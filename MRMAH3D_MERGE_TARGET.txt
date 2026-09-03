@@ -1,0 +1,107 @@
+MR.MAH 3D — PHASE 1 ADDITIVE RETURN — MERGE INSTRUCTIONS
+
+This branch is an ADDITIVE-ONLY return. Every path in it is NEW.
+No MAHFITT production file is modified, and none is included here.
+
+WHY THIS IS A DELTA AND NOT A CHECKOUT
+--------------------------------------
+The GitHub repository this session was given (jackedjah/Junctional-) was
+EMPTY — no commits, no branches. The only MAHFITT source available was the
+uploaded R83 changed-files archive:
+
+    MAHFITT_R82_MRMAH_MICRO_SPECULAR_EDGE_MRMAH_VISIBILITY_CLOSURE_CLAUDE_RETURN.zip
+    which itself merges into  branch claude/mrmah-ps3-render-parity-vvpkkj
+                              commit 8bc4fff
+
+That archive supplied complete copies of mygym.js, mygym.css and
+netlify/functions/mygym.js, which were sufficient to derive the conventions
+this work follows (see EVIDENCE below). It did not supply the repository.
+
+jackedjah/Junctional- is a PUBLIC repository. MAHFITT production source was
+therefore deliberately NOT committed to it. Only new, original 3D-laboratory
+files are present.
+
+MERGE
+-----
+Copy these paths into the MAHFITT checkpoint, preserving repository-relative
+paths. Nothing is overwritten except CLAUDE.md, which must be MERGED if the
+checkpoint already has one.
+
+    mrmah3d/                       entire directory (renderer + lab + vendored three)
+    tools/mrmah3d-verify.mjs       browser-driven runtime verification
+    tests/mrmah3d-phase1.test.js   static contract suite
+    validation/mrmah3d/            captured render evidence
+    MRMAH3D_PHASE1_REPORT.md       implementation report
+    MRMAH3D_MERGE_TARGET.txt       this file
+    CLAUDE.md                      MERGE, do not overwrite, if one already exists
+
+VERIFY AFTER MERGE
+------------------
+    node tests/mrmah3d-phase1.test.js
+      -> 90/90 PASS
+
+    npx http-server . -p 8123 -s -c-1 &
+    node tools/mrmah3d-verify.mjs http://127.0.0.1:8123
+      -> 84/84 PASS, screenshots written to validation/mrmah3d/
+
+    # the accepted application must be unchanged by this merge:
+    node --check mygym.js
+    node tests/r83-mrmah-visibility-closure.test.js
+    node tests/r82-mrmah-micro-specular-edge.test.js
+    for f in tests/*.test.js; do node "$f" >/dev/null 2>&1 || echo "FAIL $f"; done
+      -> the failure set must stay byte-identical to the pre-merge baseline.
+         This return adds one suite and modifies none, so the only expected
+         difference is the addition of mrmah3d-phase1.
+
+PRODUCTION IMPACT
+-----------------
+None, by construction.
+
+  - The application shell in netlify/functions/mygym.js is NOT modified. It
+    does not link, load or reference anything under mrmah3d/.
+  - mygym.js and mygym.css are NOT modified.
+  - The 2.5D Mr.Mah rig (fabiRigHTML) is NOT modified and remains the shipped
+    character on both AI Chat and MAH Protocol.
+  - The lab is a standalone document that loads no MAHFITT stylesheet or
+    script. It is reachable only by typing its URL, carries
+    noindex,nofollow,noarchive, and is linked from nowhere.
+
+  To revert this work completely, delete the paths listed under MERGE. There
+  is nothing else to undo.
+
+OPTIONAL HARDENING (NOT APPLIED)
+--------------------------------
+The lab is served as a static file, so it is technically reachable in
+production by URL. It is inert — it renders a grey placeholder and touches no
+member data or backend action — but if you want it unreachable on the
+production deploy, add a rule to netlify.toml. That file was not present in
+the supplied archive, so no such rule was written blind:
+
+    [[redirects]]
+      from = "/mrmah3d/*"
+      to = "/404.html"
+      status = 404
+      force = true
+      conditions = {Role = ["!admin"]}   # or gate on CONTEXT / branch deploys
+
+EVIDENCE THIS WORK WAS DERIVED FROM, NOT ASSUMED
+------------------------------------------------
+  runtime            vanilla JS, no framework, no bundler, no build step
+                     (netlify/functions/mygym.js shell(): plain <script defer>
+                     tags with cache-busting query strings)
+  deployment         Netlify functions + static assets served from repo root
+  tests              plain node scripts, no framework  (tests/*.test.js)
+  character owner    fabiRigHTML() in mygym.js, one inline SVG,
+                     viewBox 0 0 420 560, shared by AI Chat and MAH Protocol
+  camera framing     #mygym .fabi-grid in mygym.css:
+                     transform: perspective(470px) rotateX(64deg)
+                     -> 55 deg vertical FOV, 26 deg downward pitch
+  grid proportion    .fabi-grid background-size 50px x 38px -> 1.33 cell aspect
+  stage palette      --ink-rgb 14,17,20 / --bright-rgb 233,201,143 /
+                     --card-rgb 27,32,38
+  stage heights      620 / 530 / 500 / 456 / 432 / 318 across the
+                     560 / 380 / 768 / landscape breakpoints
+  drag conventions   bindFabiCharacterDrag: pointer capture, single active
+                     pointer, touch-action none
+  luminance rule     R83: mean character luminance ~18.5 (applies to the real
+                     Mr.Mah, NOT to the Phase 1 placeholder — see palette.js)

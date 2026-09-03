@@ -1,0 +1,5 @@
+three@0.185.1
+Build: build/three.module.min.js + build/three.core.min.js (ES modules, sibling relative import)
+Source: https://www.npmjs.com/package/three/v/0.185.1
+License: MIT (see LICENSE)
+Vendored because MAHFITT has no bundler; all client JS is served as plain static assets.

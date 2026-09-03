@@ -1,0 +1,708 @@
+{
+  "generatedAt": "2026-09-03T23:58:40.326Z",
+  "base": "http://127.0.0.1:8123",
+  "results": [
+    {
+      "id": "MOUNT-01 renderer mounts",
+      "ok": true,
+      "detail": "version 0.1.0-phase1"
+    },
+    {
+      "id": "MOUNT-02 no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "MOUNT-03 no failed requests",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "MOUNT-04 no captured page errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "MOUNT-05 real WebGL context",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "MOUNT-06 loop running",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "MOUNT-07 frames advancing",
+      "ok": true,
+      "detail": "93 frames"
+    },
+    {
+      "id": "MOUNT-08 geometry uploaded",
+      "ok": true,
+      "detail": "9 geometries"
+    },
+    {
+      "id": "MOUNT-09 draw calls issued",
+      "ok": true,
+      "detail": "9 draws, 274 tris"
+    },
+    {
+      "id": "MOUNT-10 placeholder flagged (not the real Mr.Mah)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "PIXEL-01 canvas produced content",
+      "ok": true,
+      "detail": "15.3% opaque"
+    },
+    {
+      "id": "PIXEL-02 lit pixels present",
+      "ok": true,
+      "detail": "14.02% lit"
+    },
+    {
+      "id": "PIXEL-03 specular highlights present",
+      "ok": true,
+      "detail": "7493 bright px, max luma 216"
+    },
+    {
+      "id": "PIXEL-04 shaded gradient (not flat fill)",
+      "ok": true,
+      "detail": "47 distinct colours"
+    },
+    {
+      "id": "PIXEL-05 stage stays dark (mean luma < 90)",
+      "ok": true,
+      "detail": "mean 58.9"
+    },
+    {
+      "id": "DEPTH-01 floor grid draws its receding lines",
+      "ok": true,
+      "detail": "350 rows carry converging content (a floor with no perspective scores ~0)"
+    },
+    {
+      "id": "DEPTH-02 floor grid draws its lateral lines",
+      "ok": true,
+      "detail": "20 full-width rows"
+    },
+    {
+      "id": "DEPTH-03 solid shows multiple lit planes",
+      "ok": true,
+      "detail": "7 luminance plateaus at [32,36,40,44,52,208]"
+    },
+    {
+      "id": "DEPTH-04 lit planes are separable",
+      "ok": true,
+      "detail": "spread 176 luma"
+    },
+    {
+      "id": "DRAG-01 drag changed the rendered image",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "DRAG-02 drag produced a real rotation",
+      "ok": true,
+      "detail": "yaw 1.540 rad"
+    },
+    {
+      "id": "DRAG-03 pointer released cleanly",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE-01 pause() stops the render loop",
+      "ok": true,
+      "detail": "199 -> 199 frames"
+    },
+    {
+      "id": "LIFE-02 start() resumes the loop",
+      "ok": true,
+      "detail": "199 -> 223 frames"
+    },
+    {
+      "id": "LIFE-03 hidden tab stops the loop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE-04 returning to foreground resumes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE-05 destroy() releases the WebGL context",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE-06 destroy() removes the canvas",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE-07 six mount/destroy cycles all succeed",
+      "ok": true,
+      "detail": "[true,true,true,true,true,true]"
+    },
+    {
+      "id": "RESP-small-320 renders",
+      "ok": true,
+      "detail": "300x432 dpr 1 tier low fov 56.7° lit 15.26%"
+    },
+    {
+      "id": "RESP-small-320 keeps real depth (grid converges, planes separate)",
+      "ok": true,
+      "detail": "326 converging rows, 7 lit planes"
+    },
+    {
+      "id": "RESP-small-320 no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-small-320 no horizontal page overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-small-320 pixel ratio within mobile budget",
+      "ok": true,
+      "detail": "dpr 1 (device 2)"
+    },
+    {
+      "id": "RESP-iphone-se renders",
+      "ok": true,
+      "detail": "355x432 dpr 1 tier low fov 55° lit 15.28%"
+    },
+    {
+      "id": "RESP-iphone-se keeps real depth (grid converges, planes separate)",
+      "ok": true,
+      "detail": "331 converging rows, 7 lit planes"
+    },
+    {
+      "id": "RESP-iphone-se no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-iphone-se no horizontal page overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-iphone-se pixel ratio within mobile budget",
+      "ok": true,
+      "detail": "dpr 1 (device 2)"
+    },
+    {
+      "id": "RESP-iphone-14 renders",
+      "ok": true,
+      "detail": "373x456 dpr 1 tier low fov 55° lit 14.01%"
+    },
+    {
+      "id": "RESP-iphone-14 keeps real depth (grid converges, planes separate)",
+      "ok": true,
+      "detail": "350 converging rows, 7 lit planes"
+    },
+    {
+      "id": "RESP-iphone-14 no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-iphone-14 no horizontal page overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-iphone-14 pixel ratio within mobile budget",
+      "ok": true,
+      "detail": "dpr 1 (device 3)"
+    },
+    {
+      "id": "RESP-iphone-pro-max renders",
+      "ok": true,
+      "detail": "410x456 dpr 1 tier low fov 55° lit 14.28%"
+    },
+    {
+      "id": "RESP-iphone-pro-max keeps real depth (grid converges, planes separate)",
+      "ok": true,
+      "detail": "350 converging rows, 7 lit planes"
+    },
+    {
+      "id": "RESP-iphone-pro-max no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-iphone-pro-max no horizontal page overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-iphone-pro-max pixel ratio within mobile budget",
+      "ok": true,
+      "detail": "dpr 1 (device 3)"
+    },
+    {
+      "id": "RESP-ipad-portrait renders",
+      "ok": true,
+      "detail": "740x530 dpr 1 tier low fov 55° lit 12.09%"
+    },
+    {
+      "id": "RESP-ipad-portrait keeps real depth (grid converges, planes separate)",
+      "ok": true,
+      "detail": "414 converging rows, 7 lit planes"
+    },
+    {
+      "id": "RESP-ipad-portrait no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-ipad-portrait no horizontal page overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-ipad-portrait pixel ratio within mobile budget",
+      "ok": true,
+      "detail": "dpr 1 (device 2)"
+    },
+    {
+      "id": "RESP-ipad-landscape renders",
+      "ok": true,
+      "detail": "996x530 dpr 1 tier low fov 55° lit 10.65%"
+    },
+    {
+      "id": "RESP-ipad-landscape keeps real depth (grid converges, planes separate)",
+      "ok": true,
+      "detail": "419 converging rows, 7 lit planes"
+    },
+    {
+      "id": "RESP-ipad-landscape no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-ipad-landscape no horizontal page overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-ipad-landscape pixel ratio within mobile budget",
+      "ok": true,
+      "detail": "dpr 1 (device 2)"
+    },
+    {
+      "id": "RESP-phone-landscape renders",
+      "ok": true,
+      "detail": "824x318 dpr 1 tier low fov 55° lit 9.28%"
+    },
+    {
+      "id": "RESP-phone-landscape keeps real depth (grid converges, planes separate)",
+      "ok": true,
+      "detail": "252 converging rows, 7 lit planes"
+    },
+    {
+      "id": "RESP-phone-landscape no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-phone-landscape no horizontal page overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-phone-landscape pixel ratio within mobile budget",
+      "ok": true,
+      "detail": "dpr 1 (device 3)"
+    },
+    {
+      "id": "RESP-desktop renders",
+      "ok": true,
+      "detail": "1072x530 dpr 1 tier low fov 55° lit 10.24%"
+    },
+    {
+      "id": "RESP-desktop keeps real depth (grid converges, planes separate)",
+      "ok": true,
+      "detail": "420 converging rows, 7 lit planes"
+    },
+    {
+      "id": "RESP-desktop no console errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-desktop no horizontal page overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESP-desktop pixel ratio within mobile budget",
+      "ok": true,
+      "detail": "dpr 1 (device 1)"
+    },
+    {
+      "id": "RESIZE-01 surface tracked the new size",
+      "ok": true,
+      "detail": "373x456 -> 996x530"
+    },
+    {
+      "id": "RESIZE-02 aspect changed the projection",
+      "ok": true,
+      "detail": "aspect 0.818 -> 1.879"
+    },
+    {
+      "id": "RESIZE-03 still rendering after resize",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "RESIZE-04 no leaked geometries after resize",
+      "ok": true,
+      "detail": "9 -> 9"
+    },
+    {
+      "id": "RESIZE-05 narrow stage widens the vertical FOV",
+      "ok": true,
+      "detail": "aspect 0.347 -> fov 75° (was 55°)"
+    },
+    {
+      "id": "RESIZE-06 FOV stays within the distortion ceiling",
+      "ok": true,
+      "detail": "fov 75° at an extreme 0.347 aspect"
+    },
+    {
+      "id": "TIER-01 pixel-ratio budget rises with tier",
+      "ok": true,
+      "detail": "low 1 / medium 1.5 / high 2 on a DPR 3 device"
+    },
+    {
+      "id": "TIER-02 low tier caps at DPR 1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "TIER-03 high tier never exceeds DPR 2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "TIER-04 shadows disabled on low tier",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "TIER-05 shadows render above low tier",
+      "ok": true,
+      "detail": "medium 2241px, high 3800px of cast shadow"
+    },
+    {
+      "id": "TIER-06 shadow map size scales with tier",
+      "ok": true,
+      "detail": "512 -> 1024"
+    },
+    {
+      "id": "MOTION-01 prefers-reduced-motion is honoured",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "MOTION-02 idle bob disabled under reduced motion",
+      "ok": true,
+      "detail": "y=0"
+    },
+    {
+      "id": "MOTION-03 still renders under reduced motion",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "responsive": [
+    {
+      "viewport": "small-320",
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 300,
+      "height": 432,
+      "fov": 56.7,
+      "camAspect": 0.694,
+      "reducedMotion": false,
+      "placeholder": true,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 76,
+        "fps": 60,
+        "avgMs": 0.41,
+        "tierDrops": 0
+      },
+      "drawCalls": 9,
+      "triangles": 274,
+      "geometries": 9,
+      "textures": 1,
+      "litFraction": 0.15256666666666666,
+      "meanLuma": 59.51900822336912,
+      "partialRows": 326,
+      "plateaus": 7
+    },
+    {
+      "viewport": "iphone-se",
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 355,
+      "height": 432,
+      "fov": 55,
+      "camAspect": 0.822,
+      "reducedMotion": false,
+      "placeholder": true,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 76,
+        "fps": 60,
+        "avgMs": 0.44,
+        "tierDrops": 0
+      },
+      "drawCalls": 9,
+      "triangles": 274,
+      "geometries": 9,
+      "textures": 1,
+      "litFraction": 0.15276760563380282,
+      "meanLuma": 60.85538913529342,
+      "partialRows": 331,
+      "plateaus": 7
+    },
+    {
+      "viewport": "iphone-14",
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 373,
+      "height": 456,
+      "fov": 55,
+      "camAspect": 0.818,
+      "reducedMotion": false,
+      "placeholder": true,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 75,
+        "fps": 60,
+        "avgMs": 0.48,
+        "tierDrops": 0
+      },
+      "drawCalls": 9,
+      "triangles": 274,
+      "geometries": 9,
+      "textures": 1,
+      "litFraction": 0.14010723860589813,
+      "meanLuma": 58.86538382822192,
+      "partialRows": 350,
+      "plateaus": 7
+    },
+    {
+      "viewport": "iphone-pro-max",
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 410,
+      "height": 456,
+      "fov": 55,
+      "camAspect": 0.899,
+      "reducedMotion": false,
+      "placeholder": true,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 75,
+        "fps": 60,
+        "avgMs": 0.43,
+        "tierDrops": 0
+      },
+      "drawCalls": 9,
+      "triangles": 274,
+      "geometries": 9,
+      "textures": 1,
+      "litFraction": 0.14280625,
+      "meanLuma": 60.57585291414976,
+      "partialRows": 350,
+      "plateaus": 7
+    },
+    {
+      "viewport": "ipad-portrait",
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 740,
+      "height": 530,
+      "fov": 55,
+      "camAspect": 1.396,
+      "reducedMotion": false,
+      "placeholder": true,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 77,
+        "fps": 60,
+        "avgMs": 0.41,
+        "tierDrops": 0
+      },
+      "drawCalls": 9,
+      "triangles": 274,
+      "geometries": 9,
+      "textures": 1,
+      "litFraction": 0.12086875,
+      "meanLuma": 65.31749637856369,
+      "partialRows": 414,
+      "plateaus": 7
+    },
+    {
+      "viewport": "ipad-landscape",
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 996,
+      "height": 530,
+      "fov": 55,
+      "camAspect": 1.879,
+      "reducedMotion": false,
+      "placeholder": true,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 76,
+        "fps": 60,
+        "avgMs": 0.57,
+        "tierDrops": 0
+      },
+      "drawCalls": 9,
+      "triangles": 274,
+      "geometries": 9,
+      "textures": 1,
+      "litFraction": 0.10649375,
+      "meanLuma": 71.08194732578794,
+      "partialRows": 419,
+      "plateaus": 7
+    },
+    {
+      "viewport": "phone-landscape",
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 824,
+      "height": 318,
+      "fov": 55,
+      "camAspect": 2.591,
+      "reducedMotion": false,
+      "placeholder": true,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 75,
+        "fps": 60,
+        "avgMs": 0.51,
+        "tierDrops": 0
+      },
+      "drawCalls": 9,
+      "triangles": 274,
+      "geometries": 9,
+      "textures": 1,
+      "litFraction": 0.09275157232704402,
+      "meanLuma": 80.92497382577642,
+      "partialRows": 252,
+      "plateaus": 7
+    },
+    {
+      "viewport": "desktop",
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 1072,
+      "height": 530,
+      "fov": 55,
+      "camAspect": 2.023,
+      "reducedMotion": false,
+      "placeholder": true,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 76,
+        "fps": 60,
+        "avgMs": 0.41,
+        "tierDrops": 0
+      },
+      "drawCalls": 9,
+      "triangles": 274,
+      "geometries": 9,
+      "textures": 1,
+      "litFraction": 0.1024375,
+      "meanLuma": 72.58036033735895,
+      "partialRows": 420,
+      "plateaus": 7
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-mrmah-lab="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- DEVELOPMENT-ONLY SURFACE. Not linked from any MAHFITT page, not part of the
+     app shell, and excluded from indexing. It loads no MAHFITT production
+     script or stylesheet, so it cannot affect the accepted application. -->
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#0E1114">
+<meta name="color-scheme" content="dark">
+<title>MR.MAH 3D LAB · development only</title>
+<link rel="stylesheet" href="./lab.css">
+</head>
+<body>
+
+<div class="lab-flag" role="note">
+  <b>DEVELOPMENT LABORATORY</b>
+  <span>Not production · placeholder geometry · not Mr.Mah</span>
+</div>
+
+<main class="lab">
+  <!-- The glass box. Everything inside this element is WebGL. Everything
+       outside it is ordinary DOM, exactly as normal MAHFITT is. -->
+  <div class="lab-stage" id="stage" data-mrmah-host aria-label="Mr.Mah 3D stage">
+    <noscript><p class="lab-fallback">This laboratory requires JavaScript.</p></noscript>
+  </div>
+
+  <p class="lab-hint" id="hint">Drag left and right across the stage to turn the figure.</p>
+
+  <div class="lab-panel">
+    <div class="lab-readout" id="readout" aria-live="polite">starting…</div>
+    <div class="lab-controls">
+      <button type="button" data-act="pause">Pause</button>
+      <button type="button" data-act="start">Resume</button>
+      <button type="button" data-act="destroy">Destroy</button>
+      <button type="button" data-act="remount">Re-mount</button>
+      <button type="button" data-act="tier">Cycle quality</button>
+    </div>
+    <div class="lab-sizes">
+      <span>Preview width:</span>
+      <button type="button" data-w="375">375</button>
+      <button type="button" data-w="393">393</button>
+      <button type="button" data-w="430">430</button>
+      <button type="button" data-w="768">768</button>
+      <button type="button" data-w="1024">1024</button>
+      <button type="button" data-w="0">full</button>
+    </div>
+  </div>
+</main>
+
+<script type="module" src="./lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+/* MR.MAH 3D LAB — development-only stylesheet.
+
+   Standalone on purpose. It does not import, extend or override mygym.css, so
+   nothing here can reach a production MAHFITT surface. The theme tokens below
+   are copies of MAHFITT's defaults, declared locally, so the lab lights the
+   stage in the right palette without taking a dependency on the production
+   sheet. */
+
+:root {
+  --ink-rgb: 14, 17, 20;
+  --bright-rgb: 233, 201, 143;
+  --card-rgb: 27, 32, 38;
+  --ink: rgb(var(--ink-rgb));
+  --bright: rgb(var(--bright-rgb));
+  --card: rgb(var(--card-rgb));
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ink);
+  color: rgba(var(--bright-rgb), .82);
+  font: 500 13px/1.45 "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.lab-flag {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding: 8px 14px;
+  background: rgba(var(--bright-rgb), .1);
+  border-bottom: 1px solid rgba(var(--bright-rgb), .28);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+.lab-flag b { color: var(--bright); letter-spacing: .12em; }
+.lab-flag span { opacity: .62; }
+
+.lab {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+/* THE GLASS BOX.
+   The renderer's canvas is appended here and fills it. The stage is sized in
+   the same language as the production stage: a height that steps down on small
+   phones and short landscape viewports, mirroring the #mygym .fabi-stage
+   breakpoints in mygym.css (620 / 530 / 500 / 456 / 432 / 318). */
+.lab-stage {
+  position: relative;
+  width: 100%;
+  max-width: var(--lab-preview-width, none);
+  height: 500px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(var(--bright-rgb), .16);
+  border-radius: 10px;
+  background:
+    radial-gradient(ellipse 58% 30% at 50% 56%,
+      rgba(var(--bright-rgb), .055), rgba(var(--bright-rgb), .014) 42%, transparent 74%),
+    var(--ink);
+  /* Contains the canvas's own compositing so the lab cannot leak paint. */
+  isolation: isolate;
+  touch-action: none;
+}
+.lab-stage canvas { display: block; width: 100%; height: 100%; }
+
+.lab-fallback { padding: 24px; opacity: .7; }
+
+.lab-hint {
+  margin: 10px 2px 0;
+  font-size: 11px;
+  letter-spacing: .05em;
+  opacity: .55;
+  text-align: center;
+}
+
+.lab-panel { margin-top: 14px; display: grid; gap: 10px; }
+
+.lab-readout {
+  padding: 10px 12px;
+  border: 1px solid rgba(var(--bright-rgb), .14);
+  border-radius: 8px;
+  background: rgba(var(--card-rgb), .55);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  opacity: .9;
+}
+.lab-readout[data-error="1"] {
+  border-color: rgba(224, 96, 96, .6);
+  color: rgb(240, 160, 160);
+}
+
+.lab-controls, .lab-sizes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lab-sizes span { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .5; }
+
+button {
+  appearance: none;
+  min-height: 38px;           /* comfortable touch target on a phone */
+  padding: 8px 14px;
+  border: 1px solid rgba(var(--bright-rgb), .3);
+  border-radius: 8px;
+  background: rgba(var(--bright-rgb), .07);
+  color: rgba(var(--bright-rgb), .9);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+button:hover { background: rgba(var(--bright-rgb), .14); }
+button:active { transform: translateY(1px); }
+button[aria-pressed="true"] { background: rgba(var(--bright-rgb), .24); color: #fff; }
+
+@media (max-width: 560px) { .lab-stage { height: 456px; } .lab { padding: 10px; } }
+@media (max-width: 380px) { .lab-stage { height: 432px; } }
+@media (min-width: 768px) { .lab-stage { height: 530px; } }
+@media (max-height: 460px) and (orientation: landscape) { .lab-stage { height: 318px; } }
