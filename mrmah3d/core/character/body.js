@@ -314,7 +314,11 @@ export function buildBody(materials, P) {
        upper body and it rounds over the top of the bicep. */
     /* R98: a shade more cap (r0 0.240 -> 0.252) — "slightly more jacked" —
        and the belly below goes with it. */
-    var D = ARMS_.deltoid || { innerX: 0.300, innerY: 2.050, outerX: 0.590, outerY: 1.960, r0: 0.252 };
+    /* R99: the root goes DEEPER into the chest (0.300 -> 0.262) and a shade
+       higher, so the cap grows out of the trapezius and the front lobe
+       overlaps the pec's outer plane — the shoulder wrapping into the body
+       rather than sitting beside it. */
+    var D = ARMS_.deltoid || { innerX: 0.262, innerY: 2.062, outerX: 0.590, outerY: 1.960, r0: 0.252 };
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;
@@ -425,28 +429,35 @@ export function buildBody(materials, P) {
        0.055, so it was buried by a factor of five. Sampled as a short polyline
        along the top instead, with the profile applied exactly as `segment` does,
        so it rides the swell rather than cutting through it. */
-    var ridgePts = [];
-    var STEPS = 6;
-    for (var ri = 0; ri <= STEPS; ri++) {
-      var rt = ri / STEPS;
-      var rr = (deltoidR0 + (deltoidR1 - deltoidR0) * rt) * deltoidProfile(rt);
-      ridgePts.push(
-        inner[0] + (outer[0] - inner[0]) * rt,
-        inner[1] + (outer[1] - inner[1]) * rt + rr * 0.90,
-        inner[2] + (outer[2] - inner[2]) * rt + rr * 0.16
-      );
+    /* R99 — THE RIDGE LINE IS GONE. It was authored when the cap's own
+       planes could not carry the shoulder; they can now (the platinum coat
+       lights the crest as a PLANE, which is what the godform reference
+       shows), and the godform brief rules out light that defines anatomy as
+       a stroke. Kept as a switch for the record. */
+    if (ARMS_.deltoidRidge) {
+      var ridgePts = [];
+      var STEPS = 6;
+      for (var ri = 0; ri <= STEPS; ri++) {
+        var rt = ri / STEPS;
+        var rr = (deltoidR0 + (deltoidR1 - deltoidR0) * rt) * deltoidProfile(rt);
+        ridgePts.push(
+          inner[0] + (outer[0] - inner[0]) * rt,
+          inner[1] + (outer[1] - inner[1]) * rt + rr * 0.90,
+          inner[2] + (outer[2] - inner[2]) * rt + rr * 0.16
+        );
+      }
+      var ridgeSeg = [];
+      for (var rj = 0; rj < STEPS; rj++) {
+        ridgeSeg.push(
+          ridgePts[rj * 3], ridgePts[rj * 3 + 1], ridgePts[rj * 3 + 2],
+          ridgePts[rj * 3 + 3], ridgePts[rj * 3 + 4], ridgePts[rj * 3 + 5]
+        );
+      }
+      var ridge = new BufferGeometry();
+      ridge.setAttribute('position', new Float32BufferAttribute(ridgeSeg, 3));
+      group.add(new LineSegments(ridge, materials.edgeHero));
+      owned.push(ridge);
     }
-    var ridgeSeg = [];
-    for (var rj = 0; rj < STEPS; rj++) {
-      ridgeSeg.push(
-        ridgePts[rj * 3], ridgePts[rj * 3 + 1], ridgePts[rj * 3 + 2],
-        ridgePts[rj * 3 + 3], ridgePts[rj * 3 + 4], ridgePts[rj * 3 + 5]
-      );
-    }
-    var ridge = new BufferGeometry();
-    ridge.setAttribute('position', new Float32BufferAttribute(ridgeSeg, 3));
-    group.add(new LineSegments(ridge, materials.edgeHero));
-    owned.push(ridge);
   });
 
   /* ---- no neck -------------------------------------------------------- */

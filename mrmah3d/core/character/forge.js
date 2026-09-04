@@ -726,6 +726,34 @@ export function loft(sections, sides, options) {
     positions: positions, faces: faces };
 }
 
+/* R99 — which WORLD direction a limb's ring angle d = +pi/2 points in.
+
+   `segment` hands its shape and zone functions an angle relative to the
+   limb's FRONT, which makes "the bicep is at d = 0" pose-independent — but it
+   leaves "which side is the INNER arm" unknowable from d alone: worked
+   through, +pi/2 is world +x on a limb whose axis points down and world -x on
+   one whose axis points up, so the same rule puts the shadow valley on the
+   outside of one arm and the inside of the other. This reproduces the basis
+   and front-angle derivation exactly and returns the +pi/2 direction, so a
+   caller can decide the sign per limb instead of guessing it. */
+export function limbSideDirection(a, b) {
+  var dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2];
+  var len = Math.hypot(dx, dy, dz) || 1e-6;
+  var ux = dx / len, uy = dy / len, uz = dz / len;
+  var hx = Math.abs(uy) < 0.99 ? 0 : 1, hy = Math.abs(uy) < 0.99 ? 1 : 0, hz = 0;
+  var rx = hy * uz - hz * uy, ry = hz * ux - hx * uz, rz = hx * uy - hy * ux;
+  var rl = Math.hypot(rx, ry, rz) || 1; rx /= rl; ry /= rl; rz /= rl;
+  var zx = ry * uz - rz * uy, zy = rz * ux - rx * uz, zz = rx * uy - ry * ux;
+  var fdot = uz;
+  var px = -fdot * ux, py = -fdot * uy, pz = 1 - fdot * uz;
+  var pl = Math.hypot(px, py, pz);
+  var frontAngle = pl < 1e-6 ? 0
+    : Math.atan2((px * zx + py * zy + pz * zz) / pl, (px * rx + py * ry + pz * rz) / pl);
+  var an = frontAngle + Math.PI / 2;
+  var c = Math.cos(an), s = Math.sin(an);
+  return [c * rx + s * zx, c * ry + s * zy, c * rz + s * zz];
+}
+
 /* A tapered faceted limb segment running from point A to point B.
    Built along +Y then oriented, so the caller works in world positions and
    never has to think about rotations. */

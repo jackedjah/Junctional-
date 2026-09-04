@@ -69,7 +69,7 @@ export var PALETTE = {
      sat at chroma 68. Same luma as the steel, the hue moved to sapphire. */
   /* R97: a step deeper again — the R97 references' backs are 76% under 32
      luma and their chests 64%; this build had reached 44% and 30%. */
-  crystalDeep: 0x1c2a52, /* the darkest facets — deep navy */
+  crystalDeep: 0x1b2340, /* the darkest facets — deep navy; R99: toward steel, the godform reference's darks are 76% blue where this build's were 96% */
   /* R98 — the platinum coat's albedo: a cool near-neutral silver, a touch
      blue so it reads as platinum under a moon rather than as chrome. Never
      theme-derived (see crystal-shader.js). */
@@ -225,11 +225,14 @@ export function createCrystalMaterials(options) {
      GUNMETAL, not the cavity's void: Reference A's joints are machined steel
      between the crystal masses, dark but with a metallic sheen that turns
      with the arm. Drawn in the cavity material they rendered as black cuts. */
+  /* R99: lighter and glossier — the joints read as compressed dark crystal
+     with a steel sheen rather than as black connector bands, which the
+     godform brief rules out. */
   var joint = new MeshStandardMaterial({
-    color: new Color(PALETTE.joint || 0x34486c),
-    roughness: 0.38,
-    metalness: 0.72,
-    envMapIntensity: 2.4,
+    color: new Color(PALETTE.joint || 0x3c5484),
+    roughness: 0.30,
+    metalness: 0.70,
+    envMapIntensity: 3.2,
     flatShading: true
   });
 
@@ -435,7 +438,10 @@ export function createCrystalMaterials(options) {
        both together — CLAUDE.md, "absorption widens"). */
     fresnelBoost: 1.55,
     fresnelPower: 2.0,
-    innerDark: 0.64,
+    /* R99: 0.64 -> 0.72. The godform brief wants near-black to dominate
+       ("the dark makes the light look expensive"); absorption is the control
+       that widens the dark end without touching the lit planes. */
+    innerDark: 0.72,
     /* R96 — the facet dome (crystal-shader.js): every large plane grades from
        its edge to its centre, which is what Reference A's glossy planes are. */
     dome: 0.42,
@@ -484,7 +490,7 @@ export function createCrystalMaterials(options) {
     coatColor: PALETTE.platinum,
     coatMetal: 0.66,
     coatRough: 0.05,
-    coatEnv: 0.55
+    coatEnv: 0.70   /* R99: rarer coat, hotter catches — the reference chest has 14% above 160 luma, this had 6% */
   });
 
   /* R94 — THE HEAD HAS ITS OWN MATERIAL, and it is ICE.

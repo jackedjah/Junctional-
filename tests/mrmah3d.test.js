@@ -681,5 +681,35 @@ if (exists('CLAUDE.md')) {
   ok('R98-variant-clavicle-carries-coat', /coat: 0\.30/.test(read('mrmah3d/core/character/variants.js')));
 })();
 
+/* ---- R99: the godform — anatomy first, shadow second, facets third ------- */
+(function () {
+  const forge = read('mrmah3d/core/character/forge.js');
+  const propsSrc = read('mrmah3d/core/character/proportions.js');
+  const limbs = read('mrmah3d/core/character/limbs.js');
+  const body = read('mrmah3d/core/character/body.js');
+  const regions = read('mrmah3d/core/character/regions.js');
+  ok('R99-godform-reference-present', exists('reference/mrmah-refI-godform-front.jpg'));
+  /* the underside of the pec is its own dark zone — contact shadow between masses */
+  ok('R99-pec-underside-zone', /function pecUnderZone/.test(propsSrc) && /zoneAt: pecUnderZone/.test(propsSrc));
+  /* the underarm pocket is lost */
+  ok('R99-underarm-pocket-lost', /ae < 2\.05\) return \{ classes: REGIONS\.OBLIQUE\.classes[^}]*index: 0/.test(propsSrc));
+  /* the inner arm is a shadow valley, decided per limb from its real basis */
+  ok('R99-inner-arm-valley', /export function limbSideDirection/.test(forge) && /innerSignOf/.test(limbs) && /armZone\(REGIONS\.UPPER_ARM\.classes, upperInner\)/.test(limbs));
+  /* the chest has depth: every chest ring is deeper than 0.85 of its width */
+  const chestRows = propsSrc.match(/\{ y: (1\.895|1\.970|2\.080), w: ([\d.]+), d: ([\d.]+)/g) || [];
+  ok('R99-chest-has-depth', chestRows.length === 3 && chestRows.every(r => { const m = r.match(/w: ([\d.]+), d: ([\d.]+)/); return Number(m[2]) >= Number(m[1]) * 0.85; }), chestRows.join(' | '));
+  /* the neck is a column, not a connector: at least 0.13 half-width under the chin */
+  const neckRow = propsSrc.match(/\{ y: 2\.315, w: ([\d.]+)/);
+  ok('R99-neck-carries-the-head', neckRow && Number(neckRow[1]) >= 0.13, 'neck half-width ' + (neckRow && neckRow[1]));
+  /* no authored shoulder stroke: the deltoid's ridge line is off */
+  ok('R99-no-shoulder-ridge-stroke', /if \(ARMS_\.deltoidRidge\)/.test(body) && !/deltoidRidge:\s*true/.test(propsSrc));
+  /* the lowered hand is a fist */
+  ok('R99-lowered-hand-is-a-fist', /var curl = opts\.open \? 0\.22 : 0\.5[0-9]/.test(limbs));
+  /* the deltoid's root is buried in the chest, inboard of the pec's outer plane */
+  ok('R99-deltoid-root-buried', /innerX: 0\.2[0-9]{2}/.test(body));
+  /* the arm's named rows reach the dark end */
+  ok('R99-arm-rows-reach-dark', /var UPPER_ARM = \[\s*\/\*[^]*?\*\/\s*var UPPER_ARM = \[|var UPPER_ARM = \[\n\s*\[0\.14,\s*0\.08,\s*-0\.10,\s*0\.7/.test(regions));
+})();
+
 console.log('\n' + pass + '/' + (pass + fail) + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

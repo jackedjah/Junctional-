@@ -63,12 +63,14 @@ var HEAD_SHELL = [
 /* Steel-blue, with a dark minority and no silver: the neck sits in the chin's
    shadow and reads as a machined column, brighter than the chest below it and
    much darker than the ice head above. */
+/* R99: darker — the column sits in the chin's shadow and partly disappears
+   into it ("dark planes beneath the jaw"); its light is on its edges. */
 var NECK = [
-  [0.14,   0.10,  -0.12,   0.62,  0.06],
-  [0.26,   0.06,  -0.04,   0.36,  0.16],
-  [0.36,   0.03,   0.04,   0.14,  0.30],
-  [0.18,   0.00,   0.12,  -0.06,  0.50],
-  [0.06,  -0.03,   0.18,  -0.30,  0.55]
+  [0.24,   0.10,  -0.12,   0.66,  0.06],
+  [0.30,   0.06,  -0.04,   0.40,  0.16],
+  [0.30,   0.03,   0.04,   0.16,  0.30],
+  [0.12,   0.00,   0.12,  -0.06,  0.50],
+  [0.04,  -0.03,   0.18,  -0.30,  0.55]
 ];
 
 /* THE LOWER TAPER — dark spear, sapphire flanks, bright rails.
@@ -153,18 +155,22 @@ var DELT = [
    bottom third of these tables is never reached; reweighting the darkest
    entries measured as an exact no-op on the arm histogram. The arms' value is
    set by what they reflect and by the deep colour, not by these rows. */
+/* R99: the rows the arm's zones NAME are what set its value (a named row
+   ignores the lift — see facetClass), and the godform reference's arm is
+   49% under 32 luma where this build's was 9%: the lost side, the navy side
+   and the flank all go deeper; the bicep plane keeps its light. */
 var UPPER_ARM = [
-  [0.14,   0.08,  -0.10,   0.56,  0.14],
-  [0.24,   0.05,  -0.04,   0.34,  0.24],
-  [0.32,   0.03,   0.02,   0.14,  0.40],
+  [0.14,   0.08,  -0.10,   0.72,  0.12],
+  [0.24,   0.05,  -0.04,   0.48,  0.22],
+  [0.32,   0.03,   0.02,   0.24,  0.38],
   [0.18,   0.01,   0.08,  -0.04,  0.60],
   [0.08,  -0.02,   0.16,  -0.24,  0.70],
   [0.04,  -0.05,   0.30,  -0.66,  0.22]
 ];
 var FOREARM = [
-  [0.12,   0.08,  -0.10,   0.52,  0.12],
-  [0.22,   0.05,  -0.02,   0.30,  0.22],
-  [0.28,   0.02,   0.06,   0.10,  0.38],
+  [0.12,   0.08,  -0.10,   0.68,  0.10],
+  [0.22,   0.05,  -0.02,   0.44,  0.20],
+  [0.28,   0.02,   0.06,   0.20,  0.36],
   [0.22,   0.00,   0.14,  -0.10,  0.58],   /* steel */
   [0.10,  -0.02,   0.20,  -0.32,  0.50],
   [0.06,  -0.05,   0.32,  -0.70,  0.20]    /* silver */
@@ -196,7 +202,7 @@ export var REGIONS = {
      coverage rule, and the coat has to be RARE enough that a platinum plane
      beside a sapphire one reads as a coat on a crystal, not as a silver
      figure with blue gaps. Hero planes stay full; everything else drops. */
-  BODY:        { classes: BODY,       lift: 0.06, coat: 0.28 },
+  BODY:        { classes: BODY,       lift: 0.06, coat: 0.22 },   /* R99: rarer still off the hero planes */
   HEAD_SHELL:  { classes: HEAD_SHELL, lift: 0.00, coat: 0.80 },
   NECK:        { classes: NECK,       lift: 0.00, coat: 0.30 },
   TAPER_SPEAR: { classes: TAPER_SPEAR, lift: 0.00, coat: 0.10 },
@@ -207,7 +213,7 @@ export var REGIONS = {
   ABS:         { classes: ABS,        lift: 0.00, coat: 0.38 },
   OBLIQUE:     { classes: OBLIQUE,    lift: 0.00, coat: 0.18 },
   DELT:        { classes: DELT,       lift: 0.00, coat: 1.00 },
-  UPPER_ARM:   { classes: UPPER_ARM,  lift: 0.00, coat: 0.80 },
-  FOREARM:     { classes: FOREARM,    lift: 0.00, coat: 0.72 },
+  UPPER_ARM:   { classes: UPPER_ARM,  lift: 0.00, coat: 0.55 },   /* R99: histogrammed, the arm was mean 81 against the godform reference's 54 */
+  FOREARM:     { classes: FOREARM,    lift: 0.00, coat: 0.50 },
   HAND:        { classes: HAND,       lift: 0.00, coat: 0.22 }
 };

@@ -162,12 +162,16 @@ export var HEAD = {
      transitions rather than one deep funnel. The rear is a plate too (see
      backInset below). Head depth over all falls from 1.19 to 0.72 of the
      half-width. */
-  faceInset: 0.66,               /* plate size as a share of the diamond */
-  crownInset: 0.91,              /* outer chamfer band */
+  /* R99: a THICKER rim — the godform reference's head frame is a wide,
+     physically deep chamfer, several planes across, not a stroke; the band
+     grows from 0.18 to 0.21 of the half-width and the screen keeps two
+     thirds of the diamond. */
+  faceInset: 0.645,              /* plate size as a share of the diamond */
+  crownInset: 0.895,             /* outer chamfer band */
   crownZ: 0.20,                  /* its depth, share of halfDepth */
-  bevelInset: 0.820,             /* the lip — the inner edge of the chamfer */
+  bevelInset: 0.790,             /* the lip — the inner edge of the chamfer */
   bevelZ: 0.40,                  /* 0.096 forward of the girdle */
-  innerInset: 0.750,             /* the cavity wall's foot */
+  innerInset: 0.720,             /* the cavity wall's foot */
   innerZ: 0.04,                  /* the wall drops nearly to the girdle plane */
   /* the rear: a side band from the silhouette to a back ring, then a flat
      back plate — a streamlined plate rather than a pyramid */
@@ -311,12 +315,15 @@ function chestShape(k) {
     /* R95-BB: the valley softens a little (0.26 -> 0.21) and the pec crowns
        come forward (0.245 -> 0.28): the reference's pecs are thick SHELVES
        with a groove between them, not two swells either side of a slot. */
-    var sternum = -lobe(a, 0, 0.38) * 0.210;
-    var pec = (lobe(a, 0.70, 0.52) + lobe(a, -0.70, 0.52)) * 0.320;
+    /* R99: a deeper valley and a thicker shelf — the godform reference's pec
+       is a mass with real front-to-back projection, and the sternum falls
+       away between the two; the lats flare a little more under the arm. */
+    var sternum = -lobe(a, 0, 0.38) * 0.245;
+    var pec = (lobe(a, 0.70, 0.52) + lobe(a, -0.70, 0.52)) * 0.360;
     /* R97: the lats — the ribcage's side planes swell so the V reads from
        the front AND the back; the back itself is flattened, grooved down the
        spine and carries a pair of erector / lat planes either side of it. */
-    var lat = (lobe(a, Math.PI / 2 + 0.25, 0.60) + lobe(a, -Math.PI / 2 - 0.25, 0.60)) * 0.135;
+    var lat = (lobe(a, Math.PI / 2 + 0.25, 0.60) + lobe(a, -Math.PI / 2 - 0.25, 0.60)) * 0.165;
     var back = lobe(a, Math.PI, 1.00) * -0.100;
     var spine = -lobe(a, Math.PI, 0.20) * 0.080;
     var erector = (lobe(a, Math.PI - 0.42, 0.30) + lobe(a, -Math.PI + 0.42, 0.30)) * 0.060;
@@ -395,7 +402,10 @@ function pecZone(row) {
     if (ae < sternum) return { classes: REGIONS.STERNUM.classes, seed: 10 + row, index: 0, coat: 0 };
     if (ae < pecSplit) return { classes: table.classes, seed: 20 + row * 4 + side, index: 1, coat: table.coat * 0.60 };
     if (ae < pecOuter) return { classes: table.classes, seed: 22 + row * 4 + side, index: 2, coat: table.coat };
-    if (ae < 2.05) return { classes: REGIONS.OBLIQUE.classes, seed: 30 + row * 2 + side, index: 1, coat: 0.08 };   /* lats / the underarm pocket */
+    /* R99: the underarm pocket is LOST — the darkest row, no coat — so the
+       deltoid and the pec read as masses with a shadow between them rather
+       than as two lit objects touching. */
+    if (ae < 2.05) return { classes: REGIONS.OBLIQUE.classes, seed: 30 + row * 2 + side, index: 0, coat: 0.04 };   /* lats / the underarm pocket */
     /* R97 — THE BACK IS AUTHORED TOO: a near-black spine channel, erector
        planes either side of it, and the lat / upper-back planes out to the
        arm, so the rear reads as designed rather than as leftover geometry. */
@@ -403,6 +413,18 @@ function pecZone(row) {
     if (ae > 2.50) return { classes: REGIONS.ABS.classes, seed: 92 + row * 2 + side, index: 0, coat: 0.35 };    /* erectors */
     return { classes: REGIONS.OBLIQUE.classes, seed: 96 + row * 2 + side, index: 1, coat: 0.45 };               /* lat / upper back */
   };
+}
+/* R99 — THE UNDERSIDE OF THE PEC. The crease ring where the chest shelf
+   turns under is its own zone: across the whole pec width it takes the
+   sternum table's second row (a deep, uncoated plane), so the shelf casts a
+   shadow onto the ribcage below it — the contact darkening the godform brief
+   asks for between overlapping masses — and outside the pecs it falls
+   through to the upper core. */
+function pecUnderZone(a, y) {
+  var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
+  if (ae < 0.24) return { classes: REGIONS.STERNUM.classes, seed: 14, index: 0, coat: 0 };
+  if (ae < 1.30) return { classes: REGIONS.STERNUM.classes, seed: 15 + side, index: 1, coat: 0 };
+  return coreZone(3)(a, y);
 }
 function coreZone(row) {
   return function (a, y) {
@@ -493,7 +515,7 @@ function clavicleShape(k) {
   return function (a) {
     var hollow = -lobe(a, 0, 0.60) * 0.160;
     var collar = (lobe(a, 0.95, 0.50) + lobe(a, -0.95, 0.50)) * 0.150;
-    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.170;
+    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.220;   /* R99: the traps climb to carry the head */
     /* R97: a SHOULDER SHELF at the sides, so the torso's own line runs out
        under the deltoid cap and the cap grows out of the trapezius instead of
        sitting on it — the trap -> delt continuity the brief asks for. */
@@ -770,18 +792,23 @@ export var TORSO = {
     /* R97 — THE LOWER PEC TURN: a crease ring where the chest shelf ends and
        a belly ring above it, so the pectoral is a mass with a lower edge
        that falls into shadow rather than a plane that fades into the abs. */
-    { y: 1.830, w: 0.280, d: 0.236, facet: -0.0060, crystal: 0.0300, crystalY: 0.0080,
-      shape: chestShape(0.62), zoneAt: coreZone(3) },
-    { y: 1.895, w: 0.312, d: 0.262, facet: 0.0050, crystal: 0.0320, crystalY: 0.0080,
+    /* R99 — THE CHEST HAS DEPTH. The godform reference's pec is a thick shelf
+       projecting toward the viewer; the chest rings' front-to-back radius
+       rises about 9% while the width holds, the crease ring under the shelf
+       comes in so the shelf overhangs it, and that ring takes its own dark
+       zone (pecUnderZone). */
+    { y: 1.830, w: 0.272, d: 0.252, facet: -0.0060, crystal: 0.0300, crystalY: 0.0080,
+      shape: chestShape(0.62), zoneAt: pecUnderZone },
+    { y: 1.895, w: 0.312, d: 0.286, facet: 0.0050, crystal: 0.0320, crystalY: 0.0080,
       shape: chestShape(0.96), hero: 0.30, zoneAt: pecZone(0) },
     /* the pectoral line — the strongest cross-section shaping on the body */
-    { y: 1.970, w: 0.325, d: 0.268, facet: 0.0055, crystal: 0.0340, crystalY: 0.0080,
+    { y: 1.970, w: 0.325, d: 0.294, facet: 0.0055, crystal: 0.0340, crystalY: 0.0080,
       shape: chestShape(1.0), hero: 0.34, zoneAt: pecZone(0) },
-    { y: 2.080, w: 0.318, d: 0.256, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
+    { y: 2.080, w: 0.318, d: 0.280, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
       shape: chestShape(0.80), hero: 0.40, zoneAt: pecZone(1) },
     /* THE SHOULDER LINE — collarbones across the front, trapezius behind */
-    { y: 2.170, w: 0.316, d: 0.226, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
-      shape: clavicleShape(1.0), dip: 0.030, hero: 0.46, zoneAt: null, coat: 0.45 },
+    { y: 2.170, w: 0.316, d: 0.242, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
+      shape: clavicleShape(1.0), dip: 0.030, hero: 0.32, zoneAt: null, coat: 0.30 },   /* R99: the shelf blew white; the godform reference's clavicle is dark under a lit shoulder */
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11
@@ -886,16 +913,23 @@ export var TORSO = {
     /* R95-BB: the trapezius ring rises with the shoulder line and is broader,
        so the neck is the reference's SHORT, THICK column — 0.12 of clear neck
        under the chin instead of 0.16, and traps that climb steeply beside it. */
-    { y: 2.205, w: 0.218, d: 0.160, facet: -0.0120, crystal: 0.024, crystalY: 0.0050, coat: 0.25,
+    /* R99 — A NECK THAT CARRIES THE HEAD. The column was 0.10-0.13 across:
+       a connector under a floating diamond. The godform reference's neck is
+       a real faceted column rising out of the trapezius, about a third of
+       the head's width, that the chin sits DOWN onto; these rings are 20%
+       wider and deeper and the trapezius ring above the shoulder line is
+       broader, so the head's lower vertex is swallowed by a column the eye
+       accepts as supporting it. */
+    { y: 2.205, w: 0.236, d: 0.172, facet: -0.0120, crystal: 0.024, crystalY: 0.0050, coat: 0.25,
       shape: clavicleShape(0.55), hero: 0.16, classesAt: neckClasses },
     /* The column's rings follow the head's lower vertex (2.324 now): the top
        ring sits 0.09 above it where the head is 0.10 wide and swallows it, and
        the visible neck from trapezius to chin is 0.12 — the reference's. */
-    { y: 2.250, w: 0.126, d: 0.104, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
+    { y: 2.250, w: 0.152, d: 0.124, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
       zc: -0.030, hero: 0.10, classesAt: neckClasses },
-    { y: 2.315, w: 0.108, d: 0.092, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
+    { y: 2.315, w: 0.132, d: 0.110, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
       zc: -0.040, hero: 0.06, classesAt: neckClasses },
-    { y: 2.368, w: 0.098, d: 0.086, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
+    { y: 2.368, w: 0.118, d: 0.100, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
       zc: -0.044, hero: 0.04, classesAt: neckClasses },
     { y: 2.412, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neckClasses }
   ],
@@ -1063,7 +1097,7 @@ export var ARMS = {
   /* R95: 0.44 -> 0.30. Reviewed against the references the arms were one navy
      band with no dark tricep side; with their class now named per strip (see
      armZone in limbs.js) the lift only needs to keep the seam ramps honest. */
-  classLift: 0.30,
+  classLift: 0.20,   /* R99: 0.30 -> 0.20 — the arm reaches its dark rows again (reference arm 49% under 32 luma, this build 9%) */
 
   /* The deltoid takes MORE lift than the arm it caps. Its exposed surface is
      mostly upward-facing, and an upward-facing plane reflects x~64 in the
@@ -1080,7 +1114,7 @@ export var ARMS = {
      things were ruled out before the lottery: the authored ridge line and the
      rim shell were each removed for a capture and neither moved it, and the
      wedges are absent at the arm's own lift. */
-  deltoidLift: 0.28,
+  deltoidLift: 0.24,
 
   profiles: {
     /* STARTS BELOW 1, which is the correction the brief asks for.
@@ -1137,7 +1171,7 @@ export var ARMS = {
          at a quarter, and the groove between them deepens so the two masses
          read as two from the side and trade dominance as the arm turns. */
       var bicep = bump(d, 0, 0.80) * 0.320 * belly;
-      var tricep = bump(d, Math.PI, 1.10) * 0.270 * rear;
+      var tricep = bump(d, Math.PI, 1.10) * 0.300 * rear;   /* R99: the tricep is a volume of its own */
       /* the groove between them, down each side of the arm */
       /* R98: the groove is deepest through the upper half, and in the lower
          half a BRACHIALIS lobe fills it either side — the lateral mass that
@@ -1146,7 +1180,7 @@ export var ARMS = {
       var low = Math.max(0, Math.min(1, (t - 0.45) / 0.35));
       low = low * low * (3 - 2 * low);
       var sides = bump(d, Math.PI / 2, 0.42) + bump(d, -Math.PI / 2, 0.42);
-      var groove = sides * -0.105 * belly * (1 - low);
+      var groove = sides * -0.125 * belly * (1 - low);   /* R99: a deeper valley between the two */
       var brachialis = sides * 0.110 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);
       return 1 + bicep + tricep + groove + brachialis;
     },
@@ -1191,7 +1225,7 @@ export var HAND = {
      and slimmer, as the references' robotic hands are. */
   digitCount: 4,
   digitLength: 0.124,
-  digitRadius: 0.021,
+  digitRadius: 0.023,   /* R99: a touch thicker — a fist's knuckles have to read */
   /* The small bright diamond above the reference's raised hand. */
   tipDiamond: 0.048
 };

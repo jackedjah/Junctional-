@@ -142,6 +142,18 @@ elbow; and a hand that cups its crystal in that crystal's own light. The
 three-quarter shows the plate's flat sides and back. The coat is neutral
 and never takes the theme.
 
+There is now a TENTH, `reference/mrmah-refI-godform-front.jpg` (R99), the
+GODFORM: the same platinum-crystal character with its anatomy CONTINUOUS —
+a deltoid that grows out of the trapezius and overlaps the pec, a thick pec
+shelf with a dark underside, a real faceted neck the chin sits down onto,
+an upper arm whose bicep and tricep are two volumes with a lost inner
+valley between arm and ribcage, a closed fist on the lowered hand, and a
+value structure that is near-black over most of the body with rare silver
+catches (chest crop: 31% under 32 luma, 14% above 160, 76% blue where this
+build's darks were 96%). It is the authority on MASS, OCCLUSION and
+CONTINUITY; the platinum pair remains the authority on the coat and the
+head plate.
+
 **Expect the silhouette score against the canonical front to be low, and do not
 chase it.** The head is deliberately 30% smaller than the canonical measurement
 and the shoulder line 0.2 units higher; a comparison against a file the design
@@ -300,6 +312,7 @@ must not be claimed from headless runs.
 | `reference/mrmah-refF-r96-female.png` | R96 — the female variant's reference |
 | `reference/mrmah-refG-r97-{threequarter,rear}.png` | R97 — the rear and three-quarter authority: back anatomy, deltoid domes, muscle bellies |
 | `reference/mrmah-refH-platinum-{front,threequarter}.png` | R98 — the MATERIAL and HEAD authority: the selective platinum coat, the plate head with its face screen, the elbow hinge |
+| `reference/mrmah-refI-godform-front.jpg` | R99 — the GODFORM: mass, occlusion and anatomical continuity |
 | `reference/mrmah-refE-bodybuilder-{a,b}.png` | the body-proportion authority where Reference A is silent |
 | `reference/mrmah-refD-guardian-{a,b,c,d}.png` | the authority on material, light and world |
 | `reference/mrmah-refA-anatomical.png` | proportion and anatomy where the bodybuilder set is silent |
@@ -1037,3 +1050,39 @@ lip survives rotation.
 The male's clavicle ring got an explicit reduced share; the female's did
 not, and her shelf blew white under the same key. When a per-plane weight
 is added to a ring table, every proportion set carries that ring.
+
+### A named row ignores the lift (R99)
+
+`facetClass` takes `classIndex` as the row outright, so a zone that NAMES
+its class is untouched by any lift or hero ramp on that solid. The arm's
+lift was cut from 0.30 to 0.20 to reach its dark rows and the histogram did
+not move by a tenth of a percent: every arm strip is named by `armZone`,
+so the arm's value lives in the UPPER_ARM and FOREARM tables and nowhere
+else. When a named region will not darken, edit its rows.
+
+### Which sign of d is the inner arm is a property of the limb's axis
+
+`segment` hands its shape and zone functions an angle relative to the
+limb's front, which is pose-independent for "the bicep is at d = 0" and
+unknowable for "the inner arm is at d > 0": worked through, +pi/2 is world
++x on a limb whose axis points down and -x on one pointing up, so the same
+rule puts the shadow valley outside one arm and inside the other.
+`limbSideDirection` (forge.js) reproduces the basis and returns the +pi/2
+direction so each segment decides its own sign against the torso.
+
+### Continuity is bought with shadow, not with geometry that touches
+
+The deltoid already interpenetrated the chest correctly and still read as
+a ball beside it. What made it belong was darkness between the masses: the
+underarm pocket on the darkest row with no coat, a crease ring under the pec
+on its own uncoated dark zone, an inner-arm valley on the navy row, and the
+authored ridge stroke along the shoulder removed so the crest reads as a lit
+plane. Overlap the eye cannot see is not overlap.
+
+### A reference box that includes background is not a body measurement
+
+The godform reference's lowered arm measured 49% under 32 luma against
+this build's 9%, and two rounds of darkening the arm's rows moved that
+number by nothing. The reference box included the black gap between arm
+and torso, which the render's box (its void skipped) did not. Compare a
+region only when both boxes hold the same anatomy.

@@ -14,7 +14,7 @@
 import {
   Group, Mesh, EdgesGeometry, LineSegments, Vector3, PointLight
 } from '../../vendor/three/three.module.min.js';
-import { segment, diamondPlate, facetedGeometry, mergeGeometries } from './forge.js';
+import { segment, diamondPlate, facetedGeometry, mergeGeometries, limbSideDirection } from './forge.js';
 import { ARMS, HAND } from './proportions.js';
 import { REGIONS } from './regions.js';
 
@@ -25,11 +25,19 @@ import { REGIONS } from './regions.js';
    long planes: a lit bicep plane on the front, sapphire flanks, and a dark
    tricep side that reaches the black rows — which is what lets the arm read
    as the same dark crystal as the torso rather than as a softer material. */
-function armZone(table) {
+/* R99 — `innerSign` says which sign of d faces the torso (see
+   limbSideDirection in forge.js). The inner flank is the arm's shadow
+   valley: it takes the navy row and almost no coat, so the arm reads as a
+   mass with a lit outer side and a lost inner one — the contact shadow
+   between arm and ribcage that the godform reference carries. */
+function armZone(table, innerSign) {
   return function (d, t) {
     while (d > Math.PI) d -= Math.PI * 2;
     while (d < -Math.PI) d += Math.PI * 2;
     var ad = Math.abs(d);
+    var inner = innerSign != null && d * innerSign > 0;
+    if (inner && ad >= 0.60 && ad < 1.50) return { classes: table, seed: 76, index: 1, coat: 0.12 };   /* the inner flank: the valley */
+    if (inner && ad >= 1.50 && ad < 2.30) return { classes: table, seed: 77, index: 0, coat: 0.0 };    /* inner rear: lost */
     /* R96: measured against Reference A's lowered arm (48% under 32 luma, 12%
        above 96) this build's was 72% under 32 with 3% above 96 — more than half
        of every arm was drawn from the two darkest rows. The flanks now reach
@@ -42,7 +50,7 @@ function armZone(table) {
        facing outward, is what keeps the inner arm darker). */
     if (ad < 0.60) return { classes: table, seed: 70, index: 3, coat: 1.0 };           /* the bicep / flexor plane: steel-blue */
     if (ad < 1.50) return { classes: table, seed: 71 + (d > 0 ? 1 : 0), index: 2, coat: 0.55 };   /* flanks: sapphire */
-    if (ad < 2.30) return { classes: table, seed: 73 + (d > 0 ? 1 : 0), index: 2, coat: 0.35 };   /* toward the back: sapphire too */
+    if (ad < 2.30) return { classes: table, seed: 73 + (d > 0 ? 1 : 0), index: 1, coat: 0.20 };   /* toward the back: navy (R99: the mass turns away) */
     if (ad < 2.75) return { classes: table, seed: 74, index: 1, coat: 0.15 };          /* navy */
     return { classes: table, seed: 75, index: 0, coat: 0.0 };                         /* the tricep side: lost */
   };
@@ -195,7 +203,10 @@ function buildHand(materials, spec, options) {
      fingers folded forward into the palm and the lowered hand read as a box
      with two stubs on it; the bodybuilder reference hangs the fingers DOWN
      with only a gentle curl, so each one shows its length from the front. */
-  var curl = opts.open ? 0.22 : 0.38;
+  /* R99: the lowered hand is a FIST — the godform reference closes it — and
+     with two-segment jointed digits a firm curl reads as knuckles rather than
+     as the box-with-stubs the old one-piece digits made at this value. */
+  var curl = opts.open ? 0.22 : 0.56;
   for (var i = 0; i < n; i++) {
     var t = n === 1 ? 0.5 : i / (n - 1);
     var x = (t - 0.5) * spec.palmHalfWidth * 1.50;
@@ -271,6 +282,15 @@ function buildArm(materials, spec, options) {
   var shoulder = new Vector3().fromArray(spec.shoulder);
   var elbow = new Vector3().fromArray(spec.elbow);
   var wrist = new Vector3().fromArray(spec.wrist);
+  /* R99 — which sign of the ring angle faces the torso, per segment: the
+     side toward x = 0 from this arm's shoulder. */
+  var towardTorso = spec.shoulder[0] > 0 ? -1 : 1;
+  function innerSignOf(a, b) {
+    var dir = limbSideDirection(a, b);
+    return dir[0] * towardTorso > 0 ? 1 : -1;
+  }
+  var upperInner = innerSignOf(spec.shoulder, spec.elbow);
+  var foreInner = innerSignOf(spec.elbow, spec.wrist);
 
   /* Upper arm: shoulder -> elbow, in the shoulder joint's local space. */
   var shoulderJoint = new Group();
@@ -297,9 +317,11 @@ function buildArm(materials, spec, options) {
        is six or eight large graded planes; fifty small quads cannot grade —
        the facet dome (crystal-shader.js) is gated on face size and had
        nothing to work on — and read as a quilt beside the reference. */
-    { depthRatio: 1.12, crystal: 0.045, steps: 5,
+    /* R99: deeper front-to-back (1.12 -> 1.18) so the bicep and tricep are
+       two volumes the silhouette shows from the side, not two colours. */
+    { depthRatio: 1.18, crystal: 0.045, steps: 5,
       profile: ARMS_.profiles.upper, shape: ARMS_.shapes.upper, lift: ARMS_.classLift,
-      classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes),
+      classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner),
       coat: REGIONS.UPPER_ARM.coat,
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
          its own by the bicep belly, for the same reason the cap ramps into the
@@ -327,7 +349,7 @@ function buildArm(materials, spec, options) {
        to peak on and the taper into the wrist has two to fall through. */
     { depthRatio: 1.06, crystal: 0.040, steps: 5,
       profile: ARMS_.profiles.fore, shape: ARMS_.shapes.fore, lift: ARMS_.classLift,
-      classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes),
+      classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes, foreInner),
       coat: REGIONS.FOREARM.coat }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 0);
@@ -359,7 +381,7 @@ function buildArm(materials, spec, options) {
   var lateral = new Vector3(0, 0, 1).cross(upDir);
   if (lateral.lengthSq() < 1e-6) lateral.set(1, 0, 0);
   lateral.normalize();
-  var pinHalf = eR * 1.14, pinR = eR * 0.42;
+  var pinHalf = eR * 1.06, pinR = eR * 0.38;   /* R99: bosses just proud of the tube — compression, not a bolt */
   var pinGeo = segment(
     lateral.clone().multiplyScalar(-pinHalf).toArray(),
     lateral.clone().multiplyScalar(pinHalf).toArray(),

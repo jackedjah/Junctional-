@@ -37,7 +37,7 @@ export function createLights(options) {
   /* Cool white key — not cyan. A cyan key would tint every lit plane and the
      body would start reading as "a glowing cyan object", which the reference
      explicitly is not. The cyan belongs to the edges and the rim. */
-  var key = new DirectionalLight(new Color(0xd8ecff), 5.5);
+  var key = new DirectionalLight(new Color(0xd8ecff), 6.0);   /* R99: 5.5 -> 6.0, the lit planes brighter while the fill falls */
   key.position.set(-4.2, 7.4, 6.2);
   key.castShadow = false;
   if (key.castShadow) {
@@ -70,7 +70,7 @@ export function createLights(options) {
      was 44%. A softer fill from the right is what lets the far side of every
      pair (pecs, deltoids, quad heads) fall away, which is the local contrast
      the brief asks for. */
-  var fill = new DirectionalLight(new Color(0x9fb8d2), 1.0);   /* R97: 1.4 -> 1.0, the far side falls away */
+  var fill = new DirectionalLight(new Color(0x9fb8d2), 0.80);   /* R97: 1.4 -> 1.0; R99: 0.80, the far side falls further */
   fill.position.set(5.6, 3.0, 4.0);
 
   /* Rim — cyan, from behind and above. This is what draws the lit contour. */
@@ -179,7 +179,7 @@ export function createLights(options) {
      to destroy a dark end — the difference here is that it is raising it to a
      COLOUR rather than to grey, and the hierarchy is carried by hue as much as
      by value from this point on. */
-  var hemi = new HemisphereLight(new Color(0x7186a4), new Color(0x2a3442), 0.40);   /* R97: 0.55 -> 0.40 */
+  var hemi = new HemisphereLight(new Color(0x7186a4), new Color(0x2a3442), 0.34);   /* R97: 0.55 -> 0.40; R99: 0.34 */
 
   /* Deliberately tiny. The dark side of a crystal should be nearly black —
      that contrast is the material. */
@@ -201,8 +201,8 @@ export function createLights(options) {
 
   function setIntensity(scale) {
     var k = Math.max(0, Number(scale) || 1);
-    key.intensity = 5.5 * k;
-    fill.intensity = 1.0 * k;
+    key.intensity = 6.0 * k;
+    fill.intensity = 0.80 * k;
     rim.intensity = 2.2 * k;
     rim2.intensity = 2.6 * k;
     bounce.intensity = 1.05 * k;
