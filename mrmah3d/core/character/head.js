@@ -26,6 +26,8 @@ export function buildHead(materials) {
     halfHeight: HEAD.halfHeight,
     halfDepth: HEAD.halfDepth,
     bevelInset: HEAD.bevelInset,
+    crownInset: HEAD.crownInset,
+    crownZ: HEAD.crownZ,
     faceInset: HEAD.faceInset,
     bevelZ: HEAD.bevelZ,
     faceZ: HEAD.faceZ,

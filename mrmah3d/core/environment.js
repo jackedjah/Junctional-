@@ -146,6 +146,27 @@ function cloudTexture() {
   return t;
 }
 
+/* A one-dimensional ramp: opaque at v=0, gone at v=1. Used for the light
+   pillars (bright at the floor, dissolving upward) and for the wet-floor
+   streaks (bright at the source, dissolving away from it). One tiny texture
+   serves both because both are the same falloff seen along different axes. */
+function rampTexture() {
+  var c = document.createElement('canvas');
+  c.width = 4; c.height = 128;
+  var g = c.getContext('2d');
+  var grad = g.createLinearGradient(0, 128, 0, 0);
+  grad.addColorStop(0.00, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.10, 'rgba(255,255,255,0.62)');
+  grad.addColorStop(0.34, 'rgba(255,255,255,0.24)');
+  grad.addColorStop(0.68, 'rgba(255,255,255,0.06)');
+  grad.addColorStop(1.00, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 4, 128);
+  var t = new CanvasTexture(c);
+  t.needsUpdate = true;
+  return t;
+}
+
 /* A horizontal band, bright at its base and fading upward — the glow sitting
    on the world's far edge. Drawn as a texture rather than geometry so it costs
    one transparent quad. */
@@ -315,6 +336,32 @@ export function createEnvironment(options) {
   owned.push(laserCore.geometry, laserCoreMat, laserMat);
   glowGroup.add(laserGroup);
 
+  /* THE WET-FLOOR STREAK.
+
+     Reference A's floor is not a mirror — it is a wet, semi-reflective surface,
+     and what it actually returns is a vertical SMEAR of light beneath each
+     bright thing rather than a sharp inverted copy. That distinction matters
+     enormously here: a true planar reflection needs a second render pass of the
+     whole scene, which on a mobile budget is the single most expensive thing we
+     could add, and it would buy an effect the reference does not even show.
+
+     A stretched additive quad lying on the floor, brightest at his contact
+     point and dissolving away toward the camera, reproduces the look for one
+     draw call. It sits in glowGroup, so it tracks him when he is dragged. */
+  var streakTex = rampTexture();
+  var streakMat = new MeshBasicMaterial({
+    map: streakTex, color: new Color(0x6fdcff), transparent: true, opacity: 0.34,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: true
+  });
+  var streak = new Mesh(new PlaneGeometry(0.85, 7.0), streakMat);
+  streak.rotation.x = -Math.PI / 2;
+  /* The ramp's opaque end is at v=0, which after the -90 degrees about X lands
+     at the far edge; pushing the quad forward by half its length puts that end
+     under him and lets the tail run toward the viewer. */
+  streak.position.set(0, 0.016, 3.5);
+  glowGroup.add(streak);
+  owned.push(streak.geometry, streakMat, streakTex);
+
   /* Default length until the character reports its real hover height. */
   var laserHeight = 0.16;
   function setLaser(height) {
@@ -450,6 +497,70 @@ export function createEnvironment(options) {
     });
   group.add(structures);
 
+  /* ---- 5b. light pillars ----------------------------------------------- */
+  /* The vertical beams standing in Reference A's landscape. They do more than
+     decorate: they are the only strictly vertical elements in a world built of
+     horizontals, so they give the eye a scale rule against the pyramids and
+     stop the far distance reading as flat. Bright at the floor and dissolving
+     upward, fogged with everything else, and crossed in pairs so they keep
+     their width when the subject is dragged and the view shifts. */
+  var pillarTex = rampTexture();
+  var pillarMat = new MeshBasicMaterial({
+    map: pillarTex, color: new Color(0x5fd4ff), transparent: true, opacity: 0.42,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false,
+    side: DoubleSide, fog: true
+  });
+  var pillars = new Group();
+  pillars.name = 'light-pillars';
+  [
+    /* Brought nearer and spread wider. At z -44..-72 every pillar sat beyond
+       where the fog has already taken the world, so none of them reached the
+       frame in any mode — they existed and were invisible, which is the worst
+       of both. These are inside the fade, at azimuths that put at least one in
+       shot at every composition. */
+    { x: -19, z: -30, h: 16, w: 0.17, o: 1.0 },
+    { x: -34, z: -46, h: 26, w: 0.24, o: 0.8 },
+    { x: 15, z: -34, h: 19, w: 0.19, o: 1.0 },
+    { x: 30, z: -52, h: 29, w: 0.26, o: 0.7 },
+    { x: 4, z: -60, h: 24, w: 0.22, o: 0.5 }
+  ].forEach(function (b) {
+    var m = pillarMat.clone();
+    m.opacity = pillarMat.opacity * b.o;
+    [0, Math.PI / 2].forEach(function (rot) {
+      var q = new Mesh(new PlaneGeometry(b.w, b.h), m);
+      q.position.set(b.x, b.h / 2, b.z);
+      q.rotation.y = rot;
+      pillars.add(q);
+      owned.push(q.geometry);
+    });
+    owned.push(m);
+  });
+  group.add(pillars);
+  owned.push(pillarTex);
+
+  /* ---- 5c. stars -------------------------------------------------------- */
+  /* Sparse, dim, and high. They cost one draw call and they are what tells the
+     eye the dark above the horizon is SKY rather than an empty backdrop — the
+     cheapest depth cue in the whole scene. */
+  var starCount = tier === 'low' ? 40 : 90;
+  var starPos = [];
+  var sseed = 7771;
+  function srnd() { sseed = (sseed * 1103515245 + 12345) & 0x7fffffff; return sseed / 0x7fffffff; }
+  for (var si = 0; si < starCount; si++) {
+    starPos.push((srnd() - 0.5) * 150, 9 + srnd() * 34, -40 - srnd() * 45);
+  }
+  var starGeo = new BufferGeometry();
+  starGeo.setAttribute('position', new Float32BufferAttribute(starPos, 3));
+  var starMat = new PointsMaterial({
+    color: new Color(0xbfe8ff), size: 0.16, sizeAttenuation: true,
+    transparent: true, opacity: 0.55, depthWrite: false, toneMapped: false,
+    blending: AdditiveBlending, fog: false
+  });
+  var stars = new Points(starGeo, starMat);
+  stars.name = 'stars';
+  group.add(stars);
+  owned.push(starGeo, starMat);
+
   /* ---- 6. motes -------------------------------------------------------- */
   var moteCount = tier === 'low' ? 60 : tier === 'medium' ? 120 : 190;
   var motePts = [], moteSeed = [];
@@ -540,6 +651,13 @@ export function createEnvironment(options) {
     /* Atmosphere follows the same per-mode weighting as everything else: a
        tight portrait wants less sky than a wide showcase does. */
     var ha = w.haze == null ? 1 : w.haze;
+    /* Pillars and stars follow the structures weight — they are the same
+       "distant world" tier, and a mode that wants a quiet background should
+       lose all of it together rather than in pieces. */
+    var st = w.structures == null ? 1 : w.structures;
+    pillars.visible = st > 0.05;
+    stars.visible = st > 0.05;
+    starMat.opacity = 0.55 * st;
     clouds.visible = ha > 0.03;
     cloudBands.forEach(function (b, i) {
       b.mesh.material.opacity = 0.11 * [1.00, 0.66][i] * ha;
@@ -556,6 +674,7 @@ export function createEnvironment(options) {
     glow: glowGroup, structures: structures, motes: motes, horizon: horizon,
     update: update, followCharacter: followCharacter, applyMode: applyMode,
     setHorizon: setHorizon, setLaser: setLaser, clouds: clouds,
+    pillars: pillars, stars: stars,
     setOpacity: function (v) { gridMat.opacity = Math.max(0, Math.min(1, Number(v))); },
     dispose: dispose
   };

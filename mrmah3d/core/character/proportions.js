@@ -52,10 +52,23 @@ export var HEAD = {
   /* The front face plate is inset from the silhouette and pushed back from
      the bevel ring, which is what makes the face read as recessed INSIDE the
      crystal rather than painted on its front. */
+  /* Back to 0.54. Shrinking the plate to 0.48 was the wrong way to buy shell
+     thickness: the eyes and smile are sized off the head, not off the plate, so
+     a smaller plate just crowded them — the smile ran past its lower edge. The
+     thickness now comes from the crown band and the deep recess wall, which add
+     it without taking anything away from the face. */
   faceInset: 0.54,               /* plate size as a share of the diamond */
-  bevelInset: 0.66,              /* bevel ring size */
-  bevelZ: 0.62,                  /* bevel ring depth, share of halfDepth */
-  faceZ: 0.44,                   /* plate depth — behind the bevel: the recess */
+  crownInset: 0.84,              /* intermediate crown band */
+  crownZ: 0.36,                  /* crown band depth, share of halfDepth */
+  bevelInset: 0.665,             /* table edge / recess lip */
+  bevelZ: 0.72,                  /* bevel ring depth, share of halfDepth */
+  /* Dropped from 0.44 to 0.17. The recess wall is the difference between the
+     lip and the plate, and at 0.62 vs 0.44 it was only 0.06 units deep — barely
+     a step, so the face read as painted just behind the surface rather than set
+     down inside the crystal. It is now 0.19 deep, better than three times as
+     much, which is what gives the shell visible thickness and puts the eyes and
+     smile properly inside the stone. */
+  faceZ: 0.17,                   /* plate depth — well behind the lip */
   backApexZ: -1.0,
   /* Depth scatter on the head's bevel ring, so its front facets tilt slightly
      differently and the head catches light in several places.
@@ -160,7 +173,7 @@ export var TORSO = {
      across the shoulders, and the refined reference is broader still — the
      brief asks explicitly for stronger shoulder-cap presence and a deltoid-like
      silhouette. This is the single value that controls how heroic he reads. */
-  shoulderHalfWidth: 0.735,
+  shoulderHalfWidth: 0.808,
   shoulderY: 1.900
 };
 
@@ -178,20 +191,38 @@ export var TORSO = {
    the reference is at its widest. */
 export var ARMS = {
   right: {                        /* viewer's LEFT — the lowered arm */
-    shoulder: [-0.544, 1.944, 0.02],   /* ref px (267, 645) */
-    elbow: [-0.764, 1.541, 0.10],      /* ref px (185, 795) — the outer point */
-    wrist: [-0.429, 0.979, 0.16],      /* ref px (310, 1005) */
-    upperRadius: 0.128,
-    foreRadius: 0.094,
-    wristRadius: 0.064
+    /* MOVED OUTBOARD, and this is the change that opens the armpit.
+
+       The measured joint sat at 0.544 while the torso is 0.557 wide at that
+       height, so the upper arm began INSIDE the body and the two solids simply
+       welded — no gap, no separate limb, and the shoulder read as a bulge on
+       the chest rather than as a joint. Reference A shows daylight between the
+       arm and the torso along its whole length; that gap is most of what makes
+       the arms read as arms.
+
+       Hung under the outer part of the deltoid cap instead. The elbow and wrist
+       stay where they were measured, so the pose and the hand positions are
+       unchanged — only the top of the limb moves out, which also gives the
+       upper arm the near-vertical hang that Reference A has. */
+    shoulder: [-0.660, 1.902, 0.02],
+    /* Brought under the shoulder. With the joint moved outboard, the old elbow
+       at 0.764 made the upper arm angle further OUT before the forearm cut back
+       in — a chicken wing. Reference A hangs the upper arm almost vertically
+       from the outer shoulder and lets only the forearm angle inward to the
+       hip, which is both calmer and stronger. */
+    elbow: [-0.702, 1.318, 0.10],
+    wrist: [-0.470, 0.902, 0.16],
+    upperRadius: 0.112,
+    foreRadius: 0.086,
+    wristRadius: 0.060
   },
   left: {                         /* viewer's RIGHT — the raised arm */
-    shoulder: [0.542, 1.936, 0.02],    /* ref px (672, 648) */
-    elbow: [0.684, 1.354, 0.10],       /* ref px (725, 865) — the V's bottom */
-    wrist: [0.911, 1.970, 0.14],       /* ref px (810, 635) */
-    upperRadius: 0.128,
-    foreRadius: 0.094,
-    wristRadius: 0.064
+    shoulder: [0.658, 1.896, 0.02],
+    elbow: [0.758, 1.330, 0.10],
+    wrist: [0.812, 1.982, 0.14],
+    upperRadius: 0.112,
+    foreRadius: 0.086,
+    wristRadius: 0.060
   },
 
   /* LIMB PROFILES — where the mass sits along each bone.

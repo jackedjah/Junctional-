@@ -240,7 +240,7 @@ export function createCrystalMaterials(options) {
        the silhouette against the void; with dimmer edges the rim shell is now
        doing most of that job, which is the right owner for it — it follows the
        real surface curvature instead of drawing every polygon boundary. */
-    opacity: 0.10,
+    opacity: 0.155,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false

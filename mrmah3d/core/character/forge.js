@@ -68,9 +68,9 @@ var FACET_CLASSES = [
   /* w,    rough,  metal,  dark,  tint */
   [0.50,   0.14,  -0.36,   1.00,  0.00],   /* black    */
   [0.24,   0.08,  -0.18,   0.74,  0.03],   /* charcoal */
-  [0.14,   0.02,   0.04,   0.34,  0.26],   /* deep     */
+  [0.12,   0.02,   0.04,   0.34,  0.26],   /* deep     */
   [0.07,  -0.04,   0.18,  -0.06,  1.00],   /* cyan     */
-  [0.05,  -0.06,   0.32,  -0.76,  0.22]    /* silver   */
+  [0.07,  -0.06,   0.34,  -0.82,  0.20]    /* silver   */
 ];
 
 /* Five classes give five values, and five values across a few hundred facets is
@@ -88,27 +88,72 @@ var FACET_CLASSES = [
    Math.random() — so the character is byte-identical on every mount and every
    screenshot, and a comparison run measures the change I made rather than a new
    roll of the dice. */
-function facetClass(i) {
+/* HERO FACETS ARE BIG FACETS.
+
+   "Some planes should carry the entire read of the torso; other facets should
+   fall almost completely away." That is a hierarchy of IMPORTANCE, and until
+   now every triangle drew from the same lottery regardless of how much of the
+   body it covered — so a sliver between two chest planes could come up silver
+   while the large plane beside it came up charcoal. The result reads as noise
+   however well-authored the individual classes are, because visual weight and
+   visual drama were uncorrelated.
+
+   So the face's own AREA now steers its class. A large face is allowed to be
+   fully what its class says — near-black, or a silver catch — and is biased
+   toward the extremes, because a big plane taking a hero value is exactly what
+   makes a cut gemstone read. A small face is pulled toward the middle and
+   damped, so transition facets support the form instead of competing with it.
+
+   AREA_HERO is calibrated against the character's own scale (3 world units
+   tall): torso and shoulder planes land near or above it, while the slivers
+   produced by relief and by the crown's convergence land far below. */
+var AREA_HERO = 0.011;
+
+function facetClass(i, area) {
   var n = Math.sin(i * 78.233 + 12.9898) * 43758.5453;
   var r = n - Math.floor(n);
   var m = Math.sin(i * 39.719 + 4.1414) * 24634.6345;
   var j = (m - Math.floor(m)) * 2 - 1;          /* -1 .. 1 */
+
+  /* 0 = a sliver, 1 = a hero plane. sqrt so the ramp is generous in the middle
+     rather than only rewarding the very largest faces. */
+  var big = area == null ? 0.7 : Math.min(1, Math.sqrt(area / AREA_HERO));
+  /* Big faces are pushed AWAY FROM THE MIDDLE of the lottery, toward whichever
+     extreme they were already nearer.
+
+     The first version of this lowered `r` for large faces, on the reasoning
+     that it would "reach further into the bright end". It does the opposite:
+     the table accumulates from black upward, so lowering r lands on black more
+     often and silver never got any commoner. The bias has to be symmetric.
+
+     Spreading from the centre is also the behaviour actually wanted, and the
+     reference is the argument for it — its large planes are either almost
+     black or a bright catch, and it is that pairing, a near-black plane sitting
+     directly beside a silver one, that reads as cut crystal. The mid classes
+     belong to the small transition faces. */
+  r = Math.max(0.0005, Math.min(0.9995, 0.5 + (r - 0.5) * (1 + big * 0.62)));
+
   var acc = 0;
   for (var k = 0; k < FACET_CLASSES.length; k++) {
     acc += FACET_CLASSES[k][0];
     if (r <= acc) {
       var c = FACET_CLASSES[k];
+      /* Damp everything a small face does. `damp` 1 leaves a hero plane at full
+         strength; at 0.35 a sliver keeps only a third of its class's departure
+         from the mid tone, which is what makes it a transition rather than a
+         statement. */
+      var damp = 0.35 + 0.65 * big;
       return [
         c[0],
-        c[1] + j * 0.05,                         /* roughness */
+        c[1] * damp + j * 0.05,                  /* roughness */
         /* A plain offset. These four numbers are OFFSETS applied to the
            material's own values, and the shader already clamps each resulting
            factor into range — an earlier attempt to clamp here instead read
            `max(0 - c[2], ...)`, which for the black class pinned its offset at
            +0.34 and made the darkest facets the most metallic of all. */
-        c[2] + j * 0.10,                         /* metalness */
-        Math.max(-0.9, Math.min(1, c[3] + j * 0.26)),   /* darkness — the wide one */
-        Math.max(0, Math.min(1, c[4] + j * 0.14))       /* tint */
+        c[2] * damp + j * 0.10,                  /* metalness */
+        Math.max(-0.9, Math.min(1, c[3] * damp + j * 0.26 * damp)),  /* darkness */
+        Math.max(0, Math.min(1, c[4] * damp + j * 0.14))             /* tint */
       ];
     }
   }
@@ -134,7 +179,9 @@ export function facetedGeometry(positions, faces, groups) {
     nor.push(nx, ny, nz, nx, ny, nz, nx, ny, nz);
     /* All three vertices of a face share its optical class, so the value is
        constant across the triangle and the facet reads as one material. */
-    var k = facetClass(faceIndex++);
+    /* Triangle area, from the cross product already computed above: |u x v|/2
+       is exactly `len / 2`, so the hierarchy costs nothing extra. */
+    var k = facetClass(faceIndex++, len * 0.5);
     for (var v = 0; v < 3; v++) fac.push(k[1], k[2], k[3], k[4]);
     written += 3;
   }
@@ -415,16 +462,34 @@ export function diamondCrystal(opts) {
     });
   }
 
+  /* A CROWN RING, so the head stops reading as a frame.
+
+     With only girdle -> bevel -> plate there is exactly ONE band of facets
+     between the silhouette and the face, and one band cannot look like
+     thickness: it reads as a flat diamond outline drawn around a dark hole,
+     which was the standing "head is still a frame" note. A real cut stone
+     climbs from its girdle to its table across several bands, and each one
+     takes light at its own angle.
+
+     So there is now an intermediate ring between the two, giving two bands of
+     crown facets rather than one, and the plate drops much further back. The
+     shell gains visible thickness from the depth between the bands, and the
+     recess gains a genuine wall for the face to sit down inside. */
+  var crownZ = (opts.crownZ == null ? 0.38 : opts.crownZ) * hd;
+  var crownInset = opts.crownInset == null ? 0.84 : opts.crownInset;
+
   var E = ring(1, 0, null);                 /* the silhouette — never jittered */
-  var B = ring(bevel, bevelZ, 5);           /* forward bevel ring */
+  var C = ring(crownInset, crownZ, 11);     /* crown band */
+  var B = ring(bevel, bevelZ, 5);           /* table edge / recess lip */
   var F = ring(face, faceZ, null);          /* the recessed face plate */
   var back = push(0, 0, backZ);
 
   var shell = [], plate = [];
   for (var i = 0; i < N; i++) {
     var j = (i + 1) % N;
-    shell.push([E[i], B[i], B[j], E[j]]);   /* front bevels */
-    shell.push([B[i], F[i], F[j], B[j]]);   /* the recess lip */
+    shell.push([E[i], C[i], C[j], E[j]]);   /* lower crown band */
+    shell.push([C[i], B[i], B[j], C[j]]);   /* upper crown band */
+    shell.push([B[i], F[i], F[j], B[j]]);   /* the recess wall */
     shell.push([E[j], E[i], back]);         /* back facets */
   }
   /* Fan the plate from its centre so it is several triangles, not one quad —

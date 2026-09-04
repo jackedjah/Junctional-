@@ -12,10 +12,11 @@
    stiffens slightly in the upper third. */
 
 import {
-  Group, Mesh, EdgesGeometry, LineSegments, PlaneGeometry, Vector3
+  Group, Mesh, EdgesGeometry, LineSegments, PlaneGeometry, Vector3,
+  BufferGeometry, Float32BufferAttribute
 } from '../../vendor/three/three.module.min.js';
 import { loft, segment, diamondPlate, facetedGeometry } from './forge.js';
-import { TORSO, NECK, INSIGNIA, HEAD } from './proportions.js';
+import { TORSO, NECK, INSIGNIA, HEAD, ARMS } from './proportions.js';
 
 function lit(group, geo, materials, opts) {
   var o = opts || {};
@@ -124,81 +125,59 @@ export function buildBody(materials) {
   var torsoParts = lit(group, torsoLoft.geometry, materials, { rimScale: 1.022, hero: true, heroAngle: 86 });
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
 
-  /* ---- shoulder caps -------------------------------------------------- */
-  /* Angular wedges reaching past the torso ring, which is what gives the
-     reference its broad, hard shoulder line and gives the arms a real joint
-     to leave from rather than sprouting out of a smooth surface. */
+  /* ---- shoulder caps / deltoids --------------------------------------- */
+  /* A LOFTED MASS, NOT A SLAB.
+
+     Three versions of this were wedges — a flat-topped box reaching out from
+     the chest — and every one of them read as an epaulette rather than as a
+     shoulder. The reasons compound: a slab has a flat top plane that either
+     faces the light (a bright plate) or is tilted away (a collapsed shoulder),
+     its box corners are all sharp so any edge threshold outlines it, and,
+     worst, it is a SEPARATE object butted against the arm, so the eye reads
+     plate-then-arm instead of one continuous mass.
+
+     Reference A has no such seam. The shoulder swells out of the chest, is
+     widest just outboard of the joint, and tapers straight into the upper arm.
+     That is a tapered tube with a belly, which is exactly what `segment` with a
+     profile builds — the same tool the biceps use. Its far end lands on the
+     shoulder joint at slightly more than the upper arm's own radius, so the
+     deltoid closes over the top of the arm and the two become one form. */
+  var deltoidGeos = [];
   [-1, 1].forEach(function (side) {
-    var P = [];
-    function p(x, y, z) { P.push(x, y, z); return P.length / 3 - 1; }
-    /* Anchored to the SHOULDER-LINE ring by height, not to the last ring in the
-       table. The crown rings added above the shoulder line are deliberately
-       narrow, so `rings[length-1]` now returns 0.104 and the wedges would have
-       sprouted from the middle of the chest and burst out through the crown. */
-    var shoulderRing = TORSO.rings.reduce(function (best, r) {
-      return Math.abs(r.y - TORSO.topY) < Math.abs(best.y - TORSO.topY) ? r : best;
-    }, TORSO.rings[0]);
-    var inner = shoulderRing.w * 0.72;
-    var outer = TORSO.shoulderHalfWidth;
-    /* DELTOID PRESENCE.
-
-       The wedge used to be shallow (d=0.20) and stop 0.30 below the shoulder
-       line, so it read as a plate laid on top of the chest and the arm appeared
-       to sprout from under it. A real shoulder cap has depth front-to-back and
-       hangs DOWN over the top of the upper arm; that overlap is what makes the
-       arm look inserted rather than attached.
-
-       So it is deeper and it descends far enough to cover the top of the upper
-       arm, which now has a bicep swell to be covered. Together those two give
-       the shoulder-to-arm connection the brief asks for. */
-    var yTop = TORSO.topY, yBot = TORSO.shoulderY - 0.46, d = 0.225;
-    /* HOW FAR THE CAP FALLS FROM NECK TO OUTER TIP.
-
-       This one number decides whether the shoulder reads as a deltoid or as a
-       wing. The cap's upper surface runs from the neck side down to the outer
-       tip, and at a drop of 0.055 that surface was very nearly horizontal —
-       which meant it faced the sky, caught the light cards flat on, and drew a
-       bright plate sticking out sideways from each shoulder. The character had
-       shoulder pads.
-
-       A real shoulder falls away steeply from the neck. At 0.26 the same
-       surface is a slope, so it takes light at a glancing angle and reads as
-       the top of a rounded mass rather than as a lit shelf — and the silhouette
-       gains the downward shoulder line the reference has. */
-    var fall = 0.26;
-
-    /* A RIDGE along the top, and a deliberately deep underside.
-
-       A plain wedge gave the shoulders no drama: one flat top plane and one
-       flat bottom. Raising a spine along the top edge splits the upper surface
-       into two planes that catch light very differently, and dropping the
-       underside back into shadow gives the arm somewhere to emerge FROM. The
-       shoulders are the character's widest structure, so this is where the
-       strongest depth cue is available. */
-    var ridge = 0.095;
-    var a = p(side * inner, yTop, d);
-    var b = p(side * outer, yTop - fall, d * 0.62);
-    var c = p(side * outer, yBot, d * 0.52);
-    var e = p(side * inner, yBot - 0.06, d);
-    var a2 = p(side * inner, yTop, -d);
-    var b2 = p(side * outer, yTop - fall, -d * 0.62);
-    var c2 = p(side * outer, yBot, -d * 0.52);
-    var e2 = p(side * inner, yBot - 0.06, -d);
-    /* the spine: a raised centre line running out along the shoulder */
-    var r1 = p(side * inner * 1.02, yTop + ridge, 0);
-    var r2 = p(side * outer * 1.01, yTop - fall + ridge * 0.72, 0);
-
-    var faces = side > 0
-      ? [[a, b, r2, r1], [r1, r2, b2, a2],
-         [a, b, c, e], [e2, c2, b2, a2],
-         [b, c, c2, b2], [c2, e2, e, c], [e2, a2, r1, a], [e, r1, a2, e2].slice(0, 3)]
-      : [[r1, r2, b, a], [a2, b2, r2, r1],
-         [e, c, b, a], [a2, b2, c2, e2],
-         [b2, c2, c, b], [c, e, e2, c2], [a, r1, a2, e2], [e2, a2, r1, e].slice(0, 3)];
-
-    var geo = facetedGeometry(P, faces);
-    var parts = lit(group, geo, materials, { rimScale: 1.04, quiet: true, minorAngle: 34 });
+    var spec = side < 0 ? ARMS.right : ARMS.left;
+    var joint = spec.shoulder;
+    var inner = [side * 0.26, TORSO.topY - 0.015, 0.015];
+    var outer = [joint[0] * 0.99, joint[1] - 0.10, joint[2]];
+    var geo = segment(
+      inner, outer,
+      0.300, spec.upperRadius * 1.22, 8,
+      { depthRatio: 0.86, crystal: 0.055, steps: 5, profile: function (t) {
+        /* Widest just outboard of where it leaves the chest — the deltoid
+           belly — then drawing into the arm. */
+        return 1 + Math.sin(Math.pow(t, 0.7) * Math.PI) * 0.17;
+      } }
+    );
+    var parts = lit(group, geo, materials, { rimScale: 1.03, quiet: true, minorAngle: 30 });
     owned.push(geo, parts.edges, parts.minorEdges, parts.heroEdges);
+    deltoidGeos.push(geo);
+
+    /* THE SHOULDER LINE, drawn explicitly.
+
+       Reference A runs a bright line along the top of each shoulder, and it is
+       doing real work: it states the shoulder's width and separates the lit
+       upper surface from the shadowed outer one. It cannot be extracted by
+       dihedral angle, because on a rounded mass the break it describes is the
+       silhouette from this viewpoint rather than a crease in the surface — the
+       angle there is gentle everywhere. Threshold tools cannot find a line that
+       is not a crease, so it is authored: two points, hero value, following the
+       top of the deltoid from the neck side out to the joint. */
+    var ridge = new BufferGeometry();
+    ridge.setAttribute('position', new Float32BufferAttribute([
+      inner[0] * 0.9, inner[1] + 0.055, inner[2] + 0.10,
+      outer[0], outer[1] + spec.upperRadius * 1.05, outer[2] + 0.04
+    ], 3));
+    group.add(new LineSegments(ridge, materials.edgeHero));
+    owned.push(ridge);
   });
 
   /* ---- neck ----------------------------------------------------------- */
@@ -239,7 +218,12 @@ export function buildBody(materials) {
     NECK.halfWidth * 0.42, NECK.halfWidth * 0.34, 8,
     { depthRatio: 0.92, crystal: 0.05, steps: 3 }
   );
-  var neckParts = lit(group, neckGeo, materials, { rim: false, minorAngle: 30 });
+  /* Quiet, and no rim. Whatever of the tenon is briefly visible between the
+     head's lower vertex and the chest crown should read as crystal continuing,
+     not as a bright-edged column bridging two objects — which is exactly the
+     "assembled" impression the tenon exists to remove. Its edges are demoted to
+     a whisper so the surfaces alone carry it. */
+  var neckParts = lit(group, neckGeo, materials, { rim: false, quiet: true, minorAngle: 40 });
   owned.push(neckGeo, neckParts.edges, neckParts.minorEdges, neckParts.heroEdges);
 
   /* ---- chest insignia ------------------------------------------------- */

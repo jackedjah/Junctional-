@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T02:42:06.377Z",
+  "generatedAt": "2026-09-04T03:06:01.653Z",
   "base": "http://127.0.0.1:8123",
   "results": [
     {
@@ -35,17 +35,17 @@
     {
       "id": "MOUNT-07 frames advancing",
       "ok": true,
-      "detail": "54 frames"
+      "detail": "53 frames"
     },
     {
       "id": "MOUNT-08 geometry uploaded",
       "ok": true,
-      "detail": "80 geometries"
+      "detail": "92 geometries"
     },
     {
       "id": "MOUNT-09 draw calls issued",
       "ok": true,
-      "detail": "115 draws, 5986 tris"
+      "detail": "135 draws, 6376 tris"
     },
     {
       "id": "MOUNT-10 the real character, not a placeholder",
@@ -55,32 +55,32 @@
     {
       "id": "PIXEL-01 canvas produced content",
       "ok": true,
-      "detail": "58.1% opaque"
+      "detail": "58.7% opaque"
     },
     {
       "id": "PIXEL-02 lit pixels present",
       "ok": true,
-      "detail": "55.09% lit"
+      "detail": "55.19% lit"
     },
     {
       "id": "PIXEL-03 specular highlights present",
       "ok": true,
-      "detail": "29249 bright px, max luma 255"
+      "detail": "29050 bright px, max luma 255"
     },
     {
       "id": "PIXEL-04 shaded gradient (not flat fill)",
       "ok": true,
-      "detail": "286 distinct colours"
+      "detail": "268 distinct colours"
     },
     {
       "id": "PIXEL-05 stage stays dark (reference character measures 68.2)",
       "ok": true,
-      "detail": "mean 73.0"
+      "detail": "mean 72.1"
     },
     {
       "id": "DEPTH-01 floor grid draws its receding lines",
       "ok": true,
-      "detail": "232 rows carry converging content (a floor with no perspective scores ~0)"
+      "detail": "259 rows carry converging content (a floor with no perspective scores ~0)"
     },
     {
       "id": "DEPTH-02 floor grid draws its lateral lines",
@@ -90,12 +90,12 @@
     {
       "id": "DEPTH-03 solid shows multiple lit planes",
       "ok": true,
-      "detail": "9 luminance plateaus at [16,20,24,28,32,36,40,48]"
+      "detail": "8 luminance plateaus at [16,20,24,28,32,36,40]"
     },
     {
       "id": "DEPTH-04 lit planes are separable",
       "ok": true,
-      "detail": "spread 32 luma"
+      "detail": "spread 24 luma"
     },
     {
       "id": "DRAG-01 drag changed the rendered image",
@@ -115,12 +115,12 @@
     {
       "id": "LIFE-01 pause() stops the render loop",
       "ok": true,
-      "detail": "249 -> 249 frames"
+      "detail": "246 -> 246 frames"
     },
     {
       "id": "LIFE-02 start() resumes the loop",
       "ok": true,
-      "detail": "249 -> 265 frames"
+      "detail": "246 -> 262 frames"
     },
     {
       "id": "LIFE-03 hidden tab stops the loop",
@@ -150,12 +150,12 @@
     {
       "id": "RESP-small-320 renders",
       "ok": true,
-      "detail": "300x432 dpr 1 tier low fov 32° lit 57.32%"
+      "detail": "300x432 dpr 1 tier low fov 32° lit 57.36%"
     },
     {
       "id": "RESP-small-320 keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "215 converging rows, 9 lit planes"
+      "detail": "238 converging rows, 8 lit planes"
     },
     {
       "id": "RESP-small-320 no console errors",
@@ -175,12 +175,12 @@
     {
       "id": "RESP-iphone-se renders",
       "ok": true,
-      "detail": "355x432 dpr 1 tier low fov 32° lit 55.10%"
+      "detail": "355x432 dpr 1 tier low fov 32° lit 55.19%"
     },
     {
       "id": "RESP-iphone-se keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "220 converging rows, 9 lit planes"
+      "detail": "245 converging rows, 8 lit planes"
     },
     {
       "id": "RESP-iphone-se no console errors",
@@ -200,12 +200,12 @@
     {
       "id": "RESP-iphone-14 renders",
       "ok": true,
-      "detail": "373x456 dpr 1 tier low fov 32° lit 55.11%"
+      "detail": "373x456 dpr 1 tier low fov 32° lit 55.19%"
     },
     {
       "id": "RESP-iphone-14 keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "233 converging rows, 9 lit planes"
+      "detail": "258 converging rows, 8 lit planes"
     },
     {
       "id": "RESP-iphone-14 no console errors",
@@ -225,12 +225,12 @@
     {
       "id": "RESP-iphone-pro-max renders",
       "ok": true,
-      "detail": "410x456 dpr 1 tier low fov 32° lit 53.86%"
+      "detail": "410x456 dpr 1 tier low fov 32° lit 53.85%"
     },
     {
       "id": "RESP-iphone-pro-max keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "238 converging rows, 9 lit planes"
+      "detail": "264 converging rows, 8 lit planes"
     },
     {
       "id": "RESP-iphone-pro-max no console errors",
@@ -250,12 +250,12 @@
     {
       "id": "RESP-ipad-portrait renders",
       "ok": true,
-      "detail": "740x530 dpr 1 tier low fov 32° lit 44.64%"
+      "detail": "740x530 dpr 1 tier low fov 32° lit 44.70%"
     },
     {
       "id": "RESP-ipad-portrait keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "330 converging rows, 8 lit planes"
+      "detail": "361 converging rows, 8 lit planes"
     },
     {
       "id": "RESP-ipad-portrait no console errors",
@@ -275,12 +275,12 @@
     {
       "id": "RESP-ipad-landscape renders",
       "ok": true,
-      "detail": "996x530 dpr 1 tier low fov 32° lit 41.54%"
+      "detail": "996x530 dpr 1 tier low fov 32° lit 41.70%"
     },
     {
       "id": "RESP-ipad-landscape keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "337 converging rows, 7 lit planes"
+      "detail": "372 converging rows, 8 lit planes"
     },
     {
       "id": "RESP-ipad-landscape no console errors",
@@ -300,12 +300,12 @@
     {
       "id": "RESP-phone-landscape renders",
       "ok": true,
-      "detail": "824x318 dpr 1 tier low fov 32° lit 38.98%"
+      "detail": "824x318 dpr 1 tier low fov 32° lit 39.09%"
     },
     {
       "id": "RESP-phone-landscape keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "203 converging rows, 7 lit planes"
+      "detail": "224 converging rows, 8 lit planes"
     },
     {
       "id": "RESP-phone-landscape no console errors",
@@ -325,12 +325,12 @@
     {
       "id": "RESP-desktop renders",
       "ok": true,
-      "detail": "1072x530 dpr 1 tier low fov 32° lit 40.55%"
+      "detail": "1072x530 dpr 1 tier low fov 32° lit 40.68%"
     },
     {
       "id": "RESP-desktop keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "339 converging rows, 7 lit planes"
+      "detail": "372 converging rows, 8 lit planes"
     },
     {
       "id": "RESP-desktop no console errors",
@@ -365,7 +365,7 @@
     {
       "id": "RESIZE-04 geometry count stable across repeated resizes",
       "ok": true,
-      "detail": "90 -> 90 -> 90 -> 90 -> 90"
+      "detail": "104 -> 104 -> 104 -> 104 -> 104"
     },
     {
       "id": "RESIZE-05 narrow stage widens the vertical FOV",
@@ -400,7 +400,7 @@
     {
       "id": "TIER-05 shadows render above low tier",
       "ok": true,
-      "detail": "medium 4982px, high 8709px of cast shadow"
+      "detail": "medium 5069px, high 8824px of cast shadow"
     },
     {
       "id": "TIER-06 shadow map size scales with tier",
@@ -465,7 +465,7 @@
     {
       "id": "MODE-showcase horizontal placement",
       "ok": true,
-      "detail": "0.536 vs intent 0.5"
+      "detail": "0.519 vs intent 0.5"
     },
     {
       "id": "MODE-showcase vertical placement",
@@ -490,7 +490,7 @@
     {
       "id": "MODE-chat horizontal placement",
       "ok": true,
-      "detail": "0.292 vs intent 0.285"
+      "detail": "0.286 vs intent 0.285"
     },
     {
       "id": "MODE-chat vertical placement",
@@ -515,7 +515,7 @@
     {
       "id": "MODE-protocol horizontal placement",
       "ok": true,
-      "detail": "0.359 vs intent 0.345"
+      "detail": "0.350 vs intent 0.345"
     },
     {
       "id": "MODE-protocol vertical placement",
@@ -540,7 +540,7 @@
     {
       "id": "MODE-portrait horizontal placement",
       "ok": true,
-      "detail": "0.456 vs intent 0.44"
+      "detail": "0.445 vs intent 0.44"
     },
     {
       "id": "MODE-portrait vertical placement",
@@ -570,7 +570,7 @@
     {
       "id": "MODE-protocol leaves the upper-centre free for UI",
       "ok": true,
-      "detail": "head at 0.44 down, centre 0.36 across"
+      "detail": "head at 0.44 down, centre 0.35 across"
     },
     {
       "id": "MODE-00 no errors switching modes",
@@ -601,18 +601,18 @@
       },
       "stats": {
         "frames": 46,
-        "fps": 30,
-        "avgMs": 2.19,
+        "fps": 60,
+        "avgMs": 2.4,
         "tierDrops": 0
       },
-      "drawCalls": 115,
-      "triangles": 5986,
-      "geometries": 80,
-      "textures": 7,
-      "litFraction": 0.573175,
-      "meanLuma": 74.92269188638478,
-      "partialRows": 215,
-      "plateaus": 9
+      "drawCalls": 135,
+      "triangles": 6376,
+      "geometries": 92,
+      "textures": 9,
+      "litFraction": 0.5736,
+      "meanLuma": 73.67610527936456,
+      "partialRows": 238,
+      "plateaus": 8
     },
     {
       "viewport": "iphone-se",
@@ -635,19 +635,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 42,
+        "frames": 41,
         "fps": 60,
-        "avgMs": 2.03,
+        "avgMs": 2.73,
         "tierDrops": 0
       },
-      "drawCalls": 115,
-      "triangles": 5986,
-      "geometries": 80,
-      "textures": 7,
-      "litFraction": 0.5509577464788732,
-      "meanLuma": 73.34121239540465,
-      "partialRows": 220,
-      "plateaus": 9
+      "drawCalls": 135,
+      "triangles": 6376,
+      "geometries": 92,
+      "textures": 9,
+      "litFraction": 0.5519154929577464,
+      "meanLuma": 72.47020403582833,
+      "partialRows": 245,
+      "plateaus": 8
     },
     {
       "viewport": "iphone-14",
@@ -672,17 +672,17 @@
       "stats": {
         "frames": 40,
         "fps": 30,
-        "avgMs": 1.98,
+        "avgMs": 2.43,
         "tierDrops": 0
       },
-      "drawCalls": 115,
-      "triangles": 5986,
-      "geometries": 80,
-      "textures": 7,
-      "litFraction": 0.5510723860589812,
-      "meanLuma": 73.04275097682164,
-      "partialRows": 233,
-      "plateaus": 9
+      "drawCalls": 135,
+      "triangles": 6376,
+      "geometries": 92,
+      "textures": 9,
+      "litFraction": 0.5518900804289544,
+      "meanLuma": 72.14081386963997,
+      "partialRows": 258,
+      "plateaus": 8
     },
     {
       "viewport": "iphone-pro-max",
@@ -706,18 +706,18 @@
       },
       "stats": {
         "frames": 39,
-        "fps": 60,
-        "avgMs": 2.39,
+        "fps": 30,
+        "avgMs": 2.46,
         "tierDrops": 0
       },
-      "drawCalls": 115,
-      "triangles": 5986,
-      "geometries": 80,
-      "textures": 7,
-      "litFraction": 0.53858125,
-      "meanLuma": 71.9115658879243,
-      "partialRows": 238,
-      "plateaus": 9
+      "drawCalls": 135,
+      "triangles": 6376,
+      "geometries": 92,
+      "textures": 9,
+      "litFraction": 0.5385,
+      "meanLuma": 71.10230431131538,
+      "partialRows": 264,
+      "plateaus": 8
     },
     {
       "viewport": "ipad-portrait",
@@ -745,13 +745,13 @@
         "avgMs": 0,
         "tierDrops": 0
       },
-      "drawCalls": 119,
-      "triangles": 6002,
-      "geometries": 84,
-      "textures": 7,
-      "litFraction": 0.4463625,
-      "meanLuma": 63.69939245140138,
-      "partialRows": 330,
+      "drawCalls": 143,
+      "triangles": 6400,
+      "geometries": 98,
+      "textures": 9,
+      "litFraction": 0.4469625,
+      "meanLuma": 62.97563616417194,
+      "partialRows": 361,
       "plateaus": 8
     },
     {
@@ -775,19 +775,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 25,
+        "frames": 24,
         "fps": 0,
         "avgMs": 0,
         "tierDrops": 0
       },
-      "drawCalls": 125,
-      "triangles": 6026,
-      "geometries": 90,
-      "textures": 7,
-      "litFraction": 0.41544375,
-      "meanLuma": 59.72891023618697,
-      "partialRows": 337,
-      "plateaus": 7
+      "drawCalls": 149,
+      "triangles": 6424,
+      "geometries": 104,
+      "textures": 9,
+      "litFraction": 0.41701875,
+      "meanLuma": 58.8989240481451,
+      "partialRows": 372,
+      "plateaus": 8
     },
     {
       "viewport": "phone-landscape",
@@ -810,19 +810,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 38,
+        "frames": 36,
         "fps": 30,
-        "avgMs": 2.04,
+        "avgMs": 3.06,
         "tierDrops": 0
       },
-      "drawCalls": 125,
-      "triangles": 6026,
-      "geometries": 90,
-      "textures": 7,
-      "litFraction": 0.3898349056603774,
-      "meanLuma": 59.365790453438564,
-      "partialRows": 203,
-      "plateaus": 7
+      "drawCalls": 149,
+      "triangles": 6424,
+      "geometries": 104,
+      "textures": 9,
+      "litFraction": 0.3908883647798742,
+      "meanLuma": 58.73409153845185,
+      "partialRows": 224,
+      "plateaus": 8
     },
     {
       "viewport": "desktop",
@@ -850,14 +850,14 @@
         "avgMs": 0,
         "tierDrops": 0
       },
-      "drawCalls": 125,
-      "triangles": 6026,
-      "geometries": 90,
-      "textures": 7,
-      "litFraction": 0.4055,
-      "meanLuma": 59.07554624597172,
-      "partialRows": 339,
-      "plateaus": 7
+      "drawCalls": 149,
+      "triangles": 6424,
+      "geometries": 104,
+      "textures": 9,
+      "litFraction": 0.40683125,
+      "meanLuma": 58.361524689786485,
+      "partialRows": 372,
+      "plateaus": 8
     }
   ]
 }

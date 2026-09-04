@@ -126,6 +126,23 @@ function buildEnvironment(renderer, palette) {
     /* a low silver bounce so downward-tilted facets are not uniformly dead */
     { x: 96, y: 82, w: 20, h: 14, fill: 'rgba(228,244,255,0.55)' },
 
+    /* THE CAMERA-SIDE KEY — the reason the body had no silver catches.
+
+       A facet reflects its MIRROR direction, and for a plane facing the viewer
+       that direction points straight back at the camera. In equirectangular
+       terms the camera (+z) sits at u = atan2(1,0)/2pi + 0.5 = 0.75, i.e. x
+       around 192 of 256. Every card was off to the sides, so the whole front of
+       the character was reflecting empty black sky and no amount of raising
+       envMapIntensity could produce a highlight there — the reflected content
+       was zero.
+
+       These two sit around that direction. Only facets whose relief happens to
+       aim them at one will catch it, so what lands is a scatter of bright
+       planes across the chest and shoulders rather than a uniform sheen —
+       which is exactly the reference's behaviour. */
+    { x: 202, y: 50, w: 26, h: 22, fill: 'rgba(255,255,255,1)' },
+    { x: 176, y: 68, w: 18, h: 15, fill: 'rgba(226,246,255,0.85)' },
+
     /* THE MIDTONE TIER — larger, dimmer, and the reason this list has two
        kinds of entry.
 
