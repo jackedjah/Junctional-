@@ -46,7 +46,8 @@
 
 import {
   BufferGeometry, Float32BufferAttribute, Mesh, MeshBasicMaterial, Points,
-  PointsMaterial, Color, Group, Vector3, AdditiveBlending, DoubleSide, FrontSide
+  PointsMaterial, Color, Group, Vector3, AdditiveBlending, DoubleSide, FrontSide,
+  LineSegments, LineBasicMaterial
 } from '../vendor/three/three.module.min.js';
 
 /* One fixed light for the whole range. High, from the left and slightly the
@@ -136,7 +137,10 @@ var MIST_RIM = srgb(120, 145, 172);
    its lit planes under 96: narrowing the swing alone (0.60 + 0.25) put 54%
    of the range under 32, since the half-lit faces dropped with the lit
    ones. */
+/* R101 — the spire tone: darker steel than the mid range, a harder catch, no
+   jitter — towers cut by an impossible civilisation, not rubble. */
 var TONES = {
+  spire: { base: srgb(40, 46, 62), amb: 0.22, kd: 0.52, spec: srgb(190, 205, 228), ks: 0.85, shine: 42, jitter: 0.10, depth: 0.22, rim: 0.18, floor: 0.50, dir: 0.50 },
   ridge: { base: srgb(66, 74, 88), amb: 0.26, kd: 0.48, spec: srgb(170, 185, 205), ks: 0.62, shine: 36, jitter: 0.46, depth: 0.0, rim: 0.26, floor: 0.60, dir: 0.40 },
   /* Round 4 overshot: amb 0.68 put 73% of the mid range's own pixels under
      32 luma in the harness frame (R94-WORLD-12's ceiling is 50%) while the
@@ -173,6 +177,7 @@ var TONES = {
    have. */
 var JITTER = {
   ridge: { ang: 0.60, rad: 0.90, y: 0.70 },
+  spire: { ang: 0.0, rad: 0.0, y: 0.0 },
   mid:   { ang: 0.30, rad: 0.30, y: 0.16 },
   far:   { ang: 0.26, rad: 0.28, y: 0.14 }
 };
@@ -189,7 +194,7 @@ var LAYERS = {
      `fadeFoot` — so the rocks dissolve into the mist rather than ending on a
      line. */
   ridge: {
-    tone: 'ridge', rings: 3, profile: 0.8, sparkle: 90, sparkleColor: srgb(185, 200, 220), fadeFoot: true,
+    tone: 'ridge', rings: 3, profile: 0.8, behindDim: 0.42, sparkle: 90, sparkleColor: srgb(185, 200, 220), fadeFoot: true,
     massifs: [
       { x: -9.4, z: -24, h: 1.30, r: 2.2, sides: 13, elong: 0.45, seed: 11 },
       { x: -7.0, z: -26, h: 0.85, r: 1.7, sides: 12, elong: 0.5, seed: 41 },
@@ -220,7 +225,7 @@ var LAYERS = {
      from a point. Two massifs at x +/-15 keep the narrower peaks from emptying
      the skyline. Rings 6 -> 5 pays for the mirrored range (`mirror`). */
   mid: {
-    tone: 'mid', rings: 5, profile: 1.04, sparkle: 1100, sparkleColor: srgb(222, 236, 252),
+    tone: 'mid', rings: 5, profile: 1.04, behindDim: 0.36, sparkle: 1100, sparkleColor: srgb(222, 236, 252),
     /* R95 world: alpha 0.70 -> 0.78, mist 0.30 -> 0.42. Guardian-a's floor
        past the horizon averages 40 luma against 24 here; a wet floor returns
        the lit mist as much as the rock, so the reflection carries more of it. */
@@ -239,7 +244,7 @@ var LAYERS = {
     ]
   },
   far: {
-    tone: 'far', rings: 4, profile: 1.0, sparkle: 180, sparkleColor: srgb(180, 198, 220),
+    tone: 'far', rings: 4, profile: 1.0, behindDim: 0.30, sparkle: 180, sparkleColor: srgb(180, 198, 220),
     massifs: [
       /* Carries a beam so a narrow phone frame — half-width ~8 units at the
          mid range, which puts the flanking beacons just outside — still sees
@@ -254,6 +259,22 @@ var LAYERS = {
       { x: 33.0, z: -86, h: 8.4, r: 4.2, sides: 7, elong: 0.9, seed: 37 },
       { x: -44.0, z: -88, h: 7.0, r: 3.5, sides: 6, elong: 0.9, seed: 38 },
       { x: 46.0, z: -84, h: 7.5, r: 3.75, sides: 6, elong: 0.9, seed: 39 }
+    ]
+  },
+  /* R101 — THE SPIRES: the first of the platinum nocturne's structures.
+     Square towers with a short pyramidal cap (`column`), between the ridge
+     and the mid range, none inside the column behind his head and shoulders
+     (|x| < 3), each with a beacon beam and a hairline light seam up its lit
+     edge. Restrained: six, dark, no signage. */
+  spires: {
+    tone: 'spire', rings: 2, profile: 1.0, column: true, behindDim: 0.30, sparkle: 40, sparkleColor: srgb(200, 214, 236), fadeFoot: true,
+    massifs: [
+      { x: -7.8, z: -40, h: 6.6, r: 0.30, sides: 4, elong: 1.0, seed: 61, beacon: true },
+      { x: -4.1, z: -42, h: 8.4, r: 0.24, sides: 4, elong: 1.0, seed: 62 },
+      { x: 7.6, z: -43, h: 7.8, r: 0.26, sides: 4, elong: 1.0, seed: 63, beacon: true },   /* was x 4.4: its beam stood behind the raised hand's crystal */
+      { x: 10.2, z: -38, h: 5.6, r: 0.32, sides: 4, elong: 1.0, seed: 64 },
+      { x: 12.8, z: -40, h: 7.0, r: 0.28, sides: 4, elong: 1.0, seed: 65, beacon: true },
+      { x: -13.2, z: -39, h: 6.0, r: 0.28, sides: 4, elong: 1.0, seed: 66 }
     ]
   }
 };
@@ -271,8 +292,9 @@ function buildMassif(spec, layer, tone, acc) {
     /* The base ring sits ON the floor. At -0.35 it hung below the transparent
        floor and drew an opaque skirt darker than the stage — a hard
        bright/black/floor line right across the frame under the horizon. */
-    var y = k === 0 ? 0.0 : spec.h * Math.pow(t, layer.profile || 1);
-    var rad = spec.r * (1 - t);
+    var y = k === 0 ? 0.0 : (layer.column ? (k === rings ? spec.h * 0.90 : spec.h * t) : spec.h * Math.pow(t, layer.profile || 1));
+    /* R101: a column keeps its radius to the cap ring, then a short pyramid closes it */
+    var rad = layer.column ? spec.r * (k === rings ? 0.70 : 1) : spec.r * (1 - t);
     var ring = [];
     for (var i = 0; i < n; i++) {
       var a = rot + (i / n) * Math.PI * 2 + (rnd() - 0.5) * (k === 0 ? 0.10 : J.ang) * (Math.PI * 2 / n) * 2.4;
@@ -319,6 +341,15 @@ function buildMassif(spec, layer, tone, acc) {
     var g = tone.base.g * lit * jit + tone.spec.g * catchK * tone.ks + MIST_RIM.g * up;
     var b = tone.base.b * lit * jit + tone.spec.b * catchK * tone.ks + MIST_RIM.b * up;
     r += (ATMOS.r - r) * tone.depth; g += (ATMOS.g - g) * tone.depth; b += (ATMOS.b - b) * tone.depth;
+    /* R101 — DARKER BEHIND HIM. The world column behind his head, shoulders
+       and outer arms is held darker than the rest of the range, so the
+       silhouette separates by contrast rather than by glow (the brief's
+       negative-space halo). The column widens with depth because the camera
+       is a perspective one: a shoulder's screen column at the mid range is
+       seven times wider in world units than at the character. */
+    var behindSig = 1.0 + 0.085 * Math.abs(cen.z);
+    var behind = Math.exp(-Math.pow(cen.x / behindSig, 2)) * (layer.behindDim || 0);
+    r *= 1 - behind; g *= 1 - behind; b *= 1 - behind;
 
     acc.pos.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
     /* Colour is RGBA: the fourth channel is where a foot or a reflection fades
@@ -562,7 +593,7 @@ export function createTerrain(options) {
      column and the grid's local brightening only. Quality degrades downward
      only — nothing here is promoted at runtime. */
   var mirrors = [];
-  ['far', 'mid', 'ridge'].forEach(function (name) {
+  ['far', 'mid', 'spires', 'ridge'].forEach(function (name) {
     var L = buildLayer(name, LAYERS[name], !!settings.worldReflections);
     layers[name] = L;
     group.add(L.mesh);
@@ -581,6 +612,27 @@ export function createTerrain(options) {
     L.spkGeo.dispose();
     L.summits.forEach(function (s) { if (s.beacon) { s.far = name === 'far'; summits.push(s); } });
   });
+
+  /* R101 — LIGHT SEAMS: a hairline of the world accent up the lit edge of
+     every spire, from a hand above its foot to just under its cap. One
+     LineSegments, additive, faint: long architectural light seams, not
+     signage. */
+  var seamPos = [];
+  LAYERS.spires.massifs.forEach(function (m) {
+    var ex = m.x + m.r * 0.70, ez = m.z + m.r * 0.70;
+    seamPos.push(ex, 0.25, ez, ex - m.r * 0.20, m.h * 0.88, ez - m.r * 0.20);
+  });
+  var seamGeo = new BufferGeometry();
+  seamGeo.setAttribute('position', new Float32BufferAttribute(seamPos, 3));
+  var seamMat = new LineBasicMaterial({
+    color: new Color(opts.beamColor || 0x52acff).lerp(new Color(0xffffff), 0.35),
+    transparent: true, opacity: 0.42, depthWrite: false, blending: AdditiveBlending, fog: false, toneMapped: false
+  });
+  var seams = new LineSegments(seamGeo, seamMat);
+  seams.name = 'spire-seams';
+  seams.frustumCulled = false;
+  group.add(seams);
+  owned.push(seamGeo, seamMat);
 
   /* Sparkles: one Points for the whole range. Sub-pixel on a phone at chat
      size, so setDetail pulls them back rather than letting them fizz. The low
@@ -639,7 +691,7 @@ export function createTerrain(options) {
   /* Authored baselines, captured once, so a weight of 1 restores exactly what
      was built and no literal is ever duplicated into applyWeight. */
   var BASE = {
-    beam: beams.mat.opacity, cap: capMat.opacity,
+    beam: beams.mat.opacity, cap: capMat.opacity, seam: seamMat.opacity,
     sparkle: spkMat.opacity,
     beamMirror: beamMirror ? beamMirror.mat.opacity : 0
   };
@@ -655,6 +707,7 @@ export function createTerrain(options) {
     var dim = 0.45 + 0.55 * weight;
     Object.keys(layers).forEach(function (k) { layers[k].mat.color.setScalar(dim); });
     mirrors.forEach(function (m) { m.mat.color.setScalar(dim); });
+    seamMat.opacity = BASE.seam * weight;
     beams.mat.opacity = BASE.beam * weight;
     capMat.opacity = BASE.cap * weight;
     spkMat.opacity = BASE.sparkle * weight * (0.3 + 0.7 * detail);

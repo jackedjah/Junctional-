@@ -1146,3 +1146,82 @@ reflection is platinum carrying the theme at 65 / 35; and a hairline seam
 of the theme's colour runs along the rim of large coated chromatic facets.
 Under gold and purple the coat still reads silver — measured on the same
 crops as R99 — and the colour reads as reflected through it.
+
+### The neutral head is a true square diamond (R101 head law)
+
+`reference/mrmah-refJ-r101-godforms-sheet.png` fixes the head as a square
+rotated 45 degrees: `halfWidth` and `halfHeight` are equal (0.366, the
+geometric mean of the old pair, so the presence in frame is unchanged) and
+the test suite holds them equal. The chassis is symmetric BY CONSTRUCTION:
+the head's bevel scatter and zigzag are keyed on each ring point's folded
+index (its mirror across the vertical centreline), so the two halves are
+exact reflections and only the light is allowed to be asymmetric. Measured
+with the scratch `headsym` tool on the neutral front: top and bottom corners
+on the centreline within half a pixel, mirror difference 2.6%, the display
+centred within a pixel, casing thickness symmetric within two. The
+visible diamond still reads a few percent wider than tall because the
+camera looks slightly down at it and its bottom corner sits into the neck
+collar — perspective and seating, not geometry.
+
+### A collar the head plunges into, not a stick it balances on
+
+The square head's bottom corner is at 2.268; the neck column rises past
+it and closes at 2.335, inside the diamond. Burying it to 2.345 cost the
+visible diamond a tenth of its height (aspect 1.13); at 2.335 it reads
+square (1.08). Seat the corner into the collar by about 0.03, no more.
+
+### The Secondary illuminates him; it does not paint him (R101 material law)
+
+The chromatic facets' own hue had taken the theme since R96 (`uTint` in
+the diffuse mix), so under purple the body was purple crystal, and the
+R101 reflection tint stacked on top read as paint — rejected on the
+capture. The facets' own hue is now `uCrystalTint`, the canonical
+sapphire under every theme; `uTint` (the theme) drives only the rims, the
+seams, the coat's albedo and reflection tint, the internal light and the
+lamps.
+
+Measured over the CHARACTER ONLY (theme-hue pixels at luma 18-150 that
+are not emitters, as a share of his pixels), R100 -> R101: blue 73.0% ->
+77.0%, purple 33.0% -> 39.6%, gold 21.7% -> 22.3%, with the platinum still
+reading silver. Three things about that measurement, each of which cost a
+pass:
+
+- **The first mask was mostly background.** It was taken from the mass
+  debug view as "opaque and near-black", and the lab stage behind the
+  transparent canvas is also opaque and near-black, so "body" was 56% of
+  the frame and every number was diluted three to one. The character mask
+  is now the `groups` view with every scene child but the character root
+  hidden, at the low tier (no halo to blur the outline), and the body comes
+  out at 16% of the canonical frame. Sanity-check the pixel count against
+  his expected share of the frame before believing a distribution built
+  on a mask. (This document already said so. It was still done.)
+- **A complementary theme cannot be reflected off a sapphire body.** Gold
+  light on blue crystal adds to grey, and the coat reflects it white, so
+  the coat's reflection tint, the rim and the seams — the terms that carry
+  blue and purple — each measured as a no-op for gold (0.04 points). What
+  R100's gold number had been counting was the facets' own hue taking the
+  theme: paint. The only transport that carries a complementary theme
+  through this body is TRANSMISSION, the core light (`coreStrength`, 2.0 ->
+  3.6), which is added in the theme's own colour where the crystal is
+  dark. It lifted gold on the abdomen quarter from 3.6% to 9.8% and moved
+  the blue render by nothing the eye can find at the waist.
+- **Blue is a poor test of the theme system**, because the crystal's own
+  hue is inside its band; the honest numbers are purple and gold.
+
+### Darker behind him, alive around him
+
+The range's baked vertex colours are dimmed by a Gaussian in world x whose
+width grows with depth (a shoulder's screen column is seven times wider in
+world units at the mid range than at the character), so the range is
+darker behind his head, shoulders and outer arms and rises away from him —
+a negative-space halo without glow. Measured on the no-character showcase
+capture over the range band (scratch `envread`), the centre column went
+from 1.02x the flanks to 0.99x: real, and modest, because the horizon mist
+in that band is uniform and is most of its mean. Do not claim more than
+that number from the render. The first structures of the
+platinum nocturne are a `spires` layer in terrain.js: square towers with a
+short cap between the ridge and the mid range, beacon beams on three, a
+hairline light seam up each lit edge, none inside |x| < 3.5. One of them
+first stood at x 4.4 and its beam ran straight up behind the raised hand's
+crystal; a structure's screen column has to be checked against the pose,
+not only against the head.

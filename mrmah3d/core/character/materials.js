@@ -201,7 +201,7 @@ export function createCrystalMaterials(options) {
        near-black: the reflection is a catch, the glass a void between. */
     roughness: 0.06,
     metalness: 0.74,
-    envMapIntensity: 2.4,
+    envMapIntensity: 3.0,   /* R101: the reflection travels more clearly across the glass */
     flatShading: true,
     /* R98 — the screen is not pitch black: a faint deep-blue self-light so
        the plate reads as a powered display the eyes and smile are drawn ON,
@@ -210,7 +210,7 @@ export function createCrystalMaterials(options) {
        eyes' own colour faintly (a fifth of the way from its blue-violet
        floor toward the emission hue), so violet eyes sit in a screen that
        is faintly violet inside and gold eyes in one that is faintly warm. */
-    emissive: new Color(PALETTE.faceGlow || 0x0c1a34).lerp(new Color(tint.glow || PALETTE.glow), 0.18),
+    emissive: new Color(PALETTE.faceGlow || 0x0c1a34).lerp(new Color(tint.glow || PALETTE.glow), 0.26),   /* R101: 0.18 -> 0.26 */
     emissiveIntensity: 0.50
   });
 
@@ -399,6 +399,8 @@ export function createCrystalMaterials(options) {
      See crystal-shader.js. */
   applyCrystalShader(body, {
     tint: tint.edge || PALETTE.edge,
+    /* R101: the facets' own hue never takes the theme (crystal-shader.js) */
+    crystalTint: PALETTE.edge,
     deep: PALETTE.crystalDeep,
     /* Down from 1.35. The Fresnel boost brightens whatever faces away from the
        camera, which is the right instinct for a silhouette lip and the wrong
@@ -495,7 +497,8 @@ export function createCrystalMaterials(options) {
     innerY: 0.42,
     innerRange: 1.00,
     innerTop: 1.28,
-    coreStrength: 1.6,
+    coreStrength: 3.6,   /* R101: 1.6 -> 3.6, the core's theme light reaches the abdominal valleys — the one
+                            transport that carries a complementary theme (gold) through a sapphire body */
     coreY: 1.66,
     coreRange: 0.66,
     coreTop: 2.08,

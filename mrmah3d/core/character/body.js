@@ -322,7 +322,7 @@ export function buildBody(materials, P) {
     /* R99, from the silhouette test (?debug=mass): at innerY 2.062 the cap's
        crest rose ABOVE the trapezius line and each shoulder read as a bump
        sitting on the body. Lowered so the crest continues the trap's slope. */
-    var D = ARMS_.deltoid || { innerX: 0.262, innerY: 2.030, outerX: 0.590, outerY: 1.935, r0: 0.252 };
+    var D = ARMS_.deltoid || { innerX: 0.262, innerY: 2.030, outerX: 0.596, outerY: 1.935, r0: 0.268 };   /* R101: a bigger cap */
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;
@@ -349,7 +349,7 @@ export function buildBody(materials, P) {
       var endT = Math.max(0, (t - 0.75) / 0.25);
       var end = 1 - 0.55 * endT * endT * (3 - 2 * endT);
       return (0.28 + 0.72 * root * root * (3 - 2 * root)) * end *
-             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.33);
+             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.36);
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -372,10 +372,18 @@ export function buildBody(materials, P) {
            front steel-blue, the crest lit sapphire, the rear sapphire — so the
            dome reads as front / side / rear delt and its planes trade as he
            turns, rather than as one shoulder lump. */
+        /* R101 — THREE HEADS AS FORM, not only as colour: the front and rear
+           lobes, a lateral CREST across the top of the cap, and two shallow
+           grooves between the heads so the plane flow changes three times
+           across the shoulder. */
         shape: function (t, d) {
           var belly = Math.sin(Math.min(1, t / 0.9) * Math.PI);
-          return 1 + (0.07 * Math.exp(-Math.pow(d / 0.75, 2)) +
-                      0.06 * Math.exp(-Math.pow((Math.abs(d) - Math.PI) / 0.85, 2))) * belly;
+          var ad = Math.abs(d);
+          var front = 0.08 * Math.exp(-Math.pow(d / 0.70, 2));
+          var rear = 0.07 * Math.exp(-Math.pow((ad - Math.PI) / 0.80, 2));
+          var lateral = 0.06 * Math.exp(-Math.pow((ad - Math.PI / 2) / 0.45, 2));
+          var grooves = -0.045 * (Math.exp(-Math.pow((ad - 0.95) / 0.22, 2)) + Math.exp(-Math.pow((ad - 2.25) / 0.22, 2)));
+          return 1 + (front + rear + lateral + grooves) * belly;
         },
         zoneAt: function (d, t) {
           var ad = Math.abs(d);

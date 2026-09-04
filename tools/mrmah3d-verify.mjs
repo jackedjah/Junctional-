@@ -796,8 +796,9 @@ for (const v of VIEWPORTS) {
   check('R94-WORLD-01 frame budget at tier high (draws <= 165, tris <= 11000)',
     world.budget.calls <= 165 && world.budget.tris <= 11000,
     `${world.budget.calls} draws, ${world.budget.tris} tris`);
-  check('R94-WORLD-02 three terrain layers built and visible',
-    world.layers.length === 3 && world.layers.every(l => l.visible && l.tris > 100),
+  check('R94-WORLD-02 three depth layers (far, mid, ridge) built and visible; extra layers (R101 spires) allowed',
+    ['far', 'mid', 'ridge'].every(n => world.layers.some(l => l.name === n && l.visible && l.tris > 100))
+      && world.layers.every(l => l.visible && l.tris > 0),
     world.layers.map(l => `${l.name} ${l.tris} tris`).join(', '));
   check('R94-WORLD-03 the range is a lit mid-dark mass (not black cut-outs, not a pale wall)',
     world.band.mean > 22 && world.band.mean < 90 && world.band.midFrac > 0.15,

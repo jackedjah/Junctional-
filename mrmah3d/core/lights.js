@@ -145,7 +145,7 @@ export function createLights(options) {
      at 0.89 takes nothing. */
   /* R96: 0.9 -> 0.75. With the arms hanging closer to the ribcage their inner
      planes at 0.77 drew the lamp as two cyan dots; the sternum at 0.6 keeps it. */
-  var chestLamp = new PointLight(new Color(T('emission', 0x4fe3ff)), 0.62, 0.75, 2);
+  var chestLamp = new PointLight(new Color(T('emission', 0x4fe3ff)), 0.85, 0.92, 2);   /* R101: the chest diamond's bounce reaches the pec planes */
   chestLamp.position.set(0, 1.80, 0.85);
   /* R95: range 1.1 -> 0.5. Reviewed, the face lamp reached the shoulder line
      half a unit below the head and drew pinpoint white speculars across the
@@ -206,7 +206,7 @@ export function createLights(options) {
     rim.intensity = 2.2 * k;
     rim2.intensity = 2.6 * k;
     bounce.intensity = 1.05 * k;
-    chestLamp.intensity = 0.62 * k;
+    chestLamp.intensity = 0.85 * k;
     faceLamp.intensity = 0.95 * k;
   }
 
@@ -226,7 +226,7 @@ export function createLights(options) {
        into the geometry around each emitter rather than staying on it. */
     setEmissionGlow: function (g) {
       var k = Math.max(0, Number(g) || 1);
-      chestLamp.intensity = 0.62 * k;
+      chestLamp.intensity = 0.85 * k;
       faceLamp.intensity = 0.95 * k;
     }
   };

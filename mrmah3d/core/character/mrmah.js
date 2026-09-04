@@ -100,7 +100,7 @@ export function createMrMah(options) {
 
     materials.setGlow(v.glow * (conf.glowScale == null ? 1 : conf.glowScale));
     /* R98 — the hand crystal's lamp rides the same pulse as the emitters. */
-    if (limbs.handLamp) limbs.handLamp.intensity = 0.70 * v.glow;
+    if (limbs.handLamp) limbs.handLamp.intensity = 0.95 * v.glow;
     /* R99 — THE CRYSTAL LEVITATES over the palm: a slow rise and fall of a
        few millimetres and a slight roll, out of phase with the hover, so it
        reads as held by control rather than glued to the fingertips. Off

@@ -82,6 +82,12 @@ export function applyCrystalShader(material, options) {
        through the floor rather than sitting on it. */
     uInnerDark: { value: opts.innerDark == null ? 0.50 : opts.innerDark },
     uTint: { value: tintColor },
+    /* R101 — THE CRYSTAL'S OWN HUE IS CANONICAL. `uTint` is theme energy and
+       drives the rims, the seams, the coat's reflection and the internal
+       light; the chromatic facets' own colour is this, the canonical sapphire,
+       under every theme — the R101 material law: the Secondary illuminates,
+       refracts through and reflects inside him, it does not paint him. */
+    uCrystalTint: { value: new Color(opts.crystalTint == null ? 0x35d6ff : opts.crystalTint) },
     uDeep: { value: deepColor },
     uVariation: { value: opts.variation == null ? 1.0 : opts.variation },
     /* Width of the shaded chamfer as a share of the face, and how far the
@@ -221,6 +227,7 @@ export function applyCrystalShader(material, options) {
         'uniform float uInnerDark;',
         'uniform float uVariation;',
         'uniform vec3 uTint;',
+        'uniform vec3 uCrystalTint;',
         'uniform vec3 uDeep;',
         'uniform float uBevelWorld;',
         'uniform float uBevelAmount;',
@@ -332,7 +339,7 @@ export function applyCrystalShader(material, options) {
            hierarchy as well as the hue — the opposite of the reference, where
            cyan is a mid-value accent and the bright end is white. */
         '  vec3 mrHue = mix( vec3( dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) ),',
-        '                    diffuseColor.rgb * uTint * 0.95, clamp( vFacet.w, 0.0, 1.0 ) );',
+        '                    diffuseColor.rgb * uCrystalTint * 0.95, clamp( vFacet.w, 0.0, 1.0 ) );',
         '  diffuseColor.rgb = mix( mrHue, uDeep, clamp( mrDark, 0.0, 1.0 ) );',
         /* The silver class carries a NEGATIVE darkness, and this line turns
            that into extra albedo — it is what makes a silver facet the
@@ -354,7 +361,7 @@ export function applyCrystalShader(material, options) {
            the coat's value: neutral silver still dominates, the theme lives
            in what it reflects. */
         '  vec3 mrTintN = uTint / max( dot( uTint, vec3( 0.299, 0.587, 0.114 ) ), 0.05 );',
-        '  vec3 mrCoatAlbedo = uCoatColor * mix( vec3( 1.0 ), mrTintN, 0.10 );',
+        '  vec3 mrCoatAlbedo = uCoatColor * mix( vec3( 1.0 ), mrTintN, 0.16 );',   /* R101: 0.10 -> 0.16; 0.24 read as paint on the purple capture */
         '  diffuseColor.rgb = mix( diffuseColor.rgb, mrCoatAlbedo * ( 0.80 + 0.20 * dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) * 2.0 ), mrCoatW );',
         '#endif'
       ].join('\n'))
@@ -383,7 +390,11 @@ export function applyCrystalShader(material, options) {
          diffuse under the key and keeps its catches as accents rather than as
          blown panels. */
       .replace('radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );',
-               'radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness ) * mix( 1.0, uCoatEnv, mrCoatW );')
+               /* R101 — THE PLATINUM REFLECTS A COLOURED UNIVERSE: what a coated plane
+                  mirrors is tinted a third of the way toward the theme's hue (normalised, so
+                  the catch keeps its value), which is where the colour shows up as reflection
+                  rather than as paint. */
+               'radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness ) * mix( 1.0, uCoatEnv, mrCoatW ) * mix( vec3( 1.0 ), uTint / max( dot( uTint, vec3( 0.299, 0.587, 0.114 ) ), 0.05 ), mrCoatW * 0.26 );')
 
       /* Fresnel, applied after lighting.
 
@@ -447,7 +458,7 @@ export function applyCrystalShader(material, options) {
         /* R100: a coated plane's grazing reflection is platinum carrying the
            theme (65 / 35), not platinum instead of it — the colour trapped in
            the material's edge response rather than laid over it. */
-        '    vec3 mrRimColor = mix( uTint, mix( uCoatColor * 1.15, uTint, 0.35 ), mrCoatW * 0.70 );',
+        '    vec3 mrRimColor = mix( uTint, mix( uCoatColor * 1.15, uTint, 0.58 ), mrCoatW * 0.70 );',   /* R101: 0.35 -> 0.58, the coat's rim reflects the theme */
         /* R99: the rim is fragmented by direction — see the uniform note. */
         '    vec3 mrRN = normalize( normal );',
         '    float mrRimDir = clamp( uRimFloor + max( dot( mrRN, uRimDirA ), 0.0 ) * 1.0 + max( dot( mrRN, uRimDirB ), 0.0 ) * 0.55, 0.0, 1.0 );',
@@ -462,7 +473,7 @@ export function applyCrystalShader(material, options) {
         '      float mrSeamW = clamp( 0.018 / max( vBary.w, 1e-4 ), 0.02, 0.12 );',
         '      float mrSeam = ( 1.0 - smoothstep( 0.0, mrSeamW, mrSeamEdge ) ) * smoothstep( 0.025, 0.06, vBary.w );',
         '      mrSeam *= mrCoatW * smoothstep( 0.35, 0.75, clamp( vFacet.w, 0.0, 1.0 ) );',
-        '      outgoingLight += uTint * mrSeam * 0.16;',
+        '      outgoingLight += uTint * mrSeam * 0.38;',   /* R101: 0.16 -> 0.38, the seams carry more */
         '    }',
         /* R94 — the internal light. See the uniform note above. */
         '    if ( uInnerStrength > 0.0 && vInner > 0.5 ) {',
@@ -500,7 +511,7 @@ export function applyCrystalShader(material, options) {
         '        float mcAtt = 1.0 / ( 1.0 + mcQ * mcQ );',
         '        float mcGate = 1.0 - smoothstep( uCoreTop - 0.30, uCoreTop + 0.06, vObjPos.y );',
         '        mcGate *= smoothstep( uInnerTop - 0.55, uInnerTop + 0.25, vObjPos.y );',
-        '        float mcSide = 0.18 + 0.82 * pow( abs( mrN.x ), 0.75 );',
+        '        float mcSide = 0.26 + 0.74 * pow( abs( mrN.x ), 0.75 );',   /* R101: the core light reaches the front valleys a little more */
         '        float mcInner = uCoreStrength * mcAtt * mcGate * mcSide * mrPass * ( 0.18 + 0.82 * pow( mcTrans, 1.25 ) );',
         '        outgoingLight += uInnerColor * mcInner * mix( 0.55, 1.0, clamp( vFacet.w, 0.0, 1.0 ) );',
         '      }',

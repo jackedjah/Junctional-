@@ -94,9 +94,16 @@ export var HEAD = {
      tolerance band (6% under the anatomical value) and the rest of the ratio
      is bought by growing the body: shoulders 0.598 -> 0.672, arms 40% thicker.
      The apex still lands at HEIGHT. */
-  halfWidth: 0.395,
-  halfHeight: 0.338,
-  centreY: 2.662,               /* apex lands at HEIGHT; base at 2.324 */
+  /* R101 — A TRUE SQUARE, ROTATED 45 DEGREES. The head had been 0.395 by
+     0.338 since the anatomical reference (which cut it broader than tall);
+     the R101 law locks the neutral head as a square diamond: equal sides,
+     equal opposing angles, top and bottom corners on the centreline. The
+     side is the geometric mean of the old pair, so the head keeps its
+     presence in the frame; the apex still lands at HEIGHT and the bottom
+     corner now sits DOWN INTO the neck column (see the neck rings). */
+  halfWidth: 0.366,
+  halfHeight: 0.366,
+  centreY: 2.634,               /* apex lands at HEIGHT; base at 2.268 */
   /* Real front-to-back depth. The head is a beveled crystal, not a plate.
      The ratio goes UP as the head comes down — 0.85 of half-width against the
      old 0.68 — because the reference's head reads as a thick cut stone with
@@ -174,9 +181,9 @@ export var HEAD = {
      The glass keeps the smile inside it (its tips reach 0.625). */
   faceInset: 0.680,              /* the cavity floor's edge, as a share of the diamond */
   crownInset: 0.895,             /* outer chamfer band */
-  crownZ: 0.20,                  /* its depth, share of halfDepth */
+  crownZ: 0.24,                  /* its depth, share of halfDepth (R101: a thicker casing) */
   bevelInset: 0.800,             /* the lip — the inner edge of the chamfer */
-  bevelZ: 0.40,                  /* 0.096 forward of the girdle */
+  bevelZ: 0.46,                  /* 0.110 forward of the girdle (R101) */
   innerInset: 0.740,             /* the cavity wall's foot */
   screenInset: 0.630,            /* the glass's edge */
   screenZ: 0.08,                 /* the glass's depth — 0.019 forward of the girdle, share of halfDepth */
@@ -327,11 +334,11 @@ function chestShape(k) {
        is a mass with real front-to-back projection, and the sternum falls
        away between the two; the lats flare a little more under the arm. */
     var sternum = -lobe(a, 0, 0.38) * 0.245;
-    var pec = (lobe(a, 0.70, 0.52) + lobe(a, -0.70, 0.52)) * 0.360;
+    var pec = (lobe(a, 0.70, 0.52) + lobe(a, -0.70, 0.52)) * 0.390;   /* R101: a deeper shelf */
     /* R97: the lats — the ribcage's side planes swell so the V reads from
        the front AND the back; the back itself is flattened, grooved down the
        spine and carries a pair of erector / lat planes either side of it. */
-    var lat = (lobe(a, Math.PI / 2 + 0.25, 0.60) + lobe(a, -Math.PI / 2 - 0.25, 0.60)) * 0.165;
+    var lat = (lobe(a, Math.PI / 2 + 0.25, 0.60) + lobe(a, -Math.PI / 2 - 0.25, 0.60)) * 0.190;   /* R101: the lats flare wider */
     var back = lobe(a, Math.PI, 1.00) * -0.100;
     var spine = -lobe(a, Math.PI, 0.20) * 0.080;
     var erector = (lobe(a, Math.PI - 0.42, 0.30) + lobe(a, -Math.PI + 0.42, 0.30)) * 0.060;
@@ -565,7 +572,7 @@ function clavicleShape(k) {
   return function (a) {
     var hollow = -lobe(a, 0, 0.60) * 0.160;
     var collar = (lobe(a, 0.95, 0.50) + lobe(a, -0.95, 0.50)) * 0.150;
-    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.280;   /* R99: the traps climb to carry the head; R100: higher still */
+    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.340;   /* R99: the traps climb to carry the head; R100: higher still; R101: undeniable */
     /* R97: a SHOULDER SHELF at the sides, so the torso's own line runs out
        under the deltoid cap and the cap grows out of the trapezius instead of
        sitting on it — the trap -> delt continuity the brief asks for. */
@@ -849,12 +856,12 @@ export var TORSO = {
        zone (pecUnderZone). */
     { y: 1.830, w: 0.272, d: 0.252, facet: -0.0060, crystal: 0.0300, crystalY: 0.0080,
       shape: chestShape(0.62), zoneAt: pecUnderZone },
-    { y: 1.895, w: 0.312, d: 0.286, facet: 0.0050, crystal: 0.0320, crystalY: 0.0080,
+    { y: 1.895, w: 0.312, d: 0.294, facet: 0.0050, crystal: 0.0320, crystalY: 0.0080,
       shape: chestShape(0.96), hero: 0.30, zoneAt: pecZone(0) },
     /* the pectoral line — the strongest cross-section shaping on the body */
-    { y: 1.970, w: 0.325, d: 0.294, facet: 0.0055, crystal: 0.0340, crystalY: 0.0080,
+    { y: 1.970, w: 0.325, d: 0.303, facet: 0.0055, crystal: 0.0340, crystalY: 0.0080,
       shape: chestShape(1.0), hero: 0.34, zoneAt: pecZone(0) },
-    { y: 2.080, w: 0.318, d: 0.280, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
+    { y: 2.080, w: 0.318, d: 0.288, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
       shape: chestShape(0.80), hero: 0.40, zoneAt: pecZone(1) },
     /* R100 — the groove under the clavicle (subclavicleShape): its own dark,
        uncoated zone, so the collarbone above it reads as a bar with shadow
@@ -870,8 +877,8 @@ export var TORSO = {
     /* R100 — THE TRAPEZIUS RING: between the shoulder line and the neck's
        base, so the traps rise diagonally toward the neck across two bands
        instead of one steep step, with the trap lobes at full strength. */
-    { y: 2.192, w: 0.268, d: 0.198, facet: -0.0050, crystal: 0.0260, crystalY: 0.0050,
-      shape: clavicleShape(0.85), hero: 0.04, zoneAt: trapZone, coat: 0.12 },   /* a slope, not a shelf: first cut at 2.190 / 0.282 drew a flat ledge */
+    { y: 2.192, w: 0.272, d: 0.214, facet: -0.0050, crystal: 0.0260, crystalY: 0.0050,
+      shape: clavicleShape(0.85), hero: 0.04, zoneAt: trapZone, coat: 0.12 },   /* R101: deeper behind, the upper back's thickness */   /* a slope, not a shelf: first cut at 2.190 / 0.282 drew a flat ledge */
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11
@@ -991,13 +998,21 @@ export var TORSO = {
     /* The column's rings follow the head's lower vertex (2.324 now): the top
        ring sits 0.09 above it where the head is 0.10 wide and swallows it, and
        the visible neck from trapezius to chin is 0.12 — the reference's. */
-    { y: 2.250, w: 0.152, d: 0.124, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
+    /* R101 — the square head's bottom corner is at 2.268 and the column
+       rises past it: the diamond's point sits down INTO the neck, which is
+       how the sheet reference seats it — a collar the head plunges into,
+       not a stick the head balances on. The column closes at 2.380, inside
+       the diamond (0.11 wide there). */
+    { y: 2.250, w: 0.150, d: 0.122, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
       zc: -0.030, hero: 0.10, classesAt: neckClasses },
-    { y: 2.315, w: 0.132, d: 0.110, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
+    /* measured (headsym): buried to 2.345 the visible diamond lost a tenth of
+       its height and read wider than tall; the collar now closes at 2.335 so
+       the corner sits into it by 0.03 and the square reads. */
+    { y: 2.290, w: 0.126, d: 0.104, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
       zc: -0.040, hero: 0.06, classesAt: neckClasses },
-    { y: 2.368, w: 0.118, d: 0.100, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
+    { y: 2.318, w: 0.080, d: 0.068, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
       zc: -0.044, hero: 0.04, classesAt: neckClasses },
-    { y: 2.412, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neckClasses }
+    { y: 2.335, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neckClasses }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
   /* Widened. Against the canonical reference the render measured 9.3% narrow
@@ -1107,8 +1122,8 @@ export var ARMS = {
     shoulder: [-0.496, 1.985, 0.014],
     elbow: [-0.600, 1.440, 0.10],
     wrist: [-0.545, 1.060, 0.14],
-    upperRadius: 0.152,
-    foreRadius: 0.118,
+    upperRadius: 0.160,
+    foreRadius: 0.124,
     wristRadius: 0.074
   },
   left: {                         /* viewer's RIGHT — the raised arm */
@@ -1125,8 +1140,8 @@ export var ARMS = {
     shoulder: [0.496, 1.985, 0.014],
     elbow: [0.545, 1.450, 0.11],
     wrist: [0.720, 1.860, 0.15],
-    upperRadius: 0.152,
-    foreRadius: 0.118,
+    upperRadius: 0.160,
+    foreRadius: 0.124,
     wristRadius: 0.074
   },
 
@@ -1244,9 +1259,9 @@ export var ARMS = {
          and rises (0.32 -> 0.36) so it peaks along a line; the tricep keeps
          its long-head fullness and gains a LATERAL-HEAD ridge on the outer
          arm, the horseshoe's outer arm converging toward the elbow. */
-      var bicep = bump(d, 0, 0.62) * 0.360 * belly;
-      var tricep = bump(d, Math.PI, 1.10) * 0.300 * rear;   /* R99: the tricep is a volume of its own */
-      var lateralHead = bump(d, outer * (Math.PI - 0.95), 0.40) * 0.110 * Math.sin(Math.pow(t, 1.1) * Math.PI);
+      var bicep = bump(d, 0, 0.62) * 0.400 * belly;   /* R101: the male standard — a fuller belly */
+      var tricep = bump(d, Math.PI, 1.10) * 0.340 * rear;   /* R99: the tricep is a volume of its own; R101: thicker */
+      var lateralHead = bump(d, outer * (Math.PI - 0.95), 0.40) * 0.150 * Math.sin(Math.pow(t, 1.1) * Math.PI);   /* R101: the horseshoe's outer arm */
       /* the groove between them, down each side of the arm */
       /* R98: the groove is deepest through the upper half, and in the lower
          half a BRACHIALIS lobe fills it either side — the lateral mass that
@@ -1255,8 +1270,8 @@ export var ARMS = {
       var low = Math.max(0, Math.min(1, (t - 0.45) / 0.35));
       low = low * low * (3 - 2 * low);
       var sides = bump(d, Math.PI / 2, 0.42) + bump(d, -Math.PI / 2, 0.42);
-      var groove = sides * -0.150 * belly * (1 - low);   /* R99: a deeper valley between the two; R100: deeper again */
-      var brachialis = sides * 0.110 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);
+      var groove = sides * -0.160 * belly * (1 - low);   /* R99: a deeper valley between the two; R100: deeper again; R101 */
+      var brachialis = sides * 0.150 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);   /* R101: visible between bicep and tricep above the elbow */
       return 1 + bicep + tricep + lateralHead + groove + brachialis;
     },
     fore: function (t, d, inner) {
@@ -1274,7 +1289,8 @@ export var ARMS = {
       /* R100: the RADIAL ridge — the brachioradialis running down the outer
          forearm from the elbow, fullest in the upper third and fading to
          the wrist, which is what gives the forearm its direction. */
-      var radial = bump(d, outer * 0.95, 0.36) * 0.095 * Math.sin(Math.pow(t, 0.50) * Math.PI) * (1 - t * 0.5);
+      /* R101: the BRACHIORADIALIS — starts at the lateral elbow, fullest in the upper third, fading to the wrist */
+      var radial = bump(d, outer * 0.95, 0.42) * 0.165 * Math.sin(Math.min(1, t / 0.78) * Math.PI) * (1 - t * 0.35);
       return 1 + flexor + extensor + ulna + radial;
     }
   }
@@ -1299,8 +1315,8 @@ export var HAND = {
      reference's hand is a flat articulated plate with fingers that read
      individually, not a block with stubs. */
   palmLength: 0.138,
-  palmHalfWidth: 0.104,
-  palmHalfDepth: 0.044,
+  palmHalfWidth: 0.110,
+  palmHalfDepth: 0.052,   /* R101: a thicker palm */
   /* R95: four jointed fingers (see buildDigit in limbs.js), a little longer
      and slimmer, as the references' robotic hands are. */
   digitCount: 4,

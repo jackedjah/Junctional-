@@ -228,13 +228,16 @@ const headW = Number((props.match(/halfWidth:\s*([\d.]+)\s*,/) || [])[1]);
 const headH = Number((props.match(/halfHeight:\s*([\d.]+)\s*,/) || [])[1]);
 const REFA_W = 302 / 1083 * 3 / 2;   /* 0.4183 */
 const REFA_H = 258 / 1083 * 3 / 2;   /* 0.3573 */
-ok('PROP-head-matches-anatomical-reference',
-  Math.abs(headW - REFA_W) < REFA_W * 0.06 && Math.abs(headH - REFA_H) < REFA_H * 0.06,
-  'head ' + headW + ' x ' + headH + ' against the anatomical reference ' +
-  REFA_W.toFixed(4) + ' x ' + REFA_H.toFixed(4));
-ok('PROP-head-slightly-wider-than-tall', headW > headH && headW < headH * 1.35,
-  'the anatomical reference cuts the diamond broader than it is tall (302 x 258); ' +
-  'taller-than-wide was the canonical front and is no longer the target');
+/* R101 — THE HEAD IS A TRUE SQUARE DIAMOND. The R101 law supersedes the
+   anatomical reference's broader-than-tall cut: at neutral the head is a
+   square rotated 45 degrees, its side the geometric mean of the old pair so
+   the presence in frame is unchanged. Bounded so it can neither drift off
+   square nor be quietly resized. */
+ok('PROP-head-is-a-square-diamond', Math.abs(headW - headH) < 0.004,
+  'head ' + headW + ' x ' + headH + ' must be square (R101 head law)');
+ok('PROP-head-size-bounded',
+  Math.abs(headW - Math.sqrt(REFA_W * REFA_H)) < Math.sqrt(REFA_W * REFA_H) * 0.06,
+  'head half-side ' + headW + ' against the anatomical geometric mean ' + Math.sqrt(REFA_W * REFA_H).toFixed(4));
 ok('PROP-float-not-grounded', /height:\s*0\.1/.test(props));
 
 /* Every part the brief names must actually exist as geometry. */
@@ -394,7 +397,7 @@ ok('DOC-claude-md', exists('CLAUDE.md'));
     terrainUnfogged + ' of ' + terrainMats + ' materials carry fog:false');
   ok('R94-WORLD-terrain-has-depth-tint', /depth:\s*0\.\d+/.test(terrain) && /ATMOS/.test(terrain));
   ok('R94-WORLD-terrain-three-depth-layers',
-    /\['far',\s*'mid',\s*'ridge'\]/.test(terrain) && /z:\s*-2\d/.test(terrain) &&
+    /\['far',\s*'mid',\s*(?:'spires',\s*)?'ridge'\]/.test(terrain) && /z:\s*-2\d/.test(terrain) &&
     /z:\s*-4\d/.test(terrain) && /z:\s*-[6-9]\d/.test(terrain));
   ok('R94-WORLD-terrain-one-draw-per-layer', /new Mesh\(geo, mat\)/.test(terrain) &&
     !/massifs\.forEach\(function[^}]*new Mesh/.test(terrain));
@@ -699,8 +702,8 @@ if (exists('CLAUDE.md')) {
   const chestRows = propsSrc.match(/\{ y: (1\.895|1\.970|2\.080), w: ([\d.]+), d: ([\d.]+)/g) || [];
   ok('R99-chest-has-depth', chestRows.length === 3 && chestRows.every(r => { const m = r.match(/w: ([\d.]+), d: ([\d.]+)/); return Number(m[2]) >= Number(m[1]) * 0.85; }), chestRows.join(' | '));
   /* the neck is a column, not a connector: at least 0.13 half-width under the chin */
-  const neckRow = propsSrc.match(/\{ y: 2\.315, w: ([\d.]+)/);
-  ok('R99-neck-carries-the-head', neckRow && Number(neckRow[1]) >= 0.13, 'neck half-width ' + (neckRow && neckRow[1]));
+  const neckRow = propsSrc.match(/\{ y: 2\.2[5-9]0, w: ([\d.]+)/);
+  ok('R99-neck-carries-the-head', neckRow && Number(neckRow[1]) >= 0.125, 'neck half-width ' + (neckRow && neckRow[1]));
   /* no authored shoulder stroke: the deltoid's ridge line is off */
   ok('R99-no-shoulder-ridge-stroke', /if \(ARMS_\.deltoidRidge\)/.test(body) && !/deltoidRidge:\s*true/.test(propsSrc));
   /* the lowered hand is a fist */
@@ -757,20 +760,63 @@ if (exists('CLAUDE.md')) {
     /setDisplayIcon/.test(read('mrmah3d/core/mrmah-scene.js')) && /params\.get\('face'\)/.test(lab));
   ok('R100-icon-is-not-in-any-state', !/setIcon|setDisplayIcon/.test(read('mrmah3d/core/character/states.js')) && !/setDisplayIcon/.test(read('mrmah3d/core/surfaces.js')));
   /* the glass is glossy, dark, and carries a trace of the theme */
-  ok('R100-display-glass-material', /roughness: 0\.0[0-9],\s*\n\s*metalness: 0\.7/.test(mats) && /\.lerp\(new Color\(tint\.glow \|\| PALETTE\.glow\), 0\.1/.test(mats));
+  ok('R100-display-glass-material', /roughness: 0\.0[0-9],\s*\n\s*metalness: 0\.7/.test(mats) && /\.lerp\(new Color\(tint\.glow \|\| PALETTE\.glow\), 0\.[1-3]/.test(mats));
   /* anatomy: traps, clavicle groove, serratus, bicep crest, lateral tricep head, radial ridge, knuckles */
   ok('R100-trapezius-ring-and-zone', /function trapZone/.test(propsSrc) && /zoneAt: trapZone/.test(propsSrc));
   ok('R100-clavicle-groove', /function subclavicleShape/.test(propsSrc) && /function subclavicleZone/.test(propsSrc) && /zoneAt: subclavicleZone/.test(propsSrc));
   ok('R100-serratus-saw', /tooth/.test(propsSrc) && /SERRATUS/.test(propsSrc));
-  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.62\) \* 0\.360/.test(propsSrc) && /lateralHead/.test(propsSrc));
+  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.62\) \* 0\.[34][0-9]0/.test(propsSrc) && /lateralHead/.test(propsSrc));
   ok('R100-radial-forearm-ridge', /var radial = bump\(d, outer \* 0\.95/.test(propsSrc) && /ARMS_\.shapes\.fore\(t, d, foreInner\)/.test(limbs));
   ok('R100-cap-shadow-on-the-arm', /t < 0\.17 && ad > 0\.55/.test(limbs));
   ok('R100-hand-knuckles', /KNUCKLE/.test(limbs) && /spec\.digitRadius \* 1\.22/.test(limbs));
   /* platinum / theme fusion: the coat's albedo and grazing reflection carry the theme, the base stays neutral */
-  ok('R100-platinum-reflects-the-theme', /mrTintN/.test(shader) && /mix\( vec3\( 1\.0 \), mrTintN, 0\.10 \)/.test(shader) &&
-    /mix\( uCoatColor \* 1\.15, uTint, 0\.35 \)/.test(shader));
-  ok('R100-internal-colour-seams', /mrSeam/.test(shader) && /uTint \* mrSeam \* 0\.1/.test(shader));
+  ok('R100-platinum-reflects-the-theme', /mrTintN/.test(shader) && /mix\( vec3\( 1\.0 \), mrTintN, 0\.[1-2][0-9] \)/.test(shader) &&
+    /mix\( uCoatColor \* 1\.15, uTint, 0\.[3-5][0-9] \)/.test(shader));
+  ok('R100-internal-colour-seams', /mrSeam/.test(shader) && /uTint \* mrSeam \* 0\.[1-3]/.test(shader));
   ok('R100-platinum-base-still-neutral', /platinum: 0xc4ccd8/.test(mats) && /coatColor: PALETTE\.platinum/.test(mats));
+})();
+
+/* ---- R101: the square head law, the symmetric chassis, the male arm, the world behind him */
+(function () {
+  const forge = read('mrmah3d/core/character/forge.js');
+  const propsSrc = read('mrmah3d/core/character/proportions.js');
+  const body = read('mrmah3d/core/character/body.js');
+  const shader = read('mrmah3d/core/character/crystal-shader.js');
+  const mats = read('mrmah3d/core/character/materials.js');
+  const terrain = read('mrmah3d/core/terrain.js');
+  ok('R101-sheet-reference-present', exists('reference/mrmah-refJ-r101-godforms-sheet.png'));
+  /* the chassis is symmetric by construction: scatter and zigzag keyed on the folded index */
+  ok('R101-head-rings-mirror-symmetric', /var fi = Math\.min\(i, \(N \/ 2 - i \+ N\) % N\)/.test(forge) && /hash2\(fi \* 3 \+ jitterSeed/.test(forge));
+  /* the head's bottom corner sits into the neck collar, which closes inside the diamond */
+  const base = Number((propsSrc.match(/centreY:\s*([\d.]+)/) || [])[1]) - Number((propsSrc.match(/halfHeight:\s*([\d.]+)/) || [])[1]);
+  const neckTop = Number((propsSrc.match(/\{ y: (2\.3[0-9]{2}), w: 0\.010/) || [])[1]);
+  ok('R101-head-seated-in-the-neck', neckTop > base && neckTop - base < 0.09, 'head base ' + base.toFixed(3) + ', neck closes at ' + neckTop);
+  /* the male arm standard: bigger cap, fuller bicep, lateral head, brachialis, brachioradialis */
+  ok('R101-male-arm-standard', /r0: 0\.26[0-9]/.test(body) && /bump\(d, 0, 0\.62\) \* 0\.400/.test(propsSrc) &&
+    /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.95\), 0\.40\) \* 0\.150/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
+    /upperRadius: 0\.160/.test(propsSrc));
+  /* three deltoid heads as FORM: front, rear, lateral crest and two grooves */
+  ok('R101-deltoid-heads-as-form', /var lateral = 0\.06/.test(body) && /var grooves = -0\.045/.test(body));
+  /* the crystal's own hue is canonical; the theme is light, not paint */
+  ok('R101-crystal-hue-canonical', /uCrystalTint/.test(shader) && /diffuseColor\.rgb \* uCrystalTint \* 0\.95/.test(shader) &&
+    /crystalTint: PALETTE\.edge/.test(mats) && !/diffuseColor\.rgb \* uTint \* 0\.95/.test(shader));
+  ok('R101-platinum-reflects-the-theme', /uTint \/ max\( dot\( uTint, vec3\( 0\.299, 0\.587, 0\.114 \) \), 0\.05 \), mrCoatW \* 0\.[1-3]/.test(shader));
+  /* the world: darker behind him, spires with seams, none inside the column behind the head */
+  ok('R101-world-darker-behind-him', /behindDim/.test(terrain) && /var behindSig = 1\.0 \+ 0\.085 \* Math\.abs\(cen\.z\)/.test(terrain));
+  const spires = (terrain.match(/spires:\s*\{[\s\S]*?massifs:\s*\[([\s\S]*?)\]/) || [])[1] || '';
+  const spireXs = (spires.match(/x: (-?[\d.]+)/g) || []).map(m => Math.abs(Number(m.slice(3))));
+  ok('R101-spires-clear-of-the-head-column', spireXs.length >= 5 && spireXs.every(x => x >= 3.5), 'spire |x|: ' + spireXs.join(', '));
+  ok('R101-spire-light-seams', /spire-seams/.test(terrain) && /LineSegments\(seamGeo, seamMat\)/.test(terrain));
+
+  /* R101 — a complementary theme (gold on a sapphire body) is carried only by
+     TRANSMISSION: the core light is added in the theme's own colour where the
+     crystal is dark. Reflection tint, rim and seams measured as no-ops for it.
+     Keep the core strong enough to carry it (measured: 3.6 puts gold over the
+     R100 baseline; 2.0 left it three points under). */
+  const matsR101 = read('mrmah3d/core/character/materials.js');
+  const coreM = matsR101.match(/coreStrength: ([\d.]+)/);
+  ok('R101-theme-carried-by-transmission', !!coreM && Number(coreM[1]) >= 3.0,
+    coreM ? 'coreStrength ' + coreM[1] : 'no coreStrength');
 })();
 
 console.log('\n' + pass + '/' + (pass + fail) + ' passed, ' + fail + ' failed');

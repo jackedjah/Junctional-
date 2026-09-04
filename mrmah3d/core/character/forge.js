@@ -963,10 +963,16 @@ export function diamondCrystal(opts) {
 
   function ring(scale, z, jitterSeed, insetZig) {
     return girdle.map(function (p, i) {
+      /* R101 — MIRROR-SYMMETRIC. The scatter and the zigzag are keyed on the
+         point's FOLDED index (its mirror across the vertical centreline is
+         i -> N/2 - i), so the left and right halves of every ring are exact
+         reflections: the chassis is symmetric by construction and only the
+         light is allowed to be asymmetric. */
+      var fi = Math.min(i, (N / 2 - i + N) % N);
       /* A little depth scatter on the bevel ring gives the front facets
          genuinely different tilts, which is what makes the head catch light in
          several places instead of reading as one plate. */
-      var jz = jitterSeed == null ? 0 : (hash2(i * 3 + jitterSeed, jitterSeed) - 0.5) * 2 * relief * hd;
+      var jz = jitterSeed == null ? 0 : (hash2(fi * 3 + jitterSeed, jitterSeed) - 0.5) * 2 * relief * hd;
       /* R95 — AN IN-PLANE ZIGZAG ON THE INNER RINGS. Reviewed, each side of a
          crown band was four coplanar quads (all four points sit on the same
          diamond edge, only z scattered), so a band reflected one environment
@@ -974,7 +980,7 @@ export function diamondCrystal(opts) {
          outside the nominal inset, which breaks each side into planes that tilt
          left and right as well as in and out — the many small facets a cut
          frame shows. The silhouette ring never takes it. */
-      var s = scale * (1 + (insetZig || 0) * (i % 2 ? 1 : -1) * (i % 4 < 2 ? 1 : -0.6));
+      var s = scale * (1 + (insetZig || 0) * (fi % 2 ? 1 : -1) * (fi % 4 < 2 ? 1 : -0.6));
       return push(p.x * s, p.y * s, z + jz);
     });
   }

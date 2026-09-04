@@ -1,0 +1,62 @@
+{
+  "pass": "R101 — autonomous convergence (head law, male anatomy, theme/platinum fusion, platinum nocturne)",
+  "baseline": "R100 (commit db5de44), rendered from a detached worktree of that commit at identical framing",
+  "framing": "lab ?canonical=1&tier=high, showcase, 500x889 css px at DPR 2 (780x1388 captures), yaw 0 unless stated",
+  "headSymmetry": {
+    "source": "05-head-symmetry.json / 05-head-symmetry-proof.png (mass debug view, reduced motion)",
+    "headPx": { "width": 224, "height": 207, "aspectWidthOverHeight": 1.082 },
+    "cornerOffsetFromCentrePx": { "topX": -0.5, "bottomX": -0.5, "leftY": 5, "rightY": 7 },
+    "sideLengthsPx": { "topLeft": 154.9, "topRight": 157.0, "bottomLeft": 148.1, "bottomRight": 147.5 },
+    "mirrorDifference": "2.6%",
+    "display": { "widthPx": 172, "heightPx": 155, "offsetFromHeadCentrePx": { "x": 1, "y": -3 }, "shareOfHeadWidth": 0.768, "casingThicknessPx": { "left": 27, "right": 25, "top": 23, "bottom": 29 } },
+    "note": "The geometry is square by construction (halfWidth == halfHeight == 0.366); the rendered diamond reads 8% wider than tall because the camera looks slightly down and the bottom corner seats 0.03 into the neck collar. The display's own mirror figure (18%) measures the lit face content on the screen, not the casing."
+  },
+  "themePenetration": {
+    "method": "scratch themepen2.mjs — over the CHARACTER ONLY. Mask: groups debug view at tier low with every scene child but the character root hidden (16-theme-body-mask-*.png); body = 16.2% of the frame. Secondary = body pixels with the theme hue (±32°), saturation ≥ 0.28, luma 18..150 (reflection, rims, seams, bounce, transmission). Primary = same hue at luma ≥ 150 (emitters). Quarters are top→bottom of the character's bounding box: head+traps, chest+deltoids+upper arms, abdomen+forearms+hands, taper.",
+    "secondaryPercentOfBody": {
+      "blue":   { "R100": 72.95, "R101": 77.04, "quartersR100": [51.98, 80.21, 71.97, 61.31], "quartersR101": [65.03, 81.70, 77.23, 61.54] },
+      "gold":   { "R100": 21.65, "R101": 22.30, "quartersR100": [18.44, 22.02, 14.40, 53.98], "quartersR101": [34.95, 23.52, 9.76, 41.63] },
+      "purple": { "R100": 33.02, "R101": 39.63, "quartersR100": [19.59, 31.88, 32.56, 68.67], "quartersR101": [20.65, 35.46, 48.78, 68.35] }
+    },
+    "primaryPercentOfBody": { "blue": { "R100": 9.20, "R101": 10.65 }, "gold": { "R100": 4.78, "R101": 5.40 }, "purple": { "R100": 1.55, "R101": 2.04 } },
+    "secondaryChromaMean": { "blue": { "R100": 0.279, "R101": 0.337 }, "gold": { "R100": 0.130, "R101": 0.181 }, "purple": { "R100": 0.324, "R101": 0.387 } },
+    "maps": ["16-theme-penetration-map-R100-{blue,gold,purple}.png", "16-theme-penetration-map-R101-{blue,gold,purple}.png"],
+    "levers": {
+      "crystalOwnHue": "uCrystalTint — the facets' own hue is the canonical sapphire under every theme (R100 let uTint into the diffuse mix: paint). This is why gold's abdomen quarter FELL 14.4 → 9.8: R100's gold there was painted facets.",
+      "measuredNoOpsForGold": "coat reflection tint 0.26 → 0.34 and directional rim 0.62 → 0.70 moved gold by 0.04 points (reverted); seams 0.36 → 0.38 and coat rim mix 0.50 → 0.58 kept (small, in the brief's direction).",
+      "theLeverThatWorked": "coreStrength 2.0 → 3.6 (the core's transmission, added in the theme's own colour where the crystal is dark): gold 18.65 → 22.30, purple 35.34 → 39.63, blue 75.68 → 77.04; the blue waist crop at 2.0 vs 3.6 is 16-theme-core-light-waist-2.0-vs-3.6.png."
+    },
+    "earlierFigureRetracted": "Numbers reported during passes C/D (blue 34.6, gold 6.2–8.6, purple 10.8–12.2) were taken over a mask that was mostly stage background (56% of the frame) and are withdrawn; the relative direction they showed was right, the magnitudes were diluted three to one."
+  },
+  "environmentReadability": {
+    "method": "scratch envread.mjs on the no-character showcase capture (r95-world-showcase-nochar.png, 746x1400; R100 from git HEAD, R101 from this build). Range band rows 0.55–0.66: mean luma in the centre 38% of columns (behind him) over the outer 24% each side (flanks).",
+    "rangeBand": { "R100": { "behindLuma": 55.27, "flankLuma": 54.13, "behindToFlank": 1.021 }, "R101": { "behindLuma": 52.94, "flankLuma": 53.40, "behindToFlank": 0.991 } },
+    "litVerticalStructuresAboveTheRange": { "R100": 3, "R101": 5, "R101columns": [0.058, 0.265, 0.421, 0.753, 0.984] },
+    "horizonContrastOverFloor": { "R100": 2.36, "R101": 2.29 },
+    "overlays": ["17-environment-readability-R100.png", "17-environment-readability-R101.png"],
+    "note": "The darkening behind him is real and modest (3% relative) because the horizon mist in that band is uniform and dominates the mean. The spire beam at column 0.42 sits behind the torso in the front view."
+  },
+  "motionReadability": {
+    "method": "scratch motion.mjs — six yaw steps over 0.3 rad, luminance histogram over the character's own pixels",
+    "R100": { "travelPerStep": 6.12, "rangeOverSweep": 24.4, "bandCrossers": "27.8%" },
+    "R101": { "travelPerStep": 6.3, "rangeOverSweep": 25.45, "bandCrossers": "29%" }
+  },
+  "proportions": {
+    "source": "scratch proportions.json (character-space landmarks)",
+    "head": "square diamond, halfWidth == halfHeight == 0.366, apex 3.000, bottom corner 2.268 seated 0.03 into the neck collar (closes at 2.335)",
+    "shoulders": "deltoid outer edge 0.596 (chest end 0.262 at y 2.030, r0 0.268, belly 0.36)",
+    "arms": "upperRadius 0.160, foreRadius 0.124, wristRadius 0.074; bicep bump 0.400, tricep 0.340, lateral head 0.150, brachialis 0.150, brachioradialis ridge 0.165",
+    "torso": "chest silhouette d 0.303 at y 1.970, belt 0.19, quad 0.264; trap ring y 2.192 w 0.272, clavicle groove y 2.150–2.170"
+  },
+  "engineering": {
+    "staticSuite": "node tests/mrmah3d.test.js — 342/342",
+    "verify": "node tools/mrmah3d-verify.mjs — 150/150 (R94-WORLD-02 now accepts the R101 spire layer alongside far/mid/ridge)",
+    "frameBudgetTierHigh": "within R94-WORLD-01 (draws <= 165, tris <= 11000) — see VERIFY_RESULTS.json",
+    "notEvidence": "Headless Chromium on SwiftShader proves geometry, lighting and lifecycle; it is not evidence about iPhone/iPad Safari. The two .mov references could not be decoded in this container."
+  },
+  "scorecard0to10": {
+    "note": "Self-scored per the brief; the art gate is the director's, not this table's.",
+    "headSquareDiamond": 9, "headSymmetryChassis": 9, "displayModuleCasing": 8, "trapsAndClavicles": 7, "deltoidThreeHeads": 7, "bicepPeakBrachialis": 7, "tricepsHorseshoe": 6, "forearmGroups": 7, "hands": 6, "chestDepth": 7, "latsAndBack": 6, "core": 7,
+    "platinumStaysNeutral": 8, "themeIlluminatesNotPaints": 8, "themePenetrationVsBaseline": 7, "faceGlass": 8, "environmentDarkerBehind": 5, "environmentReadableNocturne": 7
+  }
+}

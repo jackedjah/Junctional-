@@ -241,7 +241,7 @@ function buildHand(materials, spec, options) {
   var thumbTip = opts.open
     ? [thumbBase[0] - thumbLen * 0.72, thumbBase[1] + thumbLen * 0.62, thumbBase[2] + thumbLen * 0.28]
     : [thumbBase[0] - thumbLen * 0.20, thumbBase[1] + thumbLen * 0.70, thumbBase[2] + thumbLen * 0.55];
-  var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 6,
+  var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.34, spec.digitRadius * 0.86, 6,   /* R101: a real thumb base */
     { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
   parts.push(thumbGeo);
   var handGeo = mergeGeometries(parts);
@@ -455,7 +455,7 @@ export function buildLimbs(materials, P) {
   var handLamp = null;
   var left = buildArm(materials, ARMS_.left, { name: 'arm-left', openHand: true, tipDiamond: true, arms: ARMS_, hand: HAND_,
     makeLamp: function () {
-      handLamp = new PointLight(materials.emissive.color.clone(), 0.70, 0.42, 2);
+      handLamp = new PointLight(materials.emissive.color.clone(), 0.95, 0.56, 2);   /* R101: fingertips, palm and a grazing of forearm */
       return handLamp;
     } });
 

@@ -1,0 +1,85 @@
+{
+  "cropPx": {
+    "w": 375,
+    "h": 361
+  },
+  "head": {
+    "box": {
+      "left": 75,
+      "right": 298,
+      "top": 99,
+      "bottom": 305
+    },
+    "width": 224,
+    "height": 207,
+    "aspect": 1.0821,
+    "centre": {
+      "x": 186.5,
+      "y": 202
+    },
+    "corners": {
+      "top": [
+        186,
+        99
+      ],
+      "bottom": [
+        186,
+        305
+      ],
+      "left": [
+        75,
+        207
+      ],
+      "right": [
+        298,
+        209
+      ]
+    },
+    "cornerOffsetFromCentre": {
+      "topX": -0.5,
+      "bottomX": -0.5,
+      "leftY": 5,
+      "rightY": 7
+    },
+    "cornerDistances": {
+      "top": 103,
+      "bottom": 103,
+      "left": 111.6,
+      "right": 111.7
+    },
+    "sides": {
+      "topLeft": 154.9,
+      "topRight": 157,
+      "bottomLeft": 148.1,
+      "bottomRight": 147.5
+    },
+    "sideSpread": "6.03%",
+    "mirrorDifference": "2.6%"
+  },
+  "display": {
+    "box": {
+      "left": 102,
+      "right": 273,
+      "top": 122,
+      "bottom": 276
+    },
+    "width": 172,
+    "height": 155,
+    "centre": {
+      "x": 187.5,
+      "y": 199
+    },
+    "offsetFromHeadCentre": {
+      "x": 1,
+      "y": -3
+    },
+    "shareOfHeadWidth": 0.768,
+    "casingThicknessPx": {
+      "left": 27,
+      "right": 25,
+      "top": 23,
+      "bottom": 29
+    },
+    "mirrorDifference": "18.44%"
+  }
+}
