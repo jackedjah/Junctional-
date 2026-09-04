@@ -134,7 +134,10 @@ function cloudCornerTexture() {
   /* Soft elliptical cut, centred toward the outer edge. */
   g.save();
   g.translate(104, 64);
-  g.scale(1.0, 0.5);
+  /* 0.42, not 0.5: at 0.5 the cut reached full only 2 px past the canvas'
+     top and bottom, which left a few percent of alpha along both edges — a
+     faint rectangular sprite outline in the sky at x 0.27 and 0.72. */
+  g.scale(1.0, 0.42);
   var ell = g.createRadialGradient(0, 0, 0, 0, 0, 132);
   ell.addColorStop(0, 'rgba(0,0,0,0)');
   ell.addColorStop(0.55, 'rgba(0,0,0,0)');
@@ -145,9 +148,57 @@ function cloudCornerTexture() {
   var hfade = g.createLinearGradient(0, 0, 256, 0);
   hfade.addColorStop(0, 'rgba(0,0,0,1)');
   hfade.addColorStop(0.10, 'rgba(0,0,0,0)');
-  hfade.addColorStop(1, 'rgba(0,0,0,0)');
+  hfade.addColorStop(0.90, 'rgba(0,0,0,0)');
+  hfade.addColorStop(1, 'rgba(0,0,0,1)');   /* the inner edge, so two formations never meet */
   g.fillStyle = hfade;
   g.fillRect(0, 0, 256, 128);
+  g.globalCompositeOperation = 'source-over';
+  /* Dither. An 8-bit gradient this dark renders as concentric contour rings —
+     a step of one alpha level is a visible band when the whole cloud spans a
+     dozen of them. A deterministic +/-4 of alpha per pixel, never more than the
+     pixel already has (so the clear sky stays clear), breaks the contours into
+     grain, which is what cloud looks like. */
+  var img = g.getImageData(0, 0, 256, 128), px = img.data;
+  for (var k = 3; k < px.length; k += 4) {
+    var a = px[k];
+    /* Multiplicative, +/-30%: the rings live in the 1-4 alpha tail, where an
+       additive +/-1 cannot break a step but a proportional jitter can. (+/-40%
+       made the dense core visibly speckled.) */
+    if (a > 0) px[k] = Math.max(0, Math.min(255, Math.round(a * (1 + 0.6 * (rnd() - 0.5)))));
+  }
+  g.putImageData(img, 0, 0);
+  var t = new CanvasTexture(c);
+  t.needsUpdate = true;
+  return t;
+}
+
+/* The reflected column under the hover point: a vertical ramp — opaque at
+   v=0, gone at v=1 — with SOFT SIDES, from a horizontal falloff multiplied in.
+   The plain ramp gave a flat trapezoid with two straight edges running to the
+   frame bottom, i.e. a carpet; the reference column blurs sideways and dims
+   toward the camera. */
+function columnTexture() {
+  var c = document.createElement('canvas');
+  c.width = 32; c.height = 128;
+  var g = c.getContext('2d');
+  var grad = g.createLinearGradient(0, 128, 0, 0);
+  grad.addColorStop(0.00, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.10, 'rgba(255,255,255,0.62)');
+  grad.addColorStop(0.34, 'rgba(255,255,255,0.24)');
+  grad.addColorStop(0.68, 'rgba(255,255,255,0.06)');
+  grad.addColorStop(1.00, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 32, 128);
+  g.globalCompositeOperation = 'destination-in';
+  var side = g.createLinearGradient(0, 0, 32, 0);
+  side.addColorStop(0.00, 'rgba(0,0,0,0)');
+  side.addColorStop(0.30, 'rgba(0,0,0,0.70)');
+  side.addColorStop(0.42, 'rgba(0,0,0,1)');
+  side.addColorStop(0.58, 'rgba(0,0,0,1)');
+  side.addColorStop(0.70, 'rgba(0,0,0,0.70)');
+  side.addColorStop(1.00, 'rgba(0,0,0,0)');
+  g.fillStyle = side;
+  g.fillRect(0, 0, 32, 128);
   g.globalCompositeOperation = 'source-over';
   var t = new CanvasTexture(c);
   t.needsUpdate = true;
@@ -158,29 +209,38 @@ function cloudCornerTexture() {
    with gaps between them, over a thin base band — and fades to nothing well
    before the top. Built so a quad standing on the floor puts all of its light
    just above the horizon line and none of it across the sky. */
-function mistTexture() {
+function mistTexture(tuftsOnly) {
   var c = document.createElement('canvas');
   c.width = 512; c.height = 96;
   var g = c.getContext('2d');
   g.clearRect(0, 0, 512, 96);
   var seed = 90411;
   function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
-  /* Base band: brightest at the floor, gone by 40% of the height. */
-  var base = g.createLinearGradient(0, 96, 0, 58);
-  base.addColorStop(0, 'rgba(255,255,255,0.42)');
-  base.addColorStop(0.5, 'rgba(255,255,255,0.16)');
-  base.addColorStop(1, 'rgba(255,255,255,0)');
+  if (!tuftsOnly) {
+  /* Base band: densest a little ABOVE the floor and gone AT it. A band that
+     was brightest at its bottom edge ended in a line where it met the floor —
+     reference B's mist grades into the floor over ~0.06 of the frame with no
+     line anywhere, and the wet floor's own light (the mirrored range) takes
+     over below. Gone by 55% of the height going up. */
+  var base = g.createLinearGradient(0, 96, 0, 43);
+  base.addColorStop(0.00, 'rgba(255,255,255,0)');
+  base.addColorStop(0.28, 'rgba(255,255,255,0.28)');
+  base.addColorStop(0.60, 'rgba(255,255,255,0.12)');
+  base.addColorStop(1.00, 'rgba(255,255,255,0)');
   g.fillStyle = base;
   g.fillRect(0, 0, 512, 96);
-  /* Tufts, clustered, with real gaps. */
+  }
+  /* Tufts, clustered, with real gaps. Their heights vary a lot — some stand
+     well above the band — so the top of the mist is a ragged line rather
+     than a straight one. */
   var clusters = [50, 160, 250, 340, 450];
   clusters.forEach(function (cx) {
     var n = 3 + Math.floor(rnd() * 3);
     for (var i = 0; i < n; i++) {
       var x = cx + (rnd() - 0.5) * 70;
-      var y = 62 + rnd() * 30;
+      var y = 40 + rnd() * 42;
       var r = 18 + rnd() * 26;
-      var a = 0.18 + rnd() * 0.30;
+      var a = 0.16 + rnd() * 0.26;
       var grd = g.createRadialGradient(x, y, 0, x, y, r);
       grd.addColorStop(0, 'rgba(255,255,255,' + a.toFixed(3) + ')');
       grd.addColorStop(0.5, 'rgba(255,255,255,' + (a * 0.35).toFixed(3) + ')');
@@ -192,10 +252,16 @@ function mistTexture() {
   g.globalCompositeOperation = 'destination-out';
   var top = g.createLinearGradient(0, 0, 0, 96);
   top.addColorStop(0, 'rgba(0,0,0,1)');
-  top.addColorStop(0.42, 'rgba(0,0,0,1)');
-  top.addColorStop(0.62, 'rgba(0,0,0,0)');
+  top.addColorStop(0.20, 'rgba(0,0,0,1)');
+  top.addColorStop(0.55, 'rgba(0,0,0,0)');
   top.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = top;
+  g.fillRect(0, 0, 512, 96);
+  /* The floor edge, cut again so no tuft can reach it. */
+  var foot = g.createLinearGradient(0, 96, 0, 80);
+  foot.addColorStop(0, 'rgba(0,0,0,1)');
+  foot.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = foot;
   g.fillRect(0, 0, 512, 96);
   var hfade = g.createLinearGradient(0, 0, 512, 0);
   hfade.addColorStop(0, 'rgba(0,0,0,1)');
@@ -210,10 +276,8 @@ function mistTexture() {
   return t;
 }
 
-/* A one-dimensional ramp: opaque at v=0, gone at v=1. Used for the light
-   pillars (bright at the floor, dissolving upward) and for the wet-floor
-   streaks (bright at the source, dissolving away from it). One tiny texture
-   serves both because both are the same falloff seen along different axes. */
+/* A one-dimensional ramp: opaque at v=0, gone at v=1. Used by the summit
+   beacons in terrain.js (bright at the summit, dissolving upward). */
 function rampTexture() {
   var c = document.createElement('canvas');
   c.width = 4; c.height = 128;
@@ -317,9 +381,17 @@ export function createEnvironment(options) {
   var half = GRID.size / 2, step = GRID.size / GRID.divisions;
   var pts = [], gcol = [];
   var HOVER_GAIN = 1.9, HOVER_RADIUS = 3.6;
+  /* The floor is brightest at the horizon in both references — the wet
+     surface giving the mist back — and the brightness there belongs to the
+     LINES, converging, not to a strip lying across the floor. The 60 x 9 sheen
+     quad that used to do this job ended in a hard line (rows 0.666 -> 0.669:
+     87% lit -> 3%); this gain climbs to 1.6 by z -15 and is 1.0 from z -5
+     forward, so it fades with the lines rather than sitting on top of them. */
+  var FAR_GAIN = 1.6, FAR_Z0 = -5, FAR_Z1 = -15;
   function gridGain(x, z) {
     var d2 = (x * x + z * z) / (HOVER_RADIUS * HOVER_RADIUS);
-    return 1 + HOVER_GAIN * Math.exp(-d2);
+    var far = z >= FAR_Z0 ? 0 : z <= FAR_Z1 ? 1 : (FAR_Z0 - z) / (FAR_Z0 - FAR_Z1);
+    return (1 + HOVER_GAIN * Math.exp(-d2)) * (1 + (FAR_GAIN - 1) * far);
   }
   function seg(x0, z0, x1, z1) {
     var g0 = gridGain(x0, z0 + GRID.centerZ), g1 = gridGain(x1, z1 + GRID.centerZ);
@@ -456,8 +528,12 @@ export function createEnvironment(options) {
   });
   var starQuads = [];
   /* R94: a compact cross — a short horizontal flare and a shorter arm running
-     toward the camera, which with the column below reads as the reflection. */
-  [[2.6, 0.09], [0.09, 1.7]].forEach(function (s) {
+     toward the camera, which with the column below reads as the reflection.
+     Punch list: 2.6 x 0.09 drew as a 1-px ruled line over half the frame's
+     width. At 1.1 x 0.14 the radial texture's falloff tapers each arm to a
+     point inside its own glow, which is the four-point star the references
+     show. */
+  [[1.1, 0.14], [0.14, 1.1]].forEach(function (s) {
     var q = new Mesh(new PlaneGeometry(s[0], s[1]), flareMat);
     q.rotation.x = -Math.PI / 2;
     q.position.y = 0.014;
@@ -521,10 +597,16 @@ export function createEnvironment(options) {
      A stretched additive quad lying on the floor, brightest at his contact
      point and dissolving away toward the camera, reproduces the look for one
      draw call. It sits in glowGroup, so it tracks him when he is dragged. */
-  var streakTex = rampTexture();
+  /* Punch list: the ramp on a 0.55 x 7 plane had no lateral falloff and read
+     as a flat grey-blue trapezoid to the frame bottom. columnTexture gives it
+     soft sides; 0x3aa0ff is the saturated blue the reference column has
+     (0x7fe2ff came out as low-saturation grey once the additive stack had its
+     way with it); fog is off because at 1-8 units from the camera it was a
+     no-op that only muddied the colour. */
+  var streakTex = columnTexture();
   var streakMat = new MeshBasicMaterial({
-    map: streakTex, color: new Color(0x7fe2ff), transparent: true, opacity: 0.62,
-    blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: true
+    map: streakTex, color: new Color(0x3aa0ff), transparent: true, opacity: 0.90,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: false
   });
   /* R90: longer and wider, but only to here.
 
@@ -541,12 +623,17 @@ export function createEnvironment(options) {
      which costs no area. */
   /* R94: narrower and brighter — a reflected COLUMN, the mirror of the beam
      above the tip, not a wash. 0.55 wide costs the convergence rows nothing. */
-  var streak = new Mesh(new PlaneGeometry(0.55, 7.0), streakMat);
+  var streak = new Mesh(new PlaneGeometry(0.7, 3.0), streakMat);
   streak.rotation.x = -Math.PI / 2;
-  /* The ramp's opaque end is at v=0, which after the -90 degrees about X lands
-     at the far edge; pushing the quad forward by half its length puts that end
-     under him and lets the tail run toward the viewer. */
-  streak.position.set(0, 0.016, 3.5);
+  /* The texture's opaque end is at v=0. Rotating -90 degrees about X alone
+     puts v=0 at the NEAR edge — the previous comment here had it backwards,
+     and the column was brightest at the frame's bottom and dimmest under him,
+     which is the "carpet" the review saw. The half-turn about Z puts the
+     opaque end under him; the quad is pushed forward by half its length so
+     the tail runs toward the viewer. 3.0 long, because only the first unit or
+     so is in frame at showcase and the fade has to happen inside it. */
+  streak.rotation.z = Math.PI;
+  streak.position.set(0, 0.016, 1.5);
   glowGroup.add(streak);
   owned.push(streak.geometry, streakMat, streakTex);
 
@@ -626,8 +713,12 @@ export function createEnvironment(options) {
   /* Restraint, measured: both references' upper corners are 100% under 32
      luma (means 8 and 12). The cloud is a smudge a little lighter than the
      sky, not a shape — colour and opacity here put its densest core near 28. */
+  /* Punch list: 0.50 -> 0.80. At 0.50 the densest core was a luma or two
+     over the sky — invisible as cloud, visible only as contour rings. With the
+     texture dithered the same mass at 0.80 reads as smoky grey cloud, and the
+     corners still measure under 32. */
   var cloudMat = new MeshBasicMaterial({
-    map: cloudTex, color: new Color(0x4a5d78), transparent: true, opacity: 0.50,
+    map: cloudTex, color: new Color(0x66809e), transparent: true, opacity: 0.85,
     depthWrite: false, toneMapped: false, side: DoubleSide, fog: false
   });
   var clouds = new Group();
@@ -636,9 +727,24 @@ export function createEnvironment(options) {
   /* The texture's alpha lives in the middle half of the quad's height, so a
      quad centred at y 16.4 with h 6.4 puts its visible mass at y 14.8-18.0 —
      frame rows 0.12 down to 0.01 at z=-42 — above his apex at 0.15. */
+  /* Placed for the REFERENCE framing, measured: at z=-42 the showcase frame
+     (aspect 0.686) has a half-width of 9.6 units and puts y 15 at row 0.12,
+     so +/-8 lands each formation's mass in an upper corner — x 0.0-0.35 and
+     0.65-1.0, rows 0.05-0.18 — which is where both references keep theirs.
+     Each is 9 wide, not 14.5: at 14.5 the two nearly met at the centre and
+     rows 0.125-0.197 measured as lit right across (a veil, 34 rows lost).
+     The previous +/-11.6 sat at the frame edge at this aspect and mostly
+     outside it.
+
+     They are NOT placed for the in-app frames, because no single world
+     position can serve both: the chat camera is 22 degrees round and 46
+     degrees wide, and anything in the showcase's upper-left corner lands in
+     its upper CENTRE, where the DOM response diamond sits. So the clouds are
+     gated on the scale hint instead (see applyFine): they belong to the large
+     frame, and at chat and protocol size they are withheld. */
   [
-    { x: -11.6, y: 16.4, z: -42, w: 14.5, h: 6.4, speed: 0.035, o: 1.00, flip: false },
-    { x: 11.9, y: 17.0, z: -43, w: 15.0, h: 6.0, speed: -0.028, o: 0.86, flip: true }
+    { x: -8.0, y: 15.0, z: -42, w: 9.0, h: 6.4, speed: 0.035, o: 1.00, flip: false },
+    { x: 8.0, y: 15.0, z: -43, w: 9.5, h: 6.0, speed: -0.028, o: 0.86, flip: true }
   ].forEach(function (b, i) {
     var m = cloudMat.clone();
     m.opacity = cloudMat.opacity * b.o;
@@ -675,9 +781,14 @@ export function createEnvironment(options) {
   var mistTex = mistTexture();
   /* Luminous, measured: reference B's rows 0.62-0.68 average 71 luma and A's
      41; at 0.30 this band measured 20. */
+  /* NORMAL blending, not additive. Mist scatters — it replaces what is behind
+     it with its own colour, it does not add to it. Additive, a front tuft
+     lying over a lit peak face and a rear tuft went to 255 in a blob the size
+     of the peak's base: the one white patch in the frame. Blended, the same
+     tuft veils the face toward the mist colour and can never exceed it. */
   var mistMat = new MeshBasicMaterial({
     map: mistTex, color: new Color(0xc2dcf2), transparent: true, opacity: 0.95,
-    blending: AdditiveBlending, depthWrite: false, toneMapped: false,
+    depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: false
   });
   var mist = new Group();
@@ -688,14 +799,21 @@ export function createEnvironment(options) {
      lower and thinner, so the rocks sit IN the mist rather than in front of a
      backdrop of it — which is how both references place them. Round 2 had the
      rear row alone and the ridges hid almost all of it. */
+  /* Punch list: the band measured 35 luma against reference B's 70 over rows
+     0.62-0.68 because the rear row (y 0.1) was hidden behind the rock ridges
+     and the front row (h 1.5) too thin to show over them. The rear row now
+     stands at y 0.4 — its foot hidden behind the rocks, its tufts over them —
+     and the front row is 2.6 tall at 0.85-0.90 so its tufts overlap the ridge
+     tops. (1.2 was tried for the rear row: its foot then showed as a straight
+     bright edge above the rocks.) */
   [
-    { x: -21, z: -33, w: 16, h: 3.4, y: 0.1, o: 0.85, flip: true },
-    { x: -6.5, z: -33.5, w: 15, h: 3.4, y: 0.1, o: 1.0, flip: false },
-    { x: 7.5, z: -33, w: 15, h: 3.3, y: 0.1, o: 0.95, flip: true },
-    { x: 22, z: -33.5, w: 16, h: 3.5, y: 0.1, o: 0.8, flip: false },
-    { x: -13, z: -19.5, w: 12, h: 1.5, y: 0.04, o: 0.55, flip: false },
-    { x: -1, z: -20, w: 11, h: 1.4, y: 0.04, o: 0.60, flip: true },
-    { x: 11, z: -19.5, w: 12, h: 1.5, y: 0.04, o: 0.55, flip: false }
+    { x: -21, z: -33, w: 16, h: 3.4, y: 0.4, o: 0.85, flip: true },
+    { x: -6.5, z: -33.5, w: 15, h: 3.4, y: 0.4, o: 1.0, flip: false },
+    { x: 7.5, z: -33, w: 15, h: 3.3, y: 0.4, o: 0.95, flip: true },
+    { x: 22, z: -33.5, w: 16, h: 3.5, y: 0.4, o: 0.8, flip: false },
+    { x: -13, z: -19.5, w: 15, h: 2.6, y: 0.04, o: 0.85, flip: false },
+    { x: -1, z: -20, w: 15, h: 2.6, y: 0.04, o: 0.90, flip: true },
+    { x: 11, z: -19.5, w: 15, h: 2.6, y: 0.04, o: 0.85, flip: false }
   ].forEach(function (b) {
     var m = mistMat.clone();
     m.opacity = mistMat.opacity * b.o;
@@ -706,23 +824,50 @@ export function createEnvironment(options) {
     mistQuads.push({ mesh: q, baseOpacity: m.opacity, x: b.x });
     owned.push(q.geometry, m);
   });
-  /* The wet floor gives the mist back. Reference B's floor is brightest right
-     at the horizon, under the mist, and fades toward the camera; this is one
-     ramp quad lying on the floor from the mist's foot forward, bright at the
-     far end. It lies entirely on rows the far grid already fills (frame
-     0.62-0.66), so it costs the convergence rows nothing — measured, not
-     assumed: DEPTH-01 counts rows, and these were full before it existed. */
-  var floorSheenMat = new MeshBasicMaterial({
-    map: mistTex, color: new Color(0x6f98ba), transparent: true, opacity: 0.30,
-    blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: false
+  /* THE MIST IN THE FLOOR. Reference B's floor is brightest right under the
+     horizon — the wet surface giving the mist back — and fades toward the
+     camera over ~0.06 of the frame. The front row is mirrored below the floor
+     (the floor is transparent, so a quad hanging under it is seen through it),
+     flipped so its dense edge is at the surface and it dissolves downward.
+     The mirror uses a TUFTS-ONLY texture: a mirrored base band would be a
+     full-width strip over the convergence rows, i.e. the veil DEPTH-01 exists
+     to catch, where separate tufts leave every row partial. */
+  var mistReflTex = mistTexture(true);
+  /* A darker colour at a higher opacity than the mist itself, for the same
+     composited value: PIXEL-05 reads the canvas UNPREMULTIPLIED, so a faint
+     bright layer over a large area reports its full colour and lifted the
+     frame's mean by 9 points on its own. */
+  var mistReflMat = new MeshBasicMaterial({
+    map: mistReflTex, color: new Color(0x7f96b0), transparent: true, opacity: 0.72,
+    depthWrite: false, toneMapped: false,
+    side: DoubleSide, fog: false
   });
-  var floorSheen = new Mesh(new PlaneGeometry(60, 9), floorSheenMat);
-  floorSheen.rotation.x = -Math.PI / 2;
-  floorSheen.rotation.z = Math.PI;      /* the texture's dense edge at the far end */
-  floorSheen.position.set(0, 0.006, -23.5);
-  floorSheen.name = 'floor-sheen';
-  mist.add(floorSheen);
-  owned.push(floorSheen.geometry, floorSheenMat);
+  /* Narrower than the row it mirrors (9 against 15): three 15-wide quads
+     overlapped into one full-width sheet under the horizon and turned rows
+     0.695-0.776 into full rows. At 9 the tufts sit under the mist's own
+     clusters with floor showing between them. */
+  mistQuads.slice(4).forEach(function (m) {
+    var q = new Mesh(new PlaneGeometry(9, m.mesh.geometry.parameters.height), mistReflMat);
+    /* Stretched 1.7x downward: a wet floor smears a reflection vertically,
+       and unstretched the round tufts read as puffs of fog lying ON the floor
+       rather than as the mist returned by it. The quad's top edge stays at the
+       surface (position is its centre, so it moves down with the stretch). */
+    q.position.set(m.mesh.position.x, -m.mesh.position.y * 1.7, m.mesh.position.z);
+    q.scale.set(m.mesh.scale.x, -1.7, 1);
+    q.renderOrder = -19;   /* over the mirrored range, under the grid */
+    mist.add(q);
+    mistQuads.push({ mesh: q, baseOpacity: mistReflMat.opacity, x: m.x, shared: true });
+    owned.push(q.geometry);
+  });
+  owned.push(mistReflTex, mistReflMat);
+
+  /* There is deliberately no floor strip under the mist. A 60 x 9 sheen quad
+     lay here and ended in a hard line under the horizon — rows 0.657-0.666
+     were 77-87% lit right across, then row 0.669 was 3% — a stage edge, and
+     exactly the "anything lying on the floor is a veil" case. The wet floor's
+     brightness at the horizon now comes from the mirrored range (terrain.js)
+     and from the grid's own distance gain, both of which converge with the
+     lines instead of lying across them. */
   group.add(mist);
   owned.push(mistTex, mistMat);
 
@@ -731,7 +876,7 @@ export function createEnvironment(options) {
      their shade baked into vertex colours, summit beacons, sparkle specks and
      the near black rock ridges — three draws for the range, one for the
      sparkles, one for the beams, one for their summit caps, one (above low)
-     for the beams' floor streaks. It replaces twelve fogged cones with twelve
+     for the mid range mirrored into the wet floor. It replaces twelve fogged cones with twelve
      edge outlines that cost twenty-four draws and rendered as two black
      triangles, and five light pillars that were never in frame. */
   var terrain = createTerrain({
@@ -867,6 +1012,11 @@ export function createEnvironment(options) {
     /* The fine particles are weighted by mode AND by on-screen size; one
        writer for each so the two cannot race. */
     var k = W.detail;
+    /* Clouds: gone below a scale hint of 0.30 (chat 0.13, protocol 0.26),
+       full from 0.60 (portrait 0.61, showcase 1.0). One writer, authored
+       baseline x haze x scale. */
+    var cloudK = Math.max(0, Math.min(1, (k - 0.30) / 0.30));
+    cloudBands.forEach(function (b) { b.mesh.material.opacity = b.baseOpacity * W.haze * cloudK; });
     moteMat.opacity = BASE.motes * W.motes * (0.35 + 0.65 * k);
     starMat.opacity = BASE.star * W.structures * (0.45 + 0.55 * k);
     nodeMat.opacity = BASE.nodes * W.nodes * (0.5 + 0.5 * k);
@@ -907,9 +1057,8 @@ export function createEnvironment(options) {
        it, so there is one writer and one place to edit — the duplicated
        literal that once lived here (`0.40 * [weights][i]`) silently discarded
        every edit to the cloud material before the first frame. */
-    cloudBands.forEach(function (b) { b.mesh.material.opacity = b.baseOpacity * W.haze; });
     mistQuads.forEach(function (m) { m.mesh.material.opacity = m.baseOpacity * W.haze; });
-    applyFine();
+    applyFine();   /* the clouds are written there: haze x scale, one writer */
   }
 
   function dispose() {

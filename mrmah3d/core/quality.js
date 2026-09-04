@@ -85,10 +85,11 @@ export function settingsFor(tier) {
        it is what makes a dark stage read as having depth. Never dropped. */
     fog: true,
     /* R94 world. The floor's reflective response is a PROXY on every tier — a
-       true planar reflection would re-draw the character (76 draws, ~6k tris)
-       and cannot fit the frame budget — but the proxy is tiered: above low it
-       adds the floor streaks under the summit beacons. Low keeps the hover
-       column and the grid's local brightening only. */
+       true planar reflection is a second pass over the whole scene and cannot
+       fit the frame budget — but the proxy is tiered: above low, terrain.js
+       mirrors the in-frame mid range through the floor (one draw, ~280
+       triangles). Low keeps the hover column, the mist's reflection and the
+       grid's local brightening only. */
     worldReflections: tier !== 'low'
   };
 }

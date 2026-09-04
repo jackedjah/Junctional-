@@ -742,6 +742,71 @@ for (const v of VIEWPORTS) {
   check('R94-WORLD-09 sparkle specks were placed on the slopes', world.sparkles > 200, `${world.sparkles} specks`);
   check('R94-WORLD-10 no errors building the world', errs.length === 0, errs.slice(0, 3).join(' | '));
 
+  /* Review round. These read the DELIVERED frame — the page screenshot, i.e.
+     what the high tier's composite actually puts on screen — because the raw
+     `grab()` above measures the scene before bloom's composite and the two
+     differ by nearly 2x in the midtones; the review's numbers were taken from
+     screenshots and so are these. The mid range is measured over ITS OWN
+     pixels (a mask from an isolated render), not over a box that is mostly
+     sky: the first cut of item 6 was tuned against a box and came out as black
+     cut-outs. The phone frame here (aspect 0.56 at the 700px stage) sees the
+     small central massifs more than the big flank ones and reads darker than
+     the 500px review frame (42% against 27% under 32), so the ceiling is 50%. */
+  await page.evaluate(() => { document.querySelector('.lab-stage').style.height = '700px'; window.__MRMAH_LAB.scene.parts.stage.subject.visible = false; window.__MRMAH_LAB.scene.parts.environment.mist.visible = false; });
+  await page.waitForTimeout(400);
+  const shotNoMist = await page.locator('.lab-stage').screenshot();
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.environment.mist.visible = true; });
+  await page.waitForTimeout(300);
+  const shotNoChar = await page.locator('.lab-stage').screenshot();
+  const delivered = await page.evaluate(async ({ noMist, noChar }) => {
+    const s = window.__MRMAH_LAB.scene, env = s.parts.environment, c = s.canvas;
+    async function load(data) {
+      const img = new Image(); img.src = data; await img.decode();
+      const g = document.createElement('canvas'); g.width = img.naturalWidth; g.height = img.naturalHeight;
+      const x = g.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0);
+      return { d: x.getImageData(0, 0, g.width, g.height).data, W: g.width, H: g.height };
+    }
+    const luma = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+    /* Mask of the mid range from an isolated render. */
+    const vis = []; env.group.traverse(o => { vis.push([o, o.visible]); if (o !== env.group && o !== env.structures && o.name !== 'terrain-mid') o.visible = false; });
+    env.structures.visible = true;
+    s.renderer.render(s.scene, s.camera);
+    const g = document.createElement('canvas'); g.width = c.width; g.height = c.height;
+    const x = g.getContext('2d', { willReadFrequently: true }); x.drawImage(c, 0, 0);
+    const md = x.getImageData(0, 0, c.width, c.height).data;
+    vis.forEach(([o, v]) => { o.visible = v; });
+    s.renderer.render(s.scene, s.camera);
+    const nm = await load(noMist), nc = await load(noChar);
+    const sameSize = nm.W === c.width && nm.H === c.height;
+    const h = new Array(8).fill(0); let n = 0;
+    if (sameSize) for (let i = 0; i < md.length; i += 4) { if (md[i + 3] < 200) continue; h[Math.min(7, luma(nm.d, i) >> 5)]++; n++; }
+    const planes = { px: n, under32: n ? h[0] / n : 1, mid: n ? (h[1] + h[2]) / n : 0, over128: n ? (h[4] + h[5] + h[6] + h[7]) / n : 1 };
+    /* Horizon falloff: fraction of each row above 40 luma, rows 0.62-0.72. */
+    const rows = [];
+    for (let fy = 0.62; fy < 0.72; fy += 0.004) {
+      const y = Math.round(fy * nc.H); let lit = 0;
+      for (let xx = 0; xx < nc.W; xx++) if (luma(nc.d, (y * nc.W + xx) * 4) > 40) lit++;
+      rows.push(lit / nc.W);
+    }
+    let maxDrop = 0; for (let i = 1; i < rows.length; i++) maxDrop = Math.max(maxDrop, rows[i - 1] - rows[i]);
+    /* The floor in front (rows 0.70-0.82): share above 32 luma. */
+    let fl = 0, fn = 0;
+    for (let y = Math.round(0.70 * nc.H); y < Math.round(0.82 * nc.H); y++) for (let xx = 0; xx < nc.W; xx++) { fn++; if (luma(nc.d, (y * nc.W + xx) * 4) > 32) fl++; }
+    const mirror = env.terrain.mirrors.map(m => ({ visible: m.mesh.visible, tris: m.tris }));
+    return { sameSize, planes, maxDrop, floorLit: fl / fn, mirror };
+  }, { noMist: 'data:image/png;base64,' + shotNoMist.toString('base64'), noChar: 'data:image/png;base64,' + shotNoChar.toString('base64') });
+  check('R94-WORLD-11 the mid range is mirrored into the floor at the high tier',
+    delivered.mirror.length === 1 && delivered.mirror[0].visible && delivered.mirror[0].tris > 100,
+    JSON.stringify(delivered.mirror));
+  check('R94-WORLD-12 the range reads as gunmetal over its own pixels (ref B: ~22% <32, ~69% 32-96, ~2% >128)',
+    delivered.sameSize && delivered.planes.under32 < 0.50 && delivered.planes.mid > 0.40 && delivered.planes.over128 < 0.08,
+    `${delivered.planes.px} px: ${(delivered.planes.under32 * 100).toFixed(0)}% <32, ${(delivered.planes.mid * 100).toFixed(0)}% 32-96, ${(delivered.planes.over128 * 100).toFixed(1)}% >128`);
+  check('R94-WORLD-13 the horizon grades into the floor (no row-to-row step over 50 points)',
+    delivered.maxDrop < 0.50, `largest drop ${(delivered.maxDrop * 100).toFixed(0)} points between rows 0.4% apart`);
+  check('R94-WORLD-14 the floor in front reads wet (ref B: 29.5% of rows 0.72-0.84 above 32)',
+    delivered.floorLit > 0.10, `${(delivered.floorLit * 100).toFixed(1)}% of the floor above 32`);
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.stage.subject.visible = true; });
+
   /* The delivered evidence: showcase with and without him, chat, protocol, 3/4. */
   await page.evaluate(() => { document.querySelector('.lab-stage').style.height = '700px'; });
   await page.waitForTimeout(300);
@@ -753,11 +818,17 @@ for (const v of VIEWPORTS) {
   await page.waitForTimeout(200);
   writeFileSync(join(OUT, 'r94-world-threequarter.png'), await page.locator('.lab-stage').screenshot());
   await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.character.setYaw(0); document.querySelector('.lab-stage').style.height = '620px'; });
+  const cloudAt = {};
   for (const name of ['chat', 'protocol']) {
     await page.evaluate(n => window.__MRMAH_LAB.scene.setMode(n), name);
     await page.waitForTimeout(400);
     writeFileSync(join(OUT, `r94-world-${name}.png`), await page.locator('.lab-stage').screenshot());
+    cloudAt[name] = await page.evaluate(() => window.__MRMAH_LAB.scene.parts.environment.clouds.children.map(q => q.material.opacity));
   }
+  /* The in-app frames keep their upper centre clear: the clouds are withheld
+     there (scale-gated in applyFine), not merely moved. */
+  check('R94-WORLD-15 clouds withheld at chat and protocol scale',
+    Object.values(cloudAt).every(a => a.every(o => o === 0)), JSON.stringify(cloudAt));
   await ctx.close();
 }
 /* ---------------------------------------- end R94 world ------------------ */
