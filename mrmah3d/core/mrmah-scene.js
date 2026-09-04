@@ -444,6 +444,12 @@ export function createMrMahScene(host, options) {
     setDebugView: function (name) {
       return characterBox.setDebugView ? characterBox.setDebugView(name) : null;
     },
+    /* ---- development only: content on the display glass ----------------
+       'dumbbell' or null. Proof that the screen can host more than the face
+       (see setIcon in character/head.js). Nothing in the product calls it. */
+    setDisplayIcon: function (name) {
+      return characterBox.setDisplayIcon ? characterBox.setDisplayIcon(name) : null;
+    },
 
     /* ---- site-facing page API ------------------------------------------
        A page reports what happened to IT; surfaces.js decides what that means

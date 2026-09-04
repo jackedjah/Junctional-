@@ -731,5 +731,47 @@ if (exists('CLAUDE.md')) {
   ok('R99-arm-rows-reach-dark', /var UPPER_ARM = \[\s*\/\*[^]*?\*\/\s*var UPPER_ARM = \[|var UPPER_ARM = \[\n\s*\[0\.14,\s*0\.08,\s*-0\.10,\s*0\.7/.test(regions));
 })();
 
+/* ---- R100: the display module, the carving, the platinum / theme fusion --- */
+(function () {
+  const forge = read('mrmah3d/core/character/forge.js');
+  const head = read('mrmah3d/core/character/head.js');
+  const propsSrc = read('mrmah3d/core/character/proportions.js');
+  const limbs = read('mrmah3d/core/character/limbs.js');
+  const mats = read('mrmah3d/core/character/materials.js');
+  const shader = read('mrmah3d/core/character/crystal-shader.js');
+  const lab = read('mrmah3d/lab/lab.js');
+  /* the head is a casing around a display module: channel floor, bezel wall, glass forward of the floor */
+  ok('R100-display-module-geometry', /screenInset/.test(forge) && /bezel\.push\(\[S0\[sj\], S\[sj\], S\[s\], S0\[s\]\]\)/.test(forge) &&
+    /material: 3/.test(forge) && /geo\.userData\.screen/.test(forge));
+  const screenZ = Number((propsSrc.match(/screenZ:\s*(-?[\d.]+)/) || [])[1]);
+  const faceZ = Number((propsSrc.match(/faceZ:\s*(-?[\d.]+)/) || [])[1]);
+  const bevelZ = Number((propsSrc.match(/bevelZ:\s*([\d.]+)/) || [])[1]);
+  ok('R100-glass-forward-of-floor-behind-lip', screenZ > faceZ && screenZ < bevelZ, 'floor ' + faceZ + ' < glass ' + screenZ + ' < lip ' + bevelZ);
+  const screenInset = Number((propsSrc.match(/screenInset:\s*([\d.]+)/) || [])[1]);
+  ok('R100-screen-keeps-the-face', screenInset >= 0.63 && screenInset <= 0.70, 'screenInset ' + screenInset + ' (the smile reaches 0.625)');
+  ok('R100-head-has-four-materials', /materials\.face, materials\.cavity, materials\.bezel/.test(head) && /var bezel = new MeshStandardMaterial/.test(mats));
+  /* the casing's shadow on the glass is a vertex-alpha ring, not a filter */
+  ok('R100-casing-shadow-on-glass', /display-shadow/.test(head) && /vertexColors: true/.test(head) && !/style\.filter|backdrop/.test(head));
+  /* hardware / content split: a content slot that can host more than the face, developer only */
+  ok('R100-display-content-slot', /function setIcon/.test(head) && /display-icon/.test(head) && /faceContent/.test(head) &&
+    /setDisplayIcon/.test(read('mrmah3d/core/mrmah-scene.js')) && /params\.get\('face'\)/.test(lab));
+  ok('R100-icon-is-not-in-any-state', !/setIcon|setDisplayIcon/.test(read('mrmah3d/core/character/states.js')) && !/setDisplayIcon/.test(read('mrmah3d/core/surfaces.js')));
+  /* the glass is glossy, dark, and carries a trace of the theme */
+  ok('R100-display-glass-material', /roughness: 0\.0[0-9],\s*\n\s*metalness: 0\.7/.test(mats) && /\.lerp\(new Color\(tint\.glow \|\| PALETTE\.glow\), 0\.1/.test(mats));
+  /* anatomy: traps, clavicle groove, serratus, bicep crest, lateral tricep head, radial ridge, knuckles */
+  ok('R100-trapezius-ring-and-zone', /function trapZone/.test(propsSrc) && /zoneAt: trapZone/.test(propsSrc));
+  ok('R100-clavicle-groove', /function subclavicleShape/.test(propsSrc) && /function subclavicleZone/.test(propsSrc) && /zoneAt: subclavicleZone/.test(propsSrc));
+  ok('R100-serratus-saw', /tooth/.test(propsSrc) && /SERRATUS/.test(propsSrc));
+  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.62\) \* 0\.360/.test(propsSrc) && /lateralHead/.test(propsSrc));
+  ok('R100-radial-forearm-ridge', /var radial = bump\(d, outer \* 0\.95/.test(propsSrc) && /ARMS_\.shapes\.fore\(t, d, foreInner\)/.test(limbs));
+  ok('R100-cap-shadow-on-the-arm', /t < 0\.17 && ad > 0\.55/.test(limbs));
+  ok('R100-hand-knuckles', /KNUCKLE/.test(limbs) && /spec\.digitRadius \* 1\.22/.test(limbs));
+  /* platinum / theme fusion: the coat's albedo and grazing reflection carry the theme, the base stays neutral */
+  ok('R100-platinum-reflects-the-theme', /mrTintN/.test(shader) && /mix\( vec3\( 1\.0 \), mrTintN, 0\.10 \)/.test(shader) &&
+    /mix\( uCoatColor \* 1\.15, uTint, 0\.35 \)/.test(shader));
+  ok('R100-internal-colour-seams', /mrSeam/.test(shader) && /uTint \* mrSeam \* 0\.1/.test(shader));
+  ok('R100-platinum-base-still-neutral', /platinum: 0xc4ccd8/.test(mats) && /coatColor: PALETTE\.platinum/.test(mats));
+})();
+
 console.log('\n' + pass + '/' + (pass + fail) + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

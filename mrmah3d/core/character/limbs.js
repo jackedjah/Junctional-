@@ -36,6 +36,11 @@ function armZone(table, innerSign) {
     while (d < -Math.PI) d += Math.PI * 2;
     var ad = Math.abs(d);
     var inner = innerSign != null && d * innerSign > 0;
+    /* R100 — the shadow UNDER THE CAP: the arm's top band, everywhere but
+       the bicep's front, takes the navy row with no coat, so the deltoid
+       reads as a mass sitting over the arm rather than a colour change on
+       the same tube. */
+    if (t != null && t < 0.17 && ad > 0.55) return { classes: table, seed: 78, index: 1, coat: 0.08 };
     if (inner && ad >= 0.60 && ad < 1.50) return { classes: table, seed: 76, index: 1, coat: 0.12 };   /* the inner flank: the valley */
     if (inner && ad >= 1.50 && ad < 2.30) return { classes: table, seed: 77, index: 0, coat: 0.0 };    /* inner rear: lost */
     /* R96: measured against Reference A's lowered arm (48% under 32 luma, 12%
@@ -218,6 +223,14 @@ function buildHand(materials, spec, options) {
     var base = [x, spec.palmLength, spec.palmHalfDepth * 0.15];
     parts.push.apply(parts, buildDigit(hand, materials, spec, base, Math.sin(splay), len,
       spec.digitRadius, curl, HAND_EDGES));
+    /* R100 — a KNUCKLE at each finger's base: a short, slightly thicker
+       boss across the metacarpal head, so the back of the hand reads as a
+       row of joints rather than four tubes leaving a block. Merged with the
+       hand, so it costs no draw. */
+    var kb = [x, spec.palmLength - spec.digitRadius * 0.9, spec.palmHalfDepth * 0.22];
+    var kt = [x + Math.sin(splay) * spec.digitRadius * 1.2, spec.palmLength + spec.digitRadius * 1.1, spec.palmHalfDepth * 0.22 + Math.sin(curl * 0.85) * spec.digitRadius * 1.1];
+    parts.push(segment(kb, kt, spec.digitRadius * 1.22, spec.digitRadius * 1.05, 6,
+      { depthRatio: 0.95, crystal: 0.02, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat }));
   }
 
   /* A THUMB — the one addition that makes a hand read as a hand. Set on the
@@ -325,7 +338,7 @@ function buildArm(materials, spec, options) {
     /* R99: deeper front-to-back (1.12 -> 1.18) so the bicep and tricep are
        two volumes the silhouette shows from the side, not two colours. */
     { depthRatio: 1.18, crystal: 0.045, steps: 5,
-      profile: ARMS_.profiles.upper, shape: ARMS_.shapes.upper, lift: ARMS_.classLift,
+      profile: ARMS_.profiles.upper, shape: function (t, d) { return ARMS_.shapes.upper(t, d, upperInner); }, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner),
       coat: REGIONS.UPPER_ARM.coat,
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
@@ -353,7 +366,7 @@ function buildArm(materials, spec, options) {
     /* R98: five steps so the extensor belly just under the elbow has a ring
        to peak on and the taper into the wrist has two to fall through. */
     { depthRatio: 1.06, crystal: 0.040, steps: 5,
-      profile: ARMS_.profiles.fore, shape: ARMS_.shapes.fore, lift: ARMS_.classLift,
+      profile: ARMS_.profiles.fore, shape: function (t, d) { return ARMS_.shapes.fore(t, d, foreInner); }, lift: ARMS_.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes, foreInner),
       coat: REGIONS.FOREARM.coat }
   );

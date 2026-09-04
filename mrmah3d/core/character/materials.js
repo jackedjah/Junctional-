@@ -194,15 +194,35 @@ export function createCrystalMaterials(options) {
        ties it to the shell around it and stops it reading as a hole. Still
        far darker than the shell. */
     color: new Color(PALETTE.face),
-    roughness: 0.20,
-    metalness: 0.58,
-    envMapIntensity: 1.1,
+    /* R100 — PREMIUM DISPLAY GLASS. Tighter and more mirror-like than the
+       R97 screen, so the environment's cards ghost across it as a narrow
+       reflection that travels when the head yaws — the strongest single cue
+       that the screen is a physical pane and not a painted polygon. Still
+       near-black: the reflection is a catch, the glass a void between. */
+    roughness: 0.06,
+    metalness: 0.74,
+    envMapIntensity: 2.4,
     flatShading: true,
     /* R98 — the screen is not pitch black: a faint deep-blue self-light so
        the plate reads as a powered display the eyes and smile are drawn ON,
        embedded in the shell, rather than a hole. Far below the features. */
-    emissive: new Color(PALETTE.faceGlow || 0x0a1c30),
-    emissiveIntensity: 0.55
+    /* R100 — and it carries a trace of the THEME: the glass reflects the
+       eyes' own colour faintly (a fifth of the way from its blue-violet
+       floor toward the emission hue), so violet eyes sit in a screen that
+       is faintly violet inside and gold eyes in one that is faintly warm. */
+    emissive: new Color(PALETTE.faceGlow || 0x0c1a34).lerp(new Color(tint.glow || PALETTE.glow), 0.18),
+    emissiveIntensity: 0.50
+  });
+
+  /* R100 — THE BEZEL the glass stands on: dark machined steel, a little
+     glossier than the joints, so the module's edge catches a thin bright
+     line where the casing's lip does not. */
+  var bezel = new MeshStandardMaterial({
+    color: new Color(0x2c3c5c),
+    roughness: 0.24,
+    metalness: 0.80,
+    envMapIntensity: 3.0,
+    flatShading: true
   });
 
   /* CAVITY WALL — the inside of the face recess.
@@ -546,6 +566,7 @@ export function createCrystalMaterials(options) {
     face.envMap = opts.envMap;
     cavity.envMap = opts.envMap;
     joint.envMap = opts.envMap;
+    bezel.envMap = opts.envMap;
     body.needsUpdate = true;
     head.needsUpdate = true;
     face.needsUpdate = true;
@@ -569,7 +590,7 @@ export function createCrystalMaterials(options) {
     opacity: 0.92
   });
 
-  var all = [body, head, face, cavity, joint, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, emissiveSmile, emissiveCore, rim];
+  var all = [body, head, face, cavity, joint, bezel, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, emissiveSmile, emissiveCore, rim];
 
   /* Captured at construction so setGlow(1) restores exactly what each material
      was defined with. */
@@ -601,7 +622,7 @@ export function createCrystalMaterials(options) {
   }
 
   return {
-    body: body, head: head, face: face, cavity: cavity, joint: joint, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
+    body: body, head: head, face: face, cavity: cavity, joint: joint, bezel: bezel, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
     emissive: emissive, emissiveSoft: emissiveSoft, emissiveSmile: emissiveSmile, emissiveCore: emissiveCore, rim: rim,
     /* One place to drive the whole character's luminosity — used by the
        animation states so a "thinking" pulse cannot desynchronise.

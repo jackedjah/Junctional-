@@ -44,6 +44,8 @@ var brightParam = params.get('bright');
    `gray` desaturates the stage in CSS so the value hierarchy can be judged
    without its colour. Development affordance only. */
 var debugParam = params.get('debug');
+/* R100: ?face=dumbbell puts the developer-only dumbbell icon on the display glass. */
+var faceParam = params.get('face');
 if (brightParam && /^\s*\d+\s*,\s*\d+\s*,\s*\d+\s*$/.test(brightParam)) {
   document.documentElement.style.setProperty('--bright-rgb', brightParam);
 }
@@ -88,6 +90,7 @@ function mount() {
     window.__MRMAH_LAB.mounted = true;
     if (debugParam === 'mass' || debugParam === 'groups') scene.setDebugView(debugParam);
     if (debugParam === 'gray') host.style.filter = 'grayscale(1)';
+    if (faceParam && scene.setDisplayIcon) scene.setDisplayIcon(faceParam);
   } catch (err) {
     window.__MRMAH_LAB.errors.push(String(err && err.message || err));
     say('Mount failed: ' + (err && err.message || err), true);

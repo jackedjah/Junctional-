@@ -12,7 +12,8 @@
    legible at any exposure. */
 
 import {
-  Group, Mesh, TorusGeometry, EdgesGeometry, LineSegments, Object3D
+  Group, Mesh, TorusGeometry, EdgesGeometry, LineSegments, Object3D,
+  BufferGeometry, Float32BufferAttribute, MeshBasicMaterial, PlaneGeometry
 } from '../../vendor/three/three.module.min.js';
 import { diamondCrystal } from './forge.js';
 import { HEAD } from './proportions.js';
@@ -36,6 +37,10 @@ export function buildHead(materials) {
     faceZ: HEAD.faceZ,
     backApexZ: HEAD.backApexZ,
     backInset: HEAD.backInset,
+    /* R100 — the display module (forge.js): the glass stands on a bezel
+       inside the recess, forward of the channel floor, behind the lip. */
+    screenInset: HEAD.screenInset,
+    screenZ: HEAD.screenZ,
     relief: HEAD.relief,
     /* R98 — the platinum coat on the head's chamfer bands (regions.js) */
     coat: REGIONS.HEAD_SHELL.coat,
@@ -49,7 +54,9 @@ export function buildHead(materials) {
     classes: REGIONS.HEAD_SHELL.classes
   });
 
-  var shell = new Mesh(geo, [materials.head || materials.body, materials.face, materials.cavity]);
+  /* R100 — four materials: the crystal casing, the display GLASS, the cavity
+     (walls and channel floor), and the bezel the glass stands on. */
+  var shell = new Mesh(geo, [materials.head || materials.body, materials.face, materials.cavity, materials.bezel || materials.joint || materials.cavity]);
   shell.name = 'head-shell';
   shell.castShadow = true;
   shell.receiveShadow = true;
@@ -96,11 +103,57 @@ export function buildHead(materials) {
   /* ---- face ----------------------------------------------------------- */
   /* Sits on the recessed plate. faceZ is where the plate is; the features are
      pushed a hair forward of it so they never z-fight the plane they read on. */
-  var faceZ = HEAD.faceZ * HEAD.halfDepth + 0.004;
+  /* R100 — THE DISPLAY IS HARDWARE + CONTENT. The glass, bezel and channel
+     are geometry in the shell (forge.js, `screen`); everything drawn ON the
+     glass lives in `face`, the content layer, positioned on the glass plane
+     and scaled to the screen's own half extents (`display.halfWidth` /
+     `halfHeight`), so a future icon or pixel sequence is placed in screen
+     units and never touches the casing. */
+  var screen = geo.userData.screen || { z: HEAD.faceZ * HEAD.halfDepth, inset: HEAD.faceInset };
+  var faceZ = screen.z + 0.004;
   var face = new Group();
   face.name = 'mrmah-face';
   face.position.z = faceZ;
   group.add(face);
+  var display = {
+    z: screen.z,
+    inset: screen.inset,
+    halfWidth: HEAD.halfWidth * screen.inset,
+    halfHeight: HEAD.halfHeight * screen.inset
+  };
+
+  /* R100 — THE CASING'S SHADOW ON THE GLASS. A physical screen set inside a
+     thick frame is darker at its edge, most of all under the top edge where
+     the frame stands between the glass and the sky. A translucent black
+     diamond ring drawn just above the glass, opaque at the bezel and clear
+     a third of the way in, gives exactly that contact occlusion for one tiny
+     mesh; the alpha is heavier along the top than the bottom. Vertex alpha,
+     no filter, no extra pass. */
+  (function () {
+    var N = 16, hw = display.halfWidth, hh = display.halfHeight;
+    var pos = [], col = [], idx = [];
+    for (var i = 0; i < N; i++) {
+      var t = i / N * Math.PI * 2, ct = Math.cos(t), st = Math.sin(t);
+      var k = 1 / (Math.abs(ct) + Math.abs(st));
+      var ox = ct * k * hw, oy = st * k * hh;
+      var top = 0.55 + 0.45 * Math.max(0, st);           /* darker along the top edge */
+      pos.push(ox, oy, 0, ox * 0.62, oy * 0.62, 0);
+      col.push(0, 0, 0, 0.72 * top, 0, 0, 0, 0);
+    }
+    for (var j = 0; j < N; j++) {
+      var a = j * 2, b = ((j + 1) % N) * 2;
+      idx.push(a, b, a + 1, b, b + 1, a + 1);
+    }
+    var g = new BufferGeometry();
+    g.setAttribute('position', new Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new Float32BufferAttribute(col, 4));
+    g.setIndex(idx);
+    var m = new MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, toneMapped: false });
+    var shadow = new Mesh(g, m);
+    shadow.name = 'display-shadow';
+    shadow.position.z = 0.0015;
+    face.add(shadow);
+  })();
 
   /* Thin, laser-like rings — not donuts. The reference's eyes are drawn with a
      hairline; a thick tube reads as a cartoon mascot and was the single most
@@ -215,12 +268,49 @@ export function buildHead(materials) {
   smileSoft.position.copy(smile.position);
   face.add(smileSoft);
 
+  /* R100 — A CONTENT SLOT ON THE GLASS. Proof that the display can host more
+     than the face: `setIcon('dumbbell')` draws a tiny pixel dumbbell — two
+     plates and a bar, seven emissive quads — in screen units, above the
+     smile's line and below the eyes; `setIcon(null)` removes it. Developer
+     only: nothing in idle, no state and no surface calls it, and the lab
+     exposes it as ?face=dumbbell. Hidden pixels cost nothing. */
+  var icon = null;
+  var faceContent = [];   /* the eyes, the smile and their glows — hidden while an icon shows */
+  face.traverse(function (o) { if (o.isMesh && o.name !== 'display-shadow') faceContent.push(o); });
+  function setIcon(name) {
+    if (icon) { face.remove(icon); icon.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); icon = null; }
+    faceContent.forEach(function (o) { o.visible = true; });
+    if (name !== 'dumbbell') return null;
+    /* a communication state: the icon takes the screen, the face yields it */
+    faceContent.forEach(function (o) { o.visible = false; });
+    icon = new Group();
+    icon.name = 'display-icon';
+    var u = display.halfWidth * 0.115;                    /* one "pixel" */
+    var mat = materials.emissive;
+    function px(x, y, w, h) {
+      var q = new Mesh(new PlaneGeometry(u * w, u * h), mat);
+      q.position.set(u * x, u * y, 0.002);
+      icon.add(q);
+    }
+    /* bar */
+    px(0, 0, 6, 1);
+    /* inner plates */
+    px(-3.5, 0, 1, 3); px(3.5, 0, 1, 3);
+    /* outer plates */
+    px(-4.75, 0, 1, 2.2); px(4.75, 0, 1, 2.2);
+    icon.position.y = 0;
+    face.add(icon);
+    return name;
+  }
+
   group.position.y = HEAD.centreY;
 
   return {
     group: group,
     shell: shell,
     face: face,
+    display: display,
+    setIcon: setIcon,
     eyes: eyes,
     smile: smile,
     geometry: geo,

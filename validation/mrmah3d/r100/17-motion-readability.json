@@ -1,0 +1,11 @@
+{
+  "tool": "scratch motion.mjs — luminance travel over the character's own pixels across a yaw sweep, showcase, high tier",
+  "yawSweep": 0.3,
+  "steps": 6,
+  "characterPixels": 74295,
+  "travelPerStep": 6.12,
+  "rangeOverSweep": 24.4,
+  "bandCrossers": "27.8%",
+  "baseline": { "build": "R99c", "travelPerStep": 6.09, "rangeOverSweep": 24.55, "bandCrossers": "27.7%" },
+  "note": "R100 (display module, carving, platinum/theme fusion): motion readability preserved within measurement noise."
+}

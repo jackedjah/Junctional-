@@ -166,12 +166,20 @@ export var HEAD = {
      physically deep chamfer, several planes across, not a stroke; the band
      grows from 0.18 to 0.21 of the half-width and the screen keeps two
      thirds of the diamond. */
-  faceInset: 0.645,              /* plate size as a share of the diamond */
+  /* R100 — A DISPLAY MODULE IN A CASING. The recess now holds a raised
+     module: a channel floor around it, a bezel wall, and the glass standing
+     0.067 forward of the floor and 0.077 behind the lip. Read from the
+     silhouette inward: casing chamfer 1.00 -> 0.80, the wall down to the
+     floor at 0.68, a channel to 0.655, the bezel up to the glass at 0.63.
+     The glass keeps the smile inside it (its tips reach 0.625). */
+  faceInset: 0.680,              /* the cavity floor's edge, as a share of the diamond */
   crownInset: 0.895,             /* outer chamfer band */
   crownZ: 0.20,                  /* its depth, share of halfDepth */
-  bevelInset: 0.790,             /* the lip — the inner edge of the chamfer */
+  bevelInset: 0.800,             /* the lip — the inner edge of the chamfer */
   bevelZ: 0.40,                  /* 0.096 forward of the girdle */
-  innerInset: 0.720,             /* the cavity wall's foot */
+  innerInset: 0.740,             /* the cavity wall's foot */
+  screenInset: 0.630,            /* the glass's edge */
+  screenZ: 0.08,                 /* the glass's depth — 0.019 forward of the girdle, share of halfDepth */
   innerZ: 0.04,                  /* the wall drops nearly to the girdle plane */
   /* the rear: a side band from the silhouette to a back ring, then a flat
      back plate — a streamlined plate rather than a pyramid */
@@ -343,7 +351,7 @@ function chestShape(k) {
 function coreShape(k, rectusK) {
   var rk = rectusK == null ? 0.120 : rectusK;
   return function (a) {
-    var linea = -lobe(a, 0, 0.34) * 0.180;
+    var linea = -lobe(a, 0, 0.34) * 0.220;   /* R100: a deeper channel */
     var rectus = (lobe(a, 0.52, 0.44) + lobe(a, -0.52, 0.44)) * rk;
     var oblique = (lobe(a, 1.20, 0.48) + lobe(a, -1.20, 0.48)) * 0.080;
     var back = lobe(a, Math.PI, 0.95) * -0.085;
@@ -426,6 +434,26 @@ function pecUnderZone(a, y) {
   if (ae < 1.30) return { classes: REGIONS.STERNUM.classes, seed: 15 + side, index: 1, coat: 0 };
   return coreZone(3)(a, y);
 }
+/* R100 — the sub-clavicular groove: dark under the collar lobes, the
+   sternal notch darker still, the shoulder ends left to the upper pec's
+   outer plane so the front deltoid runs into it. */
+function subclavicleZone(a, y) {
+  var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
+  if (ae < 0.32) return { classes: REGIONS.STERNUM.classes, seed: 120, index: 0, coat: 0 };
+  if (ae < 1.30) return { classes: REGIONS.STERNUM.classes, seed: 121 + side, index: 2, coat: 0.10 };   /* the hollow, not a black band */
+  if (ae < 2.05) return { classes: REGIONS.PEC_UPPER.classes, seed: 22 + 4 + side, index: 2, coat: 0.85 };
+  return pecZone(1)(a, y);
+}
+/* R100 — the trapezius: a lit diagonal plane either side of a dark valley
+   at the neck, front and back, so the rise toward the neck reads as a pair
+   of muscles and not as a collar. */
+function trapZone(a, y) {
+  var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
+  if (ae < 0.30) return { classes: REGIONS.STERNUM.classes, seed: 124, index: 1, coat: 0 };          /* the notch / neck valley, front */
+  if (ae > 2.85) return { classes: REGIONS.STERNUM.classes, seed: 125, index: 0, coat: 0 };          /* the valley behind the neck */
+  if (ae > 1.90) return { classes: REGIONS.DELT.classes, seed: 126 + side, index: 2, coat: 0.55 };   /* the trap's upper plane */
+  return { classes: REGIONS.PEC_UPPER.classes, seed: 128 + side, index: 2, coat: 0.60 };            /* collar to shoulder */
+}
 function coreZone(row) {
   return function (a, y) {
     var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
@@ -442,7 +470,16 @@ function coreZone(row) {
     /* R98: the abdominal blocks take the coat on their ridge (the belt row
        does not), the obliques a quarter of it, the channel and spine none. */
     if (ae < absOuter) return { classes: REGIONS.ABS.classes, seed: 50 + row * 2 + side, index: row === 0 ? 0 : 1, coat: row === 0 ? 0.20 : REGIONS.ABS.coat };
-    if (ae < obliqueOuter) return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side, index: row === 0 ? 0 : 1, coat: REGIONS.OBLIQUE.coat };
+    /* R100 — SERRATUS: on the upper rows the plane between the abdominal
+       blocks and the flank is cut into an alternating saw of lit and lost
+       facets, the rhythm the reference shows under the outer pec. */
+    if (ae < obliqueOuter) {
+      if (row >= 2) {
+        var tooth = Math.floor((ae - absOuter) / 0.27) % 2 === 0;
+        return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side + (tooth ? 0 : 8), index: tooth ? 2 : 0, coat: tooth ? 0.40 : 0 };
+      }
+      return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side, index: row === 0 ? 0 : 1, coat: REGIONS.OBLIQUE.coat };
+    }
     if (ae > 2.92) return { classes: REGIONS.STERNUM.classes, seed: 100 + row, index: 0, coat: 0 };    /* spine channel */
     if (ae > 2.55) return { classes: REGIONS.ABS.classes, seed: 102 + row * 2 + side, index: 0, coat: 0.30 };   /* erectors */
     return { classes: REGIONS.OBLIQUE.classes, seed: 106 + row * 2 + side, index: 0, coat: 0.30 };              /* lower back / lat */
@@ -511,11 +548,24 @@ function quadZone(row) {
   };
 }
 
+/* R100 — THE GROOVE UNDER THE CLAVICLE. A ridge is only a ridge against a
+   hollow beneath it: this ring sits between the upper pec and the shoulder
+   line and pulls IN where the collar lobes above it stand out, so the
+   clavicle reads as a bar across the top of the chest with shadow under it
+   rather than as a widening of the pec. */
+function subclavicleShape(k) {
+  return function (a) {
+    var hollow = -(lobe(a, 0.95, 0.40) + lobe(a, -0.95, 0.40)) * 0.070;
+    var notch = -lobe(a, 0, 0.30) * 0.09;
+    var back = lobe(a, Math.PI, 1.0) * -0.06;
+    return 1 + (hollow + notch + back) * k;
+  };
+}
 function clavicleShape(k) {
   return function (a) {
     var hollow = -lobe(a, 0, 0.60) * 0.160;
     var collar = (lobe(a, 0.95, 0.50) + lobe(a, -0.95, 0.50)) * 0.150;
-    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.220;   /* R99: the traps climb to carry the head */
+    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.280;   /* R99: the traps climb to carry the head; R100: higher still */
     /* R97: a SHOULDER SHELF at the sides, so the torso's own line runs out
        under the deltoid cap and the cap grows out of the trapezius instead of
        sitting on it — the trap -> delt continuity the brief asks for. */
@@ -806,9 +856,22 @@ export var TORSO = {
       shape: chestShape(1.0), hero: 0.34, zoneAt: pecZone(0) },
     { y: 2.080, w: 0.318, d: 0.280, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
       shape: chestShape(0.80), hero: 0.40, zoneAt: pecZone(1) },
-    /* THE SHOULDER LINE — collarbones across the front, trapezius behind */
+    /* R100 — the groove under the clavicle (subclavicleShape): its own dark,
+       uncoated zone, so the collarbone above it reads as a bar with shadow
+       beneath. */
+    { y: 2.150, w: 0.315, d: 0.250, facet: 0.0040, crystal: 0.0200, crystalY: 0.0040,
+      shape: subclavicleShape(1.0), hero: 0.20, zoneAt: pecZone(1), coat: 0.55 },
+    /* THE SHOULDER LINE — collarbones across the front, trapezius behind.
+       R100: the thin band just under it (2.150 -> 2.170) is the groove's
+       dark zone, so the collarbone reads as a bar with a hairline of shadow
+       beneath — not a stripe across the chest. */
     { y: 2.170, w: 0.316, d: 0.242, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
-      shape: clavicleShape(1.0), dip: 0.030, hero: 0.32, zoneAt: null, coat: 0.30 },   /* R99: the shelf blew white; the godform reference's clavicle is dark under a lit shoulder */
+      shape: clavicleShape(1.0), dip: 0.030, hero: 0.32, zoneAt: subclavicleZone, coat: 0.30 },   /* R99: the shelf blew white; the godform reference's clavicle is dark under a lit shoulder */
+    /* R100 — THE TRAPEZIUS RING: between the shoulder line and the neck's
+       base, so the traps rise diagonally toward the neck across two bands
+       instead of one steep step, with the trap lobes at full strength. */
+    { y: 2.192, w: 0.268, d: 0.198, facet: -0.0050, crystal: 0.0260, crystalY: 0.0050,
+      shape: clavicleShape(0.85), hero: 0.04, zoneAt: trapZone, coat: 0.12 },   /* a slope, not a shelf: first cut at 2.190 / 0.282 drew a flat ledge */
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11
@@ -920,8 +983,11 @@ export var TORSO = {
        wider and deeper and the trapezius ring above the shoulder line is
        broader, so the head's lower vertex is swallowed by a column the eye
        accepts as supporting it. */
-    { y: 2.205, w: 0.236, d: 0.172, facet: -0.0120, crystal: 0.024, crystalY: 0.0050, coat: 0.25,
-      shape: clavicleShape(0.55), hero: 0.16, classesAt: neckClasses },
+    /* R100: the neck's base ring narrows and rises (0.236 at 2.205 -> 0.205
+       at 2.215) so the trapezius runs DIAGONALLY from the shoulder line up
+       to the neck instead of stepping onto a flat ledge. */
+    { y: 2.215, w: 0.205, d: 0.156, facet: -0.0120, crystal: 0.024, crystalY: 0.0050, coat: 0.15,
+      shape: clavicleShape(0.55), hero: 0.08, classesAt: neckClasses },
     /* The column's rings follow the head's lower vertex (2.324 now): the top
        ring sits 0.09 above it where the head is 0.10 wide and swallows it, and
        the visible neck from trapezius to chin is 0.12 — the reference's. */
@@ -1143,7 +1209,7 @@ export var ARMS = {
     /* R98: the extensor swell sits high, just under the elbow, and the taper
        to the wrist is steeper — an anatomical forearm, not a stick. */
     fore: function (t) {
-      return 0.90 + Math.sin(Math.pow(t, 0.55) * Math.PI) * 0.20 - t * 0.16;
+      return 0.90 + Math.sin(Math.pow(t, 0.55) * Math.PI) * 0.20 - t * 0.20;   /* R100: harder compression into the wrist */
     }
   },
 
@@ -1163,15 +1229,24 @@ export var ARMS = {
      From the front the bicep reads as fullness; from a slight angle the front
      and rear masses separate, which is what the brief asks for. */
   shapes: {
-    upper: function (t, d) {
+    /* R100 — `inner` is +1 or -1: which sign of d faces the torso (see
+       limbSideDirection); the lateral tricep ridge and the radial forearm
+       ridge sit on the OUTER side, which is -inner. */
+    upper: function (t, d, inner) {
       var belly = Math.sin(Math.pow(t, 0.82) * Math.PI);
       var rear = Math.sin(Math.pow(t, 1.30) * Math.PI);
+      var outer = -(inner || 1);
       /* R97: BELLIES, not bulges. The bicep peaks at a third of the way
          down at nearly a third of the radius, the tricep — broader, lower —
          at a quarter, and the groove between them deepens so the two masses
          read as two from the side and trade dominance as the arm turns. */
-      var bicep = bump(d, 0, 0.80) * 0.320 * belly;
+      /* R100: a CREST, not a bulge — the bicep's lobe narrows (0.80 -> 0.62)
+         and rises (0.32 -> 0.36) so it peaks along a line; the tricep keeps
+         its long-head fullness and gains a LATERAL-HEAD ridge on the outer
+         arm, the horseshoe's outer arm converging toward the elbow. */
+      var bicep = bump(d, 0, 0.62) * 0.360 * belly;
       var tricep = bump(d, Math.PI, 1.10) * 0.300 * rear;   /* R99: the tricep is a volume of its own */
+      var lateralHead = bump(d, outer * (Math.PI - 0.95), 0.40) * 0.110 * Math.sin(Math.pow(t, 1.1) * Math.PI);
       /* the groove between them, down each side of the arm */
       /* R98: the groove is deepest through the upper half, and in the lower
          half a BRACHIALIS lobe fills it either side — the lateral mass that
@@ -1180,12 +1255,13 @@ export var ARMS = {
       var low = Math.max(0, Math.min(1, (t - 0.45) / 0.35));
       low = low * low * (3 - 2 * low);
       var sides = bump(d, Math.PI / 2, 0.42) + bump(d, -Math.PI / 2, 0.42);
-      var groove = sides * -0.125 * belly * (1 - low);   /* R99: a deeper valley between the two */
+      var groove = sides * -0.150 * belly * (1 - low);   /* R99: a deeper valley between the two; R100: deeper again */
       var brachialis = sides * 0.110 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);
-      return 1 + bicep + tricep + groove + brachialis;
+      return 1 + bicep + tricep + lateralHead + groove + brachialis;
     },
-    fore: function (t, d) {
+    fore: function (t, d, inner) {
       var swell = Math.sin(Math.pow(t, 0.58) * Math.PI);
+      var outer = -(inner || 1);
       /* Flexor mass sits front-and-inboard, extensor mass rear-and-outboard —
          offset from dead front and dead back, which is what stops the forearm
          reading as a smaller copy of the upper arm. */
@@ -1195,7 +1271,11 @@ export var ARMS = {
       var flexor = bump(d, 0.45, 0.85) * 0.240 * swell;
       var extensor = bump(d, Math.PI - 0.55, 0.95) * 0.230 * Math.sin(Math.pow(t, 0.45) * Math.PI);
       var ulna = bump(d, -Math.PI / 2 - 0.2, 0.40) * -0.070 * swell;
-      return 1 + flexor + extensor + ulna;
+      /* R100: the RADIAL ridge — the brachioradialis running down the outer
+         forearm from the elbow, fullest in the upper third and fading to
+         the wrist, which is what gives the forearm its direction. */
+      var radial = bump(d, outer * 0.95, 0.36) * 0.095 * Math.sin(Math.pow(t, 0.50) * Math.PI) * (1 - t * 0.5);
+      return 1 + flexor + extensor + ulna + radial;
     }
   }
 };

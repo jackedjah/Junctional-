@@ -1110,3 +1110,39 @@ moon-side rim stays on the moon side in every mode and at every yaw. Read
 the front capture: the left contour lit, the right dark, the crystal's own
 catch on the raised arm. The edge LINES remain uniform — they are unlit
 line materials — so their opacity is what keeps them a whisper.
+
+### The face is a module in a casing, and the module has a depth stack (R100)
+
+The platinum references present the face as a display set into a
+manufactured casing, and one recessed plate cannot say that however deep
+the recess is. `diamondCrystal` now builds the stack the eye needs to read
+hardware: the casing's chamfer, the cavity wall down to a channel FLOOR
+(cavity material), a short BEZEL wall rising from the floor (its own dark
+steel material), and the GLASS on top of it — forward of the floor, still
+behind the lip. A translucent vertex-alpha ring on the glass is the
+casing's contact shadow, heavier along the top edge. Everything drawn on
+the glass lives in the content layer (`mrmah-face`), positioned in screen
+units from `display.halfWidth / halfHeight`, so an icon or a future pixel
+sequence never touches the casing; `setIcon('dumbbell')` (`?face=dumbbell`
+on the lab) proves the slot and is called by nothing in the product.
+
+### A shallow band between two wide rings is a ledge
+
+Adding a trapezius ring between the shoulder line and the neck's base drew
+a flat, lit shelf across the top of the shoulders: the two rings were
+close in height and far apart in width, so the band between them faced
+UP. The shelf existed before the ring too — it was the "clavicle blown
+white" of two passes — and it went away only when the neck's base ring
+narrowed and rose so the band tilts toward the neck. A ring table can
+carve a slope only if the width falls faster than the height rises.
+
+### The theme lives in what the platinum reflects, not in the platinum
+
+The R98 coat stayed neutral and the theme sat on top of it as coloured
+light, which the ultra brief read as "silver body plus coloured light".
+The coat's albedo now carries a tenth of the theme's hue, normalised to
+the hue's luminance so the coat's value never changes; its grazing
+reflection is platinum carrying the theme at 65 / 35; and a hairline seam
+of the theme's colour runs along the rim of large coated chromatic facets.
+Under gold and purple the coat still reads silver — measured on the same
+crops as R99 — and the colour reads as reflected through it.

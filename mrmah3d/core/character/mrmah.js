@@ -293,6 +293,8 @@ export function createMrMah(options) {
     getYaw: getYaw,
     /* R99 — the rim's directions (crystal-shader.js), handed in by the scene
        in VIEW space each frame: the moon side and the hand crystal's side. */
+    /* R100 — content on the display glass (head.js setIcon); development only. */
+    setDisplayIcon: function (name) { return head.setIcon ? head.setIcon(name) : null; },
     setRimDirections: function (a, b) {
       setRimDirections(materials.body, a, b);
       if (materials.head) setRimDirections(materials.head, a, b);

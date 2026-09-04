@@ -1019,6 +1019,18 @@ export function diamondCrystal(opts) {
   var backInset = opts.backInset == null ? 0 : opts.backInset;
   var K = backInset > 0 ? ring(backInset, backZ, null) : null;
   var back = push(0, 0, backZ);
+  /* R100 — THE DISPLAY MODULE. The face is no longer a plate painted on the
+     cavity floor: inside the recess sits a raised module — a channel floor
+     ring around it (the cavity material), a short bezel wall rising from the
+     floor (its own material, dark steel), and the GLASS on top, standing
+     `screenZ` forward of the floor and still behind the lip. That is the
+     depth stack the platinum references show: casing, channel, bezel, glass,
+     dark screen, luminous UI. `screenInset` sizes the glass. 0 keeps the old
+     flat plate. */
+  var screenInset = opts.screenInset == null ? 0 : opts.screenInset;
+  var screenZ = (opts.screenZ == null ? 0 : opts.screenZ) * hd;
+  var S0 = screenInset > 0 ? ring(Math.min(face, screenInset + 0.025), faceZ, null) : null;   /* the bezel's foot, on the floor */
+  var S = screenInset > 0 ? ring(screenInset, screenZ, null) : null;                            /* the glass's edge */
 
   /* THREE MATERIAL GROUPS, not two.
 
@@ -1084,16 +1096,33 @@ export function diamondCrystal(opts) {
   /* Fan the plate from its centre so it is several triangles, not one quad —
      it then picks up a little value variation of its own instead of reading as
      a single flat void. */
-  var centre = push(0, 0, faceZ);
-  for (var f = 0; f < N; f++) plate.push([centre, F[f], F[(f + 1) % N]]);
+  var bezel = [];
+  if (S) {
+    /* the channel floor: an annulus between the cavity's foot and the bezel */
+    for (var s = 0; s < N; s++) {
+      var sj = (s + 1) % N;
+      cavity.push([F[sj], S0[sj], S0[s], F[s]]);          /* floor ring, facing forward */
+      bezel.push([S0[sj], S[sj], S[s], S0[s]]);           /* the bezel wall, rising */
+    }
+    var sc = push(0, 0, screenZ);
+    for (var g2 = 0; g2 < N; g2++) plate.push([sc, S[g2], S[(g2 + 1) % N]]);   /* the glass */
+  } else {
+    var centre = push(0, 0, faceZ);
+    for (var f = 0; f < N; f++) plate.push([centre, F[f], F[(f + 1) % N]]);
+  }
 
   var faceCoat = shellCoat.slice();
-  for (var pc = 0; pc < plate.length + cavity.length; pc++) faceCoat.push(0);
-  return facetedGeometry(P, null, [
+  for (var pc = 0; pc < plate.length + cavity.length + bezel.length; pc++) faceCoat.push(0);
+  var groups = [
     { faces: shell, material: 0 },
     { faces: plate, material: 1 },
     { faces: cavity, material: 2 }
-  ], { lift: opts.lift, classes: opts.classes, faceCoat: faceCoat });
+  ];
+  if (bezel.length) groups.push({ faces: bezel, material: 3 });
+  var geo = facetedGeometry(P, null, groups, { lift: opts.lift, classes: opts.classes, faceCoat: faceCoat });
+  /* where the glass sits, for the content layer and the casing shadow */
+  geo.userData.screen = { z: S ? screenZ : faceZ, inset: S ? screenInset : face };
+  return geo;
 }
 
 /* A flat diamond outline plate, used for the chest emblem and the transport

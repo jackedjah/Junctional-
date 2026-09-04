@@ -348,7 +348,14 @@ export function applyCrystalShader(material, options) {
         /* R98 — the platinum albedo. A coated plane's colour is the coat's,
            carrying a trace of the crystal's own value underneath so a coated
            silver catch stays brighter than a coated sapphire plane. */
-        '  diffuseColor.rgb = mix( diffuseColor.rgb, uCoatColor * ( 0.80 + 0.20 * dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) * 2.0 ), mrCoatW );',
+        /* R100 — THE PLATINUM REFLECTS A COLOURED UNIVERSE. The coat's
+           albedo (which, at its metalness, is mostly its specular colour)
+           carries a tenth of the theme's hue, normalised so it never changes
+           the coat's value: neutral silver still dominates, the theme lives
+           in what it reflects. */
+        '  vec3 mrTintN = uTint / max( dot( uTint, vec3( 0.299, 0.587, 0.114 ) ), 0.05 );',
+        '  vec3 mrCoatAlbedo = uCoatColor * mix( vec3( 1.0 ), mrTintN, 0.10 );',
+        '  diffuseColor.rgb = mix( diffuseColor.rgb, mrCoatAlbedo * ( 0.80 + 0.20 * dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) * 2.0 ), mrCoatW );',
         '#endif'
       ].join('\n'))
 
@@ -437,11 +444,26 @@ export function applyCrystalShader(material, options) {
         '    float mrRim = 1.0 - exp( -1.6 * mrF );',
         /* R98: on a coated plane the grazing add goes silver-blue rather than
            cyan — a platinum rim catches the moon, a crystal rim its own energy. */
-        '    vec3 mrRimColor = mix( uTint, uCoatColor * 1.15, mrCoatW * 0.70 );',
+        /* R100: a coated plane's grazing reflection is platinum carrying the
+           theme (65 / 35), not platinum instead of it — the colour trapped in
+           the material's edge response rather than laid over it. */
+        '    vec3 mrRimColor = mix( uTint, mix( uCoatColor * 1.15, uTint, 0.35 ), mrCoatW * 0.70 );',
         /* R99: the rim is fragmented by direction — see the uniform note. */
         '    vec3 mrRN = normalize( normal );',
         '    float mrRimDir = clamp( uRimFloor + max( dot( mrRN, uRimDirA ), 0.0 ) * 1.0 + max( dot( mrRN, uRimDirB ), 0.0 ) * 0.55, 0.0, 1.0 );',
         '    outgoingLight += mrRimColor * mrRim * mrRimDir * 0.62 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
+        /* R100 — INTERNAL COLOUR SEAMS. Along the rim of a large coated,
+           chromatic facet a hairline of the theme's colour, as if light were
+           carried inside the crystal to the plane's edge. Gated hard: big
+           faces only, coated only, the chromatic classes only, and faint —
+           the brief's "do not turn the body into Tron". */
+        '    {',
+        '      float mrSeamEdge = min( min( vBary.x, vBary.y ), vBary.z );',
+        '      float mrSeamW = clamp( 0.018 / max( vBary.w, 1e-4 ), 0.02, 0.12 );',
+        '      float mrSeam = ( 1.0 - smoothstep( 0.0, mrSeamW, mrSeamEdge ) ) * smoothstep( 0.025, 0.06, vBary.w );',
+        '      mrSeam *= mrCoatW * smoothstep( 0.35, 0.75, clamp( vFacet.w, 0.0, 1.0 ) );',
+        '      outgoingLight += uTint * mrSeam * 0.16;',
+        '    }',
         /* R94 — the internal light. See the uniform note above. */
         '    if ( uInnerStrength > 0.0 && vInner > 0.5 ) {',
         '      vec3 mrN = normalize( vObjN );',
