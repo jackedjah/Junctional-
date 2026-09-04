@@ -83,6 +83,18 @@ trapezius, a chest with pectoral masses, and arms with a bicep, an elbow and a
 forearm that reach the hip. `mrmah-canonical-front.png` is still the measurement
 baseline and must not be swapped, but it is no longer the design target.
 
+There is now a FIFTH set, `reference/mrmah-refD-guardian-{a,b,c,d}.png` (R95),
+and it is the current art-direction authority for the WHOLE PICTURE: a
+premium, volumetric crystal guardian with integrated shoulders and striated
+arms, jointed robotic hands, a chest with pec and ab planes read through facet
+and light shifts, a luminous taper, a soft close aura, and a world with a large
+mostly-white moon framed by clouds, steel mountains with thin summit beams,
+horizon mist, a reflective grid floor, and small distant Mr.Mah variant
+figures. The emblem row beneath the chest diamond is three outlined
+right-pointing triangles in every reference. The canonical front remains the
+measurement baseline; the anatomical reference remains the proportion
+authority where the guardian set does not contradict it.
+
 **Expect the silhouette score against the canonical front to be low, and do not
 chase it.** The head is deliberately 30% smaller than the canonical measurement
 and the shoulder line 0.2 units higher; a comparison against a file the design
