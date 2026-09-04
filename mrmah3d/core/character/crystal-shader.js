@@ -49,10 +49,38 @@ export function applyCrystalShader(material, options) {
   material.userData.crystal = {
     uFresnelPower: { value: opts.fresnelPower == null ? 2.6 : opts.fresnelPower },
     uFresnelBoost: { value: opts.fresnelBoost == null ? 1.35 : opts.fresnelBoost },
-    uInnerDark: { value: opts.innerDark == null ? 0.72 : opts.innerDark },
+    /* R92: 0.72 -> 0.38. This is the multiplier that was eating the sapphire.
+
+       `outgoingLight *= mix(1 - absorb*(1 - fresnel), 1, 0.10)`, and absorb is
+       uInnerDark times the facet's own darkness — so a black-class facet seen
+       face-on came out at 0.35 of whatever lit it. Raising the ambient to a
+       deep blue floor therefore changed almost nothing: the floor was being
+       multiplied away before it reached the frame, which is why the first
+       attempt at the sapphire body measured WORSE than the black one.
+
+       Absorption is still the mechanism that makes a crystal read as having an
+       inside, and it still varies per facet. It just no longer takes two thirds
+       of the body's value with it. */
+    /* And then partway back up to 0.60. 0.38 was chosen to stop the absorption
+       eating the new sapphire floor, and it did — but it also flattened the
+       bottom of the range: measured, near-black fell to 1.7% against a target
+       of 10-15%, i.e. the body had no lost planes left at all. Absorption is
+       the right control for exactly that, because it scales by the facet's OWN
+       darkness: raising it pulls the dark classes down and leaves the lit ones
+       where they are, which widens the distribution instead of moving it. */
+    uInnerDark: { value: opts.innerDark == null ? 0.60 : opts.innerDark },
     uTint: { value: tintColor },
     uDeep: { value: deepColor },
-    uVariation: { value: opts.variation == null ? 1.0 : opts.variation }
+    uVariation: { value: opts.variation == null ? 1.0 : opts.variation },
+    /* Width of the shaded chamfer as a share of the face, and how far the
+       normal is allowed to lean across it. Both deliberately small: the brief
+       asks for 1-3% of the local form, and the point is that a viewer says
+       "the crystal has better light behavior", never "it became rounded". */
+    /* Chamfer width in WORLD UNITS, on a character 3.0 tall — so a shade over
+       a quarter of a percent of his height, which is the 1-3%-of-local-form the
+       brief asks for on the parts that matter (an arm is ~0.2 across). */
+    uBevelWorld: { value: opts.bevelWorld == null ? 0.0045 : opts.bevelWorld },
+    uBevelAmount: { value: opts.bevelAmount == null ? 0.38 : opts.bevelAmount }
   };
 
   material.onBeforeCompile = function (shader) {
@@ -65,11 +93,18 @@ export function applyCrystalShader(material, options) {
       .replace('#include <common>', [
         '#include <common>',
         'attribute vec4 aFacet;',
-        'varying vec4 vFacet;'
+        'varying vec4 vFacet;',
+        'attribute vec3 aSmooth;',
+        'attribute vec4 aBary;',
+        'varying vec3 vSmoothN;',
+        'varying vec4 vBary;'
       ].join('\n'))
       .replace('#include <begin_vertex>', [
         '#include <begin_vertex>',
-        'vFacet = aFacet;'
+        'vFacet = aFacet;',
+        'vBary = aBary;',
+        /* into view space, matching how three carries `normal` */
+        'vSmoothN = normalize( normalMatrix * aSmooth );'
       ].join('\n'));
 
     /* ---- fragment: modulate the material per facet ---------------------- */
@@ -82,7 +117,59 @@ export function applyCrystalShader(material, options) {
         'uniform float uInnerDark;',
         'uniform float uVariation;',
         'uniform vec3 uTint;',
-        'uniform vec3 uDeep;'
+        'uniform vec3 uDeep;',
+        'uniform float uBevelWorld;',
+        'uniform float uBevelAmount;',
+        'varying vec3 vSmoothN;',
+        'varying vec4 vBary;'
+      ].join('\n'))
+
+      /* THE MICRO-BEVEL. See the long note in forge.js.
+
+         `vBary` is the barycentric coordinate, so the smallest of its three
+         components is the fractional distance to the NEAREST EDGE of this face:
+         0.333 dead centre, 0 on an edge. Inside a thin margin the shading
+         normal leans toward the surface's smoothed normal, which is what a
+         physical chamfer would have done, and everywhere else the face keeps
+         its own flat normal exactly.
+
+         smoothstep rather than a linear ramp so the middle of every face is
+         perfectly flat and the lean happens entirely inside the margin —
+         a linear blend leaves a trace of curvature across the whole face and
+         the character stops reading as cut.
+
+         This runs after <normal_fragment_begin>, which is where three has
+         finished deciding what `normal` is. */
+      .replace('#include <normal_fragment_begin>', [
+        '#include <normal_fragment_begin>',
+        '{',
+        '  float mrEdge = min( min( vBary.x, vBary.y ), vBary.z );',
+        /* Absolute chamfer -> this face's barycentric fraction, with the
+           ceiling doing real work. The arms are built from small facets, so
+           their inradius is small and the ratio blows up: at a ceiling of 0.30
+           a third of every arm facet was chamfer, the normals leaned most of
+           the way to smooth, and both arms came back as bright chrome tubes
+           while the large-faceted torso stayed correctly faceted. 0.11 means a
+           facet too small to carry a real chamfer simply gets a small one
+           rather than becoming a curved surface. */
+        '  float mrW = clamp( uBevelWorld / max( vBary.w, 1e-4 ), 0.010, 0.11 );',
+        '  float mrB = 1.0 - smoothstep( 0.0, mrW, mrEdge );',
+        /* And leaning is capped by how far the neighbours actually disagree.
+           Where a surface is nearly smooth already the chamfer has nothing to
+           do; where two planes meet at a hard angle it must not swing the
+           normal all the way across or the facet stops being a facet. */
+        '  float mrDiv = clamp( dot( normal, vSmoothN ), 0.0, 1.0 );',
+        /* AND ONLY BIG FACES GET A CHAMFER.
+           A chamfer is a feature of an EDGE between two planes worth calling
+           planes. Applied to the slivers that make up a limb's transition rings
+           it does not soften an edge, it smooths the whole facet — the arms came
+           back reading as hollow glass tubes rather than solid crystal. Gated on
+           the face's own inradius, the hero planes get their softened edge and
+           the small transition faces keep their crisp ones, which is also the
+           plane hierarchy the brief asks for. */
+        '  float mrBig = smoothstep( 0.030, 0.082, vBary.w );',
+        '  normal = normalize( mix( normal, vSmoothN, mrB * uBevelAmount * mrDiv * mrBig ) );',
+        '}'
       ].join('\n'))
 
       /* Base colour: pull each facet toward the deep interior colour by its

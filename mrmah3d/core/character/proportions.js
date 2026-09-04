@@ -203,7 +203,7 @@ export var HEAD = {
      the body's area nor the arms' range of orientations to separate its facets
      with. 0.36 leaves roughly a third black or charcoal and lets the rest
      catch. */
-  classLift: 0.30
+  classLift: 0.12
 };
 
 export var NECK = {
@@ -348,7 +348,22 @@ export var TORSO = {
      nearly every torso facet into the same middle, which is what made the body
      read as one continuous surface with seams drawn on it however the anatomy
      underneath was shaped. Anatomy needs a value range to be seen through. */
-  classLift: 0.14,
+  /* R92 — EVERY LIFT COMES DOWN, because the body they were compensating for
+     no longer exists.
+
+     `lift` compresses the class lottery toward the TOP of the table, and these
+     were tuned against a table that was 34% black with an absorption of 0.72 —
+     a lift of 0.50 on the arms was the only thing keeping them visible at all.
+     Against the sapphire table (20% black, absorption 0.38) the same 0.50 puts
+     22% of every arm facet into the three brightest classes, more than double
+     their nominal share, and both arms came back as white chrome while the
+     torso stayed correctly deep.
+
+     Isolated by setting the micro-bevel to zero and re-rendering: the arms were
+     still white, so it was never the bevel. The hierarchy is kept — arms above
+     head above torso, as the brief's arm-visibility requirement needs — but it
+     is now a nudge rather than a rescue. */
+  classLift: 0.06,
   /* AUTHORED HERO REGIONS — `hero` overrides classLift for one band.
 
      The class lottery is steered by face AREA, which is a good proxy for visual
@@ -670,7 +685,7 @@ export var ARMS = {
      purpose. Reference A does the same thing: its arms carry noticeably more
      secondary blue and more silver than the chest, because they are what has to
      read against a black world at the edge of the silhouette. */
-  classLift: 0.50,
+  classLift: 0.44,
 
   /* The deltoid takes MORE lift than the arm it caps. Its exposed surface is
      mostly upward-facing, and an upward-facing plane reflects x~64 in the
@@ -687,7 +702,7 @@ export var ARMS = {
      things were ruled out before the lottery: the authored ridge line and the
      rim shell were each removed for a capture and neither moved it, and the
      wedges are absent at the arm's own lift. */
-  deltoidLift: 0.40,
+  deltoidLift: 0.34,
 
   profiles: {
     /* STARTS BELOW 1, which is the correction the brief asks for.

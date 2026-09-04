@@ -26,13 +26,25 @@ function clad(group, geo, materials, rimScale) {
      are built in character space around y ~ 1.9, so a plain setScalar(1.05)
      lifted each shell 0.095 units off its own bone and drew it as a bright
      slab beside the arm rather than as a lip along it. */
-  var s = rimScale || 1.05;
-  var rim = new Mesh(geo, materials.rim);
-  rim.scale.set(s, 1, s);
-  if (!geo.boundingBox) geo.computeBoundingBox();
-  var c = geo.boundingBox.getCenter(new Vector3());
-  rim.position.set(c.x * (1 - s), 0, c.z * (1 - s));
-  group.add(rim);
+  /* R92 — NO RIM SHELL ON THE LIMBS, for the reason the torso lost its own.
+
+     The brief is explicit that the arms must not be defined by line outlines,
+     and between this additive shell and three tiers of edge line that is exactly
+     what they were: dark sapphire interiors with a bright lip all the way round,
+     which reads as hollow glass rather than as a solid limb. Removing it is what
+     forces the arm's own SURFACES to carry it — which is what the facet lift and
+     the environment cards are for.
+
+     Kept as a parameter so a caller can still ask for one; nothing does. */
+  if (rimScale) {
+    var s = rimScale;
+    var rim = new Mesh(geo, materials.rim);
+    rim.scale.set(s, 1, s);
+    if (!geo.boundingBox) geo.computeBoundingBox();
+    var c = geo.boundingBox.getCenter(new Vector3());
+    rim.position.set(c.x * (1 - s), 0, c.z * (1 - s));
+    group.add(rim);
+  }
   /* 36, not 20. At 20 degrees every ring seam along a profiled limb qualified,
      so the arms wore a ladder of faint lines that competed with the planes
      describing the bicep and forearm. Suppressing the transition tier is what
@@ -40,8 +52,10 @@ function clad(group, geo, materials, rimScale) {
      needed, for the same reason. */
   var major = new EdgesGeometry(geo, 48);
   var minor = new EdgesGeometry(geo, 36);
+  /* One structural tier, not two. The halo pass doubled every major line on a
+     limb, and doubled lines are what turned the arms into wireframe tubes once
+     the shell came off. */
   group.add(new LineSegments(major, materials.edge));
-  group.add(new LineSegments(major, materials.edgeHalo));
   group.add(new LineSegments(minor, materials.edgeFaint));
   return { mesh: mesh, edges: major, minorEdges: minor };
 }
@@ -73,7 +87,7 @@ function buildHand(materials, spec, options) {
   var owned = [];
 
   var palmGeo = palmGeometry(1, spec);
-  var palm = clad(hand, palmGeo, materials, 1.06);
+  var palm = clad(hand, palmGeo, materials, 0);
   owned.push(palmGeo, palm.edges, palm.minorEdges);
 
   /* Digits. Simplified and few — the requirement is that the raised hand
@@ -109,7 +123,7 @@ function buildHand(materials, spec, options) {
     ];
     var g = segment(base, tip, spec.digitRadius, spec.digitRadius * (curl ? 0.92 : 0.7), 5,
       { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
-    var d = clad(hand, g, materials, 1.08);
+    var d = clad(hand, g, materials, 0);
     owned.push(g, d.edges, d.minorEdges);
   }
 
@@ -130,7 +144,7 @@ function buildHand(materials, spec, options) {
     : [thumbBase[0] + thumbLen * 0.62, thumbBase[1] + thumbLen * 0.34, thumbBase[2] + thumbLen * 0.72];
   var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 5,
     { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
-  var thumb = clad(hand, thumbGeo, materials, 1.08);
+  var thumb = clad(hand, thumbGeo, materials, 0);
   owned.push(thumbGeo, thumb.edges, thumb.minorEdges);
 
   /* The bright tip diamond the reference shows above the raised hand. */
@@ -192,7 +206,7 @@ function buildArm(materials, spec, options) {
         return ARMS.deltoidLift + (ARMS.classLift - ARMS.deltoidLift) * k * k * (3 - 2 * k);
       } }
   );
-  var upper = clad(shoulderJoint, upperGeo, materials, 1.05);
+  var upper = clad(shoulderJoint, upperGeo, materials, 0);
   owned.push(upperGeo, upper.edges, upper.minorEdges);
 
   /* Forearm hangs off an elbow joint so the elbow can actually bend. */
@@ -208,7 +222,7 @@ function buildArm(materials, spec, options) {
     { depthRatio: 1.04, crystal: 0.070, steps: 6,
       profile: ARMS.profiles.fore, shape: ARMS.shapes.fore, lift: ARMS.classLift }
   );
-  var fore = clad(elbowJoint, foreGeo, materials, 1.05);
+  var fore = clad(elbowJoint, foreGeo, materials, 0);
   owned.push(foreGeo, fore.edges, fore.minorEdges);
 
   /* Wrist joint, oriented so the hand continues along the forearm axis. */

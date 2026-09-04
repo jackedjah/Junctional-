@@ -53,6 +53,21 @@ export function createRenderer(options) {
      than a missing bright tail, which is exposure's job and not
      envMapIntensity's — the two are not interchangeable and using the wrong one
      has produced a correctly-numbered, visually flat body here before. */
+  /* R92: 1.38 -> 1.12. With the body rebuilt around a sapphire albedo the
+     distribution came out correct in the middle and top-heavy at both ends:
+     measured over the character's mask, dark sapphire landed on target at 45%
+     but brighter blue ran 16.8% against a target of 8-12% while near-black sat
+     at 1.7% against 10-15%. That is one distribution sitting too high, not two
+     separate faults — which is precisely what exposure is for, and precisely
+     what envMapIntensity is not (it would have pulled the bright end down and
+     left the missing blacks missing). */
+  /* R92: tried at 1.12 and put back. Exposure shifts a distribution as a whole,
+     and this one was not shifted — it was too NARROW: near-black short by ten
+     points while brighter blue ran high. Lowering exposure bought 3 points of
+     black and cost 8 points of sapphire, which is the wrong trade. Widening is
+     absorption's job (uInnerDark in crystal-shader.js), because that scales by
+     each facet's own darkness and so pulls the bottom down without touching the
+     top. */
   renderer.toneMappingExposure = Number(opts.exposure) || 1.38;
   renderer.shadowMap.enabled = settings.shadows;
   renderer.shadowMap.type = PCFSoftShadowMap;

@@ -35,8 +35,27 @@ export var PALETTE = {
      well the per-facet classes separate. The cyan the character needs comes
      from the edges, the tint class and the rim card — all of which are
      selective. This is not. */
-  crystal: 0x4a5058,
-  crystalDeep: 0x0b1219, /* the darkest facets */
+  /* R92 — AND NOW IT GOES BACK TO BLUE, DELIBERATELY, because the neutral was
+     solving the wrong problem.
+
+     The reasoning above is sound and its premise expired. At metalness 0.68 the
+     base colour tints every reflection, so a blue base made the whole body one
+     hue — true. But metalness is 0.30 now and the environment is near-black, so
+     there is barely any reflection for a base colour to tint: what the neutral
+     slate actually buys at this point is a body whose unlit facets are GREY
+     rather than blue, and grey against a near-black environment is black.
+
+     Measured over the character's own mask, the build this replaces was 54.4%
+     near-black and 8.3% dark sapphire, against a brief asking for 10-15% and
+     45-55%. He was a black body with blue edges, exactly as the brief says.
+
+     Dark sapphire is his identity colour and it has to live in the ALBEDO,
+     because albedo is the only thing that speaks when nothing is being
+     reflected. The cyan accents stay selective — they come from the edges, the
+     tint class and the rim card, all of which are chosen. This is the floor
+     underneath them. */
+  crystal: 0x1c3a63,
+  crystalDeep: 0x0a1730, /* the darkest facets — still sapphire, not void */
   edge: 0x35d6ff,        /* cyan edge illumination */
   edgeHot: 0xbdf2ff,     /* near-white specular catch */
   face: 0x05090d,        /* the recessed facial plane — almost black */
@@ -70,7 +89,14 @@ export function createCrystalMaterials(options) {
        reflection. At 0.68 the body was almost purely specular and therefore
        almost purely bimodal. Kept above a half so the specular catches still
        dominate the bright end, which is what keeps it crystal and not stone. */
-    metalness: 0.55,
+    /* R92: 0.55 -> 0.30. Metalness is the switch between "this surface's colour
+       is its own" and "this surface's colour is whatever it can see", and with
+       a near-black environment to see, 0.55 meant most of the body had no
+       colour available to it at all. Halving it lets the sapphire albedo carry
+       the unlit and half-lit planes — which is 70% of him — while the facets
+       that DO catch a card still go specular, because roughness stays low and
+       that is what actually makes a catch sharp. */
+    metalness: 0.30,
     /* The environment built in stage.js is what this metalness reflects.
        Without it a dark metal returns near-black on every facet. */
     /* High, and paired with a LOW tone-mapping exposure. These two are not
@@ -110,8 +136,22 @@ export function createCrystalMaterials(options) {
        so it stretches the bright tail and leaves the blacks where they are.
        Exposure would have moved the whole distribution and made the midtone
        problem worse. */
-    envMapIntensity: 27.0,
-    flatShading: true,
+    /* R92: 27 -> 19. envMapIntensity scales the REFLECTED component, and with
+       metalness coming down to let albedo speak, the reflection no longer has
+       to carry the whole material. Left at 27 it would simply have re-crushed
+       the midtones the albedo is being brought in to supply — the same
+       distribution error from the other direction. */
+    envMapIntensity: 19.0,
+    /* R92: flatShading OFF, and the facets are unaffected.
+
+       Every vertex of a face already carries that face's own normal, so
+       interpolating across three identical normals returns the same constant
+       the derivative was producing — the faceted read comes from the DATA, not
+       from this flag. Turning it off is what makes the normal blendable, which
+       is what the micro-bevel needs (see forge.js and crystal-shader.js). With
+       it on, three overwrites the interpolated normal with a screen-space
+       derivative every fragment and the bevel is discarded. */
+    flatShading: false,
     /* A faint self-lit floor so facets turned fully away from every light are
        still crystal rather than holes cut in the frame. Deliberately tiny. */
     emissive: new Color(tint.crystal || PALETTE.crystal),
@@ -312,7 +352,12 @@ export function createCrystalMaterials(options) {
        the real curvature — so it puts light on the contour without laying a
        flat overlay across the chest, which is precisely the difference between
        the two approaches. */
-    fresnelBoost: 1.30
+    /* R92: 1.30 -> 1.00. Fresnel multiplies whatever a grazing facet already
+       has, and against a sapphire body that is a good deal more than it was
+       against a black one — the bright end measured 9.2% above 190 luma where
+       the brief asks for 2-5%. Trimmed rather than removed: it is still what
+       puts light on the contour. */
+    fresnelBoost: 1.00
   });
 
   /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */

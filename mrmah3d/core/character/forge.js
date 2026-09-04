@@ -85,16 +85,43 @@ import { BufferGeometry, Float32BufferAttribute } from '../../vendor/three/three
    The order matters — the table accumulates from black upward and `lift` and
    the area bias both index into it — so the tiers run monotonically from
    swallowed to mirror. */
+/* R92 — REWEIGHTED AND LIGHTENED, to the brief's stated perceptual target.
+
+   Measured over the character's own mask, this table's predecessor produced
+   54.4% near-black and 8.3% dark sapphire against a brief asking for 10-15%
+   and 45-55%. Two things were wrong and they compounded:
+
+   WEIGHT. 34% of faces were the black class and another 22% charcoal, so more
+   than half the body was drawn from the two darkest entries before absorption
+   was even applied. Black comes down to 0.14 — it is a punctuation class now,
+   the lost planes the brief describes, not the body's default.
+
+   DARKNESS. The `dark` column is a multiplier on how much the shader swallows,
+   and at 1.00 and 0.74 the top two classes were being crushed to near nothing
+   whatever lit them. Every entry moves up: the darkest facet on him now keeps
+   about half its light rather than a third, which is the difference between a
+   lost plane that is still sapphire and a hole cut in the frame.
+
+   The bright end is untouched in weight (cyan 0.05, silver 0.04) because the
+   measurement said it was already on target at 1.7-2.8% — the body was not
+   short of catches, it was short of a body. */
 var FACET_CLASSES = [
   /* w,    rough,  metal,  dark,  tint */
-  [0.34,   0.14,  -0.36,   1.00,  0.00],   /* black    — the anchor */
-  [0.22,   0.08,  -0.18,   0.74,  0.03],   /* charcoal */
-  [0.16,   0.05,  -0.06,   0.50,  0.12],   /* navy     — new */
-  [0.12,   0.02,   0.04,   0.34,  0.26],   /* deep     */
-  [0.07,  -0.02,   0.14,   0.10,  0.55],   /* steel    — new */
-  [0.05,  -0.04,   0.18,  -0.06,  1.00],   /* cyan     */
-  [0.04,  -0.06,   0.34,  -0.82,  0.20]    /* silver   — rarer, and hotter for it */
+  [0.20,   0.14,  -0.20,   0.78,  0.00],   /* black    — lost planes, punctuation */
+  [0.16,   0.08,  -0.12,   0.50,  0.06],   /* navy     — the deep body */
+  [0.36,   0.05,  -0.02,   0.28,  0.18],   /* sapphire — the DEFAULT, and the point */
+  [0.17,   0.02,   0.06,   0.12,  0.34],   /* lit sapphire */
+  [0.04,  -0.02,   0.14,  -0.02,  0.62],   /* steel    */
+  [0.04,  -0.04,   0.18,  -0.14,  1.00],   /* cyan     */
+  [0.03,  -0.06,   0.34,  -0.82,  0.20]    /* silver   — rare, and hot for it */
 ];
+/* The weights above were tuned against a measurement of the character's own
+   mask, and the first cut of them overshot in both directions: near-black fell
+   to 1.1% against a brief asking for 10-15%, which loses the lost planes the
+   value hierarchy needs, while the bright end stayed at 8%. Black comes back up
+   to 0.20 and the top three classes come down, because the brief is explicit
+   that white should be rare and powerful — a catch is only a catch against
+   surface that has chosen not to be one. */
 
 /* Five classes give five values, and five values across a few hundred facets is
    a mosaic — which is exactly what it looked like. Measured against the
@@ -199,12 +226,80 @@ function facetClass(i, area, lift) {
   return FACET_CLASSES[0];
 }
 
+/* R92 — THE MICRO-BEVEL, and it costs no triangles at all.
+
+   The brief wants what rounding the corner of a UI container does: the shape
+   stays geometric, the edge stops being a razor. Done as geometry that is a
+   chamfer — inset every face and add a connecting strip — which triples the
+   triangle count on a mesh whose whole discipline is not doing that.
+
+   But a chamfer is only visible as an OPTICAL event: a narrow band along each
+   edge whose normal leans toward its neighbour, so a highlight rolls off across
+   it instead of stopping dead at the crease. That band can be shaded rather
+   than built.
+
+   So each vertex carries two extra attributes:
+
+     aSmooth  the area-averaged normal of every face meeting at this POSITION,
+              i.e. the normal the surface would have if it were smooth
+     aBary    which corner of its triangle this vertex is
+
+   and the shader blends from the flat face normal at the middle of a face
+   toward aSmooth in a thin margin at its edges. The silhouette does not move —
+   no vertex is displaced — and the geometry is untouched. What changes is
+   exactly what a 1-2% chamfer would change: the rolloff.
+
+   `flatShading` has to come OFF for this, and that is safe: every vertex of a
+   face already carries that face's own normal, so an interpolated normal across
+   three identical normals is the same constant the derivative gave. The faceted
+   look is preserved by the DATA rather than by the renderer's flag, which is
+   what makes it blendable. */
 export function facetedGeometry(positions, faces, groups, options) {
   var opts = options || {};
-  var pos = [], nor = [], fac = [];
+  var pos = [], nor = [], fac = [], smo = [], bar = [];
   var groupRanges = [];
   var written = 0;
   var faceIndex = 0;
+
+  /* Accumulate face normals per unique POSITION so shared corners average.
+     Positions are keyed on a rounded string: vertices are expanded per face, so
+     the only way to know two of them are the same corner is to compare where
+     they are. 1e-4 is far below any feature on this character and far above
+     float noise from the loft's own arithmetic. */
+  var normAcc = Object.create(null);
+  function key(x, y, z) {
+    return (Math.round(x * 1e4) / 1e4) + ',' + (Math.round(y * 1e4) / 1e4) + ',' +
+           (Math.round(z * 1e4) / 1e4);
+  }
+  function accumulate(a, b, c) {
+    var ax = positions[a * 3], ay = positions[a * 3 + 1], az = positions[a * 3 + 2];
+    var bx = positions[b * 3], by = positions[b * 3 + 1], bz = positions[b * 3 + 2];
+    var cx = positions[c * 3], cy = positions[c * 3 + 1], cz = positions[c * 3 + 2];
+    var ux = bx - ax, uy = by - ay, uz = bz - az;
+    var vx = cx - ax, vy = cy - ay, vz = cz - az;
+    /* NOT normalised: the cross product's length is twice the triangle's area,
+       so leaving it raw weights each face's vote by its size — which is what
+       makes a hero plane dominate the corner it shares with a sliver. */
+    var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+    [[a, ax, ay, az], [b, bx, by, bz], [c, cx, cy, cz]].forEach(function (v) {
+      var kk = key(v[1], v[2], v[3]);
+      var e = normAcc[kk];
+      if (!e) { e = normAcc[kk] = [0, 0, 0]; }
+      e[0] += nx; e[1] += ny; e[2] += nz;
+    });
+  }
+  (groups || [{ faces: faces, material: 0 }]).forEach(function (g) {
+    g.faces.forEach(function (f) {
+      if (f.length === 3) accumulate(f[0], f[1], f[2]);
+      else { accumulate(f[0], f[1], f[2]); accumulate(f[0], f[2], f[3]); }
+    });
+  });
+  function smoothAt(x, y, z) {
+    var e = normAcc[key(x, y, z)];
+    if (!e) return null;
+    var l = Math.hypot(e[0], e[1], e[2]);
+    return l < 1e-9 ? null : [e[0] / l, e[1] / l, e[2] / l];
+  }
 
   function emitTri(a, b, c) {
     var ax = positions[a * 3], ay = positions[a * 3 + 1], az = positions[a * 3 + 2];
@@ -217,6 +312,30 @@ export function facetedGeometry(positions, faces, groups, options) {
     nx /= len; ny /= len; nz /= len;
     pos.push(ax, ay, az, bx, by, bz, cx, cy, cz);
     nor.push(nx, ny, nz, nx, ny, nz, nx, ny, nz);
+    var sa = smoothAt(ax, ay, az) || [nx, ny, nz];
+    var sb = smoothAt(bx, by, bz) || [nx, ny, nz];
+    var sc = smoothAt(cx, cy, cz) || [nx, ny, nz];
+    smo.push(sa[0], sa[1], sa[2], sb[0], sb[1], sb[2], sc[0], sc[1], sc[2]);
+    /* The fourth component is the triangle's INRADIUS, and it is what makes the
+       chamfer a constant width instead of a constant fraction.
+
+       A first version used the barycentric margin directly, so the bevel was a
+       percentage of each face — which meant the torso's large planes got a thin
+       lip and the arms' small facets got a band across most of their area. The
+       arms came back as bright chrome lattice: every edge blended into every
+       other, which is precisely the "white scratches" the brief rules out.
+
+       inradius = 2 * area / perimeter is the radius of the largest circle that
+       fits in the triangle, i.e. its characteristic size. Dividing the target
+       world width by it in the shader converts an absolute chamfer into the
+       barycentric fraction that face needs, so a 0.9 mm bevel is 0.9 mm on a
+       hero plane and on a sliver alike. */
+    var la = Math.hypot(bx - ax, by - ay, bz - az);
+    var lb = Math.hypot(cx - bx, cy - by, cz - bz);
+    var lc = Math.hypot(ax - cx, ay - cy, az - cz);
+    var per = la + lb + lc;
+    var inr = per > 1e-9 ? (len * 0.5) * 2 / per : 1e-4;   /* len/2 is the area */
+    bar.push(1, 0, 0, inr, 0, 1, 0, inr, 0, 0, 1, inr);
     /* All three vertices of a face share its optical class, so the value is
        constant across the triangle and the facet reads as one material. */
     /* Triangle area, from the cross product already computed above: |u x v|/2
@@ -256,6 +375,8 @@ export function facetedGeometry(positions, faces, groups, options) {
   geo.setAttribute('position', new Float32BufferAttribute(pos, 3));
   geo.setAttribute('normal', new Float32BufferAttribute(nor, 3));
   geo.setAttribute('aFacet', new Float32BufferAttribute(fac, 4));
+  geo.setAttribute('aSmooth', new Float32BufferAttribute(smo, 3));
+  geo.setAttribute('aBary', new Float32BufferAttribute(bar, 4));
   if (groupRanges.length > 1) {
     groupRanges.forEach(function (g) { geo.addGroup(g.start, g.count, g.material); });
   }
@@ -450,8 +571,28 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
   var hx = Math.abs(uy) < 0.99 ? 0 : 1, hy = Math.abs(uy) < 0.99 ? 1 : 0, hz = 0;
   var rx = hy * uz - hz * uy, ry = hz * ux - hx * uz, rz = hx * uy - hy * ux;
   var rl = Math.hypot(rx, ry, rz) || 1; rx /= rl; ry /= rl; rz /= rl;   /* X axis */
-  /* Z axis = u cross r */
-  var zx = uy * rz - uz * ry, zy = uz * rx - ux * rz, zz = ux * ry - uy * rx;
+  /* Z axis = r cross u, NOT u cross r — the basis has to be RIGHT-handed.
+
+     It was u x r, which makes [r u z] a left-handed frame: worked through for
+     u = (1,0,0) the determinant is -1. A left-handed basis MIRRORS whatever it
+     transforms, so every limb built by `segment` has been reflected, and — the
+     part that matters — its triangle winding no longer agrees with its stored
+     normals. Every arm, hand, digit and deltoid has been carrying inverted
+     normals in its `normal` attribute.
+
+     It went unseen for many passes because `flatShading` was on, and flat
+     shading ignores the attribute entirely: three derives the normal from
+     screen-space derivatives of the view position, which is always consistent
+     with what is actually facing the camera. The moment flatShading came off so
+     the micro-bevel could blend the normal, the real data was used and both
+     arms rendered white — an inverted normal gives N.V = 0, which is maximum
+     grazing Fresnel, which is maximum brightness.
+
+     Found by elimination: the bevel was set to zero and the arms stayed white,
+     the facet lift was cut from 0.50 to 0.18 and they stayed white, the rim
+     shells were hidden and they stayed white, and flatShading was put back and
+     they went correctly dark. Only then was the basis worth checking. */
+  var zx = ry * uz - rz * uy, zy = rz * ux - rx * uz, zz = rx * uy - ry * ux;
 
   /* WHICH RING ANGLE FACES THE VIEWER.
 
@@ -521,6 +662,12 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
   }
   xform(p, true);
   xform(n, false);
+  /* The smoothed normals are a normal field like any other and have to be
+     rotated with the part. Left in the loft's local space they would describe a
+     surface pointing in an unrelated direction, and the chamfer would lean the
+     shading normal toward nonsense. */
+  var sm = built.geometry.attributes.aSmooth;
+  if (sm) { xform(sm.array, false); sm.needsUpdate = true; }
   built.geometry.attributes.position.needsUpdate = true;
   built.geometry.attributes.normal.needsUpdate = true;
   built.geometry.computeBoundingSphere();

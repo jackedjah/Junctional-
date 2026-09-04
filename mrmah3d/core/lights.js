@@ -96,11 +96,26 @@ export function createLights(options) {
   var faceLamp = new PointLight(new Color(0x6cebff), 0.85, 1.1, 2);
   faceLamp.position.set(0, 2.62, 0.16);
 
-  var hemi = new HemisphereLight(new Color(0x1b2836), new Color(0x08222e), 0.20);
+  /* R92 — THE FLOOR UNDER THE DARKS IS SAPPHIRE, NOT VOID.
+
+     A plane turned away from every source has to land on SOMETHING, and what it
+     landed on was 0.10 of a near-neutral ambient — i.e. black. That is why 54%
+     of the character measured near-black while the brief asks for 10-15%: not
+     because the lit planes were wrong, but because the unlit ones had no colour
+     to fall back to.
+
+     In the reference a lost shadow plane is still dark sapphire. That is what
+     these two provide: a deep blue floor, from above and below, strong enough
+     that the darkest facets read as deep crystal and weak enough that the value
+     hierarchy above them survives. Raising ambient is normally the fastest way
+     to destroy a dark end — the difference here is that it is raising it to a
+     COLOUR rather than to grey, and the hierarchy is carried by hue as much as
+     by value from this point on. */
+  var hemi = new HemisphereLight(new Color(0x24487e), new Color(0x0c1c3a), 0.30);
 
   /* Deliberately tiny. The dark side of a crystal should be nearly black —
      that contrast is the material. */
-  var ambient = new AmbientLight(new Color(0x0e1a24), 0.10);
+  var ambient = new AmbientLight(new Color(0x16305a), 0.22);
 
   var all = [key, fill, rim, rim2, bounce, chestLamp, faceLamp, hemi, ambient];
   if (group) all.forEach(function (l) { group.add(l); });

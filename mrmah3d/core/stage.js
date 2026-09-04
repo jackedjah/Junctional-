@@ -113,11 +113,25 @@ function buildEnvironment(renderer, palette) {
 
      There are more of them now, at scattered azimuths and elevations, so the
      catches land all over the body instead of banding down one side. */
+  /* R92 — THE HOT CARDS ARE ICE-BLUE, NOT WHITE.
+
+     The brief is explicit that white must be rare and powerful, and that most
+     of what reads as "bright" on the body should be ice blue or pale secondary
+     blue rather than pure white. These cards are the source of nearly every
+     bright pixel on him: a facet that catches one returns the card's colour
+     almost unmodified, because at this roughness the reflection is a mirror.
+     So pure-white cards guarantee pure-white catches no matter what the albedo
+     underneath is doing.
+
+     Measured over the character's mask, pixels above 190 luma were 9.9% of him
+     against a target of 2-5%. Tinting the sources is the correct fix rather
+     than dimming them: the catches keep their punch and stop being colourless,
+     which is what separates an expensive-looking crystal from a lit outline. */
   var cards = [
     /* key: the main near-white source, front-left of the character */
-    { x: 14, y: 30, w: 34, h: 30, fill: 'rgba(255,255,255,1)' },
+    { x: 14, y: 30, w: 34, h: 30, fill: 'rgba(214,238,255,1)' },
     /* a second hot pinpoint just off the key — the true white catches */
-    { x: 52, y: 48, w: 14, h: 12, fill: 'rgba(255,255,255,1)' },
+    { x: 52, y: 48, w: 14, h: 12, fill: 'rgba(226,244,255,1)' },
     /* fill: cool, weaker, opposite side */
     { x: 152, y: 44, w: 26, h: 22, fill: 'rgba(198,236,252,0.75)' },
     /* rim: narrow bright cyan, behind — the chromatic catches */
@@ -151,7 +165,7 @@ function buildEnvironment(renderer, palette) {
        Back to a middle size. Large enough that the flared chest has something
        to read by now the shell is gone, small enough that facets still hit or
        miss it rather than all catching it together. */
-    { x: 202, y: 50, w: 21, h: 18, fill: 'rgba(255,255,255,1)' },
+    { x: 202, y: 50, w: 21, h: 18, fill: 'rgba(210,236,255,1)' },
     /* THE SHOULDER-TOP CARD.
 
        The deltoids were rendering as flat black masses, and the geometry was
@@ -169,7 +183,7 @@ function buildEnvironment(renderer, palette) {
        tube end standing proud of the chest rather than anything to do with
        lighting. The brief is explicit that the shoulder must not become one
        giant dark mass, and this card is the only thing keeping it from that. */
-    { x: 68, y: 54, w: 28, h: 22, fill: 'rgba(255,255,255,0.84)' },
+    { x: 68, y: 54, w: 28, h: 22, fill: 'rgba(206,234,255,0.84)' },
     { x: 176, y: 68, w: 18, h: 15, fill: 'rgba(226,246,255,0.85)' },
 
     /* A NOTE ON WHAT IS DELIBERATELY NOT HERE.
