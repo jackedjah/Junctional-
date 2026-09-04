@@ -63,7 +63,11 @@ export var PALETTE = {
      are (24,27,35)-(45,54,71): near-neutral grey with a slight blue cast. A
      saturated deep colour under blue lights gave darks of (6,31,83) — blue with
      no luma — whatever its value was set to. */
-  crystalDeep: 0x3a4256, /* the darkest facets — dark steel with a blue cast */
+  /* R96: steel -> NAVY. The R94 steel darks were measured on the anatomical
+     reference; Reference A (R96) keeps its blue into the darks — the quad
+     histograms at chroma 94 with 57% under 32 luma, where this build's darks
+     sat at chroma 68. Same luma as the steel, the hue moved to sapphire. */
+  crystalDeep: 0x28386a, /* the darkest facets — navy with a little luma in it */
   /* R94 — the head's ice family: a pale steel-blue albedo, a deep that is
      still blue rather than black, and a whiter tint for its catches. */
   headCrystal: 0x7d9fc6,
@@ -205,6 +209,18 @@ export function createCrystalMaterials(options) {
     flatShading: true
   });
 
+  /* R96 — JOINTS. The elbow knuckles and wrist cuffs (limbs.js) are dark
+     GUNMETAL, not the cavity's void: Reference A's joints are machined steel
+     between the crystal masses, dark but with a metallic sheen that turns
+     with the arm. Drawn in the cavity material they rendered as black cuts. */
+  var joint = new MeshStandardMaterial({
+    color: new Color(PALETTE.joint || 0x34486c),
+    roughness: 0.38,
+    metalness: 0.72,
+    envMapIntensity: 2.4,
+    flatShading: true
+  });
+
   /* EDGES — the cyan perimeter. Unlit and additive so it holds its value
      against the dark body regardless of where the lights are; this is
      illumination, not a surface. Thin by construction: it is drawn from the
@@ -263,7 +279,7 @@ export function createCrystalMaterials(options) {
      is what removes the last of the technical-wireframe look; a single value
      everywhere is a drawing, a range is lighting. */
   var edgeHero = new LineBasicMaterial({
-    color: new Color(PALETTE.edgeHot),
+    color: new Color(tint.hot || PALETTE.edgeHot),
     transparent: true,
     opacity: 1.00,
     blending: AdditiveBlending,
@@ -403,6 +419,9 @@ export function createCrystalMaterials(options) {
        are already lit. */
     fresnelBoost: 1.30,
     fresnelPower: 2.0,
+    /* R96 — the facet dome (crystal-shader.js): every large plane grades from
+       its edge to its centre, which is what Reference A's glossy planes are. */
+    dome: 0.36,
     /* R94 — the taper's internal light (see crystal-shader.js). Sapphire, not
        cyan: the reference's taper is a saturated royal blue lit from within,
        and the cyan belongs to the edges. The source sits a third of the way up
@@ -438,7 +457,8 @@ export function createCrystalMaterials(options) {
     coreRange: 0.66,
     coreTop: 2.08,
     innerHalfWidth: 0.36,
-    innerColor: 0x4a9cff
+    /* R96: the internal light is theme energy (palette.js) */
+    innerColor: tint.inner || 0x4a9cff
   });
 
   /* R94 — THE HEAD HAS ITS OWN MATERIAL, and it is ICE.
@@ -475,7 +495,8 @@ export function createCrystalMaterials(options) {
     deep: PALETTE.headDeep,
     innerDark: 0.42,
     fresnelBoost: 0.90,
-    fresnelPower: 3.0
+    fresnelPower: 3.0,
+    dome: 0.30
   });
 
   /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */
@@ -484,6 +505,7 @@ export function createCrystalMaterials(options) {
     head.envMap = opts.envMap;
     face.envMap = opts.envMap;
     cavity.envMap = opts.envMap;
+    joint.envMap = opts.envMap;
     body.needsUpdate = true;
     head.needsUpdate = true;
     face.needsUpdate = true;
@@ -501,13 +523,13 @@ export function createCrystalMaterials(options) {
 
   /* R95 — the emblem's white-hot core. */
   var emissiveCore = new MeshBasicMaterial({
-    color: new Color(PALETTE.edgeHot),
+    color: new Color(tint.hot || PALETTE.edgeHot),
     toneMapped: false,
     transparent: true,
     opacity: 0.92
   });
 
-  var all = [body, head, face, cavity, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, emissiveSmile, emissiveCore, rim];
+  var all = [body, head, face, cavity, joint, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, emissiveSmile, emissiveCore, rim];
 
   /* Captured at construction so setGlow(1) restores exactly what each material
      was defined with. */
@@ -539,7 +561,7 @@ export function createCrystalMaterials(options) {
   }
 
   return {
-    body: body, head: head, face: face, cavity: cavity, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
+    body: body, head: head, face: face, cavity: cavity, joint: joint, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
     emissive: emissive, emissiveSoft: emissiveSoft, emissiveSmile: emissiveSmile, emissiveCore: emissiveCore, rim: rim,
     /* One place to drive the whole character's luminosity — used by the
        animation states so a "thinking" pulse cannot desynchronise.

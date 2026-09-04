@@ -30,9 +30,15 @@ function armZone(table) {
     while (d > Math.PI) d -= Math.PI * 2;
     while (d < -Math.PI) d += Math.PI * 2;
     var ad = Math.abs(d);
-    if (ad < 0.55) return { classes: table, seed: 70, index: 3 };           /* the bicep / flexor plane: steel-blue */
-    if (ad < 1.25) return { classes: table, seed: 71 + (d > 0 ? 1 : 0), index: 2 };   /* flanks: sapphire */
-    if (ad < 2.20) return { classes: table, seed: 73 + (d > 0 ? 1 : 0), index: 1 };   /* toward the back: navy */
+    /* R96: measured against Reference A's lowered arm (48% under 32 luma, 12%
+       above 96) this build's was 72% under 32 with 3% above 96 — more than half
+       of every arm was drawn from the two darkest rows. The flanks now reach
+       further round and the rear takes sapphire; only the last 50 degrees of
+       the tricep side stay lost. */
+    if (ad < 0.60) return { classes: table, seed: 70, index: 3 };           /* the bicep / flexor plane: steel-blue */
+    if (ad < 1.50) return { classes: table, seed: 71 + (d > 0 ? 1 : 0), index: 2 };   /* flanks: sapphire */
+    if (ad < 2.30) return { classes: table, seed: 73 + (d > 0 ? 1 : 0), index: 2 };   /* toward the back: sapphire too */
+    if (ad < 2.75) return { classes: table, seed: 74, index: 1 };           /* navy */
     return { classes: table, seed: 75, index: 0 };                         /* the tricep side: lost */
   };
 }
@@ -251,7 +257,7 @@ function buildArm(materials, spec, options) {
      and the arm stays a cone with a kink in it. */
   var upperGeo = segment(
     [0, 0, 0], elbow.clone().sub(shoulder).toArray(),
-    spec.upperRadius, spec.foreRadius * 1.02, 10,
+    spec.upperRadius, spec.foreRadius * 1.02, 8,
     /* R90: depthRatio goes above 1 and the cross-section is now SHAPED.
 
        The upper arm is deeper front-to-back than it is wide, because that is
@@ -261,7 +267,11 @@ function buildArm(materials, spec, options) {
        their own pair of facets instead of sharing one. */
     /* R95: fewer, longer planes — five steps, strips seeded as columns and
        named by armZone — and a touch less relief so a strip stays one plane. */
-    { depthRatio: 1.12, crystal: 0.055, steps: 5,
+    /* R96: eight sides by three steps, not ten by five. Reference A's upper arm
+       is six or eight large graded planes; fifty small quads cannot grade —
+       the facet dome (crystal-shader.js) is gated on face size and had
+       nothing to work on — and read as a quilt beside the reference. */
+    { depthRatio: 1.12, crystal: 0.045, steps: 3,
       profile: ARMS.profiles.upper, shape: ARMS.shapes.upper, lift: ARMS.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes),
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
@@ -285,13 +295,27 @@ function buildArm(materials, spec, options) {
   var foreVec = wrist.clone().sub(elbow);
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
-    spec.foreRadius, spec.wristRadius, 10,
-    { depthRatio: 1.04, crystal: 0.050, steps: 4,
+    spec.foreRadius, spec.wristRadius, 8,
+    { depthRatio: 1.04, crystal: 0.040, steps: 3,
       profile: ARMS.profiles.fore, shape: ARMS.shapes.fore, lift: ARMS.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes) }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 0);
   owned.push(foreGeo, fore.edges, fore.minorEdges);
+
+  /* R96 — THE JOINTS ARE DARK STEEL. Reference A's elbow is a small dark
+     mechanical knuckle between the two crystal masses, and its wrist carries
+     a cuff ring; both hide the segments' end discs — the flat pale facet that
+     showed at every elbow — and read as machined joints in the crystal. Drawn
+     in the cavity material (dark, barely reflective), no edge lines. */
+  var eR = spec.foreRadius * 0.98;
+  var elbowGeo = segment([0, -eR * 0.55, 0], [0, eR * 0.55, 0], eR, eR, 8,
+    { depthRatio: 1.0, crystal: 0.015, steps: 2,
+      profile: function (t) { return 0.70 + Math.sin(t * Math.PI) * 0.36; } });
+  var elbowKnob = new Mesh(elbowGeo, materials.joint || materials.cavity);
+  elbowKnob.name = root.name + '-elbow-knob';
+  elbowJoint.add(elbowKnob);
+  owned.push(elbowGeo);
 
   /* Wrist joint, oriented so the hand continues along the forearm axis. */
   var wristJoint = new Group();
@@ -300,6 +324,15 @@ function buildArm(materials, spec, options) {
   var dir = foreVec.clone().normalize();
   wristJoint.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), dir);
   elbowJoint.add(wristJoint);
+
+  /* The wrist cuff, in the wrist's own frame so it rings the forearm's end. */
+  var cR = spec.wristRadius * 1.22;
+  var cuffGeo = segment([0, -0.030, 0], [0, 0.026, 0], cR, cR * 0.96, 8,
+    { depthRatio: 1.0, crystal: 0.01, steps: 1 });
+  var cuff = new Mesh(cuffGeo, materials.joint || materials.cavity);
+  cuff.name = root.name + '-wrist-cuff';
+  wristJoint.add(cuff);
+  owned.push(cuffGeo);
 
   var hand = buildHand(materials, HAND, { open: !!opts.openHand, tipDiamond: !!opts.tipDiamond });
   wristJoint.add(hand.group);

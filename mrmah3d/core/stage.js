@@ -127,6 +127,10 @@ function buildEnvironment(renderer, palette) {
      against a target of 2-5%. Tinting the sources is the correct fix rather
      than dimming them: the catches keep their punch and stop being colourless,
      which is what separates an expensive-looking crystal from a lit outline. */
+  /* R96: the side key is theme energy (palette.js) — the hero role lifted a
+     quarter toward white so it reads as light, not as a coloured wall. */
+  var heroRgb = (palette && palette.theme && palette.theme.hero) || [3, 215, 255];
+  var sideKey = heroRgb.map(function (c) { return Math.round(c + (255 - c) * 0.25); });
   var cards = [
     /* key: the main near-white source, front-left of the character */
     { x: 14, y: 30, w: 34, h: 30, fill: 'rgba(214,238,255,1)' },
@@ -185,6 +189,18 @@ function buildEnvironment(renderer, palette) {
        giant dark mass, and this card is the only thing keeping it from that. */
     { x: 68, y: 54, w: 28, h: 22, fill: 'rgba(206,234,255,0.84)' },
     { x: 176, y: 68, w: 18, h: 15, fill: 'rgba(226,246,255,0.85)' },
+
+    /* R96 — THE BLUE SIDE KEY. Reference A is lit from the left: an electric
+       blue gradient runs down the whole outer contour of the lowered arm, the
+       deltoid's crest, the head's left bevels and the quad's sweep, while the
+       right side falls away. Worked through: a plane facing dead left
+       reflects straight back (x~64), one facing half-left, half-toward the
+       camera reflects x~0/256, so the left contour sees the band x 0-64 — and
+       nothing bright sat in it. This tall card is what that contour reflects.
+       Right-facing planes see x 64-128 and do not catch it, which is the
+       asymmetry the reference has. Electric blue, not white, so the contour
+       stays chromatic and the silver catches stay rare. */
+    { x: 8, y: 36, w: 64, h: 58, fill: 'rgba(' + sideKey.join(',') + ',0.80)' },
 
     /* A NOTE ON WHAT IS DELIBERATELY NOT HERE.
 

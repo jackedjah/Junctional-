@@ -433,7 +433,10 @@ function buildLayer(name, layer, wantMirror) {
    each so they keep their width from the in-app azimuths. fog:false, because a
    fogged additive quad at z=-45 adds ink, i.e. nothing: that is exactly why the
    previous peakBeams were built, placed correctly and never seen. */
-function buildBeacons(summits, ramp) {
+/* R96: `beamColor` is the theme's world accent (palette.js), lightened toward
+   white so the beams stay the thin near-white lines the references show with
+   only a cast of the Secondary — never a saturated bar of theme colour. */
+function buildBeacons(summits, ramp, beamColor) {
   var pos = [], uv = [];
   function quad(cx, cy, cz, w, h, axis) {
     /* v=0 at the bottom (the ramp's opaque end), v=1 at the top. */
@@ -459,7 +462,7 @@ function buildBeacons(summits, ramp) {
   geo.setAttribute('position', new Float32BufferAttribute(pos, 3));
   geo.setAttribute('uv', new Float32BufferAttribute(uv, 2));
   var mat = new MeshBasicMaterial({
-    map: ramp, color: srgb(196, 232, 255), transparent: true, opacity: 0.82,
+    map: ramp, color: beamColor != null ? new Color(beamColor).convertSRGBToLinear().lerp(new Color(1, 1, 1), 0.55) : srgb(196, 232, 255), transparent: true, opacity: 0.82,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: false
   });
@@ -605,7 +608,7 @@ export function createTerrain(options) {
   /* Beacons. */
   var beacons = new Group();
   beacons.name = 'beacons';
-  var beams = buildBeacons(summits, opts.ramp);
+  var beams = buildBeacons(summits, opts.ramp, opts.beamColor);
   beacons.add(beams.mesh);
   owned.push(beams.geo, beams.mat);
 

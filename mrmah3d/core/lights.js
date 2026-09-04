@@ -25,6 +25,12 @@ import {
 
 export function createLights(options) {
   var opts = options || {};
+  /* R96 — the chromatic lights are THEME ENERGY (palette.js deriveTheme):
+     the rims, the floor bounce and the two emission lamps take the theme's
+     hue; the key and fill stay cool white / steel so the body's material
+     family is never recoloured. Fallbacks are the canonical blue values. */
+  var theme = (opts.palette && opts.palette.theme) || {};
+  var T = function (role, fallback) { return theme[role + 'Hex'] != null ? theme[role + 'Hex'] : fallback; };
   var settings = opts.settings || { shadows: true, shadowMapSize: 512 };
   var group = opts.parent;
 
@@ -68,13 +74,18 @@ export function createLights(options) {
   fill.position.set(5.6, 3.0, 4.0);
 
   /* Rim — cyan, from behind and above. This is what draws the lit contour. */
-  var rim = new DirectionalLight(new Color(0x49dcff), 2.2);
+  var rim = new DirectionalLight(new Color(T('hero', 0x49dcff)), 2.2);
   rim.position.set(1.4, 4.6, -7.0);
 
   /* A second rim from the other side, weaker, so the silhouette closes on
      both edges when the character turns. */
-  var rim2 = new DirectionalLight(new Color(0x3fb8e8), 1.1);
-  rim2.position.set(-5.2, 3.0, -5.6);
+  /* R96: 1.1 -> 2.6, and further round to the side. Reference A's lowered arm
+     carries a bright electric-blue rim down its whole OUTER edge and the
+     deltoid's outer crest; the left-side rim was too weak and too far behind
+     him to reach either. Side-rear now, so the left contour of the arm, the
+     deltoid and the quad's sweep all take it. */
+  var rim2 = new DirectionalLight(new Color(T('worldAccent', 0x3fb8e8)), 2.6);
+  rim2.position.set(-6.4, 3.4, -3.2);
 
   /* Floor bounce: the grid is a light source in the reference, and a point
      light low and in front sells the character standing IN the world rather
@@ -86,7 +97,7 @@ export function createLights(options) {
      0x4fe3ff). Its job is the lower body standing in the floor glow, which is
      within 1.7 of it; the chest at 2.05 and the head at 2.5 now take nothing.
      Intensity up a little to hold the quad where it was under the falloff. */
-  var bounce = new PointLight(new Color(0x2fbfe8), 1.05, 2.0, 2);
+  var bounce = new PointLight(new Color(T('atmosphere', 0x2fbfe8)), 1.05, 2.0, 2);
   bounce.position.set(0, 0.28, 1.5);
 
   /* R91 — HIS OWN EMISSIONS LIGHT THE SURFACES AROUND THEM.
@@ -132,7 +143,9 @@ export function createLights(options) {
      wall with a shorter reach, and dimmer to match the inverse square: the
      sternum still takes 0.64 of the lamp at 0.6 away, the turned head's back
      at 0.89 takes nothing. */
-  var chestLamp = new PointLight(new Color(0x4fe3ff), 0.62, 0.9, 2);
+  /* R96: 0.9 -> 0.75. With the arms hanging closer to the ribcage their inner
+     planes at 0.77 drew the lamp as two cyan dots; the sternum at 0.6 keeps it. */
+  var chestLamp = new PointLight(new Color(T('emission', 0x4fe3ff)), 0.62, 0.75, 2);
   chestLamp.position.set(0, 1.80, 0.85);
   /* R95: range 1.1 -> 0.5. Reviewed, the face lamp reached the shoulder line
      half a unit below the head and drew pinpoint white speculars across the
@@ -143,7 +156,7 @@ export function createLights(options) {
      by geometry first, wrongly; the head is small enough that a lamp inside
      its cavity reaches its back shell at 0.35. The cavity walls at 0.28 keep
      0.4 of the lamp; the back shell at 0.30-0.35 keeps a tenth or nothing. */
-  var faceLamp = new PointLight(new Color(0x6cebff), 0.85, 0.36, 2);
+  var faceLamp = new PointLight(new Color(T('emission', 0x6cebff)), 0.85, 0.36, 2);
   faceLamp.position.set(0, 2.62, 0.10);
 
   /* R92 — THE FLOOR UNDER THE DARKS IS SAPPHIRE, NOT VOID.
@@ -186,7 +199,7 @@ export function createLights(options) {
     key.intensity = 5.5 * k;
     fill.intensity = 1.4 * k;
     rim.intensity = 2.2 * k;
-    rim2.intensity = 1.1 * k;
+    rim2.intensity = 2.6 * k;
     bounce.intensity = 1.05 * k;
     chestLamp.intensity = 0.62 * k;
     faceLamp.intensity = 0.85 * k;

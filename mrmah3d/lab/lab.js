@@ -33,6 +33,13 @@ var tierParam = params.get('tier');
 if (tierParam === 'high' || tierParam === 'medium' || tierParam === 'low') {
   forcedTier = tierParam;
 }
+/* R96: ?bright=r,g,b sets the Secondary theme colour the renderer derives its
+   energy palette from — the way to see him under a member's non-blue theme.
+   Development affordance only; production hosts carry the real token. */
+var brightParam = params.get('bright');
+if (brightParam && /^\s*\d+\s*,\s*\d+\s*,\s*\d+\s*$/.test(brightParam)) {
+  document.documentElement.style.setProperty('--bright-rgb', brightParam);
+}
 
 function say(text, isError) {
   readout.textContent = text;

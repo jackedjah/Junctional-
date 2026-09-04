@@ -8,7 +8,12 @@
 
 :root {
   --ink-rgb: 14, 17, 20;
-  --bright-rgb: 233, 201, 143;
+  /* R96: the lab's Secondary is the CANONICAL blue (0x4fe3ff), because every
+     reference and every piece of evidence under validation/ is the blue
+     theme. MAHFITT's shipped default Secondary is the warm 233,201,143; the
+     renderer derives its energy palette from whichever it is given
+     (palette.js deriveTheme), and `?bright=r,g,b` overrides it here. */
+  --bright-rgb: 79, 227, 255;
   --card-rgb: 27, 32, 38;
   --ink: rgb(var(--ink-rgb));
   --bright: rgb(var(--bright-rgb));

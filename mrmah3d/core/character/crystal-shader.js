@@ -93,6 +93,18 @@ export function applyCrystalShader(material, options) {
        brief asks for on the parts that matter (an arm is ~0.2 across). */
     uBevelWorld: { value: opts.bevelWorld == null ? 0.0062 : opts.bevelWorld },
     uBevelAmount: { value: opts.bevelAmount == null ? 0.46 : opts.bevelAmount },
+    /* R96 — THE FACET DOME. A cut gem's facets are not optically flat: each
+       reads as a shallow convex plane whose reflection GRADES across it, from
+       a bright edge to a deeper centre, and it is that gradient — not the
+       facet count — that the reference's glossy planes are made of. A flat
+       facet reflects one point of the environment and comes back as one
+       value however sharp the material is. `uDome` leans the normal toward
+       the smooth (area-weighted) normal across the WHOLE face in proportion to
+       the distance from its centroid, so the face keeps its own flat normal
+       at the centre and curves toward its neighbours at the rim; the chamfer
+       above still handles the last margin. Gated to large faces exactly as
+       the chamfer is, so a limb's transition slivers stay cut. */
+    uDome: { value: opts.dome == null ? 0.0 : opts.dome },
     /* R94 — THE INTERNAL LIGHT. A real source INSIDE the crystal, in the
        mesh's own space, whose light reaches the outside of a facet by
        TRANSMISSION rather than reflection: a facet is lit in proportion to how
@@ -170,6 +182,7 @@ export function applyCrystalShader(material, options) {
         'uniform vec3 uDeep;',
         'uniform float uBevelWorld;',
         'uniform float uBevelAmount;',
+        'uniform float uDome;',
         'uniform vec3 uInnerLight;',
         'uniform vec3 uInnerColor;',
         'uniform float uInnerStrength;',
@@ -231,7 +244,18 @@ export function applyCrystalShader(material, options) {
            the small transition faces keep their crisp ones, which is also the
            plane hierarchy the brief asks for. */
         '  float mrBig = smoothstep( 0.030, 0.082, vBary.w );',
-        '  normal = normalize( mix( normal, vSmoothN, mrB * uBevelAmount * mrDiv * mrBig ) );',
+        /* R96 — the dome: centreness is the smallest barycentric coordinate
+           scaled so the centroid reads 1 and every edge 0; the lean grows as
+           the square of the distance from the centre, which keeps the middle
+           third of a face essentially flat and the curvature at its rim. */
+        '  float mrCentre = clamp( mrEdge * 3.0, 0.0, 1.0 );',
+        /* The dome's size gate opens lower than the chamfer's: a limb's strips
+           have an inradius of 0.015-0.045 and the reference's arms are made of
+           exactly such planes, each graded. The lean is quadratic from the
+           centre so a small face still keeps a flat middle. */
+        '  float mrBigDome = smoothstep( 0.012, 0.045, vBary.w );',
+        '  float mrDome = uDome * ( 1.0 - mrCentre ) * ( 1.0 - mrCentre ) * mrDiv * mrBigDome;',
+        '  normal = normalize( mix( normal, vSmoothN, max( mrB * uBevelAmount * mrDiv * mrBig, mrDome ) ) );',
         '}'
       ].join('\n'))
 

@@ -78,7 +78,10 @@ export function createMrMahScene(host, options) {
     palette: palette, settings: settings, parent: stageBox.world, tier: tier
   });
   var characterBox = (opts.createCharacter || createCharacter)({
-    palette: palette, settings: settings, parent: stageBox.subject, tint: opts.tint,
+    palette: palette, settings: settings, parent: stageBox.subject,
+    /* R96: the character's energy tint is derived from the theme unless the
+       host passes its own (palette.js deriveTheme). */
+    tint: opts.tint || palette.tint,
     envMap: stageBox.environment
   });
 
@@ -145,6 +148,8 @@ export function createMrMahScene(host, options) {
     ? createBloom({
         renderer: rendererBox.renderer,
         strength: settings.bloomStrength,
+        /* R96: the aura is theme energy (palette.js) */
+        haloColor: palette.theme ? palette.theme.atmosphereHex : undefined,
         /* Matches what the canvas would have had. WebGL2 only; three ignores it
            on WebGL1, where the tier that asks for it would not be reached. */
         samples: settings.antialias ? 4 : 0

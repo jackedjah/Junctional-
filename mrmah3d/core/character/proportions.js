@@ -102,7 +102,13 @@ export var HEAD = {
      old 0.68 — because the reference's head reads as a thick cut stone with
      substantial bevels, and a smaller diamond needs proportionally more depth
      to keep that. */
-  halfDepth: 0.355,
+  /* R96 — SLEEK, NOT BULBOUS. At 0.355 (0.90 of the half-width) the head was
+     nearly a cube seen from any angle but dead front, and from behind it read
+     as a faceted skull. Reference A/C cut it as a THIN-DEPTH shell: the depth
+     comes down to 0.60 of the width, the rear apex sits close behind the
+     girdle, and the cavity keeps its full 0.22 by moving the lip forward and
+     the plate back (bevelZ / faceZ below, which are shares of this). */
+  halfDepth: 0.240,
   /* The front face plate is inset from the silhouette and pushed back from
      the bevel ring, which is what makes the face read as recessed INSIDE the
      crystal rather than painted on its front. */
@@ -143,11 +149,11 @@ export var HEAD = {
      thickness while giving the face a plate it actually fits on. */
   faceInset: 0.63,               /* plate size as a share of the diamond */
   crownInset: 0.90,              /* outer crown band — narrower now */
-  crownZ: 0.40,                  /* crown band depth, share of halfDepth */
+  crownZ: 0.52,                  /* crown band depth, share of halfDepth (R96: re-based on the thinner shell) */
   bevelInset: 0.790,             /* the lip, at the front of the crystal */
-  bevelZ: 0.78,                  /* the lip stands proud */
+  bevelZ: 0.96,                  /* the lip stands proud — at the front of the thin shell */
   innerInset: 0.700,             /* inner bevel, framing the cavity */
-  innerZ: 0.30,                  /* set well behind the lip */
+  innerZ: 0.42,                  /* set well behind the lip */
   /* R90: -0.06 -> 0.15. The recess was 0.294 units deep behind a lip 0.263
      wide, which at the chat composition's 22-degree yaw put the near wall
      straight across the smile — the character rendered with eyes and no mouth
@@ -158,7 +164,7 @@ export var HEAD = {
      still obviously a hole rather than a panel (the three-quarter capture is
      what proves that, not the front one), while clearing the smile at every
      yaw the in-app compositions use. */
-  faceZ: 0.15,                   /* plate depth — behind the lip, ahead of the girdle */
+  faceZ: 0.06,                   /* plate depth — 0.216 behind the lip on the thin shell, the same cavity as before */
   backApexZ: -1.0,
   /* Depth scatter on the head's bevel ring, so its front facets tilt slightly
      differently and the head catches light in several places.
@@ -298,10 +304,17 @@ function chestShape(k) {
 /* CORE — a central abdominal plane with a shallow division either side of it,
    and the oblique running back to the flank. Deliberately much weaker than the
    chest: the brief asks for restrained core structure, not a six-pack. */
-function coreShape(k) {
+/* R96: `rectus` is a second argument, because the abdominal blocks are made
+   by ALTERNATING it ring to ring — a bulge ring carries full rectus lobes and
+   the crease ring between two blocks carries almost none, so the front of the
+   abdomen steps in and out three times between the belt and the pecs. That
+   is the reference's UPPER / MIDDLE / LOWER pair, built as shallow volumes
+   that light and shadow one another, not painted. */
+function coreShape(k, rectusK) {
+  var rk = rectusK == null ? 0.120 : rectusK;
   return function (a) {
-    var linea = -lobe(a, 0, 0.34) * 0.130;
-    var rectus = (lobe(a, 0.52, 0.44) + lobe(a, -0.52, 0.44)) * 0.120;
+    var linea = -lobe(a, 0, 0.34) * 0.150;
+    var rectus = (lobe(a, 0.52, 0.44) + lobe(a, -0.52, 0.44)) * rk;
     var oblique = (lobe(a, 1.20, 0.48) + lobe(a, -1.20, 0.48)) * 0.070;
     var back = lobe(a, Math.PI, 0.95) * -0.085;
     return 1 + (linea + rectus + oblique + back) * k;
@@ -366,7 +379,9 @@ function coreZone(row) {
     var absOuter = 0.74 + (yy - 1.18) * 0.28;                /* the blocks widen with the ribcage */
     var obliqueOuter = 1.45 + (yy - 1.18) * 0.30;
     if (ae < channel) return { classes: REGIONS.STERNUM.classes, seed: 40 + row, index: 0 };            /* the central channel */
-    if (ae < absOuter) return { classes: REGIONS.ABS.classes, seed: 50 + row * 2 + side, index: row === 1 ? 2 : 1 };
+    /* R96: rows 1-3 are the three abdominal pairs; the middle pair takes the
+       lit row so the stack reads as three values, not one plane. */
+    if (ae < absOuter) return { classes: REGIONS.ABS.classes, seed: 50 + row * 2 + side, index: row === 2 ? 2 : (row === 0 ? 0 : 1) };
     if (ae < obliqueOuter) return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side, index: row === 0 ? 0 : 1 };
     return null;
   };
@@ -681,12 +696,24 @@ export var TORSO = {
        which is the single thing that makes the lower body read as a thigh
        hung from a belt rather than as a skirt continuing the torso. */
     { y: 1.480, w: 0.188, d: 0.156, facet: -0.0070, crystal: 0.0300, crystalY: 0.0080,
-      shape: coreShape(1.0), hero: 0.04, zoneAt: coreZone(0) },
-    /* the V — abdomen into the rib arch, opening out FAST toward the pecs */
-    { y: 1.660, w: 0.240, d: 0.196, facet: 0.0060, crystal: 0.0400, crystalY: 0.0100,
-      shape: coreShape(0.85), hero: 0.06, zoneAt: coreZone(1) },
-    { y: 1.830, w: 0.285, d: 0.240, facet: -0.0060, crystal: 0.0400, crystalY: 0.0100,
-      shape: chestShape(0.70), zoneAt: coreZone(2) },
+      shape: coreShape(1.0, 0.06), hero: 0.04, zoneAt: coreZone(0) },
+    /* R96 — THE ABDOMINAL ROWS. Three blocks a side between the belt and the
+       pectoral turn, as bulge rings (full rectus lobes) alternating with
+       crease rings (almost none), so each pair steps out of the abdomen by
+       0.03-0.04 and its lower edge falls into the crease below it. The V still
+       opens FAST toward the pecs. */
+    { y: 1.545, w: 0.206, d: 0.170, facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
+      shape: coreShape(1.0, 0.24), hero: 0.08, zoneAt: coreZone(1) },
+    { y: 1.605, w: 0.222, d: 0.182, facet: -0.0040, crystal: 0.0220, crystalY: 0.0050,
+      shape: coreShape(1.0, 0.05), hero: 0.03, zoneAt: coreZone(1) },
+    { y: 1.665, w: 0.242, d: 0.198, facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
+      shape: coreShape(0.95, 0.24), hero: 0.08, zoneAt: coreZone(2) },
+    { y: 1.725, w: 0.260, d: 0.214, facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
+      shape: coreShape(0.90, 0.05), hero: 0.03, zoneAt: coreZone(2) },
+    { y: 1.780, w: 0.274, d: 0.228, facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
+      shape: coreShape(0.85, 0.22), hero: 0.08, zoneAt: coreZone(3) },
+    { y: 1.830, w: 0.285, d: 0.240, facet: -0.0060, crystal: 0.0300, crystalY: 0.0080,
+      shape: chestShape(0.70), zoneAt: coreZone(3) },
     /* the pectoral line — the strongest cross-section shaping on the body */
     { y: 1.970, w: 0.325, d: 0.268, facet: 0.0055, crystal: 0.0340, crystalY: 0.0080,
       shape: chestShape(1.0), hero: 0.34, zoneAt: pecZone(0) },
@@ -1073,14 +1100,17 @@ export var ARMS = {
    claw. Still a robotic hand with readable fingers, still small next to the
    body; the presented diamond stays small. */
 export var HAND = {
-  palmLength: 0.142,
-  palmHalfWidth: 0.114,
-  palmHalfDepth: 0.064,
+  /* R96: a thinner, slightly narrower palm and longer, slimmer fingers — the
+     reference's hand is a flat articulated plate with fingers that read
+     individually, not a block with stubs. */
+  palmLength: 0.138,
+  palmHalfWidth: 0.104,
+  palmHalfDepth: 0.044,
   /* R95: four jointed fingers (see buildDigit in limbs.js), a little longer
      and slimmer, as the references' robotic hands are. */
   digitCount: 4,
-  digitLength: 0.108,
-  digitRadius: 0.025,
+  digitLength: 0.124,
+  digitRadius: 0.021,
   /* The small bright diamond above the reference's raised hand. */
   tipDiamond: 0.048
 };

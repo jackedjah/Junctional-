@@ -408,6 +408,11 @@ export function createEnvironment(options) {
   var owned = [];
   var group = new Group();
   group.name = 'mrmah-environment';
+  /* R96 — the world's EMITTERS are theme energy (palette.js deriveTheme): the
+     hover flare and column and the summit beams take the theme's hue. The
+     range, floor, moon and mist are steel and stay steel. */
+  var theme = (opts.palette && opts.palette.theme) || {};
+  function themeHex(role, fallback) { return theme[role + 'Hex'] != null ? theme[role + 'Hex'] : fallback; }
 
   var cyan = new Color(0x35d6ff);
 
@@ -576,7 +581,7 @@ export function createEnvironment(options) {
      further down in the same function scope — so the flare was never the one
      being animated and the sky stars breathed with his hover instead. */
   var flareMat = new MeshBasicMaterial({
-    map: glowTex, color: new Color(0xcdf5ff), transparent: true, opacity: 0.55,
+    map: glowTex, color: new Color(themeHex('hot', 0xcdf5ff)), transparent: true, opacity: 0.55,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false
   });
   var starQuads = [];
@@ -676,7 +681,7 @@ export function createEnvironment(options) {
      almost none; the blue channel saturates first and the rest is lost. */
   var streakTex = columnTexture();
   var streakMat = new MeshBasicMaterial({
-    map: streakTex, color: new Color(0x52acff).multiplyScalar(1.4), transparent: true, opacity: 1.0,
+    map: streakTex, color: new Color(themeHex('worldAccent', 0x52acff)).multiplyScalar(1.4), transparent: true, opacity: 1.0,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: false
   });
   /* R90: longer and wider, but only to here.
@@ -971,7 +976,7 @@ export function createEnvironment(options) {
   owned.push(rampTex, worldRadialTex, smearTex);
   var terrain = createTerrain({
     tier: tier, settings: settings, ramp: rampTex, radial: worldRadialTex,
-    smear: smearTex
+    smear: smearTex, beamColor: themeHex('worldAccent', null)
   });
   var structures = terrain.group;
   var beacons = terrain.beacons;
