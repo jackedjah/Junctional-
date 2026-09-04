@@ -36,6 +36,8 @@ if (tierParam === 'high' || tierParam === 'medium' || tierParam === 'low') {
 /* R96: ?bright=r,g,b sets the Secondary theme colour the renderer derives its
    energy palette from — the way to see him under a member's non-blue theme.
    Development affordance only; production hosts carry the real token. */
+/* R96: ?variant=female mounts the female proportion set (variants.js). */
+var variantParam = params.get('variant') === 'female' ? 'female' : undefined;
 var brightParam = params.get('bright');
 if (brightParam && /^\s*\d+\s*,\s*\d+\s*,\s*\d+\s*$/.test(brightParam)) {
   document.documentElement.style.setProperty('--bright-rgb', brightParam);
@@ -72,6 +74,7 @@ function mount() {
   try {
     scene = createMrMahScene(host, {
       tier: forcedTier || undefined,
+      variant: variantParam,
       /* The lab screenshots itself during verification, which needs the
          drawing buffer to survive the frame. Production hosts must leave this
          off — it costs a buffer copy on some mobile drivers. */

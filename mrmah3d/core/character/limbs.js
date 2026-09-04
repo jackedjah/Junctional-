@@ -238,6 +238,8 @@ function buildHand(materials, spec, options) {
    remain free to animate from there. */
 function buildArm(materials, spec, options) {
   var opts = options || {};
+  /* R96 — the arm and hand tables come from the caller's proportion set. */
+  var ARMS_ = opts.arms || ARMS, HAND_ = opts.hand || HAND;
   var root = new Group();
   root.name = opts.name || 'arm';
   var owned = [];
@@ -272,7 +274,7 @@ function buildArm(materials, spec, options) {
        the facet dome (crystal-shader.js) is gated on face size and had
        nothing to work on — and read as a quilt beside the reference. */
     { depthRatio: 1.12, crystal: 0.045, steps: 3,
-      profile: ARMS.profiles.upper, shape: ARMS.shapes.upper, lift: ARMS.classLift,
+      profile: ARMS_.profiles.upper, shape: ARMS_.shapes.upper, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes),
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
          its own by the bicep belly, for the same reason the cap ramps into the
@@ -280,7 +282,7 @@ function buildArm(materials, spec, options) {
          emerges from reads as a separate object stuck to it. */
       hero: function (t) {
         var k = Math.min(1, t / 0.45);
-        return ARMS.deltoidLift + (ARMS.classLift - ARMS.deltoidLift) * k * k * (3 - 2 * k);
+        return ARMS_.deltoidLift + (ARMS_.classLift - ARMS_.deltoidLift) * k * k * (3 - 2 * k);
       } }
   );
   var upper = clad(shoulderJoint, upperGeo, materials, 0);
@@ -297,7 +299,7 @@ function buildArm(materials, spec, options) {
     [0, 0, 0], foreVec.toArray(),
     spec.foreRadius, spec.wristRadius, 8,
     { depthRatio: 1.04, crystal: 0.040, steps: 3,
-      profile: ARMS.profiles.fore, shape: ARMS.shapes.fore, lift: ARMS.classLift,
+      profile: ARMS_.profiles.fore, shape: ARMS_.shapes.fore, lift: ARMS_.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes) }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 0);
@@ -334,7 +336,7 @@ function buildArm(materials, spec, options) {
   wristJoint.add(cuff);
   owned.push(cuffGeo);
 
-  var hand = buildHand(materials, HAND, { open: !!opts.openHand, tipDiamond: !!opts.tipDiamond });
+  var hand = buildHand(materials, HAND_, { open: !!opts.openHand, tipDiamond: !!opts.tipDiamond });
   wristJoint.add(hand.group);
 
   return {
@@ -347,14 +349,15 @@ function buildArm(materials, spec, options) {
   };
 }
 
-export function buildLimbs(materials) {
+export function buildLimbs(materials, P) {
+  var ARMS_ = (P && P.ARMS) || ARMS, HAND_ = (P && P.HAND) || HAND;
   var group = new Group();
   group.name = 'mrmah-limbs';
 
   /* The lowered arm's hand is relaxed and partly closed; the raised one is
      open and carries the tip diamond. */
-  var right = buildArm(materials, ARMS.right, { name: 'arm-right', openHand: false });
-  var left = buildArm(materials, ARMS.left, { name: 'arm-left', openHand: true, tipDiamond: true });
+  var right = buildArm(materials, ARMS_.right, { name: 'arm-right', openHand: false, arms: ARMS_, hand: HAND_ });
+  var left = buildArm(materials, ARMS_.left, { name: 'arm-left', openHand: true, tipDiamond: true, arms: ARMS_, hand: HAND_ });
 
   group.add(right.group);
   group.add(left.group);

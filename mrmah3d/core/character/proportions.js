@@ -1189,3 +1189,18 @@ export var FLOAT = {
   bobAmplitude: 0.016,
   bobPeriod: 6.4
 };
+
+/* R96 — THE MALE CANON AS ONE SET, and the shape vocabulary a variant builds
+   its own table from. `variants.js` returns this set by default and a
+   FEMALE set derived from it; nothing under core/ reads the loose exports
+   above for a variant, only this bundle. */
+export var MALE = {
+  HEAD: HEAD, NECK: NECK, TORSO: TORSO, ARMS: ARMS, HAND: HAND,
+  INSIGNIA: INSIGNIA, POSE: POSE, FLOAT: FLOAT
+};
+export var SHAPES = {
+  bump: bump, lobe: lobe, chestShape: chestShape, coreShape: coreShape,
+  quadShape: quadShape, quadZone: quadZone, clavicleShape: clavicleShape,
+  pecZone: pecZone, coreZone: coreZone, taperClasses: taperClasses,
+  neckClasses: neckClasses
+};

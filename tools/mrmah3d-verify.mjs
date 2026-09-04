@@ -396,8 +396,14 @@ for (const v of VIEWPORTS) {
       g.width = c.width; g.height = c.height;
       const cx = g.getContext('2d'); cx.drawImage(c, 0, 0);
       const d = cx.getImageData(0, 0, c.width, c.height).data;
+      /* R96: counted on the FLOOR ROWS only (below his tip, the lower sixth
+         of the showcase frame). Counted over the whole frame, the dark
+         anti-aliased edges of his own gunmetal joints matched the heuristic
+         and reported 21 px of "cast shadow" on a scene with no shadow map. */
       let shadowPx = 0;
-      for (let i = 0; i < d.length; i += 4) {
+      const floorFrom = Math.floor(c.height * 0.83);
+      for (let y = floorFrom; y < c.height; y++) for (let x = 0; x < c.width; x++) {
+        const i = (y * c.width + x) * 4;
         const a = d[i + 3];
         if (a > 20 && a < 160 && (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) < 14) shadowPx++;
       }

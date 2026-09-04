@@ -111,7 +111,11 @@ function lit(group, geo, materials, opts) {
   return { mesh: mesh, edges: major, minorEdges: minor, heroEdges: hero };
 }
 
-export function buildBody(materials) {
+/* R96 — `P` is an optional PROPORTION SET (see variants.js). The male canon
+   is the default; a variant hands in its own TORSO / ARMS / INSIGNIA and the
+   builder is otherwise identical — one renderer, one body pipeline. */
+export function buildBody(materials, P) {
+  var TORSO_ = (P && P.TORSO) || TORSO, ARMS_ = (P && P.ARMS) || ARMS, INSIGNIA_ = (P && P.INSIGNIA) || INSIGNIA;
   var group = new Group();
   group.name = 'mrmah-body';
   var owned = [];
@@ -127,8 +131,8 @@ export function buildBody(materials) {
      the crown meets the head. Hero edges have to be rare BY CONSTRUCTION; on a
      shape with this many real breaks, no threshold makes them rare. The
      structural and secondary tiers describe the form perfectly well without it. */
-  var torsoLoft = loft(TORSO.rings, TORSO.sides || 8,
-    { capTop: true, capBottom: false, lift: TORSO.classLift, inner: true });
+  var torsoLoft = loft(TORSO_.rings, TORSO_.sides || 8,
+    { capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true });
   /* edgeAngle 42, down from the 52 default. With the ring table thinned and the
      crystal relief raised to compensate, the torso's structural breaks are real
      but not extreme — at 52 almost none of them qualified and the front of the
@@ -202,7 +206,7 @@ export function buildBody(materials) {
      deltoid closes over the top of the arm and the two become one form. */
   var deltoidGeos = [];
   [-1, 1].forEach(function (side) {
-    var spec = side < 0 ? ARMS.right : ARMS.left;
+    var spec = side < 0 ? ARMS_.right : ARMS_.left;
     var joint = spec.shoulder;
     /* PROPORTION CORRECTION — the heroic pass overshot here.
 
@@ -302,9 +306,10 @@ export function buildBody(materials) {
        other direction: a full-radius end disc perpendicular to a horizontal
        axis reaches 0.03 outside the arm's tube and shows as a flat circle on
        the outside of the shoulder from any three-quarter view. */
-    var inner = [side * 0.300, 2.030, 0.0];
-    var outer = [side * 0.560, 1.955, 0.02];
-    var deltoidR0 = 0.210;
+    var D = ARMS_.deltoid || { innerX: 0.300, innerY: 2.030, outerX: 0.560, outerY: 1.955, r0: 0.210 };
+    var inner = [side * D.innerX, D.innerY, 0.0];
+    var outer = [side * D.outerX, D.outerY, 0.02];
+    var deltoidR0 = D.r0;
     /* SMALLER THAN THE ARM IT MEETS, not larger. `segment` caps both ends, and
        the outer cap is a disc perpendicular to a near-horizontal axis, so at
        1.22x the upper-arm radius it stood proud of the limb all the way round
@@ -343,7 +348,7 @@ export function buildBody(materials) {
     var geo = segment(
       inner, outer,
       deltoidR0, deltoidR1, 8,
-      { depthRatio: 1.0, crystal: 0.050, steps: 6, lift: ARMS.deltoidLift,
+      { depthRatio: 1.0, crystal: 0.050, steps: 6, lift: ARMS_.deltoidLift,
         classes: REGIONS.DELT.classes,
         profile: deltoidProfile,
         /* R91 — THE VALUE STEP AT THE SEAM IS WHAT READS AS "BOLTED ON".
@@ -360,7 +365,7 @@ export function buildBody(materials) {
            Two more steps along its length so the ramp has rings to land on. */
         hero: function (t) {
           var k = Math.min(1, t / 0.62);
-          return TORSO.classLift + (ARMS.deltoidLift - TORSO.classLift) * k * k * (3 - 2 * k);
+          return TORSO_.classLift + (ARMS_.deltoidLift - TORSO_.classLift) * k * k * (3 - 2 * k);
         } }
     );
     /* minorAngle up from 30 to 44: the secondary tier was outlining the cap's
@@ -430,7 +435,7 @@ export function buildBody(materials) {
      swallowed by the prow. */
   function chestZ(y) {
     /* interpolate the torso's front depth at height y */
-    var r = TORSO.rings;
+    var r = TORSO_.rings;
     for (var i = 0; i < r.length - 1; i++) {
       if (y >= r[i].y && y <= r[i + 1].y) {
         var t = (y - r[i].y) / (r[i + 1].y - r[i].y || 1);
@@ -450,31 +455,31 @@ export function buildBody(materials) {
      diamond exactly there, and it works for the reason accents at junctions
      always work: a deliberate mark reads as design, a bare seam reads as a
      mistake. */
-  var throatGeo = diamondPlate(INSIGNIA.throatHalf, 0.008);
+  var throatGeo = diamondPlate(INSIGNIA_.throatHalf, 0.008);
   var throat = new Mesh(throatGeo, materials.emissive);
-  throat.position.set(0, INSIGNIA.throatY, chestZ(INSIGNIA.throatY) + 0.010);
+  throat.position.set(0, INSIGNIA_.throatY, chestZ(INSIGNIA_.throatY) + 0.010);
   throat.name = 'throat-gem';
   group.add(throat);
-  var throatGlow = new Mesh(diamondPlate(INSIGNIA.throatHalf * 2.1, 0.004), materials.emissiveSoft);
+  var throatGlow = new Mesh(diamondPlate(INSIGNIA_.throatHalf * 2.1, 0.004), materials.emissiveSoft);
   throatGlow.position.copy(throat.position);
   group.add(throatGlow);
   owned.push(throatGeo, throatGlow.geometry);
 
-  var emblemGeo = diamondPlate(INSIGNIA.emblemHalf, 0.012);
+  var emblemGeo = diamondPlate(INSIGNIA_.emblemHalf, 0.012);
   var emblem = new Mesh(emblemGeo, materials.emissive);
-  emblem.position.set(0, INSIGNIA.emblemY, chestZ(INSIGNIA.emblemY) + 0.012);
+  emblem.position.set(0, INSIGNIA_.emblemY, chestZ(INSIGNIA_.emblemY) + 0.012);
   emblem.name = 'chest-emblem';
   group.add(emblem);
   /* R95: a white-hot core inside the emblem, as every reference draws it — a
      small brighter diamond at the centre of the cyan one, so the emblem reads
      as a light source with a graded edge rather than one flat two-tone plate. */
-  var emblemCoreGeo = diamondPlate(INSIGNIA.emblemHalf * 0.42, 0.004);
+  var emblemCoreGeo = diamondPlate(INSIGNIA_.emblemHalf * 0.42, 0.004);
   var emblemCore = new Mesh(emblemCoreGeo, materials.emissiveCore || materials.emissive);
   emblemCore.position.copy(emblem.position);
   emblemCore.position.z += 0.014;
   group.add(emblemCore);
   owned.push(emblemCoreGeo);
-  var emblemGlow = new Mesh(diamondPlate(INSIGNIA.emblemHalf * 1.9, 0.004), materials.emissiveSoft);
+  var emblemGlow = new Mesh(diamondPlate(INSIGNIA_.emblemHalf * 1.9, 0.004), materials.emissiveSoft);
   emblemGlow.position.copy(emblem.position);
   group.add(emblemGlow);
   owned.push(emblemGeo, emblemGlow.geometry);
@@ -483,9 +488,9 @@ export function buildBody(materials) {
      matching the row beneath the emblem in the reference. */
   var symbols = new Group();
   symbols.name = 'transport-symbols';
-  var sy = INSIGNIA.symbolsY;
+  var sy = INSIGNIA_.symbolsY;
   var sz = chestZ(sy) + 0.012;
-  var sh = INSIGNIA.symbolHalf;
+  var sh = INSIGNIA_.symbolHalf;
 
   /* R95 — THREE OUTLINED RIGHT-POINTING TRIANGLES. Every reference in the
      luminous and guardian sets draws the row under the emblem as ▷ ▷ ▷ —
@@ -505,7 +510,7 @@ export function buildBody(materials) {
     var inner = triangle(1, 0.58, 0.009);
     var mo = new Mesh(outer, materials.emissive);
     var mi = new Mesh(inner, materials.face);
-    mo.position.set((si - 1) * INSIGNIA.symbolSpacing, sy, sz);
+    mo.position.set((si - 1) * INSIGNIA_.symbolSpacing, sy, sz);
     mi.position.copy(mo.position);
     mi.position.x += sh * 0.05;
     symbols.add(mo);

@@ -110,6 +110,17 @@ is kept canonical (to the floor of the test's tolerance) and the ratio is bought
 by growing the body instead. The canonical front remains the measurement
 baseline; the guardian set remains the authority on material, light and world.
 
+There is now a SEVENTH pair, `reference/mrmah-refF-r96-male.png` and
+`reference/mrmah-refF-r96-female.png` (R96). The male is the PRIMARY CHARACTER
+TARGET: glossy dark-sapphire planes that each grade from a bright rim to a
+deep centre, a thin-depth diamond head, a clean bevel band around a black
+face plate, three abdominal pairs, steel joints at elbow and wrist, and a
+world lit from the left. Measured (941 x 1672; apex y 235, tip y 1435, 400
+px to the unit) its silhouette is at or under this build's — deltoid outer
+edge 0.58, upper-arm radius 0.12, belt 0.19, quad 0.27 — so the gap it
+closed was MATERIAL and plane structure, not width. The female is the
+variant's reference: same head, same symbols, one lower body.
+
 **Expect the silhouette score against the canonical front to be low, and do not
 chase it.** The head is deliberately 30% smaller than the canonical measurement
 and the shoulder line 0.2 units higher; a comparison against a file the design
@@ -256,13 +267,17 @@ must not be claimed from headless runs.
 | `mrmah3d/core/surfaces.js` | page events -> character states (the only file naming a MAHFITT page) |
 | `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
 | `mrmah3d/core/character/regions.js` | per-region optical class tables (head, neck, pecs, sternum, abs, obliques, taper, deltoids, arms, hands) |
+| `mrmah3d/core/character/variants.js` | proportion sets for the ONE renderer: the male canon and the female prototype (`createMrMahScene(el, { variant: 'female' })`) |
+| `mrmah3d/core/palette.js` | theme tokens and the R96 energy palette: the Secondary's hue fitted into emission / hero / crystal-light / atmosphere / world-accent luminance bands |
 | `mrmah3d/core/terrain.js` | the faceted gunmetal range: three depth layers, beacons, sparkles, the mirrored range and beam smears in the floor |
 | `mrmah3d/core/moon.js` | the large cratered moon and the cumulus that crosses it (R95 world) |
 | `mrmah3d/core/figures.js` | the small distant Mr.Mah variant figures — five, baked vertex colour, two draws (R95 world; cut from eight for the bodybuilder brief) |
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
 | `reference/mrmah-canonical-front.png` | the MEASUREMENT baseline — do not swap |
-| `reference/mrmah-refE-bodybuilder-{a,b}.png` | the BODY-PROPORTION authority: shoulders, chest, arms, belt, the single quad |
+| `reference/mrmah-refF-r96-male.png` | R96 Reference A — the PRIMARY CHARACTER TARGET: gloss, plane structure, value, symbols |
+| `reference/mrmah-refF-r96-female.png` | R96 — the female variant's reference |
+| `reference/mrmah-refE-bodybuilder-{a,b}.png` | the body-proportion authority where Reference A is silent |
 | `reference/mrmah-refD-guardian-{a,b,c,d}.png` | the authority on material, light and world |
 | `reference/mrmah-refA-anatomical.png` | proportion and anatomy where the bodybuilder set is silent |
 | `reference/mrmah-refA-cinematic.png` | material richness and world atmosphere |
@@ -875,3 +890,58 @@ head's was the FACE LAMP, whose 0.5 range reached the head's back shell from
 inside its cavity. A point light's specular does not care which way you think
 a facet faces. Fix the surface where a reference says it is matte (the hands),
 and the light's reach where it is not (the head's ice shell must stay sharp).
+
+### A flat facet reflects one point; a gem's facet is a shallow dome (R96)
+
+Reference A's planes are each a GRADIENT — bright at one rim, deep at the
+centre — and no amount of roughness, card tuning or class weighting makes a
+flat facet do that: it reflects one direction of the environment and comes
+back as one value. `uDome` in the crystal shader leans the normal toward the
+area-weighted smooth normal as the square of the distance from the face's
+centroid, so the middle stays flat and the rim curves toward its neighbours.
+Gated on face size like the chamfer (a limb's transition slivers stay cut) —
+and the arms had to become eight large planes rather than fifty small ones
+before the dome had anything to grade. That single change did more for
+"glossy" than every material number moved before it.
+
+### Which part of the environment a contour actually sees
+
+Work the mirror direction through before adding a card. A plane facing dead
+left reflects straight back (x≈64 of 256); one facing half-left, half-toward
+the camera reflects x≈0/256; so the whole LEFT contour of the body — the
+lowered arm, the deltoid's crest, the quad's sweep — sees the band x 0–64,
+and nothing bright sat there. A tall electric-blue card in that band lit the
+left contour and nothing else, which is the one-sided lighting Reference A
+has. Right-facing planes see x 64–128 and do not catch it.
+
+### Theme colour is LIGHT, not material
+
+`--bright-rgb` (the Secondary) drives only what emits or catches: eyes,
+smile, both diamonds, the aura, the hover point, rims, the two lamps, the
+internal crystal light, the side key card and the world's beacons. The
+body's family — near-black, navy, dark crystal, gunmetal, ice — never takes
+the theme. Each role is the Secondary's HUE at its own saturation, with its
+lightness walked until the perceived luminance lands in that role's band
+(`fit` in palette.js), so a yellow theme cannot blow him out and a purple one
+cannot make him vanish; a near-grey Secondary falls back to the canonical
+blue rather than inventing red from hue zero. The lab declares the canonical
+blue and `?bright=r,g,b` shows any other. The blue references are one value
+of this function, not the function.
+
+### A variant is a proportion set, never a second character
+
+`buildBody(materials, P)` and `buildLimbs(materials, P)` take a proportion
+set; `variants.js` returns the male canon by default and a female set derived
+from it — same head, face, symbols, material and pipeline. The head is not
+parametrised on purpose: the face is the identity. The female's bust is two
+ring-shape lobes on a continuous ribcage (`bustShape`), the hip a
+`hipShape` with a positive glute lobe, and there is still exactly one lower
+body.
+
+### A heuristic that counts dark edge pixels will count the joints
+
+The "cast shadow" check counted semi-transparent near-black pixels over the
+whole frame, and the gunmetal elbow knuckles' anti-aliased edges reported 21
+px of shadow on a scene with no shadow map. It now counts floor rows only.
+When a check fails after adding something dark, ask what the metric is
+actually measuring before touching the render.

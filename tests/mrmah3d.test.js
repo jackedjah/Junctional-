@@ -247,8 +247,8 @@ const parts = {
   'head-to-chest crown': /THE CROWN/.test(props),
   'shoulders': /shoulder caps/i.test(read('mrmah3d/core/character/body.js')),
   'tapered torso': /torsoLoft/.test(read('mrmah3d/core/character/body.js')),
-  'two arms': /ARMS\.right/.test(read('mrmah3d/core/character/limbs.js')) &&
-              /ARMS\.left/.test(read('mrmah3d/core/character/limbs.js')),
+  'two arms': /ARMS_?\.right/.test(read('mrmah3d/core/character/limbs.js')) &&
+              /ARMS_?\.left/.test(read('mrmah3d/core/character/limbs.js')),
   'elbow joints': /elbowJoint/.test(read('mrmah3d/core/character/limbs.js')),
   'wrists': /wristJoint/.test(read('mrmah3d/core/character/limbs.js')),
   'hands': /buildHand/.test(read('mrmah3d/core/character/limbs.js')),
@@ -612,6 +612,28 @@ if (exists('CLAUDE.md')) {
     ok('DOC-' + rule[0], rule.slice(1).every(re => re.test(md)));
   });
 }
+
+/* ---- R96: gloss, thin head, theme energy, one renderer with variants ------ */
+(function () {
+  const shader = read('mrmah3d/core/character/crystal-shader.js');
+  const pal = read('mrmah3d/core/palette.js');
+  const variants = exists('mrmah3d/core/character/variants.js') ? read('mrmah3d/core/character/variants.js') : '';
+  const sceneSrc = read('mrmah3d/core/mrmah-scene.js');
+  const propsSrc = read('mrmah3d/core/character/proportions.js');
+  ok('R96-facet-dome-in-shader', /uDome/.test(shader) && /mrDome/.test(shader));
+  const hw = Number((propsSrc.match(/halfWidth:\s*([\d.]+)\s*,/) || [])[1]);
+  const hd = Number((propsSrc.match(/halfDepth:\s*([\d.]+)\s*,/) || [])[1]);
+  ok('R96-head-is-a-thin-shell', hd > 0 && hd <= hw * 0.66, 'halfDepth ' + hd + ' against halfWidth ' + hw + ' (rear must not be bulbous)');
+  ok('R96-theme-derived-from-secondary', /export function deriveTheme/.test(pal) &&
+    ['emission', 'hero', 'crystalLight', 'atmosphere', 'worldAccent'].every(r => pal.indexOf(r) !== -1));
+  ok('R96-theme-luminance-fitted', /function fit\(/.test(pal) && /yMin/.test(pal) && /yMax/.test(pal));
+  ok('R96-scene-passes-derived-tint', /opts\.tint \|\| palette\.tint/.test(sceneSrc));
+  ok('R96-variants-module', variants.length > 0 && /export function proportionsFor/.test(variants) && /female/.test(variants));
+  ok('R96-variant-is-an-option-not-a-fork', /variant: opts\.variant/.test(sceneSrc) &&
+    /proportionsFor\(opts\.variant\)/.test(read('mrmah3d/core/character/mrmah.js')));
+  ok('R96-variant-keeps-one-lower-body', variants.length > 0 && !/leg/i.test(code('mrmah3d/core/character/variants.js')) && /hipShape/.test(variants));
+  ok('R96-lab-declares-canonical-blue', /--bright-rgb:\s*79,\s*227,\s*255/.test(read('mrmah3d/lab/lab.css')));
+})();
 
 console.log('\n' + pass + '/' + (pass + fail) + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

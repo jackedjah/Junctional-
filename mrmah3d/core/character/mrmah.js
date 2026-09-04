@@ -20,6 +20,7 @@ import { createStateMachine } from './states.js';
 import { setInnerLight } from './crystal-shader.js';
 import { HALO_LAYER } from '../bloom.js';
 import { HEIGHT, FLOAT, HEAD } from './proportions.js';
+import { proportionsFor } from './variants.js';
 
 export function createMrMah(options) {
   var opts = options || {};
@@ -37,9 +38,12 @@ export function createMrMah(options) {
   root.add(float);
   float.add(rig);
 
+  /* R96 — one renderer, one body pipeline, a PROPORTION SET per variant
+     (variants.js). The head is shared: the face is the identity. */
+  var P = proportionsFor(opts.variant);
   var head = buildHead(materials);
-  var body = buildBody(materials);
-  var limbs = buildLimbs(materials);
+  var body = buildBody(materials, P);
+  var limbs = buildLimbs(materials, P);
   rig.add(body.group);
   rig.add(limbs.group);
   rig.add(head.group);

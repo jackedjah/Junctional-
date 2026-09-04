@@ -82,6 +82,8 @@ export function createMrMahScene(host, options) {
     /* R96: the character's energy tint is derived from the theme unless the
        host passes its own (palette.js deriveTheme). */
     tint: opts.tint || palette.tint,
+    /* R96: 'male' (default) or 'female' — a proportion set on the one renderer */
+    variant: opts.variant,
     envMap: stageBox.environment
   });
 
