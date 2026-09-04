@@ -273,7 +273,7 @@ function buildArm(materials, spec, options) {
        is six or eight large graded planes; fifty small quads cannot grade —
        the facet dome (crystal-shader.js) is gated on face size and had
        nothing to work on — and read as a quilt beside the reference. */
-    { depthRatio: 1.12, crystal: 0.045, steps: 3,
+    { depthRatio: 1.12, crystal: 0.045, steps: 5,
       profile: ARMS_.profiles.upper, shape: ARMS_.shapes.upper, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes),
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
@@ -298,7 +298,7 @@ function buildArm(materials, spec, options) {
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
     spec.foreRadius, spec.wristRadius, 8,
-    { depthRatio: 1.04, crystal: 0.040, steps: 3,
+    { depthRatio: 1.04, crystal: 0.040, steps: 4,
       profile: ARMS_.profiles.fore, shape: ARMS_.shapes.fore, lift: ARMS_.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes) }
   );

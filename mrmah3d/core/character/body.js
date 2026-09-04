@@ -306,7 +306,10 @@ export function buildBody(materials, P) {
        other direction: a full-radius end disc perpendicular to a horizontal
        axis reaches 0.03 outside the arm's tube and shows as a flat circle on
        the outside of the shoulder from any three-quarter view. */
-    var D = ARMS_.deltoid || { innerX: 0.300, innerY: 2.030, outerX: 0.560, outerY: 1.955, r0: 0.210 };
+    /* R97: a bigger, rounder DOME — ten sides, a fuller belly, a higher and
+       wider axis — the references' deltoid is the largest single mass on the
+       upper body and it rounds over the top of the bicep. */
+    var D = ARMS_.deltoid || { innerX: 0.300, innerY: 2.050, outerX: 0.585, outerY: 1.960, r0: 0.240 };
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;
@@ -333,7 +336,7 @@ export function buildBody(materials, P) {
       var endT = Math.max(0, (t - 0.75) / 0.25);
       var end = 1 - 0.55 * endT * endT * (3 - 2 * endT);
       return (0.28 + 0.72 * root * root * (3 - 2 * root)) * end *
-             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.26);
+             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.34);
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -347,10 +350,26 @@ export function buildBody(materials, P) {
        the sharpest breaks drawn — the dome is now carried by its planes. */
     var geo = segment(
       inner, outer,
-      deltoidR0, deltoidR1, 8,
+      deltoidR0, deltoidR1, 10,
       { depthRatio: 1.0, crystal: 0.050, steps: 6, lift: ARMS_.deltoidLift,
         classes: REGIONS.DELT.classes,
         profile: deltoidProfile,
+        /* R97 — THREE HEADS. `d` is the angle from the cap's front (+z): a
+           front-delt lobe, a rear-delt lobe, and named planes for each — the
+           front steel-blue, the crest lit sapphire, the rear sapphire — so the
+           dome reads as front / side / rear delt and its planes trade as he
+           turns, rather than as one shoulder lump. */
+        shape: function (t, d) {
+          var belly = Math.sin(Math.min(1, t / 0.9) * Math.PI);
+          return 1 + (0.07 * Math.exp(-Math.pow(d / 0.75, 2)) +
+                      0.06 * Math.exp(-Math.pow((Math.abs(d) - Math.PI) / 0.85, 2))) * belly;
+        },
+        zoneAt: function (d, t) {
+          var ad = Math.abs(d);
+          if (ad < 0.75) return { classes: REGIONS.DELT.classes, seed: 110, index: 3 };
+          if (ad < 1.95) return { classes: REGIONS.DELT.classes, seed: 111 + (d > 0 ? 1 : 0), index: 2 };
+          return { classes: REGIONS.DELT.classes, seed: 113, index: 1 };
+        },
         /* R91 — THE VALUE STEP AT THE SEAM IS WHAT READS AS "BOLTED ON".
 
            The deltoid carried one lift (0.40) and the torso another (0.14), so

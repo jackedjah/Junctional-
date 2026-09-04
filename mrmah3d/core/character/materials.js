@@ -67,7 +67,9 @@ export var PALETTE = {
      reference; Reference A (R96) keeps its blue into the darks — the quad
      histograms at chroma 94 with 57% under 32 luma, where this build's darks
      sat at chroma 68. Same luma as the steel, the hue moved to sapphire. */
-  crystalDeep: 0x28386a, /* the darkest facets — navy with a little luma in it */
+  /* R97: a step deeper again — the R97 references' backs are 76% under 32
+     luma and their chests 64%; this build had reached 44% and 30%. */
+  crystalDeep: 0x1c2a52, /* the darkest facets — deep navy */
   /* R94 — the head's ice family: a pale steel-blue albedo, a deep that is
      still blue rather than black, and a whiter tint for its catches. */
   headCrystal: 0x7d9fc6,
@@ -75,7 +77,7 @@ export var PALETTE = {
   headTint: 0xa9e6ff,
   edge: 0x35d6ff,        /* cyan edge illumination */
   edgeHot: 0xbdf2ff,     /* near-white specular catch */
-  face: 0x05090d,        /* the recessed facial plane — almost black */
+  face: 0x0a1220,        /* the recessed face-screen — near-black navy, glossy (R97) */
   cavity: 0x121b24,      /* the walls of the face recess — shadowed crystal */
   glow: 0x4fe3ff
 };
@@ -182,14 +184,15 @@ export function createCrystalMaterials(options) {
   /* FACE PLATE — the recess. Almost black, rough, non-metallic, so it stays a
      dark void that the eyes and smile read against at maximum contrast. */
   var face = new MeshStandardMaterial({
+    /* R97 — A FACE-SCREEN, not black paint. The plate is a glossy dark
+       display surface nested in the crystal: near-black, but polished enough
+       that the environment's cards ghost across it as he turns, which is what
+       ties it to the shell around it and stops it reading as a hole. Still
+       far darker than the shell. */
     color: new Color(PALETTE.face),
-    roughness: 0.9,
-    metalness: 0.0,
-    /* The recess must stay a VOID. Even at roughness 0.9 and zero metalness the
-       plate picks up a diffuse wash of the environment, and any value at all in
-       there costs the eyes and smile the contrast they read against — which is
-       the whole reason the plate is recessed in the first place. */
-    envMapIntensity: 0.18,
+    roughness: 0.20,
+    metalness: 0.58,
+    envMapIntensity: 1.1,
     flatShading: true
   });
 
@@ -417,11 +420,16 @@ export function createCrystalMaterials(options) {
        additive grazing term in crystal-shader.js instead; this one is back to
        doing what it can genuinely do, which is deepen the turn on facets that
        are already lit. */
-    fresnelBoost: 1.30,
+    /* R97: 1.30 -> 1.55 and absorption 0.50 -> 0.64. The references are dark
+       bodies with ELECTRIC RIMS: the grazing term is what draws the rim, the
+       absorption is what widens the dark end under it (exposure would move
+       both together — CLAUDE.md, "absorption widens"). */
+    fresnelBoost: 1.55,
     fresnelPower: 2.0,
+    innerDark: 0.64,
     /* R96 — the facet dome (crystal-shader.js): every large plane grades from
        its edge to its centre, which is what Reference A's glossy planes are. */
-    dome: 0.36,
+    dome: 0.42,
     /* R94 — the taper's internal light (see crystal-shader.js). Sapphire, not
        cyan: the reference's taper is a saturated royal blue lit from within,
        and the cyan belongs to the edges. The source sits a third of the way up

@@ -121,6 +121,15 @@ edge 0.58, upper-arm radius 0.12, belt 0.19, quad 0.27 — so the gap it
 closed was MATERIAL and plane structure, not width. The female is the
 variant's reference: same head, same symbols, one lower body.
 
+There is now an EIGHTH pair, `reference/mrmah-refG-r97-threequarter.png` and
+`reference/mrmah-refG-r97-rear.png` (R97): the same character seen from the
+three-quarter and from behind, lit from behind and the side. They own the
+REAR (trapezius kite, rear deltoids, a spine channel between erector planes,
+lat wings into a tight waist, a belt crease, one taper) and the muscle-belly
+read of the arms. Measured over the back they are 76% under 32 luma with the
+light on the rims; over the three-quarter chest 64%. They are darker than
+Reference A because they are lit from behind, not because the body changed.
+
 **Expect the silhouette score against the canonical front to be low, and do not
 chase it.** The head is deliberately 30% smaller than the canonical measurement
 and the shoulder line 0.2 units higher; a comparison against a file the design
@@ -277,6 +286,7 @@ must not be claimed from headless runs.
 | `reference/mrmah-canonical-front.png` | the MEASUREMENT baseline — do not swap |
 | `reference/mrmah-refF-r96-male.png` | R96 Reference A — the PRIMARY CHARACTER TARGET: gloss, plane structure, value, symbols |
 | `reference/mrmah-refF-r96-female.png` | R96 — the female variant's reference |
+| `reference/mrmah-refG-r97-{threequarter,rear}.png` | R97 — the rear and three-quarter authority: back anatomy, deltoid domes, muscle bellies |
 | `reference/mrmah-refE-bodybuilder-{a,b}.png` | the body-proportion authority where Reference A is silent |
 | `reference/mrmah-refD-guardian-{a,b,c,d}.png` | the authority on material, light and world |
 | `reference/mrmah-refA-anatomical.png` | proportion and anatomy where the bodybuilder set is silent |
@@ -945,3 +955,31 @@ whole frame, and the gunmetal elbow knuckles' anti-aliased edges reported 21
 px of shadow on a scene with no shadow map. It now counts floor rows only.
 When a check fails after adding something dark, ask what the metric is
 actually measuring before touching the render.
+
+### Bulge-and-crease rings at 0.06 spacing are corrugation, not abs (R97)
+
+Three abdominal pairs were first built as bulge rings carrying a 30% rectus
+lobe alternating with crease rings carrying 2%, six hundredths apart. The
+abdomen came back as a ribbed barrel — the eye reads a stack of horizontal
+rings long before it reads blocks. A block is a TALL flat plane between two
+NARROW creases: the step came down to 17% against 8%, and the block's
+identity now comes from its zone class and the dark oblique planes flanking
+it, not from the depth of the ridge.
+
+### The back is authored the same way the front is
+
+`pecZone` and `coreZone` used to return null behind the lats and hand the
+back to the body lottery, so the rear was leftover geometry. It now names a
+near-black spine channel, erector planes either side of it and lat / upper
+back planes out to the arms, and `chestShape` / `coreShape` carry a spine
+groove and paired erector lobes. The rear reference's back is 76% under 32
+luma: the back's rows take the DARK entries, and its light is on the rims.
+
+### A muscle belly is a centre of fullness plus enough rings to curve
+
+Reference A's bicep peaks a third of the way down; a limb with three steps
+has no ring there to peak on, so the upper arm went back to five steps at
+eight sides — large planes for the dome to grade, enough rings for the
+profile to curve. The deltoid became a ten-sided dome with a 34% belly and a
+`zoneAt` naming front, crest and rear planes, so the three heads trade as he
+turns. Value, not only geometry: the dome needed the darker rows on its rear.

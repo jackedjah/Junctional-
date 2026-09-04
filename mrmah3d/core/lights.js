@@ -70,7 +70,7 @@ export function createLights(options) {
      was 44%. A softer fill from the right is what lets the far side of every
      pair (pecs, deltoids, quad heads) fall away, which is the local contrast
      the brief asks for. */
-  var fill = new DirectionalLight(new Color(0x9fb8d2), 1.4);
+  var fill = new DirectionalLight(new Color(0x9fb8d2), 1.0);   /* R97: 1.4 -> 1.0, the far side falls away */
   fill.position.set(5.6, 3.0, 4.0);
 
   /* Rim — cyan, from behind and above. This is what draws the lit contour. */
@@ -174,11 +174,11 @@ export function createLights(options) {
      to destroy a dark end — the difference here is that it is raising it to a
      COLOUR rather than to grey, and the hierarchy is carried by hue as much as
      by value from this point on. */
-  var hemi = new HemisphereLight(new Color(0x7186a4), new Color(0x2a3442), 0.55);
+  var hemi = new HemisphereLight(new Color(0x7186a4), new Color(0x2a3442), 0.40);   /* R97: 0.55 -> 0.40 */
 
   /* Deliberately tiny. The dark side of a crystal should be nearly black —
      that contrast is the material. */
-  var ambient = new AmbientLight(new Color(0x3c4a60), 0.30);
+  var ambient = new AmbientLight(new Color(0x3c4a60), 0.22);   /* R97: 0.30 -> 0.22 */
 
   var all = [key, fill, rim, rim2, bounce, chestLamp, faceLamp, hemi, ambient];
   if (group) all.forEach(function (l) { group.add(l); });
@@ -197,7 +197,7 @@ export function createLights(options) {
   function setIntensity(scale) {
     var k = Math.max(0, Number(scale) || 1);
     key.intensity = 5.5 * k;
-    fill.intensity = 1.4 * k;
+    fill.intensity = 1.0 * k;
     rim.intensity = 2.2 * k;
     rim2.intensity = 2.6 * k;
     bounce.intensity = 1.05 * k;
