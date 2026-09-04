@@ -446,6 +446,15 @@ export function buildBody(materials) {
   emblem.position.set(0, INSIGNIA.emblemY, chestZ(INSIGNIA.emblemY) + 0.012);
   emblem.name = 'chest-emblem';
   group.add(emblem);
+  /* R95: a white-hot core inside the emblem, as every reference draws it — a
+     small brighter diamond at the centre of the cyan one, so the emblem reads
+     as a light source with a graded edge rather than one flat two-tone plate. */
+  var emblemCoreGeo = diamondPlate(INSIGNIA.emblemHalf * 0.42, 0.004);
+  var emblemCore = new Mesh(emblemCoreGeo, materials.emissiveCore || materials.emissive);
+  emblemCore.position.copy(emblem.position);
+  emblemCore.position.z += 0.014;
+  group.add(emblemCore);
+  owned.push(emblemCoreGeo);
   var emblemGlow = new Mesh(diamondPlate(INSIGNIA.emblemHalf * 1.9, 0.004), materials.emissiveSoft);
   emblemGlow.position.copy(emblem.position);
   group.add(emblemGlow);
@@ -459,20 +468,31 @@ export function buildBody(materials) {
   var sz = chestZ(sy) + 0.012;
   var sh = INSIGNIA.symbolHalf;
 
-  function triangle(dir) {
+  /* R95 — THREE OUTLINED RIGHT-POINTING TRIANGLES. Every reference in the
+     luminous and guardian sets draws the row under the emblem as ▷ ▷ ▷ —
+     three hollow triangles all pointing the same way — not the ◀ ◆ ▶ this
+     carried. Outlined by drawing each glow triangle with a smaller near-black
+     triangle a hair in front of it. */
+  function triangle(dir, scale, z) {
     var P = [];
-    function p(x, y, z) { P.push(x, y, z); return P.length / 3 - 1; }
-    var t = [p(dir * sh, 0, 0.006), p(-dir * sh * 0.75, sh * 0.9, 0.006), p(-dir * sh * 0.75, -sh * 0.9, 0.006)];
+    function p(x, y, zz) { P.push(x, y, zz); return P.length / 3 - 1; }
+    var s = sh * (scale || 1);
+    var t = [p(dir * s, 0, z), p(-dir * s * 0.75, s * 0.9, z), p(-dir * s * 0.75, -s * 0.9, z)];
     return facetedGeometry(P, dir > 0 ? [[t[0], t[1], t[2]]] : [[t[0], t[2], t[1]]]);
   }
 
-  var symGeos = [triangle(-1), diamondPlate(sh * 0.8, 0.006), triangle(1)];
-  symGeos.forEach(function (g, i) {
-    var m = new Mesh(g, materials.emissive);
-    m.position.set((i - 1) * INSIGNIA.symbolSpacing, sy, sz);
-    symbols.add(m);
-    owned.push(g);
-  });
+  for (var si = 0; si < 3; si++) {
+    var outer = triangle(1, 1.0, 0.006);
+    var inner = triangle(1, 0.58, 0.009);
+    var mo = new Mesh(outer, materials.emissive);
+    var mi = new Mesh(inner, materials.face);
+    mo.position.set((si - 1) * INSIGNIA.symbolSpacing, sy, sz);
+    mi.position.copy(mo.position);
+    mi.position.x += sh * 0.05;
+    symbols.add(mo);
+    symbols.add(mi);
+    owned.push(outer, inner);
+  }
   group.add(symbols);
 
   return {

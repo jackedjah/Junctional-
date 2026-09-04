@@ -8,7 +8,7 @@
    cap live WebGL contexts (Safari especially). A leaked context is not a slow
    page, it is a page where the next mount renders nothing at all. */
 
-import { WebGLRenderer, SRGBColorSpace, ACESFilmicToneMapping, PCFSoftShadowMap } from '../vendor/three/three.module.min.js';
+import { WebGLRenderer, LinearSRGBColorSpace, NoToneMapping, PCFSoftShadowMap } from '../vendor/three/three.module.min.js';
 import { pixelRatioFor, settingsFor } from './quality.js';
 
 export function createRenderer(options) {
@@ -29,10 +29,26 @@ export function createRenderer(options) {
     preserveDrawingBuffer: !!opts.preserveDrawingBuffer
   });
 
-  renderer.outputColorSpace = SRGBColorSpace;
-  /* MAHFITT's stage is very dark with small bright speculars — exactly the case
-     where a filmic curve beats clipping to white. */
-  renderer.toneMapping = ACESFilmicToneMapping;
+  /* R95 — ONE PIPELINE FOR EVERY TIER.
+
+     three applies tone mapping and the output colour-space encoding ONLY when
+     it renders to the canvas. The medium and high tiers render the scene into
+     bloom's target first, so on those tiers the crystal has always been drawn
+     WITHOUT the ACES curve and without sRGB encoding, and the composite quad
+     writes those linear values to the canvas verbatim. The low tier, drawing
+     straight to the canvas, got both. Captured side by side on identical
+     framing, the low tier was a pale ice-white figure and the high tier the
+     dark sapphire every reference pass has been tuned against: two different
+     characters, and every histogram in this project was measured on the high
+     one. (An earlier note in CLAUDE.md asserted the opposite about targets;
+     it was wrong, and this capture is the evidence.)
+
+     The high-tier look is the accepted one, so the direct path now matches it:
+     no tone mapping and a linear output space, which is exactly what the
+     composite does. `toneMappingExposure` is inert under NoToneMapping on both
+     paths, so the tiers cannot drift apart again through it. */
+  renderer.outputColorSpace = LinearSRGBColorSpace;
+  renderer.toneMapping = NoToneMapping;
   /* ACES rolls the top end off hard. At exposure 1 the crystal's bright facets
      were being compressed into the same mid-tone as its dark ones, flattening
      exactly the contrast the reference depends on. */

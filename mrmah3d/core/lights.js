@@ -107,9 +107,14 @@ export function createLights(options) {
      emblem drew a hot specular dot of it — three white points on the sternum.
      At 0.95 with a wider range it is a gradient across the pectorals, which is
      what the emblem's light looks like in the references. */
-  var chestLamp = new PointLight(new Color(0x4fe3ff), 1.35, 2.8, 2);
-  chestLamp.position.set(0, 1.84, 0.95);
-  var faceLamp = new PointLight(new Color(0x6cebff), 0.85, 1.1, 2);
+  /* R95: reviewed as drawing hot specular blobs on the deltoids at yaw —
+     pulled further back and dimmed; its job is the sternum, not the shoulders. */
+  var chestLamp = new PointLight(new Color(0x4fe3ff), 1.05, 2.4, 2);
+  chestLamp.position.set(0, 1.80, 1.10);
+  /* R95: range 1.1 -> 0.5. Reviewed, the face lamp reached the shoulder line
+     half a unit below the head and drew pinpoint white speculars across the
+     crown, traps and neck. It only needs the cavity walls and bevel undersides. */
+  var faceLamp = new PointLight(new Color(0x6cebff), 0.85, 0.5, 2);
   faceLamp.position.set(0, 2.62, 0.16);
 
   /* R92 — THE FLOOR UNDER THE DARKS IS SAPPHIRE, NOT VOID.
@@ -154,7 +159,7 @@ export function createLights(options) {
     rim.intensity = 2.2 * k;
     rim2.intensity = 1.1 * k;
     bounce.intensity = 0.85 * k;
-    chestLamp.intensity = 0.95 * k;
+    chestLamp.intensity = 1.05 * k;
     faceLamp.intensity = 0.85 * k;
   }
 
@@ -174,7 +179,7 @@ export function createLights(options) {
        into the geometry around each emitter rather than staying on it. */
     setEmissionGlow: function (g) {
       var k = Math.max(0, Number(g) || 1);
-      chestLamp.intensity = 0.95 * k;
+      chestLamp.intensity = 1.05 * k;
       faceLamp.intensity = 0.85 * k;
     }
   };

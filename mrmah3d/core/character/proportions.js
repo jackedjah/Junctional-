@@ -315,21 +315,42 @@ function frontDelta(a) {
   while (e < -Math.PI) e += Math.PI * 2;
   return e;
 }
+/* R95 — ZONES ARE DETERMINISTIC AND THEIR BOUNDARIES ARE DIAGONAL.
+
+   Reviewed against the references, the R94 zones drew as a rectangular grid
+   of tiles — every boundary vertical or horizontal — and each zone rolled its
+   class by lottery, so a pectoral was black one mount in five. Now each zone
+   NAMES its class (`index` into its region table, see facetClass) and the
+   zone function receives the band's height, so the sternum narrows upward,
+   the pec lobe's outer edge climbs toward the deltoid, and the oblique line
+   runs diagonally out from the waist to the ribcage — the plane architecture
+   the brief asks for: two planes a pec (an inner sapphire plane, an outer
+   steel one), a dark sternum, abdominal pairs on a dark channel, obliques. */
 function pecZone(row) {
-  return function (a) {
+  return function (a, y) {
     var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
-    if (ae < 0.30) return { classes: REGIONS.STERNUM.classes, seed: 10 + row };
-    if (ae < 1.30) return { classes: (row === 1 ? REGIONS.PEC_UPPER : REGIONS.PEC_LOWER).classes, seed: 20 + row * 2 + side };
-    if (ae < 2.05) return { classes: REGIONS.OBLIQUE.classes, seed: 30 + row * 2 + side };   /* lats */
-    return null;                                                                             /* back: the body lottery */
+    var yy = y == null ? 1.90 : y;
+    var sternum = 0.34 - (yy - 1.80) * 0.36;                 /* 0.34 at the lower pec, ~0.23 at the clavicle */
+    var pecOuter = 1.02 + (yy - 1.80) * 0.95;                /* the lobe reaches out toward the shoulder as it rises */
+    var pecSplit = 0.30 + (pecOuter - 0.30) * 0.58;          /* inner plane / outer plane */
+    var table = row === 1 ? REGIONS.PEC_UPPER : REGIONS.PEC_LOWER;
+    if (ae < sternum) return { classes: REGIONS.STERNUM.classes, seed: 10 + row, index: 0 };
+    if (ae < pecSplit) return { classes: table.classes, seed: 20 + row * 4 + side, index: 1 };
+    if (ae < pecOuter) return { classes: table.classes, seed: 22 + row * 4 + side, index: 2 };
+    if (ae < 2.05) return { classes: REGIONS.OBLIQUE.classes, seed: 30 + row * 2 + side, index: 1 };   /* lats */
+    return null;                                                                                        /* back: the body lottery */
   };
 }
 function coreZone(row) {
-  return function (a) {
+  return function (a, y) {
     var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
-    if (ae < 0.20) return { classes: REGIONS.STERNUM.classes, seed: 40 + row };            /* the central channel */
-    if (ae < 0.78) return { classes: REGIONS.ABS.classes, seed: 50 + row * 2 + side };
-    if (ae < 1.55) return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side };
+    var yy = y == null ? 1.50 : y;
+    var channel = 0.22 - (yy - 1.18) * 0.06;
+    var absOuter = 0.74 + (yy - 1.18) * 0.28;                /* the blocks widen with the ribcage */
+    var obliqueOuter = 1.45 + (yy - 1.18) * 0.30;
+    if (ae < channel) return { classes: REGIONS.STERNUM.classes, seed: 40 + row, index: 0 };            /* the central channel */
+    if (ae < absOuter) return { classes: REGIONS.ABS.classes, seed: 50 + row * 2 + side, index: row === 1 ? 2 : 1 };
+    if (ae < obliqueOuter) return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side, index: row === 0 ? 0 : 1 };
     return null;
   };
 }
@@ -338,7 +359,9 @@ function taperClasses(a) {
   while (e > Math.PI) e -= Math.PI * 2;
   while (e < -Math.PI) e += Math.PI * 2;
   var ae = Math.abs(e);
-  if (ae < 0.52) return REGIONS.TAPER_SPEAR.classes;
+  /* R95: the spear widened to about a third of the taper's front (0.52 -> 0.66
+     rad either side), as reviewed against the reference crop. */
+  if (ae < 0.66) return REGIONS.TAPER_SPEAR.classes;
   if (ae < 1.80) return REGIONS.TAPER_FLANK.classes;
   return REGIONS.TAPER_SPEAR.classes;
 }
@@ -659,15 +682,20 @@ export var TORSO = {
        ring cap at the vertex's own height; these faces are dark-classed and
        the cap is buried). `zc` sets the column 0.04 behind the head's axis so
        the chin overhangs it. */
+    /* R95: the neck's hero values come down hard (0.26-0.40 -> 0.04-0.12).
+       Reviewed, the column rendered as two pale posts beside the chin — mean
+       luma 90 against the reference's 29 — because `hero` slides the lottery
+       onto the NECK table's steel rows. It is a dark column in the chin's
+       shadow, brighter than the chest only by its edges. */
     { y: 2.165, w: 0.212, d: 0.158, facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
-      shape: clavicleShape(0.55), hero: 0.40, classesAt: neckClasses },
+      shape: clavicleShape(0.55), hero: 0.16, classesAt: neckClasses },
     { y: 2.200, w: 0.122, d: 0.102, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
-      zc: -0.030, hero: 0.30, classesAt: neckClasses },
+      zc: -0.030, hero: 0.10, classesAt: neckClasses },
     { y: 2.262, w: 0.104, d: 0.090, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
-      zc: -0.040, hero: 0.28, classesAt: neckClasses },
+      zc: -0.040, hero: 0.06, classesAt: neckClasses },
     { y: 2.330, w: 0.098, d: 0.086, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
-      zc: -0.044, hero: 0.26, classesAt: neckClasses },
-    { y: 2.372, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.10, classesAt: neckClasses }
+      zc: -0.044, hero: 0.04, classesAt: neckClasses },
+    { y: 2.372, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neckClasses }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
   /* Widened. Against the canonical reference the render measured 9.3% narrow
@@ -806,7 +834,10 @@ export var ARMS = {
      purpose. Reference A does the same thing: its arms carry noticeably more
      secondary blue and more silver than the chest, because they are what has to
      read against a black world at the edge of the silhouette. */
-  classLift: 0.44,
+  /* R95: 0.44 -> 0.30. Reviewed against the references the arms were one navy
+     band with no dark tricep side; with their class now named per strip (see
+     armZone in limbs.js) the lift only needs to keep the seam ramps honest. */
+  classLift: 0.30,
 
   /* The deltoid takes MORE lift than the arm it caps. Its exposed surface is
      mostly upward-facing, and an upward-facing plane reflects x~64 in the
@@ -823,7 +854,7 @@ export var ARMS = {
      things were ruled out before the lottery: the authored ridge line and the
      rim shell were each removed for a capture and neither moved it, and the
      wedges are absent at the arm's own lift. */
-  deltoidLift: 0.34,
+  deltoidLift: 0.28,
 
   profiles: {
     /* STARTS BELOW 1, which is the correction the brief asks for.
@@ -897,9 +928,11 @@ export var HAND = {
   palmLength: 0.106,
   palmHalfWidth: 0.085,
   palmHalfDepth: 0.050,
-  digitCount: 3,
-  digitLength: 0.070,
-  digitRadius: 0.026,
+  /* R95: four jointed fingers (see buildDigit in limbs.js), a little longer
+     and slimmer, as the references' robotic hands are. */
+  digitCount: 4,
+  digitLength: 0.082,
+  digitRadius: 0.019,
   /* The small bright diamond above the reference's raised hand. */
   tipDiamond: 0.044
 };

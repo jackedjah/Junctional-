@@ -18,6 +18,25 @@ import { segment, diamondPlate, facetedGeometry } from './forge.js';
 import { ARMS, HAND } from './proportions.js';
 import { REGIONS } from './regions.js';
 
+/* R95 — THE ARM'S STRIPS ARE NAMED, NOT ROLLED.
+
+   `d` is the angle relative to the limb's front (0 = the bicep side, pi = the
+   tricep side), `t` the position along it. The references' arms are a few
+   long planes: a lit bicep plane on the front, sapphire flanks, and a dark
+   tricep side that reaches the black rows — which is what lets the arm read
+   as the same dark crystal as the torso rather than as a softer material. */
+function armZone(table) {
+  return function (d, t) {
+    while (d > Math.PI) d -= Math.PI * 2;
+    while (d < -Math.PI) d += Math.PI * 2;
+    var ad = Math.abs(d);
+    if (ad < 0.55) return { classes: table, seed: 70, index: 3 };           /* the bicep / flexor plane: steel-blue */
+    if (ad < 1.25) return { classes: table, seed: 71 + (d > 0 ? 1 : 0), index: 2 };   /* flanks: sapphire */
+    if (ad < 2.20) return { classes: table, seed: 73 + (d > 0 ? 1 : 0), index: 1 };   /* toward the back: navy */
+    return { classes: table, seed: 75, index: 0 };                         /* the tricep side: lost */
+  };
+}
+
 function clad(group, geo, materials, rimScale, edgeAngles) {
   var ea = edgeAngles || {};
   var mesh = new Mesh(geo, materials.body);
@@ -66,27 +85,62 @@ function clad(group, geo, materials, rimScale, edgeAngles) {
   return { mesh: mesh, edges: major, minorEdges: minor };
 }
 
-/* A faceted wedge palm built between the wrist and the fingertips. */
+/* A faceted wedge palm built between the wrist and the knuckles.
+
+   R95 — WITH A BACK-OF-HAND RIDGE. Reviewed, the palm was one flat quad and
+   read as a slab. A hand's back is two planes meeting at a low ridge running
+   from the wrist to the middle knuckle, so the +z face is now split down its
+   middle (five vertices a side) and the front stays flat. Two planes catch
+   the light differently, which is what makes the hand read as a solid rather
+   than a tile. */
 function palmGeometry(dir, spec) {
   var P = [];
   function p(x, y, z) { P.push(x, y, z); return P.length / 3 - 1; }
   var w = spec.palmHalfWidth, d = spec.palmHalfDepth, L = spec.palmLength;
   /* Slight taper outward so the hand reads wider than the wrist. */
-  var a = [p(-w * 0.72, 0, d * 0.8), p(w * 0.72, 0, d * 0.8),
+  var a = [p(-w * 0.72, 0, d * 0.8), p(0, 0, d * 1.10), p(w * 0.72, 0, d * 0.8),
            p(w * 0.72, 0, -d * 0.8), p(-w * 0.72, 0, -d * 0.8)];
-  var b = [p(-w, L, d), p(w, L, d), p(w, L, -d), p(-w, L, -d)];
-  /* R94: every face of the palm was wound inward (a0..a3 runs clockwise seen
-     from above, so the old "reversed" bottom pointed up and each side strip's
-     normal pointed into the block). Same fault as the lofts — see forge.js. */
+  var b = [p(-w, L, d), p(0, L, d * 1.32), p(w, L, d), p(w, L, -d), p(-w, L, -d)];
+  /* Wound outward (see the R94 note in forge.js): the wrist end faces -y, the
+     knuckle end +y, and each strip's normal points away from the block. */
   var faces = [
-    [a[0], a[1], a[2], a[3]],
-    [b[3], b[2], b[1], b[0]],
-    [a[0], a[1], b[1], b[0]],
-    [a[1], a[2], b[2], b[1]],
+    [a[0], a[1], a[2], a[3], a[4]],
+    [b[4], b[3], b[2], b[1], b[0]],
+    [a[0], a[1], b[1], b[0]],        /* back of the hand, left plane */
+    [a[1], a[2], b[2], b[1]],        /* back of the hand, right plane */
     [a[2], a[3], b[3], b[2]],
-    [a[3], a[0], b[0], b[3]]
+    [a[3], a[4], b[4], b[3]],        /* the palm */
+    [a[4], a[0], b[0], b[4]]
   ];
-  return facetedGeometry(P, faces, null, { lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+  /* facetedGeometry takes triangles and quads; fan the two pentagon ends. */
+  var tris = [];
+  faces.forEach(function (f) {
+    if (f.length <= 4) { tris.push(f); return; }
+    for (var i = 1; i < f.length - 1; i++) tris.push([f[0], f[i], f[i + 1]]);
+  });
+  return facetedGeometry(P, tris, null, { lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+}
+
+/* One finger: two segments with a knuckle between them, so a curl is a bend
+   rather than a shortening. `curl` 0 is straight, 1 fully folded toward the
+   palm's front (+z). Returns the geometries it made. */
+function buildDigit(hand, materials, spec, base, dirX, len, radius, curl, edges) {
+  var owned = [];
+  var l1 = len * 0.56, l2 = len * 0.44;
+  /* proximal segment: leans forward by the curl */
+  var a1 = curl * 0.85;
+  var mid = [base[0] + dirX * l1, base[1] + Math.cos(a1) * l1, base[2] + Math.sin(a1) * l1];
+  var a2 = curl * 1.75;
+  var tip = [mid[0] + dirX * l2 * 0.6, mid[1] + Math.cos(a2) * l2, mid[2] + Math.sin(a2) * l2];
+  var g1 = segment(base, mid, radius, radius * 0.92, 6,
+    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+  var g2 = segment(mid, tip, radius * 0.92, radius * 0.66, 6,
+    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+  [g1, g2].forEach(function (g) {
+    var c = clad(hand, g, materials, 0, edges);
+    owned.push(g, c.edges, c.minorEdges);
+  });
+  return owned;
 }
 
 function buildHand(materials, spec, options) {
@@ -117,43 +171,37 @@ function buildHand(materials, spec, options) {
      shortening it, so the closed hand presents knuckles to the viewer and the
      fingers disappear underneath, which is the silhouette a fist has. The open
      hand is untouched: it still splays and presents. */
+  /* R95 — FOUR JOINTED FINGERS AND A THUMB, RELAXED OR PRESENTING.
+
+     Reviewed against the references, the fist was "a slab with three detached
+     cubes", and the brief now asks for the lowered hand to hang RELAXED with
+     readable fingers, and the raised one to present the crystal confidently.
+     Each finger is two segments with a knuckle (buildDigit), so the relaxed
+     hand's fingers hang with a gentle curl and the presenting hand's stand
+     open with a slight cup — the two silhouettes a hand actually has. */
   var n = spec.digitCount;
-  var curl = opts.open ? 0 : 1;
+  var curl = opts.open ? 0.22 : 0.62;
   for (var i = 0; i < n; i++) {
     var t = n === 1 ? 0.5 : i / (n - 1);
-    var x = (t - 0.5) * spec.palmHalfWidth * 1.55;
+    var x = (t - 0.5) * spec.palmHalfWidth * 1.50;
     /* Splay the outer digits and shorten them slightly. */
-    var splay = (t - 0.5) * (opts.open ? 0.55 : 0.20);
-    var len = spec.digitLength * (opts.open ? 1 : 0.78) * (1 - Math.abs(t - 0.5) * 0.35);
-    var base = [x, spec.palmLength, curl * spec.palmHalfDepth * 0.30];
-    var tip = [
-      x + Math.sin(splay) * len * (1 - curl * 0.55),
-      spec.palmLength + Math.cos(splay) * len * (1 - curl * 0.62),
-      0.01 + curl * len * 0.80
-    ];
-    var g = segment(base, tip, spec.digitRadius, spec.digitRadius * (curl ? 0.92 : 0.7), 5,
-      { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
-    var d = clad(hand, g, materials, 0, HAND_EDGES);
-    owned.push(g, d.edges, d.minorEdges);
+    var splay = (t - 0.5) * (opts.open ? 0.30 : 0.10);
+    var len = spec.digitLength * (1 - Math.abs(t - 0.5) * 0.30);
+    var base = [x, spec.palmLength, spec.palmHalfDepth * 0.15];
+    owned.push.apply(owned, buildDigit(hand, materials, spec, base, Math.sin(splay), len,
+      spec.digitRadius, curl, HAND_EDGES));
   }
 
-  /* A THUMB — the one addition that makes a hand read as a hand.
-
-     Three digits in a row is a fork; the same three with a shorter opposed
-     digit set lower and angled across is unmistakably a hand, at any size, and
-     it costs one small segment. The brief asks for thumb logic and finger
-     grouping rather than knuckles, and this is exactly that: the silhouette
-     does the work. Set on the inner side so the raised hand reads as an open
-     presenting gesture rather than a claw. */
+  /* A THUMB — the one addition that makes a hand read as a hand. Set on the
+     inner side, opposed, and shorter; on the relaxed hand it rests along the
+     palm, on the presenting hand it opens out to cup the crystal. */
   var thumbBase = [-spec.palmHalfWidth * 0.92, spec.palmLength * 0.42, spec.palmHalfDepth * 0.35];
-  var thumbLen = spec.digitLength * (opts.open ? 0.82 : 0.62);
-  /* On the closed hand the thumb lies ACROSS the folded fingers, which is the
-     detail that separates a fist from a lump. */
+  var thumbLen = spec.digitLength * 0.80;
   var thumbTip = opts.open
     ? [thumbBase[0] - thumbLen * 0.72, thumbBase[1] + thumbLen * 0.62, thumbBase[2] + thumbLen * 0.28]
-    : [thumbBase[0] + thumbLen * 0.62, thumbBase[1] + thumbLen * 0.34, thumbBase[2] + thumbLen * 0.72];
-  var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 5,
-    { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+    : [thumbBase[0] - thumbLen * 0.20, thumbBase[1] + thumbLen * 0.70, thumbBase[2] + thumbLen * 0.55];
+  var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 6,
+    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
   var thumb = clad(hand, thumbGeo, materials, 0, HAND_EDGES);
   owned.push(thumbGeo, thumb.edges, thumb.minorEdges);
 
@@ -205,9 +253,11 @@ function buildArm(materials, spec, options) {
        which is why the profile swell alone only ever produced a fatter pipe.
        Ten sides rather than eight so the bicep and tricep lobes each land on
        their own pair of facets instead of sharing one. */
-    { depthRatio: 1.12, crystal: 0.075, steps: 7,
+    /* R95: fewer, longer planes — five steps, strips seeded as columns and
+       named by armZone — and a touch less relief so a strip stays one plane. */
+    { depthRatio: 1.12, crystal: 0.055, steps: 5,
       profile: ARMS.profiles.upper, shape: ARMS.shapes.upper, lift: ARMS.classLift,
-      classes: REGIONS.UPPER_ARM.classes,
+      classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes),
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
          its own by the bicep belly, for the same reason the cap ramps into the
          torso — a limb that starts at a different value from the thing it
@@ -230,9 +280,9 @@ function buildArm(materials, spec, options) {
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
     spec.foreRadius, spec.wristRadius, 10,
-    { depthRatio: 1.04, crystal: 0.070, steps: 6,
+    { depthRatio: 1.04, crystal: 0.050, steps: 4,
       profile: ARMS.profiles.fore, shape: ARMS.shapes.fore, lift: ARMS.classLift,
-      classes: REGIONS.FOREARM.classes }
+      classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes) }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 0);
   owned.push(foreGeo, fore.edges, fore.minorEdges);

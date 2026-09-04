@@ -418,10 +418,17 @@ export function createCrystalMaterials(options) {
        the outward flanks transmit far more than the interior wall did, so the
        tip went near-white at 9.0. The source moves up the taper and softens so
        the glow spans the whole lower body rather than pooling at the point. */
-    innerStrength: 5.5,
-    innerY: 0.55,
+    /* R95: reviewed as "a blown blue lampshade" (mean 78 against the reference
+       taper's 42, 9.5% of pixels at 192-223 against 0.5%): strength down, the
+       source lower, the gate a long fade (crystal-shader.js). */
+    innerStrength: 3.6,
+    innerY: 0.48,
     innerRange: 1.05,
-    innerTop: 1.20,
+    innerTop: 1.30,
+    coreStrength: 1.6,
+    coreY: 1.58,
+    coreRange: 0.62,
+    coreTop: 2.02,
     innerHalfWidth: 0.34,
     innerColor: 0x4a9cff
   });
@@ -484,7 +491,15 @@ export function createCrystalMaterials(options) {
     opacity: 0.78
   });
 
-  var all = [body, head, face, cavity, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, emissiveSmile, rim];
+  /* R95 — the emblem's white-hot core. */
+  var emissiveCore = new MeshBasicMaterial({
+    color: new Color(PALETTE.edgeHot),
+    toneMapped: false,
+    transparent: true,
+    opacity: 0.92
+  });
+
+  var all = [body, head, face, cavity, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, emissiveSmile, emissiveCore, rim];
 
   /* Captured at construction so setGlow(1) restores exactly what each material
      was defined with. */
@@ -517,7 +532,7 @@ export function createCrystalMaterials(options) {
 
   return {
     body: body, head: head, face: face, cavity: cavity, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
-    emissive: emissive, emissiveSoft: emissiveSoft, emissiveSmile: emissiveSmile, rim: rim,
+    emissive: emissive, emissiveSoft: emissiveSoft, emissiveSmile: emissiveSmile, emissiveCore: emissiveCore, rim: rim,
     /* One place to drive the whole character's luminosity — used by the
        animation states so a "thinking" pulse cannot desynchronise.
 

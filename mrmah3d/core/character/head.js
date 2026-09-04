@@ -119,8 +119,11 @@ export function buildHead(materials) {
      Every earlier value here was set by eye against a smaller crop and the
      rings had crept to a 0.175 stroke — thick enough that, with the soft
      companion doubling it, the eyes read as goggles. */
-  var eyeR = HEAD.halfWidth * 0.140;
-  var eyeGap = HEAD.halfWidth * 0.290;
+  /* R95: reviewed as ~40% too large and twice too heavy against the luminous
+     references; the guardian references sit between. Rings a shade smaller,
+     the stroke thinner, and the soft companion carries the glow. */
+  var eyeR = HEAD.halfWidth * 0.118;
+  var eyeGap = HEAD.halfWidth * 0.280;
   var eyeY = HEAD.halfHeight * 0.06;
 
   /* R90 — STROKE WEIGHT RE-DERIVED FOR THE SMALLER HEAD.

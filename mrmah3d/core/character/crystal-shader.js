@@ -113,7 +113,16 @@ export function applyCrystalShader(material, options) {
     uInnerStrength: { value: opts.innerStrength == null ? 0.0 : opts.innerStrength },
     uInnerRange: { value: opts.innerRange == null ? 0.85 : opts.innerRange },
     uInnerTop: { value: opts.innerTop == null ? 1.10 : opts.innerTop },
-    uInnerHalfWidth: { value: opts.innerHalfWidth == null ? 0.34 : opts.innerHalfWidth }
+    uInnerHalfWidth: { value: opts.innerHalfWidth == null ? 0.34 : opts.innerHalfWidth },
+    /* R95 — a SECOND source in the core, so the abdomen and lower ribcage
+       carry interior blue too ("richer interior fill; do not let the body
+       collapse into mostly black"). Weaker and shorter-ranged than the taper's,
+       gated below the clavicle, and lateral in the same way so the abdominal
+       blocks' outer planes glow and the channel stays dark. */
+    uCoreLight: { value: new Vector3(0, opts.coreY == null ? 1.58 : opts.coreY, 0.0) },
+    uCoreStrength: { value: opts.coreStrength == null ? 0.0 : opts.coreStrength },
+    uCoreRange: { value: opts.coreRange == null ? 0.62 : opts.coreRange },
+    uCoreTop: { value: opts.coreTop == null ? 2.02 : opts.coreTop }
   };
 
   material.onBeforeCompile = function (shader) {
@@ -167,6 +176,10 @@ export function applyCrystalShader(material, options) {
         'uniform float uInnerRange;',
         'uniform float uInnerTop;',
         'uniform float uInnerHalfWidth;',
+        'uniform vec3 uCoreLight;',
+        'uniform float uCoreStrength;',
+        'uniform float uCoreRange;',
+        'uniform float uCoreTop;',
         'varying vec3 vSmoothN;',
         'varying vec4 vBary;',
         'varying vec3 vObjPos;',
@@ -315,7 +328,11 @@ export function applyCrystalShader(material, options) {
            multiplier to a floor of 0.35 — the chromatic facets still take the
            most of it, but a black facet at the contour is no longer excluded
            from the one effect that defines the silhouette. */
-        '    outgoingLight += uTint * mrF * 0.55 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) );',
+        /* R95: the dark classes take less of the additive grazing cyan, so a
+           lost plane at the contour stays steel rather than turning blue —
+           reviewed, every dark on the body was saturated blue where the
+           reference's darks are neutral. */
+        '    outgoingLight += uTint * mrF * 0.55 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
         /* R94 — the internal light. See the uniform note above. */
         '    if ( uInnerStrength > 0.0 && vInner > 0.5 ) {',
         '      vec3 mrN = normalize( vObjN );',
@@ -327,7 +344,10 @@ export function applyCrystalShader(material, options) {
         '      float mrQ = mrD / uInnerRange;',
         '      float mrAtt = 1.0 / ( 1.0 + mrQ * mrQ );',
         /* the region gate: below uInnerTop, within the taper's own width */
-        '      float mrGate = 1.0 - smoothstep( uInnerTop - 0.28, uInnerTop + 0.08, vObjPos.y );',
+        /* R95: a LONG vertical fade rather than a short one — reviewed, the
+           gate drew a hard horizontal glow line at the hip. The light now grows
+           out of the abdomen over ~0.8 units. */
+        '      float mrGate = 1.0 - smoothstep( uInnerTop - 0.80, uInnerTop + 0.10, vObjPos.y );',
         '      mrGate *= 1.0 - smoothstep( uInnerHalfWidth * 0.75, uInnerHalfWidth * 1.25, abs( vObjPos.x ) );',
         /* flanks glow, the front spear stays dark: side-facing over viewer-facing */
         '      float mrSide = 0.10 + 0.90 * pow( abs( mrN.x ), 0.75 );',
@@ -339,6 +359,20 @@ export function applyCrystalShader(material, options) {
            A first cut at 1.6 with a short range put the taper's light out. */
         '      float mrInner = uInnerStrength * mrAtt * mrGate * mrSide * mrPass * ( 0.18 + 0.82 * pow( mrTrans, 1.25 ) );',
         '      outgoingLight += uInnerColor * mrInner * mix( 0.55, 1.0, clamp( vFacet.w, 0.0, 1.0 ) );',
+        /* the core source — see the uniform note */
+        '      if ( uCoreStrength > 0.0 ) {',
+        '        vec3 mcL = uCoreLight - vObjPos;',
+        '        float mcD = length( mcL );',
+        '        mcL /= max( mcD, 1e-4 );',
+        '        float mcTrans = clamp( -dot( mrN, mcL ), 0.0, 1.0 );',
+        '        float mcQ = mcD / uCoreRange;',
+        '        float mcAtt = 1.0 / ( 1.0 + mcQ * mcQ );',
+        '        float mcGate = 1.0 - smoothstep( uCoreTop - 0.30, uCoreTop + 0.06, vObjPos.y );',
+        '        mcGate *= smoothstep( uInnerTop - 0.55, uInnerTop + 0.25, vObjPos.y );',
+        '        float mcSide = 0.18 + 0.82 * pow( abs( mrN.x ), 0.75 );',
+        '        float mcInner = uCoreStrength * mcAtt * mcGate * mcSide * mrPass * ( 0.18 + 0.82 * pow( mcTrans, 1.25 ) );',
+        '        outgoingLight += uInnerColor * mcInner * mix( 0.55, 1.0, clamp( vFacet.w, 0.0, 1.0 ) );',
+        '      }',
         '    }',
         '  }',
         '#endif',

@@ -415,11 +415,18 @@ the lighting. That is the "wireframe feel" note, measurable.
 
 ### Post-processing, if you touch `bloom.js`
 
-Three writes DISPLAY-ENCODED colour into a render target regardless of the
-target's `colorSpace`. What that flag changes is whether a shader sampling it
-gets DECODED back to linear. Marked sRGB with no encode in the composite, the
-midtones are crushed and the crystal goes flat; left default with an encode
-added, the character blows out. Leave the targets default and convert nothing.
+**Correction (R95).** An earlier version of this note claimed three writes
+display-encoded colour into a render target regardless of its `colorSpace`.
+It does not. Three applies tone mapping and the output colour-space encoding
+ONLY when rendering to the canvas; into a render target it writes LINEAR,
+un-tone-mapped values. So the medium and high tiers, which draw the scene
+into bloom's target, had never been through the ACES curve or sRGB encoding,
+while the low tier had been through both — captured side by side, the low tier
+was a pale ice-white figure and the high tier the dark sapphire every pass had
+been tuned against. `renderer.js` now uses `NoToneMapping` and a linear output
+space so every tier writes the same values as the composite. Every histogram
+in this project was measured on the high tier; that look is the accepted one.
+Leave the targets default and convert nothing in the composite.
 
 Two more, each of which cost a pass:
 
