@@ -169,7 +169,12 @@ ok('ENV-grid-near-edge-in-front-of-camera', centerZ + gridSize / 2 < nearestCamZ
 ok('ENV-grid-cell-plausible', gridSize / gridDiv > 1 && gridSize / gridDiv < 2,
   'cell ' + (gridSize / gridDiv).toFixed(3) + ' units');
 ok('ENV-grid-clear-of-shadow-plane', /y:\s*0\.0[2-9]/.test(env));
-ok('ENV-ground-does-not-occlude', /ground\.material\.depthWrite\s*=\s*false/.test(env));
+/* R95 world: the shadow catcher is gone (the guardian references have no cast
+   shadow), so the assertion that it never occluded the grid becomes the
+   assertion that nothing catches a shadow at all. */
+ok('ENV-ground-does-not-occlude', !/ShadowMaterial/.test(code('mrmah3d/core/environment.js')) &&
+  !/receiveShadow\s*=\s*true/.test(code('mrmah3d/core/environment.js')),
+  'R95 world: no shadow catcher, nothing to occlude the grid');
 /* The reference world, not a bare floor. */
 ok('ENV-glowing-grid-nodes', /grid-nodes/.test(env));
 ok('ENV-floor-glow', /floor-glow/.test(env));
@@ -347,8 +352,11 @@ ok('WORLD-glow-follows-character', /followCharacter/.test(env));
 /* R94 world: amended from the literal 9 x 9 — brief item 7 clips the catcher
    to a 2-unit pool under the tip, which is smaller still; the intent (never a
    floor-sized catcher) is what this asserts. */
-ok('WORLD-shadow-catcher-is-small', /new PlaneGeometry\((9, 9|2\.0, 2\.0)\)/.test(env),
-  'a floor-sized catcher paints a dark band outside the shadow camera');
+/* R95 world: amended again — there is no catcher. The guardian references
+   have no cast shadow; the key never casts and nothing receives. */
+ok('WORLD-shadow-catcher-is-small', !/new PlaneGeometry\((9, 9|2\.0, 2\.0)\)/.test(env) &&
+  /key\.castShadow = false;/.test(read('mrmah3d/core/lights.js')),
+  'R95 world: no catcher at all, and the key does not cast');
 ok('WORLD-per-mode-emphasis', /applyMode/.test(env));
 ok('WORLD-fog-is-per-mode', /setFog/.test(read('mrmah3d/core/stage.js')));
 
@@ -418,10 +426,15 @@ ok('DOC-claude-md', exists('CLAUDE.md'));
      column's opaque end was at the camera, not under him. */
   ok('R94-WORLD-hover-is-a-compact-cross',
     /new PlaneGeometry\(1\.9, 1\.9\)/.test(envR94) && /\[\[1\.1, 0\.14\], \[0\.14, 1\.1\]\]/.test(envR94));
-  ok('R94-WORLD-reflection-is-a-narrow-column', /new PlaneGeometry\(0\.7, 3\.0\)/.test(envR94) &&
+  /* R95 world (round 5): the column runs 5.0 long so it reaches the frame's
+     bottom row as guardian-a's does; "narrow" is the 0.7 width, which is what
+     the convergence rows accepted, and that is the literal this holds. */
+  ok('R94-WORLD-reflection-is-a-narrow-column', /new PlaneGeometry\(0\.7, [3-5]\.0\)/.test(envR94) &&
     /function columnTexture/.test(envR94) && /streak\.rotation\.z = Math\.PI/.test(envR94));
+  /* R95 world: the pool is gone with the shadow — see WORLD-shadow-catcher-is-small. */
   ok('R94-WORLD-shadow-catcher-is-a-pool',
-    /new PlaneGeometry\(2\.0, 2\.0\)/.test(envR94) && /poolFade/.test(envR94) && !/new PlaneGeometry\(9, 9\)/.test(envR94));
+    !/poolFade/.test(code('mrmah3d/core/environment.js')) && !/new PlaneGeometry\(9, 9\)/.test(envR94),
+    'R95 world: no shadow pool, no catcher');
   ok('R94-WORLD-aura-is-a-single-faint-wash',
     (envR94.match(/\{ w: [\d.]+, h: [\d.]+, y: [\d.]+, z: -[\d.]+, o: 0\.0\d+ \}/g) || []).length === 1 &&
     !/o: 0\.185/.test(envR94));
@@ -471,7 +484,13 @@ ok('DOC-claude-md', exists('CLAUDE.md'));
   ok('R94-WORLD-mist-reflected-in-floor', /mistTexture\(true\)/.test(envR94) && /scale\.set\(m\.mesh\.scale\.x, -1\.7, 1\)/.test(envR94));
   /* Item 6: gunmetal — the steel catch and the diffuse gain came down, the
      brightness moved into the specks. */
-  ok('R94-WORLD-steel-not-ice', /ks: 0\.34/.test(terrain) && /sparkle: 1100/.test(terrain) && /size: 0\.36/.test(terrain));
+  /* R95 world: the literal `ks: 0.34` became a ceiling. R95 measured the range
+     competing with the character (a massif box at 53.8 luma against his left
+     pectoral at 47.8) and brought the mid tone's catch down again; the intent
+     of this check — the catch came DOWN from R94's 0.62, never up — holds. */
+  const midKs = Number((terrain.match(/mid:\s*\{[^}]*ks: ([\d.]+)/) || [])[1]);
+  ok('R94-WORLD-steel-not-ice', midKs > 0 && midKs <= 0.34 && /sparkle: 1100/.test(terrain) && /size: 0\.36/.test(terrain),
+    'mid ks ' + midKs);
   /* Item 8: clouds placed for the reference frame, dithered, and withheld at
      app scale from the one writer in applyFine. */
   ok('R94-WORLD-clouds-scale-gated', /cloudK/.test(envR94) &&
@@ -480,6 +499,99 @@ ok('DOC-claude-md', exists('CLAUDE.md'));
   ok('R94-WORLD-clouds-dithered', /getImageData\(0, 0, 256, 128\)/.test(envR94) && /putImageData/.test(envR94));
 }
 /* ---- end R94 world ------------------------------------------------------ */
+
+/* ---- R95 world ---------------------------------------------------------
+   The moon, the distant variant figures, the hover beam, the beams' floor
+   reflections, the darker range and the removal of the cast shadow, built
+   for brief R95 (reference/mrmah-refD-guardian-{a,b,c,d}.png). Static
+   contracts only; the rendered result is measured by the R95-WORLD block in
+   tools/mrmah3d-verify.mjs. */
+{
+  const envR95 = read('mrmah3d/core/environment.js');
+  const envCode = code('mrmah3d/core/environment.js');
+  const moon = read('mrmah3d/core/moon.js');
+  const figures = read('mrmah3d/core/figures.js');
+  const terrainR95 = read('mrmah3d/core/terrain.js');
+  const lightsR95 = read('mrmah3d/core/lights.js');
+
+  ok('R95-WORLD-moon-module-exists', exists('mrmah3d/core/moon.js'));
+  ok('R95-WORLD-figures-module-exists', exists('mrmah3d/core/figures.js'));
+  ok('R95-WORLD-modules-imported-by-environment',
+    /from '\.\/moon\.js'/.test(envR95) && /from '\.\/figures\.js'/.test(envR95));
+  /* The glass box: a new module may create a canvas to paint a texture, the
+     way environment.js does, and nothing more. */
+  ['moon.js', 'figures.js'].forEach(function (f) {
+    const src = code('mrmah3d/core/' + f);
+    ok('R95-WORLD-no-global-dom-' + f, !/document\.(getElementById|querySelector|body)\b/.test(src) && !/\bwindow\b/.test(src));
+    const specs = (src.match(/from\s+'([^']+)'/g) || []).map(s => s.slice(6, -1));
+    ok('R95-WORLD-imports-stay-inside-' + f, specs.length > 0 && specs.every(s => s.startsWith('./') || s.startsWith('../vendor/')));
+  });
+  ok('R95-WORLD-figures-never-touch-document', !/\bdocument\b/.test(code('mrmah3d/core/figures.js')));
+  /* The moon: one painted disc, normal blending, unfogged, upper left, far. */
+  ok('R95-WORLD-moon-is-one-painted-disc', /function moonTexture/.test(moon) && /createRadialGradient/.test(moon) &&
+    (moon.match(/new PlaneGeometry\(/g) || []).length === 1);
+  /* R95 world (round 5): the disc is fully opaque and its value distribution
+     lives in the texture — at 0.86 under a tint nothing in it could deliver
+     the reference's top band. Unfogged and normally blended is the intent. */
+  ok('R95-WORLD-moon-unfogged-and-not-additive',
+    /map: tex, color: new Color\(0x[0-9a-f]+\), transparent: true, opacity: (0\.\d+|1\.0),\s*depthWrite: false, toneMapped: false, fog: false/.test(moon) &&
+    !/AdditiveBlending/.test(code('mrmah3d/core/moon.js')));
+  ok('R95-WORLD-moon-hangs-far-and-high-on-the-left', /MOON = \{ x: -1\d, y: 4\d, z: -1[2-6]\d, disc: 1\d(\.\d)? \}/.test(moon));
+  ok('R95-WORLD-moon-has-framing-clouds-in-one-geometry', /function moonCloudTexture/.test(moon) &&
+    /MOON_CLOUDS\.forEach/.test(moon) && /moon-clouds/.test(moon) && (moon.match(/new Mesh\(/g) || []).length === 2);
+  ok('R95-WORLD-moon-weights-from-authored-baselines', /var BASE = \{ disc: mat\.opacity, cloud: cloudMat\.opacity \}/.test(moon) &&
+    /BASE\.disc \* weight/.test(moon) && !/BASE\.\w+\s*=\s*0\.\d/.test(code('mrmah3d/core/moon.js')));
+  /* The figures: forge parts, baked vertex colours on an unlit material, one
+     geometry, no edge lines, no fog, a bounded cast. */
+  ok('R95-WORLD-figures-built-from-forge', /import \{ loft, segment \} from '\.\/character\/forge\.js'/.test(figures) &&
+    /loft\(rings, 7/.test(figures) && /segment\(a, b/.test(figures));
+  ok('R95-WORLD-figures-are-baked-vertex-colour', /vertexColors: true/.test(figures) && /MeshBasicMaterial/.test(figures) &&
+    !/MeshStandardMaterial|MeshPhysicalMaterial|MeshLambertMaterial|LineSegments|EdgesGeometry|LineBasicMaterial/.test(figures));
+  ok('R95-WORLD-figures-never-fogged', (figures.match(/fog:\s*false/g) || []).length >= 2 && !/fog:\s*true/.test(figures));
+  ok('R95-WORLD-figures-faces-wound-outward', /if \(n\.dot\(outv\) < 0\)/.test(figures));
+  const cast = (figures.match(/\{ x: -?[\d.]+, z: -[\d.]+, s: 0\.\d+, yaw: -?[\d.]+, body: '\w+', head: '\w+' \}/g) || []);
+  ok('R95-WORLD-figures-cast-is-six-to-nine', cast.length >= 6 && cast.length <= 9, cast.length + ' figures');
+  ok('R95-WORLD-figures-scaled-to-his-height', cast.every(c => { const s = Number(c.match(/s: (0\.\d+)/)[1]); return s >= 0.30 && s <= 0.60; }));
+  ok('R95-WORLD-figures-stand-behind-him', cast.every(c => { const z = Number(c.match(/z: (-[\d.]+)/)[1]); return z <= -16 && z >= -36; }));
+  ok('R95-WORLD-figures-vary-in-body', new Set(cast.map(c => c.match(/body: '(\w+)'/)[1])).size >= 5 &&
+    /obese/.test(figures) && /thin/.test(figures) && /heavy/.test(figures) && /taper/.test(figures));
+  ok('R95-WORLD-figures-vary-in-head', /round:\s*\{[^}]*sides: 8/.test(figures) && /wide:/.test(figures) && /tall:/.test(figures));
+  ok('R95-WORLD-figures-have-eyes', /figure-eyes/.test(figures) && /AdditiveBlending/.test(figures));
+  ok('R95-WORLD-figures-two-draws', /draws: 2/.test(figures) && (figures.match(/new Mesh\(/g) || []).length === 1 && (figures.match(/new Points\(/g) || []).length === 1);
+  ok('R95-WORLD-figures-feet-dissolve', /footFade/.test(figures) && /Float32BufferAttribute\(acc\.col, 4\)/.test(figures));
+  /* The hover beam: a dedicated core texture on the crossed quads. */
+  ok('R95-WORLD-hover-beam-has-a-core', /function beamTexture/.test(envR95) && /map: beamTex/.test(envR95) &&
+    /new PlaneGeometry\(0\.02[0-9], 1\)/.test(envR95));
+  /* The floor: the beams mirrored through it on a soft smear, tiered. */
+  ok('R95-WORLD-beams-mirrored-into-floor', /function buildBeamMirror/.test(terrainR95) && /beacon-beams-mirror/.test(terrainR95) &&
+    /settings\.worldReflections && opts\.smear/.test(terrainR95) && /function smearTexture/.test(envR95) &&
+    /smearTex = smearTexture\(\)/.test(envR95) && /smear: smearTex\b/.test(envR95) && /owned\.push\(rampTex, worldRadialTex, smearTex\)/.test(envR95));
+  ok('R95-WORLD-beam-mirror-weighted-from-baseline', /beamMirror: beamMirror \? beamMirror\.mat\.opacity : 0/.test(terrainR95) &&
+    /BASE\.beamMirror \* weight/.test(terrainR95));
+  /* The range: darker than the character. The mid tone's diffuse gain and
+     steel catch came down from R94's 0.60 / 0.34. */
+  const midTone = (terrainR95.match(/mid:\s*\{ base: srgb\(\d+, \d+, \d+\), amb: ([\d.]+), kd: ([\d.]+), spec: srgb\([^)]+\), ks: ([\d.]+)/) || []);
+  ok('R95-WORLD-range-tones-came-down', midTone.length === 4 && Number(midTone[1]) <= 0.90 && Number(midTone[2]) <= 0.40 && Number(midTone[3]) <= 0.22,
+    'mid amb/kd/ks ' + midTone.slice(1).join('/'));
+  /* No cast shadow anywhere. */
+  ok('R95-WORLD-key-never-casts', /key\.castShadow = false;/.test(lightsR95) && !/key\.castShadow = !!settings\.shadows/.test(lightsR95));
+  ok('R95-WORLD-no-shadow-catcher', !/ShadowMaterial/.test(envCode) && !/receiveShadow/.test(envCode) && !/name = 'ground'/.test(envCode));
+  /* One writer each, from authored baselines, through applyMode / applyFine. */
+  ok('R95-WORLD-applyMode-drives-moon-and-figures',
+    /moon\.applyWeight\(W\.structures\)/.test(envR95) && /figures\.applyWeight\(W\.structures\)/.test(envR95) &&
+    /moon\.setDetail\(k\)/.test(envR95) && /figures\.setDetail\(k\)/.test(envR95));
+  ok('R95-WORLD-new-parts-disposed-with-environment', /owned\.push\(moon\)/.test(envR95) && /owned\.push\(figures\)/.test(envR95) &&
+    /owned\.forEach\(function \(o\) \{ if \(o && o\.dispose\) o\.dispose\(\); \}\)/.test(moon) &&
+    /owned\.forEach\(function \(o\) \{ if \(o && o\.dispose\) o\.dispose\(\); \}\)/.test(figures));
+  /* The mist in front of the figures is thinned, from the authored table. */
+  ok('R95-WORLD-front-mist-veiled-not-rewritten', /veil: 0\.\d+/.test(envR95) &&
+    /m\.opacity = mistMat\.opacity \* b\.o \* \(b\.veil == null \? 1 : b\.veil\)/.test(envR95));
+  /* Guardian references committed. */
+  ['a', 'b', 'c', 'd'].forEach(function (k) {
+    ok('R95-WORLD-reference-' + k + '-is-committed', exists('reference/mrmah-refD-guardian-' + k + '.png'));
+  });
+}
+/* ---- end R95 world ------------------------------------------------------ */
 
 if (exists('CLAUDE.md')) {
   const md = read('CLAUDE.md');

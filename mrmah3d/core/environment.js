@@ -18,8 +18,17 @@
                         floor giving it back (R94)
      5  the range       three depth layers of faceted gunmetal massifs, near
                         black rock ridges, summit beacons — terrain.js (R94)
+     5b the moon        one large, mostly-white disc high in the upper left,
+                        with the clouds that frame it — moon.js (R95)
+     5c the figures     small distant variant silhouettes on the near ridge,
+                        partly in the mist — figures.js (R95)
      6  motes           slow drifting light, the only other moving thing
      7  haze            linear fog binding it all together
+
+   R95 world: there is NO cast shadow. The guardian references have none — the
+   floor under the tip is lit by the contact flare, and the only thing that
+   grounds him is his own light on the floor. The ShadowMaterial catcher that
+   stood here is gone (one draw fewer) and the key light never casts.
 
    The discipline to protect: the world is QUIET. Mr.Mah is the only bright,
    detailed thing in frame. Every value below is deliberately low. If this file
@@ -35,12 +44,14 @@
    it is now large enough to survive the wide-FOV in-app modes too. */
 
 import {
-  Mesh, PlaneGeometry, ShadowMaterial, Color, Group,
+  Mesh, PlaneGeometry, Color, Group,
   BufferGeometry, Float32BufferAttribute, LineSegments, LineBasicMaterial,
   Points, PointsMaterial, MeshBasicMaterial, AdditiveBlending,
   CanvasTexture, DoubleSide
 } from '../vendor/three/three.module.min.js';
 import { createTerrain } from './terrain.js';
+import { createMoon } from './moon.js';
+import { createFigures } from './figures.js';
 
 export var GRID = {
   size: 110,           /* large: the wide in-app FOVs see much further */
@@ -91,8 +102,14 @@ function radialTexture(size, hardness) {
    centre of the frame, faded to nothing at every edge so the quad never shows
    its seam. Alpha carries the shape; the material supplies the colour. The
    right-hand cloud is this texture mirrored. Deterministic: the world must
-   look identical on every mount, or a screenshot comparison is worthless. */
+   look identical on every mount, or a screenshot comparison is worthless.
+
+   R95 world: the clouds that cross the moon are NOT this texture — a dense
+   variant of it was tried and, being alpha-only with one colour, it was a
+   veil over the disc and speckle beside it. moon.js paints its own, with a
+   dark body and lit tufts. */
 function cloudCornerTexture() {
+  var dens = 1;
   var c = document.createElement('canvas');
   c.width = 256; c.height = 128;
   var g = c.getContext('2d');
@@ -109,7 +126,7 @@ function cloudCornerTexture() {
   var cx = 46, cy = 66;
   for (var i = 0; i < 18; i++) {
     var r = 30 - i * 0.9 + rnd() * 14;
-    var a = (0.34 - i * 0.012) + rnd() * 0.22;
+    var a = Math.min(1, ((0.34 - i * 0.012) + rnd() * 0.22) * dens);
     var grd = g.createRadialGradient(cx, cy, 0, cx, cy, r);
     grd.addColorStop(0, 'rgba(255,255,255,' + a.toFixed(3) + ')');
     grd.addColorStop(0.5, 'rgba(255,255,255,' + (a * 0.42).toFixed(3) + ')');
@@ -125,7 +142,7 @@ function cloudCornerTexture() {
   for (var j = 0; j < 5; j++) {
     var tx = 30 + rnd() * 140, ty = 28 + rnd() * 26, tr = 9 + rnd() * 12;
     var tg = g.createRadialGradient(tx, ty, 0, tx, ty, tr);
-    tg.addColorStop(0, 'rgba(255,255,255,0.28)');
+    tg.addColorStop(0, 'rgba(255,255,255,' + Math.min(1, 0.28 * dens).toFixed(3) + ')');
     tg.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = tg;
     g.fillRect(tx - tr, ty - tr, tr * 2, tr * 2);
@@ -199,6 +216,74 @@ function columnTexture() {
   side.addColorStop(1.00, 'rgba(0,0,0,0)');
   g.fillStyle = side;
   g.fillRect(0, 0, 32, 128);
+  g.globalCompositeOperation = 'source-over';
+  var t = new CanvasTexture(c);
+  t.needsUpdate = true;
+  return t;
+}
+
+/* R95 world — THE WET-FLOOR SMEAR, for the beacons' reflections in
+   terrain.js. A ramp with hard sides drew them as crisp bars standing in the
+   foreground floor. A reflection in a wet surface has no edge anywhere: soft
+   sides, a soft start at the mirrored summit (v=1, the top), a peak just
+   below it and a long dissolve toward the camera (v=0). */
+function smearTexture() {
+  var c = document.createElement('canvas');
+  c.width = 32; c.height = 128;
+  var g = c.getContext('2d');
+  /* Round 5: the peak moved from 0.16 to 0.08 of the length, so each smear
+     is hottest at the mirrored summit and runs from there. */
+  var along = g.createLinearGradient(0, 0, 0, 128);
+  along.addColorStop(0.00, 'rgba(255,255,255,0)');
+  along.addColorStop(0.08, 'rgba(255,255,255,1)');
+  along.addColorStop(0.45, 'rgba(255,255,255,0.50)');
+  along.addColorStop(0.78, 'rgba(255,255,255,0.14)');
+  along.addColorStop(1.00, 'rgba(255,255,255,0)');
+  g.fillStyle = along;
+  g.fillRect(0, 0, 32, 128);
+  g.globalCompositeOperation = 'destination-in';
+  var side = g.createLinearGradient(0, 0, 32, 0);
+  side.addColorStop(0.00, 'rgba(0,0,0,0)');
+  side.addColorStop(0.28, 'rgba(0,0,0,0.55)');
+  side.addColorStop(0.50, 'rgba(0,0,0,1)');
+  side.addColorStop(0.72, 'rgba(0,0,0,0.55)');
+  side.addColorStop(1.00, 'rgba(0,0,0,0)');
+  g.fillStyle = side;
+  g.fillRect(0, 0, 32, 128);
+  g.globalCompositeOperation = 'source-over';
+  var t = new CanvasTexture(c);
+  t.needsUpdate = true;
+  return t;
+}
+
+/* R95 world — THE HOVER BEAM's texture. The emitter used the radial glow
+   stretched over a tall thin quad, which is a soft lozenge: bright in the
+   middle, gone at both ends, and it never read as a beam. A beam has a
+   CORE — full along its whole length, soft only across its width — and it is
+   brightest where it meets the floor, so it reads as an emission arriving at
+   the flare rather than a smudge hanging under the tip. u is across, v is
+   up: v=0 at the floor. */
+function beamTexture() {
+  var c = document.createElement('canvas');
+  c.width = 16; c.height = 64;
+  var g = c.getContext('2d');
+  var along = g.createLinearGradient(0, 64, 0, 0);
+  along.addColorStop(0.00, 'rgba(255,255,255,1)');
+  along.addColorStop(0.18, 'rgba(255,255,255,0.92)');
+  along.addColorStop(0.80, 'rgba(255,255,255,0.78)');
+  along.addColorStop(1.00, 'rgba(255,255,255,0.55)');
+  g.fillStyle = along;
+  g.fillRect(0, 0, 16, 64);
+  g.globalCompositeOperation = 'destination-in';
+  var across = g.createLinearGradient(0, 0, 16, 0);
+  across.addColorStop(0.00, 'rgba(0,0,0,0)');
+  across.addColorStop(0.30, 'rgba(0,0,0,0.45)');
+  across.addColorStop(0.44, 'rgba(0,0,0,1)');
+  across.addColorStop(0.56, 'rgba(0,0,0,1)');
+  across.addColorStop(0.70, 'rgba(0,0,0,0.45)');
+  across.addColorStop(1.00, 'rgba(0,0,0,0)');
+  g.fillStyle = across;
+  g.fillRect(0, 0, 16, 64);
   g.globalCompositeOperation = 'source-over';
   var t = new CanvasTexture(c);
   t.needsUpdate = true;
@@ -326,47 +411,15 @@ export function createEnvironment(options) {
 
   var cyan = new Color(0x35d6ff);
 
-  /* ---- 0. ground: catches his shadow, never lit itself ----------------- */
-  /* Small, and only under him. It exists solely to catch his contact shadow.
-     At floor-size it stretched far outside the key light's shadow camera
-     (which covers only about +/-3 units around the character), and everything
-     beyond that frustum sampled as fully shadowed — painting a hard dark band
-     straight across the middle of the world. A catcher only needs to be as big
-     as the shadow it catches.
-
-     R94 — A POOL, NOT A PROJECTION. At 9 x 9 the catcher took the key light's
-     whole cast of him: a long dark blob running across the floor to his right,
-     which neither luminous reference has. Their floor returns a REFLECTION, and
-     the only darkening is a small contact pool under the tip. So the catcher is
-     now a 2.8-unit plane, offset a little toward where the key throws the tip's
-     shadow, with a radial fade shaded into the ShadowMaterial itself so the
-     pool has no edge: whatever falls inside it is a soft pool, whatever would
-     have fallen outside it does not exist. */
-  var groundMat = new ShadowMaterial({ opacity: settings.shadows ? 0.5 : 0 });
-  groundMat.onBeforeCompile = function (shader) {
-    shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vPool;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvPool = position.xy;');
-    shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vPool;')
-      .replace(
-        /gl_FragColor\s*=\s*vec4\(\s*color,\s*opacity\s*\*\s*\(\s*1\.0\s*-\s*getShadowMask\(\)\s*\)\s*\);/,
-        'float poolFade = 1.0 - smoothstep(0.40, 1.0, length(vPool));\n' +
-        '\tgl_FragColor = vec4( color, opacity * poolFade * ( 1.0 - getShadowMask() ) );');
-  };
-  /* 2.0 units: at his depth in the showcase frame that is about half the frame
-     width for the plane and a third for the visible pool. 2.8 measured as three
-     quarters of the width — a plate, not a pool. */
-  var ground = new Mesh(new PlaneGeometry(2.0, 2.0), groundMat);
-  ground.rotation.x = -Math.PI / 2;
-  /* The key stands at (-4.2, 7.4, 6.2), so the tip's shadow lands a little to
-     +x and -z of it; the pool is centred on where the shadow actually falls. */
-  ground.position.set(0.22, 0, -0.30);
-  ground.receiveShadow = !!settings.shadows;
-  ground.material.depthWrite = false;   /* it must never occlude the grid */
-  ground.name = 'ground';
-  group.add(ground);
-  owned.push(ground.geometry, ground.material);
+  /* ---- 0. ground ------------------------------------------------------- */
+  /* R95 world: THERE IS NO SHADOW CATCHER. A ShadowMaterial pool stood here
+     through R94 (2 x 2 units, radially faded, under the tip), and measured in
+     the showcase frame it was a dark ellipse he appeared to stand in — a
+     bucket. None of the four guardian references has a cast shadow: their
+     floor under the tip is the brightest part of it, lit by the contact flare
+     with a reflected column below. What grounds him is his own light on the
+     floor (section 3), and the key light no longer casts (lights.js). The
+     floor itself stays the void: the grid lines carry the perspective. */
 
   /* ---- 1. floor grid --------------------------------------------------- */
   /* R94 — THE LINES PICK UP HIS LIGHT. In both luminous references the grid is
@@ -559,19 +612,27 @@ export function createEnvironment(options) {
      he rises or the illusion breaks immediately. */
   var laserGroup = new Group();
   laserGroup.name = 'hover-laser';
+  /* R95 world: a BEAM, not a lozenge. The radial glow stretched over the quad
+     faded to nothing at both ends and the emitter was invisible in every
+     capture; beamTexture keeps a full-length core with soft sides and is
+     brightest at the floor. 0.026 units wide — two or three pixels at
+     showcase, one at chat — and a near-white ice blue so it reads as energy
+     against the sapphire tip rather than as more of it. */
+  var beamTex = beamTexture();
   var laserMat = new MeshBasicMaterial({
-    map: glowTex, color: new Color(0xa9ecff), transparent: true, opacity: 0.58,
+    map: beamTex, color: new Color(0xd2f4ff), transparent: true, opacity: 0.92,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: false
   });
   var laserQuads = [];
   [0, Math.PI / 2].forEach(function (rot) {
-    var q = new Mesh(new PlaneGeometry(0.028, 1), laserMat);
+    var q = new Mesh(new PlaneGeometry(0.026, 1), laserMat);
     q.rotation.y = rot;
     laserGroup.add(q);
     laserQuads.push(q);
     owned.push(q.geometry);
   });
+  owned.push(beamTex);
   /* A very small hot core right where it meets the floor, so the beam has a
      root rather than fading out into the grid. */
   var laserCoreMat = new MeshBasicMaterial({
@@ -583,6 +644,9 @@ export function createEnvironment(options) {
   laserCore.position.y = 0.02;
   laserGroup.add(laserCore);
   owned.push(laserCore.geometry, laserCoreMat, laserMat);
+  /* Over the flare and the disc: the beam is the emission, they are its
+     light on the floor. */
+  laserGroup.renderOrder = 2;
   glowGroup.add(laserGroup);
 
   /* THE WET-FLOOR STREAK.
@@ -603,9 +667,16 @@ export function createEnvironment(options) {
      (0x7fe2ff came out as low-saturation grey once the additive stack had its
      way with it); fog is off because at 1-8 units from the camera it was a
      no-op that only muddied the colour. */
+  /* R95 world (round 5): the column under his tip was a whisper against
+     guardian-a's long bright column. x1.5 — through the colour, because an
+     additive blend factor clamps at 1 and 0.90 has only a tenth of headroom
+     in opacity. And the hue moves a step toward the white-blue the
+     reference's column has near the tip: at 0x3aa0ff x 1.35 the column
+     sampled (14,58,114) — luma 53 — because luma is green and that blue has
+     almost none; the blue channel saturates first and the rest is lost. */
   var streakTex = columnTexture();
   var streakMat = new MeshBasicMaterial({
-    map: streakTex, color: new Color(0x3aa0ff), transparent: true, opacity: 0.90,
+    map: streakTex, color: new Color(0x52acff).multiplyScalar(1.4), transparent: true, opacity: 1.0,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: false
   });
   /* R90: longer and wider, but only to here.
@@ -623,7 +694,12 @@ export function createEnvironment(options) {
      which costs no area. */
   /* R94: narrower and brighter — a reflected COLUMN, the mirror of the beam
      above the tip, not a wash. 0.55 wide costs the convergence rows nothing. */
-  var streak = new Mesh(new PlaneGeometry(0.7, 3.0), streakMat);
+  /* R95 world (round 5): 3.0 -> 5.0 long. The frame's bottom row meets the
+     floor about 6.5 units in front of the origin at showcase, and a column
+     that dissolves by 3 is a puddle under him where guardian-a's runs the
+     whole floor. The width stays 0.7 — that is what the convergence rows
+     have accepted; length only stretches the texture's dissolve. */
+  var streak = new Mesh(new PlaneGeometry(0.7, 5.0), streakMat);
   streak.rotation.x = -Math.PI / 2;
   /* The texture's opaque end is at v=0. Rotating -90 degrees about X alone
      puts v=0 at the NEAR edge — the previous comment here had it backwards,
@@ -633,7 +709,7 @@ export function createEnvironment(options) {
      the tail runs toward the viewer. 3.0 long, because only the first unit or
      so is in frame at showcase and the fade has to happen inside it. */
   streak.rotation.z = Math.PI;
-  streak.position.set(0, 0.016, 1.5);
+  streak.position.set(0, 0.016, 2.5);
   glowGroup.add(streak);
   owned.push(streak.geometry, streakMat, streakTex);
 
@@ -786,8 +862,13 @@ export function createEnvironment(options) {
      lying over a lit peak face and a rear tuft went to 255 in a blob the size
      of the peak's base: the one white patch in the frame. Blended, the same
      tuft veils the face toward the mist colour and can never exceed it. */
+  /* R95 world: 0.95 -> 0.90, with the front row veiled to 0.70 of that (see
+     the table). Measured over rows 0.56-0.64 of the showcase frame the mist
+     averaged 83 luma against guardian-a's 72 over the same rows, and at that
+     value it was the brightest large area in the frame after him — the
+     mountains were being read against a wall of it. */
   var mistMat = new MeshBasicMaterial({
-    map: mistTex, color: new Color(0xc2dcf2), transparent: true, opacity: 0.95,
+    map: mistTex, color: new Color(0xc2dcf2), transparent: true, opacity: 0.90,
     depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: false
   });
@@ -811,12 +892,16 @@ export function createEnvironment(options) {
     { x: -6.5, z: -33.5, w: 15, h: 3.4, y: 0.4, o: 1.0, flip: false },
     { x: 7.5, z: -33, w: 15, h: 3.3, y: 0.4, o: 0.95, flip: true },
     { x: 22, z: -33.5, w: 16, h: 3.5, y: 0.4, o: 0.8, flip: false },
-    { x: -13, z: -19.5, w: 15, h: 2.6, y: 0.04, o: 0.85, flip: false },
-    { x: -1, z: -20, w: 15, h: 2.6, y: 0.04, o: 0.90, flip: true },
-    { x: 11, z: -19.5, w: 15, h: 2.6, y: 0.04, o: 0.85, flip: false }
+    /* R95 world: `veil` thins the front row. The distant figures stand at its
+       near edge, and at full strength its tufts in front of their legs were a
+       215-luma wash that no body tone could get under. The rocks still sit in
+       it; the figures now silhouette against it. */
+    { x: -13, z: -19.5, w: 15, h: 2.6, y: 0.04, o: 0.85, flip: false, veil: 0.70 },
+    { x: -1, z: -20, w: 15, h: 2.6, y: 0.04, o: 0.90, flip: true, veil: 0.70 },
+    { x: 11, z: -19.5, w: 15, h: 2.6, y: 0.04, o: 0.85, flip: false, veil: 0.70 }
   ].forEach(function (b) {
     var m = mistMat.clone();
-    m.opacity = mistMat.opacity * b.o;
+    m.opacity = mistMat.opacity * b.o * (b.veil == null ? 1 : b.veil);
     var q = new Mesh(new PlaneGeometry(b.w, b.h), m);
     q.position.set(b.x, b.y + b.h / 2, b.z);
     if (b.flip) q.scale.x = -1;
@@ -838,7 +923,7 @@ export function createEnvironment(options) {
      bright layer over a large area reports its full colour and lifted the
      frame's mean by 9 points on its own. */
   var mistReflMat = new MeshBasicMaterial({
-    map: mistReflTex, color: new Color(0x7f96b0), transparent: true, opacity: 0.72,
+    map: mistReflTex, color: new Color(0x7f96b0), transparent: true, opacity: 0.64,
     depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: false
   });
@@ -879,8 +964,14 @@ export function createEnvironment(options) {
      for the mid range mirrored into the wet floor. It replaces twelve fogged cones with twelve
      edge outlines that cost twenty-four draws and rendered as two black
      triangles, and five light pillars that were never in frame. */
+  /* R95 world: the textures handed to terrain (and the figures' eyes) are
+     owned HERE, so dispose() releases them — envBox.dispose() detaches the
+     group before the stage's traversal runs, so nothing else would. */
+  var rampTex = rampTexture(), worldRadialTex = radialTexture(32, 0.15), smearTex = smearTexture();
+  owned.push(rampTex, worldRadialTex, smearTex);
   var terrain = createTerrain({
-    tier: tier, settings: settings, ramp: rampTexture(), radial: radialTexture(32, 0.15)
+    tier: tier, settings: settings, ramp: rampTex, radial: worldRadialTex,
+    smear: smearTex
   });
   var structures = terrain.group;
   var beacons = terrain.beacons;
@@ -888,26 +979,54 @@ export function createEnvironment(options) {
   group.add(beacons);
   owned.push(terrain);
 
-  /* ---- 5c. stars -------------------------------------------------------- */
+  /* ---- 5b. the moon ------------------------------------------------------ */
+  /* R95 world: see moon.js. One disc, painted; three framing clouds in one
+     geometry from the dense variant of the corner-cloud texture. Two draws. */
+  var moon = createMoon();
+  group.add(moon.group);
+  owned.push(moon);
+
+  /* ---- 5c. the distant figures ------------------------------------------ */
+  /* R95 world: see figures.js. Eight variant silhouettes on the near ridge,
+     one geometry for the bodies and one Points for the eyes. Two draws. */
+  var figures = createFigures({ radial: worldRadialTex });
+  group.add(figures.group);
+  owned.push(figures);
+
+  /* ---- 5d. stars -------------------------------------------------------- */
   /* Sparse, dim, and high. They cost one draw call and they are what tells the
      eye the dark above the horizon is SKY rather than an empty backdrop — the
      cheapest depth cue in the whole scene. */
-  var starCount = tier === 'low' ? 40 : 90;
+  /* R95 world: 90 -> 110 and 0.16 -> 0.21 units. At 0.16 a star at 60 units
+     was a single pixel on the showcase frame and most of them did not survive
+     the composite; the references' sky is sparse but its stars are there. */
+  /* Review (R95 world, round 5): the shell sat at z -40..-85, IN FRONT of the
+     moon at z -140, and stars drew on the disc in every mode. Nothing
+     pierces the moon in the references; the stars are behind it. So the
+     shell now hangs at z -145..-180 — behind the disc, inside the camera's
+     200 far plane — with its spread and its point size scaled by the same
+     2.6x the distance grew, so the angular field, the on-screen dot size and
+     the density are unchanged; and it draws BEFORE the disc (renderOrder
+     -41 against the disc's -40), so the opaque disc paints over any star
+     behind it and the glow veils, rather than adds to, the ones in its
+     fringe. Order does the occluding: nothing here writes depth. */
+  var starCount = tier === 'low' ? 50 : 110;
   var starPos = [];
   var sseed = 7771;
   function srnd() { sseed = (sseed * 1103515245 + 12345) & 0x7fffffff; return sseed / 0x7fffffff; }
   for (var si = 0; si < starCount; si++) {
-    starPos.push((srnd() - 0.5) * 150, 9 + srnd() * 34, -40 - srnd() * 45);
+    starPos.push((srnd() - 0.5) * 390, 23 + srnd() * 89, -145 - srnd() * 35);
   }
   var starGeo = new BufferGeometry();
   starGeo.setAttribute('position', new Float32BufferAttribute(starPos, 3));
   var starMat = new PointsMaterial({
-    color: new Color(0xbfe8ff), size: 0.16, sizeAttenuation: true,
-    transparent: true, opacity: 0.55, depthWrite: false, toneMapped: false,
+    color: new Color(0xbfe8ff), size: 0.55, sizeAttenuation: true,
+    transparent: true, opacity: 0.62, depthWrite: false, toneMapped: false,
     blending: AdditiveBlending, fog: false
   });
   var stars = new Points(starGeo, starMat);
   stars.name = 'stars';
+  stars.renderOrder = -41;
   group.add(stars);
   owned.push(starGeo, starMat);
 
@@ -994,6 +1113,7 @@ export function createEnvironment(options) {
     });
 
     terrain.update(dt);
+    moon.update(dt);
   }
 
   /* Called by the scene each frame with the character's live world position,
@@ -1021,6 +1141,11 @@ export function createEnvironment(options) {
     starMat.opacity = BASE.star * W.structures * (0.45 + 0.55 * k);
     nodeMat.opacity = BASE.nodes * W.nodes * (0.5 + 0.5 * k);
     terrain.setDetail(k);
+    /* R95 world: the moon dims toward a third at app scale (present, never
+       competing with the DOM UI in front of it); the figures' eyes are
+       sub-pixel there and pull back with the other fine particles. */
+    moon.setDetail(k);
+    figures.setDetail(k);
   }
 
   function applyMode(w) {
@@ -1044,6 +1169,10 @@ export function createEnvironment(options) {
        in pieces. terrain.applyWeight reads its own authored baselines. */
     terrain.applyWeight(W.structures);
     stars.visible = W.structures > 0.05;
+    /* R95 world: the moon and the figures are the same "distant world" tier
+       and follow the structures weight, each from its own authored baseline. */
+    moon.applyWeight(W.structures);
+    figures.applyWeight(W.structures);
     /* The presence field follows the glow weight, so a mode that wants a quiet
        character gets a quiet field with him. */
     auraCards.forEach(function (a) { a.mesh.visible = W.glow > 0.05; });
@@ -1067,7 +1196,7 @@ export function createEnvironment(options) {
   }
 
   return {
-    group: group, ground: ground, grid: grid, nodes: nodes,
+    group: group, grid: grid, nodes: nodes,
     glow: glowGroup, structures: structures, motes: motes, horizon: horizon,
     update: update, followCharacter: followCharacter, applyMode: applyMode,
     setHorizon: setHorizon, setLaser: setLaser, clouds: clouds,
@@ -1075,6 +1204,11 @@ export function createEnvironment(options) {
        the summit beacons — so the harness's isolation lists keep working. */
     pillars: beacons, beacons: beacons, stars: stars, mist: mist,
     terrain: terrain,
+    /* R95 world. `ground` (the shadow catcher) is gone: there is no cast
+       shadow. The moon, the figures and the hover beam are exposed so the
+       harness can isolate and measure each. */
+    moon: moon.group, moonBox: moon, figures: figures.group, figuresBox: figures,
+    laser: laserGroup,
     /* Scale-aware world detail. At chat and protocol size the fine particles
        are sub-pixel noise competing with the character for the little contrast
        the frame has; the large layers — grid, horizon, mist, structures — are

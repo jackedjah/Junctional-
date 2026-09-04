@@ -381,12 +381,13 @@ for (const v of VIEWPORTS) {
          horizon glow land in exactly that range — with the world visible it
          reported "shadows" on a tier that has them switched off. */
       s.parts.stage.world.visible = false;
-      /* ...but keep the shadow catcher, which lives in the world group and is
-         the only surface his shadow can fall on. Hiding it too reports zero
-         shadow on every tier. */
-      s.parts.environment.ground.visible = true;
+      /* R95 world: there is no shadow catcher any more (the guardian
+         references have no cast shadow), so `ground` is absent; the count
+         below must now come out at ZERO on every tier. The guard keeps this
+         block honest either way. */
+      if (s.parts.environment.ground) s.parts.environment.ground.visible = true;
       s.parts.environment.group.visible = true;
-      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon', 'clouds', 'pillars', 'stars', 'mist'].forEach(function (k) {
+      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon', 'clouds', 'pillars', 'stars', 'mist', 'moon', 'figures'].forEach(function (k) {
         if (s.parts.environment[k]) s.parts.environment[k].visible = false;
       });
       s.parts.stage.world.visible = true;
@@ -401,13 +402,16 @@ for (const v of VIEWPORTS) {
         if (a > 20 && a < 160 && (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) < 14) shadowPx++;
       }
       const info = s.info();
-      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon', 'clouds', 'pillars', 'stars', 'mist'].forEach(function (k) {
+      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon', 'clouds', 'pillars', 'stars', 'mist', 'moon', 'figures'].forEach(function (k) {
         if (s.parts.environment[k]) s.parts.environment[k].visible = true;
       });
       out.push({
         tier: info.tier, dpr: info.pixelRatio,
         shadows: s.renderer.shadowMap.enabled,
         shadowMap: s.parts.lights.key.shadow.mapSize.width,
+        castShadow: s.parts.lights.key.castShadow,
+        shadowMapAllocated: !!s.parts.lights.key.shadow.map,
+        catcher: !!s.parts.environment.ground,
         shadowPx
       });
     }
@@ -419,10 +423,17 @@ for (const v of VIEWPORTS) {
   check('TIER-02 low tier caps at DPR 1', low.dpr === 1);
   check('TIER-03 high tier never exceeds DPR 2', high.dpr <= 2);
   check('TIER-04 shadows disabled on low tier', low.shadows === false && low.shadowPx === 0);
-  check('TIER-05 shadows render above low tier', med.shadows && med.shadowPx > 200 && high.shadowPx > 200,
-    `medium ${med.shadowPx}px, high ${high.shadowPx}px of cast shadow`);
-  check('TIER-06 shadow map size scales with tier', high.shadowMap > med.shadowMap,
-    `${med.shadowMap} -> ${high.shadowMap}`);
+  /* R95 world: TIER-05 and TIER-06 asserted a cast shadow above the low tier
+     and a shadow map that grew with it. None of the four guardian references
+     has a cast shadow — the floor under the tip is lit by the contact flare —
+     so the key no longer casts on ANY tier, the catcher is gone, and no shadow
+     map is ever allocated. The two checks now hold that. */
+  check('TIER-05 no cast shadow on any tier (R95 world: the references have none)',
+    tiers.every(t => t.castShadow === false && t.catcher === false && t.shadowPx === 0),
+    `cast shadow px low ${low.shadowPx} / medium ${med.shadowPx} / high ${high.shadowPx}`);
+  check('TIER-06 no shadow map allocated on any tier (R95 world)',
+    tiers.every(t => t.shadowMapAllocated === false),
+    tiers.map(t => `${t.tier} ${t.shadowMapAllocated ? 'allocated' : 'none'}`).join(', '));
   /* ---- R95 tier parity ---------------------------------------------------
      The low tier draws straight to the canvas; the others draw into bloom's
      target and composite. three applies tone mapping and the output encoding
@@ -470,8 +481,7 @@ for (const v of VIEWPORTS) {
   });
 
   /* This container reports a low-core device, so every other capture in this
-     run is tier 'low' and therefore shadowless. Capture the high tier too, or
-     the delivered evidence never shows a contact shadow. */
+     run is tier 'low'. Capture the high tier too: it is the delivered look. */
   writeFileSync(join(OUT, 'stage-tier-high.png'), await page.locator('.lab-stage').screenshot());
   await ctx.close();
 }
@@ -725,9 +735,14 @@ for (const v of VIEWPORTS) {
     /* Full scene at the high tier: the budget. */
     r.render(s.scene, cam);
     const budget = { calls: r.info.render.calls, tris: r.info.render.triangles };
-    /* Environment only. */
+    /* Environment only. R95 world: the moon (brief §11, guardian-a) hangs in
+       the upper LEFT corner this block reads as sky, so it is hidden for this
+       read only — the check is about the SKY staying near-black, and the sky
+       beside the moon still has to. The R95 block measures the moon itself. */
     s.parts.stage.subject.visible = false;
+    if (env.moon) env.moon.visible = false;
     const d = grab();
+    if (env.moon) env.moon.visible = true;
     const band = region(d, 0.1, 0.9, 0.44, 0.62);       /* the range */
     const above = region(d, 0.0, 1.0, 0.30, 0.44);      /* where only beams and cloud can be */
     const mist = region(d, 0.0, 1.0, 0.56, 0.64);       /* the mist at the bases */
@@ -790,9 +805,11 @@ for (const v of VIEWPORTS) {
   check('R94-WORLD-06 the sky stays near-black (references: upper corners 100% under 32)',
     world.skyL.mean < 30 && world.skyR.mean < 30,
     `corners ${world.skyL.mean.toFixed(1)} / ${world.skyR.mean.toFixed(1)}`);
-  check('R94-WORLD-07 cast shadow is a pool under the tip, not a projection',
-    world.shadow.px > 200 && world.shadow.wFrac < 0.40 && world.shadow.hFrac < 0.14,
-    `${world.shadow.px} px, ${(world.shadow.wFrac * 100).toFixed(0)}% of width x ${(world.shadow.hFrac * 100).toFixed(0)}% of height`);
+  /* R95 world: amended from "a pool under the tip" to "no cast shadow at
+     all" — the guardian references have none, the catcher is gone and the
+     key never casts. The measurement is unchanged; its expected value is 0. */
+  check('R95 world / R94-WORLD-07 no cast shadow on the floor (the references have none)',
+    world.shadow.px === 0, `${world.shadow.px} px of cast shadow`);
   check('R94-WORLD-08 floor still converges with the world in place',
     world.partialRows > 200, `${world.partialRows} rows carry converging content`);
   check('R94-WORLD-09 sparkle specks were placed on the slopes', world.sparkles > 200, `${world.sparkles} specks`);
@@ -888,6 +905,180 @@ for (const v of VIEWPORTS) {
   await ctx.close();
 }
 /* ---------------------------------------- end R94 world ------------------ */
+
+/* ---------------------------------------- 11. R95 world ------------------ */
+/* The moon, the distant variant figures, the hover beam, the beams' floor
+   reflections and the darker range built for R95, measured at the high tier
+   in the frames they have to hold: showcase and website at the 700px stage,
+   chat and protocol at the 620px stage. Each check is STRUCTURAL: is the
+   moon a textured disc in the upper left, above the horizon rows; do the
+   figures ever touch him, in any mode; is the range darker than his chest;
+   is there a beam between the tip and the floor; is there no cast shadow;
+   does the floor still converge; does the budget hold. Every mask here comes
+   from an ISOLATED render — the character alone, the figures alone, the moon
+   alone, the beam alone — so a check about one thing never measures another. */
+{
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  const errs = [];
+  page.on('pageerror', e => errs.push(String(e)));
+  await page.goto(`${URL_LAB}?tier=high`, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__MRMAH_LAB && window.__MRMAH_LAB.mounted, { timeout: 20000 });
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.setReducedMotion(true); });
+
+  const measure = (mode, stage) => page.evaluate(async ({ mode, stage }) => {
+    const s = window.__MRMAH_LAB.scene;
+    s.setMode(mode);
+    document.querySelector('.lab-stage').style.height = stage + 'px';
+    await new Promise(r => setTimeout(r, 300));
+    s.resize();
+    const env = s.parts.environment, c = s.canvas, r = s.renderer, cam = s.camera;
+    const g = document.createElement('canvas'); g.width = c.width; g.height = c.height;
+    const x = g.getContext('2d', { willReadFrequently: true });
+    const luma = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+    /* Masks are cut from RAW frames (alpha is the object); values that are
+       compared to the references are read COMPOSITED over the stage's ink,
+       because getImageData returns unpremultiplied colour and a 3%-alpha
+       corner cloud otherwise reports its full RGB as sky. */
+    function grab(ink) { r.render(s.scene, cam); x.clearRect(0, 0, c.width, c.height); if (ink) { x.fillStyle = 'rgb(14,17,20)'; x.fillRect(0, 0, c.width, c.height); } x.drawImage(c, 0, 0); return x.getImageData(0, 0, c.width, c.height).data; }
+    function mask(d, thr) { const m = new Uint8Array(c.width * c.height); let n = 0; for (let i = 0; i < m.length; i++) { const k = i * 4; if (d[k + 3] > 40 && luma(d, k) > thr) { m[i] = 1; n++; } } return { m, n }; }
+    function bbox(mk) { let x0 = 1e9, x1 = -1, y0 = 1e9, y1 = -1; for (let i = 0; i < mk.length; i++) if (mk[i]) { const xx = i % c.width, yy = (i / c.width) | 0; if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (yy < y0) y0 = yy; if (yy > y1) y1 = yy; } return x1 < 0 ? null : [x0 / c.width, y0 / c.height, x1 / c.width, y1 / c.height]; }
+    function stats(d, mk, x0, y0, x1, y1) {
+      let n = 0, sum = 0, tail = 0; const bands = new Array(8).fill(0);
+      for (let yy = Math.floor((y0 || 0) * c.height); yy < Math.floor((y1 == null ? 1 : y1) * c.height); yy++)
+        for (let xx = Math.floor((x0 || 0) * c.width); xx < Math.floor((x1 == null ? 1 : x1) * c.width); xx++) {
+          const i = yy * c.width + xx; if (mk && !mk[i]) continue;
+          const l = luma(d, i * 4); n++; sum += l; if (l > 128) tail++; bands[Math.min(7, l >> 5)]++;
+        }
+      return { n, mean: n ? sum / n : 0, tail: n ? tail / n : 0, bands: n ? bands.filter(v => v / n > 0.03).length : 0 };
+    }
+    const vis = []; env.group.traverse(o => vis.push([o, o.visible]));
+    /* The full frame first: budget, DEPTH-01's measure, the sky beside the moon. */
+    const full = grab();
+    const budget = { calls: r.info.render.calls, tris: r.info.render.triangles };
+    let partialRows = 0;
+    for (let yy = 0; yy < c.height; yy++) { let n = 0; for (let xx = 0; xx < c.width; xx++) { const i = (yy * c.width + xx) * 4; if (full[i + 3] > 4 && luma(full, i) > 10) n++; } if (n > 0 && n <= c.width * 0.8) partialRows++; }
+    const fullInk = grab(true);
+    const skyR = stats(fullInk, null, 0.7, 0.02, 1.0, 0.30);
+    /* A: the character alone. */
+    env.group.visible = false;
+    const dA = grab(); const A = mask(dA, 24); const charBox = bbox(A.m);
+    let chest = null;
+    if (charBox) {
+      const w = charBox[2] - charBox[0], h = charBox[3] - charBox[1];
+      chest = stats(dA, A.m, charBox[0] + 0.34 * w, charBox[1] + 0.27 * h, charBox[0] + 0.66 * w, charBox[1] + 0.45 * h);
+    }
+    let charP99 = 0; { const ls = []; for (let i = 0; i < A.m.length; i++) if (A.m[i]) ls.push(luma(dA, i * 4)); ls.sort((a, b) => a - b); charP99 = ls.length ? ls[Math.floor(ls.length * 0.99)] : 0; }
+    /* B: the figures alone. */
+    env.group.visible = true; s.parts.stage.subject.visible = false;
+    env.group.children.forEach(k => { k.visible = (k === env.figures); });
+    const B = mask(grab(), 10);
+    let overlap = 0; for (let i = 0; i < A.m.length; i++) if (A.m[i] && B.m[i]) overlap++;
+    const figuresInFrame = stats(fullInk, B.m);         /* their pixels, in the delivered frame */
+    /* M: the moon alone. R95 world (round 5): read OVER THE INK like every
+       other value compared to a reference — the raw read is unpremultiplied,
+       so a disc at any opacity reported its texel x tint (255 for a white
+       limb) rather than what the frame shows, and the moon's max and the
+       character's p99 were never on the same scale. */
+    env.group.children.forEach(k => { k.visible = (k === env.moon); });
+    const dM = grab(true); const M = mask(dM, 60);       /* the disc, not its glow */
+    const moon = stats(dM, M.m); moon.box = bbox(M.m);
+    let moonMax = 0; for (let i = 0; i < M.m.length; i++) if (M.m[i]) moonMax = Math.max(moonMax, luma(dM, i * 4));
+    /* R: the range alone (structures, no mist, no figures), over its rows. */
+    env.group.children.forEach(k => { k.visible = (k === env.structures); });
+    const dR = grab(); const R = mask(dR, 6);
+    const range = stats(dR, R.m, 0.0, 0.40, 1.0, 0.66);
+    /* L: the beam alone. */
+    env.group.children.forEach(k => { k.visible = (k === env.glow); });
+    env.glow.children.forEach(k => { k.visible = (k === env.laser); });
+    const L = mask(grab(), 30); const beamBox = bbox(L.m);
+    vis.forEach(([o, v]) => { o.visible = v; });
+    s.parts.stage.subject.visible = true;
+    r.render(s.scene, cam);
+    return {
+      budget, partialRows, skyR: skyR.mean, charBox, chest, charP99,
+      figures: { n: B.n, overlap, box: bbox(B.m), inFrame: figuresInFrame, stats: env.figuresBox.stats },
+      moon: { n: M.n, mean: moon.mean, max: moonMax, bands: moon.bands, box: moon.box },
+      range, beam: { n: L.n, box: beamBox },
+      noShadow: s.parts.lights.key.castShadow === false && !env.ground && !s.parts.lights.key.shadow.map,
+      beamMirror: !!(env.terrain.beamMirror && env.terrain.beamMirror.mesh.visible)
+    };
+  }, { mode, stage });
+
+  const sc = await measure('showcase', 700);
+  const web = await measure('website', 700);
+  const chat = await measure('chat', 620);
+  const proto = await measure('protocol', 620);
+  const all = { showcase: sc, website: web, chat, protocol: proto };
+
+  check('R95-WORLD-01 frame budget at tier high (draws <= 170, tris <= 12500)',
+    sc.budget.calls <= 170 && sc.budget.tris <= 12500, `${sc.budget.calls} draws, ${sc.budget.tris} tris`);
+  check('R95-WORLD-02 the moon is a textured disc in the upper left, above the horizon rows',
+    sc.moon.n > 2000 && sc.moon.box && sc.moon.box[0] < 0.35 && sc.moon.box[3] < 0.40 && sc.moon.bands >= 3 &&
+    sc.moon.mean > 100 && sc.moon.mean < 200 && sc.moon.max < 250,
+    `${sc.moon.n} px at [${(sc.moon.box || []).map(v => v.toFixed(2)).join(', ')}], mean ${sc.moon.mean.toFixed(0)}, max ${sc.moon.max.toFixed(0)}, ${sc.moon.bands} bands`);
+  check('R95-WORLD-03 the character stays the brightest thing (his 99th percentile above the moon\'s brightest)',
+    sc.charP99 > sc.moon.max, `character p99 ${sc.charP99.toFixed(0)} vs moon max ${sc.moon.max.toFixed(0)}`);
+  check('R95-WORLD-04 the moon is present in every mode',
+    Object.values(all).every(m => m.moon.n > 300), Object.keys(all).map(k => `${k} ${all[k].moon.n}px`).join(', '));
+  check('R95-WORLD-05 six to nine figures, at most four draws, under 1,600 triangles',
+    sc.figures.stats.count >= 6 && sc.figures.stats.count <= 9 && sc.figures.stats.draws <= 4 && sc.figures.stats.tris <= 1600,
+    `${sc.figures.stats.count} figures, ${sc.figures.stats.draws} draws, ${sc.figures.stats.tris} tris`);
+  check('R95-WORLD-06 the figures never overlap him (showcase, website, chat, protocol)',
+    sc.figures.n > 500 && Object.values(all).every(m => m.figures.overlap === 0),
+    Object.keys(all).map(k => `${k} ${all[k].figures.overlap}px of ${all[k].figures.n}`).join(', '));
+  check('R95-WORLD-07 the figures are dim silhouettes in the delivered frame (mean 25-75 over their own pixels)',
+    sc.figures.inFrame.mean > 25 && sc.figures.inFrame.mean < 75 && sc.figures.inFrame.tail < 0.05,
+    `mean ${sc.figures.inFrame.mean.toFixed(1)}, ${(sc.figures.inFrame.tail * 100).toFixed(1)}% above 128`);
+  check('R95-WORLD-08 the range is darker than his chest, with a small bright tail',
+    sc.chest && sc.range.n > 1000 && sc.range.mean < sc.chest.mean * 0.9 && sc.range.tail < 0.03,
+    `range ${sc.range.mean.toFixed(1)} (${(sc.range.tail * 100).toFixed(1)}% above 128) vs chest ${sc.chest ? sc.chest.mean.toFixed(1) : '?'}`);
+  check('R95-WORLD-09 a thin beam stands between the tip and the floor flare',
+    sc.beam.n > 20 && sc.beam.box && (sc.beam.box[2] - sc.beam.box[0]) < 0.08 && (sc.beam.box[3] - sc.beam.box[1]) > 0.015 &&
+    sc.charBox && Math.abs(sc.beam.box[1] - sc.charBox[3]) < 0.05,
+    `${sc.beam.n} px, ${sc.beam.box ? `${((sc.beam.box[2] - sc.beam.box[0]) * 100).toFixed(1)}% wide x ${((sc.beam.box[3] - sc.beam.box[1]) * 100).toFixed(1)}% tall, top at ${sc.beam.box[1].toFixed(3)} vs tip ${sc.charBox[3].toFixed(3)}` : 'none'}`);
+  check('R95-WORLD-10 no cast shadow: the key never casts, no catcher, no shadow map', sc.noShadow);
+  check('R95-WORLD-11 the beams are mirrored into the wet floor at the high tier', sc.beamMirror);
+  check('R95-WORLD-12 the floor still converges with the moon and the figures in place',
+    sc.partialRows > 200, `${sc.partialRows} rows carry converging content`);
+  check('R95-WORLD-13 the sky beside the moon stays near-black (right corner < 30)',
+    sc.skyR < 30, `right corner ${sc.skyR.toFixed(1)}`);
+  check('R95-WORLD-14 no errors building the world', errs.length === 0, errs.slice(0, 3).join(' | '));
+
+  /* The delivered evidence. */
+  const shot = async (name) => writeFileSync(join(OUT, `r95-world-${name}.png`), await page.locator('.lab-stage').screenshot());
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.setMode('showcase'); document.querySelector('.lab-stage').style.height = '700px'; });
+  await page.waitForTimeout(400);
+  await shot('showcase');
+  const box = await page.locator('.lab-stage').boundingBox();
+  const clip = (x0, y0, x1, y1) => ({ x: box.x + box.width * x0, y: box.y + box.height * y0, width: box.width * (x1 - x0), height: box.height * (y1 - y0) });
+  writeFileSync(join(OUT, 'r95-world-moon.png'), await page.screenshot({ clip: clip(0.0, 0.02, 0.55, 0.30) }));
+  writeFileSync(join(OUT, 'r95-world-figures.png'), await page.screenshot({ clip: clip(0.0, 0.54, 1.0, 0.70) }));
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.stage.subject.visible = false; });
+  await page.waitForTimeout(200);
+  await shot('showcase-nochar');
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.stage.subject.visible = true; window.__MRMAH_LAB.scene.parts.character.setYaw(0.62); });
+  await page.waitForTimeout(200);
+  await shot('threequarter');
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.character.setYaw(0); document.querySelector('.lab-stage').style.height = '620px'; });
+  for (const name of ['chat', 'protocol']) {
+    await page.evaluate(n => window.__MRMAH_LAB.scene.setMode(n), name);
+    await page.waitForTimeout(400);
+    await shot(name);
+  }
+  await ctx.close();
+
+  /* Website, in the canonical aspect. */
+  const ctx2 = await browser.newContext({ viewport: { width: 600, height: 1100 }, deviceScaleFactor: 2 });
+  const page2 = await ctx2.newPage();
+  await page2.goto(`${URL_LAB}?tier=high&canonical=1`, { waitUntil: 'networkidle' });
+  await page2.waitForFunction(() => window.__MRMAH_LAB && window.__MRMAH_LAB.mounted, { timeout: 20000 });
+  await page2.evaluate(() => { window.__MRMAH_LAB.scene.setReducedMotion(true); window.__MRMAH_LAB.scene.setMode('website'); });
+  await page2.waitForTimeout(600);
+  writeFileSync(join(OUT, 'r95-world-website.png'), await page2.locator('.lab-stage').screenshot());
+  await ctx2.close();
+}
+/* ---------------------------------------- end R95 world ------------------ */
 
 await browser.close();
 

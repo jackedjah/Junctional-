@@ -33,7 +33,7 @@ export function createLights(options) {
      explicitly is not. The cyan belongs to the edges and the rim. */
   var key = new DirectionalLight(new Color(0xd8ecff), 5.5);
   key.position.set(-4.2, 7.4, 6.2);
-  key.castShadow = !!settings.shadows;
+  key.castShadow = false;
   if (key.castShadow) {
     var s = settings.shadowMapSize || 512;
     key.shadow.mapSize.set(s, s);
