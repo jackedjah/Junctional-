@@ -60,9 +60,19 @@ var VIEW = new Vector3(0.0, 0.14, 1.0).normalize();
    mean 72 with NOTHING under 32 — a pale cut-out lighter than the mist behind
    it. The references' figures are darker than the mist, read as silhouettes
    with a blue edge, so the base is half that and the rim does the drawing. */
+/* Review (R95 world, round 5): the cast measured as dim silhouettes (33)
+   but read as flat grey mannequins — the rim term pow(1 - n.V, 3) x 0.42
+   only fired on the 7-sided loft's side faces, so almost no outline showed,
+   the heads were as dark as the bodies, and the eyes were one faint pixel.
+   Every reference figure carries a BLUE rim along its whole outline and a
+   LIT blue diamond head with two visible eyes: bodies dark, edges light.
+   So the body rim is stronger with a gentler exponent, and the head takes a
+   rim FLOOR — a share of the rim colour on every face regardless of its
+   normal — so the diamond reads lit. The base does not move: R95-WORLD-07
+   wants the delivered mean in 25-75. */
 var TONE = {
   base: land(30, 35, 46), amb: 0.55, kd: 0.36, jitter: 0.30,
-  rim: land(96, 170, 230), rimK: 0.42,
+  rim: land(96, 170, 230), rimK: 0.70, rimPow: 2, headRimFloor: 0.30,
   mist: land(124, 148, 176), depth: 0.10,
   footFade: 0.24            /* of the figure's height: alpha 0 at the floor */
 };
@@ -171,7 +181,8 @@ function prng(seed) {
 /* Take a forge geometry's positions, place them in the world (yaw about the
    figure's own axis, then translate), wind every face outward from `centre`
    and CHECK it, shade it, and append to the flat arrays. */
-function bake(geometry, place, centre, h, acc, rnd) {
+function bake(geometry, place, centre, h, acc, rnd, rimFloor) {
+  var floor = rimFloor || 0;
   var p = geometry.attributes.position.array;
   var cosY = Math.cos(place.yaw), sinY = Math.sin(place.yaw);
   function world(i) {
@@ -199,7 +210,7 @@ function bake(geometry, place, centre, h, acc, rnd) {
     var jit = 1 + (rnd() - 0.5) * TONE.jitter;
     /* The silhouette lift: faces that graze the view direction take a little
        blue, which is the rim the references' figures carry against the mist. */
-    var rim = Math.pow(1 - Math.max(0, n.dot(VIEW)), 3) * TONE.rimK;
+    var rim = Math.pow(1 - Math.max(0, n.dot(VIEW)), TONE.rimPow) * TONE.rimK + floor;
     var r = TONE.base.r * lit * jit + TONE.rim.r * rim;
     var g = TONE.base.g * lit * jit + TONE.rim.g * rim;
     var b = TONE.base.b * lit * jit + TONE.rim.b * rim;
@@ -249,7 +260,7 @@ function buildFigure(spec, acc, eyes) {
     ];
   }
   var headGeo = loft(headRings, head.sides, { phase: 0, capTop: false, capBottom: false });
-  bake(headGeo.geometry, place, new Vector3(0, hy, 0), h, acc, rnd);
+  bake(headGeo.geometry, place, new Vector3(0, hy, 0), h, acc, rnd, TONE.headRimFloor);
 
   /* Eyes: two lit points on the front of the head, in world space. Held a
      fifth of the head's depth clear of its front point: at 0.92 of it they
@@ -318,11 +329,11 @@ export function createFigures(options) {
 
   var eyeGeo = new BufferGeometry();
   eyeGeo.setAttribute('position', new Float32BufferAttribute(eyePos, 3));
-  /* World-unit size under attenuation: 0.06 units at 35 units' distance is a
-     4-px dot on a 1400-px frame, and sub-pixel at chat size — which is what
-     setDetail is for. */
+  /* World-unit size under attenuation: 0.16 units at 35 units' distance is a
+     ~6-px dot on a 1400-px frame (0.09 was one faint pixel in the showcase
+     crop), and sub-pixel at chat size — which is what setDetail is for. */
   var eyeMat = new PointsMaterial({
-    color: new Color(0x7af0ff), size: 0.09, sizeAttenuation: true, map: opts.radial || null,
+    color: new Color(0x7af0ff), size: 0.16, sizeAttenuation: true, map: opts.radial || null,
     transparent: true, opacity: 0.95, depthWrite: false, blending: AdditiveBlending,
     fog: false, toneMapped: false
   });

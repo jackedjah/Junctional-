@@ -426,7 +426,10 @@ ok('DOC-claude-md', exists('CLAUDE.md'));
      column's opaque end was at the camera, not under him. */
   ok('R94-WORLD-hover-is-a-compact-cross',
     /new PlaneGeometry\(1\.9, 1\.9\)/.test(envR94) && /\[\[1\.1, 0\.14\], \[0\.14, 1\.1\]\]/.test(envR94));
-  ok('R94-WORLD-reflection-is-a-narrow-column', /new PlaneGeometry\(0\.7, 3\.0\)/.test(envR94) &&
+  /* R95 world (round 5): the column runs 5.0 long so it reaches the frame's
+     bottom row as guardian-a's does; "narrow" is the 0.7 width, which is what
+     the convergence rows accepted, and that is the literal this holds. */
+  ok('R94-WORLD-reflection-is-a-narrow-column', /new PlaneGeometry\(0\.7, [3-5]\.0\)/.test(envR94) &&
     /function columnTexture/.test(envR94) && /streak\.rotation\.z = Math\.PI/.test(envR94));
   /* R95 world: the pool is gone with the shadow — see WORLD-shadow-catcher-is-small. */
   ok('R94-WORLD-shadow-catcher-is-a-pool',
@@ -527,8 +530,11 @@ ok('DOC-claude-md', exists('CLAUDE.md'));
   /* The moon: one painted disc, normal blending, unfogged, upper left, far. */
   ok('R95-WORLD-moon-is-one-painted-disc', /function moonTexture/.test(moon) && /createRadialGradient/.test(moon) &&
     (moon.match(/new PlaneGeometry\(/g) || []).length === 1);
+  /* R95 world (round 5): the disc is fully opaque and its value distribution
+     lives in the texture — at 0.86 under a tint nothing in it could deliver
+     the reference's top band. Unfogged and normally blended is the intent. */
   ok('R95-WORLD-moon-unfogged-and-not-additive',
-    /map: tex, color: new Color\(0x[0-9a-f]+\), transparent: true, opacity: 0\.\d+,\s*depthWrite: false, toneMapped: false, fog: false/.test(moon) &&
+    /map: tex, color: new Color\(0x[0-9a-f]+\), transparent: true, opacity: (0\.\d+|1\.0),\s*depthWrite: false, toneMapped: false, fog: false/.test(moon) &&
     !/AdditiveBlending/.test(code('mrmah3d/core/moon.js')));
   ok('R95-WORLD-moon-hangs-far-and-high-on-the-left', /MOON = \{ x: -1\d, y: 4\d, z: -1[2-6]\d, disc: 1\d(\.\d)? \}/.test(moon));
   ok('R95-WORLD-moon-has-framing-clouds-in-one-geometry', /function moonCloudTexture/.test(moon) &&

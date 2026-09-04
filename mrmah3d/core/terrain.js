@@ -128,17 +128,42 @@ var MIST_RIM = srgb(120, 145, 172);
    lit mass rather than falling back to the black cut-outs R94 climbed out
    of. Note that the renderer now writes linear values (R95): the sRGB
    numbers authored here land at roughly half their value on screen. */
+/* `floor` and `dir` (R95 world, round 5) are the directional swing on the
+   ambient, (floor + dir x away): 0.60 + 0.40 is what every layer had. The
+   mid tone compresses it from BOTH ends — a higher floor lifts its shadow
+   faces, a narrower swing lowers its light-facing planes — because R94-
+   WORLD-12 holds the range above 50% under 32 luma and the reference holds
+   its lit planes under 96: narrowing the swing alone (0.60 + 0.25) put 54%
+   of the range under 32, since the half-lit faces dropped with the lit
+   ones. */
 var TONES = {
-  ridge: { base: srgb(66, 74, 88), amb: 0.26, kd: 0.48, spec: srgb(170, 185, 205), ks: 0.62, shine: 36, jitter: 0.46, depth: 0.0, rim: 0.26 },
+  ridge: { base: srgb(66, 74, 88), amb: 0.26, kd: 0.48, spec: srgb(170, 185, 205), ks: 0.62, shine: 36, jitter: 0.46, depth: 0.0, rim: 0.26, floor: 0.60, dir: 0.40 },
   /* Round 4 overshot: amb 0.68 put 73% of the mid range's own pixels under
      32 luma in the harness frame (R94-WORLD-12's ceiling is 50%) while the
      range sat at 20 against a chest of 83 — cut-outs, with room to spare. The
      AMBIENT floor comes back up (it lifts the dark faces); the diffuse gain
      and the catch, which make the bright tail, stay down. */
-  mid:   { base: srgb(130, 144, 166), amb: 0.90, kd: 0.38, spec: srgb(224, 234, 248), ks: 0.20, shine: 30, jitter: 0.40, depth: 0.08, rim: 0.20 },
+  /* Round 5 (review): the right flank massif's lit planes were still a pale
+     wedge — its box averaged 54.8 with 16% in 96-127, LIGHTER than his left
+     pec (45.8) — while the left flank (44.9) and the range band (40) were
+     fine. Cutting kd 0.38 -> 0.28 and ks 0.20 -> 0.14 moved that box by two
+     luma, because `amb` here is not ambient: its (0.60 + 0.40 x away) swing
+     is the main directional term and kd is a top-up. And amb cannot simply
+     come down — R94-WORLD-12 sits at 49% under 32 against a 50% ceiling —
+     so the tone is compressed from the TOP: less jitter raises the darkest
+     faces as it lowers the brightest, which buys the room for a small amb
+     cut that nets the darks to where they were and takes the pale planes
+     down. That measured as two more luma: the pale planes are the
+     light-facing slopes at the top of the (0.60 + 0.40 x away) swing, and
+     nothing in kd, ks, jitter or amb reaches them without reaching the
+     darks. So the swing itself is compressed for this tone (floor 0.68,
+     dir 0.20): a shadow face sits 6% above its R94 value, a light-facing
+     plane 20% below. Guardian-a's lit mountain planes sit in 32-95 with the
+     brightness in sparkle and beam. */
+  mid:   { base: srgb(130, 144, 166), amb: 0.84, kd: 0.20, spec: srgb(224, 234, 248), ks: 0.14, shine: 30, jitter: 0.30, depth: 0.08, rim: 0.20, floor: 0.68, dir: 0.20 },
   /* Round 3 measured the far peaks at 23 luma over their own pixels against
      guardian-a's 36 for its distant pyramids: cut-outs. A small lift back. */
-  far:   { base: srgb(100, 114, 134), amb: 0.46, kd: 0.50, spec: srgb(190, 205, 225), ks: 0.22, shine: 22, jitter: 0.34, depth: 0.38, rim: 0.0 }
+  far:   { base: srgb(100, 114, 134), amb: 0.46, kd: 0.50, spec: srgb(190, 205, 225), ks: 0.22, shine: 22, jitter: 0.34, depth: 0.38, rim: 0.0, floor: 0.60, dir: 0.40 }
 };
 
 /* Per-layer irregularity: angular, radial and vertical jitter of the ring
@@ -287,7 +312,8 @@ function buildMassif(spec, layer, tone, acc) {
     /* The shadow-side floor is 0.60 of the ambient, not 0.45: measured over
        the mid layer's own pixels in the delivered frame, the lower floor put
        46% of the range under 32 luma against reference B's ~22%. */
-    var lit = tone.amb * (0.4 + 0.6 * sky) * (0.60 + 0.40 * away) + tone.kd * diff;
+    var swing = (tone.floor == null ? 0.60 : tone.floor) + (tone.dir == null ? 0.40 : tone.dir) * away;
+    var lit = tone.amb * (0.4 + 0.6 * sky) * swing + tone.kd * diff;
     var up = Math.pow(Math.max(0, nrm.y), 2.2) * tone.rim;
     var r = tone.base.r * lit * jit + tone.spec.r * catchK * tone.ks + MIST_RIM.r * up;
     var g = tone.base.g * lit * jit + tone.spec.g * catchK * tone.ks + MIST_RIM.g * up;
@@ -469,9 +495,19 @@ function buildBeamMirror(summits, smear) {
     var t = [[0, 0], [1, 0], [1, 1], [0, 0], [1, 1], [0, 1]];
     for (var i = 0; i < 6; i++) { pos.push(p[i][0], p[i][1], p[i][2]); uv.push(t[i][0], t[i][1]); }
   }
+  /* Review (R95 world, round 5): at 1.4 wide and 0.20 the mirrors were at
+     threshold — findable only by knowing where to look — and the floor box
+     measured 24.8 mean with 1.5% above 64 against guardian-a's 35 and 13%.
+     A first correction to 1.0 wide at 0.42 drew two crisp 12-px poles that
+     stopped a third of the way down the floor: a 1-unit quad at 55 units is
+     a line, and 1.6x the peak's height below the floor ends at 13 degrees
+     under the horizon. Guardian-a's smears are ~4.5% of the frame wide,
+     soft-sided, and run the whole floor toward the viewer — a wet surface
+     stretches a reflection along the line of sight. So: 2.4 wide, 3.2x the
+     height, and the smear's soft sides have room to be soft. */
   summits.forEach(function (s) {
-    var w = s.far ? 0.9 : 1.4;
-    var h = s.h * 1.6;
+    var w = s.far ? 1.6 : 2.4;
+    var h = s.h * 3.2;
     quad(s.x, -(s.y - 0.6), s.z, w, h, 0);
     quad(s.x, -(s.y - 0.6), s.z, w, h, 1);
   });
@@ -479,7 +515,7 @@ function buildBeamMirror(summits, smear) {
   geo.setAttribute('position', new Float32BufferAttribute(pos, 3));
   geo.setAttribute('uv', new Float32BufferAttribute(uv, 2));
   var mat = new MeshBasicMaterial({
-    map: smear, color: srgb(176, 212, 240), transparent: true, opacity: 0.20,
+    map: smear, color: srgb(176, 212, 240), transparent: true, opacity: 0.68,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: false
   });

@@ -919,9 +919,13 @@ for (const v of VIEWPORTS) {
     const B = mask(grab(), 10);
     let overlap = 0; for (let i = 0; i < A.m.length; i++) if (A.m[i] && B.m[i]) overlap++;
     const figuresInFrame = stats(fullInk, B.m);         /* their pixels, in the delivered frame */
-    /* M: the moon alone. */
+    /* M: the moon alone. R95 world (round 5): read OVER THE INK like every
+       other value compared to a reference — the raw read is unpremultiplied,
+       so a disc at any opacity reported its texel x tint (255 for a white
+       limb) rather than what the frame shows, and the moon's max and the
+       character's p99 were never on the same scale. */
     env.group.children.forEach(k => { k.visible = (k === env.moon); });
-    const dM = grab(); const M = mask(dM, 60);           /* the disc, not its glow */
+    const dM = grab(true); const M = mask(dM, 60);       /* the disc, not its glow */
     const moon = stats(dM, M.m); moon.box = bbox(M.m);
     let moonMax = 0; for (let i = 0; i < M.m.length; i++) if (M.m[i]) moonMax = Math.max(moonMax, luma(dM, i * 4));
     /* R: the range alone (structures, no mist, no figures), over its rows. */

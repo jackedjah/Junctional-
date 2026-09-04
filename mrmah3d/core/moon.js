@@ -53,7 +53,20 @@ function prng(seed) {
    Round 1 measured the first cut at 96-159 luma over the disc with nothing
    above 160 against the reference's 57% in 128-191, and its 46 craters read
    as polka dots. So: a brighter body, fewer and softer craters, broader and
-   fainter maria, and less grain. */
+   fainter maria, and less grain.
+
+   Review (R95 world, round 5): the round-1 disc measured right in the middle
+   (upper half 157 against the reference's 162) and had NOTHING above 192
+   where guardian-a's clear upper half carries 11% — the reference's limb is
+   the brightest ring of the disc, crisp, with the glow just outside it, and
+   its rays are white; ours darkened toward the limb and faded into the glow
+   with no edge. And the 320-px canvas was being MAGNIFIED at showcase scale,
+   so 14 soft maria and 22 faint pits read as a smudged marble. So the
+   texture now carries the whole value distribution — a mid grey-white body,
+   a limb RING at 255, ray splashes and ~90 hard-floored craters with 1-px
+   rims on a 512 canvas — and the material is fully opaque (below), because
+   at 0.86 x the showcase weight 0.85 nothing in the texture could reach 192.
+   Delivered value = texture x 0.96 (the material's tint) x mode weight. */
 export function moonTexture(size) {
   var c = document.createElement('canvas');
   c.width = c.height = size;
@@ -62,12 +75,13 @@ export function moonTexture(size) {
   var rnd = prng(19690720);
   var cx = size / 2, cy = size / 2, R = size * 0.33;
 
-  /* Limb glow, under the disc: gone by 1.5 R. A wide halo here would be a
-     bigger sky, and the sky must stay black. */
-  var glow = g.createRadialGradient(cx, cy, R * 0.90, cx, cy, R * 1.50);
-  glow.addColorStop(0.00, 'rgba(255,255,255,0.50)');
-  glow.addColorStop(0.22, 'rgba(255,255,255,0.16)');
-  glow.addColorStop(0.55, 'rgba(255,255,255,0.04)');
+  /* Limb glow, OUTSIDE the disc: it starts at the limb, so the halo sits
+     just outside a bright edge, and is gone by 1.5 R. A wide halo here would
+     be a bigger sky, and the sky must stay black. */
+  var glow = g.createRadialGradient(cx, cy, R, cx, cy, R * 1.50);
+  glow.addColorStop(0.00, 'rgba(255,255,255,0.46)');
+  glow.addColorStop(0.16, 'rgba(255,255,255,0.15)');
+  glow.addColorStop(0.50, 'rgba(255,255,255,0.04)');
   glow.addColorStop(1.00, 'rgba(255,255,255,0)');
   g.fillStyle = glow;
   g.fillRect(0, 0, size, size);
@@ -76,13 +90,31 @@ export function moonTexture(size) {
   g.beginPath();
   g.arc(cx, cy, R, 0, Math.PI * 2);
   g.clip();
-  /* The body: nearly flat — a full moon is lit face-on — with a little
-     limb darkening so the disc reads as a sphere rather than a coin. */
+  /* The body: a mid grey-white, lit a little from the upper left, with a
+     LIMB RING — the brightest ring of the disc — and the clip's anti-aliased
+     arc as its hard edge. The maria and craters pull the middle down from
+     here toward the reference's 128-191 spread. */
   var body = g.createRadialGradient(cx - R * 0.22, cy - R * 0.26, R * 0.10, cx, cy, R);
+  /* Delivered value = texel luma x the mode weight (0.85 in showcase) over
+     the ink: 255 -> 219, 230 -> 198, 201 -> 173, 190 -> 164. The faint blue
+     lives HERE now, not in the material: a tinted material is sRGB-decoded
+     to 0.92 and with it nothing in the texture could deliver above 200,
+     which is how the top band went missing twice. The reference's upper
+     half is MORE contrasty than a flat disc — 41% in 128-159 and 7% in
+     96-127 under 11% above 192 — so the mid-body sits at the reference's
+     middle and the highlight zone (t < 0.22, ~9% of the disc) and the limb
+     ring are what clear 192. */
+  /* Each stop is (L-14, L, L+22) for its luma L: the reference disc has
+     b > r+25 over 63% of its pixels at chroma ~27, and a tint of a few
+     units vanished under the 0.85 weight. */
   body.addColorStop(0.00, 'rgba(255,255,255,1)');
-  body.addColorStop(0.66, 'rgba(248,249,252,1)');
-  body.addColorStop(0.93, 'rgba(230,233,240,1)');
-  body.addColorStop(1.00, 'rgba(206,211,222,1)');
+  body.addColorStop(0.10, 'rgba(240,248,255,1)');
+  body.addColorStop(0.22, 'rgba(216,230,252,1)');
+  body.addColorStop(0.50, 'rgba(184,198,220,1)');
+  body.addColorStop(0.86, 'rgba(174,188,210,1)');
+  body.addColorStop(0.925, 'rgba(194,208,230,1)');
+  body.addColorStop(0.95, 'rgba(252,253,255,1)');
+  body.addColorStop(1.00, 'rgba(252,253,255,1)');
   g.fillStyle = body;
   g.fillRect(0, 0, size, size);
 
@@ -106,24 +138,59 @@ export function moonTexture(size) {
     g.fillRect(-mr, -mr, mr * 2, mr * 2);
     g.restore();
   }
-  /* Craters: a few soft pits, each with a thin lit rim on its sunward side.
-     Small and faint — at the disc's on-screen size a crater is texture, not
-     a feature. */
-  for (var k = 0; k < 22; k++) {
-    var ca = rnd() * Math.PI * 2, cr = Math.sqrt(rnd()) * R * 0.92;
+  /* Ray splashes, under the craters: the bright young impacts the reference
+     shows as three or four white smears with thin rays. The core is what
+     puts a few disc pixels above 192 besides the limb. */
+  /* A tight core with 1-px rays read as a lone dot at chat scale — a star
+     on the disc, to the eye. The core is broad and soft and the rays are
+     wide enough to survive minification, so it reads as a splash. */
+  for (var s = 0; s < 4; s++) {
+    var sa = rnd() * Math.PI * 2, sr = Math.sqrt(rnd()) * R * 0.72;
+    var sx = cx + Math.cos(sa) * sr, sy = cy + Math.sin(sa) * sr;
+    var core = R * (0.08 + rnd() * 0.06);
+    var splash = g.createRadialGradient(sx, sy, 0, sx, sy, core);
+    splash.addColorStop(0.00, 'rgba(255,255,255,0.60)');
+    splash.addColorStop(0.35, 'rgba(255,255,255,0.34)');
+    splash.addColorStop(0.75, 'rgba(255,255,255,0.12)');
+    splash.addColorStop(1.00, 'rgba(255,255,255,0)');
+    g.fillStyle = splash;
+    g.fillRect(sx - core, sy - core, core * 2, core * 2);
+    var nRays = 7 + Math.floor(rnd() * 6);
+    for (var q = 0; q < nRays; q++) {
+      var ra = rnd() * Math.PI * 2, rl = R * (0.12 + rnd() * 0.30);
+      g.strokeStyle = 'rgba(255,255,255,' + (0.18 + rnd() * 0.16).toFixed(3) + ')';
+      g.lineWidth = 1.5 + rnd() * 1.5;
+      g.beginPath();
+      g.moveTo(sx, sy);
+      g.lineTo(sx + Math.cos(ra) * rl, sy + Math.sin(ra) * rl);
+      g.stroke();
+    }
+  }
+  /* Craters: a dense field of hard-floored pits — the floor is flat to 0.7 r
+     and gone at r — each with a crisp 1-px rim all round and a brighter arc
+     on the sunward (upper-left) side. Dense and small: at the disc's
+     on-screen size this is the high-frequency texture that reads as sharp
+     at any scale, where a few soft pits read as a smudge. */
+  for (var k = 0; k < 90; k++) {
+    var ca = rnd() * Math.PI * 2, cr = Math.sqrt(rnd()) * R * 0.94;
     var px = cx + Math.cos(ca) * cr, py = cy + Math.sin(ca) * cr;
-    var r = R * (0.016 + rnd() * 0.036);
-    var a = 0.07 + rnd() * 0.12;
+    var r = R * (0.012 + rnd() * 0.045);
+    var a = 0.25 + rnd() * 0.15;
     var pit = g.createRadialGradient(px, py, 0, px, py, r);
     pit.addColorStop(0.00, 'rgba(60,70,90,' + a.toFixed(3) + ')');
-    pit.addColorStop(0.65, 'rgba(60,70,90,' + (a * 0.5).toFixed(3) + ')');
+    pit.addColorStop(0.70, 'rgba(60,70,90,' + a.toFixed(3) + ')');
     pit.addColorStop(1.00, 'rgba(60,70,90,0)');
     g.fillStyle = pit;
     g.fillRect(px - r, py - r, r * 2, r * 2);
-    g.strokeStyle = 'rgba(255,255,255,' + (0.08 + rnd() * 0.12).toFixed(3) + ')';
-    g.lineWidth = Math.max(1, r * 0.2);
+    g.strokeStyle = 'rgba(255,255,255,' + (0.30 + rnd() * 0.15).toFixed(3) + ')';
+    g.lineWidth = 1;
     g.beginPath();
-    g.arc(px, py, r * 0.9, Math.PI * 1.05, Math.PI * 1.95);
+    g.arc(px, py, r * 0.92, 0, Math.PI * 2);
+    g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,' + (0.22 + rnd() * 0.20).toFixed(3) + ')';
+    g.lineWidth = 1.5;
+    g.beginPath();
+    g.arc(px, py, r * 0.92, Math.PI * 1.05, Math.PI * 1.95);
     g.stroke();
   }
   /* Grain: +/-1.5% per pixel inside the disc, so the 8-bit gradients do not
@@ -156,66 +223,98 @@ export function moonTexture(size) {
    shape is the corner clouds' — a lumpy tapering mass, dense at the left,
    cut by a soft ellipse, faded at every edge — with a gentler dither, because
    a dense texture shows the +/-30% grain the faint one hid. */
+/* Review (R95 world, round 5): eighteen soft radial blobs with soft lit
+   blobs above were smoke streaks on screen, with no edge anywhere, and in
+   chat two grey smudges beside a grey coin. The references' clouds are
+   cumulus MASSES: hard lumpy silhouettes, dark bodies, a thin bright edge
+   along the TOP where the moon lights them. So the body is now hard-edged
+   discs (flat to 0.85 r, a 15% falloff) in three size tiers hung along the
+   same wandering chain — a big lump, a turret on it, small tufts on the
+   turret — and the lit top is a 3-px band cut from the mass's own
+   silhouette: the silhouette minus itself shifted down, which is exactly the
+   set of pixels whose upward neighbour is sky. The ellipse cut and the
+   horizontal fade stay, so the mass still tapers and dissolves at its ends
+   without softening the lumps inside it. Canvas doubled to 512 x 256 so a
+   3-px rim is a rim at showcase scale and not a blur. */
 export function moonCloudTexture() {
+  var W = 512, H = 256;
   var c = document.createElement('canvas');
-  c.width = 256; c.height = 128;
+  c.width = W; c.height = H;
   var g = c.getContext('2d');
-  g.clearRect(0, 0, 256, 128);
+  g.clearRect(0, 0, W, H);
   var rnd = prng(20250904);
-  /* The body: large overlapping blobs, dense. Round 2's 30-px blobs at 0.7
-     were a thin band the disc showed through; a cloud that crosses a moon is
-     a MASS. */
-  var cx = 44, cy = 70;
+  /* The chain, and the lumps hung on it. [x, y, r], three tiers per node. */
+  var discs = [];
+  var cx = 88, cy = 140;
   for (var i = 0; i < 18; i++) {
-    var r = 40 - i * 1.0 + rnd() * 18;
-    var a = Math.min(1, (0.92 - i * 0.018) + rnd() * 0.20);
-    var grd = g.createRadialGradient(cx, cy, 0, cx, cy, r);
-    grd.addColorStop(0, 'rgba(30,36,48,' + a.toFixed(3) + ')');
-    grd.addColorStop(0.62, 'rgba(30,36,48,' + (a * 0.72).toFixed(3) + ')');
-    grd.addColorStop(1, 'rgba(30,36,48,0)');
+    var r = (40 - i * 1.0 + rnd() * 18) * 1.5;
+    discs.push([cx, cy, r]);
+    discs.push([cx + (rnd() - 0.5) * r * 0.9, cy - r * 0.50, r * 0.55]);
+    discs.push([cx + (rnd() - 0.5) * r * 1.2, cy - r * 0.78, r * 0.30]);
+    discs.push([cx + (rnd() - 0.5) * r * 1.2, cy - r * 0.62, r * 0.36]);
+    cx += (9 + rnd() * 7) * 2;
+    cy += (rnd() - 0.5) * 36;
+    cy = Math.max(88, Math.min(180, cy));
+  }
+  /* The body: dark, hard-edged, opaque where the lumps overlap. */
+  discs.forEach(function (d) {
+    var grd = g.createRadialGradient(d[0], d[1], 0, d[0], d[1], d[2]);
+    grd.addColorStop(0.00, 'rgba(30,36,48,0.98)');
+    grd.addColorStop(0.85, 'rgba(30,36,48,0.98)');
+    grd.addColorStop(1.00, 'rgba(30,36,48,0)');
     g.fillStyle = grd;
-    g.fillRect(cx - r, cy - r, r * 2, r * 2);
-    cx += 9 + rnd() * 7;
-    cy += (rnd() - 0.5) * 18;
-    cy = Math.max(44, Math.min(90, cy));
+    g.fillRect(d[0] - d[2], d[1] - d[2], d[2] * 2, d[2] * 2);
+  });
+  /* The silhouette, at the radius where the body's falloff crosses half
+     alpha, so the rim sits on the visible edge. */
+  var sil = document.createElement('canvas');
+  sil.width = W; sil.height = H;
+  var sg = sil.getContext('2d');
+  sg.fillStyle = '#fff';
+  discs.forEach(function (d) {
+    sg.beginPath();
+    sg.arc(d[0], d[1], d[2] * 0.93, 0, Math.PI * 2);
+    sg.fill();
+  });
+  /* rimBand(shift, style): the silhouette minus itself shifted down by
+     `shift` px, filled with `style` — a band along every upward-facing
+     edge and nowhere else — drawn over the body. */
+  var band = document.createElement('canvas');
+  band.width = W; band.height = H;
+  var bg = band.getContext('2d');
+  function rimBand(shift, style) {
+    bg.globalCompositeOperation = 'source-over';
+    bg.clearRect(0, 0, W, H);
+    bg.drawImage(sil, 0, 0);
+    bg.globalCompositeOperation = 'destination-out';
+    bg.drawImage(sil, 0, shift);
+    bg.globalCompositeOperation = 'source-in';
+    bg.fillStyle = style;
+    bg.fillRect(0, 0, W, H);
+    g.drawImage(band, 0, 0);
   }
-  /* Lit tops: a continuous band of broader, softer masses along the upper
-     edge — what the disc lights — not a string of beads. Drawn over the body
-     so the lit rim reads as the cloud's own surface turned toward the moon. */
-  cx = 40; cy = 52;
-  for (var j = 0; j < 16; j++) {
-    var tr = 16 + rnd() * 14;
-    var ta = 0.22 + rnd() * 0.22;
-    var tg = g.createRadialGradient(cx, cy - tr * 0.2, 0, cx, cy, tr);
-    tg.addColorStop(0, 'rgba(172,184,204,' + ta.toFixed(3) + ')');
-    tg.addColorStop(0.5, 'rgba(172,184,204,' + (ta * 0.45).toFixed(3) + ')');
-    tg.addColorStop(1, 'rgba(172,184,204,0)');
-    g.fillStyle = tg;
-    g.fillRect(cx - tr, cy - tr, tr * 2, tr * 2);
-    cx += 11 + rnd() * 6;
-    cy += (rnd() - 0.5) * 12;
-    cy = Math.max(40, Math.min(66, cy));
-  }
+  rimBand(3, 'rgba(210,220,235,0.55)');
+  rimBand(1, 'rgba(236,242,255,0.45)');
   g.globalCompositeOperation = 'destination-out';
   g.save();
-  g.translate(112, 66);
+  g.translate(224, 132);
   g.scale(1.0, 0.44);
-  var ell = g.createRadialGradient(0, 0, 0, 0, 0, 136);
+  var ell = g.createRadialGradient(0, 0, 0, 0, 0, 272);
   ell.addColorStop(0, 'rgba(0,0,0,0)');
   ell.addColorStop(0.58, 'rgba(0,0,0,0)');
   ell.addColorStop(1, 'rgba(0,0,0,1)');
   g.fillStyle = ell;
-  g.fillRect(-150, -150, 300, 300);
+  g.fillRect(-300, -300, 600, 600);
   g.restore();
-  var hfade = g.createLinearGradient(0, 0, 256, 0);
+  var hfade = g.createLinearGradient(0, 0, W, 0);
   hfade.addColorStop(0, 'rgba(0,0,0,1)');
   hfade.addColorStop(0.09, 'rgba(0,0,0,0)');
   hfade.addColorStop(0.90, 'rgba(0,0,0,0)');
   hfade.addColorStop(1, 'rgba(0,0,0,1)');
   g.fillStyle = hfade;
-  g.fillRect(0, 0, 256, 128);
+  g.fillRect(0, 0, W, H);
   g.globalCompositeOperation = 'source-over';
-  var img = g.getImageData(0, 0, 256, 128), px = img.data;
+  var img = g.getImageData(0, 0, W, H), px = img.data;
   for (var k = 3; k < px.length; k += 4) {
     var al = px[k];
     if (al > 0) px[k] = Math.max(0, Math.min(255, Math.round(al * (1 + 0.16 * (rnd() - 0.5)))));
@@ -234,12 +333,15 @@ export var MOON = { x: -14, y: 41, z: -140, disc: 13.0 };
    other way. Authored against guardian-a: a large mass across the lower left
    of the disc, a second across the lower right, a small tuft beside the upper
    left limb. */
-/* Both crossing masses end at world x ~ -5 (0.39 across in showcase): round 3
-   ran the right-hand one out to x -1 and its lit tops sat against his head's
-   left corner, which is clutter on the one outline that matters. */
+/* Both crossing masses end at world x ~ -6.5: round 3 ran the right-hand
+   one out to x -1 and its lit tops sat against his head's left corner, which
+   is clutter on the one outline that matters; at x -5 (round 4) the hard
+   cumulus tuft and its lit rim still touched that corner in the website
+   (canonical) frame, where his head sits further left than in showcase. The
+   tails run into empty sky on the left, so there is nothing to lose there. */
 var MOON_CLOUDS = [
-  { dx: -0.6, dy: -4.2, dz: 4.0, w: 19.0, h: 9.0, flip: false },
-  { dx: 3.0, dy: -6.8, dz: 3.0, w: 12.0, h: 6.6, flip: false },
+  { dx: -2.1, dy: -4.2, dz: 4.0, w: 19.0, h: 9.0, flip: false },
+  { dx: 1.5, dy: -6.8, dz: 3.0, w: 12.0, h: 6.6, flip: false },
   { dx: -9.4, dy: 2.4, dz: 5.0, w: 9.5, h: 4.6, flip: false }
 ];
 
@@ -255,13 +357,17 @@ export function createMoon(options) {
   var group = new Group();
   group.name = 'moon';
 
-  var tex = moonTexture(opts.size || 320);
-  /* Mostly white with the faintest hint of the secondary blue. Opacity is
-     the disc's VALUE: the renderer writes linear values with no tone mapping,
-     so 255 x 0.95 x 0.86 lands the brightest part around 200 and the maria
-     around 150 — the reference disc's distribution, not a white hole. */
+  var tex = moonTexture(opts.size || 512);
+  /* The disc is a SOLID and its whole value distribution lives in the
+     texture, blue included: the material is white and opaque. The renderer
+     writes linear values with no tone mapping, so a texel lands at its own
+     value x the mode's structures weight (0.85 in showcase) — a 255 limb at
+     ~219, the mid-body around 170, the maria around 150 — the reference
+     disc's distribution, with the top band the limb, the highlight zone and
+     the ray cores supply. At 0.86 opacity under a tint (sRGB-decoded to
+     0.92) nothing in the texture could clear 192, whatever it said. */
   var mat = new MeshBasicMaterial({
-    map: tex, color: new Color(0xf2f6ff), transparent: true, opacity: 0.86,
+    map: tex, color: new Color(0xffffff), transparent: true, opacity: 1.0,
     depthWrite: false, toneMapped: false, fog: false, side: DoubleSide
   });
   var quad = MOON.disc / 0.66;

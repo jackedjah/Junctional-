@@ -231,9 +231,11 @@ function smearTexture() {
   var c = document.createElement('canvas');
   c.width = 32; c.height = 128;
   var g = c.getContext('2d');
+  /* Round 5: the peak moved from 0.16 to 0.08 of the length, so each smear
+     is hottest at the mirrored summit and runs from there. */
   var along = g.createLinearGradient(0, 0, 0, 128);
   along.addColorStop(0.00, 'rgba(255,255,255,0)');
-  along.addColorStop(0.16, 'rgba(255,255,255,1)');
+  along.addColorStop(0.08, 'rgba(255,255,255,1)');
   along.addColorStop(0.45, 'rgba(255,255,255,0.50)');
   along.addColorStop(0.78, 'rgba(255,255,255,0.14)');
   along.addColorStop(1.00, 'rgba(255,255,255,0)');
@@ -665,9 +667,16 @@ export function createEnvironment(options) {
      (0x7fe2ff came out as low-saturation grey once the additive stack had its
      way with it); fog is off because at 1-8 units from the camera it was a
      no-op that only muddied the colour. */
+  /* R95 world (round 5): the column under his tip was a whisper against
+     guardian-a's long bright column. x1.5 — through the colour, because an
+     additive blend factor clamps at 1 and 0.90 has only a tenth of headroom
+     in opacity. And the hue moves a step toward the white-blue the
+     reference's column has near the tip: at 0x3aa0ff x 1.35 the column
+     sampled (14,58,114) — luma 53 — because luma is green and that blue has
+     almost none; the blue channel saturates first and the rest is lost. */
   var streakTex = columnTexture();
   var streakMat = new MeshBasicMaterial({
-    map: streakTex, color: new Color(0x3aa0ff), transparent: true, opacity: 0.90,
+    map: streakTex, color: new Color(0x52acff).multiplyScalar(1.4), transparent: true, opacity: 1.0,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: false
   });
   /* R90: longer and wider, but only to here.
@@ -685,7 +694,12 @@ export function createEnvironment(options) {
      which costs no area. */
   /* R94: narrower and brighter — a reflected COLUMN, the mirror of the beam
      above the tip, not a wash. 0.55 wide costs the convergence rows nothing. */
-  var streak = new Mesh(new PlaneGeometry(0.7, 3.0), streakMat);
+  /* R95 world (round 5): 3.0 -> 5.0 long. The frame's bottom row meets the
+     floor about 6.5 units in front of the origin at showcase, and a column
+     that dissolves by 3 is a puddle under him where guardian-a's runs the
+     whole floor. The width stays 0.7 — that is what the convergence rows
+     have accepted; length only stretches the texture's dissolve. */
+  var streak = new Mesh(new PlaneGeometry(0.7, 5.0), streakMat);
   streak.rotation.x = -Math.PI / 2;
   /* The texture's opaque end is at v=0. Rotating -90 degrees about X alone
      puts v=0 at the NEAR edge — the previous comment here had it backwards,
@@ -695,7 +709,7 @@ export function createEnvironment(options) {
      the tail runs toward the viewer. 3.0 long, because only the first unit or
      so is in frame at showcase and the fade has to happen inside it. */
   streak.rotation.z = Math.PI;
-  streak.position.set(0, 0.016, 1.5);
+  streak.position.set(0, 0.016, 2.5);
   glowGroup.add(streak);
   owned.push(streak.geometry, streakMat, streakTex);
 
@@ -986,22 +1000,33 @@ export function createEnvironment(options) {
   /* R95 world: 90 -> 110 and 0.16 -> 0.21 units. At 0.16 a star at 60 units
      was a single pixel on the showcase frame and most of them did not survive
      the composite; the references' sky is sparse but its stars are there. */
+  /* Review (R95 world, round 5): the shell sat at z -40..-85, IN FRONT of the
+     moon at z -140, and stars drew on the disc in every mode. Nothing
+     pierces the moon in the references; the stars are behind it. So the
+     shell now hangs at z -145..-180 — behind the disc, inside the camera's
+     200 far plane — with its spread and its point size scaled by the same
+     2.6x the distance grew, so the angular field, the on-screen dot size and
+     the density are unchanged; and it draws BEFORE the disc (renderOrder
+     -41 against the disc's -40), so the opaque disc paints over any star
+     behind it and the glow veils, rather than adds to, the ones in its
+     fringe. Order does the occluding: nothing here writes depth. */
   var starCount = tier === 'low' ? 50 : 110;
   var starPos = [];
   var sseed = 7771;
   function srnd() { sseed = (sseed * 1103515245 + 12345) & 0x7fffffff; return sseed / 0x7fffffff; }
   for (var si = 0; si < starCount; si++) {
-    starPos.push((srnd() - 0.5) * 150, 9 + srnd() * 34, -40 - srnd() * 45);
+    starPos.push((srnd() - 0.5) * 390, 23 + srnd() * 89, -145 - srnd() * 35);
   }
   var starGeo = new BufferGeometry();
   starGeo.setAttribute('position', new Float32BufferAttribute(starPos, 3));
   var starMat = new PointsMaterial({
-    color: new Color(0xbfe8ff), size: 0.21, sizeAttenuation: true,
+    color: new Color(0xbfe8ff), size: 0.55, sizeAttenuation: true,
     transparent: true, opacity: 0.62, depthWrite: false, toneMapped: false,
     blending: AdditiveBlending, fog: false
   });
   var stars = new Points(starGeo, starMat);
   stars.name = 'stars';
+  stars.renderOrder = -41;
   group.add(stars);
   owned.push(starGeo, starMat);
 
