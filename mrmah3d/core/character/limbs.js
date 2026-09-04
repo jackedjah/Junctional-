@@ -25,10 +25,12 @@ function clad(group, geo, materials, rimScale) {
   var rim = new Mesh(geo, materials.rim);
   rim.scale.setScalar(rimScale || 1.05);
   group.add(rim);
-  var edges = new EdgesGeometry(geo, 40);
-  group.add(new LineSegments(edges, materials.edge));
-  group.add(new LineSegments(edges, materials.edgeHalo));
-  return { mesh: mesh, edges: edges };
+  var major = new EdgesGeometry(geo, 48);
+  var minor = new EdgesGeometry(geo, 20);
+  group.add(new LineSegments(major, materials.edge));
+  group.add(new LineSegments(major, materials.edgeHalo));
+  group.add(new LineSegments(minor, materials.edgeFaint));
+  return { mesh: mesh, edges: major, minorEdges: minor };
 }
 
 /* A faceted wedge palm built between the wrist and the fingertips. */
@@ -59,7 +61,7 @@ function buildHand(materials, spec, options) {
 
   var palmGeo = palmGeometry(1, spec);
   var palm = clad(hand, palmGeo, materials, 1.06);
-  owned.push(palmGeo, palm.edges);
+  owned.push(palmGeo, palm.edges, palm.minorEdges);
 
   /* Digits. Simplified and few — the requirement is that the raised hand
      reads as a hand rather than a triangle, not that it has knuckles. */
@@ -72,9 +74,9 @@ function buildHand(materials, spec, options) {
     var len = spec.digitLength * (opts.open ? 1 : 0.72) * (1 - Math.abs(t - 0.5) * 0.35);
     var base = [x, spec.palmLength, 0];
     var tip = [x + Math.sin(splay) * len, spec.palmLength + Math.cos(splay) * len, 0.01];
-    var g = segment(base, tip, spec.digitRadius, spec.digitRadius * 0.7, 5, { depthRatio: 0.9 });
+    var g = segment(base, tip, spec.digitRadius, spec.digitRadius * 0.7, 5, { depthRatio: 0.9, crystal: 0.05, steps: 2 });
     var d = clad(hand, g, materials, 1.08);
-    owned.push(g, d.edges);
+    owned.push(g, d.edges, d.minorEdges);
   }
 
   /* The bright tip diamond the reference shows above the raised hand. */
@@ -114,10 +116,10 @@ function buildArm(materials, spec, options) {
 
   var upperGeo = segment(
     [0, 0, 0], elbow.clone().sub(shoulder).toArray(),
-    spec.upperRadius, spec.foreRadius * 1.05, 6, { depthRatio: 0.85 }
+    spec.upperRadius, spec.foreRadius * 1.05, 8, { depthRatio: 0.85, crystal: 0.085, steps: 4 }
   );
   var upper = clad(shoulderJoint, upperGeo, materials, 1.05);
-  owned.push(upperGeo, upper.edges);
+  owned.push(upperGeo, upper.edges, upper.minorEdges);
 
   /* Forearm hangs off an elbow joint so the elbow can actually bend. */
   var elbowJoint = new Group();
@@ -128,10 +130,10 @@ function buildArm(materials, spec, options) {
   var foreVec = wrist.clone().sub(elbow);
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
-    spec.foreRadius, spec.wristRadius, 6, { depthRatio: 0.85 }
+    spec.foreRadius, spec.wristRadius, 8, { depthRatio: 0.85, crystal: 0.085, steps: 4 }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 1.05);
-  owned.push(foreGeo, fore.edges);
+  owned.push(foreGeo, fore.edges, fore.minorEdges);
 
   /* Wrist joint, oriented so the hand continues along the forearm axis. */
   var wristJoint = new Group();

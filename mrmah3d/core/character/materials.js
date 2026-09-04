@@ -23,8 +23,12 @@ import {
 
 /* Ice-blue family. `edge` is the reference's signature cyan. */
 export var PALETTE = {
-  crystal: 0x2b4152,     /* blue-slate body — dark, but not so dark that the
-                            facets have no diffuse left to separate them */
+  /* Desaturated on purpose. At metalness 0.68 the base colour tints every
+     reflection, so a strongly blue crystal turns even a white environment zone
+     blue and the whole body converges on one hue. A near-neutral slate lets
+     the white zone stay white, the dark zone stay black, and the cyan come
+     from the edges and the narrow environment band where it belongs. */
+  crystal: 0x44525c,
   crystalDeep: 0x0b1219, /* the darkest facets */
   edge: 0x35d6ff,        /* cyan edge illumination */
   edgeHot: 0xbdf2ff,     /* near-white specular catch */
@@ -51,16 +55,27 @@ export function createCrystalMaterials(options) {
        body gets the reference's strong dark-to-light contrast. Blurring it
        (high roughness) averages the environment out and every facet converges
        on the same mid-tone, which reads as flat plastic. */
-    roughness: 0.14,
+    roughness: 0.085,
     metalness: 0.68,
     /* The environment built in stage.js is what this metalness reflects.
        Without it a dark metal returns near-black on every facet. */
-    envMapIntensity: 1.5,
+    /* High, and paired with a LOW tone-mapping exposure. These two are not
+       the same knob: exposure lifts every pixel together, while envMapIntensity
+       scales the reflection — and the dark zones of the environment reflect
+       almost nothing, so raising it pushes the bright facets up while leaving
+       the dark ones where they are. That is contrast, which is what the
+       crystal reads by. Chasing the mean with exposure alone produced a
+       correctly-numbered but visually flat body. */
+    envMapIntensity: 4.0,
     flatShading: true,
     /* A faint self-lit floor so facets turned fully away from every light are
        still crystal rather than holes cut in the frame. Deliberately tiny. */
     emissive: new Color(tint.crystal || PALETTE.crystal),
-    emissiveIntensity: 0.35
+    /* Small. Self-illumination raises the floor of EVERY facet at once, which
+       is the fastest way to destroy the dark end of the value hierarchy — the
+       reference puts a third of its pixels in the darkest eighth, and it cannot
+       do that if the material is glowing at itself. */
+    emissiveIntensity: 0.05
   });
 
   /* FACE PLATE — the recess. Almost black, rough, non-metallic, so it stays a
@@ -111,6 +126,21 @@ export function createCrystalMaterials(options) {
     toneMapped: false
   });
 
+  /* FAINT EDGES — every remaining seam, at a whisper.
+
+     This is the other half of the two-tier scheme in body.js. The facet seams
+     still need to exist, or the crystal loses its cut; they just must not
+     compete with the structural lines. At this value they read as the glint
+     along a facet boundary rather than as drawn linework. */
+  var edgeFaint = new LineBasicMaterial({
+    color: new Color(tint.edge || PALETTE.edge),
+    transparent: true,
+    opacity: 0.13,
+    blending: AdditiveBlending,
+    depthWrite: false,
+    toneMapped: false
+  });
+
   /* EMISSIVE — eyes, smile, emblem, symbols. Unlit and tone-mapping-exempt so
      they keep their exact colour and stay legible; the brief is explicit that
      bloom must not be allowed to destroy the eyes or the smile. */
@@ -142,18 +172,27 @@ export function createCrystalMaterials(options) {
        the silhouette against the void; with dimmer edges the rim shell is now
        doing most of that job, which is the right owner for it — it follows the
        real surface curvature instead of drawing every polygon boundary. */
-    opacity: 0.22,
+    opacity: 0.15,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
   });
 
-  var all = [body, face, edge, edgeHalo, emissive, emissiveSoft, rim];
+  /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */
+  if (opts.envMap) {
+    body.envMap = opts.envMap;
+    face.envMap = opts.envMap;
+    body.needsUpdate = true;
+    face.needsUpdate = true;
+  }
+
+  var all = [body, face, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, rim];
 
   /* Captured at construction so setGlow(1) restores exactly what each material
      was defined with. */
   var BASE = {
     edge: edge.opacity,
+    edgeFaint: edgeFaint.opacity,
     edgeHalo: edgeHalo.opacity,
     emissiveSoft: emissiveSoft.opacity,
     rim: rim.opacity,
@@ -161,7 +200,7 @@ export function createCrystalMaterials(options) {
   };
 
   return {
-    body: body, face: face, edge: edge, edgeHalo: edgeHalo,
+    body: body, face: face, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
     emissive: emissive, emissiveSoft: emissiveSoft, rim: rim,
     /* One place to drive the whole character's luminosity — used by the
        animation states so a "thinking" pulse cannot desynchronise.
@@ -174,6 +213,7 @@ export function createCrystalMaterials(options) {
       var s = Math.max(0, Number(scale) || 0);
       edge.opacity = BASE.edge * s;
       edgeHalo.opacity = BASE.edgeHalo * s;
+      edgeFaint.opacity = BASE.edgeFaint * s;
       emissiveSoft.opacity = BASE.emissiveSoft * s;
       rim.opacity = BASE.rim * s;
       body.emissiveIntensity = BASE.emissive * s;

@@ -21,7 +21,7 @@ import { HEIGHT, FLOAT, HEAD } from './proportions.js';
 
 export function createMrMah(options) {
   var opts = options || {};
-  var materials = createCrystalMaterials({ tint: opts.tint });
+  var materials = createCrystalMaterials({ tint: opts.tint, envMap: opts.envMap });
 
   /* root -> float -> rig
      `float` carries hover and bob so the pose rig never has to know about

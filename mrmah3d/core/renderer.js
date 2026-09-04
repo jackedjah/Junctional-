@@ -36,7 +36,7 @@ export function createRenderer(options) {
   /* ACES rolls the top end off hard. At exposure 1 the crystal's bright facets
      were being compressed into the same mid-tone as its dark ones, flattening
      exactly the contrast the reference depends on. */
-  renderer.toneMappingExposure = Number(opts.exposure) || 1.12;
+  renderer.toneMappingExposure = Number(opts.exposure) || 0.76;
   renderer.shadowMap.enabled = settings.shadows;
   renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.setClearColor(0x000000, 0);

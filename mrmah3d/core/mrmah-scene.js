@@ -19,6 +19,7 @@
 
 import { detectTier, degrade, prefersReducedMotion } from './quality.js';
 import { getMode, MODE_NAMES } from './composition.js';
+import { resolve as resolveSurface, modeFor, SURFACE_NAMES } from './surfaces.js';
 import { readPalette } from './palette.js';
 import { createRenderer } from './renderer.js';
 import { createStage } from './stage.js';
@@ -76,7 +77,8 @@ export function createMrMahScene(host, options) {
     palette: palette, settings: settings, parent: stageBox.world, tier: tier
   });
   var characterBox = (opts.createCharacter || createCharacter)({
-    palette: palette, settings: settings, parent: stageBox.subject, tint: opts.tint
+    palette: palette, settings: settings, parent: stageBox.subject, tint: opts.tint,
+    envMap: stageBox.environment
   });
 
   /* Re-solve the camera against the character's actual height, so the measured
@@ -285,6 +287,32 @@ export function createMrMahScene(host, options) {
     setMode: setMode,
     getMode: function () { return modeName; },
     modes: MODE_NAMES,
+
+    /* ---- site-facing page API ------------------------------------------
+       A page reports what happened to IT; surfaces.js decides what that means
+       for the body. The renderer still knows nothing about AI Chat or MAH
+       Protocol — the mapping is a table in one file.
+
+           mah.signal('chat', 'generating');   // -> thinking
+           mah.signal('protocol', 'complete'); // -> success
+
+       Unknown events are ignored rather than throwing: a page mid-refactor
+       must not be able to break the character. */
+    signal: function (surface, event) {
+      var next = resolveSurface(surface, event);
+      if (!next) return null;
+      hostState = next;
+      if (characterBox.setState) characterBox.setState(next);
+      return next;
+    },
+    /* Adopt a surface's whole presentation — its composition and its resting
+       behaviour — in one call. */
+    adopt: function (surface) {
+      var m = modeFor(surface);
+      if (m) setMode(m);
+      return m;
+    },
+    surfaces: SURFACE_NAMES,
     info: function () {
       return {
         version: VERSION,

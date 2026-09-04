@@ -59,8 +59,8 @@ luminance distribution, and writes `validation/mrmah3d/silhouette-overlay.png`
 has mass it should not. **Open the overlay.** It has repeatedly located faults
 that the numbers alone described only vaguely.
 
-Current state: silhouette **89.4 / 100**, all seven proportion checks in
-tolerance. Known remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
+Current state: silhouette **89.9 / 100**, all seven proportion checks in
+tolerance, character mean luminance 71.7 against the reference's 68.2. Known remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
 
 Two properties of the measurement are worth knowing before trusting a delta:
 the reference mask includes the glow bleed around its own edges, so it reads
@@ -166,6 +166,7 @@ must not be claimed from headless runs.
 | `mrmah3d/core/mrmah-scene.js` | the one public entry point |
 | `mrmah3d/core/` | scene, renderer, camera, lights, environment, interaction, quality, lifecycle, palette |
 | `mrmah3d/core/composition.js` | page modes and the camera solver |
+| `mrmah3d/core/surfaces.js` | page events -> character states (the only file naming a MAHFITT page) |
 | `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
@@ -230,6 +231,28 @@ coherently rather than only moving a camera.
 mode into a real 620px chat stage and measures where he actually lands against
 the intent. Both the horizontal and the vertical placement were silently
 mirrored at one point and only that measurement caught it.
+
+### Page events
+
+A page reports what happened to IT and `surfaces.js` decides what that means
+for the body:
+
+```js
+mah.adopt('chat');                  // take the surface's whole presentation
+mah.signal('chat', 'generating');   // -> thinking
+mah.signal('protocol', 'complete'); // -> success
+```
+
+| Surface | Events |
+| --- | --- |
+| `chat` | idle · waiting · generating · response · settled · error |
+| `protocol` | intro · question · answered · generating · complete · concern |
+| `ambient` | idle · greet · attention |
+
+`surfaces.js` is the **only** file in the package permitted to name a MAHFITT
+page, and it names them only as keys in a table. Unknown events are ignored
+rather than throwing, so a page mid-refactor cannot break the character. A test
+enforces that nothing under `core/character/` mentions a surface.
 
 ### Behaviour states
 

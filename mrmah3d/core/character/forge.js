@@ -55,6 +55,32 @@ export function facetedGeometry(positions, faces, groups) {
   return geo;
 }
 
+/* Deterministic pseudo-random in 0..1 from two integers.
+
+   Deterministic matters: the character must be identical on every mount and in
+   every screenshot, so the facet pattern is a function of position in the mesh,
+   never of Math.random(). */
+function hash2(i, j) {
+  var n = Math.sin(i * 127.1 + j * 311.7) * 43758.5453;
+  return n - Math.floor(n);
+}
+
+/* How much a vertex is allowed to move, given where it sits around the ring.
+
+   This is what lets the body be richly faceted WITHOUT damaging the measured
+   silhouette. Seen from the front camera the outline is drawn by the vertices
+   at the extreme left and right of each ring — cos(angle) = +/-1 — while the
+   vertices facing the camera contribute nothing to the outline at all. So
+   displacement is suppressed near the profile and allowed in full across the
+   front and back.
+
+   The result is that the face of him the viewer actually reads gets the most
+   plane variation, and the shape they judge him by does not move. */
+function reliefWeight(angle) {
+  var c = Math.abs(Math.cos(angle));
+  return 1 - c * c * 0.82;
+}
+
 /* Loft a stack of rings into a closed solid.
 
    Rings are elliptical in XZ, phased so that with 6 sides a vertex lands dead
@@ -78,22 +104,41 @@ export function loft(sections, sides, options) {
 
   function push(x, y, z) { positions.push(x, y, z); return positions.length / 3 - 1; }
 
-  sections.forEach(function (s) {
+  sections.forEach(function (s, ri) {
     if (s.w <= 1e-6 && s.d <= 1e-6) { rings.push({ point: push(0, s.y, 0), verts: null }); return; }
     var verts = [];
     for (var i = 0; i < sides; i++) {
       var a = phase + (i / sides) * Math.PI * 2;
+      var guard = reliefWeight(a);
+
       /* Alternating facet relief. Pulling every other vertex slightly in
          makes each quad of the loft non-planar, so its two triangles get
          different normals and return different values under the same light.
          Without it a lofted taper is almost smooth and the body reads as a
-         flat dark shape with lines drawn on it — the crystal has to be made
-         of visibly distinct planes for lighting to describe the form. */
+         flat dark shape with lines drawn on it. */
       var relief = 1 + (s.facet || 0) * (i % 2 ? -1 : 1);
+
+      /* CRYSTAL RELIEF — the difference between a faceted cone and a cut gem.
+
+         A regular alternation still produces a regular surface: every quad the
+         same size, every plane at the same angle to its neighbour, which is
+         what made the body read as machined rather than grown. An irregular
+         but DETERMINISTIC displacement gives neighbouring triangles genuinely
+         different normals, so they catch genuinely different parts of the
+         environment — which is where the reference's glistening front faces
+         come from. Weighted by `guard`, so the profile stays measured. */
+      var jitter = (hash2(i * 3 + 1, ri * 7 + 2) - 0.5) * 2 * (s.crystal || 0) * guard;
+
+      /* A little vertical scatter too. Perfectly level rings read as stacked
+         bands; breaking them is most of what removes the rigid, CAD look. */
+      var yJit = (hash2(i * 5 + 11, ri * 13 + 3) - 0.5) * (s.crystalY || 0) * guard;
+
       /* A shoulder shelf: front and back vertices sit lower than the sides,
          which is the collar chevron the reference shows across the chest. */
       var drop = (s.dip || 0) * Math.abs(Math.sin(a));
-      verts.push(push(Math.cos(a) * s.w * relief, s.y - drop, Math.sin(a) * s.d * relief));
+
+      var r = relief + jitter;
+      verts.push(push(Math.cos(a) * s.w * r, s.y - drop + yJit, Math.sin(a) * s.d * r));
     }
     rings.push({ point: null, verts: verts });
   });
@@ -148,10 +193,31 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
   var dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2];
   var len = Math.hypot(dx, dy, dz) || 1e-6;
 
-  var built = loft([
-    { y: 0, w: radiusA, d: radiusA * (opts.depthRatio || 0.82) },
-    { y: len, w: radiusB, d: radiusB * (opts.depthRatio || 0.82) }
-  ], sides || 6, { capTop: true, capBottom: true, phase: opts.phase });
+  /* Limbs get intermediate rings and their own crystal relief.
+
+     Built as a single tapered tube from end to end, an arm is four or six long
+     flat strips — which is exactly why the limbs kept reading as bars while the
+     torso read as crystal. Subdividing along the length and letting the same
+     deterministic relief work on it gives the arms facets of a comparable size
+     to the body's, so they belong to the same object. */
+  var STEPS = opts.steps || 4;
+  var crystal = opts.crystal == null ? 0.075 : opts.crystal;
+  var ratio = opts.depthRatio || 0.82;
+  var rings = [];
+  for (var k = 0; k <= STEPS; k++) {
+    var t = k / STEPS;
+    var r = radiusA + (radiusB - radiusA) * t;
+    /* Relief fades out at both ends so the joints still meet cleanly. */
+    var taper = Math.sin(t * Math.PI);
+    rings.push({
+      y: len * t, w: r, d: r * ratio,
+      crystal: crystal * taper,
+      crystalY: crystal * 0.35 * taper * len,
+      facet: (k % 2 ? -1 : 1) * 0.03 * taper
+    });
+  }
+
+  var built = loft(rings, sides || 6, { capTop: true, capBottom: true, phase: opts.phase });
 
   /* Orient +Y onto the A->B axis with a minimal rotation. */
   var ux = dx / len, uy = dy / len, uz = dz / len;
@@ -197,29 +263,58 @@ export function diamondCrystal(opts) {
   var hw = opts.halfWidth, hh = opts.halfHeight, hd = opts.halfDepth;
   var bevel = opts.bevelInset, face = opts.faceInset;
   var bevelZ = opts.bevelZ * hd, faceZ = opts.faceZ * hd, backZ = opts.backApexZ * hd;
+  var relief = opts.relief || 0;
 
   var P = [];
   function push(x, y, z) { P.push(x, y, z); return P.length / 3 - 1; }
 
-  /* Equator diamond: right, top, left, bottom — at z = 0. */
-  var E = [push(hw, 0, 0), push(0, hh, 0), push(-hw, 0, 0), push(0, -hh, 0)];
-  /* Bevel ring, forward. */
-  var B = [push(hw * bevel, 0, bevelZ), push(0, hh * bevel, bevelZ),
-           push(-hw * bevel, 0, bevelZ), push(0, -hh * bevel, bevelZ)];
-  /* Face plate, inset AND behind the bevel ring. */
-  var F = [push(hw * face, 0, faceZ), push(0, hh * face, faceZ),
-           push(-hw * face, 0, faceZ), push(0, -hh * face, faceZ)];
-  /* Back apex. */
+  /* An EIGHT-point girdle, not four.
+
+     With four points the head has only four front bevels, and it rendered as a
+     flat diamond outline with a large black hole in it — by some distance the
+     least resolved part of the character. Eight points double the facet count
+     on every ring while keeping the outline exactly where it was: the four
+     extra vertices sit ON the diamond's own edges (the line x/hw + y/hh = 1),
+     so the silhouette is mathematically unchanged and only the cut gets
+     richer. */
+  var N = 8;
+  var girdle = [];
+  for (var g = 0; g < N; g++) {
+    var t = g / N * Math.PI * 2;
+    /* Parametrise the diamond itself rather than a circle, so every point
+       lands exactly on the outline. */
+    var ct = Math.cos(t), st = Math.sin(t);
+    var k = 1 / (Math.abs(ct) + Math.abs(st));
+    girdle.push({ x: ct * k * hw, y: st * k * hh });
+  }
+
+  function ring(scale, z, jitterSeed) {
+    return girdle.map(function (p, i) {
+      /* A little depth scatter on the bevel ring gives the front facets
+         genuinely different tilts, which is what makes the head catch light in
+         several places instead of reading as one plate. */
+      var jz = jitterSeed == null ? 0 : (hash2(i * 3 + jitterSeed, jitterSeed) - 0.5) * 2 * relief * hd;
+      return push(p.x * scale, p.y * scale, z + jz);
+    });
+  }
+
+  var E = ring(1, 0, null);                 /* the silhouette — never jittered */
+  var B = ring(bevel, bevelZ, 5);           /* forward bevel ring */
+  var F = ring(face, faceZ, null);          /* the recessed face plate */
   var back = push(0, 0, backZ);
 
   var shell = [], plate = [];
-  for (var i = 0; i < 4; i++) {
-    var j = (i + 1) % 4;
+  for (var i = 0; i < N; i++) {
+    var j = (i + 1) % N;
     shell.push([E[i], B[i], B[j], E[j]]);   /* front bevels */
     shell.push([B[i], F[i], F[j], B[j]]);   /* the recess lip */
     shell.push([E[j], E[i], back]);         /* back facets */
   }
-  plate.push([F[0], F[1], F[2], F[3]]);     /* the dark facial plane */
+  /* Fan the plate from its centre so it is several triangles, not one quad —
+     it then picks up a little value variation of its own instead of reading as
+     a single flat void. */
+  var centre = push(0, 0, faceZ);
+  for (var f = 0; f < N; f++) plate.push([centre, F[f], F[(f + 1) % N]]);
 
   return facetedGeometry(P, null, [
     { faces: shell, material: 0 },

@@ -276,6 +276,31 @@ const protoBlock = (comp.match(/protocol:\s*\{[\s\S]*?\},\s*\n\n/) || [''])[0];
 ok('COMP-scene-exposes-setMode', /setMode: setMode/.test(read('mrmah3d/core/mrmah-scene.js')));
 ok('COMP-camera-resolves-on-resize', /if \(mode\) \{ applyMode\(aspect\)/.test(read('mrmah3d/core/camera.js')));
 
+/* ---- F5b. site-facing page API ----------------------------------------- */
+const surf = read('mrmah3d/core/surfaces.js');
+ok('SURF-module-exists', exists('mrmah3d/core/surfaces.js'));
+['chat', 'protocol', 'ambient'].forEach(function (x) {
+  ok('SURF-' + x, new RegExp('\\b' + x + ':\\s*\\{').test(surf));
+});
+/* The events a page actually knows about. */
+['waiting', 'generating', 'response'].forEach(function (e) {
+  ok('SURF-chat-event-' + e, new RegExp(e + ':').test(surf));
+});
+['intro', 'question', 'answered', 'complete'].forEach(function (e) {
+  ok('SURF-protocol-event-' + e, new RegExp(e + ':').test(surf));
+});
+ok('SURF-unknown-event-is-noop', /return state \|\| null/.test(surf),
+  'a page mid-refactor must not be able to throw inside the renderer');
+ok('SURF-scene-exposes-signal', /signal: function/.test(scene));
+ok('SURF-scene-exposes-adopt', /adopt: function/.test(scene));
+/* surfaces.js is the ONLY file allowed to name a MAHFITT page. */
+['states.js', 'mrmah.js', 'body.js', 'head.js', 'limbs.js', 'materials.js']
+  .forEach(function (f) {
+    ok('SURF-character-is-page-agnostic-' + f,
+      !/aiChat|ai-chat|mahfitt|mygym|protocol/i.test(code('mrmah3d/core/character/' + f)),
+      f + ' must not know which surface is driving it');
+  });
+
 /* ---- F6. the world is a layered place, and it is quiet ----------------- */
 ok('WORLD-horizon-band', /horizon/.test(env));
 ok('WORLD-horizon-is-fogged', /fog MUST be on/.test(env),

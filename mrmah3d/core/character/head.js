@@ -29,7 +29,8 @@ export function buildHead(materials) {
     faceInset: HEAD.faceInset,
     bevelZ: HEAD.bevelZ,
     faceZ: HEAD.faceZ,
-    backApexZ: HEAD.backApexZ
+    backApexZ: HEAD.backApexZ,
+    relief: HEAD.relief
   });
 
   var shell = new Mesh(geo, [materials.body, materials.face]);
@@ -45,13 +46,15 @@ export function buildHead(materials) {
   group.add(rim);
 
   /* Edge illumination, taken from the geometry itself. */
-  var edges = new EdgesGeometry(geo, 26);
+  var edges = new EdgesGeometry(geo, 34);
   var line = new LineSegments(edges, materials.edge);
   line.name = 'head-edges';
   group.add(line);
   var halo = new LineSegments(edges, materials.edgeHalo);
   halo.name = 'head-edge-halo';
   group.add(halo);
+  var minorEdges = new EdgesGeometry(geo, 14);
+  group.add(new LineSegments(minorEdges, materials.edgeFaint));
 
   /* ---- face ----------------------------------------------------------- */
   /* Sits on the recessed plate. faceZ is where the plate is; the features are
@@ -122,6 +125,7 @@ export function buildHead(materials) {
     dispose: function () {
       geo.dispose();
       edges.dispose();
+      minorEdges.dispose();
       group.traverse(function (o) { if (o.geometry && o.geometry !== geo) o.geometry.dispose(); });
     }
   };

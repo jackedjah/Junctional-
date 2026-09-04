@@ -22,7 +22,7 @@ export { HEIGHT as CHARACTER_HEIGHT };
 
 export function createCharacter(options) {
   var opts = options || {};
-  var mah = createMrMah({ tint: opts.tint });
+  var mah = createMrMah({ tint: opts.tint, envMap: opts.envMap });
   if (opts.parent) opts.parent.add(mah.root);
 
   /* Shadow flags are the renderer's business, not the character's: the

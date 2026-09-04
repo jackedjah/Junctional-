@@ -63,8 +63,9 @@ mah.setMode('protocol');               // re-composes the whole scene
 mah.destroy();
 ```
 
-A surface declares WHERE it is (`mode`) and WHAT IS HAPPENING (`state`). It
-never positions a camera. See `../CLAUDE.md` §9 for what each mode is for and
+A surface declares WHERE it is (`mode`) and WHAT IS HAPPENING (`state`), or
+simply reports its own events with `mah.signal('chat', 'generating')`. It never
+positions a camera. See `../CLAUDE.md` §9 for what each mode is for and
 why the in-app ones keep him low and off-centre.
 
 `createMrMahScene(host, options)` takes the element it should fill and confines
@@ -89,6 +90,7 @@ core/
   stage.js         Scene + fog; 'world' and 'subject' roots
   camera.js        PerspectiveCamera + responsive framing
   composition.js   page modes; solves a camera from compositional intent
+  surfaces.js      page events -> states; the only file naming a MAHFITT page
   lights.js        key / fill / rim / hemi / ambient
   environment.js   shadow-catching ground + perspective grid
   character.js     the character seam (swap point for a loaded model)

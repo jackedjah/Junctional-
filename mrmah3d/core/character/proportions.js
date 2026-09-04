@@ -52,11 +52,14 @@ export var HEAD = {
   /* The front face plate is inset from the silhouette and pushed back from
      the bevel ring, which is what makes the face read as recessed INSIDE the
      crystal rather than painted on its front. */
-  faceInset: 0.60,               /* plate size as a share of the diamond */
+  faceInset: 0.54,               /* plate size as a share of the diamond */
   bevelInset: 0.66,              /* bevel ring size */
   bevelZ: 0.62,                  /* bevel ring depth, share of halfDepth */
   faceZ: 0.44,                   /* plate depth — behind the bevel: the recess */
-  backApexZ: -1.0
+  backApexZ: -1.0,
+  /* Depth scatter on the head's bevel ring, so its front facets tilt slightly
+     differently and the head catches light in several places. */
+  relief: 0.13
 };
 
 export var NECK = {
@@ -75,22 +78,32 @@ export var NECK = {
    the front and back vertices to cut the collar chevron the reference shows
    across the chest. Rings are dense in the upper body where the reference's
    faceting is most visible and sparser down the plain taper. */
+/* `crystal` / `crystalY` are the irregular relief that turns a faceted cone
+   into a cut gem — see forge.js. They are strongest across the chest, which is
+   the surface the viewer actually reads, and taper to nothing at the tip and
+   the collar so neither the point nor the shoulder line loses its shape.
+
+   12 sides rather than 8: the front of the torso now spans several distinct
+   planes instead of two, which is what the reference shows and what a uniform
+   front could never produce. */
 export var TORSO = {
   topY: (1 - 0.356) * H,         /* 1.932 */
-  sides: 8,
+  sides: 12,
   rings: [
     { y: 0.000, w: 0.000, d: 0.000 },
-    { y: 0.140, w: 0.075, d: 0.048, facet: 0.026 },
-    { y: 0.330, w: 0.148, d: 0.090, facet: -0.026 },
-    { y: 0.560, w: 0.228, d: 0.135, facet: 0.026 },
-    { y: 0.780, w: 0.296, d: 0.168, facet: -0.026 },
-    { y: 0.980, w: 0.352, d: 0.192, facet: 0.024 },
-    { y: 1.180, w: 0.404, d: 0.212, facet: -0.024 },
-    { y: 1.330, w: 0.440, d: 0.226, facet: 0.022 },
-    { y: 1.470, w: 0.472, d: 0.238, facet: -0.020 },
-    { y: 1.600, w: 0.498, d: 0.246, facet: 0.018 },
-    { y: 1.700, w: 0.518, d: 0.252, facet: -0.016 },
-    { y: 1.850, w: 0.548, d: 0.258, facet: 0.012, dip: 0.055 },
+    { y: 0.120, w: 0.064, d: 0.041, facet: 0.026, crystal: 0.02, crystalY: 0.004 },
+    { y: 0.270, w: 0.122, d: 0.075, facet: -0.026, crystal: 0.04, crystalY: 0.010 },
+    { y: 0.420, w: 0.180, d: 0.108, facet: 0.026, crystal: 0.055, crystalY: 0.014 },
+    { y: 0.580, w: 0.235, d: 0.138, facet: -0.026, crystal: 0.065, crystalY: 0.018 },
+    { y: 0.740, w: 0.284, d: 0.162, facet: 0.026, crystal: 0.072, crystalY: 0.020 },
+    { y: 0.900, w: 0.330, d: 0.183, facet: -0.026, crystal: 0.076, crystalY: 0.022 },
+    { y: 1.060, w: 0.374, d: 0.201, facet: 0.024, crystal: 0.078, crystalY: 0.022 },
+    { y: 1.210, w: 0.410, d: 0.215, facet: -0.024, crystal: 0.078, crystalY: 0.022 },
+    { y: 1.350, w: 0.444, d: 0.228, facet: 0.022, crystal: 0.074, crystalY: 0.020 },
+    { y: 1.480, w: 0.474, d: 0.239, facet: -0.020, crystal: 0.066, crystalY: 0.018 },
+    { y: 1.600, w: 0.498, d: 0.246, facet: 0.018, crystal: 0.056, crystalY: 0.014 },
+    { y: 1.700, w: 0.518, d: 0.252, facet: -0.016, crystal: 0.044, crystalY: 0.010 },
+    { y: 1.850, w: 0.548, d: 0.258, facet: 0.012, crystal: 0.026, crystalY: 0.005, dip: 0.055 },
     { y: 1.932, w: 0.557, d: 0.260, facet: 0.010, dip: 0.130 }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */

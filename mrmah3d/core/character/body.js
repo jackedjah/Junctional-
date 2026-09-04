@@ -30,10 +30,20 @@ function lit(group, geo, materials, opts) {
     if (o.rimOffset) rim.position.copy(o.rimOffset);
     group.add(rim);
   }
-  var edges = new EdgesGeometry(geo, o.edgeAngle || 44);
-  group.add(new LineSegments(edges, materials.edge));
-  group.add(new LineSegments(edges, materials.edgeHalo));
-  return { mesh: mesh, edges: edges };
+  /* TWO TIERS OF EDGE, and this is what breaks the wireframe read.
+
+     One threshold gives every line the same weight, so a structural break like
+     the shoulder chevron looks exactly as important as the seam between two
+     adjacent facets — the eye reads a cage. Extracting twice separates them:
+     a high threshold finds only the real plane breaks and draws them brightly,
+     a low threshold finds every seam and draws it as a whisper. The surfaces
+     then carry the identity and the lines describe structure. */
+  var major = new EdgesGeometry(geo, o.edgeAngle || 52);
+  var minor = new EdgesGeometry(geo, o.minorAngle || 18);
+  group.add(new LineSegments(major, materials.edge));
+  group.add(new LineSegments(major, materials.edgeHalo));
+  group.add(new LineSegments(minor, materials.edgeFaint));
+  return { mesh: mesh, edges: major, minorEdges: minor };
 }
 
 export function buildBody(materials) {
@@ -44,7 +54,7 @@ export function buildBody(materials) {
   /* ---- torso ---------------------------------------------------------- */
   var torsoLoft = loft(TORSO.rings, TORSO.sides || 8, { capTop: true, capBottom: false });
   var torsoParts = lit(group, torsoLoft.geometry, materials, { rimScale: 1.022 });
-  owned.push(torsoLoft.geometry, torsoParts.edges);
+  owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges);
 
   /* ---- shoulder caps -------------------------------------------------- */
   /* Angular wedges reaching past the torso ring, which is what gives the
@@ -72,7 +82,7 @@ export function buildBody(materials) {
 
     var geo = facetedGeometry(P, faces);
     var parts = lit(group, geo, materials, { rimScale: 1.04 });
-    owned.push(geo, parts.edges);
+    owned.push(geo, parts.edges, parts.minorEdges);
   });
 
   /* ---- neck ----------------------------------------------------------- */
@@ -81,10 +91,10 @@ export function buildBody(materials) {
   var neckGeo = segment(
     [0, TORSO.topY - 0.02, 0.02],
     [0, HEAD.centreY - HEAD.halfHeight * 0.45, 0.02],
-    NECK.halfWidth * 1.15, NECK.halfWidth * 0.86, 6, { depthRatio: 0.85 }
+    NECK.halfWidth * 1.15, NECK.halfWidth * 0.86, 8, { depthRatio: 0.85, crystal: 0.06, steps: 3 }
   );
   var neckParts = lit(group, neckGeo, materials, { rimScale: 1.05 });
-  owned.push(neckGeo, neckParts.edges);
+  owned.push(neckGeo, neckParts.edges, neckParts.minorEdges);
 
   /* ---- chest insignia ------------------------------------------------- */
   /* Emissive, sitting slightly proud of the chest ridge so it is never
