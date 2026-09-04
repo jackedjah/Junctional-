@@ -1,4 +1,4 @@
-MR.MAH 3D — PHASE 1 ADDITIVE RETURN — MERGE INSTRUCTIONS
+MR.MAH 3D — ADDITIVE RETURN — MERGE INSTRUCTIONS
 
 This branch is an ADDITIVE-ONLY return. Every path in it is NEW.
 No MAHFITT production file is modified, and none is included here.
@@ -28,21 +28,30 @@ paths. Nothing is overwritten except CLAUDE.md, which must be MERGED if the
 checkpoint already has one.
 
     mrmah3d/                       entire directory (renderer + lab + vendored three)
+    reference/                     the canonical visual reference (engineering evidence)
+    tools/mrmah3d-reference.mjs    measures the reference into numbers
+    tools/mrmah3d-compare.mjs      scores the render against the reference
     tools/mrmah3d-verify.mjs       browser-driven runtime verification
-    tests/mrmah3d-phase1.test.js   static contract suite
+    tests/mrmah3d.test.js          static contract suite
     validation/mrmah3d/            captured render evidence
-    MRMAH3D_PHASE1_REPORT.md       implementation report
+    MRMAH3D_PHASE1_REPORT.md       phase 1 (architecture) report
+    MRMAH3D_PHASE2_REPORT.md       phase 1 high-fidelity (reference parity) report
     MRMAH3D_MERGE_TARGET.txt       this file
     CLAUDE.md                      MERGE, do not overwrite, if one already exists
 
 VERIFY AFTER MERGE
 ------------------
-    node tests/mrmah3d-phase1.test.js
-      -> 90/90 PASS
+    node tests/mrmah3d.test.js
+      -> 146/146 PASS
 
     npx http-server . -p 8123 -s -c-1 &
     node tools/mrmah3d-verify.mjs http://127.0.0.1:8123
-      -> 84/84 PASS, screenshots written to validation/mrmah3d/
+      -> 92/92 PASS, screenshots written to validation/mrmah3d/
+
+    node tools/mrmah3d-reference.mjs http://127.0.0.1:8123
+    node tools/mrmah3d-compare.mjs   http://127.0.0.1:8123
+      -> silhouette 89.4/100, 7/7 proportions in tolerance
+      -> open validation/mrmah3d/silhouette-overlay.png
 
     # the accepted application must be unchanged by this merge:
     node --check mygym.js
@@ -51,7 +60,7 @@ VERIFY AFTER MERGE
     for f in tests/*.test.js; do node "$f" >/dev/null 2>&1 || echo "FAIL $f"; done
       -> the failure set must stay byte-identical to the pre-merge baseline.
          This return adds one suite and modifies none, so the only expected
-         difference is the addition of mrmah3d-phase1.
+         difference is the addition of mrmah3d.
 
 PRODUCTION IMPACT
 -----------------
@@ -72,10 +81,11 @@ None, by construction.
 OPTIONAL HARDENING (NOT APPLIED)
 --------------------------------
 The lab is served as a static file, so it is technically reachable in
-production by URL. It is inert — it renders a grey placeholder and touches no
-member data or backend action — but if you want it unreachable on the
-production deploy, add a rule to netlify.toml. That file was not present in
-the supplied archive, so no such rule was written blind:
+production by URL. It is inert — it renders a character on an empty stage and
+touches no member data, no backend action and no MAHFITT script or stylesheet —
+but if you want it unreachable on the production deploy, add a rule to
+netlify.toml. That file was not present in the supplied archive, so no such
+rule was written blind:
 
     [[redirects]]
       from = "/mrmah3d/*"
@@ -93,15 +103,22 @@ EVIDENCE THIS WORK WAS DERIVED FROM, NOT ASSUMED
   tests              plain node scripts, no framework  (tests/*.test.js)
   character owner    fabiRigHTML() in mygym.js, one inline SVG,
                      viewBox 0 0 420 560, shared by AI Chat and MAH Protocol
-  camera framing     #mygym .fabi-grid in mygym.css:
+  legacy framing     #mygym .fabi-grid in mygym.css:
                      transform: perspective(470px) rotateX(64deg)
                      -> 55 deg vertical FOV, 26 deg downward pitch
-  grid proportion    .fabi-grid background-size 50px x 38px -> 1.33 cell aspect
+                     (retained as camera.js LEGACY_STAGE for the 2.5D surface)
+  canonical framing  solved from reference/mrmah-canonical-front.png:
+                     character fills 67.0% of frame height, apex 15.0% down,
+                     horizon 59.8% down -> 32 deg FOV, distance 7.81,
+                     pitched UP 3.22 deg. The reference governs, not the CSS.
+  character measures reference apex y=251, tip y=1370 -> height 1119 px;
+                     head 366 x 384 px; torso top 415 px; elbows y=795 / y=865
   stage palette      --ink-rgb 14,17,20 / --bright-rgb 233,201,143 /
                      --card-rgb 27,32,38
   stage heights      620 / 530 / 500 / 456 / 432 / 318 across the
                      560 / 380 / 768 / landscape breakpoints
   drag conventions   bindFabiCharacterDrag: pointer capture, single active
                      pointer, touch-action none
-  luminance rule     R83: mean character luminance ~18.5 (applies to the real
-                     Mr.Mah, NOT to the Phase 1 placeholder — see palette.js)
+  luminance          reference character pixels measure mean luma 68.2 with a
+                     full black-to-white spread; the render is tracked against
+                     that by tools/mrmah3d-compare.mjs

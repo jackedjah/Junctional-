@@ -1,5 +1,5 @@
 'use strict';
-/* MR.MAH 3D — PHASE 1 STATIC CONTRACT SUITE
+/* MR.MAH 3D — STATIC CONTRACT SUITE
 
    Written in the plain-node style the rest of tests/ uses: no framework, no
    dependencies, run with `node tests/mrmah3d-phase1.test.js`.
@@ -123,12 +123,22 @@ ok('MOB-resize-observed', /ResizeObserver/.test(scene));
    the drawing buffer fight each other on rotate. */
 ok('MOB-no-inline-canvas-size', /setSize\(w,\s*h,\s*false\)/.test(renderer));
 
-/* ---- E. framing is derived from the accepted design ------------------- */
+/* ---- E. framing reproduces the reference composition ------------------ */
+/* The camera is now solved against reference/mrmah-canonical-front.png, not
+   against the 2.5D CSS stage. The legacy stage numbers are still exported for
+   that surface, so these assertions read FRAMING specifically — matching the
+   file loosely would pass on the legacy constants and prove nothing. */
 const camera = read('mrmah3d/core/camera.js');
-ok('CAM-fov-from-css-perspective', /fov:\s*55/.test(camera));
-ok('CAM-pitch-from-css-rotateX', /pitchDeg:\s*26/.test(camera));
-ok('CAM-documents-its-derivation', /perspective\(470px\)/.test(camera) && /rotateX\(64deg\)/.test(camera));
+const framingBlock = (camera.match(/export var FRAMING = \{[\s\S]*?\};/) || [''])[0];
+ok('CAM-reference-fov', /fov:\s*32/.test(framingBlock), 'FRAMING.fov must be the solved 32');
+ok('CAM-reference-distance', /distance:\s*7\.81/.test(framingBlock));
+ok('CAM-reference-aspect', /referenceAspect:\s*0\.5622/.test(framingBlock));
+ok('CAM-pitched-up-not-down', /cameraY:\s*1\.15/.test(framingBlock) && /targetY:\s*1\.59/.test(framingBlock),
+  'the reference horizon sits below frame centre, so the camera tilts UP');
+ok('CAM-legacy-stage-retained', /LEGACY_STAGE/.test(camera) && /pitchDeg:\s*26/.test(camera));
+ok('CAM-documents-its-derivation', /940 x 1672/.test(camera) && /67\.0%/.test(camera));
 ok('CAM-fov-clamped', /maxFov/.test(camera));
+ok('CAM-reframes-to-character', /frameCharacter/.test(camera));
 
 /* The grid must stay entirely in front of the camera: line segments that
    straddle the near plane were measured being dropped by the rasteriser,
@@ -141,18 +151,96 @@ const centerZ = Number((env.match(/centerZ:\s*(-?\d+)/) || [])[1]);
 const camZ = Math.cos(26 * Math.PI / 180) * 7.2;
 ok('ENV-grid-near-edge-in-front-of-camera', centerZ + gridSize / 2 < camZ,
   'grid near edge z=' + (centerZ + gridSize / 2).toFixed(2) + ' vs camera z=' + camZ.toFixed(2));
-ok('ENV-grid-cell-matches-css-aspect', Math.abs(gridSize / gridDiv - 1.3333) < 0.01,
+ok('ENV-grid-cell-plausible', gridSize / gridDiv > 1 && gridSize / gridDiv < 2,
   'cell ' + (gridSize / gridDiv).toFixed(3) + ' units');
 ok('ENV-grid-clear-of-shadow-plane', /y:\s*0\.0[2-9]/.test(env));
 ok('ENV-ground-does-not-occlude', /ground\.material\.depthWrite\s*=\s*false/.test(env));
+/* The reference world, not a bare floor. */
+ok('ENV-glowing-grid-nodes', /grid-nodes/.test(env));
+ok('ENV-floor-glow', /floor-glow/.test(env));
+ok('ENV-background-structures', /structures/.test(env));
+ok('ENV-particles', /motes/.test(env));
+ok('ENV-world-stays-quiet', /Mr\.Mah is the only bright, detailed thing/.test(env));
 
-/* ---- F. the placeholder is unmistakably a placeholder ----------------- */
-const character = read('mrmah3d/core/character.js');
-ok('PH-flagged-in-api', /isPlaceholder:\s*true/.test(character));
-ok('PH-declared-in-source', /THIS IS NOT MR\.MAH/.test(character));
-ok('PH-uses-neutral-not-theme-body', /palette\.placeholder/.test(character));
-ok('PH-no-face-geometry', !/\b(eye|mouth|nose|brow|face)\b/i.test(code('mrmah3d/core/character.js')));
-ok('PH-palette-warns-against-reuse', /Do not carry this value into him/.test(read('mrmah3d/core/palette.js')));
+/* ---- F. the real character, built from the reference ------------------ */
+const mrmah = read('mrmah3d/core/character/mrmah.js');
+const props = read('mrmah3d/core/character/proportions.js');
+
+ok('CHR-not-a-placeholder', /isPlaceholder:\s*false/.test(mrmah));
+ok('CHR-reference-is-committed', exists('reference/mrmah-canonical-front.png'),
+  'the visual reference is engineering evidence and must live in the repo');
+
+/* Proportions must stay traceable to the reference, not drift into taste. */
+ok('PROP-cites-the-reference', /reference\/mrmah-canonical-front\.png/.test(props));
+ok('PROP-records-frame', /940/.test(props) && /1672/.test(props));
+ok('PROP-records-character-height-px', /1119/.test(props));
+const headW = Number((props.match(/halfWidth:\s*([\d.]+)\s*\*\s*H\s*\/\s*2/) || [])[1]);
+const headH = Number((props.match(/halfHeight:\s*([\d.]+)\s*\*\s*H\s*\/\s*2/) || [])[1]);
+ok('PROP-head-width-matches-reference', Math.abs(headW - 366 / 1119) < 0.01,
+  'head width ' + headW.toFixed(4) + ' vs reference ' + (366 / 1119).toFixed(4));
+ok('PROP-head-slightly-taller-than-wide', headH > headW,
+  'the reference diamond is 366 wide by 384 tall');
+ok('PROP-float-not-grounded', /height:\s*0\.1/.test(props));
+
+/* Every part the brief names must actually exist as geometry. */
+const parts = {
+  'diamond head': /diamondCrystal/.test(read('mrmah3d/core/character/head.js')),
+  'recessed face plate': /faceZ/.test(read('mrmah3d/core/character/forge.js')),
+  'neck': /neckGeo/.test(read('mrmah3d/core/character/body.js')),
+  'shoulders': /shoulder caps/i.test(read('mrmah3d/core/character/body.js')),
+  'tapered torso': /torsoLoft/.test(read('mrmah3d/core/character/body.js')),
+  'two arms': /ARMS\.right/.test(read('mrmah3d/core/character/limbs.js')) &&
+              /ARMS\.left/.test(read('mrmah3d/core/character/limbs.js')),
+  'elbow joints': /elbowJoint/.test(read('mrmah3d/core/character/limbs.js')),
+  'wrists': /wristJoint/.test(read('mrmah3d/core/character/limbs.js')),
+  'hands': /buildHand/.test(read('mrmah3d/core/character/limbs.js')),
+  'digits': /digitCount/.test(read('mrmah3d/core/character/limbs.js')),
+  'chest emblem': /chest-emblem/.test(read('mrmah3d/core/character/body.js')),
+  'transport symbols': /transport-symbols/.test(read('mrmah3d/core/character/body.js')),
+  'eyes': /eye-left/.test(read('mrmah3d/core/character/head.js')),
+  'smile': /smile/.test(read('mrmah3d/core/character/head.js'))
+};
+Object.keys(parts).forEach(function (k) { ok('GEO-' + k.replace(/\s+/g, '-'), parts[k]); });
+
+/* True 3D, not a flat plate with lines on it. */
+const forge = read('mrmah3d/core/character/forge.js');
+ok('GEO-flat-per-face-normals', /FLAT per-face normals/.test(forge));
+ok('GEO-head-has-depth', /halfDepth/.test(props));
+ok('GEO-head-back-apex', /backApexZ/.test(props));
+ok('GEO-torso-facet-relief', /facet:/.test(props));
+ok('GEO-torso-collar-dip', /dip:/.test(props));
+ok('GEO-alternating-triangulation', /Alternate the diagonal/.test(forge));
+
+/* ---- F2. material hierarchy ------------------------------------------- */
+const mats = read('mrmah3d/core/character/materials.js');
+ok('MAT-body-is-dark-and-lit-not-emissive', /NOT\s+a\s+glowing\s+cyan\s+object/.test(mats));
+ok('MAT-flat-shading', /flatShading:\s*true/.test(mats));
+ok('MAT-edge-illumination', /LineBasicMaterial/.test(mats));
+ok('MAT-edges-depth-tested', /depthTest:\s*true/.test(mats),
+  'edge halo must be depth tested or the character reads as a wireframe');
+ok('MAT-face-plate-near-black', /face:\s*0x0/.test(mats));
+ok('MAT-eyes-exempt-from-tonemapping', /toneMapped:\s*false/.test(mats));
+ok('MAT-glow-baselines-not-duplicated', /BASE\.edge/.test(mats));
+/* A metallic crystal with nothing to reflect renders black. */
+ok('MAT-environment-provided', /PMREMGenerator/.test(read('mrmah3d/core/stage.js')));
+ok('MAT-environment-is-bright', /has to be BRIGHT/.test(read('mrmah3d/core/stage.js')));
+
+/* ---- F3. behaviour states, uncoupled from any page -------------------- */
+const states = read('mrmah3d/core/character/states.js');
+['idle', 'listening', 'thinking', 'explaining', 'success', 'concerned', 'tapped', 'dragging']
+  .forEach(function (s) { ok('STATE-' + s, new RegExp('\\b' + s + ':\\s*\\{').test(states)); });
+ok('STATE-transient-returns', /transient/.test(states));
+ok('STATE-no-page-coupling',
+  !/mahfitt|mygym|protocol|aiChat/i.test(code('mrmah3d/core/character/states.js')),
+  'the renderer must not know which surface is driving it');
+ok('STATE-exposed-on-scene-api', /setState:/.test(read('mrmah3d/core/mrmah-scene.js')));
+
+/* ---- F4. tap and drag are distinguishable ----------------------------- */
+const inter = read('mrmah3d/core/interaction.js');
+ok('TAP-slop-before-drag', /DRAG_SLOP/.test(inter));
+ok('TAP-time-bounded', /TAP_MS/.test(inter));
+ok('TAP-drag-never-becomes-tap', /wasDragging/.test(inter));
+ok('TAP-cancel-is-not-a-tap', /function cancel/.test(inter));
 
 /* ---- G. persistent instructions exist --------------------------------- */
 ok('DOC-claude-md', exists('CLAUDE.md'));

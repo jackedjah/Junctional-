@@ -8,14 +8,83 @@
    inexpensive" the Phase 1 brief asks for. Anything more (bloom, SSAO, DOF)
    is a later-phase decision and must be tier-gated when it arrives. */
 
-import { Scene, Fog, Group, Color } from '../vendor/three/three.module.min.js';
+import {
+  Scene, Fog, Group, Color, CanvasTexture, EquirectangularReflectionMapping,
+  PMREMGenerator, SRGBColorSpace
+} from '../vendor/three/three.module.min.js';
+
+/* A tiny procedural environment for the crystal to reflect.
+
+   This is not decoration — it is what makes the material read as crystal at
+   all. A metallic surface with nothing to reflect returns almost pure black
+   except where a light happens to specular off it, and the body rendered as a
+   flat black shape with cyan outlines no matter how the lights were tuned.
+   Give it an environment and every facet reflects a different part of the
+   gradient, which is exactly the "readable internal facet variation" the
+   reference depends on.
+
+   Generated rather than loaded: no asset to ship, and it re-tints with the
+   theme. 64x32 is plenty — it is only ever seen blurred through roughness. */
+function buildEnvironment(renderer, palette) {
+  var c = document.createElement('canvas');
+  c.width = 64; c.height = 32;
+  var g = c.getContext('2d');
+  /* This gradient has to be BRIGHT. It is a reflection source, not scenery,
+     and it is never seen directly — the scene background stays transparent.
+     A first attempt used the stage's own near-black values and the crystal
+     stayed black, because a dark metal reflecting a dark room is just dark. */
+  var grad = g.createLinearGradient(0, 0, 0, 32);
+  grad.addColorStop(0.00, '#eafaff');   /* zenith: near-white */
+  grad.addColorStop(0.22, '#8fd8f2');
+  grad.addColorStop(0.44, '#2f7a9b');
+  grad.addColorStop(0.58, '#173c50');   /* horizon */
+  grad.addColorStop(0.80, '#12293a');
+  /* The floor of the environment is dark but NOT black. Limbs are roughly
+     horizontal tubes whose normals point sideways and down; against a black
+     lower hemisphere they reflected nothing and the arms rendered as flat
+     near-black bars while the torso read correctly. */
+  grad.addColorStop(1.00, '#0d1e2b');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 32);
+  /* A hot band just above the horizon: facets angled slightly up catch a
+     near-white highlight, which is the reference's sparse specular catch. */
+  g.fillStyle = 'rgba(255,255,255,0.98)';
+  g.fillRect(0, 8, 64, 3);
+
+  /* Hard bands over the smooth gradient.
+
+     A pure gradient makes neighbouring facets reflect almost the same value,
+     and measured against the reference that piled 50% of the character's
+     pixels into a single mid-tone band where the reference spreads them evenly
+     from black to white. Discrete steps give adjacent facets genuinely
+     different reflections, which is what a real cut crystal does. */
+  var bands = [
+    [0, 2, 'rgba(255,255,255,0.55)'],
+    [13, 2, 'rgba(10,20,30,0.60)'],
+    [17, 2, 'rgba(150,220,245,0.30)'],
+    [22, 3, 'rgba(6,12,18,0.55)'],
+    [27, 2, 'rgba(90,170,205,0.22)']
+  ];
+  bands.forEach(function (b) { g.fillStyle = b[2]; g.fillRect(0, b[0], 64, b[1]); });
+
+  var tex = new CanvasTexture(c);
+  tex.mapping = EquirectangularReflectionMapping;
+  tex.colorSpace = SRGBColorSpace;
+  tex.needsUpdate = true;
+
+  var pmrem = new PMREMGenerator(renderer);
+  var target = pmrem.fromEquirectangular(tex);
+  pmrem.dispose();
+  tex.dispose();
+  return target;
+}
 
 /* Linear, not exponential, and that choice matters. FogExp2 fogs by absolute
    distance from the camera, so any density strong enough to dissolve the grid's
    far edge (~28 units) also puts visible haze on the character, who sits a
    fixed ~7 units away. Linear fog with an explicit near lets the subject stay
    completely clean while the floor still fades to nothing. */
-export var FOG = { near: 9, far: 26 };
+export var FOG = { near: 11, far: 42 };
 
 export function createStage(options) {
   var opts = options || {};
@@ -30,6 +99,12 @@ export function createStage(options) {
 
   if (settings.fog) {
     scene.fog = new Fog(new Color(palette.fog).getHex(), FOG.near, FOG.far);
+  }
+
+  var envTarget = null;
+  if (opts.renderer) {
+    envTarget = buildEnvironment(opts.renderer, palette);
+    scene.environment = envTarget.texture;
   }
 
   /* Two roots, deliberately separate.
@@ -60,6 +135,7 @@ export function createStage(options) {
         if (m.dispose) m.dispose();
       });
     });
+    if (envTarget) { envTarget.dispose(); envTarget = null; scene.environment = null; }
     scene.clear();
   }
 

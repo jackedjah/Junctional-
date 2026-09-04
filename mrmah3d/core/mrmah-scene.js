@@ -66,13 +66,23 @@ export function createMrMahScene(host, options) {
   });
   var settings = rendererBox.settings;
 
-  var stageBox = createStage({ palette: palette, settings: settings });
+  var stageBox = createStage({
+    palette: palette, settings: settings, renderer: rendererBox.renderer
+  });
   var cameraBox = createCamera({ framing: opts.framing });
   var lightsBox = createLights({ palette: palette, settings: settings, parent: stageBox.scene });
-  var envBox = createEnvironment({ palette: palette, settings: settings, parent: stageBox.world });
-  var characterBox = (opts.createCharacter || createCharacter)({
-    palette: palette, settings: settings, parent: stageBox.subject
+  var envBox = createEnvironment({
+    palette: palette, settings: settings, parent: stageBox.world, tier: tier
   });
+  var characterBox = (opts.createCharacter || createCharacter)({
+    palette: palette, settings: settings, parent: stageBox.subject, tint: opts.tint
+  });
+
+  /* Re-solve the camera against the character's actual height, so the measured
+     reference composition holds even as the model is refined. */
+  if (characterBox.height && cameraBox.frameCharacter) {
+    cameraBox.frameCharacter(characterBox.height, 0.16, 0.670);
+  }
 
   host.appendChild(rendererBox.canvas);
 
@@ -121,11 +131,18 @@ export function createMrMahScene(host, options) {
   rendererBox.canvas.addEventListener('webglcontextlost', onContextLost, false);
   rendererBox.canvas.addEventListener('webglcontextrestored', onContextRestored, false);
 
+  /* The behaviour the HOST asked for, as distinct from a momentary reaction
+     to a gesture. Tap and drag are transient; when they finish the character
+     returns here rather than to a hardcoded idle, so a surface that had him
+     'thinking' still has him thinking after someone pokes him. */
+  var hostState = 'idle';
+
   /* ---- frame ---------------------------------------------------------- */
 
   function renderFrame(dt) {
     if (contextLost || rendererBox.isDisposed()) return;
     characterBox.update(dt, { reducedMotion: reducedMotion });
+    if (envBox.update) envBox.update(dt, { reducedMotion: reducedMotion });
     rendererBox.renderer.render(stageBox.scene, cameraBox.camera);
   }
 
@@ -154,6 +171,16 @@ export function createMrMahScene(host, options) {
       /* Repaint immediately so a drag stays responsive even while the loop is
          paused (reduced motion, or off-screen with a pointer still captured). */
       if (!loop.isRunning()) renderFrame(0);
+    },
+    onTap: function () {
+      if (characterBox.setState) characterBox.setState('tapped');
+    },
+    onDragStart: function () {
+      if (characterBox.setState) characterBox.setState('dragging');
+    },
+    onDragEnd: function () {
+      /* Back to whatever the host had asked for before the gesture. */
+      if (characterBox.setState) characterBox.setState(hostState);
     }
   });
 
@@ -200,6 +227,24 @@ export function createMrMahScene(host, options) {
     start: loop.start,
     destroy: destroy,
     setReducedMotion: function (v) { reducedMotion = !!v; },
+
+    /* ---- behaviour API -------------------------------------------------
+       This is how a page will eventually drive him:
+
+         AI Chat        generating -> 'thinking'
+                        response   -> 'explaining'
+                        waiting    -> 'listening'
+         MAH Protocol   question   -> 'explaining'
+                        calculating-> 'thinking'
+                        completed  -> 'success'
+
+       The renderer knows none of those surfaces. It only knows the states. */
+    setState: function (name) {
+      hostState = name;
+      return characterBox.setState ? characterBox.setState(name) : null;
+    },
+    getState: function () { return characterBox.getState ? characterBox.getState() : null; },
+    states: characterBox.stateNames || [],
     info: function () {
       return {
         version: VERSION,

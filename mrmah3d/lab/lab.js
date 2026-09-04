@@ -15,6 +15,12 @@ var readout = document.getElementById('readout');
 var scene = null;
 var forcedTier = null;
 
+/* ?canonical=1 puts the stage into the reference frame's aspect. That is the
+   view the character's camera was solved for, and the only one that should be
+   compared against reference/mrmah-canonical-front.png. */
+var params = new URLSearchParams(location.search || '');
+if (params.get('canonical') === '1') document.documentElement.dataset.canonical = '1';
+
 function say(text, isError) {
   readout.textContent = text;
   if (isError) readout.setAttribute('data-error', '1');

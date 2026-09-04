@@ -33,7 +33,10 @@ export function createRenderer(options) {
   /* MAHFITT's stage is very dark with small bright speculars — exactly the case
      where a filmic curve beats clipping to white. */
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = Number(opts.exposure) || 1;
+  /* ACES rolls the top end off hard. At exposure 1 the crystal's bright facets
+     were being compressed into the same mid-tone as its dark ones, flattening
+     exactly the contrast the reference depends on. */
+  renderer.toneMappingExposure = Number(opts.exposure) || 1.12;
   renderer.shadowMap.enabled = settings.shadows;
   renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.setClearColor(0x000000, 0);

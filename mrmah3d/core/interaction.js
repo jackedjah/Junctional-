@@ -20,14 +20,28 @@ export function createInteraction(options) {
   var element = opts.element;
   var onYaw = typeof opts.onYaw === 'function' ? opts.onYaw : function () {};
   var getYaw = typeof opts.getYaw === 'function' ? opts.getYaw : function () { return 0; };
+  var onTap = typeof opts.onTap === 'function' ? opts.onTap : function () {};
+  var onDragStart = typeof opts.onDragStart === 'function' ? opts.onDragStart : function () {};
+  var onDragEnd = typeof opts.onDragEnd === 'function' ? opts.onDragEnd : function () {};
 
   /* A full drag across the element's width turns the subject this far. Scaling
      by width rather than by raw pixels is what makes the gesture feel the same
      on a 375px phone and a 1024px iPad. */
   var SWEEP = Math.PI * 1.6;
 
+  /* Tap vs drag. A press only becomes a drag once it travels past
+     DRAG_SLOP css px, and only counts as a tap if it both stayed inside that
+     slop AND lifted within TAP_MS. The slop is generous because a finger on
+     glass always moves a little; without it every tap on a phone would be
+     swallowed as a one-pixel drag. Once a gesture becomes a drag it can never
+     become a tap again, which is the guarantee the brief asks for. */
+  var DRAG_SLOP = 9;
+  var TAP_MS = 450;
+
   var active = null;    /* pointerId of the one gesture we track */
   var startX = 0;
+  var startY = 0;
+  var startAt = 0;
   var startYaw = 0;
   var dragged = false;
   var bound = false;
@@ -42,35 +56,48 @@ export function createInteraction(options) {
     if (e.button != null && e.button !== 0 && e.pointerType === 'mouse') return;
     active = e.pointerId;
     startX = e.clientX;
+    startY = e.clientY;
+    startAt = (typeof performance !== 'undefined' ? performance.now() : Date.now());
     startYaw = getYaw();
     dragged = false;
     try { element.setPointerCapture(e.pointerId); } catch (x) {}
-    if (element.dataset) element.dataset.mrmahDragging = '1';
   }
 
   function onPointerMove(e) {
     if (active === null || e.pointerId !== active) return;
     var dx = e.clientX - startX;
-    if (!dragged && Math.abs(dx) > 2) dragged = true;
+    var dy = e.clientY - startY;
+    if (!dragged && Math.hypot(dx, dy) > DRAG_SLOP) {
+      dragged = true;
+      if (element.dataset) element.dataset.mrmahDragging = '1';
+      onDragStart();
+    }
+    if (!dragged) return;              /* inside the slop it is still a tap */
     onYaw(startYaw + (dx / width()) * SWEEP);
     /* Only once the gesture is genuinely a drag: a stationary press must stay
-       cancellable so it can still become a tap for a later phase. */
-    if (dragged && e.cancelable) e.preventDefault();
+       cancellable so it can still become a tap. */
+    if (e.cancelable) e.preventDefault();
   }
 
-  function end(e) {
+  function end(e, cancelled) {
     if (active === null || (e && e.pointerId !== active)) return;
     try { element.releasePointerCapture(active); } catch (x) {}
+    var wasDragging = dragged;
+    var held = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startAt;
     active = null;
+    dragged = false;
     if (element.dataset) delete element.dataset.mrmahDragging;
+    if (wasDragging) { onDragEnd(); return; }
+    if (!cancelled && held <= TAP_MS) onTap({ x: e && e.clientX, y: e && e.clientY });
   }
+  function cancel(e) { end(e, true); }
 
   function bind() {
     if (bound || !element) return false;
     element.addEventListener('pointerdown', onPointerDown);
     element.addEventListener('pointermove', onPointerMove, { passive: false });
     element.addEventListener('pointerup', end);
-    element.addEventListener('pointercancel', end);
+    element.addEventListener('pointercancel', cancel);
     /* A pointer released outside the window never fires pointerup on the
        element; without this the subject stays stuck to a pointer that is gone. */
     if (element.ownerDocument) element.ownerDocument.addEventListener('pointerup', end);
@@ -83,7 +110,7 @@ export function createInteraction(options) {
     element.removeEventListener('pointerdown', onPointerDown);
     element.removeEventListener('pointermove', onPointerMove);
     element.removeEventListener('pointerup', end);
-    element.removeEventListener('pointercancel', end);
+    element.removeEventListener('pointercancel', cancel);
     if (element.ownerDocument) element.ownerDocument.removeEventListener('pointerup', end);
     if (element.dataset) delete element.dataset.mrmahDragging;
     active = null;

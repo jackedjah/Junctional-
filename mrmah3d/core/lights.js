@@ -1,92 +1,98 @@
 /* MR.MAH 3D :: LIGHTS
-   A three-point rig: key, fill, rim. Plus a very low ambient so unlit faces
-   are dark rather than pure black.
+   A three-point rig whose job is to REVEAL FACETS.
 
-   This mirrors the vocabulary the 2.5D rig already speaks. The current SVG
-   system paints a key sweep, a fill/bounce and a Secondary-family perimeter
-   rim by hand (mygym.css, .fabi-rig__rim, and fabiApplySceneLighting's
-   keyMix / bounceMix). Phase 1 uses real lights for the same three jobs, so
-   when the real Mr.Mah model arrives the lighting intent transfers directly
-   instead of being reinvented.
+   The reference has strong dark-to-light contrast: the body is largely dark
+   and only some planes catch light. That is the look, and it comes from
+   lighting a dark material with directional sources — never from brightening
+   the material to compensate for weak lights, which flattens every facet at
+   once and is the failure this rig exists to avoid.
 
-   The rim in particular is load-bearing, not decoration: R83's whole finding
-   was that a dark character against a dark stage dissolves at the silhouette
-   unless something separates the edge from the void. */
+   Omnidirectional fill is kept DELIBERATELY LOW. Ambient, hemisphere and
+   bounce all raise the floor of every facet at once, and measured against the
+   reference that compressed 62% of the character's pixels into a single
+   mid-tone band where the reference spreads them from black to white. Contrast
+   is the material; fill is what destroys it.
 
-import { DirectionalLight, HemisphereLight, AmbientLight, Color } from '../vendor/three/three.module.min.js';
+   Key from the front-left and high, so the character's front and side planes
+   return clearly different values. Fill from the opposite side at a fraction
+   of the key, only enough to keep the shadow side readable. Rim from behind
+   in full-chroma cyan, which is what separates the silhouette from the void —
+   the same job the 2.5D rig's Secondary perimeter does by hand. */
+
+import {
+  DirectionalLight, HemisphereLight, AmbientLight, PointLight, Color
+} from '../vendor/three/three.module.min.js';
 
 export function createLights(options) {
   var opts = options || {};
-  var palette = opts.palette;
   var settings = opts.settings || { shadows: true, shadowMapSize: 512 };
   var group = opts.parent;
 
-  /* KEY — the one required directional light. High, and to the left of camera
-     but well forward of it.
-
-     The forward bias is deliberate and was measured, not guessed. An earlier
-     placement at (-3.4, 5.4, 4.2) put the key on the exact 45-degree diagonal
-     between the front and left faces of the torso, so both faces returned the
-     same N.L and rendered at an identical value — the box lost its corner and
-     read as a flat silhouette. Pulling the key toward the front separates the
-     three visible planes into three distinct values, which is the single
-     clearest proof that the geometry has real depth. */
-  var key = new DirectionalLight(new Color(palette.key).getHex(), 2.1);
-  key.position.set(-2.2, 6.2, 5.2);
+  /* Cool white key — not cyan. A cyan key would tint every lit plane and the
+     body would start reading as "a glowing cyan object", which the reference
+     explicitly is not. The cyan belongs to the edges and the rim. */
+  var key = new DirectionalLight(new Color(0xd8ecff), 2.6);
+  key.position.set(-4.2, 7.4, 6.2);
   key.castShadow = !!settings.shadows;
   if (key.castShadow) {
     var s = settings.shadowMapSize || 512;
     key.shadow.mapSize.set(s, s);
-    /* A tight ortho frustum around the subject. Left at three's defaults the
-       shadow map would spread over a 10x10 area and the character's contact
-       shadow would be a soft grey smear. */
-    key.shadow.camera.left = -4;
-    key.shadow.camera.right = 4;
-    key.shadow.camera.top = 5;
-    key.shadow.camera.bottom = -1;
-    key.shadow.camera.near = 0.5;
-    key.shadow.camera.far = 18;
+    key.shadow.camera.left = -3.2;
+    key.shadow.camera.right = 3.2;
+    key.shadow.camera.top = 4.6;
+    key.shadow.camera.bottom = -0.6;
+    key.shadow.camera.near = 1;
+    key.shadow.camera.far = 22;
     key.shadow.bias = -0.0012;
-    key.shadow.normalBias = 0.02;
+    key.shadow.normalBias = 0.024;
   }
 
-  /* FILL — opposite side, far weaker, cool-neutral. Its only job is to keep
-     the shadow side readable. It never casts. */
-  var fill = new DirectionalLight(new Color(palette.fill).getHex(), 0.42);
-  fill.position.set(4.6, 1.8, 2.4);
+  /* Fill — cool, weak, opposite side. Never casts. */
+  var fill = new DirectionalLight(new Color(0x5f88a8), 0.34);
+  fill.position.set(5.6, 2.2, 3.4);
 
-  /* RIM — behind and above, the Secondary at full chroma. This is what draws
-     the bright edge that separates the silhouette from the void. */
-  var rim = new DirectionalLight(new Color(palette.rim).getHex(), 1.5);
-  rim.position.set(1.6, 3.2, -5.2);
+  /* Rim — cyan, from behind and above. This is what draws the lit contour. */
+  var rim = new DirectionalLight(new Color(0x49dcff), 2.2);
+  rim.position.set(1.4, 4.6, -7.0);
 
-  /* Ground-to-sky ambient. Cheaper and more directional than flat ambient:
-     the floor bounce arrives from below in the floor's own colour. */
-  var hemi = new HemisphereLight(new Color(palette.card).getHex(), new Color(palette.floor).getHex(), 0.34);
+  /* A second rim from the other side, weaker, so the silhouette closes on
+     both edges when the character turns. */
+  var rim2 = new DirectionalLight(new Color(0x3fb8e8), 1.1);
+  rim2.position.set(-5.2, 3.0, -5.6);
 
-  /* A floor of last resort so nothing is ever absolutely 0,0,0. */
-  var ambient = new AmbientLight(new Color(palette.ink).getHex(), 0.6);
+  /* Floor bounce: the grid is a light source in the reference, and a point
+     light low and in front sells the character standing IN the world rather
+     than composited over it. */
+  var bounce = new PointLight(new Color(0x2fbfe8), 0.85, 9, 2);
+  bounce.position.set(0, 0.28, 1.5);
 
-  var all = [key, fill, rim, hemi, ambient];
+  var hemi = new HemisphereLight(new Color(0x1b2836), new Color(0x08222e), 0.20);
+
+  /* Deliberately tiny. The dark side of a crystal should be nearly black —
+     that contrast is the material. */
+  var ambient = new AmbientLight(new Color(0x0e1a24), 0.10);
+
+  var all = [key, fill, rim, rim2, bounce, hemi, ambient];
   if (group) all.forEach(function (l) { group.add(l); });
 
-  /* Exposed so a future character-attitude system can swing the key the way
-     fabiMidpointPerspective already swings the 2.5D specular — same idea,
-     real light. Horizontal only, matching R83's finding that vertical
-     position must not vote on which side catches light. */
+  /* Swing the key horizontally with the character's yaw so the lit side
+     follows him as he turns. Horizontal only — vertical position must never
+     vote on which side catches light. */
   function setKeyAzimuth(ratio) {
     var r = Math.max(-1, Math.min(1, Number(ratio) || 0));
-    var radius = Math.sqrt(2.2 * 2.2 + 5.2 * 5.2);
-    var base = Math.atan2(5.2, -2.2);
-    var a = base - r * 0.6;
-    key.position.set(Math.cos(a) * radius, 6.2, Math.sin(a) * radius);
+    var radius = Math.hypot(4.2, 6.2);
+    var base = Math.atan2(6.2, -4.2);
+    var a = base - r * 0.55;
+    key.position.set(Math.cos(a) * radius, 7.4, Math.sin(a) * radius);
   }
 
   function setIntensity(scale) {
     var k = Math.max(0, Number(scale) || 1);
-    key.intensity = 2.1 * k;
-    fill.intensity = 0.42 * k;
-    rim.intensity = 1.5 * k;
+    key.intensity = 2.6 * k;
+    fill.intensity = 0.34 * k;
+    rim.intensity = 2.2 * k;
+    rim2.intensity = 1.1 * k;
+    bounce.intensity = 0.85 * k;
   }
 
   function dispose() {
@@ -98,10 +104,8 @@ export function createLights(options) {
   }
 
   return {
-    key: key, fill: fill, rim: rim, hemi: hemi, ambient: ambient,
-    all: all,
-    setKeyAzimuth: setKeyAzimuth,
-    setIntensity: setIntensity,
-    dispose: dispose
+    key: key, fill: fill, rim: rim, rim2: rim2, bounce: bounce,
+    hemi: hemi, ambient: ambient, all: all,
+    setKeyAzimuth: setKeyAzimuth, setIntensity: setIntensity, dispose: dispose
   };
 }

@@ -72,6 +72,18 @@ html, body {
 }
 .lab-stage canvas { display: block; width: 100%; height: 100%; }
 
+/* CANONICAL VIEW — the reference frame's own aspect (940:1672 = 0.5622).
+   This is the view the character is composed for and the only one that should
+   be compared against `reference/mrmah-canonical-front.png`. Every media query
+   below is suppressed for it, because its shape is the point. */
+html[data-canonical="1"] .lab-stage,
+html[data-canonical="1"] .lab-stage:where(*) {
+  aspect-ratio: 940 / 1672;
+  height: auto;
+  max-height: 78vh;
+  max-width: min(100%, calc(78vh * 0.5622));
+}
+
 .lab-fallback { padding: 24px; opacity: .7; }
 
 .lab-hint {

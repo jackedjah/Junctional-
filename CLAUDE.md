@@ -31,13 +31,44 @@ system in order to add a feature.
 There is an isolated real-time 3D renderer in **`mrmah3d/`**.
 
 - **It is experimental and development-only.** It is not part of the product.
-- It renders a **placeholder made of primitives. That placeholder is not
-  Mr.Mah** and must never be presented as him. It exists only to prove the
-  rendering architecture.
+- It renders the **real reference-derived Mr.Mah** — a faceted crystalline
+  character built to match `reference/mrmah-canonical-front.png`. He is no
+  longer a placeholder, but he is **not finished art** either.
 - The shipped Mr.Mah is still the 2.5D inline-SVG rig in `mygym.js`
   (`fabiRigHTML()`, `viewBox 0 0 420 560`) styled by the `MR.MAH` block in
   `mygym.css`. **The 3D system does not replace it**, and nothing in production
   loads the 3D system.
+
+### The reference is the specification
+
+`reference/mrmah-canonical-front.png` is **literal engineering evidence**, not
+a mood board. Everything in `mrmah3d/core/character/proportions.js` is measured
+from it by `tools/mrmah3d-reference.mjs`; nothing there is invented.
+
+Before changing the character's shape, proportions, pose or framing, run the
+comparison loop and keep the score from regressing:
+
+```sh
+node tools/mrmah3d-reference.mjs http://127.0.0.1:8123   # measure the reference
+node tools/mrmah3d-compare.mjs   http://127.0.0.1:8123   # score the render
+```
+
+It reports a silhouette score, per-landmark proportion deltas, a character
+luminance distribution, and writes `validation/mrmah3d/silhouette-overlay.png`
+— magenta where the reference has mass the render lacks, green where the render
+has mass it should not. **Open the overlay.** It has repeatedly located faults
+that the numbers alone described only vaguely.
+
+Current state: silhouette **89.4 / 100**, all seven proportion checks in
+tolerance. Known remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
+
+Two properties of the measurement are worth knowing before trusting a delta:
+the reference mask includes the glow bleed around its own edges, so it reads
+slightly larger than the geometry everywhere; and it fills the gaps between arm
+and torso, because those dark regions are enclosed by lit contours. Neither is
+a shape error in the render. The last 7% of the character's height is excluded
+from scoring because the reference's ground starburst merges with the torso tip
+there.
 
 ### Production integration requires explicit approval
 
@@ -133,22 +164,53 @@ must not be claimed from headless runs.
 | Path | What it is |
 | --- | --- |
 | `mrmah3d/core/mrmah-scene.js` | the one public entry point |
-| `mrmah3d/core/` | scene, renderer, camera, lights, environment, character, interaction, quality, lifecycle, palette |
+| `mrmah3d/core/` | scene, renderer, camera, lights, environment, interaction, quality, lifecycle, palette |
+| `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
+| `reference/` | the canonical visual reference — engineering evidence |
+| `tools/mrmah3d-reference.mjs` | measures the reference into numbers |
+| `tools/mrmah3d-compare.mjs` | scores the render against it |
 | `tools/mrmah3d-verify.mjs` | browser-driven runtime verification |
-| `tests/mrmah3d-phase1.test.js` | static contract suite (`node tests/…`) |
+| `tests/mrmah3d.test.js` | static contract suite (`node tests/…`) |
 | `validation/mrmah3d/` | captured render evidence |
 
 Open the lab at **`/mrmah3d/lab/index.html`** with any static server rooted at
-the repository root.
+the repository root. Add **`?canonical=1`** for the reference framing — that is
+the only view that should be compared against the reference image.
 
 Tests are plain Node scripts with no framework:
 
 ```sh
-node tests/mrmah3d-phase1.test.js
+node tests/mrmah3d.test.js
 node tools/mrmah3d-verify.mjs http://127.0.0.1:8123
 ```
+
+## 9. Driving the character from a page
+
+Page logic asks for a STATE; the renderer decides what the body does. The
+renderer knows nothing about AI Chat or MAH Protocol, and it must stay that way
+— that is what lets one character serve every surface.
+
+```js
+mah.setState('thinking');   // idle listening thinking explaining
+                            // success concerned  (tapped/dragging are automatic)
+```
+
+Intended mapping when integration is eventually approved:
+
+| Surface | Event | State |
+| --- | --- | --- |
+| AI Chat | generating a response | `thinking` |
+| AI Chat | response appears | `explaining` |
+| AI Chat | waiting for the member | `listening` |
+| MAH Protocol | question presented | `explaining` |
+| MAH Protocol | calculating | `thinking` |
+| MAH Protocol | program completed | `success` |
+
+`tapped` and `dragging` are driven by gestures and are transient: when the
+gesture ends the character returns to whatever the host last asked for, not to
+`idle`. Do not add page-specific names to `states.js`.
 
 ---
 

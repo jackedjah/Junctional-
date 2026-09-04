@@ -1,101 +1,249 @@
 /* MR.MAH 3D :: ENVIRONMENT
-   The floor: a shadow-catching ground plane plus a real perspective grid.
+   The reference world: a near-black void, a perspective grid with glowing
+   intersections, sparse dark geometric structures in depth, a controlled floor
+   glow beneath Mr.Mah, and a few drifting motes.
 
-   This is the direct replacement for #mygym .fabi-grid, which fakes its
-   perspective with a CSS transform on a flat repeating background. Everything
-   the CSS version can only imply — lines actually converging, the grid passing
-   *behind* the character, the floor receiving his shadow — is free here.
+   The discipline the reference sets, and the one thing to protect here: the
+   world is quiet. Mr.Mah is the only bright, detailed thing in frame.
+   Everything below is deliberately dim, sparse and low-contrast so that it
+   reads as depth rather than as decoration. If this file ever starts competing
+   with the character, it is wrong.
 
-   Grid proportions are carried over from the CSS rule so the stage keeps its
-   proportions: background-size 50px x 38px gives cells about 1.32 times wider
-   than deep, and opacity .3 with line alphas around .11-.13.
-
-   The grid's far edge is dissolved by the stage's linear fog rather than by a
-   backdrop plane. Fog costs nothing per frame; a full-width backdrop quad is a
-   real draw, and the brief allows atmospheric depth only while it stays
-   extremely inexpensive. */
+   The grid is sized and pushed forward so it lies ENTIRELY IN FRONT OF THE
+   CAMERA. Line segments straddling the near plane were measured being dropped
+   by the rasteriser, which removed every converging line and left the floor
+   reading as flat horizontal bands. */
 
 import {
-  Mesh, PlaneGeometry, ShadowMaterial, GridHelper, Color
+  Mesh, PlaneGeometry, ShadowMaterial, Color, Group,
+  BufferGeometry, Float32BufferAttribute, LineSegments, LineBasicMaterial,
+  Points, PointsMaterial, MeshBasicMaterial, AdditiveBlending, DoubleSide,
+  ConeGeometry, MeshStandardMaterial, EdgesGeometry, CanvasTexture
 } from '../vendor/three/three.module.min.js';
 
-/* The grid is sized and pushed forward so that it lies ENTIRELY IN FRONT OF
-   THE CAMERA. This is not cosmetic.
-
-   A grid centred on the origin at the default 40-unit size spans z = +20..-20,
-   while the Phase 1 camera sits at z = +6.5. Every line running along Z then
-   has one endpoint behind the near plane, and a line segment that straddles
-   the near plane has to be clipped. Measured here in ANGLE/SwiftShader, such
-   segments are dropped outright: the floor rendered as a set of horizontal
-   bands with no converging lines at all, which reads as a flat backdrop rather
-   than a receding floor.
-
-   Sizing the grid to the region that is actually visible fixes it on every
-   rasteriser and draws less geometry, so there is no reason to rely on a
-   driver clipping this correctly. `centerZ` keeps the near edge just in front
-   of the camera; `size / divisions` is held at 1.33 units to preserve the
-   50:38 cell aspect of the CSS grid it replaces. */
 export var GRID = {
-  size: 28,        /* world units across */
-  divisions: 21,   /* -> 1.33 unit cells, the 50:38 CSS cell aspect */
-  centerZ: -9,     /* spans z = +5 .. -23, all in front of a camera at z=+6.5 */
-  /* Lifted clear of the shadow-catcher rather than sharing its plane. At the
-     original 0.001 the two surfaces were within depth-buffer precision at
-     grazing angles and the ground won, erasing half the grid lines. */
+  size: 46,
+  divisions: 30,       /* ~1.53 unit cells */
+  /* The canonical camera sits at z = +7.81. At centerZ -14 the grid's near
+     edge landed at z = +9 — BEHIND the camera — so every receding line
+     straddled the near plane and was dropped, leaving the floor as flat
+     horizontal bands with no perspective at all. At -20 the near edge is at
+     z = +3, comfortably in front, and still below the bottom of frame. */
+  centerZ: -20,        /* spans z = +3 .. -43 */
   y: 0.02,
-  opacity: 0.3     /* .fabi-grid opacity: .3 */
+  opacity: 0.34
 };
+
+/* A soft round sprite, generated rather than loaded: no texture file to ship,
+   and it scales to whatever the tier allows. */
+function radialTexture(size, hardness) {
+  var c = document.createElement('canvas');
+  c.width = c.height = size;
+  var g = c.getContext('2d');
+  var grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(hardness || 0.25, 'rgba(190,240,255,0.55)');
+  grad.addColorStop(1, 'rgba(120,220,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, size, size);
+  var t = new CanvasTexture(c);
+  t.needsUpdate = true;
+  return t;
+}
 
 export function createEnvironment(options) {
   var opts = options || {};
   var palette = opts.palette;
   var settings = opts.settings || { shadows: true };
   var parent = opts.parent;
-  var made = [];
+  var tier = opts.tier || 'medium';
+  var owned = [];
+  var group = new Group();
+  group.name = 'mrmah-environment';
 
-  /* GROUND — a ShadowMaterial, not a lit surface. It is invisible except where
-     something shadows it, so the floor contributes contact grounding without
-     adding a large lit quad that would brighten the whole dark stage. */
+  var cyan = new Color(0x35d6ff);
+
+  /* ---- ground: catches the character's shadow, never lit itself -------- */
   var ground = new Mesh(
-    new PlaneGeometry(GRID.size + 20, GRID.size + 20),
-    new ShadowMaterial({ opacity: settings.shadows ? 0.42 : 0 })
+    new PlaneGeometry(GRID.size + 30, GRID.size + 30),
+    new ShadowMaterial({ opacity: settings.shadows ? 0.5 : 0 })
   );
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = !!settings.shadows;
-  /* It exists to catch a shadow, never to occlude. Leaving depthWrite on made
-     it hide grid lines it did not visibly cover. */
-  ground.material.depthWrite = false;
-  ground.name = 'mrmah-ground';
-  made.push(ground);
+  ground.material.depthWrite = false;   /* it must never occlude the grid */
+  ground.name = 'ground';
+  group.add(ground);
+  owned.push(ground.geometry, ground.material);
 
-  /* GRID — lifted a hair off the ground plane and with depthWrite off so it
-     cannot z-fight the shadow catcher sharing its height. Its LineBasicMaterial
-     is fog-responsive by default, which is what fades the far edge out. */
-  var gridColor = new Color(palette.grid);
-  var grid = new GridHelper(GRID.size, GRID.divisions, gridColor, gridColor);
-  grid.material.transparent = true;
-  grid.material.opacity = GRID.opacity;
-  grid.material.depthWrite = false;
-  grid.material.fog = true;
+  /* ---- grid lines ------------------------------------------------------ */
+  var half = GRID.size / 2, step = GRID.size / GRID.divisions;
+  var pts = [];
+  for (var i = 0; i <= GRID.divisions; i++) {
+    var o = -half + i * step;
+    pts.push(-half, 0, o, half, 0, o);      /* lateral */
+    pts.push(o, 0, -half, o, 0, half);      /* receding */
+  }
+  var gridGeo = new BufferGeometry();
+  gridGeo.setAttribute('position', new Float32BufferAttribute(pts, 3));
+  var gridMat = new LineBasicMaterial({
+    color: cyan, transparent: true, opacity: GRID.opacity,
+    depthWrite: false, fog: true, blending: AdditiveBlending
+  });
+  var grid = new LineSegments(gridGeo, gridMat);
   grid.position.set(0, GRID.y, GRID.centerZ);
-  grid.name = 'mrmah-grid';
-  made.push(grid);
+  grid.name = 'grid';
+  group.add(grid);
+  owned.push(gridGeo, gridMat);
 
-  if (parent) made.forEach(function (m) { parent.add(m); });
+  /* ---- glowing intersections ------------------------------------------ */
+  /* The reference's floor reads as energy points, not just ruled lines. Only
+     every other intersection is lit, and only within the near half of the
+     grid, so the effect stays sparse and the far floor still fades out. */
+  var nodePts = [];
+  for (var a = 0; a <= GRID.divisions; a += 2) {
+    for (var b = 0; b <= GRID.divisions; b += 2) {
+      var x = -half + a * step, z = -half + b * step;
+      if (Math.abs(x) > half * 0.8 || z > half * 0.55) continue;
+      nodePts.push(x, 0, z);
+    }
+  }
+  var nodeGeo = new BufferGeometry();
+  nodeGeo.setAttribute('position', new Float32BufferAttribute(nodePts, 3));
+  var nodeTex = radialTexture(tier === 'low' ? 32 : 64, 0.18);
+  var nodeMat = new PointsMaterial({
+    color: cyan, size: 0.42, map: nodeTex, transparent: true,
+    opacity: 0.85, depthWrite: false, blending: AdditiveBlending,
+    sizeAttenuation: true, fog: true, toneMapped: false
+  });
+  var nodes = new Points(nodeGeo, nodeMat);
+  nodes.position.set(0, GRID.y + 0.01, GRID.centerZ);
+  nodes.name = 'grid-nodes';
+  group.add(nodes);
+  owned.push(nodeGeo, nodeMat, nodeTex);
 
-  function setOpacity(value) {
-    grid.material.opacity = Math.max(0, Math.min(1, Number(value)));
+  /* ---- floor glow beneath the character -------------------------------- */
+  /* The bright contact starburst the reference shows under the torso tip.
+     Two crossed additive quads plus a soft disc: cheaper and more controllable
+     than a bloom pass, and it sits exactly where the point does. */
+  var glowGroup = new Group();
+  glowGroup.name = 'floor-glow';
+  var glowTex = radialTexture(128, 0.10);
+  var discMat = new MeshBasicMaterial({
+    map: glowTex, color: cyan, transparent: true, opacity: 0.55,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false
+  });
+  var disc = new Mesh(new PlaneGeometry(2.6, 2.6), discMat);
+  disc.rotation.x = -Math.PI / 2;
+  disc.position.y = 0.012;
+  glowGroup.add(disc);
+  owned.push(disc.geometry, discMat, glowTex);
+
+  var starMat = new MeshBasicMaterial({
+    map: glowTex, color: new Color(0xbdf2ff), transparent: true, opacity: 0.5,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false
+  });
+  [[3.4, 0.10], [0.10, 2.2]].forEach(function (s) {
+    var q = new Mesh(new PlaneGeometry(s[0], s[1]), starMat);
+    q.rotation.x = -Math.PI / 2;
+    q.position.y = 0.014;
+    glowGroup.add(q);
+    owned.push(q.geometry);
+  });
+  owned.push(starMat);
+  group.add(glowGroup);
+
+  /* ---- background structures ------------------------------------------ */
+  /* Flanking dark pyramids, well back and well dim. Faceted and edge-lit like
+     the character so the world shares his geometric language, but at a
+     fraction of the brightness so they never pull focus. */
+  var structures = new Group();
+  structures.name = 'structures';
+  var structMat = new MeshStandardMaterial({
+    color: new Color(0x101d28), roughness: 0.7, metalness: 0.25, flatShading: true
+  });
+  var structEdge = new LineBasicMaterial({
+    color: cyan, transparent: true, opacity: 0.26,
+    depthWrite: false, blending: AdditiveBlending, fog: true
+  });
+  owned.push(structMat, structEdge);
+
+  [[-9.5, -13, 4.2, 6.0], [10.5, -16, 5.0, 7.4], [-15, -24, 6.2, 9.0], [16, -27, 5.6, 8.2]]
+    .forEach(function (s) {
+      var geo = new ConeGeometry(s[2], s[3], 4, 1);
+      var m = new Mesh(geo, structMat);
+      m.position.set(s[0], s[3] / 2, s[1]);
+      m.rotation.y = Math.PI / 4;
+      structures.add(m);
+      var eg = new EdgesGeometry(geo, 20);
+      var el = new LineSegments(eg, structEdge);
+      el.position.copy(m.position);
+      el.rotation.copy(m.rotation);
+      structures.add(el);
+      owned.push(geo, eg);
+    });
+  group.add(structures);
+
+  /* ---- drifting motes -------------------------------------------------- */
+  var moteCount = tier === 'low' ? 40 : tier === 'medium' ? 80 : 130;
+  var motePts = [], moteSeed = [];
+  for (var m2 = 0; m2 < moteCount; m2++) {
+    var mx = (Math.random() - 0.5) * 26;
+    var my = Math.random() * 9;
+    var mz = -Math.random() * 26 + 5;
+    motePts.push(mx, my, mz);
+    moteSeed.push(Math.random() * Math.PI * 2);
+  }
+  var moteGeo = new BufferGeometry();
+  moteGeo.setAttribute('position', new Float32BufferAttribute(motePts, 3));
+  var moteTex = radialTexture(32, 0.2);
+  var moteMat = new PointsMaterial({
+    color: cyan, size: 0.10, map: moteTex, transparent: true, opacity: 0.5,
+    depthWrite: false, blending: AdditiveBlending, sizeAttenuation: true,
+    fog: true, toneMapped: false
+  });
+  var motes = new Points(moteGeo, moteMat);
+  motes.name = 'motes';
+  group.add(motes);
+  owned.push(moteGeo, moteMat, moteTex);
+
+  if (parent) parent.add(group);
+
+  var baseY = motePts.filter(function (_, i) { return i % 3 === 1; });
+  var time = 0;
+
+  function update(dt, opts2) {
+    var o = opts2 || {};
+    if (o.reducedMotion) return;
+    time += dt;
+    /* Motes drift upward slowly and wrap. The only moving thing in the world,
+       and deliberately almost imperceptible. */
+    var arr = moteGeo.attributes.position.array;
+    for (var i = 0; i < moteCount; i++) {
+      arr[i * 3 + 1] += dt * 0.085;
+      arr[i * 3] += Math.sin(time * 0.3 + moteSeed[i]) * dt * 0.05;
+      if (arr[i * 3 + 1] > 9.5) arr[i * 3 + 1] = 0;
+    }
+    moteGeo.attributes.position.needsUpdate = true;
+    /* The floor glow breathes with the character's hover. */
+    var pulse = 0.9 + 0.1 * Math.sin(time * 1.5);
+    discMat.opacity = 0.55 * pulse;
+    starMat.opacity = 0.5 * pulse;
+  }
+
+  function setGlowPosition(x, z) {
+    glowGroup.position.set(x || 0, 0, z || 0);
   }
 
   function dispose() {
-    made.forEach(function (m) {
-      if (m.geometry && m.geometry.dispose) m.geometry.dispose();
-      var mats = m.material ? (Array.isArray(m.material) ? m.material : [m.material]) : [];
-      mats.forEach(function (x) { if (x && x.dispose) x.dispose(); });
-      if (m.parent) m.parent.remove(m);
-    });
-    made.length = 0;
+    owned.forEach(function (o) { if (o && o.dispose) o.dispose(); });
+    if (group.parent) group.parent.remove(group);
   }
 
-  return { ground: ground, grid: grid, objects: made, setOpacity: setOpacity, dispose: dispose };
+  return {
+    group: group, ground: ground, grid: grid, nodes: nodes,
+    glow: glowGroup, structures: structures, motes: motes,
+    update: update, setGlowPosition: setGlowPosition,
+    setOpacity: function (v) { gridMat.opacity = Math.max(0, Math.min(1, Number(v))); },
+    dispose: dispose
+  };
 }
