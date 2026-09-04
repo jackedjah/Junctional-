@@ -66,13 +66,43 @@ export function createLights(options) {
   var bounce = new PointLight(new Color(0x2fbfe8), 0.85, 9, 2);
   bounce.position.set(0, 0.28, 1.5);
 
+  /* R91 — HIS OWN EMISSIONS LIGHT THE SURFACES AROUND THEM.
+
+     The face and the chest emblem are emissive, but emissive materials in this
+     renderer light nothing: they are a colour written into the frame, not a
+     source. So the geometry immediately around them stayed exactly as dark as
+     the geometry across the body, which is the "composited rather than
+     integrated" reading the brief describes — a glowing decal on a dark solid
+     rather than a light inside a crystal.
+
+     Two small point lights fix it for the cost of two lights. Short range on
+     purpose (1.5 and 1.1 units, quadratic falloff) so each one reaches the
+     planes around its own emitter and nothing else: the chest lamp grazes the
+     pectorals, the sternum and the inner faces of both upper arms; the face
+     lamp catches the cavity walls and the underside of the head's bevels. They
+     are not general fill — at these radii they are inert three feet away, which
+     is what keeps this a local response rather than a brightening pass.
+
+     Their positions are the emblem's and the face plate's, and their intensity
+     rides the character's glow so a thinking pulse spills into the body around
+     it rather than being confined to the emitter. */
+  /* Standing OFF the surface, with a gentler falloff. At distance 1.5 and
+     0.30 units out it sat almost on the chest wall, and a point light that
+     close to a surface draws itself on it: a hot blob appeared on the abdomen
+     below the emblem, which is a lamp, not a glow. Further forward and wider
+     makes the near planes a gradient instead of a spot. */
+  var chestLamp = new PointLight(new Color(0x4fe3ff), 0.95, 2.1, 2);
+  chestLamp.position.set(0, 1.86, 0.46);
+  var faceLamp = new PointLight(new Color(0x6cebff), 0.85, 1.1, 2);
+  faceLamp.position.set(0, 2.62, 0.16);
+
   var hemi = new HemisphereLight(new Color(0x1b2836), new Color(0x08222e), 0.20);
 
   /* Deliberately tiny. The dark side of a crystal should be nearly black —
      that contrast is the material. */
   var ambient = new AmbientLight(new Color(0x0e1a24), 0.10);
 
-  var all = [key, fill, rim, rim2, bounce, hemi, ambient];
+  var all = [key, fill, rim, rim2, bounce, chestLamp, faceLamp, hemi, ambient];
   if (group) all.forEach(function (l) { group.add(l); });
 
   /* Swing the key horizontally with the character's yaw so the lit side
@@ -93,6 +123,8 @@ export function createLights(options) {
     rim.intensity = 2.2 * k;
     rim2.intensity = 1.1 * k;
     bounce.intensity = 0.85 * k;
+    chestLamp.intensity = 0.95 * k;
+    faceLamp.intensity = 0.85 * k;
   }
 
   function dispose() {
@@ -106,6 +138,13 @@ export function createLights(options) {
   return {
     key: key, fill: fill, rim: rim, rim2: rim2, bounce: bounce,
     hemi: hemi, ambient: ambient, all: all,
-    setKeyAzimuth: setKeyAzimuth, setIntensity: setIntensity, dispose: dispose
+    setKeyAzimuth: setKeyAzimuth, setIntensity: setIntensity, dispose: dispose,
+    /* The scene rides these on the character's glow so a thinking pulse spills
+       into the geometry around each emitter rather than staying on it. */
+    setEmissionGlow: function (g) {
+      var k = Math.max(0, Number(g) || 1);
+      chestLamp.intensity = 0.95 * k;
+      faceLamp.intensity = 0.85 * k;
+    }
   };
 }

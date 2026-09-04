@@ -268,6 +268,11 @@ export function createMrMahScene(host, options) {
       }
     }
     characterBox.update(dt, { reducedMotion: reducedMotion });
+    /* The emission lamps follow his state, so the light he casts on himself
+       brightens when he is thinking and settles when he is not. */
+    if (lightsBox.setEmissionGlow && characterBox.states) {
+      lightsBox.setEmissionGlow(0.8 + 0.5 * (characterBox.states.values.glow || 1));
+    }
     /* Keep the pool of floor light under him — including while he is being
        dragged. This is the main thing that stops him reading as pasted on. */
     if (envBox.followCharacter && characterBox.root) {

@@ -49,6 +49,7 @@ export function createMrMah(options) {
   var yaw = 0;
   var time = 0;
   var blinkTimer = 2.4;
+  var driftLag = 0;
   var blink = 0;
 
   /* Rest orientations, captured so every animated joint eases back to the
@@ -62,7 +63,8 @@ export function createMrMah(options) {
     rightElbow: limbs.right.elbowJoint.rotation.clone(),
     leftWrist: limbs.left.wristJoint.rotation.clone(),
     rightWrist: limbs.right.wristJoint.rotation.clone(),
-    bodyRotY: body.group.rotation.y
+    bodyRotY: body.group.rotation.y,
+    bodyRotX: body.group.rotation.x
   };
 
   function setYaw(radians) {
@@ -139,11 +141,34 @@ export function createMrMah(options) {
 
     /* Arms: the raised arm carries most of the life, as it does in the
        reference composition. */
+    /* R91 — ARM INERTIA. The limbs lag the body they hang from.
+
+       Everything in this rig moved in perfect lockstep with the torso, which is
+       the single most mechanical thing a jointed character can do: a real arm
+       arrives late and overshoots slightly, and the eye reads that lag as mass.
+       It costs one smoothed value.
+
+       `driftLag` chases the body's own drift with a first-order filter; the
+       DIFFERENCE between where the body is and where the lag has got to is the
+       instantaneous angular error, and feeding that back into the shoulders as
+       a counter-rotation makes the arms trail the turn and settle after it.
+       Frame-rate independent, so a 30fps device lags by the same amount of
+       TIME rather than the same number of frames. */
+    var kLag = 1 - Math.exp(-dt * 2.6);
+    driftLag += (float.rotation.y - driftLag) * kLag;
+    var inertia = (float.rotation.y - driftLag) * 2.4;
+
     var lift = v.armLift;
     var open = v.elbowOpen || 0;
-    limbs.left.shoulderJoint.rotation.z = rest.leftShoulder.z - lift - Math.sin(time * 0.72) * 0.030 * v.sway;
+    /* Shoulders settle when he is thinking and open when he is explaining —
+       the micro-shift the brief asks for, applied to both sides so it reads as
+       posture rather than as a gesture on one arm. */
+    var set = v.shoulderSet || 0;
+    limbs.left.shoulderJoint.rotation.z = rest.leftShoulder.z - lift + set
+      - Math.sin(time * 0.72) * 0.030 * v.sway;
     limbs.left.elbowJoint.rotation.z = rest.leftElbow.z + open * 0.30 + Math.sin(time * 0.72 + 0.7) * 0.024 * v.sway;
-    limbs.right.shoulderJoint.rotation.z = rest.rightShoulder.z + lift * 0.35 + Math.sin(time * 0.66 + 1.9) * 0.020 * v.sway;
+    limbs.right.shoulderJoint.rotation.z = rest.rightShoulder.z + lift * 0.35 - set
+      + Math.sin(time * 0.66 + 1.9) * 0.020 * v.sway;
     limbs.right.elbowJoint.rotation.z = rest.rightElbow.z - open * 0.10 + Math.sin(time * 0.66 + 2.4) * 0.018 * v.sway;
 
     /* R90 — THE JOINTS BELOW THE ELBOW, and a torso that answers the head.
@@ -173,8 +198,19 @@ export function createMrMah(options) {
 
     limbs.left.shoulderJoint.rotation.x = rest.leftShoulder.x + Math.sin(time * 0.31 + 0.4) * 0.045 * v.sway;
     limbs.right.shoulderJoint.rotation.x = rest.rightShoulder.x + Math.sin(time * 0.27 + 2.6) * 0.038 * v.sway;
+    /* The inertia term goes on the shoulders' Y, which is the axis the body's
+       drift turns about — so the arms swing behind the torso and catch up. */
+    limbs.left.shoulderJoint.rotation.y = rest.leftShoulder.y - inertia;
+    limbs.right.shoulderJoint.rotation.y = rest.rightShoulder.y - inertia;
+    /* The hands settle a beat after the wrists, for the same reason. */
+    limbs.left.wristJoint.rotation.z = rest.leftWrist.z + inertia * 0.5;
+    limbs.right.wristJoint.rotation.z = rest.rightWrist.z + inertia * 0.5;
 
     body.group.rotation.y = rest.bodyRotY - head.group.rotation.y * 0.34;
+    /* THE CHEST OPENS when he explains and closes a little when he thinks — a
+       small backward tilt of the torso, which is what "presenting" looks like
+       from the ribcage rather than from the arm. */
+    body.group.rotation.x = rest.bodyRotX - (v.chestOpen || 0);
 
     /* Thinking pulse — a visible periodic brightening of the emissive family
        only, so the body stays dark while he is clearly working. */

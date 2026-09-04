@@ -22,7 +22,7 @@ export var STATES = {
      at all: it reads undefined every frame, the guard in mrmah.js turns that
      into 0, and the animation silently does nothing. elbowOpen and wristTurn
      were added that way first and had no effect whatsoever. */
-  idle:        { glow: 1.00, bob: 1.00, sway: 1.00, headTilt: 0.00, armLift: 0.00, pulse: 0.00, blinkRate: 1.00, smile: 1.00, elbowOpen: 0.00, wristTurn: 0.00 },
+  idle:        { glow: 1.00, bob: 1.00, sway: 1.00, headTilt: 0.00, armLift: 0.00, pulse: 0.00, blinkRate: 1.00, smile: 1.00, elbowOpen: 0.00, wristTurn: 0.00, shoulderSet: 0.00, chestOpen: 0.00 },
   /* attentive, leaning in slightly, calmer motion */
   listening:   { glow: 1.06, bob: 0.70, sway: 0.55, headTilt: 0.10, armLift: 0.04, pulse: 0.00, blinkRate: 1.40, smile: 1.00 },
   /* working: brighter, slower bob, a visible periodic pulse */
@@ -33,9 +33,9 @@ export var STATES = {
      which is the point, and the small asymmetry is what stops it reading as a
      freeze-frame. Explaining opens the elbow and rolls the wrist outward, which
      is a presenting gesture; the head follows and the torso counters it. */
-  thinking:    { glow: 1.14, bob: 0.55, sway: 0.35, headTilt: -0.12, armLift: 0.02, pulse: 1.00, blinkRate: 0.55, smile: 0.55, elbowOpen: -0.10, wristTurn: -0.16 },
+  thinking:    { glow: 1.14, bob: 0.55, sway: 0.35, headTilt: -0.12, armLift: 0.02, pulse: 1.00, blinkRate: 0.55, smile: 0.55, elbowOpen: -0.10, wristTurn: -0.16, shoulderSet: 0.055, chestOpen: -0.022 },
   /* presenting an answer: raised hand emphasised, lively */
-  explaining:  { glow: 1.10, bob: 1.15, sway: 1.35, headTilt: 0.05, armLift: 0.16, pulse: 0.22, blinkRate: 1.00, smile: 1.00, elbowOpen: 0.26, wristTurn: 0.22 },
+  explaining:  { glow: 1.10, bob: 1.15, sway: 1.35, headTilt: 0.05, armLift: 0.16, pulse: 0.22, blinkRate: 1.00, smile: 1.00, elbowOpen: 0.26, wristTurn: 0.22, shoulderSet: -0.040, chestOpen: 0.030 },
   /* success: brightest, buoyant */
   success:     { glow: 1.30, bob: 1.60, sway: 1.10, headTilt: 0.14, armLift: 0.30, pulse: 0.35, blinkRate: 1.20, smile: 1.30 },
   /* concern: dimmer, lower, head down, smile flattened */
@@ -63,7 +63,15 @@ export function createStateMachine(options) {
   function targetsFor(name) { return STATES[name] || STATES.idle; }
 
   function set(name) {
-    if (!STATES[name] || name === current) return current;
+    /* R91: a repeat of a TRANSIENT state is allowed through, so it restarts.
+
+       The note below says a second tap restarts the same reaction rather than
+       nesting — and the early return made that impossible: `name === current`
+       sent the second tap straight back out, so tapping him again while the
+       first reaction was still running did nothing at all and the reaction
+       ended on the first tap's clock. Restarting is both what the comment
+       promises and what a viewer expects from tapping something twice. */
+    if (!STATES[name] || (name === current && !STATES[name].transient)) return current;
     var spec = STATES[name];
     if (spec.transient) {
       /* Don't stack transients — a second tap restarts the same reaction

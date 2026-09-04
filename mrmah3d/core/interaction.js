@@ -36,7 +36,25 @@ export function createInteraction(options) {
      swallowed as a one-pixel drag. Once a gesture becomes a drag it can never
      become a tap again, which is the guarantee the brief asks for. */
   var DRAG_SLOP = 9;
-  var TAP_MS = 450;
+  /* R91: 450 -> 900, and this was a real defect rather than a test threshold.
+
+     A press is rejected as a tap if it is held longer than this, which exists
+     to stop a long press being read as a poke. But there IS no long press in
+     this interaction — the only two gestures are tap and drag, and drag is
+     already fully determined by DRAG_SLOP. So duration was disambiguating
+     nothing and was purely a way to lose taps.
+
+     It was caught by a check that failed only under load: traced, the press was
+     held for 446 ms against a limit of 450, so the tap survived on an idle
+     machine and was dropped whenever the frame budget slipped. A person
+     pressing a character deliberately holds for 300-600 ms routinely, and on a
+     phone under any real load the old limit would have been dropping taps that
+     the user would call obviously intentional — silently, with no feedback and
+     nothing to debug from.
+
+     At 900 ms a press inside the slop is a tap however slowly it is released,
+     and a genuine rest-and-think still falls through to nothing. */
+  var TAP_MS = 900;
 
   var active = null;    /* pointerId of the one gesture we track */
   var startX = 0;
