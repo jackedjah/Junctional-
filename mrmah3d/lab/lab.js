@@ -13,6 +13,7 @@ import { TIERS } from '../core/quality.js';
 var host = document.getElementById('stage');
 var readout = document.getElementById('readout');
 var scene = null;
+
 var forcedTier = null;
 
 /* ?canonical=1 puts the stage into the reference frame's aspect. That is the
@@ -20,6 +21,18 @@ var forcedTier = null;
    compared against reference/mrmah-canonical-front.png. */
 var params = new URLSearchParams(location.search || '');
 if (params.get('canonical') === '1') document.documentElement.dataset.canonical = '1';
+/* ?tier=high|medium|low forces the quality tier at mount.
+
+   This exists because the verification container advertises very few cores and
+   therefore always resolves to the LOW tier, where bloom is deliberately not
+   created at all. Without an override every captured frame would be missing an
+   effect that most real devices will run, so the evidence would not show what
+   the product actually looks like. Development affordance only — nothing in
+   the renderer reads it, and production hosts pass no tier and get detection. */
+var tierParam = params.get('tier');
+if (tierParam === 'high' || tierParam === 'medium' || tierParam === 'low') {
+  forcedTier = tierParam;
+}
 
 function say(text, isError) {
   readout.textContent = text;

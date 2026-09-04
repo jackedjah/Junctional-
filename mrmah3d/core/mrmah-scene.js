@@ -22,6 +22,7 @@ import { getMode, MODE_NAMES } from './composition.js';
 import { resolve as resolveSurface, modeFor, SURFACE_NAMES } from './surfaces.js';
 import { readPalette } from './palette.js';
 import { createRenderer } from './renderer.js';
+import { createBloom } from './bloom.js';
 import { createStage } from './stage.js';
 import { createCamera } from './camera.js';
 import { createLights } from './lights.js';
@@ -115,10 +116,26 @@ export function createMrMahScene(host, options) {
     return { width: w, height: h };
   }
 
+  /* Selective bloom, tier-gated. Null on the low tier, and every call site
+     below treats null as "draw straight to the canvas", so the cheapest devices
+     run exactly the pipeline they ran before this existed. */
+  var bloomBox = settings.bloom
+    ? createBloom({
+        renderer: rendererBox.renderer,
+        strength: settings.bloomStrength,
+        /* Matches what the canvas would have had. WebGL2 only; three ignores it
+           on WebGL1, where the tier that asks for it would not be reached. */
+        samples: settings.antialias ? 4 : 0
+      })
+    : null;
+
   function resize() {
     var m = measure();
     rendererBox.setSize(m.width, m.height);
     cameraBox.setViewport(m.width, m.height);
+    if (bloomBox) {
+      bloomBox.setSize(m.width, m.height, rendererBox.renderer.getPixelRatio());
+    }
     return m;
   }
 
@@ -180,7 +197,8 @@ export function createMrMahScene(host, options) {
       }
     }
     if (envBox.update) envBox.update(dt, { reducedMotion: reducedMotion });
-    rendererBox.renderer.render(stageBox.scene, cameraBox.camera);
+    if (bloomBox) bloomBox.render(stageBox.scene, cameraBox.camera);
+    else rendererBox.renderer.render(stageBox.scene, cameraBox.camera);
   }
 
   var loop = createLoop({
@@ -243,6 +261,11 @@ export function createMrMahScene(host, options) {
     envBox.dispose();
     lightsBox.dispose();
     stageBox.dispose();
+    /* Render targets are GPU memory and are NOT owned by the scene graph, so
+       nothing above releases them. Browsers cap live contexts and a leaked
+       target survives until GC notices, which on a single-page app that mounts
+       and unmounts this repeatedly is a real leak. */
+    if (bloomBox) bloomBox.dispose();
     /* Renderer last: it is what actually hands the WebGL context back. */
     rendererBox.dispose();
   }

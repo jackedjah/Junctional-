@@ -74,6 +74,13 @@ export function settingsFor(tier) {
     antialias: tier === 'high',
     shadows: tier !== 'low',
     shadowMapSize: tier === 'high' ? 1024 : 512,
+    /* Bloom is the one genuinely optional pass in the renderer, so it is the
+       first thing a weak device gives up. On low it is not created at all and
+       the scene draws straight to the canvas exactly as before — no render
+       target, no fullscreen passes, no cost. Above low it runs at quarter area
+       and adds three small passes. */
+    bloom: tier !== 'low',
+    bloomStrength: tier === 'high' ? 0.44 : 0.36,
     /* Fog is nearly free and does the most per-cost work of anything here:
        it is what makes a dark stage read as having depth. Never dropped. */
     fog: true

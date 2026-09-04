@@ -147,10 +147,10 @@ export function buildBody(materials) {
     var spec = side < 0 ? ARMS.right : ARMS.left;
     var joint = spec.shoulder;
     var inner = [side * 0.26, TORSO.topY - 0.015, 0.015];
-    var outer = [joint[0] * 0.99, joint[1] - 0.10, joint[2]];
+    var outer = [joint[0] * 1.02, joint[1] - 0.10, joint[2]];
     var geo = segment(
       inner, outer,
-      0.300, spec.upperRadius * 1.22, 8,
+      0.310, spec.upperRadius * 1.42, 8,
       { depthRatio: 0.86, crystal: 0.055, steps: 5, profile: function (t) {
         /* Widest just outboard of where it leaves the chest — the deltoid
            belly — then drawing into the arm. */
@@ -171,11 +171,34 @@ export function buildBody(materials) {
        angle there is gentle everywhere. Threshold tools cannot find a line that
        is not a crease, so it is authored: two points, hero value, following the
        top of the deltoid from the neck side out to the joint. */
+    /* The line has to lie ON the deltoid's top surface, which means following
+       the same profile the loft used. The first attempt put its two endpoints a
+       fixed distance above the axis and the whole line disappeared INSIDE the
+       tube — the deltoid is 0.31 units thick at the shoulder and the offset was
+       0.055, so it was buried by a factor of five. Sampled as a short polyline
+       along the top instead, with the profile applied exactly as `segment` does,
+       so it rides the swell rather than cutting through it. */
+    var ridgePts = [];
+    var STEPS = 5;
+    for (var ri = 0; ri <= STEPS; ri++) {
+      var rt = ri / STEPS;
+      var rr = (0.310 + (spec.upperRadius * 1.42 - 0.310) * rt) *
+               (1 + Math.sin(Math.pow(rt, 0.7) * Math.PI) * 0.17);
+      ridgePts.push(
+        inner[0] + (outer[0] - inner[0]) * rt,
+        inner[1] + (outer[1] - inner[1]) * rt + rr * 0.90,
+        inner[2] + (outer[2] - inner[2]) * rt + rr * 0.16
+      );
+    }
+    var ridgeSeg = [];
+    for (var rj = 0; rj < STEPS; rj++) {
+      ridgeSeg.push(
+        ridgePts[rj * 3], ridgePts[rj * 3 + 1], ridgePts[rj * 3 + 2],
+        ridgePts[rj * 3 + 3], ridgePts[rj * 3 + 4], ridgePts[rj * 3 + 5]
+      );
+    }
     var ridge = new BufferGeometry();
-    ridge.setAttribute('position', new Float32BufferAttribute([
-      inner[0] * 0.9, inner[1] + 0.055, inner[2] + 0.10,
-      outer[0], outer[1] + spec.upperRadius * 1.05, outer[2] + 0.04
-    ], 3));
+    ridge.setAttribute('position', new Float32BufferAttribute(ridgeSeg, 3));
     group.add(new LineSegments(ridge, materials.edgeHero));
     owned.push(ridge);
   });

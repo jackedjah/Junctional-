@@ -31,7 +31,20 @@ export function createCharacter(options) {
   mah.root.traverse(function (o) {
     if (!o.isMesh) return;
     o.castShadow = shadows && o.castShadow;
-    o.receiveShadow = shadows && o.receiveShadow;
+    /* HE DOES NOT RECEIVE SHADOW, only casts it.
+
+       Self-shadowing was measurably flattening the crystal. The shadow camera
+       covers a few units and PCF spreads each sample over a region far wider
+       than one facet, so what lands on the body is not occlusion — a convex
+       gem has almost none to show — but a soft grey wash drifting across
+       several facets at once, competing with exactly the per-facet values the
+       whole material is built to produce. Captured side by side, the low tier
+       (shadows off entirely) had visibly stronger facet-to-facet contrast than
+       the high tier, which is the wrong way round for a quality setting.
+
+       The floor contact shadow is the one that carries meaning here, and that
+       is a cast, so it is untouched. */
+    o.receiveShadow = false;
   });
 
   return mah;

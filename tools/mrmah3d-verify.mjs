@@ -521,7 +521,12 @@ for (const v of VIEWPORTS) {
   const errs = [];
   page.on('pageerror', e => errs.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
-  await page.goto(URL_LAB, { waitUntil: 'networkidle' });
+  /* The mode previews are the DELIVERED evidence of what each surface looks
+     like, so they are captured at the high tier. This container advertises very
+     few cores and therefore detects as 'low', where bloom is deliberately never
+     created — without the override every preview would be missing an effect
+     most real devices will run, and the evidence would not show the product. */
+  await page.goto(`${URL_LAB}?tier=high`, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => window.__MRMAH_LAB && window.__MRMAH_LAB.mounted, { timeout: 20000 });
   await page.evaluate(() => { document.querySelector('.lab-stage').style.height = '620px'; });
   await page.waitForTimeout(300);

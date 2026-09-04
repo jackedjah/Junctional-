@@ -223,7 +223,16 @@ export function createCrystalMaterials(options) {
        presence. So the ring stays hairline and this does the work at distance.
        This is also the reason it must not be solved with bloom: bloom would
        thicken every bright thing on the character, not just the face. */
-    opacity: 0.72,
+    /* Back down now that there is a REAL bloom pass.
+
+       This companion geometry existed as a stand-in for bloom — a wider, dimmer
+       copy of each bright feature so the hairline eyes and smile kept presence
+       at small scale. With bloom.js actually running, the two stack: the face
+       got a halo from the companion AND a halo from the post pass, which
+       together washed the recess and flattened the head shell behind it. The
+       companion now does only what bloom cannot, which is stay visible on the
+       low tier where there is no post-processing at all. */
+    opacity: 0.40,
     blending: AdditiveBlending,
     depthWrite: false
   });

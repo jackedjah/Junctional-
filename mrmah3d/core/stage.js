@@ -141,6 +141,19 @@ function buildEnvironment(renderer, palette) {
        planes across the chest and shoulders rather than a uniform sheen —
        which is exactly the reference's behaviour. */
     { x: 202, y: 50, w: 26, h: 22, fill: 'rgba(255,255,255,1)' },
+    /* THE SHOULDER-TOP CARD.
+
+       The deltoids were rendering as flat black masses, and the geometry was
+       not the reason. An upward-facing facet does not reflect the sky: mirror
+       the view vector about an up normal and the result points BACKWARD and
+       slightly up, which in this projection lands around x=64, y=56 — a region
+       that was empty. So every up-facing plane on the character, which is most
+       of both shoulders, was reflecting nothing.
+
+       This is the card those planes actually see. It is the reason the shoulder
+       tops now catch light while their outer and under surfaces stay dark,
+       which is the read Reference A has. */
+    { x: 68, y: 54, w: 30, h: 24, fill: 'rgba(255,255,255,0.92)' },
     { x: 176, y: 68, w: 18, h: 15, fill: 'rgba(226,246,255,0.85)' },
 
     /* THE MIDTONE TIER — larger, dimmer, and the reason this list has two

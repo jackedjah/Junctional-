@@ -36,6 +36,21 @@ const VW = Math.round(REF.image.width / 2);
 const VH = Math.round(REF.image.height / 2);
 
 const browser = await chromium.launch();
+/* MEASUREMENT RUNS WITHOUT BLOOM, DELIBERATELY.
+
+   This tool extracts the character's mask by luminance and then finds
+   landmarks in its width profile — the head's widest row, the shoulder line —
+   by looking for a peak and the valley after it. Bloom puts a soft halo around
+   every bright element, which thickens the mask unevenly and moves those
+   landmarks: with it enabled the head width measured 0.05 of character height
+   against a true 0.33, i.e. the detector had lost the head entirely.
+
+   That is a measurement artifact, not a regression, but a diagnostic that can
+   be wrong by 85% is worse than no diagnostic. So the comparison deliberately
+   does NOT force a quality tier and runs on this container's detected tier,
+   which is bloom-free — keeping every score comparable with the whole history
+   of this project. Beauty renders are captured separately, at tier=high, by
+   mrmah3d-verify.mjs. */
 const page = await browser.newPage({ viewport: { width: VW, height: VH + 260 }, deviceScaleFactor: 2 });
 const errors = [];
 page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });

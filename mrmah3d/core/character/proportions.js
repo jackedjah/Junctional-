@@ -78,7 +78,12 @@ export var HEAD = {
      as busy and unresolved next to the reference's clean, expensive-looking
      shell. The head is the recognition feature and the one place where
      symmetry is worth more than variation. */
-  relief: 0.065
+  /* Raised a little from 0.065 once the crown band existed. With two bands to
+     tilt rather than one, a small scatter separates their reflections without
+     returning the head to the busy, asymmetric read that 0.13 produced — the
+     bands catch different parts of the environment, which is what stops the
+     shell looking like one flat panel. */
+  relief: 0.095
 };
 
 export var NECK = {
@@ -120,7 +125,15 @@ export var TORSO = {
 
        So the spacing is now graded: wide steps through the taper, tightening
        through the chest, tight across the shoulder crown. Same silhouette
-       curve, far fewer and much larger faces where the reference has them. */
+       curve, far fewer and much larger faces where the reference has them.
+
+       AND THE RELIEF HAD TO GO UP TO PAY FOR IT. Thinning the rings without
+       raising `crystal` left the surviving planes very nearly coplanar down the
+       cone, so they all reflected the same part of the environment and the
+       torso went back to reading as one smooth dark shape — fewer facets is
+       only an improvement if the ones that remain are genuinely differently
+       angled. The relief is now roughly 75% stronger than it was at the old
+       ring density, which is what buys each large plane its own value. */
     /* NOT zero. A ring of radius zero collapses all twelve of its vertices onto
        one point, so every triangle in the bottom band is a degenerate sliver
        with an ill-defined normal — and EdgesGeometry, which works from face
@@ -129,14 +142,14 @@ export var TORSO = {
        is still visually sharp (well under a pixel at any framing we render) and
        the faces are real. */
     { y: 0.000, w: 0.006, d: 0.004 },
-    { y: 0.230, w: 0.104, d: 0.065, facet: 0.0121, crystal: 0.030, crystalY: 0.008 },
-    { y: 0.520, w: 0.213, d: 0.126, facet: -0.0121, crystal: 0.048, crystalY: 0.014 },
-    { y: 0.810, w: 0.305, d: 0.171, facet: 0.0110, crystal: 0.056, crystalY: 0.016 },
-    { y: 1.090, w: 0.381, d: 0.204, facet: -0.0110, crystal: 0.058, crystalY: 0.016 },
-    { y: 1.350, w: 0.444, d: 0.228, facet: 0.0099, crystal: 0.054, crystalY: 0.015 },
-    { y: 1.580, w: 0.494, d: 0.245, facet: -0.0088, crystal: 0.046, crystalY: 0.012 },
-    { y: 1.760, w: 0.529, d: 0.255, facet: 0.0077, crystal: 0.034, crystalY: 0.008 },
-    { y: 1.880, w: 0.551, d: 0.259, facet: -0.0055, crystal: 0.020, crystalY: 0.004, dip: 0.040 },
+    { y: 0.230, w: 0.104, d: 0.065, facet: 0.0121, crystal: 0.0525, crystalY: 0.0120 },
+    { y: 0.520, w: 0.213, d: 0.126, facet: -0.0121, crystal: 0.0840, crystalY: 0.0210 },
+    { y: 0.810, w: 0.305, d: 0.171, facet: 0.0110, crystal: 0.0980, crystalY: 0.0240 },
+    { y: 1.090, w: 0.381, d: 0.204, facet: -0.0110, crystal: 0.1015, crystalY: 0.0240 },
+    { y: 1.350, w: 0.444, d: 0.228, facet: 0.0099, crystal: 0.0945, crystalY: 0.0225 },
+    { y: 1.580, w: 0.494, d: 0.245, facet: -0.0088, crystal: 0.0805, crystalY: 0.0180 },
+    { y: 1.760, w: 0.529, d: 0.255, facet: 0.0077, crystal: 0.0595, crystalY: 0.0120 },
+    { y: 1.880, w: 0.551, d: 0.259, facet: -0.0055, crystal: 0.0350, crystalY: 0.0060, dip: 0.040 },
     { y: 1.932, w: 0.557, d: 0.260, facet: 0.0055, dip: 0.030 },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
@@ -173,7 +186,10 @@ export var TORSO = {
      across the shoulders, and the refined reference is broader still — the
      brief asks explicitly for stronger shoulder-cap presence and a deltoid-like
      silhouette. This is the single value that controls how heroic he reads. */
-  shoulderHalfWidth: 0.808,
+  /* The deltoid no longer reads this — its extent comes from the arm joint plus
+     its own end radius (see body.js) — but the shoulder line is still measured
+     against it, so it is kept as the stated target the two should agree on. */
+  shoulderHalfWidth: 0.870,
   shoulderY: 1.900
 };
 
@@ -204,7 +220,7 @@ export var ARMS = {
        stay where they were measured, so the pose and the hand positions are
        unchanged — only the top of the limb moves out, which also gives the
        upper arm the near-vertical hang that Reference A has. */
-    shoulder: [-0.660, 1.902, 0.02],
+    shoulder: [-0.698, 1.900, 0.02],
     /* Brought under the shoulder. With the joint moved outboard, the old elbow
        at 0.764 made the upper arm angle further OUT before the forearm cut back
        in — a chicken wing. Reference A hangs the upper arm almost vertically
@@ -217,7 +233,7 @@ export var ARMS = {
     wristRadius: 0.060
   },
   left: {                         /* viewer's RIGHT — the raised arm */
-    shoulder: [0.658, 1.896, 0.02],
+    shoulder: [0.696, 1.894, 0.02],
     elbow: [0.758, 1.330, 0.10],
     wrist: [0.812, 1.982, 0.14],
     upperRadius: 0.112,
