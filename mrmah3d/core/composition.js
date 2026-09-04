@@ -155,6 +155,24 @@ export var MODES = {
     state: 'idle'
   },
 
+  /* WEBSITE-CANONICAL — R94, measured off reference/mrmah-refC-luminous-b.png
+     (941 x 1671): head apex at 0.090 of the frame, taper tip at 0.778, so he
+     spans 0.688 of the height with his centre at 0.434; centred horizontally;
+     the horizon sits LOW, at ~0.74, so the camera is a little below his chest
+     and pitched up — the hero framing for a marketing page, with the mountain
+     line and its beacons filling the lower third behind him. Dead front. */
+  website: {
+    label: 'website',
+    fov: 34,
+    heightFrac: 0.688,
+    screenX: 0.50,
+    screenY: 0.434,
+    azimuthDeg: 0,
+    elevation: 1.05,
+    world: { grid: 1.0, nodes: 1.0, structures: 1.0, motes: 1.0, glow: 1.0, fogNear: 12, fogFar: 60 },
+    state: 'idle'
+  },
+
   /* AI CHAT — he is a presence beside the conversation, not its subject.
 
      Small (30% of frame height), low and left, seen from his right so he reads

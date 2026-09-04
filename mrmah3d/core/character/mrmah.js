@@ -18,6 +18,7 @@ import { buildBody } from './body.js';
 import { buildLimbs } from './limbs.js';
 import { createStateMachine } from './states.js';
 import { setInnerLight } from './crystal-shader.js';
+import { HALO_LAYER } from '../bloom.js';
 import { HEIGHT, FLOAT, HEAD } from './proportions.js';
 
 export function createMrMah(options) {
@@ -42,6 +43,11 @@ export function createMrMah(options) {
   rig.add(body.group);
   rig.add(limbs.group);
   rig.add(head.group);
+
+  /* R94 — flag every solid of his for the silhouette-halo pass (bloom.js
+     renders HALO_LAYER alone as a mask). Meshes only: the edge lines would
+     thicken the mask with their own width and the halo would inherit a cage. */
+  root.traverse(function (o) { if (o.isMesh) o.layers.enable(HALO_LAYER); });
 
   float.position.y = FLOAT.height;
 

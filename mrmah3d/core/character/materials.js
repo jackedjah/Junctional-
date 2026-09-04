@@ -440,7 +440,7 @@ export function createCrystalMaterials(options) {
        tail was five times too heavy (21% above 160 luma against 4%) and all
        of it was facets catching the camera-side environment card. The
        reflection scales with this number and nothing else on the head does. */
-    envMapIntensity: 3.5,
+    envMapIntensity: 2.8,
     flatShading: false,
     /* A small self-lit floor: it is what populates the 64-127 bands the
        reference's shell has and this one lacked, without touching the top. */

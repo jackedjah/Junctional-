@@ -686,6 +686,68 @@ so they can take a darker, barely-reflective material, and the value step does
 the work. Verify depth with `head-threequarter.png`, not front-on: a recess and
 a painted panel are indistinguishable from straight ahead.
 
+### The body rendered INSIDE-OUT for many passes (R94)
+
+Every band quad and both caps of every `loft` — and therefore every `segment`
+— were wound inward: for a quad on the +x side of a ring, `(b−a)×(c−a)` came
+out pointing −x. `FrontSide` culled the whole outer surface of the torso,
+deltoids and arms, and what had been rendering all along was the INTERIOR OF
+THE FAR WALL, whose stored normals (computed from the same winding) point at
+the camera, so it shaded plausibly and the silhouette was identical. Only the
+tip fans were outward. Consequences that had each been "fixed" elsewhere: the
+emblem read as a sticker (it floated 0.45 units in front of the surface being
+drawn), no pectoral or authored front plane ever read, the chest lamp lit
+nothing, the edge lines floated in front of the body as a cage, and the taper
+could not be lit from inside.
+
+Three probes settled it, in order of cost: **raycast the frame** (the first
+`FrontSide` hit on the chest was at z −0.13, behind the axis, with a forward
+normal); **count winding against the radial direction per mesh** (96–100%
+inward on every loft, 0% disagreement with the stored normals — the arms'
+R92 "basis fix" had made the normals agree with an inward winding); and
+**render once with the material on `BackSide`** — a solid character with
+domed shoulders, a clavicle shelf and pec planes appeared. The winding probe
+is in the scratch tools and takes a minute; run it whenever geometry is
+authored. A culled face and a black face look identical — still.
+
+### A measured shell beats an impression of one
+
+The reference head "looked like pale ice". Histogrammed over a diamond-ring
+mask (the shell without its cavity) it is 52% below 32 luma, 23% in 32–63,
+12% in 64–95, 7% in 96–127 and under 4% above 160 — a dark crystal with a
+graded middle and thin bright edges. The first table authored from the
+impression put 21% of the shell above 160 (blown facets). Region tables are
+tuned against the crop's histogram, not against how the crop feels.
+
+### Region classes, zones and columns
+
+`regions.js` gives each region its own class table; a scalar lift on one
+table cannot express "ice head, steel neck, sapphire flanks, dark spear". A
+ring's `zoneAt(angle)` returns `{ classes, seed }` so every quad in a zone
+draws ONE class and reads as one plane; the jitter stays per face, because
+sharing it too made each zoned pectoral a flat rectangle. Keep albedo-boost
+classes (negative darkness) out of zoned planes: a whole zone drawn as ice is
+a bright rectangle whatever the light does — a sticker. `columns: true` seeds
+a vertical strip identically and keeps one diagonal, which is how the taper
+gets long converging facets.
+
+### The internal light is gated per MESH, not per material
+
+The taper's light is `-N·L` transmission from a source in the mesh's own
+space. Gating it by object-space y and |x| lit both arms electric blue,
+because an arm's local origin is its shoulder joint and its whole length sits
+inside the gate. `aInner` (a per-geometry attribute) marks the one solid that
+carries the light; the material stays shared.
+
+### The silhouette halo is a screen-space thing
+
+An additive shell floors the body's own darks wherever the surface folds, and
+a card behind him is a shape. The aura that hugs the outline is built in
+`bloom.js`: the character alone (layer `HALO_LAYER`, `scene.overrideMaterial`)
+rendered as a flat mask at half resolution, blurred wide, and added ONLY
+outside the sharp mask. Inside the outline nothing changes. Tier-gated with
+bloom, so `low` pays nothing.
+
 ### Anything upward-facing reflects x≈64, not the sky
 
 The deltoids rendered as flat black masses and the geometry was not the reason.

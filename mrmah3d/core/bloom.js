@@ -39,9 +39,13 @@
 
 import {
   WebGLRenderTarget, ShaderMaterial, OrthographicCamera, Scene, Mesh,
-  PlaneGeometry, Vector2, LinearFilter, ClampToEdgeWrapping,
-  NoBlending
+  PlaneGeometry, Vector2, Color, LinearFilter, ClampToEdgeWrapping,
+  NoBlending, MeshBasicMaterial
 } from '../vendor/three/three.module.min.js';
+
+/* The layer the character's meshes are flagged with so the halo pass can
+   render him alone. Exported so the character can flag itself. */
+export var HALO_LAYER = 2;
 
 var VERT = [
   'varying vec2 vUv;',
@@ -87,10 +91,30 @@ var BLUR = [
   '}'
 ].join('\n');
 
+/* R94 — THE SILHOUETTE HALO.
+
+   The brief asks for an aura OWNED BY THE SILHOUETTE: a glow that hugs his
+   outline and never reads as a rectangle or an ellipse behind him. Every
+   in-scene attempt at this has failed for a structural reason — an additive
+   shell puts a floor under the body's own darks wherever the surface folds,
+   and a card behind him is a shape. A halo is a screen-space thing, so it is
+   built in screen space: the character alone is rendered as a flat mask into
+   a small target, the mask is blurred wide, and the blur is added to the frame
+   ONLY OUTSIDE the sharp mask. Inside the outline nothing changes, which is
+   what keeps the dark end of the crystal intact. Tier-gated with the bloom it
+   rides on, so the low tier pays nothing. */
+var HALO_MASK = [
+  'void main() { gl_FragColor = vec4( 1.0 ); }'
+].join('\n');
+
 var COMPOSITE = [
   'uniform sampler2D tScene;',
   'uniform sampler2D tBloom;',
+  'uniform sampler2D tHalo;',
+  'uniform sampler2D tMask;',
   'uniform float uStrength;',
+  'uniform float uHalo;',
+  'uniform vec3 uHaloColor;',
   'varying vec2 vUv;',
   /* COLOUR SPACE, established by experiment rather than by reading the docs,
      because two plausible configurations both looked wrong in different ways.
@@ -118,6 +142,12 @@ var COMPOSITE = [
   'void main() {',
   '  vec4 base = texture2D( tScene, vUv );',
   '  vec3 glow = texture2D( tBloom, vUv ).rgb * uStrength;',
+  /* the halo: blurred silhouette, gated OUTSIDE the sharp silhouette, squared
+     so it falls away quickly and reads as a rim of light rather than a fog */
+  '  float hb = texture2D( tHalo, vUv ).r;',
+  '  float hm = texture2D( tMask, vUv ).r;',
+  '  float halo = hb * hb * ( 1.0 - hm ) * uHalo;',
+  '  glow += uHaloColor * halo;',
   '  float ga = clamp( dot( glow, vec3( 0.2126, 0.7152, 0.0722 ) ), 0.0, 1.0 );',
   '  gl_FragColor = vec4( base.rgb + glow, clamp( base.a + ga, 0.0, 1.0 ) );',
   '}'
@@ -161,6 +191,13 @@ export function createBloom(options) {
 
   var rtA = target(1, 1);
   var rtB = target(1, 1);
+  /* Halo: the sharp silhouette mask and its wide blur, both at quarter area. */
+  var rtMask = target(1, 1);
+  var rtHalo = target(1, 1);
+  var haloStrength = opts.halo == null ? 1.05 : opts.halo;
+  var haloColor = new Color(opts.haloColor == null ? 0x3a9cff : opts.haloColor);
+  /* A flat, unlit, unfogged material for the mask pass. */
+  var maskMat = new MeshBasicMaterial({ color: 0xffffff, fog: false });
 
   var brightMat = new ShaderMaterial({
     vertexShader: VERT, fragmentShader: BRIGHT,
@@ -181,7 +218,11 @@ export function createBloom(options) {
     uniforms: {
       tScene: { value: rtScene.texture },
       tBloom: { value: rtA.texture },
-      uStrength: { value: strength }
+      tHalo: { value: rtHalo.texture },
+      tMask: { value: rtMask.texture },
+      uStrength: { value: strength },
+      uHalo: { value: haloStrength },
+      uHaloColor: { value: haloColor }
     },
     /* NoBlending, and this matters more than it looks.
 
@@ -215,10 +256,53 @@ export function createBloom(options) {
     rtScene.setSize(w, h);
     rtA.setSize(bw, bh);
     rtB.setSize(bw, bh);
+    rtMask.setSize(bw, bh);
+    rtHalo.setSize(bw, bh);
+  }
+
+  /* The halo pass: the character alone, flat white, into rtMask; then a wide
+     separable blur of it into rtHalo (rtB is the ping). Three blur rounds at
+     increasing radius give a soft falloff over ~40 px of the half-res target
+     without a bigger kernel. Layers do the isolation: only objects flagged
+     with HALO_LAYER are drawn, and the camera's own mask is restored after. */
+  function renderHalo(scene, camera) {
+    var prevMask = camera.layers.mask;
+    var prevOverride = scene.overrideMaterial;
+    var prevBg = scene.background, prevFog = scene.fog;
+    camera.layers.set(HALO_LAYER);
+    scene.overrideMaterial = maskMat;
+    scene.background = null;
+    scene.fog = null;
+    renderer.setRenderTarget(rtMask);
+    renderer.setClearColor(0x000000, 0);
+    renderer.clear();
+    renderer.render(scene, camera);
+    camera.layers.mask = prevMask;
+    scene.overrideMaterial = prevOverride;
+    scene.background = prevBg;
+    scene.fog = prevFog;
+
+    var src = rtMask;
+    var radii = [1.4, 3.0, 5.5];
+    for (var i = 0; i < radii.length; i++) {
+      blurMat.uniforms.tDiffuse.value = src.texture;
+      blurMat.uniforms.uDir.value.set(radii[i] / bw, 0);
+      renderer.setRenderTarget(rtB);
+      renderer.clear();
+      renderer.render(blurScene, cam);
+      blurMat.uniforms.tDiffuse.value = rtB.texture;
+      blurMat.uniforms.uDir.value.set(0, radii[i] / bh);
+      renderer.setRenderTarget(rtHalo);
+      renderer.clear();
+      renderer.render(blurScene, cam);
+      src = rtHalo;
+    }
   }
 
   function render(scene, camera) {
     var prevTarget = renderer.getRenderTarget();
+
+    if (haloStrength > 0) renderHalo(scene, camera);
 
     renderer.setRenderTarget(rtScene);
     renderer.clear();
@@ -251,17 +335,21 @@ export function createBloom(options) {
   function setStrength(v) {
     compositeMat.uniforms.uStrength.value = Math.max(0, Number(v) || 0);
   }
+  function setHalo(v) {
+    haloStrength = Math.max(0, Number(v) || 0);
+    compositeMat.uniforms.uHalo.value = haloStrength;
+  }
 
   function dispose() {
-    rtScene.dispose(); rtA.dispose(); rtB.dispose();
-    brightMat.dispose(); blurMat.dispose(); compositeMat.dispose();
+    rtScene.dispose(); rtA.dispose(); rtB.dispose(); rtMask.dispose(); rtHalo.dispose();
+    brightMat.dispose(); blurMat.dispose(); compositeMat.dispose(); maskMat.dispose();
     [brightScene, blurScene, compositeScene].forEach(function (s) {
       s.traverse(function (o) { if (o.geometry) o.geometry.dispose(); });
     });
   }
 
   return {
-    render: render, setSize: setSize, setStrength: setStrength,
+    render: render, setSize: setSize, setStrength: setStrength, setHalo: setHalo,
     dispose: dispose,
     get strength() { return compositeMat.uniforms.uStrength.value; }
   };

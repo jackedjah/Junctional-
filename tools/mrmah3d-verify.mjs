@@ -613,7 +613,7 @@ for (const v of VIEWPORTS) {
   });
   check('MODE-00 no errors switching modes', errs.length === 0, errs.slice(0, 3).join(' | '));
 
-  for (const name of ['showcase', 'chat', 'protocol', 'portrait']) {
+  for (const name of ['showcase', 'website', 'chat', 'protocol', 'portrait']) {
     await page.evaluate(n => window.__MRMAH_LAB.scene.setMode(n), name);
     await page.waitForTimeout(500);
     writeFileSync(join(OUT, `mode-${name}.png`), await page.locator('.lab-stage').screenshot());
