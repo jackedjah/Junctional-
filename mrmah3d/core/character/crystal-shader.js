@@ -75,7 +75,12 @@ export function applyCrystalShader(material, options) {
        brilliant catches — which is the opposite of the flat mid-blue this had
        settled into. Absorption is the control that deepens the dark classes
        without touching the lit ones. */
-    uInnerDark: { value: opts.innerDark == null ? 0.62 : opts.innerDark },
+    /* R94: 0.62 -> 0.50, with the deep colour lifted at the same time. Measured
+       over the chest on identical framing against Reference A: 66% of the
+       render's pixels sat below 32 luma against the reference's 48%, and the
+       32-63 band held 4.6% against 27.8% — the lost planes were falling
+       through the floor rather than sitting on it. */
+    uInnerDark: { value: opts.innerDark == null ? 0.50 : opts.innerDark },
     uTint: { value: tintColor },
     uDeep: { value: deepColor },
     uVariation: { value: opts.variation == null ? 1.0 : opts.variation },

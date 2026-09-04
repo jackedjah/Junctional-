@@ -31,7 +31,7 @@ export function createLights(options) {
   /* Cool white key — not cyan. A cyan key would tint every lit plane and the
      body would start reading as "a glowing cyan object", which the reference
      explicitly is not. The cyan belongs to the edges and the rim. */
-  var key = new DirectionalLight(new Color(0xd8ecff), 2.6);
+  var key = new DirectionalLight(new Color(0xd8ecff), 5.5);
   key.position.set(-4.2, 7.4, 6.2);
   key.castShadow = !!settings.shadows;
   if (key.castShadow) {
@@ -48,8 +48,18 @@ export function createLights(options) {
   }
 
   /* Fill — cool, weak, opposite side. Never casts. */
-  var fill = new DirectionalLight(new Color(0x5f88a8), 0.34);
-  fill.position.set(5.6, 2.2, 3.4);
+  /* R94: raising this to 0.62 was measured as a no-op on the chest histogram
+     (mean 50.6 -> 50.9). A dim fill on a dark, absorbing albedo cannot fill the
+     32-63 band; the deep colour and the absorption own that end. Left alone. */
+  /* R94 — A REAL OPPOSING FILL, in STEEL. Sampled, the reference's unlit
+     planes are near-neutral grey at 20-55 luma — (24,27,35), (45,54,71) — and
+     its blue lives in the lit and transmitting crystal. This build's darks were
+     saturated blue at 20-30 luma because every soft source was itself a deep
+     saturated blue carrying almost no luminance: tripling the hemisphere moved
+     the chest histogram by 0.3%. Luma comes from green, and the soft rig now
+     has some. */
+  var fill = new DirectionalLight(new Color(0x9fb8d2), 2.2);
+  fill.position.set(5.6, 3.0, 4.0);
 
   /* Rim — cyan, from behind and above. This is what draws the lit contour. */
   var rim = new DirectionalLight(new Color(0x49dcff), 2.2);
@@ -117,11 +127,11 @@ export function createLights(options) {
      to destroy a dark end — the difference here is that it is raising it to a
      COLOUR rather than to grey, and the hierarchy is carried by hue as much as
      by value from this point on. */
-  var hemi = new HemisphereLight(new Color(0x24487e), new Color(0x0c1c3a), 0.30);
+  var hemi = new HemisphereLight(new Color(0x7186a4), new Color(0x2a3442), 0.55);
 
   /* Deliberately tiny. The dark side of a crystal should be nearly black —
      that contrast is the material. */
-  var ambient = new AmbientLight(new Color(0x16305a), 0.22);
+  var ambient = new AmbientLight(new Color(0x3c4a60), 0.30);
 
   var all = [key, fill, rim, rim2, bounce, chestLamp, faceLamp, hemi, ambient];
   if (group) all.forEach(function (l) { group.add(l); });
@@ -139,8 +149,8 @@ export function createLights(options) {
 
   function setIntensity(scale) {
     var k = Math.max(0, Number(scale) || 1);
-    key.intensity = 2.6 * k;
-    fill.intensity = 0.34 * k;
+    key.intensity = 5.5 * k;
+    fill.intensity = 2.2 * k;
     rim.intensity = 2.2 * k;
     rim2.intensity = 1.1 * k;
     bounce.intensity = 0.85 * k;

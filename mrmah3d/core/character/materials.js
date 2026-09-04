@@ -54,8 +54,16 @@ export var PALETTE = {
      reflected. The cyan accents stay selective — they come from the edges, the
      tint class and the rim card, all of which are chosen. This is the floor
      underneath them. */
-  crystal: 0x1c3a63,
-  crystalDeep: 0x0a1730, /* the darkest facets — still sapphire, not void */
+  crystal: 0x30507a,
+  /* R94: 0x0a1730 -> 0x11284f. Histogrammed over the chest against Reference A
+     the render was 57% below 32 luma against 40%, with the 32-63 band nearly
+     empty: the darkest facets were falling to this colour, and this colour was
+     black. The reference's lost planes sit at 20-30 luma and are still blue. */
+  /* R94 again: STEEL, not sapphire. Sampled on Reference A, the lost planes
+     are (24,27,35)-(45,54,71): near-neutral grey with a slight blue cast. A
+     saturated deep colour under blue lights gave darks of (6,31,83) — blue with
+     no luma — whatever its value was set to. */
+  crystalDeep: 0x3a4256, /* the darkest facets — dark steel with a blue cast */
   /* R94 — the head's ice family: a pale steel-blue albedo, a deep that is
      still blue rather than black, and a whiter tint for its catches. */
   headCrystal: 0x7d9fc6,
@@ -146,7 +154,7 @@ export function createCrystalMaterials(options) {
        to carry the whole material. Left at 27 it would simply have re-crushed
        the midtones the albedo is being brought in to supply — the same
        distribution error from the other direction. */
-    envMapIntensity: 19.0,
+    envMapIntensity: 14.0,
     /* R92: flatShading OFF, and the facets are unaffected.
 
        Every vertex of a face already carries that face's own normal, so
@@ -445,7 +453,7 @@ export function createCrystalMaterials(options) {
     /* A small self-lit floor: it is what populates the 64-127 bands the
        reference's shell has and this one lacked, without touching the top. */
     emissive: new Color(tint.headCrystal || PALETTE.headCrystal),
-    emissiveIntensity: 0.10
+    emissiveIntensity: 0.05
   });
   applyCrystalShader(head, {
     tint: PALETTE.headTint,

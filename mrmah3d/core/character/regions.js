@@ -149,6 +149,10 @@ var DELT = [
 /* UPPER ARM — sapphire with a dark tricep side; FOREARM — steel segments with
    more silver, the reference's forearms read as machined; HAND — dark steel,
    small, with one or two catches so it reads solid rather than as a cage. */
+/* NOTE: the limbs draw with a lift ramp of 0.34-0.44 (see limbs.js), so the
+   bottom third of these tables is never reached; reweighting the darkest
+   entries measured as an exact no-op on the arm histogram. The arms' value is
+   set by what they reflect and by the deep colour, not by these rows. */
 var UPPER_ARM = [
   [0.14,   0.08,  -0.10,   0.56,  0.14],
   [0.24,   0.05,  -0.04,   0.34,  0.24],
