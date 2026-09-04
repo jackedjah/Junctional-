@@ -437,6 +437,32 @@ export function facetedGeometry(positions, faces, groups, options) {
   return geo;
 }
 
+/* R95 — merge several forge geometries into one, so a hand's palm, fingers and
+   thumb are one mesh and one edge set instead of ten of each. Every forge
+   geometry is non-indexed and carries the same attributes, so this is a
+   concatenation; groups are dropped (the parts share one material). The
+   inputs are disposed. */
+export function mergeGeometries(list) {
+  var names = Object.keys(list[0].attributes);
+  var geo = new BufferGeometry();
+  names.forEach(function (name) {
+    var size = list[0].attributes[name].itemSize;
+    var total = 0;
+    list.forEach(function (g) { total += g.attributes[name].count; });
+    var out = new Float32Array(total * size);
+    var offset = 0;
+    list.forEach(function (g) {
+      var a = g.attributes[name].array;
+      out.set(a, offset);
+      offset += a.length;
+    });
+    geo.setAttribute(name, new Float32BufferAttribute(out, size));
+  });
+  list.forEach(function (g) { g.dispose(); });
+  geo.computeBoundingSphere();
+  return geo;
+}
+
 /* Deterministic pseudo-random in 0..1 from two integers.
 
    Deterministic matters: the character must be identical on every mount and in

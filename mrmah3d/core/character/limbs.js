@@ -14,7 +14,7 @@
 import {
   Group, Mesh, EdgesGeometry, LineSegments, Vector3
 } from '../../vendor/three/three.module.min.js';
-import { segment, diamondPlate, facetedGeometry } from './forge.js';
+import { segment, diamondPlate, facetedGeometry, mergeGeometries } from './forge.js';
 import { ARMS, HAND } from './proportions.js';
 import { REGIONS } from './regions.js';
 
@@ -136,11 +136,9 @@ function buildDigit(hand, materials, spec, base, dirX, len, radius, curl, edges)
     { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
   var g2 = segment(mid, tip, radius * 0.92, radius * 0.66, 6,
     { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
-  [g1, g2].forEach(function (g) {
-    var c = clad(hand, g, materials, 0, edges);
-    owned.push(g, c.edges, c.minorEdges);
-  });
-  return owned;
+  /* The segments are returned, not clad: the hand merges every part into ONE
+     geometry (see buildHand) so a hand costs three draws, not thirty. */
+  return [g1, g2];
 }
 
 function buildHand(materials, spec, options) {
@@ -149,10 +147,12 @@ function buildHand(materials, spec, options) {
   hand.name = 'hand';
   var owned = [];
 
-  var palmGeo = palmGeometry(1, spec);
   var HAND_EDGES = { major: 84, minor: 89 };
-  var palm = clad(hand, palmGeo, materials, 0, HAND_EDGES);
-  owned.push(palmGeo, palm.edges, palm.minorEdges);
+  /* R95 — ONE GEOMETRY PER HAND. Four jointed fingers and a thumb as separate
+     meshes took a hand from 15 draws to 30 and put the high tier over its
+     frame budget; merged with the palm they are one mesh and one pair of edge
+     sets. */
+  var parts = [palmGeometry(1, spec)];
 
   /* Digits. Simplified and few — the requirement is that the raised hand
      reads as a hand rather than a triangle, not that it has knuckles. */
@@ -188,7 +188,7 @@ function buildHand(materials, spec, options) {
     var splay = (t - 0.5) * (opts.open ? 0.30 : 0.10);
     var len = spec.digitLength * (1 - Math.abs(t - 0.5) * 0.30);
     var base = [x, spec.palmLength, spec.palmHalfDepth * 0.15];
-    owned.push.apply(owned, buildDigit(hand, materials, spec, base, Math.sin(splay), len,
+    parts.push.apply(parts, buildDigit(hand, materials, spec, base, Math.sin(splay), len,
       spec.digitRadius, curl, HAND_EDGES));
   }
 
@@ -202,8 +202,10 @@ function buildHand(materials, spec, options) {
     : [thumbBase[0] - thumbLen * 0.20, thumbBase[1] + thumbLen * 0.70, thumbBase[2] + thumbLen * 0.55];
   var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 6,
     { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
-  var thumb = clad(hand, thumbGeo, materials, 0, HAND_EDGES);
-  owned.push(thumbGeo, thumb.edges, thumb.minorEdges);
+  parts.push(thumbGeo);
+  var handGeo = mergeGeometries(parts);
+  var handParts = clad(hand, handGeo, materials, 0, HAND_EDGES);
+  owned.push(handGeo, handParts.edges, handParts.minorEdges);
 
   /* The bright tip diamond the reference shows above the raised hand. */
   if (opts.tipDiamond) {
