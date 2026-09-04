@@ -386,7 +386,7 @@ for (const v of VIEWPORTS) {
          shadow on every tier. */
       s.parts.environment.ground.visible = true;
       s.parts.environment.group.visible = true;
-      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon'].forEach(function (k) {
+      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon', 'clouds'].forEach(function (k) {
         if (s.parts.environment[k]) s.parts.environment[k].visible = false;
       });
       s.parts.stage.world.visible = true;
@@ -401,7 +401,7 @@ for (const v of VIEWPORTS) {
         if (a > 20 && a < 160 && (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) < 14) shadowPx++;
       }
       const info = s.info();
-      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon'].forEach(function (k) {
+      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon', 'clouds'].forEach(function (k) {
         if (s.parts.environment[k]) s.parts.environment[k].visible = true;
       });
       out.push({

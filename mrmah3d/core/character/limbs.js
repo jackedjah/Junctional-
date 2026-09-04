@@ -122,9 +122,13 @@ function buildArm(materials, spec, options) {
   shoulderJoint.position.copy(shoulder);
   root.add(shoulderJoint);
 
+  /* Six steps rather than four, because a profiled limb needs enough rings to
+     actually describe its swell — at four the bicep belly lands between rings
+     and the arm stays a cone with a kink in it. */
   var upperGeo = segment(
     [0, 0, 0], elbow.clone().sub(shoulder).toArray(),
-    spec.upperRadius, spec.foreRadius * 1.05, 8, { depthRatio: 0.85, crystal: 0.085, steps: 4 }
+    spec.upperRadius, spec.foreRadius * 1.02, 8,
+    { depthRatio: 0.88, crystal: 0.075, steps: 6, profile: ARMS.profiles.upper }
   );
   var upper = clad(shoulderJoint, upperGeo, materials, 1.05);
   owned.push(upperGeo, upper.edges, upper.minorEdges);
@@ -138,7 +142,8 @@ function buildArm(materials, spec, options) {
   var foreVec = wrist.clone().sub(elbow);
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
-    spec.foreRadius, spec.wristRadius, 8, { depthRatio: 0.85, crystal: 0.085, steps: 4 }
+    spec.foreRadius, spec.wristRadius, 8,
+    { depthRatio: 0.88, crystal: 0.070, steps: 5, profile: ARMS.profiles.fore }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 1.05);
   owned.push(foreGeo, fore.edges, fore.minorEdges);

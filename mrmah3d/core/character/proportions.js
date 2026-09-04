@@ -58,8 +58,14 @@ export var HEAD = {
   faceZ: 0.44,                   /* plate depth — behind the bevel: the recess */
   backApexZ: -1.0,
   /* Depth scatter on the head's bevel ring, so its front facets tilt slightly
-     differently and the head catches light in several places. */
-  relief: 0.13
+     differently and the head catches light in several places.
+
+     Halved. At 0.13 the scatter broke the diamond's symmetry visibly and threw
+     a fan of small facets around the recess, which is most of why the head read
+     as busy and unresolved next to the reference's clean, expensive-looking
+     shell. The head is the recognition feature and the one place where
+     symmetry is worth more than variation. */
+  relief: 0.065
 };
 
 export var NECK = {
@@ -90,21 +96,35 @@ export var TORSO = {
   topY: (1 - 0.356) * H,         /* 1.932 */
   sides: 12,
   rings: [
-    { y: 0.000, w: 0.000, d: 0.000 },
-    { y: 0.120, w: 0.064, d: 0.041, facet: 0.026, crystal: 0.02, crystalY: 0.004 },
-    { y: 0.270, w: 0.122, d: 0.075, facet: -0.026, crystal: 0.04, crystalY: 0.010 },
-    { y: 0.420, w: 0.180, d: 0.108, facet: 0.026, crystal: 0.055, crystalY: 0.014 },
-    { y: 0.580, w: 0.235, d: 0.138, facet: -0.026, crystal: 0.065, crystalY: 0.018 },
-    { y: 0.740, w: 0.284, d: 0.162, facet: 0.026, crystal: 0.072, crystalY: 0.020 },
-    { y: 0.900, w: 0.330, d: 0.183, facet: -0.026, crystal: 0.076, crystalY: 0.022 },
-    { y: 1.060, w: 0.374, d: 0.201, facet: 0.024, crystal: 0.078, crystalY: 0.022 },
-    { y: 1.210, w: 0.410, d: 0.215, facet: -0.024, crystal: 0.078, crystalY: 0.022 },
-    { y: 1.350, w: 0.444, d: 0.228, facet: 0.022, crystal: 0.074, crystalY: 0.020 },
-    { y: 1.480, w: 0.474, d: 0.239, facet: -0.020, crystal: 0.066, crystalY: 0.018 },
-    { y: 1.600, w: 0.498, d: 0.246, facet: 0.018, crystal: 0.056, crystalY: 0.014 },
-    { y: 1.700, w: 0.518, d: 0.252, facet: -0.016, crystal: 0.044, crystalY: 0.010 },
-    { y: 1.850, w: 0.548, d: 0.258, facet: 0.012, crystal: 0.026, crystalY: 0.005, dip: 0.055 },
-    { y: 1.932, w: 0.557, d: 0.260, facet: 0.010, dip: 0.030 },
+    /* FEWER, LARGER PLANES DOWN THE CONE.
+
+       The previous table stepped every 0.12-0.16 units all the way to the tip,
+       which gave the lower body a dense mesh of small triangles. The reference
+       does the opposite: below the chest it is a handful of big, calm planes,
+       and the facet detail concentrates where the eye actually reads it — the
+       chest and shoulders. Equal detail everywhere is what made the body feel
+       over-busy and what stops any single plane reading as a hero.
+
+       So the spacing is now graded: wide steps through the taper, tightening
+       through the chest, tight across the shoulder crown. Same silhouette
+       curve, far fewer and much larger faces where the reference has them. */
+    /* NOT zero. A ring of radius zero collapses all twelve of its vertices onto
+       one point, so every triangle in the bottom band is a degenerate sliver
+       with an ill-defined normal — and EdgesGeometry, which works from face
+       normals, then reports meaningless dihedral angles there and drew a bright
+       hero edge straight across the cone just above the tip. At 0.006 the point
+       is still visually sharp (well under a pixel at any framing we render) and
+       the faces are real. */
+    { y: 0.000, w: 0.006, d: 0.004 },
+    { y: 0.230, w: 0.104, d: 0.065, facet: 0.0121, crystal: 0.030, crystalY: 0.008 },
+    { y: 0.520, w: 0.213, d: 0.126, facet: -0.0121, crystal: 0.048, crystalY: 0.014 },
+    { y: 0.810, w: 0.305, d: 0.171, facet: 0.0110, crystal: 0.056, crystalY: 0.016 },
+    { y: 1.090, w: 0.381, d: 0.204, facet: -0.0110, crystal: 0.058, crystalY: 0.016 },
+    { y: 1.350, w: 0.444, d: 0.228, facet: 0.0099, crystal: 0.054, crystalY: 0.015 },
+    { y: 1.580, w: 0.494, d: 0.245, facet: -0.0088, crystal: 0.046, crystalY: 0.012 },
+    { y: 1.760, w: 0.529, d: 0.255, facet: 0.0077, crystal: 0.034, crystalY: 0.008 },
+    { y: 1.880, w: 0.551, d: 0.259, facet: -0.0055, crystal: 0.020, crystalY: 0.004, dip: 0.040 },
+    { y: 1.932, w: 0.557, d: 0.260, facet: 0.0055, dip: 0.030 },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11
@@ -130,13 +150,17 @@ export var TORSO = {
        hovering above a rim. `dip` on the shoulder ring drops to a trace: it cut
        the collar chevron when that ring was the top of the model, but under a
        crown it only carved a notch you could see down into. */
-    { y: 1.985, w: 0.470, d: 0.232, facet: -0.016, crystal: 0.038, crystalY: 0.008 },
-    { y: 2.035, w: 0.360, d: 0.190, facet: 0.014, crystal: 0.034, crystalY: 0.007 },
-    { y: 2.080, w: 0.250, d: 0.140, facet: -0.012, crystal: 0.026, crystalY: 0.005 },
-    { y: 2.115, w: 0.150, d: 0.095, facet: 0.010 }
+    { y: 1.985, w: 0.470, d: 0.232, facet: -0.0088, crystal: 0.038, crystalY: 0.008 },
+    { y: 2.035, w: 0.360, d: 0.190, facet: 0.0077, crystal: 0.034, crystalY: 0.007 },
+    { y: 2.080, w: 0.250, d: 0.140, facet: -0.0066, crystal: 0.026, crystalY: 0.005 },
+    { y: 2.115, w: 0.150, d: 0.095, facet: 0.0055 }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
-  shoulderHalfWidth: 0.62,
+  /* Widened. Against the canonical reference the render measured 9.3% narrow
+     across the shoulders, and the refined reference is broader still — the
+     brief asks explicitly for stronger shoulder-cap presence and a deltoid-like
+     silhouette. This is the single value that controls how heroic he reads. */
+  shoulderHalfWidth: 0.735,
   shoulderY: 1.900
 };
 
@@ -157,17 +181,42 @@ export var ARMS = {
     shoulder: [-0.544, 1.944, 0.02],   /* ref px (267, 645) */
     elbow: [-0.764, 1.541, 0.10],      /* ref px (185, 795) — the outer point */
     wrist: [-0.429, 0.979, 0.16],      /* ref px (310, 1005) */
-    upperRadius: 0.094,
-    foreRadius: 0.078,
-    wristRadius: 0.060
+    upperRadius: 0.128,
+    foreRadius: 0.094,
+    wristRadius: 0.064
   },
   left: {                         /* viewer's RIGHT — the raised arm */
     shoulder: [0.542, 1.936, 0.02],    /* ref px (672, 648) */
     elbow: [0.684, 1.354, 0.10],       /* ref px (725, 865) — the V's bottom */
     wrist: [0.911, 1.970, 0.14],       /* ref px (810, 635) */
-    upperRadius: 0.094,
-    foreRadius: 0.078,
-    wristRadius: 0.060
+    upperRadius: 0.128,
+    foreRadius: 0.094,
+    wristRadius: 0.064
+  },
+
+  /* LIMB PROFILES — where the mass sits along each bone.
+
+     Radii alone give a cone. These are the multipliers that put a bicep/tricep
+     belly on the upper arm and a forearm swell just below the elbow, which is
+     what the brief asks for: stronger form language, implied through the
+     crystal rather than sculpted as anatomy. The numbers are deliberately
+     modest — a 22% swell reads clearly as upper-arm mass at silhouette scale
+     and stops well short of a bodybuilder, which the brief rules out just as
+     firmly as it rules out a bar.
+
+     Both start and end at ~1.0 so the joints still meet their sockets exactly
+     and the measured shoulder/elbow/wrist points stay where the reference put
+     them. */
+  profiles: {
+    /* Peaks at t=0.34 — the belly of the upper arm — then draws into the
+       elbow, which is the narrowest point of the whole limb. */
+    upper: function (t) {
+      return 1 + Math.sin(Math.pow(t, 0.78) * Math.PI) * 0.22 - t * 0.10;
+    },
+    /* Peaks earlier and less: a forearm is fullest right below the elbow. */
+    fore: function (t) {
+      return 1 + Math.sin(Math.pow(t, 0.62) * Math.PI) * 0.13 - t * 0.06;
+    }
   }
 };
 
@@ -196,8 +245,20 @@ export var INSIGNIA = {
 
 /* The character hovers; the tip does not rest on the floor. The reference
    shows a bright contact starburst directly beneath the point. */
+/* HOVER, deliberately almost imperceptible.
+
+   The brief is specific: gently sustaining himself above the floor, not
+   bobbing, drifting or bouncing. 0.030 at a 4.2s period was a visible rise and
+   fall — readable as animation, which is exactly what it should not be. At
+   0.016 over 6.4 seconds the movement is below the threshold where the eye
+   tracks it as motion and instead just reads the character as alive. Slower is
+   as important as smaller here: a small fast movement still registers as a
+   twitch, a small slow one registers as breathing.
+
+   `height` also sets how long the levitation emitter is, so it is the one
+   number that ties the hover and the beam together. */
 export var FLOAT = {
-  height: 0.16,
-  bobAmplitude: 0.030,
-  bobPeriod: 4.2
+  height: 0.17,
+  bobAmplitude: 0.016,
+  bobPeriod: 6.4
 };

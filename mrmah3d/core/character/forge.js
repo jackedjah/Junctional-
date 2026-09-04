@@ -58,13 +58,19 @@ import { BufferGeometry, Float32BufferAttribute } from '../../vendor/three/three
    mostly-black room is black; the same facet rotated a few degrees onto a light
    card is white. That hit-or-miss behaviour across neighbouring planes is the
    entire optical effect, and a broad lobe averages it away. */
+/* Reweighted toward the dark end again. The refined reference is dominated by
+   near-black and charcoal — well over half its body area — with deep blue as a
+   minority, cyan as an accent and silver as a rarity. Half the faces are now
+   the black class, and the black class itself goes deeper. The silver class is
+   left alone: rarity is what makes a catch read as a catch, and widening it
+   would turn the sparkle into a sheen. */
 var FACET_CLASSES = [
   /* w,    rough,  metal,  dark,  tint */
-  [0.42,   0.16,  -0.34,   0.94,  0.00],   /* black    */
-  [0.24,   0.09,  -0.16,   0.68,  0.04],   /* charcoal */
-  [0.18,   0.02,   0.04,   0.30,  0.30],   /* deep     */
-  [0.10,  -0.04,   0.18,  -0.08,  1.00],   /* cyan     */
-  [0.06,  -0.06,   0.30,  -0.72,  0.24]    /* silver   */
+  [0.50,   0.14,  -0.36,   1.00,  0.00],   /* black    */
+  [0.24,   0.08,  -0.18,   0.74,  0.03],   /* charcoal */
+  [0.14,   0.02,   0.04,   0.34,  0.26],   /* deep     */
+  [0.07,  -0.04,   0.18,  -0.06,  1.00],   /* cyan     */
+  [0.05,  -0.06,   0.32,  -0.76,  0.22]    /* silver   */
 ];
 
 /* Five classes give five values, and five values across a few hundred facets is
@@ -302,9 +308,22 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
   var crystal = opts.crystal == null ? 0.075 : opts.crystal;
   var ratio = opts.depthRatio || 0.82;
   var rings = [];
+  /* PROFILE — the difference between a bar and a limb.
+
+     A straight interpolation from radiusA to radiusB is a cone, and a cone is
+     what made the arms read as bars no matter how they were faceted. A real
+     upper arm is thickest a third of the way down (the bicep/tricep belly) and
+     narrows into the elbow; a forearm is thickest just below the elbow. So the
+     caller can hand in a profile — a multiplier on the interpolated radius as a
+     function of t — and get that swell without any extra geometry.
+
+     Kept as a multiplier rather than a radius table so a profile can be reused
+     across limbs of different lengths and thicknesses. */
+  var profile = opts.profile;
   for (var k = 0; k <= STEPS; k++) {
     var t = k / STEPS;
     var r = radiusA + (radiusB - radiusA) * t;
+    if (profile) r *= profile(t);
     /* Relief fades out at both ends so the joints still meet cleanly. */
     var taper = Math.sin(t * Math.PI);
     rings.push({

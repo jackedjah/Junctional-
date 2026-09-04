@@ -62,7 +62,11 @@ export function buildHead(materials) {
   var halo = new LineSegments(edges, materials.edgeHalo);
   halo.name = 'head-edge-halo';
   group.add(halo);
-  var minorEdges = new EdgesGeometry(geo, 14);
+  /* 14 degrees found every seam on the bevel relief and drew a fan of faint
+     lines straight across the face — the "dirty face" note. The head is the one
+     part where linework must stay off the surface entirely, because anything
+     crossing the recess competes with the eyes and smile. */
+  var minorEdges = new EdgesGeometry(geo, 40);
   group.add(new LineSegments(minorEdges, materials.edgeFaint));
 
   /* ---- face ----------------------------------------------------------- */
@@ -94,33 +98,47 @@ export function buildHead(materials) {
        companion below carries the bloom so the line itself never has to thicken
        in order to stay visible. Segment count around the tube drops to 6 —
        nothing at this width can show its cross-section. */
-    var eye = new Mesh(new TorusGeometry(eyeR, eyeR * 0.075, 6, 32), materials.emissive);
+    /* STROKE WEIGHT, arrived at from both directions.
+
+       0.135 of the ring radius was a donut — the "developer art" note. 0.075
+       was a hairline, and a hairline sub-pixels out at chat size and turned the
+       eyes into dark holes. The refined reference sits between: a clean ring
+       with a definite, even stroke, obviously drawn rather than either fat or
+       fragile. 0.13 is that, and it survives down to protocol scale. */
+    var eye = new Mesh(new TorusGeometry(eyeR, eyeR * 0.13, 8, 40), materials.emissive);
     eye.position.set(side * eyeGap, eyeY, 0);
     eye.name = side < 0 ? 'eye-left' : 'eye-right';
     face.add(eye);
     eyes.push(eye);
 
-    var soft = new Mesh(new TorusGeometry(eyeR * 1.18, eyeR * 0.26, 6, 24), materials.emissiveSoft);
+    var soft = new Mesh(new TorusGeometry(eyeR * 1.16, eyeR * 0.34, 8, 28), materials.emissiveSoft);
     soft.position.copy(eye.position);
     face.add(soft);
   });
 
   /* Smile: a partial torus opening upward. Rotated PI so the arc's belly is
      at the bottom, which is a smile rather than a frown. */
-  var smileR = HEAD.halfWidth * 0.30;
+  /* THE SMILE HAS TO BE VISIBLE. The brief is unambiguous that it currently is
+     not, and it was the one face element I kept trimming. It is now wider
+     (0.34 of the head half-width, so it spans the gap between the eyes rather
+     than hiding under them), meaningfully thicker than the eye stroke, and
+     opened out to a fuller arc so its curve reads as a smile at a glance
+     instead of as a short dash. */
+  var smileR = HEAD.halfWidth * 0.34;
+  var smileArc = Math.PI * 0.92;
   var smile = new Mesh(
     /* The smile is drawn with the same hairline as the eyes, for the same
        reason — the reference's mouth is a thin arc of light, not a band. */
-    new TorusGeometry(smileR, smileR * 0.038, 6, 44, Math.PI * 0.86),
+    new TorusGeometry(smileR, smileR * 0.062, 8, 52, smileArc),
     materials.emissive
   );
-  smile.rotation.z = Math.PI + (Math.PI - Math.PI * 0.86) / 2;
-  smile.position.set(0, eyeY - HEAD.halfHeight * 0.30, 0);
+  smile.rotation.z = Math.PI + (Math.PI - smileArc) / 2;
+  smile.position.set(0, eyeY - HEAD.halfHeight * 0.27, 0);
   smile.name = 'smile';
   face.add(smile);
 
   var smileSoft = new Mesh(
-    new TorusGeometry(smileR, smileR * 0.072, 6, 44, Math.PI * 0.86),
+    new TorusGeometry(smileR, smileR * 0.125, 8, 52, smileArc),
     materials.emissiveSoft
   );
   smileSoft.rotation.copy(smile.rotation);

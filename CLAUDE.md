@@ -59,9 +59,20 @@ luminance distribution, and writes `validation/mrmah3d/silhouette-overlay.png`
 has mass it should not. **Open the overlay.** It has repeatedly located faults
 that the numbers alone described only vaguely.
 
-Current state: silhouette **90.5 / 100**, IoU 69.4%, all seven proportion checks
-in tolerance, character mean luminance 49.1 against the reference's 68.2. Known
-remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
+There are now TWO reference images and they have different jobs.
+`reference/mrmah-canonical-front.png` is the MEASUREMENT baseline — every number
+in `proportions.js` is traced to it and the comparison tool scores against it, so
+it must not be swapped. `reference/mrmah-refined-front.png` is the later, more
+resolved art-direction authority: broader shoulders, real upper-arm mass, a
+cleaner face, a much darker body and a world with cloud and distant structures.
+Where they disagree on FORM, the refined image wins and the silhouette score is
+expected to drift slightly; where they disagree on MEASUREMENT, neither wins
+until the canonical file is re-measured deliberately.
+
+Current state: silhouette **89.0 / 100**, IoU **72.8%** (the shape-overlap
+number, and the one that improved as the form got better), all seven proportion
+checks in tolerance, character mean luminance 50.0 against the reference's 68.2.
+Known remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
 
 The overlay earned that instruction again in the optical pass. A bright ellipse
 across the chest — the character appeared to be standing in a bucket — survived
@@ -185,7 +196,8 @@ must not be claimed from headless runs.
 | `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
-| `reference/` | the canonical visual reference — engineering evidence |
+| `reference/mrmah-canonical-front.png` | the MEASUREMENT baseline — do not swap |
+| `reference/mrmah-refined-front.png` | the art-direction authority for form and value |
 | `tools/mrmah3d-reference.mjs` | measures the reference into numbers |
 | `tools/mrmah3d-compare.mjs` | scores the render against it |
 | `tools/mrmah3d-verify.mjs` | browser-driven runtime verification |
@@ -342,3 +354,25 @@ Four rules, each of which cost a wrong pass to learn. Read them before touching
 And a diagnostic worth keeping: if lowering the edge-line opacity drops the
 character's mean luminance sharply, the linework — not the surfaces — is doing
 the lighting. That is the "wireframe feel" note, measurable.
+
+### Three traps that cost a pass each
+
+1. **A zero-radius ring in a loft makes degenerate faces.** The torso's tip ring
+   had `w: 0`, collapsing twelve vertices onto one point, so every triangle in
+   the bottom band was a sliver with an ill-defined normal. `EdgesGeometry`
+   works from face normals, so it reported nonsense dihedral angles there and
+   drew a bright hero edge straight across the cone. Give a converging ring a
+   tiny non-zero radius instead; it is sub-pixel and the faces become real.
+2. **Any full-width transparent layer is a veil, however faint.** The first
+   cloud bands were dark and at 0.30 opacity, and they still lifted 140 rows of
+   the frame from "partially lit" to "lit right across", which is the structural
+   signature the DEPTH-01 check exists to catch — the floor stopped reading as
+   perspective. Atmosphere has to have GAPS and stay above the horizon.
+   Related, and worth knowing before trusting that check: `getImageData` returns
+   UNPREMULTIPLIED colour, so a pixel at 4% alpha still reports its full RGB and
+   clears a luma threshold. Faint large-area transparency is measured as if it
+   were opaque.
+3. **`visible = false` set at build time does not survive `applyMode()`.** An
+   isolation test that hid the clouds that way was silently undone before the
+   frame was drawn, and reported "not the clouds" when it was entirely the
+   clouds. Isolate by not adding the object at all.

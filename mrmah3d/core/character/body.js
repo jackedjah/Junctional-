@@ -114,9 +114,14 @@ export function buildBody(materials) {
   group.name = 'mrmah-body';
   var owned = [];
 
-  /* ---- torso ---------------------------------------------------------- */
+  /* ---- torso ----------------------------------------------------------
+     heroAngle 86, not 78. With the ring table thinned out the seam just above
+     the tip became a very sharp break, cleared the hero threshold, and drew a
+     bright white bar straight across the bottom of the body. Hero edges are
+     meant to be rare by construction; if a routine seam qualifies, the
+     threshold is wrong rather than the seam. */
   var torsoLoft = loft(TORSO.rings, TORSO.sides || 8, { capTop: true, capBottom: false });
-  var torsoParts = lit(group, torsoLoft.geometry, materials, { rimScale: 1.022, hero: true, heroAngle: 78 });
+  var torsoParts = lit(group, torsoLoft.geometry, materials, { rimScale: 1.022, hero: true, heroAngle: 86 });
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
 
   /* ---- shoulder caps -------------------------------------------------- */
@@ -135,7 +140,32 @@ export function buildBody(materials) {
     }, TORSO.rings[0]);
     var inner = shoulderRing.w * 0.72;
     var outer = TORSO.shoulderHalfWidth;
-    var yTop = TORSO.topY, yBot = TORSO.shoulderY - 0.30, d = 0.20;
+    /* DELTOID PRESENCE.
+
+       The wedge used to be shallow (d=0.20) and stop 0.30 below the shoulder
+       line, so it read as a plate laid on top of the chest and the arm appeared
+       to sprout from under it. A real shoulder cap has depth front-to-back and
+       hangs DOWN over the top of the upper arm; that overlap is what makes the
+       arm look inserted rather than attached.
+
+       So it is deeper and it descends far enough to cover the top of the upper
+       arm, which now has a bicep swell to be covered. Together those two give
+       the shoulder-to-arm connection the brief asks for. */
+    var yTop = TORSO.topY, yBot = TORSO.shoulderY - 0.46, d = 0.225;
+    /* HOW FAR THE CAP FALLS FROM NECK TO OUTER TIP.
+
+       This one number decides whether the shoulder reads as a deltoid or as a
+       wing. The cap's upper surface runs from the neck side down to the outer
+       tip, and at a drop of 0.055 that surface was very nearly horizontal —
+       which meant it faced the sky, caught the light cards flat on, and drew a
+       bright plate sticking out sideways from each shoulder. The character had
+       shoulder pads.
+
+       A real shoulder falls away steeply from the neck. At 0.26 the same
+       surface is a slope, so it takes light at a glancing angle and reads as
+       the top of a rounded mass rather than as a lit shelf — and the silhouette
+       gains the downward shoulder line the reference has. */
+    var fall = 0.26;
 
     /* A RIDGE along the top, and a deliberately deep underside.
 
@@ -145,18 +175,18 @@ export function buildBody(materials) {
        underside back into shadow gives the arm somewhere to emerge FROM. The
        shoulders are the character's widest structure, so this is where the
        strongest depth cue is available. */
-    var ridge = 0.085;
+    var ridge = 0.095;
     var a = p(side * inner, yTop, d);
-    var b = p(side * outer, yTop - 0.055, d * 0.62);
+    var b = p(side * outer, yTop - fall, d * 0.62);
     var c = p(side * outer, yBot, d * 0.52);
     var e = p(side * inner, yBot - 0.06, d);
     var a2 = p(side * inner, yTop, -d);
-    var b2 = p(side * outer, yTop - 0.055, -d * 0.62);
+    var b2 = p(side * outer, yTop - fall, -d * 0.62);
     var c2 = p(side * outer, yBot, -d * 0.52);
     var e2 = p(side * inner, yBot - 0.06, -d);
     /* the spine: a raised centre line running out along the shoulder */
     var r1 = p(side * inner * 1.02, yTop + ridge, 0);
-    var r2 = p(side * outer * 1.01, yTop - 0.055 + ridge * 0.72, 0);
+    var r2 = p(side * outer * 1.01, yTop - fall + ridge * 0.72, 0);
 
     var faces = side > 0
       ? [[a, b, r2, r1], [r1, r2, b2, a2],

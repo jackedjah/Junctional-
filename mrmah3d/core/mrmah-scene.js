@@ -170,6 +170,14 @@ export function createMrMahScene(host, options) {
         characterBox.root.position.z,
         characterBox.states ? 0.85 + 0.35 * (characterBox.states.values.glow || 1) : 1
       );
+      /* The levitation emitter spans the real gap between his lower point and
+         the floor, so it has to be driven from his live hover offset rather
+         than a constant. If it were fixed, the beam would detach from the tip
+         at the top of every hover cycle — which is precisely the illusion it
+         exists to support. */
+      if (envBox.setLaser && characterBox.float) {
+        envBox.setLaser(characterBox.float.position.y);
+      }
     }
     if (envBox.update) envBox.update(dt, { reducedMotion: reducedMotion });
     rendererBox.renderer.render(stageBox.scene, cameraBox.camera);

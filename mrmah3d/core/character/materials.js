@@ -91,7 +91,12 @@ export function createCrystalMaterials(options) {
        not the surfaces — had been doing the lighting. That is the wireframe
        read, stated as a measurement. The brightness has to come back through
        the material instead, and it does. */
-    envMapIntensity: 11.0,
+    /* 14, once the facet table was reweighted half-black. The brief is explicit
+       that the dark regions must not go dead or matte — they have to keep
+       catching light — and darkening the albedo without raising the reflected
+       component is exactly how a body goes flat. Verification caught it as a
+       drop in separable lit planes before it was obvious by eye. */
+    envMapIntensity: 14.0,
     flatShading: true,
     /* A faint self-lit floor so facets turned fully away from every light are
        still crystal rather than holes cut in the frame. Deliberately tiny. */
@@ -109,6 +114,11 @@ export function createCrystalMaterials(options) {
     color: new Color(PALETTE.face),
     roughness: 0.9,
     metalness: 0.0,
+    /* The recess must stay a VOID. Even at roughness 0.9 and zero metalness the
+       plate picks up a diffuse wash of the environment, and any value at all in
+       there costs the eyes and smile the contrast they read against — which is
+       the whole reason the plate is recessed in the first place. */
+    envMapIntensity: 0.18,
     flatShading: true
   });
 
@@ -213,7 +223,7 @@ export function createCrystalMaterials(options) {
        presence. So the ring stays hairline and this does the work at distance.
        This is also the reason it must not be solved with bloom: bloom would
        thicken every bright thing on the character, not just the face. */
-    opacity: 0.55,
+    opacity: 0.72,
     blending: AdditiveBlending,
     depthWrite: false
   });
