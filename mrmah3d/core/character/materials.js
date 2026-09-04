@@ -96,7 +96,12 @@ export function createCrystalMaterials(options) {
        catching light — and darkening the albedo without raising the reflected
        component is exactly how a body goes flat. Verification caught it as a
        drop in separable lit planes before it was obvious by eye. */
-    envMapIntensity: 14.0,
+    /* 17, raised when the torso's rim shell was removed. That shell had been
+       contributing a broad additive lift to the body as well as a contour, and
+       taking it off cost the chest its facet read at app scale. Putting the
+       light back through the reflection keeps it on the SURFACES, which is
+       where this material has been made to carry it. */
+    envMapIntensity: 17.0,
     flatShading: true,
     /* A faint self-lit floor so facets turned fully away from every light are
        still crystal rather than holes cut in the frame. Deliberately tiny. */
@@ -249,7 +254,7 @@ export function createCrystalMaterials(options) {
        the silhouette against the void; with dimmer edges the rim shell is now
        doing most of that job, which is the right owner for it — it follows the
        real surface curvature instead of drawing every polygon boundary. */
-    opacity: 0.195,
+    opacity: 0.150,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -272,7 +277,17 @@ export function createCrystalMaterials(options) {
        The lit contour it used to provide is now the rim shell's job — that one
        follows the real surface curvature instead of every grazing pixel, so it
        puts light on the silhouette without washing the faces behind it. */
-    fresnelBoost: 0.92
+    /* Restored to 1.30. It was cut to 0.92 on the theory that it was flattening
+       the head shell; that turned out to be the facet distribution instead, so
+       the cut was paying a real cost for nothing.
+
+       It matters more now that the torso's rim shell is gone. Fresnel is the
+       right tool for exactly the job the shell was doing badly: it brightens a
+       surface by how far it has turned from the viewer, per pixel, following
+       the real curvature — so it puts light on the contour without laying a
+       flat overlay across the chest, which is precisely the difference between
+       the two approaches. */
+    fresnelBoost: 1.30
   });
 
   /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */

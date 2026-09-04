@@ -350,7 +350,7 @@ export function loft(sections, sides, options) {
     for (var i5 = 0; i5 < sides; i5++) faces.push([ct, last.verts[i5], last.verts[(i5 + 1) % sides]]);
   }
 
-  return { geometry: facetedGeometry(positions, faces), positions: positions, faces: faces };
+  return { geometry: facetedGeometry(positions, faces, null, { lift: opts.lift }), positions: positions, faces: faces };
 }
 
 /* A tapered faceted limb segment running from point A to point B.
@@ -398,7 +398,7 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
     });
   }
 
-  var built = loft(rings, sides || 6, { capTop: true, capBottom: true, phase: opts.phase });
+  var built = loft(rings, sides || 6, { capTop: true, capBottom: true, phase: opts.phase, lift: opts.lift });
 
   /* Orient +Y onto the A->B axis with a minimal rotation. */
   var ux = dx / len, uy = dy / len, uz = dz / len;
@@ -494,10 +494,21 @@ export function diamondCrystal(opts) {
      recess gains a genuine wall for the face to sit down inside. */
   var crownZ = (opts.crownZ == null ? 0.38 : opts.crownZ) * hd;
   var crownInset = opts.crownInset == null ? 0.84 : opts.crownInset;
+  /* THE INNER BEVEL — a band inside the lip, framing the face cavity.
+
+     Without it the solid went lip -> plate in one step, so the face was a flat
+     black panel butted straight against the shell: the "helmet around a
+     sticker" read. A real recessed setting has a bevel running around the
+     inside of the opening, and it is that band, catching light at a different
+     angle from both the outer crown and the plate, which tells the eye the face
+     is set DOWN INSIDE the crystal rather than painted across a hole in it. */
+  var innerZ = (opts.innerZ == null ? 0.30 : opts.innerZ) * hd;
+  var innerInset = opts.innerInset == null ? 0.62 : opts.innerInset;
 
   var E = ring(1, 0, null);                 /* the silhouette — never jittered */
   var C = ring(crownInset, crownZ, 11);     /* crown band */
   var B = ring(bevel, bevelZ, 5);           /* table edge / recess lip */
+  var I = ring(innerInset, innerZ, 17);     /* inner bevel, inside the opening */
   var F = ring(face, faceZ, null);          /* the recessed face plate */
   var back = push(0, 0, backZ);
 
@@ -506,7 +517,8 @@ export function diamondCrystal(opts) {
     var j = (i + 1) % N;
     shell.push([E[i], C[i], C[j], E[j]]);   /* lower crown band */
     shell.push([C[i], B[i], B[j], C[j]]);   /* upper crown band */
-    shell.push([B[i], F[i], F[j], B[j]]);   /* the recess wall */
+    shell.push([B[i], I[i], I[j], B[j]]);   /* over the lip, into the cavity */
+    shell.push([I[i], F[i], F[j], I[j]]);   /* the inner bevel wall */
     shell.push([E[j], E[i], back]);         /* back facets */
   }
   /* Fan the plate from its centre so it is several triangles, not one quad —

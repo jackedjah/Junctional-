@@ -121,13 +121,28 @@ export function buildBody(materials) {
      bright white bar straight across the bottom of the body. Hero edges are
      meant to be rare by construction; if a routine seam qualifies, the
      threshold is wrong rather than the seam. */
-  var torsoLoft = loft(TORSO.rings, TORSO.sides || 8, { capTop: true, capBottom: false });
+  var torsoLoft = loft(TORSO.rings, TORSO.sides || 8,
+    { capTop: true, capBottom: false, lift: TORSO.classLift });
   /* edgeAngle 42, down from the 52 default. With the ring table thinned and the
      crystal relief raised to compensate, the torso's structural breaks are real
      but not extreme — at 52 almost none of them qualified and the front of the
      body read as one smooth surface with values on it rather than as a cut
      stone with planes. Reference A's torso is defined by exactly these seams:
      thin, and present at every major plane boundary. */
+  /* The torso keeps its rim shell.
+
+     It was removed for a while during this pass on the grounds that it laid a
+     broad pale sheen over the flared chest rather than a contour lip — which it
+     does, because the torso is not convex: its dip chevron, crown and facet
+     relief all create folds, and a back-faced copy of a folded solid shows
+     through wherever the surface turns, at any inflation.
+
+     But that sheen was never what the brief objected to. The brief asked for
+     MORE presence in the torso, and the shell is most of where the body's
+     presence comes from. Removing it, then compensating with envMapIntensity,
+     Fresnel, a facet lift and the camera-side card in turn, produced a torso
+     progressively darker and flatter than the one that was being "fixed" — a
+     long correction of a fault nobody had reported. Restored. */
   var torsoParts = lit(group, torsoLoft.geometry, materials,
     { rimScale: 1.022, hero: true, heroAngle: 86, edgeAngle: 42 });
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
@@ -208,7 +223,8 @@ export function buildBody(materials) {
     var geo = segment(
       inner, outer,
       0.230, spec.upperRadius * 1.30, 8,
-      { depthRatio: 1.12, crystal: 0.058, steps: 6, profile: function (t) {
+      { depthRatio: 1.12, crystal: 0.058, steps: 6, lift: ARMS.classLift,
+        profile: function (t) {
         /* Widest just outboard of where it leaves the chest — the deltoid
            belly — then drawing into the arm. Shallower than before: the swell
            was adding lateral width exactly where the silhouette is read. */

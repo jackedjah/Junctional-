@@ -139,8 +139,19 @@ function buildEnvironment(renderer, palette) {
        These two sit around that direction. Only facets whose relief happens to
        aim them at one will catch it, so what lands is a scatter of bright
        planes across the chest and shoulders rather than a uniform sheen —
-       which is exactly the reference's behaviour. */
-    { x: 202, y: 50, w: 26, h: 22, fill: 'rgba(255,255,255,1)' },
+       which is exactly the reference's behaviour.
+
+       SIZE, corrected twice. It was cut from 26x22 to 15x13 while chasing a pale
+       wash across the upper chest — on the theory that a source facing the
+       camera lights a broad front square-on and so stops being a catch. That
+       theory was wrong: the wash was the torso's rim shell, found later by
+       isolation, and shrinking this card had only starved the chest of the one
+       light its front planes can actually see.
+
+       Back to a middle size. Large enough that the flared chest has something
+       to read by now the shell is gone, small enough that facets still hit or
+       miss it rather than all catching it together. */
+    { x: 202, y: 50, w: 21, h: 18, fill: 'rgba(255,255,255,1)' },
     /* THE SHOULDER-TOP CARD.
 
        The deltoids were rendering as flat black masses, and the geometry was

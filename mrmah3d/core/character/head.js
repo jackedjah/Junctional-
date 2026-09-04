@@ -30,6 +30,8 @@ export function buildHead(materials) {
     crownZ: HEAD.crownZ,
     faceInset: HEAD.faceInset,
     bevelZ: HEAD.bevelZ,
+    innerInset: HEAD.innerInset,
+    innerZ: HEAD.innerZ,
     faceZ: HEAD.faceZ,
     backApexZ: HEAD.backApexZ,
     relief: HEAD.relief,

@@ -58,7 +58,7 @@ function palmGeometry(dir, spec) {
     [a[2], b[2], b[3], a[3]],
     [a[3], b[3], b[0], a[0]]
   ];
-  return facetedGeometry(P, faces);
+  return facetedGeometry(P, faces, null, { lift: ARMS.classLift });
 }
 
 function buildHand(materials, spec, options) {
@@ -85,7 +85,7 @@ function buildHand(materials, spec, options) {
     var len = spec.digitLength * (opts.open ? 1 : 0.62) * (1 - Math.abs(t - 0.5) * 0.35);
     var base = [x, spec.palmLength, 0];
     var tip = [x + Math.sin(splay) * len, spec.palmLength + Math.cos(splay) * len, 0.01];
-    var g = segment(base, tip, spec.digitRadius, spec.digitRadius * 0.7, 5, { depthRatio: 0.9, crystal: 0.05, steps: 2 });
+    var g = segment(base, tip, spec.digitRadius, spec.digitRadius * 0.7, 5, { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
     var d = clad(hand, g, materials, 1.08);
     owned.push(g, d.edges, d.minorEdges);
   }
@@ -131,7 +131,7 @@ function buildArm(materials, spec, options) {
   var upperGeo = segment(
     [0, 0, 0], elbow.clone().sub(shoulder).toArray(),
     spec.upperRadius, spec.foreRadius * 1.02, 8,
-    { depthRatio: 0.88, crystal: 0.075, steps: 6, profile: ARMS.profiles.upper }
+    { depthRatio: 0.88, crystal: 0.075, steps: 6, profile: ARMS.profiles.upper, lift: ARMS.classLift }
   );
   var upper = clad(shoulderJoint, upperGeo, materials, 1.05);
   owned.push(upperGeo, upper.edges, upper.minorEdges);
@@ -146,7 +146,7 @@ function buildArm(materials, spec, options) {
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
     spec.foreRadius, spec.wristRadius, 8,
-    { depthRatio: 0.88, crystal: 0.070, steps: 5, profile: ARMS.profiles.fore }
+    { depthRatio: 0.88, crystal: 0.070, steps: 5, profile: ARMS.profiles.fore, lift: ARMS.classLift }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 1.05);
   owned.push(foreGeo, fore.edges, fore.minorEdges);

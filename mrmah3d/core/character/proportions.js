@@ -57,18 +57,31 @@ export var HEAD = {
      a smaller plate just crowded them — the smile ran past its lower edge. The
      thickness now comes from the crown band and the deep recess wall, which add
      it without taking anything away from the face. */
-  faceInset: 0.54,               /* plate size as a share of the diamond */
-  crownInset: 0.84,              /* intermediate crown band */
-  crownZ: 0.36,                  /* crown band depth, share of halfDepth */
-  bevelInset: 0.665,             /* table edge / recess lip */
-  bevelZ: 0.72,                  /* bevel ring depth, share of halfDepth */
-  /* Dropped from 0.44 to 0.17. The recess wall is the difference between the
-     lip and the plate, and at 0.62 vs 0.44 it was only 0.06 units deep — barely
-     a step, so the face read as painted just behind the surface rather than set
-     down inside the crystal. It is now 0.19 deep, better than three times as
-     much, which is what gives the shell visible thickness and puts the eyes and
-     smile properly inside the stone. */
-  faceZ: 0.17,                   /* plate depth — well behind the lip */
+  /* THE SHELL IS THINNER AND THE CAVITY IS DEEPER — the helmet correction.
+
+     Read as rings from the silhouette inward, the head was
+     1.00 -> 0.84 -> 0.665 -> 0.54: two thick crown bands eating a third of the
+     diamond's width before the face began, and then a single step onto a flat
+     plate. That is a helmet with a sticker on it.
+
+     Now 1.00 -> 0.88 -> 0.72 -> 0.62 -> 0.55. The outer bands are narrower, so
+     the shell reads as a crisp frame rather than bulk; the opening is wider;
+     and the last two rings form a real inner bevel stepping down into the
+     cavity instead of one flat wall.
+
+     The plate also sits BEHIND the girdle plane now. The lip stands 0.78 of
+     halfDepth forward and the plate at -0.06, so the cavity is 0.29 units deep
+     — about half the head's whole front-to-back dimension, and roughly five
+     times the depth this recess had two passes ago. That is what makes the face
+     read as a space inside the crystal rather than a surface on it. */
+  faceInset: 0.55,               /* plate size as a share of the diamond */
+  crownInset: 0.88,              /* outer crown band — narrower now */
+  crownZ: 0.40,                  /* crown band depth, share of halfDepth */
+  bevelInset: 0.720,             /* the lip, at the front of the crystal */
+  bevelZ: 0.78,                  /* the lip stands proud */
+  innerInset: 0.620,             /* inner bevel, framing the cavity */
+  innerZ: 0.30,                  /* set well behind the lip */
+  faceZ: -0.06,                  /* plate depth — behind the girdle plane */
   backApexZ: -1.0,
   /* Depth scatter on the head's bevel ring, so its front facets tilt slightly
      differently and the head catches light in several places.
@@ -127,6 +140,20 @@ export var NECK = {
 export var TORSO = {
   topY: (1 - 0.356) * H,         /* 1.932 */
   sides: 12,
+  /* A SMALL lift away from the black end — a third of the head's, half the
+     arms'. The body is the one part that should keep the black-heavy weighting,
+     because that is what makes it read as a dark crystalline mass. But with the
+     rim shell removed from the torso, its facets had nothing lifting them at
+     all and the chest went flat at app scale.
+
+     0.16 was too timid — the chest stayed near-black once the shell was gone.
+     0.30 puts enough of the chest's planes into the charcoal and deep-blue
+     classes that they separate from one another and the flare has something to
+     read on, while still sitting below the arms (0.34) and well below the head
+     (0.42) so the value hierarchy across the character holds. This is presence
+     built from per-facet variation rather than from a flat overlay, which is
+     the whole difference between it and the rim shell it replaces. */
+  classLift: 0.30,
   rings: [
     /* FEWER, LARGER PLANES DOWN THE CONE.
 
@@ -159,12 +186,32 @@ export var TORSO = {
     { y: 0.230, w: 0.104, d: 0.065, facet: 0.0121, crystal: 0.0525, crystalY: 0.0120 },
     { y: 0.520, w: 0.213, d: 0.126, facet: -0.0121, crystal: 0.0840, crystalY: 0.0210 },
     { y: 0.810, w: 0.305, d: 0.171, facet: 0.0110, crystal: 0.0980, crystalY: 0.0240 },
-    { y: 1.090, w: 0.381, d: 0.204, facet: -0.0110, crystal: 0.1015, crystalY: 0.0240 },
-    { y: 1.350, w: 0.444, d: 0.228, facet: 0.0099, crystal: 0.0945, crystalY: 0.0225 },
-    { y: 1.580, w: 0.494, d: 0.245, facet: -0.0088, crystal: 0.0805, crystalY: 0.0180 },
-    { y: 1.760, w: 0.529, d: 0.255, facet: 0.0077, crystal: 0.0595, crystalY: 0.0120 },
-    { y: 1.880, w: 0.551, d: 0.259, facet: -0.0055, crystal: 0.0350, crystalY: 0.0060, dip: 0.040 },
-    { y: 1.932, w: 0.557, d: 0.260, facet: 0.0055, dip: 0.030 },
+    /* THE CHEST FLARE.
+
+       The taper from tip to shoulder used to be very nearly a straight line, so
+       the torso read as exactly what it was — a cone with facets on it. A cone
+       has no upper-body PRESENCE: nothing about its profile says chest.
+
+       The waist is now drawn in slightly and the chest carried out, so the
+       outline swells through the upper third before the shoulder line. It is a
+       small move — under 4% at its widest — because the silhouette against the
+       reference is already right and this is about giving the eye a curve to
+       read rather than about size. Crystal relief rises through the same rings,
+       so the flare arrives with the largest and most varied hero facets on the
+       body rather than as a smooth bulge.
+
+       Relief is deliberately NOT raised along with the width. Pushing both at
+       once was tried and the chest came back as a smooth pale swell: past about
+       18% of the ring radius the displacement stops reading as facets and
+       starts rounding the profile, which is the exact opposite of what a flare
+       is for. The width gives the curve; the existing relief keeps the planes
+       that sit on it. */
+    { y: 1.090, w: 0.371, d: 0.200, facet: -0.0110, crystal: 0.1015, crystalY: 0.0240 },
+    { y: 1.350, w: 0.440, d: 0.226, facet: 0.0099, crystal: 0.0930, crystalY: 0.0225 },
+    { y: 1.580, w: 0.504, d: 0.250, facet: -0.0088, crystal: 0.0830, crystalY: 0.0185 },
+    { y: 1.760, w: 0.546, d: 0.262, facet: 0.0077, crystal: 0.0640, crystalY: 0.0130 },
+    { y: 1.880, w: 0.570, d: 0.267, facet: -0.0055, crystal: 0.0470, crystalY: 0.0085, dip: 0.052 },
+    { y: 1.932, w: 0.576, d: 0.268, facet: 0.0055, dip: 0.038 },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11
@@ -190,10 +237,17 @@ export var TORSO = {
        hovering above a rim. `dip` on the shoulder ring drops to a trace: it cut
        the collar chevron when that ring was the top of the model, but under a
        crown it only carved a notch you could see down into. */
-    { y: 1.985, w: 0.470, d: 0.232, facet: -0.0088, crystal: 0.038, crystalY: 0.008 },
-    { y: 2.035, w: 0.360, d: 0.190, facet: 0.0077, crystal: 0.034, crystalY: 0.007 },
-    { y: 2.080, w: 0.250, d: 0.140, facet: -0.0066, crystal: 0.026, crystalY: 0.005 },
-    { y: 2.115, w: 0.150, d: 0.095, facet: 0.0055 }
+    /* The crown carries real relief now. It is a broad, upward-facing surface
+       and it sits directly under the shoulder-top light card, so with the low
+       relief it had it caught that card as ONE smooth plane — a pale swell
+       across the upper chest between the two deltoids, which is what stopped
+       the torso reading as sculptural at showcase scale however the chest
+       below it was shaped. Broken into facets it takes the same light as a set
+       of distinct planes instead. */
+    { y: 1.985, w: 0.470, d: 0.232, facet: -0.0195, crystal: 0.072, crystalY: 0.016 },
+    { y: 2.035, w: 0.360, d: 0.190, facet: 0.0175, crystal: 0.062, crystalY: 0.013 },
+    { y: 2.080, w: 0.250, d: 0.140, facet: -0.0140, crystal: 0.044, crystalY: 0.009 },
+    { y: 2.115, w: 0.150, d: 0.095, facet: 0.0090 }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
   /* Widened. Against the canonical reference the render measured 9.3% narrow
@@ -274,6 +328,12 @@ export var ARMS = {
      Both start and end at ~1.0 so the joints still meet their sockets exactly
      and the measured shoulder/elbow/wrist points stay where the reference put
      them. */
+  /* The limbs take a lift away from the black end for the same reason the head
+     does — they are small, and the body's 50%-black weighting leaves a slim
+     tapered tube with almost nothing visible on it. Kept below the head's, so
+     the arms stay clearly darker than the face. */
+  classLift: 0.34,
+
   profiles: {
     /* STARTS BELOW 1, which is the correction the brief asks for.
 
