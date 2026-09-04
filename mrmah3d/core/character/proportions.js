@@ -84,9 +84,19 @@ export var HEAD = {
      stays the measurement baseline but it is no longer the art-direction
      authority, and the brief is explicit that a materially weak proportion is
      not to be preserved merely because a test was written around it. */
-  halfWidth: 0.418,
-  halfHeight: 0.357,
-  centreY: 2.643,               /* apex lands at HEIGHT; base at 2.286 */
+  /* R95-BB — TO THE FLOOR OF THE TOLERANCE, NOT PAST IT.
+
+     The bodybuilder reference's head is 0.31 x 0.30 — a quarter smaller than
+     the anatomical measurement this is checked against — because a
+     bodybuilder's head is small against his shoulders; that ratio is most of
+     what "dense and compact" means. The head is the recognition feature and
+     the brief keeps it canonical, so it goes down only to the edge of the
+     tolerance band (6% under the anatomical value) and the rest of the ratio
+     is bought by growing the body: shoulders 0.598 -> 0.672, arms 40% thicker.
+     The apex still lands at HEIGHT. */
+  halfWidth: 0.395,
+  halfHeight: 0.338,
+  centreY: 2.662,               /* apex lands at HEIGHT; base at 2.324 */
   /* Real front-to-back depth. The head is a beveled crystal, not a plate.
      The ratio goes UP as the head comes down — 0.85 of half-width against the
      old 0.68 — because the reference's head reads as a thick cut stone with
@@ -274,8 +284,11 @@ function chestShape(k) {
      values the sternum sits 0.06 behind the pec crowns, which is a step the eye
      reads as two masses rather than as one surface. */
   return function (a) {
-    var sternum = -lobe(a, 0, 0.38) * 0.260;
-    var pec = (lobe(a, 0.70, 0.52) + lobe(a, -0.70, 0.52)) * 0.245;
+    /* R95-BB: the valley softens a little (0.26 -> 0.21) and the pec crowns
+       come forward (0.245 -> 0.28): the reference's pecs are thick SHELVES
+       with a groove between them, not two swells either side of a slot. */
+    var sternum = -lobe(a, 0, 0.38) * 0.210;
+    var pec = (lobe(a, 0.70, 0.52) + lobe(a, -0.70, 0.52)) * 0.280;
     var lat = (lobe(a, Math.PI / 2, 0.62) + lobe(a, -Math.PI / 2, 0.62)) * 0.100;
     var back = lobe(a, Math.PI, 0.90) * -0.110;
     return 1 + (sternum + pec + lat + back) * k;
@@ -330,7 +343,11 @@ function pecZone(row) {
   return function (a, y) {
     var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
     var yy = y == null ? 1.90 : y;
-    var sternum = 0.34 - (yy - 1.80) * 0.36;                 /* 0.34 at the lower pec, ~0.23 at the clavicle */
+    /* R95-BB: 0.34 -> 0.26. With the abs channel and the quad seam below it,
+       the sternum drew as one dark stripe splitting the torso from throat to
+       belt; the reference's groove is narrower and the pecs' inner edges are
+       rounded toward it. */
+    var sternum = 0.26 - (yy - 1.80) * 0.30;                 /* 0.26 at the lower pec, ~0.17 at the clavicle */
     var pecOuter = 1.02 + (yy - 1.80) * 0.95;                /* the lobe reaches out toward the shoulder as it rises */
     var pecSplit = 0.30 + (pecOuter - 0.30) * 0.58;          /* inner plane / outer plane */
     var table = row === 1 ? REGIONS.PEC_UPPER : REGIONS.PEC_LOWER;
@@ -345,7 +362,7 @@ function coreZone(row) {
   return function (a, y) {
     var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
     var yy = y == null ? 1.50 : y;
-    var channel = 0.22 - (yy - 1.18) * 0.06;
+    var channel = 0.16 - (yy - 1.18) * 0.04;
     var absOuter = 0.74 + (yy - 1.18) * 0.28;                /* the blocks widen with the ribcage */
     var obliqueOuter = 1.45 + (yy - 1.18) * 0.30;
     if (ae < channel) return { classes: REGIONS.STERNUM.classes, seed: 40 + row, index: 0 };            /* the central channel */
@@ -366,6 +383,53 @@ function taperClasses(a) {
   return REGIONS.TAPER_SPEAR.classes;
 }
 
+/* R95-BB — THE SINGLE QUAD. One lower-body mass, shaped like a thigh.
+
+   `reference/mrmah-refE-bodybuilder-a.png` (1024 x 1536; apex y 165, tip
+   y 1145, so 980 px of character and 327 px to the unit) has ONE lower-body
+   piece below a tight waist belt — never two legs — and it is not a cone: it
+   swells out immediately under the belt to its widest (half-width 0.256 at
+   y 1.33), holds that width to about y 1.05, then runs a long convex sweep on
+   its OUTER edge down to the point (0.228 at y 1.00, 0.153 at 0.71, 0.08 at
+   0.40). Read as anatomy that is a vastus-lateralis sweep on a single quad; the
+   front carries a shallow seam between two heads, and the back is flatter with
+   the glute mass deliberately restrained.
+
+   Cross-section, as a per-vertex radius multiplier (same convention as
+   chestShape): a groove down the front centre, two quad heads either side of
+   it, the lateral sweep at the front-outer angle, and a flattened back. */
+function quadShape(k) {
+  return function (a) {
+    var seam = -lobe(a, 0, 0.30) * 0.110;
+    var heads = (lobe(a, 0.62, 0.50) + lobe(a, -0.62, 0.50)) * 0.120;
+    var sweep = (lobe(a, 1.30, 0.55) + lobe(a, -1.30, 0.55)) * 0.150;
+    var glute = lobe(a, Math.PI, 0.90) * -0.090;
+    return 1 + (seam + heads + sweep + glute) * k;
+  };
+}
+/* And the quad's planes, by zone: a dark seam down the centre, a quad head
+   either side of it as one plane each, the lateral sweep as a lit sapphire
+   plane, and the back left to the body lottery. Two rows so the upper mass
+   and the sweep read as separate planes. */
+function quadZone(row) {
+  return function (a, y) {
+    var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
+    var yy = y == null ? 1.15 : y;
+    var seam = 0.16 + (1.30 - yy) * 0.10;                 /* the seam widens toward the spear */
+    var headOuter = 1.00 + (1.30 - yy) * 0.25;
+    var sweepOuter = 1.95;
+    /* Histogrammed against the reference's quad (43% of it under 32 luma, 49%
+       in 32-63, 4% above), a first cut with lit heads and bright-blue sweep
+       planes came back with a mean of 54 against 38: the reference's quad is a
+       DARK navy mass whose light sits on its outer edge, so the heads take the
+       dark and sapphire rows and the sweep the sapphire and lit rows. */
+    if (ae < seam) return { classes: REGIONS.STERNUM.classes, seed: 80 + row, index: 0 };
+    if (ae < headOuter) return { classes: REGIONS.ABS.classes, seed: 82 + row * 2 + side, index: row === 0 ? 0 : 1 };
+    if (ae < sweepOuter) return { classes: REGIONS.TAPER_FLANK.classes, seed: 86 + row * 2 + side, index: row === 0 ? 1 : 2 };
+    return null;
+  };
+}
+
 function clavicleShape(k) {
   return function (a) {
     var hollow = -lobe(a, 0, 0.60) * 0.160;
@@ -374,6 +438,31 @@ function clavicleShape(k) {
     return 1 + (hollow + collar + traps) * k;
   };
 }
+
+/* R95-BB — THE BODYBUILDER LOCK. Where the numbers below come from.
+
+   `reference/mrmah-refE-bodybuilder-a.png` is the body-proportion target from
+   here on: a compact, dense, very muscular crystal guardian — broad faceted
+   deltoids that flow out of the trapezius and clavicle, thick pectoral shelves
+   either side of a dark sternum, arms with real bicep, tricep and forearm mass,
+   a much tighter waist, and one quad-shaped lower body. Measured on it at 327
+   px to the unit, against the values this table carried:
+
+     chest (pec line)      half-width 0.35  (was 0.328)   and deeper
+     waist                 half-width 0.22  (was 0.244)   a 37% pinch, not 26%
+     quad, widest          half-width 0.256 (was 0.264)   the SHAPE changes, not the width
+     shoulder, outer edge  0.60 on the lowered side, i.e. 1.94 of the head's
+                           half-width — this build had 1.43
+     upper arm, mid-bicep  radius 0.153 (was 0.104 nominal, 0.137 at the belly)
+     forearm               radius 0.118 (was 0.081)
+     wrist                 radius 0.090 (was 0.055)
+     hand                  1.4x this build's, in both width and length
+
+   The head is kept at its canonical size (it is the recognition feature and
+   the brief says to keep it), so the head-to-shoulder ratio is moved by
+   growing the shoulders, not shrinking the head: deltoid outer edge 0.68, arm
+   joints outboard to match, arms ~40% thicker. The character's height is
+   unchanged, so every camera solve and framing is unchanged. */
 
 export var TORSO = {
   /* R90: the shoulder line rises from 1.932 to 2.130.
@@ -551,40 +640,60 @@ export var TORSO = {
        makes the flanks glow lives in crystal-shader.js (uInnerLight), gated to
        this region of the body. The relief is halved down here so the long
        planes stay long. */
+    /* R95-BB — THE LOWER BODY IS ONE QUAD, and the torso above it is a
+       bodybuilder's. See the note above TORSO. From the point upward: the
+       spear, then the sweep of the quad's outer edge (0.153 at 0.71, 0.228 at
+       1.00), the held width of the mass (0.256 from 1.05 to 1.30), the belt at
+       the waist (0.22 at 1.48 — the deepest concavity on the character), the
+       abdominal block, the ribcage flaring to the pectoral shelf (0.36 at
+       1.97), and a shoulder line raised to 2.170 so the deltoids can sit
+       0.12 under the chin the way the reference's do. */
+    /* `w` IS THE RING RADIUS BEFORE `shape`, and the SILHOUETTE is w times the
+       shape at the side angle — chestShape's lateral lobe adds 10%, the quad's
+       sweep 10-12%, coreShape's oblique 3-4%. A first cut of this table set w
+       to the reference's silhouette and came back 13% too wide across the
+       ribcage, a barrel; the numbers below are pre-divided so that the
+       silhouette lands on the measurement: chest 0.357 at 1.97, then a FAST
+       V — 0.305 at 1.83, 0.248 at 1.66, 0.22 at the belt — which is what
+       makes a broad chest read as a bodybuilder's rather than a barrel's. */
     { y: 0.000, w: 0.006, d: 0.004, columns: true, classesAt: taperClasses },
-    { y: 0.175, w: 0.050, d: 0.034, facet: 0.0060, crystal: 0.0180, crystalY: 0.0040,
+    { y: 0.150, w: 0.034, d: 0.025, facet: 0.0060, crystal: 0.0180, crystalY: 0.0040,
       columns: true, classesAt: taperClasses },
-    { y: 0.400, w: 0.110, d: 0.082, facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20,
+    { y: 0.400, w: 0.086, d: 0.066, facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20,
       columns: true, classesAt: taperClasses },
-    { y: 0.680, w: 0.178, d: 0.132, facet: 0.0055, crystal: 0.0280, crystalY: 0.0070, hero: 0.24,
+    { y: 0.700, w: 0.156, d: 0.122, facet: 0.0055, crystal: 0.0280, crystalY: 0.0070, hero: 0.24,
       columns: true, classesAt: taperClasses },
-    { y: 0.950, w: 0.236, d: 0.172, facet: -0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
-      columns: true, classesAt: taperClasses },
-    /* hip swell — the widest point of the lower mass, and modest */
-    { y: 1.180, w: 0.264, d: 0.192, facet: 0.0099, crystal: 0.0640, crystalY: 0.0150,
-      shape: coreShape(0.55), hero: 0.26, columns: false, classesAt: null },
-    /* THE WAIST. The one concave moment in the outline. */
-    /* R94 — THE CORE AND CHEST ARE ZONED INTO PLANES (see zoneAt in forge.js
-       and the tables in regions.js): three rows of abdominal blocks either side
-       of a dark channel, oblique planes outboard, then a lower and an upper
-       pectoral plane each side of a dark sternum. The crystal jitter comes
-       down through these rings so the triangles inside one zone stay near
-       enough coplanar to read as a single plane with facet variation, which
-       is what the reference's chest is. */
-    { y: 1.400, w: 0.244, d: 0.182, facet: -0.0070, crystal: 0.0380, crystalY: 0.0100,
-      shape: coreShape(1.0), hero: 0.04, columns: false, classesAt: null, zoneAt: coreZone(0) },
-    /* ribcage opening back out — lower abdominal into the rib arch */
-    { y: 1.620, w: 0.298, d: 0.222, facet: 0.0060, crystal: 0.0400, crystalY: 0.0100,
+    /* the sweep — the outer edge is CONVEX from here to the belt: the width
+       comes off slowly at first (0.253 -> 0.233 -> 0.196) and fast below */
+    { y: 0.850, w: 0.188, d: 0.152, facet: -0.0050, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
+      shape: quadShape(0.35), columns: true, classesAt: taperClasses },
+    { y: 1.000, w: 0.218, d: 0.176, facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+      shape: quadShape(0.60), columns: true, classesAt: taperClasses },
+    /* the quad mass — held wide, shaped as two heads and a lateral sweep */
+    { y: 1.130, w: 0.236, d: 0.200, facet: 0.0070, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
+      shape: quadShape(1.0), columns: false, classesAt: null, zoneAt: quadZone(1) },
+    { y: 1.300, w: 0.236, d: 0.202, facet: -0.0070, crystal: 0.0360, crystalY: 0.0090, hero: 0.16,
+      shape: quadShape(0.85), zoneAt: quadZone(0) },
+    /* THE BELT — the waist. The deepest concavity on the character, and the
+       line that separates the torso from the single quad. Re-measured on the
+       lower-body crop it is TIGHTER than the abdomen above it (0.19 against
+       0.24) and the quad swells to 0.264 within 0.3 below it — a 40% step,
+       which is the single thing that makes the lower body read as a thigh
+       hung from a belt rather than as a skirt continuing the torso. */
+    { y: 1.480, w: 0.188, d: 0.156, facet: -0.0070, crystal: 0.0300, crystalY: 0.0080,
+      shape: coreShape(1.0), hero: 0.04, zoneAt: coreZone(0) },
+    /* the V — abdomen into the rib arch, opening out FAST toward the pecs */
+    { y: 1.660, w: 0.240, d: 0.196, facet: 0.0060, crystal: 0.0400, crystalY: 0.0100,
       shape: coreShape(0.85), hero: 0.06, zoneAt: coreZone(1) },
-    { y: 1.800, w: 0.320, d: 0.248, facet: -0.0060, crystal: 0.0400, crystalY: 0.0100,
+    { y: 1.830, w: 0.285, d: 0.240, facet: -0.0060, crystal: 0.0400, crystalY: 0.0100,
       shape: chestShape(0.70), zoneAt: coreZone(2) },
     /* the pectoral line — the strongest cross-section shaping on the body */
-    { y: 1.930, w: 0.328, d: 0.258, facet: 0.0055, crystal: 0.0340, crystalY: 0.0080,
+    { y: 1.970, w: 0.325, d: 0.268, facet: 0.0055, crystal: 0.0340, crystalY: 0.0080,
       shape: chestShape(1.0), hero: 0.34, zoneAt: pecZone(0) },
-    { y: 2.040, w: 0.322, d: 0.244, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
+    { y: 2.080, w: 0.318, d: 0.256, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
       shape: chestShape(0.80), hero: 0.40, zoneAt: pecZone(1) },
     /* THE SHOULDER LINE — collarbones across the front, trapezius behind */
-    { y: 2.130, w: 0.290, d: 0.206, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
+    { y: 2.170, w: 0.316, d: 0.226, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
       shape: clavicleShape(1.0), dip: 0.030, hero: 0.46, zoneAt: null },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
@@ -687,15 +796,21 @@ export var TORSO = {
        luma 90 against the reference's 29 — because `hero` slides the lottery
        onto the NECK table's steel rows. It is a dark column in the chin's
        shadow, brighter than the chest only by its edges. */
-    { y: 2.165, w: 0.212, d: 0.158, facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
+    /* R95-BB: the trapezius ring rises with the shoulder line and is broader,
+       so the neck is the reference's SHORT, THICK column — 0.12 of clear neck
+       under the chin instead of 0.16, and traps that climb steeply beside it. */
+    { y: 2.205, w: 0.236, d: 0.170, facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
       shape: clavicleShape(0.55), hero: 0.16, classesAt: neckClasses },
-    { y: 2.200, w: 0.122, d: 0.102, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
+    /* The column's rings follow the head's lower vertex (2.324 now): the top
+       ring sits 0.09 above it where the head is 0.10 wide and swallows it, and
+       the visible neck from trapezius to chin is 0.12 — the reference's. */
+    { y: 2.250, w: 0.126, d: 0.104, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
       zc: -0.030, hero: 0.10, classesAt: neckClasses },
-    { y: 2.262, w: 0.104, d: 0.090, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
+    { y: 2.315, w: 0.108, d: 0.092, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
       zc: -0.040, hero: 0.06, classesAt: neckClasses },
-    { y: 2.330, w: 0.098, d: 0.086, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
+    { y: 2.368, w: 0.098, d: 0.086, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
       zc: -0.044, hero: 0.04, classesAt: neckClasses },
-    { y: 2.372, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neckClasses }
+    { y: 2.412, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neckClasses }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
   /* Widened. Against the canonical reference the render measured 9.3% narrow
@@ -719,8 +834,14 @@ export var TORSO = {
      reaches 216 px of 1083, i.e. 0.598 at 3.0 units. Narrower than the 0.734
      this carried, because that number was set against a head half as wide again
      — the shoulders only had to be that broad to avoid being outranked. */
-  shoulderHalfWidth: 0.598,
-  shoulderY: 2.095
+  /* R95-BB: 0.598 -> 0.680. The bodybuilder reference puts the lowered-side
+     deltoid's outer edge at 1.94 head half-widths from the centre line; with
+     the head kept canonical that is 0.81, and 0.68 is as far as the shoulders
+     can go before the raised hand leaves the canonical frame. The ratio moves
+     from 1.43 to 1.63 — most of the way — and the rest is carried by the arm
+     mass, which is where the reference's width actually is. */
+  shoulderHalfWidth: 0.672,
+  shoulderY: 2.120
 };
 
 /* Arm joint positions, converted from reference pixels via PX with the torso
@@ -784,24 +905,42 @@ export var ARMS = {
        just below the hip rather than level with the waist. That reach is a
        large part of why the reference reads humanoid and this build read as a
        cone with stubs. */
-    shoulder: [-0.500, 2.064, 0.03],
-    elbow: [-0.623, 1.399, 0.09],
-    wrist: [-0.485, 0.956, 0.13],
-    upperRadius: 0.104,
-    foreRadius: 0.081,
-    wristRadius: 0.055
+    /* R95-BB — OUTBOARD AND THICK. The joints move 0.06 out with the
+       shoulders, the shoulder joint rises with the shoulder line, and the
+       radii go up by about 40% (measured: mid-bicep 0.153, forearm 0.118,
+       wrist 0.090 on the reference). The elbow and wrist keep the reference's
+       hang — upper arm near-vertical, forearm cutting in to the hip — and the
+       elbow swings a little further out so the thicker upper arm still clears
+       the wider ribcage. */
+    /* The shoulder joint sits ON the deltoid's axis at 0.7 of its length (see
+       body.js), so the arm's top cap is buried inside the cap's belly. The arm
+       is SHORTER than it was and thicker: on the reference the elbow is at
+       y 1.56 and the wrist at 1.20 (this build had 1.40 and 0.96), and the big
+       hand then reaches the same 0.82 the old fingertips did. Compact, dense. */
+    shoulder: [-0.482, 1.978, 0.014],
+    elbow: [-0.600, 1.440, 0.10],
+    wrist: [-0.545, 1.060, 0.14],
+    upperRadius: 0.146,
+    foreRadius: 0.114,
+    wristRadius: 0.074
   },
   left: {                         /* viewer's RIGHT — the raised arm */
     /* Reference pixels: shoulder (645, 550), elbow (730, 700), wrist (775, 570).
        A shallower, more relaxed V than the old pose — the reference does not
        fold the raised arm hard, it opens the elbow to about 100 degrees and
        presents the crystal at roughly shoulder height. */
-    shoulder: [0.500, 2.064, 0.03],
-    elbow: [0.720, 1.648, 0.10],
-    wrist: [0.845, 2.008, 0.14],
-    upperRadius: 0.104,
-    foreRadius: 0.081,
-    wristRadius: 0.055
+    /* R95-BB: the raised arm's upper arm HANGS — the reference drops it
+       almost vertically to an elbow at waist height (y 1.52) and raises only
+       the forearm, 21 degrees off vertical, to present the crystal at the
+       shoulder line. That is a far stronger, more compact pose than the wide
+       V this carried, and it is what keeps the raised arm's mass beside the
+       ribcage instead of out in space. */
+    shoulder: [0.482, 1.978, 0.014],
+    elbow: [0.545, 1.450, 0.11],
+    wrist: [0.720, 1.860, 0.15],
+    upperRadius: 0.146,
+    foreRadius: 0.114,
+    wristRadius: 0.074
   },
 
   /* LIMB PROFILES — where the mass sits along each bone.
@@ -866,8 +1005,12 @@ export var ARMS = {
        bicep/tricep belly around a third of the way down, and draws into the
        elbow as the narrowest point of the whole limb. That sequence is what
        makes the taper read; a single bulge on a straight cone does not. */
+    /* R95-BB: starts nearer full radius (0.90) so the upper arm leaves the
+       deltoid as a thick limb rather than a waisted one, and the belly is a
+       touch fuller. The reference's upper arm is close to its bicep width for
+       most of its length. */
     upper: function (t) {
-      return 0.84 + Math.sin(Math.pow(t, 0.85) * Math.PI) * 0.28;
+      return 0.90 + Math.sin(Math.pow(t, 0.85) * Math.PI) * 0.26;
     },
     /* Picks up close to where the upper arm ended — a step at the elbow reads
        as an error rather than as a joint — then swells just below it and tapers
@@ -924,17 +1067,22 @@ export var ARMS = {
    wider than the arm it hangs from. A hand is meaningfully wider than its
    wrist; that difference is most of what makes it read as a hand at a glance,
    which is all that is being asked for here. */
+/* R95-BB: scaled up 1.35x with the arms. The bodybuilder reference's lowered
+   hand is 0.27 wide and 0.38 long to the fingertips against this build's
+   0.17 x 0.19 — a hand a third the size of the forearm it hung from read as a
+   claw. Still a robotic hand with readable fingers, still small next to the
+   body; the presented diamond stays small. */
 export var HAND = {
-  palmLength: 0.106,
-  palmHalfWidth: 0.085,
-  palmHalfDepth: 0.050,
+  palmLength: 0.142,
+  palmHalfWidth: 0.114,
+  palmHalfDepth: 0.064,
   /* R95: four jointed fingers (see buildDigit in limbs.js), a little longer
      and slimmer, as the references' robotic hands are. */
   digitCount: 4,
-  digitLength: 0.082,
-  digitRadius: 0.019,
+  digitLength: 0.108,
+  digitRadius: 0.025,
   /* The small bright diamond above the reference's raised hand. */
-  tipDiamond: 0.044
+  tipDiamond: 0.048
 };
 
 /* Chest insignia, measured at reference y 735 (emblem) and y 820 (symbols). */
@@ -948,11 +1096,15 @@ export var INSIGNIA = {
      reference puts it and why the sternum valley matters to it: a glowing
      diamond on a flat chest is a sticker, the same one in a groove reads as
      set into the crystal. */
-  emblemY: 1.837,
-  emblemHalf: 0.070,
-  symbolsY: 1.648,
-  symbolHalf: 0.034,
-  symbolSpacing: 0.104,
+  /* R95-BB: both rise with the chest. On the bodybuilder reference the
+     diamond sits on the sternum at the level of the pec crowns (y 2.03) and the
+     three indicators at the pecs' lower edge (y 1.85); the diamond is the
+     canonical anchor and is centred, the indicators stay small and secondary. */
+  emblemY: 1.900,
+  emblemHalf: 0.074,
+  symbolsY: 1.715,
+  symbolHalf: 0.032,
+  symbolSpacing: 0.100,
   /* THE THROAT GEM. The reference carries a small bright diamond exactly where
      the neck disappears under the jaw. It is doing real work there — it is the
      one place on the body where two very different forms meet, and a deliberate
@@ -963,7 +1115,7 @@ export var INSIGNIA = {
      where the neck meets the collarbones, in the notch between them. Sitting
      the gem on the notch gives the neck a base and the chin nothing to
      compete with. */
-  throatY: 2.146,
+  throatY: 2.186,
   throatHalf: 0.026 };
 
 /* The character hovers; the tip does not rest on the floor. The reference
@@ -995,10 +1147,10 @@ export var POSE = {
   centreX: (
     /* rightmost: the raised hand, plus its palm */
     (ARMS.left.wrist[0] + HAND.palmHalfWidth) +
-    /* leftmost: whichever of the lowered elbow, hand or deltoid reaches furthest */
-    Math.min(ARMS.right.elbow[0],
+    /* leftmost: whichever of the lowered elbow, hand, arm or deltoid reaches furthest */
+    Math.min(ARMS.right.elbow[0] - ARMS.right.upperRadius,
              ARMS.right.wrist[0] - HAND.palmHalfWidth,
-             ARMS.right.shoulder[0] - ARMS.right.upperRadius)
+             -TORSO.shoulderHalfWidth)
   ) / 2
 };
 

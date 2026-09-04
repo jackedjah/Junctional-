@@ -58,7 +58,13 @@ export function createLights(options) {
      saturated blue carrying almost no luminance: tripling the hemisphere moved
      the chest histogram by 0.3%. Luma comes from green, and the soft rig now
      has some. */
-  var fill = new DirectionalLight(new Color(0x9fb8d2), 2.2);
+  /* R95-BB: 2.2 -> 1.4. The bodybuilder reference is lit from one side — the
+     left pec, deltoid and arm bright, the right side of the chest in a deep
+     recess — and its chest histogram is 50% under 32 luma where this build's
+     was 44%. A softer fill from the right is what lets the far side of every
+     pair (pecs, deltoids, quad heads) fall away, which is the local contrast
+     the brief asks for. */
+  var fill = new DirectionalLight(new Color(0x9fb8d2), 1.4);
   fill.position.set(5.6, 3.0, 4.0);
 
   /* Rim — cyan, from behind and above. This is what draws the lit contour. */
@@ -109,7 +115,10 @@ export function createLights(options) {
      what the emblem's light looks like in the references. */
   /* R95: reviewed as drawing hot specular blobs on the deltoids at yaw —
      pulled further back and dimmed; its job is the sternum, not the shoulders. */
-  var chestLamp = new PointLight(new Color(0x4fe3ff), 1.05, 2.4, 2);
+  /* R95-BB: range 2.4 -> 1.3. At 2.4 the lamp reached the lowered hand (1.36
+     away) and drew its specular on the back of the hand as a hot cyan blob;
+     the chest it exists for is 0.8-0.9 away and still inside the falloff. */
+  var chestLamp = new PointLight(new Color(0x4fe3ff), 1.05, 1.3, 2);
   chestLamp.position.set(0, 1.80, 1.10);
   /* R95: range 1.1 -> 0.5. Reviewed, the face lamp reached the shoulder line
      half a unit below the head and drew pinpoint white speculars across the
@@ -155,7 +164,7 @@ export function createLights(options) {
   function setIntensity(scale) {
     var k = Math.max(0, Number(scale) || 1);
     key.intensity = 5.5 * k;
-    fill.intensity = 2.2 * k;
+    fill.intensity = 1.4 * k;
     rim.intensity = 2.2 * k;
     rim2.intensity = 1.1 * k;
     bounce.intensity = 0.85 * k;

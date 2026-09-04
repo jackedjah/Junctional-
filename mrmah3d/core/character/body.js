@@ -285,9 +285,26 @@ export function buildBody(materials) {
        Reference A has and this build has never had — every previous version ran
        the axis level, which produces a square upper body no matter what radius
        it carries. */
-    var inner = [side * 0.210, 2.095, -0.005];
-    var outer = [joint[0] * 1.00, joint[1] - 0.045, joint[2]];
-    var deltoidR0 = 0.200;
+    /* R95-BB — A BIG ROUND CAP THAT ENCLOSES THE TOP OF THE ARM.
+
+       Measured on the bodybuilder reference the deltoid is a near-sphere of
+       radius ~0.16 sitting HIGH and OUTBOARD — its top 0.12 under the chin,
+       its outer edge at 0.60, its centre roughly over the arm's axis — and the
+       upper arm below it is nearly as thick as the cap. So the cap's axis now
+       runs from deep inside the upper chest (x 0.30, where its root disc is
+       buried) out to x 0.56 just below the shoulder line, with a belly of
+       0.216 at six tenths of its length: top at 2.20, outer edge at 0.672.
+
+       The arm's shoulder joint sits ON this axis at t 0.7 (see ARMS in
+       proportions.js), so the arm's own top cap — a horizontal disc of 0.131 —
+       is inside the cap's belly and never stands proud of it. The cap's OUTER
+       end is choked to 0.45 of the arm's radius for the same reason in the
+       other direction: a full-radius end disc perpendicular to a horizontal
+       axis reaches 0.03 outside the arm's tube and shows as a flat circle on
+       the outside of the shoulder from any three-quarter view. */
+    var inner = [side * 0.300, 2.030, 0.0];
+    var outer = [side * 0.560, 1.955, 0.02];
+    var deltoidR0 = 0.210;
     /* SMALLER THAN THE ARM IT MEETS, not larger. `segment` caps both ends, and
        the outer cap is a disc perpendicular to a near-horizontal axis, so at
        1.22x the upper-arm radius it stood proud of the limb all the way round
@@ -308,8 +325,10 @@ export function buildBody(materials) {
        raising a hump beside the neck. */
     var deltoidProfile = function (t) {
       var root = Math.min(1, t / 0.28);
-      return (0.28 + 0.72 * root * root * (3 - 2 * root)) *
-             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.22);
+      var endT = Math.max(0, (t - 0.75) / 0.25);
+      var end = 1 - 0.55 * endT * endT * (3 - 2 * endT);
+      return (0.28 + 0.72 * root * root * (3 - 2 * root)) * end *
+             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.26);
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -323,8 +342,8 @@ export function buildBody(materials) {
        the sharpest breaks drawn — the dome is now carried by its planes. */
     var geo = segment(
       inner, outer,
-      deltoidR0, deltoidR1, 7,
-      { depthRatio: 1.0, crystal: 0.050, steps: 5, lift: ARMS.deltoidLift,
+      deltoidR0, deltoidR1, 8,
+      { depthRatio: 1.0, crystal: 0.050, steps: 6, lift: ARMS.deltoidLift,
         classes: REGIONS.DELT.classes,
         profile: deltoidProfile,
         /* R91 — THE VALUE STEP AT THE SEAM IS WHAT READS AS "BOLTED ON".
@@ -369,7 +388,7 @@ export function buildBody(materials) {
        along the top instead, with the profile applied exactly as `segment` does,
        so it rides the swell rather than cutting through it. */
     var ridgePts = [];
-    var STEPS = 5;
+    var STEPS = 6;
     for (var ri = 0; ri <= STEPS; ri++) {
       var rt = ri / STEPS;
       var rr = (deltoidR0 + (deltoidR1 - deltoidR0) * rt) * deltoidProfile(rt);

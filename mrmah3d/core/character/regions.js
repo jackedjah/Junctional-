@@ -110,8 +110,8 @@ var PEC_UPPER = [
 ];
 var PEC_LOWER = [
   [0.22,   0.06,  -0.06,   0.52,  0.20],
-  [0.40,   0.04,   0.00,   0.30,  0.34],   /* sapphire */
-  [0.28,   0.02,   0.06,   0.08,  0.48],
+  [0.40,   0.04,   0.00,   0.38,  0.32],   /* sapphire — R95-BB: a shade deeper, the lower pec turns away from the key */
+  [0.28,   0.02,   0.06,   0.26,  0.44],   /* R95-BB: the lower pec's outer plane is in the shelf's shadow, not lit */
   [0.10,   0.00,   0.12,  -0.14,  0.60]
 ];
 var STERNUM = [
@@ -169,12 +169,16 @@ var FOREARM = [
   [0.10,  -0.02,   0.20,  -0.32,  0.50],
   [0.06,  -0.05,   0.32,  -0.70,  0.20]    /* silver */
 ];
+/* R95-BB: the hands are MATTE steel. Every row carries a large roughness
+   offset, because at the body's 0.085 the flat back of the lowered hand drew
+   the floor-bounce point light as one hot cyan blob — a mirror, not a hand.
+   The reference's hands are dark machined steel with a few soft catches. */
 var HAND = [
-  [0.18,   0.08,  -0.08,   0.52,  0.12],
-  [0.30,   0.05,   0.00,   0.30,  0.24],
-  [0.30,   0.02,   0.08,   0.10,  0.40],
-  [0.16,   0.00,   0.14,  -0.10,  0.56],
-  [0.06,  -0.04,   0.28,  -0.60,  0.24]
+  [0.18,   0.26,  -0.08,   0.52,  0.12],
+  [0.30,   0.22,   0.00,   0.30,  0.24],
+  [0.30,   0.18,   0.08,   0.10,  0.40],
+  [0.16,   0.14,   0.14,  -0.10,  0.56],
+  [0.06,   0.08,   0.28,  -0.60,  0.24]
 ];
 
 export var REGIONS = {

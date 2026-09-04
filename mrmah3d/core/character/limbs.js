@@ -180,7 +180,11 @@ function buildHand(materials, spec, options) {
      hand's fingers hang with a gentle curl and the presenting hand's stand
      open with a slight cup — the two silhouettes a hand actually has. */
   var n = spec.digitCount;
-  var curl = opts.open ? 0.22 : 0.62;
+  /* R95-BB: the relaxed hand's curl comes down from 0.62 to 0.38. At 0.62 the
+     fingers folded forward into the palm and the lowered hand read as a box
+     with two stubs on it; the bodybuilder reference hangs the fingers DOWN
+     with only a gentle curl, so each one shows its length from the front. */
+  var curl = opts.open ? 0.22 : 0.38;
   for (var i = 0; i < n; i++) {
     var t = n === 1 ? 0.5 : i / (n - 1);
     var x = (t - 0.5) * spec.palmHalfWidth * 1.50;

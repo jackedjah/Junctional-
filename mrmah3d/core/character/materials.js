@@ -422,15 +422,22 @@ export function createCrystalMaterials(options) {
     /* R95: reviewed as "a blown blue lampshade" (mean 78 against the reference
        taper's 42, 9.5% of pixels at 192-223 against 0.5%): strength down, the
        source lower, the gate a long fade (crystal-shader.js). */
-    innerStrength: 3.6,
-    innerY: 0.48,
-    innerRange: 1.05,
-    innerTop: 1.30,
+    /* R95-BB: the gates follow the new body — the quad mass now reaches the
+       belt at 1.48, so the taper light's top rises to 1.40 and its source
+       with it; the core light spans the taller abdomen and chest. */
+    /* And then back DOWN the spear: histogrammed against the bodybuilder
+       reference the quad mass is a dark navy (43% under 32 luma, mean 38) and
+       the light lives in the spear below it and on the outer edge, so the
+       source sits low and the gate fades out through the quad. */
+    innerStrength: 3.4,
+    innerY: 0.42,
+    innerRange: 1.00,
+    innerTop: 1.28,
     coreStrength: 1.6,
-    coreY: 1.58,
-    coreRange: 0.62,
-    coreTop: 2.02,
-    innerHalfWidth: 0.34,
+    coreY: 1.66,
+    coreRange: 0.66,
+    coreTop: 2.08,
+    innerHalfWidth: 0.36,
     innerColor: 0x4a9cff
   });
 

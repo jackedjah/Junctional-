@@ -647,7 +647,7 @@ for (const v of VIEWPORTS) {
      skew(frame fractions) = POSE.centreX * heightFrac / (characterHeight * aspect),
      since the frame is characterHeight/heightFrac tall in world units and
      aspect times that wide. */
-  const POSE_CENTRE_X = 0.1535;   /* proportions.js POSE.centreX */
+  const POSE_CENTRE_X = 0.044;    /* proportions.js POSE.centreX (R95-BB pose) */
   const CHARACTER_H = 3.0;
   modes.forEach(m => {
     const skew = POSE_CENTRE_X * m.wantH / (CHARACTER_H * (m.aspect || 1));

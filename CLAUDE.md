@@ -95,6 +95,21 @@ right-pointing triangles in every reference. The canonical front remains the
 measurement baseline; the anatomical reference remains the proportion
 authority where the guardian set does not contradict it.
 
+There is now a SIXTH set, `reference/mrmah-refE-bodybuilder-{a,b}.png`
+(R95-BB), and it is the BODY-PROPORTION authority. It supersedes the anatomical
+reference on the body: a compact, dense, bodybuilder-influenced crystal guardian
+— broad faceted deltoids flowing out of the trapezius and clavicle, thick
+pectoral shelves either side of a dark sternum, arms with real bicep, tricep
+and forearm mass, a much tighter belt at the waist, and ONE quad-shaped lower
+body (never two legs) with a vastus-lateralis sweep tapering to the point.
+Measured on `a` (1024 x 1536; apex y 165, tip y 1145, 327 px to the unit):
+chest silhouette 0.357 at y 1.97, belt 0.19 at 1.48, quad 0.264 at 1.17,
+upper arm radius 0.153, forearm 0.118, deltoid outer edge 0.60 on the lowered
+side. Its head is a quarter smaller than the anatomical measurement; the head
+is kept canonical (to the floor of the test's tolerance) and the ratio is bought
+by growing the body instead. The canonical front remains the measurement
+baseline; the guardian set remains the authority on material, light and world.
+
 **Expect the silhouette score against the canonical front to be low, and do not
 chase it.** The head is deliberately 30% smaller than the canonical measurement
 and the shoulder line 0.2 units higher; a comparison against a file the design
@@ -245,7 +260,9 @@ must not be claimed from headless runs.
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
 | `reference/mrmah-canonical-front.png` | the MEASUREMENT baseline — do not swap |
-| `reference/mrmah-refA-anatomical.png` | the ART-DIRECTION authority: proportion and anatomy |
+| `reference/mrmah-refE-bodybuilder-{a,b}.png` | the BODY-PROPORTION authority: shoulders, chest, arms, belt, the single quad |
+| `reference/mrmah-refD-guardian-{a,b,c,d}.png` | the authority on material, light and world |
+| `reference/mrmah-refA-anatomical.png` | proportion and anatomy where the bodybuilder set is silent |
 | `reference/mrmah-refA-cinematic.png` | material richness and world atmosphere |
 | `reference/mrmah-refined-front.png` | superseded; kept for the record |
 | `tools/mrmah3d-reference.mjs` | measures the reference into numbers |
@@ -814,3 +831,41 @@ region. Likewise, a plane facing the viewer reflects x≈192 (the camera
 direction), which is where the silver catches come from. If a surface is
 inexplicably dead, work out which part of the environment it actually sees
 before touching its material.
+
+### A ring's `w` is not its silhouette (R95-BB)
+
+`shape(angle)` multiplies each vertex's radius, so the torso's silhouette is
+`w` times the shape at the SIDE angle — chestShape's lateral lobe adds 10%,
+quadShape's sweep 10-12%, coreShape's oblique 3-4%. A ring table authored with
+`w` set to the reference's measured silhouette came back 13% too wide across
+the ribcage and read as a barrel. Pre-divide, and measure the render's outline,
+not the table.
+
+### The reference's belt is TIGHTER than the abdomen above it
+
+Measured on the bodybuilder crop the waist belt is 0.19 where the abdomen just
+above it is 0.24 and the quad just below swells to 0.264 — a 40% step within a
+third of a unit. Before that step the single lower body read as a skirt
+continuing the torso; after it, as a thigh hung from a belt. One concavity in
+the outline is what makes a mass read as anatomy, and its DEPTH is the whole
+effect: at 16% it was arithmetic, at 40% it is a landmark.
+
+### The arm's top lives INSIDE the deltoid
+
+A cap that ends at the joint leaves the outer half of the arm's own end disc
+exposed however the radii are tuned, and a full-radius cap end perpendicular to
+a near-horizontal axis reaches outside the arm's tube and shows as a flat circle
+from any three-quarter view. So the shoulder joint sits ON the deltoid's axis at
+0.7 of its length, where the belly (0.216) encloses the arm's 0.131 disc, and
+the cap's outer end is choked to 0.45 of the arm's radius. Check both discs
+against both tubes before blaming a light for a bright wedge on a shoulder.
+
+### A hot blob on a flat plane is a point light, and not always the nearest one
+
+The lowered hand carried a soft cyan blob on the back of the hand through
+several passes. The chest lamp was the obvious suspect and its range was cut
+first; the blob stayed. It was the FLOOR BOUNCE (0x2fbfe8, range 9) reflecting
+off a 0.085-roughness plane facing the camera. Matching the colour of the blob
+to the colour of each light settles this in one look — the lamp is 0x4fe3ff,
+the bounce is 0x2fbfe8 — and the fix belongs on the surface (the hands are matte
+steel in every reference), not on a light the whole body needs.
