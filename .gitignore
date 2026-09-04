@@ -1,2 +1,4 @@
 # Tooling state: git worktrees created by Claude Code workflows
 .claude/worktrees/
+# Transient probe captures written under the served tree by scratch tools
+validation/mrmah3d/_*.png
