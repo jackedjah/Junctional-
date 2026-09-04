@@ -240,6 +240,8 @@ must not be claimed from headless runs.
 | `mrmah3d/core/bloom.js` | selective bloom, tier-gated (never on `low`) |
 | `mrmah3d/core/surfaces.js` | page events -> character states (the only file naming a MAHFITT page) |
 | `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
+| `mrmah3d/core/character/regions.js` | per-region optical class tables (head, neck, pecs, sternum, abs, obliques, taper, deltoids, arms, hands) |
+| `mrmah3d/core/terrain.js` | the faceted gunmetal range: three depth layers, beacons, sparkles, the mirrored range in the floor |
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
 | `reference/mrmah-canonical-front.png` | the MEASUREMENT baseline — do not swap |
@@ -774,6 +776,24 @@ environment reflection comes down so it no longer outweighs the middle.
 Two habits from this: sample the pixels before theorising about the light,
 and measure before/after on IDENTICAL framing — a box on a differently
 framed capture compared 'before' and 'after' of two different regions.
+
+### A zone names its class; a lottery is a coin flip per mount (R95)
+
+Zoned planes were rolled from a per-zone seed, so a pectoral came up black one
+mount in five, and every boundary was a ring or a column, so the chest was a
+grid of tiles. `zoneAt(angle, y)` now receives the band's height and returns
+`index` (the class row) as well as the table: the sternum narrows upward, the
+pec lobe reaches toward the shoulder, obliques run diagonally, and the values
+are designed, not drawn. `segment()` takes `columns` and `zoneAt(d, t)` too,
+which is how the arms became a few long strips — a lit bicep plane, sapphire
+flanks, a lost tricep side — rather than a quilt of small triangles.
+
+### A hand is one geometry
+
+Four jointed fingers and a thumb as separate meshes took a hand from 15 draws
+to 30 and put the high tier over its frame budget. `mergeGeometries` in
+forge.js concatenates forge geometries (all non-indexed, same attributes), so
+a hand is one mesh and one pair of edge sets. Merge before you clad.
 
 ### The silhouette halo is a screen-space thing
 

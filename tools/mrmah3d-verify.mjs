@@ -423,6 +423,52 @@ for (const v of VIEWPORTS) {
     `medium ${med.shadowPx}px, high ${high.shadowPx}px of cast shadow`);
   check('TIER-06 shadow map size scales with tier', high.shadowMap > med.shadowMap,
     `${med.shadowMap} -> ${high.shadowMap}`);
+  /* ---- R95 tier parity ---------------------------------------------------
+     The low tier draws straight to the canvas; the others draw into bloom's
+     target and composite. three applies tone mapping and the output encoding
+     only on the direct path, so for many passes the low tier was a pale
+     ice-white figure while the high tier was the dark sapphire everything was
+     tuned against. renderer.js now uses one pipeline; this holds it there by
+     comparing the same chest box on the two tiers. Bloom and the halo do not
+     reach inside the upper chest, so the box is a fair comparison. */
+  const parity = await page.evaluate(async () => {
+    const m = await import('/mrmah3d/core/mrmah-scene.js');
+    const host = document.getElementById('stage');
+    const out = {};
+    for (const tier of ['low', 'high']) {
+      if (window.__MRMAH_LAB.scene) window.__MRMAH_LAB.scene.destroy();
+      const s = m.createMrMahScene(host, { tier, preserveDrawingBuffer: true, reducedMotion: true });
+      window.__MRMAH_LAB.scene = s;
+      s.setMode('showcase');
+      await new Promise(r => setTimeout(r, 350));
+      s.parts.loop.pause && s.parts.loop.pause();
+      s.renderer.render(s.scene, s.camera);
+      const c = s.canvas, g = document.createElement('canvas');
+      g.width = c.width; g.height = c.height;
+      const cx = g.getContext('2d'); cx.drawImage(c, 0, 0);
+      const d = cx.getImageData(0, 0, c.width, c.height).data;
+      let sum = 0, n = 0;
+      for (let y = Math.floor(c.height * 0.31); y < c.height * 0.35; y++) {
+        for (let x = Math.floor(c.width * 0.44); x < c.width * 0.56; x++) {
+          const i = (y * c.width + x) * 4;
+          sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]; n++;
+        }
+      }
+      out[tier] = sum / n;
+    }
+    return out;
+  });
+  check('R95-TIER-07 every tier renders through the same colour pipeline',
+    Math.abs(parity.low - parity.high) <= 8,
+    `upper-chest mean luma low ${parity.low.toFixed(1)} vs high ${parity.high.toFixed(1)}`);
+  await page.evaluate(async () => {
+    const m = await import('/mrmah3d/core/mrmah-scene.js');
+    const host = document.getElementById('stage');
+    if (window.__MRMAH_LAB.scene) window.__MRMAH_LAB.scene.destroy();
+    window.__MRMAH_LAB.scene = m.createMrMahScene(host, { tier: 'high', preserveDrawingBuffer: true });
+    await new Promise(r => setTimeout(r, 350));
+  });
+
   /* This container reports a low-core device, so every other capture in this
      run is tier 'low' and therefore shadowless. Capture the high tier too, or
      the delivered evidence never shows a contact shadow. */
@@ -470,11 +516,21 @@ for (const v of VIEWPORTS) {
 
   /* A finger on glass always moves a little; a few px must still be a tap. */
   await page.waitForTimeout(900);
-  await page.mouse.move(cx, cy); await page.mouse.down();
+  await page.mouse.move(cx, cy);
+  /* The press duration is REPORTED, because this check has failed twice for
+     timing reasons that read as product bugs: once at 446 ms against a 450 ms
+     TAP_MS (a real defect, fixed by raising it to 900), and once under a
+     loaded machine where three Playwright mouse steps alone took longer than
+     any finger tap. A failure with a held time over TAP_MS is the harness;
+     under it, it is the product. */
+  const pressAt = Date.now();
+  await page.mouse.down();
   await page.mouse.move(cx + 4, cy + 2, { steps: 3 }); await page.mouse.up();
+  const heldMs = Date.now() - pressAt;
   await page.waitForTimeout(60);
   check('GESTURE-02 a press with slight jitter is still a tap',
-    (await page.evaluate(() => window.__MRMAH_LAB.scene.getState())) === 'tapped');
+    (await page.evaluate(() => window.__MRMAH_LAB.scene.getState())) === 'tapped',
+    `press held ${heldMs} ms by the harness (TAP_MS is 900)`);
 
   /* A real drag must never fire a tap, and must restore the HOST's state. */
   await page.waitForTimeout(900);
