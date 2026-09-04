@@ -362,6 +362,22 @@ export function createEnvironment(options) {
   glowGroup.add(streak);
   owned.push(streak.geometry, streakMat, streakTex);
 
+  /* A broad, very faint sheen on the floor around the contact point — the
+     "restrained reflective floor response". It is not a reflection: it is the
+     wet-look bloom a polished surface gives back around a bright object, which
+     is what Reference A's floor actually shows near his feet. Wider and far
+     weaker than the streak, so it reads as the floor having a finish rather
+     than as a second light source. */
+  var sheenMat = new MeshBasicMaterial({
+    map: glowTex, color: new Color(0x2f6f92), transparent: true, opacity: 0.10,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: true
+  });
+  var sheen = new Mesh(new PlaneGeometry(3.6, 3.6), sheenMat);
+  sheen.rotation.x = -Math.PI / 2;
+  sheen.position.y = 0.008;
+  glowGroup.add(sheen);
+  owned.push(sheen.geometry, sheenMat);
+
   /* Default length until the character reports its real hover height. */
   var laserHeight = 0.16;
   function setLaser(height) {
@@ -381,7 +397,7 @@ export function createEnvironment(options) {
      visible line. Faces the camera, sits at the far edge, unlit and additive. */
   var horizonTex = horizonTexture();
   var horizonMat = new MeshBasicMaterial({
-    map: horizonTex, color: cyan, transparent: true, opacity: 0.85,
+    map: horizonTex, color: cyan, transparent: true, opacity: 0.88,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false,
     side: DoubleSide,
     /* fog MUST be on. Unfogged, this quad sat behind the distance at which the
@@ -460,7 +476,13 @@ export function createEnvironment(options) {
        units off the floor, they clear it comfortably while staying inside the
        fade where the atmosphere can actually reach the eye. */
     { z: -38, y: 15.5, w: 96, h: 10, speed: 0.050, o: 1.00 },
-    { z: -29, y: 11.4, w: 70, h: 7, speed: -0.080, o: 0.66 }
+    { z: -29, y: 11.4, w: 70, h: 7, speed: -0.080, o: 0.66 },
+    /* A third layer, nearer and lower, drifting fastest. Three depths rather
+       than two is what turns "two cloud quads" into air: the parallax between
+       them never repeats, so the sky reads as volume the character is standing
+       inside rather than as a backdrop hung behind him. Still clear of the
+       horizon line — everything above it, nothing over the floor. */
+    { z: -22, y: 8.4, w: 54, h: 5.5, speed: 0.140, o: 0.42 }
   ].forEach(function (b, i) {
     var m = cloudMat.clone();
     m.opacity = cloudMat.opacity * b.o;
@@ -474,7 +496,22 @@ export function createEnvironment(options) {
   group.add(clouds);
   owned.push(cloudTex);
 
-  /* ---- 5. distant structures ------------------------------------------- */
+  /* ---- 4c. horizon mist: NOT a separate layer, deliberately ------------
+     A wide band of haze sitting on the horizon was built here and removed. It
+     is the obvious way to get "distant mist" and it cannot be made to work in
+     this scene: placed beyond the fog's far plane it renders at 100% fog colour
+     — a solid lit rectangle across the horizon, the same trap the horizon glow
+     fell into two passes ago — and placed inside the fade it covers exactly the
+     screen rows where the floor's perspective is read. Measured, the rows
+     carrying converging content fell from 202 to 158 even at a fifth of the
+     opacity and half the width, because getImageData returns unpremultiplied
+     colour and a barely-visible pixel still counts as lit.
+
+     The job it was meant to do is covered: the cloud bands now run at three
+     depths, the nearest of them low and fast, and the horizon glow marks where
+     the floor dissolves. Both already sit clear of the convergence rows. */
+
+  /* ---- 5. distant structures ------------------------------------------- */  /* ---- 5. distant structures ------------------------------------------- */
   /* Faceted forms far out, edge-lit in the character's own geometric language
      so the world looks built of the same material he is. Kept very dim: they
      exist for parallax and scale, not to be looked at. */
@@ -676,7 +713,7 @@ export function createEnvironment(options) {
     starMat.opacity = 0.55 * st;
     clouds.visible = ha > 0.03;
     cloudBands.forEach(function (b, i) {
-      b.mesh.material.opacity = 0.40 * [1.00, 0.66][i] * ha;
+      b.mesh.material.opacity = 0.40 * [1.00, 0.66, 0.42][i] * ha;
     });
   }
 
@@ -691,6 +728,16 @@ export function createEnvironment(options) {
     update: update, followCharacter: followCharacter, applyMode: applyMode,
     setHorizon: setHorizon, setLaser: setLaser, clouds: clouds,
     pillars: pillars, stars: stars,
+    /* Scale-aware world detail. At chat and protocol size the fine particles
+       are sub-pixel noise competing with the character for the little contrast
+       the frame has; the large layers — grid, horizon, mist, structures — are
+       what still read, so only the small stuff is pulled back. */
+    setDetail: function (t) {
+      var k = Math.max(0, Math.min(1, Number(t)));
+      moteMat.opacity = BASE.motes * (0.35 + 0.65 * k);
+      starMat.opacity = 0.55 * (0.45 + 0.55 * k);
+      nodeMat.opacity = BASE.nodes * (0.5 + 0.5 * k);
+    },
     setOpacity: function (v) { gridMat.opacity = Math.max(0, Math.min(1, Number(v))); },
     dispose: dispose
   };

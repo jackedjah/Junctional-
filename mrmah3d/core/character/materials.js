@@ -40,6 +40,7 @@ export var PALETTE = {
   edge: 0x35d6ff,        /* cyan edge illumination */
   edgeHot: 0xbdf2ff,     /* near-white specular catch */
   face: 0x05090d,        /* the recessed facial plane — almost black */
+  cavity: 0x121b24,      /* the walls of the face recess — shadowed crystal */
   glow: 0x4fe3ff
 };
 
@@ -124,6 +125,22 @@ export function createCrystalMaterials(options) {
        there costs the eyes and smile the contrast they read against — which is
        the whole reason the plate is recessed in the first place. */
     envMapIntensity: 0.18,
+    flatShading: true
+  });
+
+  /* CAVITY WALL — the inside of the face recess.
+
+     Darker and far less reflective than the shell around it, because that value
+     STEP is what the eye reads as depth from the front. A wall inside a hole lit
+     like the crystal surrounding the hole gives no occlusion cue at all, which
+     is why the recess kept measuring deep and looking shallow. Not pure black:
+     it keeps a little reflection so the wall still turns with the head and
+     provides parallax at three-quarter angles. */
+  var cavity = new MeshStandardMaterial({
+    color: new Color(PALETTE.cavity),
+    roughness: 0.62,
+    metalness: 0.22,
+    envMapIntensity: 1.6,
     flatShading: true
   });
 
@@ -294,11 +311,12 @@ export function createCrystalMaterials(options) {
   if (opts.envMap) {
     body.envMap = opts.envMap;
     face.envMap = opts.envMap;
+    cavity.envMap = opts.envMap;
     body.needsUpdate = true;
     face.needsUpdate = true;
   }
 
-  var all = [body, face, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, rim];
+  var all = [body, face, cavity, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, rim];
 
   /* Captured at construction so setGlow(1) restores exactly what each material
      was defined with. */
@@ -330,7 +348,7 @@ export function createCrystalMaterials(options) {
   }
 
   return {
-    body: body, face: face, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
+    body: body, face: face, cavity: cavity, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
     emissive: emissive, emissiveSoft: emissiveSoft, rim: rim,
     /* One place to drive the whole character's luminosity — used by the
        animation states so a "thinking" pulse cannot desynchronise.
@@ -374,7 +392,7 @@ export function createCrystalMaterials(options) {
       SCALE.edgeHero = 1 + (1 - t) * 0.22;
       /* The face is the exception: it is the one thing that must not degrade
          with size at all, so its glow gets the largest share of the lift. */
-      SCALE.emissiveSoft = 1 + (1 - t) * 0.70;
+      SCALE.emissiveSoft = 1 + (1 - t) * 0.95;
       applyOpacity();
     },
     setGlow: function (scale) {

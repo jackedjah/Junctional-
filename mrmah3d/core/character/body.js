@@ -144,7 +144,7 @@ export function buildBody(materials) {
      progressively darker and flatter than the one that was being "fixed" — a
      long correction of a fault nobody had reported. Restored. */
   var torsoParts = lit(group, torsoLoft.geometry, materials,
-    { rimScale: 1.022, hero: true, heroAngle: 86, edgeAngle: 42 });
+    { rimScale: 1.022, hero: true, heroAngle: 86, edgeAngle: 42, minorAngle: 36 });
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
 
   /* ---- shoulder caps / deltoids --------------------------------------- */
@@ -222,13 +222,13 @@ export function buildBody(materials) {
     var outer = [joint[0] * 1.00, joint[1] - 0.033, joint[2]];
     var geo = segment(
       inner, outer,
-      0.230, spec.upperRadius * 1.30, 8,
-      { depthRatio: 1.12, crystal: 0.058, steps: 6, lift: ARMS.classLift,
+      0.205, spec.upperRadius * 1.24, 8,
+      { depthRatio: 1.22, crystal: 0.058, steps: 6, lift: ARMS.classLift,
         profile: function (t) {
         /* Widest just outboard of where it leaves the chest — the deltoid
            belly — then drawing into the arm. Shallower than before: the swell
            was adding lateral width exactly where the silhouette is read. */
-        return 1 + Math.sin(Math.pow(t, 0.7) * Math.PI) * 0.11;
+        return 1 + Math.sin(Math.pow(t, 0.7) * Math.PI) * 0.075;
       } }
     );
     var parts = lit(group, geo, materials, { rimScale: 1.03, quiet: true, minorAngle: 30 });
@@ -256,8 +256,8 @@ export function buildBody(materials) {
     var STEPS = 5;
     for (var ri = 0; ri <= STEPS; ri++) {
       var rt = ri / STEPS;
-      var rr = (0.230 + (spec.upperRadius * 1.30 - 0.230) * rt) *
-               (1 + Math.sin(Math.pow(rt, 0.7) * Math.PI) * 0.11);
+      var rr = (0.205 + (spec.upperRadius * 1.24 - 0.205) * rt) *
+               (1 + Math.sin(Math.pow(rt, 0.7) * Math.PI) * 0.075);
       ridgePts.push(
         inner[0] + (outer[0] - inner[0]) * rt,
         inner[1] + (outer[1] - inner[1]) * rt + rr * 0.90,

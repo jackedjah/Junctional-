@@ -41,7 +41,7 @@ export function buildHead(materials) {
     lift: HEAD.classLift
   });
 
-  var shell = new Mesh(geo, [materials.body, materials.face]);
+  var shell = new Mesh(geo, [materials.body, materials.face, materials.cavity]);
   shell.name = 'head-shell';
   shell.castShadow = true;
   shell.receiveShadow = true;
@@ -61,9 +61,24 @@ export function buildHead(materials) {
   group.add(rim);
 
   /* Edge illumination, taken from the geometry itself. */
-  var heroEdges = new EdgesGeometry(geo, 68);
-  group.add(new LineSegments(heroEdges, materials.edgeHero));
-  var edges = new EdgesGeometry(geo, 44);
+  /* THE HEAD CARRIES VERY FEW LINES.
+
+     It is a small object with a lot of plane breaks, so any threshold that
+     looks reasonable on the body draws a dense cyan cage on the head — which is
+     the whole of the "outer diamond is too uniformly cyan" note. The reference's
+     shell is crystal MASS with sparse edge light, so the structural threshold
+     goes up hard and the secondary pass is dropped entirely: at 40 degrees it
+     was nearly duplicating the 44-degree pass anyway, drawing every line twice.
+     What survives is the girdle, the crown break and the lip — the three edges
+     that actually describe the cut. */
+  /* NO HERO PASS ON THE HEAD. The girdle is a continuous hard break all the way
+     round the diamond, so any hero threshold draws a complete near-white outline
+     — a frame, by definition, however dark the faces inside it are. The
+     reference's head has cyan edge light that comes and goes and several
+     stretches lost entirely into darkness. Dropping this pass is what lets the
+     shell read as mass rather than as an outlined shape. */
+  var heroEdges = new EdgesGeometry(geo, 72);   /* kept for disposal parity */
+  var edges = new EdgesGeometry(geo, 58);
   var line = new LineSegments(edges, materials.edge);
   line.name = 'head-edges';
   group.add(line);
@@ -74,8 +89,7 @@ export function buildHead(materials) {
      lines straight across the face — the "dirty face" note. The head is the one
      part where linework must stay off the surface entirely, because anything
      crossing the recess competes with the eyes and smile. */
-  var minorEdges = new EdgesGeometry(geo, 40);
-  group.add(new LineSegments(minorEdges, materials.edgeFaint));
+  var minorEdges = new EdgesGeometry(geo, 58);   /* kept for disposal parity */
 
   /* ---- face ----------------------------------------------------------- */
   /* Sits on the recessed plate. faceZ is where the plate is; the features are

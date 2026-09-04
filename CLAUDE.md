@@ -453,6 +453,28 @@ wide. A surface that was supposed to be inside the mesh was outside it.
 Before adjusting light or material for a bright artifact, check whether
 something is simply sticking out.
 
+### A fogged object beyond `fog.far` is a solid wall, not invisible
+
+A horizon mist band was hung at z=-63 to feel distant. Linear fog ends at 42,
+and past that an object is not gone — it is drawn at 100% FOG COLOUR, which is a
+lit grey-blue. It rendered as a solid rectangle straight across the horizon and
+dropped the floor's converging rows from 202 to 158. Moved inside the fade it
+covers the convergence rows instead; at a fifth of the opacity it still cost 44
+of them, because `getImageData` counts a barely-visible pixel as lit. A
+full-width horizon layer cannot be made to work in this scene, and the job is
+already done by the three cloud bands and the horizon glow, which sit clear of
+those rows. Do not re-add it.
+
+### Depth is read from OCCLUSION before geometry
+
+The head's face cavity measured five times deeper than before and still looked
+shallow front-on, because the cavity walls shared the outer shell's material —
+a wall inside a hole lit exactly like the crystal around the hole gives the eye
+no cue at all. `diamondCrystal` now emits the walls as their own material group
+so they can take a darker, barely-reflective material, and the value step does
+the work. Verify depth with `head-threequarter.png`, not front-on: a recess and
+a painted panel are indistinguishable from straight ahead.
+
 ### Anything upward-facing reflects x≈64, not the sky
 
 The deltoids rendered as flat black masses and the geometry was not the reason.

@@ -512,13 +512,24 @@ export function diamondCrystal(opts) {
   var F = ring(face, faceZ, null);          /* the recessed face plate */
   var back = push(0, 0, backZ);
 
-  var shell = [], plate = [];
+  /* THREE MATERIAL GROUPS, not two.
+
+     The cavity walls used to share the outer shell's material, and that is
+     most of why the recess did not read as depth from the front: a wall inside
+     a hole was being lit exactly like the crystal surrounding the hole. Real
+     depth is mostly OCCLUSION — the lip overhangs the wall, so the wall is
+     darker than the surface it sits under, and the eye reads that value step as
+     distance before it reads any geometry at all.
+
+     Splitting them lets the cavity take its own darker, barely-reflective
+     material, so the step exists whatever angle the head is seen from. */
+  var shell = [], cavity = [], plate = [];
   for (var i = 0; i < N; i++) {
     var j = (i + 1) % N;
     shell.push([E[i], C[i], C[j], E[j]]);   /* lower crown band */
     shell.push([C[i], B[i], B[j], C[j]]);   /* upper crown band */
-    shell.push([B[i], I[i], I[j], B[j]]);   /* over the lip, into the cavity */
-    shell.push([I[i], F[i], F[j], I[j]]);   /* the inner bevel wall */
+    cavity.push([B[i], I[i], I[j], B[j]]);  /* over the lip, into the cavity */
+    cavity.push([I[i], F[i], F[j], I[j]]);  /* the inner bevel wall */
     shell.push([E[j], E[i], back]);         /* back facets */
   }
   /* Fan the plate from its centre so it is several triangles, not one quad —
@@ -529,7 +540,8 @@ export function diamondCrystal(opts) {
 
   return facetedGeometry(P, null, [
     { faces: shell, material: 0 },
-    { faces: plate, material: 1 }
+    { faces: plate, material: 1 },
+    { faces: cavity, material: 2 }
   ], { lift: opts.lift });
 }
 

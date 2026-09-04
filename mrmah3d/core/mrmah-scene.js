@@ -112,11 +112,19 @@ export function createMrMahScene(host, options) {
      intent, i.e. what share of the frame he is meant to fill — so this stays
      correct at any viewport without measuring the rendered pixels back. */
   function applyScaleHint(m) {
-    if (!characterBox.materials || !characterBox.materials.setScaleHint) return;
     var mode = m || getMode(modeName);
     var box = measure();
     var frac = (mode && mode.heightFrac) || 0.6;
-    characterBox.materials.setScaleHint(box.height * frac);
+    var px = box.height * frac;
+    if (characterBox.materials && characterBox.materials.setScaleHint) {
+      characterBox.materials.setScaleHint(px);
+    }
+    /* The WORLD is scale-aware too, not just the character. At chat size the
+       motes, grid nodes and stars are sub-pixel specks competing for the little
+       contrast a dark frame has, while the large layers — grid, horizon, cloud,
+       structures — still read. Pulling back only the fine particles keeps the
+       world feeling big without letting it fight him for attention. */
+    if (envBox.setDetail) envBox.setDetail((px - 150) / 280);
   }
 
   host.appendChild(rendererBox.canvas);
@@ -152,7 +160,9 @@ export function createMrMahScene(host, options) {
     }
     if (characterBox && characterBox.materials && characterBox.materials.setScaleHint) {
       var md = getMode(modeName);
-      characterBox.materials.setScaleHint(m.height * ((md && md.heightFrac) || 0.6));
+      var hpx = m.height * ((md && md.heightFrac) || 0.6);
+      characterBox.materials.setScaleHint(hpx);
+      if (envBox.setDetail) envBox.setDetail((hpx - 150) / 280);
     }
     return m;
   }

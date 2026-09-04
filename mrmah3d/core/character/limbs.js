@@ -33,8 +33,13 @@ function clad(group, geo, materials, rimScale) {
   var c = geo.boundingBox.getCenter(new Vector3());
   rim.position.set(c.x * (1 - s), 0, c.z * (1 - s));
   group.add(rim);
+  /* 36, not 20. At 20 degrees every ring seam along a profiled limb qualified,
+     so the arms wore a ladder of faint lines that competed with the planes
+     describing the bicep and forearm. Suppressing the transition tier is what
+     lets the major planes carry the volume — the same hierarchy the torso
+     needed, for the same reason. */
   var major = new EdgesGeometry(geo, 48);
-  var minor = new EdgesGeometry(geo, 20);
+  var minor = new EdgesGeometry(geo, 36);
   group.add(new LineSegments(major, materials.edge));
   group.add(new LineSegments(major, materials.edgeHalo));
   group.add(new LineSegments(minor, materials.edgeFaint));

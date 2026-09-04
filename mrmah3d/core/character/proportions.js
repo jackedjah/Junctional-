@@ -110,7 +110,13 @@ export var HEAD = {
   /* How far the head's facets are biased away from the body's black-heavy
      distribution. 0 would give it the body's weighting, which measured as an
      almost entirely black shell. */
-  classLift: 0.42
+  /* Down from 0.42. That lift was added when the shell measured almost
+     entirely black, and it over-corrected: the head came back reading as a
+     uniformly bright cyan frame. At 0.26 roughly a quarter of the shell's
+     faces still land in the black class, several more in charcoal, and the
+     occasional silver catch survives — crystal mass with dark faces in it,
+     which is what the reference shows. */
+  classLift: 0.26
 };
 
 export var NECK = {
@@ -263,7 +269,11 @@ export var TORSO = {
      moved into front-to-back DEPTH (see the deltoid's depthRatio in body.js),
      which reads as mass from every angle a viewer can reach without widening
      the silhouette. Roughly a 10% reduction in projection, as briefed. */
-  shoulderHalfWidth: 0.782,
+  /* A further 6% off the lateral projection, as briefed. Combined with the
+     previous pass the shoulders have come in 14% from their widest, while the
+     deltoid's front-to-back depth has gone the other way — the mass is being
+     moved out of the silhouette rather than removed. */
+  shoulderHalfWidth: 0.734,
   shoulderY: 1.900
 };
 
@@ -294,21 +304,21 @@ export var ARMS = {
        stay where they were measured, so the pose and the hand positions are
        unchanged — only the top of the limb moves out, which also gives the
        upper arm the near-vertical hang that Reference A has. */
-    shoulder: [-0.638, 1.884, 0.02],
+    shoulder: [-0.598, 1.878, 0.02],
     /* Brought under the shoulder. With the joint moved outboard, the old elbow
        at 0.764 made the upper arm angle further OUT before the forearm cut back
        in — a chicken wing. Reference A hangs the upper arm almost vertically
        from the outer shoulder and lets only the forearm angle inward to the
        hip, which is both calmer and stronger. */
-    elbow: [-0.664, 1.318, 0.10],
+    elbow: [-0.628, 1.318, 0.10],
     wrist: [-0.470, 0.902, 0.16],
     upperRadius: 0.112,
     foreRadius: 0.086,
     wristRadius: 0.060
   },
   left: {                         /* viewer's RIGHT — the raised arm */
-    shoulder: [0.636, 1.878, 0.02],
-    elbow: [0.716, 1.330, 0.10],
+    shoulder: [0.596, 1.872, 0.02],
+    elbow: [0.678, 1.330, 0.10],
     wrist: [0.812, 1.982, 0.14],
     upperRadius: 0.112,
     foreRadius: 0.086,
