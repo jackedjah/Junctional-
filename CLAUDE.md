@@ -456,6 +456,69 @@ render once. It costs one capture and it distinguishes "the material is wrong"
 from "there is no material showing" — which no amount of tuning the material
 can tell you apart.
 
+### Motion readability is measurable, and per-pixel travel is the wrong metric
+
+"Does he look 3D when he moves?" is not a matter of opinion. Sample the rendered
+frames over real seconds of idle and measure, over the character's own pixels.
+But measure the luminance HISTOGRAM, not per-pixel change: a bob drags edges
+across pixels and produces large per-pixel deltas while proving nothing about
+form. The histogram is translation-invariant and moves only when facets actually
+change value.
+
+Useful numbers from R91 (14s window, showcase, low tier):
+
+| | R90 | R91 |
+| --- | --- | --- |
+| pixels changing >12 luma | 45.4% | 63.9% |
+| frame-to-frame histogram drift | 2.91% | 3.29% |
+
+Three levers, in descending order of size, all of which needed measuring
+because two of them are counter-intuitive:
+
+1. **The body has to actually turn.** Idle rotated the torso 0.9 degrees.
+   Nothing in any material reads at 0.9 degrees.
+2. **The environment needs angular STRUCTURE, not more light.** A wide soft
+   halo around each card was tried and measured as a clean failure: the share
+   of the character above 140 luma went 10-12% -> 22-25% while shading drift did
+   not move at all. A broad halo is a bigger sky. What motion needs is many
+   moderate features at many azimuths — soft striations — so a turning facet is
+   always crossing something instead of sitting in black between hot cards.
+3. **Rotate the environment map.** This material is reflection-dominated
+   (metalness 0.55, envMapIntensity 27), so moving a directional light barely
+   registers. `scene.environmentRotation` is an exact no-op here because the
+   materials carry an EXPLICIT `envMap` — use `material.envMapRotation`. It can
+   afford to be brisk (0.17 rad/s) because the map is never drawn: the
+   background stays transparent, so there is no visibly spinning room.
+
+### A value step at a seam is what "bolted on" looks like
+
+The arms read as attached-afterward while the geometry already interpenetrated
+correctly. The cause was optical, not geometric: the deltoid carried a facet
+lift of 0.40 against the torso's 0.14, and a step in value at a boundary is
+exactly what an object boundary looks like. `segment` takes a lift RAMP along
+its length so a limb starts at its neighbour's weighting and arrives at its own.
+Fixing the shape of a join will not help while the values either side of it
+disagree.
+
+### Emissive materials light nothing
+
+An emissive face and an emissive chest emblem are colours written into the
+frame, not sources, so the geometry around them stays as dark as the geometry
+across the body — which reads as a decal on a solid. Two short-range point
+lights at the emitters fix it. Keep them OFF the surface: at 0.30 units from the
+chest wall the lamp drew itself on the abdomen as a hot blob. Further forward
+with a wider falloff gives a gradient instead of a spot.
+
+### A failing check that passes in isolation may still be a real bug
+
+`GESTURE-02` failed in the full run and passed standalone, which reads exactly
+like a flake, and had been dismissed as one before. It reproduced only after
+copying the harness's mobile/touch context exactly, and a pointer-event trace
+showed the press was held for **446 ms against a TAP_MS of 450**. The product
+was dropping taps whenever the frame budget slipped, silently and with nothing
+to debug from. Before writing off an intermittent check, reproduce its exact
+context and trace the events.
+
 ### A culled face and a black face look identical
 
 The head's crown and bevel bands were wound INWARD, so `FrontSide` discarded all
