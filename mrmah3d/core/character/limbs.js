@@ -73,13 +73,16 @@ function buildHand(materials, spec, options) {
 
   /* Digits. Simplified and few — the requirement is that the raised hand
      reads as a hand rather than a triangle, not that it has knuckles. */
-  var n = opts.open ? spec.digitCount : Math.max(2, spec.digitCount - 1);
+  /* Three digits on BOTH hands. The closed hand used to drop to two, which at
+     app scale read as a pincer rather than a hand; keeping three and shortening
+     them instead costs one small segment and reads as fingers curled in. */
+  var n = spec.digitCount;
   for (var i = 0; i < n; i++) {
     var t = n === 1 ? 0.5 : i / (n - 1);
     var x = (t - 0.5) * spec.palmHalfWidth * 1.55;
     /* Splay the outer digits and shorten them slightly. */
     var splay = (t - 0.5) * (opts.open ? 0.55 : 0.22);
-    var len = spec.digitLength * (opts.open ? 1 : 0.72) * (1 - Math.abs(t - 0.5) * 0.35);
+    var len = spec.digitLength * (opts.open ? 1 : 0.62) * (1 - Math.abs(t - 0.5) * 0.35);
     var base = [x, spec.palmLength, 0];
     var tip = [x + Math.sin(splay) * len, spec.palmLength + Math.cos(splay) * len, 0.01];
     var g = segment(base, tip, spec.digitRadius, spec.digitRadius * 0.7, 5, { depthRatio: 0.9, crystal: 0.05, steps: 2 });

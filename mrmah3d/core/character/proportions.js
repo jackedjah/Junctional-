@@ -270,13 +270,19 @@ export var ARMS = {
 /* The hand is SMALL. From the reference the raised hand spans only about
    0.12 world units from wrist to fingertip; an earlier 0.24 pushed the hand
    up into the head's height band and made the silhouette 20% too wide there. */
+/* Scaled up with the limbs. The arms gained real mass this pass and the hands
+   did not, so they had started to read as small claws on the end of proper
+   forearms — the wrist is 0.060 and the palm was only 0.062 half-width, barely
+   wider than the arm it hangs from. A hand is meaningfully wider than its
+   wrist; that difference is most of what makes it read as a hand at a glance,
+   which is all that is being asked for here. */
 export var HAND = {
-  palmLength: 0.080,
-  palmHalfWidth: 0.062,
-  palmHalfDepth: 0.036,
+  palmLength: 0.098,
+  palmHalfWidth: 0.079,
+  palmHalfDepth: 0.044,
   digitCount: 3,
-  digitLength: 0.058,
-  digitRadius: 0.020,
+  digitLength: 0.070,
+  digitRadius: 0.024,
   /* The small bright diamond above the reference's raised hand. */
   tipDiamond: 0.044
 };

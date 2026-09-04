@@ -129,9 +129,16 @@ export function buildHead(materials) {
   var smileR = HEAD.halfWidth * 0.34;
   var smileArc = Math.PI * 0.92;
   var smile = new Mesh(
-    /* The smile is drawn with the same hairline as the eyes, for the same
-       reason — the reference's mouth is a thin arc of light, not a band. */
-    new TorusGeometry(smileR, smileR * 0.062, 8, 52, smileArc),
+    /* Slightly heavier than the eye stroke, not lighter.
+
+       The smile is a longer, shallower shape than a ring, so at the same line
+       weight it carries far less ink and it is the first face element to go
+       when the character shrinks — checked on the iPad-landscape capture, where
+       the eyes were crisp and the mouth had faded to a suggestion. The brief
+       makes its visibility a named requirement, so it gets the weight it needs
+       to survive the smallest framing rather than the weight that looks
+       balanced in the showcase view. */
+    new TorusGeometry(smileR, smileR * 0.078, 8, 52, smileArc),
     materials.emissive
   );
   smile.rotation.z = Math.PI + (Math.PI - smileArc) / 2;
@@ -140,7 +147,7 @@ export function buildHead(materials) {
   face.add(smile);
 
   var smileSoft = new Mesh(
-    new TorusGeometry(smileR, smileR * 0.125, 8, 52, smileArc),
+    new TorusGeometry(smileR, smileR * 0.165, 8, 52, smileArc),
     materials.emissiveSoft
   );
   smileSoft.rotation.copy(smile.rotation);
