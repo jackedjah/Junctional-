@@ -83,7 +83,13 @@ export function settingsFor(tier) {
     bloomStrength: tier === 'high' ? 0.44 : 0.36,
     /* Fog is nearly free and does the most per-cost work of anything here:
        it is what makes a dark stage read as having depth. Never dropped. */
-    fog: true
+    fog: true,
+    /* R94 world. The floor's reflective response is a PROXY on every tier — a
+       true planar reflection would re-draw the character (76 draws, ~6k tris)
+       and cannot fit the frame budget — but the proxy is tiered: above low it
+       adds the floor streaks under the summit beacons. Low keeps the hover
+       column and the grid's local brightening only. */
+    worldReflections: tier !== 'low'
   };
 }
 
