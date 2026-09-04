@@ -18,6 +18,7 @@
    See CLAUDE.md. */
 
 import { detectTier, degrade, prefersReducedMotion } from './quality.js';
+import { getMode, MODE_NAMES } from './composition.js';
 import { readPalette } from './palette.js';
 import { createRenderer } from './renderer.js';
 import { createStage } from './stage.js';
@@ -83,6 +84,23 @@ export function createMrMahScene(host, options) {
   if (characterBox.height && cameraBox.frameCharacter) {
     cameraBox.frameCharacter(characterBox.height, 0.16, 0.670);
   }
+  if (cameraBox.setCharacter) cameraBox.setCharacter(characterBox.height, 0.16);
+
+  /* ---- page mode ------------------------------------------------------ */
+  /* A host surface declares WHERE this is being shown, and the composition,
+     the world's emphasis and the resting behaviour all follow from that. */
+  var modeName = opts.mode || 'showcase';
+
+  function setMode(name) {
+    var m = getMode(name);
+    modeName = m.label;
+    if (cameraBox.setMode) cameraBox.setMode(modeName);
+    if (envBox.applyMode) envBox.applyMode(m.world);
+    if (stageBox.setFog && m.world) stageBox.setFog(m.world.fogNear, m.world.fogFar);
+    if (m.state) { hostState = m.state; if (characterBox.setState) characterBox.setState(m.state); }
+    resize();
+    return modeName;
+  }
 
   host.appendChild(rendererBox.canvas);
 
@@ -142,6 +160,15 @@ export function createMrMahScene(host, options) {
   function renderFrame(dt) {
     if (contextLost || rendererBox.isDisposed()) return;
     characterBox.update(dt, { reducedMotion: reducedMotion });
+    /* Keep the pool of floor light under him — including while he is being
+       dragged. This is the main thing that stops him reading as pasted on. */
+    if (envBox.followCharacter && characterBox.root) {
+      envBox.followCharacter(
+        characterBox.root.position.x + (characterBox.float ? characterBox.float.position.x : 0),
+        characterBox.root.position.z,
+        characterBox.states ? 0.85 + 0.35 * (characterBox.states.values.glow || 1) : 1
+      );
+    }
     if (envBox.update) envBox.update(dt, { reducedMotion: reducedMotion });
     rendererBox.renderer.render(stageBox.scene, cameraBox.camera);
   }
@@ -184,6 +211,7 @@ export function createMrMahScene(host, options) {
     }
   });
 
+  setMode(modeName);
   resize();
   loop.start();
   /* One synchronous frame so the very first paint is not an empty canvas —
@@ -245,6 +273,18 @@ export function createMrMahScene(host, options) {
     },
     getState: function () { return characterBox.getState ? characterBox.getState() : null; },
     states: characterBox.stateNames || [],
+
+    /* ---- page composition ----------------------------------------------
+       A surface says where it is, not how to point a camera:
+
+         createMrMahScene(el, { mode: 'chat' })
+         mah.setMode('protocol')
+
+       Each mode carries its own framing, world emphasis and resting state.
+       See composition.js for what each one means and why. */
+    setMode: setMode,
+    getMode: function () { return modeName; },
+    modes: MODE_NAMES,
     info: function () {
       return {
         version: VERSION,

@@ -139,5 +139,17 @@ export function createStage(options) {
     scene.clear();
   }
 
-  return { scene: scene, world: world, subject: subject, dispose: dispose };
+  /* Per-mode atmospheric depth. A chat stage wants haze starting closer and
+     reaching further than a tight portrait does, and that is a property of
+     the composition, not of the scene. */
+  function setFog(near, far) {
+    if (!scene.fog) return;
+    if (near != null) scene.fog.near = near;
+    if (far != null) scene.fog.far = far;
+  }
+
+  return {
+    scene: scene, world: world, subject: subject,
+    setFog: setFog, dispose: dispose
+  };
 }

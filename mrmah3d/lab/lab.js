@@ -85,6 +85,19 @@ document.querySelector('.lab-controls').addEventListener('click', function (e) {
   }
 });
 
+/* Page modes. Switching here is exactly what a MAHFITT surface will do:
+   declare where the character is being shown and let the composition, world
+   emphasis and resting behaviour follow. */
+var modeBar = document.querySelector('.lab-modes');
+modeBar.addEventListener('click', function (e) {
+  var mode = e.target && e.target.getAttribute('data-mode');
+  if (!mode || !scene) return;
+  Array.prototype.forEach.call(modeBar.querySelectorAll('button'), function (b) {
+    b.setAttribute('aria-pressed', String(b === e.target));
+  });
+  scene.setMode(mode);
+});
+
 /* Width presets. These constrain the *stage element*, not the window, so a
    desktop browser can check the phone and iPad layouts without a device — the
    renderer sees a genuinely different host size and must re-frame. */
@@ -103,6 +116,7 @@ function tick() {
     var i = scene.info();
     say([
       'mrmah3d ' + i.version + (i.placeholder ? '   [PLACEHOLDER GEOMETRY — NOT MR.MAH]' : ''),
+      'mode        ' + scene.getMode() + '   state ' + scene.getState(),
       'surface     ' + i.width + ' x ' + i.height + ' css   dpr ' + i.pixelRatio + '   fov ' + i.fov + '°',
       'quality     tier ' + i.tier + (i.stats.tierDrops ? '  (auto-dropped ' + i.stats.tierDrops + 'x)' : ''),
       'loop        ' + (i.loop.running ? 'running' : 'STOPPED') +

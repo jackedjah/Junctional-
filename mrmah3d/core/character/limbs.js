@@ -25,7 +25,7 @@ function clad(group, geo, materials, rimScale) {
   var rim = new Mesh(geo, materials.rim);
   rim.scale.setScalar(rimScale || 1.05);
   group.add(rim);
-  var edges = new EdgesGeometry(geo, 30);
+  var edges = new EdgesGeometry(geo, 40);
   group.add(new LineSegments(edges, materials.edge));
   group.add(new LineSegments(edges, materials.edgeHalo));
   return { mesh: mesh, edges: edges };

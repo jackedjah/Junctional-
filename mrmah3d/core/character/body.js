@@ -30,7 +30,7 @@ function lit(group, geo, materials, opts) {
     if (o.rimOffset) rim.position.copy(o.rimOffset);
     group.add(rim);
   }
-  var edges = new EdgesGeometry(geo, o.edgeAngle || 34);
+  var edges = new EdgesGeometry(geo, o.edgeAngle || 44);
   group.add(new LineSegments(edges, materials.edge));
   group.add(new LineSegments(edges, materials.edgeHalo));
   return { mesh: mesh, edges: edges };

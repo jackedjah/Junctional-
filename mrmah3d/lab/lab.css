@@ -113,8 +113,8 @@ html[data-canonical="1"] .lab-stage:where(*) {
   color: rgb(240, 160, 160);
 }
 
-.lab-controls, .lab-sizes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.lab-sizes span { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .5; }
+.lab-controls, .lab-sizes, .lab-modes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lab-sizes span, .lab-modes span { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .5; }
 
 button {
   appearance: none;

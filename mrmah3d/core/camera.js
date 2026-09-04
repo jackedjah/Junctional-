@@ -28,6 +28,7 @@
    Do not "tidy" these into round numbers. They are the composition. */
 
 import { PerspectiveCamera, Vector3, MathUtils } from '../vendor/three/three.module.min.js';
+import { solveFraming, getMode } from './composition.js';
 
 export var LEGACY_STAGE = { fov: 55, pitchDeg: 26, distance: 7.2, targetY: 1.05 };
 
@@ -50,10 +51,42 @@ export function createCamera(options) {
   var camera = new PerspectiveCamera(framing.fov, framing.referenceAspect, framing.near, framing.far);
   var target = new Vector3(0, framing.targetY, 0);
 
+  /* Page-mode composition. When a mode is set the camera is SOLVED from its
+     intent at the host's real aspect ratio (see composition.js) rather than
+     using the fixed reference numbers, so the same scene composes correctly
+     in a 620px chat stage and a 320px landscape one. */
+  var mode = null;
+  var characterHeight = opts.characterHeight || 3.0;
+  var floatHeight = opts.floatHeight == null ? 0.16 : opts.floatHeight;
+  var lastAspect = framing.referenceAspect;
+
   function place() {
+    if (mode) { applyMode(lastAspect); return; }
     camera.position.set(0, framing.cameraY, framing.distance);
     target.set(0, framing.targetY, 0);
     camera.lookAt(target);
+  }
+
+  function applyMode(aspect) {
+    var solved = solveFraming(mode, aspect, characterHeight, floatHeight);
+    camera.fov = solved.fov;
+    camera.position.copy(solved.position);
+    target.copy(solved.target);
+    camera.lookAt(target);
+    camera.updateProjectionMatrix();
+    return solved;
+  }
+
+  function setMode(name) {
+    mode = name ? getMode(name) : null;
+    place();
+    return mode;
+  }
+
+  function setCharacter(height, float) {
+    characterHeight = height || characterHeight;
+    if (float != null) floatHeight = float;
+    place();
   }
 
   /* Portrait phones are much narrower than the reference frame; a fixed
@@ -67,6 +100,12 @@ export function createCamera(options) {
     var h = Math.max(1, Number(height) || 1);
     var aspect = w / h;
     camera.aspect = aspect;
+    lastAspect = aspect;
+
+    /* A mode re-solves itself at the new aspect: its intent is "he spans 30%
+       of the height, at 28% across", and that stays true on any shape of
+       stage. The legacy path below is only for the fixed reference framing. */
+    if (mode) { applyMode(aspect); return camera.fov; }
 
     if (aspect < framing.referenceAspect) {
       var refV = MathUtils.degToRad(framing.fov);
@@ -111,6 +150,9 @@ export function createCamera(options) {
     place: place,
     setViewport: setViewport,
     setDistance: setDistance,
-    frameCharacter: frameCharacter
+    frameCharacter: frameCharacter,
+    setMode: setMode,
+    setCharacter: setCharacter,
+    getMode: function () { return mode; }
   };
 }

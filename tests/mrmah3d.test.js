@@ -21,6 +21,10 @@ const exists = p => fs.existsSync(R(p));
    or a sentence using the word "face-on", is not an import or a facial feature. */
 const code = p => read(p).replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
 
+/* Read once, up here: the environment section below derives the grid's
+   clearance from the composition modes, so `comp` must exist before it. */
+const comp = read('mrmah3d/core/composition.js');
+
 let pass = 0, fail = 0;
 function ok(id, cond, detail) {
   if (cond) { pass++; console.log('PASS  ' + id); }
@@ -148,9 +152,20 @@ ok('ENV-grid-pushed-in-front-of-camera', /centerZ:\s*-\d/.test(env));
 const gridSize = Number((env.match(/size:\s*(\d+)/) || [])[1]);
 const gridDiv = Number((env.match(/divisions:\s*(\d+)/) || [])[1]);
 const centerZ = Number((env.match(/centerZ:\s*(-?\d+)/) || [])[1]);
-const camZ = Math.cos(26 * Math.PI / 180) * 7.2;
-ok('ENV-grid-near-edge-in-front-of-camera', centerZ + gridSize / 2 < camZ,
-  'grid near edge z=' + (centerZ + gridSize / 2).toFixed(2) + ' vs camera z=' + camZ.toFixed(2));
+/* The nearest camera across every composition mode, derived from the modes
+   themselves rather than from a constant that goes stale the moment a preset
+   changes. */
+var nearestCamZ = Infinity;
+comp.replace(/\{[^{}]*fov:\s*([\d.]+)[^{}]*heightFrac:\s*([\d.]+)[^{}]*azimuthDeg:\s*(-?[\d.]+)/g,
+  function (_, fov, hf, az) {
+    var d = 3.0 / (2 * Math.tan(Number(fov) * Math.PI / 360) * Number(hf));
+    var z = Math.cos(Number(az) * Math.PI / 180) * d;
+    if (z < nearestCamZ) nearestCamZ = z;
+    return _;
+  });
+ok('ENV-grid-near-edge-in-front-of-camera', centerZ + gridSize / 2 < nearestCamZ - 2,
+  'grid near edge z=' + (centerZ + gridSize / 2).toFixed(2) +
+  ' vs nearest mode camera z=' + nearestCamZ.toFixed(2));
 ok('ENV-grid-cell-plausible', gridSize / gridDiv > 1 && gridSize / gridDiv < 2,
   'cell ' + (gridSize / gridDiv).toFixed(3) + ' units');
 ok('ENV-grid-clear-of-shadow-plane', /y:\s*0\.0[2-9]/.test(env));
@@ -160,7 +175,7 @@ ok('ENV-glowing-grid-nodes', /grid-nodes/.test(env));
 ok('ENV-floor-glow', /floor-glow/.test(env));
 ok('ENV-background-structures', /structures/.test(env));
 ok('ENV-particles', /motes/.test(env));
-ok('ENV-world-stays-quiet', /Mr\.Mah is the only bright, detailed thing/.test(env));
+ok('ENV-world-stays-quiet', /Mr\.Mah\s+is\s+the\s+only\s+bright,\s+detailed\s+thing/.test(env));
 
 /* ---- F. the real character, built from the reference ------------------ */
 const mrmah = read('mrmah3d/core/character/mrmah.js');
@@ -234,6 +249,42 @@ ok('STATE-no-page-coupling',
   !/mahfitt|mygym|protocol|aiChat/i.test(code('mrmah3d/core/character/states.js')),
   'the renderer must not know which surface is driving it');
 ok('STATE-exposed-on-scene-api', /setState:/.test(read('mrmah3d/core/mrmah-scene.js')));
+
+/* ---- F5. page-aware composition --------------------------------------- */
+ok('COMP-module-exists', exists('mrmah3d/core/composition.js'));
+['showcase', 'chat', 'protocol', 'portrait'].forEach(function (m) {
+  ok('COMP-mode-' + m, new RegExp('\\b' + m + ':\\s*\\{').test(comp));
+});
+/* The camera is solved from intent, not hardcoded per page. */
+ok('COMP-solver', /export function solveFraming/.test(comp));
+ok('COMP-intent-fields', /heightFrac/.test(comp) && /screenX/.test(comp) && /azimuthDeg/.test(comp));
+ok('COMP-cites-real-stage-layout', /fabi-response-anchor/.test(comp) && /bottom:68px/.test(comp));
+/* In-app modes must keep him low and off-centre, or the response diamond
+   (large, centred, near the top of the real stage) lands on his face. */
+const chatBlock = (comp.match(/chat:\s*\{[\s\S]*?\},\s*\n\n/) || [''])[0];
+const protoBlock = (comp.match(/protocol:\s*\{[\s\S]*?\},\s*\n\n/) || [''])[0];
+[['chat', chatBlock], ['protocol', protoBlock]].forEach(function (p) {
+  const sx = Number((p[1].match(/screenX:\s*([\d.]+)/) || [])[1]);
+  const sy = Number((p[1].match(/screenY:\s*([\d.]+)/) || [])[1]);
+  const hf = Number((p[1].match(/heightFrac:\s*([\d.]+)/) || [])[1]);
+  const az = Number((p[1].match(/azimuthDeg:\s*([\d.]+)/) || [])[1]);
+  ok('COMP-' + p[0] + '-off-centre', sx < 0.45, 'screenX ' + sx);
+  ok('COMP-' + p[0] + '-low-in-frame', sy > 0.55, 'screenY ' + sy);
+  ok('COMP-' + p[0] + '-leaves-room-for-ui', hf < 0.45, 'heightFrac ' + hf);
+  ok('COMP-' + p[0] + '-not-dead-front', az > 0, 'azimuth ' + az + ' — a scene, not a portrait');
+});
+ok('COMP-scene-exposes-setMode', /setMode: setMode/.test(read('mrmah3d/core/mrmah-scene.js')));
+ok('COMP-camera-resolves-on-resize', /if \(mode\) \{ applyMode\(aspect\)/.test(read('mrmah3d/core/camera.js')));
+
+/* ---- F6. the world is a layered place, and it is quiet ----------------- */
+ok('WORLD-horizon-band', /horizon/.test(env));
+ok('WORLD-horizon-is-fogged', /fog MUST be on/.test(env),
+  'an unfogged horizon punches a lit wall through the haze');
+ok('WORLD-glow-follows-character', /followCharacter/.test(env));
+ok('WORLD-shadow-catcher-is-small', /new PlaneGeometry\(9, 9\)/.test(env),
+  'a floor-sized catcher paints a dark band outside the shadow camera');
+ok('WORLD-per-mode-emphasis', /applyMode/.test(env));
+ok('WORLD-fog-is-per-mode', /setFog/.test(read('mrmah3d/core/stage.js')));
 
 /* ---- F4. tap and drag are distinguishable ----------------------------- */
 const inter = read('mrmah3d/core/interaction.js');

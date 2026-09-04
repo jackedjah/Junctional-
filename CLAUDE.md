@@ -109,7 +109,7 @@ is explicitly widened later.
   in order to install it.
 - Nothing in `mrmah3d/core/` may reach into the document. It receives a host
   element and confines itself to it. This is enforced by
-  `tests/mrmah3d-phase1.test.js`.
+  `tests/mrmah3d.test.js`.
 
 ---
 
@@ -165,6 +165,7 @@ must not be claimed from headless runs.
 | --- | --- |
 | `mrmah3d/core/mrmah-scene.js` | the one public entry point |
 | `mrmah3d/core/` | scene, renderer, camera, lights, environment, interaction, quality, lifecycle, palette |
+| `mrmah3d/core/composition.js` | page modes and the camera solver |
 | `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
@@ -188,9 +189,52 @@ node tools/mrmah3d-verify.mjs http://127.0.0.1:8123
 
 ## 9. Driving the character from a page
 
-Page logic asks for a STATE; the renderer decides what the body does. The
-renderer knows nothing about AI Chat or MAH Protocol, and it must stay that way
-— that is what lets one character serve every surface.
+A surface declares two things and nothing else: **where it is** (the mode) and
+**what is happening** (the state).
+
+```js
+const mah = createMrMahScene(el, { mode: 'chat' });
+mah.setMode('protocol');    // showcase chat protocol portrait
+mah.setState('thinking');
+```
+
+### Composition modes
+
+`mrmah3d/core/composition.js` owns them. A mode is **compositional intent** —
+how much of the frame he fills, where in frame he sits, from what angle, how
+much world is behind him — and the camera is **solved** from that intent at
+whatever aspect the host element happens to be. There is no hardcoded camera
+per page; a hardcoded one is correct for exactly one viewport.
+
+The in-app modes are shaped by the real shipped stage, not by taste. In
+`mygym.css` the character is a small element anchored `bottom:68px` at
+`characterX .18` while `.fabi-response-anchor` is a `clamp(318px,37vw,392px)`
+diamond centred at `top:14px`. So **every in-app mode keeps him low and
+off-centre and leaves the upper-centre clear** for the DOM UI that will sit in
+front of the canvas. A centred hero render cannot host that layout.
+
+| Mode | For | He fills | Sits at | Angle |
+| --- | --- | --- | --- | --- |
+| `showcase` | evaluating him against the reference | 67% | centre | dead front |
+| `chat` | AI Chat — a presence beside the conversation | 30% | 28% across, 60% down | 22° |
+| `protocol` | MAH Protocol — he is presenting | 36% | 34% across, 61% down | 14° |
+| `portrait` | a Home card or coach avatar | 52% | near centre | 28° |
+
+`showcase` is **not** an app composition and must not be used as one.
+
+Each mode also carries its world emphasis (grid, nodes, structures, motes,
+glow, fog) and a resting state, so switching mode changes the whole scene
+coherently rather than only moving a camera.
+
+**These are verified, not asserted.** `tools/mrmah3d-verify.mjs` renders every
+mode into a real 620px chat stage and measures where he actually lands against
+the intent. Both the horizontal and the vertical placement were silently
+mirrored at one point and only that measurement caught it.
+
+### Behaviour states
+
+The renderer knows nothing about AI Chat or MAH Protocol, and it must stay that
+way — that is what lets one character serve every surface.
 
 ```js
 mah.setState('thinking');   // idle listening thinking explaining

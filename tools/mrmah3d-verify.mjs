@@ -376,6 +376,21 @@ for (const v of VIEWPORTS) {
       const s = m.createMrMahScene(host, { tier, preserveDrawingBuffer: true });
       window.__MRMAH_LAB.scene = s;
       await new Promise(r => setTimeout(r, 350));
+      /* Hide the world before counting shadow pixels. The heuristic looks for
+         dark semi-transparent pixels, and the environment's additive haze and
+         horizon glow land in exactly that range — with the world visible it
+         reported "shadows" on a tier that has them switched off. */
+      s.parts.stage.world.visible = false;
+      /* ...but keep the shadow catcher, which lives in the world group and is
+         the only surface his shadow can fall on. Hiding it too reports zero
+         shadow on every tier. */
+      s.parts.environment.ground.visible = true;
+      s.parts.environment.group.visible = true;
+      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon'].forEach(function (k) {
+        if (s.parts.environment[k]) s.parts.environment[k].visible = false;
+      });
+      s.parts.stage.world.visible = true;
+      s.renderer.render(s.scene, s.camera);
       const c = s.canvas, g = document.createElement('canvas');
       g.width = c.width; g.height = c.height;
       const cx = g.getContext('2d'); cx.drawImage(c, 0, 0);
@@ -386,6 +401,9 @@ for (const v of VIEWPORTS) {
         if (a > 20 && a < 160 && (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) < 14) shadowPx++;
       }
       const info = s.info();
+      ['grid', 'nodes', 'glow', 'structures', 'motes', 'horizon'].forEach(function (k) {
+        if (s.parts.environment[k]) s.parts.environment[k].visible = true;
+      });
       out.push({
         tier: info.tier, dpr: info.pixelRatio,
         shadows: s.renderer.shadowMap.enabled,
@@ -488,6 +506,91 @@ for (const v of VIEWPORTS) {
   check('STATE-02 no errors driving states', errs.length === 0, errs.join(' | '));
 
   writeFileSync(join(OUT, 'stage-canonical.png'), await page.locator('.lab-stage').screenshot());
+  await ctx.close();
+}
+
+/* ---------------------------------------- 9. page composition modes ------ */
+{
+  /* A real AI Chat stage: 393px phone, 620px tall stage. Each mode declares
+     where Mr.Mah should sit and how big he should be; this measures where he
+     ACTUALLY lands. Without it the presets are just numbers in a file — and
+     the horizontal and vertical placement were each silently mirrored at one
+     point, which only a measurement caught. */
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 900 }, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  const errs = [];
+  page.on('pageerror', e => errs.push(String(e)));
+  page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
+  await page.goto(URL_LAB, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__MRMAH_LAB && window.__MRMAH_LAB.mounted, { timeout: 20000 });
+  await page.evaluate(() => { document.querySelector('.lab-stage').style.height = '620px'; });
+  await page.waitForTimeout(300);
+
+  const modes = await page.evaluate(async () => {
+    const s = window.__MRMAH_LAB.scene;
+    const M = await import('/mrmah3d/core/composition.js');
+    s.setReducedMotion(true);
+    const out = [];
+    for (const name of s.modes) {
+      s.setMode(name);
+      await new Promise(r => setTimeout(r, 420));
+      const world = s.parts.stage.world;
+      world.visible = false;
+      s.renderer.render(s.scene, s.camera);
+      const c = s.canvas, g = document.createElement('canvas');
+      g.width = c.width; g.height = c.height;
+      const x = g.getContext('2d', { willReadFrequently: true });
+      x.drawImage(c, 0, 0);
+      const d = x.getImageData(0, 0, g.width, g.height).data;
+      let minX = 1e9, maxX = -1, minY = 1e9, maxY = -1;
+      for (let i = 0; i < g.width * g.height; i++) {
+        if (d[i * 4 + 3] <= 170) continue;
+        const px = i % g.width, py = (i - px) / g.width;
+        if (px < minX) minX = px; if (px > maxX) maxX = px;
+        if (py < minY) minY = py; if (py > maxY) maxY = py;
+      }
+      world.visible = true;
+      s.renderer.render(s.scene, s.camera);
+      const want = M.MODES[name];
+      out.push({
+        name,
+        gotX: ((minX + maxX) / 2) / g.width, wantX: want.screenX,
+        gotY: ((minY + maxY) / 2) / g.height, wantY: want.screenY,
+        gotH: (maxY - minY) / g.height, wantH: want.heightFrac,
+        state: s.getState(), wantState: want.state,
+        onScreen: minX >= 0 && maxX < g.width && minY >= 0 && maxY < g.height
+      });
+    }
+    s.setMode('showcase');
+    return out;
+  });
+
+  modes.forEach(m => {
+    /* X tolerance is looser than Y: the raised arm makes his alpha bounding
+       box asymmetric, so its centre sits right of his body axis. */
+    check(`MODE-${m.name} horizontal placement`, Math.abs(m.gotX - m.wantX) <= 0.055,
+      `${m.gotX.toFixed(3)} vs intent ${m.wantX}`);
+    check(`MODE-${m.name} vertical placement`, Math.abs(m.gotY - m.wantY) <= 0.045,
+      `${m.gotY.toFixed(3)} vs intent ${m.wantY}`);
+    check(`MODE-${m.name} scale in frame`, Math.abs(m.gotH - m.wantH) <= 0.045,
+      `${m.gotH.toFixed(3)} vs intent ${m.wantH}`);
+    check(`MODE-${m.name} fully in frame`, m.onScreen);
+    check(`MODE-${m.name} sets its resting state`, m.state === m.wantState, m.state);
+  });
+  /* The in-app modes must leave the upper-centre clear for the DOM UI that
+     sits in front of them — the response diamond is large and centred there. */
+  modes.filter(m => m.name === 'chat' || m.name === 'protocol').forEach(m => {
+    check(`MODE-${m.name} leaves the upper-centre free for UI`,
+      m.gotY - m.gotH / 2 > 0.40 && m.gotX < 0.45,
+      `head at ${(m.gotY - m.gotH / 2).toFixed(2)} down, centre ${m.gotX.toFixed(2)} across`);
+  });
+  check('MODE-00 no errors switching modes', errs.length === 0, errs.slice(0, 3).join(' | '));
+
+  for (const name of ['showcase', 'chat', 'protocol', 'portrait']) {
+    await page.evaluate(n => window.__MRMAH_LAB.scene.setMode(n), name);
+    await page.waitForTimeout(500);
+    writeFileSync(join(OUT, `mode-${name}.png`), await page.locator('.lab-stage').screenshot());
+  }
   await ctx.close();
 }
 

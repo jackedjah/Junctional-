@@ -76,10 +76,17 @@ export function createCrystalMaterials(options) {
      against the dark body regardless of where the lights are; this is
      illumination, not a surface. Thin by construction: it is drawn from the
      geometry's own edges, so it can never drift off the form. */
+  /* Opacity is well under 1 on purpose. At full strength every plane break on
+     the model draws a bright line of equal weight, and the character reads as
+     a wireframe cage with dark fill rather than as a lit solid — which was the
+     standing note after the last pass. The edges are a highlight ON the
+     crystal, not the crystal's outline. Selectivity is enforced twice: here by
+     value, and in the geometry by only extracting edges above a large
+     dihedral angle. */
   var edge = new LineBasicMaterial({
     color: new Color(tint.edge || PALETTE.edge),
     transparent: true,
-    opacity: 0.95,
+    opacity: 0.62,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -97,7 +104,7 @@ export function createCrystalMaterials(options) {
   var edgeHalo = new LineBasicMaterial({
     color: new Color(tint.edge || PALETTE.edge),
     transparent: true,
-    opacity: 0.30,
+    opacity: 0.16,
     blending: AdditiveBlending,
     depthWrite: false,
     depthTest: true,
@@ -131,7 +138,11 @@ export function createCrystalMaterials(options) {
     color: new Color(tint.edge || PALETTE.edge),
     side: BackSide,
     transparent: true,
-    opacity: 0.14,
+    /* Raised as the edge lines came down. The lit contour still has to close
+       the silhouette against the void; with dimmer edges the rim shell is now
+       doing most of that job, which is the right owner for it — it follows the
+       real surface curvature instead of drawing every polygon boundary. */
+    opacity: 0.22,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false

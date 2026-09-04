@@ -53,10 +53,19 @@ One entry point. Everything else is internal.
 import { createMrMahScene, isSupported } from '/mrmah3d/core/mrmah-scene.js';
 
 if (!isSupported()) return;            // fall back to the 2.5D rig
-const mah = createMrMahScene(hostElement);
+
+const mah = createMrMahScene(hostElement, { mode: 'chat' });
+mah.setState('thinking');              // idle listening thinking explaining
+                                       // success concerned
+mah.setMode('protocol');               // re-composes the whole scene
+
 // ... later, on unmount — this is not optional:
 mah.destroy();
 ```
+
+A surface declares WHERE it is (`mode`) and WHAT IS HAPPENING (`state`). It
+never positions a camera. See `../CLAUDE.md` §9 for what each mode is for and
+why the in-app ones keep him low and off-centre.
 
 `createMrMahScene(host, options)` takes the element it should fill and confines
 itself to it. Useful options: `tier` (`'low' | 'medium' | 'high'`, otherwise
@@ -79,6 +88,7 @@ core/
   renderer.js      WebGLRenderer, canvas, buffer size, context lifetime
   stage.js         Scene + fog; 'world' and 'subject' roots
   camera.js        PerspectiveCamera + responsive framing
+  composition.js   page modes; solves a camera from compositional intent
   lights.js        key / fill / rim / hemi / ambient
   environment.js   shadow-catching ground + perspective grid
   character.js     the character seam (swap point for a loaded model)
@@ -100,7 +110,11 @@ link or add a package manager for it.
 
 ## Two decisions worth not re-deriving
 
-**The camera framing is solved, not chosen.** It reproduces the reference's
+**The in-app camera is solved from intent, not chosen.** See `composition.js`
+and `../CLAUDE.md` §9: a mode says how big he is and where he sits, and the
+camera follows at any aspect ratio.
+
+**The showcase framing reproduces the reference.** It
 composition: the character fills 67.0% of frame height, his apex sits 15.0%
 down, and the horizon sits 59.8% down. Those three constraints give a 32° FOV
 at distance 7.81 with the camera at Y 1.15 pitched **up** 3.22° — up, because a
@@ -112,12 +126,13 @@ The 2.5D stage's own framing (`perspective(470px) rotateX(64deg)` → 55° FOV,
 but it is not the reference's framing and is no longer the default.
 
 **The floor grid is deliberately pushed in front of the camera.** A grid
-centred on the origin spans z = +20..−20 while the camera sits at z ≈ +6.5, so
-every line running along Z straddles the near plane. Measured in
-ANGLE/SwiftShader, such segments are dropped outright — the floor rendered as
-horizontal bands with no converging lines and read as a flat backdrop. Sizing
-the grid to the visible region fixes it on every rasteriser and draws less
-geometry. Do not re-centre it on the origin.
+centred on the origin straddles the near plane, and measured in
+ANGLE/SwiftShader such line segments are dropped outright — the floor rendered
+as horizontal bands with no converging lines and read as a flat backdrop. The
+grid's near edge is therefore kept well in front of the closest camera any mode
+produces, with margin; `tests/mrmah3d.test.js` derives that clearance from the
+modes themselves so a new preset cannot quietly break it. Do not re-centre it
+on the origin.
 
 ---
 
