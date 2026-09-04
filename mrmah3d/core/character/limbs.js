@@ -182,7 +182,15 @@ function buildArm(materials, spec, options) {
        Ten sides rather than eight so the bicep and tricep lobes each land on
        their own pair of facets instead of sharing one. */
     { depthRatio: 1.12, crystal: 0.075, steps: 7,
-      profile: ARMS.profiles.upper, shape: ARMS.shapes.upper, lift: ARMS.classLift }
+      profile: ARMS.profiles.upper, shape: ARMS.shapes.upper, lift: ARMS.classLift,
+      /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
+         its own by the bicep belly, for the same reason the cap ramps into the
+         torso — a limb that starts at a different value from the thing it
+         emerges from reads as a separate object stuck to it. */
+      hero: function (t) {
+        var k = Math.min(1, t / 0.45);
+        return ARMS.deltoidLift + (ARMS.classLift - ARMS.deltoidLift) * k * k * (3 - 2 * k);
+      } }
   );
   var upper = clad(shoulderJoint, upperGeo, materials, 1.05);
   owned.push(upperGeo, upper.edges, upper.minorEdges);

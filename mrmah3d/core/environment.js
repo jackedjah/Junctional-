@@ -279,6 +279,56 @@ export function createEnvironment(options) {
   glowGroup.add(disc);
   owned.push(disc.geometry, discMat, glowTex);
 
+  /* ---- R91: THE PRESENCE FIELD ------------------------------------------
+
+     The brief's problem is that he is a dark object on a dark ground and the
+     two share too much value, so he reads as a silhouette rather than as
+     something occupying space. The obvious answer — an outline glow — is the
+     wrong one: it draws a line around him, which flattens a solid into a
+     sticker, and it is what the edge tiers already spent several passes
+     learning not to do.
+
+     A presence field works the other way round. It is a soft body of light
+     standing BEHIND him in the air, brightest around his own emissions, with
+     no edge of its own anywhere. He separates because the ground immediately
+     behind him is lifted, not because he is traced. Read in a still frame it is
+     barely there; read in motion it is what makes the space around him feel
+     charged rather than empty.
+
+     Three vertical cards rather than one, at three depths and three sizes:
+
+       torso   large, dimmest, well behind him — the general lift
+       chest   mid, centred on the emblem — the emblem's light in the air
+       head    small, tightest, brightest — around the eyes and smile
+
+     They live in glowGroup, so they track him when he is dragged. They face the
+     camera's general direction rather than billboarding per frame: every mode's
+     azimuth is within 28 degrees of front, and a soft radial gradient at these
+     opacities is indistinguishable across that range for the cost of nothing.
+
+     Their lower edges stop well above the floor. A field that reached the
+     ground would sit over the rows where the grid's convergence is read, which
+     is the constraint that governs every transparent layer in this scene. */
+  var auraTex = radialTexture(128, 0.34);
+  var auraCards = [];
+  [
+    { w: 2.95, h: 3.45, y: 1.42, z: -0.42, o: 0.185 },
+    { w: 1.70, h: 1.80, y: 1.86, z: -0.20, o: 0.235 },
+    { w: 1.25, h: 1.25, y: 2.62, z: -0.16, o: 0.310 }
+  ].forEach(function (a, i) {
+    var m = new MeshBasicMaterial({
+      map: auraTex, color: cyan, transparent: true, opacity: a.o,
+      blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: false
+    });
+    var q = new Mesh(new PlaneGeometry(a.w, a.h), m);
+    q.position.set(0, a.y, a.z);
+    q.renderOrder = -1;
+    glowGroup.add(q);
+    auraCards.push({ mesh: q, base: a.o, phase: i * 1.9 });
+    owned.push(q.geometry, m);
+  });
+  owned.push(auraTex);
+
   var starMat = new MeshBasicMaterial({
     map: glowTex, color: new Color(0xcdf5ff), transparent: true, opacity: 0.5,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false
@@ -722,6 +772,15 @@ export function createEnvironment(options) {
 
     /* Each band drifts at its own rate and wraps, so the parallax between them
        never settles into a repeating pattern the eye can lock onto. */
+    /* The field breathes with him rather than sitting at a constant value — a
+       static glow reads as a lens artifact, one that moves reads as something
+       the character is doing. Each card on its own slow period so the three
+       never pulse together. */
+    auraCards.forEach(function (a) {
+      a.mesh.material.opacity = a.base * glowPulse *
+        (0.82 + 0.18 * Math.sin(time * 0.44 + a.phase));
+    });
+
     cloudBands.forEach(function (b) {
       b.base += dt * b.speed;
       if (b.base > b.span) b.base -= b.span * 2;
@@ -764,6 +823,11 @@ export function createEnvironment(options) {
     pillars.visible = st > 0.05;
     stars.visible = st > 0.05;
     starMat.opacity = 0.55 * st;
+    /* The presence field follows the glow weight, so a mode that wants a quiet
+       character gets a quiet field with him. */
+    var gw = w.glow == null ? 1 : w.glow;
+    auraCards.forEach(function (a) { a.mesh.visible = gw > 0.05; });
+
     clouds.visible = ha > 0.03;
     /* R90: reads the band's OWN authored opacity instead of a literal.
 

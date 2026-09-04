@@ -64,13 +64,36 @@ import { BufferGeometry, Float32BufferAttribute } from '../../vendor/three/three
    the black class, and the black class itself goes deeper. The silver class is
    left alone: rarity is what makes a catch read as a catch, and widening it
    would turn the sparkle into a sheen. */
+/* R91 — SEVEN CLASSES, and the middle of the table is where they went.
+
+   Five classes weighted 50% black gives a body that is black plus a scatter of
+   catches, and in a still frame that is defensible — it is close to what the
+   references show. In MOTION it is not, and that is the difference this pass
+   exists to close: a facet rotating out of a catch has nowhere to land except
+   black, so the body does not turn in light, it BLINKS. Every plane is either
+   an event or nothing, and the transitions between them carry no information.
+
+   Motion needs somewhere to travel THROUGH, which means a populated middle. So
+   the black share comes down from 50% to 34% and the space it vacates goes into
+   two new intermediate tiers — a dark navy and a brighter steel-blue — rather
+   than into more catches. The bright end actually gets RARER (cyan 0.07 -> 0.05,
+   silver 0.07 -> 0.04), because the brief asks for shine to be deliberate: a
+   catch reads as a catch in proportion to how much suppressed surface surrounds
+   it, and thinning the top while filling the middle sharpens the hierarchy at
+   both ends at once.
+
+   The order matters — the table accumulates from black upward and `lift` and
+   the area bias both index into it — so the tiers run monotonically from
+   swallowed to mirror. */
 var FACET_CLASSES = [
   /* w,    rough,  metal,  dark,  tint */
-  [0.50,   0.14,  -0.36,   1.00,  0.00],   /* black    */
-  [0.24,   0.08,  -0.18,   0.74,  0.03],   /* charcoal */
+  [0.34,   0.14,  -0.36,   1.00,  0.00],   /* black    — the anchor */
+  [0.22,   0.08,  -0.18,   0.74,  0.03],   /* charcoal */
+  [0.16,   0.05,  -0.06,   0.50,  0.12],   /* navy     — new */
   [0.12,   0.02,   0.04,   0.34,  0.26],   /* deep     */
-  [0.07,  -0.04,   0.18,  -0.06,  1.00],   /* cyan     */
-  [0.07,  -0.06,   0.34,  -0.82,  0.20]    /* silver   */
+  [0.07,  -0.02,   0.14,   0.10,  0.55],   /* steel    — new */
+  [0.05,  -0.04,   0.18,  -0.06,  1.00],   /* cyan     */
+  [0.04,  -0.06,   0.34,  -0.82,  0.20]    /* silver   — rarer, and hotter for it */
 ];
 
 /* Five classes give five values, and five values across a few hundred facets is
@@ -464,7 +487,19 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
       facet: (k % 2 ? -1 : 1) * 0.03 * taper,
       shape: opts.shape ? (function (tt, fa, fn) {
         return function (a) { return fn(tt, a - fa); };
-      }(t, frontAngle, opts.shape)) : undefined
+      }(t, frontAngle, opts.shape)) : undefined,
+      /* A LIFT RAMP ALONG THE LIMB — how a part stops looking bolted on.
+
+         `opts.lift` is one value for a whole solid, so a deltoid at 0.40 meeting
+         a torso at 0.14 puts a hard value step exactly at the seam between them,
+         and the eye reads a step in value as a boundary between OBJECTS however
+         well the geometry interpenetrates. That is most of the "arms attached
+         afterward" impression: not the shape of the join, the value of it.
+
+         `opts.hero(t)` lets a limb start at its neighbour's value and arrive at
+         its own, so the transition happens across the form instead of at the
+         seam. */
+      hero: opts.hero ? opts.hero(t) : undefined
     });
   }
 

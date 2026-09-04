@@ -204,8 +204,69 @@ export function createMrMahScene(host, options) {
 
   /* ---- frame ---------------------------------------------------------- */
 
+  /* R91 — THE KEY LIGHT DRIFTS, and it is the second half of motion readability.
+
+     Making the body turn is one way to move a surface through light; moving the
+     light is the other, and they compose. A drifting key means the shading
+     changes even in the instants when the body is at the end of its own sweep
+     and momentarily still — so there is no moment at which he flattens into a
+     picture.
+
+     It runs at periods incommensurable with the body's drift, so the pair never
+     settles into a beat, and it is small: the azimuth ratio here maps to about
+     +/-0.3 radians of light position. Held to a slow rate for the same reason
+     the body's is slow — a fast-moving key reads as a disco, a slow one reads
+     as a world with weather in it.
+
+     `onYaw` also writes this channel during a drag; the drag term is added on
+     top rather than replacing it, so the two do not fight over one value. */
+  var lightDriftT = 0;
+  var dragKeyAzimuth = 0;
+
   function renderFrame(dt) {
     if (contextLost || rendererBox.isDisposed()) return;
+    if (!reducedMotion) {
+      lightDriftT += dt;
+      lightsBox.setKeyAzimuth(dragKeyAzimuth +
+        Math.sin(lightDriftT * 0.107) * 0.34 +
+        Math.sin(lightDriftT * 0.223 + 1.1) * 0.16);
+      /* AND THE ENVIRONMENT TURNS TOO — the strongest of the three levers.
+
+         This material is reflection-dominated: metalness 0.55 against an
+         envMapIntensity of 27, so what a facet returns is overwhelmingly what
+         it sees in the environment map, and moving a directional light around
+         it barely registers (measured: the key drift above bought 0.2 points of
+         shading drift on its own). Rotating the environment moves EVERY facet's
+         reflection at once, for the cost of one uniform.
+
+         It has to be the MATERIAL's rotation, not the scene's. Setting
+         `scene.environmentRotation` measured as an exact no-op (3.44% before,
+         3.43% after) because these materials carry an explicit `envMap` — which
+         is what makes envMapIntensity work at all here — and an explicit map
+         ignores the scene-level rotation entirely. `material.envMapRotation` is
+         the channel that reaches it.
+
+         RATE, chosen by measurement. Shading drift against the R90 baseline of
+         3.05%: 0.02 rad/s bought nothing (3.43%), 0.10 gave 4.37%, 0.22 gave
+         5.08%, and a deliberately absurd 1.2 gave 4.49% — the curve turns over
+         because at that speed consecutive samples are decorrelated rather than
+         sweeping. 0.17 sits in the productive part of it.
+
+         It can afford to be this brisk because the environment map is NEVER
+         DRAWN: the scene background stays transparent and the map exists only
+         to be reflected. So rotating it produces no spinning room, only
+         reflections that slide — which is exactly the "moving highlights" the
+         brief asks for, at the cost of one uniform.
+
+         A slow oscillation rides on top of the constant term so the sweep is
+         not perfectly linear, and it runs against the body's own drift so the
+         two never cancel: when he turns one way the reflections slide the other
+         and the relative sweep is the sum. */
+      if (characterBox.setEnvRotation) {
+        characterBox.setEnvRotation(
+          lightDriftT * 0.17 + Math.sin(lightDriftT * 0.071) * 0.30);
+      }
+    }
     characterBox.update(dt, { reducedMotion: reducedMotion });
     /* Keep the pool of floor light under him — including while he is being
        dragged. This is the main thing that stops him reading as pasted on. */
@@ -250,7 +311,7 @@ export function createMrMahScene(host, options) {
       characterBox.setYaw(y);
       /* Keep the key light swinging with the subject the way the 2.5D rig's
          midpoint calculator does — horizontal only, never vertical. */
-      lightsBox.setKeyAzimuth(Math.sin(y) * 0.5);
+      dragKeyAzimuth = Math.sin(y) * 0.5;
       /* Repaint immediately so a drag stays responsive even while the loop is
          paused (reduced motion, or off-screen with a pointer still captured). */
       if (!loop.isRunning()) renderFrame(0);

@@ -99,6 +99,30 @@ export function createMrMah(options) {
     float.position.x = Math.sin(time * 0.41) * 0.012 * v.sway;
     float.rotation.z = Math.sin(time * 0.37) * 0.010 * v.sway;
 
+    /* R91 — THE BODY TURNS. This is the largest single fix for "he reads as a
+       still image in motion", and it is a fact about the rig rather than about
+       the lighting.
+
+       Idle used to rotate the HEAD by 0.045 rad and the torso by 0.34 of that
+       — 0.9 degrees. Nothing in any material can read at 0.9 degrees: measured
+       over the full idle sweep the character's pixels moved 2.18 luma per step
+       and 82% never left the value band they started in. He was, correctly, a
+       still image with a bobbing translation applied.
+
+       The whole body now drifts about its own vertical axis. Two incommensurable
+       periods so the pair never repeats inside any time a viewer will watch, and
+       slow enough (roughly a 40-second beat) that it registers as presence
+       rather than as animation — but wide enough that facets genuinely sweep
+       through the environment's ramps and the volume reads.
+
+       It sits on `float`, not on `rig`: `setYaw` owns rig.rotation.y for drag,
+       and the two must not fight over one channel. */
+    float.rotation.y = (Math.sin(time * 0.155) * 0.112 +
+                        Math.sin(time * 0.082 + 2.3) * 0.052) * v.sway;
+    /* A trace of pitch, so the drift is not confined to one plane and the chest
+       and shoulder tops change relationship to the light as well as the sides. */
+    float.rotation.x = Math.sin(time * 0.121 + 0.8) * 0.024 * v.sway;
+
     /* Head: a small independent drift plus the state's tilt. */
     head.group.rotation.x = rest.headRotX + v.headTilt * 0.5 + Math.sin(time * 0.63) * 0.028 * v.sway;
     head.group.rotation.z = rest.headRotZ + Math.sin(time * 0.48) * 0.022 * v.sway;
@@ -184,6 +208,13 @@ export function createMrMah(options) {
     states: states,
     height: HEIGHT,
 
+    /* R91: the scene drives this so the crystal's reflections sweep even when
+       the body is momentarily still. See the note at renderFrame. */
+    setEnvRotation: function (y) {
+      var r = Number(y) || 0;
+      if (materials.body.envMapRotation) materials.body.envMapRotation.y = r;
+      if (materials.cavity && materials.cavity.envMapRotation) materials.cavity.envMapRotation.y = r;
+    },
     setYaw: setYaw,
     getYaw: getYaw,
     setState: states.set,

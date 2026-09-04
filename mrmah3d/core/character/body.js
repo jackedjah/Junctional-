@@ -309,10 +309,29 @@ export function buildBody(materials) {
     var geo = segment(
       inner, outer,
       deltoidR0, deltoidR1, 8,
-      { depthRatio: 1.0, crystal: 0.058, steps: 6, lift: ARMS.deltoidLift,
-        profile: deltoidProfile }
+      { depthRatio: 1.0, crystal: 0.058, steps: 8, lift: ARMS.deltoidLift,
+        profile: deltoidProfile,
+        /* R91 — THE VALUE STEP AT THE SEAM IS WHAT READS AS "BOLTED ON".
+
+           The deltoid carried one lift (0.40) and the torso another (0.14), so
+           there was a hard jump in optical class exactly where the two solids
+           meet. Geometry alone could not fix that: the shapes already
+           interpenetrate correctly, and the eye still read two objects, because
+           a step in VALUE at a boundary is what an object boundary looks like.
+
+           The cap now starts at the torso's own weighting where it is buried in
+           the chest and arrives at the arm's by the time it reaches the joint,
+           so the transition happens across the form rather than at the seam.
+           Two more steps along its length so the ramp has rings to land on. */
+        hero: function (t) {
+          var k = Math.min(1, t / 0.62);
+          return TORSO.classLift + (ARMS.deltoidLift - TORSO.classLift) * k * k * (3 - 2 * k);
+        } }
     );
-    var parts = lit(group, geo, materials, { rimScale: 1.03, quiet: true, minorAngle: 30 });
+    /* minorAngle up from 30 to 44: the secondary tier was outlining the cap's
+       own ring seams, which draws a boundary at exactly the place the value ramp
+       above exists to dissolve. */
+    var parts = lit(group, geo, materials, { rimScale: 1.03, quiet: true, minorAngle: 44 });
     owned.push(geo, parts.edges, parts.minorEdges, parts.heroEdges);
     deltoidGeos.push(geo);
 

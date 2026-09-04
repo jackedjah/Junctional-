@@ -236,6 +236,43 @@ function buildEnvironment(renderer, palette) {
     { x: 148, y: 92, w: 64, h: 34, fill: 'rgba(118,156,184,0.20)' },
     { x: 28, y: 96, w: 58, h: 32, fill: 'rgba(110,148,178,0.18)' }
   ];
+  /* R91 — ANGULAR STRUCTURE, so a turning facet has something to travel THROUGH.
+
+     A first attempt put a wide soft halo around every card. It measured as a
+     failure in the most instructive way: the share of the character above 140
+     luma went from 10-12% to 22-25% — it brightened him by half again — while
+     the frame-to-frame shading drift did not move at all (3.05% to 3.23%). A
+     broad soft halo is a bigger sky, not a travel path. It has a LOW angular
+     gradient by construction, which is the opposite of what motion needs.
+
+     What motion needs is many moderate features at many azimuths. A facet
+     reflects its mirror direction, so a 5-degree body rotation sweeps the
+     reflection about 10 degrees, i.e. roughly 7 px across this 256-wide map.
+     Features on that scale mean a facet is always crossing something: it climbs
+     a strip, crests, falls, and climbs the next one, continuously, instead of
+     sitting in black until it happens to hit a hot card.
+
+     So: soft vertical striations across the horizon band, dim enough that they
+     barely register in a still frame and structured enough that they carry the
+     motion. Deterministic — the same bars every mount, never Math.random(). */
+  var STRIPES = 13;
+  for (var sIdx = 0; sIdx < STRIPES; sIdx++) {
+    var sx = (sIdx + 0.5) * (256 / STRIPES);
+    /* deterministic per-stripe variation so the ring is not a regular comb */
+    var wob = Math.sin(sIdx * 12.9898) * 43758.5453;
+    wob = wob - Math.floor(wob);
+    var sw = 9 + wob * 9;
+    var sa = 0.135 + wob * 0.185;
+    var sy = 30 + wob * 18;
+    var sh = 52 + wob * 28;
+    var grad2 = g.createLinearGradient(sx - sw, 0, sx + sw, 0);
+    grad2.addColorStop(0, 'rgba(0,0,0,0)');
+    grad2.addColorStop(0.5, 'rgba(172,212,236,' + sa.toFixed(3) + ')');
+    grad2.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = grad2;
+    g.fillRect(sx - sw, sy, sw * 2, sh);
+  }
+
   cards.forEach(function (c2) {
     var grd = g.createRadialGradient(
       c2.x + c2.w / 2, c2.y + c2.h / 2, 0,
