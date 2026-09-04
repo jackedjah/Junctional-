@@ -134,7 +134,23 @@ export function applyCrystalShader(material, options) {
     uCoreLight: { value: new Vector3(0, opts.coreY == null ? 1.58 : opts.coreY, 0.0) },
     uCoreStrength: { value: opts.coreStrength == null ? 0.0 : opts.coreStrength },
     uCoreRange: { value: opts.coreRange == null ? 0.62 : opts.coreRange },
-    uCoreTop: { value: opts.coreTop == null ? 2.02 : opts.coreTop }
+    uCoreTop: { value: opts.coreTop == null ? 2.02 : opts.coreTop },
+    /* R98 — THE PLATINUM COAT. A second material blended over the crystal by
+       the per-polygon `aCoat` mask (forge.js) and the facet's own class: a
+       near-neutral platinum albedo, higher metalness, tighter roughness and no
+       absorption. It is deliberately NOT chrome — metalness stops short of 1
+       so a coated plane facing the key still shows a pale diffuse steel rather
+       than only what it can mirror, which is the difference between a plated
+       solid and a hollow reflection. Only the lit classes take it (a black
+       facet stays a lost plane whatever region it is in), and planes that face
+       up and out take more than planes that face down, which is where a coat
+       lit by a moon would read. `uCoat` is the global strength; `uCoatColor`
+       stays neutral under every theme ("the platinum remains neutral"). */
+    uCoat: { value: opts.coat == null ? 0.0 : opts.coat },
+    uCoatColor: { value: new Color(opts.coatColor == null ? 0xbfc8d6 : opts.coatColor) },
+    uCoatMetal: { value: opts.coatMetal == null ? 0.66 : opts.coatMetal },
+    uCoatRough: { value: opts.coatRough == null ? 0.05 : opts.coatRough },
+    uCoatEnv: { value: opts.coatEnv == null ? 0.55 : opts.coatEnv }
   };
 
   material.onBeforeCompile = function (shader) {
@@ -155,7 +171,9 @@ export function applyCrystalShader(material, options) {
         'varying vec3 vObjPos;',
         'varying vec3 vObjN;',
         'attribute float aInner;',
-        'varying float vInner;'
+        'varying float vInner;',
+        'attribute float aCoat;',
+        'varying float vCoat;'
       ].join('\n'))
       .replace('#include <begin_vertex>', [
         '#include <begin_vertex>',
@@ -166,7 +184,18 @@ export function applyCrystalShader(material, options) {
         /* the mesh's own space, for the internal light */
         'vObjPos = position;',
         'vObjN = normal;',
-        'vInner = aInner;'
+        'vInner = aInner;',
+        /* R98 — the coat's exposure term is settled here, where the view-space
+           normal is cheap: planes facing up and outward take more of the coat
+           than planes facing down, which is where a plated solid lit by a moon
+           reads platinum. (The fragment's `normal` is not known yet where the
+           colour, roughness and metalness are decided, so it cannot be done
+           there.) View space is close enough to world: the camera pitches only
+           a few degrees. */
+        '{',
+        '  vec3 mrVN = normalize( normalMatrix * normal );',
+        '  vCoat = aCoat * ( 0.55 + 0.45 * clamp( mrVN.y * 0.9 + abs( mrVN.x ) * 0.45 + 0.35, 0.0, 1.0 ) );',
+        '}'
       ].join('\n'));
 
     /* ---- fragment: modulate the material per facet ---------------------- */
@@ -197,7 +226,15 @@ export function applyCrystalShader(material, options) {
         'varying vec4 vBary;',
         'varying vec3 vObjPos;',
         'varying vec3 vObjN;',
-        'varying float vInner;'
+        'varying float vInner;',
+        'varying float vCoat;',
+        'uniform float uCoat;',
+        'uniform vec3 uCoatColor;',
+        'uniform float uCoatMetal;',
+        'uniform float uCoatRough;',
+        'uniform float uCoatEnv;',
+        /* the coat weight of this fragment, settled once the normal is known */
+        'float mrCoatW = 0.0;'
       ].join('\n'))
 
       /* THE MICRO-BEVEL. See the long note in forge.js.
@@ -266,6 +303,12 @@ export function applyCrystalShader(material, options) {
       .replace('#include <color_fragment>', [
         '#include <color_fragment>',
         '#ifdef MRMAH_CRYSTAL',
+        /* R98 — the coat's weight: the polygon's mask (already carrying the
+           exposure term from the vertex stage), times a class gate that keeps
+           the coat off the dark rows — a black facet is a lost plane whatever
+           region it is in. Decided here because this runs before roughness,
+           metalness and lighting. */
+        '  mrCoatW = clamp( vCoat * uCoat, 0.0, 1.0 ) * ( 1.0 - smoothstep( 0.0, 0.36, clamp( vFacet.z, 0.0, 1.0 ) ) );',
         '  float mrDark = clamp( vFacet.z * uVariation, -0.5, 1.0 );',
         /* The tinted end of the mix is no longer amplified. Multiplying the
            crystal's own colour by the cyan AND boosting it meant the chromatic
@@ -286,6 +329,10 @@ export function applyCrystalShader(material, options) {
            with envMapIntensity 14 the brightest catches were sitting right on
            the clip point with nowhere left to roll off. */
         '  diffuseColor.rgb *= 1.0 + max( -mrDark, 0.0 ) * 1.38;',
+        /* R98 — the platinum albedo. A coated plane's colour is the coat's,
+           carrying a trace of the crystal's own value underneath so a coated
+           silver catch stays brighter than a coated sapphire plane. */
+        '  diffuseColor.rgb = mix( diffuseColor.rgb, uCoatColor * ( 0.80 + 0.20 * dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) * 2.0 ), mrCoatW );',
         '#endif'
       ].join('\n'))
 
@@ -296,14 +343,24 @@ export function applyCrystalShader(material, options) {
         '#include <roughnessmap_fragment>',
         '#ifdef MRMAH_CRYSTAL',
         '  roughnessFactor = clamp( roughnessFactor + vFacet.x * uVariation, 0.02, 1.0 );',
+        '  roughnessFactor = mix( roughnessFactor, uCoatRough, mrCoatW );',
         '#endif'
       ].join('\n'))
       .replace('#include <metalnessmap_fragment>', [
         '#include <metalnessmap_fragment>',
         '#ifdef MRMAH_CRYSTAL',
         '  metalnessFactor = clamp( metalnessFactor + vFacet.y * uVariation, 0.0, 1.0 );',
+        '  metalnessFactor = mix( metalnessFactor, uCoatMetal, mrCoatW );',
         '#endif'
       ].join('\n'))
+      /* R98 — a coated plane reflects the environment at its own intensity.
+         The body's envMapIntensity is tuned for a dark crystal against a
+         near-black room with hot cards, where a metal plane either catches or
+         misses; scaled down on the coat, the platinum reads by its pale
+         diffuse under the key and keeps its catches as accents rather than as
+         blown panels. */
+      .replace('radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );',
+               'radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness ) * mix( 1.0, uCoatEnv, mrCoatW );')
 
       /* Fresnel, applied after lighting.
 
@@ -332,7 +389,7 @@ export function applyCrystalShader(material, options) {
            transmits nothing, so it must not be darkened at all. Applying one
            absorption to every facet crushed the whole front of the body and
            lost the bright catches entirely. */
-        '    float mrAbsorb = uInnerDark * clamp( vFacet.z, 0.0, 1.0 );',
+        '    float mrAbsorb = uInnerDark * clamp( vFacet.z, 0.0, 1.0 ) * ( 1.0 - mrCoatW );',
         '    outgoingLight *= mix( 1.0 - mrAbsorb * ( 1.0 - mrF ), 1.0, 0.10 );',
         '    outgoingLight += outgoingLight * mrF * uFresnelBoost;',
         /* A FLAT cyan add was the last thing keeping the body blue.
@@ -362,7 +419,10 @@ export function applyCrystalShader(material, options) {
            keeps the add chromatic however grazing the pixel, and the wider lobe
            (uFresnelPower 2.6 -> 2.0, set in materials) spreads it. */
         '    float mrRim = 1.0 - exp( -1.6 * mrF );',
-        '    outgoingLight += uTint * mrRim * 0.50 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
+        /* R98: on a coated plane the grazing add goes silver-blue rather than
+           cyan — a platinum rim catches the moon, a crystal rim its own energy. */
+        '    vec3 mrRimColor = mix( uTint, uCoatColor * 1.15, mrCoatW * 0.70 );',
+        '    outgoingLight += mrRimColor * mrRim * 0.50 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
         /* R94 — the internal light. See the uniform note above. */
         '    if ( uInnerStrength > 0.0 && vInner > 0.5 ) {',
         '      vec3 mrN = normalize( vObjN );',

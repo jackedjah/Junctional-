@@ -35,7 +35,10 @@ export function buildHead(materials) {
     innerZ: HEAD.innerZ,
     faceZ: HEAD.faceZ,
     backApexZ: HEAD.backApexZ,
+    backInset: HEAD.backInset,
     relief: HEAD.relief,
+    /* R98 — the platinum coat on the head's chamfer bands (regions.js) */
+    coat: REGIONS.HEAD_SHELL.coat,
     /* The head takes a lighter share of the optical lottery than the body —
        see `lift` in forge.js. Without it the shell rendered essentially black
        and every bit of its apparent value was the linework drawn over it. */
@@ -74,7 +77,10 @@ export function buildHead(materials) {
      stretches lost entirely into darkness. Dropping this pass is what lets the
      shell read as mass rather than as an outlined shape. */
   var heroEdges = new EdgesGeometry(geo, 72);   /* kept for disposal parity */
-  var edges = new EdgesGeometry(geo, 58);
+  /* R98: the chamfer meets the side band at ~53 degrees and the lip at ~37;
+     the threshold sits between them so the silhouette break and the lip draw
+     and the two chamfer bands' own seam does not. */
+  var edges = new EdgesGeometry(geo, 44);
   var line = new LineSegments(edges, materials.edge);
   line.name = 'head-edges';
   group.add(line);

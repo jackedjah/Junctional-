@@ -91,7 +91,7 @@ function femaleProportions() {
       shape: S.chestShape(0.55), hero: 0.40, zoneAt: S.pecZone(1) },
     /* the shoulder line, narrower, with the same collar */
     { y: 2.170, w: 0.236, d: 0.180, facet: 0.0055, crystal: 0.0300, crystalY: 0.0060,
-      shape: S.clavicleShape(1.0), dip: 0.030, hero: 0.46, zoneAt: null },
+      shape: S.clavicleShape(1.0), dip: 0.030, hero: 0.46, zoneAt: null, coat: 0.30 },   /* R98: the shelf takes a reduced platinum share, as the male's does */
     /* the neck — the same column, a touch slimmer */
     { y: 2.205, w: 0.190, d: 0.140, facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
       shape: S.clavicleShape(0.55), hero: 0.16, classesAt: neck },

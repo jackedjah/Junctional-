@@ -194,7 +194,7 @@ export function createBloom(options) {
   /* Halo: the sharp silhouette mask and its wide blur, both at quarter area. */
   var rtMask = target(1, 1);
   var rtHalo = target(1, 1);
-  var haloStrength = opts.halo == null ? 1.05 : opts.halo;
+  var haloStrength = opts.halo == null ? 1.30 : opts.halo;   /* R98: 1.05 -> 1.30, the aura */
   var haloColor = new Color(opts.haloColor == null ? 0x3a9cff : opts.haloColor);
   /* A flat, unlit, unfogged material for the mask pass. */
   var maskMat = new MeshBasicMaterial({ color: 0xffffff, fog: false });
@@ -283,7 +283,10 @@ export function createBloom(options) {
     scene.fog = prevFog;
 
     var src = rtMask;
-    var radii = [1.4, 3.0, 5.5];
+    /* R98: a wider last round — the aura reads as a soft field around him
+       (the brief's "half-strength Kaioken"), not a thin fringe. Still gated
+       outside the sharp mask, so nothing inside the outline changes. */
+    var radii = [1.4, 3.2, 7.0];
     for (var i = 0; i < radii.length; i++) {
       blurMat.uniforms.tDiffuse.value = src.texture;
       blurMat.uniforms.uDir.value.set(radii[i] / bw, 0);

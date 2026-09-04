@@ -145,7 +145,11 @@ var HEADS = {
   diamond: { hw: 0.105, hh: 0.095, hd: 0.075, sides: 4 },
   wide:    { hw: 0.135, hh: 0.082, hd: 0.075, sides: 4 },
   tall:    { hw: 0.088, hh: 0.118, hd: 0.070, sides: 4 },
-  round:   { hw: 0.098, hh: 0.098, hd: 0.090, sides: 8, rings: 2 }
+  round:   { hw: 0.098, hh: 0.098, hd: 0.090, sides: 8, rings: 2 },
+  /* R98 — a SQUARE head (brief: "circular heads, square heads, diamond
+     heads"): four sides turned a quarter so a flat face points forward, and
+     vertical sides between a flat top and bottom rather than two points. */
+  square:  { hw: 0.092, hh: 0.088, hd: 0.080, sides: 4, box: true }
 };
 
 /* THE CAST. x/z in world units, s the height as a fraction of his, yaw in
@@ -164,7 +168,8 @@ var HEADS = {
    and head type still represented, read as a few distant others. */
 var CAST = [
   { x: 2.0, z: -18.8, s: 0.50, yaw: 0.25, body: 'athletic', head: 'diamond' },
-  { x: 3.9, z: -17.6, s: 0.44, yaw: -0.35, body: 'heavy', head: 'wide' },
+  /* R98: a square head among them (brief §9.5: circular, square, diamond) */
+  { x: 3.9, z: -17.6, s: 0.44, yaw: -0.35, body: 'heavy', head: 'square' },
   { x: 5.6, z: -20.2, s: 0.40, yaw: 0.40, body: 'thin', head: 'tall' },
   { x: 1.1, z: -21.4, s: 0.34, yaw: 0.05, body: 'taper', head: 'diamond' },
   /* The one on his left. Measured to the frame: in showcase the obese one
@@ -245,7 +250,17 @@ function buildFigure(spec, acc, eyes) {
   /* Head: a diamond (4 sides, point-equator-point) or a faceted ball. */
   var hy = neckY + head.hh * h * 0.9;
   var headRings;
-  if (head.rings) {
+  if (head.box) {
+    /* a cube: the loft's ring radius is measured to a corner, so the
+       half-width is scaled by root two to keep the FACE at hw */
+    var cw = head.hw * h * Math.SQRT2, cd = head.hd * h * Math.SQRT2;
+    headRings = [
+      { y: hy - head.hh * h, w: cw * 0.92, d: cd * 0.92 },
+      { y: hy - head.hh * h * 0.55, w: cw, d: cd },
+      { y: hy + head.hh * h * 0.55, w: cw, d: cd },
+      { y: hy + head.hh * h, w: cw * 0.92, d: cd * 0.92 }
+    ];
+  } else if (head.rings) {
     headRings = [
       { y: hy - head.hh * h, w: 0.004, d: 0.004 },
       { y: hy - head.hh * h * 0.5, w: head.hw * h * 0.82, d: head.hd * h * 0.82 },
@@ -260,7 +275,9 @@ function buildFigure(spec, acc, eyes) {
       { y: hy + head.hh * h, w: 0.004, d: 0.004 }
     ];
   }
-  var headGeo = loft(headRings, head.sides, { phase: 0, capTop: false, capBottom: false });
+  var headGeo = loft(headRings, head.sides, head.box
+    ? { phase: Math.PI / 4, capTop: true, capBottom: true }
+    : { phase: 0, capTop: false, capBottom: false });
   bake(headGeo.geometry, place, new Vector3(0, hy, 0), h, acc, rnd, TONE.headRimFloor);
 
   /* Eyes: two lit points on the front of the head, in world space. Held a

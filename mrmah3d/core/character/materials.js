@@ -70,6 +70,10 @@ export var PALETTE = {
   /* R97: a step deeper again — the R97 references' backs are 76% under 32
      luma and their chests 64%; this build had reached 44% and 30%. */
   crystalDeep: 0x1c2a52, /* the darkest facets — deep navy */
+  /* R98 — the platinum coat's albedo: a cool near-neutral silver, a touch
+     blue so it reads as platinum under a moon rather than as chrome. Never
+     theme-derived (see crystal-shader.js). */
+  platinum: 0xc4ccd8,
   /* R94 — the head's ice family: a pale steel-blue albedo, a deep that is
      still blue rather than black, and a whiter tint for its catches. */
   headCrystal: 0x7d9fc6,
@@ -193,7 +197,12 @@ export function createCrystalMaterials(options) {
     roughness: 0.20,
     metalness: 0.58,
     envMapIntensity: 1.1,
-    flatShading: true
+    flatShading: true,
+    /* R98 — the screen is not pitch black: a faint deep-blue self-light so
+       the plate reads as a powered display the eyes and smile are drawn ON,
+       embedded in the shell, rather than a hole. Far below the features. */
+    emissive: new Color(PALETTE.faceGlow || 0x0a1c30),
+    emissiveIntensity: 0.55
   });
 
   /* CAVITY WALL — the inside of the face recess.
@@ -466,7 +475,16 @@ export function createCrystalMaterials(options) {
     coreTop: 2.08,
     innerHalfWidth: 0.36,
     /* R96: the internal light is theme energy (palette.js) */
-    innerColor: tint.inner || 0x4a9cff
+    innerColor: tint.inner || 0x4a9cff,
+    /* R98 — THE PLATINUM COAT (crystal-shader.js), at full strength: the
+       per-region map in regions.js and the zone functions decide WHERE, this
+       only says the coat exists. Neutral colour on purpose — the platinum
+       never takes the theme; the theme lives in what emits and what catches. */
+    coat: 1.0,
+    coatColor: PALETTE.platinum,
+    coatMetal: 0.66,
+    coatRough: 0.05,
+    coatEnv: 0.55
   });
 
   /* R94 — THE HEAD HAS ITS OWN MATERIAL, and it is ICE.
@@ -504,7 +522,15 @@ export function createCrystalMaterials(options) {
     innerDark: 0.42,
     fresnelBoost: 0.90,
     fresnelPower: 3.0,
-    dome: 0.30
+    dome: 0.30,
+    /* R98 — the head's chamfer band is platinum too (the bright frame around
+       the black face in the platinum references). The head's own environment
+       intensity is already low, so the coat keeps most of its reflection. */
+    coat: 1.0,
+    coatColor: PALETTE.platinum,
+    coatMetal: 0.60,
+    coatRough: 0.06,
+    coatEnv: 0.85
   });
 
   /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */

@@ -635,5 +635,51 @@ if (exists('CLAUDE.md')) {
   ok('R96-lab-declares-canonical-blue', /--bright-rgb:\s*79,\s*227,\s*255/.test(read('mrmah3d/lab/lab.css')));
 })();
 
+/* ---- R98: platinum coat, plate head, elbow hinge, hand lamp, square head -- */
+(function () {
+  const forge = read('mrmah3d/core/character/forge.js');
+  const shader = read('mrmah3d/core/character/crystal-shader.js');
+  const regions = read('mrmah3d/core/character/regions.js');
+  const propsSrc = read('mrmah3d/core/character/proportions.js');
+  const limbs = read('mrmah3d/core/character/limbs.js');
+  const mats = read('mrmah3d/core/character/materials.js');
+  const figures = read('mrmah3d/core/figures.js');
+  ok('R98-platinum-references-present',
+    exists('reference/mrmah-refH-platinum-front.png') && exists('reference/mrmah-refH-platinum-threequarter.png'));
+  /* the coat is a per-polygon mask in the geometry, not a global tint */
+  ok('R98-coat-is-a-geometry-mask', /'aCoat'/.test(forge) && /faceCoat/.test(forge) && /quadCoat/.test(forge));
+  ok('R98-coat-in-shader', /uCoat\b/.test(shader) && /mrCoatW/.test(shader) && /uCoatColor/.test(shader));
+  /* the coat's weight is settled before roughness / metalness are decided */
+  const colorAt = shader.indexOf('mrCoatW = clamp( vCoat * uCoat');
+  const roughAt = shader.indexOf('roughnessFactor = mix( roughnessFactor, uCoatRough');
+  ok('R98-coat-weight-decided-before-roughness', colorAt > 0 && roughAt > colorAt);
+  /* dark rows never take the coat */
+  ok('R98-coat-gated-off-dark-classes', /mrCoatW = clamp\( vCoat \* uCoat, 0\.0, 1\.0 \) \* \( 1\.0 - smoothstep/.test(shader));
+  /* every region carries its share, and the recesses carry none */
+  ok('R98-regions-carry-coat-shares', /STERNUM:\s*\{[^}]*coat:\s*0\.00/.test(regions) && /DELT:\s*\{[^}]*coat:\s*1\.00/.test(regions) &&
+    /HAND:\s*\{[^}]*coat:\s*0\.[0-2]/.test(regions));
+  /* the coat is neutral, never theme energy */
+  ok('R98-coat-colour-is-neutral', /platinum:\s*0x[0-9a-f]{6}/i.test(mats) && /coatColor:\s*PALETTE\.platinum/.test(mats) &&
+    !/coatColor:\s*tint\./.test(mats));
+  /* the head is a chamfered PLATE with a flat back and a wide face screen */
+  const bevelZ = Number((propsSrc.match(/bevelZ:\s*([\d.]+)/) || [])[1]);
+  const faceInset = Number((propsSrc.match(/faceInset:\s*([\d.]+)/) || [])[1]);
+  ok('R98-head-front-is-a-shallow-chamfer', bevelZ > 0 && bevelZ <= 0.5, 'bevelZ ' + bevelZ + ' of halfDepth (was 0.96: a wall)');
+  ok('R98-head-face-screen-is-wide', faceInset >= 0.64, 'faceInset ' + faceInset);
+  ok('R98-head-has-a-flat-back-plate', /backInset:\s*0\.[5-9]/.test(propsSrc) && /backInset/.test(forge) && /backInset: HEAD\.backInset/.test(read('mrmah3d/core/character/head.js')));
+  ok('R98-face-screen-self-lit', /emissive: new Color\(PALETTE\.faceGlow \|\| 0x[0-9a-f]{6}\)/i.test(mats));
+  /* the elbow is a hinge: a lateral pin in the joint material */
+  ok('R98-elbow-hinge-pin', /elbow-pin/.test(limbs) && /lateral/.test(limbs));
+  /* the hand crystal lights the hand, and rides the glow */
+  ok('R98-hand-crystal-lamp', /hand-crystal-lamp/.test(limbs) && /PointLight/.test(limbs) &&
+    /limbs\.handLamp\.intensity/.test(read('mrmah3d/core/character/mrmah.js')));
+  /* the forearm and upper arm have real profiles: brachialis, extensor, a taper into the elbow */
+  ok('R98-arm-anatomy-profiles', /brachialis/.test(propsSrc) && /extensor/.test(propsSrc) && /ulna/.test(propsSrc));
+  /* the background cast carries a square head among the diamonds and the round one */
+  ok('R98-figures-include-a-square-head', /square:\s*\{[^}]*box: true/.test(figures) && /head: 'square'/.test(figures));
+  /* the female variant carries the same reduced clavicle share as the male */
+  ok('R98-variant-clavicle-carries-coat', /coat: 0\.30/.test(read('mrmah3d/core/character/variants.js')));
+})();
+
 console.log('\n' + pass + '/' + (pass + fail) + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

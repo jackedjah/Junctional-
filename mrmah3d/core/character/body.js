@@ -132,7 +132,10 @@ export function buildBody(materials, P) {
      shape with this many real breaks, no threshold makes them rare. The
      structural and secondary tiers describe the form perfectly well without it. */
   var torsoLoft = loft(TORSO_.rings, TORSO_.sides || 8,
-    { capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true });
+    { capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true,
+      /* R98 — the body's default platinum share; the ring table and the zone
+         functions in proportions.js refine it per plane. */
+      coat: REGIONS.BODY.coat });
   /* edgeAngle 42, down from the 52 default. With the ring table thinned and the
      crystal relief raised to compensate, the torso's structural breaks are real
      but not extreme — at 52 almost none of them qualified and the front of the
@@ -309,7 +312,9 @@ export function buildBody(materials, P) {
     /* R97: a bigger, rounder DOME — ten sides, a fuller belly, a higher and
        wider axis — the references' deltoid is the largest single mass on the
        upper body and it rounds over the top of the bicep. */
-    var D = ARMS_.deltoid || { innerX: 0.300, innerY: 2.050, outerX: 0.585, outerY: 1.960, r0: 0.240 };
+    /* R98: a shade more cap (r0 0.240 -> 0.252) — "slightly more jacked" —
+       and the belly below goes with it. */
+    var D = ARMS_.deltoid || { innerX: 0.300, innerY: 2.050, outerX: 0.590, outerY: 1.960, r0: 0.252 };
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;
@@ -336,7 +341,7 @@ export function buildBody(materials, P) {
       var endT = Math.max(0, (t - 0.75) / 0.25);
       var end = 1 - 0.55 * endT * endT * (3 - 2 * endT);
       return (0.28 + 0.72 * root * root * (3 - 2 * root)) * end *
-             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.34);
+             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.37);
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -366,9 +371,18 @@ export function buildBody(materials, P) {
         },
         zoneAt: function (d, t) {
           var ad = Math.abs(d);
-          if (ad < 0.75) return { classes: REGIONS.DELT.classes, seed: 110, index: 3 };
-          if (ad < 1.95) return { classes: REGIONS.DELT.classes, seed: 111 + (d > 0 ? 1 : 0), index: 2 };
-          return { classes: REGIONS.DELT.classes, seed: 113, index: 1 };
+          /* R98: the front delt and the crest are the strongest platinum
+             planes on the body; the rear delt keeps more of the crystal. */
+          if (ad < 0.75) return { classes: REGIONS.DELT.classes, seed: 110, index: 3, coat: 0.90 };
+          if (ad < 1.95) return { classes: REGIONS.DELT.classes, seed: 111 + (d > 0 ? 1 : 0), index: 2, coat: 1.0 };
+          return { classes: REGIONS.DELT.classes, seed: 113, index: 1, coat: 0.45 };
+        },
+        /* R98: the coat ramps in with the value — a cap that is platinum at
+           the seam and sapphire chest under it is bolted on; it starts where
+           the deltoid emerges from the chest and is full by the joint. */
+        coatAt: function (t) {
+          var k = Math.min(1, t / 0.55);
+          return REGIONS.DELT.coat * (0.35 + 0.65 * k * k * (3 - 2 * k));
         },
         /* R91 — THE VALUE STEP AT THE SEAM IS WHAT READS AS "BOLTED ON".
 

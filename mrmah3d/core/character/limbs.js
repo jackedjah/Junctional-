@@ -12,7 +12,7 @@
    small bright tip diamond the reference shows above it. */
 
 import {
-  Group, Mesh, EdgesGeometry, LineSegments, Vector3
+  Group, Mesh, EdgesGeometry, LineSegments, Vector3, PointLight
 } from '../../vendor/three/three.module.min.js';
 import { segment, diamondPlate, facetedGeometry, mergeGeometries } from './forge.js';
 import { ARMS, HAND } from './proportions.js';
@@ -35,11 +35,16 @@ function armZone(table) {
        of every arm was drawn from the two darkest rows. The flanks now reach
        further round and the rear takes sapphire; only the last 50 degrees of
        the tricep side stay lost. */
-    if (ad < 0.60) return { classes: table, seed: 70, index: 3 };           /* the bicep / flexor plane: steel-blue */
-    if (ad < 1.50) return { classes: table, seed: 71 + (d > 0 ? 1 : 0), index: 2 };   /* flanks: sapphire */
-    if (ad < 2.30) return { classes: table, seed: 73 + (d > 0 ? 1 : 0), index: 2 };   /* toward the back: sapphire too */
-    if (ad < 2.75) return { classes: table, seed: 74, index: 1 };           /* navy */
-    return { classes: table, seed: 75, index: 0 };                         /* the tricep side: lost */
+    /* R98: the platinum coat follows the same map — full on the bicep ridge
+       and the outer flank, less toward the back, none on the lost tricep side
+       and the inner arm (the flank facing the ribcage is the same angle as
+       the outer one here; the shader's exposure term, which favours planes
+       facing outward, is what keeps the inner arm darker). */
+    if (ad < 0.60) return { classes: table, seed: 70, index: 3, coat: 1.0 };           /* the bicep / flexor plane: steel-blue */
+    if (ad < 1.50) return { classes: table, seed: 71 + (d > 0 ? 1 : 0), index: 2, coat: 0.55 };   /* flanks: sapphire */
+    if (ad < 2.30) return { classes: table, seed: 73 + (d > 0 ? 1 : 0), index: 2, coat: 0.35 };   /* toward the back: sapphire too */
+    if (ad < 2.75) return { classes: table, seed: 74, index: 1, coat: 0.15 };          /* navy */
+    return { classes: table, seed: 75, index: 0, coat: 0.0 };                         /* the tricep side: lost */
   };
 }
 
@@ -124,7 +129,7 @@ function palmGeometry(dir, spec) {
     if (f.length <= 4) { tris.push(f); return; }
     for (var i = 1; i < f.length - 1; i++) tris.push([f[0], f[i], f[i + 1]]);
   });
-  return facetedGeometry(P, tris, null, { lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+  return facetedGeometry(P, tris, null, { lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
 }
 
 /* One finger: two segments with a knuckle between them, so a curl is a bend
@@ -139,9 +144,9 @@ function buildDigit(hand, materials, spec, base, dirX, len, radius, curl, edges)
   var a2 = curl * 1.75;
   var tip = [mid[0] + dirX * l2 * 0.6, mid[1] + Math.cos(a2) * l2, mid[2] + Math.sin(a2) * l2];
   var g1 = segment(base, mid, radius, radius * 0.92, 6,
-    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
   var g2 = segment(mid, tip, radius * 0.92, radius * 0.66, 6,
-    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
   /* The segments are returned, not clad: the hand merges every part into ONE
      geometry (see buildHand) so a hand costs three draws, not thirty. */
   return [g1, g2];
@@ -211,7 +216,7 @@ function buildHand(materials, spec, options) {
     ? [thumbBase[0] - thumbLen * 0.72, thumbBase[1] + thumbLen * 0.62, thumbBase[2] + thumbLen * 0.28]
     : [thumbBase[0] - thumbLen * 0.20, thumbBase[1] + thumbLen * 0.70, thumbBase[2] + thumbLen * 0.55];
   var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 6,
-    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
   parts.push(thumbGeo);
   var handGeo = mergeGeometries(parts);
   var handParts = clad(hand, handGeo, materials, 0, HAND_EDGES);
@@ -227,6 +232,25 @@ function buildHand(materials, spec, options) {
     tipGlow.position.copy(tip2.position);
     hand.add(tipGlow);
     owned.push(tipGeo, tipGlow.geometry);
+
+    /* R98 — THE HAND CRYSTAL LIGHTS THE HAND. An emissive plate lights
+       nothing (CLAUDE.md, "emissive materials light nothing"), so the
+       fingers cupping the crystal stayed exactly as dark as the fingers of
+       the other hand and the crystal read as a sticker floating over them.
+       A short-range point light parented to the hand travels with it through
+       every pose and reaches only the fingertips and the back of the hand —
+       at 0.42 units the forearm below the wrist takes a tenth of it and the
+       head, 0.5 away, nothing. Its colour is the emitter's own, i.e. theme
+       energy. Stood a little in front of the plate so it does not draw itself
+       on the fingers as a hot dot. */
+    if (opts.lamp !== false && typeof opts.makeLamp === 'function') {
+      var lamp = opts.makeLamp();
+      if (lamp) {
+        lamp.position.set(tip2.position.x, tip2.position.y - spec.digitLength * 0.20, tip2.position.z + 0.10);
+        lamp.name = 'hand-crystal-lamp';
+        hand.add(lamp);
+      }
+    }
   }
 
   return { group: hand, dispose: function () { owned.forEach(function (g) { if (g && g.dispose) g.dispose(); }); } };
@@ -276,6 +300,7 @@ function buildArm(materials, spec, options) {
     { depthRatio: 1.12, crystal: 0.045, steps: 5,
       profile: ARMS_.profiles.upper, shape: ARMS_.shapes.upper, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes),
+      coat: REGIONS.UPPER_ARM.coat,
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
          its own by the bicep belly, for the same reason the cap ramps into the
          torso — a limb that starts at a different value from the thing it
@@ -298,9 +323,12 @@ function buildArm(materials, spec, options) {
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
     spec.foreRadius, spec.wristRadius, 8,
-    { depthRatio: 1.04, crystal: 0.040, steps: 4,
+    /* R98: five steps so the extensor belly just under the elbow has a ring
+       to peak on and the taper into the wrist has two to fall through. */
+    { depthRatio: 1.06, crystal: 0.040, steps: 5,
       profile: ARMS_.profiles.fore, shape: ARMS_.shapes.fore, lift: ARMS_.classLift,
-      classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes) }
+      classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes),
+      coat: REGIONS.FOREARM.coat }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 0);
   owned.push(foreGeo, fore.edges, fore.minorEdges);
@@ -319,6 +347,31 @@ function buildArm(materials, spec, options) {
   elbowJoint.add(elbowKnob);
   owned.push(elbowGeo);
 
+  /* R98 — THE HINGE. A knuckle ring alone is a bend in a pipe; an elbow is
+     a hinge, and the platinum references draw it as one: a steel pin across
+     the joint whose two bosses show on the outer and inner elbow. The pin
+     lies along the arm's LATERAL axis (the upper arm's direction crossed with
+     forward), which is the axis a forearm actually swings about, and it is
+     long enough to stand a little proud of the arm's tube on both sides so a
+     boss reads from the front and from the three-quarter. Same gunmetal as
+     the knuckle, no edge lines. */
+  var upDir = elbow.clone().sub(shoulder).normalize();
+  var lateral = new Vector3(0, 0, 1).cross(upDir);
+  if (lateral.lengthSq() < 1e-6) lateral.set(1, 0, 0);
+  lateral.normalize();
+  var pinHalf = eR * 1.14, pinR = eR * 0.42;
+  var pinGeo = segment(
+    lateral.clone().multiplyScalar(-pinHalf).toArray(),
+    lateral.clone().multiplyScalar(pinHalf).toArray(),
+    pinR, pinR, 8,
+    { depthRatio: 1.0, crystal: 0.0, steps: 2,
+      /* a boss at each end, a waist through the joint */
+      profile: function (t) { var e = Math.abs(t - 0.5) * 2; return 0.72 + 0.28 * e * e; } });
+  var pin = new Mesh(pinGeo, materials.joint || materials.cavity);
+  pin.name = root.name + '-elbow-pin';
+  elbowJoint.add(pin);
+  owned.push(pinGeo);
+
   /* Wrist joint, oriented so the hand continues along the forearm axis. */
   var wristJoint = new Group();
   wristJoint.name = root.name + '-wrist';
@@ -336,7 +389,7 @@ function buildArm(materials, spec, options) {
   wristJoint.add(cuff);
   owned.push(cuffGeo);
 
-  var hand = buildHand(materials, HAND_, { open: !!opts.openHand, tipDiamond: !!opts.tipDiamond });
+  var hand = buildHand(materials, HAND_, { open: !!opts.openHand, tipDiamond: !!opts.tipDiamond, makeLamp: opts.makeLamp });
   wristJoint.add(hand.group);
 
   return {
@@ -357,7 +410,13 @@ export function buildLimbs(materials, P) {
   /* The lowered arm's hand is relaxed and partly closed; the raised one is
      open and carries the tip diamond. */
   var right = buildArm(materials, ARMS_.right, { name: 'arm-right', openHand: false, arms: ARMS_, hand: HAND_ });
-  var left = buildArm(materials, ARMS_.left, { name: 'arm-left', openHand: true, tipDiamond: true, arms: ARMS_, hand: HAND_ });
+  /* R98 — the raised hand carries the crystal's own lamp (see buildHand). */
+  var handLamp = null;
+  var left = buildArm(materials, ARMS_.left, { name: 'arm-left', openHand: true, tipDiamond: true, arms: ARMS_, hand: HAND_,
+    makeLamp: function () {
+      handLamp = new PointLight(materials.emissive.color.clone(), 0.70, 0.42, 2);
+      return handLamp;
+    } });
 
   group.add(right.group);
   group.add(left.group);
@@ -366,6 +425,8 @@ export function buildLimbs(materials, P) {
     group: group,
     right: right,
     left: left,
-    dispose: function () { right.dispose(); left.dispose(); }
+    /* the hand crystal's lamp, so the character can ride it on its glow */
+    handLamp: handLamp,
+    dispose: function () { right.dispose(); left.dispose(); if (handLamp && handLamp.dispose) handLamp.dispose(); }
   };
 }

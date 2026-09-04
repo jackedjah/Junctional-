@@ -130,6 +130,18 @@ read of the arms. Measured over the back they are 76% under 32 luma with the
 light on the rims; over the three-quarter chest 64%. They are darker than
 Reference A because they are lit from behind, not because the body changed.
 
+There is now a NINTH pair, `reference/mrmah-refH-platinum-front.png` and
+`reference/mrmah-refH-platinum-threequarter.png` (R98), and it is the
+MATERIAL AND HEAD authority: a dark sapphire crystal wearing a thin
+platinum-silver coat on its hero planes only — shoulder caps, upper pecs,
+bicep and forearm ridges, the quad's outer sweep, the head's chamfer — with
+the recesses (sternum, abdominal channel, armpit, face cavity) left dark; a
+head presented as a chamfered PLATE with a black glossy face screen filling
+two thirds of it and one lit bevel band around it; a steel hinge at the
+elbow; and a hand that cups its crystal in that crystal's own light. The
+three-quarter shows the plate's flat sides and back. The coat is neutral
+and never takes the theme.
+
 **Expect the silhouette score against the canonical front to be low, and do not
 chase it.** The head is deliberately 30% smaller than the canonical measurement
 and the shoulder line 0.2 units higher; a comparison against a file the design
@@ -275,7 +287,7 @@ must not be claimed from headless runs.
 | `mrmah3d/core/bloom.js` | selective bloom, tier-gated (never on `low`) |
 | `mrmah3d/core/surfaces.js` | page events -> character states (the only file naming a MAHFITT page) |
 | `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
-| `mrmah3d/core/character/regions.js` | per-region optical class tables (head, neck, pecs, sternum, abs, obliques, taper, deltoids, arms, hands) |
+| `mrmah3d/core/character/regions.js` | per-region optical class tables (head, neck, pecs, sternum, abs, obliques, taper, deltoids, arms, hands) and each region's share of the platinum coat |
 | `mrmah3d/core/character/variants.js` | proportion sets for the ONE renderer: the male canon and the female prototype (`createMrMahScene(el, { variant: 'female' })`) |
 | `mrmah3d/core/palette.js` | theme tokens and the R96 energy palette: the Secondary's hue fitted into emission / hero / crystal-light / atmosphere / world-accent luminance bands |
 | `mrmah3d/core/terrain.js` | the faceted gunmetal range: three depth layers, beacons, sparkles, the mirrored range and beam smears in the floor |
@@ -287,6 +299,7 @@ must not be claimed from headless runs.
 | `reference/mrmah-refF-r96-male.png` | R96 Reference A — the PRIMARY CHARACTER TARGET: gloss, plane structure, value, symbols |
 | `reference/mrmah-refF-r96-female.png` | R96 — the female variant's reference |
 | `reference/mrmah-refG-r97-{threequarter,rear}.png` | R97 — the rear and three-quarter authority: back anatomy, deltoid domes, muscle bellies |
+| `reference/mrmah-refH-platinum-{front,threequarter}.png` | R98 — the MATERIAL and HEAD authority: the selective platinum coat, the plate head with its face screen, the elbow hinge |
 | `reference/mrmah-refE-bodybuilder-{a,b}.png` | the body-proportion authority where Reference A is silent |
 | `reference/mrmah-refD-guardian-{a,b,c,d}.png` | the authority on material, light and world |
 | `reference/mrmah-refA-anatomical.png` | proportion and anatomy where the bodybuilder set is silent |
@@ -983,3 +996,44 @@ eight sides — large planes for the dome to grade, enough rings for the
 profile to curve. The deltoid became a ten-sided dome with a 34% belly and a
 `zoneAt` naming front, crest and rear planes, so the three heads trade as he
 turns. Value, not only geometry: the dome needed the darker rows on its rear.
+
+### The platinum coat is a MASK, and coverage is the whole design (R98)
+
+The platinum brief's material is a dark sapphire crystal with a thin
+silver coat on selected planes. It is built as a per-polygon weight
+(`aCoat`, forge.js) that travels with the geometry like the optical class,
+scaled per region in `regions.js` and per plane by the zone functions, and
+read by the crystal shader as a blend toward a neutral platinum albedo,
+higher metalness, tighter roughness and no absorption. Two things decide
+whether it reads as a coat or as a chrome figure:
+
+- **Coverage.** The first weights put the whole upper body in ice-white;
+  the second cut them by a third and the read came back — a platinum plane
+  beside a sapphire one is a coat, a silver body with blue gaps is a
+  different character. Hero planes stay full; everything else is rare.
+- **The class gate.** A black facet stays a lost plane in a coated region.
+  Without that the recesses fill in and the body loses the dark end that
+  makes it crystal.
+
+And a plumbing fact that cost a render: three's fragment shader decides the
+colour, roughness and metalness BEFORE `normal_fragment_begin`, so a coat
+weight that needs the normal (planes facing up and out take more) cannot be
+computed where the normal is; the exposure term is folded into the varying
+in the vertex stage and the class gate applied at `color_fragment`.
+
+### A steep chamfer is a helmet; a shallow one is a coin
+
+The head's lip stood 0.23 forward of the girdle across an in-plane band of
+0.08 — a near-vertical wall, i.e. a box with a hole in it from every angle
+but dead front, which is what "bulbous" and "helmet-like" were describing.
+At 0.096 across 0.071 (53 degrees) with a wider plate and a truncated
+flat back (`backInset`), the same recess depth reads as a chamfered plate.
+The cavity did not get shallower in the way that matters: the wall behind
+the lip is still steep and the inner bevel shallow, so the value step at the
+lip survives rotation.
+
+### Coat coverage regressions show up on the variant first
+
+The male's clavicle ring got an explicit reduced share; the female's did
+not, and her shelf blew white under the same key. When a per-plane weight
+is added to a ring table, every proportion set carries that ring.

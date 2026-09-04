@@ -156,8 +156,13 @@ export function createLights(options) {
      by geometry first, wrongly; the head is small enough that a lamp inside
      its cavity reaches its back shell at 0.35. The cavity walls at 0.28 keep
      0.4 of the lamp; the back shell at 0.30-0.35 keeps a tenth or nothing. */
-  var faceLamp = new PointLight(new Color(T('emission', 0x6cebff)), 0.85, 0.36, 2);
-  faceLamp.position.set(0, 2.62, 0.10);
+  /* R98: the head is a chamfered plate now — its lip is 0.096 forward of the
+     girdle, not 0.23 — so the lamp sits at the mouth of the shallower cavity
+     and reaches a little further, to the chamfer band around the face: the
+     "faint local bounce around the facial emitters" the brief asks for. The
+     back plate is 0.19 behind the girdle and still takes nothing. */
+  var faceLamp = new PointLight(new Color(T('emission', 0x6cebff)), 0.95, 0.40, 2);
+  faceLamp.position.set(0, 2.63, 0.08);
 
   /* R92 — THE FLOOR UNDER THE DARKS IS SAPPHIRE, NOT VOID.
 
@@ -202,7 +207,7 @@ export function createLights(options) {
     rim2.intensity = 2.6 * k;
     bounce.intensity = 1.05 * k;
     chestLamp.intensity = 0.62 * k;
-    faceLamp.intensity = 0.85 * k;
+    faceLamp.intensity = 0.95 * k;
   }
 
   function dispose() {
@@ -222,7 +227,7 @@ export function createLights(options) {
     setEmissionGlow: function (g) {
       var k = Math.max(0, Number(g) || 1);
       chestLamp.intensity = 0.62 * k;
-      faceLamp.intensity = 0.85 * k;
+      faceLamp.intensity = 0.95 * k;
     }
   };
 }

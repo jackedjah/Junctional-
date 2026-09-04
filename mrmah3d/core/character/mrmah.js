@@ -99,6 +99,8 @@ export function createMrMah(options) {
     time += dt;
 
     materials.setGlow(v.glow * (conf.glowScale == null ? 1 : conf.glowScale));
+    /* R98 — the hand crystal's lamp rides the same pulse as the emitters. */
+    if (limbs.handLamp) limbs.handLamp.intensity = 0.70 * v.glow;
 
     if (reduced) {
       /* Reduced motion keeps him present but still: hover holds at its

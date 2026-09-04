@@ -181,19 +181,33 @@ var HAND = [
   [0.06,   0.08,   0.28,  -0.60,  0.24]
 ];
 
+/* R98 — THE PLATINUM MAP. `coat` is each region's share of the platinum
+   coat (crystal-shader.js): 1 on the hero planes the brief names — shoulder
+   caps, outer delts, upper pecs, bicep and tricep ridges, forearm planes,
+   the quad's outer sweep, the head's chamfer — and near 0 in the recesses: the
+   sternum, the abdominal channel, the armpit and inner arm, the face cavity.
+   The zone functions in proportions.js refine these per plane, and the
+   shader's class gate keeps the coat off every dark row regardless, so a lost
+   plane stays lost inside a coated region. The coat's colour is neutral and
+   never takes the theme. */
 export var REGIONS = {
-  BODY:        { classes: BODY,       lift: 0.06 },
-  HEAD_SHELL:  { classes: HEAD_SHELL, lift: 0.00 },
-  NECK:        { classes: NECK,       lift: 0.00 },
-  TAPER_SPEAR: { classes: TAPER_SPEAR, lift: 0.00 },
-  TAPER_FLANK: { classes: TAPER_FLANK, lift: 0.00 },
-  PEC_UPPER:   { classes: PEC_UPPER,  lift: 0.00 },
-  PEC_LOWER:   { classes: PEC_LOWER,  lift: 0.00 },
-  STERNUM:     { classes: STERNUM,    lift: 0.00 },
-  ABS:         { classes: ABS,        lift: 0.00 },
-  OBLIQUE:     { classes: OBLIQUE,    lift: 0.00 },
-  DELT:        { classes: DELT,       lift: 0.00 },
-  UPPER_ARM:   { classes: UPPER_ARM,  lift: 0.00 },
-  FOREARM:     { classes: FOREARM,    lift: 0.00 },
-  HAND:        { classes: HAND,       lift: 0.00 }
+  /* First cut had these 30-40% higher and the whole upper body came back
+     ice-white: the brief's "majority of the body still lives in blue" is a
+     coverage rule, and the coat has to be RARE enough that a platinum plane
+     beside a sapphire one reads as a coat on a crystal, not as a silver
+     figure with blue gaps. Hero planes stay full; everything else drops. */
+  BODY:        { classes: BODY,       lift: 0.06, coat: 0.28 },
+  HEAD_SHELL:  { classes: HEAD_SHELL, lift: 0.00, coat: 0.80 },
+  NECK:        { classes: NECK,       lift: 0.00, coat: 0.30 },
+  TAPER_SPEAR: { classes: TAPER_SPEAR, lift: 0.00, coat: 0.10 },
+  TAPER_FLANK: { classes: TAPER_FLANK, lift: 0.00, coat: 0.60 },
+  PEC_UPPER:   { classes: PEC_UPPER,  lift: 0.00, coat: 0.85 },
+  PEC_LOWER:   { classes: PEC_LOWER,  lift: 0.00, coat: 0.40 },
+  STERNUM:     { classes: STERNUM,    lift: 0.00, coat: 0.00 },
+  ABS:         { classes: ABS,        lift: 0.00, coat: 0.38 },
+  OBLIQUE:     { classes: OBLIQUE,    lift: 0.00, coat: 0.18 },
+  DELT:        { classes: DELT,       lift: 0.00, coat: 1.00 },
+  UPPER_ARM:   { classes: UPPER_ARM,  lift: 0.00, coat: 0.80 },
+  FOREARM:     { classes: FOREARM,    lift: 0.00, coat: 0.72 },
+  HAND:        { classes: HAND,       lift: 0.00, coat: 0.22 }
 };

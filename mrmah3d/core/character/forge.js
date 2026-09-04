@@ -294,6 +294,16 @@ export function facetedGeometry(positions, faces, groups, options) {
      electric blue. A per-geometry flag is the honest fix: the material stays
      shared, and only the mesh that asked for the light gets it. */
   var innerFlag = opts.inner ? 1 : 0;
+  /* R98 — `aCoat` is the PLATINUM MASK. The brief's material is a dark
+     sapphire crystal wearing a thin platinum-silver coat on its HERO planes
+     only — shoulder caps, upper pecs, bicep and forearm ridges, the quad's
+     outer sweep, a few head planes — and none in the recesses. That is a
+     region-aware weight, so it travels with the geometry exactly as the class
+     does: one value per polygon (`faceCoat`), falling back to one per solid
+     (`coat`), read by the crystal shader as the blend toward the coat's
+     albedo, metalness and roughness. 0 everywhere unless a region asks. */
+  var coatAll = opts.coat == null ? 0 : opts.coat;
+  var coa = [];
   var groupRanges = [];
   var written = 0;
   var faceIndex = 0;
@@ -386,6 +396,7 @@ export function facetedGeometry(positions, faces, groups, options) {
     var k = facetClass(seed, len * 0.5, faceLift, faceClasses, faceIndex, faceClassIndex);
     faceIndex++;
     for (var v = 0; v < 3; v++) fac.push(k[1], k[2], k[3], k[4]);
+    coa.push(faceCoat, faceCoat, faceCoat);
     written += 3;
   }
 
@@ -405,12 +416,14 @@ export function facetedGeometry(positions, faces, groups, options) {
   var faceClasses = opts.classes || null;
   var faceSeed = null;
   var faceClassIndex = null;
+  var faceCoat = coatAll;
   var polyIndex = 0;
   (groups || [{ faces: faces, material: 0 }]).forEach(function (g) {
     var start = written;
     g.faces.forEach(function (f) {
       if (opts.faceLift && opts.faceLift[polyIndex] != null) faceLift = opts.faceLift[polyIndex];
       else faceLift = opts.lift;
+      faceCoat = opts.faceCoat && opts.faceCoat[polyIndex] != null ? opts.faceCoat[polyIndex] : coatAll;
       faceClasses = (opts.faceClasses && opts.faceClasses[polyIndex]) || opts.classes || null;
       faceSeed = opts.faceSeed && opts.faceSeed[polyIndex] != null ? opts.faceSeed[polyIndex] : null;
       faceClassIndex = opts.faceClassIndex && opts.faceClassIndex[polyIndex] != null ? opts.faceClassIndex[polyIndex] : null;
@@ -430,6 +443,7 @@ export function facetedGeometry(positions, faces, groups, options) {
   var inn = new Float32Array(pos.length / 3);
   if (innerFlag) inn.fill(1);
   geo.setAttribute('aInner', new Float32BufferAttribute(inn, 1));
+  geo.setAttribute('aCoat', new Float32BufferAttribute(coa, 1));
   if (groupRanges.length > 1) {
     groupRanges.forEach(function (g) { geo.addGroup(g.start, g.count, g.material); });
   }
@@ -574,10 +588,11 @@ export function loft(sections, sides, options) {
      taper's spear columns dark, its flank columns sapphire); a ring with
      `columns: true` seeds every quad in a column identically, so the column
      draws one class from top to bottom and reads as a single long facet. */
-  var faceLift = [], faceClasses = [], faceSeed = [], faceClassIndex = [];
-  function pushFace(f, heroLift, classes, seed, index) {
+  var faceLift = [], faceClasses = [], faceSeed = [], faceClassIndex = [], faceCoat = [];
+  function pushFace(f, heroLift, classes, seed, index, coat) {
     faces.push(f); faceLift.push(heroLift); faceClasses.push(classes || null); faceSeed.push(seed);
     faceClassIndex.push(index == null ? null : index);
+    faceCoat.push(coat == null ? null : coat);
   }
   function bandSpec(r) {
     var s = sections[r + 1], lo = sections[r];
@@ -585,6 +600,9 @@ export function loft(sections, sides, options) {
        `classesAt: null` on the ring above a region is how a region ENDS. */
     return {
       lift: s.hero == null ? lo.hero : s.hero,
+      /* R98 — the band's platinum weight, from the ring table; a zone may
+         override it per plane (see quadCoat). */
+      coat: s.coat == null ? lo.coat : s.coat,
       classesAt: (s.classesAt !== undefined ? s.classesAt : lo.classesAt) || null,
       /* R94 — `zoneAt(angle)` returns { classes, seed } and is how a band is
          carved into ANATOMICAL PLANES: every quad whose angle falls in one zone
@@ -618,6 +636,10 @@ export function loft(sections, sides, options) {
     return spec.columns ? 100000 + i * 7 + (r % 2) * 3 : null;
   }
   function quadIndex(z) { return z && z.index != null ? z.index : null; }
+  function quadCoat(spec, z) {
+    if (z && z.coat != null) return spec.coat == null ? z.coat : spec.coat * z.coat;
+    return spec.coat == null ? null : spec.coat;
+  }
   for (var r = 0; r < rings.length - 1; r++) {
     var lo = rings[r], hi = rings[r + 1];
     var spec = bandSpec(r);
@@ -625,19 +647,19 @@ export function loft(sections, sides, options) {
     if (lo.point != null && hi.verts) {
       for (var i = 0; i < sides; i++) {
         var z0 = quadZone(spec, i, r);
-        pushFace([lo.point, hi.verts[i], hi.verts[(i + 1) % sides]], bandLift, quadClasses(spec, i, z0), quadSeed(spec, i, r, z0), quadIndex(z0));
+        pushFace([lo.point, hi.verts[i], hi.verts[(i + 1) % sides]], bandLift, quadClasses(spec, i, z0), quadSeed(spec, i, r, z0), quadIndex(z0), quadCoat(spec, z0));
       }
     } else if (lo.verts && hi.point != null) {
       for (var i2 = 0; i2 < sides; i2++) {
         var z1 = quadZone(spec, i2, r);
-        pushFace([lo.verts[i2], hi.point, lo.verts[(i2 + 1) % sides]], bandLift, quadClasses(spec, i2, z1), quadSeed(spec, i2, r, z1), quadIndex(z1));
+        pushFace([lo.verts[i2], hi.point, lo.verts[(i2 + 1) % sides]], bandLift, quadClasses(spec, i2, z1), quadSeed(spec, i2, r, z1), quadIndex(z1), quadCoat(spec, z1));
       }
     } else if (lo.verts && hi.verts) {
       for (var i3 = 0; i3 < sides; i3++) {
         var a1 = lo.verts[i3], b1 = lo.verts[(i3 + 1) % sides];
         var c1 = hi.verts[(i3 + 1) % sides], d1 = hi.verts[i3];
         var z2 = quadZone(spec, i3, r);
-        var qc = quadClasses(spec, i3, z2), qs = quadSeed(spec, i3, r, z2), qi = quadIndex(z2);
+        var qc = quadClasses(spec, i3, z2), qs = quadSeed(spec, i3, r, z2), qi = quadIndex(z2), qk = quadCoat(spec, z2);
         /* Alternate the diagonal of each quad, checkerboard fashion. Combined
            with the facet relief above — which already makes these quads
            non-planar — this gives every triangle its own normal and lays a
@@ -675,11 +697,11 @@ export function loft(sections, sides, options) {
            a culled face and a black face look identical — read the geometry. */
         var alt = spec.columns ? (i3 % 2 === 0) : ((i3 + r) % 2 === 0);
         if (alt) {
-          pushFace([a1, c1, b1], bandLift, qc, qs, qi);
-          pushFace([a1, d1, c1], bandLift, qc, qs, qi);
+          pushFace([a1, c1, b1], bandLift, qc, qs, qi, qk);
+          pushFace([a1, d1, c1], bandLift, qc, qs, qi, qk);
         } else {
-          pushFace([a1, d1, b1], bandLift, qc, qs, qi);
-          pushFace([b1, d1, c1], bandLift, qc, qs, qi);
+          pushFace([a1, d1, b1], bandLift, qc, qs, qi, qk);
+          pushFace([b1, d1, c1], bandLift, qc, qs, qi, qk);
         }
       }
     }
@@ -700,7 +722,7 @@ export function loft(sections, sides, options) {
 
   return { geometry: facetedGeometry(positions, faces, null,
       { lift: opts.lift, faceLift: faceLift, classes: opts.classes, faceClasses: faceClasses, faceSeed: faceSeed,
-        faceClassIndex: faceClassIndex, inner: opts.inner }),
+        faceClassIndex: faceClassIndex, inner: opts.inner, coat: opts.coat, faceCoat: faceCoat }),
     positions: positions, faces: faces };
 }
 
@@ -813,6 +835,9 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
          its own, so the transition happens across the form instead of at the
          seam. */
       hero: opts.hero ? opts.hero(t) : undefined,
+      /* R98 — the platinum weight may ramp along the limb too, for the same
+         reason the lift does: a coat that starts at the seam is a seam. */
+      coat: opts.coatAt ? opts.coatAt(t) : opts.coat,
       /* R95 — LONG FACETS ALONG THE LIMB. The references' arms are striated:
          a handful of long crystal planes running from shoulder to elbow, not a
          quilt of small triangles. `columns` seeds each strip of the tube as one
@@ -826,7 +851,7 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
     });
   }
 
-  var built = loft(rings, sides || 6, { capTop: true, capBottom: true, phase: opts.phase, lift: opts.lift, classes: opts.classes });
+  var built = loft(rings, sides || 6, { capTop: true, capBottom: true, phase: opts.phase, lift: opts.lift, classes: opts.classes, coat: opts.coat });
 
   var p = built.geometry.attributes.position.array;
   var n = built.geometry.attributes.normal.array;
@@ -957,6 +982,14 @@ export function diamondCrystal(opts) {
   var B = ring(bevel, bevelZ, 5, 0.022);          /* table edge / recess lip */
   var I = ring(innerInset, innerZ, 17, 0.014);    /* inner bevel, inside the opening */
   var F = ring(face, faceZ, null);          /* the recessed face plate */
+  /* R98 — A PLATE, NOT A SKULL. The rear used to close to a single apex, so
+     from any three-quarter or rear view the head was a faceted pyramid behind
+     the face — the "bulbous" read. The platinum references cut the head as a
+     thin plate with a chamfered back: a side band from the silhouette to a
+     back ring, and a flat back plate. `backInset` sizes that plate (0 keeps
+     the old apex). */
+  var backInset = opts.backInset == null ? 0 : opts.backInset;
+  var K = backInset > 0 ? ring(backInset, backZ, null) : null;
   var back = push(0, 0, backZ);
 
   /* THREE MATERIAL GROUPS, not two.
@@ -998,13 +1031,27 @@ export function diamondCrystal(opts) {
      dark stage, and no amount of material tuning distinguishes them. Reading
      the geometry is a two-minute check that no capture can substitute for. */
   var shell = [], cavity = [], plate = [];
+  /* R98 — the platinum weight per shell polygon: the front chamfer bands take
+     the coat (they are the head's hero planes — the bevel band the reference
+     draws bright around the black face), the side band a little less, the back
+     plate the least; the cavity and the face plate never do. */
+  var shellCoat = [];
+  var coat = opts.coat == null ? 0 : opts.coat;
   for (var i = 0; i < N; i++) {
     var j = (i + 1) % N;
-    shell.push([E[j], C[j], C[i], E[i]]);   /* lower crown band */
-    shell.push([C[j], B[j], B[i], C[i]]);   /* upper crown band */
+    shell.push([E[j], C[j], C[i], E[i]]); shellCoat.push(coat);          /* outer chamfer band */
+    shell.push([C[j], B[j], B[i], C[i]]); shellCoat.push(coat * 1.0);    /* inner chamfer band — the lip */
     cavity.push([B[j], I[j], I[i], B[i]]);  /* over the lip, into the cavity */
     cavity.push([I[j], F[j], F[i], I[i]]);  /* the inner bevel wall */
-    shell.push([E[j], E[i], back]);         /* back facets — already correct */
+    if (K) {
+      shell.push([E[j], E[i], K[i], K[j]]); shellCoat.push(coat * 0.55);  /* side band, wound rearward */
+    } else {
+      shell.push([E[j], E[i], back]); shellCoat.push(coat * 0.35);        /* back facets — already correct */
+    }
+  }
+  if (K) {
+    /* the flat back plate, fanned and wound rearward */
+    for (var kb = 0; kb < N; kb++) { shell.push([back, K[(kb + 1) % N], K[kb]]); shellCoat.push(coat * 0.30); }
   }
   /* Fan the plate from its centre so it is several triangles, not one quad —
      it then picks up a little value variation of its own instead of reading as
@@ -1012,11 +1059,13 @@ export function diamondCrystal(opts) {
   var centre = push(0, 0, faceZ);
   for (var f = 0; f < N; f++) plate.push([centre, F[f], F[(f + 1) % N]]);
 
+  var faceCoat = shellCoat.slice();
+  for (var pc = 0; pc < plate.length + cavity.length; pc++) faceCoat.push(0);
   return facetedGeometry(P, null, [
     { faces: shell, material: 0 },
     { faces: plate, material: 1 },
     { faces: cavity, material: 2 }
-  ], { lift: opts.lift, classes: opts.classes });
+  ], { lift: opts.lift, classes: opts.classes, faceCoat: faceCoat });
 }
 
 /* A flat diamond outline plate, used for the chest emblem and the transport

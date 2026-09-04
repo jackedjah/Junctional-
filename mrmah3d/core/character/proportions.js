@@ -147,13 +147,31 @@ export var HEAD = {
      a 0.55 plate all along. Every ring from the girdle in is opened up by
      roughly a tenth, which keeps the bevel's proportions and the shell's
      thickness while giving the face a plate it actually fits on. */
-  faceInset: 0.63,               /* plate size as a share of the diamond */
-  crownInset: 0.90,              /* outer crown band — narrower now */
-  crownZ: 0.52,                  /* crown band depth, share of halfDepth (R96: re-based on the thinner shell) */
-  bevelInset: 0.790,             /* the lip, at the front of the crystal */
-  bevelZ: 0.96,                  /* the lip stands proud — at the front of the thin shell */
-  innerInset: 0.700,             /* inner bevel, framing the cavity */
-  innerZ: 0.42,                  /* set well behind the lip */
+  /* R98 — A COIN, NOT A HELMET. Read as depths: the lip stood 0.23 forward
+     of the girdle over an in-plane band of only 0.08, i.e. the whole front of
+     the head was a near-vertical wall and, seen from any angle but dead front,
+     a BOX with a hole in it — the bulbous, helmet-like read the platinum
+     brief names first. The platinum references present the face as a flat
+     black plate with ONE lit chamfer band around it, roughly 45 degrees, and
+     the plate itself fills about two thirds of the diamond.
+
+     So the front is now a chamfered plate: the lip sits 0.096 forward of the
+     girdle across a band 0.071 wide (53 degrees), the plate is wider (0.66)
+     and sits 0.048 BEHIND the girdle so the cavity keeps 0.144 of real depth
+     behind a steep wall and a shallow inner bevel — crisp, architectural
+     transitions rather than one deep funnel. The rear is a plate too (see
+     backInset below). Head depth over all falls from 1.19 to 0.72 of the
+     half-width. */
+  faceInset: 0.66,               /* plate size as a share of the diamond */
+  crownInset: 0.91,              /* outer chamfer band */
+  crownZ: 0.20,                  /* its depth, share of halfDepth */
+  bevelInset: 0.820,             /* the lip — the inner edge of the chamfer */
+  bevelZ: 0.40,                  /* 0.096 forward of the girdle */
+  innerInset: 0.750,             /* the cavity wall's foot */
+  innerZ: 0.04,                  /* the wall drops nearly to the girdle plane */
+  /* the rear: a side band from the silhouette to a back ring, then a flat
+     back plate — a streamlined plate rather than a pyramid */
+  backInset: 0.70,
   /* R90: -0.06 -> 0.15. The recess was 0.294 units deep behind a lip 0.263
      wide, which at the chat composition's 22-degree yaw put the near wall
      straight across the smile — the character rendered with eyes and no mouth
@@ -164,8 +182,8 @@ export var HEAD = {
      still obviously a hole rather than a panel (the three-quarter capture is
      what proves that, not the front one), while clearing the smile at every
      yaw the in-app compositions use. */
-  faceZ: 0.06,                   /* plate depth — 0.216 behind the lip on the thin shell, the same cavity as before */
-  backApexZ: -1.0,
+  faceZ: -0.20,                  /* plate depth — 0.048 behind the girdle, 0.144 behind the lip (R98) */
+  backApexZ: -0.78,              /* the back plate's depth (R98: a plate, not an apex) */
   /* Depth scatter on the head's bevel ring, so its front facets tilt slightly
      differently and the head catches light in several places.
 
@@ -189,7 +207,7 @@ export var HEAD = {
      the useful result: the head's flatness was never geometric. It came from
      the Fresnel term lifting every grazing facet, and on a diamond seen
      face-on almost every shell facet is grazing. Settled at a modest 0.105. */
-  relief: 0.105,
+  relief: 0.070,                 /* R98: the chamfer is 0.096 deep now; 0.105 of the half-depth was a quarter of it */
   /* How far the head's facets are biased away from the body's black-heavy
      distribution. 0 would give it the body's weighting, which measured as an
      almost entirely black shell. */
@@ -371,16 +389,19 @@ function pecZone(row) {
     var pecOuter = 1.02 + (yy - 1.80) * 0.95;                /* the lobe reaches out toward the shoulder as it rises */
     var pecSplit = 0.30 + (pecOuter - 0.30) * 0.58;          /* inner plane / outer plane */
     var table = row === 1 ? REGIONS.PEC_UPPER : REGIONS.PEC_LOWER;
-    if (ae < sternum) return { classes: REGIONS.STERNUM.classes, seed: 10 + row, index: 0 };
-    if (ae < pecSplit) return { classes: table.classes, seed: 20 + row * 4 + side, index: 1 };
-    if (ae < pecOuter) return { classes: table.classes, seed: 22 + row * 4 + side, index: 2 };
-    if (ae < 2.05) return { classes: REGIONS.OBLIQUE.classes, seed: 30 + row * 2 + side, index: 1 };   /* lats */
+    /* R98 — each plane's share of the platinum coat (see REGIONS): the
+       sternum valley none, the pec's inner plane some, its OUTER plane — the
+       upper-pec-to-front-delt transition — the most, the armpit almost none. */
+    if (ae < sternum) return { classes: REGIONS.STERNUM.classes, seed: 10 + row, index: 0, coat: 0 };
+    if (ae < pecSplit) return { classes: table.classes, seed: 20 + row * 4 + side, index: 1, coat: table.coat * 0.60 };
+    if (ae < pecOuter) return { classes: table.classes, seed: 22 + row * 4 + side, index: 2, coat: table.coat };
+    if (ae < 2.05) return { classes: REGIONS.OBLIQUE.classes, seed: 30 + row * 2 + side, index: 1, coat: 0.08 };   /* lats / the underarm pocket */
     /* R97 — THE BACK IS AUTHORED TOO: a near-black spine channel, erector
        planes either side of it, and the lat / upper-back planes out to the
        arm, so the rear reads as designed rather than as leftover geometry. */
-    if (ae > 2.92) return { classes: REGIONS.STERNUM.classes, seed: 90 + row, index: 0 };              /* spine channel */
-    if (ae > 2.50) return { classes: REGIONS.ABS.classes, seed: 92 + row * 2 + side, index: 0 };       /* erectors */
-    return { classes: REGIONS.OBLIQUE.classes, seed: 96 + row * 2 + side, index: 1 };                  /* lat / upper back */
+    if (ae > 2.92) return { classes: REGIONS.STERNUM.classes, seed: 90 + row, index: 0, coat: 0 };              /* spine channel */
+    if (ae > 2.50) return { classes: REGIONS.ABS.classes, seed: 92 + row * 2 + side, index: 0, coat: 0.35 };    /* erectors */
+    return { classes: REGIONS.OBLIQUE.classes, seed: 96 + row * 2 + side, index: 1, coat: 0.45 };               /* lat / upper back */
   };
 }
 function coreZone(row) {
@@ -393,14 +414,16 @@ function coreZone(row) {
        the torso reads through the core. */
     var absOuter = 0.56 + (yy - 1.18) * 0.20;
     var obliqueOuter = 1.40 + (yy - 1.18) * 0.30;
-    if (ae < channel) return { classes: REGIONS.STERNUM.classes, seed: 40 + row, index: 0 };            /* the central channel */
+    if (ae < channel) return { classes: REGIONS.STERNUM.classes, seed: 40 + row, index: 0, coat: 0 };   /* the central channel */
     /* R96: rows 1-3 are the three abdominal pairs; the middle pair takes the
        lit row so the stack reads as three values, not one plane. */
-    if (ae < absOuter) return { classes: REGIONS.ABS.classes, seed: 50 + row * 2 + side, index: row === 0 ? 0 : 1 };
-    if (ae < obliqueOuter) return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side, index: row === 0 ? 0 : 1 };
-    if (ae > 2.92) return { classes: REGIONS.STERNUM.classes, seed: 100 + row, index: 0 };             /* spine channel */
-    if (ae > 2.55) return { classes: REGIONS.ABS.classes, seed: 102 + row * 2 + side, index: 0 };      /* erectors */
-    return { classes: REGIONS.OBLIQUE.classes, seed: 106 + row * 2 + side, index: 0 };                 /* lower back / lat */
+    /* R98: the abdominal blocks take the coat on their ridge (the belt row
+       does not), the obliques a quarter of it, the channel and spine none. */
+    if (ae < absOuter) return { classes: REGIONS.ABS.classes, seed: 50 + row * 2 + side, index: row === 0 ? 0 : 1, coat: row === 0 ? 0.20 : REGIONS.ABS.coat };
+    if (ae < obliqueOuter) return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side, index: row === 0 ? 0 : 1, coat: REGIONS.OBLIQUE.coat };
+    if (ae > 2.92) return { classes: REGIONS.STERNUM.classes, seed: 100 + row, index: 0, coat: 0 };    /* spine channel */
+    if (ae > 2.55) return { classes: REGIONS.ABS.classes, seed: 102 + row * 2 + side, index: 0, coat: 0.30 };   /* erectors */
+    return { classes: REGIONS.OBLIQUE.classes, seed: 106 + row * 2 + side, index: 0, coat: 0.30 };              /* lower back / lat */
   };
 }
 function taperClasses(a) {
@@ -457,9 +480,11 @@ function quadZone(row) {
        planes came back with a mean of 54 against 38: the reference's quad is a
        DARK navy mass whose light sits on its outer edge, so the heads take the
        dark and sapphire rows and the sweep the sapphire and lit rows. */
-    if (ae < seam) return { classes: REGIONS.STERNUM.classes, seed: 80 + row, index: 0 };
-    if (ae < headOuter) return { classes: REGIONS.ABS.classes, seed: 82 + row * 2 + side, index: row === 0 ? 0 : 1 };
-    if (ae < sweepOuter) return { classes: REGIONS.TAPER_FLANK.classes, seed: 86 + row * 2 + side, index: row === 0 ? 1 : 2 };
+    /* R98: the quad's OUTER SWEEP is a platinum hero plane; the seam none,
+       the heads a little, the back the body's default. */
+    if (ae < seam) return { classes: REGIONS.STERNUM.classes, seed: 80 + row, index: 0, coat: 0 };
+    if (ae < headOuter) return { classes: REGIONS.ABS.classes, seed: 82 + row * 2 + side, index: row === 0 ? 0 : 1, coat: 0.40 };
+    if (ae < sweepOuter) return { classes: REGIONS.TAPER_FLANK.classes, seed: 86 + row * 2 + side, index: row === 0 ? 1 : 2, coat: 1.0 };
     return null;
   };
 }
@@ -694,7 +719,10 @@ export var TORSO = {
        silhouette lands on the measurement: chest 0.357 at 1.97, then a FAST
        V — 0.305 at 1.83, 0.248 at 1.66, 0.22 at the belt — which is what
        makes a broad chest read as a bodybuilder's rather than a barrel's. */
-    { y: 0.000, w: 0.006, d: 0.004, columns: true, classesAt: taperClasses },
+    /* R98: `coat` per band is the platinum share (see REGIONS in regions.js);
+       the taper's columns take a moderate share and the shader's class gate
+       keeps it on the lit flank columns and off the dark spear. */
+    { y: 0.000, w: 0.006, d: 0.004, columns: true, classesAt: taperClasses, coat: 0.55 },
     { y: 0.150, w: 0.034, d: 0.025, facet: 0.0060, crystal: 0.0180, crystalY: 0.0040,
       columns: true, classesAt: taperClasses },
     { y: 0.400, w: 0.086, d: 0.066, facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20,
@@ -709,7 +737,7 @@ export var TORSO = {
       shape: quadShape(0.60), columns: true, classesAt: taperClasses },
     /* the quad mass — held wide, shaped as two heads and a lateral sweep */
     { y: 1.130, w: 0.238, d: 0.202, facet: 0.0070, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
-      shape: quadShape(1.0), columns: false, classesAt: null, zoneAt: quadZone(1) },
+      shape: quadShape(1.0), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },
     { y: 1.290, w: 0.230, d: 0.200, facet: -0.0070, crystal: 0.0360, crystalY: 0.0090, hero: 0.16,
       shape: quadShape(0.90), zoneAt: quadZone(0) },
     /* R97: the quad's SHELF — the mass rounds over under the belt instead
@@ -753,7 +781,7 @@ export var TORSO = {
       shape: chestShape(0.80), hero: 0.40, zoneAt: pecZone(1) },
     /* THE SHOULDER LINE — collarbones across the front, trapezius behind */
     { y: 2.170, w: 0.316, d: 0.226, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
-      shape: clavicleShape(1.0), dip: 0.030, hero: 0.46, zoneAt: null },
+      shape: clavicleShape(1.0), dip: 0.030, hero: 0.46, zoneAt: null, coat: 0.45 },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11
@@ -858,7 +886,7 @@ export var TORSO = {
     /* R95-BB: the trapezius ring rises with the shoulder line and is broader,
        so the neck is the reference's SHORT, THICK column — 0.12 of clear neck
        under the chin instead of 0.16, and traps that climb steeply beside it. */
-    { y: 2.205, w: 0.218, d: 0.160, facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
+    { y: 2.205, w: 0.218, d: 0.160, facet: -0.0120, crystal: 0.024, crystalY: 0.0050, coat: 0.25,
       shape: clavicleShape(0.55), hero: 0.16, classesAt: neckClasses },
     /* The column's rings follow the head's lower vertex (2.324 now): the top
        ring sits 0.09 above it where the head is 0.10 wide and swallows it, and
@@ -979,8 +1007,8 @@ export var ARMS = {
     shoulder: [-0.496, 1.985, 0.014],
     elbow: [-0.600, 1.440, 0.10],
     wrist: [-0.545, 1.060, 0.14],
-    upperRadius: 0.146,
-    foreRadius: 0.114,
+    upperRadius: 0.152,
+    foreRadius: 0.118,
     wristRadius: 0.074
   },
   left: {                         /* viewer's RIGHT — the raised arm */
@@ -997,8 +1025,8 @@ export var ARMS = {
     shoulder: [0.496, 1.985, 0.014],
     elbow: [0.545, 1.450, 0.11],
     wrist: [0.720, 1.860, 0.15],
-    upperRadius: 0.146,
-    foreRadius: 0.114,
+    upperRadius: 0.152,
+    foreRadius: 0.118,
     wristRadius: 0.074
   },
 
@@ -1068,14 +1096,20 @@ export var ARMS = {
        deltoid as a thick limb rather than a waisted one, and the belly is a
        touch fuller. The reference's upper arm is close to its bicep width for
        most of its length. */
+    /* R98: the belly a touch fuller and the arm DRAWS IN to the elbow — the
+       platinum references' upper arm is its widest at the bicep peak and
+       clearly narrower at the joint, which is what makes the elbow read as a
+       hinge between two masses rather than a bend in a pipe. */
     upper: function (t) {
-      return 0.90 + Math.sin(Math.pow(t, 0.85) * Math.PI) * 0.26;
+      return 0.92 + Math.sin(Math.pow(t, 0.85) * Math.PI) * 0.28 - t * 0.08;
     },
     /* Picks up close to where the upper arm ended — a step at the elbow reads
        as an error rather than as a joint — then swells just below it and tapers
        to a narrow wrist. */
+    /* R98: the extensor swell sits high, just under the elbow, and the taper
+       to the wrist is steeper — an anatomical forearm, not a stick. */
     fore: function (t) {
-      return 0.88 + Math.sin(Math.pow(t, 0.62) * Math.PI) * 0.16 - t * 0.10;
+      return 0.90 + Math.sin(Math.pow(t, 0.55) * Math.PI) * 0.20 - t * 0.16;
     }
   },
 
@@ -1102,21 +1136,32 @@ export var ARMS = {
          down at nearly a third of the radius, the tricep — broader, lower —
          at a quarter, and the groove between them deepens so the two masses
          read as two from the side and trade dominance as the arm turns. */
-      var bicep = bump(d, 0, 0.80) * 0.300 * belly;
-      var tricep = bump(d, Math.PI, 1.10) * 0.250 * rear;
+      var bicep = bump(d, 0, 0.80) * 0.320 * belly;
+      var tricep = bump(d, Math.PI, 1.10) * 0.270 * rear;
       /* the groove between them, down each side of the arm */
-      var groove = (bump(d, Math.PI / 2, 0.42) +
-                    bump(d, -Math.PI / 2, 0.42)) * -0.095 * belly;
-      return 1 + bicep + tricep + groove;
+      /* R98: the groove is deepest through the upper half, and in the lower
+         half a BRACHIALIS lobe fills it either side — the lateral mass that
+         sits between bicep and tricep just above the elbow, which is what
+         gives the outer upper arm its second contour. */
+      var low = Math.max(0, Math.min(1, (t - 0.45) / 0.35));
+      low = low * low * (3 - 2 * low);
+      var sides = bump(d, Math.PI / 2, 0.42) + bump(d, -Math.PI / 2, 0.42);
+      var groove = sides * -0.105 * belly * (1 - low);
+      var brachialis = sides * 0.110 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);
+      return 1 + bicep + tricep + groove + brachialis;
     },
     fore: function (t, d) {
       var swell = Math.sin(Math.pow(t, 0.58) * Math.PI);
       /* Flexor mass sits front-and-inboard, extensor mass rear-and-outboard —
          offset from dead front and dead back, which is what stops the forearm
          reading as a smaller copy of the upper arm. */
-      var flexor = bump(d, 0.45, 0.85) * 0.220 * swell;
-      var extensor = bump(d, Math.PI - 0.55, 0.95) * 0.170 * swell;
-      return 1 + flexor + extensor;
+      /* R98: fuller extensor group high on the outer forearm, flexors
+         inboard, and a shallow groove between them down the ulna so the two
+         groups read as two under the coat. */
+      var flexor = bump(d, 0.45, 0.85) * 0.240 * swell;
+      var extensor = bump(d, Math.PI - 0.55, 0.95) * 0.230 * Math.sin(Math.pow(t, 0.45) * Math.PI);
+      var ulna = bump(d, -Math.PI / 2 - 0.2, 0.40) * -0.070 * swell;
+      return 1 + flexor + extensor + ulna;
     }
   }
 };
