@@ -146,6 +146,19 @@ export function applyCrystalShader(material, options) {
        up and out take more than planes that face down, which is where a coat
        lit by a moon would read. `uCoat` is the global strength; `uCoatColor`
        stays neutral under every theme ("the platinum remains neutral"). */
+    /* R99 — THE RIM IS DIRECTIONAL. The additive grazing term is a Fresnel
+       term, so on its own it lit every silhouette edge equally — a uniform
+       outline, which the godform brief rules out ("the rim must be
+       fragmented and physically motivated"). It is now weighted by how far
+       the surface faces two view-space directions: the moon / key side
+       (up-left, strong) and the hand crystal's side (right, weaker), with a
+       small floor so a contour turned from both is dim rather than absent.
+       The scene rotates these into view space each frame (setRimDirections),
+       so the moon-side rim stays on the moon side as the camera and the
+       character move. */
+    uRimDirA: { value: new Vector3(-0.62, 0.72, 0.30).normalize() },
+    uRimDirB: { value: new Vector3(0.85, 0.15, 0.25).normalize() },
+    uRimFloor: { value: opts.rimFloor == null ? 0.22 : opts.rimFloor },
     uCoat: { value: opts.coat == null ? 0.0 : opts.coat },
     uCoatColor: { value: new Color(opts.coatColor == null ? 0xbfc8d6 : opts.coatColor) },
     uCoatMetal: { value: opts.coatMetal == null ? 0.66 : opts.coatMetal },
@@ -229,6 +242,9 @@ export function applyCrystalShader(material, options) {
         'varying float vInner;',
         'varying float vCoat;',
         'uniform float uCoat;',
+        'uniform vec3 uRimDirA;',
+        'uniform vec3 uRimDirB;',
+        'uniform float uRimFloor;',
         'uniform vec3 uCoatColor;',
         'uniform float uCoatMetal;',
         'uniform float uCoatRough;',
@@ -422,7 +438,10 @@ export function applyCrystalShader(material, options) {
         /* R98: on a coated plane the grazing add goes silver-blue rather than
            cyan — a platinum rim catches the moon, a crystal rim its own energy. */
         '    vec3 mrRimColor = mix( uTint, uCoatColor * 1.15, mrCoatW * 0.70 );',
-        '    outgoingLight += mrRimColor * mrRim * 0.50 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
+        /* R99: the rim is fragmented by direction — see the uniform note. */
+        '    vec3 mrRN = normalize( normal );',
+        '    float mrRimDir = clamp( uRimFloor + max( dot( mrRN, uRimDirA ), 0.0 ) * 1.0 + max( dot( mrRN, uRimDirB ), 0.0 ) * 0.55, 0.0, 1.0 );',
+        '    outgoingLight += mrRimColor * mrRim * mrRimDir * 0.62 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
         /* R94 — the internal light. See the uniform note above. */
         '    if ( uInnerStrength > 0.0 && vInner > 0.5 ) {',
         '      vec3 mrN = normalize( vObjN );',
@@ -481,6 +500,16 @@ export function setCrystalVariation(material, v) {
   if (material.userData && material.userData.crystal) {
     material.userData.crystal.uVariation.value = v;
   }
+}
+
+/* R99 — the rim's two directions, in VIEW space (the scene rotates the world
+   directions of the moon side and the hand-crystal side into view space each
+   frame, so they follow the camera). */
+export function setRimDirections(material, a, b) {
+  var u = material.userData && material.userData.crystal;
+  if (!u) return;
+  if (a) u.uRimDirA.value.copy(a).normalize();
+  if (b) u.uRimDirB.value.copy(b).normalize();
 }
 
 /* R94 — drive the internal light: strength scales with the character's glow

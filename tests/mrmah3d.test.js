@@ -719,6 +719,14 @@ if (exists('CLAUDE.md')) {
     /'-upper'/.test(limbs) && /'-fore'/.test(limbs) && /'hand-solid'/.test(limbs));
   /* the presented crystal levitates over the palm and stops under reduced motion */
   ok('R99-hand-crystal-levitates', /crystal\.plate\.position\.y = crystal\.restY \+ lev/.test(mrmahSrc) && /if \(crystal && !reduced\)/.test(mrmahSrc));
+  /* the rim is directional, not a uniform outline (brief §21): two view-space
+     directions, rotated from world each frame by the scene */
+  const shaderSrc = read('mrmah3d/core/character/crystal-shader.js');
+  const sceneSrc2 = read('mrmah3d/core/mrmah-scene.js');
+  ok('R99-rim-is-directional', /uRimDirA/.test(shaderSrc) && /uRimDirB/.test(shaderSrc) && /mrRimDir/.test(shaderSrc) &&
+    /export function setRimDirections/.test(shaderSrc));
+  ok('R99-rim-directions-follow-the-camera', /transformDirection\(cameraBox\.camera\.matrixWorldInverse\)/.test(sceneSrc2) &&
+    /characterBox\.setRimDirections\(RIM_A_VIEW, RIM_B_VIEW\)/.test(sceneSrc2));
   /* the arm's named rows reach the dark end */
   ok('R99-arm-rows-reach-dark', /var UPPER_ARM = \[\s*\/\*[^]*?\*\/\s*var UPPER_ARM = \[|var UPPER_ARM = \[\n\s*\[0\.14,\s*0\.08,\s*-0\.10,\s*0\.7/.test(regions));
 })();

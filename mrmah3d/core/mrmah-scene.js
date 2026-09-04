@@ -27,6 +27,13 @@ import { createStage } from './stage.js';
 import { createCamera } from './camera.js';
 import { createLights } from './lights.js';
 import { createEnvironment } from './environment.js';
+import { Vector3 as RimVector3 } from '../vendor/three/three.module.min.js';
+
+/* R99 — where the rim comes from, in world space (see renderFrame). */
+var RIM_A_WORLD = new RimVector3(-0.58, 0.62, -0.30).normalize();   /* the moon's side */
+var RIM_B_WORLD = new RimVector3(0.82, 0.28, 0.24).normalize();     /* the hand crystal's side */
+var RIM_A_VIEW = new RimVector3();
+var RIM_B_VIEW = new RimVector3();
 import { createCharacter } from './character.js';
 import { createInteraction } from './interaction.js';
 import { createLoop } from './lifecycle.js';
@@ -275,6 +282,17 @@ export function createMrMahScene(host, options) {
       }
     }
     characterBox.update(dt, { reducedMotion: reducedMotion });
+    /* R99 — the rim's directions, rotated from world into view space every
+       frame (crystal-shader.js, setRimDirections): the moon's side of the
+       world (up, left and a little behind him) and the hand crystal's side
+       (right and forward). World-fixed, so the moon-side rim stays on the
+       moon side whichever mode the camera is in and however he turns. */
+    if (characterBox.setRimDirections) {
+      cameraBox.camera.updateMatrixWorld();
+      RIM_A_VIEW.copy(RIM_A_WORLD).transformDirection(cameraBox.camera.matrixWorldInverse);
+      RIM_B_VIEW.copy(RIM_B_WORLD).transformDirection(cameraBox.camera.matrixWorldInverse);
+      characterBox.setRimDirections(RIM_A_VIEW, RIM_B_VIEW);
+    }
     /* The emission lamps follow his state, so the light he casts on himself
        brightens when he is thinking and settles when he is not. */
     if (lightsBox.setEmissionGlow && characterBox.states) {

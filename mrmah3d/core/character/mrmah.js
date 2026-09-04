@@ -17,7 +17,7 @@ import { buildHead } from './head.js';
 import { buildBody } from './body.js';
 import { buildLimbs } from './limbs.js';
 import { createStateMachine } from './states.js';
-import { setInnerLight } from './crystal-shader.js';
+import { setInnerLight, setRimDirections } from './crystal-shader.js';
 import { HALO_LAYER } from '../bloom.js';
 import { HEIGHT, FLOAT, HEAD } from './proportions.js';
 import { proportionsFor } from './variants.js';
@@ -291,6 +291,12 @@ export function createMrMah(options) {
     },
     setYaw: setYaw,
     getYaw: getYaw,
+    /* R99 — the rim's directions (crystal-shader.js), handed in by the scene
+       in VIEW space each frame: the moon side and the hand crystal's side. */
+    setRimDirections: function (a, b) {
+      setRimDirections(materials.body, a, b);
+      if (materials.head) setRimDirections(materials.head, a, b);
+    },
     /* R99 — SHADOW-FIRST DEBUG VIEWS (godform brief §39), development only.
 
          'mass'    every solid flat near-black, no lines: the silhouette test —

@@ -1097,3 +1097,16 @@ line and the wrist cuff and elbow bosses read as blocks on the limb — none of
 which the lit render showed, because the coat's catches were drawing the eye
 across the seams. Lowering the cap onto the trap slope and shrinking the
 joint rings was a silhouette fix; no material change could have made it.
+
+### A Fresnel rim is a uniform outline; a rim needs a direction
+
+The additive grazing term is view-based, so it lit every silhouette edge
+equally — the "cyan stroke around the whole body" the godform brief rules
+out, however low its opacity. It is now weighted by how far the surface
+faces two directions, the moon's side of the world and the hand crystal's
+side, with a small floor elsewhere; the scene rotates those world
+directions into view space every frame (`setRimDirections`), so the
+moon-side rim stays on the moon side in every mode and at every yaw. Read
+the front capture: the left contour lit, the right dark, the crystal's own
+catch on the raised arm. The edge LINES remain uniform — they are unlit
+line materials — so their opacity is what keeps them a whisper.
