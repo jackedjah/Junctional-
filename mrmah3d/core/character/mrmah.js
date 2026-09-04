@@ -99,7 +99,16 @@ export function createMrMah(options) {
     /* Head: a small independent drift plus the state's tilt. */
     head.group.rotation.x = rest.headRotX + v.headTilt * 0.5 + Math.sin(time * 0.63) * 0.028 * v.sway;
     head.group.rotation.z = rest.headRotZ + Math.sin(time * 0.48) * 0.022 * v.sway;
-    head.group.rotation.y = Math.sin(time * 0.29) * 0.045 * v.sway;
+    /* Head yaw carries TWO periods, not one.
+
+       A single sine is a metronome: watch it for ten seconds and the eye finds
+       the loop, and a character whose idle has a findable loop reads as a
+       mechanism rather than as something alive. Adding a second, slower and
+       weaker term at an incommensurable rate means the pair never repeats
+       inside any time a viewer will watch — which is the cheapest possible way
+       to buy the "micro head orientation life" the brief asks for. */
+    head.group.rotation.y = (Math.sin(time * 0.29) * 0.045 +
+                             Math.sin(time * 0.113 + 1.7) * 0.026) * v.sway;
 
     /* Arms: the raised arm carries most of the life, as it does in the
        reference composition. */

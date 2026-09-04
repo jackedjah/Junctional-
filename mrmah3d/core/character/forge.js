@@ -523,14 +523,41 @@ export function diamondCrystal(opts) {
 
      Splitting them lets the cavity take its own darker, barely-reflective
      material, so the step exists whatever angle the head is seen from. */
+  /* WINDING. Every one of these rings runs clockwise as seen from the front, so
+     a quad listed outer-then-inner comes out with its normal pointing INTO the
+     head and is culled by FrontSide. All four bands were listed that way, and
+     the consequences were severe and completely silent:
+
+       - the head's crown and bevel — the whole diamond frame — were never drawn
+         by their own material at all;
+       - the additive back-faced rim shell WAS drawing them, because BackSide is
+         exactly the set of faces FrontSide was throwing away, so the head's
+         apparent material was a flat 15%-opacity overlay of one colour;
+       - and every attempt to fix the resulting flatness measured nothing,
+         because none of them was touching a face that reached the screen. The
+         facet lift was moved from 0.26 to 0.15 to 0.36 and finally to 1.0, which
+         makes every facet silver, with no visible change whatsoever. The relief
+         was raised twice in an earlier pass. The global Fresnel boost was cut to
+         0.15. Four light cards were added on calculated reflection directions.
+         None of it could have worked.
+
+     What settled it was reading the normals out of the live geometry: material 0
+     had 40 of 40 triangles pointing backward when only its 8 back facets should,
+     and material 2 had 32 of 32. The back facets below are listed in the
+     opposite order and were correct already, which is why they are not touched
+     here — and the plate fan measured 8 of 8 forward, so it is left alone too.
+
+     Lesson worth keeping: a culled face and a black face look identical on a
+     dark stage, and no amount of material tuning distinguishes them. Reading
+     the geometry is a two-minute check that no capture can substitute for. */
   var shell = [], cavity = [], plate = [];
   for (var i = 0; i < N; i++) {
     var j = (i + 1) % N;
-    shell.push([E[i], C[i], C[j], E[j]]);   /* lower crown band */
-    shell.push([C[i], B[i], B[j], C[j]]);   /* upper crown band */
-    cavity.push([B[i], I[i], I[j], B[j]]);  /* over the lip, into the cavity */
-    cavity.push([I[i], F[i], F[j], I[j]]);  /* the inner bevel wall */
-    shell.push([E[j], E[i], back]);         /* back facets */
+    shell.push([E[j], C[j], C[i], E[i]]);   /* lower crown band */
+    shell.push([C[j], B[j], B[i], C[i]]);   /* upper crown band */
+    cavity.push([B[j], I[j], I[i], B[i]]);  /* over the lip, into the cavity */
+    cavity.push([I[j], F[j], F[i], I[i]]);  /* the inner bevel wall */
+    shell.push([E[j], E[i], back]);         /* back facets — already correct */
   }
   /* Fan the plate from its centre so it is several triangles, not one quad —
      it then picks up a little value variation of its own instead of reading as

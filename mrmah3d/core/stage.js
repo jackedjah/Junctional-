@@ -172,6 +172,18 @@ function buildEnvironment(renderer, palette) {
     { x: 68, y: 54, w: 28, h: 22, fill: 'rgba(255,255,255,0.84)' },
     { x: 176, y: 68, w: 18, h: 15, fill: 'rgba(226,246,255,0.85)' },
 
+    /* A NOTE ON WHAT IS DELIBERATELY NOT HERE.
+
+       Four more cards were added at one point on calculated reflection
+       directions for the head's crown bands — x~140 and x~244 at the horizon,
+       x~192 near both poles — because the head was rendering black and the
+       shoulder-top card's lesson suggested it was reflecting a gap. The real
+       cause was that those bands were wound inward and culled entirely (see
+       forge.js), and once that was fixed the four cards measured as a visible
+       no-op and were removed rather than left in as decoration. Recorded
+       because the reasoning was sound and only the premise was wrong: if a part
+       is dark, check that it is being DRAWN before working out what it sees. */
+
     /* THE MIDTONE TIER — larger, dimmer, and the reason this list has two
        kinds of entry.
 

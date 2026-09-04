@@ -189,19 +189,37 @@ ok('CHR-reference-is-committed', exists('reference/mrmah-canonical-front.png'),
 ok('PROP-cites-the-reference', /reference\/mrmah-canonical-front\.png/.test(props));
 ok('PROP-records-frame', /940/.test(props) && /1672/.test(props));
 ok('PROP-records-character-height-px', /1119/.test(props));
-const headW = Number((props.match(/halfWidth:\s*([\d.]+)\s*\*\s*H\s*\/\s*2/) || [])[1]);
-const headH = Number((props.match(/halfHeight:\s*([\d.]+)\s*\*\s*H\s*\/\s*2/) || [])[1]);
-ok('PROP-head-width-matches-reference', Math.abs(headW - 366 / 1119) < 0.01,
-  'head width ' + headW.toFixed(4) + ' vs reference ' + (366 / 1119).toFixed(4));
+/* The head is now DELIBERATELY LARGER than the canonical measurement.
+
+   These two checks used to assert the head against the reference's 366/1119, and
+   they were right to until the character-direction pass: a stylized companion
+   character oversizes the head relative to strict proportion, because that is
+   where identity and expression live and the viewer looks there first. At the
+   measured size the torso outranked the face.
+
+   So the assertion changes from "matches the measurement" to "is a deliberate,
+   bounded enlargement of it" — still a real guard against drift, and against
+   anyone quietly returning it to the traced value or inflating it into a
+   bobblehead. The shape relationship is unchanged: still slightly taller than
+   wide, which is what makes it a diamond rather than a lozenge. */
+const headW = Number((props.match(/halfWidth:\s*([\d.]+)\s*,/) || [])[1]);
+const headH = Number((props.match(/halfHeight:\s*([\d.]+)\s*,/) || [])[1]);
+const HEAD_REF_W = 366 / 1119 * 3 / 2;   /* the canonical half-width, 0.4905 */
+ok('PROP-head-enlarged-for-character', headW > HEAD_REF_W * 1.05 && headW < HEAD_REF_W * 1.35,
+  'head half-width ' + headW + ' against the canonical ' + HEAD_REF_W.toFixed(4) +
+  ' — a deliberate stylization, bounded so it cannot drift back or balloon');
 ok('PROP-head-slightly-taller-than-wide', headH > headW,
-  'the reference diamond is 366 wide by 384 tall');
+  'the diamond reads as a diamond only while it is taller than it is wide');
 ok('PROP-float-not-grounded', /height:\s*0\.1/.test(props));
 
 /* Every part the brief names must actually exist as geometry. */
 const parts = {
   'diamond head': /diamondCrystal/.test(read('mrmah3d/core/character/head.js')),
   'recessed face plate': /faceZ/.test(read('mrmah3d/core/character/forge.js')),
-  'neck': /neckGeo/.test(read('mrmah3d/core/character/body.js')),
+  /* No neck part any more — the chest crown meets the head's own cross-section
+     flush, so a connector would only be visible clutter. What must exist is the
+     crown that does that job. */
+  'head-to-chest crown': /THE CROWN/.test(props),
   'shoulders': /shoulder caps/i.test(read('mrmah3d/core/character/body.js')),
   'tapered torso': /torsoLoft/.test(read('mrmah3d/core/character/body.js')),
   'two arms': /ARMS\.right/.test(read('mrmah3d/core/character/limbs.js')) &&

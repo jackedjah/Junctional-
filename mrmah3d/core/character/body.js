@@ -16,7 +16,7 @@ import {
   BufferGeometry, Float32BufferAttribute
 } from '../../vendor/three/three.module.min.js';
 import { loft, segment, diamondPlate, facetedGeometry } from './forge.js';
-import { TORSO, NECK, INSIGNIA, HEAD, ARMS } from './proportions.js';
+import { TORSO, INSIGNIA, HEAD, ARMS } from './proportions.js';
 
 function lit(group, geo, materials, opts) {
   var o = opts || {};
@@ -116,11 +116,16 @@ export function buildBody(materials) {
   var owned = [];
 
   /* ---- torso ----------------------------------------------------------
-     heroAngle 86, not 78. With the ring table thinned out the seam just above
-     the tip became a very sharp break, cleared the hero threshold, and drew a
-     bright white bar straight across the bottom of the body. Hero edges are
-     meant to be rare by construction; if a routine seam qualifies, the
-     threshold is wrong rather than the seam. */
+     NO HERO TIER ON THE TORSO ANY MORE.
+
+     It existed to pick out the prow down the chest when the body was a plain
+     cone. The body now has a waist, a ribcage and a crown, and every one of
+     those is a sharp enough turn to clear a hero threshold — so instead of one
+     authored highlight the tier drew bright white bars across whichever ring
+     happened to turn hardest, most recently a hard line under the chin where
+     the crown meets the head. Hero edges have to be rare BY CONSTRUCTION; on a
+     shape with this many real breaks, no threshold makes them rare. The
+     structural and secondary tiers describe the form perfectly well without it. */
   var torsoLoft = loft(TORSO.rings, TORSO.sides || 8,
     { capTop: true, capBottom: false, lift: TORSO.classLift });
   /* edgeAngle 42, down from the 52 default. With the ring table thinned and the
@@ -144,7 +149,7 @@ export function buildBody(materials) {
      progressively darker and flatter than the one that was being "fixed" — a
      long correction of a fault nobody had reported. Restored. */
   var torsoParts = lit(group, torsoLoft.geometry, materials,
-    { rimScale: 1.022, hero: true, heroAngle: 86, edgeAngle: 42, minorAngle: 36 });
+    { rimScale: 1.022, edgeAngle: 42, minorAngle: 36 });
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
 
   /* ---- shoulder caps / deltoids --------------------------------------- */
@@ -218,18 +223,54 @@ export function buildBody(materials) {
        shading problem: a flat surface that should have been inside the mesh was
        outside it. Moved inboard and down until the whole disc is within the
        torso at every row it crosses. */
-    var inner = [side * 0.152, TORSO.topY - 0.078, 0.02];
-    var outer = [joint[0] * 1.00, joint[1] - 0.033, joint[2]];
+    /* AND THEN THE SAME MISTAKE, ONE AXIS OVER.
+
+       Burying the cap disc fixed the bright wedge beside the neck, but the tube
+       it capped still started at x 0.152 — a sixth of the way out from the
+       spine — and was DEEPER than it was wide (depthRatio 1.22, so a 0.250
+       front-to-back radius against a chest whose own half-depth is 0.273). A
+       horizontal tube viewed from dead front is a RECTANGLE, and this one was
+       projecting through the chest wall for most of its inboard length. The
+       canonical render showed exactly that: two hard-edged pale slabs across
+       the pectorals, straight top, straight bottom, straight inner edge. It
+       read as panelling, and it was most of what still made him look like a
+       test object rather than a character.
+
+       Removing the deltoids for one capture settled it in a single render — the
+       torso underneath is a clean sloping shoulder shelf and the slabs were
+       entirely these. So the deltoid now starts OUTBOARD of the chest wall
+       (x 0.375, past the shoulder shelf's break) and its root is choked to a
+       third of its radius by the profile, which means the buried end is a stub
+       rather than a disc and nothing crosses the pectoral at all. Depth comes
+       back to parity with width: the mass it needs is outboard of the ribcage,
+       where sticking out in front is the shoulder reading as a shoulder rather
+       than as a plate stuck on the chest. */
+    var inner = [side * 0.300, TORSO.topY - 0.082, -0.005];
+    var outer = [joint[0] * 1.00, joint[1] - 0.034, joint[2]];
+    var deltoidR0 = 0.205;
+    /* SMALLER THAN THE ARM IT MEETS, not larger. `segment` caps both ends, and
+       the outer cap is a disc perpendicular to a near-horizontal axis, so at
+       1.22x the upper-arm radius it stood proud of the limb all the way round
+       and rendered as a bright white wedge on each shoulder top. The arm's own
+       profile starts at 0.84, i.e. radius 0.094 — so the deltoid ends at 0.087
+       and the disc is inside the bicep where nothing can see it. The mass the
+       shoulder needs comes from the belly in the middle, not from the join. */
+    var deltoidR1 = spec.upperRadius * 0.78;
+    /* Root choke x belly swell. The choke keeps the inboard end inside the
+       chest; the swell is the deltoid's own belly. t^1.3 puts its peak at
+       t ~ 0.59 rather than at the midpoint, which places the widest part of the
+       shoulder outboard of the clavicle, where the reference has it, instead of
+       raising a hump beside the neck. */
+    var deltoidProfile = function (t) {
+      var root = Math.min(1, t / 0.28);
+      return (0.34 + 0.66 * root * root * (3 - 2 * root)) *
+             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.22);
+    };
     var geo = segment(
       inner, outer,
-      0.205, spec.upperRadius * 1.24, 8,
-      { depthRatio: 1.22, crystal: 0.058, steps: 6, lift: ARMS.classLift,
-        profile: function (t) {
-        /* Widest just outboard of where it leaves the chest — the deltoid
-           belly — then drawing into the arm. Shallower than before: the swell
-           was adding lateral width exactly where the silhouette is read. */
-        return 1 + Math.sin(Math.pow(t, 0.7) * Math.PI) * 0.075;
-      } }
+      deltoidR0, deltoidR1, 8,
+      { depthRatio: 1.0, crystal: 0.058, steps: 6, lift: ARMS.deltoidLift,
+        profile: deltoidProfile }
     );
     var parts = lit(group, geo, materials, { rimScale: 1.03, quiet: true, minorAngle: 30 });
     owned.push(geo, parts.edges, parts.minorEdges, parts.heroEdges);
@@ -256,8 +297,7 @@ export function buildBody(materials) {
     var STEPS = 5;
     for (var ri = 0; ri <= STEPS; ri++) {
       var rt = ri / STEPS;
-      var rr = (0.205 + (spec.upperRadius * 1.24 - 0.205) * rt) *
-               (1 + Math.sin(Math.pow(rt, 0.7) * Math.PI) * 0.075);
+      var rr = (deltoidR0 + (deltoidR1 - deltoidR0) * rt) * deltoidProfile(rt);
       ridgePts.push(
         inner[0] + (outer[0] - inner[0]) * rt,
         inner[1] + (outer[1] - inner[1]) * rt + rr * 0.90,
@@ -277,51 +317,19 @@ export function buildBody(materials) {
     owned.push(ridge);
   });
 
-  /* ---- neck ----------------------------------------------------------- */
-  /* Short and narrow. The head's lower vertex overlaps it, exactly as in the
-     reference, so only a small collar of it is ever visible. */
-  /* The neck runs from INSIDE the chest to INSIDE the head.
+  /* ---- no neck -------------------------------------------------------- */
+  /* THERE IS DELIBERATELY NO NECK GEOMETRY.
 
-     Previously it spanned the visible gap between them and read as a little
-     rectangular connector bridging two separate objects — the character looked
-     assembled rather than sculpted. Burying both ends means neither termination
-     is ever visible: the head's lower vertex descends over the top of it and
-     the collar below rises to receive it, so the transition is continuous
-     crystal. It is also wider at the base than the top, which is what lets the
-     chest appear to carry the head rather than merely touch it. */
-  /* A TENON, not a neck.
+     There used to be a tenon here — a narrow internal connector buried in the
+     chest at one end and inside the head at the other — to make the two solids
+     read as one when a gap stood between them. With the head enlarged and
+     seated lower, and the chest crown shortened so its top ring is exactly the
+     head's own cross-section at that height, the two now meet flush. The tenon
+     had become the only thing visible in the junction: a pale rectangular stub
+     under the chin, which is precisely what it had been built to prevent.
 
-     Measured off the reference, the head's lower vertex (t=0.343) and the
-     shoulder line (t=0.356) are fifteen pixels apart: the point of the diamond
-     lands essentially ON the chest and no neck is visible anywhere in the
-     image. What we were drawing was a cone 0.156 wide climbing through rows
-     where the head tapers to nothing, so it protruded around the head's point
-     as a pale funnel — the "head / little rectangular neck / body" read, and
-     the reason the character looked assembled.
-
-     So this is now a narrow internal connector: buried in the chest crown at
-     the bottom, buried inside the head at the top, and narrower than the head's
-     own cross-section for all but a sliver of its length. It exists to make the
-     two solids one solid, and it is not meant to be seen.
-
-     The separate collar flare is gone with it. Its job — giving the chest
-     something to receive the head with — now belongs to the crown rings in
-     proportions.js, which is where it should have been: part of the torso's own
-     surface rather than a ring clipped around it. As a separate lofted tube it
-     could only ever read as a shelf or a hoop sitting on the chest. */
-  var neckGeo = segment(
-    [0, TORSO.topY - 0.10, 0.01],                     /* inside the chest */
-    [0, HEAD.centreY - HEAD.halfHeight * 0.60, 0.01], /* up inside the head */
-    NECK.halfWidth * 0.42, NECK.halfWidth * 0.34, 8,
-    { depthRatio: 0.92, crystal: 0.05, steps: 3 }
-  );
-  /* Quiet, and no rim. Whatever of the tenon is briefly visible between the
-     head's lower vertex and the chest crown should read as crystal continuing,
-     not as a bright-edged column bridging two objects — which is exactly the
-     "assembled" impression the tenon exists to remove. Its edges are demoted to
-     a whisper so the surfaces alone carry it. */
-  var neckParts = lit(group, neckGeo, materials, { rim: false, quiet: true, minorAngle: 40 });
-  owned.push(neckGeo, neckParts.edges, neckParts.minorEdges, neckParts.heroEdges);
+     One fewer part, a cleaner throat, and the big-shape rule honoured — head
+     mass meets chest mass directly, with nothing between them to explain. */
 
   /* ---- chest insignia ------------------------------------------------- */
   /* Emissive, sitting slightly proud of the chest ridge so it is never

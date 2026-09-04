@@ -12,7 +12,7 @@
    legible at any exposure. */
 
 import {
-  Group, Mesh, TorusGeometry, EdgesGeometry, LineSegments, Object3D, Vector3
+  Group, Mesh, TorusGeometry, EdgesGeometry, LineSegments, Object3D
 } from '../../vendor/three/three.module.min.js';
 import { diamondCrystal } from './forge.js';
 import { HEAD } from './proportions.js';
@@ -47,18 +47,9 @@ export function buildHead(materials) {
   shell.receiveShadow = true;
   group.add(shell);
 
-  /* Rim shell — the same solid, slightly inflated, back faces only. */
-  var rim = new Mesh(geo, materials.rim);
-  rim.scale.setScalar(1.035);
-  /* Concentric, for the same reason as body.js. The head's own geometry is
-     already built about its centre so the correction is small here, but it is
-     not zero — the crystal runs from a back apex to a front plate, so its
-     bounding centre sits behind z=0 and an uncorrected shell drifts forward. */
-  if (!geo.boundingBox) geo.computeBoundingBox();
-  var hc = geo.boundingBox.getCenter(new Vector3());
-  rim.position.set(hc.x * -0.035, hc.y * -0.035, hc.z * -0.035);
-  rim.name = 'head-rim';
-  group.add(rim);
+  /* NO RIM SHELL ON THE HEAD. See the note below the winding fix in forge.js:
+     this shell was drawing the head's crown bands because they were wound
+     inward, and it is not needed now that they render on their own. */
 
   /* Edge illumination, taken from the geometry itself. */
   /* THE HEAD CARRIES VERY FEW LINES.
@@ -107,8 +98,16 @@ export function buildHead(materials) {
   /* Sized against the reference: the eyes are smaller relative to the head
      than they first appear, and set a little wider apart. Oversized rings read
      as a cartoon mascot rather than as the reference's restrained face. */
-  var eyeR = HEAD.halfWidth * 0.112;
-  var eyeGap = HEAD.halfWidth * 0.325;
+  /* The features are sized off the head, so enlarging the head enlarged the
+     cavity and left the eyes and smile looking sparse inside it — a bigger face
+     with the same small marks on it reads emptier, not friendlier. These
+     factors are raised to keep the FEATURES' share of the cavity where it was,
+     which is what the charm actually depends on. */
+  /* Trimmed a little with the cavity walls now drawn — see faceInset in
+     proportions.js. The eyes move inboard rather than shrinking much, because
+     it is their OUTER edge that the inner bevel was cutting. */
+  var eyeR = HEAD.halfWidth * 0.128;
+  var eyeGap = HEAD.halfWidth * 0.315;
   var eyeY = HEAD.halfHeight * 0.10;
 
   var eyes = [];
@@ -146,7 +145,7 @@ export function buildHead(materials) {
      than hiding under them), meaningfully thicker than the eye stroke, and
      opened out to a fuller arc so its curve reads as a smile at a glance
      instead of as a short dash. */
-  var smileR = HEAD.halfWidth * 0.34;
+  var smileR = HEAD.halfWidth * 0.340;
   var smileArc = Math.PI * 0.92;
   var smile = new Mesh(
     /* Slightly heavier than the eye stroke, not lighter.

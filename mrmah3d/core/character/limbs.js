@@ -95,6 +95,26 @@ function buildHand(materials, spec, options) {
     owned.push(g, d.edges, d.minorEdges);
   }
 
+  /* A THUMB — the one addition that makes a hand read as a hand.
+
+     Three digits in a row is a fork; the same three with a shorter opposed
+     digit set lower and angled across is unmistakably a hand, at any size, and
+     it costs one small segment. The brief asks for thumb logic and finger
+     grouping rather than knuckles, and this is exactly that: the silhouette
+     does the work. Set on the inner side so the raised hand reads as an open
+     presenting gesture rather than a claw. */
+  var thumbBase = [-spec.palmHalfWidth * 0.92, spec.palmLength * 0.42, spec.palmHalfDepth * 0.35];
+  var thumbLen = spec.digitLength * (opts.open ? 0.82 : 0.62);
+  var thumbTip = [
+    thumbBase[0] - thumbLen * (opts.open ? 0.72 : 0.42),
+    thumbBase[1] + thumbLen * (opts.open ? 0.62 : 0.78),
+    thumbBase[2] + thumbLen * 0.28
+  ];
+  var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 5,
+    { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
+  var thumb = clad(hand, thumbGeo, materials, 1.08);
+  owned.push(thumbGeo, thumb.edges, thumb.minorEdges);
+
   /* The bright tip diamond the reference shows above the raised hand. */
   if (opts.tipDiamond) {
     var tipGeo = diamondPlate(spec.tipDiamond, 0.02);
