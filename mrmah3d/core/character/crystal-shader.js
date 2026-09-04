@@ -91,8 +91,8 @@ export function applyCrystalShader(material, options) {
     /* Chamfer width in WORLD UNITS, on a character 3.0 tall — so a shade over
        a quarter of a percent of his height, which is the 1-3%-of-local-form the
        brief asks for on the parts that matter (an arm is ~0.2 across). */
-    uBevelWorld: { value: opts.bevelWorld == null ? 0.0045 : opts.bevelWorld },
-    uBevelAmount: { value: opts.bevelAmount == null ? 0.38 : opts.bevelAmount },
+    uBevelWorld: { value: opts.bevelWorld == null ? 0.0062 : opts.bevelWorld },
+    uBevelAmount: { value: opts.bevelAmount == null ? 0.46 : opts.bevelAmount },
     /* R94 — THE INTERNAL LIGHT. A real source INSIDE the crystal, in the
        mesh's own space, whose light reaches the outside of a facet by
        TRANSMISSION rather than reflection: a facet is lit in proportion to how
