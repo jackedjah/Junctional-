@@ -189,7 +189,13 @@ export var TORSO = {
   /* The deltoid no longer reads this — its extent comes from the arm joint plus
      its own end radius (see body.js) — but the shoulder line is still measured
      against it, so it is kept as the stated target the two should agree on. */
-  shoulderHalfWidth: 0.870,
+  /* Corrected down from 0.870. The heroic pass overshot: the deltoids
+     projected far enough laterally to square off the whole upper body and
+     visually outrank the head. The volume they were carrying is not lost — it
+     moved into front-to-back DEPTH (see the deltoid's depthRatio in body.js),
+     which reads as mass from every angle a viewer can reach without widening
+     the silhouette. Roughly a 10% reduction in projection, as briefed. */
+  shoulderHalfWidth: 0.782,
   shoulderY: 1.900
 };
 
@@ -220,21 +226,21 @@ export var ARMS = {
        stay where they were measured, so the pose and the hand positions are
        unchanged — only the top of the limb moves out, which also gives the
        upper arm the near-vertical hang that Reference A has. */
-    shoulder: [-0.698, 1.900, 0.02],
+    shoulder: [-0.638, 1.884, 0.02],
     /* Brought under the shoulder. With the joint moved outboard, the old elbow
        at 0.764 made the upper arm angle further OUT before the forearm cut back
        in — a chicken wing. Reference A hangs the upper arm almost vertically
        from the outer shoulder and lets only the forearm angle inward to the
        hip, which is both calmer and stronger. */
-    elbow: [-0.702, 1.318, 0.10],
+    elbow: [-0.664, 1.318, 0.10],
     wrist: [-0.470, 0.902, 0.16],
     upperRadius: 0.112,
     foreRadius: 0.086,
     wristRadius: 0.060
   },
   left: {                         /* viewer's RIGHT — the raised arm */
-    shoulder: [0.696, 1.894, 0.02],
-    elbow: [0.758, 1.330, 0.10],
+    shoulder: [0.636, 1.878, 0.02],
+    elbow: [0.716, 1.330, 0.10],
     wrist: [0.812, 1.982, 0.14],
     upperRadius: 0.112,
     foreRadius: 0.086,
@@ -255,14 +261,23 @@ export var ARMS = {
      and the measured shoulder/elbow/wrist points stay where the reference put
      them. */
   profiles: {
-    /* Peaks at t=0.34 — the belly of the upper arm — then draws into the
-       elbow, which is the narrowest point of the whole limb. */
+    /* STARTS BELOW 1, which is the correction the brief asks for.
+
+       Both profiles used to begin at exactly 1.0, so the limb left the shoulder
+       at its full nominal radius and the deltoid met a cylinder of the same
+       width — no waist between them, and therefore no readable transition. The
+       arm now narrows immediately below the shoulder, swells through the
+       bicep/tricep belly around a third of the way down, and draws into the
+       elbow as the narrowest point of the whole limb. That sequence is what
+       makes the taper read; a single bulge on a straight cone does not. */
     upper: function (t) {
-      return 1 + Math.sin(Math.pow(t, 0.78) * Math.PI) * 0.22 - t * 0.10;
+      return 0.84 + Math.sin(Math.pow(t, 0.85) * Math.PI) * 0.28;
     },
-    /* Peaks earlier and less: a forearm is fullest right below the elbow. */
+    /* Picks up close to where the upper arm ended — a step at the elbow reads
+       as an error rather than as a joint — then swells just below it and tapers
+       to a narrow wrist. */
     fore: function (t) {
-      return 1 + Math.sin(Math.pow(t, 0.62) * Math.PI) * 0.13 - t * 0.06;
+      return 0.88 + Math.sin(Math.pow(t, 0.62) * Math.PI) * 0.16 - t * 0.10;
     }
   }
 };

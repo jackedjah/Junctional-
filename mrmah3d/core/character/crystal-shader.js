@@ -101,7 +101,17 @@ export function applyCrystalShader(material, options) {
         '  vec3 mrHue = mix( vec3( dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) ),',
         '                    diffuseColor.rgb * uTint * 0.95, clamp( vFacet.w, 0.0, 1.0 ) );',
         '  diffuseColor.rgb = mix( mrHue, uDeep, clamp( mrDark, 0.0, 1.0 ) );',
-        '  diffuseColor.rgb *= 1.0 + max( -mrDark, 0.0 ) * 1.6;',
+        /* The silver class carries a NEGATIVE darkness, and this line turns
+           that into extra albedo — it is what makes a silver facet the
+           brightest thing on the body after the face.
+
+           It was briefly cut to 1.02 while chasing a pair of blown white
+           patches on the shoulders. That turned out to be geometry (a capped
+           tube end standing proud of the chest), not this, so the value is
+           restored — with a little taken off the top, because at 1.6 combined
+           with envMapIntensity 14 the brightest catches were sitting right on
+           the clip point with nowhere left to roll off. */
+        '  diffuseColor.rgb *= 1.0 + max( -mrDark, 0.0 ) * 1.38;',
         '#endif'
       ].join('\n'))
 

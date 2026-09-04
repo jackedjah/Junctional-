@@ -153,15 +153,66 @@ export function buildBody(materials) {
   [-1, 1].forEach(function (side) {
     var spec = side < 0 ? ARMS.right : ARMS.left;
     var joint = spec.shoulder;
-    var inner = [side * 0.26, TORSO.topY - 0.015, 0.015];
-    var outer = [joint[0] * 1.02, joint[1] - 0.10, joint[2]];
+    /* PROPORTION CORRECTION — the heroic pass overshot here.
+
+       Four things were wrong together and they compounded. The mass was 0.310
+       thick at the chest end, which put each cap's apex high enough to crowd
+       the head; the axis ran almost level, so the shoulder line was flat rather
+       than sloping; the belly profile added 17% on top of that at the widest
+       point; and the whole thing was wider than it was deep, so every unit of
+       volume went sideways into the silhouette. The result read as armour
+       blocks — a bodybuilder, not an athlete.
+
+       The corrections are deliberately small and all in the same direction:
+
+         - the chest end is slimmer (0.310 -> 0.262) and starts lower, which
+           drops the visible apex without touching the head or the torso
+         - the axis falls further from the neck to the joint, restoring the
+           downward clavicle slope the reference has
+         - depthRatio goes ABOVE 1: the deltoid is now deeper front-to-back
+           than it is wide. This is the important one. It preserves the volume
+           the brief explicitly says to keep while taking it out of the
+           lateral silhouette, and it reads as mass from any angle the
+           interaction can actually reach
+         - one more step along the length, so the cap resolves into several
+           facets rather than presenting as a single dark slab */
+    /* THE SLOPE COMES FROM THE INNER END, NOT THE OUTER ONE.
+
+       A first attempt at this dropped the outer end 0.165 below the arm's
+       shoulder joint to get the fall. That does produce a slope, and it also
+       ends the deltoid BELOW the top of the limb it is supposed to cap — so the
+       arm's own top cap stood proud of it and each shoulder read as a separate
+       floating pauldron with a bright seam between it and the chest.
+
+       The clavicle end is raised instead. Same fall from neck to joint, but the
+       cap still closes over the top of the arm, which is what makes the two
+       read as one continuous mass. The apex comes down through the smaller
+       chest-end radius rather than by moving the whole axis. */
+    /* THE CHEST END MUST BE FULLY BURIED, and it was not.
+
+       `segment` caps both ends, so the deltoid's inner end is a flat disc. That
+       disc sits perpendicular to the axis, which here is nearly horizontal —
+       so it spans almost its whole radius VERTICALLY: centred at y 1.925 with
+       radius 0.230 it reached y 2.155, while the chest crown at that height is
+       only 0.15 wide. The top of the cap was standing clear of the body beside
+       the neck and catching light as a hard bright wedge on each shoulder.
+
+       Three other explanations were tried first and all were wrong — the
+       shoulder-top light card, the silver class's albedo boost, and the
+       authored ridge line. None of them moved it, because it was never a
+       shading problem: a flat surface that should have been inside the mesh was
+       outside it. Moved inboard and down until the whole disc is within the
+       torso at every row it crosses. */
+    var inner = [side * 0.152, TORSO.topY - 0.078, 0.02];
+    var outer = [joint[0] * 1.00, joint[1] - 0.033, joint[2]];
     var geo = segment(
       inner, outer,
-      0.310, spec.upperRadius * 1.42, 8,
-      { depthRatio: 0.86, crystal: 0.055, steps: 5, profile: function (t) {
+      0.230, spec.upperRadius * 1.30, 8,
+      { depthRatio: 1.12, crystal: 0.058, steps: 6, profile: function (t) {
         /* Widest just outboard of where it leaves the chest — the deltoid
-           belly — then drawing into the arm. */
-        return 1 + Math.sin(Math.pow(t, 0.7) * Math.PI) * 0.17;
+           belly — then drawing into the arm. Shallower than before: the swell
+           was adding lateral width exactly where the silhouette is read. */
+        return 1 + Math.sin(Math.pow(t, 0.7) * Math.PI) * 0.11;
       } }
     );
     var parts = lit(group, geo, materials, { rimScale: 1.03, quiet: true, minorAngle: 30 });
@@ -189,8 +240,8 @@ export function buildBody(materials) {
     var STEPS = 5;
     for (var ri = 0; ri <= STEPS; ri++) {
       var rt = ri / STEPS;
-      var rr = (0.310 + (spec.upperRadius * 1.42 - 0.310) * rt) *
-               (1 + Math.sin(Math.pow(rt, 0.7) * Math.PI) * 0.17);
+      var rr = (0.230 + (spec.upperRadius * 1.30 - 0.230) * rt) *
+               (1 + Math.sin(Math.pow(rt, 0.7) * Math.PI) * 0.11);
       ridgePts.push(
         inner[0] + (outer[0] - inner[0]) * rt,
         inner[1] + (outer[1] - inner[1]) * rt + rr * 0.90,

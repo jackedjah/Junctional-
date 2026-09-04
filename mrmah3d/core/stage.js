@@ -152,8 +152,13 @@ function buildEnvironment(renderer, palette) {
 
        This is the card those planes actually see. It is the reason the shoulder
        tops now catch light while their outer and under surfaces stay dark,
-       which is the read Reference A has. */
-    { x: 68, y: 54, w: 30, h: 24, fill: 'rgba(255,255,255,0.92)' },
+       which is the read Reference A has.
+       Held near full strength. It was briefly cut to 0.58 while chasing a pair
+       of blown white patches on the shoulders, which turned out to be a capped
+       tube end standing proud of the chest rather than anything to do with
+       lighting. The brief is explicit that the shoulder must not become one
+       giant dark mass, and this card is the only thing keeping it from that. */
+    { x: 68, y: 54, w: 28, h: 22, fill: 'rgba(255,255,255,0.84)' },
     { x: 176, y: 68, w: 18, h: 15, fill: 'rgba(226,246,255,0.85)' },
 
     /* THE MIDTONE TIER — larger, dimmer, and the reason this list has two
