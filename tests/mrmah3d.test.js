@@ -707,6 +707,18 @@ if (exists('CLAUDE.md')) {
   ok('R99-lowered-hand-is-a-fist', /var curl = opts\.open \? 0\.22 : 0\.5[0-9]/.test(limbs));
   /* the deltoid's root is buried in the chest, inboard of the pec's outer plane */
   ok('R99-deltoid-root-buried', /innerX: 0\.2[0-9]{2}/.test(body));
+  /* the shadow-first debug views (brief §39): mass silhouette, anatomical groups, grayscale */
+  const mrmahSrc = read('mrmah3d/core/character/mrmah.js');
+  const labSrc = read('mrmah3d/lab/lab.js');
+  ok('R99-debug-views-exist', /setDebugView/.test(mrmahSrc) && /'mass'|"mass"/.test(mrmahSrc) && /'groups'|"groups"/.test(mrmahSrc) &&
+    /setDebugView/.test(read('mrmah3d/core/mrmah-scene.js')));
+  ok('R99-debug-views-restore-exactly', /userData\.__mat/.test(mrmahSrc) && /delete o\.userData\.__mat/.test(mrmahSrc));
+  ok('R99-lab-exposes-debug-views', /params\.get\('debug'\)/.test(labSrc) && /grayscale\(1\)/.test(labSrc));
+  /* the anatomical groups are named so the view can tell them apart */
+  ok('R99-anatomy-meshes-named', /name = 'torso'/.test(body) && /'deltoid-right' : 'deltoid-left'/.test(body) &&
+    /'-upper'/.test(limbs) && /'-fore'/.test(limbs) && /'hand-solid'/.test(limbs));
+  /* the presented crystal levitates over the palm and stops under reduced motion */
+  ok('R99-hand-crystal-levitates', /crystal\.plate\.position\.y = crystal\.restY \+ lev/.test(mrmahSrc) && /if \(crystal && !reduced\)/.test(mrmahSrc));
   /* the arm's named rows reach the dark end */
   ok('R99-arm-rows-reach-dark', /var UPPER_ARM = \[\s*\/\*[^]*?\*\/\s*var UPPER_ARM = \[|var UPPER_ARM = \[\n\s*\[0\.14,\s*0\.08,\s*-0\.10,\s*0\.7/.test(regions));
 })();

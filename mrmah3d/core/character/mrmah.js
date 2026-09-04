@@ -11,7 +11,7 @@
    floated, bobbed or scaled by moving one group without any part drifting
    relative to another. */
 
-import { Group, MathUtils } from '../../vendor/three/three.module.min.js';
+import { Group, MathUtils, MeshBasicMaterial } from '../../vendor/three/three.module.min.js';
 import { createCrystalMaterials } from './materials.js';
 import { buildHead } from './head.js';
 import { buildBody } from './body.js';
@@ -101,6 +101,18 @@ export function createMrMah(options) {
     materials.setGlow(v.glow * (conf.glowScale == null ? 1 : conf.glowScale));
     /* R98 — the hand crystal's lamp rides the same pulse as the emitters. */
     if (limbs.handLamp) limbs.handLamp.intensity = 0.70 * v.glow;
+    /* R99 — THE CRYSTAL LEVITATES over the palm: a slow rise and fall of a
+       few millimetres and a slight roll, out of phase with the hover, so it
+       reads as held by control rather than glued to the fingertips. Off
+       under reduced motion, like everything else that moves. */
+    var crystal = limbs.left && limbs.left.crystal;
+    if (crystal && !reduced) {
+      var lev = Math.sin(time * 0.9 + 1.3) * 0.007;
+      crystal.plate.position.y = crystal.restY + lev;
+      crystal.glow.position.y = crystal.restY + lev;
+      crystal.plate.rotation.z = Math.sin(time * 0.55) * 0.07;
+      crystal.glow.rotation.z = crystal.plate.rotation.z;
+    }
 
     if (reduced) {
       /* Reduced motion keeps him present but still: hover holds at its
@@ -279,6 +291,53 @@ export function createMrMah(options) {
     },
     setYaw: setYaw,
     getYaw: getYaw,
+    /* R99 — SHADOW-FIRST DEBUG VIEWS (godform brief §39), development only.
+
+         'mass'    every solid flat near-black, no lines: the silhouette test —
+                   does the body read as anatomy with nothing but its outline?
+         'groups'  one flat colour per anatomical group, so the head, torso,
+                   each deltoid, upper arm, forearm and hand can be told apart
+                   and their overlaps checked.
+         null      restore the crystal.
+
+       Materials are swapped, never edited, and the originals are kept on the
+       object so restoring is exact. The lab exposes it as ?debug=. */
+    setDebugView: function (name) {
+      var mode = name || null;
+      var GROUP_COLOURS = [
+        ['head-shell', 0xd8dde6], ['torso', 0x3a6fd8], ['deltoid', 0xe0a030],
+        ['-upper', 0x30c070], ['-fore', 0xc04080], ['hand-solid', 0xe0e060],
+        ['elbow', 0x8890a0], ['wrist', 0x8890a0], ['eye', 0xffffff], ['smile', 0xffffff],
+        ['chest-emblem', 0x60e0ff], ['transport', 0x60e0ff], ['throat', 0x60e0ff], ['hand-crystal', 0x60e0ff]
+      ];
+      root.traverse(function (o) {
+        if (o.isLineSegments || o.isLine) {
+          if (mode && o.userData.__vis == null) o.userData.__vis = o.visible;
+          o.visible = mode ? false : (o.userData.__vis == null ? o.visible : o.userData.__vis);
+          if (!mode) delete o.userData.__vis;
+          return;
+        }
+        if (!o.isMesh) return;
+        if (mode) {
+          if (!o.userData.__mat) o.userData.__mat = o.material;
+          var colour = 0x171a20;
+          if (mode === 'groups') {
+            colour = 0x404650;
+            for (var i = 0; i < GROUP_COLOURS.length; i++) {
+              if (o.name.indexOf(GROUP_COLOURS[i][0]) !== -1) { colour = GROUP_COLOURS[i][1]; break; }
+            }
+          }
+          if (!o.userData.__dbg) o.userData.__dbg = new MeshBasicMaterial({ toneMapped: false });
+          o.userData.__dbg.color.setHex(colour);
+          o.material = o.userData.__dbg;
+        } else if (o.userData.__mat) {
+          o.material = o.userData.__mat;
+          delete o.userData.__mat;
+          if (o.userData.__dbg) { o.userData.__dbg.dispose(); delete o.userData.__dbg; }
+        }
+      });
+      return mode;
+    },
     setState: states.set,
     getState: states.get,
     stateNames: states.names,

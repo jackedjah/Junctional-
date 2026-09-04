@@ -188,6 +188,7 @@ export function buildBody(materials, P) {
      two masses, not a pair of lines. */
   var torsoParts = lit(group, torsoLoft.geometry, materials,
     { rim: false, edgeAngle: 48, minorAngle: 36 });
+  torsoParts.mesh.name = 'torso';   /* R99: named for the anatomical-group debug view */
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
 
   /* ---- shoulder caps / deltoids --------------------------------------- */
@@ -318,7 +319,10 @@ export function buildBody(materials, P) {
        higher, so the cap grows out of the trapezius and the front lobe
        overlaps the pec's outer plane — the shoulder wrapping into the body
        rather than sitting beside it. */
-    var D = ARMS_.deltoid || { innerX: 0.262, innerY: 2.062, outerX: 0.590, outerY: 1.960, r0: 0.252 };
+    /* R99, from the silhouette test (?debug=mass): at innerY 2.062 the cap's
+       crest rose ABOVE the trapezius line and each shoulder read as a bump
+       sitting on the body. Lowered so the crest continues the trap's slope. */
+    var D = ARMS_.deltoid || { innerX: 0.262, innerY: 2.030, outerX: 0.590, outerY: 1.935, r0: 0.252 };
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;
@@ -345,7 +349,7 @@ export function buildBody(materials, P) {
       var endT = Math.max(0, (t - 0.75) / 0.25);
       var end = 1 - 0.55 * endT * endT * (3 - 2 * endT);
       return (0.28 + 0.72 * root * root * (3 - 2 * root)) * end *
-             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.37);
+             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.33);
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -409,6 +413,7 @@ export function buildBody(materials, P) {
        own ring seams, which draws a boundary at exactly the place the value ramp
        above exists to dissolve. */
     var parts = lit(group, geo, materials, { rim: false, quiet: true, edgeAngle: 58, minorAngle: 80 });
+    parts.mesh.name = side < 0 ? 'deltoid-right' : 'deltoid-left';
     owned.push(geo, parts.edges, parts.minorEdges, parts.heroEdges);
     deltoidGeos.push(geo);
 

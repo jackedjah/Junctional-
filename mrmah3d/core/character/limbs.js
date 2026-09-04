@@ -56,9 +56,10 @@ function armZone(table, innerSign) {
   };
 }
 
-function clad(group, geo, materials, rimScale, edgeAngles) {
+function clad(group, geo, materials, rimScale, edgeAngles, name) {
   var ea = edgeAngles || {};
   var mesh = new Mesh(geo, materials.body);
+  if (name) mesh.name = name;   /* R99: named for the anatomical-group debug view */
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   group.add(mesh);
@@ -165,6 +166,7 @@ function buildHand(materials, spec, options) {
   var hand = new Group();
   hand.name = 'hand';
   var owned = [];
+  var crystal = null;   /* R99: the presented crystal, for its levitation */
 
   var HAND_EDGES = { major: 84, minor: 89 };
   /* R95 — ONE GEOMETRY PER HAND. Four jointed fingers and a thumb as separate
@@ -230,18 +232,21 @@ function buildHand(materials, spec, options) {
     { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
   parts.push(thumbGeo);
   var handGeo = mergeGeometries(parts);
-  var handParts = clad(hand, handGeo, materials, 0, HAND_EDGES);
+  var handParts = clad(hand, handGeo, materials, 0, HAND_EDGES, 'hand-solid');
   owned.push(handGeo, handParts.edges, handParts.minorEdges);
 
   /* The bright tip diamond the reference shows above the raised hand. */
   if (opts.tipDiamond) {
     var tipGeo = diamondPlate(spec.tipDiamond, 0.02);
     var tip2 = new Mesh(tipGeo, materials.emissive);
+    tip2.name = 'hand-crystal';
     tip2.position.set(0, spec.palmLength + spec.digitLength * 1.25, 0.02);
     hand.add(tip2);
     var tipGlow = new Mesh(diamondPlate(spec.tipDiamond * 2.0, 0.006), materials.emissiveSoft);
+    tipGlow.name = 'hand-crystal-glow';
     tipGlow.position.copy(tip2.position);
     hand.add(tipGlow);
+    crystal = { plate: tip2, glow: tipGlow, restY: tip2.position.y };
     owned.push(tipGeo, tipGlow.geometry);
 
     /* R98 — THE HAND CRYSTAL LIGHTS THE HAND. An emissive plate lights
@@ -264,7 +269,7 @@ function buildHand(materials, spec, options) {
     }
   }
 
-  return { group: hand, dispose: function () { owned.forEach(function (g) { if (g && g.dispose) g.dispose(); }); } };
+  return { group: hand, crystal: crystal, dispose: function () { owned.forEach(function (g) { if (g && g.dispose) g.dispose(); }); } };
 }
 
 /* Build one arm as a joint hierarchy positioned to hit the measured
@@ -332,7 +337,7 @@ function buildArm(materials, spec, options) {
         return ARMS_.deltoidLift + (ARMS_.classLift - ARMS_.deltoidLift) * k * k * (3 - 2 * k);
       } }
   );
-  var upper = clad(shoulderJoint, upperGeo, materials, 0);
+  var upper = clad(shoulderJoint, upperGeo, materials, 0, null, root.name + '-upper');
   owned.push(upperGeo, upper.edges, upper.minorEdges);
 
   /* Forearm hangs off an elbow joint so the elbow can actually bend. */
@@ -352,7 +357,7 @@ function buildArm(materials, spec, options) {
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes, foreInner),
       coat: REGIONS.FOREARM.coat }
   );
-  var fore = clad(elbowJoint, foreGeo, materials, 0);
+  var fore = clad(elbowJoint, foreGeo, materials, 0, null, root.name + '-fore');
   owned.push(foreGeo, fore.edges, fore.minorEdges);
 
   /* R96 — THE JOINTS ARE DARK STEEL. Reference A's elbow is a small dark
@@ -363,7 +368,7 @@ function buildArm(materials, spec, options) {
   var eR = spec.foreRadius * 0.98;
   var elbowGeo = segment([0, -eR * 0.55, 0], [0, eR * 0.55, 0], eR, eR, 8,
     { depthRatio: 1.0, crystal: 0.015, steps: 2,
-      profile: function (t) { return 0.70 + Math.sin(t * Math.PI) * 0.36; } });
+      profile: function (t) { return 0.70 + Math.sin(t * Math.PI) * 0.30; } });   /* R99: flush with the tube, not proud of it */
   var elbowKnob = new Mesh(elbowGeo, materials.joint || materials.cavity);
   elbowKnob.name = root.name + '-elbow-knob';
   elbowJoint.add(elbowKnob);
@@ -403,7 +408,7 @@ function buildArm(materials, spec, options) {
   elbowJoint.add(wristJoint);
 
   /* The wrist cuff, in the wrist's own frame so it rings the forearm's end. */
-  var cR = spec.wristRadius * 1.22;
+  var cR = spec.wristRadius * 1.10;   /* R99: 1.22 -> 1.10 — in silhouette the cuff read as a block on the wrist */
   var cuffGeo = segment([0, -0.030, 0], [0, 0.026, 0], cR, cR * 0.96, 8,
     { depthRatio: 1.0, crystal: 0.01, steps: 1 });
   var cuff = new Mesh(cuffGeo, materials.joint || materials.cavity);
@@ -420,6 +425,7 @@ function buildArm(materials, spec, options) {
     elbowJoint: elbowJoint,
     wristJoint: wristJoint,
     hand: hand.group,
+    crystal: hand.crystal,
     dispose: function () { hand.dispose(); owned.forEach(function (g) { if (g && g.dispose) g.dispose(); }); }
   };
 }

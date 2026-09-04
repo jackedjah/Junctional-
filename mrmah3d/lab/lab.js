@@ -39,6 +39,11 @@ if (tierParam === 'high' || tierParam === 'medium' || tierParam === 'low') {
 /* R96: ?variant=female mounts the female proportion set (variants.js). */
 var variantParam = params.get('variant') === 'female' ? 'female' : undefined;
 var brightParam = params.get('bright');
+/* R99: ?debug=mass|groups|gray — the godform brief's shadow-first views.
+   `mass` and `groups` swap the character's materials (scene.setDebugView);
+   `gray` desaturates the stage in CSS so the value hierarchy can be judged
+   without its colour. Development affordance only. */
+var debugParam = params.get('debug');
 if (brightParam && /^\s*\d+\s*,\s*\d+\s*,\s*\d+\s*$/.test(brightParam)) {
   document.documentElement.style.setProperty('--bright-rgb', brightParam);
 }
@@ -81,6 +86,8 @@ function mount() {
       preserveDrawingBuffer: true
     });
     window.__MRMAH_LAB.mounted = true;
+    if (debugParam === 'mass' || debugParam === 'groups') scene.setDebugView(debugParam);
+    if (debugParam === 'gray') host.style.filter = 'grayscale(1)';
   } catch (err) {
     window.__MRMAH_LAB.errors.push(String(err && err.message || err));
     say('Mount failed: ' + (err && err.message || err), true);

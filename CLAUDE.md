@@ -1086,3 +1086,14 @@ this build's 9%, and two rounds of darkening the arm's rows moved that
 number by nothing. The reference box included the black gap between arm
 and torso, which the render's box (its void skipped) did not. Compare a
 region only when both boxes hold the same anatomy.
+
+### The silhouette test is a debug view, and it found what the render hid
+
+`?debug=mass` on the lab renders every solid flat near-black with no lines
+(`setDebugView` in mrmah.js; `groups` gives each anatomical group one flat
+colour, `gray` desaturates the stage). Run it before judging continuity: with
+the material stripped, the deltoid caps stood as bumps ABOVE the trapezius
+line and the wrist cuff and elbow bosses read as blocks on the limb — none of
+which the lit render showed, because the coat's catches were drawing the eye
+across the seams. Lowering the cap onto the trap slope and shrinking the
+joint rings was a silhouette fix; no material change could have made it.

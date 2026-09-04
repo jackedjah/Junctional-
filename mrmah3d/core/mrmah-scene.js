@@ -420,6 +420,13 @@ export function createMrMahScene(host, options) {
     getMode: function () { return modeName; },
     modes: MODE_NAMES,
 
+    /* ---- development only: the shadow-first debug views ----------------
+       'mass' (flat near-black silhouette), 'groups' (a colour per anatomical
+       group) or null. See setDebugView in character/mrmah.js. */
+    setDebugView: function (name) {
+      return characterBox.setDebugView ? characterBox.setDebugView(name) : null;
+    },
+
     /* ---- site-facing page API ------------------------------------------
        A page reports what happened to IT; surfaces.js decides what that means
        for the body. The renderer still knows nothing about AI Chat or MAH
