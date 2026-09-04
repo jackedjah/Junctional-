@@ -35,7 +35,7 @@
    Cost: no extra draw calls, no render targets, one vec4 attribute. The
    cheapest possible route to the reference's optical range. */
 
-import { Color } from '../../vendor/three/three.module.min.js';
+import { Color, Vector3 } from '../../vendor/three/three.module.min.js';
 
 export function applyCrystalShader(material, options) {
   var opts = options || {};
@@ -87,7 +87,28 @@ export function applyCrystalShader(material, options) {
        a quarter of a percent of his height, which is the 1-3%-of-local-form the
        brief asks for on the parts that matter (an arm is ~0.2 across). */
     uBevelWorld: { value: opts.bevelWorld == null ? 0.0045 : opts.bevelWorld },
-    uBevelAmount: { value: opts.bevelAmount == null ? 0.38 : opts.bevelAmount }
+    uBevelAmount: { value: opts.bevelAmount == null ? 0.38 : opts.bevelAmount },
+    /* R94 — THE INTERNAL LIGHT. A real source INSIDE the crystal, in the
+       mesh's own space, whose light reaches the outside of a facet by
+       TRANSMISSION rather than reflection: a facet is lit in proportion to how
+       squarely the light behind it is hitting its inner face (-N.L), how near
+       it is (inverse-square over uInnerRange), and how little its own optical
+       class absorbs. A point light placed inside a closed mesh lights nothing
+       in a standard renderer — every outward normal faces away from it — which
+       is exactly why the taper stayed a slab through every lighting pass: the
+       reference taper is lit from within and nothing here could be.
+
+       The effect is gated to a region of the mesh (below uInnerTop, within
+       uInnerHalfWidth of the axis) so the same material on the arms and the
+       chest is untouched, and its lateral profile favours facets that face
+       sideways over those that face the viewer — the spear down the front
+       stays dark while the flanks glow, which is the reference's structure. */
+    uInnerLight: { value: new Vector3(0, opts.innerY == null ? 0.42 : opts.innerY, 0.0) },
+    uInnerColor: { value: new Color(opts.innerColor == null ? 0x2f7dff : opts.innerColor) },
+    uInnerStrength: { value: opts.innerStrength == null ? 0.0 : opts.innerStrength },
+    uInnerRange: { value: opts.innerRange == null ? 0.85 : opts.innerRange },
+    uInnerTop: { value: opts.innerTop == null ? 1.10 : opts.innerTop },
+    uInnerHalfWidth: { value: opts.innerHalfWidth == null ? 0.34 : opts.innerHalfWidth }
   };
 
   material.onBeforeCompile = function (shader) {
@@ -104,14 +125,22 @@ export function applyCrystalShader(material, options) {
         'attribute vec3 aSmooth;',
         'attribute vec4 aBary;',
         'varying vec3 vSmoothN;',
-        'varying vec4 vBary;'
+        'varying vec4 vBary;',
+        'varying vec3 vObjPos;',
+        'varying vec3 vObjN;',
+        'attribute float aInner;',
+        'varying float vInner;'
       ].join('\n'))
       .replace('#include <begin_vertex>', [
         '#include <begin_vertex>',
         'vFacet = aFacet;',
         'vBary = aBary;',
         /* into view space, matching how three carries `normal` */
-        'vSmoothN = normalize( normalMatrix * aSmooth );'
+        'vSmoothN = normalize( normalMatrix * aSmooth );',
+        /* the mesh's own space, for the internal light */
+        'vObjPos = position;',
+        'vObjN = normal;',
+        'vInner = aInner;'
       ].join('\n'));
 
     /* ---- fragment: modulate the material per facet ---------------------- */
@@ -127,8 +156,17 @@ export function applyCrystalShader(material, options) {
         'uniform vec3 uDeep;',
         'uniform float uBevelWorld;',
         'uniform float uBevelAmount;',
+        'uniform vec3 uInnerLight;',
+        'uniform vec3 uInnerColor;',
+        'uniform float uInnerStrength;',
+        'uniform float uInnerRange;',
+        'uniform float uInnerTop;',
+        'uniform float uInnerHalfWidth;',
         'varying vec3 vSmoothN;',
-        'varying vec4 vBary;'
+        'varying vec4 vBary;',
+        'varying vec3 vObjPos;',
+        'varying vec3 vObjN;',
+        'varying float vInner;'
       ].join('\n'))
 
       /* THE MICRO-BEVEL. See the long note in forge.js.
@@ -273,6 +311,30 @@ export function applyCrystalShader(material, options) {
            most of it, but a black facet at the contour is no longer excluded
            from the one effect that defines the silhouette. */
         '    outgoingLight += uTint * mrF * 0.55 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) );',
+        /* R94 — the internal light. See the uniform note above. */
+        '    if ( uInnerStrength > 0.0 && vInner > 0.5 ) {',
+        '      vec3 mrN = normalize( vObjN );',
+        '      vec3 mrL = uInnerLight - vObjPos;',
+        '      float mrD = length( mrL );',
+        '      mrL /= max( mrD, 1e-4 );',
+        /* light arriving from INSIDE: the inner face of this facet turned toward the source */
+        '      float mrTrans = clamp( -dot( mrN, mrL ), 0.0, 1.0 );',
+        '      float mrQ = mrD / uInnerRange;',
+        '      float mrAtt = 1.0 / ( 1.0 + mrQ * mrQ );',
+        /* the region gate: below uInnerTop, within the taper's own width */
+        '      float mrGate = 1.0 - smoothstep( uInnerTop - 0.28, uInnerTop + 0.08, vObjPos.y );',
+        '      mrGate *= 1.0 - smoothstep( uInnerHalfWidth * 0.75, uInnerHalfWidth * 1.25, abs( vObjPos.x ) );',
+        /* flanks glow, the front spear stays dark: side-facing over viewer-facing */
+        '      float mrSide = 0.10 + 0.90 * pow( abs( mrN.x ), 0.75 );',
+        /* a facet's own darkness class dims what passes through it */
+        '      float mrPass = 1.0 - 0.85 * clamp( vFacet.z, 0.0, 1.0 );',
+        /* a mild pow on the transmission so neighbouring columns, which face
+           the source at different angles, separate — the reference's flanks
+           alternate brighter and darker long facets rather than glowing evenly.
+           A first cut at 1.6 with a short range put the taper's light out. */
+        '      float mrInner = uInnerStrength * mrAtt * mrGate * mrSide * mrPass * ( 0.18 + 0.82 * pow( mrTrans, 1.25 ) );',
+        '      outgoingLight += uInnerColor * mrInner * mix( 0.55, 1.0, clamp( vFacet.w, 0.0, 1.0 ) );',
+        '    }',
         '  }',
         '#endif',
         '#include <opaque_fragment>'
@@ -290,4 +352,13 @@ export function setCrystalVariation(material, v) {
   if (material.userData && material.userData.crystal) {
     material.userData.crystal.uVariation.value = v;
   }
+}
+
+/* R94 — drive the internal light: strength scales with the character's glow
+   pulse, and the source can breathe up and down the taper. */
+export function setInnerLight(material, strength, y) {
+  var u = material.userData && material.userData.crystal;
+  if (!u) return;
+  if (strength != null) u.uInnerStrength.value = Math.max(0, Number(strength) || 0);
+  if (y != null) u.uInnerLight.value.y = Number(y);
 }

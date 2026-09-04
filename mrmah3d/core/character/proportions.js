@@ -20,6 +20,8 @@
    world units at HEIGHT. Change HEIGHT and the whole character scales; do not
    scale individual parts. */
 
+import { REGIONS } from './regions.js';
+
 /* Character height in world units, apex to torso tip. */
 export var HEIGHT = 3.0;
 
@@ -296,6 +298,51 @@ function coreShape(k) {
 /* CLAVICLE / TRAPEZIUS — the shoulder line is not round. It is flat and slightly
    hollow across the front where the collarbones run, and it carries mass to the
    sides and rear where the traps do. */
+/* R94 — per-quad class tables for the ring bands that own a region. The neck
+   uses one table all the way round; the taper chooses spear or flank by angle
+   (see the taper rings). Ring angle: pi/2 is the FRONT vertex. */
+function neckClasses() { return REGIONS.NECK.classes; }
+/* The taper: front columns within ~30 degrees of the front vertex are the
+   spear, the flanks out to ~100 degrees are sapphire, and the back is spear
+   again — it is never lit from the front and the reference keeps it dark. */
+/* ANATOMICAL ZONES for the chest and core — `zoneAt(angle)` per ring. Each
+   returns { classes, seed }: one class table and one hash seed per zone, so a
+   zone shades as ONE plane (see forge.js). `row` separates the bands so the
+   upper and lower pec, and the three abdominal rows, are distinct planes. */
+function frontDelta(a) {
+  var e = a - Math.PI / 2;
+  while (e > Math.PI) e -= Math.PI * 2;
+  while (e < -Math.PI) e += Math.PI * 2;
+  return e;
+}
+function pecZone(row) {
+  return function (a) {
+    var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
+    if (ae < 0.30) return { classes: REGIONS.STERNUM.classes, seed: 10 + row };
+    if (ae < 1.30) return { classes: (row === 1 ? REGIONS.PEC_UPPER : REGIONS.PEC_LOWER).classes, seed: 20 + row * 2 + side };
+    if (ae < 2.05) return { classes: REGIONS.OBLIQUE.classes, seed: 30 + row * 2 + side };   /* lats */
+    return null;                                                                             /* back: the body lottery */
+  };
+}
+function coreZone(row) {
+  return function (a) {
+    var e = frontDelta(a), ae = Math.abs(e), side = e < 0 ? 0 : 1;
+    if (ae < 0.20) return { classes: REGIONS.STERNUM.classes, seed: 40 + row };            /* the central channel */
+    if (ae < 0.78) return { classes: REGIONS.ABS.classes, seed: 50 + row * 2 + side };
+    if (ae < 1.55) return { classes: REGIONS.OBLIQUE.classes, seed: 60 + row * 2 + side };
+    return null;
+  };
+}
+function taperClasses(a) {
+  var e = a - Math.PI / 2;
+  while (e > Math.PI) e -= Math.PI * 2;
+  while (e < -Math.PI) e += Math.PI * 2;
+  var ae = Math.abs(e);
+  if (ae < 0.52) return REGIONS.TAPER_SPEAR.classes;
+  if (ae < 1.80) return REGIONS.TAPER_FLANK.classes;
+  return REGIONS.TAPER_SPEAR.classes;
+}
+
 function clavicleShape(k) {
   return function (a) {
     var hollow = -lobe(a, 0, 0.60) * 0.160;
@@ -467,30 +514,55 @@ export var TORSO = {
        waist 0.244 at t 0.47, chest 0.326 at t 0.62, clavicle 0.290 at t 0.71.
        The lower body is longer and considerably slimmer than it was, which is
        what lets the taper read as elegant rather than as a skirt. */
-    { y: 0.000, w: 0.006, d: 0.004 },
-    { y: 0.175, w: 0.050, d: 0.034, facet: 0.0121, crystal: 0.0380, crystalY: 0.0090 },
-    { y: 0.400, w: 0.110, d: 0.082, facet: -0.0121, crystal: 0.0520, crystalY: 0.0130, hero: 0.38 },
-    { y: 0.680, w: 0.178, d: 0.132, facet: 0.0110, crystal: 0.0620, crystalY: 0.0150, hero: 0.52 },
-    { y: 0.950, w: 0.236, d: 0.172, facet: -0.0110, crystal: 0.0680, crystalY: 0.0160, hero: 0.44 },
+    /* R94 — THE TAPER IS BUILT IN COLUMNS, AND EACH COLUMN HAS A JOB.
+
+       Cropped beside the luminous reference, the taper here was a mosaic of
+       small triangles in one dark band — measured, 80% of its pixels in a
+       single value — while the reference's is a handful of LONG planes
+       converging on the tip: a dark steel spear down the front centre, bright
+       sapphire masses either side of it lit from within, and brighter rails
+       along the silhouette. `columns: true` makes every quad in a vertical
+       strip draw one optical class and keep one diagonal, so a strip reads as a
+       single long facet; `classesAt` hands the front columns the spear table
+       and the flanks the sapphire one (regions.js). The internal light that
+       makes the flanks glow lives in crystal-shader.js (uInnerLight), gated to
+       this region of the body. The relief is halved down here so the long
+       planes stay long. */
+    { y: 0.000, w: 0.006, d: 0.004, columns: true, classesAt: taperClasses },
+    { y: 0.175, w: 0.050, d: 0.034, facet: 0.0060, crystal: 0.0180, crystalY: 0.0040,
+      columns: true, classesAt: taperClasses },
+    { y: 0.400, w: 0.110, d: 0.082, facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20,
+      columns: true, classesAt: taperClasses },
+    { y: 0.680, w: 0.178, d: 0.132, facet: 0.0055, crystal: 0.0280, crystalY: 0.0070, hero: 0.24,
+      columns: true, classesAt: taperClasses },
+    { y: 0.950, w: 0.236, d: 0.172, facet: -0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+      columns: true, classesAt: taperClasses },
     /* hip swell — the widest point of the lower mass, and modest */
     { y: 1.180, w: 0.264, d: 0.192, facet: 0.0099, crystal: 0.0640, crystalY: 0.0150,
-      shape: coreShape(0.55), hero: 0.26 },
+      shape: coreShape(0.55), hero: 0.26, columns: false, classesAt: null },
     /* THE WAIST. The one concave moment in the outline. */
-    { y: 1.400, w: 0.244, d: 0.182, facet: -0.0099, crystal: 0.0600, crystalY: 0.0140,
-      shape: coreShape(1.0), hero: 0.04 },
+    /* R94 — THE CORE AND CHEST ARE ZONED INTO PLANES (see zoneAt in forge.js
+       and the tables in regions.js): three rows of abdominal blocks either side
+       of a dark channel, oblique planes outboard, then a lower and an upper
+       pectoral plane each side of a dark sternum. The crystal jitter comes
+       down through these rings so the triangles inside one zone stay near
+       enough coplanar to read as a single plane with facet variation, which
+       is what the reference's chest is. */
+    { y: 1.400, w: 0.244, d: 0.182, facet: -0.0070, crystal: 0.0380, crystalY: 0.0100,
+      shape: coreShape(1.0), hero: 0.04, columns: false, classesAt: null, zoneAt: coreZone(0) },
     /* ribcage opening back out — lower abdominal into the rib arch */
-    { y: 1.620, w: 0.298, d: 0.222, facet: 0.0088, crystal: 0.0640, crystalY: 0.0150,
-      shape: coreShape(0.85), hero: 0.06 },
-    { y: 1.800, w: 0.320, d: 0.248, facet: -0.0088, crystal: 0.0660, crystalY: 0.0150,
-      shape: chestShape(0.70) },
+    { y: 1.620, w: 0.298, d: 0.222, facet: 0.0060, crystal: 0.0400, crystalY: 0.0100,
+      shape: coreShape(0.85), hero: 0.06, zoneAt: coreZone(1) },
+    { y: 1.800, w: 0.320, d: 0.248, facet: -0.0060, crystal: 0.0400, crystalY: 0.0100,
+      shape: chestShape(0.70), zoneAt: coreZone(2) },
     /* the pectoral line — the strongest cross-section shaping on the body */
-    { y: 1.930, w: 0.328, d: 0.258, facet: 0.0077, crystal: 0.0560, crystalY: 0.0115,
-      shape: chestShape(1.0), hero: 0.34 },
-    { y: 2.040, w: 0.322, d: 0.244, facet: -0.0055, crystal: 0.0440, crystalY: 0.0080,
-      shape: chestShape(0.80), hero: 0.40 },
+    { y: 1.930, w: 0.328, d: 0.258, facet: 0.0055, crystal: 0.0340, crystalY: 0.0080,
+      shape: chestShape(1.0), hero: 0.34, zoneAt: pecZone(0) },
+    { y: 2.040, w: 0.322, d: 0.244, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
+      shape: chestShape(0.80), hero: 0.40, zoneAt: pecZone(1) },
     /* THE SHOULDER LINE — collarbones across the front, trapezius behind */
     { y: 2.130, w: 0.290, d: 0.206, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
-      shape: clavicleShape(1.0), dip: 0.030, hero: 0.46 },
+      shape: clavicleShape(1.0), dip: 0.030, hero: 0.46, zoneAt: null },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11
@@ -566,10 +638,36 @@ export var TORSO = {
        There is no width that threads the head's lower vertex, because the
        vertex is a point. So the neck converges to one too, 0.006 below it, and
        the throat gem sits over the junction exactly as the reference does. */
-    { y: 2.190, w: 0.172, d: 0.140, facet: -0.0165, crystal: 0.030, crystalY: 0.0055 },
-    { y: 2.240, w: 0.128, d: 0.104, facet: 0.0150, crystal: 0.022, crystalY: 0.0040 },
-    { y: 2.272, w: 0.082, d: 0.060, facet: -0.0110, crystal: 0.012, crystalY: 0.0022 },
-    { y: 2.292, w: 0.010, d: 0.008, facet: 0.0090 }
+    /* R94 — A COLUMN, NOT A CONE, AND IT PASSES BEHIND THE CHIN.
+
+       The rings above converged smoothly from the 0.290 clavicle to a point
+       0.006 under the head's vertex, which is a pyramid of shoulder rising to
+       the chin: from the front there was no event anywhere that read as a
+       neck, and the chin sat directly on the deltoid line. Measured on the
+       luminous reference (2.5x crop): the trapezius slopes in fast over the
+       first ~0.07 units above the clavicle, and from there the neck is a
+       near-vertical column about 0.20 wide — 0.49 of the head's half-width —
+       that runs UP BEHIND the head's lower facets and shows either side of the
+       chin vertex before the head hides it. Its visible length below the chin
+       is a fifth of the head's height.
+
+       So: two rings of trapezius, three of column, and the column's top ring
+       sits 0.044 ABOVE the head's vertex, where the head is already 0.10 wide
+       and swallows it. Between 2.286 and ~2.35 the neck stands proud of the
+       chin by up to 0.046 a side — which is what the reference shows, a neck
+       passing behind a chin, and is not the R90 "white bar" (that was a lit
+       ring cap at the vertex's own height; these faces are dark-classed and
+       the cap is buried). `zc` sets the column 0.04 behind the head's axis so
+       the chin overhangs it. */
+    { y: 2.165, w: 0.212, d: 0.158, facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
+      shape: clavicleShape(0.55), hero: 0.40, classesAt: neckClasses },
+    { y: 2.200, w: 0.122, d: 0.102, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
+      zc: -0.030, hero: 0.30, classesAt: neckClasses },
+    { y: 2.262, w: 0.104, d: 0.090, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
+      zc: -0.040, hero: 0.28, classesAt: neckClasses },
+    { y: 2.330, w: 0.098, d: 0.086, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
+      zc: -0.044, hero: 0.26, classesAt: neckClasses },
+    { y: 2.372, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.10, classesAt: neckClasses }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
   /* Widened. Against the canonical reference the render measured 9.3% narrow
@@ -827,8 +925,13 @@ export var INSIGNIA = {
      one place on the body where two very different forms meet, and a deliberate
      bright accent at a junction reads as design where a bare seam reads as a
      mistake. */
-  throatY: 2.262,
-  throatHalf: 0.030 };
+  /* R94 — moved from the chin (2.262) to the STERNAL NOTCH. Cropped, the
+     luminous reference has no gem under the jaw at all; the bright accent sits
+     where the neck meets the collarbones, in the notch between them. Sitting
+     the gem on the notch gives the neck a base and the chin nothing to
+     compete with. */
+  throatY: 2.146,
+  throatHalf: 0.026 };
 
 /* The character hovers; the tip does not rest on the floor. The reference
    shows a bright contact starburst directly beneath the point. */

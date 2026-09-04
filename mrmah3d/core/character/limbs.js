@@ -16,8 +16,10 @@ import {
 } from '../../vendor/three/three.module.min.js';
 import { segment, diamondPlate, facetedGeometry } from './forge.js';
 import { ARMS, HAND } from './proportions.js';
+import { REGIONS } from './regions.js';
 
-function clad(group, geo, materials, rimScale) {
+function clad(group, geo, materials, rimScale, edgeAngles) {
+  var ea = edgeAngles || {};
   var mesh = new Mesh(geo, materials.body);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
@@ -50,8 +52,12 @@ function clad(group, geo, materials, rimScale) {
      describing the bicep and forearm. Suppressing the transition tier is what
      lets the major planes carry the volume — the same hierarchy the torso
      needed, for the same reason. */
-  var major = new EdgesGeometry(geo, 48);
-  var minor = new EdgesGeometry(geo, 36);
+  /* R94 — the hands pass their own thresholds. A palm and four digits are a
+     dozen tiny solids, and at the limb thresholds every corner of every one
+     of them drew, so the hands read as wire boxes with nothing inside — the
+     references' hands are solid steel with a few catches. */
+  var major = new EdgesGeometry(geo, ea.major || 48);
+  var minor = new EdgesGeometry(geo, ea.minor || 36);
   /* One structural tier, not two. The halo pass doubled every major line on a
      limb, and doubled lines are what turned the arms into wireframe tubes once
      the shell came off. */
@@ -69,15 +75,18 @@ function palmGeometry(dir, spec) {
   var a = [p(-w * 0.72, 0, d * 0.8), p(w * 0.72, 0, d * 0.8),
            p(w * 0.72, 0, -d * 0.8), p(-w * 0.72, 0, -d * 0.8)];
   var b = [p(-w, L, d), p(w, L, d), p(w, L, -d), p(-w, L, -d)];
+  /* R94: every face of the palm was wound inward (a0..a3 runs clockwise seen
+     from above, so the old "reversed" bottom pointed up and each side strip's
+     normal pointed into the block). Same fault as the lofts — see forge.js. */
   var faces = [
-    [a[0], a[1], a[2], a[3]].slice().reverse(),
-    [b[0], b[1], b[2], b[3]],
-    [a[0], b[0], b[1], a[1]],
-    [a[1], b[1], b[2], a[2]],
-    [a[2], b[2], b[3], a[3]],
-    [a[3], b[3], b[0], a[0]]
+    [a[0], a[1], a[2], a[3]],
+    [b[3], b[2], b[1], b[0]],
+    [a[0], a[1], b[1], b[0]],
+    [a[1], a[2], b[2], b[1]],
+    [a[2], a[3], b[3], b[2]],
+    [a[3], a[0], b[0], b[3]]
   ];
-  return facetedGeometry(P, faces, null, { lift: ARMS.classLift });
+  return facetedGeometry(P, faces, null, { lift: ARMS.classLift, classes: REGIONS.HAND.classes });
 }
 
 function buildHand(materials, spec, options) {
@@ -87,7 +96,8 @@ function buildHand(materials, spec, options) {
   var owned = [];
 
   var palmGeo = palmGeometry(1, spec);
-  var palm = clad(hand, palmGeo, materials, 0);
+  var HAND_EDGES = { major: 84, minor: 89 };
+  var palm = clad(hand, palmGeo, materials, 0, HAND_EDGES);
   owned.push(palmGeo, palm.edges, palm.minorEdges);
 
   /* Digits. Simplified and few — the requirement is that the raised hand
@@ -122,8 +132,8 @@ function buildHand(materials, spec, options) {
       0.01 + curl * len * 0.80
     ];
     var g = segment(base, tip, spec.digitRadius, spec.digitRadius * (curl ? 0.92 : 0.7), 5,
-      { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
-    var d = clad(hand, g, materials, 0);
+      { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+    var d = clad(hand, g, materials, 0, HAND_EDGES);
     owned.push(g, d.edges, d.minorEdges);
   }
 
@@ -143,8 +153,8 @@ function buildHand(materials, spec, options) {
     ? [thumbBase[0] - thumbLen * 0.72, thumbBase[1] + thumbLen * 0.62, thumbBase[2] + thumbLen * 0.28]
     : [thumbBase[0] + thumbLen * 0.62, thumbBase[1] + thumbLen * 0.34, thumbBase[2] + thumbLen * 0.72];
   var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 5,
-    { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
-  var thumb = clad(hand, thumbGeo, materials, 0);
+    { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift, classes: REGIONS.HAND.classes });
+  var thumb = clad(hand, thumbGeo, materials, 0, HAND_EDGES);
   owned.push(thumbGeo, thumb.edges, thumb.minorEdges);
 
   /* The bright tip diamond the reference shows above the raised hand. */
@@ -197,6 +207,7 @@ function buildArm(materials, spec, options) {
        their own pair of facets instead of sharing one. */
     { depthRatio: 1.12, crystal: 0.075, steps: 7,
       profile: ARMS.profiles.upper, shape: ARMS.shapes.upper, lift: ARMS.classLift,
+      classes: REGIONS.UPPER_ARM.classes,
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
          its own by the bicep belly, for the same reason the cap ramps into the
          torso — a limb that starts at a different value from the thing it
@@ -220,7 +231,8 @@ function buildArm(materials, spec, options) {
     [0, 0, 0], foreVec.toArray(),
     spec.foreRadius, spec.wristRadius, 10,
     { depthRatio: 1.04, crystal: 0.070, steps: 6,
-      profile: ARMS.profiles.fore, shape: ARMS.shapes.fore, lift: ARMS.classLift }
+      profile: ARMS.profiles.fore, shape: ARMS.shapes.fore, lift: ARMS.classLift,
+      classes: REGIONS.FOREARM.classes }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 0);
   owned.push(foreGeo, fore.edges, fore.minorEdges);

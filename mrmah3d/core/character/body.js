@@ -17,6 +17,7 @@ import {
 } from '../../vendor/three/three.module.min.js';
 import { loft, segment, diamondPlate, facetedGeometry } from './forge.js';
 import { TORSO, INSIGNIA, HEAD, ARMS } from './proportions.js';
+import { REGIONS } from './regions.js';
 
 function lit(group, geo, materials, opts) {
   var o = opts || {};
@@ -127,7 +128,7 @@ export function buildBody(materials) {
      shape with this many real breaks, no threshold makes them rare. The
      structural and secondary tiers describe the form perfectly well without it. */
   var torsoLoft = loft(TORSO.rings, TORSO.sides || 8,
-    { capTop: true, capBottom: false, lift: TORSO.classLift });
+    { capTop: true, capBottom: false, lift: TORSO.classLift, inner: true });
   /* edgeAngle 42, down from the 52 default. With the ring table thinned and the
      crystal relief raised to compensate, the torso's structural breaks are real
      but not extreme — at 52 almost none of them qualified and the front of the
@@ -174,8 +175,12 @@ export function buildBody(materials) {
      Fresnel, a facet lift and the camera-side card in turn, produced a torso
      progressively darker and flatter than the one that was being "fixed" — a
      long correction of a fault nobody had reported. Restored. */
+  /* R94: 42 -> 48. The sternum valley's vertical seams cleared 42 and drew two
+     bright cyan verticals either side of the emblem — the "neon lines" on the
+     core the brief rules out. The reference's sternum is a dark groove between
+     two masses, not a pair of lines. */
   var torsoParts = lit(group, torsoLoft.geometry, materials,
-    { rim: false, edgeAngle: 42, minorAngle: 36 });
+    { rim: false, edgeAngle: 48, minorAngle: 36 });
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
 
   /* ---- shoulder caps / deltoids --------------------------------------- */
@@ -306,10 +311,21 @@ export function buildBody(materials) {
       return (0.28 + 0.72 * root * root * (3 - 2 * root)) *
              (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.22);
     };
+    /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
+
+       Eight sides by eight steps with a structural edge tier, a faint tier AND
+       an additive rim shell drew each shoulder as a transparent wire balloon:
+       the cap's own faces were dark (they face up, and up reflects the empty
+       x~64 region of the environment — see CLAUDE.md), so the only things
+       visible were the lines and the lip, and the eye read a cage with nothing
+       inside it. Fewer, larger planes (seven sides, five steps), the deltoid's
+       own class table with no black entry (regions.js), no rim shell and only
+       the sharpest breaks drawn — the dome is now carried by its planes. */
     var geo = segment(
       inner, outer,
-      deltoidR0, deltoidR1, 8,
-      { depthRatio: 1.0, crystal: 0.058, steps: 8, lift: ARMS.deltoidLift,
+      deltoidR0, deltoidR1, 7,
+      { depthRatio: 1.0, crystal: 0.050, steps: 5, lift: ARMS.deltoidLift,
+        classes: REGIONS.DELT.classes,
         profile: deltoidProfile,
         /* R91 — THE VALUE STEP AT THE SEAM IS WHAT READS AS "BOLTED ON".
 
@@ -331,7 +347,7 @@ export function buildBody(materials) {
     /* minorAngle up from 30 to 44: the secondary tier was outlining the cap's
        own ring seams, which draws a boundary at exactly the place the value ramp
        above exists to dissolve. */
-    var parts = lit(group, geo, materials, { rimScale: 1.03, quiet: true, minorAngle: 44 });
+    var parts = lit(group, geo, materials, { rim: false, quiet: true, edgeAngle: 58, minorAngle: 80 });
     owned.push(geo, parts.edges, parts.minorEdges, parts.heroEdges);
     deltoidGeos.push(geo);
 

@@ -17,6 +17,7 @@ import { buildHead } from './head.js';
 import { buildBody } from './body.js';
 import { buildLimbs } from './limbs.js';
 import { createStateMachine } from './states.js';
+import { setInnerLight } from './crystal-shader.js';
 import { HEIGHT, FLOAT, HEAD } from './proportions.js';
 
 export function createMrMah(options) {
@@ -45,6 +46,13 @@ export function createMrMah(options) {
   float.position.y = FLOAT.height;
 
   var states = createStateMachine();
+
+  /* R94 — the taper's internal light breathes with him. Its authored strength
+     is read back from the material rather than repeated here (the duplicated
+     baseline bug), and the source drifts a little up and down the taper so the
+     flanks' glow moves even when the body is momentarily still. */
+  var innerBase = (materials.body.userData.crystal && materials.body.userData.crystal.uInnerStrength.value) || 0;
+  var innerY = (materials.body.userData.crystal && materials.body.userData.crystal.uInnerLight.value.y) || 0.4;
 
   var yaw = 0;
   var time = 0;
@@ -214,13 +222,18 @@ export function createMrMah(options) {
 
     /* Thinking pulse — a visible periodic brightening of the emissive family
        only, so the body stays dark while he is clearly working. */
+    var pulseP = 0.5 + 0.5 * Math.sin(time * 3.4);
     if (v.pulse > 0.01) {
-      var p = 0.5 + 0.5 * Math.sin(time * 3.4);
-      materials.emissive.opacity = 1 - 0.35 * p * v.pulse;
-      materials.emissiveSoft.opacity = 0.30 * v.glow * (1 + 1.6 * p * v.pulse);
+      materials.emissive.opacity = 1 - 0.35 * pulseP * v.pulse;
+      materials.emissiveSoft.opacity = 0.30 * v.glow * (1 + 1.6 * pulseP * v.pulse);
     } else {
       materials.emissive.opacity = 1;
     }
+    /* The internal light follows the glow, deepens on the thinking pulse, and
+       breathes slowly on its own. */
+    setInnerLight(materials.body,
+      innerBase * v.glow * (1 + 0.28 * pulseP * v.pulse) * (0.94 + 0.06 * Math.sin(time * 0.9)),
+      innerY + Math.sin(time * 0.53) * 0.06);
 
     /* Smile expression: the arc scales horizontally with the state. */
     head.smile.scale.x = 0.55 + 0.45 * MathUtils.clamp(v.smile, 0, 1.4);
@@ -249,6 +262,7 @@ export function createMrMah(options) {
     setEnvRotation: function (y) {
       var r = Number(y) || 0;
       if (materials.body.envMapRotation) materials.body.envMapRotation.y = r;
+      if (materials.head && materials.head.envMapRotation) materials.head.envMapRotation.y = r;
       if (materials.cavity && materials.cavity.envMapRotation) materials.cavity.envMapRotation.y = r;
     },
     setYaw: setYaw,

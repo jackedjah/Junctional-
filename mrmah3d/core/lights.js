@@ -91,8 +91,14 @@ export function createLights(options) {
      close to a surface draws itself on it: a hot blob appeared on the abdomen
      below the emblem, which is a lamp, not a glow. Further forward and wider
      makes the near planes a gradient instead of a spot. */
-  var chestLamp = new PointLight(new Color(0x4fe3ff), 0.95, 2.1, 2);
-  chestLamp.position.set(0, 1.86, 0.46);
+  /* R94 — further out again, and softer. With the torso's outer surface
+     finally rendering (see the winding note in forge.js) the chest wall is at
+     z ~0.26, so a lamp at 0.46 sat 0.2 units off it and every facet around the
+     emblem drew a hot specular dot of it — three white points on the sternum.
+     At 0.95 with a wider range it is a gradient across the pectorals, which is
+     what the emblem's light looks like in the references. */
+  var chestLamp = new PointLight(new Color(0x4fe3ff), 1.35, 2.8, 2);
+  chestLamp.position.set(0, 1.84, 0.95);
   var faceLamp = new PointLight(new Color(0x6cebff), 0.85, 1.1, 2);
   faceLamp.position.set(0, 2.62, 0.16);
 

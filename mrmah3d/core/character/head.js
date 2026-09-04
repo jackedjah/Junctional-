@@ -16,6 +16,7 @@ import {
 } from '../../vendor/three/three.module.min.js';
 import { diamondCrystal } from './forge.js';
 import { HEAD } from './proportions.js';
+import { REGIONS } from './regions.js';
 
 export function buildHead(materials) {
   var group = new Group();
@@ -38,10 +39,14 @@ export function buildHead(materials) {
     /* The head takes a lighter share of the optical lottery than the body —
        see `lift` in forge.js. Without it the shell rendered essentially black
        and every bit of its apparent value was the linework drawn over it. */
-    lift: HEAD.classLift
+    lift: REGIONS.HEAD_SHELL.lift,
+    /* R94 — the head draws from its OWN class table (regions.js): a pale ice
+       majority with a deep-blue minority, which no lift on the body's table can
+       produce. `classLift` in proportions.js is kept only as the fallback. */
+    classes: REGIONS.HEAD_SHELL.classes
   });
 
-  var shell = new Mesh(geo, [materials.body, materials.face, materials.cavity]);
+  var shell = new Mesh(geo, [materials.head || materials.body, materials.face, materials.cavity]);
   shell.name = 'head-shell';
   shell.castShadow = true;
   shell.receiveShadow = true;
@@ -106,9 +111,17 @@ export function buildHead(materials) {
   /* Trimmed a little with the cavity walls now drawn — see faceInset in
      proportions.js. The eyes move inboard rather than shrinking much, because
      it is their OUTER edge that the inner bevel was cutting. */
-  var eyeR = HEAD.halfWidth * 0.128;
-  var eyeGap = HEAD.halfWidth * 0.315;
-  var eyeY = HEAD.halfHeight * 0.10;
+  /* R94 — MEASURED OFF THE LUMINOUS REFERENCE, at 2.5x crop.
+
+     Head 280 px wide; eye ring 36 px across (radius 0.129 of the half-width),
+     stroke 2.4 px (0.067 of the ring radius), centres 78 px apart (0.28 of the
+     half-width either side), sitting almost exactly on the head's centre line.
+     Every earlier value here was set by eye against a smaller crop and the
+     rings had crept to a 0.175 stroke — thick enough that, with the soft
+     companion doubling it, the eyes read as goggles. */
+  var eyeR = HEAD.halfWidth * 0.140;
+  var eyeGap = HEAD.halfWidth * 0.290;
+  var eyeY = HEAD.halfHeight * 0.06;
 
   /* R90 — STROKE WEIGHT RE-DERIVED FOR THE SMALLER HEAD.
 
@@ -139,13 +152,17 @@ export function buildHead(materials) {
        eyes into dark holes. The refined reference sits between: a clean ring
        with a definite, even stroke, obviously drawn rather than either fat or
        fragile. 0.13 is that, and it survives down to protocol scale. */
-    var eye = new Mesh(new TorusGeometry(eyeR, eyeR * 0.175, 8, 40), materials.emissive);
+    /* R94: 0.175 -> 0.075. A thin stroke, as the crop measures it. The soft
+       companion below carries the eye at app scale (its opacity rises as he
+       shrinks — see setScaleHint), and it is thinner too: at 0.46 of the ring
+       radius it was the goggle, not the core ring. */
+    var eye = new Mesh(new TorusGeometry(eyeR, eyeR * 0.075, 6, 48), materials.emissive);
     eye.position.set(side * eyeGap, eyeY, 0);
     eye.name = side < 0 ? 'eye-left' : 'eye-right';
     face.add(eye);
     eyes.push(eye);
 
-    var soft = new Mesh(new TorusGeometry(eyeR * 1.20, eyeR * 0.46, 8, 28), materials.emissiveSoft);
+    var soft = new Mesh(new TorusGeometry(eyeR * 1.04, eyeR * 0.20, 6, 32), materials.emissiveSoft);
     soft.position.copy(eye.position);
     face.add(soft);
   });
@@ -158,28 +175,31 @@ export function buildHead(materials) {
      than hiding under them), meaningfully thicker than the eye stroke, and
      opened out to a fuller arc so its curve reads as a smile at a glance
      instead of as a short dash. */
-  var smileR = HEAD.halfWidth * 0.340;
-  var smileArc = Math.PI * 0.92;
-  var smile = new Mesh(
-    /* Slightly heavier than the eye stroke, not lighter.
+  /* R94 — THE SMILE IS SMALL, SHALLOW, THIN, WEAK, AND WELL ABOVE THE CHIN.
 
-       The smile is a longer, shallower shape than a ring, so at the same line
-       weight it carries far less ink and it is the first face element to go
-       when the character shrinks — checked on the iPad-landscape capture, where
-       the eyes were crisp and the mouth had faded to a suggestion. The brief
-       makes its visibility a named requirement, so it gets the weight it needs
-       to survive the smallest framing rather than the weight that looks
-       balanced in the showcase view. */
-    new TorusGeometry(smileR, smileR * 0.118, 8, 52, smileArc),
-    materials.emissive
+     Measured on the luminous reference (2.5x crop, head 280 px wide, 264 tall):
+     the mouth is a 46 px chord with a 10 px sag — a circular arc of radius
+     31.5 px spanning 94 degrees, i.e. 0.225 of the half-width and just over a
+     half-pi of arc — drawn 2 px thick, and its belly sits 0.40 of the
+     half-height below the centre line while the cavity's lower corner is at
+     0.63 and the chin vertex at 1.0. The mouth is therefore clearly ABOVE the
+     chin with the inner bevel and the shell's V below it, which the brief makes
+     non-negotiable. The previous 0.34 / 0.92-pi arc was a full U with its belly
+     at 0.57, sitting on the cavity floor. */
+  var smileR = HEAD.halfWidth * 0.225;
+  var smileArc = Math.PI * 0.55;
+  var smile = new Mesh(
+    new TorusGeometry(smileR, smileR * 0.058, 6, 40, smileArc),
+    materials.emissiveSmile || materials.emissive
   );
   smile.rotation.z = Math.PI + (Math.PI - smileArc) / 2;
-  smile.position.set(0, eyeY - HEAD.halfHeight * 0.27, 0);
+  /* position.y is the arc's CENTRE; the belly hangs one radius below it. */
+  smile.position.set(0, -HEAD.halfHeight * 0.40 + smileR, 0);
   smile.name = 'smile';
   face.add(smile);
 
   var smileSoft = new Mesh(
-    new TorusGeometry(smileR, smileR * 0.235, 8, 52, smileArc),
+    new TorusGeometry(smileR, smileR * 0.15, 6, 40, smileArc),
     materials.emissiveSoft
   );
   smileSoft.rotation.copy(smile.rotation);

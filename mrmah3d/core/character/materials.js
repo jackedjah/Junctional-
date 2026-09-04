@@ -56,6 +56,11 @@ export var PALETTE = {
      underneath them. */
   crystal: 0x1c3a63,
   crystalDeep: 0x0a1730, /* the darkest facets — still sapphire, not void */
+  /* R94 — the head's ice family: a pale steel-blue albedo, a deep that is
+     still blue rather than black, and a whiter tint for its catches. */
+  headCrystal: 0x7d9fc6,
+  headDeep: 0x1a3768,
+  headTint: 0xa9e6ff,
   edge: 0x35d6ff,        /* cyan edge illumination */
   edgeHot: 0xbdf2ff,     /* near-white specular catch */
   face: 0x05090d,        /* the recessed facial plane — almost black */
@@ -388,19 +393,90 @@ export function createCrystalMaterials(options) {
        additive grazing term in crystal-shader.js instead; this one is back to
        doing what it can genuinely do, which is deepen the turn on facets that
        are already lit. */
-    fresnelBoost: 1.30
+    fresnelBoost: 1.30,
+    /* R94 — the taper's internal light (see crystal-shader.js). Sapphire, not
+       cyan: the reference's taper is a saturated royal blue lit from within,
+       and the cyan belongs to the edges. The source sits a third of the way up
+       the taper so the lower half is brightest and the light fades out under
+       the hip, which is where the reference's glow stops. */
+    /* Histogrammed over the taper against Reference A: the reference is 42%
+       below 32 luma, 32% in 32-63 and 19% in 64-95 with a mean of 49, where
+       the first cut of this light left the taper at a mean of 18 with 99%
+       below 32 — a saturated blue has almost no luma, so a dark royal blue at
+       strength 2.4 reads as near-black by the numbers and as dim by eye. The
+       source goes brighter and its blue a shade toward cyan so the flanks
+       reach the reference's 64-95 band; the spear stays dark by class. */
+    /* Retuned once the taper's OUTER surface rendered (forge.js winding note):
+       the outward flanks transmit far more than the interior wall did, so the
+       tip went near-white at 9.0. The source moves up the taper and softens so
+       the glow spans the whole lower body rather than pooling at the point. */
+    innerStrength: 5.5,
+    innerY: 0.55,
+    innerRange: 1.05,
+    innerTop: 1.20,
+    innerHalfWidth: 0.34,
+    innerColor: 0x4a9cff
+  });
+
+  /* R94 — THE HEAD HAS ITS OWN MATERIAL, and it is ICE.
+
+     Cropped beside the reference, the head shell here was near-black with one
+     blown bevel, and the reference's is a pale, clear crystal: steel-white and
+     sky-blue planes over most of its frame, a few deep-blue facets among them,
+     bright hairline edges. That is a lighter albedo, a lower absorption and a
+     cooler, whiter tint than the sapphire body — three numbers the body's
+     material cannot hold at the same time as its own. The facet table it draws
+     from is the head's too (regions.js), so the distribution is authored for a
+     few dozen facets rather than the torso's hundreds. */
+  var head = new MeshStandardMaterial({
+    color: new Color(tint.headCrystal || PALETTE.headCrystal),
+    roughness: 0.07,
+    /* Lower metalness than the body: the head needs DIFFUSE, because diffuse
+       is what gives every facet a pale value that varies smoothly with its
+       angle to the key, where reflection alone gives hit-or-miss — one facet
+       blown white on the camera-side card, its neighbour black. */
+    metalness: 0.24,
+    /* Low. Measured against the reference's head shell, the render's bright
+       tail was five times too heavy (21% above 160 luma against 4%) and all
+       of it was facets catching the camera-side environment card. The
+       reflection scales with this number and nothing else on the head does. */
+    envMapIntensity: 3.5,
+    flatShading: false,
+    /* A small self-lit floor: it is what populates the 64-127 bands the
+       reference's shell has and this one lacked, without touching the top. */
+    emissive: new Color(tint.headCrystal || PALETTE.headCrystal),
+    emissiveIntensity: 0.10
+  });
+  applyCrystalShader(head, {
+    tint: PALETTE.headTint,
+    deep: PALETTE.headDeep,
+    innerDark: 0.42,
+    fresnelBoost: 0.90,
+    fresnelPower: 3.0
   });
 
   /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */
   if (opts.envMap) {
     body.envMap = opts.envMap;
+    head.envMap = opts.envMap;
     face.envMap = opts.envMap;
     cavity.envMap = opts.envMap;
     body.needsUpdate = true;
+    head.needsUpdate = true;
     face.needsUpdate = true;
   }
 
-  var all = [body, face, cavity, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, rim];
+  /* R94 — the smile is WEAKER than the eyes. Same glow colour, a shade less
+     opaque, so the mouth reads as a quieter mark under two brighter ones — the
+     hierarchy both luminous references draw. */
+  var emissiveSmile = new MeshBasicMaterial({
+    color: new Color(tint.glow || PALETTE.glow),
+    toneMapped: false,
+    transparent: true,
+    opacity: 0.78
+  });
+
+  var all = [body, head, face, cavity, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, emissiveSmile, rim];
 
   /* Captured at construction so setGlow(1) restores exactly what each material
      was defined with. */
@@ -432,8 +508,8 @@ export function createCrystalMaterials(options) {
   }
 
   return {
-    body: body, face: face, cavity: cavity, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
-    emissive: emissive, emissiveSoft: emissiveSoft, rim: rim,
+    body: body, head: head, face: face, cavity: cavity, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
+    emissive: emissive, emissiveSoft: emissiveSoft, emissiveSmile: emissiveSmile, rim: rim,
     /* One place to drive the whole character's luminosity — used by the
        animation states so a "thinking" pulse cannot desynchronise.
 
