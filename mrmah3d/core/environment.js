@@ -13,7 +13,11 @@
      4  horizon band    a thin luminous line where the floor dissolves; this is
                         what makes the world feel like it CONTINUES rather than
                         stopping at the edge of the grid
-     5  structures      distant faceted forms, barely lit, for parallax
+     4b corner clouds   restrained, dark, upper corners only (R94)
+     4c horizon mist    luminous, gappy, at the mountain bases, with the wet
+                        floor giving it back (R94)
+     5  the range       three depth layers of faceted gunmetal massifs, near
+                        black rock ridges, summit beacons — terrain.js (R94)
      6  motes           slow drifting light, the only other moving thing
      7  haze            linear fog binding it all together
 
@@ -34,8 +38,9 @@ import {
   Mesh, PlaneGeometry, ShadowMaterial, Color, Group,
   BufferGeometry, Float32BufferAttribute, LineSegments, LineBasicMaterial,
   Points, PointsMaterial, MeshBasicMaterial, AdditiveBlending,
-  ConeGeometry, MeshStandardMaterial, EdgesGeometry, CanvasTexture, DoubleSide
+  CanvasTexture, DoubleSide
 } from '../vendor/three/three.module.min.js';
+import { createTerrain } from './terrain.js';
 
 export var GRID = {
   size: 110,           /* large: the wide in-app FOVs see much further */
@@ -81,78 +86,198 @@ function radialTexture(size, hardness) {
   return t;
 }
 
-/* Soft, irregular mist. Overlapping radial blobs at random-but-fixed offsets,
-   blurred by their own falloff — enough structure to read as cloud rather than
-   as a gradient, and cheap enough to generate at mount. Alpha carries the
-   shape; the material supplies the colour. */
-function cloudTexture() {
+/* One cloud formation for a corner of the sky. Overlapping radial blobs at
+   fixed offsets, densest toward the OUTER (left) edge and thinning toward the
+   centre of the frame, faded to nothing at every edge so the quad never shows
+   its seam. Alpha carries the shape; the material supplies the colour. The
+   right-hand cloud is this texture mirrored. Deterministic: the world must
+   look identical on every mount, or a screenshot comparison is worthless. */
+function cloudCornerTexture() {
   var c = document.createElement('canvas');
-  c.width = 512; c.height = 128;
+  c.width = 256; c.height = 128;
   var g = c.getContext('2d');
-  g.clearRect(0, 0, 512, 128);
-  /* Deterministic: the world must look identical on every mount, and a
-     screenshot comparison is worthless if the sky is re-rolled each time. */
+  g.clearRect(0, 0, 256, 128);
   var seed = 20240904;
   function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
-
-  /* DISCRETE MASSES WITH REAL GAPS BETWEEN THEM.
-
-     The first version scattered blobs evenly across the full width, which gave
-     a continuous sheet — and a continuous sheet spanning the frame is a filter
-     over the lens, not weather in the world. It measured as one too: rows that
-     should have carried only the grid's converging lines became lit right
-     across, and the floor stopped reading as perspective.
-
-     So the blobs are now clustered into a few formations with genuinely empty
-     sky between them. The gaps are the point. They let the world show through,
-     they give the drift something to reveal and hide, and they are what makes
-     this read as cloud rather than as haze. */
-  var clusters = [40, 150, 268, 400];
-  clusters.forEach(function (cx) {
-    var n = 4 + Math.floor(rnd() * 3);
-    for (var i = 0; i < n; i++) {
-      var x = cx + (rnd() - 0.5) * 96;
-      var y = 40 + rnd() * 54;
-      var r = 30 + rnd() * 52;
-      var a = 0.16 + rnd() * 0.30;
-      var grd = g.createRadialGradient(x, y, 0, x, y, r);
-      grd.addColorStop(0, 'rgba(255,255,255,' + a.toFixed(3) + ')');
-      grd.addColorStop(0.5, 'rgba(255,255,255,' + (a * 0.38).toFixed(3) + ')');
-      grd.addColorStop(1, 'rgba(255,255,255,0)');
-      g.fillStyle = grd;
-      g.fillRect(x - r, y - r, r * 2, r * 2);
-    }
-  });
-
-  /* Fade hard at every edge so a band never shows its own seam, horizontally
-     as well as vertically — a band that runs to the frame edge reads as a
-     backdrop, one that thins out reads as a formation passing through. */
+  /* An IRREGULAR outline, deliberately. Blobs scattered evenly under straight
+     edge fades made a soft rounded rectangle, and in the chat frame — where
+     the camera's aim put both formations near the upper centre — two rounded
+     rectangles is exactly what they read as. The blobs now follow a wandering
+     chain from the outer edge inward, thinning as they go, and the whole thing
+     is cut by a soft ellipse, so the outline is a lumpy tapering mass with no
+     straight edge anywhere. */
+  var cx = 46, cy = 66;
+  for (var i = 0; i < 18; i++) {
+    var r = 30 - i * 0.9 + rnd() * 14;
+    var a = (0.34 - i * 0.012) + rnd() * 0.22;
+    var grd = g.createRadialGradient(cx, cy, 0, cx, cy, r);
+    grd.addColorStop(0, 'rgba(255,255,255,' + a.toFixed(3) + ')');
+    grd.addColorStop(0.5, 'rgba(255,255,255,' + (a * 0.42).toFixed(3) + ')');
+    grd.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grd;
+    g.fillRect(cx - r, cy - r, r * 2, r * 2);
+    cx += 8 + rnd() * 9;
+    cy += (rnd() - 0.5) * 26;
+    cy = Math.max(30, Math.min(96, cy));
+  }
+  /* A few lighter tufts along the upper edge, where a cloud catches what
+     light there is. */
+  for (var j = 0; j < 5; j++) {
+    var tx = 30 + rnd() * 140, ty = 28 + rnd() * 26, tr = 9 + rnd() * 12;
+    var tg = g.createRadialGradient(tx, ty, 0, tx, ty, tr);
+    tg.addColorStop(0, 'rgba(255,255,255,0.28)');
+    tg.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = tg;
+    g.fillRect(tx - tr, ty - tr, tr * 2, tr * 2);
+  }
   g.globalCompositeOperation = 'destination-out';
-  var fade = g.createLinearGradient(0, 0, 0, 128);
-  fade.addColorStop(0, 'rgba(0,0,0,1)');
-  fade.addColorStop(0.26, 'rgba(0,0,0,0)');
-  fade.addColorStop(0.74, 'rgba(0,0,0,0)');
-  fade.addColorStop(1, 'rgba(0,0,0,1)');
-  g.fillStyle = fade;
-  g.fillRect(0, 0, 512, 128);
-  var hfade = g.createLinearGradient(0, 0, 512, 0);
+  /* Soft elliptical cut, centred toward the outer edge. */
+  g.save();
+  g.translate(104, 64);
+  /* 0.42, not 0.5: at 0.5 the cut reached full only 2 px past the canvas'
+     top and bottom, which left a few percent of alpha along both edges — a
+     faint rectangular sprite outline in the sky at x 0.27 and 0.72. */
+  g.scale(1.0, 0.42);
+  var ell = g.createRadialGradient(0, 0, 0, 0, 0, 132);
+  ell.addColorStop(0, 'rgba(0,0,0,0)');
+  ell.addColorStop(0.55, 'rgba(0,0,0,0)');
+  ell.addColorStop(1, 'rgba(0,0,0,1)');
+  g.fillStyle = ell;
+  g.fillRect(-140, -140, 280, 280);
+  g.restore();
+  var hfade = g.createLinearGradient(0, 0, 256, 0);
   hfade.addColorStop(0, 'rgba(0,0,0,1)');
-  hfade.addColorStop(0.12, 'rgba(0,0,0,0)');
-  hfade.addColorStop(0.88, 'rgba(0,0,0,0)');
-  hfade.addColorStop(1, 'rgba(0,0,0,1)');
+  hfade.addColorStop(0.10, 'rgba(0,0,0,0)');
+  hfade.addColorStop(0.90, 'rgba(0,0,0,0)');
+  hfade.addColorStop(1, 'rgba(0,0,0,1)');   /* the inner edge, so two formations never meet */
   g.fillStyle = hfade;
-  g.fillRect(0, 0, 512, 128);
+  g.fillRect(0, 0, 256, 128);
   g.globalCompositeOperation = 'source-over';
-
+  /* Dither. An 8-bit gradient this dark renders as concentric contour rings —
+     a step of one alpha level is a visible band when the whole cloud spans a
+     dozen of them. A deterministic +/-4 of alpha per pixel, never more than the
+     pixel already has (so the clear sky stays clear), breaks the contours into
+     grain, which is what cloud looks like. */
+  var img = g.getImageData(0, 0, 256, 128), px = img.data;
+  for (var k = 3; k < px.length; k += 4) {
+    var a = px[k];
+    /* Multiplicative, +/-30%: the rings live in the 1-4 alpha tail, where an
+       additive +/-1 cannot break a step but a proportional jitter can. (+/-40%
+       made the dense core visibly speckled.) */
+    if (a > 0) px[k] = Math.max(0, Math.min(255, Math.round(a * (1 + 0.6 * (rnd() - 0.5)))));
+  }
+  g.putImageData(img, 0, 0);
   var t = new CanvasTexture(c);
   t.needsUpdate = true;
   return t;
 }
 
-/* A one-dimensional ramp: opaque at v=0, gone at v=1. Used for the light
-   pillars (bright at the floor, dissolving upward) and for the wet-floor
-   streaks (bright at the source, dissolving away from it). One tiny texture
-   serves both because both are the same falloff seen along different axes. */
+/* The reflected column under the hover point: a vertical ramp — opaque at
+   v=0, gone at v=1 — with SOFT SIDES, from a horizontal falloff multiplied in.
+   The plain ramp gave a flat trapezoid with two straight edges running to the
+   frame bottom, i.e. a carpet; the reference column blurs sideways and dims
+   toward the camera. */
+function columnTexture() {
+  var c = document.createElement('canvas');
+  c.width = 32; c.height = 128;
+  var g = c.getContext('2d');
+  var grad = g.createLinearGradient(0, 128, 0, 0);
+  grad.addColorStop(0.00, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.10, 'rgba(255,255,255,0.62)');
+  grad.addColorStop(0.34, 'rgba(255,255,255,0.24)');
+  grad.addColorStop(0.68, 'rgba(255,255,255,0.06)');
+  grad.addColorStop(1.00, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 32, 128);
+  g.globalCompositeOperation = 'destination-in';
+  var side = g.createLinearGradient(0, 0, 32, 0);
+  side.addColorStop(0.00, 'rgba(0,0,0,0)');
+  side.addColorStop(0.30, 'rgba(0,0,0,0.70)');
+  side.addColorStop(0.42, 'rgba(0,0,0,1)');
+  side.addColorStop(0.58, 'rgba(0,0,0,1)');
+  side.addColorStop(0.70, 'rgba(0,0,0,0.70)');
+  side.addColorStop(1.00, 'rgba(0,0,0,0)');
+  g.fillStyle = side;
+  g.fillRect(0, 0, 32, 128);
+  g.globalCompositeOperation = 'source-over';
+  var t = new CanvasTexture(c);
+  t.needsUpdate = true;
+  return t;
+}
+
+/* The horizon mist: a strip whose alpha lives in its LOWER half — dense tufts
+   with gaps between them, over a thin base band — and fades to nothing well
+   before the top. Built so a quad standing on the floor puts all of its light
+   just above the horizon line and none of it across the sky. */
+function mistTexture(tuftsOnly) {
+  var c = document.createElement('canvas');
+  c.width = 512; c.height = 96;
+  var g = c.getContext('2d');
+  g.clearRect(0, 0, 512, 96);
+  var seed = 90411;
+  function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+  if (!tuftsOnly) {
+  /* Base band: densest a little ABOVE the floor and gone AT it. A band that
+     was brightest at its bottom edge ended in a line where it met the floor —
+     reference B's mist grades into the floor over ~0.06 of the frame with no
+     line anywhere, and the wet floor's own light (the mirrored range) takes
+     over below. Gone by 55% of the height going up. */
+  var base = g.createLinearGradient(0, 96, 0, 43);
+  base.addColorStop(0.00, 'rgba(255,255,255,0)');
+  base.addColorStop(0.28, 'rgba(255,255,255,0.28)');
+  base.addColorStop(0.60, 'rgba(255,255,255,0.12)');
+  base.addColorStop(1.00, 'rgba(255,255,255,0)');
+  g.fillStyle = base;
+  g.fillRect(0, 0, 512, 96);
+  }
+  /* Tufts, clustered, with real gaps. Their heights vary a lot — some stand
+     well above the band — so the top of the mist is a ragged line rather
+     than a straight one. */
+  var clusters = [50, 160, 250, 340, 450];
+  clusters.forEach(function (cx) {
+    var n = 3 + Math.floor(rnd() * 3);
+    for (var i = 0; i < n; i++) {
+      var x = cx + (rnd() - 0.5) * 70;
+      var y = 40 + rnd() * 42;
+      var r = 18 + rnd() * 26;
+      var a = 0.16 + rnd() * 0.26;
+      var grd = g.createRadialGradient(x, y, 0, x, y, r);
+      grd.addColorStop(0, 'rgba(255,255,255,' + a.toFixed(3) + ')');
+      grd.addColorStop(0.5, 'rgba(255,255,255,' + (a * 0.35).toFixed(3) + ')');
+      grd.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = grd;
+      g.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+  });
+  g.globalCompositeOperation = 'destination-out';
+  var top = g.createLinearGradient(0, 0, 0, 96);
+  top.addColorStop(0, 'rgba(0,0,0,1)');
+  top.addColorStop(0.20, 'rgba(0,0,0,1)');
+  top.addColorStop(0.55, 'rgba(0,0,0,0)');
+  top.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = top;
+  g.fillRect(0, 0, 512, 96);
+  /* The floor edge, cut again so no tuft can reach it. */
+  var foot = g.createLinearGradient(0, 96, 0, 80);
+  foot.addColorStop(0, 'rgba(0,0,0,1)');
+  foot.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = foot;
+  g.fillRect(0, 0, 512, 96);
+  var hfade = g.createLinearGradient(0, 0, 512, 0);
+  hfade.addColorStop(0, 'rgba(0,0,0,1)');
+  hfade.addColorStop(0.10, 'rgba(0,0,0,0)');
+  hfade.addColorStop(0.90, 'rgba(0,0,0,0)');
+  hfade.addColorStop(1, 'rgba(0,0,0,1)');
+  g.fillStyle = hfade;
+  g.fillRect(0, 0, 512, 96);
+  g.globalCompositeOperation = 'source-over';
+  var t = new CanvasTexture(c);
+  t.needsUpdate = true;
+  return t;
+}
+
+/* A one-dimensional ramp: opaque at v=0, gone at v=1. Used by the summit
+   beacons in terrain.js (bright at the summit, dissolving upward). */
 function rampTexture() {
   var c = document.createElement('canvas');
   c.width = 4; c.height = 128;
@@ -207,12 +332,36 @@ export function createEnvironment(options) {
      (which covers only about +/-3 units around the character), and everything
      beyond that frustum sampled as fully shadowed — painting a hard dark band
      straight across the middle of the world. A catcher only needs to be as big
-     as the shadow it catches. */
-  var ground = new Mesh(
-    new PlaneGeometry(9, 9),
-    new ShadowMaterial({ opacity: settings.shadows ? 0.5 : 0 })
-  );
+     as the shadow it catches.
+
+     R94 — A POOL, NOT A PROJECTION. At 9 x 9 the catcher took the key light's
+     whole cast of him: a long dark blob running across the floor to his right,
+     which neither luminous reference has. Their floor returns a REFLECTION, and
+     the only darkening is a small contact pool under the tip. So the catcher is
+     now a 2.8-unit plane, offset a little toward where the key throws the tip's
+     shadow, with a radial fade shaded into the ShadowMaterial itself so the
+     pool has no edge: whatever falls inside it is a soft pool, whatever would
+     have fallen outside it does not exist. */
+  var groundMat = new ShadowMaterial({ opacity: settings.shadows ? 0.5 : 0 });
+  groundMat.onBeforeCompile = function (shader) {
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 vPool;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvPool = position.xy;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 vPool;')
+      .replace(
+        /gl_FragColor\s*=\s*vec4\(\s*color,\s*opacity\s*\*\s*\(\s*1\.0\s*-\s*getShadowMask\(\)\s*\)\s*\);/,
+        'float poolFade = 1.0 - smoothstep(0.40, 1.0, length(vPool));\n' +
+        '\tgl_FragColor = vec4( color, opacity * poolFade * ( 1.0 - getShadowMask() ) );');
+  };
+  /* 2.0 units: at his depth in the showcase frame that is about half the frame
+     width for the plane and a third for the visible pool. 2.8 measured as three
+     quarters of the width — a plate, not a pool. */
+  var ground = new Mesh(new PlaneGeometry(2.0, 2.0), groundMat);
   ground.rotation.x = -Math.PI / 2;
+  /* The key stands at (-4.2, 7.4, 6.2), so the tip's shadow lands a little to
+     +x and -z of it; the pool is centred on where the shadow actually falls. */
+  ground.position.set(0.22, 0, -0.30);
   ground.receiveShadow = !!settings.shadows;
   ground.material.depthWrite = false;   /* it must never occlude the grid */
   ground.name = 'ground';
@@ -220,18 +369,49 @@ export function createEnvironment(options) {
   owned.push(ground.geometry, ground.material);
 
   /* ---- 1. floor grid --------------------------------------------------- */
+  /* R94 — THE LINES PICK UP HIS LIGHT. In both luminous references the grid is
+     dim everywhere except around the hover point, where the lines brighten as
+     if reflecting the flare above them. That is done here with vertex colours
+     rather than a second material: every line is cut into cells, and each
+     vertex carries a gain that falls off with distance from the origin (he
+     hovers at the origin; drag rotates him, it does not move him). The
+     material opacity stays at GRID.opacity — the brightening is local, and the
+     far grid is exactly as dim as before. One draw call, as before; the grid's
+     Z extent, near edge and cell size are unchanged. */
   var half = GRID.size / 2, step = GRID.size / GRID.divisions;
-  var pts = [];
+  var pts = [], gcol = [];
+  var HOVER_GAIN = 1.9, HOVER_RADIUS = 3.6;
+  /* The floor is brightest at the horizon in both references — the wet
+     surface giving the mist back — and the brightness there belongs to the
+     LINES, converging, not to a strip lying across the floor. The 60 x 9 sheen
+     quad that used to do this job ended in a hard line (rows 0.666 -> 0.669:
+     87% lit -> 3%); this gain climbs to 1.6 by z -15 and is 1.0 from z -5
+     forward, so it fades with the lines rather than sitting on top of them. */
+  var FAR_GAIN = 1.6, FAR_Z0 = -5, FAR_Z1 = -15;
+  function gridGain(x, z) {
+    var d2 = (x * x + z * z) / (HOVER_RADIUS * HOVER_RADIUS);
+    var far = z >= FAR_Z0 ? 0 : z <= FAR_Z1 ? 1 : (FAR_Z0 - z) / (FAR_Z0 - FAR_Z1);
+    return (1 + HOVER_GAIN * Math.exp(-d2)) * (1 + (FAR_GAIN - 1) * far);
+  }
+  function seg(x0, z0, x1, z1) {
+    var g0 = gridGain(x0, z0 + GRID.centerZ), g1 = gridGain(x1, z1 + GRID.centerZ);
+    pts.push(x0, 0, z0, x1, 0, z1);
+    gcol.push(g0, g0, g0, g1, g1, g1);
+  }
   for (var i = 0; i <= GRID.divisions; i++) {
     var o = -half + i * step;
-    pts.push(-half, 0, o, half, 0, o);      /* lateral */
-    pts.push(o, 0, -half, o, 0, half);      /* receding */
+    for (var c = 0; c < GRID.divisions; c++) {
+      var p0 = -half + c * step, p1 = p0 + step;
+      seg(p0, o, p1, o);                    /* lateral, cell by cell */
+      seg(o, p0, o, p1);                    /* receding, cell by cell */
+    }
   }
   var gridGeo = new BufferGeometry();
   gridGeo.setAttribute('position', new Float32BufferAttribute(pts, 3));
+  gridGeo.setAttribute('color', new Float32BufferAttribute(gcol, 3));
   var gridMat = new LineBasicMaterial({
     color: new Color(0x2f8fae), transparent: true, opacity: GRID.opacity,
-    depthWrite: false, fog: true, blending: AdditiveBlending
+    depthWrite: false, fog: true, blending: AdditiveBlending, vertexColors: true
   });
   var grid = new LineSegments(gridGeo, gridMat);
   grid.position.set(0, GRID.y, GRID.centerZ);
@@ -273,10 +453,12 @@ export function createEnvironment(options) {
   glowGroup.name = 'floor-glow';
   var glowTex = radialTexture(128, 0.10);
   var discMat = new MeshBasicMaterial({
-    map: glowTex, color: cyan, transparent: true, opacity: 0.5,
+    map: glowTex, color: cyan, transparent: true, opacity: 0.46,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false
   });
-  var disc = new Mesh(new PlaneGeometry(4.2, 4.2), discMat);
+  /* R94: 4.2 -> 1.9. The references' hover point is a COMPACT cross flare with
+     a short reflected column, not a wide disc of light on the floor. */
+  var disc = new Mesh(new PlaneGeometry(1.9, 1.9), discMat);
   disc.rotation.x = -Math.PI / 2;
   disc.position.y = 0.012;
   glowGroup.add(disc);
@@ -312,12 +494,17 @@ export function createEnvironment(options) {
      Their lower edges stop well above the floor. A field that reached the
      ground would sit over the rows where the grid's convergence is read, which
      is the constraint that governs every transparent layer in this scene. */
-  var auraTex = radialTexture(128, 0.34);
+  /* R94 — REDUCED TO A WASH. Measured at the harness's frame the largest card
+     was 80% of the frame's width at his depth and lit 57% of every row he
+     stands in; three stacked radial cards read as a blue blob standing behind
+     him, i.e. exactly the shape a presence field must not have. One tall,
+     narrow, very faint card remains: a lift of the ground behind him that has
+     no edge to find. The outline halo the references show is being built on
+     the character itself, not here. */
+  var auraTex = radialTexture(128, 0.52);
   var auraCards = [];
   [
-    { w: 2.95, h: 3.45, y: 1.42, z: -0.42, o: 0.185 },
-    { w: 1.70, h: 1.80, y: 1.86, z: -0.20, o: 0.235 },
-    { w: 1.25, h: 1.25, y: 2.62, z: -0.16, o: 0.310 }
+    { w: 2.1, h: 4.8, y: 1.85, z: -0.5, o: 0.055 }
   ].forEach(function (a, i) {
     var m = new MeshBasicMaterial({
       map: auraTex, color: cyan, transparent: true, opacity: a.o,
@@ -332,20 +519,29 @@ export function createEnvironment(options) {
   });
   owned.push(auraTex);
 
-  var starMat = new MeshBasicMaterial({
-    map: glowTex, color: new Color(0xcdf5ff), transparent: true, opacity: 0.5,
+  /* R94: this was `starMat`, the same name the sky stars' PointsMaterial takes
+     further down in the same function scope — so the flare was never the one
+     being animated and the sky stars breathed with his hover instead. */
+  var flareMat = new MeshBasicMaterial({
+    map: glowTex, color: new Color(0xcdf5ff), transparent: true, opacity: 0.55,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false
   });
   var starQuads = [];
-  [[5.2, 0.13], [0.13, 3.0]].forEach(function (s) {
-    var q = new Mesh(new PlaneGeometry(s[0], s[1]), starMat);
+  /* R94: a compact cross — a short horizontal flare and a shorter arm running
+     toward the camera, which with the column below reads as the reflection.
+     Punch list: 2.6 x 0.09 drew as a 1-px ruled line over half the frame's
+     width. At 1.1 x 0.14 the radial texture's falloff tapers each arm to a
+     point inside its own glow, which is the four-point star the references
+     show. */
+  [[1.1, 0.14], [0.14, 1.1]].forEach(function (s) {
+    var q = new Mesh(new PlaneGeometry(s[0], s[1]), flareMat);
     q.rotation.x = -Math.PI / 2;
     q.position.y = 0.014;
     glowGroup.add(q);
     starQuads.push(q);
     owned.push(q.geometry);
   });
-  owned.push(starMat);
+  owned.push(flareMat);
 
   /* ---- 3b. the levitation emitter ------------------------------------- */
   /* A narrow, sharp line of energy between his lower point and the floor.
@@ -382,7 +578,7 @@ export function createEnvironment(options) {
     map: glowTex, color: new Color(0xffffff), transparent: true, opacity: 0.5,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false
   });
-  var laserCore = new Mesh(new PlaneGeometry(0.34, 0.34), laserCoreMat);
+  var laserCore = new Mesh(new PlaneGeometry(0.26, 0.26), laserCoreMat);
   laserCore.rotation.x = -Math.PI / 2;
   laserCore.position.y = 0.02;
   laserGroup.add(laserCore);
@@ -401,10 +597,16 @@ export function createEnvironment(options) {
      A stretched additive quad lying on the floor, brightest at his contact
      point and dissolving away toward the camera, reproduces the look for one
      draw call. It sits in glowGroup, so it tracks him when he is dragged. */
-  var streakTex = rampTexture();
+  /* Punch list: the ramp on a 0.55 x 7 plane had no lateral falloff and read
+     as a flat grey-blue trapezoid to the frame bottom. columnTexture gives it
+     soft sides; 0x3aa0ff is the saturated blue the reference column has
+     (0x7fe2ff came out as low-saturation grey once the additive stack had its
+     way with it); fog is off because at 1-8 units from the camera it was a
+     no-op that only muddied the colour. */
+  var streakTex = columnTexture();
   var streakMat = new MeshBasicMaterial({
-    map: streakTex, color: new Color(0x7fe2ff), transparent: true, opacity: 0.46,
-    blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: true
+    map: streakTex, color: new Color(0x3aa0ff), transparent: true, opacity: 0.90,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: false
   });
   /* R90: longer and wider, but only to here.
 
@@ -419,12 +621,19 @@ export function createEnvironment(options) {
      vertical. 1.05 x 8.4 is the largest size that leaves the grid's perspective
      intact (201 rows), and the rest of the brightness is bought with opacity,
      which costs no area. */
-  var streak = new Mesh(new PlaneGeometry(1.05, 8.4), streakMat);
+  /* R94: narrower and brighter — a reflected COLUMN, the mirror of the beam
+     above the tip, not a wash. 0.55 wide costs the convergence rows nothing. */
+  var streak = new Mesh(new PlaneGeometry(0.7, 3.0), streakMat);
   streak.rotation.x = -Math.PI / 2;
-  /* The ramp's opaque end is at v=0, which after the -90 degrees about X lands
-     at the far edge; pushing the quad forward by half its length puts that end
-     under him and lets the tail run toward the viewer. */
-  streak.position.set(0, 0.016, 4.2);
+  /* The texture's opaque end is at v=0. Rotating -90 degrees about X alone
+     puts v=0 at the NEAR edge — the previous comment here had it backwards,
+     and the column was brightest at the frame's bottom and dimmest under him,
+     which is the "carpet" the review saw. The half-turn about Z puts the
+     opaque end under him; the quad is pushed forward by half its length so
+     the tail runs toward the viewer. 3.0 long, because only the first unit or
+     so is in frame at showcase and the fade has to happen inside it. */
+  streak.rotation.z = Math.PI;
+  streak.position.set(0, 0.016, 1.5);
   glowGroup.add(streak);
   owned.push(streak.geometry, streakMat, streakTex);
 
@@ -435,10 +644,10 @@ export function createEnvironment(options) {
      weaker than the streak, so it reads as the floor having a finish rather
      than as a second light source. */
   var sheenMat = new MeshBasicMaterial({
-    map: glowTex, color: new Color(0x2f6f92), transparent: true, opacity: 0.10,
+    map: glowTex, color: new Color(0x2f6f92), transparent: true, opacity: 0.08,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: true
   });
-  var sheen = new Mesh(new PlaneGeometry(3.6, 3.6), sheenMat);
+  var sheen = new Mesh(new PlaneGeometry(3.0, 3.0), sheenMat);
   sheen.rotation.x = -Math.PI / 2;
   sheen.position.y = 0.008;
   glowGroup.add(sheen);
@@ -479,284 +688,205 @@ export function createEnvironment(options) {
   group.add(horizon);
   owned.push(horizon.geometry, horizonMat, horizonTex);
 
-  /* ---- 4b. atmosphere: cloud and mist bands ---------------------------- */
-  /* "Clouds and shit", read as intended: not fluffy cartoon clouds, but the
-     suspended haze that gives a dark world scale and mystery.
+  /* ---- 4b. atmosphere: restrained corner clouds ------------------------- */
+  /* R94 — INTO THE FRAME, INTO THE CORNERS, AND OUT OF THE FOG.
 
-     Built as a handful of very large, very faint quads carrying a soft blobby
-     texture, hung at different depths and drifting sideways at different rates.
-     Parallax between the layers is what sells them as volume — a single layer
-     reads as a painted backdrop no matter how good the texture is, and three
-     layers moving at different speeds reads as air.
+     The three drifting bands this replaces were correctly built and were
+     never seen, for two compounding reasons that are worth stating plainly:
+     they hung at y 11-18.5 and z -22..-38, which is above the showcase frame
+     top for the two far bands, and at 70-90% fog for all three. Worse, the
+     nearest one WAS in frame at the top — faint, dark, and full-width — and
+     measured as a veil: the top 15% of the harness frame was lit right across
+     (rows 0.00-0.15: 68 full rows out of 456) by a cloud nobody could see,
+     because getImageData counts a 2% alpha pixel as lit. Hiding it turned
+     those rows back to sky.
 
-     Deliberately NOT additive. Additive haze glows, and glowing clouds in the
-     upper frame would compete with him directly; these are mist that OCCLUDES,
-     so they deepen the world instead of lighting it.
-
-     The colour carries a little of the world's own cyan rather than being
-     neutral grey, which is what the brief means by cloud picking up
-     illumination from the environment — at this value it reads as atmosphere
-     lit by the same light as everything else, not as a grey filter. */
-  var cloudTex = cloudTexture();
+     Both luminous references keep their cloud to the UPPER CORNERS, dark
+     blue-grey, low contrast, with a clear sky between. So: two formations,
+     one per corner, each spanning about a third of the frame width so no row
+     can be lit right across by cloud; fog off with the distance tint authored
+     into the colour; and their lower edges above the character's apex
+     (frame 0.14) so the rows he stands in are never widened by cloud. Placed
+     against the measured frame: at z=-42 the frame's half-width is ~11.5 and
+     one unit of height is 0.035 of the frame. */
+  var cloudTex = cloudCornerTexture();
+  /* Restraint, measured: both references' upper corners are 100% under 32
+     luma (means 8 and 12). The cloud is a smudge a little lighter than the
+     sky, not a shape — colour and opacity here put its densest core near 28. */
+  /* Punch list: 0.50 -> 0.80. At 0.50 the densest core was a luma or two
+     over the sky — invisible as cloud, visible only as contour rings. With the
+     texture dithered the same mass at 0.80 reads as smoky grey cloud, and the
+     corners still measure under 32. */
   var cloudMat = new MeshBasicMaterial({
-    /* MUCH darker and fainter than the first attempt, and the reason is the
-       same trap the horizon glow fell into: a layer that covers the whole frame
-       width does not have to be bright to become a veil. At 0.30 these bands
-       lifted 140 rows of the frame from "partially lit" to "lit right across",
-       which is the structural signature of a wash over the world rather than
-       weather in it — the floor grid's converging lines stopped being
-       separable. The brief asks for subtle cloud presence and specifically
-       warns against making it obvious; this is that, at the level where it
-       reads as depth and not as a filter over the lens. */
-        /* R90: 0x1b3346 at 0.40 measured about 19 luma over a black sky — present in
-       the scene graph, correctly placed, drifting correctly, and invisible. The
-       reference's cloud is a clearly readable dark blue-grey mass; this is that
-       value. The constraint it has to respect is unchanged and is about SCREEN
-       POSITION, not brightness: everything above the horizon line, nothing over
-       the rows where the floor's convergence is read. */
-    /* R92: 0x44708f -> 0x27394f. The brief wants cloud that is present because
-       of ambient and horizon difference, not because it glows — dark, blue-black
-       and low contrast. It is still well above the horizon line, which is the
-       constraint that governs it. */
-    map: cloudTex, color: new Color(0x27394f), transparent: true, opacity: 0.72,
-    depthWrite: false, toneMapped: false, side: DoubleSide, fog: true
+    map: cloudTex, color: new Color(0x66809e), transparent: true, opacity: 0.85,
+    depthWrite: false, toneMapped: false, side: DoubleSide, fog: false
   });
   var clouds = new Group();
   clouds.name = 'atmosphere';
   var cloudBands = [];
+  /* The texture's alpha lives in the middle half of the quad's height, so a
+     quad centred at y 16.4 with h 6.4 puts its visible mass at y 14.8-18.0 —
+     frame rows 0.12 down to 0.01 at z=-42 — above his apex at 0.15. */
+  /* Placed for the REFERENCE framing, measured: at z=-42 the showcase frame
+     (aspect 0.686) has a half-width of 9.6 units and puts y 15 at row 0.12,
+     so +/-8 lands each formation's mass in an upper corner — x 0.0-0.35 and
+     0.65-1.0, rows 0.05-0.18 — which is where both references keep theirs.
+     Each is 9 wide, not 14.5: at 14.5 the two nearly met at the centre and
+     rows 0.125-0.197 measured as lit right across (a veil, 34 rows lost).
+     The previous +/-11.6 sat at the frame edge at this aspect and mostly
+     outside it.
+
+     They are NOT placed for the in-app frames, because no single world
+     position can serve both: the chat camera is 22 degrees round and 46
+     degrees wide, and anything in the showcase's upper-left corner lands in
+     its upper CENTRE, where the DOM response diamond sits. So the clouds are
+     gated on the scale hint instead (see applyFine): they belong to the large
+     frame, and at chat and protocol size they are withheld. */
   [
-    /* Every band's LOWER EDGE must stay above the floor. The first version
-       centred them at y 3.2-7.5 with heights up to 22, so each band's bottom
-       reached several units BELOW the ground plane and hung dark mist straight
-       over the grid — measured, the number of rows carrying converging content
-       collapsed and the floor stopped reading as perspective at all. Haze in
-       front of the floor is not atmosphere, it is a veil. These sit entirely in
-       the sky, which is where the reference's cloud is. */
-    /* Two bands, both far back and well above the horizon line.
-
-       A third, nearer band at z=-26 was hanging in the same screen region as
-       the upper grid and the horizon, so it veiled precisely the part of the
-       frame where the floor's perspective is read. Distant sky is where cloud
-       belongs in this composition anyway: it adds scale behind him without ever
-       coming between the camera and his world. */
-    /* INSIDE THE FOG, and that is why they were invisible before.
-
-       Linear fog runs from 11 to 42 units, so anything at z=-46 or beyond is
-       fully fogged — the bands existed, were correctly built, drifted correctly,
-       and could not be seen in any composition. Pushing them further back to
-       stop them veiling the floor had quietly pushed them out of the world.
-
-       The real constraint was never distance, it was SCREEN POSITION: they must
-       sit above the horizon line so they never cover the rows where the grid's
-       perspective is read. At these heights, seen from a camera a couple of
-       units off the floor, they clear it comfortably while staying inside the
-       fade where the atmosphere can actually reach the eye. */
-    { z: -38, y: 18.5, w: 96, h: 13, speed: 0.050, o: 1.00 },
-    { z: -29, y: 14.2, w: 70, h: 9, speed: -0.080, o: 0.72 },
-    /* A third layer, nearer and lower, drifting fastest. Three depths rather
-       than two is what turns "two cloud quads" into air: the parallax between
-       them never repeats, so the sky reads as volume the character is standing
-       inside rather than as a backdrop hung behind him. Still clear of the
-       horizon line — everything above it, nothing over the floor. */
-    /* R90: the heights are NOT negotiable and this pass proved it again.
-       Dropping these three by 2-3 units to bring them into the showcase frame
-       took DEPTH-01 from 201 rows to 164 in one step. Brightness is free;
-       screen position is not. */
-    { z: -22, y: 11.0, w: 54, h: 7.0, speed: 0.140, o: 0.50 }
+    { x: -8.0, y: 15.0, z: -42, w: 9.0, h: 6.4, speed: 0.035, o: 1.00, flip: false },
+    { x: 8.0, y: 15.0, z: -43, w: 9.5, h: 6.0, speed: -0.028, o: 0.86, flip: true }
   ].forEach(function (b, i) {
     var m = cloudMat.clone();
     m.opacity = cloudMat.opacity * b.o;
     var q = new Mesh(new PlaneGeometry(b.w, b.h), m);
-    q.position.set(0, b.y, b.z);
+    q.position.set(b.x, b.y, b.z);
+    if (b.flip) q.scale.x = -1;
     q.renderOrder = -5 + i;
     clouds.add(q);
-    cloudBands.push({ mesh: q, speed: b.speed, span: b.w * 0.25, base: 0,
+    cloudBands.push({ mesh: q, speed: b.speed, span: 0.9, base: 0, x: b.x,
       baseOpacity: m.opacity });
     owned.push(q.geometry, m);
   });
   group.add(clouds);
-  owned.push(cloudTex);
+  owned.push(cloudTex, cloudMat);
 
-  /* ---- 4c. horizon mist: NOT a separate layer, deliberately ------------
-     A wide band of haze sitting on the horizon was built here and removed. It
-     is the obvious way to get "distant mist" and it cannot be made to work in
-     this scene: placed beyond the fog's far plane it renders at 100% fog colour
-     — a solid lit rectangle across the horizon, the same trap the horizon glow
-     fell into two passes ago — and placed inside the fade it covers exactly the
-     screen rows where the floor's perspective is read. Measured, the rows
-     carrying converging content fell from 202 to 158 even at a fifth of the
-     opacity and half the width, because getImageData returns unpremultiplied
-     colour and a barely-visible pixel still counts as lit.
+  /* ---- 4c. horizon mist bank -------------------------------------------- */
+  /* The luminous mist lying along the mountain bases in both references. An
+     earlier pass hung a single full-width band here and it failed twice over
+     — as a solid wall past fog.far, then as a veil over the convergence rows
+     inside the fade. The two things that make this version work are the ones
+     that version lacked:
 
-     The job it was meant to do is covered: the cloud bands now run at three
-     depths, the nearest of them low and fast, and the horizon glow marks where
-     the floor dissolves. Both already sit clear of the convergence rows. */
+       - it is fog:false, at z=-33, in FRONT of the mid mountains and behind
+         the near rock ridges, with its brightness authored rather than
+         computed, so it is exactly as luminous as intended at any fog setting;
+       - it is a row of separate, gappy formations from a texture whose alpha
+         is concentrated in its LOWER half, its lower edge at world y 0.1, so
+         on screen it sits above the horizon line (frame ~0.65) and reaches up
+         to about 0.56 at its highest tufts. Those rows are already the
+         horizon: the far grid, the ridges and the horizon glow fill them.
 
-  /* ---- 5. distant structures ------------------------------------------- */  /* ---- 5. distant structures ------------------------------------------- */
-  /* Faceted forms far out, edge-lit in the character's own geometric language
-     so the world looks built of the same material he is. Kept very dim: they
-     exist for parallax and scale, not to be looked at. */
-  var structures = new Group();
-  structures.name = 'structures';
-  /* R92 — STEEL, NOT BLUE. The brief makes this canonical: Mr.Mah owns the
-     secondary colour and the world does not. These were a near-black blue with
-     bright cyan edges, which made them blue objects competing for the one hue
-     the character is supposed to own.
-
-     Gunmetal, and metallic enough to CATCH rather than to glow: at metalness
-     0.72 against a near-black environment a monolith is dark from almost every
-     angle and returns a hard silver edge on the few planes that happen to face
-     a light card — which is exactly the "mostly dark, occasional bright steel
-     catch" the brief describes, and it costs nothing because the environment is
-     already there for the character. */
-  var steel = new Color(0x9aa8b4);
-  var structMat = new MeshStandardMaterial({
-    color: new Color(0x323a44), roughness: 0.46, metalness: 0.72,
-    envMapIntensity: 1.15, flatShading: true, fog: true
+     The near rock ridges occlude its foot in places, which is what puts the
+     mist BEHIND the rocks rather than painted over them. */
+  var mistTex = mistTexture();
+  /* Luminous, measured: reference B's rows 0.62-0.68 average 71 luma and A's
+     41; at 0.30 this band measured 20. */
+  /* NORMAL blending, not additive. Mist scatters — it replaces what is behind
+     it with its own colour, it does not add to it. Additive, a front tuft
+     lying over a lit peak face and a rear tuft went to 255 in a blob the size
+     of the peak's base: the one white patch in the frame. Blended, the same
+     tuft veils the face toward the mist colour and can never exceed it. */
+  var mistMat = new MeshBasicMaterial({
+    map: mistTex, color: new Color(0xc2dcf2), transparent: true, opacity: 0.95,
+    depthWrite: false, toneMapped: false,
+    side: DoubleSide, fog: false
   });
-  var structEdge = new LineBasicMaterial({
-    /* R92: back down to 0.14, and STEEL rather than cyan. R90 raised this to
-       0.62 to stop the monoliths reading as flat cutouts, which worked and
-       solved it with the wrong material — a bright cyan wire around every
-       distant form puts the character's own colour on the horizon. The forms
-       are now metallic enough to catch a real highlight on their own, so the
-       line only has to state an edge, faintly, in the world's own steel. */
-    color: steel, transparent: true, opacity: 0.21,
-    depthWrite: false, blending: AdditiveBlending, fog: true
-  });
-  owned.push(structMat, structEdge);
-
-  /* x, z, radius, height — pushed well back and spread wide so they read as
-     a skyline rather than as props flanking a stage. */
-  /* Deliberately small, low and far. An earlier set stood 26 units tall at
-     z=-40 and read as a black hole punched through the floor: being opaque,
-     they occlude the receding grid, and anything large enough to do that stops
-     being atmosphere and becomes an obstacle. Kept under the horizon line and
-     back beyond the fog's reach, they now read as a skyline. */
-  /* R90: three of these are brought forward to z -44..-56, inside the fog's
-     fade, and made taller. Every one of them used to sit past fogFar, where an
-     object renders at 100% fog colour and therefore has no edges, no facets and
-     no value of its own — a flat cutout. The reference's landscape has depth
-     BETWEEN its structures, which needs at least a near tier to compare the far
-     tier against. They stay clear of the rows where the grid's convergence is
-     read, which is the constraint that removed the horizon mist. */
-  /* And then pushed wide, because the first placement cost the floor.
-
-     DEPTH-01 counts the screen rows that carry converging content, and it fell
-     from 216 to 197 the moment these went in at |x| 24-46: an opaque structure
-     standing in the middle distance occludes the receding grid behind it, which
-     is the same measured symptom the horizon mist produced even though the
-     cause is completely different. Moved outboard to |x| 38-58 they flank the
-     convergence instead of standing in it, and the near/far depth they were
-     added for survives intact. */
-  /* R93 — A BEAM STANDS ON EVERY NEAR PEAK.
-
-     Both luminous references put a thin vertical shaft of light rising out of
-     the mountain summits, and it is the single most identifiable thing about
-     that world: it is what makes the range read as built and inhabited rather
-     than as scenery, and it is the only place the environment is allowed to
-     carry the secondary colour. Two crossed quads per beam so they keep their
-     width when the subject is dragged, and only the near tier gets one — a beam
-     on every summit would be a fence. */
-  var peakBeams = new Group();
-  peakBeams.name = 'peak-beams';
-  var beamTex = rampTexture();
-  var beamMat = new MeshBasicMaterial({
-    map: beamTex, color: new Color(0xa8e4ff), transparent: true, opacity: 0.52,
-    blending: AdditiveBlending, depthWrite: false, toneMapped: false,
-    side: DoubleSide, fog: true
-  });
-  owned.push(beamTex, beamMat);
-
-  /* Two SHORT peaks near the centre azimuth exist to carry beams into frame.
-
-     The near tier sits at |x| 38-60 because bringing it inboard cost the floor
-     its convergence rows, and at that azimuth its beams never reached any
-     composition — present, correct, invisible, which is this scene's most
-     repeated failure. These two are deliberately low (7 units, well under the
-     horizon line) so they occlude almost nothing, and their beams do the work:
-     a beam is 0.3 units wide and lives entirely above the summit, so it costs
-     the grid nothing at any azimuth. */
-  [[-23, -41, 3.4, 7.0, 1], [26, -46, 3.8, 7.6, 1],
-   [-38, -44, 5.5, 10.0, 1], [46, -50, 6.2, 12.0, 1], [-60, -56, 7.0, 14.0, 1],
-   [-30, -62, 6.0, 7.5, 0], [34, -70, 7.0, 9.0, 0], [-52, -78, 8.0, 10.5, 0], [56, -84, 7.5, 9.5, 0],
-   [-14, -90, 9.0, 12.0, 0], [24, -96, 8.5, 11.0, 0], [-70, -99, 9.5, 12.5, 0]]
-    .forEach(function (s) {
-      if (s[4]) {
-        /* Rising FROM the summit, so its base is hidden inside the peak and it
-           reads as emitted rather than as a quad standing next to a mountain. */
-        var bh = s[3] * 3.2;
-        [0, Math.PI / 2].forEach(function (rot) {
-          var bq = new Mesh(new PlaneGeometry(0.30, bh), beamMat);
-          bq.position.set(s[0], s[3] + bh * 0.42, s[1]);
-          bq.rotation.y = rot;
-          peakBeams.add(bq);
-          owned.push(bq.geometry);
-        });
-      }
-      var geo = new ConeGeometry(s[2], s[3], 4, 1);
-      var m = new Mesh(geo, structMat);
-      m.position.set(s[0], s[3] / 2, s[1]);
-      m.rotation.y = Math.PI / 4;
-      structures.add(m);
-      var eg = new EdgesGeometry(geo, 20);
-      var el = new LineSegments(eg, structEdge);
-      el.position.copy(m.position);
-      el.rotation.copy(m.rotation);
-      structures.add(el);
-      owned.push(geo, eg);
-    });
-  group.add(structures);
-  group.add(peakBeams);
-
-  /* ---- 5b. light pillars ----------------------------------------------- */
-  /* The vertical beams standing in Reference A's landscape. They do more than
-     decorate: they are the only strictly vertical elements in a world built of
-     horizontals, so they give the eye a scale rule against the pyramids and
-     stop the far distance reading as flat. Bright at the floor and dissolving
-     upward, fogged with everything else, and crossed in pairs so they keep
-     their width when the subject is dragged and the view shifts. */
-  var pillarTex = rampTexture();
-  var pillarMat = new MeshBasicMaterial({
-    map: pillarTex, color: new Color(0x6fdcff), transparent: true, opacity: 0.55,
-    blending: AdditiveBlending, depthWrite: false, toneMapped: false,
-    side: DoubleSide, fog: true
-  });
-  var pillars = new Group();
-  pillars.name = 'light-pillars';
+  var mist = new Group();
+  mist.name = 'horizon-mist';
+  var mistQuads = [];
+  /* Two rows. The rear row stands at the mountain bases, tall enough that its
+     tufts show OVER the rock ridges; the front row lies at the ridges' feet,
+     lower and thinner, so the rocks sit IN the mist rather than in front of a
+     backdrop of it — which is how both references place them. Round 2 had the
+     rear row alone and the ridges hid almost all of it. */
+  /* Punch list: the band measured 35 luma against reference B's 70 over rows
+     0.62-0.68 because the rear row (y 0.1) was hidden behind the rock ridges
+     and the front row (h 1.5) too thin to show over them. The rear row now
+     stands at y 0.4 — its foot hidden behind the rocks, its tufts over them —
+     and the front row is 2.6 tall at 0.85-0.90 so its tufts overlap the ridge
+     tops. (1.2 was tried for the rear row: its foot then showed as a straight
+     bright edge above the rocks.) */
   [
-    /* Brought nearer and spread wider. At z -44..-72 every pillar sat beyond
-       where the fog has already taken the world, so none of them reached the
-       frame in any mode — they existed and were invisible, which is the worst
-       of both. These are inside the fade, at azimuths that put at least one in
-       shot at every composition. */
-    /* R90: two of these move inboard and get taller. At |x| 15-34 every pillar
-       sat outside the showcase frame and outside chat's, so the world's only
-       vertical elements never appeared in the two views that matter.
-
-       Inboard has a floor, though: at x -8 and 11 they stood in the middle of
-       the receding grid and DEPTH-01 dropped to 200. A tall additive quad is a
-       veil over whatever converges behind it, the same as any other. -13 and 17
-       is as close to centre as they can come with the grid intact. */
-    { x: -13, z: -33, h: 22, w: 0.18, o: 1.0 },
-    { x: -34, z: -46, h: 26, w: 0.24, o: 0.8 },
-    { x: 17, z: -40, h: 25, w: 0.20, o: 0.9 },
-    { x: 30, z: -52, h: 29, w: 0.26, o: 0.7 },
-    { x: 4, z: -60, h: 24, w: 0.22, o: 0.5 }
+    { x: -21, z: -33, w: 16, h: 3.4, y: 0.4, o: 0.85, flip: true },
+    { x: -6.5, z: -33.5, w: 15, h: 3.4, y: 0.4, o: 1.0, flip: false },
+    { x: 7.5, z: -33, w: 15, h: 3.3, y: 0.4, o: 0.95, flip: true },
+    { x: 22, z: -33.5, w: 16, h: 3.5, y: 0.4, o: 0.8, flip: false },
+    { x: -13, z: -19.5, w: 15, h: 2.6, y: 0.04, o: 0.85, flip: false },
+    { x: -1, z: -20, w: 15, h: 2.6, y: 0.04, o: 0.90, flip: true },
+    { x: 11, z: -19.5, w: 15, h: 2.6, y: 0.04, o: 0.85, flip: false }
   ].forEach(function (b) {
-    var m = pillarMat.clone();
-    m.opacity = pillarMat.opacity * b.o;
-    [0, Math.PI / 2].forEach(function (rot) {
-      var q = new Mesh(new PlaneGeometry(b.w, b.h), m);
-      q.position.set(b.x, b.h / 2, b.z);
-      q.rotation.y = rot;
-      pillars.add(q);
-      owned.push(q.geometry);
-    });
-    owned.push(m);
+    var m = mistMat.clone();
+    m.opacity = mistMat.opacity * b.o;
+    var q = new Mesh(new PlaneGeometry(b.w, b.h), m);
+    q.position.set(b.x, b.y + b.h / 2, b.z);
+    if (b.flip) q.scale.x = -1;
+    mist.add(q);
+    mistQuads.push({ mesh: q, baseOpacity: m.opacity, x: b.x });
+    owned.push(q.geometry, m);
   });
-  group.add(pillars);
-  owned.push(pillarTex);
+  /* THE MIST IN THE FLOOR. Reference B's floor is brightest right under the
+     horizon — the wet surface giving the mist back — and fades toward the
+     camera over ~0.06 of the frame. The front row is mirrored below the floor
+     (the floor is transparent, so a quad hanging under it is seen through it),
+     flipped so its dense edge is at the surface and it dissolves downward.
+     The mirror uses a TUFTS-ONLY texture: a mirrored base band would be a
+     full-width strip over the convergence rows, i.e. the veil DEPTH-01 exists
+     to catch, where separate tufts leave every row partial. */
+  var mistReflTex = mistTexture(true);
+  /* A darker colour at a higher opacity than the mist itself, for the same
+     composited value: PIXEL-05 reads the canvas UNPREMULTIPLIED, so a faint
+     bright layer over a large area reports its full colour and lifted the
+     frame's mean by 9 points on its own. */
+  var mistReflMat = new MeshBasicMaterial({
+    map: mistReflTex, color: new Color(0x7f96b0), transparent: true, opacity: 0.72,
+    depthWrite: false, toneMapped: false,
+    side: DoubleSide, fog: false
+  });
+  /* Narrower than the row it mirrors (9 against 15): three 15-wide quads
+     overlapped into one full-width sheet under the horizon and turned rows
+     0.695-0.776 into full rows. At 9 the tufts sit under the mist's own
+     clusters with floor showing between them. */
+  mistQuads.slice(4).forEach(function (m) {
+    var q = new Mesh(new PlaneGeometry(9, m.mesh.geometry.parameters.height), mistReflMat);
+    /* Stretched 1.7x downward: a wet floor smears a reflection vertically,
+       and unstretched the round tufts read as puffs of fog lying ON the floor
+       rather than as the mist returned by it. The quad's top edge stays at the
+       surface (position is its centre, so it moves down with the stretch). */
+    q.position.set(m.mesh.position.x, -m.mesh.position.y * 1.7, m.mesh.position.z);
+    q.scale.set(m.mesh.scale.x, -1.7, 1);
+    q.renderOrder = -19;   /* over the mirrored range, under the grid */
+    mist.add(q);
+    mistQuads.push({ mesh: q, baseOpacity: mistReflMat.opacity, x: m.x, shared: true });
+    owned.push(q.geometry);
+  });
+  owned.push(mistReflTex, mistReflMat);
+
+  /* There is deliberately no floor strip under the mist. A 60 x 9 sheen quad
+     lay here and ended in a hard line under the horizon — rows 0.657-0.666
+     were 77-87% lit right across, then row 0.669 was 3% — a stage edge, and
+     exactly the "anything lying on the floor is a veil" case. The wet floor's
+     brightness at the horizon now comes from the mirrored range (terrain.js)
+     and from the grid's own distance gain, both of which converge with the
+     lines instead of lying across them. */
+  group.add(mist);
+  owned.push(mistTex, mistMat);
+
+  /* ---- 5. the mountain range -------------------------------------------- */
+  /* R94: see terrain.js. Three depth layers of faceted gunmetal massifs with
+     their shade baked into vertex colours, summit beacons, sparkle specks and
+     the near black rock ridges — three draws for the range, one for the
+     sparkles, one for the beams, one for their summit caps, one (above low)
+     for the mid range mirrored into the wet floor. It replaces twelve fogged cones with twelve
+     edge outlines that cost twenty-four draws and rendered as two black
+     triangles, and five light pillars that were never in frame. */
+  var terrain = createTerrain({
+    tier: tier, settings: settings, ramp: rampTexture(), radial: radialTexture(32, 0.15)
+  });
+  var structures = terrain.group;
+  var beacons = terrain.beacons;
+  group.add(structures);
+  group.add(beacons);
+  owned.push(terrain);
 
   /* ---- 5c. stars -------------------------------------------------------- */
   /* Sparse, dim, and high. They cost one draw call and they are what tells the
@@ -803,12 +933,19 @@ export function createEnvironment(options) {
 
   if (parent) parent.add(group);
 
-  /* Baselines, so a mode weight of 1.0 restores exactly what was authored. */
+  /* Baselines, so a mode weight of 1.0 restores exactly what was authored.
+     R94: captured ONCE, from the materials, and never reassigned. The previous
+     applyMode wrote `BASE.disc = 0.5 * glow` — a literal copy of the disc's
+     opacity, which then silently diverged from it — and the flare, the sky
+     stars and the beams each had a second writer. Now every animated or
+     weighted value is authored value x mode weight x breath, with the weights
+     held separately in W. */
   var BASE = {
-    grid: gridMat.opacity, nodes: nodeMat.opacity, structures: structEdge.opacity,
-    motes: moteMat.opacity, disc: discMat.opacity, star: starMat.opacity,
-    horizon: horizonMat.opacity
+    grid: gridMat.opacity, nodes: nodeMat.opacity, motes: moteMat.opacity,
+    disc: discMat.opacity, flare: flareMat.opacity, star: starMat.opacity,
+    horizon: horizonMat.opacity, streak: streakMat.opacity
   };
+  var W = { grid: 1, nodes: 1, motes: 1, glow: 1, structures: 1, haze: 1, detail: 1 };
 
   var time = 0;
   var glowPulse = 1;
@@ -829,28 +966,34 @@ export function createEnvironment(options) {
     /* The floor light breathes with his hover, and brightens with his state —
        the world responding to him rather than sitting inert behind him. */
     var breathe = 0.9 + 0.1 * Math.sin(time * 1.4);
-    var g = breathe * glowPulse;
+    var g = breathe * glowPulse * W.glow;
     discMat.opacity = BASE.disc * g;
-    starMat.opacity = BASE.star * g;
+    flareMat.opacity = BASE.flare * g;
+    streakMat.opacity = BASE.streak * (0.85 + 0.15 * breathe) * W.glow;
     horizonMat.opacity = BASE.horizon * (0.94 + 0.06 * Math.sin(time * 0.5));
 
-    /* Each band drifts at its own rate and wraps, so the parallax between them
-       never settles into a repeating pattern the eye can lock onto. */
     /* The field breathes with him rather than sitting at a constant value — a
        static glow reads as a lens artifact, one that moves reads as something
-       the character is doing. Each card on its own slow period so the three
-       never pulse together. */
+       the character is doing. */
     auraCards.forEach(function (a) {
       a.mesh.material.opacity = a.base * glowPulse *
         (0.82 + 0.18 * Math.sin(time * 0.44 + a.phase));
     });
 
+    /* The corner clouds drift a little and come back — never far enough to
+       leave their corner and cross the centre of the frame. */
     cloudBands.forEach(function (b) {
       b.base += dt * b.speed;
       if (b.base > b.span) b.base -= b.span * 2;
       if (b.base < -b.span) b.base += b.span * 2;
-      b.mesh.position.x = b.base;
+      b.mesh.position.x = b.x + b.base;
     });
+    /* The mist barely moves: a slow, low-amplitude sway is what mist does. */
+    mistQuads.forEach(function (m, i) {
+      m.mesh.position.x = m.x + Math.sin(time * 0.05 + i * 1.7) * 0.5;
+    });
+
+    terrain.update(dt);
   }
 
   /* Called by the scene each frame with the character's live world position,
@@ -865,49 +1008,57 @@ export function createEnvironment(options) {
     horizon.position.z = z;
   }
 
+  function applyFine() {
+    /* The fine particles are weighted by mode AND by on-screen size; one
+       writer for each so the two cannot race. */
+    var k = W.detail;
+    /* Clouds: gone below a scale hint of 0.30 (chat 0.13, protocol 0.26),
+       full from 0.60 (portrait 0.61, showcase 1.0). One writer, authored
+       baseline x haze x scale. */
+    var cloudK = Math.max(0, Math.min(1, (k - 0.30) / 0.30));
+    cloudBands.forEach(function (b) { b.mesh.material.opacity = b.baseOpacity * W.haze * cloudK; });
+    moteMat.opacity = BASE.motes * W.motes * (0.35 + 0.65 * k);
+    starMat.opacity = BASE.star * W.structures * (0.45 + 0.55 * k);
+    nodeMat.opacity = BASE.nodes * W.nodes * (0.5 + 0.5 * k);
+    terrain.setDetail(k);
+  }
+
   function applyMode(w) {
     if (!w) return;
     /* Sit the glow just short of where the fog finishes, so the floor dissolves
        INTO it rather than stopping short of it. */
     if (w.fogFar) setHorizon(-(w.fogFar * 0.70));
-    gridMat.opacity = BASE.grid * (w.grid == null ? 1 : w.grid);
-    nodeMat.opacity = BASE.nodes * (w.nodes == null ? 1 : w.nodes);
-    structEdge.opacity = BASE.structures * (w.structures == null ? 1 : w.structures);
-    structures.visible = (w.structures == null ? 1 : w.structures) > 0.05;
-    moteMat.opacity = BASE.motes * (w.motes == null ? 1 : w.motes);
-    BASE.disc = 0.5 * (w.glow == null ? 1 : w.glow);
-    BASE.star = 0.5 * (w.glow == null ? 1 : w.glow);
+    W.grid = w.grid == null ? 1 : w.grid;
+    W.nodes = w.nodes == null ? 1 : w.nodes;
+    W.motes = w.motes == null ? 1 : w.motes;
+    W.glow = w.glow == null ? 1 : w.glow;
+    W.structures = w.structures == null ? 1 : w.structures;
     /* Atmosphere follows the same per-mode weighting as everything else: a
        tight portrait wants less sky than a wide showcase does. */
-    var ha = w.haze == null ? 1 : w.haze;
-    /* Pillars and stars follow the structures weight — they are the same
-       "distant world" tier, and a mode that wants a quiet background should
-       lose all of it together rather than in pieces. */
-    var st = w.structures == null ? 1 : w.structures;
-    pillars.visible = st > 0.05;
-    peakBeams.visible = st > 0.05;
-    stars.visible = st > 0.05;
-    starMat.opacity = 0.55 * st;
+    W.haze = w.haze == null ? 1 : w.haze;
+
+    gridMat.opacity = BASE.grid * W.grid;
+    /* The range, its beacons, its sparkles and the sky stars follow the
+       structures weight — they are the same "distant world" tier, and a mode
+       that wants a quiet background should lose all of it together rather than
+       in pieces. terrain.applyWeight reads its own authored baselines. */
+    terrain.applyWeight(W.structures);
+    stars.visible = W.structures > 0.05;
     /* The presence field follows the glow weight, so a mode that wants a quiet
        character gets a quiet field with him. */
-    var gw = w.glow == null ? 1 : w.glow;
-    auraCards.forEach(function (a) { a.mesh.visible = gw > 0.05; });
+    auraCards.forEach(function (a) { a.mesh.visible = W.glow > 0.05; });
+    discMat.opacity = BASE.disc * W.glow;
+    flareMat.opacity = BASE.flare * W.glow;
+    streakMat.opacity = BASE.streak * W.glow;
 
-    clouds.visible = ha > 0.03;
-    /* R90: reads the band's OWN authored opacity instead of a literal.
-
-       This line carried `0.40 * [1.00, 0.66, 0.42][i]` — the cloud material's
-       baseline and the three per-band weights, copied. So every mode change
-       reset the clouds to a value that had to be edited in two places, and
-       raising the material from 0.40 to 0.88 changed nothing at all: applyMode
-       runs on mount and overwrote it before the first frame. Exactly the
-       duplicated-baseline failure materials.js records, in another file.
-
-       Each band's authored opacity is captured at build time and this scales
-       it, so there is one writer and one place to edit. */
-    cloudBands.forEach(function (b) {
-      b.mesh.material.opacity = b.baseOpacity * ha;
-    });
+    clouds.visible = W.haze > 0.03;
+    mist.visible = W.haze > 0.03;
+    /* Each band's authored opacity is captured at build time and this scales
+       it, so there is one writer and one place to edit — the duplicated
+       literal that once lived here (`0.40 * [weights][i]`) silently discarded
+       every edit to the cloud material before the first frame. */
+    mistQuads.forEach(function (m) { m.mesh.material.opacity = m.baseOpacity * W.haze; });
+    applyFine();   /* the clouds are written there: haze x scale, one writer */
   }
 
   function dispose() {
@@ -920,16 +1071,17 @@ export function createEnvironment(options) {
     glow: glowGroup, structures: structures, motes: motes, horizon: horizon,
     update: update, followCharacter: followCharacter, applyMode: applyMode,
     setHorizon: setHorizon, setLaser: setLaser, clouds: clouds,
-    pillars: pillars, stars: stars,
+    /* `pillars` is kept as the name of the world's vertical light elements —
+       the summit beacons — so the harness's isolation lists keep working. */
+    pillars: beacons, beacons: beacons, stars: stars, mist: mist,
+    terrain: terrain,
     /* Scale-aware world detail. At chat and protocol size the fine particles
        are sub-pixel noise competing with the character for the little contrast
        the frame has; the large layers — grid, horizon, mist, structures — are
        what still read, so only the small stuff is pulled back. */
     setDetail: function (t) {
-      var k = Math.max(0, Math.min(1, Number(t)));
-      moteMat.opacity = BASE.motes * (0.35 + 0.65 * k);
-      starMat.opacity = 0.55 * (0.45 + 0.55 * k);
-      nodeMat.opacity = BASE.nodes * (0.5 + 0.5 * k);
+      W.detail = Math.max(0, Math.min(1, Number(t) || 0));
+      applyFine();
     },
     setOpacity: function (v) { gridMat.opacity = Math.max(0, Math.min(1, Number(v))); },
     dispose: dispose

@@ -621,6 +621,218 @@ for (const v of VIEWPORTS) {
   await ctx.close();
 }
 
+/* ---------------------------------------- 10. R94 world ------------------ */
+/* The mountain range, beacons, mist, sky and shadow pool built for R94, measured
+   in the showcase frame at the high tier — the delivered look. Each check is
+   about STRUCTURE in the frame (is the range a mid-dark mass rather than black
+   cut-outs or a pale wall; do the beams stand above the peaks; is the mist
+   brighter than the floor in front of it; is the sky still black; is the shadow
+   a pool under the tip rather than a projection across the floor), and about
+   the frame budget the world has to live inside. */
+{
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  const errs = [];
+  page.on('pageerror', e => errs.push(String(e)));
+  await page.goto(`${URL_LAB}?tier=high`, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__MRMAH_LAB && window.__MRMAH_LAB.mounted, { timeout: 20000 });
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.setMode('showcase'); window.__MRMAH_LAB.scene.setReducedMotion(true); });
+  await page.waitForTimeout(700);
+
+  const world = await page.evaluate(() => {
+    const s = window.__MRMAH_LAB.scene;
+    const r = s.renderer, cam = s.camera, c = s.canvas;
+    const env = s.parts.environment;
+    const g = document.createElement('canvas'); g.width = c.width; g.height = c.height;
+    const x = g.getContext('2d', { willReadFrequently: true });
+    const luma = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+    /* Composite over the stage's own ink before reading. getImageData returns
+       UNPREMULTIPLIED colour: read raw, a 5%-alpha wash reports full-strength
+       cyan and the sky measures as bright. `raw` keeps the alpha for the
+       shadow count, which needs it. */
+    function grab(raw) {
+      r.render(s.scene, cam);
+      x.clearRect(0, 0, c.width, c.height);
+      if (!raw) { x.fillStyle = 'rgb(14,17,20)'; x.fillRect(0, 0, c.width, c.height); }
+      x.drawImage(c, 0, 0);
+      return x.getImageData(0, 0, c.width, c.height).data;
+    }
+    function region(d, x0, x1, y0, y1) {
+      let n = 0, sum = 0, mid = 0, bright = 0, lit = 0;
+      for (let yy = Math.floor(y0 * c.height); yy < Math.floor(y1 * c.height); yy++)
+        for (let xx = Math.floor(x0 * c.width); xx < Math.floor(x1 * c.width); xx++) {
+          const i = (yy * c.width + xx) * 4; const l = luma(d, i); n++; sum += l;
+          if (l >= 32 && l < 128) mid++; if (l > 120) bright++; if (l > 10) lit++;
+        }
+      return { mean: sum / n, midFrac: mid / n, bright, litFrac: lit / n };
+    }
+    /* Full scene at the high tier: the budget. */
+    r.render(s.scene, cam);
+    const budget = { calls: r.info.render.calls, tris: r.info.render.triangles };
+    /* Environment only. */
+    s.parts.stage.subject.visible = false;
+    const d = grab();
+    const band = region(d, 0.1, 0.9, 0.44, 0.62);       /* the range */
+    const above = region(d, 0.0, 1.0, 0.30, 0.44);      /* where only beams and cloud can be */
+    const mist = region(d, 0.0, 1.0, 0.56, 0.64);       /* the mist at the bases */
+    const floor = region(d, 0.0, 1.0, 0.70, 0.78);      /* the open floor in front */
+    const skyL = region(d, 0.0, 0.3, 0.02, 0.30);
+    const skyR = region(d, 0.7, 1.0, 0.02, 0.30);
+    /* DEPTH-01's measurement, in this context, with the character back. */
+    s.parts.stage.subject.visible = true;
+    const d2 = grab(true);     /* raw, exactly as analyseStructure reads it */
+    let partialRows = 0;
+    for (let yy = 0; yy < c.height; yy++) {
+      let n = 0;
+      for (let xx = 0; xx < c.width; xx++) { const i = (yy * c.width + xx) * 4; if (d2[i + 3] > 4 && luma(d2, i) > 10) n++; }
+      if (n > 0 && n <= c.width * 0.8) partialRows++;
+    }
+    /* The shadow pool: only the catcher visible in the world, character on. */
+    const hidden = [];
+    env.group.children.forEach(k => { if (k !== env.ground) { hidden.push([k, k.visible]); k.visible = false; } });
+    const d3 = grab(true);
+    /* Floor rows only: his own semi-transparent dark edge pixels higher in the
+       frame match the same heuristic and would stretch the box. */
+    let minX = 1e9, maxX = -1, minY = 1e9, maxY = -1, shadowPx = 0;
+    for (let yy = Math.floor(c.height * 0.78); yy < c.height; yy++)
+      for (let xx = 0; xx < c.width; xx++) {
+        const i = (yy * c.width + xx) * 4, a = d3[i + 3];
+        if (a > 20 && a < 160 && luma(d3, i) < 14) {
+          shadowPx++;
+          if (xx < minX) minX = xx; if (xx > maxX) maxX = xx; if (yy < minY) minY = yy; if (yy > maxY) maxY = yy;
+        }
+      }
+    hidden.forEach(([k, v]) => { k.visible = v; });
+    r.render(s.scene, cam);
+    const layers = Object.keys(env.terrain.layers).map(k => ({
+      name: k, visible: env.terrain.layers[k].mesh.visible,
+      tris: env.terrain.layers[k].geo.attributes.position.count / 3
+    }));
+    return {
+      budget, band, above, mist, floor, skyL, skyR, partialRows, layers,
+      shadow: { px: shadowPx, wFrac: shadowPx ? (maxX - minX + 1) / c.width : 0, hFrac: shadowPx ? (maxY - minY + 1) / c.height : 0 },
+      summits: env.terrain.summits.length, sparkles: env.terrain.stats.sparkles,
+      info: s.info()
+    };
+  });
+
+  check('R94-WORLD-01 frame budget at tier high (draws <= 165, tris <= 11000)',
+    world.budget.calls <= 165 && world.budget.tris <= 11000,
+    `${world.budget.calls} draws, ${world.budget.tris} tris`);
+  check('R94-WORLD-02 three terrain layers built and visible',
+    world.layers.length === 3 && world.layers.every(l => l.visible && l.tris > 100),
+    world.layers.map(l => `${l.name} ${l.tris} tris`).join(', '));
+  check('R94-WORLD-03 the range is a lit mid-dark mass (not black cut-outs, not a pale wall)',
+    world.band.mean > 22 && world.band.mean < 90 && world.band.midFrac > 0.15,
+    `band mean ${world.band.mean.toFixed(1)}, ${(world.band.midFrac * 100).toFixed(0)}% of pixels in 32-128`);
+  check('R94-WORLD-04 summit beacons rise above the peaks',
+    world.summits >= 3 && world.above.bright > 100,
+    `${world.summits} beacons, ${world.above.bright} bright px above the range`);
+  check('R94-WORLD-05 horizon mist is luminous and sits above the floor rows',
+    world.mist.mean > world.floor.mean * 1.6 && world.mist.mean > 18,
+    `mist rows ${world.mist.mean.toFixed(1)} vs open floor ${world.floor.mean.toFixed(1)}`);
+  check('R94-WORLD-06 the sky stays near-black (references: upper corners 100% under 32)',
+    world.skyL.mean < 30 && world.skyR.mean < 30,
+    `corners ${world.skyL.mean.toFixed(1)} / ${world.skyR.mean.toFixed(1)}`);
+  check('R94-WORLD-07 cast shadow is a pool under the tip, not a projection',
+    world.shadow.px > 200 && world.shadow.wFrac < 0.40 && world.shadow.hFrac < 0.14,
+    `${world.shadow.px} px, ${(world.shadow.wFrac * 100).toFixed(0)}% of width x ${(world.shadow.hFrac * 100).toFixed(0)}% of height`);
+  check('R94-WORLD-08 floor still converges with the world in place',
+    world.partialRows > 200, `${world.partialRows} rows carry converging content`);
+  check('R94-WORLD-09 sparkle specks were placed on the slopes', world.sparkles > 200, `${world.sparkles} specks`);
+  check('R94-WORLD-10 no errors building the world', errs.length === 0, errs.slice(0, 3).join(' | '));
+
+  /* Review round. These read the DELIVERED frame — the page screenshot, i.e.
+     what the high tier's composite actually puts on screen — because the raw
+     `grab()` above measures the scene before bloom's composite and the two
+     differ by nearly 2x in the midtones; the review's numbers were taken from
+     screenshots and so are these. The mid range is measured over ITS OWN
+     pixels (a mask from an isolated render), not over a box that is mostly
+     sky: the first cut of item 6 was tuned against a box and came out as black
+     cut-outs. The phone frame here (aspect 0.56 at the 700px stage) sees the
+     small central massifs more than the big flank ones and reads darker than
+     the 500px review frame (42% against 27% under 32), so the ceiling is 50%. */
+  await page.evaluate(() => { document.querySelector('.lab-stage').style.height = '700px'; window.__MRMAH_LAB.scene.parts.stage.subject.visible = false; window.__MRMAH_LAB.scene.parts.environment.mist.visible = false; });
+  await page.waitForTimeout(400);
+  const shotNoMist = await page.locator('.lab-stage').screenshot();
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.environment.mist.visible = true; });
+  await page.waitForTimeout(300);
+  const shotNoChar = await page.locator('.lab-stage').screenshot();
+  const delivered = await page.evaluate(async ({ noMist, noChar }) => {
+    const s = window.__MRMAH_LAB.scene, env = s.parts.environment, c = s.canvas;
+    async function load(data) {
+      const img = new Image(); img.src = data; await img.decode();
+      const g = document.createElement('canvas'); g.width = img.naturalWidth; g.height = img.naturalHeight;
+      const x = g.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0);
+      return { d: x.getImageData(0, 0, g.width, g.height).data, W: g.width, H: g.height };
+    }
+    const luma = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+    /* Mask of the mid range from an isolated render. */
+    const vis = []; env.group.traverse(o => { vis.push([o, o.visible]); if (o !== env.group && o !== env.structures && o.name !== 'terrain-mid') o.visible = false; });
+    env.structures.visible = true;
+    s.renderer.render(s.scene, s.camera);
+    const g = document.createElement('canvas'); g.width = c.width; g.height = c.height;
+    const x = g.getContext('2d', { willReadFrequently: true }); x.drawImage(c, 0, 0);
+    const md = x.getImageData(0, 0, c.width, c.height).data;
+    vis.forEach(([o, v]) => { o.visible = v; });
+    s.renderer.render(s.scene, s.camera);
+    const nm = await load(noMist), nc = await load(noChar);
+    const sameSize = nm.W === c.width && nm.H === c.height;
+    const h = new Array(8).fill(0); let n = 0;
+    if (sameSize) for (let i = 0; i < md.length; i += 4) { if (md[i + 3] < 200) continue; h[Math.min(7, luma(nm.d, i) >> 5)]++; n++; }
+    const planes = { px: n, under32: n ? h[0] / n : 1, mid: n ? (h[1] + h[2]) / n : 0, over128: n ? (h[4] + h[5] + h[6] + h[7]) / n : 1 };
+    /* Horizon falloff: fraction of each row above 40 luma, rows 0.62-0.72. */
+    const rows = [];
+    for (let fy = 0.62; fy < 0.72; fy += 0.004) {
+      const y = Math.round(fy * nc.H); let lit = 0;
+      for (let xx = 0; xx < nc.W; xx++) if (luma(nc.d, (y * nc.W + xx) * 4) > 40) lit++;
+      rows.push(lit / nc.W);
+    }
+    let maxDrop = 0; for (let i = 1; i < rows.length; i++) maxDrop = Math.max(maxDrop, rows[i - 1] - rows[i]);
+    /* The floor in front (rows 0.70-0.82): share above 32 luma. */
+    let fl = 0, fn = 0;
+    for (let y = Math.round(0.70 * nc.H); y < Math.round(0.82 * nc.H); y++) for (let xx = 0; xx < nc.W; xx++) { fn++; if (luma(nc.d, (y * nc.W + xx) * 4) > 32) fl++; }
+    const mirror = env.terrain.mirrors.map(m => ({ visible: m.mesh.visible, tris: m.tris }));
+    return { sameSize, planes, maxDrop, floorLit: fl / fn, mirror };
+  }, { noMist: 'data:image/png;base64,' + shotNoMist.toString('base64'), noChar: 'data:image/png;base64,' + shotNoChar.toString('base64') });
+  check('R94-WORLD-11 the mid range is mirrored into the floor at the high tier',
+    delivered.mirror.length === 1 && delivered.mirror[0].visible && delivered.mirror[0].tris > 100,
+    JSON.stringify(delivered.mirror));
+  check('R94-WORLD-12 the range reads as gunmetal over its own pixels (ref B: ~22% <32, ~69% 32-96, ~2% >128)',
+    delivered.sameSize && delivered.planes.under32 < 0.50 && delivered.planes.mid > 0.40 && delivered.planes.over128 < 0.08,
+    `${delivered.planes.px} px: ${(delivered.planes.under32 * 100).toFixed(0)}% <32, ${(delivered.planes.mid * 100).toFixed(0)}% 32-96, ${(delivered.planes.over128 * 100).toFixed(1)}% >128`);
+  check('R94-WORLD-13 the horizon grades into the floor (no row-to-row step over 50 points)',
+    delivered.maxDrop < 0.50, `largest drop ${(delivered.maxDrop * 100).toFixed(0)} points between rows 0.4% apart`);
+  check('R94-WORLD-14 the floor in front reads wet (ref B: 29.5% of rows 0.72-0.84 above 32)',
+    delivered.floorLit > 0.10, `${(delivered.floorLit * 100).toFixed(1)}% of the floor above 32`);
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.stage.subject.visible = true; });
+
+  /* The delivered evidence: showcase with and without him, chat, protocol, 3/4. */
+  await page.evaluate(() => { document.querySelector('.lab-stage').style.height = '700px'; });
+  await page.waitForTimeout(300);
+  writeFileSync(join(OUT, 'r94-world-showcase.png'), await page.locator('.lab-stage').screenshot());
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.stage.subject.visible = false; });
+  await page.waitForTimeout(200);
+  writeFileSync(join(OUT, 'r94-world-showcase-nochar.png'), await page.locator('.lab-stage').screenshot());
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.stage.subject.visible = true; window.__MRMAH_LAB.scene.parts.character.setYaw(0.62); });
+  await page.waitForTimeout(200);
+  writeFileSync(join(OUT, 'r94-world-threequarter.png'), await page.locator('.lab-stage').screenshot());
+  await page.evaluate(() => { window.__MRMAH_LAB.scene.parts.character.setYaw(0); document.querySelector('.lab-stage').style.height = '620px'; });
+  const cloudAt = {};
+  for (const name of ['chat', 'protocol']) {
+    await page.evaluate(n => window.__MRMAH_LAB.scene.setMode(n), name);
+    await page.waitForTimeout(400);
+    writeFileSync(join(OUT, `r94-world-${name}.png`), await page.locator('.lab-stage').screenshot());
+    cloudAt[name] = await page.evaluate(() => window.__MRMAH_LAB.scene.parts.environment.clouds.children.map(q => q.material.opacity));
+  }
+  /* The in-app frames keep their upper centre clear: the clouds are withheld
+     there (scale-gated in applyFine), not merely moved. */
+  check('R94-WORLD-15 clouds withheld at chat and protocol scale',
+    Object.values(cloudAt).every(a => a.every(o => o === 0)), JSON.stringify(cloudAt));
+  await ctx.close();
+}
+/* ---------------------------------------- end R94 world ------------------ */
+
 await browser.close();
 
 writeFileSync(join(OUT, 'VERIFY_RESULTS.json'),

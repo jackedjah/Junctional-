@@ -344,7 +344,10 @@ ok('WORLD-horizon-band', /horizon/.test(env));
 ok('WORLD-horizon-is-fogged', /fog MUST be on/.test(env),
   'an unfogged horizon punches a lit wall through the haze');
 ok('WORLD-glow-follows-character', /followCharacter/.test(env));
-ok('WORLD-shadow-catcher-is-small', /new PlaneGeometry\(9, 9\)/.test(env),
+/* R94 world: amended from the literal 9 x 9 — brief item 7 clips the catcher
+   to a 2-unit pool under the tip, which is smaller still; the intent (never a
+   floor-sized catcher) is what this asserts. */
+ok('WORLD-shadow-catcher-is-small', /new PlaneGeometry\((9, 9|2\.0, 2\.0)\)/.test(env),
   'a floor-sized catcher paints a dark band outside the shadow camera');
 ok('WORLD-per-mode-emphasis', /applyMode/.test(env));
 ok('WORLD-fog-is-per-mode', /setFog/.test(read('mrmah3d/core/stage.js')));
@@ -358,6 +361,126 @@ ok('TAP-cancel-is-not-a-tap', /function cancel/.test(inter));
 
 /* ---- G. persistent instructions exist --------------------------------- */
 ok('DOC-claude-md', exists('CLAUDE.md'));
+/* ---- R94 world ---------------------------------------------------------
+   The mountain range, mist, clouds, floor response and shadow pool built for
+   brief R94. Static contracts only; the rendered result is measured by the
+   R94-WORLD block in tools/mrmah3d-verify.mjs. */
+{
+  const terrain = read('mrmah3d/core/terrain.js');
+  const envR94 = read('mrmah3d/core/environment.js');
+  const qualityR94 = read('mrmah3d/core/quality.js');
+
+  ok('R94-WORLD-terrain-module-exists', exists('mrmah3d/core/terrain.js'));
+  ok('R94-WORLD-terrain-imported-by-environment', /from '\.\/terrain\.js'/.test(envR94));
+  /* Baked flat shading: vertex colours on an unlit material, never a lit one —
+     that is what keeps a mountain as cheap as a coloured triangle. */
+  ok('R94-WORLD-terrain-is-baked-vertex-colour',
+    /vertexColors:\s*true/.test(terrain) && /MeshBasicMaterial/.test(terrain) &&
+    !/MeshStandardMaterial|MeshPhysicalMaterial|MeshLambertMaterial/.test(terrain));
+  /* The fog trap: a fogged object beyond FOG.far is a wall of fog colour and one
+     inside the fade is nearly so at these distances. Every terrain material
+     opts out and carries its depth tint in its own colour. */
+  const terrainMats = (terrain.match(/new (MeshBasicMaterial|PointsMaterial)\(/g) || []).length;
+  const terrainUnfogged = (terrain.match(/fog:\s*false/g) || []).length;
+  ok('R94-WORLD-terrain-never-fogged', terrainMats > 0 && terrainUnfogged >= terrainMats,
+    terrainUnfogged + ' of ' + terrainMats + ' materials carry fog:false');
+  ok('R94-WORLD-terrain-has-depth-tint', /depth:\s*0\.\d+/.test(terrain) && /ATMOS/.test(terrain));
+  ok('R94-WORLD-terrain-three-depth-layers',
+    /\['far',\s*'mid',\s*'ridge'\]/.test(terrain) && /z:\s*-2\d/.test(terrain) &&
+    /z:\s*-4\d/.test(terrain) && /z:\s*-[6-9]\d/.test(terrain));
+  ok('R94-WORLD-terrain-one-draw-per-layer', /new Mesh\(geo, mat\)/.test(terrain) &&
+    !/massifs\.forEach\(function[^}]*new Mesh/.test(terrain));
+  ok('R94-WORLD-terrain-faces-wound-outward', /nrm\.dot\(outv\)\s*<\s*0/.test(terrain));
+  ok('R94-WORLD-terrain-does-not-touch-document', !/\bdocument\b|\bwindow\b/.test(code('mrmah3d/core/terrain.js')));
+  ok('R94-WORLD-terrain-disposes-everything', /owned\.forEach\(function \(o\) \{ if \(o && o\.dispose\) o\.dispose\(\); \}\)/.test(terrain));
+  ok('R94-WORLD-terrain-scales-fine-detail', /function setDetail\(k\)/.test(terrain) && /spkMat\.opacity/.test(terrain));
+  ok('R94-WORLD-terrain-weights-from-authored-baselines',
+    /var BASE = \{\s*beam: beams\.mat\.opacity/.test(terrain) && /BASE\.beam \* weight/.test(terrain));
+  ok('R94-WORLD-beams-are-thin-and-short',
+    /var w = s\.far \? 0\.16 : 0\.22;/.test(terrain) && /var h = s\.h \* 1\.25;/.test(terrain));
+  ok('R94-WORLD-beams-unfogged-additive', /beacon-beams/.test(terrain) &&
+    /blending: AdditiveBlending, depthWrite: false, toneMapped: false,\s*side: DoubleSide, fog: false/.test(terrain));
+
+  /* environment.js: what was removed and what replaced it. */
+  ok('R94-WORLD-fogged-cones-gone', !/ConeGeometry|EdgesGeometry|MeshStandardMaterial/.test(envR94));
+  ok('R94-WORLD-light-pillars-gone', !/light-pillars/.test(envR94));
+  ok('R94-WORLD-full-width-cloud-bands-gone', !/w:\s*96,/.test(envR94) && /cloudCornerTexture/.test(envR94));
+  ok('R94-WORLD-clouds-are-two-corners', (envR94.match(/\{ x: -?\d+\.\d, y: 1\d\.\d, z: -4\d, w: \d+\.\d, h: \d\.\d, speed/g) || []).length === 2);
+  ok('R94-WORLD-clouds-unfogged', /cloudMat = new MeshBasicMaterial\(\{[\s\S]*?fog: false/.test(envR94));
+  ok('R94-WORLD-mist-bank-exists', /horizon-mist/.test(envR94) && /mistTexture\(\)/.test(envR94));
+  ok('R94-WORLD-mist-stands-above-the-floor', /q\.position\.set\(b\.x, b\.y \+ b\.h \/ 2, b\.z\)/.test(envR94) &&
+    !/y:\s*-\d/.test((envR94.match(/var mistQuads = \[\];[\s\S]*?\.forEach/) || [''])[0]));
+  ok('R94-WORLD-mist-unfogged-and-gappy', /mistMat = new MeshBasicMaterial\(\{[\s\S]*?fog: false/.test(envR94) &&
+    /Tufts, clustered, with real gaps/.test(envR94));
+  ok('R94-WORLD-grid-opacity-held', /opacity:\s*0\.21/.test(envR94));
+  ok('R94-WORLD-grid-brightens-near-hover', /HOVER_GAIN/.test(envR94) && /vertexColors:\s*true/.test(envR94));
+  /* Review round: 2.6 x 0.09 drew as a ruled line over half the frame; the
+     column's opaque end was at the camera, not under him. */
+  ok('R94-WORLD-hover-is-a-compact-cross',
+    /new PlaneGeometry\(1\.9, 1\.9\)/.test(envR94) && /\[\[1\.1, 0\.14\], \[0\.14, 1\.1\]\]/.test(envR94));
+  ok('R94-WORLD-reflection-is-a-narrow-column', /new PlaneGeometry\(0\.7, 3\.0\)/.test(envR94) &&
+    /function columnTexture/.test(envR94) && /streak\.rotation\.z = Math\.PI/.test(envR94));
+  ok('R94-WORLD-shadow-catcher-is-a-pool',
+    /new PlaneGeometry\(2\.0, 2\.0\)/.test(envR94) && /poolFade/.test(envR94) && !/new PlaneGeometry\(9, 9\)/.test(envR94));
+  ok('R94-WORLD-aura-is-a-single-faint-wash',
+    (envR94.match(/\{ w: [\d.]+, h: [\d.]+, y: [\d.]+, z: -[\d.]+, o: 0\.0\d+ \}/g) || []).length === 1 &&
+    !/o: 0\.185/.test(envR94));
+  /* Authored baselines, one writer each. */
+  ok('R94-WORLD-applyMode-reads-authored-baselines',
+    /b\.mesh\.material\.opacity = b\.baseOpacity \* W\.haze/.test(envR94) &&
+    /terrain\.applyWeight\(W\.structures\)/.test(envR94) &&
+    !/BASE\.\w+\s*=\s*0\.\d/.test(code('mrmah3d/core/environment.js')));
+  ok('R94-WORLD-flare-material-not-shadowed-by-stars',
+    /var flareMat = new MeshBasicMaterial/.test(envR94) && (envR94.match(/var starMat = /g) || []).length === 1);
+  ok('R94-WORLD-terrain-disposed-with-environment', /owned\.push\(terrain\)/.test(envR94));
+  ok('R94-WORLD-floor-reflections-are-tiered', /worldReflections:\s*tier !== 'low'/.test(qualityR94) &&
+    /settings\.worldReflections/.test(terrain));
+  ok('R94-WORLD-mrmah-scene-untouched-by-world-pass', !/preRender/.test(read('mrmah3d/core/mrmah-scene.js')),
+    'the proxy floor needs no pre-render hook');
+
+  /* ---- review round (critic punch list) ---- */
+  /* Item 1: pyramids, not domes — every mid and far massif at h/r >= 2.0 with
+     6-7 sides so a side is one readable plane. */
+  const midBlock = (terrain.match(/mid: \{[\s\S]*?massifs: \[([\s\S]*?)\]/) || ['', ''])[1];
+  const farBlock = (terrain.match(/far: \{[\s\S]*?massifs: \[([\s\S]*?)\]/) || ['', ''])[1];
+  const massifs = b => Array.from(b.matchAll(/h: ([\d.]+), r: ([\d.]+), sides: (\d+)/g)).map(m => ({ h: +m[1], r: +m[2], sides: +m[3] }));
+  const mids = massifs(midBlock), fars = massifs(farBlock);
+  ok('R94-WORLD-peaks-are-steep', mids.length >= 8 && fars.length >= 5 &&
+    mids.every(m => m.h / m.r >= 2.1 && m.sides <= 7) && fars.every(m => m.h / m.r >= 1.9 && m.sides <= 7),
+    mids.map(m => (m.h / m.r).toFixed(1)).join(' '));
+  /* Item 2: rocks lit and dissolving — base on the floor, foot alpha 0, ridge
+     albedo above the stage's ink, rubble-sized faces. */
+  ok('R94-WORLD-ridge-foot-dissolves', /fadeFoot: true/.test(terrain) && /k === 0 \? 0\.0 :/.test(terrain) &&
+    /Float32BufferAttribute\(col, 4\)/.test(terrain) && !/k === 0 \? -0\.35/.test(terrain));
+  ok('R94-WORLD-ridge-is-lit-not-a-hole', /ridge: \{ base: srgb\(66, 74, 88\)/.test(terrain) &&
+    /ridge: \{ ang: 0\.60, rad: 0\.90/.test(terrain) && /tone: 'ridge', rings: 3/.test(terrain));
+  /* Item 3: the floor gives the range back — mirrored through the floor, one
+     draw, tiered; the beacon streaks that never reached the frame are gone. */
+  ok('R94-WORLD-range-mirrored-into-floor', /mirror: \{ maxX: 12/.test(terrain) &&
+    /name \+ '-mirror'/.test(terrain) && /-p0\.y, p0\.z, p2\.x, -p2\.y/.test(terrain) &&
+    /!!settings\.worldReflections/.test(terrain) && !/buildBeaconReflections/.test(terrain));
+  /* Item 4: no strip lying on the floor under the horizon; the grid carries
+     the distance brightness in its own lines. */
+  ok('R94-WORLD-no-floor-sheen-strip', !/floor-sheen/.test(envR94) && !/PlaneGeometry\(60, 9\)/.test(envR94) &&
+    /FAR_GAIN/.test(envR94));
+  /* Item 5: the mist stands over the rocks and blends rather than adds. */
+  ok('R94-WORLD-mist-blends-not-adds',
+    !/mistMat = new MeshBasicMaterial\(\{[\s\S]*?AdditiveBlending[\s\S]*?\}\);/.test(
+      (envR94.match(/var mistMat = new MeshBasicMaterial\(\{[\s\S]*?\}\);/) || [''])[0]) &&
+    /h: 2\.6, y: 0\.04, o: 0\.85/.test(envR94));
+  ok('R94-WORLD-mist-reflected-in-floor', /mistTexture\(true\)/.test(envR94) && /scale\.set\(m\.mesh\.scale\.x, -1\.7, 1\)/.test(envR94));
+  /* Item 6: gunmetal — the steel catch and the diffuse gain came down, the
+     brightness moved into the specks. */
+  ok('R94-WORLD-steel-not-ice', /ks: 0\.34/.test(terrain) && /sparkle: 1100/.test(terrain) && /size: 0\.36/.test(terrain));
+  /* Item 8: clouds placed for the reference frame, dithered, and withheld at
+     app scale from the one writer in applyFine. */
+  ok('R94-WORLD-clouds-scale-gated', /cloudK/.test(envR94) &&
+    /b\.mesh\.material\.opacity = b\.baseOpacity \* W\.haze \* cloudK/.test(envR94) &&
+    (envR94.match(/b\.mesh\.material\.opacity = /g) || []).length === 1);
+  ok('R94-WORLD-clouds-dithered', /getImageData\(0, 0, 256, 128\)/.test(envR94) && /putImageData/.test(envR94));
+}
+/* ---- end R94 world ------------------------------------------------------ */
+
 if (exists('CLAUDE.md')) {
   const md = read('CLAUDE.md');
   [
