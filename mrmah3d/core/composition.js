@@ -49,7 +49,7 @@ import { MathUtils, Vector3 } from '../vendor/three/three.module.min.js';
                  viewer looks slightly up at him, which reads as presence.
 
    Returns { position, target, fov } for the given aspect. */
-export function solveFraming(intent, aspect, characterHeight, floatHeight) {
+export function solveFraming(intent, aspect, characterHeight, floatHeight, poseCentreX) {
   var H = characterHeight || 3.0;
   var fov = intent.fov;
   var vHalf = MathUtils.degToRad(fov) / 2;
@@ -57,9 +57,21 @@ export function solveFraming(intent, aspect, characterHeight, floatHeight) {
   /* Distance that makes the character span `heightFrac` of the frame. */
   var dist = H / (2 * Math.tan(vHalf) * intent.heightFrac);
 
-  /* The point on the character we are composing around: his mid-height. */
+  /* The point on the character we are composing around: his mid-height, and —
+     since R90 — his VISUAL centre rather than his origin axis.
+
+     The pose is asymmetric by design: one arm is raised and reaching, the other
+     hangs. So the character's silhouette is not centred on x=0, and composing
+     around the origin puts him off his intended screen position by exactly that
+     asymmetry. It went unnoticed while the arms were short; lengthening them to
+     the reference's reach pushed the showcase placement to 0.556 against an
+     intent of 0.500 and MODE-showcase caught it.
+
+     The offset is supplied by the caller from the character's own measured
+     extents rather than assumed here, so a change to the pose corrects the
+     framing automatically instead of silently decentring it. */
   var centreY = (floatHeight == null ? 0.16 : floatHeight) + H / 2;
-  var focus = new Vector3(0, centreY, 0);
+  var focus = new Vector3(Number(poseCentreX) || 0, centreY, 0);
 
   /* Camera stands on a circle around him. */
   var az = MathUtils.degToRad(intent.azimuthDeg || 0);

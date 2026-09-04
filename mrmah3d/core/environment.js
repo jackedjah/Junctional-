@@ -455,7 +455,13 @@ export function createEnvironment(options) {
        separable. The brief asks for subtle cloud presence and specifically
        warns against making it obvious; this is that, at the level where it
        reads as depth and not as a filter over the lens. */
-    map: cloudTex, color: new Color(0x1b3346), transparent: true, opacity: 0.40,
+        /* R90: 0x1b3346 at 0.40 measured about 19 luma over a black sky — present in
+       the scene graph, correctly placed, drifting correctly, and invisible. The
+       reference's cloud is a clearly readable dark blue-grey mass; this is that
+       value. The constraint it has to respect is unchanged and is about SCREEN
+       POSITION, not brightness: everything above the horizon line, nothing over
+       the rows where the floor's convergence is read. */
+    map: cloudTex, color: new Color(0x44708f), transparent: true, opacity: 0.78,
     depthWrite: false, toneMapped: false, side: DoubleSide, fog: true
   });
   var clouds = new Group();
@@ -488,14 +494,18 @@ export function createEnvironment(options) {
        perspective is read. At these heights, seen from a camera a couple of
        units off the floor, they clear it comfortably while staying inside the
        fade where the atmosphere can actually reach the eye. */
-    { z: -38, y: 15.5, w: 96, h: 10, speed: 0.050, o: 1.00 },
-    { z: -29, y: 11.4, w: 70, h: 7, speed: -0.080, o: 0.66 },
+    { z: -38, y: 18.5, w: 96, h: 13, speed: 0.050, o: 1.00 },
+    { z: -29, y: 14.2, w: 70, h: 9, speed: -0.080, o: 0.72 },
     /* A third layer, nearer and lower, drifting fastest. Three depths rather
        than two is what turns "two cloud quads" into air: the parallax between
        them never repeats, so the sky reads as volume the character is standing
        inside rather than as a backdrop hung behind him. Still clear of the
        horizon line — everything above it, nothing over the floor. */
-    { z: -22, y: 8.4, w: 54, h: 5.5, speed: 0.140, o: 0.42 }
+    /* R90: the heights are NOT negotiable and this pass proved it again.
+       Dropping these three by 2-3 units to bring them into the showcase frame
+       took DEPTH-01 from 201 rows to 164 in one step. Brightness is free;
+       screen position is not. */
+    { z: -22, y: 11.0, w: 54, h: 7.0, speed: 0.140, o: 0.50 }
   ].forEach(function (b, i) {
     var m = cloudMat.clone();
     m.opacity = cloudMat.opacity * b.o;
@@ -503,7 +513,8 @@ export function createEnvironment(options) {
     q.position.set(0, b.y, b.z);
     q.renderOrder = -5 + i;
     clouds.add(q);
-    cloudBands.push({ mesh: q, speed: b.speed, span: b.w * 0.25, base: 0 });
+    cloudBands.push({ mesh: q, speed: b.speed, span: b.w * 0.25, base: 0,
+      baseOpacity: m.opacity });
     owned.push(q.geometry, m);
   });
   group.add(clouds);
@@ -593,7 +604,7 @@ export function createEnvironment(options) {
      their width when the subject is dragged and the view shifts. */
   var pillarTex = rampTexture();
   var pillarMat = new MeshBasicMaterial({
-    map: pillarTex, color: new Color(0x5fd4ff), transparent: true, opacity: 0.42,
+    map: pillarTex, color: new Color(0x6fdcff), transparent: true, opacity: 0.55,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: true
   });
@@ -605,9 +616,17 @@ export function createEnvironment(options) {
        frame in any mode — they existed and were invisible, which is the worst
        of both. These are inside the fade, at azimuths that put at least one in
        shot at every composition. */
-    { x: -19, z: -30, h: 16, w: 0.17, o: 1.0 },
+    /* R90: two of these move inboard and get taller. At |x| 15-34 every pillar
+       sat outside the showcase frame and outside chat's, so the world's only
+       vertical elements never appeared in the two views that matter.
+
+       Inboard has a floor, though: at x -8 and 11 they stood in the middle of
+       the receding grid and DEPTH-01 dropped to 200. A tall additive quad is a
+       veil over whatever converges behind it, the same as any other. -13 and 17
+       is as close to centre as they can come with the grid intact. */
+    { x: -13, z: -33, h: 22, w: 0.18, o: 1.0 },
     { x: -34, z: -46, h: 26, w: 0.24, o: 0.8 },
-    { x: 15, z: -34, h: 19, w: 0.19, o: 1.0 },
+    { x: 17, z: -40, h: 25, w: 0.20, o: 0.9 },
     { x: 30, z: -52, h: 29, w: 0.26, o: 0.7 },
     { x: 4, z: -60, h: 24, w: 0.22, o: 0.5 }
   ].forEach(function (b) {
@@ -746,8 +765,19 @@ export function createEnvironment(options) {
     stars.visible = st > 0.05;
     starMat.opacity = 0.55 * st;
     clouds.visible = ha > 0.03;
-    cloudBands.forEach(function (b, i) {
-      b.mesh.material.opacity = 0.40 * [1.00, 0.66, 0.42][i] * ha;
+    /* R90: reads the band's OWN authored opacity instead of a literal.
+
+       This line carried `0.40 * [1.00, 0.66, 0.42][i]` — the cloud material's
+       baseline and the three per-band weights, copied. So every mode change
+       reset the clouds to a value that had to be edited in two places, and
+       raising the material from 0.40 to 0.88 changed nothing at all: applyMode
+       runs on mount and overwrote it before the first frame. Exactly the
+       duplicated-baseline failure materials.js records, in another file.
+
+       Each band's authored opacity is captured at build time and this scales
+       it, so there is one writer and one place to edit. */
+    cloudBands.forEach(function (b) {
+      b.mesh.material.opacity = b.baseOpacity * ha;
     });
   }
 

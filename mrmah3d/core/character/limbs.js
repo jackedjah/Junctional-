@@ -81,16 +81,34 @@ function buildHand(materials, spec, options) {
   /* Three digits on BOTH hands. The closed hand used to drop to two, which at
      app scale read as a pincer rather than a hand; keeping three and shortening
      them instead costs one small segment and reads as fingers curled in. */
+  /* R90 — THE CLOSED HAND IS A FIST, NOT A SHORTER OPEN HAND.
+
+     It used to be the same three digits at 62% length with a smaller splay,
+     which is not what closing a hand does: fingers CURL, they do not shrink.
+     Straight stubs fanned off a palm read as a claw or a fork at any size, and
+     at the sizes this actually renders at that was the weakest thing on the
+     character — the brief rules out square mittens and random spikes by name.
+
+     `curl` folds each digit forward toward the palm's front face instead of
+     shortening it, so the closed hand presents knuckles to the viewer and the
+     fingers disappear underneath, which is the silhouette a fist has. The open
+     hand is untouched: it still splays and presents. */
   var n = spec.digitCount;
+  var curl = opts.open ? 0 : 1;
   for (var i = 0; i < n; i++) {
     var t = n === 1 ? 0.5 : i / (n - 1);
     var x = (t - 0.5) * spec.palmHalfWidth * 1.55;
     /* Splay the outer digits and shorten them slightly. */
-    var splay = (t - 0.5) * (opts.open ? 0.55 : 0.22);
-    var len = spec.digitLength * (opts.open ? 1 : 0.62) * (1 - Math.abs(t - 0.5) * 0.35);
-    var base = [x, spec.palmLength, 0];
-    var tip = [x + Math.sin(splay) * len, spec.palmLength + Math.cos(splay) * len, 0.01];
-    var g = segment(base, tip, spec.digitRadius, spec.digitRadius * 0.7, 5, { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
+    var splay = (t - 0.5) * (opts.open ? 0.55 : 0.20);
+    var len = spec.digitLength * (opts.open ? 1 : 0.78) * (1 - Math.abs(t - 0.5) * 0.35);
+    var base = [x, spec.palmLength, curl * spec.palmHalfDepth * 0.30];
+    var tip = [
+      x + Math.sin(splay) * len * (1 - curl * 0.55),
+      spec.palmLength + Math.cos(splay) * len * (1 - curl * 0.62),
+      0.01 + curl * len * 0.80
+    ];
+    var g = segment(base, tip, spec.digitRadius, spec.digitRadius * (curl ? 0.92 : 0.7), 5,
+      { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
     var d = clad(hand, g, materials, 1.08);
     owned.push(g, d.edges, d.minorEdges);
   }
@@ -105,11 +123,11 @@ function buildHand(materials, spec, options) {
      presenting gesture rather than a claw. */
   var thumbBase = [-spec.palmHalfWidth * 0.92, spec.palmLength * 0.42, spec.palmHalfDepth * 0.35];
   var thumbLen = spec.digitLength * (opts.open ? 0.82 : 0.62);
-  var thumbTip = [
-    thumbBase[0] - thumbLen * (opts.open ? 0.72 : 0.42),
-    thumbBase[1] + thumbLen * (opts.open ? 0.62 : 0.78),
-    thumbBase[2] + thumbLen * 0.28
-  ];
+  /* On the closed hand the thumb lies ACROSS the folded fingers, which is the
+     detail that separates a fist from a lump. */
+  var thumbTip = opts.open
+    ? [thumbBase[0] - thumbLen * 0.72, thumbBase[1] + thumbLen * 0.62, thumbBase[2] + thumbLen * 0.28]
+    : [thumbBase[0] + thumbLen * 0.62, thumbBase[1] + thumbLen * 0.34, thumbBase[2] + thumbLen * 0.72];
   var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.12, spec.digitRadius * 0.8, 5,
     { depthRatio: 0.9, crystal: 0.05, steps: 2, lift: ARMS.classLift });
   var thumb = clad(hand, thumbGeo, materials, 1.08);

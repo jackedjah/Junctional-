@@ -14,13 +14,28 @@
 
 export var STATES = {
   /* the resting reference pose */
-  idle:        { glow: 1.00, bob: 1.00, sway: 1.00, headTilt: 0.00, armLift: 0.00, pulse: 0.00, blinkRate: 1.00, smile: 1.00 },
+  /* EVERY CHANNEL MUST APPEAR ON `idle`, including the ones that rest at zero.
+
+     `live` is seeded from this row's keys and nothing else, and the per-frame
+     blend falls back to `STATES.idle[key]` for any state that omits a channel.
+     So a channel added only to `thinking` and `explaining` never enters `live`
+     at all: it reads undefined every frame, the guard in mrmah.js turns that
+     into 0, and the animation silently does nothing. elbowOpen and wristTurn
+     were added that way first and had no effect whatsoever. */
+  idle:        { glow: 1.00, bob: 1.00, sway: 1.00, headTilt: 0.00, armLift: 0.00, pulse: 0.00, blinkRate: 1.00, smile: 1.00, elbowOpen: 0.00, wristTurn: 0.00 },
   /* attentive, leaning in slightly, calmer motion */
   listening:   { glow: 1.06, bob: 0.70, sway: 0.55, headTilt: 0.10, armLift: 0.04, pulse: 0.00, blinkRate: 1.40, smile: 1.00 },
   /* working: brighter, slower bob, a visible periodic pulse */
-  thinking:    { glow: 1.14, bob: 0.55, sway: 0.35, headTilt: -0.12, armLift: 0.02, pulse: 1.00, blinkRate: 0.55, smile: 0.55 },
+  /* R90: thinking and explaining now drive the joints below the elbow too.
+
+     Thinking settles the shoulders, tilts the head down and turns the raised
+     wrist slightly inward — the pose reads as attention held on something,
+     which is the point, and the small asymmetry is what stops it reading as a
+     freeze-frame. Explaining opens the elbow and rolls the wrist outward, which
+     is a presenting gesture; the head follows and the torso counters it. */
+  thinking:    { glow: 1.14, bob: 0.55, sway: 0.35, headTilt: -0.12, armLift: 0.02, pulse: 1.00, blinkRate: 0.55, smile: 0.55, elbowOpen: -0.10, wristTurn: -0.16 },
   /* presenting an answer: raised hand emphasised, lively */
-  explaining:  { glow: 1.10, bob: 1.15, sway: 1.35, headTilt: 0.05, armLift: 0.16, pulse: 0.22, blinkRate: 1.00, smile: 1.00 },
+  explaining:  { glow: 1.10, bob: 1.15, sway: 1.35, headTilt: 0.05, armLift: 0.16, pulse: 0.22, blinkRate: 1.00, smile: 1.00, elbowOpen: 0.26, wristTurn: 0.22 },
   /* success: brightest, buoyant */
   success:     { glow: 1.30, bob: 1.60, sway: 1.10, headTilt: 0.14, armLift: 0.30, pulse: 0.35, blinkRate: 1.20, smile: 1.30 },
   /* concern: dimmer, lower, head down, smile flattened */

@@ -29,6 +29,12 @@
 
 import { PerspectiveCamera, Vector3, MathUtils } from '../vendor/three/three.module.min.js';
 import { solveFraming, getMode } from './composition.js';
+/* The pose's visual centre. Imported rather than threaded through the scene for
+   the same reason characterHeight has a default here: it is a fact about the
+   character that the camera has to know, and there is one source of truth for
+   it. `opts.poseCentreX` still overrides, for a host that poses him
+   differently. */
+import { POSE } from './character/proportions.js';
 
 export var LEGACY_STAGE = { fov: 55, pitchDeg: 26, distance: 7.2, targetY: 1.05 };
 
@@ -68,7 +74,8 @@ export function createCamera(options) {
   }
 
   function applyMode(aspect) {
-    var solved = solveFraming(mode, aspect, characterHeight, floatHeight);
+    var solved = solveFraming(mode, aspect, characterHeight, floatHeight,
+      opts.poseCentreX == null ? POSE.centreX : opts.poseCentreX);
     camera.fov = solved.fov;
     camera.position.copy(solved.position);
     target.copy(solved.target);

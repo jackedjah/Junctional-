@@ -75,15 +75,29 @@ arm form, world atmosphere and overall finish; `mrmah-canonical-front.png`
 remains the measurement baseline and `mrmah-refined-front.png` the intermediate
 art direction. Where they disagree on FORM, the cinematic render wins.
 
-Current state: silhouette **89 / 100**, character mean luminance 63.1 against
-the reference's 68.2 with 69% of pixels in the darker half (the reference is
-62%). The shoulder-width landmark reads ~14% under the canonical front after the
-proportion correction; that landmark's row includes a differently-posed raised
-arm in the old reference, and the correction was briefed and judged against the
-cinematic one. IoU drifted from 72.8% to ~66% when the arms moved outboard to open
-the armpit and the deltoids were rebuilt — that is following the cinematic
-reference away from the canonical one, and is expected rather than a regression.
-Known remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
+There is now a FOURTH, `reference/mrmah-refA-anatomical.png`, and it is the
+current art-direction authority. It supersedes all three on PROPORTION and on
+upper-body anatomy: a head at 27.9% x 23.8% of character height (measured from
+apex y 212 to torso tip y 1295 in its 941 x 1672 frame), a real neck and
+trapezius, a chest with pectoral masses, and arms with a bicep, an elbow and a
+forearm that reach the hip. `mrmah-canonical-front.png` is still the measurement
+baseline and must not be swapped, but it is no longer the design target.
+
+**Expect the silhouette score against the canonical front to be low, and do not
+chase it.** The head is deliberately 30% smaller than the canonical measurement
+and the shoulder line 0.2 units higher; a comparison against a file the design
+has knowingly departed from measures the departure, not a defect. Use the width
+profile the tool prints as a diagnostic for *shape* faults — a missing waist, a
+fused armpit — and judge proportion against the anatomical reference by eye.
+
+**Value is compared over the BODY, never over the frame.** A histogram sampled
+around the whole character reported this build far too dark and the correction
+made from it was wrong in both direction and kind: most of what that box counts
+is background, and the anatomical reference's background is a lit cloudscape
+where this one is a near-black room. Sampled over a box that is entirely chest
+the finding inverts — the reference is 49% near-black with 19.5% above 160, i.e.
+*more* contrasty than this render, not less. The body's fault was uniformity,
+never darkness.
 
 **MEASUREMENT AND BEAUTY ARE SEPARATE CAPTURES, and must stay separate.**
 `mrmah3d-compare.mjs` finds landmarks in the character's width profile, and
@@ -217,7 +231,9 @@ must not be claimed from headless runs.
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
 | `reference/mrmah-canonical-front.png` | the MEASUREMENT baseline — do not swap |
-| `reference/mrmah-refined-front.png` | the art-direction authority for form and value |
+| `reference/mrmah-refA-anatomical.png` | the ART-DIRECTION authority: proportion and anatomy |
+| `reference/mrmah-refA-cinematic.png` | material richness and world atmosphere |
+| `reference/mrmah-refined-front.png` | superseded; kept for the record |
 | `tools/mrmah3d-reference.mjs` | measures the reference into numbers |
 | `tools/mrmah3d-compare.mjs` | scores the render against it |
 | `tools/mrmah3d-verify.mjs` | browser-driven runtime verification |
@@ -439,6 +455,71 @@ The general lesson: when a surface looks flat, hide everything drawn ON it and
 render once. It costs one capture and it distinguishes "the material is wrong"
 from "there is no material showing" — which no amount of tuning the material
 can tell you apart.
+
+### A culled face and a black face look identical
+
+The head's crown and bevel bands were wound INWARD, so `FrontSide` discarded all
+32 of them and the additive back-faced rim shell — being exactly the set
+`FrontSide` throws away — was drawing them instead. The head's entire apparent
+material was a flat 15%-opacity overlay of one colour, and nothing that touched
+the real surface could reach the screen: the facet lift was moved to 0.15, 0.36
+and finally 1.0 (every facet silver) with no visible change, the relief was
+raised twice, the global Fresnel boost was cut to near zero, and four light
+cards were added on calculated reflection directions. None of it could have
+worked.
+
+What settled it in two minutes was reading the normals out of the live geometry
+— material 0 had 40 of 40 triangles pointing backward when only its 8 back
+facets should. **When a surface will not respond to its own material, check that
+it is being DRAWN before working out what it sees.** No capture distinguishes a
+culled face from a black one on a dark stage.
+
+### An additive shell is a floor under the darks
+
+The same shell on the torso was measured, not guessed: over a box that is
+entirely chest, the render had **0%** of its pixels in the darkest band where
+the anatomical reference has 49%. Not a few percent — none. A body that cannot
+produce a dark pixel anywhere has something additive laid over all of it, and
+removing the torso's rim shell was the single largest step this renderer has
+taken toward the reference. Contour light bought with a flat overlay costs the
+whole dark end, and the dark end is most of what makes crystal read as crystal.
+
+### A ring table can only make a body of revolution
+
+No amount of faceting or lighting implies a pectoral on a circle. `loft` and
+`segment` take a per-vertex `shape(angle)` multiplier, and the torso's chest,
+core and clavicle rings use it. Two things about authoring one:
+
+- **Sample it.** The lobes are ~0.5 rad wide and a 12-sided ring samples every
+  0.52, so a pec crown could fall between two vertices and vanish. The torso
+  runs 14 sides for this reason.
+- **Author against the size of what it displaces, not the body.** The chest's
+  half-depth is 0.19, so an anatomically honest 10% modulation moves a vertex
+  0.019 units — under a pixel at chat scale. The working values are 2-3x that.
+
+`segment` derives which ring angle faces the viewer from the limb axis, so a
+limb shape function can say "bicep on the front" and have it hold under any
+pose; shaping in raw ring angles would put it somewhere different on each arm.
+
+### Anything lying on the floor is a veil too
+
+DEPTH-01 fell from 216 rows to 197 when the floor's reflection column went from
+0.85 x 7.0 to 1.5 x 11.0, and to 164 when the cloud bands were lowered 2-3 units
+to bring them into frame. The check catches horizontal veils exactly as it
+catches vertical ones. Clouds can be as BRIGHT as they need to be — raising them
+higher and pushing opacity to 0.78 took the count to 247 — but their screen
+position is not negotiable.
+
+### A duplicated baseline is a silent no-op
+
+`applyMode` set the cloud opacity to a copied literal (`0.40 * [weights][i]`)
+rather than to each band's authored value, and it runs on mount. Raising the
+material from 0.40 to 0.88 therefore changed nothing at all — the value was
+overwritten before the first frame. The same class of bug as the two writers
+racing on edge opacities in `materials.js`. Likewise `states.js`: `live` is
+seeded from `STATES.idle`'s keys only, so an animation channel added to
+`thinking` and `explaining` alone never enters the blend and reads undefined
+every frame.
 
 ### A capped tube's end disc is bigger than it looks
 

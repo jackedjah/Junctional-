@@ -136,7 +136,17 @@ export var HEAD = {
   bevelZ: 0.78,                  /* the lip stands proud */
   innerInset: 0.700,             /* inner bevel, framing the cavity */
   innerZ: 0.30,                  /* set well behind the lip */
-  faceZ: -0.06,                  /* plate depth — behind the girdle plane */
+  /* R90: -0.06 -> 0.15. The recess was 0.294 units deep behind a lip 0.263
+     wide, which at the chat composition's 22-degree yaw put the near wall
+     straight across the smile — the character rendered with eyes and no mouth
+     at app scale. That is correct occlusion and a failed requirement at the
+     same time.
+
+     0.15 leaves the cavity 0.227 deep, i.e. 64% of the head's half-depth and
+     still obviously a hole rather than a panel (the three-quarter capture is
+     what proves that, not the front one), while clearing the smile at every
+     yaw the in-app compositions use. */
+  faceZ: 0.15,                   /* plate depth — behind the lip, ahead of the girdle */
   backApexZ: -1.0,
   /* Depth scatter on the head's bevel ring, so its front facets tilt slightly
      differently and the head catches light in several places.
@@ -731,12 +741,12 @@ export var ARMS = {
    wrist; that difference is most of what makes it read as a hand at a glance,
    which is all that is being asked for here. */
 export var HAND = {
-  palmLength: 0.098,
-  palmHalfWidth: 0.079,
-  palmHalfDepth: 0.044,
+  palmLength: 0.106,
+  palmHalfWidth: 0.085,
+  palmHalfDepth: 0.050,
   digitCount: 3,
   digitLength: 0.070,
-  digitRadius: 0.024,
+  digitRadius: 0.026,
   /* The small bright diamond above the reference's raised hand. */
   tipDiamond: 0.044
 };
@@ -779,6 +789,28 @@ export var INSIGNIA = {
 
    `height` also sets how long the levitation emitter is, so it is the one
    number that ties the hover and the beam together. */
+/* THE POSE'S VISUAL CENTRE, in x.
+
+   One arm is raised and reaching and the other hangs, so the silhouette is not
+   centred on the model origin — and the camera solver composes around whatever
+   point it is given. Composing around x=0 therefore places him off his intended
+   screen position by exactly this asymmetry, which is what MODE-showcase caught
+   when the arms were lengthened to the reference's reach (0.556 against an
+   intent of 0.500).
+
+   Derived from the extents rather than hardcoded, so a change to the pose
+   corrects the framing instead of silently decentring it. */
+export var POSE = {
+  centreX: (
+    /* rightmost: the raised hand, plus its palm */
+    (ARMS.left.wrist[0] + HAND.palmHalfWidth) +
+    /* leftmost: whichever of the lowered elbow, hand or deltoid reaches furthest */
+    Math.min(ARMS.right.elbow[0],
+             ARMS.right.wrist[0] - HAND.palmHalfWidth,
+             ARMS.right.shoulder[0] - ARMS.right.upperRadius)
+  ) / 2
+};
+
 export var FLOAT = {
   height: 0.17,
   bobAmplitude: 0.016,
