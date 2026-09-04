@@ -550,7 +550,9 @@ ok('DOC-claude-md', exists('CLAUDE.md'));
   ok('R95-WORLD-figures-never-fogged', (figures.match(/fog:\s*false/g) || []).length >= 2 && !/fog:\s*true/.test(figures));
   ok('R95-WORLD-figures-faces-wound-outward', /if \(n\.dot\(outv\) < 0\)/.test(figures));
   const cast = (figures.match(/\{ x: -?[\d.]+, z: -[\d.]+, s: 0\.\d+, yaw: -?[\d.]+, body: '\w+', head: '\w+' \}/g) || []);
-  ok('R95-WORLD-figures-cast-is-six-to-nine', cast.length >= 6 && cast.length <= 9, cast.length + ' figures');
+  /* R95-BB: four to seven. The bodybuilder brief asks for FEWER figures and a
+     cleaner background; eight in a row read as a crowd. */
+  ok('R95-WORLD-figures-cast-is-four-to-seven', cast.length >= 4 && cast.length <= 7, cast.length + ' figures');
   ok('R95-WORLD-figures-scaled-to-his-height', cast.every(c => { const s = Number(c.match(/s: (0\.\d+)/)[1]); return s >= 0.30 && s <= 0.60; }));
   ok('R95-WORLD-figures-stand-behind-him', cast.every(c => { const z = Number(c.match(/z: (-[\d.]+)/)[1]); return z <= -16 && z >= -36; }));
   ok('R95-WORLD-figures-vary-in-body', new Set(cast.map(c => c.match(/body: '(\w+)'/)[1])).size >= 5 &&

@@ -505,9 +505,15 @@ function buildBeamMirror(summits, smear) {
      soft-sided, and run the whole floor toward the viewer — a wet surface
      stretches a reflection along the line of sight. So: 2.4 wide, 3.2x the
      height, and the smear's soft sides have room to be soft. */
+  /* R95-BB (brief §27): SHORTER AND DIMMER. At 3.2x the height and 0.68 the
+     two near mirrors ran from the horizon to the bottom of the canonical
+     frame as a pair of bright poles standing in the foreground either side of
+     him — "beams" the bodybuilder brief says not to fill the floor with. The
+     bodybuilder reference's wet floor gives the beacons back as SHORT faint
+     smears just under the horizon that dissolve within a few units. */
   summits.forEach(function (s) {
     var w = s.far ? 1.6 : 2.4;
-    var h = s.h * 3.2;
+    var h = s.h * 1.7;
     quad(s.x, -(s.y - 0.6), s.z, w, h, 0);
     quad(s.x, -(s.y - 0.6), s.z, w, h, 1);
   });
@@ -515,7 +521,7 @@ function buildBeamMirror(summits, smear) {
   geo.setAttribute('position', new Float32BufferAttribute(pos, 3));
   geo.setAttribute('uv', new Float32BufferAttribute(uv, 2));
   var mat = new MeshBasicMaterial({
-    map: smear, color: srgb(176, 212, 240), transparent: true, opacity: 0.68,
+    map: smear, color: srgb(176, 212, 240), transparent: true, opacity: 0.42,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: false
   });

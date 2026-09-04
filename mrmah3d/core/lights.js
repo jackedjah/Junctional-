@@ -79,7 +79,14 @@ export function createLights(options) {
   /* Floor bounce: the grid is a light source in the reference, and a point
      light low and in front sells the character standing IN the world rather
      than composited over it. */
-  var bounce = new PointLight(new Color(0x2fbfe8), 0.85, 9, 2);
+  /* R95-BB: range 9 -> 2.0. The bounce reached the whole character, and on
+     any plane facing the camera and tilted down — the back of the lowered
+     hand, the lower back of the head when he is turned — it drew its specular
+     as a cyan blob (matched by colour: 0x2fbfe8, not the chest lamp's
+     0x4fe3ff). Its job is the lower body standing in the floor glow, which is
+     within 1.7 of it; the chest at 2.05 and the head at 2.5 now take nothing.
+     Intensity up a little to hold the quad where it was under the falloff. */
+  var bounce = new PointLight(new Color(0x2fbfe8), 1.05, 2.0, 2);
   bounce.position.set(0, 0.28, 1.5);
 
   /* R91 — HIS OWN EMISSIONS LIGHT THE SURFACES AROUND THEM.
@@ -118,13 +125,26 @@ export function createLights(options) {
   /* R95-BB: range 2.4 -> 1.3. At 2.4 the lamp reached the lowered hand (1.36
      away) and drew its specular on the back of the hand as a hot cyan blob;
      the chest it exists for is 0.8-0.9 away and still inside the falloff. */
-  var chestLamp = new PointLight(new Color(0x4fe3ff), 1.05, 1.3, 2);
-  chestLamp.position.set(0, 1.80, 1.10);
+  /* And again for the REAR views: turned away (the rear three-quarter output,
+     or any drag past 120 degrees) the back of the head and the tricep of the
+     raised arm came within 1.0-1.1 of a lamp standing 1.1 units in front of
+     the chest and each drew its specular as a cyan blob. Closer to the chest
+     wall with a shorter reach, and dimmer to match the inverse square: the
+     sternum still takes 0.64 of the lamp at 0.6 away, the turned head's back
+     at 0.89 takes nothing. */
+  var chestLamp = new PointLight(new Color(0x4fe3ff), 0.62, 0.9, 2);
+  chestLamp.position.set(0, 1.80, 0.85);
   /* R95: range 1.1 -> 0.5. Reviewed, the face lamp reached the shoulder line
      half a unit below the head and drew pinpoint white speculars across the
      crown, traps and neck. It only needs the cavity walls and bevel undersides. */
-  var faceLamp = new PointLight(new Color(0x6cebff), 0.85, 0.5, 2);
-  faceLamp.position.set(0, 2.62, 0.16);
+  /* R95-BB: range 0.5 -> 0.36, and back toward the plate. Isolated by zeroing
+     each light in turn (blobprobe): the cyan blob on the lower back of the
+     head in every rear view was THIS lamp — two suspects had been ruled out
+     by geometry first, wrongly; the head is small enough that a lamp inside
+     its cavity reaches its back shell at 0.35. The cavity walls at 0.28 keep
+     0.4 of the lamp; the back shell at 0.30-0.35 keeps a tenth or nothing. */
+  var faceLamp = new PointLight(new Color(0x6cebff), 0.85, 0.36, 2);
+  faceLamp.position.set(0, 2.62, 0.10);
 
   /* R92 — THE FLOOR UNDER THE DARKS IS SAPPHIRE, NOT VOID.
 
@@ -167,8 +187,8 @@ export function createLights(options) {
     fill.intensity = 1.4 * k;
     rim.intensity = 2.2 * k;
     rim2.intensity = 1.1 * k;
-    bounce.intensity = 0.85 * k;
-    chestLamp.intensity = 1.05 * k;
+    bounce.intensity = 1.05 * k;
+    chestLamp.intensity = 0.62 * k;
     faceLamp.intensity = 0.85 * k;
   }
 
@@ -188,7 +208,7 @@ export function createLights(options) {
        into the geometry around each emitter rather than staying on it. */
     setEmissionGlow: function (g) {
       var k = Math.max(0, Number(g) || 1);
-      chestLamp.intensity = 1.05 * k;
+      chestLamp.intensity = 0.62 * k;
       faceLamp.intensity = 0.85 * k;
     }
   };

@@ -157,20 +157,21 @@ var HEADS = {
    no pixel under 32 — a pale cut-out, whatever its own tone. The references
    put their figures at the mist's near edge with the bank BEHIND them, which
    is where these now stand, scaled down for the nearer depth. */
+/* R95-BB (brief §28): FEWER figures. The bodybuilder brief asks for a
+   cleaner background — "do not fill every region with rocks, particles,
+   people" — and a small cast with varied head shapes. Eight along the horizon
+   read as a crowd lined up behind him; five, spread wider and with every body
+   and head type still represented, read as a few distant others. */
 var CAST = [
-  { x: 1.8, z: -18.8, s: 0.50, yaw: 0.25, body: 'athletic', head: 'diamond' },
-  { x: 3.2, z: -17.6, s: 0.44, yaw: -0.35, body: 'heavy', head: 'wide' },
-  { x: 4.5, z: -19.2, s: 0.40, yaw: 0.40, body: 'thin', head: 'tall' },
-  { x: 1.1, z: -20.4, s: 0.34, yaw: 0.05, body: 'taper', head: 'diamond' },
-  { x: 5.3, z: -21.0, s: 0.36, yaw: -0.2, body: 'stocky', head: 'wide' },
-  { x: 2.9, z: -23.5, s: 0.32, yaw: 0.10, body: 'athletic', head: 'diamond' },
-  /* The two on his left. Measured to the frame: in showcase the obese one
-     clears his hanging hand (0.29 across) by 0.015 and in protocol the soft
-     one clears his taper's edge (0.39) by 0.04. A third figure further left
-     (x -5) landed ON that edge in protocol and had no clear position in
-     every mode, so the cast is seven and one, not six and two. */
-  { x: -2.6, z: -18.0, s: 0.46, yaw: 0.45, body: 'obese', head: 'round' },
-  { x: -3.7, z: -20.6, s: 0.42, yaw: -0.25, body: 'soft', head: 'diamond' }
+  { x: 2.0, z: -18.8, s: 0.50, yaw: 0.25, body: 'athletic', head: 'diamond' },
+  { x: 3.9, z: -17.6, s: 0.44, yaw: -0.35, body: 'heavy', head: 'wide' },
+  { x: 5.6, z: -20.2, s: 0.40, yaw: 0.40, body: 'thin', head: 'tall' },
+  { x: 1.1, z: -21.4, s: 0.34, yaw: 0.05, body: 'taper', head: 'diamond' },
+  /* The one on his left. Measured to the frame: in showcase the obese one
+     clears his hanging hand (0.29 across) by 0.015. A second further left
+     (x -5) landed on his taper's edge in protocol and had no clear position
+     in every mode. */
+  { x: -2.6, z: -18.0, s: 0.46, yaw: 0.45, body: 'obese', head: 'round' }
 ];
 
 function prng(seed) {

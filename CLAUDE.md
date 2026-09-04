@@ -256,7 +256,9 @@ must not be claimed from headless runs.
 | `mrmah3d/core/surfaces.js` | page events -> character states (the only file naming a MAHFITT page) |
 | `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
 | `mrmah3d/core/character/regions.js` | per-region optical class tables (head, neck, pecs, sternum, abs, obliques, taper, deltoids, arms, hands) |
-| `mrmah3d/core/terrain.js` | the faceted gunmetal range: three depth layers, beacons, sparkles, the mirrored range in the floor |
+| `mrmah3d/core/terrain.js` | the faceted gunmetal range: three depth layers, beacons, sparkles, the mirrored range and beam smears in the floor |
+| `mrmah3d/core/moon.js` | the large cratered moon and the cumulus that crosses it (R95 world) |
+| `mrmah3d/core/figures.js` | the small distant Mr.Mah variant figures — five, baked vertex colour, two draws (R95 world; cut from eight for the bodybuilder brief) |
 | `mrmah3d/lab/` | the development-only laboratory page |
 | `mrmah3d/vendor/three/` | pinned Three.js (MIT) |
 | `reference/mrmah-canonical-front.png` | the MEASUREMENT baseline — do not swap |
@@ -860,12 +862,16 @@ from any three-quarter view. So the shoulder joint sits ON the deltoid's axis at
 the cap's outer end is choked to 0.45 of the arm's radius. Check both discs
 against both tubes before blaming a light for a bright wedge on a shoulder.
 
-### A hot blob on a flat plane is a point light, and not always the nearest one
+### A hot blob on a flat plane is a point light — ISOLATE it, do not reason it
 
 The lowered hand carried a soft cyan blob on the back of the hand through
-several passes. The chest lamp was the obvious suspect and its range was cut
-first; the blob stayed. It was the FLOOR BOUNCE (0x2fbfe8, range 9) reflecting
-off a 0.085-roughness plane facing the camera. Matching the colour of the blob
-to the colour of each light settles this in one look — the lamp is 0x4fe3ff,
-the bounce is 0x2fbfe8 — and the fix belongs on the surface (the hands are matte
-steel in every reference), not on a light the whole body needs.
+several passes, and the back of the head carried one in every rear view. Both
+were argued from geometry first — the chest lamp's range was cut, then the
+lamp moved, then the floor bounce's range was cut — and each argument was
+plausible and the blob stayed. What settled both in one run was zeroing every
+light in `parts.lights.all` in turn and reading the box's max luma
+(`blobprobe.mjs` in the scratch tools): the hand's was the floor bounce, the
+head's was the FACE LAMP, whose 0.5 range reached the head's back shell from
+inside its cavity. A point light's specular does not care which way you think
+a facet faces. Fix the surface where a reference says it is matte (the hands),
+and the light's reach where it is not (the head's ice shell must stay sharp).

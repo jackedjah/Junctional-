@@ -871,8 +871,14 @@ for (const v of VIEWPORTS) {
   check('R94-WORLD-11 the mid range is mirrored into the floor at the high tier',
     delivered.mirror.length === 1 && delivered.mirror[0].visible && delivered.mirror[0].tris > 100,
     JSON.stringify(delivered.mirror));
-  check('R94-WORLD-12 the range reads as gunmetal over its own pixels (ref B: ~22% <32, ~69% 32-96, ~2% >128)',
-    delivered.sameSize && delivered.planes.under32 < 0.50 && delivered.planes.mid > 0.40 && delivered.planes.over128 < 0.08,
+  /* R95-BB: the darkest band's ceiling rises from 50% to 72%. The bodybuilder
+     reference's pyramids histogram at 69-81% under 32 luma (mean 22-28) with
+     a 16-30% band at 32-63 and nothing above 128 — far darker than guardian
+     B's 22%, and the brief asks for the world darker and lower in saturation
+     than him. The 32-96 floor stays at a quarter so the range remains
+     gunmetal with lit faces rather than a void. */
+  check('R94-WORLD-12 the range reads as gunmetal over its own pixels (ref E pyramids: 69-81% <32, 16-30% 32-63, ~0% >128)',
+    delivered.sameSize && delivered.planes.under32 < 0.72 && delivered.planes.mid > 0.25 && delivered.planes.over128 < 0.08,
     `${delivered.planes.px} px: ${(delivered.planes.under32 * 100).toFixed(0)}% <32, ${(delivered.planes.mid * 100).toFixed(0)}% 32-96, ${(delivered.planes.over128 * 100).toFixed(1)}% >128`);
   check('R94-WORLD-13 the horizon grades into the floor (no row-to-row step over 50 points)',
     delivered.maxDrop < 0.50, `largest drop ${(delivered.maxDrop * 100).toFixed(0)} points between rows 0.4% apart`);
@@ -1021,8 +1027,8 @@ for (const v of VIEWPORTS) {
     sc.charP99 > sc.moon.max, `character p99 ${sc.charP99.toFixed(0)} vs moon max ${sc.moon.max.toFixed(0)}`);
   check('R95-WORLD-04 the moon is present in every mode',
     Object.values(all).every(m => m.moon.n > 300), Object.keys(all).map(k => `${k} ${all[k].moon.n}px`).join(', '));
-  check('R95-WORLD-05 six to nine figures, at most four draws, under 1,600 triangles',
-    sc.figures.stats.count >= 6 && sc.figures.stats.count <= 9 && sc.figures.stats.draws <= 4 && sc.figures.stats.tris <= 1600,
+  check('R95-WORLD-05 four to seven figures, at most four draws, under 1,600 triangles',
+    sc.figures.stats.count >= 4 && sc.figures.stats.count <= 7 && sc.figures.stats.draws <= 4 && sc.figures.stats.tris <= 1600,
     `${sc.figures.stats.count} figures, ${sc.figures.stats.draws} draws, ${sc.figures.stats.tris} tris`);
   check('R95-WORLD-06 the figures never overlap him (showcase, website, chat, protocol)',
     sc.figures.n > 500 && Object.values(all).every(m => m.figures.overlap === 0),
