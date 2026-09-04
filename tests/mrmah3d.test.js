@@ -202,14 +202,34 @@ ok('PROP-records-character-height-px', /1119/.test(props));
    anyone quietly returning it to the traced value or inflating it into a
    bobblehead. The shape relationship is unchanged: still slightly taller than
    wide, which is what makes it a diamond rather than a lozenge. */
+/* R90 — AND THEN THE ANATOMICAL REFERENCE SUPERSEDED BOTH OF THEM.
+
+   `reference/mrmah-refA-anatomical.png` is the art-direction authority now, and
+   measured on it (apex y 212, tip y 1295, so 1083 px of character) the head is
+   302 px wide and 258 px tall: 0.279 and 0.238 of character height. Two things
+   follow, and both invalidate the assertions above.
+
+   The head is SMALLER than the canonical measurement, not larger — the pivot's
+   enlargement was a design judgement the reference does not support, and it was
+   costing the body the height it needed for a neck, a trapezius and arms with
+   real reach. And the diamond is WIDER THAN TALL there, not taller than wide,
+   so the "reads as a diamond only while taller than wide" assertion was
+   asserting the opposite of the target.
+
+   These now check the head against the anatomical reference with a tolerance
+   band, which is a real guard against drift in either direction and, unlike the
+   pair it replaces, against the art direction too. */
 const headW = Number((props.match(/halfWidth:\s*([\d.]+)\s*,/) || [])[1]);
 const headH = Number((props.match(/halfHeight:\s*([\d.]+)\s*,/) || [])[1]);
-const HEAD_REF_W = 366 / 1119 * 3 / 2;   /* the canonical half-width, 0.4905 */
-ok('PROP-head-enlarged-for-character', headW > HEAD_REF_W * 1.05 && headW < HEAD_REF_W * 1.35,
-  'head half-width ' + headW + ' against the canonical ' + HEAD_REF_W.toFixed(4) +
-  ' — a deliberate stylization, bounded so it cannot drift back or balloon');
-ok('PROP-head-slightly-taller-than-wide', headH > headW,
-  'the diamond reads as a diamond only while it is taller than it is wide');
+const REFA_W = 302 / 1083 * 3 / 2;   /* 0.4183 */
+const REFA_H = 258 / 1083 * 3 / 2;   /* 0.3573 */
+ok('PROP-head-matches-anatomical-reference',
+  Math.abs(headW - REFA_W) < REFA_W * 0.06 && Math.abs(headH - REFA_H) < REFA_H * 0.06,
+  'head ' + headW + ' x ' + headH + ' against the anatomical reference ' +
+  REFA_W.toFixed(4) + ' x ' + REFA_H.toFixed(4));
+ok('PROP-head-slightly-wider-than-tall', headW > headH && headW < headH * 1.35,
+  'the anatomical reference cuts the diamond broader than it is tall (302 x 258); ' +
+  'taller-than-wide was the canonical front and is no longer the target');
 ok('PROP-float-not-grounded', /height:\s*0\.1/.test(props));
 
 /* Every part the brief names must actually exist as geometry. */

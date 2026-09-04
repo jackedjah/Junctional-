@@ -350,15 +350,28 @@ export function createEnvironment(options) {
      draw call. It sits in glowGroup, so it tracks him when he is dragged. */
   var streakTex = rampTexture();
   var streakMat = new MeshBasicMaterial({
-    map: streakTex, color: new Color(0x6fdcff), transparent: true, opacity: 0.34,
+    map: streakTex, color: new Color(0x7fe2ff), transparent: true, opacity: 0.46,
     blending: AdditiveBlending, depthWrite: false, toneMapped: false, fog: true
   });
-  var streak = new Mesh(new PlaneGeometry(0.85, 7.0), streakMat);
+  /* R90: longer and wider, but only to here.
+
+     Reference A's most identifiable floor feature is the bright column running
+     from the character toward the camera — it is what makes the floor read as
+     wet rather than as a grid on black, and at 0.85 x 7.0 this was a thin line
+     rather than a reflection. It went to 1.5 x 11.0 first, and DEPTH-01 caught
+     it immediately: the rows carrying converging content fell from 216 to 197.
+
+     A bright plane lying ON the floor is a veil in exactly the sense that check
+     exists to catch — it is only surprising because every previous instance was
+     vertical. 1.05 x 8.4 is the largest size that leaves the grid's perspective
+     intact (201 rows), and the rest of the brightness is bought with opacity,
+     which costs no area. */
+  var streak = new Mesh(new PlaneGeometry(1.05, 8.4), streakMat);
   streak.rotation.x = -Math.PI / 2;
   /* The ramp's opaque end is at v=0, which after the -90 degrees about X lands
      at the far edge; pushing the quad forward by half its length puts that end
      under him and lets the tail run toward the viewer. */
-  streak.position.set(0, 0.016, 3.5);
+  streak.position.set(0, 0.016, 4.2);
   glowGroup.add(streak);
   owned.push(streak.geometry, streakMat, streakTex);
 
@@ -521,7 +534,11 @@ export function createEnvironment(options) {
     color: new Color(0x0b1620), roughness: 0.75, metalness: 0.3, flatShading: true, fog: true
   });
   var structEdge = new LineBasicMaterial({
-    color: cyan, transparent: true, opacity: 0.22,
+    /* R90: 0.22 -> 0.62. Reference A's monoliths are dark masses with clearly
+       lit edges — that contrast is what makes the far distance read as built
+       rather than as scenery. At 0.22 they were flat silhouettes and the world
+       lost the one thing that ties it to the character's own material. */
+    color: cyan, transparent: true, opacity: 0.62,
     depthWrite: false, blending: AdditiveBlending, fog: true
   });
   owned.push(structMat, structEdge);
@@ -533,7 +550,24 @@ export function createEnvironment(options) {
      they occlude the receding grid, and anything large enough to do that stops
      being atmosphere and becomes an obstacle. Kept under the horizon line and
      back beyond the fog's reach, they now read as a skyline. */
-  [[-30, -62, 6.0, 7.5], [34, -70, 7.0, 9.0], [-52, -78, 8.0, 10.5], [56, -84, 7.5, 9.5],
+  /* R90: three of these are brought forward to z -44..-56, inside the fog's
+     fade, and made taller. Every one of them used to sit past fogFar, where an
+     object renders at 100% fog colour and therefore has no edges, no facets and
+     no value of its own — a flat cutout. The reference's landscape has depth
+     BETWEEN its structures, which needs at least a near tier to compare the far
+     tier against. They stay clear of the rows where the grid's convergence is
+     read, which is the constraint that removed the horizon mist. */
+  /* And then pushed wide, because the first placement cost the floor.
+
+     DEPTH-01 counts the screen rows that carry converging content, and it fell
+     from 216 to 197 the moment these went in at |x| 24-46: an opaque structure
+     standing in the middle distance occludes the receding grid behind it, which
+     is the same measured symptom the horizon mist produced even though the
+     cause is completely different. Moved outboard to |x| 38-58 they flank the
+     convergence instead of standing in it, and the near/far depth they were
+     added for survives intact. */
+  [[-38, -44, 5.5, 10.0], [46, -50, 6.2, 12.0], [-60, -56, 7.0, 14.0],
+   [-30, -62, 6.0, 7.5], [34, -70, 7.0, 9.0], [-52, -78, 8.0, 10.5], [56, -84, 7.5, 9.5],
    [-14, -90, 9.0, 12.0], [24, -96, 8.5, 11.0], [-70, -99, 9.5, 12.5]]
     .forEach(function (s) {
       var geo = new ConeGeometry(s[2], s[3], 4, 1);

@@ -305,7 +305,19 @@ export function loft(sections, sides, options) {
          which is the collar chevron the reference shows across the chest. */
       var drop = (s.dip || 0) * Math.abs(Math.sin(a));
 
-      var r = relief + jitter;
+      /* ANATOMICAL SHAPING — a per-vertex radius multiplier.
+
+         Everything above varies a ring's radius the same way all the way round
+         it, so a loft can only ever produce a body of revolution. That is the
+         hard ceiling the torso kept hitting: a chest and an abdomen are not the
+         same cross-section, and no amount of faceting or lighting can imply a
+         pectoral on a circle. `shape` is a function of the angle around the
+         ring, supplied by the ring table, and it is what lets the same loft
+         carry a sternum valley, two pec masses and a flatter back.
+
+         Applied as a multiplier on top of the relief so anatomy and crystal
+         jitter compose rather than overwrite one another. */
+      var r = (relief + jitter) * (s.shape ? s.shape(a) : 1);
       verts.push(push(Math.cos(a) * s.w * r, s.y - drop + yJit, Math.sin(a) * s.d * r));
     }
     rings.push({ point: null, verts: verts });
@@ -384,6 +396,38 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
      Kept as a multiplier rather than a radius table so a profile can be reused
      across limbs of different lengths and thicknesses. */
   var profile = opts.profile;
+
+  /* The orientation basis is computed HERE, before the rings are built, because
+     the shaping below needs to know which way is FORWARD in the tube's own
+     frame. u is the new Y; r and z are an arbitrary pair perpendicular to it. */
+  var ux = dx / len, uy = dy / len, uz = dz / len;
+  var hx = Math.abs(uy) < 0.99 ? 0 : 1, hy = Math.abs(uy) < 0.99 ? 1 : 0, hz = 0;
+  var rx = hy * uz - hz * uy, ry = hz * ux - hx * uz, rz = hx * uy - hy * ux;
+  var rl = Math.hypot(rx, ry, rz) || 1; rx /= rl; ry /= rl; rz /= rl;   /* X axis */
+  /* Z axis = u cross r */
+  var zx = uy * rz - uz * ry, zy = uz * rx - ux * rz, zz = ux * ry - uy * rx;
+
+  /* WHICH RING ANGLE FACES THE VIEWER.
+
+     A limb's shape function wants to say "put the bicep on the FRONT", but the
+     basis above is arbitrary — it is whatever fell out of crossing the axis with
+     a fixed helper vector, so the ring angle that happens to point forward is
+     different for every limb and changes the moment a joint moves. Shaping in
+     raw ring angles would therefore put the bicep somewhere different on each
+     arm, which is exactly the kind of silent, pose-dependent error this file has
+     produced before.
+
+     So the front direction is derived: project world +Z onto the plane
+     perpendicular to the axis, then read off the ring angle that points along
+     it. The shape function is handed the angle RELATIVE to that, so "0 is the
+     front of the limb" is true for any limb at any orientation. */
+  var fx = 0, fy = 0, fz = 1;
+  var fdot = fx * ux + fy * uy + fz * uz;
+  var px = fx - fdot * ux, py = fy - fdot * uy, pz = fz - fdot * uz;
+  var pl = Math.hypot(px, py, pz);
+  var frontAngle = pl < 1e-6 ? 0
+    : Math.atan2((px * zx + py * zy + pz * zz) / pl, (px * rx + py * ry + pz * rz) / pl);
+
   for (var k = 0; k <= STEPS; k++) {
     var t = k / STEPS;
     var r = radiusA + (radiusB - radiusA) * t;
@@ -394,23 +438,17 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
       y: len * t, w: r, d: r * ratio,
       crystal: crystal * taper,
       crystalY: crystal * 0.35 * taper * len,
-      facet: (k % 2 ? -1 : 1) * 0.03 * taper
+      facet: (k % 2 ? -1 : 1) * 0.03 * taper,
+      shape: opts.shape ? (function (tt, fa, fn) {
+        return function (a) { return fn(tt, a - fa); };
+      }(t, frontAngle, opts.shape)) : undefined
     });
   }
 
   var built = loft(rings, sides || 6, { capTop: true, capBottom: true, phase: opts.phase, lift: opts.lift });
 
-  /* Orient +Y onto the A->B axis with a minimal rotation. */
-  var ux = dx / len, uy = dy / len, uz = dz / len;
   var p = built.geometry.attributes.position.array;
   var n = built.geometry.attributes.normal.array;
-
-  /* Basis: u is the new Y. Pick any vector not parallel to u for the cross. */
-  var hx = Math.abs(uy) < 0.99 ? 0 : 1, hy = Math.abs(uy) < 0.99 ? 1 : 0, hz = 0;
-  var rx = hy * uz - hz * uy, ry = hz * ux - hx * uz, rz = hx * uy - hy * ux;
-  var rl = Math.hypot(rx, ry, rz) || 1; rx /= rl; ry /= rl; rz /= rl;   /* X axis */
-  /* Z axis = u cross r */
-  var zx = uy * rz - uz * ry, zy = uz * rx - ux * rz, zz = ux * ry - uy * rx;
 
   function xform(arr, translate) {
     for (var i = 0; i < arr.length; i += 3) {
@@ -458,7 +496,21 @@ export function diamondCrystal(opts) {
      extra vertices sit ON the diamond's own edges (the line x/hw + y/hh = 1),
      so the silhouette is mathematically unchanged and only the cut gets
      richer. */
-  var N = 8;
+  /* R90 — SIXTEEN, for the same reason and one more.
+
+     At eight, each of the four lower bevels is a single enormous plane, and a
+     single plane either catches a light card or it does not. One of them caught
+     the camera-side key square-on and returned pure white across a fifth of the
+     head — a blown bar under the chin that was the brightest thing in the frame
+     and survived several passes of being blamed on other parts.
+
+     That is not a lighting problem, it is a resolution problem: a cut gem
+     distributes light across many small facets so that some catch and their
+     neighbours do not, which is exactly the reference's head. Sixteen girdle
+     points quarter the area of each bevel; the extra vertices again sit ON the
+     diamond's own edges, so the silhouette is mathematically identical and only
+     the cut changes. It costs 64 triangles on one small mesh. */
+  var N = 16;
   var girdle = [];
   for (var g = 0; g < N; g++) {
     var t = g / N * Math.PI * 2;

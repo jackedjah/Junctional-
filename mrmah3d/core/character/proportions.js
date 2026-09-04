@@ -57,11 +57,40 @@ export var HEAD = {
      shoulders — which is the ratio that makes a character read as a companion
      rather than as a figure. The apex still lands at exactly HEIGHT, so overall
      scale, framing and every camera solve are unchanged. */
-  halfWidth: 0.545,
-  halfHeight: 0.572,
-  centreY: 2.428,               /* apex lands at HEIGHT; base seats in the crown */
-  /* Real front-to-back depth. The head is a beveled crystal, not a plate. */
-  halfDepth: 0.372,
+  /* R90 — MEASURED OFF THE ANATOMICAL REFERENCE, AND SUBSTANTIALLY SMALLER.
+
+     `reference/mrmah-refA-anatomical.png` is the art-direction target from here
+     on. Measured on it (941 x 1672, apex y 212, torso tip y 1295, so 1083 px of
+     character), the head diamond is 302 px wide and 258 px tall — 27.9% and
+     23.8% of character height.
+
+     For comparison: the canonical measurement baseline has it at 32.7% / 34.3%,
+     and the enlarged pivot head was running at 36.3% / 38.1%. So this is a 37%
+     reduction in head height against what was here, and it is the single change
+     that does the most to move him from geometric mascot toward the reference.
+     It is not a small correction and it is not reversible by tuning: the head
+     was outranking the whole body, and everything the reference has that this
+     build lacked — a neck, real trapezius, long arms with a bicep and a
+     forearm, a chest with pec masses — needs the 0.45 units of height the old
+     head was occupying.
+
+     The apex still lands at exactly HEIGHT, so framing and every camera solve
+     are untouched.
+
+     The silhouette score against the CANONICAL reference will fall as a direct
+     result, and that is expected rather than a regression — the canonical file
+     stays the measurement baseline but it is no longer the art-direction
+     authority, and the brief is explicit that a materially weak proportion is
+     not to be preserved merely because a test was written around it. */
+  halfWidth: 0.418,
+  halfHeight: 0.357,
+  centreY: 2.643,               /* apex lands at HEIGHT; base at 2.286 */
+  /* Real front-to-back depth. The head is a beveled crystal, not a plate.
+     The ratio goes UP as the head comes down — 0.85 of half-width against the
+     old 0.68 — because the reference's head reads as a thick cut stone with
+     substantial bevels, and a smaller diamond needs proportionally more depth
+     to keep that. */
+  halfDepth: 0.355,
   /* The front face plate is inset from the silhouette and pushed back from
      the bevel ring, which is what makes the face read as recessed INSIDE the
      crystal rather than painted on its front. */
@@ -191,9 +220,96 @@ export var NECK = {
    12 sides rather than 8: the front of the torso now spans several distinct
    planes instead of two, which is what the reference shows and what a uniform
    front could never produce. */
+/* ANATOMICAL SHAPING, as a per-vertex radius multiplier around a ring.
+
+   The ring table can only describe a body of revolution: it says how wide the
+   torso is at a height, not what shape that cross-section is. That is why every
+   version of this torso until now read as a lathe-turned solid however it was
+   faceted — a chest and an abdomen have completely different cross-sections and
+   the table could not express the difference.
+
+   `shape` is a function of the angle around the ring, returning a multiplier on
+   that vertex's radius. `loft` applies it after the facet relief, so anatomy and
+   crystal jitter compose rather than fight.
+
+   Convention, from loft's default phase of PI/2: sin(a) is FRONTNESS (+1 dead
+   front, -1 dead back) and cos(a) is SIDENESS. Lobes are placed by angle from
+   dead front, so they land in the same place at any `sides` count. */
+function bump(d, centre, width) {
+  var e = d - centre;
+  while (e > Math.PI) e -= Math.PI * 2;
+  while (e < -Math.PI) e += Math.PI * 2;
+  return Math.exp(-(e / width) * (e / width));
+}
+/* Same gaussian, but taking a RAW ring angle and measuring from dead front,
+   which is where the torso's rings are authored. */
+function lobe(a, centre, width) { return bump(a - Math.PI / 2, centre, width); }
+
+/* CHEST — two pec masses either side of a sternum valley, plus the lateral
+   ribcage carrying round to a flatter back. The sternum is the important half:
+   a pair of swells with no valley between them is one wide swell, and the eye
+   needs the division to read the pair. */
+function chestShape(k) {
+  /* STRENGTHS ARE LARGE ON PURPOSE.
+
+     A first attempt used a 12% sternum and a 10% pec, which is what these would
+     be as a percentage of a real ribcage — and it was invisible. The reason is
+     that the multiplier scales the ring's DEPTH as well as its width, and the
+     chest's half-depth is only 0.19: a 10% modulation there moves a vertex by
+     0.019 units on a three-unit character, which is under a pixel at chat scale
+     and barely two at showcase. Anatomy has to be authored against the size of
+     the thing it is displacing, not against the size of the body. At these
+     values the sternum sits 0.06 behind the pec crowns, which is a step the eye
+     reads as two masses rather than as one surface. */
+  return function (a) {
+    var sternum = -lobe(a, 0, 0.38) * 0.260;
+    var pec = (lobe(a, 0.70, 0.52) + lobe(a, -0.70, 0.52)) * 0.245;
+    var lat = (lobe(a, Math.PI / 2, 0.62) + lobe(a, -Math.PI / 2, 0.62)) * 0.100;
+    var back = lobe(a, Math.PI, 0.90) * -0.110;
+    return 1 + (sternum + pec + lat + back) * k;
+  };
+}
+
+/* CORE — a central abdominal plane with a shallow division either side of it,
+   and the oblique running back to the flank. Deliberately much weaker than the
+   chest: the brief asks for restrained core structure, not a six-pack. */
+function coreShape(k) {
+  return function (a) {
+    var linea = -lobe(a, 0, 0.34) * 0.130;
+    var rectus = (lobe(a, 0.52, 0.44) + lobe(a, -0.52, 0.44)) * 0.120;
+    var oblique = (lobe(a, 1.20, 0.48) + lobe(a, -1.20, 0.48)) * 0.070;
+    var back = lobe(a, Math.PI, 0.95) * -0.085;
+    return 1 + (linea + rectus + oblique + back) * k;
+  };
+}
+
+/* CLAVICLE / TRAPEZIUS — the shoulder line is not round. It is flat and slightly
+   hollow across the front where the collarbones run, and it carries mass to the
+   sides and rear where the traps do. */
+function clavicleShape(k) {
+  return function (a) {
+    var hollow = -lobe(a, 0, 0.60) * 0.160;
+    var collar = (lobe(a, 0.95, 0.50) + lobe(a, -0.95, 0.50)) * 0.150;
+    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.170;
+    return 1 + (hollow + collar + traps) * k;
+  };
+}
+
 export var TORSO = {
-  topY: (1 - 0.356) * H,         /* 1.932 */
-  sides: 12,
+  /* R90: the shoulder line rises from 1.932 to 2.130.
+
+     Measured on the anatomical reference at y 525 px, i.e. 0.710 of character
+     height above the tip. The old value came from the canonical front, where
+     the much larger head forced the shoulders down. Raising it is what creates
+     room for a real neck and trapezius between the collarbones and the jaw —
+     the region the reference has and this build did not have at all. */
+  topY: 2.130,
+  /* 14, not 12. The anatomical lobes are 0.5 radians wide and a 12-sided ring
+     samples every 0.52, so a pec crown could fall between two vertices and be
+     averaged away entirely — the shaping was there in the numbers and absent
+     from the mesh. 14 puts a vertex within 0.22 radians of every lobe centre
+     for the cost of two more columns of faces. */
+  sides: 14,
   /* A SMALL lift away from the black end — a third of the head's, half the
      arms'. The body is the one part that should keep the black-heavy weighting,
      because that is what makes it read as a dark crystalline mass. But with the
@@ -217,7 +333,12 @@ export var TORSO = {
      contour. 0.20 restores the black-heavy weighting the body is supposed to
      have while the shell keeps the contour lit, and the head (0.26) and arms
      (0.34) still sit above it so the hierarchy holds. */
-  classLift: 0.30,
+  /* R90: 0.30 -> 0.14, on the chest histogram. Half of the reference's chest
+     sits in the darkest band; this build had 6% there. The lift was pushing
+     nearly every torso facet into the same middle, which is what made the body
+     read as one continuous surface with seams drawn on it however the anatomy
+     underneath was shaped. Anatomy needs a value range to be seen through. */
+  classLift: 0.14,
   rings: [
     /* FEWER, LARGER PLANES DOWN THE CONE.
 
@@ -276,21 +397,35 @@ export var TORSO = {
        The waist pinch is DEEP enough to see. At 6% it was arithmetic; at 12% it
        is a landmark. That is the difference between an outline the eye reads as
        a body and one it reads as a shape that happens to wobble. */
+    /* R90 — RE-MEASURED, AND THE CROSS-SECTION IS NOW SHAPED.
+       Half-widths traced off the anatomical reference at 3.0 units of height:
+       waist 0.244 at t 0.47, chest 0.326 at t 0.62, clavicle 0.290 at t 0.71.
+       The lower body is longer and considerably slimmer than it was, which is
+       what lets the taper read as elegant rather than as a skirt. */
     { y: 0.000, w: 0.006, d: 0.004 },
-    { y: 0.200, w: 0.086, d: 0.056, facet: 0.0121, crystal: 0.0480, crystalY: 0.0110 },
-    { y: 0.440, w: 0.152, d: 0.096, facet: -0.0121, crystal: 0.0600, crystalY: 0.0150 },
-    { y: 0.680, w: 0.240, d: 0.144, facet: 0.0110, crystal: 0.0720, crystalY: 0.0170 },
-    /* hip swell — the widest point of the lower mass */
-    { y: 0.900, w: 0.308, d: 0.176, facet: -0.0110, crystal: 0.0760, crystalY: 0.0180 },
-    { y: 1.070, w: 0.356, d: 0.196, facet: 0.0099, crystal: 0.0740, crystalY: 0.0175 },
+    { y: 0.175, w: 0.050, d: 0.034, facet: 0.0121, crystal: 0.0380, crystalY: 0.0090 },
+    { y: 0.400, w: 0.110, d: 0.072, facet: -0.0121, crystal: 0.0520, crystalY: 0.0130 },
+    { y: 0.680, w: 0.178, d: 0.112, facet: 0.0110, crystal: 0.0620, crystalY: 0.0150 },
+    { y: 0.950, w: 0.236, d: 0.142, facet: -0.0110, crystal: 0.0680, crystalY: 0.0160 },
+    /* hip swell — the widest point of the lower mass, and modest */
+    { y: 1.180, w: 0.264, d: 0.154, facet: 0.0099, crystal: 0.0640, crystalY: 0.0150,
+      shape: coreShape(0.55) },
     /* THE WAIST. The one concave moment in the outline. */
-    { y: 1.255, w: 0.318, d: 0.180, facet: -0.0099, crystal: 0.0700, crystalY: 0.0165 },
-    /* ribcage opening back out */
-    { y: 1.430, w: 0.408, d: 0.218, facet: 0.0088, crystal: 0.0760, crystalY: 0.0180 },
-    { y: 1.600, w: 0.508, d: 0.253, facet: -0.0088, crystal: 0.0830, crystalY: 0.0185 },
-    { y: 1.765, w: 0.556, d: 0.267, facet: 0.0077, crystal: 0.0640, crystalY: 0.0130 },
-    { y: 1.880, w: 0.584, d: 0.274, facet: -0.0055, crystal: 0.0470, crystalY: 0.0085, dip: 0.052 },
-    { y: 1.932, w: 0.590, d: 0.276, facet: 0.0055, dip: 0.038 },
+    { y: 1.400, w: 0.244, d: 0.146, facet: -0.0099, crystal: 0.0600, crystalY: 0.0140,
+      shape: coreShape(1.0) },
+    /* ribcage opening back out — lower abdominal into the rib arch */
+    { y: 1.620, w: 0.298, d: 0.172, facet: 0.0088, crystal: 0.0640, crystalY: 0.0150,
+      shape: coreShape(0.85) },
+    { y: 1.800, w: 0.320, d: 0.198, facet: -0.0088, crystal: 0.0660, crystalY: 0.0150,
+      shape: chestShape(0.70) },
+    /* the pectoral line — the strongest cross-section shaping on the body */
+    { y: 1.930, w: 0.328, d: 0.206, facet: 0.0077, crystal: 0.0560, crystalY: 0.0115,
+      shape: chestShape(1.0) },
+    { y: 2.040, w: 0.322, d: 0.196, facet: -0.0055, crystal: 0.0440, crystalY: 0.0080,
+      shape: chestShape(0.80) },
+    /* THE SHOULDER LINE — collarbones across the front, trapezius behind */
+    { y: 2.130, w: 0.290, d: 0.166, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
+      shape: clavicleShape(1.0), dip: 0.030 },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11
@@ -336,10 +471,40 @@ export var TORSO = {
        something a viewer should ever see. At 2.105 the head is 0.233 across and
        the ring is 0.055, so it is buried by a factor of four and the junction
        simply has no visible event in it. */
-    { y: 1.960, w: 0.400, d: 0.215, facet: -0.0195, crystal: 0.062, crystalY: 0.014 },
-    { y: 2.010, w: 0.230, d: 0.138, facet: 0.0175, crystal: 0.044, crystalY: 0.010 },
-    { y: 2.060, w: 0.120, d: 0.082, facet: -0.0110, crystal: 0.026, crystalY: 0.006 },
-    { y: 2.105, w: 0.055, d: 0.040, facet: 0.0090 }
+    /* R90 — THIS IS A NECK NOW, not a crown buried in an oversized head.
+
+       The crown existed because the head was so large that its lower vertex sat
+       almost on the shoulder line; there was no room for anything between them,
+       so the chest was ramped straight up into the jaw. With the head at its
+       reference size there are 0.156 units of clear space there, and the
+       reference fills them with a real neck: narrow, faceted, flaring into the
+       trapezius at the bottom and disappearing under the chin at the top.
+
+       It is still part of the TORSO loft rather than its own mesh, which is
+       deliberate — a separate neck cylinder is exactly where the old build kept
+       producing a visible seam under the jaw, and a continuous loft cannot have
+       one by construction.
+
+       The top ring is buried INSIDE the head. The head's own half-width at
+       y 2.352 is 0.418 * (1 - 0.291/0.357) = 0.077, and the ring there is 0.028,
+       so it is enclosed by nearly a factor of three and the junction has no
+       visible event in it from any angle the interaction can reach. */
+    /* THE NECK MUST CONVERGE TO MEET THE HEAD'S POINT, and the arithmetic here
+       is unforgiving. The head's half-width falls off linearly from its centre:
+       hw(y) = 0.418 * (1 - |y - 2.643| / 0.357). At y 2.300 that is 0.016. A
+       first version of this table put a 0.068 ring there on the assumption that
+       anything below the head's centre was safely inside it — so a wedge of
+       neck four times the head's width at that height stood straight out
+       through the jaw and rendered as the blown white bar under the chin that
+       dominated the whole frame.
+
+       There is no width that threads the head's lower vertex, because the
+       vertex is a point. So the neck converges to one too, 0.006 below it, and
+       the throat gem sits over the junction exactly as the reference does. */
+    { y: 2.190, w: 0.172, d: 0.118, facet: -0.0165, crystal: 0.030, crystalY: 0.0055 },
+    { y: 2.240, w: 0.128, d: 0.090, facet: 0.0150, crystal: 0.022, crystalY: 0.0040 },
+    { y: 2.272, w: 0.082, d: 0.060, facet: -0.0110, crystal: 0.012, crystalY: 0.0022 },
+    { y: 2.292, w: 0.010, d: 0.008, facet: 0.0090 }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
   /* Widened. Against the canonical reference the render measured 9.3% narrow
@@ -359,8 +524,12 @@ export var TORSO = {
      previous pass the shoulders have come in 14% from their widest, while the
      deltoid's front-to-back depth has gone the other way — the mass is being
      moved out of the silhouette rather than removed. */
-  shoulderHalfWidth: 0.734,
-  shoulderY: 1.900
+  /* R90: measured on the anatomical reference, where the shoulder silhouette
+     reaches 216 px of 1083, i.e. 0.598 at 3.0 units. Narrower than the 0.734
+     this carried, because that number was set against a head half as wide again
+     — the shoulders only had to be that broad to avoid being outranked. */
+  shoulderHalfWidth: 0.598,
+  shoulderY: 2.095
 };
 
 /* Arm joint positions, converted from reference pixels via PX with the torso
@@ -409,19 +578,39 @@ export var ARMS = {
        a triangle of background between limb and body. That gap is a silhouette
        landmark in its own right, and "arms disappearing into the torso" is
        named in the brief as a fault to eliminate. */
-    elbow: [-0.742, 1.312, 0.10],
-    wrist: [-0.560, 0.876, 0.16],
-    upperRadius: 0.112,
-    foreRadius: 0.086,
-    wristRadius: 0.060
+    /* R90 — RE-MEASURED OFF THE ANATOMICAL REFERENCE, and the arms are
+       substantially longer and hung from a higher shoulder.
+
+       Reference pixels (centre column x 470, tip y 1295, 1083 px of height):
+       lowered arm shoulder (300, 550), elbow (245, 790), wrist (295, 950).
+       The upper arm falls almost vertically and slightly outward; the forearm
+       then cuts back INWARD toward the hip, which is the shape the old build
+       had backwards — it swung the elbow out and the forearm further out again,
+       so the arm read as a chicken wing and the armpit gap was made by pushing
+       the whole limb away from the body rather than by the pose.
+
+       Total limb length goes from 0.98 to 1.16 units, and the hand now falls
+       just below the hip rather than level with the waist. That reach is a
+       large part of why the reference reads humanoid and this build read as a
+       cone with stubs. */
+    shoulder: [-0.500, 2.064, 0.03],
+    elbow: [-0.623, 1.399, 0.09],
+    wrist: [-0.485, 0.956, 0.13],
+    upperRadius: 0.104,
+    foreRadius: 0.081,
+    wristRadius: 0.055
   },
   left: {                         /* viewer's RIGHT — the raised arm */
-    shoulder: [0.596, 1.872, 0.02],
-    elbow: [0.786, 1.322, 0.10],
-    wrist: [0.884, 1.958, 0.14],
-    upperRadius: 0.112,
-    foreRadius: 0.086,
-    wristRadius: 0.060
+    /* Reference pixels: shoulder (645, 550), elbow (730, 700), wrist (775, 570).
+       A shallower, more relaxed V than the old pose — the reference does not
+       fold the raised arm hard, it opens the elbow to about 100 degrees and
+       presents the crystal at roughly shoulder height. */
+    shoulder: [0.500, 2.064, 0.03],
+    elbow: [0.720, 1.648, 0.10],
+    wrist: [0.845, 2.008, 0.14],
+    upperRadius: 0.104,
+    foreRadius: 0.081,
+    wristRadius: 0.055
   },
 
   /* LIMB PROFILES — where the mass sits along each bone.
@@ -441,7 +630,20 @@ export var ARMS = {
      does — they are small, and the body's 50%-black weighting leaves a slim
      tapered tube with almost nothing visible on it. Kept below the head's, so
      the arms stay clearly darker than the face. */
-  classLift: 0.34,
+  /* R90: raised hard, from 0.34 to 0.50.
+
+     Arm visibility is called out in the brief as high priority, and the arms
+     were losing to the background: the limbs are the smallest-area parts of the
+     character, the area-driven hero hierarchy damps small faces toward the
+     middle, and the body's black-heavy weighting then takes most of what is
+     left. The result is a correct dark value that is also an invisible one.
+
+     The arms are now the LIGHTEST major region on the character — above the
+     torso (0.20) and above the head (0.30) — which inverts the old hierarchy on
+     purpose. Reference A does the same thing: its arms carry noticeably more
+     secondary blue and more silver than the chest, because they are what has to
+     read against a black world at the edge of the silhouette. */
+  classLift: 0.50,
 
   /* The deltoid takes MORE lift than the arm it caps. Its exposed surface is
      mostly upward-facing, and an upward-facing plane reflects x~64 in the
@@ -479,6 +681,43 @@ export var ARMS = {
     fore: function (t) {
       return 0.88 + Math.sin(Math.pow(t, 0.62) * Math.PI) * 0.16 - t * 0.10;
     }
+  },
+
+  /* R90 — CROSS-SECTION SHAPING FOR THE LIMBS.
+
+     `profiles` above says how THICK the arm is along its length; it cannot say
+     what shape that thickness is, so however hard it swelled the result was a
+     tapered tube with a bulge — which is why the arms kept reading as segmented
+     pipes no matter how the radii were tuned. A real upper arm is not round:
+     the bicep sits on the front and peaks around a third of the way down, the
+     tricep sits on the back, is broader, and peaks lower and closer to the
+     elbow, and the two are separated by a groove down each side.
+
+     These are handed the angle RELATIVE TO THE FRONT of the limb (see the
+     frontAngle derivation in forge.js), so they hold under any pose.
+
+     From the front the bicep reads as fullness; from a slight angle the front
+     and rear masses separate, which is what the brief asks for. */
+  shapes: {
+    upper: function (t, d) {
+      var belly = Math.sin(Math.pow(t, 0.82) * Math.PI);
+      var rear = Math.sin(Math.pow(t, 1.30) * Math.PI);
+      var bicep = bump(d, 0, 0.80) * 0.175 * belly;
+      var tricep = bump(d, Math.PI, 1.15) * 0.150 * rear;
+      /* the groove between them, down each side of the arm */
+      var groove = (bump(d, Math.PI / 2, 0.42) +
+                    bump(d, -Math.PI / 2, 0.42)) * -0.070 * belly;
+      return 1 + bicep + tricep + groove;
+    },
+    fore: function (t, d) {
+      var swell = Math.sin(Math.pow(t, 0.58) * Math.PI);
+      /* Flexor mass sits front-and-inboard, extensor mass rear-and-outboard —
+         offset from dead front and dead back, which is what stops the forearm
+         reading as a smaller copy of the upper arm. */
+      var flexor = bump(d, 0.45, 0.85) * 0.130 * swell;
+      var extensor = bump(d, Math.PI - 0.55, 0.95) * 0.095 * swell;
+      return 1 + flexor + extensor;
+    }
   }
 };
 
@@ -507,12 +746,24 @@ export var INSIGNIA = {
   /* Moved down. With the head enlarged and seated lower, the emblem sat almost
      under the chin and the whole throat region read as clutter. On the chest,
      where a chest emblem belongs. */
-  emblemY: 1.560,
-  emblemHalf: 0.074,
-  symbolsY: 1.355,
-  symbolHalf: 0.038,
-  symbolSpacing: 0.115
-};
+  /* R90: re-measured on the anatomical reference — emblem at y 632 px, symbols
+     at y 700, i.e. 0.612 and 0.549 of character height above the tip. The
+     emblem sits ON the sternum, between the pec masses, which is where the
+     reference puts it and why the sternum valley matters to it: a glowing
+     diamond on a flat chest is a sticker, the same one in a groove reads as
+     set into the crystal. */
+  emblemY: 1.837,
+  emblemHalf: 0.070,
+  symbolsY: 1.648,
+  symbolHalf: 0.034,
+  symbolSpacing: 0.104,
+  /* THE THROAT GEM. The reference carries a small bright diamond exactly where
+     the neck disappears under the jaw. It is doing real work there — it is the
+     one place on the body where two very different forms meet, and a deliberate
+     bright accent at a junction reads as design where a bare seam reads as a
+     mistake. */
+  throatY: 2.262,
+  throatHalf: 0.030 };
 
 /* The character hovers; the tip does not rest on the floor. The reference
    shows a bright contact starburst directly beneath the point. */

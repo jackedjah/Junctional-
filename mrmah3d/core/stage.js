@@ -198,11 +198,43 @@ function buildEnvironment(renderer, palette) {
        with the edge of a reflection lobe and dim enough not to blow out when it
        does. These are those: broad, weak, spread around the sphere so most
        facets graze one. The hot cards above still supply the sparse silver. */
-    { x: 66, y: 34, w: 60, h: 44, fill: 'rgba(150,186,208,0.30)' },
-    { x: 120, y: 66, w: 72, h: 40, fill: 'rgba(120,160,186,0.26)' },
-    { x: 232, y: 54, w: 56, h: 44, fill: 'rgba(132,172,198,0.28)' },
-    { x: 4, y: 70, w: 52, h: 38, fill: 'rgba(112,150,178,0.24)' },
-    { x: 172, y: 18, w: 48, h: 32, fill: 'rgba(140,178,204,0.22)' }
+    /* R90 — ROUGHLY DOUBLED, on measurement rather than taste.
+
+       An eight-band luminance histogram of the character against the anatomical
+       reference: this render had 66.3% of its lit pixels in the darkest band
+       where the reference has 39.0%, and 19.3% in the second where the reference
+       has 38.8%. That is a midtone deficit of about 27 points of the character's
+       area — not a look, a hole. The bright tail was short too, 2.3% above 160
+       against the reference's 5.6%.
+
+       AND THEN THE MEASUREMENT WAS RE-READ AND SAID THE OPPOSITE.
+
+       That first histogram sampled a box around the whole character, so most of
+       what it counted was BACKGROUND — and the reference's background is a lit
+       cloudscape while this one is a near-black room. It was measuring the sky
+       and calling it the body.
+
+       Re-run over a box that is entirely chest in both images, the finding
+       inverts: the reference's chest is 49.2% near-black with 19.5% of its
+       pixels above 160, and this render's was 5.9% near-black with 7.6% above
+       160 — a mean of 80 against the reference's 66. The body was not too dark.
+       It was too UNIFORM: a midtone mush with neither a black end nor a bright
+       one, which is precisely what "triangle soup" looks like from across a
+       room, and doubling these cards made it worse.
+
+       So they come back down, slightly below where they started, and the bright
+       end is bought with envMapIntensity instead (see materials.js) — which
+       stretches the reflected tail without lifting the blacks, exactly the
+       distinction rule 3 in CLAUDE.md draws. The two low cards stay, at a low
+       value, because the undersides of the arms genuinely were reflecting an
+       empty hemisphere; that is a gap in coverage rather than a level. */
+    { x: 66, y: 34, w: 60, h: 44, fill: 'rgba(150,186,208,0.26)' },
+    { x: 120, y: 66, w: 72, h: 40, fill: 'rgba(120,160,186,0.22)' },
+    { x: 232, y: 54, w: 56, h: 44, fill: 'rgba(132,172,198,0.24)' },
+    { x: 4, y: 70, w: 52, h: 38, fill: 'rgba(112,150,178,0.20)' },
+    { x: 172, y: 18, w: 48, h: 32, fill: 'rgba(140,178,204,0.18)' },
+    { x: 148, y: 92, w: 64, h: 34, fill: 'rgba(118,156,184,0.20)' },
+    { x: 28, y: 96, w: 58, h: 32, fill: 'rgba(110,148,178,0.18)' }
   ];
   cards.forEach(function (c2) {
     var grd = g.createRadialGradient(

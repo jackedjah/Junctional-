@@ -110,6 +110,19 @@ export function buildHead(materials) {
   var eyeGap = HEAD.halfWidth * 0.315;
   var eyeY = HEAD.halfHeight * 0.10;
 
+  /* R90 — STROKE WEIGHT RE-DERIVED FOR THE SMALLER HEAD.
+
+     These fractions were set against a head 27% larger, and they are fractions
+     OF the head, so shrinking it shrank them twice over: the smile's tube went
+     from a hairline to a sub-pixel line, and at chat scale it disappeared
+     entirely — the character rendered with eyes and no mouth, which fails the
+     one app-scale requirement the brief states outright.
+
+     Raised by about half. At showcase the smile is still a drawn line rather
+     than a tube, which is what the reference shows; at 186 px of character it
+     survives, which is the size that actually has to work. The soft companions
+     go up further still, because they are what carries the feature once the
+     core line is under a pixel. */
   var eyes = [];
   [-1, 1].forEach(function (side) {
     /* A torus, not a circle: the reference's eyes are open rings. */
@@ -126,13 +139,13 @@ export function buildHead(materials) {
        eyes into dark holes. The refined reference sits between: a clean ring
        with a definite, even stroke, obviously drawn rather than either fat or
        fragile. 0.13 is that, and it survives down to protocol scale. */
-    var eye = new Mesh(new TorusGeometry(eyeR, eyeR * 0.13, 8, 40), materials.emissive);
+    var eye = new Mesh(new TorusGeometry(eyeR, eyeR * 0.175, 8, 40), materials.emissive);
     eye.position.set(side * eyeGap, eyeY, 0);
     eye.name = side < 0 ? 'eye-left' : 'eye-right';
     face.add(eye);
     eyes.push(eye);
 
-    var soft = new Mesh(new TorusGeometry(eyeR * 1.16, eyeR * 0.34, 8, 28), materials.emissiveSoft);
+    var soft = new Mesh(new TorusGeometry(eyeR * 1.20, eyeR * 0.46, 8, 28), materials.emissiveSoft);
     soft.position.copy(eye.position);
     face.add(soft);
   });
@@ -157,7 +170,7 @@ export function buildHead(materials) {
        makes its visibility a named requirement, so it gets the weight it needs
        to survive the smallest framing rather than the weight that looks
        balanced in the showcase view. */
-    new TorusGeometry(smileR, smileR * 0.078, 8, 52, smileArc),
+    new TorusGeometry(smileR, smileR * 0.118, 8, 52, smileArc),
     materials.emissive
   );
   smile.rotation.z = Math.PI + (Math.PI - smileArc) / 2;
@@ -166,7 +179,7 @@ export function buildHead(materials) {
   face.add(smile);
 
   var smileSoft = new Mesh(
-    new TorusGeometry(smileR, smileR * 0.165, 8, 52, smileArc),
+    new TorusGeometry(smileR, smileR * 0.235, 8, 52, smileArc),
     materials.emissiveSoft
   );
   smileSoft.rotation.copy(smile.rotation);

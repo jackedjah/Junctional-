@@ -102,7 +102,15 @@ export function createCrystalMaterials(options) {
        taking it off cost the chest its facet read at app scale. Putting the
        light back through the reflection keeps it on the SURFACES, which is
        where this material has been made to carry it. */
-    envMapIntensity: 17.0,
+    /* R90: 17 -> 27. The chest histogram against the anatomical reference showed
+       this build short of bright pixels by a factor of two and a half (7.6% of
+       the chest above 160 against 19.5%) while carrying far too many midtones.
+       envMapIntensity is the correct control for exactly that shape of error:
+       against a near-black environment it scales the reflected component only,
+       so it stretches the bright tail and leaves the blacks where they are.
+       Exposure would have moved the whole distribution and made the midtone
+       problem worse. */
+    envMapIntensity: 27.0,
     flatShading: true,
     /* A faint self-lit floor so facets turned fully away from every light are
        still crystal rather than holes cut in the frame. Deliberately tiny. */

@@ -155,8 +155,16 @@ function buildArm(materials, spec, options) {
      and the arm stays a cone with a kink in it. */
   var upperGeo = segment(
     [0, 0, 0], elbow.clone().sub(shoulder).toArray(),
-    spec.upperRadius, spec.foreRadius * 1.02, 8,
-    { depthRatio: 0.88, crystal: 0.075, steps: 6, profile: ARMS.profiles.upper, lift: ARMS.classLift }
+    spec.upperRadius, spec.foreRadius * 1.02, 10,
+    /* R90: depthRatio goes above 1 and the cross-section is now SHAPED.
+
+       The upper arm is deeper front-to-back than it is wide, because that is
+       where a bicep and a tricep live — a round tube has nowhere to put either,
+       which is why the profile swell alone only ever produced a fatter pipe.
+       Ten sides rather than eight so the bicep and tricep lobes each land on
+       their own pair of facets instead of sharing one. */
+    { depthRatio: 1.12, crystal: 0.075, steps: 7,
+      profile: ARMS.profiles.upper, shape: ARMS.shapes.upper, lift: ARMS.classLift }
   );
   var upper = clad(shoulderJoint, upperGeo, materials, 1.05);
   owned.push(upperGeo, upper.edges, upper.minorEdges);
@@ -170,8 +178,9 @@ function buildArm(materials, spec, options) {
   var foreVec = wrist.clone().sub(elbow);
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
-    spec.foreRadius, spec.wristRadius, 8,
-    { depthRatio: 0.88, crystal: 0.070, steps: 5, profile: ARMS.profiles.fore, lift: ARMS.classLift }
+    spec.foreRadius, spec.wristRadius, 10,
+    { depthRatio: 1.04, crystal: 0.070, steps: 6,
+      profile: ARMS.profiles.fore, shape: ARMS.shapes.fore, lift: ARMS.classLift }
   );
   var fore = clad(elbowJoint, foreGeo, materials, 1.05);
   owned.push(foreGeo, fore.edges, fore.minorEdges);

@@ -134,6 +134,32 @@ export function buildBody(materials) {
      body read as one smooth surface with values on it rather than as a cut
      stone with planes. Reference A's torso is defined by exactly these seams:
      thin, and present at every major plane boundary. */
+  /* R90 — THE TORSO'S RIM SHELL IS GONE, AND THIS TIME ON MEASUREMENT.
+
+     It was removed once before and restored, on the reasoning recorded below.
+     What settled it now is a histogram: sampled over a box that is entirely
+     chest, the anatomical reference has 49.2% of its pixels in the darkest band
+     and 19.5% above 160 — a body that is mostly black with hard catches on it.
+     This build measured 0% in the darkest band. Not a few percent: none. The
+     chest could not produce a dark pixel anywhere, which is the signature of an
+     additive layer over the whole of it rather than of a lighting choice.
+
+     Removing the shell for one capture confirmed it, and the frame it produced
+     is by a wide margin the closest this renderer has come to Reference A: real
+     black planes, the pec masses reading as value rather than as outline, and
+     the ice catches finally standing out because there is something for them to
+     stand out FROM.
+
+     The reasoning that restored it was sound at the time and no longer applies.
+     The shell existed to put light on a contour that had nothing else — but the
+     torso now carries real anatomy, which lights its own planes, and the arms
+     hang clear of the body so the contour that matters is theirs and they keep
+     their shells. Bought with a flat overlay, contour light costs the whole
+     dark end of the body, and the dark end is most of what makes crystal read
+     as crystal.
+
+     (The note below is kept because it is the argument this replaces.) */
+
   /* The torso keeps its rim shell.
 
      It was removed for a while during this pass on the grounds that it laid a
@@ -149,7 +175,7 @@ export function buildBody(materials) {
      progressively darker and flatter than the one that was being "fixed" — a
      long correction of a fault nobody had reported. Restored. */
   var torsoParts = lit(group, torsoLoft.geometry, materials,
-    { rimScale: 1.022, edgeAngle: 42, minorAngle: 36 });
+    { rim: false, edgeAngle: 42, minorAngle: 36 });
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
 
   /* ---- shoulder caps / deltoids --------------------------------------- */
@@ -245,9 +271,18 @@ export function buildBody(materials) {
        back to parity with width: the mass it needs is outboard of the ribcage,
        where sticking out in front is the shoulder reading as a shoulder rather
        than as a plate stuck on the chest. */
-    var inner = [side * 0.300, TORSO.topY - 0.082, -0.005];
-    var outer = [joint[0] * 1.00, joint[1] - 0.034, joint[2]];
-    var deltoidR0 = 0.205;
+    /* R90 — A SLOPING CAP FROM THE TRAPEZIUS, not a level stub on the ribcage.
+
+       With the shoulder line raised to 2.130 and the head at its reference
+       size, there is a real clavicle to hang this off for the first time. The
+       inner end starts inboard and HIGH, at the trapezius; the outer end lands
+       just below the arm joint. That fall from neck to shoulder is the line
+       Reference A has and this build has never had — every previous version ran
+       the axis level, which produces a square upper body no matter what radius
+       it carries. */
+    var inner = [side * 0.210, 2.095, -0.005];
+    var outer = [joint[0] * 1.00, joint[1] - 0.045, joint[2]];
+    var deltoidR0 = 0.200;
     /* SMALLER THAN THE ARM IT MEETS, not larger. `segment` caps both ends, and
        the outer cap is a disc perpendicular to a near-horizontal axis, so at
        1.22x the upper-arm radius it stood proud of the limb all the way round
@@ -255,7 +290,12 @@ export function buildBody(materials) {
        profile starts at 0.84, i.e. radius 0.094 — so the deltoid ends at 0.087
        and the disc is inside the bicep where nothing can see it. The mass the
        shoulder needs comes from the belly in the middle, not from the join. */
-    var deltoidR1 = spec.upperRadius * 0.78;
+    /* Equal to the upper arm's nominal radius, which is 1.19x the radius the arm
+       ACTUALLY has at the joint — the limb profile starts at 0.84. So the cap
+       still closes over the top of the limb rather than standing proud of it
+       (the blown-white-wedge failure), while reaching the 0.598 half-width the
+       reference measures across the shoulders. */
+    var deltoidR1 = spec.upperRadius * 1.00;
     /* Root choke x belly swell. The choke keeps the inboard end inside the
        chest; the swell is the deltoid's own belly. t^1.3 puts its peak at
        t ~ 0.59 rather than at the midpoint, which places the widest part of the
@@ -263,7 +303,7 @@ export function buildBody(materials) {
        raising a hump beside the neck. */
     var deltoidProfile = function (t) {
       var root = Math.min(1, t / 0.28);
-      return (0.34 + 0.66 * root * root * (3 - 2 * root)) *
+      return (0.28 + 0.72 * root * root * (3 - 2 * root)) *
              (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.22);
     };
     var geo = segment(
@@ -345,6 +385,26 @@ export function buildBody(materials) {
     }
     return r[r.length - 1].d;
   }
+
+  /* THE THROAT GEM — a junction marked deliberately rather than left bare.
+
+     The head comes to a point at its lower vertex and the neck converges to
+     meet it, which is the only way two solids of these shapes can join without
+     one standing through the other (see the neck rings in proportions.js). A
+     point-to-point junction is geometrically clean and visually weak — the eye
+     reads a pinch and wonders what it is. Reference A puts a small bright
+     diamond exactly there, and it works for the reason accents at junctions
+     always work: a deliberate mark reads as design, a bare seam reads as a
+     mistake. */
+  var throatGeo = diamondPlate(INSIGNIA.throatHalf, 0.008);
+  var throat = new Mesh(throatGeo, materials.emissive);
+  throat.position.set(0, INSIGNIA.throatY, chestZ(INSIGNIA.throatY) + 0.010);
+  throat.name = 'throat-gem';
+  group.add(throat);
+  var throatGlow = new Mesh(diamondPlate(INSIGNIA.throatHalf * 2.1, 0.004), materials.emissiveSoft);
+  throatGlow.position.copy(throat.position);
+  group.add(throatGlow);
+  owned.push(throatGeo, throatGlow.geometry);
 
   var emblemGeo = diamondPlate(INSIGNIA.emblemHalf, 0.012);
   var emblem = new Mesh(emblemGeo, materials.emissive);
