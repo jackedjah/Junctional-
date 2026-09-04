@@ -117,10 +117,28 @@ var MIST_RIM = srgb(120, 145, 172);
      review's first cut (base 100,112,132, amb 0.42) measured 84% of the peak
      under 32 luma once the high-tier composite had its say — steel gone to
      black cut-outs — so they sit at 122,136,156 / 0.52. */
+/* R95 world — DARKER THAN THE CHARACTER, measured. In the delivered showcase
+   frame a box over the right mid massif averaged 53.8 luma with 15% of its
+   pixels in 96-127, against 47.8 over his left pectoral: the range was
+   competing with him. Guardian-a's mountains over the same kind of box are
+   39 with 4% above 128 — steel, cool, slightly silvered, and DARK, their
+   brightness in the sparkle and the summit beams. So the mid tone's diffuse
+   gain, steel catch and jitter come down together (the tail is what those
+   three make) while the ambient floor comes down less, so the range stays a
+   lit mass rather than falling back to the black cut-outs R94 climbed out
+   of. Note that the renderer now writes linear values (R95): the sRGB
+   numbers authored here land at roughly half their value on screen. */
 var TONES = {
-  ridge: { base: srgb(66, 74, 88), amb: 0.26, kd: 0.55, spec: srgb(170, 185, 205), ks: 0.80, shine: 36, jitter: 0.50, depth: 0.0, rim: 0.30 },
-  mid:   { base: srgb(138, 152, 172), amb: 0.90, kd: 0.60, spec: srgb(228, 238, 250), ks: 0.34, shine: 28, jitter: 0.50, depth: 0.08, rim: 0.25 },
-  far:   { base: srgb(108, 122, 142), amb: 0.40, kd: 0.60, spec: srgb(190, 205, 225), ks: 0.26, shine: 22, jitter: 0.40, depth: 0.40, rim: 0.0 }
+  ridge: { base: srgb(66, 74, 88), amb: 0.26, kd: 0.48, spec: srgb(170, 185, 205), ks: 0.62, shine: 36, jitter: 0.46, depth: 0.0, rim: 0.26 },
+  /* Round 4 overshot: amb 0.68 put 73% of the mid range's own pixels under
+     32 luma in the harness frame (R94-WORLD-12's ceiling is 50%) while the
+     range sat at 20 against a chest of 83 — cut-outs, with room to spare. The
+     AMBIENT floor comes back up (it lifts the dark faces); the diffuse gain
+     and the catch, which make the bright tail, stay down. */
+  mid:   { base: srgb(130, 144, 166), amb: 0.90, kd: 0.38, spec: srgb(224, 234, 248), ks: 0.20, shine: 30, jitter: 0.40, depth: 0.08, rim: 0.20 },
+  /* Round 3 measured the far peaks at 23 luma over their own pixels against
+     guardian-a's 36 for its distant pyramids: cut-outs. A small lift back. */
+  far:   { base: srgb(100, 114, 134), amb: 0.46, kd: 0.50, spec: srgb(190, 205, 225), ks: 0.22, shine: 22, jitter: 0.34, depth: 0.38, rim: 0.0 }
 };
 
 /* Per-layer irregularity: angular, radial and vertical jitter of the ring
@@ -178,7 +196,10 @@ var LAYERS = {
      the skyline. Rings 6 -> 5 pays for the mirrored range (`mirror`). */
   mid: {
     tone: 'mid', rings: 5, profile: 1.04, sparkle: 1100, sparkleColor: srgb(222, 236, 252),
-    mirror: { maxX: 12, alpha: 0.70, depth: 0.9, mist: 0.30 },
+    /* R95 world: alpha 0.70 -> 0.78, mist 0.30 -> 0.42. Guardian-a's floor
+       past the horizon averages 40 luma against 24 here; a wet floor returns
+       the lit mist as much as the rock, so the reflection carries more of it. */
+    mirror: { maxX: 12, alpha: 0.78, depth: 0.9, mist: 0.42 },
     massifs: [
       { x: -9.8, z: -44, h: 6.2, r: 2.7, sides: 7, elong: 0.8, seed: 21, beacon: true },
       { x: 10.4, z: -47, h: 5.4, r: 2.4, sides: 6, elong: 0.85, seed: 22, beacon: true },
@@ -422,6 +443,53 @@ function buildBeacons(summits, ramp) {
   return { mesh: mesh, geo: geo, mat: mat };
 }
 
+/* R95 world — THE BEAMS IN THE FLOOR. Guardian-a's most identifiable floor
+   feature after his own column is the bright vertical SMEAR under each summit
+   beam: the wet floor giving the beacons back. Each is the beam mirrored
+   through the floor plane — a quad hanging BELOW y=0 under its summit, seen
+   through the transparent floor exactly where a planar reflection would put
+   it, like the mirrored range — but wider, longer and much dimmer than the
+   beam above, because a wet surface smears a reflection sideways and lets it
+   run. The smear texture (environment.js) is soft on every side: a first cut
+   on the beacons' own ramp drew four crisp bars standing in the foreground
+   floor, and it was the EDGES that made them bars. One geometry, one draw;
+   tiered with the other floor reflections. It lives in the structures group
+   at the mirror's render order so the grid and the hover column lie over it. */
+function buildBeamMirror(summits, smear) {
+  var pos = [], uv = [];
+  function quad(cx, top, cz, w, h, axis) {
+    var hx = axis === 0 ? w / 2 : 0, hz = axis === 0 ? 0 : w / 2;
+    var y0 = top - h, y1 = top;
+    var p = [
+      [cx - hx, y0, cz - hz], [cx + hx, y0, cz + hz], [cx + hx, y1, cz + hz],
+      [cx - hx, y0, cz - hz], [cx + hx, y1, cz + hz], [cx - hx, y1, cz - hz]
+    ];
+    /* v=1 at the TOP (the mirrored summit, where the smear starts soft and
+       peaks just below), v=0 at the bottom, where it has dissolved. */
+    var t = [[0, 0], [1, 0], [1, 1], [0, 0], [1, 1], [0, 1]];
+    for (var i = 0; i < 6; i++) { pos.push(p[i][0], p[i][1], p[i][2]); uv.push(t[i][0], t[i][1]); }
+  }
+  summits.forEach(function (s) {
+    var w = s.far ? 0.9 : 1.4;
+    var h = s.h * 1.6;
+    quad(s.x, -(s.y - 0.6), s.z, w, h, 0);
+    quad(s.x, -(s.y - 0.6), s.z, w, h, 1);
+  });
+  var geo = new BufferGeometry();
+  geo.setAttribute('position', new Float32BufferAttribute(pos, 3));
+  geo.setAttribute('uv', new Float32BufferAttribute(uv, 2));
+  var mat = new MeshBasicMaterial({
+    map: smear, color: srgb(176, 212, 240), transparent: true, opacity: 0.20,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false,
+    side: DoubleSide, fog: false
+  });
+  var mesh = new Mesh(geo, mat);
+  mesh.name = 'beacon-beams-mirror';
+  mesh.frustumCulled = false;
+  mesh.renderOrder = -20;
+  return { mesh: mesh, geo: geo, mat: mat };
+}
+
 /* ---------------------------------------------------------------------------
    createTerrain({ tier, settings, ramp, radial })
 
@@ -515,11 +583,20 @@ export function createTerrain(options) {
   beacons.add(caps);
   owned.push(capGeo, capMat);
 
+  /* R95 world: the beams' reflection in the wet floor, above low only. */
+  var beamMirror = null;
+  if (settings.worldReflections && opts.smear) {
+    beamMirror = buildBeamMirror(summits, opts.smear);
+    group.add(beamMirror.mesh);
+    owned.push(beamMirror.geo, beamMirror.mat);
+  }
+
   /* Authored baselines, captured once, so a weight of 1 restores exactly what
      was built and no literal is ever duplicated into applyWeight. */
   var BASE = {
     beam: beams.mat.opacity, cap: capMat.opacity,
-    sparkle: spkMat.opacity
+    sparkle: spkMat.opacity,
+    beamMirror: beamMirror ? beamMirror.mat.opacity : 0
   };
   var weight = 1, detail = 1, time = 0;
 
@@ -536,6 +613,7 @@ export function createTerrain(options) {
     beams.mat.opacity = BASE.beam * weight;
     capMat.opacity = BASE.cap * weight;
     spkMat.opacity = BASE.sparkle * weight * (0.3 + 0.7 * detail);
+    if (beamMirror) beamMirror.mat.opacity = BASE.beamMirror * weight;
   }
 
   function setDetail(k) {
@@ -558,7 +636,7 @@ export function createTerrain(options) {
 
   return {
     group: group, beacons: beacons, sparkles: sparkles, summits: summits,
-    layers: layers, mirrors: mirrors, stats: stats,
+    layers: layers, mirrors: mirrors, stats: stats, beamMirror: beamMirror,
     applyWeight: applyWeight, setDetail: setDetail, update: update, dispose: dispose
   };
 }
