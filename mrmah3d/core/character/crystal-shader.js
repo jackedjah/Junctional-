@@ -332,7 +332,13 @@ export function applyCrystalShader(material, options) {
            lost plane at the contour stays steel rather than turning blue —
            reviewed, every dark on the body was saturated blue where the
            reference's darks are neutral. */
-        '    outgoingLight += uTint * mrF * 0.55 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
+        /* R95: SOFT-LIMITED. On the linear pipeline the additive term clipped
+           per channel to a 1-2 px pure-white stroke on the turned-away flank;
+           the references' contour is a broad blue gradient. A saturating curve
+           keeps the add chromatic however grazing the pixel, and the wider lobe
+           (uFresnelPower 2.6 -> 2.0, set in materials) spreads it. */
+        '    float mrRim = 1.0 - exp( -1.6 * mrF );',
+        '    outgoingLight += uTint * mrRim * 0.50 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
         /* R94 — the internal light. See the uniform note above. */
         '    if ( uInnerStrength > 0.0 && vInner > 0.5 ) {',
         '      vec3 mrN = normalize( vObjN );',

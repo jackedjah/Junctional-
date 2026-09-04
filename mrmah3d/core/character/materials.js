@@ -402,6 +402,7 @@ export function createCrystalMaterials(options) {
        doing what it can genuinely do, which is deepen the turn on facets that
        are already lit. */
     fresnelBoost: 1.30,
+    fresnelPower: 2.0,
     /* R94 — the taper's internal light (see crystal-shader.js). Sapphire, not
        cyan: the reference's taper is a saturated royal blue lit from within,
        and the cyan belongs to the edges. The source sits a third of the way up
@@ -460,7 +461,7 @@ export function createCrystalMaterials(options) {
     /* A small self-lit floor: it is what populates the 64-127 bands the
        reference's shell has and this one lacked, without touching the top. */
     emissive: new Color(tint.headCrystal || PALETTE.headCrystal),
-    emissiveIntensity: 0.05
+    emissiveIntensity: 0.09
   });
   applyCrystalShader(head, {
     tint: PALETTE.headTint,

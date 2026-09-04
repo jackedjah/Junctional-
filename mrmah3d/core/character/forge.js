@@ -882,13 +882,21 @@ export function diamondCrystal(opts) {
     girdle.push({ x: ct * k * hw, y: st * k * hh });
   }
 
-  function ring(scale, z, jitterSeed) {
+  function ring(scale, z, jitterSeed, insetZig) {
     return girdle.map(function (p, i) {
       /* A little depth scatter on the bevel ring gives the front facets
          genuinely different tilts, which is what makes the head catch light in
          several places instead of reading as one plate. */
       var jz = jitterSeed == null ? 0 : (hash2(i * 3 + jitterSeed, jitterSeed) - 0.5) * 2 * relief * hd;
-      return push(p.x * scale, p.y * scale, z + jz);
+      /* R95 — AN IN-PLANE ZIGZAG ON THE INNER RINGS. Reviewed, each side of a
+         crown band was four coplanar quads (all four points sit on the same
+         diamond edge, only z scattered), so a band reflected one environment
+         region as one plate. Alternate points now sit a little inside or
+         outside the nominal inset, which breaks each side into planes that tilt
+         left and right as well as in and out — the many small facets a cut
+         frame shows. The silhouette ring never takes it. */
+      var s = scale * (1 + (insetZig || 0) * (i % 2 ? 1 : -1) * (i % 4 < 2 ? 1 : -0.6));
+      return push(p.x * s, p.y * s, z + jz);
     });
   }
 
@@ -918,10 +926,10 @@ export function diamondCrystal(opts) {
   var innerZ = (opts.innerZ == null ? 0.30 : opts.innerZ) * hd;
   var innerInset = opts.innerInset == null ? 0.62 : opts.innerInset;
 
-  var E = ring(1, 0, null);                 /* the silhouette — never jittered */
-  var C = ring(crownInset, crownZ, 11);     /* crown band */
-  var B = ring(bevel, bevelZ, 5);           /* table edge / recess lip */
-  var I = ring(innerInset, innerZ, 17);     /* inner bevel, inside the opening */
+  var E = ring(1, 0, null);                       /* the silhouette — never jittered */
+  var C = ring(crownInset, crownZ, 11, 0.030);    /* crown band */
+  var B = ring(bevel, bevelZ, 5, 0.022);          /* table edge / recess lip */
+  var I = ring(innerInset, innerZ, 17, 0.014);    /* inner bevel, inside the opening */
   var F = ring(face, faceZ, null);          /* the recessed face plate */
   var back = push(0, 0, backZ);
 
