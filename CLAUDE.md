@@ -739,6 +739,23 @@ because an arm's local origin is its shoulder joint and its whole length sits
 inside the gate. `aInner` (a per-geometry attribute) marks the one solid that
 carries the light; the material stays shared.
 
+### Luma is green, and the reference's darks are steel
+
+Over the chest on identical framing the render was 66% below 32 luma with
+4.6% in 32–63 (reference 48% / 28%). A stronger fill, a tripled hemisphere
+and a lifted deep colour each measured as a no-op, because every soft source
+and the deep colour were saturated blue: the darks came out (6,31,83), which
+is blue with no luminance however bright the light. Sampled, the reference's
+lost planes are (24,27,35)–(45,54,71) — near-neutral steel — and its blue
+lives in the lit and transmitting crystal. So the deep colour and the soft
+lights are steel, the key is strong enough that a key-lit facet's DIFFUSE
+registers (before, every visible "lit" plane was an environment-card
+reflection and the histogram was bimodal by construction), and the
+environment reflection comes down so it no longer outweighs the middle.
+Two habits from this: sample the pixels before theorising about the light,
+and measure before/after on IDENTICAL framing — a box on a differently
+framed capture compared 'before' and 'after' of two different regions.
+
 ### The silhouette halo is a screen-space thing
 
 An additive shell floors the body's own darks wherever the surface folds, and
