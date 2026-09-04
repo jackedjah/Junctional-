@@ -349,6 +349,23 @@ export var TORSO = {
      read as one continuous surface with seams drawn on it however the anatomy
      underneath was shaped. Anatomy needs a value range to be seen through. */
   classLift: 0.14,
+  /* AUTHORED HERO REGIONS — `hero` overrides classLift for one band.
+
+     The class lottery is steered by face AREA, which is a good proxy for visual
+     weight and a poor one for anatomical importance: it cannot know that the
+     clavicle carries the light on a body and the abdomen does not. So the brief
+     asks for named hero regions, and these are them, top to bottom:
+
+       2.130  clavicle / trapezius   0.46   the brightest band on the torso
+       2.040  upper pec              0.40
+       1.930  pectoral line          0.34
+       1.620  lower ribcage          0.06   deliberately BELOW the part's lift
+       1.400  waist                  0.04   the darkest band on the body
+       0.950  one lower-body plane   0.30   a single catch in the taper
+
+     The dark bands matter as much as the bright ones. A hero region only reads
+     as one if what surrounds it recedes, and an abdomen that catches as readily
+     as a collarbone is the flat, evenly-lit torso this build kept producing. */
   rings: [
     /* FEWER, LARGER PLANES DOWN THE CONE.
 
@@ -416,26 +433,26 @@ export var TORSO = {
     { y: 0.175, w: 0.050, d: 0.034, facet: 0.0121, crystal: 0.0380, crystalY: 0.0090 },
     { y: 0.400, w: 0.110, d: 0.072, facet: -0.0121, crystal: 0.0520, crystalY: 0.0130 },
     { y: 0.680, w: 0.178, d: 0.112, facet: 0.0110, crystal: 0.0620, crystalY: 0.0150 },
-    { y: 0.950, w: 0.236, d: 0.142, facet: -0.0110, crystal: 0.0680, crystalY: 0.0160 },
+    { y: 0.950, w: 0.236, d: 0.142, facet: -0.0110, crystal: 0.0680, crystalY: 0.0160, hero: 0.30 },
     /* hip swell — the widest point of the lower mass, and modest */
     { y: 1.180, w: 0.264, d: 0.154, facet: 0.0099, crystal: 0.0640, crystalY: 0.0150,
       shape: coreShape(0.55) },
     /* THE WAIST. The one concave moment in the outline. */
     { y: 1.400, w: 0.244, d: 0.146, facet: -0.0099, crystal: 0.0600, crystalY: 0.0140,
-      shape: coreShape(1.0) },
+      shape: coreShape(1.0), hero: 0.04 },
     /* ribcage opening back out — lower abdominal into the rib arch */
     { y: 1.620, w: 0.298, d: 0.172, facet: 0.0088, crystal: 0.0640, crystalY: 0.0150,
-      shape: coreShape(0.85) },
+      shape: coreShape(0.85), hero: 0.06 },
     { y: 1.800, w: 0.320, d: 0.198, facet: -0.0088, crystal: 0.0660, crystalY: 0.0150,
       shape: chestShape(0.70) },
     /* the pectoral line — the strongest cross-section shaping on the body */
     { y: 1.930, w: 0.328, d: 0.206, facet: 0.0077, crystal: 0.0560, crystalY: 0.0115,
-      shape: chestShape(1.0) },
+      shape: chestShape(1.0), hero: 0.34 },
     { y: 2.040, w: 0.322, d: 0.196, facet: -0.0055, crystal: 0.0440, crystalY: 0.0080,
-      shape: chestShape(0.80) },
+      shape: chestShape(0.80), hero: 0.40 },
     /* THE SHOULDER LINE — collarbones across the front, trapezius behind */
     { y: 2.130, w: 0.290, d: 0.166, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
-      shape: clavicleShape(1.0), dip: 0.030 },
+      shape: clavicleShape(1.0), dip: 0.030, hero: 0.46 },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
        The torso used to end at the shoulder line in a flat lid. A lid 1.11

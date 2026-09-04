@@ -198,14 +198,31 @@ export function facetedGeometry(positions, faces, groups, options) {
        constant across the triangle and the facet reads as one material. */
     /* Triangle area, from the cross product already computed above: |u x v|/2
        is exactly `len / 2`, so the hierarchy costs nothing extra. */
-    var k = facetClass(faceIndex++, len * 0.5, opts.lift);
+    var k = facetClass(faceIndex++, len * 0.5, faceLift);
     for (var v = 0; v < 3; v++) fac.push(k[1], k[2], k[3], k[4]);
     written += 3;
   }
 
+  /* PER-POLYGON LIFT — the mechanism behind authored hero regions.
+
+     `opts.lift` biases a whole part away from the black end of the class table.
+     That is the right granularity for "arms lighter than the torso" and the
+     wrong one for "the clavicle and the outer ribcage carry the catches while
+     the abdomen stays dark", which is how the reference actually distributes
+     light on a body: not evenly, and not by area either.
+
+     `opts.faceLift` is an array indexed by POLYGON — the entry in `faces`, not
+     the triangle — so a quad and both of its triangles share one value and a
+     lofted band can hand its own lift to every quad in it. Falls back to
+     `opts.lift` wherever it is absent, so nothing that does not use it changes. */
+  var faceLift = opts.lift;
+  var polyIndex = 0;
   (groups || [{ faces: faces, material: 0 }]).forEach(function (g) {
     var start = written;
     g.faces.forEach(function (f) {
+      if (opts.faceLift && opts.faceLift[polyIndex] != null) faceLift = opts.faceLift[polyIndex];
+      else faceLift = opts.lift;
+      polyIndex++;
       if (f.length === 3) emitTri(f[0], f[1], f[2]);
       else { emitTri(f[0], f[1], f[2]); emitTri(f[0], f[2], f[3]); }
     });
@@ -324,12 +341,17 @@ export function loft(sections, sides, options) {
   });
 
   var faces = [];
+  /* One lift per quad, taken from the band's upper ring, so the ring table can
+     say "this is a hero band" the same way it says how wide it is. */
+  var faceLift = [];
+  function pushFace(f, heroLift) { faces.push(f); faceLift.push(heroLift); }
   for (var r = 0; r < rings.length - 1; r++) {
     var lo = rings[r], hi = rings[r + 1];
+    var bandLift = sections[r + 1].hero == null ? sections[r].hero : sections[r + 1].hero;
     if (lo.point != null && hi.verts) {
-      for (var i = 0; i < sides; i++) faces.push([lo.point, hi.verts[i], hi.verts[(i + 1) % sides]]);
+      for (var i = 0; i < sides; i++) pushFace([lo.point, hi.verts[i], hi.verts[(i + 1) % sides]], bandLift);
     } else if (lo.verts && hi.point != null) {
-      for (var i2 = 0; i2 < sides; i2++) faces.push([lo.verts[i2], hi.point, lo.verts[(i2 + 1) % sides]]);
+      for (var i2 = 0; i2 < sides; i2++) pushFace([lo.verts[i2], hi.point, lo.verts[(i2 + 1) % sides]], bandLift);
     } else if (lo.verts && hi.verts) {
       for (var i3 = 0; i3 < sides; i3++) {
         var a1 = lo.verts[i3], b1 = lo.verts[(i3 + 1) % sides];
@@ -341,11 +363,11 @@ export function loft(sections, sides, options) {
            the reference shows. Splitting every quad the same way instead
            produced long uniform bands that read as a smooth cone. */
         if ((i3 + r) % 2 === 0) {
-          faces.push([a1, b1, c1]);
-          faces.push([a1, c1, d1]);
+          pushFace([a1, b1, c1], bandLift);
+          pushFace([a1, c1, d1], bandLift);
         } else {
-          faces.push([a1, b1, d1]);
-          faces.push([b1, c1, d1]);
+          pushFace([a1, b1, d1], bandLift);
+          pushFace([b1, c1, d1], bandLift);
         }
       }
     }
@@ -355,14 +377,15 @@ export function loft(sections, sides, options) {
   var first = rings[0], last = rings[rings.length - 1];
   if (capBottom && first.verts) {
     var cb = push(0, sections[0].y, 0);
-    for (var i4 = 0; i4 < sides; i4++) faces.push([cb, first.verts[(i4 + 1) % sides], first.verts[i4]]);
+    for (var i4 = 0; i4 < sides; i4++) pushFace([cb, first.verts[(i4 + 1) % sides], first.verts[i4]], sections[0].hero);
   }
   if (capTop && last.verts) {
     var ct = push(0, sections[sections.length - 1].y, 0);
-    for (var i5 = 0; i5 < sides; i5++) faces.push([ct, last.verts[i5], last.verts[(i5 + 1) % sides]]);
+    for (var i5 = 0; i5 < sides; i5++) pushFace([ct, last.verts[i5], last.verts[(i5 + 1) % sides]], sections[sections.length - 1].hero);
   }
 
-  return { geometry: facetedGeometry(positions, faces, null, { lift: opts.lift }), positions: positions, faces: faces };
+  return { geometry: facetedGeometry(positions, faces, null, { lift: opts.lift, faceLift: faceLift }),
+    positions: positions, faces: faces };
 }
 
 /* A tapered faceted limb segment running from point A to point B.

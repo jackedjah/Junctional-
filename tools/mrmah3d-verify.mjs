@@ -563,6 +563,7 @@ for (const v of VIEWPORTS) {
         gotY: ((minY + maxY) / 2) / g.height, wantY: want.screenY,
         gotH: (maxY - minY) / g.height, wantH: want.heightFrac,
         state: s.getState(), wantState: want.state,
+        aspect: g.width / g.height,
         onScreen: minX >= 0 && maxX < g.width && minY >= 0 && maxY < g.height
       });
     }
@@ -570,11 +571,32 @@ for (const v of VIEWPORTS) {
     return out;
   });
 
+  /* THE POSE'S SKEW IS STATED, NOT ABSORBED INTO A TOLERANCE.
+
+     One arm is raised and reaching and the other hangs, so the alpha bounding
+     box is centred to the RIGHT of the body axis. The camera composes around
+     the axis, as the reference does — measured on the anatomical reference the
+     character's bounding box sits at 0.553 of the frame while his torso axis
+     sits at 0.499 — so the expected reading is the mode's screenX plus that
+     skew, not screenX itself.
+
+     It used to be swallowed by a loose X tolerance, and that hid a real
+     question: lengthening the arms to the reference's reach took the showcase
+     measurement to 0.556, one thousandth past the allowance, and the failure
+     read as a framing bug rather than as the pose growing. Computing the skew
+     from the pose's own extents means a change to the arms moves the
+     expectation with it, and a genuine framing fault — a mirrored axis, a drift
+     — still fails.
+
+     skew(frame fractions) = POSE.centreX * heightFrac / (characterHeight * aspect),
+     since the frame is characterHeight/heightFrac tall in world units and
+     aspect times that wide. */
+  const POSE_CENTRE_X = 0.1535;   /* proportions.js POSE.centreX */
+  const CHARACTER_H = 3.0;
   modes.forEach(m => {
-    /* X tolerance is looser than Y: the raised arm makes his alpha bounding
-       box asymmetric, so its centre sits right of his body axis. */
-    check(`MODE-${m.name} horizontal placement`, Math.abs(m.gotX - m.wantX) <= 0.055,
-      `${m.gotX.toFixed(3)} vs intent ${m.wantX}`);
+    const skew = POSE_CENTRE_X * m.wantH / (CHARACTER_H * (m.aspect || 1));
+    check(`MODE-${m.name} horizontal placement`, Math.abs(m.gotX - (m.wantX + skew)) <= 0.035,
+      `${m.gotX.toFixed(3)} vs intent ${m.wantX} + pose skew ${skew.toFixed(3)}`);
     check(`MODE-${m.name} vertical placement`, Math.abs(m.gotY - m.wantY) <= 0.045,
       `${m.gotY.toFixed(3)} vs intent ${m.wantY}`);
     check(`MODE-${m.name} scale in frame`, Math.abs(m.gotH - m.wantH) <= 0.045,

@@ -29,12 +29,22 @@
 
 import { PerspectiveCamera, Vector3, MathUtils } from '../vendor/three/three.module.min.js';
 import { solveFraming, getMode } from './composition.js';
-/* The pose's visual centre. Imported rather than threaded through the scene for
-   the same reason characterHeight has a default here: it is a fact about the
-   character that the camera has to know, and there is one source of truth for
-   it. `opts.poseCentreX` still overrides, for a host that poses him
-   differently. */
-import { POSE } from './character/proportions.js';
+/* THE CAMERA COMPOSES AROUND THE BODY AXIS, NOT THE SILHOUETTE'S CENTRE.
+
+   This briefly did the opposite. MODE-showcase measures the rendered alpha
+   bounding box and reported 0.556 against an intent of 0.500 once the arms were
+   lengthened, which looks exactly like a framing bug — so the solver was given
+   the pose's visual centre and the check went green.
+
+   It was the wrong fix, and the reference says so: measured on
+   `mrmah-refA-anatomical.png` the character's own bounding box is centred at
+   0.553 of the frame while his torso axis sits at 0.499. The reference composes
+   around the AXIS and lets the raised arm reach into the space on that side.
+   Centring the mass instead pushes the body left and reads as an off-centre
+   character, which is not what any of the references show.
+
+   So the offset stays out of the camera and is stated where it belongs: as the
+   expected skew in the verification, derived from the same pose numbers. */
 
 export var LEGACY_STAGE = { fov: 55, pitchDeg: 26, distance: 7.2, targetY: 1.05 };
 
@@ -74,8 +84,7 @@ export function createCamera(options) {
   }
 
   function applyMode(aspect) {
-    var solved = solveFraming(mode, aspect, characterHeight, floatHeight,
-      opts.poseCentreX == null ? POSE.centreX : opts.poseCentreX);
+    var solved = solveFraming(mode, aspect, characterHeight, floatHeight, opts.poseCentreX);
     camera.fov = solved.fov;
     camera.position.copy(solved.position);
     target.copy(solved.target);
