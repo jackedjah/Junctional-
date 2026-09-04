@@ -155,20 +155,23 @@ export var MODES = {
     state: 'idle'
   },
 
-  /* WEBSITE-CANONICAL — R94, measured off reference/mrmah-refC-luminous-b.png
-     (941 x 1671): head apex at 0.090 of the frame, taper tip at 0.778, so he
-     spans 0.688 of the height with his centre at 0.434; centred horizontally;
-     the horizon sits LOW, at ~0.74, so the camera is a little below his chest
-     and pitched up — the hero framing for a marketing page, with the mountain
-     line and its beacons filling the lower third behind him. Dead front. */
+  /* WEBSITE-CANONICAL — measured off reference/mrmah-refC-luminous-b.png
+     (941 x 1671). R95 CORRECTION: the first numbers here (apex 0.090, tip
+     0.778) were read by eye from a thumbnail and were wrong by a tenth of the
+     frame; an independent review flagged it and a 1.6x crop of the top and
+     bottom of the reference settled it — the head apex sits at 0.19 of the
+     frame, the taper tip at 0.80, so he spans 0.61 of the height with his
+     centre at 0.495, centred horizontally, and the horizon (mist meeting
+     floor) lies at ~0.66. More sky above him than the showcase, the mountain
+     line and beacons behind his lower half. Dead front. */
   website: {
     label: 'website',
     fov: 34,
-    heightFrac: 0.688,
+    heightFrac: 0.610,
     screenX: 0.50,
-    screenY: 0.434,
+    screenY: 0.495,
     azimuthDeg: 0,
-    elevation: 1.05,
+    elevation: 0.95,
     world: { grid: 1.0, nodes: 1.0, structures: 1.0, motes: 1.0, glow: 1.0, fogNear: 12, fogFar: 60 },
     state: 'idle'
   },
