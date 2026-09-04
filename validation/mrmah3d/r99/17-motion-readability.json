@@ -1,0 +1,10 @@
+{
+  "tool": "scratch motion.mjs — luminance travel over the character's own pixels across a yaw sweep, showcase, high tier",
+  "yawSweep": 0.3,
+  "steps": 6,
+  "characterPixels": 73602,
+  "travelPerStep": 6.09,
+  "rangeOverSweep": 24.55,
+  "bandCrossers": "27.7%",
+  "note": "R99c build (directional rim, platinum coat). Kept as the baseline for the next pass; no earlier record of this metric exists in the repository."
+}
