@@ -68,7 +68,14 @@ export function applyCrystalShader(material, options) {
        the right control for exactly that, because it scales by the facet's OWN
        darkness: raising it pulls the dark classes down and leaves the lit ones
        where they are, which widens the distribution instead of moving it. */
-    uInnerDark: { value: opts.innerDark == null ? 0.60 : opts.innerDark },
+    /* R93: 0.60 -> 0.80, on the luminous references. Measured over the chest,
+       they are DARKER than this build, not brighter: mean 55 against 95, with
+       42% of the torso below 32 luma where this had 10%. They read as luminous
+       through CONTRAST — a deep body with a hard bright contour and a few
+       brilliant catches — which is the opposite of the flat mid-blue this had
+       settled into. Absorption is the control that deepens the dark classes
+       without touching the lit ones. */
+    uInnerDark: { value: opts.innerDark == null ? 0.62 : opts.innerDark },
     uTint: { value: tintColor },
     uDeep: { value: deepColor },
     uVariation: { value: opts.variation == null ? 1.0 : opts.variation },
@@ -254,7 +261,18 @@ export function applyCrystalShader(material, options) {
            did so AFTER the per-facet classes had carefully separated them.
            It is now scaled by the facet's own tint class, so the chromatic
            faces still catch cyan and the black faces stay black. */
-        '    outgoingLight += uTint * mrF * 0.10 * clamp( vFacet.w, 0.0, 1.0 );',
+        /* R93 — THE ADDITIVE GRAZING TERM IS WHAT LIGHTS A DARK CONTOUR.
+           The Fresnel boost above is MULTIPLICATIVE, so on a deep body it has
+           almost nothing to multiply: raising it from 1.00 to 2.90 changed the
+           frame barely at all, because 2.9 times near-zero is near-zero. The
+           luminous references put a broad bright band along every silhouette
+           edge of a body that is otherwise very dark, and only an additive term
+           can do that.
+           Raised from 0.10 to 0.55, and the tint-class gate relaxed from a
+           multiplier to a floor of 0.35 — the chromatic facets still take the
+           most of it, but a black facet at the contour is no longer excluded
+           from the one effect that defines the silhouette. */
+        '    outgoingLight += uTint * mrF * 0.55 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) );',
         '  }',
         '#endif',
         '#include <opaque_fragment>'

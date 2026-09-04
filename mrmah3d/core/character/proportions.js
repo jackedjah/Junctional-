@@ -386,6 +386,14 @@ export var TORSO = {
      clavicle carries the light on a body and the abdomen does not. So the brief
      asks for named hero regions, and these are them, top to bottom:
 
+       R93 adds hero bands DOWN THE TAPER as well, which the earlier table left
+       flat. Measured against the luminous references, the lower body was 82% of
+       its pixels inside a single value band — the right average with no variance
+       at all, i.e. a slab. The reference's taper is mostly near-black with a
+       scatter of genuinely lit planes among it, and alternating the hero weight
+       ring by ring is what produces that: 0.52 at y 0.680 and 0.38 at y 0.400
+       against 0.04 at the waist.
+
        2.130  clavicle / trapezius   0.46   the brightest band on the torso
        2.040  upper pec              0.40
        1.930  pectoral line          0.34
@@ -461,12 +469,12 @@ export var TORSO = {
        what lets the taper read as elegant rather than as a skirt. */
     { y: 0.000, w: 0.006, d: 0.004 },
     { y: 0.175, w: 0.050, d: 0.034, facet: 0.0121, crystal: 0.0380, crystalY: 0.0090 },
-    { y: 0.400, w: 0.110, d: 0.082, facet: -0.0121, crystal: 0.0520, crystalY: 0.0130 },
-    { y: 0.680, w: 0.178, d: 0.132, facet: 0.0110, crystal: 0.0620, crystalY: 0.0150 },
-    { y: 0.950, w: 0.236, d: 0.172, facet: -0.0110, crystal: 0.0680, crystalY: 0.0160, hero: 0.30 },
+    { y: 0.400, w: 0.110, d: 0.082, facet: -0.0121, crystal: 0.0520, crystalY: 0.0130, hero: 0.38 },
+    { y: 0.680, w: 0.178, d: 0.132, facet: 0.0110, crystal: 0.0620, crystalY: 0.0150, hero: 0.52 },
+    { y: 0.950, w: 0.236, d: 0.172, facet: -0.0110, crystal: 0.0680, crystalY: 0.0160, hero: 0.44 },
     /* hip swell — the widest point of the lower mass, and modest */
     { y: 1.180, w: 0.264, d: 0.192, facet: 0.0099, crystal: 0.0640, crystalY: 0.0150,
-      shape: coreShape(0.55) },
+      shape: coreShape(0.55), hero: 0.26 },
     /* THE WAIST. The one concave moment in the outline. */
     { y: 1.400, w: 0.244, d: 0.182, facet: -0.0099, crystal: 0.0600, crystalY: 0.0140,
       shape: coreShape(1.0), hero: 0.04 },

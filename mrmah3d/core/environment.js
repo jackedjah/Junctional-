@@ -649,10 +649,51 @@ export function createEnvironment(options) {
      cause is completely different. Moved outboard to |x| 38-58 they flank the
      convergence instead of standing in it, and the near/far depth they were
      added for survives intact. */
-  [[-38, -44, 5.5, 10.0], [46, -50, 6.2, 12.0], [-60, -56, 7.0, 14.0],
-   [-30, -62, 6.0, 7.5], [34, -70, 7.0, 9.0], [-52, -78, 8.0, 10.5], [56, -84, 7.5, 9.5],
-   [-14, -90, 9.0, 12.0], [24, -96, 8.5, 11.0], [-70, -99, 9.5, 12.5]]
+  /* R93 — A BEAM STANDS ON EVERY NEAR PEAK.
+
+     Both luminous references put a thin vertical shaft of light rising out of
+     the mountain summits, and it is the single most identifiable thing about
+     that world: it is what makes the range read as built and inhabited rather
+     than as scenery, and it is the only place the environment is allowed to
+     carry the secondary colour. Two crossed quads per beam so they keep their
+     width when the subject is dragged, and only the near tier gets one — a beam
+     on every summit would be a fence. */
+  var peakBeams = new Group();
+  peakBeams.name = 'peak-beams';
+  var beamTex = rampTexture();
+  var beamMat = new MeshBasicMaterial({
+    map: beamTex, color: new Color(0xa8e4ff), transparent: true, opacity: 0.52,
+    blending: AdditiveBlending, depthWrite: false, toneMapped: false,
+    side: DoubleSide, fog: true
+  });
+  owned.push(beamTex, beamMat);
+
+  /* Two SHORT peaks near the centre azimuth exist to carry beams into frame.
+
+     The near tier sits at |x| 38-60 because bringing it inboard cost the floor
+     its convergence rows, and at that azimuth its beams never reached any
+     composition — present, correct, invisible, which is this scene's most
+     repeated failure. These two are deliberately low (7 units, well under the
+     horizon line) so they occlude almost nothing, and their beams do the work:
+     a beam is 0.3 units wide and lives entirely above the summit, so it costs
+     the grid nothing at any azimuth. */
+  [[-23, -41, 3.4, 7.0, 1], [26, -46, 3.8, 7.6, 1],
+   [-38, -44, 5.5, 10.0, 1], [46, -50, 6.2, 12.0, 1], [-60, -56, 7.0, 14.0, 1],
+   [-30, -62, 6.0, 7.5, 0], [34, -70, 7.0, 9.0, 0], [-52, -78, 8.0, 10.5, 0], [56, -84, 7.5, 9.5, 0],
+   [-14, -90, 9.0, 12.0, 0], [24, -96, 8.5, 11.0, 0], [-70, -99, 9.5, 12.5, 0]]
     .forEach(function (s) {
+      if (s[4]) {
+        /* Rising FROM the summit, so its base is hidden inside the peak and it
+           reads as emitted rather than as a quad standing next to a mountain. */
+        var bh = s[3] * 3.2;
+        [0, Math.PI / 2].forEach(function (rot) {
+          var bq = new Mesh(new PlaneGeometry(0.30, bh), beamMat);
+          bq.position.set(s[0], s[3] + bh * 0.42, s[1]);
+          bq.rotation.y = rot;
+          peakBeams.add(bq);
+          owned.push(bq.geometry);
+        });
+      }
       var geo = new ConeGeometry(s[2], s[3], 4, 1);
       var m = new Mesh(geo, structMat);
       m.position.set(s[0], s[3] / 2, s[1]);
@@ -666,6 +707,7 @@ export function createEnvironment(options) {
       owned.push(geo, eg);
     });
   group.add(structures);
+  group.add(peakBeams);
 
   /* ---- 5b. light pillars ----------------------------------------------- */
   /* The vertical beams standing in Reference A's landscape. They do more than
@@ -843,6 +885,7 @@ export function createEnvironment(options) {
        lose all of it together rather than in pieces. */
     var st = w.structures == null ? 1 : w.structures;
     pillars.visible = st > 0.05;
+    peakBeams.visible = st > 0.05;
     stars.visible = st > 0.05;
     starMat.opacity = 0.55 * st;
     /* The presence field follows the glow weight, so a mode that wants a quiet

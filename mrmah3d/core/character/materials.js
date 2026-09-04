@@ -211,7 +211,12 @@ export function createCrystalMaterials(options) {
        were laying a continuous cyan web over the whole torso — which is both
        the "wireframe feel" note and a large part of "too blue overall", since
        an additive cyan line brightens every pixel it crosses. */
-    opacity: 0.40,
+    /* R93: 0.40 -> 0.62. The luminous references carry a hard bright contour all
+       the way round the silhouette and along every structural break — it is
+       most of why they read as lit crystal rather than as dark glass. With the
+       body deepened this tier has to carry more of the frame, and it can: it is
+       toneMapped:false, so it holds its value while the crystal comes down. */
+    opacity: 0.62,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -229,7 +234,7 @@ export function createCrystalMaterials(options) {
   var edgeHalo = new LineBasicMaterial({
     color: new Color(tint.edge || PALETTE.edge),
     transparent: true,
-    opacity: 0.16,
+    opacity: 0.26,
     blending: AdditiveBlending,
     depthWrite: false,
     depthTest: true,
@@ -247,7 +252,7 @@ export function createCrystalMaterials(options) {
   var edgeHero = new LineBasicMaterial({
     color: new Color(PALETTE.edgeHot),
     transparent: true,
-    opacity: 0.85,
+    opacity: 1.00,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -357,7 +362,33 @@ export function createCrystalMaterials(options) {
        against a black one — the bright end measured 9.2% above 190 luma where
        the brief asks for 2-5%. Trimmed rather than removed: it is still what
        puts light on the contour. */
-    fresnelBoost: 1.00
+    /* R93: 1.00 -> 1.75. The luminous references put a hard, bright contour on
+       every silhouette edge — shoulders, arms, head, the taper — and that
+       contour is most of why they read as lit crystal rather than as dark
+       glass. Fresnel is the right owner for it: it follows real curvature per
+       pixel, so it lights the contour without laying anything across the faces,
+       which is exactly what the rim shells were removed for failing to do. */
+    /* R93: 1.75 -> 2.9. The contour in the luminous references is not a line —
+       it is a broad gradient of light running along every edge of the
+       silhouette, several pixels wide and falling off into the body. A line
+       tier cannot make that however bright it is set, because it is one pixel
+       by construction; Fresnel can, because it follows real curvature per
+       fragment and widens wherever the surface turns away gently.
+
+       This is the third time this number has moved and the reasoning is finally
+       separable: it was cut to 0.92 on the theory that it was flattening the
+       head (wrong — that was the rim shell), restored to 1.30, cut to 1.00 when
+       the body went sapphire and the bright end ran high, and raised now
+       because the body has been deepened and the contour has to carry the
+       frame. Fresnel brightens what has turned AWAY, so on a deep body it costs
+       the darks nothing. */
+    /* Settled at 1.60. 2.90 was tried and measured as very nearly nothing,
+       which is the useful result: this term is MULTIPLICATIVE, so on a deep
+       body it has almost no value to multiply. The contour is carried by the
+       additive grazing term in crystal-shader.js instead; this one is back to
+       doing what it can genuinely do, which is deepen the turn on facets that
+       are already lit. */
+    fresnelBoost: 1.30
   });
 
   /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */

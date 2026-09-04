@@ -276,6 +276,8 @@ function buildEnvironment(renderer, palette) {
     var wob = Math.sin(sIdx * 12.9898) * 43758.5453;
     wob = wob - Math.floor(wob);
     var sw = 9 + wob * 9;
+    /* R93 tried cutting these by a third to deepen the body and it was part of
+       an overshoot that had to be reverted — see the note on exposure below. */
     var sa = 0.135 + wob * 0.185;
     var sy = 30 + wob * 18;
     var sh = 52 + wob * 28;
