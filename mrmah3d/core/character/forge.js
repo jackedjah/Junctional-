@@ -17,10 +17,103 @@ import { BufferGeometry, Float32BufferAttribute } from '../../vendor/three/three
    with FLAT per-face normals. Vertices are expanded per-face rather than
    shared, because a shared vertex would average its neighbours' normals and
    soften exactly the facet edges we are trying to create. */
+/* THE OPTICAL LOTTERY — how a crystal stops being a blue mosaic.
+
+   Adding polygons was not enough: every facet still received the same material
+   treatment, so the body read as a polygon mosaic in one hue. A real cut stone
+   does not behave that way. Depending on how deep the light travels and what
+   it meets on the way out, one face returns almost nothing, its neighbour
+   returns a near-white specular, another passes light and goes translucent.
+
+   Each triangle is therefore assigned an optical CLASS here, once, at build
+   time. The distribution is authored rather than uniform, and weighted hard
+   toward the dark end — which is what the reference actually shows:
+
+     black      42%   returns almost nothing
+     charcoal   24%   very dark, slight sheen
+     deep       18%   dark blue, some transmission
+     cyan       10%   catches the cyan band
+     silver      6%   the rare bright specular face
+
+   The value is deterministic (a hash of the face index), so the pattern is
+   identical on every mount and in every screenshot — never Math.random().
+
+   Returned as a vec3 attribute the shader reads:
+     x  roughness offset   (dark faces are rougher and reflect less)
+     y  metalness offset   (silver faces are more mirror-like)
+     z  darkness           (0 = full value, 1 = swallowed) */
+/* ROUGHNESS IS NOT THE WAY TO MAKE A FACET DARK.
+
+   The first version of this table darkened the black class by roughening it to
+   0.6+, on the reasoning that a rough face kills its own reflection. It does
+   the opposite: roughness widens the reflection lobe, so a rough facet returns
+   the AVERAGE of the surrounding environment rather than a single direction.
+   With any environment that is not itself black, that average is a solid
+   mid-tone, and the darkest class rendered as the same blue as everything else.
+
+   Darkness now comes from where it physically comes from — a near-black albedo
+   (`dark`) and a low metalness, so there is little diffuse to light and little
+   reflection to return — while roughness stays LOW across the whole table so
+   every facet keeps a sharp, directional reflection. A sharp reflection of a
+   mostly-black room is black; the same facet rotated a few degrees onto a light
+   card is white. That hit-or-miss behaviour across neighbouring planes is the
+   entire optical effect, and a broad lobe averages it away. */
+var FACET_CLASSES = [
+  /* w,    rough,  metal,  dark,  tint */
+  [0.42,   0.16,  -0.34,   0.94,  0.00],   /* black    */
+  [0.24,   0.09,  -0.16,   0.68,  0.04],   /* charcoal */
+  [0.18,   0.02,   0.04,   0.30,  0.30],   /* deep     */
+  [0.10,  -0.04,   0.18,  -0.08,  1.00],   /* cyan     */
+  [0.06,  -0.06,   0.30,  -0.72,  0.24]    /* silver   */
+];
+
+/* Five classes give five values, and five values across a few hundred facets is
+   a mosaic — which is exactly what it looked like. Measured against the
+   reference, the classes alone piled 45% of the character's pixels into a
+   single band while the reference spreads its midtones evenly across four.
+
+   So each face also gets a JITTER on top of its class, from a second
+   independent hash. Same class, still visibly different face. It costs nothing
+   (the values are baked into the attribute at build time) and it is what turns
+   five discrete steps into a continuous range, which is the difference between
+   a polygon mosaic and a cut stone.
+
+   Both hashes are deterministic functions of the face index — never
+   Math.random() — so the character is byte-identical on every mount and every
+   screenshot, and a comparison run measures the change I made rather than a new
+   roll of the dice. */
+function facetClass(i) {
+  var n = Math.sin(i * 78.233 + 12.9898) * 43758.5453;
+  var r = n - Math.floor(n);
+  var m = Math.sin(i * 39.719 + 4.1414) * 24634.6345;
+  var j = (m - Math.floor(m)) * 2 - 1;          /* -1 .. 1 */
+  var acc = 0;
+  for (var k = 0; k < FACET_CLASSES.length; k++) {
+    acc += FACET_CLASSES[k][0];
+    if (r <= acc) {
+      var c = FACET_CLASSES[k];
+      return [
+        c[0],
+        c[1] + j * 0.05,                         /* roughness */
+        /* A plain offset. These four numbers are OFFSETS applied to the
+           material's own values, and the shader already clamps each resulting
+           factor into range — an earlier attempt to clamp here instead read
+           `max(0 - c[2], ...)`, which for the black class pinned its offset at
+           +0.34 and made the darkest facets the most metallic of all. */
+        c[2] + j * 0.10,                         /* metalness */
+        Math.max(-0.9, Math.min(1, c[3] + j * 0.26)),   /* darkness — the wide one */
+        Math.max(0, Math.min(1, c[4] + j * 0.14))       /* tint */
+      ];
+    }
+  }
+  return FACET_CLASSES[0];
+}
+
 export function facetedGeometry(positions, faces, groups) {
-  var pos = [], nor = [];
+  var pos = [], nor = [], fac = [];
   var groupRanges = [];
   var written = 0;
+  var faceIndex = 0;
 
   function emitTri(a, b, c) {
     var ax = positions[a * 3], ay = positions[a * 3 + 1], az = positions[a * 3 + 2];
@@ -33,6 +126,10 @@ export function facetedGeometry(positions, faces, groups) {
     nx /= len; ny /= len; nz /= len;
     pos.push(ax, ay, az, bx, by, bz, cx, cy, cz);
     nor.push(nx, ny, nz, nx, ny, nz, nx, ny, nz);
+    /* All three vertices of a face share its optical class, so the value is
+       constant across the triangle and the facet reads as one material. */
+    var k = facetClass(faceIndex++);
+    for (var v = 0; v < 3; v++) fac.push(k[1], k[2], k[3], k[4]);
     written += 3;
   }
 
@@ -48,6 +145,7 @@ export function facetedGeometry(positions, faces, groups) {
   var geo = new BufferGeometry();
   geo.setAttribute('position', new Float32BufferAttribute(pos, 3));
   geo.setAttribute('normal', new Float32BufferAttribute(nor, 3));
+  geo.setAttribute('aFacet', new Float32BufferAttribute(fac, 4));
   if (groupRanges.length > 1) {
     groupRanges.forEach(function (g) { geo.addGroup(g.start, g.count, g.material); });
   }

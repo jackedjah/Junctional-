@@ -49,17 +49,31 @@ function buildEnvironment(renderer, palette) {
      large zones with quick transitions between them. A facet's value then
      depends on which way it points, which is what a value hierarchy IS. */
   var grad = g.createLinearGradient(0, 0, 0, 128);
-  /* The zones are weighted toward DARK, deliberately. The reference puts a
-     third of the character's pixels in its darkest eighth and only about 3% in
-     its brightest; a top-heavy environment inverts that and the crystal comes
-     out pale. White is a small cap, cyan a narrow band, and everything below
-     the horizon is near black. */
-  grad.addColorStop(0.00, '#ffffff');   /* zenith: a small white cap */
-  grad.addColorStop(0.13, '#dff3ff');
-  grad.addColorStop(0.21, '#7cc4e4');   /* quick transition */
-  grad.addColorStop(0.31, '#256179');   /* the narrow cyan band */
-  grad.addColorStop(0.41, '#0b1d2a');   /* falls away fast */
-  grad.addColorStop(0.68, '#050d15');
+  /* THE SPHERE'S AVERAGE MUST BE DARK, and this is the correction that finally
+     made the body stop being blue.
+
+     A rough facet does not reflect a direction — it reflects the AVERAGE of the
+     environment around that direction. The previous sky was bright white-to-cyan
+     across its top 40%, and 40% of a sphere measured near the horizon is most of
+     its solid angle, so the average was mid-cyan. Every roughened facet
+     therefore returned mid-cyan no matter how black its albedo was, and the
+     "black" optical class could not produce a black pixel. That is the whole of
+     "ours is still too blue overall": not the albedo, not the facets, the
+     reflected average.
+
+     So the gradient is now essentially a dark room. The white cap is a sliver,
+     the cyan is a thin band, and everything from a fifth of the way down is
+     near black. The bright values the crystal needs come from the light cards
+     below, which are SMALL — small enough that a broad rough reflection barely
+     touches one, and only a smooth facet aimed straight at a card lights up.
+     Dark average, hot local sources: that is what "mostly black with sudden
+     silver catches" is made of. */
+  grad.addColorStop(0.00, '#ffffff');   /* zenith: a sliver of white cap */
+  grad.addColorStop(0.05, '#cfe9f7');
+  grad.addColorStop(0.11, '#4e8ea8');   /* falls away immediately */
+  grad.addColorStop(0.18, '#123243');   /* the thin cyan band */
+  grad.addColorStop(0.27, '#061019');
+  grad.addColorStop(0.68, '#03070c');
   /* The lower hemisphere is genuinely dark. It was lifted once because the
      arms were rendering as flat black bars — but the real cause was that they
      had no facet variation to catch anything with, not that the floor was too
@@ -87,15 +101,50 @@ function buildEnvironment(renderer, palette) {
 
      x is azimuth (0..256 = full turn), y is elevation (0 = zenith, 64 =
      horizon, 128 = nadir). */
+  /* SMALL and HOT, not large and warm.
+
+     The cards were previously wide enough that a facet could hardly avoid one,
+     which is another way of saying the sky was bright — it produced a lit body
+     rather than a body with catches on it. Shrinking them and pushing them to
+     full white turns each one into a source a facet either hits or misses. The
+     miss is what makes the neighbouring plane fall to black, and the hit/miss
+     alternation across a faceted surface IS the reference's "strategically
+     authored randomness".
+
+     There are more of them now, at scattered azimuths and elevations, so the
+     catches land all over the body instead of banding down one side. */
   var cards = [
-    /* key: large and near-white, front-left of the character */
-    { x: 8, y: 26, w: 74, h: 52, fill: 'rgba(255,255,255,0.95)' },
-    /* fill: cooler and weaker, opposite side */
-    { x: 150, y: 40, w: 52, h: 40, fill: 'rgba(186,230,250,0.55)' },
-    /* rim: narrow and bright cyan, behind */
-    { x: 214, y: 22, w: 30, h: 46, fill: 'rgba(140,240,255,0.80)' },
-    /* a small hot spot for the occasional true white catch */
-    { x: 40, y: 46, w: 22, h: 16, fill: 'rgba(255,255,255,1)' }
+    /* key: the main near-white source, front-left of the character */
+    { x: 14, y: 30, w: 34, h: 30, fill: 'rgba(255,255,255,1)' },
+    /* a second hot pinpoint just off the key — the true white catches */
+    { x: 52, y: 48, w: 14, h: 12, fill: 'rgba(255,255,255,1)' },
+    /* fill: cool, weaker, opposite side */
+    { x: 152, y: 44, w: 26, h: 22, fill: 'rgba(198,236,252,0.75)' },
+    /* rim: narrow bright cyan, behind — the chromatic catches */
+    { x: 216, y: 26, w: 18, h: 30, fill: 'rgba(150,244,255,0.95)' },
+    { x: 188, y: 62, w: 12, h: 12, fill: 'rgba(120,232,255,0.85)' },
+    /* a low silver bounce so downward-tilted facets are not uniformly dead */
+    { x: 96, y: 82, w: 20, h: 14, fill: 'rgba(228,244,255,0.55)' },
+
+    /* THE MIDTONE TIER — larger, dimmer, and the reason this list has two
+       kinds of entry.
+
+       With only small hot cards on a black sphere a facet either hits a source
+       or misses it, so the body came out bimodal: measured, 86% of the
+       character's pixels sat in the two darkest bands and 5% in the brightest,
+       with almost nothing between. The reference is not bimodal — it runs
+       33/28/15/9/6/4/3/3 straight down the range, and that continuous middle is
+       most of what makes it read as a solid object rather than a lit outline.
+
+       A midtone is a PARTIAL catch, which needs a source big enough to clip
+       with the edge of a reflection lobe and dim enough not to blow out when it
+       does. These are those: broad, weak, spread around the sphere so most
+       facets graze one. The hot cards above still supply the sparse silver. */
+    { x: 66, y: 34, w: 60, h: 44, fill: 'rgba(150,186,208,0.30)' },
+    { x: 120, y: 66, w: 72, h: 40, fill: 'rgba(120,160,186,0.26)' },
+    { x: 232, y: 54, w: 56, h: 44, fill: 'rgba(132,172,198,0.28)' },
+    { x: 4, y: 70, w: 52, h: 38, fill: 'rgba(112,150,178,0.24)' },
+    { x: 172, y: 18, w: 48, h: 32, fill: 'rgba(140,178,204,0.22)' }
   ];
   cards.forEach(function (c2) {
     var grd = g.createRadialGradient(
@@ -115,12 +164,16 @@ function buildEnvironment(renderer, palette) {
      pixels into a single mid-tone band where the reference spreads them evenly
      from black to white. Discrete steps give adjacent facets genuinely
      different reflections, which is what a real cut crystal does. */
+  /* The bright bands are now thin and the dark bands wide, for the same reason
+     the gradient was rebalanced: a band spanning the horizon covers an enormous
+     solid angle, so a "subtle" 0.30 cyan stripe there was lifting the sphere's
+     average more than the white cap was. Bright steps stay, but as slivers. */
   var bands = [
-    [0, 8, 'rgba(255,255,255,0.55)'],
-    [52, 8, 'rgba(10,20,30,0.60)'],
-    [68, 8, 'rgba(150,220,245,0.30)'],
-    [88, 12, 'rgba(6,12,18,0.55)'],
-    [108, 8, 'rgba(90,170,205,0.22)']
+    [0, 4, 'rgba(255,255,255,0.45)'],
+    [46, 14, 'rgba(4,9,14,0.72)'],
+    [66, 3, 'rgba(170,228,248,0.30)'],
+    [80, 18, 'rgba(3,7,11,0.70)'],
+    [110, 3, 'rgba(120,190,220,0.18)']
   ];
   bands.forEach(function (b) { g.fillStyle = b[2]; g.fillRect(0, b[0], 256, b[1]); });
 

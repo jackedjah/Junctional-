@@ -104,7 +104,36 @@ export var TORSO = {
     { y: 1.600, w: 0.498, d: 0.246, facet: 0.018, crystal: 0.056, crystalY: 0.014 },
     { y: 1.700, w: 0.518, d: 0.252, facet: -0.016, crystal: 0.044, crystalY: 0.010 },
     { y: 1.850, w: 0.548, d: 0.258, facet: 0.012, crystal: 0.026, crystalY: 0.005, dip: 0.055 },
-    { y: 1.932, w: 0.557, d: 0.260, facet: 0.010, dip: 0.130 }
+    { y: 1.932, w: 0.557, d: 0.260, facet: 0.010, dip: 0.030 },
+    /* THE CROWN — the upper chest rising beside the neck to meet the head.
+
+       The torso used to end at the shoulder line in a flat lid. A lid 1.11
+       units across, seen from a camera sitting at roughly shoulder height, drew
+       its whole perimeter as a bright ellipse and the character appeared to be
+       standing in a bucket. It was the most conspicuous artifact in the frame,
+       and it survived two wrong diagnoses (the rim shell's centring, then its
+       vertical inflation — both were real bugs, neither was this one).
+
+       The silhouette overlay settled it. There is a broad band of magenta —
+       reference mass the render does not have — directly beside the neck and
+       above the shoulder line, and the width profile confirms it: at t=0.30 the
+       reference is 0.518 of character height where the render reaches only
+       0.355. The reference's torso does not stop at the shoulders; it climbs
+       beside the neck toward the head.
+
+       So the fix for the bucket is the same as the fix for the missing mass,
+       which is a good sign it is the right one. These rings climb 0.18 units
+       and narrow to just under the head's own cross-section at the row where
+       they end, so the chest arrives at the head instead of stopping short of
+       it. There is no longer a horizontal surface at the top to be seen into,
+       and the head's lower vertex now seats into a shoulder rather than
+       hovering above a rim. `dip` on the shoulder ring drops to a trace: it cut
+       the collar chevron when that ring was the top of the model, but under a
+       crown it only carved a notch you could see down into. */
+    { y: 1.985, w: 0.470, d: 0.232, facet: -0.016, crystal: 0.038, crystalY: 0.008 },
+    { y: 2.035, w: 0.360, d: 0.190, facet: 0.014, crystal: 0.034, crystalY: 0.007 },
+    { y: 2.080, w: 0.250, d: 0.140, facet: -0.012, crystal: 0.026, crystalY: 0.005 },
+    { y: 2.115, w: 0.150, d: 0.095, facet: 0.010 }
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
   shoulderHalfWidth: 0.62,

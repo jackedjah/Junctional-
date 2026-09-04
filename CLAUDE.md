@@ -59,8 +59,23 @@ luminance distribution, and writes `validation/mrmah3d/silhouette-overlay.png`
 has mass it should not. **Open the overlay.** It has repeatedly located faults
 that the numbers alone described only vaguely.
 
-Current state: silhouette **89.9 / 100**, all seven proportion checks in
-tolerance, character mean luminance 71.7 against the reference's 68.2. Known remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
+Current state: silhouette **90.5 / 100**, IoU 69.4%, all seven proportion checks
+in tolerance, character mean luminance 49.1 against the reference's 68.2. Known
+remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
+
+The overlay earned that instruction again in the optical pass. A bright ellipse
+across the chest — the character appeared to be standing in a bucket — survived
+two confident diagnoses from the rendered frame alone (the rim shell's centring,
+then its vertical inflation; both were real bugs, neither was that one). The
+overlay showed a broad band of magenta beside the neck, i.e. reference mass the
+render did not have, and the actual fault was that the torso stopped at the
+shoulder line in a flat lid instead of climbing beside the neck to meet the
+head. Fixing the missing mass removed the artifact.
+
+**A luminance histogram is worth more than a luminance mean.** The mean can sit
+in tolerance while the distribution is bimodal — everything either near-black or
+blown out, with no middle — and a body with no midtones reads as a lit outline
+rather than a solid. Compare the eight-band spread, not just the average.
 
 Two properties of the measurement are worth knowing before trusting a delta:
 the reference mask includes the glow bleed around its own edges, so it reads
@@ -293,3 +308,37 @@ slate that is **not** theme-derived, so it cannot be mistaken for a colour
 decision. The real Mr.Mah must use `palette.body` and carry R83's luminance
 discipline (mean character luminance ≈ 18.5) — do not carry the placeholder's
 value into him.
+
+### How the crystal actually gets its values
+
+Four rules, each of which cost a wrong pass to learn. Read them before touching
+`stage.js`, `materials.js`, `crystal-shader.js` or the facet table in
+`forge.js`, because they are not obvious and they interact.
+
+1. **The environment's AVERAGE sets the character's darkest value.** A rough
+   facet reflects the average of the environment around its mirror direction,
+   not a direction. While the sky was bright cyan across its top 40% — which is
+   most of a sphere's solid angle — every roughened facet returned mid-cyan
+   regardless of its albedo, and the "black" optical class could not produce a
+   black pixel. The body being "too blue everywhere" was that average, not the
+   colours. The sky is now near-black with small hot light cards.
+2. **Roughness is not how you darken a facet.** It widens the reflection lobe,
+   which averages the environment and makes the facet *more* like its
+   neighbours, not darker. Darkness comes from albedo and low metalness;
+   roughness stays low so every facet keeps a sharp, directional reflection that
+   either hits a light card or misses it.
+3. **`envMapIntensity` and `toneMappingExposure` are not interchangeable.**
+   Exposure moves the whole distribution; envMapIntensity scales only the
+   reflected component, so against a dark environment it stretches the bright
+   tail and leaves the blacks alone. Use exposure for a distribution shifted as
+   a whole, envMapIntensity for a missing bright end. Using the wrong one
+   produces a correctly-numbered, visually flat body.
+4. **Small hot sources alone give a bimodal body.** Facets either catch or miss,
+   so the histogram piles up at both ends with no middle. The midtones need
+   larger, dimmer cards to graze, plus enough diffuse (metalness not too high)
+   to vary smoothly with angle. The reference's continuous middle is most of
+   what makes it read as solid.
+
+And a diagnostic worth keeping: if lowering the edge-line opacity drops the
+character's mean luminance sharply, the linework — not the surfaces — is doing
+the lighting. That is the "wireframe feel" note, measurable.

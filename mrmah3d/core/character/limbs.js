@@ -22,8 +22,16 @@ function clad(group, geo, materials, rimScale) {
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   group.add(mesh);
+  /* Concentric with the part — see the long note in body.js. The arm segments
+     are built in character space around y ~ 1.9, so a plain setScalar(1.05)
+     lifted each shell 0.095 units off its own bone and drew it as a bright
+     slab beside the arm rather than as a lip along it. */
+  var s = rimScale || 1.05;
   var rim = new Mesh(geo, materials.rim);
-  rim.scale.setScalar(rimScale || 1.05);
+  rim.scale.set(s, 1, s);
+  if (!geo.boundingBox) geo.computeBoundingBox();
+  var c = geo.boundingBox.getCenter(new Vector3());
+  rim.position.set(c.x * (1 - s), 0, c.z * (1 - s));
   group.add(rim);
   var major = new EdgesGeometry(geo, 48);
   var minor = new EdgesGeometry(geo, 20);

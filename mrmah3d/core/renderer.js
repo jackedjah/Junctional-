@@ -36,7 +36,18 @@ export function createRenderer(options) {
   /* ACES rolls the top end off hard. At exposure 1 the crystal's bright facets
      were being compressed into the same mid-tone as its dark ones, flattening
      exactly the contrast the reference depends on. */
-  renderer.toneMappingExposure = Number(opts.exposure) || 0.76;
+  /* 1.25 rather than 0.95, and the reasoning behind the change is worth
+     keeping because it reverses an earlier one. Exposure was pulled DOWN when
+     the environment was bright, because lifting everything together was
+     flattening the crystal. With the environment rebuilt dark the measurement
+     inverted: the character now had 42% of its pixels in the darkest eighth
+     against the reference's 33%, i.e. it was globally too dark rather than
+     short of highlights, and ACES's shoulder means a lift here moves the darks
+     and midtones up while the bright catches roll off gently instead of
+     clipping. Exposure is the right knob for a distribution shifted as a whole;
+     envMapIntensity is the right knob for a missing bright tail. They are not
+     interchangeable, and using the wrong one produced a flat body once already. */
+  renderer.toneMappingExposure = Number(opts.exposure) || 1.25;
   renderer.shadowMap.enabled = settings.shadows;
   renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.setClearColor(0x000000, 0);

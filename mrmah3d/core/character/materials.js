@@ -20,6 +20,7 @@ import {
   MeshStandardMaterial, MeshBasicMaterial, LineBasicMaterial, Color,
   AdditiveBlending, DoubleSide, BackSide
 } from '../../vendor/three/three.module.min.js';
+import { applyCrystalShader } from './crystal-shader.js';
 
 /* Ice-blue family. `edge` is the reference's signature cyan. */
 export var PALETTE = {
@@ -28,7 +29,13 @@ export var PALETTE = {
      blue and the whole body converges on one hue. A near-neutral slate lets
      the white zone stay white, the dark zone stay black, and the cyan come
      from the edges and the narrow environment band where it belongs. */
-  crystal: 0x44525c,
+  /* Pulled further toward neutral again. Every remaining trace of blue in the
+     base colour is multiplied across every facet at once, so it is the one
+     value that can make the whole body read as "a blue object" no matter how
+     well the per-facet classes separate. The cyan the character needs comes
+     from the edges, the tint class and the rim card — all of which are
+     selective. This is not. */
+  crystal: 0x4a5058,
   crystalDeep: 0x0b1219, /* the darkest facets */
   edge: 0x35d6ff,        /* cyan edge illumination */
   edgeHot: 0xbdf2ff,     /* near-white specular catch */
@@ -56,7 +63,13 @@ export function createCrystalMaterials(options) {
        (high roughness) averages the environment out and every facet converges
        on the same mid-tone, which reads as flat plastic. */
     roughness: 0.085,
-    metalness: 0.68,
+    /* Down from 0.68. Metalness suppresses diffuse, and diffuse is where a
+       continuous middle of the value range comes from — it varies smoothly with
+       each facet's angle to the lights instead of switching on and off with a
+       reflection. At 0.68 the body was almost purely specular and therefore
+       almost purely bimodal. Kept above a half so the specular catches still
+       dominate the bright end, which is what keeps it crystal and not stone. */
+    metalness: 0.55,
     /* The environment built in stage.js is what this metalness reflects.
        Without it a dark metal returns near-black on every facet. */
     /* High, and paired with a LOW tone-mapping exposure. These two are not
@@ -66,7 +79,19 @@ export function createCrystalMaterials(options) {
        the dark ones where they are. That is contrast, which is what the
        crystal reads by. Chasing the mean with exposure alone produced a
        correctly-numbered but visually flat body. */
-    envMapIntensity: 4.0,
+    /* Raised again once the environment was rebuilt dark. This number is only
+       safe to push because of that: envMapIntensity multiplies the REFLECTION,
+       and a facet reflecting a black room returns black however high it goes.
+       So it scales the catches and leaves the floor alone, which is precisely
+       the axis the value hierarchy needs. Against the old bright sky the same
+       move would simply have made the whole body brighter and bluer. */
+    /* Raised once more when the edge lines came down. Dropping edge opacity
+       from 0.62 to 0.40 cost the character nine points of mean luminance on its
+       own, which is the clearest possible evidence that the additive linework —
+       not the surfaces — had been doing the lighting. That is the wireframe
+       read, stated as a measurement. The brightness has to come back through
+       the material instead, and it does. */
+    envMapIntensity: 11.0,
     flatShading: true,
     /* A faint self-lit floor so facets turned fully away from every light are
        still crystal rather than holes cut in the frame. Deliberately tiny. */
@@ -101,7 +126,12 @@ export function createCrystalMaterials(options) {
   var edge = new LineBasicMaterial({
     color: new Color(tint.edge || PALETTE.edge),
     transparent: true,
-    opacity: 0.62,
+    /* Down again, from 0.62. With the surfaces finally carrying real optical
+       variation the lines no longer have to describe the form, and at 0.62 they
+       were laying a continuous cyan web over the whole torso — which is both
+       the "wireframe feel" note and a large part of "too blue overall", since
+       an additive cyan line brightens every pixel it crosses. */
+    opacity: 0.40,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -126,6 +156,23 @@ export function createCrystalMaterials(options) {
     toneMapped: false
   });
 
+  /* HERO EDGES — rare, and the brightest thing on the body after the face.
+
+     Only the very sharpest breaks qualify: the head's girdle, the shoulder
+     spine, the torso's prow. Ice-white rather than cyan so they read as a
+     specular catch running along an edge rather than as more of the same
+     outline colour. Four classes of edge — hero, structural, secondary, lost —
+     is what removes the last of the technical-wireframe look; a single value
+     everywhere is a drawing, a range is lighting. */
+  var edgeHero = new LineBasicMaterial({
+    color: new Color(PALETTE.edgeHot),
+    transparent: true,
+    opacity: 0.85,
+    blending: AdditiveBlending,
+    depthWrite: false,
+    toneMapped: false
+  });
+
   /* FAINT EDGES — every remaining seam, at a whisper.
 
      This is the other half of the two-tier scheme in body.js. The facet seams
@@ -135,7 +182,7 @@ export function createCrystalMaterials(options) {
   var edgeFaint = new LineBasicMaterial({
     color: new Color(tint.edge || PALETTE.edge),
     transparent: true,
-    opacity: 0.13,
+    opacity: 0.07,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -155,7 +202,18 @@ export function createCrystalMaterials(options) {
     color: new Color(tint.glow || PALETTE.glow),
     toneMapped: false,
     transparent: true,
-    opacity: 0.30,
+    /* Raised from 0.30 once the eyes and smile were reduced to hairlines.
+
+       A hairline is right at the canonical framing and wrong at chat framing:
+       there the character is 30% of frame height, the eye ring falls under a
+       pixel wide, and antialiasing simply erases it — the eyes rendered as dark
+       holes in the face. The brief asks for thin laser circles AND for the eyes
+       and smile to stay highly readable, and those only reconcile if the thin
+       line carries the shape while a wider, dimmer companion carries the
+       presence. So the ring stays hairline and this does the work at distance.
+       This is also the reason it must not be solved with bloom: bloom would
+       thicken every bright thing on the character, not just the face. */
+    opacity: 0.55,
     blending: AdditiveBlending,
     depthWrite: false
   });
@@ -172,10 +230,18 @@ export function createCrystalMaterials(options) {
        the silhouette against the void; with dimmer edges the rim shell is now
        doing most of that job, which is the right owner for it — it follows the
        real surface curvature instead of drawing every polygon boundary. */
-    opacity: 0.15,
+    opacity: 0.10,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
+  });
+
+  /* PER-FACET OPTICS. This is what stops the body being a blue mosaic: every
+     triangle carries its own roughness, metalness, darkness and tint class.
+     See crystal-shader.js. */
+  applyCrystalShader(body, {
+    tint: tint.edge || PALETTE.edge,
+    deep: PALETTE.crystalDeep
   });
 
   /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */
@@ -186,11 +252,12 @@ export function createCrystalMaterials(options) {
     face.needsUpdate = true;
   }
 
-  var all = [body, face, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, rim];
+  var all = [body, face, edgeHero, edge, edgeHalo, edgeFaint, emissive, emissiveSoft, rim];
 
   /* Captured at construction so setGlow(1) restores exactly what each material
      was defined with. */
   var BASE = {
+    edgeHero: edgeHero.opacity,
     edge: edge.opacity,
     edgeFaint: edgeFaint.opacity,
     edgeHalo: edgeHalo.opacity,
@@ -200,7 +267,7 @@ export function createCrystalMaterials(options) {
   };
 
   return {
-    body: body, face: face, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
+    body: body, face: face, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
     emissive: emissive, emissiveSoft: emissiveSoft, rim: rim,
     /* One place to drive the whole character's luminosity — used by the
        animation states so a "thinking" pulse cannot desynchronise.
@@ -211,6 +278,7 @@ export function createCrystalMaterials(options) {
        render loop overwrote it with the stale copy. */
     setGlow: function (scale) {
       var s = Math.max(0, Number(scale) || 0);
+      edgeHero.opacity = BASE.edgeHero * s;
       edge.opacity = BASE.edge * s;
       edgeHalo.opacity = BASE.edgeHalo * s;
       edgeFaint.opacity = BASE.edgeFaint * s;
