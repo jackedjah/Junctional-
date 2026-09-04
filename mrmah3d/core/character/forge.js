@@ -109,7 +109,7 @@ var FACET_CLASSES = [
    produced by relief and by the crown's convergence land far below. */
 var AREA_HERO = 0.011;
 
-function facetClass(i, area) {
+function facetClass(i, area, lift) {
   var n = Math.sin(i * 78.233 + 12.9898) * 43758.5453;
   var r = n - Math.floor(n);
   var m = Math.sin(i * 39.719 + 4.1414) * 24634.6345;
@@ -132,6 +132,22 @@ function facetClass(i, area) {
      directly beside a silver one, that reads as cut crystal. The mid classes
      belong to the small transition faces. */
   r = Math.max(0.0005, Math.min(0.9995, 0.5 + (r - 0.5) * (1 + big * 0.62)));
+
+  /* `lift` biases a whole part away from the black end of the table.
+
+     The body wants half its faces near-black — that is what makes it read as a
+     dark crystalline mass. The HEAD does not, and applying the body's
+     distribution to it was a real error: stripping the head's linework showed
+     the shell underneath was almost entirely black, so every bit of its
+     apparent mid-teal was coming from the lines drawn on it. That is the
+     "linework is doing the lighting" fault, still fully true for the head long
+     after it was fixed on the torso.
+
+     The head is also small, so the same weighting lands far more brutally: on a
+     few dozen facets, half of them black leaves nothing to read. Both
+     references show a head that is a lighter, clearer crystal than the body
+     with dark facets among it, not a black one. */
+  if (lift) r = r * (1 - lift) + lift;
 
   var acc = 0;
   for (var k = 0; k < FACET_CLASSES.length; k++) {
@@ -160,7 +176,8 @@ function facetClass(i, area) {
   return FACET_CLASSES[0];
 }
 
-export function facetedGeometry(positions, faces, groups) {
+export function facetedGeometry(positions, faces, groups, options) {
+  var opts = options || {};
   var pos = [], nor = [], fac = [];
   var groupRanges = [];
   var written = 0;
@@ -181,7 +198,7 @@ export function facetedGeometry(positions, faces, groups) {
        constant across the triangle and the facet reads as one material. */
     /* Triangle area, from the cross product already computed above: |u x v|/2
        is exactly `len / 2`, so the hierarchy costs nothing extra. */
-    var k = facetClass(faceIndex++, len * 0.5);
+    var k = facetClass(faceIndex++, len * 0.5, opts.lift);
     for (var v = 0; v < 3; v++) fac.push(k[1], k[2], k[3], k[4]);
     written += 3;
   }
@@ -501,7 +518,7 @@ export function diamondCrystal(opts) {
   return facetedGeometry(P, null, [
     { faces: shell, material: 0 },
     { faces: plate, material: 1 }
-  ]);
+  ], { lift: opts.lift });
 }
 
 /* A flat diamond outline plate, used for the chest emblem and the transport

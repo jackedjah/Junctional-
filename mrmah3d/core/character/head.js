@@ -32,7 +32,11 @@ export function buildHead(materials) {
     bevelZ: HEAD.bevelZ,
     faceZ: HEAD.faceZ,
     backApexZ: HEAD.backApexZ,
-    relief: HEAD.relief
+    relief: HEAD.relief,
+    /* The head takes a lighter share of the optical lottery than the body —
+       see `lift` in forge.js. Without it the shell rendered essentially black
+       and every bit of its apparent value was the linework drawn over it. */
+    lift: HEAD.classLift
   });
 
   var shell = new Mesh(geo, [materials.body, materials.face]);

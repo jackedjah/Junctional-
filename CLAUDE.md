@@ -75,8 +75,12 @@ arm form, world atmosphere and overall finish; `mrmah-canonical-front.png`
 remains the measurement baseline and `mrmah-refined-front.png` the intermediate
 art direction. Where they disagree on FORM, the cinematic render wins.
 
-Current state: silhouette **90.9 / 100**, all seven proportion checks in
-tolerance. IoU drifted from 72.8% to ~66% when the arms moved outboard to open
+Current state: silhouette **89 / 100**, character mean luminance 63.1 against
+the reference's 68.2 with 69% of pixels in the darker half (the reference is
+62%). The shoulder-width landmark reads ~14% under the canonical front after the
+proportion correction; that landmark's row includes a differently-posed raised
+arm in the old reference, and the correction was briefed and judged against the
+cinematic one. IoU drifted from 72.8% to ~66% when the arms moved outboard to open
 the armpit and the deltoids were rebuilt — that is following the cinematic
 reference away from the canonical one, and is expected rather than a regression.
 Known remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
@@ -413,6 +417,41 @@ Two more, each of which cost a pass:
 All three were found by capturing the same frame at the low tier, which bypasses
 bloom entirely, and comparing. On a scene this dark none of them announced
 itself in the frame alone.
+
+### If a part looks flat, strip its linework before touching its material
+
+The head shell read as one uniform mid-teal panel through several passes. Head
+relief was raised, then raised again, then the Fresnel boost was cut — none of
+it changed anything. Removing the head's edge lines and rim shell for one
+capture settled it in a single render: **the shell underneath was almost
+entirely black.** Every bit of its apparent value had been the lines drawn over
+it. That is the same "the linework is doing the lighting" fault that was fixed
+on the torso long before, still fully true for the head.
+
+The cause was the facet distribution. Half the body's faces being near-black is
+what makes the BODY read as a dark crystalline mass, but the head is small — on
+a few dozen facets the same weighting leaves nothing to see, and both references
+show a head that is a lighter, clearer crystal than the body with dark facets
+among it. `diamondCrystal` now takes a `lift` that biases the head away from the
+black end (`HEAD.classLift`).
+
+The general lesson: when a surface looks flat, hide everything drawn ON it and
+render once. It costs one capture and it distinguishes "the material is wrong"
+from "there is no material showing" — which no amount of tuning the material
+can tell you apart.
+
+### A capped tube's end disc is bigger than it looks
+
+The deltoids showed two blown white patches for several passes. The shoulder-top
+light card, the silver class's albedo boost and the authored ridge line were all
+suspected and adjusted; none of them moved it. `segment()` caps both ends, and a
+cap sits PERPENDICULAR TO THE AXIS — so on a near-horizontal limb the disc
+spans almost its whole radius VERTICALLY. The deltoid's chest end, centred at
+y 1.925 with radius 0.230, reached y 2.155 where the chest crown is only 0.15
+wide. A surface that was supposed to be inside the mesh was outside it.
+
+Before adjusting light or material for a bright artifact, check whether
+something is simply sticking out.
 
 ### Anything upward-facing reflects x≈64, not the sky
 

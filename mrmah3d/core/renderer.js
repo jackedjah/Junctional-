@@ -47,7 +47,13 @@ export function createRenderer(options) {
      clipping. Exposure is the right knob for a distribution shifted as a whole;
      envMapIntensity is the right knob for a missing bright tail. They are not
      interchangeable, and using the wrong one produced a flat body once already. */
-  renderer.toneMappingExposure = Number(opts.exposure) || 1.25;
+  /* 1.38. The eight-band histogram is the argument: the character was piling
+     48% of its pixels into band 2 against the reference's 28%, while bands 3
+     and 4 sat under-filled. That is a distribution shifted as a whole rather
+     than a missing bright tail, which is exposure's job and not
+     envMapIntensity's — the two are not interchangeable and using the wrong one
+     has produced a correctly-numbered, visually flat body here before. */
+  renderer.toneMappingExposure = Number(opts.exposure) || 1.38;
   renderer.shadowMap.enabled = settings.shadows;
   renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.setClearColor(0x000000, 0);

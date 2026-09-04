@@ -83,7 +83,21 @@ export var HEAD = {
      returning the head to the busy, asymmetric read that 0.13 produced — the
      bands catch different parts of the environment, which is what stops the
      shell looking like one flat panel. */
-  relief: 0.095
+  /* Raised again to 0.14. At 0.095 the head's two crown bands were still
+     tilting too little to reflect meaningfully different parts of the
+     environment, so the whole shell came back as one flat mid-teal panel with
+     linework on it — the shape had thickness but no optical variation, which is
+     the opposite of the reference's head.
+
+     Pushing it to 0.14 was tried and changed nothing visible, which is itself
+     the useful result: the head's flatness was never geometric. It came from
+     the Fresnel term lifting every grazing facet, and on a diamond seen
+     face-on almost every shell facet is grazing. Settled at a modest 0.105. */
+  relief: 0.105,
+  /* How far the head's facets are biased away from the body's black-heavy
+     distribution. 0 would give it the body's weighting, which measured as an
+     almost entirely black shell. */
+  classLift: 0.42
 };
 
 export var NECK = {

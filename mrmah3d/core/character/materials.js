@@ -249,7 +249,7 @@ export function createCrystalMaterials(options) {
        the silhouette against the void; with dimmer edges the rim shell is now
        doing most of that job, which is the right owner for it — it follows the
        real surface curvature instead of drawing every polygon boundary. */
-    opacity: 0.155,
+    opacity: 0.195,
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -260,7 +260,19 @@ export function createCrystalMaterials(options) {
      See crystal-shader.js. */
   applyCrystalShader(body, {
     tint: tint.edge || PALETTE.edge,
-    deep: PALETTE.crystalDeep
+    deep: PALETTE.crystalDeep,
+    /* Down from 1.35. The Fresnel boost brightens whatever faces away from the
+       camera, which is the right instinct for a silhouette lip and the wrong
+       one for a diamond head: seen face-on, almost every facet of the head's
+       crown bands is at a grazing angle, so the term lifted the entire shell
+       evenly and it came back as one flat mid-teal panel however the geometry
+       was tilted. Raising the head's relief to test that changed nothing, which
+       confirmed the flatness was optical rather than geometric.
+
+       The lit contour it used to provide is now the rim shell's job — that one
+       follows the real surface curvature instead of every grazing pixel, so it
+       puts light on the silhouette without washing the faces behind it. */
+    fresnelBoost: 0.92
   });
 
   /* Explicit env map — see stage.js. Without this envMapIntensity is inert. */
