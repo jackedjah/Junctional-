@@ -456,6 +456,73 @@ render once. It costs one capture and it distinguishes "the material is wrong"
 from "there is no material showing" — which no amount of tuning the material
 can tell you apart.
 
+### The character is DARK SAPPHIRE, and that lives in the albedo
+
+An earlier note here argued for a near-neutral slate base colour, because at
+metalness 0.68 a blue base tints every reflection and the whole body converges
+on one hue. That was true and its premise expired. Metalness is 0.30 now and the
+environment is near-black, so there is barely any reflection for a base colour
+to tint — what a neutral buys at this point is a body whose unlit facets are
+GREY, and grey against black is black. Albedo is the only thing that speaks when
+nothing is being reflected, so his identity colour has to live there.
+
+Two things must move together or the change measures as nothing: the shader's
+`uInnerDark` absorption (a black-class facet was coming out at 0.35 of whatever
+lit it, so a raised ambient was multiplied away before it reached the frame),
+and metalness (which is the switch between "this surface's colour is its own"
+and "this surface's colour is whatever it can see").
+
+### Exposure shifts a distribution; absorption widens one
+
+Measured over the character's mask, the body came out correct in the middle and
+wrong at both ends — brighter blue high, near-black nearly absent. That is a
+distribution too NARROW, not one sitting too high. Exposure was tried at 1.12
+and bought 3 points of black at the cost of 8 points of sapphire, because it
+moves everything together. `uInnerDark` is the control that widens, since it
+scales by each facet's own darkness: it pulls the bottom down and leaves the top
+alone.
+
+### `segment()` built every limb MIRRORED for many passes
+
+Its orientation basis was left-handed (`z = u x r`; for u = (1,0,0) the
+determinant is -1), so every arm, hand, digit and deltoid was reflected and its
+triangle winding disagreed with its stored normals.
+
+**`flatShading` hid it completely.** Flat shading ignores the normal attribute
+and derives one from screen-space derivatives, which is always consistent with
+what actually faces the camera. The bug only appeared when flatShading came off
+so the micro-bevel could blend the normal — and it appeared as WHITE arms, not
+dark ones, because an inverted normal gives N·V = 0, which is maximum grazing
+Fresnel.
+
+There is now a probe pattern worth reusing: for every triangle, compare the
+stored normal against the geometric normal implied by its own winding. It takes
+a minute and it is unambiguous. Do that before theorising about a material.
+
+### The micro-bevel is shaded, not built
+
+A chamfer's visible effect is a narrow band along each edge whose normal leans
+toward its neighbour. Building it triples the triangle count; shading it costs
+two attributes (`aSmooth`, the area-weighted normal at each POSITION, and
+`aBary`) and no geometry. Two things must be right:
+
+- **The margin is an ABSOLUTE width**, converted per face through the triangle's
+  inradius (carried in `aBary.w`). As a fraction of each face it gave large
+  planes a thin lip and small facets a band across most of their area — the arms
+  came back as bright chrome lattice.
+- **It is gated on face size.** A chamfer belongs to an edge between two planes
+  worth calling planes. Applied to a limb's transition slivers it smooths the
+  whole facet and the arms read as hollow glass.
+
+### A measurement tool can be wrong in the direction you expect
+
+The character colour tool indexed a 900x1600 render and a 450x800 mask by the
+same offset, and reported 54% of him near-black — which matched the brief's
+complaint exactly and was entirely an artifact of sampling the void. The real
+figure was 9%. Check that a mask and its image are the same size, and sanity-check
+the pixel COUNT against the character's expected share of the frame before
+believing any distribution built on it.
+
 ### Motion readability is measurable, and per-pixel travel is the wrong metric
 
 "Does he look 3D when he moves?" is not a matter of opinion. Sample the rendered

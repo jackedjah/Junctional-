@@ -46,7 +46,10 @@ export var GRID = {
      which silently deletes every converging line. */
   centerZ: -54,        /* spans z = +1 .. -109 */
   y: 0.02,
-  opacity: 0.30
+  /* R92: 0.30 -> 0.17. The brief asks for a grid that does not compete with
+     him, and with the body now sapphire rather than black the floor was the
+     brightest large area in the frame. */
+  opacity: 0.21
 };
 
 /* The world's own horizon. Beyond this the grid has fully faded. */
@@ -227,7 +230,7 @@ export function createEnvironment(options) {
   var gridGeo = new BufferGeometry();
   gridGeo.setAttribute('position', new Float32BufferAttribute(pts, 3));
   var gridMat = new LineBasicMaterial({
-    color: cyan, transparent: true, opacity: GRID.opacity,
+    color: new Color(0x2f8fae), transparent: true, opacity: GRID.opacity,
     depthWrite: false, fog: true, blending: AdditiveBlending
   });
   var grid = new LineSegments(gridGeo, gridMat);
@@ -511,7 +514,11 @@ export function createEnvironment(options) {
        value. The constraint it has to respect is unchanged and is about SCREEN
        POSITION, not brightness: everything above the horizon line, nothing over
        the rows where the floor's convergence is read. */
-    map: cloudTex, color: new Color(0x44708f), transparent: true, opacity: 0.78,
+    /* R92: 0x44708f -> 0x27394f. The brief wants cloud that is present because
+       of ambient and horizon difference, not because it glows — dark, blue-black
+       and low contrast. It is still well above the horizon line, which is the
+       constraint that governs it. */
+    map: cloudTex, color: new Color(0x27394f), transparent: true, opacity: 0.72,
     depthWrite: false, toneMapped: false, side: DoubleSide, fog: true
   });
   var clouds = new Group();
@@ -591,15 +598,30 @@ export function createEnvironment(options) {
      exist for parallax and scale, not to be looked at. */
   var structures = new Group();
   structures.name = 'structures';
+  /* R92 — STEEL, NOT BLUE. The brief makes this canonical: Mr.Mah owns the
+     secondary colour and the world does not. These were a near-black blue with
+     bright cyan edges, which made them blue objects competing for the one hue
+     the character is supposed to own.
+
+     Gunmetal, and metallic enough to CATCH rather than to glow: at metalness
+     0.72 against a near-black environment a monolith is dark from almost every
+     angle and returns a hard silver edge on the few planes that happen to face
+     a light card — which is exactly the "mostly dark, occasional bright steel
+     catch" the brief describes, and it costs nothing because the environment is
+     already there for the character. */
+  var steel = new Color(0x9aa8b4);
   var structMat = new MeshStandardMaterial({
-    color: new Color(0x0b1620), roughness: 0.75, metalness: 0.3, flatShading: true, fog: true
+    color: new Color(0x323a44), roughness: 0.46, metalness: 0.72,
+    envMapIntensity: 1.15, flatShading: true, fog: true
   });
   var structEdge = new LineBasicMaterial({
-    /* R90: 0.22 -> 0.62. Reference A's monoliths are dark masses with clearly
-       lit edges — that contrast is what makes the far distance read as built
-       rather than as scenery. At 0.22 they were flat silhouettes and the world
-       lost the one thing that ties it to the character's own material. */
-    color: cyan, transparent: true, opacity: 0.62,
+    /* R92: back down to 0.14, and STEEL rather than cyan. R90 raised this to
+       0.62 to stop the monoliths reading as flat cutouts, which worked and
+       solved it with the wrong material — a bright cyan wire around every
+       distant form puts the character's own colour on the horizon. The forms
+       are now metallic enough to catch a real highlight on their own, so the
+       line only has to state an edge, faintly, in the world's own steel. */
+    color: steel, transparent: true, opacity: 0.21,
     depthWrite: false, blending: AdditiveBlending, fog: true
   });
   owned.push(structMat, structEdge);

@@ -313,6 +313,21 @@ export var TORSO = {
      the much larger head forced the shoulders down. Raising it is what creates
      room for a real neck and trapezius between the collarbones and the jaw —
      the region the reference has and this build did not have at all. */
+  /* R92 — THE RIBCAGE HAS REAL DEPTH NOW.
+
+     The side capture is what forced this, and it is the reason the brief asks
+     for one: from the front he read correctly and from 90 degrees he was a
+     BLADE. The chest was 0.206 deep against 0.328 wide — 63% — where a human
+     ribcage runs nearer 80%, and the head beside it was already at 85%. So the
+     one part of him with no front-to-back mass was the part carrying the pecs,
+     the emblem and the whole upper-body read.
+
+     Depths through the chest and core go up by about a quarter, tapering back
+     toward the original at the point where the lower body is supposed to be a
+     blade. Widths are untouched, so the front silhouette — which every previous
+     pass was measured against — does not move at all. This is the brief's
+     "more front/back mass than excessive sideways mass", applied where the
+     measurement showed it was missing. */
   topY: 2.130,
   /* 14, not 12. The anatomical lobes are 0.5 radians wide and a 12-sided ring
      samples every 0.52, so a pec crown could fall between two vertices and be
@@ -446,27 +461,27 @@ export var TORSO = {
        what lets the taper read as elegant rather than as a skirt. */
     { y: 0.000, w: 0.006, d: 0.004 },
     { y: 0.175, w: 0.050, d: 0.034, facet: 0.0121, crystal: 0.0380, crystalY: 0.0090 },
-    { y: 0.400, w: 0.110, d: 0.072, facet: -0.0121, crystal: 0.0520, crystalY: 0.0130 },
-    { y: 0.680, w: 0.178, d: 0.112, facet: 0.0110, crystal: 0.0620, crystalY: 0.0150 },
-    { y: 0.950, w: 0.236, d: 0.142, facet: -0.0110, crystal: 0.0680, crystalY: 0.0160, hero: 0.30 },
+    { y: 0.400, w: 0.110, d: 0.082, facet: -0.0121, crystal: 0.0520, crystalY: 0.0130 },
+    { y: 0.680, w: 0.178, d: 0.132, facet: 0.0110, crystal: 0.0620, crystalY: 0.0150 },
+    { y: 0.950, w: 0.236, d: 0.172, facet: -0.0110, crystal: 0.0680, crystalY: 0.0160, hero: 0.30 },
     /* hip swell — the widest point of the lower mass, and modest */
-    { y: 1.180, w: 0.264, d: 0.154, facet: 0.0099, crystal: 0.0640, crystalY: 0.0150,
+    { y: 1.180, w: 0.264, d: 0.192, facet: 0.0099, crystal: 0.0640, crystalY: 0.0150,
       shape: coreShape(0.55) },
     /* THE WAIST. The one concave moment in the outline. */
-    { y: 1.400, w: 0.244, d: 0.146, facet: -0.0099, crystal: 0.0600, crystalY: 0.0140,
+    { y: 1.400, w: 0.244, d: 0.182, facet: -0.0099, crystal: 0.0600, crystalY: 0.0140,
       shape: coreShape(1.0), hero: 0.04 },
     /* ribcage opening back out — lower abdominal into the rib arch */
-    { y: 1.620, w: 0.298, d: 0.172, facet: 0.0088, crystal: 0.0640, crystalY: 0.0150,
+    { y: 1.620, w: 0.298, d: 0.222, facet: 0.0088, crystal: 0.0640, crystalY: 0.0150,
       shape: coreShape(0.85), hero: 0.06 },
-    { y: 1.800, w: 0.320, d: 0.198, facet: -0.0088, crystal: 0.0660, crystalY: 0.0150,
+    { y: 1.800, w: 0.320, d: 0.248, facet: -0.0088, crystal: 0.0660, crystalY: 0.0150,
       shape: chestShape(0.70) },
     /* the pectoral line — the strongest cross-section shaping on the body */
-    { y: 1.930, w: 0.328, d: 0.206, facet: 0.0077, crystal: 0.0560, crystalY: 0.0115,
+    { y: 1.930, w: 0.328, d: 0.258, facet: 0.0077, crystal: 0.0560, crystalY: 0.0115,
       shape: chestShape(1.0), hero: 0.34 },
-    { y: 2.040, w: 0.322, d: 0.196, facet: -0.0055, crystal: 0.0440, crystalY: 0.0080,
+    { y: 2.040, w: 0.322, d: 0.244, facet: -0.0055, crystal: 0.0440, crystalY: 0.0080,
       shape: chestShape(0.80), hero: 0.40 },
     /* THE SHOULDER LINE — collarbones across the front, trapezius behind */
-    { y: 2.130, w: 0.290, d: 0.166, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
+    { y: 2.130, w: 0.290, d: 0.206, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
       shape: clavicleShape(1.0), dip: 0.030, hero: 0.46 },
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
@@ -543,8 +558,8 @@ export var TORSO = {
        There is no width that threads the head's lower vertex, because the
        vertex is a point. So the neck converges to one too, 0.006 below it, and
        the throat gem sits over the junction exactly as the reference does. */
-    { y: 2.190, w: 0.172, d: 0.118, facet: -0.0165, crystal: 0.030, crystalY: 0.0055 },
-    { y: 2.240, w: 0.128, d: 0.090, facet: 0.0150, crystal: 0.022, crystalY: 0.0040 },
+    { y: 2.190, w: 0.172, d: 0.140, facet: -0.0165, crystal: 0.030, crystalY: 0.0055 },
+    { y: 2.240, w: 0.128, d: 0.104, facet: 0.0150, crystal: 0.022, crystalY: 0.0040 },
     { y: 2.272, w: 0.082, d: 0.060, facet: -0.0110, crystal: 0.012, crystalY: 0.0022 },
     { y: 2.292, w: 0.010, d: 0.008, facet: 0.0090 }
   ],
