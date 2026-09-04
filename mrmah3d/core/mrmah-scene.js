@@ -102,7 +102,21 @@ export function createMrMahScene(host, options) {
     if (stageBox.setFog && m.world) stageBox.setFog(m.world.fogNear, m.world.fogFar);
     if (m.state) { hostState = m.state; if (characterBox.setState) characterBox.setState(m.state); }
     resize();
+    applyScaleHint(m);
     return modeName;
+  }
+
+  /* Tell the materials how big he actually is on screen, so the line weights
+     can be art-directed for the size rather than assuming the showcase view.
+     The mode's own `heightFrac` is the authority — it is the compositional
+     intent, i.e. what share of the frame he is meant to fill — so this stays
+     correct at any viewport without measuring the rendered pixels back. */
+  function applyScaleHint(m) {
+    if (!characterBox.materials || !characterBox.materials.setScaleHint) return;
+    var mode = m || getMode(modeName);
+    var box = measure();
+    var frac = (mode && mode.heightFrac) || 0.6;
+    characterBox.materials.setScaleHint(box.height * frac);
   }
 
   host.appendChild(rendererBox.canvas);
@@ -135,6 +149,10 @@ export function createMrMahScene(host, options) {
     cameraBox.setViewport(m.width, m.height);
     if (bloomBox) {
       bloomBox.setSize(m.width, m.height, rendererBox.renderer.getPixelRatio());
+    }
+    if (characterBox && characterBox.materials && characterBox.materials.setScaleHint) {
+      var md = getMode(modeName);
+      characterBox.materials.setScaleHint(m.height * ((md && md.heightFrac) || 0.6));
     }
     return m;
   }

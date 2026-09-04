@@ -69,10 +69,25 @@ Where they disagree on FORM, the refined image wins and the silhouette score is
 expected to drift slightly; where they disagree on MEASUREMENT, neither wins
 until the canonical file is re-measured deliberately.
 
-Current state: silhouette **89.0 / 100**, IoU **72.8%** (the shape-overlap
-number, and the one that improved as the form got better), all seven proportion
-checks in tolerance, character mean luminance 50.0 against the reference's 68.2.
+There is now a THIRD reference: `reference/mrmah-refA-cinematic.png`, the
+cinematic render. It supersedes the other two on material richness, shoulder and
+arm form, world atmosphere and overall finish; `mrmah-canonical-front.png`
+remains the measurement baseline and `mrmah-refined-front.png` the intermediate
+art direction. Where they disagree on FORM, the cinematic render wins.
+
+Current state: silhouette **90.9 / 100**, all seven proportion checks in
+tolerance. IoU drifted from 72.8% to ~66% when the arms moved outboard to open
+the armpit and the deltoids were rebuilt — that is following the cinematic
+reference away from the canonical one, and is expected rather than a regression.
 Known remaining gaps are listed in `MRMAH3D_PHASE2_REPORT.md`.
+
+**MEASUREMENT AND BEAUTY ARE SEPARATE CAPTURES, and must stay separate.**
+`mrmah3d-compare.mjs` finds landmarks in the character's width profile, and
+bloom's halo thickens the extracted mask unevenly enough to move them — with
+bloom on, head width measured 0.05 of character height against a true 0.33, i.e.
+the detector had lost the head. So the comparison runs on this container's
+detected (bloom-free) tier, and `mrmah3d-verify.mjs` captures the delivered
+previews at `?tier=high`. Do not "fix" the comparison by turning bloom on.
 
 The overlay earned that instruction again in the optical pass. A bright ellipse
 across the chest — the character appeared to be standing in a bucket — survived
@@ -192,6 +207,7 @@ must not be claimed from headless runs.
 | `mrmah3d/core/mrmah-scene.js` | the one public entry point |
 | `mrmah3d/core/` | scene, renderer, camera, lights, environment, interaction, quality, lifecycle, palette |
 | `mrmah3d/core/composition.js` | page modes and the camera solver |
+| `mrmah3d/core/bloom.js` | selective bloom, tier-gated (never on `low`) |
 | `mrmah3d/core/surfaces.js` | page events -> character states (the only file naming a MAHFITT page) |
 | `mrmah3d/core/character/` | the character: proportions, forge, materials, head, body, limbs, states |
 | `mrmah3d/lab/` | the development-only laboratory page |
@@ -376,3 +392,35 @@ the lighting. That is the "wireframe feel" note, measurable.
    isolation test that hid the clouds that way was silently undone before the
    frame was drawn, and reported "not the clouds" when it was entirely the
    clouds. Isolate by not adding the object at all.
+
+### Post-processing, if you touch `bloom.js`
+
+Three writes DISPLAY-ENCODED colour into a render target regardless of the
+target's `colorSpace`. What that flag changes is whether a shader sampling it
+gets DECODED back to linear. Marked sRGB with no encode in the composite, the
+midtones are crushed and the crystal goes flat; left default with an encode
+added, the character blows out. Leave the targets default and convert nothing.
+
+Two more, each of which cost a pass:
+
+- The composite quad must use `NoBlending`. Alpha-blending it onto the canvas'
+  transparent clear multiplies colour by alpha a second time on top of three's
+  premultiplied output, and everything low-alpha — the floor grid above all —
+  loses most of its value while the opaque character still looks fine.
+- A render target defaults to ONE sample, so rendering into one silently
+  discards the antialiasing the canvas was created with. Pass `samples`.
+
+All three were found by capturing the same frame at the low tier, which bypasses
+bloom entirely, and comparing. On a scene this dark none of them announced
+itself in the frame alone.
+
+### Anything upward-facing reflects x≈64, not the sky
+
+The deltoids rendered as flat black masses and the geometry was not the reason.
+Mirror the view vector about an up normal and the result points BACKWARD and
+slightly up — around x=64, y=56 in the equirectangular environment — not at the
+zenith. Every upward-facing plane on the character was reflecting an empty
+region. Likewise, a plane facing the viewer reflects x≈192 (the camera
+direction), which is where the silver catches come from. If a surface is
+inexplicably dead, work out which part of the environment it actually sees
+before touching its material.

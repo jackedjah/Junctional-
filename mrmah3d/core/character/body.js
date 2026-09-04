@@ -122,7 +122,14 @@ export function buildBody(materials) {
      meant to be rare by construction; if a routine seam qualifies, the
      threshold is wrong rather than the seam. */
   var torsoLoft = loft(TORSO.rings, TORSO.sides || 8, { capTop: true, capBottom: false });
-  var torsoParts = lit(group, torsoLoft.geometry, materials, { rimScale: 1.022, hero: true, heroAngle: 86 });
+  /* edgeAngle 42, down from the 52 default. With the ring table thinned and the
+     crystal relief raised to compensate, the torso's structural breaks are real
+     but not extreme — at 52 almost none of them qualified and the front of the
+     body read as one smooth surface with values on it rather than as a cut
+     stone with planes. Reference A's torso is defined by exactly these seams:
+     thin, and present at every major plane boundary. */
+  var torsoParts = lit(group, torsoLoft.geometry, materials,
+    { rimScale: 1.022, hero: true, heroAngle: 86, edgeAngle: 42 });
   owned.push(torsoLoft.geometry, torsoParts.edges, torsoParts.minorEdges, torsoParts.heroEdges);
 
   /* ---- shoulder caps / deltoids --------------------------------------- */

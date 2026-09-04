@@ -408,9 +408,13 @@ export function createEnvironment(options) {
      layers moving at different speeds reads as air.
 
      Deliberately NOT additive. Additive haze glows, and glowing clouds in the
-     upper frame would compete with him directly; these are dark mist that
-     OCCLUDES, so they deepen the world instead of lighting it. They are fogged
-     with everything else, and their opacity is the lowest of any layer here. */
+     upper frame would compete with him directly; these are mist that OCCLUDES,
+     so they deepen the world instead of lighting it.
+
+     The colour carries a little of the world's own cyan rather than being
+     neutral grey, which is what the brief means by cloud picking up
+     illumination from the environment — at this value it reads as atmosphere
+     lit by the same light as everything else, not as a grey filter. */
   var cloudTex = cloudTexture();
   var cloudMat = new MeshBasicMaterial({
     /* MUCH darker and fainter than the first attempt, and the reason is the
@@ -422,7 +426,7 @@ export function createEnvironment(options) {
        separable. The brief asks for subtle cloud presence and specifically
        warns against making it obvious; this is that, at the level where it
        reads as depth and not as a filter over the lens. */
-    map: cloudTex, color: new Color(0x0a1018), transparent: true, opacity: 0.11,
+    map: cloudTex, color: new Color(0x1b3346), transparent: true, opacity: 0.40,
     depthWrite: false, toneMapped: false, side: DoubleSide, fog: true
   });
   var clouds = new Group();
@@ -443,8 +447,20 @@ export function createEnvironment(options) {
        frame where the floor's perspective is read. Distant sky is where cloud
        belongs in this composition anyway: it adds scale behind him without ever
        coming between the camera and his world. */
-    { z: -62, y: 20.0, w: 118, h: 13, speed: 0.050, o: 1.00 },
-    { z: -46, y: 15.0, w: 88, h: 9, speed: -0.080, o: 0.66 }
+    /* INSIDE THE FOG, and that is why they were invisible before.
+
+       Linear fog runs from 11 to 42 units, so anything at z=-46 or beyond is
+       fully fogged — the bands existed, were correctly built, drifted correctly,
+       and could not be seen in any composition. Pushing them further back to
+       stop them veiling the floor had quietly pushed them out of the world.
+
+       The real constraint was never distance, it was SCREEN POSITION: they must
+       sit above the horizon line so they never cover the rows where the grid's
+       perspective is read. At these heights, seen from a camera a couple of
+       units off the floor, they clear it comfortably while staying inside the
+       fade where the atmosphere can actually reach the eye. */
+    { z: -38, y: 15.5, w: 96, h: 10, speed: 0.050, o: 1.00 },
+    { z: -29, y: 11.4, w: 70, h: 7, speed: -0.080, o: 0.66 }
   ].forEach(function (b, i) {
     var m = cloudMat.clone();
     m.opacity = cloudMat.opacity * b.o;
@@ -660,7 +676,7 @@ export function createEnvironment(options) {
     starMat.opacity = 0.55 * st;
     clouds.visible = ha > 0.03;
     cloudBands.forEach(function (b, i) {
-      b.mesh.material.opacity = 0.11 * [1.00, 0.66][i] * ha;
+      b.mesh.material.opacity = 0.40 * [1.00, 0.66][i] * ha;
     });
   }
 

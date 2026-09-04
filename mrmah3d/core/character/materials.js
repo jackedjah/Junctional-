@@ -285,6 +285,23 @@ export function createCrystalMaterials(options) {
     emissive: body.emissiveIntensity
   };
 
+  /* Two independent multipliers on the same baselines: `glow` is the animation
+     state's pulse, `SCALE` is the size-aware art direction. They are applied
+     together in one place so neither can overwrite the other — an earlier
+     version had two writers racing on these opacities every frame. */
+  var glow = 1;
+  var SCALE = { edgeHero: 1, edge: 1, edgeFaint: 1, rim: 1, emissiveSoft: 1 };
+
+  function applyOpacity() {
+    edgeHero.opacity = BASE.edgeHero * glow * SCALE.edgeHero;
+    edge.opacity = BASE.edge * glow * SCALE.edge;
+    edgeHalo.opacity = BASE.edgeHalo * glow * SCALE.edge;
+    edgeFaint.opacity = BASE.edgeFaint * glow * SCALE.edgeFaint;
+    emissiveSoft.opacity = BASE.emissiveSoft * glow * SCALE.emissiveSoft;
+    rim.opacity = BASE.rim * glow * SCALE.rim;
+    body.emissiveIntensity = BASE.emissive * glow;
+  }
+
   return {
     body: body, face: face, edgeHero: edgeHero, edge: edge, edgeHalo: edgeHalo, edgeFaint: edgeFaint,
     emissive: emissive, emissiveSoft: emissiveSoft, rim: rim,
@@ -295,15 +312,47 @@ export function createCrystalMaterials(options) {
        as literals. They were duplicated here once, and editing a value at its
        definition then had no effect at all because the first frame of the
        render loop overwrote it with the stale copy. */
+    /* SCALE-AWARE PRESENTATION.
+
+       The showcase render does not simply scale down. At chat size the
+       character is a couple of hundred pixels tall, and at that size the facet
+       seams — which are the right weight when he fills the frame — collapse
+       into a grey fuzz that eats the silhouette and competes with the eyes.
+       Meanwhile the things that must survive (the face, the shoulder line, the
+       lit contour) are exactly the things that get thinnest.
+
+       So the same renderer presents itself differently by size: the secondary
+       seams fade out entirely, the structural lines and the rim shell come up
+       to hold the form, and the face's glow strengthens so the eyes and smile
+       stay readable. Nothing about the model changes — this is art direction on
+       the line weights, which is what a good illustrator does when the same
+       drawing has to work at two sizes.
+
+       `px` is the character's height on screen in CSS pixels. Below ~180 he is
+       a small presence beside UI; above ~420 he is the subject of the frame. */
+    setScaleHint: function (px) {
+      var t = Math.max(0, Math.min(1, (Number(px) - 150) / 280));
+      /* Faint seams: gone when small, full when large. */
+      SCALE.edgeFaint = t;
+      /* Structural lines and contour: lifted when small so the form still
+         reads once the surfaces are only a few pixels across.
+
+         The lift is deliberately modest. A first version pushed the contour up
+         by 75% and the protocol preview came back reading as a cyan figure
+         rather than a dark crystal one — which is the exact failure the brief
+         names first. Enough to hold the silhouette, not enough to become the
+         character's colour. */
+      SCALE.edge = 1 + (1 - t) * 0.34;
+      SCALE.rim = 1 + (1 - t) * 0.42;
+      SCALE.edgeHero = 1 + (1 - t) * 0.22;
+      /* The face is the exception: it is the one thing that must not degrade
+         with size at all, so its glow gets the largest share of the lift. */
+      SCALE.emissiveSoft = 1 + (1 - t) * 0.70;
+      applyOpacity();
+    },
     setGlow: function (scale) {
-      var s = Math.max(0, Number(scale) || 0);
-      edgeHero.opacity = BASE.edgeHero * s;
-      edge.opacity = BASE.edge * s;
-      edgeHalo.opacity = BASE.edgeHalo * s;
-      edgeFaint.opacity = BASE.edgeFaint * s;
-      emissiveSoft.opacity = BASE.emissiveSoft * s;
-      rim.opacity = BASE.rim * s;
-      body.emissiveIntensity = BASE.emissive * s;
+      glow = Math.max(0, Number(scale) || 0);
+      applyOpacity();
     },
     dispose: function () { all.forEach(function (m) { if (m.dispose) m.dispose(); }); }
   };
