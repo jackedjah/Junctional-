@@ -1,0 +1,484 @@
+# FOB Systems - hosting config
+
+[build]
+  publish = "."
+
+# Modern, explicit function config. netlify/functions is also Netlify's
+# default location, so this is declared two ways for maximum compatibility.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# ---- FOB Community ------------------------------------------------------
+[[redirects]]
+  from = "/community"
+  to = "/community/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/community/login"
+  to = "/community/auth.html"
+  status = 200
+
+# Private community surfaces must never be indexed.
+[[headers]]
+  for = "/community/auth.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/community/onboarding.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/community/home.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+
+# ---- Public data-source credits ------------------------------------------
+[[redirects]]
+  from = "/credits"
+  to = "/credits.html"
+  status = 200
+
+[[headers]]
+  for = "/credits.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# ---- FOB Education ------------------------------------------------------
+[[redirects]]
+  from = "/education"
+  to = "/education.html"
+  status = 200
+
+# ---- Private Form Review area -------------------------------------------
+[[redirects]]
+  from = "/admin"
+  to = "/.netlify/functions/admin"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin/"
+  to = "/.netlify/functions/admin"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin"
+  to = "/.netlify/functions/admin"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/member-access"
+  to = "/member-access.html"
+  status = 200
+
+[[redirects]]
+  from = "/form-review"
+  to = "/.netlify/functions/form-review"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/form-review/"
+  to = "/.netlify/functions/form-review"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/login"
+  to = "/.netlify/functions/auth-login"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/logout"
+  to = "/.netlify/functions/auth-logout"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/mahfitt-health-sync"
+  to = "/.netlify/functions/mahfitt-health-sync"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/responses"
+  to = "/.netlify/functions/responses"
+  status = 200
+  force = true
+
+# Never serve the function source as a static file (publish dir is the repo root)
+[[redirects]]
+  from = "/api/booking-submit"
+  to = "/.netlify/functions/booking-submit"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/booking-availability"
+  to = "/.netlify/functions/booking-availability"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/booking-admin"
+  to = "/.netlify/functions/booking-admin"
+  status = 200
+  force = true
+
+# ---- Private member calendar ---------------------------------------------
+[[redirects]]
+  from = "/calendar"
+  to = "/calendar.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/calendar"
+  to = "/.netlify/functions/calendar-api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/calendar-admin"
+  to = "/.netlify/functions/calendar-admin"
+  status = 200
+  force = true
+
+# ---- Private coach/member Message Center ---------------------------------
+[[redirects]]
+  from = "/message-center"
+  to = "/.netlify/functions/message-center"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/message-center/"
+  to = "/.netlify/functions/message-center"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/message-center"
+  to = "/.netlify/functions/message-center"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/calendar*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[redirects]]
+  from = "/api/clear-responses"
+  to = "/.netlify/functions/clear-responses"
+  status = 200
+  force = true
+
+
+# ---- FOB Payment / confirmed-member purchase gate -----------------------
+
+[[redirects]]
+  from = "/vip"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/vip/"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/fob-payment"
+  to = "/.netlify/functions/fob-payment"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/claim-your-slot"
+  to = "/claim-slot.html"
+  status = 200
+
+[[redirects]]
+  from = "/confirm"
+  to = "/confirm.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/claim-access"
+  to = "/.netlify/functions/claim-access"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/claim-status"
+  to = "/.netlify/functions/claim-status"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/claim-logout"
+  to = "/.netlify/functions/claim-logout"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/fob-rounds"
+  to = "/.netlify/functions/fob-rounds"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/fob-progress"
+  to = "/.netlify/functions/fob-progress"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/fob-share"
+  to = "/.netlify/functions/fob-share"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/gym-tracker"
+  to = "/.netlify/functions/gym-tracker"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/gym-tracker"
+  to = "/.netlify/functions/gym-tracker"
+  status = 200
+  force = true
+
+
+# ---- Member-facing Gym Tracker -------------------------------------------
+[[redirects]]
+  from = "/mygym"
+  to = "/.netlify/functions/mygym"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/mygym/"
+  to = "/.netlify/functions/mygym"
+  status = 200
+  force = true
+
+# /api/mygym is owned by netlify/functions/mygym-runtime.mjs via config.path.
+# Do not force-rewrite it around the modern AI runtime adapter.
+
+[[headers]]
+  for = "/mygym"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/mygym/"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[redirects]]
+  from = "/api/payment-members"
+  to = "/.netlify/functions/payment-members"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/group-access"
+  to = "/.netlify/functions/group-access"
+  status = 200
+  force = true
+
+
+[[headers]]
+  for = "/vip"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/vip/"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/claim-slot.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/confirm.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+
+[[redirects]]
+  from = "/group-payment"
+  to = "/group-payment.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/group-status"
+  to = "/.netlify/functions/group-status"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/group-checkout"
+  to = "/.netlify/functions/group-checkout"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/group-payment.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+
+[[redirects]]
+  from = "/api/sesh-checkout"
+  to = "/.netlify/functions/sesh-checkout"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/service-checkout"
+  to = "/.netlify/functions/service-checkout"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/group-payment.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+
+[[redirects]]
+  from = "/small-group-access"
+  to = "/small-group.html"
+  status = 200
+
+[[headers]]
+  for = "/small-group.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+# ---- Keep the private area out of search results and caches --------------
+[[headers]]
+  for = "/form-review"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/admin*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
+
+[[redirects]]
+  from = "/member-progress"
+  to = "/.netlify/functions/member-progress"
+  status = 200
+  force = true
+
+
+
+# ---- Public MAHFITT discovery / store-support surfaces -------------------
+[[redirects]]
+  from = "/mahfitt"
+  to = "/mahfitt.html"
+  status = 200
+
+[[redirects]]
+  from = "/mahfitt/"
+  to = "/mahfitt.html"
+  status = 200
+
+[[redirects]]
+  from = "/mahfitt-privacy"
+  to = "/mahfitt-privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/mahfitt-support"
+  to = "/mahfitt-support.html"
+  status = 200
+
+[[redirects]]
+  from = "/mahfitt-support-thanks"
+  to = "/mahfitt-support-thanks.html"
+  status = 200
+
+[[headers]]
+  for = "/mahfitt*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/mahfitt-support-thanks*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# ══ PWA ═══════════════════════════════════════════════════════════════════
+# The service worker must never be cached, or a deploy cannot replace it and
+# the app pins itself to an old build.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+
+# ══ FUNCTION RUNTIME ══════════════════════════════════════════════════════
+# The vision provider is called with native fetch, which requires Node 18 or
+# newer. Pinned so a stale platform default cannot silently break the provider
+# request while every other function keeps working. No SDK is bundled: both
+# providers are reached over plain HTTPS, so there is no dependency that can
+# fail to bundle.
+[build.environment]
+  NODE_VERSION = "20"
+
+[functions."calendar-email-dispatch"]
+  schedule = "@hourly"

@@ -1,0 +1,49 @@
+{
+  "name": "MAHFITT \u2014 Music and Holistic Fitness Tracker",
+  "short_name": "MAHFITT",
+  "description": "Private member fitness companion for live workouts, exercise demonstrations, music, Meal Grade, scheduling, health summaries and progress.",
+  "id": "/mygym",
+  "start_url": "/mygym?entry=tracker",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E1114",
+  "theme_color": "#0E1114",
+  "icons": [
+    {
+      "src": "/images/pwa-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/pwa-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "MAH GYM",
+      "short_name": "GYM",
+      "url": "/mygym?entry=tracker"
+    },
+    {
+      "name": "MAH LOG",
+      "short_name": "LOG",
+      "url": "/mygym?entry=meals"
+    },
+    {
+      "name": "MAH CALENDAR",
+      "short_name": "CALENDAR",
+      "url": "/mygym?entry=calendar"
+    }
+  ]
+}

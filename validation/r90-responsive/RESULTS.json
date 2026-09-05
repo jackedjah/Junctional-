@@ -1,0 +1,344 @@
+[
+  {
+    "name": "iphone-375",
+    "width": 375,
+    "height": 812,
+    "passed": 11,
+    "total": 11,
+    "overflow": false,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "errors": [],
+    "e2e": [
+      {
+        "name": "coach mode entry visible",
+        "ok": true
+      },
+      {
+        "name": "client search opens",
+        "ok": true
+      },
+      {
+        "name": "Dominic found by search",
+        "ok": true
+      },
+      {
+        "name": "client context visible",
+        "ok": true
+      },
+      {
+        "name": "Jah remains music owner",
+        "ok": true
+      },
+      {
+        "name": "client program editor uses canonical fixture",
+        "ok": true
+      },
+      {
+        "name": "client personal AI blocked",
+        "ok": true
+      },
+      {
+        "name": "client exit always reachable",
+        "ok": true
+      },
+      {
+        "name": "exit restores Jah fitness context",
+        "ok": true
+      },
+      {
+        "name": "cross-persona program mutation persists",
+        "ok": true
+      },
+      {
+        "name": "Dominic self AI available",
+        "ok": true
+      }
+    ]
+  },
+  {
+    "name": "iphone-390",
+    "width": 390,
+    "height": 844,
+    "passed": 11,
+    "total": 11,
+    "overflow": false,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "errors": [],
+    "e2e": [
+      {
+        "name": "coach mode entry visible",
+        "ok": true
+      },
+      {
+        "name": "client search opens",
+        "ok": true
+      },
+      {
+        "name": "Dominic found by search",
+        "ok": true
+      },
+      {
+        "name": "client context visible",
+        "ok": true
+      },
+      {
+        "name": "Jah remains music owner",
+        "ok": true
+      },
+      {
+        "name": "client program editor uses canonical fixture",
+        "ok": true
+      },
+      {
+        "name": "client personal AI blocked",
+        "ok": true
+      },
+      {
+        "name": "client exit always reachable",
+        "ok": true
+      },
+      {
+        "name": "exit restores Jah fitness context",
+        "ok": true
+      },
+      {
+        "name": "cross-persona program mutation persists",
+        "ok": true
+      },
+      {
+        "name": "Dominic self AI available",
+        "ok": true
+      }
+    ]
+  },
+  {
+    "name": "iphone-393",
+    "width": 393,
+    "height": 852,
+    "passed": 11,
+    "total": 11,
+    "overflow": false,
+    "scrollWidth": 393,
+    "clientWidth": 393,
+    "errors": [],
+    "e2e": [
+      {
+        "name": "coach mode entry visible",
+        "ok": true
+      },
+      {
+        "name": "client search opens",
+        "ok": true
+      },
+      {
+        "name": "Dominic found by search",
+        "ok": true
+      },
+      {
+        "name": "client context visible",
+        "ok": true
+      },
+      {
+        "name": "Jah remains music owner",
+        "ok": true
+      },
+      {
+        "name": "client program editor uses canonical fixture",
+        "ok": true
+      },
+      {
+        "name": "client personal AI blocked",
+        "ok": true
+      },
+      {
+        "name": "client exit always reachable",
+        "ok": true
+      },
+      {
+        "name": "exit restores Jah fitness context",
+        "ok": true
+      },
+      {
+        "name": "cross-persona program mutation persists",
+        "ok": true
+      },
+      {
+        "name": "Dominic self AI available",
+        "ok": true
+      }
+    ]
+  },
+  {
+    "name": "iphone-430",
+    "width": 430,
+    "height": 932,
+    "passed": 11,
+    "total": 11,
+    "overflow": false,
+    "scrollWidth": 430,
+    "clientWidth": 430,
+    "errors": [],
+    "e2e": [
+      {
+        "name": "coach mode entry visible",
+        "ok": true
+      },
+      {
+        "name": "client search opens",
+        "ok": true
+      },
+      {
+        "name": "Dominic found by search",
+        "ok": true
+      },
+      {
+        "name": "client context visible",
+        "ok": true
+      },
+      {
+        "name": "Jah remains music owner",
+        "ok": true
+      },
+      {
+        "name": "client program editor uses canonical fixture",
+        "ok": true
+      },
+      {
+        "name": "client personal AI blocked",
+        "ok": true
+      },
+      {
+        "name": "client exit always reachable",
+        "ok": true
+      },
+      {
+        "name": "exit restores Jah fitness context",
+        "ok": true
+      },
+      {
+        "name": "cross-persona program mutation persists",
+        "ok": true
+      },
+      {
+        "name": "Dominic self AI available",
+        "ok": true
+      }
+    ]
+  },
+  {
+    "name": "ipad-portrait",
+    "width": 820,
+    "height": 1180,
+    "passed": 11,
+    "total": 11,
+    "overflow": false,
+    "scrollWidth": 820,
+    "clientWidth": 820,
+    "errors": [],
+    "e2e": [
+      {
+        "name": "coach mode entry visible",
+        "ok": true
+      },
+      {
+        "name": "client search opens",
+        "ok": true
+      },
+      {
+        "name": "Dominic found by search",
+        "ok": true
+      },
+      {
+        "name": "client context visible",
+        "ok": true
+      },
+      {
+        "name": "Jah remains music owner",
+        "ok": true
+      },
+      {
+        "name": "client program editor uses canonical fixture",
+        "ok": true
+      },
+      {
+        "name": "client personal AI blocked",
+        "ok": true
+      },
+      {
+        "name": "client exit always reachable",
+        "ok": true
+      },
+      {
+        "name": "exit restores Jah fitness context",
+        "ok": true
+      },
+      {
+        "name": "cross-persona program mutation persists",
+        "ok": true
+      },
+      {
+        "name": "Dominic self AI available",
+        "ok": true
+      }
+    ]
+  },
+  {
+    "name": "ipad-landscape",
+    "width": 1180,
+    "height": 820,
+    "passed": 11,
+    "total": 11,
+    "overflow": false,
+    "scrollWidth": 1180,
+    "clientWidth": 1180,
+    "errors": [],
+    "e2e": [
+      {
+        "name": "coach mode entry visible",
+        "ok": true
+      },
+      {
+        "name": "client search opens",
+        "ok": true
+      },
+      {
+        "name": "Dominic found by search",
+        "ok": true
+      },
+      {
+        "name": "client context visible",
+        "ok": true
+      },
+      {
+        "name": "Jah remains music owner",
+        "ok": true
+      },
+      {
+        "name": "client program editor uses canonical fixture",
+        "ok": true
+      },
+      {
+        "name": "client personal AI blocked",
+        "ok": true
+      },
+      {
+        "name": "client exit always reachable",
+        "ok": true
+      },
+      {
+        "name": "exit restores Jah fitness context",
+        "ok": true
+      },
+      {
+        "name": "cross-persona program mutation persists",
+        "ok": true
+      },
+      {
+        "name": "Dominic self AI available",
+        "ok": true
+      }
+    ]
+  }
+]

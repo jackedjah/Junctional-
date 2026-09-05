@@ -1,0 +1,4155 @@
+/* ═══════════════════════════════════════════════
+   FOB SYSTEMS - Design System v1
+   Graphite / Champagne / Line Language
+   ═══════════════════════════════════════════════ */
+:root {
+  --ink: #05090D;
+  --legacy-ink: #14171B; /* retained for selected controls/panels */
+  --ink-warm: #171A1E;
+  --panel: #1B2026;
+  --panel-2: #20262D;
+  --gold: #D3BE98;
+  --gold-dim: #A8946F;
+  --gold-line: rgba(211,190,152,0.28);
+  --gold-line-soft: rgba(211,190,152,0.14);
+  --text: #EFEAE0;
+  --muted: #9BA1A8;
+  --display: 'Space Grotesk', sans-serif;
+  /* v225: one face sitewide. 'Resistance That Responds.' is set in
+     --display, and that letterform is now the standard for body copy
+     too. Only the family changes: every size, weight, letter-spacing,
+     colour and role stays exactly as it was, so passages keep their
+     scale and highlights and subtitles keep their treatment.
+     The Forum is excluded and pins itself back to Inter in
+     community/css/community.css. */
+  --body: 'Space Grotesk', sans-serif;
+  /* spacing system: consistent, responsive, clamp-driven */
+  --section-space-lg: clamp(48px, 8vw, 88px);
+  --section-space-md: clamp(36px, 6vw, 64px);
+  --section-space-sm: clamp(28px, 4.5vw, 48px);
+  --content-gap-lg: clamp(24px, 4vw, 40px);
+  --content-gap-md: clamp(16px, 2.6vw, 26px);
+  --content-gap-sm: clamp(10px, 1.8vw, 16px);
+  /* section tone palette (logo-derived, restrained) */
+  --gold-bright: #E9C98F;   /* sampled from the wordmark asset */
+  --cream: #EEE7D8;
+  --nav-h: 74px;
+  --tone-black: #070A0D;
+  --tone-graphite: #0A0E12;
+  --tone-warm: #0D1115;
+  --tone-khaki: #10110D;
+  --tone-lift: #11161B;
+  --tone-deep: #030609;
+  --tone-gold: #0F0C08;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+
+/* ── NAV ── */
+.fob-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(17,19,24,0.86);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(211,190,152,0.14);
+}
+.fob-nav.fob-home-nav {
+  /* Homepage directory banner only: closer to the page's near-black ground. */
+  background: rgba(7,9,12,0.94);
+}
+.fob-nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; gap: clamp(14px, 2.4vw, 28px);
+  padding: 0 24px; height: var(--nav-h);
+}
+.fob-brand {
+  font-family: var(--display); font-weight: 500;
+  letter-spacing: 0.34em; font-size: 14px; color: var(--gold);
+  display: flex; align-items: center; gap: 12px;
+}
+/* logo + classification lockup in the nav */
+.fob-brand-lockup { gap: 14px; }
+.fob-brand-lockup img { flex: none; }
+.fob-brand-class {
+  font-family: var(--display); font-weight: 500;
+  font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold-dim); line-height: 1.5;
+  padding-left: 14px; border-left: 1px solid var(--gold-line);
+  max-width: 210px;
+}
+@media (max-width: 900px) { .fob-brand-class { display: none; } }
+.fob-brand img { height: 36px; width: auto; }
+@media (max-width: 600px) { .fob-brand img { height: 32px; } }
+.fob-nav-links { display: flex; gap: 34px; align-items: center; }
+.fob-nav-links a {
+  font-family: var(--display); font-size: 12px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--muted);
+  position: relative; padding: 4px 0;
+  transition: color 0.25s;
+}
+.fob-nav-links a::after {
+  content: ''; position: absolute; left: 0; bottom: 0;
+  width: 0; height: 1px; background: var(--gold);
+  transition: width 0.3s cubic-bezier(0.6,0,0.2,1);
+}
+.fob-nav-links a:hover { color: var(--text); }
+.fob-nav-links a:hover::after { width: 100%; }
+.fob-nav-links a.fob-nav-cta {
+  color: var(--ink); background: var(--gold);
+  padding: 10px 22px; letter-spacing: 0.18em; font-weight: 600;
+}
+.fob-nav-links a.fob-nav-cta::after { display: none; }
+.fob-nav-links a.fob-nav-cta:hover { background: var(--text); color: var(--ink); }
+.fob-menu-btn {
+  display: none; flex-direction: column; gap: 5px;
+  background: rgba(211,190,152,0.06); border: 1px solid rgba(211,190,152,0.22);
+  border-radius: 10px; padding: 12px 12px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.fob-menu-btn:hover { border-color: rgba(211,190,152,0.5); }
+.fob-menu-btn:active { background: rgba(211,190,152,0.12); }
+.fob-menu-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.fob-menu-btn span { display: block; width: 24px; height: 1.5px; background: var(--gold); margin: 6px 0; transition: 0.3s; }
+@media (max-width: 860px) {
+  .fob-nav-links {
+    display: none; position: absolute; top: 64px; left: 0; right: 0;
+    background: var(--legacy-ink); flex-direction: column; gap: 0;
+    border-bottom: 1px solid var(--gold-line);
+    padding: 10px 0 20px;
+  }
+  .fob-nav-links.open { display: flex; }
+  .fob-nav-links a { padding: 14px 24px; width: 100%; text-align: left; border-bottom: 1px solid var(--gold-line-soft); }
+  .fob-nav-links a.fob-nav-cta { margin: 14px 24px 0; width: calc(100% - 48px); text-align: center; }
+  .fob-menu-btn { display: block; }
+}
+
+/* ── STRUCTURE ── */
+.fob-section { padding: var(--section-space-lg) 24px; }
+.fob-section.tight { padding: var(--section-space-md) 24px; }
+.fob-wrap { max-width: 1080px; margin: 0 auto; }
+.fob-wrap-narrow { max-width: 760px; margin: 0 auto; }
+
+/* Eyebrow-on-rule: the line language signature */
+.fob-rulehead {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: var(--content-gap-lg);
+}
+.fob-rulehead::before {
+  content: ''; height: 1px; width: 30px; background: var(--gold); flex: none;
+}
+.fob-rulehead::after { content: none; }
+.fob-rulehead span {
+  font-family: var(--display); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--gold); white-space: nowrap;
+}
+.fob-rulehead.left::before { flex: 0 0 32px; }
+
+.fob-h1 {
+  font-family: var(--display); font-weight: 500;
+  font-size: clamp(38px, 7vw, 68px); line-height: 1.06;
+  letter-spacing: -0.015em; color: var(--text);
+}
+.fob-h2 {
+  font-family: var(--display); font-weight: 500;
+  font-size: clamp(30px, 5vw, 48px); line-height: 1.1;
+  letter-spacing: -0.01em; color: var(--text);
+  margin-bottom: 20px;
+}
+.fob-h3 {
+  font-family: var(--display); font-weight: 500;
+  font-size: clamp(19px, 2.6vw, 24px); color: var(--gold);
+  margin-bottom: 10px;
+}
+.fob-lede {
+  font-size: clamp(16px, 1.9vw, 19px); line-height: 1.62;
+  color: #C4C8CD; max-width: 46ch; margin: 0 auto 6px;
+}
+.fob-body-txt { font-size: 16px; color: var(--muted); line-height: 1.8; }
+.fob-body-txt strong { color: var(--text); font-weight: 600; }
+
+/* ── BUTTONS: line-growth, crisp corners ── */
+.fob-btn {
+  display: inline-block; position: relative;
+  font-family: var(--display); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 16px 34px; min-height: 50px; cursor: pointer;
+  border-radius: 14px; border: 1px solid transparent;
+  transition: color 0.25s, background 0.25s, border-color 0.25s,
+              transform 0.18s ease, box-shadow 0.25s;
+}
+.fob-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
+.fob-btn:active { transform: translateY(1px); }
+
+/* primary: warm aged-gold fill, graphite text, restrained glow on hover */
+.fob-btn-solid {
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color: #15130D;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+}
+.fob-btn-solid:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(211,190,152,0.28);
+  background: linear-gradient(180deg, #F2D8A4, var(--gold-bright));
+}
+
+/* secondary: translucent warm graphite surface, thin gold border */
+.fob-btn-ghost {
+  color: var(--cream);
+  background: linear-gradient(180deg, rgba(211,190,152,0.10), rgba(23,26,30,0.55));
+  border-color: rgba(211,190,152,0.42);
+  backdrop-filter: blur(4px);
+}
+.fob-btn-ghost:hover {
+  transform: translateY(-2px);
+  color: var(--gold-bright);
+  border-color: var(--gold-bright);
+  background: linear-gradient(180deg, rgba(211,190,152,0.16), rgba(23,26,30,0.65));
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.fob-btn-ghost:hover::after { width: 100%; }
+.fob-btn-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 30px; }
+
+/* ── HERO ── */
+.fob-hero {
+  min-height: 92svh;
+  display: flex; align-items: flex-start; justify-content: center;
+  position: relative;
+  padding: calc(76px + var(--section-space-sm)) 24px var(--section-space-sm);
+  overflow: hidden;
+  background-size: cover; background-position: center 30%;
+}
+.fob-hero-art {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 24%;
+  opacity: 0.35;
+  z-index: 0;
+}
+/* portrait illustration: on wide screens it holds its true shape at full
+   hero height on the right, headline to the left, no squeeze */
+@media (min-width: 900px) {
+  .fob-hero-art {
+    left: auto; width: 46%;
+    object-fit: contain; object-position: bottom right;
+  }
+}
+.fob-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  /* text sits top-center now: dark band up top, open middle for the
+     athlete, soft fade into the next section at the bottom */
+  background:
+    linear-gradient(180deg, rgba(17,19,24,0.88) 0%, rgba(17,19,24,0.5) 26%, rgba(20,23,27,0.08) 48%, rgba(20,23,27,0.12) 74%, var(--ink) 100%);
+}
+@media (max-width: 760px) {
+  .fob-hero::before {
+    background:
+      linear-gradient(180deg, rgba(17,19,24,0.92) 0%, rgba(17,19,24,0.6) 30%, rgba(20,23,27,0.16) 52%, rgba(17,19,24,0.6) 82%, var(--ink) 100%);
+  }
+}
+.fob-hero-inner {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 1080px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.fob-hero .fob-lede { margin-top: 24px; }
+
+/* ── PILLARS ── */
+.fob-pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--gold-line-soft); border: 1px solid var(--gold-line-soft); }
+.fob-pillar { background: var(--ink-warm); padding: 34px 26px; }
+.fob-pillar-num {
+  font-family: var(--display); font-size: 11px; letter-spacing: 0.3em;
+  color: var(--gold-dim); display: block; margin-bottom: 16px;
+}
+.fob-pillar h3 { font-family: var(--display); font-size: 18px; font-weight: 500; color: var(--gold); margin-bottom: 10px; }
+.fob-pillar p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+@media (max-width: 900px) { .fob-pillars { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .fob-pillars { grid-template-columns: 1fr; } }
+
+/* ── FORMAT CARDS ── */
+.fob-formats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.fob-format {
+  background: var(--panel); border: 1px solid var(--gold-line-soft);
+  padding: 36px 30px; display: flex; flex-direction: column;
+  transition: border-color 0.3s, transform 0.3s;
+  position: relative;
+}
+.fob-format::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 0; height: 1px; background: var(--gold);
+  transition: width 0.4s cubic-bezier(0.6,0,0.2,1);
+}
+.fob-format:hover { border-color: var(--gold-line); }
+.fob-format:hover::before { width: 100%; }
+.fob-format-tag {
+  font-family: var(--display); font-size: 10px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--gold-dim); margin-bottom: 16px;
+}
+.fob-format p { font-size: 14.5px; color: var(--muted); line-height: 1.75; flex: 1; }
+.fob-format-link {
+  margin-top: 26px; font-family: var(--display); font-size: 12px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.fob-format-link::after { content: '→'; transition: transform 0.25s; }
+.fob-format:hover .fob-format-link::after { transform: translateX(5px); }
+@media (max-width: 860px) { .fob-formats { grid-template-columns: 1fr; } }
+
+/* ── ECOSYSTEM ── */
+.fob-eco { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--gold-line-soft); border: 1px solid var(--gold-line-soft); }
+.fob-eco-item { background: var(--ink-warm); padding: 44px 36px; position: relative; }
+.fob-eco-item.full { grid-column: 1 / -1; background: var(--panel); }
+.fob-eco-name {
+  font-family: var(--display); font-size: clamp(22px, 3.4vw, 30px);
+  font-weight: 500; color: var(--gold); letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.fob-eco-role {
+  font-family: var(--display); font-size: 11px; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 18px;
+}
+.fob-eco-item p { font-size: 15px; color: var(--muted); line-height: 1.75; max-width: 560px; }
+@media (max-width: 720px) { .fob-eco { grid-template-columns: 1fr; } }
+
+/* ── SPLIT (photo + text) ── */
+.fob-split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.fob-split-img { position: relative; border: 1px solid var(--gold-line-soft); }
+.fob-split-img img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.85) contrast(1.04); }
+.fob-split-img::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(20,23,27,0.55));
+}
+@media (max-width: 820px) { .fob-split { grid-template-columns: 1fr; gap: 36px; } }
+
+/* ── AUDIENCE ROWS ── */
+.fob-paths { border-top: 1px solid var(--gold-line-soft); }
+.fob-path {
+  display: grid; grid-template-columns: 200px 1fr auto;
+  gap: 24px; align-items: center;
+  padding: 30px 0; border-bottom: 1px solid var(--gold-line-soft);
+  transition: padding-left 0.3s;
+}
+.fob-path:hover { padding-left: 10px; }
+.fob-path-who { font-family: var(--display); font-size: 16px; font-weight: 500; color: var(--gold); }
+.fob-path p { font-size: 14.5px; color: var(--muted); }
+@media (max-width: 720px) {
+  .fob-path { grid-template-columns: 1fr; gap: 8px; }
+}
+
+/* ── FOOTER ── */
+.fob-footer { border-top: 1px solid var(--gold-line-soft); padding: 56px 24px 40px; }
+.fob-footer-inner { max-width: 1080px; margin: 0 auto; }
+.fob-footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 30px; flex-wrap: wrap; margin-bottom: 40px; }
+.fob-footer-links { display: flex; gap: 28px; flex-wrap: wrap; }
+.fob-footer-links a { font-family: var(--display); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); transition: color 0.25s; }
+.fob-footer-links a:hover { color: var(--gold); }
+.fob-footer-note { font-size: 12px; color: var(--muted); opacity: 0.7; }
+
+/* ── SCROLL REVEAL ── */
+.fob-reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s cubic-bezier(0.2,0,0.2,1), transform 0.7s cubic-bezier(0.2,0,0.2,1); }
+.fob-reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .fob-reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ── FORM (Start page) ── */
+.fob-field { margin-bottom: 26px; }
+.fob-field label {
+  display: block; font-family: var(--display); font-size: 11px;
+  letter-spacing: 0.26em; text-transform: uppercase; color: var(--gold-dim);
+  margin-bottom: 10px;
+}
+.fob-field input, .fob-field select, .fob-field textarea {
+  width: 100%; background: var(--panel); border: 1px solid var(--gold-line-soft);
+  color: var(--text); font-family: var(--body); font-size: 15px;
+  padding: 14px 16px; outline: none; transition: border-color 0.25s;
+  border-radius: 0; appearance: none; -webkit-appearance: none;
+}
+.fob-field select {
+  background-image: linear-gradient(45deg, transparent 50%, var(--gold) 50%), linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%;
+  background-size: 5px 5px; background-repeat: no-repeat;
+}
+.fob-field input:focus, .fob-field select:focus, .fob-field textarea:focus { border-color: var(--gold); }
+.fob-field textarea { min-height: 120px; resize: vertical; }
+
+/* ── UTILITY ── */
+.fob-rule { height: 1px; background: var(--gold-line-soft); border: none; margin: 0; }
+.fob-note-tag {
+  display: inline-block; font-family: var(--display); font-size: 10px;
+  letter-spacing: 0.26em; text-transform: uppercase;
+  color: var(--gold-dim); border: 1px solid var(--gold-line);
+  padding: 5px 12px; margin-bottom: 18px;
+}
+
+/* ═══════════════════════════════════════════════
+   FOBIBLE VISUAL LANGUAGE - recurring pencil-plate
+   design system for interior pages and dividers.
+   ═══════════════════════════════════════════════ */
+
+/* Environmental illustration layer: a page from the FOBible,
+   knocked back so text stays perfectly readable, gently
+   breathing and shifting so the plate never feels static. */
+.fob-plate {
+  position: absolute; inset: 0; overflow: hidden;
+  z-index: 0; pointer-events: none;
+}
+.fob-plate::before {
+  content: ''; position: absolute; inset: -4%;
+  background-image: var(--plate, url('images/sketch-plate-right.jpg'));
+  background-size: cover;
+  background-position: var(--plate-pos, center right);
+  opacity: var(--plate-opacity, 0.16);
+  filter: contrast(1.05);
+  transform-origin: center;
+  animation: plateBreathe 22s ease-in-out infinite;
+}
+/* animated graphite tooth: a second faint layer drifting on its
+   own timing gives the "redraw / re-shading" hand-drawn shimmer. */
+.fob-plate::after {
+  content: ''; position: absolute; inset: -4%;
+  background-image: var(--plate, url('images/sketch-plate-right.jpg'));
+  background-size: cover;
+  background-position: var(--plate-pos, center right);
+  opacity: calc(var(--plate-opacity, 0.16) * 0.5);
+  mix-blend-mode: screen;
+  animation: plateRedraw 9s steps(1) infinite, plateDrift 30s ease-in-out infinite alternate;
+}
+@keyframes plateBreathe {
+  0%,100% { transform: scale(1) translate(0,0); opacity: var(--plate-opacity, 0.16); }
+  50%     { transform: scale(1.035) translate(-0.6%, 0.4%); opacity: calc(var(--plate-opacity, 0.16) * 1.25); }
+}
+@keyframes plateDrift {
+  from { transform: translate(0,0) scale(1.01); }
+  to   { transform: translate(1.2%, -0.8%) scale(1.04); }
+}
+/* discrete opacity ticks read like strokes being re-laid each beat */
+@keyframes plateRedraw {
+  0%   { opacity: calc(var(--plate-opacity, 0.16) * 0.35); }
+  33%  { opacity: calc(var(--plate-opacity, 0.16) * 0.60); }
+  66%  { opacity: calc(var(--plate-opacity, 0.16) * 0.45); }
+  100% { opacity: calc(var(--plate-opacity, 0.16) * 0.55); }
+}
+/* top+bottom fade so the plate dissolves into the graphite page */
+.fob-plate-fade::after,
+.fob-plate-fade-el {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, var(--ink) 0%, rgba(20,23,27,0) 22%, rgba(20,23,27,0) 70%, var(--ink) 100%);
+}
+.fob-plate-host { position: relative; }
+.fob-plate-host > .fob-wrap,
+.fob-plate-host > .fob-wrap-narrow,
+.fob-plate-host > .fob-hero-inner { position: relative; z-index: 2; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fob-plate::before, .fob-plate::after { animation: none !important; }
+}
+
+/* Pencil section divider: a thin champagne stroke that tapers at
+   both ends like a drawn line, with a faint diamond node (logo motif). */
+.fob-pencil-div {
+  position: relative; height: 1px; margin: 0 auto; max-width: 1200px;
+  background: linear-gradient(90deg, transparent, var(--gold-line) 12%, var(--gold-line) 88%, transparent);
+}
+.fob-pencil-div::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 7px; height: 7px; transform: translate(-50%,-50%) rotate(45deg);
+  background: var(--gold-dim);
+}
+
+/* Eyebrow classification chip usable outside the hero */
+.fob-classification {
+  font-family: var(--display); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.42em; color: var(--gold);
+  display: inline-flex; align-items: center; gap: 16px;
+  text-transform: uppercase;
+}
+.fob-classification::before,
+.fob-classification::after { content: ''; width: 34px; height: 1px; background: var(--gold-line); }
+
+/* Journal category taxonomy grid */
+.fob-cats {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 1px; background: var(--gold-line-soft);
+  border: 1px solid var(--gold-line-soft); margin-top: 8px;
+}
+.fob-cat {
+  background: var(--ink-warm); padding: 22px 20px;
+  display: flex; flex-direction: column; gap: 8px;
+  position: relative; transition: background 0.25s;
+}
+.fob-cat:hover { background: var(--panel); }
+.fob-cat-name {
+  font-family: var(--display); font-size: 14px; font-weight: 500;
+  color: var(--gold); letter-spacing: 0.02em;
+}
+.fob-cat-count {
+  font-family: var(--display); font-size: 10px; letter-spacing: 0.24em;
+  color: var(--gold-dim); text-transform: uppercase;
+}
+.fob-cat p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+@media (max-width: 1000px){ .fob-cats { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 640px){ .fob-cats { grid-template-columns: repeat(2,1fr); } }
+
+/* Journal entry rows (knowledge-base list) */
+.fob-entries { border-top: 1px solid var(--gold-line-soft); }
+.fob-entry {
+  display: grid; grid-template-columns: 160px 1fr auto; gap: 24px;
+  align-items: baseline; padding: 26px 4px;
+  border-bottom: 1px solid var(--gold-line-soft);
+  transition: background 0.2s;
+}
+.fob-entry:hover { background: rgba(211,190,152,0.03); }
+.fob-entry-cat {
+  font-family: var(--display); font-size: 10px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--gold-dim); padding-top: 3px;
+}
+.fob-entry-title { font-family: var(--display); font-size: 17px; color: var(--text); font-weight: 500; }
+.fob-entry-title span { display:block; font-family: var(--body); font-size: 13.5px; color: var(--muted); font-weight: 400; margin-top: 6px; line-height: 1.6; }
+.fob-entry-link { font-family: var(--display); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+@media (max-width: 720px){
+  .fob-entry { grid-template-columns: 1fr; gap: 8px; }
+  .fob-entry-link { justify-self: start; }
+}
+
+/* ═══════════════════════════════════════════════
+   THE FOBIBLE - free blueprint download block.
+   Compact, classified-document feel. No lead-gen.
+   ═══════════════════════════════════════════════ */
+.fob-fobible {
+  position: relative;
+  padding: 74px 24px;
+  border-top: 1px solid var(--gold-line-soft);
+  border-bottom: 1px solid var(--gold-line-soft);
+  background: var(--ink-warm);
+}
+.fob-fobible-grid {
+  display: grid; grid-template-columns: 300px 1fr; gap: 54px;
+  align-items: center; max-width: 1080px; margin: 0 auto;
+}
+.fob-fobible-cover {
+  position: relative;
+  border: 1px solid var(--gold-line);
+  padding: 14px; background: var(--ink);
+}
+.fob-fobible-cover::before,
+.fob-fobible-cover::after {
+  content: ''; position: absolute; width: 12px; height: 12px;
+  border: 1px solid var(--gold-dim);
+}
+.fob-fobible-cover::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.fob-fobible-cover::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+.fob-fobible-cover img { width: 100%; display: block; filter: saturate(0.95); }
+
+.fob-fobible-title {
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(30px, 4.6vw, 44px); line-height: 1.02;
+  color: var(--text); letter-spacing: -0.01em; margin: 16px 0 14px;
+}
+.fob-fobible-sub {
+  font-size: clamp(16px, 2vw, 19px); color: var(--gold);
+  line-height: 1.55; margin-bottom: 22px; max-width: 60ch;
+}
+.fob-fobible-body {
+  font-size: 15px; color: var(--muted); line-height: 1.75;
+  margin-bottom: 30px; max-width: 64ch;
+}
+.fob-fobible-cta { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.fob-btn-lg { padding: 18px 40px; font-size: 13px; letter-spacing: 0.24em; }
+.fob-fobible-note {
+  font-size: 12px; color: var(--gold-dim); letter-spacing: 0.02em;
+}
+.fob-fobible-meta {
+  list-style: none; display: flex; flex-wrap: wrap; gap: 0;
+  margin: 30px 0 0; padding: 18px 0 0;
+  border-top: 1px solid var(--gold-line-soft);
+}
+.fob-fobible-meta li {
+  font-family: var(--display); font-size: 10.5px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--gold-dim);
+  padding: 0 16px; position: relative; line-height: 1;
+}
+.fob-fobible-meta li:first-child { padding-left: 0; color: var(--gold); }
+.fob-fobible-meta li + li::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  width: 1px; height: 11px; background: var(--gold-line);
+  transform: translateY(-50%);
+}
+.fob-fobible-skip {
+  display: inline-block; margin-top: 26px;
+  font-family: var(--display); font-size: 12px; letter-spacing: 0.06em;
+  color: var(--muted); border-bottom: 1px solid var(--gold-line-soft);
+  padding-bottom: 3px; transition: color 0.25s, border-color 0.25s;
+}
+.fob-fobible-skip:hover { color: var(--gold); border-color: var(--gold); }
+
+@media (max-width: 820px) {
+  .fob-fobible { padding: 56px 22px; }
+  .fob-fobible-grid { grid-template-columns: 1fr; gap: 34px; }
+  .fob-fobible-cover { max-width: 240px; }
+}
+
+
+/* ── FOBIBLE MODAL ── */
+.fob-modal {
+  position: fixed; inset: 0; z-index: 300;
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.fob-modal.open { display: flex; }
+.fob-modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(8,10,12,0.82); backdrop-filter: blur(6px);
+  animation: fobFadeIn 0.3s ease;
+}
+.fob-modal-panel {
+  position: relative; z-index: 1;
+  width: min(940px, 100%); max-height: 92svh; overflow-y: auto;
+  background: var(--ink-warm);
+  border: 1px solid var(--gold-line);
+  padding: 48px 46px;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+  animation: fobModalIn 0.4s cubic-bezier(0.2,0,0.2,1);
+}
+/* engineered corner brackets on the panel */
+.fob-modal-panel::before,
+.fob-modal-panel::after {
+  content: ''; position: absolute; width: 18px; height: 18px;
+  border: 1px solid var(--gold-dim); pointer-events: none;
+}
+.fob-modal-panel::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+.fob-modal-panel::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+.fob-modal-close {
+  position: absolute; top: 16px; right: 20px; z-index: 2;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 30px; line-height: 1;
+  transition: color 0.2s;
+}
+.fob-modal-close:hover { color: var(--gold); }
+@keyframes fobFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fobModalIn { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+/* modal reuses the fobible grid; tighten cover for the panel */
+.fob-modal .fob-fobible-grid { grid-template-columns: 260px 1fr; gap: 44px; }
+.fob-modal .fob-fobible-title { margin-top: 14px; }
+@media (max-width: 760px) {
+  .fob-modal-panel { padding: 40px 24px; }
+  .fob-modal .fob-fobible-grid { grid-template-columns: 1fr; gap: 26px; }
+  .fob-modal .fob-fobible-cover { max-width: 200px; margin: 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fob-modal-backdrop, .fob-modal-panel { animation: none; }
+}
+body.fob-modal-open { overflow: hidden; }
+
+/* ── HERO TOP BAR (classification designation) ── */
+.fob-hero-bar {
+  position: absolute; top: 64px; left: 0; right: 0; z-index: 3;
+  border-bottom: 1px solid var(--gold-line-soft);
+  background: linear-gradient(180deg, rgba(20,23,27,0.55), rgba(20,23,27,0));
+  pointer-events: none;
+}
+.fob-hero-bar-inner {
+  max-width: 1200px; margin: 0 auto; padding: 15px 24px;
+  font-family: var(--display); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.42em; text-transform: uppercase; color: var(--gold);
+  display: flex; align-items: center; gap: 16px;
+}
+.fob-hero-bar-inner::before {
+  content: ''; width: 34px; height: 1px; background: var(--gold); flex: none;
+}
+@media (max-width: 560px) {
+  .fob-hero-bar { top: 56px; }
+  .fob-hero-bar-inner { font-size: 10px; letter-spacing: 0.28em; padding: 12px 20px; gap: 12px; }
+  .fob-hero-bar-inner::before { width: 20px; }
+}
+
+/* ═══════════════════════════════════════════════
+   TRAIN WITH FOB - adaptive inquiry section.
+   Sits directly beneath the hero; six flows, one form.
+   ═══════════════════════════════════════════════ */
+.fob-inquiry {
+  position: relative; overflow: hidden;
+  padding: var(--section-space-sm) 24px var(--section-space-md);
+  border-bottom: 1px solid var(--gold-line-soft);
+  background: var(--ink);
+}
+/* graphite illustration backdrop: landscape plate on desktop,
+   dedicated 9:16 portrait asset on mobile. Gradients keep the
+   form side readable while the athlete stays visible. */
+.fob-inquiry-bg {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(180deg, var(--ink) 0%, rgba(20,23,27,0.35) 18%, rgba(20,23,27,0.35) 78%, var(--ink) 100%),
+    linear-gradient(90deg, rgba(20,23,27,0.92) 0%, rgba(20,23,27,0.78) 46%, rgba(20,23,27,0.30) 100%),
+    url('images/sketch-plate-wide.jpg');
+  background-size: auto, auto, cover;
+  background-position: center, center, center right;
+  opacity: .65;
+}
+@media (max-width: 760px) {
+  .fob-inquiry-bg {
+    background-image:
+      linear-gradient(180deg, var(--ink) 0%, rgba(20,23,27,0.55) 14%, rgba(20,23,27,0.72) 55%, var(--ink) 100%),
+      url('images/hero-poster.jpg');
+    background-size: auto, cover;
+    background-position: center, center 30%;
+  }
+}
+.fob-inquiry-wrap { position: relative; z-index: 1; }
+.fob-iq-lead { font-size: 16px; color: var(--muted); margin: 14px 0 34px; }
+
+/* type selector */
+.fob-iq-typewrap { margin-bottom: 10px; }
+.fob-iq-types { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.fob-iq-type {
+  font-family: var(--display); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: #C9CDD2;
+  background: linear-gradient(180deg, rgba(211,190,152,0.05), rgba(0,0,0,0)) , #1C2026;
+  border: 1px solid rgba(211,190,152,0.20);
+  padding: 14px 22px; min-height: 44px; cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.fob-iq-type:hover { color: var(--gold); border-color: rgba(211,190,152,0.45); transform: translateY(-1px); }
+.fob-iq-type:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.fob-iq-type.sel {
+  color: var(--text); border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(211,190,152,0.16), rgba(211,190,152,0.06)), #1C2026;
+  box-shadow: inset 0 1px 0 rgba(211,190,152,0.25);
+}
+.fob-iq-type.sel::before { content: '\25C6'; font-size: 8px; margin-right: 8px; vertical-align: 2px; }
+@media (max-width: 640px) { .fob-iq-types { display: grid; grid-template-columns: 1fr 1fr; } .fob-iq-type { padding: 14px 10px; } }
+
+/* form container + reveal */
+.fob-iq-root { margin-top: 22px; max-width: 640px; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.fob-iq-root.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .fob-iq-root { transition: none; transform: none; } }
+
+.fob-iq-form { display: flex; flex-direction: column; gap: 26px; }
+.fob-iq-intro { font-size: 15px; color: var(--muted); line-height: 1.7; }
+.fob-iq-excerpt {
+  font-size: 15px; color: var(--text); line-height: 1.75; margin: 0;
+  border-left: 2px solid var(--gold); padding: 4px 0 4px 18px;
+}
+.fob-iq-field { display: flex; flex-direction: column; gap: 8px; }
+.fob-iq-label {
+  font-family: var(--display); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold);
+}
+.fob-iq-opt { color: var(--gold-dim); letter-spacing: 0.1em; font-size: 10px; text-transform: none; }
+.fob-iq-hint { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.fob-iq-error { font-size: 12.5px; color: #d99a8a; min-height: 0; }
+.fob-iq-field.err .fob-iq-input, .fob-iq-field.err .fob-iq-select { border-color: #b5766a; }
+
+.fob-iq-input, .fob-iq-select {
+  background: rgba(23,26,30,0.82); color: var(--text);
+  border: 1px solid var(--gold-line-soft);
+  font-family: var(--body); font-size: 15px;
+  padding: 13px 14px; min-height: 44px; width: 100%;
+  transition: border-color 0.2s;
+  border-radius: 0; appearance: none; -webkit-appearance: none;
+}
+.fob-iq-select {
+  background-image: linear-gradient(45deg, transparent 50%, var(--gold-dim) 50%), linear-gradient(135deg, var(--gold-dim) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px; background-repeat: no-repeat;
+  padding-right: 38px;
+}
+.fob-iq-input:hover, .fob-iq-select:hover { border-color: var(--gold-line); }
+.fob-iq-input:focus-visible, .fob-iq-select:focus-visible { outline: none; border-color: var(--gold); }
+.fob-iq-textarea { min-height: 84px; resize: vertical; }
+
+/* radio cards */
+.fob-iq-cards { border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.fob-iq-cards legend { margin-bottom: 10px; }
+.fob-iq-cardgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 520px) { .fob-iq-cardgrid { grid-template-columns: 1fr; } }
+.fob-iq-card {
+  display: flex; flex-direction: column; gap: 4px; cursor: pointer;
+  background: linear-gradient(180deg, rgba(211,190,152,0.04), rgba(0,0,0,0)), #1B1F25;
+  border: 1px solid rgba(211,190,152,0.18);
+  padding: 14px 16px; min-height: 44px; position: relative;
+  transition: border-color 0.2s, background 0.2s;
+}
+.fob-iq-card:hover { border-color: rgba(211,190,152,0.45); }
+.fob-iq-card input { position: absolute; opacity: 0; pointer-events: none; }
+.fob-iq-card-txt { font-size: 14px; color: var(--text); }
+.fob-iq-card-note { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+.fob-iq-card:has(input:checked) {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(211,190,152,0.15), rgba(211,190,152,0.05)), #1B1F25;
+  box-shadow: inset 0 1px 0 rgba(211,190,152,0.22);
+}
+.fob-iq-card:has(input:checked) .fob-iq-card-txt { color: var(--text); }
+.fob-iq-card:has(input:checked) .fob-iq-card-txt::before { content: '\25C6'; color: var(--gold); font-size: 8px; margin-right: 8px; vertical-align: 2px; }
+.fob-iq-card:has(input:focus-visible) { outline: 2px solid var(--gold); outline-offset: 2px; }
+.fob-iq-cards.err .fob-iq-card { border-color: #b5766a; }
+
+/* competitive scale */
+.fob-iq-scale { display: flex; align-items: center; gap: 18px; }
+.fob-iq-scale input[type=range] {
+  flex: 1; height: 44px; background: transparent; appearance: none; -webkit-appearance: none; cursor: pointer;
+}
+.fob-iq-scale input[type=range]::-webkit-slider-runnable-track { height: 2px; background: var(--gold-line); }
+.fob-iq-scale input[type=range]::-moz-range-track { height: 2px; background: var(--gold-line); }
+.fob-iq-scale input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; margin-top: -8px;
+  background: var(--gold); transform: rotate(45deg); border: none;
+}
+.fob-iq-scale input[type=range]::-moz-range-thumb {
+  width: 18px; height: 18px; background: var(--gold); transform: rotate(45deg); border: none; border-radius: 0;
+}
+.fob-iq-scale input[type=range]:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.fob-iq-scale-num {
+  font-family: var(--display); font-size: 22px; font-weight: 600; color: var(--gold);
+  min-width: 40px; text-align: center; border: 1px solid var(--gold-line-soft); padding: 6px 0;
+}
+
+/* checkboxes */
+.fob-iq-check { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-size: 14px; color: var(--text); line-height: 1.6; }
+.fob-iq-check input { width: 18px; height: 18px; margin-top: 2px; accent-color: #D3BE98; flex: none; }
+.fob-iq-consent { border-top: 1px solid var(--gold-line-soft); padding-top: 22px; }
+
+/* two-column day/time */
+.fob-iq-twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; transition: opacity 0.25s; }
+@media (max-width: 520px) { .fob-iq-twocol { grid-template-columns: 1fr; } }
+.fob-iq-twocol.fob-iq-dim { opacity: 0.45; }
+.fob-iq-twocol .fob-iq-field { margin: 0; }
+
+/* progressive reveal */
+.fob-iq-reveal { animation: iqReveal 0.28s ease; }
+@keyframes iqReveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .fob-iq-reveal { animation: none; } }
+
+/* actions + status + success */
+.fob-iq-actions { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.fob-iq-submit { min-height: 48px; }
+.fob-iq-submit.busy { opacity: 0.6; cursor: default; }
+.fob-iq-status { font-size: 13px; color: var(--muted); }
+.fob-iq-success { padding: 34px 0 10px; }
+.fob-iq-success-h {
+  font-family: var(--display); font-size: clamp(24px, 4vw, 34px);
+  font-weight: 500; color: var(--text); margin: 14px 0 12px;
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION HEADING SYSTEM - eyebrow / major title /
+   support / short gold rule. Reusable site-wide.
+   ═══════════════════════════════════════════════ */
+.fob-sec-head { margin-bottom: var(--content-gap-lg); }
+.fob-sec-eyebrow {
+  font-family: var(--display); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--gold); display: flex; align-items: center; gap: 14px;
+  margin-bottom: 14px;
+}
+.fob-sec-eyebrow::before { content: ''; width: 30px; height: 1px; background: var(--gold); flex: none; }
+.fob-sec-title {
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(34px, 6vw, 54px); line-height: 1.04;
+  letter-spacing: 0.01em; color: var(--text);
+  text-transform: uppercase;
+}
+.fob-sec-rule { width: 64px; height: 2px; background: var(--gold); margin: 18px 0 0; }
+.fob-sec-title--xl {
+  font-size: clamp(38px, 7.2vw, 64px);
+  color: var(--cream);
+  text-shadow: 0 0 26px rgba(233,201,143,0.18);
+}
+.fob-sec-support {
+  font-size: clamp(16px, 2vw, 18px); color: var(--muted);
+  line-height: 1.65; margin-top: 16px; max-width: 56ch;
+}
+
+/* section tone utilities (subtle scroll variation) */
+.tone-black { background: var(--tone-black); }
+.tone-graphite { background: var(--tone-graphite); }
+.tone-warm { background: var(--tone-warm); }
+.tone-khaki { background: var(--tone-khaki); }
+.tone-lift { background: linear-gradient(180deg, rgba(211,190,152,0.03), rgba(0,0,0,0)), var(--tone-lift); }
+.tone-deep { background: var(--tone-deep); }
+.tone-gold {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(233,201,143,0.14), rgba(233,201,143,0.06) 48%, rgba(233,201,143,0.02) 100%),
+    radial-gradient(ellipse 85% 65% at 50% 0%, rgba(211,190,152,0.10), transparent 72%),
+    var(--tone-gold);
+  border-top: 1px solid rgba(211,190,152,0.24);
+  border-bottom: 1px solid rgba(211,190,152,0.24);
+}
+.tone-glow { background: radial-gradient(ellipse 90% 70% at 50% 0%, rgba(211,190,152,0.05), transparent 60%), var(--tone-graphite); }
+
+
+/* ── HERO IDENTITY CUE ── */
+.fob-hero-cue {
+  margin-top: 22px; font-size: 13px; letter-spacing: 0.04em; color: var(--muted);
+}
+.fob-hero-cue a { color: var(--gold-dim); border-bottom: 1px solid rgba(211,190,152,0.3); padding-bottom: 1px; transition: color 0.2s, border-color 0.2s; }
+.fob-hero-cue a:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
+
+/* ═══════════════════════════════════════════════
+   PANEL LANGUAGE - reusable layered surfaces
+   ═══════════════════════════════════════════════ */
+.fob-panel {
+  background: linear-gradient(145deg, rgba(218,185,130,0.07), rgba(18,22,26,0.9));
+  border: 1px solid rgba(218,185,130,0.2);
+  border-radius: 16px;
+  padding: clamp(20px, 3.5vw, 34px);
+}
+.fob-panel--elevated { box-shadow: 0 18px 50px rgba(0,0,0,0.28); }
+.fob-panel--interactive { transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s; }
+.fob-panel--interactive:hover { border-color: rgba(218,185,130,0.42); transform: translateY(-2px); }
+.fob-panel--selected {
+  border-color: var(--gold);
+  background: linear-gradient(145deg, rgba(218,185,130,0.15), rgba(18,22,26,0.92));
+  box-shadow: inset 0 1px 0 rgba(218,185,130,0.25), 0 14px 40px rgba(0,0,0,0.3);
+}
+
+/* inquiry interactive shell */
+.fob-iq-shell {
+  background: linear-gradient(150deg, rgba(218,185,130,0.06), rgba(16,19,23,0.82));
+  border: 1px solid rgba(218,185,130,0.18);
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.26);
+  padding: clamp(18px, 3.5vw, 34px);
+  max-width: 720px;
+}
+
+/* ═══════════════════════════════════════════════
+   FOUNDER SECTION + CREDENTIAL RAIL
+   ═══════════════════════════════════════════════ */
+
+.fob-cred-rail {
+  position: relative; margin-top: var(--content-gap-md);
+  width: 100%; max-width: 100%; min-width: 0;
+  background: linear-gradient(150deg, rgba(218,185,130,0.06), rgba(14,16,20,0.9));
+  border: 1px solid rgba(218,185,130,0.24);
+  border-radius: 10px;
+  overflow: hidden;
+}
+/* edge fade: affordance that the rail scrolls */
+.fob-cred-rail::after {
+  content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 44px;
+  background: linear-gradient(90deg, rgba(16,18,22,0), rgba(16,18,22,0.85));
+  pointer-events: none;
+}
+.fob-cred-scroll {
+  display: flex; flex-wrap: nowrap; overflow-x: auto;
+  width: 100%; max-width: 100%;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  padding: 16px 12px;
+}
+.fob-cred-scroll::-webkit-scrollbar { display: none; }
+.fob-cred-scroll:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: -2px; }
+.fob-cred {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  flex: none; width: clamp(104px, 12vw, 132px);
+  padding: 4px 12px; scroll-snap-align: start;
+  border-right: 1px solid rgba(218,185,130,0.16);
+  text-align: center;
+}
+.fob-cred:last-child { border-right: none; }
+.fob-cred img { width: 42px; height: 42px; object-fit: contain; }
+.fob-cred-title {
+  font-family: var(--display); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.06em; color: var(--cream); line-height: 1.25;
+}
+.fob-cred-sub {
+  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gold-dim); line-height: 1.3;
+}
+
+
+
+/* ═══════════════════════════════════════════════
+   SCROLL DIVIDERS - small animated waypoints
+   between sections; draw in as you reach them.
+   ═══════════════════════════════════════════════ */
+.fob-scroll-div {
+  position: relative; height: 1px;
+  max-width: min(520px, 72vw);
+  margin: 0 auto;
+  background: var(--gold-line);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fob-scroll-div.in { transform: scaleX(1); }
+.fob-scroll-div-node {
+  position: absolute; left: 50%; top: 50%; z-index: 2;
+  width: 7px; height: 7px;
+  transform: translate(-50%, -50%) rotate(45deg) scale(0);
+  background: var(--gold);
+  transition: transform 0.5s 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fob-scroll-div.in .fob-scroll-div-node {
+  transform: translate(-50%, -50%) rotate(45deg) scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fob-scroll-div { transform: none; transition: none; }
+  .fob-scroll-div-node { transform: translate(-50%, -50%) rotate(45deg) scale(1); transition: none; }
+}
+
+
+/* headline artwork: the supplied brand-font wordmark, centered at the top.
+   Constant slight gold glow; slow, barely-there scale breathe. */
+.fob-h1-art { margin: 0 0 clamp(9px, 1.5vw, 14px); }
+.fob-h1-art img {
+  width: min(92vw, 960px); height: auto; display: block;
+  filter: drop-shadow(0 6px 24px rgba(0,0,0,0.55))
+          drop-shadow(0 0 1px rgba(233,201,143,0.4))
+          drop-shadow(0 6px 3px rgba(233,201,143,0.26))
+          drop-shadow(0 12px 9px rgba(233,201,143,0.1));
+  animation: fobHeadlineBreathe 4.2s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+@keyframes fobHeadlineBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fob-h1-art img { animation: none; }
+}
+
+
+/* ═══════════════════════════════════════════════
+   CENTERED TEXT SYSTEM - headings, eyebrows, and
+   copy align to the page centerline site-wide.
+   Interactive form internals stay left for usability.
+   ═══════════════════════════════════════════════ */
+.fob-rulehead { justify-content: center; }
+.fob-rulehead::after { content: ''; height: 1px; width: 30px; background: var(--gold); flex: none; }
+.fob-sec-head { text-align: center; }
+.fob-sec-eyebrow { justify-content: center; }
+.fob-sec-eyebrow::after { content: ''; width: 30px; height: 1px; background: var(--gold); flex: none; }
+.fob-sec-rule { margin-left: auto; margin-right: auto; }
+.fob-sec-support { margin-left: auto; margin-right: auto; }
+.fob-section .fob-h2,
+.fob-section .fob-lede,
+.fob-section .fob-body-txt,
+.fob-section .fob-classification { text-align: center; }
+.fob-section .fob-lede,
+.fob-section .fob-body-txt { margin-left: auto; margin-right: auto; }
+.fob-split { grid-template-columns: 1fr !important; text-align: center; gap: var(--content-gap-md); }
+.fob-split > div { display: block !important; }
+.fob-btn-row { justify-content: center; }
+.fob-pillars { text-align: center; }
+.fob-pillar h3, .fob-pillar p, .fob-pillar-num { text-align: center; }
+.fob-iq-typewrap { text-align: center; }
+.fob-iq-types { justify-content: center; }
+.fob-iq-shell { margin-left: auto; margin-right: auto; }
+/* form internals remain readable: left-aligned inside the shell */
+.fob-iq-form, .fob-iq-form .fob-iq-label, .fob-iq-form legend { text-align: left; }
+.fob-iq-root .fob-iq-success { text-align: center; }
+.fob-hero-cue { text-align: center; }
+
+/* ═══════════════════════════════════════════════
+   CONVERSION LADDER COMPONENTS (v27)
+   ═══════════════════════════════════════════════ */
+/* cinematic 16:9 video slot: swaps for real film later */
+.fob-video-slot {
+  position: relative; aspect-ratio: 16 / 9;
+  max-width: 880px; margin: 0 auto;
+  border: 1px solid rgba(218,185,130,0.26); border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(17,19,24,0.55), rgba(17,19,24,0.85)),
+    url('images/sketch-plate-wide.jpg') center/cover;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.32);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  overflow: hidden;
+}
+.fob-video-play {
+  width: 64px; height: 64px; border-radius: 50%;
+  border: 1px solid var(--gold); position: relative;
+  background: rgba(17,19,24,0.6); backdrop-filter: blur(3px);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.fob-video-play::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 14px; height: 14px; background: var(--gold);
+  transform: translate(-42%, -50%) rotate(45deg);
+}
+.fob-video-slot:hover .fob-video-play { transform: scale(1.06); box-shadow: 0 0 24px rgba(233,201,143,0.25); }
+.fob-video-note {
+  font-family: var(--display); font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold-dim); text-align: center; padding: 0 20px;
+}
+
+/* three outcomes: the defining moment */
+.fob-outcomes {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--content-gap-md); margin-top: var(--content-gap-lg);
+}
+.fob-outcome { text-align: center; }
+.fob-outcome-num {
+  font-family: var(--display); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.3em; color: var(--gold);
+  display: inline-block; margin-bottom: 12px;
+}
+.fob-outcome h3, .fob-step h3 {
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(18px, 2.2vw, 22px); text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--cream); margin-bottom: 10px;
+}
+.fob-outcome p, .fob-step p { font-size: 14.5px; line-height: 1.65; color: var(--muted); }
+@media (max-width: 820px) { .fob-outcomes { grid-template-columns: 1fr; } }
+
+/* first-session steps */
+.fob-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--content-gap-md); margin-top: var(--content-gap-lg);
+  text-align: center;
+}
+@media (max-width: 820px) { .fob-steps { grid-template-columns: 1fr; gap: var(--content-gap-lg); } }
+
+/* pull quote: the sentence people say */
+.fob-pullquote {
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(22px, 3.6vw, 34px); line-height: 1.25;
+  color: var(--gold-bright); text-align: center;
+  margin: var(--content-gap-lg) auto var(--content-gap-md);
+  max-width: 20ch;
+}
+
+/* gold text link (FOBible curiosity path) */
+.fob-link-gold {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--display); font-size: 13px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--gold);
+  border-bottom: 1px solid rgba(211,190,152,0.4); padding-bottom: 3px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.fob-link-gold:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
+
+/* FAQ: native details, styled */
+.fob-faq details {
+  border: 1px solid rgba(218,185,130,0.2); border-radius: 12px;
+  background: linear-gradient(150deg, rgba(218,185,130,0.05), rgba(16,19,23,0.8));
+  margin-bottom: 12px; overflow: hidden;
+}
+.fob-faq summary {
+  cursor: pointer; list-style: none;
+  padding: 16px 20px; position: relative;
+  font-family: var(--display); font-size: 14px; font-weight: 500;
+  color: var(--cream); letter-spacing: 0.03em; text-align: left;
+}
+.fob-faq summary::-webkit-details-marker { display: none; }
+.fob-faq summary::after {
+  content: ''; position: absolute; right: 20px; top: 50%;
+  width: 8px; height: 8px; border-right: 1px solid var(--gold); border-bottom: 1px solid var(--gold);
+  transform: translateY(-70%) rotate(45deg); transition: transform 0.25s;
+}
+.fob-faq details[open] summary::after { transform: translateY(-30%) rotate(225deg); }
+.fob-faq details p {
+  padding: 0 20px 16px; font-size: 14.5px; line-height: 1.65;
+  color: var(--muted); text-align: left;
+}
+.fob-faq summary:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: -2px; }
+
+/* ═══════════════════════════════════════════════
+   V1 LAUNCH - announcement, hero, film, pricing
+   ═══════════════════════════════════════════════ */
+
+/* HERO */
+.fob-hero-v2 {
+  position: relative;
+  padding: calc(var(--nav-h) + clamp(26px, 4vw, 44px)) 24px 0;
+  background:
+    radial-gradient(ellipse 62% 42% at 50% 2%, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.62) 38%, rgba(0,0,0,0) 76%),
+    linear-gradient(180deg, #000102 0%, #000204 18%, #010407 36%, #03070A 54%, #070B0F 72%, var(--tone-graphite) 100%);
+  text-align: center;
+}
+/* Subtle warm aura easing inward from the upper-left and upper-right,
+   fading out around the headline. Bounded to the top so it never touches
+   the nav or continues down the page. Not animated. */
+.fob-hero-v2::before {
+  content: ''; position: absolute; left: 0; right: 0;
+  top: var(--nav-h); height: clamp(720px, 92vh, 980px);
+  pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 44% 62% at 12% 6%, rgba(220,190,140,0.034), transparent 70%),
+    radial-gradient(ellipse 44% 62% at 88% 6%, rgba(220,190,140,0.034), transparent 70%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 52%, rgba(0,0,0,.86) 66%, rgba(0,0,0,.58) 82%, rgba(0,0,0,.24) 93%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 52%, rgba(0,0,0,.86) 66%, rgba(0,0,0,.58) 82%, rgba(0,0,0,.24) 93%, transparent 100%);
+}
+.fob-hero-v2 > * { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: no-preference) {}
+.fob-hero-v2-inner {
+  max-width: 720px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center;
+}
+.fob-emblem {
+  width: clamp(112px, 15.5vw, 154px); height: auto; display: block;
+  filter: drop-shadow(0 8px 30px rgba(0,0,0,0.6));
+}
+.fob-hero-utility {
+  margin-top: 16px;
+  font-family: var(--display); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.26em; text-transform: uppercase; color: var(--gold-dim);
+}
+.fob-hero-h1 {
+  margin: clamp(20px, 3.4vw, 30px) 0 0;
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(34px, 6.4vw, 66px); line-height: 1.04;
+  letter-spacing: -0.015em; color: var(--cream);
+}
+.fob-hero-sub {
+  margin: clamp(14px, 2vw, 20px) auto 0;
+  max-width: 46ch; font-size: clamp(15.5px, 1.8vw, 18px);
+  line-height: 1.6; color: #C4C8CD;
+}
+.fob-hero-v2 .fob-btn-row { margin-top: clamp(18px, 2.4vw, 26px); }
+.fob-hero-micro {
+  margin-top: 12px; font-size: 12px; letter-spacing: 0.04em; color: var(--muted);
+}
+
+/* hero film */
+.fob-hero-film {
+  position: relative; margin: clamp(20px, 3vw, 34px) auto 0;
+  max-width: 1180px; aspect-ratio: 16 / 9;
+  border: 1px solid rgba(211,190,152,0.24); border-radius: 16px;
+  overflow: hidden; background: #0b0d10;
+  box-shadow: 0 26px 70px rgba(0,0,0,0.5);
+}
+.fob-hero-film-vid { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fob-hero-film-edge {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(12,14,17,0.28) 0%, rgba(12,14,17,0) 26%, rgba(12,14,17,0) 72%, rgba(12,14,17,0.55) 100%);
+}
+@media (max-width: 700px) { .fob-hero-film { border-radius: 12px; } }
+
+
+/* outcome clip slots */
+.fob-outcome-media {
+  aspect-ratio: 16 / 9; margin-bottom: 16px; border-radius: 10px;
+  background: linear-gradient(140deg, rgba(211,190,152,0.09), rgba(10,12,15,0.9));
+  border: 1px solid rgba(211,190,152,0.16);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.fob-outcome-media img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.4s ease;
+}
+.fob-outcome:hover .fob-outcome-media img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) {
+  .fob-outcome-media img, .fob-outcome:hover .fob-outcome-media img {
+    transition: none; transform: none;
+  }
+}
+.fob-outcome-media span {
+  font-family: var(--display); font-size: 10px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--gold-dim);
+}
+
+
+
+/* full film frame */
+.fob-filmframe {
+  margin: 0 auto clamp(30px, 4vw, 44px); max-width: 980px;
+  border: 1px solid rgba(211,190,152,0.24); border-radius: 14px;
+  overflow: hidden; background: #0b0d10; box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+}
+.fob-filmframe-vid { width: 100%; aspect-ratio: 16 / 9; display: block; background: #0b0d10; }
+.fob-filmframe figcaption {
+  padding: 12px 16px; font-family: var(--display); font-size: 10.5px;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-dim);
+  border-top: 1px solid rgba(211,190,152,0.16); text-align: center;
+}
+
+/* pricing */
+.fob-pricing {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;
+  margin: 0 auto clamp(24px, 3.4vw, 34px); max-width: 620px;
+}
+.fob-price-card {
+  flex: 1 1 200px; padding: 22px 20px; border-radius: 14px;
+  border: 1px solid rgba(211,190,152,0.18);
+  background: linear-gradient(160deg, rgba(211,190,152,0.05), rgba(12,14,17,0.9));
+}
+.fob-price-card--hero {
+  border-color: var(--gold);
+  background: linear-gradient(160deg, rgba(211,190,152,0.16), rgba(12,14,17,0.92));
+  box-shadow: inset 0 1px 0 rgba(211,190,152,0.25), 0 14px 40px rgba(0,0,0,0.35);
+}
+.fob-price-label {
+  font-family: var(--display); font-size: 10.5px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--gold-dim); margin-bottom: 10px;
+}
+.fob-price-num {
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(30px, 4.6vw, 44px); line-height: 1; color: var(--cream);
+}
+.fob-price-num s { color: var(--muted); text-decoration-thickness: 2px; }
+.fob-price-card--hero .fob-price-num { color: var(--gold-bright); }
+.fob-price-note { margin-top: 10px; font-size: 12px; color: var(--muted); }
+
+.fob-inquiry-alt { margin-top: 22px; text-align: center; font-size: 13.5px; color: var(--muted); }
+.fob-inquiry-alt a { color: var(--gold); border-bottom: 1px solid rgba(211,190,152,0.35); }
+.fob-inquiry-alt a:hover { color: var(--gold-bright); }
+
+
+/* ═══════════════════════════════════════════════
+   NAV RATE CARD - merged banner. Logo left, the
+   founder's rate fills the bar to its right.
+   ═══════════════════════════════════════════════ */
+.fob-brand { flex: none; }
+.fob-rate {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; align-items: center; gap: clamp(10px, 1.6vw, 20px);
+  padding: 9px clamp(14px, 2vw, 20px);
+  border: 1px solid rgba(211,190,152,0.3);
+  border-radius: 10px;
+  background: linear-gradient(100deg, rgba(233,201,143,0.16), rgba(211,190,152,0.05) 55%, rgba(18,22,26,0.6));
+  box-shadow: inset 0 1px 0 rgba(233,201,143,0.18);
+  text-decoration: none; overflow: hidden;
+  transition: border-color 0.25s, background 0.25s;
+  animation: fobRateIn 0.85s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.fob-rate:hover { border-color: var(--gold-bright); background: linear-gradient(100deg, rgba(233,201,143,0.24), rgba(211,190,152,0.08) 55%, rgba(18,22,26,0.6)); }
+.fob-rate:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.fob-rate-single {
+  min-width: 0; text-align: center; width: 100%;
+  font-family: var(--display); font-size: clamp(10px, 1.2vw, 12px); font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-bright);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fob-rate-tag { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 0 1 auto; min-width: 0;
+  font-family: var(--display); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold-bright);
+  padding-right: clamp(10px, 1.6vw, 20px);
+  border-right: 1px solid rgba(211,190,152,0.28);
+}
+.fob-rate-main {
+  font-family: var(--display); font-size: clamp(11px, 1.25vw, 13px); font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--cream);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fob-rate-main b { color: var(--gold-bright); font-weight: 600; margin-left: 8px; }
+.fob-rate-sub {
+  flex: none; margin-left: auto;
+  font-family: var(--display); font-size: 10px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold-dim); white-space: nowrap;
+}
+/* one-time reveal: the bar draws in from the left */
+@keyframes fobRateIn {
+  from { clip-path: inset(0 100% 0 0); opacity: 0; }
+  to   { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+@media (max-width: 900px) { .fob-rate-sub { display: none; } }
+@media (max-width: 640px) {
+  .fob-rate { padding: 8px 12px; gap: 10px; border-radius: 8px; }
+  .fob-rate-tag { font-size: 8.5px; letter-spacing: 0.16em; padding-right: 10px; }
+  .fob-rate-main { font-size: 10px; letter-spacing: 0.05em; }
+  .fob-rate-main b { margin-left: 6px; }
+}
+@media (max-width: 380px) { .fob-rate-tag { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .fob-rate { animation: none; clip-path: none; opacity: 1; }
+}
+
+/* film slot placeholder */
+.fob-hero-film[data-film-slot] {
+  display: flex; align-items: center; justify-content: center;
+  background:
+    repeating-linear-gradient(115deg, rgba(211,190,152,0.035) 0 2px, transparent 2px 9px),
+    linear-gradient(150deg, rgba(211,190,152,0.07), rgba(10,12,15,0.94));
+}
+.fob-filmslot-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.fob-filmslot-mark {
+  width: 46px; height: 46px; transform: rotate(45deg);
+  border: 1px solid rgba(211,190,152,0.5);
+}
+.fob-filmslot-label {
+  font-family: var(--display); font-size: 11px; letter-spacing: 0.26em;
+  text-transform: uppercase; color: var(--gold-dim); text-align: center;
+}
+
+/* secondary section head inside a merged section */
+.fob-sec-head--sub { margin-top: clamp(36px, 6vw, 64px); }
+.fob-sec-head--sub .fob-sec-title { font-size: clamp(28px, 4.4vw, 44px); }
+
+
+/* hero close: film -> book -> price, kept tight */
+.fob-hero-close {
+  max-width: 720px; margin: 0 auto;
+  padding-bottom: clamp(6px, 1.4vw, 14px);
+  display: flex; flex-direction: column; align-items: center;
+}
+.fob-hero-close .fob-btn-row { margin-top: clamp(18px, 2.6vw, 28px); }
+/* the primary CTA sits directly beneath the ghost pair, not a full
+   section-gap below it, so the three read as one closing group */
+.fob-hero-close .fob-btn-row.fob-hero-close-primary {
+  margin-top: clamp(10px, 1.4vw, 14px);
+}
+
+/* sound affordance on the launch film */
+.fob-film-sound {
+  position: absolute; right: 14px; top: 14px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 15px; cursor: pointer;
+  border: 1px solid rgba(211,190,152,0.42); border-radius: 999px;
+  background: rgba(12,14,17,0.72);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  font-family: var(--display); font-size: 10.5px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--cream);
+  transition: border-color 0.2s, background 0.2s, opacity 0.3s;
+}
+.fob-film-sound:hover { border-color: var(--gold-bright); background: rgba(12,14,17,0.88); }
+.fob-film-sound:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.fob-film-sound.is-hidden { opacity: 0; pointer-events: none; }
+.fob-film-sound-ico {
+  width: 9px; height: 9px; flex: none; transform: rotate(45deg);
+  background: var(--gold-bright);
+}
+@media (max-width: 560px) {
+  .fob-film-sound { right: 10px; top: 10px; padding: 8px 12px; font-size: 9px; letter-spacing: 0.14em; }
+}
+
+
+/* ═══════════════════════════════════════════════
+   NAV LOGO - barely-there idle lift with a tight
+   gold glow that brightens at the top of the rise.
+   ═══════════════════════════════════════════════ */
+.fob-brand img {
+  animation: fobLogoIdle 6s ease-in-out infinite;
+  will-change: transform, filter;
+}
+@keyframes fobLogoIdle {
+  0%, 100% {
+    transform: translateY(0);
+    filter: drop-shadow(0 0 1px rgba(233,201,143,0.28));
+  }
+  50% {
+    transform: translateY(-3px);
+    filter: drop-shadow(0 0 1px rgba(233,201,143,0.6))
+            drop-shadow(0 1px 4px rgba(233,201,143,0.3));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fob-brand img {
+    animation: none;
+    transform: none;
+    filter: drop-shadow(0 0 1px rgba(233,201,143,0.28));
+  }
+}
+
+/* secondary brand statement under a section explanation */
+.fob-sec-aside {
+  margin: clamp(18px, 2.6vw, 26px) auto 0;
+  max-width: 46ch; text-align: center;
+  font-family: var(--display); font-size: clamp(12.5px, 1.5vw, 14px);
+  font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gold-dim); line-height: 1.6;
+}
+
+/* quiet private entry link at the very bottom of the footer */
+.fob-footer-private { margin-top: 18px; text-align: center; }
+.fob-footer-private a {
+  font-family: var(--display); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(155,161,168,0.42); text-decoration: none;
+  padding: 6px 10px; border-radius: 6px;
+  transition: color 0.25s, background 0.25s;
+}
+.fob-footer-private a:hover { color: var(--gold-dim); background: rgba(211,190,152,0.06); }
+.fob-footer-private a:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; color: var(--gold); }
+
+/* Enforce the hidden attribute. The Netlify Forms schema form sits between
+   the FAQ and the footer; without this it can still occupy layout space
+   and leave a large empty gap at the bottom of the page. */
+[hidden] { display: none !important; }
+
+/* optional expandable view (field test under the FOBible link) */
+.fob-optional { margin-top: 22px; }
+.fob-optional > summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--display); font-size: 11.5px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim);
+  padding: 9px 14px; border: 1px solid rgba(211,190,152,0.24); border-radius: 9px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.fob-optional > summary::-webkit-details-marker { display: none; }
+.fob-optional > summary::after {
+  content: ''; width: 6px; height: 6px; flex: none;
+  border-right: 1px solid currentColor; border-bottom: 1px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px); transition: transform 0.25s;
+}
+.fob-optional[open] > summary::after { transform: rotate(225deg) translate(-2px, -2px); }
+.fob-optional > summary:hover { color: var(--gold-bright); border-color: rgba(211,190,152,0.5); background: rgba(211,190,152,0.05); }
+.fob-optional > summary:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.fob-optional .fob-filmframe { margin-top: 18px; }
+
+/* FOB Education: quiet secondary mark beside the hero emblem.
+   Visible at every width, deliberately subordinate to the headline. */
+.fob-hero-mark {
+  position: relative; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.fob-edu {
+  position: absolute;
+  /* right edge lines up with the nav rate card: same 1200px container, same 24px gutter */
+  right: max(24px, calc((100% - 1200px) / 2 + 24px));
+  top: calc(var(--nav-h) + 16px);
+  display: flex; flex-direction: column; gap: 3px;
+  max-width: 38%;
+  padding: 9px 13px; text-decoration: none; text-align: left;
+  border: 1px solid rgba(211,190,152,0.2); border-radius: 10px;
+  background: linear-gradient(180deg, rgba(211,190,152,0.06), rgba(18,22,26,0.55));
+  transition: border-color 0.25s, background 0.25s, transform 0.2s;
+  z-index: 3;
+}
+.fob-edu:hover {
+  border-color: rgba(211,190,152,0.45);
+  background: linear-gradient(180deg, rgba(211,190,152,0.12), rgba(18,22,26,0.65));
+  transform: translateX(-2px);
+}
+.fob-edu:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
+.fob-edu-tag {
+  font-family: var(--display); font-size: 8.5px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim);
+  line-height: 1.2;
+}
+.fob-edu-main {
+  font-family: var(--display); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #C4C8CD;
+  line-height: 1.2;
+}
+.fob-edu:hover .fob-edu-main { color: var(--cream); }
+@media (max-width: 520px) {
+  .fob-edu { padding: 7px 10px; border-radius: 8px; max-width: 42%; }
+  .fob-edu-tag { font-size: 7.5px; letter-spacing: 0.16em; }
+  .fob-edu-main { font-size: 9.5px; letter-spacing: 0.06em; }
+}
+
+
+/* FOB Education page mark */
+.fob-edu-emoji {
+  font-size: clamp(58px, 9vw, 82px); line-height: 1; display: block;
+  filter: drop-shadow(0 6px 22px rgba(0,0,0,0.5))
+          drop-shadow(0 0 14px rgba(233,201,143,0.22));
+}
+
+
+/* hero eyebrow above the headline */
+.fob-hero-eyebrow {
+  margin: 18px 0 0;
+  font-family: var(--display); font-size: clamp(10px, 1.2vw, 11.5px); font-weight: 600;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold);
+}
+.fob-hero-v2 .fob-hero-h1 { margin-top: clamp(12px, 1.8vw, 18px); }
+.fob-hero-utility { margin-top: 16px; }
+
+/* what a first session actually involves */
+.fob-facts {
+  list-style: none; margin: 0 auto clamp(24px, 3.4vw, 34px); padding: 0;
+  max-width: 640px; display: grid; gap: 1px;
+  border: 1px solid rgba(211,190,152,0.16); border-radius: 12px;
+  background: rgba(211,190,152,0.16); overflow: hidden;
+}
+.fob-facts li {
+  display: grid; grid-template-columns: 148px 1fr; gap: 16px; align-items: start;
+  padding: 14px 18px; background: rgba(16,19,23,0.92);
+  font-size: 14.5px; line-height: 1.6; color: #C4C8CD; text-align: left;
+}
+.fob-facts li span {
+  font-family: var(--display); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim);
+  padding-top: 3px;
+}
+@media (max-width: 560px) {
+  .fob-facts li { grid-template-columns: 1fr; gap: 5px; padding: 13px 15px; font-size: 14px; }
+}
+
+/* stable scroll target that clears the fixed nav (works on refresh + reduced-motion) */
+.fob-anchor {
+  display: block; position: relative;
+  top: calc(-1 * (var(--nav-h) + 18px)); visibility: hidden;
+}
+#first-session-form { scroll-margin-top: calc(var(--nav-h) + 18px); }
+
+/* ═══════════════════════════════════════════════
+   FOB EDUCATION - nav button into the knowledge
+   library. Distinct from the primary booking CTA.
+   ═══════════════════════════════════════════════ */
+.fob-nav-right {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; align-items: stretch; gap: clamp(8px, 1.2vw, 12px);
+}
+.fob-nav-right .fob-rate { flex: 1 1 auto; justify-content: center; }
+
+.fob-edu-btn {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px clamp(11px, 1.4vw, 15px);
+  border: 1px solid var(--gold-line); border-radius: 10px;
+  background: linear-gradient(180deg, rgba(211,190,152,0.1), rgba(18,22,26,0.55));
+  text-decoration: none; white-space: nowrap;
+  transition: border-color 0.25s, background 0.25s;
+}
+.fob-edu-btn:hover {
+  border-color: var(--gold-bright);
+  background: linear-gradient(180deg, rgba(211,190,152,0.18), rgba(18,22,26,0.65));
+}
+.fob-edu-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.fob-edu-btn-ico {
+  display: inline-flex; color: var(--gold); flex: none;
+}
+.fob-edu-btn-text { display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }
+.fob-edu-btn-main {
+  font-family: var(--display); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream);
+}
+.fob-edu-btn-sub {
+  font-family: var(--display); font-size: 8px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-dim);
+}
+
+/* responsive: keep both usable, compress text, never a 3-line bar */
+@media (max-width: 780px) {
+  .fob-rate-sub { display: none; }
+  .fob-edu-btn-sub { display: none; }
+}
+@media (max-width: 560px) {
+  .fob-nav-right { gap: 7px; }
+  .fob-rate { padding: 7px 11px; }
+  .fob-rate-tag { font-size: 8px; letter-spacing: 0.12em; padding-right: 9px; }
+  .fob-rate-main { font-size: 11px; }
+  .fob-edu-btn { padding: 7px 10px; gap: 7px; }
+  .fob-edu-btn-main { font-size: 9.5px; letter-spacing: 0.06em; }
+}
+@media (max-width: 380px) {
+  .fob-rate-tag { display: none; }
+  .fob-edu-btn-ico { display: none; }
+}
+@media (max-width: 400px) {
+  .fob-rate-main b { display: none; }
+}
+
+/* ═══════════════════════════════════════════════
+   MEMBER ACCESS PAGE - client-facing portal.
+   Own identity, shared design language. Calm,
+   athletic, premium. NOT the Form Review look.
+   ═══════════════════════════════════════════════ */
+.fob-member-nav .fob-nav-inner { justify-content: space-between; }
+.fob-member-back {
+  font-family: var(--display); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+  text-decoration: none; transition: color 0.2s;
+}
+.fob-member-back:hover { color: var(--gold); }
+.fob-member-back:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
+
+/* hero */
+.fob-member-hero {
+  position: relative;
+  padding: calc(var(--nav-h) + clamp(48px, 8vw, 96px)) 24px clamp(40px, 6vw, 72px);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(211,190,152,0.08), transparent 70%),
+    var(--tone-graphite);
+  text-align: center;
+}
+.fob-member-hero-inner { max-width: 680px; margin: 0 auto; }
+.fob-member-eyebrow {
+  font-family: var(--display); font-size: clamp(10px, 1.2vw, 11.5px); font-weight: 600;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold);
+}
+.fob-member-h1 {
+  margin: clamp(14px, 2vw, 20px) 0 0;
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(32px, 6vw, 58px); line-height: 1.05;
+  letter-spacing: -0.015em; color: var(--cream);
+}
+.fob-member-lede {
+  margin: clamp(16px, 2.4vw, 24px) auto 0; max-width: 52ch;
+  font-size: clamp(15.5px, 1.8vw, 18px); line-height: 1.6; color: #C4C8CD;
+}
+.fob-member-sub {
+  margin: 16px auto 0; max-width: 48ch;
+  font-size: 14.5px; line-height: 1.6; color: var(--muted);
+}
+.fob-member-eligibility {
+  margin: clamp(20px, 3vw, 30px) auto 0; display: inline-block;
+  font-family: var(--display); font-size: 10.5px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-dim);
+  padding: 8px 16px; border: 1px solid rgba(211,190,152,0.22); border-radius: 999px;
+}
+
+/* sections */
+.fob-member-section { padding: clamp(44px, 7vw, 84px) 24px; background: var(--tone-deep); }
+.fob-member-wrap { max-width: 1000px; margin: 0 auto; }
+.fob-member-sec-head { text-align: center; margin-bottom: clamp(32px, 5vw, 52px); }
+.fob-member-kicker {
+  font-family: var(--display); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-dim);
+}
+.fob-member-sec-title {
+  margin-top: 12px; font-family: var(--display); font-weight: 600;
+  font-size: clamp(24px, 4vw, 38px); line-height: 1.1; color: var(--cream);
+}
+
+/* portal overview cards */
+.fob-member-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+}
+.fob-member-card {
+  padding: clamp(20px, 3vw, 30px); border-radius: 14px;
+  border: 1px solid rgba(211,190,152,0.16);
+  background: linear-gradient(160deg, rgba(211,190,152,0.05), rgba(12,14,17,0.9));
+}
+.fob-member-card-num {
+  font-family: var(--display); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.2em; color: var(--gold-dim);
+}
+.fob-member-card h3 {
+  margin: 12px 0 8px; font-family: var(--display); font-weight: 600;
+  font-size: clamp(17px, 2.2vw, 21px); color: var(--cream);
+}
+.fob-member-card p { font-size: 14.5px; line-height: 1.6; color: #C4C8CD; }
+@media (max-width: 620px) { .fob-member-grid { grid-template-columns: 1fr; } }
+
+/* the portal shell around the PT Distinction embed */
+.fob-member-portal-section { background: var(--tone-graphite); }
+.fob-portal-shell {
+  border: 1px solid var(--gold-line-soft, rgba(211,190,152,0.28)); border-radius: 22px;
+  background: #0B0D10; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(211,190,152,0.08);
+}
+.fob-portal-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px clamp(16px, 2.4vw, 26px);
+  border-bottom: 1px solid rgba(211,190,152,0.16);
+  background: linear-gradient(180deg, rgba(211,190,152,0.06), rgba(0,0,0,0));
+}
+.fob-portal-brand {
+  font-family: var(--display); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold-dim);
+}
+.fob-portal-title {
+  font-family: var(--display); font-size: clamp(14px, 2vw, 17px); font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--cream); margin-top: 2px;
+}
+.fob-portal-status {
+  display: inline-flex; align-items: center; gap: 8px; flex: none;
+  font-family: var(--display); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted); white-space: nowrap;
+}
+.fob-portal-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #6FBF8B;
+  box-shadow: 0 0 8px rgba(111,191,139,0.6);
+}
+.fob-portal-body {
+  padding: clamp(10px, 1.4vw, 16px); position: relative;
+}
+/* Login view: crop the embed to just Email/Password/Login/Forgotten. The
+   attribution line renders below this height and is hidden by the crop.
+   A generous inner radius keeps corners premium without rounding PTD's UI. */
+.fob-portal-viewport {
+  height: 300px; overflow: hidden; border-radius: 14px;
+}
+.fob-portal-viewport.is-expanded { height: auto; }
+#ptd_portal { width: 100%; }
+#ptd_portal { width: 100%; }
+#ptd_portal iframe { width: 100% !important; min-height: 560px; border: 0; display: block; }
+.fob-portal-loading {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  min-height: 200px; color: var(--muted);
+  font-family: var(--display); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+}
+.fob-portal-spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid rgba(211,190,152,0.25); border-top-color: var(--gold-bright);
+  animation: fobPortalSpin 0.9s linear infinite;
+}
+@keyframes fobPortalSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .fob-portal-spinner { animation: none; } }
+.fob-portal-noscript {
+  text-align: center; padding: 40px 20px; color: #E8B4A6;
+  font-size: 15px; line-height: 1.6;
+}
+
+.fob-member-support {
+  margin: clamp(26px, 4vw, 40px) auto 0; max-width: 60ch; text-align: center;
+  font-size: 14.5px; line-height: 1.6; color: var(--muted);
+}
+.fob-member-boundary {
+  margin: 14px auto 0; max-width: 60ch; text-align: center;
+  font-size: 13.5px; line-height: 1.6; color: var(--muted);
+}
+.fob-member-boundary a, .fob-member-support a {
+  color: var(--gold); border-bottom: 1px solid rgba(211,190,152,0.35);
+}
+.fob-member-boundary a:hover, .fob-member-support a:hover { color: var(--gold-bright); }
+
+/* session supporting line + group-class preview (quiet, inside #book) */
+.fob-rate-support {
+  text-align: center; margin: clamp(14px, 2vw, 20px) auto 0; max-width: 640px;
+  font-family: var(--display); font-size: 11.5px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-dim);
+}
+.fob-group-notice {
+  max-width: 640px; margin: clamp(18px, 2.6vw, 26px) auto 0;
+  padding: 16px 20px; border-radius: 12px;
+  border: 1px dashed rgba(211,190,152,0.3);
+  background: linear-gradient(160deg, rgba(211,190,152,0.05), rgba(12,14,17,0.6));
+}
+.fob-group-notice-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap;
+}
+.fob-group-notice-tag {
+  font-family: var(--display); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--cream);
+}
+.fob-group-notice-soon {
+  font-family: var(--display); font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-bright);
+  padding: 4px 10px; border: 1px solid rgba(233,201,143,0.4); border-radius: 999px;
+}
+.fob-group-notice-body {
+  margin-top: 10px; font-size: 13.5px; line-height: 1.6; color: var(--muted);
+}
+
+/* ═══════════════════════════════════════════════
+   FOB EDUCATION - the knowledge library. Tabbed
+   curriculum built from the FOB Framework. Purely
+   conceptual / practical content, no business or
+   certification material lives here.
+   ═══════════════════════════════════════════════ */
+.fob-edu-tabs {
+  position: sticky; top: var(--nav-h); z-index: 5;
+  display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  padding: 14px 24px;
+  background: rgba(20,23,27,0.94);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--gold-line-soft);
+  border-bottom: 1px solid var(--gold-line-soft);
+  scrollbar-width: none;
+}
+@media (min-width: 900px) { .fob-edu-tabs { justify-content: center; } }
+.fob-edu-tabs::-webkit-scrollbar { display: none; }
+.fob-edu-tab {
+  flex: none; cursor: pointer; white-space: nowrap;
+  font-family: var(--display); font-size: 11.5px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  background: transparent; border: 1px solid var(--gold-line-soft); border-radius: 999px;
+  padding: 9px 16px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.fob-edu-tab:hover { color: var(--cream); border-color: var(--gold-line); }
+.fob-edu-tab:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.fob-edu-tab.is-active {
+  color: var(--ink); background: var(--gold); border-color: var(--gold);
+}
+
+.fob-edu-panels { padding-top: clamp(28px, 4vw, 44px); }
+.fob-edu-panel { display: none; }
+.fob-edu-panel.is-active { display: block; }
+
+/* long-form reading: override the site-wide centered section body copy */
+.fob-section .fob-edu-panel .fob-body-txt,
+.fob-section .fob-edu-panel .fob-edu-callout {
+  text-align: left; margin-left: 0; margin-right: 0;
+}
+.fob-edu-panel .fob-sec-head { text-align: left; }
+.fob-edu-panel .fob-sec-eyebrow { justify-content: flex-start; }
+.fob-edu-panel .fob-sec-eyebrow::after { display: none; }
+.fob-edu-panel .fob-sec-rule { margin-left: 0; margin-right: 0; }
+
+.fob-edu-block { margin-top: var(--content-gap-lg); }
+.fob-edu-block:first-child { margin-top: 0; }
+.fob-edu-block h3 {
+  font-family: var(--display); font-weight: 600; font-size: clamp(18px, 2.4vw, 22px);
+  color: var(--gold); letter-spacing: 0.01em; margin-bottom: 14px;
+}
+.fob-edu-block > p.fob-body-txt { margin-bottom: 14px; max-width: 68ch; }
+.fob-edu-block > p.fob-body-txt:last-child { margin-bottom: 0; }
+
+/* definition rows - reused pattern for components, directions, cues */
+.fob-edu-defs {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 1px; border-radius: 12px; overflow: hidden;
+  border: 1px solid rgba(211,190,152,0.16); background: rgba(211,190,152,0.16);
+}
+.fob-edu-defs li {
+  display: grid; grid-template-columns: 168px 1fr; gap: 16px; align-items: baseline;
+  padding: 14px 18px; background: rgba(16,19,23,0.92);
+  font-size: 14.5px; line-height: 1.6; color: #C4C8CD;
+}
+.fob-edu-defs li b {
+  font-family: var(--display); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.06em; color: var(--cream);
+}
+@media (max-width: 560px) {
+  .fob-edu-defs li { grid-template-columns: 1fr; gap: 4px; padding: 13px 15px; }
+}
+
+/* compact page header: replaces the old hero */
+.fob-edu-head {
+  padding: calc(var(--nav-h) + clamp(26px, 4vw, 40px)) 24px clamp(18px, 2.6vw, 26px);
+}
+.fob-edu-title {
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(22px, 3vw, 30px); letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold); text-align: center;
+}
+
+/* ordered step ladders (progression, teaching sequence, inspection) */
+.fob-edu-steps { list-style: none; margin: 0; padding: 0; counter-reset: edu-step; }
+.fob-edu-steps li {
+  counter-increment: edu-step;
+  position: relative; padding: 12px 0 12px 42px;
+  border-bottom: 1px solid var(--gold-line-soft);
+  font-size: 14.5px; line-height: 1.6; color: #C4C8CD;
+}
+.fob-edu-steps li:last-child { border-bottom: none; }
+.fob-edu-steps li::before {
+  content: counter(edu-step);
+  position: absolute; left: 0; top: 10px;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--gold-line); color: var(--gold);
+  font-family: var(--display); font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* quiet callout / pull-quote */
+.fob-edu-callout {
+  margin-top: var(--content-gap-lg);
+  padding: 22px 24px; border-radius: 12px;
+  border: 1px solid var(--gold-line); background: rgba(211,190,152,0.06);
+  font-family: var(--display); font-size: 15px; color: var(--cream);
+  line-height: 1.6;
+}
+
+/* simple two-column chip grid: variables, populations, families */
+.fob-edu-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+  background: var(--gold-line-soft); border: 1px solid var(--gold-line-soft); border-radius: 12px;
+  overflow: hidden; margin-top: 4px;
+}
+.fob-edu-grid > div { background: var(--ink-warm); padding: 16px 18px; }
+.fob-edu-grid h4 {
+  font-family: var(--display); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; color: var(--gold); margin-bottom: 6px;
+}
+.fob-edu-grid p { font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+@media (max-width: 640px) { .fob-edu-grid { grid-template-columns: 1fr; } }
+
+/* glossary */
+.fob-edu-glossary { margin: 0; padding: 0; columns: 1; }
+.fob-edu-glossary > div {
+  break-inside: avoid; padding: 13px 0; border-bottom: 1px solid var(--gold-line-soft);
+}
+.fob-edu-glossary dt {
+  font-family: var(--display); font-size: 13.5px; font-weight: 600;
+  letter-spacing: 0.04em; color: var(--gold); margin-bottom: 3px;
+}
+.fob-edu-glossary dd { font-size: 13.5px; line-height: 1.55; color: var(--muted); margin: 0; }
+@media (min-width: 720px) { .fob-edu-glossary { columns: 2; column-gap: 32px; } }
+
+/* =============================================================
+   PARK SELECTION MAP
+   Brand-styled MapLibre canvas with an always-present park list.
+   The list is the accessible path and the failure path at once.
+   ============================================================= */
+.fob-map-search { margin-bottom: 10px; }
+#fob-map-q {
+  width: 100%; box-sizing: border-box; min-height: 48px;
+  background: var(--tone-lift, #1D2128); color: var(--cream, #F3ECE0);
+  border: 1px solid rgba(211,190,152,0.26); border-radius: 12px;
+  font-family: var(--body); font-size: 16px; padding: 12px 14px;
+}
+#fob-map-q:focus-visible { outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 2px; }
+.fob-map-hint { font-size: 12.5px; color: var(--muted); margin-top: 6px; min-height: 16px; }
+
+.fob-map-canvas {
+  position: relative; width: 100%; height: 340px;
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(211,190,152,0.2); background: #14171B;
+}
+@media (min-width: 700px) { .fob-map-canvas { height: 420px; } }
+
+/* Markers. A beacon rather than a pin: a dot with a ring that only
+   lights up on selection, so forty markers do not all shout at once. */
+.fob-pin {
+  width: 26px; height: 26px; padding: 0; border: none; cursor: pointer;
+  background: none; position: relative; display: block;
+}
+.fob-pin-dot {
+  position: absolute; inset: 7px; border-radius: 50%;
+  background: var(--gold, #D3BE98);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.55), 0 0 0 2px rgba(20,23,27,0.9);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+.fob-pin-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid transparent; transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.fob-pin.is-preferred .fob-pin-dot { inset: 5px; background: var(--gold-bright, #E9C98F); }
+.fob-pin:hover .fob-pin-dot { transform: scale(1.15); }
+.fob-pin.is-on .fob-pin-dot { transform: scale(1.3); background: var(--gold-bright, #E9C98F); }
+.fob-pin.is-on .fob-pin-ring {
+  border-color: var(--gold-bright, #E9C98F); transform: scale(1.5);
+}
+.fob-pin.is-dim { opacity: 0.28; }
+.fob-pin:focus-visible { outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 3px; border-radius: 50%; }
+
+/* Sheet floats over the map rather than replacing it, so the chosen
+   park stays in context with the ones around it. */
+.fob-map-sheet {
+  position: relative; margin-top: -74px; margin-inline: 12px; z-index: 3;
+  background: var(--panel, #1A1E24); border: 1px solid rgba(211,190,152,0.24);
+  border-radius: 14px; padding: 16px 44px 16px 16px;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+}
+.fob-map-sheet[hidden] { display: none; }
+.fob-map-sheet h4 {
+  font-family: var(--display); font-size: 16px; color: var(--cream, #F3ECE0);
+  margin-bottom: 2px;
+}
+.fob-map-sheet-sub { font-size: 12.5px; color: var(--gold-dim, #B9A588); margin-bottom: 8px; }
+.fob-map-sheet-line { font-size: 13.5px; line-height: 1.55; color: var(--text); margin-top: 5px; }
+.fob-map-sheet-line b { color: var(--cream, #F3ECE0); font-weight: 600; }
+.fob-map-sheet-x {
+  position: absolute; top: 10px; right: 10px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); color: var(--cream, #F3ECE0);
+  border: none; cursor: pointer; font-size: 19px; line-height: 1;
+}
+
+.fob-map-list { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.fob-map-row {
+  display: flex; align-items: baseline; gap: 10px; width: 100%; text-align: left;
+  min-height: 52px; padding: 12px 14px; cursor: pointer;
+  background: var(--tone-lift, #1D2128); border: 1px solid rgba(211,190,152,0.16);
+  border-radius: 12px; color: var(--text); font-family: var(--body);
+}
+.fob-map-row:hover { border-color: rgba(211,190,152,0.38); }
+.fob-map-row.is-on {
+  border-color: var(--gold, #D3BE98);
+  box-shadow: 0 0 0 1px var(--gold, #D3BE98) inset;
+}
+.fob-map-row:focus-visible { outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 2px; }
+.fob-map-row-name { flex: 1; min-width: 0; font-size: 15px; color: var(--cream, #F3ECE0); }
+.fob-map-row-where { font-size: 12.5px; color: var(--muted); flex: none; }
+.fob-map-empty {
+  font-size: 13.5px; line-height: 1.6; color: var(--muted);
+  padding: 14px; border: 1px dashed rgba(211,190,152,0.26); border-radius: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fob-pin-dot, .fob-pin-ring { transition: none; }
+}
+
+
+/* =============================================================
+   START FOBBING CTA
+   A slow breath on the solid button only. Restrained on purpose: a
+   bright pulse on a primary action reads as an advert, and it has to
+   stay readable the whole way through the cycle, so the text colour
+   never moves and only the surrounding light does.
+   ============================================================= */
+.fob-btn-solid[href="#first-session-form"] {
+  position: relative;
+  animation: fob-cta-breathe 4.2s ease-in-out infinite;
+}
+@keyframes fob-cta-breathe {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(233,201,143,0.30),
+                         0 0 16px -6px rgba(233,201,143,0.34); }
+  50%      { box-shadow: 0 0 0 1px rgba(233,201,143,0.52),
+                         0 0 26px -4px rgba(233,201,143,0.52); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fob-btn-solid[href="#first-session-form"] { animation: none;
+    box-shadow: 0 0 0 1px rgba(233,201,143,0.40); }
+}
+
+/* Map inside the inquiry form. Compact by default so it does not
+   dominate a form somebody is trying to fill in, expandable when they
+   actually want to explore. */
+.fob-iq-map { margin-top: 6px; }
+.fob-iq-map .fob-map-canvas { height: 240px; transition: height 0.25s ease; }
+.fob-iq-map.is-big .fob-map-canvas { height: 68vh; height: 68dvh; }
+.fob-iq-map.is-big .fob-map-list { max-height: 200px; overflow-y: auto; }
+.fob-iq-map-expand {
+  margin-top: 10px; min-height: 44px; padding: 10px 16px; cursor: pointer;
+  background: transparent; border: 1px solid rgba(211,190,152,0.32);
+  border-radius: 999px; color: var(--cream, #F3ECE0);
+  font-family: var(--body); font-size: 14px;
+}
+.fob-iq-map-expand:hover { border-color: var(--gold, #D3BE98); }
+.fob-iq-map-expand:focus-visible { outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 2px; }
+.fob-iq-picked { margin-top: 8px; font-size: 13.5px; color: var(--gold-dim, #B9A588); min-height: 18px; }
+@media (prefers-reduced-motion: reduce) {
+  .fob-iq-map .fob-map-canvas { transition: none; }
+}
+
+/* Open-slot picker. Times as buttons rather than a dropdown: a list of
+   what is genuinely free reads faster than opening a select and
+   discovering half of it is gone. */
+.fob-iq-slots { margin-top: 4px; }
+.fob-iq-slot-day {
+  font-family: var(--display); font-size: 11px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--gold-dim, #B9A588);
+  margin: 14px 0 7px;
+}
+.fob-iq-slot-day:first-child { margin-top: 4px; }
+.fob-iq-slot-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.fob-iq-slot {
+  min-height: 44px; padding: 10px 15px; cursor: pointer;
+  background: var(--tone-lift, #1D2128);
+  border: 1px solid rgba(211,190,152,0.2); border-radius: 999px;
+  color: var(--cream, #F3ECE0); font-family: var(--body); font-size: 14.5px;
+  font-variant-numeric: tabular-nums;
+}
+.fob-iq-slot:hover { border-color: rgba(211,190,152,0.5); }
+.fob-iq-slot.is-on {
+  border-color: var(--gold, #D3BE98);
+  background: rgba(211,190,152,0.14);
+  box-shadow: 0 0 0 1px var(--gold, #D3BE98) inset;
+}
+.fob-iq-slot:focus-visible { outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 2px; }
+
+/* Map failure states. Visible on purpose: an unexplained grey box is
+   worse than a sentence saying what went wrong and what to do. */
+.fob-map-canvas.is-note {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; padding: 20px; text-align: center;
+}
+.fob-map-note { font-size: 13.5px; line-height: 1.6; color: var(--muted); max-width: 34ch; }
+.fob-map-retry {
+  min-height: 44px; padding: 10px 18px; cursor: pointer;
+  background: transparent; border: 1px solid rgba(211,190,152,0.36);
+  border-radius: 999px; color: var(--cream, #F3ECE0);
+  font-family: var(--body); font-size: 14px;
+}
+.fob-map-retry:hover { border-color: var(--gold, #D3BE98); }
+
+/* Selected park has to be unmistakable, on the map and in the list. */
+.fob-map-row.is-on {
+  border-color: var(--gold-bright, #E9C98F);
+  background: rgba(211,190,152,0.16);
+  box-shadow: 0 0 0 2px var(--gold-bright, #E9C98F) inset,
+              0 0 18px -6px rgba(233,201,143,0.55);
+}
+.fob-map-row.is-on .fob-map-row-name { color: #fff; font-weight: 600; }
+.fob-map-tick {
+  flex: none; color: var(--gold-bright, #E9C98F);
+  font-size: 16px; font-weight: 700; line-height: 1;
+}
+.fob-map-more-note {
+  font-size: 12.5px; color: var(--muted); padding: 10px 4px 2px; line-height: 1.55;
+}
+.fob-map-list { max-height: 320px; overflow-y: auto; }
+
+/* Selected marker: bigger, brighter, with a halo that reads at a glance
+   against a dense field of pins. */
+.fob-pin.is-on { z-index: 5; }
+.fob-pin.is-on .fob-pin-dot {
+  transform: scale(1.65);
+  background: var(--gold-bright, #E9C98F);
+  box-shadow: 0 0 0 3px rgba(20,23,27,0.95), 0 0 20px 4px rgba(233,201,143,0.75);
+}
+.fob-pin.is-on .fob-pin-ring {
+  border-color: var(--gold-bright, #E9C98F);
+  transform: scale(1.95);
+  box-shadow: 0 0 14px 2px rgba(233,201,143,0.4);
+}
+
+/* Map opt-in. Deliberately a real panel rather than a bare checkbox:
+   it is the thing that decides whether a heavy map loads at all, so it
+   should be obvious and easy to hit with a thumb. */
+.fob-map-toggle {
+  display: flex; align-items: center; gap: 13px;
+  margin: 12px 0 4px; padding: 14px 16px; cursor: pointer;
+  background: var(--tone-lift, #1D2128);
+  border: 1px solid rgba(211,190,152,0.24); border-radius: 14px;
+  min-height: 60px;
+}
+.fob-map-toggle:hover { border-color: rgba(211,190,152,0.48); }
+.fob-map-toggle:focus-within {
+  outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 2px;
+}
+.fob-map-toggle input {
+  width: 24px; height: 24px; flex: none; cursor: pointer;
+  accent-color: var(--gold, #D3BE98);
+}
+.fob-map-toggle-text { display: flex; flex-direction: column; gap: 2px; }
+.fob-map-toggle-text b {
+  font-family: var(--display); font-size: 15px; color: var(--cream, #F3ECE0);
+  font-weight: 600;
+}
+.fob-map-toggle-text small { font-size: 12.5px; color: var(--muted); }
+.fob-map-toggle:has(input:checked) {
+  border-color: var(--gold, #D3BE98);
+  background: rgba(211,190,152,0.10);
+}
+.fob-map-canvas[hidden] { display: none; }
+
+/* Sub-labels for the paired date and time selects, and the sedentary
+   note. Both borrow the existing field language rather than introducing
+   new sizes. */
+.fob-iq-sublabel {
+  display: block; font-size: 12px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+}
+.fob-iq-note {
+  font-size: 13.5px; line-height: 1.6; color: var(--gold-dim, #B9A588);
+  margin: -4px 0 14px; padding: 11px 14px;
+  background: rgba(211,190,152,0.07);
+  border-left: 2px solid rgba(211,190,152,0.4); border-radius: 0 8px 8px 0;
+}
+.fob-iq-note[hidden] { display: none; }
+
+/* Sheet lines tightened: hours are the thing people scan for, so they
+   sit first and everything is one line where it fits. */
+.fob-map-sheet { padding: 14px 40px 14px 14px; }
+.fob-map-sheet h4 { font-size: 15.5px; }
+.fob-map-sheet-line { font-size: 13px; line-height: 1.5; margin-top: 4px; }
+.fob-map-sheet-sub { margin-bottom: 6px; }
+
+/* Gate status. Red is reserved for the one thing that rules a park out,
+   so it carries real weight when it appears. */
+.fob-map-flag {
+  font-size: 12.5px; line-height: 1.45; margin: 2px 0 6px;
+  padding: 6px 10px; border-radius: 7px; font-weight: 500;
+}
+.fob-map-flag.is-bad { background: rgba(200,80,66,0.18); color: #F0A99C; }
+.fob-map-flag.is-ok { background: rgba(211,190,152,0.13); color: var(--gold-dim, #B9A588); }
+.fob-map-flag.is-unknown { background: rgba(255,255,255,0.05); color: var(--muted); }
+
+.fob-map-row.is-nogate { opacity: 0.6; border-color: rgba(200,80,66,0.34); }
+.fob-map-row.is-nogate .fob-map-row-name { color: #F0A99C; }
+.fob-pin.is-nogate .fob-pin-dot { background: #C85042; }
+
+/* Hero film reads as footage, not a video element. iOS still paints a
+   play affordance on some builds; this removes it. */
+.fob-hero-film-vid::-webkit-media-controls,
+.fob-hero-film-vid::-webkit-media-controls-enclosure,
+.fob-hero-film-vid::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+/* Tappable on purpose. iOS Low Power Mode refuses autoplay outright, and
+   no attribute overrides it, so a tap has to be able to start it. */
+.fob-hero-film-vid { cursor: default; }
+
+/* Directions sits at the foot of the card as its one outbound action. */
+.fob-map-directions {
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-top: 10px; min-height: 42px; padding: 10px 18px;
+  background: rgba(211,190,152,0.14); color: var(--cream, #F3ECE0);
+  border: 1px solid rgba(211,190,152,0.4); border-radius: 999px;
+  font-family: var(--body); font-size: 13.5px; text-decoration: none;
+}
+.fob-map-directions:hover {
+  border-color: var(--gold, #D3BE98); background: rgba(211,190,152,0.22);
+}
+.fob-map-directions:focus-visible {
+  outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 2px;
+}
+
+
+/* The hero film must never depend on a scroll observer to be seen: it is
+   above the fold, so there is nothing to reveal, and starting it at
+   opacity 0 made a playing video look broken. */
+.fob-hero-film, .fob-hero-film.fob-reveal {
+  opacity: 1 !important; transform: none !important;
+}
+
+/* =============================================================
+   THE FOB COURSE
+   Built for a wide range of readers, so: large type, short line
+   length, generous spacing, and no reliance on colour alone to
+   carry meaning.
+   ============================================================= */
+
+.fob-edu-sub {
+  font-size: 15px; line-height: 1.6; color: var(--muted);
+  max-width: 46ch; margin-top: 10px;
+}
+
+/* ---------- progress bar ------------------------------------ */
+.fob-course-bar {
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(20, 23, 27, 0.94);
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid rgba(211,190,152,0.18);
+}
+.fob-course-bar-inner {
+  max-width: 720px; margin: 0 auto;
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 20px;
+}
+.fob-course-menu {
+  display: flex; align-items: center; gap: 9px; flex: none;
+  background: none; border: none; cursor: pointer; padding: 6px 0;
+  color: var(--cream, #F3ECE0); font-family: var(--display);
+  font-size: 13.5px; min-height: 40px; max-width: 46vw;
+}
+.fob-course-menu span:last-child {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fob-course-menu-ico {
+  width: 16px; height: 12px; flex: none; position: relative;
+}
+.fob-course-menu-ico::before, .fob-course-menu-ico::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 2px;
+  background: var(--gold, #D3BE98); border-radius: 2px;
+}
+.fob-course-menu-ico::before { top: 0; box-shadow: 0 5px 0 var(--gold, #D3BE98); }
+.fob-course-menu-ico::after { bottom: 0; }
+.fob-course-meter {
+  flex: 1; height: 5px; border-radius: 999px;
+  background: rgba(255,255,255,0.11); overflow: hidden; min-width: 40px;
+}
+.fob-course-meter i {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--gold, #D3BE98), var(--gold-bright, #E9C98F));
+  transition: width 0.45s cubic-bezier(0.2,0,0.2,1);
+}
+.fob-course-pct {
+  flex: none; font-size: 12.5px; color: var(--gold-dim, #B9A588);
+  font-variant-numeric: tabular-nums; min-width: 34px; text-align: right;
+}
+
+/* ---------- module list ------------------------------------- */
+.fob-course-toc {
+  position: sticky; top: 52px; z-index: 39;
+  background: var(--panel, #1A1E24);
+  border-bottom: 1px solid rgba(211,190,152,0.2);
+  max-height: 62vh; overflow-y: auto;
+}
+.fob-course-toc[hidden] { display: none; }
+.fob-course-toc-inner { max-width: 720px; margin: 0 auto; padding: 8px 12px 14px; }
+.fob-toc-item {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 13px 12px; min-height: 52px; cursor: pointer; text-align: left;
+  background: none; border: none; border-radius: 10px;
+  color: var(--text); font-family: var(--body); font-size: 15px;
+}
+.fob-toc-item:hover { background: rgba(255,255,255,0.05); }
+.fob-toc-item.is-on { background: rgba(211,190,152,0.13); }
+.fob-toc-item:focus-visible { outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: -2px; }
+.fob-toc-num {
+  flex: none; width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(211,190,152,0.34);
+  font-size: 12px; color: var(--gold-dim, #B9A588);
+}
+/* Done state carries a tick as well as colour, so it does not rely on
+   colour perception alone. */
+.fob-toc-item.is-done .fob-toc-num {
+  background: var(--gold, #D3BE98); border-color: var(--gold, #D3BE98);
+  color: #14171B; font-size: 0;
+}
+.fob-toc-item.is-done .fob-toc-num::after { content: '\2713'; font-size: 13px; font-weight: 700; }
+.fob-toc-title { flex: 1; min-width: 0; }
+.fob-toc-item.is-on .fob-toc-title { color: var(--cream, #F3ECE0); font-weight: 600; }
+.fob-toc-mins { flex: none; font-size: 12px; color: var(--muted); }
+
+/* ---------- modules ------------------------------------------ */
+.fob-course { padding: 26px 0 70px; }
+.fob-mod[hidden] { display: none; }
+.fob-mod .fob-wrap-narrow { max-width: 660px; }
+.fob-mod-kicker {
+  font-family: var(--display); font-size: 11.5px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold-dim, #B9A588); margin-bottom: 10px;
+}
+.fob-mod-title {
+  font-family: var(--display); font-size: clamp(26px, 6.4vw, 38px);
+  line-height: 1.18; color: var(--cream, #F3ECE0); margin-bottom: 22px;
+}
+.fob-mod-title:focus { outline: none; }
+
+.fob-blk { margin-bottom: 26px; }
+.fob-blk h3 {
+  font-family: var(--display); font-size: 12px; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--gold, #D3BE98); margin-bottom: 10px;
+}
+/* Reading size is deliberately larger than the marketing pages. */
+.fob-blk p, .fob-blk-list li {
+  font-size: 16.5px; line-height: 1.72; color: var(--text);
+}
+.fob-blk p { margin-bottom: 12px; }
+.fob-blk p:last-child { margin-bottom: 0; }
+.fob-blk-list { list-style: none; padding: 0; margin: 4px 0 0; }
+.fob-blk-list li {
+  position: relative; padding-left: 20px; margin-bottom: 10px;
+}
+.fob-blk-list li::before {
+  content: ''; position: absolute; left: 3px; top: 11px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gold, #D3BE98);
+}
+.fob-blk-list li b { color: var(--cream, #F3ECE0); }
+
+.fob-blk-honest, .fob-blk-warn {
+  padding: 16px 18px; border-radius: 14px;
+  background: rgba(211,190,152,0.06);
+  border-left: 2px solid rgba(211,190,152,0.42);
+}
+.fob-blk-warn {
+  background: rgba(200,80,66,0.10); border-left-color: rgba(200,80,66,0.55);
+}
+.fob-blk-warn h3 { color: #F0A99C; }
+.fob-blk-mistake .fob-blk-list li::before { background: #C8A08F; }
+
+/* ---------- evidence labels ---------------------------------- */
+.fob-ev {
+  font-size: 14px; line-height: 1.65; color: var(--muted);
+  padding: 12px 14px; border-radius: 10px; margin-bottom: 12px;
+  background: rgba(255,255,255,0.035);
+}
+.fob-ev-tag {
+  display: inline-block; margin-right: 7px; padding: 2px 9px;
+  border-radius: 999px; font-family: var(--display);
+  font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  vertical-align: 1px;
+}
+.fob-ev-established .fob-ev-tag { background: rgba(150,190,160,0.22); color: #A8CDB4; }
+.fob-ev-observed .fob-ev-tag { background: rgba(211,190,152,0.22); color: var(--gold-bright, #E9C98F); }
+.fob-ev-hypothesis .fob-ev-tag { background: rgba(160,170,200,0.2); color: #A9B4D4; }
+
+/* ---------- learn more --------------------------------------- */
+.fob-more {
+  margin-bottom: 24px; border: 1px solid rgba(211,190,152,0.2);
+  border-radius: 14px; overflow: hidden; background: rgba(255,255,255,0.02);
+}
+.fob-more summary {
+  padding: 15px 18px; cursor: pointer; min-height: 52px;
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--display); font-size: 14.5px; color: var(--cream, #F3ECE0);
+  list-style: none;
+}
+.fob-more summary::-webkit-details-marker { display: none; }
+.fob-more summary::before {
+  content: '+'; flex: none; width: 20px; color: var(--gold, #D3BE98);
+  font-size: 18px; line-height: 1;
+}
+.fob-more[open] summary::before { content: '\2212'; }
+.fob-more > p, .fob-more > .fob-blk-list { padding: 0 18px; }
+.fob-more > p { font-size: 15.5px; line-height: 1.7; margin-bottom: 12px; }
+.fob-more > p:last-child { padding-bottom: 18px; }
+
+/* ---------- takeaway + feel it yourself ---------------------- */
+.fob-take {
+  margin: 26px 0; padding: 18px 20px; border-radius: 16px;
+  background: rgba(211,190,152,0.10);
+  border: 1px solid rgba(211,190,152,0.3);
+}
+.fob-take-kick {
+  font-family: var(--display); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold, #D3BE98); margin-bottom: 8px;
+}
+.fob-take-line {
+  font-family: var(--display); font-size: 18px; line-height: 1.45;
+  color: var(--cream, #F3ECE0);
+}
+.fob-take-end { text-align: center; }
+.fob-take-end .fob-btn { margin-top: 16px; }
+
+.fob-feel {
+  margin: 26px 0 0; padding: 20px; border-radius: 16px;
+  background: #12151A; border: 1px solid rgba(211,190,152,0.24);
+}
+.fob-feel-kick {
+  font-family: var(--display); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold, #D3BE98); margin-bottom: 8px;
+}
+.fob-feel h3 {
+  font-family: var(--display); font-size: 17px; color: var(--cream, #F3ECE0);
+  margin-bottom: 14px; text-transform: none; letter-spacing: 0;
+}
+.fob-feel-steps { list-style: none; counter-reset: feel; padding: 0; margin: 0 0 14px; }
+.fob-feel-steps li {
+  counter-increment: feel; position: relative; padding-left: 34px;
+  margin-bottom: 11px; font-size: 15.5px; line-height: 1.62; color: var(--text);
+}
+.fob-feel-steps li::before {
+  content: counter(feel); position: absolute; left: 0; top: -1px;
+  width: 23px; height: 23px; border-radius: 50%;
+  background: rgba(211,190,152,0.16); color: var(--gold-bright, #E9C98F);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-family: var(--display);
+}
+.fob-feel-why {
+  font-size: 14.5px; line-height: 1.65; color: var(--gold-dim, #B9A588);
+  padding-top: 13px; border-top: 1px solid rgba(211,190,152,0.16);
+}
+
+/* ---------- module navigation -------------------------------- */
+.fob-mod-nav {
+  display: flex; align-items: center; gap: 14px;
+  margin-top: 34px; padding-top: 22px;
+  border-top: 1px solid rgba(211,190,152,0.16);
+}
+.fob-mod-back, .fob-mod-next {
+  min-height: 50px; padding: 13px 26px; cursor: pointer;
+  border-radius: 999px; font-family: var(--display); font-size: 14.5px;
+}
+.fob-mod-back {
+  background: none; border: 1px solid rgba(211,190,152,0.3);
+  color: var(--cream, #F3ECE0);
+}
+.fob-mod-back:disabled { opacity: 0.32; cursor: default; }
+.fob-mod-next {
+  margin-left: auto; border: none;
+  background: var(--gold, #D3BE98); color: #14171B; font-weight: 600;
+}
+.fob-mod-next:hover { background: var(--gold-bright, #E9C98F); }
+.fob-mod-back:focus-visible, .fob-mod-next:focus-visible {
+  outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 3px;
+}
+.fob-mod-step { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---------- glossary ----------------------------------------- */
+.fob-gloss-intro { font-size: 16px; line-height: 1.7; color: var(--text); margin-bottom: 18px; }
+.fob-gloss-search {
+  width: 100%; box-sizing: border-box; min-height: 50px;
+  background: var(--tone-lift, #1D2128); color: var(--cream, #F3ECE0);
+  border: 1px solid rgba(211,190,152,0.26); border-radius: 12px;
+  font-family: var(--body); font-size: 16px; padding: 13px 16px;
+  margin-bottom: 16px;
+}
+.fob-gloss { display: flex; flex-direction: column; gap: 8px; }
+.fob-gloss-item {
+  border: 1px solid rgba(211,190,152,0.18); border-radius: 12px;
+  background: rgba(255,255,255,0.02); overflow: hidden;
+}
+.fob-gloss-item[hidden] { display: none; }
+.fob-gloss-item summary {
+  padding: 15px 18px; cursor: pointer; min-height: 52px;
+  display: flex; align-items: center; gap: 10px; list-style: none;
+}
+.fob-gloss-item summary::-webkit-details-marker { display: none; }
+.fob-gloss-item summary::before {
+  content: '+'; flex: none; width: 18px; color: var(--gold, #D3BE98); font-size: 17px;
+}
+.fob-gloss-item[open] summary::before { content: '\2212'; }
+.fob-gloss-word {
+  font-family: var(--display); font-size: 16px; color: var(--cream, #F3ECE0);
+}
+.fob-gloss-body { padding: 0 18px 18px 46px; }
+.fob-gloss-body p { font-size: 15px; line-height: 1.68; margin-bottom: 10px; color: var(--text); }
+.fob-gloss-body p b { color: var(--gold-dim, #B9A588); }
+.fob-gloss-def { color: var(--cream, #F3ECE0) !important; font-size: 15.5px !important; }
+.fob-gloss-rel { color: var(--muted) !important; font-size: 14px !important; }
+.fob-gloss-none { font-size: 15px; color: var(--muted); padding: 18px 4px; }
+
+@media (min-width: 720px) {
+  .fob-course-toc { top: 56px; }
+  .fob-blk p, .fob-blk-list li { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fob-course-meter i { transition: none; }
+}
+
+/* =============================================================
+   NAV BALANCE AFTER THE COURSE RENAME
+   "FOB Course" is shorter than "FOB Education", which frees room.
+   The CTA was truncating to "START FOBBING..." on phones, so the
+   letter-spacing is reduced before the text is ever clipped: an
+   ellipsis in a call to action reads as broken, not as tight.
+   ============================================================= */
+.fob-rate-single {
+  letter-spacing: 0.12em;
+  font-size: clamp(10.5px, 2.9vw, 12px);
+}
+@media (max-width: 560px) {
+  .fob-rate-single { letter-spacing: 0.06em; font-size: 11px; }
+  .fob-nav-right .fob-rate { padding-left: 10px; padding-right: 10px; }
+}
+/* Below this width the two buttons genuinely cannot share a line
+   without one of them lying about its label, so the course button
+   keeps its icon and drops to just the word. */
+@media (max-width: 400px) {
+  .fob-rate-single { letter-spacing: 0.02em; font-size: 10.5px; }
+  .fob-edu-btn { padding: 7px 9px; }
+  .fob-edu-btn-main { font-size: 9px; letter-spacing: 0.04em; }
+}
+/* Both controls now sit on the same vertical rhythm rather than one
+   being visibly taller than the other. */
+.fob-nav-right .fob-rate, .fob-nav-right .fob-edu-btn {
+  min-height: 42px; align-items: center;
+}
+
+/* =============================================================
+   COURSE READING SIZE
+   Two faults made the course look zoomed in on a phone:
+
+   1. Nothing in this stylesheet set text-size-adjust, so iOS Safari
+      applied its own inflation to the course pages.
+   2. .fob-wrap-narrow carries max-width and auto margins but no
+      horizontal padding. On the marketing pages a parent section
+      supplies it; .fob-course did not, so lines ran to the edge and
+      overflowed.
+   ============================================================= */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.fob-course .fob-wrap-narrow {
+  padding-left: 20px; padding-right: 20px;
+  box-sizing: border-box;
+}
+/* Long words and any stray unbreakable string wrap instead of pushing
+   the layout wider than the screen. */
+.fob-course { overflow-x: hidden; }
+.fob-course p, .fob-course li, .fob-course h2, .fob-course h3 {
+  overflow-wrap: break-word;
+}
+
+/* Comfortable rather than large. Still bigger than the marketing
+   pages, because this is long-form reading. */
+.fob-mod-title { font-size: clamp(23px, 5.4vw, 31px); margin-bottom: 18px; }
+.fob-blk p, .fob-blk-list li { font-size: 15.5px; line-height: 1.68; }
+.fob-blk { margin-bottom: 22px; }
+.fob-take-line { font-size: 16px; }
+.fob-feel h3 { font-size: 15.5px; }
+.fob-feel-steps li { font-size: 14.5px; }
+.fob-feel-why { font-size: 13.5px; }
+.fob-ev { font-size: 13px; }
+.fob-gloss-intro { font-size: 15px; }
+.fob-gloss-body p { font-size: 14.5px; }
+.fob-gloss-def { font-size: 15px !important; }
+.fob-more > p { font-size: 15px; }
+.fob-mod-kicker { font-size: 10.5px; }
+.fob-edu-sub { font-size: 14.5px; }
+
+@media (min-width: 720px) {
+  .fob-blk p, .fob-blk-list li { font-size: 16px; }
+  .fob-course .fob-wrap-narrow { padding-left: 24px; padding-right: 24px; }
+}
+
+/* Course lead-in above the booking section. Deliberately the same
+   component as the nav button rather than a new style, so it reads as
+   the same destination. Slightly larger because it stands alone here
+   instead of competing for room in a bar. */
+.fob-prebook {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  /* Sits inside the section, directly beneath the card grid, so the
+     space belongs above it. The section supplies its own bottom
+     padding. */
+  padding: 22px 20px 0; text-align: center;
+}
+.fob-prebook-line {
+  font-size: 14px; color: var(--muted); letter-spacing: 0.01em;
+}
+/* Report Card — private coach entry. Deliberately quiet. */
+.fob-report-link {
+  display: inline-block; margin-bottom: 16px;
+  font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); opacity: 0.45; text-decoration: none;
+}
+.fob-report-link:hover { color: var(--gold-bright, #C9A24A); opacity: 1; }
+.fob-report-link:focus-visible { outline: 1px solid var(--gold-bright, #C9A24A); outline-offset: 3px; opacity: 1; }
+.fob-edu-btn-lg { padding: 12px 20px; }
+.fob-edu-btn-lg .fob-edu-btn-main { font-size: 12.5px; letter-spacing: 0.1em; }
+.fob-edu-btn-lg .fob-edu-btn-sub { display: block; font-size: 10.5px; }
+.fob-edu-btn-lg .fob-edu-btn-ico svg { width: 17px; height: 17px; }
+@media (max-width: 400px) {
+  .fob-edu-btn-lg .fob-edu-btn-main { font-size: 11.5px; }
+}
+
+/* ---------- module quick check -------------------------------
+   A single easy question with unlimited attempts. It exists to
+   prompt one moment of recall, so a wrong answer is visually quiet:
+   the option dims and the prompt says try again. Nothing is scored,
+   nothing is lost, and the right answer is always still on screen. */
+.fob-quiz {
+  margin: 28px 0 0; padding: 20px; border-radius: 16px;
+  background: rgba(211,190,152,0.055);
+  border: 1px solid rgba(211,190,152,0.26);
+}
+.fob-quiz-kick {
+  font-family: var(--display); font-size: 10.5px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold, #D3BE98); margin-bottom: 9px;
+}
+.fob-quiz-q {
+  font-size: 15.5px; line-height: 1.55; color: var(--cream, #F3ECE0);
+  margin-bottom: 14px;
+}
+.fob-quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.fob-quiz-opt {
+  width: 100%; text-align: left; min-height: 50px; padding: 13px 16px;
+  cursor: pointer; border-radius: 11px;
+  background: var(--tone-lift, #1D2128);
+  border: 1px solid rgba(211,190,152,0.2);
+  color: var(--text); font-family: var(--body); font-size: 15px;
+  line-height: 1.45; transition: border-color 0.15s, background 0.15s;
+}
+.fob-quiz-opt:hover:not(:disabled) { border-color: rgba(211,190,152,0.45); }
+.fob-quiz-opt:focus-visible { outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 2px; }
+.fob-quiz-opt.is-right {
+  background: rgba(150,190,160,0.16); border-color: #8FBF9F; color: #D8EFDF;
+  cursor: default;
+}
+/* Wrong is dimmed rather than red. Being told off for one tap on a
+   question with unlimited tries would be out of proportion. */
+.fob-quiz-opt.is-wrong { opacity: 0.34; cursor: default; }
+.fob-quiz-opt:disabled:not(.is-wrong):not(.is-right) { opacity: 0.5; cursor: default; }
+.fob-quiz-note {
+  margin-top: 12px; font-size: 14px; line-height: 1.6; min-height: 20px;
+}
+.fob-quiz-note.is-good { color: #A8CDB4; }
+.fob-quiz-note.is-try { color: var(--gold-dim, #B9A588); }
+.fob-mod-next:disabled { opacity: 0.4; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .fob-quiz-opt { transition: none; } }
+
+/* ---------- gloves dialog ------------------------------------
+   Shown once after any inquiry. A dialog rather than a banner because
+   it has to be acknowledged, but everything about it is calm: the page
+   dims only slightly, the glow is barely there, and there are three
+   obvious ways out. Sits at z-index 300, above the story viewer at 200
+   and the nav, so nothing can cover it. */
+.fob-glove-back {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: rgba(8, 10, 13, 0.62);
+  opacity: 0; transition: opacity 0.22s ease;
+}
+.fob-glove-back.in { opacity: 1; }
+
+.fob-glove-card {
+  position: relative; width: 100%; max-width: 380px;
+  padding: 26px 24px 22px;
+  background: var(--panel, #1A1E24);
+  border: 1px solid rgba(211,190,152,0.34);
+  border-radius: 18px;
+  /* Barely there, as asked: a soft edge rather than a halo. */
+  box-shadow: 0 0 0 1px rgba(211,190,152,0.08),
+              0 0 34px -12px rgba(233,201,143,0.34),
+              0 22px 50px rgba(0,0,0,0.55);
+  transform: translateY(10px) scale(0.99);
+  transition: transform 0.24s cubic-bezier(0.2,0,0.2,1);
+  text-align: left;
+}
+.fob-glove-back.in .fob-glove-card { transform: none; }
+
+.fob-glove-x {
+  position: absolute; top: 12px; right: 12px;
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(211,190,152,0.12);
+  border: 1px solid rgba(211,190,152,0.42);
+  color: var(--gold-bright, #E9C98F);
+  font-size: 21px; line-height: 1; cursor: pointer;
+  box-shadow: 0 0 12px -3px rgba(233,201,143,0.5);
+  transition: background 0.16s, box-shadow 0.16s;
+}
+.fob-glove-x:hover {
+  background: rgba(211,190,152,0.2);
+  box-shadow: 0 0 18px -2px rgba(233,201,143,0.7);
+}
+.fob-glove-x:focus-visible {
+  outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 2px;
+}
+
+.fob-glove-kick {
+  font-family: var(--display); font-size: 10px; letter-spacing: .18em;
+  color: var(--gold, #D3BE98); margin-bottom: 9px; padding-right: 40px;
+}
+.fob-glove-h {
+  font-family: var(--display); font-size: 21px; line-height: 1.2;
+  color: var(--cream, #F3ECE0); margin-bottom: 10px; padding-right: 40px;
+}
+.fob-glove-line {
+  font-size: 14.5px; line-height: 1.6; color: var(--text); margin-bottom: 8px;
+}
+.fob-glove-note { font-size: 13px; line-height: 1.55; color: var(--muted); }
+.fob-glove-gift {
+  margin-top: 12px; padding-top: 11px;
+  border-top: 1px solid rgba(211,190,152,0.2);
+  font-size: 13px; color: var(--gold-dim, #B9A588);
+}
+.fob-glove-ok {
+  width: 100%; margin-top: 18px; min-height: 48px; padding: 13px 20px;
+  border: none; border-radius: 999px; cursor: pointer;
+  background: var(--gold, #D3BE98); color: #14171B;
+  font-family: var(--display); font-size: 14px; font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.fob-glove-ok:hover { background: var(--gold-bright, #E9C98F); }
+.fob-glove-ok:focus-visible {
+  outline: 2px solid var(--gold-bright, #E9C98F); outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fob-glove-back, .fob-glove-card { transition: none; }
+}
+
+/* ═══ EMBEDDED NAVIGATORS ═════════════════════════════════════════════
+   One system for the outcome cards and both inquiry steppers. Everything
+   lives in the page: no overlay, no fixed positioning, no scroll lock.
+   Arrows are flex siblings of the content, so they land exactly east and
+   west of it and exactly on its vertical midpoint at every width.        */
+.fob-visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+.fob-nav-rail,.fob-iq-rail{display:flex;justify-content:center;align-items:center;
+  gap:2px;margin:0 0 18px;padding:0}
+/* the button is a comfortable 26px target; the diamond itself stays small */
+.fob-nav-diamond,.fob-iq-diamond{width:26px;height:26px;padding:0;border:0;background:none;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent}
+.fob-nav-diamond::before,.fob-iq-diamond::before{content:'';display:block;width:9px;height:9px;
+  background:var(--fob-line,#3B3830);transform:rotate(45deg);border-radius:1px;
+  transition:background .16s ease,transform .16s cubic-bezier(.22,1,.36,1)}
+.fob-nav-diamond:hover::before,.fob-iq-diamond:hover::before{background:var(--fob-metal,#AB957B)}
+.fob-nav-diamond:active::before,.fob-iq-diamond:active::before{transform:rotate(45deg) scale(.82)}
+/* exactly one diamond is ever lit */
+.fob-nav-diamond.is-on::before,.fob-iq-diamond.is-on::before{
+  background:var(--fob-gold,#D0BC98);transform:rotate(45deg) scale(1.42)}
+.fob-nav-diamond:focus-visible,.fob-iq-diamond:focus-visible,
+.fob-nav-arrow:focus-visible,.fob-iq-arrow:focus-visible{
+  outline:2px solid var(--fob-gold,#D0BC98);outline-offset:3px;border-radius:4px}
+
+.fob-iq-stage{display:flex;align-items:center;gap:clamp(4px,1.2vw,14px);width:100%}
+/* the outcome arrows sit inside the card's own gutter rather than stealing
+   width from it, so the picture and copy get the whole container */
+.fob-nav-frame{position:relative;width:100%}
+.fob-nav-frame>.fob-nav-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3}
+.fob-nav-frame>.fob-nav-prev{left:clamp(2px,1vw,14px);margin:0}
+.fob-nav-frame>.fob-nav-next{right:clamp(2px,1vw,14px);margin:0}
+.fob-nav-frame>.fob-nav-prev:hover:not(:disabled){transform:translateY(-50%) scale(1.08)}
+.fob-nav-frame>.fob-nav-next:hover:not(:disabled){transform:translateY(-50%) scale(1.08)}
+.fob-nav-frame>.fob-nav-arrow:active:not(:disabled){transform:translateY(-50%) scale(.86)}
+/* clear the arrows so they never sit on the text */
+.fob-outcome-stage .fob-outcome{padding-left:clamp(34px,5vw,58px);padding-right:clamp(34px,5vw,58px)}
+.fob-nav-viewport{flex:1 1 auto;min-width:0;overflow:hidden;
+  transition:height .24s cubic-bezier(.22,1,.36,1)}
+.fob-nav-track{display:flex;width:100%;
+  transition:transform .24s cubic-bezier(.22,1,.36,1)}
+.fob-nav-track>*{flex:0 0 100%;max-width:100%;margin:0;
+  opacity:.28;transition:opacity .24s cubic-bezier(.22,1,.36,1)}
+.fob-nav-track>*.is-active{opacity:1}
+
+.fob-nav-arrow,.fob-iq-arrow{flex:0 0 auto;width:clamp(30px,3.4vw,38px);height:clamp(44px,5vw,54px);
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  background:none;border:0;border-radius:0;padding:0;
+  color:var(--fob-gold,#D0BC98);font-size:clamp(26px,2.9vw,32px);line-height:1;
+  -webkit-tap-highlight-color:transparent;
+  transition:color .18s ease,opacity .18s ease,transform .18s cubic-bezier(.22,1,.36,1)}
+.fob-nav-prev,.fob-iq-prev{margin-left:clamp(-14px,-1.6vw,-6px)}
+.fob-nav-next,.fob-iq-next{margin-right:clamp(-14px,-1.6vw,-6px)}
+.fob-nav-arrow span,.fob-iq-arrow span{display:block;
+  transition:transform .18s cubic-bezier(.22,1,.36,1)}
+/* a slow drift outward, so the control reads as "you can swipe this" */
+.fob-nav-prev:not(:disabled) span,.fob-iq-prev:not(:disabled) span{animation:fobDriftL 3s ease-in-out infinite}
+.fob-nav-next:not(:disabled) span,.fob-iq-next:not(:disabled) span{animation:fobDriftR 3s ease-in-out infinite}
+@keyframes fobDriftL{0%,72%,100%{transform:none}40%{transform:translateX(-3px)}}
+@keyframes fobDriftR{0%,72%,100%{transform:none}40%{transform:translateX(3px)}}
+.fob-nav-arrow:hover:not(:disabled),.fob-iq-arrow:hover:not(:disabled){
+  color:var(--fob-cream,#EDE7DA);transform:scale(1.08)}
+.fob-nav-prev:hover:not(:disabled) span,.fob-iq-prev:hover:not(:disabled) span{animation:none;transform:translateX(-4px)}
+.fob-nav-next:hover:not(:disabled) span,.fob-iq-next:hover:not(:disabled) span{animation:none;transform:translateX(4px)}
+.fob-nav-arrow:active:not(:disabled),.fob-iq-arrow:active:not(:disabled){
+  transform:scale(.86);color:var(--fob-cream,#EDE7DA)}
+.fob-nav-arrow:disabled,.fob-iq-arrow:disabled{opacity:.2;cursor:default}
+.fob-nav-frame,.fob-iq-stage{touch-action:pan-y pinch-zoom}
+
+/* ── inquiry steps: same rail, same arrows, no card of its own ── */
+.fob-iq-shell{padding-top:0}
+.fob-iq-shell .fob-iq-root{margin-top:0}
+.fob-iq-shell .fob-iq-form{margin:0 auto}
+.fob-iq-typewrap{margin-bottom:18px}
+.fob-iq-steps{flex:1 1 auto;min-width:0}
+.fob-iq-step{display:none}
+.fob-iq-step.is-active{display:block}
+.fob-iq-step.in-r{animation:fobIn .19s cubic-bezier(.22,1,.36,1) both}
+.fob-iq-step.in-l{animation:fobInL .19s cubic-bezier(.22,1,.36,1) both}
+@keyframes fobIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes fobInL{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
+.fob-iq-submit.is-locked{opacity:.4;cursor:not-allowed}
+
+@media (max-width:520px){
+  .fob-nav-frame,.fob-iq-stage{gap:4px}
+  .fob-nav-arrow,.fob-iq-arrow{width:28px;height:44px;font-size:26px}
+  .fob-nav-rail,.fob-iq-rail{gap:10px;margin-bottom:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .fob-nav-track,.fob-nav-viewport,.fob-nav-track>*{transition:none!important}
+  .fob-iq-step.in-r,.fob-iq-step.in-l{animation:none!important}
+  .fob-nav-arrow span,.fob-iq-arrow span{animation:none!important}
+}
+
+.fob-iq-success-note{margin-top:14px;font-size:13.5px;line-height:1.6;
+  color:var(--fob-text-dim,#9E9B93)}
+
+/* a plain bold word, no chrome, sitting under the question */
+.fob-iq-nextlink{display:inline-block;margin:22px auto 0;padding:6px 2px;
+  background:none;border:0;cursor:pointer;
+  font-family:var(--util,'IBM Plex Mono',monospace);font-size:15px;font-weight:700;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--fob-gold,#D0BC98);
+  -webkit-tap-highlight-color:transparent;transition:color .16s ease,transform .16s ease}
+.fob-iq-nextlink::after{content:' \2192';font-weight:400}
+.fob-iq-nextlink:hover{color:var(--fob-cream,#EDE7DA);transform:translateX(3px)}
+.fob-iq-nextlink:active{transform:translateX(1px)}
+.fob-iq-nextlink:focus-visible{outline:2px solid var(--fob-gold,#D0BC98);outline-offset:3px}
+
+
+/* ── inquiry panel: centred, and no gap doing more work than it needs ── */
+.fob-iq-rail{margin-bottom:16px}
+.fob-iq-steps{text-align:center}
+/* the prompt sits over its field, both centred on the same axis */
+.fob-iq-steps .fob-iq-label,
+.fob-iq-steps label,
+.fob-iq-steps legend,
+.fob-iq-steps .fob-iq-note,
+.fob-iq-steps .fob-iq-error,
+.fob-iq-steps .fob-iq-hint{text-align:center;display:block;width:100%}
+.fob-iq-steps .fob-iq-field{margin:0 auto;max-width:520px}
+.fob-iq-steps .fob-iq-field + .fob-iq-field,
+.fob-iq-steps .fob-iq-reveal{margin-top:18px}
+/* typing stays left-aligned; everything around it is centred */
+.fob-iq-steps input,.fob-iq-steps textarea{text-align:left}
+.fob-iq-steps select{text-align:center;text-align-last:center}
+.fob-iq-steps .fob-iq-cards{margin:0 auto;max-width:520px;justify-content:center}
+.fob-iq-steps .fob-iq-tail{max-width:520px;margin:0 auto}
+.fob-iq-steps .fob-iq-check{justify-content:center}
+.fob-iq-steps .fob-iq-actions{display:flex;flex-direction:column;align-items:center;gap:10px}
+.fob-iq-step{padding:2px 0 4px}
+.fob-iq-form{margin:0 auto}
+.fob-iq-root{margin:0 auto}
+/* equal breathing room on both sides of the step strip */
+.fob-iq-stage{padding:0}
+.fob-iq-steps{padding:0 4px}
+
+/* ── diamonds sit with the prompt, not stranded at the top ── */
+
+.fob-iq-form{padding-top:4px}
+.fob-iq-steps .fob-iq-field:first-child{margin-top:0}
+
+/* ── date and time read as real, fillable controls ── */
+.fob-iq-steps input[type="date"],
+.fob-iq-steps input[type="time"],
+.fob-iq-steps select{
+  width:100%;max-width:520px;box-sizing:border-box;
+  display:block;margin:0 auto;
+  /* height comes from symmetric padding rather than a fixed box, so the
+     value sits on the optical centre instead of riding high in Safari */
+  padding:16px 16px 15px;line-height:1.2;
+  color-scheme:dark;-webkit-appearance:none;appearance:none;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--fob-line,#33343B);border-radius:10px;
+  color:var(--fob-text,#EDE7DA);font-size:16px;text-align:center}
+.fob-iq-steps input[type="date"]{text-align:center}
+.fob-iq-steps input[type="date"]::-webkit-date-and-time-value{text-align:center;min-height:22px}
+.fob-iq-steps input[type="date"]::-webkit-calendar-picker-indicator{
+  filter:invert(82%) sepia(18%) saturate(420%) hue-rotate(2deg);cursor:pointer;opacity:.85}
+.fob-iq-steps input[type="date"]:focus,
+.fob-iq-steps input[type="time"]:focus,
+.fob-iq-steps select:focus{border-color:var(--fob-gold,#D0BC98);outline:none}
+.fob-iq-parkselect{margin-top:12px}
+
+/* ── the agreement, as an interrupt ── */
+.fob-agr-back{position:fixed;inset:0;z-index:140;display:flex;align-items:center;
+  justify-content:center;padding:clamp(16px,4vw,32px);background:rgba(8,9,10,.74);
+  opacity:0;transition:opacity .2s cubic-bezier(.22,1,.36,1)}
+.fob-agr-back.in{opacity:1}
+.fob-agr-card{position:relative;width:100%;max-width:460px;text-align:center;
+  background:var(--fob-surface,#1B1B1F);border:1px solid var(--fob-line,#33343B);
+  border-radius:18px;padding:34px 28px 30px;
+  transform:translateY(10px);opacity:0;
+  transition:transform .24s cubic-bezier(.22,1,.36,1),opacity .24s cubic-bezier(.22,1,.36,1)}
+.fob-agr-back.in .fob-agr-card{transform:none;opacity:1}
+.fob-agr-x{position:absolute;top:10px;right:12px;background:none;border:0;cursor:pointer;
+  font-size:26px;line-height:1;padding:4px 8px;color:var(--fob-text-dim,#9E9B93)}
+.fob-agr-x:hover{color:var(--fob-gold,#D0BC98)}
+.fob-agr-kick{margin:0 0 8px;font-family:var(--util,'IBM Plex Mono',monospace);font-size:10.5px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--fob-gold,#D0BC98)}
+.fob-agr-h{margin:0 0 12px;font-size:clamp(19px,2.4vw,23px);font-weight:700;
+  letter-spacing:-.01em;color:var(--fob-text,#EDE7DA)}
+.fob-agr-line{margin:0 0 22px;font-size:14.5px;line-height:1.6;color:var(--fob-text-dim,#9E9B93)}
+.fob-agr-btn{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  padding:13px 24px;border-radius:26px;background:var(--fob-gold,#D0BC98);color:#141519;
+  font-family:var(--util,'IBM Plex Mono',monospace);font-size:11.5px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;transition:filter .18s ease}
+.fob-agr-btn::before{content:'\2193';font-size:14px}
+.fob-agr-btn:hover{filter:brightness(1.08)}
+@media (prefers-reduced-motion:reduce){
+  .fob-agr-back,.fob-agr-card{transition:none!important}
+}
+
+/* the date / time pair was shrinking to content; make the row own its width */
+.fob-iq-steps .fob-iq-field{width:100%}
+.fob-iq-steps .fob-iq-twocol{width:100%;gap:14px}
+.fob-iq-steps .fob-iq-twocol .fob-iq-field{max-width:none}
+.fob-iq-steps .fob-iq-input,
+.fob-iq-steps input[type="text"],
+.fob-iq-steps input[type="email"],
+.fob-iq-steps input[type="tel"],
+.fob-iq-steps textarea{width:100%;box-sizing:border-box}
+@media (max-width:460px){
+  .fob-iq-steps .fob-iq-twocol{grid-template-columns:1fr}
+}
+
+.fob-agr-note{margin:20px 0 0;padding-top:16px;border-top:1px solid var(--fob-line,#33343B);
+  font-size:13px;line-height:1.6;color:var(--fob-text-dim,#9E9B93)}
+
+/* ── panel breathes away from the line above it, diamonds sit low ── */
+.fob-inquiry .fob-iq-shell{margin-top:34px}
+.fob-rate-support{margin-bottom:34px}
+.fob-iq-form{padding-top:0}
+.fob-iq-rail{margin:30px 0 30px}
+
+/* ── the stage is one moving object ── */
+.fob-iq-steps{position:relative;transition:height .26s cubic-bezier(.22,1,.36,1)}
+.fob-iq-steps.is-moving{overflow:hidden}
+.fob-iq-step{will-change:transform,opacity}
+.fob-iq-steps:not(.is-moving){overflow:visible}
+.fob-iq-shell{overscroll-behavior-x:contain}
+@media (prefers-reduced-motion:reduce){
+  .fob-iq-steps{transition:none!important}
+}
+/* the outcome stage now leads its section */
+.fob-outcome-stage--lead{margin-top:8px}
+
+/* second private link sits tight under the first */
+.fob-footer-private + .fob-footer-private{margin-top:6px}
+
+/* ═══ DIVIDER MOTION SYSTEM ═══════════════════════════════════════════
+   One cycle per divider. The beam and every decorative diamond attached
+   to it read the same three variables, so they are phase-locked by
+   construction rather than by matching numbers in two places.
+   Timeline: 0% left edge, 25% midpoint, 50% right edge, 75% midpoint,
+   100% left edge. The diamond is exactly centred at 25% and 75%, which
+   is the moment the beam crosses the middle.                          */
+.fob-scroll-div,
+.fob-pencil-div{
+  --fob-divider-cycle:2s;
+  --fob-divider-delay:0s;
+  --fob-divider-ease:cubic-bezier(.37,0,.63,1);
+  --fob-node-travel:clamp(24px,12.5vw,56px);
+  --fob-node-axis:3px;
+}
+
+/* the travelling light. The gold line underneath is untouched. */
+.fob-scroll-div::before,
+.fob-pencil-div::before{
+  content:'';position:absolute;top:50%;left:0;
+  width:100%;height:2px;margin-top:-1px;
+  pointer-events:none;opacity:0;border-radius:2px;
+  background-image:linear-gradient(90deg,
+    transparent 0%,
+    rgba(211,190,152,.10) 14%,
+    rgba(232,207,163,.40) 32%,
+    var(--gold-bright,#E9C98F) 45%,
+    var(--gold-bright,#E9C98F) 55%,
+    rgba(232,207,163,.40) 68%,
+    rgba(211,190,152,.10) 86%,
+    transparent 100%);
+  background-repeat:no-repeat;
+  background-size:clamp(34px,9vw,84px) 100%;
+  background-position:0% 50%;
+  z-index:1;
+  transform:translate3d(0,0,0);
+  transition:opacity .5s ease;
+}
+.fob-scroll-div.is-motion-active::before,
+.fob-pencil-div.is-motion-active::before{
+  opacity:1;
+  animation:
+    fobBeamTravel var(--fob-divider-cycle) var(--fob-divider-ease) var(--fob-divider-delay) infinite,
+    fobBeamPulse  var(--fob-divider-cycle) var(--fob-divider-ease) var(--fob-divider-delay) infinite;
+}
+/* 0% flush left, 50% exactly centred on the divider, 100% flush right.
+   Only the turnarounds are keyframed, so with the sinusoidal ease the beam
+   is at its quickest as it crosses the centre and never settles there. */
+@keyframes fobBeamTravel{
+  0%  {background-position:0% 50%}
+  50% {background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes fobBeamPulse{
+  0%,50%,100%{filter:drop-shadow(0 0 5px rgba(233,201,143,.34)) drop-shadow(0 0 12px rgba(211,190,152,.16))}
+  25%,75%     {filter:drop-shadow(0 0 8px rgba(233,201,143,.52)) drop-shadow(0 0 18px rgba(211,190,152,.24))}
+}
+/* the diamond. The horizontal offset is applied BEFORE the 45deg turn,
+   otherwise it would slide along the diagonal instead of the line. */
+.fob-scroll-div.is-motion-active .fob-scroll-div-node,
+.fob-pencil-div.is-motion-active::after{
+  animation:
+    fobNodeSway var(--fob-divider-cycle) var(--fob-divider-ease) var(--fob-divider-delay) infinite,
+    fobNodeGlow var(--fob-divider-cycle) var(--fob-divider-ease) var(--fob-divider-delay) infinite;
+}
+@keyframes fobNodeSway{
+  0%  {transform:translate(calc(-50% - var(--fob-node-travel) / 2),-50%) rotate(45deg)}
+  50% {transform:translate(calc(-50% + var(--fob-node-travel) / 2),-50%) rotate(45deg)}
+  100%{transform:translate(calc(-50% - var(--fob-node-travel) / 2),-50%) rotate(45deg)}
+}
+@keyframes fobNodeGlow{
+  0%,50%,100%{box-shadow:0 0 5px rgba(233,201,143,.22)}
+  25%,75%     {box-shadow:0 0 11px rgba(233,201,143,.55),0 0 20px rgba(211,190,152,.20)}
+}
+
+/* Half-diamond variants. Nothing in the current DOM uses these — the
+   audit found only full centred diamonds — but they are here so a
+   directional motif inherits the same locked cycle if one is added. */
+.fob-scroll-div.is-motion-active .fob-scroll-div-node--up{
+  animation-name:fobNodeUp,fobNodeGlow}
+.fob-scroll-div.is-motion-active .fob-scroll-div-node--down{
+  animation-name:fobNodeDown,fobNodeGlow}
+@keyframes fobNodeUp{
+  0%,100%{transform:translate(calc(-50% - var(--fob-node-travel) / 2),-50%) rotate(45deg)}
+  25%,75%{transform:translate(-50%,calc(-50% - var(--fob-node-axis))) rotate(45deg)}
+  50%    {transform:translate(calc(-50% + var(--fob-node-travel) / 2),-50%) rotate(45deg)}
+}
+@keyframes fobNodeDown{
+  0%,100%{transform:translate(calc(-50% - var(--fob-node-travel) / 2),-50%) rotate(45deg)}
+  25%,75%{transform:translate(-50%,calc(-50% + var(--fob-node-axis))) rotate(45deg)}
+  50%    {transform:translate(calc(-50% + var(--fob-node-travel) / 2),-50%) rotate(45deg)}
+}
+
+
+@media (prefers-reduced-motion:reduce){
+  .fob-scroll-div::before,.fob-pencil-div::before{
+    animation:none!important;opacity:0!important}
+  .fob-scroll-div .fob-scroll-div-node,
+  .fob-pencil-div::after{animation:none!important}
+}
+
+/* the divider and its diamond stay above the following section's surface,
+   so the shape reads as a whole diamond rather than a clipped half */
+.fob-scroll-div,.fob-pencil-div{z-index:3}
+
+/* ── inquiry panel: tighter, and close to a common height so the box does
+      not visibly resize between questions. The map step is the one honest
+      exception and is capped separately below. ── */
+.fob-iq-steps{min-height:212px}
+.fob-iq-rail{margin:12px 0 20px}
+.fob-iq-steps .fob-iq-field{margin-top:0}
+.fob-iq-steps .fob-iq-field + .fob-iq-field,
+.fob-iq-steps .fob-iq-reveal{margin-top:14px}
+.fob-iq-steps .fob-iq-label,
+.fob-iq-steps label{margin-bottom:8px}
+.fob-iq-steps .fob-iq-hint{margin-top:8px}
+.fob-iq-nextlink{margin-top:18px}
+.fob-iq-step{padding:0}
+.fob-iq-steps .fob-iq-tail{padding-top:2px}
+.fob-iq-steps .fob-iq-actions{gap:8px;margin-top:14px}
+
+/* the park list scrolls instead of running the whole step tall */
+.fob-map-list{
+  max-height:min(46vh,300px);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-right:4px;overscroll-behavior:contain}
+.fob-map-list::-webkit-scrollbar{width:4px}
+.fob-map-list::-webkit-scrollbar-thumb{background:rgba(211,190,152,.28);border-radius:4px}
+.fob-map-list::-webkit-scrollbar-track{background:transparent}
+
+
+/* ═══════════════════════════════════════════════
+   BOOKING / ORGANIZATION MICRO-ALIGNMENT v1.16
+   Keep the first-session diamond rail and the organization prompt optically
+   centered inside the top breathing room of their respective shells.
+   ═══════════════════════════════════════════════ */
+#first-session-form .fob-iq-rail{
+  margin-top:clamp(30px,4vw,38px);
+  margin-bottom:2px;
+}
+#organizations .fob-iq-shell{
+  padding-top:clamp(30px,4vw,38px);
+}
+@media (max-width:520px){
+  #first-session-form .fob-iq-rail{
+    margin-top:32px;
+    margin-bottom:0;
+  }
+  #organizations .fob-iq-shell{
+    padding-top:32px;
+  }
+}
+
+
+/* =============================================================
+   HOME START FOBBING — PERIMETER BEAM
+   Same restrained clockwise perimeter-light treatment used on the
+   featured 8 / 12 SESH pills in the private claim flow.
+   ============================================================= */
+.fob-home-start-beam {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-color: transparent !important;
+  background:
+    linear-gradient(#17191d,#17191d) padding-box,
+    linear-gradient(100deg,rgba(215,189,145,.34),rgba(215,189,145,.11)) border-box !important;
+}
+.fob-home-start-beam::before,
+.fob-home-start-beam::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.fob-home-start-beam::before {
+  z-index: -1;
+  inset: -1.5px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--beam-angle,0deg),
+    transparent 0deg,
+    transparent 320deg,
+    rgba(239,212,157,.03) 329deg,
+    rgba(239,212,157,.88) 344deg,
+    rgba(255,241,207,.98) 349deg,
+    rgba(239,212,157,.18) 356deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 4px rgba(239,212,157,.24));
+  animation: fobHomePillPerimeterBeam 5.4s linear infinite;
+}
+.fob-home-start-beam::after {
+  inset: -7px;
+  z-index: -2;
+  opacity: .28;
+  background: conic-gradient(
+    from var(--beam-angle,0deg),
+    transparent 0deg,
+    transparent 337deg,
+    rgba(239,212,157,.16) 348deg,
+    transparent 359deg
+  );
+  filter: blur(8px);
+  animation: fobHomePillPerimeterBeam 5.4s linear infinite;
+}
+@property --beam-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes fobHomePillPerimeterBeam { to { --beam-angle: 360deg; } }
+@media (prefers-reduced-motion: reduce) {
+  .fob-home-start-beam::before,
+  .fob-home-start-beam::after { animation: none; }
+}
+
+/* No native player chrome on the launch film. Some in-app browsers draw a
+   centred play button and a fullscreen affordance over an autoplaying
+   video; both are hidden here so the film reads as background. */
+.fob-hero-film-vid::-webkit-media-controls,
+.fob-hero-film-vid::-webkit-media-controls-enclosure,
+.fob-hero-film-vid::-webkit-media-controls-panel,
+.fob-hero-film-vid::-webkit-media-controls-start-playback-button,
+.fob-hero-film-vid::-webkit-media-controls-overlay-play-button{
+  display:none!important;-webkit-appearance:none;opacity:0!important}
+.fob-hero-film-vid{pointer-events:none}
+
+/* the same for the park dropdown and any select inside a step */
+.fob-iq-steps select,.fob-iq-parkselect{
+  padding-top:16px;padding-bottom:15px;line-height:1.2;min-height:0;
+  background-position:calc(100% - 18px) center,calc(100% - 13px) center}
+.fob-iq-steps input[type="date"]::-webkit-date-and-time-value{
+  text-align:center;line-height:1.2;margin:0}
+
+/* Inquiry park picker — borough-first filtering. Keeps Brooklyn as the
+   default operating area while making Manhattan and Queens equally selectable. */
+.fob-map-borough{width:100%;max-width:520px;margin:0 auto 18px;padding:0;text-align:center}
+.fob-map-borough .fob-iq-label{display:block;width:100%;margin:0 0 8px;text-align:center;font-family:var(--display);font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.fob-map-borough .fob-iq-select{display:block;width:100%;max-width:520px;box-sizing:border-box;margin:0 auto;padding:16px 38px 15px 16px;min-height:0;line-height:1.2;border:1px solid var(--fob-line,#33343B);border-radius:10px;background-color:rgba(255,255,255,.03);color:var(--fob-text,#EDE7DA);font-family:var(--body);font-size:16px;font-weight:400;text-align:center;text-align-last:center;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--gold-dim) 50%),linear-gradient(135deg,var(--gold-dim) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.fob-map-borough .fob-iq-select:focus{border-color:var(--fob-gold,#D0BC98);outline:none}
+.fob-map-range-note{margin:10px auto 0;max-width:480px;color:var(--muted);font-size:12.5px;line-height:1.6;text-align:center}
+
+
+/* v171 document-end trim: no decorative dead zone after the final footer content. */
+.fob-footer{min-height:0!important;margin-bottom:0!important;padding-bottom:24px!important}
+.fob-footer-inner{min-height:0!important;margin-bottom:0!important;padding-bottom:0!important}
+body> .fob-footer:last-of-type{margin-bottom:0!important}
+html,body{min-height:0}
+
+
+/* v173 final page-end trim. The footer is the document terminus; no artificial
+   viewport or decorative reserve is allowed beneath it. */
+html,body{height:auto!important;min-height:0!important;margin-bottom:0!important;padding-bottom:0!important}
+.fob-footer{height:auto!important;min-height:0!important;margin:0!important;padding-bottom:12px!important}
+.fob-footer-inner{height:auto!important;min-height:0!important;margin-bottom:0!important;padding-bottom:0!important}
+.fob-footer-private:last-child{margin-bottom:0!important;padding-bottom:0!important}
+body>.fob-footer:last-of-type{display:block!important;position:relative!important;bottom:auto!important}
+
+/* v181: keep the launch asset as a real MP4 for smooth motion. Native chrome remains hidden;
+   a FOB-styled fallback control only appears when autoplay is actually blocked. */
+.fob-hero-film-vid{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;background:#05090D}
+.fob-hero-film-play{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);z-index:3;
+  width:72px;height:72px;border-radius:50%;border:1px solid rgba(239,212,157,.34);
+  background:rgba(5,9,13,.76);color:#EFD49D;display:grid;place-items:center;cursor:pointer;
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);box-shadow:0 10px 34px rgba(0,0,0,.4)}
+.fob-hero-film-play[hidden]{display:none!important}
+.fob-hero-film-play span{font-size:27px;line-height:1;margin-left:4px}
+
+/* v190 — homepage hero tonal refinement
+   Keep the near-black treatment only at the very top, then return smoothly
+   to the established FOB graphite. Preserve the barely-visible warm side aura. */
+.fob-hero-v2 {
+  background:
+    radial-gradient(ellipse 58% 30% at 50% 1%, rgba(0,0,0,0.56) 0%, rgba(0,0,0,0.30) 46%, rgba(0,0,0,0) 78%),
+    linear-gradient(180deg,
+      #000204 0%,
+      #010407 20%,
+      #03070A 25%,
+      #080C10 39%,
+      #0D1116 58%,
+      var(--tone-graphite) 82%,
+      var(--tone-graphite) 100%);
+}
+.fob-hero-v2::before {
+  background:
+    radial-gradient(ellipse 48% 54% at 9% 9%, rgba(220,190,140,0.030), rgba(220,190,140,0.012) 42%, transparent 74%),
+    radial-gradient(ellipse 48% 54% at 91% 9%, rgba(220,190,140,0.030), rgba(220,190,140,0.012) 42%, transparent 74%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 34%, rgba(0,0,0,.78) 54%, rgba(0,0,0,.36) 76%, transparent 96%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 34%, rgba(0,0,0,.78) 54%, rgba(0,0,0,.36) 76%, transparent 96%);
+}
+
+/* v191 — hero micro-adjustment
+   Slightly lift only the top darkness while preserving the v190 20–25% falloff.
+   Restore/increase the extremely subtle warm gold side aura around the mark. */
+.fob-hero-v2 {
+  background:
+    radial-gradient(ellipse 58% 30% at 50% 1%, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.26) 46%, rgba(0,0,0,0) 78%),
+    linear-gradient(180deg,
+      #020507 0%,
+      #030609 20%,
+      #05090C 25%,
+      #090D11 39%,
+      #0D1116 58%,
+      var(--tone-graphite) 82%,
+      var(--tone-graphite) 100%);
+}
+.fob-hero-v2::before {
+  background:
+    radial-gradient(ellipse 48% 54% at 9% 9%, rgba(220,190,140,0.036), rgba(220,190,140,0.0145) 42%, transparent 74%),
+    radial-gradient(ellipse 48% 54% at 91% 9%, rgba(220,190,140,0.036), rgba(220,190,140,0.0145) 42%, transparent 74%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 34%, rgba(0,0,0,.78) 54%, rgba(0,0,0,.36) 76%, transparent 96%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 34%, rgba(0,0,0,.78) 54%, rgba(0,0,0,.36) 76%, transparent 96%);
+}
+
+
+/* v199 — LOCAL HERO BACKDROP + INQUIRY CONSENT ALIGNMENT
+   Scope intentionally limited to the homepage hero and final inquiry consent. */
+.fob-hero-v2-inner {
+  position: relative;
+  isolation: isolate;
+}
+.fob-hero-v2-inner::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  left: 50%;
+  top: clamp(-24px, -2vw, -10px);
+  width: min(1120px, 100vw);
+  height: clamp(360px, 48vw, 520px);
+  transform: translateX(-50%);
+  background:
+    linear-gradient(180deg, rgba(2,5,7,.28), rgba(3,8,11,.46)),
+    url('images/hero-action-backdrop.jpg') center 38% / cover no-repeat;
+  background-blend-mode: multiply;
+  opacity: .183;
+  filter: grayscale(.72) sepia(.12) saturate(.58) contrast(1.08) brightness(.72);
+  -webkit-mask-image: radial-gradient(ellipse 86% 76% at 50% 38%, #000 0%, rgba(0,0,0,.94) 34%, rgba(0,0,0,.72) 50%, rgba(0,0,0,.42) 64%, rgba(0,0,0,.16) 76%, rgba(0,0,0,.045) 86%, transparent 98%);
+          mask-image: radial-gradient(ellipse 86% 76% at 50% 38%, #000 0%, rgba(0,0,0,.94) 34%, rgba(0,0,0,.72) 50%, rgba(0,0,0,.42) 64%, rgba(0,0,0,.16) 76%, rgba(0,0,0,.045) 86%, transparent 98%);
+}
+.fob-hero-v2-inner > * {
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 700px) {
+  .fob-hero-v2-inner::after {
+    width: 112vw;
+    height: 390px;
+    top: -8px;
+    background-position: 52% 34%;
+    opacity: .166;
+    -webkit-mask-image: radial-gradient(ellipse 90% 78% at 50% 36%, #000 0%, rgba(0,0,0,.92) 32%, rgba(0,0,0,.70) 49%, rgba(0,0,0,.40) 64%, rgba(0,0,0,.14) 77%, rgba(0,0,0,.04) 87%, transparent 98%);
+            mask-image: radial-gradient(ellipse 90% 78% at 50% 36%, #000 0%, rgba(0,0,0,.92) 32%, rgba(0,0,0,.70) 49%, rgba(0,0,0,.40) 64%, rgba(0,0,0,.14) 77%, rgba(0,0,0,.04) 87%, transparent 98%);
+  }
+}
+
+/* v200 — hard-center final consent control above its copy */
+.fob-iq-steps label.fob-iq-check.fob-iq-consent {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  justify-items: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  text-align: center !important;
+  gap: 11px !important;
+}
+.fob-iq-steps label.fob-iq-check.fob-iq-consent input[type=checkbox] {
+  display: block !important;
+  position: static !important;
+  float: none !important;
+  flex: none !important;
+  margin: 0 auto !important;
+  justify-self: center !important;
+}
+.fob-iq-steps label.fob-iq-check.fob-iq-consent > span {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+/* v202 — LOCAL MOBILE EDGE + HERO BACKDROP SIZE FIX
+   Scope: prevent the homepage hero backdrop from creating horizontal overflow,
+   and extend the existing backdrop slightly lower without changing its opacity,
+   tint, or overall treatment. */
+html, body {
+  width: 100%;
+  max-width: 100%;
+}
+.fob-hero-v2,
+.fob-hero-v2-inner {
+  max-width: 100%;
+  overflow-x: clip;
+}
+.fob-hero-v2-inner::after {
+  width: min(1180px, 104vw);
+  height: clamp(390px, 52vw, 575px);
+  top: clamp(-12px, -1vw, -4px);
+}
+@media (max-width: 700px) {
+  .fob-hero-v2-inner::after {
+    width: 110%;
+    height: 465px;
+    top: 2px;
+    background-position: 52% 32%;
+  }
+}
+
+/* v203 — LOCAL HERO EDGE CLIP FIX
+   Keep the oversized hero backdrop intact, but clip it only at the full-width
+   hero boundary. The inner content wrapper must remain overflow-visible so its
+   narrower content width cannot expose a side strip on mobile. */
+/* v230: the html/body rule that used to sit here is GONE. See the
+   authoritative block at the end of this file for why it was the bug.
+   The hero clips with `clip`, not `hidden`, for the same reason. */
+.fob-hero-v2 {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+.fob-hero-v2-inner {
+  overflow: visible !important;
+}
+
+/* v204 — EXACT VIEWPORT HERO BACKDROP CLIP
+   Local-only fix: anchor the decorative hero photo to the viewport itself so
+   its crop ends exactly at both screen edges. No hero sizing/content changes. */
+.fob-hero-v2-inner::after {
+  left: calc(50% - 50vw) !important;
+  width: 100vw !important;
+  max-width: none !important;
+  transform: none !important;
+}
+@supports (width: 100dvw) {
+  .fob-hero-v2-inner::after {
+    left: calc(50% - 50dvw) !important;
+    width: 100dvw !important;
+  }
+}
+
+/* v218 — homepage input path stays native. These declarations are defensive:
+   neither the hero backdrop nor film wrapper may claim a vertical gesture. */
+.fob-hero-v2, .fob-hero-film { touch-action: pan-y pinch-zoom; }
+
+/* v220 — homepage render/scroll hardening.
+   Scrolling is never used as an application trigger. Keep vertical panning
+   native from first paint while the muted hero film autoplays independently. */
+html { scroll-behavior: auto !important; }
+body { overscroll-behavior-y: auto; }
+.fob-hero-v2, .fob-hero-v2 *, .fob-hero-film, .fob-hero-film * {
+  touch-action: pan-y pinch-zoom;
+}
+
+/* =============================================================
+   v221 - HOMEPAGE SCROLL STABILITY
+
+   The inquiry form is constructed by inquiry.js into an empty
+   #inquiry-form-root. That construction is now synchronous and
+   therefore lands before first paint, so the document reaches its
+   real height immediately. This floor is the safety net for the
+   case where an engine paints before end-of-body scripts finish:
+   it holds the section open at close to its built height, so the
+   page can never grow by a whole form's worth after the user has
+   already started scrolling.
+
+   Deliberately a floor and not a fixed height. The built form is
+   always at least this tall, so natural height takes over the
+   moment it exists and nothing is ever clipped or padded out.
+   ============================================================= */
+.fob-iq-root { min-height: 300px; }
+@media (min-width: 860px) { .fob-iq-root { min-height: 330px; } }
+
+/* The hero film now loads paused by design, so the branded control is
+   the advertised affordance rather than a blocked-autoplay fallback.
+   It must be paintable on the very first frame, before any script has
+   run, which means its visibility cannot depend on JavaScript. */
+.fob-hero-film-play { display: grid; }
+.fob-hero-film-play[hidden] { display: none !important; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v230 - SCROLL OWNERSHIP. THE AUTHORITATIVE RULE. READ BEFORE EDITING.
+
+   THE BUG THIS FIXES
+   Four generations of "scroll hardening" had stacked up, and the last one
+   won. v203 set `html { overflow-x: hidden !important }`.
+
+   Per the CSS Overflow spec, when one axis is `hidden` and the other is
+   `visible`, the visible axis computes to `auto`. So that one line made the
+   ROOT ELEMENT a scroll container: html became `overflow-x:hidden;
+   overflow-y:auto`. The page was no longer scrolling the viewport, it was
+   scrolling inside a box.
+
+   On iOS Safari that is the freeze. The viewport scrolls on the compositor
+   and responds to the very first touch. An element scroller does not exist
+   until layout and compositing have built and promoted its layer, which on
+   this page means after 152 KB of stylesheet has parsed. Until then touches
+   land on nothing. That is why it felt locked for a few seconds, and why
+   deferring the JavaScript in v229 changed nothing: the JavaScript was
+   never the problem.
+
+   Two more things were making it worse:
+     -webkit-overflow-scrolling:touch on body, obsolete since iOS 13, forced
+     a second scrolling layer underneath the first.
+     touch-action:pan-y pinch-zoom on html and body forced a touch-action
+     region lookup on every gesture, and blocked horizontal panning for the
+     whole document, including the chip rows that need it.
+
+   THE MODEL NOW, AND IT IS THE ONLY ONE
+     1. The VIEWPORT owns scrolling. Nothing else.
+     2. html has no overflow declaration at all. Never give it one. A
+        non-visible value on html turns the document into an element
+        scroller and the freeze comes straight back.
+     3. body carries overflow-x:hidden. That is the safe form: because html
+        is visible, body's value propagates up to the viewport and body
+        itself stays visible, so no nested scroller is created.
+     4. Horizontal overflow is contained where it is produced, on
+        .fob-hero-v2, using `clip`. `clip` does not create a scroll
+        container. `hidden` does. That difference is the whole bug.
+     5. No touch-action on html or body. The default is the fast path.
+
+   If a future element overflows sideways, clip it on that element. Do not
+   reach for html or body.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* =============================================================
+   V277 — HOMEPAGE DIRECTORY BANNER
+   The logo owns a fixed left-hand safe zone. The directory rail scrolls
+   independently to its right, so controls disappear cleanly beneath that
+   crop boundary instead of ever crossing the wordmark.
+   ============================================================= */
+.fob-banner-dirs{
+  flex:1 1 auto; min-width:0; overflow:hidden; position:relative;
+  /* Boundary moves 8px left; padding puts the buttons back where they were, so
+     SLOTS does not shift and nothing can scroll under the logo: overflow
+     still clips at this container's edge, which is now further from the
+     first button. */
+  margin-left:-8px;
+  padding-left:8px;
+}
+.fob-banner-dirs::before{
+  content:"";
+  position:absolute;
+  /* Starts inside the container's own left padding, so the fade begins in
+     empty gutter rather than hard against the first button. */
+  left:0; top:0; bottom:0;
+  width:22px;
+  z-index:3;
+  pointer-events:none;
+  /* Matched to the homepage banner's real ground, rgba(7,9,12,.94). The old
+     value was rgba(17,19,24,.92), a lighter colour from the generic nav, so
+     this strip painted a different tone over the banner and read as a vertical
+     line. Multi-stop so there is no perceptible edge at either end. */
+  background:linear-gradient(90deg,
+    rgba(7,9,12,.94) 0%,
+    rgba(7,9,12,.94) 26%,
+    rgba(7,9,12,.62) 58%,
+    rgba(7,9,12,.22) 82%,
+    rgba(7,9,12,0)   100%);
+}
+.fob-banner-dirs-scroll{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:clamp(7px,1vw,11px);
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-inline:contain;
+  scroll-snap-type:x proximity;
+  scrollbar-width:none;
+  padding:3px 2px 3px 9px;
+  touch-action:pan-x pan-y pinch-zoom;
+}
+.fob-banner-dirs-scroll::-webkit-scrollbar{display:none}
+.fob-banner-dirs .fob-dir-btn{
+  flex:0 0 auto;
+  min-height:42px;
+  scroll-snap-align:start;
+  position:relative;
+  isolation:isolate;
+}
+.fob-banner-dirs .fob-dir-btn .fob-edu-btn-main{
+  font-size:10.5px;
+  letter-spacing:.085em;
+}
+.fob-banner-dirs .fob-dir-btn .fob-edu-btn-ico svg{
+  width:15px;
+  height:15px;
+}
+
+/* v279: Slots is intentionally identical to the other directory buttons. */
+.fob-dir-slots{overflow:hidden}
+.fob-dir-slots::before,.fob-dir-slots::after{content:none!important;display:none!important}
+
+/* The relocated Claim CTA stays gold, but its traveling perimeter light is
+   a dark bronze/charcoal signature so it remains visible against the gold
+   fill without becoming another bright-gold beacon. */
+.fob-hero-claim-darkbeam{
+  position:relative;
+  isolation:isolate;
+  overflow:visible;
+  border-color:rgba(28,24,20,.42) !important;
+}
+.fob-hero-claim-darkbeam::before,
+.fob-hero-claim-darkbeam::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  border-radius:inherit;
+}
+.fob-hero-claim-darkbeam::before{
+  z-index:-1;
+  inset:-2px;
+  padding:2px;
+  background:conic-gradient(
+    from var(--beam-angle,0deg),
+    transparent 0deg,
+    transparent 317deg,
+    rgba(30,27,24,.10) 329deg,
+    rgba(44,37,30,.82) 343deg,
+    rgba(78,61,43,.98) 349deg,
+    rgba(34,30,26,.30) 357deg,
+    transparent 360deg
+  );
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  filter:drop-shadow(0 0 3px rgba(42,34,26,.40));
+  animation:fobHomePillPerimeterBeam 5.2s linear infinite;
+}
+.fob-hero-claim-darkbeam::after{
+  inset:-7px;
+  z-index:-2;
+  opacity:.26;
+  background:conic-gradient(
+    from var(--beam-angle,0deg),
+    transparent 0deg,
+    transparent 338deg,
+    rgba(35,29,24,.45) 349deg,
+    transparent 359deg
+  );
+  filter:blur(7px);
+  animation:fobHomePillPerimeterBeam 5.2s linear infinite;
+}
+
+@media(max-width:700px){
+  .fob-nav-inner{padding-left:14px;padding-right:12px;gap:10px}
+  .fob-brand img{height:30px}
+  .fob-banner-dirs-scroll{gap:7px;padding-left:7px}
+  .fob-banner-dirs .fob-dir-btn{padding:7px 9px;gap:6px;min-height:40px}
+  .fob-banner-dirs .fob-dir-btn .fob-edu-btn-main{font-size:9.25px;letter-spacing:.055em}
+  .fob-banner-dirs .fob-dir-btn .fob-edu-btn-ico svg{width:14px;height:14px}
+}
+@media(max-width:430px){
+  .fob-brand img{height:28px}
+  .fob-nav-inner{gap:8px;padding-left:11px;padding-right:8px}
+  .fob-banner-dirs .fob-dir-btn{padding:7px 8px}
+  .fob-banner-dirs .fob-dir-btn .fob-edu-btn-main{font-size:8.8px}
+  .fob-banner-dirs .fob-dir-btn .fob-edu-btn-ico{display:inline-flex}
+}
+@media(prefers-reduced-motion:reduce){
+  .fob-dir-slots::before,.fob-dir-slots::after,
+  .fob-hero-claim-darkbeam::before,.fob-hero-claim-darkbeam::after{animation:none}
+}
+
+/* v280 — Slots keeps the neutral directory-button interior, with only a
+   restrained perimeter beam. This is intentionally more visible than v278
+   while never tinting the button body itself. */
+.fob-dir-slots{position:relative;isolation:isolate;overflow:visible!important}
+.fob-dir-slots::before,.fob-dir-slots::after{content:""!important;display:block!important;position:absolute;pointer-events:none;border-radius:inherit}
+.fob-dir-slots::before{
+  z-index:-1;inset:-1.5px;padding:1.5px;
+  background:conic-gradient(from var(--beam-angle,0deg),transparent 0deg,transparent 319deg,rgba(239,212,157,.09) 328deg,rgba(239,212,157,.72) 342deg,rgba(255,241,207,.96) 349deg,rgba(239,212,157,.24) 356deg,transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  filter:drop-shadow(0 0 3px rgba(239,212,157,.21));animation:fobHomePillPerimeterBeam 5.8s linear infinite
+}
+.fob-dir-slots::after{inset:-5px;z-index:-2;opacity:.225;background:conic-gradient(from var(--beam-angle,0deg),transparent 0deg,transparent 338deg,rgba(239,212,157,.27) 349deg,transparent 359deg);filter:blur(6px);animation:fobHomePillPerimeterBeam 5.8s linear infinite}
+@media(prefers-reduced-motion:reduce){.fob-dir-slots::before,.fob-dir-slots::after{animation:none}}
+
+/* ══ v287 · SLOTS BUTTON BEAM ══════════════════════════════════════════════
+   The travelling beam on Claim Your Slot, 50% more opaque. Every alpha in both
+   the beam layer and its glow layer is multiplied by 1.5 and clamped at 1.
+   Geometry, timing, colour and blur are untouched; only opacity moves.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.fob-hero-claim-darkbeam::before{
+  background:conic-gradient(
+    from var(--beam-angle,0deg),
+    transparent 0deg,
+    transparent 317deg,
+    rgba(30,27,24,.15) 329deg,
+    rgba(44,37,30,1) 343deg,
+    rgba(78,61,43,1) 349deg,
+    rgba(34,30,26,.45) 353deg,
+    transparent 360deg
+  ) !important;
+}
+.fob-hero-claim-darkbeam::after{
+  opacity:.39 !important;                     /* .26 x 1.5 */
+  background:conic-gradient(
+    from var(--beam-angle,0deg),
+    transparent 0deg,
+    transparent 338deg,
+    rgba(35,29,24,.68) 349deg,
+    transparent 359deg
+  ) !important;
+}
+
+
+/* ══ v314 — no accidental double-tap zoom, without touching html/body ═══
+   v230 correctly forbids touch-action on the root scroll owners. Apply the
+   gesture policy one level down instead: normal pan and pinch remain native,
+   while a quick second tap no longer turns ordinary site content into a zoom
+   target. Existing component-specific pan rules still win where declared. */
+body > :not(script):not(style){touch-action:manipulation}
+button,a,input,select,textarea,summary,[role="button"]{touch-action:manipulation}
+
+/* ══ v359 — unified, static MAHFITT hero portal ════════════════════════════
+   Only the beta copy travels. Its old ±4 mm range is exactly halved to ±2 mm,
+   and its old 9 s duration is 1.23× faster (9 / 1.23 = 7.32 s). */
+.fob-mahfitt-hero{display:grid!important;justify-items:center!important;align-items:center!important;overflow:visible}
+.fob-mahfitt-portal{position:relative;display:grid;justify-items:center;align-items:center;gap:10px;width:min(92vw,390px);min-height:132px;padding:17px 24px 19px;border:1px solid rgba(233,201,143,.32);border-radius:14px;background:rgba(11,14,17,.62);color:var(--gold-bright);text-decoration:none;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.018),0 16px 48px rgba(0,0,0,.22)}
+.fob-mahfitt-portal::before{content:"";position:absolute;inset:0;border-radius:inherit;border:1px solid transparent;background:linear-gradient(90deg,transparent 0%,rgba(233,201,143,.10) 36%,rgba(233,201,143,.52) 50%,rgba(233,201,143,.10) 64%,transparent 100%) border-box;mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);mask-composite:exclude;-webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;pointer-events:none}
+.fob-mahfitt-portal:hover,.fob-mahfitt-portal:focus-visible{outline:0;border-color:rgba(233,201,143,.54);background:rgba(18,22,26,.75)}
+.fob-beta-mode{display:grid;place-items:center;width:100%;min-height:26px;font:650 10px/1.1 var(--display,system-ui,sans-serif);letter-spacing:.15em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.fob-beta-mode>span{position:relative;z-index:1;animation:mahfitt-beta-copy-drift 7.32s ease-in-out infinite;will-change:transform}
+.fob-mahfitt-mark{position:relative;z-index:1;display:block;width:min(270px,77vw);height:66px;background:currentColor;-webkit-mask:url('/images/mahfitt-mark-mask.png') center/contain no-repeat;mask:url('/images/mahfitt-mark-mask.png') center/contain no-repeat;filter:drop-shadow(0 0 7px rgba(233,201,143,.12))}
+@keyframes mahfitt-beta-copy-drift{0%,100%{transform:translate3d(-2mm,-.75px,0)}50%{transform:translate3d(2mm,.75px,0)}}
+@media(prefers-reduced-motion:reduce){.fob-beta-mode>span{animation:none!important}}
+@media(max-width:560px){.fob-mahfitt-portal{width:min(92vw,350px);min-height:120px;padding:15px 17px;border-radius:12px}.fob-beta-mode{font-size:8.2px;letter-spacing:.12em}.fob-mahfitt-mark{width:min(245px,73vw);height:59px}}
+
+/* v359: four banner destinations always share the available width. */
+.fob-banner-dirs-scroll{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;overflow:visible;scroll-snap-type:none}
+.fob-banner-dirs .fob-dir-btn{min-width:0;width:100%;justify-content:center;padding-left:8px;padding-right:8px}
+.fob-dir-mahfitt{position:relative;isolation:isolate;overflow:visible!important}
+.fob-dir-mahfitt::before,.fob-dir-mahfitt::after{content:""!important;display:block!important;position:absolute;pointer-events:none;border-radius:inherit}
+.fob-dir-mahfitt::before{z-index:-1;inset:-1.5px;padding:1.5px;background:conic-gradient(from var(--beam-angle,0deg),transparent 0deg,transparent 319deg,rgba(239,212,157,.09) 328deg,rgba(239,212,157,.72) 342deg,rgba(255,241,207,.96) 349deg,rgba(239,212,157,.24) 356deg,transparent 360deg);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;filter:drop-shadow(0 0 3px rgba(239,212,157,.21));animation:fobHomePillPerimeterBeam 5.8s linear infinite}
+.fob-dir-mahfitt::after{inset:-5px;z-index:-2;opacity:.225;background:conic-gradient(from var(--beam-angle,0deg),transparent 0deg,transparent 338deg,rgba(239,212,157,.27) 349deg,transparent 359deg);filter:blur(6px);animation:fobHomePillPerimeterBeam 5.8s linear infinite}
+@media(max-width:700px){.fob-banner-dirs-scroll{gap:5px;padding-left:5px}.fob-banner-dirs .fob-dir-btn{padding-left:4px;padding-right:4px;gap:4px}.fob-banner-dirs .fob-dir-btn .fob-edu-btn-main{font-size:8px}.fob-banner-dirs .fob-dir-btn .fob-edu-btn-ico svg{width:12px;height:12px}}
+@media(max-width:430px){.fob-brand img{height:25px}.fob-nav-inner{gap:5px;padding-left:8px;padding-right:6px}.fob-banner-dirs{margin-left:-5px;padding-left:5px}.fob-banner-dirs .fob-dir-btn{min-height:38px;display:grid;grid-template-rows:13px auto;gap:2px}.fob-banner-dirs .fob-dir-btn .fob-edu-btn-main{font-size:7px;letter-spacing:.02em}.fob-banner-dirs .fob-dir-btn .fob-edu-btn-ico{display:grid}}
+@media(prefers-reduced-motion:reduce){.fob-dir-mahfitt::before,.fob-dir-mahfitt::after{animation:none}}
+
+
+/* ══ v362 — MAHFITT hero lockup: tighter, symmetric, mature motion ══════════
+   Keep the portal as one object. Narrow the perimeter around the mark, stop
+   the lateral beta drift, and replace it with a barely-there centered pulse.
+   The logo itself gets the same restrained left→right sheen language used by
+   the player controls. */
+.fob-mahfitt-portal{
+  width:min(74vw,300px)!important;
+  min-height:0!important;
+  padding:15px 18px!important;
+  gap:4px!important;
+  align-content:center!important;
+}
+.fob-beta-mode{min-height:18px!important;margin:0!important;overflow:visible!important}
+.fob-beta-mode>span{
+  animation:mahfitt-beta-pulse 5.8s ease-in-out infinite!important;
+  transform-origin:center center!important;
+  will-change:transform!important;
+}
+.fob-mahfitt-mark{
+  width:min(232px,64vw)!important;
+  height:58px!important;
+  margin:0!important;
+  background:linear-gradient(110deg,currentColor 0 40%,currentColor 43%,rgba(255,245,220,.98) 49%,currentColor 55%,currentColor 100%)!important;
+  background-size:285% 100%!important;
+  background-position:130% 50%!important;
+  animation:mahfitt-mark-sheen 7.2s ease-in-out infinite!important;
+}
+@keyframes mahfitt-beta-pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.025)}
+}
+@keyframes mahfitt-mark-sheen{
+  0%,62%{background-position:130% 50%}
+  78%{background-position:-35% 50%}
+  100%{background-position:-35% 50%}
+}
+@media(max-width:560px){
+  .fob-mahfitt-portal{width:min(76vw,286px)!important;padding:14px 16px!important;gap:3px!important;border-radius:12px}
+  .fob-mahfitt-mark{width:min(218px,62vw)!important;height:54px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .fob-beta-mode>span,.fob-mahfitt-mark{animation:none!important}
+  .fob-mahfitt-mark{background:currentColor!important}
+}
+
+
+/* ══ v364 — direct MAHFITT mark sheath ═══════════════════════════════════════
+   Logo-only sheen. No portal, copy, or surrounding hero element participates. */
+.fob-mahfitt-mark{
+  background:linear-gradient(110deg,currentColor 0 41%,currentColor 44%,rgba(255,248,228,.99) 49.5%,currentColor 55%,currentColor 100%)!important;
+  background-size:310% 100%!important;
+  background-position:136% 50%!important;
+  animation:mahfitt-mark-sheath-v364 6.6s cubic-bezier(.42,0,.3,1) infinite!important;
+  will-change:background-position!important
+}
+@keyframes mahfitt-mark-sheath-v364{
+  0%,66%{background-position:136% 50%}
+  82%,100%{background-position:-40% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+  .fob-mahfitt-mark{animation:none!important;background:currentColor!important;will-change:auto!important}
+}
+
+/* ══ v365 — sitewide synchronous/opposed FOBEAM timing ═════════════════════
+   Existing ranges/sizes remain unchanged. The beam owns the wider path while
+   the square diamond owns the shorter path; they cross centre and hit their
+   opposite apices on the same timestamps. */
+@keyframes fobBeamTravel{
+  0%,50%,100%{background-position:50% 50%}
+  25%{background-position:100% 50%}
+  75%{background-position:0% 50%}
+}
+@keyframes fobNodeSway{
+  0%,50%,100%{transform:translate(-50%,-50%) rotate(45deg)}
+  25%{transform:translate(calc(-50% - var(--fob-node-travel)/2),-50%) rotate(45deg)}
+  75%{transform:translate(calc(-50% + var(--fob-node-travel)/2),-50%) rotate(45deg)}
+}
+
+/* ══ v366 — continuous opposed FOBEAM + focused MAHFITT hero motion ════════
+   Ambient FOBEAMs now use only the two physical turnarounds as keyframes.
+   That keeps velocity continuous through centre while the small square diamond
+   travels opposite the wider beam and both cross centre at the same instant. */
+@keyframes fobBeamTravel{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes fobNodeSway{
+  0%{transform:translate(calc(-50% + var(--fob-node-travel)/2),-50%) rotate(45deg)}
+  50%{transform:translate(calc(-50% - var(--fob-node-travel)/2),-50%) rotate(45deg)}
+  100%{transform:translate(calc(-50% + var(--fob-node-travel)/2),-50%) rotate(45deg)}
+}
+@keyframes fobBeamPulse{
+  0%,50%,100%{filter:drop-shadow(0 0 8px rgba(233,201,143,.52)) drop-shadow(0 0 18px rgba(211,190,152,.24))}
+  25%,75%{filter:drop-shadow(0 0 5px rgba(233,201,143,.34)) drop-shadow(0 0 12px rgba(211,190,152,.16))}
+}
+@keyframes fobNodeGlow{
+  0%,50%,100%{box-shadow:0 0 11px rgba(233,201,143,.55),0 0 20px rgba(211,190,152,.20)}
+  25%,75%{box-shadow:0 0 5px rgba(233,201,143,.22)}
+}
+
+/* Hero beta copy breathes in depth only; no lateral drift. The requested
+   0.9→1.2 range reaches its maximum every 5.6 seconds. */
+.fob-beta-mode>span{
+  animation:mahfitt-beta-depth-v366 11.2s ease-in-out infinite!important;
+  transform-origin:center center!important;
+  will-change:transform!important
+}
+@keyframes mahfitt-beta-depth-v366{
+  0%,100%{transform:scale(.9)}
+  50%{transform:scale(1.2)}
+}
+
+/* Tighten the hero portal evenly around the unchanged MAHFITT mark. */
+.fob-mahfitt-portal{
+  width:min(66vw,252px)!important;
+  padding:15px 8px!important;
+  gap:4px!important
+}
+@media(max-width:560px){
+  .fob-mahfitt-portal{width:min(66vw,252px)!important;padding:14px 8px!important}
+}
+
+/* A quiet perimeter glint makes one slow lap. It is intentionally dimmer and
+   slower than the ordinary navigation sheens. */
+@property --mahfitt-hero-angle{syntax:'<angle>';inherits:false;initial-value:0deg}
+.fob-mahfitt-portal::before{
+  border:0!important;
+  inset:0!important;
+  padding:1px!important;
+  background:conic-gradient(from var(--mahfitt-hero-angle),transparent 0deg,transparent 326deg,rgba(233,201,143,.035) 334deg,rgba(247,225,181,.34) 347deg,rgba(255,244,218,.46) 351deg,rgba(233,201,143,.08) 357deg,transparent 360deg)!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  mask-composite:exclude!important;
+  opacity:.58!important;
+  animation:mahfittHeroPerimeterV366 9.6s linear infinite!important;
+  will-change:--mahfitt-hero-angle
+}
+@keyframes mahfittHeroPerimeterV366{to{--mahfitt-hero-angle:360deg}}
+
+/* Keep the mark's dimensions exactly as established; only its masked fill
+   receives the west→east glossy passage. */
+.fob-mahfitt-mark{
+  animation:mahfitt-mark-sheath-v366 5.6s cubic-bezier(.42,0,.3,1) infinite!important
+}
+@keyframes mahfitt-mark-sheath-v366{
+  0%,68%{background-position:136% 50%}
+  86%,100%{background-position:-40% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+  .fob-beta-mode>span,.fob-mahfitt-mark,.fob-mahfitt-portal::before{animation:none!important}
+  .fob-beta-mode>span{transform:none!important}
+}
+
+
+/* ══ v367 — final MAHFITT hero frame trim ══════════════════════════════════
+   Narrow only the hero portal perimeter, symmetrically. Logo dimensions,
+   beta pulse, mark sheen, perimeter animation and surrounding copy remain
+   exactly as established before this pass. */
+.fob-mahfitt-portal{width:min(58vw,225px)!important}
+@media(max-width:560px){.fob-mahfitt-portal{width:min(58vw,225px)!important}}
+
+/* ══ v383 — sitewide FOBEAM artifact-range swap ═══════════════════════════
+   Keep the established clocks/easing/glow. The square diamond now owns the
+   former full rail traversal; the luminous beam owns the former compact node
+   travel. This changes artifacts only, not the musical/ambient timeline. */
+@keyframes fobBeamTravel{
+  0%{background-position:calc(50% + var(--fob-node-travel)/2) 50%}
+  50%{background-position:calc(50% - var(--fob-node-travel)/2) 50%}
+  100%{background-position:calc(50% + var(--fob-node-travel)/2) 50%}
+}
+@keyframes fobNodeSway{
+  0%{left:96%;transform:translate(-50%,-50%) rotate(45deg)}
+  50%{left:4%;transform:translate(-50%,-50%) rotate(45deg)}
+  100%{left:96%;transform:translate(-50%,-50%) rotate(45deg)}
+}
+
+/* ══ v442 — MAHFITT APP REVEAL (replaces the boxed BETA card) ══════════════
+   The old system was a bordered rounded card (.fob-mahfitt-portal) holding a
+   BETA: APP COMING SOON label and a MAHFITT mark. Its MARKUP is deleted from
+   index.html, so nothing of that container renders — no ghost border, no empty
+   box. Its historical CSS rules are deliberately left in place: they appear in
+   several later override blocks and other pages still reference members of that
+   family, so stripping them risked breaking accepted surfaces for no rendered
+   benefit. Dead rules for absent elements paint nothing.
+
+   The replacement sits directly on the page background between the navigation
+   and FUNCTIONAL OSCILLATION BAND. Colour comes from the existing FOB champagne
+   tokens; presence comes from contrast, weight and letter-spacing rather than
+   halos. */
+.fob-appreveal{width:100%;display:grid;justify-items:center;
+  margin:clamp(6px,2.4vw,18px) 0 clamp(20px,5vw,44px)}
+.fob-appreveal__link{display:grid;justify-items:center;gap:clamp(10px,2.4vw,18px);
+  text-decoration:none;color:inherit;padding:clamp(4px,1.4vw,12px) 0;
+  border:0;background:none;border-radius:0}
+.fob-appreveal__link:focus-visible{outline:1px solid rgba(233,201,143,.55);outline-offset:8px}
+.fob-appreveal__eyebrow{margin:0;
+  font:650 clamp(10px,2.6vw,13px)/1 var(--display,system-ui,sans-serif);
+  letter-spacing:.42em;text-indent:.42em;text-transform:uppercase;
+  color:rgba(233,201,143,.82)}
+.fob-appreveal__title{margin:0;
+  font:600 clamp(24px,7.4vw,46px)/1.05 var(--display,system-ui,sans-serif);
+  letter-spacing:.24em;text-indent:.24em;text-transform:uppercase;
+  color:#F0E2C6;position:relative;overflow:hidden}
+/* One restrained luminous sweep. Paint only — background-position cannot move
+   layout — and switched off entirely under reduced motion. */
+.fob-appreveal__title>span{
+  background:linear-gradient(100deg,#EBDCC0 0%,#EBDCC0 38%,#FFF6E4 50%,#EBDCC0 62%,#EBDCC0 100%);
+  background-size:280% 100%;-webkit-background-clip:text;background-clip:text;
+  color:transparent;animation:fob-appreveal-sweep 9.5s ease-in-out infinite}
+@keyframes fob-appreveal-sweep{0%,100%{background-position:120% 0}50%{background-position:-20% 0}}
+/* iPhone-17-like silhouette: thin champagne trim, near-black body, Dynamic
+   Island, one soft grounding light. No photoreal reflections, no wallpaper,
+   no model number. */
+.fob-appreveal__device{position:relative;width:clamp(178px,46vw,258px);display:grid;justify-items:center}
+.fob-appreveal__frame{position:relative;width:100%;aspect-ratio:786 / 1430;
+  border-radius:clamp(26px,7.4vw,40px);padding:clamp(4px,1.1vw,6px);
+  background:linear-gradient(165deg,rgba(238,214,168,.92) 0%,rgba(176,146,98,.72) 26%,
+    rgba(84,68,45,.62) 52%,rgba(198,168,118,.80) 78%,rgba(120,98,64,.66) 100%);
+  box-shadow:0 0 0 1px rgba(255,240,210,.18),0 26px 54px -28px rgba(0,0,0,.92),
+    0 0 34px -14px rgba(233,201,143,.24);
+  overflow:hidden;isolation:isolate}
+.fob-appreveal__screen{display:block;width:100%;height:100%;object-fit:cover;
+  object-position:top center;border-radius:clamp(22px,6.4vw,35px);background:#07090C}
+.fob-appreveal__island{position:absolute;z-index:2;top:clamp(9px,2.4vw,14px);left:50%;
+  transform:translateX(-50%);width:clamp(52px,14vw,78px);height:clamp(15px,4vw,22px);
+  border-radius:999px;background:#050608;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.fob-appreveal__ground{position:absolute;left:50%;bottom:clamp(-16px,-3vw,-10px);
+  transform:translateX(-50%);width:76%;height:clamp(16px,4vw,26px);
+  background:radial-gradient(ellipse at center,rgba(233,201,143,.20) 0%,rgba(233,201,143,0) 70%);
+  pointer-events:none}
+@media (min-width:900px){.fob-appreveal__device{width:clamp(240px,20vw,300px)}}
+@media (prefers-reduced-motion:reduce){.fob-appreveal__title>span{animation:none;background-position:50% 0}}
+
+/* ══ v442 — FOB HEADER LOCKUP SIZING ═══════════════════════════════════════
+   The approved interior lockup is a squarer frame than the artwork it replaces
+   (582x422 vs 803x422), because it now carries the top ornament, FOB, SYSTEMS
+   and the lower divider rather than a wordmark alone. At the inherited 32px
+   nav height that made SYSTEMS illegible. Height is raised just enough to keep
+   the full lockup readable; the nav's own box is taller than this, so the bar
+   does NOT grow and the mark still clears the directory buttons. */
+.fob-nav .fob-brand img{height:44px}
+@media (max-width:600px){.fob-nav .fob-brand img{height:40px}}
+@media (max-width:430px){.fob-nav .fob-brand img{height:38px}}
+/* Measured at 375/393/430: the lockup finished flush against the first
+   directory button (gap 0). An explicit gutter keeps the mark from touching
+   the nav controls without widening the bar. */
+@media (max-width:600px){.fob-nav .fob-brand{margin-right:12px}}
+
+/* ══ v445 — FOB HOMEPAGE PHONE SILHOUETTE REFINEMENT ═════════════════════
+   The homepage render should read more like a real iPhone: narrower overall,
+   a little smaller on the page, and with a much thinner gold perimeter. Keep
+   the established current Live Workout top crop, but tune the device shell to
+   the user's requested ~6.5in x 3in proportion instead of the wider v444 look. */
+.fob-appreveal__device{width:clamp(76px,19.5vw,106px)}
+.fob-appreveal__frame{aspect-ratio:600 / 1300;border-radius:clamp(24px,6.8vw,36px);padding:clamp(2px,.55vw,3px)}
+.fob-appreveal__screen{object-position:top center;border-radius:clamp(21px,5.9vw,33px)}
+@media (min-width:900px){.fob-appreveal__device{width:clamp(104px,8.5vw,123px)}}
+
+
+/* ══ v451 — FOB FINAL EXACT WORDMARK + USER IPHONE MOCKUP ════════════════
+   Use the existing exact gold FOB/SYSTEMS artwork rather than reconstructing
+   the letters in CSS.  The hero device is built from Jah's supplied iPhone
+   mockup geometry with the supplied OG-theme MAHFITT Home screenshot inside.
+   Its physical CSS footprint is deliberately locked to the requested
+   1.50in x 0.47in; it must not grow at desktop breakpoints. */
+.fob-nav .fob-brand{display:flex!important;align-items:center!important;justify-content:center!important;color:inherit!important;text-decoration:none!important}
+.fob-brand-exact{display:block!important;width:auto!important;height:30px!important;object-fit:contain!important;flex:none!important}
+@media(max-width:430px){.fob-brand-exact{height:28px!important}}
+
+.fob-appreveal__device{width:.47in!important;min-width:.47in!important;max-width:.47in!important;height:1.5in!important;min-height:1.5in!important;max-height:1.5in!important;display:grid!important;justify-items:center!important}
+.fob-appreveal__frame{width:100%!important;height:100%!important;aspect-ratio:auto!important;padding:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;overflow:visible!important}
+.fob-appreveal__screen{display:block!important;width:100%!important;height:100%!important;object-fit:fill!important;object-position:center!important;border-radius:0!important;background:transparent!important;filter:drop-shadow(0 9px 7px rgba(0,0,0,.72)) drop-shadow(0 0 5px rgba(210,169,104,.18))!important}
+.fob-appreveal__island{display:none!important}
+.fob-appreveal__ground{bottom:-8px!important;width:110%!important;height:12px!important;background:radial-gradient(ellipse at center,rgba(0,0,0,.58) 0%,rgba(0,0,0,0) 74%)!important}
+@media(min-width:900px){.fob-appreveal__device{width:.47in!important;min-width:.47in!important;max-width:.47in!important;height:1.5in!important;min-height:1.5in!important;max-height:1.5in!important}}
+
+
+/* ══ v452 — FINAL FOB HERO MICRO CLOSURE ═══════════════════════════════════
+   Only the requested FOB hero pieces change here:
+   - exact FOB emblem silhouette, flat-tinted to the sampled reference gold
+   - MAHFITT wordmark replaces the former eyebrow copy at exactly 2in wide
+   - COMING SOON is reduced to 0.4x its v456 visual size (.6in / 7.2px)
+   - the existing .47in-wide iPhone art is cropped to half height (.75in)
+   Nothing outside the hero/nav lockup is touched. */
+.fob-nav .fob-brand-exact{
+  display:block!important;
+  width:72px!important;
+  height:38px!important;
+  flex:none!important;
+  background:#D3BE9E!important;
+  -webkit-mask:url("images/fob-emblem.png") center/contain no-repeat!important;
+  mask:url("images/fob-emblem.png") center/contain no-repeat!important;
+}
+@media(max-width:430px){.fob-nav .fob-brand-exact{width:68px!important;height:36px!important}}
+
+.fob-appreveal__brandlogo{
+  display:block!important;
+  width:1.4in!important;
+  max-width:1.4in!important;
+  height:auto!important;
+  object-fit:contain!important;
+  margin:0 auto!important;
+}
+.fob-appreveal__title{
+  width:.6in!important;
+  max-width:.6in!important;
+  font-size:7.2px!important;
+  line-height:1.05!important;
+  letter-spacing:.14em!important;
+  text-indent:.14em!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+}
+.fob-appreveal__device{
+  width:.47in!important;
+  min-width:.47in!important;
+  max-width:.47in!important;
+  height:.75in!important;
+  min-height:.75in!important;
+  max-height:.75in!important;
+}
+.fob-appreveal__frame{
+  width:100%!important;
+  height:100%!important;
+  overflow:visible!important;
+}
+.fob-appreveal__screen{
+  width:100%!important;
+  height:100%!important;
+  object-fit:fill!important;
+  object-position:top center!important;
+}
+@media(min-width:900px){.fob-appreveal__device{width:.47in!important;min-width:.47in!important;max-width:.47in!important;height:.75in!important;min-height:.75in!important;max-height:.75in!important}}
+
+/* ══ v453 — FINAL MAHFITT HERO GAP TRIM ════════════════════════════════════
+   Tighten only the open space above and below the MAHFITT reveal on the FOB
+   hero. Preserve all accepted logo/title/phone sizing from v452. */
+.fob-hero-v2{
+  padding-top:calc(var(--nav-h) + 6px)!important;
+}
+.fob-appreveal{
+  margin:0 0 4px!important;
+}
+.fob-appreveal__link{
+  gap:6px!important;
+  padding:0!important;
+}
+.fob-appreveal + .fob-hero-eyebrow{
+  margin-top:4px!important;
+}
+
+
+/* ══ v454 — FINAL HERO FOBEAM SPACER ═══════════════════════════════════════
+   One existing FOB divider primitive now bridges the tiny space between the
+   MAHFITT phone crop and the Functional Oscillation Band label. It keeps the
+   accepted sitewide rail/diamond language but runs at 70% of the normal
+   divider speed (2s / .70 = 2.857s). The label is only nudged down by the
+   beam's compact breathing room; all accepted v453 hero sizing is preserved. */
+.fob-appreveal__beam{
+  --fob-divider-cycle:2.857s;
+  width:min(2.25in,58vw);
+  max-width:min(2.25in,58vw);
+  margin:8px auto 8px!important;
+}
+.fob-appreveal__beam + .fob-hero-eyebrow{
+  margin-top:0!important;
+}
+
+/* RC5C — the private Coach entry now belongs to MAHFITT's product language.
+   It remains intentionally quiet; this is an identity cue, not a public CTA. */
+.fob-footer-private a[href="/admin"]{
+  display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(211,190,152,.18);
+  border-radius:1px;padding:7px 11px;background:rgba(4,7,9,.28);color:rgba(211,190,152,.44);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018)
+}
+.fob-footer-private a[href="/admin"]::before{content:"";width:6px;height:6px;transform:rotate(45deg);border:1px solid currentColor;box-shadow:0 0 8px rgba(211,190,152,.13)}
+.fob-footer-private a[href="/admin"]:hover{color:var(--gold-dim);border-color:rgba(211,190,152,.34);background:rgba(211,190,152,.045)}

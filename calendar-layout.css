@@ -1,0 +1,49 @@
+/* The normal route uses calendar.css's expanded calendar-stage split. Inside
+   that stage, the two compact FOBEAM rails frame the grid without becoming
+   sticky overlays. */
+.cal-stage {
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+}
+.calendar.is-checkout .cal-stage {
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+}
+.cal-stage > .fobeam.is-south {
+  margin-top: 1px;
+  margin-bottom: 0;
+  opacity: .58;
+  transform: scaleY(-1);
+}
+.cal-form .cal-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  cursor: pointer;
+}
+.cal-form .cal-check input {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  accent-color: var(--cal-accent);
+}
+.cal-plan-count {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  min-width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+  border: 1px solid var(--cal-accent);
+  color: var(--cal-accent);
+  background: var(--cal-bg);
+  font: 700 8px/1 ui-monospace, monospace;
+}
+.slot-conflict-title { margin: 20px 0 8px; color: #d9aaa1; }
+.slot.is-overlap:disabled { opacity: .24; cursor: not-allowed; }
+
+/* v358 — normal member calendar can temporarily become the checkout planner. */
+.calendar.is-schedule-mode .cal-stage{
+  grid-template-rows:auto auto auto minmax(500px,1fr) auto auto;
+}

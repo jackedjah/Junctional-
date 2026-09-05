@@ -1,0 +1,20 @@
+-- 016 :: stories
+--
+-- Applied 2026-07-27. Ephemeral posts that expire after one hour.
+--
+-- Self-contained rather than reusing discussion_media. A story carries
+-- exactly one item and dies within the hour, so hanging it off the
+-- discussion tables would have meant making discussion_id nullable and
+-- teaching every existing query to ignore rows that are not really
+-- discussions. The small duplication buys isolation: nothing about
+-- expiry can reach a permanent post.
+--
+-- Expiry is enforced by the SELECT policy, not by the client choosing
+-- to stop rendering. expires_at is defaulted at insert so a client
+-- cannot extend its own story.
+--
+-- purge_expired_stories() is not scheduled. Rows stay readable only to
+-- their author after the hour; run it (or schedule it via pg_cron)
+-- to reclaim space. Storage objects are NOT removed by it.
+--
+-- See the applied migration in Supabase for the full body.

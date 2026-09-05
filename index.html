@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FOB Systems | Functional Oscillation Training in Brooklyn</title>
+  <meta name="description" content="FOB brings coached outdoor training to you in Brooklyn, using moving resistance to build strength, conditioning, coordination, and core control." />
+  <meta name="author" content="FOB Systems" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="FOB Systems | Functional Oscillation Training" />
+  <meta property="og:description" content="FOB brings coached outdoor training to you in Brooklyn, using moving resistance to build strength, conditioning, coordination, and core control." />
+  <meta property="og:image" content="https://fob.systems/images/fob-social.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="images/favicon-512.png" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+  <link rel="canonical" href="https://fob.systems/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="fob.css?v=454&rc5c=1" />
+  <meta name="theme-color" content="#0E1114" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://fob.systems/" />
+  <meta property="og:site_name" content="FOB Systems" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://fob.systems/images/fob-social.png" />
+<script>
+/* ══ HOMEPAGE SIGNS YOU OUT ════════════════════════════════════════════
+   Landing on or reloading the homepage ends the current name-driven
+   membership session. Access is by approved name, so getting back in is
+   typing a name again, and it means several accounts can be tested in one
+   browser session without clearing cookies by hand.
+
+   Deliberately inline and deliberately not deferred, so it fires the moment
+   the page starts rather than after the deferred bundle. It is a fire and
+   forget POST: nothing waits on it, nothing blocks on it, and a failure is
+   swallowed, so it can never hold up paint or scrolling.
+
+   The admin session cookie is a different cookie and is NOT touched, so FOB
+   Rounds tracking survives a trip through the homepage.
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+  /* Two halves, and the order matters.
+
+     The server half expires the cookie. The client half clears the visit
+     flag in sessionStorage, which claimSlotGate uses to remember "signed in
+     this visit" without asking the server.
+
+     v229 shipped only the server half. That left the flag saying signed in
+     while the cookie was gone, so tapping Claim Your Slot navigated straight
+     to /claim-your-slot, that page checked the cookie, found nothing, and
+     bounced back to /?claim=1. That bounce is the flashing.
+
+     The flag is cleared synchronously, before any other script can read it,
+     and the marker below tells claimSlotGate not to trust a status check on
+     this page at all: the logout POST is still in flight, so a check now can
+     still come back ok and send the member into the same bounce. */
+  try{ sessionStorage.removeItem('fob_claim_visit'); }catch(e){}
+  window.__FOB_HOME_SIGNOUT__ = true;
+  try{
+    fetch('/api/claim-logout',{method:'POST',credentials:'same-origin',keepalive:true,cache:'no-store'})
+      .catch(function(){});
+  }catch(e){}
+}());
+</script>
+<link rel="manifest" href="/manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="FOB"><meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+
+  <nav class="fob-nav fob-home-nav">
+    <div class="fob-nav-inner">
+      <a class="fob-brand" href="index.html" aria-label="FOB Systems home">
+        <span class="fob-brand-exact" aria-hidden="true"></span>
+      </a>
+      <div class="fob-banner-dirs" aria-label="FOB directories">
+        <div class="fob-banner-dirs-scroll">
+          <a class="fob-edu-btn fob-dir-btn fob-dir-slots" href="/mygym?entry=slots" aria-label="Slots">
+            <span class="fob-edu-btn-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5h12v15H6z"/><path d="M9 8h6M9 12h6M9 16h3"/><path d="M4 7.5h2M4 12h2M4 16.5h2"/></svg>
+            </span>
+            <span class="fob-edu-btn-text"><span class="fob-edu-btn-main">Slots</span></span>
+          </a>
+          <a class="fob-edu-btn fob-dir-btn fob-dir-mahfitt" href="/mygym?entry=tracker" aria-label="Open MAHFITT">
+            <span class="fob-edu-btn-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7v10M7 5v14M17 5v14M20 7v10M7 12h10"/></svg>
+            </span>
+            <span class="fob-edu-btn-text"><span class="fob-edu-btn-main">MAHFITT</span></span>
+          </a>
+          <a class="fob-edu-btn fob-dir-btn" href="/community/auth.html" aria-label="FOB Forum sign in">
+            <span class="fob-edu-btn-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10H9l-5 3v-13Z"/><path d="M8 9h8M8 12h5"/></svg>
+            </span>
+            <span class="fob-edu-btn-text"><span class="fob-edu-btn-main">Forum</span></span>
+          </a>
+          <a class="fob-edu-btn fob-dir-btn" href="education.html" aria-label="The FOB Course, learn FOB from scratch">
+            <span class="fob-edu-btn-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5c2.2-1.3 5-1.3 7 0v13c-2-1.3-4.8-1.3-7 0v-13Z"/><path d="M22 5.5c-2.2-1.3-5-1.3-7 0v13c2-1.3 4.8-1.3 7 0v-13Z"/></svg>
+            </span>
+            <span class="fob-edu-btn-text"><span class="fob-edu-btn-main">Course</span></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="fob-hero-v2">
+    <div class="fob-hero-v2-inner">
+      <!-- v442: the boxed BETA card is gone as a visual system. The MAHFITT
+           announcement is now an open product reveal integrated into the page
+           background: title, then the device, then straight into the FOB hero. -->
+      <div class="fob-appreveal fob-reveal">
+        <a class="fob-appreveal__link" href="/mygym?entry=tracker" aria-label="MAHFITT app — coming soon">
+          <img class="fob-appreveal__brandlogo" src="images/mahfitt-mark-gold.png?v=452" alt="" width="1128" height="652" aria-hidden="true">
+          <p class="fob-appreveal__title"><span>COMING SOON</span></p>
+          <div class="fob-appreveal__device" aria-hidden="true">
+            <div class="fob-appreveal__frame">
+              <span class="fob-appreveal__island"></span>
+              <img class="fob-appreveal__screen" src="images/mahfitt-iphone-mockup-v452.png?v=452"
+                   alt="" width="470" height="750" loading="lazy" decoding="async">
+            </div>
+            <span class="fob-appreveal__ground"></span>
+          </div>
+        </a>
+      </div>
+      <div class="fob-scroll-div fob-appreveal__beam fob-reveal" aria-hidden="true"><span class="fob-scroll-div-node"></span></div>
+      <p class="fob-hero-eyebrow fob-reveal">Functional Oscillation Band</p>
+      <h1 class="fob-hero-h1 fob-reveal">An Evolution of Fitness</h1>
+      <p class="fob-hero-sub fob-reveal">FOB brings coached outdoor training to you, using a moving weighted attachment that keeps your core responding while you build strength, conditioning, coordination, and control.</p>
+      <p class="fob-hero-utility fob-reveal">New York City &middot; We come to your park</p>
+    </div>
+
+    <!-- LAUNCH FILM: muted inline autoplay is independent of scrolling. -->
+    <div class="fob-hero-film">
+      <video id="launch-film" class="fob-hero-film-vid" muted playsinline webkit-playsinline
+             preload="metadata" poster="images/launch-film-poster.jpg" loop aria-label="FOB Systems launch film">
+        <source src="images/launch-film.mp4" type="video/mp4" />
+      </video>
+      <button type="button" class="fob-hero-film-play" data-launch-film-play aria-label="Play FOB Systems launch film">
+        <span aria-hidden="true">▶</span>
+      </button>
+    </div>
+
+    <div class="fob-hero-close">
+      <div class="fob-btn-row fob-reveal">
+        <a class="fob-btn fob-btn-ghost fob-home-start-beam" href="#first-session-form">Start Fobbing Now!</a>
+      </div>
+      <div class="fob-btn-row fob-reveal fob-hero-close-primary">
+        <a class="fob-btn fob-btn-solid fob-hero-claim-darkbeam" href="/mygym?entry=slots">Claim Your Slot</a>
+      </div>
+      <p class="fob-hero-micro fob-reveal">$120 private FOB SESH &middot; travel adjustment may apply &middot; 45-75 min &middot; approved member access</p>
+    </div>
+  </header>
+
+  <div class="fob-scroll-div fob-reveal" aria-hidden="true"><span class="fob-scroll-div-node"></span></div>
+
+  <!-- WHAT IS FOB: the plain-language explanation -->
+  <section class="fob-section tone-deep" id="how">
+    <div class="fob-wrap">
+      <div class="fob-sec-head fob-reveal">
+        <p class="fob-sec-eyebrow">What It Is</p>
+        <h2 class="fob-sec-title">The weight does not stay still.</h2>
+        <div class="fob-sec-rule"></div>
+      </div>
+      <p class="fob-body-txt fob-reveal" style="max-width: 58ch; margin: 0 auto;">Because you have to control and redirect the weight as it shifts, simple movements become full-body training.</p>
+      <p class="fob-sec-aside fob-reveal">A dumbbell only moves when you move it. This keeps moving on its own.</p>
+
+      <span class="fob-anchor" id="outcomes" aria-hidden="true"></span>
+      <div class="fob-nav-stage fob-outcome-stage fob-outcome-stage--lead fob-reveal" data-fob-nav aria-roledescription="carousel" aria-label="What the training gives you" tabindex="0">
+        <div class="fob-nav-rail" aria-label="Choose an outcome"></div>
+        <div class="fob-nav-frame">
+          <button type="button" class="fob-nav-arrow fob-nav-prev" aria-label="Previous outcome"><span aria-hidden="true">&#8592;</span></button>
+          <div class="fob-nav-viewport">
+            <div class="fob-nav-track">
+        <article class="fob-panel fob-outcome">
+          <div class="fob-outcome-media">
+            <img src="images/outcome-01-body-balance.jpg" alt="FOB coaching outdoors: controlling the moving ballast while walking, building body balance" loading="lazy" decoding="async" width="1200" height="675" onerror="this.closest('.fob-outcome-media').remove()" />
+          </div>
+          <span class="fob-outcome-num">01</span>
+          <h3>Move With More Control</h3>
+          <p>Strengthen your core and stay balanced while the resistance keeps changing.</p>
+        </article>
+        <article class="fob-panel fob-outcome">
+          <div class="fob-outcome-media">
+            <img src="images/outcome-02-reactive-strength.jpg" alt="FOB coaching outdoors: redirecting the moving ballast under tension, building reactive strength" loading="lazy" decoding="async" width="1200" height="676" onerror="this.closest('.fob-outcome-media').remove()" />
+          </div>
+          <span class="fob-outcome-num">02</span>
+          <h3>Build a Strong, Athletic Body</h3>
+          <p>Train your core and upper body while building the conditioning to do more with that strength.</p>
+        </article>
+        <article class="fob-panel fob-outcome">
+          <div class="fob-outcome-media">
+            <img src="images/outcome-03-endurance-capacity.jpg" alt="FOB coaching outdoors: sustaining repeated effort with the moving ballast, building endurance capacity" loading="lazy" decoding="async" width="1200" height="674" onerror="this.closest('.fob-outcome-media').remove()" />
+          </div>
+          <span class="fob-outcome-num">03</span>
+          <h3>Keep Going When You Get Tired</h3>
+          <p>Maintain better movement and control deeper into a workout, game, or active day.</p>
+        </article>
+            </div>
+          </div>
+          <button type="button" class="fob-nav-arrow fob-nav-next" aria-label="Next outcome"><span aria-hidden="true">&#8594;</span></button>
+        </div>
+        <p class="fob-nav-live fob-visually-hidden" aria-live="polite"></p>
+      </div>
+
+    <!-- REPORT CARDS + COURSE LEAD-IN -->
+    <div class="fob-prebook fob-reveal">
+      <p class="fob-prebook-line">Not sure yet? Learn how it works first.</p>
+      <a class="fob-edu-btn fob-edu-btn-lg" href="education.html"
+         aria-label="The FOB Course, learn FOB from scratch">
+        <span class="fob-edu-btn-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5c2.2-1.3 5-1.3 7 0v13c-2-1.3-4.8-1.3-7 0v-13Z"/><path d="M22 5.5c-2.2-1.3-5-1.3-7 0v13c2-1.3 4.8-1.3 7 0v-13Z"/></svg>
+        </span>
+        <span class="fob-edu-btn-text">
+          <span class="fob-edu-btn-main">FOB Course</span>
+          <span class="fob-edu-btn-sub">Free &middot; 11 modules</span>
+        </span>
+      </a>
+    </div>
+
+    </div>
+  </section>
+
+  <div class="fob-scroll-div fob-reveal" aria-hidden="true"><span class="fob-scroll-div-node"></span></div>
+
+  <!-- THE FOBIBLE - free, no-friction blueprint download (modal) -->
+  <div class="fob-modal" id="fobible-modal" role="dialog" aria-modal="true" aria-labelledby="fobible-modal-title" aria-hidden="true">
+    <div class="fob-modal-backdrop" data-fobible-close></div>
+    <div class="fob-modal-panel" role="document">
+      <button class="fob-modal-close" aria-label="Close" data-fobible-close>&times;</button>
+      <div class="fob-fobible-grid">
+        <div class="fob-fobible-cover">
+          <img src="images/fobible-cover.jpg" alt="The FOBible, First Edition, official book of FOB Systems" />
+        </div>
+        <div class="fob-fobible-copy">
+          <p class="fob-classification">First Edition &middot; Free Download</p>
+          <h2 class="fob-fobible-title" id="fobible-modal-title">Read the FOBible.</h2>
+          <p class="fob-fobible-sub">A free 93-page book explaining how FOB works: the equipment, the movements, the coaching method, and the thinking behind it.</p>
+          <p class="fob-fobible-body">It covers why the system was created, how the moving resistance is meant to feel, the terms you will see on this site, and how sessions are coached. If you want to understand FOB properly before booking, start here. It is free, and there is nothing to sign up for.</p>
+          <div class="fob-fobible-cta">
+            <a class="fob-btn fob-btn-solid fob-btn-lg" href="papers/fobible_first_edition.pdf" download="FOBible_First_Edition.pdf">Download the FOBible</a>
+            <p class="fob-fobible-note">No email. No account. No checkout. One click, immediate download.</p>
+          </div>
+          <ul class="fob-fobible-meta" aria-label="Publication details">
+            <li>FOBible</li>
+            <li>First Edition</li>
+            <li>2026</li>
+            <li>93 Pages</li>
+            <li>Official FOB Systems Publication</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <section class="fob-inquiry" id="book">
+    <div class="fob-inquiry-bg" aria-hidden="true"></div>
+    <div class="fob-wrap fob-inquiry-wrap">
+      <div class="fob-sec-head">
+        <h2 class="fob-sec-title fob-sec-title--xl">Inquire for Sessions</h2>
+        <div class="fob-sec-rule"></div>
+      </div>
+
+      <p class="fob-rate-support fob-reveal">Pick a park and a time. FOB comes to you.</p>
+
+      <div class="fob-iq-shell" id="first-session-form">
+        <span class="fob-anchor" id="first-session-form-anchor" aria-hidden="true"></span>
+        <div class="fob-iq-root" id="inquiry-form-root" data-iq-single="session" data-iq-form="fob-inquiry"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="fob-scroll-div fob-reveal" aria-hidden="true"><span class="fob-scroll-div-node"></span></div>
+
+  <section class="fob-section tone-deep" id="organizations">
+    <div class="fob-wrap">
+      <div class="fob-sec-head fob-reveal">
+        <p class="fob-sec-eyebrow">Gyms and Organizations</p>
+        <h2 class="fob-sec-title">Bring FOB to your people.</h2>
+        <div class="fob-sec-rule"></div>
+        <p class="fob-sec-support">Gyms, teams, schools, events, and other groups. Tell us what you need.</p>
+      </div>
+
+      <div class="fob-iq-shell">
+        <div class="fob-iq-typewrap">
+          <p class="fob-iq-label" id="org-types-label">What are you looking for?</p>
+          <div class="fob-iq-types" data-iq-types data-iq-default="gym" role="group" aria-labelledby="org-types-label">
+            <button type="button" class="fob-iq-type" data-iq-type="gym" aria-pressed="false">Gym or training facility</button>
+            <button type="button" class="fob-iq-type" data-iq-type="privateGym" aria-pressed="false">Private training space</button>
+            <button type="button" class="fob-iq-type" data-iq-type="outdoorEvent" aria-pressed="false">Event or community program</button>
+            <button type="button" class="fob-iq-type" data-iq-type="presentation" aria-pressed="false">Workshop or presentation</button>
+          </div>
+        </div>
+        <div class="fob-iq-root" data-iq-form="fob-partners"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="fob-scroll-div fob-reveal" aria-hidden="true"><span class="fob-scroll-div-node"></span></div>
+
+  <section class="fob-section tone-gold" id="different">
+    <div class="fob-wrap-narrow">
+      <div class="fob-sec-head fob-reveal">
+        <p class="fob-sec-eyebrow">An Original Training Practice</p>
+        <h2 class="fob-sec-title">FOB was built from the ground up.</h2>
+        <div class="fob-sec-rule"></div>
+      </div>
+      <p class="fob-body-txt fob-reveal">FOB was created by <strong>Jah Matt</strong>, <strong>@jahfobin on IG</strong>, who studied <strong>Kinesiology for a decade</strong> while coaching in gyms, physical therapy clinics, and his own private training. He built and tested the FOBand himself, so the equipment and the method were developed simultaneously. New movements and progressions are still being developed.</p>
+      <p class="fob-body-txt fob-reveal">For now FOB can only be performed through supervised sessions. Jah has made it a point to gamify the session structure, so as you learn to control the FOBand you’re also having an enjoyable experience.</p>
+      <p class="fob-reveal" style="margin-top: 26px;"><button type="button" class="fob-link-gold" data-fobible-open>Read the FOBible for the full story and training theory.</button></p>
+      <details class="fob-optional fob-reveal">
+        <summary>Watch the first field test</summary>
+        <figure class="fob-filmframe fob-reveal">
+          <video class="fob-filmframe-vid" controls preload="none" playsinline
+                 poster="images/hero-film-poster.jpg">
+            <source src="images/field-test-01.mp4" type="video/mp4" />
+            Your browser does not support video playback.
+          </video>
+          <figcaption>Founding Fobber 01 &middot; Field Test</figcaption>
+        </figure>
+      </details>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="fob-section tight tone-graphite" id="faq">
+    <div class="fob-wrap-narrow">
+      <div class="fob-sec-head fob-reveal">
+        <p class="fob-sec-eyebrow">Questions</p>
+        <h2 class="fob-sec-title">Before you book.</h2>
+        <div class="fob-sec-rule"></div>
+      </div>
+      <div class="fob-faq fob-reveal">
+        <details><summary>Do I need to be fit or experienced?</summary><p>No. FOB scales to every level and your first session is coached from the first rep. Nobody is thrown in.</p></details>
+        <details><summary>Is this a gym membership?</summary><p>No. FOB is not a traditional gym membership or recurring subscription. Private FOB SESH purchasing is a <b>members-only access experience</b>: once your session request is confirmed, your approved full name unlocks the private SESH purchase portal. You purchase SESH packages as needed, with no recurring membership dues. FOB comes to your approved outdoor training location, using spaces with enough room to coach the equipment safely.</p></details>
+        <details><summary>Do I need to play a sport?</summary><p>No. FOB is for general fitness, strength, conditioning, body control, and athletic performance. Sessions are adjusted to your experience and goals, whether you are beginning to exercise, already train regularly, or play a competitive sport.</p></details>
+        <details><summary>What should I bring?</summary><p>Bring water and a basic work glove. Wear comfortable, breathable clothing you can move in. Athletic shoes are preferred; boots can work with modified footwork. The FOBallast is provided.</p></details>
+        <details><summary>How long is a private FOB session?</summary><p>Private FOB sessions generally last between 45 and 75 minutes. Exact duration may depend on setup, instruction, current progression, and the amount of controlled training appropriate for the session.</p></details>
+        <details><summary>How does payment work?</summary><p>Once your session request is approved and you are added to the FOB member system, your approved name unlocks the private FOB SESH purchasing portal. Your available SESH packages, any location-based travel adjustment, and other important purchase details are shown there before you confirm payment.</p></details>
+        <details><summary>Are group classes available?</summary><p>Small-group FOB classes are offered through scheduled cohorts with limited capacity. Current group pricing and availability are shown inside the group access flow when a cohort is open.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Netlify Forms schema. Hidden from visitors; it exists so Netlify
+       registers the field names at build time and can store submissions. -->
+  <form name="fob-inquiry" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
+      <input type="hidden" name="form-name" value="fob-inquiry" />
+      <input type="hidden" name="bot-field" />
+      <input type="hidden" name="name" />
+      <input type="hidden" name="sport" />
+      <input type="hidden" name="sportOther" />
+      <input type="hidden" name="interest" />
+      <input type="hidden" name="preferredTime" />
+      <input type="hidden" name="preferredDay" />
+      <input type="hidden" name="flexibleSchedule" />
+      <input type="hidden" name="availabilityNotes" />
+      <input type="hidden" name="playEnough" />
+      <input type="hidden" name="currentFrequency" />
+      <input type="hidden" name="competitiveLevel" />
+      <input type="hidden" name="trainingFormat" />
+      <input type="hidden" name="locationArea" />
+      <input type="hidden" name="bookingReference" />
+      <input type="hidden" name="requestedDate" />
+      <input type="hidden" name="requestedStart" />
+      <input type="hidden" name="timezone" />
+      <input type="hidden" name="parkId" />
+      <input type="hidden" name="parkName" />
+      <input type="hidden" name="parkAddress" />
+      <input type="hidden" name="parkNeighborhood" />
+      <input type="hidden" name="parkLat" />
+      <input type="hidden" name="parkLng" />
+      <input type="hidden" name="meetingInstructions" />
+      <input type="hidden" name="bookingStatus" />
+      <input type="hidden" name="sourceForm" />
+      <input type="hidden" name="inquiryFocus" />
+      <input type="hidden" name="recreationalActive" />
+      <input type="hidden" name="locationId" />
+      <input type="hidden" name="customLocation" />
+      <input type="hidden" name="organizationName" />
+      <input type="hidden" name="role" />
+      <input type="hidden" name="gymType" />
+      <input type="hidden" name="city" />
+      <input type="hidden" name="participants" />
+      <input type="hidden" name="meetingFormat" />
+      <input type="hidden" name="eventName" />
+      <input type="hidden" name="eventType" />
+      <input type="hidden" name="preferredDate" />
+      <input type="hidden" name="eventLocation" />
+      <input type="hidden" name="involvement" />
+      <input type="hidden" name="audience" />
+      <input type="hidden" name="audienceSize" />
+      <input type="hidden" name="outcome" />
+      <input type="hidden" name="format" />
+      <input type="hidden" name="length" />
+      <input type="hidden" name="venue" />
+      <input type="hidden" name="contactMethod" />
+      <input type="hidden" name="phone" />
+      <input type="hidden" name="email" />
+      <input type="hidden" name="instagram" />
+      <input type="hidden" name="message" />
+      <input type="hidden" name="inquiryType" />
+      <input type="hidden" name="submittedAt" />
+      <input type="hidden" name="source" />
+      <input type="hidden" name="consentToContact" />
+  </form>
+
+  <form name="fob-partners" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
+      <input type="hidden" name="form-name" value="fob-partners" />
+      <input type="hidden" name="bot-field" />
+      <input type="hidden" name="name" />
+      <input type="hidden" name="sport" />
+      <input type="hidden" name="sportOther" />
+      <input type="hidden" name="interest" />
+      <input type="hidden" name="preferredTime" />
+      <input type="hidden" name="preferredDay" />
+      <input type="hidden" name="flexibleSchedule" />
+      <input type="hidden" name="availabilityNotes" />
+      <input type="hidden" name="playEnough" />
+      <input type="hidden" name="currentFrequency" />
+      <input type="hidden" name="competitiveLevel" />
+      <input type="hidden" name="trainingFormat" />
+      <input type="hidden" name="locationArea" />
+      <input type="hidden" name="inquiryFocus" />
+      <input type="hidden" name="recreationalActive" />
+      <input type="hidden" name="locationId" />
+      <input type="hidden" name="customLocation" />
+      <input type="hidden" name="organizationName" />
+      <input type="hidden" name="role" />
+      <input type="hidden" name="gymType" />
+      <input type="hidden" name="city" />
+      <input type="hidden" name="participants" />
+      <input type="hidden" name="meetingFormat" />
+      <input type="hidden" name="eventName" />
+      <input type="hidden" name="eventType" />
+      <input type="hidden" name="preferredDate" />
+      <input type="hidden" name="eventLocation" />
+      <input type="hidden" name="involvement" />
+      <input type="hidden" name="audience" />
+      <input type="hidden" name="audienceSize" />
+      <input type="hidden" name="outcome" />
+      <input type="hidden" name="format" />
+      <input type="hidden" name="length" />
+      <input type="hidden" name="venue" />
+      <input type="hidden" name="contactMethod" />
+      <input type="hidden" name="phone" />
+      <input type="hidden" name="email" />
+      <input type="hidden" name="instagram" />
+      <input type="hidden" name="message" />
+      <input type="hidden" name="inquiryType" />
+      <input type="hidden" name="submittedAt" />
+      <input type="hidden" name="source" />
+      <input type="hidden" name="consentToContact" />
+  </form>
+
+  <footer class="fob-footer">
+    <div class="fob-footer-inner">
+      <div class="fob-footer-top">
+        <span class="fob-brand" style="font-size: 12px;">FOB SYSTEMS</span>
+        <div class="fob-footer-links">
+          <a href="index.html#how">How It Works</a>
+          <a href="#first-session-form">Book a Session</a>
+          <a href="index.html#organizations">Gyms &amp; Orgs</a>
+          <a href="index.html#different">The Story</a>
+          <a href="education.html">FOB Course</a>
+          <a href="community/">FOB Community</a>
+          <a href="coaches.html">Coach Certification</a>
+          <a href="credits.html">Data Credits</a>
+        </div>
+      </div>
+      <hr class="fob-rule" />
+      <p class="fob-footer-note" style="margin-top: 24px;">© 2026 FOB Systems. Training involves physical exertion. Consult a qualified professional before beginning any new program. FOB, FOBlock, FOBand, and FOBallast are trademarks of FOB Systems.</p>
+      <p class="fob-footer-private"><a href="/admin">ADMIN</a></p>
+    </div>
+  </footer>
+
+  <script defer src="fob.js?v=241"></script>
+  <script defer src="inquiry-locations.js?v=241"></script>
+  <script defer src="booking-config.js?v=241"></script>
+  <script defer src="park-map.js?v=241"></script>
+  <script defer src="inquiry.js?v=241"></script>
+  <script defer src="fob-ui.js?v=241"></script>
+
+<script>if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(function(r){return r.update();}).catch(function(){});});}</script></body>
+</html>

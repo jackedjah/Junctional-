@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Home | FOB Community</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/fob.css?v=389" />
+  <link rel="stylesheet" href="/community/css/community.css?v=241" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body class="fob-community-page" data-fob-guard="protected" data-fob-pending>
+
+  <!-- STICKY HEADER + TABS :: one sticky block, see .fob-social-stack -->
+  <div class="fob-social-stack">
+  <header class="fob-social-top">
+    <a href="/index.html" aria-label="FOB Systems homepage">
+      <img src="/images/fob-forum-nav.png" srcset="/images/fob-forum-nav.png 1x, /images/fob-forum-nav@2x.png 2x" alt="FOB Forum" />
+    </a>
+    <span class="fob-social-top-spacer"></span>
+    <button class="fob-social-iconbtn" id="open-search" type="button" aria-label="Search"
+            aria-controls="search-wrap" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <button class="fob-social-iconbtn fob-notif-btn" id="open-notifications" type="button" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      <span class="fob-notif-badge" id="notif-badge" hidden></span>
+    </button>
+    <a class="fob-social-iconbtn" href="/community/home.html" aria-label="Your account">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </a>
+  </header>
+
+  <!-- FEED TABS -->
+  <nav class="fob-social-tabs" role="tablist" aria-label="Feed">
+    <button class="fob-social-tab" role="tab" data-feed="rooms" aria-selected="true">Rooms</button>
+    <button class="fob-social-tab" role="tab" data-feed="latest" aria-selected="false">Latest</button>
+    <button class="fob-social-tab" role="tab" data-feed="following" aria-selected="false">Following</button>
+    <button class="fob-social-tab" role="tab" data-feed="saved" aria-selected="false">Saved</button>
+  </nav>
+  </div>
+
+  <main class="fob-social-main" id="main">
+
+    <!-- SEARCH (hidden until tapped) -->
+    <div class="fob-community-search-wrap" id="search-wrap" hidden>
+      <label class="fob-community-sr" for="feed-search">Search the community</label>
+      <input class="fob-community-input" type="search" id="feed-search"
+             placeholder="Search posts and people" autocomplete="off" />
+      <div class="fob-community-search-results" id="search-results" hidden></div>
+    </div>
+
+    <!-- COMPOSER -->
+    <button class="fob-social-composer" id="composer-collapsed" type="button">
+      <span id="composer-prompt">Share today's training.</span>
+      <span class="fob-social-composer-cta" aria-hidden="true">Post</span>
+    </button>
+
+    <!-- STORIES -->
+    <div class="fob-story-rail" id="story-rail" hidden></div>
+
+    <!-- FULL COMPOSER -->
+    <section class="fob-community-panel" id="composer-full" hidden style="margin-bottom:12px;">
+      <div id="composer-expanded">
+      <p class="fob-community-field-note" id="composer-draft-note" hidden>Draft restored from this device.</p>
+
+      <div class="fob-community-field">
+        <label for="composer-category">Post to <span class="optional">(optional)</span></label>
+        <select class="fob-community-select" id="composer-category"></select>
+      </div>
+
+      <div class="fob-community-field">
+        <label for="composer-title">Title <span class="optional">(optional)</span></label>
+        <input class="fob-community-input" type="text" id="composer-title" maxlength="160"
+               placeholder="Leave blank for a quick thought" />
+      </div>
+
+      <div class="fob-community-field">
+        <label for="composer-body">Your post</label>
+        <textarea class="fob-community-textarea" id="composer-body" maxlength="20000"
+                  placeholder="Say anything. Questions welcome."></textarea>
+        <div class="fob-community-preview" id="composer-preview" hidden></div>
+        <p class="fob-community-field-note">
+          <span id="composer-count"></span>
+        </p>
+      </div>
+
+      <div class="fob-media-strip" id="composer-media" hidden></div>
+
+      <div class="fob-compose-tools">
+        <button class="fob-tool" type="button" id="composer-photo" aria-label="Add a photo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m3.5 17 4.8-4.6a2 2 0 0 1 2.7 0l6.4 6.1"/><path d="m14.5 13.5 2-1.9a2 2 0 0 1 2.7 0l1.3 1.2"/></svg>
+        </button>
+        <button class="fob-tool" type="button" id="composer-voice" aria-label="Record a voice note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></svg>
+        </button>
+        <button class="fob-tool" type="button" id="composer-gif" aria-label="Add a GIF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.5H7.8A1.8 1.8 0 0 0 6 11.3v1.4a1.8 1.8 0 0 0 1.8 1.8H10v-2.1"/><path d="M12.9 9.5v5"/><path d="M18.4 9.5h-2.6v5m0-2.7h2.2"/></svg>
+        </button>
+        <button class="fob-tool fob-tool-data" type="button" id="composer-training" aria-label="Add your FOB training data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19V3"/><path d="M2 19h22"/></svg>
+          FOB Data
+        </button>
+        <input type="file" id="composer-file" accept="image/*,video/*" multiple hidden />
+      </div>
+
+      <div class="fob-training-share" id="composer-training-share" hidden>
+        <p class="fob-training-share-title">Share your FOB data as a photo</p>
+        <div class="fob-training-share-actions">
+          <button type="button" class="fob-training-share-choice" id="share-latest-sesh">Latest SESH</button>
+          <button type="button" class="fob-training-share-choice" id="share-progress">Progress</button>
+        </div>
+        <p class="fob-training-share-note" id="training-share-note">Loading your recorded training...</p>
+      </div>
+
+      <div class="fob-community-btn-row">
+        <button class="fob-community-btn fob-community-btn-ghost" type="button" id="composer-cancel">Cancel</button>
+        <button class="fob-community-btn fob-community-btn-primary" type="button" id="composer-submit">Post</button>
+      </div>
+
+      <div class="fob-community-status" id="composer-status" role="alert" aria-live="assertive" hidden></div>
+      </div>
+    </section>
+
+    <!-- COMPACT RESEARCH STRIP -->
+    <a class="fob-social-research" id="research-module" href="#" hidden>
+      <span class="fob-social-research-tag">FOB</span>
+      <span class="fob-social-research-title" id="research-title"></span>
+    </a>
+    <span hidden id="research-excerpt"></span>
+    <span hidden id="research-meta"></span>
+
+    <!-- FOLLOW STRIP -->
+    <section class="fob-follow-strip" id="follow-strip" hidden aria-label="People you follow"></section>
+
+    <!-- ACTIVE FILTER -->
+    <div class="fob-social-active-filter" id="active-filter" hidden>
+      <span id="active-filter-name"></span>
+      <button type="button" id="clear-filter" aria-label="Clear filter">&times;</button>
+    </div>
+
+    <!-- FEED -->
+    <div id="feed-list"></div>
+    <span hidden id="feed-filters"></span>
+
+    <button class="fob-community-btn fob-community-btn-ghost" id="feed-more"
+            style="margin-top:14px;" hidden>Load More</button>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="fob-social-nav" aria-label="Primary">
+    <a href="/community/discussions.html" class="is-current">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+      Home
+    </a>
+    <button type="button" id="nav-search" aria-controls="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      Search
+    </button>
+    <button type="button" id="nav-create" class="fob-social-nav-create" aria-label="Create a post">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 8v8M8 12h8"/></svg>
+      Post
+    </button>
+    <button type="button" id="nav-saved">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>
+      Saved
+    </button>
+    <a href="/community/home.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      You
+    </a>
+  </nav>
+
+  <!-- EXPLORE SHEET -->
+  <div class="fob-social-sheet" id="explore-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="explore-heading">
+    <div class="fob-social-sheet-inner">
+      <div class="fob-social-sheet-grip" aria-hidden="true"></div>
+      <h2 id="explore-heading">Explore</h2>
+      <p class="fob-social-sheet-note">Jump to a topic. Tap again to clear.</p>
+      <div id="explore-categories"></div>
+    </div>
+  </div>
+
+  <div id="fob-community-toasts" aria-live="polite"></div>
+
+  <script src="/community/js/config.js"></script>
+  <script src="/community/js/supabase-client.js"></script>
+  <script src="/community/js/utilities.js"></script>
+  <script src="/community/js/auth-guard.js"></script>
+  <script src="/community/js/discussion-render.js"></script>
+  <script src="/community/js/comments-sheet.js"></script>
+  <script src="/community/js/room-recommendations.js"></script>
+  <script src="/community/js/community-feed.js"></script>
+  <script src="/community/js/profile-view.js"></script>
+  <script src="/community/js/notifications.js"></script>
+  <script src="/community/js/media-lib.js"></script>
+  <script src="/community/js/media-render.js"></script>
+  <script src="/community/js/gif-picker.js"></script>
+  <script src="/community/js/composer-media.js?v=215"></script>
+  <script src="/community/js/composer.js?v=215"></script>
+  <script src="/community/js/stories.js"></script>
+  <script src="/community/js/follow-strip.js"></script>
+  <script src="/community/js/social-shell.js"></script>
+</body>
+</html>

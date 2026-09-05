@@ -1,0 +1,556 @@
+/* MAHFITT v440 — canonical subtle rectangular corner language.
+   Measured app controls cluster around 42–54px tall and major cards around
+   64–140px. A 2–4px turn keeps >90% of the visible edge language square while
+   removing the brittle perfect-90° corner. Special shapes are excluded. */
+:root{
+  --mf-rect-radius-tight:2px;
+  --mf-rect-radius:3px;
+  --mf-rect-radius-panel:4px;
+  /* R67 follow-up — preserve the shared rectangular-container family, but refine
+     the accepted heavy perimeter to a cleaner half-thickness without touching
+     the protected crown frame, rails, decorative strokes or MR.MAH response diamond. */
+  --mah-container-border-base:1px;
+  --mah-container-border-scale:1.65;
+  --mah-container-border:1.65px;
+  --mah-container-border-strong:2.475px;
+  --mah-container-secondary:var(--secondary,var(--bright,var(--cal-accent,currentColor)));
+  --mah-container-border-color:color-mix(in srgb,var(--mah-container-secondary) 56%,transparent);
+  --mah-container-aura-color:color-mix(in srgb,var(--mah-container-secondary) 18%,transparent);
+}
+
+/* Standard rectangular controls. One late shared owner is intentional: older
+   component sheets contain many historical border-radius:0!important locks. */
+#mygym :is(
+  .my-fob-home,.workoutback,.workout-titlebox,.member-client,
+  .musiclib,.musiclibplay,.themeedit,.themeplay,.mf-banner__collapse,
+  .mymedia__field input,.mytheme__color input,.mytheme__url input,
+  .mytheme__atmospherepick,.mytheme__atmosphereclear,
+  .programlib-back,.programlib-create,.programlib-card>button,
+  .programedit-title input,.programedit-day header input,.programedit-day>header>button,
+  .programedit-item input,.programedit-addex,.programedit-addday,
+  .programedit-actions button,.programedit-delete,.program-picker__card>header button,
+  .program-picker__search,.program-picker__exercise,
+  .progresschoose,.progresschoose__body .find,.progresshit,.progressbookmark,
+  .workout-sheet__card button,.exercise-recent button,
+  .fobtempo__vhs,.fobtempo__reverb,.mah-volume__replay,
+  .studio-tabs,.studio-tabs button,.studio-head__upload,.studio-head__close,
+  .studio-toolgrid>button,.studio-presets button,.studio-loopbuttons button,
+  .studio-libraryhead input,.studio-libraryhead>button,.studio-playlist-actions button,
+  .studio-focus__shortcuts>button,.studio-dialog button,.studio-dialog input,
+  .mmw-launch
+){border-radius:var(--mf-rect-radius)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+
+/* Rectangular cards / panels. */
+#mygym :is(
+  .my-loginbox,.mymedia__card,.myleave__card,.mytheme__card,.member-checkin__card,
+  .program,.programlib-card,.programedit-day,.programedit-item,
+  .program-picker__card,.sectionrail__card,.workout-sheet__card,.exercise-recent,
+  .mytheme__atmospherepreview,
+  .studio-track,.studio-empty,.studio-playlist-art,.studio-track__ghost-cover,.studio-eq-card,.studio-eq-card__icon,.studio-eq,
+  .studio-beats,.studio-dialog>section,.studio-now,.studio-cover
+){border-radius:var(--mf-rect-radius-panel)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+
+/* Exercise/workout rectangles keep the tighter instrument-panel turn. */
+#mygym :is(.ex,.worksec__head,.worksec__head>button,.workout-nowplaying){border-radius:var(--mf-rect-radius-tight)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+
+/* MAH LOG / Scanner / Meal Grade rectangles. */
+:is(.mg-log-shell,.mg-picker-shell,.mg-shell) :is(
+  .mg-entry,.mg-review-compose textarea,.mg-feedback-route,.mg-message-bubble,
+  .mg-message-compose textarea,.mg-message-actions button,.mg-curation-launch,
+  .mg-curation-hero,.mg-curation textarea,.mg-curation input,.mg-curation-pay,
+  .mg-message-action-card,.mg-goalblock,.mg-setting input,.mg-physique-setting select,
+  .mg-filters button,.mg-storage,.mg-meal-choice,.mg-picker-log,
+  .mg-log-musicpair>button,.mg-picker-music
+){border-radius:var(--mf-rect-radius)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+:is(.mg-log-shell,.mg-picker-shell,.mg-shell) :is(.mg-goalblock,.mg-storage,.mg-curation-hero,.mg-message-action-card){border-radius:var(--mf-rect-radius-panel)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+
+/* Calendar rectangles. Crown itself is deliberately NOT in this list. */
+.calendar :is(
+  .cal-detail-card,.cal-back,.cal-iconbtn,.cal-form input,.cal-form select,.cal-form textarea,
+  .cal-sheet-card,.sheet-btn,.slot,.planner-chip,.checkout-continue,.cal-toast,
+  .cal-audio-row button
+){border-radius:var(--mf-rect-radius)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+.calendar :is(.cal-detail-card,.cal-sheet-card){border-radius:var(--mf-rect-radius-panel)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+
+/* Explicit special-shape protection. These retain their own geometry even if a
+   future selector is broadened.
+
+   v441 ROOT CAUSE — THE DIAMOND WAS IN THE CIRCLE LIST.
+   .hd__transport-diamond is a ROTATED SQUARE (transform:rotate(45deg)), not a
+   circle. Handing it the circle protection value made it a perfect circle:
+   measured at 393x852 standalone it computed border-radius 50% with
+   matrix(0.707107,...) still applied — a 28.3px round dot where the canonical
+   MAHFITT centre transport diamond belongs. The protection list was correct in
+   intent and wrong in value for this one member, so the list is now split by
+   ACTUAL shape rather than by "special". */
+:is(#mygym,.calendar,.mg-shell) :is(
+  .gym-motion-divider__node,.workout-live>span,
+  .sectionchoice i,.member-checkin__x,.mg-photo-dots i
+){border-radius:50%!important}
+/* Rotated-square family: a diamond must never receive a circular radius. The
+   1px turn is the canonical subtle corner, applied BEFORE rotation, so the
+   diamond keeps its points. */
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(
+  .hd__transport-diamond,.cal-logo-diamond,.studio-head-transport__diamond,
+  .mah-songseek__node,.fobtempo__node,.workout-completion-node
+){border-radius:var(--mf-diamond-radius,1px)!important}
+
+/* Crown perimeter remains exclusively owned by mahfitt-banner.css. */
+#mygym>.mf-banner,
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{border-radius:var(--mf-v434-shell-radius,var(--mf-banner-top-radius,42px)) var(--mf-v434-shell-radius,var(--mf-banner-top-radius,42px)) 0 0!important}
+
+/* Remaining shared application rectangles from the core gym/health surfaces. */
+#mygym :is(
+  .prev,.circ,.circuitbuilder__meta input,.member-checkin__qr,
+  .mah-health-backbar button,.mah-health-connect>button,.mah-health-metric,
+  .mah-health-trend,.mah-health-history,.mah-health-dialog,.mah-health-import,
+  .mah-health-copyrow code,.mah-health-copyrow button
+){border-radius:var(--mf-rect-radius)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+#mygym :is(.mah-health-metric,.mah-health-trend,.mah-health-history,.mah-health-dialog,.mah-health-import){border-radius:var(--mf-rect-radius-panel)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+
+/* MAH Player has historical #musicStudio hard locks; this two-ID owner is the
+   canonical v440 replacement instead of editing dozens of legacy rules. */
+#mygym #musicStudio :is(
+  .studio-track,.studio-empty,.studio-playlist-art,.studio-track__ghost-cover,.studio-eq-card,.studio-eq-card__icon,.studio-eq,
+  .studio-toolgrid>button,.studio-beats,.studio-presets button,.studio-loopbuttons button,
+  .studio-libraryhead input,.studio-libraryhead>button,.studio-libraryhead--soft input,.studio-libraryhead--soft>button,.studio-playlist-actions button,
+  .studio-focus__shortcuts>button,.studio-dialog>section,.studio-dialog button,.studio-dialog input,
+  .studio-head,.studio-head__upload,.studio-head__close,.studio-cover,.studio-cover img,
+  .studio-cover__camera,.studio-library-only .studio-track,.studio-library-only .studio-track--placeholder,
+  .mah-volume--studio>label,.mah-volume__replay,.mmw-launch
+),
+#musicStudio :is(
+  .studio-track,.studio-empty,.studio-playlist-art,.studio-track__ghost-cover,.studio-eq-card,.studio-eq-card__icon,.studio-eq,
+  .studio-toolgrid>button,.studio-beats,.studio-presets button,.studio-loopbuttons button,
+  .studio-libraryhead input,.studio-libraryhead>button,.studio-libraryhead--soft input,.studio-libraryhead--soft>button,.studio-playlist-actions button,
+  .studio-focus__shortcuts>button,.studio-dialog>section,.studio-dialog button,.studio-dialog input,
+  .studio-head,.studio-head__upload,.studio-head__close,.studio-cover,.studio-cover img,
+  .studio-cover__camera,.studio-library-only .studio-track,.studio-library-only .studio-track--placeholder,
+  .mah-volume--studio>label,.mah-volume__replay,.mmw-launch
+){border-radius:var(--mf-rect-radius)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+#musicStudio :is(.studio-track,.studio-empty,.studio-dialog>section,.studio-head,.studio-eq-card){border-radius:var(--mf-rect-radius-panel)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+
+/* Native diamond thumbs remain square before rotation. */
+#mygym .workout-hd .workout-pitch::-webkit-slider-thumb,
+#mygym .workout-hd .mah-volume--workout input::-webkit-slider-thumb{border-radius:0!important}
+#mygym .workout-hd .workout-pitch::-moz-range-thumb,
+#mygym .workout-hd .mah-volume--workout input::-moz-range-thumb{border-radius:0!important}
+
+/* Common gym controls that already share rectangular construction. */
+#mygym :is(
+  .ghost,.memberchange,.back,.member-finishbar .go,.primary,.danger,
+  .mahai-composer,.mahai-history-toggle,.mahai-history-drawer,.mahai-history-entry,.mahai-capability.ghost,.mahai-confirm__box,.mahai-confirm__box button,
+  .mymedia__preview,.exvar,.memberavatar,.memberavatar i,
+  input:not([type="range"]):not([type="color"]):not([type="checkbox"]):not([type="radio"]),
+  select,textarea
+){border-radius:var(--mf-rect-radius)!important;border-width:var(--mah-container-border)!important;box-sizing:border-box!important}
+#mygym .memberavatar{border-radius:var(--mf-rect-radius-panel)!important}
+
+/* ══ v441 — CANONICAL PRESS RESPONSE ══════════════════════════════════════
+   §40-49 and the tactile supplemental. ONE owner, no per-page animation
+   pasting, no JavaScript, no new motion system.
+
+   The vocabulary is not invented: MAHFITT already answers a press with a
+   ~0.985-0.94 compression, a small luminance lift on the bright token, and a
+   restrained border response. Those existing values are promoted to shared
+   tokens here and applied to the control FAMILIES that genuinely share
+   behaviour. Where a component already declares its own :active, it keeps it —
+   these rules never carry !important, so any existing page-level press
+   response still wins.
+
+   Timing: response begins on :active, i.e. at touch-down, and is 90ms in /
+   140ms out. Nothing waits on navigation, audio or network, and nothing delays
+   the real action — this is paint only.
+
+   EXCLUDED BY DESIGN:
+   - sliders and rails (drag must never fight a transform)
+   - the rotated-square diamond family (geometry is identity; it gets luminance
+     only, never scale — a scaled diamond reads as a shape change)
+   - [disabled] and [aria-disabled] (must not imply the action worked)
+   - anything inside a scroll track that a transform would jitter */
+:root{
+  --mf-press-dur:90ms;
+  --mf-press-out:140ms;
+  --mf-press-ease:cubic-bezier(.22,.61,.36,1);
+  --mf-press-scale:.972;
+  --mf-press-scale-card:.988;
+  --mf-press-wash:rgba(var(--bright-rgb,233,201,143),.10);
+  --mf-press-edge:rgba(var(--bright-rgb,233,201,143),.34);
+}
+
+/* ── Family 1: navigation cards and full-width actions ──────────────────
+   Home nav, program cards, Finish Workout, modal buttons. Compression is the
+   smaller card value so a wide rectangle does not appear to jump. */
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(
+  .membernav button,.membernav__btn,.gymnav button,.homecard,.programcard,
+  .programlib-create,.programlib-card,.program,.workoutcard,
+  .finishbtn,.sheet-btn,.cal-back,.backbar__t,.back,
+  .member-checkin button,.mmw-share,.mmw-launch
+):not([disabled]):not([aria-disabled="true"]){
+  transition:transform var(--mf-press-out) var(--mf-press-ease),
+             background-color var(--mf-press-out) var(--mf-press-ease),
+             border-color var(--mf-press-out) var(--mf-press-ease);
+}
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(
+  .membernav button,.membernav__btn,.gymnav button,.homecard,.programcard,
+  .programlib-create,.programlib-card,.program,.workoutcard,
+  .finishbtn,.sheet-btn,.cal-back,.backbar__t,.back,
+  .member-checkin button,.mmw-share,.mmw-launch
+):not([disabled]):not([aria-disabled="true"]):active{
+  transform:scale(var(--mf-press-scale-card));
+  background-color:var(--mf-press-wash);
+  border-color:var(--mf-press-edge);
+  transition-duration:var(--mf-press-dur);
+}
+
+/* ── Family 2: square icon controls — crown, transport, media utilities ──
+   Player, Theme, collapse/expand, previous, next, Replay/Repeat, VHS, Reverb,
+   carousel arrows. Slightly deeper compression because the target is small. */
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(
+  .musiclib,.musiclibplay,.themeedit,.themeplay,.mf-banner__collapse,
+  .workout-transport__skip,.workout-replay,.workout-rackslot--replay,
+  .fobtempo__vhs,.fobtempo__reverb,.mah-volume__replay,
+  .excollapse,.exslide .ex__h button,.cal-iconbtn,.mg-picker-music,
+  .studio-transport button,.mmw-headback,.studio-head__close,
+  .hd__logo-transport button,.hd__logo-skip,.workout-racktransport,.mg-picker-transport button
+):not([disabled]):not([aria-disabled="true"]){
+  transition:transform var(--mf-press-out) var(--mf-press-ease),
+             opacity var(--mf-press-out) var(--mf-press-ease),
+             border-color var(--mf-press-out) var(--mf-press-ease);
+}
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(
+  .musiclib,.musiclibplay,.themeedit,.themeplay,.mf-banner__collapse,
+  .workout-transport__skip,.workout-replay,.workout-rackslot--replay,
+  .fobtempo__vhs,.fobtempo__reverb,.mah-volume__replay,
+  .excollapse,.exslide .ex__h button,.cal-iconbtn,.mg-picker-music,
+  .studio-transport button,.mmw-headback,.studio-head__close,
+  .hd__logo-transport button,.hd__logo-skip,.workout-racktransport,.mg-picker-transport button
+):not([disabled]):not([aria-disabled="true"]):active{
+  transform:scale(var(--mf-press-scale));
+  border-color:var(--mf-press-edge);
+  transition-duration:var(--mf-press-dur);
+}
+
+/* ── Family 3: the diamond. LUMINANCE ONLY — never scale, never reshape ──
+   A scaled or softened diamond reads as a shape change, which is the exact
+   regression this release just repaired. */
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(.hd__logo-play,.workout-transport__play,.studio-head-transport)
+  :is(.hd__transport-diamond,.studio-head-transport__diamond){
+  transition:opacity var(--mf-press-out) var(--mf-press-ease),
+             filter var(--mf-press-out) var(--mf-press-ease);
+}
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(.hd__logo-play,.workout-transport__play,.studio-head-transport):active
+  :is(.hd__transport-diamond,.studio-head-transport__diamond){
+  opacity:.78;
+  filter:brightness(1.18);
+  transition-duration:var(--mf-press-dur);
+}
+
+/* ── Family 4: list rows — tracks, playlists, sessions ──────────────────
+   Rows get an edge/wash response, never compression: a scaling row inside a
+   scroll list causes visible jitter during momentum scrolling. */
+:is(#mygym,#musicStudio) :is(
+  .studio-track,.studio-row,.studio-playlist-row,.trackrow,.playlistrow,
+  .progresshits li,.recentrow
+):not([disabled]):not([aria-disabled="true"]){
+  transition:background-color var(--mf-press-out) var(--mf-press-ease),
+             border-color var(--mf-press-out) var(--mf-press-ease);
+}
+:is(#mygym,#musicStudio) :is(
+  .studio-track,.studio-row,.studio-playlist-row,.trackrow,.playlistrow,
+  .progresshits li,.recentrow
+):not([disabled]):not([aria-disabled="true"]):active{
+  background-color:var(--mf-press-wash);
+  border-color:var(--mf-press-edge);
+  transition-duration:var(--mf-press-dur);
+}
+
+/* ── Guards ─────────────────────────────────────────────────────────────
+   Sliders and rails are never given a press transform: dragging must stay
+   exact, and a transform on the track would move the value under the finger. */
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(
+  input[type="range"],.mah-songseek,.mah-songseek__rail,.workout-controlrail,
+  .workout-prog,.fobtempo__input,.mah-volume input
+):active{transform:none}
+/* Disabled controls must not imply the action registered. */
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(button,[role="button"])[disabled]:active,
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(button,[role="button"])[aria-disabled="true"]:active{
+  transform:none;background-color:inherit;border-color:inherit;opacity:inherit;
+}
+/* Keyboard focus stays visible — press feedback must not replace it. */
+:is(#mygym,.calendar,.mg-shell,#musicStudio) :is(button,[role="button"]):focus-visible{
+  outline:1px solid var(--mf-press-edge);outline-offset:2px;
+}
+@media(prefers-reduced-motion:reduce){
+  :is(#mygym,.calendar,.mg-shell,#musicStudio) :is(button,[role="button"],.programcard,.homecard):active{
+    transform:none;
+  }
+}
+
+/* ══ v441 §29-30 — MONTH WRAPPED / MAH PLAYER HEAD SAFE AREA ══════════════
+   Measured at 393x852 standalone with a real 59px inset: the Month Wrapped
+   head rendered at y 0-72 with Back occupying y 12.5-56.5 and Close y 14.5-54.5
+   — BOTH ENTIRELY INSIDE THE STATUS BAR. That is the physical screenshot where
+   the back chevron sits on top of the clock and the close X sits on the battery.
+
+   music-studio.css line 4 does declare a safe-area-aware padding, but a later
+   rule in the same sheet re-declares .studio-head padding without the inset, so
+   the top inset was being dropped. Restated here — this sheet loads after
+   music-studio.css — as a MINIMUM rather than a fixed value, so any future head
+   padding larger than the inset still wins and nothing else in the accepted
+   MAH Player composition moves.
+
+   Exit behaviour itself was exercised, not assumed: Back removes the Wrapped
+   panel and returns to MAH Player with the player still mounted. It was already
+   correct and is left alone. */
+#musicStudio .studio-head{
+  padding-top:max(10px,calc(10px + var(--mf-studio-safe-top,0px)))!important;
+  box-sizing:border-box!important;
+}
+#musicStudio .studio-head--mmw{
+  min-height:calc(72px + var(--mf-studio-safe-top,0px))!important;
+}
+@supports(padding:max(0px)){
+  #musicStudio{--mf-studio-safe-top:env(safe-area-inset-top,0px)}
+}
+
+/* ══ PASS A / A4 — GLOBAL MAHFITT RAIL TERMINAL STANDARD ══════════════════
+   One geometry owner for every shared thin rail. Only the terminal caps change:
+   no rail length, thickness, value mapping, drag hitbox, color, glow or handle
+   geometry is changed here. Diamond handles remain owned by their existing
+   component rules. This sheet loads after the component sheets on My Gym and
+   Calendar, so it is the canonical cross-surface end-cap owner. */
+:root{--mf-rail-cap:999px}
+
+/* Shared member / workout / scanner media rails. */
+#mygym .fobtempo__rail::before,
+#mygym .fobtempo__beam,
+#mygym .mah-songseek__rail::before,
+#mygym .mah-songseek__played,
+#mygym .workout-hd .workout-controlrail::before,
+#mygym .workout-prog,
+#mygym .workout-prog__fill,
+.mg-log-shell .fobtempo__rail::before,
+.mg-log-shell .fobtempo__beam,
+.mg-log-shell .mah-songseek__rail::before,
+.mg-log-shell .mah-songseek__played{
+  border-radius:var(--mf-rail-cap)!important;
+}
+
+/* Native range tracks. The thumb/diamond selectors are deliberately excluded. */
+#mygym .mah-volume input::-webkit-slider-runnable-track,
+#mygym .workout-hd .mah-volume--workout input::-webkit-slider-runnable-track,
+#musicStudio .studio-progress input::-webkit-slider-runnable-track,
+#musicStudio .studio-eq input::-webkit-slider-runnable-track,
+#musicStudio .mah-volume--studio input::-webkit-slider-runnable-track,
+.trimrange::-webkit-slider-runnable-track,
+.mg-log-shell input[type="range"]::-webkit-slider-runnable-track{
+  border-radius:var(--mf-rail-cap)!important;
+}
+#mygym .mah-volume input::-moz-range-track,
+#mygym .mah-volume input::-moz-range-progress,
+#mygym .workout-hd .mah-volume--workout input::-moz-range-track,
+#mygym .workout-hd .mah-volume--workout input::-moz-range-progress,
+#musicStudio .studio-progress input::-moz-range-track,
+#musicStudio .studio-progress input::-moz-range-progress,
+#musicStudio .studio-eq input::-moz-range-track,
+#musicStudio .studio-eq input::-moz-range-progress,
+#musicStudio .mah-volume--studio input::-moz-range-track,
+#musicStudio .mah-volume--studio input::-moz-range-progress,
+.trimrange::-moz-range-track,
+.trimrange::-moz-range-progress,
+.mg-log-shell input[type="range"]::-moz-range-track,
+.mg-log-shell input[type="range"]::-moz-range-progress{
+  border-radius:var(--mf-rail-cap)!important;
+}
+
+/* Tracker completion, Studio decorative/progress rails and calendar FOBEAM. */
+.hd__bar .prog,
+.hd__bar .prog>span,
+.trimbar,
+.trimbar>i,
+#musicStudio .studio-tempo__beam,
+#musicStudio .studio-brandflow>span,
+#musicStudio .mmw-progress,
+#musicStudio .mmw-progress>i,
+.calendar .fobeam__rail,
+.calendar .fobeam__rail::after,
+.calendar .cal-loadstate i{
+  border-radius:var(--mf-rail-cap)!important;
+}
+
+/* SVG meters/rails keep their existing width and geometry; only line caps are
+   normalized. Graph curves remain graph curves and are intentionally excluded. */
+#mygym svg :is(.rail,.track,.progress,.seek,.meter),
+.calendar svg :is(.rail,.track,.progress,.seek,.meter),
+.mg-log-shell svg :is(.rail,.track,.progress,.seek,.meter){
+  stroke-linecap:round!important;
+}
+
+
+/* ══ PASS C / §18 — TACTILE COVERAGE CLOSURE ══════════════════════════════
+   v441 established the press vocabulary. Pass C closes the inventory gaps on
+   the detached MAH LOG utility deck, Program Library/editor controls and MAH
+   Player browse/focus actions. Paint only: no delayed action, no listener, no
+   slider transform, no geometry/state ownership change. */
+:is(#mygym,.mg-shell,#musicStudio) :is(
+  .mg-log-tools button,.mg-feedback-route,.mg-message-actions button,
+  .mg-message-action-card,.mg-curation-pay,.mg-wide,
+  .programlib-card>button,.program-picker__exercise,
+  .programedit-addex,.programedit-addday,.programedit-actions button,.programedit-delete,
+  .studio-playlist-card,.studio-track__more,.studio-head__upload,
+  .studio-focus__head>button,.studio-focus__shortcuts>button,.studio-now__more,.studio-now__upload
+):not([disabled]):not([aria-disabled="true"]){
+  transition:transform var(--mf-press-out) var(--mf-press-ease),
+             filter var(--mf-press-out) var(--mf-press-ease),
+             background-color var(--mf-press-out) var(--mf-press-ease),
+             border-color var(--mf-press-out) var(--mf-press-ease);
+  -webkit-tap-highlight-color:transparent;
+}
+:is(#mygym,.mg-shell,#musicStudio) :is(
+  .mg-log-tools button,.mg-feedback-route,.mg-message-actions button,
+  .mg-message-action-card,.mg-curation-pay,.mg-wide,
+  .programlib-card>button,.program-picker__exercise,
+  .programedit-addex,.programedit-addday,.programedit-actions button,.programedit-delete,
+  .studio-playlist-card,.studio-track__more,.studio-head__upload,
+  .studio-focus__head>button,.studio-focus__shortcuts>button,.studio-now__more,.studio-now__upload
+):not([disabled]):not([aria-disabled="true"]):active{
+  transform:scale(var(--mf-press-scale));
+  filter:brightness(1.08);
+  border-color:var(--mf-press-edge);
+  transition-duration:var(--mf-press-dur);
+}
+/* Scroll-list rows retain the v441 no-compression rule. */
+#musicStudio .studio-track:active{transform:none!important}
+@media(prefers-reduced-motion:reduce){
+  :is(#mygym,.mg-shell,#musicStudio) :is(
+    .mg-log-tools button,.mg-feedback-route,.mg-message-actions button,
+    .mg-message-action-card,.mg-curation-pay,.mg-wide,
+    .programlib-card>button,.program-picker__exercise,
+    .programedit-addex,.programedit-addday,.programedit-actions button,.programedit-delete,
+    .studio-playlist-card,.studio-track__more,.studio-head__upload,
+    .studio-focus__head>button,.studio-focus__shortcuts>button,.studio-now__more,.studio-now__upload
+  ):active{transform:none}
+}
+
+
+/* ══ POST-v446 TRUE-FINAL SHARED BACK CONTROL STANDARD ════════════════════
+   One square shell + one masked rounded-chevron primitive.  Route labels are
+   not part of navigation geometry.  Calendar keeps its existing SVG glyph but
+   receives the same square shell size. */
+:root{--mf-back-size:42px;--mf-back-icon:16px}
+#mygym .workout-hd .workoutback.mf-back-control,
+#mygym .programlib-hd__context .programlib-back.mf-back-control,
+.mg-picker-shell>.mg-picker-backrow .mg-back.mf-back-control,
+.mg-picker-shell>.mg-picker-top .mg-back.mf-back-control,
+.mg-log-shell .mg-back.mf-back-control,
+.calendar:not(.is-checkout) .cal-context-tools .cal-back,
+.calendar .cal-back{
+  box-sizing:border-box!important;
+  width:var(--mf-back-size)!important;min-width:var(--mf-back-size)!important;max-width:var(--mf-back-size)!important;
+  height:var(--mf-back-size)!important;min-height:var(--mf-back-size)!important;max-height:var(--mf-back-size)!important;
+  padding:0!important;margin:0!important;
+  display:grid!important;place-items:center!important;
+  /* R47 — the shared Back primitive paints from whichever theme token the HOST
+     document owns.  MyGym publishes --bright/--ink; the Calendar is a separate
+     document that publishes --cal-accent/--cal-bg.  The old rgba(var(--*-rgb))
+     form resolved to its hardcoded gold fallback on the Calendar, so Back read
+     yellow while every themed neighbour read correctly.  color-mix over a host
+     token chain keeps one owner and lets each document theme it. */
+  border:1px solid color-mix(in srgb,var(--bright,var(--cal-accent,#E9C98F)) 28%,transparent)!important;
+  background:color-mix(in srgb,var(--ink,var(--cal-bg,#0E1114)) 28%,transparent)!important;
+  color:var(--secondary,var(--mg-gold,var(--bright,#E9C98F)))!important;
+  border-radius:var(--mf-rect-radius)!important;
+  line-height:0!important;
+}
+/* Job III Phase 0: Calendar Back remains on the shared square navigation shell,
+   but its navigation glyph is semantic light ink — not the Calendar accent used
+   by Schedule / Reschedule actions.  Surface, border and press response remain
+   owned by the shared Back primitive above. */
+.calendar:not(.is-checkout) .cal-context-tools .cal-back,
+.calendar .cal-back{color:var(--cal-ink,#fff)!important}
+/* Live Workout navigation ink is semantic light ink, not Theme accent. */
+#mygym .workout-hd .workoutback.mf-back-control{color:var(--cream,#f4eee5)!important}
+:is(#mygym,.mg-shell,.mg-picker-shell,.mg-log-shell) .mf-back-control .mf-back-arrow{
+  display:block!important;width:var(--mf-back-icon)!important;height:var(--mf-back-icon)!important;
+  margin:0!important;padding:0!important;transform:none!important;
+  font-size:0!important;line-height:0!important;
+  background:currentColor!important;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 4.5 8 12l7.5 7.5' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat!important;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 4.5 8 12l7.5 7.5' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat!important;
+}
+/* Retire old arrow/text-generated geometry when a shared primitive is present. */
+#mygym .workoutback.mf-back-control>span:not(.mf-back-arrow),
+#mygym .workoutback.mf-back-control>b,
+.mg-picker-shell .mg-back.mf-back-control>span:not(.mf-back-arrow){display:none!important}
+
+/* ══ POST-v446 TRUE-FINAL MAH PLAYER SOFT-TECH SURFACE FAMILY ══════════════
+   Spotify-like softness means removing razor corners, not changing MAHFITT's
+   segmented/tab/diamond identity.  Scope is intentionally MAH Player only. */
+#musicStudio.musicstudio{
+  --mf-player-radius-control:5px;
+  --mf-player-radius-surface:7px;
+  --mf-player-radius-panel:9px;
+}
+#musicStudio.musicstudio .studio-mainnav .studio-tabs{
+  border-radius:var(--mf-player-radius-surface)!important;overflow:hidden!important;
+}
+#musicStudio.musicstudio .studio-mainnav .studio-tabs button{border-radius:0!important}
+#musicStudio.musicstudio :is(
+  .studio-head,.studio-track,.studio-empty,.studio-playlist-art,.studio-track__ghost-cover,
+  .studio-eq-card,.studio-eq,.studio-beats,.studio-now,.studio-cover,.studio-cover img,
+  .studio-dialog>section
+){border-radius:var(--mf-player-radius-surface)!important}
+#musicStudio.musicstudio :is(
+  .studio-head__upload,.studio-head__close,.studio-libraryhead input,.studio-libraryhead>button,
+  .studio-libraryhead--soft input,.studio-libraryhead--soft>button,.studio-playlist-actions button,
+  .studio-focus__shortcuts>button,.studio-dialog button,.studio-dialog input,.studio-toolgrid>button,
+  .studio-presets button,.studio-loopbuttons button,.mah-volume--studio>label,.mah-volume__replay
+){border-radius:var(--mf-player-radius-control)!important}
+#musicStudio.musicstudio .studio-library-only .studio-track::before{
+  border-radius:var(--mf-player-radius-surface)!important;
+}
+
+/* ══ v450 — MAH PLAYER PHONE HEADER DEAD-SPACE CLOSURE ════════════════════
+   The safe-area is already consumed by .studio-mainnav. A historical shared
+   .studio-head safe-top rule was adding the iPhone inset a second time to the
+   player header, creating the blank band above the MAHFITT lockup. Keep that
+   extra inset only for Month Wrapped; regular Player heads hug their content. */
+@media(max-width:430px){
+  #musicStudio .studio-head:not(.studio-head--mmw){
+    padding-top:4px!important;
+  }
+  #musicStudio .studio-head--browse{
+    min-height:82px!important;
+    padding:4px 9px 5px!important;
+    align-items:center!important;
+  }
+  #musicStudio .studio-head--browse .studio-head__brandstack{
+    align-content:center!important;
+    gap:0!important;
+  }
+  #musicStudio .studio-head--browse .studio-mahfitt-mark{
+    width:88px!important;height:51px!important;max-width:88px!important;
+  }
+  #musicStudio .studio-head-transport{
+    height:26px!important;
+    grid-template-columns:28px 28px 28px!important;
+    gap:4px!important;
+  }
+  #musicStudio .studio-head-transport button{width:28px!important;height:26px!important}
+  #musicStudio .studio-head-transport svg{width:22px!important;height:16px!important}
+  #musicStudio .studio-head-transport__diamond{width:12px!important;height:12px!important}
+  #musicStudio .studio-head__upload,
+  #musicStudio .studio-head__close{
+    width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;
+  }
+}
+
+/* R65 border-footprint compensation — exercise cards are content-height
+   containers, so border-box alone cannot absorb the +2.3px stroke per edge.
+   Preserve the accepted outer closed/open card height by resolving that added
+   perimeter inward through the existing 12px header padding. */
+#mygym .ex > .ex__h{padding-block:10px!important}

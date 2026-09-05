@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#0E1114">
+  <meta name="color-scheme" content="dark">
+  <title>mah calendar · FOB Systems</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/calendar.css?v=452&j3=crown-final1&job3=prefabi1&r4=5&fxclose=1&r16=1&r17=1&r19=1&r47=1&r49=1&r52=1&r53=1&r54=1&r55=1&r56=1&postr67=crownfade1&r68=1&r69=1">
+  <link rel="stylesheet" href="/calendar-layout.css?v=452">
+  <link rel="stylesheet" href="/mahfitt-geometry.css?v=452&r=fc2&j3=p0&r47=1&r65=1">
+  <link rel="stylesheet" href="/mahfitt-atmosphere.css?v=452">
+  <link rel="stylesheet" href="/mahfitt-banner.css?v=452&r=fc2&j3=crown-final1&job3=prefabi1&r4=8&r6=1&volfix=1&fxclose=1&airclean=1&r16=1&r17=1&r19=1&r47=1&r52=1&r53=1&r54=1&r55=1&r65=1&postr67=crownfade1&r68=1&r69=1">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script>(function(){try{if(navigator.standalone||(matchMedia&&matchMedia('(display-mode: standalone)').matches))document.documentElement.dataset.mahfittStandalone='1'}catch(e){}})();</script>
+</head>
+<body class="mahfitt-calendar">
+  <main id="calendarApp" class="cal-loading">
+    <section class="cal-loadstate"><b>FOB SYSTEMS</b><span>Opening mah calendar…</span><i></i></section>
+  </main>
+  <script>
+  (function(){
+    window.__mahfittCalendarStartup={phase:'document',error:'',updatedAt:Date.now()};
+    window.__mahfittCalendarRetry=function(){try{for(var i=sessionStorage.length-1;i>=0;i--){var k=sessionStorage.key(i);if(k&&k.indexOf('fob.calendar.boot.')===0)sessionStorage.removeItem(k)}}catch(e){}location.reload()};
+    window.__mahfittCalendarBootTimer=setTimeout(function(){var app=document.getElementById('calendarApp');if(!app||!app.classList.contains('cal-loading'))return;var state=window.__mahfittCalendarStartup||{},phase=String(state.phase||'document'),reason=state.error||('Calendar startup stopped during '+phase+'.');state.phase='watchdog-failed';state.error=reason;state.updatedAt=Date.now();window.__mahfittCalendarStartup=state;app.className='cal-loading cal-login';app.innerHTML='<section class="cal-login-card"><div class="cal-loginbrand">FOB SYSTEMS</div><div class="cal-loginkicker">MAH CALENDAR</div><h1>CALENDAR DID NOT FINISH OPENING</h1><p>'+String(reason).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})+'</p><button class="cal-login-primary" type="button" onclick="window.__mahfittCalendarRetry()">TRY AGAIN</button></section>';},4500);
+  }());
+  </script>
+  <script defer src="/mahfitt-ui-state.js?v=452&r4=2"></script>
+  <script defer src="/mahfitt-navigation.js?v=452&r=job3-prefabi1"></script>
+  <script defer src="/mahfitt-atmosphere.js?v=452"></script>
+  <script defer src="/mahfitt-listening.js?v=452"></script>
+  <script defer src="/calendar.js?v=452&j3=crown-final1&job3=prefabi1&r4=7&pc=16c1bb5&r47=1&r49=1&r52=1&r54=1&r55=1&r56=1&r65=1"></script>
+  <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(function(r){return r.update()}).catch(function(){})})}</script>
+</body>
+</html>

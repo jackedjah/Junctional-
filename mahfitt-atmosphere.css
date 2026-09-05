@@ -1,0 +1,210 @@
+/* MAHFITT v360 — shared theme-aware viewport atmosphere.
+   The primary stays dominant through the broad center. Black closes every
+   edge; the secondary contributes only restrained, diffused light. */
+:root{
+  --mahfitt-primary:var(--ink,var(--mg-bg,var(--cal-bg,var(--admin-bg,var(--coach-surface,var(--bg,#0e1114))))));
+  --mahfitt-secondary:var(--bright,var(--mg-bright,var(--cal-accent,var(--admin-primary,var(--coach-primary,var(--gold,#e9c98f))))));
+}
+.mahfitt-member{
+  --mahfitt-primary:var(--ink,#0e1114);
+  --mahfitt-secondary:var(--bright,#e9c98f);
+}
+.mahfitt-calendar{
+  --mahfitt-primary:var(--cal-bg,#0e1114);
+  --mahfitt-secondary:var(--cal-accent,#e9c98f);
+}
+.admin-login-page{
+  --mahfitt-primary:var(--admin-bg,#0e1114);
+  --mahfitt-secondary:var(--admin-primary,#e9c98f);
+}
+[data-coach-surface],.coach-shell-mounted{
+  --mahfitt-primary:var(--coach-surface,#0e1114);
+  --mahfitt-secondary:var(--coach-primary,#e9c98f);
+}
+html{background:#000}
+body{
+  position:relative;
+  isolation:isolate;
+  min-height:100vh;
+  min-height:100dvh;
+  background:var(--mahfitt-primary)!important;
+}
+body::before,body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+}
+body::before{
+  z-index:-2;
+  background:
+    radial-gradient(ellipse 112% 96% at 50% 46%,
+      color-mix(in srgb,var(--mahfitt-primary) 91%,white 9%) 0%,
+      var(--mahfitt-primary) 48%,
+      color-mix(in srgb,var(--mahfitt-primary) 88%,#000 12%) 76%,
+      color-mix(in srgb,var(--mahfitt-primary) 48%,#000 52%) 91%,
+      #000 116%);
+}
+body::after{
+  z-index:-1;
+  inset:-8%;
+  opacity:var(--mah-atmosphere-opacity,.32);
+  filter:blur(30px);
+  background:var(--mah-atmosphere-layer,
+    radial-gradient(ellipse 43% 31% at 22% 24%,color-mix(in srgb,var(--mahfitt-secondary) 17%,transparent),transparent 72%),
+    radial-gradient(ellipse 51% 36% at 76% 52%,color-mix(in srgb,var(--mahfitt-secondary) 12%,transparent),transparent 74%),
+    radial-gradient(ellipse 37% 29% at 43% 85%,color-mix(in srgb,var(--mahfitt-secondary) 9%,transparent),transparent 76%));
+  animation:mahfitt-cloud-drift 18s ease-in-out infinite alternate;
+}
+
+/* These full-view app shells must reveal the shared body atmosphere. The live
+   meal camera remains true black and is deliberately excluded. */
+#mygym,.calendar{background:transparent!important}
+/* v361: Meal Grade overlays are destinations layered above an already-rendered
+   tracker. They must own an opaque surface or MAH GYM bleeds through them. */
+.mg-shell:not(.mg-camera-shell){background:var(--mg-bg,var(--mahfitt-primary,#0e1114))!important;background:var(--mah-atmosphere-layer,linear-gradient(transparent,transparent)),var(--mg-bg,var(--mahfitt-primary,#0e1114))!important;background-attachment:fixed!important}
+.mg-camera-shell{background:#000!important}
+
+@keyframes mahfitt-cloud-drift{
+  from{transform:translate3d(-1.4%,-.7%,0) scale(1)}
+  to{transform:translate3d(1.6%,1%,0) scale(1.035)}
+}
+@media(prefers-reduced-motion:reduce){body::after{animation:none}}
+
+
+/* ══ v412 — PHOTO-DERIVED ATMOSPHERIC MESH ═══════════════════════════════
+   Six sanitized spatial colors become large abstract fields. The source photo
+   never appears in the DOM. One fixed, pointer-transparent layer owns motion
+   so Theme atmosphere can never intercept gestures or change app geometry. */
+.mah-atmosphere-mesh{
+  position:fixed;inset:-12vmax;z-index:-1;overflow:hidden;pointer-events:none;
+  opacity:.96;filter:blur(18px) saturate(1.16);transform:translateZ(0);
+  contain:strict;transition:opacity .45s ease;
+}
+body.mah-atmosphere-mesh-active::after{z-index:-2;opacity:.10;filter:blur(46px)}
+.mah-atmosphere-blob{
+  position:absolute;left:var(--mah-blob-x,50%);top:var(--mah-blob-y,50%);
+  width:var(--mah-blob-w,58vmax);height:var(--mah-blob-h,44vmax);border-radius:50%;
+  pointer-events:none;opacity:var(--mah-blob-alpha,.28);will-change:transform;
+  background:radial-gradient(ellipse at 50% 50%,
+    rgba(var(--mah-blob-rgb,233,201,143),.98) 0%,
+    rgba(var(--mah-blob-rgb,233,201,143),.72) 28%,
+    rgba(var(--mah-blob-rgb,233,201,143),.31) 52%,
+    rgba(var(--mah-blob-rgb,233,201,143),0) 76%);
+  transform:translate3d(-50%,-50%,0);
+  transition:left .55s ease,top .55s ease,width .55s ease,height .55s ease,opacity .45s ease,background .55s ease;
+  animation-duration:var(--mah-blob-duration,34s);animation-delay:var(--mah-blob-delay,0s);
+  animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-direction:alternate;
+}
+.mah-atmosphere-blob--a{animation-name:mahfitt-mesh-drift-a}
+.mah-atmosphere-blob--b{animation-name:mahfitt-mesh-drift-b}
+.mah-atmosphere-blob--c{animation-name:mahfitt-mesh-drift-c}
+@keyframes mahfitt-mesh-drift-a{
+  0%{transform:translate3d(calc(-50% - 2.2vmax),calc(-50% + .8vmax),0) scale(.98)}
+  48%{transform:translate3d(calc(-50% + 1.6vmax),calc(-50% - 1.4vmax),0) scale(1.045)}
+  100%{transform:translate3d(calc(-50% + 3.1vmax),calc(-50% + 1.3vmax),0) scale(1.015)}
+}
+@keyframes mahfitt-mesh-drift-b{
+  0%{transform:translate3d(calc(-50% + 1.7vmax),calc(-50% - 1.1vmax),0) scale(1.025)}
+  52%{transform:translate3d(calc(-50% - 2.6vmax),calc(-50% + 1.5vmax),0) scale(.99)}
+  100%{transform:translate3d(calc(-50% - .8vmax),calc(-50% - 2.1vmax),0) scale(1.055)}
+}
+@keyframes mahfitt-mesh-drift-c{
+  0%{transform:translate3d(calc(-50% - 1.1vmax),calc(-50% - 1.8vmax),0) scale(1)}
+  50%{transform:translate3d(calc(-50% + 2.8vmax),calc(-50% + .6vmax),0) scale(1.055)}
+  100%{transform:translate3d(calc(-50% - .4vmax),calc(-50% + 2.4vmax),0) scale(.985)}
+}
+@media(max-width:430px){.mah-atmosphere-mesh{filter:blur(14px) saturate(1.13);inset:-10vmax}.mah-atmosphere-blob{will-change:transform}}
+@media(prefers-reduced-motion:reduce){
+  .mah-atmosphere-mesh{filter:blur(16px) saturate(1.1)}
+  .mah-atmosphere-blob{animation:none!important;transform:translate3d(-50%,-50%,0)!important;transition:none}
+}
+
+/* ══ v413 — ADVANCED THEME SCENES ════════════════════════════════════════
+   Scene layers are procedural atmosphere only. They are fixed behind the UI,
+   pointer-transparent and transform/opacity driven. They cannot alter layout,
+   capture gestures, reveal a reference photo, or become a playback owner. */
+.mah-atmosphere-mesh::before,.mah-atmosphere-mesh::after,
+.mytheme__previewmesh::before,.mytheme__previewmesh::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:0;
+  transform:translateZ(0);will-change:transform,opacity
+}
+.mah-atmosphere-mesh[data-scene="storm"]::before,.mytheme__previewmesh[data-scene="storm"]::before{
+  opacity:.34;inset:-8%;filter:blur(18px);
+  background:
+    radial-gradient(ellipse 46% 24% at 24% 31%,rgba(var(--mah-scene-accent-rgb),.19),transparent 72%),
+    radial-gradient(ellipse 54% 29% at 72% 42%,rgba(14,24,40,.72),transparent 75%),
+    radial-gradient(ellipse 64% 30% at 42% 68%,rgba(6,10,18,.62),transparent 76%);
+  animation:mah-scene-storm-clouds 38s ease-in-out infinite alternate
+}
+.mah-atmosphere-mesh[data-scene="storm"]::after,.mytheme__previewmesh[data-scene="storm"]::after{
+  opacity:.08;inset:-4%;filter:blur(32px);
+  background:radial-gradient(ellipse 32% 20% at 62% 34%,rgba(var(--mah-scene-accent-rgb),.88),transparent 76%);
+  animation:mah-scene-storm-bloom 17s ease-in-out infinite
+}
+@keyframes mah-scene-storm-clouds{0%{transform:translate3d(-2.2%,-.8%,0) scale(1)}100%{transform:translate3d(2.5%,1.3%,0) scale(1.045)}}
+@keyframes mah-scene-storm-bloom{0%,43%,57%,100%{opacity:.035;transform:scale(.96)}49%{opacity:.12;transform:scale(1.055)}52%{opacity:.065;transform:scale(1.01)}}
+
+.mah-atmosphere-mesh[data-scene="waterfall"]::before,.mytheme__previewmesh[data-scene="waterfall"]::before{
+  opacity:.22;inset:-10% -2%;filter:blur(11px);
+  background:repeating-linear-gradient(96deg,transparent 0 7%,rgba(var(--mah-scene-accent-rgb),.11) 8% 9%,transparent 10% 17%);
+  animation:mah-scene-waterfall 31s linear infinite
+}
+.mah-atmosphere-mesh[data-scene="waterfall"]::after,.mytheme__previewmesh[data-scene="waterfall"]::after{
+  opacity:.30;filter:blur(28px);
+  background:radial-gradient(ellipse 70% 22% at 50% 80%,rgba(var(--mah-scene-accent-rgb),.22),transparent 75%);
+  animation:mah-scene-mist 24s ease-in-out infinite alternate
+}
+@keyframes mah-scene-waterfall{0%{transform:translate3d(0,-8%,0)}100%{transform:translate3d(-2%,8%,0)}}
+@keyframes mah-scene-mist{0%{transform:translate3d(-3%,1%,0) scale(1)}100%{transform:translate3d(4%,-1%,0) scale(1.06)}}
+
+.mah-atmosphere-mesh[data-scene="mountain"]::before,.mytheme__previewmesh[data-scene="mountain"]::before{
+  opacity:.30;inset:auto -8% 8% -8%;height:44%;filter:blur(15px);
+  background:linear-gradient(180deg,rgba(var(--mah-scene-accent-rgb),.09),rgba(2,8,5,.60));
+  clip-path:polygon(0 100%,0 68%,16% 38%,30% 68%,47% 26%,59% 58%,72% 32%,100% 70%,100% 100%);
+  animation:mah-scene-mountain 44s ease-in-out infinite alternate
+}
+.mah-atmosphere-mesh[data-scene="mountain"]::after,.mytheme__previewmesh[data-scene="mountain"]::after{
+  opacity:.22;inset:auto -15% 4% -15%;height:29%;filter:blur(34px);
+  background:radial-gradient(ellipse 70% 55% at 46% 54%,rgba(var(--mah-scene-accent-rgb),.23),transparent 73%);
+  animation:mah-scene-mist 33s ease-in-out infinite alternate-reverse
+}
+@keyframes mah-scene-mountain{0%{transform:translate3d(-1.5%,1%,0) scale(1.02)}100%{transform:translate3d(1.8%,-.5%,0) scale(1.045)}}
+
+.mah-atmosphere-mesh[data-scene="disco"]::before,.mytheme__previewmesh[data-scene="disco"]::before{
+  opacity:.18;inset:-24%;filter:blur(16px);
+  background:conic-gradient(from 20deg at 50% 48%,transparent 0 12deg,rgba(var(--mah-scene-accent-rgb),.28) 18deg,transparent 30deg 82deg,rgba(255,255,255,.12) 88deg,transparent 96deg 162deg,rgba(var(--mah-scene-accent-rgb),.18) 170deg,transparent 182deg 360deg);
+  animation:mah-scene-disco 54s linear infinite
+}
+.mah-atmosphere-mesh[data-scene="disco"]::after,.mytheme__previewmesh[data-scene="disco"]::after{
+  opacity:.23;inset:6%;filter:blur(25px);
+  background:radial-gradient(circle at 55% 35%,rgba(255,255,255,.18),transparent 7%),radial-gradient(circle at 32% 64%,rgba(var(--mah-scene-accent-rgb),.24),transparent 11%),radial-gradient(circle at 76% 76%,rgba(255,255,255,.11),transparent 7%);
+  animation:mah-scene-disco-float 29s ease-in-out infinite alternate
+}
+@keyframes mah-scene-disco{to{transform:rotate(360deg) scale(1.04)}}
+@keyframes mah-scene-disco-float{0%{transform:translate3d(-2%,-1%,0)}100%{transform:translate3d(2.5%,1.5%,0)}}
+
+.mah-atmosphere-mesh[data-scene="space"]::before,.mytheme__previewmesh[data-scene="space"]::before{
+  opacity:.30;inset:-6%;
+  background:
+    radial-gradient(circle at 11% 19%,rgba(255,255,255,.48) 0 1px,transparent 1.5px),
+    radial-gradient(circle at 28% 72%,rgba(var(--mah-scene-accent-rgb),.52) 0 1px,transparent 1.5px),
+    radial-gradient(circle at 46% 27%,rgba(255,255,255,.36) 0 1px,transparent 1.6px),
+    radial-gradient(circle at 69% 58%,rgba(var(--mah-scene-accent-rgb),.42) 0 1.2px,transparent 1.8px),
+    radial-gradient(circle at 84% 16%,rgba(255,255,255,.40) 0 1px,transparent 1.6px),
+    radial-gradient(circle at 92% 83%,rgba(var(--mah-scene-accent-rgb),.43) 0 1px,transparent 1.6px);
+  background-size:37% 41%,43% 47%,53% 57%,61% 63%,71% 73%,83% 87%;
+  animation:mah-scene-stars 66s linear infinite
+}
+.mah-atmosphere-mesh[data-scene="space"]::after,.mytheme__previewmesh[data-scene="space"]::after{
+  opacity:.20;inset:-10%;filter:blur(42px);
+  background:radial-gradient(ellipse 58% 36% at 61% 47%,rgba(var(--mah-scene-accent-rgb),.28),transparent 74%);
+  animation:mah-scene-nebula 43s ease-in-out infinite alternate
+}
+@keyframes mah-scene-stars{to{transform:translate3d(-2.5%,2%,0) scale(1.025)}}
+@keyframes mah-scene-nebula{0%{transform:translate3d(-3%,-1%,0) scale(.98)}100%{transform:translate3d(3%,2%,0) scale(1.07)}}
+
+@media(prefers-reduced-motion:reduce){
+  .mah-atmosphere-mesh::before,.mah-atmosphere-mesh::after,
+  .mytheme__previewmesh::before,.mytheme__previewmesh::after{animation:none!important;transform:none!important;will-change:auto}
+}

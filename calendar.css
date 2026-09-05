@@ -1,0 +1,1489 @@
+:root{--cal-bg:#0e1114;--cal-accent:#e9c98f;--cal-ink:#fff;--cal-muted:#8d949c;--cal-line:rgba(255,255,255,.13);--cal-soft:color-mix(in srgb,var(--cal-accent) 12%,transparent);--cal-bpm:120;--safe-top:max(14px,env(safe-area-inset-top));--safe-bottom:max(15px,env(safe-area-inset-bottom))}*{box-sizing:border-box}html,body{margin:0;width:100%;min-height:100%;background:var(--cal-bg);color:var(--cal-ink);font-family:"Space Grotesk",system-ui,sans-serif;overscroll-behavior:none}button,input,select,textarea{font:inherit}button{color:inherit}.cal-loading{min-height:100vh;display:grid;place-items:center}.cal-loadstate{display:grid;text-align:center;gap:13px}.cal-loadstate b,.cal-kicker{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.28em;text-transform:uppercase;color:var(--cal-accent)}.cal-loadstate span{color:var(--cal-muted)}.cal-loadstate i{display:block;width:190px;height:1px;margin:6px auto;background:linear-gradient(90deg,transparent,var(--cal-accent),transparent);animation:cal-load 1.4s ease-in-out infinite}@keyframes cal-load{50%{opacity:.25;transform:scaleX(.55)}}.calendar{height:100vh;height:100dvh;display:grid;grid-template-rows:minmax(180px,25fr) minmax(0,75fr);overflow:hidden;background:radial-gradient(circle at 75% 8%,color-mix(in srgb,var(--cal-accent) 8%,transparent),transparent 28%),var(--cal-bg)}.calendar.is-checkout{grid-template-rows:1fr}.cal-detail{position:relative;overflow:hidden;border-bottom:1px solid var(--cal-line);padding:calc(var(--safe-top) + 58px) max(22px,env(safe-area-inset-right)) 18px max(22px,env(safe-area-inset-left));display:grid;align-content:end;min-height:0}.cal-detail::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 55%,color-mix(in srgb,var(--cal-accent) 8%,transparent));pointer-events:none}.cal-detail-date{font-size:clamp(25px,6vw,45px);font-weight:700;letter-spacing:-.035em;margin:4px 0 10px}.cal-detail-list{display:flex;gap:8px;overflow:auto;scrollbar-width:none;position:relative;z-index:1}.cal-detail-list::-webkit-scrollbar{display:none}.cal-detail-card{min-width:min(310px,79vw);max-width:420px;text-align:left;border:1px solid color-mix(in srgb,var(--cal-accent) 34%,transparent);background:rgba(255,255,255,.035);padding:11px 13px;display:grid;grid-template-columns:3px 1fr;gap:11px;cursor:pointer}.cal-detail-card i{background:var(--event-color,var(--cal-accent));box-shadow:0 0 12px color-mix(in srgb,var(--event-color,var(--cal-accent)) 35%,transparent)}.cal-detail-card b{display:block;font-size:13px}.cal-detail-card span{display:block;margin-top:3px;font-size:11px;color:var(--cal-muted)}.cal-detail-empty{margin:0;max-width:62ch;color:var(--cal-muted);font-size:13px;line-height:1.55;position:relative;z-index:1}.cal-fixed-nav{position:fixed;left:max(14px,env(safe-area-inset-left));top:var(--safe-top);z-index:50;display:flex;gap:8px}.cal-back,.cal-iconbtn{width:48px;height:48px;border:1px solid color-mix(in srgb,var(--cal-accent) 27%,transparent);background:color-mix(in srgb,var(--cal-bg) 84%,transparent);backdrop-filter:blur(14px);display:grid;place-items:center;cursor:pointer}.cal-back svg,.cal-iconbtn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.cal-stage{min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;overflow:hidden;position:relative}.calendar.is-checkout .cal-stage{padding-top:var(--safe-top)}.cal-head{display:flex;justify-content:space-between;align-items:end;gap:15px;padding:17px max(20px,env(safe-area-inset-right)) 10px max(20px,env(safe-area-inset-left))}.cal-head h1{margin:3px 0 0;font-size:clamp(32px,8vw,58px);line-height:.95;letter-spacing:-.045em}.cal-head-actions{display:flex;gap:8px}.cal-month-nav{display:flex;align-items:center;gap:8px}.cal-month-nav button{border:0;background:transparent;padding:9px;color:var(--cal-muted);font-size:26px;cursor:pointer}.cal-month-nav b{min-width:45px;text-align:center;color:var(--cal-accent);font:600 10px/1 ui-monospace,monospace;letter-spacing:.15em}.fobeam{height:26px;position:relative;margin:0 max(20px,env(safe-area-inset-right)) 2px max(20px,env(safe-area-inset-left));opacity:.78;overflow:hidden}.fobeam__rail{position:absolute;left:0;right:0;top:12px;height:1px;background:linear-gradient(90deg,transparent,var(--cal-accent) 12%,var(--cal-accent) 88%,transparent)}.fobeam__diamond{position:absolute;width:11px;height:11px;background:var(--cal-accent);left:var(--beam-x,52%);top:7px;transform:translateX(-50%) rotate(45deg);box-shadow:0 0 14px color-mix(in srgb,var(--cal-accent) 55%,transparent);transition:left .14s linear}.fobeam__bars{position:absolute;inset:0 3%;display:flex;align-items:flex-end;justify-content:space-between}.fobeam__bars i{width:1px;height:calc(2px + var(--bar,4)*1px);max-height:10px;background:var(--cal-accent);opacity:.46;transform-origin:bottom;animation:cal-beat calc(60s/var(--cal-bpm)*2) ease-in-out infinite;animation-delay:calc(var(--delay,0)*-18ms);animation-play-state:paused}.is-music-playing .fobeam__bars i{animation-play-state:running}@keyframes cal-beat{0%,100%{transform:scaleY(.3);opacity:.24}18%{transform:scaleY(1);opacity:.64}32%{transform:scaleY(.48)}55%{transform:scaleY(.76)}75%{transform:scaleY(.36)}}.cal-gridwrap{min-height:0;overflow:auto;scrollbar-width:none;padding:0 max(12px,env(safe-area-inset-right)) 3px max(12px,env(safe-area-inset-left))}.cal-gridwrap::-webkit-scrollbar{display:none}.cal-weekdays,.cal-monthgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}.cal-weekdays{position:sticky;top:0;background:var(--cal-bg);z-index:3;border-bottom:1px solid var(--cal-line)}.cal-weekdays span{text-align:center;padding:7px 0 9px;color:#fff;font:600 10px/1 ui-monospace,monospace;letter-spacing:.16em}.cal-day{min-height:clamp(76px,11.5vh,135px);border:0;border-right:1px solid var(--cal-line);border-bottom:1px solid var(--cal-line);background:transparent;padding:7px 5px;text-align:left;overflow:hidden;cursor:pointer;position:relative}.cal-day:nth-child(7n){border-right:0}.cal-day.is-out{opacity:.27}.cal-day.is-today .cal-num{color:var(--cal-accent)}.cal-day.is-selected{background:linear-gradient(145deg,color-mix(in srgb,var(--cal-accent) 12%,transparent),transparent 62%)}.cal-num{width:29px;height:29px;display:grid;place-items:center;margin:0 auto 4px;font-size:14px;font-weight:650}.is-selected .cal-num{background:var(--cal-accent);color:var(--cal-bg)!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--cal-accent) 60%,white),0 0 18px color-mix(in srgb,var(--cal-accent) 28%,transparent)}.cal-events{display:grid;gap:2px}.cal-event-chip{height:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid var(--event-color,var(--cal-accent));padding:1px 3px;background:color-mix(in srgb,var(--event-color,var(--cal-accent)) 14%,transparent);font-size:7.5px;line-height:11px;color:#fff}.cal-more{font:600 7px/1 ui-monospace,monospace;color:var(--cal-muted);padding:2px}.cal-weekview{display:grid;grid-template-columns:repeat(7,minmax(100px,1fr));min-height:100%;width:max(100%,700px)}.cal-weekcol{border-right:1px solid var(--cal-line);min-height:100%;padding:8px}.cal-weekcol:last-child{border-right:0}.cal-weekcol h3{position:sticky;top:34px;background:var(--cal-bg);margin:0 -8px 8px;padding:8px;text-align:center;font-size:12px;z-index:2}.cal-weekcol h3 b{display:block;font-size:20px;margin-top:4px}.week-event{border:1px solid color-mix(in srgb,var(--event-color,var(--cal-accent)) 40%,transparent);border-left:3px solid var(--event-color,var(--cal-accent));background:color-mix(in srgb,var(--event-color,var(--cal-accent)) 12%,transparent);padding:8px;margin-bottom:6px;font-size:9px;cursor:pointer}.week-event time{display:block;color:var(--cal-muted);margin-top:4px}.cal-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px max(18px,env(safe-area-inset-right)) var(--safe-bottom) max(18px,env(safe-area-inset-left));border-top:1px solid var(--cal-line);background:color-mix(in srgb,var(--cal-bg) 94%,transparent);backdrop-filter:blur(14px)}.cal-today,.cal-viewtoggle button,.cal-add{min-height:44px;border:1px solid color-mix(in srgb,var(--cal-accent) 25%,transparent);background:rgba(255,255,255,.025);padding:0 15px;font:600 10px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}.cal-viewtoggle{display:flex}.cal-viewtoggle button{padding:0 12px}.cal-viewtoggle button+button{border-left:0}.cal-viewtoggle .is-on{color:var(--cal-accent);background:var(--cal-soft)}.cal-add{width:44px;padding:0;font-size:22px;color:var(--cal-accent)}.cal-checkoutbar{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:11px max(20px,env(safe-area-inset-right)) 12px max(20px,env(safe-area-inset-left));border-top:1px solid var(--cal-line);background:rgba(0,0,0,.18)}.checkout-progress span{display:block;color:var(--cal-muted);font-size:10px}.checkout-progress b{font-size:13px;color:var(--cal-accent)}.checkout-continue{min-height:48px;border:1px solid var(--cal-accent);background:var(--cal-accent);color:var(--cal-bg);padding:0 19px;font:700 10px/1 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}.checkout-continue:disabled{opacity:.35}.planner{border-bottom:1px solid var(--cal-line);padding:9px max(20px,env(safe-area-inset-right)) 11px max(20px,env(safe-area-inset-left));display:grid;gap:9px}.planner-row{display:flex;gap:7px;overflow:auto;scrollbar-width:none}.planner-row::-webkit-scrollbar{display:none}.planner-chip{min-height:36px;white-space:nowrap;border:1px solid color-mix(in srgb,var(--cal-accent) 24%,transparent);background:transparent;padding:0 12px;font:600 9px/1 ui-monospace,monospace;letter-spacing:.11em;text-transform:uppercase}.planner-chip.is-on{background:var(--cal-accent);color:var(--cal-bg)}.planner-copy{font-size:10px;line-height:1.45;color:var(--cal-muted);margin:0}.cal-sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));backdrop-filter:blur(5px);overscroll-behavior:contain}.cal-sheet[hidden]{display:none}.cal-sheet-card{width:min(680px,calc(100vw - 36px));max-height:min(82dvh,780px);overflow:auto;background:color-mix(in srgb,var(--cal-bg) 94%,white 6%);border:1px solid color-mix(in srgb,var(--cal-accent) 30%,transparent);padding:18px max(20px,env(safe-area-inset-right)) max(18px,calc(var(--safe-bottom) + 4px)) max(20px,env(safe-area-inset-left));box-shadow:0 24px 70px rgba(0,0,0,.55);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.sheet-grip{width:48px;height:3px;background:var(--cal-muted);opacity:.45;margin:3px auto 20px}.cal-sheet-card h2{margin:0 0 7px;font-size:26px}.sheet-copy{color:var(--cal-muted);font-size:12px;line-height:1.6}.cal-form label{display:grid;gap:7px;margin:13px 0;color:var(--cal-muted);font:600 9px/1.2 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}.cal-form input,.cal-form select,.cal-form textarea{width:100%;background:rgba(0,0,0,.22);border:1px solid color-mix(in srgb,var(--cal-accent) 25%,transparent);color:#fff;padding:13px;border-radius:0}.sheet-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}.sheet-btn{min-height:45px;border:1px solid color-mix(in srgb,var(--cal-accent) 33%,transparent);background:transparent;color:#fff;padding:0 17px;font:650 9px/1 ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}.sheet-btn.is-primary{background:var(--cal-accent);color:var(--cal-bg)}.sheet-btn.is-danger{border-color:rgba(206,91,80,.6);color:#efaaa2}.slot-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:7px;margin:14px 0}.slot{min-height:44px;border:1px solid color-mix(in srgb,var(--cal-accent) 27%,transparent);background:transparent;font-size:11px}.slot.is-on{background:var(--cal-accent);color:var(--cal-bg)}.slot.is-conflict{border-color:rgba(205,112,94,.55);color:#d9aaa1}.disclosure{border-left:2px solid var(--cal-accent);padding:10px 12px;background:var(--cal-soft);font-size:11px;color:var(--cal-muted);line-height:1.55}.cal-toast{position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 70px);z-index:120;transform:translate(-50%,20px);opacity:0;pointer-events:none;width:min(88vw,480px);padding:12px 16px;background:#f5eee3;color:#111;font-size:12px;text-align:center;transition:.2s}.cal-toast.is-on{transform:translate(-50%,0);opacity:1}.login-card{max-width:500px;margin:auto}.login-card input{font-size:17px}.event-gold{--event-color:var(--cal-accent)}.event-blue{--event-color:#65a9d8}.event-green{--event-color:#70b88a}.event-white{--event-color:#fff}@media(max-width:640px){.cal-detail{padding-bottom:13px}.cal-detail-date{font-size:25px}.cal-day{min-height:72px;padding-left:2px;padding-right:2px}.cal-num{width:25px;height:25px;font-size:12px}.cal-event-chip{font-size:0;height:5px;border:0;border-radius:2px;background:var(--event-color,var(--cal-accent));opacity:.7}.cal-more{display:none}.cal-head h1{font-size:34px}.cal-head{padding-top:12px}.cal-iconbtn{width:42px;height:42px}.calendar.is-checkout .cal-head{padding-left:76px}.planner{padding-top:5px}.cal-checkoutbar{grid-template-columns:1fr auto}.checkout-continue{padding:0 12px}}@media(min-width:900px){.cal-monthgrid{max-width:1200px;margin:auto;width:100%}.cal-weekdays{padding-left:max(0px,calc((100% - 1200px)/2));padding-right:max(0px,calc((100% - 1200px)/2))}.cal-detail-list{max-width:1200px}.cal-sheet{align-items:center;justify-content:center;padding:30px}.cal-sheet-card{max-width:620px;border-bottom:1px solid color-mix(in srgb,var(--cal-accent) 30%,transparent)}}@media(prefers-reduced-motion:reduce){.fobeam__bars i,.cal-loadstate i{animation:none!important}.fobeam__diamond{transition:none}}
+
+
+/* ══ v353 — MAH CALENDAR / PAYMENT CALENDAR VISUAL UNIFICATION ═══════════
+   Calendar typography and geometry now follow the compact tracker language.
+   FOBEAMs are intentionally independent from playback: one small node travels
+   a fixed ~96px total range at a constant cadence while music continues in the
+   parent tracker unchanged. */
+.calendar:not(.is-checkout){grid-template-rows:minmax(112px,14fr) minmax(0,86fr)}
+.cal-detail{padding:calc(var(--safe-top) + 44px) max(20px,env(safe-area-inset-right)) 10px max(20px,env(safe-area-inset-left));text-align:center;align-content:center;justify-items:center}
+.cal-detail-date{font-size:clamp(22px,5.6vw,36px);font-weight:600;letter-spacing:-.025em;margin:3px 0 7px}
+.cal-detail-list{width:100%;justify-content:center}
+.cal-detail-card{min-width:min(300px,78vw);text-align:center;grid-template-columns:3px minmax(0,1fr);padding:9px 11px}
+.cal-detail-empty{margin:0 auto;max-width:58ch;font-size:11px;line-height:1.38;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.cal-loadstate b,.cal-kicker{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:600;letter-spacing:.22em}
+.cal-fixed-nav{left:max(12px,env(safe-area-inset-left));top:var(--safe-top)}
+.cal-back,.cal-iconbtn{width:36px;height:36px}
+.cal-back svg,.cal-iconbtn svg{width:16px;height:16px;stroke-width:1.6}
+.calendar.is-checkout .cal-stage{padding-top:var(--safe-top)}
+.cal-head{display:block;text-align:center;padding:9px max(56px,env(safe-area-inset-right)) 5px max(56px,env(safe-area-inset-left))}
+.cal-head-copy{display:grid;justify-items:center;gap:3px}
+.cal-head .cal-kicker{display:block;text-align:center;line-height:1.35}
+.cal-month-nav{width:100%;justify-content:center;gap:7px;min-width:0}
+.cal-month-nav h1{margin:0;min-width:0;font-size:clamp(28px,7vw,46px);font-weight:600;line-height:1;letter-spacing:-.035em;text-align:center}
+.cal-month-nav button{padding:3px 7px;color:var(--cal-muted);font-size:23px;line-height:1;min-width:30px}
+.cal-month-nav b{min-width:42px;font-family:"Space Grotesk",system-ui,sans-serif;font-size:9px;font-weight:600;letter-spacing:.16em}
+.fobeam{height:16px;margin:0 max(18px,env(safe-area-inset-right)) 1px max(18px,env(safe-area-inset-left));opacity:.72}
+.fobeam__rail{top:8px;height:1px}
+.fobeam__bars{display:none!important}
+.fobeam__diamond{width:6px;height:6px;top:5px;left:calc(50% - 48px);transform:rotate(45deg);transition:none;animation:cal-beam-sway calc(120s/var(--cal-bpm,120)) ease-in-out infinite;box-shadow:0 0 9px color-mix(in srgb,var(--cal-accent) 42%,transparent)}
+@keyframes cal-beam-sway{0%,100%{left:calc(50% - 48px)}50%{left:calc(50% + 48px)}}
+.cal-gridwrap{padding:0 max(10px,env(safe-area-inset-right)) 1px max(10px,env(safe-area-inset-left))}
+.cal-gridwrap--month{display:grid;grid-template-rows:auto minmax(0,1fr);overflow:hidden}
+.cal-gridwrap--month .cal-monthgrid{height:100%;min-height:0;grid-template-rows:repeat(6,minmax(0,1fr))}
+.cal-weekdays{position:relative;top:auto}
+.cal-weekdays span{padding:6px 0 7px;font-family:"Space Grotesk",system-ui,sans-serif;font-size:9px;font-weight:600;letter-spacing:.12em}
+.cal-day{min-height:0;padding:5px 4px;text-align:center}
+.cal-num{width:27px;height:27px;margin:0 auto 3px;font-size:13px;font-weight:550}
+.cal-events{text-align:center}
+.cal-event-chip{border-left-width:1px;padding:1px 2px;font-size:7px;text-align:center}
+.cal-more{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:500;text-align:center}
+.cal-weekcol{text-align:center}
+.cal-weekcol h3{top:0;font-weight:500}
+.cal-weekcol h3 b{font-weight:600}
+.week-event{text-align:center;border-left-width:1px;font-weight:500}
+.cal-toolbar{padding:8px max(16px,env(safe-area-inset-right)) var(--safe-bottom) max(16px,env(safe-area-inset-left))}
+.cal-today,.cal-viewtoggle button,.cal-add{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:600;letter-spacing:.12em}
+.planner{padding:5px max(18px,env(safe-area-inset-right)) 8px max(18px,env(safe-area-inset-left));gap:7px;text-align:center}
+.planner-recurring{justify-self:center;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:25px;color:var(--cal-accent);font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.planner-recurring input{width:15px;height:15px;margin:0;accent-color:var(--cal-accent)}
+.planner-row{gap:7px;text-align:center}
+.planner-packages{justify-content:flex-start;scroll-padding-inline:1px}
+.planner-types{justify-content:center;overflow:visible}
+.planner-chip{min-height:34px;padding:0 11px;font-family:"Space Grotesk",system-ui,sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;text-align:center}
+.planner-copy{max-width:680px;margin:0 auto;font-size:9.5px;line-height:1.35;text-align:center}
+.cal-checkoutbar{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:7px;padding:9px max(18px,env(safe-area-inset-right)) max(10px,var(--safe-bottom)) max(18px,env(safe-area-inset-left));text-align:center}
+.checkout-continue{width:min(520px,92%);min-height:44px;font-family:"Space Grotesk",system-ui,sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.15em}
+.checkout-progress{width:min(520px,92%);text-align:center}
+.checkout-progress b{display:block;font-size:11px;font-weight:500;line-height:1.35;color:var(--cal-accent)}
+.cal-sheet-card{text-align:center}
+.cal-form{text-align:left}
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:minmax(108px,14fr) minmax(0,86fr)}
+  .cal-head{padding-left:50px;padding-right:50px}
+  .cal-month-nav{gap:4px}
+  .cal-month-nav h1{font-size:30px}
+  .cal-month-nav b{min-width:39px;font-size:8.5px}
+  .planner{padding-left:12px;padding-right:12px}
+  .planner-chip{padding:0 10px;font-size:8.5px}
+  .planner-copy{font-size:9px}
+  .cal-day{padding:4px 2px}
+  .cal-num{width:25px;height:25px;font-size:12px}
+  .cal-event-chip{font-size:6.8px}
+}
+@media(max-height:720px){
+  .calendar:not(.is-checkout){grid-template-rows:minmax(100px,13fr) minmax(0,87fr)}
+  .cal-detail-empty{font-size:10px}
+  .cal-head{padding-top:5px}
+  .planner-copy{display:none}
+  .planner-chip{min-height:31px}
+  .cal-toolbar{padding-top:6px}
+}
+@media(prefers-reduced-motion:reduce){.fobeam__diamond{animation:none;left:50%;transform:translateX(-50%) rotate(45deg)}}
+
+/* ══ v354 — CALENDAR APP POLISH ═══════════════════════════════════════════
+   Mirrors the MAH Tracker / Meal Log visual language. Calendar beam motion is
+   intentionally constant and independent of either audio transport. */
+.cal-fixed-actions{position:fixed;right:max(12px,env(safe-area-inset-right));top:var(--safe-top);z-index:55;display:flex}
+.cal-themeplay{width:36px;height:36px;display:grid;place-items:center;padding:0;border:1px solid color-mix(in srgb,var(--cal-accent) 30%,transparent);background:color-mix(in srgb,var(--cal-bg) 90%,#000 10%);color:var(--cal-accent);box-shadow:inset 0 0 13px color-mix(in srgb,var(--cal-accent) 4%,transparent);cursor:pointer}
+.cal-themeplay svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.cal-themeplay svg path[d^="M8 5l"]{fill:currentColor;stroke:none}
+.cal-themeplay[data-playing="1"]{background:color-mix(in srgb,var(--cal-accent) 9%,var(--cal-bg));box-shadow:0 0 12px color-mix(in srgb,var(--cal-accent) 15%,transparent),inset 0 0 12px color-mix(in srgb,var(--cal-accent) 8%,transparent)}
+.cal-head{padding-top:8px!important;padding-bottom:5px!important}
+.cal-head-copy{width:100%;display:grid;justify-items:center;gap:4px}
+.cal-month-nav{display:grid!important;grid-template-columns:34px minmax(0,auto) 34px;align-items:center;justify-content:center!important;column-gap:9px;width:100%}
+.cal-month-stack{display:grid;justify-items:center;align-items:center;gap:4px;min-width:min(52vw,260px)}
+.cal-month-stack h1{margin:0!important;text-align:center;font-size:clamp(30px,7vw,46px)!important;font-weight:500!important;line-height:.94!important;letter-spacing:-.035em!important}
+.cal-month-stack b{min-width:0!important;font-family:"Space Grotesk",system-ui,sans-serif!important;font-size:9px!important;font-weight:600!important;line-height:1!important;letter-spacing:.20em!important;color:var(--cal-accent)!important;text-align:center}
+.cal-month-nav button{min-width:34px!important;padding:4px!important;font-family:"Space Grotesk",system-ui,sans-serif;font-weight:400;color:var(--cal-muted);font-size:24px!important}
+.fobeam__diamond{animation:cal-beam-sway calc(240s/var(--cal-bpm,120)) ease-in-out infinite!important}
+.cal-detail{background:linear-gradient(180deg,color-mix(in srgb,var(--cal-accent) 2%,transparent),transparent);text-align:center}
+.cal-detail-date{font-weight:500!important;letter-spacing:-.02em!important}
+.cal-detail-card{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:400;background:color-mix(in srgb,var(--cal-accent) 3%,transparent);border-color:color-mix(in srgb,var(--event-color,var(--cal-accent)) 25%,transparent);box-shadow:0 0 16px color-mix(in srgb,var(--event-color,var(--cal-accent)) 5%,transparent),inset 0 0 15px rgba(255,255,255,.008)}
+.cal-detail-card b{font-weight:600!important}.cal-detail-card span{font-weight:400}
+.cal-day.has-events{background:radial-gradient(circle at 50% 15%,color-mix(in srgb,var(--cal-accent) 7%,transparent),transparent 58%);box-shadow:inset 0 0 17px color-mix(in srgb,var(--cal-accent) 4%,transparent)}
+.cal-day.has-events .cal-num{text-shadow:0 0 9px color-mix(in srgb,var(--cal-accent) 25%,transparent)}
+.cal-event-chip{display:grid!important;grid-template-columns:2px minmax(0,1fr);align-items:center;gap:3px;border-left:0!important;background:color-mix(in srgb,var(--event-color,var(--cal-accent)) 9%,transparent)!important;box-shadow:0 0 8px color-mix(in srgb,var(--event-color,var(--cal-accent)) 8%,transparent);padding:1px 2px!important}
+.cal-event-chip i,.week-event>i{display:block;width:2px;height:74%;min-height:4px;background:var(--event-color,var(--cal-accent));box-shadow:0 0 7px color-mix(in srgb,var(--event-color,var(--cal-accent)) 35%,transparent)}
+.cal-event-chip span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-weekcol.has-events{background:linear-gradient(180deg,color-mix(in srgb,var(--cal-accent) 5%,transparent),transparent 42%);box-shadow:inset 0 0 18px color-mix(in srgb,var(--cal-accent) 3%,transparent)}
+.week-event{display:grid;grid-template-columns:2px minmax(0,1fr);gap:4px;align-items:center;border-left:1px solid color-mix(in srgb,var(--event-color,var(--cal-accent)) 38%,transparent)!important;box-shadow:0 0 10px color-mix(in srgb,var(--event-color,var(--cal-accent)) 7%,transparent)}
+.week-event>i{grid-row:1/3}.week-event>b,.week-event>time{grid-column:2}.week-event>b{font-weight:600}.week-event time{margin-top:0!important}
+
+/* Sheets are centered tracker-style instruments rather than a full-screen form. */
+.cal-sheet{align-items:center!important;justify-content:center!important;padding:max(18px,var(--safe-top)) max(14px,env(safe-area-inset-right)) max(18px,var(--safe-bottom)) max(14px,env(safe-area-inset-left))!important;background:rgba(3,5,7,.78)!important;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.cal-sheet-card{width:min(92vw,590px)!important;max-height:calc(100dvh - max(36px,calc(var(--safe-top) + var(--safe-bottom))))!important;border:1px solid color-mix(in srgb,var(--cal-accent) 30%,transparent)!important;background:color-mix(in srgb,var(--cal-bg) 95%,#171a1e 5%)!important;padding:22px clamp(18px,5vw,34px) max(22px,var(--safe-bottom))!important;box-shadow:0 26px 85px rgba(0,0,0,.62),0 0 24px color-mix(in srgb,var(--cal-accent) 4%,transparent),inset 0 1px 0 color-mix(in srgb,var(--cal-accent) 8%,transparent)!important;overflow:auto;text-align:center}
+.sheet-grip{width:34px!important;height:1px!important;margin:0 auto 20px!important;background:var(--cal-accent)!important;opacity:.35!important}
+.cal-sheet-heading{display:grid;justify-items:center;gap:8px;margin:0 auto 18px;max-width:470px;text-align:center}
+.cal-sheet-heading .cal-kicker{font-family:"Space Grotesk",system-ui,sans-serif;font-size:9px;font-weight:600;line-height:1.2;letter-spacing:.24em}
+.cal-sheet-heading h2,.cal-sheet-card>h2{margin:0!important;font-family:"Space Grotesk",system-ui,sans-serif;font-size:clamp(25px,6vw,35px)!important;font-weight:500!important;line-height:1.02!important;letter-spacing:-.025em!important;text-align:center}
+.sheet-copy{margin:0 auto;color:var(--cal-muted)!important;font-family:"Space Grotesk",system-ui,sans-serif;font-size:11px!important;font-weight:400;line-height:1.55!important;text-align:center;max-width:48ch}
+.cal-form{display:grid;gap:13px;text-align:center!important}
+.cal-form label{display:grid!important;gap:7px!important;margin:0!important;color:var(--cal-muted)!important;font-family:"Space Grotesk",system-ui,sans-serif!important;font-size:9px!important;font-weight:600!important;line-height:1.2!important;letter-spacing:.15em!important;text-align:center;text-transform:uppercase}
+.cal-form input,.cal-form select,.cal-form textarea{border:1px solid color-mix(in srgb,var(--cal-accent) 25%,transparent)!important;background:color-mix(in srgb,var(--cal-bg) 92%,#000 8%)!important;color:#f2f0eb!important;border-radius:0!important;padding:12px 13px!important;font-family:"Space Grotesk",system-ui,sans-serif!important;font-size:13px!important;font-weight:400!important;text-align:center!important;outline:none;box-shadow:inset 0 0 14px rgba(0,0,0,.12)}
+.cal-form input:focus,.cal-form select:focus,.cal-form textarea:focus{border-color:color-mix(in srgb,var(--cal-accent) 66%,transparent)!important;box-shadow:0 0 10px color-mix(in srgb,var(--cal-accent) 7%,transparent)}
+.cal-form textarea{resize:vertical;min-height:82px;line-height:1.45}
+.cal-form select{text-align-last:center}
+.cal-check{grid-template-columns:auto auto!important;justify-content:center;align-items:center;gap:10px!important;min-height:34px}
+.cal-check input{width:17px!important;height:17px!important;margin:0!important;padding:0!important;accent-color:var(--cal-accent);box-shadow:none!important}
+.cal-check span{color:var(--cal-muted)}
+.cal-timegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sheet-actions{justify-content:center!important;align-items:center!important;margin-top:5px!important;gap:9px!important}
+.sheet-actions.is-centered{justify-content:center!important}
+.sheet-btn{min-width:118px;min-height:43px!important;border-color:color-mix(in srgb,var(--cal-accent) 31%,transparent)!important;font-family:"Space Grotesk",system-ui,sans-serif!important;font-size:9px!important;font-weight:600!important;letter-spacing:.15em!important}
+.sheet-btn.is-primary{background:var(--cal-accent)!important;color:var(--cal-bg)!important;border-color:var(--cal-accent)!important}
+.disclosure{margin:13px auto;border-left:0!important;border-top:1px solid color-mix(in srgb,var(--cal-accent) 22%,transparent);border-bottom:1px solid color-mix(in srgb,var(--cal-accent) 12%,transparent);background:color-mix(in srgb,var(--cal-accent) 4%,transparent)!important;padding:11px 12px!important;text-align:center;font-size:10px!important;line-height:1.5!important}
+.cal-summary-list{display:grid;gap:8px;margin:14px 0}
+.cal-summary-event{width:100%;display:grid;grid-template-columns:3px minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 13px;border:1px solid color-mix(in srgb,var(--event-color,var(--cal-accent)) 27%,transparent);background:color-mix(in srgb,var(--event-color,var(--cal-accent)) 4%,transparent);color:#f4f1eb;text-align:left;box-shadow:0 0 13px color-mix(in srgb,var(--event-color,var(--cal-accent)) 6%,transparent);cursor:pointer}
+.cal-summary-event>i{height:100%;min-height:38px;background:var(--event-color,var(--cal-accent));box-shadow:0 0 9px color-mix(in srgb,var(--event-color,var(--cal-accent)) 38%,transparent)}
+.cal-summary-copy{display:grid;gap:2px;min-width:0}.cal-summary-copy small{color:var(--event-color,var(--cal-accent));font-size:8px;font-weight:600;letter-spacing:.15em}.cal-summary-copy b{font-size:13px;font-weight:600}.cal-summary-copy span{font-size:10px;font-weight:400;color:var(--cal-muted)}.cal-summary-event em{font-style:normal;color:var(--cal-muted);font-size:8px;font-weight:600;letter-spacing:.14em}
+.cal-event-detail{position:relative;margin:12px auto 15px;padding:15px;border:1px solid color-mix(in srgb,var(--event-color,var(--cal-accent)) 24%,transparent);background:color-mix(in srgb,var(--event-color,var(--cal-accent)) 4%,transparent);box-shadow:0 0 15px color-mix(in srgb,var(--event-color,var(--cal-accent)) 6%,transparent);text-align:center}
+.cal-event-detail>i{display:block;width:26px;height:2px;margin:0 auto 12px;background:var(--event-color,var(--cal-accent));box-shadow:0 0 9px color-mix(in srgb,var(--event-color,var(--cal-accent)) 40%,transparent)}
+.cal-event-detail p{margin:0 auto;color:#d7d6d2;font-size:11px;line-height:1.55;max-width:48ch}.cal-event-detail dl{display:grid;gap:9px;margin:15px 0 0}.cal-event-detail dl div{display:grid;gap:3px}.cal-event-detail dt{color:var(--event-color,var(--cal-accent));font-size:8px;font-weight:600;letter-spacing:.15em}.cal-event-detail dd{margin:0;color:var(--cal-muted);font-size:10.5px}
+.slot-list{margin:13px 0!important}.slot{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:500}.slot-conflict-title{margin-top:18px;text-align:center}
+
+/* Direct-calendar sign-in matches the MAH Tracker login panel. */
+.cal-loading.cal-login{min-height:100vh;min-height:100dvh;padding:22px;background:#0e1114}
+.cal-login-card{width:min(86vw,500px);margin:auto;border:1px solid rgba(233,201,143,.26);background:#14171b;padding:34px clamp(24px,5vw,36px);box-shadow:inset 0 1px 0 rgba(233,201,143,.03);text-align:left}
+.cal-loginbrand{color:var(--cal-accent);font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;margin-bottom:29px}.cal-loginkicker{color:var(--cal-muted);font-size:9px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;margin-bottom:11px}.cal-login-card h1{margin:0 0 9px;font-size:clamp(34px,8vw,48px);font-weight:500;letter-spacing:-.04em;line-height:1}.cal-login-card p{margin:0 0 23px;color:var(--cal-muted);font-size:15px;line-height:1.45}.cal-login-card form{display:grid;gap:12px}.cal-login-input{width:100%;min-height:56px;border:1px solid rgba(233,201,143,.25);background:#191c20;color:#eeeae2;padding:0 17px;font-size:16px;outline:none}.cal-login-input:focus{border-color:rgba(233,201,143,.6)}.cal-login-primary{min-height:58px;border:1px solid var(--cal-accent);background:var(--cal-accent);color:#0e1114;font-size:11px;font-weight:600;letter-spacing:.19em;text-transform:uppercase}.cal-login-error{min-height:16px;color:#d79b91;font-size:10px;text-align:center}
+
+@media(max-width:430px){
+  .cal-fixed-actions{right:max(12px,env(safe-area-inset-right))}
+  .cal-month-stack{min-width:min(48vw,205px)}
+  .cal-month-stack h1{font-size:29px!important}
+  .cal-timegrid{grid-template-columns:1fr}
+  .cal-sheet-card{width:94vw!important;padding:20px 17px max(20px,var(--safe-bottom))!important}
+  .cal-summary-event{grid-template-columns:3px minmax(0,1fr);}.cal-summary-event em{display:none}
+  .cal-login-card{width:min(90vw,500px);padding:31px 24px}
+}
+@media(prefers-reduced-motion:reduce){.fobeam__diamond{animation:none!important;left:50%!important;transform:translateX(-50%) rotate(45deg)!important}}
+
+/* ══ v355 — calendar geometry + event-channel refinement ═══════════════════
+   Visual-only calendar pass: exact centre axes, cleaner month markers, a
+   week-level add affordance, and the expanded personal-event palette. */
+.event-orange{--event-color:#f28a46}
+.event-purple{--event-color:#9b7ae6}
+.event-yellow{--event-color:#f1d35d}
+.event-beige{--event-color:#d8c5a2}
+
+/* The member title now lives in the selected-day panel. It is deliberately
+   larger than the old kicker, but keeps the tracker/log letter spacing. */
+.cal-detail-brand{
+  display:block;
+  font-size:13px!important;
+  line-height:1!important;
+  letter-spacing:.22em!important;
+  margin:0 0 13px;
+}
+.cal-detail-date{margin:0 0 10px!important}
+
+/* Removing the duplicate MAH CALENDAR line must not pull the year upward.
+   Preserve the old header footprint, then lift only the month word. */
+.calendar:not(.is-checkout) .cal-head-copy{padding-top:15px}
+.calendar:not(.is-checkout) .cal-month-stack h1{transform:translateY(-7px)}
+
+/* Payment header: one true centre line from copy -> month -> year -> beam. */
+.cal-head--checkout{padding-left:max(56px,env(safe-area-inset-left))!important;padding-right:max(56px,env(safe-area-inset-right))!important}
+.cal-head--checkout .cal-head-copy{width:100%;max-width:660px;margin:0 auto;gap:9px!important}
+.cal-payment-kicker{margin:0 0 2px;line-height:1.35!important}
+.cal-head--checkout .cal-month-nav{display:grid!important;grid-template-columns:40px minmax(170px,260px) 40px!important;justify-content:center!important;align-items:center!important;column-gap:10px!important;width:100%!important;margin:0 auto}
+.cal-head--checkout .cal-month-stack{gap:8px!important;min-width:0!important}
+.cal-head--checkout .cal-month-nav button{justify-self:center;width:40px}
+
+/* A rotated square is positioned by its centre, not its left edge. This makes
+   the 96px east/west travel mathematically symmetric around the page axis. */
+.fobeam__diamond{transform:translateX(-50%) rotate(45deg)!important}
+@keyframes cal-beam-sway{0%,100%{left:calc(50% - 48px)}50%{left:calc(50% + 48px)}}
+
+/* Month = color channels only. Detail belongs in Week and the event sheet. */
+.cal-monthgrid .cal-events{gap:3px;padding:0 3px}
+.cal-monthgrid .cal-event-chip{
+  display:block!important;
+  width:100%!important;
+  height:4px!important;
+  min-height:4px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:var(--event-color,var(--cal-accent))!important;
+  box-shadow:0 0 7px color-mix(in srgb,var(--event-color,var(--cal-accent)) 30%,transparent)!important;
+  opacity:.78;
+  overflow:hidden
+}
+.cal-monthgrid .cal-event-chip i,.cal-monthgrid .cal-event-chip span{display:none!important}
+
+/* Week view gets the roomier event language plus a day-specific add button. */
+.cal-weekhead{position:sticky;top:0;z-index:4;display:grid;justify-items:center;gap:5px;margin:0 -8px 9px;padding:8px 5px 7px;background:color-mix(in srgb,var(--cal-bg) 96%,transparent);backdrop-filter:blur(8px)}
+.cal-weekcol h3{position:static!important;top:auto!important;margin:0!important;padding:0!important;background:transparent!important;font-weight:500}
+.cal-week-add{width:27px;height:27px;display:grid;place-items:center;padding:0;border:1px solid color-mix(in srgb,var(--cal-accent) 28%,transparent);background:transparent;color:var(--cal-accent);font-size:17px;line-height:1;cursor:pointer}
+.week-event{grid-template-columns:2px minmax(0,1fr)!important;align-items:start!important;text-align:left!important;padding:9px 8px!important}
+.week-event>i{grid-column:1;grid-row:1;height:100%!important;min-height:34px!important}
+.week-event>span{grid-column:2;display:grid;gap:3px;min-width:0}
+.week-event>span>b{font-size:10px;font-weight:600;line-height:1.25;overflow:hidden;text-overflow:ellipsis}
+.week-event>span>time{font-size:8px;line-height:1.2;color:var(--cal-muted);margin:0!important}
+
+/* Personal event editor: one symmetric instrument panel. No decorative left
+   rail or asymmetric field treatment is allowed inside this sheet. */
+.cal-event-editor .cal-sheet-card{width:min(92vw,560px)!important;padding-left:clamp(20px,5vw,34px)!important;padding-right:clamp(20px,5vw,34px)!important}
+.cal-event-editor .cal-form{width:100%;max-width:500px;margin:0 auto;justify-items:stretch}
+.cal-event-editor .cal-form label,.cal-event-editor .cal-timegrid{width:100%;margin-left:auto!important;margin-right:auto!important}
+.cal-event-editor .cal-form input,.cal-event-editor .cal-form select,.cal-event-editor .cal-form textarea{border-width:1px!important;border-style:solid!important;border-left-width:1px!important;border-right-width:1px!important;background-image:none!important;box-shadow:inset 0 0 14px rgba(0,0,0,.12)!important}
+.cal-event-editor .sheet-actions{width:100%;justify-content:center!important}
+
+@media(max-width:430px){
+  .cal-detail-brand{font-size:12px!important;margin-bottom:11px}
+  .calendar:not(.is-checkout) .cal-head-copy{padding-top:13px}
+  .calendar:not(.is-checkout) .cal-month-stack h1{transform:translateY(-6px)}
+  .cal-head--checkout .cal-month-nav{grid-template-columns:34px minmax(150px,205px) 34px!important;column-gap:7px!important}
+  .cal-payment-kicker{font-size:9px!important;letter-spacing:.19em!important}
+}
+
+
+/* ══ v356 — persistent four-button audio dock ═════════════════════════════
+   Same two paired controls used by MAH Tracker / MAH Log. Kept compact in
+   the upper-right dead space so calendar geometry stays centered. */
+.cal-fixed-actions{
+  right:max(12px,env(safe-area-inset-right))!important;
+  top:var(--safe-top)!important;
+  z-index:58!important;
+  display:block!important;
+  width:132px;
+  pointer-events:auto
+}
+.cal-audio-controls{display:grid;gap:5px;width:100%}
+.cal-audio-row{display:grid;grid-template-columns:42px 1fr;align-items:center;gap:5px;min-width:0}
+.cal-audio-row>b{font:600 7.5px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.14em;color:var(--cal-muted);text-align:right}
+.cal-audio-row>span{display:grid;grid-template-columns:repeat(2,34px);gap:5px;justify-content:end}
+.cal-audio-btn,.cal-themeplay{
+  width:34px!important;height:34px!important;min-width:34px;padding:0!important;
+  display:grid!important;place-items:center;border:1px solid color-mix(in srgb,var(--cal-accent) 29%,transparent)!important;
+  background:color-mix(in srgb,var(--cal-bg) 92%,#000 8%)!important;color:var(--cal-accent)!important;
+  box-shadow:inset 0 0 12px rgba(0,0,0,.17)!important;cursor:pointer
+}
+.cal-audio-btn svg,.cal-themeplay svg{width:15px!important;height:15px!important;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.cal-audio-btn svg path[d^="M8 5l"],.cal-themeplay svg path[d^="M8 5l"]{fill:currentColor;stroke:none}
+.cal-audio-btn[data-playing="1"],.cal-themeplay[data-playing="1"]{background:color-mix(in srgb,var(--cal-accent) 8%,var(--cal-bg))!important;box-shadow:0 0 10px color-mix(in srgb,var(--cal-accent) 12%,transparent),inset 0 0 12px color-mix(in srgb,var(--cal-accent) 5%,transparent)!important}
+@media(max-width:430px){
+  .cal-fixed-actions{width:116px;right:max(9px,env(safe-area-inset-right))!important}
+  .cal-audio-row{grid-template-columns:36px 1fr;gap:4px}
+  .cal-audio-row>b{font-size:6.7px;letter-spacing:.10em}
+  .cal-audio-row>span{grid-template-columns:repeat(2,31px);gap:4px}
+  .cal-audio-btn,.cal-themeplay{width:31px!important;height:31px!important;min-width:31px}
+  .cal-audio-btn svg,.cal-themeplay svg{width:14px!important;height:14px!important}
+}
+
+/* v357 — fine-line mah player waveform glyph only. */
+.cal-audio-btn svg.cal-studio-wave{stroke-width:.88!important}
+
+/* ══ v358 — MAHFITT calendar portal + checkout lock + session aura ═══════════ */
+.calendar{
+  background:
+    radial-gradient(circle at 76% 8%,color-mix(in srgb,var(--cal-accent) 8%,transparent),transparent 28%),
+    radial-gradient(ellipse at 50% 43%,var(--cal-bg) 0 72%,color-mix(in srgb,var(--cal-bg) 86%,#000 14%) 100%)!important;
+}
+.cal-gridwrap{touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.cal-gridwrap button{-webkit-user-select:none;user-select:none}
+
+/* Shared editable MAHFITT mark. The PNG is an alpha mask, so every member
+   theme can recolor the complete waveform + beam + diamond + wordmark + tag. */
+.cal-mahfitt-home{display:grid;place-items:center;border:0;background:transparent;padding:0;color:var(--cal-accent);cursor:pointer;position:relative;z-index:2}
+.cal-mahfitt-mark{display:block;width:143px;height:38px;background:currentColor;-webkit-mask:url('/images/mahfitt-mark-mask.png') center/contain no-repeat;mask:url('/images/mahfitt-mark-mask.png') center/contain no-repeat}
+.cal-detail-logo{margin:0 auto 9px;justify-self:center}
+.cal-detail-brand{font-size:10.5px!important;letter-spacing:.205em!important;margin:0 0 10px!important}
+.cal-payment-logo{margin:0 auto 5px}
+.cal-detail-logo,.cal-payment-logo{transform:translateY(-6px)}
+.cal-payment-logo .cal-mahfitt-mark{width:136px;height:36px}
+
+/* SCHEDULE SESH is deliberately a mode control, not another navigation tab. */
+.cal-sesh-mode{height:36px;min-width:126px;padding:0 10px;border:1px solid color-mix(in srgb,var(--cal-accent) 26%,transparent);background:color-mix(in srgb,var(--cal-bg) 91%,transparent);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;gap:8px;color:var(--cal-muted);font:650 8px/1 ui-monospace,monospace;letter-spacing:.13em;white-space:nowrap;cursor:pointer}
+.cal-sesh-mode i{width:13px;height:13px;border:1px solid currentColor;display:block;position:relative;flex:none}
+.cal-sesh-mode.is-on{color:var(--cal-accent);background:color-mix(in srgb,var(--cal-accent) 7%,var(--cal-bg))}
+.cal-sesh-mode.is-on i::after{content:"";position:absolute;left:3.5px;top:2px;width:3.5px;height:6px;border-right:1.25px solid currentColor;border-bottom:1.25px solid currentColor;transform:rotate(45deg)}
+.calendar.is-schedule-mode .cal-detail::after{background:linear-gradient(105deg,transparent 45%,color-mix(in srgb,var(--cal-accent) 11%,transparent))}
+.calendar.is-schedule-mode .planner{background:color-mix(in srgb,var(--cal-accent) 1.5%,transparent)}
+
+/* Draft session blocks are intentionally more alive than personal events,
+   while remaining compact enough to preserve the calendar's reading order. */
+.draft-event{--event-color:var(--cal-accent)!important}
+.cal-monthgrid .cal-event-chip.draft-event{opacity:.96!important;height:5px!important;box-shadow:0 0 5px color-mix(in srgb,var(--cal-accent) 88%,transparent),0 0 15px color-mix(in srgb,var(--cal-accent) 42%,transparent)!important}
+.week-event.draft-event,.cal-detail-card.draft-event,.cal-summary-event.draft-event,.cal-event-detail.draft-event{border-color:color-mix(in srgb,var(--cal-accent) 58%,transparent)!important;background:linear-gradient(90deg,color-mix(in srgb,var(--cal-accent) 10%,transparent),color-mix(in srgb,var(--cal-accent) 3%,transparent))!important;box-shadow:0 0 18px color-mix(in srgb,var(--cal-accent) 14%,transparent),inset 0 0 18px color-mix(in srgb,var(--cal-accent) 4%,transparent)!important}
+
+/* Payment-route audio dock: theme playback is still live, everything else is
+   intentionally gated. A backdrop masks calendar glyphs that pass underneath. */
+.cal-fixed-actions{position:fixed!important}
+.calendar.is-checkout .cal-fixed-actions::before{content:"";position:absolute;inset:-5px -4px;z-index:-1;background:linear-gradient(90deg,color-mix(in srgb,var(--cal-bg) 90%,transparent),var(--cal-bg) 18%,var(--cal-bg));opacity:.97;pointer-events:none}
+.calendar.is-checkout .cal-audio-row{grid-template-columns:35px 1fr;gap:2px}
+.calendar.is-checkout .cal-audio-row>b{justify-self:end;margin-right:1px}
+.cal-audio-controls{position:relative}
+.cal-audio-btn.is-locked{color:color-mix(in srgb,var(--cal-muted) 82%,#777 18%)!important;border-color:rgba(150,154,160,.18)!important;background:color-mix(in srgb,var(--cal-bg) 94%,#777 6%)!important;filter:saturate(.15);cursor:pointer}
+.cal-audio-lockmark{position:absolute;z-index:4;left:33px;top:4px;width:70px;height:58px;display:grid;place-items:center;color:#a1a4a8;opacity:.38;pointer-events:none;filter:drop-shadow(0 0 4px rgba(0,0,0,.65))}
+.cal-audio-lockmark svg{width:50px;height:28px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+.cal-audio-lockmark rect{fill:color-mix(in srgb,var(--cal-bg) 82%,#777 18%)}
+.cal-sheet-x{position:absolute;right:15px;top:14px;width:36px;height:36px;border:1px solid color-mix(in srgb,var(--cal-accent) 28%,transparent);background:color-mix(in srgb,var(--cal-bg) 92%,#000 8%);color:var(--cal-accent);font-size:22px;line-height:1;z-index:2;cursor:pointer}
+.cal-sheet-card{position:relative}
+
+/* Checkout header is centered independent of the fixed audio dock. */
+.cal-head--checkout .cal-head-copy{max-width:590px!important;gap:7px!important}
+.cal-head--checkout .cal-payment-kicker{margin:1px auto 3px;max-width:230px}
+.cal-head--checkout .cal-month-stack{gap:9px!important}
+.cal-head--checkout .cal-month-stack h1{margin-top:3px!important}
+
+@media(max-width:560px){
+  .cal-fixed-nav{gap:6px}
+  .cal-sesh-mode{height:36px;min-width:108px;padding:0 7px;font-size:7px;letter-spacing:.09em;gap:6px}
+  .cal-sesh-mode i{width:12px;height:12px}
+  .cal-detail-logo .cal-mahfitt-mark{width:121px;height:32px}
+  .cal-payment-logo .cal-mahfitt-mark{width:117px;height:32px}
+  .cal-detail-brand{font-size:9.4px!important;margin-bottom:8px!important}
+  .calendar.is-checkout .cal-audio-row{grid-template-columns:31px 1fr;gap:2px}
+  .calendar.is-checkout .cal-audio-row>b{font-size:6.2px;letter-spacing:.075em}
+  .cal-audio-lockmark{left:27px;top:4px;width:65px;height:53px}
+  .cal-head--checkout .cal-payment-kicker{max-width:166px;font-size:8px!important;letter-spacing:.13em!important;white-space:nowrap}
+}
+/* v358 lock-mark refinement: the usable Theme play key must read as unlocked. */
+.cal-audio-lockmark{left:35px!important;top:2px!important;width:70px!important;height:30px!important;opacity:.42!important}
+
+/* v359 — the date weekday is gone; brand and controls use that space cleanly. */
+.cal-fixed-nav{flex-direction:column;align-items:flex-start;gap:6px}
+.calendar:not(.is-checkout){grid-template-rows:minmax(158px,18fr) minmax(0,82fr)}
+.calendar:not(.is-checkout) .cal-detail{padding-top:calc(var(--safe-top) + 76px)}
+.cal-detail-brand{font-size:9.8px!important;letter-spacing:.19em!important;margin-bottom:9px!important}
+.cal-detail-date{display:none!important}
+.cal-mahfitt-home{margin-inline:auto;justify-self:center}
+@media(max-width:560px){.cal-sesh-mode.is-on i::after{left:3px;top:2px;width:3px;height:5.5px}.cal-detail-brand{font-size:9px!important;letter-spacing:.17em!important}}
+.cal-audio-btn.is-locked{position:relative}
+.cal-audio-btn.is-locked::after{content:"";position:absolute;right:3px;bottom:3px;width:6px;height:5px;border:1px solid currentColor;border-radius:1px;opacity:.55}
+.cal-audio-btn.is-locked::before{content:"";position:absolute;right:4.5px;bottom:8px;width:3px;height:4px;border:1px solid currentColor;border-bottom:0;border-radius:3px 3px 0 0;opacity:.55}
+@media(max-width:560px){.cal-audio-lockmark{left:29px!important;top:2px!important;width:66px!important;height:27px!important}}
+
+/* ══ v361 — compact premium calendar masthead ═══════════════════════════════
+   The MAHFITT lockup now occupies the true top-centre dead space between the
+   navigation stack and PLAYER/THEME stack.  Event detail stays in the lower
+   part of the band, so only the masthead geometry changes. */
+.calendar:not(.is-checkout){grid-template-rows:minmax(126px,15fr) minmax(0,85fr)!important}
+.calendar:not(.is-checkout) .cal-detail{
+  padding:calc(var(--safe-top) + 68px) max(18px,env(safe-area-inset-right)) 9px max(18px,env(safe-area-inset-left))!important;
+  align-content:end!important;justify-items:center!important;
+  border-bottom:0!important;
+  background:
+    radial-gradient(ellipse 40% 95% at 50% 0,color-mix(in srgb,var(--cal-accent) 4.5%,transparent),transparent 73%),
+    linear-gradient(180deg,color-mix(in srgb,var(--cal-bg) 93%,#000 7%),color-mix(in srgb,var(--cal-bg) 98%,#000 2%))!important;
+  box-shadow:inset 1px 0 0 color-mix(in srgb,var(--cal-accent) 10%,transparent),inset -1px 0 0 color-mix(in srgb,var(--cal-accent) 10%,transparent),inset 0 1px 0 color-mix(in srgb,var(--cal-accent) 13%,transparent),inset 0 -1px 0 color-mix(in srgb,var(--cal-accent) 19%,transparent),0 12px 34px rgba(0,0,0,.16)
+}
+.cal-detail-brandlock{
+  position:absolute;z-index:4;left:50%;top:calc(var(--safe-top) + 1px);transform:translateX(-50%);
+  width:min(150px,38vw);display:grid;justify-items:center;align-content:start;gap:1px;pointer-events:auto
+}
+.cal-detail-brandlock .cal-detail-logo{margin:0!important;transform:none!important}
+.cal-detail-brandlock .cal-detail-brand{margin:0!important;font-size:9px!important;line-height:1!important;letter-spacing:.18em!important;white-space:nowrap}
+.calendar:not(.is-checkout) .cal-detail-list{align-self:end}
+.calendar:not(.is-checkout) .cal-detail-empty{align-self:end;max-width:52ch;font-size:9.5px;line-height:1.28;-webkit-line-clamp:1}
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:minmax(120px,15fr) minmax(0,85fr)!important}
+  .calendar:not(.is-checkout) .cal-detail{padding-top:calc(var(--safe-top) + 64px)!important}
+  .cal-detail-brandlock{width:min(130px,34vw)}
+  .cal-detail-brandlock .cal-mahfitt-mark{width:110px;height:30px}
+  .cal-detail-brandlock .cal-detail-brand{font-size:8.3px!important;letter-spacing:.16em!important}
+  .calendar:not(.is-checkout) .cal-detail-empty{font-size:8.7px}
+}
+@media(max-height:720px){
+  .calendar:not(.is-checkout){grid-template-rows:minmax(112px,14fr) minmax(0,86fr)!important}
+  .calendar:not(.is-checkout) .cal-detail{padding-top:calc(var(--safe-top) + 60px)!important}
+}
+
+
+/* ══ v362 — separated, compact MAH CALENDAR banner ═════════════════════════
+   The top band is identity + controls only. Event cards no longer sit behind
+   it. Geometry mirrors MAH GYM: a bounded rectangular surface with a clean
+   bottom edge and no hidden content. */
+.calendar:not(.is-checkout){grid-template-rows:minmax(104px,12fr) minmax(0,88fr)!important}
+.calendar:not(.is-checkout) .cal-detail{
+  padding:0!important;
+  min-height:104px!important;
+  align-content:center!important;
+  overflow:visible!important;
+  margin:0!important;
+  border:1px solid color-mix(in srgb,var(--cal-accent) 18%,transparent)!important;
+  border-left-color:color-mix(in srgb,var(--cal-accent) 15%,transparent)!important;
+  border-right-color:color-mix(in srgb,var(--cal-accent) 15%,transparent)!important;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cal-accent) 12%,transparent),inset 0 -1px 0 color-mix(in srgb,var(--cal-accent) 16%,transparent),0 10px 28px rgba(0,0,0,.14)!important;
+}
+.calendar:not(.is-checkout) .cal-detail-list,
+.calendar:not(.is-checkout) .cal-detail-empty{display:none!important}
+.cal-detail-brandlock{
+  top:calc(var(--safe-top) + 3px)!important;
+  width:min(150px,38vw)!important;
+  gap:5px!important;
+}
+.cal-detail-brandlock .cal-detail-brand{
+  transform:translateY(8px)!important;
+  color:var(--cal-muted)!important;
+}
+.cal-fixed-nav{top:calc(var(--safe-top) + 2px)!important;gap:5px!important}
+.cal-back{width:34px!important;height:34px!important}
+.cal-sesh-mode{height:34px!important;min-width:126px!important}
+.cal-fixed-actions{top:calc(var(--safe-top) + 2px)!important}
+.cal-audio-btn,.cal-themeplay{height:34px!important}
+/* Theme pair gets the exact same translucent interior language as Player. */
+.cal-audio-row:last-child .cal-audio-btn,
+.cal-audio-row:last-child .cal-themeplay{
+  background:rgba(255,255,255,.025)!important;
+  box-shadow:inset 0 0 12px color-mix(in srgb,var(--cal-accent) 3%,transparent)!important;
+}
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:minmax(98px,12fr) minmax(0,88fr)!important}
+  .calendar:not(.is-checkout) .cal-detail{min-height:98px!important}
+  .cal-back{width:31px!important;height:31px!important}
+  .cal-sesh-mode{height:31px!important;min-width:108px!important}
+  .cal-detail-brandlock{top:calc(var(--safe-top) + 1px)!important}
+  .cal-detail-brandlock .cal-detail-brand{transform:translateY(7px)!important}
+}
+
+/* Personal calendar editor: one even visual system. Secondary captions,
+   uniform field containers, and datetime controls that can never overflow. */
+.cal-event-editor .cal-sheet-card{
+  width:min(92vw,560px)!important;
+  padding:24px clamp(20px,5vw,34px) max(24px,var(--safe-bottom))!important;
+}
+.cal-event-editor .cal-sheet-heading{margin-bottom:20px!important}
+.cal-event-editor .cal-sheet-heading .cal-kicker,
+.cal-event-editor .cal-form label{color:var(--cal-accent)!important}
+.cal-event-editor .sheet-copy{color:color-mix(in srgb,var(--cal-accent) 58%,var(--cal-muted))!important}
+.cal-event-editor .cal-form{gap:15px!important;max-width:500px!important}
+.cal-event-editor .cal-form label{gap:8px!important;min-width:0!important}
+.cal-event-editor .cal-timegrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;min-width:0!important}
+.cal-event-editor .cal-timegrid label{min-width:0!important}
+.cal-event-editor .cal-form input,
+.cal-event-editor .cal-form select,
+.cal-event-editor .cal-form textarea{
+  min-width:0!important;max-width:100%!important;width:100%!important;
+  min-height:54px!important;
+  border-color:color-mix(in srgb,var(--cal-accent) 30%,transparent)!important;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--cal-bg) 91%,#fff 9%),color-mix(in srgb,var(--cal-bg) 96%,#000 4%))!important;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cal-accent) 5%,transparent),inset 0 0 16px rgba(0,0,0,.16)!important;
+  box-sizing:border-box!important;
+}
+.cal-event-editor .cal-form textarea{min-height:108px!important}
+.cal-event-editor .cal-form input[type="datetime-local"]{-webkit-appearance:none!important;appearance:none!important;font-size:12px!important;padding-inline:10px!important}
+.cal-event-editor .cal-check{min-height:42px!important}
+@media(max-width:520px){
+  .cal-event-editor .cal-timegrid{grid-template-columns:1fr!important;gap:14px!important}
+  .cal-event-editor .cal-sheet-card{width:94vw!important;padding-left:18px!important;padding-right:18px!important}
+}
+
+
+/* ══ v364 — schedule guidance + whole-stage scroll ═════════════════════════
+   Scheduling is a short guided flow: date → time → complete package.  The
+   instruction deliberately inherits the same compact Secondary-color language
+   as RECURRING, and the schedule stage itself can move vertically so the month
+   heading, full calendar and checkout guidance remain reachable as one surface. */
+.planner-instruction{
+  max-width:650px;margin:0 auto;color:var(--cal-accent);text-align:center;
+  font-size:9px;font-weight:600;line-height:1.45;letter-spacing:.14em;
+  text-transform:uppercase
+}
+.calendar.is-schedule-mode .cal-stage{
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none
+}
+.calendar.is-schedule-mode .cal-stage::-webkit-scrollbar{display:none}
+.calendar.is-schedule-mode .cal-gridwrap--month{
+  min-height:clamp(500px,56dvh,640px);
+  overflow:hidden
+}
+@media(max-width:430px){
+  .planner-instruction{font-size:8.5px;letter-spacing:.12em;line-height:1.42;padding:0 5px}
+  .calendar.is-schedule-mode .cal-gridwrap--month{min-height:500px}
+}
+
+/* ══ v365 — pinpoint masthead + synchronous opposed FOBEAM ═════════════════
+   Keep the established banner geometry, but align the left stack around the
+   SCHEDULE SESH axis and lower/enlarge MAH CALENDAR to the Theme caption line. */
+.calendar:not(.is-checkout) .cal-back{margin-left:46px!important}
+.cal-detail-brandlock .cal-detail-brand{
+  transform:translateY(14px)!important;
+  font-size:11.25px!important;
+  letter-spacing:.18em!important;
+  color:var(--cal-muted)!important
+}
+@media(max-width:430px){
+  .calendar:not(.is-checkout) .cal-back{margin-left:38.5px!important}
+  .cal-detail-brandlock .cal-detail-brand{transform:translateY(12px)!important;font-size:10.4px!important}
+}
+
+/* Every playable dock key uses the same darker interior and west→east sheath.
+   The rule is deliberately shared so theme variations cannot drift apart. */
+.cal-audio-btn,.cal-themeplay{
+  position:relative!important;overflow:hidden!important;
+  background:color-mix(in srgb,var(--cal-bg) 90%,#000 10%)!important;
+  box-shadow:inset 0 0 14px rgba(0,0,0,.22)!important
+}
+.cal-audio-btn:not(.is-locked)::after,.cal-themeplay:not(.is-locked)::after{
+  content:"";position:absolute;top:0;bottom:0;left:-42%;width:34%;pointer-events:none;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--cal-accent) 24%,transparent),transparent);
+  transform:skewX(-14deg);animation:cal-control-sheath-v365 4.8s ease-in-out infinite
+}
+.cal-audio-btn svg,.cal-themeplay svg{position:relative;z-index:1}
+@keyframes cal-control-sheath-v365{0%,64%{left:-42%;opacity:0}72%{opacity:.82}88%{left:118%;opacity:.4}100%{left:118%;opacity:0}}
+
+/* Shared calendar beam sequence: beam and diamond leave centre together,
+   reach opposite apices together, meet at centre, then swap directions. */
+.fobeam__rail{overflow:visible}
+.fobeam__rail::after{
+  content:"";position:absolute;top:-1px;left:0;width:18%;height:3px;
+  background:linear-gradient(90deg,transparent,var(--cal-accent),transparent);
+  filter:drop-shadow(0 0 6px color-mix(in srgb,var(--cal-accent) 34%,transparent));
+  transform:translateX(228%);animation:calFobBeamOppose 3.8s cubic-bezier(.37,0,.63,1) infinite
+}
+.fobeam__diamond{animation:calFobDiamondOppose 3.8s cubic-bezier(.37,0,.63,1) infinite;transition:none!important}
+@keyframes calFobBeamOppose{
+  0%,50%,100%{transform:translateX(228%)}
+  25%{transform:translateX(455%)}
+  75%{transform:translateX(0%)}
+}
+@keyframes calFobDiamondOppose{
+  0%,50%,100%{left:50%}
+  25%{left:47%}
+  75%{left:53%}
+}
+@media(prefers-reduced-motion:reduce){.fobeam__rail::after,.fobeam__diamond{animation:none!important}.fobeam__diamond{left:50%!important}}
+
+/* ══ v366 — calendar FOBEAM continuity ════════════════════════════════════
+   The beam and diamond now ease only at their real east/west turnarounds.
+   They cross the midpoint in opposite directions without pausing there. */
+.fobeam__rail::after,.fobeam__diamond{animation-duration:var(--cal-motion-cycle,3.8s)!important}
+@keyframes calFobBeamOppose{
+  0%{transform:translateX(0%)}
+  50%{transform:translateX(455%)}
+  100%{transform:translateX(0%)}
+}
+@keyframes calFobDiamondOppose{
+  0%{left:53%}
+  50%{left:47%}
+  100%{left:53%}
+}
+
+/* ══ v380 — compact banner skip navigation ════════════════════════════════
+   MAH CALENDAR now carries the same transport affordances as the rest of the
+   member app.  They flank the existing wordmark and are intentionally 0.8x
+   the standard banner glyph scale so the calendar masthead stays airy. */
+.calendar:not(.is-checkout) .cal-detail-brandlock{
+  width:min(164px,42vw)!important;
+}
+.cal-detail-brandrow{
+  display:grid;
+  grid-template-columns:22px auto 22px;
+  align-items:center;
+  justify-content:center;
+  column-gap:2px;
+  width:100%;
+}
+.cal-detail-brandrow .cal-detail-logo{
+  grid-column:2;
+  margin:0!important;
+  justify-self:center;
+}
+.cal-audio-skip{
+  appearance:none;
+  -webkit-appearance:none;
+  width:22px;
+  height:18px;
+  padding:0;
+  margin:0;
+  border:0;
+  background:transparent;
+  color:var(--cal-accent);
+  display:grid;
+  place-items:center;
+  opacity:.86;
+  cursor:pointer;
+  touch-action:manipulation;
+  transition:opacity .16s ease;
+}
+.cal-audio-skip:active{opacity:1}
+.cal-audio-skip svg{width:17px;height:11px;display:block;fill:currentColor;stroke:none}
+@media(max-width:430px){
+  .calendar:not(.is-checkout) .cal-detail-brandlock{width:min(154px,39.2vw)!important}
+  .cal-detail-brandrow{grid-template-columns:20px auto 20px;column-gap:2px}
+  .cal-audio-skip{width:20px;height:17px}
+  .cal-audio-skip svg{width:16px;height:10.5px}
+}
+
+/* ══ v381 — compact MAHFITT transport lock ═══════════════════════════════ */
+.cal-detail-brandrow{grid-template-columns:18px auto 18px!important;column-gap:1px!important;align-items:center!important}
+.cal-detail-brandrow .cal-detail-logo{align-self:center!important}
+.cal-detail-brandrow .cal-mahfitt-mark{width:94px!important;height:26px!important}
+.cal-audio-skip{width:18px!important;height:16px!important;align-self:center!important}
+.cal-audio-skip svg{width:14.5px!important;height:9.5px!important}
+@media(max-width:430px){
+  .cal-detail-brandrow{grid-template-columns:17px auto 17px!important;column-gap:1px!important}
+  .cal-detail-brandrow .cal-mahfitt-mark{width:86px!important;height:24px!important}
+  .cal-audio-skip{width:17px!important;height:15px!important}
+  .cal-audio-skip svg{width:14px!important;height:9px!important}
+}
+
+/* ══ v383 — Calendar FOBEAM artifact-range swap ═══════════════════════════
+   Old beam: ~9–91% centre travel. Old diamond: 47–53%. Those ranges simply
+   trade owners while the 3.8s/BPM-synced clock and easing stay untouched. */
+@keyframes calFobBeamOppose{
+  0%{transform:translateX(244.4%)}
+  50%{transform:translateX(211.1%)}
+  100%{transform:translateX(244.4%)}
+}
+@keyframes calFobDiamondOppose{
+  0%{left:9%}
+  50%{left:91%}
+  100%{left:9%}
+}
+
+/* ══ v384 — integrated MAHFITT logo skip hotspots ══════════════════════════ */
+.cal-detail-brandrow--integrated-skip{
+  position:relative!important;
+  display:inline-grid!important;
+  grid-template-columns:1fr!important;
+  place-items:center!important;
+  width:auto!important;
+  column-gap:0!important;
+  isolation:isolate;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-touch-callout:none!important;
+}
+.cal-detail-brandrow--integrated-skip .cal-detail-logo,
+.cal-detail-brandrow--integrated-skip .cal-payment-logo{grid-area:1/1!important;position:relative;z-index:1}
+.cal-logo-skip{
+  position:absolute!important;
+  top:50%!important;
+  width:18px!important;
+  height:25px!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  transform:translate(-50%,-50%)!important;
+  z-index:3!important;
+  cursor:pointer;
+  touch-action:manipulation!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-touch-callout:none!important;
+}
+.cal-logo-skip--back{left:40.5%!important}
+.cal-logo-skip--forward{left:59.5%!important}
+.cal-audio-skip{display:none!important}
+
+
+/* ══ v385 — integrated MAHFITT Theme transport ═══════════════════════════ */
+.cal-detail-brandrow--integrated-skip{position:relative!important;overflow:visible!important}.cal-logo-transport{position:absolute;left:50%;top:0;width:114px;height:35px;transform:translate(-50%,-22%);display:grid;grid-template-columns:1fr 33px 1fr;align-items:center;justify-items:center;gap:3px;z-index:7;color:var(--cal-bright,var(--bright));pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.cal-logo-skip,.cal-logo-play{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;transform:none!important;width:37px!important;height:35px!important;padding:0!important;border:0!important;background:transparent!important;color:inherit!important;display:grid!important;place-items:center!important;pointer-events:auto!important;touch-action:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}.cal-logo-skip svg{width:31px;height:23px}.cal-logo-skip path{fill:currentColor;stroke:currentColor;stroke-width:.5}.cal-logo-diamond{display:block;width:20px;height:20px;background:currentColor;transform:rotate(45deg)}
+
+
+/* ══ v386 — calendar banner parity with Meal Log ═══════════════════════════
+   Calendar keeps the same functional stacks but gives the top banner a touch
+   more height, lowers the logo lockup slightly, raises the integrated logo
+   transport, and scales the PLAYER/THEME pair to match the new banner rhythm. */
+.calendar:not(.is-checkout){grid-template-rows:minmax(118px,13fr) minmax(0,87fr)!important}
+.calendar:not(.is-checkout) .cal-detail{min-height:118px!important}
+.cal-detail-brandlock{top:calc(var(--safe-top) + 6px)!important;width:min(166px,42vw)!important;gap:4px!important}
+.cal-detail-brandlock .cal-detail-brand{transform:translateY(11px)!important}
+.cal-detail-brandrow--integrated-skip .cal-detail-logo{transform:translateY(8px)!important}
+.cal-logo-transport{top:-3px!important;width:126px!important;height:40px!important;transform:translate(-50%,-34%)!important;grid-template-columns:1fr 36px 1fr!important;gap:4px!important}
+.cal-logo-skip,.cal-logo-play{width:40px!important;height:38px!important}.cal-logo-skip svg{width:33px!important;height:25px!important}.cal-logo-diamond{width:22px!important;height:22px!important}
+.cal-fixed-nav,.cal-fixed-actions{top:calc(var(--safe-top) + 6px)!important}
+.cal-audio-row{grid-template-columns:48px 1fr!important;gap:6px!important}.cal-audio-row>b{font-size:8px!important}.cal-audio-row>span{grid-template-columns:repeat(2,48px)!important;gap:6px!important}.cal-audio-btn,.cal-themeplay{width:48px!important;height:48px!important;min-width:48px!important}.cal-audio-btn svg,.cal-themeplay svg{width:18px!important;height:18px!important}
+@media(max-width:430px){.calendar:not(.is-checkout){grid-template-rows:minmax(112px,13fr) minmax(0,87fr)!important}.calendar:not(.is-checkout) .cal-detail{min-height:112px!important}.cal-detail-brandlock{top:calc(var(--safe-top) + 4px)!important;width:min(152px,40vw)!important}.cal-detail-brandlock .cal-detail-brand{transform:translateY(10px)!important}.cal-detail-brandrow--integrated-skip .cal-detail-logo{transform:translateY(7px)!important}.cal-logo-transport{width:118px!important;height:38px!important;transform:translate(-50%,-32%)!important}.cal-logo-skip,.cal-logo-play{width:38px!important;height:36px!important}.cal-logo-skip svg{width:31px!important;height:23px!important}.cal-logo-diamond{width:21px!important;height:21px!important}.cal-fixed-nav,.cal-fixed-actions{top:calc(var(--safe-top) + 4px)!important}.cal-audio-row{grid-template-columns:42px 1fr!important;gap:5px!important}.cal-audio-row>span{grid-template-columns:repeat(2,42px)!important;gap:5px!important}.cal-audio-btn,.cal-themeplay{width:42px!important;height:42px!important;min-width:42px!important}.cal-audio-btn svg,.cal-themeplay svg{width:17px!important;height:17px!important}}
+
+
+/* ══ v387 PHASE 3 — CALENDAR MASTHEAD REBALANCE ════════════════════════════
+   The masthead was carrying its title under the logo, a two-across left nav,
+   and a right control group wide enough to risk the viewport edge. It is now a
+   deliberate left/right composition around the centred brand:
+
+     MAH CALENDAR          MAHFITT           PLAYER  [ ][ ]
+     BACK                  (logo)            THEME   [ ][ ]
+     SCHEDULE SESH         ◀  ◆  ▶
+
+   Functionality is untouched — this is geometry only. */
+
+/* 3C/3D: left stack, title on top, Back above Schedule Sesh with the same
+   vertical rhythm between them, and a little air above the title. */
+.cal-fixed-nav--stack{
+  display:grid!important;
+  grid-auto-flow:row!important;
+  justify-items:start!important;
+  gap:9px!important;
+  top:calc(var(--safe-top) + 6px)!important;
+  max-width:44vw;
+}
+.cal-nav-title{
+  display:block;
+  font-size:10px;letter-spacing:.18em;
+  color:var(--cal-accent);opacity:.86;
+  white-space:nowrap;
+}
+.cal-fixed-nav--stack .cal-back{flex:0 0 auto}
+.cal-fixed-nav--stack .cal-sesh-mode{margin:0!important}
+
+/* 3A: the right group must sit entirely inside the masthead. Slightly smaller
+   controls, smaller labels that stay legible, even two-row stack, and enough
+   right margin that nothing can clip the viewport edge. */
+.cal-fixed-actions{
+  width:104px!important;
+  top:calc(var(--safe-top) + 6px)!important;
+  right:max(12px,env(safe-area-inset-right))!important;
+}
+.cal-audio-controls{gap:7px!important}
+.cal-audio-row{grid-template-columns:34px 1fr!important;gap:5px!important}
+.cal-audio-row>b{font-size:7.5px!important;letter-spacing:.10em!important;line-height:1.1!important}
+.cal-audio-row>span{display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important}
+.cal-audio-btn{
+  width:100%!important;aspect-ratio:1/1!important;height:auto!important;
+  min-width:0!important;max-width:31px!important;
+  display:grid!important;place-items:center!important;
+  border-radius:0!important;              /* square geometry preserved */
+}
+.cal-audio-btn svg{width:64%!important;height:64%!important;display:block}
+
+/* 3B: the brand grows into the space the compaction frees, and the functional
+   transport drops toward the lower border with breathing room. The symbols
+   printed inside the mark stay decorative — these are the real controls. */
+.cal-detail{
+  padding-top:calc(var(--safe-top) + 40px)!important;
+  padding-bottom:12px!important;
+  min-height:calc(var(--safe-top) + 132px)!important;
+}
+.cal-detail-brandlock{display:grid!important;justify-items:center!important;gap:9px!important}
+.cal-detail-brandrow--integrated-skip{
+  display:grid!important;
+  grid-template-rows:auto auto!important;
+  justify-items:center!important;
+  gap:7px!important;
+  position:relative!important;
+  overflow:visible!important;
+}
+.cal-mahfitt-mark{width:200px!important;height:53px!important}   /* ~1.4x of 143x38 */
+.cal-detail-brandrow--integrated-skip .cal-logo-transport{
+  position:static!important;
+  inset:auto!important;transform:none!important;
+  width:auto!important;height:auto!important;
+  display:grid!important;
+  grid-template-columns:auto auto auto!important;
+  align-items:center!important;gap:15px!important;
+  pointer-events:none;
+  -webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;
+}
+.cal-logo-skip,.cal-logo-play{
+  position:relative!important;inset:auto!important;transform:none!important;
+  width:42px!important;height:34px!important;
+  display:grid!important;place-items:center!important;
+  padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+  color:var(--cal-accent)!important;
+  pointer-events:auto!important;touch-action:none!important;
+  -webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;
+  -webkit-tap-highlight-color:transparent;
+}
+.cal-logo-skip svg{width:35px!important;height:26px!important;fill:currentColor;overflow:visible}
+.cal-logo-diamond{display:block;width:21px;height:21px;background:currentColor;transform:rotate(45deg)}
+
+@media(max-width:430px){
+  .cal-mahfitt-mark{width:178px!important;height:47px!important}
+  .cal-fixed-actions{width:96px!important}
+  .cal-audio-btn{max-width:28px!important}
+  .cal-detail-brandrow--integrated-skip .cal-logo-transport{gap:12px!important}
+  .cal-logo-skip,.cal-logo-play{width:39px!important;height:32px!important}
+  .cal-logo-skip svg{width:32px!important;height:24px!important}
+  .cal-nav-title{font-size:9px}
+}
+/* The masthead logo is also targeted by `.cal-detail-logo .cal-mahfitt-mark`,
+   which is more specific than a bare `.cal-mahfitt-mark` and wins even against
+   !important. 121x32 is the real base here, so 1.4x is 169x45. */
+.cal-detail-logo .cal-mahfitt-mark{width:169px!important;height:45px!important}
+.cal-detail-logo{margin:0 auto!important;transform:none!important}
+/* Room for the three-item left stack to finish inside the banner. */
+.cal-detail{min-height:calc(var(--safe-top) + 166px)!important}
+@media(max-width:430px){
+  .cal-detail-logo .cal-mahfitt-mark{width:152px!important;height:40px!important}
+  .cal-detail{min-height:calc(var(--safe-top) + 158px)!important}
+}
+/* Measured at 390/393/430: the three-item stack finished 5px below the banner
+   and, at 390 only, the enlarged mark came within 1px of it. Tightening the
+   stack rhythm (equal gaps preserved, per 3C) reclaims the height, and the
+   narrowest step takes slightly less of the 1.4x so the centre stays clear.
+   This is the "only as far as the masthead geometry safely permits" clause. */
+.cal-fixed-nav--stack{gap:6px!important;max-width:108px!important}
+.cal-detail{padding-bottom:16px!important}
+@media(max-width:400px){
+  .cal-detail-logo .cal-mahfitt-mark{width:144px!important;height:38px!important}
+}
+
+/* ══ v389 — FLOATING CALENDAR PSEUDO-BANNER + OPTICAL SIDE BALANCE ═════════
+   Keep Calendar logic untouched. The identity/control band now floats inside
+   the viewport with a crisp perimeter, and both side stacks carry equivalent
+   visual weight around the centred MAHFITT lockup. */
+.calendar:not(.is-checkout){grid-template-rows:minmax(calc(var(--safe-top) + 164px),auto) minmax(0,1fr)!important}
+.calendar:not(.is-checkout) .cal-detail{
+  width:calc(100% - 16px)!important;
+  min-height:calc(var(--safe-top) + 154px)!important;
+  margin:8px auto 0!important;
+  border:1.38px solid color-mix(in srgb,var(--cal-accent) 19%,transparent)!important;
+  border-radius:0!important;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cal-accent) 11%,transparent),inset 0 -1px 0 color-mix(in srgb,var(--cal-accent) 15%,transparent),0 10px 28px rgba(0,0,0,.16)!important;
+}
+.cal-fixed-nav--stack{
+  left:max(16px,calc(env(safe-area-inset-left) + 12px))!important;
+  top:calc(var(--safe-top) + 12px)!important;
+  gap:6px!important;max-width:110px!important;
+}
+.cal-fixed-nav--stack .cal-back{
+  width:38px!important;height:38px!important;margin-left:35px!important;
+}
+.cal-fixed-nav--stack .cal-sesh-mode{height:38px!important;min-width:108px!important}
+.cal-nav-title{font-size:9px!important;letter-spacing:.16em!important}
+.cal-fixed-actions{
+  width:106px!important;
+  right:max(16px,calc(env(safe-area-inset-right) + 12px))!important;
+  top:calc(var(--safe-top) + 12px)!important;
+}
+.cal-audio-controls{gap:6px!important}
+.cal-audio-row{grid-template-columns:24px 1fr!important;gap:4px!important;align-items:center!important}
+.cal-audio-row>b{font-size:7.4px!important;letter-spacing:.08em!important;text-align:right!important}
+.cal-audio-row>span{grid-template-columns:repeat(2,37px)!important;gap:4px!important}
+.cal-audio-btn,.cal-themeplay{
+  width:37px!important;height:37px!important;min-width:37px!important;max-width:37px!important;
+  aspect-ratio:1/1!important;
+}
+.cal-audio-btn svg,.cal-themeplay svg{width:16px!important;height:16px!important}
+/* Logo/transport form one tighter centre object without collision. */
+.cal-detail-brandlock{top:calc(var(--safe-top) + 11px)!important;gap:3px!important}
+.cal-detail-brandrow--integrated-skip{gap:2px!important}
+.cal-detail-logo .cal-mahfitt-mark{width:158px!important;height:42px!important}
+.cal-detail-brandrow--integrated-skip .cal-logo-transport{gap:9px!important}
+.cal-logo-skip,.cal-logo-play{width:40px!important;height:38px!important}
+.cal-logo-skip svg{width:34px!important;height:25px!important}
+
+/* Calendar FOBEAM now follows the same site rule as MAH GYM / MAH LOG:
+   diamond works the wide rail; glow works a smaller, opposed centre range. */
+.fobeam__rail::after{
+  left:50%!important;width:22%!important;
+  transform:translate(calc(-50% - 12px),0)!important;
+  animation-name:calFobBeamOpposeV389!important;
+}
+.fobeam__diamond{animation-name:calFobDiamondOpposeV389!important}
+@keyframes calFobBeamOpposeV389{
+  0%{transform:translate(calc(-50% - 12px),0)}
+  50%{transform:translate(calc(-50% + 12px),0)}
+  100%{transform:translate(calc(-50% - 12px),0)}
+}
+@keyframes calFobDiamondOpposeV389{
+  0%{left:92%}
+  50%{left:8%}
+  100%{left:92%}
+}
+
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:minmax(calc(var(--safe-top) + 158px),auto) minmax(0,1fr)!important}
+  .calendar:not(.is-checkout) .cal-detail{width:calc(100% - 14px)!important;min-height:calc(var(--safe-top) + 148px)!important;margin-top:7px!important}
+  .cal-fixed-nav--stack{left:max(14px,calc(env(safe-area-inset-left) + 10px))!important;top:calc(var(--safe-top) + 10px)!important}
+  .cal-fixed-actions{right:max(14px,calc(env(safe-area-inset-right) + 10px))!important;top:calc(var(--safe-top) + 10px)!important;width:104px!important}
+  .cal-fixed-nav--stack .cal-back{width:37px!important;height:37px!important;margin-left:35px!important}
+  .cal-fixed-nav--stack .cal-sesh-mode{height:37px!important;min-width:108px!important}
+  .cal-audio-row>span{grid-template-columns:repeat(2,36px)!important;gap:4px!important}
+  .cal-audio-btn,.cal-themeplay{width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important}
+  .cal-detail-brandlock{top:calc(var(--safe-top) + 9px)!important}
+  .cal-detail-logo .cal-mahfitt-mark{width:148px!important;height:39px!important}
+  .cal-detail-brandrow--integrated-skip .cal-logo-transport{gap:7px!important}
+  .cal-logo-skip,.cal-logo-play{width:39px!important;height:37px!important}
+}
+@media(max-width:400px){
+  .cal-detail-logo .cal-mahfitt-mark{width:140px!important;height:37px!important}
+  .cal-fixed-actions{width:101px!important}
+  .cal-audio-row{grid-template-columns:23px 1fr!important;gap:3px!important}
+  .cal-audio-row>span{grid-template-columns:repeat(2,35px)!important;gap:3px!important}
+  .cal-audio-btn,.cal-themeplay{width:35px!important;height:35px!important;min-width:35px!important;max-width:35px!important}
+}
+
+/* ══ v390 — ULTRA-MAHFITT CALENDAR DENSITY PASS ════════════════════════════
+   Preserve the Calendar-specific three-level left stack, but remove the large
+   empty lower pocket visible in v389. The bottom edge now closes shortly after
+   the deepest side control, like the MAH GYM gold-standard masthead. */
+.calendar:not(.is-checkout){grid-template-rows:minmax(calc(var(--safe-top) + 142px),auto) minmax(0,1fr)!important}
+.calendar:not(.is-checkout) .cal-detail{
+  min-height:calc(var(--safe-top) + 134px)!important;
+  padding-bottom:8px!important;
+}
+.cal-detail-brandlock{top:calc(var(--safe-top) + 10px)!important}
+.cal-detail-brandrow--integrated-skip .cal-logo-transport{gap:8px!important}
+.cal-fixed-nav--stack,.cal-fixed-actions{top:calc(var(--safe-top) + 10px)!important}
+/* At narrow iPhone widths the right stack should not look subordinate to the
+   37px Back key. 36px is the optical compromise that remains collision-safe. */
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:minmax(calc(var(--safe-top) + 138px),auto) minmax(0,1fr)!important}
+  .calendar:not(.is-checkout) .cal-detail{min-height:calc(var(--safe-top) + 130px)!important;padding-bottom:7px!important}
+  .cal-fixed-nav--stack,.cal-fixed-actions{top:calc(var(--safe-top) + 9px)!important}
+  .cal-detail-brandlock{top:calc(var(--safe-top) + 9px)!important}
+  .cal-detail-logo .cal-mahfitt-mark{width:148px!important;height:39px!important}
+  .cal-audio-row>span{grid-template-columns:repeat(2,36px)!important;gap:4px!important}
+  .cal-audio-btn,.cal-themeplay{width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important}
+}
+@media(max-width:400px){
+  .cal-detail-logo .cal-mahfitt-mark{width:144px!important;height:38px!important}
+  .cal-fixed-actions{width:104px!important}
+  .cal-audio-row{grid-template-columns:24px 1fr!important;gap:4px!important}
+  .cal-audio-row>span{grid-template-columns:repeat(2,36px)!important;gap:4px!important}
+  .cal-audio-btn,.cal-themeplay{width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important}
+}
+
+
+/* ══ v391 — ULTRA-MAHFITT CALENDAR LEFT-STACK OPTICAL ALIGNMENT ═══════════
+   MAH CALENDAR was visually pinned to the banner ceiling while the centre mark
+   and right-side labels read lower. Nudge only the title's optical baseline;
+   Back / Schedule Sesh geometry and all scheduling behavior stay untouched. */
+.cal-fixed-nav--stack .cal-nav-title{
+  position:relative!important;top:8px!important;margin-bottom:8px!important;
+}
+@media(max-width:430px){
+  .cal-fixed-nav--stack .cal-nav-title{top:7px!important;margin-bottom:7px!important}
+}
+
+/* ══ v393 — one-session Reschedule v2 launcher + fee state ═════════════════ */
+.cal-reschedule-launch{display:flex;justify-content:flex-start;align-items:center;padding:8px max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left));min-height:38px}
+.cal-reschedule-launch>button{min-height:30px;padding:0 11px;border:1px solid color-mix(in srgb,var(--cal-accent) 27%,transparent);background:color-mix(in srgb,var(--cal-bg) 94%,#000 6%);color:var(--cal-muted);font:650 8px/1 ui-monospace,monospace;letter-spacing:.14em;display:flex;align-items:center;gap:8px;text-transform:uppercase;cursor:pointer}
+.cal-reschedule-launch>button b{min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;background:var(--cal-accent);color:var(--cal-bg);font-size:8px;line-height:1}
+.cal-reschedule-list{display:grid;gap:8px;margin:15px 0 4px}
+.cal-reschedule-list>button{width:100%;min-height:62px;padding:12px 13px;border:1px solid color-mix(in srgb,var(--cal-accent) 25%,transparent);background:color-mix(in srgb,var(--cal-bg) 94%,#000 6%);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;cursor:pointer}
+.cal-reschedule-list>button:disabled{cursor:default;opacity:.66}
+.cal-reschedule-list>button span{display:grid;gap:5px;min-width:0}.cal-reschedule-list>button small{font:650 8px/1 ui-monospace,monospace;letter-spacing:.16em;color:var(--cal-muted)}
+.cal-reschedule-list>button b{font:500 13px/1.25 "Space Grotesk",system-ui,sans-serif}.cal-reschedule-list>button em{font:650 8px/1 ui-monospace,monospace;letter-spacing:.12em;color:var(--cal-accent);font-style:normal;white-space:nowrap}
+.cal-empty-request{padding:18px 12px;border:1px solid color-mix(in srgb,var(--cal-accent) 18%,transparent);color:var(--cal-muted);font-size:12px;line-height:1.5}
+.cal-late-fee{grid-template-columns:18px 1fr!important;align-items:start!important;gap:10px!important;padding:12px!important;border:1px solid color-mix(in srgb,var(--cal-accent) 38%,transparent);background:color-mix(in srgb,var(--cal-accent) 6%,var(--cal-bg));text-align:left!important}
+.cal-late-fee[hidden]{display:none!important}.cal-late-fee input{width:16px!important;height:16px!important;margin:1px 0 0!important;padding:0!important;accent-color:var(--cal-accent)}
+.cal-late-fee span{display:grid;gap:6px}.cal-late-fee b{font:650 9px/1.25 ui-monospace,monospace;letter-spacing:.11em;color:var(--cal-accent)}.cal-late-fee small{font:400 11px/1.45 "Space Grotesk",system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--cal-muted)}
+.cal-request-status{margin-top:12px;padding:12px;border:1px solid color-mix(in srgb,var(--cal-accent) 28%,transparent);display:grid;gap:6px;text-align:left;background:color-mix(in srgb,var(--cal-accent) 4%,var(--cal-bg))}
+.cal-request-status span{font:650 8px/1 ui-monospace,monospace;letter-spacing:.14em;color:var(--cal-accent)}.cal-request-status b{font:500 13px/1.3 "Space Grotesk",system-ui,sans-serif}.cal-request-status small{font-size:11px;line-height:1.4;color:var(--cal-muted)}
+@media(max-width:430px){.cal-reschedule-launch{padding-top:6px;min-height:34px}.cal-reschedule-launch>button{min-height:28px;font-size:7.5px}.cal-reschedule-list>button{min-height:58px;padding:10px 11px}.cal-reschedule-list>button b{font-size:12px}}
+
+/* ══ v399 — Calendar banner: balanced three-control left stack ════════════ */
+.calendar:not(.is-checkout){grid-template-rows:minmax(calc(var(--safe-top) + 174px),auto) minmax(0,1fr)!important}
+.calendar:not(.is-checkout) .cal-detail{min-height:calc(var(--safe-top) + 166px)!important;padding-bottom:9px!important}
+.cal-fixed-nav--v399{
+  display:grid!important;grid-template-columns:126px!important;grid-auto-rows:auto!important;
+  justify-items:stretch!important;align-content:start!important;gap:5px!important;
+  left:max(16px,calc(env(safe-area-inset-left) + 12px))!important;
+  top:calc(var(--safe-top) + 10px)!important;max-width:none!important;width:126px!important;
+}
+.cal-fixed-nav--v399 .cal-sesh-mode,
+.cal-fixed-nav--v399 .cal-reschedule-launch,
+.cal-fixed-nav--v399 .cal-reschedule-launch>button{width:126px!important;min-width:126px!important;max-width:126px!important;box-sizing:border-box!important}
+.cal-fixed-nav--v399 .cal-sesh-mode,
+.cal-fixed-nav--v399 .cal-reschedule-launch>button{
+  height:30px!important;min-height:30px!important;padding:0 7px!important;margin:0!important;
+  border-radius:0!important;display:flex!important;align-items:center!important;
+  font-size:8px!important;letter-spacing:.09em!important;
+}
+.cal-fixed-nav--v399 .cal-sesh-mode{justify-content:flex-start!important;gap:6px!important}
+.cal-fixed-nav--v399 .cal-sesh-mode i{width:12px!important;height:12px!important}
+.cal-fixed-nav--v399 .cal-back{
+  justify-self:center!important;width:43px!important;height:30px!important;min-height:30px!important;
+  margin:0!important;border-radius:0!important;
+}
+.cal-fixed-nav--v399 .cal-reschedule-launch{position:static!important;margin:0!important;padding:0!important;min-height:30px!important;display:block!important}
+.cal-fixed-nav--v399 .cal-reschedule-launch>button{justify-content:center!important;gap:6px!important;color:var(--cal-muted)}
+.cal-fixed-nav--v399 .cal-reschedule-launch>button:disabled{opacity:.44;cursor:default}
+.cal-fixed-nav--v399 .cal-reschedule-launch>button b{min-width:15px;height:15px;font-size:7px}
+.cal-fixed-nav--v399 .cal-nav-title{
+  position:static!important;top:auto!important;margin:2px 0 0!important;
+  justify-self:start!important;padding-left:1px;font-size:8.5px!important;letter-spacing:.17em!important;
+  line-height:1!important;white-space:nowrap!important;
+}
+/* Move the right group inward enough that PLAYER / THEME labels never kiss
+   their button boxes. The four buttons still form the right-side height target. */
+.cal-fixed-actions{right:max(22px,calc(env(safe-area-inset-right) + 18px))!important;top:calc(var(--safe-top) + 10px)!important;width:112px!important}
+.cal-audio-row{grid-template-columns:29px 1fr!important;gap:7px!important}
+.cal-audio-row>b{justify-self:end!important;margin:0!important;text-align:right!important}
+.cal-audio-row>span{grid-template-columns:repeat(2,36px)!important;gap:5px!important}
+.cal-audio-btn,.cal-themeplay{width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important}
+/* Central brand remains the optical anchor, with a touch more lower breathing
+   room now that the left stack is intentionally taller. */
+.cal-detail-brandlock{top:calc(var(--safe-top) + 12px)!important}
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:minmax(calc(var(--safe-top) + 168px),auto) minmax(0,1fr)!important}
+  .calendar:not(.is-checkout) .cal-detail{min-height:calc(var(--safe-top) + 160px)!important}
+  .cal-fixed-nav--v399{grid-template-columns:120px!important;width:120px!important;left:max(14px,calc(env(safe-area-inset-left) + 10px))!important;top:calc(var(--safe-top) + 9px)!important;gap:4px!important}
+  .cal-fixed-nav--v399 .cal-sesh-mode,.cal-fixed-nav--v399 .cal-reschedule-launch,.cal-fixed-nav--v399 .cal-reschedule-launch>button{width:120px!important;min-width:120px!important;max-width:120px!important}
+  .cal-fixed-nav--v399 .cal-sesh-mode,.cal-fixed-nav--v399 .cal-reschedule-launch>button{height:29px!important;min-height:29px!important;font-size:7.5px!important}
+  .cal-fixed-nav--v399 .cal-back{width:41px!important;height:29px!important;min-height:29px!important}
+  .cal-fixed-actions{right:max(18px,calc(env(safe-area-inset-right) + 14px))!important;top:calc(var(--safe-top) + 9px)!important;width:108px!important}
+  .cal-audio-row{grid-template-columns:27px 1fr!important;gap:6px!important}
+  .cal-audio-row>span{grid-template-columns:repeat(2,35px)!important;gap:4px!important}
+  .cal-audio-btn,.cal-themeplay{width:35px!important;height:35px!important;min-width:35px!important;max-width:35px!important}
+  .cal-detail-brandlock{top:calc(var(--safe-top) + 11px)!important}
+}
+@media(max-width:400px){
+  .cal-fixed-nav--v399{grid-template-columns:116px!important;width:116px!important}
+  .cal-fixed-nav--v399 .cal-sesh-mode,.cal-fixed-nav--v399 .cal-reschedule-launch,.cal-fixed-nav--v399 .cal-reschedule-launch>button{width:116px!important;min-width:116px!important;max-width:116px!important}
+  .cal-fixed-actions{right:max(14px,calc(env(safe-area-inset-right) + 10px))!important;width:105px!important}
+  .cal-audio-row{grid-template-columns:26px 1fr!important;gap:5px!important}
+  .cal-audio-row>span{grid-template-columns:repeat(2,34px)!important;gap:4px!important}
+  .cal-audio-btn,.cal-themeplay{width:34px!important;height:34px!important;min-width:34px!important;max-width:34px!important}
+}
+
+
+/* ══ v400 A1 — CALENDAR BANNER TIGHTENING ══════════════════════════════════
+   Measured on v399 at 390/393/430: the frame ran 48.5px past its lowest
+   intentional element, and at 390/393 the left stack's box overlapped the
+   enlarged mark. Surgical only -- stack ORDER, widths relationship, badges,
+   scheduling, checkout and reschedule logic are all untouched. */
+.calendar:not(.is-checkout) .cal-detail{
+  min-height:calc(var(--safe-top) + 132px)!important;
+  padding-bottom:10px!important;
+}
+@media(max-width:430px){
+  .calendar:not(.is-checkout) .cal-detail{min-height:calc(var(--safe-top) + 128px)!important}
+  /* Narrower stack + a slightly restrained mark so the two clusters stop
+     overlapping at the tightest widths. Schedule and Reschedule keep their
+     shared width; Back stays narrower and centred between them. */
+  .cal-fixed-nav--v399{grid-template-columns:114px!important;width:114px!important}
+  .cal-fixed-nav--v399 .cal-sesh-mode span,
+  .cal-fixed-nav--v399 .cal-reschedule-launch>button{font-size:8.5px!important;letter-spacing:.05em!important}
+}
+@media(max-width:400px){
+  .cal-detail-logo .cal-mahfitt-mark{width:124px!important;height:33px!important}
+}
+
+/* v400 A1 (cont). The real cause of the Calendar banner's dead height: it is
+   the FIRST TRACK of .calendar's grid, declared minmax(180px,25fr). Both of
+   its children (.cal-detail-brandlock and ::after) are position:absolute, so
+   .cal-detail has NO in-flow content and its own min-height never governed --
+   the 180px track floor did. Every previous attempt tuned min-height and
+   padding, which is why the height would not move.
+   With a real container height the 25fr share resolved to ~204px on an 844px
+   iPhone, so the banner was sized as a PERCENTAGE OF THE VIEWPORT rather than
+   by its contents -- taller screens got more dead space, which is why it looked
+   airy. Since every child is absolutely positioned at fixed offsets, a fixed
+   content-appropriate track is the honest declaration, and the reclaimed height
+   goes to the calendar grid. Checkout keeps its single-row layout untouched. */
+.calendar:not(.is-checkout){grid-template-rows:152px minmax(0,1fr)!important}
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:148px minmax(0,1fr)!important}
+}
+
+/* ══ v401 — UNIVERSAL MAHFITT BANNER / CALENDAR ADAPTER ═══════════════════ */
+.calendar,.calendar.is-checkout{grid-template-rows:var(--mf-banner-height) minmax(0,1fr)!important}
+.calendar>.cal-detail.mf-banner{display:block!important;padding:0!important;min-height:var(--mf-banner-height)!important;height:var(--mf-banner-height)!important;overflow:visible!important;border:1.38px solid color-mix(in srgb,var(--cal-accent) 22%,transparent)!important;border-radius:0!important;background:color-mix(in srgb,var(--cal-bg) 96%,transparent)!important;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--cal-accent) 11%,transparent),inset 0 -1px 0 color-mix(in srgb,var(--cal-accent) 14%,transparent),0 10px 28px rgba(0,0,0,.16)!important}
+.calendar>.cal-detail.mf-banner::after{border-radius:inherit!important}
+.cal-detail.mf-banner .cal-audio-controls{display:contents!important}
+.cal-detail.mf-banner .cal-audio-row{position:absolute!important;top:13px!important;z-index:6!important;width:min(31%,116px)!important;display:grid!important;grid-template-columns:none!important;gap:5px!important;align-content:start!important;margin:0!important}
+.cal-detail.mf-banner .cal-audio-row--player{left:var(--mf-banner-edge)!important;justify-items:start!important}
+.cal-detail.mf-banner .cal-audio-row--theme{right:var(--mf-banner-edge)!important;justify-items:end!important}
+.cal-detail.mf-banner .cal-audio-row>b{width:100%!important;margin:0!important;color:var(--cal-accent)!important;opacity:.62!important;font:600 8px/1.1 ui-monospace,monospace!important;letter-spacing:.16em!important;text-transform:uppercase!important}
+.cal-detail.mf-banner .cal-audio-row--theme>b{text-align:right!important}
+.cal-detail.mf-banner .cal-audio-row>span{display:grid!important;grid-template-columns:repeat(2,var(--mf-banner-control))!important;gap:6px!important;width:max-content!important}
+.cal-detail.mf-banner .cal-audio-btn,.cal-detail.mf-banner .cal-themeplay{width:var(--mf-banner-control)!important;min-width:var(--mf-banner-control)!important;max-width:var(--mf-banner-control)!important;height:var(--mf-banner-control)!important;min-height:var(--mf-banner-control)!important;max-height:var(--mf-banner-control)!important;margin:0!important;background:color-mix(in srgb,var(--cal-bg) 86%,transparent)!important;border:1px solid color-mix(in srgb,var(--cal-accent) 26%,transparent)!important;color:var(--cal-accent)!important}
+.cal-detail.mf-banner .cal-audio-lockmark{position:absolute!important;left:calc(var(--mf-banner-edge) + 91px)!important;top:13px!important;z-index:8!important;transform:scale(.58);transform-origin:left top;opacity:.48;pointer-events:none!important}
+.cal-detail.mf-banner .mf-banner__center{width:min(46%,184px)!important}
+.cal-detail.mf-banner .cal-detail-brandlock{display:grid!important;justify-items:center!important;gap:0!important}
+.cal-detail.mf-banner .cal-detail-brandrow{position:static!important;display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto auto!important;justify-items:center!important;align-items:start!important;gap:0!important;width:auto!important;height:auto!important;overflow:visible!important}
+.cal-detail.mf-banner .cal-detail-logo{grid-area:auto!important;transform:none!important;margin:0!important;display:block!important;width:148px!important;height:47px!important}
+.cal-detail.mf-banner .cal-detail-logo .cal-mahfitt-mark{width:148px!important;height:47px!important;display:block!important}
+.cal-detail.mf-banner .cal-logo-transport{position:static!important;inset:auto!important;transform:none!important;width:auto!important;height:44px!important;display:grid!important;grid-template-columns:auto auto auto!important;gap:8px!important;align-items:center!important;justify-items:center!important;margin-top:0!important;pointer-events:none!important;color:var(--cal-accent)!important}
+.cal-detail.mf-banner .cal-logo-skip,.cal-detail.mf-banner .cal-logo-play{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;pointer-events:auto!important}
+.cal-detail.mf-banner .cal-logo-skip svg{width:37px!important;height:28px!important}
+.cal-detail.mf-banner .cal-logo-diamond{width:22px!important;height:22px!important}
+.cal-detail.mf-banner .mf-banner__page,.cal-detail.mf-banner .mf-banner__date{color:var(--cal-accent)!important}
+/* Scheduling/reschedule/back are contextual calendar tools, not masthead audio
+   controls. Keeping them in the stage prevents asymmetric side stacks from
+   moving the canonical device-center composition. */
+.cal-head{position:relative!important;display:block!important;padding-top:8px!important}
+.cal-context-tools{position:static!important;inset:auto!important;width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;gap:7px!important;margin:0 auto 6px!important;z-index:8!important}
+.cal-context-tools .cal-nav-title{display:none!important}
+.cal-context-tools .cal-sesh-mode,.cal-context-tools .cal-reschedule-launch,.cal-context-tools .cal-reschedule-launch>button{width:auto!important;min-width:0!important;max-width:none!important;margin:0!important}
+.cal-context-tools .cal-sesh-mode,.cal-context-tools .cal-reschedule-launch>button{height:34px!important;min-height:34px!important;padding:0 10px!important;font-size:7.5px!important;letter-spacing:.08em!important}
+.cal-context-tools .cal-back{width:38px!important;height:34px!important;min-height:34px!important;margin:0!important}
+.cal-context-tools .cal-reschedule-launch{position:static!important;padding:0!important;min-height:34px!important;display:block!important}
+.cal-head-copy{display:grid!important;justify-items:center!important}
+.calendar.is-checkout .cal-stage{padding-top:0!important}
+.calendar.is-checkout .cal-payment-kicker{margin-bottom:5px!important}
+@media(display-mode:standalone){
+  .calendar>.cal-detail.mf-banner{border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important}
+  .cal-detail.mf-banner .cal-audio-row{top:max(15px,calc(env(safe-area-inset-top,0px) - 24px))!important}
+  .cal-detail.mf-banner .mf-banner__center{top:max(18px,calc(env(safe-area-inset-top,0px) - 8px))!important}
+}
+html[data-mahfitt-standalone="1"] .calendar>.cal-detail.mf-banner{border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important}
+html[data-mahfitt-standalone="1"] .cal-detail.mf-banner .cal-audio-row{top:max(15px,calc(env(safe-area-inset-top,0px) - 24px))!important}
+@media(max-width:430px){
+  .cal-detail.mf-banner .cal-audio-row{width:min(31%,104px)!important}
+  .cal-detail.mf-banner .cal-audio-row>span{gap:5px!important}
+  .cal-detail.mf-banner .cal-detail-logo,.cal-detail.mf-banner .cal-detail-logo .cal-mahfitt-mark{width:134px!important;height:43px!important}
+  .cal-detail.mf-banner .cal-logo-transport{gap:6px!important}
+  .cal-context-tools{gap:5px!important}
+  .cal-context-tools .cal-sesh-mode,.cal-context-tools .cal-reschedule-launch>button{padding:0 8px!important;font-size:7px!important}
+}
+
+/* v401 final geometry lock: Calendar has no 14px <main> host inset like
+   My Gym / MAH LOG. Give its frame the same 22px physical viewport gutter
+   (14px host inset + 8px banner gutter) and reserve the banner's top margin
+   in the grid so the stage can never sit invisibly underneath it. */
+.calendar,.calendar.is-checkout{grid-template-rows:calc(var(--mf-banner-height) + 8px) minmax(0,1fr)!important}
+.calendar>.cal-detail.mf-banner{width:min(calc(100% - 44px),920px)!important;max-width:920px!important}
+@media(display-mode:standalone){
+  .calendar,.calendar.is-checkout{grid-template-rows:calc(var(--mf-banner-height) + 25px) minmax(0,1fr)!important}
+  .calendar>.cal-detail.mf-banner{margin-top:max(20px,calc(env(safe-area-inset-top,0px) - 34px))!important}
+}
+html[data-mahfitt-standalone="1"] .calendar,
+html[data-mahfitt-standalone="1"] .calendar.is-checkout{grid-template-rows:calc(var(--mf-banner-height) + 25px) minmax(0,1fr)!important}
+html[data-mahfitt-standalone="1"] .calendar>.cal-detail.mf-banner{margin-top:max(20px,calc(env(safe-area-inset-top,0px) - 34px))!important}
+
+/* ══ v409 — CALENDAR CONTEXT CONTROL RESTORATION ══════════════════════════
+   v408 moved context below the hardware frame but inherited an old vertical
+   flex-direction, allowing SCHEDULE SESH to hide under the sticky masthead.
+   The business mechanics never left calendar.js; this makes all three real
+   controls visible again in one centered, symmetric row. */
+.cal-context-tools{
+  display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+  justify-content:center!important;align-items:center!important;
+  gap:6px!important;width:100%!important;max-width:none!important;
+  margin:0 auto 6px!important;
+}
+.cal-context-tools .cal-sesh-mode,
+.cal-context-tools .cal-reschedule-launch,
+.cal-context-tools .cal-reschedule-launch>button{
+  width:108px!important;min-width:108px!important;max-width:108px!important;
+}
+.cal-context-tools .cal-sesh-mode,
+.cal-context-tools .cal-reschedule-launch>button{
+  height:34px!important;min-height:34px!important;
+  justify-content:center!important;padding:0 7px!important;
+}
+.cal-context-tools .cal-back{
+  flex:0 0 38px!important;width:38px!important;height:34px!important;min-height:34px!important;margin:0!important;
+}
+.cal-context-tools .cal-reschedule-launch{display:block!important;position:static!important;padding:0!important;min-height:34px!important}
+@media(max-width:390px){
+  .cal-context-tools{gap:5px!important}
+  .cal-context-tools .cal-sesh-mode,.cal-context-tools .cal-reschedule-launch,.cal-context-tools .cal-reschedule-launch>button{width:101px!important;min-width:101px!important;max-width:101px!important}
+  .cal-context-tools .cal-sesh-mode,.cal-context-tools .cal-reschedule-launch>button{font-size:6.8px!important;letter-spacing:.055em!important;padding:0 5px!important}
+  .cal-context-tools .cal-back{flex-basis:36px!important;width:36px!important}
+}
+
+
+/* ══ v409 AUDIT FIX — CALENDAR BACK BUTTON CENTRING ════════════════════════
+   Measured at 370/390/393/430: the gaps either side of Back were 43.5px and
+   5px instead of the intended symmetric 6px. Root cause is a survivor from the
+   pre-v409 VERTICAL stack, where Back was centred by a hard margin-left:
+
+     .calendar:not(.is-checkout) .cal-back{margin-left:38.5px!important}   (0,3,0)
+
+   v409 turned this row into a centred flex row with a gap and correctly
+   declared margin:0, but only at
+
+     .cal-context-tools .cal-back{margin:0!important}                      (0,2,0)
+
+   Both carry !important, so the higher-specificity legacy rule won and shoved
+   Back to the right. Neutralised here at (0,4,0), scoped to .cal-context-tools
+   ONLY, so any surface still using the old stacked nav keeps its behaviour. */
+.calendar:not(.is-checkout) .cal-context-tools .cal-back{
+  margin:0!important;margin-left:0!important;margin-right:0!important;
+}
+
+/* ══ v424 — CALENDAR CONTEXT-LANE VISIBILITY LOCK ═════════════════════════
+   The three contextual controls were still being painted into the masthead's
+   visual edge on physical Safari. They now own an explicit lane BELOW the
+   sticky MAHFITT hardware banner; no scheduling logic or calendar-body layout
+   is rewritten. */
+.calendar:not(.is-checkout) .cal-stage{position:relative!important;z-index:2!important}
+.calendar:not(.is-checkout) .cal-head{padding-top:18px!important;overflow:visible!important}
+.calendar:not(.is-checkout) .cal-context-tools{
+  position:relative!important;z-index:130!important;margin:0 auto 8px!important;
+  isolation:isolate!important;
+}
+.calendar:not(.is-checkout) .cal-context-tools .cal-sesh-mode,
+.calendar:not(.is-checkout) .cal-context-tools .cal-reschedule-launch>button{
+  color:var(--cal-accent)!important;
+  background:color-mix(in srgb,var(--cal-bg) 94%,transparent)!important;
+  border-color:color-mix(in srgb,var(--cal-accent) 30%,transparent)!important;
+  opacity:1!important;
+}
+.calendar:not(.is-checkout) .cal-context-tools .cal-reschedule-launch>button:disabled{opacity:.56!important;color:var(--cal-muted)!important}
+
+/* v424 root cause: legacy `.calendar:not(.is-checkout)` row rules carry more
+   specificity than the later universal `.calendar` lock. On browser Safari
+   that collapsed the first grid row to ~15% while the 172px sticky masthead
+   kept its real height, so the context lane physically rendered underneath it. */
+.calendar:not(.is-checkout){grid-template-rows:calc(var(--mf-banner-height-tight) + 8px) minmax(0,1fr)!important}
+@media(display-mode:standalone){.calendar:not(.is-checkout){grid-template-rows:var(--mf-banner-height-tight) minmax(0,1fr)!important}}
+html[data-mahfitt-standalone="1"] .calendar:not(.is-checkout){grid-template-rows:var(--mf-banner-height-tight) minmax(0,1fr)!important}
+
+/* ══ v425 — PAGE IDENTITY OUTSIDE THE CALENDAR HARDWARE CROWN ══════════════
+   The v424 Calendar geometry is the accepted gold standard. Only MAH CALENDAR
+   + date leave the solid crown and become a page-context row. */
+.calendar:not(.is-checkout) .cal-page-context{
+  width:100%!important;min-height:19px!important;margin:0 0 7px!important;padding:0 2px!important;
+  color:var(--cal-accent)!important;font-size:8px!important;letter-spacing:.16em!important;
+}
+.calendar:not(.is-checkout) .cal-head{padding-top:8px!important}
+.calendar:not(.is-checkout) .cal-context-tools{margin-top:0!important}
+
+/* ══ v431 — WEEK VIEW USES THE CANONICAL SCHEDULER ════════════════════════ */
+.cal-weekcol.is-selected{background:color-mix(in srgb,var(--cal-accent) 5%,transparent)}
+.cal-week-select{width:100%;min-height:66px;display:grid;place-items:center;align-content:center;gap:3px;padding:6px;border:1px solid color-mix(in srgb,var(--cal-accent) 28%,transparent);background:color-mix(in srgb,var(--cal-bg) 91%,transparent);color:#fff;cursor:pointer}
+.cal-week-select>span{font:500 11px/1 ui-monospace,monospace;color:#fff}
+.cal-week-select>b{font:700 21px/1 ui-monospace,monospace;color:#fff}
+.cal-week-select>small{font:700 6.8px/1 ui-monospace,monospace;letter-spacing:.16em;color:var(--cal-accent);opacity:.82}
+.cal-weekcol.is-selected .cal-week-select{border-color:color-mix(in srgb,var(--cal-accent) 72%,transparent);box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--cal-accent) 72%,transparent),0 0 14px color-mix(in srgb,var(--cal-accent) 9%,transparent)}
+.cal-weekview.is-scheduling .week-event{opacity:.78}
+
+/* ══ ULTIMATE JOB III — PASS B2 CANONICAL CALENDAR CROWN BRIDGE ═══════════
+   Calendar remains an iframe, so it cannot literally share the parent DOM.
+   This late adapter mirrors the Home crown's PRESENTATION only; all audio
+   state/actions are proxied to mygym.js, which remains the sole audio owner.
+   Checkout is deliberately excluded because its payment route is not an
+   ordinary member crown. */
+.calendar:not(.is-checkout){
+  /* R69: Calendar consumes the exact ordinary/Home crown footprint.  These
+     aliases deliberately remove its stale independent rack/height geometry. */
+  --j3-cal-crown-h:var(--j3-crown-expanded-h,281px);
+  --j3-cal-rack-top:var(--j3-crown-rack-top,151px);
+  --j3-cal-rack-inset:var(--j3-crown-rack-inset,38px);
+  /* R52 — Message and Collapse share one literal top-edge anchor. Message X is
+     derived from the Player row's second column: edge + control + pair gap. */
+  --r52-cal-utility-top:max(calc(var(--mf-safe-top,0px) + 4px),14px);
+  --r52-cal-message-left:calc(var(--mf-banner-edge) + var(--mf-banner-control) + var(--mf-banner-pair-gap,6px));
+  /* R55: AI LEFT / Theme Editor RIGHT; Collapse sits above AI. */
+  --r55-cal-ai-right:calc(var(--mf-crown-edge-v438,18px) + var(--mf-banner-control) + var(--mf-banner-pair-gap,6px));
+  --r55-cal-theme-editor-right:var(--mf-crown-edge-v438,18px);
+  grid-template-rows:calc(var(--j3-cal-crown-h) + 8px) minmax(0,1fr)!important;
+}
+.calendar:not(.is-checkout).is-crown-collapsed{--j3-cal-crown-h:172px}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member{
+  height:var(--j3-cal-crown-h)!important;min-height:var(--j3-cal-crown-h)!important;max-height:var(--j3-cal-crown-h)!important;
+  transition:height .18s ease,min-height .18s ease,max-height .18s ease!important;
+  border-bottom:0!important;
+}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member>.cal-crown-rack{
+  position:absolute!important;z-index:7!important;top:var(--j3-cal-rack-top)!important;
+  left:var(--j3-cal-rack-inset)!important;right:var(--j3-cal-rack-inset)!important;
+  width:auto!important;margin:0!important;padding:0!important;color:var(--cal-accent)!important;
+  display:grid!important;grid-template-rows:28px 48px 23px!important;row-gap:2px!important;overflow:visible!important;
+  /* Controls stay crisp. Only the crown's inert ::before/::after paint layers
+     own the lower dissolve, exactly like Home. */
+  -webkit-mask-image:none!important;mask-image:none!important;
+  transition:opacity .14s ease,transform .18s ease,visibility .14s linear!important;
+}
+.calendar:not(.is-checkout).is-crown-collapsed>.cal-detail.mf-banner.mf-banner--member>.cal-crown-rack{
+  opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:translateY(-5px) scaleY(.92)!important;
+}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member>.cal-crown-collapse{
+  display:grid!important;place-items:center!important;position:absolute!important;z-index:10!important;
+  width:var(--mf-banner-control)!important;min-width:var(--mf-banner-control)!important;max-width:var(--mf-banner-control)!important;
+  height:var(--mf-banner-control)!important;min-height:var(--mf-banner-control)!important;max-height:var(--mf-banner-control)!important;
+  top:var(--r52-cal-utility-top)!important;right:var(--r55-cal-ai-right)!important;
+  left:auto!important;bottom:auto!important;margin:0!important;padding:0!important;
+  border:1px solid color-mix(in srgb,var(--cal-accent) 26%,transparent)!important;border-radius:0!important;
+  background:color-mix(in srgb,var(--cal-bg) 86%,transparent)!important;color:var(--cal-accent)!important;
+  box-sizing:border-box!important;touch-action:manipulation!important;opacity:1!important;line-height:0!important;
+}
+
+/* R52 — the Calendar iframe is an ordinary crown with its own DOM owner. The
+   control only proxies a tap to mygym.js; message state remains owned by the
+   existing Meal Grade feedback/message surface. */
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member>.cal-crown-message{
+  position:absolute!important;z-index:10!important;
+  top:var(--r52-cal-utility-top)!important;left:var(--r52-cal-message-left)!important;right:auto!important;bottom:auto!important;
+  width:var(--mf-banner-control)!important;min-width:var(--mf-banner-control)!important;max-width:var(--mf-banner-control)!important;
+  height:var(--mf-banner-control)!important;min-height:var(--mf-banner-control)!important;max-height:var(--mf-banner-control)!important;
+  margin:0!important;padding:0!important;display:grid!important;place-items:center!important;
+  border:1px solid color-mix(in srgb,var(--cal-accent) 26%,transparent)!important;border-radius:0!important;
+  background:color-mix(in srgb,var(--cal-bg) 86%,transparent)!important;color:var(--cal-accent)!important;
+  box-sizing:border-box!important;touch-action:manipulation!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member>.cal-crown-message svg{
+  display:block!important;width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;
+  stroke-width:1.25!important;stroke-linecap:round!important;stroke-linejoin:round!important;pointer-events:none!important;
+}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member>.cal-crown-message .cal-crown-message__check{stroke-width:1.35!important}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member>.cal-crown-collapse span{display:block!important;line-height:1!important;transform:none!important}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member[data-collapsed="1"]>.cal-crown-collapse span{transform:rotate(180deg)!important}
+
+/* Shared rack geometry. Every visible line is round-ended and every travelling
+   value marker is the MAHFITT diamond, matching the Home primitive. */
+.cal-crown-rack input{-webkit-appearance:none;appearance:none;background:transparent;border:0;opacity:0;cursor:ew-resize;touch-action:none;margin:0;padding:0}
+.cal-crown-rack input:disabled{cursor:default}
+.cal-crown-rack input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:1px;height:1px;opacity:0}
+.cal-crown-rack input::-moz-range-thumb{width:1px;height:1px;border:0;opacity:0}
+.cal-crown-rack input::-webkit-slider-runnable-track{height:100%;background:transparent}
+.cal-crown-rack input::-moz-range-track{height:100%;background:transparent}
+.cal-crown-volume{position:relative;display:block;width:100%;height:34px;margin:0;padding:0;--cal-volume-x:100%}
+.cal-crown-pitch{position:relative;display:block;width:100%;height:34px;margin:-5px 0 0;padding:0;--cal-pitch-x:50%}
+.cal-crown-volume>.cal-crown-rail{height:34px}
+.cal-crown-pitch>.cal-crown-rail{position:absolute;left:0;right:0;bottom:0;height:25px}
+.cal-crown-rail{position:relative;display:block;width:100%;touch-action:none;-webkit-user-select:none;user-select:none}
+.cal-crown-rail::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;transform:translateY(-50%);border-radius:999px;background:color-mix(in srgb,var(--cal-accent) 20%,transparent);pointer-events:none}
+.cal-crown-volume .cal-crown-railfill,.cal-crown-pitch .cal-crown-railfill{position:absolute;left:0;right:0;top:50%;height:1.5px;transform:translateY(-50%);border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--cal-accent) 45%,transparent),color-mix(in srgb,var(--cal-accent) 74%,transparent),color-mix(in srgb,var(--cal-accent) 45%,transparent));box-shadow:0 0 4px color-mix(in srgb,var(--cal-accent) 18%,transparent);pointer-events:none}
+.cal-crown-node{position:absolute;top:50%;width:10px;height:10px;transform:translate(-50%,-50%) rotate(45deg);background:var(--cal-accent);border:1px solid rgba(255,255,255,.34);box-shadow:0 0 7px color-mix(in srgb,var(--cal-accent) 38%,transparent);pointer-events:none}
+.cal-crown-volume .cal-crown-node{left:clamp(8px,var(--cal-volume-x),calc(100% - 8px))}
+.cal-crown-pitch .cal-crown-node{left:clamp(8px,var(--cal-pitch-x),calc(100% - 8px))}
+.cal-crown-rail>input{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.cal-crown-meta{position:absolute;left:0;right:0;top:0;height:11px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;font:700 6px/1 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}
+.cal-crown-meta b{font:inherit;color:var(--cal-muted);font-weight:700}.cal-crown-meta output{font:inherit;color:var(--cal-accent);font-variant-numeric:tabular-nums}
+.cal-crown-rack[data-volume="0"] .cal-crown-volume .cal-crown-railfill,.cal-crown-rack[data-volume="0"] .cal-crown-volume .cal-crown-node,.cal-crown-rack[data-volume="0"] .cal-crown-volume .cal-crown-meta,.cal-crown-rack[data-pitch="0"] .cal-crown-pitch .cal-crown-railfill,.cal-crown-rack[data-pitch="0"] .cal-crown-pitch .cal-crown-node,.cal-crown-rack[data-pitch="0"] .cal-crown-meta{opacity:.42;filter:none}
+
+.cal-crown-seek{position:relative;grid-row:2;width:100%;height:48px;margin:0;padding:0 0 28px;--cal-seek-x:0%}
+.cal-crown-seek>.cal-crown-rail{height:32px}
+.cal-crown-seekfill{position:absolute;left:0;top:50%;width:var(--cal-seek-x);height:2px;transform:translateY(-50%);border-radius:999px;background:var(--cal-accent);box-shadow:0 0 7px color-mix(in srgb,var(--cal-accent) 30%,transparent);pointer-events:none}
+.cal-crown-seek .cal-crown-node{left:clamp(7px,var(--cal-seek-x),calc(100% - 7px));width:9px;height:9px}
+.cal-crown-times{display:flex;justify-content:space-between;align-items:center;margin-top:-6px;color:var(--cal-muted);font:700 7px/1 ui-monospace,monospace;letter-spacing:.08em;font-variant-numeric:tabular-nums;pointer-events:none}
+.cal-crown-rack[data-owner="none"] .cal-crown-seekfill,.cal-crown-rack[data-owner="none"] .cal-crown-seek .cal-crown-node{opacity:.34;box-shadow:none}
+.cal-crown-replay{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:23px;min-width:68px;padding:0 9px;border:1px solid color-mix(in srgb,var(--cal-accent) 30%,transparent);border-radius:var(--mf-rect-radius,3px);background:color-mix(in srgb,var(--cal-accent) 3.5%,transparent);color:var(--cal-accent);display:flex;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
+.cal-crown-replay:disabled{opacity:.40}.cal-replay-icon{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.cal-crown-replay span{font:700 6px/1 ui-monospace,monospace;letter-spacing:.12em}
+.cal-crown-actions{position:relative;grid-row:3;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:23px;min-height:23px;margin:0;pointer-events:none}
+.cal-crown-actions button{position:relative;height:13px;min-height:0;padding:0 7px;border:1px solid color-mix(in srgb,var(--cal-accent) 26%,transparent);background:transparent;color:var(--cal-muted);font:700 7px/11px ui-monospace,monospace;letter-spacing:.20em;text-transform:uppercase;pointer-events:auto}
+.cal-crown-actions button:first-child{grid-column:1;justify-self:start}.cal-crown-actions button:last-child{grid-column:3;justify-self:end}.cal-crown-actions button:disabled{opacity:.40}.cal-crown-actions button[aria-pressed="true"]{color:var(--cal-accent);border-color:color-mix(in srgb,var(--cal-accent) 62%,transparent);box-shadow:0 0 5px color-mix(in srgb,var(--cal-accent) 20%,transparent)}
+
+@media(max-width:390px){
+  .calendar:not(.is-checkout).is-crown-collapsed{--j3-cal-crown-h:172px}
+}
+@media(min-width:768px){
+  .calendar:not(.is-checkout).is-crown-collapsed{--j3-cal-crown-h:188px}
+  .calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member>.cal-crown-rack{left:50%!important;right:auto!important;width:min(720px,calc(100% - 112px))!important;max-width:720px!important;transform:translateX(-50%)!important}
+}
+@media(display-mode:standalone){
+  .calendar:not(.is-checkout){grid-template-rows:calc(var(--j3-cal-crown-h) + 25px) minmax(0,1fr)!important}
+}
+html[data-mahfitt-standalone="1"] .calendar:not(.is-checkout){grid-template-rows:calc(var(--j3-cal-crown-h) + 25px) minmax(0,1fr)!important}
+
+/* ══ ULTIMATE JOB III — PASS D CALENDAR THREE-CONTROL COMPOSITION ═════════
+   Visual-only offsets preserve the context row's layout box, therefore August,
+   year and calendar grid geometry cannot be pushed.  The central Back control
+   rises while the two symmetric actions drop by the same responsive amount. */
+.calendar:not(.is-checkout){--j3-cal-action-split:clamp(8px,2.35vw,11px)}
+.calendar:not(.is-checkout) .cal-context-tools .cal-back{
+  transform:translateY(calc(0px - var(--j3-cal-action-split)))!important;
+}
+.calendar:not(.is-checkout) .cal-context-tools .cal-sesh-mode,
+.calendar:not(.is-checkout) .cal-context-tools .cal-reschedule-launch{
+  transform:translateY(var(--j3-cal-action-split))!important;
+}
+
+/* ══ ULTIMATE JOB III — CALENDAR OPTICAL CROWN CHEVRON ═══════════════════ */
+.calendar:not(.is-checkout)>.cal-detail.mf-banner--member>.cal-crown-collapse>.mf-banner__chevron{
+  display:block!important;width:22px!important;height:14px!important;margin:auto!important;padding:0!important;
+  overflow:visible!important;color:inherit!important;transform:rotate(0deg)!important;transform-origin:50% 50%!important;
+  transition:transform .18s ease!important;pointer-events:none!important;
+}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner--member>.cal-crown-collapse>.mf-banner__chevron path{
+  fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;
+  stroke-linejoin:round!important;vector-effect:non-scaling-stroke!important;
+}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner--member[data-collapsed="1"]>.cal-crown-collapse>.mf-banner__chevron{
+  transform:rotate(180deg)!important;
+}
+
+/* ══ JOB III ADDENDUM — IPHONE CROWN→CALENDAR RELATIONSHIP ════════════════
+   Move the entire .cal-stage as one block by removing the legacy mobile spacer
+   after the measured crown height. Internal calendar rows/cells are untouched.
+   iPad keeps its accepted larger-screen spacing until independently verified. */
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:var(--j3-cal-crown-h) minmax(0,1fr)!important}
+}
+
+/* JOB III physical closure: Calendar ordinary crown Volume is rail-only. */
+.cal-crown-volume--rail-only>.cal-crown-meta{display:none!important}
+.cal-crown-volume--rail-only{height:28px!important}
+.cal-crown-volume--rail-only>.cal-crown-rail{height:28px!important}
+.cal-crown-volume--rail-only input{-webkit-tap-highlight-color:transparent!important;outline:0!important;box-shadow:none!important;-webkit-user-select:none!important;user-select:none!important}
+.cal-crown-volume--rail-only input:focus:not(:focus-visible){outline:0!important;box-shadow:none!important}
+.cal-crown-volume--rail-only input:focus-visible{outline:1px solid var(--cal-ink,#fff)!important;outline-offset:2px!important}
+
+
+/* JOB III local closure — Calendar Back is a Theme instrument, and crown
+   diamonds keep their full rotated footprint inside the rail at 0/100%. */
+.calendar:not(.is-checkout) .cal-context-tools .cal-back{color:var(--cal-accent)!important;border-color:color-mix(in srgb,var(--cal-accent) 42%,transparent)!important;background:color-mix(in srgb,var(--cal-bg) 92%,var(--cal-accent) 8%)!important;box-shadow:inset 0 0 12px color-mix(in srgb,var(--cal-accent) 5%,transparent)!important}
+.calendar:not(.is-checkout){--cal-crown-node-inset:15px}
+/* POST-R68 — Calendar Volume now uses the same physical rail contract as the
+   accepted ordinary crown: muted track spans the safe rail, luminous paint
+   ends exactly at the diamond, and 0/100 keep the full diamond footprint in
+   bounds. The range input remains the only interaction owner. */
+.cal-crown-volume{--cal-volume-paint-x:clamp(var(--cal-crown-node-inset),var(--cal-volume-x),calc(100% - var(--cal-crown-node-inset)))}
+.cal-crown-volume .cal-crown-rail::before{left:var(--cal-crown-node-inset)!important;right:var(--cal-crown-node-inset)!important}
+.cal-crown-volume .cal-crown-railfill{left:var(--cal-crown-node-inset)!important;right:auto!important;width:calc(var(--cal-volume-paint-x) - var(--cal-crown-node-inset))!important}
+.cal-crown-volume .cal-crown-node{left:var(--cal-volume-paint-x)!important}
+.cal-crown-pitch .cal-crown-node{left:clamp(var(--cal-crown-node-inset),var(--cal-pitch-x),calc(100% - var(--cal-crown-node-inset)))!important}
+.cal-crown-seek{--cal-seek-paint-x:clamp(var(--cal-crown-node-inset),var(--cal-seek-x),calc(100% - var(--cal-crown-node-inset)))}
+.cal-crown-seek .cal-crown-rail::before{left:var(--cal-crown-node-inset)!important;right:var(--cal-crown-node-inset)!important}
+.cal-crown-seekfill{left:var(--cal-crown-node-inset)!important;width:calc(var(--cal-seek-paint-x) - var(--cal-crown-node-inset))!important}
+.cal-crown-seek .cal-crown-node{left:var(--cal-seek-paint-x)!important}
+
+/* Keep Calendar's accepted Replay layout/tap box, but reduce only its painted
+   shell/content to the ordinary-crown ~0.75x visual treatment. */
+.cal-crown-replay{border-color:transparent!important;background:transparent!important;gap:4px!important}
+.cal-crown-replay::before{content:"";position:absolute;left:50%;top:50%;width:75%;height:75%;transform:translate(-50%,-50%);border:1px solid color-mix(in srgb,var(--cal-accent) 30%,transparent);border-radius:var(--mf-rect-radius,3px);background:color-mix(in srgb,var(--cal-accent) 3.5%,transparent);pointer-events:none;z-index:0}
+.cal-crown-replay>*{position:relative;z-index:1}.cal-crown-replay .cal-replay-icon{width:11px!important;height:11px!important}.cal-crown-replay>span{font-size:5px!important;letter-spacing:.11em!important}
+
+/* R47 — Pitch is retired app-wide. Any legacy pitch rail markup that survives
+   in a cached shell is hidden and removed from layout so it can never leave a
+   gap where the rail used to sit. */
+.fobpitch,.cal-crown-pitch,.studio-eq--pitch,[data-a="crown-pitch"],[data-cal-pitch],
+.cal-crown-meta--pitch-spacer{display:none!important}
+
+/* ══ R49/R69 — IPHONE CALENDAR STAGE-ALLOCATION OWNER ════════════════════
+   R69 removes the stale Calendar-only expanded height entirely: expanded
+   geometry now comes from the canonical Home crown. This phone branch owns
+   only the Calendar stage handoff and the genuinely different collapsed height. */
+@media(max-width:430px){
+  .calendar:not(.is-checkout){grid-template-rows:var(--j3-cal-crown-h) minmax(0,1fr)!important}
+  .calendar:not(.is-checkout).is-crown-collapsed{--j3-cal-crown-h:172px}
+  html[data-mahfitt-standalone="1"] .calendar:not(.is-checkout){grid-template-rows:var(--j3-cal-crown-h) minmax(0,1fr)!important}
+}
+@media(max-width:430px) and (display-mode:standalone){
+  .calendar:not(.is-checkout){grid-template-rows:var(--j3-cal-crown-h) minmax(0,1fr)!important}
+}
+
+.event-activity{--event-color:var(--cal-accent)}
+
+/* ══ R55 — CALENDAR CROWN RIGHT-SIDE SIMPLIFICATION ═════════════════════
+   The Calendar page uses AI LEFT / Theme Editor RIGHT in the ordinary Theme
+   pair and Collapse above AI. Its pre-R54 crown fade remains untouched. */
+.calendar:not(.is-checkout) .cal-audio-row--theme .cal-crown-ai{position:relative!important;overflow:hidden!important}
+.calendar:not(.is-checkout) .cal-audio-row--theme .cal-crown-ai svg{display:block!important;width:22px!important;height:22px!important;margin:auto!important;fill:none!important;stroke:currentColor!important;stroke-width:1.35!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.calendar:not(.is-checkout) .cal-audio-row--theme .cal-crown-ai>.cal-crown-ai__label{position:absolute!important;z-index:3!important;top:4px!important;right:5px!important;margin:0!important;padding:0!important;color:currentColor!important;font:700 5px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;letter-spacing:.04em!important;text-transform:uppercase!important;opacity:.74!important;pointer-events:none!important}
+
+/* ══ POST-R67 / R69 — CALENDAR TRUE-FADE ADAPTER ═════════════════════════
+   Calendar remains iframe-owned, but its expanded physical height/rack cadence
+   now consumes Home's canonical 103px visible rack plus shared air/fade tail.
+   Only inert crown painters fade; the control rack itself stays fully crisp. */
+/* Expanded Calendar inherits the ordinary/Home 6px + 21px phone tail and
+   8px + 24px tablet tail from the canonical crown owner. */
+.calendar:not(.is-checkout).is-crown-collapsed>.cal-detail.mf-banner.mf-banner--member{--mf-crown-fade-tail:15px}
+.calendar:not(.is-checkout)>.cal-detail.mf-banner.mf-banner--member>.cal-crown-rack{
+  padding-bottom:0!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+@media(min-width:768px){
+  .calendar:not(.is-checkout).is-crown-collapsed>.cal-detail.mf-banner.mf-banner--member{--mf-crown-fade-tail:15px}
+}
+
+/* MAH PROTOCOL events resolve from the live Calendar accent / Theme Secondary token. */
+.event-protocol{--event-color:var(--cal-accent)}
+
+/* ══ R90 — AUTHORIZED CLIENT CONTEXT ══════════════════════════════════════
+   Calendar stays the accepted canonical Calendar. This is only the compact
+   role-context content inside its existing page-context row; no second crown. */
+.calendar:not(.is-checkout) .cal-page-context:has(.cal-client-context){gap:8px!important}
+.calendar:not(.is-checkout) .cal-client-context{min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:3px 6px;border:1px solid color-mix(in srgb,var(--cal-accent) 23%,transparent);border-radius:2px;background:color-mix(in srgb,var(--cal-accent) 4%,var(--cal-bg));color:var(--cal-accent)}
+.calendar:not(.is-checkout) .cal-client-context i,.calendar:not(.is-checkout) .cal-client-context b,.calendar:not(.is-checkout) .cal-client-context button{margin:0;font:700 6.7px/1 ui-monospace,"SFMono-Regular",Menlo,monospace;letter-spacing:.10em;text-transform:uppercase}
+.calendar:not(.is-checkout) .cal-client-context i{font-style:normal;opacity:.62;white-space:nowrap}
+.calendar:not(.is-checkout) .cal-client-context b{min-width:0;max-width:min(38vw,270px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff}
+.calendar:not(.is-checkout) .cal-client-context button{min-height:23px;padding:0 6px;border:1px solid color-mix(in srgb,var(--cal-accent) 30%,transparent);border-radius:2px;background:color-mix(in srgb,var(--cal-accent) 5%,transparent);color:var(--cal-accent);cursor:pointer;touch-action:manipulation}
+.calendar:not(.is-checkout) .cal-client-context button:focus-visible{outline:1px solid #fff;outline-offset:2px}
+@media(max-width:430px){
+  .calendar:not(.is-checkout) .cal-page-context:has(.cal-client-context){display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;gap:5px!important;min-height:31px!important}
+  .calendar:not(.is-checkout) .cal-client-context{gap:4px;padding:3px 4px}
+  .calendar:not(.is-checkout) .cal-client-context i{font-size:0}
+  .calendar:not(.is-checkout) .cal-client-context i::after{content:"COACH";font-size:5.6px;letter-spacing:.08em}
+  .calendar:not(.is-checkout) .cal-client-context b{max-width:33vw;font-size:6.1px;letter-spacing:.07em}
+  .calendar:not(.is-checkout) .cal-client-context button{min-height:21px;padding-inline:4px;font-size:6.1px}
+}

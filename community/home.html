@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Home | FOB Community</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/fob.css?v=389" />
+  <link rel="stylesheet" href="/community/css/community.css?v=241" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body class="fob-community-page" data-fob-guard="protected" data-fob-pending>
+
+  <nav class="fob-nav">
+    <div class="fob-nav-inner">
+      <a class="fob-brand" href="/community/discussions.html" aria-label="Back to the feed">
+        <img src="/images/fob-forum-nav.png" srcset="/images/fob-forum-nav.png 1x, /images/fob-forum-nav@2x.png 2x" alt="FOB Forum" />
+      </a>
+      <a class="fob-rate" href="/community/discussions.html">
+        <span class="fob-rate-tag">FOB Community</span>
+        <span class="fob-rate-main">Back to Feed</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="fob-community-shell is-narrow" id="main">
+
+    <section class="fob-community-panel">
+      <div class="fob-profile-avatar-row">
+        <div id="home-avatar-host">
+          <div class="fob-profile-avatar-fallback" id="home-avatar" aria-hidden="true">?</div>
+        </div>
+        <div class="fob-profile-avatar-actions">
+          <p class="fob-community-eyebrow" style="margin-bottom:4px;">Signed in</p>
+          <h1 class="fob-community-title" style="font-size:21px;margin-bottom:2px;" id="home-name"></h1>
+          <p id="home-username" style="color:var(--gold-dim);font-size:13.5px;"></p>
+          <button class="fob-community-btn fob-community-btn-ghost" type="button"
+                  id="avatar-change" style="margin-top:10px;">Change photo</button>
+          <input type="file" id="avatar-change-file" accept="image/*" hidden />
+        </div>
+      </div>
+      <p class="fob-community-field-note" id="avatar-change-note"></p>
+      <p class="fob-community-sub" style="margin-bottom:0;">
+        Your account and profile are set up. Your details are stored under the privacy
+        rules you chose, and you can change any of them at any time.
+      </p>
+    </section>
+
+    <section class="fob-community-panel">
+      <p class="fob-community-eyebrow">Your profile</p>
+      <h2 class="fob-community-title" style="font-size:19px;">Edit your details</h2>
+      <p class="fob-community-sub">
+        This is what other members see when they tap your name.
+      </p>
+
+      <div class="fob-community-field">
+        <label for="edit-display-name">Display name</label>
+        <input class="fob-community-input" type="text" id="edit-display-name" maxlength="50" />
+      </div>
+
+      <div class="fob-community-field">
+        <label for="edit-bio">Bio <span class="optional">(optional)</span></label>
+        <textarea class="fob-community-textarea" id="edit-bio" maxlength="500"
+                  placeholder="Whatever you want people to know."></textarea>
+        <p class="fob-community-field-note" id="edit-bio-count">0 / 500</p>
+      </div>
+
+      <div class="fob-community-row">
+        <div class="fob-community-field">
+          <label for="edit-pronouns">Pronouns <span class="optional">(optional)</span></label>
+          <input class="fob-community-input" type="text" id="edit-pronouns" maxlength="40" />
+        </div>
+        <div class="fob-community-field">
+          <label for="edit-experience">Experience</label>
+          <select class="fob-community-select" id="edit-experience">
+            <option value="">Prefer not to say</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+            <option value="professional">Professional</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fob-community-row">
+        <div class="fob-community-field">
+          <label for="edit-city">Where you are now <span class="optional">(optional)</span></label>
+          <input class="fob-community-input" type="text" id="edit-city" maxlength="80" />
+        </div>
+        <div class="fob-community-field">
+          <label for="edit-hometown">Where you are from <span class="optional">(optional)</span></label>
+          <input class="fob-community-input" type="text" id="edit-hometown" maxlength="80" />
+        </div>
+      </div>
+
+      <div class="fob-community-field">
+        <label for="edit-goals">What you are working toward <span class="optional">(optional)</span></label>
+        <textarea class="fob-community-textarea" id="edit-goals" maxlength="400"
+                  placeholder="Anything you are chasing right now."></textarea>
+      </div>
+
+      <div class="fob-community-field">
+        <label for="edit-fob">Your experience with FOB <span class="optional">(optional)</span></label>
+        <textarea class="fob-community-textarea" id="edit-fob" maxlength="400"
+                  placeholder="How long, what you have tried, what you think."></textarea>
+      </div>
+
+      <div class="fob-community-field">
+        <label for="edit-website">Link <span class="optional">(optional)</span></label>
+        <input class="fob-community-input" type="url" id="edit-website" maxlength="200"
+               placeholder="https://" />
+      </div>
+
+      <div class="fob-community-field">
+        <label for="edit-glow">Story glow <span class="optional">(optional)</span></label>
+        <div class="fob-story-glow-row">
+          <input type="color" id="edit-glow" value="#D3BE98" />
+          <button type="button" class="fob-community-textlink" id="edit-glow-off">Turn off</button>
+          <span class="fob-story-glow-dot" id="edit-glow-dot" aria-hidden="true"></span>
+        </div>
+        <p class="fob-community-field-note">
+          A color around your stories when other members watch them.
+        </p>
+      </div>
+
+      <div class="fob-community-field">
+        <label id="edit-interests-label">Interests</label>
+        <div id="edit-interests" role="group" aria-labelledby="edit-interests-label"></div>
+      </div>
+
+      <div class="fob-community-btn-row">
+        <button class="fob-community-btn fob-community-btn-primary"
+                type="button" id="edit-save">Save changes</button>
+      </div>
+      <div class="fob-community-status" id="edit-status" role="status" aria-live="polite" hidden></div>
+    </section>
+
+    <section class="fob-community-panel">
+      <p class="fob-community-eyebrow">Privacy</p>
+      <h2 class="fob-community-title" style="font-size:19px;">Who sees what</h2>
+      <p class="fob-community-sub">
+        Anything set below "All members" is hidden from your profile
+        for everyone else.
+      </p>
+
+      <div id="privacy-fields"></div>
+
+      <div class="fob-community-btn-row">
+        <button class="fob-community-btn fob-community-btn-primary"
+                type="button" id="privacy-save">Save privacy settings</button>
+      </div>
+      <div class="fob-community-status" id="privacy-status" role="status" aria-live="polite" hidden></div>
+    </section>
+
+    <section class="fob-community-panel">
+      <p class="fob-community-eyebrow">Your look</p>
+      <h2 class="fob-community-title" style="font-size:19px;">Post color</h2>
+      <p class="fob-community-sub">
+        Pick the color your posts show up in. Make the place feel like yours.
+      </p>
+      <div class="fob-theme-grid" id="theme-grid" role="group" aria-label="Post card color"></div>
+      <div class="fob-community-status" id="theme-status" role="status" aria-live="polite" hidden></div>
+
+      <p class="fob-community-eyebrow" style="margin:22px 0 8px;">Preview</p>
+      <div id="theme-preview"></div>
+    </section>
+
+    <section class="fob-community-panel">
+      <p class="fob-community-eyebrow">Community</p>
+      <h2 class="fob-community-title" style="font-size:19px;">Jump in</h2>
+      <p class="fob-community-sub">
+        Say hello, ask something, or just have a look around. No pressure.
+      </p>
+      <div class="fob-community-btn-row" style="margin-top:0;">
+        <a class="fob-community-btn fob-community-btn-primary"
+           href="/community/discussions.html">Go to the Feed</a>
+      </div>
+    </section>
+
+
+    <div class="fob-community-btn-row" style="margin-top:18px;">
+      <button class="fob-community-btn fob-community-btn-ghost" type="button"
+              id="home-signout">Sign out</button>
+    </div>
+
+    <p class="fob-community-footnote">
+      <a href="/community-guidelines.html">Community Guidelines</a> &middot;
+      <a href="/community-safety.html">Safety</a> &middot;
+      <a href="/index.html">FOB Systems</a>
+    </p>
+  </main>
+
+  <div id="fob-community-toasts" aria-live="polite"></div>
+
+  <script src="/community/js/config.js"></script>
+  <script src="/community/js/supabase-client.js"></script>
+  <script src="/community/js/utilities.js"></script>
+  <script src="/community/js/auth-guard.js"></script>
+  <script src="/community/js/discussion-render.js"></script>
+  <script src="/community/js/theme-picker.js"></script>
+  <script src="/image-crop.js?v=446"></script>
+  <script src="/community/js/profile-avatar.js"></script>
+  <script src="/community/js/profile-edit.js"></script>
+  <script src="/community/js/privacy-settings.js"></script>
+  <script src="/community/js/profile-view.js"></script>
+  <script>
+    document.addEventListener('fob:ready', function (e) {
+      var p = e.detail.profile;
+      document.getElementById('home-name').textContent = p.display_name;
+      document.getElementById('home-username').textContent = '@' + p.username;
+
+      var host = document.getElementById('home-avatar-host');
+      var url = window.FOB.avatarUrl(p.avatar_path);
+      if (url) {
+        host.innerHTML = '';
+        var img = document.createElement('img');
+        img.className = 'fob-profile-avatar';
+        img.src = url;
+        img.alt = '';
+        host.appendChild(img);
+      } else {
+        document.getElementById('home-avatar').textContent =
+          window.FOB.initialsFor(p.display_name, p.username);
+      }
+    });
+    document.getElementById('home-signout').addEventListener('click', function (ev) {
+      ev.preventDefault();
+      window.FOB.signOut();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+'use strict';
+const assert=require('assert');
+const fs=require('fs');const path=require('path');
+const Role=require('../netlify/functions/_mahfitt-role-context');
+const X=require('../netlify/functions/_mahfitt-coach-experience');
+const root=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const mig=root('supabase/migrations/053_coach_habits_resources.sql');
+const server=root('netlify/functions/mygym.js');
+let n=0;function ok(v,m){assert.ok(v,m);n++}function eq(a,b,m){assert.equal(a,b,m);n++}
+['mahfitt_resources','mahfitt_resource_assignments','mahfitt_habits','mahfitt_habit_completions'].forEach(t=>ok(mig.includes('create table if not exists public.'+t),t+' must have a canonical server-owned table'));
+['mahfitt_resources','mahfitt_resource_assignments','mahfitt_habits','mahfitt_habit_completions'].forEach(t=>ok(mig.includes('alter table public.'+t+' enable row level security')&&mig.includes('revoke all on public.'+t+' from anon,authenticated'),t+' must stay browser-private'));
+ok(mig.includes("source_type text not null default 'self' check (source_type in ('self','coach','mrmah'))"),'Habit provenance must be self/coach/Mr.Mah-ready');
+ok(mig.includes('created_by_member_id uuid not null'),'Habit creator identity must be distinct from fitness owner');
+ok(mig.includes('updated_by_member_id uuid not null'),'Habit completion actor must be attributable');
+ok(mig.includes('unique(habit_id,day)'),'Habit completion must be one canonical state per day');
+ok(mig.includes('unique(resource_id,client_member_id)'),'Resource assignment must not make duplicate client copies');
+let p=Role.cleanPermissions({habits:false,resources:false});eq(p.habits,false,'explicit habit denial must survive');eq(p.resources,false,'explicit resource denial must survive');
+p=Role.cleanPermissions({});eq(p.habits,true,'habit permission defaults on for existing relationships');eq(p.resources,true,'resource permission defaults on for existing relationships');
+eq(X.safeUrl('javascript:alert(1)'),'','resource URL must reject script schemes');
+eq(X.safeUrl('https://example.com/guide'),'https://example.com/guide','resource URL must allow HTTPS');
+eq(X.safeUrl('/FOB-Pre-Sesh-Checklist.pdf'),'/FOB-Pre-Sesh-Checklist.pdf','resource URL must allow safe same-site files');
+ok(server.includes("roleContext.isClientContext?'coach':'member'"),'Client periodization writes must preserve coach actor identity');
+ok(server.includes("if(/^habit/.test(action))permission='habits'"),'Habit operations must use their own relationship permission');
+ok(server.includes("if(action==='memberResources')permission='resources'"),'Client resource reads must use their own relationship permission');
+ok(server.includes("COACH_EXPERIENCE_ACTIONS.has(action)"),'New Coach Experience actions must share one server owner');
+console.log('r85-data-model: '+n+'/'+n+' PASS');

@@ -1,0 +1,3157 @@
+/* MAHFITT v401 :: UNIVERSAL BANNER CONSTITUTION
+   Geometry only. Audio/business ownership remains with each surface.
+   The device/Dynamic-Island centerline is always left:50%; no side content
+   participates in calculating the brand/transport x position. */
+:root{
+  --mf-banner-height:clamp(184px,49vw,202px);
+  --mf-banner-gutter:8px;
+  --mf-banner-edge:14px;
+  --mf-banner-control:42px;
+  --mf-banner-top-radius:clamp(30px,9.5vw,42px);
+}
+.mf-banner{
+  position:relative!important;
+  box-sizing:border-box!important;
+  width:min(calc(100% - (var(--mf-banner-gutter) * 2)),920px)!important;
+  height:var(--mf-banner-height)!important;
+  min-height:var(--mf-banner-height)!important;
+  max-height:var(--mf-banner-height)!important;
+  margin:8px auto 0!important;
+  padding:0!important;
+  overflow:visible!important;
+  isolation:isolate;
+  border-radius:0!important;
+}
+.mf-banner__center{
+  position:absolute!important;
+  left:50%!important;
+  top:13px!important;
+  transform:translateX(-50%)!important;
+  width:min(46%,190px)!important;
+  display:grid!important;
+  justify-items:center!important;
+  align-content:start!important;
+  gap:0!important;
+  z-index:3!important;
+  pointer-events:none!important;
+}
+.mf-banner__center>*{pointer-events:auto}
+.mf-banner__player,.mf-banner__theme{
+  position:absolute!important;
+  top:13px!important;
+  z-index:5!important;
+  width:min(31%,116px)!important;
+  display:grid!important;
+  gap:5px!important;
+  align-content:start!important;
+}
+.mf-banner__player{left:var(--mf-banner-edge)!important;justify-items:start!important}
+.mf-banner__theme{right:var(--mf-banner-edge)!important;justify-items:end!important}
+.mf-banner__controls-label{
+  display:block!important;
+  width:100%!important;
+  color:var(--secondary,var(--bright,var(--cal-accent,#E9C98F)))!important;
+  opacity:.62!important;
+  font:600 8px/1.1 ui-monospace,"SFMono-Regular",Menlo,monospace!important;
+  letter-spacing:.16em!important;
+  text-transform:uppercase!important;
+  pointer-events:none!important;
+}
+.mf-banner__theme .mf-banner__controls-label{text-align:right!important}
+.mf-banner__control-pair{
+  display:grid!important;
+  grid-template-columns:repeat(2,var(--mf-banner-control))!important;
+  gap:6px!important;
+  width:max-content!important;
+  align-items:center!important;
+}
+.mf-banner__control-pair>button{
+  box-sizing:border-box!important;
+  width:var(--mf-banner-control)!important;
+  min-width:var(--mf-banner-control)!important;
+  max-width:var(--mf-banner-control)!important;
+  height:var(--mf-banner-control)!important;
+  min-height:var(--mf-banner-control)!important;
+  max-height:var(--mf-banner-control)!important;
+  margin:0!important;
+  position:relative!important;
+  z-index:1!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.mf-banner__page,.mf-banner__date{
+  position:absolute!important;
+  bottom:13px!important;
+  z-index:4!important;
+  margin:0!important;
+  width:auto!important;
+  max-width:34%!important;
+  color:var(--secondary,var(--bright,var(--cal-accent,#E9C98F)))!important;
+  font:600 9px/1 ui-monospace,"SFMono-Regular",Menlo,monospace!important;
+  letter-spacing:.17em!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.mf-banner__page{left:var(--mf-banner-edge)!important;text-align:left!important}
+.mf-banner__date{right:var(--mf-banner-edge)!important;text-align:right!important;opacity:.58!important}
+.mf-banner__context{
+  width:min(calc(100% - 28px),892px);
+  margin:7px auto 0;
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+/* When a true modal/overlay owns input, the surface under it must not be a
+   second invisible click target. JS also sets inert where supported. */
+body.musicstudio-open #mygym,body.theme-editor-open #mygym,body.mygym-calendar-open #mygym,body.member-checkin-open #mygym{pointer-events:none!important}
+
+/* iOS Home Screen: the banner frame participates in the phone silhouette,
+   while content consumes the safe-area only ONCE.  Crucially, height is not
+   `height + safe-area`; this removes the old doubled top pocket. */
+@media (display-mode:standalone){
+  .mf-banner{
+    margin-top:max(6px,calc(env(safe-area-inset-top,0px) - 48px))!important;
+    border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+  }
+  .mf-banner__player,.mf-banner__theme{
+    top:max(15px,calc(env(safe-area-inset-top,0px) - 24px))!important;
+  }
+  .mf-banner__center{
+    top:max(18px,calc(env(safe-area-inset-top,0px) - 8px))!important;
+  }
+}
+html[data-mahfitt-standalone="1"] .mf-banner{
+  margin-top:max(6px,calc(env(safe-area-inset-top,0px) - 48px))!important;
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+}
+html[data-mahfitt-standalone="1"] .mf-banner__player,
+html[data-mahfitt-standalone="1"] .mf-banner__theme{top:max(15px,calc(env(safe-area-inset-top,0px) - 24px))!important}
+html[data-mahfitt-standalone="1"] .mf-banner__center{top:max(18px,calc(env(safe-area-inset-top,0px) - 8px))!important}
+
+@media(max-width:430px){
+  :root{--mf-banner-height:194px;--mf-banner-edge:12px;--mf-banner-control:40px}
+  .mf-banner__center{width:min(45%,174px)!important}
+  .mf-banner__player,.mf-banner__theme{width:min(31%,104px)!important}
+  .mf-banner__control-pair{gap:5px!important}
+  .mf-banner__page,.mf-banner__date{bottom:11px!important;font-size:8px!important;letter-spacing:.14em!important}
+}
+@media(max-width:370px){
+  :root{--mf-banner-height:188px;--mf-banner-edge:9px;--mf-banner-control:37px}
+  .mf-banner__control-pair{gap:4px!important}
+  .mf-banner__controls-label{font-size:7px!important;letter-spacing:.12em!important}
+  .mf-banner__page,.mf-banner__date{max-width:32%!important;font-size:7.5px!important}
+}
+
+/* mygym.js already has one shared control factory.  In a canonical banner the
+   wrapper becomes layout-transparent and its two semantic groups occupy the
+   same left/right slots as the generic banner contract. */
+.mf-banner>.themecontrols{display:contents!important}
+.mf-banner>.themecontrols>.themecontrol-group{
+  position:absolute!important;top:13px!important;z-index:5!important;
+  width:min(31%,116px)!important;display:grid!important;gap:5px!important;
+  align-content:start!important;margin:0!important;
+}
+.mf-banner>.themecontrols>.themecontrol-group:first-child{left:var(--mf-banner-edge)!important;justify-items:start!important}
+.mf-banner>.themecontrols>.themecontrol-group:last-child{right:var(--mf-banner-edge)!important;justify-items:end!important}
+.mf-banner>.themecontrols .themecontrol-label{
+  width:100%!important;color:var(--secondary,var(--bright,#E9C98F))!important;opacity:.62!important;
+  font:600 8px/1.1 ui-monospace,"SFMono-Regular",Menlo,monospace!important;
+  letter-spacing:.16em!important;text-transform:uppercase!important;pointer-events:none!important;
+}
+.mf-banner>.themecontrols>.themecontrol-group:last-child .themecontrol-label{text-align:right!important}
+.mf-banner>.themecontrols .themecontrol-pair{
+  display:grid!important;grid-template-columns:repeat(2,var(--mf-banner-control))!important;
+  gap:6px!important;width:max-content!important;align-items:center!important;
+}
+.mf-banner>.themecontrols .themecontrol-pair>button{
+  box-sizing:border-box!important;width:var(--mf-banner-control)!important;min-width:var(--mf-banner-control)!important;max-width:var(--mf-banner-control)!important;
+  height:var(--mf-banner-control)!important;min-height:var(--mf-banner-control)!important;max-height:var(--mf-banner-control)!important;
+  margin:0!important;position:relative!important;z-index:1!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;
+}
+@media(display-mode:standalone){
+  .mf-banner>.themecontrols>.themecontrol-group{top:max(15px,calc(env(safe-area-inset-top,0px) - 24px))!important}
+}
+html[data-mahfitt-standalone="1"] .mf-banner>.themecontrols>.themecontrol-group{top:max(15px,calc(env(safe-area-inset-top,0px) - 24px))!important}
+@media(max-width:430px){
+  .mf-banner>.themecontrols>.themecontrol-group{width:min(31%,104px)!important}
+  .mf-banner>.themecontrols .themecontrol-pair{gap:5px!important}
+}
+@media(max-width:370px){
+  .mf-banner>.themecontrols .themecontrol-pair{gap:4px!important}
+  .mf-banner>.themecontrols .themecontrol-label{font-size:7px!important;letter-spacing:.12em!important}
+}
+
+/* ══ v408 — HARDWARE-AXIS STICKY BANNER / TRUE MIRROR GEOMETRY ═══════════
+   v401 established the visual constitution. v408 makes the EFFECTIVE cascade
+   obey it on a real iPhone: equal physical gutters, equal square Player/Theme
+   keys, a completely independent 50% brand/transport axis, and sticky banner
+   ownership. In the Home Screen PWA the frame itself begins at y=0, so the
+   Dynamic Island/status hardware lives inside the rounded top pocket and the
+   interactive content consumes that safe area exactly once. */
+:root{
+  --mf-banner-height:188px;
+  --mf-banner-outer-gutter:8px;
+  --mf-banner-edge:10px;
+  --mf-banner-control:40px;
+  --mf-banner-pair-gap:6px;
+  --mf-banner-logo-w:132px;
+  --mf-banner-logo-h:42px;
+  --mf-banner-transport-control:40px;
+  --mf-banner-transport-gap:8px;
+  --mf-banner-center-w:calc((var(--mf-banner-transport-control) * 3) + (var(--mf-banner-transport-gap) * 2));
+  --mf-safe-top:env(safe-area-inset-top,0px);
+}
+
+/* Ordinary member masthead: side controls never participate in centre math. */
+.mf-banner{
+  position:sticky!important;
+  top:0!important;
+  z-index:120!important;
+  width:min(calc(100% - (var(--mf-banner-outer-gutter) * 2)),920px)!important;
+  height:var(--mf-banner-height)!important;
+  min-height:var(--mf-banner-height)!important;
+  max-height:var(--mf-banner-height)!important;
+  margin:8px auto 0!important;
+  overflow:visible!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  backdrop-filter:blur(14px)!important;
+}
+.mf-banner__center{
+  left:50%!important;
+  top:11px!important;
+  width:var(--mf-banner-center-w)!important;
+  max-width:var(--mf-banner-center-w)!important;
+  transform:translateX(-50%)!important;
+}
+.mf-banner__player,.mf-banner__theme,
+.mf-banner>.themecontrols>.themecontrol-group{
+  top:11px!important;
+  width:calc((var(--mf-banner-control) * 2) + var(--mf-banner-pair-gap))!important;
+  max-width:none!important;
+  gap:5px!important;
+}
+.mf-banner__player,.mf-banner>.themecontrols>.themecontrol-group:first-child{
+  left:var(--mf-banner-edge)!important;right:auto!important;justify-items:start!important
+}
+.mf-banner__theme,.mf-banner>.themecontrols>.themecontrol-group:last-child{
+  right:var(--mf-banner-edge)!important;left:auto!important;justify-items:end!important
+}
+
+/* Root-cause correction: music-studio.css had label | buttons in COLUMNS,
+   which pushed both pairs toward the logo. The semantic group is two ROWS:
+   label above, exact square pair below. */
+.mf-banner>.themecontrols>.themecontrol-group{
+  grid-template-columns:1fr!important;
+  grid-template-rows:auto auto!important;
+  align-items:start!important;
+  justify-content:start!important;
+}
+.mf-banner>.themecontrols>.themecontrol-group:last-child{justify-content:end!important}
+.mf-banner>.themecontrols>.themecontrol-group .themecontrol-label{grid-column:1!important;grid-row:1!important}
+.mf-banner>.themecontrols>.themecontrol-group .themecontrol-pair{grid-column:1!important;grid-row:2!important}
+
+.mf-banner__control-pair,.mf-banner>.themecontrols .themecontrol-pair{
+  grid-template-columns:repeat(2,var(--mf-banner-control))!important;
+  gap:var(--mf-banner-pair-gap)!important;
+  width:calc((var(--mf-banner-control) * 2) + var(--mf-banner-pair-gap))!important;
+  margin:0!important;
+  justify-content:start!important;
+}
+.mf-banner__control-pair>button,.mf-banner>.themecontrols .themecontrol-pair>button{
+  width:var(--mf-banner-control)!important;min-width:var(--mf-banner-control)!important;max-width:var(--mf-banner-control)!important;
+  height:var(--mf-banner-control)!important;min-height:var(--mf-banner-control)!important;max-height:var(--mf-banner-control)!important;
+}
+.mf-banner__controls-label,.mf-banner>.themecontrols .themecontrol-label{
+  font-size:8px!important;line-height:1!important;letter-spacing:.15em!important
+}
+.mf-banner__page,.mf-banner__date{bottom:10px!important;max-width:38%!important}
+
+/* My Gym / Progress / Program Library / MAH Health all share this factory. */
+#mygym>.mf-banner:not(.mf-banner--workout){
+  position:sticky!important;top:0!important;z-index:120!important;
+  width:min(calc(100% - (var(--mf-banner-outer-gutter) * 2)),920px)!important;
+  max-width:920px!important;margin:8px auto 0!important
+}
+#mygym>.mf-banner .mf-banner__center .my-fob-home.my-mahfitt-home,
+#mygym>.mf-banner .mf-banner__center .my-mahfitt-wordmark{
+  width:var(--mf-banner-logo-w)!important;min-width:var(--mf-banner-logo-w)!important;max-width:var(--mf-banner-logo-w)!important;
+  height:var(--mf-banner-logo-h)!important;min-height:var(--mf-banner-logo-h)!important;max-height:var(--mf-banner-logo-h)!important;
+  margin:0!important;transform:none!important
+}
+#mygym>.mf-banner .mf-banner__center .hd__logo-transport{
+  width:var(--mf-banner-center-w)!important;height:var(--mf-banner-transport-control)!important;
+  grid-template-columns:repeat(3,var(--mf-banner-transport-control))!important;
+  gap:var(--mf-banner-transport-gap)!important;margin-top:1px!important;justify-content:center!important
+}
+#mygym>.mf-banner .mf-banner__center .hd__logo-skip,
+#mygym>.mf-banner .mf-banner__center .hd__logo-play{
+  width:var(--mf-banner-transport-control)!important;min-width:var(--mf-banner-transport-control)!important;
+  height:var(--mf-banner-transport-control)!important;min-height:var(--mf-banner-transport-control)!important
+}
+#mygym>.mf-banner .mf-banner__center .hd__logo-skip svg{width:34px!important;height:26px!important}
+#mygym>.mf-banner .mf-banner__center .hd__transport-diamond{width:20px!important;height:20px!important}
+
+/* MAH LOG uses the same mirror/centre tokens; its five utility keys are a
+   separate sibling deck in meal-gradient.js and therefore cannot affect this. */
+.mg-log-shell .mg-log-top-centered.mf-banner{
+  width:min(calc(100% - (var(--mf-banner-outer-gutter) * 2)),920px)!important;
+  margin:8px auto 0!important
+}
+.mg-log-top-centered.mf-banner .mg-log-center{width:var(--mf-banner-center-w)!important;max-width:var(--mf-banner-center-w)!important}
+.mg-log-top-centered.mf-banner .mg-fob-home,
+.mg-log-top-centered.mf-banner .mg-fob-home .mg-mahfitt-wordmark{
+  width:var(--mf-banner-logo-w)!important;height:var(--mf-banner-logo-h)!important;max-width:var(--mf-banner-logo-w)!important
+}
+.mg-log-top-centered.mf-banner .mg-logo-transport{
+  width:var(--mf-banner-center-w)!important;height:var(--mf-banner-transport-control)!important;
+  grid-template-columns:repeat(3,var(--mf-banner-transport-control))!important;
+  gap:var(--mf-banner-transport-gap)!important;justify-content:center!important
+}
+.mg-log-top-centered.mf-banner .mg-logo-skip,.mg-log-top-centered.mf-banner .mg-logo-play{
+  width:var(--mf-banner-transport-control)!important;min-width:var(--mf-banner-transport-control)!important;
+  height:var(--mf-banner-transport-control)!important;min-height:var(--mf-banner-transport-control)!important
+}
+.mg-log-top-centered.mf-banner .mg-logo-skip svg{width:34px!important;height:26px!important}
+.mg-log-top-centered.mf-banner .mg-logo-diamond{width:20px!important;height:20px!important}
+.mg-log-top-centered.mf-banner .mg-log-musicpair{
+  width:calc((var(--mf-banner-control) * 2) + var(--mf-banner-pair-gap))!important;
+  grid-template-columns:repeat(2,var(--mf-banner-control))!important;
+  gap:var(--mf-banner-pair-gap)!important
+}
+.mg-log-top-centered.mf-banner .mg-log-musicpair--studio{left:var(--mf-banner-edge)!important;top:11px!important}
+.mg-log-top-centered.mf-banner .mg-log-musicpair--theme{right:var(--mf-banner-edge)!important;top:11px!important}
+
+/* Calendar is the hard case: audio frame stays perfectly symmetric while
+   Schedule/Back/Reschedule remain contextual controls below it. */
+.calendar>.cal-detail.mf-banner{
+  position:sticky!important;top:0!important;z-index:120!important;
+  width:min(calc(100% - 44px),920px)!important;
+  max-width:920px!important;margin:8px auto 0!important
+}
+.cal-detail.mf-banner .cal-audio-row{
+  top:11px!important;
+  width:calc((var(--mf-banner-control) * 2) + var(--mf-banner-pair-gap))!important;
+  max-width:none!important
+}
+.cal-detail.mf-banner .cal-audio-row--player{left:var(--mf-banner-edge)!important;right:auto!important}
+.cal-detail.mf-banner .cal-audio-row--theme{right:var(--mf-banner-edge)!important;left:auto!important}
+.cal-detail.mf-banner .cal-audio-row>span{
+  grid-template-columns:repeat(2,var(--mf-banner-control))!important;
+  gap:var(--mf-banner-pair-gap)!important;
+  width:calc((var(--mf-banner-control) * 2) + var(--mf-banner-pair-gap))!important
+}
+.cal-detail.mf-banner .mf-banner__center{width:var(--mf-banner-center-w)!important;max-width:var(--mf-banner-center-w)!important}
+.cal-detail.mf-banner .cal-detail-logo,.cal-detail.mf-banner .cal-detail-logo .cal-mahfitt-mark{
+  width:var(--mf-banner-logo-w)!important;height:var(--mf-banner-logo-h)!important;max-width:var(--mf-banner-logo-w)!important
+}
+.cal-detail.mf-banner .cal-logo-transport{
+  width:var(--mf-banner-center-w)!important;height:var(--mf-banner-transport-control)!important;
+  grid-template-columns:repeat(3,var(--mf-banner-transport-control))!important;
+  gap:var(--mf-banner-transport-gap)!important;justify-content:center!important
+}
+.cal-detail.mf-banner .cal-logo-skip,.cal-detail.mf-banner .cal-logo-play{
+  width:var(--mf-banner-transport-control)!important;min-width:var(--mf-banner-transport-control)!important;
+  height:var(--mf-banner-transport-control)!important;min-height:var(--mf-banner-transport-control)!important
+}
+.cal-detail.mf-banner .cal-logo-skip svg{width:34px!important;height:26px!important}
+.cal-detail.mf-banner .cal-logo-diamond{width:20px!important;height:20px!important}
+.calendar,.calendar.is-checkout{grid-template-rows:calc(var(--mf-banner-height) + 8px) minmax(0,1fr)!important}
+
+/* Live Workout is intentionally not converted into the ordinary banner. Its
+   instrument panel keeps Back/title/progress/pitch semantics but is now sticky
+   and uses the same physical gutter/hardware-frame policy. */
+#mygym>.workout-hd.mf-banner--workout{
+  position:sticky!important;top:0!important;z-index:120!important;
+  width:min(calc(100% - (var(--mf-banner-outer-gutter) * 2)),920px)!important;
+  margin:8px auto 0!important;
+  /* Atmospheric filtering belongs to the masked inert paint layer, never the
+     rectangular interactive header box. The late true-fade owner below moves
+     the blur to ::after so the filter disappears with the crown. */
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important
+}
+
+/* PWA / Dynamic-Island hardware mode. Frame at y=0; safe area moves CONTENT,
+   never adds a second outside pocket. Lower corners stay sharp. */
+@media(display-mode:standalone){
+  :root{--mf-banner-height:194px}
+  .mf-banner,#mygym>.workout-hd.mf-banner--workout,.calendar>.cal-detail.mf-banner{
+    top:0!important;margin-top:0!important;
+    border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important
+  }
+  #mygym>.mf-banner:not(.mf-banner--workout),.mg-log-shell .mg-log-top-centered.mf-banner{margin-top:0!important}
+  .mf-banner__player,.mf-banner__theme,.mf-banner>.themecontrols>.themecontrol-group,
+  .mg-log-top-centered.mf-banner .mg-log-musicpair--studio,
+  .mg-log-top-centered.mf-banner .mg-log-musicpair--theme,
+  .cal-detail.mf-banner .cal-audio-row,
+  .mf-banner__center,.cal-detail.mf-banner .mf-banner__center{
+    top:max(12px,calc(var(--mf-safe-top) + 3px))!important
+  }
+  #mygym>.workout-hd.mf-banner--workout .workout-brand{top:max(5px,calc(var(--mf-safe-top) + 3px))!important}
+  #mygym>.workout-hd.mf-banner--workout .workoutnav{padding-top:max(31px,calc(var(--mf-safe-top) + 36px))!important}
+  #mygym{padding-top:0!important}
+  .mg-log-shell.mg-standalone{padding-top:0!important}
+  .calendar,.calendar.is-checkout{grid-template-rows:var(--mf-banner-height) minmax(0,1fr)!important}
+}
+
+/* JS fallback mirrors display-mode during PWA lifecycle transitions and gives
+   the browser geometry harness a deterministic notch token. */
+html[data-mahfitt-standalone="1"]{--mf-banner-height:194px}
+html[data-mahfitt-standalone="1"] .mf-banner,
+html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout,
+html[data-mahfitt-standalone="1"] .calendar>.cal-detail.mf-banner{
+  top:0!important;margin-top:0!important;
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important
+}
+html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout),
+html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner{margin-top:0!important}
+html[data-mahfitt-standalone="1"] .mf-banner__player,
+html[data-mahfitt-standalone="1"] .mf-banner__theme,
+html[data-mahfitt-standalone="1"] .mf-banner>.themecontrols>.themecontrol-group,
+html[data-mahfitt-standalone="1"] .mg-log-top-centered.mf-banner .mg-log-musicpair--studio,
+html[data-mahfitt-standalone="1"] .mg-log-top-centered.mf-banner .mg-log-musicpair--theme,
+html[data-mahfitt-standalone="1"] .cal-detail.mf-banner .cal-audio-row,
+html[data-mahfitt-standalone="1"] .mf-banner__center,
+html[data-mahfitt-standalone="1"] .cal-detail.mf-banner .mf-banner__center{
+  top:max(12px,calc(var(--mf-safe-top) + 3px))!important
+}
+html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workout-brand{top:max(5px,calc(var(--mf-safe-top) + 3px))!important}
+html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workoutnav{padding-top:max(31px,calc(var(--mf-safe-top) + 36px))!important}
+html[data-mahfitt-standalone="1"] #mygym{padding-top:0!important}
+html[data-mahfitt-standalone="1"] .mg-log-shell.mg-standalone{padding-top:0!important}
+html[data-mahfitt-standalone="1"] .calendar,html[data-mahfitt-standalone="1"] .calendar.is-checkout{
+  grid-template-rows:var(--mf-banner-height) minmax(0,1fr)!important
+}
+
+@media(max-width:390px){
+  :root{
+    --mf-banner-height:184px;
+    --mf-banner-outer-gutter:8px;
+    --mf-banner-edge:8px;
+    --mf-banner-control:39px;
+    --mf-banner-pair-gap:5px;
+    --mf-banner-logo-w:124px;
+    --mf-banner-logo-h:40px;
+    --mf-banner-transport-control:39px;
+    --mf-banner-transport-gap:7px;
+  }
+  .mf-banner__controls-label,.mf-banner>.themecontrols .themecontrol-label{font-size:7.5px!important;letter-spacing:.13em!important}
+  .mf-banner__page,.mf-banner__date{font-size:7.5px!important;letter-spacing:.13em!important}
+  html[data-mahfitt-standalone="1"]{--mf-banner-height:192px}
+}
+@media(display-mode:standalone) and (max-width:390px){:root{--mf-banner-height:192px}}
+
+/* ══ v409 — INTEGRATED HARDWARE FRAME / FADED BEZEL RAILS ═════════════════
+   The former pseudo-banner is now part of the device composition. The top
+   perimeter traces the phone, deliberately has NO bottom rule, and its side
+   rails continue into the page. In standalone mode the fade begins around the
+   35–40% viewport zone and is essentially gone by the middle of the screen. */
+:root{
+  --mf-frame-line:1.62px;
+  --mf-frame-alpha:.34;
+  --mf-frame-rail-end:52vh;
+}
+.mf-banner,
+#mygym>.workout-hd.mf-banner--workout,
+.calendar>.cal-detail.mf-banner{
+  border-bottom:0!important;
+  border-left:var(--mf-frame-line) solid color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 34%,transparent)!important;
+  border-right:var(--mf-frame-line) solid color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 34%,transparent)!important;
+  border-top:var(--mf-frame-line) solid color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 40%,transparent)!important;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 15%,transparent),0 8px 24px rgba(0,0,0,.10)!important;
+}
+/* One pseudo-element paints BOTH lower rails, leaving ::after free for
+   Calendar's atmosphere layer. It begins exactly where the masthead ends. */
+.mf-banner::before,
+#mygym>.workout-hd.mf-banner--workout::before,
+.calendar>.cal-detail.mf-banner::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  left:calc(-1 * var(--mf-frame-line))!important;
+  right:calc(-1 * var(--mf-frame-line))!important;
+  top:100%!important;
+  height:max(0px,calc(var(--mf-frame-rail-end) - 100%))!important;
+  background:
+    linear-gradient(to bottom,
+      color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 34%,transparent) 0%,
+      color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 32%,transparent) 42%,
+      color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 14%,transparent) 72%,
+      transparent 100%) left top / var(--mf-frame-line) 100% no-repeat,
+    linear-gradient(to bottom,
+      color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 34%,transparent) 0%,
+      color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 32%,transparent) 42%,
+      color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 14%,transparent) 72%,
+      transparent 100%) right top / var(--mf-frame-line) 100% no-repeat!important;
+}
+
+/* PWA: almost touch the hardware bezel but leave a visible sliver outside the
+   frame. The top curve becomes a traced extension of the iPhone silhouette. */
+@media(display-mode:standalone){
+  :root{
+    --mf-banner-outer-gutter:3px;
+    --mf-banner-edge:9px;
+    --mf-banner-top-radius:44px;
+    --mf-frame-line:1.72px;
+  }
+  .mf-banner,
+  #mygym>.mf-banner:not(.mf-banner--workout),
+  #mygym>.workout-hd.mf-banner--workout,
+  .mg-log-shell .mg-log-top-centered.mf-banner,
+  .calendar>.cal-detail.mf-banner{
+    width:calc(100% - 6px)!important;
+    max-width:none!important;
+    margin-left:auto!important;margin-right:auto!important;
+    margin-top:0!important;
+    border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+  }
+}
+html[data-mahfitt-standalone="1"]{
+  --mf-banner-outer-gutter:3px;
+  --mf-banner-edge:9px;
+  --mf-banner-top-radius:44px;
+  --mf-frame-line:1.72px;
+}
+html[data-mahfitt-standalone="1"] .mf-banner,
+html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout),
+html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout,
+html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner,
+html[data-mahfitt-standalone="1"] .calendar>.cal-detail.mf-banner{
+  width:calc(100% - 6px)!important;
+  max-width:none!important;
+  margin-left:auto!important;margin-right:auto!important;margin-top:0!important;
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+}
+/* v409 specificity lock: MAH LOG historically disabled ::before at a more
+   specific selector. Re-own it here so the integrated lower rails cannot be
+   suppressed by the old pseudo-banner adapter. */
+.mg-log-shell .mg-log-top-centered.mf-banner::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  left:calc(-1 * var(--mf-frame-line))!important;
+  right:calc(-1 * var(--mf-frame-line))!important;
+  top:100%!important;
+  height:max(0px,calc(var(--mf-frame-rail-end) - 100%))!important;
+  border:0!important;
+  box-shadow:none!important;
+  background:
+    linear-gradient(to bottom,
+      color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 34%,transparent) 0%,
+      color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 32%,transparent) 42%,
+      color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 14%,transparent) 72%,
+      transparent 100%) left top / var(--mf-frame-line) 100% no-repeat,
+    linear-gradient(to bottom,
+      color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 34%,transparent) 0%,
+      color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 32%,transparent) 42%,
+      color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 14%,transparent) 72%,
+      transparent 100%) right top / var(--mf-frame-line) 100% no-repeat!important;
+}
+/* v409 perimeter cascade lock: older page CSS uses ID-scoped !important
+   border shorthands. Own the four sides explicitly at equal/higher specificity
+   so the integrated frame has no lower horizontal seam on any member surface. */
+#mygym>.mf-banner:not(.mf-banner--workout),
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  border-bottom-width:0!important;
+  border-bottom-style:none!important;
+  border-left-width:var(--mf-frame-line)!important;
+  border-right-width:var(--mf-frame-line)!important;
+  border-top-width:var(--mf-frame-line)!important;
+  border-left-style:solid!important;border-right-style:solid!important;border-top-style:solid!important;
+  border-left-color:color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 34%,transparent)!important;
+  border-right-color:color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 34%,transparent)!important;
+  border-top-color:color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 40%,transparent)!important;
+}
+/* v409 no-bottom-line optical lock: remove inherited inset-bottom shadows as
+   well as the physical border so the frame truly remains open underneath. */
+#mygym>.mf-banner:not(.mf-banner--workout),
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#e9c98f))) 15%,transparent),0 8px 24px rgba(0,0,0,.10)!important;
+}
+
+/* ══ v417 — PHYSICAL iPHONE BANNER TIGHTENING ═══════════════════════════════
+   Physical PWA acceptance showed the integrated frame was still inset too far
+   from the iPhone bezel and the Primary masthead held unnecessary dead height.
+   This lock moves the hardware rails to a near-edge sliver, shortens the
+   canonical masthead, and aligns the Player/Theme square pairs to the same
+   vertical button axis as the independent centre transport. Geometry only:
+   audio ownership and page business logic are unchanged. */
+:root{
+  --mf-banner-height-tight:168px;
+  --mf-banner-lower-gap:9px;
+  --mf-banner-safe-left:1px;
+  --mf-banner-safe-right:1px;
+}
+
+/* Canonical member surfaces: page/date are the lower optical anchors. */
+#mygym>.mf-banner:not(.mf-banner--workout),
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  height:var(--mf-banner-height-tight)!important;
+  min-height:var(--mf-banner-height-tight)!important;
+  max-height:var(--mf-banner-height-tight)!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__page,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__date,
+.mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__page,
+.mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__date,
+.calendar>.cal-detail.mf-banner .mf-banner__page,
+.calendar>.cal-detail.mf-banner .mf-banner__date{
+  bottom:var(--mf-banner-lower-gap)!important;
+}
+
+/* Desktop/browser fallback: preserve existing top safe-area logic, but place
+   the SIDE BUTTONS on the centre transport's button row. The semantic label
+   remains immediately above its pair. */
+.mf-banner>.themecontrols>.themecontrol-group,
+.mf-banner__player,.mf-banner__theme,
+.mg-log-top-centered.mf-banner .mg-log-musicpair,
+.cal-detail.mf-banner .cal-audio-row{
+  top:39px!important;
+}
+
+/* Home-screen PWA: centre starts just below the hardware safe area. Its logo
+   is 40px tall on phone, then a 1px transport gap. Labels consume ~8px + 5px
+   gap, so side-group top = centre-top + 28px makes the SQUARE PAIR top equal
+   centre-top + 41px. One visible row, three independent x-axis owners. */
+@media(display-mode:standalone){
+  :root{
+    --mf-banner-height:168px;
+    --mf-banner-height-tight:168px;
+    --mf-banner-outer-gutter:1px;
+    --mf-banner-edge:10px;
+    --mf-banner-safe-left:max(1px,env(safe-area-inset-left,0px));
+    --mf-banner-safe-right:max(1px,env(safe-area-inset-right,0px));
+  }
+  .mf-banner,
+  #mygym>.mf-banner:not(.mf-banner--workout),
+  #mygym>.workout-hd.mf-banner--workout,
+  .mg-log-shell .mg-log-top-centered.mf-banner,
+  .calendar>.cal-detail.mf-banner{
+    width:calc(100vw - var(--mf-banner-safe-left) - var(--mf-banner-safe-right))!important;
+    max-width:none!important;
+    margin-left:calc(50% - 50vw + var(--mf-banner-safe-left))!important;
+    margin-right:0!important;
+  }
+  .mf-banner>.themecontrols>.themecontrol-group,
+  .mf-banner__player,.mf-banner__theme,
+  .mg-log-top-centered.mf-banner .mg-log-musicpair,
+  .cal-detail.mf-banner .cal-audio-row{
+    top:max(40px,calc(var(--mf-safe-top) + var(--mf-banner-logo-h) - 9px))!important;
+  }
+  .calendar,.calendar.is-checkout{
+    grid-template-rows:var(--mf-banner-height-tight) minmax(0,1fr)!important;
+  }
+}
+
+/* JS standalone mirror for iOS lifecycle transitions and deterministic tests. */
+html[data-mahfitt-standalone="1"]{
+  --mf-banner-height:168px;
+  --mf-banner-height-tight:168px;
+  --mf-banner-outer-gutter:1px;
+  --mf-banner-edge:10px;
+  --mf-banner-safe-left:max(1px,env(safe-area-inset-left,0px));
+  --mf-banner-safe-right:max(1px,env(safe-area-inset-right,0px));
+}
+html[data-mahfitt-standalone="1"] .mf-banner,
+html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout),
+html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout,
+html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner,
+html[data-mahfitt-standalone="1"] .calendar>.cal-detail.mf-banner{
+  width:calc(100vw - var(--mf-banner-safe-left) - var(--mf-banner-safe-right))!important;
+  max-width:none!important;
+  margin-left:calc(50% - 50vw + var(--mf-banner-safe-left))!important;
+  margin-right:0!important;
+}
+html[data-mahfitt-standalone="1"] .mf-banner>.themecontrols>.themecontrol-group,
+html[data-mahfitt-standalone="1"] .mf-banner__player,
+html[data-mahfitt-standalone="1"] .mf-banner__theme,
+html[data-mahfitt-standalone="1"] .mg-log-top-centered.mf-banner .mg-log-musicpair,
+html[data-mahfitt-standalone="1"] .cal-detail.mf-banner .cal-audio-row{
+  top:max(40px,calc(var(--mf-safe-top) + var(--mf-banner-logo-h) - 9px))!important;
+}
+html[data-mahfitt-standalone="1"] .calendar,
+html[data-mahfitt-standalone="1"] .calendar.is-checkout{
+  grid-template-rows:var(--mf-banner-height-tight) minmax(0,1fr)!important;
+}
+
+@media(max-width:390px){
+  :root{--mf-banner-height-tight:168px}
+  html[data-mahfitt-standalone="1"]{--mf-banner-height:168px;--mf-banner-height-tight:168px}
+}
+@media(display-mode:standalone) and (max-width:390px){
+  :root{--mf-banner-height:168px;--mf-banner-height-tight:168px}
+}
+
+
+/* ══ v418 — HOME FRAME TO THE PHYSICAL PORTRAIT EDGE ════════════════════
+   Real iPhone acceptance showed the portrait safe-area inset itself was what
+   kept the accepted MAH GYM rails ~one phone-bezel step inward. The HOME frame
+   is decorative hardware, not a tap target, so in portrait it may meet the
+   physical viewport edge while its controls keep their existing 10px internal
+   safety gutter. Landscape still uses v417's notch-safe left/right insets. */
+@media (display-mode:standalone) and (orientation:portrait){
+  html #mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+    width:100vw!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+}
+@media (orientation:portrait){
+  html[data-mahfitt-standalone="1"] #mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+    width:100vw!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+}
+
+/* ══ v424 — PHYSICAL IPHONE PUZZLE-FRAME SURGICAL LOCK ════════════════════
+   Real-device screenshots exposed two geometry problems, not a new design:
+   HOME's old 100vw rule started from #mygym's padded content edge and therefore
+   overflowed/clipped the right Theme cluster; the 44px crown also read too round
+   against the iPhone silhouette. Break out from the padded host symmetrically,
+   keep every established label/button/brand anchor, and only tighten the frame. */
+:root{--mf-banner-top-radius:35px;--mf-banner-height-tight:172px}
+#mygym>.mf-banner:not(.mf-banner--workout),
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  height:var(--mf-banner-height-tight)!important;
+  min-height:var(--mf-banner-height-tight)!important;
+  max-height:var(--mf-banner-height-tight)!important;
+}
+@media(display-mode:standalone) and (orientation:portrait){
+  :root{--mf-banner-height:172px;--mf-banner-height-tight:172px;--mf-banner-top-radius:35px}
+  html .mf-banner,
+  html #mygym>.mf-banner:not(.mf-banner--workout),
+  html #mygym>.workout-hd.mf-banner--workout,
+  html .mg-log-shell .mg-log-top-centered.mf-banner,
+  html .calendar>.cal-detail.mf-banner{
+    width:calc(100vw - 4px)!important;
+    max-width:none!important;
+    margin-left:calc(50% - 50vw + 2px)!important;
+    margin-right:0!important;
+    margin-top:0!important;
+  }
+  html #mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+    width:calc(100vw - 4px)!important;
+    margin-left:calc(50% - 50vw + 2px)!important;margin-right:0!important;margin-top:0!important;
+  }
+  .calendar,.calendar.is-checkout{grid-template-rows:var(--mf-banner-height-tight) minmax(0,1fr)!important}
+}
+@media(orientation:portrait){
+  html[data-mahfitt-standalone="1"]{--mf-banner-height:172px;--mf-banner-height-tight:172px;--mf-banner-top-radius:35px}
+  html[data-mahfitt-standalone="1"] .mf-banner,
+  html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout),
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout,
+  html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner,
+  html[data-mahfitt-standalone="1"] .calendar>.cal-detail.mf-banner{
+    width:calc(100vw - 4px)!important;
+    max-width:none!important;
+    margin-left:calc(50% - 50vw + 2px)!important;
+    margin-right:0!important;
+    margin-top:0!important;
+  }
+  html[data-mahfitt-standalone="1"] #mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+    width:calc(100vw - 4px)!important;
+    margin-left:calc(50% - 50vw + 2px)!important;margin-right:0!important;margin-top:0!important;
+  }
+  html[data-mahfitt-standalone="1"] .calendar,
+  html[data-mahfitt-standalone="1"] .calendar.is-checkout{grid-template-rows:var(--mf-banner-height-tight) minmax(0,1fr)!important}
+}
+
+/* ══ v425 — CALENDAR-GOLD-STANDARD BANNER CONSTITUTION ════════════════════
+   The physical iPhone review makes the Calendar crown the canonical member
+   banner. Hardware/brand/audio controls stay in the frame; page identity and
+   date are page context, never a competing fifth/sixth banner control. Apple
+   safe-area env() values own Dynamic-Island clearance at runtime. */
+:root{
+  --mf-device-safe-top:env(safe-area-inset-top,0px);
+  --mf-banner-top-radius:35px;
+  --mf-home-banner-height:318px;
+}
+.mf-page-context{
+  box-sizing:border-box;width:min(calc(100% - 28px),892px);min-height:24px;
+  margin:5px auto 0;padding:0 2px;display:flex;align-items:center;
+  justify-content:space-between;gap:14px;position:relative;z-index:12;
+  color:var(--secondary,var(--bright,var(--cal-accent,#E9C98F)));
+  font:700 8px/1 ui-monospace,"SFMono-Regular",Menlo,monospace;
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.mf-page-context strong,.mf-page-context time{font:inherit;color:inherit;white-space:nowrap}
+.mf-page-context time{opacity:.62;text-align:right}
+/* The old lower-corner text is superseded even if a stale surface happens to
+   emit it. This is a visual lock, not a business/navigation change. */
+.mf-banner:not(.mf-banner--home)>.mf-banner__page,
+.mf-banner:not(.mf-banner--home)>.mf-banner__date{display:none!important}
+
+/* HOME is intentionally the expanded instrument crown. Its solid field fades
+   naturally through the track-position zone and is gone at Replay instead of
+   ending as a visible rectangle. Content itself never fades. */
+/* v435: the shell border was stripped out of this rule. It is a PNG-PAINT rule:
+   background/mask/shadow are its business, the crown SHELL is not. Killing the
+   border here is what forced every later pass to re-assert HOME's outline with a
+   more specific selector -- a race HOME lost whenever the newer rule moved.
+   Paint and fade behaviour below are unchanged. */
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+  height:var(--mf-home-banner-height)!important;
+  min-height:var(--mf-home-banner-height)!important;
+  max-height:var(--mf-home-banner-height)!important;
+  background:transparent!important;box-shadow:none!important;
+  overflow:visible!important;
+}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::before{display:none!important}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::after{
+  content:"";position:absolute;z-index:-1;pointer-events:none;inset:0;
+  border-top:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 40%,transparent);
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0;
+  background:
+    linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent) 0 66%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 20%,transparent) 72%,transparent 81%) left top/var(--mf-frame-line,1.72px) 100% no-repeat,
+    linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent) 0 66%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 20%,transparent) 72%,transparent 81%) right top/var(--mf-frame-line,1.72px) 100% no-repeat,
+    linear-gradient(to bottom,
+      rgba(var(--ink-rgb,14,17,20),.96) 0 66%,
+      rgba(var(--ink-rgb,14,17,20),.84) 69%,
+      rgba(var(--ink-rgb,14,17,20),.46) 73%,
+      rgba(var(--ink-rgb,14,17,20),.12) 77%,
+      rgba(var(--ink-rgb,14,17,20),0) 81%);
+}
+#mygym>.mf-banner.mf-banner--home>.fobtempo{
+  position:absolute!important;z-index:7!important;left:38px!important;right:38px!important;
+  top:151px!important;width:auto!important;margin:0!important;padding:0!important;
+}
+#mygym>.mf-banner.mf-banner--home>.fobtempo .fobtempo__rail{height:38px!important}
+#mygym>.mf-banner.mf-banner--home>.fobtempo>.mah-songseek{margin-top:-2px!important}
+#mygym>.mf-banner.mf-banner--home>.fobtempo .mah-songseek__rail{height:32px!important}
+#mygym>.mf-banner.mf-banner--home>.fobtempo .mah-songseek__times{margin-top:-6px!important}
+#mygym>.mf-banner.mf-banner--home>.fobtempo .fobtempo__actions{margin-top:-23px!important}
+@media(max-width:390px){
+  :root{--mf-home-banner-height:312px}
+  #mygym>.mf-banner.mf-banner--home>.fobtempo{left:31px!important;right:31px!important;top:149px!important}
+}
+@media(display-mode:standalone), (max-width:430px){
+  .mf-banner>.themecontrols>.themecontrol-group,
+  .mf-banner__player,.mf-banner__theme{
+    top:max(40px,calc(var(--mf-device-safe-top) - 19px))!important;
+  }
+  .mf-banner__center{top:max(19px,calc(var(--mf-device-safe-top) - 9px))!important}
+}
+html[data-mahfitt-standalone="1"] .mf-banner>.themecontrols>.themecontrol-group,
+html[data-mahfitt-standalone="1"] .mf-banner__player,
+html[data-mahfitt-standalone="1"] .mf-banner__theme{top:max(40px,calc(var(--mf-device-safe-top) - 19px))!important}
+html[data-mahfitt-standalone="1"] .mf-banner__center{top:max(19px,calc(var(--mf-device-safe-top) - 9px))!important}
+
+
+/* ══ v426 — CALENDAR CROWN PROMOTED TO THE GLOBAL STANDARD ═════════════════
+   The v424/v425 Calendar crown is the accepted gold standard. Every other
+   member crown was sitting its logo and controls materially higher, which is
+   why MAH LOG and the Homepage read as "too high" and fought the Dynamic
+   Island while Calendar did not.
+
+   Calendar achieves its result with:
+     .cal-audio-row{top:max(40px,calc(var(--mf-safe-top) + var(--mf-banner-logo-h) - 9px))}
+   against a global default of max(15px, safe-top - 24px) for the control pairs
+   and max(18px, safe-top - 8px) for the centre.
+
+   Rather than re-tune each surface by eye, the Calendar expressions become
+   TOKENS and the shared crown selectors consume them. Parity is then true by
+   construction, and a future change to the standard is one edit in one place.
+   Calendar keeps its own more specific rules and is unaffected. */
+:root{
+  /* Control pairs. MEASURED, not theorised: Calendar renders its pairs at 40px
+     from the banner top at 390/393/430. Re-deriving the offset from the safe
+     inset here produced 90px, because .mf-banner already offsets the inset via
+     its own margin-top — adding it again DOUBLE-COUNTS the notch. That double
+     count is the actual reason the other crowns drifted from Calendar. */
+  --mf-crown-pair-top:40px;
+  /* Centre block carries the logo ABOVE the transport row, so it starts higher
+     than the pairs by roughly the logo's own descent — this is what makes the
+     mark read as large and low without colliding with the notch. */
+  --mf-crown-center-top:max(24px,calc(var(--mf-safe-top) + 2px));
+}
+
+/* Standalone/PWA is where the notch actually exists, so the standard is applied
+   there and at ordinary widths alike; the max() floors keep browser tabs sane. */
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme,
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group,
+.mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__player,
+.mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__theme,
+.mg-log-shell .mg-log-top-centered.mf-banner>.themecontrols>.themecontrol-group{
+  top:var(--mf-crown-pair-top)!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__center,
+.mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__center{
+  top:var(--mf-crown-center-top)!important;
+}
+html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme,
+html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__player,
+html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__theme{
+  top:var(--mf-crown-pair-top)!important;
+}
+html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__center,
+html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__center{
+  top:var(--mf-crown-center-top)!important;
+}
+@media(display-mode:standalone){
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__player,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__theme{top:var(--mf-crown-pair-top)!important}
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__center,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__center{top:var(--mf-crown-center-top)!important}
+}
+
+/* ── v426 device-shell: smoother, genuinely device-adaptive top corners ────
+   The previous radius was a single clamp() guess. A real iPhone's display
+   corner is a continuous curve whose radius scales with the device, and the
+   only honest signal a web app gets for it is the safe-area inset — a notch or
+   Dynamic Island device reports a large top inset AND has large display
+   corners. Deriving the radius from that inset makes the shell adapt across
+   devices instead of being tuned for one handset, and it degrades to the
+   existing clamp on hardware that reports nothing. */
+html[data-mahfitt-standalone="1"]{
+  /* Redefining the token the existing rules ALREADY consume, rather than adding
+     a competing border-radius rule — a rival declaration lost the cascade
+     silently and would have shipped as a dead rule that merely looked adaptive.
+     A device with a notch or Dynamic Island reports a large top inset AND has
+     large physical display corners, so the inset is the one honest signal a web
+     app gets for corner scale. Falls back to the previous viewport clamp on
+     hardware that reports nothing. */
+  --mf-banner-top-radius:clamp(30px,calc(env(safe-area-inset-top,0px) * 0.62 + 20px),52px);
+}
+@media(display-mode:standalone){
+  :root{--mf-banner-top-radius:clamp(30px,calc(env(safe-area-inset-top,0px) * 0.62 + 20px),52px)}
+}
+
+/* ══ v431 — ULTIMATE JOB II FINAL CROWN LOCK ═══════════════════════════════
+   MAH LOG remains the accepted visual standard. This final pass changes only
+   the shared geometry requested by the physical-iPhone review: +2px shell
+   descent, a 1.10x brand mark, true Player/Theme labels, and no corner squeeze. */
+:root{
+  --mf-crown-shell-nudge:2px;
+  --mf-banner-logo-w:154px;
+  --mf-banner-logo-h:89px;
+}
+#mygym>.mf-banner:not(.mf-banner--workout),
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  margin-top:10px!important;
+}
+@media(max-width:390px){
+  :root{--mf-banner-logo-w:144px;--mf-banner-logo-h:83px}
+}
+@media(display-mode:standalone) and (orientation:portrait){
+  html .mf-banner,
+  html #mygym>.mf-banner:not(.mf-banner--workout),
+  html #mygym>.workout-hd.mf-banner--workout,
+  html .mg-log-shell .mg-log-top-centered.mf-banner,
+  html .mg-picker-shell .mg-picker-top-canonical.mf-banner,
+  html .calendar>.cal-detail.mf-banner{margin-top:var(--mf-crown-shell-nudge)!important}
+}
+@media(orientation:portrait){
+  html[data-mahfitt-standalone="1"] .mf-banner,
+  html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout),
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout,
+  html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner,
+  html[data-mahfitt-standalone="1"] .mg-picker-shell .mg-picker-top-canonical.mf-banner,
+  html[data-mahfitt-standalone="1"] .calendar>.cal-detail.mf-banner{margin-top:var(--mf-crown-shell-nudge)!important}
+}
+.calendar,.calendar.is-checkout{grid-template-rows:calc(var(--mf-banner-height-tight) + var(--mf-crown-shell-nudge)) minmax(0,1fr)!important}
+
+/* HOME: remove the old pseudo haze. The crown itself, including hardware and
+   controls, is the thing that disappears. A CSS mask changes paint only — hit
+   boxes and the page underneath keep normal ownership. */
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  border-left:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent)!important;
+  border-right:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent)!important;
+  border-top:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 40%,transparent)!important;
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 57%,rgba(0,0,0,.96) 61%,rgba(0,0,0,.78) 69%,rgba(0,0,0,.48) 77%,rgba(0,0,0,.20) 86%,rgba(0,0,0,.05) 94%,transparent 100%)!important;
+  mask-image:linear-gradient(to bottom,#000 0%,#000 57%,rgba(0,0,0,.96) 61%,rgba(0,0,0,.78) 69%,rgba(0,0,0,.48) 77%,rgba(0,0,0,.20) 86%,rgba(0,0,0,.05) 94%,transparent 100%)!important;
+  -webkit-mask-size:100% 100%!important;mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important;
+}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::after{display:none!important;background:none!important}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::before{display:none!important}
+#mygym>.home-page-context{margin-top:5px!important;margin-bottom:2px!important}
+
+/* CHOOSE MEAL / SCANNER inherits the MAH LOG crown instead of keeping a
+   second, historical geometry stack. */
+.mg-picker-shell .mg-picker-top-canonical.mf-banner{
+  display:block!important;
+  box-sizing:border-box!important;
+  width:min(calc(100% - (var(--mf-banner-outer-gutter) * 2)),920px)!important;
+  max-width:920px!important;
+  height:var(--mf-banner-height-tight)!important;min-height:var(--mf-banner-height-tight)!important;max-height:var(--mf-banner-height-tight)!important;
+  padding:0!important;
+  background:rgba(var(--ink-rgb,14,17,20),.94)!important;
+  border-bottom-width:0!important;border-bottom-style:none!important;
+  border-left:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent)!important;
+  border-right:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent)!important;
+  border-top:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 40%,transparent)!important;
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 15%,transparent),0 8px 24px rgba(0,0,0,.10)!important;
+  overflow:visible!important;
+}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-center{top:var(--mf-crown-center-top)!important;width:var(--mf-banner-center-w)!important;max-width:var(--mf-banner-center-w)!important}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-picker-home,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-mahfitt-wordmark{width:var(--mf-banner-logo-w)!important;height:var(--mf-banner-logo-h)!important;max-width:var(--mf-banner-logo-w)!important}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-logo-transport{width:var(--mf-banner-center-w)!important;height:var(--mf-banner-transport-control)!important;grid-template-columns:repeat(3,var(--mf-banner-transport-control))!important;gap:var(--mf-banner-transport-gap)!important;justify-content:center!important}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair{top:var(--mf-crown-pair-top)!important;width:calc((var(--mf-banner-control) * 2) + var(--mf-banner-pair-gap))!important;grid-template-columns:repeat(2,var(--mf-banner-control))!important;grid-template-rows:auto var(--mf-banner-control)!important;gap:var(--mf-banner-pair-gap)!important}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--studio{left:var(--mf-banner-edge)!important;right:auto!important}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--theme{right:var(--mf-banner-edge)!important;left:auto!important}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair>button{width:var(--mf-banner-control)!important;min-width:var(--mf-banner-control)!important;height:var(--mf-banner-control)!important;min-height:var(--mf-banner-control)!important}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::before{
+  content:""!important;display:block!important;position:absolute!important;z-index:0!important;pointer-events:none!important;
+  left:calc(-1 * var(--mf-frame-line))!important;right:calc(-1 * var(--mf-frame-line))!important;top:100%!important;height:max(0px,calc(var(--mf-frame-rail-end) - 100%))!important;border:0!important;box-shadow:none!important;
+  background:linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 34%,transparent) 0%,color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 32%,transparent) 42%,color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 14%,transparent) 72%,transparent 100%) left top/var(--mf-frame-line) 100% no-repeat,linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 34%,transparent) 0%,color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 32%,transparent) 42%,color-mix(in srgb,var(--secondary,var(--bright,#e9c98f)) 14%,transparent) 72%,transparent 100%) right top/var(--mf-frame-line) 100% no-repeat!important;
+}
+@media(display-mode:standalone) and (orientation:portrait){
+  html .mg-picker-shell .mg-picker-top-canonical.mf-banner{width:calc(100vw - 4px)!important;max-width:none!important;margin-left:calc(50% - 50vw + 2px)!important;margin-right:0!important}
+}
+@media(orientation:portrait){
+  html[data-mahfitt-standalone="1"] .mg-picker-shell .mg-picker-top-canonical.mf-banner{width:calc(100vw - 4px)!important;max-width:none!important;margin-left:calc(50% - 50vw + 2px)!important;margin-right:0!important}
+}
+
+/* Keep MAH LOG's horizontally scrolling meal tabs safely inside the visual
+   side rails in Safari. The filter track scrolls; the crown never deforms. */
+.mg-log-shell .mg-filters{box-sizing:border-box!important;width:calc(100% - 28px)!important;max-width:calc(100vw - 36px)!important;margin-left:auto!important;margin-right:auto!important;padding-left:2px!important;padding-right:2px!important;scroll-padding-inline:4px!important}
+
+/* ══ v432 — PHYSICAL IPHONE PNG-LOGIC CROWN FADE CORRECTION ═══════════════
+   HOME is not blurred and the banner is not opacity-masked as one rectangle.
+   The shell itself is transparent. A paint-only crown backing disappears to
+   true alpha, while the lower rack receives its own Y-opacity mask. Hit boxes
+   remain untouched because both mechanisms are paint-only/pointer-events:none. */
+/* v435: the shell border was stripped out of this rule. It is a PNG-PAINT rule:
+   background/mask/shadow are its business, the crown SHELL is not. Killing the
+   border here is what forced every later pass to re-assert HOME's outline with a
+   more specific selector -- a race HOME lost whenever the newer rule moved.
+   Paint and fade behaviour below are unchanged. */
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+  background:transparent!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  box-shadow:none!important;
+}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::before{display:none!important}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::after{
+  content:""!important;display:block!important;position:absolute!important;z-index:-1!important;pointer-events:none!important;inset:0!important;
+  border-top:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 40%,transparent)!important;
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+  background:
+    linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent) 0 58%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 18%,transparent) 66%,transparent 74%) left top/var(--mf-frame-line,1.72px) 100% no-repeat,
+    linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent) 0 58%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 18%,transparent) 66%,transparent 74%) right top/var(--mf-frame-line,1.72px) 100% no-repeat,
+    linear-gradient(to bottom,rgba(var(--ink-rgb,14,17,20),.96) 0 54%,rgba(var(--ink-rgb,14,17,20),.90) 58%,rgba(var(--ink-rgb,14,17,20),.62) 64%,rgba(var(--ink-rgb,14,17,20),.26) 69%,rgba(var(--ink-rgb,14,17,20),0) 74%)!important;
+}
+#mygym>.mf-banner.mf-banner--home>.fobtempo{
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 34%,rgba(0,0,0,.65) 58%,rgba(0,0,0,.34) 72%,rgba(0,0,0,.08) 87%,transparent 100%)!important;
+  mask-image:linear-gradient(to bottom,#000 0%,#000 34%,rgba(0,0,0,.65) 58%,rgba(0,0,0,.34) 72%,rgba(0,0,0,.08) 87%,transparent 100%)!important;
+  -webkit-mask-size:100% 100%!important;mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important;
+}
+
+/* ══ v432 — PHYSICAL IPHONE PNG-LOGIC CROWN FADE CORRECTION ═══════════════
+   HOME is not a blurred/translucent panel. Only the PAINT fades, as though the
+   crown were a PNG whose lower pixels become transparent. The real buttons,
+   sliders and their hitboxes remain in the DOM and fully functional. Replay is
+   the visual endpoint: by its lower edge the hardware is essentially gone. */
+:root{--mf-crown-shell-nudge-app:4px}
+@media(display-mode:standalone) and (orientation:portrait){
+ html #mygym>.mf-banner:not(.mf-banner--workout),
+ html #mygym>.workout-hd.mf-banner--workout,
+ html .mg-log-shell .mg-log-top-centered.mf-banner,
+ html .mg-picker-shell .mg-picker-top-canonical.mf-banner{margin-top:var(--mf-crown-shell-nudge-app)!important}
+ /* Calendar is physically approved; do not move it. */
+ html .calendar>.cal-detail.mf-banner{margin-top:var(--mf-crown-shell-nudge)!important}
+}
+@media(orientation:portrait){
+ html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout),
+ html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout,
+ html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner,
+ html[data-mahfitt-standalone="1"] .mg-picker-shell .mg-picker-top-canonical.mf-banner{margin-top:var(--mf-crown-shell-nudge-app)!important}
+ html[data-mahfitt-standalone="1"] .calendar>.cal-detail.mf-banner{margin-top:var(--mf-crown-shell-nudge)!important}
+}
+/* v435: the shell border was stripped out of this rule. It is a PNG-PAINT rule:
+   background/mask/shadow are its business, the crown SHELL is not. Killing the
+   border here is what forced every later pass to re-assert HOME's outline with a
+   more specific selector -- a race HOME lost whenever the newer rule moved.
+   Paint and fade behaviour below are unchanged. */
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+ background:transparent!important;box-shadow:none!important;
+ -webkit-mask-image:none!important;mask-image:none!important;
+ -webkit-backdrop-filter:none!important;backdrop-filter:none!important;overflow:visible!important;
+}
+/* This noninteractive layer is the crown's visible PNG-like paint. It draws
+   only the upper field + fading side rails and reaches REAL alpha zero. */
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::after{
+ content:""!important;display:block!important;position:absolute!important;z-index:0!important;pointer-events:none!important;inset:0!important;
+ border-top:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 40%,transparent)!important;
+ border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+ background:
+  linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent) 0 53%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 25%,transparent) 59%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 12%,transparent) 66%,transparent 74%) left top/var(--mf-frame-line,1.72px) 100% no-repeat,
+  linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent) 0 53%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 25%,transparent) 59%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 12%,transparent) 66%,transparent 74%) right top/var(--mf-frame-line,1.72px) 100% no-repeat,
+  linear-gradient(to bottom,rgba(var(--ink-rgb,14,17,20),.96) 0 53%,rgba(var(--ink-rgb,14,17,20),.78) 58%,rgba(var(--ink-rgb,14,17,20),.46) 63%,rgba(var(--ink-rgb,14,17,20),.18) 68%,rgba(var(--ink-rgb,14,17,20),.05) 71%,rgba(var(--ink-rgb,14,17,20),0) 74%,rgba(var(--ink-rgb,14,17,20),0) 100%)!important;
+}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::before{display:none!important}
+/* User-directed Y opacity anchors for the actual lower hardware:
+   upper speed/pitch zone ≈100%; playback ≈65%; Replay/VHS/Reverb lower half
+   ≈0–10%. Masking paint never disables the real controls. */
+#mygym>.mf-banner.mf-banner--home>.fobtempo{
+ -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 31%,rgba(0,0,0,.88) 43%,rgba(0,0,0,.65) 58%,rgba(0,0,0,.32) 70%,rgba(0,0,0,.14) 79%,rgba(0,0,0,.08) 87%,transparent 100%)!important;
+ mask-image:linear-gradient(to bottom,#000 0%,#000 31%,rgba(0,0,0,.88) 43%,rgba(0,0,0,.65) 58%,rgba(0,0,0,.32) 70%,rgba(0,0,0,.14) 79%,rgba(0,0,0,.08) 87%,transparent 100%)!important;
+ -webkit-mask-size:100% 100%!important;mask-size:100% 100%!important;-webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important;
+}
+
+/* ══ v433 — CALENDAR / ADD-PROGRAMS CROWN GOLD STANDARD ═══════════════════
+   Physical iPhone closure: Calendar + Program Library are the approved shell.
+   All sibling member crowns consume the same radius, near-bezel width and 2px
+   standalone Y nudge. Page content may differ; the device contour may not. */
+:root{
+  --mf-banner-top-radius:35px;
+  --mf-crown-shell-nudge-app:2px;
+}
+#mygym>.mf-banner:not(.mf-banner--workout),
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+}
+@media(max-width:520px){
+  #mygym>.mf-banner:not(.mf-banner--workout),
+  #mygym>.workout-hd.mf-banner--workout,
+  .mg-log-shell .mg-log-top-centered.mf-banner,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner{
+    box-sizing:border-box!important;
+    width:calc(100vw - 4px)!important;
+    max-width:none!important;
+    margin-left:2px!important;
+    margin-right:2px!important;
+  }
+}
+@media(display-mode:standalone) and (orientation:portrait){
+  html #mygym>.mf-banner:not(.mf-banner--workout),
+  html #mygym>.workout-hd.mf-banner--workout,
+  html .mg-log-shell .mg-log-top-centered.mf-banner,
+  html .mg-picker-shell .mg-picker-top-canonical.mf-banner{
+    margin-top:var(--mf-crown-shell-nudge-app)!important;
+  }
+}
+@media(orientation:portrait){
+  html[data-mahfitt-standalone="1"] #mygym>.mf-banner:not(.mf-banner--workout),
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout,
+  html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner,
+  html[data-mahfitt-standalone="1"] .mg-picker-shell .mg-picker-top-canonical.mf-banner{
+    margin-top:var(--mf-crown-shell-nudge-app)!important;
+  }
+}
+/* Calendar is the reference shot. Repeat only its already-approved token so a
+   future adaptive safe-area rule cannot silently bend it away from the master. */
+.calendar>.cal-detail.mf-banner{border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important}
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner{border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important}
+
+/* ══ v433 — HOME PNG-PAINT FADE, PHYSICAL RETUNE ═══════════════════════════
+   The v432 architecture was correct: PAINT disappears while controls keep
+   normal hitboxes. The physical phone showed the curve was too aggressive.
+   Keep the rack readable through Replay/VHS/Reverb; only the backing/rails
+   continue to true alpha below that hardware. No blur, veil or frosted box. */
+/* v435: the shell border was stripped out of this rule. It is a PNG-PAINT rule:
+   background/mask/shadow are its business, the crown SHELL is not. Killing the
+   border here is what forced every later pass to re-assert HOME's outline with a
+   more specific selector -- a race HOME lost whenever the newer rule moved.
+   Paint and fade behaviour below are unchanged. */
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout){
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  overflow:visible!important;
+  isolation:isolate!important;
+}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::before{display:none!important}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  pointer-events:none!important;
+  z-index:-1!important;
+  inset:0!important;
+  border-top:var(--mf-frame-line,1.72px) solid color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 40%,transparent)!important;
+  border-radius:var(--mf-banner-top-radius) var(--mf-banner-top-radius) 0 0!important;
+  background:
+    linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent) 0 58%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 30%,transparent) 68%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 22%,transparent) 78%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 12%,transparent) 88%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 5%,transparent) 95%,transparent 100%) left top/var(--mf-frame-line,1.72px) 100% no-repeat,
+    linear-gradient(to bottom,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 34%,transparent) 0 58%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 30%,transparent) 68%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 22%,transparent) 78%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 12%,transparent) 88%,color-mix(in srgb,var(--secondary,var(--bright,#E9C98F)) 5%,transparent) 95%,transparent 100%) right top/var(--mf-frame-line,1.72px) 100% no-repeat,
+    linear-gradient(to bottom,rgba(var(--ink-rgb,14,17,20),.96) 0 56%,rgba(var(--ink-rgb,14,17,20),.91) 66%,rgba(var(--ink-rgb,14,17,20),.76) 76%,rgba(var(--ink-rgb,14,17,20),.52) 86%,rgba(var(--ink-rgb,14,17,20),.24) 94%,rgba(var(--ink-rgb,14,17,20),0) 100%)!important;
+}
+/* v441: THE FADE HAD TWO OWNERS. This rule hard-coded the old ramp with
+   !important and a more specific selector, so the tokenised
+   --mf-crown-content-mask further down this file never actually rendered on
+   HOME — editing the token changed nothing. Pointed at the token so there is
+   exactly one owner of the crown descent. */
+#mygym>.mf-banner.mf-banner--home>.fobtempo{
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  -webkit-mask-size:100% 100%!important;
+  mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-repeat:no-repeat!important;
+}
+
+/* ══ v434 — PHYSICAL DEVICE CROWN UNIFICATION / COLLAPSE ══════════════════
+   Live Workout's near-bezel contour is the shell master. Calendar and Meal
+   Picker keep their page behavior but consume the same physical shell geometry.
+   Ordinary member crowns gain one non-destructive collapse control: it hides
+   only the lower audio rack, never its state. */
+:root{--mf-v434-shell-gutter:2px;--mf-v434-shell-radius:35px}
+#mygym>.mf-banner:not(.mf-banner--workout),
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  box-sizing:border-box!important;
+  width:calc(100% - (var(--mf-v434-shell-gutter) * 2))!important;
+  max-width:none!important;
+  margin-left:var(--mf-v434-shell-gutter)!important;
+  margin-right:var(--mf-v434-shell-gutter)!important;
+  border-radius:var(--mf-v434-shell-radius) var(--mf-v434-shell-radius) 0 0!important;
+}
+#mygym>.mf-banner--member{transition:min-height .22s ease,height .22s ease,max-height .22s ease}
+#mygym>.mf-banner--member .mf-banner__collapse{position:absolute;z-index:12;right:10px;bottom:34px;width:28px;height:24px;padding:0;border:var(--mah-container-border,3.3px) solid rgba(var(--secondary-rgb,var(--bright-rgb,233,201,143)),.28);background:rgba(var(--ink-rgb,14,17,20),.26);color:var(--bright);display:grid;place-items:center;opacity:.7;touch-action:manipulation}
+#mygym>.mf-banner--member .mf-banner__collapse span{display:block;font-size:13px;line-height:1;transition:transform .2s ease}
+#mygym>.mf-banner--member[data-collapsed="1"] .mf-banner__collapse span{transform:rotate(180deg)}
+#mygym>.mf-banner--member[data-collapsed="1"]>.fobtempo{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:translateY(-5px) scaleY(.92)!important}
+#mygym>.mf-banner--member[data-collapsed="1"]{height:118px!important;min-height:118px!important;max-height:118px!important;overflow:visible!important}
+#mygym>.mf-banner--member[data-collapsed="1"]::after{background:linear-gradient(to bottom,rgba(var(--ink-rgb,14,17,20),.96),rgba(var(--ink-rgb,14,17,20),.72) 64%,rgba(var(--ink-rgb,14,17,20),0) 100%)!important}
+@media(min-width:700px) and (max-width:1400px){
+  .calendar>.cal-detail.mf-banner,.mg-picker-shell .mg-picker-top-canonical.mf-banner{width:calc(100vw - 4px)!important;max-width:none!important;margin-left:calc(50% - 50vw + 2px)!important;margin-right:2px!important}
+}
+
+/* ══ v433 PHYSICAL ACCEPTANCE — PROGRAM LIBRARY BORDER MASTER ═══════════════
+   Physical-device correction requested after v433 follow-up: the Add Programs /
+   Program Library crown is the canonical outline painter.  Every MAHFITT crown
+   consumes the exact same top/side border + continuing rail construction.
+   Page-specific content/fades remain page-owned; HOME keeps its approved paint
+   fade behind this outline instead of replacing the outline itself. */
+:root{
+  --mf-crown-master-line:var(--mf-frame-line,1.72px);
+  --mf-crown-master-top:color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#E9C98F))) 40%,transparent);
+  --mf-crown-master-side:color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#E9C98F))) 34%,transparent);
+  --mf-crown-master-inset:color-mix(in srgb,var(--secondary,var(--bright,var(--cal-accent,#E9C98F))) 15%,transparent);
+  /* POST-R67 canonical terminal zone. Surface and perimeter resolve this same
+     element-relative tail so neither can outlive the other. Individual crown
+     families may change only the tail length when their real content differs. */
+  --mf-crown-fade-gap:6px;
+  --mf-crown-fade-tail:21px;
+}
+#mygym>.mf-banner:not(.mf-banner--workout),
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  /* Define terminal masks on the crown element itself, not :root. Custom
+     properties resolve var() where they are defined; element ownership lets
+     AI / iPad / Live Workout tail lengths resolve to their actual geometry. */
+  --mf-crown-stroke-mask:linear-gradient(to bottom,#000 0 calc(100% - var(--mf-crown-fade-tail)),rgba(0,0,0,.90) calc(100% - 12px),rgba(0,0,0,.52) calc(100% - 6px),rgba(0,0,0,.14) calc(100% - 2px),transparent 100%);
+  --mf-crown-surface-mask:linear-gradient(to bottom,#000 0 calc(100% - var(--mf-crown-fade-tail)),rgba(0,0,0,.94) calc(100% - 12px),rgba(0,0,0,.58) calc(100% - 6px),rgba(0,0,0,.16) calc(100% - 2px),transparent 100%);
+  border:0!important;
+  border-radius:var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) 0 0!important;
+  box-shadow:none!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)::before,
+#mygym>.workout-hd.mf-banner--workout::before,
+.mg-log-shell .mg-log-top-centered.mf-banner::before,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::before,
+.calendar>.cal-detail.mf-banner::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  pointer-events:none!important;
+  inset:0!important;
+  height:100%!important;
+  border-left:var(--mf-crown-master-line) solid var(--mf-crown-master-side)!important;
+  border-right:var(--mf-crown-master-line) solid var(--mf-crown-master-side)!important;
+  border-top:var(--mf-crown-master-line) solid var(--mf-crown-master-top)!important;
+  border-bottom:0!important;
+  border-radius:var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) 0 0!important;
+  box-shadow:none!important;
+  background:none!important;
+  -webkit-mask-image:var(--mf-crown-stroke-mask)!important;
+  mask-image:var(--mf-crown-stroke-mask)!important;
+}
+/* HOME's already-approved PNG-style disappearance remains intact.  Its ::after
+   paints only the fading field now; the Program Library master above owns the
+   physical outline, so HOME cannot drift into a second border geometry again. */
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::after{
+  border:0!important;
+  border-radius:var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) 0 0!important;
+  background:linear-gradient(to bottom,rgba(var(--ink-rgb,14,17,20),.96) 0 56%,rgba(var(--ink-rgb,14,17,20),.91) 66%,rgba(var(--ink-rgb,14,17,20),.76) 76%,rgba(var(--ink-rgb,14,17,20),.52) 86%,rgba(var(--ink-rgb,14,17,20),.24) 94%,rgba(var(--ink-rgb,14,17,20),0) 100%)!important;
+}
+
+/* ══ v434 — GLOBAL SIDE-AUDIO AXIS + PAINT FADE STANDARD ═══════════════════
+   Physical iPhone acceptance: the Program Library crown remains the border
+   master. On every ordinary member crown, PLAYER/THEME captions stay pinned to
+   the upper hardware corners while the two square button pairs descend to a
+   shared axis slightly BELOW the centre skip-back / skip-forward row.
+   Live Workout is deliberately excluded for the next dedicated physical pass.
+   The HOME paint-only opacity descent is also promoted to ordinary crowns:
+   backing paint and continuation rails fade; controls and hitboxes do not. */
+:root{
+  --mf-crown-label-top:40px;
+  --mf-crown-side-pair-top:78px;
+  --mf-crown-paint-solid:rgba(var(--ink-rgb,14,17,20),.96);
+}
+
+/* Shared My Gym / Progress / Program Library / MAH Health crowns. */
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme{
+  top:var(--mf-crown-side-pair-top)!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group .themecontrol-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__controls-label{
+  position:absolute!important;
+  top:calc(var(--mf-crown-label-top) - var(--mf-crown-side-pair-top))!important;
+  margin:0!important;
+  width:auto!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:first-child .themecontrol-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player .mf-banner__controls-label{left:0!important;right:auto!important;text-align:left!important}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:last-child .themecontrol-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme .mf-banner__controls-label{right:0!important;left:auto!important;text-align:right!important}
+
+/* MAH LOG and CHOOSE MEAL use their own pair markup, but the same physical
+   label/pair coordinates. The label is lifted out of the button grid so moving
+   the buttons can never drag the caption down with them. */
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair{
+  top:var(--mf-crown-side-pair-top)!important;
+}
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-pairlabel,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-pairlabel{
+  position:absolute!important;
+  top:calc(var(--mf-crown-label-top) - var(--mf-crown-side-pair-top))!important;
+  margin:0!important;
+  width:auto!important;
+  white-space:nowrap!important;
+}
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--studio .mg-log-pairlabel,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--studio .mg-log-pairlabel{left:0!important;right:auto!important;text-align:left!important}
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--theme .mg-log-pairlabel,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--theme .mg-log-pairlabel{right:0!important;left:auto!important;text-align:right!important}
+
+/* Calendar keeps all calendar-specific navigation/layout logic. Only its two
+   audio pairs/captions consume the new global crown axis. */
+.calendar>.cal-detail.mf-banner .cal-audio-row{
+  top:var(--mf-crown-side-pair-top)!important;
+  display:block!important;
+}
+.calendar>.cal-detail.mf-banner .cal-audio-row>b{
+  position:absolute!important;
+  top:calc(var(--mf-crown-label-top) - var(--mf-crown-side-pair-top))!important;
+  margin:0!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+.calendar>.cal-detail.mf-banner .cal-audio-row--player>b{left:0!important;right:auto!important;text-align:left!important}
+.calendar>.cal-detail.mf-banner .cal-audio-row--theme>b{right:0!important;left:auto!important;text-align:right!important}
+.calendar>.cal-detail.mf-banner .cal-audio-row>span{margin:0!important}
+
+/* Promote HOME's PNG-like paint descent to every NON-WORKOUT crown. The real
+   crown element is transparent; this inert pseudo layer owns the backing only.
+   Buttons, labels and transports stay at full opacity and retain normal hitboxes. */
+#mygym>.mf-banner:not(.mf-banner--workout):not(.mf-banner--home),
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  background:transparent!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  isolation:isolate!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout):not(.mf-banner--home)::after,
+.mg-log-shell .mg-log-top-centered.mf-banner::after,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:-1!important;
+  pointer-events:none!important;
+  inset:0!important;
+  border:0!important;
+  border-radius:var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) 0 0!important;
+  background:linear-gradient(to bottom,
+    var(--mf-crown-paint-solid) 0 48%,
+    rgba(var(--ink-rgb,14,17,20),.90) 58%,
+    rgba(var(--ink-rgb,14,17,20),.70) 70%,
+    rgba(var(--ink-rgb,14,17,20),.44) 82%,
+    rgba(var(--ink-rgb,14,17,20),.18) 92%,
+    rgba(var(--ink-rgb,14,17,20),0) 100%)!important;
+}
+/* Calendar keeps its own crown composition. Its upper paint is deliberately
+   opaque in the Calendar primary so a photo-derived green/foreign palette blob
+   cannot bleed through the hardware-safe top. Event colors are untouched. */
+.calendar>.cal-detail.mf-banner::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:-1!important;
+  pointer-events:none!important;
+  inset:0!important;
+  border:0!important;
+  border-radius:var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) var(--mf-v434-shell-radius,var(--mf-banner-top-radius,35px)) 0 0!important;
+  /* Calendar page ambience must not tint the still-opaque crown. Consume the
+     same theme-reactive atmospheric field as the accepted ordinary/Home crown;
+     the shared surface mask performs the terminal fade to true transparency. */
+  background:var(--mf-crown-occlusion)!important;
+}
+/* Continuation rails use the same staged opacity language instead of remaining
+   fully present for most of their descent. */
+#mygym>.mf-banner:not(.mf-banner--workout)::before,
+.mg-log-shell .mg-log-top-centered.mf-banner::before,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::before,
+.calendar>.cal-detail.mf-banner::before{
+  background:none!important;
+  -webkit-mask-image:var(--mf-crown-stroke-mask)!important;
+  mask-image:var(--mf-crown-stroke-mask)!important;
+}
+
+@media(max-width:390px){
+  :root{--mf-crown-label-top:39px;--mf-crown-side-pair-top:77px}
+}
+
+/* ══ v433 PHYSICAL ACCEPTANCE — CROWN SHELL + SIDE-AXIS HARD LOCK ═════════
+   Final correction after physical iPhone comparison. The MAH GYM crown is the
+   visual device-contour master. Program Library/Add Programs and every ordinary
+   member crown must consume the exact same shell radius and the already-requested
+   lower Player/Theme axis; labels remain pinned to the upper corners. */
+:root{
+  --mf-v434-shell-radius:42px;
+  --mf-banner-top-radius:42px;
+  --mf-crown-label-top:40px;
+  --mf-crown-side-pair-top:122px;
+}
+#mygym>.mf-banner:not(.mf-banner--workout),
+#mygym>.programlib-hd.mf-banner,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  border-radius:42px 42px 0 0!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)::after,
+#mygym>.programlib-hd.mf-banner::after,
+.mg-log-shell .mg-log-top-centered.mf-banner::after,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::after,
+.calendar>.cal-detail.mf-banner::after{
+  border-radius:42px 42px 0 0!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group,
+#mygym>.programlib-hd.mf-banner>.themecontrols>.themecontrol-group{
+  top:var(--mf-crown-side-pair-top)!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group .themecontrol-label,
+#mygym>.programlib-hd.mf-banner>.themecontrols>.themecontrol-group .themecontrol-label{
+  top:calc(var(--mf-crown-label-top) - var(--mf-crown-side-pair-top))!important;
+}
+@media(max-width:390px){
+  :root{--mf-crown-label-top:39px;--mf-crown-side-pair-top:119px}
+}
+
+/* ══ v433 CUMULATIVE LOCK — UNIVERSAL CROWN-CONTENT FADE ═══════════════════
+   Physical-device correction after the crown shell hard-lock. The accepted
+   HOME opacity descent belongs to the crown AUDIO CONTENT, not only its backing.
+   Promote that exact paint-only mask to every ordinary member audio rack so
+   accepted passes accumulate instead of replacing each other. Hitboxes remain
+   untouched because mask-image changes pixels only; no opacity/pointer-events
+   is applied to the controls themselves. Calendar, Meal Picker and Live Workout
+   retain their separately accepted compositions. */
+:root{
+  /* v441 §19-20 — THE FADE NEVER REACHED ZERO.
+     Measured on Home at 393x852 standalone: the masked rack spans y 152-249,
+     and the ramp ended at alpha .38 at 100% — so the crown content stayed 38%
+     opaque and then simply STOPPED. That terminating step is the hard
+     horizontal edge / rectangle residue, and no amount of border removal can
+     hide it because the mask itself was drawing it.
+     The same measurement showed the ramp was running THROUGH the utility row
+     rather than after it: VHS and Reverb occupy 81.4%-94.8% of the masked
+     rack and Replay 76.3%-100%, where the old ramp had already fallen to
+     .56-.38 — exactly the '§20 zero through its centre' failure.
+     Rewritten so alpha is HIGHER across the utility row than before and only
+     then collapses to TRUE zero at the rack's own bottom edge. */
+  --mf-crown-content-mask:none; /* legacy alias: crown controls do not fade */
+}
+/* HOME plus every ordinary My Gym audio rack (Program Library and any future
+   member surface that reuses tempoControlHTML). */
+#mygym .fobtempo:not([data-scope="workout"]){
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  -webkit-mask-size:100% 100%!important;
+  mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-repeat:no-repeat!important;
+}
+/* MAH LOG uses the same shared fobtempo factory outside #mygym; it receives the
+   same visual descent. The separate Choose Meal picker is intentionally not
+   targeted, matching the physical-acceptance exception. */
+.mg-log-shell:not(.mg-picker-shell) .fobtempo{
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  -webkit-mask-size:100% 100%!important;
+  mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-repeat:no-repeat!important;
+}
+
+/* ══ v433 FINAL CUMULATIVE AUDIT — CROWN OUTLINE + LABEL PAIR LOCK ════════
+   Physical acceptance follow-up. Keep every accepted v433 change cumulative:
+   - HOME must visibly keep the shared crown outline (no specificity rollback).
+   - PLAYER/THEME captions sit directly above their own two-button pairs.
+   - Meal Selection must render both Player and Theme buttons fully in-frame.
+   - Live Workout layout remains page-owned and untouched here. */
+:root{
+  --mf-crown-pair-top-final:112px;
+  --mf-crown-label-overhang:18px;
+  --mf-crown-edge-final:18px;
+}
+
+/* HOME: the earlier PNG-paint rule used a more-specific border:0. Reassert the
+   canonical physical crown on the element itself so the outline cannot vanish. */
+#mygym>.mf-banner.mf-banner--home.mf-banner--member:not(.mf-banner--workout){
+  border:0!important;
+  border-radius:var(--mf-v434-shell-radius,42px) var(--mf-v434-shell-radius,42px) 0 0!important;
+  box-shadow:none!important;
+}
+#mygym>.mf-banner.mf-banner--home.mf-banner--member:not(.mf-banner--workout)::before{
+  content:""!important;display:block!important;position:absolute!important;z-index:0!important;pointer-events:none!important;
+  inset:0!important;height:100%!important;
+  border-left:var(--mf-crown-master-line,1.72px) solid var(--mf-crown-master-side)!important;
+  border-right:var(--mf-crown-master-line,1.72px) solid var(--mf-crown-master-side)!important;
+  border-top:var(--mf-crown-master-line,1.72px) solid var(--mf-crown-master-top)!important;border-bottom:0!important;
+  border-radius:var(--mf-v434-shell-radius,42px) var(--mf-v434-shell-radius,42px) 0 0!important;
+  background:none!important;box-shadow:none!important;
+  -webkit-mask-image:var(--mf-crown-stroke-mask)!important;mask-image:var(--mf-crown-stroke-mask)!important;
+}
+
+/* Ordinary My Gym crowns: captions belong to the pair, not the hardware corner. */
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme{
+  top:var(--mf-crown-pair-top-final)!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group .themecontrol-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__controls-label{
+  position:absolute!important;
+  top:calc(-1 * var(--mf-crown-label-overhang))!important;
+  left:0!important;
+  right:auto!important;
+  width:100%!important;
+  margin:0!important;
+  text-align:left!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:last-child .themecontrol-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme .mf-banner__controls-label{
+  text-align:right!important;
+}
+
+/* MAH LOG + Meal Selection: same label-over-pair relationship. */
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair{
+  top:var(--mf-crown-pair-top-final)!important;
+}
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-pairlabel,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-pairlabel{
+  position:absolute!important;
+  top:calc(-1 * var(--mf-crown-label-overhang))!important;
+  left:0!important;
+  right:auto!important;
+  width:100%!important;
+  margin:0!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  text-align:left!important;
+}
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--theme .mg-log-pairlabel,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--theme .mg-log-pairlabel{
+  text-align:right!important;
+}
+
+/* Meal Selection physical-phone guard: two complete controls per side, always
+   visible and inset from the bezel. This intentionally does not add the shared
+   content fade to the picker; it only fixes visibility/placement. */
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--studio{
+  left:var(--mf-crown-edge-final)!important;right:auto!important;
+}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--theme{
+  right:var(--mf-crown-edge-final)!important;left:auto!important;
+}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair{
+  width:calc((var(--mf-banner-control,40px) * 2) + var(--mf-banner-pair-gap,6px))!important;
+  min-width:calc((var(--mf-banner-control,40px) * 2) + var(--mf-banner-pair-gap,6px))!important;
+  max-width:none!important;
+  grid-template-columns:repeat(2,var(--mf-banner-control,40px))!important;
+  grid-template-rows:var(--mf-banner-control,40px)!important;
+  column-gap:var(--mf-banner-pair-gap,6px)!important;
+  overflow:visible!important;
+}
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair>button{
+  position:relative!important;
+  inset:auto!important;
+  display:grid!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:var(--mf-banner-control,40px)!important;
+  min-width:var(--mf-banner-control,40px)!important;
+  max-width:var(--mf-banner-control,40px)!important;
+  height:var(--mf-banner-control,40px)!important;
+  min-height:var(--mf-banner-control,40px)!important;
+  max-height:var(--mf-banner-control,40px)!important;
+}
+
+/* Calendar keeps its accepted page composition but captions now sit directly
+   above the pair there too, matching the app-wide label contract. */
+.calendar>.cal-detail.mf-banner .cal-audio-row{top:var(--mf-crown-pair-top-final)!important}
+.calendar>.cal-detail.mf-banner .cal-audio-row>b{
+  top:calc(-1 * var(--mf-crown-label-overhang))!important;
+  width:100%!important;
+}
+
+@media(max-width:390px){
+  :root{--mf-crown-pair-top-final:108px;--mf-crown-edge-final:16px}
+}
+
+/* ══ v435 — ONE CROWN SHELL. OWNERSHIP CONSOLIDATION, NOT ANOTHER PATCH ═════
+   Root causes found by rendered measurement at 393x852 standalone, not by
+   reading source:
+
+   1) TWO INDEPENDENT RADIUS SYSTEMS. HOME's crown resolved its radius from
+      --mf-v434-shell-radius (42px) while every other crown resolved from
+      --mf-banner-top-radius, the device-following
+      clamp(30px, safe-area-top*0.62 + 20px, 52px) = 52px. Measured: HOME 42px,
+      Program Library / MAH LOG / Meal Selection 52px. That is the "Program
+      Library uses a different radius" report, and it was never a specificity
+      fight -- it was two owners. Fixed by pointing the v434 token AT the
+      device-following token so both rules now compute the same number. No new
+      override is added on top; the conflict itself is removed.
+
+   2) THE MEAL SELECTION PAIRS WERE NOT A 2x1 GRID. Measured: pair box 86px
+      tall with the two controls on a SECOND row at y=204, 11px BELOW the crown
+      bottom (233), and the Theme pair's second control starting at x=378 so it
+      ran to 418 on a 393px viewport -- off the physical screen. The previous
+      pass wrote visibility/opacity/width rules for those buttons, which cannot
+      fix a control that is laid out off-viewport. Fixed by giving every crown
+      pair ONE canonical single-row two-column track in every shell.
+
+   Scope: shells only. Live Workout keeps its own page-owned composition. */
+:root{
+  /* One owner for the physical-bezel radius. Keep the v434 name alive for the
+     rules that already reference it, but make it resolve to the same value. */
+  --mf-v434-shell-radius:var(--mf-banner-top-radius);
+  --mf-crown-ctl:var(--mf-banner-control,40px);
+  --mf-crown-ctl-gap:var(--mf-banner-pair-gap,6px);
+  --mf-crown-pair-w:calc((var(--mf-crown-ctl) * 2) + var(--mf-crown-ctl-gap));
+  --mf-crown-edge:14px;
+}
+html[data-mahfitt-standalone="1"]{--mf-v434-shell-radius:var(--mf-banner-top-radius)}
+
+/* ── Shell: one radius, one rail weight, one bottom-open profile ─────────── */
+#mygym>.mf-banner:not(.mf-banner--workout),
+.mg-log-shell .mf-banner:not(.mf-banner--workout),
+.mg-picker-shell .mf-banner:not(.mf-banner--workout){
+  border-top-left-radius:var(--mf-banner-top-radius)!important;
+  border-top-right-radius:var(--mf-banner-top-radius)!important;
+  border-bottom-left-radius:0!important;
+  border-bottom-right-radius:0!important;
+}
+
+/* ── Pair: exactly two controls, one row, both inside the shell ──────────── */
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group>.themecontrol-pair,
+.mg-log-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair,
+.mg-picker-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair{
+  display:grid!important;
+  grid-template-columns:var(--mf-crown-ctl) var(--mf-crown-ctl)!important;
+  grid-template-rows:var(--mf-crown-ctl)!important;
+  grid-auto-rows:0!important;
+  grid-auto-flow:column!important;
+  column-gap:var(--mf-crown-ctl-gap)!important;
+  row-gap:0!important;
+  width:var(--mf-crown-pair-w)!important;
+  min-width:var(--mf-crown-pair-w)!important;
+  max-width:var(--mf-crown-pair-w)!important;
+  height:var(--mf-crown-ctl)!important;
+  min-height:var(--mf-crown-ctl)!important;
+  max-height:var(--mf-crown-ctl)!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+/* The caption is lifted out of the track so it can never consume a grid row
+   and push the controls below the crown. */
+.mg-log-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair>.mg-log-pairlabel,
+.mg-picker-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair>.mg-log-pairlabel{
+  position:absolute!important;
+  grid-area:auto!important;
+  grid-column:auto!important;
+  grid-row:auto!important;
+}
+/* Both controls occupy their own column, at the shared control size. */
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group>.themecontrol-pair>*,
+.mg-log-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair>button,
+.mg-picker-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair>button{
+  position:relative!important;
+  inset:auto!important;
+  /* meal-gradient.css:1129 and :2088 pin .mg-picker-music to grid-column:3 from
+     the era when the picker crown itself was a three-column bar. Inside a
+     two-column pair that legacy value created an IMPLICIT third column and
+     threw the Theme play control to x=382 on a 393px screen -- 29px past the
+     physical edge. Reclaiming the column is the fix; forcing visibility on an
+     off-viewport control never could be. */
+  grid-column:auto!important;
+  grid-row:1!important;
+  align-self:start!important;
+  justify-self:start!important;
+  display:grid!important;
+  place-items:center!important;
+  visibility:visible!important;
+  opacity:1!important;
+  margin:0!important;
+  width:var(--mf-crown-ctl)!important;
+  min-width:var(--mf-crown-ctl)!important;
+  max-width:var(--mf-crown-ctl)!important;
+  height:var(--mf-crown-ctl)!important;
+  min-height:var(--mf-crown-ctl)!important;
+  max-height:var(--mf-crown-ctl)!important;
+}
+/* ── Both pairs are inset from the physical bezel, never past it ─────────── */
+.mg-log-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair--studio,
+.mg-picker-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair--studio{
+  left:var(--mf-crown-edge)!important;right:auto!important;
+}
+.mg-log-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair--theme,
+.mg-picker-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair--theme{
+  right:var(--mf-crown-edge)!important;left:auto!important;
+}
+
+/* ══ v435 — LIVE WORKOUT iPHONE: LOGO / TITLE COLLISION ════════════════════
+   Rendered measurement at 393x852 standalone: the crown wordmark occupied
+   y 134-193 while the UPPER Z title box occupied y 167-211 -- a 26px overlap,
+   which is the collision visible in the physical iPhone screenshot. Above the
+   wordmark sat 132px of dead band. The wordmark is lifted into that dead band
+   rather than pushing the title further down, so the collision clears AND an
+   already tall crown does not grow.
+
+   OWNERSHIP NOTE: the value that was actually winning is the STANDALONE rule
+   at line 416 of this file, top:max(5px, --mf-safe-top + 3px) = 62px. A rule
+   written in mygym.css, or written here without the standalone prefix, is
+   silently outranked -- the same class of mistake that produced the two
+   competing radius systems above. The override therefore mirrors that exact
+   selector shape instead of guessing at specificity. */
+@media(max-width:430px){
+  #mygym>.workout-hd.mf-banner--workout .workout-brand,
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workout-brand,
+  #mygym .workout-hd.mf-banner--workout .workout-brand{
+    /* v443 physical closure: keep the existing safe-aware anchor and use
+       18px more of the still-empty hardware-adjacent band. This is phone-only;
+       the accepted tablet branch remains untouched. */
+    top:max(calc(var(--mf-safe-top,0px) + 11px),calc(11dvh - 19px))!important;
+    transform:translate(-50%,-50%) translateY(-48px)!important;
+  }
+  #mygym>.workout-hd.mf-banner--workout .workoutnav,
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workoutnav{
+    padding-top:max(31px,calc(var(--mf-safe-top,0px) + 24px))!important;
+  }
+}
+
+/* ══ v436 — SHARED ORDINARY CROWN: COLLAPSE, NO BOTTOM EDGE, PAIR LOCK ═════
+   OWNERS FOUND (diagnosed, not guessed):
+
+   §3 COLLAPSE. mygym.js already toggles data-collapsed on the crown, and a
+   collapse rule already existed at "#mygym>.mf-banner--member[data-collapsed]"
+   (1 id, 1 class, 1 attr). The HOME height rule is
+   "#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)" (1 id, 3
+   classes) and therefore WON. Measured before: pressing collapse moved
+   data-collapsed 0 -> 1 while crown height stayed 318px and the content below
+   stayed at y=323 -- exactly "the music area hides but the page still behaves
+   like the large crown is there". The collapsed height simply never owned the
+   value. Collapsed HOME now resolves to the SHARED ordinary crown height, so
+   collapsing HOME literally turns it into the ordinary-page crown.
+
+   §2 BOTTOM EDGE. The crown carried an inset bottom hairline
+   (box-shadow: inset 0 -1px 0 ...) plus a bottom border on some shells. That
+   hairline is the faint horizontal rectangle residue. Paint only -- no
+   pointer-events anywhere in this block, so nothing becomes untappable. */
+:root{
+  --mf-crown-collapsed-h:var(--mf-banner-height,172px);
+}
+
+/* ── §3 Collapse actually shortens the crown ─────────────────────────────── */
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"],
+#mygym>.mf-banner.mf-banner--home.mf-banner--member[data-collapsed="1"],
+#mygym>.mf-banner.mf-banner--home.mf-banner--member[data-collapsed="1"]:not(.mf-banner--workout){
+  height:var(--mf-crown-collapsed-h)!important;
+  min-height:var(--mf-crown-collapsed-h)!important;
+  max-height:var(--mf-crown-collapsed-h)!important;
+}
+/* The expanded audio rack is removed from layout, not merely faded, so the
+   crown can genuinely shrink and the page can rise. */
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]>.fobtempo,
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]>.mah-songseek,
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]>.mah-volume,
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]>.mah-volume--home{
+  display:none!important;
+}
+/* Everything that survives the collapse keeps its exact shared geometry. */
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]>.themecontrols,
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]>.mf-banner__center,
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]>.mf-banner__collapse{
+  visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+}
+
+/* ── §2 No horizontal bottom cutoff on any ordinary crown, or on Calendar ── */
+#mygym>.mf-banner:not(.mf-banner--workout),
+.mg-log-shell .mf-banner:not(.mf-banner--workout),
+.mg-picker-shell .mf-banner:not(.mf-banner--workout),
+.calendar>.cal-detail.mf-banner{
+  border-bottom:0!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.10)!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)::after,
+.mg-log-shell .mf-banner:not(.mf-banner--workout)::after,
+.mg-picker-shell .mf-banner:not(.mf-banner--workout)::after,
+.calendar>.cal-detail.mf-banner::after{
+  border-bottom:0!important;
+  box-shadow:none!important;
+}
+
+/* ── §4 Meal Selection / MAH LOG pair: geometry, not visibility tricks ───── */
+.mg-log-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair,
+.mg-picker-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair{
+  position:absolute!important;
+  max-width:calc(100vw - (2 * var(--mf-crown-edge)))!important;
+}
+/* Neutralize EVERY legacy track assignment on EVERY child, not just <button>.
+   meal-gradient.css pins .mg-picker-music to grid-column:3 from the old
+   three-column picker bar; inside a two-column pair that creates an implicit
+   third column and throws the Theme play control past the physical edge. */
+.mg-log-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair>*:not(.mg-log-pairlabel),
+.mg-picker-shell .mf-banner:not(.mf-banner--workout) .mg-log-musicpair>*:not(.mg-log-pairlabel){
+  grid-column:auto!important;
+  grid-row:1!important;
+  justify-self:start!important;
+  align-self:start!important;
+  position:relative!important;
+  inset:auto!important;
+  margin:0!important;
+  width:var(--mf-crown-ctl)!important;
+  min-width:var(--mf-crown-ctl)!important;
+  max-width:var(--mf-crown-ctl)!important;
+  height:var(--mf-crown-ctl)!important;
+  min-height:var(--mf-crown-ctl)!important;
+  max-height:var(--mf-crown-ctl)!important;
+}
+
+/* ══ v438 — GLOBAL CROWN FOREGROUND / SAFE PAIR OWNERSHIP ══════════════════
+   One late-loaded owner for the shared shell. This block fixes the mechanism
+   that allowed scrolling page content to remain readable through a sticky
+   crown, keeps Player/Theme labels attached to their actual pair boxes, and
+   makes HOME height/state geometry explicit. Calendar and Live Workout keep
+   their page-specific information architecture; only foreground/shell
+   invariants are shared here. */
+:root{
+  --mf-crown-collapsed-h:172px;
+  --mf-crown-expanded-h:278px;
+  --mf-crown-pair-top-v438:112px;
+  --mf-crown-pair-y-v438:max(var(--mf-crown-pair-top-v438),calc(var(--mf-safe-top,0px) + 48px));
+  /* Historical pair tokens now alias the one v438 owner. Older high-specificity
+     standalone selectors may still reference these names, but they can no
+     longer compute a different axis. */
+  --mf-crown-pair-top:var(--mf-crown-pair-y-v438);
+  --mf-crown-side-pair-top:var(--mf-crown-pair-y-v438);
+  --mf-crown-pair-top-final:var(--mf-crown-pair-y-v438);
+  --mf-crown-label-lift-v438:20px;
+  --mf-crown-edge-v438:16px;
+  /* v443 closure: occlusion and visual disappearance are separate jobs.
+     The upper field stays fully opaque behind logo/Player/Theme/transport;
+     only the lower tail loses alpha. This removes the rectangle ending without
+     allowing route text to contaminate the protected crown region. */
+  --mf-crown-occlusion:
+    radial-gradient(ellipse 52% 120% at 50% -18%,color-mix(in srgb,var(--mahfitt-secondary,var(--bright,#e9c98f)) 6%,transparent),transparent 70%),
+    linear-gradient(to bottom,
+      var(--mahfitt-primary,var(--ink,#0e1114)) 0 calc(100% - var(--mf-crown-fade-tail)),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 84%,transparent) calc(100% - 12px),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 46%,transparent) calc(100% - 6px),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 12%,transparent) calc(100% - 2px),
+      transparent 100%);
+  --mf-crown-occlusion-home:
+    radial-gradient(ellipse 58% 128% at 50% -16%,color-mix(in srgb,var(--mahfitt-secondary,var(--bright,#e9c98f)) 7%,transparent),transparent 72%),
+    linear-gradient(to bottom,
+      var(--mahfitt-primary,var(--ink,#0e1114)) 0 calc(100% - var(--mf-crown-fade-tail)),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 86%,transparent) calc(100% - 12px),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 48%,transparent) calc(100% - 6px),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 12%,transparent) calc(100% - 2px),
+      transparent 100%);
+  --mf-crown-occlusion-workout:
+    radial-gradient(ellipse 55% 125% at 50% -18%,color-mix(in srgb,var(--mahfitt-secondary,var(--bright,#e9c98f)) 6%,transparent),transparent 72%),
+    linear-gradient(to bottom,
+      var(--mahfitt-primary,var(--ink,#0e1114)) 0 calc(100% - var(--mf-crown-fade-tail)),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 88%,transparent) calc(100% - 12px),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 50%,transparent) calc(100% - 6px),
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 14%,transparent) calc(100% - 2px),
+      transparent 100%);
+}
+
+/* The sticky crown is the foreground. Page cards/text may scroll underneath,
+   but the crown's own atmospheric field stays opaque throughout the protected
+   region. The missing bottom border plus fading side continuation rails creates
+   the visual dissolve without allowing route content to ghost through. This is
+   deliberately separate from the existing control-content mask. */
+#mygym>.mf-banner:not(.mf-banner--workout),
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  isolation:isolate!important;
+  background:transparent!important;
+  border-bottom:0!important;
+  border-bottom-width:0!important;
+  border-bottom-style:none!important;
+  box-shadow:none!important;
+}
+/* The inert paint layer, not the interactive crown element, owns the lower
+   disappearance. It remains inside the crown's high stacking context. */
+#mygym>.mf-banner:not(.mf-banner--workout)::after,
+#mygym>.workout-hd.mf-banner--workout::after,
+.mg-log-shell .mg-log-top-centered.mf-banner::after,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::after,
+.calendar>.cal-detail.mf-banner::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:-1!important;
+  pointer-events:none!important;
+  border-bottom:0!important;
+  border-bottom-width:0!important;
+  border-bottom-style:none!important;
+  box-shadow:none!important;
+  -webkit-mask-image:var(--mf-crown-surface-mask)!important;
+  mask-image:var(--mf-crown-surface-mask)!important;
+  -webkit-mask-size:100% 100%!important;mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout):not(.mf-banner--home)::after,
+.mg-log-shell .mg-log-top-centered.mf-banner::after,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::after{
+  background:var(--mf-crown-occlusion)!important;
+}
+#mygym>.mf-banner.mf-banner--home:not(.mf-banner--workout)::after{
+  background:var(--mf-crown-occlusion-home)!important;
+}
+#mygym>.workout-hd.mf-banner--workout::after{
+  background:var(--mf-crown-occlusion-workout)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  backdrop-filter:blur(14px)!important;
+}
+
+/* HOME keeps its accepted paint/content fade, but the foreground field is no
+   longer transparent behind live controls. Expanded height is derived from the
+   last audio-control row (≈246px on phone) plus a deliberate dissolve tail. */
+#mygym>.mf-banner.mf-banner--home.mf-banner--member:not(.mf-banner--workout){
+  height:var(--mf-crown-expanded-h)!important;
+  min-height:var(--mf-crown-expanded-h)!important;
+  max-height:var(--mf-crown-expanded-h)!important;
+  background:transparent!important;
+}
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"],
+#mygym>.mf-banner.mf-banner--home.mf-banner--member[data-collapsed="1"],
+#mygym>.mf-banner.mf-banner--home.mf-banner--member[data-collapsed="1"]:not(.mf-banner--workout){
+  height:var(--mf-crown-collapsed-h)!important;
+  min-height:var(--mf-crown-collapsed-h)!important;
+  max-height:var(--mf-crown-collapsed-h)!important;
+  background:transparent!important;
+}
+
+/* v443 analytics closure: progress content stays below the sticky crown stacking
+   context while scrolling; no route-local card/text may paint above chrome. */
+#mygym>.hd--progress.mf-banner{z-index:240!important;isolation:isolate!important}
+#mygym>.progress-page-context,#mygym>.progressview{position:relative!important;z-index:1!important}
+
+/* One pair axis. Labels are centered over the actual pair midpoint instead of
+   being independently pinned toward the hardware/status-bar corners. */
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme,
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair,
+.calendar>.cal-detail.mf-banner .cal-audio-row{
+  top:var(--mf-crown-pair-y-v438)!important;
+}
+/* Standalone Meal surfaces historically carry an extra html[data-*] selector
+   that beats equal-class-count rules even when this sheet loads last. Mirror
+   only that device-state selector and feed it the SAME canonical pair axis. */
+html[data-mahfitt-standalone="1"] .mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair,
+html[data-mahfitt-standalone="1"] .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair{
+  top:var(--mf-crown-pair-y-v438)!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group .themecontrol-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__controls-label,
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-pairlabel,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-pairlabel,
+.calendar>.cal-detail.mf-banner .cal-audio-row>b{
+  position:absolute!important;
+  top:calc(-1 * var(--mf-crown-label-lift-v438))!important;
+  left:0!important;
+  right:auto!important;
+  width:100%!important;
+  margin:0!important;
+  text-align:center!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:last-child .themecontrol-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme .mf-banner__controls-label,
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--theme .mg-log-pairlabel,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--theme .mg-log-pairlabel,
+.calendar>.cal-detail.mf-banner .cal-audio-row--theme>b{
+  text-align:center!important;
+}
+
+/* Keep both pairs inside the physical bezel with the same inward distance. */
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:first-child,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--studio,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--studio,
+.calendar>.cal-detail.mf-banner .cal-audio-row--player{
+  left:var(--mf-crown-edge-v438)!important;right:auto!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:last-child,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme,
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--theme,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--theme,
+.calendar>.cal-detail.mf-banner .cal-audio-row--theme{
+  right:var(--mf-crown-edge-v438)!important;left:auto!important;
+}
+
+/* Collapse has exactly one canonical Theme-side location in both states. This
+   keeps its shell clear of Replay/Reverb while button and swipe share one state. */
+#mygym>.mf-banner--member .mf-banner__collapse,
+#mygym>.mf-banner--member[data-collapsed="1"] .mf-banner__collapse{
+  top:max(calc(var(--mf-safe-top,0px) + 4px),calc(var(--mf-crown-pair-y-v438) - 49px))!important;
+  bottom:auto!important;
+  right:calc(var(--mf-crown-edge-v438) + ((var(--mf-crown-pair-w,86px) - 28px) / 2))!important;
+  left:auto!important;
+}
+
+/* The accepted content fade remains paint-only; hiding the expanded rack on a
+   collapsed crown is layout state, not an opacity trick. */
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]>.fobtempo{
+  display:none!important;
+}
+
+/* Small-phone pair axis: keep labels below the 59px hardware band while still
+   leaving enough room for the 40px keys before the 172px lower dissolve. */
+@media(max-width:390px){
+  :root{--mf-crown-pair-top-v438:110px;--mf-crown-edge-v438:14px}
+}
+
+/* ══ v439 — FINAL iPAD CROWN / GESTURE GEOMETRY LOCK ═══════════════════════
+   iPhone geometry from v438 is protected. This tablet-only owner pulls the
+   paired controls into one bounded instrument width, keeps the collapsed
+   affordance deliberately above Theme, and paints an atmospheric-but-opaque
+   foreground so route content cannot remain readable through the crown. */
+@media (min-width:768px){
+  :root{
+    --mf-v439-crown-console:780px;
+    --mf-v439-crown-inset:max(32px,calc((100% - var(--mf-v439-crown-console)) / 2));
+    --mf-v439-pair-y:max(126px,calc(var(--mf-safe-top,0px) + 58px));
+    --mf-v439-collapsed-h:188px;
+    --mf-v439-expanded-h:304px;
+  }
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout),
+  .mg-log-shell .mg-log-top-centered.mf-banner,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner{
+    --mf-crown-pair-y-v438:var(--mf-v439-pair-y);
+    background:transparent!important;
+    z-index:200!important;isolation:isolate!important;border-bottom:0!important;
+    box-shadow:none!important;
+  }
+  #mygym>.workout-hd.mf-banner--workout{
+    background:transparent!important;
+    z-index:200!important;isolation:isolate!important;border-bottom:0!important;border-bottom-width:0!important;border-bottom-style:none!important;
+    box-shadow:none!important;
+  }
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:first-child,
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout) .mf-banner__player,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--studio,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--studio{left:var(--mf-v439-crown-inset)!important;right:auto!important}
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:last-child,
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout) .mf-banner__theme,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--theme,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--theme{right:var(--mf-v439-crown-inset)!important;left:auto!important}
+  #mygym>.mf-banner.mf-banner--home.mf-banner--member:not(.mf-banner--workout){height:var(--mf-v439-expanded-h)!important;min-height:var(--mf-v439-expanded-h)!important;max-height:var(--mf-v439-expanded-h)!important}
+  #mygym>.mf-banner.mf-banner--member[data-collapsed="1"],
+  #mygym>.mf-banner.mf-banner--home.mf-banner--member[data-collapsed="1"]:not(.mf-banner--workout){height:var(--mf-v439-collapsed-h)!important;min-height:var(--mf-v439-collapsed-h)!important;max-height:var(--mf-v439-collapsed-h)!important}
+  #mygym>.mf-banner.mf-banner--home>.fobtempo{left:50%!important;right:auto!important;width:min(720px,calc(100% - 112px))!important;transform:translateX(-50%)!important}
+  #mygym>.mf-banner--member:not([data-collapsed="1"]) .mf-banner__collapse{right:calc(var(--mf-v439-crown-inset) + ((var(--mf-crown-pair-w,86px) - 28px) / 2))!important}
+  #mygym>.mf-banner--member[data-collapsed="1"] .mf-banner__collapse{width:30px!important;height:26px!important;top:calc(var(--mf-v439-pair-y) - 58px)!important;bottom:auto!important;right:calc(var(--mf-v439-crown-inset) + ((var(--mf-crown-pair-w,86px) - 30px) / 2))!important}
+}
+
+
+/* ══ PASS A — A1/A2/A3 CROWN OCCLUSION + UTILITY-FADE OWNERSHIP ═══════════
+   A1: every crown is one high sticky foreground stacking context. Route text
+   can scroll under the crown, but it cannot paint through PLAYER / THEME / the
+   central transport. This is a shared owner, not a page-local cover patch.
+
+   A2: the crown paint and side continuation rails already terminate at genuine
+   alpha zero in the canonical gradients above. Reassert only the structural
+   invariants here: no bottom border/shadow may recreate a hard cutoff.
+
+   A3: the lower utility row must fade WITH the crown rather than independently
+   collapsing to invisible at the bottom of the much shorter fobtempo box. The
+   content-mask token is therefore spatially mapped to the crown: on phone the
+   rack ends while crown paint is still materially visible; on tablet it ends
+   even earlier in the crown fade. VHS / Replay / Reverb remain readable and
+   usable while painted. The expanded VHS/Reverb tap areas grow UPWARD only,
+   never below their visible row into page content. */
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout),
+#mygym>.workout-hd.mf-banner--workout,
+.mg-log-shell .mg-log-top-centered.mf-banner,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner,
+.calendar>.cal-detail.mf-banner{
+  position:sticky!important;
+  top:0!important;
+  z-index:240!important;
+  isolation:isolate!important;
+  border-bottom:0!important;
+  border-bottom-width:0!important;
+  border-bottom-style:none!important;
+  box-shadow:none!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout)::after,
+#mygym>.workout-hd.mf-banner--workout::after,
+.mg-log-shell .mg-log-top-centered.mf-banner::after,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::after,
+.calendar>.cal-detail.mf-banner::after,
+#mygym>.mf-banner:not(.mf-banner--workout)::before,
+#mygym>.workout-hd.mf-banner--workout::before,
+.mg-log-shell .mg-log-top-centered.mf-banner::before,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner::before,
+.calendar>.cal-detail.mf-banner::before{
+  border-bottom:0!important;
+  border-bottom-width:0!important;
+  border-bottom-style:none!important;
+  box-shadow:none!important;
+}
+
+/* At >=768px the same rack occupies a smaller fraction of the taller crown, so
+   its visible utility row appropriately remains stronger. This changes paint
+   only; geometry, range mapping and audio ownership are untouched. */
+@media(min-width:768px){
+}
+
+/* Keep the accepted >=40px effective touch height without allowing the
+   invisible pseudo hitbox to extend below the fading utility row. */
+#mygym .fobtempo:not([data-scope="workout"]) .fobtempo__vhs::after,
+#mygym .fobtempo:not([data-scope="workout"]) .fobtempo__reverb::after,
+.mg-log-shell:not(.mg-picker-shell) .fobtempo .fobtempo__vhs::after,
+.mg-log-shell:not(.mg-picker-shell) .fobtempo .fobtempo__reverb::after{
+  top:-27px!important;
+  bottom:0!important;
+  left:-12px!important;
+  right:-12px!important;
+}
+
+/* ══ PASS B — LANDSCAPE + CONTROL-SHELL QUALITY FREEZE ════════════════════
+   Scope: §5 landscape standard, §9–12 Live Workout panel preservation and
+   §15 control-shell centering.  Pass A crown/fade/rail ownership stays above.
+
+   iPhone landscape and iPad landscape are intentionally separate gates:
+   - short landscape viewports fill only the physical left/right safe region;
+   - iPad landscape keeps the bounded 920px crown rather than stretching the
+     instrument to the full tablet width.
+   No portrait geometry is changed. */
+:root{
+  --mf-landscape-safe-left:max(8px,env(safe-area-inset-left,0px));
+  --mf-landscape-safe-right:max(8px,env(safe-area-inset-right,0px));
+}
+
+/* iPhone-class landscape: respect the notch / physical side insets in Safari
+   and PWA alike.  Previously only the standalone branch consumed these insets,
+   so the browser-mode crown could resolve almost edge-to-edge. */
+@media (orientation:landscape) and (max-height:500px){
+  html .mf-banner,
+  html #mygym>.mf-banner:not(.mf-banner--workout),
+  html #mygym>.workout-hd.mf-banner--workout,
+  html .mg-log-shell .mg-log-top-centered.mf-banner,
+  html .mg-picker-shell .mg-picker-top-canonical.mf-banner,
+  html .calendar>.cal-detail.mf-banner{
+    box-sizing:border-box!important;
+    width:calc(100vw - var(--mf-landscape-safe-left) - var(--mf-landscape-safe-right))!important;
+    max-width:none!important;
+    margin-left:calc(50% - 50vw + var(--mf-landscape-safe-left))!important;
+    margin-right:0!important;
+    margin-top:0!important;
+  }
+}
+
+/* iPad-class landscape: preserve the deliberate bounded instrument rather than
+   inheriting the standalone max-width:none rule. */
+@media (orientation:landscape) and (min-width:900px) and (min-height:600px){
+  html .mf-banner,
+  html #mygym>.mf-banner:not(.mf-banner--workout),
+  html #mygym>.workout-hd.mf-banner--workout,
+  html .mg-log-shell .mg-log-top-centered.mf-banner,
+  html .mg-picker-shell .mg-picker-top-canonical.mf-banner,
+  html .calendar>.cal-detail.mf-banner{
+    box-sizing:border-box!important;
+    width:min(calc(100vw - 48px),1120px)!important;
+    max-width:1120px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+}
+
+/* One shared optical-centering contract for crown control shells.  Do not move
+   the hitboxes or glyph-specific optical transforms; only remove inherited
+   button padding/line-box bias so the existing icon mass is centered by grid. */
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols .themecontrol-pair>button,
+#mygym>.workout-hd.mf-banner--workout .themecontrols--workout .musiclib,
+#mygym>.workout-hd.mf-banner--workout .themecontrols--workout .themeedit,
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair>button,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair>button,
+.calendar>.cal-detail.mf-banner .cal-audio-row>button{
+  box-sizing:border-box!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:0!important;
+  line-height:0!important;
+}
+
+/* Live Workout's Player and Theme launchers use the same square-shell language
+   as the canonical crown.  The title column absorbs the small width delta;
+   Replay remains the accepted compact stack directly beneath Player. */
+#mygym>.workout-hd.mf-banner--workout .themecontrols--workout .musiclib,
+#mygym>.workout-hd.mf-banner--workout .themecontrols--workout .themeedit{
+  width:42px!important;
+  min-width:42px!important;
+  max-width:42px!important;
+  height:42px!important;
+  min-height:42px!important;
+  max-height:42px!important;
+  flex:0 0 42px!important;
+}
+@media(max-width:430px){
+  #mygym>.workout-hd.mf-banner--workout .themecontrols--workout .musiclib,
+  #mygym>.workout-hd.mf-banner--workout .themecontrols--workout .themeedit{
+    width:40px!important;
+    min-width:40px!important;
+    max-width:40px!important;
+    height:40px!important;
+    min-height:40px!important;
+    max-height:40px!important;
+    flex-basis:40px!important;
+  }
+}
+/* Pass B tablet specificity lock: the standalone adapter above carries an
+   html[data-mahfitt-standalone] selector, so match that owner rather than
+   stacking a weaker width declaration that cannot win the real PWA cascade. */
+@media (orientation:landscape) and (min-width:900px) and (min-height:600px){
+  html[data-mahfitt-standalone] .mf-banner,
+  html[data-mahfitt-standalone] #mygym>.mf-banner:not(.mf-banner--workout),
+  html[data-mahfitt-standalone] #mygym>.workout-hd.mf-banner--workout,
+  html[data-mahfitt-standalone] .mg-log-shell .mg-log-top-centered.mf-banner,
+  html[data-mahfitt-standalone] .mg-picker-shell .mg-picker-top-canonical.mf-banner,
+  html[data-mahfitt-standalone] .calendar>.cal-detail.mf-banner{
+    box-sizing:border-box!important;
+    width:min(calc(100vw - 48px),1120px)!important;
+    max-width:1120px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+}
+
+/* ══ v446 PHYSICAL IPAD LANDSCAPE — WIDE THREE-ZONE CROWN ══════════════════
+   Physical iPad evidence supersedes the former 780px inner-console freeze.
+   The widened shell keeps a true 50% center while Player and Theme consume
+   corresponding outer zones. Portrait and iPhone landscape remain separate. */
+@media (orientation:landscape) and (min-width:900px) and (min-height:600px){
+  :root{
+    --mf-v439-crown-console:1048px;
+    --mf-v439-crown-inset:48px;
+  }
+  #mygym>.mf-banner.mf-banner--home>.fobtempo{
+    width:min(880px,calc(100% - 176px))!important;
+    max-width:880px!important;
+  }
+}
+
+/* ══ v446 PHYSICAL iPHONE PORTRAIT — SAFE BRAND / CONTROL SEPARATION ═══════
+   The late-loaded v443 transform still lifted the now-taller canonical mark
+   through the title/control row. Physical iPhone evidence requires distinct
+   bands: hardware-safe brand first, then title/Player/Theme, then the paired
+   media/rail instrument. This is deliberately phone-portrait only. */
+@media (max-width:430px) and (orientation:portrait){
+  #mygym>.workout-hd.mf-banner--workout .workoutnav,
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workoutnav{
+    padding-top:max(118px,calc(var(--mf-safe-top,0px) + 88px))!important;
+    height:auto!important;
+    min-height:max(164px,calc(var(--mf-safe-top,0px) + 134px))!important;
+  }
+  #mygym>.workout-hd.mf-banner--workout .workout-brand,
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workout-brand,
+  #mygym .workout-hd.mf-banner--workout .workout-brand{
+    top:max(6px,calc(var(--mf-safe-top,0px) - 4px))!important;
+    transform:translateX(-50%)!important;
+  }
+}
+
+/* ══ POST-v446 PHYSICAL iPHONE CROWN CORRECTION ════════════════════════════
+   Authoritative Aug-25 physical screenshots exposed the real root cause of the
+   apparent +9px centre drift: on phone portrait the 154px logo was wider than
+   the canonical 136px centre grid track. CSS Grid therefore overflow-aligned
+   that track from its start edge, pulling BOTH the logo and the lower transport
+   to the right even though .mf-banner__center itself was mathematically 50%.
+
+   Keep the shared centre owner at true 50%. The requested ~.69x logo now fits
+   inside the centre track, so the grid can centre it without an optical nudge.
+   Player/Theme remain equal-width mirror zones; the collapse affordance is
+   reduced and parked at the outer Theme edge so it no longer adds centreward
+   visual weight. Scanner gets an opaque upper crown paint so its scrolling
+   route/back context cannot show through the hardware/brand band. */
+@media (max-width:430px) and (orientation:portrait){
+  :root{
+    --mf-banner-logo-w:106px;
+    --mf-banner-logo-h:61px;
+  }
+
+  /* One true viewport axis. No page/date/side-control content participates. */
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__center,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mf-banner__center,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-center,
+  .calendar>.cal-detail.mf-banner .mf-banner__center{
+    left:50%!important;
+    right:auto!important;
+    transform:translateX(-50%)!important;
+    width:var(--mf-banner-center-w)!important;
+    max-width:var(--mf-banner-center-w)!important;
+    min-width:0!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    justify-items:center!important;
+  }
+
+  /* 154x89 → approximately .69x. Explicit child centring prevents an
+     oversized/intrinsic grid track from ever reintroducing axis drift. */
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__center .my-fob-home.my-mahfitt-home,
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__center .my-mahfitt-wordmark,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-fob-home,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-mahfitt-wordmark,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-picker-home,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-mahfitt-wordmark,
+  .calendar>.cal-detail.mf-banner .cal-detail-logo,
+  .calendar>.cal-detail.mf-banner .cal-detail-logo .cal-mahfitt-mark{
+    width:var(--mf-banner-logo-w)!important;
+    min-width:var(--mf-banner-logo-w)!important;
+    max-width:var(--mf-banner-logo-w)!important;
+    height:var(--mf-banner-logo-h)!important;
+    min-height:var(--mf-banner-logo-h)!important;
+    max-height:var(--mf-banner-logo-h)!important;
+    justify-self:center!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+
+  /* Equal transport cells around the diamond: same y-axis, same gap, same
+     apparent left/right allocation on every ordinary crown consumer. */
+  #mygym>.mf-banner:not(.mf-banner--workout) .hd__logo-transport,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-logo-transport,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-logo-transport,
+  .calendar>.cal-detail.mf-banner .cal-logo-transport{
+    box-sizing:border-box!important;
+    width:var(--mf-banner-center-w)!important;
+    grid-template-columns:repeat(3,var(--mf-banner-transport-control))!important;
+    column-gap:var(--mf-banner-transport-gap)!important;
+    justify-items:center!important;
+    justify-content:center!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+
+  /* Side zones consume exactly the same width and inward distance. */
+  #mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group,
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair{
+    width:var(--mf-crown-pair-w,86px)!important;
+    max-width:var(--mf-crown-pair-w,86px)!important;
+  }
+  #mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:first-child,
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--studio,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--studio{
+    left:var(--mf-crown-edge-v438,18px)!important;right:auto!important;
+  }
+  #mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group:last-child,
+  #mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme,
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-log-musicpair--theme,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-musicpair--theme{
+    right:var(--mf-crown-edge-v438,18px)!important;left:auto!important;
+  }
+
+  /* Collapse is Theme-owned and shares the exact Theme pair midpoint.  The
+     pair itself remains at the mirrored crown edge; only this tiny launcher is
+     centered above it so it cannot visually drag the right side outward. */
+  #mygym>.mf-banner--member .mf-banner__collapse,
+  #mygym>.mf-banner--member[data-collapsed="1"] .mf-banner__collapse{
+    width:22px!important;height:20px!important;
+    top:max(calc(var(--mf-safe-top,0px) + 4px),14px)!important;
+    right:calc(var(--mf-crown-edge-v438,18px) + ((var(--mf-crown-pair-w,86px) - 22px) / 2))!important;
+    left:auto!important;bottom:auto!important;
+    opacity:.66!important;
+  }
+
+  /* Scanner-specific occlusion ownership. Route/date + Back remain ordinary
+     page context below the crown, but can no longer paint through its upper
+     Player / Brand / Theme hardware band while scrolling underneath. */
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner{
+    background:linear-gradient(to bottom,
+      rgba(var(--ink-rgb,14,17,20),.985) 0%,
+      rgba(var(--ink-rgb,14,17,20),.975) 72%,
+      rgba(var(--ink-rgb,14,17,20),.88) 84%,
+      rgba(var(--ink-rgb,14,17,20),0) 100%)!important;
+  }
+  .mg-picker-shell>.mg-picker-page-context,
+  .mg-picker-shell>.mg-picker-backrow{position:relative!important;z-index:1!important}
+  .mg-picker-shell>.mg-picker-page-context{margin-top:8px!important;margin-bottom:3px!important}
+  .mg-picker-shell>.mg-picker-backrow{margin-top:3px!important}
+
+  /* Live Workout crown mark receives the same .69x physical correction. The
+     title/control row follows the smaller hardware-safe mark instead of keeping
+     the old oversized-logo clearance. */
+  #mygym>.workout-hd.mf-banner--workout .workout-brand,
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workout-brand{
+    width:99px!important;height:57px!important;
+    top:max(4px,calc(var(--mf-safe-top,0px) - 10px))!important;
+    left:50%!important;right:auto!important;
+    transform:translateX(-50%)!important;
+  }
+  #mygym>.workout-hd.mf-banner--workout .workoutnav,
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workoutnav{
+    padding-top:max(78px,calc(var(--mf-safe-top,0px) + 48px))!important;
+    min-height:max(124px,calc(var(--mf-safe-top,0px) + 90px))!important;
+    height:auto!important;
+  }
+}
+
+/* ══ POST-v446 TRUE-FINAL PHYSICAL OCCLUSION / THEME STACK LOCK ═══════════
+   New iPhone evidence showed page context readable through the lower media
+   rack while the sticky crown was still active.  The leak is not a hidden
+   control: it is ordinary route/date content seen through an atmosphere that
+   became translucent too early.  Keep the shared foreground opaque through
+   active hardware/media, then dissolve only in the terminal crown tail. */
+@media (max-width:430px) and (orientation:portrait){
+  :root{
+    --mf-crown-occlusion:
+      radial-gradient(ellipse 52% 120% at 50% -18%,color-mix(in srgb,var(--mahfitt-secondary,var(--bright,#e9c98f)) 6%,transparent),transparent 70%),
+      linear-gradient(to bottom,
+        var(--mahfitt-primary,var(--ink,#0e1114)) 0 82%,
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 96%,transparent) 88%,
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 72%,transparent) 93%,
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 34%,transparent) 97%,
+        transparent 100%);
+    --mf-crown-occlusion-home:
+      radial-gradient(ellipse 58% 128% at 50% -16%,color-mix(in srgb,var(--mahfitt-secondary,var(--bright,#e9c98f)) 7%,transparent),transparent 72%),
+      linear-gradient(to bottom,
+        var(--mahfitt-primary,var(--ink,#0e1114)) 0 84%,
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 97%,transparent) 89%,
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 76%,transparent) 94%,
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 36%,transparent) 97%,
+        transparent 100%);
+  }
+  /* Page identity stays page-owned and below the crown stacking context. */
+  #mygym>.mf-page-context,
+  .mg-log-shell>.mf-page-context,
+  .mg-picker-shell>.mf-page-context{
+    position:relative!important;z-index:1!important;
+  }
+}
+
+/* Scanner/Log logo launchers are buttons. Their historical horizontal button
+   padding made a correctly-sized child over-constrained, resolving auto margin
+   as a negative right margin and recreating a +6px visual drift. The launcher
+   shell itself has no visible chrome, so padding is not part of its hit target. */
+@media (max-width:430px) and (orientation:portrait){
+  .mg-log-shell .mg-log-top-centered.mf-banner .mg-fob-home,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-picker-home,
+  .calendar>.cal-detail.mf-banner .cal-detail-logo{
+    box-sizing:border-box!important;padding:0!important;border:0!important;
+    display:grid!important;place-items:center!important;
+  }
+}
+
+
+/* ══ v449 — LIVE WORKOUT FINAL PHONE CROWN LIFT + SEAMLESS DISSOLVE ════════
+   Physical iPhone evidence: the balanced 131/131 instrument internals are
+   already correct.  This owner only lifts the crown-owned composition and
+   gives the inert paint/stroke layers a true-zero tail so no bottom endpoint
+   survives.  Workout body, rail mapping and touch geometry are untouched. */
+@media (max-width:430px) and (orientation:portrait){
+  #mygym>.workout-hd.mf-banner--workout{
+    --mf-workout-crown-fade-tail:44px;
+    /* The shared stroke/surface masks are element-owned. Point their terminal
+       length at Live Workout's already-accepted absolute tail so paint, blur
+       and perimeter all start/finish dissolution in the same physical zone. */
+    --mf-crown-fade-tail:var(--mf-workout-crown-fade-tail);
+    /* Job III measured closure: the completion row ends 10px above the old
+       crown bottom while the new centered collapse key needs its own lower
+       lane. 28px preserves the existing instrument geometry and adds exactly
+       18px of real crown space instead of overlapping the completion rail. */
+    padding-bottom:28px!important;
+  }
+  #mygym>.workout-hd.mf-banner--workout::after{
+    /* Keep the foreground fully owned through the REAL crown bottom, then
+       dissolve only in this added inert tail.  Using absolute tail distances
+       avoids the old percentage bug where a taller safe-area crown became
+       transparent before its own geometry ended. */
+    inset:0 -1px auto!important;
+    height:calc(100% + var(--mf-workout-crown-fade-tail))!important;
+    background:
+      radial-gradient(ellipse 55% 120% at 50% -18%,color-mix(in srgb,var(--mahfitt-secondary,var(--bright,#e9c98f)) 6%,transparent),transparent 72%),
+      linear-gradient(to bottom,
+        var(--mahfitt-primary,var(--ink,#0e1114)) 0 calc(100% - var(--mf-workout-crown-fade-tail)),
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 96%,transparent) calc(100% - 34px),
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 78%,transparent) calc(100% - 22px),
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 42%,transparent) calc(100% - 12px),
+        color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 14%,transparent) calc(100% - 5px),
+        transparent 100%)!important;
+    -webkit-mask-image:var(--mf-crown-surface-mask)!important;
+    mask-image:var(--mf-crown-surface-mask)!important;
+  }
+  #mygym>.workout-hd.mf-banner--workout::before{
+    height:calc(100% + var(--mf-workout-crown-fade-tail))!important;
+    -webkit-mask-image:var(--mf-crown-stroke-mask)!important;
+    mask-image:var(--mf-crown-stroke-mask)!important;
+  }
+  #mygym>.workout-hd.mf-banner--workout .workout-brand,
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workout-brand{
+    top:max(2px,calc(var(--mf-safe-top,0px) - 28px))!important;
+  }
+  #mygym>.workout-hd.mf-banner--workout .workoutnav,
+  html[data-mahfitt-standalone="1"] #mygym>.workout-hd.mf-banner--workout .workoutnav{
+    padding-top:max(74px,calc(var(--mf-safe-top,0px) + 42px))!important;
+    min-height:max(120px,calc(var(--mf-safe-top,0px) + 86px))!important;
+  }
+}
+
+/* ══ v450 — SCANNER CROWN SIDE-LINE CONTINUITY ════════════════════════════
+   Scanner already consumes HOME's canonical crown stroke color/mask, but its
+   short crown height ended that stroke before the route/back context lane,
+   leaving the physical iPhone side gaps. Continue the SAME master side rails
+   through the context transition and let the existing crown mask fade them to
+   zero — no second border geometry and no opaque patch. */
+@media(max-width:430px) and (orientation:portrait){
+  /* The legacy deterministic-standalone Scanner rule in meal-gradient.css is
+     more specific than the generic shared crown selector.  Beat it HERE, at
+     the canonical late crown owner, so the old element border/two-background-
+     rail painter cannot become a second geometry source. */
+  html[data-mahfitt-standalone="1"] .mg-picker-shell .mg-picker-top-canonical.mf-banner{
+    border:0!important;
+    box-shadow:none!important;
+  }
+  html[data-mahfitt-standalone="1"] .mg-picker-shell .mg-picker-top-canonical.mf-banner::before,
+  .mg-picker-shell .mg-picker-top-canonical.mf-banner::before{
+    content:""!important;display:block!important;position:absolute!important;
+    pointer-events:none!important;z-index:0!important;
+    top:0!important;left:0!important;right:0!important;bottom:auto!important;
+    width:auto!important;
+    height:100%!important;
+    border-left:var(--mf-crown-master-line) solid var(--mf-crown-master-side)!important;
+    border-right:var(--mf-crown-master-line) solid var(--mf-crown-master-side)!important;
+    border-top:var(--mf-crown-master-line) solid var(--mf-crown-master-top)!important;
+    border-bottom:0!important;
+    box-shadow:none!important;
+    background:none!important;
+    -webkit-mask-image:var(--mf-crown-stroke-mask)!important;
+    mask-image:var(--mf-crown-stroke-mask)!important;
+  }
+}
+
+/* ══ ULTIMATE JOB III — LIVE WORKOUT HARDWARE-POCKET LIFT ════════════════
+   User physical evidence: the final Live Workout composition still carried
+   one redundant 16px top pad from the generic .hd primitive. The workout
+   crown already owns its own safe-area math through --mf-safe-top plus the
+   late workout-brand/workoutnav offsets, so that inherited pad was a second
+   vertical owner. Remove only that duplicate phone-portrait pad. This lifts
+   the logo, title/actions and the complete timer/audio/progress instrument as
+   one unit without changing their internal geometry, rail mapping or handlers.
+   The accepted crown fade remains height-relative and continues below the
+   resulting real crown bottom. Tablet/desktop branches are intentionally
+   untouched. */
+@media (max-width:430px) and (orientation:portrait){
+  #mygym>.workout-hd.mf-banner--workout{
+    padding-top:0!important;
+  }
+}
+
+/* ══ ULTIMATE JOB III — PASS B1 CANONICAL ORDINARY CROWN OWNER ════════════
+   The normal crown factory now emits its own complete audio rack. HOME,
+   Progress, Health and both Program surfaces therefore share ONE expanded /
+   collapsed DOM contract instead of moving or duplicating `.fobtempo` after
+   render. Live Workout is explicitly excluded and keeps its dedicated panel.
+   This late owner keeps the accepted three-row rack. The compact ordinary
+   Pitch controller now lives inside the utilities row between VHS and REVERB,
+   so no fourth grid track or crown-height expansion is permitted. */
+:root{
+  --j3-crown-rack-top:151px;
+  --j3-crown-rack-inset:38px;
+  --j3-crown-rack-content-h:103px; /* 28 Volume + 2 + 48 Seek + 2 + 23 utilities; Pitch is compact inside utilities */
+  --mf-crown-fade-gap:6px;
+  --mf-crown-fade-tail:21px;
+  --j3-crown-expanded-h:calc(var(--j3-crown-rack-top) + var(--j3-crown-rack-content-h) + var(--mf-crown-fade-gap) + var(--mf-crown-fade-tail));
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"]){
+  height:var(--j3-crown-expanded-h)!important;
+  min-height:var(--j3-crown-expanded-h)!important;
+  max-height:var(--j3-crown-expanded-h)!important;
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo{
+  position:absolute!important;z-index:2!important;
+  top:var(--j3-crown-rack-top)!important;left:var(--j3-crown-rack-inset)!important;right:var(--j3-crown-rack-inset)!important;
+  width:auto!important;max-width:none!important;margin:0!important;padding:0!important;
+  transform:none!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+  -webkit-mask-size:100% 100%!important;mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important;
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.fobtempo__rail{height:34px!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-songseek{margin-top:-2px!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo .mah-songseek__rail{height:32px!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo .mah-songseek__times{margin-top:-6px!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo .fobtempo__actions{margin-top:-23px!important}
+
+/* The Program crown is no longer a manual pseudo-banner. Keep only its page
+   context identity below the canonical hardware shell. */
+#mygym>.programlib-hd.mf-banner.mf-banner--member{
+  display:block!important;grid-template:none!important;padding:0!important;
+}
+
+@media(max-width:390px){
+  :root{--j3-crown-rack-top:149px;--j3-crown-rack-inset:31px}
+}
+@media(min-width:768px){
+  :root{--j3-crown-rack-top:168px;--j3-crown-rack-inset:56px;--mf-crown-fade-gap:8px;--mf-crown-fade-tail:24px}
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo{
+    left:50%!important;right:auto!important;width:min(720px,calc(100% - 112px))!important;max-width:720px!important;
+    transform:translateX(-50%)!important;
+  }
+}
+
+/* ══ ULTIMATE JOB III — PASS B2 MEAL OVERLAY CROWN ADAPTER ═══════════════
+   Meal Log + Scanner are body-level destinations, so they cannot be literal
+   children of #mygym. They now consume the same `.fobtempo` DOM primitive and
+   same collapsed-state contract while retaining Meal Grade's router/camera
+   ownership. No page-local audio state is introduced. */
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member:not([data-collapsed="1"]),
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member:not([data-collapsed="1"]){
+  height:var(--j3-crown-expanded-h)!important;
+  min-height:var(--j3-crown-expanded-h)!important;
+  max-height:var(--j3-crown-expanded-h)!important;
+}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo{
+  position:absolute!important;z-index:2!important;
+  top:var(--j3-crown-rack-top)!important;
+  left:var(--j3-crown-rack-inset)!important;right:var(--j3-crown-rack-inset)!important;
+  width:auto!important;max-width:none!important;margin:0!important;padding:0!important;
+  transform:none!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+  -webkit-mask-size:100% 100%!important;mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important;
+}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo>.fobtempo__rail,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo>.fobtempo__rail{height:34px!important}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo>.mah-songseek,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo>.mah-songseek{margin-top:-2px!important}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo .mah-songseek__rail,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo .mah-songseek__rail{height:32px!important}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo .mah-songseek__times,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo .mah-songseek__times{margin-top:-6px!important}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo .fobtempo__actions,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo .fobtempo__actions{margin-top:-23px!important}
+
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.mf-banner__collapse,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.mf-banner__collapse{
+  display:grid!important;place-items:center!important;position:absolute!important;z-index:10!important;
+  width:22px!important;height:20px!important;
+  top:max(calc(var(--mf-safe-top,0px) + 4px),14px)!important;
+  right:calc(var(--mf-crown-edge-v438,18px) + ((var(--mf-crown-pair-w,86px) - 22px) / 2))!important;
+  left:auto!important;bottom:auto!important;margin:0!important;padding:0!important;
+  border:var(--mah-container-border,3.3px) solid rgba(var(--secondary-rgb,var(--bright-rgb,233,201,143)),.30)!important;border-radius:3px!important;
+  background:rgba(var(--ink-rgb,14,17,20),.72)!important;color:var(--secondary,var(--bright))!important;
+  opacity:.66!important;line-height:1!important;
+}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.mf-banner__collapse span,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.mf-banner__collapse span{display:block!important;line-height:1!important;transform:none!important}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member[data-collapsed="1"],
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member[data-collapsed="1"]{
+  height:172px!important;min-height:172px!important;max-height:172px!important;
+}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member[data-collapsed="1"]>.fobtempo,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member[data-collapsed="1"]>.fobtempo{
+  opacity:0!important;visibility:hidden!important;transform:translateY(-5px) scaleY(.92)!important;
+}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member[data-collapsed="1"]>.mf-banner__collapse span,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member[data-collapsed="1"]>.mf-banner__collapse span{transform:rotate(180deg)!important}
+@media(min-width:768px){
+  .mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo,
+  .mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo{
+    left:50%!important;right:auto!important;width:min(720px,calc(100% - 112px))!important;max-width:720px!important;transform:translateX(-50%)!important;
+  }
+  .mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member[data-collapsed="1"],
+  .mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member[data-collapsed="1"]{height:188px!important;min-height:188px!important;max-height:188px!important}
+}
+
+/* ══ ULTIMATE JOB III — OPTICAL CROWN CHEVRON OWNER ═══════════════════════
+   The collapse indicator is an explicit symmetric SVG, not a font glyph.
+   Expanded is up; collapsed rotates the same exact geometry 180 degrees. */
+#mygym>.mf-banner--member .mf-banner__collapse>.mf-banner__chevron,
+.mg-log-shell>.mf-banner--member .mf-banner__collapse>.mf-banner__chevron,
+.mg-picker-shell>.mf-banner--member .mf-banner__collapse>.mf-banner__chevron{
+  display:block!important;width:14px!important;height:10px!important;
+  margin:0!important;padding:0!important;overflow:visible!important;
+  color:inherit!important;transform:rotate(0deg)!important;transform-origin:50% 50%!important;
+  transition:transform .18s ease!important;pointer-events:none!important;
+}
+#mygym>.mf-banner--member .mf-banner__collapse>.mf-banner__chevron path,
+.mg-log-shell>.mf-banner--member .mf-banner__collapse>.mf-banner__chevron path,
+.mg-picker-shell>.mf-banner--member .mf-banner__collapse>.mf-banner__chevron path{
+  fill:none!important;stroke:currentColor!important;stroke-width:1.5!important;
+  stroke-linecap:round!important;stroke-linejoin:round!important;vector-effect:non-scaling-stroke!important;
+}
+#mygym>.mf-banner--member[data-collapsed="1"] .mf-banner__collapse>.mf-banner__chevron,
+.mg-log-shell>.mf-banner--member[data-collapsed="1"] .mf-banner__collapse>.mf-banner__chevron,
+.mg-picker-shell>.mf-banner--member[data-collapsed="1"] .mf-banner__collapse>.mf-banner__chevron{
+  transform:rotate(180deg)!important;
+}
+
+/* ══ ULTRA-MAHFITT JOB III MASTER — PLAYER/THEME LABEL AXIS OWNER ═════════
+   Physical iPhone evidence showed PLAYER still inheriting a historical
+   corner-aligned caption despite the pair track being correct. Captions now
+   anchor to the true midpoint of their own two-button pair. Theme uses the
+   identical Y/centering contract; buttons, logo and crown shell do not move. */
+#mygym>.mf-banner:not(.mf-banner--workout)>.themecontrols>.themecontrol-group .themecontrol-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__player .mf-banner__controls-label,
+#mygym>.mf-banner:not(.mf-banner--workout) .mf-banner__theme .mf-banner__controls-label,
+.mg-log-shell .mg-log-top-centered.mf-banner .mg-log-pairlabel,
+.mg-picker-shell .mg-picker-top-canonical.mf-banner .mg-log-pairlabel{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  transform:none!important;
+  text-align:center!important;
+  top:calc(-1 * var(--mf-crown-label-lift-v438))!important;
+}
+/* R69 — Calendar captions consume the actual rendered Home caption anchors,
+   not a synthetic centered 86px box: PLAYER begins at the left pair edge and
+   THEME ends at the right pair edge, with the same -20px baseline lift. */
+.calendar>.cal-detail.mf-banner .cal-audio-row>b{
+  position:absolute!important;
+  top:calc(-1 * var(--mf-crown-label-lift-v438))!important;
+  width:auto!important;min-width:0!important;max-width:none!important;
+  transform:none!important;white-space:nowrap!important;
+}
+.calendar>.cal-detail.mf-banner .cal-audio-row--player>b{left:0!important;right:auto!important;text-align:left!important}
+.calendar>.cal-detail.mf-banner .cal-audio-row--theme>b{left:auto!important;right:0!important;text-align:right!important}
+
+
+/* ══ ULTIMATE JOB III — FINAL PRE-FABI SHARED VOLUME STACK OWNER ════════
+   Ordinary crowns expose only the rail + diamond. No visible VOLUME text and
+   no numeric percentage. The semantic range keeps its accessible name/value. */
+/* Safari/iOS crown Volume paint contract. The range remains the semantic and
+   draggable input, but it owns ZERO visible pixels. Safari's native range
+   anonymous layer was the remaining painter that could sit across adjacent
+   crown controls even after ordinary CSS z-index corrections. The label owns
+   one MAHFITT rail + one MAHFITT diamond; the transparent input is interaction
+   only. This also guarantees there is no second native/focus track on touch. */
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume{position:relative!important;display:block!important;width:100%!important;height:28px!important;margin:0!important;padding:0!important;color:var(--secondary,var(--bright))!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume>label{position:relative!important;display:block!important;width:100%!important;height:28px!important;min-width:0!important;margin:0!important;padding:0!important;overflow:visible!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume>label>span,.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume output{display:none!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume>label::before{content:""!important;position:absolute!important;z-index:1!important;pointer-events:none!important;left:0!important;right:0!important;top:calc(50% + 4px)!important;height:1.5px!important;transform:translateY(-50%)!important;border:0!important;border-radius:999px!important;background:linear-gradient(90deg,var(--secondary,var(--bright)) 0 var(--mah-volume-x),rgba(var(--bright-rgb,233,201,143),.20) var(--mah-volume-x) 100%)!important;box-shadow:0 0 4px rgba(var(--bright-rgb,233,201,143),.18)!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume>label::after{content:""!important;position:absolute!important;z-index:1!important;pointer-events:none!important;top:calc(50% + 4px)!important;left:clamp(5px,var(--mah-volume-x),calc(100% - 5px))!important;width:10px!important;height:10px!important;box-sizing:border-box!important;border:1px solid rgba(255,255,255,.34)!important;border-radius:var(--mf-diamond-radius,1px)!important;background:var(--secondary,var(--bright))!important;transform:translate(-50%,-50%) rotate(45deg)!important;box-shadow:0 0 7px rgba(var(--bright-rgb,233,201,143),.38)!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input{position:absolute!important;z-index:2!important;top:4px!important;left:0!important;right:0!important;bottom:auto!important;width:100%!important;height:24px!important;margin:0!important;padding:0!important;border:0!important;outline:0!important;-webkit-appearance:none!important;appearance:none!important;background:transparent!important;box-shadow:none!important;opacity:0!important;touch-action:none!important;cursor:ew-resize!important;-webkit-tap-highlight-color:transparent!important;-webkit-user-select:none!important;user-select:none!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input:focus,.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input:focus-visible,.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input:active{outline:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input::-webkit-slider-runnable-track{height:100%!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input::-webkit-slider-thumb{-webkit-appearance:none!important;appearance:none!important;width:1px!important;height:1px!important;margin:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input::-moz-range-track,.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input::-moz-range-progress{height:100%!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume input::-moz-range-thumb{width:1px!important;height:1px!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume>label:has(input:focus-visible)::after{box-shadow:0 0 0 2px rgba(var(--bright-rgb,233,201,143),.24),0 0 8px rgba(var(--bright-rgb,233,201,143),.52)!important}
+
+/* R70 EMERGENCY ORDINARY RACK ORDER: Volume → Seek/Replay → utilities.
+   Pitch is restored as a compact utility-row instrument between VHS/Reverb;
+   it never owns an implicit fourth grid track. */
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo{display:grid!important;grid-template-rows:28px 48px 23px!important;row-gap:2px!important;overflow:visible!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume,.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo>.mah-volume,.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo>.mah-volume{grid-row:1!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-songseek,.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo>.mah-songseek,.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo>.mah-songseek{grid-row:2!important;margin:0!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.fobtempo__actions,.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo>.fobtempo__actions,.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo>.fobtempo__actions{grid-row:3!important;margin:0!important;min-height:23px!important;grid-template-columns:1fr minmax(96px,132px) 1fr!important;column-gap:10px!important;overflow:visible!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.fobtempo__actions>.fobpitch,.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo>.fobtempo__actions>.fobpitch,.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo>.fobtempo__actions>.fobpitch{grid-column:2!important;grid-row:1!important;justify-self:stretch!important;align-self:center!important;width:100%!important;min-width:0!important;max-width:132px!important;height:23px!important;margin:0!important;overflow:visible!important;pointer-events:auto!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.fobtempo__actions>.fobpitch>.fobpitch__rail,.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo>.fobtempo__actions>.fobpitch>.fobpitch__rail,.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo>.fobtempo__actions>.fobpitch>.fobpitch__rail{top:0!important;bottom:0!important;height:23px!important;overflow:visible!important}
+
+/* Mask route content under the instrument field, then fade to true zero. */
+/* The canonical crown ::after layer already owns route occlusion/fade. A second
+   rectangular rack backing created a visibly different top edge and vertical side
+   seam on physical iPhone. Keep the instrument rack paint-transparent so no
+   shaped rectangle can bleed through the crown. */
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo::before,.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo::before,.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo::before{content:none!important;display:none!important;background:none!important}
+
+/* JOB III physical closure: Pitch uses one visible technical rail, not a
+   second browser/decorative under-track beneath the functional beam. */
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.fobpitch .fobpitch__rail::before,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo>.fobpitch .fobpitch__rail::before,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo>.fobpitch .fobpitch__rail::before{display:none!important}
+
+/* ══ JOB III R4 — FULL CENTER-PLAY DIAMOND PAINT ════════════════════════════
+   Physical iPhone evidence showed the lower tip of the canonical centre Play
+   diamond being sliced flat. Root cause: the historical stacked My Gym rule
+   groups .hd__logo-skip and .hd__logo-play under overflow:hidden so the skip
+   sheen can be contained. Only the skip controls own that sheen; the rotated
+   Play square never should have inherited its clipping boundary. Keep skip
+   sheen containment in mygym.css, but let every canonical crown transport row
+   and centre Play button paint outside its rectangular hit box. This late
+   shared owner covers My Gym/ordinary crowns, MAH LOG/Scanner, and Calendar. */
+.mf-banner :is(.hd__logo-transport,.mg-logo-transport,.cal-logo-transport){overflow:visible!important}
+.mf-banner :is(.hd__logo-play,.mg-logo-play,.cal-logo-play){overflow:visible!important}
+
+
+/* JOB III local closure — slider endpoint diamonds remain fully visible.
+   Range VALUE still reaches 0/100%; only the painted diamond centre is inset by
+   its rotated half-diagonal so the crown mask cannot guillotine a corner. */
+:root{--mf-slider-diamond-inset:15px}
+.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo>.mah-volume>label::after{left:clamp(var(--mf-slider-diamond-inset),var(--mah-volume-x),calc(100% - var(--mf-slider-diamond-inset)))!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo .mah-songseek,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo .mah-songseek,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo .mah-songseek{--mf-seek-paint-x:clamp(var(--mf-slider-diamond-inset),var(--mah-song-seek,0%),calc(100% - var(--mf-slider-diamond-inset)))}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo .mah-songseek__rail::before,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo .mah-songseek__rail::before,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo .mah-songseek__rail::before{left:var(--mf-slider-diamond-inset)!important;right:var(--mf-slider-diamond-inset)!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo .mah-songseek__played,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo .mah-songseek__played,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo .mah-songseek__played{left:var(--mf-slider-diamond-inset)!important;width:calc(var(--mf-seek-paint-x) - var(--mf-slider-diamond-inset))!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo .mah-songseek__node,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo .mah-songseek__node,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo .mah-songseek__node{left:var(--mf-seek-paint-x)!important}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.fobtempo .fobpitch__node,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.fobtempo .fobpitch__node,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.fobtempo .fobpitch__node{left:clamp(var(--mf-slider-diamond-inset),var(--fob-pitch-x,50%),calc(100% - var(--mf-slider-diamond-inset)))!important}
+
+/* R17 ordinary Replay: keep the accepted 64x23 interaction/layout box so crown
+   centering does not move, but paint the visible shell/content at ~75%. Live
+   Workout is explicitly excluded because it owns separate replay geometry. */
+.mf-banner.mf-banner--member:not(.mf-banner--workout) .mah-songseek__replay{border-color:transparent!important;background:transparent!important;gap:4px!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout) .mah-songseek__replay::before{content:"";position:absolute;left:50%;top:50%;width:75%;height:75%;transform:translate(-50%,-50%);border:1px solid rgba(var(--bright-rgb,233,201,143),.30);border-radius:var(--mf-rect-radius,3px);background:rgba(var(--bright-rgb,233,201,143),.035);pointer-events:none;z-index:0}
+.mf-banner.mf-banner--member:not(.mf-banner--workout) .mah-songseek__replay>*{position:relative;z-index:1}
+.mf-banner.mf-banner--member:not(.mf-banner--workout) .mah-songseek__replay .mah-replay__icon{width:11px!important;height:11px!important}
+.mf-banner.mf-banner--member:not(.mf-banner--workout) .mah-songseek__replay>span{font-size:5px!important;letter-spacing:.11em!important}
+
+/* R47 — Pitch is retired app-wide. Any legacy pitch rail markup that survives
+   in a cached shell is hidden and removed from layout so it can never leave a
+   gap where the rail used to sit. */
+/* R70 — Pitch is a universal ordinary-crown control again. The R47 sweep is
+   narrowed to the Calendar-only remnants; Calendar remains an exclusion.
+   NOTE: this sweep was also hiding .studio-eq--pitch, which silently made
+   the MAH Player Pitch row invisible even after R51 set the flag true. */
+.cal-crown-pitch,[data-cal-pitch],
+.cal-crown-meta--pitch-spacer{display:none!important}
+
+/* ══ R53 — MIRRORED ORDINARY-CROWN UTILITY KEYS ═════════════════════════
+   Message and Collapse are analogous hardware keys. Message is centered over
+   Player Play (the inner left-side key); Collapse is centered over Theme
+   Editor (the inner right-side key). Both use the exact ordinary crown square
+   shell and one shared top axis. Live Workout remains a separate geometry. */
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout),
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member{
+  --mf-crown-player-left:var(--mf-crown-edge-v438,18px);
+  --mf-crown-theme-right:var(--mf-crown-edge-v438,18px);
+  --mf-crown-utility-top:max(calc(var(--mf-safe-top,0px) + 4px),calc(var(--mf-crown-pair-y-v438) - 49px));
+  --mf-crown-player-play-left:calc(var(--mf-crown-player-left) + var(--mf-crown-ctl) + var(--mf-crown-ctl-gap));
+  --mf-crown-theme-ai-right:calc(var(--mf-crown-theme-right) + var(--mf-crown-ctl) + var(--mf-crown-ctl-gap));
+  --mf-crown-theme-editor-right:var(--mf-crown-theme-right);
+}
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member{
+  --mf-crown-utility-top:max(calc(var(--mf-safe-top,0px) + 4px),14px);
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.mf-banner__collapse,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.mf-banner__collapse,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.mf-banner__collapse{
+  position:absolute!important;z-index:14!important;
+  top:var(--mf-crown-utility-top)!important;
+  right:var(--mf-crown-theme-ai-right)!important;left:auto!important;bottom:auto!important;
+  width:var(--mf-crown-ctl)!important;min-width:var(--mf-crown-ctl)!important;max-width:var(--mf-crown-ctl)!important;
+  height:var(--mf-crown-ctl)!important;min-height:var(--mf-crown-ctl)!important;max-height:var(--mf-crown-ctl)!important;
+  margin:0!important;padding:0!important;display:grid!important;place-items:center!important;
+  border:var(--mah-container-border,3.3px) solid rgba(var(--secondary-rgb,var(--bright-rgb,233,201,143)),.30)!important;border-radius:0!important;
+  background:rgba(var(--ink-rgb,14,17,20),.44)!important;color:var(--secondary,var(--bright))!important;
+  visibility:visible!important;opacity:1!important;pointer-events:auto!important;touch-action:manipulation!important;
+  box-sizing:border-box!important;line-height:0!important;
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.mf-banner__collapse>.mf-banner__chevron,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.mf-banner__collapse>.mf-banner__chevron,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.mf-banner__collapse>.mf-banner__chevron{
+  display:block!important;width:22px!important;height:14px!important;margin:auto!important;padding:0!important;
+  overflow:visible!important;color:inherit!important;transform:rotate(0deg)!important;transform-origin:50% 50%!important;
+  transition:transform .18s ease!important;pointer-events:none!important;
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.mf-banner__collapse>.mf-banner__chevron path,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.mf-banner__collapse>.mf-banner__chevron path,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.mf-banner__collapse>.mf-banner__chevron path{
+  fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;
+  stroke-linejoin:round!important;vector-effect:non-scaling-stroke!important;
+}
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]:not(.mf-banner--workout)>.mf-banner__collapse>.mf-banner__chevron,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member[data-collapsed="1"]>.mf-banner__collapse>.mf-banner__chevron,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member[data-collapsed="1"]>.mf-banner__collapse>.mf-banner__chevron{
+  transform:rotate(180deg)!important;
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.crownmessage,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.crownmessage,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.crownmessage{
+  position:absolute!important;z-index:14!important;
+  top:var(--mf-crown-utility-top)!important;
+  left:var(--mf-crown-player-play-left)!important;right:auto!important;bottom:auto!important;
+  width:var(--mf-crown-ctl)!important;min-width:var(--mf-crown-ctl)!important;max-width:var(--mf-crown-ctl)!important;
+  height:var(--mf-crown-ctl)!important;min-height:var(--mf-crown-ctl)!important;max-height:var(--mf-crown-ctl)!important;
+  margin:0!important;padding:0!important;display:grid!important;place-items:center!important;
+  border:var(--mah-container-border,3.3px) solid rgba(var(--secondary-rgb,var(--bright-rgb,233,201,143)),.30)!important;border-radius:0!important;
+  background:rgba(var(--ink-rgb,14,17,20),.44)!important;color:var(--secondary,var(--bright))!important;
+  visibility:visible!important;opacity:1!important;pointer-events:auto!important;touch-action:manipulation!important;
+  box-sizing:border-box!important;
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.crownmessage svg,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.crownmessage svg,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.crownmessage svg{
+  display:block!important;width:22px!important;height:22px!important;margin:auto!important;
+  fill:none!important;stroke:currentColor!important;stroke-width:1.25!important;
+  stroke-linecap:round!important;stroke-linejoin:round!important;overflow:visible!important;pointer-events:none!important;
+}
+.crownmessage .crownmessage__check{stroke-width:1.35!important}
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]:not(.mf-banner--workout)>.crownmessage,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member[data-collapsed="1"]>.crownmessage,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member[data-collapsed="1"]>.crownmessage{
+  visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+}
+#mygym>.workout-hd.mf-banner--workout .crownmessage{display:none!important}
+
+/* Tiny identifier inside the permanent MAHFITT AI square. It shares the
+   button's existing currentColor/theme state and never becomes a second box. */
+#mygym>.mf-banner:not(.mf-banner--workout) .crownai,
+.mg-log-shell>.mg-log-top-centered.mf-banner .crownai,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner .crownai{position:relative!important;overflow:hidden!important}
+#mygym>.mf-banner:not(.mf-banner--workout) .crownai>.crownai__label,
+.mg-log-shell>.mg-log-top-centered.mf-banner .crownai>.crownai__label,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner .crownai>.crownai__label{
+  position:absolute!important;z-index:3!important;top:4px!important;right:5px!important;
+  display:block!important;margin:0!important;padding:0!important;color:currentColor!important;
+  font:700 5px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;
+  letter-spacing:.04em!important;text-transform:uppercase!important;opacity:.74!important;
+  pointer-events:none!important;
+}
+
+@media(max-width:767px){
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout){--mf-crown-utility-top:max(calc(var(--mf-safe-top,0px) + 4px),14px)}
+}
+@media(min-width:768px){
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout),
+  .mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member,
+  .mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member{
+    --mf-crown-player-left:var(--mf-v439-crown-inset);
+    --mf-crown-theme-right:var(--mf-v439-crown-inset);
+  }
+  #mygym>.mf-banner.mf-banner--member[data-collapsed="1"]:not(.mf-banner--workout){--mf-crown-utility-top:calc(var(--mf-v439-pair-y) - 58px)}
+}
+
+/* ══ R55 — ORDINARY-CROWN RIGHT-SIDE SIMPLIFICATION ═════════════════════
+   Lower Theme pair is AI LEFT / Theme Editor RIGHT. Collapse mirrors the
+   Message key by sitting directly above the inner AI square. The R54 mask
+   override is intentionally absent: the accepted pre-R54 smooth fade owner
+   above remains canonical. Live Workout is excluded. */
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout),
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member{
+  --mf-crown-theme-ai-right:calc(var(--mf-crown-theme-right) + var(--mf-crown-ctl) + var(--mf-crown-ctl-gap));
+  --mf-crown-theme-editor-right:var(--mf-crown-theme-right);
+}
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout)>.mf-banner__collapse,
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member>.mf-banner__collapse,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member>.mf-banner__collapse{
+  right:var(--mf-crown-theme-ai-right)!important;
+}
+#mygym>.mf-banner:not(.mf-banner--workout) .crownai,
+.mg-log-shell>.mg-log-top-centered.mf-banner .crownai,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner .crownai{position:relative!important;overflow:hidden!important}
+#mygym>.mf-banner:not(.mf-banner--workout) .crownai>.crownai__label,
+.mg-log-shell>.mg-log-top-centered.mf-banner .crownai>.crownai__label,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner .crownai>.crownai__label{
+  position:absolute!important;z-index:3!important;top:4px!important;right:5px!important;
+  display:block!important;margin:0!important;padding:0!important;color:currentColor!important;
+  font:700 5px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;
+  letter-spacing:.04em!important;text-transform:uppercase!important;opacity:.74!important;pointer-events:none!important;
+}
+
+/* ══ POST-R67 — UNIVERSAL TIGHT-CROP / TRUE-FADE STANDARD ════════════════
+   Expanded ordinary crowns are sized from their final visible control row,
+   followed by a small breathing gap and one short atmospheric tail. Controls
+   are never masked; only the inert surface/stroke painters dissolve. */
+#mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout),
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member,
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member{
+  --mf-crown-fade-gap:6px;--mf-crown-fade-tail:21px;
+}
+#mygym>.mf-banner.mf-banner--member[data-collapsed="1"]:not(.mf-banner--workout),
+.mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member[data-collapsed="1"],
+.mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member[data-collapsed="1"]{
+  --mf-crown-fade-tail:15px;
+}
+@media(min-width:768px){
+  #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout),
+  .mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member,
+  .mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member{--mf-crown-fade-gap:8px;--mf-crown-fade-tail:24px}
+  #mygym>.mf-banner.mf-banner--member[data-collapsed="1"]:not(.mf-banner--workout),
+  .mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member[data-collapsed="1"],
+  .mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member[data-collapsed="1"]{--mf-crown-fade-tail:15px}
+}
+
+
+/* ══ R67 — IPAD CROWN WIDTH / TRUE DEVICE CENTER ══════════════════════════
+   The member root is full-width on iPad in R67. Keep the canonical crown as a
+   centered hardware frame with symmetric viewport margins so its existing
+   absolute 50% brand axis is also the actual device centerline. Phone rules
+   remain untouched. */
+@media (min-width:768px) and (max-width:1366px){
+  html #mygym>.mf-banner.mf-banner--member:not(.mf-banner--workout),
+  html #mygym>.workout-hd.mf-banner--workout,
+  html .mg-log-shell>.mg-log-top-centered.mf-banner.mf-banner--member,
+  html .mg-picker-shell>.mg-picker-top-canonical.mf-banner.mf-banner--member,
+  html .calendar>.cal-detail.mf-banner{
+    box-sizing:border-box!important;
+    width:min(calc(100vw - 48px),1280px)!important;
+    max-width:1280px!important;
+    margin-left:auto!important;margin-right:auto!important;
+  }
+}
+
+/* POST-R67 MR.MAH WORLD HANDOFF — one shared lower-protection token.
+   The crown owns the terminal dissolve; the AI page consumes the same token
+   before placing readable topline content. This intentionally stays inside
+   the crown box (the current R67 fade owner) rather than resurrecting a
+   separate external fade-tail system. */
+/* R71 / BAND-01 + GE-02 — the crown keeps its own 21pt protective tail so
+   the backdrop behind the transport controls is never thinned, and the PAGE
+   continues the same dissolve for another --mahai-crown-fade-continue below
+   it. Because .mahai-view::before now starts on the exact value the crown
+   ends on, the two read as one continuous handoff: ~51pt of monotonic
+   darkening with no step, against 21pt and a visible trough in RC5C. */
+#mygym:has(>.mf-banner.hd--ai){--mahai-crown-handoff-depth:30px;--mahai-crown-fade-continue:30px}
+#mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout)::after{
+  -webkit-mask-image:var(--mf-crown-surface-mask)!important;
+  mask-image:var(--mf-crown-surface-mask)!important;
+}
+@media (max-width:560px){#mygym:has(>.mf-banner.hd--ai){--mahai-crown-handoff-depth:26px;--mahai-crown-fade-continue:28px}}
+@media (min-width:768px) and (max-width:1366px){#mygym:has(>.mf-banner.hd--ai){--mahai-crown-handoff-depth:34px;--mahai-crown-fade-continue:36px}}
+
+/* ══ R67 AI FINAL LOCK-IN — SEEK + THREE-BUTTON EXPANDED RACK ════════════
+   Physical iPhone evidence: the AI page does not need a crown Volume rail.
+   Keep the time-based playback/seek rail and align Replay with VHS/Reverb in
+   one utility band, then let the crown dissolve immediately below that band.
+   Other member crowns keep the shared full rack unchanged. */
+#mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"]){
+  --mahai-crown-rack-top:160px;
+  --mahai-crown-rack-content-h:73px; /* 48 Seek + 2 + 23 utilities */
+  --mf-crown-fade-gap:6px;
+  --mf-crown-fade-tail:19px;
+  --mahai-crown-expanded-h:calc(var(--mahai-crown-rack-top) + var(--mahai-crown-rack-content-h) + var(--mf-crown-fade-gap) + var(--mf-crown-fade-tail));
+  --mf-crown-occlusion:
+    radial-gradient(ellipse 56% 124% at 50% -18%,color-mix(in srgb,var(--mahfitt-secondary,var(--bright,#e9c98f)) 7%,transparent),transparent 72%),
+    linear-gradient(to bottom,
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 96%,transparent) 0 54%,
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 88%,transparent) 64%,
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 68%,transparent) 74%,
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 44%,transparent) 84%,
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 22%,transparent) 92%,
+      color-mix(in srgb,var(--mahfitt-primary,var(--ink,#0e1114)) 7%,transparent) 97%,
+      transparent 100%);
+  height:var(--mahai-crown-expanded-h)!important;
+  min-height:var(--mahai-crown-expanded-h)!important;
+  max-height:var(--mahai-crown-expanded-h)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+#mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"])::after{
+  -webkit-backdrop-filter:blur(20px) saturate(.92)!important;
+  backdrop-filter:blur(20px) saturate(.92)!important;
+  opacity:1!important;
+}
+#mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"])>.fobtempo{
+  display:grid!important;
+  grid-template-rows:48px 23px!important;
+  row-gap:2px!important;
+  top:var(--mahai-crown-rack-top)!important;
+  padding-bottom:0!important;
+  overflow:visible!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+}
+#mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"])>.fobtempo>.mah-volume{
+  display:none!important;
+}
+#mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"])>.fobtempo>.mah-songseek{
+  grid-row:1!important;
+  margin:0!important;
+  overflow:visible!important;
+}
+#mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"])>.fobtempo>.mah-songseek>.mah-songseek__replay{
+  top:calc(100% + 2px)!important;
+  bottom:auto!important;
+}
+#mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"])>.fobtempo>.fobtempo__actions{
+  grid-row:2!important;
+  margin:0!important;
+  min-height:23px!important;
+}
+@media (max-width:560px){
+  #mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"]){
+    --mahai-crown-rack-top:156px;
+    --mf-crown-fade-tail:17px;
+  }
+}
+@media (min-width:768px) and (max-width:1366px){
+  #mygym>.mf-banner.hd--ai.mf-banner--member:not(.mf-banner--workout):not([data-collapsed="1"]){
+    --mahai-crown-rack-top:174px;
+    --mf-crown-fade-gap:8px;
+    --mf-crown-fade-tail:23px;
+  }
+}

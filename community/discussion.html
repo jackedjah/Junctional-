@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Discussion | FOB Community</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/fob.css?v=389" />
+  <link rel="stylesheet" href="/community/css/community.css?v=241" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body class="fob-community-page" data-fob-guard="protected" data-fob-pending>
+
+  <nav class="fob-nav">
+    <div class="fob-nav-inner">
+      <a class="fob-brand" href="/index.html" aria-label="FOB Systems home">
+        <img src="/images/fob-forum-nav.png" srcset="/images/fob-forum-nav.png 1x, /images/fob-forum-nav@2x.png 2x" alt="FOB Forum" />
+      </a>
+      <a class="fob-rate" href="/community/discussions.html">
+        <span class="fob-rate-tag">FOB Community</span>
+        <span class="fob-rate-main">All discussions</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="fob-community-shell is-narrow" id="main">
+
+    <div id="thread-not-found" hidden>
+      <div class="fob-community-panel">
+        <h1 class="fob-community-title">Discussion not found</h1>
+        <p class="fob-community-sub">
+          It may have been removed, or you may not have access to it.
+        </p>
+        <a class="fob-community-btn fob-community-btn-ghost fob-community-btn-auto"
+           href="/community/discussions.html">Back to discussions</a>
+      </div>
+    </div>
+
+    <div id="thread-content" hidden>
+
+      <article class="fob-community-panel">
+        <p class="fob-thread-flag" id="thread-research-flag" hidden></p>
+        <p class="fob-community-eyebrow" id="thread-category"></p>
+        <h1 class="fob-community-title" id="thread-title"></h1>
+
+        <div class="fob-thread-card-head" id="thread-byline" style="margin:16px 0 20px;"></div>
+
+        <div class="fob-thread-body" id="thread-body"></div>
+        <div id="thread-media"></div>
+
+        <div id="thread-edit-panel" hidden>
+          <label class="fob-community-sr" for="thread-edit-body">Edit your post</label>
+          <textarea class="fob-community-textarea" id="thread-edit-body" maxlength="20000"></textarea>
+          <div class="fob-community-btn-row">
+            <button class="fob-community-btn fob-community-btn-ghost" type="button" id="thread-edit-cancel">Cancel</button>
+            <button class="fob-community-btn fob-community-btn-primary" type="button" id="thread-edit-save">Save Changes</button>
+          </div>
+        </div>
+
+        <p class="fob-thread-submeta" id="thread-stats" style="margin-top:18px;"></p>
+
+        <div class="fob-thread-reactions" id="thread-reactions" role="group" aria-label="React to this discussion"></div>
+
+        <div class="fob-thread-actions">
+          <button class="fob-thread-action" type="button" id="thread-save">Save</button>
+          <button class="fob-thread-action" type="button" id="thread-follow">Follow</button>
+          <button class="fob-thread-action" type="button" id="thread-edit" hidden>Edit</button>
+          <button class="fob-thread-action" type="button" id="thread-remove" hidden>Delete</button>
+        </div>
+      </article>
+
+      <!-- REPLY COMPOSER -->
+      <section class="fob-community-panel" id="thread-reply-form">
+        <p class="fob-community-eyebrow">Reply</p>
+        <p class="fob-community-field-note" id="thread-replying-note" hidden>
+          Replying to <b id="thread-replying-name"></b>
+          <button class="fob-community-textlink" type="button" id="thread-replying-cancel">Cancel</button>
+        </p>
+        <label class="fob-community-sr" for="thread-reply-body">Your reply</label>
+        <textarea class="fob-community-textarea" id="thread-reply-body" maxlength="10000"
+                  placeholder="Add to the conversation..."></textarea>
+        <div class="fob-media-strip" id="reply-media" hidden></div>
+
+        <div class="fob-compose-tools">
+          <button class="fob-tool" type="button" id="reply-photo" aria-label="Add a photo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m3.5 17 4.8-4.6a2 2 0 0 1 2.7 0l6.4 6.1"/><path d="m14.5 13.5 2-1.9a2 2 0 0 1 2.7 0l1.3 1.2"/></svg>
+          </button>
+          <button class="fob-tool" type="button" id="reply-voice" aria-label="Record a voice note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></svg>
+          </button>
+          <button class="fob-tool" type="button" id="reply-gif" aria-label="Add a GIF">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.5H7.8A1.8 1.8 0 0 0 6 11.3v1.4a1.8 1.8 0 0 0 1.8 1.8H10v-2.1"/><path d="M12.9 9.5v5"/><path d="M18.4 9.5h-2.6v5m0-2.7h2.2"/></svg>
+          </button>
+          <input type="file" id="reply-file" accept="image/*,video/*" multiple hidden />
+        </div>
+
+        <div class="fob-community-btn-row">
+          <button class="fob-community-btn fob-community-btn-primary" type="button" id="thread-reply-submit">Post Reply</button>
+        </div>
+        <div class="fob-community-status" id="thread-reply-status" role="alert" aria-live="assertive" hidden></div>
+      </section>
+
+      <div class="fob-community-panel" id="thread-locked-note" hidden>
+        <p class="fob-community-sub" style="margin:0;">
+          This discussion is locked. No new replies can be added.
+        </p>
+      </div>
+
+      <!-- REPLIES -->
+      <div class="fob-thread-replies-head">
+        <h2 class="fob-community-eyebrow" style="margin:0;">Replies</h2>
+        <label class="fob-community-sr" for="thread-sort">Sort replies</label>
+        <select class="fob-community-select" id="thread-sort">
+          <option value="oldest">Oldest first</option>
+          <option value="newest">Newest first</option>
+        </select>
+      </div>
+
+      <div id="thread-reply-list"></div>
+    </div>
+
+    <p class="fob-community-footnote">
+      <a href="/community-guidelines.html">Community Guidelines</a> &middot;
+      <a href="/community/discussions.html">All discussions</a> &middot;
+      <a href="/index.html">FOB Systems</a>
+    </p>
+  </main>
+
+  <div id="fob-community-toasts" aria-live="polite"></div>
+
+  <script src="/community/js/config.js"></script>
+  <script src="/community/js/supabase-client.js"></script>
+  <script src="/community/js/utilities.js"></script>
+  <script src="/community/js/auth-guard.js"></script>
+  <script src="/community/js/discussion-render.js"></script>
+  <script src="/community/js/comments-sheet.js"></script>
+  <script src="/community/js/media-lib.js"></script>
+  <script src="/community/js/media-render.js"></script>
+  <script src="/community/js/gif-picker.js"></script>
+  <script src="/community/js/reply-media.js"></script>
+  <script src="/community/js/thread.js"></script>
+  <script src="/community/js/profile-view.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>FOB Forums | Where FOB gets figured out</title>
+  <meta name="description" content="Ask questions, post your training, review gear, and help test what is not out yet. The FOB system worked on by the people using it. Everything else is fair game too." />
+  <meta property="og:title" content="FOB Forums" />
+  <meta property="og:description" content="Ask questions, post your training, review gear, help test what is not out yet. Everything else is fair game too." />
+  <meta property="og:image" content="https://fob.systems/images/fob-forum-social.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+  <link rel="canonical" href="https://fob.systems/community/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/fob.css?v=389" />
+  <link rel="stylesheet" href="/community/css/community.css?v=241" />
+</head>
+<body class="fob-community-page fob-community-landing">
+
+  <nav class="fob-nav">
+    <div class="fob-nav-inner">
+      <a class="fob-brand" href="/index.html" aria-label="FOB Systems home">
+        <img src="/images/fob-forum-nav.png" srcset="/images/fob-forum-nav.png 1x, /images/fob-forum-nav@2x.png 2x" alt="FOB Forum" />
+      </a>
+      <a class="fob-rate" href="/community/auth.html"><span class="fob-rate-single">ENTER FORUM</span></a>
+    </div>
+  </nav>
+
+  <main class="fob-community-shell" id="main">
+
+    <div class="fob-community-setup-banner" id="fob-community-setup-banner" hidden>
+      <b>Setup required</b>
+      FOB Community is not connected to a backend yet. Add your Supabase URL and
+      anon key to <code>community/js/config.js</code>. See <code>COMMUNITY_SETUP.md</code>.
+    </div>
+
+    <div class="fob-community-hero">
+      <div class="fob-intro-blobs" aria-hidden="true"><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.2" r="4.1"/><path d="M3.6 21c0-4.3 3.8-7.4 8.4-7.4s8.4 3.1 8.4 7.4z"/></svg></span><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.2" r="4.1"/><path d="M3.6 21c0-4.3 3.8-7.4 8.4-7.4s8.4 3.1 8.4 7.4z"/></svg></span><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.2" r="4.1"/><path d="M3.6 21c0-4.3 3.8-7.4 8.4-7.4s8.4 3.1 8.4 7.4z"/></svg></span></div>
+      <img class="fob-forum-hero-mark"
+           src="/images/fob-forum.png"
+           alt="FOB Forum" width="900" height="387" />
+      <h1 class="fob-community-title" style="font-size:clamp(28px,5vw,42px);">
+        Where FOB gets figured out
+      </h1>
+      <p class="fob-community-sub">
+        Ask questions, post your training, review gear, help test what is not
+        out yet. This is where the system gets worked on by the people using
+        it. Everything else is fair game too.
+      </p>
+
+      <div class="fob-community-btn-row fob-community-enter-only" style="max-width:400px;margin-inline:auto;">
+        <a class="fob-community-btn fob-community-btn-ghost"
+           href="/community/auth.html" data-requires-supabase>Enter Forum</a>
+      </div>
+
+      <ul class="fob-community-features">
+        <li><b>The main thing</b>Questions, sessions, form checks, gear, and testing what is not released.</li>
+        <li><b>Everything else too</b>Movies, ball, gaming, off topic. Nothing is walled off.</li>
+        <li><b>Curse and argue if you want</b>Harassment is the only thing that gets you removed.</li>
+      </ul>
+
+      <p class="fob-community-footnote">
+        Free to join, 18 and over. Made by Jah in Brooklyn.<br />
+        <a href="/community-guidelines.html">Community Guidelines</a> &middot;
+        <a href="/community-privacy.html">Privacy</a> &middot;
+        <a href="/community-safety.html">Safety</a> &middot;
+        <a href="/index.html">Back to FOB Systems</a>
+      </p>
+    </div>
+  </main>
+
+  <div id="fob-community-toasts" aria-live="polite"></div>
+
+</body>
+</html>

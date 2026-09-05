@@ -1,0 +1,25 @@
+-- 018 :: optional title and room
+-- 019 :: founder role + story glow colour
+--
+-- Applied 2026-07-27.
+--
+-- 018: title may now be empty and category_id is nullable. A short
+-- thought does not need a headline, and a post with no room appears in
+-- Latest rather than being filed into a wrong room to satisfy a
+-- required field. can_post_in() returns false for a null category
+-- because it looks the category up and finds nothing, which is right
+-- for a bad id and wrong for "no room chosen" — so the insert policy
+-- had to distinguish the two.
+--
+-- 019: the founder role drives the feed treatment rather than a
+-- hardcoded username, so it survives a rename. user_roles_guard blocks
+-- non-member grants without is_admin() and blocks self-granting; both
+-- are correct and remain in force. A migration has no auth.uid(), so
+-- the guard was disabled for the single grant and re-enabled in the
+-- same transaction. Verified afterwards that it is enabled again.
+--
+-- glow_color is validated by CHECK because it is interpolated into a
+-- style attribute; anything that is not a plain 6-digit hex is refused
+-- at the source rather than trusted from the client.
+--
+-- See the applied migrations in Supabase for the full bodies.

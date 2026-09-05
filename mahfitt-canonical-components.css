@@ -1,0 +1,43 @@
+/* MAHFITT canonical component metrics.
+   R85A makes role-specific surfaces consume the same visual primitives instead
+   of recreating member controls. These values are the accepted member owners
+   from gym-app.css / the ordinary crown geometry. */
+:root{
+  --mf-ui-font:"Space Grotesk",system-ui,-apple-system,sans-serif;
+  --mf-ui-control-radius:2px;
+  --mf-ui-primary-h:52px;
+  --mf-ui-button-h:48px;
+  --mf-ui-button-size:11px;
+  --mf-ui-primary-size:12px;
+  --mf-ui-button-tracking:.2em;
+  --mf-ui-primary-tracking:.22em;
+  --mf-ui-body-size:13px;
+  --mf-ui-body-line:1.6;
+  --mf-ui-section-title-size:clamp(22px,5vw,34px);
+  --mf-ui-page-title-size:clamp(26px,7vw,42px);
+  --mf-ui-micro-size:9px;
+  --mf-ui-micro-tracking:.2em;
+  --mf-crown-height:281px;
+  --mf-crown-collapsed-height:172px;
+  --mf-crown-control:40px;
+  --mf-crown-pair-gap:6px;
+  --mf-crown-logo-w:132px;
+  --mf-crown-logo-h:42px;
+}
+.mf-canon-button{
+  min-height:var(--mf-ui-button-h);border-radius:var(--mf-ui-control-radius);
+  border:1px solid var(--line,var(--admin-line,currentColor));background:transparent;
+  color:var(--gold,var(--admin-primary,currentColor));font-family:var(--mf-ui-font);
+  font-size:var(--mf-ui-button-size);font-weight:600;letter-spacing:var(--mf-ui-button-tracking);
+  line-height:1.2;text-transform:uppercase;text-decoration:none;display:flex;align-items:center;
+  justify-content:center;text-align:center;padding:0 14px;touch-action:manipulation
+}
+.mf-canon-button--primary{
+  min-height:var(--mf-ui-primary-h);font-size:var(--mf-ui-primary-size);font-weight:700;
+  letter-spacing:var(--mf-ui-primary-tracking);border-color:transparent;
+  background:linear-gradient(180deg,var(--bright,var(--admin-primary,#E9C98F)),var(--accent-deep,var(--bright,var(--admin-primary,#CDAF7A))));
+  color:var(--accent-ink,var(--admin-bg,#14171B))
+}
+.mf-canon-button:focus-visible{outline:1px solid var(--bright,var(--admin-primary,currentColor));outline-offset:3px}
+.mf-canon-micro{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--mf-ui-micro-size);font-weight:650;letter-spacing:var(--mf-ui-micro-tracking);line-height:1.2;text-transform:uppercase}
+.mf-canon-body{font-family:var(--mf-ui-font);font-size:var(--mf-ui-body-size);line-height:var(--mf-ui-body-line)}

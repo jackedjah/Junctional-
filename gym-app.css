@@ -1,0 +1,1028 @@
+/* ══ FOB SYSTEMS :: GYM TRACKER ════════════════════════════════════════════
+   Tokens sampled from the live site, not invented: the near-black ground and
+   card surface from the FOBreakdown dossier, the champagne gold from the UI
+   labels and rules, the cream headline colour, Space Grotesk as standardised
+   in v225. Nothing here is a new palette.
+
+   Built thumb-first. Every control the coach touches while standing next to a
+   client is at least 44px, high contrast, with a visible pressed state.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0E1114;          /* page ground */
+  --deep:#14171B;         /* header / sheet ground */
+  --card:#1B2026;         /* card surface */
+  --card2:#171A1E;        /* inset surface */
+  --line:rgba(211,190,152,.20);
+  --line2:rgba(211,190,152,.11);
+  --gold:#D3BE98;         /* labels, rules */
+  --bright:#E9C98F;       /* active gold */
+  --cream:#EFEAE0;        /* headline / body */
+  --muted:#9BA1A8;
+  --dim:#6E757C;
+  --good:#9FB8A4;
+  --warn:#D99A8A;
+  --r:2px;   /* sharp by default: this is a control surface, not a consumer app */
+  --safe:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink);color:var(--cream);
+  font-family:'Space Grotesk',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+  font-size:16px;line-height:1.5;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  /* No overflow or touch-action on html. See the v230 note in fob.css: a
+     non-visible overflow on the root turns the document into an element
+     scroller and iOS stops answering the first touch. */
+}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+
+/* ── header ───────────────────────────────────────────────────────────── */
+.hd{position:sticky;top:0;z-index:30;background:rgba(14,17,20,.94);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line2);padding:10px 14px 11px}
+.hd__top{display:flex;align-items:center;gap:10px}
+.client{flex:1;min-width:0;display:flex;align-items:center;gap:7px;
+  min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:2px;
+  background:var(--card2);
+  /* angular corner cut, the one decorative liberty taken */
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}
+.client b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:15px;font-weight:600;text-align:left}
+.client i{font-style:normal;color:var(--gold);font-size:11px}
+.hd__ico{flex:0 0 auto;width:44px;height:44px;border:1px solid var(--line);
+  border-radius:2px;display:grid;place-items:center;color:var(--gold)}
+.hd__ico:active{background:rgba(211,190,152,.10)}
+.hd__meta{display:flex;align-items:baseline;gap:10px;margin-top:9px}
+.hd__meta h1{flex:1;min-width:0;margin:0;font-size:13px;font-weight:600;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--gold);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd__meta time{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.hd__bar{display:flex;align-items:center;gap:12px;margin-top:9px}
+.clock{font-variant-numeric:tabular-nums;font-size:26px;font-weight:600;
+  letter-spacing:.02em;line-height:1;color:var(--cream)}
+.clock[data-run="1"]{color:var(--bright)}
+.hd__bar .prog{flex:1;height:3px;border-radius:0;background:rgba(211,190,152,.12);overflow:hidden}
+.hd__bar .prog span{display:block;height:100%;background:var(--bright);
+  border-radius:0;transition:width .28s ease}
+.pct{font-size:12px;font-weight:600;color:var(--gold);
+  font-variant-numeric:tabular-nums;min-width:38px;text-align:right}
+
+/* ── workout list ─────────────────────────────────────────────────────── */
+main{padding:14px 14px calc(112px + var(--safe))}
+.ex{border:1px solid var(--line2);border-radius:var(--r);background:var(--card);
+  margin-bottom:11px;overflow:hidden}
+.ex[data-done="1"]{border-color:rgba(159,184,164,.30)}
+.ex__h{display:flex;align-items:center;gap:11px;padding:12px 13px}
+.thumb{flex:0 0 auto;width:42px;height:42px;border-radius:2px;border:1px solid var(--line2);
+  background:var(--card2);display:grid;place-items:center;color:var(--dim);font-size:16px}
+.thumb[data-has="1"]{color:var(--bright);border-color:var(--line)}
+.ex__n{flex:1;min-width:0}
+.ex__n b{display:block;font-size:15px;font-weight:600;line-height:1.3}
+.ex__n span{display:block;margin-top:2px;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim)}
+.ex__more{flex:0 0 auto;width:38px;height:38px;border-radius:2px;color:var(--dim);
+  display:grid;place-items:center;font-size:19px}
+.ex__more:active{background:rgba(211,190,152,.09)}
+
+.prev{margin:0 13px 10px;padding:8px 10px;border-radius:0;background:var(--card2);
+  border-left:2px solid var(--line)}
+.prev em{display:block;font-style:normal;font-size:9px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:3px}
+.prev p{margin:0;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.prev p.sug{margin-top:4px;color:var(--bright);font-size:12px}
+
+/* ── set rows ─────────────────────────────────────────────────────────── */
+/* ══ SET ROW ════════════════════════════════════════════════════════
+   Was a flex row of steppers competing for width, so "190" had nowhere to
+   sit. Now a grid: the label and the tick take fixed columns and the
+   steppers share whatever is left, equally, with a real minimum. The unit
+   sits UNDER the value as a caption rather than stealing width from it. */
+.sets{padding:2px 13px 5px}
+/* The set number used to sit hard against the card edge and read as if it
+   were falling off. It now has its own inset column and is centred in it,
+   so it reads as a label belonging to the row rather than a stray digit. */
+.set{display:grid;grid-template-columns:26px 1fr 44px;align-items:center;gap:10px;
+  padding:7px 0 7px 8px;border-top:1px solid var(--line2)}
+.set__n{font-size:11px;font-weight:600;letter-spacing:0;text-align:center;
+  color:var(--muted);font-variant-numeric:tabular-nums}
+.fields{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:7px;min-width:0}
+.stepper{min-width:0;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:stretch;
+  border:1px solid var(--line2);background:var(--card2)}
+.stepper button{height:46px;font-size:20px;font-weight:600;color:var(--gold);
+  display:grid;place-items:center;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.stepper button:active{background:rgba(211,190,152,.18)}
+.stepper .val{min-width:0;width:100%;height:46px;border:0;background:none;text-align:center;
+  font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;color:#fff;white-space:nowrap;
+  -webkit-appearance:none;appearance:none;outline:none;padding:0 1px;touch-action:manipulation}
+.stepper .val:focus{color:var(--bright);background:rgba(233,201,143,.07)}
+.unit{display:block;text-align:center;font-size:8px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim);margin-top:3px;line-height:1}
+.fieldwrap{min-width:0}
+/* At phone widths the row gives the two steppers the maximum safe room while
+   keeping the set number and completion target intact. This is the narrowest
+   layout where 44px side targets and a wider three-digit center can coexist. */
+@media(max-width:520px){
+  .sets{padding-left:4px;padding-right:4px}
+  .set{grid-template-columns:22px minmax(0,1fr) 44px;gap:4px;padding-left:0}
+  .fields{gap:5px}
+}
+.tick{width:44px;height:46px;border:1px solid var(--line);border-radius:2px;
+  display:grid;place-items:center;color:var(--dim);font-size:0;touch-action:manipulation}
+.tick::after{content:"";width:15px;height:8px;border-left:2px solid currentColor;
+  border-bottom:2px solid currentColor;transform:rotate(-45deg) translate(1px,-2px)}
+.tick[data-on="1"]{border-color:rgba(159,184,164,.5);background:rgba(159,184,164,.12);color:var(--good)}
+.tick:active{transform:scale(.94)}
+.pr{margin-left:5px;font-size:9px;letter-spacing:.15em;color:var(--bright);text-transform:uppercase}
+
+.ex__f{display:flex;gap:7px;padding:8px 13px 12px;flex-wrap:wrap}
+.chip{min-height:36px;padding:0 12px;border:1px solid var(--line2);border-radius:2px;
+  display:inline-flex;align-items:center;gap:5px;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.chip:active{background:rgba(211,190,152,.10);color:var(--bright)}
+.chip.add{border-style:dashed;color:var(--gold)}
+
+/* circuits: connected, not decorated */
+.circ{border:1px solid var(--line);border-radius:0;padding:9px;margin-bottom:11px;
+  background:rgba(211,190,152,.028)}
+.circ__h{display:flex;align-items:center;gap:9px;padding:2px 4px 9px}
+.circ__h b{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.circ__h span{flex:1;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim)}
+.circ .ex{margin-bottom:8px}
+.circ .ex:last-child{margin-bottom:0}
+
+/* ── bottom bar ───────────────────────────────────────────────────────── */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;gap:9px;
+  padding:11px 14px calc(11px + var(--safe));
+  background:rgba(14,17,20,.96);-webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);border-top:1px solid var(--line2)}
+.bar button{flex:1;min-height:50px;border-radius:2px;border:1px solid var(--line);
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--gold)}
+.bar button:active{background:rgba(211,190,152,.12)}
+.bar button.go{background:linear-gradient(180deg,#E9C98F,#CDAF7A);color:#14171B;border-color:transparent}
+
+/* ── sheets ───────────────────────────────────────────────────────────── */
+.veil{position:fixed;inset:0;z-index:60;background:rgba(6,8,10,.72);
+  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);display:none}
+.veil.open{display:block}
+/* ══ MODAL ══════════════════════════════════════════════════════════
+   Centred dialog, not a bottom sheet. Closes on the X, on the backdrop,
+   and on Escape. */
+.sheet{position:fixed;left:50%;top:50%;z-index:61;
+  width:min(560px,calc(100vw - 28px));max-height:min(78vh,700px);
+  display:none;flex-direction:column;background:var(--deep);
+  border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.62);
+  transform:translate(-50%,-48%) scale(.98);opacity:0;
+  transition:transform .16s ease,opacity .16s ease}
+.sheet.open{display:flex;transform:translate(-50%,-50%);opacity:1}
+.sheet__h{flex:0 0 auto;display:flex;align-items:center;gap:12px;
+  padding:14px 12px 13px 16px;border-bottom:1px solid var(--line2)}
+.sheet__h b{flex:1;min-width:0;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sheet__h button{flex:0 0 auto;width:38px;height:38px;border:1px solid var(--line2);
+  color:var(--muted);font-size:19px;line-height:1;display:grid;place-items:center}
+.sheet__h button:active{background:rgba(211,190,152,.12);color:var(--bright)}
+.sheet__b{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 15px 20px}
+.find{width:100%;min-height:48px;border-radius:2px;border:1px solid var(--line);
+  background:var(--card2);color:var(--cream);padding:0 14px;font-size:16px;outline:none;
+  -webkit-appearance:none;appearance:none}
+.find:focus{border-color:rgba(233,201,143,.45)}
+.filters{display:flex;gap:7px;overflow-x:auto;padding:10px 0 3px;-webkit-overflow-scrolling:touch}
+.filters::-webkit-scrollbar{display:none}
+.filters button{flex:0 0 auto;min-height:34px;padding:0 12px;border-radius:2px;
+  border:1px solid var(--line2);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.filters button[data-on="1"]{border-color:var(--line);background:rgba(211,190,152,.13);color:var(--bright)}
+.filterstack{margin:9px 0 4px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:7px 0 9px}
+.filtergroup{min-width:0}.filtergroup+.filtergroup{margin-top:6px}
+.filtergroup__label{display:block;margin-top:3px;font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.filtergroup .filters{padding-top:6px}
+.filterstage{margin:8px 0 1px;padding:7px 9px;border-left:2px solid var(--gold);background:rgba(233,201,143,.055);color:var(--gold);font-size:9px;letter-spacing:.14em;text-transform:uppercase}
+.filtermore{margin-top:8px;border-top:1px solid var(--line2);padding-top:7px}
+.filtermore summary{cursor:pointer;list-style:none;color:var(--muted);font-size:9px;letter-spacing:.15em;text-transform:uppercase;min-height:30px;display:flex;align-items:center}
+.filtermore summary::-webkit-details-marker{display:none}.filtermore summary::after{content:'+';margin-left:auto;color:var(--gold);font-size:15px}.filtermore[open] summary::after{content:'−'}
+.filterclear{display:block;margin:6px 0 0 auto;min-height:30px;color:var(--gold);font-size:9px;letter-spacing:.13em;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px}
+.hit{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  padding:11px 4px;border-bottom:1px solid var(--line2)}
+.hit b{flex:1;min-width:0;font-size:15px;font-weight:500}
+.hit span{max-width:48%;text-align:right;line-height:1.35;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.hist{font-variant-numeric:tabular-nums}
+.hist div{display:flex;gap:12px;padding:9px 2px;border-bottom:1px solid var(--line2);font-size:14px}
+.hist div em{font-style:normal;flex:0 0 62px;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim)}
+.fld{display:block;margin-bottom:11px}
+.fld span{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;min-height:46px;border-radius:2px;
+  border:1px solid var(--line2);background:var(--card2);color:var(--cream);
+  padding:10px 12px;font-size:16px;outline:none;-webkit-appearance:none;appearance:none}
+.fld textarea{min-height:76px;resize:vertical}
+.vars{display:flex;flex-wrap:wrap;gap:7px}
+.vars button{min-height:38px;padding:0 13px;border-radius:2px;border:1px solid var(--line2);
+  font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.vars button[data-on="1"]{border-color:var(--line);background:rgba(211,190,152,.14);color:var(--bright)}
+.primary{width:100%;min-height:var(--mf-ui-primary-h,52px);border-radius:var(--mf-ui-control-radius,2px);margin-top:6px;
+  background:linear-gradient(180deg,var(--bright,#E9C98F),var(--accent-deep,#CDAF7A));color:var(--accent-ink,#14171B);font-weight:700;
+  font-family:var(--mf-ui-font,"Space Grotesk",system-ui,sans-serif);font-size:var(--mf-ui-primary-size,12px);letter-spacing:var(--mf-ui-primary-tracking,.22em);text-transform:uppercase}
+.ghost{width:100%;min-height:var(--mf-ui-button-h,48px);border-radius:var(--mf-ui-control-radius,2px);border:1px solid var(--line);
+  color:var(--gold);font-family:var(--mf-ui-font,"Space Grotesk",system-ui,sans-serif);font-size:var(--mf-ui-button-size,11px);letter-spacing:var(--mf-ui-button-tracking,.2em);text-transform:uppercase;margin-top:9px}
+
+/* ── rest timer + toast ───────────────────────────────────────────────── */
+.rest{position:fixed;left:14px;right:14px;bottom:calc(74px + var(--safe));z-index:40;
+  display:none;align-items:center;gap:10px;padding:10px 13px;border-radius:12px;
+  border:1px solid rgba(159,184,164,.34);background:rgba(20,24,28,.97);border-radius:2px}
+.rest.open{display:flex}
+.rest b{flex:1;font-variant-numeric:tabular-nums;font-size:19px;color:var(--good)}
+.rest button{min-height:38px;padding:0 12px;border-radius:2px;border:1px solid var(--line2);
+  font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(128px + var(--safe));
+  z-index:70;display:none;align-items:center;gap:12px;padding:11px 16px;border-radius:2px;
+  border:1px solid var(--line);background:rgba(20,24,28,.98);font-size:12px;
+  letter-spacing:.1em;max-width:calc(100vw - 28px)}
+.toast.open{display:flex}
+.toast button{color:var(--bright);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.empty{text-align:center;color:var(--muted);font-size:14px;line-height:1.65;padding:44px 18px}
+.empty b{display:block;color:var(--gold);font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;margin-bottom:9px}
+.sync{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
+.sync[data-s="off"]{color:var(--warn)}
+
+@media(min-width:820px){
+  .hd,main,.bar{max-width:760px;margin-left:auto;margin-right:auto}
+  .bar{left:50%;transform:translateX(-50%);width:min(760px,100%);border-radius:14px 14px 0 0}
+  .sheet{left:50%;transform:translateX(-50%);width:min(680px,100%);border-radius:18px 18px 0 0}
+  .sheet.open{transform:translateX(-50%)}
+}
+
+
+/* ══ DRAG TO REORDER ═══════════════════════════════════════════════════
+   The handle is the ONLY element with touch-action:none. That is the whole
+   trick on iOS: the browser needs to know before the gesture starts whether
+   it owns the scroll, and declaring it on one 44px handle means the page
+   scrolls normally everywhere else. Nothing is disabled globally, and no
+   touchmove listener ever calls preventDefault on the page.
+   ═══════════════════════════════════════════════════════════════════ */
+.grip{flex:0 0 auto;width:34px;height:44px;display:grid;place-items:center;
+  color:var(--dim);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.grip:active{cursor:grabbing;color:var(--bright)}
+.grip s{display:block;width:15px;height:2px;background:currentColor;
+  box-shadow:0 5px 0 currentColor,0 -5px 0 currentColor;text-decoration:none}
+.ex.dragging{opacity:.92;border-color:rgba(233,201,143,.55);
+  box-shadow:0 14px 34px rgba(0,0,0,.55);position:relative;z-index:20;
+  will-change:transform}
+.ex.shift{transition:transform .16s ease}
+.dropline{height:2px;background:var(--bright);margin:6px 0;box-shadow:0 0 9px rgba(233,201,143,.6)}
+
+/* ══ ACTIVE EXERCISE ═══════════════════════════════════════════════════
+   A single faint gold beam traverses the border of the exercise being worked.
+   Transform and opacity only, one element, paused whenever the tab is hidden
+   or the user prefers reduced motion. Nothing measures layout, nothing runs
+   on scroll.
+   ═══════════════════════════════════════════════════════════════════ */
+.ex[data-active="1"]{border-color:rgba(233,201,143,.42)}
+.ex[data-active="1"]::before{content:"";position:absolute;left:0;top:0;height:1px;width:34%;
+  background:linear-gradient(90deg,transparent,rgba(233,201,143,.85),transparent);
+  animation:beam 3.6s linear infinite;pointer-events:none}
+.ex{position:relative}
+@keyframes beam{from{transform:translateX(-110%)}to{transform:translateX(400%)}}
+@media (prefers-reduced-motion:reduce){.ex[data-active="1"]::before{animation:none;opacity:.5}}
+
+/* ══ MEMBER SELECT / MEMBER HOME ═══════════════════════════════════════ */
+.msel{margin:16px 0 0;border:1px solid var(--line);background:var(--card2);
+  clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,11px 100%,0 calc(100% - 11px))}
+.msel__t{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding:0 15px;
+  font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.msel__t b{flex:1;text-align:left}
+.msel__t i{font-style:normal;transition:transform .18s ease}
+.msel[data-open="1"] .msel__t i{transform:rotate(180deg)}
+.msel__b{max-height:0;overflow:hidden;transition:max-height .26s cubic-bezier(.4,0,.2,1)}
+.msel[data-open="1"] .msel__b{max-height:62vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.msel__b .find{border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+.mrow{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:13px 15px;
+  border-bottom:1px solid var(--line2);position:relative}
+.mrow b{flex:1;min-width:0;font-size:15px;font-weight:600}
+.mrow span{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
+.mrow:active{background:rgba(211,190,152,.09)}
+.mrow:active::after{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--bright)}
+.home{padding:18px 14px calc(30px + var(--safe))}
+.home h2{margin:0 0 3px;font-size:24px;font-weight:600;letter-spacing:-.01em}
+.home .lab{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin:20px 0 7px}
+.home .panel{border:1px solid var(--line2);background:var(--card);padding:14px}
+.home .panel b{display:block;font-size:17px;font-weight:600}
+.home .panel span{display:block;margin-top:3px;font-size:11px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim)}
+.home .rec{border:1px solid var(--line2);background:var(--card);padding:2px 14px}
+.home .rec div{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line2);font-size:14px}
+.home .rec div:last-child{border-bottom:0}
+.home .rec em{font-style:normal;flex:0 0 62px;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim)}
+.home .swap{margin-top:22px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.pre{width:100%;text-align:left;border:1px solid var(--line2);background:var(--card);
+  padding:13px 14px;margin-bottom:8px}
+.pre b{display:block;font-size:15px;font-weight:600}
+.pre span{display:block;margin-top:3px;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim)}
+.pre:active{border-color:var(--line)}
+.day{border:1px solid var(--line2);background:var(--card);padding:11px 13px;margin-bottom:8px}
+.day b{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.day p{margin:6px 0 0;font-size:13px;color:var(--muted);line-height:1.55}
+
+
+/* ══ COLLAPSE ═══════════════════════════════════════════════════════
+   A long workout is unreadable if every card is open. Collapsed cards keep
+   the name, the muscle line and a one-line result, which is what the coach
+   scans for. State lives in the item, so it survives autosave and restore. */
+.ex__h{cursor:pointer}
+.ex__caret{flex:0 0 auto;width:30px;height:38px;display:grid;place-items:center;color:var(--dim)}
+.ex__caret::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);
+  transition:transform .16s ease}
+.ex[data-open="0"] .ex__caret::after{transform:rotate(-45deg) translate(0,1px)}
+.ex[data-open="0"] .prev,.ex[data-open="0"] .sets,.ex[data-open="0"] .ex__f{display:none}
+.ex__sum{padding:0 13px 11px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ex[data-open="1"] .ex__sum{display:none}
+
+/* ══ HEADER CONTROLS ════════════════════════════════════════════════
+   Word labels, not emoji. An emoji renders differently on every device and
+   reads as a placeholder. */
+.hd__btn{flex:0 0 auto;min-height:44px;padding:0 12px;border:1px solid var(--line);
+  color:var(--gold);font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.hd__btn:active{background:rgba(211,190,152,.12)}
+.hd__btn[data-on="1"]{border-color:rgba(233,201,143,.5);color:var(--bright)}
+.back{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 12px 0 8px;
+  border:1px solid var(--line2);color:var(--muted);font-size:10px;letter-spacing:.18em;
+  text-transform:uppercase;margin-bottom:2px}
+.back::before{content:"";width:7px;height:7px;border-left:2px solid currentColor;
+  border-bottom:2px solid currentColor;transform:rotate(45deg)}
+.back:active{color:var(--bright);border-color:var(--line)}
+
+/* ══ VIDEO ══════════════════════════════════════════════════════════ */
+.vid{width:100%;aspect-ratio:16/9;background:#000;border:1px solid var(--line2)}
+.vidframe{width:100%;aspect-ratio:16/9;border:0;display:block}
+.vidnote{font-size:11px;color:var(--dim);line-height:1.6;margin:10px 0 0}
+.thumb[data-has="1"]::after{content:"";position:absolute;right:-2px;top:-2px;width:6px;height:6px;
+  background:var(--bright)}
+.thumb{position:relative}
+
+/* ══ v242 :: MULTI-PROGRAM MEMBER HOME ═══════════════════════════════════ */
+.homeactions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 2px}
+.homeactions .ghost{margin:0;min-height:44px}
+.program{border:1px solid var(--line2);background:var(--card);margin-bottom:12px;position:relative;overflow:hidden}
+.program::before{content:"";position:absolute;left:0;top:0;width:28%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(233,201,143,.65),transparent);
+  animation:programBeam 5.8s linear infinite;pointer-events:none;opacity:.55}
+@keyframes programBeam{from{transform:translateX(-130%)}to{transform:translateX(470%)}}
+.program__head{padding:14px 14px 11px;border-bottom:1px solid var(--line2)}
+.program__head b{display:block;font-size:17px;font-weight:600;color:var(--cream)}
+.program__head span{display:block;margin-top:4px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.program__days{display:grid;grid-template-columns:1fr}
+.program__days button{width:100%;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line2);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px}
+.program__days button:last-child{border-bottom:0}
+.program__days button:active{background:rgba(211,190,152,.08)}
+.program__days b{font-size:14px;font-weight:600;color:var(--cream)}
+.program__days span{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+/* ══ v242 :: GYM PROGRESS ═══════════════════════════════════════════════ */
+.progressview{padding-bottom:38px}
+.progresshero{border:1px solid var(--line2);background:var(--card);padding:16px 14px;margin-bottom:12px;
+  display:flex;align-items:baseline;gap:12px}
+.progresshero b{font-size:34px;line-height:1;color:var(--bright);font-variant-numeric:tabular-nums}
+.progresshero span{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.exprogress{border:1px solid var(--line2);background:var(--card);margin:0 0 14px;overflow:hidden}
+.exprogress__title{padding:14px;border-bottom:1px solid var(--line2);display:flex;align-items:flex-end;gap:10px}
+.exprogress__title b{flex:1;font-size:17px;color:var(--cream)}
+.exprogress__title span{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.chart{padding:13px 14px 12px;border-bottom:1px solid var(--line2)}
+.chart:last-child{border-bottom:0}
+.chart__head{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.chart__head b{flex:1;font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:var(--muted)}
+.chart__head span{font-size:15px;font-variant-numeric:tabular-nums;color:var(--bright)}
+.chart__plot{height:128px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.012),transparent)}
+.chart__plot svg{width:100%;height:100%;display:block;overflow:visible}
+.chart__plot .axis{stroke:rgba(211,190,152,.18);stroke-width:1;vector-effect:non-scaling-stroke}
+.chart__plot .trend{fill:none;stroke:#E9C98F;stroke-width:2;vector-effect:non-scaling-stroke;
+  stroke-linejoin:round;stroke-linecap:round}
+.chart__plot circle{fill:#E9C98F;stroke:#0E1114;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.chartbeam{position:absolute;left:4%;right:4%;bottom:18px;height:1px;overflow:hidden;pointer-events:none}
+.chartbeam::after{content:"";position:absolute;top:0;left:0;width:24%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(233,201,143,.9),transparent);
+  animation:graphBeam 4.8s linear infinite}
+@keyframes graphBeam{from{transform:translateX(-120%)}to{transform:translateX(520%)}}
+.chart__dates{display:flex;justify-content:space-between;margin-top:5px;font-size:9px;letter-spacing:.12em;color:var(--dim)}
+.chart__empty{padding:22px 0;color:var(--dim);font-size:12px}
+@media (prefers-reduced-motion:reduce){.program::before,.chartbeam::after{animation:none;opacity:.45}}
+
+/* ══ v243 :: MEMBER ENTRY / SECTIONED WORKOUT / EDITOR ══════════════════ */
+.membergate{padding:22px 14px calc(46px + var(--safe));max-width:760px;margin:0 auto}
+.membergate__intro{padding:18px 0 20px;border-bottom:1px solid var(--line2)}
+.membergate__intro>span{display:block;font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold)}
+.membergate__intro h2{margin:8px 0 5px;font-size:30px;line-height:1.05;font-weight:600;letter-spacing:-.02em}
+.membergate__intro p{margin:0;max-width:520px;color:var(--muted);font-size:13px}
+.membergate__select{margin-top:16px;border:1px solid var(--line);background:var(--deep);position:relative;overflow:hidden}
+.membergate__select::before{content:"";position:absolute;left:0;top:0;width:28%;height:1px;z-index:2;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(233,201,143,.86),transparent);animation:memberBeam 5.4s linear infinite}
+@keyframes memberBeam{from{transform:translateX(-120%)}to{transform:translateX(480%)}}
+.membergate__select .find{margin:0;border:0;border-bottom:1px solid var(--line2);background:#111519;min-height:56px}
+.membercard{width:100%;min-height:64px;padding:12px 14px;display:flex;align-items:center;gap:12px;text-align:left;
+  border-bottom:1px solid var(--line2);background:var(--card)}
+.membercard:last-child{border-bottom:0}
+.membercard span{flex:1;min-width:0}.membercard b{display:block;font-size:16px;font-weight:600;color:var(--cream)}
+.membercard small{display:block;margin-top:3px;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.membercard i{font-style:normal;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.membercard:active{background:rgba(211,190,152,.09)}
+.memberhomehead{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;margin-bottom:4px}
+.memberhomehead h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.memberchange{min-height:46px;padding:0 15px;border:1px solid rgba(233,201,143,.62);background:rgba(211,190,152,.08);
+  color:var(--bright);font-size:9px;letter-spacing:.19em;text-transform:uppercase;font-weight:700;position:relative;overflow:hidden}
+.memberchange::after{content:"";position:absolute;left:0;bottom:0;width:32%;height:1px;background:linear-gradient(90deg,transparent,var(--bright),transparent);
+  animation:memberBeam 4.4s linear infinite;opacity:.7}.memberchange:active{background:rgba(211,190,152,.17)}
+.saveoffer{margin:15px 0 4px;border:1px solid rgba(233,201,143,.38);background:linear-gradient(135deg,rgba(211,190,152,.08),var(--card));padding:14px}
+.saveoffer>b{display:block;font-size:15px}.saveoffer>span{display:block;margin-top:4px;font-size:11px;color:var(--muted)}
+.saveoffer>div{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.saveoffer button{min-height:44px;border:1px solid var(--line);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.saveoffer button:first-child{background:var(--bright);color:#111317;border-color:var(--bright);font-weight:700}
+.program__head{display:flex;align-items:center;gap:12px}.program__head>div{flex:1;min-width:0}
+.program__tag{flex:0 0 auto!important;margin:0!important;font-size:8px!important;color:var(--gold)!important;white-space:nowrap}
+
+.worksec{margin:0 0 16px}
+.worksec__head{height:46px;display:grid;grid-template-columns:34px 1fr auto;align-items:center;border:1px solid var(--line2);border-bottom:0;
+  background:#12161A;padding:0 10px 0 8px;position:relative;overflow:hidden}
+.worksec__head::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:24%;background:linear-gradient(90deg,transparent,rgba(233,201,143,.58),transparent);opacity:.5}
+.worksec__head>span{font-size:9px;letter-spacing:.14em;color:var(--dim)}
+.worksec__head>b{font-size:10px;letter-spacing:.19em;text-transform:uppercase;color:var(--gold)}
+.worksec__head>button{min-height:34px;padding:0 10px;border:1px solid var(--line2);color:var(--gold);font-size:8px;letter-spacing:.15em;text-transform:uppercase}
+.worksec__empty{min-height:52px;border:1px solid var(--line2);background:rgba(27,32,38,.46);display:flex;align-items:center;padding:0 13px;color:var(--dim);font-size:11px}
+.worksec>.ex,.worksec>.circ{margin-bottom:8px;border-radius:0}.worksec>.ex:last-child,.worksec>.circ:last-child{margin-bottom:0}
+
+.edithelp{margin:4px 0 13px;color:var(--muted);font-size:11px;line-height:1.55}
+.editorsec{border:1px solid var(--line2);margin:0 0 10px;background:var(--card2)}
+.editorsec__head{display:flex;align-items:center;gap:10px;padding:10px 11px;border-bottom:1px solid var(--line2)}
+.editorsec__head b{flex:1;font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:var(--gold)}
+.editorsec__head button{min-height:34px;padding:0 9px;border:1px solid var(--line);font-size:8px;letter-spacing:.13em;text-transform:uppercase;color:var(--gold)}
+.editorsec__empty{padding:13px;color:var(--dim);font-size:11px}
+.editrow{display:grid;grid-template-columns:minmax(0,1fr) 112px 38px 38px;gap:5px;padding:9px 10px;border-bottom:1px solid var(--line2);align-items:center}
+.editrow:last-child{border-bottom:0}.editrow>span{grid-column:1 / -1;font-size:13px;font-weight:600;color:var(--cream);padding-bottom:3px}
+.editrow select{min-width:0;height:40px;border:1px solid var(--line2);background:var(--ink);color:var(--muted);font-size:10px;padding:0 6px}
+.editrow button{height:40px;border:1px solid var(--line2);color:var(--gold);font-size:10px}
+.editrow button:nth-last-child(-n+2){grid-column:span 2}
+
+/* v243 progress graphs exist before the first data point. */
+.progressmatrix{border:1px solid var(--line2);background:var(--card);margin-bottom:14px;overflow:hidden}
+.progressmatrix__head{padding:14px;border-bottom:1px solid var(--line2)}
+.progressmatrix__head b{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.progressmatrix__head span{display:block;margin-top:4px;font-size:10px;color:var(--dim)}
+.progressmatrix .chart{background:linear-gradient(180deg,rgba(255,255,255,.008),transparent)}
+.chart__plot .grid{stroke:rgba(211,190,152,.07);stroke-width:1;stroke-dasharray:3 6;vector-effect:non-scaling-stroke}
+.chartzero{position:absolute;inset:0;display:grid;place-items:center;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(155,161,168,.55);pointer-events:none}
+.chart__plot[data-empty="1"] .chartbeam{opacity:.55}.progressnote{margin-top:-2px}
+
+@media(max-width:430px){
+  .membergate__intro h2{font-size:27px}.memberhomehead{grid-template-columns:1fr}.memberchange{width:100%}
+  .editrow{grid-template-columns:minmax(0,1fr) 104px 36px 36px}.program__tag{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){.membergate__select::before,.memberchange::after{animation:none;opacity:.4}}
+
+/* ══ v244 :: EXERCISE-SPECIFIC PROGRESS / CLEAN MEMBER ENTRY / BODY TONES ══ */
+/* Program-day color is semantic, not decorative noise. Lower stays on the
+   normal graphite surface; upper carries the FOB gold; full-body sits halfway. */
+.program__days button.tone-upper{
+  background:linear-gradient(90deg,rgba(211,190,152,.105),rgba(211,190,152,.035) 62%,transparent);
+  border-left:2px solid rgba(233,201,143,.58)
+}
+.program__days button.tone-upper b{color:var(--bright)}
+.program__days button.tone-full{
+  background:linear-gradient(90deg,rgba(211,190,152,.052),rgba(211,190,152,.018) 62%,transparent);
+  border-left:2px solid rgba(233,201,143,.30)
+}
+.program__days button.tone-full b{color:#e7dcc8}
+.program__days button.tone-lower,.program__days button.tone-neutral{background:transparent;border-left:2px solid transparent}
+
+/* The same hierarchy follows the coach into the live workout, but the wash is
+   intentionally subtle so numbers and controls always win. */
+.workout.tone-upper{--work-wash:rgba(211,190,152,.045);--work-line:rgba(211,190,152,.22);--section-wash:rgba(211,190,152,.075)}
+.workout.tone-full{--work-wash:rgba(211,190,152,.022);--work-line:rgba(211,190,152,.16);--section-wash:rgba(211,190,152,.038)}
+.workout.tone-lower,.workout.tone-neutral{--work-wash:transparent;--work-line:var(--line2);--section-wash:transparent}
+.workout .ex{background:linear-gradient(105deg,var(--work-wash),transparent 58%),var(--card);border-color:var(--work-line)}
+.workout .worksec__head{background:linear-gradient(90deg,var(--section-wash),transparent 66%),#12161A}
+.workout-hd.tone-upper .hd__meta h1{color:var(--bright)}
+.workout-hd.tone-full .hd__meta h1{color:#dfcfb3}
+
+/* v359 — coach parity: Full/Full Body uses the same lower-body aura in both
+   the expanded program and the live workout, including member names that use
+   the short label “Full”. */
+.program__days button.tone-lower,.program__days button.tone-full{
+  background:linear-gradient(90deg,color-mix(in srgb,var(--gold) 18%,transparent),color-mix(in srgb,var(--gold) 5.5%,transparent) 62%,transparent);
+  border-left:2px solid color-mix(in srgb,var(--bright) 76%,transparent);
+  box-shadow:inset 18px 0 24px -24px color-mix(in srgb,var(--bright) 90%,transparent)
+}
+.workout.tone-lower,.workout.tone-full{
+  --work-wash:color-mix(in srgb,var(--gold) 7.5%,transparent);
+  --work-line:color-mix(in srgb,var(--gold) 30%,transparent);
+  --section-wash:color-mix(in srgb,var(--gold) 12%,transparent)
+}
+.workout.tone-lower .ex,.workout.tone-full .ex{
+  box-shadow:inset 18px 0 28px -27px color-mix(in srgb,var(--bright) 85%,transparent)
+}
+
+/* One selected exercise owns the graph stack. This is how gym progress is read:
+   exercise first, variable second, date across the x-axis. */
+.progresspicker{border:1px solid var(--line2);background:var(--card);margin:0 0 12px;padding:14px;position:relative;overflow:hidden}
+.progresspicker::before{content:"";position:absolute;left:0;top:0;width:26%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(233,201,143,.82),transparent);animation:graphBeam 5.4s linear infinite;opacity:.55}
+.progresspicker__label{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+.progresspicker__label span{flex:1;font-size:10px;letter-spacing:.19em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.progresspicker__label small{font-size:9px;letter-spacing:.08em;color:var(--dim)}
+.progresschoose{border:1px solid var(--line);background:var(--deep)}
+.progresschoose summary{list-style:none;min-height:52px;padding:0 13px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.progresschoose summary::-webkit-details-marker{display:none}
+.progresschoose summary span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;font-weight:600;color:var(--cream)}
+.progresschoose summary i{font-style:normal;color:var(--gold);font-size:16px}
+.progresschoose[open] summary{border-bottom:1px solid var(--line2)}
+.progresschoose__body{padding:10px;background:#111519}
+.progresschoose__body .find{width:100%;margin:0 0 8px;min-height:46px;border:1px solid var(--line2);background:var(--ink);padding:0 12px;border-radius:0;outline:none}
+.progresschoose__body .find:focus{border-color:rgba(233,201,143,.45)}
+#progressExerciseHits{max-height:250px;overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line2)}
+.progresshit{width:100%;min-height:52px;padding:9px 11px;display:flex;align-items:center;gap:10px;text-align:left;border-bottom:1px solid var(--line2);background:var(--card2)}
+.progresshit:last-child{border-bottom:0}.progresshit[data-on="1"]{background:rgba(211,190,152,.095);box-shadow:inset 2px 0 var(--bright)}
+.progresshit b{flex:1;font-size:13px;font-weight:600;color:var(--cream)}
+.progresshit span{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.progressnohit{padding:16px 11px;color:var(--dim);font-size:12px}
+.bookmark{width:100%;min-height:44px;margin-top:8px;border:1px solid var(--line2);color:var(--gold);font-size:9px;letter-spacing:.17em;text-transform:uppercase}
+.bookmark[data-on="1"]{border-color:rgba(233,201,143,.38);background:rgba(211,190,152,.06);color:var(--bright)}
+.progressmarks{margin:0 0 10px}.progressmarks>span{display:block;margin-bottom:6px;font-size:8px;letter-spacing:.17em;text-transform:uppercase;color:var(--dim)}
+.progressmarks>div{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.progressmarks button{flex:0 0 auto;min-height:34px;padding:0 10px;border:1px solid var(--line2);background:var(--deep);color:var(--gold);font-size:9px;white-space:nowrap}
+.progressmatrix{border:1px solid var(--line2);background:var(--card);margin-bottom:14px;overflow:hidden}
+.progressmatrix__head{padding:14px;border-bottom:1px solid var(--line2)}
+.progressmatrix__head b{display:block;font-size:17px;color:var(--cream)}
+.progressmatrix__head span{display:block;margin-top:4px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.chartzero{position:absolute;inset:0;display:grid;place-items:center;color:var(--dim);font-size:10px;letter-spacing:.15em;text-transform:uppercase;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.progresspicker::before{animation:none}}
+
+/* ══ v245 :: PROGRAM COLLAPSE / CLEAN SHEETS / SET SWIPE / PROGRESS CONTEXT ══ */
+/* Member programs are intentionally collapsed at rest so several programs can
+   be scanned without scrolling through every workout day. */
+details.program{overflow:hidden}
+details.program>summary{list-style:none;cursor:pointer;user-select:none;-webkit-user-select:none}
+details.program>summary::-webkit-details-marker{display:none}
+.program__head{min-height:64px;padding:12px 13px;display:grid;grid-template-columns:minmax(0,1fr) auto 24px;align-items:center;gap:10px}
+.program__head>div{min-width:0}
+.program__count{margin:0!important;font-size:8px!important;letter-spacing:.14em!important;color:var(--dim)!important;white-space:nowrap}
+.program__chev{width:10px;height:10px;border-right:1.5px solid var(--gold);border-bottom:1.5px solid var(--gold);transform:rotate(45deg);transition:transform .16s ease;justify-self:center}
+details.program[open] .program__chev{transform:rotate(225deg)}
+details.program[open] .program__head{border-bottom:1px solid var(--line2)}
+.program__days{display:grid}
+
+/* Compact icon-only exercise actions. The top-left media tile remains the only
+   video gateway, so the footer has no duplicate VIDEO text control. */
+.ex__f{display:grid;grid-template-columns:repeat(4,44px);justify-content:start;gap:8px}
+.icochip{width:44px;height:40px;min-height:40px;padding:0;display:grid;place-items:center}
+.icochip svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+
+/* Swipe-left set removal: the red-X surface lives behind the set row and never
+   shifts layout. Vertical scrolling stays native because the gesture code does
+   not prevent touchmove. */
+.setwrap{position:relative;overflow:hidden;border-top:1px solid var(--line2)}
+.setwrap .set{position:relative;z-index:2;border-top:0;background:var(--card);transition:transform .17s ease;will-change:transform}
+.setdelete{position:absolute;z-index:1;right:0;top:0;bottom:0;width:58px;background:rgba(217,154,138,.13);border-left:1px solid rgba(217,154,138,.28);color:var(--warn);font-size:24px;display:grid;place-items:center}
+.setwrap[data-reveal="1"] .set{transform:translateX(-58px)}
+.setwrap[data-reveal="1"] .setdelete{z-index:3}
+
+/* Modal cleanup: one bounded panel, no overflowing CLOSE label, stable header,
+   and library/history/video bodies scroll inside the panel rather than behind it. */
+.sheet{width:min(560px,calc(100vw - 24px));max-height:min(80dvh,720px);overflow:hidden}
+.sheet__h{min-width:0;padding:12px 12px 12px 15px}
+.sheet__h b{padding-right:6px}
+.sheet__h button{width:40px;height:40px;font-size:25px;font-weight:300;overflow:hidden;white-space:nowrap}
+.sheet__b{min-width:0;overscroll-behavior:contain}
+#libhits{max-height:46vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.vid,.vidframe{display:block;width:100%;max-width:100%;aspect-ratio:16/9;border:1px solid var(--line2);background:#090b0d}
+.vidframe{height:auto;min-height:190px}
+.vidnote{font-size:10px;line-height:1.55;color:var(--dim);margin:11px 0 0}
+
+/* Peak graph headers include the paired variable from the SAME recorded set:
+   peak load (reps) and peak reps (load). */
+.chart__head span{display:flex;align-items:baseline;gap:4px;white-space:nowrap}
+.chart__head span small{font-size:9px;font-weight:500;letter-spacing:.04em;color:var(--muted)}
+
+/* Program construction remains branded but, more importantly, the client now
+   resolves an entire preset through one backend request instead of dozens. */
+.buildstate{position:relative;overflow:hidden}
+.buildstate span{display:block;margin-top:6px;color:var(--muted)}
+.buildbeam{display:block;width:180px;max-width:70vw;height:1px;margin:18px auto 0;background:rgba(211,190,152,.12);position:relative;overflow:hidden}
+.buildbeam::after{content:"";position:absolute;inset:0 auto 0 -35%;width:34%;background:linear-gradient(90deg,transparent,var(--bright),transparent);animation:graphBeam 1.6s linear infinite}
+
+@media(max-width:430px){
+  .program__head{grid-template-columns:minmax(0,1fr) auto 20px}
+  .program__count{max-width:72px;overflow:hidden;text-overflow:ellipsis}
+  .sheet{width:calc(100vw - 20px);max-height:82dvh}
+  .sheet__b{padding:10px 12px 16px}
+  .ex__f{grid-template-columns:repeat(4,42px)}
+  .icochip{width:42px}
+}
+@media(prefers-reduced-motion:reduce){.program__chev,.setwrap .set,.buildbeam::after{transition:none;animation:none}}
+
+/* ══ v247 MEMBER IDENTITY + TRAINING THEME ═════════════════════════════ */
+.memberidentity{min-width:0;display:flex;align-items:center;gap:11px}
+.memberidentity__text{min-width:0;flex:1}.memberidentity__text h2{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.memberidentity__text span{display:block;margin-top:3px;color:var(--dim);font-size:9px;letter-spacing:.18em;text-transform:uppercase}
+.memberavatar{position:relative;flex:0 0 48px;width:48px;height:48px;padding:0;border:1px solid var(--line);background:var(--card2);overflow:hidden;display:grid;place-items:center;color:var(--gold)}
+.memberavatar__img{width:100%;height:100%;object-fit:cover;display:block}.memberavatar__fallback{font-size:13px;font-weight:700;letter-spacing:.12em}
+.memberavatar i{position:absolute;right:1px;bottom:1px;width:17px;height:17px;background:rgba(14,17,20,.9);border:1px solid var(--line);display:grid;place-items:center;color:var(--gold)}
+.memberavatar i svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.themeplay{flex:0 0 42px;width:42px;height:42px;border:1px solid var(--line);background:rgba(211,190,152,.035);color:var(--gold);display:grid;place-items:center;position:relative;overflow:hidden}
+.themeplay:after{content:"";position:absolute;left:-28px;top:0;width:24px;height:100%;background:linear-gradient(90deg,transparent,rgba(233,201,143,.17),transparent);animation:themebeam 4.5s linear infinite}
+.themeplay[data-on="1"]{border-color:rgba(233,201,143,.5);background:rgba(211,190,152,.09)}
+.themeplay svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;position:relative;z-index:1}.themeplay svg path[d^="M8 5l"]{fill:currentColor;stroke:none}
+@keyframes themebeam{to{transform:translateX(100px)}}
+@media(max-width:560px){.memberhomehead{grid-template-columns:1fr}.memberidentity{width:100%}.memberchange{width:100%}}
+@media(prefers-reduced-motion:reduce){.themeplay:after{animation:none}}
+
+
+/* v248 — section separators reuse the exact homepage divider motion language.
+   Kept structural and quiet: one gold line, one square diamond, one travelling beam. */
+.gym-motion-divider{
+  --fob-divider-cycle:2s;--fob-divider-delay:0s;--fob-divider-ease:cubic-bezier(.37,0,.63,1);
+  --fob-node-travel:clamp(24px,12.5vw,56px);
+  position:relative;height:1px;width:min(520px,88%);margin:22px auto 20px;
+  background:rgba(211,190,152,.22);z-index:3;overflow:visible;
+}
+.gym-motion-divider::before{
+  content:'';position:absolute;top:50%;left:0;width:100%;height:2px;margin-top:-1px;pointer-events:none;
+  opacity:0;border-radius:2px;background-image:linear-gradient(90deg,transparent 0%,rgba(211,190,152,.10) 14%,rgba(232,207,163,.40) 32%,#E9C98F 45%,#E9C98F 55%,rgba(232,207,163,.40) 68%,rgba(211,190,152,.10) 86%,transparent 100%);
+  background-repeat:no-repeat;background-size:clamp(34px,9vw,84px) 100%;background-position:0% 50%;
+  transform:translate3d(0,0,0);transition:opacity .5s ease;
+}
+.gym-motion-divider.is-motion-active::before{opacity:1;animation:gymFobBeamTravel var(--fob-divider-cycle) var(--fob-divider-ease) var(--fob-divider-delay) infinite,gymFobBeamPulse var(--fob-divider-cycle) var(--fob-divider-ease) var(--fob-divider-delay) infinite}
+.gym-motion-divider>span{position:absolute;left:50%;top:50%;z-index:2;width:7px;height:7px;background:#D3BE98;transform:translate(-50%,-50%) rotate(45deg)}
+.gym-motion-divider.is-motion-active>span{animation:gymFobNodeSway var(--fob-divider-cycle) var(--fob-divider-ease) var(--fob-divider-delay) infinite,gymFobNodeGlow var(--fob-divider-cycle) var(--fob-divider-ease) var(--fob-divider-delay) infinite}
+@keyframes gymFobBeamTravel{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes gymFobBeamPulse{0%,50%,100%{filter:drop-shadow(0 0 5px rgba(233,201,143,.34)) drop-shadow(0 0 12px rgba(211,190,152,.16))}25%,75%{filter:drop-shadow(0 0 8px rgba(233,201,143,.52)) drop-shadow(0 0 18px rgba(211,190,152,.24))}}
+@keyframes gymFobNodeSway{0%{transform:translate(calc(-50% - var(--fob-node-travel)/2),-50%) rotate(45deg)}50%{transform:translate(calc(-50% + var(--fob-node-travel)/2),-50%) rotate(45deg)}100%{transform:translate(calc(-50% - var(--fob-node-travel)/2),-50%) rotate(45deg)}}
+@keyframes gymFobNodeGlow{0%,50%,100%{box-shadow:0 0 5px rgba(233,201,143,.22)}25%,75%{box-shadow:0 0 11px rgba(233,201,143,.55),0 0 20px rgba(211,190,152,.20)}}
+@media(prefers-reduced-motion:reduce){.gym-motion-divider::before,.gym-motion-divider>span{animation:none!important}.gym-motion-divider::before{opacity:.35!important}}
+
+/* v249 :: admin routine creator — Gym Tracker only */
+.homeactions .routine-launch{grid-column:1/-1}
+.routinehome,.routinebuilder{padding-bottom:48px}
+.routineintro{border:1px solid var(--line2);background:linear-gradient(180deg,rgba(211,190,152,.045),rgba(255,255,255,.012));padding:18px 16px;margin-bottom:14px}
+.routineintro>span{font-size:9px;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
+.routineintro h2{margin:7px 0 5px;font-size:24px;font-weight:600;color:var(--cream)}
+.routineintro p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.routinegrid{display:grid;gap:8px}
+.routinecard{width:100%;min-height:66px;border:1px solid var(--line2);background:var(--card);padding:13px 14px;text-align:left;display:flex;align-items:center;gap:10px}
+.routinecard b{flex:1;color:var(--cream);font-size:16px;font-weight:600}
+.routinecard span{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.routine-name{margin-bottom:16px}
+.routine-section{border:1px solid var(--line2);background:rgba(255,255,255,.012);margin:0 0 10px}
+.routine-section__head{min-height:52px;display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line2)}
+.routine-section__head>span{font-size:9px;letter-spacing:.15em;color:var(--dim)}
+.routine-section__head b{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.routine-section__head button{min-height:34px;padding:0 10px;border:1px solid var(--line2);color:var(--gold);font-size:9px;letter-spacing:.13em;text-transform:uppercase}
+.routineitem{min-height:64px;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line2)}
+.routineitem:last-child{border-bottom:0}.routineitem>div:first-child{flex:1;min-width:0}
+.routineitem b{display:block;font-size:15px;color:var(--cream);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.routineitem span{display:block;margin-top:4px;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.routineitem__acts{display:flex;gap:5px}.routineitem__acts button{width:34px;height:34px;border:1px solid var(--line2);color:var(--muted);font-size:15px}
+.routineitem__acts button:active{background:rgba(211,190,152,.12);color:var(--bright)}
+.routine-empty{padding:16px 12px;color:var(--dim);font-size:12px}
+.routine-savebar{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;margin-top:14px}.routine-savebar .ghost,.routine-savebar .primary{margin:0}
+@media(max-width:430px){.routine-savebar{grid-template-columns:1fr}.routine-savebar .primary{order:-1}}
+
+/* v250 program maintenance */
+.program__tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px;border-bottom:1px solid rgba(211,190,152,.12)}.program__tools button{min-height:42px;border:1px solid rgba(211,190,152,.22);background:#11151a;color:#d7c39d;font:600 10px/1 'Space Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase}.program__tools button:last-child{color:#a8adb3;border-color:rgba(255,255,255,.12)}
+
+/* v251 :: routine-builder reliability / full-library section access */
+.libcontext{border:1px solid var(--line2);background:linear-gradient(90deg,rgba(211,190,152,.055),rgba(255,255,255,.01));padding:10px 11px;margin:0 0 10px;display:grid;grid-template-columns:auto 1fr;gap:3px 9px;align-items:baseline}
+.libcontext span{font-size:8px;letter-spacing:.18em;color:var(--dim)}
+.libcontext b{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)}
+.libcontext small{grid-column:1/-1;color:var(--muted);font-size:10px;line-height:1.4}
+.libmore{margin-top:10px!important}
+.routineitem__body{flex:1;min-width:0}
+.routineitem__section{margin-top:7px;width:100%;max-width:210px;min-height:30px;border:1px solid var(--line2);border-radius:1px;background:var(--deep);color:var(--muted);font:inherit;font-size:8px;letter-spacing:.11em;text-transform:uppercase;padding:0 28px 0 8px}
+.routineitem__section:focus{outline:1px solid var(--line);color:var(--cream)}
+
+/* v252 :: routine creator refinement */
+.routinegrid{gap:10px}
+.routinecard{padding:0;display:grid;grid-template-columns:minmax(0,1fr) 48px;overflow:hidden}
+.routinecard__open{min-width:0;min-height:68px;padding:14px;text-align:left;display:flex;align-items:center;gap:10px}
+.routinecard__open b{flex:1;color:var(--cream);font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.routinecard__open span{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.routinecard__unsave{border-left:1px solid var(--line2);color:var(--dim);font-size:22px;min-height:68px}
+.routinecard__unsave:active{color:var(--cream);background:rgba(211,190,152,.10)}
+.routine-section{position:relative;overflow:hidden}
+.routine-section__head button,.routine-addzone{touch-action:manipulation}
+.routine-addzone{width:calc(100% - 24px);margin:10px 12px 12px;min-height:46px;border:1px dashed rgba(211,190,152,.34);background:rgba(211,190,152,.025);color:var(--gold);font-size:9px;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:9px}
+.routine-addzone span{font-size:18px;line-height:1;color:var(--cream)}
+.routine-addzone:active{background:rgba(211,190,152,.10);border-style:solid}
+.routine-empty{padding:18px 12px 6px;text-align:center}
+.routine-empty span{color:var(--dim);font-size:11px;letter-spacing:.08em}
+@media(max-width:430px){.routine-section__head{grid-template-columns:30px 1fr auto}.routine-section__head button{padding:0 8px}.routinecard{grid-template-columns:minmax(0,1fr) 44px}}
+
+
+/* ══ BACK CONTROL ══════════════════════════════════════════════════════
+   Browsing a long program list used to mean scrolling to the bottom to get
+   out. The back control now sits in a sticky band directly under the header,
+   so it is one tap from anywhere. */
+.backbar{position:sticky;top:0;z-index:25;display:flex;align-items:center;gap:10px;
+  padding:9px 14px;background:rgba(14,17,20,.96);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(211,190,152,.11)}
+.backbar .back{margin:0}
+.backbar__t{flex:1;min-width:0;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:#6E757C;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+
+/* ══ TRIM PANEL ═══════════════════════════════════════════════════════ */
+.trim{display:block}
+.trimnote{margin:12px 0 0;font-size:12px;line-height:1.55;color:#9BA1A8}
+.trimrow{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:11px 0 6px}
+.trimrow b{font-size:15px;font-weight:600;color:#EFEAE0;font-variant-numeric:tabular-nums}
+.trimrow span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6E757C;text-align:right}
+.trimrange{width:100%;height:44px;-webkit-appearance:none;appearance:none;background:none;outline:none;
+  touch-action:manipulation}
+.trimrange::-webkit-slider-runnable-track{height:4px;background:rgba(211,190,152,.20)}
+.trimrange::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-11px;
+  background:#E9C98F;border:2px solid #14171B;cursor:grab}
+.trimrange::-moz-range-track{height:4px;background:rgba(211,190,152,.20)}
+.trimrange::-moz-range-thumb{width:26px;height:26px;background:#E9C98F;border:2px solid #14171B}
+.trimbar{height:3px;background:rgba(211,190,152,.16);margin:12px 0 4px}
+.trimbar i{display:block;height:100%;width:0;background:#E9C98F;transition:width .2s linear}
+
+
+/* ══ PROGRAM EDITOR ═══════════════════════════════════════════════════
+   A real workout list. Adding a workout is a primary action at the bottom,
+   and every row carries its own rename, reorder and remove so the coach never
+   has to guess which control belongs to which workout. */
+.wkhead{display:flex;align-items:baseline;justify-content:space-between;
+  margin:20px 0 9px;padding-bottom:7px;border-bottom:1px solid rgba(211,190,152,.14)}
+.wkhead b{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#D3BE98}
+.wkhead span{font-size:10px;letter-spacing:.16em;color:#6E757C}
+.wklist{display:block}
+.wkrow{display:grid;grid-template-columns:22px 1fr repeat(4,34px);gap:6px;align-items:center;
+  padding:10px 0;border-bottom:1px solid rgba(211,190,152,.09)}
+.wkrow__n{font-size:11px;font-weight:600;color:#6E757C;text-align:center;font-variant-numeric:tabular-nums}
+.wkrow__name{min-width:0;height:40px;border:1px solid rgba(211,190,152,.16);background:#171A1E;
+  color:#EFEAE0;padding:0 10px;font-size:15px;border-radius:2px;-webkit-appearance:none;appearance:none;outline:none}
+.wkrow__name:focus{border-color:rgba(233,201,143,.45)}
+.wkrow__ic{height:40px;border:1px solid rgba(211,190,152,.14);color:#9BA1A8;font-size:15px;
+  display:grid;place-items:center;border-radius:2px;touch-action:manipulation}
+.wkrow__ic:active{background:rgba(211,190,152,.14);color:#E9C98F}
+.wkrow__ic.warn{color:#D99A8A;border-color:rgba(217,154,138,.26)}
+.wkrow__foot{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-top:7px;padding-left:28px}
+.wkrow__foot span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6E757C}
+
+
+/* Common-exercise shortcuts, shown only when the search box is empty. */
+.commonhead{margin:14px 0 7px;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#6E757C}
+.common{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.commonchip{min-height:38px;padding:0 11px;border:1px solid rgba(211,190,152,.18);
+  background:#171A1E;color:#C9CDD2;font-size:12px;border-radius:2px;text-align:left;
+  touch-action:manipulation}
+.commonchip:active{border-color:rgba(233,201,143,.5);color:#E9C98F;background:rgba(233,201,143,.09)}
+
+
+/* Program builder. Same row language as the workout list, plus an empty-day
+   warning so an unfinished program is obvious before it is assigned. */
+.pbnote{margin:12px 0 0;font-size:12px;line-height:1.55;color:#8C9299;
+  border-left:2px solid rgba(211,190,152,.3);padding-left:10px}
+.wkrow__foot span.warnT{color:#D99A8A}
+.wkrow__ic[disabled]{opacity:.28}
+.wkrow__ic[disabled]:active{background:none}
+[data-soft="1"]{opacity:.75}
+
+
+/* Graph internals, shared with the Strength History chart on FOB Progress. */
+.chart svg .grid{stroke:rgba(211,190,152,.12);stroke-width:1;stroke-dasharray:2 4}
+.chart svg .axis{stroke:rgba(211,190,152,.20);stroke-width:1}
+.chart svg .trend{fill:none;stroke:#E9C98F;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart svg .pt{fill:#E9C98F}
+.chart svg .pt--best{fill:#E9C98F;stroke:#14171B;stroke-width:1.4}
+.chart svg .gnum{fill:#5F666D;font-size:7px;font-family:inherit}
+.chart svg .xlab{fill:#5F666D;font-size:7px;font-family:inherit}
+.chart svg .alab{fill:#6B727A;font-size:6.5px;letter-spacing:.16em;font-family:inherit}
+.chart__plot{position:relative}
+.chart__plot svg{display:block;width:100%;height:auto;max-width:460px;margin:0 auto;overflow:hidden}
+.chartzero{position:absolute;left:0;right:0;top:46%;text-align:center;font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;color:#5F666D}
+
+/* v262 — workout builder reliability + multi-exercise circuits */
+.routineitem.is-circuit{background:linear-gradient(90deg,rgba(211,190,152,.055),rgba(211,190,152,.012));border-left:2px solid rgba(211,190,152,.42)}
+.routineitem__acts button[data-act="routine-circuit"]{font-size:9px;font-weight:700;letter-spacing:.05em;color:var(--gold)}
+.circuitbuilder{display:grid;gap:14px}
+.circuitbuilder>p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+.circuitbuilder>p b{color:var(--gold);font-weight:600}
+.circuitbuilder__list{display:grid;border:1px solid var(--line2);background:var(--deep);max-height:min(46vh,390px);overflow:auto;-webkit-overflow-scrolling:touch}
+.circuitbuilder__list label{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;min-height:48px;padding:0 10px;border-bottom:1px solid var(--line2);cursor:pointer}
+.circuitbuilder__list label:last-child{border-bottom:0}
+.circuitbuilder__list input{width:18px;height:18px;accent-color:var(--gold)}
+.circuitbuilder__list span{color:var(--cream);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.circuitbuilder__meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.circuitbuilder__meta label{display:grid;gap:5px}
+.circuitbuilder__meta span{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.circuitbuilder__meta input{width:100%;height:42px;border:1px solid var(--line2);background:var(--deep);color:var(--cream);padding:0 10px;font:inherit;border-radius:0}
+.circuitbuilder__actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.circuitbuilder__actions button:only-child{grid-column:1/-1}
+@media(max-width:390px){.circuitbuilder__actions{grid-template-columns:1fr}.circuitbuilder__meta{grid-template-columns:1fr 1fr}}
+
+/* v265 — admin exercise database */
+.exmanager{padding-bottom:54px}
+.exmanager__top{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:14px}
+.exmanager__top h2{margin:0 0 4px}.exmanager__top p{margin:0;color:var(--muted);font-size:12px;max-width:520px}
+.exmanager__top .primary{width:auto;min-width:148px;margin:0}
+.exmanager__rows{margin-top:10px;border:1px solid var(--line2);background:var(--card)}
+.exmanager__row{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:0;border-bottom:1px solid var(--line2);background:transparent;color:var(--text);text-align:left;font:inherit}
+.exmanager__row:last-child{border-bottom:0}.exmanager__row:active{background:rgba(233,201,143,.06)}
+.exmanager__row span{min-width:0}.exmanager__row b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.exmanager__row small{display:block;margin-top:3px;color:var(--muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase}.exmanager__row i{font-style:normal;color:var(--gold);font-size:10px;letter-spacing:.16em}.exmanager__more{margin-top:10px;width:100%}
+.exedit__grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.exedit__flags{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 14px}.exvars{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 14px}.exvar{display:flex;align-items:center;gap:8px;border:1px solid var(--line2);background:var(--card2);padding:10px 11px;min-height:42px}.exvar input{accent-color:#E9C98F}.exvar span{font-size:12px;letter-spacing:.04em}.exedit__media{display:flex;align-items:center;gap:10px;margin:10px 0 16px}.exedit__media .ghost{margin:0;width:auto}.exedit__media a{color:var(--gold);font-size:11px}.exedit__actions{display:grid;grid-template-columns:1fr auto;gap:8px}.exedit__actions .primary,.exedit__actions .danger{margin:0}.exedit__actions .danger{border:1px solid rgba(189,92,92,.5);background:rgba(189,92,92,.08);color:#dca5a5;padding:0 14px;min-height:44px;font:inherit;text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+@media(max-width:560px){.exmanager__top{grid-template-columns:1fr}.exmanager__top .primary{width:100%}.exedit__grid{grid-template-columns:1fr}.exedit__actions{grid-template-columns:1fr}.exedit__actions .danger{width:100%}}
+
+
+/* Exercise thumbnail. The frame fills the square; the gold dot marks it as
+   playable without covering the movement. */
+.thumb{position:relative;overflow:hidden;padding:0}
+.thumbimg{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;
+  border-radius:1px}
+.thumb[data-has="1"]{border-color:rgba(233,201,143,.34)}
+.thumb[data-has="1"]::before{content:"";position:absolute;left:50%;top:50%;
+  width:0;height:0;transform:translate(-40%,-50%);
+  border-left:9px solid rgba(255,255,255,.92);
+  border-top:6px solid transparent;border-bottom:6px solid transparent;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.7));z-index:2;pointer-events:none}
+.thumb[data-has="1"]::after{content:"";position:absolute;inset:0;
+  background:rgba(6,8,10,.28);z-index:1;pointer-events:none}
+
+
+/* ══ v314 — app-surface gesture hardening ═══════════════════════════════
+   Keep scrolling on the viewport (never put touch-action on html/body), but
+   remove accidental double-tap zoom inside the two Gym application roots.
+   `manipulation` still permits ordinary panning and pinch zoom. */
+#app,#mygym{touch-action:manipulation}
+button,a,input,select,textarea,summary,[role="button"],[data-act],[data-a]{touch-action:manipulation}
+
+/* ══ v365 — coach/member shared animation timing + clean corners ══════════ */
+@keyframes gymFobBeamTravel{
+  0%,50%,100%{background-position:50% 50%}
+  25%{background-position:100% 50%}
+  75%{background-position:0% 50%}
+}
+@keyframes gymFobNodeSway{
+  0%,50%,100%{transform:translate(-50%,-50%) rotate(45deg)}
+  25%{transform:translate(calc(-50% - var(--fob-node-travel)/2),-50%) rotate(45deg)}
+  75%{transform:translate(calc(-50% + var(--fob-node-travel)/2),-50%) rotate(45deg)}
+}
+/* Keep moving edge glints off the physical corner pixels so borders never
+   double in weight where two edges meet. */
+.program,.ex,.progresspicker,.membergate__select,.routineintro,.sectionrail{background-clip:padding-box}
+.program::before,.ex[data-active]::before,.progresspicker::before,.membergate__select::before{
+  top:1px!important;max-width:calc(100% - 2px)!important
+}
+
+/* ══ v366 — uninterrupted opposed FOBEAM timing ═══════════════════════════
+   Coach/member shared dividers no longer keyframe the midpoint. Beam and node
+   therefore pass straight through centre at full continuity and only ease at
+   their true east/west turnarounds. */
+.gym-motion-divider{--fob-divider-cycle:var(--fob-ambient-cycle,2s)}
+@keyframes gymFobBeamTravel{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes gymFobNodeSway{
+  0%{transform:translate(calc(-50% + var(--fob-node-travel)/2),-50%) rotate(45deg)}
+  50%{transform:translate(calc(-50% - var(--fob-node-travel)/2),-50%) rotate(45deg)}
+  100%{transform:translate(calc(-50% + var(--fob-node-travel)/2),-50%) rotate(45deg)}
+}
+@keyframes gymFobBeamPulse{
+  0%,50%,100%{filter:drop-shadow(0 0 8px rgba(233,201,143,.52)) drop-shadow(0 0 18px rgba(211,190,152,.24))}
+  25%,75%{filter:drop-shadow(0 0 5px rgba(233,201,143,.34)) drop-shadow(0 0 12px rgba(211,190,152,.16))}
+}
+@keyframes gymFobNodeGlow{
+  0%,50%,100%{box-shadow:0 0 11px rgba(233,201,143,.55),0 0 20px rgba(211,190,152,.20)}
+  25%,75%{box-shadow:0 0 5px rgba(233,201,143,.22)}
+}
+
+/* ══ v383 — MAHFITT/coach FOBEAM artifact-range swap ══════════════════════ */
+@keyframes gymFobBeamTravel{
+  0%{background-position:calc(50% + var(--fob-node-travel)/2) 50%}
+  50%{background-position:calc(50% - var(--fob-node-travel)/2) 50%}
+  100%{background-position:calc(50% + var(--fob-node-travel)/2) 50%}
+}
+@keyframes gymFobNodeSway{
+  0%{left:96%;transform:translate(-50%,-50%) rotate(45deg)}
+  50%{left:4%;transform:translate(-50%,-50%) rotate(45deg)}
+  100%{left:96%;transform:translate(-50%,-50%) rotate(45deg)}
+}
+
+/* v432 — coach/member parity: deletion is hidden until a 620ms long press on
+   the completion check. Swipe-to-delete is retired on both surfaces. */
+.setdelete{display:none!important;z-index:4!important}
+.setwrap[data-reveal="1"] .set{transform:none!important;margin-right:58px!important}
+.setwrap[data-reveal="1"] .setdelete{display:grid!important;place-items:center!important}
+
+/* ══ v433 — IOS LONG-PRESS DELETE HARDENING ════════════════════════════════ */
+.setwrap [data-act="tick"],.setwrap .setdelete{
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-touch-callout:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.setwrap [data-act="tick"]{-webkit-user-drag:none!important;touch-action:manipulation!important}
+
+/* ── R47 · Quick access picker ────────────────────────────────────────────
+   The R46 markup shipped with NO stylesheet, so the line-art SVGs fell back
+   to the browser default fill:black and rendered as solid black silhouettes
+   with no layout and no visible selected state. The crown button reads fine
+   because it inherits .themeplay svg{fill:none;stroke:currentColor}; the
+   picker inherited nothing. This is the missing owner. */
+.mytheme__quickaccessrow{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;margin-top:14px!important;align-items:stretch!important;
+}
+.mytheme__quickaccessbtn{
+  -webkit-appearance:none;appearance:none;
+  display:grid!important;grid-template-rows:auto auto!important;
+  justify-items:center!important;align-content:center!important;gap:9px!important;
+  min-height:96px!important;padding:14px 8px!important;cursor:pointer;
+  border:1px solid rgba(var(--bright-rgb,233,201,143),.30)!important;
+  background:rgba(var(--ink-rgb,14,17,20),.30)!important;
+  color:var(--cream,#F4EEE5)!important;
+  border-radius:var(--mf-rect-radius,10px)!important;
+  transition:border-color .18s ease,background-color .18s ease,transform .18s ease;
+}
+/* The whole point of the fix: line art, not filled blobs. */
+.mytheme__quickaccessbtn svg{
+  width:26px!important;height:26px!important;display:block!important;
+  fill:none!important;stroke:currentColor!important;stroke-width:1.7!important;
+  stroke-linecap:round!important;stroke-linejoin:round!important;
+  opacity:.92!important;
+}
+.mytheme__quickaccessbtn span{
+  font:600 9px/1.25 ui-monospace,monospace!important;letter-spacing:.12em!important;
+  text-transform:uppercase!important;text-align:center!important;
+  color:inherit!important;opacity:.78!important;
+  overflow-wrap:anywhere!important;hyphens:none!important;
+}
+/* Selected state must be unmistakable at a glance. */
+.mytheme__quickaccessbtn[data-on="1"]{
+  border-color:var(--bright,#E9C98F)!important;
+  background:color-mix(in srgb,var(--bright,#E9C98F) 16%,transparent)!important;
+  color:var(--bright,#E9C98F)!important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--bright,#E9C98F) 28%,transparent)!important;
+}
+.mytheme__quickaccessbtn[data-on="1"] svg{opacity:1!important}
+.mytheme__quickaccessbtn[data-on="1"] span{opacity:1!important}
+.mytheme__quickaccessbtn:active{transform:scale(.97)}
+@media(max-width:380px){
+  .mytheme__quickaccessbtn{min-height:88px!important;padding:12px 5px!important}
+  .mytheme__quickaccessbtn svg{width:23px!important;height:23px!important}
+  .mytheme__quickaccessbtn span{font-size:8px!important;letter-spacing:.08em!important}
+}
+
+/* R47 — Pitch is retired app-wide. Any legacy pitch rail markup that survives
+   in a cached shell is hidden and removed from layout so it can never leave a
+   gap where the rail used to sit. */
+/* R70 — Pitch is a universal ordinary-crown control again. The R47 sweep is
+   narrowed to the Calendar-only remnants; Calendar remains an exclusion.
+   NOTE: this sweep was also hiding .studio-eq--pitch, which silently made
+   the MAH Player Pitch row invisible even after R51 set the flag true. */
+.cal-crown-pitch,[data-cal-pitch],
+.cal-crown-meta--pitch-spacer{display:none!important}
+
+/* ══ R48 · COACH ↔ MEMBER CANONICAL PERIODIZATION ═══════════════════════ */
+.coach-periodization-entry{width:100%;min-height:72px;margin:10px 0 2px;display:grid;grid-template-columns:minmax(0,1fr) 18px;align-items:center;gap:12px;padding:13px 15px;border:1px solid rgba(233,201,143,.38);border-radius:2px;background:rgba(233,201,143,.025);color:var(--cream);text-align:left;position:relative}
+.coach-periodization-entry:before{content:"";position:absolute;left:0;top:14%;bottom:14%;width:1px;background:var(--bright);box-shadow:0 0 10px rgba(233,201,143,.42)}
+.coach-periodization-entry span,.coach-periodization-entry small{display:block}.coach-periodization-entry span{color:var(--bright);font-size:12px;letter-spacing:.16em;font-weight:600}.coach-periodization-entry small{margin-top:4px;color:var(--muted);font-size:10px}.coach-periodization-entry i{grid-column:2;grid-row:1;font-style:normal;color:var(--bright);font-size:23px}.coach-periodization-entry>span,.coach-periodization-entry>small{grid-column:1}
+.coach-periodization{padding-bottom:calc(50px + var(--safe))}.coach-period-top{display:grid;grid-template-columns:170px 1fr;align-items:center;gap:10px;margin-bottom:10px}.coach-period-top .ghost{margin:0}.coach-period-top>div{text-align:right}.coach-period-top>div span{display:block;color:var(--dim);font-size:8px;letter-spacing:.14em}.coach-period-top>div b{display:block;margin-top:2px;color:var(--gold);font-size:12px}
+.coach-period-defs{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 14px}.coach-period-term{display:inline;border:0;border-bottom:1px dotted rgba(233,201,143,.6);padding:0 0 2px;background:none;color:var(--bright);font:inherit;font-size:8px;letter-spacing:.12em;text-transform:uppercase}.coach-period-existing{display:flex;align-items:center;gap:7px;overflow-x:auto;padding:8px 0 12px}.coach-period-existing>span{color:var(--dim);font-size:7px;letter-spacing:.14em;white-space:nowrap}.coach-period-existing button{min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:2px;color:var(--muted);font-size:8px;white-space:nowrap}.coach-period-existing button[data-on="1"]{border-color:var(--bright);color:var(--bright)}
+.coach-period-card{margin-bottom:10px;border:1px solid rgba(211,190,152,.24);border-radius:2px;background:rgba(211,190,152,.018);padding:13px}.coach-period-card>header,.coach-period-micro>header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}.coach-period-card>header>div:first-child{display:flex;align-items:center;gap:10px}.coach-period-card header span{display:block;color:var(--dim);font-size:7px;letter-spacing:.13em;text-transform:uppercase}.coach-period-card h2,.coach-period-card h3{margin:3px 0 0;color:var(--bright);font-size:13px;letter-spacing:.1em;text-transform:uppercase}.coach-period-card header em{font-style:normal;color:var(--bright);font-size:18px}.coach-period-card>header>button,.coach-period-micro>header>button{min-width:38px;min-height:38px;border:1px solid var(--line);border-radius:2px;color:var(--gold);font-size:9px;letter-spacing:.1em}
+.coach-period-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.coach-period-grid label>span,.coach-period-notes>span,.coach-period-label{display:block;margin-bottom:5px;color:var(--dim);font-size:7px;letter-spacing:.12em;text-transform:uppercase}.coach-period-grid input,.coach-period-notes textarea{width:100%;min-height:42px;border:1px solid var(--line);border-radius:0;background:var(--card2);color:var(--cream);padding:0 9px;font:inherit;font-size:11px;outline:0}.coach-period-notes{display:block;margin-top:8px}.coach-period-notes textarea{min-height:70px;padding:9px;resize:vertical}.coach-period-grid input:focus,.coach-period-notes textarea:focus{border-color:rgba(233,201,143,.58);box-shadow:inset 2px 0 0 var(--bright)}
+.coach-period-micros{display:grid;gap:8px;margin-top:11px}.coach-period-micro{border:1px solid var(--line2);padding:11px;background:rgba(0,0,0,.07)}.coach-period-micro>header b{display:block;margin-top:3px;color:var(--bright);font-size:11px}.coach-period-programs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:8px}.coach-period-programs label{display:flex;align-items:center;gap:7px;min-height:40px;border:1px solid var(--line);padding:8px;background:var(--card2)}.coach-period-programs input{accent-color:var(--bright)}.coach-period-programs span{font-size:9px;color:var(--cream)}.coach-period-empty{border:1px dashed var(--line);padding:10px;color:var(--muted);font-size:10px}.coach-period-label{margin-top:9px}.coach-period-add{margin:8px 0 0}.coach-period-truth{margin:10px 0;border-left:1px solid var(--bright);padding:10px 12px;background:rgba(233,201,143,.018)}.coach-period-truth b{display:block;color:var(--bright);font-size:9px;letter-spacing:.14em}.coach-period-truth p{margin:4px 0 0;color:var(--muted);font-size:10px;line-height:1.5}.coach-period-save{margin-top:10px}.coach-period-definition b{display:block;color:var(--bright);font-size:15px;letter-spacing:.08em}.coach-period-definition p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+@media(max-width:560px){.coach-period-top{grid-template-columns:1fr}.coach-period-top>div{text-align:left}.coach-period-grid,.coach-period-programs{grid-template-columns:1fr}}
+@media(min-width:768px){.coach-periodization{max-width:980px;margin:0 auto}.coach-period-micros{grid-template-columns:repeat(2,minmax(0,1fr))}.coach-period-micros>.coach-period-add{grid-column:1/-1}}
+
+/* ══ R48 · COACH BODY / ACTIVITY CANONICAL MIRROR ═══════════════════════ */
+.coach-foundation-entry{margin-top:8px}
+.coach-foundation{padding-bottom:calc(50px + var(--safe))}.coach-foundation-actions{display:flex;justify-content:flex-end;margin:0 0 10px}.coach-foundation-actions button,.coach-foundation-save{min-height:42px;border:1px solid rgba(233,201,143,.38);border-radius:2px;background:transparent;color:var(--bright);font-size:8px;letter-spacing:.12em;text-transform:uppercase}.coach-foundation-actions button{padding:0 12px}.coach-foundation-panel{margin:0 0 11px;border:1px solid rgba(211,190,152,.24);border-radius:2px;background:rgba(211,190,152,.018);padding:13px}.coach-foundation-panel>header{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:11px;border-bottom:1px solid var(--line2);padding-bottom:9px}.coach-foundation-panel>header span{color:var(--dim);font-size:7px;letter-spacing:.14em}.coach-foundation-panel>header b{color:var(--bright);font-size:8px;letter-spacing:.1em;text-align:right}.coach-foundation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.coach-foundation-grid label>span{display:block;margin-bottom:5px;color:var(--dim);font-size:7px;letter-spacing:.12em}.coach-foundation-grid input,.coach-foundation-grid select{width:100%;min-height:42px;border:1px solid var(--line);border-radius:0;background:var(--card2);color:var(--cream);padding:0 9px;font:inherit;font-size:11px;outline:0}.coach-foundation-grid input:focus,.coach-foundation-grid select:focus{border-color:rgba(233,201,143,.58);box-shadow:inset 2px 0 0 var(--bright)}.coach-foundation-save{width:100%;margin-top:10px}.coach-foundation-current{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px;border:1px solid var(--line2)}.coach-foundation-current span{min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px}.coach-foundation-current span+span{border-left:1px solid var(--line2)}.coach-foundation-current small{color:var(--dim);font-size:7px;letter-spacing:.11em}.coach-foundation-current b{margin-top:5px;color:var(--bright);font-size:13px;font-weight:500}.coach-foundation-note{margin:10px 0 0;color:var(--muted);font-size:9.5px;line-height:1.5}.coach-measure-list{display:grid;gap:5px;margin-top:11px}.coach-measure-list>div{display:grid;grid-template-columns:90px repeat(3,minmax(0,1fr));gap:7px;align-items:center;min-height:38px;border-top:1px solid var(--line2);padding:6px 2px}.coach-measure-list b{color:var(--bright);font-size:8px}.coach-measure-list span{color:var(--muted);font-size:8px}.coach-measure-list>p{color:var(--muted);font-size:10px}.coach-activity-list{display:grid;gap:8px;margin-top:11px}.coach-activity-list article{border:1px solid var(--line);padding:10px;background:rgba(0,0,0,.07)}.coach-activity-list article>div:first-child{display:flex;justify-content:space-between;gap:10px;align-items:center}.coach-activity-list article>div:first-child span{color:var(--dim);font-size:7px}.coach-activity-list article>div:first-child b{color:var(--bright);font-size:10px;letter-spacing:.1em}.coach-activity-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:8px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}.coach-activity-metrics span{padding:7px 4px;text-align:center;color:var(--muted);font-size:7px}.coach-activity-metrics span+span{border-left:1px solid var(--line2)}.coach-activity-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:8px}.coach-activity-actions button{min-height:34px;border:1px solid var(--line);border-radius:0;background:transparent;color:var(--muted);font-size:7px;letter-spacing:.08em}.coach-activity-actions button:disabled{border-color:rgba(233,201,143,.4);color:var(--bright);opacity:1}
+@media(max-width:560px){.coach-foundation-grid{grid-template-columns:1fr}.coach-foundation-current{grid-template-columns:1fr}.coach-foundation-current span+span{border-left:0;border-top:1px solid var(--line2)}.coach-measure-list>div{grid-template-columns:1fr 1fr}.coach-activity-metrics,.coach-activity-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.coach-activity-metrics span:nth-child(3){border-left:0;border-top:1px solid var(--line2)}.coach-activity-metrics span:nth-child(4){border-top:1px solid var(--line2)}}
+@media(min-width:768px){.coach-foundation{max-width:980px;margin:0 auto}.coach-activity-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* R48.1 — coach mirror for the member-owned body calculator inputs. */
+.coach-estimate-toggle{grid-column:1/-1!important;display:flex!important;align-items:center;gap:9px;min-height:42px;border:1px solid var(--line2);padding:8px 10px}
+.coach-estimate-toggle input{width:18px!important;min-height:18px!important;flex:0 0 auto;padding:0!important;accent-color:var(--bright)}
+.coach-estimate-toggle span{margin:0!important;color:var(--cream)!important}
+.coach-foundation-current--calc{grid-template-columns:repeat(4,minmax(0,1fr))}
+.coach-calculator-goals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:7px;border:1px solid var(--line2)}
+.coach-calculator-goals span{min-height:38px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px;color:var(--dim);font-size:7px;letter-spacing:.08em}
+.coach-calculator-goals span+span{border-left:1px solid var(--line2)}
+.coach-calculator-goals b{color:var(--bright);font-size:9px;font-weight:500}
+@media(max-width:560px){
+  .coach-foundation-current--calc{grid-template-columns:1fr 1fr}
+  .coach-foundation-current--calc span:nth-child(3){border-left:0;border-top:1px solid var(--line2)}
+  .coach-foundation-current--calc span:nth-child(4){border-top:1px solid var(--line2)}
+  .coach-calculator-goals{grid-template-columns:1fr}
+  .coach-calculator-goals span+span{border-left:0;border-top:1px solid var(--line2)}
+}

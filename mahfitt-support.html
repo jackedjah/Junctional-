@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>MAHFITT Support | FOB Systems</title>
+  <meta name="description" content="Support for MAHFITT members and app questions.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://fob.systems/mahfitt-support">
+  <meta name="theme-color" content="#0E1114">
+  <link rel="stylesheet" href="/mahfitt-public.css?v=446">
+</head>
+<body>
+  <header class="mp-nav"><a class="mp-back" href="/mahfitt">← MAHFITT</a><a class="mp-open" href="/mygym?entry=tracker">OPEN APP</a></header>
+  <main class="mp-legal">
+    <p class="mp-kicker">MEMBER SUPPORT</p>
+    <h1>MAHFITT Support</h1>
+    <p>Use this form for MAHFITT access, workout, music, Meal Grade, calendar, privacy or account questions. Do not send payment-card numbers, passwords or authentication secrets.</p>
+
+    <form class="mp-support-form" name="mahfitt-support" method="POST" action="/mahfitt-support-thanks" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="mahfitt-support">
+      <p class="mp-honeypot"><label>Leave this field empty <input name="bot-field" autocomplete="off" tabindex="-1"></label></p>
+      <label><span>NAME</span><input name="name" type="text" maxlength="100" autocomplete="name" required></label>
+      <label><span>EMAIL</span><input name="email" type="email" maxlength="180" autocomplete="email" required></label>
+      <label><span>WHAT DO YOU NEED HELP WITH?</span><select name="topic" required><option value="">Choose one</option><option>Member access</option><option>Live Workout / exercise demo</option><option>MAH PLAYER / music</option><option>Meal Grade</option><option>MAH Calendar</option><option>MAH Health</option><option>Privacy / data request</option><option>Something else</option></select></label>
+      <label><span>MESSAGE</span><textarea name="message" rows="7" maxlength="3000" required></textarea></label>
+      <button class="mp-primary" type="submit">SEND SUPPORT REQUEST</button>
+    </form>
+    <p class="mp-form-note">This form is processed by the site's Netlify form service and is intended for support correspondence only.</p>
+    <div class="mp-actions"><a href="/mahfitt-privacy">READ PRIVACY</a><a href="/mahfitt">BACK TO MAHFITT</a></div>
+  </main>
+  <footer class="mp-footer"><span>MAHFITT · MUSIC AND HOLISTIC FITNESS TRACKER</span><nav><a href="/">FOB SYSTEMS</a><a href="/credits">CREDITS</a></nav></footer>
+</body>
+</html>

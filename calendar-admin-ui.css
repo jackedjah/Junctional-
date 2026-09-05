@@ -1,0 +1,54 @@
+.btn.is-danger {
+  color: #e6a299;
+  border-color: rgba(230, 162, 153, .4);
+  margin-right: auto;
+}
+.ca-toast {
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  transform: translate(-50%, 18px);
+  opacity: 0;
+  pointer-events: none;
+  max-width: min(430px, calc(100vw - 34px));
+  padding: 12px 16px;
+  border: 1px solid var(--gold);
+  background: #f0e7d7;
+  color: #101315;
+  font-size: 12px;
+  transition: .2s;
+}
+.ca-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+.ca-toast.is-bad { border-color: #e6a299; }
+
+/* v354 — calendar backend visual parity with the member calendar. */
+.sheet{
+  background:rgba(3,5,7,.78);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+  padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+}
+.sheet-card{
+  width:min(92vw,590px);
+  max-height:calc(100dvh - 36px);
+  border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);
+  background:color-mix(in srgb,var(--bg) 95%,#171a1e 5%);
+  padding:22px clamp(18px,5vw,34px);
+  box-shadow:0 26px 85px rgba(0,0,0,.62),0 0 24px color-mix(in srgb,var(--gold) 4%,transparent),inset 0 1px 0 color-mix(in srgb,var(--gold) 8%,transparent);
+  text-align:center;
+}
+.sheet-card h2{margin:0 0 18px;font-size:clamp(25px,6vw,35px);font-weight:500;line-height:1.02;letter-spacing:-.025em;text-align:center}
+.sheet-card label{gap:7px;margin:12px 0;color:var(--muted);font-size:9px;font-weight:600;letter-spacing:.15em;text-align:center}
+.sheet-card input,.sheet-card select,.sheet-card textarea{border-color:color-mix(in srgb,var(--gold) 25%,transparent);background:color-mix(in srgb,var(--bg) 92%,#000 8%);padding:12px 13px;font-size:13px;font-weight:400;text-align:center;outline:none}
+.sheet-card input:focus,.sheet-card select:focus,.sheet-card textarea:focus{border-color:color-mix(in srgb,var(--gold) 66%,transparent);box-shadow:0 0 10px color-mix(in srgb,var(--gold) 7%,transparent)}
+.sheet-actions{justify-content:center;align-items:center;gap:9px}.sheet-actions .btn.is-danger{margin-right:0}
+.event{border:1px solid color-mix(in srgb,var(--gold) 12%,transparent);background:color-mix(in srgb,var(--gold) 2.5%,transparent);padding:12px;box-shadow:0 0 12px color-mix(in srgb,var(--gold) 4%,transparent)}
+
+/* v393 — authoritative reschedule request states */
+.request-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.request-head>span{font:650 9px/1 ui-monospace,monospace;letter-spacing:.12em;color:var(--gold);border:1px solid rgba(233,201,143,.26);padding:7px 8px}
+.request.is-late{box-shadow:inset 2px 0 var(--gold)}
+.request.is-awaiting{background:rgba(233,201,143,.045)}
+.request-fee{margin:10px 0 0;padding:9px 10px;border-left:2px solid var(--gold);color:var(--muted);font-size:12px;line-height:1.45}
+.request-fee.is-waiting{color:var(--ink);background:rgba(233,201,143,.06)}

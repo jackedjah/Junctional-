@@ -1,0 +1,10 @@
+{
+  "name": "fob-systems-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "FOB Systems static site with Netlify Functions for the private Form Review area.",
+  "dependencies": {
+    "@netlify/aws-lambda-compat": "^2.0.0"
+  }
+}

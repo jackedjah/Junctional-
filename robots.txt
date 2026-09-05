@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /form-review
+Disallow: /admin
+Disallow: /api/
+Disallow: /mygym
+Disallow: /gym-tracker
+Disallow: /calendar
+Disallow: /message-center
+Allow: /
+
+Sitemap: https://fob.systems/sitemap.xml

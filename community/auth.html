@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Enter | FOB Community</title>
+  <meta name="description" content="Enter the FOB Community with your confirmed full name." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/fob.css?v=389" />
+  <link rel="stylesheet" href="/community/css/community.css?v=241" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body class="fob-community-page" data-fob-guard="guest">
+  <nav class="fob-nav">
+    <div class="fob-nav-inner">
+      <a class="fob-brand" href="/index.html" aria-label="FOB Systems home">
+        <img src="/images/fob-forum-nav.png" srcset="/images/fob-forum-nav.png 1x, /images/fob-forum-nav@2x.png 2x" alt="FOB Forum" />
+      </a>
+      <a class="fob-rate" href="/community/">
+        <span class="fob-rate-tag">FOB Community</span>
+        <span class="fob-rate-main">Back to overview</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="fob-community-shell is-narrow" id="main">
+    <section class="fob-community-panel" id="panel-name-access">
+      <p class="fob-community-eyebrow">FOB Community</p>
+      <h1 class="fob-community-title">Enter the Forum</h1>
+      <p class="fob-community-sub">Use the same full name confirmed with FOB Systems.</p>
+
+      <form id="form-name-access" novalidate>
+        <div class="fob-community-field">
+          <label for="forum-full-name">Full name</label>
+          <input class="fob-community-input" type="text" id="forum-full-name"
+                 autocomplete="name" autocapitalize="words" maxlength="100" required />
+        </div>
+        <button class="fob-community-btn fob-community-btn-primary" type="submit">Enter Forum</button>
+      </form>
+      <div class="fob-community-status" id="auth-status" role="alert" aria-live="assertive" hidden></div>
+    </section>
+  </main>
+
+  <div id="fob-community-toasts" aria-live="polite"></div>
+  <script src="/community/js/config.js"></script>
+  <script src="/community/js/supabase-client.js"></script>
+  <script src="/community/js/utilities.js"></script>
+  <script src="/community/js/auth-guard.js?v=214"></script>
+  <script src="/community/js/auth.js?v=214"></script>
+</body>
+</html>

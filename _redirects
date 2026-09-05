@@ -1,0 +1,43 @@
+/community        /community/index.html   200
+/community/       /community/index.html   200
+/community/login  /community/auth.html     200
+/community/discussions   /community/discussions.html   200
+/community/discussion    /community/discussion.html    200
+/education      /education.html       200
+/admin          /.netlify/functions/admin        200!
+/admin/         /.netlify/functions/admin        200!
+/api/admin      /.netlify/functions/admin        200!
+/member-access   /member-access.html   200
+/vip             /index.html          200
+/vip/            /index.html          200
+/api/health     /.netlify/functions/health         200!
+/api/mahfitt-health-sync /.netlify/functions/mahfitt-health-sync 200!
+/form-review    /.netlify/functions/form-review   200!
+/form-review/   /.netlify/functions/form-review   200!
+/api/login      /.netlify/functions/auth-login     200!
+/api/logout     /.netlify/functions/auth-logout    200!
+/api/responses  /.netlify/functions/responses      200!
+/api/booking-submit  /.netlify/functions/booking-submit  200!
+/api/booking-availability  /.netlify/functions/booking-availability  200!
+/api/booking-admin  /.netlify/functions/booking-admin  200!
+/api/clear-responses  /.netlify/functions/clear-responses  200!
+/netlify/*      /404.html                          404!
+
+/group-payment   /group-payment.html                    200
+/api/group-access /.netlify/functions/group-access      200!
+/api/group-status /.netlify/functions/group-status      200!
+/api/group-checkout /.netlify/functions/group-checkout  200!
+/api/sesh-checkout  /.netlify/functions/sesh-checkout   200!
+/api/stripe-webhook /.netlify/functions/stripe-webhook  200!
+/small-group-access /small-group.html 200
+
+/api/claim-logout /.netlify/functions/claim-logout 200!
+
+/api/fob-rounds   /.netlify/functions/fob-rounds   200!
+/fob-progress     /.netlify/functions/fob-progress 200!
+/member-progress  /.netlify/functions/member-progress 200!
+/fob-share        /.netlify/functions/fob-share    200!
+/gym-tracker      /.netlify/functions/gym-tracker  200!
+/api/gym-tracker  /.netlify/functions/gym-tracker  200!
+
+# /api/meal-gradient is owned by meal-gradient-runtime.mjs (modern runtime config.path)

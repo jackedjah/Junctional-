@@ -1,0 +1,15 @@
+-- 009 :: make the forum reciprocal
+--
+-- Applied 2026-07-27. Two things were only firing one way:
+--
+--   1. Replying to someone's COMMENT notified the post owner but not
+--      the person you were actually answering.
+--   2. Reacting to a COMMENT notified nobody at all; reply_reactions
+--      had no trigger.
+--
+-- Also adds profile_stats(), so a profile can show real activity
+-- counts instead of just a bio. It is security definer because the
+-- true totals should not depend on which rows the viewer can read,
+-- and it returns counts only, never identities.
+--
+-- See the applied migration in Supabase for the full body.

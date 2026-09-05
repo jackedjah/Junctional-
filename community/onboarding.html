@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Set Up Your Profile | FOB Community</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/fob.css?v=389" />
+  <link rel="stylesheet" href="/community/css/community.css?v=241" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body class="fob-community-page" data-fob-guard="onboarding" data-fob-pending>
+
+  <nav class="fob-nav">
+    <div class="fob-nav-inner">
+      <a class="fob-brand" href="/index.html" aria-label="FOB Systems home">
+        <img src="/images/fob-forum-nav.png" srcset="/images/fob-forum-nav.png 1x, /images/fob-forum-nav@2x.png 2x" alt="FOB Forum" />
+      </a>
+      <a class="fob-rate" href="#" id="onboarding-signout">
+        <span class="fob-rate-tag">FOB Community</span>
+        <span class="fob-rate-main">Sign out</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="fob-community-shell is-narrow" id="main">
+
+    <div class="fob-community-setup-banner" id="fob-community-setup-banner" hidden>
+      <b>Setup required</b>
+      Add your Supabase URL and anon key to <code>community/js/config.js</code>.
+    </div>
+
+    <p class="fob-community-step-label" id="step-label">Step 1 of 5</p>
+    <ol class="fob-community-steps" id="step-bar" aria-hidden="true">
+      <li class="is-current"></li><li></li><li></li><li></li><li></li>
+    </ol>
+
+    <!-- 1 IDENTITY -->
+    <section class="fob-community-panel" data-step="1">
+      <p class="fob-community-eyebrow">Identity</p>
+      <h1 class="fob-community-title">Who are you here?</h1>
+      <p class="fob-community-sub">This is what other members will see.</p>
+
+      <div class="fob-profile-avatar-row">
+        <div id="avatar-preview-host">
+          <div class="fob-profile-avatar-fallback" id="avatar-fallback" aria-hidden="true">?</div>
+        </div>
+        <div class="fob-profile-avatar-actions">
+          <button class="fob-community-btn fob-community-btn-ghost fob-community-btn-auto"
+                  type="button" id="avatar-pick" data-requires-supabase>Upload Photo</button>
+          <input type="file" id="avatar-file" accept="image/jpeg,image/png,image/webp" hidden />
+          <p id="avatar-note">Optional. We will use your initials otherwise. JPEG, PNG or WebP, up to 8 MB.</p>
+        </div>
+      </div>
+
+      <div class="fob-community-field">
+        <label for="ob-display-name">Display name</label>
+        <input class="fob-community-input" type="text" id="ob-display-name" maxlength="50" />
+      </div>
+
+      <div class="fob-community-field">
+        <label for="ob-pronouns">Pronouns <span class="optional">(optional)</span></label>
+        <input class="fob-community-input" type="text" id="ob-pronouns" maxlength="40"
+               placeholder="she/her, he/him, they/them" />
+      </div>
+
+      <div class="fob-community-btn-row">
+        <button class="fob-community-btn fob-community-btn-primary"
+                type="button" data-next="2" data-requires-supabase>Continue</button>
+      </div>
+    </section>
+
+    <!-- 2 MOVEMENT -->
+    <section class="fob-community-panel" data-step="2" hidden>
+      <p class="fob-community-eyebrow">Movement</p>
+      <h1 class="fob-community-title">What do you train?</h1>
+      <p class="fob-community-sub">Pick your main sport, plus anything else you do.</p>
+
+      <div class="fob-community-field">
+        <label for="ob-primary-sport">Primary sport or activity</label>
+        <select class="fob-community-select" id="ob-primary-sport" data-requires-supabase>
+          <option value="">Loading...</option>
+        </select>
+      </div>
+
+      <div class="fob-community-field">
+        <label id="ob-other-sports-label">Anything else <span class="optional">(optional)</span></label>
+        <div class="fob-community-chips" id="ob-other-sports" role="group"
+             aria-labelledby="ob-other-sports-label"></div>
+      </div>
+
+      <div class="fob-community-field">
+        <label for="ob-experience">Experience level <span class="optional">(optional)</span></label>
+        <select class="fob-community-select" id="ob-experience">
+          <option value="">Prefer not to say</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+          <option value="professional">Professional</option>
+        </select>
+      </div>
+
+      <div class="fob-community-btn-row">
+        <button class="fob-community-btn fob-community-btn-ghost" type="button" data-back="1">Back</button>
+        <button class="fob-community-btn fob-community-btn-primary" type="button" data-next="3">Continue</button>
+      </div>
+    </section>
+
+    <!-- 3 COMMUNITY -->
+    <section class="fob-community-panel" data-step="3" hidden>
+      <p class="fob-community-eyebrow">Community</p>
+      <h1 class="fob-community-title">What are you here to talk about?</h1>
+      <p class="fob-community-sub">Choose at least one. This is how members find each other.</p>
+
+      <div class="fob-community-field">
+        <label id="ob-interests-label">Interests</label>
+        <div class="fob-community-chips" id="ob-interests" role="group"
+             aria-labelledby="ob-interests-label"></div>
+        <p class="fob-community-count" id="ob-interests-count">0 selected</p>
+      </div>
+
+      <div class="fob-community-field">
+        <label for="ob-bio">Short bio <span class="optional">(optional)</span></label>
+        <textarea class="fob-community-textarea" id="ob-bio" maxlength="500"
+                  placeholder="What you train, what you are working on, what you are curious about."></textarea>
+        <p class="fob-community-field-note" id="ob-bio-count">0 / 500</p>
+      </div>
+
+      <div class="fob-community-field">
+        <label for="ob-goals">Training goals <span class="optional">(optional)</span></label>
+        <textarea class="fob-community-textarea" id="ob-goals" maxlength="400"></textarea>
+      </div>
+
+      <div class="fob-community-btn-row">
+        <button class="fob-community-btn fob-community-btn-ghost" type="button" data-back="2">Back</button>
+        <button class="fob-community-btn fob-community-btn-primary" type="button" data-next="4">Continue</button>
+      </div>
+    </section>
+
+    <!-- 4 PRIVACY -->
+    <section class="fob-community-panel" data-step="4" hidden>
+      <p class="fob-community-eyebrow">Privacy</p>
+      <h1 class="fob-community-title">What stays private?</h1>
+      <p class="fob-community-sub">
+        Everything below is hidden by default. You decide what to show, and you can
+        change any of it later in Settings.
+      </p>
+
+      <div class="fob-community-field">
+        <label for="ob-hometown">Hometown <span class="optional">(optional)</span></label>
+        <input class="fob-community-input" type="text" id="ob-hometown" maxlength="80"
+               placeholder="City or region" />
+      </div>
+      <div class="fob-community-field">
+        <label for="ob-city">Current city <span class="optional">(optional)</span></label>
+        <input class="fob-community-input" type="text" id="ob-city" maxlength="80" />
+      </div>
+
+      <div class="fob-community-privacy-row">
+        <div>
+          <h4>Show my age</h4>
+          <p>Your age only. Your date of birth is never shown.</p>
+        </div>
+        <select class="fob-community-select" id="priv-age">
+          <option value="only_me">Hidden</option>
+          <option value="members">Members</option>
+        </select>
+      </div>
+      <div class="fob-community-privacy-row">
+        <div><h4>Show my hometown</h4><p>Text only. Never a precise location.</p></div>
+        <select class="fob-community-select" id="priv-hometown">
+          <option value="only_me">Hidden</option>
+          <option value="members">Members</option>
+        </select>
+      </div>
+      <div class="fob-community-privacy-row">
+        <div><h4>Show my current city</h4><p>Text only. Never a precise location.</p></div>
+        <select class="fob-community-select" id="priv-city">
+          <option value="only_me">Hidden</option>
+          <option value="members">Members</option>
+        </select>
+      </div>
+      <div class="fob-community-privacy-row">
+        <div><h4>Show my activity status</h4><p>Lets friends see when you are around.</p></div>
+        <select class="fob-community-select" id="priv-activity">
+          <option value="true">On</option>
+          <option value="false">Off</option>
+        </select>
+      </div>
+      <div class="fob-community-privacy-row">
+        <div><h4>Who can send me friend requests</h4><p>You can change this at any time.</p></div>
+        <select class="fob-community-select" id="priv-requests">
+          <option value="everyone">Everyone</option>
+          <option value="friends_of_friends">Friends of friends</option>
+          <option value="nobody">Nobody</option>
+        </select>
+      </div>
+
+      <div class="fob-community-btn-row">
+        <button class="fob-community-btn fob-community-btn-ghost" type="button" data-back="3">Back</button>
+        <button class="fob-community-btn fob-community-btn-primary" type="button" data-next="5">Continue</button>
+      </div>
+    </section>
+
+    <!-- 5 FINISH -->
+    <section class="fob-community-panel" data-step="5" hidden>
+      <p class="fob-community-eyebrow">Finish</p>
+      <h1 class="fob-community-title">Here is how you will look.</h1>
+      <p class="fob-community-sub">Check it over. Nothing here is permanent.</p>
+
+      <div class="fob-profile-avatar-row">
+        <div id="review-avatar-host">
+          <div class="fob-profile-avatar-fallback" id="review-avatar" aria-hidden="true">?</div>
+        </div>
+        <div class="fob-profile-avatar-actions">
+          <h2 class="fob-community-title" style="font-size:19px;margin-bottom:2px;" id="review-name"></h2>
+          <p id="review-username" style="color:var(--gold-dim);"></p>
+        </div>
+      </div>
+
+      <div id="review-summary"></div>
+
+      <div class="fob-community-btn-row">
+        <button class="fob-community-btn fob-community-btn-ghost" type="button" data-back="4">Back</button>
+        <button class="fob-community-btn fob-community-btn-primary" type="button"
+                id="ob-finish" data-requires-supabase>Enter FOB Community</button>
+      </div>
+    </section>
+
+    <div class="fob-community-status" id="ob-status" role="alert" aria-live="assertive" hidden></div>
+  </main>
+
+  <div id="fob-community-toasts" aria-live="polite"></div>
+
+  <script src="/community/js/config.js"></script>
+  <script src="/community/js/supabase-client.js"></script>
+  <script src="/community/js/utilities.js"></script>
+  <script src="/community/js/auth-guard.js"></script>
+  <script src="/community/js/onboarding.js"></script>
+</body>
+</html>
