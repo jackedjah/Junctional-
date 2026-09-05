@@ -8,7 +8,8 @@ let passed = 0, failed = 0;
 function P(name, ok, why) { if (ok) { passed++; return; } failed++; console.log('FAIL  ' + name + (why ? ' — ' + why : '')); }
 const read = f => fs.readFileSync(path.join(SCENE, f), 'utf8');
 const stripComments = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-const FILES = ['materials.js', 'ground.js', 'buildings.js', 'residents.js', 'flora-and-vehicles.js', 'sky.js', 'mahplaza.js', 'world-clock.js'];
+const FILES = ['materials.js', 'ground.js', 'buildings.js', 'residents.js', 'flora-and-vehicles.js', 'sky.js', 'mahplaza.js', 'world-clock.js']
+  .concat(['city.js', 'plaza-dressing.js', 'match-interior.js', 'life.js', 'effects.js'].filter(f => fs.existsSync(path.join(SCENE, f))));   /* v4 modules when present */
 const src = Object.fromEntries(FILES.map(f => [f, read(f)]));
 const html = read('mahplaza.html');
 const all = FILES.map(f => stripComments(src[f])).join('\n');

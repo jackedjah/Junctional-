@@ -11,7 +11,88 @@
    room in front of it (open toward the plaza), a glass line across the
    opening, and two piers + a lintel framing it at the front. */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { softMass, signTexture, diamondOutline } from './materials.js';
+import { softMass, signTexture, diamondOutline, chamferBox, windowGrid } from './materials.js';
+
+/* ---- v4: merge many small parts into ONE mesh per material (draw-call discipline, brief §52) ---- */
+const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(1, 1, 1);
+function part(list, geo, x, y, z, ry = 0, rx = 0, rz = 0) {
+  _p.set(x, y, z); _q.setFromEuler(new THREE.Euler(rx, ry, rz)); _m4.compose(_p, _q, _s);
+  const g = geo.index ? geo.toNonIndexed() : geo.clone(); g.applyMatrix4(_m4); list.push(g);
+  return list;
+}
+function mergeParts(list) {
+  let n = 0; for (const g of list) n += g.getAttribute('position').count;
+  const pos = new Float32Array(n * 3), nrm = new Float32Array(n * 3); let o = 0;
+  for (const g of list) { pos.set(g.getAttribute('position').array, o * 3); if (g.getAttribute('normal')) nrm.set(g.getAttribute('normal').array, o * 3); o += g.getAttribute('position').count; g.dispose(); }
+  const out = new THREE.BufferGeometry(); out.setAttribute('position', new THREE.BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
+  return out;
+}
+function merged(parent, list, mat, name, shadow) { if (!list.length) return null; const m = new THREE.Mesh(mergeParts(list), mat); m.name = name || 'merged'; if (shadow) { m.castShadow = true; m.receiveShadow = true; } parent.add(m); return m; }
+
+/* Secondary massing + tertiary detail for a destination facade (brief §12–§14): wings, canopy, parapet, roof kit,
+   upper window courses, entrance light housings, vents, seams. Everything merged per material; two InstancedMesh window grids. */
+function dressFacade(ctx, g, o) {
+  const { M } = ctx;
+  const { W, H, D, openW, openH, E, floorY = 0, wings = true, canopy = true, roofKit = true, windowsUpper = true, seed = 1 } = o;
+  const structural = [], trim = [], dark = [], composite = [], lit = [];
+  const pierW = (W - openW) / 2;
+  /* SECONDARY — side wings: lower attached masses set back behind the pier line, each with a recessed window course */
+  if (wings) {
+    const wingW = W * 0.34, wingH = H * 0.58, wingD = D * 0.7;
+    [-1, 1].forEach(sd => {
+      const wing = new THREE.Mesh(softMass(wingW, wingH, wingD, 1.0), M.structural); wing.position.set(sd * (W / 2 + wingW / 2 - 0.6), 0, -(E + 2.4)); wing.castShadow = true; wing.receiveShadow = true; g.add(wing); ctx.colliders.push(wing);
+      const grid = windowGrid({ cols: 5, rows: Math.max(2, Math.round(wingH / 4)), cellW: 1.1, cellH: 1.7, gapX: 0.7, gapY: 1.1, depth: 0.1, onFraction: 0.35, seed: seed + sd + 5 });
+      grid.position.set(sd * (W / 2 + wingW / 2 - 0.6), wingH * 0.52, -(E + 2.4) + 0.42); g.add(grid);
+      ctx.windowGrids.push(grid);
+      /* a parapet trim and one setback step on the wing roof */
+      part(trim, chamferBox(wingW - 0.4, 0.2, 0.3, 0.05), sd * (W / 2 + wingW / 2 - 0.6), wingH - 0.1, -(E + 2.4) + 0.35);
+      part(structural, chamferBox(wingW * 0.55, 1.6, wingD * 0.5, 0.08), sd * (W / 2 + wingW / 2 - 0.6), wingH + 0.8, -(E + 2.4) - wingD * 0.35);
+    });
+  }
+  /* SECONDARY — entry canopy: a chamfered slab over the opening with a lit underside and two brackets */
+  if (canopy) {
+    const cw = openW + 2.4, cd = 3.2, cy = floorY + openH + 0.35;
+    part(structural, chamferBox(cw, 0.36, cd, 0.08), 0, cy, cd / 2 - 0.2);
+    part(trim, chamferBox(cw + 0.1, 0.06, 0.12, 0.02), 0, cy - 0.21, cd - 0.26);
+    const under = new THREE.Mesh(new THREE.PlaneGeometry(cw - 0.8, cd - 0.9), M.interior); under.rotation.x = Math.PI / 2; under.position.set(0, cy - 0.19, cd / 2 - 0.2); g.add(under);
+    ctx.timeHooks.push(s => { under.visible = true; });
+    [-1, 1].forEach(sd => part(structural, chamferBox(0.22, 1.4, 0.22, 0.03), sd * (cw / 2 - 0.5), cy + 0.85, 0.6, 0, 0.42));
+    ctx.entranceLights.push(world(g, 0, cy - 0.6, cd * 0.6));
+  }
+  /* SECONDARY — parapet and roof kit: the silhouette stops being a blank slab */
+  if (roofKit) {
+    part(trim, chamferBox(W - 0.6, 0.22, 0.34, 0.05), 0, H - 0.11, -0.05);
+    part(trim, chamferBox(0.34, 0.22, D - 0.6, 0.05), -W / 2 + 0.3, H - 0.11, -(E + D / 2));
+    part(trim, chamferBox(0.34, 0.22, D - 0.6, 0.05), W / 2 - 0.3, H - 0.11, -(E + D / 2));
+    const R = ((seed * 9301 + 49297) % 233280) / 233280;
+    part(structural, chamferBox(W * 0.22, 1.2, D * 0.18, 0.08), -W * 0.26, H + 0.6, -(E + D * 0.45));
+    part(structural, chamferBox(W * 0.16, 2.0, D * 0.14, 0.08), W * (0.18 + R * 0.1), H + 1.0, -(E + D * 0.55));
+    for (let i = 0; i < 6; i++) part(dark, new THREE.BoxGeometry(W * 0.14, 0.08, 0.06), W * (0.18 + R * 0.1), H + 0.35 + i * 0.28, -(E + D * 0.55) + D * 0.07);   /* louvred plant screen */
+    part(trim, new THREE.CylinderGeometry(0.06, 0.09, 4.2, 6), W * 0.36, H + 2.1, -(E + D * 0.3));
+    part(composite, chamferBox(1.2, 0.9, 1.2, 0.06), -W * 0.05, H + 0.45, -(E + D * 0.7));
+  }
+  /* TERTIARY — upper window courses on both piers (dark recesses, a few lit), vents, light housings, seams */
+  if (windowsUpper) {
+    const rows = Math.max(1, Math.round((H - floorY - openH - 2.2) / 3.2));
+    [-1, 1].forEach(sd => {
+      const grid = windowGrid({ cols: Math.max(2, Math.round(pierW / 2.6)), rows, cellW: 1.0, cellH: 1.5, gapX: 1.0, gapY: 1.2, depth: 0.12, onFraction: 0.22, seed: seed * 3 + sd, tint: 0xcfdcf2, dimTint: 0x1b2535 });
+      grid.position.set(sd * (openW / 2 + pierW / 2), floorY + openH + 1.2 + rows * 1.35 + 0.4, 0.4); g.add(grid); ctx.windowGrids.push(grid);
+    });
+  }
+  /* vents: two slot groups low on each pier; entrance light housings; a sign mount bar */
+  [-1, 1].forEach(sd => {
+    for (let i = 0; i < 4; i++) part(dark, new THREE.BoxGeometry(1.6, 0.08, 0.08), sd * (openW / 2 + pierW * 0.55), floorY + 1.0 + i * 0.22, 0.42);
+    part(structural, chamferBox(0.5, 0.9, 0.36, 0.05), sd * (openW / 2 + 0.9), floorY + openH * 0.62, 0.45);
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.7), M.panelLit); face.position.set(sd * (openW / 2 + 0.9), floorY + openH * 0.62, 0.64); g.add(face);
+  });
+  part(trim, chamferBox(openW * 0.8, 0.1, 0.16, 0.03), 0, floorY + openH + (H - floorY - openH) * 0.72 + 0.1, 0.5);
+  /* horizontal seams across the piers: recessed dark lines (scale cue) */
+  for (let y = floorY + 3.2; y < H - 1.5; y += 3.2) [-1, 1].forEach(sd => part(dark, new THREE.BoxGeometry(pierW - 1.6, 0.05, 0.04), sd * (openW / 2 + pierW / 2), y, 0.43));
+  merged(g, structural, M.structural, 'dress-structural', true);
+  merged(g, trim, M.trim, 'dress-trim', false);
+  merged(g, dark, M.graphiteDark, 'dress-dark', false);
+  merged(g, composite, M.composite, 'dress-composite', true);
+}
 
 /* a square-diamond frame standing upright in the XY plane */
 function diamondFrame(size, bar, mat, depth = 0.12) {
@@ -38,10 +119,11 @@ function sign(ctx, parent, spec) {
 function facade(ctx, parent, o) {
   const { M } = ctx;
   const { W, H, D, openW, openH, pierDepth: E, roomDepth: R, floorY = 0, radius = 1.4, glassMullions = 0 } = o;
-  const body = new THREE.Mesh(softMass(W, H, D, radius), M.graphite); body.position.z = -(E + R); parent.add(body);
+  const body = new THREE.Mesh(softMass(W, H, D, radius), M.graphite); body.position.z = -(E + R); body.castShadow = true; body.receiveShadow = true; parent.add(body);
+  (ctx.colliders = ctx.colliders || []).push(body);
   /* room: floor, ceiling, back wall, side walls, light strips */
   const room = new THREE.Group(); room.position.set(0, floorY, -E);
-  const rw = openW + 6, rh = openH + 1.2;
+  const rw = o.roomW || openW + 6, rh = o.roomH || openH + 1.2;
   room.add(box(rw, 0.2, R, M.graphiteLight, 0, -0.1, -R / 2));
   room.add(box(rw, 0.2, R, M.graphiteDark, 0, rh + 0.1, -R / 2));
   room.add(box(rw, rh, 0.2, M.graphiteLight, 0, rh / 2, -R + 0.1));
@@ -64,6 +146,7 @@ function facade(ctx, parent, o) {
   const pr = pl.clone(); pr.position.x = W / 2 - pierW / 2; parent.add(pr);
   const lintelH = H - openH - floorY;
   const lintel = new THREE.Mesh(softMass(openW + 0.6, lintelH, E + 0.4, Math.min(radius, lintelH / 3)), M.graphite); lintel.position.set(0, floorY + openH, 0); parent.add(lintel);
+  pl.castShadow = pr.castShadow = lintel.castShadow = true; ctx.colliders.push(pl, pr);
   /* platinum roof trims: the silhouette catches light without a neon outline */
   parent.add(box(pierW - 1.2, 0.16, 0.22, M.platinum, -W / 2 + pierW / 2, H - 0.32, 0.36));
   parent.add(box(pierW - 1.2, 0.16, 0.22, M.platinum, W / 2 - pierW / 2, H - 0.32, 0.36));
@@ -73,7 +156,7 @@ function facade(ctx, parent, o) {
   const cols = Math.max(3, Math.round(openW / 3.2));
   for (let i = 0; i < cols; i++) { const pw = openW / cols - 0.25; const p = box(pw, lintelH * 0.34, 0.22, M.panel, -openW / 2 + pw / 2 + i * (openW / cols) + 0.12, floorY + openH + lintelH * 0.22, 0.34 + (i % 2) * 0.06); p.rotation.y = (i % 2 ? 1 : -1) * 0.05; panels.add(p); }
   parent.add(panels);
-  return { body, room, glass, pl, pr, lintel };
+  return { body, room, glass, pl, pr, lintel, rw, rh };
 }
 
 export function buildBuildings(ctx) {
@@ -82,6 +165,8 @@ export function buildBuildings(ctx) {
   ctx.residentSpots = ctx.residentSpots || [];
   ctx.entranceLights = ctx.entranceLights || [];
   ctx.actions = ctx.actions || [];        /* tap targets: { id, label, kind, mesh, at: world Vector3 } */
+  ctx.windowGrids = ctx.windowGrids || []; /* InstancedMesh window courses; the assembly dims them by day */
+  ctx.colliders = ctx.colliders || [];
   const out = {};
   const action = (id, label, kind, mesh, at, extra) => { mesh.userData.action = id; ctx.actions.push(Object.assign({ id, label, kind, mesh, at }, extra)); return mesh; };
 
@@ -91,6 +176,7 @@ export function buildBuildings(ctx) {
     const W = 30, H = 16, openW = 14, openH = 8, E = 4, R = 12;
     g.position.set(-36, 0, -30); g.rotation.y = 0.32; scene.add(g);
     const f = facade(ctx, g, { W, H, D: 26, openW, openH, pierDepth: E, roomDepth: R, radius: 1.6, glassMullions: 2 });
+    dressFacade(ctx, g, { W, H, D: 26, openW, openH, E, seed: 1 });
     action('gym', 'MAH GYM', 'destination', f.glass, world(g, 0, 0, 2), { view: 'gym-entrance', copy: 'Training facility. Preview navigation: the camera moves to the entrance. Training data stays in MAHFITT.' });
     /* upper window band across the piers: interior glow behind glass */
     const windowGlow = M.interiorSoft.clone(); windowGlow.opacity = 0.28; ctx.timeHooks.push(s => { windowGlow.opacity = 0.28 * (1 - s.daylight * 0.5); });
@@ -121,7 +207,8 @@ export function buildBuildings(ctx) {
     const g = new THREE.Group(); g.name = 'MAH MATCH';
     const W = 44, H = 24, openW = 18, openH = 14, E = 5, R = 22, floorY = 1.8;
     g.position.set(0, 0, -48); scene.add(g);
-    const f = facade(ctx, g, { W, H, D: 34, openW, openH, pierDepth: E, roomDepth: R, floorY, radius: 1.8 });
+    const f = facade(ctx, g, { W, H, D: 34, openW, openH, pierDepth: E, roomDepth: R, floorY, radius: 1.8, roomW: 38 });
+    dressFacade(ctx, g, { W, H, D: 34, openW, openH, E, floorY, seed: 2, canopy: false });   /* MAH MATCH keeps its own portal frame instead of a canopy */
     action('match', 'MAH MATCH', 'destination', f.glass, world(g, 0, floorY, 2), { view: 'match-entrance', copy: 'Fighting facility: matches and practice. Choose an action at the entrance.' });
     /* the strong central frame around the opening, with a square-diamond keystone */
     const fT = 1.4, fD = 1.0, fz = 0.55;
@@ -143,7 +230,7 @@ export function buildBuildings(ctx) {
       const panel = box(5.6, 1.5, 0.12, M.graphiteDark, x, floorY + 2.75, -E + 0.42); g.add(panel);
       const edge = box(5.4, 0.03, 0.04, M.energySoft, x, floorY + 1.98, -E + 0.5); g.add(edge);
       const s = sign(ctx, g, { title, width: 5.2, y: floorY + 2.75, z: -E + 0.5, x, titleSize: 118, w: 2048, h: 320, reflect: false });
-      action(id, title, 'match-action', panel, world(g, x, floorY, 2), extra); s.userData.action = id; ctx.actions[ctx.actions.length - 1].meshes = [panel, s];
+      action(id, title, 'match-action', panel, world(g, x, floorY, 2), extra); s.userData.action = id; ctx.actions[ctx.actions.length - 1].meshes = [panel, s]; ctx.actions[ctx.actions.length - 1].edge = edge;
       return panel;
     };
     entranceAction('find-opponent', 'FIND AN OPPONENT', -openW / 4, { copy: 'Opponent matching is not available in this preview. No live players are connected and none are simulated.' });
@@ -156,11 +243,16 @@ export function buildBuildings(ctx) {
       [-1, 1].forEach(sd => { g.add(box(sideW, h, run, M.graphiteLight, sd * (rampW / 2 + sideW / 2), h / 2, zc)); g.add(box(sideW, 0.02, 0.05, M.energySoft, sd * (rampW / 2 + sideW / 2), h + 0.011, (steps - i) * run - 0.03)); });
     }
     const rampAngle = Math.atan2(floorY, rampLen), rampHyp = Math.hypot(floorY, rampLen);
-    const ramp = box(rampW, 0.24, rampHyp, M.graphiteLight, 0, floorY / 2 - 0.12, rampLen / 2); ramp.rotation.x = -rampAngle; g.add(ramp);
+    const ramp = box(rampW, 0.24, rampHyp, M.graphiteLight, 0, floorY / 2 - 0.12, rampLen / 2); ramp.rotation.x = -rampAngle; ramp.receiveShadow = true; g.add(ramp);
     [-1, 1].forEach(sd => { const edge = box(0.06, 0.02, rampHyp - 0.2, M.energySoft, sd * (rampW / 2 - 0.1), floorY / 2 + 0.011, rampLen / 2); edge.rotation.x = -rampAngle; g.add(edge); });
     g.add(box(rampW + 0.4, 0.06, 0.6, M.graphiteLight, 0, 0.03, rampLen + 0.3));   /* the landing lip at plaza level */
-    /* interior: the square-diamond fighting platform, energy boundary, spectator tiers, practice zones */
-    const room = g.children.find(c => c.isGroup && c.position.z === -E);
+    /* handrails either side of the ramp and at the outer ends of the stairs: posts + a top bar, a human-scale cue */
+    { const rails = []; [-1, 1].forEach(sd => { for (let i = 0; i <= 4; i++) { const zz = rampLen - i * (rampLen / 4), yy = floorY * (1 - zz / rampLen); part(rails, chamferBox(0.06, 1.0, 0.06, 0.01), sd * (rampW / 2 + 0.16), yy + 0.5, zz); } const bar = chamferBox(0.06, 0.06, rampHyp, 0.01); part(rails, bar, sd * (rampW / 2 + 0.16), floorY / 2 + 1.0, rampLen / 2, 0, -rampAngle); const ow = (openW + 6 + steps * 0.6) / 2; for (let i = 0; i <= 3; i++) part(rails, chamferBox(0.06, 1.0, 0.06, 0.01), sd * ow, 0.5 + i * (floorY / 3), rampLen - i * (rampLen / 3)); }); merged(g, rails, M.trimSatin, 'stair-rails', false); }
+    /* interior: the square-diamond fighting platform, energy boundary, spectator tiers, practice zones.
+       v3 inline version, kept inside `legacy-interior`; the assembly swaps it for match-interior.js when that module exists */
+    const hall = g.children.find(c => c.isGroup && c.position.z === -E);
+    const room = new THREE.Group(); room.name = 'legacy-interior'; hall.add(room);
+    ctx.matchHall = { group: g, room: hall, legacy: room, dims: { roomW: f.rw, roomD: R, roomH: f.rh, openW, E, floorY } };
     const arena = box(12, 0.8, 12, M.graphiteDark, 0, 0.4, -10); arena.rotation.y = Math.PI / 4; room.add(arena);
     const bound = diamondOutline(12.6, 0.3, M.energyLight, 0.04); bound.position.set(0, 0.82, -10); room.add(bound);
     const boundRed = diamondOutline(11.0, 0.08, M.matchRed, 0.03); boundRed.position.set(0, 0.82, -10); room.add(boundRed);
@@ -191,6 +283,7 @@ export function buildBuildings(ctx) {
     const W = 32, H = 12, openW = 20, openH = 7, E = 2.5, R = 12;
     g.position.set(36, 0, -30); g.rotation.y = -0.32; scene.add(g);
     const f = facade(ctx, g, { W, H, D: 22, openW, openH, pierDepth: E, roomDepth: R, radius: 3.0, glassMullions: 3 });
+    dressFacade(ctx, g, { W, H, D: 22, openW, openH, E, seed: 3, windowsUpper: false });   /* the low market: wings, canopy and roof kit, no upper courses */
     action('market', 'MAH MARKET', 'destination', f.glass, world(g, 0, 0, 2), { view: 'market-entrance', copy: 'World marketplace. Preview navigation only: nothing is for sale here and no prices exist.' });
     /* a soft continuous sill light under the glass — the welcome line */
     const sill = box(openW, 0.05, 0.08, M.energyLight, 0, 0.06, -E + 0.3); g.add(sill); ctx.reflect(sill, 0.3);

@@ -98,6 +98,12 @@
     <button type="button" data-practice>Practice preview</button>
     <button type="button" data-diagnostic aria-pressed="false">Reduced-glare view</button>
   </div>
+  <div class="row" role="group" aria-label="Quality tier" data-qualities>
+    <span class="label">Quality</span>
+    <button type="button" data-quality="high">High</button>
+    <button type="button" data-quality="medium">Medium</button>
+    <button type="button" data-quality="low">Low</button>
+  </div>
   <div class="row" role="group" aria-label="Route">
     <span class="label">Route</span>
     <a class="back" href="../../mahfitt.html" data-back>← MAHFITT control deck</a>
@@ -136,7 +142,7 @@
   };
   try {
     world = await createMahplaza(canvas, {
-      theme: q.get('theme'), self: q.get('self'), time: q.get('time'),
+      theme: q.get('theme'), self: q.get('self'), time: q.get('time'), quality: q.get('quality'),
       onSelect: paintCard, onPractice: paintStep,
       hud: s => {
         if (s.frames % 15) return;
@@ -157,6 +163,8 @@
     $('[data-tour]').addEventListener('click', async () => { world.select(null); await world.tour(); paintViews(); });
     $('[data-practice]').addEventListener('click', async () => { world.select('practice-buddy'); await world.practicePreview(); paintViews(); });
     $('[data-diagnostic]').addEventListener('click', e => { const on = world.setDiagnostic(!world.state.diagnostic); e.currentTarget.setAttribute('aria-pressed', String(on)); });
+    const qualityButtons = $$('[data-quality]'), paintQuality = () => qualityButtons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.quality === world.quality)));
+    qualityButtons.forEach(b => b.addEventListener('click', () => { world.setQuality(b.dataset.quality); paintQuality(); })); paintQuality();
     $('[data-card-go]').addEventListener('click', async () => { await world.go(); paintViews(); });
     $('[data-card-practice]').addEventListener('click', async () => { await world.practicePreview(); paintViews(); });
     $('[data-card-exit]').addEventListener('click', () => { world.practiceExit(); paintViews(); });

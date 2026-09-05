@@ -35,11 +35,27 @@ export const VIEWS = {
   'sky-plant':       { pos: [-11.5, 1.5, 28],  look: [-15, 4.5, 18],   fov: 54, label: 'Plant and sky' },
   practice:          { pos: [-10.5, 4.0, -66],  look: [-7, 2.4, -72],   fov: 54, label: 'Practice zone' },   /* from above the left tier, nothing between the camera and the marks */
   'gym-side':        { pos: [-8, 2.0, 18],     look: [-34, 6, -30],    fov: 56, label: 'Gym side' },
-  'market-side':     { pos: [8, 2.0, 18],      look: [34, 5, -30],     fov: 56, label: 'Market side' }
+  'market-side':     { pos: [8, 2.0, 18],      look: [34, 5, -30],     fov: 56, label: 'Market side' },
+  /* v4 review views */
+  skyline:           { pos: [2, 2.4, 36],      look: [-8, 34, -260],   fov: 62, label: 'Skyline' },
+  'plaza-node':      { pos: [-24, 2.0, 16],    look: [8, 3, -20],      fov: 58, label: 'Plaza node' },
+  'match-hall':      { pos: [-10, 4.0, -56],   look: [2, 2.6, -66],    fov: 60, label: 'MAH MATCH hall' }
 };
 export const TOUR = ['establishing', 'in-world', 'match-entrance'];
 export const AVATAR_COLOURS = ['purple', 'green', 'blue', 'red', 'silver', 'teal', 'violet', 'emerald', 'crimson', 'platinum'];
 const STORE = { world: 'fob.mahworld.preview.worldTheme', self: 'fob.mahworld.preview.selfColour' };
+/* quality tiers (brief §53): composition, materials and silhouette survive every tier; cost moves */
+export const QUALITY = {
+  high:   { name: 'high',   pixelRatio: 2,   shadowMap: 2048, shadows: true,  reflections: true,  life: { near: 6, mid: 8, far: 10 }, farLayers: true },
+  medium: { name: 'medium', pixelRatio: 1.5, shadowMap: 1024, shadows: true,  reflections: true,  life: { near: 4, mid: 6, far: 8 },  farLayers: true },
+  low:    { name: 'low',    pixelRatio: 1,   shadowMap: 0,    shadows: false, reflections: false, life: { near: 3, mid: 4, far: 6 },  farLayers: false }
+};
+function resolveQuality(name) {
+  if (name && QUALITY[name]) return QUALITY[name];
+  /* auto: phones and small cores get medium; low only when the device says so */
+  try { const cores = navigator.hardwareConcurrency || 4, mem = navigator.deviceMemory || 4; if (cores <= 2 || mem <= 2) return QUALITY.low; if (cores <= 6 || (window.devicePixelRatio || 1) >= 2.5) return QUALITY.medium; } catch (e) {}
+  return QUALITY.high;
+}
 
 function reducedMotion() { try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
 function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
@@ -48,20 +64,24 @@ const readStore = k => { try { return localStorage.getItem(k); } catch (e) { ret
 const writeStore = (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, String(v)); } catch (e) {} };
 
 export async function createMahplaza(canvas, options = {}) {
-  const opts = Object.assign({ theme: null, self: null, time: null, pixelRatioCap: 2, hud: null, onSelect: null, onPractice: null, persist: true }, options);
+  const opts = Object.assign({ theme: null, self: null, time: null, pixelRatioCap: 2, hud: null, onSelect: null, onPractice: null, persist: true, quality: null }, options);
   let theme = resolveTheme(opts.theme || (opts.persist && readStore(STORE.world)) || 'canonical');
+  let quality = resolveQuality(opts.quality);
   const clock = createWorldClock();
   if (opts.time) clock.freeze(opts.time);
-  const state = { version: 'mahplaza-v3', view: 'establishing', yaw: 0, pitch: 0, dolly: 0, touring: false, frames: 0, ms: 0, reduced: reducedMotion(), theme: theme.name, clock: null, selection: null, practice: null, diagnostic: false, appearance: null };
+  const state = { version: 'mahplaza-v4', view: 'establishing', yaw: 0, pitch: 0, dolly: 0, touring: false, frames: 0, ms: 0, reduced: reducedMotion(), theme: theme.name, clock: null, selection: null, practice: null, diagnostic: false, appearance: null, quality: quality.name };
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, opts.pixelRatioCap));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, opts.pixelRatioCap, quality.pixelRatio));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
+  /* one shadow-mapped key light: the sun by day, the moon by night (brief §21, §40) */
+  renderer.shadowMap.enabled = quality.shadows;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0d1f3e, 40, 420);
+  scene.fog = new THREE.Fog(0x0d1f3e, 60, 760);   /* near / far follow the time of day in applyTime: atmospheric perspective, not a fog bank */
   const camera = new THREE.PerspectiveCamera(54, 1, 0.1, 2000);
   const M = createMaterials(theme);
 
@@ -82,18 +102,56 @@ export async function createMahplaza(canvas, options = {}) {
     mirrorQueue.length = 0;
   }
 
-  const ctx = { THREE, scene, M, theme, clock, reflect, timeHooks: [], updateHooks: [], signMaterials: [], residentSpots: [], entranceLights: [], actions: [] };
+  const ctx = { THREE, scene, M, theme, clock, reflect, timeHooks: [], updateHooks: [], signMaterials: [], residentSpots: [], entranceLights: [], actions: [], colliders: [], lifeAnchors: { paths: [], pads: [], doors: [], windows: [] } };
+  /* v4 modules are optional at load: the assembly integrates whichever exist (see CONTRACTS_V4.md) */
+  const optional = async (name) => { try { return await import(name); } catch (e) { if (!/Failed to fetch|Cannot find|Failed to resolve|404|import/i.test(String(e && e.message))) console.info('MAHPLAZA optional module ' + name + ' —', e && e.message); return null; } };
+  const CITY = await optional('./city.js'), DRESS = await optional('./plaza-dressing.js'), MATCHI = await optional('./match-interior.js'), LIFE = await optional('./life.js');
+  ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
   const lights = { hemi: new THREE.HemisphereLight(0x2a4f8c, 0x05070c, 0.6), dir: new THREE.DirectionalLight(0x9fc3ff, 0.4), fill: new THREE.DirectionalLight(0x9dbdf0, 0.4) };
   lights.dir.position.set(-80, 120, 160);
   lights.fill.position.set(60, 40, 160);
-  scene.add(lights.hemi, lights.dir, lights.fill);
+  lights.dir.castShadow = quality.shadows;
+  lights.dir.shadow.mapSize.set(quality.shadowMap || 1024, quality.shadowMap || 1024);
+  Object.assign(lights.dir.shadow.camera, { left: -78, right: 78, top: 78, bottom: -78, near: 40, far: 620 });
+  lights.dir.shadow.bias = -0.0005; lights.dir.shadow.normalBias = 0.05; lights.dir.shadow.radius = 2;
+  lights.dir.shadow.camera.updateProjectionMatrix();
+  scene.add(lights.hemi, lights.dir, lights.dir.target, lights.fill);
 
   /* ---- the world ------------------------------------------------------- */
   buildGround(ctx);
   const buildings = buildBuildings(ctx);
+  /* doors: where ambient residents may enter and leave (derived from the destination actions) */
+  ctx.actions.filter(a => a.kind === 'destination').forEach(a => { const g = buildings[a.id]; ctx.lifeAnchors.doors.push({ id: a.id, position: a.at.clone(), facing: g ? g.rotation.y : 0, building: a.id }); });
+  /* MAH MATCH interior: the v4 module replaces the v3 inline hall when present */
+  let matchInterior = null;
+  if (MATCHI && MATCHI.buildMatchInterior && ctx.matchHall) {
+    try {
+      const h = ctx.matchHall;
+      matchInterior = MATCHI.buildMatchInterior(ctx, h.room, h.dims);
+      if (matchInterior) {
+        h.room.remove(h.legacy); h.legacy.traverse(o => { if (o.isMesh && o.geometry) o.geometry.dispose(); });
+        if (matchInterior.arenaLight) ctx.arenaLight = h.room.localToWorld(matchInterior.arenaLight.clone());
+        if (matchInterior.practice) { const P = matchInterior.practice, w = v => h.room.localToWorld(v.clone()); ctx.practice = { centre: w(P.centre), a: w(P.a), b: w(P.b), facingA: P.facingA, facingB: P.facingB }; }
+        /* the two entrance-action panels move onto the hall's display mounts */
+        const mounts = matchInterior.actionMounts || {};
+        [['find-opponent', mounts.findOpponent], ['practice-buddy', mounts.practiceBuddy]].forEach(([id, mt]) => {
+          if (!mt) return; const a = ctx.actions.find(x => x.id === id); if (!a || !a.meshes) return;
+          const [panel, sign] = a.meshes; const n = (mt.normal || new THREE.Vector3(0, 0, 1)).clone().normalize();
+          const base = mt.position.clone().add(h.room.position);      /* room-local → building-local */
+          const sw = (mt.width || 5.6) / 5.6;
+          panel.position.copy(base); panel.scale.set(sw, (mt.height || 1.5) / 1.5, 1); panel.lookAt(base.clone().add(n));
+          sign.position.copy(base).addScaledVector(n, 0.09); sign.scale.setScalar(Math.min(sw, 1.15)); sign.lookAt(sign.position.clone().add(n));
+          if (a.edge) { a.edge.visible = false; }
+        });
+      }
+    } catch (e) { console.info('MAHPLAZA: match-interior module failed —', e && e.message); matchInterior = null; }
+  }
   const sky = buildSky(ctx);
+  let city = null, dressing = null;
+  if (CITY && CITY.buildCity) { try { city = CITY.buildCity(ctx); if (city && city.group && !city.group.parent) scene.add(city.group); } catch (e) { console.info('MAHPLAZA: city module failed —', e && e.message); city = null; } }
+  if (DRESS && DRESS.buildDressing) { try { dressing = DRESS.buildDressing(ctx); if (dressing && dressing.group && !dressing.group.parent) scene.add(dressing.group); } catch (e) { console.info('MAHPLAZA: dressing module failed —', e && e.message); dressing = null; } }
 
   /* entrance and plaza point lights, bounded (v3: entrance strength lowered for the glare correction) */
   const pointLights = [], themedLights = [];
@@ -147,8 +205,15 @@ export async function createMahplaza(canvas, options = {}) {
     }
   } catch (e) { console.info('MAHPLAZA: flora / vehicles module not available —', e && e.message); }
   const byId = id => residents.find(r => r.userData && r.userData.id === id) || null;
+  /* ambient life (v4 module): walkers, groups, doors, the event scheduler, GYMATTACK background events */
+  let life = null;
+  if (LIFE && LIFE.createLife && R) { try { life = LIFE.createLife(ctx, R, { anchors: ctx.lifeAnchors, existing: residents, camera, maxNear: quality.life.near, maxMid: quality.life.mid, maxFar: quality.life.far, seed: 7 }); } catch (e) { console.info('MAHPLAZA: life module failed —', e && e.message); life = null; } }
 
   buildReflections();
+  reflections.visible = quality.reflections;
+  /* camera colliders: world-space boxes of the masses the camera must stay out of */
+  scene.updateMatrixWorld(true);
+  const colliderBoxes = (ctx.colliders || []).filter(o => o && o.isMesh).map(o => { if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); return o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld).expandByScalar(0.3); });
 
   /* ---- environment map from the sky itself, refreshed as the day turns --- */
   const pmrem = new THREE.PMREMGenerator(renderer); pmrem.compileEquirectangularShader();
@@ -167,7 +232,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (envRT) envRT.dispose();
     envRT = pmrem.fromScene(envScene, 0.04, 0.1, 200);
     scene.environment = envRT.texture;
-    scene.environmentIntensity = 0.5 + 0.55 * clockState.daylight;
+    scene.environmentIntensity = 0.48 + 0.3 * clockState.daylight;   /* the environment fills; it never flattens the key */
     envDaylight = clockState.daylight;
   }
 
@@ -180,12 +245,17 @@ export async function createMahplaza(canvas, options = {}) {
     const k = sky.setTime(s, lights);
     M.setTime(s);
     renderer.toneMappingExposure = state.diagnostic ? 1.0 : k.exposure;
+    /* atmospheric perspective: a long, subtle falloff — deeper by day, closer at night; the city's far layers live inside it */
+    scene.fog.near = 55 + 45 * s.daylight; scene.fog.far = 640 + 320 * s.daylight;
     pointLights.forEach(l => { l.intensity = l.userData.base * (1 - 0.7 * s.daylight) * (state.diagnostic ? 0.6 : 1); });
     ctx.timeHooks.forEach(h => { try { h(s); } catch (e) {} });
     const energy = state.diagnostic ? Math.min(0.3, 1 - s.daylight) : 1 - s.daylight;
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
+    [city, dressing, matchInterior, life].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    /* window courses on the facades: lit at night, dark recesses by day */
+    (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
     return s;
   }
@@ -217,6 +287,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
+    [city, dressing, matchInterior, life].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -257,22 +328,39 @@ export async function createMahplaza(canvas, options = {}) {
   const viewSpec = n => { const v = VIEWS[n]; return portrait && v.portrait ? v.portrait : v; };
   const applyView = n => { const v = viewSpec(n); cur.pos.set(...v.pos); cur.look.set(...v.look); cur.fov = v.fov; };
   applyView('establishing');
-  const dirV = new THREE.Vector3(), rightV = new THREE.Vector3(), targetV = new THREE.Vector3(), upV = new THREE.Vector3(0, 1, 0);
-  function placeCamera() {
-    dirV.subVectors(cur.look, cur.pos).normalize().applyAxisAngle(upV, state.yaw);
-    rightV.crossVectors(dirV, upV).normalize(); dirV.applyAxisAngle(rightV, state.pitch).normalize();
-    camera.position.copy(cur.pos).addScaledVector(dirV, state.dolly); if (camera.position.y < 0.7) camera.position.y = 0.7;
+  const dirV = new THREE.Vector3(), rightV = new THREE.Vector3(), targetV = new THREE.Vector3(), upV = new THREE.Vector3(0, 1, 0), probeV = new THREE.Vector3();
+  /* the camera has weight (brief §37): look / move inputs set targets, the camera follows them with critical damping; it never enters a collider (§38) */
+  const smooth = { yaw: 0, pitch: 0, dolly: 0 };
+  let smoothing = true;
+  function placeCamera(dt = 0) {
+    if (smoothing && dt > 0 && !state.reduced) { const k = 1 - Math.exp(-dt * 11); smooth.yaw += (state.yaw - smooth.yaw) * k; smooth.pitch += (state.pitch - smooth.pitch) * k; smooth.dolly += (state.dolly - smooth.dolly) * k; }
+    else { smooth.yaw = state.yaw; smooth.pitch = state.pitch; smooth.dolly = state.dolly; }
+    dirV.subVectors(cur.look, cur.pos).normalize().applyAxisAngle(upV, smooth.yaw);
+    rightV.crossVectors(dirV, upV).normalize(); dirV.applyAxisAngle(rightV, smooth.pitch).normalize();
+    camera.position.copy(cur.pos).addScaledVector(dirV, smooth.dolly); if (camera.position.y < 0.7) camera.position.y = 0.7;
+    /* collision: if the camera sits inside a mass, slide it forward along the view until it is out (smooth recovery, no pop) */
+    for (let guard = 0; guard < 24; guard++) {
+      let inside = false;
+      for (let i = 0; i < colliderBoxes.length; i++) { if (colliderBoxes[i].containsPoint(camera.position)) { inside = true; break; } }
+      if (!inside) break;
+      camera.position.addScaledVector(dirV, 0.5); smooth.dolly += 0.5; if (guard === 23) state.dolly = smooth.dolly;
+    }
+    /* keep a little air in front of the lens */
+    probeV.copy(camera.position).addScaledVector(dirV, 0.6);
+    for (let i = 0; i < colliderBoxes.length; i++) { if (colliderBoxes[i].containsPoint(probeV)) { state.dolly = Math.min(state.dolly, smooth.dolly - 0.6); break; } }
     targetV.copy(camera.position).addScaledVector(dirV, 60); camera.lookAt(targetV);
     camera.fov = cur.fov + (state.fovBias || 0); camera.updateProjectionMatrix();
   }
   function setView(name, { instant = false, duration = 2800 } = {}) {
     if (!VIEWS[name]) return Promise.resolve(false);
-    state.view = name; state.yaw = 0; state.pitch = 0; state.dolly = 0;
+    state.view = name; state.yaw = 0; state.pitch = 0; state.dolly = 0; smooth.yaw = 0; smooth.pitch = 0; smooth.dolly = 0;
     if (anim && anim.resolve) { const r = anim.resolve; anim = null; r(false); }
     if (instant || state.reduced) { applyView(name); requestRender(); return Promise.resolve(true); }
     from.pos.copy(cur.pos); from.look.copy(cur.look); from.fov = cur.fov;
     return new Promise(resolve => { anim = { t0: performance.now(), dur: duration, to: viewSpec(name), resolve }; requestRender(); });
   }
+  /* evidence only: frame an arbitrary point (used by the capture script to look at an ambient event) */
+  function setCustomView({ pos, look, fov = 56 }) { state.view = 'custom'; state.yaw = state.pitch = state.dolly = 0; smooth.yaw = smooth.pitch = smooth.dolly = 0; anim = null; cur.pos.set(...pos); cur.look.set(...look); cur.fov = fov; requestRender(); return true; }
   async function tour({ hold = 900, leg = 3800 } = {}) {
     if (state.touring) return false; state.touring = true;
     try { await setView(TOUR[0], { instant: true }); await sleep(hold); for (let i = 1; i < TOUR.length; i++) { await setView(TOUR[i], { duration: leg }); await sleep(hold); } } finally { state.touring = false; }
@@ -427,13 +515,33 @@ export async function createMahplaza(canvas, options = {}) {
       walkers.forEach(w => { const p0 = w.phase; w.phase = (w.phase + dt * 0.02) % 1; const k = 0.5 - 0.5 * Math.cos(w.phase * Math.PI * 2); const dir = Math.sin(w.phase * Math.PI * 2) >= 0 ? 1 : -1; w.r.position.x = w.from[0] + (w.to[0] - w.from[0]) * k; w.r.position.z = w.from[1] + (w.to[1] - w.from[1]) * k; w.r.rotation.y = Math.atan2((w.to[0] - w.from[0]) * dir, (w.to[1] - w.from[1]) * dir); void p0; });
       if (vehicles && vehicles.update) vehicles.update(t);
       sky.update(now);
+      if (city && city.update) city.update(t, dt);
+      if (dressing && dressing.update) dressing.update(t, dt);
+      if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
+      if (life && life.update) life.update(t, dt);
       ctx.updateHooks.slice().forEach(h => h(t, dt));
     }
-    placeCamera();
+    placeCamera(dt);
     const t0 = performance.now(); renderer.render(scene, camera);
     state.ms = state.ms * 0.9 + (performance.now() - t0) * 0.1; state.frames++;
     if (opts.hud) opts.hud(state);
-    if (!hidden && (anim || !state.reduced || ctx.updateHooks.length)) raf = requestAnimationFrame(frame);
+    const settling = Math.abs(smooth.yaw - state.yaw) + Math.abs(smooth.pitch - state.pitch) + Math.abs(smooth.dolly - state.dolly) > 0.002;
+    if (!hidden && (anim || !state.reduced || ctx.updateHooks.length || settling)) raf = requestAnimationFrame(frame);
+  }
+  /* quality tier at run time (validation and the page's Preview row) */
+  function setQuality(name) {
+    if (!QUALITY[name] || QUALITY[name] === quality) return quality.name;
+    quality = QUALITY[name]; state.quality = quality.name;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, opts.pixelRatioCap, quality.pixelRatio));
+    const shadowsChanged = renderer.shadowMap.enabled !== quality.shadows;
+    renderer.shadowMap.enabled = quality.shadows; lights.dir.castShadow = quality.shadows;
+    if (quality.shadowMap) { lights.dir.shadow.mapSize.set(quality.shadowMap, quality.shadowMap); if (lights.dir.shadow.map) { lights.dir.shadow.map.dispose(); lights.dir.shadow.map = null; } }
+    if (shadowsChanged) scene.traverse(o => { if (o.material) { (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { m.needsUpdate = true; }); } });
+    reflections.visible = quality.reflections;
+    if (life && life.setBudget) { try { life.setBudget(quality.life); } catch (e) {} }
+    if (city && city.setQuality) { try { city.setQuality(quality); } catch (e) {} }
+    resize(); requestRender();
+    return quality.name;
   }
   on(document, 'visibilitychange', () => { hidden = document.hidden; if (!hidden) { applyTime(true); requestRender(); } });
   applyTime(true);
@@ -465,12 +573,13 @@ export async function createMahplaza(canvas, options = {}) {
 
   return {
     version: 'mahplaza-v3',
-    views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, tour, ready, state, clock, camera, scene, renderer, buildings,
+    views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
+    modules: { city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life }, city, dressing, matchInterior, life,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
-    setDiagnostic,
+    setDiagnostic, setQuality, get quality() { return quality.name; }, qualities: Object.keys(QUALITY),
     /* validation: pin or release world time */
     setTime(spec) { if (spec == null || spec === 'live') clock.release(); else clock.freeze(spec); applyTime(true); requestRender(); return clock.state(); },
     renderOnce() { requestRender(); },

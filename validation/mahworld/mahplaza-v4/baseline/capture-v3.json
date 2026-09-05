@@ -1,0 +1,1882 @@
+{
+  "renderer": "three@0.185.1 (mahworld/vendor/three, byte-identical to mrmah3d/vendor/three)",
+  "gl": "headless Chromium, ANGLE/SwiftShader software GL — ms/frame here is NOT a phone number; draw calls and triangles are",
+  "ranAt": "2026-09-05T21:56:50.960Z",
+  "revision": "9315031+working-tree",
+  "errors": [],
+  "logs": [],
+  "chromium": "141.0.7390.37",
+  "captures": [
+    {
+      "file": "v3-establishing-night-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "night",
+      "label": "wide",
+      "title": "1. Main arrival view — skyline, MAHPLAZA marker, three destinations",
+      "drawCalls": 513,
+      "triangles": 35454,
+      "ms": 18.2,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 405,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-night-wide.png",
+      "set": "core",
+      "view": "in-world",
+      "time": "night",
+      "label": "wide",
+      "title": "2. Ground-level three-quarter view — plaza, sidewalks, road",
+      "drawCalls": 487,
+      "triangles": 33862,
+      "ms": 11.3,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-gym-entrance-night-wide.png",
+      "set": "core",
+      "view": "gym-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "3. MAH GYM entrance and interior",
+      "drawCalls": 187,
+      "triangles": 18300,
+      "ms": 5.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 417,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-match-entrance-night-wide.png",
+      "set": "core",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "4. MAH MATCH arena — the two functions: FIND AN OPPONENT / PRACTICE WITH A BUDDY",
+      "drawCalls": 177,
+      "triangles": 17682,
+      "ms": 7.1,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 417,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-market-entrance-night-wide.png",
+      "set": "core",
+      "view": "market-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "5. MAH MARKET entrance and interior",
+      "drawCalls": 183,
+      "triangles": 15988,
+      "ms": 4.9,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-residents-night-wide.png",
+      "set": "core",
+      "view": "residents",
+      "time": "night",
+      "label": "wide",
+      "title": "6. Resident close-up group — teardrop lower bodies, dark facial chambers, physique variation",
+      "drawCalls": 379,
+      "triangles": 29492,
+      "ms": 8.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-sky-plant-night-wide.png",
+      "set": "core",
+      "view": "sky-plant",
+      "time": "night",
+      "label": "wide",
+      "title": "7. Sky, FOBEAM / FOBLOW infrastructure and square-diamond plant detail",
+      "drawCalls": 349,
+      "triangles": 27440,
+      "ms": 6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-establishing-day-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "day",
+      "label": "wide",
+      "title": "1. Main arrival view — skyline, MAHPLAZA marker, three destinations",
+      "drawCalls": 513,
+      "triangles": 35454,
+      "ms": 10.8,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-day-wide.png",
+      "set": "core",
+      "view": "in-world",
+      "time": "day",
+      "label": "wide",
+      "title": "2. Ground-level three-quarter view — plaza, sidewalks, road",
+      "drawCalls": 487,
+      "triangles": 33862,
+      "ms": 11.2,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-gym-entrance-day-wide.png",
+      "set": "core",
+      "view": "gym-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "3. MAH GYM entrance and interior",
+      "drawCalls": 187,
+      "triangles": 18300,
+      "ms": 5.6,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-match-entrance-day-wide.png",
+      "set": "core",
+      "view": "match-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "4. MAH MATCH arena — the two functions: FIND AN OPPONENT / PRACTICE WITH A BUDDY",
+      "drawCalls": 177,
+      "triangles": 17682,
+      "ms": 4.1,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-market-entrance-day-wide.png",
+      "set": "core",
+      "view": "market-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "5. MAH MARKET entrance and interior",
+      "drawCalls": 183,
+      "triangles": 15988,
+      "ms": 3.8,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-residents-day-wide.png",
+      "set": "core",
+      "view": "residents",
+      "time": "day",
+      "label": "wide",
+      "title": "6. Resident close-up group — teardrop lower bodies, dark facial chambers, physique variation",
+      "drawCalls": 379,
+      "triangles": 29492,
+      "ms": 8.9,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-sky-plant-day-wide.png",
+      "set": "core",
+      "view": "sky-plant",
+      "time": "day",
+      "label": "wide",
+      "title": "7. Sky, FOBEAM / FOBLOW infrastructure and square-diamond plant detail",
+      "drawCalls": 349,
+      "triangles": 27440,
+      "ms": 6.6,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-establishing-dusk-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "dusk",
+      "label": "wide",
+      "title": "1. Main arrival view — skyline, MAHPLAZA marker, three destinations",
+      "drawCalls": 513,
+      "triangles": 35454,
+      "ms": 7.8,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-dusk-wide.png",
+      "set": "core",
+      "view": "in-world",
+      "time": "dusk",
+      "label": "wide",
+      "title": "2. Ground-level three-quarter view — plaza, sidewalks, road",
+      "drawCalls": 487,
+      "triangles": 33862,
+      "ms": 11.8,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 418,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.1,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-night-standard.png",
+      "set": "diagnostic",
+      "view": "in-world",
+      "time": "night",
+      "label": "standard",
+      "title": "standard render",
+      "drawCalls": 484,
+      "triangles": 33830,
+      "ms": 13,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-night-diagnostic.png",
+      "set": "diagnostic",
+      "view": "in-world",
+      "time": "night",
+      "label": "diagnostic",
+      "title": "9. reduced-glare diagnostic: additive glow off, emissive capped at 1.0, exposure fixed at 1.0",
+      "drawCalls": 404,
+      "triangles": 26690,
+      "ms": 7.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": true
+    },
+    {
+      "file": "v3-match-entrance-night-standard.png",
+      "set": "diagnostic",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "standard",
+      "title": "standard render",
+      "drawCalls": 177,
+      "triangles": 17682,
+      "ms": 4.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-match-entrance-night-diagnostic.png",
+      "set": "diagnostic",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "diagnostic",
+      "title": "9. reduced-glare diagnostic: additive glow off, emissive capped at 1.0, exposure fixed at 1.0",
+      "drawCalls": 122,
+      "triangles": 11210,
+      "ms": 3.1,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": true
+    },
+    {
+      "file": "v3-in-world-day-standard.png",
+      "set": "diagnostic",
+      "view": "in-world",
+      "time": "day",
+      "label": "standard",
+      "title": "standard render",
+      "drawCalls": 487,
+      "triangles": 33862,
+      "ms": 6.9,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-day-diagnostic.png",
+      "set": "diagnostic",
+      "view": "in-world",
+      "time": "day",
+      "label": "diagnostic",
+      "title": "9. reduced-glare diagnostic: additive glow off, emissive capped at 1.0, exposure fixed at 1.0",
+      "drawCalls": 404,
+      "triangles": 26690,
+      "ms": 6.1,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": true
+    },
+    {
+      "file": "v3-match-entrance-day-standard.png",
+      "set": "diagnostic",
+      "view": "match-entrance",
+      "time": "day",
+      "label": "standard",
+      "title": "standard render",
+      "drawCalls": 167,
+      "triangles": 17470,
+      "ms": 3.9,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-match-entrance-day-diagnostic.png",
+      "set": "diagnostic",
+      "view": "match-entrance",
+      "time": "day",
+      "label": "diagnostic",
+      "title": "9. reduced-glare diagnostic: additive glow off, emissive capped at 1.0, exposure fixed at 1.0",
+      "drawCalls": 122,
+      "triangles": 11210,
+      "ms": 3,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 407,
+      "textures": 12,
+      "programs": 29,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": true
+    },
+    {
+      "file": "v3-establishing-night-phone.png",
+      "set": "phone",
+      "view": "establishing",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 276,
+      "triangles": 23660,
+      "ms": 11.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 228,
+      "textures": 10,
+      "programs": 29,
+      "heapMB": 17.4,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-night-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 260,
+      "triangles": 22768,
+      "ms": 6.3,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 229,
+      "textures": 10,
+      "programs": 29,
+      "heapMB": 17.4,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-match-entrance-night-phone.png",
+      "set": "phone",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 158,
+      "triangles": 15544,
+      "ms": 5.6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 229,
+      "textures": 10,
+      "programs": 29,
+      "heapMB": 17.4,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-residents-night-phone.png",
+      "set": "phone",
+      "view": "residents",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 244,
+      "triangles": 21454,
+      "ms": 6.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 270,
+      "textures": 11,
+      "programs": 29,
+      "heapMB": 17.4,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-appearance-night-phone.png",
+      "set": "phone",
+      "view": "appearance",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 238,
+      "triangles": 22088,
+      "ms": 4.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 270,
+      "textures": 11,
+      "programs": 29,
+      "heapMB": 17.4,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-day-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 250,
+      "triangles": 22556,
+      "ms": 4.2,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 270,
+      "textures": 11,
+      "programs": 29,
+      "heapMB": 17.4,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-match-entrance-day-phone.png",
+      "set": "phone",
+      "view": "match-entrance",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 168,
+      "triangles": 15756,
+      "ms": 3.3,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "geometries": 270,
+      "textures": 11,
+      "programs": 29,
+      "heapMB": 17.4,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-in-world-night-phone-with-controls.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone with controls",
+      "drawCalls": 260,
+      "triangles": 22768,
+      "ms": 17.9,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 219,
+      "textures": 10,
+      "programs": 28,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-find-opponent-card-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone: FIND AN OPPONENT selected (honest unavailable state)",
+      "drawCalls": 260,
+      "triangles": 22768,
+      "ms": 9.3,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 219,
+      "textures": 10,
+      "programs": 28,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": false
+    },
+    {
+      "file": "v3-practice-buddy-card-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone: PRACTICE WITH A BUDDY selected (local preview offer)",
+      "drawCalls": 250,
+      "triangles": 22556,
+      "ms": 6.3,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "geometries": 219,
+      "textures": 10,
+      "programs": 28,
+      "heapMB": 12.8,
+      "world": "blue",
+      "diagnostic": false
+    }
+  ],
+  "checks": [
+    {
+      "file": "v3-check-1-blue-world-purple-self-wide.png",
+      "key": "1-blue-world-purple-self",
+      "title": "Check 1 — blue world; local avatar purple; fixtures green, red, blue, silver",
+      "label": "wide",
+      "world": {
+        "name": "blue",
+        "energyHex": "7fc6ff",
+        "energyMaterialEmissiveHex": "7fc6ff"
+      },
+      "self": {
+        "id": "self",
+        "role": "self",
+        "colour": "purple",
+        "materialName": "resident-purple-body",
+        "emissiveHex": "9b3fd6",
+        "vertexAverageHex": "984fcb",
+        "note": null
+      },
+      "fixtures": [
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "materialName": "resident-green-body",
+          "emissiveHex": "3fc26a",
+          "vertexAverageHex": "5abd77",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "materialName": "resident-red-body",
+          "emissiveHex": "e0453f",
+          "vertexAverageHex": "d35c58",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "materialName": "resident-blue-body",
+          "emissiveHex": "2f6fe6",
+          "vertexAverageHex": "4b77da",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "materialName": "resident-silver-body",
+          "emissiveHex": "aebbcb",
+          "vertexAverageHex": "aab5c3",
+          "note": null
+        }
+      ],
+      "globalTint": {
+        "canvasCssFilter": "none",
+        "toneMappingExposure": 1,
+        "sceneOverlayMaterials": 0
+      },
+      "samples": [
+        {
+          "id": "self",
+          "role": "self",
+          "colour": "purple",
+          "screen": [
+            639,
+            525
+          ],
+          "rgb": [
+            117,
+            29,
+            181
+          ]
+        },
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "screen": [
+            383,
+            392
+          ],
+          "rgb": [
+            75,
+            185,
+            115
+          ]
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "screen": [
+            533,
+            379
+          ],
+          "rgb": [
+            194,
+            42,
+            47
+          ]
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "screen": [
+            850,
+            387
+          ],
+          "rgb": [
+            9,
+            64,
+            160
+          ]
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "screen": [
+            693,
+            369
+          ],
+          "rgb": [
+            155,
+            172,
+            194
+          ]
+        }
+      ],
+      "drawCalls": 463
+    },
+    {
+      "file": "v3-check-2-world-red-wide.png",
+      "key": "2-world-red",
+      "title": "Check 2 — change ONLY the world to red",
+      "label": "wide",
+      "world": {
+        "name": "red",
+        "energyHex": "ff5a6e",
+        "energyMaterialEmissiveHex": "ff5a6e"
+      },
+      "self": {
+        "id": "self",
+        "role": "self",
+        "colour": "purple",
+        "materialName": "resident-purple-body",
+        "emissiveHex": "9b3fd6",
+        "vertexAverageHex": "984fcb",
+        "note": null
+      },
+      "fixtures": [
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "materialName": "resident-green-body",
+          "emissiveHex": "3fc26a",
+          "vertexAverageHex": "5abd77",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "materialName": "resident-red-body",
+          "emissiveHex": "e0453f",
+          "vertexAverageHex": "d35c58",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "materialName": "resident-blue-body",
+          "emissiveHex": "2f6fe6",
+          "vertexAverageHex": "4b77da",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "materialName": "resident-silver-body",
+          "emissiveHex": "aebbcb",
+          "vertexAverageHex": "aab5c3",
+          "note": null
+        }
+      ],
+      "globalTint": {
+        "canvasCssFilter": "none",
+        "toneMappingExposure": 1,
+        "sceneOverlayMaterials": 0
+      },
+      "samples": [
+        {
+          "id": "self",
+          "role": "self",
+          "colour": "purple",
+          "screen": [
+            639,
+            525
+          ],
+          "rgb": [
+            68,
+            10,
+            120
+          ]
+        },
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "screen": [
+            383,
+            392
+          ],
+          "rgb": [
+            74,
+            185,
+            114
+          ]
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "screen": [
+            533,
+            379
+          ],
+          "rgb": [
+            205,
+            60,
+            65
+          ]
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "screen": [
+            850,
+            387
+          ],
+          "rgb": [
+            17,
+            92,
+            204
+          ]
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "screen": [
+            693,
+            369
+          ],
+          "rgb": [
+            155,
+            172,
+            194
+          ]
+        }
+      ],
+      "drawCalls": 463
+    },
+    {
+      "file": "v3-check-3-self-green-wide.png",
+      "key": "3-self-green",
+      "title": "Check 3 — change ONLY the local avatar to green",
+      "label": "wide",
+      "world": {
+        "name": "red",
+        "energyHex": "ff5a6e",
+        "energyMaterialEmissiveHex": "ff5a6e"
+      },
+      "self": {
+        "id": "self",
+        "role": "self",
+        "colour": "green",
+        "materialName": "resident-green-body",
+        "emissiveHex": "3fc26a",
+        "vertexAverageHex": "4fba6f",
+        "note": null
+      },
+      "fixtures": [
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "materialName": "resident-green-body",
+          "emissiveHex": "3fc26a",
+          "vertexAverageHex": "5abd77",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "materialName": "resident-red-body",
+          "emissiveHex": "e0453f",
+          "vertexAverageHex": "d35c58",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "materialName": "resident-blue-body",
+          "emissiveHex": "2f6fe6",
+          "vertexAverageHex": "4b77da",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "materialName": "resident-silver-body",
+          "emissiveHex": "aebbcb",
+          "vertexAverageHex": "aab5c3",
+          "note": null
+        }
+      ],
+      "globalTint": {
+        "canvasCssFilter": "none",
+        "toneMappingExposure": 1,
+        "sceneOverlayMaterials": 0
+      },
+      "samples": [
+        {
+          "id": "self",
+          "role": "self",
+          "colour": "green",
+          "screen": [
+            639,
+            525
+          ],
+          "rgb": [
+            0,
+            134,
+            66
+          ]
+        },
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "screen": [
+            383,
+            392
+          ],
+          "rgb": [
+            73,
+            184,
+            114
+          ]
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "screen": [
+            533,
+            379
+          ],
+          "rgb": [
+            194,
+            42,
+            47
+          ]
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "screen": [
+            850,
+            387
+          ],
+          "rgb": [
+            19,
+            93,
+            205
+          ]
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "screen": [
+            693,
+            369
+          ],
+          "rgb": [
+            194,
+            205,
+            218
+          ]
+        }
+      ],
+      "drawCalls": 473
+    },
+    {
+      "file": "v3-check-4-remote-silver-to-purple-wide.png",
+      "key": "4-remote-silver-to-purple",
+      "title": "Check 4 — change ONE remote avatar (the silver fixture) to purple",
+      "label": "wide",
+      "world": {
+        "name": "red",
+        "energyHex": "ff5a6e",
+        "energyMaterialEmissiveHex": "ff5a6e"
+      },
+      "self": {
+        "id": "self",
+        "role": "self",
+        "colour": "green",
+        "materialName": "resident-green-body",
+        "emissiveHex": "3fc26a",
+        "vertexAverageHex": "4fba6f",
+        "note": null
+      },
+      "fixtures": [
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "materialName": "resident-green-body",
+          "emissiveHex": "3fc26a",
+          "vertexAverageHex": "5abd77",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "materialName": "resident-red-body",
+          "emissiveHex": "e0453f",
+          "vertexAverageHex": "d35c58",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "materialName": "resident-blue-body",
+          "emissiveHex": "2f6fe6",
+          "vertexAverageHex": "4b77da",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "purple",
+          "materialName": "resident-purple-body",
+          "emissiveHex": "9b3fd6",
+          "vertexAverageHex": "9a56cd",
+          "note": null
+        }
+      ],
+      "globalTint": {
+        "canvasCssFilter": "none",
+        "toneMappingExposure": 1,
+        "sceneOverlayMaterials": 0
+      },
+      "samples": [
+        {
+          "id": "self",
+          "role": "self",
+          "colour": "green",
+          "screen": [
+            639,
+            525
+          ],
+          "rgb": [
+            0,
+            134,
+            66
+          ]
+        },
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "screen": [
+            383,
+            392
+          ],
+          "rgb": [
+            53,
+            171,
+            102
+          ]
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "screen": [
+            533,
+            379
+          ],
+          "rgb": [
+            205,
+            60,
+            66
+          ]
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "screen": [
+            850,
+            387
+          ],
+          "rgb": [
+            19,
+            93,
+            205
+          ]
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "purple",
+          "screen": [
+            693,
+            369
+          ],
+          "rgb": [
+            170,
+            103,
+            218
+          ]
+        }
+      ],
+      "drawCalls": 473
+    },
+    {
+      "file": "v3-check-5-world-blue-wide.png",
+      "key": "5-world-blue",
+      "title": "Check 5 — restore the blue world; avatars keep their last colours",
+      "label": "wide",
+      "world": {
+        "name": "blue",
+        "energyHex": "7fc6ff",
+        "energyMaterialEmissiveHex": "7fc6ff"
+      },
+      "self": {
+        "id": "self",
+        "role": "self",
+        "colour": "green",
+        "materialName": "resident-green-body",
+        "emissiveHex": "3fc26a",
+        "vertexAverageHex": "4fba6f",
+        "note": null
+      },
+      "fixtures": [
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "materialName": "resident-green-body",
+          "emissiveHex": "3fc26a",
+          "vertexAverageHex": "5abd77",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "materialName": "resident-red-body",
+          "emissiveHex": "e0453f",
+          "vertexAverageHex": "d35c58",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "materialName": "resident-blue-body",
+          "emissiveHex": "2f6fe6",
+          "vertexAverageHex": "4b77da",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "purple",
+          "materialName": "resident-purple-body",
+          "emissiveHex": "9b3fd6",
+          "vertexAverageHex": "9a56cd",
+          "note": null
+        }
+      ],
+      "globalTint": {
+        "canvasCssFilter": "none",
+        "toneMappingExposure": 1,
+        "sceneOverlayMaterials": 0
+      },
+      "samples": [
+        {
+          "id": "self",
+          "role": "self",
+          "colour": "green",
+          "screen": [
+            639,
+            525
+          ],
+          "rgb": [
+            0,
+            96,
+            38
+          ]
+        },
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "screen": [
+            383,
+            392
+          ],
+          "rgb": [
+            73,
+            184,
+            114
+          ]
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "screen": [
+            533,
+            379
+          ],
+          "rgb": [
+            236,
+            111,
+            120
+          ]
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "screen": [
+            850,
+            387
+          ],
+          "rgb": [
+            54,
+            120,
+            217
+          ]
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "purple",
+          "screen": [
+            693,
+            369
+          ],
+          "rgb": [
+            133,
+            47,
+            200
+          ]
+        }
+      ],
+      "drawCalls": 463
+    },
+    {
+      "file": "v3-check-1-blue-world-purple-self-phone.png",
+      "key": "1-blue-world-purple-self",
+      "title": "Check 1 — blue world; local avatar purple; fixtures green, red, blue, silver",
+      "label": "phone",
+      "world": {
+        "name": "blue",
+        "energyHex": "7fc6ff",
+        "energyMaterialEmissiveHex": "7fc6ff"
+      },
+      "self": {
+        "id": "self",
+        "role": "self",
+        "colour": "purple",
+        "materialName": "resident-purple-body",
+        "emissiveHex": "9b3fd6",
+        "vertexAverageHex": "984fcb",
+        "note": null
+      },
+      "fixtures": [
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "materialName": "resident-green-body",
+          "emissiveHex": "3fc26a",
+          "vertexAverageHex": "5abd77",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "materialName": "resident-red-body",
+          "emissiveHex": "e0453f",
+          "vertexAverageHex": "d35c58",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "materialName": "resident-blue-body",
+          "emissiveHex": "2f6fe6",
+          "vertexAverageHex": "4b77da",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "materialName": "resident-silver-body",
+          "emissiveHex": "aebbcb",
+          "vertexAverageHex": "aab5c3",
+          "note": null
+        }
+      ],
+      "globalTint": {
+        "canvasCssFilter": "none",
+        "toneMappingExposure": 1,
+        "sceneOverlayMaterials": 0
+      },
+      "samples": [
+        {
+          "id": "self",
+          "role": "self",
+          "colour": "purple",
+          "screen": [
+            194,
+            567
+          ],
+          "rgb": [
+            91,
+            18,
+            155
+          ]
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "screen": [
+            101,
+            438
+          ],
+          "rgb": [
+            205,
+            84,
+            93
+          ]
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "screen": [
+            380,
+            446
+          ],
+          "rgb": [
+            19,
+            93,
+            205
+          ]
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "screen": [
+            241,
+            430
+          ],
+          "rgb": [
+            155,
+            172,
+            194
+          ]
+        }
+      ],
+      "drawCalls": 238
+    },
+    {
+      "file": "v3-check-2-world-red-phone.png",
+      "key": "2-world-red",
+      "title": "Check 2 — change ONLY the world to red",
+      "label": "phone",
+      "world": {
+        "name": "red",
+        "energyHex": "ff5a6e",
+        "energyMaterialEmissiveHex": "ff5a6e"
+      },
+      "self": {
+        "id": "self",
+        "role": "self",
+        "colour": "purple",
+        "materialName": "resident-purple-body",
+        "emissiveHex": "9b3fd6",
+        "vertexAverageHex": "984fcb",
+        "note": null
+      },
+      "fixtures": [
+        {
+          "id": "fixture-green",
+          "role": "remote",
+          "colour": "green",
+          "materialName": "resident-green-body",
+          "emissiveHex": "3fc26a",
+          "vertexAverageHex": "5abd77",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "materialName": "resident-red-body",
+          "emissiveHex": "e0453f",
+          "vertexAverageHex": "d35c58",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "materialName": "resident-blue-body",
+          "emissiveHex": "2f6fe6",
+          "vertexAverageHex": "4b77da",
+          "note": "local fixture"
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "materialName": "resident-silver-body",
+          "emissiveHex": "aebbcb",
+          "vertexAverageHex": "aab5c3",
+          "note": null
+        }
+      ],
+      "globalTint": {
+        "canvasCssFilter": "none",
+        "toneMappingExposure": 1,
+        "sceneOverlayMaterials": 0
+      },
+      "samples": [
+        {
+          "id": "self",
+          "role": "self",
+          "colour": "purple",
+          "screen": [
+            194,
+            567
+          ],
+          "rgb": [
+            91,
+            18,
+            155
+          ]
+        },
+        {
+          "id": "fixture-red",
+          "role": "remote",
+          "colour": "red",
+          "screen": [
+            101,
+            438
+          ],
+          "rgb": [
+            194,
+            42,
+            47
+          ]
+        },
+        {
+          "id": "fixture-blue",
+          "role": "remote",
+          "colour": "blue",
+          "screen": [
+            380,
+            446
+          ],
+          "rgb": [
+            19,
+            93,
+            205
+          ]
+        },
+        {
+          "id": "fixture-silver",
+          "role": "remote",
+          "colour": "silver",
+          "screen": [
+            241,
+            430
+          ],
+          "rgb": [
+            155,
+            172,
+            194
+          ]
+        }
+      ],
+      "drawCalls": 248
+    }
+  ],
+  "checkVerdicts": [
+    {
+      "key": "1-blue-world-purple-self",
+      "world": "blue",
+      "self": "purple",
+      "fixtures": "green:green red:red blue:blue silver:silver",
+      "changedFromPrevious": "baseline",
+      "otherFixturesUnchanged": true,
+      "globalTint": "none"
+    },
+    {
+      "key": "2-world-red",
+      "world": "red",
+      "self": "purple",
+      "fixtures": "green:green red:red blue:blue silver:silver",
+      "changedFromPrevious": "world",
+      "otherFixturesUnchanged": true,
+      "globalTint": "none"
+    },
+    {
+      "key": "3-self-green",
+      "world": "red",
+      "self": "green",
+      "fixtures": "green:green red:red blue:blue silver:silver",
+      "changedFromPrevious": "self",
+      "otherFixturesUnchanged": true,
+      "globalTint": "none"
+    },
+    {
+      "key": "4-remote-silver-to-purple",
+      "world": "red",
+      "self": "green",
+      "fixtures": "green:green red:red blue:blue silver:purple",
+      "changedFromPrevious": "fixture-silver",
+      "otherFixturesUnchanged": true,
+      "globalTint": "none"
+    },
+    {
+      "key": "5-world-blue",
+      "world": "blue",
+      "self": "green",
+      "fixtures": "green:green red:red blue:blue silver:purple",
+      "changedFromPrevious": "world",
+      "otherFixturesUnchanged": true,
+      "globalTint": "none"
+    }
+  ],
+  "tour": {
+    "file": "v3-camera-movement.webm",
+    "durationMs": 114361,
+    "frames": [
+      {
+        "file": "v3-tour-frame-1.png",
+        "atMs": 7369,
+        "view": "match-entrance"
+      },
+      {
+        "file": "v3-tour-frame-2.png",
+        "atMs": 17065,
+        "view": "match-entrance"
+      },
+      {
+        "file": "v3-tour-frame-3.png",
+        "atMs": 29781,
+        "view": "match-entrance"
+      },
+      {
+        "file": "v3-tour-frame-4.png",
+        "atMs": 42708,
+        "view": "match-entrance"
+      },
+      {
+        "file": "v3-tour-frame-5.png",
+        "atMs": 54194,
+        "view": "match-entrance"
+      },
+      {
+        "file": "v3-tour-frame-6.png",
+        "atMs": 66672,
+        "view": "match-entrance"
+      },
+      {
+        "file": "v3-tour-frame-7-drag-look.png",
+        "note": "after a 12-step pointer drag (look)"
+      },
+      {
+        "file": "v3-tour-frame-8-dolly.png",
+        "note": "after wheel dolly and arrow keys (move)"
+      }
+    ],
+    "order": [
+      "establishing",
+      "in-world",
+      "match-entrance",
+      "drag look",
+      "wheel dolly + arrow keys"
+    ]
+  },
+  "practice": {
+    "file": "v3-practice-preview.webm",
+    "completed": true,
+    "steps": [
+      {
+        "file": "v3-practice-1-enter.png",
+        "step": "enter",
+        "detail": "entering the practice zone (camera only — nothing about the account changes)",
+        "atMs": 11529
+      },
+      {
+        "file": "v3-practice-2-positions.png",
+        "step": "positions",
+        "detail": "two local proxies take the marks: your colour and a labelled buddy fixture",
+        "atMs": 26115
+      },
+      {
+        "file": "v3-practice-3-guard.png",
+        "step": "guard",
+        "detail": "both in guard",
+        "atMs": 36432
+      },
+      {
+        "file": "v3-practice-4-strike.png",
+        "step": "strike",
+        "detail": "your proxy strikes (right arm extends)",
+        "atMs": 47151
+      },
+      {
+        "file": "v3-practice-5-block.png",
+        "step": "block",
+        "detail": "the buddy proxy blocks (both arms rise)",
+        "atMs": 57213
+      },
+      {
+        "file": "v3-practice-6-evade.png",
+        "step": "evade",
+        "detail": "the buddy proxy evades (slips sideways)",
+        "atMs": 67871
+      },
+      {
+        "file": "v3-practice-7-reset.png",
+        "step": "reset",
+        "detail": "both return to guard, then the marks clear",
+        "atMs": 78652
+      },
+      {
+        "file": "v3-practice-8-return.png",
+        "step": "return",
+        "detail": "returning to where you were",
+        "atMs": 89527
+      }
+    ],
+    "before": {
+      "view": "match-entrance",
+      "sceneChildren": 42
+    },
+    "after": {
+      "view": "match-entrance",
+      "sceneChildren": 42,
+      "proxiesLeft": 0,
+      "practice": null,
+      "selection": null
+    },
+    "earlyExit": {
+      "completed": false,
+      "afterExit": {
+        "view": "match-entrance",
+        "proxiesLeft": 0,
+        "practice": null,
+        "sceneChildren": 42
+      }
+    },
+    "cleanExit": true
+  }
+}

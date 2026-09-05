@@ -47,18 +47,91 @@ export function canvasTexture(w, h, draw) {
 }
 export function hex(n) { return '#' + ('000000' + (n >>> 0).toString(16)).slice(-6); }
 
+/* ---- procedural surface information (v4): roughness / bump maps so large
+   surfaces have physical variation without any texture asset ---------------- */
+const TEX = {};
+function seeded(seed) { let s = seed >>> 0 || 7; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+/* broad soft blotches + faint panel seams; mid grey so a material's roughness stays the average */
+export function surfaceTexture(kind = 'floor', size = 512) {
+  const key = kind + ':' + size; if (TEX[key]) return TEX[key];
+  const t = canvasTexture(size, size, (c, w, h) => {
+    /* three.js MULTIPLIES material.roughness by this map, so the map lives near white (≈0.86) and only
+       varies ±12%: blotches a touch smoother, grout / seams rougher, traffic bands slightly smoother */
+    const R = seeded(kind === 'floor' ? 11 : kind === 'wall' ? 23 : 37);
+    c.fillStyle = '#dcdcdc'; c.fillRect(0, 0, w, h);
+    const n = kind === 'floor' ? 60 : 36;
+    for (let i = 0; i < n; i++) { const x = R() * w, y = R() * h, r = (0.06 + R() * 0.22) * w, v = 196 + Math.floor(R() * 40) - 20, a = 0.10 + R() * 0.22; const g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(${v},${v},${v},${a})`); g.addColorStop(1, `rgba(${v},${v},${v},0)`); c.fillStyle = g; c.fillRect(x - r, y - r, 2 * r, 2 * r); }
+    /* seams: floor = large slabs; wall = panel courses (rougher, i.e. lighter) */
+    c.strokeStyle = 'rgba(250,250,250,0.7)'; c.lineWidth = kind === 'floor' ? 3 : 2;
+    const step = kind === 'floor' ? w / 4 : w / 6;
+    for (let i = 0; i <= (kind === 'floor' ? 4 : 6); i++) { const p = Math.round(i * step) + 0.5; c.beginPath(); c.moveTo(p, 0); c.lineTo(p, h); c.stroke(); if (kind === 'floor' || i % 2 === 0) { c.beginPath(); c.moveTo(0, p); c.lineTo(w, p); c.stroke(); } }
+    /* traffic softening near seams (floor only): a slightly smoother band */
+    if (kind === 'floor') { c.strokeStyle = 'rgba(200,200,200,0.35)'; c.lineWidth = 18; for (let i = 0; i <= 4; i++) { const p = Math.round(i * step) + 0.5; c.beginPath(); c.moveTo(p, 0); c.lineTo(p, h); c.stroke(); } }
+  });
+  t.colorSpace = THREE.NoColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8;
+  TEX[key] = t; return t;
+}
+/* soft radial blob: contact / hover shadows and light pools */
+export function blobTexture() {
+  if (TEX.blob) return TEX.blob;
+  const t = canvasTexture(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 4, 64, 64, 64); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.55, 'rgba(0,0,0,0.55)'); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
+  TEX.blob = t; return t;
+}
+
+/* ---- geometry helpers (v4): chamfered boxes and instanced window grids ---- */
+/* A box with CHAMFERED front/back edges (c wide) — the cheapest way to give light a place to live on
+   trims, frames, steps, rails and platforms. Centred at the origin; ~28 triangles. */
+export function chamferBox(w, h, d, c = 0.04) {
+  c = Math.max(0.001, Math.min(c, w / 2 - 0.001, h / 2 - 0.001, d / 2 - 0.001));
+  const s = new THREE.Shape(); const x = -(w / 2 - c), y = -(h / 2 - c), W = w - 2 * c, H = h - 2 * c;
+  s.moveTo(x, y); s.lineTo(x + W, y); s.lineTo(x + W, y + H); s.lineTo(x, y + H); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth: d - 2 * c, bevelEnabled: true, bevelThickness: c, bevelSize: c, bevelSegments: 1, curveSegments: 1 });
+  g.translate(0, 0, -(d - 2 * c) / 2);
+  g.computeVertexNormals();
+  return g;
+}
+/* One mesh for a facade of recessed window cells: InstancedMesh of thin boxes with per-window brightness
+   (instance colour × material colour). `material` should be an unlit MeshBasicMaterial (windows glow),
+   or a dark MeshStandardMaterial for unlit recesses. Local origin at the grid centre, cells in the XY plane facing +Z. */
+export function windowGrid({ cols = 8, rows = 6, cellW = 1.2, cellH = 1.6, gapX = 0.5, gapY = 0.6, depth = 0.08, onFraction = 0.55, seed = 1, material = null, tint = 0xc4d6f0, dimTint = 0x1c2838 }) {
+  const mat = material || new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: true });
+  const geo = new THREE.BoxGeometry(cellW, cellH, depth);
+  const mesh = new THREE.InstancedMesh(geo, mat, cols * rows);
+  const R = seeded(seed * 977 + 13), m4 = new THREE.Matrix4(), col = new THREE.Color(), on = new THREE.Color(tint), off = new THREE.Color(dimTint);
+  const totalW = cols * cellW + (cols - 1) * gapX, totalH = rows * cellH + (rows - 1) * gapY;
+  let i = 0;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    m4.makeTranslation(-totalW / 2 + cellW / 2 + c * (cellW + gapX), -totalH / 2 + cellH / 2 + r * (cellH + gapY), 0);
+    mesh.setMatrixAt(i, m4);
+    const lit = R() < onFraction; col.copy(lit ? on : off); if (lit) col.multiplyScalar(0.42 + R() * 0.5);   /* lit windows: a spread of brightness, none blown out */
+    mesh.setColorAt(i, col); i++;
+  }
+  mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  mesh.userData.windows = { cols, rows, totalW, totalH };
+  return mesh;
+}
+
 export function createMaterials(themeIn) {
   const theme = resolveTheme(themeIn);
+  const floorTex = surfaceTexture('floor'), wallTex = surfaceTexture('wall');
   const m = {
     theme,
-    graphite: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphite, roughness: 0.5, metalness: 0.28 }),
-    graphiteDark: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphiteDark, roughness: 0.6, metalness: 0.25 }),
-    graphiteLight: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphiteLight, roughness: 0.55, metalness: 0.22 }),
+    graphite: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphite, roughness: 0.52, metalness: 0.3, roughnessMap: wallTex }),
+    graphiteDark: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphiteDark, roughness: 0.62, metalness: 0.25 }),
+    graphiteLight: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphiteLight, roughness: 0.58, metalness: 0.22, roughnessMap: floorTex }),
     platinum: new THREE.MeshStandardMaterial({ color: NEUTRALS.platinum, roughness: 0.26, metalness: 0.9 }),
     panel: new THREE.MeshStandardMaterial({ color: NEUTRALS.panel, roughness: 0.34, metalness: 0.5, flatShading: true }),
-    plaza: new THREE.MeshStandardMaterial({ color: 0x0c111b, roughness: 0.46, metalness: 0.26, envMapIntensity: 0.32, transparent: true, opacity: 0.88 }),
-    road: new THREE.MeshStandardMaterial({ color: NEUTRALS.road, roughness: 0.45, metalness: 0.3 }),
-    glass: new THREE.MeshPhysicalMaterial({ color: NEUTRALS.glassTint, roughness: 0.06, metalness: 0.15, transparent: true, opacity: 0.38, side: THREE.DoubleSide, envMapIntensity: 1.4 }),
+    /* the v4 physical family — the same dark world, differentiated by roughness and metalness, not by colour */
+    structural: new THREE.MeshStandardMaterial({ color: 0x151b26, roughness: 0.64, metalness: 0.82, roughnessMap: wallTex }),   /* dark structural metal: broad muted highlight */
+    composite: new THREE.MeshStandardMaterial({ color: 0x1d2636, roughness: 0.4, metalness: 0.36 }),                            /* satin graphite composite */
+    trim: new THREE.MeshStandardMaterial({ color: 0x9aa7bb, roughness: 0.16, metalness: 0.96 }),                                /* polished architectural trim */
+    trimSatin: new THREE.MeshStandardMaterial({ color: 0x8593a8, roughness: 0.36, metalness: 0.9 }),                            /* brushed / satin trim */
+    curb: new THREE.MeshStandardMaterial({ color: 0x38445a, roughness: 0.72, metalness: 0.12 }),                                /* raised edges, kerbs, steps */
+    arena: new THREE.MeshStandardMaterial({ color: 0x171a21, roughness: 0.88, metalness: 0.04 }),                               /* rubberised impact floor */
+    panelLit: new THREE.MeshStandardMaterial({ color: 0x1a2436, roughness: 0.5, metalness: 0.1, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */
+    plaza: new THREE.MeshStandardMaterial({ color: 0x0b1019, roughness: 0.56, metalness: 0.22, envMapIntensity: 0.3, roughnessMap: floorTex, bumpMap: floorTex, bumpScale: 0.003, transparent: true, opacity: 0.9 }),
+    road: new THREE.MeshStandardMaterial({ color: NEUTRALS.road, roughness: 0.5, metalness: 0.28, roughnessMap: floorTex }),
+    glass: new THREE.MeshPhysicalMaterial({ color: NEUTRALS.glassTint, roughness: 0.08, metalness: 0.15, transparent: true, opacity: 0.4, side: THREE.DoubleSide, envMapIntensity: 1.3 }),
     /* interior light: unlit cool white, dimmed by day */
     interior: new THREE.MeshBasicMaterial({ color: NEUTRALS.interior, toneMapped: true }),
     interiorSoft: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.5 }),
@@ -71,7 +144,7 @@ export function createMaterials(themeIn) {
     /* MAH MATCH competitive accent — the one place red is allowed as a world colour */
     matchRed: new THREE.MeshStandardMaterial({ color: 0x140a0e, emissive: 0xff3b57, emissiveIntensity: 1.1, roughness: 0.5, metalness: 0 })
   };
-  const baseEmissive = { energy: 1.3, energyLight: 1.7, matchRed: 1.1 };
+  const baseEmissive = { energy: 1.3, energyLight: 1.7, matchRed: 1.1, panelLit: 0.7 };
   const baseOpacity = { energySoft: 0.26, interiorSoft: 0.5 };
   m.interiorSoft.opacity = baseOpacity.interiorSoft;
   let lastState = null, diagnostic = false;
@@ -83,6 +156,7 @@ export function createMaterials(themeIn) {
     m.energy.emissiveIntensity = Math.min(diagnostic ? 1 : 9, baseEmissive.energy * k);
     m.energyLight.emissiveIntensity = Math.min(diagnostic ? 1 : 9, baseEmissive.energyLight * k);
     m.matchRed.emissiveIntensity = Math.min(diagnostic ? 1 : 9, baseEmissive.matchRed * k);
+    m.panelLit.emissiveIntensity = Math.min(diagnostic ? 0.6 : 9, baseEmissive.panelLit * (1 - d * 0.5));
     m.energySoft.opacity = diagnostic ? 0 : baseOpacity.energySoft * k;
     m.interiorSoft.opacity = baseOpacity.interiorSoft * (1 - d * 0.5);
     m.interior.color.setHex(NEUTRALS.interior).multiplyScalar(1 - d * 0.35);

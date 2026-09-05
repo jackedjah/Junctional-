@@ -18,8 +18,9 @@ export function buildGround(ctx) {
 
   /* 1. plaza: polished dark ground, semi-transparent over black so mirrored
      emissives read as wet reflections (see the assembly's reflection group) */
-  const plaza = new THREE.Mesh(new THREE.PlaneGeometry(260, 260), M.plaza);
-  plaza.rotation.x = -Math.PI / 2; plaza.renderOrder = 2; g.add(plaza);
+  const plaza = new THREE.Mesh(new THREE.PlaneGeometry(260, 260, 1, 1), M.plaza);
+  plaza.rotation.x = -Math.PI / 2; plaza.renderOrder = 2; plaza.receiveShadow = true; g.add(plaza);
+  if (M.plaza.roughnessMap) { M.plaza.roughnessMap.repeat.set(12, 12); }
   const under = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshBasicMaterial({ color: 0x02040a, fog: false }));
   under.rotation.x = -Math.PI / 2; under.position.y = -80; g.add(under);
   /* very faint paving seams: large slabs, not a glowing grid */
@@ -48,7 +49,7 @@ export function buildGround(ctx) {
   /* 2. aprons: raised slabs in front of the three destinations */
   function apron(x, z, w, d, rotY) {
     const a = new THREE.Mesh(new THREE.BoxGeometry(w, 0.16, d), M.graphiteLight);
-    a.position.set(x, 0.08, z); a.rotation.y = rotY; g.add(a);
+    a.position.set(x, 0.08, z); a.rotation.y = rotY; a.receiveShadow = true; g.add(a);
     const lip = new THREE.Mesh(new THREE.BoxGeometry(w, 0.02, 0.06), M.energySoft);
     lip.position.set(0, 0.09, d / 2 - 0.03); a.add(lip);
     return a;

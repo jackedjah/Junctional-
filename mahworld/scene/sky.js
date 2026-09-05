@@ -11,9 +11,10 @@
 import * as THREE from '../vendor/three/three.module.min.js';
 
 const KEYS = {
-  night: { top: 0x040a19, horizon: 0x10264c, fog: 0x0e2142, hemiSky: 0x5a83c8, hemiGround: 0x141c2c, hemiI: 1.2, sun: 0xa9c9ff, sunI: 0.75, fillI: 0.5, exposure: 1.0, stars: 1.0, haze: 0.5, infra: 1.0, sunDisc: 0, clouds: 0.12 },
-  dusk:  { top: 0x1a1a48, horizon: 0x7466b4, fog: 0x3c3672, hemiSky: 0x8a8ed4, hemiGround: 0x16162a, hemiI: 1.05, sun: 0xd8dbff, sunI: 1.0, fillI: 0.35, exposure: 1.0, stars: 0.35, haze: 0.55, infra: 0.8, sunDisc: 0.7, clouds: 0.3 },
-  day:   { top: 0x5f87bd, horizon: 0xc4d5ea, fog: 0xb3c6df, hemiSky: 0xcfdff3, hemiGround: 0x2a3340, hemiI: 0.85, sun: 0xf3f7ff, sunI: 2.3, fillI: 0.18, exposure: 1.02, stars: 0.0, haze: 0.22, infra: 0.3, sunDisc: 1, clouds: 0.42 }
+  night: { top: 0x040a19, mid: 0x091634, horizon: 0x10264c, fog: 0x0e2142, hemiSky: 0x5a83c8, hemiGround: 0x141c2c, hemiI: 1.15, sun: 0xa9c9ff, sunI: 0.8, fillI: 0.45, exposure: 1.0, stars: 1.0, haze: 0.5, infra: 1.0, sunDisc: 0, clouds: 0.12, bands: 0.42 },
+  dusk:  { top: 0x1a1a48, mid: 0x3d3688, horizon: 0x7466b4, fog: 0x3c3672, hemiSky: 0x8a8ed4, hemiGround: 0x16162a, hemiI: 1.0, sun: 0xd8dbff, sunI: 1.1, fillI: 0.32, exposure: 1.0, stars: 0.35, haze: 0.55, infra: 0.8, sunDisc: 0.7, clouds: 0.3, bands: 0.5 },
+  /* day: the sun is the KEY (light has a direction; shadows read), sky fill stays secondary */
+  day:   { top: 0x5f87bd, mid: 0x8fb0d8, horizon: 0xc4d5ea, fog: 0xb3c6df, hemiSky: 0xcfdff3, hemiGround: 0x2a3340, hemiI: 0.55, sun: 0xf3f7ff, sunI: 3.3, fillI: 0.12, exposure: 0.98, stars: 0.0, haze: 0.22, infra: 0.3, sunDisc: 1, clouds: 0.42, bands: 0.34 }
 };
 const c1 = new THREE.Color(), c2 = new THREE.Color();
 function lerpHex(a, b, t) { c1.setHex(a); c2.setHex(b); return c1.lerp(c2, t).getHex(); }
@@ -38,7 +39,9 @@ export function sunDirection(worldHour, out) {
   const h = ((worldHour % 24) + 24) % 24;
   const day = h >= 6 && h <= 18;
   const f = day ? (h - 6) / 12 : ((h > 18 ? h - 18 : h + 6) / 12);
-  const az = f * Math.PI, el = Math.sin(f * Math.PI) * 0.78;   /* noon ≈ 45°: the sun models the facades instead of grazing them */
+  /* noon ≈ 45° high and shifted toward +x: the key light comes from the front-right, so facades are modelled
+     and shadows fall across the plaza to the left instead of straight behind the buildings (brief §21, §40) */
+  const az = f * Math.PI - 0.62, el = Math.sin(f * Math.PI) * 0.78;
   out.set(Math.cos(az) * Math.cos(el), Math.sin(el), 0.6 * Math.sin(az) * Math.cos(el) + 0.3).normalize();
   return { day, dir: out };
 }
@@ -61,8 +64,9 @@ export function buildSky(ctx) {
   const dome = new THREE.Mesh(domeGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
   dome.renderOrder = -10; g.add(dome);
   function paintDome(k) {
-    const pos = domeGeo.attributes.position; const top = new THREE.Color(k.top), hor = new THREE.Color(k.horizon), below = hor.clone().multiplyScalar(0.55), tmp = new THREE.Color();
-    for (let i = 0; i < pos.count; i++) { const ny = pos.getY(i) / 900; if (ny >= 0) tmp.copy(hor).lerp(top, smooth(ny / 0.55)); else tmp.copy(hor).lerp(below, smooth(-ny / 0.2)); colours[i * 3] = tmp.r; colours[i * 3 + 1] = tmp.g; colours[i * 3 + 2] = tmp.b; }
+    /* three stops: horizon → mid (low sky, where the atmosphere is thickest) → zenith */
+    const pos = domeGeo.attributes.position; const top = new THREE.Color(k.top), mid = new THREE.Color(k.mid), hor = new THREE.Color(k.horizon), below = hor.clone().multiplyScalar(0.55), tmp = new THREE.Color();
+    for (let i = 0; i < pos.count; i++) { const ny = pos.getY(i) / 900; if (ny >= 0.18) tmp.copy(mid).lerp(top, smooth((ny - 0.18) / 0.5)); else if (ny >= 0) tmp.copy(hor).lerp(mid, smooth(ny / 0.18)); else tmp.copy(hor).lerp(below, smooth(-ny / 0.2)); colours[i * 3] = tmp.r; colours[i * 3 + 1] = tmp.g; colours[i * 3 + 2] = tmp.b; }
     domeGeo.attributes.color.needsUpdate = true;
   }
 
@@ -89,6 +93,14 @@ export function buildSky(ctx) {
   /* horizon haze: luminous urban depth behind everything */
   const haze = new THREE.Mesh(new THREE.PlaneGeometry(1400, 220), new THREE.MeshBasicMaterial({ map: glowTex, color: theme.energyDeep, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
   haze.position.set(0, 30, -520); g.add(haze);
+  /* atmospheric depth bands (v4): three translucent air layers between the city's depth layers —
+     what separates midground from background from the distant giants (brief §26) */
+  const bandTex = gradientTexture();
+  const bands = [[900, 110, 34, -262], [1400, 170, 52, -470], [2000, 260, 80, -690]].map(([w, h, y, z]) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: bandTex, color: 0x10264c, transparent: true, opacity: 0.4, depthWrite: false, fog: false })); m.position.set(0, y, z); m.renderOrder = -5; g.add(m); return m; });
+  /* a second, lower cloud deck that drifts: long soft masses under the high sprites (brief §25) */
+  const deck = new THREE.Group();
+  [[-420, 118, -430, 620, 70], [60, 132, -520, 760, 84], [520, 108, -400, 560, 64], [-120, 96, -330, 480, 54]].forEach(([x, y, z, w, h]) => { const s = new THREE.Sprite(cloudMat.clone()); s.position.set(x, y, z); s.scale.set(w, h, 1); s.userData.x0 = x; deck.add(s); });
+  g.add(deck);
 
   /* mountains: two dark ridges, fog-affected so they recede */
   const mountainMat = new THREE.MeshStandardMaterial({ color: 0x0c1322, roughness: 0.95, metalness: 0.0, flatShading: true });
@@ -104,11 +116,12 @@ export function buildSky(ctx) {
   };
   ridge(560, 11, 120, 240, 5); ridge(430, 9, 70, 150, 17);
 
-  /* restrained skyline: rounded towers, a few cylinders, one ring — quiet, softened, receding */
+  /* restrained skyline: rounded towers, a few cylinders, one ring — quiet, softened, receding.
+     v4: when city.js is present it owns the district; only the ring and the two far cylinders stay */
   const towerMat = new THREE.MeshStandardMaterial({ color: 0x131c2c, roughness: 0.6, metalness: 0.35 });
   const stripMat = new THREE.MeshBasicMaterial({ color: theme.energy, transparent: true, opacity: 0.35, fog: true });
   let s = 3; const rnd = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < (ctx.cityPresent ? 0 : 16); i++) {
     const a = Math.PI * 0.55 + (i / 15) * Math.PI * 0.9, r = 165 + rnd() * 70;
     const x = Math.cos(a) * r, z = -Math.abs(Math.sin(a) * r) - 40;
     if (Math.abs(x) < 26) continue;
@@ -169,6 +182,8 @@ export function buildSky(ctx) {
     stars.material.opacity = 0.85 * k.stars;
     haze.material.opacity = k.haze;
     clouds.children.forEach((c, i) => { c.material.opacity = k.clouds * (0.7 + (i % 3) * 0.15); c.material.color.setHex(clockState.daylight > 0.5 ? 0xe4edf9 : 0x8fb0e6); });
+    deck.children.forEach((c, i) => { c.material.opacity = k.clouds * (0.55 + (i % 2) * 0.2); c.material.color.setHex(clockState.daylight > 0.5 ? 0xd6e2f2 : 0x7f9fd6); });
+    bands.forEach((b, i) => { b.material.color.setHex(k.fog).lerp(c2.setHex(k.horizon), 0.35 + i * 0.2); b.material.opacity = k.bands * (0.7 + i * 0.15); });
     beams.forEach(b => { b.core.material.opacity = 0.8 * k.infra; b.glow.material.opacity = 0.09 * k.infra; });
     flows.forEach(f => { f.material.opacity = 0.13 * k.infra; });
     stripMat.opacity = 0.3 * (1 - clockState.daylight * 0.7);
@@ -182,7 +197,10 @@ export function buildSky(ctx) {
     }
     return k;
   }
-  function update(t) { flows.forEach((f, i) => { const k = state.k ? state.k.infra : 1; f.material.opacity = (0.13 + Math.sin(t * 0.00025 + i * 2.1) * 0.03) * k; }); }
+  function update(t) {
+    flows.forEach((f, i) => { const k = state.k ? state.k.infra : 1; f.material.opacity = (0.13 + Math.sin(t * 0.00025 + i * 2.1) * 0.03) * k; });
+    deck.children.forEach((c, i) => { c.position.x = c.userData.x0 + Math.sin(t * 0.00002 + i) * 40; });   /* an imperceptibly slow drift */
+  }
   /* live world-Theme change: only the ENERGY of the sky infrastructure follows (haze, tower strips, beams, flows) */
   function setTheme(t) {
     haze.material.color.setHex(t.energyDeep); stripMat.color.setHex(t.energy);
@@ -194,6 +212,14 @@ export function buildSky(ctx) {
   return { group: g, setTime, setTheme, update, beams, flows, additive: [sunHalo, moonHalo, haze].concat(beams.map(b => b.glow), flows) };
 }
 
+function gradientTexture() {
+  /* vertical alpha ramp: dense at the bottom, clear at the top */
+  const c = document.createElement('canvas'); c.width = 4; c.height = 128; const g = c.getContext('2d');
+  const r = g.createLinearGradient(0, 0, 0, 128);
+  r.addColorStop(0, 'rgba(255,255,255,0)'); r.addColorStop(0.45, 'rgba(255,255,255,0.35)'); r.addColorStop(1, 'rgba(255,255,255,0.9)');
+  g.fillStyle = r; g.fillRect(0, 0, 4, 128);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
 function radialTexture() {
   const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
   const r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
