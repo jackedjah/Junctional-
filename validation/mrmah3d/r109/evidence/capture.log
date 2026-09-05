@@ -1,0 +1,14 @@
+proof set written to /tmp/claude-0/-home-user-Junctional-/26202b52-dea2-5bed-a726-bbc766d8e027/scratchpad/r109/forensic-evidence
+m-mask-front waist 0.138 hip 0.263 B/W 1.91 | shoulderRun 0.382 shoulder/waist 2.77 | knee 0.090 calf 0.100
+   profile(t,central): 0.00:0.003 0.10:0.063 0.20:0.076 0.31:0.382 0.41:0.472 0.51:0.155 0.61:0.252 0.72:0.145 0.82:0.100 0.92:0.042
+m-mask-rear waist 0.136 hip 0.259 B/W 1.90 | shoulderRun 0.464 shoulder/waist 3.41 | knee 0.099 calf 0.108
+   profile(t,central): 0.00:0.005 0.10:0.212 0.20:0.069 0.31:0.384 0.41:0.466 0.51:0.160 0.62:0.249 0.72:0.143 0.82:0.099 0.92:0.041
+f-mask-front waist 0.086 hip 0.362 B/W 4.21 | shoulderRun 0.364 shoulder/waist 4.23 | knee 0.059 calf 0.081
+   profile(t,central): 0.00:0.003 0.10:0.063 0.20:0.076 0.31:0.004 0.41:0.132 0.51:0.362 0.61:0.196 0.72:0.100 0.82:0.081 0.92:0.026
+f-mask-rear waist 0.086 hip 0.356 B/W 4.14 | shoulderRun 0.357 shoulder/waist 4.15 | knee 0.080 calf 0.103
+   profile(t,central): 0.00:0.005 0.10:0.212 0.20:0.069 0.31:0.296 0.41:0.128 0.51:0.356 0.62:0.199 0.72:0.096 0.82:0.080 0.92:0.026
+fna-front waist 0.086 hip 0.257 B/W 2.99 shoulderRun 0.317
+   profile(t:width): 0.00:0.003 0.10:0.063 0.20:0.076 0.31:0.004 0.41:0.134 0.51:0.250 0.61:0.196 0.72:0.100 0.82:0.081 0.92:0.026
+fna-rear waist 0.086 hip 0.264 B/W 3.07 shoulderRun 0.316
+   profile(t:width): 0.00:0.005 0.10:0.212 0.20:0.069 0.31:0.296 0.41:0.128 0.51:0.264 0.62:0.199 0.72:0.096 0.82:0.080 0.92:0.026
+EVIDENCE-DONE

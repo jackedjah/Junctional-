@@ -1,0 +1,402 @@
+diff --git a/mrmah3d/core/character/variants.js b/mrmah3d/core/character/variants.js
+index e26138a..9e8d928 100644
+--- a/mrmah3d/core/character/variants.js
++++ b/mrmah3d/core/character/variants.js
+@@ -7,76 +7,116 @@
+    `buildBody` / `buildLimbs` pipeline from a different PROPORTION SET. This
+    module returns that set; the male canon (proportions.js) is the default.
+ 
+-   The female prototype is measured off `reference/mrmah-refF-r96-female.png`
+-   (941 x 1672; apex y 230, tip y 1435, 400 px to the unit, centre x 470):
+-
+-     deltoid outer edge      0.42   (male 0.672)
+-     chest, with the bust    0.325  at y 2.07
+-     waist                   0.18   at y 1.67  — higher and tighter than his
+-     hip / upper thigh       0.31   at y 1.40  — the broad transition
+-     lower body              0.24 at 1.07, 0.14 at 0.70, one taper to the point
+-     upper arm radius        ~0.08, forearm ~0.065 — slim, long
+-     raised hand             presents the crystal at y ~2.4, above the shoulder
+-
+-   Same species, feminine athletic: narrower shoulders, an integrated bust as
+-   two faceted upper-chest volumes on a continuous ribcage (never two spheres),
+-   a smaller waist, a broader hip transition, a larger but restrained glute
+-   region, and — as canon demands — ONE lower crystalline body. */
++   R109 — MRS. MAH IS SOLVED AS A COMPLETE FEMALE FIGURE, against
++   `reference/mrmah-refN-r109-female-hero.png` (the hero front) and
++   `reference/mrmah-refN-r109-female-sheet.png` (front / side / back / side
++   and the chest, shoulder, back, glute and lower-body details). Read by hand
++   off a 5% grid on the hero (full width as a fraction of character height,
++   head apex t 0, point t 1; 1024 x 1536, apex y 2.5%, point y 90%):
++
++     shoulder span            0.34  at t 0.26
++     chest, with the bust     0.24  at t 0.30   — the breast's lateral edge
++     waist (narrowest)        0.133 at t 0.40   — SHORT
++     glute / upper-thigh max  0.36  at t 0.53   — 2.7 x the waist, 1.06 x the shoulders
++     t 0.67 / 0.74 / 0.81 / 0.91   0.22 / 0.17 / 0.11 / 0.05 — one convex sweep
++     upper arm at the belly   ~0.07-0.078;  forearm at its bloom ~0.06
++     side view: the breast projects ~0.36 forward of the axis at its apex and
++       the abdomen sits ~0.22; the glute projects ~0.30 behind the axis at
++       the max and the thigh ~0.26 in front — a cross-section twice as wide
++       as it is deep.
++
++   This build keeps the canonical head (0.24 of height where the reference's
++   is 0.17) and the R103 girdle at 2.120, so her torso is shorter than the
++   reference's between the shoulder line and the waist; the waist stays on
++   the 1.690 row (t 0.44) and everything below it is authored to the
++   reference's t targets. Character height is 3.0 units: t = 1 - y / 3. */
+ 
+ import { MALE, SHAPES } from './proportions.js';
+ import { REGIONS } from './regions.js';
+ 
+ var lobe = SHAPES.lobe;
++var dome = SHAPES.dome;
++function domePair(a, centre, hw) { return dome(a, centre, hw) + dome(a, -centre, hw); }
++
++/* THE BUST — a breast VOLUME emerging from a ribcage that keeps the male's
++   flank and back architecture.
++
++   R109. The R96-R108 bust was two Gaussian lobes on a chest ring whose depth
++   (`d` 0.276) was already the deepest on the body, so the whole chest was a
++   barrel and the "bust" a 0.07 swell on it — shallow in the side silhouette
++   however the lobes were scaled. Here the ribcage is THIN (d 0.20-0.21, a
++   back at -0.19) and each breast is a compact DOME (`SHAPES.dome`, zero
++   outside its half-width) whose amplitude walks up and down the rings: a
++   long superior slope from under the clavicle (0.20 at 2.050), the apex at
++   1.945 (0.80: the 30-degree vertex lands 0.32 forward, 0.14 proud of the
++   abdominal plane under it), a full lower half (0.70 at 1.895) and a fast
++   turn under into the inframammary fold ring (0.18 at 1.845, `cav`), so
++   the side view shows a real projection with an underside.
+ 
+-/* THE BUST — the pectoral shelves' feminine counterpart: two rounder lobes
+-   set lower and closer to the sternum, projecting further forward, on a
+-   ribcage that keeps its side planes. The sternum valley stays so the chest
+-   diamond sits between two volumes rather than on a dome. */
+-function bustShape(k) {
++   Designed onto the 24-side ring's vertices (15 degrees each): the dome is
++   centred at 0.60 rad with a 0.38 half-width, so the 0 vertex is the
++   sternum floor, the 15 vertex barely rises (the cleavage the chest diamond
++   sits in — at a wider dome the emblem's corners went under the medial
++   slope), the 30 vertex is the apex, the 45 vertex the rounded lateral
++   edge, and the 60 vertex is untouched, which leaves the serratus hollow
++   under the lateral breast before the lat flare picks the contour up again
++   at 105 degrees. `chestShape(1e-3, ...)` returns the male's lat, insertion
++   and back terms with the pec and sternum divided out — the same trick the
++   male table uses to scale the pec alone — so her back is authored the
++   same way his is. */
++function bustShape(o) {
++  var dk = o.dome || 0, sk = o.sternum == null ? 0.14 : o.sternum;
++  var dc = o.domeAt == null ? 0.66 : o.domeAt, dw = o.domeW == null ? 0.60 : o.domeW;
++  var flank = SHAPES.chestShape(1e-3, o.erector == null ? 0.10 : o.erector, o.lat == null ? 0.30 : o.lat, {
++    insertion: o.insertion == null ? 0.06 : o.insertion, kite: o.kite, valley: o.valley, valleyAt: o.valleyAt,
++    latBack: o.latBack, spine: o.spine, erectorAt: o.erectorAt, erectorW: o.erectorW, teres: o.teres, flat: o.flat
++  });
+   return function (a) {
+-    var sternum = -lobe(a, 0, 0.34) * 0.200;
+-    var bust = (lobe(a, 0.58, 0.50) + lobe(a, -0.58, 0.50)) * 0.470;
+-    var lat = (lobe(a, Math.PI / 2, 0.62) + lobe(a, -Math.PI / 2, 0.62)) * 0.070;
+-    var back = lobe(a, Math.PI, 0.90) * -0.110;
+-    return 1 + (sternum + bust + lat + back) * k;
++    return flank(a) - lobe(a, 0, 0.30) * sk + domePair(a, dc, dw) * dk;
+   };
+ }
+-/* THE HIP — the quad's feminine counterpart: the lateral sweep sits higher
+-   and broader, the front seam is shallower, and the back carries a positive
+-   glute lobe where the male's is held negative. */
+-/* R102: `gluteK` scales the posterior pair separately from the hip's sweep,
+-   so the rings can build a glute SHELF under the waist, a full belly, and an
+-   under-glute crease into the hamstring (`reference/mrmah-refK-r102-female-
+-   rear.png`: two full round masses with a cleft, upper shelf at t 0.43, max
+-   at t 0.49, crease at t 0.55). The cleft is what keeps two lobes from
+-   reading as one dome. */
+-/* R108: the four masses are scaled SEPARATELY — `k` for the whole, `gluteK`
+-   for the posterior pair, `quadK` for the front's seam and quad heads,
+-   `hamK` for the hamstring columns — so the pelvis rows can carry the glute
+-   shelf without a quad on the front, the thigh rows the quad without a glute
+-   behind, and the fold between them is the glute scale FALLING between two
+-   rings rather than a ring narrowed all round.
+-
+-   The glute is ONE large continuous belly per side (the R107 sheet's clay
+-   panel: an upper shelf, a posterior dome, a lateral sweep and a fold), not
+-   the R107 sphere pair: each belly is 0.44 rad wide and centred 35 degrees
+-   off the back, and the lateral sweep sits at ±1.52 so the multiplier RISES
+-   without a dip from the side (1.20) through 2.0 rad (1.34) to the apex
+-   (1.54) and only then falls into the cleft (0.75 at dead back) — one
+-   uninterrupted outer curve in the three-quarter, two masses from behind. */
++
++/* THE LOWER BODY — one mass, four named muscle groups, authored by the rule
++   of the male's `thighShape`: every amplitude is a FINAL multiplier and each
++   group has its own scale per ring so it can have an origin, a belly and an
++   insertion. `k` scales the lateral SWEEP (the hip's outer curve — the one
++   uninterrupted convex line from the waist to the taper), `gluteK` the
++   posterior pair with its cleft, `quadK` the front's seam and the two thigh
++   columns, `hamK` the hamstring columns under the fold. The signature is the
++   R108 contract; the table may also pass one options object in `k`
++   ({ sweep, glute, quad, ham, sacrum, gluteAt, gluteW }) when a ring needs
++   the sacral flat or a differently placed glute.
++
++   Cross-section, by angle from dead front (24 sides, a vertex every 15 deg):
++     0        seam    the channel between the two thigh columns (small: the
++                      reference's front is one mass with a value line)
++     +-40     head    one dome per thigh column, seam to side
++     +-86     sweep   the lateral hip / vastus sweep — the silhouette's extra
++     180-+33  glute   ONE compact dome per side, 0.68 rad half-width, so it
++                      reaches from the cleft round to 110 degrees and meets
++                      the sweep with no dip — a shelf on the upper rings,
++                      the apex at 1.430, its underside on 1.250
++     180      cleft   the central division (deep: half the ring at the apex)
++     180      sacrum  a shallow flat between the upper glutes (upper rings)
++     180-+29  ham     the hamstring columns below the fold, with their own cleft
++
++   R109 replaces the R108 Gaussian bellies (`SHAPES.belly`) here with compact
++   domes for the reason recorded for the male: at 24 sides a Gaussian^0.55
++   is still 0.58 one width from its centre and every lobe leaked into its
++   neighbours — the two glute bellies filled the sacrum and reached the hip. */
+ function hipShape(k, gluteK, quadK, hamK) {
+-  var gk = gluteK == null ? 1.0 : gluteK;
+-  var qk = quadK == null ? 0.35 : quadK;
+-  var hk = hamK == null ? 0 : hamK;
++  var o = (k !== null && typeof k === 'object') ? k : { sweep: k, glute: gluteK, quad: quadK, ham: hamK };
++  var sw = o.sweep || 0, gk = o.glute || 0, qk = o.quad || 0, hk = o.ham || 0, sac = o.sacrum || 0;
++  var gC = o.gluteAt == null ? 0.72 : o.gluteAt, gW = o.gluteW == null ? 0.78 : o.gluteW;
++  var PI = Math.PI;
+   return function (a) {
+-    var seam = -lobe(a, 0, 0.40) * 0.460 * qk;   /* three vertices wide on an 18-sided ring: at 0.26 the channel was one vertex and read as a line in the clay */
+-    var heads = (SHAPES.belly(a, 0.58, 0.42) + SHAPES.belly(a, -0.58, 0.42)) * 0.380 * qk;
+-    var sweep = (SHAPES.belly(a, 1.52, 0.50) + SHAPES.belly(a, -1.52, 0.50)) * 0.160;
+-    var glute = ((SHAPES.belly(a, Math.PI - 0.62, 0.44) + SHAPES.belly(a, -Math.PI + 0.62, 0.44)) * 0.520 - lobe(a, Math.PI, 0.20) * 0.600) * gk;
+-    /* the hamstring pair: probed at y 1.03 a 0.10 cleft left the columns 0.008
+-       apart in z — a line; the cleft is 0.22 now, a valley */
+-    var ham = ((SHAPES.belly(a, Math.PI - 0.42, 0.34) + SHAPES.belly(a, -Math.PI + 0.42, 0.34)) * 0.240 - lobe(a, Math.PI, 0.16) * 0.320) * hk;
+-    return 1 + (seam + heads + sweep + glute + ham) * k;
++    var seam = -dome(a, 0, 0.30) * 0.13 * qk;
++    var heads = domePair(a, 0.70, 0.75) * 0.20 * qk;
++    var sweep = domePair(a, 1.50, 0.80) * sw;
++    var glute = (domePair(a, PI - gC, gW) * 0.50 - dome(a, PI, 0.52) * 0.68) * gk;
++    var sacrum = -dome(a, PI, 0.45) * sac;
++    var ham = (domePair(a, PI - 0.50, 0.45) * 0.18 - dome(a, PI, 0.22) * 0.15) * hk;
++    return 1 + seam + heads + sweep + glute + sacrum + ham;
+   };
+ }
+ 
+@@ -87,81 +127,85 @@ function femaleProportions() {
+   var taper = S.taperClasses, neck = S.neckClasses;
+ 
+   var rings = [
+-    /* R108 — THE LOWER BODY, re-authored against the R107 Mrs. Mah sheet.
+-       Read on its front figure (waist 12% of the crop at y 40%, hip 36% at
+-       52-55%, thigh 30% at 62%, knee 16% at 70%, calf 19% at 75%, 10% at
+-       80%): hip / waist 3.0, thigh 0.83 of the hip, knee 0.44, calf 0.53.
+-       The R107 table's hip row (0.395, silhouette 0.478) measured 3.6
+-       waists on the front mask WITH THE ARMS HIDDEN (4.0 with the lowered
+-       forearm swallowed into the central run — measure the lower body with
+-       `mrmah-limbs` hidden or the arm is counted) and read as a ball under a
+-       waist; a first cut at 0.274 measured 2.42, and the max row is 0.315
+-       now for the brief's 2.8. The drama is in the SHAPE: waist -> pelvic
+-       transition -> glute shelf -> outward sweep -> apex -> lower glute ->
+-       fold -> quad / hamstring sweep -> knee -> calf -> Achilles compression
+-       -> ONE point. */
++    /* R109 — THE LOWER BODY IS ONE DRAWN LINE. Targets (full width / height
++       at t): 0.05 @ 0.91, 0.11 @ 0.81, 0.17 @ 0.74, 0.22 @ 0.67, 0.30 @ 0.60,
++       0.345 @ 0.52-0.54 (the max), then the explosive-but-smooth expansion up
++       to a SHORT waist of 0.12-0.13. Monotonic below the max with one gentle
++       slope change near t 0.7 (the reference's "knee landmark (subtle)"),
++       NO fold pinch followed by a second bulge (R108 d's 1.185 / 1.040 rows)
++       and NO calf (R108's 0.740 / 0.650 bloom): the sheet's lower-body panel
++       says "no separate calf bulge — smooth, divine taper", and lower-leg
++       anatomy lives in the longitudinal facet columns and the value alone.
++       A ring's silhouette is `w` times the shape at the side angle; the
++       widths below are pre-divided by the sweep. */
+     { y: 0.000, w: 0.006, d: 0.004, fg: [2, 2], columns: true, classesAt: taper },
+-    { y: 0.150, w: 0.026, d: 0.020, fg: [2, 2], facet: 0.0060, crystal: 0.0180, crystalY: 0.0040, columns: true, classesAt: taper },
+-    { y: 0.400, w: 0.062, d: 0.052, fg: [2, 2], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20, columns: true, classesAt: taper },
+-    /* the Achilles compression under the calf: 0.31 of the hip at t 0.81 */
+-    { y: 0.560, w: 0.132, d: 0.116, fg: [2, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.22,
+-      shape: S.calfShape(0.50), columns: true, classesAt: taper },
+-    /* the calf — the secondary sweep. Its mass is POSTERIOR (calfShape's
+-       gastrocnemius bellies), so from the front the width barely exceeds the
+-       knee's and the outline is one long taper with a slower passage; a first
+-       cut 15% wider than the knee made the knee a groove all round with a
+-       bead under it (a ring narrower than both neighbours is a groove) */
+-    { y: 0.650, w: 0.180, d: 0.170, fg: [1, 2],   /* R108 d: the CALF BLOOM */ facet: -0.0055, crystal: 0.0280, crystalY: 0.0070, hero: 0.26,
+-      shape: S.calfShape(1.0), columns: true, classesAt: taper },
+-    { y: 0.740, w: 0.170, d: 0.156, fg: [1, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.16,
+-      shape: S.calfShape(0.90), columns: true, classesAt: taper },
+-    /* the knee — the controlled compression, read in depth by kneeShape's
+-       notch; in width it is an inflection of the taper, not a band */
+-    { y: 0.820, w: 0.130, d: 0.120, fg: [1, 2],   /* R108 d: the knee PINCH */ facet: -0.0045, crystal: 0.0220, crystalY: 0.0050, hero: 0.08,
+-      shape: S.kneeShape(0.80), columns: true, classesAt: taper, cav: 0.35 },   /* R108: softer than the male's — at 1.0 / 0.45 it read as a joint ring from behind */
+-    /* the long quad / hamstring sweep: quad heads and seam at full strength,
+-       two hamstring columns behind (their depth carries the posterior thigh
+-       back out under the fold), no glute */
+-    { y: 0.910, w: 0.205, d: 0.186, fg: [1, 3], facet: -0.0050, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
+-      shape: hipShape(0.70, 0.0, 0.95, 0.70), columns: true, classesAt: taper },
+-    { y: 1.040, w: 0.272, d: 0.250, fg: [1, 3],   /* R108 d: the hamstring / quad BULGE — wider than the fold above it (round b: 0.264 -> 0.272 against a 0.242 fold, so the second bulge reads from the front too) */ facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+-      shape: hipShape(0.85, 0.0, 1.0, 1.0), columns: true, classesAt: taper },
+-    /* the glute FOLD: the posterior pair falls from 1.0 to 0.25 between this
+-       ring and the one above, so the dome's underside turns in over the
+-       hamstring columns that begin here; the crease is a cavity, not a slot */
+-    { y: 1.185, w: 0.242, d: 0.210, fg: [1, 3],   /* R108 d: the FOLD is a short pinch between the glute and the hamstring bulge */ facet: 0.0070, zc: -0.012, crystal: 0.0340, crystalY: 0.0090, hero: 0.22,
+-      shape: hipShape(0.95, 0.25, 0.85, 0.60), columns: false, classesAt: null, zoneAt: S.quadZone(1), cav: 0.55 },
+-    /* the lower glute curvature — still full behind, the quad beginning in front */
+-    { y: 1.300, w: 0.305, d: 0.278, fg: [1, 3], facet: -0.0060, zc: -0.030, crystal: 0.0340, crystalY: 0.0090, hero: 0.20,
+-      shape: hipShape(1.0, 1.0, 0.60), zoneAt: S.quadZone(1), cav: 0.20 },
+-    /* the muscle-bust APEX — widest below the waist, maximum posterior projection */
+-    { y: 1.430, w: 0.315, d: 0.292, fg: [1, 3], facet: -0.0070, zc: -0.035, crystal: 0.0340, crystalY: 0.0090, hero: 0.16,
+-      shape: hipShape(1.0, 1.0, 0.40), zoneAt: S.quadZone(0) },
+-    /* the glute SHELF and the outward acceleration out of the pelvis: the
+-       pair is already FULL here, one ring under the transition */
+-    { y: 1.545, w: 0.280, d: 0.250, fg: [1, 3], facet: 0.0050, zc: -0.025, crystal: 0.0280, crystalY: 0.0070, hero: 0.10,
+-      shape: hipShape(0.95, 1.0, 0.30), zoneAt: S.quadZone(0) },
+-    /* the gradual pelvic transition out of the waist — NO glute yet (the
+-       lower back is still the lumbar plane), so the shelf is the step to the
+-       full pair one ring down; with 0.30 of the pair here the spline rounded
+-       the shelf into a dome that began at the waist */
+-    { y: 1.625, w: 0.200, d: 0.180, fg: [1, 3],   /* R108 d: the bloom begins straight under the waist */ facet: -0.0050, zc: -0.010, crystal: 0.0240, crystalY: 0.0060, hero: 0.06,
+-      shape: hipShape(0.60, 0.0, 0.25), zoneAt: S.coreZone(0) },
+-    /* THE WAIST — higher and tighter than his (R102: 0.30 of her shoulders) */
+-    { y: 1.690, w: 0.118, d: 0.108, fg: [1, 1], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060,
+-      shape: S.coreShape(1.0, 0.05), hero: 0.04, zoneAt: S.coreZone(1), cav: 0.30 },
+-    { y: 1.770, w: 0.192, d: 0.162, fg: [1, 2], facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
+-      shape: S.coreShape(0.9, 0.16, 0.12), hero: 0.08, zoneAt: S.coreZone(2) },
+-    /* the under-bust */
+-    { y: 1.860, w: 0.236, d: 0.232, fg: [2, 2], facet: -0.0050, crystal: 0.0260, crystalY: 0.0060,
+-      shape: bustShape(0.85), hero: 0.10, zoneAt: S.coreZone(3) },
+-    /* THE BUST — two integrated volumes either side of the sternum */
+-    { y: 1.970, w: 0.262, d: 0.276, fg: [2, 2], facet: 0.0055, crystal: 0.0300, crystalY: 0.0070,
+-      shape: bustShape(1.0), hero: 0.34, zoneAt: S.pecZone(0) },
+-    { y: 2.050, w: 0.250, d: 0.220, fg: [2, 2], facet: -0.0045, crystal: 0.0280, crystalY: 0.0060,
+-      shape: S.chestShape(0.55), hero: 0.40, zoneAt: S.pecZone(1) },   /* R103: the girdle sits 0.05 lower, as the male's does */
+-    /* the shoulder line, narrower, with the same collar */
+-    { y: 2.120, w: 0.236, d: 0.184, fg: [2, 2], facet: 0.0055, crystal: 0.0300, crystalY: 0.0060,
++    { y: 0.130, w: 0.032, d: 0.024, fg: [2, 2], facet: 0.0060, crystal: 0.0180, crystalY: 0.0040, columns: true, classesAt: taper },
++    { y: 0.270, w: 0.075, d: 0.052, fg: [2, 2], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20, columns: true, classesAt: taper },
++    { y: 0.420, w: 0.115, d: 0.078, fg: [2, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.22, columns: true, classesAt: taper },
++    { y: 0.570, w: 0.162, d: 0.100, fg: [1, 3], facet: -0.0055, crystal: 0.0260, crystalY: 0.0060, hero: 0.24,
++      shape: hipShape({ sweep: 0.02, quad: 0.25 }), columns: true, classesAt: taper },
++    { y: 0.680, w: 0.207, d: 0.120, fg: [1, 3], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.20,
++      shape: hipShape({ sweep: 0.04, quad: 0.40 }), columns: true, classesAt: taper },
++    /* the knee landmark — an inflection of the taper read in value (cav), never a band */
++    { y: 0.780, w: 0.241, d: 0.145, fg: [1, 4], facet: -0.0045, crystal: 0.0240, crystalY: 0.0050, hero: 0.14,
++      shape: hipShape({ sweep: 0.06, quad: 0.55, ham: 0.15 }), columns: true, classesAt: taper, cav: 0.15 },
++    { y: 0.870, w: 0.266, d: 0.160, fg: [1, 4], facet: 0.0050, crystal: 0.0280, crystalY: 0.0070, hero: 0.18,
++      shape: hipShape({ sweep: 0.09, quad: 0.75, ham: 0.45 }), columns: true, classesAt: taper },
++    { y: 0.990, w: 0.297, d: 0.185, fg: [1, 4], facet: -0.0050, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
++      shape: hipShape({ sweep: 0.11, quad: 0.90, ham: 0.75 }), columns: true, classesAt: taper },
++    { y: 1.120, w: 0.353, d: 0.220, fg: [1, 4], facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
++      shape: hipShape({ sweep: 0.14, quad: 1.00, ham: 1.00 }), columns: true, classesAt: taper },
++    /* the glute / hamstring transition: the pair's underside turns in over
++       the hamstring columns that begin here. A value crease (cav), not a
++       silhouette pinch — the width keeps falling through it */
++    { y: 1.250, w: 0.407, d: 0.237, fg: [1, 4], facet: 0.0070, crystal: 0.0340, crystalY: 0.0090, hero: 0.22,
++      shape: hipShape({ sweep: 0.16, quad: 1.00, glute: 0.20, ham: 0.60 }), zoneAt: S.quadZone(1), cav: 0.45 },
++    /* the lower glute curvature — the pair still full behind, the thigh front at its fullest */
++    { y: 1.340, w: 0.420, d: 0.257, fg: [2, 2], facet: -0.0060, crystal: 0.0340, crystalY: 0.0090, hero: 0.20,
++      shape: hipShape({ sweep: 0.17, quad: 1.00, glute: 0.95, ham: 0.10 }), zoneAt: S.quadZone(1), cav: 0.10 },
++    /* THE MAXIMUM — widest point and maximum posterior projection (t 0.52) */
++    { y: 1.430, w: 0.417, d: 0.250, fg: [2, 2], facet: -0.0070, crystal: 0.0340, crystalY: 0.0090, hero: 0.16,
++      shape: hipShape({ sweep: 0.17, quad: 0.85, glute: 1.00 }), zoneAt: S.quadZone(0) },
++    /* the outward acceleration out of the pelvis: the pair is nearly full */
++    { y: 1.490, w: 0.397, d: 0.242, fg: [2, 2], facet: 0.0050, crystal: 0.0300, crystalY: 0.0080, hero: 0.12,
++      shape: hipShape({ sweep: 0.16, quad: 0.55, glute: 0.95, sacrum: 0.08 }), zoneAt: S.quadZone(0) },
++    /* the upper glute SHELF and the iliac sweep — the explosive part; the
++       sacral flat sits between the two shelves */
++    { y: 1.560, w: 0.324, d: 0.218, fg: [2, 2], facet: -0.0050, crystal: 0.0280, crystalY: 0.0070, hero: 0.10,
++      shape: hipShape({ sweep: 0.12, quad: 0.30, glute: 0.78, sacrum: 0.15 }), zoneAt: S.quadZone(0) },
++    /* the pelvic transition straight under the waist: the lumbar plane
++       rounding into the sacrum, the glutes beginning as a slope */
++    { y: 1.630, w: 0.229, d: 0.171, fg: [1, 3], facet: -0.0050, crystal: 0.0240, crystalY: 0.0060, hero: 0.06,
++      shape: hipShape({ sweep: 0.06, quad: 0.15, glute: 0.25, sacrum: 0.12 }), zoneAt: S.coreZone(0) },
++    /* THE WAIST — the narrowest point, SHORT: 0.122 of height in silhouette
++       (the reference's 0.133; R108's 0.086 was a pinched mesh) */
++    { y: 1.690, w: 0.176, d: 0.155, fg: [1, 1], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060,
++      shape: S.coreShape(1.0, 0.06, 0.0, 0.0, 0.10, { oblique: 0.08 }), hero: 0.04, zoneAt: S.coreZone(1), cav: 0.30 },
++    /* the ribcage taper: lower ribs and obliques above the waist */
++    { y: 1.735, w: 0.222, d: 0.165, fg: [1, 2], facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
++      shape: S.coreShape(1.0, 0.10, 0.08, 0.10, 0.12, { oblique: 0.12, obliqueShift: 0.12 }), hero: 0.08, zoneAt: S.coreZone(2) },
++    /* the upper abdomen under the bust (the three indicators sit here, so a
++       low rectus row — the crests would otherwise pass through them) */
++    { y: 1.780, w: 0.240, d: 0.170, fg: [1, 2], facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
++      shape: S.coreShape(1.0, 0.10, 0.20, 0.0, 0.12, { oblique: 0.12, obliqueShift: 0.24, serratus: 0.035, serratusAt: 1.15 }), hero: 0.08, zoneAt: S.coreZone(2) },
++    /* the INFRAMAMMARY FOLD — the breast's underside turns in here; a crease
++       ring in value, wider than the abdomen row under it */
++    { y: 1.830, w: 0.285, d: 0.200, fg: [2, 2], facet: -0.0050, crystal: 0.0260, crystalY: 0.0060,
++      shape: bustShape({ dome: 0.28, lat: 0.30, insertion: 0.04, erector: 0.15, latBack: 0.20 }), hero: 0.10, zoneAt: S.coreZone(3), cav: 0.45 },
++    /* the lower half of the breast, full */
++    { y: 1.885, w: 0.280, d: 0.210, fg: [2, 2], facet: 0.0045, crystal: 0.0300, crystalY: 0.0070,
++      shape: bustShape({ dome: 0.80, lat: 0.35, insertion: 0.08, erector: 0.14, latBack: 0.24 }), hero: 0.30, zoneAt: S.pecZone(0) },
++    /* THE APEX — the breast's fullest projection, the chest's lateral edge */
++    { y: 1.940, w: 0.290, d: 0.210, fg: [2, 2], facet: -0.0045, crystal: 0.0320, crystalY: 0.0080,
++      shape: bustShape({ dome: 0.85, lat: 0.30, insertion: 0.10, erector: 0.12, kite: 0.06, latBack: 0.20 }), hero: 0.34, zoneAt: S.pecZone(0) },
++    /* the superior slope, with the armpit flare (the lat's upper mass) at full */
++    { y: 1.995, w: 0.300, d: 0.205, fg: [2, 2], facet: 0.0050, crystal: 0.0300, crystalY: 0.0070,
++      shape: bustShape({ dome: 0.72, lat: 0.50, insertion: 0.10, erector: 0.10, kite: 0.10, latBack: 0.12 }), hero: 0.34, zoneAt: S.pecZone(0) },
++    /* the upper chest: the breast's clavicular slope begins under the collarbone */
++    { y: 2.050, w: 0.290, d: 0.200, fg: [2, 2], facet: -0.0045, crystal: 0.0280, crystalY: 0.0060,
++      shape: bustShape({ dome: 0.38, lat: 0.55, insertion: 0.06, erector: 0.08, kite: 0.16, valley: 0.02 }), hero: 0.40, zoneAt: S.pecZone(1) },   /* R103: the girdle sits 0.05 lower, as the male's does */
++    /* the shoulder line, narrower than his, with the same collar */
++    { y: 2.120, w: 0.250, d: 0.184, fg: [2, 2], facet: 0.0055, crystal: 0.0300, crystalY: 0.0060,
+       shape: S.clavicleShape(1.0), dip: 0.030, hero: 0.30, zoneAt: null, coat: 0.12 },   /* R98: the shelf takes a reduced platinum share, as the male's does; R102: less again — her upper chest rendered as one blown white ledge */
+     /* the neck — the same column, a touch slimmer */
+     { y: 2.205, w: 0.165, d: 0.130, fg: [1, 1], facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
+@@ -174,30 +218,36 @@ function femaleProportions() {
+ 
+   var TORSO = {
+     topY: T.topY, sides: T.sides, refine: T.refine, classLift: T.classLift, rings: rings,
+-    shoulderHalfWidth: 0.510, shoulderY: 2.120   /* R102: 0.420 -> 0.470, her shoulders are 0.91 of his */
++    shoulderHalfWidth: 0.545, shoulderY: 2.120   /* R109: the cap's outer edge — 0.34 of height across the shoulders, as the hero measures */
+   };
+ 
+-  /* R102 — MUSCULAR SHOULDERS AND ARMS. The R102 female references carry
+-     shoulders nearly as wide as the male's (0.316 of height against his
+-     0.347), round deltoid caps and arms with real bicep and forearm mass;
+-     the R96 prototype's slim long arms (0.092 / 0.072) read soft beside
+-     them. Radii come up a quarter and the cap grows with them. */
++  /* R109 — MUSCULAR SHOULDERS AND ARMS. The hero's shoulders span 0.34 of
++     height (R108's 0.317), its deltoids are round three-head caps, its upper
++     arm is ~0.07-0.078 of height wide at the belly and its forearm ~0.06 at
++     the bloom, and the arm hangs OUTSIDE the hip — shoulder 0.51, elbow 0.65,
++     wrist 0.74 units from the centre line — because the hip is wider than
++     the shoulder is. Her radii were already at the hero's widths (R108:
++     0.116 / 0.084 / 0.056, 0.74 of his), so they stay; the cap grows
++     (r0 0.160 -> 0.170, outerX 0.470 -> 0.505) and both arms move out with
++     it. The joints sit ON the cap's axis at 0.7 of its length (R103). The
++     arm is the male's length now (upper 0.48, forearm 0.36; R108's female
++     arm was 13% longer than his and its elbow hung inside the new hip). */
+   var A = M.ARMS;
+   var ARMS = {
+     right: {
+-      shoulder: [-0.389, 1.954, 0.014],
+-      elbow: [-0.455, 1.390, 0.10],
+-      wrist: [-0.410, 0.985, 0.14],
++      shoulder: [-0.4135, 1.9526, 0.014],
++      elbow: [-0.575, 1.505, 0.10],
++      wrist: [-0.605, 1.148, 0.15],
+       upperRadius: 0.116, foreRadius: 0.084, wristRadius: 0.056
+     },
+     left: {
+-      shoulder: [0.389, 1.954, 0.014],
+-      elbow: [0.455, 1.430, 0.11],
+-      wrist: [0.560, 2.110, 0.15],
++      shoulder: [0.4135, 1.9526, 0.014],
++      elbow: [0.585, 1.520, 0.12],
++      wrist: [0.600, 1.875, 0.16],
+       upperRadius: 0.116, foreRadius: 0.084, wristRadius: 0.056
+     },
+-    /* the deltoid: a round cap that encloses the arm's top — R102: larger; R103: rooted deeper and lower with the girdle */
+-    deltoid: { innerX: 0.200, innerY: 2.010, outerX: 0.470, outerY: 1.930, r0: 0.160 }   /* R107: a dome, not a ball (see body.js) */,   /* R104: wider, muscular shoulders */
++    /* the deltoid: a round cap that encloses the arm's top — R102: larger; R103: rooted deeper and lower with the girdle; R109: rounder and further out */
++    deltoid: { innerX: 0.200, innerY: 2.010, outerX: 0.505, outerY: 1.928, r0: 0.165 }   /* R107: a dome, not a ball (see body.js) */,
+     classLift: A.classLift, deltoidLift: A.deltoidLift,
+     profiles: A.profiles, shapes: A.shapes
+   };
+@@ -211,8 +261,8 @@ function femaleProportions() {
+ 
+   var I = M.INSIGNIA;
+   var INSIGNIA = {
+-    emblemY: 1.965, emblemHalf: I.emblemHalf * 0.92,
+-    symbolsY: 1.795, symbolHalf: I.symbolHalf * 0.92, symbolSpacing: I.symbolSpacing * 0.92,
++    emblemY: 1.965, emblemHalf: I.emblemHalf * 0.92,   /* in the cleavage between the breast domes, at their upper half — the reference's diamond */
++    symbolsY: 1.795, symbolHalf: I.symbolHalf * 0.92, symbolSpacing: I.symbolSpacing * 0.92,   /* the upper abdomen, just under the fold */
+     throatY: I.throatY, throatHalf: I.throatHalf
+   };
+ 

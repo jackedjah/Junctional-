@@ -1,0 +1,367 @@
+diff --git a/mrmah3d/core/character/body.js b/mrmah3d/core/character/body.js
+index 005ee5e..71d1d1d 100644
+--- a/mrmah3d/core/character/body.js
++++ b/mrmah3d/core/character/body.js
+@@ -354,7 +354,21 @@ export function buildBody(materials, P) {
+        is authored on the arm, shapes.upper) rather than meeting a flush arm
+        top in a crease. The joint at 0.7 and the elbow / wrist move with it
+        (ARMS). */
+-    var D = ARMS_.deltoid || { innerX: 0.220, innerY: 2.045, outerX: 0.605, outerY: 1.915, r0: 0.228 };   /* R108: 0.235 -> 0.228 with the arm 0.158 / 1.06 deep — the cap is 1.4x the arm's depth from the side, down from 1.6x */   /* R107 c: rooted deeper and higher, so the dome grows OUT of the trapezius slope */   /* R107 b: higher and further in, so the dome ENCLOSES the torso's shoulder corner (the flat plate the rear clay showed above the caps) */
++    /* R109 — THE CAP SITS UNDER THE TRAPEZIUS LINE, NOT ON IT. Worked
++       through at the crest (r0 0.228 x the 1.30 belly, plus the lateral
++       head) the dome reached y 2.245 from x 0.30 out to 0.43 — level with
++       the neck's base and 0.12 above the torso's own shoulder corner at
++       (0.30, 2.12) — so the silhouette fell from the neck into a saddle and
++       climbed back onto a ball. Measured on the R109 hero, the deltoid's top
++       sits ~0.035 of height under the neck's base and the cap is WIDER than
++       it is tall (0.45 x 0.355) where this one was 0.40 x 0.47. The axis
++       comes down (2.045 / 1.915 -> 2.005 / 1.885), r0 to 0.200 and the outer
++       lerp to 0.85 of the arm, so the crest runs ~2.17 — 0.06 under the neck
++       base, meeting the widened trapezius ring (proportions.js 2.172) — and
++       the cap is 0.42 tall. The joint (0.7 of the axis) and the arm's elbow
++       and wrist move down with it (ARMS); the axis END, which is the shoulder
++       width, does not move. */
++    var D = ARMS_.deltoid || { innerX: 0.220, innerY: 2.005, outerX: 0.605, outerY: 1.885, r0: 0.200 };   /* R108: 0.235 -> 0.228 with the arm 0.158 / 1.06 deep — the cap is 1.4x the arm's depth from the side, down from 1.6x */   /* R107 c: rooted deeper and higher, so the dome grows OUT of the trapezius slope */   /* R107 b: higher and further in, so the dome ENCLOSES the torso's shoulder corner (the flat plate the rear clay showed above the caps) */
+     var inner = [side * D.innerX, D.innerY, 0.0];
+     var outer = [side * D.outerX, D.outerY, 0.02];
+     var deltoidR0 = D.r0;
+@@ -390,7 +404,7 @@ export function buildBody(materials, P) {
+        still closes over the top of the limb rather than standing proud of it
+        (the blown-white-wedge failure), while reaching the 0.598 half-width the
+        reference measures across the shoulders. */
+-    var deltoidR1 = spec.upperRadius * 1.00;
++    var deltoidR1 = spec.upperRadius * 0.85;   /* R109: the outer lerp comes down with r0 so the dome is flatter; at 0.7 of the axis the ring is still 0.19 against the arm's 0.14 top, so the arm's disc stays buried */
+     /* Root choke x belly swell. The choke keeps the inboard end inside the
+        chest; the swell is the deltoid's own belly. t^1.3 puts its peak at
+        t ~ 0.59 rather than at the midpoint, which places the widest part of the
+@@ -425,7 +439,7 @@ export function buildBody(materials, P) {
+     var geo = segment(
+       inner, outer,
+       deltoidR0, deltoidR1, 16,   /* R108 c: sixteen sides so the three heads' plane changes land on vertices */
+-      { depthRatio: 0.88, crystal: 0.012, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 2],   /* R108 c: 0.88 deep for its width — with the arm at 1.12 the side view lands near the reference's cap-to-arm ratio */   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first; R108: 0.92 deep for its width (see the shape) */
++      { depthRatio: 0.98, crystal: 0.012, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 2],   /* R109: 0.98 — the ring radius came down 12% and the front-to-back mass is kept; the cap is now no taller than it is deep */   /* R108 c: 0.88 deep for its width — with the arm at 1.12 the side view lands near the reference's cap-to-arm ratio */   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first; R108: 0.92 deep for its width (see the shape) */
+         classes: REGIONS.DELT.classes,
+         profile: deltoidProfile,
+         /* R97 — THREE HEADS. `d` is the angle from the cap's front (+z): a
+@@ -469,11 +483,11 @@ export function buildBody(materials, P) {
+           /* round 3: bellies (pow 0.55) rather than soft bumps, so each head
+              is a plateau with its own edge and the valleys between the three
+              form themselves. */
+-          var front = 0.13 * Math.pow(Math.exp(-Math.pow((d + upSign * 0.18) / 0.56, 2)), 0.55) * frontEnv;
++          var front = 0.15 * Math.pow(Math.exp(-Math.pow((d + upSign * 0.18) / 0.50, 2)), 0.55) * frontEnv;   /* R109: a narrower, fuller anterior head — a lobe the eye can find on the front of the cap */
+           var rearD = d - upSign * (Math.PI / 2 + 1.30);
+           while (rearD > Math.PI) rearD -= Math.PI * 2;
+           while (rearD < -Math.PI) rearD += Math.PI * 2;
+-          var rear = 0.13 * Math.pow(Math.exp(-Math.pow(rearD / 0.62, 2)), 0.55) * rearEnv;
++          var rear = 0.14 * Math.pow(Math.exp(-Math.pow(rearD / 0.62, 2)), 0.55) * rearEnv;   /* R109: the posterior head a shade fuller, so it reads as its own mass from behind */
+           /* R108 — UP AND DOWN ARE DIFFERENT SIDES OF THIS TUBE. The cap's
+              axis runs outward, so its ring's +/-pi/2 are the crest and the
+              UNDERSIDE, and `upSign` (from the segment's basis, per side) says
+@@ -487,10 +501,10 @@ export function buildBody(materials, P) {
+              a point halfway down the outer arm. */
+           var up = Math.exp(-Math.pow((d - upSign * Math.PI / 2) / 0.55, 2));
+           var downB = Math.exp(-Math.pow((d + upSign * Math.PI / 2) / 0.62, 2));
+-          var lateral = 0.09 * up * crestEnv;   /* R108 c: the lateral head is the dominant cap */
++          var lateral = 0.06 * up * crestEnv;   /* R108 c: the lateral head is the dominant cap; R109: 0.06 — the crest is flatter, the width is the axis */
+           var pitEnv = 1 - Math.min(1, Math.max(0, (t - 0.40) / 0.32));
+           pitEnv = pitEnv * pitEnv * (3 - 2 * pitEnv);
+-          var pit = -0.18 * downB * pitEnv;
++          var pit = -0.22 * downB * pitEnv;   /* R109: 0.22 — the underside is drawn up further; the reference's cap is flat under the armpit */
+           var vEnv = Math.min(1, Math.max(0, (t - 0.55) / 0.45));
+           vEnv = vEnv * vEnv * (3 - 2 * vEnv);
+           var vee = 0.70 * Math.exp(-Math.pow((d + upSign * Math.PI / 2) / 0.50, 2)) * vEnv * vEnv;
+@@ -519,7 +533,7 @@ export function buildBody(materials, P) {
+           var gA = d - upSign * (Math.PI / 2 - spread), gP = d - upSign * (Math.PI / 2 + spread);
+           while (gA > Math.PI) gA -= Math.PI * 2; while (gA < -Math.PI) gA += Math.PI * 2;
+           while (gP > Math.PI) gP -= Math.PI * 2; while (gP < -Math.PI) gP += Math.PI * 2;
+-          var grooves = -0.09 * (Math.exp(-Math.pow(gA / 0.40, 2)) + Math.exp(-Math.pow(gP / 0.40, 2))) * gEnv;   /* round 2: 0.36 wide — at 0.24 (14 degrees) a groove fell between two of sixteen vertices and vanished; round 3: 0.42 */
++          var grooves = -0.10 * (Math.exp(-Math.pow(gA / 0.42, 2)) + Math.exp(-Math.pow(gP / 0.42, 2))) * gEnv;   /* R109: 0.10 — the three heads' plane changes, still under the one-dome cap */   /* round 2: 0.36 wide — at 0.24 (14 degrees) a groove fell between two of sixteen vertices and vanished; round 3: 0.42 */
+           return 1 + front + rear + lateral + broad + pit + vee + grooves;
+         },
+         zoneAt: function (d, t) {
+diff --git a/mrmah3d/core/character/proportions.js b/mrmah3d/core/character/proportions.js
+index bac3b45..295d076 100644
+--- a/mrmah3d/core/character/proportions.js
++++ b/mrmah3d/core/character/proportions.js
+@@ -403,13 +403,26 @@ function chestShape(k, erectorK, latK, opts) {
+      the chest rings (a long clavicular sweep to a low apex and a fast turn
+      under), and nothing on the back or the flank should follow it; the lat,
+      the insertion and the whole back are divided out of it. */
++  /* R109 — THE UNDER-PEC RING IS SHAPED, NOT SHRUNK. The crease ring used to
++     make its shelf with a smaller ring depth (d 0.276 under a 0.316 crown),
++     which recessed the ring UNIFORMLY round the whole torso: the pec's lower
++     border came out as one straight horizontal edge across the chest — the
++     plate edge the R109 clay showed — and the back stepped in with it. The
++     ring keeps its depth now and the border is cut by the shape: `pecAt` /
++     `pecW` let the crease ring carry a narrower, more MEDIAL pec lobe (the
++     sternal pec reaches lowest) and `under` is a negative lobe at the pec's
++     lateral third so the shelf's outer end turns under too, higher, into the
++     armpit — an oblique lower border rising from the sternum to the arm. */
++  var pa = o.pecAt == null ? 0.64 : o.pecAt, pw = o.pecW == null ? 0.44 : o.pecW;
++  var uk = o.under || 0, ua = o.underAt == null ? 1.05 : o.underAt, uw = o.underW == null ? 0.36 : o.underW;
+   return function (a) {
+     /* R108: the trench is WIDER and deeper (0.22 x 0.38 -> 0.30 x 0.44) so
+        the 15-degree vertex sits on the pec's rolled inner edge rather than
+        already on its crown — the reference's pecs roll away from the sternum,
+        they do not meet it in a V one vertex wide. */
+     var sternum = -lobe(a, 0, 0.30) * 0.440;
+-    var pec = (belly(a, 0.64, 0.44) + belly(a, -0.64, 0.44)) * 0.560;   /* R105; R106; R107: each pec a full BELLY that falls fast into the trench and the armpit */
++    var pec = (belly(a, pa, pw) + belly(a, -pa, pw)) * 0.560;   /* R105; R106; R107: each pec a full BELLY that falls fast into the trench and the armpit */
++    var under = -(lobe(a, ua, uw) + lobe(a, -ua, uw)) * uk / kk;
+     /* R108: the lat's upper mass is the flare under the armpit — a belly on
+        the 105 vertex (0.42 wide, where R107's 0.56 reached from 60 to 150
+        degrees and rounded the whole flank into a barrel). */
+@@ -420,7 +433,7 @@ function chestShape(k, erectorK, latK, opts) {
+        falls into the armpit, faint on the under-pec ring. */
+     var insertion = -(lobe(a, 1.28, 0.22) + lobe(a, -1.28, 0.22)) * ik / kk;
+     var back = backTerms(a, { flat: o.flat, spine: o.spine, erector: ek, erectorAt: o.erectorAt, erectorW: o.erectorW, kite: o.kite, valley: o.valley, valleyAt: o.valleyAt, teres: o.teres, latBack: o.latBack }) / kk;
+-    return 1 + (sternum + pec + lat + insertion + back) * k;
++    return 1 + (sternum + pec + lat + insertion + under + back) * k;
+   };
+ }
+ 
+@@ -870,6 +883,11 @@ function clavicleShape(k, opts) {
+   var nk = o.notch == null ? 0 : o.notch;
+   var tk = o.traps == null ? 0.18 : o.traps;
+   var fk = o.flat == null ? 0.04 : o.flat;
++  /* R109: the male girdle ring passes its own collar and hollow so the upper
++     pec can roll up under the collarbone (see the 2.120 row); the defaults
++     are R108 b's and are what the female's rings receive. */
++  var ck = o.collar == null ? 0.110 : o.collar;
++  var hk = o.hollow == null ? 0.030 : o.hollow;
+   return function (a) {
+     /* R108 b: 0.12 -> 0.03. The front hollow made the girdle ring's front
+        0.05 SMALLER than the groove ring's 0.02 below it — a fold facing
+@@ -877,8 +895,8 @@ function clavicleShape(k, opts) {
+        the collarbone in every clay capture since R103 lowered the girdle.
+        The clavicle is the top edge above the sub-clavicular hollow, not a
+        hollow of its own. */
+-    var hollow = -lobe(a, 0, 0.60) * 0.030;
+-    var collar = (lobe(a, 0.95, 0.42) + lobe(a, -0.95, 0.42)) * 0.110;   /* R108: narrower, so the collar's tail no longer widens the side vertex — the shoulder corner stays at w 0.30 inside the deltoid dome */
++    var hollow = -lobe(a, 0, 0.60) * hk;
++    var collar = (lobe(a, 0.95, 0.42) + lobe(a, -0.95, 0.42)) * ck;   /* R108: narrower, so the collar's tail no longer widens the side vertex — the shoulder corner stays at w 0.30 inside the deltoid dome */
+     /* R106: 0.72 -> 0.30. Worked through at the rear-side angle the
+        shoulder-line ring stood 0.18 proud of the ring 0.02 below it and 0.04
+        proud of the one above — a LEDGE, the flat lid the rear clay view
+@@ -1241,14 +1259,24 @@ export var TORSO = {
+       shape: coreShape(1.0, 0.08, 0.10, 0.34, 0.34, { obliqueShift: 0.10, oblique: 0.14, spine: 0.34, valley: 0.14, erectorAt: 0.36, erectorW: 0.25, latBack: 0.14 }), hero: 0.03, zoneAt: coreZone(1), cav: 0.75 },   /* R102: abdominal crease */
+     { y: 1.665, w: 0.310, d: 0.176, fg: [1, 4], facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
+       shape: coreShape(0.95, 0.26, 0.26, 0.24, 0.28, { obliqueShift: 0.18, oblique: 0.14, spine: 0.32, valley: 0.14, erectorAt: 0.34, erectorW: 0.24, latBack: 0.22 }), hero: 0.08, zoneAt: coreZone(2) },
+-    { y: 1.725, w: 0.330, d: 0.198, fg: [1, 4], facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
+-      shape: coreShape(0.90, 0.08, 0.36, 0.12, 0.22, { obliqueShift: 0.26, oblique: 0.12, spine: 0.28, serratus: 0.035, serratusAt: 1.05, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.32 }), hero: 0.03, zoneAt: coreZone(2), cav: 0.75 },   /* R102: abdominal crease */
++    /* R109 — THE BACK DEEPENS STEADILY, NOT IN ONE STEP. Probed at the erector
++       column (~160 degrees) the back sat at -0.215 / -0.229 on these two rows
++       and then jumped to -0.284 / -0.328 on the two chest rows above: 0.10 of
++       depth gained in 0.115 of height, a 41-degree upward-facing band right
++       across the back at armpit level — the bright horizontal ledge in every
++       R109 rear clay. These rows take more depth (d) and sit a hair further
++       back (zc) with the back flattener eased, and the chest rows' back is
++       trimmed (flat 0.13), so the erector plane now runs -0.199 (1.665, the
++       abdominal sculptor's row) -> -0.24 -> -0.27 -> -0.30 -> -0.31: one
++       convex curve from the waist up into the shoulder blades. */
++    { y: 1.725, w: 0.330, d: 0.208, zc: -0.004, fg: [1, 4], facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
++      shape: coreShape(0.90, 0.08, 0.36, 0.12, 0.24, { obliqueShift: 0.26, oblique: 0.12, spine: 0.28, flat: 0.04, serratus: 0.035, serratusAt: 1.05, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.34 }), hero: 0.03, zoneAt: coreZone(2), cav: 0.75 },   /* R102: abdominal crease */
+     /* the lat hands over to chestShape's lat on the ring above at the SAME
+        strength (0.34 here against 0.33 there): R108's first cut had 0.52
+        against 0.30, and the flank normal flipped from facing down to facing
+        up across 0.05 of height — a ledge on top of the lat. */
+-    { y: 1.780, w: 0.342, d: 0.222, fg: [1, 4], facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
+-      shape: coreShape(0.85, 0.24, 0.34, 0.0, 0.18, { obliqueShift: 0.36, oblique: 0.06, spine: 0.26, serratus: 0.035, serratusAt: 1.20, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.36 }), hero: 0.08, zoneAt: coreZone(3) },
++    { y: 1.780, w: 0.342, d: 0.240, zc: -0.010, fg: [1, 4], facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
++      shape: coreShape(0.85, 0.24, 0.34, 0.0, 0.20, { obliqueShift: 0.36, oblique: 0.06, spine: 0.26, flat: 0.02, serratus: 0.035, serratusAt: 1.20, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.38 }), hero: 0.08, zoneAt: coreZone(3) },
+     /* R97 — THE LOWER PEC TURN: a crease ring where the chest shelf ends and
+        a belly ring above it, so the pectoral is a mass with a lower edge
+        that falls into shadow rather than a plane that fades into the abs. */
+@@ -1266,19 +1294,40 @@ export var TORSO = {
+        0.80 / 0.95 / 1.0 down from the groove ring to 1.895, and the ring
+        under it drops the front 0.13 in 0.065 — steep, but the spline rounds
+        it and the under-pec is the one crease the chest needs. */
+-    { y: 1.830, w: 0.336, d: 0.276, fg: [2, 2], facet: -0.0040,   /* R107: not narrower than either neighbour — that was a groove all round */ crystal: 0.0300, crystalY: 0.0080,
+-      shape: chestShape(0.55, 0.17, 1.10, { insertion: 0.04, spine: 0.26, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.34 }), zoneAt: pecUnderZone, cav: 0.60 },
++    /* R109 — THE SHELF IS CUT BY THE SHAPE (see chestShape): the ring keeps
++       its depth (0.276 -> 0.300, so the back no longer steps in with the
++       front) and the crease is a medial pec lobe over a deep trench plus an
++       `under` lobe at the pec's lateral third — the border is deepest at the
++       sternum and turns under higher toward the armpit. */
++    { y: 1.830, w: 0.336, d: 0.300, fg: [2, 2], facet: -0.0040,   /* R107: not narrower than either neighbour — that was a groove all round */ crystal: 0.0300, crystalY: 0.0080,
++      shape: chestShape(0.52, 0.17, 1.10, { insertion: 0.04, pecAt: 0.50, pecW: 0.38, under: 0.22, underAt: 1.05, underW: 0.40, spine: 0.26, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.34 }), zoneAt: pecUnderZone, cav: 0.65 },
++    /* R109: `flat` 0.13 on the three chest rows trims the back of the ribcage
++       by ~0.015 so the erector plane runs on from the rows below instead of
++       standing out past them (the depth step, above); the insertion groove is
++       a little deeper on the two crown rows so the pec's lateral edge turns
++       up into the armpit rather than fading into the flank. */
+     { y: 1.895, w: 0.328, d: 0.316, fg: [2, 2], facet: 0.0035, crystal: 0.0320, crystalY: 0.0080,
+-      shape: chestShape(1.0, 0.15, 1.0, { insertion: 0.14, kite: 0.06, erectorAt: 0.34, erectorW: 0.24, valley: 0.14, valleyAt: 0.60, latBack: 0.28 }), hero: 0.30, zoneAt: pecZone(0) },
++      /* R109: `under` on the crown ring too — the pec's LATERAL third begins
++         turning under one ring higher than its sternal end, so the lower
++         border is oblique: lowest at the sternum, rising toward the armpit. */
++      shape: chestShape(1.0, 0.15, 1.0, { insertion: 0.18, flat: 0.13, under: 0.10, underAt: 1.00, underW: 0.40, kite: 0.06, erectorAt: 0.34, erectorW: 0.24, valley: 0.14, valleyAt: 0.60, latBack: 0.28 }), hero: 0.30, zoneAt: pecZone(0) },
+     /* R106 — THE PEC IS A DOME: a crown ring between two shoulder rings, so
+        the mass rounds over in the vertical as well as across. Three bands
+        over 0.22 units made a hexagonal profile that the clay view read as a
+        flat plate with a slot beneath it. */
+     { y: 1.935, w: 0.336, d: 0.320, fg: [2, 2], facet: -0.0030, crystal: 0.0340, crystalY: 0.0080,
+-      shape: chestShape(0.95, 0.13, 0.90, { insertion: 0.14, kite: 0.10, valley: 0.10, valleyAt: 0.66, latBack: 0.20 }), hero: 0.34, zoneAt: pecZone(0) },
++      shape: chestShape(0.95, 0.13, 0.90, { insertion: 0.17, flat: 0.13, under: 0.04, underAt: 1.00, underW: 0.40, kite: 0.10, valley: 0.10, valleyAt: 0.66, latBack: 0.20 }), hero: 0.34, zoneAt: pecZone(0) },
+     /* the pectoral line — the strongest cross-section shaping on the body */
++    /* R109: the UPPER BACK IS A SLAB. On the two rows above the pec line the
++       120-135 degree vertices were left on the ellipse (latBack 0.10 / 0),
++       so the back rounded forward from the erector column to the shoulder
++       and the rear clay read one domed plate between two balls. The scapular
++       plane is pushed back flush with the column here as R108 b did for the
++       lat rows, with a valley at its outer edge (the scapula's lateral
++       border, ~130 degrees) so the trapezius kite ends in a plane change
++       before the rear deltoid. */
+     { y: 1.970, w: 0.338, d: 0.315, fg: [2, 2], facet: 0.0035, crystal: 0.0340, crystalY: 0.0080,
+-      shape: chestShape(0.80, 0.10, 0.75, { insertion: 0.10, kite: 0.14, valley: 0.06, valleyAt: 0.72, latBack: 0.10 }), hero: 0.34, zoneAt: pecZone(0) },
++      shape: chestShape(0.80, 0.10, 0.75, { insertion: 0.10, flat: 0.13, kite: 0.14, valley: 0.08, valleyAt: 0.85, latBack: 0.22 }), hero: 0.34, zoneAt: pecZone(0) },
+     /* R103 — THE SHOULDER GIRDLE SITS 0.05 LOWER. The trap could only slope
+        at 22 degrees from a shoulder line at 2.170 to a neck base at 2.215;
+        the references' traps climb at about 40 degrees into a visible neck,
+@@ -1286,25 +1335,50 @@ export var TORSO = {
+        shoulder line at 2.120 the slope is 41 degrees, the cap's crest meets
+        it, and the neck is embedded in a rising upper torso. The head does
+        not move. */
+-    { y: 2.050, w: 0.330, d: 0.295, fg: [2, 2], facet: -0.0035, crystal: 0.0300, crystalY: 0.0060,
+-      shape: chestShape(0.55, 0.08, 0.40, { insertion: 0.06, kite: 0.16, valley: 0.02 }), hero: 0.40, zoneAt: pecZone(1) },   /* R107: the pec FADES up into the clavicle; R108: the clavicular sweep — 0.55 here, 0.30 on the groove ring */
++    /* R109 — CLAVICULAR FULLNESS. Probed at the pec crown angle the front ran
++       0.416 (1.935) -> 0.390 -> 0.329 (2.050) -> 0.284 (2.092) -> ~0.236
++       (2.120): a straight 37-47 degree plane from the apex to the collar,
++       which is the flat upper chest the R109 front clay showed under a
++       horizontal bar. The reference's upper pec is convex — full right under
++       the collarbone and rolling out to a low apex. The clavicular sweep
++       carries more pec (0.55 -> 0.70, 0.30 -> 0.42) on a slightly deeper
++       ring, and the girdle ring's front comes forward with it (collar 0.18,
++       no hollow) so the step under the collarbone stays a hollow of ~0.04,
++       not the slot R106 closed. */
++    { y: 2.050, w: 0.330, d: 0.300, fg: [2, 2], facet: -0.0035, crystal: 0.0300, crystalY: 0.0060,
++      shape: chestShape(0.70, 0.08, 0.40, { insertion: 0.06, kite: 0.20, valley: 0.08, valleyAt: 0.95, latBack: 0.16 }), hero: 0.40, zoneAt: pecZone(1) },   /* R107: the pec FADES up into the clavicle; R108: the clavicular sweep — 0.55 here, 0.30 on the groove ring; R109: 0.70 / 0.42 — convex under the collarbone */
+     /* R100 — the groove under the clavicle (subclavicleShape): its own dark,
+        uncoated zone, so the collarbone above it reads as a bar with shadow
+        beneath. */
+-    { y: 2.092, w: 0.316, d: 0.285, fg: [2, 2], facet: 0.0035, crystal: 0.0200, crystalY: 0.0040,
+-      shape: subclavicleShape(1.0, 0.17, 0.30, { notch: 0.22 }), hero: 0.20, zoneAt: pecZone(1), coat: 0.55 },   /* R108 b: 2.100 -> 2.092 and the spine channel continues through it (notch 0.22): at 2.100 it sat at the girdle ring's own radius behind, a flat spot the rear clay read as a crease under the trap band */   /* R106: d 0.250 -> 0.300, the slot under the collarbone closes to a hollow */
++    { y: 2.092, w: 0.316, d: 0.290, fg: [2, 2], facet: 0.0035, crystal: 0.0200, crystalY: 0.0040,
++      shape: subclavicleShape(1.0, 0.17, 0.42, { notch: 0.22 }), hero: 0.20, zoneAt: pecZone(1), coat: 0.55 },   /* R108 b: 2.100 -> 2.092 and the spine channel continues through it (notch 0.22): at 2.100 it sat at the girdle ring's own radius behind, a flat spot the rear clay read as a crease under the trap band */   /* R106: d 0.250 -> 0.300, the slot under the collarbone closes to a hollow */
+     /* THE SHOULDER LINE — collarbones across the front, trapezius behind.
+        R100: the thin band just under it is the groove's dark zone, so the
+        collarbone reads as a bar with a hairline of shadow beneath — not a
+        stripe across the chest. */
+-    { y: 2.120, w: 0.300, d: 0.276, fg: [2, 2], facet: 0.0035, crystal: 0.0340, crystalY: 0.0060,
+-      shape: clavicleShape(1.0, { notch: 0.20, traps: 0.12, flat: 0.08 }), dip: 0.004, hero: 0.32, zoneAt: subclavicleZone, coat: 0.30 },   /* R108: 0.030 -> 0.012. The girdle ring is 0.02 above the groove ring since R103, so a 0.03 dip put this ring's front and back vertices BELOW the ring under it — the surface folded and a strip faced straight up (probed: normal y 0.996 at y 2.097), the bright bar under the collarbone and the seam under the traps in clay */   /* R99: the shelf blew white; the godform reference's clavicle is dark under a lit shoulder */
++    /* R109: the pec's top edge rises. From the groove ring (front 0.30) to
++       the neck base (0.13) the torso's top was a 0.136-tall upward-facing
++       band across its whole width — the bright bar under the collar in the
++       front clay. The reference's clavicular pec reaches to within a few
++       hundredths of the neck's base. The girdle ring (collar 0.26, d 0.300)
++       and the trapezius ring (collar 0.18, d 0.245) carry the roll up, so the
++       front now runs 0.30 -> 0.29 -> 0.24 -> 0.13 and the lit band is the
++       last 0.056 only — the trap's top, which the reference lights too. */
++    { y: 2.120, w: 0.300, d: 0.300, fg: [2, 2], facet: 0.0035, crystal: 0.0340, crystalY: 0.0060,
++      shape: clavicleShape(1.0, { notch: 0.20, traps: 0.12, flat: 0.08, collar: 0.26, hollow: 0.0 }), dip: 0.004, hero: 0.32, zoneAt: subclavicleZone, coat: 0.30 },   /* R108: 0.030 -> 0.012. The girdle ring is 0.02 above the groove ring since R103, so a 0.03 dip put this ring's front and back vertices BELOW the ring under it — the surface folded and a strip faced straight up (probed: normal y 0.996 at y 2.097), the bright bar under the collarbone and the seam under the traps in clay */   /* R99: the shelf blew white; the godform reference's clavicle is dark under a lit shoulder */
+     /* R100 — THE TRAPEZIUS RING: between the shoulder line and the neck's
+        base, so the traps rise diagonally toward the neck across two bands
+        instead of one steep step, with the trap lobes at full strength.
+        R103: halfway up the 41-degree slope. */
+-    { y: 2.172, w: 0.258, d: 0.220, fg: [2, 2], facet: -0.0040, crystal: 0.0260, crystalY: 0.0050,
+-      shape: clavicleShape(0.85, { notch: 0.14 }), hero: 0.04, zoneAt: trapZone, coat: 0.12 },   /* R106: narrower — the width falls faster than the height rises, so the band tilts toward the neck */   /* R101: deeper behind, the upper back's thickness */   /* a slope, not a shelf: first cut at 2.190 / 0.282 drew a flat ledge */
++    /* R109: 0.258 -> 0.276. The deltoid's crest stood 0.12 above the torso's
++       shoulder corner (0.30, 2.12) and level with the neck's base, so the
++       silhouette ran neck -> down a 41-degree trap -> a saddle -> back UP onto
++       a dome: a ball sitting on the shoulder. The cap comes down (body.js)
++       and this ring widens so the trapezius carries out to meet the cap's
++       crest at ~2.17 — one line from the neck to the shoulder, the reference's
++       shallow trap. Still narrower than the ring below it, so no ledge. */
++    { y: 2.172, w: 0.276, d: 0.245, fg: [2, 2], facet: -0.0040, crystal: 0.0260, crystalY: 0.0050,
++      shape: clavicleShape(0.85, { notch: 0.14, collar: 0.18 }), hero: 0.04, zoneAt: trapZone, coat: 0.12 },   /* R106: narrower — the width falls faster than the height rises, so the band tilts toward the neck */   /* R101: deeper behind, the upper back's thickness */   /* a slope, not a shelf: first cut at 2.190 / 0.282 drew a flat ledge */
+     /* THE CROWN — the upper chest rising beside the neck to meet the head.
+ 
+        The torso used to end at the shoulder line in a flat lid. A lid 1.11
+@@ -1553,9 +1627,13 @@ export var ARMS = {
+     /* R108 c: the cap's axis ends at 0.605 / 1.915 (body.js), so the joint on
+        it at 0.7 is 0.4895 / 1.954; the elbow and wrist move out by the same
+        0.0105 so the hang is unchanged. */
+-    shoulder: [-0.4895, 1.954, 0.014],   /* R104: on the cap's axis at 0.7; R107: the axis moved up and in with the smaller dome */
+-    elbow: [-0.5605, 1.455, 0.10],   /* R103: the reference's lowered arm hangs STRAIGHT and close — elbow in, shorter */
+-    wrist: [-0.5955, 1.105, 0.14],
++    /* R109: the cap's axis comes down 0.04 / 0.03 (body.js: 2.005 / 1.885,
++       its crest no longer standing above the trapezius), so the joint on it
++       at 0.7 is 0.4895 / 1.921 and the elbow and wrist drop the same 0.033 —
++       the hang is unchanged. */
++    shoulder: [-0.4895, 1.921, 0.014],   /* R104: on the cap's axis at 0.7; R107: the axis moved up and in with the smaller dome */
++    elbow: [-0.5605, 1.422, 0.10],   /* R103: the reference's lowered arm hangs STRAIGHT and close — elbow in, shorter */
++    wrist: [-0.5955, 1.072, 0.14],
+     upperRadius: 0.158,   /* R103: 0.160 -> 0.150, the arm was as wide as the lat at the elbow; R108: 0.158 — with the sides no longer grooved the arm's belly is 0.57 of the cap's width from the front and 0.73 from the side (the reference's ~0.8) */
+     foreRadius: 0.112,   /* R105: the reference forearm is three quarters of the upper arm */
+     wristRadius: 0.074
+@@ -1571,9 +1649,9 @@ export var ARMS = {
+        shoulder line. That is a far stronger, more compact pose than the wide
+        V this carried, and it is what keeps the raised arm's mass beside the
+        ribcage instead of out in space. */
+-    shoulder: [0.4895, 1.954, 0.014],   /* R108: on the cap's axis at 0.7, see the lowered arm */
+-    elbow: [0.5455, 1.465, 0.11],
+-    wrist: [0.7005, 1.860, 0.15],
++    shoulder: [0.4895, 1.921, 0.014],   /* R108: on the cap's axis at 0.7, see the lowered arm; R109: down 0.033 with the cap */
++    elbow: [0.5455, 1.432, 0.11],
++    wrist: [0.7005, 1.827, 0.15],
+     upperRadius: 0.158,   /* R103: 0.160 -> 0.150, the arm was as wide as the lat at the elbow; R108: 0.158 — with the sides no longer grooved the arm's belly is 0.57 of the cap's width from the front and 0.73 from the side (the reference's ~0.8) */
+     foreRadius: 0.112,   /* R105: the reference forearm is three quarters of the upper arm */
+     wristRadius: 0.074
+@@ -1751,18 +1829,30 @@ export var ARMS = {
+          (around the ring) and can be large; the row steps (the envelopes)
+          stay smooth. */
+       /* longitudinal envelopes: where each belly sits along the bone */
++      /* R109 — THE TRICEPS CARRIES THE ARM. Worked through at the belly the
++         R108 d section projected 1.36 of the radius on the biceps side and
++         1.25 on the triceps side, and the rear clay showed a smooth tube
++         under the cap with no horseshoe: the biceps was the arm. The
++         reference's arm is triceps-dominant — its rear silhouette is heavier
++         than its front, lower down. So the long head grows (0.36 -> 0.48),
++         peaks lower (t 0.57) and sits nearer the rear (0.66 rad off it), the
++         lateral head grows with it (0.30 -> 0.38), the tendon flat starts
++         lower and is shallower through the belly (it was cancelling the
++         heads' projection where they are fullest), and the biceps eases
++         (0.40 -> 0.36). The section now projects ~1.28 front and ~1.29 rear
++         at the belly and 1.14 / 1.27 at t 0.7; the circumference is kept. */
+       var bic = Math.pow(Math.sin(Math.pow(Math.min(1, t / 0.92), 0.78) * Math.PI), 1.6);   /* the biceps peaks at t 0.38 and is gone into its tendon by t 0.92 */
+-      var tri = Math.pow(Math.sin(Math.pow(t, 1.10) * Math.PI), 1.2);                          /* the long head peaks at t 0.53, long */
+-      var lat = Math.pow(Math.sin(Math.pow(t, 1.00) * Math.PI), 1.2);                          /* the lateral head, t 0.50 */
+-      var low = Math.max(0, Math.min(1, (t - 0.30) / 0.42));
+-      low = low * low * (3 - 2 * low);                                                          /* 0 -> 1 from a third down — the tendon flat starts where the heads are fullest */
++      var tri = Math.pow(Math.sin(Math.pow(t, 1.25) * Math.PI), 1.2);                          /* the long head peaks at t 0.57, long (R109: lower) */
++      var lat = Math.pow(Math.sin(Math.pow(t, 1.05) * Math.PI), 1.2);                          /* the lateral head, t 0.52 */
++      var low = Math.max(0, Math.min(1, (t - 0.40) / 0.40));
++      low = low * low * (3 - 2 * low);                                                          /* 0 -> 1 from 0.40 down — the tendon flat starts below the heads' fullness (R109) */
+       var lower = t < 0.38 ? 0 : Math.sin(Math.min(1, (t - 0.38) / 0.60) * Math.PI);          /* the brachialis wedge, t 0.68 */
+       /* BICEPS: a full belly across the front, a shade toward the inner arm,
+          with the long head (outer) and short head (inner) as two shallow
+          crowns on it so the ball has a seam, and a distal INSERTION where
+          the belly falls fast into its tendon (the pow 1.6 envelope). */
+       var heads = 1 + 0.10 * (bump(d, out * 0.42, 0.30) + bump(d, inn * 0.55, 0.30)) - 0.05 * bump(d, inn * 0.08, 0.16);
+-      var biceps = Math.pow(bump(d, inn * 0.10, 0.80), 0.7) * 0.40 * bic * heads;
++      var biceps = Math.pow(bump(d, inn * 0.10, 0.80), 0.7) * 0.36 * bic * heads;   /* R109: 0.40 -> 0.36, the triceps takes the balance */
+       /* TRICEPS: the long head on the rear-inner, the lateral head on the
+          rear-outer, and between them, low down, the flat TENDON plane that
+          makes the horseshoe a U rather than a second belly. */
+@@ -1774,9 +1864,9 @@ export var ARMS = {
+          and a tendon flat that starts a third down: the valley is now ~0.29
+          against peaks of 0.36 / 0.30. */
+       var conv = 0.22 * low;
+-      var triLong = Math.pow(bump(d, Math.PI - inn * (0.72 - conv), 0.48), 0.50) * 0.36 * tri;
+-      var triLat = Math.pow(bump(d, Math.PI + inn * (0.80 - conv), 0.44), 0.50) * 0.30 * lat;
+-      var tendon = -Math.pow(bump(d, Math.PI, 0.44), 0.7) * 0.22 * low;   /* round 3: a plateau flat with steeper sides — the horseshoe's inside is a PLANE, not a dip */
++      var triLong = Math.pow(bump(d, Math.PI - inn * (0.66 - conv), 0.50), 0.50) * 0.48 * tri;   /* R109: the major mass of the arm */
++      var triLat = Math.pow(bump(d, Math.PI + inn * (0.76 - conv), 0.46), 0.50) * 0.38 * lat;
++      var tendon = -Math.pow(bump(d, Math.PI, 0.44), 0.7) * 0.16 * low;   /* round 3: a plateau flat with steeper sides — the horseshoe's inside is a PLANE, not a dip; R109: 0.16, and it starts lower */
+       /* SEPTA: the biceps / triceps interlock is a valley either side —
+          deepest through the belly, and the brachialis fills the outer one
+          below it. */
+@@ -1784,7 +1874,7 @@ export var ARMS = {
+       var septIn = -bump(d, inn * 1.55, 0.30) * 0.13 * bic;
+       /* BRACHIALIS: a controlled wedge on the outer distal arm, between the
+          biceps and the lateral head, pushing the lower outer contour out. */
+-      var brach = Math.pow(bump(d, out * 1.45, 0.38), 0.8) * 0.20 * lower;
++      var brach = Math.pow(bump(d, out * 1.45, 0.38), 0.8) * 0.22 * lower;   /* R109: 0.22 — the wedge between the biceps and the lateral head */
+       /* INSERTION and THE DELTOID V. The arm narrows into the cap across its
+          top 0.26 on the front and rear (the anterior and posterior delt
+          overhang it there), but NOT on the outer side: there the deltoid's
