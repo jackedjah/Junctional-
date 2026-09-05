@@ -504,7 +504,7 @@ export function createCrystalMaterials(options) {
        reference the quad mass is a dark navy (43% under 32 luma, mean 38) and
        the light lives in the spear below it and on the outer edge, so the
        source sits low and the gate fades out through the quad. */
-    innerStrength: 2.0,   /* R109: 3.4 -> 2.0 — the spear box was 11% energy cyan against the reference's 4%; cyan is light in the crystal, not the crystal */
+    innerStrength: 1.5,   /* R109: 3.4 -> 1.5 — the spear box was 11% energy cyan against the reference's 4%; cyan is light in the crystal, not the crystal */
     innerY: 0.42,
     innerRange: 1.00,
     innerTop: 1.28,
