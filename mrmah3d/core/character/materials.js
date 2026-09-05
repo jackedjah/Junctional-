@@ -175,7 +175,7 @@ export function createCrystalMaterials(options) {
        to carry the whole material. Left at 27 it would simply have re-crushed
        the midtones the albedo is being brought in to supply — the same
        distribution error from the other direction. */
-    envMapIntensity: 14.0,
+    envMapIntensity: 11.0,   /* R108: 14 -> 11, the reflected tail (the white panels the addendum named) */
     /* R92: flatShading OFF, and the facets are unaffected.
 
        Every vertex of a face already carries that face's own normal, so
@@ -474,7 +474,7 @@ export function createCrystalMaterials(options) {
     /* R99: 0.64 -> 0.72. The godform brief wants near-black to dominate
        ("the dark makes the light look expensive"); absorption is the control
        that widens the dark end without touching the lit planes. */
-    innerDark: 0.72,
+    innerDark: 1.00,   /* R108: 0.72 -> 1.00 — with coherent facet groups the body lost its dark end (chest box 29% -> 17% under 32); absorption widens it back down without moving the bright end */
     /* R96 — the facet dome (crystal-shader.js): every large plane grades from
        its edge to its centre, which is what Reference A's glossy planes are. */
     dome: 0.55,   /* R105: the gloss wraps each belly */

@@ -425,7 +425,7 @@ export function buildBody(materials, P) {
     var geo = segment(
       inner, outer,
       deltoidR0, deltoidR1, 16,   /* R108 c: sixteen sides so the three heads' plane changes land on vertices */
-      { depthRatio: 0.88, crystal: 0.012, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 3],   /* R108 c: 0.88 deep for its width — with the arm at 1.12 the side view lands near the reference's cap-to-arm ratio */   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first; R108: 0.92 deep for its width (see the shape) */
+      { depthRatio: 0.88, crystal: 0.012, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 2],   /* R108 c: 0.88 deep for its width — with the arm at 1.12 the side view lands near the reference's cap-to-arm ratio */   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first; R108: 0.92 deep for its width (see the shape) */
         classes: REGIONS.DELT.classes,
         profile: deltoidProfile,
         /* R97 — THREE HEADS. `d` is the angle from the cap's front (+z): a

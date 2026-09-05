@@ -393,7 +393,7 @@ function buildArm(materials, spec, options) {
        depth where it belongs (a 1.28 front, a 1.20 rear at the peak); on a
        tube that was ALSO 1.18 deeper than wide the arm was a lens — 0.20
        wide by 0.45 deep at the biceps. */
-    { depthRatio: 1.12, crystal: 0.012, steps: 10, fg: [2, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first; R108 c: 1.12 — the side view measured the cap at 1.27x the arm's depth against the reference's ~1.1, and the depth belongs to the biceps / triceps, not the cap */
+    { depthRatio: 1.12, crystal: 0.012, steps: 10, fg: [1, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first; R108 c: 1.12 — the side view measured the cap at 1.27x the arm's depth against the reference's ~1.1, and the depth belongs to the biceps / triceps, not the cap */
       profile: ARMS_.profiles.upper, shape: function (t, d) { return ARMS_.shapes.upper(t, d, upperInner); }, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner),
       coat: REGIONS.UPPER_ARM.coat,
@@ -422,7 +422,7 @@ function buildArm(materials, spec, options) {
     spec.foreRadius, spec.wristRadius, 16,   /* R108 c: sixteen sides — the brachioradialis, extensor and flexor masses are three columns */
     /* R98: five steps so the extensor belly just under the elbow has a ring
        to peak on and the taper into the wrist has two to fall through. */
-    { depthRatio: 1.06, crystal: 0.010, steps: 9, fg: [2, 2],
+    { depthRatio: 1.06, crystal: 0.010, steps: 9, fg: [1, 2],
       profile: ARMS_.profiles.fore, shape: function (t, d) { return ARMS_.shapes.fore(t, d, foreInner); }, lift: ARMS_.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes, foreInner),
       coat: REGIONS.FOREARM.coat }

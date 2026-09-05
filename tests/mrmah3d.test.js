@@ -850,12 +850,15 @@ if (exists('CLAUDE.md')) {
   const rows = [];
   torsoBlock.replace(/\{ y: ([\d.]+), w: ([\d.]+), d: ([\d.]+)/g, function (m, y, w, d) { rows.push({ y: Number(y), w: Number(w), d: Number(d) }); return m; });
   const row = y => rows.find(r => Math.abs(r.y - y) < 1e-6);
-  const belt = row(1.480), hip = row(1.130), knee = row(0.780), calf = row(0.640);
-  ok('R106-teardrop-hip-over-belt', !!belt && !!hip && hip.w / belt.w >= 1.8, belt && hip ? (hip.w / belt.w).toFixed(2) : 'rows missing');
+  const belt = row(1.480), hip = row(1.100), knee = row(0.810), calf = row(0.640);
+  /* R108: the male lower body's width lives in the vastus lateralis SWEEP of thighShape, not in w (w stays at the
+     waist's radius); the apex row is measured by its depth and by the sweep terms it declares */
+  ok('R106-teardrop-hip-over-belt', !!belt && !!hip && hip.d / belt.d >= 1.35 && /function thighShape\(o\)/.test(propsSrc) && /\{ y: 1\.100, [^\n]*\n[^\n]*thighShape\(\{/.test(propsSrc),
+    belt && hip ? 'apex depth over belt ' + (hip.d / belt.d).toFixed(2) : 'rows missing');
   const below = rows.filter(r => r.y <= 0.640).sort((a, b) => b.y - a.y);
   ok('R106-teardrop-converges-to-one-point', below.length >= 5 && below.every((r, i) => i === 0 || r.w < below[i - 1].w) && rows[0].w < 0.01,
     below.map(r => r.w).join(' > '));
-  ok('R106-knee-and-calf-inside-the-taper', !!knee && !!calf && knee.w < calf.w && calf.w < hip.w);
+  ok('R106-knee-and-calf-inside-the-taper', !!knee && !!calf && knee.w < calf.w && calf.d < hip.d && /function lowerLegShape\(o\)/.test(propsSrc) && /medial/.test(propsSrc) && /soleus/.test(propsSrc) && /tendon/.test(propsSrc));   /* R108: knee, two gastrocnemius heads, soleus and an Achilles taper on one mass */
   /* the abdomen is a curved mass with blocks as relief, not a stack of plates */
   ok('R106-abs-not-corrugated', /coreShape\(1\.0, 0\.2[0-9], /.test(propsSrc) && !/coreShape\([01]\.[0-9]+, -0\.0[5-9]/.test(propsSrc));   /* R107/R108: block rows 0.24-0.26 against crease rows around 0.08; never an inset slot */
   /* the pec is a dome: a crown ring between two shoulder rings */
@@ -872,7 +875,7 @@ if (exists('CLAUDE.md')) {
   const palmM = propsSrc.match(/palmLength: ([\d.]+)/), digitM = propsSrc.match(/digitLength: ([\d.]+)/);
   ok('R106-fingers-longer-than-the-palm', !!palmM && !!digitM && Number(digitM[1]) > Number(palmM[1]) * 1.2);
   /* the elbow joint is a ball whose end discs hide inside the tubes */
-  ok('R106-elbow-is-a-ball', /profile: function \(t\) \{ return 0\.50 \+ Math\.sin\(t \* Math\.PI\) \* 0\.50; \}/.test(limbs));
+  ok('R106-elbow-is-a-ball', /profile: function \(t\) \{ return 0\.1[0-9] \+ Math\.pow\(Math\.sin\(t \* Math\.PI\), 0\.8\) \* 0\.8[0-9]; \}/.test(limbs));   /* R108: a true ball whose end discs vanish inside both tubes */
   /* posterior: scapular planes on the chest rings */
   ok('R106-scapular-planes', /function backTerms\(a, o\)/.test(propsSrc) && /var latBack = /.test(propsSrc) && /kite/.test(propsSrc));   /* R108: the upper back is a trapezius kite, erector columns, a valley and a lat plane (backTerms) */
   /* the crystal precesses; the mist takes a tenth of the theme */
@@ -895,7 +898,7 @@ if (exists('CLAUDE.md')) {
   /* the micro jitter sits UNDER the curve */
   ok('R107-jitter-under-the-curve', /jitter: 0\.4[0-9],/.test(propsSrc) && /jitterScale/.test(forge) && /crystal: 0\.012, steps: 1[0-9]/.test(limbs));
   /* resolution: 24-side torso, 14-side limbs, 12-ring deltoid */
-  ok('R107-round-resolution', /sides: 24,/.test(propsSrc) && /spec\.foreRadius \* 1\.02, 14,/.test(limbs) && /deltoidR0, deltoidR1, 14,/.test(body) && /steps: 12/.test(body));
+  ok('R107-round-resolution', /sides: 24,/.test(propsSrc) && /spec\.foreRadius \* 1\.02, 16,/.test(limbs) && /deltoidR0, deltoidR1, 16,/.test(body) && /steps: 12/.test(body));   /* R108: limbs and deltoid at sixteen sides so the heads land on vertices */
   /* bellies: fuller top, steeper flanks */
   ok('R107-belly-function', /function belly\(a, centre, width\) \{ return Math\.pow\(bump\(a - Math\.PI \/ 2, centre, width\), 0\.55\); \}/.test(propsSrc) && (propsSrc.match(/belly\(a, /g) || []).length >= 6 && /SHAPES\.belly/.test(variants));
   /* the deltoid is a dome of ~0.2 radius rooted in the trapezius, not a 0.33 ball */
@@ -908,12 +911,12 @@ if (exists('CLAUDE.md')) {
   /* the neck is a column into the head; the shoulder corner sits inside the dome */
   ok('R107-neck-column', /\{ y: 2\.335, w: 0\.1[0-9]{2}/.test(propsSrc) && /\{ y: 2\.120, w: 0\.30[0-9]/.test(propsSrc));
   /* Mrs. Mah: hip / glute max near 1 : 3.5 against the waist, glute spheres with a fold */
-  const fw = Number((variants.match(/\{ y: 1\.690, w: ([\d.]+)/) || [])[1]), fh = Number((variants.match(/\{ y: 1\.400, w: ([\d.]+)/) || [])[1]);
-  ok('R107-female-hip-ratio', fw > 0 && fh / fw >= 3.0, 'hip/waist ' + (fh / fw).toFixed(2));
-  ok('R107-female-glute-spheres', /SHAPES\.belly\(a, Math\.PI - 0\.6[0-9], 0\.3[0-9]\)/.test(variants) && /hipShape\(1\.0, 0\.85\)/.test(variants) && /hipShape\(0\.45, 0\.0\)/.test(variants));
-  ok('R107-male-glute-spheres', /belly\(a, Math\.PI - 0\.70, 0\.36\)/.test(propsSrc) && /quadShape\(0\.70, 0\.0, 1\.0\)/.test(propsSrc));
+  const fw = Number((variants.match(/\{ y: 1\.690, w: ([\d.]+)/) || [])[1]), fh = Number((variants.match(/\{ y: 1\.430, w: ([\d.]+)/) || [])[1]);   /* R108: her apex row is 1.430 */
+  ok('R107-female-hip-ratio', fw > 0 && fh / fw >= 2.5 && fh / fw <= 3.2, 'hip/waist ' + (fh / fw).toFixed(2));   /* R108: 2.8 : 1 in silhouette (w 2.67 plus the sweep), an art-direction ratio made by muscle contour */
+  ok('R107-female-glute-spheres', /function hipShape\(k, gluteK, quadK, hamK\)/.test(variants) && /SHAPES\.belly\(a, Math\.PI - 0\.6[0-9], 0\.4[0-9]\)/.test(variants) && /var ham = /.test(variants) && /cav: 0\.55/.test(variants));   /* R108: ONE continuous glute belly per side, a hamstring pair, a fold ring */
+  ok('R107-male-glute-spheres', /function thighShape\(o\)/.test(propsSrc) && /gluteC/.test(propsSrc) && /hamCleft/.test(propsSrc) && /function dome\(a, centre, hw\)/.test(propsSrc));   /* R108: compact-support domes — glute per side with a curving fold, hamstring pair below */
   /* facet GROUPS: several triangles share one group-averaged normal, sized per ring */
-  ok('R107-facet-groups', /function groupKey\(spec, i, r\)/.test(forge) && /faceGroup: faceGroup/.test(forge) && /triGroup\.forEach/.test(forge) && (propsSrc.match(/fg: \[[0-9], [0-9]\]/g) || []).length >= 24 && /fg: \[2, 3\],/.test(body));
+  ok('R107-facet-groups', /function groupKey\(spec, i, r\)/.test(forge) && /faceGroup: faceGroup/.test(forge) && /triGroup\.forEach/.test(forge) && (propsSrc.match(/fg: \[[0-9], [0-9]\]/g) || []).length >= 24 && /fg: \[2, 2\],/.test(body) && /var shift = \(row % 2\)/.test(forge) && /fg: \[1, 3\],/.test(limbs));   /* R108: bricked groups that follow the muscle — strips along the limbs, wraps on the cap */
   /* the smooth clay gate: smooth normals swapped in, a camera-side key */
   ok('R107-smooth-clay-gate', /g\.setAttribute\('normal', g\.attributes\.aSmooth\)/.test(mrmah) && /__facetNormal/.test(mrmah) && /clayKey = new ClayLight\(0xffffff, 1\.[0-9]\)/.test(sceneSrc));
   /* posterior (R106 back sheet, carried into R107): trap kite, lat sweep, scapular planes */

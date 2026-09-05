@@ -1528,11 +1528,71 @@ not move, so the silhouette is the clay's; only the shading is cut. Check
 the clay against the lit render after any change to `fg`: the two must have
 the same outline.
 
-### Mrs. Mah's ratio is authored, not derived
+### Mrs. Mah's ratio is authored, not derived (R107, corrected in R108)
 
-The R107 brief allows a visual waist-to-hip near 1 : 3.5 for her godform
-state, and says not to normalise it back. Her waist is 0.118 and her hip
-row 0.395 (3.35 in w, more in silhouette with the sweep); the glutes are
-two 0.30-rad bellies 38 degrees off the back with a 0.64 cleft, full to
-the 1.230 ring and ended by 1.070 so the sphere folds into the thigh. Her
-deltoid shares the male's dome law (r0 0.16 on her scale).
+R107 built her at 1 : 3.5 in w (hip row 0.395 with two 0.30-rad glute
+spheres); the R108 brief re-set the art-direction ratio to about 2.8 : 1
+of MUSCLE SILHOUETTE against the waist — never a wider pelvis — and said
+the drama comes from shape. Her waist row is 0.118 and her apex row 1.430
+is 0.315 (2.67 in w, 2.80 in silhouette with the sweep, front, arms
+hidden; 3.0 from the rear). Each glute is ONE continuous 0.44-rad belly at
+38 degrees off the back (two spheres read as pads), with an upper shelf
+ring (1.545) that carries no quad, a fold ring (1.185, cav 0.55) where the
+glute scale falls between rings, hamstring bellies below it, and the outer
+hip a 0.16 belly sweep at 1.52 rad. Measure her with the ARMS HIDDEN: the
+mask's central run swallows the lowered forearm beside the hip and read
+4.0 for a body that measured 3.57.
+
+### The male lower body's width is a muscle, not a radius (R108)
+
+Mr. Mah's brief ratio is about 1.5 : 1 of lower-body muscle silhouette
+against the waist. `thighShape` keeps the ring's `w` at the WAIST's radius
+from the knee to the belt and puts every unit of width into the vastus
+lateralis sweep, so the apex (row 1.100, 0.162 of height, 1.48 x the belt
+measured on the front mask) is a muscle event with an origin and an
+insertion, not a wider pelvis. `dome()` — a compact-support lobe, zero
+outside its half-width with zero slope at the edge — replaced `belly()`
+for the thigh, glute and calf terms because the Gaussian^0.55 is still
+0.58 one width from its centre and on a 24-side ring every lobe leaked
+into its neighbours (the two thigh heads filled the seam, the glutes
+reached the hip). The knee is not notched in depth (the side view showed a
+corner); the calf's two gastrocnemius heads peak on different rows (0.640
+medial, 0.720 lateral), the soleus lower and wider, the Achilles a
+tendon-plus-hollows row at 0.440.
+
+### Facet groups are bricks, and they follow the muscle (R108)
+
+Facet groups laid out as a grid of [2,3] blocks lit as a checkerboard of
+tiles — the "armour panels" the addendum named: a whole block took one
+reflection and came back as a white rectangle across the biceps. The
+groups are now BRICKED (`groupKey` shifts alternate rows by half a group)
+and sized along the muscle: one column by several bands on the limbs,
+thighs, calves and abs (strips along the belly), two by two on the pecs,
+deltoid caps and glutes (wrapping the dome). The geometry does not move;
+the lit body stopped flattening the clay's anatomy.
+
+### With coherent facets the darkness has to come from absorption
+
+Random facets miss the lights often; grouped facets face where the
+surface faces, so the body brightened as a whole and lost its dark end
+(chest box, identical framing: 29% -> 17% under 32 luma, mean 91 -> 105).
+Per the rule above this is a shifted distribution AND a missing dark end:
+`envMapIntensity` 14 -> 11 trimmed the bright tail (above 224: 10.7% ->
+1.1%) and `innerDark` 0.72 -> 1.00 widened the darks back to 22%; the theme
+rims came down (rim lights 0.80 / 0.95, rim floor 0.09) so the silhouette
+is a thin rim, not a stroke. The histogram now reads shadow, dark midtone,
+body midtone, controlled highlight, rare specular — the addendum's stack.
+
+### Read the sculptors' reports for what they did NOT do
+
+Four regional sculptors in worktrees (arms, torso and back, male lower
+body, Mrs. Mah) plus a second arm pass converged R108 in parallel, each in
+the smooth-clay loop against its reference panels, each owning a file or
+a block of one file, committing on its branch for a three-way merge. Two
+habits paid: the report schema asked for remaining issues and failing
+tests, and every one of them listed faults the orchestrator would not
+have found in an hour (a lens-shaped arm cross-section from sided
+grooves, a flexor and extensor swapping sides between the two arms, the
+forearm swallowed into a hip measurement); and no sculptor was allowed to
+edit the tests, so every pinned literal surfaced at the merge as a
+failing contract to be re-authored, never silently loosened.

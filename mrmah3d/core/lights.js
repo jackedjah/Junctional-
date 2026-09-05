@@ -74,7 +74,7 @@ export function createLights(options) {
   fill.position.set(5.6, 3.0, 4.0);
 
   /* Rim — cyan, from behind and above. This is what draws the lit contour. */
-  var rim = new DirectionalLight(new Color(T('hero', 0x49dcff)), 1.0);
+  var rim = new DirectionalLight(new Color(T('hero', 0x49dcff)), 0.80);   /* R108: a thin theme rim where justified, not a stroke */
   rim.position.set(1.4, 4.6, -7.0);
 
   /* A second rim from the other side, weaker, so the silhouette closes on
@@ -84,7 +84,7 @@ export function createLights(options) {
      deltoid's outer crest; the left-side rim was too weak and too far behind
      him to reach either. Side-rear now, so the left contour of the arm, the
      deltoid and the quad's sweep all take it. */
-  var rim2 = new DirectionalLight(new Color(T('worldAccent', 0x3fb8e8)), 1.2);
+  var rim2 = new DirectionalLight(new Color(T('worldAccent', 0x3fb8e8)), 0.95);
   rim2.position.set(-6.4, 3.4, -3.2);
 
   /* Floor bounce: the grid is a light source in the reference, and a point
@@ -203,8 +203,8 @@ export function createLights(options) {
     var k = Math.max(0, Number(scale) || 1);
     key.intensity = 6.0 * k;
     fill.intensity = 0.80 * k;
-    rim.intensity = 1.0 * k;   /* R102: 2.2 -> 1.0, the theme is an accent on a platinum body */
-    rim2.intensity = 1.2 * k;  /* R102: 2.6 -> 1.2 */
+    rim.intensity = 0.80 * k;   /* R102: 2.2 -> 1.0; R108: 0.80 */
+    rim2.intensity = 0.95 * k;  /* R102: 2.6 -> 1.2; R108: 0.95 */
     bounce.intensity = 1.05 * k;
     chestLamp.intensity = 0.85 * k;
     faceLamp.intensity = 0.95 * k;

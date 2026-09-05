@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T03:55:11.338Z",
+  "generatedAt": "2026-09-05T11:32:24.222Z",
   "base": "http://127.0.0.1:8123",
   "results": [
     {
@@ -9,8 +9,8 @@
     },
     {
       "id": "MOUNT-02 no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "MOUNT-03 no failed requests",
@@ -35,7 +35,7 @@
     {
       "id": "MOUNT-07 frames advancing",
       "ok": true,
-      "detail": "45 frames"
+      "detail": "38 frames"
     },
     {
       "id": "MOUNT-08 geometry uploaded",
@@ -45,7 +45,7 @@
     {
       "id": "MOUNT-09 draw calls issued",
       "ok": true,
-      "detail": "112 draws, 13197 tris"
+      "detail": "112 draws, 14093 tris"
     },
     {
       "id": "MOUNT-10 the real character, not a placeholder",
@@ -60,22 +60,22 @@
     {
       "id": "PIXEL-02 lit pixels present",
       "ok": true,
-      "detail": "51.00% lit"
+      "detail": "51.21% lit"
     },
     {
       "id": "PIXEL-03 specular highlights present",
       "ok": true,
-      "detail": "42020 bright px, max luma 255"
+      "detail": "42768 bright px, max luma 255"
     },
     {
       "id": "PIXEL-04 shaded gradient (not flat fill)",
       "ok": true,
-      "detail": "509 distinct colours"
+      "detail": "499 distinct colours"
     },
     {
       "id": "PIXEL-05 stage stays dark (reference character measures 68.2)",
       "ok": true,
-      "detail": "mean 87.0"
+      "detail": "mean 86.8"
     },
     {
       "id": "DEPTH-01 floor grid draws its receding lines",
@@ -90,12 +90,12 @@
     {
       "id": "DEPTH-03 solid shows multiple lit planes",
       "ok": true,
-      "detail": "19 luminance plateaus at [12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80]"
+      "detail": "20 luminance plateaus at [12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84]"
     },
     {
       "id": "DEPTH-04 lit planes are separable",
       "ok": true,
-      "detail": "spread 68 luma"
+      "detail": "spread 72 luma"
     },
     {
       "id": "DRAG-01 drag changed the rendered image",
@@ -115,12 +115,12 @@
     {
       "id": "LIFE-01 pause() stops the render loop",
       "ok": true,
-      "detail": "227 -> 227 frames"
+      "detail": "226 -> 226 frames"
     },
     {
       "id": "LIFE-02 start() resumes the loop",
       "ok": true,
-      "detail": "227 -> 241 frames"
+      "detail": "226 -> 237 frames"
     },
     {
       "id": "LIFE-03 hidden tab stops the loop",
@@ -150,17 +150,17 @@
     {
       "id": "RESP-small-320 renders",
       "ok": true,
-      "detail": "300x432 dpr 1 tier low fov 32° lit 54.31%"
+      "detail": "300x432 dpr 1 tier low fov 32° lit 54.54%"
     },
     {
       "id": "RESP-small-320 keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "313 converging rows, 19 lit planes"
+      "detail": "312 converging rows, 20 lit planes"
     },
     {
       "id": "RESP-small-320 no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "RESP-small-320 no horizontal page overflow",
@@ -175,17 +175,17 @@
     {
       "id": "RESP-iphone-se renders",
       "ok": true,
-      "detail": "355x432 dpr 1 tier low fov 32° lit 50.64%"
+      "detail": "355x432 dpr 1 tier low fov 32° lit 50.87%"
     },
     {
       "id": "RESP-iphone-se keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "318 converging rows, 19 lit planes"
+      "detail": "318 converging rows, 20 lit planes"
     },
     {
       "id": "RESP-iphone-se no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "RESP-iphone-se no horizontal page overflow",
@@ -200,17 +200,17 @@
     {
       "id": "RESP-iphone-14 renders",
       "ok": true,
-      "detail": "373x456 dpr 1 tier low fov 32° lit 50.86%"
+      "detail": "373x456 dpr 1 tier low fov 32° lit 51.05%"
     },
     {
       "id": "RESP-iphone-14 keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "334 converging rows, 19 lit planes"
+      "detail": "334 converging rows, 20 lit planes"
     },
     {
       "id": "RESP-iphone-14 no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "RESP-iphone-14 no horizontal page overflow",
@@ -225,17 +225,17 @@
     {
       "id": "RESP-iphone-pro-max renders",
       "ok": true,
-      "detail": "410x456 dpr 1 tier low fov 32° lit 48.42%"
+      "detail": "410x456 dpr 1 tier low fov 32° lit 48.58%"
     },
     {
       "id": "RESP-iphone-pro-max keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "343 converging rows, 19 lit planes"
+      "detail": "342 converging rows, 20 lit planes"
     },
     {
       "id": "RESP-iphone-pro-max no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "RESP-iphone-pro-max no horizontal page overflow",
@@ -250,17 +250,17 @@
     {
       "id": "RESP-ipad-portrait renders",
       "ok": true,
-      "detail": "740x530 dpr 1 tier low fov 32° lit 40.35%"
+      "detail": "740x530 dpr 1 tier low fov 32° lit 40.44%"
     },
     {
       "id": "RESP-ipad-portrait keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "426 converging rows, 21 lit planes"
+      "detail": "427 converging rows, 22 lit planes"
     },
     {
       "id": "RESP-ipad-portrait no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "RESP-ipad-portrait no horizontal page overflow",
@@ -275,17 +275,17 @@
     {
       "id": "RESP-ipad-landscape renders",
       "ok": true,
-      "detail": "996x530 dpr 1 tier low fov 32° lit 38.16%"
+      "detail": "996x530 dpr 1 tier low fov 32° lit 38.23%"
     },
     {
       "id": "RESP-ipad-landscape keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "426 converging rows, 21 lit planes"
+      "detail": "428 converging rows, 20 lit planes"
     },
     {
       "id": "RESP-ipad-landscape no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "RESP-ipad-landscape no horizontal page overflow",
@@ -300,17 +300,17 @@
     {
       "id": "RESP-phone-landscape renders",
       "ok": true,
-      "detail": "824x318 dpr 1 tier low fov 32° lit 32.26%"
+      "detail": "824x318 dpr 1 tier low fov 32° lit 32.29%"
     },
     {
       "id": "RESP-phone-landscape keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "251 converging rows, 22 lit planes"
+      "detail": "252 converging rows, 22 lit planes"
     },
     {
       "id": "RESP-phone-landscape no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "RESP-phone-landscape no horizontal page overflow",
@@ -325,17 +325,17 @@
     {
       "id": "RESP-desktop renders",
       "ok": true,
-      "detail": "1072x530 dpr 1 tier low fov 32° lit 37.50%"
+      "detail": "1072x530 dpr 1 tier low fov 32° lit 37.54%"
     },
     {
       "id": "RESP-desktop keeps real depth (grid converges, planes separate)",
       "ok": true,
-      "detail": "426 converging rows, 21 lit planes"
+      "detail": "426 converging rows, 20 lit planes"
     },
     {
       "id": "RESP-desktop no console errors",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "RESP-desktop no horizontal page overflow",
@@ -410,7 +410,7 @@
     {
       "id": "R95-TIER-07 every tier renders through the same colour pipeline",
       "ok": true,
-      "detail": "upper-chest mean luma low 143.4 vs high 143.7"
+      "detail": "upper-chest mean luma low 130.0 vs high 127.8"
     },
     {
       "id": "MOTION-01 prefers-reduced-motion is honoured",
@@ -435,7 +435,7 @@
     {
       "id": "GESTURE-02 a press with slight jitter is still a tap",
       "ok": true,
-      "detail": "press held 549 ms by the harness (TAP_MS is 900)"
+      "detail": "press held 661 ms by the harness (TAP_MS is 900)"
     },
     {
       "id": "GESTURE-03 dragging reports the drag state",
@@ -545,7 +545,7 @@
     {
       "id": "MODE-protocol horizontal placement",
       "ok": true,
-      "detail": "0.355 vs intent 0.345 + pose skew 0.009"
+      "detail": "0.356 vs intent 0.345 + pose skew 0.009"
     },
     {
       "id": "MODE-protocol vertical placement",
@@ -604,13 +604,13 @@
     },
     {
       "id": "MODE-00 no errors switching modes",
-      "ok": false,
-      "detail": "THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn | THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. Wn"
+      "ok": true,
+      "detail": ""
     },
     {
       "id": "R94-WORLD-01 frame budget at tier high (draws <= 165, tris <= 15000)",
       "ok": true,
-      "detail": "115 draws, 13544 tris"
+      "detail": "115 draws, 14440 tris"
     },
     {
       "id": "R94-WORLD-02 three depth layers (far, mid, ridge) built and visible; extra layers (R101 spires) allowed",
@@ -645,7 +645,7 @@
     {
       "id": "R94-WORLD-08 floor still converges with the world in place",
       "ok": true,
-      "detail": "622 rows carry converging content"
+      "detail": "623 rows carry converging content"
     },
     {
       "id": "R94-WORLD-09 sparkle specks were placed on the slopes",
@@ -683,9 +683,9 @@
       "detail": "{\"chat\":[0,0],\"protocol\":[0,0]}"
     },
     {
-      "id": "R95-WORLD-01 frame budget at tier high (draws <= 170, tris <= 12500)",
-      "ok": false,
-      "detail": "111 draws, 13536 tris"
+      "id": "R95-WORLD-01 frame budget at tier high (draws <= 170, tris <= 15000)",
+      "ok": true,
+      "detail": "111 draws, 14432 tris"
     },
     {
       "id": "R95-WORLD-02 the moon is a textured disc in the upper left, above the horizon rows",
@@ -710,17 +710,17 @@
     {
       "id": "R95-WORLD-06 the figures never overlap him (showcase, website, chat, protocol)",
       "ok": true,
-      "detail": "showcase 0px of 12236, website 0px of 12615, chat 0px of 3032, protocol 0px of 5406"
+      "detail": "showcase 0px of 12243, website 0px of 12620, chat 0px of 3035, protocol 0px of 5406"
     },
     {
       "id": "R95-WORLD-07 the figures are dim silhouettes in the delivered frame (mean 25-75 over their own pixels)",
       "ok": true,
-      "detail": "mean 37.5, 0.1% above 128"
+      "detail": "mean 37.4, 0.1% above 128"
     },
     {
       "id": "R95-WORLD-08 the range is darker than his chest, with a small bright tail",
       "ok": true,
-      "detail": "range 17.4 (0.0% above 128) vs chest 83.2"
+      "detail": "range 17.4 (0.0% above 128) vs chest 90.1"
     },
     {
       "id": "R95-WORLD-09 a thin beam stands between the tip and the floor flare",
@@ -740,7 +740,7 @@
     {
       "id": "R95-WORLD-12 the floor still converges with the moon and the figures in place",
       "ok": true,
-      "detail": "809 rows carry converging content"
+      "detail": "812 rows carry converging content"
     },
     {
       "id": "R95-WORLD-13 the sky beside the moon stays near-black (right corner < 30)",
@@ -775,19 +775,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 38,
-        "fps": 60,
-        "avgMs": 2.33,
+        "frames": 33,
+        "fps": 30,
+        "avgMs": 2.89,
         "tierDrops": 0
       },
       "drawCalls": 112,
-      "triangles": 13197,
+      "triangles": 14093,
       "geometries": 91,
       "textures": 16,
-      "litFraction": 0.5431083333333333,
-      "meanLuma": 90.54000882026637,
-      "partialRows": 313,
-      "plateaus": 19
+      "litFraction": 0.5454,
+      "meanLuma": 90.31861962802402,
+      "partialRows": 312,
+      "plateaus": 20
     },
     {
       "viewport": "iphone-se",
@@ -810,19 +810,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 37,
-        "fps": 60,
-        "avgMs": 2.49,
+        "frames": 33,
+        "fps": 30,
+        "avgMs": 2.78,
         "tierDrops": 0
       },
       "drawCalls": 112,
-      "triangles": 13197,
+      "triangles": 14093,
       "geometries": 91,
       "textures": 16,
-      "litFraction": 0.5064295774647888,
-      "meanLuma": 87.31023103690875,
+      "litFraction": 0.5086830985915493,
+      "meanLuma": 87.09062109233221,
       "partialRows": 318,
-      "plateaus": 19
+      "plateaus": 20
     },
     {
       "viewport": "iphone-14",
@@ -845,19 +845,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 34,
-        "fps": 30,
-        "avgMs": 2.82,
+        "frames": 29,
+        "fps": 0,
+        "avgMs": 0,
         "tierDrops": 0
       },
       "drawCalls": 112,
-      "triangles": 13197,
+      "triangles": 14093,
       "geometries": 91,
       "textures": 16,
-      "litFraction": 0.5085991957104558,
-      "meanLuma": 86.83484943228795,
+      "litFraction": 0.5105160857908847,
+      "meanLuma": 86.62640601694129,
       "partialRows": 334,
-      "plateaus": 19
+      "plateaus": 20
     },
     {
       "viewport": "iphone-pro-max",
@@ -880,19 +880,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 33,
+        "frames": 30,
         "fps": 30,
-        "avgMs": 2.76,
+        "avgMs": 3,
         "tierDrops": 0
       },
       "drawCalls": 112,
-      "triangles": 13197,
+      "triangles": 14093,
       "geometries": 91,
       "textures": 16,
-      "litFraction": 0.48416875,
-      "meanLuma": 86.10050267080472,
-      "partialRows": 343,
-      "plateaus": 19
+      "litFraction": 0.48583125,
+      "meanLuma": 85.85471664213851,
+      "partialRows": 342,
+      "plateaus": 20
     },
     {
       "viewport": "ipad-portrait",
@@ -915,19 +915,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 26,
+        "frames": 23,
         "fps": 0,
         "avgMs": 0,
         "tierDrops": 0
       },
       "drawCalls": 116,
-      "triangles": 13205,
+      "triangles": 14101,
       "geometries": 93,
       "textures": 16,
-      "litFraction": 0.40350625,
-      "meanLuma": 80.22335453093872,
-      "partialRows": 426,
-      "plateaus": 21
+      "litFraction": 0.40435,
+      "meanLuma": 80.01922044923752,
+      "partialRows": 427,
+      "plateaus": 22
     },
     {
       "viewport": "ipad-landscape",
@@ -950,19 +950,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 25,
+        "frames": 21,
         "fps": 0,
         "avgMs": 0,
         "tierDrops": 0
       },
       "drawCalls": 116,
-      "triangles": 13205,
+      "triangles": 14101,
       "geometries": 93,
       "textures": 16,
-      "litFraction": 0.38156875,
-      "meanLuma": 76.07942058283993,
-      "partialRows": 426,
-      "plateaus": 21
+      "litFraction": 0.3822625,
+      "meanLuma": 75.93855909141621,
+      "partialRows": 428,
+      "plateaus": 20
     },
     {
       "viewport": "phone-landscape",
@@ -985,18 +985,18 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 34,
-        "fps": 60,
-        "avgMs": 3.28,
+        "frames": 31,
+        "fps": 30,
+        "avgMs": 2.97,
         "tierDrops": 0
       },
       "drawCalls": 116,
-      "triangles": 13205,
+      "triangles": 14101,
       "geometries": 93,
       "textures": 16,
-      "litFraction": 0.32264150943396225,
-      "meanLuma": 76.01712436769611,
-      "partialRows": 251,
+      "litFraction": 0.3229481132075472,
+      "meanLuma": 75.84368200074937,
+      "partialRows": 252,
       "plateaus": 22
     },
     {
@@ -1020,19 +1020,19 @@
         "destroyed": false
       },
       "stats": {
-        "frames": 24,
+        "frames": 21,
         "fps": 0,
         "avgMs": 0,
         "tierDrops": 0
       },
       "drawCalls": 116,
-      "triangles": 13205,
+      "triangles": 14101,
       "geometries": 93,
       "textures": 16,
-      "litFraction": 0.3749875,
-      "meanLuma": 75.43920205884855,
+      "litFraction": 0.37544375,
+      "meanLuma": 75.31903600473679,
       "partialRows": 426,
-      "plateaus": 21
+      "plateaus": 20
     }
   ]
 }

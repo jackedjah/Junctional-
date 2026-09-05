@@ -711,7 +711,13 @@ export function loft(sections, sides, options) {
      valleys, none where a ring says nothing. The geometry does not move. */
   function groupKey(spec, i, r) {
     if (!spec.fg) return null;
-    return Math.floor(i / spec.fg[0]) + ':' + Math.floor(r / spec.fg[1]);
+    var gc = spec.fg[0], gb = spec.fg[1];
+    var row = Math.floor(r / gb);
+    /* R108: BRICK offset — alternate group rows shift by half a group, so
+       the groups never line up into the checkerboard of tiles that read as
+       armour panels on the lit body; a cut gem's facets are staggered. */
+    var shift = (row % 2) ? Math.floor(gc / 2) : 0;
+    return Math.floor((i + shift) / gc) + ':' + row;
   }
   function bandSpec(r) {
     var s = sections[r + 1], lo = sections[r];

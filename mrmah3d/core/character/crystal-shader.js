@@ -164,7 +164,7 @@ export function applyCrystalShader(material, options) {
        character move. */
     uRimDirA: { value: new Vector3(-0.62, 0.72, 0.30).normalize() },
     uRimDirB: { value: new Vector3(0.85, 0.15, 0.25).normalize() },
-    uRimFloor: { value: opts.rimFloor == null ? 0.12 : opts.rimFloor },   /* R102: 0.22 -> 0.12, the theme rim is a contour accent on a platinum body */
+    uRimFloor: { value: opts.rimFloor == null ? 0.09 : opts.rimFloor },   /* R102: 0.22 -> 0.12; R108: 0.09 — a thin rim, not a stroke around the silhouette */
     uCoat: { value: opts.coat == null ? 0.0 : opts.coat },
     uCoatColor: { value: new Color(opts.coatColor == null ? 0xbfc8d6 : opts.coatColor) },
     uCoatMetal: { value: opts.coatMetal == null ? 0.66 : opts.coatMetal },
