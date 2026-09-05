@@ -159,6 +159,62 @@ function facade(ctx, parent, o) {
   return { body, room, glass, pl, pr, lintel, rw, rh };
 }
 
+/* CRYSTALLIZATION (brief §06–§09, §12): the MAHFITT crystal language applied to ARCHITECTURE —
+   a faceted tapered crown, angled inset crystal panels, chamfered corner turns that catch the moon,
+   and one diamond roof beacon. The building stays a building; crystal is its surface language. */
+function crystallize(ctx, g, o) {
+  const { M } = ctx;
+  const { W, H, D, openW, E, floorY = 0, seed = 1, beacon = true } = o;
+  const crystal = [], catches = [], deep = [];
+  const pierW = (W - openW) / 2;
+  const R = ((seed * 2654435761) % 1000) / 1000;
+  /* CROWN: a tapered faceted cap — four angled planes stepping in toward the roof line, flat shaded so
+     each plane takes its own value under the moon; the silhouette turns instead of stopping flat */
+  const crownH = 1.9 + R * 0.6, inset = 1.5;
+  for (const [sx, sz, w, d] of [[0, 1, W - 1.2, 0], [0, -1, W - 1.2, 0], [-1, 0, 0, D - 1.2], [1, 0, 0, D - 1.2]]) {
+    const len = sx ? d : w;
+    const geo = chamferBox(sx ? 1.5 : len, crownH, sx ? len : 1.5, 0.06);
+    const px = sx * (W / 2 - 0.75), pz = sz ? (sz > 0 ? 0.4 : -(E + D) + 0.4) : -(E + D / 2);
+    part(crystal, geo, px, H + crownH / 2 - 0.2, pz, 0, sz ? sz * -0.22 : 0, sx ? sx * 0.22 : 0);
+  }
+  /* the crown's bright turn: a thin platinum cap band that only exists where the planes meet the sky */
+  part(catches, chamferBox(W - 2.4, 0.14, 0.5, 0.04), 0, H + crownH - 0.25, 0.2);
+  part(catches, chamferBox(0.5, 0.14, D - 2.4, 0.04), -W / 2 + 1.1, H + crownH - 0.25, -(E + D / 2));
+  part(catches, chamferBox(0.5, 0.14, D - 2.4, 0.04), W / 2 - 1.1, H + crownH - 0.25, -(E + D / 2));
+  /* ANGLED INSET CRYSTAL PANELS: shallow rotated facets recessed into each pier, in two courses.
+     Their angle is what reads — each catches a different amount of moon and city glow. */
+  const rows = Math.max(2, Math.round((H - floorY - 6) / 5.5));
+  for (let sd = -1; sd <= 1; sd += 2) for (let i = 0; i < rows; i++) {
+    const y = floorY + 4.4 + i * 5.0, tilt = ((i + (sd > 0 ? 1 : 0)) % 2 ? 1 : -1) * 0.05;
+    if (y > H - crownH - 1.6) continue;
+    const x = sd * (openW / 2 + pierW / 2), w = pierW * 0.66;
+    /* a recessed reveal, then the crystal face set INTO it with a shallow tilt: the facet is a change of
+       plane in the wall, not a slab stuck on top of it */
+    part(deep, chamferBox(w + 0.5, 3.0, 0.3, 0.04), x, y, 0.28);
+    part(crystal, chamferBox(w, 2.6, 0.26, 0.05), x, y, 0.3, tilt * 0.4, 0, tilt);
+    part(catches, chamferBox(w, 0.06, 0.1, 0.015), x, y + 1.31, 0.42, tilt * 0.4, 0, tilt);
+  }
+  /* CORNER TURNS: chamfered vertical strips on the four front corners — the geometric turn of the mass,
+     with a platinum edge that draws the building's height */
+  for (const sd of [-1, 1]) {
+    part(deep, chamferBox(0.9, H - 0.6, 0.9, 0.16), sd * (W / 2 - 0.35), (H - 0.6) / 2, 0.12);
+    part(catches, chamferBox(0.12, H - 2.4, 0.12, 0.03), sd * (W / 2 - 0.02), (H - 2.4) / 2 + 0.4, 0.5);
+  }
+  /* DIAMOND ROOF BEACON: a slim mast and one square diamond — a FOBEAM endpoint's architectural logic */
+  if (beacon) {
+    const bx = (R < 0.5 ? -1 : 1) * (W * 0.3), bz = -(E + D * 0.25), bh = 3.4 + R * 2.2;
+    part(deep, new THREE.BoxGeometry(0.22, bh, 0.22), bx, H + crownH + bh / 2 - 0.2, bz);
+    const dia = new THREE.Mesh(new THREE.OctahedronGeometry(0.62, 0), M.energyLight);
+    const w = world(g, bx, H + crownH + bh + 0.3, bz);
+    dia.position.set(bx, H + crownH + bh + 0.3, bz); dia.scale.set(1, 1.25, 0.35); g.add(dia);
+    ctx.reflect(dia, 0.3);
+    (ctx.beacons = ctx.beacons || []).push({ position: w, building: g.name });
+  }
+  merged(g, crystal, M.composite, 'crystal-panels', true);
+  merged(g, catches, M.trim, 'crystal-catches', false);
+  merged(g, deep, M.structural, 'crystal-structure', true);
+}
+
 export function buildBuildings(ctx) {
   const { M, scene } = ctx;
   ctx.signMaterials = ctx.signMaterials || [];
@@ -177,6 +233,7 @@ export function buildBuildings(ctx) {
     g.position.set(-36, 0, -30); g.rotation.y = 0.32; scene.add(g);
     const f = facade(ctx, g, { W, H, D: 26, openW, openH, pierDepth: E, roomDepth: R, radius: 1.6, glassMullions: 2 });
     dressFacade(ctx, g, { W, H, D: 26, openW, openH, E, seed: 1 });
+    crystallize(ctx, g, { W, H, D: 26, openW, E, seed: 1 });
     action('gym', 'MAH GYM', 'destination', f.glass, world(g, 0, 0, 2), { view: 'gym-entrance', copy: 'Training facility. Preview navigation: the camera moves to the entrance. Training data stays in MAHFITT.' });
     /* upper window band across the piers: interior glow behind glass */
     const windowGlow = M.interiorSoft.clone(); windowGlow.opacity = 0.28; ctx.timeHooks.push(s => { windowGlow.opacity = 0.28 * (1 - s.daylight * 0.5); });
@@ -212,6 +269,7 @@ export function buildBuildings(ctx) {
     g.position.set(0, 0, -48); scene.add(g);
     const f = facade(ctx, g, { W, H, D: 34, openW, openH, pierDepth: E, roomDepth: R, floorY, radius: 1.8, roomW: 38 });
     dressFacade(ctx, g, { W, H, D: 34, openW, openH, E, floorY, seed: 2, canopy: false });   /* MAH MATCH keeps its own portal frame instead of a canopy */
+    crystallize(ctx, g, { W, H, D: 34, openW, E, floorY, seed: 2 });
     action('match', 'MAH MATCH', 'destination', f.glass, world(g, 0, floorY, 2), { view: 'match-entrance', copy: 'Fighting facility: matches and practice. Choose an action at the entrance.' });
     /* the strong central frame around the opening, with a square-diamond keystone */
     const fT = 1.4, fD = 1.0, fz = 0.55;
@@ -287,6 +345,7 @@ export function buildBuildings(ctx) {
     g.position.set(36, 0, -30); g.rotation.y = -0.32; scene.add(g);
     const f = facade(ctx, g, { W, H, D: 22, openW, openH, pierDepth: E, roomDepth: R, radius: 3.0, glassMullions: 3 });
     dressFacade(ctx, g, { W, H, D: 22, openW, openH, E, seed: 3, windowsUpper: false });   /* the low market: wings, canopy and roof kit, no upper courses */
+    crystallize(ctx, g, { W, H, D: 22, openW, E, seed: 3 });
     action('market', 'MAH MARKET', 'destination', f.glass, world(g, 0, 0, 2), { view: 'market-entrance', copy: 'World marketplace. Preview navigation only: nothing is for sale here and no prices exist.' });
     /* a soft continuous sill light under the glass — the welcome line */
     const sill = box(openW, 0.05, 0.08, M.energyLight, 0, 0.06, -E + 0.3); g.add(sill); ctx.reflect(sill, 0.3);

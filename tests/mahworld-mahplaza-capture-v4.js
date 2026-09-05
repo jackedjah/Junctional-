@@ -46,8 +46,8 @@ const info = () => { const w = window.MAHWORLD_MAHPLAZA; let lights = 0, casters
 const setView = (page, v) => page.evaluate(v => window.MAHWORLD_MAHPLAZA.setView(v, { instant: true }), v).then(() => page.waitForTimeout(700));
 const setTime = (page, t) => page.evaluate(t => window.MAHWORLD_MAHPLAZA.setTime(t), t).then(() => page.waitForTimeout(1200));
 async function shot(page, file, meta) { await page.screenshot({ path: p.join(OUT, file) }); const i = await page.evaluate(info); report.captures = (report.captures || []).filter(c => c.file !== file); report.captures.push(Object.assign({ file }, meta, i)); console.log('captured', file, 'draws', i.drawCalls, 'tris', i.triangles, 'ms', i.ms, 'lights', i.lights, 'casters', i.shadowCasters); }
-const WIDE = { viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 };
-const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
+const WIDE = { viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1, reducedMotion: 'no-preference' };
+const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, reducedMotion: 'no-preference' };
 const VIEWS = [
   ['establishing', 'Arrival — plaza, three destinations, skyline behind'],
   ['in-world', 'In-world — ground level, foreground / midground / background'],
@@ -94,35 +94,38 @@ const BASELINE = { establishing: 'v3-establishing-night-wide.png', 'in-world': '
     for (const view of ['in-world', 'establishing', 'skyline', 'match-hall']) { await setView(page, view); await shot(page, `v4-noui-${view}-night.png`, { set: 'noui', view, time: 'night', label: 'no labels' }); }
     await ctx.close(); save();
   }
-  /* the world-life test (brief §62): stand still for a minute */
+  /* the world-life test (brief §44): stand still and let the world act. Headless browsers throttle
+     requestAnimationFrame to a fraction of a frame per second, so the capture advances the world
+     deterministically through the SAME step function the browser runs (world.advance). */
   if (want('life')) {
     const ctx = await browser.newContext(WIDE); const page = await ctx.newPage(); await serve(page);
     await open(page, '?hud=0&time=night&theme=blue&self=purple', 'life');
     await setView(page, 'in-world');
-    const t0 = Date.now(); const stills = [];
+    const stills = [];
     for (const at of [0, 20, 40, 60]) {
-      const wait = t0 + at * 1000 - Date.now(); if (wait > 0) await page.waitForTimeout(wait);
+      if (at) await page.evaluate(s => window.MAHWORLD_MAHPLAZA.advance(s), 20);
+      await page.waitForTimeout(120);
       const f = `v4-life-in-world-${at}s.png`; await page.screenshot({ path: p.join(OUT, f) });
       const st = await page.evaluate(() => { const w = window.MAHWORLD_MAHPLAZA; return w.life ? { stats: JSON.parse(JSON.stringify(w.life.stats || {})), log: (w.life.log || []).slice(-12) } : null; });
       stills.push({ file: f, atS: at, life: st }); console.log('life still', at, 's', st && JSON.stringify(st.stats));
     }
-    /* wait for an ambient GYMATTACK-class event and frame it */
-    let framed = null; const tEv = Date.now();
-    while (Date.now() - tEv < 120000 && !framed) {
-      await page.waitForTimeout(1500);
-      const ev = await page.evaluate(() => { const w = window.MAHWORLD_MAHPLAZA; if (!w.life || !w.life.log) return null; const L = w.life.log.slice().reverse().find(e => e && e.where && /strike|spar|levit|dash|projectile|wave|gymattack|training/i.test(e.name || e.id || '')); if (!L) return null; const pos = Array.isArray(L.where) ? L.where : (L.where.x != null ? [L.where.x, L.where.y, L.where.z] : null); return pos ? { name: L.name || L.id, where: pos, t: L.t } : null; });
-      if (ev) {
-        const d = Math.hypot(ev.where[0], ev.where[2]);
-        const dist = d > 80 ? 26 : 14; const dirx = ev.where[0] / (d || 1), dirz = ev.where[2] / (d || 1);
-        await page.evaluate(v => window.MAHWORLD_MAHPLAZA.setCustomView(v), { pos: [ev.where[0] - dirx * dist + 4, Math.max(2.2, ev.where[1] + 3), ev.where[2] - dirz * dist + 6], look: [ev.where[0], ev.where[1] + 1.2, ev.where[2]], fov: 50 });
-        await page.waitForTimeout(500);
-        const f = 'v4-life-event.png'; await page.screenshot({ path: p.join(OUT, f) });
-        framed = { file: f, event: ev }; console.log('event framed', ev.name, ev.where.map(v => Math.round(v)));
-      }
+    /* advance until an ambient GYMATTACK-class event is running, then frame it from a custom camera */
+    let framed = null;
+    for (let i = 0; i < 40 && !framed; i++) {
+      await page.evaluate(() => window.MAHWORLD_MAHPLAZA.advance(3));
+      const ev = await page.evaluate(() => { const w = window.MAHWORLD_MAHPLAZA; if (!w.life || !w.life.log) return null; const L = w.life.log.slice().reverse().find(e => e && e.where && /strike|spar|levit|dash|projectile|wave|training/i.test(e.name || e.id || '')); return L && L.where ? { name: L.name || L.id, where: L.where, t: L.t } : null; });
+      if (!ev) continue;
+      const d = Math.hypot(ev.where[0], ev.where[2]) || 1, dist = d > 80 ? 30 : 15;
+      await page.evaluate(v => window.MAHWORLD_MAHPLAZA.setCustomView(v), { pos: [ev.where[0] - (ev.where[0] / d) * dist + 5, Math.max(2.4, (ev.where[1] || 0) + 4), ev.where[2] - (ev.where[2] / d) * dist + 7], look: [ev.where[0], (ev.where[1] || 0) + 1.2, ev.where[2]], fov: 50 });
+      await page.evaluate(() => window.MAHWORLD_MAHPLAZA.advance(0.6, 1 / 60));
+      const f = 'v4-life-event.png'; await page.screenshot({ path: p.join(OUT, f) });
+      framed = { file: f, event: ev }; console.log('event framed', ev.name, ev.where.map(v => Math.round(v)));
     }
-    report.life = { stills, framed: framed || 'no framed event within 120 s (see the log in the stills)', modulePresent: await page.evaluate(() => !!window.MAHWORLD_MAHPLAZA.life) };
+    const summary = await page.evaluate(() => { const L = window.MAHWORLD_MAHPLAZA.life; return { stats: JSON.parse(JSON.stringify(L.stats || {})), log: (L.log || []).slice(-20) }; });
+    report.life = { stills, framed: framed || 'no event framed', modulePresent: true, summary };
     await ctx.close(); save();
   }
+
   if (want('quality')) {
     const ctx = await browser.newContext(WIDE); const page = await ctx.newPage(); await serve(page);
     await open(page, '?hud=0&time=night&theme=blue&self=purple&quality=high', 'quality');

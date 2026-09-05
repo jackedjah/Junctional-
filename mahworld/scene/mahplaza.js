@@ -172,7 +172,9 @@ export async function createMahplaza(canvas, options = {}) {
   ctx.entranceLights.forEach(p => addPoint(p, theme.energy, 46, 52, true));
   (ctx.roomLights || []).forEach(p => addPoint(p, 0xcfe4ff, matchInterior && Math.abs(p.x) < 12 && p.z < -50 ? 70 : 130, 34));
   if (ctx.arenaLight) addPoint(ctx.arenaLight, 0xbfdcff, matchInterior ? 70 : 120, 32);
-  addPoint(new THREE.Vector3(0, 2.4, 13), 0xcfe4ff, 30, 26, false);   /* the plaza-centre light stays neutral: residents near the marker are lit, not tinted, by the world Theme */
+  /* the plaza-centre light stays neutral (residents near the marker are lit, not tinted, by the world
+     Theme) and sits high and soft so it models the ground instead of burning a pool into it */
+  addPoint(new THREE.Vector3(0, 5.6, 13), 0xcfe4ff, 22, 34, false);
 
   /* ---- population: 12 outdoor residents (self + 11 fixtures) and the building spots -- */
   const selfColour = (() => { const c = String(opts.self || (opts.persist && readStore(STORE.self)) || 'purple').toLowerCase(); return AVATAR_COLOURS.indexOf(c) > -1 ? c : 'purple'; })();
@@ -523,26 +525,39 @@ export async function createMahplaza(canvas, options = {}) {
   resize();
   let raf = 0, last = performance.now(), hidden = false, lastClockCheck = 0;
   function requestRender() { if (!raf) raf = requestAnimationFrame(frame); }
+  /* ONE world step, shared by the animation loop and by `advance()` (validation) so evidence exercises
+     exactly the code a viewer's browser runs */
+  function stepWorld(t, dt, nowMs) {
+    residents.forEach(r => { if (r.userData && r.userData.update) r.userData.update(t, dt); });
+    extras.forEach(r => { if (r.userData && r.userData.update) r.userData.update(t, dt); });
+    walkers.forEach(w => { w.phase = (w.phase + dt * 0.02) % 1; const k = 0.5 - 0.5 * Math.cos(w.phase * Math.PI * 2); const dir = Math.sin(w.phase * Math.PI * 2) >= 0 ? 1 : -1; w.r.position.x = w.from[0] + (w.to[0] - w.from[0]) * k; w.r.position.z = w.from[1] + (w.to[1] - w.from[1]) * k; w.r.rotation.y = Math.atan2((w.to[0] - w.from[0]) * dir, (w.to[1] - w.from[1]) * dir); });
+    if (vehicles && vehicles.update) vehicles.update(t);
+    sky.update(nowMs != null ? nowMs : t * 1000);
+    if (city && city.update) city.update(t, dt);
+    if (clouds && clouds.update) clouds.update(t, dt);
+    if (fobeams && fobeams.update) fobeams.update(t, dt);
+    if (dressing && dressing.update) dressing.update(t, dt);
+    if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
+    if (life && life.update) life.update(t, dt);
+    ctx.updateHooks.slice().forEach(h => h(t, dt));
+  }
+  /* Validation only: advance the world by `seconds` in fixed steps without waiting for animation frames.
+     Headless browsers throttle requestAnimationFrame to a fraction of a frame per second, so a capture
+     could never observe ambient life in real time; this runs the same step function deterministically. */
+  let advanceClock = 0;
+  function advance(seconds, stepSeconds = 1 / 30) {
+    const n = Math.max(1, Math.round(seconds / stepSeconds));
+    for (let i = 0; i < n; i++) { advanceClock += stepSeconds; stepWorld(advanceClock, stepSeconds, advanceClock * 1000); }
+    applyTime(false); placeCamera(0); renderer.render(scene, camera); state.frames++;
+    return { advancedSeconds: n * stepSeconds, steps: n, worldTime: advanceClock };
+  }
   function frame(now) {
     raf = 0;
+    if (advanceClock < now / 1000) advanceClock = now / 1000;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (now - lastClockCheck > 1000 || !lastApplied) { lastClockCheck = now; applyTime(false); }
     if (anim) { const k = Math.min(1, (now - anim.t0) / anim.dur), e = ease(k); cur.pos.lerpVectors(from.pos, new THREE.Vector3(...anim.to.pos), e); cur.look.lerpVectors(from.look, new THREE.Vector3(...anim.to.look), e); cur.fov = from.fov + (anim.to.fov - from.fov) * e; if (k >= 1) { const r = anim.resolve; anim = null; r(true); } }
-    if (!state.reduced || ctx.updateHooks.length) {
-      const t = now / 1000;
-      residents.forEach(r => { if (r.userData && r.userData.update) r.userData.update(t, dt); });
-      extras.forEach(r => { if (r.userData && r.userData.update) r.userData.update(t, dt); });
-      walkers.forEach(w => { const p0 = w.phase; w.phase = (w.phase + dt * 0.02) % 1; const k = 0.5 - 0.5 * Math.cos(w.phase * Math.PI * 2); const dir = Math.sin(w.phase * Math.PI * 2) >= 0 ? 1 : -1; w.r.position.x = w.from[0] + (w.to[0] - w.from[0]) * k; w.r.position.z = w.from[1] + (w.to[1] - w.from[1]) * k; w.r.rotation.y = Math.atan2((w.to[0] - w.from[0]) * dir, (w.to[1] - w.from[1]) * dir); void p0; });
-      if (vehicles && vehicles.update) vehicles.update(t);
-      sky.update(now);
-      if (city && city.update) city.update(t, dt);
-      if (clouds && clouds.update) clouds.update(t, dt);
-      if (fobeams && fobeams.update) fobeams.update(t, dt);
-      if (dressing && dressing.update) dressing.update(t, dt);
-      if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
-      if (life && life.update) life.update(t, dt);
-      ctx.updateHooks.slice().forEach(h => h(t, dt));
-    }
+    if (!state.reduced || ctx.updateHooks.length) stepWorld(now / 1000, dt, now);
     placeCamera(dt);
     const t0 = performance.now(); renderer.render(scene, camera);
     state.ms = state.ms * 0.9 + (performance.now() - t0) * 0.1; state.frames++;
@@ -602,7 +617,7 @@ export async function createMahplaza(canvas, options = {}) {
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
-    setDiagnostic, setQuality, get quality() { return quality.name; }, qualities: Object.keys(QUALITY),
+    setDiagnostic, setQuality, get quality() { return quality.name; }, qualities: Object.keys(QUALITY), advance,
     /* validation: pin or release world time */
     setTime(spec) { if (spec == null || spec === 'live') clock.release(); else clock.freeze(spec); applyTime(true); requestRender(); return clock.state(); },
     renderOnce() { requestRender(); },

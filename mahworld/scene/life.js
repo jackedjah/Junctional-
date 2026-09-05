@@ -329,14 +329,16 @@ export function createLife(ctx, R, opts = {}) {
   function tryStartEvent(t) {
     if (active.length >= 3) return;
     const ready = EVENTS.filter(e => cooldowns[e.id] <= 0);
+    stats.ready = ready.length;
     if (!ready.length) return;
+    stats.attempts = (stats.attempts || 0) + 1;
     let total = 0; ready.forEach(e => { total += e.weight; });
     let pick = rand() * total, chosen = ready[0];
     for (const e of ready) { pick -= e.weight; if (pick <= 0) { chosen = e; break; } }
     let inst = null;
-    try { inst = chosen.run(t); } catch (err) { inst = null; }
-    cooldowns[chosen.id] = chosen.cooldown * (0.75 + rand() * 0.6);
-    if (!inst) return;
+    try { inst = chosen.run(t); } catch (err) { inst = null; stats.lastError = chosen.id + ': ' + (err && err.message); }
+    cooldowns[chosen.id] = chosen.cooldown * (0.75 + rand() * 0.6) * (inst ? 1 : 0.25);   /* a failed stage retries sooner */
+    if (!inst) { stats.lastFail = chosen.id; return; }
     inst.id = chosen.id; inst.name = chosen.name; inst.t0 = inst.t0 || t; inst.dur = inst.dur || 4;
     active.push(inst); stats.events++;
     const p = inst.pos || (inst.who && inst.who[0] ? inst.who[0].g.position : null);
