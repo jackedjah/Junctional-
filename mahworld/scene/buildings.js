@@ -180,7 +180,10 @@ export function buildBuildings(ctx) {
     action('gym', 'MAH GYM', 'destination', f.glass, world(g, 0, 0, 2), { view: 'gym-entrance', copy: 'Training facility. Preview navigation: the camera moves to the entrance. Training data stays in MAHFITT.' });
     /* upper window band across the piers: interior glow behind glass */
     const windowGlow = M.interiorSoft.clone(); windowGlow.opacity = 0.28; ctx.timeHooks.push(s => { windowGlow.opacity = 0.28 * (1 - s.daylight * 0.5); });
-    [-1, 1].forEach(s => { const gl = new THREE.Mesh(new THREE.PlaneGeometry(6.5, 2.2), M.glass); gl.position.set(s * (W / 2 - 4.2), 11.6, 0.44); g.add(gl); const glow = new THREE.Mesh(new THREE.PlaneGeometry(6.3, 2.0), windowGlow); glow.position.set(s * (W / 2 - 4.2), 11.6, 0.3); g.add(glow); });
+    [-1, 1].forEach(s => { const gl = new THREE.Mesh(new THREE.PlaneGeometry(6.5, 2.2), M.glass); gl.position.set(s * (W / 2 - 4.2), 11.6, 0.44); g.add(gl); const glow = new THREE.Mesh(new THREE.PlaneGeometry(6.3, 2.0), windowGlow); glow.position.set(s * (W / 2 - 4.2), 11.6, 0.3); g.add(glow);
+      /* a window the life module may put a training silhouette behind (brief §43) */
+      const n = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), g.rotation.y);
+      (ctx.lifeAnchors ? ctx.lifeAnchors.windows : []).push({ id: 'gym-window-' + (s < 0 ? 'l' : 'r'), position: world(g, s * (W / 2 - 4.2), 10.6, -0.4), normal: n, size: [6.3, 2.0], building: 'gym' }); });
     /* one light seam on each outer pier: a single vertical energy line, not an outline */
     [-1, 1].forEach(s => { const seam = box(0.08, H * 0.62, 0.06, M.energy, s * (W / 2 - 1.0), H * 0.42, 0.46); g.add(seam); ctx.reflect(seam, 0.35); });
     /* signage on the lintel */

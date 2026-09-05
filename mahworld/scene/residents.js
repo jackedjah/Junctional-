@@ -2,16 +2,29 @@
 
    Species law (art direction, hard requirements):
    - Head: a beveled, flattened square-diamond slab — never a sphere.  Dark
-     front/back panels and one small bright diamond plate suggest a face.
-   - Everything is low-poly and flat shaded; every mesh carries per-facet
+     front/back panels and a DARK FACIAL CHAMBER holding two eyes and a small
+     smile (in the resident's own light colour) suggest a face.
+   - Everything is faceted and flat shaded; every mesh carries per-facet
      vertex colour so ONE shared material per colour still reads as a cut
      crystal: dark structural planes, coloured mid facets, pale platinum catches.
-   - Humanoid upper body (shoulder caps, chest block, waist, two arms with a
-     faceted hand wedge).  NO legs, feet or knees: below the waist there is ONE
-     continuous faceted teardrop that tapers to a single terminal point which
-     hangs `hover` metres above the ground.  The whole body floats.
+     The torso, head and arms are painted CALM (one volume, few shallow dark
+     planes, small facets); the lower teardrop keeps the stronger, larger cut —
+     so a figure reads as a sculpted crystal person, not a heap of triangles.
+   - Humanoid upper body: a shoulder yoke the shoulder caps sit INTO, chest,
+     waist, a short neck that enters the head slab, two arms with a faceted
+     hand wedge and a thumb notch.  NO legs, feet or knees: below the waist
+     there is ONE continuous faceted teardrop that tapers to a single terminal
+     point which hangs `hover` metres above the ground.  The whole body floats;
+     a soft dark contact blob on the ground under the tip grounds it.
    - `physique` 0..1 blends untrained → hero; `sex` 'm' | 'f' picks the base.
    - One coherent colour per resident, chosen by its player; no yellow anywhere.
+
+   Detail tiers — `createResident({ lod: 'near' | 'mid' | 'far' })` (default
+   near = the full sculpt, ~1000 triangles; mid ≈ 55 % of that; far ≤ 120
+   triangles in two draw calls) and `createImpostor()` (≤ 60 triangles, ONE
+   draw call) for the distant crowd.  `setLOD(group, tier)` and
+   `recolour(group, colour)` rebuild a figure in place from the same seed, so
+   its look, idle motion, id, transform and parent all survive.
 
    Group origin = the ground point under the terminal tip (y = 0 is the ground);
    local +Z is the resident's front.  Materials are cached per colour and shared
@@ -20,6 +33,7 @@
    frame — it is a no-op when the value is unchanged. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
+import { blobTexture } from './materials.js';
 
 export const COLOURS = ['blue', 'purple', 'violet', 'green', 'emerald', 'teal', 'red', 'crimson', 'platinum', 'silver'];
 
@@ -45,6 +59,7 @@ export function residentPalette(name) {
 /* ------------------------------------------------------------------ utils */
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
 const lerp = (a, b, t) => a + (b - a) * t;
 function mulberry(seed) {
   let a = (seed >>> 0) || 1;
@@ -94,6 +109,53 @@ function materialsFor(name) {
   return set;
 }
 
+/* Contact blob (hover grounding): ONE shared unlit black material; each
+   figure's opacity rides on a 4-component vertex colour of its own 2-triangle
+   plane, so the material stays shared.  Soft radial falloff (blobTexture),
+   never darker than BLOB_OPACITY at the centre — no black halo. */
+const BLOB_OPACITY = 0.4, BLOB_MIN = 0.18;
+let BLOB = null;
+function blobMaterial() {
+  if (BLOB) return BLOB;
+  BLOB = new THREE.MeshBasicMaterial({ map: blobTexture(), color: 0x000000, transparent: true, opacity: BLOB_OPACITY, depthWrite: false, vertexColors: true });
+  BLOB.name = 'resident-contact';
+  return BLOB;
+}
+function contactBlob(width) {
+  const g = new THREE.PlaneGeometry(width, width); g.rotateX(-Math.PI / 2);
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(16).fill(1), 4));
+  const mesh = new THREE.Mesh(g, blobMaterial());
+  mesh.name = 'contact'; mesh.position.y = 0.012; mesh.castShadow = false; mesh.receiveShadow = false;
+  return mesh;
+}
+/* opacity by hover height: a figure resting low sits on a firm shadow, a high hoverer on a faint one */
+function blobDriver(mesh) {
+  const attr = mesh.geometry.getAttribute('color'), arr = attr.array;
+  let last = -1;
+  return function (y) {
+    const a = clamp(BLOB_OPACITY - (y - 0.1) * 0.5, BLOB_MIN, BLOB_OPACITY) / BLOB_OPACITY;
+    if (Math.abs(a - last) < 0.01) return;
+    last = a; arr[3] = arr[7] = arr[11] = arr[15] = a; attr.needsUpdate = true;
+  };
+}
+
+/* ---------------------------------------------------------------- detail */
+/* near = the full sculpt; mid ≈ 55 % of its triangles (SEG 8, no smile, fewer
+   arm rings); far ≤ 120 triangles in two draw calls (body + dark): one lathe
+   for teardrop + torso, a head slab, two simple arm lathes baked into the body. */
+export const LOD_TIERS = Object.freeze(['near', 'mid', 'far']);
+const LODS = Object.freeze({
+  near: { seg: 14, dropSeg: 12, armSeg: 8, neckSeg: 8, drop: [0.1, 0.25, 0.45, 0.68, 0.88, 1.0], hip: [0.36, 0.7], torsoMid: true,  head: 5, eyes: true,  smile: true,  emblem: true,  thumb: true,  armDetail: 2 },
+  mid:  { seg: 8,  dropSeg: 8,  armSeg: 6, neckSeg: 6, drop: [0.12, 0.35, 0.62, 0.85, 1.0],     hip: [0.5],       torsoMid: false, head: 3, eyes: true,  smile: false, emblem: true,  thumb: false, armDetail: 1 },
+  far:  { seg: 6,  dropSeg: 6,  armSeg: 4, neckSeg: 0, drop: [0.4, 1.0],                        hip: [],          torsoMid: false, head: 2, eyes: false, smile: false, emblem: false, thumb: false, armDetail: 0, far: true }
+});
+/* head rim profiles: [depth fraction, size fraction] back → front */
+const HEAD_PROFILES = Object.freeze({
+  5: [[-0.5, 0.66], [-0.34, 0.92], [-0.12, 1], [0.12, 1], [0.34, 0.92], [0.5, 0.7]],
+  3: [[-0.5, 0.7], [-0.2, 1], [0.2, 1], [0.5, 0.72]],
+  2: [[-0.5, 0.7], [0, 1], [0.5, 0.72]]
+});
+
 /* ---------------------------------------------------------- gem geometry */
 /* Triangle accumulator → non-indexed BufferGeometry, flat normals, one colour per facet. */
 class Poly {
@@ -113,7 +175,10 @@ class Poly {
 
 const _c = new THREE.Color();
 /* Facet painter, deterministic per seed.  Each mesh shows dark planes, coloured
-   mid facets and a few platinum catches while staying ONE colour. */
+   mid facets and a few platinum catches while staying ONE colour.
+   'torso' (torso, head rim, arms) keeps a narrow value range with shallow dark
+   planes on ≤ 20 % of facets so the upper body reads as one volume; 'body'
+   (teardrop, far figures) keeps the stronger cut; 'dark' is the structure. */
 function painter(rng, cols, tier) {
   const { base, dark, light } = cols;
   return function (ny) {
@@ -122,9 +187,14 @@ function painter(rng, cols, tier) {
       if (r < 0.11) _c.copy(dark).lerp(base, 0.55);
       else if (r < 0.19) _c.copy(dark).lerp(light, 0.32);
       else _c.copy(dark).multiplyScalar(0.75 + 0.5 * rng());
+    } else if (tier === 'torso') {
+      if (r < 0.2) _c.copy(base).lerp(dark, 0.3 + 0.18 * rng());
+      else if (r < 0.3) _c.copy(base).lerp(light, 0.28 + 0.24 * rng());
+      else _c.copy(base).multiplyScalar(0.88 + 0.2 * rng());
+      if (ny > 0.55 && rng() < 0.5) _c.lerp(light, 0.16);
     } else {
-      if (r < 0.14) _c.copy(base).lerp(dark, 0.62 + 0.2 * rng());
-      else if (r < 0.26) _c.copy(base).lerp(light, 0.45 + 0.35 * rng());
+      if (r < 0.16) _c.copy(base).lerp(dark, 0.62 + 0.22 * rng());
+      else if (r < 0.28) _c.copy(base).lerp(light, 0.45 + 0.35 * rng());
       else _c.copy(base).multiplyScalar(0.78 + 0.34 * rng());
       if (ny > 0.55 && rng() < 0.5) _c.lerp(light, 0.25);   /* upward facets catch the sky */
     }
@@ -174,6 +244,30 @@ function lathe(poly, rings, seg, paint, opts = {}) {
   }
 }
 
+/* Convex solids with faces wound outward from their centroid; the painter
+   receives the face normal's y and z. */
+function convex(poly, pts, faces, paint) {
+  let cx = 0, cy = 0, cz = 0;
+  for (const p of pts) { cx += p[0]; cy += p[1]; cz += p[2]; }
+  cx /= pts.length; cy /= pts.length; cz /= pts.length;
+  for (const [i, j, k] of faces) {
+    const a = pts[i], b = pts[j], c = pts[k];
+    const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
+    const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx, len = Math.hypot(nx, ny, nz) || 1;
+    const fx = (a[0] + b[0] + c[0]) / 3 - cx, fy = (a[1] + b[1] + c[1]) / 3 - cy, fz = (a[2] + b[2] + c[2]) / 3 - cz;
+    if (nx * fx + ny * fy + nz * fz < 0) poly.tri(a, c, b, paint(-ny / len, -nz / len)); else poly.tri(a, b, c, paint(ny / len, nz / len));
+  }
+}
+/* a 4-face pyramid: apex + base triangle (the thumb) */
+const tetra = (poly, apex, b0, b1, b2, paint) => convex(poly, [apex, b0, b1, b2], [[0, 1, 2], [0, 2, 3], [0, 3, 1], [1, 3, 2]], paint);
+/* an octahedron with half-extents hx, hy, hz about c (impostor head, shoulder bar) */
+function octa(poly, c, hx, hy, hz, paint) {
+  const pts = [[c[0] + hx, c[1], c[2]], [c[0] - hx, c[1], c[2]], [c[0], c[1] + hy, c[2]], [c[0], c[1] - hy, c[2]], [c[0], c[1], c[2] + hz], [c[0], c[1], c[2] - hz]];
+  const faces = [];
+  for (const x of [0, 1]) for (const y of [2, 3]) for (const z of [4, 5]) faces.push([x, y, z]);
+  convex(poly, pts, faces, paint);
+}
+
 const meshOf = (poly, material, name) => { const m = new THREE.Mesh(poly.build(), material); if (name) m.name = name; return m; };
 /* A flat diamond plate facing +Z: built as a fan around Y then turned upright. */
 function plateGeom(w, h, paint) {
@@ -187,7 +281,7 @@ function plateGeom(w, h, paint) {
    baked — per material — into ONE mesh inside the nearest ancestor that
    update() animates (flagged userData.animated) or the body group.  Vertex
    colours and flat normals are carried over, so the result is pixel-identical:
-   3 draws for a still resident, 5 for spar, 7 for walk. */
+   3 draws for a still resident, 5 for spar, 7 for walk (+1 contact blob). */
 function concatF32(arrays) {
   let n = 0; for (const a of arrays) n += a.length;
   const out = new Float32Array(n); let o = 0;
@@ -244,7 +338,7 @@ function measures(spec, rng) {
     handW: L(0.042, 0.052) * F(1, 0.88), handD: L(0.024, 0.03), handLen: 0.14,
     headW: 0.19 * F(1, 0.93), headH: 0.215 * F(1, 0.93), headD: 0.2 * F(1, 0.92),
     neckR: L(0.04, 0.05) * F(1, 0.85),
-    hipY: 0.78, waistY: 1.08, chestBotY: 1.22, chestY: 1.40, shoulderY: 1.54, neckTop: 1.60,
+    hipY: 0.78, waistY: 1.08, chestBotY: 1.215, chestY: 1.39, shoulderY: 1.52, neckTop: 1.60,
     upperLen: 0.36, foreLen: 0.31,
     abduct: L(7, 10) * DEG
   };
@@ -252,8 +346,11 @@ function measures(spec, rng) {
   const dropScale = seated ? 0.62 : 1, shift = m.hipY * (dropScale - 1);
   m.hipY *= dropScale;
   for (const k of ['waistY', 'chestBotY', 'chestY', 'shoulderY', 'neckTop']) m[k] += shift;
-  m.headC = 2.0 + shift - m.headH;
+  m.headC = 2.02 + shift - m.headH;   /* the slab sits a little proud of the frame so the neck reads */
   for (const k in m) if (k !== 'taperQ' && k !== 'bicep' && k !== 'abduct') m[k] *= s;
+  /* the shoulder yoke: the torso's top ring reaches out under the caps so they sit INTO it */
+  m.yokeRx = Math.max(m.chestRx * 0.97, m.shoulderHalf - m.capR * 0.62); m.yokeRz = m.chestRz * 0.84;
+  m.blobW = clamp(m.hipRx * 3.8, 0.7, 0.95);   /* contact blob width ≈ 1.9 × the hip width */
   m.height = H; m.scale = s;
   return m;
 }

@@ -103,7 +103,10 @@ export function windowGrid({ cols = 8, rows = 6, cellW = 1.2, cellH = 1.6, gapX 
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
     m4.makeTranslation(-totalW / 2 + cellW / 2 + c * (cellW + gapX), -totalH / 2 + cellH / 2 + r * (cellH + gapY), 0);
     mesh.setMatrixAt(i, m4);
-    const lit = R() < onFraction; col.copy(lit ? on : off); if (lit) col.multiplyScalar(0.42 + R() * 0.5);   /* lit windows: a spread of brightness, none blown out */
+    /* lit windows: a wide spread of brightness and a slight cool/neutral drift, so a facade never reads
+       as a uniform grid of identical white dots (brief §08) */
+    const lit = R() < onFraction; col.copy(lit ? on : off);
+    if (lit) { col.multiplyScalar(0.22 + R() * R() * 0.95); if (R() < 0.3) col.lerp(new THREE.Color(0x9fc0f0), 0.35); }
     mesh.setColorAt(i, col); i++;
   }
   mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
@@ -116,16 +119,20 @@ export function createMaterials(themeIn) {
   const floorTex = surfaceTexture('floor'), wallTex = surfaceTexture('wall');
   const m = {
     theme,
-    graphite: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphite, roughness: 0.52, metalness: 0.3, roughnessMap: wallTex }),
-    graphiteDark: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphiteDark, roughness: 0.62, metalness: 0.25 }),
-    graphiteLight: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphiteLight, roughness: 0.58, metalness: 0.22, roughnessMap: floorTex }),
+    /* v4 night pass (brief §11): the neutrals sit a step higher and a touch more reflective so planes,
+       bevels and facade depth survive the dark instead of collapsing into black */
+    graphite: new THREE.MeshStandardMaterial({ color: 0x222c3d, roughness: 0.48, metalness: 0.38, roughnessMap: wallTex, envMapIntensity: 1.15 }),
+    graphiteDark: new THREE.MeshStandardMaterial({ color: 0x18202e, roughness: 0.58, metalness: 0.3, envMapIntensity: 1.0 }),
+    graphiteLight: new THREE.MeshStandardMaterial({ color: 0x33405a, roughness: 0.54, metalness: 0.26, roughnessMap: floorTex, envMapIntensity: 1.1 }),
     platinum: new THREE.MeshStandardMaterial({ color: NEUTRALS.platinum, roughness: 0.26, metalness: 0.9 }),
     panel: new THREE.MeshStandardMaterial({ color: NEUTRALS.panel, roughness: 0.34, metalness: 0.5, flatShading: true }),
     /* the v4 physical family — the same dark world, differentiated by roughness and metalness, not by colour */
-    structural: new THREE.MeshStandardMaterial({ color: 0x151b26, roughness: 0.64, metalness: 0.82, roughnessMap: wallTex }),   /* dark structural metal: broad muted highlight */
-    composite: new THREE.MeshStandardMaterial({ color: 0x1d2636, roughness: 0.4, metalness: 0.36 }),                            /* satin graphite composite */
-    trim: new THREE.MeshStandardMaterial({ color: 0x9aa7bb, roughness: 0.16, metalness: 0.96 }),                                /* polished architectural trim */
-    trimSatin: new THREE.MeshStandardMaterial({ color: 0x8593a8, roughness: 0.36, metalness: 0.9 }),                            /* brushed / satin trim */
+    structural: new THREE.MeshStandardMaterial({ color: 0x1c2433, roughness: 0.58, metalness: 0.86, roughnessMap: wallTex, envMapIntensity: 1.3 }),   /* dark structural metal: broad muted highlight */
+    composite: new THREE.MeshStandardMaterial({ color: 0x243044, roughness: 0.36, metalness: 0.42, envMapIntensity: 1.25 }),                          /* satin graphite composite */
+    /* platinum / silver catches (brief §12): the same language as Mr. Mah's edge catches — these read as
+       bright turns of the surface under moonlight and city glow, never as an outline */
+    trim: new THREE.MeshStandardMaterial({ color: 0xb6c3d6, roughness: 0.13, metalness: 0.98, envMapIntensity: 1.9 }),
+    trimSatin: new THREE.MeshStandardMaterial({ color: 0x9aa8bd, roughness: 0.3, metalness: 0.94, envMapIntensity: 1.5 }),
     curb: new THREE.MeshStandardMaterial({ color: 0x38445a, roughness: 0.72, metalness: 0.12 }),                                /* raised edges, kerbs, steps */
     arena: new THREE.MeshStandardMaterial({ color: 0x171a21, roughness: 0.88, metalness: 0.04 }),                               /* rubberised impact floor */
     panelLit: new THREE.MeshStandardMaterial({ color: 0x1a2436, roughness: 0.5, metalness: 0.1, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */

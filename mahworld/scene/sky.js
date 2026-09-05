@@ -11,8 +11,11 @@
 import * as THREE from '../vendor/three/three.module.min.js';
 
 const KEYS = {
-  night: { top: 0x040a19, mid: 0x091634, horizon: 0x10264c, fog: 0x0e2142, hemiSky: 0x5a83c8, hemiGround: 0x141c2c, hemiI: 1.15, sun: 0xa9c9ff, sunI: 0.8, fillI: 0.45, exposure: 1.0, stars: 1.0, haze: 0.5, infra: 1.0, sunDisc: 0, clouds: 0.12, bands: 0.42 },
-  dusk:  { top: 0x1a1a48, mid: 0x3d3688, horizon: 0x7466b4, fog: 0x3c3672, hemiSky: 0x8a8ed4, hemiGround: 0x16162a, hemiI: 1.0, sun: 0xd8dbff, sunI: 1.1, fillI: 0.32, exposure: 1.0, stars: 0.35, haze: 0.55, infra: 0.8, sunDisc: 0.7, clouds: 0.3, bands: 0.5 },
+  /* LUMINOUS NIGHT (brief §01, §10, §11): the night stays deep in absolute value but is filled with
+     controlled light — a moon that is a real key, sky and city bounce that keep dark planes readable,
+     and a horizon that glows with the district behind it. Never daylight; never a black field. */
+  night: { top: 0x081226, mid: 0x102446, horizon: 0x1d3d6e, fog: 0x152c52, hemiSky: 0x74a0dc, hemiGround: 0x1e2a3f, hemiI: 1.5, sun: 0xbcd6ff, sunI: 1.35, fillI: 0.66, exposure: 1.06, stars: 1.0, haze: 0.62, infra: 1.0, sunDisc: 0, clouds: 0.18, bands: 0.5 },
+  dusk:  { top: 0x1a1a48, mid: 0x3d3688, horizon: 0x7466b4, fog: 0x3c3672, hemiSky: 0x8a8ed4, hemiGround: 0x1c1f38, hemiI: 1.15, sun: 0xd8dbff, sunI: 1.3, fillI: 0.42, exposure: 1.02, stars: 0.35, haze: 0.55, infra: 0.8, sunDisc: 0.7, clouds: 0.3, bands: 0.5 },
   /* day: the sun is the KEY (light has a direction; shadows read), sky fill stays secondary */
   day:   { top: 0x5f87bd, mid: 0x8fb0d8, horizon: 0xc4d5ea, fog: 0xb3c6df, hemiSky: 0xcfdff3, hemiGround: 0x2a3340, hemiI: 0.55, sun: 0xf3f7ff, sunI: 3.3, fillI: 0.12, exposure: 0.98, stars: 0.0, haze: 0.22, infra: 0.3, sunDisc: 1, clouds: 0.42, bands: 0.34 }
 };
@@ -114,7 +117,10 @@ export function buildSky(ctx) {
       m.position.set(x, h / 2 - 4, z); m.rotation.y = rnd() * Math.PI; g.add(m);
     }
   };
-  ridge(560, 11, 120, 240, 5); ridge(430, 9, 70, 150, 17);
+  /* when the city module supplies its own distant silhouettes, the old ridges only muddy the skyline —
+     keep one far ridge as a horizon backstop and drop the near one */
+  if (ctx.cityPresent) { /* the city module owns the far silhouette; the ridges only muddied it */ }
+  else { ridge(560, 11, 120, 240, 5); ridge(430, 9, 70, 150, 17); }
 
   /* restrained skyline: rounded towers, a few cylinders, one ring — quiet, softened, receding.
      v4: when city.js is present it owns the district; only the ring and the two far cylinders stay */
@@ -183,7 +189,9 @@ export function buildSky(ctx) {
     haze.material.opacity = k.haze;
     clouds.children.forEach((c, i) => { c.material.opacity = k.clouds * (0.7 + (i % 3) * 0.15); c.material.color.setHex(clockState.daylight > 0.5 ? 0xe4edf9 : 0x8fb0e6); });
     deck.children.forEach((c, i) => { c.material.opacity = k.clouds * (0.55 + (i % 2) * 0.2); c.material.color.setHex(clockState.daylight > 0.5 ? 0xd6e2f2 : 0x7f9fd6); });
-    bands.forEach((b, i) => { b.material.color.setHex(k.fog).lerp(c2.setHex(k.horizon), 0.35 + i * 0.2); b.material.opacity = k.bands * (0.7 + i * 0.15); });
+    /* the depth bands are AIR, not cloud: they only wash the layers behind them, so they stay very faint
+       and take the horizon's own colour (otherwise they read as grey streaks across the sky) */
+    bands.forEach((b, i) => { b.material.color.setHex(k.horizon).lerp(c2.setHex(k.fog), 0.3 + i * 0.22); b.material.opacity = k.bands * (0.16 + i * 0.05); });
     beams.forEach(b => { b.core.material.opacity = 0.8 * k.infra; b.glow.material.opacity = 0.09 * k.infra; });
     flows.forEach(f => { f.material.opacity = 0.13 * k.infra; });
     stripMat.opacity = 0.3 * (1 - clockState.daylight * 0.7);
@@ -209,7 +217,9 @@ export function buildSky(ctx) {
     return t;
   }
 
-  return { group: g, setTime, setTheme, update, beams, flows, additive: [sunHalo, moonHalo, haze].concat(beams.map(b => b.glow), flows) };
+  /* `clouds` / `deck` are the soft sprite clouds and `beams` / `flows` the plain arcs: the assembly hides
+     each set when the dedicated v4 module (clouds.js / fobeam.js) is present and takes over that role */
+  return { group: g, setTime, setTheme, update, beams, flows, clouds, deck, bands, additive: [sunHalo, moonHalo, haze].concat(beams.map(b => b.glow), flows) };
 }
 
 function gradientTexture() {

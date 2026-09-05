@@ -24,8 +24,8 @@ import { buildBuildings } from './buildings.js';
 import { buildSky } from './sky.js';
 
 export const VIEWS = {
-  establishing:      { pos: [0.6, 3.0, 42],    look: [0, 8.5, -46],    fov: 56, label: 'Arrival' },
-  'in-world':        { pos: [3.5, 1.9, 28],    look: [-1, 7.0, -46],   fov: 60, label: 'In-world' },
+  establishing:      { pos: [0.6, 3.0, 42],    look: [0, 8.5, -46],    fov: 56, label: 'Arrival', portrait: { pos: [0.6, 2.7, 40], look: [0, 13, -46], fov: 58 } },
+  'in-world':        { pos: [3.5, 1.9, 28],    look: [-1, 7.0, -46],   fov: 60, label: 'In-world', portrait: { pos: [3.5, 1.9, 28], look: [-1, 10, -46], fov: 62 } },
   'match-approach':  { pos: [1.4, 1.9, -14],   look: [0, 6.5, -48],    fov: 58, label: 'Toward MAH MATCH' },
   'match-entrance':  { pos: [0.4, 3.0, -37],   look: [0, 4.8, -60],    fov: 54, label: 'MAH MATCH entrance', portrait: { pos: [0.4, 3.4, -28], look: [0, 5.4, -60], fov: 58 } },
   'gym-entrance':    { pos: [-20, 2.2, -8],    look: [-36, 6, -30],    fov: 56, label: 'MAH GYM entrance' },
@@ -106,6 +106,7 @@ export async function createMahplaza(canvas, options = {}) {
   /* v4 modules are optional at load: the assembly integrates whichever exist (see CONTRACTS_V4.md) */
   const optional = async (name) => { try { return await import(name); } catch (e) { if (!/Failed to fetch|Cannot find|Failed to resolve|404|import/i.test(String(e && e.message))) console.info('MAHPLAZA optional module ' + name + ' —', e && e.message); return null; } };
   const CITY = await optional('./city.js'), DRESS = await optional('./plaza-dressing.js'), MATCHI = await optional('./match-interior.js'), LIFE = await optional('./life.js');
+  const CLOUDS = await optional('./clouds.js'), FOBEAM = await optional('./fobeam.js');
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -149,6 +150,16 @@ export async function createMahplaza(canvas, options = {}) {
     } catch (e) { console.info('MAHPLAZA: match-interior module failed —', e && e.message); matchInterior = null; }
   }
   const sky = buildSky(ctx);
+  /* the v4 sky modules take over from the sky's own placeholders when they exist */
+  let clouds = null, fobeams = null;
+  if (CLOUDS && CLOUDS.buildClouds) {
+    try { clouds = CLOUDS.buildClouds(ctx); if (clouds && clouds.group && !clouds.group.parent) scene.add(clouds.group); if (clouds) { sky.clouds.visible = false; sky.deck.visible = false; } }
+    catch (e) { console.info('MAHPLAZA: clouds module failed —', e && e.message); clouds = null; }
+  }
+  if (FOBEAM && FOBEAM.buildFobeams) {
+    try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
+    catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
+  }
   let city = null, dressing = null;
   if (CITY && CITY.buildCity) { try { city = CITY.buildCity(ctx); if (city && city.group && !city.group.parent) scene.add(city.group); } catch (e) { console.info('MAHPLAZA: city module failed —', e && e.message); city = null; } }
   if (DRESS && DRESS.buildDressing) { try { dressing = DRESS.buildDressing(ctx); if (dressing && dressing.group && !dressing.group.parent) scene.add(dressing.group); } catch (e) { console.info('MAHPLAZA: dressing module failed —', e && e.message); dressing = null; } }
@@ -156,9 +167,11 @@ export async function createMahplaza(canvas, options = {}) {
   /* entrance and plaza point lights, bounded (v3: entrance strength lowered for the glare correction) */
   const pointLights = [], themedLights = [];
   const addPoint = (p, color, intensity, distance, themed) => { const l = new THREE.PointLight(color, intensity, distance, 2); l.position.copy(p); l.userData.base = intensity; scene.add(l); pointLights.push(l); if (themed) themedLights.push(l); return l; };
-  ctx.entranceLights.forEach(p => addPoint(p, theme.energy, 90, 64, true));
-  (ctx.roomLights || []).forEach(p => addPoint(p, 0xcfe4ff, 220, 40));
-  if (ctx.arenaLight) addPoint(ctx.arenaLight, 0xbfdcff, 140, 40);
+  /* v4: lower than v3 — ACES rolls very bright blue-white highlights toward warm, so no source
+     may blow out a nearby surface; the architecture now carries its own lit panels and truss heads */
+  ctx.entranceLights.forEach(p => addPoint(p, theme.energy, 46, 52, true));
+  (ctx.roomLights || []).forEach(p => addPoint(p, 0xcfe4ff, matchInterior && Math.abs(p.x) < 12 && p.z < -50 ? 70 : 130, 34));
+  if (ctx.arenaLight) addPoint(ctx.arenaLight, 0xbfdcff, matchInterior ? 70 : 120, 32);
   addPoint(new THREE.Vector3(0, 2.4, 13), 0xcfe4ff, 30, 26, false);   /* the plaza-centre light stays neutral: residents near the marker are lit, not tinted, by the world Theme */
 
   /* ---- population: 12 outdoor residents (self + 11 fixtures) and the building spots -- */
@@ -225,14 +238,21 @@ export async function createMahplaza(canvas, options = {}) {
   const envFloor = new THREE.Mesh(new THREE.CircleGeometry(48, 24), new THREE.MeshBasicMaterial({ color: 0x05070c, side: THREE.DoubleSide })); envFloor.rotation.x = Math.PI / 2; envFloor.position.y = -0.5; envScene.add(envFloor);
   function refreshEnvironment(k, clockState) {
     const pos = envDome.geometry.attributes.position, top = new THREE.Color(k.top), hor = new THREE.Color(k.horizon), tmp = new THREE.Color();
-    for (let i = 0; i < pos.count; i++) { const ny = Math.max(0, pos.getY(i) / 50); tmp.copy(hor).lerp(top, ny); envCols[i * 3] = tmp.r; envCols[i * 3 + 1] = tmp.g; envCols[i * 3 + 2] = tmp.b; }
+    /* the horizon band carries the district's glow, so reflective trims and glass see a lit city, not a void */
+    const band = hor.clone().lerp(new THREE.Color(k.hemiSky), 0.45).multiplyScalar(1 + 0.5 * (1 - clockState.daylight));
+    for (let i = 0; i < pos.count; i++) { const ny = pos.getY(i) / 50; const a = Math.max(0, ny); tmp.copy(hor).lerp(top, a); if (ny > -0.05 && ny < 0.16) tmp.lerp(band, 1 - Math.abs(ny - 0.055) / 0.105); envCols[i * 3] = tmp.r; envCols[i * 3 + 1] = tmp.g; envCols[i * 3 + 2] = tmp.b; }
     envDome.geometry.attributes.color.needsUpdate = true;
     envSun.position.copy(lights.dir.position).normalize().multiplyScalar(45); envSun.lookAt(0, 0, 0);
-    envSun.material.color.setHex(k.sun).multiplyScalar(0.4 + 1.4 * clockState.daylight);
+    envSun.material.color.setHex(k.sun).multiplyScalar(0.55 + 1.25 * clockState.daylight);
+    /* the city's own glow belongs in the environment map: a bright band at the horizon so metal and glass
+       pick up the district rather than a black void (brief §10 city bounce) */
+    envDome.geometry.attributes.color.needsUpdate = true;
     if (envRT) envRT.dispose();
     envRT = pmrem.fromScene(envScene, 0.04, 0.1, 200);
     scene.environment = envRT.texture;
-    scene.environmentIntensity = 0.48 + 0.3 * clockState.daylight;   /* the environment fills; it never flattens the key */
+    /* skylight (brief §10): at night the sky and the district behind it are a real fill, so dark planes,
+       bevels and platinum catches keep reading; by day the sun stays the key and the fill stays secondary */
+    scene.environmentIntensity = 0.92 - 0.34 * clockState.daylight;
     envDaylight = clockState.daylight;
   }
 
@@ -253,7 +273,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [city, dressing, matchInterior, life].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -287,7 +307,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -516,6 +536,8 @@ export async function createMahplaza(canvas, options = {}) {
       if (vehicles && vehicles.update) vehicles.update(t);
       sky.update(now);
       if (city && city.update) city.update(t, dt);
+      if (clouds && clouds.update) clouds.update(t, dt);
+      if (fobeams && fobeams.update) fobeams.update(t, dt);
       if (dressing && dressing.update) dressing.update(t, dt);
       if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
       if (life && life.update) life.update(t, dt);
@@ -540,6 +562,7 @@ export async function createMahplaza(canvas, options = {}) {
     reflections.visible = quality.reflections;
     if (life && life.setBudget) { try { life.setBudget(quality.life); } catch (e) {} }
     if (city && city.setQuality) { try { city.setQuality(quality); } catch (e) {} }
+    if (clouds && clouds.setQuality) { try { clouds.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
     return quality.name;
   }
@@ -575,7 +598,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life }, city, dressing, matchInterior, life,
+    modules: { city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams }, city, dressing, matchInterior, life, clouds, fobeams,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,

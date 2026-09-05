@@ -21,6 +21,27 @@ export function buildGround(ctx) {
   const plaza = new THREE.Mesh(new THREE.PlaneGeometry(260, 260, 1, 1), M.plaza);
   plaza.rotation.x = -Math.PI / 2; plaza.renderOrder = 2; plaza.receiveShadow = true; g.add(plaza);
   if (M.plaza.roughnessMap) { M.plaza.roughnessMap.repeat.set(12, 12); }
+  /* MATERIAL ZONES (brief §13): the civic disc is a different, slightly smoother stone than the outer
+     field, with a faceted slab break between them — the floor stops being one endless surface */
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(PLAZA_RADIUS + 1.2, 96), new THREE.MeshStandardMaterial({ color: 0x141b28, roughness: 0.44, metalness: 0.3, envMapIntensity: 0.5, roughnessMap: M.plaza.roughnessMap }));
+  disc.rotation.x = -Math.PI / 2; disc.position.y = 0.006; disc.renderOrder = 3; disc.receiveShadow = true; g.add(disc);
+  /* eight faceted slab wedges around the disc edge: shallow angled planes that catch the moon and the
+     entrance lights, so the transition reads as construction rather than a painted circle */
+  const wedgeMat = new THREE.MeshStandardMaterial({ color: 0x1a2333, roughness: 0.5, metalness: 0.34, flatShading: true, envMapIntensity: 0.8 });
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4 + Math.PI / 8;
+    const w = new THREE.Mesh(new THREE.BoxGeometry(9.5, 0.09, 2.2), wedgeMat);
+    w.position.set(Math.cos(a) * (PLAZA_RADIUS + 2.6), 0.045, Math.sin(a) * (PLAZA_RADIUS + 2.6));
+    w.rotation.y = -a; w.rotation.x = 0.02; w.receiveShadow = true; g.add(w);
+  }
+  /* MAHGIC routing channels: four thin inlaid lines running from the disc edge out toward the district,
+     the city's energy grid passing under the plaza — restrained, never a glowing cage */
+  for (let i = 0; i < 4; i++) {
+    const a = i * Math.PI / 2 + Math.PI / 4;
+    const ch = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, 46), M.energySoft);
+    ch.position.set(Math.cos(a) * (PLAZA_RADIUS + 25), 0.028, Math.sin(a) * (PLAZA_RADIUS + 25));
+    ch.rotation.y = -a + Math.PI / 2; g.add(ch);
+  }
   const under = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshBasicMaterial({ color: 0x02040a, fog: false }));
   under.rotation.x = -Math.PI / 2; under.position.y = -80; g.add(under);
   /* very faint paving seams: large slabs, not a glowing grid */
