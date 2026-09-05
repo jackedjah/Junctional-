@@ -171,12 +171,12 @@ var CAST = [
   /* R98: a square head among them (brief §9.5: circular, square, diamond) */
   { x: 3.9, z: -17.6, s: 0.44, yaw: -0.35, body: 'heavy', head: 'square' },
   { x: 5.6, z: -20.2, s: 0.40, yaw: 0.40, body: 'thin', head: 'tall' },
-  { x: 1.1, z: -21.4, s: 0.34, yaw: 0.05, body: 'taper', head: 'diamond' },
+  { x: 1.5, z: -21.4, s: 0.34, yaw: 0.05, body: 'taper', head: 'diamond' },   /* R104: 1.1 -> 1.5, the wider shoulder wall touched it by a pixel in showcase */
   /* The one on his left. Measured to the frame: in showcase the obese one
      clears his hanging hand (0.29 across) by 0.015. A second further left
      (x -5) landed on his taper's edge in protocol and had no clear position
      in every mode. */
-  { x: -2.6, z: -18.0, s: 0.46, yaw: 0.45, body: 'obese', head: 'round' }
+  { x: -2.9, z: -18.0, s: 0.46, yaw: 0.45, body: 'obese', head: 'round' }
 ];
 
 function prng(seed) {

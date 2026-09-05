@@ -1,0 +1,38 @@
+{
+  "pass": "R104 — extreme silhouette morph (geometry only, grayscale / silhouette loop, two increments)",
+  "baseline": "R103 (commit fea1326)",
+  "references": "reference/mrmah-refK-r102-{male,female}-{front,rear}.png (landmarks in validation/mrmah3d/r102/18-measurement-summary.json)",
+  "units": "full silhouette width as a fraction of character height; torso and lower-body widths exclude the arms",
+  "male-front": {
+    "reference": { "shoulder": 0.347, "lat": 0.183, "waist": 0.128, "hip": 0.167, "thigh(t0.66)": 0.140, "knee": 0.089, "calf": 0.101 },
+    "R103":      { "shoulder(delt run)": 0.360, "waist": 0.127, "hip": 0.170, "thigh(t0.66)": 0.136, "knee(t0.73)": 0.096, "calf(t0.78)": 0.104 },
+    "R104":      { "shoulder(delt run)": 0.384, "waist": 0.108, "hip": 0.140, "thigh(t0.66)": 0.111, "knee(t0.73)": 0.088, "calf(t0.78)": 0.100 },
+    "ratios": {
+      "shoulderOverWaist": { "reference": 2.71, "R103": 2.83, "R104": 3.56 },
+      "hipOverShoulder":   { "reference": 0.481, "R103": 0.472, "R104": 0.365 },
+      "hipOverWaist":      { "reference": 1.30, "R103": 1.34, "R104": 1.30 },
+      "thighOverShoulder": { "reference": 0.403, "R103": 0.378, "R104": 0.289 },
+      "calfOverThigh":     { "reference": 0.72, "R103": 0.76, "R104": 0.90 }
+    },
+    "note": "the brief's 'shoulder / waist ~1.45-1.60' cannot be the deltoid-edge-to-waist ratio (the reference itself measures 2.7 on that definition); the pass took it as 'push the V well past the reference', which it now is at 3.56"
+  },
+  "male-rear":  { "reference": { "waist": 0.115, "glute": 0.188, "thigh": 0.151, "knee": 0.103, "calf": 0.114 }, "R104": { "waist": 0.107, "glute": 0.139, "thigh": 0.109, "knee": 0.085, "calf": 0.098 } },
+  "female-front": { "reference": { "shoulder": 0.316, "waist": 0.095, "hip": 0.243 }, "R103": { "shoulder(delts)": 0.259, "waist": 0.108, "hip": 0.347 }, "R104": { "shoulder(delts)": 0.280, "waist": 0.099, "hip": 0.294 } },
+  "female-rear":  { "reference": { "waist": 0.104, "glute": 0.233 }, "R104": { "waist": 0.095, "glute": 0.356 } },
+  "changes": {
+    "shoulderWall": "deltoid outerX 0.596 -> 0.650, r0 0.268 -> 0.290 (shoulderHalfWidth 0.770); shoulder line 0.316 -> 0.330; arm joints follow the cap (0.525, 1.900), elbow 0.585, wrist 0.610",
+    "traps": "trap lobe 0.46 -> 0.60, trap ring 0.262 -> 0.280, neck base 0.205 -> 0.225 — the neck is buried in the girdle",
+    "chest": "pec lobe 0.52, sternum 0.36, chest rings 0.324 / 0.338 / 0.330 with depth 0.330 / 0.340 / 0.322",
+    "latWall": "chestShape lat 0.34; latK 0.18 / 0.32 / 0.42; rings 1.830 0.304, 1.780 0.306, 1.725 0.280, then the cut: 1.665 0.212, 1.605 0.180, 1.545 0.160, belt 0.150",
+    "hipsThighs": "1.400 0.160, 1.290 0.176, 1.130 0.180, 1.000 0.168, 0.850 0.146 (thigh -18% from R103); knee 0.124; calf 0.162 / 0.150 (calf/thigh 0.76 -> 0.90)",
+    "arms": "bicep 0.52, triceps 0.46, lateral head 0.24, groove 0.36, brachialis 0.24, flexor 0.32, extensor 0.31; the upper-arm profile swell 0.28 -> 0.20 so the arm hangs as a column from the front",
+    "female": "deltoid 0.490 / r0 0.215, shoulderHalfWidth 0.510, waist 0.130, thigh 0.214; arm joints follow"
+  },
+  "engineering": { "staticSuite": "342/342 (bicep and deltoid-radius regexes loosened)", "verify": "node tools/mrmah3d-verify.mjs — 150/150 (one distant figure moved from x 1.1 to 1.5 after the wider shoulder wall touched it by a pixel)", "notEvidence": "headless Chromium on SwiftShader" },
+  "openItems": [
+    "the calf is now 0.90 of the thigh where the reference is 0.72 — the legs are leaner than the reference's, by the brief's instruction; if the lower leg reads heavy, take the calf down with the thigh",
+    "the lowered arm still bows slightly at the elbow in silhouette",
+    "her hip / glute is wider than her reference relative to her shoulders (glute 0.356 vs 0.233 of height) — her shoulders were widened but the hips were held; the next female pass should decide the hip",
+    "the head remains canonical (0.24 of height vs 0.15 in the references)"
+  ]
+}

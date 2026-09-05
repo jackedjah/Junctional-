@@ -86,7 +86,7 @@ function femaleProportions() {
     { y: 0.920, w: 0.168, d: 0.138, facet: -0.0050, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
       shape: hipShape(0.45, 0.3), columns: true, classesAt: taper },
     /* the thigh — strong, the reference's 0.60 of the shoulder width */
-    { y: 1.070, w: 0.226, d: 0.186, facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+    { y: 1.070, w: 0.214, d: 0.178, facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
       shape: hipShape(0.70, 0.5), columns: true, classesAt: taper },
     /* R102 — the under-glute crease: the glute pair pulls in here so the
        belly above it overhangs the hamstring */
@@ -103,7 +103,7 @@ function femaleProportions() {
     { y: 1.610, w: 0.196, d: 0.166, facet: -0.0050, crystal: 0.0240, crystalY: 0.0060, hero: 0.06,
       shape: hipShape(0.60, 0.70), zoneAt: S.coreZone(0) },
     /* THE WAIST — higher and tighter than his (R102: 0.30 of her shoulders) */
-    { y: 1.690, w: 0.146, d: 0.128, facet: -0.0060, crystal: 0.0240, crystalY: 0.0060,
+    { y: 1.690, w: 0.130, d: 0.116, facet: -0.0060, crystal: 0.0240, crystalY: 0.0060,
       shape: S.coreShape(1.0, 0.05), hero: 0.04, zoneAt: S.coreZone(1), cav: 0.30 },
     { y: 1.770, w: 0.192, d: 0.162, facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
       shape: S.coreShape(0.9, 0.16, 0.12), hero: 0.08, zoneAt: S.coreZone(2) },
@@ -129,7 +129,7 @@ function femaleProportions() {
 
   var TORSO = {
     topY: T.topY, sides: T.sides, classLift: T.classLift, rings: rings,
-    shoulderHalfWidth: 0.470, shoulderY: 2.120   /* R102: 0.420 -> 0.470, her shoulders are 0.91 of his */
+    shoulderHalfWidth: 0.510, shoulderY: 2.120   /* R102: 0.420 -> 0.470, her shoulders are 0.91 of his */
   };
 
   /* R102 — MUSCULAR SHOULDERS AND ARMS. The R102 female references carry
@@ -140,19 +140,19 @@ function femaleProportions() {
   var A = M.ARMS;
   var ARMS = {
     right: {
-      shoulder: [-0.325, 1.935, 0.014],   /* R103: down with the girdle, on the cap's axis */
-      elbow: [-0.430, 1.390, 0.10],
-      wrist: [-0.385, 0.985, 0.14],
+      shoulder: [-0.355, 1.935, 0.014],
+      elbow: [-0.455, 1.390, 0.10],
+      wrist: [-0.410, 0.985, 0.14],
       upperRadius: 0.116, foreRadius: 0.090, wristRadius: 0.056
     },
     left: {
-      shoulder: [0.325, 1.935, 0.014],
-      elbow: [0.430, 1.430, 0.11],
+      shoulder: [0.355, 1.935, 0.014],
+      elbow: [0.455, 1.430, 0.11],
       wrist: [0.560, 2.110, 0.15],
       upperRadius: 0.116, foreRadius: 0.090, wristRadius: 0.056
     },
     /* the deltoid: a round cap that encloses the arm's top — R102: larger; R103: rooted deeper and lower with the girdle */
-    deltoid: { innerX: 0.180, innerY: 1.990, outerX: 0.445, outerY: 1.915, r0: 0.200 },
+    deltoid: { innerX: 0.180, innerY: 1.990, outerX: 0.490, outerY: 1.910, r0: 0.215 },   /* R104: wider, muscular shoulders */
     classLift: A.classLift, deltoidLift: A.deltoidLift,
     profiles: A.profiles, shapes: A.shapes
   };

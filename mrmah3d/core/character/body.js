@@ -329,7 +329,7 @@ export function buildBody(materials, P) {
        between shoulder and pec. The axis comes down with the girdle, the
        root goes deeper into the chest, and the anterior lobe (below) grows
        so the front delt overlaps the upper pec. */
-    var D = ARMS_.deltoid || { innerX: 0.235, innerY: 1.965, outerX: 0.596, outerY: 1.875, r0: 0.268 };
+    var D = ARMS_.deltoid || { innerX: 0.235, innerY: 1.965, outerX: 0.650, outerY: 1.870, r0: 0.290 };
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;

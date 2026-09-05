@@ -1341,6 +1341,18 @@ egg; at 0.34 with 0.22 heads it reads as two columns that close at the
 knee, and the silhouette width did not change. The canon (ONE lower
 body) holds.
 
+### A morph is judged against the PREVIOUS silhouette, not only the reference (R104)
+
+R103 matched the reference's ratios within a few percent and the director
+still read it as conservative, because a body that is numerically close
+and visually the same as the last pass is not a change. The R104 loop put
+CURRENT, NEW and REFERENCE side by side as silhouettes each increment and
+only stopped when NEW was visibly different from CURRENT — waist 0.127 ->
+0.108, hip 0.170 -> 0.140, thigh 0.136 -> 0.111, deltoid run 0.360 ->
+0.384 of height — with the V pushed past the reference on purpose
+(shoulder over waist 3.56 against its 2.71). When a brief says "morph",
+the previous pass is the thing to beat.
+
 ### Reference segmentation: read the grid
 
 Every automatic mask of the R102 references failed — brightness took the

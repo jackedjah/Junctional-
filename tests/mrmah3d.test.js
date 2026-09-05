@@ -766,7 +766,7 @@ if (exists('CLAUDE.md')) {
   ok('R100-trapezius-ring-and-zone', /function trapZone/.test(propsSrc) && /zoneAt: trapZone/.test(propsSrc));
   ok('R100-clavicle-groove', /function subclavicleShape/.test(propsSrc) && /function subclavicleZone/.test(propsSrc) && /zoneAt: subclavicleZone/.test(propsSrc));
   ok('R100-serratus-saw', /tooth/.test(propsSrc) && /SERRATUS/.test(propsSrc));
-  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.62\) \* 0\.[34][0-9]0/.test(propsSrc) && /lateralHead/.test(propsSrc));
+  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.62\) \* 0\.[3-5][0-9]0/.test(propsSrc) && /lateralHead/.test(propsSrc));
   ok('R100-radial-forearm-ridge', /var radial = bump\(d, outer \* 0\.95/.test(propsSrc) && /ARMS_\.shapes\.fore\(t, d, foreInner\)/.test(limbs));
   ok('R100-cap-shadow-on-the-arm', /t < 0\.17 && ad > 0\.55/.test(limbs));
   ok('R100-hand-knuckles', /KNUCKLE/.test(limbs) && /spec\.digitRadius \* 1\.22/.test(limbs));
@@ -796,7 +796,7 @@ if (exists('CLAUDE.md')) {
   const neckTop = Number((propsSrc.match(/\{ y: (2\.3[0-9]{2}), w: 0\.010/) || [])[1]);
   ok('R101-head-seated-in-the-neck', neckTop > base && neckTop - base < 0.09, 'head base ' + base.toFixed(3) + ', neck closes at ' + neckTop);
   /* the male arm standard: bigger cap, fuller bicep, lateral head, brachialis, brachioradialis */
-  ok('R101-male-arm-standard', /r0: 0\.26[0-9]/.test(body) && /bump\(d, 0, 0\.62\) \* 0\.4[0-9]0/.test(propsSrc) &&
+  ok('R101-male-arm-standard', /r0: 0\.2[6-9][0-9]/.test(body) && /bump\(d, 0, 0\.62\) \* 0\.[45][0-9]0/.test(propsSrc) &&
     /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.95\), 0\.40\) \* 0\.[12][0-9]0/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
     /upperRadius: 0\.1[5-6]0/.test(propsSrc));
   /* three deltoid heads as FORM: front, rear, lateral crest and two grooves */
