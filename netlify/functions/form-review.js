@@ -14,8 +14,8 @@ const HEAD = `<!doctype html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/coach-shell.css?v=452&rc5c=1" />
-  <link rel="stylesheet" href="/mahfitt-atmosphere.css?v=452" />
+  <link rel="stylesheet" href="/coach-shell.css?v=453&rc5c=1" />
+  <link rel="stylesheet" href="/mahfitt-atmosphere.css?v=453" />
   <style>
     :root{
       --ink:var(--coach-surface,#0e1114);
@@ -1224,7 +1224,7 @@ function dashboardPage() {
     load();
   })();
   </script>
-  <script defer src="/coach-shell.js?v=452&rc5c=1"></script>
+  <script defer src="/coach-shell.js?v=453&rc5c=1"></script>
 </body></html>`;
 }
 

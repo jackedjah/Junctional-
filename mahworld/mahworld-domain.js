@@ -141,8 +141,9 @@
       var ev = { from: prev, to: next, reason: reason || '', at: nowIso() };
       history.push(ev);
       if (history.length > 40) history.shift();
-      for (var i = 0; i < listeners.length; i++) {
-        try { listeners[i](next, ev); } catch (e) { if (opts.onError) opts.onError(e); }
+      var ls = listeners.slice();   /* snapshot: a listener may unsubscribe itself mid-notification */
+      for (var i = 0; i < ls.length; i++) {
+        try { ls[i](next, ev); } catch (e) { if (opts.onError) opts.onError(e); }
       }
     }
     var session = {
@@ -238,7 +239,10 @@
         mahworldEnabled: false,          /* explicit opt-in (brief §7) */
         onboarding: ONBOARDING.NOT_STARTED,
         avatarCreated: false,
+        avatar: null,                    /* an Avatar record once created (never a renderer object) */
+        displayRef: null,                /* public handle; never a real name by default */
         presenceOptIn: false,            /* separate opt-in (brief §7, §35) */
+        presenceLevel: 'hidden',         /* the member's chosen abstraction level */
         progression: Progression.create(),
         attributes: FitnessAttributes.create(),
         mahgic: Mahgic.create(),
@@ -246,6 +250,7 @@
         abilities: { unlocked: [], equipped: [] },
         inventoryRef: null,              /* Inventory lives in its own boundary */
         currentWorldRef: null,           /* { worldId, sessionId } while ACTIVE */
+        lastDerivation: null,            /* summary of the last adapter result and its authority */
         authority: 'local-draft',        /* 'local-draft' | 'server' — see antiExploit */
         createdAt: nowIso(), updatedAt: nowIso()
       }, extra || {});
@@ -259,6 +264,7 @@
       if (typeof p.presenceOptIn !== 'boolean') errs.push('presenceOptIn');
       if (!isObj(p.progression) || !(p.progression.level >= 1 && p.progression.level <= 100)) errs.push('progression.level');
       if (!isObj(p.mahgic) || p.mahgic.resource !== RESOURCE_NAME) errs.push('mahgic');
+      else if (!isFinite(Number(p.mahgic.capacity)) || !isFinite(Number(p.mahgic.current)) || !isFinite(Number(p.mahgic.recoveryPerMinute))) errs.push('mahgic.numbers');
       return errs;
     }
   };
@@ -336,9 +342,9 @@
     /* The future uses MAHGIC may power (§24), as a documented list — no costs. */
     futureUses: deepFreeze(['enhanced-traversal', 'levitation', 'sustained-levitation', 'flight', 'projectile', 'construct', 'defensive-effect', 'special-attack']),
     spend: function (m, amount) {
-      var out = clone(m); var a = Math.max(0, num(amount));
-      if (out.current < a) return { ok: false, mahgic: out, reason: 'INSUFFICIENT_MAHGIC' };
-      out.current -= a; return { ok: true, mahgic: out };
+      var out = clone(m); var a = Math.max(0, num(amount)); var cur = num(out.current);
+      if (!(cur >= a)) return { ok: false, mahgic: out, reason: 'INSUFFICIENT_MAHGIC' };
+      out.current = cur - a; return { ok: true, mahgic: out };
     },
     recover: function (m, minutes) {
       var out = clone(m);
@@ -380,8 +386,20 @@
     mahgic: { capacityPerCapacityPoint: 10, recoveryPerRecoveryPoint: 0.1 }
   });
   var balance = BALANCE_V0;
+  /* Everything the adapter dereferences must be present in a replacement
+     table; a half table would turn derive() into exceptions at run time. */
+  var BALANCE_SECTIONS = deepFreeze(['classify', 'xp', 'attributes', 'musculature', 'diminishing', 'caps', 'mahgic']);
   function setBalance(table) {
     if (!isObj(table) || !table.version || !isObj(table.curve)) throw new Error('A balance table needs a version and a curve');
+    var missing = BALANCE_SECTIONS.filter(function (k) { return !isObj(table[k]); });
+    if (typeof table.musculaturePerUnit !== 'number') missing.push('musculaturePerUnit');
+    if (missing.length) throw new Error('A balance table needs every section: ' + missing.join(', '));
+    var c = table.curve, max = num(c.maxLevel, 100);
+    if (!(max >= 2 && max <= 100)) throw new Error('curve.maxLevel must be between 2 and 100');
+    if (c.kind === 'table') { if (!Array.isArray(c.values) || c.values.length < max) throw new Error('a table curve needs a value for every level up to maxLevel'); }
+    else if (c.kind !== 'quadratic' || !(num(c.base) > 0) || !(num(c.growth) > 0)) throw new Error('curve.kind must be quadratic (base, growth) or table (values)');
+    if (!(num(table.classify.heavyMaxReps) > 0) || !(num(table.classify.hypertrophyMaxReps) >= num(table.classify.heavyMaxReps))) throw new Error('classify thresholds are invalid');
+    if (!(num(table.diminishing.dailySoftCap) >= 0) || !(num(table.diminishing.rate) >= 0 && num(table.diminishing.rate) <= 1)) throw new Error('diminishing returns are invalid');
     balance = deepFreeze(clone(table));
     return balance;
   }
@@ -487,7 +505,7 @@
   var Inventory = {
     contract: 'mahworld.Inventory',
     version: 1,
-    kinds: deepFreeze(['cosmetic', 'equipment', 'collectible', 'consumable']),
+    kinds: deepFreeze(['cosmetic', 'construct', 'trophy', 'consumable']),
     create: function (ownerAccountId) {
       return { contract: Inventory.contract, version: Inventory.version, ownerAccountId: String(ownerAccountId || ''), items: [] };
     },
@@ -600,25 +618,29 @@
     kinds: SIGNAL_KINDS,
     regions: BODY_REGIONS,
     classifySet: classifySet,
-    /* A completed workout: { id, completedAt|date, exercises: [ { name, region ('upper'|'lower'|'core'|'full'), sets: [ { reps, weight, completed } ] } ] }
-       Only COMPLETED sets count (LIVE-004: completion is real completed sets). */
+    /* A completed workout in MAHFITT's own shape: { id, completedAt|date|endedAt,
+       items|exercises: [ { name, region ('upper'|'lower'|'core'|'full'), sets: [ { reps, weight, done } ] } ] }.
+       MAHFITT's completion flag is `done` (the 'finish' body filters on st.done);
+       `completed` is accepted as an alias. Completion FAILS CLOSED: a set with
+       neither flag true is not a signal (LIVE-004: completion is real completed
+       sets). A signal carries no record detail — only a source reference. */
     normalizeWorkout: function (w, table) {
       var t = table || balance; var out = [];
       if (!isObj(w)) return out;
       var when = w.completedAt || w.date || w.endedAt || null;
-      var exercises = Array.isArray(w.exercises) ? w.exercises : [];
+      var exercises = Array.isArray(w.items) ? w.items : (Array.isArray(w.exercises) ? w.exercises : []);
       exercises.forEach(function (ex) {
         if (!isObj(ex)) return;
         var region = BODY_REGIONS.indexOf(ex.region) > -1 ? ex.region : 'full';
         var sets = Array.isArray(ex.sets) ? ex.sets : [];
-        sets.forEach(function (s) {
-          if (!isObj(s) || s.completed === false) return;
+        sets.forEach(function (s, setIndex) {
+          if (!isObj(s) || !(s.done === true || s.completed === true)) return;
           var kind = classifySet(s, t);
           if (!kind) return;
-          var reps = num(s.reps), weight = Math.max(0, num(s.weight));
+          var weight = Math.max(0, num(s.weight));
           /* One normalised unit is one working set; load scales it gently. */
           var units = 1 + Math.min(1, weight / 100) * 0.5;
-          out.push({ kind: kind, units: units, region: region, at: when, source: { type: 'workout', id: w.id || null, exercise: ex.name || null, reps: reps, weight: weight } });
+          out.push({ kind: kind, units: units, region: region, at: when, source: { type: 'workout', id: w.id || null, setIndex: setIndex } });
         });
       });
       return out;
@@ -640,18 +662,24 @@
     }
   };
 
-  /* Derivation: signals -> { xp, attributeDeltas, musculatureDeltas, mahgicDelta } — PURE.
-     Diminishing returns are applied per calendar day of the signal. */
+  /* Derivation: signals -> { version, signalCount, xp, attributeDeltas, musculatureDeltas, mahgicDelta } — PURE.
+     Diminishing returns are applied per UTC calendar day of the signal. */
+  function dayKey(at) {
+    if (at == null || at === '') return 'undated';
+    var d = new Date(at);
+    return isFinite(+d) ? d.toISOString().slice(0, 10) : 'undated';
+  }
   function derive(signalList, table) {
     var t = table || balance;
     var list = Array.isArray(signalList) ? signalList : [];
     var perDay = {};
-    var xp = 0, attributeDeltas = {}, musculatureDeltas = {};
+    var xp = 0, counted = 0, attributeDeltas = {}, musculatureDeltas = {};
     ATTRIBUTE_KEYS.forEach(function (k) { attributeDeltas[k] = 0; });
     ['shoulders', 'chest', 'back', 'arms', 'core', 'lowerBody'].forEach(function (k) { musculatureDeltas[k] = 0; });
     list.forEach(function (s) {
       if (!isObj(s) || SIGNAL_KINDS.indexOf(s.kind) < 0) return;
-      var day = String(s.at || '').slice(0, 10) || 'undated';
+      counted++;
+      var day = dayKey(s.at);
       var used = perDay[day] || 0;
       var raw = Math.max(0, num(s.units));
       var soft = t.diminishing.dailySoftCap, rate = t.diminishing.rate;
@@ -669,7 +697,7 @@
       capacity: attributeDeltas.mahgicCapacity * t.mahgic.capacityPerCapacityPoint,
       recoveryPerMinute: attributeDeltas.mahgicRecovery * t.mahgic.recoveryPerRecoveryPoint
     };
-    return { version: t.version, signals: list.length, xp: Math.round(xp), attributeDeltas: attributeDeltas, musculatureDeltas: musculatureDeltas, mahgicDelta: mahgicDelta };
+    return { version: t.version, signalCount: counted, xp: Math.round(xp), attributeDeltas: attributeDeltas, musculatureDeltas: musculatureDeltas, mahgicDelta: mahgicDelta };
   }
 
   /* ------------------------------------------------------------------ */
@@ -679,22 +707,40 @@
   var AUTHORITY = deepFreeze({ PREVIEW: 'client-preview', SERVER: 'server-validated' });
   var antiExploit = {
     AUTHORITY: AUTHORITY,
+    /* What a derivation must look like to be applied at all: the full shape
+       `derive` produces, under the CURRENT balance version. A bare XP number,
+       a stale or foreign version, or missing deltas are refused outright. */
+    validateDerivation: function (derivation) {
+      var errs = [];
+      if (!isObj(derivation)) return ['not an object'];
+      if (derivation.version !== balance.version) errs.push('version');
+      if (!(typeof derivation.xp === 'number' && isFinite(derivation.xp) && derivation.xp >= 0 && Math.floor(derivation.xp) === derivation.xp)) errs.push('xp');
+      if (!(typeof derivation.signalCount === 'number' && derivation.signalCount >= 0)) errs.push('signalCount');
+      if (!isObj(derivation.attributeDeltas)) errs.push('attributeDeltas');
+      if (!isObj(derivation.musculatureDeltas)) errs.push('musculatureDeltas');
+      if (!isObj(derivation.mahgicDelta)) errs.push('mahgicDelta');
+      return errs;
+    },
     /* Applies a derivation to a profile. Never accepts a bare XP number:
-       the input is a derivation object produced by `derive`, carrying its
-       balance version. Preview results are marked and are never a claim. */
+       the input is a derivation object produced by `derive`, carrying the
+       current balance version and every delta. Preview results are marked
+       and are never a claim; only the server can make a profile 'server'. */
     applyDerivation: function (profile, derivation, options) {
       var o = options || {};
-      if (!isObj(profile) || !isObj(derivation) || derivation.version == null) throw new Error('applyDerivation needs a profile and a versioned derivation');
+      if (!isObj(profile)) throw new Error('applyDerivation needs a profile');
+      var bad = antiExploit.validateDerivation(derivation);
+      if (bad.length) throw new Error('applyDerivation refused the derivation (' + bad.join(', ') + ')');
       var authority = o.authority === AUTHORITY.SERVER ? AUTHORITY.SERVER : AUTHORITY.PREVIEW;
       var out = clone(profile);
       out.progression = Progression.addXp(out.progression, derivation.xp);
       out.attributes = FitnessAttributes.add(out.attributes, derivation.attributeDeltas, balance.caps);
       out.mahgic = assign(clone(out.mahgic), {
-        capacity: num(out.mahgic.capacity) + num(derivation.mahgicDelta && derivation.mahgicDelta.capacity),
-        recoveryPerMinute: num(out.mahgic.recoveryPerMinute) + num(derivation.mahgicDelta && derivation.mahgicDelta.recoveryPerMinute)
+        capacity: Math.max(0, num(out.mahgic.capacity) + num(derivation.mahgicDelta.capacity)),
+        recoveryPerMinute: Math.max(0, num(out.mahgic.recoveryPerMinute) + num(derivation.mahgicDelta.recoveryPerMinute))
       });
+      out.mahgic.current = Math.min(num(out.mahgic.current), out.mahgic.capacity);
       out.authority = authority === AUTHORITY.SERVER ? 'server' : 'local-draft';
-      out.lastDerivation = { version: derivation.version, xp: derivation.xp, authority: authority, at: nowIso() };
+      out.lastDerivation = { version: derivation.version, xp: derivation.xp, signalCount: derivation.signalCount, authority: authority, at: nowIso() };
       out.updatedAt = nowIso();
       return out;
     }
@@ -711,7 +757,14 @@
       if (!ownerAccountId) return null;
       var raw = readStorage(store.keyFor(ownerAccountId));
       if (!raw) return null;
-      try { var p = JSON.parse(raw); return WorldProfile.validate(p).length ? null : p; } catch (e) { return null; }
+      try {
+        var p = JSON.parse(raw);
+        if (WorldProfile.validate(p).length) return null;
+        /* A LOCAL draft is never server authority, whatever it claims. */
+        p.authority = 'local-draft';
+        if (isObj(p.lastDerivation)) p.lastDerivation.authority = AUTHORITY.PREVIEW;
+        return p;
+      } catch (e) { return null; }
     },
     save: function (profile) {
       if (!isObj(profile) || !profile.ownerAccountId) return false;
@@ -732,7 +785,7 @@
   /* `mahfittAction` instead and the portal asks the bound `openAction`.  */
   var MAHTROPOLIS = deepFreeze([
     { id: 'program-gym',   label: 'Program Gym',        mahfittOwner: 'Program system (MAH PROGRAMS / OUTDOOR/FOB, Program Library)', mahfittRoute: 'home' },
-    { id: 'training-room', label: 'Training Room',      mahfittOwner: 'Exercise education + Program Tools (canonical exercise data)', mahfittRoute: 'home', status: 'future' },
+    { id: 'training-room', label: 'Training Room',      mahfittOwner: 'Exercise education + Program Tools (canonical exercise data)', mahfittRoute: null, status: 'future' },
     { id: 'progress',      label: 'Progress',           mahfittOwner: 'MAH Progress / Body data', mahfittRoute: 'progress' },
     { id: 'calendar',      label: 'Calendar',           mahfittOwner: 'MAH Calendar', mahfittRoute: 'calendar' },
     { id: 'health',        label: 'Health / Recovery',  mahfittOwner: 'MAH Health / Activity', mahfittRoute: 'health' },
@@ -778,7 +831,7 @@
   /* A portal opens the canonical MAHFITT destination and nothing else:
      a route through the app's own navigation, or an app-owned overlay
      (MAH PLAYER) through the app's own action. Never both, never a copy. */
-  function destinationOpens(d) { return !!(d && (d.mahfittRoute || d.mahfittAction)); }
+  function destinationOpens(d) { return !!(d && d.status !== 'future' && (d.mahfittRoute || d.mahfittAction)); }
   function openDestination(id) {
     var d = null; for (var i = 0; i < MAHTROPOLIS.length; i++) if (MAHTROPOLIS[i].id === id) d = MAHTROPOLIS[i];
     if (!destinationOpens(d)) return false;

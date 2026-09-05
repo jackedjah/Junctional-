@@ -1,8 +1,8 @@
 {
-  "ranAt": "2026-09-05T17:38:15.655Z",
+  "ranAt": "2026-09-05T18:10:34.478Z",
   "shell": "netlify/functions/mygym.js handler GET (V=453), served at https://mahfitt.test/mygym with /api/mygym stubbed",
   "device": "iPhone 13 (Playwright device profile), service workers blocked",
-  "passed": 46,
+  "passed": 47,
   "failed": 0,
   "results": [
     {
@@ -129,7 +129,7 @@
       "scenario": "S3",
       "name": "ENTER → WORLD_ENTERING then WORLD_ACTIVE (simulated), attribute follows",
       "ok": true,
-      "detail": "{\"mid\":{\"attr\":\"entering\",\"session\":\"WORLD_ENTERING\"},\"act\":{\"attr\":\"active\",\"session\":\"WORLD_ACTIVE\",\"ref\":{\"worldId\":\"mahtropolis-dev\",\"sessionId\":\"sim-mtoo1556\"}}}"
+      "detail": "{\"mid\":{\"attr\":\"entering\",\"session\":\"WORLD_ENTERING\"},\"act\":{\"attr\":\"active\",\"session\":\"WORLD_ACTIVE\",\"ref\":{\"worldId\":\"mahtropolis-dev\",\"sessionId\":\"sim-mtop6nj2\"}}}"
     },
     {
       "scenario": "S3",
@@ -148,6 +148,12 @@
       "name": "leaving the page mid-ENTER cancels the entry: nothing re-renders over Home, session settles to WORLD_AVAILABLE",
       "ok": true,
       "detail": "{\"shell\":false,\"home\":true,\"state\":\"WORLD_AVAILABLE\",\"attr\":\"available\",\"ref\":null}"
+    },
+    {
+      "scenario": "S3",
+      "name": "leaving the page mid-EXIT settles to WORLD_AVAILABLE and the saved draft no longer points at a world",
+      "ok": true,
+      "detail": "{\"shell\":false,\"state\":\"WORLD_AVAILABLE\",\"attr\":\"available\",\"ref\":null,\"stored\":null}"
     },
     {
       "scenario": "S3",

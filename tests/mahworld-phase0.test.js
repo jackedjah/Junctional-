@@ -45,6 +45,7 @@ P('MW-004 no game engine or renderer dependency anywhere in mahworld/', !/\bthre
 P('MW-005 the app shell loads MAHWORLD as deferred optional scripts BEFORE mygym.js', /mahworld\/mahworld-domain\.js\?v='\+V\+'"><\/script><script defer src="\/mahworld\/mahworld-shell\.js\?v='\+V\+'"><\/script><script defer src="\/mygym\.js/.test(server));
 P('MW-006 the deploy context reaches the client as a flag, not as a secret', /window\.MAHWORLD_FLAGS=\{context:'\+JSON\.stringify\(String\(process\.env\.CONTEXT\|\|'production'\)\)/.test(server) && !/SERVICE_ROLE|SESSION_SECRET|OPENAI/.test(server.slice(server.indexOf('MAHWORLD_FLAGS'), server.indexOf('MAHWORLD_FLAGS') + 200)));
 P('MW-007 cache identity advanced together (server V, sw V) and the new files are precached', /const V = 453;/.test(server) && /fob-shell-v453/.test(sw) && /'\/mahworld\/mahworld-domain\.js', '\/mahworld\/mahworld-shell\.js', '\/mahworld\/mahworld-menu\.css'/.test(sw));
+P('MW-008 the release gate and every R85A1 cache-stamp owner moved to 453 with the shell (no surface mixes generations)', /fob-shell-v453/.test(read('tests/r85a-release-gate.py')) && /const V = 453;/.test(read('tests/r85a-release-gate.py')) && ['calendar.html', 'report-cards.html', 'admin-app.css', 'coach-shell.css', 'netlify/functions/admin.js', 'netlify/functions/calendar-admin.js', 'netlify/functions/fob-payment.js', 'netlify/functions/fob-progress.js', 'netlify/functions/form-review.js'].every(f => !/v=452/.test(read(f)) && /v=453/.test(read(f))));
 
 /* ---- 2. every hook in mygym.js is guarded ------------------------------- */
 const hooks = client.match(/mahworld[A-Za-z]*\(|window\.MAHWORLD[_A-Z]*/g) || [];
@@ -67,7 +68,7 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
   const sess = M.createSession();
   P('MW-022 a fresh session is WORLD_OFF and cannot be entered from OFF', sess.state === 'WORLD_OFF' && sess.enter() === false && sess.state === 'WORLD_OFF');
   const prof = M.WorldProfile.create('acct-A');
-  P('MW-023 a new WorldProfile is opted OUT of the world and OUT of presence', prof.mahworldEnabled === false && prof.presenceOptIn === false && prof.onboarding === 'not_started' && prof.avatarCreated === false);
+  P('MW-023 a new WorldProfile is opted OUT of the world and OUT of presence, hidden, with no avatar, handle or derivation yet', prof.mahworldEnabled === false && prof.presenceOptIn === false && prof.presenceLevel === 'hidden' && prof.onboarding === 'not_started' && prof.avatarCreated === false && prof.avatar === null && prof.displayRef === null && prof.lastDerivation === null && prof.inventoryRef === null && Array.isArray(prof.abilities.unlocked));
   P('MW-024 with the flag off the world can never become available, even for an enabled profile', (prof.mahworldEnabled = true, sess.makeAvailable(prof) === false && sess.state === 'WORLD_OFF'));
 }
 {
@@ -91,6 +92,10 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
   M.presentation.applyState(el, 'WORLD_ENTERING'); const a1 = el.attrs['data-mahworld-state'];
   M.presentation.applyState(el, 'WORLD_OFF'); const a2 = el.attrs['data-mahworld-state'];
   P('MW-036 applyState writes data-mahworld-state and clears it for OFF', a1 === 'entering' && a2 === undefined);
+  const s2 = M.createSession(); const p2 = M.WorldProfile.create('acct-B'); p2.mahworldEnabled = true; const got = [];
+  const unA = s2.subscribe(() => { got.push('A'); unA(); }); s2.subscribe(() => got.push('B')); s2.subscribe(() => got.push('C'));
+  s2.makeAvailable(p2);
+  P('MW-037 a listener that unsubscribes itself during a notification does not silence the next listener', got.join() === 'A,B,C');
 }
 
 /* ---- 5. identity: signed-in account, never the active profile ---------- */
@@ -106,6 +111,10 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
   P('MW-043 the local draft store is namespaced by owner account', M.store.keyFor('jah') !== M.store.keyFor('dominic') && M.store.keyFor('jah').indexOf('fob.mahworld.profile.v0.') === 0);
   const p = M.WorldProfile.create('jah'); p.mahworldEnabled = true;
   P('MW-044 a draft round-trips through the store and an invalid draft is refused', M.store.save(p) === true && M.store.load('jah').ownerAccountId === 'jah' && M.store.load('dominic') === null && M.store.save({ contract: 'mahworld.WorldProfile', ownerAccountId: 'x' }) === false);
+  const claimed = M.antiExploit.applyDerivation(p, M.derive(M.signals.normalizeActivity({ id: 'a', type: 'run', distanceMeters: 2000, durationSeconds: 600, completedAt: '2026-09-05T11:00:00Z' })), { authority: 'server-validated' });
+  M.store.save(claimed);
+  const reloaded = M.store.load('jah');
+  P('MW-046 a LOCAL draft is never server authority: a saved "server" claim reloads as local-draft / client-preview', claimed.authority === 'server' && reloaded.authority === 'local-draft' && reloaded.lastDerivation.authority === 'client-preview');
 }
 
 /* ---- 6. MAHGIC is canonical --------------------------------------------- */
@@ -113,9 +122,12 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
   const { M } = loadDomain();
   const all = (domainSrc + shellSrc + menuCss + read('MAHWORLD_PHASE0_FOUNDATION.md')).toLowerCase();
   P('MW-050 the resource is named MAHGIC', M.RESOURCE_NAME === 'MAHGIC' && M.Mahgic.resource === 'MAHGIC' && M.WorldProfile.create('a').mahgic.resource === 'MAHGIC');
-  P('MW-051 no forbidden spelling appears in mahworld/ or the foundation doc (outside the prohibition notes)', !/mahnah|mahna\b/.test(all.replace(/do not (use|introduce)[^.\n]*mahnah[^.\n]*/g, '').replace(/mahnah \/ mahna \/ mana/g, '').replace(/not mahnah, mahna, or mana/g, '')) && !/\bmana\b/.test(all.replace(/do not (use|introduce)[^.\n]*/g, '').replace(/mahnah \/ mahna \/ mana/g, '').replace(/not mahnah, mahna, or mana/g, '').replace(/\/ mana\)/g, '')));
+  const PERMITTED = 'do not use mahnah, mahna or mana in any file, identifier, string or document.';
+  P('MW-051 no forbidden spelling appears in mahworld/ or the foundation doc outside the ONE permitted prohibition sentence', all.split(PERMITTED).length === 2 && !/mahnah|mahna\b|\bmana\b/.test(all.split(PERMITTED).join('')));
   const m = M.Mahgic.create({ capacity: 10, current: 4, recoveryPerMinute: 1 });
   P('MW-052 MAHGIC spend refuses overdraft and recovery is capped at capacity', M.Mahgic.spend(m, 5).ok === false && M.Mahgic.spend(m, 4).mahgic.current === 0 && M.Mahgic.recover(m, 60).current === 10);
+  const noCurrent = M.Mahgic.spend({ contract: 'mahworld.MAHGIC', version: 1, resource: 'MAHGIC', capacity: 10, recoveryPerMinute: 1 }, 5);
+  P('MW-053 spending from a record without a numeric balance is refused, never NaN, and such a record fails profile validation', noCurrent.ok === false && !Number.isNaN(noCurrent.mahgic.current) && M.WorldProfile.validate(Object.assign(M.WorldProfile.create('z'), { mahgic: noCurrent.mahgic })).indexOf('mahgic.numbers') > -1);
 }
 
 /* ---- 7. progression: level 1..100, replaceable curve ------------------- */
@@ -129,6 +141,9 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
   P('MW-062 a balance table without a version is refused', threw);
   const prog = M.Progression.fromLifetimeXp(95);
   P('MW-063 progression carries level, lifetime XP, XP into level and progress to next', prog.level === 10 && prog.xpIntoLevel === 5 && prog.xpForNextLevel === 100 && prog.progressToNext > 0.4 && prog.progressToNext < 0.6);
+  const v0 = () => JSON.parse(JSON.stringify(M.BALANCE_V0));
+  const tries = [{ version: 'x', curve: { kind: 'quadratic', base: 100, growth: 1.35, maxLevel: 100 } }, Object.assign(v0(), { version: 'short', curve: { kind: 'table', values: [0, 10, 20], maxLevel: 100 } }), Object.assign(v0(), { version: 'tall', curve: { kind: 'quadratic', base: 100, growth: 1.35, maxLevel: 200 } }), Object.assign(v0(), { version: 'odd', curve: { kind: 'cubic', maxLevel: 100 } })].map(t => { try { M.setBalance(t); return false; } catch (e) { return true; } });
+  P('MW-064 a balance table missing its sections, a table curve shorter than its max level, a max level above 100 or an unknown curve kind is refused and leaves the live table untouched', tries.every(Boolean) && M.getBalance().version === 'test-curve');
 }
 
 /* ---- 8. the adapter boundary: real fitness in, derived game out --------- */
@@ -139,19 +154,26 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
     { name: 'bench', region: 'upper', sets: [{ reps: 3, weight: 100, completed: true }] } ] };
   const sig = M.signals.normalizeWorkout(workout);
   P('MW-070 only COMPLETED sets become signals (LIVE-004 truth), classified heavy / hypertrophy / endurance', sig.length === 4 && sig.map(s => s.kind).sort().join() === 'endurance,hypertrophy,strength,strength');
-  P('MW-071 signals never carry the fitness record itself, only a source reference', sig.every(s => !s.record && s.source && s.source.type === 'workout' && s.source.id === 'w'));
+  const mahfittShaped = { id: 'm', endedAt: '2026-09-05T10:00:00Z', items: [{ name: 'row', sets: [{ done: false, reps: 8, weight: 40 }, { reps: 8, weight: 40 }, { done: true, reps: 8, weight: 40 }] }] };
+  const msig = M.signals.normalizeWorkout(mahfittShaped);
+  P('MW-070b MAHFITT\'s own shape (items[].sets[].done) is accepted and completion FAILS CLOSED: unticked or unflagged sets are not signals', msig.length === 1 && msig[0].kind === 'hypertrophy' && msig[0].source.setIndex === 2 && msig[0].source.id === 'm');
+  P('MW-071 signals never carry the fitness record itself — the source is a reference only (type, id, set index): no exercise name, reps or load', sig.every(s => !s.record && s.source && s.source.type === 'workout' && s.source.id === 'w' && Object.keys(s.source).sort().join() === 'id,setIndex,type') && !/squat|bench|"weight"|"reps"|"name"/.test(JSON.stringify(sig)));
   const frozen = JSON.stringify(workout);
   const d = M.derive(sig.concat(M.signals.normalizeActivity({ id: 'a', type: 'run', distanceMeters: 4000, durationSeconds: 1500, completedAt: '2026-09-05T11:00:00Z' }), M.signals.normalizeBody({ recordedAt: '2026-09-05', weightKg: 80 })));
-  P('MW-072 derivation is pure: inputs untouched, output versioned, XP an integer', JSON.stringify(workout) === frozen && d.version === M.getBalance().version && Number.isInteger(d.xp) && d.xp > 0);
+  P('MW-072 derivation is pure: inputs untouched, output versioned with exactly the documented fields, XP an integer', JSON.stringify(workout) === frozen && d.version === M.getBalance().version && Number.isInteger(d.xp) && d.xp > 0 && d.signalCount === 6 && Object.keys(d).sort().join() === 'attributeDeltas,mahgicDelta,musculatureDeltas,signalCount,version,xp');
   P('MW-073 lower-body training develops the lower-body musculature more than the upper', d.musculatureDeltas.lowerBody > d.musculatureDeltas.chest && d.attributeDeltas.strength > 0 && d.attributeDeltas.endurance > 0);
   const many = []; for (let i = 0; i < 80; i++) many.push({ kind: 'strength', units: 1, region: 'upper', at: '2026-09-05T10:00:00Z' });
   const capped = M.derive(many), half = M.derive(many.slice(0, 40));
-  P('MW-074 diminishing returns apply per day', capped.xp < half.xp * 2 && capped.xp > half.xp);
+  const twoDays = many.map((s, i) => Object.assign({}, s, { at: i < 40 ? '2026-09-05T10:00:00Z' : '2026-09-06T10:00:00Z' }));
+  const epochSameDay = many.map((s, i) => Object.assign({}, s, { at: Date.UTC(2026, 8, 5, 10, 0, 0) + i * 60000 }));
+  P('MW-074 diminishing returns apply PER DAY: one day is capped, two days are not, and numeric timestamps bucket by day too', capped.xp < half.xp * 2 && capped.xp > half.xp && M.derive(twoDays).xp === half.xp * 2 && M.derive(epochSameDay).xp === capped.xp);
   const p = M.WorldProfile.create('acct');
-  let bare = false; try { M.antiExploit.applyDerivation(p, { xp: 500 }); } catch (e) { bare = true; }
+  const refused = [{ xp: 500 }, { version: M.getBalance().version, xp: 999999 }, Object.assign({}, d, { version: 'ancient' }), Object.assign({}, d, { xp: 12.5 }), Object.assign({}, d, { xp: -5 }), Object.assign({}, d, { attributeDeltas: null }), Object.assign({}, d, { mahgicDelta: undefined })].map(bad => { try { M.antiExploit.applyDerivation(p, bad); return false; } catch (e) { return true; } });
   const preview = M.antiExploit.applyDerivation(p, d);
   const serverSide = M.antiExploit.applyDerivation(p, d, { authority: 'server-validated' });
-  P('MW-075 a bare "give me XP" is refused; a derivation applies as a PREVIEW unless the server validated it', bare && preview.authority === 'local-draft' && preview.lastDerivation.authority === 'client-preview' && serverSide.authority === 'server' && preview.progression.lifetimeXp === d.xp);
+  P('MW-075 a bare or crafted XP claim is refused (no version, version-only, stale version, fractional or negative XP, missing deltas); a real derivation applies as a PREVIEW unless the server validated it', refused.every(Boolean) && preview.authority === 'local-draft' && preview.lastDerivation.authority === 'client-preview' && preview.lastDerivation.signalCount === d.signalCount && serverSide.authority === 'server' && preview.progression.lifetimeXp === d.xp);
+  const negative = M.antiExploit.applyDerivation(p, Object.assign({}, d, { mahgicDelta: { capacity: -100, recoveryPerMinute: -50 } }));
+  P('MW-077 MAHGIC capacity and recovery never go negative through a derivation, and the balance never exceeds capacity', negative.mahgic.capacity === 0 && negative.mahgic.recoveryPerMinute === 0 && negative.mahgic.current === 0);
   P('MW-076 the fitness record shapes accepted by the adapter are MAHFITT\'s, not a world schema', /completedAt \|\| w\.date \|\| w\.endedAt/.test(domainSrc) && /distanceMeters/.test(domainSrc) && /durationSeconds/.test(domainSrc) && /weightKg/.test(domainSrc));
 }
 
@@ -175,7 +197,7 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
 {
   const { M } = loadDomain();
   const a = M.Avatar.create('feminine');
-  P('MW-090 avatar has the two bases and renderer-independent fields', M.Avatar.bases.join() === 'masculine,feminine' && a.base === 'feminine' && 'musculature' in a && 'proportion' in a && 'cosmetics' in a && 'traversalCapabilities' in a && 'abilityVisualState' in a);
+  P('MW-090 avatar has the two bases and exactly the documented renderer-independent fields', M.Avatar.bases.join() === 'masculine,feminine' && a.base === 'feminine' && Object.keys(a).sort().join() === 'abilityVisualState,appearance,attachments,base,contract,cosmetics,musculature,proportion,traversalCapabilities,updatedAt,version');
   const grown = M.Avatar.applyMusculature(a, { chest: 0.4, lowerBody: 2 });
   P('MW-091 musculature is a bounded derived state, applied through the adapter', grown.musculature.chest === 0.4 && grown.musculature.lowerBody === 1 && a.musculature.chest === 0);
   P('MW-092 avatar data names no Three.js / mrmah3d / mesh concept', !/three|mrmah3d|mesh|shader|geometry|material/i.test(JSON.stringify(a)));
@@ -191,7 +213,7 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
   P('MW-101 an ability unlocks when the profile meets its requirements', M.Ability.isUnlocked(ab, p) === true);
   P('MW-102 traversal tiers are reserved up to aerial control, starting at walk, with no hard-coded unlock levels', M.Traversal.tiers.join() === 'walk,sprint,jump,enhanced-jump,climb,levitate,sustained-levitate,fly,aerial-control' && M.Traversal.create().tier === 'walk' && !/unlockLevel|LEVEL_FOR_FLIGHT/.test(domainSrc));
   const inv = M.Inventory.add(M.Inventory.create('acct'), { id: 'cape', kind: 'cosmetic' });
-  P('MW-103 inventory accepts only the reserved kinds and carries no economy', inv.items.length === 1 && M.Inventory.add(inv, { id: 'coin', kind: 'currency' }).items.length === 1 && !/blockchain|\bnft\b|wallet|\btrade/i.test(code('mahworld/mahworld-domain.js')));
+  P('MW-103 inventory accepts only the reserved kinds (cosmetic, construct, trophy, consumable) and carries no economy', inv.items.length === 1 && M.Inventory.kinds.join() === 'cosmetic,construct,trophy,consumable' && M.Inventory.add(inv, { id: 'cup', kind: 'trophy' }).items.length === 2 && M.Inventory.add(inv, { id: 'coin', kind: 'currency' }).items.length === 1 && !/blockchain|\bnft\b|wallet|\btrade/i.test(code('mahworld/mahworld-domain.js')));
   P('MW-104 MAHMATCH, RACING, TRAINING_ROOM and FOBBING are reserved namespaces without mechanics', ['MAHMATCH', 'RACING', 'TRAINING_ROOM', 'FOBBING'].every(k => M.reserved[k] && M.reserved[k].status === 'reserved') && !/damage\s*[:=]\s*\d|hitpoints|round\s*\d/i.test(domainSrc.slice(domainSrc.indexOf('var reserved'))));
 }
 
@@ -201,7 +223,7 @@ P('MW-019 leaving the page goes through the app\'s page-teardown owner; sign-out
   const opened = [];
   M.bind({ navigate: v => opened.push(v) });
   P('MW-110 every destination names its MAHFITT owner or is marked future', M.MAHTROPOLIS.length >= 10 && M.MAHTROPOLIS.every(d => d.mahfittOwner || d.status === 'future'));
-  P('MW-111 a portal navigates to the existing MAHFITT view and a future destination opens nothing', M.openDestination('calendar') === true && opened.join() === 'calendar' && M.openDestination('shop') === false && opened.length === 1);
+  P('MW-111 a portal navigates to the existing MAHFITT view and EVERY future destination opens nothing', M.openDestination('calendar') === true && opened.join() === 'calendar' && M.MAHTROPOLIS.filter(d => d.status === 'future').length >= 4 && M.MAHTROPOLIS.filter(d => d.status === 'future').every(d => M.openDestination(d.id) === false && !M.destinationOpens(d)) && opened.length === 1);
   const routes = M.MAHTROPOLIS.map(d => d.mahfittRoute).filter(Boolean);
   P('MW-112 every portal route is a view mygym.js actually renders', routes.length >= 6 && routes.every(r => new RegExp("view==='" + r + "'").test(client)));
   const acted = [];
@@ -215,7 +237,7 @@ P('MW-120 the shell renders with MAHFITT settings primitives and canonical butto
 P('MW-121 the shell\'s controls dispatch through their own attribute, not the app\'s data-a router', /data-mahworld-action/.test(shellSrc) && !/data-a=/.test(shellSrc));
 P('MW-122 the URL development switch is refused on the production deploy context off a local host', /allowed = localHost\(\) \|\| deployContext\(\) !== 'production'/.test(shellSrc));
 P('MW-123 the world session the shell enters is labelled a simulation', /SIMULATED/.test(shellSrc));
-P('MW-124 the menu hook is CSS-only, scoped to the state attribute, and paused under prefers-reduced-motion', /html\[data-mahworld-state="available"\]/.test(menuCss) && /@media \(prefers-reduced-motion:reduce\)[\s\S]*animation:none!important/.test(menuCss) && !/requestAnimationFrame|setInterval/.test(shellSrc.slice(0, shellSrc.indexOf('function later'))));
+P('MW-124 the menu hook is CSS-only, scoped to the state attribute, and paused under prefers-reduced-motion', /html\[data-mahworld-state="available"\]/.test(menuCss) && /@media \(prefers-reduced-motion:reduce\)[\s\S]*animation:none!important/.test(menuCss) && !/requestAnimationFrame|setInterval/.test(shellSrc) && (shellSrc.match(/setTimeout\(/g) || []).length === 1);
 P('MW-125 the hook changes no button geometry (no size, radius, padding or min-height on the entry)', !/(min-height|padding|border-radius|width|height)\s*:/.test(menuCss.split('/* ---- the development entry control')[1].split('/* ---- the internal shell page')[0]));
 P('MW-126 the energy colour derives from the Theme Secondary custom property', /--mahworld-energy-rgb:var\(--bright-rgb/.test(menuCss));
 

@@ -74,7 +74,8 @@ disagreement is listed in §25.
 | `tests/mahworld-phase0.test.js` | the Phase 0 contract suite (plain Node, same shape as the r85/r90 suites) |
 | `tests/mahworld-phase0-browser.js` | real-browser verification: the Netlify-generated shell in headless Chromium on a phone profile, boot stubbed, six scenarios |
 | `validation/mahworld/phase0/` | the evidence that run writes: `browser-smoke.json` and the Home / shell / Coach-context screenshots |
-| `tests/r85a-*.test.js` (4 files) | version pins 452 → 453, the same move R85A1 made from 451 |
+| `tests/r85a-*.test.js` (4 files), `tests/r85a-release-gate.py` | version pins 452 → 453, the same move R85A1 made from 451 |
+| `calendar.html`, `report-cards.html`, `admin-app.css`, `coach-shell.css`, `netlify/functions/{admin,calendar-admin,fob-payment,fob-progress,form-review}.js` | the R85A1 cache-stamp owners: `?v=452` → `?v=453` and nothing else, so no surface mixes asset generations behind the v453 service worker |
 | `MAHWORLD_PHASE0_FOUNDATION.md` | this document |
 
 No Supabase migration, no Netlify function, no server action, no schema and
@@ -92,7 +93,7 @@ Line numbers are from the baseline `mygym.js` (8354 lines) and
 | Concern | Owner | Anchor |
 | --- | --- | --- |
 | HTML shell | `shell()` in `netlify/functions/mygym.js`, served pre-authentication on GET | lines 43–58; stylesheets at 54–56, scripts at 57 |
-| Cache identity | `const V` (server) and `const V = 'fob-shell-v…'` (`sw.js`) — must move together | server line 25; `sw.js` line 1 |
+| Cache identity | `const V` (server) and `const V = 'fob-shell-v…'` (`sw.js`) — must move together, with the nine other stamp owners R85A1 lists | server line 25; `sw.js` line 21 |
 | Boot warm-up | inline `<script>` in `shell()` POSTs `{action:'boot'}` before `mygym.js` downloads; `bootRequest()` consumes it | server line 51; client 4695–4701 |
 | Client boot | `boot()` — splash, boot request, account/member/roleContext, theme + music hydration, history init, first route | 4727–4743, called once at 8287 |
 | Server boot action | `api()` boot branch; theme/music fetched by `accountMemberId`, fitness by `memberId` | server 2297–2319 |
@@ -146,7 +147,7 @@ Line numbers are from the baseline `mygym.js` (8354 lines) and
 
 | Concern | Owner | Anchor |
 | --- | --- | --- |
-| Shipped Mr.Mah | the 2.5D inline-SVG rig `fabiRigHTML()` (`viewBox 0 0 420 560`), staged by `fabiStageHTML()` and reused by MAH Protocol | 4163, 4417, 5634 |
+| Shipped Mr.Mah | the 2.5D inline-SVG rig `fabiRigHTML()` (`viewBox 0 0 420 560`), staged by `fabiStageHTML()` and reused by MAH Protocol | 4161, 4417, 5634 |
 | AI entry | `MAHFITT_AI_ROUTE = 'mahfitt-ai'` | 1112 |
 | 3D renderer | `mrmah3d/` — experimental, development-only, never loaded by the production shell; it lives on the repository's default branch (`claude/mrmah-3d-renderer-poc-1nyunz`), not on this branch; **Astra's, not touched by Phase 0** | that branch's `CLAUDE.md` §2 |
 
@@ -307,13 +308,13 @@ and no `mahworld` markup exists in the DOM.
 | `mahgic` | `Mahgic.create()` | §11 |
 | `progression` | `Progression.create()` | §13 |
 | `traversal` | `Traversal.create()` | tier `walk` |
-| `abilities` | `[]` | unlocked Ability ids |
-| `inventory` | `Inventory.create(owner)` | §19 |
+| `abilities` | `{ unlocked: [], equipped: [] }` | Ability ids |
+| `inventoryRef` | `null` | the Inventory lives in its own boundary (§19) |
 | `presenceOptIn` | `false` | presence OFF until enabled |
 | `presenceLevel` | `hidden` | |
 | `displayRef` | `null` | a public handle, never a real name by default |
 | `currentWorldRef` | `null` | `{ worldId, sessionId }` while active |
-| `lastDerivation` | `null` | the last adapter result and its authority |
+| `lastDerivation` | `null` | a summary of the last adapter result: `version, xp, signalCount, authority, at` — never the signals |
 | `authority` | `local-draft` | `server` once the server has validated |
 | `createdAt`, `updatedAt` | ISO | |
 
@@ -327,14 +328,18 @@ account removal.
 `MAHWORLD.Avatar.create(base)` → contract `mahworld.Avatar` v1:
 
 - `base`: `masculine` | `feminine` (the two bases; `Avatar.bases`)
+- `appearance`: `{ theme:'inherit', accentRole:'secondary' }` — derives from
+  the account Theme, never owns one
 - `musculature`: `{ shoulders, chest, back, arms, core, lowerBody }`, each
   0–1, a **derived** state applied only through `applyMusculature`
-- `proportion`: `{ height, breadth }` neutral 1.0
-- `cosmetics`: `{ palette:null, coat:null, emblem:null, aura:null }` — slots
+- `proportion`: `{ stage: 0 }` — the godform's progression stage
+- `cosmetics`: `{ equipped: [] }` and `attachments`: `[]` — slots only
 - `traversalCapabilities`: `[]` — filled from Traversal
-- `abilityVisualState`: `{}` — what an unlocked ability shows on the body
-- `rendererHints`: `{}` — reserved; **no Three.js, mesh, shader, geometry or
-  mrmah3d concept appears in avatar data** (tested)
+- `abilityVisualState`: `{ active: [], charged: false }` — what an unlocked
+  ability shows on the body
+- `updatedAt`
+- The key set is pinned exactly by MW-090; **no Three.js, mesh, shader,
+  geometry or mrmah3d concept appears in avatar data** (tested)
 
 The avatar is what the world knows about the body. How it is drawn, and by
 which renderer, is Astra's domain and a later decision.
@@ -372,18 +377,23 @@ MAHFITT record  --normalize-->  signal[]  --derive-->  derivation  --applyDeriva
 ```
 
 - **`signals.normalizeWorkout(w)`** accepts MAHFITT's own workout shape
-  (`completedAt | date | endedAt`, `exercises[].sets[]` with `reps`,
-  `weight`, `completed`). **Only completed sets become signals.** A set is
-  `strength` at ≤ 5 reps, `hypertrophy` at ≤ 15, `endurance` above; an
-  `explosive` flag maps to `power`, a `control` flag to `control`.
+  (`completedAt | date | endedAt`, `items[]` or `exercises[]` with
+  `sets[]` carrying `reps`, `weight` and MAHFITT's completion flag `done`;
+  `completed` is accepted as an alias). **Completion fails closed: only a
+  set with `done === true` (or `completed === true`) becomes a signal**; an
+  unticked or unflagged set never does. A set is `strength` at ≤ 5 reps,
+  `hypertrophy` at ≤ 15, `endurance` above; an `explosive` flag maps to
+  `power`, a `control` flag to `control`.
 - **`normalizeActivity(a)`** reads `distanceMeters`, `durationSeconds`;
   **`normalizeBody(b)`** reads `weightKg` / `recordedAt`.
-- A signal carries `{ kind, units, region, at, source:{type,id} }` and
-  **never the record itself** (tested).
-- **`derive(signals)`** is pure: inputs untouched, output
-  `{ version, xp, attributeDeltas, musculatureDeltas, mahgic, signalCount,
-  days }`, XP an integer, per-day diminishing returns
-  (`dailySoftCap 40`, `rate 0.35`).
+- A signal carries `{ kind, units, region, at, source:{type,id,setIndex} }`
+  and **never the record itself** — no exercise name, reps or load leave
+  the fitness owner (tested by key set).
+- **`derive(signals)`** is pure: inputs untouched, output exactly
+  `{ version, signalCount, xp, attributeDeltas, musculatureDeltas,
+  mahgicDelta }`, XP an integer, diminishing returns per UTC calendar day
+  (`dailySoftCap 40`, `rate 0.35`; ISO strings and numeric timestamps
+  bucket alike).
 - **Balance table** `BALANCE_V0` is versioned; `setBalance(table)` swaps it
   (a table without a `version` is refused). The curve, classification
   thresholds, XP weights, attribute weights and caps all live there.
@@ -392,12 +402,20 @@ MAHFITT record  --normalize-->  signal[]  --derive-->  derivation  --applyDeriva
 
 `antiExploit.applyDerivation(profile, derivation, {authority})`:
 
-- a bare `{xp}` with no `version`, `signalCount` and deltas is **thrown out**
-  — the client can never assert XP;
+- `antiExploit.validateDerivation` is the gate: the `version` must equal the
+  CURRENT balance version, `xp` must be a non-negative integer,
+  `signalCount` a number, and `attributeDeltas`, `musculatureDeltas` and
+  `mahgicDelta` objects — a bare `{xp}`, a version-only claim, a stale
+  version or missing deltas are **thrown out** (tested);
+- MAHGIC capacity and recovery are clamped at zero and the balance at
+  capacity after every application;
 - without `authority:'server-validated'` the result is a **client preview**:
   `profile.authority` stays `local-draft`, `lastDerivation.authority` is
   `client-preview`;
-- only a server-validated derivation makes `profile.authority = 'server'`.
+- only a server-validated derivation makes `profile.authority = 'server'`,
+  and **a local draft is never server authority**: `store.load` forces
+  `local-draft` / `client-preview` on whatever it reads back, so a
+  hand-edited draft can claim nothing.
 
 Phase 0 has no server, so every value the shell shows is a labelled
 preview on a labelled fixture. **FUTURE:** the server recomputes the same
@@ -505,7 +523,7 @@ studio')`, which `mygym.js` maps to its own `openMusicStudio()`; it returns
 | Destination | MAHFITT owner | Route (a `view===` `mygym.js` renders) |
 | --- | --- | --- |
 | Program Gym | Program system (MAH PROGRAMS / OUTDOOR, Program Library) | `home` |
-| Training Room | exercise education + Program Tools — **FUTURE** | `home` |
+| Training Room | exercise education + Program Tools — **FUTURE** | — (opens nothing yet) |
 | Progress | MAH Progress / body data | `progress` |
 | Calendar | MAH Calendar | `calendar` |
 | Health / Recovery | MAH Health / Activity | `health` |
@@ -557,8 +575,9 @@ written only by a world action that follows the client-context denylist
 
 ## 23. Performance and engine law — LOCKED
 
-- Motion in the menu layer is CSS-only (`background-position`, `opacity`,
-  `box-shadow` on one control), composited, confined to the development
+- Motion in the menu layer is CSS-only and compositor-friendly: `transform`
+  and `opacity` on one pseudo-element (a static `box-shadow` in one state,
+  never a paint property animated per frame), confined to the development
   entry control, and **paused under `prefers-reduced-motion`**. There is no
   app-wide animation loop, `requestAnimationFrame` or interval in the shell's
   page logic.
@@ -578,6 +597,7 @@ Run from the repository root:
 ```sh
 node tests/mahworld-phase0.test.js
 node tests/mahworld-phase0-browser.js
+python3 tests/r85a-release-gate.py
 node tests/r85a-canonical-component-closure.test.js
 node tests/r85a-source-guards.test.js
 node tests/r85a-r82-mrmah-preservation.test.js
@@ -587,10 +607,24 @@ node tests/r90-audio-ownership.test.js
 node tests/r90a-entry-boot-resilience.test.js
 ```
 
-Results at this checkpoint: `mahworld-phase0` 89/89, `mahworld-phase0-browser`
-46/46, every current-generation suite (`r85a-*`, `r85-coach-*`,
-`r85-data-model`, `r90-*` behavioural, `r90a-*`) passing with the same counts
-as the untouched baseline, zero syntax failures across every JS file.
+Results at this checkpoint: `mahworld-phase0` 96/96, `mahworld-phase0-browser`
+47/47, the R85A release gate passing on a clean checkout (it walks the
+working directory, so stale tool worktrees under `.claude/` must not be
+present when it runs), every current-generation suite (`r85a-*`,
+`r85-coach-*`, `r85-data-model`, `r90-*` behavioural, `r90a-*`) passing
+with the same counts as the untouched baseline, zero syntax failures across
+every JS file.
+
+An independent six-lens review of the diff (flag-off and boot, roles and
+privacy, domain correctness, shell and CSS, scope and naming, conventions
+and tests) ran before this checkpoint; its confirmed findings are fixed in
+this commit: no page-wide flag source, owner-bound shell session, shape
+allow-listed presence references, completion failing closed on MAHFITT's
+`done`, signals stripped of record detail, strict derivation validation,
+local drafts never server authority, transform-only drift, route-boundary
+teardown that also clears the world reference, the release gate and every
+R85A1 stamp owner moved to 453, and the doc brought into line with the code
+(WorldProfile, Avatar, derive output, Inventory kinds, Training Room).
 
 `tests/mahworld-phase0.test.js` covers: isolation and load order; every
 `mygym.js` hook guarded; flag default OFF; the state machine; identity and
@@ -718,3 +752,5 @@ Do not begin Phase 1 without the decisions in §25 items 1–3.
 | D35 | Astra's character files untouched; renderer for the Avatar not chosen | LOCKED (Phase 0) |
 | D36 | The shell's world session is bound to one owner account; sign-out or another account discards it | LOCKED |
 | D37 | Public presence references are opaque strings (≤ 64 chars, never coordinate-shaped); objects and arrays are dropped | LOCKED |
+| D38 | A derivation is applied only under the current balance version with every delta present; a local draft is never server authority | LOCKED |
+| D39 | Completion fails closed: MAHFITT's `done` (or `completed`) must be `true` for a set to count; signals carry no record detail | LOCKED |

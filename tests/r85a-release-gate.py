@@ -49,9 +49,9 @@ for p in all_files(text_ext):
     if re.search(r'^(<<<<<<<|=======|>>>>>>>)',s,re.M): errors.append('MERGE MARKER '+str(p.relative_to(ROOT)))
     if '/mnt/data/' in s or '/home/oai/' in s: errors.append('ABSOLUTE DEV PATH '+str(p.relative_to(ROOT)))
 # Cache lineage guards.
-if "fob-shell-v452" not in sw: errors.append('SW cache identity is not v451')
-if 'const V = 452;' not in (ROOT/'netlify/functions/mygym.js').read_text(): errors.append('mygym asset stamp is not v451')
-if 'v=452' not in (ROOT/'calendar.html').read_text(): errors.append('calendar asset stamp is not v451')
+if "fob-shell-v453" not in sw: errors.append('SW cache identity is not v453')
+if 'const V = 453;' not in (ROOT/'netlify/functions/mygym.js').read_text(): errors.append('mygym asset stamp is not v453')
+if 'v=453' not in (ROOT/'calendar.html').read_text(): errors.append('calendar asset stamp is not v453')
 print(f'JS {len(js)} | HTML {len(html)} | CSS {len(css)} | JSON {len(jsons)}')
 if errors:
     print('R85A RELEASE GATE FAIL')

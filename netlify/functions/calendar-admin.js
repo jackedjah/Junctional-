@@ -56,9 +56,9 @@ function shell() {
     + '<meta name="robots" content="noindex,nofollow,noarchive"><title>MAH Calendar · Coach</title>'
     + '<meta name="theme-color" content="#0E1114"><link rel="preconnect" href="https://fonts.googleapis.com">'
     + '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">'
-    + '<link rel="stylesheet" href="/calendar-admin.css?v=394"><link rel="stylesheet" href="/calendar-admin-ui.css?v=394"><link rel="stylesheet" href="/coach-shell.css?v=452&rc5c=1"><link rel="stylesheet" href="/mahfitt-atmosphere.css?v=452"></head><body data-coach-surface="calendar">'
+    + '<link rel="stylesheet" href="/calendar-admin.css?v=394"><link rel="stylesheet" href="/calendar-admin-ui.css?v=394"><link rel="stylesheet" href="/coach-shell.css?v=453&rc5c=1"><link rel="stylesheet" href="/mahfitt-atmosphere.css?v=453"></head><body data-coach-surface="calendar">'
     + '<main id="calendarAdmin"><section class="admin-loading"><b>MAHFITT</b><span>Opening coach calendar…</span></section></main>'
-    + '<script defer src="/coach-shell.js?v=452&rc5c=1"></script><script defer src="/calendar-admin-client.js?v=394"></script></body></html>';
+    + '<script defer src="/coach-shell.js?v=453&rc5c=1"></script><script defer src="/calendar-admin-client.js?v=394"></script></body></html>';
 }
 async function openSlots(days) {
   const now = new Date(), count = days || 190, until = new Date(now.getTime() + count * 86400000);

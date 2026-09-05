@@ -154,7 +154,7 @@ padding:9px 15px;border-radius:9px;border:1px solid var(--line);background:rgba(
 .empty{text-align:center;padding:38px 16px;color:var(--muted);font-size:14px;line-height:1.6}
 .empty strong{display:block;color:var(--gold);font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:11px}
 .foot{margin-top:26px;text-align:center;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#4E545B}
-</style><link rel="stylesheet" href="/coach-shell.css?v=452&rc5c=1"><link rel="stylesheet" href="/mahfitt-atmosphere.css?v=452"></head><body><main>${body}</main><script defer src="/coach-shell.js?v=452&rc5c=1"></script></body></html>`;
+</style><link rel="stylesheet" href="/coach-shell.css?v=453&rc5c=1"><link rel="stylesheet" href="/mahfitt-atmosphere.css?v=453"></head><body><main>${body}</main><script defer src="/coach-shell.js?v=453&rc5c=1"></script></body></html>`;
 }
 
 /* ---- tiny SVG chart helpers. No libraries on this site, and a hand-rolled

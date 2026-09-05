@@ -18,7 +18,7 @@ function login(){
   return '<!doctype html><html lang="en"><head><meta charset="utf-8">'
     + '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
     + '<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#0E1114">'
-    + '<title>MAHFITT Admin</title><link rel="stylesheet" href="/admin-app.css?v=452&rc5c=1"><link rel="stylesheet" href="/mahfitt-atmosphere.css?v=452"></head>'
+    + '<title>MAHFITT Admin</title><link rel="stylesheet" href="/admin-app.css?v=453&rc5c=1"><link rel="stylesheet" href="/mahfitt-atmosphere.css?v=453"></head>'
     + '<body class="admin-login-page"><main class="admin-login"><section class="admin-login-card">'
     + '<span class="admin-login-mark" aria-hidden="true"></span><span class="admin-login-brand">MAHFITT COACH</span><span class="admin-login-kicker">PRIVATE COACH OPERATIONS</span>'
     + '<h1>ADMIN</h1><p>Enter the private coach password.</p>'
@@ -33,9 +33,9 @@ function shell(){
     + '<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#0E1114"><meta name="color-scheme" content="dark">'
     + '<title>MAHFITT Coach Admin</title><link rel="preconnect" href="https://fonts.googleapis.com">'
     + '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">'
-    + '<link rel="stylesheet" href="/admin-app.css?v=452&rc5c=1"><link rel="stylesheet" href="/coach-shell.css?v=452&rc5c=1"><link rel="stylesheet" href="/mahfitt-atmosphere.css?v=452">'
+    + '<link rel="stylesheet" href="/admin-app.css?v=453&rc5c=1"><link rel="stylesheet" href="/coach-shell.css?v=453&rc5c=1"><link rel="stylesheet" href="/mahfitt-atmosphere.css?v=453">'
     + '</head><body data-coach-surface="admin"><main id="adminApp" class="admin-loading"><section><b>MAHFITT</b><span>Opening coach admin…</span></section></main>'
-    + '<script defer src="/qr-lite.js?v=452"></script><script defer src="/coach-shell.js?v=452&rc5c=1"></script><script defer src="/admin-app.js?v=452&rc5c=1"></script>'
+    + '<script defer src="/qr-lite.js?v=453"></script><script defer src="/coach-shell.js?v=453&rc5c=1"></script><script defer src="/admin-app.js?v=453&rc5c=1"></script>'
     + '</body></html>';
 }
 

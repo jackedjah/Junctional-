@@ -11,9 +11,14 @@
 const fs = require('fs'), p = require('path');
 const ROOT = p.resolve(__dirname, '..');
 const OUT = p.join(ROOT, 'validation/mahworld/phase0');
+/* Playwright is not a dependency of the site. Resolve it from a local install,
+   from the global npm root, or from PLAYWRIGHT_MODULE; otherwise skip cleanly. */
 let pw = null;
-for (const cand of ['playwright', '/opt/node22/lib/node_modules/playwright', '/usr/lib/node_modules/playwright']) { try { pw = require(cand); break; } catch (e) {} }
-if (!pw) { console.log('mahworld-phase0-browser: SKIP (playwright is not installed)'); process.exit(0); }
+const candidates = ['playwright'];
+if (process.env.PLAYWRIGHT_MODULE) candidates.unshift(process.env.PLAYWRIGHT_MODULE);
+try { candidates.push(p.join(require('child_process').execSync('npm root -g', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(), 'playwright')); } catch (e) {}
+for (const cand of candidates) { try { pw = require(cand); break; } catch (e) {} }
+if (!pw) { console.log('mahworld-phase0-browser: SKIP (playwright is not installed; npm i -g playwright, or set PLAYWRIGHT_MODULE)'); process.exit(0); }
 const { chromium, devices } = pw;
 fs.mkdirSync(OUT, { recursive: true });
 /* The shell exactly as the Netlify function emits it. The function needs a few
@@ -169,6 +174,13 @@ const mobile = Object.assign({}, devices['iPhone 13'], { serviceWorkers: 'block'
     await page.click('[data-mahworld-action="enter"]'); await page.waitForTimeout(60); await routeTo(page, 'home'); await page.waitForTimeout(1000);
     const td = await dom(page, () => ({ shell: !!document.querySelector('[data-mahworld-page]'), home: !!document.querySelector('[data-home-directory-stack]'), state: window.MAHWORLD_SHELL.session.state, attr: document.documentElement.getAttribute('data-mahworld-state'), ref: window.MAHWORLD.currentProfile().profile.currentWorldRef }));
     check('S3', 'leaving the page mid-ENTER cancels the entry: nothing re-renders over Home, session settles to WORLD_AVAILABLE', !td.shell && td.home && td.state === 'WORLD_AVAILABLE' && td.attr === 'available' && td.ref === null, JSON.stringify(td));
+    await page.click('[data-mahworld-entry]'); await page.waitForSelector('[data-mahworld-page]', { timeout: 5000 });
+    /* And mid-EXIT: enter fully, exit, leave within the 500 ms window — the
+       draft must forget the world it was in and the session must settle. */
+    await page.click('[data-mahworld-action="enter"]'); await page.waitForTimeout(900);
+    await page.click('[data-mahworld-action="exit"]'); await page.waitForTimeout(60); await routeTo(page, 'home'); await page.waitForTimeout(800);
+    const tx = await dom(page, () => ({ shell: !!document.querySelector('[data-mahworld-page]'), state: window.MAHWORLD_SHELL.session.state, attr: document.documentElement.getAttribute('data-mahworld-state'), ref: window.MAHWORLD.currentProfile().profile.currentWorldRef, stored: JSON.parse(localStorage.getItem('fob.mahworld.profile.v0.acct-1') || '{}').currentWorldRef }));
+    check('S3', 'leaving the page mid-EXIT settles to WORLD_AVAILABLE and the saved draft no longer points at a world', !tx.shell && tx.state === 'WORLD_AVAILABLE' && tx.attr === 'available' && tx.ref === null && tx.stored === null, JSON.stringify(tx));
     await page.click('[data-mahworld-entry]'); await page.waitForSelector('[data-mahworld-page]', { timeout: 5000 });
     /* Another owner on the same device gets a fresh session, never this one. */
     const oc = await dom(page, () => { const M = window.MAHWORLD, SH = window.MAHWORLD_SHELL; const before = SH.session.state; const restore = { accountId: 'acct-1', activeProfileId: 'acct-1', isClientContext: false, permissionKind: 'self' }; M.bind({ getAccountContext: () => ({ accountId: 'acct-2', activeProfileId: 'acct-2', isClientContext: false, permissionKind: 'self' }) }); const owner = SH.syncOwner(); const after = SH.session.state; const attr = document.documentElement.getAttribute('data-mahworld-state'); const html = SH.pageHTML(); M.bind({ getAccountContext: () => restore }); SH.syncOwner(); return { before, owner, after, attr, ownerRow: /ACCT-2/.test(html), offered: /ENABLE MAHWORLD FOR THIS ACCOUNT/.test(html), restored: SH.session.state }; });

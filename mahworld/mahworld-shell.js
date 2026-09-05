@@ -167,6 +167,14 @@
   }
 
   /* ---- behaviour ------------------------------------------------------- */
+  /* The ONE place an exit completes: the draft forgets the world it was in,
+     then the session returns to AVAILABLE. Used by the simulated exit timer
+     and by unmount(), so leaving the page mid-exit cannot strand a ref. */
+  function settleExit(reason) {
+    var cur = current();
+    if (cur.ok && cur.profile.currentWorldRef) { cur.profile.currentWorldRef = null; saveProfile(cur.profile); }
+    session.exited(reason);
+  }
   function onAction(id) {
     if (!M || !session) return;
     var cur = ensureOwner(); if (!cur.ok) return;
@@ -183,7 +191,7 @@
     if (id === 'cancel') { session.cancelEntry('dev-cancel'); return; }
     if (id === 'exit') {
       if (!session.exit('dev-control')) return;
-      later(function () { if (session.state === M.STATES.EXITING) { p.currentWorldRef = null; saveProfile(p); session.exited('returned-to-mahfitt'); } }, 500);
+      later(function () { if (session.state === M.STATES.EXITING) settleExit('returned-to-mahfitt'); }, 500);
       return;
     }
     if (id === 'preview') {
@@ -225,7 +233,7 @@
     mounted = false; rerender = null; clearTimers();
     if (M && session) {
       if (session.state === M.STATES.ENTERING) session.cancelEntry('left-the-deck');
-      else if (session.state === M.STATES.EXITING) session.exited('left-the-deck');
+      else if (session.state === M.STATES.EXITING) settleExit('left-the-deck');
     }
   }
   /* For the app: call after sign-in, sign-out or session loss. */

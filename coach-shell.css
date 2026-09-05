@@ -1,4 +1,4 @@
-@import url('/mahfitt-canonical-components.css?v=452');
+@import url('/mahfitt-canonical-components.css?v=453');
 :root{--coach-primary:#e9c98f;--coach-secondary:#e9c98f;--coach-surface:#0e1114;--coach-panel:#15191d;--coach-crown-h:var(--mf-crown-height,188px);--coach-crown-collapsed-h:var(--mf-crown-collapsed-height,74px)}
 .coach-shell{position:fixed;z-index:2147482000;top:0;left:0;right:0;height:var(--coach-crown-h);padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left));display:flex;justify-content:center;color:#f7f3ec;font-family:var(--mf-ui-font);transition:height .22s ease;isolation:isolate;overflow:hidden;background:transparent}
 /* Real occlusion owner: scroll content is fully covered through the crown's
