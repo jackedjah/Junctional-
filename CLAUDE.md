@@ -1632,3 +1632,30 @@ read as columns along the muscle instead of rows cut at every ring. The
 same change on the pec crown rows measured as nothing — the pec's rows
 are named per band by `pecZone`, so its seams are class boundaries, not
 group boundaries — and was reverted rather than kept as noise.
+
+### The chest box measures the emblem (R109)
+
+The R109 hero references are body-only when you crop them right, and the
+value targets have to be read that way: the male's left pec is 69% under
+48 luma at mean 43 with 2.7% energy cyan; his quad 53% at mean 61 with a
+4% platinum tail; his lowered arm 94% under 48 (it is in shadow); the
+female's chest 67%, her hip 53%, her lower taper 33% at mean 86. The
+chest box every earlier pass measured (x 0.36–0.64) contains the chest
+DIAMOND and the three glyphs, so its "cyan" floor is about 9% whatever
+the material does; a pec-only box (x 0.38–0.47) is what compares. And
+"cyan" needs a classifier for ENERGY cyan (bright and saturated in the
+cyan band), not for blue: the crystal's own dark blue at luma 60 is body
+midtone, and counting it inflated the reference's "cyan" to 20–47%.
+
+### Isolate before tuning, per region, and expect different answers
+
+Isolation captures (scratch `isolate.mjs`, one transport off per render)
+gave different owners for the same fault on different regions: the
+chest's excess brightness was the ENVIRONMENT REFLECTION (mean 92 → 57
+with it off), the arm's was the PLATINUM COAT (87 → 47), and the chest's
+energy cyan was split between the rim floor, the core light and the
+theme cards reflected by the coat, with the lamps measuring as nothing.
+A global cut (key 6.0 → 4.4) then took the QUAD from 57% to 76% under 32
+and stripped its tail, because the quad's light was mostly the key; its
+zone rows went one step lighter with more coat instead. Region tables
+are how a value moves in one place and not another.
