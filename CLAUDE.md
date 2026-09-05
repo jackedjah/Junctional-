@@ -1596,3 +1596,39 @@ grooves, a flexor and extensor swapping sides between the two arms, the
 forearm swallowed into a hip measurement); and no sculptor was allowed to
 edit the tests, so every pinned literal surfaced at the merge as a
 failing contract to be re-authored, never silently loosened.
+
+### Mass is never traded for definition; a pinch is a transition, not a region (R108 d)
+
+The mass-recovery brief read the R108 body as "more structure by removing
+mass": the male thigh a long taper from a belt to a point, the arm a
+continuous taper from the cap to the wrist, Mrs. Mah a pear. Its rule is
+BULGE -> PINCH -> BULGE -> PINCH, never bulge -> long taper -> point, and
+the narrow places are SHORT. Three things about authoring that:
+
+- **A ring table whose widths hold constant is a column, and a column
+  reads as the torso continuing.** The male thigh at 0.170 / 0.168 /
+  0.166 / 0.165 was 1.58 x the belt and still read as a tube; bowing it
+  (0.166 -> 0.176 -> 0.180 -> 0.178 -> 0.168 -> 0.158, then a 0.124 knee
+  and a 0.174 calf) made it a bloom at 1.71 x. The eye reads the second
+  derivative of the outline, not its ratio to the waist.
+- **A limb profile has to fall BELOW where the next segment begins, and
+  the next segment has to climb back out.** The upper arm now ends at
+  0.76 of its lerped radius (0.087) after a 1.14 belly (0.164), and the
+  forearm starts inside that (0.086) and blooms to 1.25 (0.128) a quarter
+  of the way down before pinching to a 0.58 wrist. Belly : elbow : bloom
+  : wrist is 1.9 : 1 : 1.5 : 0.5, and the same profile carries Mrs. Mah's
+  arms at her radii. The circumference did not move — the start radius
+  and the belly are as full as before; only the JOINTS narrowed.
+- **The measurement tool cannot see a pinch it was not told about.** The
+  refwidth landmark set names a waist, a hip, a knee and a calf; the
+  knee it reports (0.072) is the taper under the calf, not the 0.124 ring.
+  Judge the knee and the elbow on the clay, and measure only the ratios
+  the tool has landmarks for (male B/W 1.71 front / 1.75 rear; Mrs. Mah
+  2.99 / 3.07 with the arms hidden).
+
+Facet groups on the lats, abs and thighs went from one or two bands to
+FOUR, so a strip spans two authored rings and the lit lower back and quad
+read as columns along the muscle instead of rows cut at every ring. The
+same change on the pec crown rows measured as nothing — the pec's rows
+are named per band by `pecZone`, so its seams are class boundaries, not
+group boundaries — and was reverted rather than kept as noise.

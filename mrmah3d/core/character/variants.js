@@ -102,50 +102,50 @@ function femaleProportions() {
        -> ONE point. */
     { y: 0.000, w: 0.006, d: 0.004, fg: [2, 2], columns: true, classesAt: taper },
     { y: 0.150, w: 0.026, d: 0.020, fg: [2, 2], facet: 0.0060, crystal: 0.0180, crystalY: 0.0040, columns: true, classesAt: taper },
-    { y: 0.400, w: 0.066, d: 0.054, fg: [2, 2], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20, columns: true, classesAt: taper },
+    { y: 0.400, w: 0.062, d: 0.052, fg: [2, 2], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20, columns: true, classesAt: taper },
     /* the Achilles compression under the calf: 0.31 of the hip at t 0.81 */
-    { y: 0.560, w: 0.108, d: 0.090, fg: [2, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.22,
+    { y: 0.560, w: 0.132, d: 0.116, fg: [2, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.22,
       shape: S.calfShape(0.50), columns: true, classesAt: taper },
     /* the calf — the secondary sweep. Its mass is POSTERIOR (calfShape's
        gastrocnemius bellies), so from the front the width barely exceeds the
        knee's and the outline is one long taper with a slower passage; a first
        cut 15% wider than the knee made the knee a groove all round with a
        bead under it (a ring narrower than both neighbours is a groove) */
-    { y: 0.650, w: 0.150, d: 0.140, fg: [1, 2], facet: -0.0055, crystal: 0.0280, crystalY: 0.0070, hero: 0.26,
+    { y: 0.650, w: 0.180, d: 0.170, fg: [1, 2],   /* R108 d: the CALF BLOOM */ facet: -0.0055, crystal: 0.0280, crystalY: 0.0070, hero: 0.26,
       shape: S.calfShape(1.0), columns: true, classesAt: taper },
-    { y: 0.740, w: 0.152, d: 0.134, fg: [1, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.16,
+    { y: 0.740, w: 0.170, d: 0.156, fg: [1, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.16,
       shape: S.calfShape(0.90), columns: true, classesAt: taper },
     /* the knee — the controlled compression, read in depth by kneeShape's
        notch; in width it is an inflection of the taper, not a band */
-    { y: 0.820, w: 0.152, d: 0.128, fg: [1, 2], facet: -0.0045, crystal: 0.0220, crystalY: 0.0050, hero: 0.08,
+    { y: 0.820, w: 0.130, d: 0.120, fg: [1, 2],   /* R108 d: the knee PINCH */ facet: -0.0045, crystal: 0.0220, crystalY: 0.0050, hero: 0.08,
       shape: S.kneeShape(0.80), columns: true, classesAt: taper, cav: 0.35 },   /* R108: softer than the male's — at 1.0 / 0.45 it read as a joint ring from behind */
     /* the long quad / hamstring sweep: quad heads and seam at full strength,
        two hamstring columns behind (their depth carries the posterior thigh
        back out under the fold), no glute */
-    { y: 0.910, w: 0.188, d: 0.170, fg: [1, 3], facet: -0.0050, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
+    { y: 0.910, w: 0.205, d: 0.186, fg: [1, 3], facet: -0.0050, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
       shape: hipShape(0.70, 0.0, 0.95, 0.70), columns: true, classesAt: taper },
-    { y: 1.040, w: 0.232, d: 0.220, fg: [1, 3], facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+    { y: 1.040, w: 0.272, d: 0.250, fg: [1, 3],   /* R108 d: the hamstring / quad BULGE — wider than the fold above it (round b: 0.264 -> 0.272 against a 0.242 fold, so the second bulge reads from the front too) */ facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
       shape: hipShape(0.85, 0.0, 1.0, 1.0), columns: true, classesAt: taper },
     /* the glute FOLD: the posterior pair falls from 1.0 to 0.25 between this
        ring and the one above, so the dome's underside turns in over the
        hamstring columns that begin here; the crease is a cavity, not a slot */
-    { y: 1.185, w: 0.262, d: 0.214, fg: [1, 3], facet: 0.0070, zc: -0.012, crystal: 0.0340, crystalY: 0.0090, hero: 0.22,
+    { y: 1.185, w: 0.242, d: 0.210, fg: [1, 3],   /* R108 d: the FOLD is a short pinch between the glute and the hamstring bulge */ facet: 0.0070, zc: -0.012, crystal: 0.0340, crystalY: 0.0090, hero: 0.22,
       shape: hipShape(0.95, 0.25, 0.85, 0.60), columns: false, classesAt: null, zoneAt: S.quadZone(1), cav: 0.55 },
     /* the lower glute curvature — still full behind, the quad beginning in front */
-    { y: 1.300, w: 0.300, d: 0.272, fg: [1, 3], facet: -0.0060, zc: -0.030, crystal: 0.0340, crystalY: 0.0090, hero: 0.20,
+    { y: 1.300, w: 0.305, d: 0.278, fg: [1, 3], facet: -0.0060, zc: -0.030, crystal: 0.0340, crystalY: 0.0090, hero: 0.20,
       shape: hipShape(1.0, 1.0, 0.60), zoneAt: S.quadZone(1), cav: 0.20 },
     /* the muscle-bust APEX — widest below the waist, maximum posterior projection */
     { y: 1.430, w: 0.315, d: 0.292, fg: [1, 3], facet: -0.0070, zc: -0.035, crystal: 0.0340, crystalY: 0.0090, hero: 0.16,
       shape: hipShape(1.0, 1.0, 0.40), zoneAt: S.quadZone(0) },
     /* the glute SHELF and the outward acceleration out of the pelvis: the
        pair is already FULL here, one ring under the transition */
-    { y: 1.545, w: 0.262, d: 0.236, fg: [1, 3], facet: 0.0050, zc: -0.025, crystal: 0.0280, crystalY: 0.0070, hero: 0.10,
+    { y: 1.545, w: 0.280, d: 0.250, fg: [1, 3], facet: 0.0050, zc: -0.025, crystal: 0.0280, crystalY: 0.0070, hero: 0.10,
       shape: hipShape(0.95, 1.0, 0.30), zoneAt: S.quadZone(0) },
     /* the gradual pelvic transition out of the waist — NO glute yet (the
        lower back is still the lumbar plane), so the shelf is the step to the
        full pair one ring down; with 0.30 of the pair here the spline rounded
        the shelf into a dome that began at the waist */
-    { y: 1.625, w: 0.176, d: 0.160, fg: [1, 3], facet: -0.0050, zc: -0.010, crystal: 0.0240, crystalY: 0.0060, hero: 0.06,
+    { y: 1.625, w: 0.200, d: 0.180, fg: [1, 3],   /* R108 d: the bloom begins straight under the waist */ facet: -0.0050, zc: -0.010, crystal: 0.0240, crystalY: 0.0060, hero: 0.06,
       shape: hipShape(0.60, 0.0, 0.25), zoneAt: S.coreZone(0) },
     /* THE WAIST — higher and tighter than his (R102: 0.30 of her shoulders) */
     { y: 1.690, w: 0.118, d: 0.108, fg: [1, 1], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060,

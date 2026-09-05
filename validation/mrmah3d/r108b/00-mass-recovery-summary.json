@@ -1,0 +1,28 @@
+{
+  "pass": "R108 d — silhouette mass recovery / bulge-pinch-bulge lock / reference proportion correction / no more global narrowing",
+  "baseline": "R108 commit 258695b",
+  "brief": "the previous pass achieved more structure by removing mass; every narrow place is a SHORT transition between two round masses, never a region; keep the diamond head, face, hand articulation, environment, hover point, height, chest width, arm circumference, material, interaction, performance and architecture",
+  "method": "smooth-clay loop (?debug=clay) front / rear / three-quarter / side plus 2x close-ups of the arm, the lower body and Mrs. Mah's rear three-quarter; two rounds (a: bulge-pinch-bulge rows and arm profiles, b: the thigh bowed and her fold deepened); then the lit render checked for horizontal facet slicing",
+  "sequences": {
+    "mrMahFront": "huge delts -> huge chest -> SHORT tight waist (belt 0.150, unchanged) -> thigh bloom straight out of the belt (rows 1.410 0.166 / 1.320 0.176 / 1.200 0.180 / 1.100 0.178 / 1.030 0.168 / 0.950 0.158) -> knee pinch 0.124 at 0.810 -> calf bloom 0.164 / 0.174 at 0.720 / 0.640 -> soleus 0.150 -> Achilles 0.088 -> point",
+    "mrMahRear": "glute pair (1.320 glute 0.44, cleft 0.50) -> fold 1.030 (cav 0.25) -> hamstring bulge 0.950 (ham 0.36, cleft 0.14) -> knee -> gastrocnemius heads -> Achilles",
+    "arms": "round delt cap (r0 0.228) -> tuck (profile 0.90) -> HUGE upper-arm belly (1.14 at t 0.40, radius 0.164) -> clear elbow pinch (0.76, radius 0.087) -> LARGE forearm bloom (1.25 at t 0.28, radius 0.128) -> wrist pinch (0.58, radius 0.043) -> hand; belly : elbow : bloom : wrist = 1.9 : 1 : 1.5 : 0.5; Mrs. Mah's arms share the profiles at her radii (0.116 / 0.084 / 0.056)",
+    "mrsMah": "tiny waist 0.118 at 1.690 -> hip bloom 0.200 at 1.625 -> upper glute shelf 0.280 at 1.545 -> glute + proximal thigh apex 0.315 at 1.430 -> 0.305 -> fold pinch 0.242 at 1.185 -> hamstring / quad bulge 0.272 at 1.040 -> 0.205 -> knee pinch 0.130 at 0.820 -> calf bloom 0.170 / 0.180 at 0.740 / 0.650 -> 0.132 -> 0.062 -> point; one lower body, inner-thigh seam through the front, glute cleft and hamstring pair behind"
+  },
+  "ratios": {
+    "units": "fractions of character height on the front / rear orthographic body mask; B = widest lower-body silhouette, W = narrowest waist; Mrs. Mah measured with the limbs hidden",
+    "mrMah": { "R108": { "waist": 0.112, "B": 0.160, "BoverW": 1.43 }, "roundA": { "B": 0.177, "BoverW": 1.58 }, "final": { "waist": 0.112, "B": 0.192, "BoverWfront": 1.71, "BoverWrear": 1.75, "shoulderRun": 0.382, "shoulderOverWaist": 3.41 } },
+    "mrsMah": { "R108": { "waist": 0.088, "B": 0.255, "BoverW": 2.90 }, "final": { "waist": 0.086, "B": 0.257, "BoverWfront": 2.99, "BoverWrear": 3.07, "shoulderRun": 0.317 }, "brief": "about 2.8 : 1 from muscle contour" },
+    "kneeAndCalf": "the refwidth landmarks do not name the knee ring (its 'knee' is the taper under the calf); judged on the clay — male knee 0.124 w against a 0.174 calf and a 0.180 thigh; hers 0.130 against 0.180 and 0.272"
+  },
+  "facets": "lats, abs and thigh rows take fg [1, 4] (one column, four refined bands = two authored rings) so the lit lower back and quad read as strips along the muscle rather than rows cut at every ring; pecs, caps and glutes stay [2, 2]; a [2, 4] trial on the pec crown rows measured as nothing (pecZone names the rows) and was reverted",
+  "locked": ["head geometry and face", "hand articulation", "environment and hover point", "character height", "chest width (torso rows above 1.480 untouched)", "arm start radius and belly (circumference kept; only the joints narrowed)", "material, lights and post (no numbers moved)", "states, gestures, performance tiers", "code architecture (row tables and two profile functions only)"],
+  "engineering": { "staticSuite": "376/376", "verify": "150/150; 112 draws, 14093 tris at tier high (ceiling 15000)", "nanProbe": "clean on both variants", "notEvidence": "headless Chromium on SwiftShader" },
+  "proofSet": "this folder: m01-m07 / f01-f08 full views (clay and final), cA-cL regional close-ups clay and final",
+  "openItems": [
+    "Mrs. Mah's front hip mass is one broad contour with a seam; the upper-glute / hip bloom and the proximal-thigh mass are one bulge from dead front and separate only from the rear three-quarter",
+    "the bright horizontal contour along the lower edge of the lats in the rear lit view is the rim light on the lat-to-waist turn, not a facet row; it survives the group change",
+    "the male hamstring bulge under the fold is modest in silhouette (0.158 against a 0.168 fold row) and reads mostly in depth",
+    "the upper back's [2, 2] bricks still show a row structure at 2x; a flow-oriented (diagonal) group key would be a forge.js change and was out of this brief's scope"
+  ]
+}

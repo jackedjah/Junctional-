@@ -1142,66 +1142,66 @@ export var TORSO = {
     /* THE ACHILLES: an aggressive narrowing under the calf — 0.106 of height
        at the calf to 0.056 here, 0.13 of height lower — easing into the
        straight cone below; a narrow tendon on the back with hollows beside it. */
-    { y: 0.440, w: 0.082, d: 0.072, fg: [2, 2], facet: 0.0020, zc: -0.004, crystal: 0.0140, crystalY: 0.0060, hero: 0.20,
+    { y: 0.440, w: 0.088, d: 0.078, fg: [2, 2], facet: 0.0020, zc: -0.004, crystal: 0.0140, crystalY: 0.0060, hero: 0.20,
       shape: lowerLegShape({ notch: 0.03, shins: 0.03, tendon: 0.06, hollow: 0.06, soleus: 0.04 }), columns: true, classesAt: taperClasses },
     /* THE SOLEUS: wider and lower than the gastrocnemius heads, so the calf's
        lower edge is a second, flatter swell rather than the end of a bulb;
        the medial head still carries 0.22 here so the belly falls away over
        two rings instead of cornering on one (the side view showed a beak). */
-    { y: 0.550, w: 0.124, d: 0.126, fg: [2, 2], facet: -0.0020, zc: -0.010, crystal: 0.0150, crystalY: 0.0060, hero: 0.22,
+    { y: 0.550, w: 0.150, d: 0.148, fg: [2, 2], facet: -0.0020, zc: -0.010, crystal: 0.0150, crystalY: 0.0060, hero: 0.22,
       shape: lowerLegShape({ notch: 0.03, shins: 0.04, medial: 0.22, lateral: 0.06, cleft: 0.08, soleus: 0.14 }), columns: true, classesAt: taperClasses },
     /* THE GASTROCNEMIUS: the medial head peaks here (large, near the centre),
        the lateral head one ring higher (smaller, further out) — asymmetric
        within each half, symmetric across the body. In silhouette the calf
        is only 7% wider than the knee (the plate's is 5%); its identity is
        posterior depth, +30% on the medial head. */
-    { y: 0.640, w: 0.157, d: 0.142, fg: [1, 2], facet: 0.0020, zc: -0.012, crystal: 0.0160, crystalY: 0.0070, hero: 0.26,
-      shape: lowerLegShape({ notch: 0.03, shins: 0.04, medial: 0.30, lateral: 0.14, cleft: 0.10, soleus: 0.06 }), columns: true, classesAt: taperClasses },
-    { y: 0.720, w: 0.152, d: 0.138, fg: [1, 2], facet: -0.0020, crystal: 0.0150, crystalY: 0.0060, hero: 0.16,
-      shape: lowerLegShape({ notch: 0.03, shins: 0.04, medial: 0.22, lateral: 0.16, cleft: 0.06 }), columns: true, classesAt: taperClasses },
+    { y: 0.640, w: 0.174, d: 0.170, fg: [1, 2],   /* R108 d: the CALF BLOOM — 0.157 -> 0.174, 38% over the knee */ facet: 0.0020, zc: -0.012, crystal: 0.0160, crystalY: 0.0070, hero: 0.26,
+      shape: lowerLegShape({ notch: 0.03, shins: 0.04, medial: 0.34, lateral: 0.20, cleft: 0.10, soleus: 0.06 }), columns: true, classesAt: taperClasses },
+    { y: 0.720, w: 0.164, d: 0.160, fg: [1, 2], facet: -0.0020, crystal: 0.0150, crystalY: 0.0060, hero: 0.16,
+      shape: lowerLegShape({ notch: 0.03, shins: 0.04, medial: 0.24, lateral: 0.22, cleft: 0.06 }), columns: true, classesAt: taperClasses },
     /* THE KNEE: the compression between the thigh's long descent and the
        calf's swell — 0.099 of height, read in depth (the pit behind, the
        cavity term) more than in width. Its FRONT is not a notch: from the
        side the line from thigh to shin runs nearly straight over the
        patellae and the concavity is behind (the first cut notched the front
        too and the side view showed a corner). */
-    { y: 0.810, w: 0.146, d: 0.144, fg: [1, 2], facet: 0.0020, zc: 0.008, crystal: 0.0130, crystalY: 0.0050, hero: 0.08,
+    { y: 0.810, w: 0.124, d: 0.126, fg: [1, 2],   /* R108 d: the knee PINCH — 0.146 -> 0.124, a short narrow transition between two masses */ facet: 0.0020, zc: 0.008, crystal: 0.0130, crystalY: 0.0050, hero: 0.08,
       shape: lowerLegShape({ notch: 0.05, caps: 0.06, pit: 0.06, medial: 0.04, cleft: 0.04 }), columns: true, classesAt: taperClasses, cav: 0.35 },
     /* THE LOWER THIGH: the VL inserting toward the knee (0.24), the RF
        tendon fading (0.12) and the VASTUS MEDIALIS teardrop taking over
        medial and low (0.20) — the one belly that lives only here. The
        hamstrings end into the knee behind. */
-    { y: 0.870, w: 0.148, d: 0.156, fg: [1, 2], facet: -0.0030, zc: 0.012, crystal: 0.0200, crystalY: 0.0070, hero: 0.18,
-      shape: thighShape({ seam: 0.22, head: 0.04, vl: 0.28, valley: 0.06, vm: 0.28, itb: 0.04, ham: 0.20, hamCleft: 0.10 }), columns: true, classesAt: taperClasses },
+    { y: 0.870, w: 0.146, d: 0.162, fg: [1, 2], facet: -0.0030, zc: 0.012, crystal: 0.0200, crystalY: 0.0070, hero: 0.18,
+      shape: thighShape({ seam: 0.22, head: 0.06, vl: 0.32, valley: 0.06, vm: 0.30, itb: 0.04, ham: 0.22, hamCleft: 0.10 }), columns: true, classesAt: taperClasses },
     /* THE LONG DESCENT: from the apex the VL falls away (0.62 -> 0.40) while
        the RF holds its belly; the hamstring columns peak here under the fold. */
-    { y: 0.950, w: 0.150, d: 0.176, fg: [1, 3], facet: 0.0040, zc: 0.008, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
-      shape: thighShape({ seam: 0.25, head: 0.24, rf: 0.08, vl: 0.48, valley: 0.10, vm: 0.14, itb: 0.06, ham: 0.26, hamCleft: 0.12 }), columns: true, classesAt: taperClasses },
+    { y: 0.950, w: 0.158, d: 0.190, fg: [1, 4], facet: 0.0040, zc: 0.008, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+      shape: thighShape({ seam: 0.25, head: 0.26, rf: 0.08, vl: 0.50, valley: 0.10, vm: 0.14, itb: 0.06, ham: 0.36, hamCleft: 0.14 }), columns: true, classesAt: taperClasses },   /* R108 d: the HAMSTRING is its own bulge under the fold */
     /* THE GLUTEAL FOLD: the glute goes NEGATIVE here (a crease under the
        mass, darkened by the ring's cav where the multiplier is at or under
        1 — the front bellies sit above 1 and take none of it) and the
        hamstrings begin under it. */
-    { y: 1.030, w: 0.151, d: 0.186, fg: [1, 3], facet: -0.0040, crystal: 0.0300, crystalY: 0.0070, hero: 0.14,
-      shape: thighShape({ seam: 0.26, head: 0.30, rf: 0.10, vl: 0.60, valley: 0.12, vm: 0.04, itb: 0.06, glute: -0.05, gluteC: 0.52, gluteW: 0.42, ham: 0.08, hamCleft: 0.10 }), columns: true, classesAt: taperClasses, cav: 0.25 },
+    { y: 1.030, w: 0.168, d: 0.198, fg: [1, 4], facet: -0.0040, crystal: 0.0300, crystalY: 0.0070, hero: 0.14,
+      shape: thighShape({ seam: 0.26, head: 0.30, rf: 0.10, vl: 0.62, valley: 0.12, vm: 0.04, itb: 0.06, glute: -0.05, gluteC: 0.52, gluteW: 0.42, ham: 0.18, hamCleft: 0.12 }), columns: true, classesAt: taperClasses, cav: 0.25 },
     /* THE LATERAL APEX: the VL's belly (0.62) makes the widest row — 0.162 of
        height, 1.50 x the belt — on a base ring no wider than the belt's. */
-    { y: 1.100, w: 0.152, d: 0.192, fg: [1, 3], facet: 0.0045, zc: -0.012, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
-      shape: thighShape({ seam: 0.26, head: 0.30, rf: 0.10, vl: 0.62, valley: 0.12, itb: 0.06, glute: 0.16, gluteC: 0.50, gluteW: 0.38, cleft: 0.30, ham: 0.05 }), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },
+    { y: 1.100, w: 0.178, d: 0.208, fg: [1, 4], facet: 0.0045, zc: -0.012, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
+      shape: thighShape({ seam: 0.26, head: 0.32, rf: 0.10, vl: 0.66, valley: 0.12, itb: 0.06, glute: 0.16, gluteC: 0.50, gluteW: 0.38, cleft: 0.30, ham: 0.08 }), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },   /* R108 d: the APEX — 0.265 at the silhouette, about 1.6 x the belt; huge distinct quads, then a pinch */
     /* The VL still rising here; the apex is one row down (round 5 moved it
        from 1.200 to 1.100 so the expansion out of the belt is RESTRAINED and
        the apex sits in the mid thigh, the brief's sequence). */
-    { y: 1.200, w: 0.153, d: 0.196, fg: [1, 3], facet: -0.0045, zc: -0.024, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
-      shape: thighShape({ seam: 0.26, head: 0.28, rf: 0.10, vl: 0.54, valley: 0.12, itb: 0.05, glute: 0.36, gluteC: 0.58, gluteW: 0.52, cleft: 0.48 }), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },
+    { y: 1.200, w: 0.180, d: 0.210, fg: [1, 4], facet: -0.0045, zc: -0.024, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,   /* R108 d round b: the sweep BOWS — the column (0.170 / 0.168 / 0.166 / 0.165) read as the torso continuing; the widest row is here and the rows either side fall away from it */
+      shape: thighShape({ seam: 0.26, head: 0.30, rf: 0.10, vl: 0.62, valley: 0.12, itb: 0.05, glute: 0.38, gluteC: 0.58, gluteW: 0.52, cleft: 0.48 }), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },
     /* THE GLUTE SHELF: the pair is fullest here, 35 degrees off the back with
        the cleft's centre vertex at half the ring, and the RF / VL are rising
        out of their origins under the belt. */
-    { y: 1.320, w: 0.157, d: 0.186, fg: [1, 3], facet: 0.0045, zc: -0.032, crystal: 0.0360, crystalY: 0.0090, hero: 0.16,
-      shape: thighShape({ seam: 0.20, head: 0.20, rf: 0.07, vl: 0.34, valley: 0.10, glute: 0.42, gluteC: 0.62, gluteW: 0.55, cleft: 0.50 }), zoneAt: quadZone(0) },
+    { y: 1.320, w: 0.176, d: 0.200, fg: [1, 4], facet: 0.0045, zc: -0.032, crystal: 0.0360, crystalY: 0.0090, hero: 0.16,
+      shape: thighShape({ seam: 0.20, head: 0.22, rf: 0.07, vl: 0.52, valley: 0.10, glute: 0.44, gluteC: 0.62, gluteW: 0.55, cleft: 0.50 }), zoneAt: quadZone(0) },
     /* THE UPPER GLUTE / GLUTE MEDIUS: a restrained expansion out of the belt
        (0.108 -> 0.133 of height in 0.07), the glute already a shelf behind
        and sitting LATERAL here — the upper shelf ties into the hip. */
-    { y: 1.410, w: 0.160, d: 0.170, fg: [1, 3], facet: 0.0035, zc: -0.026, crystal: 0.0300, crystalY: 0.0080, hero: 0.10,
-      shape: thighShape({ seam: 0.12, head: 0.12, rf: 0.03, vl: 0.18, valley: 0.06, glute: 0.30, gluteC: 0.70, gluteW: 0.50, cleft: 0.30 }), zoneAt: quadZone(0) },
+    { y: 1.410, w: 0.166, d: 0.180, fg: [1, 4], facet: 0.0035, zc: -0.026, crystal: 0.0300, crystalY: 0.0080, hero: 0.10,
+      shape: thighShape({ seam: 0.12, head: 0.14, rf: 0.03, vl: 0.30, valley: 0.06, glute: 0.32, gluteC: 0.70, gluteW: 0.50, cleft: 0.30 }), zoneAt: quadZone(0) },   /* R108 d: the thigh BLOOMS straight out of the belt — the waist is a short transition, not a region */
     /* THE BELT — the waist. The deepest concavity on the character, and the
        line that separates the torso from the single quad. Re-measured on the
        lower-body crop it is TIGHTER than the abdomen above it (0.19 against
@@ -1234,19 +1234,19 @@ export var TORSO = {
        rows descend (obliqueShift 0.36 -> 0), the diagonal side-body sweep;
        the lumbar erectors are the tallest thing on the lower back
        (erector 0.30 against a 0.34 channel) and fade upward. */
-    { y: 1.545, w: 0.184, d: 0.150, fg: [1, 2], facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
+    { y: 1.545, w: 0.184, d: 0.150, fg: [1, 4], facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
       shape: coreShape(1.0, 0.26, 0.0, 0.0, 0.34, { obliqueShift: 0.0, oblique: 0.14, spine: 0.34, valley: 0.14, erectorAt: 0.36, erectorW: 0.25, latBack: 0.08 }), hero: 0.08, zoneAt: coreZone(1) },
-    { y: 1.605, w: 0.250, d: 0.160, fg: [1, 2], facet: -0.0040, crystal: 0.0220, crystalY: 0.0050,
+    { y: 1.605, w: 0.250, d: 0.160, fg: [1, 4], facet: -0.0040, crystal: 0.0220, crystalY: 0.0050,
       shape: coreShape(1.0, 0.08, 0.10, 0.34, 0.34, { obliqueShift: 0.10, oblique: 0.14, spine: 0.34, valley: 0.14, erectorAt: 0.36, erectorW: 0.25, latBack: 0.14 }), hero: 0.03, zoneAt: coreZone(1), cav: 0.75 },   /* R102: abdominal crease */
-    { y: 1.665, w: 0.310, d: 0.176, fg: [1, 2], facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
+    { y: 1.665, w: 0.310, d: 0.176, fg: [1, 4], facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
       shape: coreShape(0.95, 0.26, 0.26, 0.24, 0.28, { obliqueShift: 0.18, oblique: 0.14, spine: 0.32, valley: 0.14, erectorAt: 0.34, erectorW: 0.24, latBack: 0.22 }), hero: 0.08, zoneAt: coreZone(2) },
-    { y: 1.725, w: 0.330, d: 0.198, fg: [1, 2], facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
+    { y: 1.725, w: 0.330, d: 0.198, fg: [1, 4], facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
       shape: coreShape(0.90, 0.08, 0.36, 0.12, 0.22, { obliqueShift: 0.26, oblique: 0.12, spine: 0.28, serratus: 0.035, serratusAt: 1.05, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.32 }), hero: 0.03, zoneAt: coreZone(2), cav: 0.75 },   /* R102: abdominal crease */
     /* the lat hands over to chestShape's lat on the ring above at the SAME
        strength (0.34 here against 0.33 there): R108's first cut had 0.52
        against 0.30, and the flank normal flipped from facing down to facing
        up across 0.05 of height — a ledge on top of the lat. */
-    { y: 1.780, w: 0.342, d: 0.222, fg: [1, 2], facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
+    { y: 1.780, w: 0.342, d: 0.222, fg: [1, 4], facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
       shape: coreShape(0.85, 0.24, 0.34, 0.0, 0.18, { obliqueShift: 0.36, oblique: 0.06, spine: 0.26, serratus: 0.035, serratusAt: 1.20, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.36 }), hero: 0.08, zoneAt: coreZone(3) },
     /* R97 — THE LOWER PEC TURN: a crease ring where the chest shelf ends and
        a belly ring above it, so the pectoral is a mass with a lower edge
@@ -1664,7 +1664,14 @@ export var ARMS = {
          — the arm was the broadest mass, and the director's order is broad
          delt -> tuck -> belly. The ball's roundness is the front / rear
          bellies' job (shapes.upper); the profile only sets the side width. */
-      return 0.90 + Math.pow(Math.sin(Math.pow(t, 0.80) * Math.PI), 1.3) * 0.20 - Math.pow(t, 1.5) * 0.10;   /* round 4: 0.80 at the end — the last band turned in so steeply it read as a dark ring at the joint */
+      /* R108 d — BULGE -> PINCH -> BULGE. The mass-recovery brief rules out a
+         continuous taper from the cap to the wrist: the upper arm is a HUGE
+         round belly (1.14 at t 0.40, so the belly is 0.16 against the cap's
+         0.228 — big, and still under the delt), and the elbow is a CLEAR,
+         SHORT pinch (0.76 at the end, 0.087) that the forearm's own bloom
+         then climbs out of. The circumference was not traded for it: the
+         start (0.90) and the peak are as full as or fuller than R108 c. */
+      return 0.90 + Math.pow(Math.sin(Math.pow(t, 0.80) * Math.PI), 1.3) * 0.28 - Math.pow(t, 1.5) * 0.14;
     },
     /* Picks up close to where the upper arm ended — a step at the elbow reads
        as an error rather than as a joint — then swells just below it and tapers
@@ -1684,7 +1691,12 @@ export var ARMS = {
          continuous to 0.62 (0.046): BIG -> NARROWER -> BIG -> TAPER. */
       /* round 2: the belly is CONVEX and the taper CONCAVE (sin^1.6 against a
          t^1.3 fall) — a straight line from the peak to the wrist is a club. */
-      return 0.79 + Math.pow(Math.sin(Math.pow(t, 0.55) * Math.PI), 1.6) * 0.37 - Math.pow(t, 1.3) * 0.22;   /* round 4: the first ring sits INSIDE the upper arm's buried end (0.0885 under 0.091) */
+      /* R108 d — the forearm is its OWN bulge, not the upper arm's tail. It
+         starts at 0.77 (0.086, inside the upper arm's 0.087 end), BLOOMS to
+         1.25 at t 0.28 (0.126 — 1.45x the elbow pinch and 0.8 of the upper
+         belly, the reference's forearm-to-upper-arm), and pinches to a 0.58
+         wrist (0.043). The bloom is convex and the fall concave, as before. */
+      return 0.77 + Math.pow(Math.sin(Math.pow(t, 0.55) * Math.PI), 1.6) * 0.51 - Math.pow(t, 1.3) * 0.19;
     }
   },
 
