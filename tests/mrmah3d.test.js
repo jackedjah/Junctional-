@@ -863,7 +863,13 @@ if (exists('CLAUDE.md')) {
   const below = rows.filter(r => r.y <= 0.640).sort((a, b) => b.y - a.y);
   ok('R106-teardrop-converges-to-one-point', below.length >= 5 && below.every((r, i) => i === 0 || r.w < below[i - 1].w) && rows[0].w < 0.01,
     below.map(r => r.w).join(' > '));
-  ok('R106-knee-and-calf-inside-the-taper', !!knee && !!calf && knee.w < calf.w && calf.d < hip.d && /function lowerLegShape\(o\)/.test(propsSrc) && /medial/.test(propsSrc) && /soleus/.test(propsSrc) && /tendon/.test(propsSrc));   /* R108: knee, two gastrocnemius heads, soleus and an Achilles taper on one mass */
+  /* R109: NO CALF BELLIES. The lower body is one continuous convergence below the quad apex —
+     the knee is a change of slope, the calf rows are narrower than it, and the calf rows carry
+     no gastrocnemius heads (the R108 bulb is the regression the R109 brief names). */
+  const calfRows = rows.filter(r => r.y >= 0.55 && r.y <= 0.73);
+  ok('R106-knee-and-calf-inside-the-taper', !!knee && !!calf && knee.w > calf.w && calf.d < hip.d && /function lowerLegShape\(o\)/.test(propsSrc) &&
+    calfRows.length >= 2 && calfRows.every(r => { const m = propsSrc.match(new RegExp('\\{ y: ' + r.y.toFixed(3) + ', [^\\n]*\\n[^\\n]*')); return !!m && !/medial:\s*0\.[1-9]|lateral:\s*0\.[1-9]/.test(m[0]); }),
+    'knee ' + (knee && knee.w) + ' calf ' + (calf && calf.w) + ' (must fall) ; calf rows without gastrocnemius heads');
   /* the abdomen is a curved mass with blocks as relief, not a stack of plates */
   ok('R106-abs-not-corrugated', /coreShape\(1\.0, 0\.2[0-9], /.test(propsSrc) && !/coreShape\([01]\.[0-9]+, -0\.0[5-9]/.test(propsSrc));   /* R107/R108: block rows 0.24-0.26 against crease rows around 0.08; never an inset slot */
   /* the pec is a dome: a crown ring between two shoulder rings */
