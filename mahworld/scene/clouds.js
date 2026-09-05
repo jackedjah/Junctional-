@@ -97,13 +97,16 @@ function cloudAtlas(size) {
         /* vertical volume ramp: crown lit, base in the mass's own shadow */
         const lum = 0.34 + 0.66 * Math.pow(1 - fy, 1.25);
         const r = Math.round(196 + 58 * lum), gg = Math.round(210 + 44 * lum), b = Math.round(232 + 23 * lum);
-        const a = (0.17 + R() * 0.18) * (0.55 + 0.45 * lum);
+        const a = (0.24 + R() * 0.22) * (0.55 + 0.45 * lum);
         g.save();
         g.translate(ox + fx * half, oy + fy * half);
         g.scale(1.22, 0.80);
+        /* a plateau then a quick shoulder: the union of the blobs gets a bumpy,
+           cauliflower silhouette instead of dissolving into even haze */
         const grad = g.createRadialGradient(0, 0, rad * 0.05, 0, 0, rad);
         grad.addColorStop(0, 'rgba(' + r + ',' + gg + ',' + b + ',' + a.toFixed(3) + ')');
-        grad.addColorStop(0.55, 'rgba(' + r + ',' + gg + ',' + b + ',' + (a * 0.42).toFixed(3) + ')');
+        grad.addColorStop(0.46, 'rgba(' + r + ',' + gg + ',' + b + ',' + (a * 0.90).toFixed(3) + ')');
+        grad.addColorStop(0.74, 'rgba(' + r + ',' + gg + ',' + b + ',' + (a * 0.42).toFixed(3) + ')');
         grad.addColorStop(1, 'rgba(' + r + ',' + gg + ',' + b + ',0)');
         g.fillStyle = grad; g.beginPath(); g.arc(0, 0, rad, 0, Math.PI * 2); g.fill();
         g.restore();
@@ -157,10 +160,13 @@ function facetTexture(size) {
    almost pure atmospheric silhouette (and is the first thing a low tier
    simplifies). Azimuths are measured from the −z axis, where the cameras look. */
 const LAYOUT = [
-  { name: 'low',  count: 4, yMin: 92,  yMax: 140, rMin: 300, rMax: 500, wMin: 200, wMax: 340, qMin: 6, qVar: 3, pMin: 4, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.02, -0.34, 0.30, 1.06] },
-  { name: 'mid',  count: 4, yMin: 152, yMax: 220, rMin: 400, rMax: 700, wMin: 300, wMax: 500, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.80, speed: 1.00, order: -4, spread: [-0.78, -0.16, 0.46, 1.20] },
-  { name: 'high', count: 4, yMin: 250, yMax: 340, rMin: 620, rMax: 900, wMin: 400, wMax: 640, qMin: 4, qVar: 3, pMin: 1, pVar: 2, pScale: 0.50, speed: 0.70, order: -6, spread: [-1.24, -0.52, 0.12, 0.86] }
+  { name: 'low',  count: 4, yMin: 108, yMax: 148, rMin: 300, rMax: 500, wMin: 200, wMax: 340, qMin: 6, qVar: 3, pMin: 4, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.02, -0.34, 0.30, 1.06] },
+  { name: 'mid',  count: 4, yMin: 168, yMax: 224, rMin: 400, rMax: 700, wMin: 300, wMax: 500, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.80, speed: 1.00, order: -4, spread: [-0.78, -0.16, 0.46, 1.20] },
+  { name: 'high', count: 4, yMin: 256, yMax: 336, rMin: 620, rMax: 900, wMin: 400, wMax: 640, qMin: 4, qVar: 3, pMin: 1, pVar: 2, pScale: 0.55, speed: 0.70, order: -6, spread: [-1.24, -0.52, 0.12, 0.86] }
 ];
+/* the blob atlas paints the middle of each cell, so a quad has to be ~1.7× the
+   mass width it is meant to draw. QSCALE keeps that conversion in one place. */
+const QSCALE = 1.7;
 
 export function buildClouds(ctx) {
   const scene = ctx && ctx.scene;
@@ -194,7 +200,7 @@ export function buildClouds(ctx) {
       const th = L.spread[m] + (R() - 0.5) * 0.22;                       /* azimuth from the −z axis */
       const rad = L.rMin + R() * (L.rMax - L.rMin);
       const cx = Math.sin(th) * rad, cz = -Math.cos(th) * rad, cy = L.yMin + R() * (L.yMax - L.yMin);
-      const W = L.wMin + R() * (L.wMax - L.wMin), H = W * (0.40 + R() * 0.16);
+      const W = L.wMin + R() * (L.wMax - L.wMin), H = W * 0.34;            /* a cloud is far wider than it is deep */
       /* the mass's own frame: `out` points away from the world origin, `right` across it */
       const inv = 1 / Math.hypot(cx, cz);
       const outX = cx * inv, outZ = cz * inv, rightX = -outZ, rightZ = outX;
@@ -203,10 +209,10 @@ export function buildClouds(ctx) {
       const nq = L.qMin + Math.floor(R() * L.qVar);
       for (let q = 0; q < nq; q++) {
         const primary = q < 3;
-        const w = W * (q === 0 ? 1.0 : q === 1 ? 0.86 : 0.52 + R() * 0.38);
-        const h = w * (0.44 + R() * 0.20);
-        const dx = q === 0 ? (R() - 0.5) * W * 0.08 : (R() - 0.5) * W * 0.72;
-        const dy = q === 0 ? 0 : (R() - 0.5) * H * 0.95;
+        const w = W * QSCALE * (q === 0 ? 1.0 : q === 1 ? 0.86 : 0.55 + R() * 0.35);
+        const h = w * (0.46 + R() * 0.12);
+        const dx = q === 0 ? (R() - 0.5) * W * 0.08 : (R() - 0.5) * W * 0.50;
+        const dy = q === 0 ? 0 : (R() - 0.5) * H * 0.60;
         const behind = q === 0 ? true : q === 1 ? false : R() < 0.5;
         const dz = (behind ? 1 : -1) * W * (0.05 + R() * 0.18);
         /* dx runs across the mass, dy up it, dz along the view axis (+ = farther) */
@@ -227,8 +233,10 @@ export function buildClouds(ctx) {
       /* ---- CRYSTALLINE SHEETS: small, feathered, entirely inside the body ---- */
       const np = L.pMin + Math.floor(R() * L.pVar);
       for (let i = 0; i < np; i++) {
-        const flat = R() < 0.4;                                           /* layered internal plates vs steeper facets */
-        const tilt = flat ? 0.14 + R() * 0.22 : 0.42 + R() * 0.62;
+        /* the cameras look UP at these decks, so a near-horizontal sheet is an
+           invisible sliver: most sheets are steeply tilted plates */
+        const flat = R() < 0.22;
+        const tilt = flat ? 0.16 + R() * 0.22 : 0.50 + R() * 0.65;
         /* the sheet's normal leans toward the viewer's side of the world more
            often than away, so caught tops are read as often as dark undersides */
         const psi = (R() < 0.62 ? Math.atan2(-outZ, -outX) : R() * Math.PI * 2) + (R() - 0.5) * 1.5;
@@ -238,11 +246,11 @@ export function buildClouds(ctx) {
         if (_ref.lengthSq() < 1e-4) _ref.set(outX, 0, outZ).addScaledVector(_n, -(outX * _n.x + outZ * _n.z));
         _ay.copy(_ref).normalize();
         _ax.crossVectors(_ay, _n).normalize();
-        const pw = W * (0.20 + R() * 0.20) * L.pScale;
+        const pw = W * (0.28 + R() * 0.24) * L.pScale;
         const pd = pw * (0.60 + R() * 0.44);
-        _p.set(cx + rightX * (R() - 0.5) * W * 0.44 + outX * (R() - 0.5) * W * 0.30,
-               cy + (R() - 0.5) * H * 0.62,
-               cz + rightZ * (R() - 0.5) * W * 0.44 + outZ * (R() - 0.5) * W * 0.30);
+        _p.set(cx + rightX * (R() - 0.5) * W * 0.50 + outX * (R() - 0.5) * W * 0.30,
+               cy + (R() - 0.5) * H * 0.56,
+               cz + rightZ * (R() - 0.5) * W * 0.50 + outZ * (R() - 0.5) * W * 0.30);
         _sc.set(pw, pd, 1);
         _m4.makeBasis(_ax, _ay, _n).scale(_sc).setPosition(_p);
         const pinv = 1 / _p.length();
@@ -404,16 +412,19 @@ export function buildClouds(ctx) {
       const p = layer.planes[i];
       const d = p.up.x * kx + p.up.y * ky + p.up.z * kz;
       p.d = d;
-      /* undersides stay darker than tops, whatever the moon is doing */
-      const face = 0.34 + 0.66 * (p.vdot > 0 ? p.vdot : 0);
+      /* the moon sits behind this sky, so most catches are seen through the
+         sheet: a plate read edge-on is dim, a plate read face-on is bright, and
+         an UNDERSIDE always stays darker than a top */
+      const av = p.vdot < 0 ? -p.vdot : p.vdot;
+      const face = (0.46 + 0.54 * av) * (p.vdot > 0 ? 1 : 0.68);
       if (d > litT) {
         const f = Math.pow(Math.min(1, (d - litT) / span), 0.7);
-        p.b = Math.min(0.92, (0.30 + 0.70 * f) * face * key.catch + (1 - key.catch) * 0.30);
+        p.b = Math.min(0.95, (0.34 + 0.66 * f) * face * key.catch + (1 - key.catch) * 0.30);
         layer.lit.setMatrixAt(nl, p.m);
         _col.setRGB(p.b, p.b, p.b); layer.lit.setColorAt(nl, _col);
         layer.litMap[nl] = p; nl++;
       } else {
-        p.b = 0.60 + 0.40 * face;
+        p.b = 0.58 + 0.42 * face;
         layer.dark.setMatrixAt(nd, p.m);
         _col.setRGB(p.b, p.b, p.b); layer.dark.setColorAt(nd, _col);
         layer.darkMap[nd] = p; nd++;

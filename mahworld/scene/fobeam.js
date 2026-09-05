@@ -5,9 +5,9 @@
    clock read as a low, broad edge flow. This module is that motif built in
    world space, replacing the two decorative arcs sky.js draws:
 
-     RAIL          a thin additive tube along a CatmullRom curve (r 0.26),
+     RAIL          a thin additive tube along a CatmullRom curve (r 0.23),
                    vertex-faded at both ends so a route arrives rather than stops.
-     OUTER FIELD   a second, much wider tube (r ≈ 2.0) at very low opacity —
+     OUTER FIELD   a second, much wider tube (r 1.85) at very low opacity —
                    the air the rail energises. Soft; never a laser hose.
      PACKETS       square diamonds (an octahedron flattened in its own plane =
                    a square rotated 45°, the reserved mark) travelling one way,
@@ -205,7 +205,7 @@ export function buildFobeams(ctx) {
       packets.push({
         r: ri,
         s: ((i / r.count + ROUTES[ri].phase + jitter) % 1 + 1) % 1 * r.len,
-        speed: r.speed * (0.92 + R() * 0.16),          /* never in lockstep, even on one route */
+        speed: r.speed * (0.94 + R() * 0.14),          /* 12–26 m/s, and never in lockstep even on one route */
         size: (0.5 + R() * 0.6) * r.gauge,             /* 0.5–1.1 m, scaled by the route's gauge */
         gain: 0.72 + R() * 0.34,
         b: 0

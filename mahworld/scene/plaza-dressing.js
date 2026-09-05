@@ -1,0 +1,202 @@
+/* MAHPLAZA :: FOREGROUND DRESSING — the civic design of the floor.
+
+   The plaza was a large empty surface. This resolves it COMPOSITIONALLY rather
+   than by scattering objects (brief §17, §13): understandable routes from the
+   MAHPLAZA marker to each destination and to the vehicle corridors, two
+   gathering nodes, edges where the ground changes function, and a small number
+   of well-placed fixtures — light masts, benches, bollards, rails, an info
+   pylon, a corridor shelter.
+
+   Everything is calm and dark: inlaid bands are a change of stone, not a glow;
+   the only light is the luminaire heads and the soft pools they throw. Nothing
+   is brighter than the destination signage, nothing blocks the three signs from
+   the arrival cameras, and nothing above knee height stands inside the
+   appearance-check area (|x| < 6, 10 < z < 24).
+
+   Draw-call discipline: every static part is merged per material, masts /
+   bollards / rail posts are instanced. */
+
+import * as THREE from '../vendor/three/three.module.min.js';
+import { chamferBox, canvasTexture, blobTexture } from './materials.js';
+
+const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(1, 1, 1), _e = new THREE.Euler();
+function part(list, geo, x, y, z, ry = 0, rx = 0, rz = 0) {
+  _e.set(rx, ry, rz); _q.setFromEuler(_e); _p.set(x, y, z); _m4.compose(_p, _q, _s);
+  const g = geo.index ? geo.toNonIndexed() : geo.clone(); g.applyMatrix4(_m4); list.push(g); return list;
+}
+function mergeParts(list) {
+  let n = 0; for (const g of list) n += g.getAttribute('position').count;
+  const pos = new Float32Array(n * 3), nrm = new Float32Array(n * 3); let o = 0;
+  for (const g of list) { pos.set(g.getAttribute('position').array, o * 3); if (g.getAttribute('normal')) nrm.set(g.getAttribute('normal').array, o * 3); o += g.getAttribute('position').count; g.dispose(); }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
+  return out;
+}
+
+/* the route network, in plaza coordinates: [from, to] pairs the paths connect */
+const MARKER = [0, 14];
+const ROUTES = [
+  { to: [0, -33], w: 5.2 },        /* MAH MATCH forecourt */
+  { to: [-31, -18], w: 4.2 },      /* MAH GYM apron */
+  { to: [31, -18], w: 4.2 },       /* MAH MARKET apron */
+  { to: [-40, 40], w: 3.6 },       /* west corridor mouth */
+  { to: [40, 40], w: 3.6 }         /* east corridor mouth */
+];
+const NODES = [[-16, 6], [17, 4]];
+/* masts sit inside the plaza, never in the arrival camera's near foreground (z ≳ 24 at the edges reads
+   as a pillar across the lens) and never in front of a destination sign */
+const MASTS = [[-13, 20], [13, 20], [-26, 16], [26, 16], [-10, -12], [10, -12], [-27, -25], [27, -25], [-34, -14], [34, -14]];
+
+export function buildDressing(ctx) {
+  const M = ctx.M, THREEJS = THREE;
+  const group = new THREE.Group(); group.name = 'plaza-dressing';
+  const owned = [];
+  const own = g => { owned.push(g); return g; };
+  ctx.colliders = ctx.colliders || [];
+
+  const curb = [], slab = [], trim = [], dark = [];
+  const pools = [], luminaires = [];
+
+  /* ---- 1. PATHS: inlaid bands of a lighter, rougher stone with a curb lip ---- */
+  const chevron = canvasTexture(64, 256, (c, w, h) => {
+    c.clearRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(150,180,220,0.5)'; c.lineWidth = 4;
+    for (let i = 0; i < 3; i++) { const y = 40 + i * 88; c.beginPath(); c.moveTo(14, y + 22); c.lineTo(w / 2, y); c.lineTo(w - 14, y + 22); c.stroke(); }
+  });
+  chevron.wrapS = chevron.wrapT = THREE.RepeatWrapping;
+  const guideMat = new THREE.MeshBasicMaterial({ map: chevron, transparent: true, opacity: 0.22, depthWrite: false });
+  owned.push(chevron);
+  for (const r of ROUTES) {
+    const dx = r.to[0] - MARKER[0], dz = r.to[1] - MARKER[1];
+    const len = Math.hypot(dx, dz), ang = Math.atan2(dx, dz);
+    const cx = MARKER[0] + dx / 2, cz = MARKER[1] + dz / 2;
+    part(slab, chamferBox(r.w, 0.05, len, 0.03), cx, 0.025, cz, ang);
+    /* the curb lip either side: where the path stone meets the plaza stone */
+    for (const sd of [-1, 1]) part(curb, chamferBox(0.16, 0.07, len, 0.02), cx + Math.cos(ang) * sd * r.w / 2, 0.035, cz - Math.sin(ang) * sd * r.w / 2, ang);
+    /* guidance chevrons, restrained */
+    const guide = new THREE.Mesh(own(new THREE.PlaneGeometry(r.w * 0.5, len)), guideMat);
+    guide.rotation.x = -Math.PI / 2; guide.rotation.z = -ang; guide.position.set(cx, 0.058, cz);
+    guide.material.map.repeat.set(1, Math.max(2, Math.round(len / 9)));
+    guide.renderOrder = 5; group.add(guide);
+  }
+
+  /* ---- 2. NODES: a seating ring segment, a planter surround, a mast ---------- */
+  for (const [nx, nz] of NODES) {
+    for (let i = 0; i < 5; i++) {
+      const a = -0.9 + i * 0.45;
+      part(curb, chamferBox(2.4, 0.46, 0.9, 0.07), nx + Math.cos(a) * 3.4, 0.23, nz + Math.sin(a) * 3.4, -a);
+      part(trim, chamferBox(2.2, 0.04, 0.08, 0.015), nx + Math.cos(a) * 3.4, 0.47, nz + Math.sin(a) * 3.4 + 0.4, -a);
+    }
+    part(slab, chamferBox(9.5, 0.06, 9.5, 0.05), nx, 0.03, nz, Math.PI / 4);
+  }
+  /* the civic ring around the MAHPLAZA marker: one inlaid band, no glow */
+  for (let i = 0; i < 48; i++) {
+    const a = i / 48 * Math.PI * 2, R = 9.2;
+    part(curb, chamferBox(1.25, 0.05, 0.34, 0.02), MARKER[0] + Math.cos(a) * R, 0.028, MARKER[1] + Math.sin(a) * R, -a + Math.PI / 2);
+  }
+
+  /* ---- 3. LIGHT MASTS: instanced pole + square-diamond luminaire + light pool -- */
+  const poleGeo = own(new THREE.CylinderGeometry(0.13, 0.17, 5.6, 8));
+  const headGeo = own(new THREE.OctahedronGeometry(0.34, 0));
+  const poles = new THREE.InstancedMesh(poleGeo, M.trimSatin, MASTS.length);
+  const heads = new THREE.InstancedMesh(headGeo, M.energyLight, MASTS.length);
+  poles.castShadow = true;
+  const poolMat = new THREE.MeshBasicMaterial({ map: blobTexture(), color: (ctx.theme && ctx.theme.energy) || 0x7fc6ff, transparent: true, opacity: 0.11, blending: THREE.AdditiveBlending, depthWrite: false });
+  pools.push(poolMat);
+  const poolGeo = own(new THREE.PlaneGeometry(9, 9));
+  const poolMesh = new THREE.InstancedMesh(poolGeo, poolMat, MASTS.length);
+  poolMesh.renderOrder = 6;
+  MASTS.forEach(([x, z], i) => {
+    _p.set(x, 2.8, z); _q.identity(); _m4.compose(_p, _q, _s); poles.setMatrixAt(i, _m4);
+    _p.set(x, 5.8, z); _e.set(0, Math.PI / 4, 0); _q.setFromEuler(_e); _s.set(1, 1.5, 0.42); _m4.compose(_p, _q, _s); heads.setMatrixAt(i, _m4); _s.set(1, 1, 1);
+    _p.set(x, 0.05, z); _e.set(-Math.PI / 2, 0, 0); _q.setFromEuler(_e); _m4.compose(_p, _q, _s); poolMesh.setMatrixAt(i, _m4);
+    /* the mast is something the camera must not walk into */
+    const col = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 0.5), M.trimSatin);
+    col.position.set(x, 3, z); col.visible = false; group.add(col); ctx.colliders.push(col);
+  });
+  [poles, heads, poolMesh].forEach(m => { m.instanceMatrix.needsUpdate = true; group.add(m); });
+  luminaires.push(heads);
+
+  /* ---- 4. CORRIDOR EDGES: rails, bollards, barrier segments ------------------- */
+  const railPost = own(chamferBox(0.1, 0.95, 0.1, 0.02));
+  const postMats = [];
+  for (const sd of [-1, 1]) for (let z = 40; z > -40; z -= 2.6) postMats.push([sd * 39.6, 0.48, z]);
+  const posts = new THREE.InstancedMesh(railPost, M.trimSatin, postMats.length);
+  postMats.forEach((pm, i) => { _p.set(pm[0], pm[1], pm[2]); _q.identity(); _m4.compose(_p, _q, _s); posts.setMatrixAt(i, _m4); });
+  posts.instanceMatrix.needsUpdate = true; group.add(posts);
+  for (const sd of [-1, 1]) part(trim, chamferBox(0.08, 0.08, 80, 0.02), sd * 39.6, 0.95, 0);
+  const bollard = own(chamferBox(0.26, 0.9, 0.26, 0.05));
+  const bolls = [];
+  for (const sd of [-1, 1]) for (let i = 0; i < 4; i++) bolls.push([sd * (36 - i * 1.8), 0.45, 42]);
+  const bollardMesh = new THREE.InstancedMesh(bollard, M.curb, bolls.length);
+  bolls.forEach((b, i) => { _p.set(b[0], b[1], b[2]); _q.identity(); _m4.compose(_p, _q, _s); bollardMesh.setMatrixAt(i, _m4); });
+  bollardMesh.instanceMatrix.needsUpdate = true; bollardMesh.castShadow = true; group.add(bollardMesh);
+
+  /* ---- 5. SMALL STRUCTURES: an info pylon and a corridor shelter -------------- */
+  {
+    const px = 20, pz = 14;
+    part(dark, chamferBox(1.3, 2.3, 0.36, 0.07), px, 1.15, pz, -0.5);
+    part(trim, chamferBox(1.4, 0.07, 0.44, 0.02), px, 2.36, pz, -0.5);
+    const face = new THREE.Mesh(own(new THREE.PlaneGeometry(1.0, 1.5)), M.panelLit);
+    face.position.set(px + Math.cos(-0.5 + Math.PI / 2) * 0.2, 1.3, pz - Math.sin(-0.5 + Math.PI / 2) * 0.2);
+    face.rotation.y = -0.5; group.add(face);
+    const col = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.6, 0.7), M.curb); col.position.set(px, 1.3, pz); col.visible = false; group.add(col); ctx.colliders.push(col);
+  }
+  {
+    const sx = 46, sz = 30;
+    for (const dz of [-2.4, 2.4]) part(dark, chamferBox(0.22, 3.2, 0.22, 0.04), sx, 1.6, sz + dz);
+    part(trim, chamferBox(3.2, 0.18, 6.4, 0.06), sx, 3.3, sz);
+    const col = new THREE.Mesh(new THREE.BoxGeometry(3.4, 3.4, 6.6), M.curb); col.position.set(sx, 1.7, sz); col.visible = false; group.add(col); ctx.colliders.push(col);
+  }
+
+  /* ---- 6. BENCHES: chamfered seat slabs on the existing bench spots and nodes -- */
+  for (const [bx, bz, ry] of [[-19, 21, 0.5], [19, 21, -0.5], [-16, 10.5, 0.2], [17, 8.5, -0.2]]) {
+    part(curb, chamferBox(5.2, 0.16, 1.35, 0.05), bx, 0.63, bz, ry);
+    part(trim, chamferBox(5.0, 0.03, 0.06, 0.012), bx, 0.72, bz + 0.62, ry);
+    const col = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.8, 1.6), M.curb); col.position.set(bx, 0.4, bz); col.rotation.y = ry; col.visible = false; group.add(col); ctx.colliders.push(col);
+  }
+
+  /* ---- 7. CURB LINE between the plaza circle and the aprons / sidewalk band ---- */
+  for (let i = 0; i < 64; i++) {
+    const a = i / 64 * Math.PI * 2, R = 27.9;
+    if (Math.sin(a) < -0.55 && Math.abs(Math.cos(a)) < 0.5) continue;   /* leave the MAH MATCH approach open */
+    part(curb, chamferBox(2.6, 0.12, 0.3, 0.03), Math.cos(a) * R, 0.06, Math.sin(a) * R, -a + Math.PI / 2);
+  }
+
+  /* ---- merge and finish ------------------------------------------------------- */
+  const add = (list, mat, name, shadow, receive) => {
+    if (!list.length) return null;
+    const m = new THREE.Mesh(own(mergeParts(list)), mat); m.name = name;
+    if (shadow) m.castShadow = true; if (receive) m.receiveShadow = true;
+    group.add(m); return m;
+  };
+  add(slab, M.graphiteLight, 'dressing-paths', false, true);
+  add(curb, M.curb, 'dressing-curbs', true, true);
+  add(trim, M.trimSatin, 'dressing-trim', false, false);
+  add(dark, M.structural, 'dressing-structures', true, true);
+
+  const stats = { masts: MASTS.length, routes: ROUTES.length, nodes: NODES.length, colliders: ctx.colliders.length, drawCalls: 0 };
+  group.traverse(o => { if (o.isMesh && o.visible) stats.drawCalls++; });
+
+  let daylight = 0, breath = 0;
+  function setTime(s) {
+    daylight = s ? s.daylight : daylight;
+    const k = 1 - 0.7 * daylight;
+    poolMat.opacity = 0.11 * k;
+    return s;
+  }
+  function setTheme(t) { if (t && t.energy != null) poolMat.color.setHex(t.energy); return t; }
+  function update(t) {
+    /* one very slow breath so the pools are not perfectly static at night; imperceptible by day */
+    breath = 0.94 + Math.sin(t * 0.3) * 0.06;
+    poolMat.opacity = 0.11 * (1 - 0.7 * daylight) * breath;
+  }
+  function dispose() {
+    if (group.parent) group.parent.remove(group);
+    owned.forEach(g => { if (g && g.dispose) g.dispose(); });
+    poolMat.dispose(); guideMat.dispose();
+  }
+  setTime(ctx.clock && ctx.clock.state ? ctx.clock.state() : null);
+  return { group, setTime, setTheme, update, dispose, stats };
+}
