@@ -164,12 +164,17 @@ export function applyCrystalShader(material, options) {
        character move. */
     uRimDirA: { value: new Vector3(-0.62, 0.72, 0.30).normalize() },
     uRimDirB: { value: new Vector3(0.85, 0.15, 0.25).normalize() },
-    uRimFloor: { value: opts.rimFloor == null ? 0.22 : opts.rimFloor },
+    uRimFloor: { value: opts.rimFloor == null ? 0.12 : opts.rimFloor },   /* R102: 0.22 -> 0.12, the theme rim is a contour accent on a platinum body */
     uCoat: { value: opts.coat == null ? 0.0 : opts.coat },
     uCoatColor: { value: new Color(opts.coatColor == null ? 0xbfc8d6 : opts.coatColor) },
     uCoatMetal: { value: opts.coatMetal == null ? 0.66 : opts.coatMetal },
     uCoatRough: { value: opts.coatRough == null ? 0.05 : opts.coatRough },
-    uCoatEnv: { value: opts.coatEnv == null ? 0.55 : opts.coatEnv }
+    uCoatEnv: { value: opts.coatEnv == null ? 0.55 : opts.coatEnv },
+    /* R102 — CAVITY: how strongly a muscle valley (forge.js `aCavity`, from
+       the anatomical multiplier) loses albedo, reflection, coat and rim. The
+       R102 references' carving is read as SHADOW between raised forms: the
+       valley stays near-black while the crest catches the silver. */
+    uCavity: { value: opts.cavity == null ? 1.0 : opts.cavity }
   };
 
   material.onBeforeCompile = function (shader) {
@@ -192,7 +197,9 @@ export function applyCrystalShader(material, options) {
         'attribute float aInner;',
         'varying float vInner;',
         'attribute float aCoat;',
-        'varying float vCoat;'
+        'varying float vCoat;',
+        'attribute float aCavity;',   /* R102 — per-vertex valley depth (forge.js) */
+        'varying float vCavity;'
       ].join('\n'))
       .replace('#include <begin_vertex>', [
         '#include <begin_vertex>',
@@ -214,6 +221,7 @@ export function applyCrystalShader(material, options) {
         '{',
         '  vec3 mrVN = normalize( normalMatrix * normal );',
         '  vCoat = aCoat * ( 0.55 + 0.45 * clamp( mrVN.y * 0.9 + abs( mrVN.x ) * 0.45 + 0.35, 0.0, 1.0 ) );',
+        '  vCavity = aCavity;',
         '}'
       ].join('\n'));
 
@@ -248,6 +256,8 @@ export function applyCrystalShader(material, options) {
         'varying vec3 vObjN;',
         'varying float vInner;',
         'varying float vCoat;',
+        'varying float vCavity;',
+        'uniform float uCavity;',
         'uniform float uCoat;',
         'uniform vec3 uRimDirA;',
         'uniform vec3 uRimDirB;',
@@ -331,7 +341,8 @@ export function applyCrystalShader(material, options) {
            the coat off the dark rows — a black facet is a lost plane whatever
            region it is in. Decided here because this runs before roughness,
            metalness and lighting. */
-        '  mrCoatW = clamp( vCoat * uCoat, 0.0, 1.0 ) * ( 1.0 - smoothstep( 0.0, 0.36, clamp( vFacet.z, 0.0, 1.0 ) ) );',
+        '  float mrCav = clamp( vCavity * uCavity, 0.0, 1.0 );',   /* R102 — the muscle valley */
+        '  mrCoatW = clamp( vCoat * uCoat, 0.0, 1.0 ) * ( 1.0 - smoothstep( 0.0, 0.36, clamp( vFacet.z, 0.0, 1.0 ) ) ) * ( 1.0 - 0.80 * mrCav );',
         '  float mrDark = clamp( vFacet.z * uVariation, -0.5, 1.0 );',
         /* The tinted end of the mix is no longer amplified. Multiplying the
            crystal's own colour by the cyan AND boosting it meant the chromatic
@@ -341,6 +352,9 @@ export function applyCrystalShader(material, options) {
         '  vec3 mrHue = mix( vec3( dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) ),',
         '                    diffuseColor.rgb * uCrystalTint * 0.95, clamp( vFacet.w, 0.0, 1.0 ) );',
         '  diffuseColor.rgb = mix( mrHue, uDeep, clamp( mrDark, 0.0, 1.0 ) );',
+        /* R102 — the valley's albedo falls toward the deep colour: a groove is
+           a change of surface depth, and depth is read as shadow */
+        '  diffuseColor.rgb = mix( diffuseColor.rgb, uDeep * 0.6, mrCav * 0.70 );',
         /* The silver class carries a NEGATIVE darkness, and this line turns
            that into extra albedo — it is what makes a silver facet the
            brightest thing on the body after the face.
@@ -361,7 +375,7 @@ export function applyCrystalShader(material, options) {
            the coat's value: neutral silver still dominates, the theme lives
            in what it reflects. */
         '  vec3 mrTintN = uTint / max( dot( uTint, vec3( 0.299, 0.587, 0.114 ) ), 0.05 );',
-        '  vec3 mrCoatAlbedo = uCoatColor * mix( vec3( 1.0 ), mrTintN, 0.16 );',   /* R101: 0.10 -> 0.16; 0.24 read as paint on the purple capture */
+        '  vec3 mrCoatAlbedo = uCoatColor * mix( vec3( 1.0 ), mrTintN, 0.10 );',   /* R101: 0.10 -> 0.16; 0.24 read as paint on the purple capture; R102: 0.10, the coat is silver */
         '  diffuseColor.rgb = mix( diffuseColor.rgb, mrCoatAlbedo * ( 0.80 + 0.20 * dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) * 2.0 ), mrCoatW );',
         '#endif'
       ].join('\n'))
@@ -394,7 +408,7 @@ export function applyCrystalShader(material, options) {
                   mirrors is tinted a third of the way toward the theme's hue (normalised, so
                   the catch keeps its value), which is where the colour shows up as reflection
                   rather than as paint. */
-               'radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness ) * mix( 1.0, uCoatEnv, mrCoatW ) * mix( vec3( 1.0 ), uTint / max( dot( uTint, vec3( 0.299, 0.587, 0.114 ) ), 0.05 ), mrCoatW * 0.26 );')
+               'radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness ) * mix( 1.0, uCoatEnv, mrCoatW ) * mix( vec3( 1.0 ), uTint / max( dot( uTint, vec3( 0.299, 0.587, 0.114 ) ), 0.05 ), mrCoatW * 0.12 ) * ( 1.0 - 0.60 * mrCav );')   /* R102: 0.26 -> 0.12, the platinum reflects silver first */
 
       /* Fresnel, applied after lighting.
 
@@ -462,7 +476,7 @@ export function applyCrystalShader(material, options) {
         /* R99: the rim is fragmented by direction — see the uniform note. */
         '    vec3 mrRN = normalize( normal );',
         '    float mrRimDir = clamp( uRimFloor + max( dot( mrRN, uRimDirA ), 0.0 ) * 1.0 + max( dot( mrRN, uRimDirB ), 0.0 ) * 0.55, 0.0, 1.0 );',
-        '    outgoingLight += mrRimColor * mrRim * mrRimDir * 0.62 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) );',
+        '    outgoingLight += mrRimColor * mrRim * mrRimDir * 0.62 * mix( 0.35, 1.0, clamp( vFacet.w, 0.0, 1.0 ) ) * ( 1.0 - 0.55 * clamp( vFacet.z, 0.0, 1.0 ) ) * ( 1.0 - 0.60 * mrCav );',
         /* R100 — INTERNAL COLOUR SEAMS. Along the rim of a large coated,
            chromatic facet a hairline of the theme's colour, as if light were
            carried inside the crystal to the plane's edge. Gated hard: big
@@ -473,7 +487,12 @@ export function applyCrystalShader(material, options) {
         '      float mrSeamW = clamp( 0.018 / max( vBary.w, 1e-4 ), 0.02, 0.12 );',
         '      float mrSeam = ( 1.0 - smoothstep( 0.0, mrSeamW, mrSeamEdge ) ) * smoothstep( 0.025, 0.06, vBary.w );',
         '      mrSeam *= mrCoatW * smoothstep( 0.35, 0.75, clamp( vFacet.w, 0.0, 1.0 ) );',
-        '      outgoingLight += uTint * mrSeam * 0.38;',   /* R101: 0.16 -> 0.38, the seams carry more */
+        /* R102: the seams were the cyan WIREFRAME the torso crop showed — the
+           isolation set proved it (no coat: gone; no lines: unchanged). The
+           references have no coloured hairlines; their facet boundaries are
+           value steps with the odd silver glint. So the seam is a SILVER
+           hairline carrying a third of the theme, at a fraction of the weight. */
+        '      outgoingLight += mix( uCoatColor * 1.2, uTint, 0.35 ) * mrSeam * 0.14;',
         '    }',
         /* R94 — the internal light. See the uniform note above. */
         '    if ( uInnerStrength > 0.0 && vInner > 0.5 ) {',

@@ -304,6 +304,12 @@ export function facetedGeometry(positions, faces, groups, options) {
      albedo, metalness and roughness. 0 everywhere unless a region asks. */
   var coatAll = opts.coat == null ? 0 : opts.coat;
   var coa = [];
+  /* R102 — `aCavity`, per POSITION from the loft (see loft's ring loop):
+     how far a vertex sits inside its ring's nominal surface. 0 where the
+     caller has none (the head, the caps). */
+  var cavArr = opts.vertexCavity || null;
+  var cav = [];
+  function cavityAt(i) { return cavArr && cavArr[i] != null ? cavArr[i] : 0; }
   var groupRanges = [];
   var written = 0;
   var faceIndex = 0;
@@ -397,6 +403,7 @@ export function facetedGeometry(positions, faces, groups, options) {
     faceIndex++;
     for (var v = 0; v < 3; v++) fac.push(k[1], k[2], k[3], k[4]);
     coa.push(faceCoat, faceCoat, faceCoat);
+    cav.push(cavityAt(a), cavityAt(b), cavityAt(c));
     written += 3;
   }
 
@@ -444,6 +451,7 @@ export function facetedGeometry(positions, faces, groups, options) {
   if (innerFlag) inn.fill(1);
   geo.setAttribute('aInner', new Float32BufferAttribute(inn, 1));
   geo.setAttribute('aCoat', new Float32BufferAttribute(coa, 1));
+  geo.setAttribute('aCavity', new Float32BufferAttribute(cav, 1));
   if (groupRanges.length > 1) {
     groupRanges.forEach(function (g) { geo.addGroup(g.start, g.count, g.material); });
   }
@@ -523,6 +531,7 @@ export function loft(sections, sides, options) {
   var positions = [];
   var index = [];
   var rings = [];
+  var vertexCavity = [];   /* R102 — per position, see the ring loop */
 
   function push(x, y, z) { positions.push(x, y, z); return positions.length / 3 - 1; }
 
@@ -571,11 +580,27 @@ export function loft(sections, sides, options) {
 
          Applied as a multiplier on top of the relief so anatomy and crystal
          jitter compose rather than overwrite one another. */
-      var r = (relief + jitter) * (s.shape ? s.shape(a) : 1);
+      var mul = s.shape ? s.shape(a) : 1;
+      var r = (relief + jitter) * mul;
       /* R94 — `zc` shifts a ring's centre front-to-back. The neck sits BEHIND
          the chin, not under its point, and a loft whose rings all share one
          axis cannot say that. */
-      verts.push(push(Math.cos(a) * s.w * r, s.y - drop + yJit, Math.sin(a) * s.d * r + (s.zc || 0)));
+      var vi = push(Math.cos(a) * s.w * r, s.y - drop + yJit, Math.sin(a) * s.d * r + (s.zc || 0));
+      /* R102 — CAVITY. How far this vertex sits INSIDE the ring's nominal
+         surface, from the anatomical multiplier alone: a sternum valley at
+         0.76 is a full cavity, an oblique groove at 0.95 a quarter of one, a
+         pec crown none. Carried per vertex (`aCavity`) so it interpolates
+         across each face into a gradient toward the valley, and read by the
+         crystal shader as less albedo, less reflection, less coat and less
+         rim — the muscle valley stays dark while the raised form catches the
+         silver, which is what makes carving read as depth rather than as
+         lines. Geometry-derived, so it cannot disagree with the relief. */
+      /* `cav` on a ring adds a cavity the ring table declares outright — a
+         CREASE ring (under the pec, between abdominal blocks, the belt, the
+         knee, under the glute) is a valley between the rings either side of
+         it, which the multiplier alone cannot know. */
+      vertexCavity[vi] = Math.max(0, Math.min(1, (1 - mul) / 0.22 + (s.cav || 0)));
+      verts.push(vi);
     }
     rings.push({ point: null, verts: verts });
   });
@@ -722,7 +747,8 @@ export function loft(sections, sides, options) {
 
   return { geometry: facetedGeometry(positions, faces, null,
       { lift: opts.lift, faceLift: faceLift, classes: opts.classes, faceClasses: faceClasses, faceSeed: faceSeed,
-        faceClassIndex: faceClassIndex, inner: opts.inner, coat: opts.coat, faceCoat: faceCoat }),
+        faceClassIndex: faceClassIndex, inner: opts.inner, coat: opts.coat, faceCoat: faceCoat,
+        vertexCavity: vertexCavity }),
     positions: positions, faces: faces };
 }
 

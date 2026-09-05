@@ -681,7 +681,8 @@ if (exists('CLAUDE.md')) {
   /* the background cast carries a square head among the diamonds and the round one */
   ok('R98-figures-include-a-square-head', /square:\s*\{[^}]*box: true/.test(figures) && /head: 'square'/.test(figures));
   /* the female variant carries the same reduced clavicle share as the male */
-  ok('R98-variant-clavicle-carries-coat', /coat: 0\.30/.test(read('mrmah3d/core/character/variants.js')));
+  /* R102: her shoulder line's share came down to 0.12 (it rendered as one blown white ledge) — it is still an explicit, reduced share */
+  ok('R98-variant-clavicle-carries-coat', /clavicleShape\(1\.0\), dip: 0\.030, hero: 0\.[0-9]+, zoneAt: null, coat: 0\.[1-3][0-9]/.test(read('mrmah3d/core/character/variants.js')));
 })();
 
 /* ---- R99: the godform — anatomy first, shadow second, facets third ------- */
@@ -772,7 +773,10 @@ if (exists('CLAUDE.md')) {
   /* platinum / theme fusion: the coat's albedo and grazing reflection carry the theme, the base stays neutral */
   ok('R100-platinum-reflects-the-theme', /mrTintN/.test(shader) && /mix\( vec3\( 1\.0 \), mrTintN, 0\.[1-2][0-9] \)/.test(shader) &&
     /mix\( uCoatColor \* 1\.15, uTint, 0\.[3-5][0-9] \)/.test(shader));
-  ok('R100-internal-colour-seams', /mrSeam/.test(shader) && /uTint \* mrSeam \* 0\.[1-3]/.test(shader));
+  /* R102: the seam is a SILVER hairline carrying a third of the theme, at a
+     low weight — the theme-coloured seam at 0.38 was the cyan wireframe the
+     torso crop showed (isolation: no coat -> gone, no lines -> unchanged). */
+  ok('R100-internal-colour-seams', /mrSeam/.test(shader) && /mix\( uCoatColor \* 1\.2, uTint, 0\.[2-4][0-9]? \) \* mrSeam \* 0\.[01][0-9]/.test(shader));
   ok('R100-platinum-base-still-neutral', /platinum: 0xc4ccd8/.test(mats) && /coatColor: PALETTE\.platinum/.test(mats));
 })();
 
@@ -796,10 +800,15 @@ if (exists('CLAUDE.md')) {
     /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.95\), 0\.40\) \* 0\.150/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
     /upperRadius: 0\.160/.test(propsSrc));
   /* three deltoid heads as FORM: front, rear, lateral crest and two grooves */
-  ok('R101-deltoid-heads-as-form', /var lateral = 0\.06/.test(body) && /var grooves = -0\.045/.test(body));
+  /* R102: the grooves between the heads are twice as deep (0.045 -> 0.090) */
+  ok('R101-deltoid-heads-as-form', /var lateral = 0\.06/.test(body) && /var grooves = -0\.0[4-9]/.test(body));
   /* the crystal's own hue is canonical; the theme is light, not paint */
+  /* R102: the facets' own hue is a PALETTE constant (cool neutral platinum,
+     `PALETTE.crystalTint`), never the theme (`uTint`) and no longer the
+     sapphire edge colour — the R102 references are a graphite-and-silver
+     body carrying the theme as light. */
   ok('R101-crystal-hue-canonical', /uCrystalTint/.test(shader) && /diffuseColor\.rgb \* uCrystalTint \* 0\.95/.test(shader) &&
-    /crystalTint: PALETTE\.edge/.test(mats) && !/diffuseColor\.rgb \* uTint \* 0\.95/.test(shader));
+    /crystalTint: PALETTE\.crystalTint/.test(mats) && !/crystalTint: tint\./.test(mats) && !/diffuseColor\.rgb \* uTint \* 0\.95/.test(shader));
   ok('R101-platinum-reflects-the-theme', /uTint \/ max\( dot\( uTint, vec3\( 0\.299, 0\.587, 0\.114 \) \), 0\.05 \), mrCoatW \* 0\.[1-3]/.test(shader));
   /* the world: darker behind him, spires with seams, none inside the column behind the head */
   ok('R101-world-darker-behind-him', /behindDim/.test(terrain) && /var behindSig = 1\.0 \+ 0\.085 \* Math\.abs\(cen\.z\)/.test(terrain));
@@ -815,7 +824,9 @@ if (exists('CLAUDE.md')) {
      R100 baseline; 2.0 left it three points under). */
   const matsR101 = read('mrmah3d/core/character/materials.js');
   const coreM = matsR101.match(/coreStrength: ([\d.]+)/);
-  ok('R101-theme-carried-by-transmission', !!coreM && Number(coreM[1]) >= 3.0,
+  /* R102: 3.6 flooded the abdominal valleys; 2.0 with the cavity term keeps
+     the transport and the carving. The floor is the R101 pre-nudge value. */
+  ok('R101-theme-carried-by-transmission', !!coreM && Number(coreM[1]) >= 2.0,
     coreM ? 'coreStrength ' + coreM[1] : 'no coreStrength');
 })();
 

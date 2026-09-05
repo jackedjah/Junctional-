@@ -1,0 +1,48 @@
+{
+  "pass": "R102 — silhouette + muscle indentation + glossy platinum (autonomous loop, passes A–G)",
+  "baseline": "R101 (commit 4613b82)",
+  "references": "reference/mrmah-refK-r102-{male-front,male-rear,female-front,female-rear}.png, read by hand off a 5% grid (scratch grid.mjs); automatic segmentation failed because the platinum body carries violet reflections and the violet world carries silver — the mask either took the mist or lost the body.",
+  "units": "full silhouette width as a fraction of character height (apex to tip); t = row from the apex as a fraction of height; torso widths exclude the arms",
+  "referenceLandmarks": {
+    "male-front":   { "shoulder": [0.347, 0.27], "lat": [0.183, 0.37], "waist": [0.128, 0.474], "hip": [0.167, 0.589], "thigh": [0.140, 0.657], "knee": [0.089, 0.749], "calf": [0.101, 0.806] },
+    "male-rear":    { "shoulder": [0.309, 0.243], "lat": [0.197, 0.322], "waist": [0.115, 0.424], "glute": [0.188, 0.503], "thigh": [0.151, 0.638], "knee": [0.103, 0.706], "calf": [0.114, 0.774] },
+    "female-front": { "shoulder": [0.316, 0.243], "bust": [0.166, 0.30], "waist": [0.095, 0.435], "hip": [0.243, 0.548], "thigh": [0.191, 0.638], "knee": [0.103, 0.717], "calf": [0.110, 0.763] },
+    "female-rear":  { "shoulder": [0.263, 0.205], "lat": [0.200, 0.295], "waist": [0.104, 0.386], "glute": [0.233, 0.489], "thigh": [0.178, 0.602], "knee": [0.096, 0.693], "calf": [0.107, 0.75] }
+  },
+  "renderLandmarks": {
+    "method": "scratch bodymask.mjs (groups view, world hidden, low tier) + refwidth.mjs central-run profile; the head is locked canonical (0.244 of height against the references' 0.15–0.17), so shape is judged by body-internal ratios",
+    "male-front":   { "R101": { "shoulder": 0.399, "latBlock": 0.229, "waist": 0.142, "hip": 0.186, "knee(t0.73)": 0.125, "calf(t0.78)": 0.098 },
+                      "R102": { "shoulder": 0.403, "latBlock": 0.229, "lat(t0.44)": 0.183, "waist": 0.134, "hip": 0.192, "knee(t0.73)": 0.102, "calf(t0.78)": 0.105 } },
+    "male-rear":    { "R102": { "waist": 0.132, "glute": 0.188, "thigh": 0.141, "knee": 0.091, "calf": 0.101 } },
+    "female-front": { "R101": { "waist": 0.121, "hip": 0.261 }, "R102": { "shoulder(delts)": 0.291, "waist": 0.108, "hip": 0.343, "thigh(t0.63)": 0.170, "knee(t0.73)": 0.083, "calf(t0.78)": 0.094 } },
+    "female-rear":  { "R102": { "waist": 0.106, "glute": 0.343, "thigh": 0.112, "knee": 0.077, "calf": 0.088 } }
+  },
+  "ratios": {
+    "note": "reference vs render; the render's shoulders are relatively wider because the head is locked, so ratios against the shoulder are the honest comparison",
+    "male":   { "waistOverShoulder": { "reference": 0.369, "R101": 0.356, "R102": 0.333 }, "latOverShoulder": { "reference": 0.527, "R102(t0.41)": 0.57 }, "hipOverShoulder": { "reference": 0.481, "R102": 0.476 }, "calfOverKnee": { "reference": 1.135, "R101": 0.78, "R102": 1.03 } },
+    "female": { "waistOverShoulder": { "reference": 0.30, "R102": 0.37 }, "hipOverShoulder": { "reference": 0.769, "R102": 1.18 }, "calfOverKnee": { "reference": 1.068, "R102": 1.13 } }
+  },
+  "materialAndTheme": {
+    "method": "scratch themepen2.mjs over the character only; strict gate (theme hue ±32°, sat ≥ 0.28, absolute chroma ≥ 28, luma 18–150)",
+    "blueShareOfBodyStrict": { "R101": 70.9, "R102": 65.6 },
+    "isolation": "with the theme rim, the internal light, the edge lines and the theme lights all off, 65% of the body still passed the LAX gate — the cool graphite darks (20,24,32) have saturation 0.37; the strict gate is what the eye agrees with. The internal light accounted for 13 points; rims, lines and theme lights for under one point each; the cyan wireframe in the torso crop was the coat-gated SEAM term (no coat: gone; no lines: unchanged).",
+    "changes": ["crystalTint sapphire -> cool neutral 0xb4bccb, deep navy -> graphite 0x141820, base albedo 0x30507a -> 0x565e6a", "environment hot cards and midtone tier neutralised to moonlight silver; the two chromatic rim cards now follow the theme (they were fixed cyan under every theme)", "key/fill/hemisphere/ambient neutral; theme rim lights 2.2/2.6 -> 1.0/1.2; side key card 0.80 -> 0.65", "rim floor 0.22 -> 0.12; coat reflection tint 0.26 -> 0.12; coat albedo tint 0.16 -> 0.10; seams theme@0.38 -> silver-with-a-third-theme@0.14; edge lines halved", "core light 3.6 -> 2.0 (it flooded the abdominal valleys)", "NEW per-vertex cavity attribute (forge.js aCavity, from the anatomical multiplier and declared crease rings): valleys lose 70% albedo toward the deep, 60% reflection, 80% coat, 60% rim"]
+  },
+  "geometry": {
+    "male": ["lat block-and-pinch: rings 1.78/1.725 wider with a latissimus lobe (coreShape latK), 1.605/1.545 narrower", "thigh channel deeper (quadShape seam 0.13 -> 0.19), glute pair 0.14 with a 0.11 cleft", "knee ring (0.780, w 0.150, kneeShape) and calf rings (0.720/0.640/0.530, calfShape: two posterior bellies, front ridge, cleft); a first cut at knee 0.128 / calf 0.160 read as an egg on a bulb", "chestShape: lats further back and wider (0.21), spine 0.08 -> 0.14, erectors 0.10, a pec/deltoid insertion groove; coreShape: linea 0.24, oblique groove, spine 0.11, erectors 0.08", "deltoid: grooves between the three heads 0.045 -> 0.09, fuller front/rear lobes", "upper arm: biceps/triceps groove 0.16 -> 0.20, a deltoid-insertion valley under the cap, elbow compression; forearm: flexor/extensor channel, wrist-tendon narrowing", "clavicle undercut 0.07 -> 0.10"],
+    "female": ["shoulders 0.42 -> 0.47 half-width, deltoid r0 0.118 -> 0.200, arms 0.092/0.072 -> 0.116/0.090", "waist 0.170 -> 0.146; hip 0.276 -> 0.292 at 1.40; glute SHELF ring at 1.61, glute max at 1.40–1.53, under-glute crease ring at 1.23 (cav 0.45); hipShape glute pair 0.15 -> 0.26 with a 0.11 cleft", "thigh 0.226, knee ring 0.83 (0.140), calf rings 0.76/0.68/0.56", "shoulder-line platinum share 0.30 -> 0.12 (it rendered as one blown white ledge)"]
+  },
+  "engineering": { "staticSuite": "node tests/mrmah3d.test.js — 342/342", "verify": "node tools/mrmah3d-verify.mjs — 150/150 (VERIFY_RESULTS.json regenerated on this build)", "notEvidence": "headless Chromium on SwiftShader; not evidence about iPhone/iPad Safari" },
+  "scores0to10": {
+    "note": "self-scored; the art gate is the director's",
+    "indentation": { "shoulders": 7, "arms": 7, "forearms": 6, "chest": 6, "abs": 5, "back": 6, "glutes": 6 },
+    "silhouette": { "maleFront": 7, "maleBack": 7, "femaleFront": 7, "femaleBack": 7 },
+    "platinum": { "gloss": 6, "darkness": 8, "silverRichness": 6, "facetCoherence": 6, "depth": 7, "anatomicalReadability": 7, "premiumQuality": 6 }
+  },
+  "openItems": [
+    "her upper chest / shoulder-top band still catches the shoulder-top card as a bright bar in the rear view (the deltoid crest coat is shared with the male)",
+    "facet density: the references' torsos are far denser than this build's few large planes (a topology decision, not taken here)",
+    "the R101 theme-penetration numbers no longer apply: the body is dark platinum by design and the theme is an accent — gold/purple penetration will read lower and should be re-measured against the new law if it matters",
+    "the reference's head is 0.15 of height; this build keeps the canonical 0.24 head, so shoulder-to-height ratios differ by design"
+  ]
+}

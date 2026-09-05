@@ -54,7 +54,7 @@ export var PALETTE = {
      reflected. The cyan accents stay selective — they come from the edges, the
      tint class and the rim card, all of which are chosen. This is the floor
      underneath them. */
-  crystal: 0x30507a,
+  crystal: 0x565e6a,   /* R102: graphite-silver, the dark-silver broad plane of the platinum body (was sapphire 0x30507a) */
   /* R94: 0x0a1730 -> 0x11284f. Histogrammed over the chest against Reference A
      the render was 57% below 32 luma against 40%, with the 32-63 band nearly
      empty: the darkest facets were falling to this colour, and this colour was
@@ -74,6 +74,17 @@ export var PALETTE = {
      blue so it reads as platinum under a moon rather than as chrome. Never
      theme-derived (see crystal-shader.js). */
   platinum: 0xc4ccd8,
+  /* R102 — THE BODY IS DARK PLATINUM, NOT SAPPHIRE. Every R102 reference
+     (`reference/mrmah-refK-r102-*.png`) is a graphite-and-silver body: the
+     broad planes dark silver, the cavities near-black, the crests mid
+     platinum, rare white peaks, and the theme present ONLY as refraction,
+     internal light and reflected accent. The chromatic facets' own hue
+     (`crystalTint`) therefore moves from the canonical sapphire to a cool
+     neutral, and the deep colour from navy to graphite; the theme keeps its
+     transports (rims, seams, coat reflection, core light, lamps). The blue
+     that remains on him under the blue theme is LIGHT. */
+  crystalTint: 0xb4bccb,
+  graphiteDeep: 0x141820,
   /* R94 — the head's ice family: a pale steel-blue albedo, a deep that is
      still blue rather than black, and a whiter tint for its catches. */
   headCrystal: 0x7d9fc6,
@@ -280,7 +291,7 @@ export function createCrystalMaterials(options) {
        most of why they read as lit crystal rather than as dark glass. With the
        body deepened this tier has to carry more of the frame, and it can: it is
        toneMapped:false, so it holds its value while the crystal comes down. */
-    opacity: 0.62,
+    opacity: 0.32,   /* R102: halved — the lines were the loudest colour on the body, a cyan wireframe over the platinum */
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -298,7 +309,7 @@ export function createCrystalMaterials(options) {
   var edgeHalo = new LineBasicMaterial({
     color: new Color(tint.edge || PALETTE.edge),
     transparent: true,
-    opacity: 0.26,
+    opacity: 0.14,   /* R102: halved */
     blending: AdditiveBlending,
     depthWrite: false,
     depthTest: true,
@@ -316,7 +327,7 @@ export function createCrystalMaterials(options) {
   var edgeHero = new LineBasicMaterial({
     color: new Color(tint.hot || PALETTE.edgeHot),
     transparent: true,
-    opacity: 1.00,
+    opacity: 0.60,   /* R102: 1.00 -> 0.60 */
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -331,7 +342,7 @@ export function createCrystalMaterials(options) {
   var edgeFaint = new LineBasicMaterial({
     color: new Color(tint.edge || PALETTE.edge),
     transparent: true,
-    opacity: 0.07,
+    opacity: 0.04,   /* R102: halved */
     blending: AdditiveBlending,
     depthWrite: false,
     toneMapped: false
@@ -400,8 +411,8 @@ export function createCrystalMaterials(options) {
   applyCrystalShader(body, {
     tint: tint.edge || PALETTE.edge,
     /* R101: the facets' own hue never takes the theme (crystal-shader.js) */
-    crystalTint: PALETTE.edge,
-    deep: PALETTE.crystalDeep,
+    crystalTint: PALETTE.crystalTint,   /* R102: the facets' own hue is cool neutral platinum, never the theme, no longer sapphire */
+    deep: PALETTE.graphiteDeep,          /* R102: near-black graphite in the cavities */
     /* Down from 1.35. The Fresnel boost brightens whatever faces away from the
        camera, which is the right instinct for a silhouette lip and the wrong
        one for a diamond head: seen face-on, almost every facet of the head's
@@ -497,8 +508,11 @@ export function createCrystalMaterials(options) {
     innerY: 0.42,
     innerRange: 1.00,
     innerTop: 1.28,
-    coreStrength: 3.6,   /* R101: 1.6 -> 3.6, the core's theme light reaches the abdominal valleys — the one
-                            transport that carries a complementary theme (gold) through a sapphire body */
+    coreStrength: 2.0,   /* R101: 1.6 -> 3.6, the core's theme light reaches the abdominal valleys — the one
+                            transport that carries a complementary theme (gold) through a sapphire body.
+                            R102: back to 2.0 — at 3.6 it flooded the abdominal valleys with theme colour,
+                            which is the one thing the carving brief forbids; the valleys are now kept dark
+                            by the cavity term and the theme keeps its transports elsewhere. */
     coreY: 1.66,
     coreRange: 0.66,
     coreTop: 2.08,

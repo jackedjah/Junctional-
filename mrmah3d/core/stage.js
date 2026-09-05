@@ -133,16 +133,16 @@ function buildEnvironment(renderer, palette) {
   var sideKey = heroRgb.map(function (c) { return Math.round(c + (255 - c) * 0.25); });
   var cards = [
     /* key: the main near-white source, front-left of the character */
-    { x: 14, y: 30, w: 34, h: 30, fill: 'rgba(214,238,255,1)' },
+    { x: 14, y: 30, w: 34, h: 30, fill: 'rgba(228,232,238,1)' },
     /* a second hot pinpoint just off the key — the true white catches */
-    { x: 52, y: 48, w: 14, h: 12, fill: 'rgba(226,244,255,1)' },
+    { x: 52, y: 48, w: 14, h: 12, fill: 'rgba(240,242,246,1)' },
     /* fill: cool, weaker, opposite side */
-    { x: 152, y: 44, w: 26, h: 22, fill: 'rgba(198,236,252,0.75)' },
+    { x: 152, y: 44, w: 26, h: 22, fill: 'rgba(204,212,222,0.75)' },
     /* rim: narrow bright cyan, behind — the chromatic catches */
-    { x: 216, y: 26, w: 18, h: 30, fill: 'rgba(150,244,255,0.95)' },
-    { x: 188, y: 62, w: 12, h: 12, fill: 'rgba(120,232,255,0.85)' },
+    { x: 216, y: 26, w: 18, h: 30, fill: 'rgba(' + sideKey.join(',') + ',0.95)' },
+    { x: 188, y: 62, w: 12, h: 12, fill: 'rgba(' + sideKey.join(',') + ',0.85)' },
     /* a low silver bounce so downward-tilted facets are not uniformly dead */
-    { x: 96, y: 82, w: 20, h: 14, fill: 'rgba(228,244,255,0.55)' },
+    { x: 96, y: 82, w: 20, h: 14, fill: 'rgba(226,230,236,0.55)' },
 
     /* THE CAMERA-SIDE KEY — the reason the body had no silver catches.
 
@@ -169,7 +169,7 @@ function buildEnvironment(renderer, palette) {
        Back to a middle size. Large enough that the flared chest has something
        to read by now the shell is gone, small enough that facets still hit or
        miss it rather than all catching it together. */
-    { x: 202, y: 50, w: 21, h: 18, fill: 'rgba(210,236,255,1)' },
+    { x: 202, y: 50, w: 21, h: 18, fill: 'rgba(226,230,236,1)' },
     /* THE SHOULDER-TOP CARD.
 
        The deltoids were rendering as flat black masses, and the geometry was
@@ -187,8 +187,8 @@ function buildEnvironment(renderer, palette) {
        tube end standing proud of the chest rather than anything to do with
        lighting. The brief is explicit that the shoulder must not become one
        giant dark mass, and this card is the only thing keeping it from that. */
-    { x: 68, y: 54, w: 28, h: 22, fill: 'rgba(206,234,255,0.84)' },
-    { x: 176, y: 68, w: 18, h: 15, fill: 'rgba(226,246,255,0.85)' },
+    { x: 68, y: 54, w: 28, h: 22, fill: 'rgba(222,226,232,0.84)' },
+    { x: 176, y: 68, w: 18, h: 15, fill: 'rgba(232,236,240,0.85)' },
 
     /* R96 — THE BLUE SIDE KEY. Reference A is lit from the left: an electric
        blue gradient runs down the whole outer contour of the lowered arm, the
@@ -200,7 +200,7 @@ function buildEnvironment(renderer, palette) {
        Right-facing planes see x 64-128 and do not catch it, which is the
        asymmetry the reference has. Electric blue, not white, so the contour
        stays chromatic and the silver catches stay rare. */
-    { x: 8, y: 36, w: 64, h: 58, fill: 'rgba(' + sideKey.join(',') + ',0.80)' },
+    { x: 8, y: 36, w: 64, h: 58, fill: 'rgba(' + sideKey.join(',') + ',0.65)' },
 
     /* A NOTE ON WHAT IS DELIBERATELY NOT HERE.
 
@@ -258,13 +258,13 @@ function buildEnvironment(renderer, palette) {
        distinction rule 3 in CLAUDE.md draws. The two low cards stay, at a low
        value, because the undersides of the arms genuinely were reflecting an
        empty hemisphere; that is a gap in coverage rather than a level. */
-    { x: 66, y: 34, w: 60, h: 44, fill: 'rgba(150,186,208,0.26)' },
-    { x: 120, y: 66, w: 72, h: 40, fill: 'rgba(120,160,186,0.22)' },
-    { x: 232, y: 54, w: 56, h: 44, fill: 'rgba(132,172,198,0.24)' },
-    { x: 4, y: 70, w: 52, h: 38, fill: 'rgba(112,150,178,0.20)' },
-    { x: 172, y: 18, w: 48, h: 32, fill: 'rgba(140,178,204,0.18)' },
-    { x: 148, y: 92, w: 64, h: 34, fill: 'rgba(118,156,184,0.20)' },
-    { x: 28, y: 96, w: 58, h: 32, fill: 'rgba(110,148,178,0.18)' }
+    { x: 66, y: 34, w: 60, h: 44, fill: 'rgba(160,168,180,0.26)' },
+    { x: 120, y: 66, w: 72, h: 40, fill: 'rgba(132,140,152,0.22)' },
+    { x: 232, y: 54, w: 56, h: 44, fill: 'rgba(142,150,162,0.24)' },
+    { x: 4, y: 70, w: 52, h: 38, fill: 'rgba(122,130,142,0.20)' },
+    { x: 172, y: 18, w: 48, h: 32, fill: 'rgba(150,158,170,0.18)' },
+    { x: 148, y: 92, w: 64, h: 34, fill: 'rgba(128,136,148,0.20)' },
+    { x: 28, y: 96, w: 58, h: 32, fill: 'rgba(120,128,140,0.18)' }
   ];
   /* R91 — ANGULAR STRUCTURE, so a turning facet has something to travel THROUGH.
 
@@ -299,7 +299,7 @@ function buildEnvironment(renderer, palette) {
     var sh = 52 + wob * 28;
     var grad2 = g.createLinearGradient(sx - sw, 0, sx + sw, 0);
     grad2.addColorStop(0, 'rgba(0,0,0,0)');
-    grad2.addColorStop(0.5, 'rgba(172,212,236,' + sa.toFixed(3) + ')');
+    grad2.addColorStop(0.5, 'rgba(180,190,204,' + sa.toFixed(3) + ')');
     grad2.addColorStop(1, 'rgba(0,0,0,0)');
     g.fillStyle = grad2;
     g.fillRect(sx - sw, sy, sw * 2, sh);

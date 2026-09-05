@@ -37,7 +37,7 @@ export function createLights(options) {
   /* Cool white key — not cyan. A cyan key would tint every lit plane and the
      body would start reading as "a glowing cyan object", which the reference
      explicitly is not. The cyan belongs to the edges and the rim. */
-  var key = new DirectionalLight(new Color(0xd8ecff), 6.0);   /* R99: 5.5 -> 6.0, the lit planes brighter while the fill falls */
+  var key = new DirectionalLight(new Color(0xe6ebf2), 6.0);   /* R99: 5.5 -> 6.0, the lit planes brighter while the fill falls */
   key.position.set(-4.2, 7.4, 6.2);
   key.castShadow = false;
   if (key.castShadow) {
@@ -70,11 +70,11 @@ export function createLights(options) {
      was 44%. A softer fill from the right is what lets the far side of every
      pair (pecs, deltoids, quad heads) fall away, which is the local contrast
      the brief asks for. */
-  var fill = new DirectionalLight(new Color(0x9fb8d2), 0.80);   /* R97: 1.4 -> 1.0; R99: 0.80, the far side falls further */
+  var fill = new DirectionalLight(new Color(0xb0b8c4), 0.80);   /* R97: 1.4 -> 1.0; R99: 0.80, the far side falls further */
   fill.position.set(5.6, 3.0, 4.0);
 
   /* Rim — cyan, from behind and above. This is what draws the lit contour. */
-  var rim = new DirectionalLight(new Color(T('hero', 0x49dcff)), 2.2);
+  var rim = new DirectionalLight(new Color(T('hero', 0x49dcff)), 1.0);
   rim.position.set(1.4, 4.6, -7.0);
 
   /* A second rim from the other side, weaker, so the silhouette closes on
@@ -84,7 +84,7 @@ export function createLights(options) {
      deltoid's outer crest; the left-side rim was too weak and too far behind
      him to reach either. Side-rear now, so the left contour of the arm, the
      deltoid and the quad's sweep all take it. */
-  var rim2 = new DirectionalLight(new Color(T('worldAccent', 0x3fb8e8)), 2.6);
+  var rim2 = new DirectionalLight(new Color(T('worldAccent', 0x3fb8e8)), 1.2);
   rim2.position.set(-6.4, 3.4, -3.2);
 
   /* Floor bounce: the grid is a light source in the reference, and a point
@@ -179,11 +179,11 @@ export function createLights(options) {
      to destroy a dark end — the difference here is that it is raising it to a
      COLOUR rather than to grey, and the hierarchy is carried by hue as much as
      by value from this point on. */
-  var hemi = new HemisphereLight(new Color(0x7186a4), new Color(0x2a3442), 0.34);   /* R97: 0.55 -> 0.40; R99: 0.34 */
+  var hemi = new HemisphereLight(new Color(0x8a929e), new Color(0x2a2e36), 0.34);   /* R97: 0.55 -> 0.40; R99: 0.34 */
 
   /* Deliberately tiny. The dark side of a crystal should be nearly black —
      that contrast is the material. */
-  var ambient = new AmbientLight(new Color(0x3c4a60), 0.22);   /* R97: 0.30 -> 0.22 */
+  var ambient = new AmbientLight(new Color(0x444a54), 0.22);   /* R97: 0.30 -> 0.22 */
 
   var all = [key, fill, rim, rim2, bounce, chestLamp, faceLamp, hemi, ambient];
   if (group) all.forEach(function (l) { group.add(l); });
@@ -203,8 +203,8 @@ export function createLights(options) {
     var k = Math.max(0, Number(scale) || 1);
     key.intensity = 6.0 * k;
     fill.intensity = 0.80 * k;
-    rim.intensity = 2.2 * k;
-    rim2.intensity = 2.6 * k;
+    rim.intensity = 1.0 * k;   /* R102: 2.2 -> 1.0, the theme is an accent on a platinum body */
+    rim2.intensity = 1.2 * k;  /* R102: 2.6 -> 1.2 */
     bounce.intensity = 1.05 * k;
     chestLamp.intensity = 0.85 * k;
     faceLamp.intensity = 0.95 * k;

@@ -154,6 +154,19 @@ build's darks were 96%). It is the authority on MASS, OCCLUSION and
 CONTINUITY; the platinum pair remains the authority on the coat and the
 head plate.
 
+There is now an ELEVENTH set, `reference/mrmah-refK-r102-{male,female}-
+{front,rear}.png` (R102), and it is the SILHOUETTE, CARVING and MATERIAL
+authority for the body: a male that is upper-body dominant (lat block held
+from t 0.37 to 0.42 and a pinch to 0.128 of height at the waist, lean
+straight thighs, a knee band at t 0.75, a calf at 0.80, a restrained glute
+pair), a female with muscular shoulders and arms, a 0.095 waist, a 0.243
+hip and a full glute pair with a shelf and a cleft — and BOTH a dark
+platinum body: graphite planes, near-black cavities, silver crests, rare
+white, the theme only as refraction, rims and glows. Landmarks were read
+by hand off a grid and live in `validation/mrmah3d/r102/18-measurement-
+summary.json`. The head stays canonical (0.24 of height where these
+references are 0.15), so proportion is judged by body-internal ratios.
+
 **Expect the silhouette score against the canonical front to be low, and do not
 chase it.** The head is deliberately 30% smaller than the canonical measurement
 and the shoulder line 0.2 units higher; a comparison against a file the design
@@ -313,6 +326,7 @@ must not be claimed from headless runs.
 | `reference/mrmah-refG-r97-{threequarter,rear}.png` | R97 — the rear and three-quarter authority: back anatomy, deltoid domes, muscle bellies |
 | `reference/mrmah-refH-platinum-{front,threequarter}.png` | R98 — the MATERIAL and HEAD authority: the selective platinum coat, the plate head with its face screen, the elbow hinge |
 | `reference/mrmah-refI-godform-front.jpg` | R99 — the GODFORM: mass, occlusion and anatomical continuity |
+| `reference/mrmah-refK-r102-{male,female}-{front,rear}.png` | R102 — the SILHOUETTE, CARVING and DARK-PLATINUM authority: lat block and pinch, lean thighs, knee and calf, glute pair, graphite body with silver crests and the theme as accent |
 | `reference/mrmah-refE-bodybuilder-{a,b}.png` | the body-proportion authority where Reference A is silent |
 | `reference/mrmah-refD-guardian-{a,b,c,d}.png` | the authority on material, light and world |
 | `reference/mrmah-refA-anatomical.png` | proportion and anatomy where the bodybuilder set is silent |
@@ -1225,3 +1239,72 @@ hairline light seam up each lit edge, none inside |x| < 3.5. One of them
 first stood at x 4.4 and its beam ran straight up behind the raised hand's
 crystal; a structure's screen column has to be checked against the pose,
 not only against the head.
+
+### The body is DARK PLATINUM, and the theme is an accent (R102 material law)
+
+`reference/mrmah-refK-r102-{male,female}-{front,rear}.png` are a
+graphite-and-silver body under a violet theme: broad planes dark silver,
+cavities near-black, crests mid platinum, rare white peaks, and the theme
+present only as refraction, the spear's internal light, rims and glows.
+So the chromatic facets' own hue (`PALETTE.crystalTint`) is a cool neutral
+now rather than the sapphire edge colour, the deep colour is graphite, the
+base albedo graphite-silver, the environment's hot and midtone cards are
+moonlight silver (the two chromatic rim cards follow the theme — they had
+been fixed cyan under gold), and the key, fill, hemisphere and ambient
+lights are neutral. Everything that carries the theme is still there and
+is tuned as an accent: rim floor 0.12, theme rim lights 1.0 / 1.2, side key
+0.65, coat reflection tint 0.12, core light 2.0.
+
+Three things that were only found by ISOLATION (scratch `isolate.mjs`:
+render with one transport off, measure, look):
+
+- **The cyan wireframe was the SEAMS.** The torso crop showed a cyan wire
+  along every facet edge. Halving the edge lines changed nothing; with the
+  coat off the wires vanished and with the lines off they stayed. The seam
+  term (theme colour along coated facet rims) is now a silver hairline
+  carrying a third of the theme at a third of the weight.
+- **Albedo, cards and lights together moved the blue share by nothing** —
+  because the metric was lying. A cool near-black (20,24,32) has
+  saturation 0.37 and passed the "blue" gate. The gate now also requires
+  absolute chroma ≥ 28. With every theme transport off, the strict share is
+  what the eye agrees with; the internal light alone is 13 points of it.
+- **The core light at 3.6 flooded the abdominal valleys.** It bought
+  R101's gold-penetration number and cost the carving; it is 2.0 again.
+
+### Carving is read as SHADOW, so the valley has to lose value (R102 cavity)
+
+Deeper grooves in the shape functions did not read: a valley lit like the
+crest beside it is a line, not a cut. `loft` now writes a per-vertex
+`aCavity` — how far the anatomical multiplier pulls a vertex inside its
+ring, plus a `cav` a ring may declare outright for a crease (under the
+pec, between abdominal blocks, the belt, the knee, under the glute) —
+and the crystal shader takes albedo, reflection, coat and rim out of it.
+It interpolates across each face into a gradient toward the valley, which
+is what a change of surface depth looks like. Geometry-derived, so it can
+never disagree with the relief; `segment` gets it for free because it
+builds through `loft`.
+
+### The knee is read in depth, not in width
+
+Measured on the R102 front the knee is 0.092 of height against a calf of
+0.101 — a 9% step — and the thigh runs nearly straight from the hip to it.
+A first cut with a 0.128 knee under a 0.176 thigh and a 0.160 calf read,
+on the previous-vs-new sheet, as an egg on a bulb on a stem. The band's
+identity comes from `kneeShape`'s front notch and its cavity; the
+silhouette keeps the long lean line (0.150 / 0.162).
+
+### The lat is a block and a pinch, not a funnel
+
+The references hold 0.18 of height from under the armpit (t 0.37) to
+t 0.42 and then pinch to 0.128 at 0.47; this table funnelled evenly from
+the pec-under ring to the belt. `coreShape` takes `latK`, a lateral lobe
+set slightly behind the side angle, carried by the two rings above the
+pinch, and the two rings below it narrowed.
+
+### Reference segmentation: read the grid
+
+Every automatic mask of the R102 references failed — brightness took the
+violet mist, a "not violet" rule lost the body's own violet reflections.
+The landmarks were read by hand off a 5% grid (scratch `grid.mjs`) and
+recorded in `validation/mrmah3d/r102/18-measurement-summary.json`. An
+hour of threshold tuning is worth less than ten minutes with a ruler.
