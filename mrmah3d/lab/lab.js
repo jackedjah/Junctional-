@@ -88,7 +88,7 @@ function mount() {
       preserveDrawingBuffer: true
     });
     window.__MRMAH_LAB.mounted = true;
-    if (debugParam === 'mass' || debugParam === 'groups') scene.setDebugView(debugParam);
+    if (debugParam === 'mass' || debugParam === 'groups' || debugParam === 'clay') scene.setDebugView(debugParam);
     if (debugParam === 'gray') host.style.filter = 'grayscale(1)';
     if (faceParam && scene.setDisplayIcon) scene.setDisplayIcon(faceParam);
   } catch (err) {

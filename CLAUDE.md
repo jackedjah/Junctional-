@@ -167,6 +167,19 @@ by hand off a grid and live in `validation/mrmah3d/r102/18-measurement-
 summary.json`. The head stays canonical (0.24 of height where these
 references are 0.15), so proportion is judged by body-internal ratios.
 
+There is now a TWELFTH set, `reference/mrmah-refL-r106-{godform-plate,
+torso-core,arms-shoulders,arm-strips,muscle-relief}.png` (R106), the anatomy
+sheets of the master convergence brief, and the godform plate is the current
+SILHOUETTE authority. Measured on its front figure (905 px of height): head
+0.175, shoulders 0.297 at t 0.24, waist 0.100 at t 0.435, thigh 0.22 at
+t 0.54, knee 0.128 at t 0.69, calf 0.135 at t 0.76 and a straight cone to
+the point; on its rear the glute pair is 0.227 at t 0.52. The lower body is
+ONE teardrop as wide as three quarters of the shoulders — never two legs.
+The sheets' clay studies are the macro-form target: curved, pumped, capped
+muscles with origin, belly and insertion; the crystal faceting is micro form
+laid over that and may not decide the contour. The canonical front remains
+the measurement baseline.
+
 **Expect the silhouette score against the canonical front to be low, and do not
 chase it.** The head is deliberately 30% smaller than the canonical measurement
 and the shoulder line 0.2 units higher; a comparison against a file the design
@@ -326,6 +339,7 @@ must not be claimed from headless runs.
 | `reference/mrmah-refG-r97-{threequarter,rear}.png` | R97 — the rear and three-quarter authority: back anatomy, deltoid domes, muscle bellies |
 | `reference/mrmah-refH-platinum-{front,threequarter}.png` | R98 — the MATERIAL and HEAD authority: the selective platinum coat, the plate head with its face screen, the elbow hinge |
 | `reference/mrmah-refI-godform-front.jpg` | R99 — the GODFORM: mass, occlusion and anatomical continuity |
+| `reference/mrmah-refL-r106-{godform-plate,torso-core,arms-shoulders,arm-strips,muscle-relief}.png` | R106 — the anatomy sheets: the godform plate is the SILHOUETTE and teardrop authority; the clay studies are the macro-form target |
 | `reference/mrmah-refK-r102-{male,female}-{front,rear}.png` | R102 — the SILHOUETTE, CARVING and DARK-PLATINUM authority: lat block and pinch, lean thighs, knee and calf, glute pair, graphite body with silver crests and the theme as accent |
 | `reference/mrmah-refE-bodybuilder-{a,b}.png` | the body-proportion authority where Reference A is silent |
 | `reference/mrmah-refD-guardian-{a,b,c,d}.png` | the authority on material, light and world |
@@ -1103,7 +1117,7 @@ region only when both boxes hold the same anatomy.
 
 ### The silhouette test is a debug view, and it found what the render hid
 
-`?debug=mass` on the lab renders every solid flat near-black with no lines
+`?debug=mass` on the lab renders every solid flat near-black with no lines (R106 adds `clay`, a lit matte grey — the sculpt test)
 (`setDebugView` in mrmah.js; `groups` gives each anatomical group one flat
 colour, `gray` desaturates the stage). Run it before judging continuity: with
 the material stripped, the deltoid caps stood as bumps ABOVE the trapezius
@@ -1381,3 +1395,65 @@ violet mist, a "not violet" rule lost the body's own violet reflections.
 The landmarks were read by hand off a 5% grid (scratch `grid.mjs`) and
 recorded in `validation/mrmah3d/r102/18-measurement-summary.json`. An
 hour of threshold tuning is worth less than ten minutes with a ruler.
+
+### The clay view is the gate, and it found what the crystal hid (R106)
+
+`?debug=clay` (`setDebugView('clay')`) renders every solid as a matte
+Lambert clay under the scene's own lights — no lines, no coat, no facet
+classes. The first clay capture of the R105 build showed four black
+horizontal SLOTS across the front torso (two abdominal creases at
+0.42 / -0.06, the under-pec crease whose shelf overhung it by 0.2 units,
+and the clavicle groove) and a flat lid with a dark slot under it across
+the shoulders from behind. None of that was visible in the crystal render,
+because the coat's catches and the facet lottery drew the eye across the
+seams. That is the "armour plating" the R106 brief called a regression, and
+it was the amplitude of the ring-to-ring steps, not the anatomy. Run the
+clay view before judging any geometry change; if the macro form does not
+read as curved, pumped anatomy in clay, no material will make it.
+
+### Anatomy is authored at two amplitudes, and the clay decides which
+
+Two lessons from earlier passes pull in opposite directions: "author
+against the size of what it displaces" (a 10% lobe is under a pixel) and
+"bulge-and-crease rings 0.06 apart are corrugation". The clay view
+resolves them. A ROW step (ring to ring, in y) reads as a plate seam at
+anything past ~16% and must stay small — the ab pairs are 0.24 against a
+0.06 crease, and the value does the rest through the cavity term. A
+COLUMN step (around the ring, in angle) can be large — the quad heads are
+0.34, the glute pair 0.40 — because a vertical change of plane reads as a
+muscle belly, never as armour.
+
+### A ledge is a ring wider than both its neighbours
+
+The shoulder-line ring carried a 0.72 trapezius lobe while the ring 0.02
+below carried none: worked through at the rear-side angle it stood 0.18
+proud of the ring under it and 0.04 proud of the ring above — a lid. The
+same class of fault appeared twice more in one pass: a "back hollow" added
+to the ring under the shoulder line made THAT ring narrower than both
+neighbours (a groove, with the band above it facing down and dark), and
+the pec crown ring's extra depth bulged the BACK as well as the front. A
+loft's depth must be monotonic along any contour that is meant to read as
+one surface; put the dome in the shape's `k`, not in `d`, and spread a
+mass like the trapezius across the rings it climbs (0.17 / 0.30 / 0.26 /
+0.17 here) rather than putting it on one.
+
+### The teardrop is measured against the waist, not the shoulders
+
+The R106 plate's lower body is 0.22 of height at the thigh against a 0.10
+waist and a 0.30 shoulder span — a teardrop as wide as three quarters of
+the shoulders. This build keeps the canonical head, so its shoulders are
+proportionally wider than the plate's; matching hip-to-shoulder would have
+made a pear. The waist already matched the plate, so every row below it
+was re-widened against the waist (hip/waist 1.30 -> 1.95, plate 2.2), and
+the shoulders were left as the V's authority. The knee and calf sit a
+little under the plate on purpose: at the plate's values the taper read as
+a thigh bulb over a calf bulb, and ONE convergence with a swell on it was
+worth more than two matched widths.
+
+### A drum at a joint shows its disc; a ball does not
+
+Sizing the elbow knob to the upper arm's end (so it filled the wedge that
+opens on the outside of the bend) put a flat bright disc on every elbow in
+the three-quarter view — the capped-tube lesson again, at a joint. A
+segment whose profile falls to half at both ends (0.5 + 0.5 sin) is a ball
+whose end discs sit inside both tubes at any bend angle.

@@ -11,7 +11,7 @@
    floated, bobbed or scaled by moving one group without any part drifting
    relative to another. */
 
-import { Group, MathUtils, MeshBasicMaterial } from '../../vendor/three/three.module.min.js';
+import { Group, MathUtils, MeshBasicMaterial, MeshLambertMaterial } from '../../vendor/three/three.module.min.js';
 import { createCrystalMaterials } from './materials.js';
 import { buildHead } from './head.js';
 import { buildBody } from './body.js';
@@ -112,6 +112,10 @@ export function createMrMah(options) {
       crystal.glow.position.y = crystal.restY + lev;
       crystal.plate.rotation.z = Math.sin(time * 0.55) * 0.07;
       crystal.glow.rotation.z = crystal.plate.rotation.z;
+      /* R106: PRECESSION — the plate turns slowly about its own axis (a
+         40-second revolution) so its facets travel through the light; the
+         glow card faces the camera and does not turn. */
+      crystal.plate.rotation.y = time * 0.16;
     }
 
     if (reduced) {
@@ -306,6 +310,10 @@ export function createMrMah(options) {
          'groups'  one flat colour per anatomical group, so the head, torso,
                    each deltoid, upper arm, forearm and hand can be told apart
                    and their overlaps checked.
+         'clay'    (R106) every solid as a matte mid-grey clay under the
+                   scene's own lights, no lines, no coat, no facet classes:
+                   the sculpt test — does the MACRO form read as curved,
+                   pumped anatomy before the crystal is allowed to speak?
          null      restore the crystal.
 
        Materials are swapped, never edited, and the originals are kept on the
@@ -335,13 +343,25 @@ export function createMrMah(options) {
               if (o.name.indexOf(GROUP_COLOURS[i][0]) !== -1) { colour = GROUP_COLOURS[i][1]; break; }
             }
           }
-          if (!o.userData.__dbg) o.userData.__dbg = new MeshBasicMaterial({ toneMapped: false });
-          o.userData.__dbg.color.setHex(colour);
-          o.material = o.userData.__dbg;
+          if (mode === 'clay') {
+            /* Lit clay: a Lambert surface has no specular term, so nothing but
+               the form's own turning can make a value change. Emitters stay
+               flat so the face and symbols still locate. */
+            var emitter = /eye|smile|emblem|transport|throat|hand-crystal|display|glass/.test(o.name);
+            if (!o.userData.__clay) o.userData.__clay = new MeshLambertMaterial({ toneMapped: false });
+            o.userData.__clay.color.setHex(emitter ? 0x1a1c22 : 0x9a9ea6);
+            o.userData.__clay.emissive.setHex(emitter ? 0x000000 : 0x14161a);
+            o.material = o.userData.__clay;
+          } else {
+            if (!o.userData.__dbg) o.userData.__dbg = new MeshBasicMaterial({ toneMapped: false });
+            o.userData.__dbg.color.setHex(colour);
+            o.material = o.userData.__dbg;
+          }
         } else if (o.userData.__mat) {
           o.material = o.userData.__mat;
           delete o.userData.__mat;
           if (o.userData.__dbg) { o.userData.__dbg.dispose(); delete o.userData.__dbg; }
+          if (o.userData.__clay) { o.userData.__clay.dispose(); delete o.userData.__clay; }
         }
       });
       return mode;

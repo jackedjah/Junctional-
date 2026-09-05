@@ -389,10 +389,10 @@ export function buildBody(materials, P) {
           /* R102: the three heads are CARVED — the grooves between them are
              twice as deep (and the cavity term in the shader keeps them
              dark), the rear delt is fuller for the rear views. */
-          var front = 0.22 * Math.exp(-Math.pow(d / 0.66, 2));   /* R103: the anterior delt overlaps the pec; R105: fuller */
-          var rear = 0.12 * Math.exp(-Math.pow((ad - Math.PI) / 0.76, 2));
-          var lateral = 0.06 * Math.exp(-Math.pow((ad - Math.PI / 2) / 0.45, 2));
-          var grooves = -0.120 * (Math.exp(-Math.pow((ad - 0.95) / 0.20, 2)) + Math.exp(-Math.pow((ad - 2.25) / 0.20, 2)));
+          var front = 0.17 * Math.exp(-Math.pow(d / 0.72, 2));   /* R103: the anterior delt overlaps the pec; R105: fuller; R106: broader, lower */
+          var rear = 0.10 * Math.exp(-Math.pow((ad - Math.PI) / 0.80, 2));
+          var lateral = 0.05 * Math.exp(-Math.pow((ad - Math.PI / 2) / 0.55, 2));
+          var grooves = -0.045 * (Math.exp(-Math.pow((ad - 0.95) / 0.22, 2)) + Math.exp(-Math.pow((ad - 2.25) / 0.22, 2)));   /* R106: in clay the 0.12 grooves cut the cap into three lumps; the reference's cap is ONE dome whose heads are plane changes */
           return 1 + (front + rear + lateral + grooves) * belly;
         },
         zoneAt: function (d, t) {

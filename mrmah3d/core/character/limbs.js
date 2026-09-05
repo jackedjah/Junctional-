@@ -150,20 +150,25 @@ function palmGeometry(dir, spec) {
    rather than a shortening. `curl` 0 is straight, 1 fully folded toward the
    palm's front (+z). Returns the geometries it made. */
 function buildDigit(hand, materials, spec, base, dirX, len, radius, curl, edges) {
-  var owned = [];
-  var l1 = len * 0.56, l2 = len * 0.44;
-  /* proximal segment: leans forward by the curl */
-  var a1 = curl * 0.85;
+  /* R106 — THREE PHALANGES. The arms sheet's hand is articulated: proximal,
+     middle and distal segments with a knuckle between each, the curl
+     progressing along the finger so a relaxed hand hangs in a hook and a
+     presenting hand cups. Two segments read as a stub with a bend. Still
+     merged into the one hand geometry, so it costs no draw. */
+  var l1 = len * 0.42, l2 = len * 0.32, l3 = len * 0.26;
+  var a1 = curl * 0.70;
   var mid = [base[0] + dirX * l1, base[1] + Math.cos(a1) * l1, base[2] + Math.sin(a1) * l1];
-  var a2 = curl * 1.75;
-  var tip = [mid[0] + dirX * l2 * 0.6, mid[1] + Math.cos(a2) * l2, mid[2] + Math.sin(a2) * l2];
-  var g1 = segment(base, mid, radius, radius * 0.92, 6,
-    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
-  var g2 = segment(mid, tip, radius * 0.92, radius * 0.66, 6,
-    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
+  var a2 = curl * 1.45;
+  var mid2 = [mid[0] + dirX * l2 * 0.7, mid[1] + Math.cos(a2) * l2, mid[2] + Math.sin(a2) * l2];
+  var a3 = curl * 2.05;
+  var tip = [mid2[0] + dirX * l3 * 0.5, mid2[1] + Math.cos(a3) * l3, mid2[2] + Math.sin(a3) * l3];
+  var o = { depthRatio: 0.86, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat };
+  var g1 = segment(base, mid, radius, radius * 0.94, 6, o);
+  var g2 = segment(mid, mid2, radius * 0.94, radius * 0.84, 6, o);
+  var g3 = segment(mid2, tip, radius * 0.84, radius * 0.60, 6, o);
   /* The segments are returned, not clad: the hand merges every part into ONE
      geometry (see buildHand) so a hand costs three draws, not thirty. */
-  return [g1, g2];
+  return [g1, g2, g3];
 }
 
 function buildHand(materials, spec, options) {
@@ -213,13 +218,13 @@ function buildHand(materials, spec, options) {
   /* R99: the lowered hand is a FIST — the godform reference closes it — and
      with two-segment jointed digits a firm curl reads as knuckles rather than
      as the box-with-stubs the old one-piece digits made at this value. */
-  var curl = opts.open ? 0.22 : 0.56;
+  var curl = opts.open ? 0.18 : 0.40;   /* R106: the relaxed hand HANGS its long fingers in a gentle hook (the plate's lowered hand), the presenting one cups */
   for (var i = 0; i < n; i++) {
     var t = n === 1 ? 0.5 : i / (n - 1);
     var x = (t - 0.5) * spec.palmHalfWidth * 1.50;
     /* Splay the outer digits and shorten them slightly. */
     var splay = (t - 0.5) * (opts.open ? 0.30 : 0.10);
-    var len = spec.digitLength * (1 - Math.abs(t - 0.5) * 0.30);
+    var len = spec.digitLength * (1 - Math.abs(t - 0.5) * 0.26 - (t > 0.9 ? 0.10 : 0));   /* R106: the little finger shorter */
     var base = [x, spec.palmLength, spec.palmHalfDepth * 0.15];
     parts.push.apply(parts, buildDigit(hand, materials, spec, base, Math.sin(splay), len,
       spec.digitRadius, curl, HAND_EDGES));
@@ -378,10 +383,17 @@ function buildArm(materials, spec, options) {
      a cuff ring; both hide the segments' end discs — the flat pale facet that
      showed at every elbow — and read as machined joints in the crystal. Drawn
      in the cavity material (dark, barely reflective), no edge lines. */
-  var eR = spec.foreRadius * 0.88;   /* R105: the knob read as a block */
-  var elbowGeo = segment([0, -eR * 0.55, 0], [0, eR * 0.55, 0], eR, eR, 8,
-    { depthRatio: 1.0, crystal: 0.015, steps: 2,
-      profile: function (t) { return 0.70 + Math.sin(t * Math.PI) * 0.30; } });   /* R99: flush with the tube, not proud of it */
+  /* R106: sized to the UPPER arm's end (0.126) rather than the forearm's
+     start (0.10): the wedge that opens on the outside of the bend between
+     the two tubes' end discs was a black gap with a flat lid in the clay
+     view; the knob now fills it and its peak is flush with the larger tube. */
+  var eR = spec.upperRadius * 0.78;
+  /* A BALL, not a drum: its end discs closed to half the radius so they sit
+     inside both tubes (a drum's disc showed as a bright flat lid on the
+     outside of the bend as soon as it was sized to the upper arm). */
+  var elbowGeo = segment([0, -eR * 0.95, 0], [0, eR * 0.95, 0], eR, eR, 8,
+    { depthRatio: 1.0, crystal: 0.015, steps: 3,
+      profile: function (t) { return 0.50 + Math.sin(t * Math.PI) * 0.50; } });
   var elbowKnob = new Mesh(elbowGeo, materials.joint || materials.cavity);
   elbowKnob.name = root.name + '-elbow-knob';
   elbowJoint.add(elbowKnob);
@@ -421,7 +433,7 @@ function buildArm(materials, spec, options) {
   elbowJoint.add(wristJoint);
 
   /* The wrist cuff, in the wrist's own frame so it rings the forearm's end. */
-  var cR = spec.wristRadius * 1.00;   /* R99: 1.22 -> 1.10; R105: 1.00 */
+  var cR = spec.wristRadius * 0.94;   /* R99: 1.22 -> 1.10; R105: 1.00; R106: 0.94 */
   var cuffGeo = segment([0, -0.030, 0], [0, 0.026, 0], cR, cR * 0.96, 8,
     { depthRatio: 1.0, crystal: 0.01, steps: 1 });
   var cuff = new Mesh(cuffGeo, materials.joint || materials.cavity);

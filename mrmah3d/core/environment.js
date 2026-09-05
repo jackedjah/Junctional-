@@ -872,8 +872,14 @@ export function createEnvironment(options) {
      averaged 83 luma against guardian-a's 72 over the same rows, and at that
      value it was the brightest large area in the frame after him — the
      mountains were being read against a wall of it. */
+  /* R106: the mist takes a TENTH of the theme's atmosphere colour — the
+     master brief asks for theme-reactive smoke, subtle; the range and the
+     floor stay steel, the emitters carry the theme, and the mist sits
+     between as air the light has passed through. Under blue it measures the
+     same steel it was. */
+  var mistColour = new Color(0xc2dcf2).lerp(new Color(themeHex('atmosphere', 0xc2dcf2)), 0.10);
   var mistMat = new MeshBasicMaterial({
-    map: mistTex, color: new Color(0xc2dcf2), transparent: true, opacity: 0.90,
+    map: mistTex, color: mistColour, transparent: true, opacity: 0.90,
     depthWrite: false, toneMapped: false,
     side: DoubleSide, fog: false
   });

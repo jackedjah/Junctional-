@@ -708,7 +708,7 @@ if (exists('CLAUDE.md')) {
   /* no authored shoulder stroke: the deltoid's ridge line is off */
   ok('R99-no-shoulder-ridge-stroke', /if \(ARMS_\.deltoidRidge\)/.test(body) && !/deltoidRidge:\s*true/.test(propsSrc));
   /* the lowered hand is a fist */
-  ok('R99-lowered-hand-is-a-fist', /var curl = opts\.open \? 0\.22 : 0\.5[0-9]/.test(limbs));
+  ok('R99-lowered-hand-is-a-fist', /var curl = opts\.open \? 0\.[12][0-9] : 0\.[3-5][0-9]/.test(limbs));   /* R106: a relaxed hook, three phalanges */
   /* the deltoid's root is buried in the chest, inboard of the pec's outer plane */
   ok('R99-deltoid-root-buried', /innerX: 0\.2[0-9]{2}/.test(body));
   /* the shadow-first debug views (brief §39): mass silhouette, anatomical groups, grayscale */
@@ -766,7 +766,7 @@ if (exists('CLAUDE.md')) {
   ok('R100-trapezius-ring-and-zone', /function trapZone/.test(propsSrc) && /zoneAt: trapZone/.test(propsSrc));
   ok('R100-clavicle-groove', /function subclavicleShape/.test(propsSrc) && /function subclavicleZone/.test(propsSrc) && /zoneAt: subclavicleZone/.test(propsSrc));
   ok('R100-serratus-saw', /tooth/.test(propsSrc) && /SERRATUS/.test(propsSrc));
-  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.62\) \* 0\.[3-6][0-9]0/.test(propsSrc) && /lateralHead/.test(propsSrc));
+  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.[67][0-9]\) \* 0\.[3-6][0-9]0/.test(propsSrc) && /lateralHead/.test(propsSrc));
   ok('R100-radial-forearm-ridge', /var radial = bump\(d, outer \* 0\.95/.test(propsSrc) && /ARMS_\.shapes\.fore\(t, d, foreInner\)/.test(limbs));
   ok('R100-cap-shadow-on-the-arm', /t < 0\.17 && ad > 0\.55/.test(limbs));
   ok('R100-hand-knuckles', /KNUCKLE/.test(limbs) && /spec\.digitRadius \* 1\.22/.test(limbs));
@@ -796,12 +796,12 @@ if (exists('CLAUDE.md')) {
   const neckTop = Number((propsSrc.match(/\{ y: (2\.3[0-9]{2}), w: 0\.010/) || [])[1]);
   ok('R101-head-seated-in-the-neck', neckTop > base && neckTop - base < 0.09, 'head base ' + base.toFixed(3) + ', neck closes at ' + neckTop);
   /* the male arm standard: bigger cap, fuller bicep, lateral head, brachialis, brachioradialis */
-  ok('R101-male-arm-standard', /r0: 0\.2[6-9][0-9]/.test(body) && /bump\(d, 0, 0\.62\) \* 0\.[4-6][0-9]0/.test(propsSrc) &&
-    /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.95\), 0\.40\) \* 0\.[12][0-9]0/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
+  ok('R101-male-arm-standard', /r0: 0\.2[6-9][0-9]/.test(body) && /bump\(d, 0, 0\.[67][0-9]\) \* 0\.[4-6][0-9]0/.test(propsSrc) &&
+    /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.95\), 0\.4[0-9]\) \* 0\.[12][0-9]0/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
     /upperRadius: 0\.1[5-6]0/.test(propsSrc));
   /* three deltoid heads as FORM: front, rear, lateral crest and two grooves */
   /* R102: the grooves between the heads are twice as deep (0.045 -> 0.090) */
-  ok('R101-deltoid-heads-as-form', /var lateral = 0\.06/.test(body) && /var grooves = -0\.[01][0-9]/.test(body));
+  ok('R101-deltoid-heads-as-form', /var lateral = 0\.0[4-6]/.test(body) && /var grooves = -0\.0[2-9][0-9]?/.test(body));   /* R106: ONE dome — the grooves are plane changes, not cuts */
   /* the crystal's own hue is canonical; the theme is light, not paint */
   /* R102: the facets' own hue is a PALETTE constant (cool neutral platinum,
      `PALETTE.crystalTint`), never the theme (`uTint`) and no longer the
@@ -828,6 +828,57 @@ if (exists('CLAUDE.md')) {
      the transport and the carving. The floor is the R101 pre-nudge value. */
   ok('R101-theme-carried-by-transmission', !!coreM && Number(coreM[1]) >= 2.0,
     coreM ? 'coreStrength ' + coreM[1] : 'no coreStrength');
+})();
+
+/* ---- R106 — SUPER-ULTRA REFERENCE CONVERGENCE (the recovery pass) ------- */
+(function () {
+  const propsSrc = read('mrmah3d/core/character/proportions.js');
+  const body = read('mrmah3d/core/character/body.js');
+  const limbs = read('mrmah3d/core/character/limbs.js');
+  const mrmah = read('mrmah3d/core/character/mrmah.js');
+  const lab = read('mrmah3d/lab/lab.js');
+  /* the five R106 anatomy sheets are filed as evidence */
+  ['godform-plate', 'torso-core', 'arms-shoulders', 'arm-strips', 'muscle-relief'].forEach(function (n) {
+    ok('R106-reference-' + n + '-present', exists('reference/mrmah-refL-r106-' + n + '.png'));
+  });
+  /* the clay view: a lit Lambert sculpt test, development only, wired on the lab */
+  ok('R106-clay-debug-view', /mode === 'clay'/.test(mrmah) && /MeshLambertMaterial/.test(mrmah) && /debugParam === 'clay'/.test(lab));
+  /* ONE GODFORM TEARDROP: the widest lower-body row is at least 1.8x the belt
+     (plate: hip 0.22 of height against a 0.10 waist) and the rows converge to
+     the point without a second bulb (each row below the knee narrower than the
+     one above it) */
+  const torsoBlock = propsSrc.slice(propsSrc.indexOf('export var TORSO'), propsSrc.indexOf('export var ARMS'));
+  const rows = [];
+  torsoBlock.replace(/\{ y: ([\d.]+), w: ([\d.]+), d: ([\d.]+)/g, function (m, y, w, d) { rows.push({ y: Number(y), w: Number(w), d: Number(d) }); return m; });
+  const row = y => rows.find(r => Math.abs(r.y - y) < 1e-6);
+  const belt = row(1.480), hip = row(1.130), knee = row(0.780), calf = row(0.640);
+  ok('R106-teardrop-hip-over-belt', !!belt && !!hip && hip.w / belt.w >= 1.8, belt && hip ? (hip.w / belt.w).toFixed(2) : 'rows missing');
+  const below = rows.filter(r => r.y <= 0.640).sort((a, b) => b.y - a.y);
+  ok('R106-teardrop-converges-to-one-point', below.length >= 5 && below.every((r, i) => i === 0 || r.w < below[i - 1].w) && rows[0].w < 0.01,
+    below.map(r => r.w).join(' > '));
+  ok('R106-knee-and-calf-inside-the-taper', !!knee && !!calf && knee.w < calf.w && calf.w < hip.w);
+  /* the abdomen is a curved mass with blocks as relief, not a stack of plates */
+  ok('R106-abs-not-corrugated', /coreShape\(1\.0, 0\.2[0-9]\)/.test(propsSrc) && !/coreShape\(1\.0, -0\.0[0-9]/.test(propsSrc) && !/coreShape\(0\.90, -0\.0[0-9]/.test(propsSrc));
+  /* the pec is a dome: a crown ring between two shoulder rings */
+  ok('R106-pec-crown-ring', /\{ y: 1\.935, w: 0\.3[0-9]{2}, d: 0\.3[0-9]{2}/.test(propsSrc) && /shape: chestShape\(0\.[89][0-9]\), hero: 0\.30/.test(propsSrc));
+  /* the trapezius is a SLOPE across three rings, not a 0.72 ledge on the shoulder line */
+  const trapM = propsSrc.match(/var traps = \(lobe\(a, Math\.PI - 0\.7, 0\.60\) \+ lobe\(a, -Math\.PI \+ 0\.7, 0\.60\)\) \* ([\d.]+);/);
+  ok('R106-trapezius-is-a-slope', !!trapM && Number(trapM[1]) <= 0.40 && /function subclavicleShape\(k, trapK\)/.test(propsSrc) && /subclavicleShape\(1\.0, 0\.1[0-9]\)/.test(propsSrc),
+    trapM ? 'traps ' + trapM[1] : 'no traps lobe');
+  /* the deltoid is ONE dome: the inter-head grooves are plane changes (<= 0.06) */
+  const grooveM = body.match(/var grooves = -([\d.]+) \*/);
+  ok('R106-deltoid-one-dome', !!grooveM && Number(grooveM[1]) <= 0.06, grooveM ? 'grooves ' + grooveM[1] : 'no grooves');
+  /* the hand: three phalanges, fingers longer than the palm, relaxed hook */
+  ok('R106-three-phalanges', /var l1 = len \* 0\.42, l2 = len \* 0\.32, l3 = len \* 0\.26/.test(limbs) && /return \[g1, g2, g3\]/.test(limbs));
+  const palmM = propsSrc.match(/palmLength: ([\d.]+)/), digitM = propsSrc.match(/digitLength: ([\d.]+)/);
+  ok('R106-fingers-longer-than-the-palm', !!palmM && !!digitM && Number(digitM[1]) > Number(palmM[1]) * 1.2);
+  /* the elbow joint is a ball whose end discs hide inside the tubes */
+  ok('R106-elbow-is-a-ball', /profile: function \(t\) \{ return 0\.50 \+ Math\.sin\(t \* Math\.PI\) \* 0\.50; \}/.test(limbs));
+  /* posterior: scapular planes on the chest rings */
+  ok('R106-scapular-planes', /var scapula = /.test(propsSrc) && /\+ scapula\) \* k/.test(propsSrc));
+  /* the crystal precesses; the mist takes a tenth of the theme */
+  ok('R106-crystal-precession', /crystal\.plate\.rotation\.y = time \* 0\.1[0-9]/.test(mrmah));
+  ok('R106-mist-theme-tenth', /themeHex\('atmosphere', 0xc2dcf2\)\), 0\.10\)/.test(read('mrmah3d/core/environment.js')));
 })();
 
 console.log('\n' + pass + '/' + (pass + fail) + ' passed, ' + fail + ' failed');
