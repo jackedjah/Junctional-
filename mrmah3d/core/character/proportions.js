@@ -1274,9 +1274,12 @@ export var ARMS = {
        come in 0.035 / 0.025 so the arm hangs straight — shoulder 0.479,
        elbow 0.550, wrist 0.585 against the R102 reference's 0.46 / 0.53 /
        0.58. */
-    shoulder: [-0.479, 1.961, 0.014],   /* R104: on the cap's axis at 0.7; R107: the axis moved up and in with the smaller dome */
-    elbow: [-0.550, 1.455, 0.10],   /* R103: the reference's lowered arm hangs STRAIGHT and close — elbow in, shorter */
-    wrist: [-0.585, 1.105, 0.14],
+    /* R108 c: the cap's axis ends at 0.605 / 1.915 (body.js), so the joint on
+       it at 0.7 is 0.4895 / 1.954; the elbow and wrist move out by the same
+       0.0105 so the hang is unchanged. */
+    shoulder: [-0.4895, 1.954, 0.014],   /* R104: on the cap's axis at 0.7; R107: the axis moved up and in with the smaller dome */
+    elbow: [-0.5605, 1.455, 0.10],   /* R103: the reference's lowered arm hangs STRAIGHT and close — elbow in, shorter */
+    wrist: [-0.5955, 1.105, 0.14],
     upperRadius: 0.158,   /* R103: 0.160 -> 0.150, the arm was as wide as the lat at the elbow; R108: 0.158 — with the sides no longer grooved the arm's belly is 0.57 of the cap's width from the front and 0.73 from the side (the reference's ~0.8) */
     foreRadius: 0.112,   /* R105: the reference forearm is three quarters of the upper arm */
     wristRadius: 0.074
@@ -1292,9 +1295,9 @@ export var ARMS = {
        shoulder line. That is a far stronger, more compact pose than the wide
        V this carried, and it is what keeps the raised arm's mass beside the
        ribcage instead of out in space. */
-    shoulder: [0.479, 1.961, 0.014],   /* R108: on the cap's axis at 0.7, see the lowered arm */
-    elbow: [0.535, 1.465, 0.11],
-    wrist: [0.690, 1.860, 0.15],
+    shoulder: [0.4895, 1.954, 0.014],   /* R108: on the cap's axis at 0.7, see the lowered arm */
+    elbow: [0.5455, 1.465, 0.11],
+    wrist: [0.7005, 1.860, 0.15],
     upperRadius: 0.158,   /* R103: 0.160 -> 0.150, the arm was as wide as the lat at the elbow; R108: 0.158 — with the sides no longer grooved the arm's belly is 0.57 of the cap's width from the front and 0.73 from the side (the reference's ~0.8) */
     foreRadius: 0.112,   /* R105: the reference forearm is three quarters of the upper arm */
     wristRadius: 0.074
@@ -1375,7 +1378,18 @@ export var ARMS = {
          controlled apex at 0.42 and a gradual reversal into the elbow. The
          muscle bellies live in the cross-section (shapes.upper), so the
          envelope stays modest or the two compound into a ball. */
-      return 0.92 + Math.pow(Math.sin(Math.pow(t, 0.85) * Math.PI), 1.2) * 0.16 - t * 0.08;
+      /* R108 c — THE OUTLINE HAS TO SAY IT. At 0.92 -> 1.05 -> 0.84 the arm
+         was near-constant width from the cap to the elbow (the first pass's
+         three-quarter crop measured 1.2 : 1 belly to elbow); the reference's
+         biceps belly is a round peak and its elbow a compact hinge at about
+         0.6 of it. 0.90 -> 1.10 (t 0.40) -> 0.94 (0.70) -> 0.78 (1.0): the
+         elbow end is 0.089, which the forearm's first ring matches. */
+      /* round 7: the peak comes back to 1.05 (from 1.10). Measured on the
+         front clay the biceps' outer edge stood outside the cap's outer edge
+         — the arm was the broadest mass, and the director's order is broad
+         delt -> tuck -> belly. The ball's roundness is the front / rear
+         bellies' job (shapes.upper); the profile only sets the side width. */
+      return 0.90 + Math.pow(Math.sin(Math.pow(t, 0.80) * Math.PI), 1.3) * 0.20 - Math.pow(t, 1.5) * 0.10;   /* round 4: 0.80 at the end — the last band turned in so steeply it read as a dark ring at the joint */
     },
     /* Picks up close to where the upper arm ended — a step at the elbow reads
        as an error rather than as a joint — then swells just below it and tapers
@@ -1389,7 +1403,13 @@ export var ARMS = {
          way down and draws to a 0.64 wrist. The cuff and the elbow ball are
          sized from this function (limbs.js), so the joints never stand proud
          of the tubes they sit between. */
-      return 0.84 + Math.sin(Math.pow(t, 0.58) * Math.PI) * 0.30 - t * 0.20;
+      /* R108 c: starts at 0.79 (0.089, the upper arm's compressed end), the
+         brachioradialis / extensor peak comes HIGH (1.085 at t 0.25, a
+         quarter up from the elbow) and the taper to the wrist is long and
+         continuous to 0.62 (0.046): BIG -> NARROWER -> BIG -> TAPER. */
+      /* round 2: the belly is CONVEX and the taper CONCAVE (sin^1.6 against a
+         t^1.3 fall) — a straight line from the peak to the wrist is a club. */
+      return 0.79 + Math.pow(Math.sin(Math.pow(t, 0.55) * Math.PI), 1.6) * 0.37 - Math.pow(t, 1.3) * 0.22;   /* round 4: the first ring sits INSIDE the upper arm's buried end (0.0885 under 0.091) */
     }
   },
 
@@ -1432,50 +1452,86 @@ export var ARMS = {
        by exactly this sign, which is one reason the horseshoe never read. */
     upper: function (t, d, inner) {
       var inn = inner || 1, out = -inn;
+      /* R108 c — SCULPTED INSIDE THE SAME CIRCUMFERENCE. The first pass's
+         section was a round limb with modest bellies (biceps 0.28, heads
+         0.24 / 0.22) and read as one generic volume; the reference's clay
+         strips are a biceps that is a distinct round ball with a visible
+         distal insertion, a triceps HORSESHOE whose long head is the deep
+         posterior mass and whose lateral head sweeps the outer arm, a
+         brachialis wedge between them, and a deltoid whose lateral head
+         ends in a V on the outer arm. Everything below is a column step
+         (around the ring) and can be large; the row steps (the envelopes)
+         stay smooth. */
       /* longitudinal envelopes: where each belly sits along the bone */
-      var bic = Math.pow(Math.sin(Math.pow(Math.min(1, t / 0.96), 0.80) * Math.PI), 1.5);   /* the biceps peaks at t 0.42 and is gone into its tendon by the elbow */
-      var tri = Math.pow(Math.sin(Math.pow(t, 1.15) * Math.PI), 1.3);                          /* the long head peaks lower, t 0.55 */
-      var lat = Math.pow(Math.sin(Math.pow(t, 1.05) * Math.PI), 1.2);                          /* the lateral head, t 0.52 */
-      var low = Math.max(0, Math.min(1, (t - 0.45) / 0.35));
-      low = low * low * (3 - 2 * low);                                                          /* 0 -> 1 across the lower half */
-      var lower = t < 0.40 ? 0 : Math.sin(Math.min(1, (t - 0.40) / 0.58) * Math.PI);          /* the brachialis hump, t 0.69 */
-      /* BICEPS: one full belly across the front, a shade toward the inner arm
-         (it sits medial of centre on a hanging arm), peaking forward. */
-      var biceps = Math.pow(bump(d, inn * 0.12, 0.72), 0.7) * 0.28 * bic;
+      var bic = Math.pow(Math.sin(Math.pow(Math.min(1, t / 0.92), 0.78) * Math.PI), 1.6);   /* the biceps peaks at t 0.38 and is gone into its tendon by t 0.92 */
+      var tri = Math.pow(Math.sin(Math.pow(t, 1.10) * Math.PI), 1.2);                          /* the long head peaks at t 0.53, long */
+      var lat = Math.pow(Math.sin(Math.pow(t, 1.00) * Math.PI), 1.2);                          /* the lateral head, t 0.50 */
+      var low = Math.max(0, Math.min(1, (t - 0.30) / 0.42));
+      low = low * low * (3 - 2 * low);                                                          /* 0 -> 1 from a third down — the tendon flat starts where the heads are fullest */
+      var lower = t < 0.38 ? 0 : Math.sin(Math.min(1, (t - 0.38) / 0.60) * Math.PI);          /* the brachialis wedge, t 0.68 */
+      /* BICEPS: a full belly across the front, a shade toward the inner arm,
+         with the long head (outer) and short head (inner) as two shallow
+         crowns on it so the ball has a seam, and a distal INSERTION where
+         the belly falls fast into its tendon (the pow 1.6 envelope). */
+      var heads = 1 + 0.10 * (bump(d, out * 0.42, 0.30) + bump(d, inn * 0.55, 0.30)) - 0.05 * bump(d, inn * 0.08, 0.16);
+      var biceps = Math.pow(bump(d, inn * 0.10, 0.80), 0.7) * 0.40 * bic * heads;
       /* TRICEPS: the long head on the rear-inner, the lateral head on the
          rear-outer, and between them, low down, the flat TENDON plane that
          makes the horseshoe a U rather than a second belly. */
       /* the heads CONVERGE toward the olecranon: their centres move toward
          the rear as t grows, and the tendon flat between them deepens */
-      var conv = 0.20 * low;
-      var triLong = Math.pow(bump(d, Math.PI - inn * (0.62 - conv), 0.50), 0.65) * 0.24 * tri;
-      var triLat = Math.pow(bump(d, Math.PI + inn * (0.72 - conv), 0.46), 0.65) * 0.22 * lat;
-      var tendon = -bump(d, Math.PI, 0.42) * 0.18 * low;
-      /* SEPTA: the biceps / triceps interlock is a valley either side — a
-         tenth of the radius, narrow — deepest through the belly, and the
-         brachialis fills the outer one below it. */
-      var septOut = -bump(d, out * 1.75, 0.26) * 0.10 * bic;
-      var septIn = -bump(d, inn * 1.60, 0.30) * 0.11 * bic;
-      /* BRACHIALIS: a rounded wedge on the outer distal arm, between the
-         biceps and the lateral head, the second contour of the outer arm. */
-      var brach = Math.pow(bump(d, out * 1.35, 0.45), 0.7) * 0.20 * lower;
-      /* INSERTION: the arm narrows into the cap across its top 0.30 — the
-         cap -> undercut -> arm step — most on the front under the anterior
-         delt and on the outer side where the lateral head inserts. The
-         reference's cap OVERHANGS the arm: the arm's top is about two thirds
-         of the cap's width and the biceps swells back out below it. */
-      /* R108 b: the undercut is a V. Its reach down the arm is longest on the
-         OUTER side (0.38, the deltoid tuberosity) and shortest front and back
-         (0.22), so the cap's rim reads as a diagonal from the pec to a point
-         on the outer arm rather than as a horizontal ring; and the rear takes
-         the least of it, so the posterior delt flows into the long head. */
-      var reach = 0.22 + 0.16 * bump(d, out * 1.57, 0.75);
+      /* R108 c, round 2: the U's valley has to be a THIRD of the heads'
+         height to read as two masses (the belly rule) — at 0.16 of the
+         radius it was a flat on an oval. Narrower, fuller heads (pow 0.55)
+         and a tendon flat that starts a third down: the valley is now ~0.29
+         against peaks of 0.36 / 0.30. */
+      var conv = 0.22 * low;
+      var triLong = Math.pow(bump(d, Math.PI - inn * (0.72 - conv), 0.48), 0.50) * 0.36 * tri;
+      var triLat = Math.pow(bump(d, Math.PI + inn * (0.80 - conv), 0.44), 0.50) * 0.30 * lat;
+      var tendon = -Math.pow(bump(d, Math.PI, 0.44), 0.7) * 0.22 * low;   /* round 3: a plateau flat with steeper sides — the horseshoe's inside is a PLANE, not a dip */
+      /* SEPTA: the biceps / triceps interlock is a valley either side —
+         deepest through the belly, and the brachialis fills the outer one
+         below it. */
+      var septOut = -bump(d, out * 1.05, 0.24) * 0.10 * lower - bump(d, out * 1.62, 0.26) * 0.12 * bic;   /* round 4: the outer septum continues down between the biceps and the brachialis */
+      var septIn = -bump(d, inn * 1.55, 0.30) * 0.13 * bic;
+      /* BRACHIALIS: a controlled wedge on the outer distal arm, between the
+         biceps and the lateral head, pushing the lower outer contour out. */
+      var brach = Math.pow(bump(d, out * 1.45, 0.38), 0.8) * 0.20 * lower;
+      /* INSERTION and THE DELTOID V. The arm narrows into the cap across its
+         top 0.26 on the front and rear (the anterior and posterior delt
+         overhang it there), but NOT on the outer side: there the deltoid's
+         lateral head continues down the arm as a tongue whose two edges — a
+         groove in front of it (delt / biceps separation) and one behind it
+         (delt / lateral head) — converge to a point at t 0.42. The cap's own
+         rings end at the shoulder's outer x, so the V can only live on the
+         arm's surface; the first pass put the deepest narrowing on the outer
+         side and got a horizontal crease. */
+      var reach = 0.26 - 0.12 * bump(d, out * 1.45, 0.70);
       var top = Math.pow(1 - Math.min(1, t / reach), 1.5);
-      var insertion = -(0.10 + 0.12 * bump(d, 0, 0.70) + 0.12 * bump(d, out * 1.57, 0.60)) * top;
-      /* ELBOW: a compression on the front (the cubital fossa) and a small
-         bony landmark at the rear (the olecranon) — a joint, not a hinge. */
-      var e = Math.pow(Math.max(0, (t - 0.78) / 0.22), 2);
-      var elbow = -bump(d, 0, 0.62) * 0.12 * e + bump(d, Math.PI, 0.45) * 0.06 * e;
+      var insertionBase = -(0.13 + 0.12 * bump(d, 0, 0.70) + 0.05 * bump(d, Math.PI, 0.70)) * top;   /* round 7: 0.13 all round — the tuck has to be in the OUTLINE, under the cap's outer edge */
+      /* round 3: at +0.05 / -0.09 with 0.24-wide grooves the V was invisible
+         in the 3x side clay. The tongue is a plateau (pow 0.6) of +0.10, the
+         grooves -0.12 and 0.40 wide (two vertices at sixteen sides), fading
+         IN over the top 0.08 so the tongue rises out of the cap's rim rather
+         than stepping off it, and OUT to the tip at t 0.44. */
+      /* round 4: the V's strongest rings were UNDER the cap's overhang where
+         nothing sees them; it now fades in over the top 0.14, is fullest at
+         t 0.2-0.3 and closes at 0.52 — on the visible outer arm. */
+      var vT = Math.max(0, 1 - t / 0.52);
+      var gw = 0.26 + 0.74 * vT;                                     /* the grooves' half-spread: 1.0 rad under the cap, closing to 0.26 at the tip */
+      var vEnv = Math.min(1, t / 0.14) * Math.pow(Math.sin(Math.min(1, vT) * Math.PI * 0.5), 0.8);
+      var vee = -0.13 * (bump(d, out * 1.45 - out * gw, 0.40) + bump(d, out * 1.45 + out * gw, 0.40)) * vEnv
+              + 0.04 * Math.pow(bump(d, out * 1.45, gw * 0.75), 0.6) * vEnv;   /* round 7: 0.04 — at 0.10 the tongue cancelled the tuck on the outer side and the outline lost its notch */
+      var insertion = insertionBase + vee;   /* the insertion IS the V: the cap's rim as it lands on the arm */
+      /* ELBOW: a compression on the front (the cubital fossa) and the
+         olecranon at the rear — a joint, not a hinge. The BRACHIORADIALIS
+         ORIGIN sits here too: it rises off the outer-front of the humerus
+         above the elbow, so the upper arm's last rings carry its ridge and
+         the forearm's first ring (which used to overhang the joint by a lip
+         on that side) continues it. */
+      var e = Math.pow(Math.max(0, (t - 0.76) / 0.24), 2);
+      var radialOrigin = Math.pow(bump(d, out * 0.85, 0.50), 0.7) * 0.14 * Math.pow(Math.max(0, (t - 0.70) / 0.30), 1.5);
+      var elbow = -bump(d, 0, 0.62) * 0.12 * e + bump(d, Math.PI, 0.42) * 0.08 * e + radialOrigin;
       return 1 + biceps + triLong + triLat + tendon + septOut + septIn + brach + insertion + elbow;
     },
     /* R108 — THE FOREARM'S MASSES ARE PLACED BY `inner`, all of them.
@@ -1492,17 +1548,27 @@ export var ARMS = {
        tendons read as a compression before the hand expands again. */
     fore: function (t, d, inner) {
       var inn = inner || 1, out = -inn;
-      var swell = Math.sin(Math.pow(t, 0.58) * Math.PI);                          /* the belly, t 0.30 */
-      var high = Math.pow(Math.sin(Math.pow(t, 0.45) * Math.PI), 1.4);            /* the extensor origin, t 0.21 */
-      var radialEnv = Math.sin(Math.min(1, t / 0.82) * Math.PI) * (1 - t * 0.30); /* the brachioradialis, t 0.41, fading to the wrist */
-      var brachioradialis = Math.pow(bump(d, out * 0.80, 0.42), 0.7) * 0.26 * radialEnv;
-      var extensor = Math.pow(bump(d, Math.PI + inn * 0.85, 0.60), 0.7) * 0.22 * high;
-      var flexor = Math.pow(bump(d, inn * 0.55, 0.70), 0.7) * 0.24 * swell;
-      var fcu = bump(d, Math.PI - inn * 0.60, 0.50) * 0.12 * swell;
-      var ulna = -bump(d, Math.PI - inn * 1.05, 0.26) * 0.06;
-      var radialChannel = -bump(d, out * 1.35, 0.24) * 0.07 * swell;           /* between the brachioradialis and the extensors */
-      var w = Math.pow(Math.max(0, (t - 0.70) / 0.30), 2);
-      var wrist = -(bump(d, 0, 0.70) * 0.10 + bump(d, Math.PI, 0.70) * 0.06) * w;   /* the wrist is wider than it is deep */
+      /* R108 c — A CLUSTER, NOT A CLUB. The brachioradialis is the dominant
+         mass and it originates HIGH, on the outer arm above the elbow line
+         (its envelope is already 0.6 at t 0), sweeping down the radial side
+         and fading by the wrist; the extensor mass sits behind it and peaks
+         a quarter down; the flexor mass on the front-inner peaks a third
+         down; and everything is gone by t 0.8 so the wrist is tendon over
+         bone. The flexor and extensor amplitudes come down (0.24 / 0.22 ->
+         0.18 / 0.18) so the forearm's top is not as wide as the arm's
+         bottom: the profile carries the peak now. */
+      var swell = Math.pow(Math.sin(Math.pow(Math.min(1, t / 0.94), 0.62) * Math.PI), 1.2);   /* the flexor belly, t 0.33 */
+      var high = Math.pow(Math.sin(Math.pow(Math.min(1, t / 0.90), 0.50) * Math.PI), 1.3);    /* the extensor origin, t 0.22 */
+      var radialEnv = Math.pow(Math.sin(Math.min(1, (t + 0.08) / 1.02) * Math.PI), 1.1) * (1 - t * 0.35); /* the brachioradialis: 0.2 at the elbow (the upper arm's radialOrigin hands it over), peak t 0.32, gone at the wrist */
+      var brachioradialis = Math.pow(bump(d, out * 0.85, 0.46), 0.7) * 0.30 * radialEnv;
+      var extensor = Math.pow(bump(d, Math.PI + inn * 0.90, 0.56), 0.7) * 0.18 * high;
+      var flexor = Math.pow(bump(d, inn * 0.60, 0.66), 0.7) * 0.18 * swell;
+      var fcu = bump(d, Math.PI - inn * 0.62, 0.48) * 0.11 * swell;
+      var ulna = -bump(d, Math.PI - inn * 1.10, 0.26) * 0.06;
+      var radialChannel = -bump(d, out * 1.50, 0.26) * 0.08 * Math.max(swell, high)   /* between the brachioradialis and the extensors */
+                        - bump(d, inn * 0.02, 0.22) * 0.05 * swell;                  /* and between the brachioradialis and the flexors */
+      var w = Math.pow(Math.max(0, (t - 0.66) / 0.34), 2);
+      var wrist = -(bump(d, 0, 0.70) * 0.12 + bump(d, Math.PI, 0.70) * 0.08) * w;   /* the wrist is wider than it is deep: tendons */
       return 1 + brachioradialis + extensor + flexor + fcu + ulna + radialChannel + wrist;
     }
   }
