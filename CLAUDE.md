@@ -1301,6 +1301,46 @@ the pec-under ring to the belt. `coreShape` takes `latK`, a lateral lobe
 set slightly behind the side angle, carried by the two rings above the
 pinch, and the two rings below it narrowed.
 
+### The shoulder was a bump because the girdle was too high (R103)
+
+The deltoid cap stood proud of the trapezius line however its axis, root
+or belly were tuned, and the trap could only slope at 22 degrees. Both
+had one cause: a shoulder line at 2.170 under a neck base at 2.215 leaves
+0.045 of rise for 0.11 of run. The head is locked, so the girdle came
+DOWN — shoulder line 2.120, groove 2.100, upper chest 2.050, trap ring
+2.165 — and the slope is 41 degrees, the cap's crest meets it, and the
+neck reads as embedded in a rising torso. The cap's axis, the arm joints
+(on the axis at 0.7) and the female's girdle all move with it; lower one
+without the others and the arm's top disc shows.
+
+### A detached shoulder is a value socket as much as a geometry gap
+
+The dark wedge between shoulder and chest was made of three things: the
+armpit pocket zone, the pec/deltoid insertion groove added for carving,
+and a cap whose front lobe stopped at the pec's edge. Rooting the cap
+0.03 deeper, growing its anterior lobe (0.10 -> 0.18) so it overlaps the
+upper pec, and cutting the insertion groove to a crease closed it. A cut
+that is anatomically right at one depth is a socket at twice that depth.
+
+### The reference's arm hangs STRAIGHT, and it is shorter than this build's
+
+Read off the R102 male front: shoulder 0.46, elbow 0.53, wrist 0.58 units
+from the centre line — the arm falls almost vertically with the hand a
+touch OUTSIDE the elbow, and the hand ends at the hip, not the mid-thigh.
+This build swung the elbow out to 0.60 and cut the forearm back in, and
+with a 0.16 radius the arm was as wide as the lat at the elbow: the
+silhouette measured 0.49 of height across the arms against the
+reference's 0.39. Elbow 0.548, wrist 0.575, radius 0.150, and 0.05
+shorter.
+
+### Two thigh columns on one mass
+
+"Keep upper-leg anatomy readable longer" was not asking for two legs; it
+was asking for the channel. At a seam of 0.19 the lower body read as one
+egg; at 0.34 with 0.22 heads it reads as two columns that close at the
+knee, and the silhouette width did not change. The canon (ONE lower
+body) holds.
+
 ### Reference segmentation: read the grid
 
 Every automatic mask of the R102 references failed — brightness took the

@@ -1,0 +1,35 @@
+{
+  "pass": "R103 — major shape-match reset (geometry only, grayscale loop; no material or theme work)",
+  "baseline": "R102 (commit ec5371d)",
+  "references": "reference/mrmah-refK-r102-{male,female}-{front,rear}.png (landmarks read off a grid, see validation/mrmah3d/r102/18-measurement-summary.json)",
+  "units": "full silhouette width as a fraction of character height; torso widths exclude the arms; 'full' includes the arms",
+  "male-front": {
+    "reference": { "shoulder": 0.347, "widthAcrossArms(t0.43)": 0.39, "lat": 0.183, "waist": 0.128, "hip": 0.167, "thigh(t0.66)": 0.140, "knee": 0.089, "calf": 0.101 },
+    "R102":      { "shoulder": 0.403, "widthAcrossArms(t0.43)": 0.494, "lat": 0.183, "waist": 0.134, "hip": 0.192, "thigh(t0.66)": 0.145, "knee(t0.73)": 0.102, "calf(t0.78)": 0.105 },
+    "R103":      { "shoulder": 0.360, "widthAcrossArms(t0.43)": 0.475, "waist": 0.127, "hip": 0.170, "thigh(t0.66)": 0.136, "knee(t0.73)": 0.096, "calf(t0.78)": 0.104 },
+    "ratiosOverShoulder": { "reference": { "waist": 0.369, "hip": 0.481 }, "R102": { "waist": 0.333, "hip": 0.476 }, "R103": { "waist": 0.353, "hip": 0.472 } }
+  },
+  "male-rear":  { "reference": { "waist": 0.115, "glute": 0.188, "thigh": 0.151, "knee": 0.103, "calf": 0.114 }, "R103": { "waist": 0.128, "glute": 0.171, "thigh": 0.131, "knee": 0.091, "calf": 0.104 } },
+  "female-front": { "reference": { "shoulder": 0.316, "waist": 0.095, "hip": 0.243 }, "R103": { "shoulder(delts)": 0.259, "waist": 0.108, "hip": 0.347 } },
+  "female-rear":  { "reference": { "waist": 0.104, "glute": 0.233 }, "R103": { "waist": 0.106, "glute": 0.338 } },
+  "structuralChanges": {
+    "shoulderGirdle": "the shoulder line sits at 2.120 (was 2.170), the clavicle groove at 2.100, the upper chest ring at 2.050 and the trap ring at 2.165, so the trapezius climbs at 41 degrees into the neck instead of 22; the head does not move",
+    "shoulderRoot": "deltoid axis lowered with the girdle (inner 1.965, outer 1.875), rooted deeper into the chest (innerX 0.235), belly 0.36 -> 0.30 so the crest meets the trap slope, anterior lobe 0.10 -> 0.18 so the front delt overlaps the upper pec; the pec/delt insertion groove reduced from a socket to a crease; the torso's shoulder shelf doubled so its own line runs out under the cap",
+    "arms": "shoulder joints follow the cap axis (0.488, 1.905); the lowered arm hangs STRAIGHT and close (elbow 0.548 / 1.455, wrist 0.575 / 1.105 — the reference's hand ends at the hip, not the mid-thigh); upper-arm radius 0.160 -> 0.150; bicep 0.46, tricep 0.40, lateral head 0.20, biceps/triceps groove 0.30, brachialis 0.20; forearm flexor 0.28, extensor 0.27, channel 0.14, brachioradialis 0.20",
+    "chest": "chest rings' depth +8% (0.318 / 0.328 / 0.312), pec lobe 0.45, sternum 0.30, under-pec crease ring pulled in (d 0.232) so the shelf overhangs it",
+    "lats": "chestShape lat 0.28; latK 0.14 / 0.22 / 0.30 on the three rings above the pinch; pec-under ring 0.292",
+    "waistHips": "belt 0.176, 1.400 -> 0.200, 1.290 -> 0.214, 1.130 -> 0.222, 1.000 -> 0.206, 0.850 -> 0.172",
+    "thighs": "quadShape seam 0.19 -> 0.34 and heads 0.22 (two thigh columns on ONE mass), outer sweep 0.21 -> 0.16",
+    "calvesKnee": "calf 0.172 / 0.164, bellies 0.20; knee 0.146",
+    "grooves": "linea 0.30, oblique groove 0.10, spine 0.18 (chest) / 0.15 (core), traps 0.46",
+    "female": "the same girdle shift (2.050 / 2.120), deltoid rooted deeper and lower, arm joints follow"
+  },
+  "grayscaleSurvival": "01/02/05/06 are the grayscale captures the brief asks the carving to survive: sternum, under-pec, thigh channel, knee band, spine channel and the biceps/triceps groove read without colour",
+  "engineering": { "staticSuite": "342/342 (three regexes loosened to the new values: chest rows, arm standard, arm radius)", "verify": "node tools/mrmah3d-verify.mjs — 150/150", "notEvidence": "headless Chromium on SwiftShader; not device evidence" },
+  "openItems": [
+    "the raised arm's forearm still angles further out than the reference's",
+    "the trapezius kite from behind is still a band rather than a kite; the upper back's top plane catches the shoulder-top card as a bar",
+    "the reference's head is 0.15 of height against the canonical 0.24; body ratios are matched against the shoulder, not the head",
+    "the female hip / glute reads wider than her reference in width terms (0.34 vs 0.24 of height) because her shoulders are narrower than the reference's; her shoulder-to-hip ratio is the open number"
+  ]
+}

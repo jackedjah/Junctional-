@@ -113,10 +113,10 @@ function femaleProportions() {
     /* THE BUST — two integrated volumes either side of the sternum */
     { y: 1.970, w: 0.262, d: 0.276, facet: 0.0055, crystal: 0.0300, crystalY: 0.0070,
       shape: bustShape(1.0), hero: 0.34, zoneAt: S.pecZone(0) },
-    { y: 2.080, w: 0.250, d: 0.214, facet: -0.0045, crystal: 0.0280, crystalY: 0.0060,
-      shape: S.chestShape(0.55), hero: 0.40, zoneAt: S.pecZone(1) },
+    { y: 2.050, w: 0.250, d: 0.220, facet: -0.0045, crystal: 0.0280, crystalY: 0.0060,
+      shape: S.chestShape(0.55), hero: 0.40, zoneAt: S.pecZone(1) },   /* R103: the girdle sits 0.05 lower, as the male's does */
     /* the shoulder line, narrower, with the same collar */
-    { y: 2.170, w: 0.236, d: 0.180, facet: 0.0055, crystal: 0.0300, crystalY: 0.0060,
+    { y: 2.120, w: 0.236, d: 0.184, facet: 0.0055, crystal: 0.0300, crystalY: 0.0060,
       shape: S.clavicleShape(1.0), dip: 0.030, hero: 0.30, zoneAt: null, coat: 0.12 },   /* R98: the shelf takes a reduced platinum share, as the male's does; R102: less again — her upper chest rendered as one blown white ledge */
     /* the neck — the same column, a touch slimmer */
     { y: 2.205, w: 0.190, d: 0.140, facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
@@ -140,19 +140,19 @@ function femaleProportions() {
   var A = M.ARMS;
   var ARMS = {
     right: {
-      shoulder: [-0.330, 1.985, 0.014],
-      elbow: [-0.430, 1.430, 0.10],
-      wrist: [-0.385, 1.020, 0.14],
+      shoulder: [-0.325, 1.935, 0.014],   /* R103: down with the girdle, on the cap's axis */
+      elbow: [-0.430, 1.390, 0.10],
+      wrist: [-0.385, 0.985, 0.14],
       upperRadius: 0.116, foreRadius: 0.090, wristRadius: 0.056
     },
     left: {
-      shoulder: [0.330, 1.985, 0.014],
-      elbow: [0.430, 1.470, 0.11],
+      shoulder: [0.325, 1.935, 0.014],
+      elbow: [0.430, 1.430, 0.11],
       wrist: [0.560, 2.110, 0.15],
       upperRadius: 0.116, foreRadius: 0.090, wristRadius: 0.056
     },
-    /* the deltoid: a round cap that encloses the arm's top — R102: larger */
-    deltoid: { innerX: 0.205, innerY: 2.035, outerX: 0.445, outerY: 1.960, r0: 0.200 },   /* R102: the rear capture's caps were small beside the reference's round rear delts */
+    /* the deltoid: a round cap that encloses the arm's top — R102: larger; R103: rooted deeper and lower with the girdle */
+    deltoid: { innerX: 0.180, innerY: 1.990, outerX: 0.445, outerY: 1.915, r0: 0.200 },
     classLift: A.classLift, deltoidLift: A.deltoidLift,
     profiles: A.profiles, shapes: A.shapes
   };

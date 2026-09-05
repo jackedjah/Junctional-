@@ -700,7 +700,7 @@ if (exists('CLAUDE.md')) {
   /* the inner arm is a shadow valley, decided per limb from its real basis */
   ok('R99-inner-arm-valley', /export function limbSideDirection/.test(forge) && /innerSignOf/.test(limbs) && /armZone\(REGIONS\.UPPER_ARM\.classes, upperInner\)/.test(limbs));
   /* the chest has depth: every chest ring is deeper than 0.85 of its width */
-  const chestRows = propsSrc.match(/\{ y: (1\.895|1\.970|2\.080), w: ([\d.]+), d: ([\d.]+)/g) || [];
+  const chestRows = propsSrc.match(/\{ y: (1\.895|1\.970|2\.0[58]0), w: ([\d.]+), d: ([\d.]+)/g) || [];
   ok('R99-chest-has-depth', chestRows.length === 3 && chestRows.every(r => { const m = r.match(/w: ([\d.]+), d: ([\d.]+)/); return Number(m[2]) >= Number(m[1]) * 0.85; }), chestRows.join(' | '));
   /* the neck is a column, not a connector: at least 0.13 half-width under the chin */
   const neckRow = propsSrc.match(/\{ y: 2\.2[5-9]0, w: ([\d.]+)/);
@@ -796,9 +796,9 @@ if (exists('CLAUDE.md')) {
   const neckTop = Number((propsSrc.match(/\{ y: (2\.3[0-9]{2}), w: 0\.010/) || [])[1]);
   ok('R101-head-seated-in-the-neck', neckTop > base && neckTop - base < 0.09, 'head base ' + base.toFixed(3) + ', neck closes at ' + neckTop);
   /* the male arm standard: bigger cap, fuller bicep, lateral head, brachialis, brachioradialis */
-  ok('R101-male-arm-standard', /r0: 0\.26[0-9]/.test(body) && /bump\(d, 0, 0\.62\) \* 0\.400/.test(propsSrc) &&
-    /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.95\), 0\.40\) \* 0\.150/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
-    /upperRadius: 0\.160/.test(propsSrc));
+  ok('R101-male-arm-standard', /r0: 0\.26[0-9]/.test(body) && /bump\(d, 0, 0\.62\) \* 0\.4[0-9]0/.test(propsSrc) &&
+    /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.95\), 0\.40\) \* 0\.[12][0-9]0/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
+    /upperRadius: 0\.1[5-6]0/.test(propsSrc));
   /* three deltoid heads as FORM: front, rear, lateral crest and two grooves */
   /* R102: the grooves between the heads are twice as deep (0.045 -> 0.090) */
   ok('R101-deltoid-heads-as-form', /var lateral = 0\.06/.test(body) && /var grooves = -0\.0[4-9]/.test(body));

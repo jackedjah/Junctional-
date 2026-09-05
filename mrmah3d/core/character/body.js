@@ -322,7 +322,14 @@ export function buildBody(materials, P) {
     /* R99, from the silhouette test (?debug=mass): at innerY 2.062 the cap's
        crest rose ABOVE the trapezius line and each shoulder read as a bump
        sitting on the body. Lowered so the crest continues the trap's slope. */
-    var D = ARMS_.deltoid || { innerX: 0.262, innerY: 2.030, outerX: 0.596, outerY: 1.935, r0: 0.268 };   /* R101: a bigger cap */
+    /* R103 — THE SHOULDER ROOT. The cap sat as a detached piece beside the
+       torso: its axis was 0.05 above where the lowered shoulder girdle now
+       sits, so its crest stood proud of the trap slope as a bump, and its
+       inboard end stopped at the chest's edge so a dark socket opened
+       between shoulder and pec. The axis comes down with the girdle, the
+       root goes deeper into the chest, and the anterior lobe (below) grows
+       so the front delt overlaps the upper pec. */
+    var D = ARMS_.deltoid || { innerX: 0.235, innerY: 1.965, outerX: 0.596, outerY: 1.875, r0: 0.268 };
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;
@@ -349,7 +356,7 @@ export function buildBody(materials, P) {
       var endT = Math.max(0, (t - 0.75) / 0.25);
       var end = 1 - 0.55 * endT * endT * (3 - 2 * endT);
       return (0.28 + 0.72 * root * root * (3 - 2 * root)) * end *
-             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.36);
+             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.30);   /* R103: 0.36 -> 0.30, the crest stood above the trap slope */
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -382,8 +389,8 @@ export function buildBody(materials, P) {
           /* R102: the three heads are CARVED — the grooves between them are
              twice as deep (and the cavity term in the shader keeps them
              dark), the rear delt is fuller for the rear views. */
-          var front = 0.10 * Math.exp(-Math.pow(d / 0.66, 2));
-          var rear = 0.09 * Math.exp(-Math.pow((ad - Math.PI) / 0.76, 2));
+          var front = 0.18 * Math.exp(-Math.pow(d / 0.66, 2));   /* R103: the anterior delt overlaps the pec */
+          var rear = 0.12 * Math.exp(-Math.pow((ad - Math.PI) / 0.76, 2));
           var lateral = 0.06 * Math.exp(-Math.pow((ad - Math.PI / 2) / 0.45, 2));
           var grooves = -0.090 * (Math.exp(-Math.pow((ad - 0.95) / 0.20, 2)) + Math.exp(-Math.pow((ad - 2.25) / 0.20, 2)));
           return 1 + (front + rear + lateral + grooves) * belly;
