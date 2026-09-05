@@ -1,0 +1,111 @@
+{
+  "ranAt": "2026-09-05T20:19:21.105Z",
+  "renderer": "three@0.185.1 (mahworld/vendor/three, byte-identical to mrmah3d/vendor/three)",
+  "device": "iPhone-class portrait 390x844 @2x and landscape 1280x720 @1",
+  "views": [
+    {
+      "view": "arrival",
+      "label": "phone",
+      "file": "view-arrival-phone.png",
+      "msPerFrameSoftwareGL": 3.7,
+      "drawCalls": 106,
+      "triangles": 19844,
+      "programs": 17,
+      "pixelRatio": 2
+    },
+    {
+      "view": "ascent",
+      "label": "phone",
+      "file": "view-ascent-phone.png",
+      "msPerFrameSoftwareGL": 1.6,
+      "drawCalls": 106,
+      "triangles": 19844,
+      "programs": 17,
+      "pixelRatio": 2
+    },
+    {
+      "view": "threshold",
+      "label": "phone",
+      "file": "view-threshold-phone.png",
+      "msPerFrameSoftwareGL": 1.6,
+      "drawCalls": 106,
+      "triangles": 19844,
+      "programs": 17,
+      "pixelRatio": 2
+    },
+    {
+      "view": "arrival",
+      "label": "wide",
+      "file": "view-arrival-wide.png",
+      "msPerFrameSoftwareGL": 3,
+      "drawCalls": 118,
+      "triangles": 21082,
+      "programs": 17,
+      "pixelRatio": 1
+    },
+    {
+      "view": "ascent",
+      "label": "wide",
+      "file": "view-ascent-wide.png",
+      "msPerFrameSoftwareGL": 2.1,
+      "drawCalls": 118,
+      "triangles": 21082,
+      "programs": 17,
+      "pixelRatio": 1
+    },
+    {
+      "view": "threshold",
+      "label": "wide",
+      "file": "view-threshold-wide.png",
+      "msPerFrameSoftwareGL": 1.9,
+      "drawCalls": 118,
+      "triangles": 21082,
+      "programs": 17,
+      "pixelRatio": 1
+    }
+  ],
+  "tour": {
+    "file": "tour.webm",
+    "durationMs": 32246,
+    "frames": [
+      {
+        "file": "tour-frame-1.png",
+        "atMs": 5150,
+        "view": "threshold"
+      },
+      {
+        "file": "tour-frame-2.png",
+        "atMs": 10146,
+        "view": "threshold"
+      },
+      {
+        "file": "tour-frame-3.png",
+        "atMs": 15435,
+        "view": "threshold"
+      },
+      {
+        "file": "tour-frame-4.png",
+        "atMs": 21046,
+        "view": "threshold"
+      },
+      {
+        "file": "tour-frame-5.png",
+        "atMs": 26390,
+        "view": "threshold"
+      },
+      {
+        "file": "tour-frame-6.png",
+        "atMs": 32166,
+        "view": "threshold"
+      }
+    ],
+    "legsMs": 3200,
+    "holdsMs": 700,
+    "order": [
+      "arrival",
+      "ascent",
+      "threshold"
+    ]
+  },
+  "errors": []
+}

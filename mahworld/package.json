@@ -1,0 +1,6 @@
+{
+  "name": "mahworld-static",
+  "private": true,
+  "type": "module",
+  "description": "Marks the MAHWORLD static files as ES modules for Node tooling (tests, the release gate's syntax check). The browser ignores this file; nothing here is installed or bundled."
+}

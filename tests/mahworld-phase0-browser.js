@@ -152,7 +152,12 @@ const mobile = Object.assign({}, devices['iPhone 13'], { serviceWorkers: 'block'
     const labels = await dom(page, () => Array.from(document.querySelectorAll('[data-mahworld-page] b')).map(b => b.textContent.trim()));
     check('S3', 'STATUS shows WORLD OFFLINE / DEVELOPMENT, LEVEL, XP, MAHGIC, AVATAR STATUS', /WORLD OFFLINE \/ DEVELOPMENT/.test(sh.text) && ['LEVEL', 'XP', 'MAHGIC', 'AVATAR STATUS'].every(l => labels.indexOf(l) > -1), JSON.stringify(labels));
     check('S3', 'no forbidden resource spelling on the page', !/mahnah|mahna\b|\bmana\b/i.test(sh.text));
+    /* The crown is position:fixed; an element screenshot of a page taller than
+       the viewport scrolls and stitches, so the crown would be captured again
+       mid-page. A tall viewport captures the shell page in one frame instead. */
+    await page.setViewportSize({ width: 390, height: 2600 }); await page.waitForTimeout(150);
     await page.locator('[data-mahworld-page]').screenshot({ path: p.join(OUT, 's3-shell-world-off.png') });
+    await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150);
     await page.click('[data-mahworld-action="enable"]'); await page.waitForTimeout(150);
     let a = await dom(page, () => ({ attr: document.documentElement.getAttribute('data-mahworld-state'), session: document.querySelector('[data-mahworld-page]').getAttribute('data-mahworld-session'), enabled: window.MAHWORLD.currentProfile().profile.mahworldEnabled }));
     check('S3', 'ENABLE → profile opted in, session WORLD_AVAILABLE, <html data-mahworld-state="available">', a.enabled === true && a.session === 'WORLD_AVAILABLE' && a.attr === 'available', JSON.stringify(a));
@@ -162,7 +167,9 @@ const mobile = Object.assign({}, devices['iPhone 13'], { serviceWorkers: 'block'
     const act = await dom(page, () => ({ attr: document.documentElement.getAttribute('data-mahworld-state'), session: document.querySelector('[data-mahworld-page]').getAttribute('data-mahworld-session'), ref: window.MAHWORLD.currentProfile().profile.currentWorldRef, text: document.querySelector('[data-mahworld-page]').textContent }));
     check('S3', 'ENTER → WORLD_ENTERING then WORLD_ACTIVE (simulated), attribute follows', mid.session === 'WORLD_ENTERING' && mid.attr === 'entering' && act.session === 'WORLD_ACTIVE' && act.attr === 'active' && act.ref && act.ref.worldId === 'mahtropolis-dev', JSON.stringify({ mid, act: { attr: act.attr, session: act.session, ref: act.ref } }));
     check('S3', 'the active session is labelled a simulation on the page', /SIMULATED/.test(act.text));
+    await page.setViewportSize({ width: 390, height: 2600 }); await page.waitForTimeout(150);
     await page.locator('[data-mahworld-page]').screenshot({ path: p.join(OUT, 's3-shell-world-active.png') });
+    await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150);
     await page.click('[data-mahworld-action="exit"]'); await page.waitForTimeout(120);
     const ex = await dom(page, () => document.querySelector('[data-mahworld-page]').getAttribute('data-mahworld-session'));
     await page.waitForTimeout(700);

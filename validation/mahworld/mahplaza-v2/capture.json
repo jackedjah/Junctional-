@@ -1,0 +1,326 @@
+{
+  "ranAt": "2026-09-05T20:10:55.176Z",
+  "renderer": "three@0.185.1 (mahworld/vendor/three, byte-identical to mrmah3d/vendor/three)",
+  "captures": [
+    {
+      "file": "mahplaza-establishing-day-wide.png",
+      "view": "establishing",
+      "time": "day",
+      "label": "wide",
+      "drawCalls": 498,
+      "triangles": 35072,
+      "ms": 17.3,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-in-world-day-wide.png",
+      "view": "in-world",
+      "time": "day",
+      "label": "wide",
+      "drawCalls": 469,
+      "triangles": 32798,
+      "ms": 10.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-match-approach-day-wide.png",
+      "view": "match-approach",
+      "time": "day",
+      "label": "wide",
+      "drawCalls": 248,
+      "triangles": 22384,
+      "ms": 5.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-establishing-dusk-wide.png",
+      "view": "establishing",
+      "time": "dusk",
+      "label": "wide",
+      "drawCalls": 498,
+      "triangles": 35072,
+      "ms": 7.1,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-in-world-dusk-wide.png",
+      "view": "in-world",
+      "time": "dusk",
+      "label": "wide",
+      "drawCalls": 469,
+      "triangles": 32798,
+      "ms": 6.3,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-match-approach-dusk-wide.png",
+      "view": "match-approach",
+      "time": "dusk",
+      "label": "wide",
+      "drawCalls": 238,
+      "triangles": 22172,
+      "ms": 4,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-establishing-night-wide.png",
+      "view": "establishing",
+      "time": "night",
+      "label": "wide",
+      "drawCalls": 498,
+      "triangles": 35072,
+      "ms": 6.1,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-in-world-night-wide.png",
+      "view": "in-world",
+      "time": "night",
+      "label": "wide",
+      "drawCalls": 459,
+      "triangles": 32586,
+      "ms": 6.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-match-approach-night-wide.png",
+      "view": "match-approach",
+      "time": "night",
+      "label": "wide",
+      "drawCalls": 238,
+      "triangles": 22172,
+      "ms": 4.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-in-world-day-phone.png",
+      "view": "in-world",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 235,
+      "triangles": 20510,
+      "ms": 10.5,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY",
+        "daylight": 1
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-in-world-dusk-phone.png",
+      "view": "in-world",
+      "time": "dusk",
+      "label": "phone",
+      "drawCalls": 233,
+      "triangles": 20460,
+      "ms": 5.4,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-in-world-night-phone.png",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 235,
+      "triangles": 20510,
+      "ms": 6.1,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-establishing-night-phone.png",
+      "view": "establishing",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 253,
+      "triangles": 22026,
+      "ms": 4.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-match-approach-night-phone.png",
+      "view": "match-approach",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 173,
+      "triangles": 16404,
+      "ms": 3.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-in-world-night-phone-theme-red.png",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone",
+      "theme": "red",
+      "drawCalls": 235,
+      "triangles": 20510,
+      "ms": 9.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    },
+    {
+      "file": "mahplaza-establishing-night-phone-theme-red.png",
+      "view": "establishing",
+      "time": "night",
+      "label": "phone",
+      "theme": "red",
+      "drawCalls": 252,
+      "triangles": 22014,
+      "ms": 5.6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT",
+        "daylight": 0
+      },
+      "residents": 18,
+      "flora": 6,
+      "vehicles": true
+    }
+  ],
+  "tour": {
+    "file": "tour-night.webm",
+    "durationMs": 57639,
+    "frames": [
+      {
+        "file": "tour-frame-1.png",
+        "atMs": 10348,
+        "view": "match-approach"
+      },
+      {
+        "file": "tour-frame-2.png",
+        "atMs": 20150,
+        "view": "match-approach"
+      },
+      {
+        "file": "tour-frame-3.png",
+        "atMs": 29530,
+        "view": "match-approach"
+      },
+      {
+        "file": "tour-frame-4.png",
+        "atMs": 39151,
+        "view": "match-approach"
+      },
+      {
+        "file": "tour-frame-5.png",
+        "atMs": 48307,
+        "view": "match-approach"
+      },
+      {
+        "file": "tour-frame-6.png",
+        "atMs": 57586,
+        "view": "match-approach"
+      }
+    ],
+    "order": [
+      "establishing",
+      "in-world",
+      "match-approach"
+    ]
+  },
+  "errors": [],
+  "logs": [
+    "wide: error: Failed to load resource: net::ERR_FAILED",
+    "phone: error: Failed to load resource: net::ERR_FAILED"
+  ]
+}

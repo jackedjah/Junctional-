@@ -711,6 +711,45 @@ Do not begin Phase 1 without the decisions in §25 items 1–3.
 
 ---
 
+## 26a. Visible world milestones (added after Phase 0)
+
+Phase 0 built the foundation, not a visible world. The first visible places
+were then built as **development-only runtime scenes** under
+`mahworld/scene/`, on the permitted renderer and nothing else:
+
+| Milestone | What exists | Evidence |
+| --- | --- | --- |
+| Arrival Gate (study v1) | the MAHWORLD gate plaza: wet cobalt plaza, steps, the gate with emblem, wordmark and portal, towers, ribbons, moon; three views, a camera move | `validation/mahworld/arrival-gate/` |
+| **MAHPLAZA (world scene v2)** | MAH GYM, MAH MATCH (the fighting facility with a visible square-diamond arena) and MAH MARKET around the plaza; sidewalks, vehicle corridors, the MAHPLAZA civic marker; crystalline residents of many player colours (square-diamond heads, one lower teardrop, physique variation); diamond vegetation; FOB-inspired vehicles; FOBEAMS and FOBLOWS; mountains and a quiet skyline; a **real-time-anchored day/night clock**; player-local world Theme | `validation/mahworld/mahplaza-v2/` — the same cameras at DAY, DUSK and NIGHT, phone views, a red-Theme proof, `tour-night.webm` |
+
+Decisions these scenes add to the register:
+
+- **Renderer (LOCKED):** Three.js 0.185.1 from `mahworld/vendor/three/`, a
+  byte-identical copy of the renderer branch's vendored module. No addons,
+  no textures, no models, no post-processing, no engine, no toolchain. The
+  world never imports from `mrmah3d/`; Mr. Mah's character work is separate.
+- **World clock (LOCKED law, PROVISIONAL numbers):** `world-clock.js` is the
+  one owner of world time. 24 world hours ≈ 2.5 real hours (1 real minute ≈
+  9.6 world minutes), anchored to the player's real local time by varying
+  how fast the world moves through daylight versus darkness inside each
+  cycle; sunrise is always world 06:00, sunset 18:00; everything is a pure
+  function of wall-clock milliseconds, so returning later resumes at the
+  right state. Pinning a time exists for validation only.
+- **Theme is local to the viewer (LOCKED):** it recolours environmental
+  energy only; every resident keeps its own player's colour.
+- **Light law (LOCKED):** blue-white only, no yellow; the single red accent
+  belongs to MAH MATCH's competitive identity.
+- **Species law (LOCKED):** residents share Mr. Mah's language — square-diamond
+  head, crystalline facets, humanoid upper body, ONE lower teardrop, never
+  legs — at different development stages, never grotesque.
+- **What is NOT built (FUTURE):** any game system behind these places —
+  combat, matchmaking, commerce, inventory, presence, chat, multiplayer.
+  Residents are visual representation only. Nothing here is linked from the
+  MAHFITT shell.
+
+The MAHPLAZA scene's own README (`mahworld/scene/README.md`) carries viewing
+instructions and the module ownership table.
+
 ## 27. Decision register
 
 | # | Decision | Tag |

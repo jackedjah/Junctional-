@@ -1,5 +1,5 @@
 {
-  "ranAt": "2026-09-05T18:10:34.478Z",
+  "ranAt": "2026-09-05T20:25:33.322Z",
   "shell": "netlify/functions/mygym.js handler GET (V=453), served at https://mahfitt.test/mygym with /api/mygym stubbed",
   "device": "iPhone 13 (Playwright device profile), service workers blocked",
   "passed": 47,
@@ -129,7 +129,7 @@
       "scenario": "S3",
       "name": "ENTER → WORLD_ENTERING then WORLD_ACTIVE (simulated), attribute follows",
       "ok": true,
-      "detail": "{\"mid\":{\"attr\":\"entering\",\"session\":\"WORLD_ENTERING\"},\"act\":{\"attr\":\"active\",\"session\":\"WORLD_ACTIVE\",\"ref\":{\"worldId\":\"mahtropolis-dev\",\"sessionId\":\"sim-mtop6nj2\"}}}"
+      "detail": "{\"mid\":{\"attr\":\"entering\",\"session\":\"WORLD_ENTERING\"},\"act\":{\"attr\":\"active\",\"session\":\"WORLD_ACTIVE\",\"ref\":{\"worldId\":\"mahtropolis-dev\",\"sessionId\":\"sim-mtou06zj\"}}}"
     },
     {
       "scenario": "S3",
