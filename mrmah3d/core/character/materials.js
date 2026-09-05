@@ -477,7 +477,7 @@ export function createCrystalMaterials(options) {
     innerDark: 0.72,
     /* R96 — the facet dome (crystal-shader.js): every large plane grades from
        its edge to its centre, which is what Reference A's glossy planes are. */
-    dome: 0.42,
+    dome: 0.55,   /* R105: the gloss wraps each belly */
     /* R94 — the taper's internal light (see crystal-shader.js). Sapphire, not
        cyan: the reference's taper is a saturated royal blue lit from within,
        and the cyan belongs to the edges. The source sits a third of the way up

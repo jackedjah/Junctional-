@@ -143,13 +143,13 @@ function femaleProportions() {
       shoulder: [-0.355, 1.935, 0.014],
       elbow: [-0.455, 1.390, 0.10],
       wrist: [-0.410, 0.985, 0.14],
-      upperRadius: 0.116, foreRadius: 0.090, wristRadius: 0.056
+      upperRadius: 0.116, foreRadius: 0.084, wristRadius: 0.056
     },
     left: {
       shoulder: [0.355, 1.935, 0.014],
       elbow: [0.455, 1.430, 0.11],
       wrist: [0.560, 2.110, 0.15],
-      upperRadius: 0.116, foreRadius: 0.090, wristRadius: 0.056
+      upperRadius: 0.116, foreRadius: 0.084, wristRadius: 0.056
     },
     /* the deltoid: a round cap that encloses the arm's top — R102: larger; R103: rooted deeper and lower with the girdle */
     deltoid: { innerX: 0.180, innerY: 1.990, outerX: 0.490, outerY: 1.910, r0: 0.215 },   /* R104: wider, muscular shoulders */

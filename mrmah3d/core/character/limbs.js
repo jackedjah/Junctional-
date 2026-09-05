@@ -321,7 +321,7 @@ function buildArm(materials, spec, options) {
      and the arm stays a cone with a kink in it. */
   var upperGeo = segment(
     [0, 0, 0], elbow.clone().sub(shoulder).toArray(),
-    spec.upperRadius, spec.foreRadius * 1.02, 8,
+    spec.upperRadius, spec.foreRadius * 1.02, 12,   /* R105: twelve sides — a belly needs vertices to be round */
     /* R90: depthRatio goes above 1 and the cross-section is now SHAPED.
 
        The upper arm is deeper front-to-back than it is wide, because that is
@@ -337,7 +337,7 @@ function buildArm(materials, spec, options) {
        nothing to work on — and read as a quilt beside the reference. */
     /* R99: deeper front-to-back (1.12 -> 1.18) so the bicep and tricep are
        two volumes the silhouette shows from the side, not two colours. */
-    { depthRatio: 1.18, crystal: 0.045, steps: 5,
+    { depthRatio: 1.18, crystal: 0.045, steps: 7,   /* R105: seven rings so the belly can PEAK */
       profile: ARMS_.profiles.upper, shape: function (t, d) { return ARMS_.shapes.upper(t, d, upperInner); }, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner),
       coat: REGIONS.UPPER_ARM.coat,
@@ -362,10 +362,10 @@ function buildArm(materials, spec, options) {
   var foreVec = wrist.clone().sub(elbow);
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
-    spec.foreRadius, spec.wristRadius, 8,
+    spec.foreRadius, spec.wristRadius, 12,
     /* R98: five steps so the extensor belly just under the elbow has a ring
        to peak on and the taper into the wrist has two to fall through. */
-    { depthRatio: 1.06, crystal: 0.040, steps: 5,
+    { depthRatio: 1.06, crystal: 0.040, steps: 6,
       profile: ARMS_.profiles.fore, shape: function (t, d) { return ARMS_.shapes.fore(t, d, foreInner); }, lift: ARMS_.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes, foreInner),
       coat: REGIONS.FOREARM.coat }
@@ -378,7 +378,7 @@ function buildArm(materials, spec, options) {
      a cuff ring; both hide the segments' end discs — the flat pale facet that
      showed at every elbow — and read as machined joints in the crystal. Drawn
      in the cavity material (dark, barely reflective), no edge lines. */
-  var eR = spec.foreRadius * 0.98;
+  var eR = spec.foreRadius * 0.88;   /* R105: the knob read as a block */
   var elbowGeo = segment([0, -eR * 0.55, 0], [0, eR * 0.55, 0], eR, eR, 8,
     { depthRatio: 1.0, crystal: 0.015, steps: 2,
       profile: function (t) { return 0.70 + Math.sin(t * Math.PI) * 0.30; } });   /* R99: flush with the tube, not proud of it */
@@ -421,7 +421,7 @@ function buildArm(materials, spec, options) {
   elbowJoint.add(wristJoint);
 
   /* The wrist cuff, in the wrist's own frame so it rings the forearm's end. */
-  var cR = spec.wristRadius * 1.10;   /* R99: 1.22 -> 1.10 — in silhouette the cuff read as a block on the wrist */
+  var cR = spec.wristRadius * 1.00;   /* R99: 1.22 -> 1.10; R105: 1.00 */
   var cuffGeo = segment([0, -0.030, 0], [0, 0.026, 0], cR, cR * 0.96, 8,
     { depthRatio: 1.0, crystal: 0.01, steps: 1 });
   var cuff = new Mesh(cuffGeo, materials.joint || materials.cavity);

@@ -1,0 +1,22 @@
+{
+  "pass": "R105 — rapid anatomical morph: capped / pumped bellies, deep insertion valleys, curve-first silhouette (grayscale loop, six increments; passes A–D on anatomy, E as the 18-side reconciliation, F as one platinum-wrap check)",
+  "baseline": "R104 (commit aeeedd0)",
+  "loop": [
+    { "p1": "delts capped (8 rings, belly 0.30 -> 0.50 on a rounder curve, cap tucks under 0.62, front lobe 0.22, grooves 0.12); bicep/triceps as PEAKS (sin^1.6 / sin^1.4 bellies, 0.62 / 0.54), brachialis 0.30, under-delt insertion 0.20, elbow compression 0.13; forearm flexor/extensor 0.36 with a peaked extensor, channel 0.20, wrist 0.11; pec 0.60, pec/delt insertion 0.08, traps 0.72, trap ring 0.300; lat sweep (latK 0.26 / 0.40 / 0.46, rings 0.230 / 0.292); ab bulge 0.24 vs crease 0.06 with cav 0.55; serratus relief; calf bellies 0.26; dome 0.42 -> 0.55", "verdict": "kept — delts capped, but the arm read as a lumpy 8-sided boulder in the close-up" },
+    { "p2-p3": "limbs to TWELVE sides (upper arm and forearm), seven and six rings; bicep 0.52, triceps 0.48, groove 0.36 (a round tube needs less); forearm radius 0.124 -> 0.112 (the reference's forearm is three quarters of the upper arm); elbow knob 0.88, wrist cuff 1.00", "verdict": "kept — the arm is a round column with a belly; the hand is still a mitten (out of scope)" },
+    { "p4": "upper pec rounds off toward the clavicle (2.050 at k 0.62, d 0.306); the under-delt valley runs all the way round (0.10 + 0.14 on the front); ab bulge 0.30, crease 0.02, cav 0.65", "verdict": "kept, but the chest was still one plate: a pec lobe on a 14-sided ring is two vertices" },
+    { "p5": "torso to EIGHTEEN sides; upper pec k 0.45, d 0.290; pec lobe width 0.55", "verdict": "kept — two pec domes with a sternum trench and a pec/delt separation" },
+    { "p6": "ab blocks as INSETS: bulge 0.42 against a -0.06 crease with cav 0.80; clavicle band steeper (2.100 d 0.250, 2.120 d 0.240, 2.165 d 0.230); hip ring 0.156", "verdict": "kept — block rows read; the band under the neck still catches light" }
+  ],
+  "cappedMuscleScore0to10": { "delts": 7, "biceps": 6, "triceps": 5, "pecs": 7, "traps": 6, "lats": 7, "forearms": 5, "calves": 6 },
+  "roundnessFullness": { "silhouetteConvexity": "the arm's outer contour and the deltoid cap are arcs now (12 and 10 sides on 7 and 8 rings); the torso's pec lobes and rectus blocks have vertices to curve on (18 sides)", "peakProjection": "bicep and triceps bellies peak at a third and two thirds of the arm (sin^1.6 / sin^1.4)", "insertionDepth": "under-delt 0.10-0.24, biceps/triceps groove 0.36, pec/delt 0.08, ab creases -0.06 with cav 0.80, under-pec cav 0.60", "valleyContrast": "the cavity term keeps every one of these dark in grayscale (01/02/03)" },
+  "triangleBudget": "torso 14 -> 18 sides (+~230 tris), upper arm 8x5 -> 12x7 (+~110 per arm), forearm 8x5 -> 12x6, deltoid 10x6 -> 10x8; verify's R94-WORLD-01 draw and triangle budget still holds (verify 150/150)",
+  "phoneScale": "not re-captured this pass; the R104 chat-scale capture is the last one",
+  "openItems": [
+    "the hand is still a mitten beside the reference's articulated hand — out of this brief's scope, and the next most visible fault in the arm close-up",
+    "the band under the neck (clavicle / trap top) still catches the shoulder-top light as a bright bar",
+    "the abdomen reads as block ROWS; the reference's six-pack has visible left/right block separation that would need the rectus lobes split further",
+    "her bust reads slightly boxy at 18 sides — the bust lobes were authored for 14",
+    "platinum wrap was checked once (09); the gloss grades across the deltoid cap and the bicep, less so on the forearm"
+  ]
+}

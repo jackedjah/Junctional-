@@ -334,7 +334,7 @@ function chestShape(k) {
        is a mass with real front-to-back projection, and the sternum falls
        away between the two; the lats flare a little more under the arm. */
     var sternum = -lobe(a, 0, 0.38) * 0.360;   /* R103: deeper */
-    var pec = (lobe(a, 0.70, 0.52) + lobe(a, -0.70, 0.52)) * 0.520;   /* R101: a deeper shelf */
+    var pec = (lobe(a, 0.70, 0.55) + lobe(a, -0.70, 0.55)) * 0.600;   /* R105: a rounder, fuller belly */   /* R101: a deeper shelf */
     /* R97: the lats — the ribcage's side planes swell so the V reads from
        the front AND the back; the back itself is flattened, grooved down the
        spine and carries a pair of erector / lat planes either side of it. */
@@ -344,7 +344,7 @@ function chestShape(k) {
     var erector = (lobe(a, Math.PI - 0.42, 0.30) + lobe(a, -Math.PI + 0.42, 0.30)) * 0.100;   /* R102: 0.06 -> 0.10 */
     /* R102: the pec / deltoid junction and the outer pec insertion — a groove at
        the armpit line so the pec ends in shadow against the shoulder */
-    var insertion = -(lobe(a, 1.22, 0.16) + lobe(a, -1.22, 0.16)) * 0.030;   /* R103: the delt now overlaps the pec; a deep cut here read as a socket */
+    var insertion = -(lobe(a, 1.22, 0.20) + lobe(a, -1.22, 0.20)) * 0.080;   /* R103: the delt now overlaps the pec; a deep cut here read as a socket */
     return 1 + (sternum + pec + lat + back + spine + erector + insertion) * k;
   };
 }
@@ -368,15 +368,16 @@ function coreShape(k, rectusK, latK) {
   var rk = rectusK == null ? 0.120 : rectusK;
   var lk = latK == null ? 0 : latK;
   return function (a) {
-    var linea = -lobe(a, 0, 0.34) * 0.300;   /* R100: a deeper channel; R102: deeper */
+    var linea = -lobe(a, 0, 0.34) * 0.340;   /* R100: a deeper channel; R102: deeper */
     var rectus = (lobe(a, 0.52, 0.44) + lobe(a, -0.52, 0.44)) * rk;
     var oblique = (lobe(a, 1.20, 0.48) + lobe(a, -1.20, 0.48)) * 0.080;
     var obliqueGroove = -(lobe(a, 0.98, 0.16) + lobe(a, -0.98, 0.16)) * 0.100 * (lk > 0 ? 1 : 0.5);   /* R102 */
     var lat = (lobe(a, Math.PI / 2 + 0.22, 0.58) + lobe(a, -Math.PI / 2 - 0.22, 0.58)) * lk;
+    var serratus = (lobe(a, 1.02, 0.13) + lobe(a, -1.02, 0.13)) * 0.070 * Math.min(1, lk / 0.3);   /* R105: the teeth under the pec, as relief */
     var back = lobe(a, Math.PI, 0.95) * -0.085;
     var spine = -lobe(a, Math.PI, 0.20) * 0.150;   /* R102: 0.06 -> 0.11 */
     var erector = (lobe(a, Math.PI - 0.36, 0.28) + lobe(a, -Math.PI + 0.36, 0.28)) * 0.080;   /* R102: 0.045 -> 0.08 */
-    return 1 + (linea + rectus + oblique + obliqueGroove + lat + back + spine + erector) * k;
+    return 1 + (linea + rectus + oblique + obliqueGroove + lat + serratus + back + spine + erector) * k;
   };
 }
 
@@ -568,7 +569,7 @@ function calfShape(k) {
   return function (a) {
     var ridge = lobe(a, 0, 0.26) * 0.060;
     var shin = -(lobe(a, 0.55, 0.28) + lobe(a, -0.55, 0.28)) * 0.060;
-    var bellies = (lobe(a, Math.PI - 0.62, 0.50) + lobe(a, -Math.PI + 0.62, 0.50)) * 0.200;
+    var bellies = (lobe(a, Math.PI - 0.62, 0.50) + lobe(a, -Math.PI + 0.62, 0.50)) * 0.260;
     var cleft = -lobe(a, Math.PI, 0.18) * 0.080;
     return 1 + (ridge + shin + bellies + cleft) * k;
   };
@@ -615,7 +616,7 @@ function clavicleShape(k) {
   return function (a) {
     var hollow = -lobe(a, 0, 0.60) * 0.160;
     var collar = (lobe(a, 0.95, 0.50) + lobe(a, -0.95, 0.50)) * 0.150;
-    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.600;   /* R99: the traps climb to carry the head; R100: higher still; R101: undeniable */
+    var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * 0.720;   /* R99: the traps climb to carry the head; R100: higher still; R101: undeniable */
     /* R97: a SHOULDER SHELF at the sides, so the torso's own line runs out
        under the deltoid cap and the cap grows out of the trapezius instead of
        sitting on it — the trap -> delt continuity the brief asks for. */
@@ -678,7 +679,7 @@ export var TORSO = {
      averaged away entirely — the shaping was there in the numbers and absent
      from the mesh. 14 puts a vertex within 0.22 radians of every lobe centre
      for the cost of two more columns of faces. */
-  sides: 14,
+  sides: 18,   /* R105: a pec dome, a rectus block and an oblique each need vertices to be ROUND; at 14 a lobe was one flat facet */
   /* A SMALL lift away from the black end — a third of the head's, half the
      arms'. The body is the one part that should keep the black-heavy weighting,
      because that is what makes it read as a dark crystalline mass. But with the
@@ -880,7 +881,7 @@ export var TORSO = {
       shape: quadShape(0.90), zoneAt: quadZone(0) },
     /* R97: the quad's SHELF — the mass rounds over under the belt instead
        of meeting it in a straight line, which is the muscle-belly read. */
-    { y: 1.400, w: 0.160, d: 0.146, facet: 0.0050, crystal: 0.0300, crystalY: 0.0080, hero: 0.10,
+    { y: 1.400, w: 0.156, d: 0.142, facet: 0.0050, crystal: 0.0300, crystalY: 0.0080, hero: 0.10,
       shape: quadShape(0.60), zoneAt: quadZone(0) },
     /* THE BELT — the waist. The deepest concavity on the character, and the
        line that separates the torso from the single quad. Re-measured on the
@@ -904,15 +905,15 @@ export var TORSO = {
        nearly doubled on the two rings above the pinch — the lat is a
        silhouette driver, not a flank detail. */
     { y: 1.545, w: 0.160, d: 0.144, facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
-      shape: coreShape(1.0, 0.17), hero: 0.08, zoneAt: coreZone(1) },
-    { y: 1.605, w: 0.180, d: 0.160, facet: -0.0040, crystal: 0.0220, crystalY: 0.0050,
-      shape: coreShape(1.0, 0.08, 0.04), hero: 0.03, zoneAt: coreZone(1), cav: 0.40 },   /* R102: abdominal crease */
-    { y: 1.665, w: 0.212, d: 0.182, facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
-      shape: coreShape(0.95, 0.17, 0.18), hero: 0.08, zoneAt: coreZone(2) },
-    { y: 1.725, w: 0.280, d: 0.220, facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
-      shape: coreShape(0.90, 0.08, 0.32), hero: 0.03, zoneAt: coreZone(2), cav: 0.40 },   /* R102: abdominal crease */
+      shape: coreShape(1.0, 0.42), hero: 0.08, zoneAt: coreZone(1) },   /* R105: BLOCKS — bulge 0.42 against an inset crease (-0.06) */
+    { y: 1.605, w: 0.188, d: 0.164, facet: -0.0040, crystal: 0.0220, crystalY: 0.0050,
+      shape: coreShape(1.0, -0.06, 0.04), hero: 0.03, zoneAt: coreZone(1), cav: 0.80 },   /* R102: abdominal crease */
+    { y: 1.665, w: 0.230, d: 0.190, facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
+      shape: coreShape(0.95, 0.42, 0.26), hero: 0.08, zoneAt: coreZone(2) },
+    { y: 1.725, w: 0.292, d: 0.226, facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
+      shape: coreShape(0.90, -0.06, 0.40), hero: 0.03, zoneAt: coreZone(2), cav: 0.80 },   /* R102: abdominal crease */
     { y: 1.780, w: 0.306, d: 0.240, facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
-      shape: coreShape(0.85, 0.16, 0.42), hero: 0.08, zoneAt: coreZone(3) },
+      shape: coreShape(0.85, 0.42, 0.46), hero: 0.08, zoneAt: coreZone(3) },
     /* R97 — THE LOWER PEC TURN: a crease ring where the chest shelf ends and
        a belly ring above it, so the pectoral is a mass with a lower edge
        that falls into shadow rather than a plane that fades into the abs. */
@@ -922,7 +923,7 @@ export var TORSO = {
        comes in so the shelf overhangs it, and that ring takes its own dark
        zone (pecUnderZone). */
     { y: 1.830, w: 0.304, d: 0.236, facet: -0.0060, crystal: 0.0300, crystalY: 0.0080,
-      shape: chestShape(0.62), zoneAt: pecUnderZone, cav: 0.50 },   /* R103: the under-pec crease pulls IN (d 0.252 -> 0.232) so the shelf overhangs it; the lat block is wider */   /* R102: 0.272 -> 0.282, the top of the lat block; the under-pec crease is a cavity */
+      shape: chestShape(0.62), zoneAt: pecUnderZone, cav: 0.60 },   /* R103: the under-pec crease pulls IN (d 0.252 -> 0.232) so the shelf overhangs it; the lat block is wider */   /* R102: 0.272 -> 0.282, the top of the lat block; the under-pec crease is a cavity */
     /* R103 — THE CHEST PROJECTS: the chest rings' front-to-back radius rises
        another 8% and the pec lobe with it, so the pectoral is a shelf that
        overhangs the crease ring under it. */
@@ -938,24 +939,24 @@ export var TORSO = {
        shoulder line at 2.120 the slope is 41 degrees, the cap's crest meets
        it, and the neck is embedded in a rising upper torso. The head does
        not move. */
-    { y: 2.050, w: 0.330, d: 0.322, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
-      shape: chestShape(0.80), hero: 0.40, zoneAt: pecZone(1) },
+    { y: 2.050, w: 0.330, d: 0.290, facet: -0.0045, crystal: 0.0300, crystalY: 0.0060,
+      shape: chestShape(0.45), hero: 0.40, zoneAt: pecZone(1) },   /* R105: the upper pec ROUNDS OFF toward the clavicle (0.80 -> 0.62) instead of running flat into it */
     /* R100 — the groove under the clavicle (subclavicleShape): its own dark,
        uncoated zone, so the collarbone above it reads as a bar with shadow
        beneath. */
-    { y: 2.100, w: 0.328, d: 0.262, facet: 0.0040, crystal: 0.0200, crystalY: 0.0040,
+    { y: 2.100, w: 0.328, d: 0.250, facet: 0.0040, crystal: 0.0200, crystalY: 0.0040,
       shape: subclavicleShape(1.0), hero: 0.20, zoneAt: pecZone(1), coat: 0.55 },
     /* THE SHOULDER LINE — collarbones across the front, trapezius behind.
        R100: the thin band just under it is the groove's dark zone, so the
        collarbone reads as a bar with a hairline of shadow beneath — not a
        stripe across the chest. */
-    { y: 2.120, w: 0.330, d: 0.252, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
+    { y: 2.120, w: 0.330, d: 0.240, facet: 0.0055, crystal: 0.0340, crystalY: 0.0060,
       shape: clavicleShape(1.0), dip: 0.030, hero: 0.32, zoneAt: subclavicleZone, coat: 0.30 },   /* R99: the shelf blew white; the godform reference's clavicle is dark under a lit shoulder */
     /* R100 — THE TRAPEZIUS RING: between the shoulder line and the neck's
        base, so the traps rise diagonally toward the neck across two bands
        instead of one steep step, with the trap lobes at full strength.
        R103: halfway up the 41-degree slope. */
-    { y: 2.165, w: 0.280, d: 0.222, facet: -0.0050, crystal: 0.0260, crystalY: 0.0050,
+    { y: 2.165, w: 0.300, d: 0.230, facet: -0.0050, crystal: 0.0260, crystalY: 0.0050,
       shape: clavicleShape(0.85), hero: 0.04, zoneAt: trapZone, coat: 0.12 },   /* R101: deeper behind, the upper back's thickness */   /* a slope, not a shelf: first cut at 2.190 / 0.282 drew a flat ledge */
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
@@ -1201,7 +1202,7 @@ export var ARMS = {
     elbow: [-0.585, 1.455, 0.10],   /* R103: the reference's lowered arm hangs STRAIGHT and close — elbow in, shorter */
     wrist: [-0.610, 1.105, 0.14],
     upperRadius: 0.150,   /* R103: 0.160 -> 0.150, the arm was as wide as the lat at the elbow */
-    foreRadius: 0.124,
+    foreRadius: 0.112,   /* R105: the reference forearm is three quarters of the upper arm */
     wristRadius: 0.074
   },
   left: {                         /* viewer's RIGHT — the raised arm */
@@ -1219,7 +1220,7 @@ export var ARMS = {
     elbow: [0.565, 1.465, 0.11],
     wrist: [0.720, 1.860, 0.15],
     upperRadius: 0.150,   /* R103: 0.160 -> 0.150, the arm was as wide as the lat at the elbow */
-    foreRadius: 0.124,
+    foreRadius: 0.112,   /* R105: the reference forearm is three quarters of the upper arm */
     wristRadius: 0.074
   },
 
@@ -1294,7 +1295,7 @@ export var ARMS = {
        clearly narrower at the joint, which is what makes the elbow read as a
        hinge between two masses rather than a bend in a pipe. */
     upper: function (t) {   /* R104: swell 0.28 -> 0.20, the arm hangs as a column from the front; the bellies read in the three-quarter */
-      return 0.92 + Math.sin(Math.pow(t, 0.85) * Math.PI) * 0.20 - t * 0.08;
+      return 0.92 + Math.pow(Math.sin(Math.pow(t, 0.85) * Math.PI), 1.3) * 0.24 - t * 0.08;   /* R105: a sharper peak */
     },
     /* Picks up close to where the upper arm ended — a step at the elbow reads
        as an error rather than as a joint — then swells just below it and tapers
@@ -1326,8 +1327,8 @@ export var ARMS = {
        limbSideDirection); the lateral tricep ridge and the radial forearm
        ridge sit on the OUTER side, which is -inner. */
     upper: function (t, d, inner) {
-      var belly = Math.sin(Math.pow(t, 0.82) * Math.PI);
-      var rear = Math.sin(Math.pow(t, 1.30) * Math.PI);
+      var belly = Math.pow(Math.sin(Math.pow(t, 0.82) * Math.PI), 1.6);   /* R105: a PEAK, not a broad swell — the bicep is a belly under tension */
+      var rear = Math.pow(Math.sin(Math.pow(t, 1.30) * Math.PI), 1.4);
       var outer = -(inner || 1);
       /* R97: BELLIES, not bulges. The bicep peaks at a third of the way
          down at nearly a third of the radius, the tricep — broader, lower —
@@ -1338,7 +1339,7 @@ export var ARMS = {
          its long-head fullness and gains a LATERAL-HEAD ridge on the outer
          arm, the horseshoe's outer arm converging toward the elbow. */
       var bicep = bump(d, 0, 0.62) * 0.520 * belly;   /* R101: the male standard — a fuller belly */
-      var tricep = bump(d, Math.PI, 1.10) * 0.460 * rear;   /* R99: the tricep is a volume of its own; R101: thicker */
+      var tricep = bump(d, Math.PI, 1.10) * 0.480 * rear;   /* R99: the tricep is a volume of its own; R101: thicker */
       var lateralHead = bump(d, outer * (Math.PI - 0.95), 0.40) * 0.240 * Math.sin(Math.pow(t, 1.1) * Math.PI);   /* R101: the horseshoe's outer arm */
       /* the groove between them, down each side of the arm */
       /* R98: the groove is deepest through the upper half, and in the lower
@@ -1349,14 +1350,14 @@ export var ARMS = {
       low = low * low * (3 - 2 * low);
       var sides = bump(d, Math.PI / 2, 0.42) + bump(d, -Math.PI / 2, 0.42);
       var groove = sides * -0.360 * belly * (1 - low);   /* R99: a deeper valley between the two; R100: deeper again; R101; R102: 0.16 -> 0.20, the biceps/triceps boundary is a cut */
-      var brachialis = sides * 0.240 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);   /* R101: visible between bicep and tricep above the elbow */
+      var brachialis = sides * 0.300 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);   /* R101: visible between bicep and tricep above the elbow */
       /* R102: the DELTOID INSERTION — a valley across the top of the arm
          under the cap, so the shoulder is separated from the arm by a
          change of depth (the brief's "visible insertion under the delt
          cap"), and ELBOW COMPRESSION — the arm narrows into the joint on the
          front where the biceps' tendon runs. */
-      var insertion = -bump(d, 0, 0.55) * 0.110 * (1 - Math.min(1, t / 0.22)) * (1 - Math.min(1, t / 0.22));
-      var elbow = -bump(d, 0, 0.60) * 0.090 * Math.pow(Math.max(0, (t - 0.80) / 0.20), 2);
+      var insertion = -(0.10 + 0.14 * bump(d, 0, 0.55)) * (1 - Math.min(1, t / 0.22)) * (1 - Math.min(1, t / 0.22));   /* R105: the under-delt valley runs all the way round; deeper on the front */
+      var elbow = -bump(d, 0, 0.60) * 0.130 * Math.pow(Math.max(0, (t - 0.80) / 0.20), 2);
       return 1 + bicep + tricep + lateralHead + groove + brachialis + insertion + elbow;
     },
     fore: function (t, d, inner) {
@@ -1368,8 +1369,8 @@ export var ARMS = {
       /* R98: fuller extensor group high on the outer forearm, flexors
          inboard, and a shallow groove between them down the ulna so the two
          groups read as two under the coat. */
-      var flexor = bump(d, 0.45, 0.85) * 0.320 * swell;
-      var extensor = bump(d, Math.PI - 0.55, 0.95) * 0.310 * Math.sin(Math.pow(t, 0.45) * Math.PI);
+      var flexor = bump(d, 0.45, 0.85) * 0.360 * swell;
+      var extensor = bump(d, Math.PI - 0.55, 0.95) * 0.360 * Math.pow(Math.sin(Math.pow(t, 0.45) * Math.PI), 1.4);
       var ulna = bump(d, -Math.PI / 2 - 0.2, 0.40) * -0.070 * swell;
       /* R100: the RADIAL ridge — the brachioradialis running down the outer
          forearm from the elbow, fullest in the upper third and fading to
@@ -1379,8 +1380,8 @@ export var ARMS = {
       /* R102: the FLEXOR / EXTENSOR CHANNEL — a groove between the two groups
          on the inner side, and the WRIST TENDONS: the forearm flattens toward
          the wrist on the front so the flexor tendons read as a narrowing */
-      var channel = -bump(d, -outer * 0.95, 0.26) * 0.140 * swell;
-      var wrist = -bump(d, 0.20, 0.55) * 0.070 * Math.pow(Math.max(0, (t - 0.72) / 0.28), 2);
+      var channel = -bump(d, -outer * 0.95, 0.26) * 0.200 * swell;
+      var wrist = -bump(d, 0.20, 0.55) * 0.110 * Math.pow(Math.max(0, (t - 0.72) / 0.28), 2);
       return 1 + flexor + extensor + ulna + radial + channel + wrist;
     }
   }

@@ -354,9 +354,9 @@ export function buildBody(materials, P) {
     var deltoidProfile = function (t) {
       var root = Math.min(1, t / 0.28);
       var endT = Math.max(0, (t - 0.75) / 0.25);
-      var end = 1 - 0.55 * endT * endT * (3 - 2 * endT);
+      var end = 1 - 0.62 * endT * endT * (3 - 2 * endT);
       return (0.28 + 0.72 * root * root * (3 - 2 * root)) * end *
-             (1 + Math.sin(Math.pow(t, 1.3) * Math.PI) * 0.30);   /* R103: 0.36 -> 0.30, the crest stood above the trap slope */
+             (1 + Math.pow(Math.sin(Math.pow(t, 1.15) * Math.PI), 0.8) * 0.50);   /* R105: a CAP — rounder, fuller belly with the axis lowered in R103 */
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -371,7 +371,7 @@ export function buildBody(materials, P) {
     var geo = segment(
       inner, outer,
       deltoidR0, deltoidR1, 10,
-      { depthRatio: 1.0, crystal: 0.050, steps: 6, lift: ARMS_.deltoidLift,
+      { depthRatio: 1.0, crystal: 0.050, steps: 8, lift: ARMS_.deltoidLift,   /* R105: eight rings, a spherical cap */
         classes: REGIONS.DELT.classes,
         profile: deltoidProfile,
         /* R97 — THREE HEADS. `d` is the angle from the cap's front (+z): a
@@ -389,10 +389,10 @@ export function buildBody(materials, P) {
           /* R102: the three heads are CARVED — the grooves between them are
              twice as deep (and the cavity term in the shader keeps them
              dark), the rear delt is fuller for the rear views. */
-          var front = 0.18 * Math.exp(-Math.pow(d / 0.66, 2));   /* R103: the anterior delt overlaps the pec */
+          var front = 0.22 * Math.exp(-Math.pow(d / 0.66, 2));   /* R103: the anterior delt overlaps the pec; R105: fuller */
           var rear = 0.12 * Math.exp(-Math.pow((ad - Math.PI) / 0.76, 2));
           var lateral = 0.06 * Math.exp(-Math.pow((ad - Math.PI / 2) / 0.45, 2));
-          var grooves = -0.090 * (Math.exp(-Math.pow((ad - 0.95) / 0.20, 2)) + Math.exp(-Math.pow((ad - 2.25) / 0.20, 2)));
+          var grooves = -0.120 * (Math.exp(-Math.pow((ad - 0.95) / 0.20, 2)) + Math.exp(-Math.pow((ad - 2.25) / 0.20, 2)));
           return 1 + (front + rear + lateral + grooves) * belly;
         },
         zoneAt: function (d, t) {

@@ -1353,6 +1353,27 @@ only stopped when NEW was visibly different from CURRENT — waist 0.127 ->
 (shoulder over waist 3.56 against its 2.71). When a brief says "morph",
 the previous pass is the thing to beat.
 
+### A belly needs vertices to be round (R105)
+
+Deeper lobes on the same rings did not make a muscle: a pec lobe half a
+radian wide on a 14-sided ring lands on two vertices and is a flat facet
+however tall it is, and an 8-sided upper arm with a 0.62 bicep read as a
+lumpy boulder in the close-up. The torso is 18 sides now and the limbs 12,
+with seven rings on the upper arm and eight on the deltoid, and the lobes
+came DOWN as the sides went up — bicep 0.62 -> 0.52, groove 0.42 -> 0.36 —
+because a round tube needs less exaggeration to show a belly. The peak is
+made by the profile along the limb (sin^1.6 for the bicep, sin^1.4 for the
+triceps), not by the lobe's height. Check the close-up against the
+reference's arm before touching a lobe: the fault was resolution, and no
+amplitude fixes resolution.
+
+### A block is a bulge against an INSET, not against a smaller bulge
+
+Three abdominal pairs at 0.24 / 0.06 read as nothing in grayscale; at
+0.42 against a -0.06 crease carrying a 0.80 cavity they read as rows. The
+crease has to go below the ring's nominal surface for the block above it
+to have a lower edge.
+
 ### Reference segmentation: read the grid
 
 Every automatic mask of the R102 references failed — brightness took the
