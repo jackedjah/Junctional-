@@ -766,7 +766,7 @@ if (exists('CLAUDE.md')) {
   ok('R100-trapezius-ring-and-zone', /function trapZone/.test(propsSrc) && /zoneAt: trapZone/.test(propsSrc));
   ok('R100-clavicle-groove', /function subclavicleShape/.test(propsSrc) && /function subclavicleZone/.test(propsSrc) && /zoneAt: subclavicleZone/.test(propsSrc));
   ok('R100-serratus-saw', /tooth/.test(propsSrc) && /SERRATUS/.test(propsSrc));
-  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.[67][0-9]\) \* 0\.[3-6][0-9]0/.test(propsSrc) && /lateralHead/.test(propsSrc));
+  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.[5-7][0-9]\) \* 0\.[3-6][0-9]0/.test(propsSrc) && /lateralHead/.test(propsSrc));
   ok('R100-radial-forearm-ridge', /var radial = bump\(d, outer \* 0\.95/.test(propsSrc) && /ARMS_\.shapes\.fore\(t, d, foreInner\)/.test(limbs));
   ok('R100-cap-shadow-on-the-arm', /t < 0\.17 && ad > 0\.55/.test(limbs));
   ok('R100-hand-knuckles', /KNUCKLE/.test(limbs) && /spec\.digitRadius \* 1\.22/.test(limbs));
@@ -793,11 +793,11 @@ if (exists('CLAUDE.md')) {
   ok('R101-head-rings-mirror-symmetric', /var fi = Math\.min\(i, \(N \/ 2 - i \+ N\) % N\)/.test(forge) && /hash2\(fi \* 3 \+ jitterSeed/.test(forge));
   /* the head's bottom corner sits into the neck collar, which closes inside the diamond */
   const base = Number((propsSrc.match(/centreY:\s*([\d.]+)/) || [])[1]) - Number((propsSrc.match(/halfHeight:\s*([\d.]+)/) || [])[1]);
-  const neckTop = Number((propsSrc.match(/\{ y: (2\.3[0-9]{2}), w: 0\.010/) || [])[1]);
+  const neckTop = Number((propsSrc.match(/\{ y: (2\.3[0-9]{2}), w: 0\.[01][0-9]{2}, d: 0\.[0-9]{3},(?: fg: \[[0-9], [0-9]\],)? facet: 0\.0060/) || [])[1]);   /* R107: the neck closes as a COLUMN, not a point */
   ok('R101-head-seated-in-the-neck', neckTop > base && neckTop - base < 0.09, 'head base ' + base.toFixed(3) + ', neck closes at ' + neckTop);
   /* the male arm standard: bigger cap, fuller bicep, lateral head, brachialis, brachioradialis */
-  ok('R101-male-arm-standard', /r0: 0\.2[6-9][0-9]/.test(body) && /bump\(d, 0, 0\.[67][0-9]\) \* 0\.[4-6][0-9]0/.test(propsSrc) &&
-    /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.95\), 0\.4[0-9]\) \* 0\.[12][0-9]0/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
+  ok('R101-male-arm-standard', /r0: 0\.[12][0-9]{2}/.test(body) && /bump\(d, 0, 0\.[5-7][0-9]\) \* 0\.[4-6][0-9]0/.test(propsSrc) &&
+    /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.[79][0-9]\), 0\.4[0-9]\) \* 0\.[1-3][0-9]0/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
     /upperRadius: 0\.1[5-6]0/.test(propsSrc));
   /* three deltoid heads as FORM: front, rear, lateral crest and two grooves */
   /* R102: the grooves between the heads are twice as deep (0.045 -> 0.090) */
@@ -858,12 +858,12 @@ if (exists('CLAUDE.md')) {
     below.map(r => r.w).join(' > '));
   ok('R106-knee-and-calf-inside-the-taper', !!knee && !!calf && knee.w < calf.w && calf.w < hip.w);
   /* the abdomen is a curved mass with blocks as relief, not a stack of plates */
-  ok('R106-abs-not-corrugated', /coreShape\(1\.0, 0\.2[0-9]\)/.test(propsSrc) && !/coreShape\(1\.0, -0\.0[0-9]/.test(propsSrc) && !/coreShape\(0\.90, -0\.0[0-9]/.test(propsSrc));
+  ok('R106-abs-not-corrugated', /coreShape\(1\.0, 0\.[23][0-9]\)/.test(propsSrc) && !/coreShape\(1\.0, -0\.0[5-9]/.test(propsSrc) && !/coreShape\(0\.90, -0\.0[5-9]/.test(propsSrc));   /* R107: a crease may sit a hair under the ring (-0.03) against a 0.30 belly; the slot was -0.06 against 0.42 */
   /* the pec is a dome: a crown ring between two shoulder rings */
-  ok('R106-pec-crown-ring', /\{ y: 1\.935, w: 0\.3[0-9]{2}, d: 0\.3[0-9]{2}/.test(propsSrc) && /shape: chestShape\(0\.[89][0-9]\), hero: 0\.30/.test(propsSrc));
+  ok('R106-pec-crown-ring', /\{ y: 1\.935, w: 0\.3[0-9]{2}, d: 0\.3[0-9]{2}/.test(propsSrc) && /shape: chestShape\(0\.[89][0-9](, [0-9]\.[0-9]+)*\), hero: 0\.30/.test(propsSrc));
   /* the trapezius is a SLOPE across three rings, not a 0.72 ledge on the shoulder line */
   const trapM = propsSrc.match(/var traps = \(lobe\(a, Math\.PI - 0\.7, 0\.60\) \+ lobe\(a, -Math\.PI \+ 0\.7, 0\.60\)\) \* ([\d.]+);/);
-  ok('R106-trapezius-is-a-slope', !!trapM && Number(trapM[1]) <= 0.40 && /function subclavicleShape\(k, trapK\)/.test(propsSrc) && /subclavicleShape\(1\.0, 0\.1[0-9]\)/.test(propsSrc),
+  ok('R106-trapezius-is-a-slope', !!trapM && Number(trapM[1]) <= 0.40 && /function subclavicleShape\(k, trapK(, pecK)?\)/.test(propsSrc) && /subclavicleShape\(1\.0, 0\.1[0-9](, 0\.[0-9]+)?\)/.test(propsSrc),
     trapM ? 'traps ' + trapM[1] : 'no traps lobe');
   /* the deltoid is ONE dome: the inter-head grooves are plane changes (<= 0.06) */
   const grooveM = body.match(/var grooves = -([\d.]+) \*/);
@@ -879,6 +879,46 @@ if (exists('CLAUDE.md')) {
   /* the crystal precesses; the mist takes a tenth of the theme */
   ok('R106-crystal-precession', /crystal\.plate\.rotation\.y = time \* 0\.1[0-9]/.test(mrmah));
   ok('R106-mist-theme-tenth', /themeHex\('atmosphere', 0xc2dcf2\)\), 0\.10\)/.test(read('mrmah3d/core/environment.js')));
+})();
+
+/* ---- R107 — GODFORM TRUE SCULPT: smooth curve -> belly -> valley -> facet ---- */
+(function () {
+  const propsSrc = read('mrmah3d/core/character/proportions.js');
+  const forge = read('mrmah3d/core/character/forge.js');
+  const body = read('mrmah3d/core/character/body.js');
+  const limbs = read('mrmah3d/core/character/limbs.js');
+  const variants = read('mrmah3d/core/character/variants.js');
+  const mrmah = read('mrmah3d/core/character/mrmah.js');
+  const sceneSrc = read('mrmah3d/core/mrmah-scene.js');
+  ok('R107-references-present', exists('reference/mrmah-refM-r107-master-sheet.png') && exists('reference/mrmah-refM-r107-mrs-mah-sheet.png') && exists('reference/mrmah-refL-r106-back-anatomy.png'));
+  /* the macro form is a SPLINE: rings refined on a Catmull-Rom curve with the shape blended */
+  ok('R107-spline-refined-loft', /function refineSections\(sections, n\)/.test(forge) && /if \(opts\.refine\) sections = refineSections\(sections, opts\.refine\);/.test(forge) && /refine: 1,/.test(propsSrc) && /refine: TORSO_\.refine/.test(body) && /refine: T\.refine/.test(variants));
+  /* the micro jitter sits UNDER the curve */
+  ok('R107-jitter-under-the-curve', /jitter: 0\.4[0-9],/.test(propsSrc) && /jitterScale/.test(forge) && /crystal: 0\.012, steps: 1[0-9]/.test(limbs));
+  /* resolution: 24-side torso, 14-side limbs, 12-ring deltoid */
+  ok('R107-round-resolution', /sides: 24,/.test(propsSrc) && /spec\.foreRadius \* 1\.02, 14,/.test(limbs) && /deltoidR0, deltoidR1, 14,/.test(body) && /steps: 12/.test(body));
+  /* bellies: fuller top, steeper flanks */
+  ok('R107-belly-function', /function belly\(a, centre, width\) \{ return Math\.pow\(bump\(a - Math\.PI \/ 2, centre, width\), 0\.55\); \}/.test(propsSrc) && /belly\(a, 0\.66, 0\.46\)/.test(propsSrc) && /SHAPES\.belly/.test(variants));
+  /* the deltoid is a dome of ~0.2 radius rooted in the trapezius, not a 0.33 ball */
+  const r0 = Number((body.match(/r0: ([\d.]+) \}/) || [])[1]);
+  ok('R107-deltoid-is-a-dome', r0 > 0.18 && r0 < 0.26 && /\* 0\.30\);   \/\* R105: a CAP; R107/.test(body) && /return \(0\.55 \+ 0\.45 \* root/.test(body), 'r0 ' + r0);
+  /* the arm: biceps peak, horseshoe with a valley, brachialis wedge, brachioradialis ridge */
+  ok('R107-arm-masses', /var triValley = /.test(propsSrc) && /\+ triValley \+/.test(propsSrc) && /var brachialis = \(bump\(d, outer \* \(Math\.PI \/ 2 - 0\.15\)/.test(propsSrc) && /bump\(d, outer \* 0\.95, 0\.40\) \* 0\.300/.test(propsSrc));
+  /* the lat is scaled on its own; the pec fades into the clavicle */
+  ok('R107-lat-independent-of-pec', /function chestShape\(k, erectorK, latK\)/.test(propsSrc) && /function subclavicleShape\(k, trapK, pecK\)/.test(propsSrc) && /subclavicleShape\(1\.0, 0\.17, 0\.35\)/.test(propsSrc));
+  /* the neck is a column into the head; the shoulder corner sits inside the dome */
+  ok('R107-neck-column', /\{ y: 2\.335, w: 0\.1[0-9]{2}/.test(propsSrc) && /\{ y: 2\.120, w: 0\.30[0-9]/.test(propsSrc));
+  /* Mrs. Mah: hip / glute max near 1 : 3.5 against the waist, glute spheres with a fold */
+  const fw = Number((variants.match(/\{ y: 1\.690, w: ([\d.]+)/) || [])[1]), fh = Number((variants.match(/\{ y: 1\.400, w: ([\d.]+)/) || [])[1]);
+  ok('R107-female-hip-ratio', fw > 0 && fh / fw >= 3.0, 'hip/waist ' + (fh / fw).toFixed(2));
+  ok('R107-female-glute-spheres', /SHAPES\.belly\(a, Math\.PI - 0\.6[0-9], 0\.3[0-9]\)/.test(variants) && /hipShape\(1\.0, 0\.85\)/.test(variants) && /hipShape\(0\.45, 0\.0\)/.test(variants));
+  ok('R107-male-glute-spheres', /belly\(a, Math\.PI - 0\.70, 0\.36\)/.test(propsSrc) && /quadShape\(0\.70, 0\.0, 1\.0\)/.test(propsSrc));
+  /* facet GROUPS: several triangles share one group-averaged normal, sized per ring */
+  ok('R107-facet-groups', /function groupKey\(spec, i, r\)/.test(forge) && /faceGroup: faceGroup/.test(forge) && /triGroup\.forEach/.test(forge) && (propsSrc.match(/fg: \[[0-9], [0-9]\]/g) || []).length >= 24 && /fg: \[2, 3\],/.test(body));
+  /* the smooth clay gate: smooth normals swapped in, a camera-side key */
+  ok('R107-smooth-clay-gate', /g\.setAttribute\('normal', g\.attributes\.aSmooth\)/.test(mrmah) && /__facetNormal/.test(mrmah) && /clayKey = new ClayLight\(0xffffff, 1\.[0-9]\)/.test(sceneSrc));
+  /* posterior (R106 back sheet, carried into R107): trap kite, lat sweep, scapular planes */
+  ok('R107-posterior-authored', /chestShape\(0\.70, 0\.44, 0\.45\)/.test(propsSrc) && /Math\.PI \/ 2 \+ 0\.22 \+ ls/.test(propsSrc) && /var scapula = /.test(propsSrc));
 })();
 
 console.log('\n' + pass + '/' + (pass + fail) + ' passed, ' + fail + ' failed');

@@ -365,6 +365,9 @@ export function facetedGeometry(positions, faces, groups, options) {
     nx /= len; ny /= len; nz /= len;
     pos.push(ax, ay, az, bx, by, bz, cx, cy, cz);
     nor.push(nx, ny, nz, nx, ny, nz, nx, ny, nz);
+    /* R107 facet groups: remember this triangle's area-weighted normal and its
+       group, so the group's average can replace the per-triangle normal below. */
+    triGroup.push(curGroup); triArea.push(nx * len, ny * len, nz * len);
     var sa = smoothAt(ax, ay, az) || [nx, ny, nz];
     var sb = smoothAt(bx, by, bz) || [nx, ny, nz];
     var sc = smoothAt(cx, cy, cz) || [nx, ny, nz];
@@ -419,6 +422,7 @@ export function facetedGeometry(positions, faces, groups, options) {
      the triangle — so a quad and both of its triangles share one value and a
      lofted band can hand its own lift to every quad in it. Falls back to
      `opts.lift` wherever it is absent, so nothing that does not use it changes. */
+  var triGroup = [], triArea = [], curGroup = null;
   var faceLift = opts.lift;
   var faceClasses = opts.classes || null;
   var faceSeed = null;
@@ -434,6 +438,7 @@ export function facetedGeometry(positions, faces, groups, options) {
       faceClasses = (opts.faceClasses && opts.faceClasses[polyIndex]) || opts.classes || null;
       faceSeed = opts.faceSeed && opts.faceSeed[polyIndex] != null ? opts.faceSeed[polyIndex] : null;
       faceClassIndex = opts.faceClassIndex && opts.faceClassIndex[polyIndex] != null ? opts.faceClassIndex[polyIndex] : null;
+      curGroup = opts.faceGroup && opts.faceGroup[polyIndex] != null ? opts.faceGroup[polyIndex] : null;
       polyIndex++;
       if (f.length === 3) emitTri(f[0], f[1], f[2]);
       else { emitTri(f[0], f[1], f[2]); emitTri(f[0], f[2], f[3]); }
@@ -441,6 +446,21 @@ export function facetedGeometry(positions, faces, groups, options) {
     groupRanges.push({ start: start, count: written - start, material: g.material || 0 });
   });
 
+  /* R107 — one shading normal per FACET GROUP (see loft). */
+  if (triGroup.some(function (g) { return g != null; })) {
+    var gsum = {};
+    triGroup.forEach(function (g, t) {
+      if (g == null) return;
+      var e = gsum[g] || (gsum[g] = [0, 0, 0]);
+      e[0] += triArea[t * 3]; e[1] += triArea[t * 3 + 1]; e[2] += triArea[t * 3 + 2];
+    });
+    triGroup.forEach(function (g, t) {
+      if (g == null) return;
+      var e = gsum[g], l = Math.hypot(e[0], e[1], e[2]);
+      if (l < 1e-9) return;
+      for (var v = 0; v < 3; v++) { nor[t * 9 + v * 3] = e[0] / l; nor[t * 9 + v * 3 + 1] = e[1] / l; nor[t * 9 + v * 3 + 2] = e[2] / l; }
+    });
+  }
   var geo = new BufferGeometry();
   geo.setAttribute('position', new Float32BufferAttribute(pos, 3));
   geo.setAttribute('normal', new Float32BufferAttribute(nor, 3));
@@ -522,8 +542,69 @@ function reliefWeight(angle) {
    with w=0 collapses to a point and is emitted as a fan, which is how the
    torso terminates in its sharp lower tip without a degenerate ring of
    zero-area quads. */
+/* R107 — THE MACRO FORM IS A SPLINE, NOT A POLYLINE.
+
+   A loft is piecewise-linear between its authored rings, so however the ring
+   table is tuned the silhouette is a chain of straight segments and corners —
+   the "step, corner, straight segment" the R107 brief rules out. `refine`
+   inserts `n` rings between every authored pair, with y / w / d / zc on a
+   Catmull-Rom curve through the authored rings and the anatomical shape
+   blended between the two neighbours, so the profile is one continuous curve
+   and the shape functions' lobes flow from ring to ring instead of stepping.
+
+   Everything that names a PLANE (zoneAt, classesAt, columns, hero, coat) is
+   inherited from the authored ring ABOVE, which is exactly what bandSpec
+   already reads for a band, so the zone architecture is unchanged; `cav` is
+   interpolated so a crease ring's cavity peaks at the crease. The crystal
+   jitter is scaled down on the inserted rings: with rings twice as dense the
+   same displacement is twice as rough, and the micro facets are meant to be
+   SMALLER than the macro curve, not to fight it. */
+function refineSections(sections, n) {
+  if (!n || sections.length < 3) return sections;
+  var out = [];
+  function P(i) { return sections[Math.max(0, Math.min(sections.length - 1, i))]; }
+  function cr(p0, p1, p2, p3, t) {
+    var t2 = t * t, t3 = t2 * t;
+    return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
+  }
+  function num(s, k) { return s[k] == null ? 0 : s[k]; }
+  for (var i = 0; i < sections.length - 1; i++) {
+    var A = sections[i], B = sections[i + 1], Pm = P(i - 1), Pn = P(i + 2);
+    out.push(A);
+    /* A ring on the axis (a point) is a tip: the band into it stays as authored. */
+    if (A.w <= 1e-6 || B.w <= 1e-6) continue;
+    for (var k = 1; k <= n; k++) {
+      var t = k / (n + 1);
+      var sm = t * t * (3 - 2 * t);
+      out.push({
+        y: cr(Pm.y, A.y, B.y, Pn.y, t),
+        w: Math.max(1e-4, cr(Pm.w, A.w, B.w, Pn.w, t)),
+        d: Math.max(1e-4, cr(Pm.d, A.d, B.d, Pn.d, t)),
+        zc: cr(num(Pm, 'zc'), num(A, 'zc'), num(B, 'zc'), num(Pn, 'zc'), t),
+        dip: num(A, 'dip') + (num(B, 'dip') - num(A, 'dip')) * t,
+        cav: num(A, 'cav') + (num(B, 'cav') - num(A, 'cav')) * t,
+        facet: (num(A, 'facet') + num(B, 'facet')) * 0.5 * (k % 2 ? -1 : 1) * 0.6,
+        crystal: (num(A, 'crystal') + num(B, 'crystal')) * 0.5 * 0.55,
+        crystalY: (num(A, 'crystalY') + num(B, 'crystalY')) * 0.5 * 0.55,
+        shape: (A.shape || B.shape) ? (function (fa, fb, w) {
+          return function (a) { return (fa ? fa(a) : 1) * (1 - w) + (fb ? fb(a) : 1) * w; };
+        }(A.shape, B.shape, sm)) : undefined,
+        hero: B.hero, coat: B.coat, classesAt: B.classesAt, zoneAt: B.zoneAt, columns: B.columns, fg: B.fg,
+        refined: true
+      });
+    }
+  }
+  out.push(sections[sections.length - 1]);
+  return out;
+}
+
 export function loft(sections, sides, options) {
   var opts = options || {};
+  if (opts.refine) sections = refineSections(sections, opts.refine);
+  /* R107: one scale on the whole solid's crystal jitter. The smooth-normal
+     clay showed the authored jitter (0.02-0.036 on a 0.3 radius) as lumps on
+     the macro form; the micro facets are meant to sit UNDER the curve. */
+  var jitterScale = opts.jitter == null ? 1 : opts.jitter;
   var phase = opts.phase == null ? Math.PI / 2 : opts.phase;
   var capTop = opts.capTop !== false;
   var capBottom = opts.capBottom !== false;
@@ -558,11 +639,11 @@ export function loft(sections, sides, options) {
          different normals, so they catch genuinely different parts of the
          environment — which is where the reference's glistening front faces
          come from. Weighted by `guard`, so the profile stays measured. */
-      var jitter = (hash2(i * 3 + 1, ri * 7 + 2) - 0.5) * 2 * (s.crystal || 0) * guard;
+      var jitter = (hash2(i * 3 + 1, ri * 7 + 2) - 0.5) * 2 * (s.crystal || 0) * jitterScale * guard;
 
       /* A little vertical scatter too. Perfectly level rings read as stacked
          bands; breaking them is most of what removes the rigid, CAD look. */
-      var yJit = (hash2(i * 5 + 11, ri * 13 + 3) - 0.5) * (s.crystalY || 0) * guard;
+      var yJit = (hash2(i * 5 + 11, ri * 13 + 3) - 0.5) * (s.crystalY || 0) * jitterScale * guard;
 
       /* A shoulder shelf: front and back vertices sit lower than the sides,
          which is the collar chevron the reference shows across the chest. */
@@ -613,11 +694,24 @@ export function loft(sections, sides, options) {
      taper's spear columns dark, its flank columns sapphire); a ring with
      `columns: true` seeds every quad in a column identically, so the column
      draws one class from top to bottom and reads as a single long facet. */
-  var faceLift = [], faceClasses = [], faceSeed = [], faceClassIndex = [], faceCoat = [];
-  function pushFace(f, heroLift, classes, seed, index, coat) {
+  var faceLift = [], faceClasses = [], faceSeed = [], faceClassIndex = [], faceCoat = [], faceGroup = [];
+  function pushFace(f, heroLift, classes, seed, index, coat, group) {
     faces.push(f); faceLift.push(heroLift); faceClasses.push(classes || null); faceSeed.push(seed);
     faceClassIndex.push(index == null ? null : index);
     faceCoat.push(coat == null ? null : coat);
+    faceGroup.push(group == null ? null : group);
+  }
+  /* R107 — FACET GROUPS. The macro form is a smooth spline now, so its
+     triangles are small and uniform and read as low-poly rather than as cut
+     crystal. A ring may declare `fg: [columns, bands]`: every polygon in a
+     block of that many columns by that many bands shares ONE shading normal
+     (the block's area-weighted average — see facetedGeometry), so the body
+     shows large planar facets over a curved sculpt, each facet's normal
+     following the curvature under it. Big on the big masses, small near the
+     valleys, none where a ring says nothing. The geometry does not move. */
+  function groupKey(spec, i, r) {
+    if (!spec.fg) return null;
+    return Math.floor(i / spec.fg[0]) + ':' + Math.floor(r / spec.fg[1]);
   }
   function bandSpec(r) {
     var s = sections[r + 1], lo = sections[r];
@@ -636,7 +730,8 @@ export function loft(sections, sides, options) {
          than as six unrelated tiles. The zone function is the ring's own, so
          the upper pec band and the lower pec band can be two planes. */
       zoneAt: (s.zoneAt !== undefined ? s.zoneAt : lo.zoneAt) || null,
-      columns: !!(s.columns !== undefined ? s.columns : lo.columns)
+      columns: !!(s.columns !== undefined ? s.columns : lo.columns),
+      fg: s.fg !== undefined ? s.fg : lo.fg
     };
   }
   function midAngle(i) { return phase + ((i + 0.5) / sides) * Math.PI * 2; }
@@ -684,7 +779,7 @@ export function loft(sections, sides, options) {
         var a1 = lo.verts[i3], b1 = lo.verts[(i3 + 1) % sides];
         var c1 = hi.verts[(i3 + 1) % sides], d1 = hi.verts[i3];
         var z2 = quadZone(spec, i3, r);
-        var qc = quadClasses(spec, i3, z2), qs = quadSeed(spec, i3, r, z2), qi = quadIndex(z2), qk = quadCoat(spec, z2);
+        var qc = quadClasses(spec, i3, z2), qs = quadSeed(spec, i3, r, z2), qi = quadIndex(z2), qk = quadCoat(spec, z2), qg = groupKey(spec, i3, r);
         /* Alternate the diagonal of each quad, checkerboard fashion. Combined
            with the facet relief above — which already makes these quads
            non-planar — this gives every triangle its own normal and lays a
@@ -722,11 +817,11 @@ export function loft(sections, sides, options) {
            a culled face and a black face look identical — read the geometry. */
         var alt = spec.columns ? (i3 % 2 === 0) : ((i3 + r) % 2 === 0);
         if (alt) {
-          pushFace([a1, c1, b1], bandLift, qc, qs, qi, qk);
-          pushFace([a1, d1, c1], bandLift, qc, qs, qi, qk);
+          pushFace([a1, c1, b1], bandLift, qc, qs, qi, qk, qg);
+          pushFace([a1, d1, c1], bandLift, qc, qs, qi, qk, qg);
         } else {
-          pushFace([a1, d1, b1], bandLift, qc, qs, qi, qk);
-          pushFace([b1, d1, c1], bandLift, qc, qs, qi, qk);
+          pushFace([a1, d1, b1], bandLift, qc, qs, qi, qk, qg);
+          pushFace([b1, d1, c1], bandLift, qc, qs, qi, qk, qg);
         }
       }
     }
@@ -748,7 +843,7 @@ export function loft(sections, sides, options) {
   return { geometry: facetedGeometry(positions, faces, null,
       { lift: opts.lift, faceLift: faceLift, classes: opts.classes, faceClasses: faceClasses, faceSeed: faceSeed,
         faceClassIndex: faceClassIndex, inner: opts.inner, coat: opts.coat, faceCoat: faceCoat,
-        vertexCavity: vertexCavity }),
+        vertexCavity: vertexCavity, faceGroup: faceGroup }),
     positions: positions, faces: faces };
 }
 
@@ -889,6 +984,7 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
          its own, so the transition happens across the form instead of at the
          seam. */
       hero: opts.hero ? opts.hero(t) : undefined,
+      fg: opts.fg,   /* R107: facet-group size along the limb */
       /* R98 — the platinum weight may ramp along the limb too, for the same
          reason the lift does: a coat that starts at the seam is a seam. */
       coat: opts.coatAt ? opts.coatAt(t) : opts.coat,

@@ -1457,3 +1457,82 @@ opens on the outside of the bend) put a flat bright disc on every elbow in
 the three-quarter view — the capped-tube lesson again, at a joint. A
 segment whose profile falls to half at both ends (0.5 + 0.5 sin) is a ball
 whose end discs sit inside both tubes at any bend angle.
+
+### The clay view needs its own key, and the back proved it
+
+Under the scene's lights the rear clay was lit only by the rims and the
+ambient — a flat, form-hiding light — so the back read as a slab whatever
+the rings did. `setDebugView('clay')` now hangs a directional key off the
+camera's upper left (mrmah-scene.js) and removes it with the view. Keep it
+modest: at 2.6 it blew the front to white on top of the scene's key; 1.2
+reads.
+
+### A loft is a polyline until you tell it otherwise (R107)
+
+Every ring table before R107 was tuned against a body that was
+piecewise-linear between its rings: whatever the numbers said, the
+silhouette was a chain of segments and corners, and the smooth-normal clay
+showed it as stacked bands. `loft` now takes `refine`: rings are inserted on
+a Catmull-Rom curve through the authored rings with the anatomical shape
+blended between neighbours (`refineSections`, forge.js). The authored table
+is still the design; the spline is the sculpt. Two consequences worth
+knowing: the jitter that used to hide the polyline now sits ON a smooth
+surface and reads as lumps, so it is scaled down (`jitter` on the solid,
+0.45 on the torso, 0.012 on the limbs); and a crease ring no longer has to
+be a slot to read, because the spline rounds it.
+
+### Smooth clay is the honest gate — flat clay flattered the sculpt
+
+`?debug=clay` now swaps the facet normal for the forge's per-position
+smooth normal (`aSmooth`), so the sculpt is judged with no facet language
+at all. The very first smooth capture showed what nine passes of flat clay
+had not: a deltoid that was a 0.33-unit ball as tall as the whole chest
+(r0 0.29 with a 0.50 belly), arms that were a ball on a tube, a torso that
+was a barrel with horizontal waves, and glutes that were a vase. The flat
+facets had been supplying "form" that the geometry did not have. Judge in
+smooth clay; then check the facets do not change the read.
+
+### A belly is a plateau with steep flanks, not a Gaussian
+
+`lobe` (a Gaussian) makes a soft bump that the smooth clay read as a barrel
+with waves on it. `belly` raises the same Gaussian to 0.55 — fuller across
+its width, falling fast at its edges — and the pecs, rectus, lats, quad
+heads and glutes are built from it. Two spheres side by side need their
+valley a THIRD of their height deep: a cleft whose centre vertex sits at
+the ring's nominal radius (multiplier 1.0) is a line, and the cavity term
+cannot darken it; at 0.5 of the ring it is a valley. Probe the ring (the
+scratch `shapeprobe2.mjs` prints x/z per vertex) before arguing about the
+light.
+
+### Per-ring k scales EVERY lobe — decouple what should not move together
+
+The under-pec shelf ring took `chestShape(0.5)` to drop the pec, and that
+halved the lat on the same ring, so the shelf became a groove all the way
+round the torso. The lat has its own scale now (`latK`), the trapezius
+kite its own (`erectorK`), the groove ring under the collarbone carries the
+pec's fading tail (`pecK`) so the pec does not step off into a horizontal
+band. Likewise a ring narrower than BOTH its neighbours is a groove all
+round whatever its shape says (the 1.830 ring at 0.320 between 0.332 and
+0.326).
+
+### Facets are groups, not triangles (R107 facet language)
+
+With the macro smooth and dense, every triangle was the same size and the
+lit body read as low-poly rather than as cut crystal. A ring may declare
+`fg: [columns, bands]`: every triangle in that block shares one
+area-weighted shading normal (forge.js `groupKey`, applied in
+`facetedGeometry`), so the surface shows large planar facets whose normals
+follow the curvature under them — big on the pecs, glutes and quads (3x3,
+2x3), small at the belt, the creases and the neck (1x1). The geometry does
+not move, so the silhouette is the clay's; only the shading is cut. Check
+the clay against the lit render after any change to `fg`: the two must have
+the same outline.
+
+### Mrs. Mah's ratio is authored, not derived
+
+The R107 brief allows a visual waist-to-hip near 1 : 3.5 for her godform
+state, and says not to normalise it back. Her waist is 0.118 and her hip
+row 0.395 (3.35 in w, more in silhouette with the sweep); the glutes are
+two 0.30-rad bellies 38 degrees off the back with a 0.64 cleft, full to
+the 1.230 ring and ended by 1.070 so the sphere folds into the thigh. Her
+deltoid shares the male's dome law (r0 0.16 on her scale).

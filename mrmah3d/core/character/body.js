@@ -132,7 +132,7 @@ export function buildBody(materials, P) {
      shape with this many real breaks, no threshold makes them rare. The
      structural and secondary tiers describe the form perfectly well without it. */
   var torsoLoft = loft(TORSO_.rings, TORSO_.sides || 8,
-    { capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true,
+    { capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true, refine: TORSO_.refine || 0, jitter: TORSO_.jitter == null ? 1 : TORSO_.jitter,   /* R107: spline-refined rings, half the jitter — see forge.js */
       /* R98 — the body's default platinum share; the ring table and the zone
          functions in proportions.js refine it per plane. */
       coat: REGIONS.BODY.coat });
@@ -329,7 +329,14 @@ export function buildBody(materials, P) {
        between shoulder and pec. The axis comes down with the girdle, the
        root goes deeper into the chest, and the anterior lobe (below) grows
        so the front delt overlaps the upper pec. */
-    var D = ARMS_.deltoid || { innerX: 0.235, innerY: 1.965, outerX: 0.650, outerY: 1.870, r0: 0.290 };
+    /* R107 — THE CAP WAS A 0.33-UNIT BALL. r0 0.29 with a 0.50 belly put the
+       deltoid's radius at 0.33 at its widest — a sphere as tall as the whole
+       chest (1.83-2.12), hanging beside it from above the shoulder line to the
+       pec's lower edge: the smooth clay read it as a pauldron. The plate's
+       deltoid is 0.11 of height tall (0.33 units across), i.e. radius ~0.17.
+       So: r0 0.20, belly 0.30, rooted higher so the dome's crest continues
+       the trapezius slope and its underside undercuts into the arm. */
+    var D = ARMS_.deltoid || { innerX: 0.220, innerY: 2.045, outerX: 0.600, outerY: 1.930, r0: 0.235 };   /* R107 c: rooted deeper and higher, so the dome grows OUT of the trapezius slope */   /* R107 b: higher and further in, so the dome ENCLOSES the torso's shoulder corner (the flat plate the rear clay showed above the caps) */
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;
@@ -352,11 +359,11 @@ export function buildBody(materials, P) {
        shoulder outboard of the clavicle, where the reference has it, instead of
        raising a hump beside the neck. */
     var deltoidProfile = function (t) {
-      var root = Math.min(1, t / 0.28);
+      var root = Math.min(1, t / 0.34);
       var endT = Math.max(0, (t - 0.75) / 0.25);
       var end = 1 - 0.62 * endT * endT * (3 - 2 * endT);
-      return (0.28 + 0.72 * root * root * (3 - 2 * root)) * end *
-             (1 + Math.pow(Math.sin(Math.pow(t, 1.15) * Math.PI), 0.8) * 0.50);   /* R105: a CAP — rounder, fuller belly with the axis lowered in R103 */
+      return (0.55 + 0.45 * root * root * (3 - 2 * root)) * end *   /* R107: the root is FULL (0.55 of r0) inside the torso — a choked root necked the dome onto the chest with a crease all round */
+             (1 + Math.pow(Math.sin(Math.pow(t, 1.15) * Math.PI), 0.8) * 0.30);   /* R105: a CAP; R107: 0.30 — the dome's size is r0's job, the belly only rounds it */
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -370,8 +377,8 @@ export function buildBody(materials, P) {
        the sharpest breaks drawn — the dome is now carried by its planes. */
     var geo = segment(
       inner, outer,
-      deltoidR0, deltoidR1, 10,
-      { depthRatio: 1.0, crystal: 0.050, steps: 8, lift: ARMS_.deltoidLift,   /* R105: eight rings, a spherical cap */
+      deltoidR0, deltoidR1, 14,
+      { depthRatio: 1.0, crystal: 0.012, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 3],   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first */
         classes: REGIONS.DELT.classes,
         profile: deltoidProfile,
         /* R97 — THREE HEADS. `d` is the angle from the cap's front (+z): a
@@ -390,7 +397,7 @@ export function buildBody(materials, P) {
              twice as deep (and the cavity term in the shader keeps them
              dark), the rear delt is fuller for the rear views. */
           var front = 0.17 * Math.exp(-Math.pow(d / 0.72, 2));   /* R103: the anterior delt overlaps the pec; R105: fuller; R106: broader, lower */
-          var rear = 0.10 * Math.exp(-Math.pow((ad - Math.PI) / 0.80, 2));
+          var rear = 0.16 * Math.exp(-Math.pow((ad - Math.PI) / 0.80, 2));   /* R106 back sheet: the posterior head is a full round cap */
           var lateral = 0.05 * Math.exp(-Math.pow((ad - Math.PI / 2) / 0.55, 2));
           var grooves = -0.045 * (Math.exp(-Math.pow((ad - 0.95) / 0.22, 2)) + Math.exp(-Math.pow((ad - 2.25) / 0.22, 2)));   /* R106: in clay the 0.12 grooves cut the cap into three lumps; the reference's cap is ONE dome whose heads are plane changes */
           return 1 + (front + rear + lateral + grooves) * belly;

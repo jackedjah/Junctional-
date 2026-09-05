@@ -11,40 +11,129 @@
   "operatingSystem": "MODE A: measure (5% grid on the plate) -> batch edit -> clay render (?debug=clay, new) front / rear / side / three-quarter + 3x microscope crops -> reject or keep; six batches; MODE B (verify, tests, proof set) only on the kept state",
   "plateMeasurement": {
     "units": "full width as a fraction of character height; t from the head apex (0) to the point (1); read by hand off the grid (scratch grid.mjs) — the automatic profile failed on the sheet's labels, as it did on R102",
-    "front": { "head": 0.175, "shoulder": 0.297, "shoulderT": 0.244, "waist": 0.100, "waistT": 0.435, "hipThigh": 0.22, "hipT": 0.54, "knee": 0.128, "kneeT": 0.69, "calf": 0.135, "calfT": 0.76, "calfToPoint": "a straight cone" },
-    "rear": { "latTorsoOnly": 0.20, "waist": 0.088, "glute": 0.227, "gluteT": 0.52, "knee": 0.135, "calf": 0.149 },
-    "ratios": { "shoulderOverWaist": 2.97, "hipOverWaist": 2.2, "hipOverShoulder": 0.74, "neckHeight": "0.015 of height — the head sits DOWN on the traps" }
+    "front": {
+      "head": 0.175,
+      "shoulder": 0.297,
+      "shoulderT": 0.244,
+      "waist": 0.1,
+      "waistT": 0.435,
+      "hipThigh": 0.22,
+      "hipT": 0.54,
+      "knee": 0.128,
+      "kneeT": 0.69,
+      "calf": 0.135,
+      "calfT": 0.76,
+      "calfToPoint": "a straight cone"
+    },
+    "rear": {
+      "latTorsoOnly": 0.2,
+      "waist": 0.088,
+      "glute": 0.227,
+      "gluteT": 0.52,
+      "knee": 0.135,
+      "calf": 0.149
+    },
+    "ratios": {
+      "shoulderOverWaist": 2.97,
+      "hipOverWaist": 2.2,
+      "hipOverShoulder": 0.74,
+      "neckHeight": "0.015 of height — the head sits DOWN on the traps"
+    }
   },
   "renderMeasurement": {
     "method": "character-only body mask (groups view, world hidden, low tier), refwidth.mjs central run",
-    "R105": { "shoulderRun": 0.416, "waist": 0.108, "hip": 0.141, "knee": 0.072, "calf": 0.088, "hipOverWaist": 1.30 },
-    "R106": { "shoulderRun": 0.466, "waist": 0.108, "hip": 0.211, "knee": 0.092, "calf": 0.102, "hipOverWaist": 1.95, "hipOverShoulderRun": 0.45 },
+    "R105": {
+      "shoulderRun": 0.416,
+      "waist": 0.108,
+      "hip": 0.141,
+      "knee": 0.072,
+      "calf": 0.088,
+      "hipOverWaist": 1.3
+    },
+    "R106": {
+      "shoulderRun": 0.466,
+      "waist": 0.108,
+      "hip": 0.211,
+      "knee": 0.092,
+      "calf": 0.102,
+      "hipOverWaist": 1.95,
+      "hipOverShoulderRun": 0.45
+    },
     "note": "the waist already matched the plate, so every lower-body row was re-widened against it; the head stays canonical (0.24 of height against the plate's 0.175), which is why the shoulders remain proportionally wider than the plate's and hip/shoulder sits at 0.45 rather than 0.74 — the V is still upper-body dominant. Knee and calf were then deliberately held a little under the plate so the taper reads as ONE convergence with a calf swell on it rather than a thigh bulb over a calf bulb (batch 5)."
   },
   "batches": [
-    { "b1": "teardrop rows (hip 0.180 -> 0.290, knee 0.124 -> 0.188, calf 0.162 -> 0.200, a 0.280 ring for the straight cone); ab bulge / crease 0.42 / -0.06 -> 0.24 / 0.06; pec-under ring d 0.236 -> 0.272; sternum 0.36 -> 0.30, pec lobe broader and lower; deltoid grooves 0.12 -> 0.045; bicep / groove / brachialis 0.52 / 0.36 / 0.30 -> 0.44 / 0.22 / 0.22; neck base up to 2.228", "verdict": "kept — the plate slots across the chest and abdomen were gone in clay; the lower body read as ONE mass but as a vase" },
-    { "b2": "subclavicleShape takes trapK, the traps become a slope (0.17 / 0.30 / 0.85x / 0.55x across four rings; was 0.72 on one ring — a ledge); 2.100 d 0.250 -> 0.285 (the black slot under the collarbone); a 1.935 pec crown ring; ribcage +4%; the widest lower row moved down and the diagonal out of the belt straightened", "verdict": "kept — the shoulder-line lid went; the pec turned into a dome with a lit crown" },
-    { "b3": "quad heads 0.24 -> 0.34, seam 0.36, glute pair 0.22 -> 0.40 with a 0.25 cleft; zc offsets so the glutes sit back and the knee forward", "verdict": "kept — the lower body reads as anatomy in clay from behind and the front seam shades" },
-    { "b4": "the back's depth made monotonic to the shoulder line (the 1.935 crown had bulged the back too); three-phalanx fingers, palm 0.138 -> 0.120, digits 0.124 -> 0.172; relaxed curl 0.56 -> 0.40", "verdict": "kept for the back; the palm still a paddle, the elbow drum's disc showed" },
-    { "b5": "continuous convergence below the thigh (calf 0.196 -> 0.180); scapular planes on the chest rings; palm 0.088 half-width, digits 0.160 x 0.024; elbow sized to the upper arm", "verdict": "kept except the elbow — a drum sized to the upper arm showed its disc outside the bend" },
-    { "b6": "the elbow as a BALL (profile 0.5 + 0.5 sin, discs inside both tubes) at 0.78 of the upper arm; knee / calf nudged back up (0.178 / 0.190); crystal precession; mist a tenth of the theme", "verdict": "kept" }
+    {
+      "b1": "teardrop rows (hip 0.180 -> 0.290, knee 0.124 -> 0.188, calf 0.162 -> 0.200, a 0.280 ring for the straight cone); ab bulge / crease 0.42 / -0.06 -> 0.24 / 0.06; pec-under ring d 0.236 -> 0.272; sternum 0.36 -> 0.30, pec lobe broader and lower; deltoid grooves 0.12 -> 0.045; bicep / groove / brachialis 0.52 / 0.36 / 0.30 -> 0.44 / 0.22 / 0.22; neck base up to 2.228",
+      "verdict": "kept — the plate slots across the chest and abdomen were gone in clay; the lower body read as ONE mass but as a vase"
+    },
+    {
+      "b2": "subclavicleShape takes trapK, the traps become a slope (0.17 / 0.30 / 0.85x / 0.55x across four rings; was 0.72 on one ring — a ledge); 2.100 d 0.250 -> 0.285 (the black slot under the collarbone); a 1.935 pec crown ring; ribcage +4%; the widest lower row moved down and the diagonal out of the belt straightened",
+      "verdict": "kept — the shoulder-line lid went; the pec turned into a dome with a lit crown"
+    },
+    {
+      "b3": "quad heads 0.24 -> 0.34, seam 0.36, glute pair 0.22 -> 0.40 with a 0.25 cleft; zc offsets so the glutes sit back and the knee forward",
+      "verdict": "kept — the lower body reads as anatomy in clay from behind and the front seam shades"
+    },
+    {
+      "b4": "the back's depth made monotonic to the shoulder line (the 1.935 crown had bulged the back too); three-phalanx fingers, palm 0.138 -> 0.120, digits 0.124 -> 0.172; relaxed curl 0.56 -> 0.40",
+      "verdict": "kept for the back; the palm still a paddle, the elbow drum's disc showed"
+    },
+    {
+      "b5": "continuous convergence below the thigh (calf 0.196 -> 0.180); scapular planes on the chest rings; palm 0.088 half-width, digits 0.160 x 0.024; elbow sized to the upper arm",
+      "verdict": "kept except the elbow — a drum sized to the upper arm showed its disc outside the bend"
+    },
+    {
+      "b6": "the elbow as a BALL (profile 0.5 + 0.5 sin, discs inside both tubes) at 0.78 of the upper arm; knee / calf nudged back up (0.178 / 0.190); crystal precession; mist a tenth of the theme",
+      "verdict": "kept"
+    }
   ],
   "anatomyScore0to10": {
-    "deltoids": 7, "trapezius": 6, "pectorals": 7, "biceps": 6, "brachialis": 5, "triceps": 5, "forearms": 6, "hands": 6,
-    "lats": 6, "serratus": 4, "abs": 6, "obliques": 5, "teardropLowerBody": 8, "posteriorChain": 5, "silhouetteVsPlate": 7
+    "deltoids": 7,
+    "trapezius": 6,
+    "pectorals": 7,
+    "biceps": 6,
+    "brachialis": 5,
+    "triceps": 5,
+    "forearms": 6,
+    "hands": 6,
+    "lats": 6,
+    "serratus": 4,
+    "abs": 6,
+    "obliques": 5,
+    "teardropLowerBody": 8,
+    "posteriorChain": 5,
+    "silhouetteVsPlate": 7
   },
   "curvatureAndNegativeSpace": {
     "frontSilhouetteConvexity": "the belt -> thigh diagonal is one straight line into a convex arc that converges to the point (16-silhouette-front-vs-plate.png); no second bulb",
     "negativeSpace": "the armpit triangle and the gap between the lowered arm and the thigh both survive (12-chat-mode.png at phone scale)",
     "clayCorrugation": "0 horizontal slots on the front torso in clay (was 4: two ab creases, the under-pec crease, the clavicle groove)"
   },
-  "themeCheck": { "blue": "05-lit-front.png", "purple": "08-lit-purple.png", "gold": "09-lit-gold.png", "note": "the platinum reads silver under all three; the theme lives in the emitters, the rims, the core light of the taper, and now a tenth of the mist" },
-  "engineering": { "staticSuite": "361/361 (four R99-R101 regexes loosened to the new arm and deltoid values; 19 R106 contracts added)", "verify": "node tools/mrmah3d-verify.mjs — 150/150", "draws": "unchanged — the three-phalanx hand is still one merged geometry; one loft ring added to the torso (0.280) and one to the chest (1.935)", "notEvidence": "headless Chromium on SwiftShader; not device evidence" },
+  "themeCheck": {
+    "blue": "05-lit-front.png",
+    "purple": "08-lit-purple.png",
+    "gold": "09-lit-gold.png",
+    "note": "the platinum reads silver under all three; the theme lives in the emitters, the rims, the core light of the taper, and now a tenth of the mist"
+  },
+  "engineering": {
+    "staticSuite": "361/361 (four R99-R101 regexes loosened to the new arm and deltoid values; 19 R106 contracts added)",
+    "verify": "node tools/mrmah3d-verify.mjs — 150/150",
+    "draws": "unchanged — the three-phalanx hand is still one merged geometry; one loft ring added to the torso (0.280) and one to the chest (1.935)",
+    "notEvidence": "headless Chromium on SwiftShader; not device evidence"
+  },
   "openItems": [
     "the band under the neck (2.172-2.228) still faces up and catches the key as a lit collar; it is the trapezius' top and the plate lights it too, but it is brighter than the plate's",
     "the plate's knee (0.128) and calf (0.135) are a third wider than this build's; held under on purpose for the single convergence — if the lower leg reads thin at phone scale, widen 0.780 / 0.640 together",
     "the fingers are merged geometry and do not animate; finger micro-motion needs per-digit meshes (a draw-count cost) or a vertex-shader bend",
     "torso respiration is carried by the core light and glow pulse, not by geometry; a geometric breath was judged too close to the rubber deformation the brief rules out",
     "the female variant took the shared shape changes (trap slope, pec dome, ab de-corrugation) but her own ring table was not re-morphed this pass"
-  ]
+  ],
+  "posteriorAddendum": {
+    "references": [
+      "reference/mrmah-refL-r106-back-anatomy.png — the POSTERIOR authority",
+      "reference/mrmah-refL-r106-lower-region-map.png — glute / hamstring / calf mass reference only; the canon lower body stays ONE teardrop"
+    ],
+    "changes": "chestShape takes a per-ring erector strength so the trapezius KITE descends the spine; teres plane 0.12; coreShape takes latShift so the lat's centre walks toward the spine as it descends; quadShape takes gluteK / hamK — glute spheres with a fold and hamstring columns; rear deltoid lobe 0.16; the clay view gets a camera-side key",
+    "carriedInto": "R107 (validation/mrmah3d/r107/)"
+  }
 }

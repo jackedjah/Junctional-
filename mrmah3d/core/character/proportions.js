@@ -309,12 +309,19 @@ function bump(d, centre, width) {
 /* Same gaussian, but taking a RAW ring angle and measuring from dead front,
    which is where the torso's rings are authored. */
 function lobe(a, centre, width) { return bump(a - Math.PI / 2, centre, width); }
+/* R107 — a BELLY is a lobe with a fuller top and steeper flanks (the Gaussian
+   raised to 0.55): it fills its width like a pumped muscle and then falls
+   fast into the valley beside it, where the plain Gaussian was a soft bump
+   that the smooth clay read as a barrel with waves on it. */
+function belly(a, centre, width) { return Math.pow(bump(a - Math.PI / 2, centre, width), 0.55); }
 
 /* CHEST — two pec masses either side of a sternum valley, plus the lateral
    ribcage carrying round to a flatter back. The sternum is the important half:
    a pair of swells with no valley between them is one wide swell, and the eye
    needs the division to read the pair. */
-function chestShape(k) {
+function chestShape(k, erectorK, latK) {
+  var ek = erectorK == null ? 0.100 : erectorK;
+  var lk = latK == null ? 1.0 : latK;   /* R107: the lat is scaled on its own, not by the pec's k — the under-pec shelf ring (k 0.5) was pinching the lat too, a groove all round the torso */
   /* STRENGTHS ARE LARGE ON PURPOSE.
 
      A first attempt used a 12% sternum and a 10% pec, which is what these would
@@ -333,24 +340,24 @@ function chestShape(k) {
     /* R99: a deeper valley and a thicker shelf — the godform reference's pec
        is a mass with real front-to-back projection, and the sternum falls
        away between the two; the lats flare a little more under the arm. */
-    var sternum = -lobe(a, 0, 0.34) * 0.300;   /* R103: deeper; R106: a trench, not a canyon — 0.36 -> 0.30, narrower */
-    var pec = (lobe(a, 0.72, 0.62) + lobe(a, -0.72, 0.62)) * 0.520;   /* R105: a rounder, fuller belly; R106: BROADER (0.55 -> 0.62) and lower (0.60 -> 0.52) — a dome, not two cylinders */
+    var sternum = -lobe(a, 0, 0.22) * 0.380;   /* R103; R106; R107: a deep NARROW trench the bellies roll away from */
+    var pec = (belly(a, 0.66, 0.46) + belly(a, -0.66, 0.46)) * 0.560;   /* R105; R106; R107: each pec a full BELLY that falls fast into the trench and the armpit */
     /* R97: the lats — the ribcage's side planes swell so the V reads from
        the front AND the back; the back itself is flattened, grooved down the
        spine and carries a pair of erector / lat planes either side of it. */
-    var lat = (lobe(a, Math.PI / 2 + 0.32, 0.62) + lobe(a, -Math.PI / 2 - 0.32, 0.62)) * 0.340;   /* R101: the lats flare wider; R102: further back and wider still — the rear reference's lat spread is wider than the front's */
+    var lat = (belly(a, Math.PI / 2 + 0.32, 0.56) + belly(a, -Math.PI / 2 - 0.32, 0.56)) * 0.320 * lk / Math.max(k, 1e-3);   /* R101: the lats flare wider; R102: further back and wider still — the rear reference's lat spread is wider than the front's */
     var back = lobe(a, Math.PI, 1.00) * -0.100;
-    var spine = -lobe(a, Math.PI, 0.20) * 0.180;   /* R102: a deeper spinal groove (rear capture: the channel barely read at 0.105) */
-    var erector = (lobe(a, Math.PI - 0.42, 0.30) + lobe(a, -Math.PI + 0.42, 0.30)) * 0.100;   /* R102: 0.06 -> 0.10 */
+    var spine = -lobe(a, Math.PI, 0.26) * 0.200;   /* R102; R107: a CHANNEL two vertices wide, deep enough to survive grayscale */
+    var erector = (lobe(a, Math.PI - 0.42, 0.30) + lobe(a, -Math.PI + 0.42, 0.30)) * ek;   /* R102: 0.06 -> 0.10; R106: per ring — the TRAPEZIUS KITE descends the spine from the shoulder line and fades by the lower pec (back sheet) */
     /* R102: the pec / deltoid junction and the outer pec insertion — a groove at
        the armpit line so the pec ends in shadow against the shoulder */
-    var insertion = -(lobe(a, 1.22, 0.20) + lobe(a, -1.22, 0.20)) * 0.080;   /* R103: the delt now overlaps the pec; a deep cut here read as a socket */
+    var insertion = -(lobe(a, 1.30, 0.28) + lobe(a, -1.30, 0.28)) * 0.140;   /* R103; R107: the pec's outer edge FALLS into the armpit so the dome ends */
     /* R106: the SCAPULAR planes — a pair of shallow masses between the
        spine channel and the rear deltoid (the torso sheet's back 3/4 reads
        rhomboid / teres planes there), with a channel between them and the
        erectors, so the upper back is structured and not one slab. */
-    var scapula = (lobe(a, Math.PI - 0.80, 0.26) + lobe(a, -Math.PI + 0.80, 0.26)) * 0.090
-                - (lobe(a, Math.PI - 0.58, 0.10) + lobe(a, -Math.PI + 0.58, 0.10)) * 0.050;
+    var scapula = (lobe(a, Math.PI - 0.80, 0.26) + lobe(a, -Math.PI + 0.80, 0.26)) * 0.120
+                - (lobe(a, Math.PI - 0.58, 0.10) + lobe(a, -Math.PI + 0.58, 0.10)) * 0.055;   /* R106 back sheet: teres major / infraspinatus under the rear delt */
     return 1 + (sternum + pec + lat + back + spine + erector + insertion + scapula) * k;
   };
 }
@@ -370,19 +377,21 @@ function chestShape(k) {
    V is a block-and-pinch, not a funnel: 0.18 of height held from t 0.37 to
    0.42, then 0.128 at 0.47). The oblique groove between the lat and the
    rectus is what makes the lat read as its own mass. */
-function coreShape(k, rectusK, latK) {
+function coreShape(k, rectusK, latK, latShift, erectorK) {
   var rk = rectusK == null ? 0.120 : rectusK;
   var lk = latK == null ? 0 : latK;
+  var ls = latShift == null ? 0 : latShift;   /* R106: the lat's centre walks toward the spine as it descends — the back sheet's lat inserts diagonally into the lower back */
+  var ek = erectorK == null ? 0.080 : erectorK;
   return function (a) {
-    var linea = -lobe(a, 0, 0.30) * 0.260;   /* R100: a deeper channel; R102: deeper; R106: narrower and shallower, the blocks meet across it */
-    var rectus = (lobe(a, 0.52, 0.44) + lobe(a, -0.52, 0.44)) * rk;
+    var linea = -lobe(a, 0, 0.22) * 0.360;   /* R100; R102; R106; R107: narrow and deep between the bellies */
+    var rectus = (belly(a, 0.50, 0.38) + belly(a, -0.50, 0.38)) * rk;   /* R107: raised bellies with a rounded apex either side of the linea */
     var oblique = (lobe(a, 1.20, 0.48) + lobe(a, -1.20, 0.48)) * 0.080;
-    var obliqueGroove = -(lobe(a, 0.98, 0.16) + lobe(a, -0.98, 0.16)) * 0.100 * (lk > 0 ? 1 : 0.5);   /* R102 */
-    var lat = (lobe(a, Math.PI / 2 + 0.22, 0.58) + lobe(a, -Math.PI / 2 - 0.22, 0.58)) * lk;
-    var serratus = (lobe(a, 1.02, 0.13) + lobe(a, -1.02, 0.13)) * 0.070 * Math.min(1, lk / 0.3);   /* R105: the teeth under the pec, as relief */
+    var obliqueGroove = -(lobe(a, 0.98, 0.15) + lobe(a, -0.98, 0.15)) * 0.130 * (lk > 0 ? 1 : 0.5);   /* R102; R107: the valley between the block and the oblique */
+    var lat = (belly(a, Math.PI / 2 + 0.22 + ls, 0.52) + belly(a, -Math.PI / 2 - 0.22 - ls, 0.52)) * lk;
+    var serratus = (lobe(a, 1.02, 0.15) + lobe(a, -1.02, 0.15)) * 0.100 * Math.min(1, lk / 0.3);   /* R105; R107: a real tooth mass under the pec */
     var back = lobe(a, Math.PI, 0.95) * -0.085;
-    var spine = -lobe(a, Math.PI, 0.20) * 0.150;   /* R102: 0.06 -> 0.11 */
-    var erector = (lobe(a, Math.PI - 0.36, 0.28) + lobe(a, -Math.PI + 0.36, 0.28)) * 0.080;   /* R102: 0.045 -> 0.08 */
+    var spine = -lobe(a, Math.PI, 0.26) * 0.170;   /* R102; R107: a channel */
+    var erector = (lobe(a, Math.PI - 0.36, 0.28) + lobe(a, -Math.PI + 0.36, 0.28)) * ek;   /* R102: 0.045 -> 0.08; R106: per ring */
     return 1 + (linea + rectus + oblique + obliqueGroove + lat + serratus + back + spine + erector) * k;
   };
 }
@@ -538,7 +547,9 @@ function taperClasses(a) {
    Cross-section, as a per-vertex radius multiplier (same convention as
    chestShape): a groove down the front centre, two quad heads either side of
    it, the lateral sweep at the front-outer angle, and a flattened back. */
-function quadShape(k) {
+function quadShape(k, gluteK, hamK) {
+  var gk = gluteK == null ? 1.0 : gluteK;
+  var hk = hamK == null ? 0 : hamK;
   return function (a) {
     /* R97: the heads and the sweep are muscle BELLIES now — a centre of
        fullness the eye can find — and the back keeps a restrained glute. */
@@ -551,12 +562,16 @@ function quadShape(k) {
        The quad heads, the seam and the glute pair are now masses the
        Lambert clay reads without the cavity term's help. */
     var seam = -lobe(a, 0, 0.24) * 0.360;
-    var heads = (lobe(a, 0.58, 0.46) + lobe(a, -0.58, 0.46)) * 0.340;
+    var heads = (belly(a, 0.58, 0.42) + belly(a, -0.58, 0.42)) * 0.320;   /* R107: two full quad bellies either side of the seam */
     var sweep = (lobe(a, 1.30, 0.55) + lobe(a, -1.30, 0.55)) * 0.160;   /* R103: less outer-thigh bulge */
     /* R106: the glute PAIR is a real mass (0.14 -> 0.22) with a deeper cleft;
        in the rear clay view the lower body was a smooth vase with no glute. */
-    var glute = lobe(a, Math.PI, 0.90) * -0.020 + (lobe(a, Math.PI - 0.52, 0.50) + lobe(a, -Math.PI + 0.52, 0.50)) * 0.400 - lobe(a, Math.PI, 0.18) * 0.250;
-    return 1 + (seam + heads + sweep + glute) * k;
+    /* R106 back sheet: the glutes are two SPHERES that project back with a
+       fold under them (`gluteK` falls to nothing by the mid-thigh) and two
+       hamstring columns take over below the fold (`hamK`). */
+    var glute = (lobe(a, Math.PI, 0.90) * -0.020 + (belly(a, Math.PI - 0.70, 0.36) + belly(a, -Math.PI + 0.70, 0.36)) * 0.520 - lobe(a, Math.PI, 0.22) * 0.620) * gk;   /* R107: two SPHERES 40 degrees off the back with a valley a third of their height deep (see variants.js) */   /* the cleft's centre vertex goes BELOW the ring (mul 0.80) so the cavity term darkens it; at 0.32 it sat at 1.0 and read as a line */
+    var ham = ((lobe(a, Math.PI - 0.42, 0.36) + lobe(a, -Math.PI + 0.42, 0.36)) * 0.160 - lobe(a, Math.PI, 0.14) * 0.080) * hk;
+    return 1 + (seam + heads + sweep + glute + ham) * k;
   };
 }
 /* R102 — THE KNEE AND THE CALF. The lower body is still ONE crystalline
@@ -616,8 +631,9 @@ function quadZone(row) {
    line and pulls IN where the collar lobes above it stand out, so the
    clavicle reads as a bar across the top of the chest with shadow under it
    rather than as a widening of the pec. */
-function subclavicleShape(k, trapK) {
+function subclavicleShape(k, trapK, pecK) {
   var tk = trapK == null ? 0 : trapK;
+  var pk = pecK == null ? 0 : pecK;
   return function (a) {
     /* R106: in the clay view the 0.10 undercut under a 0.45-strength upper
        pec was a black SLOT across the top of the chest (the pec overhung this
@@ -629,11 +645,12 @@ function subclavicleShape(k, trapK) {
     var hollow = -(lobe(a, 0.95, 0.40) + lobe(a, -0.95, 0.40)) * 0.050;
     var notch = -lobe(a, 0, 0.30) * 0.06;
     var traps = (lobe(a, Math.PI - 0.7, 0.60) + lobe(a, -Math.PI + 0.7, 0.60)) * tk;
+    var pec = ((belly(a, 0.66, 0.46) + belly(a, -0.66, 0.46)) * 0.56 - lobe(a, 0, 0.22) * 0.38) * pk;   /* R107: the upper pec's tail */
     /* No back term: worked through at the back, a ring narrower than BOTH its
        neighbours is a groove, and the band above it faces down — the dark
        line under the trap cap in the rear clay view. The back's depth must
        be monotonic from the chest to the shoulder line. */
-    return 1 + (hollow + notch + traps) * k;
+    return 1 + (hollow + notch + traps + pec) * k;
   };
 }
 function clavicleShape(k) {
@@ -650,7 +667,7 @@ function clavicleShape(k) {
     /* R97: a SHOULDER SHELF at the sides, so the torso's own line runs out
        under the deltoid cap and the cap grows out of the trapezius instead of
        sitting on it — the trap -> delt continuity the brief asks for. */
-    var shelf = (lobe(a, Math.PI / 2, 0.50) + lobe(a, -Math.PI / 2, 0.50)) * 0.100;
+    var shelf = (lobe(a, Math.PI / 2, 0.50) + lobe(a, -Math.PI / 2, 0.50)) * 0.060;   /* R107: the shoulder corner sits INSIDE the deltoid dome; a shelf out to the crest was a flat plate above the caps from behind */
     return 1 + (hollow + collar + traps + shelf) * k;
   };
 }
@@ -709,7 +726,14 @@ export var TORSO = {
      averaged away entirely — the shaping was there in the numbers and absent
      from the mesh. 14 puts a vertex within 0.22 radians of every lobe centre
      for the cost of two more columns of faces. */
-  sides: 18,   /* R105: a pec dome, a rectus block and an oblique each need vertices to be ROUND; at 14 a lobe was one flat facet */
+  sides: 24,   /* R105: a pec dome, a rectus block and an oblique each need vertices to be ROUND; at 14 a lobe was one flat facet; R107: 24 — a glute belly spans four vertices */
+  /* R107 — SMOOTH CURVE FIRST. One ring is inserted between every authored
+     pair on a Catmull-Rom curve (forge.js refineSections), so the profile is
+     a pencil stroke rather than a chain of segments and the shape lobes flow
+     from ring to ring. The authored table stays the design; the spline is
+     the sculpt. */
+  refine: 1,
+  jitter: 0.45,
   /* A SMALL lift away from the black end — a third of the head's, half the
      arms'. The body is the one part that should keep the black-heavy weighting,
      because that is what makes it read as a dark crystalline mass. But with the
@@ -875,7 +899,7 @@ export var TORSO = {
     /* R98: `coat` per band is the platinum share (see REGIONS in regions.js);
        the taper's columns take a moderate share and the shader's class gate
        keeps it on the lit flank columns and off the dark spear. */
-    { y: 0.000, w: 0.006, d: 0.004, columns: true, classesAt: taperClasses, coat: 0.55 },
+    { y: 0.000, w: 0.006, d: 0.004, fg: [3, 2], columns: true, classesAt: taperClasses, coat: 0.55 },
     /* R106 — ONE GODFORM TEARDROP. Measured on the R106 godform plate (front
        figure, 905 px of height): waist 0.100 of height at t 0.435, the
        thigh / glute mass 0.22 at t 0.54, knee 0.128 at t 0.69, calf 0.135 at
@@ -885,21 +909,21 @@ export var TORSO = {
        converging bilateral masses on ONE body. The waist already matched, so
        every ring below it is re-widened against the waist and the rows
        between are set on the reference's own profile. */
-    { y: 0.150, w: 0.044, d: 0.037, facet: 0.0040, crystal: 0.0180, crystalY: 0.0040,
+    { y: 0.150, w: 0.044, d: 0.037, fg: [3, 2], facet: 0.0040, crystal: 0.0180, crystalY: 0.0040,
       columns: true, classesAt: taperClasses },
-    { y: 0.280, w: 0.082, d: 0.070, facet: -0.0040, crystal: 0.0220, crystalY: 0.0050, hero: 0.16,
+    { y: 0.280, w: 0.082, d: 0.070, fg: [3, 2], facet: -0.0040, crystal: 0.0220, crystalY: 0.0050, hero: 0.16,
       columns: true, classesAt: taperClasses },
-    { y: 0.400, w: 0.116, d: 0.100, facet: 0.0040, crystal: 0.0240, crystalY: 0.0060, hero: 0.20,
+    { y: 0.400, w: 0.116, d: 0.100, fg: [3, 2], facet: 0.0040, crystal: 0.0240, crystalY: 0.0060, hero: 0.20,
       columns: true, classesAt: taperClasses },
     /* R102 — THE CALF AND THE KNEE (see kneeShape / calfShape). The old
        0.700 ring was a point on a straight taper; the references put a
        concavity at t 0.75 and a swell at t 0.80, so the profile now goes
        thigh 0.188 -> knee 0.128 -> calf 0.160 -> 0.086 -> the point. */
-    { y: 0.530, w: 0.156, d: 0.138, facet: -0.0040, zc: -0.012, crystal: 0.0260, crystalY: 0.0060, hero: 0.22,
+    { y: 0.530, w: 0.156, d: 0.138, fg: [3, 2], facet: -0.0040, zc: -0.012, crystal: 0.0260, crystalY: 0.0060, hero: 0.22,
       shape: calfShape(0.55), columns: true, classesAt: taperClasses },
-    { y: 0.640, w: 0.190, d: 0.168, facet: 0.0040, zc: -0.018, crystal: 0.0280, crystalY: 0.0070, hero: 0.26,
+    { y: 0.640, w: 0.190, d: 0.168, fg: [2, 2], facet: 0.0040, zc: -0.018, crystal: 0.0280, crystalY: 0.0070, hero: 0.26,
       shape: calfShape(1.0), columns: true, classesAt: taperClasses },
-    { y: 0.720, w: 0.184, d: 0.162, facet: -0.0040, crystal: 0.0260, crystalY: 0.0060, hero: 0.16,
+    { y: 0.720, w: 0.184, d: 0.162, fg: [2, 2], facet: -0.0040, crystal: 0.0260, crystalY: 0.0060, hero: 0.16,
       shape: calfShape(0.60), columns: true, classesAt: taperClasses },
     /* THE KNEE IS READ IN DEPTH, NOT IN WIDTH. Measured on the R102 front the
        knee is 0.092 of height against a calf of 0.101 — a 9% step — and the
@@ -908,29 +932,29 @@ export var TORSO = {
        bulb on a stem (previous-vs-new sheet, pass A). The band's identity
        now comes from kneeShape's front notch and its dark zone, and the
        silhouette keeps the reference's long lean line. */
-    { y: 0.780, w: 0.178, d: 0.156, facet: 0.0035, crystal: 0.0220, crystalY: 0.0050, hero: 0.08,
+    { y: 0.780, w: 0.166, d: 0.146, fg: [2, 2], facet: 0.0035, crystal: 0.0220, crystalY: 0.0050, hero: 0.08,
       shape: kneeShape(1.0), columns: true, classesAt: taperClasses, cav: 0.45 },   /* R106: 0.124 -> 0.188, the reference's knee is 0.128 of height */
     /* the thigh: a long lean taper from the hip to the knee (R102), no sweep */
-    { y: 0.850, w: 0.206, d: 0.184, facet: -0.0040, zc: 0.012, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
-      shape: quadShape(0.55), columns: true, classesAt: taperClasses },
-    { y: 1.000, w: 0.262, d: 0.232, facet: 0.0040, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
-      shape: quadShape(0.70), columns: true, classesAt: taperClasses },
+    { y: 0.850, w: 0.206, d: 0.184, fg: [2, 2], facet: -0.0040, zc: 0.012, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
+      shape: quadShape(0.55, 0.0, 0.8), columns: true, classesAt: taperClasses },
+    { y: 1.000, w: 0.262, d: 0.232, fg: [2, 3], facet: 0.0040, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+      shape: quadShape(0.70, 0.0, 1.0), columns: true, classesAt: taperClasses },   /* R107: the glute has ENDED by here — a fold, not a fade */
     /* the quad mass — held wide, shaped as two heads and a lateral sweep */
-    { y: 1.130, w: 0.276, d: 0.250, facet: 0.0045, zc: -0.020, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
-      shape: quadShape(1.0), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },   /* R106: the teardrop's widest row (0.180 -> 0.290) */
-    { y: 1.290, w: 0.240, d: 0.220, facet: -0.0045, zc: -0.030, crystal: 0.0360, crystalY: 0.0090, hero: 0.16,
-      shape: quadShape(0.90), zoneAt: quadZone(0) },
+    { y: 1.130, w: 0.276, d: 0.250, fg: [2, 3], facet: 0.0045, zc: -0.020, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
+      shape: quadShape(1.0, 0.72, 0.6), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },   /* R106: the teardrop's widest row (0.180 -> 0.290) */
+    { y: 1.290, w: 0.240, d: 0.246, fg: [2, 3], facet: -0.0045, zc: -0.034, crystal: 0.0360, crystalY: 0.0090, hero: 0.16,
+      shape: quadShape(0.90, 1.0), zoneAt: quadZone(0) },
     /* R97: the quad's SHELF — the mass rounds over under the belt instead
        of meeting it in a straight line, which is the muscle-belly read. */
-    { y: 1.400, w: 0.192, d: 0.174, facet: 0.0035, zc: -0.020, crystal: 0.0300, crystalY: 0.0080, hero: 0.10,
-      shape: quadShape(0.60), zoneAt: quadZone(0) },   /* R106: the glute and quad swell FAST out of the belt (reference: 0.10 -> 0.20 of height within 0.07 of it) */
+    { y: 1.400, w: 0.192, d: 0.196, fg: [2, 3], facet: 0.0035, zc: -0.026, crystal: 0.0300, crystalY: 0.0080, hero: 0.10,
+      shape: quadShape(0.60, 0.85), zoneAt: quadZone(0) },   /* R106: the glute and quad swell FAST out of the belt (reference: 0.10 -> 0.20 of height within 0.07 of it) */
     /* THE BELT — the waist. The deepest concavity on the character, and the
        line that separates the torso from the single quad. Re-measured on the
        lower-body crop it is TIGHTER than the abdomen above it (0.19 against
        0.24) and the quad swells to 0.264 within 0.3 below it — a 40% step,
        which is the single thing that makes the lower body read as a thigh
        hung from a belt rather than as a skirt continuing the torso. */
-    { y: 1.480, w: 0.150, d: 0.132, facet: -0.0070, crystal: 0.0300, crystalY: 0.0080,
+    { y: 1.480, w: 0.150, d: 0.132, fg: [1, 1], facet: -0.0070, crystal: 0.0300, crystalY: 0.0080,
       shape: coreShape(1.0, 0.06), hero: 0.04, zoneAt: coreZone(0), cav: 0.35 },   /* R102: the belt is a crease */
     /* R96 — THE ABDOMINAL ROWS. Three blocks a side between the belt and the
        pectoral turn, as bulge rings (full rectus lobes) alternating with
@@ -945,16 +969,16 @@ export var TORSO = {
     /* R103: the waist tighter still (0.176 / 0.182 / 0.196) and the lat lobe
        nearly doubled on the two rings above the pinch — the lat is a
        silhouette driver, not a flank detail. */
-    { y: 1.545, w: 0.160, d: 0.144, facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
-      shape: coreShape(1.0, 0.24), hero: 0.08, zoneAt: coreZone(1) },   /* R106: bulge 0.24 against a 0.06 crease — in the clay view the 0.42 / -0.06 pairs were horizontal SLOTS, armour plating, not blocks */
-    { y: 1.605, w: 0.188, d: 0.164, facet: -0.0040, crystal: 0.0220, crystalY: 0.0050,
-      shape: coreShape(1.0, 0.06, 0.04), hero: 0.03, zoneAt: coreZone(1), cav: 0.80 },   /* R102: abdominal crease */
-    { y: 1.665, w: 0.246, d: 0.198, facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
-      shape: coreShape(0.95, 0.24, 0.26), hero: 0.08, zoneAt: coreZone(2) },
-    { y: 1.725, w: 0.306, d: 0.232, facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
-      shape: coreShape(0.90, 0.06, 0.40), hero: 0.03, zoneAt: coreZone(2), cav: 0.80 },   /* R102: abdominal crease */
-    { y: 1.780, w: 0.318, d: 0.246, facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
-      shape: coreShape(0.85, 0.24, 0.46), hero: 0.08, zoneAt: coreZone(3) },
+    { y: 1.545, w: 0.160, d: 0.144, fg: [2, 2], facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
+      shape: coreShape(1.0, 0.26), hero: 0.08, zoneAt: coreZone(1) },   /* R106: bulge 0.24 against a 0.06 crease — in the clay view the 0.42 / -0.06 pairs were horizontal SLOTS, armour plating, not blocks */
+    { y: 1.605, w: 0.188, d: 0.164, fg: [2, 2], facet: -0.0040, crystal: 0.0220, crystalY: 0.0050,
+      shape: coreShape(1.0, 0.10, 0.04, 0.40, 0.08), hero: 0.03, zoneAt: coreZone(1), cav: 0.80 },   /* R102: abdominal crease */
+    { y: 1.665, w: 0.246, d: 0.198, fg: [2, 2], facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
+      shape: coreShape(0.95, 0.26, 0.26, 0.28, 0.09), hero: 0.08, zoneAt: coreZone(2) },
+    { y: 1.725, w: 0.306, d: 0.232, fg: [2, 2], facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
+      shape: coreShape(0.90, 0.10, 0.40, 0.14, 0.10), hero: 0.03, zoneAt: coreZone(2), cav: 0.80 },   /* R102: abdominal crease */
+    { y: 1.780, w: 0.332, d: 0.250, fg: [2, 2], facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
+      shape: coreShape(0.85, 0.26, 0.46, 0.0, 0.10), hero: 0.08, zoneAt: coreZone(3) },
     /* R97 — THE LOWER PEC TURN: a crease ring where the chest shelf ends and
        a belly ring above it, so the pectoral is a mass with a lower edge
        that falls into shadow rather than a plane that fades into the abs. */
@@ -963,22 +987,22 @@ export var TORSO = {
        rises about 9% while the width holds, the crease ring under the shelf
        comes in so the shelf overhangs it, and that ring takes its own dark
        zone (pecUnderZone). */
-    { y: 1.830, w: 0.304, d: 0.272, facet: -0.0040, crystal: 0.0300, crystalY: 0.0080,
-      shape: chestShape(0.74), zoneAt: pecUnderZone, cav: 0.60 },   /* R106: d 0.236 -> 0.272, k 0.62 -> 0.74 — the shelf overhung its crease by 0.2 units and drew a black slot across the chest in clay */   /* R103: the under-pec crease pulls IN (d 0.252 -> 0.232) so the shelf overhangs it; the lat block is wider */   /* R102: 0.272 -> 0.282, the top of the lat block; the under-pec crease is a cavity */
+    { y: 1.830, w: 0.330, d: 0.262, fg: [2, 2], facet: -0.0040,   /* R107: not narrower than either neighbour — that was a groove all round */ crystal: 0.0300, crystalY: 0.0080,
+      shape: chestShape(0.50, 0.11, 1.0), zoneAt: pecUnderZone, cav: 0.60 },   /* R106: d 0.236 -> 0.272, k 0.62 -> 0.74 — the shelf overhung its crease by 0.2 units and drew a black slot across the chest in clay */   /* R103: the under-pec crease pulls IN (d 0.252 -> 0.232) so the shelf overhangs it; the lat block is wider */   /* R102: 0.272 -> 0.282, the top of the lat block; the under-pec crease is a cavity */
     /* R103 — THE CHEST PROJECTS: the chest rings' front-to-back radius rises
        another 8% and the pec lobe with it, so the pectoral is a shelf that
        overhangs the crease ring under it. */
-    { y: 1.895, w: 0.326, d: 0.306, facet: 0.0035, crystal: 0.0320, crystalY: 0.0080,
-      shape: chestShape(0.86), hero: 0.30, zoneAt: pecZone(0) },
+    { y: 1.895, w: 0.326, d: 0.306, fg: [3, 3], facet: 0.0035, crystal: 0.0320, crystalY: 0.0080,
+      shape: chestShape(0.94, 0.13, 1.0), hero: 0.30, zoneAt: pecZone(0) },
     /* R106 — THE PEC IS A DOME: a crown ring between two shoulder rings, so
        the mass rounds over in the vertical as well as across. Three bands
        over 0.22 units made a hexagonal profile that the clay view read as a
        flat plate with a slot beneath it. */
-    { y: 1.935, w: 0.336, d: 0.318, facet: -0.0030, crystal: 0.0340, crystalY: 0.0080,
-      shape: chestShape(1.0), hero: 0.34, zoneAt: pecZone(0) },
+    { y: 1.935, w: 0.336, d: 0.318, fg: [3, 3], facet: -0.0030, crystal: 0.0340, crystalY: 0.0080,
+      shape: chestShape(1.0, 0.15, 0.90), hero: 0.34, zoneAt: pecZone(0) },
     /* the pectoral line — the strongest cross-section shaping on the body */
-    { y: 1.970, w: 0.338, d: 0.322, facet: 0.0035, crystal: 0.0340, crystalY: 0.0080,
-      shape: chestShape(0.92), hero: 0.34, zoneAt: pecZone(0) },
+    { y: 1.970, w: 0.338, d: 0.322, fg: [3, 3], facet: 0.0035, crystal: 0.0340, crystalY: 0.0080,
+      shape: chestShape(0.92, 0.18, 0.78), hero: 0.34, zoneAt: pecZone(0) },
     /* R103 — THE SHOULDER GIRDLE SITS 0.05 LOWER. The trap could only slope
        at 22 degrees from a shoulder line at 2.170 to a neck base at 2.215;
        the references' traps climb at about 40 degrees into a visible neck,
@@ -986,24 +1010,24 @@ export var TORSO = {
        shoulder line at 2.120 the slope is 41 degrees, the cap's crest meets
        it, and the neck is embedded in a rising upper torso. The head does
        not move. */
-    { y: 2.050, w: 0.330, d: 0.300, facet: -0.0035, crystal: 0.0300, crystalY: 0.0060,
-      shape: chestShape(0.40), hero: 0.40, zoneAt: pecZone(1) },   /* R105: the upper pec ROUNDS OFF toward the clavicle (0.80 -> 0.62) instead of running flat into it */
+    { y: 2.050, w: 0.330, d: 0.300, fg: [2, 2], facet: -0.0035, crystal: 0.0300, crystalY: 0.0060,
+      shape: chestShape(0.70, 0.44, 0.45), hero: 0.40, zoneAt: pecZone(1) },   /* R107: the pec FADES up into the clavicle (0.52 -> 0.70 here, 0.35 on the groove ring) instead of stepping off — the step was a horizontal band above the chest */   /* R105: the upper pec ROUNDS OFF toward the clavicle (0.80 -> 0.62) instead of running flat into it */
     /* R100 — the groove under the clavicle (subclavicleShape): its own dark,
        uncoated zone, so the collarbone above it reads as a bar with shadow
        beneath. */
-    { y: 2.100, w: 0.328, d: 0.285, facet: 0.0035, crystal: 0.0200, crystalY: 0.0040,
-      shape: subclavicleShape(1.0, 0.17), hero: 0.20, zoneAt: pecZone(1), coat: 0.55 },   /* R106: d 0.250 -> 0.300, the slot under the collarbone closes to a hollow */
+    { y: 2.100, w: 0.316, d: 0.285, fg: [2, 2], facet: 0.0035, crystal: 0.0200, crystalY: 0.0040,
+      shape: subclavicleShape(1.0, 0.17, 0.35), hero: 0.20, zoneAt: pecZone(1), coat: 0.55 },   /* R106: d 0.250 -> 0.300, the slot under the collarbone closes to a hollow */
     /* THE SHOULDER LINE — collarbones across the front, trapezius behind.
        R100: the thin band just under it is the groove's dark zone, so the
        collarbone reads as a bar with a hairline of shadow beneath — not a
        stripe across the chest. */
-    { y: 2.120, w: 0.330, d: 0.270, facet: 0.0035, crystal: 0.0340, crystalY: 0.0060,
+    { y: 2.120, w: 0.300, d: 0.270, fg: [2, 2], facet: 0.0035, crystal: 0.0340, crystalY: 0.0060,
       shape: clavicleShape(1.0), dip: 0.030, hero: 0.32, zoneAt: subclavicleZone, coat: 0.30 },   /* R99: the shelf blew white; the godform reference's clavicle is dark under a lit shoulder */
     /* R100 — THE TRAPEZIUS RING: between the shoulder line and the neck's
        base, so the traps rise diagonally toward the neck across two bands
        instead of one steep step, with the trap lobes at full strength.
        R103: halfway up the 41-degree slope. */
-    { y: 2.172, w: 0.280, d: 0.220, facet: -0.0040, crystal: 0.0260, crystalY: 0.0050,
+    { y: 2.172, w: 0.258, d: 0.220, fg: [2, 2], facet: -0.0040, crystal: 0.0260, crystalY: 0.0050,
       shape: clavicleShape(0.85), hero: 0.04, zoneAt: trapZone, coat: 0.12 },   /* R106: narrower — the width falls faster than the height rises, so the band tilts toward the neck */   /* R101: deeper behind, the upper back's thickness */   /* a slope, not a shelf: first cut at 2.190 / 0.282 drew a flat ledge */
     /* THE CROWN — the upper chest rising beside the neck to meet the head.
 
@@ -1119,7 +1143,7 @@ export var TORSO = {
     /* R100: the neck's base ring narrows and rises (0.236 at 2.205 -> 0.205
        at 2.215) so the trapezius runs DIAGONALLY from the shoulder line up
        to the neck instead of stepping onto a flat ledge. */
-    { y: 2.228, w: 0.165, d: 0.130, facet: -0.0120, crystal: 0.024, crystalY: 0.0050, coat: 0.15,
+    { y: 2.228, w: 0.165, d: 0.130, fg: [1, 1], facet: -0.0120, crystal: 0.024, crystalY: 0.0050, coat: 0.15,
       shape: clavicleShape(0.55), hero: 0.08, classesAt: neckClasses },   /* R106: 2.215 / 0.225 -> 2.228 / 0.190 — the plate's head sits DOWN on the traps; the base rises toward the head's corner and narrows so the collar under the head is a slope, not a lid */
     /* The column's rings follow the head's lower vertex (2.324 now): the top
        ring sits 0.09 above it where the head is 0.10 wide and swallows it, and
@@ -1129,16 +1153,16 @@ export var TORSO = {
        how the sheet reference seats it — a collar the head plunges into,
        not a stick the head balances on. The column closes at 2.380, inside
        the diamond (0.11 wide there). */
-    { y: 2.250, w: 0.135, d: 0.110, facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
+    { y: 2.250, w: 0.135, d: 0.110, fg: [1, 1], facet: 0.0120, crystal: 0.018, crystalY: 0.0040,
       zc: -0.030, hero: 0.10, classesAt: neckClasses },
     /* measured (headsym): buried to 2.345 the visible diamond lost a tenth of
        its height and read wider than tall; the collar now closes at 2.335 so
        the corner sits into it by 0.03 and the square reads. */
-    { y: 2.290, w: 0.115, d: 0.095, facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
+    { y: 2.290, w: 0.125, d: 0.100, fg: [1, 1], facet: -0.0110, crystal: 0.014, crystalY: 0.0030,
       zc: -0.040, hero: 0.06, classesAt: neckClasses },
-    { y: 2.318, w: 0.080, d: 0.068, facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
+    { y: 2.318, w: 0.116, d: 0.094, fg: [1, 1], facet: 0.0100, crystal: 0.012, crystalY: 0.0020,
       zc: -0.044, hero: 0.04, classesAt: neckClasses },
-    { y: 2.335, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neckClasses }
+    { y: 2.335, w: 0.108, d: 0.088, fg: [1, 1], facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neckClasses }   /* R107: a column the head sits down onto (the back sheet's neck), capped inside the plate */
   ],
   /* Shoulder caps reach wider than the torso ring and carry the arm joints. */
   /* Widened. Against the canonical reference the render measured 9.3% narrow
@@ -1245,7 +1269,7 @@ export var ARMS = {
        is SHORTER than it was and thicker: on the reference the elbow is at
        y 1.56 and the wrist at 1.20 (this build had 1.40 and 0.96), and the big
        hand then reaches the same 0.82 the old fingertips did. Compact, dense. */
-    shoulder: [-0.525, 1.900, 0.014],   /* R104: on the wider cap's axis at 0.7 */
+    shoulder: [-0.498, 1.957, 0.014],   /* R104: on the cap's axis at 0.7; R107: the axis moved up and in with the smaller dome */
     elbow: [-0.585, 1.455, 0.10],   /* R103: the reference's lowered arm hangs STRAIGHT and close — elbow in, shorter */
     wrist: [-0.610, 1.105, 0.14],
     upperRadius: 0.150,   /* R103: 0.160 -> 0.150, the arm was as wide as the lat at the elbow */
@@ -1263,7 +1287,7 @@ export var ARMS = {
        shoulder line. That is a far stronger, more compact pose than the wide
        V this carried, and it is what keeps the raised arm's mass beside the
        ribcage instead of out in space. */
-    shoulder: [0.525, 1.900, 0.014],
+    shoulder: [0.498, 1.957, 0.014],
     elbow: [0.565, 1.465, 0.11],
     wrist: [0.720, 1.860, 0.15],
     upperRadius: 0.150,   /* R103: 0.160 -> 0.150, the arm was as wide as the lat at the elbow */
@@ -1342,7 +1366,7 @@ export var ARMS = {
        clearly narrower at the joint, which is what makes the elbow read as a
        hinge between two masses rather than a bend in a pipe. */
     upper: function (t) {   /* R104: swell 0.28 -> 0.20, the arm hangs as a column from the front; the bellies read in the three-quarter */
-      return 0.92 + Math.pow(Math.sin(Math.pow(t, 0.85) * Math.PI), 1.3) * 0.24 - t * 0.08;   /* R105: a sharper peak */
+      return 0.90 + Math.pow(Math.sin(Math.pow(t, 0.85) * Math.PI), 1.3) * 0.18 - t * 0.10;   /* R105; R107: a modest belly in the PROFILE — the bicep lobe makes the peak; at 0.34 the two compounded into a ball under the dome */
     },
     /* Picks up close to where the upper arm ended — a step at the elbow reads
        as an error rather than as a joint — then swells just below it and tapers
@@ -1350,7 +1374,7 @@ export var ARMS = {
     /* R98: the extensor swell sits high, just under the elbow, and the taper
        to the wrist is steeper — an anatomical forearm, not a stick. */
     fore: function (t) {
-      return 0.90 + Math.sin(Math.pow(t, 0.55) * Math.PI) * 0.20 - t * 0.20;   /* R100: harder compression into the wrist */
+      return 0.86 + Math.sin(Math.pow(t, 0.55) * Math.PI) * 0.30 - t * 0.24;   /* R100; R107: moderate at the elbow, a real belly, a narrow wrist */
     }
   },
 
@@ -1385,9 +1409,12 @@ export var ARMS = {
          and rises (0.32 -> 0.36) so it peaks along a line; the tricep keeps
          its long-head fullness and gains a LATERAL-HEAD ridge on the outer
          arm, the horseshoe's outer arm converging toward the elbow. */
-      var bicep = bump(d, 0, 0.70) * 0.440 * belly;   /* R101: the male standard — a fuller belly; R106: broader and lower — a belly, not a crest */
-      var tricep = bump(d, Math.PI, 1.10) * 0.420 * rear;   /* R99: the tricep is a volume of its own; R101: thicker; R106: 0.42 */
-      var lateralHead = bump(d, outer * (Math.PI - 0.95), 0.44) * 0.170 * Math.sin(Math.pow(t, 1.1) * Math.PI);   /* R101: the horseshoe's outer arm; R106: 0.17 */
+      var bicep = bump(d, 0, 0.58) * 0.420 * belly;   /* R101; R106; R107: a PEAK on the front of a cylinder, not a ball */
+      /* R107 — THE HORSESHOE: a long head on the inner rear, a lateral head on
+         the outer rear, and a valley between them that opens toward the elbow
+         where the tendon runs; the arm rear crop showed one smooth column. */
+      var tricep = bump(d, Math.PI + (inner || 1) * 0.30, 0.55) * 0.400 * rear;
+      var lateralHead = bump(d, outer * (Math.PI - 0.70), 0.42) * 0.300 * Math.sin(Math.pow(t, 1.1) * Math.PI);   /* R101; R106; R107: the lateral head is the horseshoe's outer arm, a sweep of its own */
       /* the groove between them, down each side of the arm */
       /* R98: the groove is deepest through the upper half, and in the lower
          half a BRACHIALIS lobe fills it either side — the lateral mass that
@@ -1395,17 +1422,21 @@ export var ARMS = {
          gives the outer upper arm its second contour. */
       var low = Math.max(0, Math.min(1, (t - 0.45) / 0.35));
       low = low * low * (3 - 2 * low);
+      /* (declared after `low`: an earlier placement read it before assignment and
+         every upper-arm vertex came out NaN — the arm vanished and the clay
+         crops were judged on a deltoid and a forearm with nothing between.) */
+      var triValley = -bump(d, Math.PI - (inner || 1) * 0.15, 0.20) * 0.140 * low;
       var sides = bump(d, Math.PI / 2, 0.42) + bump(d, -Math.PI / 2, 0.42);
-      var groove = sides * -0.220 * belly * (1 - low);   /* R106: 0.36 -> 0.22 — in clay the arm was a fluted column */   /* R99: a deeper valley between the two; R100: deeper again; R101; R102: 0.16 -> 0.20, the biceps/triceps boundary is a cut */
-      var brachialis = sides * 0.220 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);   /* R101: visible between bicep and tricep above the elbow */
+      var groove = -(bump(d, Math.PI / 2, 0.30) + bump(d, -Math.PI / 2, 0.30)) * 0.300 * belly * (1 - low);   /* R106: 0.22; R107: a NARROW valley (0.42 -> 0.30 wide) at 0.30 — the biceps / triceps interlock, not a flute */   /* R99: a deeper valley between the two; R100: deeper again; R101; R102: 0.16 -> 0.20, the biceps/triceps boundary is a cut */
+      var brachialis = (bump(d, outer * (Math.PI / 2 - 0.15), 0.36) * 1.0 + bump(d, -outer * (Math.PI / 2 - 0.15), 0.36) * 0.5) * 0.280 * low * Math.sin(Math.min(1, t / 0.92) * Math.PI);   /* R107: the brachialis is a WEDGE on the outer lower arm, half as much inside */   /* R101: visible between bicep and tricep above the elbow */
       /* R102: the DELTOID INSERTION — a valley across the top of the arm
          under the cap, so the shoulder is separated from the arm by a
          change of depth (the brief's "visible insertion under the delt
          cap"), and ELBOW COMPRESSION — the arm narrows into the joint on the
          front where the biceps' tendon runs. */
-      var insertion = -(0.10 + 0.14 * bump(d, 0, 0.55)) * (1 - Math.min(1, t / 0.22)) * (1 - Math.min(1, t / 0.22));   /* R105: the under-delt valley runs all the way round; deeper on the front */
+      var insertion = -(0.12 + 0.16 * bump(d, 0, 0.55)) * (1 - Math.min(1, t / 0.24)) * (1 - Math.min(1, t / 0.24));   /* R105; R107: the CAP -> UNDERCUT -> ARM step */
       var elbow = -bump(d, 0, 0.60) * 0.130 * Math.pow(Math.max(0, (t - 0.80) / 0.20), 2);
-      return 1 + bicep + tricep + lateralHead + groove + brachialis + insertion + elbow;
+      return 1 + bicep + tricep + triValley + lateralHead + groove + brachialis + insertion + elbow;
     },
     fore: function (t, d, inner) {
       var swell = Math.sin(Math.pow(t, 0.58) * Math.PI);
@@ -1416,19 +1447,19 @@ export var ARMS = {
       /* R98: fuller extensor group high on the outer forearm, flexors
          inboard, and a shallow groove between them down the ulna so the two
          groups read as two under the coat. */
-      var flexor = bump(d, 0.45, 0.85) * 0.360 * swell;
-      var extensor = bump(d, Math.PI - 0.55, 0.95) * 0.360 * Math.pow(Math.sin(Math.pow(t, 0.45) * Math.PI), 1.4);
+      var flexor = bump(d, 0.45, 0.75) * 0.340 * swell;
+      var extensor = bump(d, Math.PI - 0.55, 0.85) * 0.380 * Math.pow(Math.sin(Math.pow(t, 0.45) * Math.PI), 1.4);
       var ulna = bump(d, -Math.PI / 2 - 0.2, 0.40) * -0.070 * swell;
       /* R100: the RADIAL ridge — the brachioradialis running down the outer
          forearm from the elbow, fullest in the upper third and fading to
          the wrist, which is what gives the forearm its direction. */
       /* R101: the BRACHIORADIALIS — starts at the lateral elbow, fullest in the upper third, fading to the wrist */
-      var radial = bump(d, outer * 0.95, 0.42) * 0.200 * Math.sin(Math.min(1, t / 0.78) * Math.PI) * (1 - t * 0.35);
+      var radial = bump(d, outer * 0.95, 0.40) * 0.300 * Math.sin(Math.min(1, t / 0.78) * Math.PI) * (1 - t * 0.35);   /* R107: the BRACHIORADIALIS is an obvious ridge */
       /* R102: the FLEXOR / EXTENSOR CHANNEL — a groove between the two groups
          on the inner side, and the WRIST TENDONS: the forearm flattens toward
          the wrist on the front so the flexor tendons read as a narrowing */
       var channel = -bump(d, -outer * 0.95, 0.26) * 0.200 * swell;
-      var wrist = -bump(d, 0.20, 0.55) * 0.110 * Math.pow(Math.max(0, (t - 0.72) / 0.28), 2);
+      var wrist = -bump(d, 0.20, 0.55) * 0.150 * Math.pow(Math.max(0, (t - 0.72) / 0.28), 2);
       return 1 + flexor + extensor + ulna + radial + channel + wrist;
     }
   }
@@ -1552,6 +1583,7 @@ export var MALE = {
   INSIGNIA: INSIGNIA, POSE: POSE, FLOAT: FLOAT
 };
 export var SHAPES = {
+  belly: belly,
   bump: bump, lobe: lobe, chestShape: chestShape, coreShape: coreShape,
   quadShape: quadShape, quadZone: quadZone, clavicleShape: clavicleShape,
   kneeShape: kneeShape, calfShape: calfShape,

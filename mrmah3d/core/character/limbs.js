@@ -326,7 +326,7 @@ function buildArm(materials, spec, options) {
      and the arm stays a cone with a kink in it. */
   var upperGeo = segment(
     [0, 0, 0], elbow.clone().sub(shoulder).toArray(),
-    spec.upperRadius, spec.foreRadius * 1.02, 12,   /* R105: twelve sides — a belly needs vertices to be round */
+    spec.upperRadius, spec.foreRadius * 1.02, 14,   /* R105: twelve sides — a belly needs vertices to be round */
     /* R90: depthRatio goes above 1 and the cross-section is now SHAPED.
 
        The upper arm is deeper front-to-back than it is wide, because that is
@@ -342,7 +342,7 @@ function buildArm(materials, spec, options) {
        nothing to work on — and read as a quilt beside the reference. */
     /* R99: deeper front-to-back (1.12 -> 1.18) so the bicep and tricep are
        two volumes the silhouette shows from the side, not two colours. */
-    { depthRatio: 1.18, crystal: 0.045, steps: 7,   /* R105: seven rings so the belly can PEAK */
+    { depthRatio: 1.18, crystal: 0.012, steps: 10, fg: [2, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first */
       profile: ARMS_.profiles.upper, shape: function (t, d) { return ARMS_.shapes.upper(t, d, upperInner); }, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner),
       coat: REGIONS.UPPER_ARM.coat,
@@ -367,10 +367,10 @@ function buildArm(materials, spec, options) {
   var foreVec = wrist.clone().sub(elbow);
   var foreGeo = segment(
     [0, 0, 0], foreVec.toArray(),
-    spec.foreRadius, spec.wristRadius, 12,
+    spec.foreRadius, spec.wristRadius, 14,
     /* R98: five steps so the extensor belly just under the elbow has a ring
        to peak on and the taper into the wrist has two to fall through. */
-    { depthRatio: 1.06, crystal: 0.040, steps: 6,
+    { depthRatio: 1.06, crystal: 0.010, steps: 9, fg: [2, 2],
       profile: ARMS_.profiles.fore, shape: function (t, d) { return ARMS_.shapes.fore(t, d, foreInner); }, lift: ARMS_.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes, foreInner),
       coat: REGIONS.FOREARM.coat }

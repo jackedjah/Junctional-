@@ -348,6 +348,16 @@ export function createMrMah(options) {
                the form's own turning can make a value change. Emitters stay
                flat so the face and symbols still locate. */
             var emitter = /eye|smile|emblem|transport|throat|hand-crystal|display|glass/.test(o.name);
+            /* R107: SMOOTH clay. The forge stores the area-weighted smooth
+               normal per position (`aSmooth`); swapping it in for the facet
+               normal renders the macro sculpt with no facet language at all,
+               which is what the brief's "smooth matte grey clay, no facets"
+               gate asks to see. Restored with the view. */
+            var g = o.geometry;
+            if (g && g.attributes && g.attributes.aSmooth && !o.userData.__facetNormal) {
+              o.userData.__facetNormal = g.attributes.normal;
+              g.setAttribute('normal', g.attributes.aSmooth);
+            }
             if (!o.userData.__clay) o.userData.__clay = new MeshLambertMaterial({ toneMapped: false });
             o.userData.__clay.color.setHex(emitter ? 0x1a1c22 : 0x9a9ea6);
             o.userData.__clay.emissive.setHex(emitter ? 0x000000 : 0x14161a);
@@ -360,6 +370,7 @@ export function createMrMah(options) {
         } else if (o.userData.__mat) {
           o.material = o.userData.__mat;
           delete o.userData.__mat;
+          if (o.userData.__facetNormal) { o.geometry.setAttribute('normal', o.userData.__facetNormal); delete o.userData.__facetNormal; }
           if (o.userData.__dbg) { o.userData.__dbg.dispose(); delete o.userData.__dbg; }
           if (o.userData.__clay) { o.userData.__clay.dispose(); delete o.userData.__clay; }
         }

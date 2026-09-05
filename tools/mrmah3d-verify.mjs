@@ -793,8 +793,12 @@ for (const v of VIEWPORTS) {
     };
   });
 
-  check('R94-WORLD-01 frame budget at tier high (draws <= 165, tris <= 11000)',
-    world.budget.calls <= 165 && world.budget.tris <= 11000,
+  /* R107: the ceiling rises 11000 -> 15000 for the spline-refined 24-side torso
+     and the rounder limbs (about +3500 triangles). Vertex count is not what
+     costs a phone here — fill and bloom are — and the check exists to catch
+     an explosion, not a sculpt. */
+  check('R94-WORLD-01 frame budget at tier high (draws <= 165, tris <= 15000)',
+    world.budget.calls <= 165 && world.budget.tris <= 15000,
     `${world.budget.calls} draws, ${world.budget.tris} tris`);
   check('R94-WORLD-02 three depth layers (far, mid, ridge) built and visible; extra layers (R101 spires) allowed',
     ['far', 'mid', 'ridge'].every(n => world.layers.some(l => l.name === n && l.visible && l.tris > 100))
@@ -1024,8 +1028,8 @@ for (const v of VIEWPORTS) {
   const proto = await measure('protocol', 620);
   const all = { showcase: sc, website: web, chat, protocol: proto };
 
-  check('R95-WORLD-01 frame budget at tier high (draws <= 170, tris <= 12500)',
-    sc.budget.calls <= 170 && sc.budget.tris <= 12500, `${sc.budget.calls} draws, ${sc.budget.tris} tris`);
+  check('R95-WORLD-01 frame budget at tier high (draws <= 170, tris <= 15000)',   /* R107: raised with R94-WORLD-01 */
+    sc.budget.calls <= 170 && sc.budget.tris <= 15000, `${sc.budget.calls} draws, ${sc.budget.tris} tris`);
   check('R95-WORLD-02 the moon is a textured disc in the upper left, above the horizon rows',
     sc.moon.n > 2000 && sc.moon.box && sc.moon.box[0] < 0.35 && sc.moon.box[3] < 0.40 && sc.moon.bands >= 3 &&
     sc.moon.mean > 100 && sc.moon.mean < 200 && sc.moon.max < 250,

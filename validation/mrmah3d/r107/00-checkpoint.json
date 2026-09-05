@@ -1,0 +1,17 @@
+{
+  "checkpoint": "R107 sculpt engine — committed as the base for the R108 regional convergence",
+  "engineering": [
+    "forge.js refineSections: rings on a Catmull-Rom spline with the anatomical shape blended (opts.refine; torso refine 1)",
+    "forge.js jitterScale: crystal jitter sits under the curve (torso 0.45, deltoid 0.012, arms 0.012 / 0.010)",
+    "resolution: torso 24 sides, limbs 14, deltoid 14 x 12 rings, upper arm 10 rings, forearm 9",
+    "belly(): Gaussian^0.55 — fuller top, steeper flanks — for pecs, rectus, lats, quad heads, glutes",
+    "clay view renders with smooth normals (aSmooth) and a camera-side key: the sculpt is judged with no facet language",
+    "facet GROUPS (fg: [columns, bands] per ring / segment): shared shading normals, large on masses, small at valleys",
+    "chestShape(k, erectorK, latK), subclavicleShape(k, trapK, pecK), coreShape(k, rectusK, latK, latShift, erectorK), quadShape(k, gluteK, hamK)",
+    "deltoid r0 0.235 belly 0.30 root 0.55 axis (0.22, 2.045)->(0.60, 1.93); arm joints on the axis at 0.7; neck a column to 2.335; shoulder line 0.300",
+    "Mrs. Mah: waist 0.118, hip row 0.395, glute spheres 0.30 rad at 38 deg off the back with a 0.64 cleft, fold by 1.070; her deltoid r0 0.16"
+  ],
+  "bugFoundByVerify": "the horseshoe batch declared triValley before `low` was assigned: both upper arms were NaN (invisible) for six batches and were judged on a deltoid and a forearm with nothing between. Found by MOUNT-02's console check; fixed; nanprobe clean on both variants.",
+  "validation": "static suite 376/376; verify to be re-run at the end of R108 (the R107 run found the NaN and was superseded by the fix)",
+  "budget": "R94-WORLD-01 / R95-WORLD-01 ceilings 15000 tris (13544 at tier high)"
+}

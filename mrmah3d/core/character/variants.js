@@ -55,8 +55,16 @@ function hipShape(k, gluteK) {
   return function (a) {
     var seam = -lobe(a, 0, 0.30) * 0.090;
     var heads = (lobe(a, 0.62, 0.50) + lobe(a, -0.62, 0.50)) * 0.090;
-    var sweep = (lobe(a, 1.35, 0.60) + lobe(a, -1.35, 0.60)) * 0.170;
-    var glute = ((lobe(a, Math.PI - 0.50, 0.50) + lobe(a, -Math.PI + 0.50, 0.50)) * 0.260 - lobe(a, Math.PI, 0.17) * 0.110) * gk;
+    var sweep = (SHAPES.belly(a, 1.40, 0.52) + SHAPES.belly(a, -1.40, 0.52)) * 0.220;   /* R107: the outer hip is a full round sweep */
+    /* R107: the glute is a structure grown from the pelvis — an upper shelf,
+       maximum posterior projection, an outer sweep and a deep central valley
+       whose floor sits BELOW the ring so the cavity term darkens it. */
+    /* R107: TWO SPHERES. Probed at y 1.40 the earlier pair was one broad bulge
+       from 126 to 161 degrees with a one-vertex crack at the centre; the
+       bellies are now narrower and further apart (centre 40 degrees off the
+       back) so the inner vertex sits on a slope, and the valley floor is at
+       half the ring — a third of the spheres' height deep. */
+    var glute = ((SHAPES.belly(a, Math.PI - 0.66, 0.30) + SHAPES.belly(a, -Math.PI + 0.66, 0.30)) * 0.560 - lobe(a, Math.PI, 0.22) * 0.640) * gk;   /* rounder: each sphere 0.30 rad wide, so the outer hip is its own curve */
     return 1 + (seam + heads + sweep + glute) * k;
   };
 }
@@ -68,67 +76,67 @@ function femaleProportions() {
   var taper = S.taperClasses, neck = S.neckClasses;
 
   var rings = [
-    { y: 0.000, w: 0.006, d: 0.004, columns: true, classesAt: taper },
-    { y: 0.150, w: 0.032, d: 0.024, facet: 0.0060, crystal: 0.0180, crystalY: 0.0040, columns: true, classesAt: taper },
-    { y: 0.400, w: 0.076, d: 0.060, facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20, columns: true, classesAt: taper },
+    { y: 0.000, w: 0.006, d: 0.004, fg: [3, 2], columns: true, classesAt: taper },
+    { y: 0.150, w: 0.032, d: 0.024, fg: [3, 2], facet: 0.0060, crystal: 0.0180, crystalY: 0.0040, columns: true, classesAt: taper },
+    { y: 0.400, w: 0.090, d: 0.072, fg: [3, 2], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060, hero: 0.20, columns: true, classesAt: taper },
     /* R102 — knee and calf, as on the male (proportions.js kneeShape /
        calfShape). Measured on the female references: thigh 0.191 of height
        at t 0.64, knee 0.103 at t 0.72, calf 0.110 at t 0.76 (front). */
-    { y: 0.560, w: 0.122, d: 0.100, facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.22,
+    { y: 0.560, w: 0.136, d: 0.112, fg: [3, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.22,
       shape: S.calfShape(0.55), columns: true, classesAt: taper },
-    { y: 0.680, w: 0.150, d: 0.126, facet: -0.0055, crystal: 0.0280, crystalY: 0.0070, hero: 0.26,
+    { y: 0.680, w: 0.172, d: 0.144, fg: [2, 2], facet: -0.0055, crystal: 0.0280, crystalY: 0.0070, hero: 0.26,
       shape: S.calfShape(1.0), columns: true, classesAt: taper },
-    { y: 0.760, w: 0.146, d: 0.122, facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.16,
+    { y: 0.760, w: 0.166, d: 0.140, fg: [2, 2], facet: 0.0050, crystal: 0.0260, crystalY: 0.0060, hero: 0.16,
       shape: S.calfShape(0.60), columns: true, classesAt: taper },
     /* the knee is read in depth, not in width (see the male table) */
-    { y: 0.830, w: 0.140, d: 0.116, facet: -0.0045, crystal: 0.0220, crystalY: 0.0050, hero: 0.08,
+    { y: 0.830, w: 0.158, d: 0.132, fg: [2, 2], facet: -0.0045, crystal: 0.0220, crystalY: 0.0050, hero: 0.08,
       shape: S.kneeShape(1.0), columns: true, classesAt: taper, cav: 0.45 },
-    { y: 0.920, w: 0.168, d: 0.138, facet: -0.0050, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
-      shape: hipShape(0.45, 0.3), columns: true, classesAt: taper },
+    { y: 0.920, w: 0.204, d: 0.170, fg: [2, 3], facet: -0.0050, crystal: 0.0300, crystalY: 0.0070, hero: 0.18,
+      shape: hipShape(0.45, 0.0), columns: true, classesAt: taper },
     /* the thigh — strong, the reference's 0.60 of the shoulder width */
-    { y: 1.070, w: 0.214, d: 0.178, facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
-      shape: hipShape(0.70, 0.5), columns: true, classesAt: taper },
+    { y: 1.070, w: 0.276, d: 0.234, fg: [2, 3], facet: 0.0055, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+      shape: hipShape(0.70, 0.12), columns: true, classesAt: taper },
     /* R102 — the under-glute crease: the glute pair pulls in here so the
        belly above it overhangs the hamstring */
-    { y: 1.230, w: 0.256, d: 0.216, facet: 0.0070, crystal: 0.0340, crystalY: 0.0090, hero: 0.22,
-      shape: hipShape(1.0, 0.45), columns: false, classesAt: null, zoneAt: S.quadZone(1), cav: 0.45 },
+    { y: 1.230, w: 0.330, d: 0.270, fg: [2, 3], facet: 0.0070, zc: -0.030, crystal: 0.0340, crystalY: 0.0090, hero: 0.22,
+      shape: hipShape(1.0, 0.85), columns: false, classesAt: null, zoneAt: S.quadZone(1), cav: 0.45 },   /* R107: still a full sphere here; it ends in a fold below */
     /* the hip / glute max — the widest point below the waist, glute-full behind
        (R102: the reference's hip is 0.77 of her shoulder width, the glute max
        sits HIGH, at t 0.49, and the shelf begins straight under the waist) */
-    { y: 1.400, w: 0.292, d: 0.246, facet: -0.0070, crystal: 0.0340, crystalY: 0.0090, hero: 0.16,
+    { y: 1.400, w: 0.395, d: 0.340, fg: [2, 3], facet: -0.0070, zc: -0.045,   /* R107: the hip / glute max — 1 : 3.5 against the waist, the brief's godform ratio */ crystal: 0.0340, crystalY: 0.0090, hero: 0.16,
       shape: hipShape(1.0, 1.0), zoneAt: S.quadZone(0) },
-    { y: 1.530, w: 0.262, d: 0.220, facet: 0.0050, crystal: 0.0280, crystalY: 0.0070, hero: 0.10,
+    { y: 1.530, w: 0.356, d: 0.300, fg: [2, 3], facet: 0.0050, zc: -0.040, crystal: 0.0280, crystalY: 0.0070, hero: 0.10,
       shape: hipShape(0.90, 1.0), zoneAt: S.quadZone(0) },
     /* the glute SHELF — the pair is already present where the waist ends */
-    { y: 1.610, w: 0.196, d: 0.166, facet: -0.0050, crystal: 0.0240, crystalY: 0.0060, hero: 0.06,
+    { y: 1.610, w: 0.250, d: 0.210, fg: [2, 3], facet: -0.0050, zc: -0.020, crystal: 0.0240, crystalY: 0.0060, hero: 0.06,
       shape: hipShape(0.60, 0.70), zoneAt: S.coreZone(0) },
     /* THE WAIST — higher and tighter than his (R102: 0.30 of her shoulders) */
-    { y: 1.690, w: 0.130, d: 0.116, facet: -0.0060, crystal: 0.0240, crystalY: 0.0060,
+    { y: 1.690, w: 0.118, d: 0.108, fg: [1, 1], facet: -0.0060, crystal: 0.0240, crystalY: 0.0060,
       shape: S.coreShape(1.0, 0.05), hero: 0.04, zoneAt: S.coreZone(1), cav: 0.30 },
-    { y: 1.770, w: 0.192, d: 0.162, facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
+    { y: 1.770, w: 0.192, d: 0.162, fg: [2, 2], facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
       shape: S.coreShape(0.9, 0.16, 0.12), hero: 0.08, zoneAt: S.coreZone(2) },
     /* the under-bust */
-    { y: 1.860, w: 0.236, d: 0.232, facet: -0.0050, crystal: 0.0260, crystalY: 0.0060,
+    { y: 1.860, w: 0.236, d: 0.232, fg: [3, 3], facet: -0.0050, crystal: 0.0260, crystalY: 0.0060,
       shape: bustShape(0.85), hero: 0.10, zoneAt: S.coreZone(3) },
     /* THE BUST — two integrated volumes either side of the sternum */
-    { y: 1.970, w: 0.262, d: 0.276, facet: 0.0055, crystal: 0.0300, crystalY: 0.0070,
+    { y: 1.970, w: 0.262, d: 0.276, fg: [3, 3], facet: 0.0055, crystal: 0.0300, crystalY: 0.0070,
       shape: bustShape(1.0), hero: 0.34, zoneAt: S.pecZone(0) },
-    { y: 2.050, w: 0.250, d: 0.220, facet: -0.0045, crystal: 0.0280, crystalY: 0.0060,
+    { y: 2.050, w: 0.250, d: 0.220, fg: [2, 2], facet: -0.0045, crystal: 0.0280, crystalY: 0.0060,
       shape: S.chestShape(0.55), hero: 0.40, zoneAt: S.pecZone(1) },   /* R103: the girdle sits 0.05 lower, as the male's does */
     /* the shoulder line, narrower, with the same collar */
-    { y: 2.120, w: 0.236, d: 0.184, facet: 0.0055, crystal: 0.0300, crystalY: 0.0060,
+    { y: 2.120, w: 0.236, d: 0.184, fg: [2, 2], facet: 0.0055, crystal: 0.0300, crystalY: 0.0060,
       shape: S.clavicleShape(1.0), dip: 0.030, hero: 0.30, zoneAt: null, coat: 0.12 },   /* R98: the shelf takes a reduced platinum share, as the male's does; R102: less again — her upper chest rendered as one blown white ledge */
     /* the neck — the same column, a touch slimmer */
-    { y: 2.205, w: 0.190, d: 0.140, facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
+    { y: 2.205, w: 0.165, d: 0.130, fg: [1, 1], facet: -0.0120, crystal: 0.024, crystalY: 0.0050,
       shape: S.clavicleShape(0.55), hero: 0.16, classesAt: neck },
-    { y: 2.250, w: 0.110, d: 0.092, facet: 0.0120, crystal: 0.018, crystalY: 0.0040, zc: -0.030, hero: 0.10, classesAt: neck },
-    { y: 2.315, w: 0.096, d: 0.082, facet: -0.0110, crystal: 0.014, crystalY: 0.0030, zc: -0.040, hero: 0.06, classesAt: neck },
-    { y: 2.368, w: 0.088, d: 0.078, facet: 0.0100, crystal: 0.012, crystalY: 0.0020, zc: -0.044, hero: 0.04, classesAt: neck },
-    { y: 2.412, w: 0.010, d: 0.008, facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neck }
+    { y: 2.250, w: 0.110, d: 0.092, fg: [1, 1], facet: 0.0120, crystal: 0.018, crystalY: 0.0040, zc: -0.030, hero: 0.10, classesAt: neck },
+    { y: 2.315, w: 0.096, d: 0.082, fg: [1, 1], facet: -0.0110, crystal: 0.014, crystalY: 0.0030, zc: -0.040, hero: 0.06, classesAt: neck },
+    { y: 2.368, w: 0.088, d: 0.078, fg: [1, 1], facet: 0.0100, crystal: 0.012, crystalY: 0.0020, zc: -0.044, hero: 0.04, classesAt: neck },
+    { y: 2.412, w: 0.080, d: 0.072, fg: [1, 1], facet: 0.0060, zc: -0.044, hero: 0.02, classesAt: neck }
   ];
 
   var TORSO = {
-    topY: T.topY, sides: T.sides, classLift: T.classLift, rings: rings,
+    topY: T.topY, sides: T.sides, refine: T.refine, classLift: T.classLift, rings: rings,
     shoulderHalfWidth: 0.510, shoulderY: 2.120   /* R102: 0.420 -> 0.470, her shoulders are 0.91 of his */
   };
 
@@ -140,19 +148,19 @@ function femaleProportions() {
   var A = M.ARMS;
   var ARMS = {
     right: {
-      shoulder: [-0.355, 1.935, 0.014],
+      shoulder: [-0.389, 1.954, 0.014],
       elbow: [-0.455, 1.390, 0.10],
       wrist: [-0.410, 0.985, 0.14],
       upperRadius: 0.116, foreRadius: 0.084, wristRadius: 0.056
     },
     left: {
-      shoulder: [0.355, 1.935, 0.014],
+      shoulder: [0.389, 1.954, 0.014],
       elbow: [0.455, 1.430, 0.11],
       wrist: [0.560, 2.110, 0.15],
       upperRadius: 0.116, foreRadius: 0.084, wristRadius: 0.056
     },
     /* the deltoid: a round cap that encloses the arm's top — R102: larger; R103: rooted deeper and lower with the girdle */
-    deltoid: { innerX: 0.180, innerY: 1.990, outerX: 0.490, outerY: 1.910, r0: 0.215 },   /* R104: wider, muscular shoulders */
+    deltoid: { innerX: 0.200, innerY: 2.010, outerX: 0.470, outerY: 1.930, r0: 0.160 }   /* R107: a dome, not a ball (see body.js) */,   /* R104: wider, muscular shoulders */
     classLift: A.classLift, deltoidLift: A.deltoidLift,
     profiles: A.profiles, shapes: A.shapes
   };

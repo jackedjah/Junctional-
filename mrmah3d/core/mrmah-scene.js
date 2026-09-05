@@ -27,7 +27,7 @@ import { createStage } from './stage.js';
 import { createCamera } from './camera.js';
 import { createLights } from './lights.js';
 import { createEnvironment } from './environment.js';
-import { Vector3 as RimVector3 } from '../vendor/three/three.module.min.js';
+import { Vector3 as RimVector3, DirectionalLight as ClayLight } from '../vendor/three/three.module.min.js';
 
 /* R99 — where the rim comes from, in world space (see renderFrame). */
 var RIM_A_WORLD = new RimVector3(-0.58, 0.62, -0.30).normalize();   /* the moon's side */
@@ -81,6 +81,7 @@ export function createMrMahScene(host, options) {
   });
   var cameraBox = createCamera({ framing: opts.framing });
   var lightsBox = createLights({ palette: palette, settings: settings, parent: stageBox.scene });
+  var clayKey = null;   /* R106: the clay debug view's camera-side key (setDebugView) */
   var envBox = createEnvironment({
     palette: palette, settings: settings, parent: stageBox.world, tier: tier
   });
@@ -442,6 +443,21 @@ export function createMrMahScene(host, options) {
        'mass' (flat near-black silhouette), 'groups' (a colour per anatomical
        group) or null. See setDebugView in character/mrmah.js. */
     setDebugView: function (name) {
+      /* R106 — the CLAY view carries its own key, hung off the camera's
+         upper left, so the sculpt reads from every yaw: the scene's key sits
+         in front of him and the back was lit only by the rims and the
+         ambient, which is a flat, form-hiding light. Development only;
+         removed with the view. */
+      if (clayKey) { stageBox.scene.remove(clayKey); clayKey = null; }
+      if (name === 'clay') {
+        clayKey = new ClayLight(0xffffff, 1.2);
+        clayKey.name = 'clay-key';
+        var cp = cameraBox.camera.position;
+        clayKey.position.set(cp.x - 3.0, cp.y + 5.0, cp.z);
+        clayKey.target.position.set(0, 1.4, 0);
+        stageBox.scene.add(clayKey);
+        stageBox.scene.add(clayKey.target);
+      }
       return characterBox.setDebugView ? characterBox.setDebugView(name) : null;
     },
     /* ---- development only: content on the display glass ----------------
