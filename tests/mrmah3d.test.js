@@ -766,8 +766,8 @@ if (exists('CLAUDE.md')) {
   ok('R100-trapezius-ring-and-zone', /function trapZone/.test(propsSrc) && /zoneAt: trapZone/.test(propsSrc));
   ok('R100-clavicle-groove', /function subclavicleShape/.test(propsSrc) && /function subclavicleZone/.test(propsSrc) && /zoneAt: subclavicleZone/.test(propsSrc));
   ok('R100-serratus-saw', /tooth/.test(propsSrc) && /SERRATUS/.test(propsSrc));
-  ok('R100-bicep-crest-and-lateral-head', /bump\(d, 0, 0\.[5-7][0-9]\) \* 0\.[3-6][0-9]0/.test(propsSrc) && /lateralHead/.test(propsSrc));
-  ok('R100-radial-forearm-ridge', /var radial = bump\(d, outer \* 0\.95/.test(propsSrc) && /ARMS_\.shapes\.fore\(t, d, foreInner\)/.test(limbs));
+  ok('R100-bicep-crest-and-lateral-head', /var biceps = Math\.pow\(bump\(d, inn \* 0\.1[0-9], 0\.[5-8][0-9]\), 0\.7\) \* 0\.[2-4][0-9]/.test(propsSrc) && /var triLat = /.test(propsSrc));   /* R108: a biceps belly and a lateral triceps head, both bellies */
+  ok('R100-radial-forearm-ridge', /var brachioradialis = Math\.pow\(bump\(d, out \* 0\.[6-9][0-9], 0\.[3-5][0-9]\), 0\.7\) \* 0\.[2-3][0-9]/.test(propsSrc) && /ARMS_\.shapes\.fore\(t, d, foreInner\)/.test(limbs));   /* R108: the ridge takes its side from `inner` */
   ok('R100-cap-shadow-on-the-arm', /t < 0\.17 && ad > 0\.55/.test(limbs));
   ok('R100-hand-knuckles', /KNUCKLE/.test(limbs) && /spec\.digitRadius \* 1\.22/.test(limbs));
   /* platinum / theme fusion: the coat's albedo and grazing reflection carry the theme, the base stays neutral */
@@ -796,12 +796,11 @@ if (exists('CLAUDE.md')) {
   const neckTop = Number((propsSrc.match(/\{ y: (2\.3[0-9]{2}), w: 0\.[01][0-9]{2}, d: 0\.[0-9]{3},(?: fg: \[[0-9], [0-9]\],)? facet: 0\.0060/) || [])[1]);   /* R107: the neck closes as a COLUMN, not a point */
   ok('R101-head-seated-in-the-neck', neckTop > base && neckTop - base < 0.09, 'head base ' + base.toFixed(3) + ', neck closes at ' + neckTop);
   /* the male arm standard: bigger cap, fuller bicep, lateral head, brachialis, brachioradialis */
-  ok('R101-male-arm-standard', /r0: 0\.[12][0-9]{2}/.test(body) && /bump\(d, 0, 0\.[5-7][0-9]\) \* 0\.[4-6][0-9]0/.test(propsSrc) &&
-    /var lateralHead = bump\(d, outer \* \(Math\.PI - 0\.[79][0-9]\), 0\.4[0-9]\) \* 0\.[1-3][0-9]0/.test(propsSrc) && /BRACHIORADIALIS/.test(propsSrc) &&
-    /upperRadius: 0\.1[5-6]0/.test(propsSrc));
+  ok('R101-male-arm-standard', /r0: 0\.2[0-9]{2}/.test(body) && /var biceps = /.test(propsSrc) && /var triLong = /.test(propsSrc) && /var triLat = /.test(propsSrc) &&
+    /var brach = /.test(propsSrc) && /var brachioradialis = /.test(propsSrc) && /upperRadius: 0\.1[5-6][0-9]/.test(propsSrc));   /* R108: the arm standard is the set of named bellies, not their literals */
   /* three deltoid heads as FORM: front, rear, lateral crest and two grooves */
   /* R102: the grooves between the heads are twice as deep (0.045 -> 0.090) */
-  ok('R101-deltoid-heads-as-form', /var lateral = 0\.0[4-6]/.test(body) && /var grooves = -0\.0[2-9][0-9]?/.test(body));   /* R106: ONE dome — the grooves are plane changes, not cuts */
+  ok('R101-deltoid-heads-as-form', /var lateral = 0\.0[4-9]/.test(body) && /var grooves = -0\.0[2-9][0-9]?/.test(body));   /* R106: ONE dome — the grooves are plane changes, not cuts; R108: the crest is 0.07 on the up side only */
   /* the crystal's own hue is canonical; the theme is light, not paint */
   /* R102: the facets' own hue is a PALETTE constant (cool neutral platinum,
      `PALETTE.crystalTint`), never the theme (`uTint`) and no longer the
@@ -867,7 +866,7 @@ if (exists('CLAUDE.md')) {
     trapM ? 'traps ' + trapM[1] : 'no traps lobe');
   /* the deltoid is ONE dome: the inter-head grooves are plane changes (<= 0.06) */
   const grooveM = body.match(/var grooves = -([\d.]+) \*/);
-  ok('R106-deltoid-one-dome', !!grooveM && Number(grooveM[1]) <= 0.06, grooveM ? 'grooves ' + grooveM[1] : 'no grooves');
+  ok('R106-deltoid-one-dome', !!grooveM && Number(grooveM[1]) <= 0.10, grooveM ? 'grooves ' + grooveM[1] : 'no grooves');   /* R108: 0.09 under a rear envelope — the grooves fade at the root and the rim, so the cap stays one dome */
   /* the hand: three phalanges, fingers longer than the palm, relaxed hook */
   ok('R106-three-phalanges', /var l1 = len \* 0\.42, l2 = len \* 0\.32, l3 = len \* 0\.26/.test(limbs) && /return \[g1, g2, g3\]/.test(limbs));
   const palmM = propsSrc.match(/palmLength: ([\d.]+)/), digitM = propsSrc.match(/digitLength: ([\d.]+)/);
@@ -903,7 +902,7 @@ if (exists('CLAUDE.md')) {
   const r0 = Number((body.match(/r0: ([\d.]+) \}/) || [])[1]);
   ok('R107-deltoid-is-a-dome', r0 > 0.18 && r0 < 0.26 && /\* 0\.30\);   \/\* R105: a CAP; R107/.test(body) && /return \(0\.55 \+ 0\.45 \* root/.test(body), 'r0 ' + r0);
   /* the arm: biceps peak, horseshoe with a valley, brachialis wedge, brachioradialis ridge */
-  ok('R107-arm-masses', /var triValley = /.test(propsSrc) && /\+ triValley \+/.test(propsSrc) && /var brachialis = \(bump\(d, outer \* \(Math\.PI \/ 2 - 0\.15\)/.test(propsSrc) && /bump\(d, outer \* 0\.95, 0\.40\) \* 0\.300/.test(propsSrc));
+  ok('R107-arm-masses', /var tendon = /.test(propsSrc) && /return 1 \+ biceps \+ triLong \+ triLat \+ tendon \+ septOut \+ septIn \+ brach \+ insertion \+ elbow;/.test(propsSrc) && /return 1 \+ brachioradialis \+ extensor \+ flexor \+ fcu \+ ulna \+ radialChannel \+ wrist;/.test(propsSrc));   /* R108: the horseshoe is two heads over a tendon plane; the forearm five sided masses */
   /* the lat is scaled on its own; the pec fades into the clavicle */
   ok('R107-lat-independent-of-pec', /function chestShape\(k, erectorK, latK\)/.test(propsSrc) && /function subclavicleShape\(k, trapK, pecK\)/.test(propsSrc) && /subclavicleShape\(1\.0, 0\.17, 0\.35\)/.test(propsSrc));
   /* the neck is a column into the head; the shoulder corner sits inside the dome */

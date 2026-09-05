@@ -968,7 +968,11 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
       y: len * t, w: r, d: r * ratio,
       crystal: crystal * taper,
       crystalY: crystal * 0.35 * taper * len,
-      facet: (k % 2 ? -1 : 1) * 0.03 * taper,
+      /* R108: the alternating relief is an OPTION now (default a third of the
+         old 0.03). On a smooth-normal limb the +/-3% checkerboard read as
+         horizontal corrugation on every arm; the crystal's facet groups no
+         longer need it to break the bands. */
+      facet: (k % 2 ? -1 : 1) * (opts.facet == null ? 0.010 : opts.facet) * taper,
       shape: opts.shape ? (function (tt, fa, fn) {
         return function (a) { return fn(tt, a - fa); };
       }(t, frontAngle, opts.shape)) : undefined,
