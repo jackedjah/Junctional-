@@ -167,9 +167,13 @@ function buildDigit(hand, materials, spec, base, dirX, len, radius, curl, edges)
   var a3 = curl * 2.05;
   var tip = [mid2[0] + dirX * l3 * 0.5, mid2[1] + Math.cos(a3) * l3, mid2[2] + Math.sin(a3) * l3];
   var o = { depthRatio: 0.86, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat };
-  var g1 = segment(base, mid, radius, radius * 0.94, 6, o);
-  var g2 = segment(mid, mid2, radius * 0.94, radius * 0.84, 6, o);
-  var g3 = segment(mid2, tip, radius * 0.84, radius * 0.60, 6, o);
+  /* R108 c: a real TAPER along the finger (1.0 -> 0.88 -> 0.74 -> 0.50) and
+     each phalanx a hair fuller at its joint end than its middle (the
+     profile), so a finger is three jointed volumes rather than a tube. */
+  var ph = function (t) { return 0.95 + 0.05 * Math.abs(t - 0.5) * 2; };
+  var g1 = segment(base, mid, radius, radius * 0.88, 6, Object.assign({ profile: ph }, o));
+  var g2 = segment(mid, mid2, radius * 0.88, radius * 0.74, 6, Object.assign({ profile: ph }, o));
+  var g3 = segment(mid2, tip, radius * 0.74, radius * 0.50, 6, o);
   /* The segments are returned, not clad: the hand merges every part into ONE
      geometry (see buildHand) so a hand costs three draws, not thirty. */
   return [g1, g2, g3];
@@ -236,10 +240,15 @@ function buildHand(materials, spec, options) {
        boss across the metacarpal head, so the back of the hand reads as a
        row of joints rather than four tubes leaving a block. Merged with the
        hand, so it costs no draw. */
-    var kb = [x, spec.palmLength - spec.digitRadius * 0.9, spec.palmHalfDepth * 0.22];
-    var kt = [x + Math.sin(splay) * spec.digitRadius * 1.2, spec.palmLength + spec.digitRadius * 1.1, spec.palmHalfDepth * 0.22 + Math.sin(curl * 0.85) * spec.digitRadius * 1.1];
-    parts.push(segment(kb, kt, spec.digitRadius * 1.22, spec.digitRadius * 1.05, 6,
-      { depthRatio: 0.95, crystal: 0.02, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat }));
+    /* R108 c: the bosses are a KNUCKLE ROW — wider (1.34 of the digit) and
+       set a little further back on the hand, so neighbours touch and the
+       back of the hand ends in a continuous ridge of joints (the reference
+       clay strip's hand), not four separate beads. */
+    var kb = [x, spec.palmLength - spec.digitRadius * 1.3, spec.palmHalfDepth * 0.26];
+    var kt = [x + Math.sin(splay) * spec.digitRadius * 1.2, spec.palmLength + spec.digitRadius * 1.0, spec.palmHalfDepth * 0.26 + Math.sin(curl * 0.85) * spec.digitRadius * 1.0];
+    parts.push(segment(kb, kt, spec.digitRadius * 1.22, spec.digitRadius * 1.08, 6,   /* 1.22: at the finger spacing (0.044) bosses of 0.029 already touch */
+      { depthRatio: 0.90, crystal: 0.02, steps: 2, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat,
+        profile: function (t) { return 0.86 + 0.14 * Math.sin(t * Math.PI); } }));
   }
 
   /* A THUMB — the one addition that makes a hand read as a hand. Set on the
@@ -250,9 +259,21 @@ function buildHand(materials, spec, options) {
   var thumbTip = opts.open
     ? [thumbBase[0] - thumbLen * 0.72, thumbBase[1] + thumbLen * 0.62, thumbBase[2] + thumbLen * 0.28]
     : [thumbBase[0] - thumbLen * 0.20, thumbBase[1] + thumbLen * 0.70, thumbBase[2] + thumbLen * 0.55];
-  var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.34, spec.digitRadius * 0.86, 6,   /* R101: a real thumb base */
-    { depthRatio: 0.9, crystal: 0.03, steps: 1, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat });
+  var thumbGeo = segment(thumbBase, thumbTip, spec.digitRadius * 1.30, spec.digitRadius * 0.80, 6,   /* R101: a real thumb base; R108 c: tapers to 0.80 */
+    { depthRatio: 0.9, crystal: 0.03, steps: 2, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat,
+      profile: function (t) { return 0.94 + 0.06 * Math.abs(t - 0.5) * 2; } });
   parts.push(thumbGeo);
+  /* R108 c — THE THUMB PLANE. A thumb leaving a flat palm at a point is a
+     peg; the reference hands carry a thenar wedge — the thumb's base is a
+     broad flattened mass running from the inner wrist corner to the thumb's
+     root, which is what gives the hand its width on that side. A short,
+     flattened segment (depth 0.55 of its width) from just above the wrist
+     to the thumb base, buried into the palm's inner face. */
+  var thenarA = [-spec.palmHalfWidth * 0.50, spec.palmLength * 0.10, spec.palmHalfDepth * 0.05];
+  var thenarB = [thumbBase[0] * 0.92, thumbBase[1] * 0.96, thumbBase[2] * 0.85];
+  parts.push(segment(thenarA, thenarB, spec.digitRadius * 1.55, spec.digitRadius * 1.35, 8,
+    { depthRatio: 0.55, crystal: 0.02, steps: 2, lift: ARMS.classLift, classes: REGIONS.HAND.classes, coat: REGIONS.HAND.coat,
+      profile: function (t) { return 0.90 + 0.10 * Math.sin(t * Math.PI); } }));
   var handGeo = mergeGeometries(parts);
   var handParts = clad(hand, handGeo, materials, 0, HAND_EDGES, 'hand-solid');
   owned.push(handGeo, handParts.edges, handParts.minorEdges);
@@ -328,9 +349,31 @@ function buildArm(materials, spec, options) {
   /* Six steps rather than four, because a profiled limb needs enough rings to
      actually describe its swell — at four the bicep belly lands between rings
      and the arm stays a cone with a kink in it. */
+  /* R108 c — THE JOINT IS BURIED, NOT BUTTED. Two capped tubes ending at the
+     same point meet as two rounded cap rims with a slot between them, which
+     the 3x clay showed as a dark ring at every elbow — a pipe joint. The
+     upper arm now runs 0.035 PAST the elbow into the forearm, whose first
+     ring (0.80 of foreRadius, profiles.fore) is a hair wider than the upper
+     arm's end (0.78), so the two surfaces cross at a shallow angle just
+     below the joint and both cap discs are inside the other tube. The
+     elbow ball fills the wedge on the outside of the bend as before. */
+  /* Round 5: the burial SCALES WITH THE BEND. The seam is a normal artifact
+     — the forge's smooth normal at a tube's end ring averages in its cap
+     disc, so the forearm's first band is lit as a rounded rim and the upper
+     arm's last band as a dark ring whatever the geometry does — and the
+     cure is to put those bands INSIDE the other tube. On the hanging arm
+     (a 4-degree bend) the upper arm runs 0.06 past the joint and the
+     forearm starts 0.045 before it; on the presenting arm (folded to 150
+     degrees) the same extension stood out under the elbow as a flat stump,
+     so there the factor is zero and the ball fills the wedge as before. */
+  var upperVec = elbow.clone().sub(shoulder);
+  var foreVec0 = wrist.clone().sub(elbow);
+  var bendK = Math.max(0, upperVec.clone().normalize().dot(foreVec0.clone().normalize()));
+  bendK = bendK * bendK;
+  var upperEnd = upperVec.clone().add(upperVec.clone().normalize().multiplyScalar(0.06 * bendK));
   var upperGeo = segment(
-    [0, 0, 0], elbow.clone().sub(shoulder).toArray(),
-    spec.upperRadius, spec.foreRadius * 1.02, 14,   /* R105: twelve sides — a belly needs vertices to be round */
+    [0, 0, 0], upperEnd.toArray(),
+    spec.upperRadius, spec.foreRadius * 1.02, 16,   /* R105: twelve sides — a belly needs vertices to be round; R108 c: sixteen, so the horseshoe's two heads and its tendon flat each land on their own vertices */
     /* R90: depthRatio goes above 1 and the cross-section is now SHAPED.
 
        The upper arm is deeper front-to-back than it is wide, because that is
@@ -350,7 +393,7 @@ function buildArm(materials, spec, options) {
        depth where it belongs (a 1.28 front, a 1.20 rear at the peak); on a
        tube that was ALSO 1.18 deeper than wide the arm was a lens — 0.20
        wide by 0.45 deep at the biceps. */
-    { depthRatio: 1.06, crystal: 0.012, steps: 10, fg: [2, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first */
+    { depthRatio: 1.12, crystal: 0.012, steps: 10, fg: [2, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first; R108 c: 1.12 — the side view measured the cap at 1.27x the arm's depth against the reference's ~1.1, and the depth belongs to the biceps / triceps, not the cap */
       profile: ARMS_.profiles.upper, shape: function (t, d) { return ARMS_.shapes.upper(t, d, upperInner); }, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner),
       coat: REGIONS.UPPER_ARM.coat,
@@ -373,9 +416,10 @@ function buildArm(materials, spec, options) {
   shoulderJoint.add(elbowJoint);
 
   var foreVec = wrist.clone().sub(elbow);
+  var foreStart = foreVec.clone().normalize().multiplyScalar(-0.045 * bendK);
   var foreGeo = segment(
-    [0, 0, 0], foreVec.toArray(),
-    spec.foreRadius, spec.wristRadius, 14,
+    foreStart.toArray(), foreVec.toArray(),
+    spec.foreRadius, spec.wristRadius, 16,   /* R108 c: sixteen sides — the brachioradialis, extensor and flexor masses are three columns */
     /* R98: five steps so the extensor belly just under the elbow has a ring
        to peak on and the taper into the wrist has two to fall through. */
     { depthRatio: 1.06, crystal: 0.010, steps: 9, fg: [2, 2],
@@ -402,13 +446,22 @@ function buildArm(materials, spec, options) {
      bulging ring at every elbow, the "mechanical hinge" the brief rules out.
      The elbow is a compression between two equal tubes with a bony
      landmark (the olecranon in shapes.upper), not a knuckle. */
-  var eR = spec.foreRadius * ARMS_.profiles.fore(0) * 1.00;
+  /* Round 5: on the folded arm (bendK 0) the ball grows a tenth, because the
+     upper arm's end ring there carries the olecranon and the brachioradialis
+     origin (up to 1.14 of its radius) and the wedge on the outside of the
+     bend showed that ring's flat disc past a ball sized to the bare radius.
+     On the hanging arm the tubes overlap and the ball stays flush. */
+  var eR = spec.foreRadius * ARMS_.profiles.fore(0) * (1.0 + 0.12 * (1 - bendK));
   /* A BALL, not a drum: its end discs closed to half the radius so they sit
      inside both tubes (a drum's disc showed as a bright flat lid on the
      outside of the bend as soon as it was sized to the upper arm). */
+  /* Round 6: a TRUE ball. At 0.5 + 0.5 sin the end discs were half the
+     radius, and on the folded arm — where no tube covers the underside of
+     the joint — the lower disc showed as a flat lid under the elbow. Ends
+     at 0.12 of the radius, four steps, so what shows is a sphere. */
   var elbowGeo = segment([0, -eR * 0.95, 0], [0, eR * 0.95, 0], eR, eR, 8,
-    { depthRatio: 1.0, crystal: 0.015, steps: 3,
-      profile: function (t) { return 0.50 + Math.sin(t * Math.PI) * 0.50; } });
+    { depthRatio: 1.0, crystal: 0.015, steps: 8,   /* eight steps: on the folded arm the ball's lower half IS the elbow's point, and four steps drew it as a shelf */
+      profile: function (t) { return 0.12 + Math.pow(Math.sin(t * Math.PI), 0.8) * 0.88; } });
   var elbowKnob = new Mesh(elbowGeo, materials.joint || materials.cavity);
   elbowKnob.name = root.name + '-elbow-knob';
   elbowJoint.add(elbowKnob);
@@ -426,7 +479,7 @@ function buildArm(materials, spec, options) {
   var lateral = new Vector3(0, 0, 1).cross(upDir);
   if (lateral.lengthSq() < 1e-6) lateral.set(1, 0, 0);
   lateral.normalize();
-  var pinHalf = eR * 1.00, pinR = eR * 0.34;   /* R99: bosses just proud of the tube — compression, not a bolt; R108: flush — the bosses show only where the elbow compression exposes them, as the epicondyles, not as a bolt through the arm */
+  var pinHalf = eR * 0.90, pinR = eR * 0.34;   /* R108 c: 0.90 — at 1.00 the boss showed as a spike on the outer elbow of the compressed joint */   /* R99: bosses just proud of the tube — compression, not a bolt; R108: flush — the bosses show only where the elbow compression exposes them, as the epicondyles, not as a bolt through the arm */
   var pinGeo = segment(
     lateral.clone().multiplyScalar(-pinHalf).toArray(),
     lateral.clone().multiplyScalar(pinHalf).toArray(),
