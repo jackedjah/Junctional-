@@ -1,0 +1,285 @@
+{
+  "ranAt": "2026-09-05T17:38:15.655Z",
+  "shell": "netlify/functions/mygym.js handler GET (V=453), served at https://mahfitt.test/mygym with /api/mygym stubbed",
+  "device": "iPhone 13 (Playwright device profile), service workers blocked",
+  "passed": 46,
+  "failed": 0,
+  "results": [
+    {
+      "scenario": "S1",
+      "name": "Home renders with the world scripts loaded (domain + shell present)",
+      "ok": true,
+      "detail": "{\"hasDomain\":true,\"hasShell\":true,\"flag\":false,\"source\":\"off\",\"attr\":null,\"entry\":false,\"mentions\":false,\"directory\":[\"ACTIVITY\",\"＋ PROGRAM LIBRARY\"],\"primary\":5,\"worldKeys\":[]}"
+    },
+    {
+      "scenario": "S1",
+      "name": "development flag is OFF on a fresh device",
+      "ok": true,
+      "detail": "off"
+    },
+    {
+      "scenario": "S1",
+      "name": "no data-mahworld-state attribute on <html>",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "scenario": "S1",
+      "name": "no MAHWORLD entry and no MAHWORLD text anywhere in #mygym",
+      "ok": true,
+      "detail": "[\"ACTIVITY\",\"＋ PROGRAM LIBRARY\"]"
+    },
+    {
+      "scenario": "S1",
+      "name": "the directory stack is exactly ACTIVITY + PROGRAM LIBRARY, five primary actions untouched",
+      "ok": true,
+      "detail": "ACTIVITY|＋ PROGRAM LIBRARY / 5"
+    },
+    {
+      "scenario": "S1",
+      "name": "no fob.mahworld.* key written to localStorage",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "scenario": "S1",
+      "name": "Settings renders without the MAHWORLD section",
+      "ok": true,
+      "detail": "{\"settings\":true,\"world\":false,\"mentions\":false}"
+    },
+    {
+      "scenario": "S1",
+      "name": "a direct mahworld route renders Home, not the shell",
+      "ok": true,
+      "detail": "{\"home\":true,\"page\":false}"
+    },
+    {
+      "scenario": "S1",
+      "name": "zero page errors, zero console errors",
+      "ok": true,
+      "detail": "{\"errors\":[],\"console\":[]}"
+    },
+    {
+      "scenario": "S1",
+      "name": "boot went to /api/mygym once as the first call",
+      "ok": true,
+      "detail": "[\"boot\",\"activityLiveState\"]"
+    },
+    {
+      "scenario": "S2",
+      "name": "?mahworld=1 is refused on the production context off localhost (flag off, no key, no entry)",
+      "ok": true,
+      "detail": "{\"flag\":false,\"key\":null,\"entry\":false,\"ctx\":\"production\",\"host\":\"mahfitt.test\"}"
+    },
+    {
+      "scenario": "S2",
+      "name": "zero page errors",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "scenario": "S3",
+      "name": "flag ON from the URL switch on a non-production context (source: device storage)",
+      "ok": true,
+      "detail": "storage"
+    },
+    {
+      "scenario": "S3",
+      "name": "the MAHWORLD entry renders last in the directory stack with .mg-button geometry",
+      "ok": true,
+      "detail": "{\"flag\":true,\"source\":\"storage\",\"entry\":true,\"label\":\"MAHWORLD\",\"cls\":\"mg-button mahworld-home\",\"attr\":null,\"geom\":{\"w\":[334,334],\"h\":[78,78],\"radius\":[\"0px\",\"0px\"],\"border\":[\"1px\",\"1px\"],\"font\":[\"13px\",\"13px\"],\"pad\":[\"1px 6px\",\"1px 6px\"],\"last\":true}}"
+    },
+    {
+      "scenario": "S3",
+      "name": "entry geometry equals ＋ PROGRAM LIBRARY (width, height, radius, border, font, padding)",
+      "ok": true,
+      "detail": "{\"w\":[334,334],\"h\":[78,78],\"radius\":[\"0px\",\"0px\"],\"border\":[\"1px\",\"1px\"],\"font\":[\"13px\",\"13px\"],\"pad\":[\"1px 6px\",\"1px 6px\"],\"last\":true}"
+    },
+    {
+      "scenario": "S3",
+      "name": "no state attribute yet: the profile has not opted in, so the world is OFF even with the flag on",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "scenario": "S3",
+      "name": "the shell page opens under the MAHFITT crown with the MAHWORLD page context, session WORLD_OFF, five groups",
+      "ok": true,
+      "detail": "{\"crown\":true,\"context\":\"MAHWORLD\",\"session\":\"WORLD_OFF\",\"groups\":[\"STATUS\",\"PROGRESSION\",\"CONTROLS\",\"PRESENCE\",\"MAHTROPOLIS · PORTALS TO MAHFITT\"]}"
+    },
+    {
+      "scenario": "S3",
+      "name": "STATUS shows WORLD OFFLINE / DEVELOPMENT, LEVEL, XP, MAHGIC, AVATAR STATUS",
+      "ok": true,
+      "detail": "[\"WORLD\",\"OWNER\",\"AUTHORITY\",\"LEVEL\",\"XP\",\"MAHGIC\",\"AVATAR STATUS\",\"ENABLE MAHWORLD FOR THIS ACCOUNT\",\"RUN SAMPLE DERIVATION · PREVIEW\",\"RESET LOCAL DRAFT\",\"PUBLIC PRESENCE\",\"PROGRAM GYM\",\"TRAINING ROOM\",\"PROGRESS\",\"CALENDAR\",\"HEALTH / RECOVERY\",\"MAH MEDIA\",\"MAH PLAYER\",\"SHOPPING HUB\",\"MR. MAH / AI\",\"PROTECTED SOCIAL SPACES\",\"EXITS TO OPEN-WORLD REGIONS\"]"
+    },
+    {
+      "scenario": "S3",
+      "name": "no forbidden resource spelling on the page",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "scenario": "S3",
+      "name": "ENABLE → profile opted in, session WORLD_AVAILABLE, <html data-mahworld-state=\"available\">",
+      "ok": true,
+      "detail": "{\"attr\":\"available\",\"session\":\"WORLD_AVAILABLE\",\"enabled\":true}"
+    },
+    {
+      "scenario": "S3",
+      "name": "ENTER → WORLD_ENTERING then WORLD_ACTIVE (simulated), attribute follows",
+      "ok": true,
+      "detail": "{\"mid\":{\"attr\":\"entering\",\"session\":\"WORLD_ENTERING\"},\"act\":{\"attr\":\"active\",\"session\":\"WORLD_ACTIVE\",\"ref\":{\"worldId\":\"mahtropolis-dev\",\"sessionId\":\"sim-mtoo1556\"}}}"
+    },
+    {
+      "scenario": "S3",
+      "name": "the active session is labelled a simulation on the page",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "scenario": "S3",
+      "name": "EXIT → WORLD_EXITING then back to WORLD_AVAILABLE, world ref cleared",
+      "ok": true,
+      "detail": "{\"ex\":\"WORLD_EXITING\",\"back\":{\"attr\":\"available\",\"session\":\"WORLD_AVAILABLE\",\"ref\":null}}"
+    },
+    {
+      "scenario": "S3",
+      "name": "leaving the page mid-ENTER cancels the entry: nothing re-renders over Home, session settles to WORLD_AVAILABLE",
+      "ok": true,
+      "detail": "{\"shell\":false,\"home\":true,\"state\":\"WORLD_AVAILABLE\",\"attr\":\"available\",\"ref\":null}"
+    },
+    {
+      "scenario": "S3",
+      "name": "a different signed-in account on the same device gets a fresh WORLD_OFF session and its own (un-enabled) profile",
+      "ok": true,
+      "detail": "{\"before\":\"WORLD_AVAILABLE\",\"owner\":\"acct-2\",\"after\":\"WORLD_OFF\",\"attr\":null,\"ownerRow\":true,\"offered\":true,\"restored\":\"WORLD_OFF\"}"
+    },
+    {
+      "scenario": "S3",
+      "name": "RUN SAMPLE DERIVATION → XP > 0 as a client PREVIEW carrying the balance version; profile authority stays local-draft",
+      "ok": true,
+      "detail": "{\"xp\":120,\"level\":2,\"authority\":\"local-draft\",\"last\":\"client-preview\",\"version\":\"v0-provisional\"}"
+    },
+    {
+      "scenario": "S3",
+      "name": "presence: OFF profile → null payload; opted-in payload carries venue only, no coordinates at any depth",
+      "ok": true,
+      "detail": "{\"offProfile\":null,\"pub\":{\"displayRef\":\"MAH-7\",\"level\":\"venue\",\"regionRef\":null,\"venueRef\":\"gym-7\"},\"leak\":false,\"keys\":[\"displayRef\",\"level\",\"regionRef\",\"venueRef\"],\"str\":\"{\\\"displayRef\\\":\\\"MAH-7\\\",\\\"level\\\":\\\"venue\\\",\\\"regionRef\\\":null,\\\"venueRef\\\":\\\"gym-7\\\"}\"}"
+    },
+    {
+      "scenario": "S3",
+      "name": "only the flag key and the account-namespaced draft were written",
+      "ok": true,
+      "detail": "fob.mahworld.dev.v1,fob.mahworld.profile.v0.acct-1"
+    },
+    {
+      "scenario": "S3",
+      "name": "MAHTROPOLIS portal opens the canonical MAH Calendar (the app's own calendar overlay)",
+      "ok": true,
+      "detail": "{\"overlay\":true,\"tag\":\"IFRAME.\",\"src\":\"/calendar?embed=1&source=tracker\",\"bodyHasCalendar\":true}"
+    },
+    {
+      "scenario": "S3",
+      "name": "back on Home in WORLD_AVAILABLE the entry carries the CSS-only micro-motion (::after drift)",
+      "ok": true,
+      "detail": "{\"attr\":\"available\",\"entry\":true,\"anim\":\"mahworldDrift\",\"opacity\":\"0.18\"}"
+    },
+    {
+      "scenario": "S3",
+      "name": "Settings shows the MAHWORLD · DEVELOPMENT section with OPEN and DISABLE",
+      "ok": true,
+      "detail": "{\"section\":true,\"actions\":[\"OPEN MAHWORLD\",\"DISABLE DEVELOPMENT MODE\"]}"
+    },
+    {
+      "scenario": "S3",
+      "name": "DISABLE DEVELOPMENT MODE → flag off, attribute removed, Home without the entry",
+      "ok": true,
+      "detail": "{\"flag\":false,\"attr\":null,\"entry\":false,\"home\":true,\"key\":null}"
+    },
+    {
+      "scenario": "S3",
+      "name": "zero page errors, zero console errors across the whole development flow",
+      "ok": true,
+      "detail": "{\"errors\":[],\"console\":[]}"
+    },
+    {
+      "scenario": "S4",
+      "name": "under prefers-reduced-motion the entry has no animation and no transition while WORLD_AVAILABLE",
+      "ok": true,
+      "detail": "{\"attr\":\"available\",\"anim\":\"none\",\"transition\":\"none\",\"dur\":\"0s\"}"
+    },
+    {
+      "scenario": "S4",
+      "name": "sign-out discards the world session: attribute removed, WORLD_OFF, no owner, login screen without MAHWORLD; the account's draft stays namespaced",
+      "ok": true,
+      "detail": "{\"attr\":null,\"state\":\"WORLD_OFF\",\"owner\":false,\"mentions\":false,\"draft\":true}"
+    },
+    {
+      "scenario": "S4",
+      "name": "zero page errors",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "scenario": "S5",
+      "name": "flag is on but the coach viewing a client sees no entry and no MAHWORLD text",
+      "ok": true,
+      "detail": "{\"flag\":true,\"entry\":false,\"mentions\":false,\"owner\":{\"ok\":false,\"ownerAccountId\":null,\"reason\":\"CLIENT_CONTEXT_BLOCKED\"},\"profile\":false,\"attr\":null}"
+    },
+    {
+      "scenario": "S5",
+      "name": "the domain refuses an owner in client context (neither coach nor client becomes the player)",
+      "ok": true,
+      "detail": "{\"ok\":false,\"ownerAccountId\":null,\"reason\":\"CLIENT_CONTEXT_BLOCKED\"}"
+    },
+    {
+      "scenario": "S5",
+      "name": "a direct mahworld route in client context renders Home",
+      "ok": true,
+      "detail": "{\"home\":true,\"page\":false}"
+    },
+    {
+      "scenario": "S5",
+      "name": "Settings has no MAHWORLD section in client context",
+      "ok": true,
+      "detail": "{\"settings\":true,\"world\":false}"
+    },
+    {
+      "scenario": "S5",
+      "name": "no draft was written for the coach or the client",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "scenario": "S5",
+      "name": "zero page errors",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "scenario": "S6",
+      "name": "with /mahworld/*.js returning 404 MAHFITT still boots to Home, no entry, no globals",
+      "ok": true,
+      "detail": "{\"domain\":\"undefined\",\"shell\":\"undefined\",\"home\":true,\"entry\":false,\"primary\":5}"
+    },
+    {
+      "scenario": "S6",
+      "name": "the mahworld route falls back to Home when the domain is absent",
+      "ok": true,
+      "detail": "{\"home\":true,\"page\":false}"
+    },
+    {
+      "scenario": "S6",
+      "name": "Settings renders normally without the domain",
+      "ok": true,
+      "detail": "{\"settings\":true,\"world\":false}"
+    },
+    {
+      "scenario": "S6",
+      "name": "zero page errors (a missing optional script is not an exception)",
+      "ok": true,
+      "detail": "[]"
+    }
+  ]
+}

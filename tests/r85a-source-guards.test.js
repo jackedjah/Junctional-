@@ -32,6 +32,6 @@ const checks=[
   [sim.includes("KEY='fob.mahfitt.roleSim.r90.v1'"),'simulator uses isolated fixture namespace'],
   [sim.includes("No API calls")||sim.includes('No real member records'),'simulator declares no production record use'],
   [sim.includes("location.hostname==='127.0.0.1'")&&!sim.includes("get('demo')==='1'"),'simulator is blocked on public hosts even with query parameters'],
-  [server.includes('const V = 452;')&&sw.includes("fob-shell-v452"),'R90 cache identity advances canonical role-context assets']
+  [server.includes('const V = 453;')&&sw.includes("fob-shell-v453"),'R90 cache identity advances canonical role-context assets']
 ];
 let passed=0;for(const [ok,msg] of checks){assert.ok(ok,msg);passed++}console.log('r85a-source-guards: '+passed+'/'+checks.length+' PASS');

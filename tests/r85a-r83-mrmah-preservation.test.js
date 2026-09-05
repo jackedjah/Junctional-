@@ -286,7 +286,7 @@ console.log('\nR82 PRESERVATION');
 console.log('\nDELIVERY');
 P('R83-CACHE-01',/mygym\.css\?v='\+V\+'[^"]*&r82=1&r83=1/.test(server)&&/mygym\.js\?v='\+V\+'[^"]*&r82=1&r83=1/.test(server),
   'both changed assets advance through the existing delivery lineage');
-P('R85A-R83-CACHE-02',/const V = 452;/.test(server)&&/fob-shell-v452/.test(fs.readFileSync(path.join(root,'sw.js'),'utf8')),
+P('R85A-R83-CACHE-02',/const V = 453;/.test(server)&&/fob-shell-v453/.test(fs.readFileSync(path.join(root,'sw.js'),'utf8')),
   'R85A intentionally advances the shell identity while preserving every R83 Mr.Mah visibility/material contract');
 
 console.log('\nR83 suite: '+passed+' assertions passed.');

@@ -18,7 +18,7 @@
    Bump the shell identity so no R90A/v447 script or stylesheet can win from
    CacheStorage after the humanized Coach Mode deployment. API/member data is
    still never cached. */
-const V = 'fob-shell-v452';
+const V = 'fob-shell-v453';
 /* The stamp the PAGES actually ask for. Precaching '/mygym.js' while the
    document requests '/mygym.js?v=332' meant the two never matched: every shell
    file was downloaded once into an entry nothing would ever read, then
@@ -29,7 +29,8 @@ const SHELL = [
   '/mygym.css', '/mygym.js', '/mahfitt-ui-state.js', '/mahfitt-navigation.js', '/exercise-visuals.js', '/mahfitt-health.js', '/mahfitt-listening.js', '/mahfitt-mmw.js', '/meal-gradient.css', '/meal-gradient.js', '/music-studio.css', '/image-crop.js',
   '/fob-pitch-worklet.js',
   '/calendar.css', '/calendar-layout.css', '/calendar.js', '/mahfitt-public.css',
-  '/mahfitt-geometry.css', '/mahfitt-banner.css', '/mahfitt-atmosphere.js', '/qr-lite.js', '/admin-app.css', '/admin-app.js', '/message-center.css', '/message-center-client.js', '/coach-shell.css', '/coach-shell.js', '/mahfitt-atmosphere.css'
+  '/mahfitt-geometry.css', '/mahfitt-banner.css', '/mahfitt-atmosphere.js', '/qr-lite.js', '/admin-app.css', '/admin-app.js', '/message-center.css', '/message-center-client.js', '/coach-shell.css', '/coach-shell.js', '/mahfitt-atmosphere.css',
+  '/mahworld/mahworld-domain.js', '/mahworld/mahworld-shell.js', '/mahworld/mahworld-menu.css'
 ].map(u => u + '?v=' + N).concat([
   '/images/pwa-192.png', '/images/pwa-512.png',
   '/images/favicon-32.png', '/images/apple-touch-icon.png',

@@ -1,0 +1,55 @@
+/* MAHWORLD :: MENU PRESENTATION HOOKS  (Phase 0)
+   The world-ready menu layer, reserved rather than built (bridge §5, brief
+   §9-§12). Everything here is inert until mygym.js's guarded route exists
+   AND `[data-mahworld-state]` is set on <html> by mahworld-shell.js — with
+   the development flag off neither happens, so the accepted MAHFITT
+   stylesheets see nothing new.
+
+   Rules this layer keeps:
+   - MAHFITT's button GEOMETRY is authoritative (brief §10): nothing here
+     changes a size, radius, padding or tap target. Only surface light.
+   - Colour comes from the account Theme's two-colour system through the
+     same custom properties the app writes (--bright-rgb, --card-rgb,
+     --line, --gold); the world never owns a Theme (brief §37).
+   - Motion is CSS-only, composited (background-position / opacity), paused
+     under prefers-reduced-motion, and confined to the ONE development entry
+     control (brief §44) — no app-wide animation loop (brief §45).
+   - The exact historical MAHWORLD button choreography was NOT recovered
+     (bridge §10); this is an architectural hook, not the animation. */
+
+:root{
+  /* the world's energy is the Secondary — derived, never written back */
+  --mahworld-energy-rgb:var(--bright-rgb,233,201,143);
+  --mahworld-motion-cycle:9s;
+}
+
+/* ---- state tokens on the root: what future art direction hangs on ----- */
+html[data-mahworld-state="available"]{--mahworld-energy:.18;--mahworld-idle-drift:1}
+html[data-mahworld-state="entering"]{--mahworld-energy:.42;--mahworld-idle-drift:0}
+html[data-mahworld-state="active"]{--mahworld-energy:.10;--mahworld-idle-drift:0}
+html[data-mahworld-state="exiting"]{--mahworld-energy:.26;--mahworld-idle-drift:0}
+
+/* ---- the development entry control on Home (same .mg-button geometry) - */
+#mygym .mg-button.mahworld-home{position:relative;overflow:hidden;isolation:isolate}
+#mygym .mg-button.mahworld-home::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:0;
+  /* a faint internal texture: hairlines of the Theme's Secondary over the card */
+  background-image:repeating-linear-gradient(115deg,rgba(var(--mahworld-energy-rgb),.10) 0 1px,transparent 1px 9px);
+  background-size:200% 100%;
+  transition:opacity .4s ease;
+}
+html[data-mahworld-state] #mygym .mg-button.mahworld-home::after{opacity:calc(var(--mahworld-energy,0) * 1)}
+html[data-mahworld-state="available"] #mygym .mg-button.mahworld-home::after{animation:mahworldDrift var(--mahworld-motion-cycle) linear infinite}
+html[data-mahworld-state="entering"] #mygym .mg-button.mahworld-home{box-shadow:0 0 0 1px rgba(var(--mahworld-energy-rgb),.55),0 0 18px rgba(var(--mahworld-energy-rgb),.22)}
+html[data-mahworld-state="active"] #mygym .mg-button.mahworld-home{opacity:.62}
+@keyframes mahworldDrift{from{background-position:0 0}to{background-position:-100% 0}}
+
+/* ---- the internal shell page (reuses .mahset-* settings primitives) --- */
+#mygym .mahworld-view .mahworld-row output{font-variant-numeric:tabular-nums;color:var(--gold);text-align:right;max-width:52%}
+#mygym .mahworld-view .mahset-action[disabled]{opacity:.42;cursor:default}
+#mygym .mahworld-view[data-mahworld-session="WORLD_ACTIVE"] .mahset-intro h1::after{content:" SESSION ACTIVE · SIMULATED";font-size:.5em;letter-spacing:.2em;color:rgb(var(--mahworld-energy-rgb));display:block;margin-top:.4em}
+
+/* ---- the hook is inert for anyone who asked for less motion ----------- */
+@media (prefers-reduced-motion:reduce){
+  #mygym .mg-button.mahworld-home::after{animation:none!important;transition:none!important}
+}

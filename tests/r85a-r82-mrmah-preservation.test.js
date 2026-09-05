@@ -293,6 +293,6 @@ P('R82-REG-04',/prefers-reduced-motion:reduce[\s\S]*fabi-rig__figure[^\n]*transf
 P('R82-REG-05',(rig.match(/fabi-rig__head-face--/g)||[]).length===4&&(rig.match(/fabi-rig__head-bevel--/g)||[]).length===4,'the R81 head construction is unchanged');
 P('R82-REG-06',/fabi-diamond-edge--key/.test(css)&&/stroke-width:1\.2px/.test(rule('#mygym .fabi-diamond-edge--key')),'the response diamond laser is untouched, and stays a heavier architectural line than the character bevels');
 P('R82-CACHE-01',/mygym\.css\?v='\+V\+'[^"]*&r81=1&r82=1/.test(server)&&/mygym\.js\?v='\+V\+'[^"]*&r81=1&r82=1/.test(server),'both changed assets advance through the existing delivery lineage');
-P('R85A-R82-CACHE-02',/const V = 452;/.test(server)&&/fob-shell-v452/.test(fs.readFileSync(path.join(root,'sw.js'),'utf8')),'R85A intentionally advances the shell identity while preserving every R82 Mr.Mah material/geometry contract');
+P('R85A-R82-CACHE-02',/const V = 453;/.test(server)&&/fob-shell-v453/.test(fs.readFileSync(path.join(root,'sw.js'),'utf8')),'R85A intentionally advances the shell identity while preserving every R82 Mr.Mah material/geometry contract');
 
 console.log('\nR82 suite: '+passed+' assertions passed.');

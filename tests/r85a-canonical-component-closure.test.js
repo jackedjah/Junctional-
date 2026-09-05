@@ -25,7 +25,7 @@ const checks=[
   [coachCss.includes('.coach-shell__occlusion')&&coachCss.includes('var(--coach-surface) 0%,var(--coach-surface) 70%'),'crown has structural opaque occlusion zone before fade'],
   [!coachCss.includes('.coach-dialog'),'legacy backend modal CSS removed'],
   [!admin.includes('legacy')&&!admin.includes('fallback'),'normal FOB Admin UI exposes no migration/fallback jargon'],
-  [server.includes('const V = 452;')&&sw.includes('fob-shell-v452'),'R85A advances current asset/cache identity'],
+  [server.includes('const V = 453;')&&sw.includes('fob-shell-v453'),'R85A advances current asset/cache identity'],
   [sw.includes("'/mahfitt-canonical-components.css'"),'service worker includes shared component owner']
 ];
 let passed=0;for(const [ok,msg] of checks){assert.ok(ok,msg);passed++}console.log('r85a-canonical-component-closure: '+passed+'/'+checks.length+' PASS');
