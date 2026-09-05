@@ -123,8 +123,12 @@ function palmGeometry(dir, spec) {
   function p(x, y, z) { P.push(x, y, z); return P.length / 3 - 1; }
   var w = spec.palmHalfWidth, d = spec.palmHalfDepth, L = spec.palmLength;
   /* Slight taper outward so the hand reads wider than the wrist. */
-  var a = [p(-w * 0.72, 0, d * 0.8), p(0, 0, d * 1.10), p(w * 0.72, 0, d * 0.8),
-           p(w * 0.72, 0, -d * 0.8), p(-w * 0.72, 0, -d * 0.8)];
+  /* R108: the wrist end is the WRIST'S size (0.55 w, 0.75 d — the forearm
+     ends at 0.047 and this is 0.048 x 0.035), so the hand grows out of the
+     wrist as a wedge; at 0.72 w it was a third wider than the tube it left
+     and its flat top disc read as a box sitting on a stick. */
+  var a = [p(-w * 0.55, 0, d * 0.75), p(0, 0, d * 1.02), p(w * 0.55, 0, d * 0.75),
+           p(w * 0.55, 0, -d * 0.75), p(-w * 0.55, 0, -d * 0.75)];
   var b = [p(-w, L, d), p(0, L, d * 1.32), p(w, L, d), p(w, L, -d), p(-w, L, -d)];
   /* Wound outward (see the R94 note in forge.js): the wrist end faces -y, the
      knuckle end +y, and each strip's normal points away from the block. */
@@ -342,7 +346,11 @@ function buildArm(materials, spec, options) {
        nothing to work on — and read as a quilt beside the reference. */
     /* R99: deeper front-to-back (1.12 -> 1.18) so the bicep and tricep are
        two volumes the silhouette shows from the side, not two colours. */
-    { depthRatio: 1.18, crystal: 0.012, steps: 10, fg: [2, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first */
+    /* R108: depthRatio back to 0.94. The bellies in shapes.upper now put the
+       depth where it belongs (a 1.28 front, a 1.20 rear at the peak); on a
+       tube that was ALSO 1.18 deeper than wide the arm was a lens — 0.20
+       wide by 0.45 deep at the biceps. */
+    { depthRatio: 1.06, crystal: 0.012, steps: 10, fg: [2, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first */
       profile: ARMS_.profiles.upper, shape: function (t, d) { return ARMS_.shapes.upper(t, d, upperInner); }, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner),
       coat: REGIONS.UPPER_ARM.coat,
@@ -387,7 +395,14 @@ function buildArm(materials, spec, options) {
      start (0.10): the wedge that opens on the outside of the bend between
      the two tubes' end discs was a black gap with a flat lid in the clay
      view; the knob now fills it and its peak is flush with the larger tube. */
-  var eR = spec.upperRadius * 0.78;
+  /* R108: sized to the FOREARM'S FIRST RING (profiles.fore(0)), which the
+     upper arm's last ring now matches, so the ball only fills the wedge on
+     the outside of the bend and never stands proud of either tube — at
+     0.78 of the upper radius (0.117 against tubes of 0.093) it showed as a
+     bulging ring at every elbow, the "mechanical hinge" the brief rules out.
+     The elbow is a compression between two equal tubes with a bony
+     landmark (the olecranon in shapes.upper), not a knuckle. */
+  var eR = spec.foreRadius * ARMS_.profiles.fore(0) * 1.00;
   /* A BALL, not a drum: its end discs closed to half the radius so they sit
      inside both tubes (a drum's disc showed as a bright flat lid on the
      outside of the bend as soon as it was sized to the upper arm). */
@@ -411,7 +426,7 @@ function buildArm(materials, spec, options) {
   var lateral = new Vector3(0, 0, 1).cross(upDir);
   if (lateral.lengthSq() < 1e-6) lateral.set(1, 0, 0);
   lateral.normalize();
-  var pinHalf = eR * 1.06, pinR = eR * 0.38;   /* R99: bosses just proud of the tube — compression, not a bolt */
+  var pinHalf = eR * 1.00, pinR = eR * 0.34;   /* R99: bosses just proud of the tube — compression, not a bolt; R108: flush — the bosses show only where the elbow compression exposes them, as the epicondyles, not as a bolt through the arm */
   var pinGeo = segment(
     lateral.clone().multiplyScalar(-pinHalf).toArray(),
     lateral.clone().multiplyScalar(pinHalf).toArray(),
@@ -433,9 +448,15 @@ function buildArm(materials, spec, options) {
   elbowJoint.add(wristJoint);
 
   /* The wrist cuff, in the wrist's own frame so it rings the forearm's end. */
-  var cR = spec.wristRadius * 0.94;   /* R99: 1.22 -> 1.10; R105: 1.00; R106: 0.94 */
-  var cuffGeo = segment([0, -0.030, 0], [0, 0.026, 0], cR, cR * 0.96, 8,
-    { depthRatio: 1.0, crystal: 0.01, steps: 1 });
+  /* R108: sized from the forearm's LAST ring (wristRadius x profiles.fore(1)
+     = 0.047), not from the nominal wrist radius (0.074): the cuff was half
+     again as wide as the tube it ringed and read as a flat box at every
+     wrist in the clay. A hair proud (1.08) with its ends drawn in so it is a
+     band on the wrist, the compression before the hand expands. */
+  var cR = spec.wristRadius * ARMS_.profiles.fore(1) * 1.08;
+  var cuffGeo = segment([0, -0.026, 0], [0, 0.022, 0], cR, cR * 0.97, 10,
+    { depthRatio: 0.92, crystal: 0.006, steps: 2,
+      profile: function (t) { return 0.90 + 0.10 * Math.sin(t * Math.PI); } });
   var cuff = new Mesh(cuffGeo, materials.joint || materials.cavity);
   cuff.name = root.name + '-wrist-cuff';
   wristJoint.add(cuff);

@@ -336,10 +336,43 @@ export function buildBody(materials, P) {
        deltoid is 0.11 of height tall (0.33 units across), i.e. radius ~0.17.
        So: r0 0.20, belly 0.30, rooted higher so the dome's crest continues
        the trapezius slope and its underside undercuts into the arm. */
-    var D = ARMS_.deltoid || { innerX: 0.220, innerY: 2.045, outerX: 0.600, outerY: 1.930, r0: 0.235 };   /* R107 c: rooted deeper and higher, so the dome grows OUT of the trapezius slope */   /* R107 b: higher and further in, so the dome ENCLOSES the torso's shoulder corner (the flat plate the rear clay showed above the caps) */
+    /* R108: the axis ENDS INSIDE THE ARM. At outerX 0.600 the cap's terminal
+       ring (0.045 at t 1) sat 0.03 outside the arm's outer contour at y 1.93
+       — a nub under the cap on the outer shoulder that filled the very notch
+       the undercut is meant to open. At 0.560 the end is flush with the
+       arm's narrowed top; the joint (0.7 of the axis) and the elbow / wrist
+       move in with it (ARMS), which also hangs the arm straighter, as the
+       R102 reference does (shoulder 0.46, elbow 0.53). */
+    /* R108 b: the SHOULDER WIDTH IS THE AXIS END, not the belly — the cap's
+       rings stand nearly vertical, so the belly at t 0.5 reaches only x 0.47
+       and the outer x of the silhouette is the terminal ring. At 0.560 the
+       shoulders had come in 0.05 a side (shoulderMaxRun 0.365 of height
+       against R104's 0.384); 0.590 with the end choked to 0.15 keeps the nub
+       within 0.007 of the arm's narrowed top and the V where it was. */
+    var D = ARMS_.deltoid || { innerX: 0.220, innerY: 2.045, outerX: 0.590, outerY: 1.925, r0: 0.228 };   /* R108: 0.235 -> 0.228 with the arm 0.158 / 1.06 deep — the cap is 1.4x the arm's depth from the side, down from 1.6x */   /* R107 c: rooted deeper and higher, so the dome grows OUT of the trapezius slope */   /* R107 b: higher and further in, so the dome ENCLOSES the torso's shoulder corner (the flat plate the rear clay showed above the caps) */
     var inner = [side * D.innerX, D.innerY, 0.0];
     var outer = [side * D.outerX, D.outerY, 0.02];
     var deltoidR0 = D.r0;
+    /* R108: which sign of the cap's ring angle is UP. `segment` hands its
+       shape function the angle from the limb's front, and +pi/2 is world
+       up on the axis that points +x and world DOWN on the one that points
+       -x (the same basis fact limbSideDirection exists for — reproduced
+       here so the cap's underside and crest can be authored per side). */
+    var upSign = (function () {
+      var dx = outer[0] - inner[0], dy = outer[1] - inner[1], dz = outer[2] - inner[2];
+      var len = Math.hypot(dx, dy, dz) || 1e-6;
+      var ux = dx / len, uy = dy / len, uz = dz / len;
+      var hx = Math.abs(uy) < 0.99 ? 0 : 1, hy = Math.abs(uy) < 0.99 ? 1 : 0;
+      var rx = hy * uz, ry = -hx * uz, rz = hx * uy - hy * ux;
+      var rl = Math.hypot(rx, ry, rz) || 1; rx /= rl; ry /= rl; rz /= rl;
+      var zx = ry * uz - rz * uy, zy = rz * ux - rx * uz, zz = rx * uy - ry * ux;
+      var px = -uz * ux, py = -uz * uy, pz = 1 - uz * uz;
+      var pl = Math.hypot(px, py, pz) || 1;
+      var fa = Math.atan2((px * zx + py * zy + pz * zz) / pl, (px * rx + py * ry + pz * rz) / pl);
+      var an = fa + Math.PI / 2;
+      var sideY = Math.cos(an) * ry + Math.sin(an) * zy;
+      return sideY >= 0 ? 1 : -1;
+    }());
     /* SMALLER THAN THE ARM IT MEETS, not larger. `segment` caps both ends, and
        the outer cap is a disc perpendicular to a near-horizontal axis, so at
        1.22x the upper-arm radius it stood proud of the limb all the way round
@@ -358,12 +391,21 @@ export function buildBody(materials, P) {
        t ~ 0.59 rather than at the midpoint, which places the widest part of the
        shoulder outboard of the clavicle, where the reference has it, instead of
        raising a hump beside the neck. */
+    /* R108 — CAP -> UNDERCUT -> ARM. The dome's outer end now falls HARDER
+       and EARLIER (from t 0.68, to 0.30 of the lerped radius) so the cap's
+       underside curves back in under its own apex before the arm emerges,
+       and the arm's insertion narrowing (shapes.upper) meets it there: the
+       contour reads rising mass -> broad apex -> descending cap -> a real
+       under-delt notch -> the biceps swelling out again. At 0.62 from 0.75
+       the cap ran almost straight into the arm and the smooth clay read one
+       lump on a tube. The belly's peak comes a touch inboard (t^1.10) so the
+       crest sits over the joint, not outboard of it. */
     var deltoidProfile = function (t) {
       var root = Math.min(1, t / 0.34);
-      var endT = Math.max(0, (t - 0.75) / 0.25);
-      var end = 1 - 0.62 * endT * endT * (3 - 2 * endT);
+      var endT = Math.max(0, (t - 0.68) / 0.32);
+      var end = 1 - 0.85 * endT * endT * (3 - 2 * endT);
       return (0.55 + 0.45 * root * root * (3 - 2 * root)) * end *   /* R107: the root is FULL (0.55 of r0) inside the torso — a choked root necked the dome onto the chest with a crease all round */
-             (1 + Math.pow(Math.sin(Math.pow(t, 1.15) * Math.PI), 0.8) * 0.30);   /* R105: a CAP; R107: 0.30 — the dome's size is r0's job, the belly only rounds it */
+             (1 + Math.pow(Math.sin(Math.pow(t, 1.10) * Math.PI), 0.8) * 0.30);   /* R105: a CAP; R107: 0.30 — the dome's size is r0's job, the belly only rounds it */
     };
     /* R94 — A DOME FROM A HANDFUL OF PLANES, drawn by its surfaces.
 
@@ -378,7 +420,7 @@ export function buildBody(materials, P) {
     var geo = segment(
       inner, outer,
       deltoidR0, deltoidR1, 14,
-      { depthRatio: 1.0, crystal: 0.012, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 3],   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first */
+      { depthRatio: 0.92, crystal: 0.012, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 3],   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first; R108: 0.92 deep for its width (see the shape) */
         classes: REGIONS.DELT.classes,
         profile: deltoidProfile,
         /* R97 — THREE HEADS. `d` is the angle from the cap's front (+z): a
@@ -391,16 +433,56 @@ export function buildBody(materials, P) {
            grooves between the heads so the plane flow changes three times
            across the shoulder. */
         shape: function (t, d) {
-          var belly = Math.sin(Math.min(1, t / 0.9) * Math.PI);
           var ad = Math.abs(d);
           /* R102: the three heads are CARVED — the grooves between them are
              twice as deep (and the cavity term in the shader keeps them
              dark), the rear delt is fuller for the rear views. */
-          var front = 0.17 * Math.exp(-Math.pow(d / 0.72, 2));   /* R103: the anterior delt overlaps the pec; R105: fuller; R106: broader, lower */
-          var rear = 0.16 * Math.exp(-Math.pow((ad - Math.PI) / 0.80, 2));   /* R106 back sheet: the posterior head is a full round cap */
-          var lateral = 0.05 * Math.exp(-Math.pow((ad - Math.PI / 2) / 0.55, 2));
-          var grooves = -0.045 * (Math.exp(-Math.pow((ad - 0.95) / 0.22, 2)) + Math.exp(-Math.pow((ad - 2.25) / 0.22, 2)));   /* R106: in clay the 0.12 grooves cut the cap into three lumps; the reference's cap is ONE dome whose heads are plane changes */
-          return 1 + (front + rear + lateral + grooves) * belly;
+          /* R108 — THREE HEADS WITH THEIR OWN CENTRES OF FULLNESS. The
+             anterior head is fullest LOW and forward (it rolls onto the
+             upper pec and hangs over the biceps: envelope peaking at t 0.40),
+             the lateral head makes the width at the crest (t 0.55), the
+             posterior head wraps to the upper back (t 0.45). Each is a
+             belly (pow 0.7 on the Gaussian) rather than a soft bump, and
+             the valleys between them are deeper (0.045 -> 0.075) so the
+             plane changes read in smooth clay — the R107 cap read as one
+             sphere from every angle. Still one dome: the valleys are a
+             sixth of the lobes, never cuts. */
+          var frontEnv = Math.sin(Math.min(1, t / 0.80) * Math.PI);
+          var crestEnv = Math.sin(Math.min(1, t / 1.05) * Math.PI);
+          var rearEnv = Math.sin(Math.min(1, t / 0.90) * Math.PI);
+          /* R108 b: front 0.22 -> 0.18, rear 0.20 -> 0.15, and the cap's
+             section 0.92 deep for its width (the segment's depthRatio): from
+             the side the cap was 1.6x the arm's depth, a ball on a column;
+             the reference's cap is about 1.2x the biceps-to-triceps depth. */
+          var front = 0.18 * Math.pow(Math.exp(-Math.pow(d / 0.62, 2)), 0.7) * frontEnv;
+          var rear = 0.15 * Math.pow(Math.exp(-Math.pow((ad - Math.PI) / 0.72, 2)), 0.7) * rearEnv;
+          /* R108 — UP AND DOWN ARE DIFFERENT SIDES OF THIS TUBE. The cap's
+             axis runs outward, so its ring's +/-pi/2 are the crest and the
+             UNDERSIDE, and `upSign` (from the segment's basis, per side) says
+             which is which. The crest takes the lateral head's fullness; the
+             underside is pulled IN through the belly (the armpit — a cap has
+             no mass under it, a ball does) and then pushed OUT along the last
+             rings, which drags the dome's lower rim down the outer arm into
+             the V of the deltoid insertion. Without the V the cap's rim is a
+             horizontal ring and the arm emerges from it like a sleeve from a
+             shoulder pad; the reference's rim is a diagonal from the pec to
+             a point halfway down the outer arm. */
+          var up = Math.exp(-Math.pow((d - upSign * Math.PI / 2) / 0.55, 2));
+          var downB = Math.exp(-Math.pow((d + upSign * Math.PI / 2) / 0.62, 2));
+          var lateral = 0.07 * up * crestEnv;
+          var pitEnv = 1 - Math.min(1, Math.max(0, (t - 0.40) / 0.32));
+          pitEnv = pitEnv * pitEnv * (3 - 2 * pitEnv);
+          var pit = -0.18 * downB * pitEnv;
+          var vEnv = Math.min(1, Math.max(0, (t - 0.55) / 0.45));
+          vEnv = vEnv * vEnv * (3 - 2 * vEnv);
+          var vee = 0.70 * Math.exp(-Math.pow((d + upSign * Math.PI / 2) / 0.50, 2)) * vEnv * vEnv;
+          /* the cap is a rounded TRIANGLE from the side, not a circle: full
+             across its upper quadrants (clavicle to scapular spine) and drawn
+             in below (the pit) toward the insertion */
+          var broad = 0.08 * (Math.exp(-Math.pow((d - upSign * (Math.PI / 2 - 1.05)) / 0.55, 2)) +
+                              Math.exp(-Math.pow((d - upSign * (Math.PI / 2 + 1.05)) / 0.55, 2))) * crestEnv;
+          var grooves = -0.09 * (Math.exp(-Math.pow((ad - 0.92) / 0.22, 2)) + Math.exp(-Math.pow((ad - 2.20) / 0.22, 2))) * rearEnv;
+          return 1 + front + rear + lateral + broad + pit + vee + grooves;
         },
         zoneAt: function (d, t) {
           var ad = Math.abs(d);
