@@ -720,7 +720,8 @@ were then built as **development-only runtime scenes** under
 | Milestone | What exists | Evidence |
 | --- | --- | --- |
 | Arrival Gate (study v1) | the MAHWORLD gate plaza: wet cobalt plaza, steps, the gate with emblem, wordmark and portal, towers, ribbons, moon; three views, a camera move | `validation/mahworld/arrival-gate/` |
-| **MAHPLAZA (world scene v2)** | MAH GYM, MAH MATCH (the fighting facility with a visible square-diamond arena) and MAH MARKET around the plaza; sidewalks, vehicle corridors, the MAHPLAZA civic marker; crystalline residents of many player colours (square-diamond heads, one lower teardrop, physique variation); diamond vegetation; FOB-inspired vehicles; FOBEAMS and FOBLOWS; mountains and a quiet skyline; a **real-time-anchored day/night clock**; player-local world Theme | `validation/mahworld/mahplaza-v2/` — the same cameras at DAY, DUSK and NIGHT, phone views, a red-Theme proof, `tour-night.webm` |
+| MAHPLAZA (world scene v2) | MAH GYM, MAH MATCH (the fighting facility with a visible square-diamond arena) and MAH MARKET around the plaza; sidewalks, vehicle corridors, the MAHPLAZA civic marker; crystalline residents of many player colours (square-diamond heads, one lower teardrop, physique variation); diamond vegetation; FOB-inspired vehicles; FOBEAMS and FOBLOWS; mountains and a quiet skyline; a **real-time-anchored day/night clock**; player-local world Theme | `validation/mahworld/mahplaza-v2/` — the same cameras at DAY, DUSK and NIGHT, phone views, a red-Theme proof, `tour-night.webm` (kept as the BASELINE) |
+| **MAHPLAZA slice v3** | the explorable, reference-locked plaza slice: truthful signage, the two MAH MATCH actions, the central ramp, faces, three independent appearance owners, tap navigation, the local practice preview, the reduced-glare diagnostic, glare lowered, sparser detail (see §26b) | `validation/mahworld/mahplaza-v3/` — `Review.html`, the required views, same-camera theme checks, recordings, `soak.json` |
 
 Decisions these scenes add to the register:
 
@@ -749,6 +750,27 @@ Decisions these scenes add to the register:
 
 The MAHPLAZA scene's own README (`mahworld/scene/README.md`) carries viewing
 instructions and the module ownership table.
+
+### 26b. MAHPLAZA slice v3 — the reference-locked visible plaza slice
+
+The v3 slice made the scene explorable and corrected it against the brief's
+five priorities. Evidence: `validation/mahworld/mahplaza-v3/` (`Review.html`,
+`capture.json`, `soak.json`). Project state: `CURRENT_STATE.md`.
+
+| Correction | What changed |
+| --- | --- |
+| MAH MATCH is a fighting facility | copy `MAH MATCH · MATCHES · PRACTICE`; the three-panel wayfinding became the two entrance actions **FIND AN OPPONENT** (honest: not available, no live players, none simulated) and **PRACTICE WITH A BUDDY** (a local preview with two labelled proxies, clean exit) |
+| Too bright | energy emissive, additive opacity, entrance lights, plaza reflection and sun halo all lowered; a reduced-glare diagnostic view (additive off, emissive ≤ 1, exposure fixed) proves readability without glow |
+| Every resident one continuous teardrop | unchanged geometry law, now audited in every capture incl. interiors; faces gained a dark facial chamber with friendly eyes and a smile |
+| World theme and avatar independent | three owners (`setWorldTheme`, `setSelfAppearance`, `setRemoteAppearance`); per-resident recolour rebuilds one resident; no global tint; the five same-camera checks are recorded with state values and read-back pixels |
+| Detail is not clutter | sparser planters (4 / 5 / 7 leaves), three craft instead of four, 12 outdoor residents, one reserved mark slot per sign instead of invented pictograms |
+
+Decisions the slice adds (D40–D46 in the register): brand accuracy (no
+fabricated logos; the concept icons are suggestions), the honesty rules for the
+two MAH MATCH actions, the three appearance owners, the diagnostic view, the
+preview-only persistence keys, tap-vs-drag input, and that the sky craft,
+FOBEAMS and FOBLOWS are labelled adaptations of the app's accepted 2-D
+vocabulary until an owner supplies 3-D references.
 
 ## 27. Decision register
 
@@ -793,3 +815,10 @@ instructions and the module ownership table.
 | D37 | Public presence references are opaque strings (≤ 64 chars, never coordinate-shaped); objects and arrays are dropped | LOCKED |
 | D38 | A derivation is applied only under the current balance version with every delta present; a local draft is never server authority | LOCKED |
 | D39 | Completion fails closed: MAHFITT's `done` (or `completed`) must be `true` for a set to count; signals carry no record detail | LOCKED |
+| D40 | Brand accuracy: no fabricated FOB / MAHFITT marks in the world; signs carry a reserved square-diamond slot and truthful text until an owner supplies the mark (`mahworld/scene/REFERENCE_MANIFEST.md`) | LOCKED |
+| D41 | MAH MATCH offers exactly two entrance actions — FIND AN OPPONENT (never claims a match, a count or a person; unavailable in the preview) and PRACTICE WITH A BUDDY (local proxies only, labelled) | LOCKED |
+| D42 | Three appearance owners: world theme (viewer-local, energy only), local avatar, each remote avatar; never a global tint, filter, overlay or material overwrite | LOCKED |
+| D43 | A reduced-glare diagnostic view exists for lighting review (additive off, emissive ≤ 1.0, exposure fixed 1.0); readability may not depend on glow | LOCKED |
+| D44 | Preview persistence is limited to `fob.mahworld.preview.worldTheme` and `fob.mahworld.preview.selfColour`, device-local, never sent | PROVISIONAL |
+| D45 | Tap selects, drag looks (≥ 8 px or ≥ 450 ms is a drag); Escape / Exit ends the practice preview and restores the plaza context | LOCKED |
+| D46 | Sky craft, FOBEAMS and FOBLOWS are labelled adaptations of the app's accepted 2-D vocabulary; no FOBlock reproduction is claimed | LOCKED (until 3-D references exist) |

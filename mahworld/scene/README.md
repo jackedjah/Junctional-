@@ -2,11 +2,11 @@
 
 Runtime scenes on the permitted renderer. Nothing here is linked from the
 MAHFITT app shell; MAHFITT never loads these pages, and they carry no game
-system, no player, no network and no interface baked into the world.
+system, no network and no interface baked into the world.
 
 | Scene | Page | Status |
 | --- | --- | --- |
-| **MAHPLAZA** — MAH GYM · MAH MATCH · MAH MARKET, residents, sky, day/night | `mahplaza.html` | world scene v2, the current milestone |
+| **MAHPLAZA** — MAH GYM · MAH MATCH · MAH MARKET, residents, sky, day/night, preview navigation | `mahplaza.html` | **slice v3** (reference-locked visible plaza slice), the current milestone |
 | Arrival Gate — the MAHWORLD gate plaza | `arrival-gate/plaza.html` | study v1, kept for the record |
 
 ## Renderer and dependencies
@@ -25,37 +25,75 @@ python3 -m http.server 8123          # from the repository root
 # open  http://localhost:8123/mahworld/scene/mahplaza.html
 ```
 
-Portrait phone or desktop. Bottom controls: **View** (Establishing, In-world, MAH MATCH,
-Gym, Market), **Tour** (the camera move establishing → in-world → MAH MATCH), **Time**
-(Live, or pin Day / Dusk / Night for inspection), **Theme** (your world Theme: canonical,
-red, purple, green — environment energy only). Drag to look, pinch or scroll to move.
-Query parameters: `?view=`, `?time=day|dusk|night|HH:MM`, `?theme=`, `?hud=0`.
+Portrait phone or desktop.
+
+- **Tap** a destination (MAH GYM, MAH MATCH, MAH MARKET) or one of the two MAH MATCH
+  entrance actions. A small card explains what it is and what the preview can do:
+  destinations move the camera to the entrance (**Go**); **FIND AN OPPONENT** is shown
+  as *not available in this preview* (no live players exist and none are simulated);
+  **PRACTICE WITH A BUDDY** offers the local practice preview (two labelled local
+  proxies: your colour and the blue buddy fixture — enter → positions → guard →
+  strike → block → evade → reset → return). **Exit practice** or Escape ends it at
+  any point and restores the plaza.
+- **Drag** to look, **pinch / scroll** to move, arrow keys or WASD on a keyboard.
+  Reduced-motion settings make camera moves instant and stop idle motion.
+- **View** row: Arrival, In-world, MAH MATCH, Gym, Market, Residents, Tour.
+- **Time** row: Live (the real-time-anchored world clock) or pin Day / Dusk / Night.
+- **World** row: your world theme — Blue, Red, Purple, Green. Environment energy only.
+- **My avatar** row: your own resident's colour. Yours only.
+- **Preview** row: Practice preview, Reduced-glare view (additive glow off, emissive
+  capped, exposure fixed), and the route back to the MAHFITT control deck.
+- Query parameters: `?view=`, `?time=day|dusk|night|HH:MM`, `?theme=`, `?self=`,
+  `?diagnostic=1`, `?hud=0` (no controls), `?debug=1` (frame meter; off by default).
+
+Your world theme and avatar colour are remembered on this device only
+(`fob.mahworld.preview.*`). Nothing is sent anywhere.
+
+## Three independent appearance owners
+
+| Owner | Changes | Never changes |
+| --- | --- | --- |
+| **World theme** (viewer-local) | seams, signs' light, ground marker, sky infrastructure, plants, craft, entrance light colour | any resident, glass, neutrals, interior whites, MAH MATCH's red |
+| **Local avatar** | the viewer's own resident (`self`) | anyone else, the world |
+| **Remote avatars** | each other resident individually (in this preview, labelled local fixtures) | the viewer's avatar, the world |
+
+Residents paint their colour into their own vertex colours and per-colour materials;
+a recolour rebuilds ONE resident in place. There is no CSS filter, overlay, colour
+grading pass or scene-wide material override. `tests/mahworld-mahplaza-capture.js`
+proves it with the same camera across five steps (state values and read-back pixels).
 
 ## What each module owns
 
 | File | Owns |
 | --- | --- |
-| `world-clock.js` | the ONE authoritative world time: 24 world hours ≈ 2.5 real hours, anchored to real local time (long world days through the real day, long nights through the real night), pure function of wall-clock ms, `freeze()` for validation only |
-| `materials.js` | themes (environment energy only), fixed neutrals, signage textures and glyphs, geometry helpers; no yellow anywhere |
+| `world-clock.js` | the ONE authoritative world time: 24 world hours ≈ 2.5 real hours, anchored to real local time, pure function of wall-clock ms, `freeze()` for validation only |
+| `materials.js` | themes (environment energy only, live `retheme`), fixed neutrals, signage textures with the reserved square-diamond mark slot (no invented pictograms), `setDiagnostic`, geometry helpers; no yellow anywhere |
 | `ground.js` | plaza, aprons, vehicle corridors with restrained markers, the MAHPLAZA civic marker, seating, planter spots |
-| `buildings.js` | MAH GYM (training, readable interior), MAH MATCH (the fighting facility: square-diamond arena, energy boundary, tiers, practice zones, wayfinding FIND AN OPPONENT / BUDDY PRACTICE / SOLO PRACTICE), MAH MARKET (low, welcoming, shelving with abstract goods) |
-| `residents.js` | the crystalline species: square-diamond head, faceted body, arms, ONE lower teardrop, no legs; physique 0..1; one coherent player colour each; poses |
-| `flora-and-vehicles.js` | diamond vegetation (dark planter → luminous stems → square-diamond leaves) and FOB-inspired square-diamond vehicles on a route |
-| `sky.js` | dome, sun and moon, stars, clouds, mountains, quiet skyline, FOBEAMS (directed) and FOBLOWS (soft flows), the light rig keyed by the clock |
-| `mahplaza.js` | assembly, camera views, tour, interaction, environment map from the sky, reflections, the loop |
+| `buildings.js` | MAH GYM (training, readable interior), MAH MATCH (the fighting facility: `MAH MATCH · MATCHES · PRACTICE`, the two entrance actions FIND AN OPPONENT / PRACTICE WITH A BUDDY, central ramp through the steps, square-diamond arena, energy boundary, tiers, practice zones), MAH MARKET (name only; abstract goods, no commerce); tap targets |
+| `residents.js` | the crystalline species: square-diamond head with a dark facial chamber, friendly eyes and smile; faceted body; arms; ONE lower teardrop, no legs; physique 0..1 (beginners included); one coherent player colour each; poses incl. `guard` (drivable for the practice preview); `recolour()`; stable ids |
+| `flora-and-vehicles.js` | diamond vegetation (dark planter → luminous stems → square-diamond leaves: a square rotated in-plane, thin depth; sparse) and square-diamond sky craft in the FOB vocabulary (an adaptation, see `REFERENCE_MANIFEST.md`), live `setTheme` |
+| `sky.js` | dome, sun and moon, stars, clouds, mountains, quiet skyline, FOBEAMS (directed) and FOBLOWS (soft flows) as adaptations of the app's accepted vocabulary, the light rig keyed by the clock, live `setTheme` |
+| `mahplaza.js` | assembly, camera views, tour, tap vs drag, selection and preview navigation, the practice preview and its clean exit, world / self / remote appearance API, diagnostic mode, environment map, reflections, the loop, teardown |
+| `REFERENCE_MANIFEST.md` | what the scene borrows from MAHFITT / FOB assets, from where, and how faithfully |
 
 ## Laws kept
 
-- Time of day and world Theme are separate; the Theme recolours environmental energy
-  only and never another resident's colour.
+- Time of day, world theme and avatar appearance are three separate things.
 - Light is blue-white; the single red accent belongs to MAH MATCH's competitive identity.
 - MAHPLAZA is the location marker; MAHWORLD is the universe.
-- No speech bubbles, no HUD in the world, no product claims: the market shows abstract goods.
+- No speech bubbles, no HUD in the world, no product claims, no prices, no fabricated
+  logos, no fake players, no "opponent found".
+- MAH PLAYER remains the music owner: the scene creates no audio.
 
 ## Evidence (actual run time)
 
-`node tests/mahworld-mahplaza-capture.js` writes `validation/mahworld/mahplaza-v2/`:
-the SAME three cameras at DAY, DUSK and NIGHT (wide), the in-world phone view at all
-three, night phone views, a red-Theme proof, `tour-night.webm` with six frames, and
-`capture.json` (draw calls, triangles, ms/frame under software GL, clock state).
-`node tests/mahworld-world-clock.test.js` proves the clock.
+- `node tests/mahworld-mahplaza-capture.js` writes `validation/mahworld/mahplaza-v3/`:
+  the required views at NIGHT, DAY (and DUSK for the arrival pair), phone frames, the
+  five same-camera theme checks with state and pixel evidence, the reduced-glare
+  diagnostic beside the standard render, `v3-camera-movement.webm`,
+  `v3-practice-preview.webm` with stepwise frames, `capture.json`, and a static
+  `Review.html` (relative assets; REFERENCE / BASELINE / AFTER).
+- `node tests/mahworld-mahplaza-soak.js 15` writes `soak.json` (idle, navigation, re-entry).
+- `node tests/mahworld-mahplaza-laws.test.js` checks the scene laws statically.
+- `node tests/mahworld-world-clock.test.js` proves the clock.
+- The v2 milestone evidence stays in `validation/mahworld/mahplaza-v2/` as the baseline.

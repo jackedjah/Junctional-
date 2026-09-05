@@ -10,48 +10,65 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
 <style>
   :root{
-    --ground:#0a1224; --ink:#e9f2ff; --dim:rgba(205,225,255,.6); --line:rgba(190,220,255,.26);
-    --energy:#8fd0ff; --panel:rgba(6,12,28,.6);
+    --ground:#0a1224; --ink:#e9f2ff; --dim:rgba(205,225,255,.62); --line:rgba(190,220,255,.26);
+    --energy:#8fd0ff; --panel:rgba(6,12,28,.62); --card:rgba(6,12,28,.82);
     --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   }
   html,body{margin:0;height:100%;background:var(--ground);color:var(--ink);font:500 12px/1.4 "Space Grotesk",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;overflow:hidden}
   canvas#mahplaza{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
   .hud{position:fixed;left:0;right:0;pointer-events:none;display:flex;flex-direction:column;gap:6px;padding:calc(12px + var(--safe-t)) 16px 0}
-  .hud--bottom{top:auto;bottom:0;padding:0 16px calc(14px + var(--safe-b));gap:8px}
+  .hud--bottom{top:auto;bottom:0;padding:0 16px calc(12px + var(--safe-b));gap:7px}
   .eyebrow{letter-spacing:.32em;text-transform:uppercase;font-size:10px;color:var(--dim)}
   .title{letter-spacing:.16em;text-transform:uppercase;font-size:14px;font-weight:700}
-  .note{max-width:38ch;color:var(--dim);letter-spacing:.04em}
-  .row{display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto;align-items:center}
-  .row button,.row a{appearance:none;font:inherit;letter-spacing:.2em;text-transform:uppercase;font-size:10px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:9px 11px;min-height:36px;backdrop-filter:blur(6px);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
-  .row button[aria-pressed="true"],.row a[aria-current="true"]{border-color:var(--energy);box-shadow:0 0 0 1px rgba(143,208,255,.35),0 0 16px rgba(143,208,255,.16)}
+  .note{max-width:40ch;color:var(--dim);letter-spacing:.04em}
+  .row{display:flex;gap:6px;flex-wrap:wrap;pointer-events:auto;align-items:center}
+  .row button,.row a{appearance:none;font:inherit;letter-spacing:.18em;text-transform:uppercase;font-size:10px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:8px 10px;min-height:34px;backdrop-filter:blur(6px);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  .row button[aria-pressed="true"]{border-color:var(--energy);box-shadow:0 0 0 1px rgba(143,208,255,.35)}
   .row button:focus-visible,.row a:focus-visible{outline:2px solid var(--energy);outline-offset:2px}
   .row .tour{border-style:dashed}
-  .label{color:var(--dim);letter-spacing:.22em;font-size:9px;text-transform:uppercase;min-width:4.5em}
+  .row .back{border-color:rgba(190,220,255,.4)}
+  .label{color:var(--dim);letter-spacing:.22em;font-size:9px;text-transform:uppercase;min-width:5.2em}
+  .swatch{width:9px;height:9px;transform:rotate(45deg);background:var(--sw,#8fd0ff);display:inline-block;border-radius:1px}
   .clock{font-variant-numeric:tabular-nums;letter-spacing:.14em;font-size:11px;color:var(--ink)}
   .clock small{color:var(--dim);letter-spacing:.1em}
+  .card{pointer-events:auto;max-width:44ch;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;backdrop-filter:blur(8px)}
+  .card .kicker{display:flex;gap:8px;align-items:center;letter-spacing:.2em;text-transform:uppercase;font-size:10px}
+  .card .pill{font-size:9px;letter-spacing:.16em;padding:2px 6px;border:1px solid var(--line);border-radius:2px;color:var(--dim)}
+  .card .pill[data-status="unavailable"]{border-color:rgba(255,120,140,.5);color:#ffb8c4}
+  .card .pill[data-status="local-preview"]{border-color:rgba(143,208,255,.5);color:var(--energy)}
+  .card p{margin:0;color:var(--dim)}
+  .card .row button{background:rgba(143,208,255,.08)}
   .fail{position:fixed;inset:0;display:none;place-items:center;padding:24px;text-align:center;background:var(--ground)}
   .fail p{max-width:34ch;color:var(--dim)}
   [hidden]{display:none!important}
+  @media (prefers-reduced-motion: reduce){ .row button,.row a{transition:none} }
 </style>
 </head>
 <body>
-<canvas id="mahplaza" aria-label="MAHPLAZA, a rendered place: MAH GYM, MAH MATCH and MAH MARKET around a wet plaza, with crystalline residents, under the FOBEAM sky"></canvas>
+<canvas id="mahplaza" aria-label="MAHPLAZA, a rendered place: MAH GYM, MAH MATCH and MAH MARKET around a plaza, with crystalline residents, under the FOBEAM sky"></canvas>
 
 <header class="hud" data-hud>
-  <span class="eyebrow">MAHWORLD · MAHPLAZA · development scene v2</span>
+  <span class="eyebrow">MAHWORLD · MAHPLAZA · preview slice v3</span>
   <span class="title">MAH GYM · MAH MATCH · MAH MARKET</span>
   <span class="clock" data-clock>—</span>
-  <span class="note">A running place, not a game: no player, no network, no interface baked into the world. This HUD is the development page only. Mr. Mah is not in this scene.</span>
+  <span class="note">Tap a destination or an entrance action to preview it. Drag to look, pinch or scroll to move. Nothing here touches your MAHFITT account.</span>
 </header>
 
 <footer class="hud hud--bottom" data-hud>
+  <section class="card" data-card hidden aria-live="polite">
+    <div class="kicker"><span data-card-label>—</span><span class="pill" data-card-status>—</span></div>
+    <p data-card-copy></p>
+    <div class="row"><button type="button" data-card-go hidden>Go</button><button type="button" data-card-practice hidden>Start local practice preview</button><button type="button" data-card-exit hidden>Exit practice</button><button type="button" data-card-dismiss>Dismiss</button></div>
+    <p data-card-step hidden></p>
+  </section>
   <div class="row" role="group" aria-label="Camera views">
     <span class="label">View</span>
-    <button type="button" data-view="establishing" aria-pressed="true">Establishing</button>
+    <button type="button" data-view="establishing" aria-pressed="true">Arrival</button>
     <button type="button" data-view="in-world" aria-pressed="false">In-world</button>
-    <button type="button" data-view="match-approach" aria-pressed="false">MAH MATCH</button>
-    <button type="button" data-view="gym-side" aria-pressed="false">Gym</button>
-    <button type="button" data-view="market-side" aria-pressed="false">Market</button>
+    <button type="button" data-view="match-entrance" aria-pressed="false">MAH MATCH</button>
+    <button type="button" data-view="gym-entrance" aria-pressed="false">Gym</button>
+    <button type="button" data-view="market-entrance" aria-pressed="false">Market</button>
+    <button type="button" data-view="residents" aria-pressed="false">Residents</button>
     <button type="button" class="tour" data-tour>Tour</button>
   </div>
   <div class="row" role="group" aria-label="World time (validation)">
@@ -61,15 +78,32 @@
     <button type="button" data-time="dusk">Dusk</button>
     <button type="button" data-time="night">Night</button>
   </div>
-  <div class="row" role="group" aria-label="Your world theme (environment only)" data-themes>
-    <span class="label">Theme</span>
-    <a href="?theme=canonical" data-theme="canonical">Canonical</a>
-    <a href="?theme=red" data-theme="red">Red</a>
-    <a href="?theme=purple" data-theme="purple">Purple</a>
-    <a href="?theme=green" data-theme="green">Green</a>
+  <div class="row" role="group" aria-label="Your world theme (environment only, local to you)" data-themes>
+    <span class="label">World</span>
+    <button type="button" data-theme="blue" style="--sw:#7fc6ff"><i class="swatch"></i>Blue</button>
+    <button type="button" data-theme="red" style="--sw:#ff5a6e"><i class="swatch"></i>Red</button>
+    <button type="button" data-theme="purple" style="--sw:#b07cff"><i class="swatch"></i>Purple</button>
+    <button type="button" data-theme="green" style="--sw:#63e6a3"><i class="swatch"></i>Green</button>
   </div>
-  <span class="note">Drag to look · pinch or scroll to move · your Theme recolours the world's energy, never another resident</span>
-  <span class="clock" data-meter>—</span>
+  <div class="row" role="group" aria-label="Your avatar colour (yours only)" data-selfs>
+    <span class="label">My avatar</span>
+    <button type="button" data-self="purple" style="--sw:#9b3fd6"><i class="swatch"></i>Purple</button>
+    <button type="button" data-self="green" style="--sw:#3fc26a"><i class="swatch"></i>Green</button>
+    <button type="button" data-self="blue" style="--sw:#2f6fe6"><i class="swatch"></i>Blue</button>
+    <button type="button" data-self="red" style="--sw:#e0453f"><i class="swatch"></i>Red</button>
+    <button type="button" data-self="silver" style="--sw:#aebbcb"><i class="swatch"></i>Silver</button>
+  </div>
+  <div class="row" role="group" aria-label="Preview">
+    <span class="label">Preview</span>
+    <button type="button" data-practice>Practice preview</button>
+    <button type="button" data-diagnostic aria-pressed="false">Reduced-glare view</button>
+  </div>
+  <div class="row" role="group" aria-label="Route">
+    <span class="label">Route</span>
+    <a class="back" href="../../mahfitt.html" data-back>← MAHFITT control deck</a>
+  </div>
+  <span class="note">Your world theme recolours the world's energy only. Other residents keep their own colours; in this preview they are local fixtures, not live players.</span>
+  <span class="clock" data-meter hidden>—</span>
 </footer>
 
 <div class="fail" data-fail><p>This scene needs WebGL. Open it in a current Safari, Chrome or Firefox.</p></div>
@@ -78,30 +112,59 @@
   import { createMahplaza } from './mahplaza.js';
   const canvas = document.getElementById('mahplaza');
   const q = new URLSearchParams(location.search);
-  if (q.get('hud') === '0') document.querySelectorAll('[data-hud]').forEach(h => h.hidden = true);
-  const clockEl = document.querySelector('[data-clock]'), meter = document.querySelector('[data-meter]');
-  const viewButtons = Array.from(document.querySelectorAll('[data-view]')), timeButtons = Array.from(document.querySelectorAll('[data-time]'));
-  const themeName = (q.get('theme') || 'canonical').toLowerCase();
-  document.querySelectorAll('[data-theme]').forEach(a => { a.setAttribute('aria-current', String(a.dataset.theme === themeName)); const u = new URL(a.getAttribute('href'), location.href); q.forEach((v, k) => { if (k !== 'theme') u.searchParams.set(k, v); }); a.setAttribute('href', u.search); });
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  if (q.get('hud') === '0') $$('[data-hud]').forEach(h => h.hidden = true);
+  if (q.get('debug') === '1') $('[data-meter]').hidden = false;
+  const clockEl = $('[data-clock]'), meter = $('[data-meter]');
+  const card = $('[data-card]');
+  const viewButtons = $$('[data-view]'), timeButtons = $$('[data-time]'), themeButtons = $$('[data-theme]'), selfButtons = $$('[data-self]');
   let world = null;
+  const paintCard = sel => {
+    if (!sel) { card.hidden = true; return; }
+    card.hidden = false;
+    $('[data-card-label]').textContent = sel.label;
+    const st = $('[data-card-status]'); st.dataset.status = sel.status; st.textContent = sel.status === 'unavailable' ? 'Not available in this preview' : sel.status === 'local-preview' ? 'Local preview' : 'Preview navigation';
+    $('[data-card-copy]').textContent = sel.copy;
+    $('[data-card-go]').hidden = sel.kind !== 'destination';
+    $('[data-card-practice]').hidden = sel.id !== 'practice-buddy' || !!(world && world.state.practice);
+    $('[data-card-exit]').hidden = !(world && world.state.practice);
+  };
+  const paintStep = (p, reason) => {
+    const el = $('[data-card-step]');
+    if (p) { card.hidden = false; el.hidden = false; el.textContent = 'Practice preview · ' + p.step.toUpperCase() + ' — ' + p.detail; $('[data-card-exit]').hidden = false; $('[data-card-practice]').hidden = true; }
+    else { el.hidden = true; $('[data-card-exit]').hidden = true; if (reason === 'exited') { card.hidden = false; $('[data-card-label]').textContent = 'PRACTICE WITH A BUDDY'; $('[data-card-copy]').textContent = 'Practice preview ended. You are back in the plaza.'; } }
+  };
   try {
     world = await createMahplaza(canvas, {
-      theme: themeName, time: q.get('time'),
+      theme: q.get('theme'), self: q.get('self'), time: q.get('time'),
+      onSelect: paintCard, onPractice: paintStep,
       hud: s => {
         if (s.frames % 15) return;
         if (s.clock) clockEl.innerHTML = 'MAHWORLD ' + s.clock.hhmm + ' · ' + s.clock.label + (s.clock.frozen ? ' <small>· pinned for validation</small>' : ' <small>· 1 real min ≈ ' + s.clock.worldMinutesPerRealMinute.toFixed(1) + ' world min</small>');
-        meter.textContent = s.view.toUpperCase() + ' · ' + s.ms.toFixed(1) + ' ms/frame · theme ' + s.theme;
+        if (!meter.hidden) meter.textContent = s.view.toUpperCase() + ' · ' + s.ms.toFixed(1) + ' ms/frame · world ' + s.theme + (s.diagnostic ? ' · diagnostic' : '');
       }
     });
-  } catch (e) { document.querySelector('[data-fail]').style.display = 'grid'; console.error(e); }
+  } catch (e) { $('[data-fail]').style.display = 'grid'; console.error(e); }
   if (world) {
     const paintViews = () => viewButtons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === world.state.view)));
     const paintTimes = () => timeButtons.forEach(b => b.setAttribute('aria-pressed', String((world.clock.state().frozen ? (window.__pinned || '') : 'live') === b.dataset.time)));
-    viewButtons.forEach(b => b.addEventListener('click', () => { world.setView(b.dataset.view); paintViews(); }));
+    const paintThemes = () => themeButtons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === (world.theme.name === 'canonical' ? 'blue' : world.theme.name))));
+    const paintSelf = () => { const a = world.describeAppearance(); selfButtons.forEach(b => b.setAttribute('aria-pressed', String(a.self && b.dataset.self === a.self.colour))); };
+    viewButtons.forEach(b => b.addEventListener('click', () => { world.select(null); world.setView(b.dataset.view); paintViews(); }));
     timeButtons.forEach(b => b.addEventListener('click', () => { window.__pinned = b.dataset.time === 'live' ? '' : b.dataset.time; world.setTime(b.dataset.time === 'live' ? null : b.dataset.time); paintTimes(); }));
-    document.querySelector('[data-tour]').addEventListener('click', async () => { await world.tour(); paintViews(); });
-    if (q.get('view') && world.views.indexOf(q.get('view')) > -1) { world.setView(q.get('view'), { instant: true }); paintViews(); }
-    if (q.get('time')) { window.__pinned = q.get('time'); paintTimes(); }
+    themeButtons.forEach(b => b.addEventListener('click', () => { world.setWorldTheme(b.dataset.theme); paintThemes(); }));
+    selfButtons.forEach(b => b.addEventListener('click', () => { world.setSelfAppearance(b.dataset.self); paintSelf(); }));
+    $('[data-tour]').addEventListener('click', async () => { world.select(null); await world.tour(); paintViews(); });
+    $('[data-practice]').addEventListener('click', async () => { world.select('practice-buddy'); await world.practicePreview(); paintViews(); });
+    $('[data-diagnostic]').addEventListener('click', e => { const on = world.setDiagnostic(!world.state.diagnostic); e.currentTarget.setAttribute('aria-pressed', String(on)); });
+    $('[data-card-go]').addEventListener('click', async () => { await world.go(); paintViews(); });
+    $('[data-card-practice]').addEventListener('click', async () => { await world.practicePreview(); paintViews(); });
+    $('[data-card-exit]').addEventListener('click', () => { world.practiceExit(); paintViews(); });
+    $('[data-card-dismiss]').addEventListener('click', () => { world.select(null); card.hidden = true; });
+    if (q.get('view') && world.views.indexOf(q.get('view')) > -1) { world.setView(q.get('view'), { instant: true }); }
+    if (q.get('time')) window.__pinned = q.get('time');
+    if (q.get('diagnostic') === '1') { world.setDiagnostic(true); $('[data-diagnostic]').setAttribute('aria-pressed', 'true'); }
+    paintViews(); paintTimes(); paintThemes(); paintSelf();
     window.MAHWORLD_MAHPLAZA = world;   /* for the capture script and for anyone inspecting the scene */
   }
 </script>

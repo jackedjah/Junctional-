@@ -21,7 +21,7 @@
 
 import * as THREE from '../vendor/three/three.module.min.js';
 
-export const COLOURS = ['blue', 'purple', 'violet', 'green', 'emerald', 'teal', 'red', 'crimson', 'platinum'];
+export const COLOURS = ['blue', 'purple', 'violet', 'green', 'emerald', 'teal', 'red', 'crimson', 'platinum', 'silver'];
 
 const PALETTES = Object.freeze({
   blue:     { base: 0x2f6fe6, dark: 0x0a1732, light: 0xd2e4ff },
@@ -32,8 +32,10 @@ const PALETTES = Object.freeze({
   teal:     { base: 0x2bb5b8, dark: 0x08262a, light: 0xd4fbff },
   red:      { base: 0xe0453f, dark: 0x36090d, light: 0xffdcd8 },
   crimson:  { base: 0xb3173c, dark: 0x2c0510, light: 0xffd2dc },
-  platinum: { base: 0xc6d2e0, dark: 0x27303d, light: 0xf4f8fc }
+  platinum: { base: 0xc6d2e0, dark: 0x27303d, light: 0xf4f8fc },
+  silver:   { base: 0xaebbcb, dark: 0x1e2631, light: 0xf0f4f9 }
 });
+export function isColour(name) { return !!PALETTES[name]; }
 
 export function residentPalette(name) {
   const p = PALETTES[name] || PALETTES.blue;
@@ -264,6 +266,9 @@ const POSES = Object.freeze({
   converse: { lean: 4,  fwd: [26, 30],  abd: 2,  elbow: 62,  yaw: 12, tilt: 3,  headYaw: 0, hoverDelta: 0 },
   walk:     { lean: 8,  fwd: [18, -14], abd: -1, elbow: 24,  yaw: 0,  tilt: 0,  headYaw: 0, hoverDelta: 0 },
   spar:     { lean: 10, fwd: [58, 64],  abd: -8, elbow: 120, yaw: 28, tilt: -4, headYaw: 0, hoverDelta: -0.05 },
+  /* guard: the spar stance with the arms left DRIVABLE (each arm is its own
+     animated node) so a practice preview can move guard → strike → block → evade */
+  guard:    { lean: 10, fwd: [58, 64],  abd: -8, elbow: 120, yaw: 28, tilt: -4, headYaw: 0, hoverDelta: -0.05, drivable: true },
   observe:  { lean: -1, fwd: [2, 2],    abd: 0,  elbow: 6,   yaw: 0,  tilt: 11, headYaw: 9, hoverDelta: 0 },
   seated:   { lean: 3,  fwd: [34, 34],  abd: 1,  elbow: 72,  yaw: 10, tilt: 2,  headYaw: 0, hoverDelta: 0 }
 });
@@ -278,6 +283,7 @@ export function createResident(spec = {}) {
   spec.hover = Number.isFinite(spec.hover) ? spec.hover : 0.25;
   spec.seed = Number.isFinite(spec.seed) ? spec.seed : 1;
   if (!(spec.height > 0)) delete spec.height;
+  if (spec.id != null) spec.id = String(spec.id);
 
   const rng = mulberry(Math.floor(spec.seed * 7919) + 17);
   const mats = materialsFor(spec.colour);
@@ -365,10 +371,17 @@ export function createResident(spec = {}) {
     lathe(caps, [{ y: -d / 2 - 0.001, rx: 0, rz: 0 }, { y: -d / 2, rx: w * 0.7, rz: h * 0.7 }], 4, paintDark, { twist: false });
     const capG = caps.build(); capG.rotateX(Math.PI / 2); capG.translate(0, hc, 0);
     const capM = new THREE.Mesh(capG, mats.dark); capM.name = 'headCore'; headPivot.add(capM);
-    /* one small bright plate on the face */
-    const plG = plateGeom(w * 0.16, h * 0.16, paintLight);
-    plG.translate(0, hc - h * 0.12, d / 2 + 0.006 * s);
-    const plM = new THREE.Mesh(plG, mats.light); plM.name = 'facePlate'; headPivot.add(plM);
+    /* the face: a DARK FACIAL CHAMBER — an inset, deeper-than-the-core diamond
+       on the front panel — holding two friendly eyes and a small smile, all in
+       the resident's own light colour. No nose, no brows, no speech. */
+    const chamberPaint = () => _c.copy(mats.colours.dark).multiplyScalar(0.42);
+    const chG = plateGeom(w * 0.66, h * 0.66, chamberPaint);
+    chG.translate(0, hc - h * 0.02, d / 2 + 0.004 * s);
+    const chM = new THREE.Mesh(chG, mats.dark); chM.name = 'faceChamber'; headPivot.add(chM);
+    const eyeW = w * 0.085, eyeH = h * 0.11, eyeY = hc + h * 0.08, eyeX = w * 0.2, faceZ = d / 2 + 0.009 * s;
+    for (const sx of [-1, 1]) { const eG = plateGeom(eyeW, eyeH, paintLight); eG.translate(sx * eyeX, eyeY, faceZ); const eM = new THREE.Mesh(eG, mats.light); eM.name = sx < 0 ? 'eyeL' : 'eyeR'; headPivot.add(eM); }
+    /* the smile: three tiny plates on a shallow upward arc */
+    for (const [sx, dy] of [[-0.11, 0.0], [0, -0.022], [0.11, 0.0]]) { const mG = plateGeom(w * 0.05, h * 0.035, paintLight); mG.translate(sx * w, hc - h * 0.2 + dy * h, faceZ); const mM = new THREE.Mesh(mG, mats.light); mM.name = 'smile'; headPivot.add(mM); }
   }
 
   /* --- arms ----------------------------------------------------------------- */
@@ -411,12 +424,13 @@ export function createResident(spec = {}) {
       lathe(P, [{ y: y0 - Lh, rx: 0, rz: 0 }, { y: y0 - Lh * 0.62, rx: w, rz: dd }, { y: y0 - Lh * 0.25, rx: w * 0.92, rz: dd * 0.95 }, { y: y0 + 0.015, rx: 0, rz: 0 }], 4, paintDark, { twist: false, phase: 0.5 });
       elbow.add(meshOf(P, mats.dark, 'hand'));
     }
-    arms.push({ shoulder, swing, elbow, baseFwd: pose.fwd[idx] * DEG, side });
+    arms.push({ shoulder, swing, elbow, baseFwd: pose.fwd[idx] * DEG, baseElbow: pose.elbow * DEG, side });
   }
 
   /* --- merge: one mesh per material inside each node update() animates ------ */
-  torso.userData.animated = spec.pose === 'spar';           /* spar sways the torso */
-  for (const a of arms) a.swing.userData.animated = spec.pose === 'walk';   /* walk swings the arms */
+  const sways = spec.pose === 'spar' || spec.pose === 'guard';
+  torso.userData.animated = sways;                                   /* spar / guard sway the torso */
+  for (const a of arms) { a.swing.userData.animated = spec.pose === 'walk' || !!pose.drivable; a.elbow.userData.animated = !!pose.drivable; }
   mergeStatic(group, body);
 
   /* --- bookkeeping ------------------------------------------------------------ */
@@ -426,18 +440,26 @@ export function createResident(spec = {}) {
   const phase = rng() * TAU, bobF = 0.55 + rng() * 0.25, leanF = 0.17 + rng() * 0.08, leanP = rng() * TAU;
   const baseLean = torso.rotation.x;
   const _v = new THREE.Vector3();
+  /* a driven pose (practice preview) overrides the idle arm motion while set */
+  const drive = { active: false, fwd: [0, 0], elbow: [0, 0], lean: 0, yaw: 0, side: 0 };
   group.userData = {
-    spec, triangles, height: m.height, hover,
+    spec, triangles, height: m.height, hover, colour: spec.colour, id: spec.id || null,
+    parts: { body, torso, head: headPivot, arms },
     update(t /*, dt */) {
       body.position.y = hover + Math.sin(t * bobF * TAU + phase) * 0.03;
       body.rotation.z = Math.sin(t * leanF * TAU + leanP) * 0.022;
       body.rotation.x = Math.sin(t * leanF * 0.7 * TAU + leanP * 1.3) * 0.014;
+      if (drive.active) {
+        for (let i = 0; i < 2; i++) { arms[i].swing.rotation.x = -(arms[i].baseFwd + drive.fwd[i]); arms[i].elbow.rotation.x = -(arms[i].baseElbow + drive.elbow[i]); }
+        torso.rotation.x = baseLean + drive.lean; torso.rotation.y = drive.yaw; body.position.x = drive.side;
+        return;
+      }
       if (spec.pose === 'walk') {
         const sw = Math.sin(t * 2.6 + phase) * 0.42;
         arms[0].swing.rotation.x = -(arms[0].baseFwd + sw * 0.6) - 0.1;
         arms[1].swing.rotation.x = -(arms[1].baseFwd - sw * 0.6) - 0.1;
         body.position.y += Math.abs(Math.sin(t * 2.6 + phase)) * 0.012;
-      } else if (spec.pose === 'spar') {
+      } else if (sways) {
         const b = Math.sin(t * 3.1 + phase);
         torso.rotation.x = baseLean + b * 0.02;
         torso.rotation.y = b * 0.05;
@@ -445,10 +467,37 @@ export function createResident(spec = {}) {
     },
     setEnergy(e) { spec.energy = clamp01(e); mats.setEnergy(spec.energy); },
     face(target) {
-      group.getWorldPosition(_v);
-      group.rotation.y = Math.atan2(target.x - _v.x, target.z - _v.z);
+      const g = body.parent || group;
+      g.getWorldPosition(_v);
+      g.rotation.y = Math.atan2(target.x - _v.x, target.z - _v.z);
+    },
+    /* practice-preview drive: radians added to the pose's arm swing / elbow, torso lean / yaw, a sideways body shift; null releases */
+    setDrive(d) {
+      if (!d) { drive.active = false; for (const a of arms) { a.swing.rotation.x = -a.baseFwd; a.elbow.rotation.x = -a.baseElbow; } torso.rotation.x = baseLean; torso.rotation.y = 0; body.position.x = 0; return; }
+      drive.active = true;
+      drive.fwd = [d.fwdL || 0, d.fwdR || 0]; drive.elbow = [d.elbowL || 0, d.elbowR || 0]; drive.lean = d.lean || 0; drive.yaw = d.yaw || 0; drive.side = d.side || 0;
     }
   };
+  return group;
+}
+
+/* Recolour ONE resident in place: the group keeps its identity, position,
+   rotation, id and parent; its crystal is rebuilt from the same seed with the
+   new player colour (facet colours are painted per vertex, so a material swap
+   alone could not do it). Shared materials of other colours are never touched,
+   so no other resident can change. Returns the same group. */
+export function recolour(group, colour) {
+  if (!group || !group.userData || !group.userData.spec) return group;
+  if (!PALETTES[colour]) return group;
+  const spec = Object.assign({}, group.userData.spec, { colour });
+  const fresh = createResident(spec);
+  const energy = group.userData.spec.energy;
+  for (const child of group.children.slice()) { group.remove(child); child.traverse(o => { if (o.isMesh && o.geometry) o.geometry.dispose(); }); }
+  for (const child of fresh.children.slice()) group.add(child);
+  group.userData = fresh.userData;
+  group.userData.id = spec.id || group.userData.id;
+  group.name = 'resident:' + colour;
+  if (typeof energy === 'number') group.userData.setEnergy(energy);
   return group;
 }
 
@@ -456,9 +505,11 @@ export function populate(parent, spots) {
   const out = [];
   spots.forEach((s, i) => {
     const seed = Number.isFinite(s.seed) ? s.seed : i + 1;
-    const r = createResident({ colour: s.colour, physique: s.physique, sex: s.sex, pose: s.pose, seed, height: s.height, hover: s.hover });
+    const id = s.id || ('resident-' + (i + 1));
+    const r = createResident({ colour: s.colour, physique: s.physique, sex: s.sex, pose: s.pose, seed, height: s.height, hover: s.hover, id });
     r.position.set(s.x || 0, 0, s.z || 0);
     r.rotation.y = Number.isFinite(s.facing) ? s.facing : (seed * 2.399) % TAU;
+    r.userData.id = id; r.userData.note = s.note || null; r.userData.role = s.role || 'resident';
     parent.add(r);
     out.push(r);
   });

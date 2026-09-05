@@ -69,7 +69,7 @@ export function buildSky(ctx) {
   /* sun and moon discs + halos */
   const glowTex = radialTexture();
   const sunDisc = new THREE.Mesh(new THREE.CircleGeometry(22, 48), new THREE.MeshBasicMaterial({ color: 0xf6f9ff, fog: false, transparent: true }));
-  const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xdde9ff, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); sunHalo.scale.set(220, 220, 1);
+  const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xdde9ff, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); sunHalo.scale.set(200, 200, 1);
   const moon = new THREE.Mesh(new THREE.CircleGeometry(24, 48), new THREE.MeshBasicMaterial({ map: moonTexture(), fog: false, transparent: true }));
   const moonHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0x9fc0ff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); moonHalo.scale.set(140, 140, 1);
   g.add(sunDisc, sunHalo, moon, moonHalo);
@@ -162,16 +162,16 @@ export function buildSky(ctx) {
     const sun = sunDirection(clockState.worldHour, sunDir);
     /* the disc positions: sun by day, moon opposite; both always placed, faded by the key */
     sunDisc.position.copy(sunDir).multiplyScalar(800); sunDisc.lookAt(0, 0, 0); sunDisc.material.opacity = k.sunDisc * (sun.day ? 1 : 0);
-    sunHalo.position.copy(sunDir).multiplyScalar(790); sunHalo.material.opacity = 0.55 * k.sunDisc * (sun.day ? 1 : 0);
+    sunHalo.position.copy(sunDir).multiplyScalar(790); sunHalo.material.opacity = 0.4 * k.sunDisc * (sun.day ? 1 : 0);
     const moonDir = moonDirection(clockState.worldHour, new THREE.Vector3());
     moon.position.copy(moonDir).multiplyScalar(800); moon.lookAt(0, 0, 0); moon.material.opacity = 0.06 + 0.94 * Math.pow(1 - clockState.daylight, 1.5);
     moonHalo.position.copy(moonDir).multiplyScalar(790); moonHalo.material.opacity = 0.22 * (1 - clockState.daylight);
     stars.material.opacity = 0.85 * k.stars;
     haze.material.opacity = k.haze;
     clouds.children.forEach((c, i) => { c.material.opacity = k.clouds * (0.7 + (i % 3) * 0.15); c.material.color.setHex(clockState.daylight > 0.5 ? 0xe4edf9 : 0x8fb0e6); });
-    beams.forEach(b => { b.core.material.opacity = 0.9 * k.infra; b.glow.material.opacity = 0.12 * k.infra; });
-    flows.forEach(f => { f.material.opacity = 0.15 * k.infra; });
-    stripMat.opacity = 0.35 * (1 - clockState.daylight * 0.7);
+    beams.forEach(b => { b.core.material.opacity = 0.8 * k.infra; b.glow.material.opacity = 0.09 * k.infra; });
+    flows.forEach(f => { f.material.opacity = 0.13 * k.infra; });
+    stripMat.opacity = 0.3 * (1 - clockState.daylight * 0.7);
     if (lights) {
       lights.hemi.color.setHex(k.hemiSky); lights.hemi.groundColor.setHex(k.hemiGround); lights.hemi.intensity = k.hemiI;
       lights.dir.color.setHex(k.sun); lights.dir.intensity = k.sunI;
@@ -182,9 +182,16 @@ export function buildSky(ctx) {
     }
     return k;
   }
-  function update(t) { flows.forEach((f, i) => { const k = state.k ? state.k.infra : 1; f.material.opacity = (0.15 + Math.sin(t * 0.00025 + i * 2.1) * 0.035) * k; }); }
+  function update(t) { flows.forEach((f, i) => { const k = state.k ? state.k.infra : 1; f.material.opacity = (0.13 + Math.sin(t * 0.00025 + i * 2.1) * 0.03) * k; }); }
+  /* live world-Theme change: only the ENERGY of the sky infrastructure follows (haze, tower strips, beams, flows) */
+  function setTheme(t) {
+    haze.material.color.setHex(t.energyDeep); stripMat.color.setHex(t.energy);
+    beamMat.color.setHex(t.energyLight); beamGlowMat.color.setHex(t.energy);
+    flows.forEach(f => f.material.color.setHex(t.energy));
+    return t;
+  }
 
-  return { group: g, setTime, update, beams, flows };
+  return { group: g, setTime, setTheme, update, beams, flows, additive: [sunHalo, moonHalo, haze].concat(beams.map(b => b.glow), flows) };
 }
 
 function radialTexture() {

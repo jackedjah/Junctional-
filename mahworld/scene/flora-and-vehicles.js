@@ -34,9 +34,10 @@ export const PLANTER_SIZES = Object.freeze({
   /* r: half-width (box) or radius (round) of the base; h: base height;
      stem: min/max stem height (m); leaf: min/max leaf height (m);
      stems: min/max primary stems; leaves: hard cap on leaves per planter */
-  small:  { r: 0.34, h: 0.42, stem: [1.2, 1.7], leaf: [0.22, 0.32], stems: [3, 4], leaves: 5 },
-  medium: { r: 0.48, h: 0.54, stem: [1.5, 2.4], leaf: [0.28, 0.40], stems: [3, 5], leaves: 7 },
-  large:  { r: 0.64, h: 0.68, stem: [2.0, 3.2], leaf: [0.34, 0.45], stems: [4, 6], leaves: 9 }
+  /* v3: sparser than v2 (detail must not become clutter) */
+  small:  { r: 0.34, h: 0.42, stem: [1.2, 1.7], leaf: [0.22, 0.32], stems: [2, 3], leaves: 4 },
+  medium: { r: 0.48, h: 0.54, stem: [1.5, 2.4], leaf: [0.28, 0.40], stems: [3, 4], leaves: 5 },
+  large:  { r: 0.64, h: 0.68, stem: [2.0, 3.2], leaf: [0.34, 0.45], stems: [3, 5], leaves: 7 }
 });
 
 /* Night-time emissive levels; day multiplies them by DAY_FACTOR. */
@@ -130,6 +131,17 @@ export function themeMaterials(theme) {
     }
   };
   for (const k of ['planter', 'stem', 'halo', 'leaf', 'seam', 'underside', 'shell', 'platinum', 'glass']) m[k].name = 'mahplaza-' + k + '-' + t.name;
+  /* live world-Theme change: recolour this shared set in place (every planter and
+     vehicle built from it follows); the cache is re-keyed so later lookups agree */
+  m.setTheme = function (themeIn) {
+    const nt = resolveTheme(themeIn);
+    const e = new THREE.Color(nt.energy), l = new THREE.Color(nt.energyLight);
+    m.stem.emissive.copy(l); m.halo.color.copy(e); m.leaf.color.copy(l); m.leaf.emissive.copy(e);
+    m.seam.emissive.copy(e); m.underside.emissive.copy(e); m.shell.emissive.copy(e); m.platinum.emissive.copy(e); m.glass.emissive.copy(e);
+    THEME_CACHE.delete(m.key); m.theme = nt; m.key = nt.energy.toString(16) + ':' + nt.energyLight.toString(16); THEME_CACHE.set(m.key, m);
+    for (const k of ['planter', 'stem', 'halo', 'leaf', 'seam', 'underside', 'shell', 'platinum', 'glass']) m[k].name = 'mahplaza-' + k + '-' + nt.name;
+    return nt;
+  };
   THEME_CACHE.set(key, m);
   return m;
 }
@@ -141,8 +153,8 @@ function stemGeometry() {   /* unit height, base at origin, slight taper */
   if (!GEO.stem) { const g = new THREE.CylinderGeometry(0.62, 1, 1, 5, 1, true); g.translate(0, 0.5, 0); GEO.stem = g; }
   return GEO.stem;
 }
-function leafGeometry() {   /* square-diamond: flattened octahedron, unit height, bottom vertex at origin, plate in local XY */
-  if (!GEO.leaf) { const g = new THREE.OctahedronGeometry(1, 0); g.scale(0.42, 0.5, 0.13); g.translate(0, 0.5, 0); GEO.leaf = g; }
+function leafGeometry() {   /* square-diamond: a SQUARE rotated 45° in the plate plane (local XY), thin depth; unit height, bottom vertex at origin */
+  if (!GEO.leaf) { const g = new THREE.OctahedronGeometry(1, 0); g.scale(0.5, 0.5, 0.09); g.translate(0, 0.5, 0); GEO.leaf = g; }
   return GEO.leaf;
 }
 function discGeometry() {   /* unit disc facing +Y */
@@ -333,7 +345,8 @@ export function createPlanter(opts) {
 
   group.userData = {
     kind: 'planter', size, shape, leaves: n, theme: mats.theme.name, triangles: tris,
-    setTime(state) { return mats.setTime(state); }
+    setTime(state) { return mats.setTime(state); },
+    setTheme(theme) { const t = mats.setTheme(theme); group.userData.theme = t.name; return t; }
   };
   return group;
 }
@@ -463,6 +476,7 @@ export function createVehicleRoute(points, opts) {
     group, curve, vehicles, length, speed, count,
     update,
     setTime(state) { return mats.setTime(state); },
+    setTheme(theme) { return mats.setTheme(theme); },
     triangles: tris
   };
 }

@@ -11,7 +11,7 @@
    room in front of it (open toward the plaza), a glass line across the
    opening, and two piers + a lintel framing it at the front. */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { softMass, signTexture, GLYPHS, diamondOutline, NEUTRALS } from './materials.js';
+import { softMass, signTexture, diamondOutline } from './materials.js';
 
 /* a square-diamond frame standing upright in the XY plane */
 function diamondFrame(size, bar, mat, depth = 0.12) {
@@ -52,7 +52,7 @@ function facade(ctx, parent, o) {
   const backGlow = new THREE.Mesh(new THREE.PlaneGeometry(rw * 0.82, rh * 0.16), M.interiorSoft); backGlow.position.set(0, rh * 0.36, -R + 0.25); room.add(backGlow);
   parent.add(room);
   /* glass line across the opening, with optional mullions */
-  const glass = new THREE.Mesh(new THREE.PlaneGeometry(openW, openH), M.glass); glass.position.set(0, floorY + openH / 2, -E + 0.15); parent.add(glass);
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(openW, openH), M.glass); glass.position.set(0, floorY + openH / 2, -E + 0.15); glass.name = 'entrance-glass'; parent.add(glass);
   for (let i = 1; i <= glassMullions; i++) parent.add(box(0.12, openH, 0.12, M.platinum, -openW / 2 + i * openW / (glassMullions + 1), floorY + openH / 2, -E + 0.15));
   /* one bounded light inside the room so the interior reads through the glass */
   ctx.roomLights = ctx.roomLights || [];
@@ -81,21 +81,24 @@ export function buildBuildings(ctx) {
   ctx.signMaterials = ctx.signMaterials || [];
   ctx.residentSpots = ctx.residentSpots || [];
   ctx.entranceLights = ctx.entranceLights || [];
+  ctx.actions = ctx.actions || [];        /* tap targets: { id, label, kind, mesh, at: world Vector3 } */
   const out = {};
+  const action = (id, label, kind, mesh, at, extra) => { mesh.userData.action = id; ctx.actions.push(Object.assign({ id, label, kind, mesh, at }, extra)); return mesh; };
 
   /* ---------------- MAH GYM — training ---------------------------------- */
   {
     const g = new THREE.Group(); g.name = 'MAH GYM';
     const W = 30, H = 16, openW = 14, openH = 8, E = 4, R = 12;
     g.position.set(-36, 0, -30); g.rotation.y = 0.32; scene.add(g);
-    facade(ctx, g, { W, H, D: 26, openW, openH, pierDepth: E, roomDepth: R, radius: 1.6, glassMullions: 2 });
+    const f = facade(ctx, g, { W, H, D: 26, openW, openH, pierDepth: E, roomDepth: R, radius: 1.6, glassMullions: 2 });
+    action('gym', 'MAH GYM', 'destination', f.glass, world(g, 0, 0, 2), { view: 'gym-entrance', copy: 'Training facility. Preview navigation: the camera moves to the entrance. Training data stays in MAHFITT.' });
     /* upper window band across the piers: interior glow behind glass */
     const windowGlow = M.interiorSoft.clone(); windowGlow.opacity = 0.28; ctx.timeHooks.push(s => { windowGlow.opacity = 0.28 * (1 - s.daylight * 0.5); });
     [-1, 1].forEach(s => { const gl = new THREE.Mesh(new THREE.PlaneGeometry(6.5, 2.2), M.glass); gl.position.set(s * (W / 2 - 4.2), 11.6, 0.44); g.add(gl); const glow = new THREE.Mesh(new THREE.PlaneGeometry(6.3, 2.0), windowGlow); glow.position.set(s * (W / 2 - 4.2), 11.6, 0.3); g.add(glow); });
     /* one light seam on each outer pier: a single vertical energy line, not an outline */
     [-1, 1].forEach(s => { const seam = box(0.08, H * 0.62, 0.06, M.energy, s * (W / 2 - 1.0), H * 0.42, 0.46); g.add(seam); ctx.reflect(seam, 0.35); });
     /* signage on the lintel */
-    sign(ctx, g, { title: 'MAH GYM', sub: 'TRAIN HIGHER', glyph: GLYPHS.dumbbell, width: 12.5, y: 12.1, z: 0.62 });
+    sign(ctx, g, { title: 'MAH GYM', sub: 'TRAIN HIGHER', mark: true, width: 12.5, y: 12.1, z: 0.62 });
     /* interior: platforms, racks, a cable frame — readable, not a machine warehouse */
     const room = g.children.find(c => c.isGroup && c.position.z === -E);
     const plat = (x, z) => { const p = box(3.2, 0.3, 3.2, M.graphiteLight, x, 0.15, z); room.add(p); return p; };
@@ -109,7 +112,7 @@ export function buildBuildings(ctx) {
     for (let i = 0; i < 4; i++) room.add(box(0.6, 0.35, 0.35, M.panel, -6 + i * 0.9, 0.47, -1.2));
     out.gym = g;
     /* who is here: one training on a platform, one heading in */
-    ctx.residentSpots.push(spot(g, 0, 0.3, -E - 6.5, 0, { colour: 'blue', physique: 0.75, sex: 'm', pose: 'spar', seed: 11, note: 'training inside MAH GYM' }));
+    ctx.residentSpots.push(spot(g, 0, 0.3, -E - 6.5, 0, { id: 'gym-trainee', colour: 'blue', physique: 0.75, sex: 'm', pose: 'spar', seed: 11, note: 'training inside MAH GYM' }));
     ctx.entranceLights.push(world(g, 0, 7.5, 11));
   }
 
@@ -118,7 +121,8 @@ export function buildBuildings(ctx) {
     const g = new THREE.Group(); g.name = 'MAH MATCH';
     const W = 44, H = 24, openW = 18, openH = 14, E = 5, R = 22, floorY = 1.8;
     g.position.set(0, 0, -48); scene.add(g);
-    facade(ctx, g, { W, H, D: 34, openW, openH, pierDepth: E, roomDepth: R, floorY, radius: 1.8 });
+    const f = facade(ctx, g, { W, H, D: 34, openW, openH, pierDepth: E, roomDepth: R, floorY, radius: 1.8 });
+    action('match', 'MAH MATCH', 'destination', f.glass, world(g, 0, floorY, 2), { view: 'match-entrance', copy: 'Fighting facility: matches and practice. Choose an action at the entrance.' });
     /* the strong central frame around the opening, with a square-diamond keystone */
     const fT = 1.4, fD = 1.0, fz = 0.55;
     const frameMat = M.platinum;
@@ -133,13 +137,28 @@ export function buildBuildings(ctx) {
     [-1, 1].forEach(s => { for (let i = 0; i < 3; i++) { const p = box(3.0, 2.2, 0.28, M.panel, s * (openW / 2 + 5.2 + (i % 2) * 0.4), 10 + i * 3, 0.42); p.rotation.y = s * 0.06; g.add(p); } });
     /* the two banners: dark cloth with the red square-diamond, the competitive accent */
     [-1, 1].forEach(s => { const cloth = box(1.8, 8.5, 0.06, M.graphiteDark, s * (openW / 2 + 3.2), floorY + 8.5, 0.62); g.add(cloth); const em = diamondFrame(0.9, 0.09, M.matchRed, 0.06); em.position.set(s * (openW / 2 + 3.2), floorY + 11.4, 0.7); g.add(em); });
-    /* signage: the name, primary; wayfinding stays at the entrance */
-    sign(ctx, g, { title: 'MAH MATCH', glyph: GLYPHS.fist, width: 15, y: floorY + openH + fT + 4.9, z: 0.62 });
-    const way = (title, x) => sign(ctx, g, { title, width: 2.6, y: floorY + 2.6, z: -E + 0.5, x, titleSize: 120, w: 2048, h: 320, reflect: false });
-    way('FIND AN OPPONENT', -openW / 2 + 1.6); way('BUDDY PRACTICE', 0); way('SOLO PRACTICE', openW / 2 - 1.6);
-    /* wide shallow entrance stairs up to the recessed floor */
-    const steps = 6, rise = floorY / steps, run = 1.4;
-    for (let i = 0; i < steps; i++) { const h = rise * (i + 1); g.add(box(openW + 6 + (steps - i) * 0.6, h, run, M.graphiteLight, 0, h / 2, (steps - i) * run - run / 2)); const strip = box(openW + 6 + (steps - i) * 0.6, 0.02, 0.05, M.energySoft, 0, h + 0.011, (steps - i) * run - 0.03); g.add(strip); }
+    /* signage: the name with its truthful sub-line; the TWO entrance actions below (§09 / §11 of the brief) */
+    sign(ctx, g, { title: 'MAH MATCH', sub: 'MATCHES · PRACTICE', mark: true, width: 15, y: floorY + openH + fT + 4.9, z: 0.62 });
+    const entranceAction = (id, title, x, extra) => {
+      const panel = box(5.6, 1.5, 0.12, M.graphiteDark, x, floorY + 2.75, -E + 0.42); g.add(panel);
+      const edge = box(5.4, 0.03, 0.04, M.energySoft, x, floorY + 1.98, -E + 0.5); g.add(edge);
+      const s = sign(ctx, g, { title, width: 5.2, y: floorY + 2.75, z: -E + 0.5, x, titleSize: 118, w: 2048, h: 320, reflect: false });
+      action(id, title, 'match-action', panel, world(g, x, floorY, 2), extra); s.userData.action = id; ctx.actions[ctx.actions.length - 1].meshes = [panel, s];
+      return panel;
+    };
+    entranceAction('find-opponent', 'FIND AN OPPONENT', -openW / 4, { copy: 'Opponent matching is not available in this preview. No live players are connected and none are simulated.' });
+    entranceAction('practice-buddy', 'PRACTICE WITH A BUDDY', openW / 4, { copy: 'Local practice preview with two labelled fixtures — no other person is involved.' });
+    /* wide shallow entrance stairs up to the recessed floor, split around a CENTRAL RAMP
+       so hovering residents have continuous access (no one climbs) */
+    const steps = 6, rise = floorY / steps, run = 1.4, rampW = 4.8, rampLen = steps * run;
+    for (let i = 0; i < steps; i++) {
+      const h = rise * (i + 1), total = openW + 6 + (steps - i) * 0.6, sideW = (total - rampW) / 2, zc = (steps - i) * run - run / 2;
+      [-1, 1].forEach(sd => { g.add(box(sideW, h, run, M.graphiteLight, sd * (rampW / 2 + sideW / 2), h / 2, zc)); g.add(box(sideW, 0.02, 0.05, M.energySoft, sd * (rampW / 2 + sideW / 2), h + 0.011, (steps - i) * run - 0.03)); });
+    }
+    const rampAngle = Math.atan2(floorY, rampLen), rampHyp = Math.hypot(floorY, rampLen);
+    const ramp = box(rampW, 0.24, rampHyp, M.graphiteLight, 0, floorY / 2 - 0.12, rampLen / 2); ramp.rotation.x = -rampAngle; g.add(ramp);
+    [-1, 1].forEach(sd => { const edge = box(0.06, 0.02, rampHyp - 0.2, M.energySoft, sd * (rampW / 2 - 0.1), floorY / 2 + 0.011, rampLen / 2); edge.rotation.x = -rampAngle; g.add(edge); });
+    g.add(box(rampW + 0.4, 0.06, 0.6, M.graphiteLight, 0, 0.03, rampLen + 0.3));   /* the landing lip at plaza level */
     /* interior: the square-diamond fighting platform, energy boundary, spectator tiers, practice zones */
     const room = g.children.find(c => c.isGroup && c.position.z === -E);
     const arena = box(12, 0.8, 12, M.graphiteDark, 0, 0.4, -10); arena.rotation.y = Math.PI / 4; room.add(arena);
@@ -152,14 +171,16 @@ export function buildBuildings(ctx) {
     const glowTop = new THREE.Mesh(new THREE.PlaneGeometry(8.5, 8.5), M.energySoft); glowTop.rotation.x = -Math.PI / 2; glowTop.rotation.z = Math.PI / 4; glowTop.position.set(0, 0.86, -10); room.add(glowTop);
     /* spectator tiers along both sides */
     [-1, 1].forEach(s => { for (let t = 0; t < 3; t++) { room.add(box(1.6, 0.4 + t * 0.4, 12, M.graphiteLight, s * (10.2 + t * 1.6), (0.4 + t * 0.4) / 2, -10)); room.add(box(0.05, 0.02, 12, M.energySoft, s * (10.2 + t * 1.6) - s * 0.78, 0.41 + t * 0.4, -10)); } });
-    /* practice zones at the back: buddy (left) and solo (right) */
+    /* two practice zones at the back of the hall (practice, not matches) */
     [-1, 1].forEach(s => { const pz = box(5, 0.25, 5, M.graphiteDark, s * 7, 0.125, -19); pz.rotation.y = Math.PI / 4; room.add(pz); const pb = diamondOutline(5.3, 0.06, M.energySoft, 0.02); pb.position.set(s * 7, 0.27, -19); room.add(pb); });
     out.match = g;
-    /* people explain the function: two facing each other on the platform, one observing, one waiting at opponent entry */
-    ctx.residentSpots.push(spot(g, -2.3, floorY + 0.8, -E - 10, Math.PI / 2, { colour: 'green', physique: 0.8, sex: 'm', pose: 'spar', seed: 21, note: 'sparring on the MAH MATCH platform' }));
-    ctx.residentSpots.push(spot(g, 2.3, floorY + 0.8, -E - 10, -Math.PI / 2, { colour: 'red', physique: 0.7, sex: 'f', pose: 'spar', seed: 22, note: 'sparring on the MAH MATCH platform' }));
-    ctx.residentSpots.push(spot(g, -10.2, floorY + 0.4, -E - 6, Math.PI / 2, { colour: 'purple', physique: 0.4, sex: 'f', pose: 'observe', seed: 23, note: 'observing from the tier' }));
-    ctx.residentSpots.push(spot(g, -6.5, floorY, -E - 2.5, 0, { colour: 'teal', physique: 0.55, sex: 'm', pose: 'stand', seed: 24, note: 'waiting near FIND AN OPPONENT' }));
+    /* where the local practice preview happens: the left practice zone, two marks 2.2 m apart, facing each other across x */
+    ctx.practice = { centre: world(g, -7, floorY + 0.25, -E - 19), a: world(g, -8.1, floorY + 0.25, -E - 19), b: world(g, -5.9, floorY + 0.25, -E - 19), facingA: Math.PI / 2, facingB: -Math.PI / 2 };
+    /* people explain the function: two facing each other on the platform, one observing, one waiting at FIND AN OPPONENT */
+    ctx.residentSpots.push(spot(g, -2.3, floorY + 0.8, -E - 10, Math.PI / 2, { id: 'match-a', colour: 'green', physique: 0.8, sex: 'm', pose: 'spar', seed: 21, note: 'sparring on the MAH MATCH platform' }));
+    ctx.residentSpots.push(spot(g, 2.3, floorY + 0.8, -E - 10, -Math.PI / 2, { id: 'match-b', colour: 'red', physique: 0.7, sex: 'f', pose: 'spar', seed: 22, note: 'sparring on the MAH MATCH platform' }));
+    ctx.residentSpots.push(spot(g, -10.2, floorY + 0.4, -E - 6, Math.PI / 2, { id: 'match-observer', colour: 'purple', physique: 0.4, sex: 'f', pose: 'observe', seed: 23, note: 'observing from the tier' }));
+    ctx.residentSpots.push(spot(g, -4.5, floorY, -E - 2.2, Math.PI, { id: 'match-waiting', colour: 'teal', physique: 0.3, sex: 'm', pose: 'stand', seed: 24, note: 'waiting at FIND AN OPPONENT (a fixture, not a queue)' }));
     ctx.entranceLights.push(world(g, 0, floorY + 8.5, 14));
     ctx.arenaLight = world(g, 0, floorY + 5, -E - 10);
   }
@@ -169,10 +190,12 @@ export function buildBuildings(ctx) {
     const g = new THREE.Group(); g.name = 'MAH MARKET';
     const W = 32, H = 12, openW = 20, openH = 7, E = 2.5, R = 12;
     g.position.set(36, 0, -30); g.rotation.y = -0.32; scene.add(g);
-    facade(ctx, g, { W, H, D: 22, openW, openH, pierDepth: E, roomDepth: R, radius: 3.0, glassMullions: 3 });
+    const f = facade(ctx, g, { W, H, D: 22, openW, openH, pierDepth: E, roomDepth: R, radius: 3.0, glassMullions: 3 });
+    action('market', 'MAH MARKET', 'destination', f.glass, world(g, 0, 0, 2), { view: 'market-entrance', copy: 'World marketplace. Preview navigation only: nothing is for sale here and no prices exist.' });
     /* a soft continuous sill light under the glass — the welcome line */
     const sill = box(openW, 0.05, 0.08, M.energyLight, 0, 0.06, -E + 0.3); g.add(sill); ctx.reflect(sill, 0.3);
-    sign(ctx, g, { title: 'MAH MARKET', sub: 'GEAR · STYLE · NUTRITION · MORE', glyph: GLYPHS.cart, width: 13.5, y: 9.15, z: 0.62 });
+    /* name only: the concept's sub-line ("… NUTRITION …") is not verified and is omitted */
+    sign(ctx, g, { title: 'MAH MARKET', mark: true, width: 13.5, y: 9.15, z: 0.62 });
     /* interior: shelving zones with abstract merchandise, two display plinths */
     const room = g.children.find(c => c.isGroup && c.position.z === -E);
     const tints = [0x3f5a86, 0x7c8fb0, 0x2f7f8f, 0x8a7ab8, 0x5ea2c8];
@@ -185,7 +208,7 @@ export function buildBuildings(ctx) {
     }
     [[-4, -2.2], [4, -2.2]].forEach(([x, z]) => { room.add(box(1.4, 1.0, 1.4, M.graphiteLight, x, 0.5, z)); const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(0.42, 0), M.energySoft); crystal.position.set(x, 1.45, z); room.add(crystal); });
     out.market = g;
-    ctx.residentSpots.push(spot(g, 2.5, 0, -E - 3.6, Math.PI, { colour: 'violet', physique: 0.5, sex: 'f', pose: 'observe', seed: 31, note: 'examining MAH MARKET' }));
+    ctx.residentSpots.push(spot(g, 2.5, 0, -E - 3.6, Math.PI, { id: 'market-visitor', colour: 'violet', physique: 0.5, sex: 'f', pose: 'observe', seed: 31, note: 'examining MAH MARKET' }));
     ctx.entranceLights.push(world(g, 0, 6.5, 11));
   }
 

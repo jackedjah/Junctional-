@@ -56,52 +56,69 @@ export function createMaterials(themeIn) {
     graphiteLight: new THREE.MeshStandardMaterial({ color: NEUTRALS.graphiteLight, roughness: 0.55, metalness: 0.22 }),
     platinum: new THREE.MeshStandardMaterial({ color: NEUTRALS.platinum, roughness: 0.26, metalness: 0.9 }),
     panel: new THREE.MeshStandardMaterial({ color: NEUTRALS.panel, roughness: 0.34, metalness: 0.5, flatShading: true }),
-    plaza: new THREE.MeshStandardMaterial({ color: 0x0c111b, roughness: 0.42, metalness: 0.28, envMapIntensity: 0.4, transparent: true, opacity: 0.86 }),
+    plaza: new THREE.MeshStandardMaterial({ color: 0x0c111b, roughness: 0.46, metalness: 0.26, envMapIntensity: 0.32, transparent: true, opacity: 0.88 }),
     road: new THREE.MeshStandardMaterial({ color: NEUTRALS.road, roughness: 0.45, metalness: 0.3 }),
     glass: new THREE.MeshPhysicalMaterial({ color: NEUTRALS.glassTint, roughness: 0.06, metalness: 0.15, transparent: true, opacity: 0.38, side: THREE.DoubleSide, envMapIntensity: 1.4 }),
     /* interior light: unlit cool white, dimmed by day */
     interior: new THREE.MeshBasicMaterial({ color: NEUTRALS.interior, toneMapped: true }),
-    interiorSoft: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.55 }),
-    /* ENERGY — the Theme */
-    energy: new THREE.MeshStandardMaterial({ color: 0x0a0f18, emissive: theme.energy, emissiveIntensity: 1.6, roughness: 0.5, metalness: 0 }),
-    energyLight: new THREE.MeshStandardMaterial({ color: 0x0a0f18, emissive: theme.energyLight, emissiveIntensity: 2.2, roughness: 0.5, metalness: 0 }),
-    energySoft: new THREE.MeshBasicMaterial({ color: theme.energy, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }),
+    interiorSoft: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.5 }),
+    /* ENERGY — the Theme. Strengths were lowered in the v3 slice (glare correction):
+       readable seams and signs, no bloom-like wash */
+    energy: new THREE.MeshStandardMaterial({ color: 0x0a0f18, emissive: theme.energy, emissiveIntensity: 1.3, roughness: 0.5, metalness: 0 }),
+    energyLight: new THREE.MeshStandardMaterial({ color: 0x0a0f18, emissive: theme.energyLight, emissiveIntensity: 1.7, roughness: 0.5, metalness: 0 }),
+    energySoft: new THREE.MeshBasicMaterial({ color: theme.energy, transparent: true, opacity: 0.26, blending: THREE.AdditiveBlending, depthWrite: false }),
     signage: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false }),   /* map set per sign */
     /* MAH MATCH competitive accent — the one place red is allowed as a world colour */
-    matchRed: new THREE.MeshStandardMaterial({ color: 0x140a0e, emissive: 0xff3b57, emissiveIntensity: 1.2, roughness: 0.5, metalness: 0 })
+    matchRed: new THREE.MeshStandardMaterial({ color: 0x140a0e, emissive: 0xff3b57, emissiveIntensity: 1.1, roughness: 0.5, metalness: 0 })
   };
-  const baseEmissive = { energy: 1.6, energyLight: 2.2, matchRed: 1.2 };
-  const baseOpacity = { energySoft: 0.35, interiorSoft: 0.55 };
+  const baseEmissive = { energy: 1.3, energyLight: 1.7, matchRed: 1.1 };
+  const baseOpacity = { energySoft: 0.26, interiorSoft: 0.5 };
+  m.interiorSoft.opacity = baseOpacity.interiorSoft;
+  let lastState = null, diagnostic = false;
   /* Time of day scales light strength only. day = 0.3, night = 1. */
   m.setTime = function (state) {
+    lastState = state;
     const d = state && typeof state.daylight === 'number' ? state.daylight : 0;
-    const k = 1 - d * 0.7;
-    m.energy.emissiveIntensity = baseEmissive.energy * k;
-    m.energyLight.emissiveIntensity = baseEmissive.energyLight * k;
-    m.matchRed.emissiveIntensity = baseEmissive.matchRed * k;
-    m.energySoft.opacity = baseOpacity.energySoft * k;
+    const k = (1 - d * 0.7) * (diagnostic ? 0.6 : 1);
+    m.energy.emissiveIntensity = Math.min(diagnostic ? 1 : 9, baseEmissive.energy * k);
+    m.energyLight.emissiveIntensity = Math.min(diagnostic ? 1 : 9, baseEmissive.energyLight * k);
+    m.matchRed.emissiveIntensity = Math.min(diagnostic ? 1 : 9, baseEmissive.matchRed * k);
+    m.energySoft.opacity = diagnostic ? 0 : baseOpacity.energySoft * k;
     m.interiorSoft.opacity = baseOpacity.interiorSoft * (1 - d * 0.5);
     m.interior.color.setHex(NEUTRALS.interior).multiplyScalar(1 - d * 0.35);
     m.signage.color.setScalar(1 - d * 0.25);
   };
+  /* Live world-Theme change: recolours the ENERGY materials only. Neutrals,
+     glass, the interior whites and MAH MATCH's red never follow the Theme, and
+     nothing here can reach a resident (residents own their materials). */
+  m.retheme = function (themeIn) {
+    const t = resolveTheme(themeIn); m.theme = t;
+    m.energy.emissive.setHex(t.energy); m.energyLight.emissive.setHex(t.energyLight); m.energySoft.color.setHex(t.energy);
+    return t;
+  };
+  /* Diagnostic view: additive glow off, emissive capped at 1.0, so what remains
+     is geometry and direct light. Used for the reduced-glare proof. */
+  m.setDiagnostic = function (on) { diagnostic = !!on; m.setTime(lastState); return diagnostic; };
   m.dispose = function () { Object.keys(m).forEach(k => { if (m[k] && m[k].isMaterial) m[k].dispose(); }); };
   return m;
 }
 
-/* A signage texture: optional glyph inside a square-diamond outline, a
-   wordmark, an optional small sub-line. Cool white on transparent. */
-export function signTexture({ title, sub, glyph, w = 2048, h = 768, titleSize = 190, subSize = 60 }) {
+/* A signage texture: a wordmark, an optional small sub-line and, when `mark`
+   is set, a RESERVED MARK SLOT above the name — an empty square-diamond outline
+   (accepted MAHFITT geometry, see REFERENCE_MANIFEST.md). No pictogram is drawn:
+   the concept sheet's dumbbell / fist / cart icons are not verified FOB or
+   MAHFITT marks, so nothing is invented in their place. Cool white on transparent. */
+export function signTexture({ title, sub, mark = false, w = 2048, h = 768, titleSize = 190, subSize = 60 }) {
   return canvasTexture(w, h, (g) => {
     g.clearRect(0, 0, w, h);
     g.textAlign = 'center'; g.textBaseline = 'middle';
     let y = h * 0.6;
-    if (glyph) {
-      const cx = w / 2, cy = h * 0.27, s = h * 0.17;
+    if (mark) {
+      const cx = w / 2, cy = h * 0.27, s = h * 0.15;
       g.save(); g.translate(cx, cy); g.rotate(Math.PI / 4);
-      g.lineWidth = 10; g.strokeStyle = 'rgba(232,242,255,0.95)'; g.strokeRect(-s, -s, 2 * s, 2 * s);
-      g.lineWidth = 4; g.strokeStyle = 'rgba(232,242,255,0.55)'; g.strokeRect(-s * 0.78, -s * 0.78, 1.56 * s, 1.56 * s);
+      g.lineWidth = 9; g.strokeStyle = 'rgba(232,242,255,0.92)'; g.strokeRect(-s, -s, 2 * s, 2 * s);
+      g.lineWidth = 4; g.strokeStyle = 'rgba(232,242,255,0.5)'; g.strokeRect(-s * 0.72, -s * 0.72, 1.44 * s, 1.44 * s);
       g.restore();
-      g.save(); g.translate(cx, cy); glyph(g, s * 0.9); g.restore();
       y = h * 0.7;
     }
     g.fillStyle = 'rgba(236,244,255,0.98)';
@@ -121,30 +138,6 @@ function spaced(g, text, cx, y, gap) {
   for (const ch of text) { g.fillText(ch, x, y); x += g.measureText(ch).width + gap; }
   g.textAlign = align;
 }
-/* Glyphs drawn inside the diamond (canvas units: s ≈ half the diamond's inner size). */
-export const GLYPHS = {
-  dumbbell(g, s) {
-    g.fillStyle = 'rgba(236,244,255,0.98)';
-    g.fillRect(-s * 0.55, -s * 0.07, s * 1.1, s * 0.14);
-    [[-0.62, 0.42], [-0.46, 0.62], [0.32, 0.62], [0.48, 0.42]].forEach(([x, hgt]) => g.fillRect(x * s, -hgt * s / 2, s * 0.14, hgt * s));
-  },
-  fist(g, s) {
-    g.fillStyle = 'rgba(236,244,255,0.98)';
-    const r = s * 0.12;
-    /* four knuckles across the top, a palm block below, a thumb wedge */
-    for (let i = 0; i < 4; i++) { const x = -s * 0.48 + i * s * 0.32; roundRect(g, x, -s * 0.5, s * 0.26, s * 0.42, r); }
-    roundRect(g, -s * 0.5, -s * 0.14, s * 1.24, s * 0.62, r);
-    g.fillStyle = 'rgba(16,24,40,1)';
-    for (let i = 1; i < 4; i++) g.fillRect(-s * 0.5 + i * s * 0.32 - s * 0.03, -s * 0.5, s * 0.06, s * 0.36);
-  },
-  cart(g, s) {
-    g.strokeStyle = 'rgba(236,244,255,0.98)'; g.lineWidth = s * 0.11; g.lineCap = 'round'; g.lineJoin = 'round';
-    g.beginPath(); g.moveTo(-s * 0.7, -s * 0.45); g.lineTo(-s * 0.45, -s * 0.45); g.lineTo(-s * 0.25, s * 0.22); g.lineTo(s * 0.5, s * 0.22); g.lineTo(s * 0.68, -s * 0.2); g.lineTo(-s * 0.38, -s * 0.2); g.stroke();
-    g.fillStyle = 'rgba(236,244,255,0.98)';
-    [[-0.12, 0.5], [0.42, 0.5]].forEach(([x, y]) => { g.beginPath(); g.arc(x * s, y * s, s * 0.1, 0, Math.PI * 2); g.fill(); });
-  }
-};
-function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); g.fill(); }
 
 /* Geometry helpers shared by the built environment. */
 export function roundedBoxShape(w, h, r) {
