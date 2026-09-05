@@ -105,13 +105,18 @@ var TAPER_FLANK = [
    bright rectangle whatever the light is doing, which is a sticker. The pec's
    catches must come from its NORMAL meeting the key and the cards, so the
    table stops at steel and lets the lighting decide which plane is lit. */
+/* R109: histogrammed over the reference's left pec (body only) it is 57% under
+   32 luma, 21% in 32-63, 9% in 64-95 and 4% above 160 — a GRAPHITE plane whose
+   light is a catch along its top edge; this build's pec was 25% / 17% / 14%
+   with 31% in 96-160. The rows go deeper and the coat share drops; the crest
+   still catches because the key and the camera-side card decide that. */
 var PEC_UPPER = [
-  [0.14,   0.04,   0.00,   0.34,  0.30],
-  [0.40,   0.02,   0.06,   0.12,  0.44],   /* sapphire */
-  [0.46,   0.00,   0.12,   0.00,  0.58]    /* steel-blue */
+  [0.42,   0.06,  -0.06,   0.64,  0.20],   /* graphite — the plane */
+  [0.36,   0.03,   0.02,   0.40,  0.36],   /* sapphire */
+  [0.22,   0.00,   0.10,   0.16,  0.52]    /* steel-blue — the lit plane */
 ];
 var PEC_LOWER = [
-  [0.22,   0.06,  -0.06,   0.52,  0.20],
+  [0.32,   0.06,  -0.06,   0.60,  0.18],   /* R109: 0.22 -> 0.32 and deeper — the under-pec is the reference's darkest chest region */
   [0.40,   0.04,   0.00,   0.38,  0.32],   /* sapphire — R95-BB: a shade deeper, the lower pec turns away from the key */
   [0.28,   0.02,   0.06,   0.26,  0.44],   /* R95-BB: the lower pec's outer plane is in the shelf's shadow, not lit */
   [0.10,   0.00,   0.12,  -0.14,  0.60]
@@ -122,11 +127,11 @@ var STERNUM = [
   [0.15,   0.03,   0.00,   0.40,  0.24]
 ];
 var ABS = [
-  [0.18,   0.06,  -0.06,   0.56,  0.18],
-  [0.36,   0.04,   0.00,   0.34,  0.30],   /* sapphire */
-  [0.30,   0.02,   0.06,   0.14,  0.42],
-  [0.12,   0.00,   0.12,  -0.10,  0.56],   /* steel */
-  [0.04,  -0.04,   0.26,  -0.55,  0.24]
+  [0.28,   0.06,  -0.06,   0.58,  0.18],   /* R109: the abdomen is 68% under 48 in the reference */
+  [0.38,   0.04,   0.00,   0.36,  0.30],   /* sapphire */
+  [0.22,   0.02,   0.06,   0.14,  0.42],
+  [0.09,   0.00,   0.12,  -0.10,  0.56],   /* steel */
+  [0.03,  -0.04,   0.26,  -0.55,  0.24]
 ];
 var OBLIQUE = [
   [0.26,   0.08,  -0.10,   0.66,  0.14],
@@ -206,14 +211,14 @@ export var REGIONS = {
   HEAD_SHELL:  { classes: HEAD_SHELL, lift: 0.00, coat: 0.80 },
   NECK:        { classes: NECK,       lift: 0.00, coat: 0.30 },
   TAPER_SPEAR: { classes: TAPER_SPEAR, lift: 0.00, coat: 0.10 },
-  TAPER_FLANK: { classes: TAPER_FLANK, lift: 0.00, coat: 0.60 },
-  PEC_UPPER:   { classes: PEC_UPPER,  lift: 0.00, coat: 0.85 },
+  TAPER_FLANK: { classes: TAPER_FLANK, lift: 0.00, coat: 0.48 },   /* R109: 0.60 -> 0.48 */
+  PEC_UPPER:   { classes: PEC_UPPER,  lift: 0.00, coat: 0.50 },   /* R109: 0.85 -> 0.50 — isolation: the env reflection off the pec planes was 17 points of the 64-96 band the reference does not have */
   PEC_LOWER:   { classes: PEC_LOWER,  lift: 0.00, coat: 0.40 },
   STERNUM:     { classes: STERNUM,    lift: 0.00, coat: 0.00 },
-  ABS:         { classes: ABS,        lift: 0.00, coat: 0.38 },
+  ABS:         { classes: ABS,        lift: 0.00, coat: 0.28 },   /* R109: 0.38 -> 0.28, the abdomen is 68% under 48 in the reference */
   OBLIQUE:     { classes: OBLIQUE,    lift: 0.00, coat: 0.18 },
-  DELT:        { classes: DELT,       lift: 0.00, coat: 1.00 },
-  UPPER_ARM:   { classes: UPPER_ARM,  lift: 0.00, coat: 0.55 },   /* R99: histogrammed, the arm was mean 81 against the godform reference's 54 */
-  FOREARM:     { classes: FOREARM,    lift: 0.00, coat: 0.50 },
+  DELT:        { classes: DELT,       lift: 0.00, coat: 0.85 },   /* R109: 1.00 -> 0.85, the crown keeps its catch, the rest of the cap goes graphite */
+  UPPER_ARM:   { classes: UPPER_ARM,  lift: 0.00, coat: 0.34 },   /* R109: 0.55 -> 0.34, the reference's lowered arm is 94% under 48 luma; the coat was the whole of the arm's brightness (isolation) */   /* R99: histogrammed, the arm was mean 81 against the godform reference's 54 */
+  FOREARM:     { classes: FOREARM,    lift: 0.00, coat: 0.32 },   /* R109: 0.50 -> 0.32 */
   HAND:        { classes: HAND,       lift: 0.00, coat: 0.22 }
 };

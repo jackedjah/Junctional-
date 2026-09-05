@@ -164,12 +164,12 @@ export function applyCrystalShader(material, options) {
        character move. */
     uRimDirA: { value: new Vector3(-0.62, 0.72, 0.30).normalize() },
     uRimDirB: { value: new Vector3(0.85, 0.15, 0.25).normalize() },
-    uRimFloor: { value: opts.rimFloor == null ? 0.09 : opts.rimFloor },   /* R102: 0.22 -> 0.12; R108: 0.09 — a thin rim, not a stroke around the silhouette */
+    uRimFloor: { value: opts.rimFloor == null ? 0.02 : opts.rimFloor },   /* R109: 0.02 — the rim floor alone was 5 points of energy cyan on the chest; R102: 0.22 -> 0.12; R108: 0.09 — a thin rim, not a stroke around the silhouette */
     uCoat: { value: opts.coat == null ? 0.0 : opts.coat },
     uCoatColor: { value: new Color(opts.coatColor == null ? 0xbfc8d6 : opts.coatColor) },
     uCoatMetal: { value: opts.coatMetal == null ? 0.66 : opts.coatMetal },
     uCoatRough: { value: opts.coatRough == null ? 0.05 : opts.coatRough },
-    uCoatEnv: { value: opts.coatEnv == null ? 0.55 : opts.coatEnv },
+    uCoatEnv: { value: opts.coatEnv == null ? 0.42 : opts.coatEnv },   /* R109: 0.55 -> 0.42 — with the coat off the arm went from mean 87 to 47; the coat's reflection is the arm's brightness */
     /* R102 — CAVITY: how strongly a muscle valley (forge.js `aCavity`, from
        the anatomical multiplier) loses albedo, reflection, coat and rim. The
        R102 references' carving is read as SHADOW between raised forms: the

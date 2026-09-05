@@ -813,7 +813,8 @@ function quadZone(row) {
     /* R98: the quad's OUTER SWEEP is a platinum hero plane; the seam none,
        the heads a little, the back the body's default. */
     if (ae < seam) return { classes: REGIONS.STERNUM.classes, seed: 80 + row, index: 0, coat: 0 };
-    if (ae < headOuter) return { classes: REGIONS.ABS.classes, seed: 82 + row * 2 + side, index: row === 0 ? 0 : 1, coat: 0.40 };
+    /* R109: one row lighter and more coat — measured over the quad the reference is 43% under 32 with a graded middle and a 4% platinum tail; after the value pass darkened the body this build's quad was 76% under 32 with no tail at all. The light the quad keeps is platinum, not cyan. */
+    if (ae < headOuter) return { classes: REGIONS.ABS.classes, seed: 82 + row * 2 + side, index: row === 0 ? 1 : 2, coat: 0.60 };
     if (ae < sweepOuter) return { classes: REGIONS.TAPER_FLANK.classes, seed: 86 + row * 2 + side, index: row === 0 ? 1 : 2, coat: 1.0 };
     return null;
   };

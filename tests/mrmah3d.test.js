@@ -659,7 +659,9 @@ if (exists('CLAUDE.md')) {
   /* dark rows never take the coat */
   ok('R98-coat-gated-off-dark-classes', /mrCoatW = clamp\( vCoat \* uCoat, 0\.0, 1\.0 \) \* \( 1\.0 - smoothstep/.test(shader));
   /* every region carries its share, and the recesses carry none */
-  ok('R98-regions-carry-coat-shares', /STERNUM:\s*\{[^}]*coat:\s*0\.00/.test(regions) && /DELT:\s*\{[^}]*coat:\s*1\.00/.test(regions) &&
+  /* R109: the deltoid keeps the largest share on the body but no longer a full coat — the
+     reference's caps are graphite with a platinum crest, not silver domes */
+  ok('R98-regions-carry-coat-shares', /STERNUM:\s*\{[^}]*coat:\s*0\.00/.test(regions) && /DELT:\s*\{[^}]*coat:\s*(0\.[89]\d|1\.00)/.test(regions) &&
     /HAND:\s*\{[^}]*coat:\s*0\.[0-2]/.test(regions));
   /* the coat is neutral, never theme energy */
   ok('R98-coat-colour-is-neutral', /platinum:\s*0x[0-9a-f]{6}/i.test(mats) && /coatColor:\s*PALETTE\.platinum/.test(mats) &&
@@ -825,7 +827,10 @@ if (exists('CLAUDE.md')) {
   const coreM = matsR101.match(/coreStrength: ([\d.]+)/);
   /* R102: 3.6 flooded the abdominal valleys; 2.0 with the cavity term keeps
      the transport and the carving. The floor is the R101 pre-nudge value. */
-  ok('R101-theme-carried-by-transmission', !!coreM && Number(coreM[1]) >= 2.0,
+  /* R109: the transport stays (a complementary theme still travels through the crystal as
+     transmission) but as an ACCENT — the brief's value architecture is 65 / 25 / 10 with cyan
+     never the body, so the strength is bounded on both sides */
+  ok('R101-theme-carried-by-transmission', !!coreM && Number(coreM[1]) >= 0.8 && Number(coreM[1]) <= 2.0,
     coreM ? 'coreStrength ' + coreM[1] : 'no coreStrength');
 })();
 

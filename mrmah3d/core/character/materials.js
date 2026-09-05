@@ -175,7 +175,7 @@ export function createCrystalMaterials(options) {
        to carry the whole material. Left at 27 it would simply have re-crushed
        the midtones the albedo is being brought in to supply — the same
        distribution error from the other direction. */
-    envMapIntensity: 11.0,   /* R108: 14 -> 11, the reflected tail (the white panels the addendum named) */
+    envMapIntensity: 7.0,   /* R108: 14 -> 11, the reflected tail (the white panels the addendum named); R109: 7.0 — isolation showed the environment reflection carried most of the chest's excess (mean 92 -> 57 with it off) against a reference chest at mean 43, 69% under 48 */
     /* R92: flatShading OFF, and the facets are unaffected.
 
        Every vertex of a face already carries that face's own normal, so
@@ -504,11 +504,11 @@ export function createCrystalMaterials(options) {
        reference the quad mass is a dark navy (43% under 32 luma, mean 38) and
        the light lives in the spear below it and on the outer edge, so the
        source sits low and the gate fades out through the quad. */
-    innerStrength: 3.4,
+    innerStrength: 2.0,   /* R109: 3.4 -> 2.0 — the spear box was 11% energy cyan against the reference's 4%; cyan is light in the crystal, not the crystal */
     innerY: 0.42,
     innerRange: 1.00,
     innerTop: 1.28,
-    coreStrength: 2.0,   /* R101: 1.6 -> 3.6, the core's theme light reaches the abdominal valleys — the one
+    coreStrength: 1.0,   /* R109: 2.0 -> 1.0, the core light was 6 points of the chest's energy cyan (reference 2.7%). R101: 1.6 -> 3.6, the core's theme light reaches the abdominal valleys — the one
                             transport that carries a complementary theme (gold) through a sapphire body.
                             R102: back to 2.0 — at 3.6 it flooded the abdominal valleys with theme colour,
                             which is the one thing the carving brief forbids; the valleys are now kept dark

@@ -139,8 +139,8 @@ function buildEnvironment(renderer, palette) {
     /* fill: cool, weaker, opposite side */
     { x: 152, y: 44, w: 26, h: 22, fill: 'rgba(204,212,222,0.75)' },
     /* rim: narrow bright cyan, behind — the chromatic catches */
-    { x: 216, y: 26, w: 18, h: 30, fill: 'rgba(' + sideKey.join(',') + ',0.95)' },
-    { x: 188, y: 62, w: 12, h: 12, fill: 'rgba(' + sideKey.join(',') + ',0.85)' },
+    { x: 216, y: 26, w: 18, h: 30, fill: 'rgba(' + sideKey.join(',') + ',0.55)' },   /* R109: 0.95 -> 0.55 */
+    { x: 188, y: 62, w: 12, h: 12, fill: 'rgba(' + sideKey.join(',') + ',0.45)' },   /* R109: 0.85 -> 0.45 */
     /* a low silver bounce so downward-tilted facets are not uniformly dead */
     { x: 96, y: 82, w: 20, h: 14, fill: 'rgba(226,230,236,0.55)' },
 
@@ -200,7 +200,7 @@ function buildEnvironment(renderer, palette) {
        Right-facing planes see x 64-128 and do not catch it, which is the
        asymmetry the reference has. Electric blue, not white, so the contour
        stays chromatic and the silver catches stay rare. */
-    { x: 8, y: 36, w: 64, h: 58, fill: 'rgba(' + sideKey.join(',') + ',0.65)' },
+    { x: 8, y: 36, w: 64, h: 58, fill: 'rgba(' + sideKey.join(',') + ',0.36)' },   /* R109: 0.65 -> 0.36 — the coat reflected this card as a cyan wash down the whole left arm */
 
     /* A NOTE ON WHAT IS DELIBERATELY NOT HERE.
 

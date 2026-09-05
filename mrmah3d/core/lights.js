@@ -37,7 +37,7 @@ export function createLights(options) {
   /* Cool white key — not cyan. A cyan key would tint every lit plane and the
      body would start reading as "a glowing cyan object", which the reference
      explicitly is not. The cyan belongs to the edges and the rim. */
-  var key = new DirectionalLight(new Color(0xe6ebf2), 6.0);   /* R99: 5.5 -> 6.0, the lit planes brighter while the fill falls */
+  var key = new DirectionalLight(new Color(0xe6ebf2), 4.8);   /* R109: 6.0 -> 4.4 — the reference pec is 57% under 32 luma with 9% in 96-160; this build had 25% / 31%: the key-lit middle was too bright */   /* R99: 5.5 -> 6.0, the lit planes brighter while the fill falls */
   key.position.set(-4.2, 7.4, 6.2);
   key.castShadow = false;
   if (key.castShadow) {
@@ -74,7 +74,7 @@ export function createLights(options) {
   fill.position.set(5.6, 3.0, 4.0);
 
   /* Rim — cyan, from behind and above. This is what draws the lit contour. */
-  var rim = new DirectionalLight(new Color(T('hero', 0x49dcff)), 0.80);   /* R108: a thin theme rim where justified, not a stroke */
+  var rim = new DirectionalLight(new Color(T('hero', 0x49dcff)), 0.45);   /* R109: 0.80 -> 0.45 */   /* R108: a thin theme rim where justified, not a stroke */
   rim.position.set(1.4, 4.6, -7.0);
 
   /* A second rim from the other side, weaker, so the silhouette closes on
@@ -84,7 +84,7 @@ export function createLights(options) {
      deltoid's outer crest; the left-side rim was too weak and too far behind
      him to reach either. Side-rear now, so the left contour of the arm, the
      deltoid and the quad's sweep all take it. */
-  var rim2 = new DirectionalLight(new Color(T('worldAccent', 0x3fb8e8)), 0.95);
+  var rim2 = new DirectionalLight(new Color(T('worldAccent', 0x3fb8e8)), 0.55);   /* R109: 0.95 -> 0.55 */
   rim2.position.set(-6.4, 3.4, -3.2);
 
   /* Floor bounce: the grid is a light source in the reference, and a point
@@ -201,10 +201,10 @@ export function createLights(options) {
 
   function setIntensity(scale) {
     var k = Math.max(0, Number(scale) || 1);
-    key.intensity = 6.0 * k;
+    key.intensity = 4.8 * k;   /* R109 */
     fill.intensity = 0.80 * k;
-    rim.intensity = 0.80 * k;   /* R102: 2.2 -> 1.0; R108: 0.80 */
-    rim2.intensity = 0.95 * k;  /* R102: 2.6 -> 1.2; R108: 0.95 */
+    rim.intensity = 0.45 * k;   /* R109 */   /* R102: 2.2 -> 1.0; R108: 0.80 */
+    rim2.intensity = 0.55 * k;  /* R109 */  /* R102: 2.6 -> 1.2; R108: 0.95 */
     bounce.intensity = 1.05 * k;
     chestLamp.intensity = 0.85 * k;
     faceLamp.intensity = 0.95 * k;
