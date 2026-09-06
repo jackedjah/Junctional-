@@ -587,12 +587,18 @@ export function buildHaloDistricts(ctx, opts = {}) {
         for (let k = 0; k < 40; k++) {
           const a = (k / 40) * TAU;
           const [bx, bz, bth] = ringPoint(D.deg, s + Math.cos(a) * R, Math.sin(a) * R);
-          /* A BOUNDARY SEGMENT MUST LIE ALONG THE BOUNDARY. Each of the 40 pieces was yawed to -bth
-             — the RING's radial direction — so all forty pointed outward from the world axis and the
-             arena read as a 40-spoke asterisk instead of a circle. The segment's own tangent at
-             parameter a is (-sin a, cos a) in the district's (along, across) frame, so the extra yaw
-             is a itself; the 4.95 m length goes on local Z, which -bth sends tangential. */
-          put('plat', chamferBox(0.9, 0.30, TAU * R / 40 * 1.05, 0.1), mat(bx, bz, 0.2, -bth + a), 1.0);
+          /* A BOUNDARY SEGMENT MUST LIE ALONG THE BOUNDARY, and the fix is the YAW ALONE.
+             Each of the 40 pieces was yawed to -bth — the ring's radial direction — so all forty
+             pointed outward from the world axis and the arena read as a 40-spoke asterisk. The
+             circle's tangent at parameter a works out to (cos(a - bth), -sin(a - bth)) in world xz,
+             and mat(..., ry) sends local +X to (cos ry, -sin ry): so ry = a - bth and the length
+             stays on X. Checked numerically — tangent . localX = 1.0000, tangent . localZ = 0.0000.
+
+             The first correction changed BOTH the yaw and the axis, which is this bug class's own
+             trap in reverse: after finding twelve places where the axis was wrong, the reflex is to
+             swap the axis everywhere, and here that turned a 4.95 m chord back into a 0.9 m tick.
+             The render showed forty dashes around a circle instead of a circle. */
+          put('plat', chamferBox(TAU * R / 40 * 1.05, 0.30, 0.9, 0.1), mat(bx, bz, 0.2, -bth + a), 1.0);
         }
         P.terrace(D.deg, s, 0, 40, 40, 0.26);
         for (const side of [-1, 1]) P.mast(D.deg, s + side * 34, -34, 11 + 3 * g, g * 5 + side);
