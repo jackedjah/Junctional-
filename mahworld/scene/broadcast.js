@@ -326,8 +326,17 @@ export function buildBroadcast(ctx, opts = {}) {
           if (!o.isMesh || !o.material) return;
           const src = Array.isArray(o.material) ? o.material : [o.material];
           const out = src.map(mm => {
+            /* CARRY THE VERTEX COLOURS. residents.js paints the dark facial chamber, the two eyes
+               and the energy accents as PER-VERTEX colour on a material whose own `color` is plain
+               WHITE — so cloning only `color` gave every part of the body the same white and the
+               presenter rendered as a flat cutout with no face. Third module to hit this (see the
+               learning record L17: the monument's LAW 1 splitter and the same assumption here).
+               With the flag carried, the chamber adds almost nothing under additive blending and
+               therefore stays dark, which is exactly what a projected face should do, and the light
+               accents add brightly against it. */
             const h = new THREE.MeshBasicMaterial({
               color: mm.color ? mm.color.clone() : new THREE.Color(0xcfe4ff),
+              vertexColors: !!mm.vertexColors,
               transparent: true, opacity: 0.72, blending: THREE.AdditiveBlending,
               depthWrite: false, side: THREE.DoubleSide, fog: true
             });

@@ -18,7 +18,7 @@
    There is no global tint, filter, overlay or material overwrite anywhere. */
 import * as THREE from '../vendor/three/three.module.min.js';
 import { createWorldClock } from './world-clock.js';
-import { createMaterials, resolveTheme, THEMES } from './materials.js';
+import { createMaterials, resolveTheme, THEMES, canvasTexture } from './materials.js';
 import { createRoam, ROAM } from './roam.js';   /* v15: the viewer's own camera */
 import { buildGround } from './ground.js';
 import { buildBuildings } from './buildings.js';
@@ -146,6 +146,7 @@ export async function createMahplaza(canvas, options = {}) {
   const CLOUDS = await optional('./clouds.js'), FOBEAM = await optional('./fobeam.js'), TERRAIN = await optional('./terrain.js');
   const FOBST = await optional('./fobstations.js');   /* v12 §4: the FOBLOCK family */
   const MONU = await optional('./monument.js');       /* v12 §5: HIGHER TOGETHER, the hero public art */
+  const BCAST = await optional('./broadcast.js');     /* v14 §8: the giant rear-city authority monitor */
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -200,7 +201,7 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null, terrain = null, fobstations = null, monument = null;
+  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null;
   /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
      own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
   if (TERRAIN && TERRAIN.buildTerrain) {
@@ -218,6 +219,20 @@ export async function createMahplaza(canvas, options = {}) {
      that list is only complete once ground.js and plaza-dressing.js have pushed theirs. It then
      adds a collider of its own, which is why it must come before the camera dolly is built. */
   if (MONU && MONU.buildMonument) { try { monument = MONU.buildMonument(ctx); } catch (e) { console.info('MAHPLAZA: monument module failed —', e && e.message); monument = null; } }
+  /* R2 §20 — THE GIANT REAR-CITY AUTHORITY MONITOR. Built and unwired since v14; the doctrine's own
+     build order puts it directly after the monument and transport, so it is wired here.
+     It needs residents.js by REFERENCE, not by import: §8's presenter ownership forbids forking the
+     species, so the module asks the authority for its figure the same way monument.js does. The
+     residents module is already resolved above as `R`, but that happens AFTER this block, so the
+     import is repeated rather than reordering the world build — a monitor 185 m out is not worth
+     moving the population step for. captions default to EMPTY: §22 forbids invented copy. */
+  if (BCAST && BCAST.buildBroadcast) {
+    try {
+      const RES = await optional('./residents.js');
+      broadcast = BCAST.buildBroadcast(ctx, { residents: RES, canvasTexture });
+      if (broadcast && broadcast.group && !broadcast.group.parent) scene.add(broadcast.group);
+    } catch (e) { console.info('MAHPLAZA: broadcast module failed —', e && e.message); broadcast = null; }
+  }
 
   /* entrance and plaza point lights, bounded (v3: entrance strength lowered for the glare correction) */
   const pointLights = [], themedLights = [];
@@ -388,7 +403,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -422,7 +437,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -760,6 +775,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (dressing && dressing.update) dressing.update(t, dt);
     if (fobstations && fobstations.update) fobstations.update(t, dt);
     if (fobpods && fobpods.update) fobpods.update(t, dt);
+    if (broadcast && broadcast.update) broadcast.update(t, dt);
     if (monument && monument.update) monument.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
@@ -1029,6 +1045,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (clouds && clouds.setQuality) { try { clouds.setQuality(quality); } catch (e) {} }
     if (monument && monument.setQuality) { try { monument.setQuality(quality); } catch (e) {} }
     if (fobpods && fobpods.setQuality) { try { fobpods.setQuality(quality); } catch (e) {} }
+    if (broadcast && broadcast.setQuality) { try { broadcast.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
     return quality.name;
   }
@@ -1064,7 +1081,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,

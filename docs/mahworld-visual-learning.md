@@ -1,9 +1,82 @@
 # MAHWORLD — visual learning record
 
-Project-local implementation memory, per MASTER WORLD CLOSURE §2. Not a log. Each entry is a rule
-that cost something to learn and that must not be rediscovered.
+Project-local implementation memory, per MASTER WORLD CLOSURE §2 and R2 PERPETUAL WORLD CRAFTSMAN
+§16. This is the ONE canonical record — director locks, proven recipes and reusable lessons live
+here and nowhere else. Not a log. Each entry is a rule that cost something to learn.
 
 Format: **failure → root owner → correction → proof view → regression to avoid.**
+
+---
+
+## DIRECTOR LOCKS — R2 PERPETUAL WORLD CRAFTSMAN DOCTRINE
+
+FACT, not hypothesis. These are standing constraints, not goals to be traded away.
+
+**Quality bar.** The physical credibility, authored specificity, environmental depth, animation
+polish and cleanliness of a top-tier modern open-world production — as a BAR ONLY. Never copy
+another property's map, assets, characters, vehicles, brands or architecture.
+
+**§2/§3 A world of cities.** Multiple physically separated, flyable city-biomes legible from world
+scale as real destinations with travel distance and atmospheric separation. Every city inherits the
+SAME genome — platinum/chromium, dark crystal, square-diamond logic, MAHGIC, FOBLOCKs, canonical
+MAHBEINGS, FOB-derived transport, physical FOBEAM endpoints, music square-diamonds, authored
+interiors. **Biomes alter ecology, topography and spatial organisation — never the palette.**
+
+**§5 LAKE CITY.** Organised BY water: a large reflective lake, connected basins, canals, falls,
+water terraces. Platinum bridges, FOBLOCK docks, water-adjacent diamond nodes, mist, shoreline
+ecology, reflective civic platforms, distant vertical landmarks. Water shapes the topology; flight
+corridors are preserved. Ordinary boats are prohibited unless redesigned from the FOB genome.
+Reserved corridor already exists: `terrain.js` `BASIN` (bearing 62, r 330, rx 210, rz 130).
+
+**§6 RAINFOREST CITY.** **DO NOT RECOLOUR TO GENERIC GREEN.** A living city of giant plant-like
+ground organisms, roots, trunks, canopy structures and organic terraces — built as MAHWORLD
+organisms: square-diamond nodes, platinum growth bands, dark crystalline tissues, embedded FOB
+interfaces, MAHGIC veins, localised FOBEAM emitters, subtle breathing/orienting/pulsing. Nature and
+technology **co-evolved**, never pasted together. Director addition: **rain is not rain** — very
+thin, detailed shards of diamond droplets with a sparkling aura. Populate with MAHNIMALS / small
+square-diamond fauna, on land and in the water, consistent with the genome.
+
+**§10/§11 UNIVERSAL MUSIC-LINE LAW.** EVERY FOBEAM family carries a refined miniature VERTICAL
+music-line/bar motif at or near its physical emitter, receiver or travelling packet. Canonical world
+motif. Built ONCE as reusable infrastructure with states IDLE / ACTIVE_AUDIO / QUIET / TRANSITION /
+DISTANT_LOD. Idle motion subtle and DETERMINISTIC. Architected now to accept normalized Apple
+Music/audio features later **without changing its geometry contract**. Forbidden: giant equalizer
+UI, strobing, noisy random motion, hundreds of unique loops.
+
+**§12 FOBEAMs are infrastructure, not decorative neon.** Real nodes at both ends, respect occlusion,
+near shows packets + music response, mid simplifies, far becomes sparse network lines.
+
+**§13 Realness through cause.** Supports hold weight; platforms have thickness; transit docks
+somewhere; windows imply interiors; water occupies terrain; organisms root into surfaces;
+reflections correspond to nearby objects; lights have fixtures; beams have endpoints; residents have
+destinations; roads connect districts; backsides are authored. Causality, not texture noise.
+
+**§14 Cleanness bar.** No z-fighting, shimmering distance geometry, placeholder primitives, dead
+black rectangles, duplicated props, unsupported roads, clipping, floating signage, arbitrary spikes,
+broken reflections, procedural repetition or unfinished backsides. **Remove before adding.**
+
+**§15 Method.** Three largest visible failures → owner → smallest correct fix → cheapest falsifying
+proof → keep/revert → one regression view → one reusable lesson. **If two attempts yield weak
+improvement, CHANGE METHOD** — never add glow, subdivisions or clutter instead.
+
+**§17 Credit discipline.** One lead writer by default. Parallelise only independent systems with
+explicit ownership. Reuse cameras, materials and diagnostics. Targeted crops over full captures.
+Spend capacity on implementation and proof, not repeated audits or long prose.
+
+**§18 Acceptance gates — closure is FORBIDDEN while:** ordinary humans or cars remain; city
+silhouettes are generic; biome identity relies on palette swaps; FOBEAMs lack physical endpoints or
+music-line accompaniment; rear views are empty; water/nature corridors are blocked; rainforest
+organisms read as ordinary plants with tech stickers; far cities are indistinguishable; inter-city
+flight lacks spatial logic.
+
+**§20 BUILD ORDER (authoritative).** civic-city defects → monument/transport/sky roads → giant
+authority hologram → global audio-reactive FOBEAM mini-line system → far-zoom world composition →
+Lake City → Rainforest City → inter-city flight/streaming → authored detail → population → 360
+closure → iPhone proof → performance → repeat.
+
+**§22 Limit handoff.** Save the strongest verified state; write only current verified state, the
+exact next three actions, the highest-risk unresolved visual defect, files owned, and the proof
+renders needed to reopen. **Do not push unless authorized.**
 
 ---
 
@@ -217,6 +290,20 @@ so "did not pass through" can only be satisfied by having arrived. Same shape as
 (R03 asserted deck height at a position outside the deck; R07 measured a bound while stopped
 against a collider). Before trusting a green test, ask what would have to be true for it to fail.
 
+## L22 — Cloning `material.color` throws away the species
+**Failure.** The broadcast presenter rendered as a flat white cutout with no face, at every distance.
+**Root owner.** `broadcast.js` rebuilt residents.js's materials as
+`new MeshBasicMaterial({ color: mm.color.clone() })`. residents.js sets `color: 0xffffff` and paints
+the dark facial chamber, the two eyes and the energy accents as **per-vertex colour** — so cloning
+only `color` gives every part of the body the same white.
+**Correction.** Carry `vertexColors: !!mm.vertexColors`. One flag. Under additive blending the dark
+chamber then adds almost nothing and stays dark, which is what a projected face should do.
+**Regression.** THIRD module to lose the species this way (monument.js's LAW 1 splitter carried
+positions and normals only — L17; this one carried `color` only). **When re-materialising geometry
+you did not build, enumerate every channel its own material carries** — `vertexColors`, `map`,
+`emissive`, `flatShading` — before deciding which to drop. A body that renders as a silhouette is
+the tell.
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)
@@ -236,6 +323,7 @@ against a collider). Before trusting a green test, ask what would have to be tru
 | FOBLOCK genome (parts only, builds nothing) | `foblock.js` |
 | FOBLOCK placement, music diamonds | `fobstations.js` |
 | Upper realm | `sky-layout.js` (contract), `skyrealm.js` (assembly), `sky-*.js` (builders) |
+| Giant rear-city authority monitor (§8) | `broadcast.js` |
 | Free movement: the viewer's own camera | `roam.js` (position, gears, collide-and-slide, input state); `mahplaza.js` owns the handover |
 
 ## Standing diagnostic harness (scratchpad)
