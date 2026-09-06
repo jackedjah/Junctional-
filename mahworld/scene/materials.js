@@ -272,6 +272,13 @@ export function createMaterials(themeIn) {
        The diamond field stays as the roughness and bump map, so the polish is JOINTED — a laid floor
        of enormous black slabs, not one poured mirror — and the joints catch the light differently
        from the faces, which is what keeps it crystalline rather than glassy. */
+    /* v10 §07: UNCHANGED, deliberately. This material was the prime suspect for the pale grazing
+       sheet that ran through the middle distance of every view, and it is not the cause: at 78 m the
+       deck read lum 128, and at runtime envMapIntensity 2.6 -> 0, roughness 0.055 -> 0.15 and
+       metalness 0.98 -> 0 each moved that pixel by two counts or fewer. The fix is the fresnel
+       darkening in mahplaza.js's plaza shader patch, which took it to 69. Do not re-tune the numbers
+       here to chase floor brightness — it has now been measured three times that they do not
+       control it. */
     plaza: new THREE.MeshStandardMaterial({ color: 0x090c12, roughness: 0.055, metalness: 0.98, envMapIntensity: 2.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.010, transparent: true, opacity: 0.94 }),
     road: new THREE.MeshStandardMaterial({ color: 0x0b0e14, roughness: 0.14, metalness: 0.9, roughnessMap: floorTex, envMapIntensity: 1.9 }),
 

@@ -172,12 +172,12 @@ const SEG = 128;            /* cached samples per route (arc-length spaced) */
 const TIER = {
   near: { railR: 0.085, fieldR: 0.72, ts: 84, rs: 5, fts: 34, frs: 5, rail: 0.62, field: 0.085, packet: 1.0 },
   mid:  { railR: 0.115, fieldR: 0.95, ts: 66, rs: 5, fts: 28, frs: 5, rail: 0.5,  field: 0.062, packet: 0.72 },
-  far:  { railR: 0.46,  fieldR: 0,    ts: 20, rs: 4, fts: 0,  frs: 0, rail: 0.17, field: 0, packet: 0.34 }
+  far:  { railR: 0.46,  fieldR: 0,    ts: 20, rs: 4, fts: 0,  frs: 0, rail: 0.115, field: 0, packet: 0.26 }   /* v10 §13: a river, not a lattice */
 };
 /* THE DISTANT MAHGIC FIELD (§11): far routes are generated along a band arcing across the sky, denser
    toward its middle, so together they read as one luminous river of energy — the Milky Way of a world
    whose infrastructure IS light — rather than as thirty separate drawn lines. */
-const FAR_ROUTES = 30;
+const FAR_ROUTES = 22;
 
 function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 function smoothstep(e0, e1, x) { const t = clamp01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); }
@@ -305,10 +305,13 @@ function column(prof, sides, fn) {
   g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0.5, 0), 8);
   return g;
 }
-/* a sampled radius/brightness profile — a column is only as good as its falloff, and both are curves */
-function profile(rings, radius) {
-  const p = [];
-  for (let i = 0; i < rings; i++) { const v = i / (rings - 1); p.push([v, radius(v)]); }
+/* A sampled radius profile — a column is only as good as its falloff, and both radius and brightness
+   are curves. `bias` > 1 clusters the rings toward the BASE, which is where a beam's skirt collapses
+   from five metres to one and a half inside the first thirty; sampling that evenly over 600 m would
+   spend twenty rings on the part that does not change and two on the part that does. */
+function profile(rings, radius, bias) {
+  const p = [], b = bias || 1;
+  for (let i = 0; i < rings; i++) { const v = Math.pow(i / (rings - 1), b); p.push([v, radius(v)]); }
   return p;
 }
 /* a flat quad in the XZ plane, unit square, +Y normal: pools, streaks and spills all lie on a surface */
@@ -383,7 +386,11 @@ export function buildFobeams(ctx) {
   const band = (u, jitter) => {
     const bearing = (-24 + 228 * u) * Math.PI / 180;
     const r = 380 + FR() * 330;
-    const y = 78 + 232 * Math.sin(Math.PI * u) + (jitter ? (FR() - 0.5) * 96 : 0);
+    /* v10 §13: the river ran at 78-310 m across radii of 380-710 m — the same band of sky the near
+       mountain range occupies (700 m, tops near 370 m) and the same band the moon sits in. Thirty
+       lit arcs were drawn straight over the mountains and across the moon, and §13 reserves those
+       sight lines. Lifted so the river passes ABOVE the skyline it used to cross. */
+    const y = 205 + 265 * Math.sin(Math.PI * u) + (jitter ? (FR() - 0.5) * 96 : 0);
     return [Math.cos(bearing) * r, y, -Math.sin(bearing) * r];
   };
   const farRoutes = [];
@@ -572,8 +579,8 @@ export function buildFobeams(ctx) {
 
     const bandTex = beamBandTexture(); owned.textures.push(bandTex);
     bandTex.repeat.set(1, BAND_REPEAT);
-    const beamCoreMat = new THREE.MeshBasicMaterial({ color: theme.energyLight, vertexColors: true, transparent: true, opacity: 0.60, blending: THREE.AdditiveBlending, depthTest: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
-    const beamBandMat = new THREE.MeshBasicMaterial({ map: bandTex, color: theme.energy, vertexColors: true, transparent: true, opacity: 0.46, blending: THREE.AdditiveBlending, depthTest: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
+    const beamCoreMat = new THREE.MeshBasicMaterial({ color: theme.energyLight, vertexColors: true, transparent: true, opacity: 0.44, blending: THREE.AdditiveBlending, depthTest: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
+    const beamBandMat = new THREE.MeshBasicMaterial({ map: bandTex, color: theme.energy, vertexColors: true, transparent: true, opacity: 0.36, blending: THREE.AdditiveBlending, depthTest: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
     const beamSheathMat = new THREE.MeshBasicMaterial({ color: theme.energy, vertexColors: true, transparent: true, opacity: 0.115, blending: THREE.AdditiveBlending, depthTest: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
     const revealMat = new THREE.MeshBasicMaterial({ color: theme.energy, vertexColors: true, transparent: true, opacity: 0.50, blending: THREE.AdditiveBlending, depthTest: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
     const emitterMat = new THREE.MeshBasicMaterial({ color: theme.energyLight, transparent: true, opacity: 0.88, blending: THREE.AdditiveBlending, depthTest: true, depthWrite: false, fog: true });
@@ -591,22 +598,40 @@ export function buildFobeams(ctx) {
        SHEATH  a flared skirt at the pad that narrows and then WIDENS with altitude: the air the
                line energises, and the reason the top dissolves into the sky instead of stopping.
        Every fade reaches exactly zero at v = 1, so no line has an end — it recedes. */
+    /* v10 §13 — WHERE A LINE IS BRIGHT DECIDES WHETHER IT IS ARCHITECTURE OR A BAR OF LIGHT.
+       Both fades ran at their maximum at v = 0 (the core peaked at 1.42) and decayed fast. v = 0 is
+       the pad, which is at EYE LEVEL in every plaza camera, so each of these read as a hard white
+       stripe drawn top-to-bottom through the middle of the composition — brighter than the towers,
+       brighter than the moon, and slicing the frame into vertical bands. The energy is unchanged in
+       total; it has been moved off the eyeline and up the shaft. Each line now enters dim at the
+       aperture, comes up to full within about a tenth of its length, and then decays much more
+       slowly than before, so it carries much further before it reaches zero — which is also what
+       the direction asked for: these go up all the way, and the city goes infinitely up with them. */
+    const rise = (v, floor) => floor + (1 - floor) * Math.min(1, v / 0.10);
     const coreGeo = own(column(profile(18, v => 0.30 * Math.pow(1 - v, 0.28) + 0.055), 10,
-      v => 1.42 * Math.pow(1 - v, 1.55)));
+      v => 1.15 * Math.pow(1 - v, 1.05) * rise(v, 0.30)));
     const bandGeo = own(column(profile(22, v => 0.60 * Math.pow(1 - v, 0.30) + 0.10), 12,
-      v => 0.95 * Math.pow(1 - v, 1.95)));
-    const sheathGeo = own(column(profile(22, v => 1.05 + 5.4 * Math.pow(v, 0.85) + 4.2 * Math.exp(-v * 46)), 10,
-      v => Math.pow(1 - v, 2.6) + 0.95 * Math.exp(-v * 34)));
+      v => 0.80 * Math.pow(1 - v, 1.25) * rise(v, 0.35)));
+    /* the sheath is the one that has to do two things at once: a 5.25 m SKIRT that collapses to 1.6 m
+       inside the first thirty metres — the air the pad's emitter energises, and the reason the line
+       looks like it comes OUT of something — and then a slow widening with altitude so the top
+       dissolves into the sky rather than ending. Rings biased to the base pay for both. */
+    const sheathGeo = own(column(profile(22, v => 1.05 + 5.4 * Math.pow(v, 0.85) + 4.2 * Math.exp(-v * 70), 2.0), 10,
+      v => Math.pow(1 - v, 2.6) + 0.55 * Math.exp(-v * 34)));
     const N_ASC = ASCENTS.length;
     const coreMesh = new THREE.InstancedMesh(coreGeo, beamCoreMat, N_ASC);
     const bandMesh = new THREE.InstancedMesh(bandGeo, beamBandMat, N_ASC);
     const sheathMesh = new THREE.InstancedMesh(sheathGeo, beamSheathMat, N_ASC);
     coreMesh.renderOrder = 6; bandMesh.renderOrder = 5; sheathMesh.renderOrder = 4;
+    coreMesh.name = 'ascent-line-core'; bandMesh.name = 'ascent-line-travel'; sheathMesh.name = 'ascent-line-sheath';
     [coreMesh, bandMesh, sheathMesh].forEach(m => { m.frustumCulled = false; ascentGroup.add(m); });
 
     /* ---- the pads: real architecture, not a decal on the floor -------------------------------
-       Three receding chamfered courses, a low mirror-grade coping, four canted mast blades and four
-       buttresses at the diamond's points. Turned 45° so the pad sits IN ground.js's diamond lattice. */
+       Two receding chamfered courses in the dark grade, a low platinum coping, four canted mast
+       blades and four buttresses at the diamond's points. Turned 45° so the pad sits IN ground.js's
+       diamond lattice rather than across it, and its coping lines up with the cell edges it stands
+       on. The blades are what the ascent line is answered BY: they are the adjacent geometry law 2
+       asks for, and without them a 500 m beam would be standing on nothing. */
     const _bm = new THREE.Matrix4(), _bq = new THREE.Quaternion(), _be = new THREE.Euler(), _bp = new THREE.Vector3(), _bs = new THREE.Vector3(1, 1, 1);
     const padParts = [], copeParts = [], mastParts = [], emitParts = [];
     function put(list, geo, x, y, z, rx, ry, rz) {
@@ -616,7 +641,11 @@ export function buildFobeams(ctx) {
     const D45 = Math.PI / 4;
     const courseA = chamferBox(8.4, 0.30, 8.4, 0.14), courseB = chamferBox(6.6, 0.36, 6.6, 0.12);
     const copeGeo = chamferBox(5.4, 0.22, 5.4, 0.07);
-    const bladeGeo = chamferBox(1.5, 5.2, 0.42, 0.12), buttGeo = chamferBox(0.9, 1.5, 1.9, 0.10);
+    /* THE CRADLE CLEARANCE, and it is measured, not guessed. The docked pod's belt is 2.6 m in
+       radius and its section only drops below the blades' inner face (2.54 m, leaning in to 2.35 m
+       at the top) beneath world y 5.42. So the blades top out at 4.85 and the pod's widest line
+       stands above them: a 5.2 m blade at a 10° cant put steel through the hull. */
+    const bladeGeo = chamferBox(1.5, 3.8, 0.42, 0.12), buttGeo = chamferBox(0.9, 1.5, 1.9, 0.10);
     const plateGeo = chamferBox(3.0, 0.12, 3.0, 0.05), barGeo = chamferBox(0.16, 0.07, 2.3, 0.02);
     ASCENTS.forEach(A => {
       put(padParts, courseA, A.x, DECK_Y + 0.15, A.z, 0, D45, 0);
@@ -626,14 +655,22 @@ export function buildFobeams(ctx) {
         /* blades stand on the diagonals of the turned pad and lean 10° INWARD, so their inner faces
            are tilted toward the line and catch it — a vertical mirror grade doing the job it can do */
         const a = D45 + i * Math.PI / 2, ry = Math.PI / 2 - a;
-        put(mastParts, bladeGeo, A.x + Math.cos(a) * 2.55, PAD_TOP + 2.55, A.z + Math.sin(a) * 2.55, -0.17, ry, 0);
+        put(mastParts, bladeGeo, A.x + Math.cos(a) * 2.75, PAD_TOP + 1.90, A.z + Math.sin(a) * 2.75, -0.10, ry, 0);
+        /* a buttress at each of the pad diamond's four points, leaning out. Its height is set from
+           its own tilted corner: at y 0.95 the lowest corner lands at 0.01, so it is ROOTED in the
+           deck (top 0.17) without ever breaking through the ground plane at y = 0 and appearing
+           under the floor in the assembly's reflection group. */
         const b = i * Math.PI / 2;
-        put(mastParts, buttGeo, A.x + Math.cos(b) * 3.15, PAD_TOP - 0.22, A.z + Math.sin(b) * 3.15, 0.22, Math.PI / 2 - b, 0);
+        put(mastParts, buttGeo, A.x + Math.cos(b) * 3.15, PAD_TOP - 0.10, A.z + Math.sin(b) * 3.15, 0.22, Math.PI / 2 - b, 0);
       }
       /* the emitter: a square-diamond plate the line leaves from, inside a square-diamond outline of
          four bars — the reserved mark at pad scale, the same figure the whole world is built on */
       put(emitParts, plateGeo, A.x, PAD_TOP + 0.07, A.z, 0, D45, 0);
-      for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2; put(emitParts, barGeo, A.x + Math.cos(a) * 1.55, PAD_TOP + 0.04, A.z + Math.sin(a) * 1.55, 0, Math.PI / 2 - a + D45, 0); }
+      /* the outline's four bars stand on the DIAGONALS, each turned tangential (a rotation of −a maps
+         a Z-long bar onto the tangent), which puts the figure's points back on the world axes — the
+         same square diamond as the pad it is inlaid into, and as the plate inside it. The 0.35 m gap
+         left at each corner is deliberate: this is the world's diamond OUTLINE, four marks, not a ring. */
+      for (let i = 0; i < 4; i++) { const a = D45 + i * Math.PI / 2; put(emitParts, barGeo, A.x + Math.cos(a) * 1.55, PAD_TOP + 0.04, A.z + Math.sin(a) * 1.55, 0, -a, 0); }
     });
     [courseA, courseB, copeGeo, bladeGeo, buttGeo, plateGeo, barGeo].forEach(g => g.dispose());
     const padMesh = new THREE.Mesh(own(mergeGeos(padParts, ['position', 'normal'])), padMat);
@@ -656,11 +693,11 @@ export function buildFobeams(ctx) {
     let revealMesh = null;
     for (let i = 0; i < 4; i++) {
       const a = D45 + i * Math.PI / 2, ry = Math.PI / 2 - a;
-      const pl = new THREE.PlaneGeometry(1.32, 4.9, 2, 6);
-      _be.set(-0.17, ry, 0, 'YXZ'); _bq.setFromEuler(_be);
-      /* the blade's inner face is at radius 2.34 (centre 2.55, half-depth 0.21); the reveal sits
+      const pl = new THREE.PlaneGeometry(1.32, 3.5, 2, 6);
+      _be.set(-0.10, ry, 0, 'YXZ'); _bq.setFromEuler(_be);
+      /* the blade's inner face is at radius 2.54 (centre 2.75, half-depth 0.21); the reveal sits
          0.04 m PROUD of it, toward the line, so it can never z-fight with the metal it lies on */
-      _bp.set(Math.cos(a) * 2.30, 2.55, Math.sin(a) * 2.30);
+      _bp.set(Math.cos(a) * 2.50, 1.90, Math.sin(a) * 2.50);
       _bm.compose(_bp, _bq, _bs); pl.applyMatrix4(_bm);
       revealParts.push(pl);
     }
@@ -805,6 +842,123 @@ export function buildFobeams(ctx) {
       const m = flowMeshes[i];
       m.material.opacity = m.userData.base * dim * (0.82 + 0.18 * Math.sin(t * m.userData.drift + m.userData.phase));
     }
+    stepAscent(t);
+  }
+
+  /* ---- the ascent cycle -----------------------------------------------------------------------
+     Everything below is a pure function of ABSOLUTE t, so a capture at a given second reproduces
+     exactly and nothing carries spawn state between frames. No allocation: the per-line records and
+     every scratch vector were made at build time. */
+  const _lm = new THREE.Matrix4(), _lp = new THREE.Vector3(), _lq = new THREE.Quaternion(), _ls = new THREE.Vector3();
+  const _upAxis = new THREE.Vector3(0, 1, 0);
+  function stepAscent(t) {
+    const A = ascent, MS = A.meshes;
+    if (!MS) return;
+    /* ONE shared texture scrolls all three lines; each line's own height turns the same v-space
+       scroll into a different metres-per-second, which is why they never march in step */
+    A.tex.offset.y = -((t * BAND_RATE) % 1);
+    for (let i = 0; i < A.lines.length; i++) {
+      const L = A.lines[i];
+      let u = ((t / CYCLE + L.phase) % 1 + 1) % 1;
+      let charge = 0, burst = 0, podOn = 0, podY = DOCK_Y, field = 3.2;
+      if (u >= U_ARRIVE && u < U_DOCK) {
+        /* ARRIVAL: the same energy in reverse. It comes down the line out of the sky, decelerating
+           hard, and the burst peaks at the moment it settles onto its field. */
+        const k = (u - U_ARRIVE) / (U_DOCK - U_ARRIVE);
+        podOn = 1; podY = DOCK_Y + DROP * Math.pow(1 - k, DROP_POW);
+        charge = 0.30 + 0.70 * (1 - k);
+        burst = Math.exp(-(1 - k) * 3.6);
+        field = 3.2 + 12 * Math.pow(1 - k, 1.7);
+      } else if (u >= U_DOCK && u < U_FIRE) {
+        /* DOCKED, then PREPARING: over 24 s the shell brightens, the seams light, the underside
+           field spools up and the line beneath charges — the departure is visible long before it
+           happens, which is the whole point of it being a departure and not a disappearance. */
+        podOn = 1;
+        podY = DOCK_Y + 0.07 * Math.sin(t * 0.55 + i * 2.1);   /* it stands on its field; it never quite sits */
+        charge = 0.10 + 0.90 * smoothstep(U_PREP, U_READY, u);
+        field = 3.2 + 1.6 * charge;
+      } else if (u >= U_FIRE && u < U_GONE) {
+        /* LAUNCH: 2.4 s of extreme vertical acceleration and one burst of POWER at ignition. No
+           fireball, no debris — the pod is intact the whole way and is back on this line next cycle. */
+        const k = (u - U_FIRE) / (U_GONE - U_FIRE);
+        podOn = 1; podY = DOCK_Y + CLIMB * Math.pow(k, CLIMB_POW);
+        charge = 1; burst = Math.exp(-k * 3.2);
+        field = 3.2 + 14 * smoothstep(0, 0.22, k) * (1 - 0.45 * k);
+      } else if (u >= U_GONE && u < U_COLD) {
+        charge = 1 - smoothstep(U_GONE, U_COLD, u);            /* the pad cools over ~11 s */
+      }
+      L.charge = charge; L.burst = burst; L.podOn = podOn; L.podY = podY; L.field = field;
+
+      const beam = 1 + 0.55 * charge + 2.1 * burst;
+      MS.core.instanceColor.setXYZ(i, beam, beam, beam);
+      MS.band.instanceColor.setXYZ(i, beam, beam, beam);
+      MS.sheath.instanceColor.setXYZ(i, beam, beam, beam);
+      const rev = 0.85 + 0.60 * charge + 1.9 * burst;
+      MS.reveal.instanceColor.setXYZ(i, rev, rev, rev);
+
+      /* the pod: one transform for the hull family, one for the field it stands on */
+      const s = L.pod * podOn;
+      _lq.identity(); _lp.set(L.x, podY, L.z); _ls.set(s, s, s); _lm.compose(_lp, _lq, _ls);
+      MS.shell.setMatrixAt(i, _lm); MS.belt.setMatrixAt(i, _lm); MS.glass.setMatrixAt(i, _lm); MS.seam.setMatrixAt(i, _lm);
+      const fw = (1.5 + 1.1 * burst) * s;
+      _lp.set(L.x, podY + POD_BOTTOM * s, L.z); _ls.set(fw, -L.field * podOn, fw); _lm.compose(_lp, _lq, _ls);
+      MS.field.setMatrixAt(i, _lm);
+      const hull = 1 + 0.55 * charge + 1.1 * burst;
+      MS.shell.instanceColor.setXYZ(i, hull, hull, hull);
+      MS.belt.instanceColor.setXYZ(i, hull, hull, hull);
+      MS.glass.instanceColor.setXYZ(i, hull, hull, hull);
+      const sm = 0.28 + 0.72 * charge + 1.6 * burst;
+      MS.seam.instanceColor.setXYZ(i, sm, sm, sm);
+      const fd = 0.30 + 0.70 * charge + 1.4 * burst;
+      MS.field.instanceColor.setXYZ(i, fd, fd, fd);
+
+      /* the floor and the coping: spill, pool and streak all surge together */
+      const fl = 0.34 + 0.50 * charge + 1.5 * burst;
+      MS.floor.instanceColor.setXYZ(i * 3, fl * 1.15, fl * 1.15, fl * 1.15);
+      MS.floor.instanceColor.setXYZ(i * 3 + 1, fl, fl, fl);
+      MS.floor.instanceColor.setXYZ(i * 3 + 2, fl * 0.92, fl * 0.92, fl * 0.92);
+    }
+    MS.core.instanceColor.needsUpdate = MS.band.instanceColor.needsUpdate = MS.sheath.instanceColor.needsUpdate = true;
+    MS.reveal.instanceColor.needsUpdate = MS.floor.instanceColor.needsUpdate = true;
+    MS.shell.instanceColor.needsUpdate = MS.belt.instanceColor.needsUpdate = MS.glass.instanceColor.needsUpdate = true;
+    MS.seam.instanceColor.needsUpdate = MS.field.instanceColor.needsUpdate = true;
+    MS.shell.instanceMatrix.needsUpdate = MS.belt.instanceMatrix.needsUpdate = MS.glass.instanceMatrix.needsUpdate = true;
+    MS.seam.instanceMatrix.needsUpdate = MS.field.instanceMatrix.needsUpdate = true;
+  }
+
+  /* THE FLOOR'S SECOND COPY. On black platinum at roughness 0.055 the reflection of a vertical light
+     is a STREAK running from its base toward the viewer, and it lengthens as the view gets more
+     grazing — so it has to be re-aimed at whatever camera is actually looking, every frame, or it is
+     only correct from one. Nine quads, one draw call: per line a spill lying on the pad coping, a
+     round pool on the deck, and the streak. */
+  function orientAscent() {
+    const A = ascent, MS = A.meshes;
+    if (!MS) return;
+    for (let i = 0; i < A.lines.length; i++) {
+      const L = A.lines[i];
+      /* the coping spill has to STAY ON THE COPING or it is a glowing sheet hanging a metre over the
+         deck: the coping is a 5.4 m diamond, so the largest square that fits inside it is 3.8 across
+         and this disc is sized from that, not from how big the glow would like to be */
+      const r = 1.75 + 0.45 * L.charge;
+      _lq.identity();
+      _lp.set(L.x, PAD_TOP + 0.04, L.z); _ls.set(r * 2, 1, r * 2); _lm.compose(_lp, _lq, _ls);
+      MS.floor.setMatrixAt(i * 3, _lm);
+      const pr = 26 + 16 * L.charge + 12 * L.burst;
+      _lp.set(L.x, DECK_Y + 0.08, L.z); _ls.set(pr, 1, pr); _lm.compose(_lp, _lq, _ls);
+      MS.floor.setMatrixAt(i * 3 + 1, _lm);
+      /* the streak: aimed along the ground at the camera, and longer the further away (and therefore
+         the more grazing) the view is — clamped so a camera standing on the pad does not get a bar */
+      let dx = _camPos.x - L.x, dz = _camPos.z - L.z;
+      const d = Math.hypot(dx, dz);
+      if (d < 1e-3) { dx = 0; dz = 1; }
+      const len = Math.min(96, Math.max(14, d * 0.62)) * (1 + 0.3 * L.charge + 0.4 * L.burst);
+      const w = (5.2 + 3.4 * L.charge + 4 * L.burst);
+      _lq.setFromAxisAngle(_upAxis, Math.atan2(dx, dz));
+      _lp.set(L.x + (dx / (d || 1)) * len * 0.42, DECK_Y + 0.09, L.z + (dz / (d || 1)) * len * 0.42);
+      _ls.set(w, 1, len); _lm.compose(_lp, _lq, _ls);
+      MS.floor.setMatrixAt(i * 3 + 2, _lm);
+    }
+    MS.floor.instanceMatrix.needsUpdate = true;
   }
 
   /* orient every packet: the long axis follows the path, the roll is billboarded so the
@@ -839,6 +993,7 @@ export function buildFobeams(ctx) {
       lightMesh.setMatrixAt(i, _mat);
     }
     packetMesh.instanceMatrix.needsUpdate = true; lightMesh.instanceMatrix.needsUpdate = true;
+    orientAscent();
   }
   /* if the assembly never calls update(), the motion still runs — but only while frames are
      actually drawn, so a reduced-motion session stays still */
@@ -857,6 +1012,10 @@ export function buildFobeams(ctx) {
     lightMat.opacity = base.light * dim;
     arriveMat.opacity = base.arrive * dim;
     flowMeshes.forEach(m => { m.material.opacity = m.userData.base * dim; });
+    /* the ascent network dims with the day too — but only its LIGHT. The pods' shell, belt and
+       glazing are physical objects lit by the scene, and a craft that faded out at noon would be a
+       hologram; only what the network EMITS follows the clock. */
+    if (ascent.mats) { const A = ascent; Object.keys(A.mats).forEach(k => { A.mats[k].opacity = A.base[k] * dim; }); }
     return dim;
   }
   function setTheme(t) {
@@ -865,6 +1024,12 @@ export function buildFobeams(ctx) {
     railMat.color.setHex(t.energyLight); packetMat.color.setHex(t.energyLight); arriveMat.color.setHex(t.energyLight);
     fieldMat.color.setHex(t.energy); lightMat.color.setHex(t.energy);
     flowMeshes.forEach(m => m.material.color.setHex(t.energy));
+    if (ascent.mats) {
+      const A = ascent.mats;
+      A.core.color.setHex(t.energyLight); A.emitter.color.setHex(t.energyLight); A.seam.color.setHex(t.energyLight);
+      A.band.color.setHex(t.energy); A.sheath.color.setHex(t.energy); A.reveal.color.setHex(t.energy);
+      A.floor.color.setHex(t.energy); A.field.color.setHex(t.energy);
+    }
     return t;
   }
   function update(t, dt) { driven = true; step(t, dt); }
@@ -875,6 +1040,7 @@ export function buildFobeams(ctx) {
     packetMesh.onBeforeRender = function () {};
     if (group.parent) group.parent.remove(group);
     packetMesh.dispose(); lightMesh.dispose(); headMesh.dispose(); arriveMesh.dispose();
+    if (ascent.meshes) Object.keys(ascent.meshes).forEach(k => { const m = ascent.meshes[k]; if (m && m.dispose) m.dispose(); });
     owned.geometries.forEach(g => g.dispose());
     owned.materials.forEach(m => m.dispose());
     owned.textures.forEach(t => t.dispose());
@@ -887,6 +1053,20 @@ export function buildFobeams(ctx) {
   setTheme(theme);
   step(0, 0.016); orient(null);
 
+  /* MEASURED, not estimated: walk what was actually built and count what the renderer will issue.
+     An InstancedMesh is ONE draw call and count × its geometry's triangles, which is the whole
+     reason the network is instanced. The +2 is the pair of mirrored copies the assembly builds
+     under the deck from this module's two ctx.reflect() registrations. */
+  const ascentCost = (() => {
+    let calls = 0, tris = 0;
+    ascentGroup.traverse(o => {
+      if (!o.isMesh) return;
+      const g = o.geometry, n = o.isInstancedMesh ? o.count : 1;
+      calls++; tris += ((g.index ? g.index.count : g.attributes.position.count) / 3) * n;
+    });
+    return { drawCalls: calls + 2, triangles: Math.round(tris), meshes: calls, reflections: 2, lights: 0 };
+  })();
+
   const tierCount = t => routes.filter(r => r.tier === t).length;
   const stats = {
     routes: routes.filter(r => r.from != null).map(r => ({ id: r.id, tier: r.tier, from: nodeList[r.from].id, to: nodeList[r.to].id, length: Math.round(r.len), speed: r.speed, packets: r.count })),
@@ -895,9 +1075,16 @@ export function buildFobeams(ctx) {
     packets: N,
     receivers: nodeList.length,
     flows: flowMeshes.length,
-    drawCalls: 2 + 2 + 3 + flowMeshes.length,          /* rail, field | packets, lights | receivers ×3 | flows */
-    triangles: routes.reduce((n, r) => { const T = TIER[r.tier]; return n + T.ts * T.rs * 2 + T.fts * T.frs * 2; }, 0) + N * 10 + nodeList.length * 90 + flowMeshes.length * 120,
+    ascent: {
+      lines: ascent.lines.map(L => ({ id: L.id, at: [L.x, L.z], height: L.h, podScale: L.pod, phase: L.phase })),
+      cycle: CYCLE, launchSeconds: +((U_GONE - U_FIRE) * CYCLE).toFixed(2), climb: CLIMB,
+      drawCalls: ascentCost.drawCalls, meshes: ascentCost.meshes, reflections: ascentCost.reflections,
+      triangles: ascentCost.triangles, lightsAdded: 0,
+      pools: typeof ctx.lightPool === 'function' ? ASCENTS.length : 0
+    },
+    drawCalls: 2 + 2 + 3 + flowMeshes.length + ascentCost.drawCalls,   /* rail, field | packets, lights | receivers ×3 | flows | ascent */
+    triangles: routes.reduce((n, r) => { const T = TIER[r.tier]; return n + T.ts * T.rs * 2 + T.fts * T.frs * 2; }, 0) + N * 10 + nodeList.length * 90 + flowMeshes.length * 120 + ascentCost.triangles,
     legacyHidden: retired.length
   };
-  return { group, setTime, setTheme, update, dispose, stats, routes: stats.routes };
+  return { group, setTime, setTheme, update, dispose, stats, routes: stats.routes, ascent: stats.ascent };
 }

@@ -81,10 +81,13 @@ const CAST = [
   { id: 'sunset-1', site: 'overlook', role: 'watch', lod: 'near', patrol: 0, spread: 11, colour: 'violet' },
   { id: 'ring-1', site: 'ringNear', role: 'ring', lod: 'mid', patrol: 0, spread: 5, colour: 'teal' },
   { id: 'ring-2', site: 'ringNear', role: 'ring', lod: 'mid', patrol: 0, spread: 5, colour: 'crimson' },
-  { id: 'flyer-1', site: 'launchPylons', role: 'learn', lod: 'far', patrol: 5, spread: 20, colour: 'green' },
+  { id: 'flyer-1', site: 'launchPylons', role: 'learn', lod: 'far', patrol: 5, spread: 9, colour: 'green' },
   { id: 'arrival-2', site: 'staging', role: 'walk', lod: 'near', patrol: 12, spread: 17, colour: 'silver' },
   { id: 'sunset-2', site: 'overlook', role: 'watch', lod: 'mid', patrol: 0, spread: 13, colour: 'platinum' },
-  { id: 'flyer-2', site: 'launchPylons', role: 'learn', lod: 'far', patrol: 6, spread: 24, colour: 'purple' },
+  /* the two flyers are placed CLOSE on purpose: a lesson only reads as a lesson if the one who can
+     already hover and the one who cannot are in the same frame, and neither is ever moved to the
+     other, so their spacing has to be right here or not at all */
+  { id: 'flyer-2', site: 'launchPylons', role: 'learn', lod: 'far', patrol: 6, spread: 12, colour: 'purple' },
   { id: 'rest-1', site: 'restDeck', role: 'watch', lod: 'mid', patrol: 0, spread: 6, colour: 'emerald' },
   { id: 'arrival-3', site: 'staging', role: 'walk', lod: 'mid', patrol: 14, spread: 19, colour: 'blue' }
 ];
@@ -688,10 +691,13 @@ export function buildSkyLife(ctx) {
         const S = SKILL[ev.kind === 'lesson' ? (i === 0 ? 1 : 0) : ev.skill];
         const fail = ev.kind === 'lesson' ? (i === 1 && ev.seed > 0.5) : ev.fail;
         const ph = ev.seed * 6.283 + i * 2.1;
-        /* the takeoff point is where this person would be standing anyway, read live */
-        ambientXZ(actors[ev.cast[0]], tt, _amb);
-        const ox = i === 0 ? 0 : -3.6, oz = i === 0 ? 0 : 1.4;
-        const bx = _amb.x + ox, bz = _amb.z + oz;
+        /* EACH takes off from where IT would be standing — not from an offset beside the teacher.
+           Placing the lesson's beginner at "the other one's position minus 3.6 m" moved it 17 m
+           across the pylon flank the instant the lesson began (measured, then fixed). The two read
+           as a pair because their homes are a few metres apart, which is a placement decision in the
+           cast table, not something to fake in the frame. */
+        ambientXZ(a, tt, _amb);
+        const bx = _amb.x, bz = _amb.z;
         const h = hoverHeight(S, u, fail, ph);
         /* DIRECTIONAL DRIFT on the hold, and only for the one who can hold a hover: a hover that
            goes somewhere is what separates "I am off the ground" from "I am flying". It goes out and
@@ -1003,8 +1009,13 @@ export function buildSkyLife(ctx) {
   function setQuality(q) {
     if (QUALITY[q]) tier = q;
     const want = QUALITY[tier].residents;
-    const grounded = Math.min(GROUNDED, want);
-    const sil = Math.max(0, want - grounded);
+    /* THE SILHOUETTES ARE RESERVED, not left over. An impostor is one draw call and 60 triangles;
+       a grounded resident is three or four calls and several hundred. So when the budget tightens,
+       dropping a person from the apron and KEEPING a MAHBEING crossing the sunset is both the
+       cheaper cut and the better realm — a rare silhouette is worth more per triangle than anything
+       else in this module (§28). Only 'low', at five people, gives them up. */
+    const sil = want >= 12 ? SILHOUETTES.length : want >= 8 ? 2 : 0;
+    const grounded = Math.min(GROUNDED, Math.max(1, want - sil));
     for (let i = 0; i < actors.length; i++) {
       const a = actors[i];
       const on = a.kind === 'resident' ? a.index < grounded : (a.index - GROUNDED) < sil;

@@ -21,7 +21,10 @@
                       vertical architecture — 620–1500 m of cloud, 1.4–3 km out (§17).
      4  THE SEA       the rolling cloud ocean out to seaRadius*0.75, cheap per square metre and
                       enormous in extent (§33, §46).
-     5  DISTURBANCE   disturb(x, z, r, strength): a pooled, self-reforming press + vapour response the
+     5  THE DRIFT     the realm's weather: mist banks crossing the low ground on one wind, wisps that
+                      come off them, a slow breathing of the cloud surface, and sunlit motes in the
+                      air. All of it pooled, deterministic and rewritten in place.
+     6  DISTURBANCE   disturb(x, z, r, strength): a pooled, self-reforming press + vapour response the
                       ascent and life modules call when something lands, launches or hits (§29–§31).
 
    THE TWO CONTRACT LAWS, and how this file keeps them
@@ -1173,7 +1176,334 @@ export function buildSkyTerrain(ctx) {
     mistGeo.attributes.color.needsUpdate = true;
   }
 
-  /* ============================================ 6. THE DISTURBANCE POOL — disturb() (§29, §30, §31) */
+  /* ================================================================== 6. THE DRIFT (§01, §26, §49) */
+  /* PEACE IS NOT STILLNESS, IT IS SLOW MOVEMENT. A realm whose only motion is a texture offset reads
+     as a photograph of weather rather than as weather; what makes a place feel calm instead of paused
+     is air that is always going somewhere and never arrives. Four things move here — the mist banks,
+     the wisps that come off them, the breath of the floor itself and the motes in the air — and all
+     four obey the same three rules:
+
+       ONE WIND           everything drifts along a single bearing. Four independent motions read as
+                          four effects; one shared motion reads as air.
+       NOTHING ARRIVES    a bank FORMS at the upwind end of its lane, crosses, and DISSOLVES at the
+                          downwind end. Nothing is ever cut off, nothing loops visibly back.
+       NOTHING ACCELERATES  1.1–3.0 m/s over 160–700 m of lane, so a bank takes three to eleven
+                          minutes to cross and a wisp one to five. Anything the eye can watch speed
+                          up reads as an effect rather than as weather.
+
+     COST. Three objects — one quad mesh, one sheet, one point cloud — and per frame 40 quads, 181
+     sheet vertices and 260 motes rewritten IN PLACE. Every buffer here is preallocated and every
+     colour is baked from the same LUTs as the rest of the module, once per band change (§45). */
+  const WIND_BEARING = 0.22;      /* just off the sunset axis: the air moves TOWARD the sun the whole
+                                     realm is looking at, and skewed enough never to read as a grid */
+  const WIND = layout.dir(WIND_BEARING);
+  const WIND_NX = -WIND.z, WIND_NZ = WIND.x;      /* the across-wind axis, for the weave */
+
+  /* ------------------------------------------------------- 6a. the banks, and the wisps off them */
+  /* A drifter is a soft atlas mass travelling a straight lane along the wind. Its lane is SAMPLED
+     AGAINST THE REAL CLOUD at build time — nine waypoints of position and thinness — so a bank
+     follows the floor into a valley and sags and thins as it leaves the deck, which is how one pours
+     over the sunset cliff instead of sailing out over the void at deck height (§05).
+
+     WHY A LANE AND NOT A LOOP. A closed path large enough not to read as circling costs more sample
+     points than the whole system is worth, and a small one visibly orbits. A straight lane with a
+     sin(pi*u) fade at both ends is a mass that forms, crosses and dissolves — the honest behaviour of
+     a mist bank — and it can never pop, because it is already at zero alpha when it wraps. */
+  const DRIFT_K = 9;                              /* waypoints per lane */
+  const NBANK = 16, NWISP = 24, NDRIFT = NBANK + NWISP;
+  const dfPts = new Float32Array(NDRIFT * DRIFT_K * 4);   /* x, y, z, thinness per waypoint */
+  const dfSpeed = new Float32Array(NDRIFT);       /* lane crossings per second */
+  const dfPhase = new Float32Array(NDRIFT);
+  const dfW = new Float32Array(NDRIFT), dfH = new Float32Array(NDRIFT);
+  const dfWeave = new Float32Array(NDRIFT);       /* how far it wanders across the wind */
+  const dfPeak = new Float32Array(NDRIFT);        /* peak alpha at mid-lane */
+  const dfBear = new Float32Array(NDRIFT);        /* lane-centre bearing, for the colour bake */
+  const dfPos = new Float32Array(NDRIFT * 12);
+  const dfUV = new Float32Array(NDRIFT * 8);
+  const dfCol = new Float32Array(NDRIFT * 16);
+  let driftGeo = null, driftMesh = null;
+  /* how many drifters a tier draws. Banks are built first and wisps second, so trimming this keeps
+     the masses that carry the realm's weather and drops the decoration — never the reverse. */
+  let driftDrawn = NDRIFT;
+  {
+    const R = layout.rng('skybiome-drift');
+    /* WHERE MIST COLLECTS. The contract's three valleys, because that is what a valley is for (§05),
+       plus eight open stretches between the boundary banks where a crossing mass has room to be read
+       against something. Anchors are reused with jitter rather than listed one per drifter: the
+       lanes want to feel like weather over a landscape, not like sixteen authored props. */
+    const ANCH = FEATURES.filter(f => f.kind === 'valley').map(f => ({ b: f.bearing, r: f.r }))
+      .concat([{ b: 0.10, r: 245 }, { b: -0.55, r: 300 }, { b: 0.85, r: 175 }, { b: 1.20, r: 520 },
+               { b: -1.30, r: 470 }, { b: 2.30, r: 330 }, { b: -2.10, r: 250 }, { b: -1.85, r: 640 }]);
+    const laneCx = new Float32Array(NBANK), laneCz = new Float32Array(NBANK), laneHalf = new Float32Array(NBANK);
+    for (let d = 0; d < NDRIFT; d++) {
+      const bank = d < NBANK;
+      let cx, cz, half;
+      if (bank) {
+        const A = ANCH[d % ANCH.length];
+        const cd = layout.dir(A.b + (R() - 0.5) * 0.34);
+        const rr = A.r * (0.84 + R() * 0.34);
+        half = 180 + R() * 170;
+        const off = (R() - 0.5) * 70;
+        cx = cd.x * rr + WIND_NX * off; cz = cd.z * rr + WIND_NZ * off;
+        laneCx[d] = cx; laneCz[d] = cz; laneHalf[d] = half;
+      } else {
+        /* A WISP TRAVELS ITS PARENT BANK'S OWN CORRIDOR, offset across the wind, lifted above it and
+           running a shorter stretch of it. That literally-shared lane is the whole reason it reads as
+           something that came OFF the bank rather than as a second, smaller, unrelated cloud — and it
+           is why the lane centres are kept rather than re-rolled from the anchor. */
+        const parent = (d - NBANK) % NBANK;
+        const off = (R() < 0.5 ? -1 : 1) * (30 + R() * 52);
+        cx = laneCx[parent] + WIND_NX * off; cz = laneCz[parent] + WIND_NZ * off;
+        half = laneHalf[parent] * (0.45 + R() * 0.25);
+      }
+      const lift = bank ? 3 + R() * 15 : 16 + R() * 36;
+      for (let k = 0; k < DRIFT_K; k++) {
+        const u = (k / (DRIFT_K - 1)) * 2 - 1;
+        const x = cx + WIND.x * half * u, z = cz + WIND.z * half * u;
+        const solid = layout.deckSolid(x, z);
+        const o = (d * DRIFT_K + k) * 4;
+        dfPts[o] = x; dfPts[o + 1] = cloudTopAt(x, z) + lift - (solid ? 0 : 17); dfPts[o + 2] = z;
+        dfPts[o + 3] = 0.26 + 0.74 * smooth(layout.deckEdge(x, z) / 0.45);
+      }
+      /* speed is metres per second divided by the lane length, so a long lane is not a fast one */
+      dfSpeed[d] = (bank ? 1.1 + R() * 0.9 : 1.6 + R() * 1.4) / (2 * half);
+      dfPhase[d] = R();
+      dfW[d] = bank ? 115 + R() * 155 : 24 + R() * 36;
+      dfH[d] = bank ? 32 + R() * 46 : 13 + R() * 21;
+      dfWeave[d] = (bank ? 14 + R() * 22 : 6 + R() * 12);
+      dfPeak[d] = bank ? 0.30 + R() * 0.15 : 0.22 + R() * 0.16;
+      dfBear[d] = layout.bearingOf(cx, cz);
+      /* atlas cell and flip, chosen the way addQuad() chooses them, so a drifter is drawn from the
+         same four lobes as every other soft mass in the realm */
+      const cell = (d * 5 + 1) & 3, flip = R() < 0.5;
+      const cu = (cell % 2) * 0.5, cv = ((cell >> 1) & 1) * 0.5;
+      const u0 = cu + PAD, u1 = cu + 0.5 - PAD, v0 = cv + PAD, v1 = cv + 0.5 - PAD;
+      for (let k = 0; k < 4; k++) {
+        const left = (k === 0 || k === 3);
+        dfUV[(d * 4 + k) * 2] = left ? (flip ? u1 : u0) : (flip ? u0 : u1);
+        dfUV[(d * 4 + k) * 2 + 1] = (k === 0 || k === 1) ? v0 : v1;
+      }
+    }
+    const idx = new Uint32Array(NDRIFT * 6);
+    for (let d = 0; d < NDRIFT; d++) {
+      const v = d * 4, o = d * 6;
+      idx[o] = v; idx[o + 1] = v + 1; idx[o + 2] = v + 2;
+      idx[o + 3] = v; idx[o + 4] = v + 2; idx[o + 5] = v + 3;
+    }
+    driftGeo = own.g(new THREE.BufferGeometry());
+    driftGeo.setAttribute('position', new THREE.BufferAttribute(dfPos, 3).setUsage(THREE.DynamicDrawUsage));
+    driftGeo.setAttribute('uv', new THREE.BufferAttribute(dfUV, 2));
+    driftGeo.setAttribute('color', new THREE.BufferAttribute(dfCol, 4).setUsage(THREE.DynamicDrawUsage));
+    driftGeo.setIndex(new THREE.BufferAttribute(idx, 1));
+    driftGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e6);   /* it moves: never cull it */
+    /* NORMAL blending, not additive, and no depth write. Two overlapping banks may composite in the
+       wrong order — they move, so no build-time far-to-near sort can help — but at a peak alpha of
+       0.45 between two masses of nearly the same colour that error is below the noise floor, whereas
+       additive mist would glow and stop being cloud. */
+    const dmat = own.m(new THREE.MeshBasicMaterial({
+      map: atlas, vertexColors: true, transparent: true, opacity: 0.92,
+      depthWrite: false, side: THREE.DoubleSide, fog: false, forceSinglePass: true
+    }));
+    dmat.name = 'skyterrain-drift';
+    driftMesh = new THREE.Mesh(driftGeo, dmat);
+    driftMesh.name = 'skyterrain-drift';
+    driftMesh.frustumCulled = false; driftMesh.renderOrder = 6;
+    driftMesh.castShadow = false; driftMesh.receiveShadow = false;
+    group.add(driftMesh);
+  }
+  function bakeDrift() {
+    /* the same two-tone every soft mass in this module takes: a crown carrying the key at its own
+       bearing, a base sitting in soft blue bounce. Only the RGB is written here — update() owns the
+       alpha channel, because alpha is where the drift actually lives. */
+    for (let d = 0; d < NDRIFT; d++) {
+      sampleLUT(lutFill, dfBear[d], _c);
+      sampleLUT(lutSky, dfBear[d], _c2);
+      const back = backlight(dfBear[d]);
+      const kf = (0.22 + 0.44 * back) * sunStr;
+      const gain = (0.94 + 0.34 * back);
+      const tr = (_c.r + (sunCol.r - _c.r) * kf) * gain;
+      const tg = (_c.g + (sunCol.g - _c.g) * kf) * gain;
+      const tb = (_c.b + (sunCol.b - _c.b) * kf) * gain;
+      const br = (_c.r * 0.60 + (_c2.r * 0.62 - _c.r * 0.60) * 0.50) * gain;
+      const bg = (_c.g * 0.60 + (_c2.g * 0.62 - _c.g * 0.60) * 0.50) * gain;
+      const bb = (_c.b * 0.60 + (_c2.b * 0.62 - _c.b * 0.60) * 0.50) * gain;
+      for (let k = 0; k < 4; k++) {
+        const p = d * 16 + k * 4, top = (k === 2 || k === 3);
+        dfCol[p] = top ? tr : br; dfCol[p + 1] = top ? tg : bg; dfCol[p + 2] = top ? tb : bb;
+      }
+    }
+    driftGeo.attributes.color.needsUpdate = true;
+  }
+
+  /* ------------------------------------------------------------- 6b. the breath of the floor itself */
+  /* The deck's own vertices cannot move: three meshes share that position buffer and rebuilding it
+     per frame would cost more than everything else in this module put together. So the breathing is
+     carried by a COARSE VAPOUR SHEET lying just over the walkable deck, whose 181 vertices rise, fall
+     and thicken on two very slow travelling waves. That is enough, because what the eye reads as a
+     surface breathing is the vapour ON it changing thickness, not the geometry moving.
+
+     It is deliberately damped over the arrival plateau and the training flats: the ground a player
+     has to trust must not visibly swell (§04, §06) — the same rule the deck's own shading follows. */
+  const BR_SEG = 30, BR_RING = 6, BR_R = 620;
+  const brCount = 1 + BR_SEG * BR_RING;
+  const brBase = new Float32Array(brCount * 4);       /* x, resting y, z, alpha ceiling */
+  const brAlong = new Float32Array(brCount), brAcross = new Float32Array(brCount);
+  const brPos = new Float32Array(brCount * 3);
+  const brCol = new Float32Array(brCount * 4);
+  const brBear = new Float32Array(brCount);
+  let breathGeo = null, breathMesh = null;
+  {
+    const uv = new Float32Array(brCount * 2);
+    const BRUV = 1 / 430;      /* deliberately NOT the skin's 1/260: two layers of the same texture at
+                                  the same scale moiré, at different scales they beat, and the beat is
+                                  most of what makes a still surface look alive */
+    const put = (v, x, z) => {
+      const rr = Math.sqrt(x * x + z * z);
+      /* 4.2 m up, and the wave below swings +-2.8, so the sheet never falls closer than 1.4 m to the
+         floor it lies on — the deck writes depth, and a veil that dips into it would be clipped away
+         exactly where it is meant to be thickest */
+      brBase[v * 4] = x; brBase[v * 4 + 1] = cloudTopAt(x, z) + 4.2; brBase[v * 4 + 2] = z;
+      brBase[v * 4 + 3] = (layout.deckSolid(x, z) ? 1 : 0)
+        * smooth(layout.deckEdge(x, z) / 0.35)
+        * (1 - 0.62 * stability(x, z))
+        * (1 - smooth((rr - BR_R * 0.70) / (BR_R * 0.30)));   /* the sheet must not end on a circle */
+      brAlong[v] = x * WIND.x + z * WIND.z;
+      brAcross[v] = x * WIND_NX + z * WIND_NZ;
+      brBear[v] = layout.bearingOf(x, z);
+      brPos[v * 3] = x; brPos[v * 3 + 1] = brBase[v * 4 + 1]; brPos[v * 3 + 2] = z;
+      uv[v * 2] = x * BRUV; uv[v * 2 + 1] = z * BRUV;
+    };
+    put(0, 0, 0);
+    for (let i = 1; i <= BR_RING; i++) {
+      const r = BR_R * Math.pow(i / BR_RING, 1.45);     /* dense where the player stands, coarse out */
+      for (let j = 0; j < BR_SEG; j++) {
+        const b = (j / BR_SEG) * TAU - Math.PI;
+        put(1 + (i - 1) * BR_SEG + j, Math.sin(b) * r, -Math.cos(b) * r);
+      }
+    }
+    const idx = [];
+    const bAt = (i, j) => 1 + (i - 1) * BR_SEG + (j % BR_SEG);
+    for (let j = 0; j < BR_SEG; j++) idx.push(0, bAt(1, j + 1), bAt(1, j));
+    for (let i = 1; i < BR_RING; i++) for (let j = 0; j < BR_SEG; j++) {
+      const a = bAt(i, j), b = bAt(i, j + 1), c = bAt(i + 1, j + 1), dd = bAt(i + 1, j);
+      idx.push(a, c, b, a, dd, c);
+    }
+    breathGeo = own.g(new THREE.BufferGeometry());
+    breathGeo.setAttribute('position', new THREE.BufferAttribute(brPos, 3).setUsage(THREE.DynamicDrawUsage));
+    breathGeo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    breathGeo.setAttribute('color', new THREE.BufferAttribute(brCol, 4).setUsage(THREE.DynamicDrawUsage));
+    breathGeo.setIndex(idx);
+    breathGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), BR_R * 1.4);
+    const bmat = own.m(new THREE.MeshBasicMaterial({
+      /* 0.62, and the alpha below peaks at 0.40, so the thickest breath is a quarter-opaque veil.
+         It has to stay under the vapour skin's own weight: two full-deck white layers at the skin's
+         strength would lift the floor's value and flatten the contrast the whole deck is graded for
+         (§14) — this layer is here to be SEEN MOVING, not to be seen. */
+      map: vapour, vertexColors: true, transparent: true, depthWrite: false,
+      side: THREE.FrontSide, fog: false, opacity: 0.62
+    }));
+    bmat.name = 'skyterrain-breath';
+    breathMesh = new THREE.Mesh(breathGeo, bmat);
+    breathMesh.name = 'skyterrain-breath';
+    breathMesh.frustumCulled = false; breathMesh.renderOrder = 1;   /* under the skin, over the deck */
+    breathMesh.castShadow = false; breathMesh.receiveShadow = false;
+    group.add(breathMesh);
+  }
+  function bakeBreath() {
+    for (let v = 0; v < brCount; v++) {
+      sampleLUT(lutFill, brBear[v], _c);
+      const back = backlight(brBear[v]);
+      const kf = (0.20 + 0.30 * back) * sunStr;
+      const o = v * 4;
+      brCol[o] = (0.88 * (0.55 + 0.45 * _c.r)) + (sunCol.r - 0.88) * kf * 0.5;
+      brCol[o + 1] = (0.90 * (0.55 + 0.45 * _c.g)) + (sunCol.g - 0.90) * kf * 0.5;
+      brCol[o + 2] = (0.94 * (0.55 + 0.45 * _c.b)) + (sunCol.b - 0.94) * kf * 0.5;
+    }
+    breathGeo.attributes.color.needsUpdate = true;
+  }
+
+  /* --------------------------------------------------------------------------------- 6c. the motes */
+  /* Dust, ice and vapour hanging in the air and catching a sun that is almost horizontal. They are
+     the smallest thing in the realm and they do the most per triangle, because they are what tells
+     the eye there is AIR here rather than empty space between the camera and the floor.
+
+     They wander rather than travel: three slow sines each, 40–170 second periods, over amplitudes of
+     a few metres. A mote that crossed the realm on the wind would have to wrap, and a wrap is a pop.
+     Every one is seeded over solid cloud, so nothing hangs above a void (contract law 1). */
+  const MOTE_N = 260;
+  const mtBase = new Float32Array(MOTE_N * 3);
+  const mtAmp = new Float32Array(MOTE_N * 3);
+  const mtRate = new Float32Array(MOTE_N * 3);
+  const mtPhase = new Float32Array(MOTE_N * 3);
+  const mtPos = new Float32Array(MOTE_N * 3);
+  const mtCol = new Float32Array(MOTE_N * 3);
+  const mtBear = new Float32Array(MOTE_N), mtGain = new Float32Array(MOTE_N);
+  let moteGeo = null, motes = null, moteTex = null, moteDrawn = MOTE_N;
+  {
+    const R = layout.rng('skybiome-motes');
+    for (let i = 0; i < MOTE_N; i++) {
+      let x = 0, z = 0;
+      for (let tries = 0; tries < 12; tries++) {
+        const a = R() * TAU, rr = 26 + Math.sqrt(R()) * 254;
+        x = Math.sin(a) * rr; z = -Math.cos(a) * rr;
+        if (layout.deckSolid(x, z)) break;
+      }
+      const b3 = i * 3;
+      /* biased to the first few metres: the air is thickest just above the cloud, and a mote at eye
+         height reads while one thirty metres up is a speck */
+      mtBase[b3] = x; mtBase[b3 + 1] = cloudTopAt(x, z) + 1.2 + Math.pow(R(), 1.7) * 30; mtBase[b3 + 2] = z;
+      mtAmp[b3] = 3 + R() * 11; mtAmp[b3 + 1] = 0.8 + R() * 3.4; mtAmp[b3 + 2] = 3 + R() * 11;
+      mtRate[b3] = 0.037 + R() * 0.11; mtRate[b3 + 1] = 0.048 + R() * 0.10; mtRate[b3 + 2] = 0.037 + R() * 0.11;
+      mtPhase[b3] = R() * TAU; mtPhase[b3 + 1] = R() * TAU; mtPhase[b3 + 2] = R() * TAU;
+      mtPos[b3] = x; mtPos[b3 + 1] = mtBase[b3 + 1]; mtPos[b3 + 2] = z;
+      mtBear[i] = layout.bearingOf(x, z);
+      mtGain[i] = 0.45 + R() * 0.55;
+      /* motes are drawn far-to-near so the point cloud composites without a per-frame sort */
+    }
+    /* one soft round sprite, drawn once: a hard-edged point reads as a pixel artefact */
+    moteTex = own.t(canvasTexture(64, 64, (g, W) => {
+      const grd = g.createRadialGradient(W / 2, W / 2, 0, W / 2, W / 2, W / 2);
+      grd.addColorStop(0, 'rgba(255,255,255,1)');
+      grd.addColorStop(0.35, 'rgba(255,255,255,0.55)');
+      grd.addColorStop(1, 'rgba(255,255,255,0)');
+      g.clearRect(0, 0, W, W);
+      g.fillStyle = grd; g.beginPath(); g.arc(W / 2, W / 2, W / 2, 0, TAU); g.fill();
+    }));
+    moteGeo = own.g(new THREE.BufferGeometry());
+    moteGeo.setAttribute('position', new THREE.BufferAttribute(mtPos, 3).setUsage(THREE.DynamicDrawUsage));
+    moteGeo.setAttribute('color', new THREE.BufferAttribute(mtCol, 3).setUsage(THREE.DynamicDrawUsage));
+    moteGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 340);
+    const mmat = own.m(new THREE.PointsMaterial({
+      map: moteTex, size: 0.42, sizeAttenuation: true, vertexColors: true,
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false
+    }));
+    mmat.name = 'skyterrain-motes';
+    motes = new THREE.Points(moteGeo, mmat);
+    motes.name = 'skyterrain-motes';
+    motes.frustumCulled = false; motes.renderOrder = 10;
+    group.add(motes);
+  }
+  function bakeMotes() {
+    /* A MOTE IS A BACKLIT PARTICLE. Facing the sun it is a bright speck of the sun's own colour; with
+       the sun behind the camera it is barely there. That contrast is the whole read.
+       AND THE DRIVER IS THE SUN'S ELEVATION, NOT THE HOUR. Forward scatter needs the light nearly
+       edge-on, so the field is at full strength at dawn and dusk and drops to a seventh of it at
+       midday — which is what "catching the LOW sun" physically means, and it is why this is keyed to
+       the contract's own sun direction rather than to the clock's daylight number. */
+    const graze = 0.14 + 0.86 * (1 - smooth((Math.abs(_sun.y) - 0.05) / 0.45));
+    for (let i = 0; i < MOTE_N; i++) {
+      sampleLUT(lutFill, mtBear[i], _c);
+      const back = backlight(mtBear[i]);
+      const k = mtGain[i] * (0.10 + 0.78 * back * back) * sunStr * graze;
+      const b3 = i * 3;
+      mtCol[b3] = (_c.r * 0.35 + sunCol.r * 0.65) * k;
+      mtCol[b3 + 1] = (_c.g * 0.35 + sunCol.g * 0.65) * k;
+      mtCol[b3 + 2] = (_c.b * 0.35 + sunCol.b * 0.65) * k;
+    }
+    moteGeo.attributes.color.needsUpdate = true;
+  }
+
+  /* ============================================ 7. THE DISTURBANCE POOL — disturb() (§29, §30, §31) */
   /* A launch, a GYMATTACK or a hover presses the cloud down and it reforms. Everything is POOLED and
      preallocated: disturb() writes into a free slot and allocates nothing, and update() rewrites two
      small dynamic buffers rather than touching the deck (a deck rebuild per impact would cost more
@@ -1314,6 +1644,7 @@ export function buildSkyTerrain(ctx) {
   function bakeAll() {
     bakeDeck(); bakeSea(); bakeIslands(); bakeMist();
     bakeQuads(nearSet); bakeQuads(towerFinished); bakeQuads(seaSet); bakeQuads(islandSkinSet);
+    bakeDrift(); bakeBreath(); bakeMotes();
   }
 
   function setTime(state) {
@@ -1355,9 +1686,79 @@ export function buildSkyTerrain(ctx) {
     /* the sea's swell tops drift very slowly around the world: 0.9 m/s at 1.5 km */
     seaSet.mesh.rotation.y = t * 0.0006;
 
+    const camX = camera ? camera.position.x : 0, camZ = camera ? camera.position.z : 0;
+
+    /* ---- the drift: banks and wisps crossing their lanes ---- */
+    if (driftMesh.visible) {
+      for (let d = 0; d < driftDrawn; d++) {
+        /* where along the lane, 0..1. The wrap is invisible because the fade below is already zero
+           at both ends — a mass dissolves before it can be cut off (§ the drift's second rule). */
+        let u = t * dfSpeed[d] + dfPhase[d];
+        u -= Math.floor(u);
+        const f = u * (DRIFT_K - 1);
+        let i0 = f | 0; if (i0 > DRIFT_K - 2) i0 = DRIFT_K - 2;
+        const g = f - i0;
+        const a0 = (d * DRIFT_K + i0) * 4, a1 = a0 + 4;
+        /* the lane already carries the cloud's own height and thinness, sampled at build */
+        const lx = dfPts[a0] + (dfPts[a1] - dfPts[a0]) * g;
+        const ly = dfPts[a0 + 1] + (dfPts[a1 + 1] - dfPts[a0 + 1]) * g;
+        const lz = dfPts[a0 + 2] + (dfPts[a1 + 2] - dfPts[a0 + 2]) * g;
+        const thin = dfPts[a0 + 3] + (dfPts[a1 + 3] - dfPts[a0 + 3]) * g;
+        const ph = dfPhase[d];
+        /* one weave across the wind on a six-minute period, so no two crossings trace the same line */
+        const weave = Math.sin(t * 0.0166 + ph * 6.283) * dfWeave[d];
+        const x = lx + WIND_NX * weave, z = lz + WIND_NZ * weave;
+        const y = ly + Math.sin(t * 0.041 + ph * 4.7) * 1.6;
+        const fade = Math.sin(Math.PI * u);
+        const alpha = dfPeak[d] * thin * fade * (0.35 + 0.65 * fade)
+          * (0.80 + 0.20 * Math.sin(t * 0.033 + ph * 9.1));
+        const swell = 1 + 0.07 * Math.sin(t * 0.026 + ph * 3.7);
+        /* yawed at the camera, like the disturbance puffs: these travel hundreds of metres, so a
+           build-time yaw at the origin would show them edge-on somewhere along every lane */
+        let nx = camX - x, nz = camZ - z;
+        const inv = 1 / Math.max(1e-3, Math.sqrt(nx * nx + nz * nz));
+        nx *= inv; nz *= inv;
+        const rxv = nz, rzv = -nx;
+        const hw = dfW[d] * 0.5 * swell, hh = dfH[d] * 0.5 * swell;
+        for (let k = 0; k < 4; k++) {
+          const cx2 = (k === 0 || k === 3) ? -hw : hw;
+          const cy2 = (k === 0 || k === 1) ? -hh : hh;
+          const vv = (d * 4 + k) * 3;
+          dfPos[vv] = x + rxv * cx2; dfPos[vv + 1] = y + cy2; dfPos[vv + 2] = z + rzv * cx2;
+          dfCol[(d * 4 + k) * 4 + 3] = alpha * ((k === 2 || k === 3) ? 1 : 0.60);
+        }
+      }
+      driftGeo.attributes.position.needsUpdate = true;
+      driftGeo.attributes.color.needsUpdate = true;
+    }
+
+    /* ---- the breath: two travelling waves through the vapour over the deck ---- */
+    if (breathMesh.visible) {
+      for (let v = 0; v < brCount; v++) {
+        /* phase speed = omega / k, so these are 2.2 m/s and 1.5 m/s — a walking pace and slower */
+        const s = Math.sin(brAlong[v] * 0.0355 - t * 0.078) * 0.62
+                + Math.cos(brAcross[v] * 0.0227 - t * 0.034) * 0.38;
+        const o4 = v * 4;
+        brPos[v * 3 + 1] = brBase[o4 + 1] + s * 2.8;
+        brCol[o4 + 3] = brBase[o4 + 3] * (0.10 + 0.30 * (s * 0.5 + 0.5));
+      }
+      breathGeo.attributes.position.needsUpdate = true;
+      breathGeo.attributes.color.needsUpdate = true;
+    }
+
+    /* ---- the motes: three slow sines each, and never a wrap ---- */
+    if (motes.visible) {
+      for (let i = 0; i < moteDrawn; i++) {
+        const b3 = i * 3;
+        mtPos[b3] = mtBase[b3] + Math.sin(t * mtRate[b3] + mtPhase[b3]) * mtAmp[b3];
+        mtPos[b3 + 1] = mtBase[b3 + 1] + Math.sin(t * mtRate[b3 + 1] + mtPhase[b3 + 1]) * mtAmp[b3 + 1];
+        mtPos[b3 + 2] = mtBase[b3 + 2] + Math.cos(t * mtRate[b3 + 2] + mtPhase[b3 + 2]) * mtAmp[b3 + 2];
+      }
+      moteGeo.attributes.position.needsUpdate = true;
+    }
+
     /* ---- the disturbance pool ---- */
     let activePress = 0, activePuff = 0;
-    const camX = camera ? camera.position.x : 0, camZ = camera ? camera.position.z : 0;
     for (let i = 0; i < SLOTS; i++) {
       const S = slots[i];
       if (!S.live) continue;
@@ -1458,6 +1859,16 @@ export function buildSkyTerrain(ctx) {
     mistMat.opacity = K.mist;
     mistMesh.visible = K.mist > 0.05;
     underMesh.visible = name !== 'low';
+    /* THE DRIFT DEGRADES BY COUNT, NEVER BY SPEED. Slowing the weather down to save work would be a
+       different world, not a cheaper one, so a tier drops masses and keeps every survivor moving at
+       the speed it was authored at. The breath is a single 330-triangle sheet and the cheapest thing
+       here per unit of life, so it is the last to go; the motes are pure overdraw and the first. */
+    driftDrawn = Math.max(NBANK >> 1, Math.round(NDRIFT * (name === 'low' ? 0.45 : name === 'medium' ? 0.78 : 1)));
+    driftGeo.setDrawRange(0, driftDrawn * 6);
+    moteDrawn = name === 'low' ? 0 : Math.round(MOTE_N * (name === 'medium' ? 0.55 : 1));
+    moteGeo.setDrawRange(0, moteDrawn);
+    motes.visible = moteDrawn > 0;
+    breathMesh.visible = name !== 'low';
     deckMat.side = name === 'low' ? THREE.DoubleSide : THREE.FrontSide;
     deckMat.needsUpdate = true;
     if (stats) measure();
@@ -1482,8 +1893,11 @@ export function buildSkyTerrain(ctx) {
     nearForms: nearSet.n, seaForms: seaSet.n, towerForms: towerFinished.n, islandSkins: islandSkinSet.n,
     islands: ISLANDS.length, towers: TOWERS.length, mistSheets: mistSheets.length,
     disturbSlots: SLOTS,
-    drawCalls: 0, triangles: 0, trianglesPeak: 0, disturbTrianglesPeak: 0,
+    driftBanks: NBANK, driftWisps: NWISP, breathVertices: brCount, moteCount: MOTE_N,
+    drawCalls: 0, triangles: 0, trianglesPeak: 0, disturbTrianglesPeak: 0, points: 0,
     get band() { return band; },
+    get drawnDrifters() { return driftDrawn; },
+    get drawnMotes() { return moteDrawn; },
     get drawnTowers() { return towerFinished.drawnRuns; },
     get drawnIslands() { return islandsSet.drawn; }
   };
@@ -1491,8 +1905,18 @@ export function buildSkyTerrain(ctx) {
      the draw range every quality pass left behind (§45, §46). The disturbance pool is idle at build,
      so its ceiling is reported separately. */
   function measure() {
-    stats.drawCalls = 0; stats.triangles = 0; stats.trianglesPeak = 0;
+    stats.drawCalls = 0; stats.triangles = 0; stats.trianglesPeak = 0; stats.points = 0;
     group.traverse(o => {
+      /* THE POINT CLOUD IS A DRAW CALL TOO. Counting only isMesh would let the motes cost the frame
+         a submission this module never reported, which is exactly the kind of quiet under-reporting
+         a measured budget exists to prevent (§45). */
+      if (o.isPoints && o.geometry) {
+        const pg = o.geometry, pdr = pg.drawRange;
+        const n = (pdr && pdr.count != null && pdr.count !== Infinity)
+          ? Math.min(pdr.count, pg.attributes.position.count) : pg.attributes.position.count;
+        if (o.visible) { stats.drawCalls++; stats.points += n; }
+        return;
+      }
       if (!o.isMesh || !o.geometry) return;
       const g = o.geometry;
       const full = g.index ? g.index.count : g.attributes.position.count;

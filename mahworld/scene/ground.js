@@ -130,6 +130,91 @@ function crystalStud(reach, foot, base) {
   return g;
 }
 
+/* ================= THE GLASS SHARDS SET INTO THIS FLOOR (v9) =========================================
+   One deterministic stream for the whole shard field — the same sixty crystals on every load, on every
+   machine, and not one of them animates. Same LCG materials.js uses for its procedural textures. */
+function shardRandom(seed) { let s = (seed >>> 0) || 9; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+/* ONE SHARD. A crystal grown on the square-diamond section — the brand's own figure, and under LAW 6
+   the single form in this world allowed a point — stacked as rings of `sides` vertices and closed with
+   a blunt crown. `profile` is the silhouette as [radius, height] fractions bottom to top; `wide`
+   squashes the section in local z, which is what turns a prism into a SLIVER, and it is applied before
+   the piece is yawed into place so a lozenge can lie at any bearing.
+
+   THE JITTER IS THE WHOLE POINT. All three shard grades are flatShading, so a FACET is the unit of
+   shading: two adjacent faces one degree apart return two different slices of the environment. A ring
+   whose vertices all sit at one radius and one height is an extruded prism and reads as machined; the
+   same ring broken ±25% is a crystal. Deterministic, never animated, exactly like the floor cells' own
+   per-cell tilt above.
+
+   AND THE TIP IS TRUNCATED. The direction that asked for shards is the same direction that asked for
+   everything sharp in the architecture to be rounded off, and people walk on this floor: every piece
+   below closes on a small crown ring lifted off the last ring, never drawn to a needle.
+   Triangles: sides * (2 * (rings - 1) + 2). */
+function shardGeo(sides, profile, rad, hgt, wide, jit, rnd) {
+  const pos = [];
+  const tri = (a, b, c) => { pos.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]); };
+  const quad = (a, b, c, d) => { tri(a, b, c); tri(a, c, d); };
+  const twist = rnd() * Math.PI * 2;
+  /* wound +x toward −z, the same winding as crystalCell, so every face comes out with an outward
+     normal and no fix-up pass is needed */
+  const rings = profile.map(([pr, ph], k) => {
+    const out = [];
+    for (let i = 0; i < sides; i++) {
+      const a = twist + i / sides * Math.PI * 2;
+      const rr = rad * pr * (1 - jit + rnd() * jit * 2);
+      /* the base ring stays level: it meets a socket, or it is buried in the paving, and a broken
+         base ring would show daylight under one edge of every piece */
+      const yy = hgt * ph + (k === 0 ? 0 : (rnd() - 0.5) * jit * hgt * 0.5);
+      out.push([Math.cos(a) * rr, yy, -Math.sin(a) * rr * wide]);
+    }
+    return out;
+  });
+  const top = rings[rings.length - 1], bot = rings[0];
+  let ty = 0, by = 0;
+  for (let i = 0; i < sides; i++) { ty += top[i][1]; by += bot[i][1]; }
+  const crown = [0, ty / sides + hgt * 0.07, 0];      /* blunt, not pointed (LAW 6) */
+  const foot = [0, by / sides - hgt * 0.05, 0];
+  for (let k = 0; k < rings.length - 1; k++) {
+    const A = rings[k], B = rings[k + 1];
+    for (let i = 0; i < sides; i++) { const j = (i + 1) % sides; quad(A[i], A[j], B[j], B[i]); }
+  }
+  for (let i = 0; i < sides; i++) { const j = (i + 1) % sides; tri(top[i], top[j], crown); tri(bot[j], bot[i], foot); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.computeVertexNormals();
+  return g;
+}
+
+/* THE SOCKET a standing shard rises out of. Four cut faces opening a square-diamond in the paving —
+   the same figure the crossing studs above are inlaid into — so a shard reads as SET INTO this floor
+   rather than stood on it, and the meeting of glass and metal is a turned edge instead of a line.
+   LAW 1 decides its material and it is not a free choice: the crown band's normal points UP, and a
+   metalness-1.0 band facing a near-black zenith renders black. That would put a black ring around
+   every shard on the plaza — the same mistake this file already made once on a bench top. The whole
+   collar is therefore the LOW-METALNESS platinum grade, which takes the hemisphere and reads.
+   Sized on the shard's own footprint (rx, rz) rather than scaled from a shared unit collar, because a
+   non-uniform scale after the fact leaves every normal in the mesh wrong by exactly the amount the law
+   above cares about. Rings outer → crown → inner → throat; 24 triangles. */
+function shardSocket(rx, rz) {
+  const P = [];
+  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + Math.PI / 4; P.push([Math.cos(a), -Math.sin(a)]); }
+  const ring = (s, y) => P.map(p => [p[0] * rx * s, y, p[1] * rz * s]);
+  const pos = [];
+  const tri = (a, b, c) => { pos.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]); };
+  const quad = (a, b, c, d) => { tri(a, b, c); tri(a, c, d); };
+  /* the skirt starts BELOW the deck so the collar emerges from the paving instead of sitting on it */
+  const bands = [ring(1.0, FLOOR_TOP - 0.055), ring(0.94, FLOOR_TOP + 0.045), ring(0.62, FLOOR_TOP + 0.028), ring(0.5, FLOOR_TOP - 0.14)];
+  for (let k = 0; k < 3; k++) {
+    const A = bands[k], B = bands[k + 1];
+    for (let i = 0; i < 4; i++) { const j = (i + 1) % 4; quad(A[i], A[j], B[j], B[i]); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.computeVertexNormals();
+  return g;
+}
+
 /* A ribbon of glow laid along a LINE of light — the ring, the routing channels. Three ribs: dark at
    the edges, bright down the middle, so an inlaid seam reads as light lying ON the floor instead of
    a drawn line. Vertex colour carries only the falloff (greyscale); the material carries the hue,
@@ -246,6 +331,27 @@ export function buildGround(ctx) {
      is the only property a black mirror has. Cells stay semi-transparent over the mirrored emissive
      copies the assembly builds under the deck.
      Cost: seven merged meshes — 69 cells, 120 joints, 52 studs — and no per-frame work.               */
+  /* ---- v10 §07 THE FLOOR WAS NOT BLACK: IT IS A MOON PATH --------------------------------------
+     A pale sheet ran across the middle distance of every view — brighter than the architecture,
+     brighter than the mountains, and in the 180 degree proof it was the brightest thing in a frame
+     whose subject is a mountain horizon. §07 asks for ultra-pristine black.
+
+     The obvious suspects were both WRONG, and both were tested rather than argued: with the deck at
+     78 m measuring lum 128 against mountains at 6-29, setting envMapIntensity to ZERO at runtime
+     changed the pixel by nothing at all, and removing the planar-mirror shader patch made the floor
+     BRIGHTER (161), not darker. So it was never the environment map and never the reflection pass.
+
+     Raising roughness (0.045 -> 0.135 here) moved the pixel by NOTHING either, so it is not a tight
+     specular lobe on these materials. Metalness 0.98 -> 0 moved it by two counts. The measured
+     conclusion is blunt: at this grazing angle the deck's value is not governed by any parameter on
+     these materials, so nothing set here can correct it. Every value in this block is therefore
+     restored to exactly what the v8/v9 passes chose, because three separate attempts to fix the
+     problem from this file were all fixing the wrong term.
+
+     The lever that DID respond is in mahplaza.js, in the shader patch that module already owns on
+     the plaza floor: a fresnel-keyed darkening applied after the reflection mix took 78 m from 128
+     to 69 and 47 m from 85 to 49 while leaving the deck at your feet untouched. The correction lives
+     there, next to the measurement that found it. */
   const heroMat = new THREE.MeshStandardMaterial({ color: 0x080b11, roughness: 0.045, metalness: 0.98, envMapIntensity: 2.9, transparent: true, opacity: 0.86, flatShading: true });
   const satinMat = new THREE.MeshStandardMaterial({ color: 0x0a0e16, roughness: 0.13, metalness: 0.96, envMapIntensity: 2.2, transparent: true, opacity: 0.92, flatShading: true });
   const contrastMat = new THREE.MeshStandardMaterial({ color: 0x0d1220, roughness: 0.085, metalness: 0.97, envMapIntensity: 2.5, transparent: true, opacity: 0.88, flatShading: true });
@@ -458,6 +564,203 @@ export function buildGround(ctx) {
     ctx.lightPool({ x: mx, z: mz, rx: 30, rz: 30, k: 0.5 });
   }
 
+  /* ---------------------------------------------------------------------------------------------
+     GLASS SHARDS SET INTO THE FLOOR (v9, art-directed) — "some of the floor as well".
+
+     WHY THE FLOOR IS THE RIGHT PLACE FOR THEM, AND THE WHOLE ARGUMENT FOR THE COMPOSITION BELOW.
+     This floor is a near mirror at roughness 0.055 AND the assembly renders a true planar reflection
+     of the entire scene through the deck plane. So a shard that stands proud of it is TWO objects for
+     the price of one: the crystal, and its complete inverted twin running away from its own contact
+     line. That pairing is the effect, not the shard, which is why every standing piece below is
+     placed where a hero camera sees the pair and not merely the piece — the arrival threshold at
+     z ≈ 26 (14 m from the in-world camera) and the monument's south-west forecourt.
+
+     THREE GRADES, AND THE SPLIT IS A COST DECISION (materials.js, shards). A transmissive material
+     makes three render an extra scene pass and the mirror already costs a second, so:
+       shardFacet  the MANY — 48 pieces inlaid flush in the paving and 14 standing ones. No
+                   transmission: a faceted crystal that fakes it with roughness 0.11, a clearcoat and
+                   envMapIntensity 2.6. At the size these read at, a refracted displacement would
+                   never have been legible; the environment catch on a broken facet is the whole read.
+       shardHero   the FEW — THREE, argued for one at a time below, because true refraction with
+                   dispersion is only worth its pass where the camera comes close and where there is
+                   something bright BEHIND the glass for it to bend.
+     Cost: four merged meshes — inlays, standing pieces, sockets, heroes — and no per-frame work.
+
+     THIS PACKAGE EMITS NOTHING. Not one emissive, not one THREE.Light: shards are the opposite of an
+     emitter, they are the thing that answers one. The only light it touches is three small caustics
+     laid where an existing source is bent by an existing hero shard, and each names its source.  */
+  {
+    const rnd = shardRandom(20936);
+
+    /* THE THREE HERO SHARDS.  [x, z, height, radius, yaw, leanX, leanZ]
+       On "refraction needs something behind it": a transmissive body over black platinum with nothing
+       behind it refracts blackness and reads as a grey lump, so each of these three was placed against
+       a NAMED bright thing and checked from the cameras that actually exist in VIEWS.
+
+       The one placement that was tested and REJECTED is worth recording, because it is the obvious
+       one: standing a hero shard in front of the monument's lit core. From every camera in the plaza's
+       +z half the corridor that would achieve it is the line from the camera to (0, 7) — which is the
+       MAH MATCH approach, the mark, the wordmark and the resident group, all of them reserved. So the
+       three below take the other two answers instead, and take them literally.
+
+       H1  the FORECOURT shard, 5 m off the monument's south-west corner. It stands inside the
+           monument's own 30 m themed pool and 9.5 m from the monument point light (intensity 30,
+           range 34), so the floor it refracts is the brightest gradient on the plaza and the light
+           entering it is a real source rather than an emissive rectangle.
+       H2  and
+       H3  the THRESHOLD PAIR, straddling the circulation ring at radius 27 either side of the axis.
+           They stand ACROSS a lit inlay: the ring itself (M.energySoft) and its glow ribbon pass
+           under each of them and out both sides, which is exactly the bright line a refracting body
+           needs to break. H2 is 14.7 m from the in-world camera — the closest the world gets to a
+           hero shard, and the only distance at which dispersion is actually resolvable. The 15.2 m
+           gap between them frames the approach without standing in it.
+
+       ALL THREE CLEAR MAH MATCH, MEASURED rather than eyeballed. Against the entrance opening's own
+       bearing cone (18 m wide, and ±3.5° from the arrival camera at 148 m) the tightest of the three
+       is H1, clear by 1.41° of bearing from `establishing` and by 7.9° from `in-world`; from
+       `match-approach` all three are behind the camera. On plan the approach band is 5.2 m wide and
+       the narrowest gap any of them leaves beside it is H2's 3.85 m of open paving. */
+    const HERO = [
+      [-8.2, 1.0, 4.2, 1.35, 0.62, 0.00, 0.10],
+      [7.6, 25.9, 3.8, 1.15, -0.42, 0.07, -0.08],
+      [-7.6, 25.9, 3.4, 1.05, 0.48, 0.06, 0.09]
+    ];
+    /* THE STANDING FACETED SHARDS. Three families at the feet of the three heroes — a big crystal with
+       two or three smaller ones around it reads as ONE outcrop breaking through the paving, where the
+       same pieces spread evenly read as three lonely objects — and five more out on the flanks where
+       the lateral cameras cross the floor. Every one of them is under 2.2 m: they are what a resident
+       walks between, not what a resident walks around. */
+    const STANDING = [
+      [-10.4, 2.6, 1.50, 0.62, 0.9, 0.06, -0.05], [-6.4, -1.6, 0.95, 0.48, -0.5, -0.05, 0.07], [-9.9, -1.2, 1.90, 0.70, 2.1, 0.04, 0.08],
+      [9.9, 27.6, 1.60, 0.60, 0.4, -0.06, 0.05], [5.9, 28.9, 0.85, 0.44, 1.7, 0.05, -0.04], [9.2, 23.6, 1.25, 0.52, -1.1, 0.03, 0.06],
+      [-9.9, 27.6, 1.35, 0.58, -0.7, 0.05, -0.06], [-5.9, 28.9, 1.05, 0.46, 2.4, -0.04, 0.05], [-9.2, 23.6, 1.80, 0.66, 1.2, 0.06, 0.03],
+      [-15.8, 30.6, 2.10, 0.78, 0.3, 0.04, -0.07], [16.4, 31.2, 1.70, 0.68, -1.4, -0.05, 0.05],
+      [-23.4, 12.6, 1.30, 0.55, 2.0, 0.06, 0.04], [22.8, 11.4, 1.45, 0.60, -0.9, -0.03, -0.06],
+      [-2.8, 33.8, 1.10, 0.50, 1.5, 0.05, 0.05]
+    ];
+
+    const inlays = [], standing = [], sockets = [], heroes = [];
+    /* one shard, placed: yaw first, then a few degrees off plumb, because a crystal that grew out of a
+       floor is never plumb and a plumb one reads as a post that was planted */
+    const setShard = (list, geo, x, y, z, ry, tx, tz) => {
+      _e.set(tx, ry, tz); _q.setFromEuler(_e); _v.set(x, y, z); _s.set(1, 1, 1); _m4.compose(_v, _q, _s);
+      geo.applyMatrix4(_m4); list.push(geo);
+    };
+    const collideGeo = new THREE.BoxGeometry(1, 1, 1);       /* ONE unit box, scaled per shard: colliders are invisible, so this costs nothing but the mesh */
+    const addCollider = (x, z, rad, h) => {
+      const c = new THREE.Mesh(collideGeo, M.curb);
+      c.position.set(x, FLOOR_TOP + h / 2, z); c.scale.set(rad * 2.0, h, rad * 2.0); c.visible = false;
+      g.add(c); (ctx.colliders = ctx.colliders || []).push(c);
+    };
+    /* the collar follows the shard's own squashed footprint and turns with it, with a floor of 0.28 m
+       on the narrow axis so a thin sliver still gets a collar wide enough to read as a turned edge */
+    const socketAt = (x, z, rad, wide, ry) => setShard(sockets, shardSocket(rad * 1.3, rad * wide * 1.3 + 0.28), x, 0, z, ry, 0, 0);
+
+    for (const [x, z, h, rad, ry, tx, tz] of HERO) {
+      /* eight sides and four rings: the heroes are the only pieces the camera comes close enough to
+         read facet by facet, and a richer section is where the dispersion fringes live */
+      setShard(heroes, shardGeo(8, [[1.0, 0.0], [0.95, 0.22], [0.70, 0.58], [0.30, 1.0]], rad, h, 0.62, 0.22, rnd), x, FLOOR_TOP - 0.12, z, ry, tx, tz);
+      socketAt(x, z, rad, 0.62, ry);
+      addCollider(x, z, rad, h);
+    }
+    for (const [x, z, h, rad, ry, tx, tz] of STANDING) {
+      setShard(standing, shardGeo(6, [[1.0, 0.0], [0.88, 0.34], [0.46, 1.0]], rad, h, 0.55, 0.25, rnd), x, FLOOR_TOP - 0.10, z, ry, tx, tz);
+      socketAt(x, z, rad, 0.55, ry);
+      if (h >= 1.5) addCollider(x, z, rad, h);              /* anything at head height; the low pieces are stepped over, not walked around */
+    }
+
+    /* WHERE AN INLAY MAY NOT GO. Only the things a 20 cm inlay would actually spoil are listed: the
+       two brand inlays, the monument, the civic ring, the walking routes (plaza-dressing.js lays its
+       path slabs 5 cm above this deck and they would slice an inlay in half), the lit circulation ring
+       and its glow ribbon, the four routing channels and the planting.
+       Street furniture is deliberately absent. A mast base or a bench plinth standing over a flush
+       inlay hides it completely and nothing clips, so listing plaza-dressing.js's furniture here would
+       only be a second copy of its table waiting to drift out of date — and a table that lies is worse
+       than no table. The three route ends come from the shared SITE PLAN for the same reason. */
+    const ROUTES = [[SITES.match.approach, 3.6], [SITES.gym.approach, 3.2], [SITES.market.approach, 3.2], [[-40, 40], 2.8], [[40, 40], 2.8]];
+    const placed = HERO.concat(STANDING);
+    function freeFloor(x, z) {
+      const r = Math.hypot(x, z);
+      if (r < 7.5 || r > 37.5) return false;                                              /* inside the laid field, outside the monument's forecourt */
+      if (Math.hypot(x, z - 7) < 8.6) return false;                                       /* the monument and its collider */
+      if (Math.abs(x - 2.18) < 7.0 && Math.abs(z - 12) < 3.4) return false;                /* the inlaid MAHFITT mark */
+      if (Math.abs(x) < 7.0 && Math.abs(z - 17.5) < 2.7) return false;                     /* the MAHPLAZA wordmark */
+      if (Math.abs(Math.hypot(x, z - 14) - 9.2) < 1.4) return false;                       /* the civic ring band */
+      if (Math.abs(r - PLAZA_RADIUS) < 2.6) return false;                                  /* the lit ring and its glow ribbon */
+      for (const [to, half] of ROUTES) {
+        const dx = to[0], dz = to[1] - 14, L = Math.hypot(dx, dz);
+        const t = Math.max(0, Math.min(L, (x * dx + (z - 14) * dz) / L));
+        if (Math.hypot(x - dx / L * t, z - 14 - dz / L * t) < half) return false;
+      }
+      if (r > 26) for (let i = 0; i < 4; i++) {
+        const a = i * Math.PI / 2 + Math.PI / 4;
+        if (Math.abs(x * Math.sin(a) - z * Math.cos(a)) < 1.3 && x * Math.cos(a) + z * Math.sin(a) > 0) return false;  /* a routing channel and its ribbon */
+      }
+      for (const s of PLANTER_SPOTS) if (Math.hypot(x - s.x, z - s.z) < 3.0) return false;
+      for (const p of placed) if (Math.hypot(x - p[0], z - p[1]) < 2.8) return false;       /* never inside a standing shard's socket */
+      return true;
+    }
+    /* THE SCATTER. 48 flush pieces is one per ~110 m2 of laid floor — sparse enough that the black
+       platinum is still the subject and the crystal is an incident in it, which is the whole of LAW 5
+       applied to paving.
+       THE RADIUS IS SAMPLED UNIFORMLY, NOT BY AREA, and that is the whole of the composition. The
+       obvious sqrt(r) draw spreads points evenly per square metre, and since the annulus at 34 m holds
+       four times the area of the one at 12 m it put four times the crystal out at the rim, where no
+       camera in VIEWS is looking. Uniform in r gives an areal density falling as 1/r; the linear
+       falloff on top of it and the weighting toward the +z arrival half do the rest. This is a scatter
+       for the cameras, not for the plan. */
+    let want = 48;
+    for (let i = 0; i < 2400 && want > 0; i++) {
+      const a = rnd() * Math.PI * 2, r = 7.5 + rnd() * 30;
+      const x = Math.cos(a) * r, z = Math.sin(a) * r;
+      if (!freeFloor(x, z)) continue;
+      if (rnd() > (1 - r / 52) * (z > 6 ? 1.0 : 0.42)) continue;
+      const rad = 0.55 + rnd() * rnd() * 1.7;                 /* squared so most are small and a few are big slabs */
+      /* MEASURED across the 48 pieces this produces: the ridge stands 8.5-19.3 cm above the deck.
+         Clear of the cells' own per-cell tilt, low enough to walk over, and deep enough that a raking
+         light finds a lit face and a dark one on the same piece. */
+      setShard(inlays, shardGeo(4, [[1.0, 0.0], [0.72, 0.62], [0.30, 1.0]], rad, 0.17 + rnd() * 0.10, 0.30 + rnd() * 0.42, 0.26, rnd),
+        x, FLOOR_TOP - 0.10, z, rnd() * Math.PI * 2, (rnd() - 0.5) * 0.05, (rnd() - 0.5) * 0.05);
+      placed.push([x, z]);                                    /* so the rest of the scatter keeps clear of it too */
+      want--;
+    }
+
+    /* THE CAUSTICS — and this is the only light this package touches. A hero shard is a lens sitting on
+       a mirror: light that enters it leaves displaced, and on a black floor the place it lands is the
+       one thing that stops a transmissive body reading as a grey lump. Each of these three answers a
+       source that already exists and names it; none of them invents an emitter.
+         H1  the monument point light, 9.5 m away — the smear falls on the far side of the shard from it
+         H2  and H3  the plaza-centre point light at (0, 5.6, 13) and the ring glow they stand across
+       Themed (hue null), so the world Theme and the day/night hook carry them with everything else. */
+    for (const [hx, hz, sx, sz, rx, rz, k] of [[-8.2, 1.0, 0, 7, 6.0, 2.6, 0.20], [7.6, 25.9, 0, 13, 5.4, 2.4, 0.18], [-7.6, 25.9, 0, 13, 5.4, 2.4, 0.18]]) {
+      const dx = hx - sx, dz = hz - sz, L = Math.hypot(dx, dz) || 1;
+      ctx.lightPool({ x: hx + dx / L * 2.3, z: hz + dz / L * 2.3, rx, rz, rot: Math.atan2(-dz / L, dx / L), k });
+    }
+
+    /* FOUR MESHES. renderOrder 4 puts every shard above the transparent diamond field (3) and below
+       the pools (5), which is the ordering the wordmark had to learn the hard way: a transparent field
+       drawn after a crystal knocks it back to its own alpha.
+       SHADOWS: the standing pieces and the heroes cast, the inlays do not — a 15 cm chip has no shadow
+       worth a shadow-map draw, and the direction's point is a raking light finding a STANDING crystal.
+       Everything they cast onto already receives: the plaza plane, all three diamond-field meshes and
+       the aprons are receiveShadow, and so are the shards themselves, so a tall shard darkens the
+       small ones at its foot instead of floating over them. */
+    const shardMesh = (list, mat, name, cast) => {
+      const mesh = new THREE.Mesh(mergeGeos(list), mat);
+      mesh.name = name; mesh.renderOrder = 4; mesh.receiveShadow = true; mesh.castShadow = !!cast;
+      g.add(mesh); return mesh;
+    };
+    /* named apart from the floor's own `heroMat` above, which is black platinum and a different thing */
+    const facetMat = M.shardFacet || M.crystalGlass, shardHeroMat = M.shardHero || facetMat;
+    shardMesh(inlays, facetMat, 'floor-shards-inlaid', false);
+    shardMesh(standing, facetMat, 'floor-shards-standing', true);
+    shardMesh(heroes, shardHeroMat, 'floor-shards-hero', true);
+    /* the sockets are OPAQUE, so they draw in the opaque pass before the field and the crystal alike —
+       the turned collar has to stay a hard bright edge, which is the only thing it is for */
+    const socketMesh = new THREE.Mesh(mergeGeos(sockets), M.platinumMidLit || M.platinumLit);
+    socketMesh.name = 'floor-shard-sockets'; socketMesh.receiveShadow = true; g.add(socketMesh);
+  }
+
   /* 2. aprons: raised slabs in front of the three destinations.
      All three merge per material — one slab mesh, one nosing mesh, one lip mesh — so the district's
      three doorsteps cost three draw calls instead of nine, and the lit lip needs only ONE mirrored
@@ -590,31 +893,35 @@ export function buildGround(ctx) {
   if (poolFixed.instanceColor) poolFixed.instanceColor.needsUpdate = true;
   g.add(poolThemed); g.add(poolFixed);
 
-  /* planter spots the flora module fills — sparse, at the plaza edge and building aprons */
-  /* v6b: the plaza was planted at one planter per ~970 m2, and four of the six sat behind or beside the
-     arrival subject. The reference's plaza is flanked by trees the whole way in. `kind: 'tree'` asks the
-     flora module for its tree where it has one, and falls back to a planter where it does not. */
-  ctx.planterSpots = [
-    { x: -14, z: 24, size: 'medium', shape: 'round' }, { x: 14, z: 24, size: 'medium', shape: 'round' },
-    { x: -30, z: 4, size: 'large', shape: 'box' }, { x: 30, z: 4, size: 'large', shape: 'box' },
-    { x: -22, z: -30, size: 'small', shape: 'box' }, { x: 22, z: -30, size: 'small', shape: 'box' },
-    /* the two avenues flanking the approach — the reference's most characteristic planting */
-    { x: -24, z: 18, kind: 'tree', size: 'large' }, { x: 24, z: 18, kind: 'tree', size: 'large' },
-    { x: -27, z: 8, kind: 'tree', size: 'medium' }, { x: 27, z: 8, kind: 'tree', size: 'medium' },
-    { x: -30, z: -3, kind: 'tree', size: 'large' }, { x: 30, z: -3, kind: 'tree', size: 'large' },
-    { x: -33, z: -14, kind: 'tree', size: 'medium' }, { x: 33, z: -14, kind: 'tree', size: 'medium' },
-    /* the plaza edge behind the arrival camera and out toward the corridors */
-    { x: -20, z: 32, kind: 'tree', size: 'medium' }, { x: 20, z: 32, kind: 'tree', size: 'medium' },
-    { x: -36, z: 26, kind: 'tree', size: 'large' }, { x: 36, z: 26, kind: 'tree', size: 'large' },
-    { x: -41, z: 6, kind: 'tree', size: 'medium' }, { x: 41, z: 6, kind: 'tree', size: 'medium' },
-    /* the courtyards the facilities' new spacing opened up */
-    { x: -40, z: -26, kind: 'tree', size: 'large' }, { x: 42, z: -30, kind: 'tree', size: 'large' },
-    { x: -30, z: -36, kind: 'tree', size: 'medium' }, { x: 32, z: -40, kind: 'tree', size: 'medium' }
-  ];
+  ctx.planterSpots = PLANTER_SPOTS;
 
   scene.add(g);
   return g;
 }
+
+/* planter spots the flora module fills — sparse, at the plaza edge and building aprons */
+/* v6b: the plaza was planted at one planter per ~970 m2, and four of the six sat behind or beside the
+   arrival subject. The reference's plaza is flanked by trees the whole way in. `kind: 'tree'` asks the
+   flora module for its tree where it has one, and falls back to a planter where it does not.
+   v9: hoisted to module scope unchanged, because the shard field below has to know where the planting
+   stands and a second hand-typed copy of these coordinates would drift the first time one moves. */
+const PLANTER_SPOTS = [
+  { x: -14, z: 24, size: 'medium', shape: 'round' }, { x: 14, z: 24, size: 'medium', shape: 'round' },
+  { x: -30, z: 4, size: 'large', shape: 'box' }, { x: 30, z: 4, size: 'large', shape: 'box' },
+  { x: -22, z: -30, size: 'small', shape: 'box' }, { x: 22, z: -30, size: 'small', shape: 'box' },
+  /* the two avenues flanking the approach — the reference's most characteristic planting */
+  { x: -24, z: 18, kind: 'tree', size: 'large' }, { x: 24, z: 18, kind: 'tree', size: 'large' },
+  { x: -27, z: 8, kind: 'tree', size: 'medium' }, { x: 27, z: 8, kind: 'tree', size: 'medium' },
+  { x: -30, z: -3, kind: 'tree', size: 'large' }, { x: 30, z: -3, kind: 'tree', size: 'large' },
+  { x: -33, z: -14, kind: 'tree', size: 'medium' }, { x: 33, z: -14, kind: 'tree', size: 'medium' },
+  /* the plaza edge behind the arrival camera and out toward the corridors */
+  { x: -20, z: 32, kind: 'tree', size: 'medium' }, { x: 20, z: 32, kind: 'tree', size: 'medium' },
+  { x: -36, z: 26, kind: 'tree', size: 'large' }, { x: 36, z: 26, kind: 'tree', size: 'large' },
+  { x: -41, z: 6, kind: 'tree', size: 'medium' }, { x: 41, z: 6, kind: 'tree', size: 'medium' },
+  /* the courtyards the facilities' new spacing opened up */
+  { x: -40, z: -26, kind: 'tree', size: 'large' }, { x: 42, z: -30, kind: 'tree', size: 'large' },
+  { x: -30, z: -36, kind: 'tree', size: 'medium' }, { x: 32, z: -40, kind: 'tree', size: 'medium' }
+];
 
 /* the seam ribbons carry a COLOUR attribute, which mergeGeos does not know about — it merges the two
    attributes a solid surface needs. This is the same concatenation for position + color. */

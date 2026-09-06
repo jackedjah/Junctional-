@@ -36,6 +36,34 @@
    on the surface it is mounted to — because an emissive rectangle that lights
    nothing is the failure this pass exists to remove.
 
+   v9 — CRYSTAL, AND A CITY WITH NO TOP. Three additions, and they are one idea.
+
+   (1) GLASS SHARDS ACROSS THE BUILDINGS. The district's mass turns to crystal where a building
+   already breaks: it GLAZES the slot of a slotted block, it OUTCROPS off the shoulder of a stepped
+   one, it FANS off a podium's terrace, it EMERGES from the vertical corner arris, and it RUNS
+   diagonally across an elevation like a fracture propagating through the wall. Nothing is stuck on a
+   flat face at random, because a shard that does not grow out of a break reads as a decoration.
+   Grades follow the cost rule in materials.js: shardFacet (no transmission) for the many, shardClear
+   for fourteen pieces on the four blocks nearest the camera, and NO shardHero — the destinations and
+   the plaza have first call on the grade that makes three render an extra scene pass.
+
+   (2) THE CITY GOES UP FOREVER. Not by making the megatalls taller — a taller cut-out with a visible
+   top is a bigger building, not an endless city. Four separate mechanisms, all composition:
+     SHAFTS      six towers whose tops leave the frame at the establishing and in-world cameras, so
+                 no silhouette closes the composition at the top;
+     VALUE BANDS each shaft is built in four bands that step DOWN toward the night sky's own mid tone
+                 the higher they stand — vertical aerial perspective, and the reason nothing is
+                 lightened to achieve it (the zenith is the darkest part of this world's sky);
+     BELTS       thirteen collars up each shaft at spacing that compresses toward the top, so the eye
+                 can count storeys and lose count;
+     GHOSTS      eight faint far shafts at 650–860 m whose tops dissolve into the fog before they end.
+   The shafts carry NO light. That is deliberate: the near city holds the light and the high city
+   loses it, which is what the value recession means — a shaft studded with emitters would defeat it.
+
+   (3) JETSONS. Ring decks: floating saucer terraces on slender stalks over five blocks, and collars
+   threaded on the shafts. Everything that was still a raw box — the rail pod, the elevator car, the
+   under-deck lights, the pad bars, the tower strips — is chamfered or turned into the square diamond.
+
    Life anchors pushed: ctx.lifeAnchors.paths (walkway + 3 bridges, kind
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
@@ -190,6 +218,40 @@ const SLABS = [
   [30, 700, 60, 210, 30, 0.3], [40, 820, 70, 260, 34, -0.2], [78, 830, 54, 230, 28, 0.1],
   [95, 640, 40, 150, 24, -0.4], [15, 620, 56, 220, 28, 0.4], [166, 690, 48, 190, 26, 0.25]
 ];
+/* ---- v9 §10 THE SHAFTS THAT DO NOT END --------------------------------------------------------
+   "Make it look like it goes infinitely up in terms of the city's depth." That is a COMPOSITION
+   problem and not a height one: the eye reads infinity from CONTINUATION plus ATMOSPHERE, never from
+   one very tall object, and a taller megatall with a visible crown just reads as a bigger building.
+   Scaling the eight megatalls up was therefore the one thing not done.
+
+   These six are a different species from a tower: they have NO CROWN, because their tops leave the
+   frame. Measured against the two cameras that establish the city — establishing (pos y 3.4, z 84,
+   look y 20, fov 44: the frame's top edge sits 28.0° above the camera) and in-world (pos y 1.9,
+   z 40, look y 14 at z −74, fov 52) — the frame top at a shaft's own distance works out at 210–260 m,
+   and every shaft here is 560–720 m. The eye follows the shaft up and runs out of picture.
+
+   bearing, radius, base width, height, taper (how much of the base width is lost by the top).
+   Hand-checked against the three valleys AND against the TOWERS table above, so no shaft stands in
+   a valley and none intersects an existing tower: the closest approach is 42 m between the 78°|340
+   shaft and the 75°|300 tower, which is 17 m of clear air with both half-widths taken off. */
+const SHAFTS = [
+  [100, 265, 30, 600, 0.42], [78, 340, 34, 720, 0.40], [104, 420, 28, 640, 0.44],
+  [46, 370, 32, 660, 0.40], [148, 330, 26, 560, 0.44], [22, 440, 30, 620, 0.42]
+];
+/* GHOST SHAFTS: the fourth mechanism — very faint far towers standing ABOVE the near ones' tops, so
+   the city implies it continues past what can be resolved. Their value is one step under the
+   farthest distant band, and the atmosphere does the rest: at night the fog runs 55 → 880 m, so a
+   shaft at 700 m is already four fifths fog at its foot and its top, being farther still, dissolves
+   completely before it ends. A form that fades out instead of stopping is the whole idea.
+   bearing, radius, width, height — all clear of the three valleys with their angular width taken
+   into account (the widest subtends 3.8°). */
+const GHOSTS = [
+  [86, 700, 46, 760], [102, 650, 42, 660], [76, 730, 44, 800], [38, 690, 40, 700],
+  [148, 700, 42, 680], [18, 760, 44, 720], [92, 860, 50, 900], [156, 820, 44, 700]
+];
+/* the five blocks that carry a floating ring deck (v9 §12, the Jetsons gesture). Five of fifteen:
+   a saucer terrace over every block would be a pattern, over five it is a civic amenity. */
+const DECK = { L1: 1, R1: 1, F2: 1, R5: 1, C3: 1 };
 
 /* ---- small deterministic helpers ------------------------------------------------------------ */
 function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -248,6 +310,17 @@ function matrixOf(x, y, z, ry = 0, sx = 1, sy = 1, sz = 1, parent = null) {
 }
 /* place a fresh geometry: local translate / yaw / scale, then an optional parent matrix */
 function xform(geo, x, y, z, ry = 0, sx = 1, sy = 1, sz = 1, parent = null) { geo.applyMatrix4(matrixOf(x, y, z, ry, sx, sy, sz, parent)); return geo; }
+/* A SHARD IS PLACED BY A FULL POSE, not by a yaw. Its entire language is that it LEANS out of the
+   surface it grows from — a shard standing plumb against a wall is a fin, and a shard with no roll is
+   a row of identical fins — so it needs pitch and roll as well. Order 'YXZ': yaw the shard around the
+   building first, then tilt it out of the wall, then roll it off the vertical. Same scratch discipline
+   as matrixOf: one Euler, one quaternion, one matrix, reused, so placing 250 shards allocates nothing. */
+const _m2 = new THREE.Matrix4(), _q2 = new THREE.Quaternion(), _p2 = new THREE.Vector3(), _s2 = new THREE.Vector3(), _e2 = new THREE.Euler();
+function poseOf(x, y, z, rx, ry, rz, sx, sy, sz, parent = null) {
+  _e2.set(rx, ry, rz, 'YXZ'); _q2.setFromEuler(_e2); _p2.set(x, y, z); _s2.set(sx, sy, sz); _m2.compose(_p2, _q2, _s2);
+  if (parent) _m2.premultiply(parent);
+  return _m2;
+}
 
 export function buildCity(ctx) {
   const M = ctx.M || {};
@@ -318,7 +391,24 @@ export function buildCity(ctx) {
     /* soft graphite: the quiet mass that lets the other two read */
     graphite: new THREE.MeshStandardMaterial({ color: 0x3a4863, roughness: 0.56, metalness: 0.82, envMapIntensity: 1.35 }),
     /* a restrained violet-grey reflective zone: one district's material identity, never a rainbow */
-    violet: new THREE.MeshStandardMaterial({ color: 0x554e7c, roughness: 0.34, metalness: 0.76, envMapIntensity: 1.7 })
+    violet: new THREE.MeshStandardMaterial({ color: 0x554e7c, roughness: 0.34, metalness: 0.76, envMapIntensity: 1.7 }),
+    /* ---- v10 §12 THE DEEP SKYLINE ---------------------------------------------------------------
+       AERIAL PERSPECTIVE WAS INVERTED, and it is what made the city read flat. Every megatall past
+       520 m wore `glass`: metalness 0.55, roughness 0.1, a dark navy. A metal takes no diffuse light,
+       so beyond the reach of the plaza's own lamps those towers were lit by whatever the night
+       environment returned — and that is LESS than the sky behind them and less than the mountains
+       behind THAT. A 600 m tower rendered darker than a 1500 m mountain. The skyline became a row of
+       flat near-black cut-outs pasted on a lighter sky: no crown, no setback, no shaft, nothing for
+       the eye to climb. §01 forbids exactly this ("black boxes"), §12 asks for a legible BASE / LOWER
+       BODY / MID / UPPER / CROWN, and the direction was "make it look like it goes infinitely up".
+
+       Distance now buys VALUE. Metalness falls away with range so the far towers take the hemisphere
+       and the fog like the mountains do, and their base colour climbs toward the horizon key — the
+       same law terrain.js paints its three ranges by. The silhouette is unchanged; only what happens
+       INSIDE it is. Two new families cost two draw calls, because the towers are instanced per
+       (archetype × family) and the megatalls are two archetypes. */
+    glassFar: new THREE.MeshStandardMaterial({ color: 0x4a688f, roughness: 0.33, metalness: 0.34, envMapIntensity: 1.45, flatShading: true }),
+    glassDeep: new THREE.MeshStandardMaterial({ color: 0x63799d, roughness: 0.54, metalness: 0.15, envMapIntensity: 1.0, flatShading: true })
   };
   Object.keys(towerFamilies).forEach(k => { towerFamilies[k].name = 'city-tower-' + k; owned.materials.push(towerFamilies[k]); });
   /* the distant layer gets THREE depth values instead of one, so 600 m and 830 m are not the same
@@ -328,7 +418,11 @@ export function buildCity(ctx) {
     new THREE.MeshBasicMaterial({ color: 0x18243a, fog: true }),
     new THREE.MeshBasicMaterial({ color: 0x111b2c, fog: true })
   ];
+  /* one step under the farthest band: the ghosts must read as a shade darker than the fogged air they
+     stand in, because that difference is all a form at 700 m has left to be seen by */
+  const farGhostM = new THREE.MeshBasicMaterial({ color: 0x0d1626, fog: true }); farGhostM.name = 'city-distant-ghost';
   farMats.forEach((m, i) => { m.name = 'city-distant-' + i; owned.materials.push(m); });
+  owned.materials.push(farGhostM);
   const groundMat = new THREE.MeshBasicMaterial({ color: 0x141d2c, fog: true }); groundMat.name = 'city-ground';
   owned.materials.push(winMat, stripMat, whiteMat, groundMat, spillWarmM, spillCoolM, accentWashM);
 
@@ -337,17 +431,65 @@ export function buildCity(ctx) {
      into the same three geometries, so widening the framing across fifteen blocks costs three draw
      calls in total rather than forty-five */
   const B = { structural: [], composite: [], trim: [], strips: [], whites: [], platMid: [], platPier: [], platLit: [], far: [], far0: [], far1: [], far2: [],
-    spillWarm: [], spillCool: [], accWash: [], violet: [], blue: [], cyan: [] };
-  const kitBoxes = [], kitMasts = [];        /* instanced roof kit matrices */
+    spillWarm: [], spillCool: [], accWash: [], violet: [], blue: [], cyan: [],
+    shardClear: [], shaft0: [], shaft1: [], shaft2: [], shaft3: [], ghost: [] };
+  const kitBoxes = [], kitMasts = [], decks = [];        /* instanced roof kit / ring deck matrices */
   const stats = { blocks: 0, bridges: 0, towers: 0, giants: 0, windows: 0, windowGrids: 0, pads: 0, paths: 0, drawCalls: 0, triangles: 0,
-    lit: 0, warmFaces: 0, coolFaces: 0, emitters: 0, washes: 0, gestures: [] };
+    lit: 0, warmFaces: 0, coolFaces: 0, emitters: 0, washes: 0, gestures: [],
+    shardsFacet: 0, shardsClear: 0, shafts: 0, shaftBelts: 0, ghosts: 0, decks: 0 };
   let elevator = null, pod = null;
+
+  /* ---- v9 §01 THE CITY CONTINUING INTO CRYSTAL --------------------------------------------------
+     "Create these glass shard looking elements all across the buildings." The failure mode is easy to
+     name: a shard placed on a flat piece of wall is a decoration stuck on, and fifteen blocks wearing
+     the same decoration is a texture. So every shard in this file grows out of a BREAK the building
+     already has — a slot, a setback shoulder, a terrace edge, a corner arris, or a fracture run across
+     an elevation — and the mass it grows from is unchanged behind it.
+
+     THREE ARCHETYPES, and one instanced mesh each, so the 263 faceted shards across fifteen blocks and
+     seven megatalls cost three draw calls in total rather than one per building — the same economy the
+     platinum frame already buys by merging fifteen blocks' framing into three geometries. A shard per
+     block as its own mesh would have been fifteen. Every one of them is BLUNT at the tip, for the same reason the
+     megatall spires were blunted in v8 (law 6): a needle aliases into a hairline and catches nothing,
+     while a small terminal facet is a real surface that answers the sky. The four-sided forms are the
+     square diamond seen in plan, which is the one silhouette the law exempts because it is the brand.
+
+     THE GRADE IS A COST DECISION, made in materials.js and obeyed here. shardFacet has NO transmission
+     — it fakes refraction with a low roughness, a clearcoat and a strong environment — and it carries
+     the great majority, because displacement is not legible at 150 m anyway. shardClear (real
+     transmission) is spent on fourteen pieces, all on the four blocks nearest the camera. shardHero
+     appears nowhere in this district: the destinations and the plaza have first call on the grade that
+     makes three render an extra scene pass, and a district that spent it would be taking it from them. */
+  const shardFacetM = mat('shardFacet', 'crystalGlass'), shardClearM = mat('shardClear', 'shardFacet');
+  const shardGeo = {
+    /* THE BLADE — four sides tapering to a small flat facet. The workhorse: reads as a splinter of the
+       wall's own crystal at any scale, and is the cheapest form in the family at 16 triangles. */
+    blade: own(faceted(new THREE.CylinderGeometry(0.13, 0.5, 1, 4, 1).translate(0, 0.5, 0))),
+    /* THE CRYSTAL — six sides, a shallower taper, a broad blunt cap. The mass that still reads as a
+       volume rather than as a line at 200 m, so it carries the mid-distance work. */
+    crystal: own(faceted(new THREE.CylinderGeometry(0.27, 0.46, 1, 6, 1).translate(0, 0.5, 0))),
+    /* THE CLUSTER — two blades fused off axis. A single shard on a corner reads as an object placed
+       there; two growing from one root read as the material breaking, which is the whole point. */
+    cluster: own(faceted(mergeGeos([
+      new THREE.CylinderGeometry(0.13, 0.42, 1, 4, 1).translate(0, 0.5, 0),
+      new THREE.CylinderGeometry(0.10, 0.30, 0.72, 4, 1).translate(0, 0.36, 0).rotateZ(0.36).translate(0.30, 0.07, 0.06)
+    ])))
+  };
+  const shardI = { blade: [], crystal: [], cluster: [] };
+  /* Place one shard. `grade` 'clear' merges a copy into the transmissive mesh (few, near); anything
+     else pushes an instance matrix (many, mid-distance). Geometry grows from y = 0 along +Y, so `y` is
+     the shard's FOOT — where it leaves the surface — which is the only anchor that stays right when a
+     shard is tilted out of a wall. w / h / t are its real metres. */
+  const SH = (grade, kind, x, y, z, rx, ry, rz, w, h, t, parent) => {
+    if (grade === 'clear') { B.shardClear.push(shardGeo[kind].clone().applyMatrix4(poseOf(x, y, z, rx, ry, rz, w, h, t, parent))); stats.shardsClear++; }
+    else { shardI[kind].push(poseOf(x, y, z, rx, ry, rz, w, h, t, parent).clone()); stats.shardsFacet++; }
+  };
 
   /* ---------------------------------------------------------------- 1. midground blocks */
   const unitKit = own(chamferBox(1, 1, 1, 0.05));
   const kitBox = (parent, x, y, z, ry, sx, sy, sz) => kitBoxes.push(matrixOf(x, y + sy / 2, z, ry, sx, sy, sz, parent).clone());
   const kitMast = (parent, x, y, z, r, h) => kitMasts.push(matrixOf(x, y + h / 2, z, 0, r * 2, h, r * 2, parent).clone());
-  const elevGeo = own(new THREE.BoxGeometry(1.0, 0.9, 0.35));
+  const elevGeo = own(chamferBox(1.0, 0.9, 0.35, 0.11));   /* law 6: the car is a rounded lozenge, not a brick sliding up a wall */
 
   /* ---- v6b GLASS BLOCKS ------------------------------------------------------------------------
      The reference's midground is not dark masses punched with small windows — it is lit curtain wall.
@@ -544,6 +686,13 @@ export function buildCity(ctx) {
       A.push(F(chamferBox(bw, bh, 0.26, 0.07), 0, by, 0.62));
       wash(hwash(bw + 0.9, bh + 0.75), 0, by, 0.46);                                       /* the recess itself, filled with its own colour */
       wash(hwash(bw + 3.4, bh * 3.5), 0, by, 0.40);                                        /* the wall and its frame, dying within ~3 m */
+      /* v9: and the CRYSTAL the band lights. A blade at each end of the band, growing out of the wall
+         into the light, with the falloff wash carried across it — the third surface this emitter
+         answers on, and the only one with facets, so the hue breaks instead of sitting flat. */
+      for (const sx of [-1, 1]) {
+        SH('facet', 'blade', sx * (bw / 2 + 1.5), by - 1.6, 0.50, -0.30, sx * 0.55, sx * 0.34, 2.2, 8.0, 1.8, fm);
+        wash(vwash(4.2, 8.5), sx * (bw / 2 + 1.6), by + 1.8, 0.42);
+      }
       stats.emitters++; stats.gestures.push(spec.id + ':band:' + hue);
     } else if (kind === 'crown') {
       /* A CROWN: the top of the mass lit in one hue on the three faces the district is seen from, so
@@ -563,6 +712,12 @@ export function buildCity(ctx) {
         B.accWash.push(paint(at(hwash(bar + 1.4, 7.5), 0.13, top.y - top.band - 3.4), col));            /* the elevation below, falling off over ~4 m */
         stats.emitters++; stats.washes += 3;
       });
+      /* v9: three shards standing on the parapet INSIDE the ring of crown bars, so the block does not
+         merely end in a colour — it ends in crystal lit from three sides at once. This is the one
+         place in the district where an emitter surrounds what it lights rather than facing it. */
+      for (let q = 0; q < 3; q++)
+        SH('facet', q === 1 ? 'crystal' : 'blade', top.x + (q - 1) * top.w * 0.26, top.y - 0.3, top.z + (q - 1) * top.d * 0.12,
+          (q - 1) * 0.16, q * 0.7, (q - 1) * 0.22, 2.6 + q * 0.5, 6.5 + q * 3.0, 2.4, bm);
       stats.gestures.push(spec.id + ':crown:' + hue);
     } else {
       /* A FULL-HEIGHT SEAM: one vertical line of colour from the plinth to the parapet, set off
@@ -575,6 +730,10 @@ export function buildCity(ctx) {
       wash(vwash(5.2, sh), sx, y0 + sh / 2, 0.40);                                         /* both jambs at once; the reveal masks the middle */
       wash(sillWash(2.8, 1.1), sx, y0 - 0.42, 0.52);                                       /* the plinth the seam stands on */
       wash(soffitWash(2.8, 0.9), sx, y1 + 0.52, 0.48);                                     /* and the parapet soffit it stops under */
+      /* v9: two clusters growing out of the cut, one either side and at two heights, so the seam is a
+         fracture the wall has opened rather than a strip applied to it */
+      for (let q = 0; q < 2; q++)
+        SH('facet', 'cluster', sx + (q ? 1.7 : -1.6), y0 + sh * (0.28 + q * 0.44), 0.48, -0.34, q ? 0.6 : -0.6, q ? 0.30 : -0.30, 2.4, 7.0 + q * 2.5, 2.0, fm);
       stats.emitters++; stats.gestures.push(spec.id + ':seam:' + hue);
     }
   }
@@ -594,6 +753,13 @@ export function buildCity(ctx) {
          top    the highest roof: plant, mast and beacon
          pad    where the life module may land */
     const faces = [], baseH = Math.max(1.1, Math.min(FR.base, h * 0.055));
+    /* the four blocks in front of the plaza are the only shards the camera ever gets near, so they are
+       the only ones that spend the transmissive grade — refraction is invisible at 150 m and expensive
+       at any distance. `crn*` is the mass whose vertical corner the emergence grows out of, which is a
+       different mass per massing: the podium's own corner is at eye level, the slotted block's wing is
+       not, and a corner shard on the wrong one would hang off nothing. */
+    const near = spec.z > -60, grade = near ? 'clear' : 'facet';
+    let crnHW = w / 2, crnHD = d / 2, crnY0 = baseH, crnY1 = h;
     let roofY = h, roofW = w, roofD = d, roofX = 0, roofZ = 0;
     let topY = h, topW = w, topD = d, topX = 0, topZ = 0, topBand = FR.band;   /* topBand: the parapet a crown light mounts on */
     let padY = h, padX = 0, padZ = 0;
@@ -624,6 +790,21 @@ export function buildCity(ctx) {
       faces.push({ ox: xA, yBase: 0, oz: d / 2, ry: 0, w: wA, h: hA, top: hA - FR.band, foot: baseH, seed: 100 + i, glaze: true });
       faces.push({ ox: xB, yBase: 0, oz: d / 2, ry: 0, w: wB, h: hB, top: hB - 1.0, foot: baseH, seed: 400 + i, glaze: true });   /* the blade takes glass only where it is wide enough to hold a module */
       if (spec.side) { const sh = spec.side > 0 ? hB : hA; faces.push({ ox: spec.side * (w / 2), yBase: 0, oz: 0, ry: spec.side * Math.PI / 2, w: d, h: sh, top: sh - 1.0, foot: baseH, seed: 200 + i, glaze: true }); }
+      /* GLAZING THE SLOT (v9 §01). The slot was a dark cut through the mass. It is filled now with a
+         stack of crystal panes, each rolled the opposite way from the one under it and each tapering
+         upward, so the cut reads as the building's material turning to glass rather than as a hole.
+         They sit at 0.44 of the slot's depth: behind the metal reveals that edge the slot, so the
+         reveals still read as the slot's edges and the crystal reads as being INSIDE it. */
+      const panes = Math.max(3, Math.round(hL / 11)), paneH = (hL - baseH - 1.4) / panes;
+      for (let k = 0; k < panes; k++)
+        SH('facet', k % 2 ? 'crystal' : 'blade', xS, baseH + 0.7 + k * paneH, d / 2 - slotD * 0.44,
+          0.05, k % 2 ? 0.22 : -0.18, (k % 2 ? 1 : -1) * 0.09, slotW * 0.92, paneH * 1.22, slotD * 0.66, bm);
+      /* and where the slot opens out above the link, three blades growing UP from it and leaning
+         toward the taller blade: the seam between two wings is the one place on this mass with room */
+      for (let k = 0; k < 3; k++)
+        SH(near ? 'clear' : 'facet', 'blade', xS + (k - 1) * slotW * 0.34, hL - 0.6, d / 2 - slotD * (0.5 + k * 0.1),
+          -0.16 - k * 0.05, k * 0.4, (k - 1) * 0.26, slotW * (0.64 - k * 0.09), 8 + k * 3.4, slotD * 0.5, bm);
+      crnHW = w / 2; crnHD = d / 2; crnY1 = hA;
       roofY = hA; roofW = wA; roofX = xA;
       topY = hB; topW = wB; topX = xB; topBand = 1.0;
       padY = hA; padX = xA;
@@ -647,6 +828,19 @@ export function buildCity(ctx) {
       /* the podium's own elevation is the widest wall this district puts at eye level — it gets the
          frame and the glass too, or the shaft above it stands on a blank plinth */
       faces.push({ ox: 0, yBase: 0, oz: pd / 2, ry: 0, w: pw, h: ph, top: ph - 0.9, foot: baseH, seed: 400 + i, glaze: true });
+      /* SPANNING THE SETBACK (v9 §01). The terrace is the one surface in this district a person could
+         stand on beside the crystal, so its shards are the largest and the most upright — a fan of four
+         leaning against the shaft's base, growing off the deck the podium already gives them, tallest
+         at the centre. This is the shape a setback wants: the step is not a smaller box on a bigger
+         one any more, it is a place where the mass split and something grew in the gap. */
+      for (let k = 0; k < 4; k++) {
+        const u = (k - 1.5) / 1.5;
+        SH('facet', k === 1 || k === 2 ? 'crystal' : 'blade', u * (sw / 2 + 1.4), ph + 0.30, sz0 + sd / 2 + 1.5 + Math.abs(u) * 0.9,
+          -0.22, u * 0.5, -u * 0.34, 2.6 + (1 - Math.abs(u)) * 1.7, 9 + (1 - Math.abs(u)) * 7.5, 2.2, bm);
+      }
+      /* and a low cluster at each front corner of the podium itself, where the mass meets the pavement */
+      for (const sx of [-1, 1]) SH('facet', 'cluster', sx * (pw / 2 - 2.2), baseH, pd / 2 - 2.0, -0.34, sx * 0.8, sx * 0.26, 3.0, 6.5, 2.6, bm);
+      crnHW = pw / 2; crnHD = pd / 2; crnY1 = ph;
       roofY = ph + 0.3; roofW = pw; roofD = pd;
       topY = h; topW = sw; topD = sd; topZ = sz0; topBand = 1.0;
       padY = ph + 0.3; padZ = Math.min(sz0 + sd / 2 + 3.1, pd / 2 - 3.0);
@@ -661,14 +855,31 @@ export function buildCity(ctx) {
       parapet(P, 0, 0, w + 0.7, d + 0.7, coreH, FR.band);
       faces.push({ ox: 0, yBase: 0, oz: d / 2, ry: 0, w, h: coreH, top: coreH - FR.band, foot: baseH, seed: 100 + i, glaze: true });
       if (spec.side) faces.push({ ox: spec.side * (w / 2), yBase: 0, oz: 0, ry: spec.side * Math.PI / 2, w: d, h: coreH, top: coreH - FR.band, foot: baseH, seed: 200 + i, glaze: true });
+      crnY1 = coreH;
       roofY = coreH; topY = coreH;
       padY = spec.sb ? coreH : h;
+      if (!spec.sb) {
+        /* a flat-topped block still has to end in crystal or its roof line is the only one in the
+           district that does not: one cluster on the parapet, leaning out over its own coping */
+        SH('facet', 'cluster', w * 0.30, coreH - 0.4, d * 0.28, -0.26, 0.7, 0.20, 3.6, 10, 3.0, bm);
+      }
       if (spec.sb) {
         const sw = w * 0.6, sd = d * 0.58, sh = h - coreH, sz0 = -d * 0.14, sx0 = (R() - 0.5) * (w - sw) * 0.5;
         B.structural.push(P(chamferBox(sw, sh, sd, 0.4), sx0, coreH + sh / 2, sz0));
         parapet(P, sx0, sz0, sw + 0.5, sd + 0.5, h, 0.9);
         for (const sx of [-1, 1]) B.platMid.push(P(chamferBox(PW * 0.8, sh + 0.3, PW * 0.8, 0.1), sx0 + sx * (sw / 2 - PW * 0.4 + 0.3), coreH + (sh + 0.3) / 2, sz0 + sd / 2 - PW * 0.4 + 0.3));
         faces.push({ ox: sx0, yBase: coreH, oz: sz0 + sd / 2, ry: 0, w: sw, h: sh, top: sh - 0.9, foot: 0.3, seed: 300 + i, glaze: true });
+        /* THE SETBACK OUTCROP (v9 §01). Where the shaft steps back off the core there is a shoulder,
+           and a shoulder is the one horizontal surface on this massing with a vertical wall behind it —
+           which is exactly the condition a crystal grows in. Five shards of falling size lean AWAY from
+           the shaft, so the step reads as a fracture the mass opened rather than as a stacking of two
+           boxes. Every one of them stays inside the core's own footprint, so nothing overhangs air. */
+        const out = [[-1, 0.55, 1.0], [1, 0.72, 0.88], [-0.62, -0.40, 0.72], [0.86, -0.18, 0.60], [0.20, 0.92, 0.48]];
+        out.forEach(([ux, uz, k2], q) => {
+          const px = sx0 + ux * (sw / 2 + 1.1 + q * 0.3), pz = sz0 + uz * (sd / 2 + 1.0);
+          SH('facet', q % 2 ? 'cluster' : 'blade', px, coreH - 0.5, pz, -0.30 * uz, Math.atan2(ux, uz), 0.30 * ux,
+            3.2 * k2, 4 + (7 + q * 2.4) * k2, 2.6 * k2, bm);
+        });
         topY = h; topW = sw; topD = sd; topX = sx0; topZ = sz0; topBand = 0.9;
         padZ = d / 2 - 3.2;
       }
@@ -685,7 +896,47 @@ export function buildCity(ctx) {
         if (mod.cols >= 2 && mod.rows >= 2) { if (light.cool) stats.coolFaces++; else stats.warmFaces++; }
       }
     });
+    /* ---- v9 §02 THE CORNER EMERGENCE AND THE FRACTURE RUN ------------------------------------------
+       Two more ways the crystal reads as the building's own material and not as applied trim.
+       THE CORNER: a cluster grows out of the vertical arris where two elevations meet, at 45° in plan
+       and leaning out and up, so the turn of the mass BREAKS instead of ending in another pilaster. The
+       two corners are set at different heights on purpose — matched pairs read as brackets.
+       THE RUN: four flakes climbing one diagonal across a primary elevation. Scattered, the same four
+       read as four objects stuck on a wall; on a line they read as a fracture propagating through it,
+       and the flake sizes swell and fall along the run for the same reason. Each is tilted a few
+       degrees out of the wall, so no two take the same slice of the horizon. */
+    for (const sx of [-1, 1]) {
+      const cy = crnY0 + (crnY1 - crnY0) * (sx > 0 ? 0.42 : 0.66);
+      SH(grade, 'cluster', sx * (crnHW - 0.7), cy, crnHD - 0.7, -0.42, sx * Math.PI / 4, sx * 0.30, 3.4, 11 + sx * 2.6, 3.0, bm);
+    }
+    faces.forEach((f, fi) => {
+      if (!f.glaze || f.w < 9 || f.top - f.foot < 10) return;
+      const fm = matrixOf(f.ox, f.yBase, f.oz, f.ry, 1, 1, 1, bm).clone(), Rs = rng(SEED + i * 61 + fi * 7);
+      const x0 = (Rs() - 0.5) * (f.w - 7), dirn = Rs() < 0.5 ? -1 : 1, span = f.top - f.foot - 5;
+      for (let k = 0; k < 4; k++) {
+        const u = k / 3, swell = 0.55 + Math.sin(u * Math.PI) * 0.75;
+        SH('facet', k % 2 ? 'blade' : 'crystal', x0 + dirn * u * f.w * 0.30, f.foot + 2 + u * span * 0.82, 0.30,
+          -0.13 - Rs() * 0.09, (Rs() - 0.5) * 0.6, dirn * (0.5 + u * 0.5), 1.5 * swell, 4.4 * swell, 0.8 + Rs() * 0.6, fm);
+      }
+    });
     accentGesture(bm, spec, faces, { x: topX, z: topZ, w: topW, d: topD, y: topY, band: topBand });
+    /* ---- v9 §12 THE RING DECK (the Jetsons gesture) ------------------------------------------------
+       The reference is optimistic mid-century futurism, not grimdark cyberpunk: sweeping curves, disc
+       and ring forms, slender supports, floating decks. So five blocks carry a saucer terrace on one
+       slim stalk over the roof — the district's only round form at building scale, and the shape that
+       tells the eye this future was drawn in 1962. Law 1 decides its material without a choice being
+       available: a deck is a HORIZONTAL plane, a metalness-0.94 grade there would reflect the near-black
+       zenith and render as a black disc, so it takes the low-metalness platinumMidLit like every other
+       cap in this file — which also makes it the brightest thing on the block, which is the point. */
+    if (DECK[spec.id]) {
+      /* set forward of the roof's centre so the saucer CANTILEVERS over the parapet — a deck that sits
+         concentrically on its own roof is a water tank, and the overhang is also what keeps the stalk
+         clear of the roof plant the kit scatters across the back half */
+      const stalkH = 7 + R() * 4, dr = 5.2 + R() * 2.4, dz = topZ + topD * 0.26, dy = topY + stalkH;
+      B.platMid.push(P(chamferBox(1.0, stalkH + 0.2, 1.0, 0.16), topX, topY + stalkH / 2 - 0.2, dz));   /* ends just under the deck it carries */
+      decks.push(poseOf(topX, dy, dz, 0, R() * Math.PI, 0, dr, 2.4, dr, bm).clone());
+      stats.decks++;
+    }
     /* parapet rails on the block's own deck (front and both sides) */
     kitBox(bm, roofX, roofY, roofZ + roofD / 2 - 0.12, 0, roofW - 0.6, 0.9, 0.12);
     kitBox(bm, roofX - (roofW / 2 - 0.12), roofY, roofZ, 0, 0.12, 0.9, roofD - 0.6);
@@ -702,12 +953,12 @@ export function buildCity(ctx) {
     if (R() < 0.7) {
       const mh = 5 + R() * 6, mx = topX + (R() < 0.5 ? -1 : 1) * (topW / 2 - 1.5), mz = topZ - topD / 2 + 1.5;
       kitMast(bm, mx, topY, mz, 0.22, mh);
-      if (i % 3 === 0) B.whites.push(P(new THREE.BoxGeometry(0.5, 0.5, 0.5), mx, topY + mh + 0.25, mz));
+      if (i % 3 === 0) B.whites.push(P(new THREE.OctahedronGeometry(0.42, 0).scale(1, 1.35, 1), mx, topY + mh + 0.25, mz));   /* the mast beacon is a square diamond — law 6's one exception, and the brand's own figure */
     }
     /* rooftop pad for the life module: a low platform with a square-diamond outline in energy */
     if (spec.pad) {
       B.composite.push(P(chamferBox(5.5, 0.3, 5.5, 0.08), padX, padY + 0.15, padZ));
-      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4, hs = 1.9; B.strips.push(P(new THREE.BoxGeometry(2.7, 0.06, 0.28), padX + Math.cos(a) * hs, padY + 0.33, padZ + Math.sin(a) * hs, Math.atan2(-Math.cos(a), -Math.sin(a)))); }
+      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4, hs = 1.9; B.strips.push(P(chamferBox(2.7, 0.06, 0.28, 0.028), padX + Math.cos(a) * hs, padY + 0.33, padZ + Math.sin(a) * hs, Math.atan2(-Math.cos(a), -Math.sin(a)))); }
       const position = new THREE.Vector3(padX, padY + 0.3, padZ).applyMatrix4(bm);
       anchors.pads.push({ id: 'city-pad-' + spec.id, position, facing: Math.atan2(-position.x, -position.z), kind: spec.pad, tier: 'far' });
       stats.pads++;
@@ -731,18 +982,18 @@ export function buildCity(ctx) {
     B.structural.push(P(chamferBox(L, 1.5, W * 0.6, 0.18), 0, -0.95, 0));            /* girder under the deck */
     for (const s of [-1, 1]) {
       B.trim.push(P(chamferBox(L, 1.05, 0.1, 0.03), 0, 0.82, s * (W / 2 - 0.08)));   /* handrails */
-      B.strips.push(P(new THREE.BoxGeometry(L, 0.16, 0.12), 0, 1.4, s * (W / 2 - 0.08)));   /* the thin rail light line */
+      B.strips.push(P(chamferBox(L, 0.16, 0.12, 0.045), 0, 1.4, s * (W / 2 - 0.08)));   /* the thin rail light line, its edges turned so it catches along its length */
     }
     /* under-deck lights along the girder's front edge, none where a pylon stands */
-    for (let u = -L / 2 + 3; u < L / 2 - 2; u += 6) { if (main && spec.pylons.some(px => Math.abs(px - u) < 1.6)) continue; B.strips.push(P(new THREE.BoxGeometry(0.5, 0.3, 0.5), u, -1.45, W * 0.3 + 0.3)); }
+    for (let u = -L / 2 + 3; u < L / 2 - 2; u += 6) { if (main && spec.pylons.some(px => Math.abs(px - u) < 1.6)) continue; B.strips.push(P(chamferBox(0.5, 0.3, 0.5, 0.09), u, -1.45, W * 0.3 + 0.3)); }
     if (main) {
       /* twin slim pylons either side of the girder with a cross-beam under it; the rail pod hangs below */
       for (const px of spec.pylons) {
         for (const s of [-1, 1]) B.structural.push(P(chamferBox(1.2, spec.y - 1.9, 1.0), px, -(spec.y - 1.9) / 2 - 1.9 + (spec.y - 1.9) / 2 + 0.05 - (spec.y - 1.9) / 2 + (spec.y - 1.9) / 2 - 0.05 + 0.05 - spec.y + (spec.y - 1.9) / 2 + 1.9 - 0.05, s * 2.1));
         B.structural.push(P(chamferBox(1.4, 0.6, 5.4, 0.1), px, -1.95, 0));
-        B.whites.push(P(new THREE.BoxGeometry(0.4, 0.4, 0.4), px, -2.45, 2.9));
+        B.whites.push(P(new THREE.OctahedronGeometry(0.34, 0), px, -2.45, 2.9));   /* the pylon's marker: the same square diamond as the mast beacons */
       }
-      pod = { mesh: new THREE.Mesh(own(new THREE.BoxGeometry(3.0, 1.0, 0.9)), whiteMat), y: -3.0, travel: (L - 6) / 6, dwell: 3, half: L / 2 - 3, frame: bm };
+      pod = { mesh: new THREE.Mesh(own(chamferBox(3.0, 1.0, 0.9, 0.30)), whiteMat), y: -3.0, travel: (L - 6) / 6, dwell: 3, half: L / 2 - 3, frame: bm };
       pod.mesh.name = 'city-rail-pod'; pod.mesh.matrixAutoUpdate = false; group.add(pod.mesh);
     }
     /* life path along the deck (world space) */
@@ -798,7 +1049,9 @@ export function buildCity(ctx) {
      assignment is deterministic and hand-checked against the TOWERS table so no two adjacent bearings
      share a family. Instancing still costs one draw call per (archetype × family) pair actually used. */
   const FAMILY_OF = (a, r, type) => {
-    if (type === 'E' || type === 'G') return r > 520 ? 'glass' : 'platinum';   /* megatalls are landmarks: they read first */
+    /* v10 §12: three depths for a megatall, not two. Under 520 m it is architecture in platinum; past
+       that it is atmosphere, and it gets lighter and less metallic the further back it stands. */
+    if (type === 'E' || type === 'G') return r > 640 ? 'glassDeep' : r > 520 ? 'glassFar' : 'platinum';
     if (type === 'F') return 'graphite';
     const k = (Math.round(a) * 7 + Math.round(r / 10) * 3) % 10;
     return k < 3 ? 'platinum' : k < 6 ? 'glass' : k < 8 ? 'graphite' : 'violet';
@@ -850,11 +1103,88 @@ export function buildCity(ctx) {
       stats.emitters += segs + 1; stats.washes += segs * 2 + 4;
       stats.gestures.push('megatall@' + a + 'deg:seam:' + seamHue);
     }
+    /* v9 §01: the crystal has to reach the background or it reads as a treatment applied to the near
+       blocks only. The megatalls have exactly one break each — the first setback, at 0.78 of an E and
+       0.72 of a G — and four shards stand on it, one per flat, at a tenth of the tower's height. Four
+       hundred metres away that is still 3° of picture, which is why this is the only shard placement in
+       the file sized as a fraction of its host rather than in metres. */
+    if (h > 200 && (type === 'E' || type === 'G')) {
+      const fy = type === 'E' ? 0.78 : 0.72, rad = (type === 'E' ? 0.40 : 0.34) * w * 0.92;
+      for (let q = 0; q < 4; q++) {
+        const qa = ry + Math.PI / 4 + q * Math.PI / 2;
+        SH('facet', q % 2 ? 'crystal' : 'blade', x + Math.sin(qa) * rad, fy * h - w * 0.05, z + Math.cos(qa) * rad,
+          -0.22, qa, (q - 1.5) * 0.10, w * 0.26, h * (0.085 + (q % 2) * 0.03), w * 0.22, null);
+      }
+    }
     stats.towers++;
+  });
+  /* ---------------------------------------------------------------- 2b. the shafts that do not end */
+  /* ---- v9 §10 VERTICAL AERIAL PERSPECTIVE ---------------------------------------------------------
+     Four bands, and the ladder only ever goes DOWN. That is not a stylistic preference: at night this
+     world's sky runs horizon 0x1d3d6e → mid 0x102446 → zenith 0x081226, so the higher a mass stands the
+     closer it sits to the DARKEST part of the sky, and a band that got lighter with altitude would be
+     painting a daylight sky's aerial perspective onto a night one. It also means law 4 is kept by
+     construction — nothing in this file is lightened to make the city look deeper.
+     The environment intensity falls with the value for the same reason: more atmosphere between the eye
+     and a surface means less of the environment survives the trip. Fog then does the rest, and it does
+     a great deal — a 600 m shaft at 265 m radius has its foot 265 m away and its top 655 m away, which
+     across a 55→880 m fog is the difference between one quarter and three quarters obscured. */
+  const shaftBand = [
+    new THREE.MeshStandardMaterial({ color: 0x2a3750, roughness: 0.50, metalness: 0.88, envMapIntensity: 1.55 }),
+    new THREE.MeshStandardMaterial({ color: 0x243149, roughness: 0.46, metalness: 0.88, envMapIntensity: 1.35 }),
+    new THREE.MeshStandardMaterial({ color: 0x1e2a41, roughness: 0.44, metalness: 0.88, envMapIntensity: 1.12 }),
+    new THREE.MeshStandardMaterial({ color: 0x18233a, roughness: 0.42, metalness: 0.88, envMapIntensity: 0.90 })
+  ];
+  shaftBand.forEach((m, i) => { m.name = 'city-shaft-band-' + i; owned.materials.push(m); });
+  /* THE RING DECK, shared by the block saucers and the shaft collars: a lens, not a plate. Three lathe
+     rings — the deck, the rim band that gives its edge a vertical face to catch the horizon with, and
+     the underbelly that tapers back to the support. 144 triangles, one geometry, one draw call for all
+     of them. Unit radius and a total depth of 0.45, so a caller scales it to real metres. */
+  const discGeo = own(mergeGeos([
+    new THREE.CylinderGeometry(0.86, 1.0, 0.10, 18, 1).translate(0, 0.05, 0),
+    new THREE.CylinderGeometry(1.03, 1.03, 0.09, 18, 1, true).translate(0, -0.02, 0),
+    new THREE.CylinderGeometry(1.0, 0.34, 0.30, 18, 1, true).translate(0, -0.21, 0)
+  ]));
+  /* the band a height fraction falls in; the boundaries close up toward the top so the bands themselves
+     are one more diminishing series the eye can read as recession */
+  const bandOf = f => (f < 0.30 ? 0 : f < 0.56 ? 1 : f < 0.80 ? 2 : 3);
+  SHAFTS.forEach(([a, r, w0, H, taper], si) => {
+    const [x, z] = polar(a, r), ry = Rt() * Math.PI * 2, cut = [0, 0.30, 0.56, 0.80, 1.0];
+    for (let k = 0; k < 4; k++) {
+      const r0 = (w0 / 2) * (1 - taper * cut[k]), r1 = (w0 / 2) * (1 - taper * cut[k + 1]);
+      B['shaft' + k].push(xform(faceted(new THREE.CylinderGeometry(r1, r0, (cut[k + 1] - cut[k]) * H, 4, 1)),
+        x, (cut[k] + cut[k + 1]) / 2 * H, z, ry));
+    }
+    /* THE BELTS. Thirteen collars whose SPACING COMPRESSES toward the top — f = 1 − (1 − k/N)^1.9,
+       whose slope falls to zero at the top — and whose height falls with it. That compression is the
+       oldest trick there is for reading a height as farther than it is: the eye counts the low ones,
+       finds the high ones too close together to separate, and stops being able to say where the top is.
+       Each belt joins its own band's mesh, so thirteen collars on six shafts cost no draw call at all. */
+    const N = 14;
+    for (let k = 1; k < N; k++) {
+      const f = 1 - Math.pow(1 - k / N, 1.9), rr = (w0 / 2) * (1 - taper * f) * 1.07;
+      B['shaft' + bandOf(f)].push(xform(faceted(new THREE.CylinderGeometry(rr, rr, 1.6 * (1 - 0.62 * f), 4, 1, true)), x, f * H, z, ry));
+      stats.shaftBelts++;
+    }
+    /* LAW 1, and the one place this section could have broken it. Every segment's top cap is buried
+       under the segment above it — the taper is continuous, so those faces never see the sky — except
+       the last one, which does. A metalness-0.88 face pointed at the near-black zenith renders black,
+       so the shaft ends in a coping in the LIT grade, exactly like every block in this district. It is
+       also the only reason a shaft that leaves the frame still resolves properly in the periphery views
+       where its top IS visible. */
+    /* turned 45° to the shaft's own axes because a four-sided cylinder puts its VERTICES on those axes
+       and its flats on the diagonals: an axis-aligned box over it would leave four corners of dark cap
+       showing. At √2 × 1.12 of the top radius the coping matches the shaft's square and overhangs it
+       by an eighth, which is a coping rather than a mushroom. */
+    const rTop = (w0 / 2) * (1 - taper);
+    B.platLit.push(xform(chamferBox(rTop * 1.585, 0.9, rTop * 1.585, 0.24), x, H + 0.3, z, ry + Math.PI / 4));
+    /* two of the six wear a collar deck low down, where the shaft is still legible as architecture */
+    if (si === 1 || si === 3) { decks.push(poseOf(x, 0.17 * H, z, 0, ry, 0, w0 * 1.6, 3.2, w0 * 1.6).clone()); stats.decks++; }
+    stats.shafts++;
   });
   const instanced = (geo, material, mats, name) => { if (!mats.length) return null; const im = new THREE.InstancedMesh(geo, material, mats.length); mats.forEach((m, i) => im.setMatrixAt(i, m)); im.instanceMatrix.needsUpdate = true; im.name = name; group.add(im); return im; };
   Object.keys(byArch).forEach(k => { const [type, fam] = k.split('|'); instanced(arch[type], towerFamilies[fam], byArch[k], 'city-towers-' + type + '-' + fam); });
-  instanced(own(new THREE.BoxGeometry(1, 1, 1)), stripMat, boxStrips, 'city-tower-strips');
+  instanced(own(chamferBox(1, 1, 1, 0.07)), stripMat, boxStrips, 'city-tower-strips');
   instanced(own(faceted(new THREE.CylinderGeometry(1, 1, 1, 6, 1, true))), stripMat, hexStrips, 'city-tower-strips-hex');
 
   /* ---------------------------------------------------------------- 3. distant silhouettes */
@@ -876,11 +1206,31 @@ export function buildCity(ctx) {
     band(780).push(xform(chamferBox(210, 14, 70, 2.4), x, 232, z, 0.15));
     [-80, 0, 80].forEach(o => band(780).push(xform(chamferBox(8, 232, 8, 1.2), x + o * Math.cos(0.15), 116, z - o * Math.sin(0.15))));
     SLABS.forEach(([a, r, w, h, d, ry]) => { const [sx, sz] = polar(a, r); band(r).push(xform(chamferBox(w, h, d, Math.min(4, w / 6)), sx, h / 2, sz, ry)); });
+    GHOSTS.forEach(([a, r, w, h]) => {
+      const [gx, gz] = polar(a, r), gry = (a * 0.37) % 1.5707;
+      B.ghost.push(xform(faceted(new THREE.CylinderGeometry(w * 0.28, w * 0.5, h, 4, 1)), gx, h / 2, gz, gry));
+      for (const f of [0.34, 0.62]) {
+        const rr = (w * 0.5 + (w * 0.28 - w * 0.5) * f) * 1.09;
+        B.ghost.push(xform(faceted(new THREE.CylinderGeometry(rr, rr, h * 0.012, 4, 1, true)), gx, f * h, gz, gry));
+      }
+      stats.ghosts++;
+    });
     stats.giants = 4 + SLABS.length;
     [B.far0, B.far1, B.far2].forEach((F, i) => {
       if (!F.length) return;
       const far = new THREE.Mesh(own(mergeGeos(F)), farMats[i]); far.name = 'city-distant-forms-' + i; far.frustumCulled = false; distant.add(far);
     });
+    /* ---- v9 §11 THE GHOSTS -------------------------------------------------------------------------
+       The fourth mechanism, and the cheapest: eight shafts at 650–860 m, 660–900 m tall, one value step
+       under the farthest distant band. Their job is to stand ABOVE the near skyline's tops with nothing
+       resolvable about them, so the city implies it continues past where it can be read. Two belts each
+       is all the structure they get — enough that they are buildings and not obelisks, not enough to be
+       countable, which would defeat them. What finishes them is the atmosphere rather than a crown: at
+       night the fog runs 55 → 880 m, so a ghost's foot is already four fifths obscured and its top,
+       being farther still, is gone entirely. A form that dissolves before it ends is the whole idea. */
+    if (B.ghost.length) {
+      const gh = new THREE.Mesh(own(mergeGeos(B.ghost)), farGhostM); gh.name = 'city-far-ghosts'; gh.frustumCulled = false; distant.add(gh);
+    }
   }
   /* The district ground: an annulus from the plaza slab's edge out to the horizon. It stops at 620 m
      now rather than 900 — beyond that the terrain module owns the world, and the city's ground plane
@@ -909,8 +1259,22 @@ export function buildCity(ctx) {
   merged(B.spillWarm, spillWarmM, 'city-window-spill-warm', false);
   merged(B.spillCool, spillCoolM, 'city-window-spill-cool', false);
   merged(B.accWash, accentWashM, 'city-accent-wash', false);
+  /* THE SHAFTS THAT DO NOT END: four meshes, one per value band, carrying six shafts' segments AND all
+     seventy-eight of their belts. Vertical aerial perspective for four draw calls. */
+  merged(B.shaft0, shaftBand[0], 'city-shaft-band-0', false);
+  merged(B.shaft1, shaftBand[1], 'city-shaft-band-1', false);
+  merged(B.shaft2, shaftBand[2], 'city-shaft-band-2', false);
+  merged(B.shaft3, shaftBand[3], 'city-shaft-band-3', false);
+  /* THE CRYSTAL. Three instanced meshes carry the whole district's shards; the fourteen transmissive
+     ones on the four nearest blocks are merged into a fourth. Four draw calls, and — the number that
+     actually matters — ONE transmissive material in the scene, so three renders its extra pass once. */
+  instanced(shardGeo.blade, shardFacetM, shardI.blade, 'city-shards-blade');
+  instanced(shardGeo.crystal, shardFacetM, shardI.crystal, 'city-shards-crystal');
+  instanced(shardGeo.cluster, shardFacetM, shardI.cluster, 'city-shards-cluster');
+  merged(B.shardClear, shardClearM, 'city-shards-clear', false);
   instanced(unitKit, compositeM, kitBoxes, 'city-roof-kit');
   instanced(own(new THREE.CylinderGeometry(0.5, 0.5, 1, 6, 1)), trimM, kitMasts, 'city-masts');
+  instanced(discGeo, platCapM, decks, 'city-decks');   /* saucer terraces and shaft collars: horizontal, so the LIT grade (law 1) */
 
   /* ---------------------------------------------------------------- time, theme, motion */
   const themeCol = new THREE.Color(theme.energy), whiteCol = new THREE.Color(WHITE);
@@ -969,8 +1333,16 @@ export function buildCity(ctx) {
 
   /* cost bookkeeping (what the establishing view can at most draw from this module) */
   group.traverse(o => { if (o.isMesh && o.geometry) { const g = o.geometry, n = g.index ? g.index.count : g.attributes.position.count; stats.triangles += Math.round(n / 3) * (o.isInstancedMesh ? o.count : 1); stats.drawCalls++; } });
-  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'block frame: platinumMid / platinumMidBrushed (vertical) + platinumMidLit (horizontal)', 'MeshBasic: windows / curtain / energy lines / lights / 3 distant bands / ground', 'accent: accentViolet (left) / accentBlue (centre) / accentCyan (right)', 'wash: warm spill / cool spill / accent (vertex-coloured)'];
+  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'block frame: platinumMid / platinumMidBrushed (vertical) + platinumMidLit (horizontal)', 'MeshBasic: windows / curtain / energy lines / lights / 3 distant bands + 1 ghost band / ground', 'accent: accentViolet (left) / accentBlue (centre) / accentCyan (right)', 'wash: warm spill / cool spill / accent (vertex-coloured)', 'shards: M.shardFacet (instanced, the many) + M.shardClear (merged, 14 near) — NO shardHero in this district', 'shafts: four value bands stepping toward the night sky'];
   stats.districtHues = ACCENT_DISTRICT;
+  /* v9 bookkeeping: the shard budget and the four mechanisms the vertical depth is built from */
+  stats.shards = { facet: stats.shardsFacet, clear: stats.shardsClear, hero: 0,
+    grades: 'shardFacet instanced in 3 archetypes (3 draw calls) + shardClear merged (1); shardHero belongs to the destinations and the plaza',
+    where: ['slot glazing (slotted)', 'setback outcrop (stepped)', 'terrace fan + podium corner (podium)', 'corner emergence (every block)', 'fracture run across every glazed elevation', 'accent gesture crystal (6 blocks)', 'megatall setback (6 towers)'] };
+  stats.verticalDepth = ['6 shafts, 560-720 m, no crown — their tops leave the establishing and in-world frames',
+    '4 value bands per shaft stepping DOWN toward the night sky (vertical aerial perspective)',
+    stats.shaftBelts + ' belts at spacing that compresses toward the top',
+    stats.ghosts + ' ghost shafts at 650-860 m whose tops dissolve into the fog'];
   stats.lights = 0;   /* this module adds no THREE light: every emitter here answers through geometry (§04, §05) */
   stats.massings = BLOCKS.reduce((o, s) => { const k = MASSING_OF(s.id); o[k] = (o[k] || 0) + 1; return o; }, {});
   stats.towerFamilies = Object.keys(byArch).reduce((o, k) => { const f = k.split('|')[1]; o[f] = (o[f] || 0) + byArch[k].length; return o; }, {});

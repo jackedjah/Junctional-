@@ -92,7 +92,12 @@ const RANGES = [
   { id: 'far', r: 1500, count: 15, hMin: 400, hMax: 660, wMin: 380, wMax: 650, base: 0x2b3f66, ridge: 0x7a8fb8, seed: 211, rings: 5, slices: 14 }
 ];
 
-const LAND_INNER = 600, LAND_OUTER = 1750;
+/* v10 §42: 1750 was far enough while every mountain stood in the front hemisphere and hid the ring's
+   own edge. The rear ranges stand at 1650–2120, so the land has to outrun them, and its outermost
+   value has to arrive at the horizon sky (0x1d3d6e) or the edge itself draws a line across the rear
+   of the world — which is exactly what the 180° proof showed. */
+const LAND_INNER = 600, LAND_OUTER = 2600;
+const LAND_HORIZON = 0x1c3355;   /* the last ring, sitting just under the horizon key so it dissolves */
 
 /* the still basin: a wide, quiet body of water sitting in the right valley, framed by the towers at
    44 deg and 75 deg. Nothing in city.js, ground.js or buildings.js occupies this region. */
@@ -273,6 +278,41 @@ export function buildTerrain(ctx) {
       peaks.push(geo);
       stats.peaks++;
     }
+    /* ---- v10 §42 THE REAR HEMISPHERE ------------------------------------------------------------
+       Every peak above is placed at `4 + (i / (count-1)) * 172` — bearings 4°–176°. All fifty-three of
+       them, in all three ranges. Behind the plaza there was nothing: the 180° spin proof showed the
+       land ring running out to its own hard edge and then sky, with no relief anywhere in half the
+       compass. The named views never looked there, which is precisely the failure §01 names — a map
+       that works from one angle.
+
+       The rear is NOT a mirror of the front, because §14 asks each sector to be its own room and §30
+       asks for non-urban regions as well as urban ones. The front is the city's amphitheatre: near,
+       tall, and framed by the three valleys. The rear is OPEN COUNTRY — pushed further out, roughly
+       half the height, and broader for that height, so it reads as land rolling away rather than as a
+       second wall of mountains closing the world in. It is what the civilisation sits INSIDE.
+
+       Cost is one merge, not one draw call: these join the same `peaks` array and land in the same
+       merged mesh as the front range they belong to. */
+    const RE = { r: R.r * 1.22, count: Math.max(6, Math.round(R.count * 0.45)),
+      hMin: R.hMin * 0.46, hMax: R.hMax * 0.54, wMin: R.wMin * 1.15, wMax: R.wMax * 1.30 };
+    for (let i = 0; i < RE.count; i++) {
+      const a = 184 + (i / (RE.count - 1)) * 172 + (rand() - 0.5) * 11;
+      const rr = RE.r * (0.9 + rand() * 0.26);
+      const [x, z] = polar(a, rr);
+      const h = lerp(RE.hMin, RE.hMax, rand() * rand() + rand() * 0.3);
+      const w = lerp(RE.wMin, RE.wMax, rand());
+      const M2 = massif(w, h, Math.max(4, R.rings - 1), Math.max(12, R.slices - 2), rand);
+      const geo = M2.geo;
+      geo.rotateY(rand() * Math.PI * 2);
+      geo.rotateZ((rand() - 0.5) * 0.09);
+      /* one step LIGHTER than the front range at the same index: the rear stands further away, and
+         aerial perspective is the only thing telling the eye so — there is no city out there to
+         give it scale. */
+      paintPeak(geo, R.base, R.ridge, h, moon, 0.86 + ri * 0.22, M2.ao);
+      geo.translate(x, h / 2 - 26, z);
+      peaks.push(geo);
+      stats.peaks++;
+    }
     const mesh = new THREE.Mesh(own(mergeGeos(peaks)), rockMat);
     mesh.name = 'terrain-range-' + R.id;
     mesh.frustumCulled = false;
@@ -287,13 +327,20 @@ export function buildTerrain(ctx) {
   const landMat = new THREE.MeshBasicMaterial({ vertexColors: true, fog: false });
   landMat.name = 'terrain-land'; owned.materials.push(landMat);
   {
-    const seg = 96, rings = 5;
+    const seg = 96, rings = 7;
     const land = new THREE.RingGeometry(LAND_INNER, LAND_OUTER, seg, rings).toNonIndexed();
     const pos = land.attributes.position, n = pos.count;
-    const col = new Float32Array(n * 3), c = new THREE.Color(), near = new THREE.Color(0x131b2b), far = new THREE.Color(0x222c44);
+    /* THREE stops, not two. Two stops ran dark ground straight into the sky and left a hard rim; the
+       third takes the last third of the ring up to the horizon key so the ground ARRIVES at the sky
+       instead of stopping against it. The knee sits at 0.62 because that is where the rear ranges
+       stand — the lift has to happen behind them, not in front. */
+    const col = new Float32Array(n * 3), c = new THREE.Color();
+    const near = new THREE.Color(0x131b2b), mid = new THREE.Color(0x222c44), far = new THREE.Color(LAND_HORIZON);
     for (let i = 0; i < n; i++) {
       const r = Math.hypot(pos.getX(i), pos.getY(i));
-      c.copy(near).lerp(far, Math.min(1, (r - LAND_INNER) / (LAND_OUTER - LAND_INNER)));
+      const t = Math.min(1, (r - LAND_INNER) / (LAND_OUTER - LAND_INNER));
+      if (t <= 0.62) c.copy(near).lerp(mid, t / 0.62);
+      else c.copy(mid).lerp(far, (t - 0.62) / 0.38);
       col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
     }
     land.setAttribute('color', new THREE.BufferAttribute(col, 3));

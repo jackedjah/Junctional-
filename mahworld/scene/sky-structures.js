@@ -852,6 +852,22 @@ export function buildSkyStructures(ctx) {
       put('X', 'midLit', chamferBox(w, 0.16, 0.72, 0.05), bx, TOP + 0.50, bz, faceOut(b) + HALF_PI);
       put('X', 'mid', chamferBox(w * 0.5, 0.48, 0.5, 0.04), bx, TOP + 0.25, bz, faceOut(b) + HALF_PI);
     }
+    /* THE LOUNGE STEP. The bench arc above is FURNITURE: it seats eight people in a row, facing out,
+       and once it is full the deck has nothing left to offer. This is the other half of somewhere a
+       person chooses to STAY — a broad low tier along the outer edge, 0.34 m up and 1.7 m deep, that
+       you sit on anywhere along its length, at any angle, with your legs out and the balustrade at
+       your knee. The 2 m gap between it and the glass is deliberate: it is the footwell, and without
+       it the tier would read as a plinth rather than as a step. */
+    for (let i = 0; i < segs; i += 2) {
+      const b0 = s.bearing - halfArc + (i / segs) * halfArc * 2;
+      const b1 = s.bearing - halfArc + ((i + 2) / segs) * halfArc * 2;
+      const bm = (b0 + b1) / 2, rr = r1 - 2.9;
+      const d = layout.dir(bm);
+      const w = (b1 - b0) * rr + 0.25;                 /* +0.25 so consecutive tiers meet without a seam */
+      put('A', 'midLit', chamferBox(w, 0.34, 1.70, 0.07), d.x * rr, TOP + 0.17, d.z * rr, faceOut(bm) + HALF_PI);
+      /* the nosing, and it is the only line on the piece: a low step with no edge light is a trip */
+      put('X', 'lit', chamferBox(w, 0.10, 0.16, 0.03), d.x * (rr - 0.86), TOP + 0.36, d.z * (rr - 0.86), faceOut(bm) + HALF_PI);
+    }
     /* three shallow steps up from the cloud on the inner edge, so the deck is walked onto, not climbed */
     for (let k = 0; k < 3; k++) {
       const rr = r0 - 1.0 - k * 1.3;
@@ -928,6 +944,180 @@ export function buildSkyStructures(ctx) {
       put('A', 'energy', chamferBox(1.4, 0.09, 0.22, 0.02), ex, ground(ex, ez) + 0.10, ez, faceOut(b) + HALF_PI);
     }
   })();
+
+  /* ---------------------------------------------------------------- THE QUIET FURNITURE OF SECTOR A
+     The realm had pads, rings, towers and a view, and nowhere to be. What follows is the small stuff
+     that turns a place you look at into a place you stay in — a sheltered ledge, three shelves at the
+     rim wide enough to lie on, a line of lanterns out to the view, and two circles that suggest
+     sitting together rather than walking past.
+
+     IT IS ALL SMALL, AND THAT IS THE POINT. §11/§32 forbid a sky metropolis and the realm's power is
+     its emptiness, so nothing here is taller than 3 m, nothing is a building, and every piece is
+     under 10 m across. Fourteen human-scale objects spread over 250 m of sector A read as intimacy;
+     one more pavilion would read as density.
+
+     EVERY FOOTPRINT WAS MEASURED OFF THE CONTRACT BEFORE IT WAS PLACED, and the numbers decided the
+     sites: the cliff-edge terrace between r 265 and 280 falls only 0.4–0.6 m across a 5 m footprint,
+     which is why the shelves can be flat plates on a low skirt instead of legged platforms, while
+     the same band at bearing +0.46 falls 6.3 m and is therefore not used at all.
+
+     ORIENTATION, as everywhere in this file: every seat top, shelf top, cap and step is horizontal
+     and takes lit / midLit; every screen panel, post and leg is vertical and takes mid / satin. */
+
+  /* ---- the lee: the sheltered ledge --------------------------------------------------------------
+     MEASURED: bearing −0.20 at r 243 falls 0.80 m across a 15 m footprint and reads deckEdge 0.48 —
+     flat, solid ground, 35 m clear of the overlook's arc and 62 m from its centre. The overlook is
+     for the view; this is where you go after twenty minutes of standing in the open.
+
+     WHICH WAY THE SHELTER FACES IS NOT A GUESS. The realm's weather runs toward the sunset — the mist
+     banks and wisps in the cloud module all drift that way — so the screen stands on the INLAND arc
+     and you sit inside it facing the sun with the wind off your back. */
+  (function lee() {
+    const LB = -0.20, LR = 243, LRAD = 6.4;
+    const d0 = layout.dir(LB), x = d0.x * LR, z = d0.z * LR;
+    if (footprintSolid(x, z, LRAD * 1.15)) {
+      const TOP = levelledDeck('A', x, z, LRAD, { clear: 0.55, seg: 22, thick: 0.40, washGain: 1.0 });
+      place('lee', x, z, { radius: LRAD, topY: TOP });
+      put('A', 'lit', new THREE.CylinderGeometry(LRAD + 0.24, LRAD + 0.24, 0.16, 22, 1, true), x, TOP - 0.07, z);
+      /* THE SCREEN: five panels on a 100 degree arc, 2.55 m apart and 2.6 m wide, so they just meet
+         and read as one curved wall with joints. Vertical, so the high-metal grade reflects the
+         horizon band and reads as metal rather than as a black slab (the header's material law). */
+      const ARC = LB + Math.PI;                     /* the inland arc: the wind comes from behind it */
+      for (let i = 0; i < 5; i++) {
+        const a = ARC + (i - 2) * 0.44;
+        const px2 = x + Math.sin(a) * (LRAD - 0.6), pz2 = z - Math.cos(a) * (LRAD - 0.6);
+        put('A', 'mid', chamferBox(2.6, 2.30, 0.30, 0.09), px2, TOP + 1.15, pz2, faceIn(a));
+        /* a cap rail: horizontal, so it takes the lit grade, and it is what your forearms go on */
+        put('A', 'lit', chamferBox(2.75, 0.13, 0.46, 0.04), px2, TOP + 2.37, pz2, faceIn(a));
+      }
+      /* three seats at 4.0 m out, backs to the screen, facing the sun */
+      const SEAT_R = 4.0;
+      for (let i = 0; i < 3; i++) {
+        const a = ARC + (i - 1) * 0.62;
+        const bx = x + Math.sin(a) * SEAT_R, bz = z - Math.cos(a) * SEAT_R;
+        put('X', 'midLit', chamferBox(2.2, 0.15, 0.68, 0.05), bx, TOP + 0.47, bz, faceOut(a));
+        put('X', 'mid', chamferBox(0.92, 0.44, 0.50, 0.04), bx, TOP + 0.24, bz, faceOut(a));
+      }
+      /* THE CANOPY, and the whole reason this piece exists rather than being three more benches: a
+         lit soffit over your head while you are still outdoors. It is centred OVER THE SEATS, not
+         over the middle of the ledge — a canopy that shelters the empty half is a sculpture. Warm,
+         because it is INTERIOR LIGHT, which is the one thing in this realm that says a place was made
+         for a person to be in (law 3, §12). */
+      const cx2 = x + Math.sin(ARC) * SEAT_R, cz2 = z - Math.cos(ARC) * SEAT_R;
+      put('A', 'midLit', chamferBox(6.4, 0.28, 2.9, 0.14), cx2, TOP + 2.76, cz2, faceIn(ARC));
+      put('A', 'lit', chamferBox(6.7, 0.10, 3.2, 0.04), cx2, TOP + 2.95, cz2, faceIn(ARC));
+      put('A', 'warm', new THREE.PlaneGeometry(5.4, 2.2).rotateX(HALF_PI), cx2, TOP + 2.59, cz2, faceIn(ARC));
+      washCard(cx2, TOP + 2.52, cz2, 6.0, 2.8, faceIn(ARC), 'fill', 0.8);
+      for (const sd of [-1, 1]) {
+        const qx = cx2 + Math.cos(ARC) * sd * 2.7, qz = cz2 + Math.sin(ARC) * sd * 2.7;
+        strut('A', 'satin', qx, TOP, qz, qx, TOP + 2.62, qz, 0.13, 0.10, 7);
+      }
+      /* AND THE WORLD ANSWERS IT (law 2). A soffit lamp that lit nothing would be a bright rectangle
+         in the air: so the deck directly under it carries a warm pool, and the screen behind the
+         bench carries the spill it throws backwards. Two answers, both off the same light. */
+      put('A', 'warmSoft', new THREE.CircleGeometry(3.0, 16).rotateX(-HALF_PI), cx2, TOP + 0.05, cz2);
+      put('A', 'warmSoft', new THREE.PlaneGeometry(6.4, 1.55), x + Math.sin(ARC) * (LRAD - 0.9), TOP + 1.30, z - Math.cos(ARC) * (LRAD - 0.9), faceIn(ARC));
+    }
+  })();
+
+  /* ---- the cliff shelves: somewhere to lie down ---------------------------------------------------
+     Three wide low plates on the last flat ground before the deck ends, laid RADIALLY so a person on
+     one has their feet toward the drop and the sun in front of them. They are 0.3 m up — you step
+     onto one, you do not climb it — and their long axis is 8.4 m so two people fit end to end.
+     Deliberately NOT railed: a rail here would make them a viewing platform, and the overlook 40 m
+     inland already is one. */
+  const SHELVES = [
+    { b: -0.33, r: 272 },     /* fall 0.43 m over a 5 m footprint, deckEdge 0.23 */
+    { b: -0.05, r: 276 },     /* fall 0.53, edge 0.20 — the one on the sun's own axis */
+    { b: 0.16, r: 274 }       /* fall 0.61, edge 0.22, and 38 m clear of the cliff marker */
+  ];
+  SHELVES.forEach((S, i) => {
+    const d = layout.dir(S.b), x = d.x * S.r, z = d.z * S.r;
+    /* minEdge 0.16: these belong AT the rim — that is the whole idea — but not on cloud the terrain
+       module is already dissolving into air, which is what the spoke test below rules out */
+    if (!footprintSolid(x, z, 5.0, 12, 0.16)) return;
+    groundBand(x, z, 5.0, 3, 12);
+    const gMin = _gb[0], gMax = _gb[1];
+    const TOP = gMax + 0.30;
+    place('shelf' + i, x, z, { radius: 4.6, baseY: gMin - 1.0, topY: TOP });
+    const yaw = faceOut(S.b);
+    put('A', 'midLit', massGeo(4.4, 8.4, 0.36, 1.5, 0.10), x, TOP - 0.36, z, yaw);
+    /* the nosing is FLUSH with the surface and only proud in plan — the same reading as the apron's
+       and the concourse terrace's. A bright lip standing 80 mm above the plate would be something to
+       lie against rather than on, which is the opposite of what this piece is. */
+    put('A', 'lit', massGeo(4.8, 8.8, 0.10, 1.7, 0.03), x, TOP - 0.10, z, yaw);
+    /* the skirt reaches PAST the lowest cloud under the plate, so it never floats (contract law 1).
+       There is no soffit wash here on purpose: the plate sits 0.3 m off the cloud, so a bounce card
+       under it would be buried in vapour and light nothing. */
+    const skTop = TOP - 0.36, skBot = gMin - 1.0;
+    if (skTop > skBot) put('A', 'mid', massGeo(3.8, 7.6, skTop - skBot, 1.2, 0.10), x, skBot, z, yaw);
+    /* the bolster, sitting ON the plate at the inland end: what your head goes on, and the reason the
+       shelf reads as a place to lie down rather than as a very wide step */
+    put('X', 'midLit', chamferBox(4.0, 0.30, 0.66, 0.14), x - d.x * 3.55, TOP + 0.15, z - d.z * 3.55, yaw);
+  });
+
+  /* ---- the lanterns: the walk out to the sunset ---------------------------------------------------
+     There is no built path from the apron to the overlook and there must not be: a paved ribbon 230 m
+     long across open cloud would be the single biggest piece of architecture in the realm. So the
+     route is carried by SEVEN LIGHTS, 36–46 m apart, each finding its own ground — enough to read as
+     a way through at dusk, and nothing at all to walk around.
+
+     WARM, AND LEGALLY SO. A lantern is interior light in the only form this realm has for it (law 3),
+     and the two things every light here owes the world (law 2) are both present on each one: a pool
+     that CONFORMS to the cloud beneath it, and a halo on its own mount under the cap. */
+  const LANTERNS = [
+    { b: 0.06, r: 46 }, { b: 0.06, r: 84 }, { b: 0.06, r: 120 }, { b: 0.06, r: 156 }, { b: 0.06, r: 192 },
+    /* the two on the rest deck's approach. MEASURED: the deck's own mast lamp stands at (−65.4,
+       −184.7), so the outer of these is at r 176 rather than 186 — 20 m from it instead of 10, which
+       is the difference between a lit sequence and two lamps that look like one mistake. */
+    { b: -0.34, r: 148 }, { b: -0.34, r: 176 }
+  ];
+  LANTERNS.forEach((LN, i) => {
+    const d = layout.dir(LN.b), x = d.x * LN.r, z = d.z * LN.r;
+    if (!footprintSolid(x, z, 1.6)) return;
+    const gy = ground(x, z);
+    place('lantern' + i, x, z, { radius: 1.4, topY: gy + 2.8 });
+    strut('A', 'satin', x, gy - 0.7, z, x, gy + 2.55, z, 0.11, 0.075, 7);
+    /* the shade: narrow on top, wide underneath, so it throws the light DOWN at the cloud instead of
+       sideways at the horizon. Horizontal faces, so it takes the low-metal grade (the header). */
+    put('A', 'lit', new THREE.CylinderGeometry(0.30, 0.46, 0.17, 12), x, gy + 2.66, z);
+    put('A', 'warm', new THREE.CircleGeometry(0.34, 12).rotateX(HALF_PI), x, gy + 2.52, z);
+    put('A', 'warmSoft', new THREE.CylinderGeometry(0.30, 0.52, 0.46, 12, 1, true), x, gy + 2.28, z);
+    conformDisc('A', 'warmSoft', x, z, 2.8, 0.07, 14, 2);
+  });
+
+  /* ---- the gathering circles ---------------------------------------------------------------------
+     A marking that says STOP HERE rather than GO THIS WAY. Both sit OFF the line of the lanterns —
+     beside the walk, not on it — because a circle laid on a route is a roundabout and a circle beside
+     one is a place to sit down. The seats are at deliberately uneven angles for the same reason: four
+     chairs on the cardinals is a meeting, three scattered round a plate is people who chose to stay.
+     Unlit, restrained, and the lantern 20–27 m away is the only light either of them gets. */
+  const CIRCLES = [
+    { b: 0.19, r: 200, seats: [0.35, 1.62, 2.94, 4.55] },   /* the shoulder before the overlook */
+    { b: -0.42, r: 172, seats: [0.9, 2.5, 4.9] }            /* off the rest deck's approach */
+  ];
+  CIRCLES.forEach((C, ci) => {
+    const d = layout.dir(C.b), x = d.x * C.r, z = d.z * C.r;
+    if (!footprintSolid(x, z, 7.5)) return;
+    place('gather' + ci, x, z, { radius: 6.0, topY: ground(x, z) + 0.1 });
+    /* the plate CONFORMS to the cloud — a marking follows the floor, it never levels it (§03) */
+    conformDisc('A', 'lit', x, z, 6.0, 0.06, 22, 2);
+    /* ten dashes just outside the plate. ry = −a − PI/2 puts each one's LONG axis on the tangent, so
+       the set reads as a dashed circle; −a alone would lay them radially and give the plate a ring of
+       spokes, which is a different mark meaning a different thing. */
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * TAU + 0.21;
+      const mx = x + Math.cos(a) * 6.35, mz = z + Math.sin(a) * 6.35;
+      put('X', 'lit', chamferBox(1.05, 0.07, 0.18, 0.02), mx, ground(mx, mz) + 0.09, mz, -a - HALF_PI);
+    }
+    for (const a of C.seats) {
+      const sx = x + Math.cos(a) * 4.5, sz = z + Math.sin(a) * 4.5;
+      const gy = ground(sx, sz);
+      /* each seat finds its own cloud, sits across the radius and faces the middle of the circle */
+      put('X', 'midLit', chamferBox(1.6, 0.14, 0.62, 0.05), sx, gy + 0.50, sz, -a - HALF_PI);
+      put('X', 'mid', chamferBox(0.64, 0.42, 0.48, 0.04), sx, gy + 0.27, sz, -a - HALF_PI);
+    }
+  });
 
   /* ================================================================= SECTOR C — TRAINING
      SPARSE, and it has to stay sparse: the content of this sector is DISTANCE (§21–24, §51). Three

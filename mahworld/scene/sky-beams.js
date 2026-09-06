@@ -61,13 +61,6 @@ const TAU = Math.PI * 2;
 const clamp01 = x => (x < 0 ? 0 : x > 1 ? 1 : x);
 function smoothstep(e0, e1, x) { const t = clamp01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); }
 
-/* COLOUR SPACE, and it is not a nicety — the same trap sky-structures.js and sky-terrain.js document.
-   layout.atmosphere() writes its stops with Color.setRGB(), which in three r185 does NOT decode sRGB,
-   while fillFor()/atmosphere() hand back a packed hex. Reading that hex with setHex() WOULD decode it,
-   and the beams' haze tint would sit visibly darker and more saturated than the sky they hang in. One
-   convention, one sky: read the hex raw, exactly the way atmosphere() reads its own stops. */
-function rawHex(h, out) { return out.setRGB(((h >> 16) & 255) / 255, ((h >> 8) & 255) / 255, (h & 255) / 255); }
-
 /* ------------------------------------------------------------------ the four layers
    ts/rs are the tube's tessellation. They fall hard with distance because a 5 km route subtends a
    pixel: spending 74 segments on it buys nothing but triangles (§45, §46).
@@ -677,7 +670,13 @@ export function buildSkyBeams(ctx) {
   /* The atmospheric tint. atmosphere() is asked for 48 bearings per tinted layer, not for 56 000
      vertices, and the result is applied through the per-vertex bucket recorded at build. The tint is
      NORMALISED (its brightest channel becomes 1) so it only ever shifts a beam's HUE toward the sky
-     it hangs in — it must not darken the network, which is energy and has its own value. */
+     it hangs in — it must not darken the network, which is energy and has its own value.
+
+     COLOUR SPACE, and it is not a nicety — the same trap sky-structures.js and sky-terrain.js
+     document. atmosphere() is asked to write straight into a THREE.Color, which it does with
+     setRGB(); in three r185 that does NOT decode sRGB. Taking its packed-hex return and reading it
+     back with setHex() WOULD decode, and the distant beams would haze toward a colour visibly darker
+     and more saturated than the sky they hang in. One convention, one sky. */
   const lut = new Float32Array(TINT_BUCKETS * 3);
   function repaintTint() {
     if (!band) return;

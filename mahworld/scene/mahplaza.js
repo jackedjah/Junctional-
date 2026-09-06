@@ -474,6 +474,32 @@ export async function createMahplaza(canvas, options = {}) {
   }
   /* evidence only: frame an arbitrary point (used by the capture script to look at an ambient event) */
   function setCustomView({ pos, look, fov = 56 }) { state.view = 'custom'; state.yaw = state.pitch = state.dolly = 0; smooth.yaw = smooth.pitch = smooth.dolly = 0; anim = null; cur.pos.set(...pos); cur.look.set(...look); cur.fov = fov; requestRender(); return true; }
+  /* ---- §42 / §43 ACCEPTANCE INSTRUMENT --------------------------------------------------------
+     The upper realm has had a spin ring since it was built; the lower world has only ever been
+     judged from named views, which is exactly the failure the law names — "a map that works from
+     one angle". This is the same instrument for the city: ONE eye point, the bearing swept, so a
+     sector that was never composed cannot hide behind a camera that was.
+
+     Bearing convention is the world's, shared with sky-layout.js: dir(b) = (sin b, 0, -cos b), so
+     bearing 0 looks up the spine of the site toward MAH MATCH, 90 toward MAH MARKET, 270 toward
+     MAH GYM, 180 back out over the arrival ground. Pitch is signed degrees: negative looks DOWN
+     at the mirror floor, 0 is level, positive is the megatall look-up test (§44).
+
+     It does not disturb VIEWS, the tour, or the collider dolly — it is evidence only, like
+     setCustomView, which it delegates to. */
+  const LOOK360 = { eye: [0, 5.6, 14], reach: 90 };
+  function look360(degrees, { pitch = 0, fov = 62, eye = null, height = null } = {}) {
+    const b = (Number(degrees) || 0) * Math.PI / 180;
+    const p = (Number(pitch) || 0) * Math.PI / 180;
+    const e = eye ? eye.slice() : LOOK360.eye.slice();
+    if (height != null) e[1] = height;
+    const ch = Math.cos(p), r = LOOK360.reach;
+    return setCustomView({
+      pos: e,
+      look: [e[0] + Math.sin(b) * ch * r, e[1] + Math.sin(p) * r, e[2] - Math.cos(b) * ch * r],
+      fov
+    });
+  }
   async function tour({ hold = 900, leg = 3800 } = {}) {
     if (state.touring) return false; state.touring = true;
     try { await setView(TOUR[0], { instant: true }); await sleep(hold); for (let i = 1; i < TOUR.length; i++) { await setView(TOUR[i], { duration: leg }); await sleep(hold); } } finally { state.touring = false; }
@@ -683,7 +709,7 @@ export async function createMahplaza(canvas, options = {}) {
     const mirrorPos = new THREE.Vector3(0, MIRROR_Y, 0);
     const view = new THREE.Vector3(), target = new THREE.Vector3(), up = new THREE.Vector3(), look = new THREE.Vector3();
     const rot = new THREE.Matrix4(), plane = new THREE.Plane(), q = new THREE.Vector4(), cp = new THREE.Vector4();
-    let strength = { value: 0.9 }, hidden = [];
+    let strength = { value: 0.52 }, hidden = [];   /* v10 §10: 0.9 duplicated the city; see the shader note */
     /* A REFLECTION ONLY CHANGES WHEN THE VIEW DOES. The city behind it is static; the mirror pass is
        a second full scene render, so redrawing it every frame doubles the whole cost to show an
        identical image. It is redrawn when the camera has actually moved, and forced whenever
@@ -780,13 +806,57 @@ export async function createMahplaza(canvas, options = {}) {
       shader.fragmentShader = 'uniform sampler2D tPlazaMirror;\nuniform float uMirrorStrength;\nvarying vec4 vMirrorCoord;\n' + shader.fragmentShader
         .replace('#include <opaque_fragment>', `
         {
-          vec3 mrefl = texture2DProj( tPlazaMirror, vMirrorCoord ).rgb;
+          /* SURFACE BREAK-UP. The plaza is cut stone, not a pond: ground.js sets every cell crown
+             about 1.2 degrees off its own table and every joint is a real edge. Pushing the
+             projected sample along the BUMPED normal is what puts that relief into the reflection,
+             so the returned city is broken across the lattice instead of arriving whole — and it is
+             the cheapest available stand-in for a roughness-convolved probe. */
+          vec4 mcoord = vMirrorCoord;
+          mcoord.xy += normal.xz * 0.085 * mcoord.w;
+          /* ROUGHNESS CONVOLUTION GROWS WITH PATH LENGTH. A perfectly sharp planar pass returns the
+             skyline as legibly upside down as it is right way up, and no amount of dimming fixes
+             that — a dim duplicate is still a duplicate. Real polished stone smears a reflection
+             VERTICALLY, and it smears the far ones more than the near ones, because the reflected
+             ray has travelled further across the same micro-relief. Three taps up the view axis,
+             widening with distance: the bench two metres away stays crisp, the tower four hundred
+             metres away arrives as a streak of its own light. This, not the strength, is what turns
+             "the city is duplicated upside down" into "that floor is insane". */
+          float mdist = length( vViewPosition );
+          float smear = ( 0.0035 + 0.030 * smoothstep( 18.0, 140.0, mdist ) ) * mcoord.w;
+          vec4 mup = mcoord + vec4( 0.0, smear, 0.0, 0.0 );
+          vec4 mdn = mcoord - vec4( 0.0, smear, 0.0, 0.0 );
+          vec3 mrefl = texture2DProj( tPlazaMirror, mcoord ).rgb * 0.40
+            + texture2DProj( tPlazaMirror, mup ).rgb * 0.30
+            + texture2DProj( tPlazaMirror, mdn ).rgb * 0.30;
           /* FRESNEL. A mirror floor returns almost everything at a grazing angle and very little
              looking straight down at your feet — that asymmetry is most of what reads as "wet
              polished stone" rather than "a picture pasted on the ground". */
           float ndv = clamp( dot( normalize( vViewPosition ), normal ), 0.0, 1.0 );
-          float fres = pow( 1.0 - ndv, 2.6 );
-          outgoingLight = mix( outgoingLight, mrefl, uMirrorStrength * ( 0.16 + 0.84 * fres ) );
+          float fres = pow( 1.0 - ndv, 4.0 );
+          /* COHERENCE FALLS OFF WITH PATH LENGTH — the correction §10 actually asks for. Every plaza
+             camera looks at this floor at a 2-12 degree depression, so fresnel alone was near 1.0
+             across the whole visible deck and the far half returned the skyline sharply enough to
+             be read as a second city hanging upside down. That is the one reaction the law rules
+             out. The NEAR floor keeps its reflection — lamps, seams, the monument, residents, the
+             part that reads as "that floor is insane" — and the far floor lets go of it. */
+          float coh = 1.0 - 0.72 * smoothstep( 60.0, 300.0, mdist );
+          /* BLACK PLATINUM ABSORBS — HARD. Measured at bearing 180: the deck at 78 m was returning
+             lum 128 against mountains at lum 6-29 and the city ground at lum 12, so the emptiest
+             surface in the frame was ten times brighter than everything behind it. That is the same
+             value inversion this world has already been caught by twice, and §07 asks for
+             ultra-pristine black. A 0.78 tint is a wet grey stone; a black one keeps roughly a
+             third, and cooler than it received. The bright catches come from the studs, the joints
+             and the light pools, which are separate materials and untouched. */
+          mrefl *= vec3( 0.34, 0.40, 0.52 );
+          outgoingLight = mix( outgoingLight, mrefl, uMirrorStrength * coh * ( 0.05 + 0.95 * fres ) );
+          /* THE DECK MAY NOT OUT-VALUE THE ARCHITECTURE (§07). Everything above governs what the
+             floor RETURNS; this governs how much of it survives at a grazing angle, which is the
+             only angle a plaza camera ever sees the middle distance at. Without it the deck measured
+             lum 128 at 78 m against mountains at 6-29 and city ground at 12 — the emptiest surface
+             in the frame was its brightest, which is the value inversion this world has already been
+             caught by twice. Keyed to the same fresnel the reflection uses, so the floor at your
+             feet is untouched and only the far grazing sheet comes down. */
+          outgoingLight *= mix( 1.0, 0.16, fres );
         }
         #include <opaque_fragment>`);
     };
@@ -856,7 +926,7 @@ export async function createMahplaza(canvas, options = {}) {
 
   return {
     version: 'mahplaza-v3',
-    views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, tour, ready, state, clock, camera, scene, renderer, buildings,
+    views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
     modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams }, terrain, city, dressing, matchInterior, life, clouds, fobeams,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
