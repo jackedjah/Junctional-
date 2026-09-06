@@ -513,6 +513,41 @@ export function buildHaloDistricts(ctx, opts = {}) {
       }
       P.terrace(D.deg, 0, 20, D.span * 0.8, 74, 0.32);
       for (const s of [-90, 90]) P.mast(D.deg, s, 56, 14, s);
+      /* ---- THE SERVING CANOPY, and why TABLE needed one -------------------------------------
+         L53 at district scale. TABLE's whole vocabulary was six 4.6 m kiosks and twenty-four 3.4 m
+         seats spread across a 300 m span: one object every 12 m, each of them dust from any camera
+         that can see the district at all, so from the ring HALO TABLE read as bare plate with a
+         sign on it. More kiosks would have been more dust.
+
+         What a food district needs is the thing that makes one legible from across a concourse: a
+         ROOF. 168 m of it on nine pier pairs, following the ring's curve, with a dark soffit and a
+         platinum fascia — so the district has a silhouette at a kilometre, a shaded edge to serve
+         under, and somewhere for the warm counter light to bounce. It is the same answer the
+         sector architecture gave the open plate, scaled to a district instead of a ring. */
+      {
+        const BAYS = 9, SPAN = 168, H = 12.5;
+        for (let k = 0; k <= BAYS; k++) {
+          const sp = -SPAN / 2 + (k * SPAN) / BAYS;
+          for (const side of [-1, 1]) {
+            const [px, pz, pth] = ringPoint(D.deg, sp, -46 + side * 13);
+            put('plat', chamferBox(2.0, H, 2.0, 0.5), mat(px, pz, H / 2, -pth), 0.90);
+            put('plat', chamferBox(3.0, 0.6, 3.0, 0.18), mat(px, pz, H - 0.4, -pth + 0.4), 1.0);
+          }
+        }
+        /* the deck itself, laid in bays so it follows the curve rather than chording across it */
+        for (let k = 0; k < BAYS; k++) {
+          const sc = -SPAN / 2 + ((k + 0.5) * SPAN) / BAYS;
+          const [cx, cz, cth] = ringPoint(D.deg, sc, -46);
+          put('dark', chamferBox(30, 0.9, SPAN / BAYS * 0.99, 0.3), mat(cx, cz, H + 0.9, -cth), 0.26);
+          put('plat', chamferBox(31.5, 0.34, SPAN / BAYS * 0.99, 0.12), mat(cx, cz, H + 1.5, -cth), 1.0);
+          /* a square-diamond node over every other bay, so the roof carries the brand figure */
+          if (k % 2 === 1) {
+            const dg = own(new THREE.OctahedronGeometry(1, 0));
+            put('plat', dg, mat(cx, cz, H + 3.4, -cth, 3.0, 2.3, 3.0), 1.0);
+          }
+        }
+        stats.canopyBays = BAYS;
+      }
       districtSign(D, ...(() => { const [x, z, th] = ringPoint(D.deg, 0, -66); return [x, z, th]; })(), 14);
 
     } else if (D.id === 'play') {

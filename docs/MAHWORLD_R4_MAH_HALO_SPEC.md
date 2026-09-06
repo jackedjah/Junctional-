@@ -137,14 +137,24 @@ surfaces, two-storey bounds) · `mahplaza.js` (build order, hook lists, `roam.se
 plaza's ~1800 / ~1.2M.
 
 **Corrections that came out of renders, in order of how much frame they occupied.**
-1. 95% bare plate → the sector architecture (L53).
-2. Graph paper to the horizon → MEGA ramps out, polar scales take over (L52).
-3. A sheet of milk → the three-grade material ladder and the platinum-is-edges rule (L51).
-4. `halo-rims` had NaN in all 205,824 positions from one undefined scale argument, so the two rims
+1. **The underside was a lit lid.** From MAHPLAZA — the view the world is seen from most — the halo
+   filled the sky as a pale ceiling out-valuing the night. Grazing Fresnel on a 6800 m dome (L57).
+2. 95% bare plate → the sector architecture: 16 joints, 64 pylons (L53).
+3. Graph paper to the horizon → MEGA ramps out, polar spokes and bands take over (L52).
+4. A sheet of milk → the three-grade material ladder, platinum confined to verticals and edges, and
+   finally the district decks taking the shell's own plating rather than a third env tweak (L51).
+5. **The overlooks photographed black.** The dish rises 39.6 m to the rim, so a window cut 60 m
+   short looks uphill at a lip 1.8 m above eye level — the guard rail deleting its own clause. They
+   are 30 m cantilevers now, straddling the shell's edge with 29 m over open air.
+6. `halo-rims` had NaN in all 205,824 positions from one undefined scale argument, so the two rims
    never drew (L56).
-5. The dock raked at 61° instead of the 32.7° its own header claimed (L55).
-6. Two `ctx.lightPool` calls would have painted the terrain 1800 m below (L54).
-7. Overlooks in three districts of eight → all eight reach the rim.
+7. The dock raked at 61° instead of the 32.7° its own header claimed (L55).
+8. Two `ctx.lightPool` calls would have painted the terrain 1800 m below (L54).
+9. **Four elements rotated 90° to their own supports** — `kerb()`, `P.screen` (twice: fixed onto the
+   wrong axis first), and HALO STAGE's proscenium, whose beams floated crosswise over their piers.
+10. Masts at 23:1 → section derived from height (L58). Overlooks in three districts of eight → all
+    eight. Crystal growths dark-on-dark → a platinum crown. HALO TABLE's 4.6 m kiosks over a 300 m
+    span → a 168 m serving canopy, L53's answer at district scale.
 
 **Open.**
 - **The downward world view is thin at night.** R4 gives it a clause. From 1836 m the world below is
