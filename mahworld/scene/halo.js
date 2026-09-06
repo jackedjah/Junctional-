@@ -347,6 +347,23 @@ export function buildHalo(ctx) {
      lit lid over the world. */
   const under = (M.graphiteMetal || M.graphite || new THREE.MeshStandardMaterial({ color: 0x141b28 })).clone();
   under.name = 'halo-underside'; under.vertexColors = false; under.side = THREE.BackSide;
+  /* THE MOST CONSEQUENTIAL MATERIAL IN THIS FILE, because it is the one the WHOLE WORLD sees. The
+     view a viewer gets most often is not from the ring, it is upward from MAHPLAZA, and the first
+     such render came back with the underside as a PALE BLUE LID filling the sky and out-valuing the
+     night behind it — v7's value inversion ("the sky out-values the architecture") arriving upside
+     down, at the largest scale the world has.
+
+     The cause is the same one L51 names, on a ceiling: graphiteMetal is envMapIntensity 1.5, the
+     dome overhead is seen at grazing incidence across nearly the whole frame, and grazing Fresnel
+     returns the bright horizon whatever the base colour is. LAW 1 predicts a down-facing metal
+     samples the near-black lower hemisphere and goes BLACK — and it does, exactly where the surface
+     faces you. Everywhere else, which is most of the sky, it is a mirror edge-on.
+
+     So the underside is authored as what the comment below always said it was: a vast DARK arc with
+     structure in it. Roughness up, env down hard, and the grid left as the only thing that emits —
+     which is what makes a 6800 m ceiling read as engineered rather than as weather. */
+  under.roughness = 0.82; under.envMapIntensity = 0.14; under.roughnessMap = null;
+  under.color.setHex(0x121a26);
   applyHaloGrid(under, { gainMicro: 0, gainTile: 0.06, gainMega: 0.30, node: 0.35, tileFar: 220 });
   owned.materials.push(under);
 

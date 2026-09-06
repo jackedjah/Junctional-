@@ -129,7 +129,7 @@ export function buildHaloDistricts(ctx, opts = {}) {
      between the two. Left at the plaza's own r0.34 the STAGE's 100 x 44 m deck and FORUM's 150 m
      treads mirror the horizon the same way the shell did, at a smaller scale but from the same
      standing eye. Three grades over sixty times the span is the ladder, not one number. */
-  darkMat.roughness = 0.52; darkMat.envMapIntensity = 0.45;
+  darkMat.roughness = 0.56; darkMat.envMapIntensity = 0.30;
   owned.materials.push(darkMat);
   /* R4's VISUAL SEPARATION list puts TRANSMISSION second, right after silhouette. The overlooks and
      the display surfaces are the only transmissive thing up here, which is what makes an overlook
@@ -234,11 +234,22 @@ export function buildHaloDistricts(ctx, opts = {}) {
        FOBEAM retains the miniature vertical music-line motif") */
     mast(deg, s, t, h, seed) {
       const [x, z, th] = ringPoint(deg, s, t);
-      put('plat', chamferBox(1.4, h, 1.4, 0.36), mat(x, z, h / 2, -th), 0.88);
-      put('plat', chamferBox(2.4, 0.44, 2.4, 0.14), mat(x, z, h - 0.3, -th + 0.4), 1.0);
+      /* THE PROPORTION IS THE LESSON mahascent ALREADY PAID FOR. A fixed 1.4 m section carried
+         heights from 11 to 32 m — up to 23:1, which is the slenderness that aliases to a hairline
+         and puts a picket fence across a district. A mast at about 6:1 is a structure: it has a
+         silhouette, it casts, and the square diamond on top is carried rather than balanced. The
+         section grows with the height instead of being a constant, and everything above it is a
+         multiple of the section so a short mast and a tall one are the same object at two sizes. */
+      const w = Math.max(1.6, h / 6);
+      put('plat', chamferBox(w, h, w, w * 0.26), mat(x, z, h / 2, -th), 0.88);
+      put('plat', chamferBox(w * 1.7, 0.44 + w * 0.10, w * 1.7, 0.14), mat(x, z, h - 0.3, -th + 0.4), 1.0);
       const dia = own(new THREE.OctahedronGeometry(1, 0));
-      put('plat', dia, mat(x, z, h + 2.2, -th, 1.8, 1.4, 1.8), 1.0);
-      musicSites.push({ x: x + Math.cos(th) * 2.6, y: haloHeight(x, z) + 0.9, z: z + Math.sin(th) * 2.6, ry: -th, scale: 2.2 });
+      /* wider than tall — the brand figure, never a spike wearing its name (§06) */
+      put('plat', dia, mat(x, z, h + w * 1.05, -th, w * 1.25, w, w * 1.25), 1.0);
+      /* the motif stands CLEAR of the mast, and the clearance has to follow the section now that
+         the section grows with height — at 2.6 m a 5.3 m mast would have swallowed it */
+      const mo = w * 0.5 + 1.6;
+      musicSites.push({ x: x + Math.cos(th) * mo, y: haloHeight(x, z) + 0.9, z: z + Math.sin(th) * mo, ry: -th, scale: 1.6 + w * 0.22 });
       return [x, z, th];
     },
     /* SUPPORTED SEATING — R4 asks for "supported seating" and "movable seating" by name. A bench in
@@ -277,10 +288,15 @@ export function buildHaloDistricts(ctx, opts = {}) {
     screen(deg, s, t, w, h, ry) {
       const [x, z, th] = ringPoint(deg, s, t);
       const a = -th + (ry || 0);
+      /* THE POSTS AND THE PANEL MUST SPAN THE SAME AXIS. mat(x,z,up,a) sends local +X to
+         (cos a, -sin a) and local +Z to (sin a, cos a). The first cut spanned the base and the glass
+         along local X and then offset the posts along local Z — a screen turned ninety degrees to
+         the two posts holding it, and nothing failed. Both now use the X axis. */
+      const px = Math.cos(a), pz = -Math.sin(a);
       put('plat', chamferBox(w + 1.4, 0.5, 1.2, 0.2), mat(x, z, 0.6, a), 0.9);
       for (const side of [-1, 1]) {
         put('plat', chamferBox(0.7, h, 0.7, 0.2),
-          mat(x + Math.cos(a + Math.PI / 2) * side * w * 0.5, z - Math.sin(a + Math.PI / 2) * side * w * 0.5, h / 2, a), 0.94);
+          mat(x + px * side * w * 0.5, z + pz * side * w * 0.5, h / 2, a), 0.94);
       }
       put('glass', chamferBox(w, h * 0.78, 0.18, 0.06), mat(x, z, h * 0.52, a), 0.62);
       return [x, z, th];
@@ -533,11 +549,19 @@ export function buildHaloDistricts(ctx, opts = {}) {
       for (let k = 0; k < 3; k++) {
         const t = -78 + k * 13, h = 40 - k * 6, w = 92 - k * 10;
         const [ax, az, ath] = ringPoint(D.deg, 0, t);
+        /* A PROSCENIUM SPANS THE WAY ITS PIERS ARE SPACED, and the first cut did not: the piers were
+           offset TANGENTIALLY (correctly — the crowd sits outboard, so the arch opens across their
+           view) while the crossbeam was authored along local X, which mat(..., -ath) sends RADIALLY.
+           Three beams floated in the air ninety degrees to the piers under them. The span is the Z
+           dimension now, which is the tangential one.
+           The piers also carry L58's ratio: 2.4 m at 40 m is 16.7:1, the slenderness that made
+           mahascent's masts a picket fence. */
+        const pw = Math.max(2.4, h / 7);
         for (const side of [-1, 1]) {
-          put('plat', chamferBox(2.4, h, 2.4, 0.7),
+          put('plat', chamferBox(pw, h, pw, pw * 0.28),
             mat(ax + Math.cos(ath + Math.PI / 2) * side * w * 0.5, az + Math.sin(ath + Math.PI / 2) * side * w * 0.5, h / 2, -ath), 0.88);
         }
-        put('plat', chamferBox(w, 2.6, 3.2, 0.8), mat(ax, az, h, -ath), 1.0);
+        put('plat', chamferBox(3.2, 2.6, w, 0.8), mat(ax, az, h, -ath), 1.0);
       }
       P.screen(D.deg, -62, -70, 26, 15, 0); P.screen(D.deg, 62, -70, 26, 15, 0);
       for (let k = 0; k < 6; k++) P.mast(D.deg, -110 + k * 44, -30, 26 + 9 * frac(k * 5), k * 7);

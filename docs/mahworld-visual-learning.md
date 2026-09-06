@@ -784,6 +784,39 @@ warning — a mesh that fails this way fails silently and looks like a design de
 
 ---
 
+## L57 — The view a thing is seen from MOST is not the view it was authored from
+**Where it bit.** MAH HALO was designed, measured and corrected from cameras ON the ring. But almost
+every hour a viewer spends in MAHWORLD is spent on the ground, and from the plaza the halo is not a
+sanctuary at all — it is a **6800 m ceiling filling the entire sky**. The first upward render showed
+it as a PALE BLUE LID out-valuing the night behind it: v7's value inversion ("the sky out-values the
+architecture") arriving upside down at the largest scale the world has, and the module's own comment
+had already said the underside must read as "a vast dark arc with structure in it rather than a lit
+lid over the world".
+**Why the material lied.** Same mechanism as L51, on a ceiling. `graphiteMetal` carries
+envMapIntensity 1.5, the dome overhead is at grazing incidence across nearly the whole frame, and
+grazing Fresnel returns the bright horizon whatever the base colour is. LAW 1's prediction (a
+down-facing metal samples the near-black lower hemisphere and goes black) holds only in the small
+part of the frame where the surface actually faces you.
+**Regression.** Before calling a large object finished, render it from the place the viewer spends
+their time, not the place you built it. For anything overhead that is also the LARGEST value
+decision in the scene, so it is the first frame to check, not the last.
+
+---
+
+## L58 — Slenderness is a proportion, so a fixed section cannot serve a range of heights
+**Where it bit, twice.** `mahascent` learned it first: four 2 m masts at 34 m is 17:1, which aliases
+to a hairline and reads as a picket fence. `halo-districts` then wrote `chamferBox(1.4, h, 1.4)` and
+passed h from 11 to 32 — up to **23:1** — so the same failure came back in a district where the fix
+was already written down one file away.
+**The fix is to make the constant a ratio.** `w = max(1.6, h / 6)`, and every part above it a
+multiple of `w`, so a short mast and a tall one are the same object at two sizes rather than two
+different objects. The clearance for the music-line motif has to follow the section too, or a 5.3 m
+mast swallows a motif offset at a constant 2.6 m.
+**Regression.** Any repeated element whose size varies takes its section from its height, never from
+a literal. When a lesson names a ratio, store the ratio.
+
+---
+
 ## Standing ownership map (reuse, do not rediscover)
 
 | System | Owner |
