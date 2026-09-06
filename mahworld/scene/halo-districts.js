@@ -429,6 +429,12 @@ export function buildHaloDistricts(ctx, opts = {}) {
       }
       stats.overlooks++;
       spawnPoints.push({ x, z, kind: 'overlook' });
+      /* WHERE THE RAIL IS, published — because the alternative is a second table (L42) and the
+         second table is how halo-life came to stand two people at a rim wall 21 m inboard of the
+         nearest bay. `rail` is the radius of the far end, the one you actually lean on. */
+      (stats.overlookSites || (stats.overlookSites = [])).push({
+        deg, s, w, r: rDeck, rail: rDeck - D * 0.5 + 1.6, up: drop + 0.55
+      });
       return [x, z, th];
     }
   };
@@ -636,7 +642,13 @@ export function buildHaloDistricts(ctx, opts = {}) {
         /* §07 again: a 150 m tread in platinum is a 150 m mirror. The TREAD is dark and the NOSING —
            the front lip, the part that is nearly vertical to a seated eye — carries the metal. That
            is also how a real stepped auditorium reads: the edge catches, the seat does not. */
-        put('dark', chamferBox(9.4, 0.2, w, 0.08), mat(x, z, 1.5 + k * 0.9, -th), 0.42 + 0.04 * k);
+        /* AND THE VALUE MATTERS AS MUCH AS THE AXIS. The first cut gave these tread tops 0.42 rising
+           to 0.66 — bright vertex values on a plated dark material, seven of them, each 150 m long.
+           Photographed from the auditorium floor they were seven horizontal white bands and the
+           amphitheatre read as a multi-storey car park. §07 does not stop at material choice: a
+           near-black surface painted 0.66 is not near-black. The tread is 0.18, the NOSING keeps the
+           metal, and the step reads because its front lip catches while its seat does not. */
+        put('dark', chamferBox(9.4, 0.2, w, 0.08), mat(x, z, 1.5 + k * 0.9, -th), 0.18 + 0.02 * k);
         const [nx2, nz2] = ringPoint(D.deg, 0, t - 4.4);
         put('plat', chamferBox(0.6, 0.34, w, 0.1), mat(nx2, nz2, 1.62 + k * 0.9, -th), 1.0);
       }

@@ -73,26 +73,49 @@ export const LIFE = Object.freeze({
 const NODES = [
   /* ARRIVAL — people who have just stepped off the pier and are orienting, on the terraces (1.48) */
   [-90, -40, -20, 3, 'cluster', 1.48], [-90, 60, -26, 2, 'pair', 1.48],
-  /* and two at an overlook rail. THE RAIL MUST BE AT AN OVERLOOK: the bays straddle the shell's
-     inner edge at r 637-667, which is t = -1398 from the midline, not the -20 the first cut used. */
-  [-90, 0, -(HALO.R_MID - HALO.R_IN) - 12, 2, 'rail', 0.44],
   /* COMMONS — R4's intentional emptiness, so the few here are widely spaced pairs on open plate */
   [-45, -170, 10, 2, 'pair', 0], [-45, 40, -30, 2, 'pair', 0], [-45, 200, 40, 3, 'cluster', 0],
   /* PULSE — the dance floor, on the event tiles (0.30); the flanking rows on terraces */
-  [0, 0, 0, 9, 'crowd', 0.30], [0, -110, 38, 3, 'row', 1.48], [0, 110, 38, 3, 'row', 1.48],
+  [0, 0, 0, 22, 'crowd', 0.30], [0, -110, 38, 7, 'row', 1.48], [0, 110, 38, 7, 'row', 1.48],
   /* TABLE — served along the kiosk line at plate level, and seated on the terrace */
-  [45, -100, -44, 2, 'row', 0], [45, -20, -44, 2, 'row', 0], [45, 60, -44, 2, 'row', 0],
-  [45, 0, 18, 4, 'cluster', 1.48],
+  [45, -100, -44, 4, 'row', 0], [45, -20, -44, 4, 'row', 0], [45, 60, -44, 4, 'row', 0],
+  [45, 0, 18, 5, 'cluster', 1.48],
   /* PLAY — two of the three arenas in use, on their terraces, with spectators outboard */
-  [90, -108, 0, 4, 'ring', 1.48], [90, 108, 0, 3, 'ring', 1.48], [90, 0, 48, 3, 'row', 0],
+  [90, -108, 0, 6, 'ring', 1.48], [90, 108, 0, 5, 'ring', 1.48], [90, 0, 48, 7, 'row', 0],
   /* QUIET — low stimulation is a design constraint, so this is the sparsest district on the ring */
   [135, -150, 20, 1, 'single', 0], [135, 60, -30, 2, 'pair', 0],
   /* FORUM — seated ON the amphitheatre tiers. t = 20 + k*11 and the tread top is 1.5 + k*0.9, so
      these three rows sit on tiers k = 1, 3 and 5 and their lifts are read off that, not guessed. */
-  [180, -40, 31, 4, 'row', 2.40], [180, 30, 53, 4, 'row', 4.20], [180, -10, 75, 3, 'row', 6.00],
+  [180, -40, 31, 11, 'row', 2.40], [180, 30, 53, 11, 'row', 4.20], [180, -10, 75, 9, 'row', 6.00],
   /* STAGE — the crowd field on the event tiles in front of the proscenium */
-  [-135, 0, -6, 8, 'crowd', 0.30], [-135, -120, 40, 3, 'row', 0], [-135, 120, 40, 3, 'row', 0]
+  [-135, 0, -6, 24, 'crowd', 0.30], [-135, -120, 40, 8, 'row', 0], [-135, 120, 40, 8, 'row', 0]
 ];
+
+/* ================================================================================================
+   THE FIELD — the population the nodes are COMPOSED AGAINST.
+
+   The first cut was 83 figures. Measured against the ring that is one person every 200 m, and the
+   wide frame said so: the district-to-district view — the exact view R4's curvature proof requires
+   to "feel INHABITED" — came back as a few coloured specks on 2700 m of plate. A composition of
+   authored groups is not a population; it is a cast standing in an empty theatre. Nodes stay what
+   they are (the dance floor, the seated rows, the conversation circles) and the FIELD is everybody
+   else: people crossing a district, waiting at its edge, walking between two of them.
+
+   WHY THE FIELD AVOIDS THE MIDDLE OF EVERY DISTRICT. There is no height query for district
+   furniture — halo-districts publishes no heightAt() and a terrace is a merged solid, so a figure
+   dropped at a random (s, t) inside a built core stands at SHELL height and is buried in whatever
+   is over it, which is exactly the empty-auditorium defect again with more figures. So the field
+   takes the two PROMENADE BANDS either side of each district's built core: inboard -170 to -100,
+   outboard 90 to 240. Both are open plate the whole way round, where lift 0 is not an assumption. */
+const FIELD = [
+  /* deg, count — density is the district's own character, not a uniform sprinkle */
+  [-90, 44], [-45, 20], [0, 54], [45, 42], [90, 40], [135, 12], [180, 34], [-135, 48]
+];
+const BAND_IN = [-170, -100], BAND_OUT = [90, 240];
+/* and the ring between the districts is not a corridor between rooms — people are ON it. 44 deg of
+   arc separates two districts and a stroller every 130 m is what keeps that arc from reading as the
+   gap in a diagram. */
+const STROLLERS = 132;
 
 /* the concourse spine is a MOVEMENT field, so the people on it are spread along its length rather
    than gathered — R4's "medium connectors" between the high-density nodes */
@@ -109,7 +132,8 @@ export function buildHaloLife(ctx, opts = {}) {
   const group = new THREE.Group(); group.name = 'halo-life';
   const owned = { geometries: [], materials: [] };
   const own = g => { owned.geometries.push(g); return g; };
-  const stats = { figures: 0, nodes: 0, draws: 0, triangles: 0, byDistrict: {} };
+  const stats = { figures: 0, nodes: 0, rails: 0, field: 0, strollers: 0,
+    draws: 0, triangles: 0, byDistrict: {} };
 
   /* ---- WHERE EVERY FIGURE STANDS, resolved once ----------------------------------------------- */
   const people = [];
@@ -168,6 +192,56 @@ export function buildHaloLife(ctx, opts = {}) {
     const z = Math.sin(th) * r + Math.cos(th) * lat;
     people.push({ x, z, face: (frac2(i * 3) > 0.5 ? 0 : Math.PI), deg: -90, kind: 'walk', lift: 0.5, seed: 900 + i });
   }
+
+  /* ---- THE RAILS, placed from the overlooks THAT WERE ACTUALLY BUILT --------------------------
+     The first cut hard-coded a rail node at (deg -90, s 0) and put two people 21 m inboard of the
+     nearest bay, leaning on a rim wall — because ARRIVAL's bays are at s = -60 and s = +60 and this
+     file had no way to know that. It still has no way to know it, so it does not guess: halo-districts
+     publishes stats.overlookSites (deg, s, w, rail) from inside P.overlook itself, and every rail
+     here is read off that. One table, one truth (L42). */
+  const overlooks = (opts && opts.overlooks) || (ctx && ctx.haloOverlooks) || [];
+  for (let o = 0; o < overlooks.length; o++) {
+    const O = overlooks[o];
+    const n = 1 + (o % 2);                       /* one or two — a rail is not a queue */
+    const th0 = O.deg * Math.PI / 180 + O.s / HALO.R_MID;
+    for (let i = 0; i < n; i++) {
+      const lat = (i - (n - 1) / 2) * 2.4;
+      const x = Math.cos(th0) * O.rail - Math.sin(th0) * lat;
+      const z = Math.sin(th0) * O.rail + Math.cos(th0) * lat;
+      /* facing OUT along the radius, over the edge — the one pose that points at the world below */
+      people.push({ x, z, face: -th0 + Math.PI, deg: O.deg, kind: 'rail', lift: O.up || 0.44,
+        seed: 1500 + o * 7 + i });
+      stats.byDistrict[O.deg] = (stats.byDistrict[O.deg] || 0) + 1;
+      stats.rails++;
+    }
+  }
+
+  /* ---- THE FIELD, in the two promenade bands ------------------------------------------------- */
+  for (let f = 0; f < FIELD.length; f++) {
+    const [deg, count] = FIELD[f];
+    for (let i = 0; i < count; i++) {
+      const s = (frac(f * 31 + i * 7) - 0.5) * 380;
+      const band = frac2(f * 13 + i * 3) > 0.42 ? BAND_OUT : BAND_IN;
+      const t = band[0] + (band[1] - band[0]) * frac(f * 5 + i * 11);
+      const [x, z, th] = ringPoint(deg, s, t);
+      people.push({ x, z, face: -th + gold(f * 5 + i), deg, kind: 'field', lift: 0,
+        seed: 2000 + f * 97 + i });
+      stats.byDistrict[deg] = (stats.byDistrict[deg] || 0) + 1;
+      stats.field++;
+    }
+  }
+
+  /* ---- THE STROLLERS, all the way round ------------------------------------------------------ */
+  for (let i = 0; i < STROLLERS; i++) {
+    const th = (i / STROLLERS) * TAU + gold(i) * 0.02;
+    const r = HALO.R_MID + BAND_OUT[0] + (BAND_OUT[1] - BAND_OUT[0]) * frac(i * 3);
+    const x = Math.cos(th) * r, z = Math.sin(th) * r;
+    /* walking ALONG the ring, one way or the other — the tangent, not a random heading */
+    const dir = frac2(i * 5) > 0.5 ? 1 : -1;
+    people.push({ x, z, face: -th + (dir > 0 ? 0 : Math.PI), deg: 'ring', kind: 'stroll', lift: 0,
+      seed: 3000 + i });
+    stats.strollers++;
+  }
   stats.figures = people.length;
 
   /* ---- MATERIALS. The species is a lit crystal body, so it takes the world's crystal grade and
@@ -182,6 +256,11 @@ export function buildHaloLife(ctx, opts = {}) {
     emissive: 0x101c30, emissiveIntensity: 0.7
   });
   headMat.name = 'halo-life-head'; owned.materials.push(headMat);
+  /* the facial chamber is DARKER than the head it is set into — residents.js multiplies its dark by
+     0.42 for exactly this. It is unlit rather than shaded, because a 0.25 m plate at 12 m has no
+     room for a gradient and a shaded one just goes black at the wrong angle. */
+  const faceMat = new THREE.MeshBasicMaterial({ color: 0x0a1220, fog: true, toneMapped: true });
+  faceMat.name = 'halo-life-face'; owned.materials.push(faceMat);
   const shadeMat = new THREE.MeshBasicMaterial({
     color: 0x000000, transparent: true, opacity: 0.30, depthWrite: false, fog: true
   });
@@ -199,10 +278,40 @@ export function buildHaloLife(ctx, opts = {}) {
   /* the TORSO — a rounded mass that narrows to a waist where it meets the drop */
   const torsoGeo = own(new THREE.SphereGeometry(1, 10, 7));
   torsoGeo.scale(0.30 * S, 0.34 * S, 0.24 * S);
-  /* the HEAD — the square-diamond SLAB, residents.js's headW/headH/headD at scale */
-  const headGeo = own(chamferBox(0.19 * S * 2, 0.215 * S * 2, 0.20 * S * 2, 0.035 * S));
-  /* an ARM — a tapered bar; two instances per figure */
+  /* the HEAD — and it has to actually BE a square diamond.
+
+     The first cut built it with chamferBox, which is a BOX, and photographed from 12 m it was a
+     pale carton balanced on a torso: no diamond outline, no front, nothing of the brand figure at
+     the one scale a viewer meets it. residents.js does not build a box either — it lathes the head
+     over FOUR segments, which in front view is a square standing on its corner. Four segments is
+     what CylinderGeometry gives for free, and rotating its axis onto Z puts the diamond in the
+     frontal plane with the depth running back, which is residents' rim exactly.
+
+     The NECK comes with it. residents' `far` tier drops the neck, and that is right at 500 m and
+     wrong at 12 — a head sitting flush on a torso reads as a bust. It is merged into the same
+     buffer, so the species gets a neck for no extra draw. */
+  const headSlab = new THREE.CylinderGeometry(1, 1, 1, 4, 1);
+  headSlab.rotateX(Math.PI / 2);
+  headSlab.scale(0.19 * S, 0.215 * S, 0.20 * S);
+  const neckStub = new THREE.CylinderGeometry(0.052 * S, 0.062 * S, 0.16 * S, 6, 1);
+  neckStub.translate(0, -0.215 * S - 0.05 * S, 0);
+  const headGeo = own(joinGeometries([headSlab, neckStub]));
+  headSlab.dispose(); neckStub.dispose();
+  /* the FACE — residents' DARK FACIAL CHAMBER, one flat diamond inset on the front panel. No eyes
+     and no smile at this tier (residents drops both past `near`), but the chamber is what tells a
+     viewer 12 m away WHICH WAY SOMEONE IS FACING, which a featureless slab cannot. */
+  const faceGeo = own(new THREE.CircleGeometry(1, 4));
+  faceGeo.scale(0.19 * S * 0.66, 0.215 * S * 0.66, 1);
+  faceGeo.translate(0, 0.008 * S, 0.20 * S * 0.5 + 0.004);
+  /* an ARM — a tapered bar; two instances per figure.
+
+     IT HANGS FROM THE SHOULDER. Built centred, as the first cut built it, the arm rotates about its
+     own MIDDLE: the outward swing lifts the top of the bar above the shoulder while the bottom
+     flares away, which is why the dance floor photographed as a field of scarecrows. Translating
+     the geometry down by half its length puts the pivot at the shoulder joint, where an arm's pivot
+     is, and the same pose angles then read as arms instead of as crossbars. */
   const armGeo = own(chamferBox(0.075 * S * 2, 0.40 * S * 2, 0.085 * S * 2, 0.028 * S));
+  armGeo.translate(0, -0.40 * S, 0);
   /* the SHADOW — the species hovers, and the shadow is how a viewer reads that */
   const shadeGeo = own(new THREE.CircleGeometry(0.34 * S, 12).rotateX(-Math.PI / 2));
 
@@ -220,26 +329,34 @@ export function buildHaloLife(ctx, opts = {}) {
   const iDrop = mk(dropGeo, body, N, 'halo-life-drop');
   const iTorso = mk(torsoGeo, body, N, 'halo-life-torso');
   const iHead = mk(headGeo, headMat, N, 'halo-life-head');
+  const iFace = mk(faceGeo, faceMat, N, 'halo-life-face');
   const iArm = mk(armGeo, body, N * 2, 'halo-life-arm');
   const iShade = mk(shadeGeo, shadeMat, N, 'halo-life-shadow');
 
   /* ---- POSES. Not a rig: three angles per figure, chosen by what the node is for. -------------- */
+  /* THE ANGLES CAME DOWN WHEN THE PIVOT MOVED. With the arm rotating about its own centre, a large
+     armOut was compensating for the fact that half the bar went the wrong way; hanging from the
+     shoulder, 0.55 rad is a figure holding both arms straight out. The dance floor keeps the widest
+     gesture in the sanctuary and it is now 0.34 — about 20 degrees off the body, which is a raised
+     arm rather than a crossbar. */
   const POSE = {
-    stand:    { lean: 0.00, armFwd: 0.14, armOut: 0.10, bob: 0.010 },
-    converse: { lean: 0.06, armFwd: 0.42, armOut: 0.16, bob: 0.014 },
-    dance:    { lean: 0.10, armFwd: 0.85, armOut: 0.55, bob: 0.075 },
-    seated:   { lean: 0.14, armFwd: 0.55, armOut: 0.08, bob: 0.006 },
-    lean:     { lean: 0.22, armFwd: 0.30, armOut: 0.20, bob: 0.008 },
-    walk:     { lean: 0.09, armFwd: 0.26, armOut: 0.12, bob: 0.022 }
+    stand:    { lean: 0.00, armFwd: 0.10, armOut: 0.09, bob: 0.010 },
+    converse: { lean: 0.06, armFwd: 0.28, armOut: 0.13, bob: 0.014 },
+    dance:    { lean: 0.10, armFwd: 0.62, armOut: 0.34, bob: 0.075 },
+    seated:   { lean: 0.14, armFwd: 0.34, armOut: 0.07, bob: 0.006 },
+    lean:     { lean: 0.22, armFwd: 0.22, armOut: 0.15, bob: 0.008 },
+    walk:     { lean: 0.09, armFwd: 0.22, armOut: 0.10, bob: 0.022 }
   };
+  /* the FIELD is people being somewhere, not people doing something: half of them idle, half in
+     conversation, which is what a promenade looks like and what keeps it from reading as a queue */
   const poseFor = k => k === 'crowd' ? POSE.dance : k === 'row' ? POSE.seated
-    : k === 'rail' ? POSE.lean : k === 'walk' ? POSE.walk
-    : k === 'single' ? POSE.stand : POSE.converse;
+    : k === 'rail' ? POSE.lean : (k === 'walk' || k === 'stroll') ? POSE.walk
+    : k === 'single' ? POSE.stand : k === 'field' ? POSE.stand : POSE.converse;
 
   const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(),
     _e = new THREE.Euler(), _s = new THREE.Vector3(), _n = new THREE.Vector3(),
     _up = new THREE.Vector3(0, 1, 0), _qn = new THREE.Quaternion(), _qy = new THREE.Quaternion(),
-    _col = new THREE.Color();
+    _col = new THREE.Color(), _light = new THREE.Color(0xdfeaff);
 
   /* every figure keeps its own colour for the life of the world (R4: independent avatar colours) */
   for (let i = 0; i < N; i++) {
@@ -248,11 +365,13 @@ export function buildHaloLife(ctx, opts = {}) {
     iDrop.setColorAt(i, _col); iTorso.setColorAt(i, _col);
     iArm.setColorAt(i * 2, _col); iArm.setColorAt(i * 2 + 1, _col);
     /* the head slab is the species' bright note — residents.js's `light` value, not the base */
-    _col.lerp(new THREE.Color(0xdfeaff), 0.55);
+    _col.lerp(_light, 0.55);
     iHead.setColorAt(i, _col);
-    _col.setRGB(1, 1, 1); iShade.setColorAt(i, _col);
+    /* white here means "no per-instance tint" — the chamber's darkness is the MATERIAL's. An
+       instanceColor buffer left at its zeros would also render black, and would be an accident. */
+    _col.setRGB(1, 1, 1); iShade.setColorAt(i, _col); iFace.setColorAt(i, _col);
   }
-  [iDrop, iTorso, iHead, iArm, iShade].forEach(m => { if (m.instanceColor) m.instanceColor.needsUpdate = true; });
+  [iDrop, iTorso, iHead, iFace, iArm, iShade].forEach(m => { if (m.instanceColor) m.instanceColor.needsUpdate = true; });
 
   /* ---- WRITE. Everything stands along the SHELL NORMAL, like everything else on the ring. ------ */
   let posed = true;
@@ -278,15 +397,19 @@ export function buildHaloLife(ctx, opts = {}) {
       _e.set(sway * 0.5, P.face, 0); _qy.setFromEuler(_e);
       _q.copy(_qn).multiply(_qy);
       iHead.setMatrixAt(i, _m.compose(_p, _q, _s));
+      /* the face rides the head exactly — same transform, and the chamber's own offset is baked
+         into its geometry so there is nothing here to keep in step and get wrong */
+      iFace.setMatrixAt(i, _m);
 
-      /* two arms, swung by the pose. An arm is an instance and an instance has a transform (L48). */
+      /* two arms, swung by the pose. An arm is an instance and an instance has a transform (L48),
+         and it is placed AT THE SHOULDER because that is where its geometry now pivots. */
       for (let a = 0; a < 2; a++) {
         const side = a ? 1 : -1;
         const swing = posed ? Math.sin(ph + (a ? Math.PI : 0)) * pose.armFwd : pose.armFwd * 0.4;
         _e.set(swing * 0.6, P.face, side * (pose.armOut + Math.abs(swing) * 0.18));
         _qy.setFromEuler(_e); _q.copy(_qn).multiply(_qy);
         const ox = Math.cos(P.face) * side * 0.30 * S, oz = -Math.sin(P.face) * side * 0.30 * S;
-        _p.set(P.x + ox, y0 + hov + 1.02 * S, P.z + oz);
+        _p.set(P.x + ox, y0 + hov + 1.36 * S, P.z + oz);
         iArm.setMatrixAt(i * 2 + a, _m.compose(_p, _q, _s));
       }
 
@@ -297,12 +420,12 @@ export function buildHaloLife(ctx, opts = {}) {
       iShade.setMatrixAt(i, _m.compose(_p, _q, _s));
     }
     iDrop.instanceMatrix.needsUpdate = true; iTorso.instanceMatrix.needsUpdate = true;
-    iHead.instanceMatrix.needsUpdate = true; iArm.instanceMatrix.needsUpdate = true;
-    iShade.instanceMatrix.needsUpdate = true;
+    iHead.instanceMatrix.needsUpdate = true; iFace.instanceMatrix.needsUpdate = true;
+    iArm.instanceMatrix.needsUpdate = true; iShade.instanceMatrix.needsUpdate = true;
   }
   write(0);
 
-  const all = [iDrop, iTorso, iHead, iArm, iShade];
+  const all = [iDrop, iTorso, iHead, iFace, iArm, iShade];
   let quiet = false, visible = true;
 
   return {
@@ -329,6 +452,7 @@ export function buildHaloLife(ctx, opts = {}) {
       const low = q && (q.name === 'low' || q === 'low');
       quiet = !!low;
       iShade.visible = !low;
+      iFace.visible = !low;
       iArm.count = low ? 0 : N * 2;
     },
     dispose() {
@@ -337,6 +461,32 @@ export function buildHaloLife(ctx, opts = {}) {
       if (group.parent) group.parent.remove(group);
     }
   };
+}
+
+/* Merge a few plain geometries into one buffer. No addons in this project, so BufferGeometryUtils is
+   not available and every module that needs this writes it — here it exists only so the head and its
+   neck can be a single instanced part rather than a sixth draw. Position and normal only: the parts
+   it joins carry no uv and take their colour per instance. */
+function joinGeometries(list) {
+  let n = 0;
+  for (const g of list) n += g.index ? g.index.count : g.attributes.position.count;
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3);
+  let o = 0;
+  for (const g of list) {
+    const P = g.attributes.position, N = g.attributes.normal;
+    const idx = g.index ? g.index.array : null;
+    const take = i => {
+      pos[o * 3] = P.getX(i); pos[o * 3 + 1] = P.getY(i); pos[o * 3 + 2] = P.getZ(i);
+      nor[o * 3] = N.getX(i); nor[o * 3 + 1] = N.getY(i); nor[o * 3 + 2] = N.getZ(i);
+      o++;
+    };
+    if (idx) { for (let i = 0; i < idx.length; i++) take(idx[i]); }
+    else { for (let i = 0; i < P.count; i++) take(i); }
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  return out;
 }
 
 export default { buildHaloLife, LIFE, NODES };
