@@ -489,6 +489,126 @@ function crystallize(ctx, g, o) {
   merged(g, deep, M.structural, 'crystal-structure', true);
 }
 
+/* ---- THE PLATINUM ORDER (v7, brief §02 / §05 / §07–§08) ------------------------------------------
+   Measured off the night establishing frame: sky 36, ARCHITECTURE 52, chromium plaza floor 95. The
+   FLOOR was doing all of the platinum work and the elevations were not. The cause was a hole in the
+   palette — the masses sit at luminance 49–58 and the whole platinum family at 183–232, with nothing
+   in between — so an elevation could only ever be a navy mass wearing hairline highlights, which is
+   precisely the black/navy dominance the brief is trying to leave. materials.js now carries the
+   missing rung at 142 (platinumMid / platinumMidBrushed / platinumMidLit); this is the architecture
+   that spends it.
+
+   THE MASSES DO NOT GET LIGHTER. graphite, panel and structural are the dark the platinum is measured
+   against, and lifting them would flatten the world rather than brighten it. What widens is the
+   FRAMING carried on them — plinth, courses, piers, corner returns, cornice — until the platinum is a
+   real proportion of each primary elevation (~25–40 %) instead of a hairline, with the dark crystal
+   infill still reading as infill between it.
+
+   TWO RULES HOLD EVERY PART BELOW.
+     ORIENTATION DECIDES THE GRADE. platinumMid is metalness 0.94: it takes no diffuse light and is
+     lit only by what it reflects, so it belongs on VERTICAL and TILTED faces, which see the
+     environment's bright horizon band. Every face whose normal points up or down — a sill, a cap, a
+     soffit — is covered in platinumMidLit instead, because a polished horizontal reflects the
+     near-black night zenith and renders BLACK. This world already shipped that bug once across
+     ~3,100 m² of surface; nothing here repeats it.
+     THE PLATINUM SITS PROUD. Every member projects off the wall plane instead of being painted onto
+     it, so the elevation has reveals, the framing casts across the infill it divides, and the same
+     member turns the corner onto the flank — a clad mass, not a decorated front (§05).
+
+   Three ORDERS, one per destination, so the platinum tells them apart the way their silhouettes
+   already do (§50-3): MAH GYM is BANDED, MAH MARKET is PIERED, MAH MATCH is FRAMED. Cost is three
+   merged meshes per building whatever the part count. */
+function platinumOrder(ctx, g, o) {
+  const { M } = ctx;
+  const { W, H, openW, openH, floorY = 0, order } = o;
+  const face = [], piers = [], caps = [];
+  /* a COURSE — a horizontal platinum band on a vertical wall face. `z` is the plane it comes out TO,
+     `d` how far it comes out, so a call site reads as how proud the member stands. Its own top and
+     underside are horizontal, so a sill sits over the top and, where the underside is seen from the
+     plaza, a soffit under it — both in the LIT grade, which is the whole point of that material. */
+  const course = (cx, len, y0, y1, z, d, soffit) => {
+    part(face, chamferBox(len, y1 - y0, d, 0.06), cx, (y0 + y1) / 2, z - d / 2);
+    part(caps, chamferBox(len + 0.18, 0.2, d + 0.18, 0.05), cx, y1 + 0.06, z - d / 2);
+    if (soffit) part(caps, chamferBox(len + 0.12, 0.16, d + 0.12, 0.04), cx, y0 - 0.04, z - d / 2);
+  };
+  /* a PIER — a vertical member, brushed because a brushed streak runs WITH the member it is cut for,
+     and deep because depth is the entire point: a pier flush with the glazing cannot cast across the
+     bays it divides, and an applied strip is what made the old framing read as paint. */
+  const pier = (cx, w, y0, y1, z, d, cap) => {
+    part(piers, chamferBox(w, y1 - y0, d, 0.07), cx, (y0 + y1) / 2, z - d / 2);
+    if (cap) part(caps, chamferBox(w + 0.22, 0.22, d + 0.2, 0.05), cx, y1 + 0.1, z - d / 2);
+  };
+  /* a RETURN — the same platinum carried around onto the flank. Without it a viewer walking past the
+     corner sees the framing end at the arris, and the whole elevation collapses back into paint. */
+  const ret = (x, y0, y1, zc, dz, t) => [-1, 1].forEach(sd =>
+    part(piers, chamferBox(t, y1 - y0, dz, 0.06), sd * x, (y0 + y1) / 2, zc));
+
+  const pierW = (W - openW) / 2, pierX = openW / 2 + pierW / 2;
+  if (order === 'banded') {
+    /* MAH GYM — BANDED. Its silhouette is one long horizontal sweep, so its platinum reads horizontal
+       too: a plinth, two floor courses across each pier, and under the canopy a deep TRANSFER BAND
+       across the whole frontage — the beam the glazed sweep springs from, and the widest single piece
+       of platinum on any of the three. It stops at 9.02 m because the canopy root is at 9.25 and the
+       clerestory and crown own the elevation above it; a parapet here would only fight them. */
+    const z = 0.66, d = 0.5, len = pierW - 0.4;
+    [-1, 1].forEach(sd => {
+      course(sd * pierX, len, floorY, floorY + 0.94, z, d, false);
+      course(sd * pierX, len, floorY + 1.98, floorY + 2.62, z, d, false);
+      course(sd * pierX, len, floorY + 6.52, floorY + 7.26, z, d, false);
+      /* the quoin: without it the courses read as four stripes painted on a navy pier rather than as
+         one clad corner, and the mass loses its edge */
+      pier(sd * (W / 2 - 0.85), 1.3, floorY, floorY + 9.0, z, d, true);
+    });
+    course(0, W - 1.2, floorY + 8.28, floorY + 9.02, z, d + 0.1, true);
+    ret(W / 2 + 0.02, floorY + 3.4, floorY + 9.7, -1.9, 2.6, 0.42);
+  } else if (order === 'piered') {
+    /* MAH MARKET — PIERED. Its terraces already give it a horizontal roof line, so the wall takes the
+       opposite emphasis: a civic order of four full-height mullion piers standing 1.15 m proud of the
+       glazing, on a deep plinth, under a projecting cornice they die into. The piers are placed
+       OUTBOARD of the entry canopy and clear of the wordmark, so the order frames the sign rather
+       than colliding with it. */
+    const s0 = 8.6, s1 = W / 2 - 0.1;
+    [-1, 1].forEach(sd => {
+      /* the plinth projects further than the piers, so the order stands ON something */
+      course(sd * pierX, pierW - 0.4, floorY, floorY + 0.94, 1.3, 1.3, false);
+      pier(sd * (openW / 2 + 2.6), 1.0, floorY + 0.94, floorY + 15.15, 1.15, 1.15, false);
+      pier(sd * (W / 2 - 1.1), 1.0, floorY + 0.94, floorY + 15.15, 1.15, 1.15, false);
+      /* the upper floor line, banded between the piers and set 0.15 m behind them so the course dies
+         INTO the pier rather than crossing it. Two segments: the middle of that course is the wordmark. */
+      course(sd * ((s0 + s1) / 2), s1 - s0, floorY + 10.95, floorY + 11.62, 1.0, 0.5, true);
+    });
+    /* the cornice starts at 15.15 and not at the roof line: the wordmark's chromium frame tops out at
+       14.99, and a cornice soffit dropped onto it would eat the sign's mounting depth */
+    course(0, W - 0.8, floorY + 15.15, floorY + 16.05, 1.3, 1.3, true);
+    ret(W / 2 + 0.02, floorY + 2.6, floorY + 12.5, -1.5, 2.0, 0.42);
+  } else {
+    /* MAH MATCH — FRAMED. At 38 m a fine grid reads as texture rather than as structure, so the anchor
+       takes a colossal order: a 4 m plinth rising out of the entrance stair, a 1.7 m BELT at the portal
+       head where the two curtain walls spring, a 1.55 m attic capping the mass, two full-height corner
+       returns carrying the platinum onto the flanks, and two TRANSOMS banding the glazed fields.
+       The transoms are placed by derivation, not by eye. curtainWall centres each storey's lit interior
+       at 0.52 of its floor height and gives it (floorH − 0.75) of height, which leaves exactly 0.75 m of
+       SOLID wall above one interior and below the next. Both transom BODIES sit inside that gap — only
+       their sill and soffit nosings lap the head and cill of the panes, which is what a sill does — so
+       the podium gets banded without a lit bay being covered. The armour panels, the banners and the
+       bays stay the infield inside the frame. */
+    const x0 = openW / 2 + 1.6, x1 = W / 2 - 0.1, cx = (x0 + x1) / 2, len = x1 - x0;
+    const tx0 = openW / 2 + 0.6, tcx = (tx0 + x1) / 2, tlen = x1 - tx0;
+    const sill = floorY + openH + 1.6, fh = (H - 1.2 - sill) / 3;   /* the podium curtain wall, as its own module lays it out */
+    [-1, 1].forEach(sd => {
+      course(sd * cx, len, floorY - 1.2, floorY + 2.8, 0.95, 0.95, false);
+      course(sd * cx, len, floorY + 13.7, floorY + 15.4, 1.05, 0.58, true);
+      for (let f = 0; f < 2; f++) course(sd * tcx, tlen, sill + (f + 1.02) * fh - 0.36, sill + (f + 1.02) * fh + 0.36, 1.05, 0.5, true);
+      pier(sd * (W / 2 - 0.55), 1.1, floorY + 2.8, floorY + 34.8, 1.05, 0.42, false);
+    });
+    course(0, W - 1.2, floorY + 34.8, floorY + 36.35, 1.05, 0.75, true);
+    ret(W / 2 + 0.06, floorY + 1.8, floorY + 33.2, -2.2, 3.4, 0.5);
+  }
+  merged(g, face, M.platinumMid || M.platinum, 'platinum-courses', true);
+  merged(g, piers, M.platinumMidBrushed || M.platinumBrushed, 'platinum-piers', true);
+  merged(g, caps, M.platinumMidLit || M.platinumLit, 'platinum-sills', true);
+}
+
 export function buildBuildings(ctx) {
   const { M, scene } = ctx;
   ctx.signMaterials = ctx.signMaterials || [];
@@ -512,6 +632,7 @@ export function buildBuildings(ctx) {
     /* MAH GYM is the BRIGHT, OPEN, GLAZED one (§21): two lit storeys of curtain wall above the canopy,
        so the training inside is what the building shows the plaza */
     curtainWall(ctx, g, { W, H, sillY: openH + 1.4, topY: H - 0.6, bays: 7, floors: 2, z: 0.62, seed: 11, lit: 0.8 });
+    platinumOrder(ctx, g, { W, H, openW, openH, order: 'banded' });   /* horizontal: the platinum reads the way the canopy does */
     ctx.entranceLights.push(world(g, 0, openH + 1.2, 4.6));
     action('gym', 'MAH GYM', 'destination', f.glass, world(g, 0, 0, 2), { view: 'gym-entrance', copy: 'Training facility. Preview navigation: the camera moves to the entrance. Training data stays in MAHFITT.' });
     /* upper window band across the piers: interior glow behind glass */
@@ -558,6 +679,7 @@ export function buildBuildings(ctx) {
       const sub = new THREE.Group(); sub.position.x = sd * (openW / 2 + pierW / 2); g.add(sub);
       curtainWall(ctx, sub, wall);
     });
+    platinumOrder(ctx, g, { W, H, openW, openH, floorY, order: 'framed' });   /* colossal: at 38 m only a big order reads as structure */
     action('match', 'MAH MATCH', 'destination', f.glass, world(g, 0, floorY, 2), { view: 'match-entrance', copy: 'Fighting facility: matches and practice. Choose an action at the entrance.' });
     /* the strong central frame around the opening, with a square-diamond keystone */
     const fT = 1.4, fD = 1.0, fz = 0.55;
@@ -638,6 +760,7 @@ export function buildBuildings(ctx) {
     /* MAH MARKET is the SOCIAL, CIVIC one (§22): wide glazing and a busy interior, the most occupied
        of the three, so it reads as a place people are in rather than a shopfront */
     curtainWall(ctx, g, { W, H, sillY: openH + 1.2, topY: H - 0.8, bays: 8, floors: 2, z: 0.6, seed: 33, lit: 0.86 });
+    platinumOrder(ctx, g, { W, H, openW, openH, order: 'piered' });   /* vertical: a civic order against the market's horizontal terraces */
     action('market', 'MAH MARKET', 'destination', f.glass, world(g, 0, 0, 2), { view: 'market-entrance', copy: 'World marketplace. Preview navigation only: nothing is for sale here and no prices exist.' });
     /* a soft continuous sill light under the glass — the welcome line */
     const sill = box(openW, 0.05, 0.08, M.energyLight, 0, 0.06, -E + 0.3); g.add(sill); ctx.reflect(sill, 0.3);
