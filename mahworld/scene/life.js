@@ -344,6 +344,110 @@ export function createLife(ctx, R, opts = {}) {
           step(t2, dt2) { a.busy = false; stepWalker(a, t2, dt2); a.busy = true; },
           end() { a.g.remove(box); box.geometry.dispose(); } }; } }
   ];
+
+  /* ================= FLIGHT AND FLIGHT-LEARNING (v6 §28-§32) ======================================
+     MAHBEINGS levitate; not all of them fly, and the ones who are learning are the point. The states
+     the brief names — FLIGHT_READY, LIFT_ATTEMPT, WOBBLE, SUCCESSFUL_HOVER, DESCEND, FAILED_ATTEMPT,
+     SHORT_FLIGHT — are built here as one shared arc driven by a skill level, so a beginner and an
+     advanced resident run the same code and differ only in how far they get and how cleanly.
+
+     Restraint is the whole design (§31): these sit alongside the eight existing ambient events under
+     the SAME three-at-once cap and the same cooldowns, so most of the plaza is still calm and flight
+     stays special. They happen in LOGICAL PLACES (§32) — the rooftop pads the city module publishes
+     and one ground training zone off the west side of the plaza — never through the pedestrian routes.
+
+     A failed attempt is charming, not slapstick (§29): a small lift, a tilt the resident corrects, and
+     a controlled settle. Nobody falls over.                                                          */
+  const FLIGHT_GROUND = { x: -46, z: 22 };          /* west of the plaza, clear of every route and node */
+  const SKILL = {
+    beginner:     { rise: 0.85, hold: 0.10, wobble: 0.15, dur: 5.2, trail: false },
+    intermediate: { rise: 1.75, hold: 0.34, wobble: 0.05, dur: 6.4, trail: true },
+    advanced:     { rise: 3.10, hold: 0.52, wobble: 0.015, dur: 7.8, trail: true }
+  };
+  /* where a flight event can happen: every rooftop pad, plus the ground training zone */
+  function flightSpot() {
+    const roof = pads.filter(p => p.kind === 'levitate' || p.kind === 'training');
+    if (roof.length && rand() < 0.62) { const p = roof[Math.floor(rand() * roof.length)].position; return { x: p.x, y: p.y, z: p.z, tier: 'far' }; }
+    return { x: FLIGHT_GROUND.x + (rand() - 0.5) * 7, y: deckY(FLIGHT_GROUND.x, FLIGHT_GROUND.z), z: FLIGHT_GROUND.z + (rand() - 0.5) * 7, tier: 'mid' };
+  }
+  /* ONE arc, five phases, parameterised by skill. `fail` turns the hold into a corrected imbalance. */
+  function flightArc(a, spot, skill, fail, t, seedPhase) {
+    const S = SKILL[skill];
+    const base = spot.y || 0;
+    a.g.position.set(spot.x, base, spot.z);
+    a.g.rotation.y = Math.atan2(-spot.x, -spot.z);
+    return {
+      t0: t, dur: S.dur, base, skill, fail,
+      step(t2) {
+        const k = Math.min(1, (t2 - this.t0) / this.dur);
+        /* FLIGHT_READY 0..0.16 — the resident settles and gathers before it tries */
+        /* LIFT_ATTEMPT 0.16..0.40 — a rise eased so the effort reads */
+        /* SUCCESSFUL_HOVER / FAILED_ATTEMPT 0.40..0.72 — hold, or lose it and correct */
+        /* DESCEND 0.72..1 — always controlled; nobody drops */
+        let h = 0;
+        if (k < 0.16) h = 0;
+        else if (k < 0.40) { const u = (k - 0.16) / 0.24; h = S.rise * u * u * (3 - 2 * u); }
+        else if (k < 0.72) {
+          const u = (k - 0.40) / 0.32;
+          h = this.fail ? S.rise * Math.max(0, 1 - u * 1.35) : S.rise * (1 + S.hold * 0.08 * Math.sin(u * 5.4 + seedPhase));
+        } else { const u = (k - 0.72) / 0.28; h = (this.fail ? 0 : S.rise) * (1 - u * u); }
+        a.g.position.y = base + h;
+        /* WOBBLE — a lateral correction, largest for a beginner and largest at the moment of losing it */
+        const w = S.wobble * (k > 0.16 && k < 0.86 ? 1 : 0) * (this.fail && k > 0.40 && k < 0.62 ? 2.1 : 1);
+        a.g.rotation.z = Math.sin(t2 * 3.1 + seedPhase) * w;
+        a.g.position.x = spot.x + Math.sin(t2 * 2.3 + seedPhase) * w * 0.5;
+        if (FX && S.trail && !this.fail && k > 0.3 && k < 0.8) FX.levitationTrail(a.g, hexOf(colourOf(a)), true);
+      },
+      end() { a.g.position.set(spot.x, base, spot.z); a.g.rotation.z = 0; if (FX && S.trail) FX.levitationTrail(a.g, hexOf(colourOf(a)), false); }
+    };
+  }
+
+  const FLIGHT_EVENTS = [
+    { id: 'F1', name: 'hover attempt', cooldown: 46, weight: 4, run: (t) => {
+        const spot = flightSpot(); const who = takeAgents(1, spot.tier) || takeAgents(1, 'mid'); if (!who) return null;
+        const arc = flightArc(who[0], spot, 'beginner', false, t, rand() * 6.283);
+        return Object.assign({ who, pos: new THREE.Vector3(spot.x, spot.y, spot.z), colour: colourOf(who[0]) }, arc); } },
+    { id: 'F2', name: 'steady hover', cooldown: 62, weight: 3, run: (t) => {
+        const spot = flightSpot(); const who = takeAgents(1, spot.tier) || takeAgents(1, 'mid'); if (!who) return null;
+        const arc = flightArc(who[0], spot, 'intermediate', false, t, rand() * 6.283);
+        return Object.assign({ who, pos: new THREE.Vector3(spot.x, spot.y, spot.z), colour: colourOf(who[0]) }, arc); } },
+    { id: 'F3', name: 'failed attempt', cooldown: 78, weight: 2, run: (t) => {
+        const spot = flightSpot(); const who = takeAgents(1, spot.tier) || takeAgents(1, 'mid'); if (!who) return null;
+        const arc = flightArc(who[0], spot, 'beginner', true, t, rand() * 6.283);
+        return Object.assign({ who, pos: new THREE.Vector3(spot.x, spot.y, spot.z), colour: colourOf(who[0]) }, arc); } },
+    /* SHORT FLIGHT — an advanced resident actually travels: pad to pad, high and smooth, far enough
+       away that it reads as someone who can already do this rather than as traffic (§30, §31) */
+    { id: 'F4', name: 'short flight', cooldown: 104, weight: 2, run: (t) => {
+        const roof = pads.filter(p => p.kind === 'levitate' || p.kind === 'training');
+        if (roof.length < 2) return null;
+        const i = Math.floor(rand() * roof.length); let j = Math.floor(rand() * roof.length); if (j === i) j = (j + 1) % roof.length;
+        const from = roof[i].position, to = roof[j].position;
+        const who = takeAgents(1, 'far'); if (!who) return null;
+        const a = who[0]; a.g.position.copy(from);
+        a.g.rotation.y = Math.atan2(to.x - from.x, to.z - from.z);
+        return { who, t0: t, dur: 9.5, colour: colourOf(a), pos: from.clone(),
+          step(t2) {
+            const k = Math.min(1, (t2 - this.t0) / this.dur), e = k * k * (3 - 2 * k);
+            a.g.position.lerpVectors(from, to, e);
+            a.g.position.y += Math.sin(Math.PI * k) * 13;          /* a real arc, well above the roofs */
+            if (FX && k > 0.06 && k < 0.94) FX.levitationTrail(a.g, hexOf(this.colour), true);
+          },
+          end() { a.g.position.copy(to); if (FX) FX.levitationTrail(a.g, hexOf(this.colour), false); } }; } },
+    /* THE LESSON — one resident who can already hold a hover, two who are still learning beside it.
+       This is the event that makes the world's progression legible without a word of copy (§34). */
+    { id: 'F5', name: 'flight lesson', cooldown: 132, weight: 1, run: (t) => {
+        const spot = flightSpot(); const who = takeAgents(3, spot.tier) || takeAgents(3, 'mid'); if (!who) return null;
+        const arcs = [
+          flightArc(who[0], { x: spot.x, y: spot.y, z: spot.z, tier: spot.tier }, 'advanced', false, t, 0.4),
+          flightArc(who[1], { x: spot.x - 3.4, y: spot.y, z: spot.z + 1.2, tier: spot.tier }, 'beginner', false, t, 2.1),
+          flightArc(who[2], { x: spot.x + 3.2, y: spot.y, z: spot.z + 1.5, tier: spot.tier }, 'beginner', rand() < 0.5, t, 4.7)
+        ];
+        return { who, t0: t, dur: 8.6, colour: colourOf(who[0]), pos: new THREE.Vector3(spot.x, spot.y, spot.z),
+          step(t2) { arcs.forEach(A => A.step(t2)); },
+          end() { arcs.forEach(A => A.end()); } }; } }
+  ];
+  FLIGHT_EVENTS.forEach(e => EVENTS.push(e));
+
   const cooldowns = {}; EVENTS.forEach(e => { cooldowns[e.id] = 6 + rand() * 30; });
 
   function tryStartEvent(t) {
