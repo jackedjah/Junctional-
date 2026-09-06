@@ -64,10 +64,14 @@ const VALLEYS = [
             low band behind the city rather than as the horizon
      base   the deep colour at the foot of the range
      ridge  the moonlit colour along its tops                                                        */
+/* The values are set AGAINST THE NIGHT SKY, not in isolation: the horizon key is 0x1d3d6e, so the near
+   range has to sit clearly BELOW that to read as a silhouette, and the far range clearly ABOVE it to
+   read as haze. A range painted near the sky's own value is invisible however large it is — which is
+   exactly what the first build of this module proved. */
 const RANGES = [
-  { id: 'near', r: 700, count: 26, hMin: 240, hMax: 430, wMin: 90, wMax: 190, base: 0x161f33, ridge: 0x4a5f88, seed: 91 },
-  { id: 'mid', r: 1050, count: 22, hMin: 380, hMax: 620, wMin: 150, wMax: 300, base: 0x1d2740, ridge: 0x5d739c, seed: 137 },
-  { id: 'far', r: 1500, count: 18, hMin: 520, hMax: 780, wMin: 240, wMax: 430, base: 0x27324e, ridge: 0x6d82aa, seed: 211 }
+  { id: 'near', r: 700, count: 26, hMin: 320, hMax: 560, wMin: 100, wMax: 210, base: 0x080e1b, ridge: 0x33456b, seed: 91 },
+  { id: 'mid', r: 1050, count: 22, hMin: 430, hMax: 680, wMin: 160, wMax: 320, base: 0x172440, ridge: 0x51648f, seed: 137 },
+  { id: 'far', r: 1500, count: 18, hMin: 560, hMax: 820, wMin: 250, wMax: 450, base: 0x2b3f66, ridge: 0x7a8fb8, seed: 211 }
 ];
 
 const LAND_INNER = 600, LAND_OUTER = 1750;
@@ -145,9 +149,9 @@ export function buildTerrain(ctx) {
       /* Spread across the full front hemisphere, then PULL toward the open valleys: a peak the city
          hides is a peak that costs triangles for nothing, and the valleys are where the brief's
          "building, open valley, mountain, sky" composition actually happens. */
-      let a = -30 + (i / (R.count - 1)) * 240 + (rand() - 0.5) * 7;
+      let a = 4 + (i / (R.count - 1)) * 172 + (rand() - 0.5) * 7;      /* the front hemisphere the city occupies */
       const V = VALLEYS[i % VALLEYS.length];
-      if (i % 2 === 0) a = lerp(a, V.from + rand() * (V.to - V.from), 0.62);
+      if (i % 2 === 0) a = lerp(a, V.from + rand() * (V.to - V.from), 0.72);
       const rr = R.r * (0.9 + rand() * 0.24);
       const [x, z] = polar(a, rr);
       const h = lerp(R.hMin, R.hMax, rand() * rand() + rand() * 0.3);
