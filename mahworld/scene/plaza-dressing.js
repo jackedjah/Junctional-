@@ -22,8 +22,8 @@
    roof, each a third to two thirds of the half-dimension it cuts — so there was no global chamfer
    deficit and no blanket widening was done. Widening a chamfer that already eats half a form does not
    make it rounder, it makes it a frustum. FOUR SPECIFIC FORMS were wrong, and only those four moved:
-     · the LAMP COWL met its top plate in one sharp arris and closed on a 1.21 m² flat disc. It is
-       rim-chamfered and crowned now (facetCowl below): one arris becomes two turns and eight facets.
+     · the LAMP COWL met its top plate in ONE 133° arris and closed on a 1.09 m² flat disc. It is
+       rim-chamfered and crowned now (facetCowl below): the sharpest arris drops to 85°.
      · the BOLLARD CAP was a square diamond over an axis-aligned post — four 9.6 cm horns per bollard.
        The post is turned to meet it.
      · the WAYFINDING BLADE stood on a 0.34 m plate a third of its own footprint, on a different
@@ -44,15 +44,17 @@ function part(list, geo, x, y, z, ry = 0, rx = 0, rz = 0) {
 /* A FACETED COWL — v11 §06. `rings` is [radius, y] bottom to top; the piece is closed with a flat
    octagon at the last ring and a flat one at the first, and every band between them is a designed
    facet. This exists because the lamp shade was CylinderGeometry(0.62, 0.30, 0.34, 8), which meets
-   its top plate in ONE sharp arris and closes on a 1.21 m2 dead-flat disc. §06's own technique for a
-   sharp arris is to replace it with a small third face, so the profile below turns twice on the way
-   over the rim instead of once, and the plate that used to be flat becomes a shallow crown of eight
-   facets closing on a table an eighth the area.
+   its top plate in ONE 133.3 deg arris and closes on a 1.087 m2 dead-flat disc. §06's own technique
+   for a sharp arris is to replace it with a small third face, so the profile below turns twice on the
+   way over the rim instead of once, and the plate that used to be flat becomes a shallow crown of
+   eight facets closing on a table a tenth the area.
    That second point is also LAW 1 arithmetic and not only taste: the cowl is chromeMirror at
-   metalness 1.0, an UP-FACING mirror face reflects the near-black zenith, and this takes the plaza's
-   dead-flat mirror plate area from 19.4 m2 across sixteen masts to 1.8 m2. (The remainder sits at
-   6.5 m, above every camera in this world, which is why it was never the visible defect the bench top
-   was.) Wound so +x turns toward −z, the same winding the rest of this world uses.
+   metalness 1.0 and an UP-FACING mirror face reflects the near-black zenith. MEASURED by summing the
+   area of every triangle whose normal is within 10 deg of level, across all sixteen masts: 17.40 m2
+   of dead-flat up-facing mirror before, 1.63 m2 after. The remainder sits at 6.5 m and EVERY camera
+   in VIEWS stands between y 1.5 and y 4.2, so nothing in this world ever looks down on it - which is
+   why it was never the visible defect the 6.4 m2 bench top was, and why it is not worth a second
+   material and a second draw call to partner. Wound +x toward -z, this world's usual winding.
    Triangles: sides * (2 * (rings - 1) + 2). */
 function facetCowl(rings, sides) {
   const pos = [];
