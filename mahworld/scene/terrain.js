@@ -103,21 +103,27 @@ const LAND_HORIZON = 0x1c3355;   /* the last ring, sitting just under the horizo
    44 deg and 75 deg. Nothing in city.js, ground.js or buildings.js occupies this region. */
 const BASIN = { bearing: 62, r: 330, rx: 210, rz: 130, y: -1.4 };
 
-/* R2 §5 — THE LAKE CITY PASS. The BASIN above reserved a bearing for water; it did not reserve the
+/* R2 §5 / §6 — THE CITY PASSES. The BASIN above reserved a bearing for water; it did not reserve the
    ROOM a city on that water needs. Measured on the built scene: the near range's peaks reach inward
    to about r 535, so the only clear annulus was 330 (the district's edge) to 535, and a lake city
    sized to be a destination rather than a pond does not fit in 205 m of it. The first placement
    attempt put its camera inside a mountain flank, which is how this was found.
 
-   So the range OPENS here. Every peak of every range whose bearing falls inside PASS is pushed out
-   of it to the nearer shoulder, which turns a reserved bearing into a reserved VOLUME: a genuine
-   mountain pass with a lake city standing in it, the mid range still closing the horizon behind.
+   So the range OPENS at each entry in PASSES. Every peak of every range whose ARC overlaps a pass is
+   pushed out of it to the nearer shoulder, which turns a reserved bearing into a reserved VOLUME: a
+   genuine mountain pass with a city standing in it and the range behind still closing the horizon.
+   A peak is tested against EVERY pass in turn, so two corridors cannot fight over the same massif —
+   the second test simply moves whatever the first left in its way.
    That is §13 — water occupies terrain — and it is also the composition §8 asks for, because the
    city then has a ridge line to be read against instead of empty sky.
 
-   The width is measured, not chosen: the city's own lake is 274 m at its widest, so it subtends
-   about 22 degrees at r 700 and the pass is opened to 30 to leave a shoulder either side. */
-const PASS = { from: 44, to: 80 };
+   Each width is measured, not chosen. Lake City's water is 274 m at its widest, subtending about 22
+   degrees at r 700, opened to 36 to leave a shoulder either side. Rainforest City's canopy reaches
+   about 300 m, so its pass is 38. */
+const PASSES = [
+  { id: 'lake', from: 44, to: 80 },        /* R2 §5 — LAKE CITY, bearing 62 */
+  { id: 'rainforest', from: 108, to: 146 } /* R2 §6 — RAINFOREST CITY, bearing 127 */
+];
 /* PUSH BY THE EDGE, NOT BY THE CENTRE. The first cut of this moved a peak's BEARING out of the pass
    and rendered no differently, because a massif is 180-650 m WIDE: one pushed to 45.5 deg at r 700
    still spans to 59 deg, and the pass was half full of the mountain that had just been moved out of
@@ -125,6 +131,10 @@ const PASS = { from: 44, to: 80 };
    width converted to degrees at its own radius, so a wide peak is pushed further than a narrow one
    and the pass ends up genuinely empty rather than nominally empty. */
 const clearPass = (a, w, rr) => {
+  for (const P of PASSES) { a = clearOne(a, w, rr, P); }
+  return a;
+};
+const clearOne = (a, w, rr, PASS) => {
   /* FOOT is why this is not simply w/2. massif() does not build a cylinder of width w: it flares an
      APRON and throws SPURS down its flanks, and the whole thing is then yawed by a random angle, so
      its real footprint is materially wider than its nominal width. Measured on the built scene after
@@ -300,7 +310,7 @@ export function buildTerrain(ctx) {
       const h = lerp(R.hMin, R.hMax, rand() * rand() + rand() * 0.3);
       const w = lerp(R.wMin, R.wMax, rand());
       /* R2 §5: keep the Lake City pass genuinely open. The width and radius have to be drawn first
-         because clearPass pushes by the massif's ARC, not by its centre — see PASS. */
+         because clearPass pushes by the massif's ARC, not by its centre — see PASSES. */
       a = clearPass(a, w, rr);
       const [x, z] = polar(a, rr);
       /* a ROUNDED MASSIF, not a cone: broad apron, full shoulders, a summit whose tangent is

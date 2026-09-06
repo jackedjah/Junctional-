@@ -381,6 +381,29 @@ far 296 → 110, and the pass renders open.
 built result, adjust from the measured overshoot, measure again — two cheap probes beat four
 renders, and the second measurement is the one that makes it evidence.
 
+## L29 — One LAW 1 bucket per orientation is not enough; roles carry the design
+**Failure.** Rainforest City sent every up-facing face to the black paving grade. LAW 1 was satisfied
+and the design was destroyed: the PLATINUM GROWTH BANDS — the part this world uses to make the whole
+family read, from a MAHNIMAL's carapace to a FOBLOCK's belt to a tree's joint — are up-facing, so
+they came out BLACK and every organism rendered as a dark post with dark belts.
+**Correction.** Split by ROLE as well as orientation, exactly as monument.js and lakecity.js do:
+`organism` up-faces take `platinumLit`, `floor` faces take `paving`. The floor is black because §07
+says the floor is black; a band is not a floor.
+**Regression.** Orientation answers "will this render black?". It does not answer "what is this?".
+Any module with more than one kind of surface needs both axes.
+
+## L30 — A slice from two index() calls can be EMPTY, and an empty needle replaces everywhere
+**Failure.** `s.replace(s[s.index(a):s.index(b)], new)` inflated `rainforest.js` from 27 KB to
+**48 MB**. When the anchors are in the wrong order the slice is `''`, and Python's `str.replace('')`
+inserts the replacement between every character of the file.
+**Recovery.** Exactly reversible, and worth knowing: the corrupted file is
+`new.join(original_characters)`, so `corrupt.replace(new, '')` returns the original byte for byte.
+27,797 bytes came back and parsed first try.
+**Correction.** Never build a replacement target from two searched indices without asserting the
+result: `assert len(old) > 200` and `assert marker in old`. Better, address by LINE RANGE and check
+both ends. Best, commit a new file before restructuring it — this one was uncommitted, and only the
+reversibility of the corruption saved a rewrite.
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)
@@ -401,6 +424,8 @@ renders, and the second measurement is the one that makes it evidence.
 | FOBLOCK placement, music diamonds | `fobstations.js` |
 | Upper realm | `sky-layout.js` (contract), `skyrealm.js` (assembly), `sky-*.js` (builders) |
 | Giant rear-city authority monitor (§8) | `broadcast.js` |
+| RAINFOREST CITY (R2 §6) — the third destination, organisms + diamond-shard rain | `rainforest.js` |
+| MAHNIMALS — the world's small fauna, land / air / water | `mahnimals.js` |
 | LAKE CITY (R2 §5) — the second destination | `lakecity.js`; its mountain pass is `terrain.js` PASS |
 | Universal music-line motif (R2 §10/§11) — built ONCE, nothing else may hand-roll a bar graph | `musicline.js` |
 | Free movement: the viewer's own camera | `roam.js` (position, gears, collide-and-slide, input state); `mahplaza.js` owns the handover |
