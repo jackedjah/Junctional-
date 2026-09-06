@@ -8,7 +8,7 @@
    a few seating blocks, and the planter spots the flora module fills.
    Deliberately sparse: pavement stays pavement. */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { canvasTexture, diamondOutline, chamferBox } from './materials.js';
+import { canvasTexture, diamondOutline, chamferBox, fobMark } from './materials.js';
 import { SITES } from './buildings.js';
 
 export const PLAZA_RADIUS = 27;
@@ -110,14 +110,23 @@ export function buildGround(ctx) {
   const ring = new THREE.Mesh(new THREE.RingGeometry(PLAZA_RADIUS - 0.09, PLAZA_RADIUS + 0.09, 128), M.energySoft);
   ring.rotation.x = -Math.PI / 2; ring.position.y = FLOOR_TOP + 0.02; ring.renderOrder = 4; g.add(ring);
 
-  /* the MAHPLAZA civic marker: square-diamond mark + wordmark, inlaid, restrained */
+  /* THE MAHPLAZA CIVIC MARKER: the canonical MAHFITT mark + the MAHPLAZA wordmark, inlaid.
+     This used to be two concentric diamond outlines and a small core — a reasonable guess at the
+     identity, and a guess is exactly what §19 forbids while the real asset sits in this repository.
+     images/mahfitt-mark-gold.png resolves, measured, into a solid diamond flanked by two double
+     chevrons pointing inward; materials.js:fobMark() rebuilds those measured proportions as geometry.
+     The whole lockup is laid flat and sized so the mark spans the same 11 m as the wordmark plane.
+
+     The mark sits 2.2 m RIGHT of the axis on purpose. In the canonical lockup it is not centred over
+     the wordmark either: its centre falls at 0.198 of the wordmark's width to the right of centre,
+     over the end of MAHFITT. Centring it here would have been tidier and would have been the
+     approximation the brief rules out. */
   const markMat = M.energyLight;
-  const mark = new THREE.Group();
-  mark.add(diamondOutline(5.2, 0.16, markMat));
-  mark.add(diamondOutline(2.6, 0.12, markMat));
-  const core = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.02, 0.8), markMat); core.rotation.y = Math.PI / 4; mark.add(core);
-  mark.position.set(0, FLOOR_TOP + 0.03, 12); g.add(mark);
-  mark.traverse(o => { if (o.isMesh) reflect(o, 0.4); });
+  const MARK_DIAMOND = 3.6;                    /* 3.08 diamond-widths of mark = 11.1 m, the wordmark's width */
+  const mark = new THREE.Mesh(fobMark(MARK_DIAMOND, 0.05), markMat);
+  mark.rotation.x = -Math.PI / 2;              /* built facing +Z for a sign face; laid flat for a floor */
+  mark.position.set(11 * 0.198, FLOOR_TOP + 0.03, 12); g.add(mark);
+  reflect(mark, 0.4);
   const wordTex = canvasTexture(2048, 512, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = 'rgba(225,238,255,0.92)'; c.font = '700 300px "Space Grotesk", "Helvetica Neue", Arial, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; let total = 0; const gap = 44; for (const ch of 'MAHPLAZA') total += c.measureText(ch).width + gap; let x = w / 2 - (total - gap) / 2; c.textAlign = 'left'; for (const ch of 'MAHPLAZA') { c.fillText(ch, x, h / 2); x += c.measureText(ch).width + gap; } });
   const word = new THREE.Mesh(new THREE.PlaneGeometry(11, 2.75), new THREE.MeshBasicMaterial({ map: wordTex, transparent: true, depthWrite: false }));
   word.rotation.x = -Math.PI / 2; word.position.set(0, FLOOR_TOP + 0.03, 17.5); g.add(word);

@@ -412,3 +412,65 @@ export function diamondOutline(size, bar, mat, thickness = 0.02) {
   grp.rotation.y = Math.PI / 4;
   return grp;
 }
+
+/* THE CANONICAL MAHFITT MARK, rebuilt as geometry rather than approximated.
+   MEASURED off images/mahfitt-mark-gold.png, which is the identity asset already in this repository,
+   so none of this is invented: in a 1130 x 652 image the mark occupies one ink band at y 221-327 and
+   resolves into exactly three column runs —
+     a solid DIAMOND          x 725-839, y 221-327   (115 x 107, widest row dead centre)
+     a left double CHEVRON    x 608-692, y 248-301   (85 x 54)
+     a right double CHEVRON   x 872-961, y 248-303   (90 x 56)
+   which gives the proportions this builder uses: the chevrons stand at 0.50 of the diamond's height,
+   the gap between a chevron group and the diamond is 0.29 of the diamond's width, and the whole mark
+   spans 3.08 diamond-widths. The chevrons point INWARD at the diamond from both sides.
+
+   The mark is built in the XY plane facing +Z so it mounts on a sign face, and it is returned as ONE
+   merged geometry per depth so a sign costs one draw call for its mark, not seven.
+
+   ON COLOUR: the canonical mark is champagne gold #E9C98F, and MAHWORLD's own light law LAW-001
+   forbids that hue (38.7 deg at 0.67 saturation). The mark therefore takes every canonical property
+   EXCEPT the hue, the same departure already recorded for the wordmark; the caller supplies the
+   material, and BRAND.gold is kept above as the record if that law is ever relaxed. */
+export function fobMark(size = 1, depth = 0.06) {
+  /* size is the DIAMOND's width; everything else is a measured ratio of it */
+  const dW = size, dH = size * (107 / 115);
+  const cH = dH * (54 / 107), cW = size * (87 / 115) * 0.5;   /* each group is two chevrons */
+  const gap = size * (33 / 115);
+  const parts = [];
+  const push = (shape, x, y) => {
+    const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelThickness: depth * 0.3, bevelSize: depth * 0.22, bevelSegments: 1 });
+    g.translate(x, y, -depth / 2); parts.push(g);
+  };
+  const diamond = new THREE.Shape();
+  diamond.moveTo(0, dH / 2); diamond.lineTo(dW / 2, 0); diamond.lineTo(0, -dH / 2); diamond.lineTo(-dW / 2, 0); diamond.closePath();
+  push(diamond, 0, 0);
+  /* one chevron: a solid triangle with its point toward the diamond, so the pair reads as << and >> */
+  for (const side of [-1, 1]) for (let k = 0; k < 2; k++) {
+    const ch = new THREE.Shape();
+    ch.moveTo(side * cW * 0.5, cH / 2); ch.lineTo(-side * cW * 0.5, 0); ch.lineTo(side * cW * 0.5, -cH / 2); ch.closePath();
+    push(ch, side * (dW / 2 + gap + cW * (0.5 + k * 0.99)), 0);   /* 0.99 puts the group at 0.757 of the diamond's width and the whole mark at 3.08, both measured */
+  }
+  const merged = mergeGeometries(parts);
+  parts.forEach(g => g.dispose());
+  return merged;
+}
+
+/* Minimal position/normal merge for the mark — BufferGeometryUtils is an addon and this module
+   vendors nothing but three's core. Every input is a non-indexed ExtrudeGeometry of the same
+   attributes, so concatenating them is the whole job. */
+function mergeGeometries(list) {
+  const flat = list.map(g => (g.index ? g.toNonIndexed() : g));
+  let n = 0; for (const g of flat) n += g.attributes.position.count;
+  const pos = new Float32Array(n * 3), nrm = new Float32Array(n * 3);
+  let o = 0;
+  for (const g of flat) {
+    if (!g.attributes.normal) g.computeVertexNormals();
+    pos.set(g.attributes.position.array, o * 3); nrm.set(g.attributes.normal.array, o * 3);
+    o += g.attributes.position.count;
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
+  out.computeBoundingSphere();
+  return out;
+}
