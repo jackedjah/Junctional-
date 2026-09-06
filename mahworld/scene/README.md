@@ -6,14 +6,34 @@ system, no network and no interface baked into the world.
 
 | Scene | Page | Status |
 | --- | --- | --- |
-| **MAHPLAZA** — MAH GYM · MAH MATCH · MAH MARKET, a living district, luminous crystalline night | `mahplaza.html` | **v4** (AAA closure + crystalline night), the current milestone |
+| **MAHPLAZA** — MAH GYM · MAH MATCH · MAH MARKET, a living chromium district under a luminous crystalline night | `mahplaza.html` | **v5** (the chromium city), the current milestone |
 | Arrival Gate — the MAHWORLD gate plaza | `arrival-gate/plaza.html` | study v1, kept for the record |
 
-## The v4 world modules
+## v5 — the chromium city
+
+MAHWORLD is now built from chromium, dark platinum, polished crystal, reflective
+glass and MAHGIC light. Five finish grades (mirror / satin / brushed / graphite /
+crystalline glass) are the same cool neutral metal at five polishes, ranked by how
+much of the world may wear each — mirror is rare and focal, graphite is everywhere.
+
+| What changed | Where |
+| --- | --- |
+| the plaza floor became the hero surface: nine-metre chromium diamond cells with chamfered bevels and mirror-grade joint catches, laid as a deck everything else stands on | `ground.js`, `materials.js` |
+| the three destinations moved to three depths with three silhouettes — broad glazed canopy, civic terraces, a dominant tower — from one exported site plan the ground, paths and crowd all read | `buildings.js` |
+| twelve megatalls at 214–392 m with three new crowns, on overlapping radii for height parallax | `city.js` |
+| forty FOBEAM hairlines in near / mid / far tiers, the far tier generated along a band across the sky as one luminous river of energy | `fobeam.js` |
+| diamond clouds hold more of the sky; their crystalline catches are stronger | `clouds.js` |
+| the environment map carries the district itself, so chromium has a city to reflect | `mahplaza.js` |
+| premium lamps, wayfinding blades, planted plinths, a second shelter, utility columns | `plaza-dressing.js` |
+
+Contracts: `CONTRACTS_V5.md` (v5 additions) and `CONTRACTS_V4.md` (the module
+contract and the standing laws).
+
+## The world modules
 
 Each is optional: the assembly imports it if the file exists and drives it through
 `setTime` / `setTheme` / `update` / `setQuality`, so any one can be removed without
-breaking the page. Contracts: `CONTRACTS_V4.md`.
+breaking the page.
 
 | Module | Owns |
 | --- | --- |

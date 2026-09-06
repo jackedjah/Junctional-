@@ -48,8 +48,11 @@ const ROUTES = [
 const NODES = [[-16, 6], [17, 4]];
 /* masts sit inside the plaza, never in the arrival camera's near foreground (z ≳ 24 at the edges reads
    as a pillar across the lens) and never in front of a destination sign */
-const MASTS = [[-13, 20], [13, 20], [-26, 16], [26, 16], [-10, -12], [10, -12], [-27, -25], [27, -25], [-34, -14], [34, -14],
-  [-20, 30], [20, 30], [-36, 2], [36, 2], [-18, -28], [18, -28]];
+/* Lamps line the plaza's EDGES and its route flanks. None stands in the central band (|x| < 15 between
+   z −22 and z 26): a lit civic square is not a forest of posts, and the camera must be able to see the
+   three destinations from the marker without a column across the lens. */
+const MASTS = [[-17, 24], [17, 24], [-26, 16], [26, 16], [-17, -12], [17, -12], [-27, -25], [27, -25], [-34, -14], [34, -14],
+  [-22, 32], [22, 32], [-36, 2], [36, 2], [-19, -28], [19, -28]];
 /* the deck the plaza is laid on: ground.js lays 9 m chromium diamond cells whose tops sit here */
 const DECK = 0.17;
 
@@ -166,7 +169,8 @@ export function buildDressing(ctx) {
   {
     const sx = 46, sz = 30;
     for (const dz of [-2.4, 2.4]) part(dark, chamferBox(0.22, 3.2, 0.22, 0.04), sx, 1.6, sz + dz);
-    part(trim, chamferBox(3.2, 0.18, 6.4, 0.06), sx, 3.3, sz);
+    part(dark, chamferBox(3.2, 0.18, 6.4, 0.06), sx, 3.3, sz);
+    part(trim, chamferBox(3.34, 0.05, 0.14, 0.02), sx, 3.42, sz + 3.2);
     const col = new THREE.Mesh(new THREE.BoxGeometry(3.4, 3.4, 6.6), M.curb); col.position.set(sx, 1.7, sz); col.visible = false; group.add(col); ctx.colliders.push(col);
   }
 
@@ -185,7 +189,9 @@ export function buildDressing(ctx) {
        has been supplied and none is invented. */
     for (const r of ROUTES.slice(0, 3)) {
       const dx = r.to[0] - MARKER[0], dz = r.to[1] - MARKER[1], L = Math.hypot(dx, dz) || 1;
-      const bx = MARKER[0] + dx / L * 11, bz = MARKER[1] + dz / L * 11, ang = Math.atan2(dx, dz);
+      /* the blade FLANKS its route rather than standing in it: 2.6 m to one side of the centre line */
+      const px = -dz / L, pz = dx / L, side = r.to[0] < 0 ? -1 : 1;
+      const bx = MARKER[0] + dx / L * 11 + px * 2.6 * side, bz = MARKER[1] + dz / L * 11 + pz * 2.6 * side, ang = Math.atan2(dx, dz);
       part(dark, chamferBox(0.24, 3.1, 1.05, 0.07), bx, 1.55, bz, ang);
       part(trim, chamferBox(0.3, 0.09, 1.15, 0.03), bx, 3.14, bz, ang);        /* the cap */
       part(trim, chamferBox(0.34, 0.12, 0.34, 0.04), bx, 0.06, bz, Math.PI / 4);
@@ -201,16 +207,17 @@ export function buildDressing(ctx) {
       const a = Math.PI / 6 + i * Math.PI / 3, R = 12.6;
       const px = MARKER[0] + Math.cos(a) * R, pz = MARKER[1] + Math.sin(a) * R;
       if (pz < MARKER[1] - 8) continue;                       /* nothing on the MAH MATCH sight line */
-      part(dark, chamferBox(2.6, 0.62, 2.6, 0.16), px, 0.31, pz, Math.PI / 4);
-      part(trim, chamferBox(2.75, 0.09, 2.75, 0.03), px, 0.66, pz, Math.PI / 4);
-      const col = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.8, 3.0), M.curb);
-      col.position.set(px, 0.4, pz); col.rotation.y = Math.PI / 4; col.visible = false; group.add(col); ctx.colliders.push(col);
+      part(dark, chamferBox(2.6, 0.44, 2.6, 0.14), px, 0.22, pz, Math.PI / 4);
+      part(trim, chamferBox(2.78, 0.08, 2.78, 0.03), px, 0.47, pz, Math.PI / 4);
+      const col = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.6, 3.0), M.curb);
+      col.position.set(px, 0.3, pz); col.rotation.y = Math.PI / 4; col.visible = false; group.add(col); ctx.colliders.push(col);
     }
     /* a second corridor shelter on the west side, mirroring the east one */
     {
       const sx = -46, sz = 30;
       for (const dz of [-2.4, 2.4]) part(dark, chamferBox(0.22, 3.2, 0.22, 0.04), sx, 1.6, sz + dz);
-      part(trim, chamferBox(3.2, 0.18, 6.4, 0.06), sx, 3.3, sz);
+      part(dark, chamferBox(3.2, 0.18, 6.4, 0.06), sx, 3.3, sz);
+      part(trim, chamferBox(3.34, 0.05, 0.14, 0.02), sx, 3.42, sz + 3.2);
       const col = new THREE.Mesh(new THREE.BoxGeometry(3.4, 3.4, 6.6), M.curb); col.position.set(sx, 1.7, sz); col.visible = false; group.add(col); ctx.colliders.push(col);
     }
     /* UTILITY COLUMNS: short machined chromium posts in pairs at the node edges — the small, ordinary
@@ -238,7 +245,10 @@ export function buildDressing(ctx) {
   add(slab, M.platinumBrushedH || M.graphiteLight, 'dressing-paths', false, true);
   add(curb, M.curb, 'dressing-curbs', true, true);
   add(trim, M.chromeMirror || M.trim, 'dressing-trim', false, false);
-  add(dark, M.structural, 'dressing-structures', true, true);
+  /* v5: street furniture is BRUSHED PLATINUM, not near-black metal. A flat top facing a dark night sky
+     mirrors nothing, so a polished grade would read as a black cut-out on the bright chromium floor; a
+     brushed grade picks up the hemisphere and the district glow and stays a readable midtone. */
+  add(dark, M.composite || M.structural, 'dressing-structures', true, true);
 
   const stats = { masts: MASTS.length, routes: ROUTES.length, nodes: NODES.length, colliders: ctx.colliders.length, drawCalls: 0 };
   group.traverse(o => { if (o.isMesh && o.visible) stats.drawCalls++; });

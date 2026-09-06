@@ -169,7 +169,7 @@ function broadCanopy(ctx, g, o) {
   for (let i = -4; i <= 4; i++) part(trim, chamferBox(0.1, 2.5, 0.14, 0.03), i * ((W - 5.5) / 9), floorY + openH + 4.3, 0.56);
   /* a low brushed plinth running the full frontage: the broad base the mass sits on */
   part(dark, chamferBox(W + 7, 0.44, 1.6, 0.12), 0, floorY + 0.22, depth + 1.1);
-  merged(g, struct, M.chromeSatin || M.trimSatin, 'gym-canopy', true);
+  merged(g, struct, M.platinumBrushed || M.trimSatin, 'gym-canopy', true);   /* brushed: a canopy top facing the night sky must not mirror it into black */
   merged(g, trim, M.chromeMirror || M.trim, 'gym-canopy-catches', false);
   merged(g, dark, M.platinumBrushedH || M.structural, 'gym-plinth', true);
 }

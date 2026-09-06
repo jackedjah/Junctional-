@@ -15,11 +15,12 @@
    pushed into the distance and into the training zones. Nothing here obstructs
    navigation and nothing repeats on a theme-park loop.
 
-   Distance tiers keep it cheap: NEAR uses full residents, MID uses residents
-   with fewer parts when the residents module offers a LOD, FAR uses a ≤ 60
-   triangle impostor built here in the same species language (one continuous
-   teardrop, a square-diamond head, no legs). Every ambient resident keeps its
-   OWN colour: the viewer's world theme never repaints a person.
+   Distance tiers keep it cheap: NEAR uses full residents, MID uses the residents
+   module's `mid` detail tier, FAR uses its ≤ 60 triangle impostor. The species is
+   identical at every tier (one continuous teardrop, a square-diamond head, no
+   legs); only the triangle count changes. A local impostor is kept as a fallback
+   for an older residents build. Every ambient resident keeps its OWN colour: the
+   viewer's world theme never repaints a person.
 
    No timers: everything is driven from update(t, dt) so it pauses with the
    loop. No allocation in the hot path. */
@@ -144,9 +145,15 @@ export function createLife(ctx, R, opts = {}) {
   const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _look = new THREE.Vector3();
   function spawnResident(colour, tier, spec) {
     const s = Object.assign({ colour, physique: 0.2 + rand() * 0.7, sex: rand() < 0.5 ? 'm' : 'f', pose: 'stand', seed: Math.floor(rand() * 1e6) }, spec || {});
-    if (tier === 'far') return makeImpostor(R, colour, 1.85 + rand() * 0.18);
-    try { return R.createResident(Object.assign({}, s, R.LOD_TIERS && tier === 'mid' ? { lod: 'mid' } : {})); }
-    catch (e) { return makeImpostor(R, colour, 1.9); }
+    const height = 1.85 + rand() * 0.18;
+    /* the residents module owns the species at every tier: prefer ITS impostor and ITS detail tiers, and
+       fall back to the local copy below only if an older build of that module is loaded */
+    if (tier === 'far') {
+      if (typeof R.createImpostor === 'function') { try { return R.createImpostor({ colour, height, hover: 0.39 }); } catch (e) {} }
+      return makeImpostor(R, colour, height);
+    }
+    try { return R.createResident(Object.assign({}, s, { height, lod: tier === 'mid' ? 'mid' : 'near' })); }
+    catch (e) { return makeImpostor(R, colour, height); }
   }
   function addAgent(tier, x, z, colour) {
     const c = colour || (rand() < 0.72 ? COMMON[Math.floor(rand() * COMMON.length)] : ACCENT[Math.floor(rand() * ACCENT.length)]);

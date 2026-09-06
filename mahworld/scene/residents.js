@@ -19,12 +19,18 @@
    - `physique` 0..1 blends untrained → hero; `sex` 'm' | 'f' picks the base.
    - One coherent colour per resident, chosen by its player; no yellow anywhere.
 
-   Detail tiers — `createResident({ lod: 'near' | 'mid' | 'far' })` (default
-   near = the full sculpt, ~1000 triangles; mid ≈ 55 % of that; far ≤ 120
-   triangles in two draw calls) and `createImpostor()` (≤ 60 triangles, ONE
-   draw call) for the distant crowd.  `setLOD(group, tier)` and
-   `recolour(group, colour)` rebuild a figure in place from the same seed, so
-   its look, idle motion, id, transform and parent all survive.
+   Detail tiers — `createResident({ lod: 'near' | 'mid' | 'far' })`: near is the
+   full sculpt, mid drops the smile, the neck ring, the hand and a third of every
+   lathe's segments, far drops the eyes and the chest emblem too and halves the
+   arm detail.  The SPECIES is identical at every tier — square-diamond head with
+   its dark facial chamber, humanoid upper body, ONE continuous teardrop, no legs
+   — only the triangle count expressing it changes.  `createImpostor()` is the
+   distant crowd: the silhouette alone, ONE draw call of ≤ 60 triangles, in the
+   resident's own colour, with the same group contract (update / setEnergy /
+   face / setDrive) so a caller can hold impostors and residents in one list.
+   `setLOD(group, tier)` and `recolour(group, colour)` rebuild a figure in place
+   from the same seed, so its look, idle motion, id, transform and parent all
+   survive.
 
    Group origin = the ground point under the terminal tip (y = 0 is the ground);
    local +Z is the resident's front.  Materials are cached per colour and shared
@@ -382,11 +388,15 @@ export function createResident(spec = {}) {
   if (!(spec.height > 0)) delete spec.height;
   if (spec.id != null) spec.id = String(spec.id);
 
+  spec.lod = LOD_TIERS.indexOf(spec.lod) > -1 ? spec.lod : 'near';
+  const L = LODS[spec.lod];
   const rng = mulberry(Math.floor(spec.seed * 7919) + 17);
   const mats = materialsFor(spec.colour);
   const m = measures(spec, rng);
   const pose = POSES[spec.pose];
-  const SEG = 10, s = m.scale;
+  /* the detail tier drives the lathe segment count and which small features are built at all; the
+     SPECIES is identical at every tier — square-diamond head, one continuous teardrop, no legs */
+  const SEG = Math.max(6, L.seg - 4), s = m.scale;
   const paintBody = painter(rng, mats.colours, 'body'), paintDark = painter(rng, mats.colours, 'dark');
   const paintLight = () => mats.colours.light;
 
@@ -434,7 +444,7 @@ export function createResident(spec = {}) {
     torso.add(meshOf(P, mats.body, 'chest'));
   }
   /* chest emblem: one small bright diamond plate */
-  {
+  if (L.emblem) {
     const g = plateGeom(0.045 * s, 0.06 * s, paintLight);
     g.translate(0, T(m.chestY) - 0.02 * s, m.chestRz + m.bustZ + 0.012 * s);
     const pl = new THREE.Mesh(g, mats.light); pl.name = 'emblem'; torso.add(pl);
@@ -442,8 +452,8 @@ export function createResident(spec = {}) {
   /* --- neck ----------------------------------------------------------------- */
   {
     const P = new Poly();
-    lathe(P, [{ y: T(m.shoulderY) - 0.02 * s, rx: m.neckR, rz: m.neckR }, { y: T(m.neckTop), rx: m.neckR * 0.92, rz: m.neckR * 0.92 }, { y: T(m.neckTop) + 0.003, rx: 0, rz: 0 }], 6, paintDark, { twist: false, phase: 0.5 });
-    torso.add(meshOf(P, mats.dark, 'neck'));
+    lathe(P, [{ y: T(m.shoulderY) - 0.02 * s, rx: m.neckR, rz: m.neckR }, { y: T(m.neckTop), rx: m.neckR * 0.92, rz: m.neckR * 0.92 }, { y: T(m.neckTop) + 0.003, rx: 0, rz: 0 }], Math.max(4, L.neckSeg || 4), paintDark, { twist: false, phase: 0.5 });
+    if (L.neckSeg) torso.add(meshOf(P, mats.dark, 'neck'));
   }
 
   /* --- head: beveled square-diamond slab ------------------------------------ */
@@ -476,9 +486,9 @@ export function createResident(spec = {}) {
     chG.translate(0, hc - h * 0.02, d / 2 + 0.004 * s);
     const chM = new THREE.Mesh(chG, mats.dark); chM.name = 'faceChamber'; headPivot.add(chM);
     const eyeW = w * 0.085, eyeH = h * 0.11, eyeY = hc + h * 0.08, eyeX = w * 0.2, faceZ = d / 2 + 0.009 * s;
-    for (const sx of [-1, 1]) { const eG = plateGeom(eyeW, eyeH, paintLight); eG.translate(sx * eyeX, eyeY, faceZ); const eM = new THREE.Mesh(eG, mats.light); eM.name = sx < 0 ? 'eyeL' : 'eyeR'; headPivot.add(eM); }
+    if (L.eyes) for (const sx of [-1, 1]) { const eG = plateGeom(eyeW, eyeH, paintLight); eG.translate(sx * eyeX, eyeY, faceZ); const eM = new THREE.Mesh(eG, mats.light); eM.name = sx < 0 ? 'eyeL' : 'eyeR'; headPivot.add(eM); }
     /* the smile: three tiny plates on a shallow upward arc */
-    for (const [sx, dy] of [[-0.11, 0.0], [0, -0.022], [0.11, 0.0]]) { const mG = plateGeom(w * 0.05, h * 0.035, paintLight); mG.translate(sx * w, hc - h * 0.2 + dy * h, faceZ); const mM = new THREE.Mesh(mG, mats.light); mM.name = 'smile'; headPivot.add(mM); }
+    if (L.smile) for (const [sx, dy] of [[-0.11, 0.0], [0, -0.022], [0.11, 0.0]]) { const mG = plateGeom(w * 0.05, h * 0.035, paintLight); mG.translate(sx * w, hc - h * 0.2 + dy * h, faceZ); const mM = new THREE.Mesh(mG, mats.light); mM.name = 'smile'; headPivot.add(mM); }
   }
 
   /* --- arms ----------------------------------------------------------------- */
@@ -500,26 +510,26 @@ export function createResident(spec = {}) {
     swing.rotation.x = -pose.fwd[idx] * DEG;
     {
       const P = new Poly(), r0 = m.upperR, r1 = m.upperR * 0.8, L = m.upperLen;
-      lathe(P, [{ y: -L - 0.002, rx: 0, rz: 0 }, { y: -L, rx: r1, rz: r1 }, { y: -L * 0.58, rx: r0 * m.bicep, rz: r0 * m.bicep * 0.95 }, { y: -L * 0.2, rx: r0, rz: r0 }, { y: 0.01, rx: r0 * 0.9, rz: r0 * 0.9 }], 6, paintBody);
+      lathe(P, [{ y: -L - 0.002, rx: 0, rz: 0 }, { y: -L, rx: r1, rz: r1 }, { y: -L * 0.58, rx: r0 * m.bicep, rz: r0 * m.bicep * 0.95 }, { y: -L * 0.2, rx: r0, rz: r0 }, { y: 0.01, rx: r0 * 0.9, rz: r0 * 0.9 }], Math.max(4, L.armSeg - 2), paintBody);
       swing.add(meshOf(P, mats.body, 'upperArm'));
     }
     const elbow = new THREE.Group(); elbow.position.y = -m.upperLen; swing.add(elbow);
     elbow.rotation.x = -pose.elbow * DEG;
     {
       const P = new Poly(), R = m.upperR * 0.98;
-      lathe(P, [{ y: -R, rx: 0, rz: 0 }, { y: -R * 0.4, rx: R, rz: R }, { y: R * 0.4, rx: R, rz: R }, { y: R, rx: 0, rz: 0 }], 6, paintDark, { twist: false, phase: 0.5 });
-      elbow.add(meshOf(P, mats.dark, 'elbow'));
+      lathe(P, [{ y: -R, rx: 0, rz: 0 }, { y: -R * 0.4, rx: R, rz: R }, { y: R * 0.4, rx: R, rz: R }, { y: R, rx: 0, rz: 0 }], Math.max(4, L.armSeg - 2), paintDark, { twist: false, phase: 0.5 });
+      if (L.armDetail) elbow.add(meshOf(P, mats.dark, 'elbow'));
     }
     {
       const P = new Poly(), r0 = m.foreR * 1.08, r1 = m.foreR * 0.72, L = m.foreLen;
-      lathe(P, [{ y: -L - 0.002, rx: 0, rz: 0 }, { y: -L, rx: r1, rz: r1 }, { y: -L * 0.55, rx: r0 * 0.95, rz: r0 * 0.95 }, { y: -0.01, rx: r0, rz: r0 }], 6, paintBody);
+      lathe(P, [{ y: -L - 0.002, rx: 0, rz: 0 }, { y: -L, rx: r1, rz: r1 }, { y: -L * 0.55, rx: r0 * 0.95, rz: r0 * 0.95 }, { y: -0.01, rx: r0, rz: r0 }], Math.max(4, L.armSeg - 2), paintBody);
       elbow.add(meshOf(P, mats.body, 'forearm'));
     }
     /* hand: a simplified faceted wedge, flat sides facing front/back */
     {
       const P = new Poly(), Lh = m.handLen, w = m.handW, dd = m.handD, y0 = -m.foreLen;
       lathe(P, [{ y: y0 - Lh, rx: 0, rz: 0 }, { y: y0 - Lh * 0.62, rx: w, rz: dd }, { y: y0 - Lh * 0.25, rx: w * 0.92, rz: dd * 0.95 }, { y: y0 + 0.015, rx: 0, rz: 0 }], 4, paintDark, { twist: false, phase: 0.5 });
-      elbow.add(meshOf(P, mats.dark, 'hand'));
+      if (L.armDetail >= 1) elbow.add(meshOf(P, mats.dark, 'hand'));
     }
     arms.push({ shoulder, swing, elbow, baseFwd: pose.fwd[idx] * DEG, baseElbow: pose.elbow * DEG, side });
   }
@@ -540,7 +550,7 @@ export function createResident(spec = {}) {
   /* a driven pose (practice preview) overrides the idle arm motion while set */
   const drive = { active: false, fwd: [0, 0], elbow: [0, 0], lean: 0, yaw: 0, side: 0 };
   group.userData = {
-    spec, triangles, height: m.height, hover, colour: spec.colour, id: spec.id || null,
+    spec, triangles, lod: spec.lod, height: m.height, hover, colour: spec.colour, id: spec.id || null,
     parts: { body, torso, head: headPivot, arms },
     update(t /*, dt */) {
       body.position.y = hover + Math.sin(t * bobF * TAU + phase) * 0.03;
@@ -598,12 +608,78 @@ export function recolour(group, colour) {
   return group;
 }
 
+/* Swap ONE resident to a different detail tier in place. Same contract as recolour(): the group keeps
+   its identity, position, rotation, id, note, role and parent, and is rebuilt from the same seed at the
+   new tier, so its look, idle motion and energy all survive. The SPECIES never changes with the tier —
+   only how many triangles express it. Returns the same group. */
+export function setLOD(group, tier) {
+  if (!group || !group.userData || !group.userData.spec) return group;
+  if (LOD_TIERS.indexOf(tier) < 0 || group.userData.lod === tier) return group;
+  const spec = Object.assign({}, group.userData.spec, { lod: tier });
+  const fresh = createResident(spec);
+  const energy = group.userData.spec.energy;
+  const keep = { id: group.userData.id, note: group.userData.note, role: group.userData.role };
+  for (const child of group.children.slice()) { group.remove(child); child.traverse(o => { if (o.isMesh && o.geometry) o.geometry.dispose(); }); }
+  for (const child of fresh.children.slice()) group.add(child);
+  group.userData = fresh.userData;
+  Object.assign(group.userData, keep);
+  if (typeof energy === 'number') group.userData.setEnergy(energy);
+  return group;
+}
+
+/* The distant-crowd IMPOSTOR: the species silhouette and nothing else — one continuous teardrop, a
+   shoulder bar, a flattened square-diamond head — in ONE draw call of ≤ 60 triangles, painted in the
+   resident's own colour. Same group contract as a resident (update / setEnergy / face / setDrive), so a
+   caller can hold impostors and full residents in one list. */
+const IMPOSTOR_CACHE = { geo: null };
+function impostorGeometry() {
+  if (IMPOSTOR_CACHE.geo) return IMPOSTOR_CACHE.geo;
+  const pos = [];
+  const ring = (y, r) => { const a = []; for (let i = 0; i < 5; i++) { const t = i / 5 * TAU; a.push([Math.cos(t) * r, y, Math.sin(t) * r * 0.8]); } return a; };
+  const rings = [ring(0.0, 0.001), ring(0.30, 0.16), ring(0.62, 0.21), ring(0.92, 0.19), ring(1.12, 0.20), ring(1.30, 0.001)];
+  for (let i = 0; i < rings.length - 1; i++) {
+    const A = rings[i], B = rings[i + 1];
+    for (let j = 0; j < 5; j++) { const k = (j + 1) % 5; pos.push(...A[j], ...A[k], ...B[j], ...A[k], ...B[k], ...B[j]); }
+  }
+  const hy = 1.52, hw = 0.17, hh = 0.19, hd = 0.06;
+  const P = [[0, hy + hh, 0], [hw, hy, 0], [0, hy - hh, 0], [-hw, hy, 0], [0, hy, hd], [0, hy, -hd]];
+  [[0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4], [1, 0, 5], [2, 1, 5], [3, 2, 5], [0, 3, 5]].forEach(f => f.forEach(i => pos.push(...P[i])));
+  const sb = [[-0.22, 1.24, -0.05], [0.22, 1.24, -0.05], [0.22, 1.34, 0.05], [-0.22, 1.34, 0.05]];
+  pos.push(...sb[0], ...sb[1], ...sb[2], ...sb[0], ...sb[2], ...sb[3]);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.computeVertexNormals();
+  IMPOSTOR_CACHE.geo = g;
+  return g;
+}
+export function createImpostor(spec = {}) {
+  const colour = PALETTES[spec.colour] ? spec.colour : 'blue';
+  const height = spec.height > 0 ? spec.height : 1.9;
+  const mats = materialsFor(colour);
+  const mesh = new THREE.Mesh(impostorGeometry(), mats.body);
+  const group = new THREE.Group();
+  const hover = Number.isFinite(spec.hover) ? spec.hover : 0.22;
+  mesh.scale.setScalar(height / 1.9); mesh.position.y = hover;
+  group.add(mesh); group.name = 'impostor:' + colour;
+  const _v = new THREE.Vector3();
+  group.userData = {
+    spec: Object.assign({}, spec, { colour, lod: 'impostor' }), lod: 'impostor', impostor: true,
+    triangles: impostorGeometry().getAttribute('position').count / 3,
+    height, hover, colour, id: spec.id || null,
+    update(t) { mesh.position.y = hover + Math.sin(t * 0.9 + height) * 0.03; },
+    setEnergy(e) { mats.setEnergy(clamp01(e)); },
+    face(target) { group.getWorldPosition(_v); group.rotation.y = Math.atan2(target.x - _v.x, target.z - _v.z); },
+    setDrive() {}
+  };
+  return group;
+}
+
 export function populate(parent, spots) {
   const out = [];
   spots.forEach((s, i) => {
     const seed = Number.isFinite(s.seed) ? s.seed : i + 1;
     const id = s.id || ('resident-' + (i + 1));
-    const r = createResident({ colour: s.colour, physique: s.physique, sex: s.sex, pose: s.pose, seed, height: s.height, hover: s.hover, id });
+    const r = createResident({ colour: s.colour, physique: s.physique, sex: s.sex, pose: s.pose, seed, height: s.height, hover: s.hover, lod: s.lod, id });
     r.position.set(s.x || 0, 0, s.z || 0);
     r.rotation.y = Number.isFinite(s.facing) ? s.facing : (seed * 2.399) % TAU;
     r.userData.id = id; r.userData.note = s.note || null; r.userData.role = s.role || 'resident';

@@ -57,7 +57,7 @@ export function buildGround(ctx) {
   const contrastMat = new THREE.MeshStandardMaterial({ color: 0x27344a, roughness: 0.16, metalness: 0.95, envMapIntensity: 2.0, transparent: true, opacity: 0.9, flatShading: true });
   ctx.floorMaterials = [heroMat, satinMat, contrastMat];
   {
-    const hero = [], satin = [], contrast = [], joints = [];
+    const hero = [], satin = [], contrast = [], joints = [], outerJoints = [];
     const inset = 0.42;                                   /* the joint width between two cells */
     const cellGeo = chamferBox(DIAMOND_CELL - inset, 0.17, DIAMOND_CELL - inset, 0.15);
     const half = Math.ceil(FIELD_RADIUS / DIAMOND_CELL) + 1;
@@ -74,14 +74,16 @@ export function buildGround(ctx) {
       geo.translate(x, 0.085, z);
       const contrasty = ((i * 5 + j * 3) % 7 === 0);
       (r < HERO_RADIUS ? (contrasty ? contrast : hero) : satin).push(geo);
-      /* joint catches: mirror-grade hairlines in the gaps, inside the hero field only */
-      if (r < HERO_RADIUS) {
-        for (const [dx, dz, w, d] of [[DIAMOND_CELL / 2, 0, inset * 0.66, DIAMOND_CELL + inset], [0, DIAMOND_CELL / 2, DIAMOND_CELL + inset, inset * 0.66]]) {
-          if (Math.hypot(x + dx, z + dz) > HERO_RADIUS) continue;
-          /* the catch fills the joint and stops a hair below the cell tops, so it reads as a bright
-             hairline turning between two slabs — never as a black gap or a glowing grid line */
-          const jg = chamferBox(w, 0.16, d, 0.035); jg.translate(x + dx, 0.077, z + dz); joints.push(jg);
-        }
+      /* joint catches: every joint is filled so the floor never shows a black gap. Inside the hero field
+         they are mirror-grade and draw the eye to the centre; outside they drop to satin, which is what
+         keeps the outer floor reading as laid construction without competing with the middle. */
+      for (const [dx, dz, w, d] of [[DIAMOND_CELL / 2, 0, inset * 0.66, DIAMOND_CELL + inset], [0, DIAMOND_CELL / 2, DIAMOND_CELL + inset, inset * 0.66]]) {
+        const jr = Math.hypot(x + dx, z + dz);
+        if (jr > FIELD_RADIUS) continue;
+        /* the catch fills the joint and stops a hair below the cell tops, so it reads as a bright
+           hairline turning between two slabs — never as a black gap or a glowing grid line */
+        const jg = chamferBox(w, 0.16, d, 0.035); jg.translate(x + dx, 0.077, z + dz);
+        (jr < HERO_RADIUS ? joints : outerJoints).push(jg);
       }
     }
     cellGeo.dispose();
@@ -90,6 +92,7 @@ export function buildGround(ctx) {
     add(satin, satinMat, 'floor-satin-field');
     add(hero, heroMat, 'floor-hero-field');
     add(contrast, contrastMat, 'floor-contrast-cells');
+    add(outerJoints, M.trimSatin, 'floor-joint-catches-outer');
     add(joints, M.trim, 'floor-joint-catches');
   }
   /* MAHGIC routing channels: four thin inlaid lines running from the disc edge out toward the district,
