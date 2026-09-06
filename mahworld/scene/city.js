@@ -19,22 +19,62 @@
       colossal tapered form, a suspended ring on pylons, a high platform.
 
    Laws honoured: materials from ctx.M only (+ MeshBasic for windows / lights /
-   far silhouettes), no yellow / amber / orange, no additive glow, nothing
-   flashes, deterministic (seeded), no per-frame allocation, everything merged
-   or instanced (≈ 45 draw calls in the establishing view). Windows dim to 20 %
-   by day; energy strips and rail lights follow the world Theme and dim ×0.3 by
-   day. Never inside |x| < 46 && z > −92, never at z > 70 within |x| < 60.
+   spill / far silhouettes), no additive glow, nothing flashes, deterministic
+   (seeded), no per-frame allocation, everything merged or instanced. Windows
+   dim by day; energy strips and rail lights follow the world Theme and dim ×0.3
+   by day. Never inside |x| < 46 && z > −92, never at z > 70 within |x| < 60.
+
+   v8 — WARM ROOMS, COLD SIGNS. Two changes, and they are the same change seen
+   twice. (1) The district's windows were one cool white, so every lit room
+   agreed with every lit sign and fifteen blocks read as one blue mass; the
+   rooms are WARM now, per face, with a MAHGIC-lit minority left cool — that
+   difference is what a skyline's life actually is. (2) Six blocks and two
+   megatalls carry ONE saturated accent gesture each, assigned BY DISTRICT
+   (left violet, centre blue, right cyan) so the eye reads regions rather than
+   per-building noise. Every emitter added here is built as three pieces — the
+   source, the dark reveal it sits in, and a short-falloff WASH in its own hue
+   on the surface it is mounted to — because an emissive rectangle that lights
+   nothing is the failure this pass exists to remove.
 
    Life anchors pushed: ctx.lifeAnchors.paths (walkway + 3 bridges, kind
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, windowGrid } from './materials.js';
+import { chamferBox, windowGrid, canvasTexture, ACCENT } from './materials.js';
 
 const SEED = 4417;
 const PW = 1.4;                       /* pilaster width */
 const FLOOR = 3.4;                    /* residential floor pitch */
-const WIN = { cellW: 1.5, cellH: 1.35, gapX: 0.95, gapY: FLOOR - 1.35, tint: 0xdde8ff, dimTint: 0x24324a };
-const WHITE = 0xdde8ff;
+const WIN = { cellW: 1.5, cellH: 1.35, gapX: 0.95, gapY: FLOOR - 1.35 };
+const WHITE = 0xdde8ff;               /* the cool MAHGIC white: masts, beacons, rail pods — never a room */
+
+/* ---- v8 §01 THE WINDOW IS A ROOM ---------------------------------------------------------------
+   "Most of the windows of the buildings should have yellow or an off-white lighting FAINTLY coming
+   out of it." The district's windows were one cool 0xdde8ff, which meant every lit room agreed
+   exactly with every lit sign, and fifteen blocks collapsed into a single blue mass however much
+   platinum went onto their frames. A room is warm because there are PEOPLE in it; a sign is cold
+   because it is MAHGIC. That one difference is what a night skyline's life actually consists of.
+
+   These are materials.js's own interior family, kept here as the literals the window grids tint
+   their instances with: windowGrid multiplies MATERIAL colour by INSTANCE colour, so the shared
+   material stays a neutral dimmer and the HUE is chosen per face. Faint is deliberate — the grid's
+   own per-cell spread (0.22–1.17 of the tint) lands most cells well under half strength. */
+const WARM = {
+  interior: 0xffeccd,        /* the standard lit room — warm off-white, and the district's majority */
+  interiorPale: 0xfff6e4,    /* a deep room read through a large pane: paler, because more of it is air */
+  interiorSoft: 0xf2d9a8     /* the SPILL — what that room throws onto its own sill, reveal and spandrel */
+};
+const COOL = { lit: 0xd7e8ff, spill: 0x8fb4e6 };        /* a MAHGIC-lit room: a training floor, a plant deck */
+const DARKROOM = { warm: 0x262229, cool: 0x24324a };    /* an unlit flat: near-black glass, never a hole in the wall */
+/* Five faces in six are DOMESTIC; the sixth is MAHGIC-lit and stays cool. The choice is per FACE and
+   never per building, because a tower whose every elevation is lit identically reads as one lamp
+   rather than as three hundred separate households — and `on` varies the lit fraction so some
+   elevations are half empty while others are nearly full. Deterministic, from the face's own seed. */
+function faceLight(seed) {
+  const k = (Math.imul(seed | 0, 2654435761) >>> 0) % 12;
+  if (k < 2) return { tint: COOL.lit, dim: DARKROOM.cool, spill: COOL.spill, cool: true, on: 0.74 };
+  if (k < 5) return { tint: WARM.interiorPale, dim: DARKROOM.warm, spill: WARM.interiorSoft, cool: false, on: 0.88 };
+  return { tint: WARM.interior, dim: DARKROOM.warm, spill: WARM.interiorSoft, cool: false, on: 0.55 + (k % 4) * 0.13 };
+}
 /* ---- v7 §02 THE PLATINUM FRAME — the dimensions that decide how much of an elevation is metal.
    Measured at night the district read: sky 36, ARCHITECTURE 52, chromium plaza floor 95. The floor was
    doing all of the platinum work because the blocks were a navy mass wearing a hairline trim. The masses
@@ -87,6 +127,22 @@ const MASSING = {
   R4: 'slotted', F1: 'stepped', F2: 'slotted', L5: 'stepped', R5: 'slotted'
 };
 const MASSING_OF = id => MASSING[id] || 'stepped';
+/* ---- v8 §02 PUNGENT DISTRICT COLOUR ------------------------------------------------------------
+   The direction is saturated primary and secondary colour on the buildings, contrasted against the
+   black platinum floor. The failure mode is obvious and worth naming: five hues sprinkled over
+   fifteen blocks reads as an arcade, not a civilisation. So colour is a property of a DISTRICT, not
+   of a building — the left blocks are violet, the centre is blue, the right is cyan — and only SIX
+   of the fifteen carry a gesture at all. Each of those six carries exactly ONE, and it is large: a
+   full signage band, a crown, or a full-height seam. Everything else stays dark mass and platinum
+   frame, because a contrast needs something to be measured against.
+   Hand-checked against the three cut valleys: L1 155.9°, L2 147.5°, C2 100.9°, C3 77.0°, R2 44.0°,
+   R5 28.0° — every one of them clear of 52–72°, 108–124° and 128–142°, so no gesture draws the eye
+   into a hole the composition is deliberately keeping open. */
+const ACCENT_DISTRICT = { L: 'violet', F: 'violet', C: 'blue', R: 'cyan' };
+const GESTURE = { L1: 'seam', L2: 'band', C2: 'crown', C3: 'band', R2: 'crown', R5: 'band' };
+/* the two megatalls that wear a full-height seam, keyed by their own bearing|radius row in TOWERS.
+   Landmarks, so they take their district's hue: 88° is the centre's tallest, 46° is the right's. */
+const TOWER_SEAM = { '88|665': 'blue', '46|505': 'cyan' };
 /* bridges between blocks (world endpoints sit just inside the block faces) and the main walkway */
 /* the walkway sits BEHIND MAH MATCH's new site (z −66, body back to −123), so it still crosses the
    frame without passing through the building */
@@ -139,17 +195,49 @@ const SLABS = [
 function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function smooth(t) { t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); }
 function polar(a, r) { const t = a * Math.PI / 180; return [r * Math.cos(t), -r * Math.sin(t)]; }
-/* concatenate geometries (non-indexed) into one static BufferGeometry; disposes the inputs */
+/* concatenate geometries (non-indexed) into one static BufferGeometry; disposes the inputs.
+   v8: a vertex COLOUR is carried when any part has one, which is what lets all three district accent
+   hues share ONE wash mesh instead of costing a draw call each — the wash material is white and the
+   hue rides on the vertices. Parts without a colour default to white, so nothing else changes. */
 function mergeGeos(list) {
-  const parts = []; let count = 0;
-  for (const g of list) { const n = g.index ? g.toNonIndexed() : g; if (!n.attributes.normal) n.computeVertexNormals(); parts.push(n); count += n.attributes.position.count; if (n !== g) g.dispose(); }
+  const parts = []; let count = 0, tinted = false;
+  for (const g of list) { const n = g.index ? g.toNonIndexed() : g; if (!n.attributes.normal) n.computeVertexNormals(); if (n.attributes.color) tinted = true; parts.push(n); count += n.attributes.position.count; if (n !== g) g.dispose(); }
   const pos = new Float32Array(count * 3), nor = new Float32Array(count * 3), uv = new Float32Array(count * 2);
+  const col = tinted ? new Float32Array(count * 3) : null;
   let o = 0;
-  for (const n of parts) { const c = n.attributes.position.count; pos.set(n.attributes.position.array, o * 3); nor.set(n.attributes.normal.array, o * 3); if (n.attributes.uv) uv.set(n.attributes.uv.array, o * 2); o += c; n.dispose(); }
+  for (const n of parts) {
+    const c = n.attributes.position.count;
+    pos.set(n.attributes.position.array, o * 3); nor.set(n.attributes.normal.array, o * 3);
+    if (n.attributes.uv) uv.set(n.attributes.uv.array, o * 2);
+    if (col) { if (n.attributes.color) col.set(n.attributes.color.array, o * 3); else col.fill(1, o * 3, (o + c) * 3); }
+    o += c; n.dispose();
+  }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  if (col) g.setAttribute('color', new THREE.BufferAttribute(col, 3));
   return g;
 }
+/* paint one geometry's vertices so it can share a merged mesh with other hues */
+const _tint = new THREE.Color();
+function paint(geo, hex) {
+  const n = geo.attributes.position.count, a = new Float32Array(n * 3);
+  _tint.setHex(hex);
+  for (let i = 0; i < n; i++) { a[i * 3] = _tint.r; a[i * 3 + 1] = _tint.g; a[i * 3 + 2] = _tint.b; }
+  geo.setAttribute('color', new THREE.BufferAttribute(a, 3));
+  return geo;
+}
+/* ---- v8 §03 THE WASH — how a light in this file proves it is a light -----------------------------
+   An emissive material makes a bright rectangle and illuminates nothing, which is the exact defect
+   the direction is calling out. A wash is the answer: an unlit plane carrying the emitter's own hue
+   and a FALLOFF MAP, laid on the surface the emitter is mounted to. The map is bright along the
+   emitter's line and gone at the edges of the quad, so a two-metre-tall wash is light that dies in
+   two metres — believable falloff, not a uniform tint over a whole facade.
+   `hwash` falls off across its HEIGHT (a band, a window ribbon, a sill line); `vwash` is the same
+   quad rotated a quarter turn so it falls off across its WIDTH, for a vertical seam's two jambs. */
+const hwash = (w, h) => new THREE.PlaneGeometry(w, h);
+const vwash = (w, h) => new THREE.PlaneGeometry(h, w).rotateZ(Math.PI / 2);
+const soffitWash = (w, d) => new THREE.PlaneGeometry(w, d).rotateX(Math.PI / 2);    /* faces DOWN: under a course, a coping */
+const sillWash = (w, d) => new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2);     /* faces UP: onto a sill, a deck, a plinth */
 /* flat facets: non-indexed + per-face normals */
 function faceted(g) { const n = g.index ? g.toNonIndexed() : g; n.computeVertexNormals(); if (n !== g) g.dispose(); return n; }
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _e = new THREE.Euler();
