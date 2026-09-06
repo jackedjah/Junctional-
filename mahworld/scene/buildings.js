@@ -495,6 +495,10 @@ function sign(ctx, parent, spec) {
   }
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(spec.width, height), mat);
   mesh.position.set(x, y, z);
+  /* the wordmark draws AFTER the reveal's wash. Both are transparent and depth-write-off, and the
+     wash sits 0.09 m behind the letters — without an explicit order three.js draws the sign first and
+     then lays a half-opaque gradient over the glyphs, which is exactly the wrong way round. */
+  mesh.renderOrder = 6;
   parent.add(mesh);
   if (spec.reflect !== false) ctx.reflect(mesh, 0.3);
   return mesh;
