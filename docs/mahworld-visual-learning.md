@@ -304,6 +304,28 @@ you did not build, enumerate every channel its own material carries** — `verte
 `emissive`, `flatShading` — before deciding which to drop. A body that renders as a silhouette is
 the tell.
 
+## L23 — "Miniature" is relative to what it sits on, not to a hand
+**Failure.** The universal music-line motif was built at 1.35 m at a FOBEAM node and 0.9 m on a
+launch pad, reasoning from the word "miniature" in the law. At 25 m the seven bars were a smudge; at
+80 m from the plaza deck they were nothing at all.
+**Correction.** Size from the VIEWING DISTANCE and from the host mass. 4.2 m at a node 30–130 m up
+is still 3% of its tower and reads from the deck; 1.6 m on a pad is chest height to the walker
+standing next to it, which is where the motif has to survive inspection.
+**Regression.** Any element specified with a relative word — miniature, subtle, sparse, low — has to
+be turned into a number against a measured distance before it is built, or the word does the sizing.
+
+## L24 — Freeze the contract, not the implementation
+**Reusable recipe, not a failure.** R2 §10 requires the music-line motif to accept real audio later
+**without changing its geometry contract**. The way that was made true: the field is
+`N_SITES × BARS` instanced quads whose footprint, base and maximum height are FIXED, and the only
+thing that ever varies is one `Float32Array` of levels in [0,1]. Idle animation, audio, LOD and
+state cross-fades are all just functions that fill that array, so `setLevels()` is the entire audio
+surface and there is no second code path to write when Apple Music arrives. One `InstancedMesh` per
+family — measured at 10 sites × 7 bars = 70 instances in **1 draw call, 140 triangles**.
+**Proof that the surface is real, not asserted:** feeding `[0.95,0.2,0.85,0.35,...]` moved bar 3's
+`scale.y` to 1.4700, which is exactly band 3 (0.35) × the site scale (4.2). The number confirms the
+audio path drives geometry; a screenshot could not have.
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)
@@ -324,6 +346,7 @@ the tell.
 | FOBLOCK placement, music diamonds | `fobstations.js` |
 | Upper realm | `sky-layout.js` (contract), `skyrealm.js` (assembly), `sky-*.js` (builders) |
 | Giant rear-city authority monitor (§8) | `broadcast.js` |
+| Universal music-line motif (R2 §10/§11) — built ONCE, nothing else may hand-roll a bar graph | `musicline.js` |
 | Free movement: the viewer's own camera | `roam.js` (position, gears, collide-and-slide, input state); `mahplaza.js` owns the handover |
 
 ## Standing diagnostic harness (scratchpad)

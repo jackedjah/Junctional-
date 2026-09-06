@@ -43,6 +43,7 @@
    yellow / amber / orange (colour comes from the world Theme's energy pair), no
    per-frame allocation, no geometry rebuilt in update, ~10 draw calls. */
 import * as THREE from '../vendor/three/three.module.min.js';
+import { createMusicLineField } from './musicline.js';   /* R2 §10: the universal music-line law */
 import { chamferBox, canvasTexture } from './materials.js';
 
 /* ---- the receivers: where a route can begin or end ---------------------------------------
@@ -788,6 +789,38 @@ export function buildFobeams(ctx) {
       .forEach(m => { for (let i = 0; i < m.count; i++) m.setColorAt(i, grey); m.instanceColor.needsUpdate = true; });
   }
 
+  /* ---- R2 §10: THE UNIVERSAL MUSIC-LINE LAW --------------------------------------------------
+     Every FOBEAM family carries the miniature vertical music-line motif at or near its PHYSICAL
+     endpoint. This module owns two families, so both get one, and both get it from the shared
+     infrastructure in musicline.js rather than hand-rolling a bar graph — §11 says build it once.
+
+     WHERE, exactly, and why:
+       · every NODES entry a route actually resolves against — those are the physical emitters and
+         receivers §12 insists on, and a beam that arrives at a bare post is the thing this law is
+         written against. The figure stands just under the node so it reads against the node's own
+         mass rather than floating in sky.
+       · every ASCENT pad, on its coping, facing the plaza. A launch pad is where a viewer stands
+         closest to the network, so it is where the motif has to survive inspection.
+     SCALE IS MEASURED FROM THE VIEWING DISTANCE, NOT FROM THE MOTIF. The first cut used 1.35 m at a
+     node and 0.9 m on a pad, reasoning from the word "miniature" — and at 25 m the seven bars were a
+     smudge, at 80 m they were nothing. "Miniature" is relative to the 130 m tower it sits on, not to
+     a hand. 4.2 m at a node reads from the plaza deck and is still 3% of its tower; 1.6 m on a pad
+     is chest height to a walker standing next to it, which is where the motif has to survive real
+     inspection. The figure is 0.457 of its height wide, so a node motif is 4.2 x 1.9 m. */
+  const mlSites = [];
+  for (const k of Object.keys(NODES)) {
+    const nd = NODES[k];
+    if (!nd || !nd.p) continue;
+    /* face the plaza centre: a motif seen edge-on is a line, and a line is not a reading */
+    mlSites.push({ x: nd.p[0], y: nd.p[1] - 6.4, z: nd.p[2], ry: Math.atan2(-nd.p[0], -nd.p[2]) + Math.PI, scale: 4.2 });
+  }
+  for (const A of ASCENTS) {
+    /* off-centre on the coping so the pad's own beam column does not stand in front of it */
+    mlSites.push({ x: A.x + 2.05, y: PAD_TOP + 0.16, z: A.z + 1.5, ry: Math.atan2(-A.x, -A.z) + Math.PI, scale: 1.6 });
+  }
+  const musicLines = createMusicLineField(ctx, mlSites, { name: 'fobeam-musicline', opacity: 0.78 });
+  group.add(musicLines.group);
+
   if (scene && !group.parent) scene.add(group);
 
   /* ---- animation ------------------------------------------------------------------------- */
@@ -1032,9 +1065,10 @@ export function buildFobeams(ctx) {
     }
     return t;
   }
-  function update(t, dt) { driven = true; step(t, dt); }
+  function update(t, dt) { driven = true; step(t, dt); musicLines.update(t); }
 
   function dispose() {
+    musicLines.dispose();
     retired.forEach(o => { o.visible = true; }); retired.length = 0;
     const i = (ctx.timeHooks || []).indexOf(timeHook); if (i > -1) ctx.timeHooks.splice(i, 1);
     packetMesh.onBeforeRender = function () {};
@@ -1086,5 +1120,17 @@ export function buildFobeams(ctx) {
     triangles: routes.reduce((n, r) => { const T = TIER[r.tier]; return n + T.ts * T.rs * 2 + T.fts * T.frs * 2; }, 0) + N * 10 + nodeList.length * 90 + flowMeshes.length * 120 + ascentCost.triangles,
     legacyHidden: retired.length
   };
-  return { group, setTime, setTheme, update, dispose, stats, routes: stats.routes, ascent: stats.ascent };
+  /* stats is assembled further down this file than the field is built, so the count is attached
+     here rather than at the build site — where `stats` is still in its temporal dead zone. */
+  stats.musicLines = musicLines.stats;
+  return {
+    group, setTime, update, dispose, stats, routes: stats.routes, ascent: stats.ascent,
+    setTheme(th) { setTheme(th); musicLines.setTheme(th); },
+    setQuality(q) { musicLines.setQuality(q); },
+    /* the world's single audio surface: hand it normalized band energy and every FOBEAM endpoint
+       responds together. No AudioContext is created anywhere in this path (MAH PLAYER owns music). */
+    setAudioLevels(arr) { musicLines.setLevels(arr); },
+    setMusicState(name) { musicLines.setState(name); },
+    musicLines
+  };
 }
