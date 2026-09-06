@@ -107,7 +107,18 @@ export async function createMahplaza(canvas, options = {}) {
   const M = createMaterials(theme);
 
   /* wet reflections: mirrored copies of emissive elements under the floor, built from world matrices once the graph is placed */
-  const reflections = new THREE.Group(); reflections.scale.y = -1; scene.add(reflections);
+  /* THE MIRROR PLANE IS THE DECK TOP, NOT y = 0 (fixed in v8).
+     scale.y = −1 alone reflects about y = 0, but the plaza deck's surface is at ground.js's
+     FLOOR_TOP = 0.17, so every reflected object was landing 0.34 m away from where it touches the
+     floor. On the old mid-dark plaza that error was invisible. The floor is black platinum at
+     roughness 0.055 now — a near mirror — and a reflection that does not meet its object at the
+     contact line is the first thing an eye notices. Reflecting about a plane at height h is
+     y' = 2h − y, which is scale.y = −1 followed by position.y = 2h.
+     One plane cannot be right everywhere: the ground outside PLAZA_DECK_R sits at 0. The deck wins
+     because it is the hero surface, it is where the camera stands, and almost everything registered
+     for reflection — the monument, the inlaid marks, the ring, the furniture, the residents — stands
+     on it. */
+  const reflections = new THREE.Group(); reflections.scale.y = -1; reflections.position.y = 2 * 0.17; scene.add(reflections);
   const mirrorQueue = [], themedReflections = [];
   const reflect = (mesh, dim = 0.4) => { mirrorQueue.push([mesh, dim]); return mesh; };
   function buildReflections() {
@@ -275,7 +286,10 @@ export async function createMahplaza(canvas, options = {}) {
   const envDome = new THREE.Mesh(new THREE.SphereGeometry(50, 24, 12), new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide }));
   const envCols = new Float32Array(envDome.geometry.attributes.position.count * 3); envDome.geometry.setAttribute('color', new THREE.BufferAttribute(envCols, 3)); envScene.add(envDome);
   const envSun = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })); envScene.add(envSun);
-  const envFloor = new THREE.Mesh(new THREE.CircleGeometry(48, 24), new THREE.MeshBasicMaterial({ color: 0x0b1220, side: THREE.DoubleSide })); envFloor.rotation.x = Math.PI / 2; envFloor.position.y = -0.5; envScene.add(envFloor);
+  /* the lower half of what every metal sees. It IS the plaza, so it follows the plaza down to black
+     platinum (v8) — a metal lit from below by a floor brighter than the floor actually is reads as
+     lit from nowhere, and it was the thing keeping the darks from settling. */
+  const envFloor = new THREE.Mesh(new THREE.CircleGeometry(48, 24), new THREE.MeshBasicMaterial({ color: 0x080b11, side: THREE.DoubleSide })); envFloor.rotation.x = Math.PI / 2; envFloor.position.y = -0.5; envScene.add(envFloor);
   /* v5 §14 — WHAT CHROMIUM REFLECTS. A mirror finish is only as interesting as its surroundings: chrome
      against a smooth gradient reads as flat grey paint. So the environment scene carries a ring of the
      district itself — 56 vertical bars of varied height and brightness around the horizon, plus a
