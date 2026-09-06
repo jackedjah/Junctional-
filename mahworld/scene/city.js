@@ -266,12 +266,41 @@ export function buildCity(ctx) {
   const anchors = ctx.lifeAnchors || (ctx.lifeAnchors = { paths: [], pads: [], doors: [], windows: [] });
   anchors.paths = anchors.paths || []; anchors.pads = anchors.pads || [];
 
+  /* the three district accent hues, and only three. materials.js owns them (emissive, near-black
+     base, dimmed with the world clock by its own setTime), so they are USED here and never disposed. */
+  const accentM = { violet: mat('accentViolet', 'energy'), blue: mat('accentBlue', 'energy'), cyan: mat('accentCyan', 'energy') };
+
   const group = new THREE.Group(); group.name = 'city';
-  const owned = { geometries: [], materials: [] };
+  const owned = { geometries: [], materials: [], textures: [] };
   const own = g => { owned.geometries.push(g); return g; };
+
+  /* THE FALLOFF MAP every wash in this module is cut from: white, opaque along its centre line and
+     gone at top and bottom, with the last 14 % of its width faded so a band does not end on a hard
+     edge. One 32 × 64 canvas, shared by every spill and every accent wash in the district. */
+  const washTex = canvasTexture(32, 64, (c, w, h) => {
+    const v = c.createLinearGradient(0, 0, 0, h);
+    v.addColorStop(0, 'rgba(255,255,255,0)'); v.addColorStop(0.34, 'rgba(255,255,255,0.55)');
+    v.addColorStop(0.5, 'rgba(255,255,255,1)');
+    v.addColorStop(0.66, 'rgba(255,255,255,0.55)'); v.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = v; c.fillRect(0, 0, w, h);
+    c.globalCompositeOperation = 'destination-in';
+    const u = c.createLinearGradient(0, 0, w, 0);
+    u.addColorStop(0, 'rgba(0,0,0,0)'); u.addColorStop(0.14, 'rgba(0,0,0,1)');
+    u.addColorStop(0.86, 'rgba(0,0,0,1)'); u.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = u; c.fillRect(0, 0, w, h);
+  });
+  owned.textures.push(washTex);
 
   /* own materials: windows (instance colour × material colour), theme energy lines, cool-white lights, far silhouettes */
   const winMat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: true, fog: true }); winMat.name = 'city-windows';
+  /* THE WORLD ANSWERING ITS OWN WINDOWS. Two materials, one per interior temperature, and one more
+     carrying every accent hue on its vertices. depthWrite off because a wash is light landing on a
+     surface, not a surface; the opaque depth buffer still occludes it, so a wash on a block behind
+     another block stays behind it. */
+  const spillWarmM = new THREE.MeshBasicMaterial({ color: WARM.interiorSoft, map: washTex, transparent: true, opacity: 0.44, depthWrite: false, toneMapped: true, fog: true });
+  const spillCoolM = new THREE.MeshBasicMaterial({ color: COOL.spill, map: washTex, transparent: true, opacity: 0.4, depthWrite: false, toneMapped: true, fog: true });
+  const accentWashM = new THREE.MeshBasicMaterial({ color: 0xffffff, map: washTex, vertexColors: true, transparent: true, opacity: 0.5, depthWrite: false, toneMapped: true, fog: true });
+  spillWarmM.name = 'city-window-spill-warm'; spillCoolM.name = 'city-window-spill-cool'; accentWashM.name = 'city-accent-wash';
   const stripMat = new THREE.MeshBasicMaterial({ color: theme.energy, toneMapped: true, fog: true }); stripMat.name = 'city-energy';
   const whiteMat = new THREE.MeshBasicMaterial({ color: WHITE, toneMapped: true, fog: true }); whiteMat.name = 'city-lights';
   /* v6 §07 / §08 / §25 / §44 — THE BACKGROUND MATERIAL FAMILIES.
@@ -301,15 +330,17 @@ export function buildCity(ctx) {
   ];
   farMats.forEach((m, i) => { m.name = 'city-distant-' + i; owned.materials.push(m); });
   const groundMat = new THREE.MeshBasicMaterial({ color: 0x141d2c, fog: true }); groundMat.name = 'city-ground';
-  owned.materials.push(winMat, stripMat, whiteMat, groundMat);
+  owned.materials.push(winMat, stripMat, whiteMat, groundMat, spillWarmM, spillCoolM, accentWashM);
 
   /* static geometry buckets, merged per material at the end */
   /* the platinum frame gets THREE buckets, not three meshes per block: every block's framing merges
      into the same three geometries, so widening the framing across fifteen blocks costs three draw
      calls in total rather than forty-five */
-  const B = { structural: [], composite: [], trim: [], strips: [], whites: [], platMid: [], platPier: [], platLit: [], far: [], far0: [], far1: [], far2: [] };
+  const B = { structural: [], composite: [], trim: [], strips: [], whites: [], platMid: [], platPier: [], platLit: [], far: [], far0: [], far1: [], far2: [],
+    spillWarm: [], spillCool: [], accWash: [], violet: [], blue: [], cyan: [] };
   const kitBoxes = [], kitMasts = [];        /* instanced roof kit matrices */
-  const stats = { blocks: 0, bridges: 0, towers: 0, giants: 0, windows: 0, windowGrids: 0, pads: 0, paths: 0, drawCalls: 0, triangles: 0 };
+  const stats = { blocks: 0, bridges: 0, towers: 0, giants: 0, windows: 0, windowGrids: 0, pads: 0, paths: 0, drawCalls: 0, triangles: 0,
+    lit: 0, warmFaces: 0, coolFaces: 0, emitters: 0, washes: 0, gestures: [] };
   let elevator = null, pod = null;
 
   /* ---------------------------------------------------------------- 1. midground blocks */
@@ -323,8 +354,11 @@ export function buildCity(ctx) {
      A third of the district's blocks are GLASS blocks now: instead of a windowGrid of individual
      cells they carry a full-height glazed face with lit floor plates behind it, which is what makes a
      night city read as inhabited rather than as a silhouette with holes in it. The MASS stays dark;
-     only the glazing is bright, so the value hierarchy the platinum depends on survives. */
-  const glassFaceMat = new THREE.MeshBasicMaterial({ color: 0xc8dcff, toneMapped: true, fog: true });
+     only the glazing is bright, so the value hierarchy the platinum depends on survives.
+     v8: the curtain material is a NEUTRAL DIMMER now rather than a cool tint. It used to hold the
+     hue for every glazed block at once, which made a hundred metres of curtain wall one temperature;
+     the hue is chosen per face and rides on the grid's instance colours instead. */
+  const glassFaceMat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: true, fog: true });
   glassFaceMat.name = 'city-curtain'; owned.materials.push(glassFaceMat);
   const glazedIds = { L2: 1, C3: 1, R2: 1, L5: 1, F2: 1, R5: 1 };
 
@@ -333,23 +367,60 @@ export function buildCity(ctx) {
      rows. Derive the two separately and the frame reads as paint laid over the glass instead of
      structure built around it — the same tell that gives a hairline trim away. Punched-window and
      curtain-wall blocks differ only in this module, so both get the same frame treatment. */
-  function winModule(faceW, faceH, glazed) {
+  function winModule(faceW, faceH, glazed, light) {
     if (glazed) {
       const cols = Math.max(3, Math.floor((faceW - 2 * PW) / 4.2)), rows = Math.max(3, Math.floor(faceH / 7));
       return { cols, rows, cellW: (faceW - 2 * PW - 2.2) / cols - 0.5, cellH: (faceH - 5) / rows - 1.1, gapX: 0.5, gapY: 1.1,
-        y0: 3.2, depth: 0.14, onFraction: 0.82, tint: 0xd8e8ff, dimTint: 0x35507a, material: glassFaceMat, name: 'city-curtain' };
+        y0: 3.2, depth: 0.14, onFraction: 0.92 * light.on, tint: light.tint, dimTint: light.dim, light, material: glassFaceMat, name: 'city-curtain' };
     }
     /* fewer lit cells and a wider brightness spread: a night city has dark apartments too (brief §08) */
     return { cols: Math.floor((faceW - 2 * PW - 1.6 + WIN.gapX) / (WIN.cellW + WIN.gapX)),
       rows: Math.floor((faceH - 4.6 + WIN.gapY) / (WIN.cellH + WIN.gapY)),
       cellW: WIN.cellW, cellH: WIN.cellH, gapX: WIN.gapX, gapY: WIN.gapY,
-      y0: 3.0, depth: 0.1, onFraction: 0.4, tint: WIN.tint, dimTint: WIN.dimTint, material: winMat, name: 'city-windows' };
+      y0: 3.0, depth: 0.1, onFraction: 0.58 * light.on, tint: light.tint, dimTint: light.dim, light, material: winMat, name: 'city-windows' };
+  }
+  /* ---- v8 §04b THE FACE'S OWN OCCUPANCY ----------------------------------------------------------
+     windowGrid hands back a grid tinted from ONE `tint`, with a per-cell brightness spread and a fixed
+     30 % drift toward cool white. That drift was right when every room in this city was cool and is
+     exactly wrong now: it lerps a DIMMED warm cell toward a FULL-strength blue, so a third of the
+     district's rooms came back on the cold side of neutral and the skyline measured 57 % warm when the
+     direction says MOST. The grid's colours are therefore rewritten here, once, at build time — no
+     runtime cost, no new draw call, and it buys the variation the direction actually asked for: a ROW
+     IS A STOREY, and a storey is bright, half empty or dark as a whole before its rooms vary inside
+     it. That is what makes a tower read as occupied rather than as a field of independent dots. */
+  const _cell = new THREE.Color();
+  function relight(grid, mod, seed) {
+    const ic = grid.instanceColor; if (!ic) return 0;
+    const light = mod.light, R = rng(seed * 733 + 17), a = ic.array;
+    let lit = 0;
+    for (let r = 0; r < mod.rows; r++) {
+      /* the storey: one floor in eight is dark (plant, empty, unlet); the rest run from two thirds to
+         full occupancy, at their own level, so neighbouring floors differ before their rooms do */
+      const dark = R() < 0.12, occ = dark ? 0.1 : 0.72 + R() * 0.5, level = 0.55 + R() * 0.45;
+      for (let c = 0; c < mod.cols; c++) {
+        const i = r * mod.cols + c;
+        if (R() < mod.onFraction * occ) {
+          /* one room. FAINT is the brief's word: the median cell lands near a third of full strength,
+             and a handful of rooms on any face are lit by the other temperature — one MAHGIC-lit study
+             in a block of homes, one lamp-lit flat in a training block. */
+          const k = R();
+          _cell.setHex(light.cool ? (k < 0.14 ? WARM.interior : COOL.lit)
+            : (k < 0.06 ? COOL.lit : k < 0.24 ? WARM.interiorPale : WARM.interior));
+          _cell.multiplyScalar(level * (0.2 + R() * R() * 0.92));
+          lit++;
+        } else _cell.setHex(light.dim);
+        a[i * 3] = _cell.r; a[i * 3 + 1] = _cell.g; a[i * 3 + 2] = _cell.b;
+      }
+    }
+    ic.needsUpdate = true;
+    return lit;
   }
   function glaze(parent, mod, seed, place) {
     if (mod.cols < 2 || mod.rows < 2) return 0;
     const grid = windowGrid({ cols: mod.cols, rows: mod.rows, cellW: mod.cellW, cellH: mod.cellH, gapX: mod.gapX, gapY: mod.gapY,
       depth: mod.depth, onFraction: mod.onFraction, seed, material: mod.material, tint: mod.tint, dimTint: mod.dimTint });
     own(grid.geometry);
+    stats.lit += relight(grid, mod, seed);
     place(grid, mod.y0 + grid.userData.windows.totalH / 2);
     grid.name = mod.name; parent.add(grid);
     stats.windows += mod.cols * mod.rows; stats.windowGrids++;
@@ -393,11 +464,118 @@ export function buildCity(ctx) {
      band's own outer footprint, so a wing can be framed without its parapet swallowing the slot beside it.
      The base course is a PLINTH: its height follows the mass it carries, because a fixed 1.9 m course
      reads as a plinth on a 60 m tower and as a skirt on a 22 m one. */
-  const baseCourse = (P, cx, cz, bw, bd, bh) => B.platMid.push(P(chamferBox(bw, bh, bd, 0.14), cx, bh / 2, cz));
+  const baseCourse = (P, cx, cz, bw, bd, bh) => {
+    B.platMid.push(P(chamferBox(bw, bh, bd, 0.14), cx, bh / 2, cz));
+    /* law 1, found in this pass: the plinth is 0.6 m wider than the wall it carries, so it leaves a
+       0.3 m LEDGE all the way round — a horizontal face, in a metalness-0.94 grade, reflecting the
+       near-black zenith and therefore rendering as a dark line at the pavement. That line is the one
+       place the district meets the black platinum floor, which is now a near mirror: it is the edge
+       the floor most wants to return. It takes the lit grade, like every other cap in this file. */
+    B.platLit.push(P(chamferBox(bw + 0.12, 0.16, bd + 0.12, 0.05), cx, bh + 0.04, cz));
+  };
   const parapet = (P, cx, cz, bw, bd, top, band) => {
     B.platMid.push(P(chamferBox(bw, band, bd, 0.18), cx, top - band / 2, cz));
     B.platLit.push(P(chamferBox(bw + 0.3, FR.cope, bd + 0.3, 0.09), cx, top + FR.cope / 2, cz));   /* the coping faces the sky */
   };
+
+  /* ---- v8 §04 THE WORLD ANSWERS THE WINDOWS ------------------------------------------------------
+     Every lit face gets three responses, and they are the three surfaces a real window actually
+     throws light onto — no more, because a fourth would start washing the whole elevation and the
+     falloff would stop being believable:
+       the SPANDREL, above and below each row of glass. One quad per storey, so a face with dark
+         floors has dark bands too and the spill inherits the grid's own occupancy;
+       the SILL at the foot of the glazing, lit from above — the one horizontal catch on the
+         elevation, and the reason the platinumMidLit sill reads as a sill rather than as a stranded
+         band (law 1 keeps that piece low-metalness; this is what gives it something to answer);
+       the SOFFIT of each spandrel course, lit from below by the row under it.
+     All three sit on the wall side of the glazing at z ≈ 0.02–0.05, so the window boxes themselves
+     (front faces at ≈ 0.11) occlude the middle of every quad and what survives is a halo around the
+     glass — which is what light leaving a window looks like, and costs nothing extra to get. */
+  function spillFace(bm, f, mod, light) {
+    if (mod.cols < 2 || mod.rows < 2) return 0;
+    const bucket = light.cool ? B.spillCool : B.spillWarm;
+    const fm = matrixOf(f.ox, f.yBase, f.oz, f.ry, 1, 1, 1, bm).clone();
+    const F = (geo, lx, ly, lz) => xform(geo, lx, ly, lz, 0, 1, 1, 1, fm);
+    const pitch = mod.cellH + mod.gapY, ribbon = mod.cols * mod.cellW + (mod.cols - 1) * mod.gapX + mod.gapX;
+    let n = 0;
+    for (let r = 0; r < mod.rows; r++) {
+      bucket.push(F(hwash(ribbon, mod.cellH + mod.gapY * 1.6), 0, mod.y0 + r * pitch + mod.cellH / 2, 0.022)); n++;
+    }
+    const inner = f.w - 2 * PW - 0.4;
+    if (inner > 2.2) {
+      bucket.push(F(sillWash(inner - 0.2, FR.sillD * 0.92), 0, mod.y0 + 0.014, FR.sillD / 2)); n++;
+      const ch = Math.min(FR.course, mod.gapY - 0.3), step = mod.gapY > 1.6 ? 2 : 1;
+      for (let r = 1; r + 1 < mod.rows; r += step) {
+        const cy = mod.y0 + r * pitch + mod.cellH + mod.gapY / 2;
+        bucket.push(F(soffitWash(inner - 0.2, FR.courseD * 0.9), 0, cy - ch / 2 - 0.014, FR.courseD / 2)); n++;
+      }
+    }
+    stats.washes += n;
+    return n;
+  }
+
+  /* ---- v8 §05 A DISTRICT GESTURE, AND WHAT ANSWERS IT ---------------------------------------------
+     Three shapes, one per named block (see GESTURE). Each is built the same way and for the same
+     reason: an EMITTER, the dark REVEAL it stands in — which is what gives it depth and stops it
+     reading as paint on a wall — and WASHES in the emitter's own hue on the surfaces around it. The
+     washes are the part that makes this a light. Falloff is set by the quad: a band 2.6 m tall gets
+     a wash 9 m tall, so it is bright at the source and gone about three metres away. */
+  function accentGesture(bm, spec, faces, top) {
+    const kind = GESTURE[spec.id];
+    if (!kind || !faces.length) return;
+    const hue = ACCENT_DISTRICT[spec.id.charAt(0)] || 'blue', A = B[hue], col = ACCENT[hue];
+    const f = faces[0];
+    const fm = matrixOf(f.ox, f.yBase, f.oz, f.ry, 1, 1, 1, bm).clone();
+    const F = (geo, lx, ly, lz) => xform(geo, lx, ly, lz, 0, 1, 1, 1, fm);
+    const wash = (geo, lx, ly, lz) => { B.accWash.push(paint(F(geo, lx, ly, lz), col)); stats.washes++; };
+    /* THE DEPTHS ARE THE ARGUMENT. The frame stands 0.32–0.34 m proud of the wall, so a wash laid on
+       the wall itself would be HIDDEN behind every pier and course it crosses and the frame would read
+       as dark bars ruled across a glow. The broad wash therefore sits at 0.40 — in front of the
+       platinum — and what it lights is the frame, which is the correct answer and the better picture.
+       The reveal (front face at 0.44) still masks its own middle, so the light reads as coming out
+       from behind the sign rather than being painted over it. */
+    if (kind === 'band') {
+      /* A SIGNAGE BAND: one large horizontal gesture across the primary elevation, sized to be read
+         from the arrival camera at 150 m. A band you have to squint at is confetti with extra steps. */
+      const bw = Math.min(f.w * 0.66, 15), bh = 2.6, by = f.foot + (f.top - f.foot) * 0.64;
+      B.structural.push(F(chamferBox(bw + 1.3, bh + 1.1, 0.4, 0.1), 0, by, 0.24));         /* the reveal it stands in */
+      A.push(F(chamferBox(bw, bh, 0.26, 0.07), 0, by, 0.62));
+      wash(hwash(bw + 0.9, bh + 0.75), 0, by, 0.46);                                       /* the recess itself, filled with its own colour */
+      wash(hwash(bw + 3.4, bh * 3.5), 0, by, 0.40);                                        /* the wall and its frame, dying within ~3 m */
+      stats.emitters++; stats.gestures.push(spec.id + ':band:' + hue);
+    } else if (kind === 'crown') {
+      /* A CROWN: the top of the mass lit in one hue on the three faces the district is seen from, so
+         a block ENDS in a colour instead of in another dark parapet. It is bolted to the parapet band
+         and stands 0.46 m proud of the mass, which clears the widest parapet any massing builds — and
+         from there it lights three real things: the band under it, the coping overhanging it, and the
+         elevation below, which is the note "a crown light must catch the parapet below it". */
+      const cy = top.y - top.band * 0.5, sides = [
+        [top.w, 0, 1, top.d / 2, 0], [top.d, -1, 0, top.w / 2, -Math.PI / 2], [top.d, 1, 0, top.w / 2, Math.PI / 2]
+      ];
+      sides.forEach(([len, nx, nz, hb, ry]) => {
+        const bar = Math.max(2.0, len - 1.6);
+        const at = (geo, t, ly) => xform(geo, top.x + nx * (hb + t), ly, top.z + nz * (hb + t), ry, 1, 1, 1, bm);
+        B[hue].push(at(chamferBox(bar, 0.5, 0.22, 0.06), 0.46, cy));
+        B.accWash.push(paint(at(hwash(bar + 0.6, top.band * 1.6), 0.36, cy), col));                     /* the parapet band it is bolted to */
+        B.accWash.push(paint(at(soffitWash(bar + 0.6, 0.26), 0.40, top.y - 0.012), col));               /* the coping's overhang, lit from under */
+        B.accWash.push(paint(at(hwash(bar + 1.4, 7.5), 0.13, top.y - top.band - 3.4), col));            /* the elevation below, falling off over ~4 m */
+        stats.emitters++; stats.washes += 3;
+      });
+      stats.gestures.push(spec.id + ':crown:' + hue);
+    } else {
+      /* A FULL-HEIGHT SEAM: one vertical line of colour from the plinth to the parapet, set off
+         centre so it DIVIDES the elevation instead of splitting it in half. Its two jambs are washed
+         with the horizontal-falloff map, so the light dies about a metre either side of the cut. */
+      const y0 = f.foot + 0.5, y1 = f.top - 0.4, sh = y1 - y0, sx = f.w * 0.21;
+      if (sh < 6) return;
+      B.structural.push(F(chamferBox(1.5, sh + 0.9, 0.4, 0.1), sx, y0 + sh / 2, 0.24));
+      A.push(F(chamferBox(0.44, sh, 0.26, 0.06), sx, y0 + sh / 2, 0.62));
+      wash(vwash(5.2, sh), sx, y0 + sh / 2, 0.40);                                         /* both jambs at once; the reveal masks the middle */
+      wash(sillWash(2.8, 1.1), sx, y0 - 0.42, 0.52);                                       /* the plinth the seam stands on */
+      wash(soffitWash(2.8, 0.9), sx, y1 + 0.52, 0.48);                                     /* and the parapet soffit it stops under */
+      stats.emitters++; stats.gestures.push(spec.id + ':seam:' + hue);
+    }
+  }
 
   BLOCKS.forEach((spec, i) => {
     const R = rng(SEED + i * 131);
@@ -415,7 +593,7 @@ export function buildCity(ctx) {
          pad    where the life module may land */
     const faces = [], baseH = Math.max(1.1, Math.min(FR.base, h * 0.055));
     let roofY = h, roofW = w, roofD = d, roofX = 0, roofZ = 0;
-    let topY = h, topW = w, topD = d, topX = 0, topZ = 0;
+    let topY = h, topW = w, topD = d, topX = 0, topZ = 0, topBand = FR.band;   /* topBand: the parapet a crown light mounts on */
     let padY = h, padX = 0, padZ = 0;
 
     if (massing === 'slotted') {
@@ -445,7 +623,7 @@ export function buildCity(ctx) {
       faces.push({ ox: xB, yBase: 0, oz: d / 2, ry: 0, w: wB, h: hB, top: hB - 1.0, foot: baseH, seed: 400 + i, glaze: true });   /* the blade takes glass only where it is wide enough to hold a module */
       if (spec.side) { const sh = spec.side > 0 ? hB : hA; faces.push({ ox: spec.side * (w / 2), yBase: 0, oz: 0, ry: spec.side * Math.PI / 2, w: d, h: sh, top: sh - 1.0, foot: baseH, seed: 200 + i, glaze: true }); }
       roofY = hA; roofW = wA; roofX = xA;
-      topY = hB; topW = wB; topX = xB;
+      topY = hB; topW = wB; topX = xB; topBand = 1.0;
       padY = hA; padX = xA;
     } else if (massing === 'podium') {
       /* PODIUM + SHAFT: a wide low base with a terrace on it and a slender tower set back above. The
@@ -468,7 +646,7 @@ export function buildCity(ctx) {
          frame and the glass too, or the shaft above it stands on a blank plinth */
       faces.push({ ox: 0, yBase: 0, oz: pd / 2, ry: 0, w: pw, h: ph, top: ph - 0.9, foot: baseH, seed: 400 + i, glaze: true });
       roofY = ph + 0.3; roofW = pw; roofD = pd;
-      topY = h; topW = sw; topD = sd; topZ = sz0;
+      topY = h; topW = sw; topD = sd; topZ = sz0; topBand = 1.0;
       padY = ph + 0.3; padZ = Math.min(sz0 + sd / 2 + 3.1, pd / 2 - 3.0);
     } else {
       /* STEPPED: the v6 form, kept — a core mass with one setback shaft above it. What changed is the
@@ -489,17 +667,23 @@ export function buildCity(ctx) {
         parapet(P, sx0, sz0, sw + 0.5, sd + 0.5, h, 0.9);
         for (const sx of [-1, 1]) B.platMid.push(P(chamferBox(PW * 0.8, sh + 0.3, PW * 0.8, 0.1), sx0 + sx * (sw / 2 - PW * 0.4 + 0.3), coreH + (sh + 0.3) / 2, sz0 + sd / 2 - PW * 0.4 + 0.3));
         faces.push({ ox: sx0, yBase: coreH, oz: sz0 + sd / 2, ry: 0, w: sw, h: sh, top: sh - 0.9, foot: 0.3, seed: 300 + i, glaze: true });
-        topY = h; topW = sw; topD = sd; topX = sx0; topZ = sz0;
+        topY = h; topW = sw; topD = sd; topX = sx0; topZ = sz0; topBand = 0.9;
         padZ = d / 2 - 3.2;
       }
     }
     /* the frame and the glazing, cut from one module per face; the frame goes on faces the block turns
        to the camera even where there is no glass behind it, so a blank flank is still a framed wall */
     faces.forEach(f => {
-      const mod = winModule(f.w, f.h, glazed);
+      const light = faceLight(f.seed * 17 + i);
+      const mod = winModule(f.w, f.h, glazed, light);
       frameFace(bm, f, mod);
-      if (f.glaze) glaze(g, mod, f.seed, (grid, cy) => { grid.position.set(f.ox + 0.06 * Math.sin(f.ry), f.yBase + cy, f.oz + 0.06 * Math.cos(f.ry)); grid.rotation.y = f.ry; });
+      if (f.glaze) {
+        glaze(g, mod, f.seed, (grid, cy) => { grid.position.set(f.ox + 0.06 * Math.sin(f.ry), f.yBase + cy, f.oz + 0.06 * Math.cos(f.ry)); grid.rotation.y = f.ry; });
+        spillFace(bm, f, mod, light);        /* law 2: no lit face leaves this loop without the wall answering it */
+        if (mod.cols >= 2 && mod.rows >= 2) { if (light.cool) stats.coolFaces++; else stats.warmFaces++; }
+      }
     });
+    accentGesture(bm, spec, faces, { x: topX, z: topZ, w: topW, d: topD, y: topY, band: topBand });
     /* parapet rails on the block's own deck (front and both sides) */
     kitBox(bm, roofX, roofY, roofZ + roofD / 2 - 0.12, 0, roofW - 0.6, 0.9, 0.12);
     kitBox(bm, roofX - (roofW / 2 - 0.12), roofY, roofZ, 0, 0.12, 0.9, roofD - 0.6);
@@ -569,8 +753,14 @@ export function buildCity(ctx) {
   BRIDGES.forEach(b => span(b, false));
 
   /* ---------------------------------------------------------------- 2. background towers */
+  /* v8 §06 (law 6): "more round looking, not so pointy". Nothing in this world is allowed to end in a
+     point unless it is a square diamond, and three of these archetypes were needles — A closed at a
+     0.03 radius, E's spire at 0.03 and G's pinnacle at 0.001, which is a mathematical spike. They are
+     BLUNTED, not shortened: the same silhouette and the same height, ending in a small flat facet the
+     moon can catch instead of an aliasing hairline. The four-sided shafts stay four-sided, because a
+     square prism seen in plan IS the diamond, and that is the one exception the law makes. */
   const arch = {
-    A: faceted(mergeGeos([new THREE.CylinderGeometry(0.60, 0.72, 1, 4, 1).translate(0, 0.5, 0), new THREE.CylinderGeometry(0.03, 0.60, 0.15, 4, 1).translate(0, 1.075, 0)])),
+    A: faceted(mergeGeos([new THREE.CylinderGeometry(0.60, 0.72, 1, 4, 1).translate(0, 0.5, 0), new THREE.CylinderGeometry(0.10, 0.60, 0.15, 4, 1).translate(0, 1.075, 0)])),
     B: faceted(mergeGeos([new THREE.CylinderGeometry(0.50, 0.56, 1, 6, 1).translate(0, 0.5, 0), new THREE.CylinderGeometry(0.10, 0.50, 0.12, 6, 1).translate(0, 1.06, 0)])),
     C: faceted(mergeGeos([new THREE.CylinderGeometry(0.70, 0.72, 0.62, 4, 1).translate(0, 0.31, 0), new THREE.CylinderGeometry(0.46, 0.50, 1, 4, 1).translate(0.12, 0.5, 0.1), new THREE.CylinderGeometry(0.04, 0.46, 0.12, 4, 1).translate(0.12, 1.06, 0.1)])),
     D: (() => { const s = new THREE.Shape(); s.moveTo(-0.5, 0); s.lineTo(0.5, 0); s.lineTo(0.5, 0.84); s.lineTo(0.12, 1); s.lineTo(-0.5, 0.9); s.closePath(); const g = new THREE.ExtrudeGeometry(s, { depth: 0.36, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1, curveSegments: 1 }); g.translate(0, 0, -0.18); return faceted(g); })(),
@@ -580,7 +770,7 @@ export function buildCity(ctx) {
       new THREE.CylinderGeometry(0.40, 0.62, 0.78, 4, 1).translate(0, 0.39, 0),
       new THREE.CylinderGeometry(0.30, 0.40, 0.13, 4, 1).translate(0, 0.845, 0),
       new THREE.CylinderGeometry(0.19, 0.30, 0.09, 4, 1).translate(0, 0.955, 0),
-      new THREE.CylinderGeometry(0.03, 0.13, 0.19, 4, 1).translate(0, 1.095, 0)
+      new THREE.CylinderGeometry(0.075, 0.13, 0.19, 4, 1).translate(0, 1.095, 0)
     ])),
     /* MEGATALL F — the notched twin blade: two slabs of different height sharing a core, so the crown
        is a NOTCH against the sky rather than a point. Reads at any distance, from any bearing. */
@@ -588,14 +778,16 @@ export function buildCity(ctx) {
       new THREE.BoxGeometry(0.86, 1.0, 0.30).translate(-0.20, 0.5, 0),
       new THREE.BoxGeometry(0.72, 0.83, 0.30).translate(0.38, 0.415, 0),
       new THREE.BoxGeometry(0.30, 0.62, 0.26).translate(0.09, 0.31, 0),
-      new THREE.CylinderGeometry(0.02, 0.05, 0.16, 4, 1).translate(-0.20, 1.08, 0)
+      new THREE.CylinderGeometry(0.045, 0.05, 0.16, 4, 1).translate(-0.20, 1.08, 0)
     ])),
-    /* MEGATALL G — the crystalline pinnacle: an eight-sided shaft narrowing to a faceted point, the
-       purest expression of the world's diamond language at architectural scale. */
+    /* MEGATALL G — the crystalline pinnacle: an eight-sided shaft narrowing toward a faceted crown,
+       the purest expression of the world's diamond language at architectural scale. It stops at a
+       0.085 cap rather than at a point (law 6): the taper reads exactly the same and the top face is
+       now a real octagon that answers the sky instead of a one-pixel spike. */
     G: faceted(mergeGeos([
       new THREE.CylinderGeometry(0.34, 0.56, 0.72, 8, 1).translate(0, 0.36, 0),
       new THREE.CylinderGeometry(0.22, 0.34, 0.18, 8, 1).translate(0, 0.81, 0),
-      new THREE.CylinderGeometry(0.001, 0.22, 0.22, 8, 1).translate(0, 1.01, 0)
+      new THREE.CylinderGeometry(0.085, 0.22, 0.22, 8, 1).translate(0, 1.01, 0)
     ]))
   };
   Object.values(arch).forEach(own);
@@ -626,6 +818,35 @@ export function buildCity(ctx) {
       else if (type === 'F') boxStrips.push(matrixOf(x - 0.20 * w * Math.cos(ry), y, z + 0.20 * w * Math.sin(ry), ry, 0.88 * w, 1.6, 0.32 * w).clone());
       else if (type === 'G') { const rr = 0.56 + (0.34 - 0.56) * Math.min(1, f / 0.72); hexStrips.push(matrixOf(x, y, z, ry, rr * w * 1.03, 1.6, rr * w * 1.03).clone()); }
       else { const rr = 0.56 + (0.50 - 0.56) * f; hexStrips.push(matrixOf(x, y, z, ry, rr * w * 1.03, 1.1, rr * w * 1.03).clone()); }
+    }
+    /* ---- v8 §07 THE MEGATALL SEAM ---------------------------------------------------------------
+       Two of the eight megatalls wear ONE full-height seam in their district's hue — the largest and
+       fewest gesture in the file, and the one that gives the skyline a colour the eye can navigate by.
+       It is built in four segments because the shaft TAPERS: a single straight strip would be buried
+       in the mass at the bottom or floating off it at the top. Each segment sits on the flat of the
+       prism (a four-sided cylinder's face lies at radius / √2 from the axis, which is what the strip
+       matrices below already use), is flanked by a wash pair that lights the shaft either side of it,
+       and the run ends in a SHOULDER band at the first setback, so the seam terminates in architecture
+       instead of stopping in mid-air. */
+    const seamHue = TOWER_SEAM[a + '|' + r];
+    if (seamHue && type === 'E') {
+      const ryd = ry + Math.PI / 4, nx = Math.sin(ryd), nz = Math.cos(ryd), tx = Math.cos(ryd), tz = -Math.sin(ryd);
+      const segs = 4, y0 = 0.06 * h, y1 = 0.78 * h, sw = 0.09 * w;
+      for (let k = 0; k < segs; k++) {
+        const fa = (y0 + (y1 - y0) * (k + 0.5) / segs) / h, sy = y0 + (y1 - y0) * (k + 0.5) / segs;
+        const ap = (0.62 + (0.40 - 0.62) * Math.min(1, fa / 0.78)) * w / Math.SQRT2;
+        B[seamHue].push(xform(chamferBox(sw, (y1 - y0) / segs, 0.7, 0.1), x + nx * ap, sy, z + nz * ap, ryd));
+        for (const sd of [-1, 1]) B.accWash.push(paint(xform(vwash(sw * 7, (y1 - y0) / segs), x + nx * (ap + 0.05) + tx * sd * sw * 3.6, sy, z + nz * (ap + 0.05) + tz * sd * sw * 3.6, ryd), ACCENT[seamHue]));
+      }
+      const shoulder = 0.40 * Math.SQRT2 * w * 1.04, sap = shoulder / 2 + 0.06;
+      B[seamHue].push(xform(chamferBox(shoulder, 0.9 + h * 0.004, shoulder, 0.12), x, y1 + 0.4, z, ryd));
+      /* the shoulder's own answer: the shaft it rings, lit for a few metres under it on all four flats */
+      for (let q = 0; q < 4; q++) {
+        const qa = ryd + q * Math.PI / 2;
+        B.accWash.push(paint(xform(hwash(shoulder * 0.92, h * 0.05), x + Math.sin(qa) * sap, y1 - h * 0.02, z + Math.cos(qa) * sap, qa), ACCENT[seamHue]));
+      }
+      stats.emitters += segs + 1; stats.washes += segs * 2 + 4;
+      stats.gestures.push('megatall@' + a + 'deg:seam:' + seamHue);
     }
     stats.towers++;
   });
@@ -677,6 +898,15 @@ export function buildCity(ctx) {
   merged(B.trim, trimM, 'city-rails', false);
   merged(B.strips, stripMat, 'city-energy-lines', false);
   merged(B.whites, whiteMat, 'city-static-lights', false);
+  /* the district's colour, in three meshes — one per hue, never one per building (law 5) */
+  merged(B.violet, accentM.violet, 'city-accent-violet', false);
+  merged(B.blue, accentM.blue, 'city-accent-blue', false);
+  merged(B.cyan, accentM.cyan, 'city-accent-cyan', false);
+  /* and the light those emitters actually throw: two interior temperatures and, because the hue rides
+     on the vertices, all three accent washes together. Five meshes for the whole district's response. */
+  merged(B.spillWarm, spillWarmM, 'city-window-spill-warm', false);
+  merged(B.spillCool, spillCoolM, 'city-window-spill-cool', false);
+  merged(B.accWash, accentWashM, 'city-accent-wash', false);
   instanced(unitKit, compositeM, kitBoxes, 'city-roof-kit');
   instanced(own(new THREE.CylinderGeometry(0.5, 0.5, 1, 6, 1)), trimM, kitMasts, 'city-masts');
 
@@ -688,9 +918,16 @@ export function buildCity(ctx) {
     /* the district reads as a lit city but never outshines the three destinations in front of it:
        windows sit at ~60 % of full at night and 18 % by day (brief §08 window variety, §45 hierarchy) */
     winMat.color.setScalar(0.18 + 0.44 * (1 - d));
-    glassFaceMat.color.setHex(0xc8dcff).multiplyScalar(0.3 + 0.62 * (1 - d));   /* the glazed blocks read as lit interiors at night, glass by day */
+    /* both window materials are neutral DIMMERS now: the warm/cool hue lives on the grid instances,
+       so time of day may only change how much light is coming out, never what colour it is */
+    glassFaceMat.color.setScalar(0.26 + 0.56 * (1 - d));           /* the glazed blocks read as lit interiors at night, as glass by day */
     stripMat.color.copy(themeCol).multiplyScalar(1 - 0.7 * d);     /* strips / rail lights: day × 0.3 */
     whiteMat.color.copy(whiteCol).multiplyScalar(0.35 + 0.65 * (1 - d));
+    /* a spill is the light a window is throwing, so it fades with the window rather than on its own
+       curve — and by day it nearly vanishes, because sunlight is what a room's own light loses to */
+    spillWarmM.opacity = 0.44 * (1 - 0.72 * d);
+    spillCoolM.opacity = 0.40 * (1 - 0.72 * d);
+    accentWashM.opacity = 0.50 * (1 - 0.66 * d);
     return last;
   }
   function setTheme(t) { if (t && t.energy != null) themeCol.setHex(t.energy); setTime(last); return t; }
@@ -725,11 +962,14 @@ export function buildCity(ctx) {
     if (group.parent) group.parent.remove(group);
     owned.geometries.forEach(g => g.dispose()); owned.geometries.length = 0;
     owned.materials.forEach(m => m.dispose()); owned.materials.length = 0;
+    owned.textures.forEach(t => t.dispose()); owned.textures.length = 0;   /* the wash map is this module's own canvas, not one of materials.js's cached ones */
   }
 
   /* cost bookkeeping (what the establishing view can at most draw from this module) */
   group.traverse(o => { if (o.isMesh && o.geometry) { const g = o.geometry, n = g.index ? g.index.count : g.attributes.position.count; stats.triangles += Math.round(n / 3) * (o.isInstancedMesh ? o.count : 1); stats.drawCalls++; } });
-  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'block frame: platinumMid / platinumMidBrushed (vertical) + platinumMidLit (horizontal)', 'MeshBasic: windows / energy lines / lights / 3 distant bands / ground'];
+  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'block frame: platinumMid / platinumMidBrushed (vertical) + platinumMidLit (horizontal)', 'MeshBasic: windows / curtain / energy lines / lights / 3 distant bands / ground', 'accent: accentViolet (left) / accentBlue (centre) / accentCyan (right)', 'wash: warm spill / cool spill / accent (vertex-coloured)'];
+  stats.districtHues = ACCENT_DISTRICT;
+  stats.lights = 0;   /* this module adds no THREE light: every emitter here answers through geometry (§04, §05) */
   stats.massings = BLOCKS.reduce((o, s) => { const k = MASSING_OF(s.id); o[k] = (o[k] || 0) + 1; return o; }, {});
   stats.towerFamilies = Object.keys(byArch).reduce((o, k) => { const f = k.split('|')[1]; o[f] = (o[f] || 0) + byArch[k].length; return o; }, {});
   stats.valleys = ['52-72 deg right', '108-124 deg centre', '128-142 deg left'];
