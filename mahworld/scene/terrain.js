@@ -125,12 +125,19 @@ const PASS = { from: 44, to: 80 };
    width converted to degrees at its own radius, so a wide peak is pushed further than a narrow one
    and the pass ends up genuinely empty rather than nominally empty. */
 const clearPass = (a, w, rr) => {
-  const halfDeg = (w * 0.5) / Math.max(1, rr) * (180 / Math.PI);
+  /* FOOT is why this is not simply w/2. massif() does not build a cylinder of width w: it flares an
+     APRON and throws SPURS down its flanks, and the whole thing is then yawed by a random angle, so
+     its real footprint is materially wider than its nominal width. Measured on the built scene after
+     the first arc-based cut: 3.0-3.3 % of every range's vertices were still inside the wedge, the
+     near range reaching r 381 with 189 m of peak in it — enough to stand between the plaza and the
+     lake. 1.55 is that overshoot turned into a number, and the 5 degree pad covers the yaw. */
+  const FOOT = 1.55, PAD = 5;
+  const halfDeg = (w * 0.5 * FOOT) / Math.max(1, rr) * (180 / Math.PI);
   const m = ((a % 360) + 360) % 360;
   if (m + halfDeg <= PASS.from || m - halfDeg >= PASS.to) return a;      /* already clear */
   return (m < (PASS.from + PASS.to) / 2)
-    ? PASS.from - halfDeg - 2
-    : PASS.to + halfDeg + 2;
+    ? PASS.from - halfDeg - PAD
+    : PASS.to + halfDeg + PAD;
 };
 
 const D2R = Math.PI / 180, TAU = Math.PI * 2;

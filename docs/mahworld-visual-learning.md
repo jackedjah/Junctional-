@@ -353,6 +353,34 @@ material. One peel costs one render; a material iteration costs a render and a w
 **Regression.** Same family as L03 and L15: prove the pixels can reach the camera before reasoning
 about what colour they are.
 
+## L27 — The black floor is a WORLD law, not a plaza law
+**Director lock, §07, restated because it was nearly lost.** The walking surface of MAHWORLD is
+near-black and reflective EVERYWHERE, not only on the civic deck. When Lake City was built its
+horizontal grades took `platinumMidLit` and `graphiteLight` — pale, correct for LAW 1, wrong for the
+world. They now take `M.paving`, the grade L03 produced: near-black albedo with metalness kept
+deliberately LOW at 0.40, so it is simultaneously the black floor AND the LAW 1 partner that keeps
+an up-facing face taking diffuse light instead of returning the near-black zenith.
+**The distance recede is the trap.** Aerial perspective lerps a colour toward the horizon key by
+0.34 (L05), which is right for a mass and would deliver a black floor as mid blue. The floors take a
+much smaller mix (0.10) and get their value from the REFLECTION instead — the vertical grades keep
+the full recede, because those are the masses aerial perspective is actually about.
+**Regression.** Any new surface a viewer stands on inherits §07 by default. Ask "is this a floor?"
+before choosing its grade, not after rendering it pale.
+
+## L28 — Measure the wedge, then measure it again
+**Failure.** Clearing terrain's mountain pass by ARC (L25) was the right idea and still left the
+pass full: measured on the built scene, 3.0–3.3 % of every range's vertices were inside it, the near
+range reaching r 381 with 189 m of peak — enough to stand between the plaza and the lake.
+**Root owner.** `massif()` does not build a cylinder of width `w`. It flares an apron, throws spurs
+down its flanks, and is then yawed by a random angle, so its real footprint is materially wider than
+`w/2`. The arc was computed from the nominal width.
+**Correction.** A FOOT factor of 1.55 and a 5° pad, both taken from the overshoot the measurement
+reported rather than guessed. Re-measured after: near 189 m → **19 m** in the pass, mid 249 → 51,
+far 296 → 110, and the pass renders open.
+**Regression.** A geometric clearance derived from a nominal parameter is a hypothesis. Measure the
+built result, adjust from the measured overshoot, measure again — two cheap probes beat four
+renders, and the second measurement is the one that makes it evidence.
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)

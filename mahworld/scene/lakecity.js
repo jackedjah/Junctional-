@@ -185,22 +185,35 @@ export function buildLakeCity(ctx) {
   stats.site = { bearing: SITE.bearing, r: SITE.r, x: +SX.toFixed(1), z: +SZ.toFixed(1) };
 
   /* recede a shared grade for 560 m (L05) */
-  const far = (base, key) => {
+  const far = (base, key, mix) => {
     if (!base) return base;
     const m = base.clone();
     m.envMapIntensity = (base.envMapIntensity !== undefined ? base.envMapIntensity : 1) * RECEDE.env;
-    if (m.color) m.color.lerp(new THREE.Color(RECEDE.tint), RECEDE.mix);
+    if (m.color) m.color.lerp(new THREE.Color(RECEDE.tint), mix == null ? RECEDE.mix : mix);
     m.vertexColors = true;
     m.name = 'lake-' + key;
     owned.materials.push(m);
     return m;
   };
+  /* THE FLOOR IS PITCH BLACK, AND IT IS THE SAME FLOOR AS THE PLAZA'S. Director lock §07: the
+     walking surface of MAHWORLD is near-black and reflective, everywhere, not only on the civic
+     deck. M.paving is the grade that lesson produced (L03 — near-black albedo, metalness kept
+     deliberately LOW at 0.40 so LAW 1 still holds and an up-facing face takes diffuse light rather
+     than returning the near-black zenith). So every horizontal plane in this city — terrace treads,
+     bridge decks, dock aprons, spire setbacks — takes it.
+
+     AND IT KEEPS ITS BLACK AT 700 m. The distance recede lerps toward the horizon key by 0.34, which
+     is right for a mass that must sit correctly in aerial perspective (L05) and WRONG for a floor
+     that is supposed to be black: it would arrive as mid blue. The floors take a much smaller mix,
+     and their value comes from the REFLECTION instead — which is exactly the plaza's own recipe
+     (L02: crush the surface term, then ADD the reflection). The vertical grades keep the full
+     recede, because those are the masses aerial perspective is actually about. */
   const GRADE = {
     steep: far(M.platinumMid || M.platinum, 'steep'),
-    up: far(M.platinumMidLit || M.platinumLit, 'up'),        /* LAW 1: every up-facing plane */
+    up: far(M.paving || M.platinumMidLit, 'up', 0.10),       /* LAW 1 partner AND the black floor */
     down: far(M.platinumLit || M.platinumMidLit, 'down'),
     stone: far(M.graphiteMetal || M.graphite, 'stone'),
-    tread: far(M.graphiteLight || M.platinumMidLit, 'tread')
+    tread: far(M.paving || M.graphiteLight, 'tread', 0.10)
   };
 
   const B = newBuckets();
@@ -239,47 +252,31 @@ export function buildLakeCity(ctx) {
        because mahplaza.js runs a real planar-mirror pass over it; a lake 700 m out gets no such pass
        and never will, because a second full scene render for one surface is not a trade worth making.
 
-       So the water does not wait to be lit. It carries a low EMISSIVE in the sky's own horizon key —
-       which is also what still water physically does at the grazing angles most of a lake is seen at,
-       returning the bright horizon rather than the dark overhead — and a raised base value so it
-       separates from the shore by VALUE and not by reflection. Tuning the roughness a fourth time
-       would have been the wrong move (L02: if a value will not move, find what owns it). */
+       AN EARLIER PASS ANSWERED THIS BY LIFTING THE WATER'S VALUE — an emissive in the horizon key,
+       a raised base colour, a broad additive sheen. That was wrong twice over. It was wrong on the
+       evidence, because the lake was not dark, it was BEHIND A MOUNTAIN and could not have been
+       judged from those frames at all (L26). And it was wrong on the direction: §07 says the floor
+       of this world is near-black and reflective, and a glowing lake is the opposite of a black
+       mirror. The lift is gone.
+
+       What makes a black surface read is not its own value, it is what it RETURNS. So the water is
+       pitch black — albedo 0x04070c, roughness 0.045 — and the reading comes entirely from the
+       inverted city built below it (see THE REFLECTION, further down). Crush the surface, add the
+       reflection: exactly the operator L02 cost three passes to find for the plaza deck. */
     const water = new THREE.MeshStandardMaterial({
-      color: 0x14263f, roughness: 0.10, metalness: 0.26,
-      emissive: new THREE.Color(0x14284a), emissiveIntensity: 0.85,
-      envMapIntensity: 2.4 * RECEDE.env
+      color: 0x04070c, roughness: 0.045, metalness: 0.30,
+      envMapIntensity: 1.5 * RECEDE.env
     });
     water.name = 'lake-water'; owned.materials.push(water);
     const mesh = new THREE.Mesh(g, water);
     mesh.name = 'lake-water'; mesh.receiveShadow = true;
     group.add(mesh);
-    /* THE SHEEN: one broad additive sheet just above the surface, brightest at the middle of the
-       lake and falling to nothing at the shore. It is what gives the water a gradient instead of a
-       flat fill, so the eye reads a surface with extent rather than a hole cut in the ground. Its
-       colour is the theme's own energy, so a retheme carries the lake with it. */
-    {
-      const pos = [], col = [];
-      const put = (x, z, a) => { pos.push(x, WATER_Y + 0.06, z); col.push(1, 1, 1, a); };
-      for (let i = 0; i < SEG; i++) {
-        const a0 = i / SEG * TAU, a1 = (i + 1) / SEG * TAU;
-        const r0 = lakeR(a0) * 0.99, r1 = lakeR(a1) * 0.99;
-        put(0, 0, 0.34);
-        put(Math.cos(a1) * r1, Math.sin(a1) * r1, 0);
-        put(Math.cos(a0) * r0, Math.sin(a0) * r0, 0);
-      }
-      const sg = new THREE.BufferGeometry();
-      sg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
-      sg.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 4));
-      own(sg);
-      const sm = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(theme.energy), vertexColors: true, transparent: true,
-        blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: true
-      });
-      sm.name = 'lake-sheen'; owned.materials.push(sm);
-      const sh = new THREE.Mesh(sg, sm);
-      sh.name = 'lake-sheen'; sh.renderOrder = 2;
-      group.add(sh);
-    }
+    /* THE SHEEN SHEET IS DELIBERATELY NOT HERE. An earlier pass laid a broad additive disc over the
+       water, brightest at the centre, to give the lake "a gradient instead of a flat fill". On a
+       black mirror that is precisely the wrong instrument: it fills the surface with its own light
+       and destroys the only thing a black mirror has to offer, which is that dark reflected content
+       adds NOTHING and the stone stays black while a lit window adds a streak. Removed rather than
+       dimmed — §14, remove before adding. */
     /* THE SHORELINE, the brightest thing on the water. Where a lake meets land there is always a
        line — §13, realness through cause — and it is what tells the eye where the water ENDS, which
        is the reading the first cut had no way to give. */
@@ -473,6 +470,65 @@ export function buildLakeCity(ctx) {
       maxNy: +t.maxNy.toFixed(3),
       tris: t.pos.length / 9
     };
+  }
+
+  /* ---- 7b. THE REFLECTION — what a black mirror is FOR --------------------------------------
+     §07's floor law and L02's operator, applied to a lake. A pitch-black surface has no value of
+     its own; everything it reads by is what it RETURNS. So the city is built a second time, inverted
+     about the water plane, and ADDED on top of the black — never mixed into it.
+
+     ADDITIVE IS THE WHOLE POINT AND IT IS NOT A STYLE CHOICE. `mix(surface, reflection, w)` REPLACES
+     the surface, so a lake reflecting a lit spire at luminance 90 IS a lake at luminance 90 and the
+     water stops being black — which is exactly how the plaza deck was got wrong for three passes
+     before the operator was identified as the cause. Under ADD, a dark reflected mass contributes
+     nothing and the water stays pitch black; a lit setback, a dock's energy strip or the crown
+     diamond contributes a streak. The lake is then black WITH the city in it, which is the reading
+     asked for.
+
+     Cost: one extra draw per grade plus the crown, sharing the SAME geometry buffers as the
+     originals — a mirrored copy is a second draw, never a second mesh's worth of memory.
+
+     KNOWN LIMIT, stated rather than hidden: the copies are clipped by nothing but their own low
+     alpha, so a piece of city that overhangs the shoreline reflects faintly onto the ground beyond
+     it as well as onto the water. At 700 m and 0.16 alpha that is below the noise of the frame, and
+     the honest fix is a stencil or a real planar pass — neither of which is worth a second full
+     scene render for one surface at this distance. */
+  {
+    const refl = new THREE.Group();
+    refl.name = 'lake-reflection';
+    refl.scale.set(1, -1, 1);
+    refl.position.y = 2 * WATER_Y;          /* mirror about the waterline, not about y = 0 */
+    refl.renderOrder = 4;
+    group.add(refl);
+    const mirrorOf = (src, alpha) => {
+      const m = new THREE.MeshBasicMaterial({
+        color: src.material.color ? src.material.color.clone() : new THREE.Color(0x8fb0d8),
+        vertexColors: !!src.material.vertexColors,
+        transparent: true, opacity: alpha,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+        side: THREE.DoubleSide,             /* the y-flip reverses winding; without this it vanishes */
+        fog: true
+      });
+      m.name = src.material.name + '-reflected';
+      owned.materials.push(m);
+      const c = new THREE.Mesh(src.geometry, m);   /* geometry SHARED, not cloned */
+      c.name = src.name + '-reflected';
+      c.renderOrder = 4;
+      c.frustumCulled = false;              /* its bounds are the original's, which are above water */
+      refl.add(c);
+      return c;
+    };
+    let n = 0;
+    for (const nm of ['lake-steep', 'lake-up', 'lake-down', 'lake-stone', 'lake-tread']) {
+      const src = group.getObjectByName(nm);
+      /* the vertical grades carry the lit faces, so they earn most of the reflection; the black
+         floors return almost nothing, which is correct — a black floor reflected in black water is
+         still black */
+      if (src) { mirrorOf(src, nm === 'lake-steep' ? 0.20 : 0.09); n++; }
+    }
+    const crown = group.getObjectByName('lake-spire-crown');
+    if (crown) { mirrorOf(crown, 0.55); n++; }     /* the brand figure is the brightest streak */
+    stats.reflected = n;
   }
 
   /* ---- 8. §10 — THE MUSIC-LINE MOTIF AT THIS CITY'S ENDPOINTS -------------------------------- */
