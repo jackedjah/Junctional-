@@ -45,7 +45,15 @@ export const VIEWS = {
   /* v4 review views */
   skyline:           { pos: [2, 2.4, 38],      look: [-8, 40, -280],   fov: 62, label: 'Skyline' },
   'plaza-node':      { pos: [-24, 2.0, 16],    look: [8, 3, -20],      fov: 58, label: 'Plaza node' },
-  'match-hall':      { pos: [-10, 4.0, -82],   look: [2, 2.6, -92],    fov: 60, label: 'MAH MATCH hall' }
+  'match-hall':      { pos: [-10, 4.0, -82],   look: [2, 2.6, -92],    fov: 60, label: 'MAH MATCH hall' },
+  /* ---- v6 ECOSYSTEM VIEWS (§45) -----------------------------------------------------------------
+     The review set pointed almost entirely at building fronts, which is exactly how a world gets
+     judged as a city. These four look at what the city is IN: the mountains through the valleys, the
+     water, the ground between the facilities, and the open land where the built world stops. */
+  'valley-right':    { pos: [10, 3.0, 44],     look: [78, 34, -104],   fov: 46, label: 'Right valley — mountains and the basin' },
+  'valley-centre':   { pos: [-6, 3.2, 40],     look: [-60, 40, -128],  fov: 46, label: 'Centre valley — mountains behind the city' },
+  overlook:          { pos: [-30, 16, 62],     look: [6, 6, -70],      fov: 52, label: 'Overlook — the whole site plan and its gaps' },
+  'natural-edge':    { pos: [26, 4.5, 30],     look: [120, 22, -150],  fov: 50, label: 'Natural edge — where the built world stops' }
 };
 export const TOUR = ['establishing', 'in-world', 'match-entrance'];
 export const AVATAR_COLOURS = ['purple', 'green', 'blue', 'red', 'silver', 'teal', 'violet', 'emerald', 'crimson', 'platinum'];

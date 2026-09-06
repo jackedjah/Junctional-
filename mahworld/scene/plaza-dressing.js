@@ -17,7 +17,7 @@
    bollards / rail posts are instanced. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, canvasTexture, blobTexture } from './materials.js';
+import { chamferBox, softMass, canvasTexture, blobTexture } from './materials.js';
 import { SITES } from './buildings.js';
 
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(1, 1, 1), _e = new THREE.Euler();
@@ -145,25 +145,43 @@ export function buildDressing(ctx) {
   const railPost = own(chamferBox(0.1, 0.95, 0.1, 0.02));
   const postMats = [];
   for (const sd of [-1, 1]) for (let z = 40; z > -40; z -= 2.6) postMats.push([sd * 39.6, 0.48, z]);
-  const posts = new THREE.InstancedMesh(railPost, M.trimSatin, postMats.length);
-  postMats.forEach((pm, i) => { _p.set(pm[0], pm[1], pm[2]); _q.identity(); _m4.compose(_p, _q, _s); posts.setMatrixAt(i, _m4); });
-  posts.instanceMatrix.needsUpdate = true; group.add(posts);
+  const posts = new THREE.InstancedMesh(railPost, M.chromeSatin || M.trimSatin, postMats.length);
+  /* base plates: the vertical shaft earns its metalness 1.0, the horizontal plate does not (§15) */
+  const plateGeo = own(chamferBox(0.24, 0.05, 0.24, 0.015));
+  const plates = new THREE.InstancedMesh(plateGeo, M.platinumLit || M.trimSatin, postMats.length);
+  postMats.forEach((pm, i) => {
+    _p.set(pm[0], pm[1], pm[2]); _q.identity(); _m4.compose(_p, _q, _s); posts.setMatrixAt(i, _m4);
+    _p.set(pm[0], 0.025, pm[2]); _m4.compose(_p, _q, _s); plates.setMatrixAt(i, _m4);
+  });
+  posts.instanceMatrix.needsUpdate = true; plates.instanceMatrix.needsUpdate = true; group.add(posts, plates);
   for (const sd of [-1, 1]) part(trim, chamferBox(0.08, 0.08, 80, 0.02), sd * 39.6, 0.95, 0);
   const bollard = own(chamferBox(0.26, 0.9, 0.26, 0.05));
   const bolls = [];
   for (const sd of [-1, 1]) for (let i = 0; i < 4; i++) bolls.push([sd * (36 - i * 1.8), 0.45, 42]);
   const bollardMesh = new THREE.InstancedMesh(bollard, M.curb, bolls.length);
-  bolls.forEach((b, i) => { _p.set(b[0], b[1], b[2]); _q.identity(); _m4.compose(_p, _q, _s); bollardMesh.setMatrixAt(i, _m4); });
-  bollardMesh.instanceMatrix.needsUpdate = true; bollardMesh.castShadow = true; group.add(bollardMesh);
+  const bollCapGeo = own(chamferBox(0.32, 0.05, 0.32, 0.015));
+  const bollCaps = new THREE.InstancedMesh(bollCapGeo, M.platinumLit || M.trimSatin, bolls.length);
+  bolls.forEach((b, i) => {
+    _p.set(b[0], b[1], b[2]); _q.identity(); _m4.compose(_p, _q, _s); bollardMesh.setMatrixAt(i, _m4);
+    _p.set(b[0], b[1] + 0.47, b[2]); _e.set(0, Math.PI / 4, 0); _q.setFromEuler(_e); _m4.compose(_p, _q, _s); bollCaps.setMatrixAt(i, _m4);
+  });
+  bollardMesh.instanceMatrix.needsUpdate = true; bollCaps.instanceMatrix.needsUpdate = true;
+  bollardMesh.castShadow = true; group.add(bollardMesh, bollCaps);
 
   /* ---- 5. SMALL STRUCTURES: an info pylon and a corridor shelter -------------- */
   {
-    const px = 20, pz = 14;
-    part(dark, chamferBox(1.3, 2.3, 0.36, 0.07), px, 1.15, pz, -0.5);
-    part(trim, chamferBox(1.4, 0.07, 0.44, 0.02), px, 2.36, pz, -0.5);
+    /* v6 §15: the lit face was offset along the WRONG axis and ended up 0.2 m behind its own body,
+       single-sided, facing into its back — an invisible panel on a solid post. It is offset along the
+       body's actual outward normal now, set into a bezel, and the post has a foot. */
+    const px = 20, pz = 14, ry = -0.5;
+    const nx = Math.sin(ry), nz = Math.cos(ry);                    /* the body's outward normal after yaw */
+    part(dark, chamferBox(1.55, 0.16, 0.62, 0.05), px, 0.08, pz, ry);          /* the foot */
+    part(dark, chamferBox(1.3, 2.3, 0.36, 0.07), px, 1.15, pz, ry);
+    part(trim, chamferBox(1.4, 0.07, 0.44, 0.02), px, 2.36, pz, ry);
+    part(trim, chamferBox(1.16, 1.66, 0.06, 0.02), px + nx * 0.185, 1.3, pz + nz * 0.185, ry);   /* the bezel */
     const face = new THREE.Mesh(own(new THREE.PlaneGeometry(1.0, 1.5)), M.panelLit);
-    face.position.set(px + Math.cos(-0.5 + Math.PI / 2) * 0.2, 1.3, pz - Math.sin(-0.5 + Math.PI / 2) * 0.2);
-    face.rotation.y = -0.5; group.add(face);
+    face.position.set(px + nx * 0.215, 1.3, pz + nz * 0.215);
+    face.rotation.y = ry; group.add(face);
     const col = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.6, 0.7), M.curb); col.position.set(px, 1.3, pz); col.visible = false; group.add(col); ctx.colliders.push(col);
   }
   {
@@ -171,13 +189,24 @@ export function buildDressing(ctx) {
     for (const dz of [-2.4, 2.4]) part(dark, chamferBox(0.22, 3.2, 0.22, 0.04), sx, 1.6, sz + dz);
     part(dark, chamferBox(3.2, 0.18, 6.4, 0.06), sx, 3.3, sz);
     part(trim, chamferBox(3.34, 0.05, 0.14, 0.02), sx, 3.42, sz + 3.2);
+    const soffitE = new THREE.Mesh(own(new THREE.PlaneGeometry(2.7, 5.8)), M.interiorSoft);
+    soffitE.rotation.x = Math.PI / 2; soffitE.position.set(sx, 3.19, sz); group.add(soffitE);
     const col = new THREE.Mesh(new THREE.BoxGeometry(3.4, 3.4, 6.6), M.curb); col.position.set(sx, 1.7, sz); col.visible = false; group.add(col); ctx.colliders.push(col);
   }
 
-  /* ---- 6. BENCHES: chamfered seat slabs on the existing bench spots and nodes -- */
+  /* ---- 6. BENCHES — v6 §15. A 0.16 m slab floating at knee height is what reads as a flat cutout.
+     A bench is a BODY: a dark plinth set back from the seat so the seat overhangs it, a curved seat
+     with real corners (softMass, not a single 45-degree chamfer), a platinum nosing along the front
+     edge, and an unlit strip in the shadow of the overhang. The plinth MUST stay dark — that dark
+     mass under the light edge is the entire reason the platinum above it reads. */
   for (const [bx, bz, ry] of [[-19, 21, 0.5], [19, 21, -0.5], [-16, 10.5, 0.2], [17, 8.5, -0.2]]) {
-    part(curb, chamferBox(5.2, 0.16, 1.35, 0.05), bx, 0.63, bz, ry);
-    part(trim, chamferBox(5.0, 0.03, 0.06, 0.012), bx, 0.72, bz + 0.62, ry);
+    part(dark, chamferBox(4.5, 0.46, 0.95, 0.09), bx, 0.23, bz, ry);                 /* the plinth, set back */
+    const seat = new THREE.Mesh(own(softMass(5.2, 0.17, 1.35, 0.16, 0.05)), M.platinumLit || M.curb);
+    seat.position.set(bx, 0.46, bz + 0.675); seat.rotation.y = ry; seat.castShadow = true; group.add(seat);
+    part(trim, chamferBox(5.06, 0.05, 0.09, 0.018), bx, 0.5, bz + 0.66, ry);          /* the nosing */
+    /* the light in the shadow of the overhang — this is what makes a 0.17 m slab read as thick */
+    const under = new THREE.Mesh(own(new THREE.PlaneGeometry(4.7, 0.1)), M.interior);
+    under.position.set(bx + Math.sin(ry) * 0.6, 0.44, bz + Math.cos(ry) * 0.6); under.rotation.y = ry; group.add(under);
     const col = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.8, 1.6), M.curb); col.position.set(bx, 0.4, bz); col.rotation.y = ry; col.visible = false; group.add(col); ctx.colliders.push(col);
   }
 
@@ -207,8 +236,14 @@ export function buildDressing(ctx) {
       const a = Math.PI / 6 + i * Math.PI / 3, R = 12.6;
       const px = MARKER[0] + Math.cos(a) * R, pz = MARKER[1] + Math.sin(a) * R;
       if (pz < MARKER[1] - 8) continue;                       /* nothing on the MAH MATCH sight line */
+      /* HOLLOW, not a solid stone box labelled "planted" (§15): a rim, a recess, and a dark void with
+         one soft interior wash, so the trough reads as something that could actually hold planting */
       part(dark, chamferBox(2.6, 0.44, 2.6, 0.14), px, 0.22, pz, Math.PI / 4);
       part(trim, chamferBox(2.78, 0.08, 2.78, 0.03), px, 0.47, pz, Math.PI / 4);
+      const voidTop = new THREE.Mesh(own(new THREE.PlaneGeometry(1.9, 1.9)), M.graphiteDark);
+      voidTop.rotation.x = -Math.PI / 2; voidTop.rotation.z = Math.PI / 4; voidTop.position.set(px, 0.4, pz); group.add(voidTop);
+      const wash = new THREE.Mesh(own(new THREE.PlaneGeometry(1.55, 1.55)), M.energySoft);
+      wash.rotation.x = -Math.PI / 2; wash.rotation.z = Math.PI / 4; wash.position.set(px, 0.43, pz); wash.renderOrder = 6; group.add(wash);
       const col = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.6, 3.0), M.curb);
       col.position.set(px, 0.3, pz); col.rotation.y = Math.PI / 4; col.visible = false; group.add(col); ctx.colliders.push(col);
     }
@@ -218,6 +253,8 @@ export function buildDressing(ctx) {
       for (const dz of [-2.4, 2.4]) part(dark, chamferBox(0.22, 3.2, 0.22, 0.04), sx, 1.6, sz + dz);
       part(dark, chamferBox(3.2, 0.18, 6.4, 0.06), sx, 3.3, sz);
       part(trim, chamferBox(3.34, 0.05, 0.14, 0.02), sx, 3.42, sz + 3.2);
+      const soffit = new THREE.Mesh(own(new THREE.PlaneGeometry(2.7, 5.8)), M.interiorSoft);
+      soffit.rotation.x = Math.PI / 2; soffit.position.set(sx, 3.19, sz); group.add(soffit);
       const col = new THREE.Mesh(new THREE.BoxGeometry(3.4, 3.4, 6.6), M.curb); col.position.set(sx, 1.7, sz); col.visible = false; group.add(col); ctx.colliders.push(col);
     }
     /* UTILITY COLUMNS: short machined chromium posts in pairs at the node edges — the small, ordinary
