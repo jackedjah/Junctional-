@@ -488,9 +488,11 @@ export function buildCity(ctx) {
          elevation, and the reason the platinumMidLit sill reads as a sill rather than as a stranded
          band (law 1 keeps that piece low-metalness; this is what gives it something to answer);
        the SOFFIT of each spandrel course, lit from below by the row under it.
-     All three sit on the wall side of the glazing at z ≈ 0.02–0.05, so the window boxes themselves
-     (front faces at ≈ 0.11) occlude the middle of every quad and what survives is a halo around the
-     glass — which is what light leaving a window looks like, and costs nothing extra to get. */
+     The spandrel band sits 0.022 m off the wall — BEHIND the window boxes (front faces at ≈ 0.11) and
+     behind the frame (0.32–0.34) — so both occlude it and what survives is a halo in the gaps around
+     the glass, which is what light leaving a window actually looks like and costs nothing to get. The
+     other two sit on the members themselves, at half the sill's and the course's own projection, so
+     each lands on the horizontal face it belongs to rather than floating in front of it. */
   function spillFace(bm, f, mod, light) {
     if (mod.cols < 2 || mod.rows < 2) return 0;
     const bucket = light.cool ? B.spillCool : B.spillWarm;

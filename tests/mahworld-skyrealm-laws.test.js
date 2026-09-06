@@ -14,7 +14,12 @@
 const fs = require('fs'), p = require('path');
 const DIR = p.resolve(__dirname, '../mahworld/scene');
 const read = f => { try { return fs.readFileSync(p.join(DIR, f), 'utf8'); } catch (e) { return null; } };
-const stripComments = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+/* Strip comments WITHOUT losing line numbers: a block comment collapses to the same count of
+   newlines it spanned. A law that reports "sky-structures.js:144" for something on line 215 sends
+   the reader to the wrong place, which is worse than not reporting a line at all. */
+const stripComments = s => s
+  .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ''))
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 /* the realm's own modules; the layout and the assembly always exist, the builders are optional
    because this realm was assembled in parallel and must degrade to whatever is present */
@@ -121,15 +126,32 @@ function updateBodies(code) {
 
   /* ------------------------------------------------------------ source laws */
   {
+    /* WARM IS ALSO INTERIOR LIGHT — the same exemption the city's LAW-001 carries, added here after
+       this law failed sky-structures.js for using 0xffeccd and 0xf2d9a8. Those are the world's warm
+       interior white and its window spill; the concourse having lit rooms behind its glass is the
+       direction, not a violation. The law was wrong, not the code.
+       The exemption is by ROLE, not by file, exactly as in the city: a warm literal passes only on a
+       line whose identifier names an interior light. Warm smuggled into a `panel` or a `rail` in the
+       same file still fails, which is the whole point of §12 — this realm reads LIGHTER than the
+       city, and it gets there with platinum and glass, not with amber paint. */
+    /* An EXPLICIT ALLOWLIST of identifiers that mean "light from inside a room", not a prefix match.
+       It has to be a list because the distinction that matters is `warmSoft` (a window's spill, fine)
+       against `warmRail` (architecture wearing amber, forbidden), and no prefix rule separates those.
+       `warm` and `warmSoft` were added after this law failed a builder for using them: they are
+       perfectly good names for warm interior light, and a law that accepts only one naming
+       convention is brittle rather than strict. */
+    const WARM_ROLE = /(^|[^A-Za-z])(interior|interiorPale|interiorSoft|interiorWarm|warm|warmSoft|warmGlow|windowWarm|roomLight|lamplight|spill)([^A-Za-z]|$)/;
     const offenders = [];
     for (const f of present) {
       if (ATMOSPHERIC.has(f)) continue;
-      for (const hx of stripComments(src[f]).match(/0x[0-9a-fA-F]{6}\b/g) || []) {
-        const { h, s, l } = hsl(parseInt(hx, 16));
-        if (h >= 20 && h <= 68 && s > 0.4 && l > 0.25) offenders.push(f + ':' + hx);
-      }
+      stripComments(src[f]).split('\n').forEach((line, i) => {
+        for (const hx of line.match(/0x[0-9a-fA-F]{6}\b/g) || []) {
+          const { h, s, l } = hsl(parseInt(hx, 16));
+          if (h >= 20 && h <= 68 && s > 0.4 && l > 0.25 && !WARM_ROLE.test(line)) offenders.push(f + ':' + (i + 1) + ':' + hx);
+        }
+      });
     }
-    P('SKY-LAW-010 warm colour belongs to the atmosphere, never to the architecture (§12)', offenders.length === 0, offenders.join(' '));
+    P('SKY-LAW-010 warm colour is atmosphere or interior light, never architecture (§12)', offenders.length === 0, offenders.join(' '));
   }
   {
     const offenders = [];

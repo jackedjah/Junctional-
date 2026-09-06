@@ -254,10 +254,16 @@ export function buildGround(ctx) {
        continuous piece of metal rather than two things intersecting. */
     const studGeo = crystalStud(inset + CELL_CORNER, 0.06, JOINT_TOP);
     const half = Math.ceil(FIELD_RADIUS / DIAMOND_CELL) + 1;
+    /* a joint belongs to TWO cells and a stud to FOUR, so each is laid only where all of its cells
+       exist. Testing each part against the field radius on its own would finish the field's west and
+       north edges with a kerb and leave the east and south bare, because a lattice step toward the
+       origin is inside the radius and a step away from it is not. */
+    const inField = (a, b) => Math.hypot(a * DIAMOND_CELL, b * DIAMOND_CELL) <= FIELD_RADIUS;
     /* the lattice is built axis-aligned then rotated 45°, which is what makes every cell a DIAMOND */
     for (let i = -half; i <= half; i++) for (let j = -half; j <= half; j++) {
       const x = i * DIAMOND_CELL, z = j * DIAMOND_CELL, r = Math.hypot(x, z);
-      if (r <= FIELD_RADIUS) {
+      const here = inField(i, j);
+      if (here) {
         const geo = cellGeo.clone();
         /* a shallow per-cell tilt (< 0.4°): each cell takes its own value under one light, which is what
            separates a laid floor from a printed pattern. Deterministic, never animated. */
@@ -270,17 +276,20 @@ export function buildGround(ctx) {
       /* joint catches: every joint is filled so the floor never shows a black gap. Inside the hero field
          they are mirror-grade and draw the eye to the centre; outside they drop to satin, which is what
          keeps the outer floor reading as laid construction without competing with the middle. */
-      for (const [dx, dz, w, d] of [[DIAMOND_CELL / 2, 0, inset * 0.66, DIAMOND_CELL + inset], [0, DIAMOND_CELL / 2, DIAMOND_CELL + inset, inset * 0.66]]) {
+      for (const [dx, dz, w, d, di, dj] of [[DIAMOND_CELL / 2, 0, inset * 0.66, DIAMOND_CELL + inset, 1, 0], [0, DIAMOND_CELL / 2, DIAMOND_CELL + inset, inset * 0.66, 0, 1]]) {
+        if (!here || !inField(i + di, j + dj)) continue;
         const jr = Math.hypot(x + dx, z + dz);
-        if (jr > FIELD_RADIUS) continue;
         /* the catch fills the joint and stops a hair below the cell rim, so it reads as a bright
            hairline turning between two slabs — never as a black gap or a glowing grid line */
         const jg = chamferBox(w, 0.135, d, 0.035); jg.translate(x + dx, JOINT_TOP - 0.0675, z + dz);
         (jr < HERO_RADIUS ? joints : outerJoints).push(jg);
       }
-      /* the stud inlaid in the crossing socket, one per lattice intersection */
-      const sx = x + DIAMOND_CELL / 2, sz = z + DIAMOND_CELL / 2, sr = Math.hypot(sx, sz);
-      if (sr <= FIELD_RADIUS) { const sg = studGeo.clone(); sg.translate(sx, 0, sz); (sr < HERO_RADIUS ? studs : outerStuds).push(sg); }
+      /* the stud inlaid in the crossing socket — only where four cut corners actually meet to make one */
+      if (here && inField(i + 1, j) && inField(i, j + 1) && inField(i + 1, j + 1)) {
+        const sx = x + DIAMOND_CELL / 2, sz = z + DIAMOND_CELL / 2;
+        const sg = studGeo.clone(); sg.translate(sx, 0, sz);
+        (Math.hypot(sx, sz) < HERO_RADIUS ? studs : outerStuds).push(sg);
+      }
     }
     cellGeo.dispose(); studGeo.dispose();
     const field = new THREE.Group(); field.rotation.y = Math.PI / 4; field.name = 'plaza-diamond-floor'; g.add(field);
