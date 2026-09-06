@@ -52,8 +52,13 @@ const TINTS = [0x2f6fe6, 0x9b3fd6, 0x2bb5b8, 0x3fb56a, 0x7c5cf0, 0xc6d2e0, 0xaeb
 export const LIFE = Object.freeze({
   H: 2.0,              /* residents.js defaultH, male, physique 1.0 */
   HOVER: 0.16,         /* the species floats; the shadow below is how you know */
-  LOD_NEAR: 220,       /* inside this the population is posed per frame */
-  LOD_FAR: 1400        /* beyond this it is hidden entirely — see setDetail */
+  /* THREE TIERS, because R4's performance clause names "hierarchical LOD" and because a thousand
+     figures cannot be paid for from every camera in the world. The distances are what the parts
+     stop being worth: an arm subtends under a pixel past ~520 m at this focal length, and a whole
+     figure does past ~1100. */
+  LOD_NEAR: 240,       /* inside this the population is posed per frame */
+  LOD_MID: 520,        /* beyond this: body, torso and head only — no arms, face or shadow */
+  LOD_FAR: 1100        /* beyond this it is hidden entirely — see setDetail */
 });
 
 /* ================================================================================================
@@ -109,13 +114,16 @@ const NODES = [
    outboard 90 to 240. Both are open plate the whole way round, where lift 0 is not an assumption. */
 const FIELD = [
   /* deg, count — density is the district's own character, not a uniform sprinkle */
-  [-90, 44], [-45, 20], [0, 54], [45, 42], [90, 40], [135, 12], [180, 34], [-135, 48]
+  [-90, 60], [-45, 28], [0, 74], [45, 58], [90, 55], [135, 16], [180, 46], [-135, 66]
 ];
 const BAND_IN = [-170, -100], BAND_OUT = [90, 240];
-/* and the ring between the districts is not a corridor between rooms — people are ON it. 44 deg of
-   arc separates two districts and a stroller every 130 m is what keeps that arc from reading as the
-   gap in a diagram. */
-const STROLLERS = 132;
+/* AND THE ARC BETWEEN TWO DISTRICTS IS THE VIEW R4 ACTUALLY NAMES. Its curvature proof asks for a
+   "district-to-district view [that] feels INHABITED", and that view looks ALONG the ring, down the
+   promenade, through the 1610 m of open plate the eight districts leave between them. The first
+   raise put 132 strollers there — one per 98 m — and the frame came back with nobody in it at all,
+   because a tangential view from a 1.7 m eye compresses 100 m of spacing into almost nothing and
+   then shows you the gaps. 420 is one every 31 m, which is a promenade with people on it. */
+const STROLLERS = 420;
 
 /* the concourse spine is a MOVEMENT field, so the people on it are spread along its length rather
    than gathered — R4's "medium connectors" between the high-density nodes */
@@ -132,7 +140,7 @@ export function buildHaloLife(ctx, opts = {}) {
   const group = new THREE.Group(); group.name = 'halo-life';
   const owned = { geometries: [], materials: [] };
   const own = g => { owned.geometries.push(g); return g; };
-  const stats = { figures: 0, nodes: 0, rails: 0, field: 0, strollers: 0,
+  const stats = { figures: 0, nodes: 0, rails: 0, field: 0, strollers: 0, threshold: 0,
     draws: 0, triangles: 0, byDistrict: {} };
 
   /* ---- WHERE EVERY FIGURE STANDS, resolved once ----------------------------------------------- */
@@ -214,6 +222,19 @@ export function buildHaloLife(ctx, opts = {}) {
       stats.byDistrict[O.deg] = (stats.byDistrict[O.deg] || 0) + 1;
       stats.rails++;
     }
+  }
+
+  /* ---- THE THRESHOLD, from the module that built it ------------------------------------------
+     R4-19's departure sequence sits at a bearing no district occupies, so the district table above
+     cannot reach it — and a 944 m route with nobody on it is a monument rather than a transition.
+     halo-threshold publishes stats.walkSites from inside its own build, lifts included, and they
+     are placed here verbatim: one table, one truth, same as the rails. */
+  const walk = (opts && opts.walkSites) || [];
+  for (let i = 0; i < walk.length; i++) {
+    const W = walk[i];
+    people.push({ x: W.x, z: W.z, face: W.face || 0, deg: 'threshold', kind: W.kind || 'walk',
+      lift: W.lift || 0, seed: 4000 + i });
+    stats.threshold++;
   }
 
   /* ---- THE FIELD, in the two promenade bands ------------------------------------------------- */
@@ -426,7 +447,7 @@ export function buildHaloLife(ctx, opts = {}) {
   write(0);
 
   const all = [iDrop, iTorso, iHead, iFace, iArm, iShade];
-  let quiet = false, visible = true;
+  let quiet = false, visible = true, detailed = true, lowQ = false;
 
   return {
     group, stats, people: people.map(p => ({ x: p.x, z: p.z, district: p.deg, kind: p.kind })),
@@ -436,7 +457,15 @@ export function buildHaloLife(ctx, opts = {}) {
     setDetail(dist) {
       posed = dist < LIFE.LOD_NEAR;
       const vis = dist < LIFE.LOD_FAR;
-      if (vis !== visible) { visible = vis; all.forEach(m => { m.visible = vis; }); }
+      const detail = dist < LIFE.LOD_MID;
+      if (vis !== visible || detail !== detailed) {
+        visible = vis; detailed = detail;
+        /* the three parts that carry the FIGURE stay to the far cut; the three that carry its
+           BEHAVIOUR — arms, face, shadow — go at the mid cut, which is 2N + 2N instances of the
+           six and where most of the population's cost lives */
+        for (const m of [iDrop, iTorso, iHead]) m.visible = vis;
+        for (const m of [iArm, iFace, iShade]) m.visible = vis && detail && !lowQ;
+      }
       return posed;
     },
     update(t) { if (!quiet && visible && posed) write(t); },
@@ -450,10 +479,12 @@ export function buildHaloLife(ctx, opts = {}) {
     setTheme() { /* deliberately empty: R4 keeps avatar colours INDEPENDENT of the world theme */ },
     setQuality(q) {
       const low = q && (q.name === 'low' || q === 'low');
-      quiet = !!low;
-      iShade.visible = !low;
-      iFace.visible = !low;
-      iArm.count = low ? 0 : N * 2;
+      quiet = !!low; lowQ = !!low;
+      /* the low tier drops the same three parts the MID distance tier does, so the two decisions
+         cannot fight: setDetail also reads lowQ rather than turning them back on behind it */
+      iShade.visible = !low && detailed && visible;
+      iFace.visible = !low && detailed && visible;
+      iArm.visible = !low && detailed && visible;
     },
     dispose() {
       owned.geometries.forEach(g => g.dispose());

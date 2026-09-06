@@ -65,7 +65,7 @@ export const THRESHOLD = Object.freeze({
   GANTRY_IN: 3380, GANTRY_OUT: 3560, GANTRY_RISE: 26,
   SHELF_IN: 3500, SHELF_OUT: 5200,
   SHELF_DROP: 62,        /* how far below the rim the nearest cloud tops sit — the distinctness gap */
-  MASSES: 46
+  MASSES: 68             /* 46 left visible gaps of open sky between banks at the fan's edges */
 });
 
 const TAU = Math.PI * 2;
@@ -92,7 +92,9 @@ export function buildHaloThreshold(ctx, opts = {}) {
     deg: THRESHOLD.DEG, gateR: THRESHOLD.GATE_R,
     rimY: +haloHeight(HALO.R_OUT, 0).toFixed(1),
     /* the distinctness measurement, published so a test can assert it rather than a render judge it */
-    cloudBelowRim: THRESHOLD.SHELF_DROP
+    cloudBelowRim: THRESHOLD.SHELF_DROP,
+    /* and where a figure stands on each part of the sequence — see the note at the causeway */
+    walkSites: []
   };
 
   /* ---- placement on the curved shell — halo-districts' orientation rule, quoted ---------------- */
@@ -123,6 +125,12 @@ export function buildHaloThreshold(ctx, opts = {}) {
 
   const B = { plat: [], dark: [] };
   const put = (b, geo, matrix, value) => B[b].push({ geo, matrix, value });
+  /* DECLARED HERE, NOT NEXT TO sign(). It was written beside the function that fills it, below the
+     build — and a `const` below its use is in the temporal dead zone, so the first sign() call threw
+     a ReferenceError, the assembly's guarded try/catch swallowed it into a console line, and the
+     ENTIRE MODULE silently did not exist. `stats` came back null and the eight threshold captures
+     photographed bare plate. A function declaration hoists; the array it closes over does not. */
+  const signMats = [];
 
   /* ---- materials. Two solids and one cloud. --------------------------------------------------- */
   const platinum = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
@@ -147,17 +155,26 @@ export function buildHaloThreshold(ctx, opts = {}) {
      six triangles per mass. Forty-six masses is 276 triangles for a biome. */
   const cloudTex = softMass(256);
   owned.textures.push(cloudTex);
+  /* THE VALUES ARE NOT clouds.js's, AND THE FIRST CUT'S WERE. Quoting that module's night key —
+     body 0x243352 at 0.60 — put a dark blue body against a dark blue night sky and the entire biome
+     photographed as nothing: the gate, the run-out and the gantry all pointed at an empty horizon,
+     and the only pale shapes in frame were the CITY's clouds 1.2 km below, seen edge-on.
+
+     The reason the quote failed is that clouds.js paints weather that is BACKGROUND — it is meant to
+     sit down in the sky's own value band and not compete with the architecture. This cloud is the
+     DESTINATION. R4 asks for the transition to be spectacular and the thing being transitioned to
+     has to be visible from the threshold that names it. So the body lifts a step off the sky and the
+     lit crowns carry real value: a top edge the eye can measure the sanctuary against. */
   const cloudMat = new THREE.MeshBasicMaterial({
-    map: cloudTex, color: 0x243352, transparent: true, opacity: 0.60,
+    map: cloudTex, color: 0x33507e, transparent: true, opacity: 0.74,
     depthWrite: false, side: THREE.DoubleSide, fog: true, vertexColors: true,
     blending: THREE.NormalBlending, toneMapped: true
   });
   cloudMat.name = 'halo-threshold-cloud'; owned.materials.push(cloudMat);
-  /* the lit crowns: the same masses again, smaller and higher, in the pale key. Two materials is
-     what gives a cloud a TOP — one flat value is the "white geometry with fog" the sky brief
-     forbids by name. */
+  /* the lit crowns: the same masses again, higher, in the pale key. Two materials is what gives a
+     cloud a TOP — one flat value is the "white geometry with fog" the sky brief forbids by name. */
   const cloudLit = cloudMat.clone();
-  cloudLit.color.setHex(0xeef5ff); cloudLit.opacity = 0.30; cloudLit.name = 'halo-threshold-cloud-lit';
+  cloudLit.color.setHex(0xdfeaff); cloudLit.opacity = 0.62; cloudLit.name = 'halo-threshold-cloud-lit';
   owned.materials.push(cloudLit);
 
   /* ================================================================================================
@@ -187,8 +204,24 @@ export function buildHaloThreshold(ctx, opts = {}) {
       put('plat', chamferBox(1.0, 0.85, 3.2, 0.22), mat(hx + ox, hz + oz, 1.24 + 0.44, rot), 0.80);
       put('plat', chamferBox(0.34, 0.14, 7.5, 0.06), mat(hx + ox, hz + oz, 1.24 + 1.12, rot), 1.0);
     }
-    sign('MAH THRESHOLD', 'departures — the sky realm', at(D, 0, THRESHOLD.HOLD_R - 46), rot, 15, 26);
+    /* THE SIGN NEEDS SOMETHING TO STAND ON. Left at 15 m it hung in the sky over the canopy with
+       nothing under it — legible, and obviously a decal. It gets a pylon, and it sits just clear of
+       the canopy's leading edge where an arriving eye meets it. */
+    const [px2, pz2] = at(D, 0, THRESHOLD.HOLD_R - 46);
+    put('plat', chamferBox(2.4, 15.5, 2.4, 0.6), mat(px2, pz2, 7.75, rot), 0.88);
+    put('plat', chamferBox(28, 0.5, 1.6, 0.16), mat(px2, pz2, 15.6, rot), 1.0);
+    sign('MAH THRESHOLD', 'departures — the sky realm', [px2, pz2], rot, 19.5, 26);
     stats.hold = { r: THRESHOLD.HOLD_R, w: 64, d: 78 };
+    /* people waiting in the hold — its deck top is 1.33 (1.1 plinth + 0.30 cap centred at 1.18) */
+    for (let i = 0; i < 12; i++) {
+      const a = gold(i * 3);
+      const dx = (frac(i * 7) - 0.5) * 48, dz = (frac(i * 13) - 0.5) * 58;
+      stats.walkSites.push({
+        x: hx + Math.cos(rot) * dx + Math.sin(rot) * dz,
+        z: hz - Math.sin(rot) * dx + Math.cos(rot) * dz,
+        lift: 1.33, face: -hth + Math.PI / 2 + (a - Math.PI) * 0.22, kind: 'field'
+      });
+    }
   }
 
   /* ================================================================================================
@@ -231,6 +264,29 @@ export function buildHaloThreshold(ctx, opts = {}) {
       stats.bays++;
     }
     stats.causeway = { inner: IN, outer: OUT, bays, wIn: THRESHOLD.W_IN, wOut: THRESHOLD.W_OUT };
+
+    /* ---- WHERE PEOPLE STAND ON IT, published --------------------------------------------------
+       A departure route with nobody departing is a monument, not a transition — and this one is
+       944 m of promenade that halo-life's district table cannot reach, because the threshold sits
+       at a bearing no district occupies. So the module that knows where its own deck is says so,
+       and halo-life reads it. The alternative is a second table of radii in another file, which is
+       how the ascent dock came to rake at 61 degrees while its header said 36 (L42, L55). */
+    for (let i = 0; i < 26; i++) {
+      const u = frac(i * 5), r = IN + (OUT - IN) * u;
+      /* gold() here returns 0..1, not radians — dividing by TAU as well pinned every walker to a
+         band 0.16 wide and put all 26 of them against the same kerb. Two files in this project
+         define `gold` (halo-life's is the golden ANGLE, in radians; this one is the golden RATIO,
+         a fraction) and mixing them is silent. */
+      const lat = (gold(i * 7) - 0.5) * (widthAt(r) - 6);
+      const [cx, cz, cth] = at(D, 0, r);
+      const rot = -cth + Math.PI / 2;
+      /* the deck is 0.5 thick centred at 0.28, so its top is 0.53 — a walker stands on THAT */
+      stats.walkSites.push({
+        x: cx + Math.cos(rot) * lat, z: cz - Math.sin(rot) * lat, lift: 0.53,
+        /* most are walking OUT; a few have turned back to look at the sanctuary */
+        face: -cth + (frac(i * 11) > 0.78 ? Math.PI : 0), kind: 'walk'
+      });
+    }
   }
 
   /* ================================================================================================
@@ -264,8 +320,14 @@ export function buildHaloThreshold(ctx, opts = {}) {
       const pz = gz - Math.sin(rot) * side * W * 0.5;
       put('plat', chamferBox(4.4, H, 4.4, 1.1), mat(px, pz, H / 2, rot), 0.90);
       put('plat', chamferBox(6.8, 0.9, 6.8, 0.3), mat(px, pz, H, rot + 0.4), 1.0);
-      /* a buttress raking back INBOARD, so the gate is braced against the way you came */
-      put('plat', chamferBox(2.2, 1.4, 22, 0.5), mat(px, pz - 0, H * 0.42, rot), 0.84);
+      /* A BUTTRESS RAKING BACK INBOARD, and the rake is the whole point of it. Authored flat it was
+         a 22 m bar lying horizontally 11 m up in the air, braced against nothing — mat() yaws, and
+         a rake is a tilt. Rotating the GEOMETRY about local X tilts it in the vertical-radial plane,
+         which is the plane a buttress leans in, then the yaw carries it round the ring. */
+      const brace = own(chamferBox(2.0, 1.5, 24, 0.5));
+      brace.rotateX(-0.62);                          /* about 36 deg off horizontal */
+      brace.translate(0, -H * 0.16, -8.0);           /* foot on the deck, head against the pier */
+      put('plat', brace, mat(px, pz, H * 0.50, rot), 0.84);
     }
     /* THE LINTEL SPANS THE WAY ITS PIERS ARE SEPARATED — tangentially, which under this rot is the
        box's local X. Same clause, same reason, thirteenth time of asking. */
@@ -278,6 +340,14 @@ export function buildHaloThreshold(ctx, opts = {}) {
     put('plat', chamferBox(W, 0.22, 1.2, 0.08), mat(gx, gz, 0.30, rot), 1.0);
     sign('SKY REALM', 'cloud biome — flight beyond this point', at(D, 0, THRESHOLD.GATE_R - 30), rot, 14, 22);
     stats.gate = { r: THRESHOLD.GATE_R, w: W, h: H, y: +haloHeight(gx, gz).toFixed(1) };
+    /* and four people at the line itself, on the shell — three facing out, one turned back */
+    for (let i = 0; i < 4; i++) {
+      const lat = (i - 1.5) * 7.5;
+      stats.walkSites.push({
+        x: gx + Math.cos(rot) * lat - Math.cos(gth) * 5, z: gz - Math.sin(rot) * lat - Math.sin(gth) * 5,
+        lift: 0, face: -gth + (i === 2 ? Math.PI : 0), kind: 'rail'
+      });
+    }
   }
 
   /* ================================================================================================
@@ -329,21 +399,32 @@ export function buildHaloThreshold(ctx, opts = {}) {
       put('plat', chamferBox(1.6, 13, 1.6, 0.4),
         free(tx + Math.cos(tRot) * side * 9, tY + 6.5, tz - Math.sin(tRot) * side * 9, tRot), 0.92);
     }
-    /* the ring is four bars on the diagonal — a square rotated 45 degrees, drawn as structure rather
-       than as a torus, because this world's circle is a square diamond */
-    const RD = 11;
+    /* THE RING IS A SQUARE DIAMOND, and it has to be built in GEOMETRY SPACE to be one.
+
+       free() applies a YAW, which is all any other piece here needs. This ring does not: it stands
+       in a VERTICAL plane, and its four bars lie on the diagonals of that plane — a rotation about
+       the local Z axis, which no yaw can produce. The first cut tried anyway and got four PARALLEL
+       bars at four offsets: a hash, not a diamond, and nothing would have failed.
+
+       So each bar is rotated and translated as geometry, in a frame where local X is tangential,
+       local Y is vertical and local Z is radial (which is exactly what free(..., tRot) then maps
+       onto the world), and the whole ring is placed with a single yaw. Vertices at distance RD on
+       the axes, edge midpoints at RD/sqrt2 on the diagonals, edge length RD*sqrt2. */
+    const RD = 11, RT = RD * 0.7071;
     for (let q = 0; q < 4; q++) {
-      const a = (q + 0.5) * Math.PI / 2;
-      const ox = Math.cos(a) * RD * 0.707, oy = Math.sin(a) * RD * 0.707;
-      put('plat', chamferBox(1.3, 1.3, RD * 1.42, 0.3),
-        free(tx + Math.cos(tRot) * ox, tY + 13 + oy, tz - Math.sin(tRot) * ox, tRot + Math.PI / 2, 1, 1, 1), 1.0);
-      /* the four bars are yawed to the diagonals by rotating each about the gantry axis: built as a
-         diamond outline, not as a square with its corners on the axes */
+      const a = (q + 0.5) * Math.PI / 2;            /* 45, 135, 225, 315 — the edge midpoints */
+      const bar = own(chamferBox(RD * 1.42, 1.3, 1.3, 0.3));   /* long along local X */
+      bar.rotateZ(a + Math.PI / 2);                 /* onto the diamond's edge, tangent to the circle */
+      bar.translate(Math.cos(a) * RT, Math.sin(a) * RT, 0);
+      put('plat', bar, free(tx, tY + 13, tz, tRot), 1.0);
     }
-    for (const s of [-1, 1]) for (const t of [-1, 1]) {
+    /* and a square diamond at each of the four VERTICES — wider than tall, as always (§06) */
+    for (let q = 0; q < 4; q++) {
+      const a = q * Math.PI / 2;
       const dia2 = own(new THREE.OctahedronGeometry(1, 0));
-      put('plat', dia2, free(tx + Math.cos(tRot) * s * RD * 0.707, tY + 13 + t * RD * 0.707,
-        tz - Math.sin(tRot) * s * RD * 0.707, tRot, 2.2, 1.7, 2.2), 1.0);
+      dia2.scale(2.2, 1.7, 2.2);
+      dia2.translate(Math.cos(a) * RD, Math.sin(a) * RD, 0);
+      put('plat', dia2, free(tx, tY + 13, tz, tRot), 1.0);
     }
     stats.gantry = { inner: IN, outer: OUT, rise: RISE, tipY: +tY.toFixed(1) };
     /* the flight line is a music line too */
@@ -375,16 +456,22 @@ export function buildHaloThreshold(ctx, opts = {}) {
       const w = 240 + 620 * far + 180 * gold(i * 11);
       const h = 90 + 300 * far + 60 * frac(i * 13);
       const topNear = rimY - THRESHOLD.SHELF_DROP;
-      const top = topNear + (far > 0.34 ? (far - 0.34) * 900 : 0) - 40 * gold(i * 7);
+      /* the rise starts at 0.16 of the way out, not 0.34. At 0.34 the biome only cleared the deck
+         past r 4078, and the deck itself hides everything below it — so from the gate, which is the
+         one place this whole sequence exists to be looked from, there was nothing above the horizon
+         at all. It still tops out BELOW the walking surface near the rim, which is the distinctness
+         clause; it just stops taking 600 m to start climbing. */
+      const top = topNear + (far > 0.16 ? (far - 0.16) * 1180 : 0) - 40 * gold(i * 7);
       const cy = top - h * 0.5;
       const yaw = gold(i * 17) * TAU;
-      const val = 0.55 + 0.45 * (1 - far) * gold(i * 19);
+      const val = 0.62 + 0.38 * (1 - far) * gold(i * 19);
       quads.push({ geo: quadGeo, matrix: free(X, cy, z, yaw, w, h, 1), value: val });
       quads.push({ geo: quadGeo, matrix: free(X, cy, z, yaw + Math.PI / 2, w * 0.86, h * 0.92, 1), value: val * 0.94 });
       quads.push({ geo: flatGeo, matrix: free(X, top - h * 0.14, z, yaw, w * 0.92, 1, w * 0.72), value: val });
       /* the crown, in the pale key: a top edge the eye can measure the sky against */
-      litQuads.push({ geo: quadGeo, matrix: free(X, top - h * 0.10, z, yaw + 0.3, w * 0.62, h * 0.34, 1), value: 0.7 + 0.3 * gold(i * 23) });
-      litQuads.push({ geo: flatGeo, matrix: free(X, top - h * 0.06, z, yaw, w * 0.58, 1, w * 0.44), value: 0.8 });
+      litQuads.push({ geo: quadGeo, matrix: free(X, top - h * 0.16, z, yaw + 0.3, w * 0.80, h * 0.46, 1), value: 0.7 + 0.3 * gold(i * 23) });
+      litQuads.push({ geo: quadGeo, matrix: free(X, top - h * 0.16, z, yaw + 0.3 + Math.PI / 2, w * 0.66, h * 0.40, 1), value: 0.66 + 0.3 * gold(i * 29) });
+      litQuads.push({ geo: flatGeo, matrix: free(X, top - h * 0.06, z, yaw, w * 0.70, 1, w * 0.54), value: 0.8 });
       stats.cloudMasses++;
     }
     addMesh(quads, cloudMat, 'halo-threshold-cloud', -3);
@@ -456,16 +543,14 @@ export function buildHaloThreshold(ctx, opts = {}) {
     }
   }
 
-  const signMats = [];
-
   /* ---- the module contract --------------------------------------------------------------------- */
   let quiet = false;
   const KEYS = {
     /* clouds.js's own night/dusk/day keys, quoted, so the threshold's weather and the city's weather
        are the same weather seen from 1.5 km apart */
-    night: { body: 0x243352, bodyA: 0.60, lit: 0xeef5ff, litA: 0.30 },
-    dusk: { body: 0x50458a, bodyA: 0.62, lit: 0xece5ff, litA: 0.26 },
-    day: { body: 0xe6eefa, bodyA: 0.66, lit: 0xf8fbff, litA: 0.14 }
+    night: { body: 0x33507e, bodyA: 0.74, lit: 0xdfeaff, litA: 0.62 },
+    dusk: { body: 0x6a5aa8, bodyA: 0.74, lit: 0xece5ff, litA: 0.54 },
+    day: { body: 0xe6eefa, bodyA: 0.70, lit: 0xf8fbff, litA: 0.30 }
   };
   function keyFor(phase) { return KEYS[phase] || KEYS.night; }
 

@@ -422,7 +422,11 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
         if (r > 4600) farTop = Math.max(farTop, y);
       }
     }
-    const nav = (w.navSites ? w.navSites() : []).filter(s => /^halo-(threshold|skygate|flightline)$/.test(s.id));
+    /* the page API is navDestinations(), not navSites() — navSites() is the MODULE-side method the
+       assembly calls to fill it. A probe that asked the window for navSites got undefined, returned
+       an empty list and reported the nav wiring broken when it was fine: the gate has to name the
+       surface it is actually testing. */
+    const nav = (w.navDestinations ? w.navDestinations() : []).filter(s => /^halo-(threshold|skygate|flightline)$/.test(s.id));
     return {
       wired: !!w.modules.haloThreshold, stats: T.stats, rimY, nearTop, farTop, nearest,
       /* HALO's own outer limit, read from the module rather than restated here */

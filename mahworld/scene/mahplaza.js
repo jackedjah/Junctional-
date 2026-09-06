@@ -326,7 +326,13 @@ export async function createMahplaza(canvas, options = {}) {
      because a ring 6800 m across has no meaningful local origin — every point on it is 2 km from
      every other. */
   if (HALOM && HALOM.buildHalo) {
-    try { halo = HALOM.buildHalo(ctx); scene.add(halo.group); }
+    /* the rim apertures come from halo-districts' OVERLOOKS table — the SAME table its bays are
+       built from — so the parapet cannot close over a bay again. halo is built first, but the table
+       is a module-level constant, so it is readable before buildHaloDistricts() ever runs. */
+    try {
+      halo = HALOM.buildHalo(ctx, { rimApertures: (HALOD && HALOD.OVERLOOKS) || [] });
+      scene.add(halo.group);
+    }
     catch (e) { console.info('MAHPLAZA: halo module failed —', e && e.message); halo = null; }
   }
   if (halo && HALOD && HALOD.buildHaloDistricts) {
@@ -337,21 +343,6 @@ export async function createMahplaza(canvas, options = {}) {
       scene.add(haloDistricts.group);
     } catch (e) { console.info('MAHPLAZA: halo districts module failed —', e && e.message); haloDistricts = null; }
   }
-  /* R4-16 — MAHBEING SOCIAL LIFE. Built after the districts because it stands on their furniture:
-     the dance floor, the amphitheatre tiers, the kiosk line, the overlook rails. It is a POPULATION
-     and not a cast, so it does not go through ctx.residentSpots — see halo-life.js's header. */
-  if (halo && HALOL && HALOL.buildHaloLife) {
-    /* the overlook table comes from the module that BUILT the bays, so a figure at a rail is at a
-       rail that exists. halo-districts is loaded before this block, so if it failed the list is
-       empty and halo-life simply places no rails — never a guessed radius (L42). */
-    try {
-      haloLife = HALOL.buildHaloLife(ctx, {
-        overlooks: (haloDistricts && haloDistricts.stats && haloDistricts.stats.overlookSites) || []
-      });
-      scene.add(haloLife.group);
-    }
-    catch (e) { console.info('MAHPLAZA: halo life module failed —', e && e.message); haloLife = null; }
-  }
   /* R4-19 — THE SKY THRESHOLD. R4's SKY REALM SEPARATION clause: HALO is the civilized tiled layer,
      the SKY REALM is the cloud biome beyond it, and "the transition between them must be clear and
      spectacular". It takes the open plate at bearing -67.5 deg, between ARRIVAL and COMMONS, and
@@ -359,6 +350,23 @@ export async function createMahplaza(canvas, options = {}) {
   if (halo && HALOT && HALOT.buildHaloThreshold) {
     try { haloThreshold = HALOT.buildHaloThreshold(ctx); scene.add(haloThreshold.group); }
     catch (e) { console.info('MAHPLAZA: halo threshold module failed —', e && e.message); haloThreshold = null; }
+  }
+  /* R4-16 — MAHBEING SOCIAL LIFE. Built after the districts AND after the threshold, because it
+     stands on their furniture: the dance floor, the amphitheatre tiers, the kiosk line, the overlook
+     rails, the departure hold and the causeway out to the sky gate. It is a POPULATION
+     and not a cast, so it does not go through ctx.residentSpots — see halo-life.js's header. */
+  if (halo && HALOL && HALOL.buildHaloLife) {
+    /* the overlook table comes from the module that BUILT the bays, so a figure at a rail is at a
+       rail that exists. halo-districts is loaded before this block, so if it failed the list is
+       empty and halo-life simply places no rails — never a guessed radius (L42). */
+    try {
+      haloLife = HALOL.buildHaloLife(ctx, {
+        overlooks: (haloDistricts && haloDistricts.stats && haloDistricts.stats.overlookSites) || [],
+        walkSites: (haloThreshold && haloThreshold.stats && haloThreshold.stats.walkSites) || []
+      });
+      scene.add(haloLife.group);
+    }
+    catch (e) { console.info('MAHPLAZA: halo life module failed —', e && e.message); haloLife = null; }
   }
   /* R3-07 — the three recommended entrances. The two peer-city sites come from THOSE MODULES' own
      stats rather than from a second table here: L42's lesson is that when two files each know where

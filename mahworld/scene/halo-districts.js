@@ -71,6 +71,35 @@ export const DISTRICTS = Object.freeze([
   { id: 'stage', label: 'HALO STAGE', sub: 'PERFORMANCE', deg: -135, span: 400, density: 'high' }
 ]);
 
+/* ================================================================================================
+   THE OVERLOOK APERTURES — and why they are a TABLE and not twelve scattered calls.
+
+   R4 gives the downward view a clause of its own, and the bays that serve it were built and then
+   BLOCKED, cross-module, by geometry neither file could see the other place. halo.js lays a
+   continuous parapet all the way round the inner rim at r = R_IN - APRON = 666 — 384 segments, no
+   gaps — and P.overlook straddles that exact radius on purpose (its deck spans r 637 to 667, "its
+   root just catches the shell"). So a 1.6 m platinum block 2.4 m tall stands across the ONLY
+   entrance to every one of the twelve bays, 1.01 m proud of the bay floor. The overlook's own
+   comment reasons carefully about keeping its 1.28 m rails clear of a standing eye, and then a wall
+   from another module lands in the aperture.
+
+   Neither module was wrong on its own. The fault is that the bay positions lived inside eight
+   per-district branches, so nothing could enumerate them — the same shape as every other L42 defect
+   in this project. They are one exported table now: halo-districts BUILDS the bays from it, and
+   halo.js SKIPS the parapet and fascia segments that fall inside one, reading the same list.
+   ================================================================================================ */
+export const OVERLOOKS = Object.freeze(DISTRICTS.flatMap(D => {
+  /* ARRIVAL's pier lands on the centreline, so its two bays step aside for it */
+  if (D.id === 'arrival') return [{ deg: D.deg, s: -60, w: 40 }, { deg: D.deg, s: 60, w: 40 }];
+  const out = [{ deg: D.deg, s: 0, w: 52 }];
+  /* COMMONS gets a second bay offset along the ring — placing it at s = 0 would build it in exactly
+     the same place as the per-district one above: doubled geometry, z-fighting glass, two colliders
+     on one point. QUIET's pair flanks its garden. */
+  if (D.id === 'commons') out.push({ deg: D.deg, s: -150, w: 56 });
+  if (D.id === 'quiet') out.push({ deg: D.deg, s: -110, w: 44 }, { deg: D.deg, s: 110, w: 44 });
+  return out;
+}));
+
 const gold = i => (i * 2.3999632) % TAU;
 const frac = i => (i * 0.6180339887) % 1;
 const frac2 = i => (i * 0.7548776662) % 1;
@@ -235,19 +264,30 @@ export function buildHaloDistricts(ctx, opts = {}) {
     /* a square-diamond GATEWAY: two piers and a diamond keystone. The brand figure, load-bearing. */
     gateway(deg, s, t, w, h) {
       const [x, z, th] = ringPoint(deg, s, t);
+      /* SAME RULE, AND THIS ONE IS THE FIRST THING A VISITOR MEETS. ARRIVAL calls this at h = 26
+         against a hardcoded 2.2 m section: 11.8:1, a needle pair standing in the three broad
+         terraces that exist specifically to answer R4's "replace the tiny top platform". h/6 gives
+         4.33 m, which is a gate you walk under rather than a pair of wires. */
+      const gw = Math.max(2.2, h / 6);
       for (const side of [-1, 1]) {
         const gx = x + Math.cos(th + Math.PI / 2) * side * w * 0.5;
         const gz = z + Math.sin(th + Math.PI / 2) * side * w * 0.5;
-        put('plat', chamferBox(2.2, h, 2.2, 0.6), mat(gx, gz, h / 2, -th), 0.90);
-        put('plat', chamferBox(3.4, 0.5, 3.4, 0.16), mat(gx, gz, h, -th + 0.4), 1.0);
+        put('plat', chamferBox(gw, h, gw, gw * 0.27), mat(gx, gz, h / 2, -th), 0.90);
+        put('plat', chamferBox(gw * 1.55, 0.5, gw * 1.55, 0.16), mat(gx, gz, h, -th + 0.4), 1.0);
       }
       /* THE LINTEL SPANS THE WAY ITS PIERS ARE SEPARATED. The piers are offset along
          (cos(th+PI/2), sin(th+PI/2)) — TANGENTIAL — and the lintel was authored on local X, which
          mat(..., -th) sends RADIALLY: the arrival gateway's crossbeam stood ninety degrees to the
          two piers under it. Fourth instance of this bug in one file (kerb, screen, proscenium). */
-      put('plat', chamferBox(1.6, 1.0, w + 2, 0.3), mat(x, z, h + 0.5, -th), 1.0);
+      /* AND THE LINTEL HAS TO LOOK LIKE IT CARRIES 44 m. At 1.6 x 1.0 over w + 2 it was a 44:1
+         span-to-depth wire between two posts — a beam that shallow reads as a cable, which is the
+         same "supports hold weight" failure as a needle, lying down. 2.6 m deep is 17:1. */
+      put('plat', chamferBox(gw * 0.8, 2.6, w + 2, 0.3), mat(x, z, h + 1.3, -th), 1.0);
+      /* the keystone SITS ON the lintel. At h + 4.2 with a 2.4 half-height its underside was at
+         27.8 while the lintel top was 27.0: an 0.8 m float, the "balanced rather than carried"
+         defect the dock keystone comment in this file says was already corrected once. */
       const dia = own(new THREE.OctahedronGeometry(1, 0));
-      put('plat', dia, mat(x, z, h + 4.2, -th, 3.0, 2.4, 3.0), 1.0);
+      put('plat', dia, mat(x, z, h + 2.6 + 2.4 - 0.5, -th, 3.4, 2.4, 3.4), 1.0);
       return [x, z, th];
     },
     /* a MAST carrying a FOBEAM endpoint — and every one of them gets the music line (R4: "Every
@@ -319,8 +359,16 @@ export function buildHaloDistricts(ctx, opts = {}) {
          thin on X, tall on Y, long on Z, with its posts offset along Z. */
       const px = Math.sin(a), pz = Math.cos(a);
       put('plat', chamferBox(1.2, 0.5, w + 1.4, 0.2), mat(x, z, 0.6, a), 0.9);
+      /* AND THE POSTS TAKE THEIR SECTION FROM THEIR HEIGHT, like every other vertical up here.
+         A fixed 0.7 m against the callers' h of 15, 18 and 20 is 21:1, 26:1 and 29:1 — the L58
+         failure the sibling P.mast fifty lines below was rewritten to fix, and WORSE than the 23:1
+         the lesson was written about. Eight posts, all past 20:1, in the three densest districts.
+         A vertical that slender does not read as a structure at any distance: near, it is a wire
+         holding a display; far, it is thinner than a pixel and aliases to a crawling hairline,
+         which is the "too sharp" the director is naming. h/6 gives 2.5, 3.0 and 3.33 m. */
+      const pw = Math.max(1.6, h / 6);
       for (const side of [-1, 1]) {
-        put('plat', chamferBox(0.7, h, 0.7, 0.2),
+        put('plat', chamferBox(pw, h, pw, pw * 0.26),
           mat(x + px * side * w * 0.5, z + pz * side * w * 0.5, h / 2, a), 0.94);
       }
       put('glass', chamferBox(0.18, h * 0.78, w, 0.06), mat(x, z, h * 0.52, a), 0.62);
@@ -404,10 +452,27 @@ export function buildHaloDistricts(ctx, opts = {}) {
       const [ex, ez] = off(-D * 0.5, 0);              /* the far end, out over the middle of the hole */
       put('plat', chamferBox(0.42, 0.22, w + 2.8, 0.08), mat(ex, ez, drop + 1.28, -th), 1.0);
       put('dark', chamferBox(0.30, 1.0, w + 2.8, 0.10), mat(ex, ez, drop + 0.75, -th), 0.30);
-      /* THE STRUTS: two raked legs back up to the rim, so the cantilever is carried and not floating */
+      /* THE STRUTS: two raked legs back up to the rim, so the cantilever is carried and not floating.
+
+         THEY WERE NEITHER RAKED NOR TOUCHING ANYTHING. mat() composes shell-normal x yaw and has no
+         pitch in it, so `chamferBox(15, 0.7, 0.7)` stayed a HORIZONTAL bar; and its 15 m went on
+         local X, which mat(..., -th) sends radially, centred at r 643 — spanning r 635.5 to 650.5
+         against a shell edge at 666. Fifteen and a half metres of open air, 0.77 m below a deck it
+         never met. Twenty-four bright platinum bars hanging unattached under the glass floor whose
+         entire point is that there is NOTHING under your feet.
+
+         A rake is a pitch, and the pitch has to be in the GEOMETRY because the placement helper
+         cannot express one. Local X is radial and local Y is the shell normal, so rotating the bar
+         about local Z tilts it in the radial-vertical plane — which is the plane a strut leans in.
+         The run is measured, not guessed: from the bay's far underside at r 640, 2.2 m down, to the
+         shell edge at r 666, 0.2 m down. 26 m of run over 2.0 m of rise is 26.08 m at 4.40 deg. */
+      const RUN_IN = 640, RUN_OUT = 666, RISE = 2.0;
+      const sLen = Math.hypot(RUN_OUT - RUN_IN, RISE), sAng = Math.atan2(RISE, RUN_OUT - RUN_IN);
       for (const side of [-1, 1]) {
-        const [ax2, az2] = off(-D * 0.30, side * (w * 0.5 + 0.9));
-        put('plat', chamferBox(15, 0.7, 0.7, 0.2), mat(ax2, az2, drop - 1.6, -th, 1, 1, 1), 0.88);
+        const [ax2, az2] = off((RUN_IN + RUN_OUT) * 0.5 - rDeck, side * (w * 0.5 + 0.9));
+        const strut = own(chamferBox(sLen, 0.8, 0.8, 0.22));
+        strut.rotateZ(sAng);
+        put('plat', strut, mat(ax2, az2, drop - 1.2, -th), 0.88);
       }
       /* and the THRESHOLD back on the ring proper, so the bay is entered rather than arrived at */
       const [tx, tz] = ringPoint(deg, s, -(HALO.R_MID - HALO.R_IN) + 20);
@@ -487,7 +552,6 @@ export function buildHaloDistricts(ctx, opts = {}) {
       P.gateway(D.deg, 0, -70, 42, 26);
       for (const s of [-140, -70, 70, 140]) P.mast(D.deg, s, 30, 20 + 8 * frac(s), s);
       for (const s of [-104, -34, 34, 104]) P.seat(D.deg, s, 46, 0, true);
-      P.overlook(D.deg, -60, 40); P.overlook(D.deg, 60, 40);
       districtSign(D, ...ringPoint(D.deg, 0, -70).slice(0, 2).concat([ringPoint(D.deg, 0, -70)[2]]), 32);
       spawnPoints.push({ x: ringPoint(D.deg, 0, -20)[0], z: ringPoint(D.deg, 0, -20)[1], kind: 'arrival' });
 
@@ -502,11 +566,6 @@ export function buildHaloDistricts(ctx, opts = {}) {
         if (k % 3 === 1) P.growth(D.deg, s + 22, t - 26, 5, k * 17);
       }
       P.mast(D.deg, -half + 40, -10, 16, 1); P.mast(D.deg, half - 40, -10, 16, 2);
-      /* COMMONS' own overlook is offset along the ring, because the blanket per-district pass at
-         the end of this loop also calls P.overlook(D.deg, 0, ...) — and P.overlook derives its
-         position entirely from (deg, s), so two calls at s = 0 build two bays in exactly the same
-         place: doubled geometry, z-fighting glass and two colliders on one point. */
-      P.overlook(D.deg, -150, 56);
       districtSign(D, ...(() => { const [x, z, th] = ringPoint(D.deg, 0, -62); return [x, z, th]; })(), 12);
 
     } else if (D.id === 'pulse') {
@@ -624,7 +683,6 @@ export function buildHaloDistricts(ctx, opts = {}) {
         P.growth(D.deg, s, t, 6 + Math.round(4 * frac2(k * 3)), k * 23);
         if (k % 2 === 0) P.seat(D.deg, s + 14, t + 12, gold(k), false);
       }
-      P.overlook(D.deg, -110, 44); P.overlook(D.deg, 110, 44);
       districtSign(D, ...(() => { const [x, z, th] = ringPoint(D.deg, 0, -64); return [x, z, th]; })(), 10);
 
     } else if (D.id === 'forum') {
@@ -656,8 +714,17 @@ export function buildHaloDistricts(ctx, opts = {}) {
       P.screen(D.deg, 0, -62, 40, 20, 0);
       for (const side of [-1, 1]) P.mast(D.deg, side * 78, -40, 17, side);
       if (ctx && ctx.residentSpots) {
-        const [sx, sz] = ringPoint(D.deg, 0, -34);
-        ctx.residentSpots.push({ x: sx, y: haloHeight(sx, sz) + 1.7, z: sz, facing: -D.deg * Math.PI / 180,
+        const [sx, sz, sth] = ringPoint(D.deg, 0, -34);
+        /* TWO FORWARD AXES MEET HERE AND THEY ARE NOT THE SAME ONE.
+           This file's `mat(..., -th)` is a BOX convention: local +X is radial, local +Z tangential.
+           residents.js states its own outright — "local +Z is the resident's front" — and assigns
+           `rotation.y = s.facing` raw. So `facing: -th`, which is right for a deck, sent the
+           speaker's front along the RING: she presented at exactly 90 degrees to the seven treads
+           she is standing in front of, and at 90 degrees to the screen behind her. The file already
+           carries the correct idiom for a +Z-forward object twice (`-dth + PI/2`, the pier and the
+           spine, "because it faces out along the radius"), and the treads are outboard, so that is
+           the heading. Derived from the same `sth` the position came from, so `s` cannot drift. */
+        ctx.residentSpots.push({ x: sx, y: haloHeight(sx, sz), z: sz, facing: -sth + Math.PI / 2,
           id: 'halo-forum-speaker', colour: 'platinum', physique: 0.55, sex: 'f', pose: 'explain',
           seed: 501, lod: 'near', note: 'presenting at HALO FORUM' });
       }
@@ -717,12 +784,16 @@ export function buildHaloDistricts(ctx, opts = {}) {
     }
     /* R4 devotes a whole clause to the views down — "Preserve dramatic overlooks to Civic City, Lake
        City, Rainforest City, mountains, moon" — and the first cut gave only three districts one, so
-       five of the eight bearings had no way to look at the world at all. Every district now reaches
-       the inner rim: eight overlooks ring the hole, which is also what makes the inner edge read as
-       an authored lip from every camera rather than as where the geometry happened to stop. The
-       three districts that authored their own above keep them and get this one alongside; ARRIVAL is
-       the exception because the concourse spine already lands there. */
-    if (D.id !== 'arrival') P.overlook(D.deg, 0, 52);
+       five of the eight bearings had no way to look at the world at all. Every district reaches the
+       inner rim now, which is also what makes that edge read as an authored lip from every camera
+       rather than as where the geometry happened to stop.
+
+       THE BAYS ARE BUILT FROM THE OVERLOOKS TABLE, not from calls scattered through the branches
+       above. They were scattered, and the cost was that nothing could ENUMERATE them — so halo.js
+       laid a continuous parapet across all twelve entrances and no file was in a position to notice.
+       See the table's own header. */
+    for (const O of OVERLOOKS) if (O.deg === D.deg) P.overlook(O.deg, O.s, O.w);
+
     /* THESE ARE THIS DISTRICT'S OWN COUNTS. stats.seats/kiosks/overlooks are sanctuary-wide running
        totals that no one resets between districts, so snapshotting them verbatim recorded a
        cumulative prefix sum — QUIET appeared to have every seat built before it. */
@@ -853,10 +924,19 @@ export function buildHaloDistricts(ctx, opts = {}) {
         for (const side of [-1, 1]) {
           const [mx, mz] = along(r0, side * 17);
           const mh = 13 + 5 * frac(b * 7 + (side > 0 ? 1 : 0));
-          put('plat', chamferBox(1.3, mh, 1.3, 0.34), mat(mx, mz, mh / 2, rot), 0.88);
-          put('plat', chamferBox(2.2, 0.4, 2.2, 0.12), mat(mx, mz, mh - 0.3, rot + 0.4), 1.0);
+          /* THESE 26 MASTS DID NOT CALL P.mast — they re-implemented it with a literal 1.3 m
+             section, which over mh 13.0-17.9 is 10:1 to 13.8:1. L58's rule is exactly "any repeated
+             element whose size varies takes its section from its height, never from a literal", and
+             this is the ONLY route between the ascent pier and HALO ARRIVAL: 1180 m of picket fence
+             as the first thing a visitor sees after the climb. The section, the collar, the finial
+             and its height are now all multiples of mw, so a short mast and a tall one are the same
+             object at two sizes — and the finial's lower pyramid lands IN the collar instead of
+             floating 0.75 m clear of it. */
+          const mw = Math.max(1.6, mh / 6);
+          put('plat', chamferBox(mw, mh, mw, mw * 0.26), mat(mx, mz, mh / 2, rot), 0.88);
+          put('plat', chamferBox(mw * 1.7, 0.44 + mw * 0.10, mw * 1.7, 0.14), mat(mx, mz, mh - 0.3, rot + 0.4), 1.0);
           const md = own(new THREE.OctahedronGeometry(1, 0));
-          put('plat', md, mat(mx, mz, mh + 2.0, rot, 1.7, 1.35, 1.7), 1.0);
+          put('plat', md, mat(mx, mz, mh + mw * 1.05, rot, mw * 1.25, mw, mw * 1.25), 1.0);
           if (b % 2 === 0) musicSites.push({ x: mx + Math.cos(dth) * 2.4, y: haloHeight(mx, mz) + 0.9, z: mz + Math.sin(dth) * 2.4, ry: rot, scale: 2.0 });
         }
         /* a bench pair every third bay: somewhere to stop on a kilometre of walking */

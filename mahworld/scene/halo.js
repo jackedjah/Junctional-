@@ -270,7 +270,7 @@ const gold = i => (i * 2.3999632) % TAU;
 const frac = i => (i * 0.6180339887) % 1;
 const frac2 = i => (i * 0.7548776662) % 1;
 
-export function buildHalo(ctx) {
+export function buildHalo(ctx, opts = {}) {
   const M = (ctx && ctx.M) || {};
   const theme = (ctx && ctx.theme) || { energy: 0x7fc6ff, energyLight: 0xdff1ff };
   const group = new THREE.Group(); group.name = 'mah-halo';
@@ -558,10 +558,32 @@ export function buildHalo(ctx) {
       _s.set(sx == null ? 1 : sx, sy == null ? 1 : sy, sz == null ? 1 : sz);
       return _m.compose(_p, _q, _s).clone();
     };
+    /* THE APERTURES. R4's downward-view clause is served by twelve overlook bays that halo-districts
+       cuts into the INNER rim, straddling r = R_IN - APRON — which is exactly where this parapet
+       stands. Built continuous, it put a 1.6 m platinum block 2.4 m tall across the only entrance
+       to every one of them: the clause implemented and then blocked, by a different module, with
+       nothing failing. So the caller hands in the bay list (mahplaza reads halo-districts' OVERLOOKS
+       table, the same one the bays are built from) and the inner rim skips the segments inside one.
+       An aperture is half the bay's tangential width plus 4 m of reveal either side. */
+    const apertures = (opts.rimApertures || []).map(O => ({
+      a: ((O.deg * Math.PI / 180 + O.s / HALO.R_MID) % TAU + TAU) % TAU,
+      half: ((O.w * 0.5 + 4) / (HALO.R_IN - HALO.APRON))
+    }));
+    stats.rimApertures = apertures.length;
+    const inAperture = a => {
+      for (const A of apertures) {
+        let d = Math.abs(a - A.a); if (d > Math.PI) d = TAU - d;
+        if (d < A.half) return true;
+      }
+      return false;
+    };
     for (const [rr, sign] of [[HALO.R_IN - HALO.APRON, -1], [HALO.R_OUT + HALO.APRON, 1]]) {
       const chord = TAU * rr / RSEG;
       for (let j = 0; j < RSEG; j++) {
         const a = (j / RSEG) * TAU;
+        /* only the INNER rim has bays cut into it — the outer one is unbroken, except where R4-19's
+           threshold gantry leaves it, and that structure carries its own rail */
+        if (sign < 0 && inAperture(a)) { stats.rimCuts = (stats.rimCuts || 0) + 1; continue; }
         const x = Math.cos(a) * rr, z = Math.sin(a) * rr, y = haloHeight(x, z);
         /* the PARAPET: a platinum band standing on the lip. It does not need to be a collider — the
            dish already curls 39.6 m over the last 1350 m, which is the guard rail. This is the part
@@ -637,7 +659,21 @@ export function buildHalo(ctx) {
        but a node you can walk around has to be a solid */
     const nodeGeo = own(new THREE.OctahedronGeometry(1, 0));
     nodeGeo.scale(0.62, 0.34, 0.62);
-    nearNodes = new THREE.InstancedMesh(nodeGeo, rimMat, Math.ceil(COUNT * T * T / (HALO.MEGA * HALO.MEGA)) + 8);
+    /* ITS OWN MATERIAL, BECAUSE rimMat IS VERTEX-COLOURED AND THIS GEOMETRY HAS NO COLOURS.
+       rimMat carries vertexColors = true for its OTHER consumer, the merged `halo-rims` mesh, which
+       mergeSolids() feeds a `color` attribute. An OctahedronGeometry has none. In r185 USE_COLOR is
+       defined from the MATERIAL alone — nothing checks that the geometry supplies the attribute —
+       so the disabled attribute array keeps its GL default of (0,0,0,1), color_fragment multiplies
+       diffuseColor by it, and every node renders BLACK on a near-black deck.
+
+       This is ascent.js's lesson word for word ("every instanceColor buffer must exist before the
+       first draw, or three hands the shader zeros") in a second channel, and it was latent until
+       this pass: placeNear()'s old MEGA test was unsatisfiable, so the nodes had never drawn at all.
+       The first render that placed them was the first render that could show they were black. */
+    const nodeMat = rimMat.clone();
+    nodeMat.vertexColors = false; nodeMat.name = 'halo-near-node';
+    owned.materials.push(nodeMat);
+    nearNodes = new THREE.InstancedMesh(nodeGeo, nodeMat, Math.ceil(COUNT * T * T / (HALO.MEGA * HALO.MEGA)) + 8);
     nearNodes.name = 'halo-near-nodes'; nearNodes.frustumCulled = false;
     nearNodes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     group.add(nearNodes); stats.draws++;
