@@ -23,11 +23,16 @@ import { softMass, signTexture, diamondOutline, chamferBox, windowGrid } from '.
      MAH MATCH   furthest, centre — DOMINANT and vertical, a tower rising far above both
 
    Ground aprons, plaza routes and the life network all read this table, so the site plan is one
-   fact in one place. Distance from the marker is deliberate: 48 m, 62 m, 66 m — near, mid, far. */
+   fact in one place. Distance from the marker is deliberate — near, mid, far — but v5's separation was
+   DEPTH ONLY: measured from the arrival camera the three facilities overlapped in bearing, and their
+   side wings physically collided (gym wing 0.40 m from MAH MATCH's apron; MAH MATCH's apron overlapping
+   the market's wing). v6 pushes them apart LATERALLY as well and grows their secondary mass backward
+   instead of sideways, so each facility has its own territory and the ground between them is free for
+   courtyards, planting and paths (§05). */
 export const SITES = Object.freeze({
-  gym:    { x: -46, z: -14, rotY: 0.52,  W: 40, H: 13, D: 24, openW: 18, openH: 8,  E: 4,   R: 12, radius: 2.6, floorY: 0,   approach: [-30, -6] },
-  market: { x: 50,  z: -36, rotY: -0.52, W: 38, H: 15, D: 24, openW: 22, openH: 7,  E: 2.5, R: 12, radius: 3.4, floorY: 0,   approach: [32, -22] },
-  match:  { x: 0,   z: -66, rotY: 0,     W: 44, H: 38, D: 30, openW: 18, openH: 14, E: 5,   R: 22, radius: 2.0, floorY: 1.8, approach: [0, -44] }
+  gym:    { x: -58, z: -10, rotY: 0.62,  W: 38, H: 13, D: 24, openW: 18, openH: 8,  E: 4,   R: 12, radius: 3.2, floorY: 0,   approach: [-36, -4] },
+  market: { x: 62,  z: -34, rotY: -0.62, W: 36, H: 15, D: 24, openW: 22, openH: 7,  E: 2.5, R: 12, radius: 4.0, floorY: 0,   approach: [38, -20] },
+  match:  { x: 0,   z: -74, rotY: 0,     W: 44, H: 38, D: 30, openW: 18, openH: 14, E: 5,   R: 22, radius: 2.6, floorY: 1.8, approach: [0, -48] }
 });
 
 /* ---- v4: merge many small parts into ONE mesh per material (draw-call discipline, brief §52) ---- */
@@ -53,8 +58,15 @@ function dressFacade(ctx, g, o) {
   const { W, H, D, openW, openH, E, floorY = 0, wings = true, canopy = true, roofKit = true, windowsUpper = true, seed = 1 } = o;
   const structural = [], trim = [], dark = [], composite = [], lit = [];
   const pierW = (W - openW) / 2;
-  /* SECONDARY — side wings: lower attached masses set back behind the pier line, each with a recessed window course */
-  if (wings) {
+  /* SECONDARY MASS — v6 §05.
+     The v4/v5 side WINGS grew each destination by 68 % of its own width, and that is what made the
+     three facilities collide: measured, MAH GYM's right wing stood 0.40 m from MAH MATCH's apron and
+     MAH MATCH's apron OVERLAPPED MAH MARKET's left wing outright. A facility that touches its
+     neighbour has no territory of its own, so the secondary mass now grows BACKWARD instead of
+     sideways — a set-back rear volume with its own window course and roof step, which reads as depth
+     from the plaza and leaves the lateral gaps open for courtyards, planting and paths.
+     `wings: true` is still honoured for any caller that wants the old behaviour. */
+  if (wings === true) {
     const wingW = W * 0.34, wingH = H * 0.58, wingD = D * 0.7;
     [-1, 1].forEach(sd => {
       const wing = new THREE.Mesh(softMass(wingW, wingH, wingD, 1.0), M.structural); wing.position.set(sd * (W / 2 + wingW / 2 - 0.6), 0, -(E + 2.4)); wing.castShadow = true; wing.receiveShadow = true; g.add(wing); ctx.colliders.push(wing);
@@ -65,6 +77,18 @@ function dressFacade(ctx, g, o) {
       part(trim, chamferBox(wingW - 0.4, 0.2, 0.3, 0.05), sd * (W / 2 + wingW / 2 - 0.6), wingH - 0.1, -(E + 2.4) + 0.35);
       part(structural, chamferBox(wingW * 0.55, 1.6, wingD * 0.5, 0.08), sd * (W / 2 + wingW / 2 - 0.6), wingH + 0.8, -(E + 2.4) - wingD * 0.35);
     });
+  } else if (wings === 'rear') {
+    const rw = W * 0.72, rh = H * 0.66, rd = D * 0.55, rz = -(E + D + rd * 0.42);
+    const rear = new THREE.Mesh(softMass(rw, rh, rd, 1.6), M.structural);
+    rear.position.set(0, 0, rz); rear.castShadow = true; rear.receiveShadow = true; g.add(rear); ctx.colliders.push(rear);
+    /* the rear volume's own courses, on its two flanks where they are seen obliquely from the plaza */
+    [-1, 1].forEach(sd => {
+      const grid = windowGrid({ cols: 4, rows: Math.max(2, Math.round(rh / 4.4)), cellW: 1.1, cellH: 1.7, gapX: 0.8, gapY: 1.2, depth: 0.1, onFraction: 0.3, seed: seed + sd + 5 });
+      grid.position.set(sd * (rw / 2 + 0.06), rh * 0.5, rz); grid.rotation.y = sd * Math.PI / 2; g.add(grid);
+      ctx.windowGrids.push(grid);
+    });
+    part(trim, chamferBox(rw + 0.4, 0.2, rd + 0.4, 0.06), 0, rh - 0.1, rz);
+    part(structural, chamferBox(rw * 0.5, 2.0, rd * 0.5, 0.14), 0, rh + 1.0, rz - rd * 0.14);
   }
   /* SECONDARY — entry canopy: a chamfered slab over the opening with a lit underside and two brackets */
   if (canopy) {
@@ -393,7 +417,7 @@ export function buildBuildings(ctx) {
     const S = SITES.gym, { W, H, D, openW, openH, E, R } = S;
     g.position.set(S.x, 0, S.z); g.rotation.y = S.rotY; scene.add(g);
     const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, radius: S.radius, glassMullions: 3 });
-    dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 1, canopy: false });   /* the broad curved canopy replaces the slab canopy */
+    dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 1, canopy: false, wings: 'rear' });   /* the broad curved canopy replaces the slab canopy */
     crystallize(ctx, g, { W, H, D, openW, E, seed: 1 });
     broadCanopy(ctx, g, { W, H, openH, seed: 1 });
     ctx.entranceLights.push(world(g, 0, openH + 1.2, 4.6));
@@ -431,7 +455,7 @@ export function buildBuildings(ctx) {
     const S = SITES.match, { W, H, D, openW, openH, E, R, floorY } = S;
     g.position.set(S.x, 0, S.z); g.rotation.y = S.rotY; scene.add(g);
     const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, floorY, radius: S.radius, roomW: 38 });
-    dressFacade(ctx, g, { W, H, D, openW, openH, E, floorY, seed: 2, canopy: false });   /* MAH MATCH keeps its own portal frame instead of a canopy */
+    dressFacade(ctx, g, { W, H, D, openW, openH, E, floorY, seed: 2, canopy: false, wings: 'rear' });   /* MAH MATCH keeps its own portal frame instead of a canopy */
     crystallize(ctx, g, { W, H, D, openW, E, floorY, seed: 2, beacon: false });
     verticalTower(ctx, g, { W, H, D, E, seed: 2 });
     action('match', 'MAH MATCH', 'destination', f.glass, world(g, 0, floorY, 2), { view: 'match-entrance', copy: 'Fighting facility: matches and practice. Choose an action at the entrance.' });
@@ -508,7 +532,7 @@ export function buildBuildings(ctx) {
     const S = SITES.market, { W, H, D, openW, openH, E, R } = S;
     g.position.set(S.x, 0, S.z); g.rotation.y = S.rotY; scene.add(g);
     const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, radius: S.radius, glassMullions: 4 });
-    dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 3, windowsUpper: false, roofKit: false });   /* the civic market: wings and canopy, terraces instead of a roof kit */
+    dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 3, windowsUpper: false, roofKit: false, wings: 'rear' });   /* the civic market: wings and canopy, terraces instead of a roof kit */
     crystallize(ctx, g, { W, H, D, openW, E, seed: 3, beacon: false, crown: false });   /* the terraces ARE the roof line */
     terraces(ctx, g, { W, H, D, E, seed: 3 });
     action('market', 'MAH MARKET', 'destination', f.glass, world(g, 0, 0, 2), { view: 'market-entrance', copy: 'World marketplace. Preview navigation only: nothing is for sale here and no prices exist.' });

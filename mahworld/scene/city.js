@@ -38,16 +38,16 @@ const WHITE = 0xdde8ff;
    from the arrival cameras (see the establishing view) — x, z, footprint w × d, total height h,
    setback fraction sb, which side face also gets windows, rooftop pad kind --------------------- */
 const BLOCKS = [
-  { id: 'L1', x: -84,  z: -62,  w: 22, d: 18, h: 34, sb: 0.25, side: 1 },
-  { id: 'L2', x: -118, z: -118, w: 30, d: 24, h: 62, sb: 0.30, side: 1 },
+  { id: 'L1', x: -104, z: -46,  w: 22, d: 18, h: 34, sb: 0.25, side: 1 },
+  { id: 'L2', x: -150, z: -96,  w: 30, d: 24, h: 62, sb: 0.30, side: 1 },
   { id: 'L3', x: -62,  z: -150, w: 26, d: 22, h: 56, sb: 0.28, side: 0, pad: 'training', elevator: true },
-  { id: 'L4', x: -84,  z: -124, w: 18, d: 16, h: 46, sb: 0,    side: 1, pad: 'levitate', rot: 0 },
-  { id: 'C1', x: 0,    z: -168, w: 34, d: 26, h: 66, sb: 0.30, side: 0 },
+  { id: 'L4', x: -112, z: -148, w: 18, d: 16, h: 46, sb: 0,    side: 1, pad: 'levitate', rot: 0 },
+  { id: 'C1', x: -26,  z: -186, w: 30, d: 24, h: 54, sb: 0.30, side: 0 },   /* off the centre sightline: the portrait hero must see sky above MAH MATCH */
   { id: 'C2', x: -38,  z: -196, w: 24, d: 22, h: 70, sb: 0.25, side: 0 },
   { id: 'C3', x: 44,   z: -190, w: 28, d: 22, h: 64, sb: 0.30, side: 0 },
-  { id: 'R1', x: 92,   z: -56,  w: 20, d: 18, h: 30, sb: 0,    side: -1 },
+  { id: 'R1', x: 106,  z: -50,  w: 20, d: 18, h: 30, sb: 0,    side: -1 },
   { id: 'R2', x: 116,  z: -112, w: 28, d: 24, h: 50, sb: 0.30, side: -1, pad: 'training' },
-  { id: 'R3', x: 56,   z: -152, w: 24, d: 20, h: 52, sb: 0.28, side: 0, pad: 'levitate' },
+  { id: 'R3', x: 74,   z: -164, w: 24, d: 20, h: 52, sb: 0.28, side: 0, pad: 'levitate' },
   { id: 'R4', x: 84,   z: -126, w: 18, d: 16, h: 42, sb: 0,    side: -1, pad: 'training', rot: 0 },
   { id: 'F1', x: -108, z: -22,  w: 22, d: 18, h: 26, sb: 0,    side: 1 },
   { id: 'F2', x: 114,  z: -10,  w: 20, d: 16, h: 22, sb: 0,    side: -1 },
@@ -64,27 +64,42 @@ const BRIDGES = [
   { id: 'city-bridge-r4-r2', ax: 92.5,  az: -124,   bx: 107.5,  bz: -124,   y: 30, width: 3.2 }
 ];
 /* background towers: bearing a° (x = r cos a, z = −r sin a), radius r, height, width, archetype, strips */
+/* ---- v6 §09 / §11 THE THREE VALLEYS ------------------------------------------------------------
+   The v5 skyline formed one continuous wall: the widest hole anywhere in the arrival frame was 3.4°,
+   and the PORTRAIT arrival frame — the hero composition — had ZERO open sky to the horizon. Towers and
+   slabs standing in three chosen bearing ranges have been removed so the eye can see THROUGH the city
+   to the mountains behind it. The valleys, in this table's polar convention (the arrival camera looks
+   along bearing ~90°, the frame spans roughly 50°–130°):
+
+     RIGHT VALLEY   52°– 72°   framed by the towers at 44° and 75°
+     CENTRE VALLEY 108°–124°   the widest, directly left of MAH MATCH's tower
+     LEFT VALLEY   128°–142°   framed by the towers at 120° and 145°
+
+   Nothing was moved into the valleys to compensate. Open sky IS the feature. */
 const TOWERS = [
-  [104, 300, 128, 22, 'A', 2], [109, 330, 96, 18, 'B', 1], [113, 285, 74, 16, 'C', 1], [100, 340, 150, 24, 'A', 2],
-  [66, 290, 108, 20, 'D', 1], [71, 330, 86, 17, 'B', 1], [75, 300, 62, 15, 'C', 1], [62, 355, 136, 22, 'A', 2],
-  [81, 450, 160, 26, 'A', 2], [103, 470, 158, 24, 'B', 1], [89, 520, 120, 28, 'D', 1],
-  [138, 260, 58, 15, 'C', 1], [128, 330, 124, 20, 'A', 1], [145, 400, 90, 19, 'B', 1], [120, 400, 136, 21, 'A', 2],
-  [52, 260, 66, 16, 'C', 1], [44, 330, 112, 21, 'A', 2], [56, 420, 130, 22, 'D', 1], [36, 450, 96, 20, 'B', 1], [48, 500, 148, 26, 'A', 2],
+  [104, 300, 128, 22, 'A', 2], [100, 340, 150, 24, 'A', 2],
+  [75, 300, 62, 15, 'C', 1],
+  [81, 450, 160, 26, 'A', 2], [103, 470, 158, 24, 'B', 1],
+  [145, 400, 90, 19, 'B', 1], [120, 400, 136, 21, 'A', 2],
+  [44, 330, 112, 21, 'A', 2], [36, 450, 96, 20, 'B', 1],
   [18, 300, 70, 18, 'C', 1], [8, 380, 90, 20, 'B', 1], [160, 320, 80, 18, 'A', 1], [172, 400, 100, 22, 'D', 1], [150, 480, 118, 22, 'A', 1], [25, 480, 124, 24, 'A', 2],
-  [58, 285, 74, 16, 'B', 1],
   /* ---- v5 §09 MEGATALL: the skyline needs a top the eye can climb to. These are 2–3× the tallest
      v4 tower, set at four different radii so they overlap each other and the towers in front of them —
      height parallax, not a flat cut-out row. Three new crowns (stepped + spire, notched twin blade,
      crystalline pinnacle) so no two megatalls end the same way. --------------------------------- */
-  [96, 470, 340, 34, 'E', 2], [70, 545, 296, 30, 'G', 1], [118, 430, 268, 30, 'F', 2],
-  [46, 505, 312, 32, 'E', 2], [30, 420, 236, 27, 'G', 1], [140, 540, 288, 31, 'F', 1],
-  [82, 380, 214, 26, 'G', 1], [58, 600, 366, 38, 'E', 2], [108, 625, 330, 35, 'F', 2],
-  [12, 560, 258, 28, 'E', 1], [156, 455, 226, 27, 'G', 1], [88, 665, 392, 40, 'E', 2]
+  /* MEGATALLS are LANDMARKS, not a wall: a few dominant towers read better than fifty competing ones
+     (§24). Eight remain, all clear of the three valleys, at four radii so they overlap in depth. */
+  [96, 470, 340, 34, 'E', 2], [46, 505, 312, 32, 'E', 2],
+  [82, 380, 214, 26, 'G', 1], [30, 420, 236, 27, 'G', 1],
+  [12, 560, 258, 28, 'E', 1], [156, 455, 226, 27, 'G', 1],
+  [88, 665, 392, 40, 'E', 2], [100, 780, 300, 33, 'F', 1]
 ];
 /* distant slabs: bearing, radius, width, height, depth, rotation */
+/* distant slabs: bearing, radius, width, height, depth, rotation. The 62°, 112° and 140° slabs were
+   the ones closing the three valleys and are gone; the rest keep the far layer populated. */
 const SLABS = [
-  [30, 700, 60, 210, 30, 0.3], [40, 820, 70, 260, 34, -0.2], [62, 760, 46, 180, 26, 0.6], [78, 830, 54, 230, 28, 0.1],
-  [95, 640, 40, 150, 24, -0.4], [112, 720, 64, 240, 30, 0.2], [140, 600, 50, 200, 26, 0.0], [15, 620, 56, 220, 28, 0.4]
+  [30, 700, 60, 210, 30, 0.3], [40, 820, 70, 260, 34, -0.2], [78, 830, 54, 230, 28, 0.1],
+  [95, 640, 40, 150, 24, -0.4], [15, 620, 56, 220, 28, 0.4], [166, 690, 48, 190, 26, 0.25]
 ];
 
 /* ---- small deterministic helpers ------------------------------------------------------------ */
@@ -129,12 +144,37 @@ export function buildCity(ctx) {
   const winMat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: true, fog: true }); winMat.name = 'city-windows';
   const stripMat = new THREE.MeshBasicMaterial({ color: theme.energy, toneMapped: true, fog: true }); stripMat.name = 'city-energy';
   const whiteMat = new THREE.MeshBasicMaterial({ color: WHITE, toneMapped: true, fog: true }); whiteMat.name = 'city-lights';
-  const farMat = new THREE.MeshBasicMaterial({ color: 0x0a1322, fog: true }); farMat.name = 'city-distant';
-  const groundMat = new THREE.MeshBasicMaterial({ color: 0x0c121d, fog: true }); groundMat.name = 'city-ground';
-  owned.materials.push(winMat, stripMat, whiteMat, farMat, groundMat);
+  /* v6 §07 / §08 / §25 / §44 — THE BACKGROUND MATERIAL FAMILIES.
+     In v5, twenty-six of thirty-nine towers wore one of two materials, and all twelve distant
+     silhouettes were a single flat 0x0a1322. Material is the only depth cue a silhouette has left, so
+     the whole background flattened into one cut-out plane. These four families give the skyline
+     separation the way a real one gets it — not by painting buildings different colours, but by
+     building them out of different METALS AND GLASS that answer the same moonlight differently.
+     Colour comes from material response, never from flat paint (§08). */
+  const towerFamilies = {
+    /* bright platinum + blue glass: the landmarks, and the closest band, so they read first */
+    platinum: new THREE.MeshStandardMaterial({ color: 0x9aabc4, roughness: 0.28, metalness: 0.94, envMapIntensity: 2.0 }),
+    /* dark crystalline glass + silver ribs: reads almost black on a turned-away plane, bright where it catches */
+    glass: new THREE.MeshStandardMaterial({ color: 0x25406b, roughness: 0.1, metalness: 0.55, envMapIntensity: 2.4, flatShading: true }),
+    /* soft graphite: the quiet mass that lets the other two read */
+    graphite: new THREE.MeshStandardMaterial({ color: 0x3a4863, roughness: 0.56, metalness: 0.82, envMapIntensity: 1.35 }),
+    /* a restrained violet-grey reflective zone: one district's material identity, never a rainbow */
+    violet: new THREE.MeshStandardMaterial({ color: 0x554e7c, roughness: 0.34, metalness: 0.76, envMapIntensity: 1.7 })
+  };
+  Object.keys(towerFamilies).forEach(k => { towerFamilies[k].name = 'city-tower-' + k; owned.materials.push(towerFamilies[k]); });
+  /* the distant layer gets THREE depth values instead of one, so 600 m and 830 m are not the same
+     paper cut-out. Unlit basic materials: at that range the fog does the rest. */
+  const farMats = [
+    new THREE.MeshBasicMaterial({ color: 0x22304a, fog: true }),
+    new THREE.MeshBasicMaterial({ color: 0x18243a, fog: true }),
+    new THREE.MeshBasicMaterial({ color: 0x111b2c, fog: true })
+  ];
+  farMats.forEach((m, i) => { m.name = 'city-distant-' + i; owned.materials.push(m); });
+  const groundMat = new THREE.MeshBasicMaterial({ color: 0x141d2c, fog: true }); groundMat.name = 'city-ground';
+  owned.materials.push(winMat, stripMat, whiteMat, groundMat);
 
   /* static geometry buckets, merged per material at the end */
-  const B = { structural: [], composite: [], trim: [], strips: [], whites: [], far: [] };
+  const B = { structural: [], composite: [], trim: [], strips: [], whites: [], far: [], far0: [], far1: [], far2: [] };
   const kitBoxes = [], kitMasts = [];        /* instanced roof kit matrices */
   const stats = { blocks: 0, bridges: 0, towers: 0, giants: 0, windows: 0, windowGrids: 0, pads: 0, paths: 0, drawCalls: 0, triangles: 0 };
   let elevator = null, pod = null;
@@ -286,16 +326,24 @@ export function buildCity(ctx) {
     ]))
   };
   Object.values(arch).forEach(own);
-  /* megatalls wear the brushed-platinum and satin grades: at that distance a rougher metal keeps them
-     readable as MASS, while the mirror grades would flare into featureless white */
-  const towerMats = { A: structuralM, B: panelM, C: compositeM, D: structuralM,
-    E: (M.platinumBrushed || structuralM), F: (M.graphiteMetal || compositeM), G: (M.panel || panelM) };
-  const byArch = { A: [], B: [], C: [], D: [], E: [], F: [], G: [] };
+  /* Every tower is assigned a MATERIAL FAMILY independently of its archetype, so a shape and a surface
+     are two separate variables and the skyline reads as a mixed city rather than a sorted one. The
+     assignment is deterministic and hand-checked against the TOWERS table so no two adjacent bearings
+     share a family. Instancing still costs one draw call per (archetype × family) pair actually used. */
+  const FAMILY_OF = (a, r, type) => {
+    if (type === 'E' || type === 'G') return r > 520 ? 'glass' : 'platinum';   /* megatalls are landmarks: they read first */
+    if (type === 'F') return 'graphite';
+    const k = (Math.round(a) * 7 + Math.round(r / 10) * 3) % 10;
+    return k < 3 ? 'platinum' : k < 6 ? 'glass' : k < 8 ? 'graphite' : 'violet';
+  };
+  const byArch = {};                       /* 'ARCH|family' -> matrices */
+  const archKey = (type, fam) => type + '|' + fam;
   const boxStrips = [], hexStrips = [];
   const Rt = rng(SEED + 77);
   TOWERS.forEach(([a, r, h, w, type, strips]) => {
     const [x, z] = polar(a, r), ry = Rt() * Math.PI * 2;
-    byArch[type].push(matrixOf(x, 0, z, ry, w, h, w).clone());
+    const key = archKey(type, FAMILY_OF(a, r, type));
+    (byArch[key] || (byArch[key] = [])).push(matrixOf(x, 0, z, ry, w, h, w).clone());
     for (let k = 0; k < strips; k++) {
       const f = strips === 1 ? 0.55 + Rt() * 0.25 : 0.35 + k * 0.3 + Rt() * 0.12, y = f * h;
       if (type === 'A') { const rr = 0.72 + (0.60 - 0.72) * f, side = rr * Math.SQRT2 * w * 1.02; boxStrips.push(matrixOf(x, y, z, ry + Math.PI / 4, side, 1.1, side).clone()); }
@@ -309,28 +357,39 @@ export function buildCity(ctx) {
     stats.towers++;
   });
   const instanced = (geo, material, mats, name) => { if (!mats.length) return null; const im = new THREE.InstancedMesh(geo, material, mats.length); mats.forEach((m, i) => im.setMatrixAt(i, m)); im.instanceMatrix.needsUpdate = true; im.name = name; group.add(im); return im; };
-  Object.keys(arch).forEach(k => instanced(arch[k], towerMats[k], byArch[k], 'city-towers-' + k));
+  Object.keys(byArch).forEach(k => { const [type, fam] = k.split('|'); instanced(arch[type], towerFamilies[fam], byArch[k], 'city-towers-' + type + '-' + fam); });
   instanced(own(new THREE.BoxGeometry(1, 1, 1)), stripMat, boxStrips, 'city-tower-strips');
   instanced(own(faceted(new THREE.CylinderGeometry(1, 1, 1, 6, 1, true))), stripMat, hexStrips, 'city-tower-strips-hex');
 
   /* ---------------------------------------------------------------- 3. distant silhouettes */
   const distant = new THREE.Group(); distant.name = 'city-distant'; group.add(distant);
   {
-    const F = B.far;
-    let [x, z] = polar(50, 720); F.push(xform(new THREE.CylinderGeometry(50, 90, 330, 4, 1), x, 165, z, 0.4));            /* the colossal tapered form */
-    [x, z] = polar(70, 680);                                                                                                 /* the suspended ring on two pylons */
-    F.push(xform(new THREE.TorusGeometry(115, 7, 6, 44).rotateX(1.25), x, 210, z, 0.1));
-    F.push(xform(new THREE.BoxGeometry(10, 200, 10), x - 64, 100, z + 6)); F.push(xform(new THREE.BoxGeometry(10, 200, 10), x + 66, 100, z - 6));
-    [x, z] = polar(128, 640); F.push(xform(new THREE.BoxGeometry(90, 320, 34), x, 160, z, 0.5));                           /* a tall slab above the ridge line */
-    [x, z] = polar(100, 780);                                                                                                /* a high platform on slim pylons */
-    F.push(xform(new THREE.BoxGeometry(210, 14, 70), x, 232, z, 0.15));
-    [-80, 0, 80].forEach(o => F.push(xform(new THREE.BoxGeometry(8, 232, 8), x + o * Math.cos(0.15), 116, z - o * Math.sin(0.15))));
-    SLABS.forEach(([a, r, w, h, d, ry]) => { const [sx, sz] = polar(a, r); F.push(xform(new THREE.BoxGeometry(w, h, d), sx, h / 2, sz, ry)); });
+    /* v6 §44: the distant layer is sorted into THREE depth bands by radius and drawn in three values.
+       A form at 620 m and a form at 830 m used to be the same 0x0a1322, which is why the far layer read
+       as one paper cut-out; giving them different values restores aerial perspective before the fog
+       even acts. Each band is one merged mesh, so this costs two extra draw calls in total.
+       Distant forms are also CHAMFERED now: eight un-bevelled black rectangles on the horizon was
+       exactly the repeated-box read the brief objects to. */
+    const band = r => (r < 660 ? B.far0 : r < 760 ? B.far1 : B.far2);
+    let [x, z] = polar(50, 720); band(720).push(xform(new THREE.CylinderGeometry(50, 90, 330, 4, 1), x, 165, z, 0.4));   /* the colossal tapered form */
+    [x, z] = polar(70, 680);                                                                                             /* the suspended ring on two pylons */
+    band(680).push(xform(new THREE.TorusGeometry(115, 7, 6, 44).rotateX(1.25), x, 210, z, 0.1));
+    band(680).push(xform(chamferBox(10, 200, 10, 1.6), x - 64, 100, z + 6)); band(680).push(xform(chamferBox(10, 200, 10, 1.6), x + 66, 100, z - 6));
+    [x, z] = polar(128, 640); band(640).push(xform(chamferBox(90, 320, 34, 4), x, 160, z, 0.5));                          /* a tall slab above the ridge line */
+    [x, z] = polar(100, 780);                                                                                            /* a high platform on slim pylons */
+    band(780).push(xform(chamferBox(210, 14, 70, 2.4), x, 232, z, 0.15));
+    [-80, 0, 80].forEach(o => band(780).push(xform(chamferBox(8, 232, 8, 1.2), x + o * Math.cos(0.15), 116, z - o * Math.sin(0.15))));
+    SLABS.forEach(([a, r, w, h, d, ry]) => { const [sx, sz] = polar(a, r); band(r).push(xform(chamferBox(w, h, d, Math.min(4, w / 6)), sx, h / 2, sz, ry)); });
     stats.giants = 4 + SLABS.length;
-    const far = new THREE.Mesh(own(mergeGeos(F)), farMat); far.name = 'city-distant-forms'; far.frustumCulled = false; distant.add(far);
+    [B.far0, B.far1, B.far2].forEach((F, i) => {
+      if (!F.length) return;
+      const far = new THREE.Mesh(own(mergeGeos(F)), farMats[i]); far.name = 'city-distant-forms-' + i; far.frustumCulled = false; distant.add(far);
+    });
   }
-  /* the district ground: a dark annulus from the plaza slab's edge to the horizon so the far layers stand on something */
-  const ground = new THREE.Mesh(own(new THREE.RingGeometry(126, 900, 72, 1)), groundMat); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.08; ground.name = 'city-ground'; ground.frustumCulled = false; group.add(ground);
+  /* The district ground: an annulus from the plaza slab's edge out to the horizon. It stops at 620 m
+     now rather than 900 — beyond that the terrain module owns the world, and the city's ground plane
+     must not paint over the natural land or the mountains standing behind it (§10, §41). */
+  const ground = new THREE.Mesh(own(new THREE.RingGeometry(126, 620, 72, 1)), groundMat); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.08; ground.name = 'city-ground'; ground.frustumCulled = false; group.add(ground);
 
   /* ---------------------------------------------------------------- merges and instances */
   const merged = (list, material, name, shadow) => { if (!list.length) return null; const m = new THREE.Mesh(own(mergeGeos(list)), material); m.name = name; if (shadow) m.castShadow = true; group.add(m); return m; };
@@ -390,7 +449,9 @@ export function buildCity(ctx) {
 
   /* cost bookkeeping (what the establishing view can at most draw from this module) */
   group.traverse(o => { if (o.isMesh && o.geometry) { const g = o.geometry, n = g.index ? g.index.count : g.attributes.position.count; stats.triangles += Math.round(n / 3) * (o.isInstancedMesh ? o.count : 1); stats.drawCalls++; } });
-  stats.materials = ['structural', 'composite', 'trimSatin', 'panel', 'MeshBasic: windows / energy lines / lights / distant / ground'];
+  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'MeshBasic: windows / energy lines / lights / 3 distant bands / ground'];
+  stats.towerFamilies = Object.keys(byArch).reduce((o, k) => { const f = k.split('|')[1]; o[f] = (o[f] || 0) + byArch[k].length; return o; }, {});
+  stats.valleys = ['52-72 deg right', '108-124 deg centre', '128-142 deg left'];
   setTime(ctx.clock && typeof ctx.clock.state === 'function' ? ctx.clock.state() : last);
   update(0);
   return { group, setTime, setTheme, update, dispose, stats, setQuality, anchors: { paths: anchors.paths.filter(p => /^city-/.test(p.id)), pads: anchors.pads.filter(p => /^city-/.test(p.id)) } };

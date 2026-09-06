@@ -27,22 +27,25 @@ export const VIEWS = {
   /* v5 §16: the three sites now stand at three depths across a much wider frontage, so the arrival
      camera stands further back on a narrower lens — the whole site plan reads, nothing is clipped, and
      the vertical portrait override puts the chromium floor in the lower third and the tower up top */
-  establishing:      { pos: [0.6, 3.2, 58],    look: [0, 17, -66],     fov: 50, label: 'Arrival', portrait: { pos: [0.6, 2.9, 54], look: [0, 26, -66], fov: 54 } },
-  'in-world':        { pos: [3.5, 1.9, 34],    look: [-1, 13, -66],    fov: 56, label: 'In-world', portrait: { pos: [3.5, 1.9, 34], look: [-1, 21, -66], fov: 60 } },
-  'match-approach':  { pos: [1.4, 1.9, -16],   look: [0, 14, -66],     fov: 58, label: 'Toward MAH MATCH' },
-  'match-entrance':  { pos: [0.4, 3.0, -50],   look: [0, 6.0, -78],    fov: 54, label: 'MAH MATCH entrance', portrait: { pos: [0.4, 3.4, -42], look: [0, 9.0, -78], fov: 58 } },
-  'gym-entrance':    { pos: [-21, 2.4, 1],     look: [-46, 7, -14],    fov: 56, label: 'MAH GYM entrance' },
-  'market-entrance': { pos: [27, 2.0, -14],    look: [50, 6.0, -36],   fov: 56, label: 'MAH MARKET entrance' },
+  /* v6 §45 / §46: the three facilities now stand apart LATERALLY as well as in depth, so the arrival
+     camera stands further back on a narrower lens — the whole ecosystem reads, with real gaps between
+     the facilities and open sky through the skyline valleys down to the mountains behind. */
+  establishing:      { pos: [0.6, 3.4, 84],    look: [0, 20, -74],     fov: 44, label: 'Arrival', portrait: { pos: [0.6, 3.1, 76], look: [0, 30, -74], fov: 48 } },
+  'in-world':        { pos: [3.5, 1.9, 40],    look: [-1, 14, -74],    fov: 52, label: 'In-world', portrait: { pos: [3.5, 1.9, 40], look: [-1, 23, -74], fov: 56 } },
+  'match-approach':  { pos: [1.4, 1.9, -18],   look: [0, 15, -74],     fov: 58, label: 'Toward MAH MATCH' },
+  'match-entrance':  { pos: [0.4, 3.0, -58],   look: [0, 6.0, -86],    fov: 54, label: 'MAH MATCH entrance', portrait: { pos: [0.4, 3.4, -50], look: [0, 9.0, -86], fov: 58 } },
+  'gym-entrance':    { pos: [-30, 2.4, 10],    look: [-58, 7, -10],    fov: 56, label: 'MAH GYM entrance' },
+  'market-entrance': { pos: [34, 2.0, -12],    look: [62, 6.5, -34],   fov: 56, label: 'MAH MARKET entrance' },
   residents:         { pos: [2.2, 1.7, 20.5],  look: [-0.6, 1.2, 12],  fov: 50, label: 'Residents' },
   appearance:        { pos: [0.8, 2.7, 26],    look: [0.2, 1.3, 12],   fov: 52, label: 'Appearance check' },
   'sky-plant':       { pos: [-11.5, 1.5, 28],  look: [-15, 4.5, 18],   fov: 54, label: 'Plant and sky' },
-  practice:          { pos: [-10.5, 4.0, -84],  look: [-7, 2.4, -90],   fov: 54, label: 'Practice zone' },   /* from above the left tier, nothing between the camera and the marks */
-  'gym-side':        { pos: [-8, 2.0, 18],     look: [-44, 7, -14],    fov: 56, label: 'Gym side' },
-  'market-side':     { pos: [8, 2.0, 18],      look: [46, 8, -36],     fov: 56, label: 'Market side' },
+  practice:          { pos: [-10.5, 4.0, -92],  look: [-7, 2.4, -98],   fov: 54, label: 'Practice zone' },   /* from above the left tier, nothing between the camera and the marks */
+  'gym-side':        { pos: [-8, 2.0, 22],     look: [-56, 8, -10],    fov: 56, label: 'Gym side' },
+  'market-side':     { pos: [8, 2.0, 22],      look: [58, 9, -34],     fov: 56, label: 'Market side' },
   /* v4 review views */
   skyline:           { pos: [2, 2.4, 38],      look: [-8, 40, -280],   fov: 62, label: 'Skyline' },
   'plaza-node':      { pos: [-24, 2.0, 16],    look: [8, 3, -20],      fov: 58, label: 'Plaza node' },
-  'match-hall':      { pos: [-10, 4.0, -74],   look: [2, 2.6, -84],    fov: 60, label: 'MAH MATCH hall' }
+  'match-hall':      { pos: [-10, 4.0, -82],   look: [2, 2.6, -92],    fov: 60, label: 'MAH MATCH hall' }
 };
 export const TOUR = ['establishing', 'in-world', 'match-entrance'];
 export const AVATAR_COLOURS = ['purple', 'green', 'blue', 'red', 'silver', 'teal', 'violet', 'emerald', 'crimson', 'platinum'];
