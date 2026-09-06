@@ -46,11 +46,16 @@ const ROUTES = [
 const NODES = [[-16, 6], [17, 4]];
 /* masts sit inside the plaza, never in the arrival camera's near foreground (z ≳ 24 at the edges reads
    as a pillar across the lens) and never in front of a destination sign */
-const MASTS = [[-13, 20], [13, 20], [-26, 16], [26, 16], [-10, -12], [10, -12], [-27, -25], [27, -25], [-34, -14], [34, -14]];
+const MASTS = [[-13, 20], [13, 20], [-26, 16], [26, 16], [-10, -12], [10, -12], [-27, -25], [27, -25], [-34, -14], [34, -14],
+  [-20, 30], [20, 30], [-36, 2], [36, 2], [-18, -28], [18, -28]];
+/* the deck the plaza is laid on: ground.js lays 9 m chromium diamond cells whose tops sit here */
+const DECK = 0.17;
 
 export function buildDressing(ctx) {
   const M = ctx.M, THREEJS = THREE;
   const group = new THREE.Group(); group.name = 'plaza-dressing';
+  /* the whole dressing stands ON the laid chromium floor, not on the raw ground plane */
+  group.position.y = DECK;
   const owned = [];
   const own = g => { owned.push(g); return g; };
   ctx.colliders = ctx.colliders || [];
@@ -97,25 +102,38 @@ export function buildDressing(ctx) {
   }
 
   /* ---- 3. LIGHT MASTS: instanced pole + square-diamond luminaire + light pool -- */
-  const poleGeo = own(new THREE.CylinderGeometry(0.13, 0.17, 5.6, 8));
+  /* v5 PREMIUM LAMP (brief §12): not a stick with a dot on it. A tapered satin-chromium column on a
+     mirror-grade base collar, a machined mid collar, a cantilevered head bracket, a mirror shade, and the
+     square-diamond luminaire beneath it throwing a soft pool. Poles / shades / luminaires are instanced;
+     the collars and brackets merge into the trim mesh. */
+  const poleGeo = own(new THREE.CylinderGeometry(0.10, 0.21, 6.4, 10));
   const headGeo = own(new THREE.OctahedronGeometry(0.34, 0));
-  const poles = new THREE.InstancedMesh(poleGeo, M.trimSatin, MASTS.length);
+  const shadeGeo = own(new THREE.CylinderGeometry(0.62, 0.30, 0.34, 8));
+  const poles = new THREE.InstancedMesh(poleGeo, M.chromeSatin || M.trimSatin, MASTS.length);
   const heads = new THREE.InstancedMesh(headGeo, M.energyLight, MASTS.length);
-  poles.castShadow = true;
-  const poolMat = new THREE.MeshBasicMaterial({ map: blobTexture(), color: (ctx.theme && ctx.theme.energy) || 0x7fc6ff, transparent: true, opacity: 0.11, blending: THREE.AdditiveBlending, depthWrite: false });
+  const shades = new THREE.InstancedMesh(shadeGeo, M.chromeMirror || M.trim, MASTS.length);
+  poles.castShadow = true; shades.castShadow = true;
+  const poolMat = new THREE.MeshBasicMaterial({ map: blobTexture(), color: (ctx.theme && ctx.theme.energy) || 0x7fc6ff, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false });
   pools.push(poolMat);
-  const poolGeo = own(new THREE.PlaneGeometry(9, 9));
+  const poolGeo = own(new THREE.PlaneGeometry(10, 10));
   const poolMesh = new THREE.InstancedMesh(poolGeo, poolMat, MASTS.length);
   poolMesh.renderOrder = 6;
   MASTS.forEach(([x, z], i) => {
-    _p.set(x, 2.8, z); _q.identity(); _m4.compose(_p, _q, _s); poles.setMatrixAt(i, _m4);
-    _p.set(x, 5.8, z); _e.set(0, Math.PI / 4, 0); _q.setFromEuler(_e); _s.set(1, 1.5, 0.42); _m4.compose(_p, _q, _s); heads.setMatrixAt(i, _m4); _s.set(1, 1, 1);
+    const face = Math.atan2(-x, -z);                       /* every lamp turns its head toward the marker */
+    _p.set(x, 3.2, z); _q.identity(); _m4.compose(_p, _q, _s); poles.setMatrixAt(i, _m4);
+    _p.set(x, 6.28, z); _e.set(0, face, 0); _q.setFromEuler(_e); _m4.compose(_p, _q, _s); shades.setMatrixAt(i, _m4);
+    _p.set(x, 5.86, z); _e.set(0, Math.PI / 4, 0); _q.setFromEuler(_e); _s.set(0.95, 1.5, 0.4); _m4.compose(_p, _q, _s); heads.setMatrixAt(i, _m4); _s.set(1, 1, 1);
     _p.set(x, 0.05, z); _e.set(-Math.PI / 2, 0, 0); _q.setFromEuler(_e); _m4.compose(_p, _q, _s); poolMesh.setMatrixAt(i, _m4);
+    /* base plinth, mirror foot ring, machined mid collar, head bracket */
+    part(dark, chamferBox(0.86, 0.30, 0.86, 0.06), x, 0.15, z, Math.PI / 4);
+    part(trim, chamferBox(0.96, 0.06, 0.96, 0.02), x, 0.32, z, Math.PI / 4);
+    part(trim, chamferBox(0.38, 0.10, 0.38, 0.025), x, 3.9, z, Math.PI / 4);
+    part(trim, chamferBox(0.14, 0.14, 0.62, 0.03), x, 6.44, z, face);
     /* the mast is something the camera must not walk into */
-    const col = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 0.5), M.trimSatin);
-    col.position.set(x, 3, z); col.visible = false; group.add(col); ctx.colliders.push(col);
+    const col = new THREE.Mesh(new THREE.BoxGeometry(0.6, 6.6, 0.6), M.trimSatin);
+    col.position.set(x, 3.3, z); col.visible = false; group.add(col); ctx.colliders.push(col);
   });
-  [poles, heads, poolMesh].forEach(m => { m.instanceMatrix.needsUpdate = true; group.add(m); });
+  [poles, shades, heads, poolMesh].forEach(m => { m.instanceMatrix.needsUpdate = true; group.add(m); });
   luminaires.push(heads);
 
   /* ---- 4. CORRIDOR EDGES: rails, bollards, barrier segments ------------------- */
@@ -171,9 +189,9 @@ export function buildDressing(ctx) {
     if (shadow) m.castShadow = true; if (receive) m.receiveShadow = true;
     group.add(m); return m;
   };
-  add(slab, M.graphiteLight, 'dressing-paths', false, true);
+  add(slab, M.platinumBrushedH || M.graphiteLight, 'dressing-paths', false, true);
   add(curb, M.curb, 'dressing-curbs', true, true);
-  add(trim, M.trimSatin, 'dressing-trim', false, false);
+  add(trim, M.chromeMirror || M.trim, 'dressing-trim', false, false);
   add(dark, M.structural, 'dressing-structures', true, true);
 
   const stats = { masts: MASTS.length, routes: ROUTES.length, nodes: NODES.length, colliders: ctx.colliders.length, drawCalls: 0 };
@@ -183,14 +201,14 @@ export function buildDressing(ctx) {
   function setTime(s) {
     daylight = s ? s.daylight : daylight;
     const k = 1 - 0.7 * daylight;
-    poolMat.opacity = 0.11 * k;
+    poolMat.opacity = 0.13 * k;
     return s;
   }
   function setTheme(t) { if (t && t.energy != null) poolMat.color.setHex(t.energy); return t; }
   function update(t) {
     /* one very slow breath so the pools are not perfectly static at night; imperceptible by day */
     breath = 0.94 + Math.sin(t * 0.3) * 0.06;
-    poolMat.opacity = 0.11 * (1 - 0.7 * daylight) * breath;
+    poolMat.opacity = 0.13 * (1 - 0.7 * daylight) * breath;
   }
   function dispose() {
     if (group.parent) group.parent.remove(group);

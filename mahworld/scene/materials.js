@@ -1,11 +1,19 @@
 /* MAHPLAZA :: MATERIALS + THEMES
 
-   One place for the world's surface language so every module agrees:
-   graphite / dark platinum architecture, faceted crystalline panels, cool
-   glass, and ENERGY (signage, seams, markers, vegetation stems) in the
-   viewing player's world Theme. Time of day only scales emissive strength;
-   it never changes a hue. There is no yellow, amber or orange anywhere in
-   this file — the brightest light is blue energy pushed toward white.
+   One place for the world's surface language so every module agrees.
+
+   v5 — THE CHROMIUM CIVILIZATION. MAHWORLD is built from chromium, dark
+   platinum, polished crystal, reflective glass and MAHGIC light. A finish is a
+   ROUGHNESS, not a hue: `chromeMirror`, `chromeSatin`, `platinumBrushed`,
+   `graphiteMetal` and `crystalGlass` are the same cool neutral metal read at
+   five different polishes, so the world stays one civilization. They are ranked
+   by how much of it may wear them — mirror is rare and focal, graphite is
+   everywhere. This does NOT mean every surface becomes mirror chrome.
+
+   ENERGY (signage, seams, markers, vegetation stems) carries the viewing
+   player's world Theme. Time of day only scales emissive strength; it never
+   changes a hue. There is no yellow, amber or orange anywhere in this file —
+   the brightest light is blue energy pushed toward white.
 
    The Theme is LOCAL TO THE VIEWER: it recolours the environment's energy,
    never a resident (residents carry their own player's colour). */
@@ -24,16 +32,21 @@ export function resolveTheme(nameOrTheme) {
   return THEMES[String(nameOrTheme || 'canonical').toLowerCase()] || THEMES.canonical;
 }
 
-/* Fixed world neutrals (the architecture does not follow the Theme). */
+/* Fixed world neutrals (the architecture does not follow the Theme).
+   v5: every value moved up a step out of near-black. MAHWORLD is a chromium civilization at
+   night — its darks are dark METAL, which returns light, not black plastic which swallows it. */
 export const NEUTRALS = Object.freeze({
-  graphite: 0x1b2433,      /* main building mass */
-  graphiteDark: 0x121a27,  /* recesses, undersides */
-  graphiteLight: 0x2a3549, /* aprons, sidewalks, sills */
-  platinum: 0x9aa7bb,      /* bright metal catches */
-  panel: 0x22304a,         /* faceted crystalline wall panels */
-  plaza: 0x0f1521,         /* polished plaza ground */
-  road: 0x0c1119,          /* smooth roadway */
-  glassTint: 0x1c2c48,
+  graphite: 0x2c3a50,      /* main building mass */
+  graphiteDark: 0x1f2a3c,  /* recesses, undersides */
+  graphiteLight: 0x3d4c68, /* aprons, sidewalks, sills */
+  platinum: 0xa9b8cd,      /* bright metal catches */
+  chromium: 0xdfe9f7,      /* mirror-grade chromium: focal trim and hero catches only */
+  chromiumSatin: 0xbecddf, /* satin chromium: broad structural framing */
+  platinumDark: 0x94a3ba,  /* brushed dark platinum: large secondary surfaces */
+  panel: 0x2c3c58,         /* faceted crystalline wall panels */
+  plaza: 0x18202e,         /* the hero chromium plaza ground */
+  road: 0x141b26,          /* smooth roadway */
+  glassTint: 0x2b3f60,
   interior: 0xd7e8ff       /* interior light, cool white */
 });
 
@@ -70,6 +83,53 @@ export function surfaceTexture(kind = 'floor', size = 512) {
   });
   t.colorSpace = THREE.NoColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8;
   TEX[key] = t; return t;
+}
+/* BRUSHED metal (v5): fine directional streaks. three.js multiplies material.roughness by this map, so it
+   lives near white and varies along ONE axis only — the read of a brushed platinum panel without an
+   anisotropy extension. `axis` 'v' streaks vertically (columns, masts), 'h' horizontally (spandrels, decks). */
+export function brushTexture(axis = 'v', size = 256) {
+  const key = 'brush:' + axis + ':' + size; if (TEX[key]) return TEX[key];
+  const t = canvasTexture(size, size, (c, w, h) => {
+    const R = seeded(axis === 'v' ? 5171 : 8231);
+    c.fillStyle = '#d2d2d2'; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 520; i++) {
+      const v = 176 + Math.floor(R() * 78), a = 0.05 + R() * 0.16, p = R() * (axis === 'v' ? w : h), thick = 0.5 + R() * 1.8;
+      c.strokeStyle = `rgba(${v},${v},${v},${a})`; c.lineWidth = thick;
+      c.beginPath();
+      if (axis === 'v') { c.moveTo(p, 0); c.lineTo(p + (R() - 0.5) * 2, h); } else { c.moveTo(0, p); c.lineTo(w, p + (R() - 0.5) * 2); }
+      c.stroke();
+    }
+  });
+  t.colorSpace = THREE.NoColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8;
+  TEX[key] = t; return t;
+}
+/* HERO CHROMIUM FLOOR (v5): the plaza's diamond field as a roughness map — architectural-scale diamond
+   cells with a smoother polished centre and a rougher joint line, so a single flat plane still reads as a
+   laid, jointed, super-polished chromium surface between the modelled bevels. */
+export function diamondFloorTexture(size = 1024) {
+  if (TEX.diamondFloor) return TEX.diamondFloor;
+  const t = canvasTexture(size, size, (c, w, h) => {
+    c.fillStyle = '#8a8a8a'; c.fillRect(0, 0, w, h);          /* base: already polished (roughness × 0.54) */
+    c.save(); c.translate(w / 2, h / 2); c.rotate(Math.PI / 4); c.translate(-w / 2, -h / 2);
+    const cell = size / 4;
+    /* each diamond cell: a smoother polished centre falling off toward its joints */
+    for (let r = -2; r <= 5; r++) for (let q = -2; q <= 5; q++) {
+      const x = q * cell + cell / 2, y = r * cell + cell / 2;
+      const g = c.createRadialGradient(x, y, 0, x, y, cell * 0.62);
+      g.addColorStop(0, 'rgba(86,86,86,0.85)'); g.addColorStop(0.7, 'rgba(120,120,120,0.35)'); g.addColorStop(1, 'rgba(150,150,150,0)');
+      c.fillStyle = g; c.fillRect(x - cell * 0.62, y - cell * 0.62, cell * 1.24, cell * 1.24);
+    }
+    /* the joints: a rougher line where two cells meet, and a brighter hairline in the middle of it */
+    c.strokeStyle = 'rgba(226,226,226,0.85)'; c.lineWidth = Math.max(2, size / 220);
+    for (let i = -2; i <= 6; i++) {
+      const p = i * cell;
+      c.beginPath(); c.moveTo(p, -size); c.lineTo(p, 2 * size); c.stroke();
+      c.beginPath(); c.moveTo(-size, p); c.lineTo(2 * size, p); c.stroke();
+    }
+    c.restore();
+  });
+  t.colorSpace = THREE.NoColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 16;
+  TEX.diamondFloor = t; return t;
 }
 /* soft radial blob: contact / hover shadows and light pools */
 export function blobTexture() {
@@ -117,28 +177,50 @@ export function windowGrid({ cols = 8, rows = 6, cellW = 1.2, cellH = 1.6, gapX 
 export function createMaterials(themeIn) {
   const theme = resolveTheme(themeIn);
   const floorTex = surfaceTexture('floor'), wallTex = surfaceTexture('wall');
+  const brushV = brushTexture('v'), brushH = brushTexture('h'), diamondTex = diamondFloorTexture();
   const m = {
     theme,
-    /* v4 night pass (brief §11): the neutrals sit a step higher and a touch more reflective so planes,
-       bevels and facade depth survive the dark instead of collapsing into black */
-    graphite: new THREE.MeshStandardMaterial({ color: 0x222c3d, roughness: 0.48, metalness: 0.38, roughnessMap: wallTex, envMapIntensity: 1.15 }),
-    graphiteDark: new THREE.MeshStandardMaterial({ color: 0x18202e, roughness: 0.58, metalness: 0.3, envMapIntensity: 1.0 }),
-    graphiteLight: new THREE.MeshStandardMaterial({ color: 0x33405a, roughness: 0.54, metalness: 0.26, roughnessMap: floorTex, envMapIntensity: 1.1 }),
-    platinum: new THREE.MeshStandardMaterial({ color: NEUTRALS.platinum, roughness: 0.26, metalness: 0.9 }),
-    panel: new THREE.MeshStandardMaterial({ color: NEUTRALS.panel, roughness: 0.34, metalness: 0.5, flatShading: true }),
-    /* the v4 physical family — the same dark world, differentiated by roughness and metalness, not by colour */
-    structural: new THREE.MeshStandardMaterial({ color: 0x1c2433, roughness: 0.58, metalness: 0.86, roughnessMap: wallTex, envMapIntensity: 1.3 }),   /* dark structural metal: broad muted highlight */
-    composite: new THREE.MeshStandardMaterial({ color: 0x243044, roughness: 0.36, metalness: 0.42, envMapIntensity: 1.25 }),                          /* satin graphite composite */
-    /* platinum / silver catches (brief §12): the same language as Mr. Mah's edge catches — these read as
+    /* ================= v5 CHROMIUM FINISH GRADES ==========================================
+       MAHWORLD is built from chromium and dark platinum. A finish is a ROUGHNESS, not a hue:
+       every grade below is the same cool neutral metal read at a different polish, so the
+       world stays one civilization instead of five materials. The grades are ranked by how
+       much of the world may wear them — mirror is rare, graphite is everywhere.
+
+         chromeMirror     0.03  focal trim, hero catches, floor bevels, portal frames
+         chromeSatin      0.17  broad structural framing, masts, rails, receivers
+         platinumBrushed  0.34  large secondary architectural surfaces (directional streaks)
+         graphiteMetal    0.52  structural depth, building mass, the dark that holds the light
+         crystalGlass     0.06  windows and light-transmitting sections
+       ===================================================================================== */
+    chromeMirror: new THREE.MeshStandardMaterial({ color: 0xdfe9f7, roughness: 0.03, metalness: 1.0, envMapIntensity: 2.7 }),
+    chromeSatin: new THREE.MeshStandardMaterial({ color: 0xbecddf, roughness: 0.17, metalness: 1.0, envMapIntensity: 2.1 }),
+    platinumBrushed: new THREE.MeshStandardMaterial({ color: 0x94a3ba, roughness: 0.34, metalness: 0.96, roughnessMap: brushV, envMapIntensity: 1.7 }),
+    platinumBrushedH: new THREE.MeshStandardMaterial({ color: 0x8d9bb2, roughness: 0.36, metalness: 0.96, roughnessMap: brushH, envMapIntensity: 1.6 }),
+    graphiteMetal: new THREE.MeshStandardMaterial({ color: 0x2c3a4e, roughness: 0.52, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.5 }),
+    crystalGlass: new THREE.MeshPhysicalMaterial({ color: 0x2b3f60, roughness: 0.06, metalness: 0.22, transparent: true, opacity: 0.42, side: THREE.DoubleSide, envMapIntensity: 2.0 }),
+    /* v5 midtone pass (brief §04): the neutrals move up out of near-black. The world stays a NIGHT world —
+       what changed is that its darks are now dark METAL that returns light, not black plastic. */
+    graphite: new THREE.MeshStandardMaterial({ color: 0x2c3a50, roughness: 0.42, metalness: 0.62, roughnessMap: wallTex, envMapIntensity: 1.5 }),
+    graphiteDark: new THREE.MeshStandardMaterial({ color: 0x1f2a3c, roughness: 0.52, metalness: 0.5, envMapIntensity: 1.25 }),
+    graphiteLight: new THREE.MeshStandardMaterial({ color: 0x3d4c68, roughness: 0.46, metalness: 0.46, roughnessMap: floorTex, envMapIntensity: 1.35 }),
+    platinum: new THREE.MeshStandardMaterial({ color: 0xa9b8cd, roughness: 0.2, metalness: 0.98, envMapIntensity: 2.0 }),
+    panel: new THREE.MeshStandardMaterial({ color: 0x2c3c58, roughness: 0.24, metalness: 0.66, flatShading: true, envMapIntensity: 1.7 }),
+    /* the physical family — the same dark world, differentiated by roughness and metalness, not by colour */
+    structural: new THREE.MeshStandardMaterial({ color: 0x27354a, roughness: 0.5, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.55 }),   /* dark structural metal: broad muted highlight */
+    composite: new THREE.MeshStandardMaterial({ color: 0x33435e, roughness: 0.3, metalness: 0.62, roughnessMap: brushH, envMapIntensity: 1.6 }),     /* brushed platinum composite */
+    /* mirror / satin catches (brief §03): the same language as Mr. Mah's edge catches — these read as
        bright turns of the surface under moonlight and city glow, never as an outline */
-    trim: new THREE.MeshStandardMaterial({ color: 0xb6c3d6, roughness: 0.13, metalness: 0.98, envMapIntensity: 1.9 }),
-    trimSatin: new THREE.MeshStandardMaterial({ color: 0x9aa8bd, roughness: 0.3, metalness: 0.94, envMapIntensity: 1.5 }),
-    curb: new THREE.MeshStandardMaterial({ color: 0x38445a, roughness: 0.72, metalness: 0.12 }),                                /* raised edges, kerbs, steps */
-    arena: new THREE.MeshStandardMaterial({ color: 0x171a21, roughness: 0.88, metalness: 0.04 }),                               /* rubberised impact floor */
-    panelLit: new THREE.MeshStandardMaterial({ color: 0x1a2436, roughness: 0.5, metalness: 0.1, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */
-    plaza: new THREE.MeshStandardMaterial({ color: 0x0b1019, roughness: 0.56, metalness: 0.22, envMapIntensity: 0.3, roughnessMap: floorTex, bumpMap: floorTex, bumpScale: 0.003, transparent: true, opacity: 0.9 }),
-    road: new THREE.MeshStandardMaterial({ color: NEUTRALS.road, roughness: 0.5, metalness: 0.28, roughnessMap: floorTex }),
-    glass: new THREE.MeshPhysicalMaterial({ color: NEUTRALS.glassTint, roughness: 0.08, metalness: 0.15, transparent: true, opacity: 0.4, side: THREE.DoubleSide, envMapIntensity: 1.3 }),
+    trim: new THREE.MeshStandardMaterial({ color: 0xdfe9f7, roughness: 0.04, metalness: 1.0, envMapIntensity: 2.6 }),
+    trimSatin: new THREE.MeshStandardMaterial({ color: 0xa8b7cb, roughness: 0.19, metalness: 0.98, envMapIntensity: 1.9 }),
+    curb: new THREE.MeshStandardMaterial({ color: 0x4a5a76, roughness: 0.58, metalness: 0.34, envMapIntensity: 1.2 }),          /* raised edges, kerbs, steps */
+    arena: new THREE.MeshStandardMaterial({ color: 0x1d2129, roughness: 0.86, metalness: 0.06 }),                               /* rubberised impact floor */
+    panelLit: new THREE.MeshStandardMaterial({ color: 0x24304a, roughness: 0.4, metalness: 0.2, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */
+    /* THE HERO SURFACE (brief §05): super-polished chromium laid in architectural-scale diamond cells.
+       Its roughness map is the diamond field itself, so the plane is jointed, polished stone-metal even
+       between the modelled bevels; ground.js lays the bevels and the mirror catches on top of it. */
+    plaza: new THREE.MeshStandardMaterial({ color: 0x18202e, roughness: 0.54, metalness: 0.94, envMapIntensity: 1.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.006, transparent: true, opacity: 0.92 }),
+    road: new THREE.MeshStandardMaterial({ color: 0x141b26, roughness: 0.4, metalness: 0.6, roughnessMap: floorTex, envMapIntensity: 1.2 }),
+    glass: new THREE.MeshPhysicalMaterial({ color: 0x2b3f60, roughness: 0.06, metalness: 0.22, transparent: true, opacity: 0.42, side: THREE.DoubleSide, envMapIntensity: 2.0 }),
     /* interior light: unlit cool white, dimmed by day */
     interior: new THREE.MeshBasicMaterial({ color: NEUTRALS.interior, toneMapped: true }),
     interiorSoft: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.5 }),

@@ -199,19 +199,22 @@ export async function createMahplaza(canvas, options = {}) {
     /* one seated at the left bench */
     { id: 'bench', role: 'remote', x: -19.6, z: 20.2, facing: 0.5, colour: 'red', physique: 0.5, sex: 'm', pose: 'seated', seed: 51 }
   ].concat(ctx.residentSpots.map(s => Object.assign({ role: 'remote' }, s)));
+  /* the laid chromium floor is a DECK: 9 m diamond cells whose tops sit 0.17 above the raw ground plane
+     (ground.js FLOOR_TOP / FIELD_RADIUS). Anything that stands on the plaza stands on the deck. */
+  const PLAZA_DECK_Y = 0.17, PLAZA_DECK_R = 43;
   let residents = [], flora = null, vehicles = null, R = null;
   const walkers = [], extras = [];
   try {
     R = await import('./residents.js');
     if (typeof R.populate === 'function') {
       residents = R.populate(scene, populationSpots) || [];
-      residents.forEach((r, i) => { const s = populationSpots[i]; if (s && s.y) r.position.y = s.y; if (s && s.walk) walkers.push({ r, from: s.walk.from, to: s.walk.to, phase: Math.random() }); });
+      residents.forEach((r, i) => { const s = populationSpots[i]; if (s && s.y) r.position.y = s.y; else if (Math.hypot(r.position.x, r.position.z) < PLAZA_DECK_R) r.position.y = PLAZA_DECK_Y; if (s && s.walk) walkers.push({ r, from: s.walk.from, to: s.walk.to, phase: Math.random() }); });
     }
   } catch (e) { console.info('MAHPLAZA: residents module not available —', e && e.message); }
   try {
     const F = await import('./flora-and-vehicles.js');
     if (typeof F.createPlanter === 'function' && ctx.planterSpots) {
-      flora = ctx.planterSpots.map((s, i) => { const p = F.createPlanter({ theme, seed: 100 + i, size: s.size, shape: s.shape }); p.position.set(s.x, 0.16, s.z); scene.add(p); return p; });
+      flora = ctx.planterSpots.map((s, i) => { const p = F.createPlanter({ theme, seed: 100 + i, size: s.size, shape: s.shape }); p.position.set(s.x, 0.16 + (Math.hypot(s.x, s.z) < PLAZA_DECK_R ? PLAZA_DECK_Y : 0), s.z); scene.add(p); return p; });
     }
     if (typeof F.createVehicleRoute === 'function') {
       /* the craft route follows the corridors and crosses behind the district, never over the plaza centre */

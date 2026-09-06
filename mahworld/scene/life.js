@@ -75,11 +75,11 @@ function impostorMaterial(R, colour) {
 function makeImpostor(R, colour, height) {
   const mesh = new THREE.Mesh(impostorGeometry(), impostorMaterial(R, colour));
   const g = new THREE.Group();
-  mesh.scale.setScalar((height || 1.9) / 1.9); mesh.position.y = 0.22;
+  mesh.scale.setScalar((height || 1.9) / 1.9); mesh.position.y = 0.39;   /* hovering, on the plaza deck (ground.js FLOOR_TOP 0.17) */
   g.add(mesh); g.name = 'impostor:' + colour;
   g.userData = {
     colour, height: height || 1.9, hover: 0.22, impostor: true, spec: { colour },
-    update(t) { mesh.position.y = 0.22 + Math.sin(t * 0.9 + (height || 1.9)) * 0.03; },
+    update(t) { mesh.position.y = 0.39 + Math.sin(t * 0.9 + (height || 1.9)) * 0.03; },
     setEnergy(e) { mesh.material.emissiveIntensity = 0.08 + 0.5 * clamp(e, 0, 1); },
     face(v) { g.rotation.y = Math.atan2(v.x - g.position.x, v.z - g.position.z); },
     setDrive() {}
@@ -128,6 +128,10 @@ export function createLife(ctx, R, opts = {}) {
   try { FX = createEffects(ctx); if (FX && FX.group && !FX.group.parent) scene.add(FX.group); } catch (e) { console.info('MAHPLAZA life: effects unavailable —', e && e.message); FX = null; }
 
   /* ---- agents -------------------------------------------------------- */
+  /* the plaza is a laid chromium DECK (ground.js FLOOR_TOP / FIELD_RADIUS): anyone standing inside it
+     stands 0.17 m higher than the raw ground plane the corridors and aprons run on */
+  const DECK_Y = 0.17, DECK_R = 43;
+  const deckY = (x, z) => (Math.hypot(x, z) < DECK_R ? DECK_Y : 0);
   const agents = [];
   const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _look = new THREE.Vector3();
   function spawnResident(colour, tier, spec) {
@@ -140,11 +144,12 @@ export function createLife(ctx, R, opts = {}) {
     const c = colour || (rand() < 0.72 ? COMMON[Math.floor(rand() * COMMON.length)] : ACCENT[Math.floor(rand() * ACCENT.length)]);
     const pose = tier === 'far' ? 'stand' : (rand() < 0.6 ? 'walk' : 'stand');
     const g = spawnResident(c, tier, { pose });
-    g.position.set(x, 0, z);
+    const deck = deckY(x, z);
+    g.position.set(x, deck, z);
     g.rotation.y = rand() * TAU;
     g.userData.role = 'ambient'; g.userData.id = g.userData.id || ('ambient-' + agents.length);
     group.add(g);
-    const a = { g, tier, colour: c, state: 'idle', node: null, target: null, t0: 0, wait: 1 + rand() * 5, speed: 1.1 + rand() * 0.5, from: new THREE.Vector3(x, 0, z), to: new THREE.Vector3(x, 0, z), u: 0, dur: 1, busy: false, scale: 1 };
+    const a = { g, tier, colour: c, state: 'idle', node: null, target: null, t0: 0, wait: 1 + rand() * 5, speed: 1.1 + rand() * 0.5, from: new THREE.Vector3(x, deck, z), to: new THREE.Vector3(x, deck, z), u: 0, dur: 1, busy: false, scale: 1 };
     agents.push(a); return a;
   }
   /* seed the population on the network */
@@ -169,8 +174,8 @@ export function createLife(ctx, R, opts = {}) {
     const n = N[next];
     a.from.copy(a.g.position);
     /* stop 3 m short of a door and enter there */
-    if (n.kind === 'door') { const dx = n.x - a.from.x, dz = n.z - a.from.z, d = Math.hypot(dx, dz) || 1; a.to.set(n.x - dx / d * 3, 0, n.z - dz / d * 3); a.entering = next; }
-    else { a.to.set(n.x + (rand() - 0.5) * 4, 0, n.z + (rand() - 0.5) * 4); a.entering = null; }
+    if (n.kind === 'door') { const dx = n.x - a.from.x, dz = n.z - a.from.z, d = Math.hypot(dx, dz) || 1; const tx = n.x - dx / d * 3, tz = n.z - dz / d * 3; a.to.set(tx, deckY(tx, tz), tz); a.entering = next; }
+    else { const tx = n.x + (rand() - 0.5) * 4, tz = n.z + (rand() - 0.5) * 4; a.to.set(tx, deckY(tx, tz), tz); a.entering = null; }
     a.node = next;
     const dist = a.from.distanceTo(a.to);
     a.dur = Math.max(0.6, dist / a.speed); a.u = 0; a.state = 'walk';
@@ -218,7 +223,7 @@ export function createLife(ctx, R, opts = {}) {
     const b = free.filter(x => x !== a).sort((x, y) => x.g.position.distanceTo(a.g.position) - y.g.position.distanceTo(a.g.position))[0];
     if (!b || b.g.position.distanceTo(a.g.position) > 22) return false;
     const cx = (a.g.position.x + b.g.position.x) / 2, cz = (a.g.position.z + b.g.position.z) / 2;
-    [a, b].forEach((m, i) => { m.busy = true; m.state = 'walk'; m.from.copy(m.g.position); m.to.set(cx + (i ? 1 : -1) * 0.9, 0, cz + (i ? 0.5 : -0.5)); m.dur = Math.max(0.8, m.from.distanceTo(m.to) / m.speed); m.u = 0; m.entering = null; });
+    [a, b].forEach((m, i) => { m.busy = true; m.state = 'walk'; m.from.copy(m.g.position); m.to.set(cx + (i ? 1 : -1) * 0.9, deckY(cx, cz), cz + (i ? 0.5 : -0.5)); m.dur = Math.max(0.8, m.from.distanceTo(m.to) / m.speed); m.u = 0; m.entering = null; });
     groups.push({ members: [a, b], until: t + 16 + rand() * 26, settled: false, cx, cz });
     log.push({ t: Math.round(t), name: 'conversation', where: [cx, 0, cz] });
     return true;
