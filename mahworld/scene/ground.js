@@ -9,6 +9,7 @@
    Deliberately sparse: pavement stays pavement. */
 import * as THREE from '../vendor/three/three.module.min.js';
 import { canvasTexture, diamondOutline, chamferBox } from './materials.js';
+import { SITES } from './buildings.js';
 
 export const PLAZA_RADIUS = 27;
 /* THE HERO SURFACE (v5 §05): the plaza floor is laid in ARCHITECTURAL-SCALE diamond cells — nine metres
@@ -129,9 +130,11 @@ export function buildGround(ctx) {
     edge.position.set(0, 0.16, d / 2 - 0.02); a.add(edge);   /* a mirror-grade nosing on the apron step */
     return a;
   }
-  apron(0, -34, 46, 16, 0);                     /* MAH MATCH forecourt */
-  apron(-37, -21, 30, 12, 0.32);                /* MAH GYM apron, angled toward the plaza */
-  apron(37, -21, 30, 12, -0.32);                /* MAH MARKET apron */
+  /* one apron per site, placed from the SITE PLAN so the ground follows the buildings (v5 §06) */
+  Object.keys(SITES).forEach(k => {
+    const S = SITES[k], out = 11;
+    apron(S.x + Math.sin(S.rotY) * out, S.z + Math.cos(S.rotY) * out, S.W + 8, 16, S.rotY);
+  });
 
   /* 3. vehicle corridors: two lanes at the district edges, curving away behind the buildings */
   function corridor(sign) {

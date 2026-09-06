@@ -11,7 +11,7 @@
    polygons, no cartoon clouds, no particle fog.
 
    Construction (all procedural, no texture files, no new dependency):
-     · three layers (low deck / mid / high) of 4 masses each = 12 masses;
+     · three layers (low deck / mid / high) of 6–7 masses each = 20 masses;
      · each mass = a soft BODY of 4–8 overlapping billboard quads drawn from a
        4-cell procedural blob atlas, merged into one mesh BEHIND the crystal
        and one IN FRONT of it, so the sheets sit inside the volume;
@@ -34,10 +34,13 @@ import { canvasTexture } from './materials.js';
    Night is the anchor: a moonlit blue-grey mass, restrained silver catches,
    dark undersides. Dusk takes MAHWORLD's violet. Day is brighter and softer
    and the crystalline catches weaken — they never take over the sky. */
+/* v5 §13: the diamond clouds were correct but too faint to be part of the composition. The bodies sit
+   a value higher and hold more of the sky, and the crystalline catches inside them are stronger — the
+   sky now has weather in it, and that weather is made of crystal. */
 const KEYS = {
-  night: { body: 0x4a5f8f, bodyA: 0.86, lit: 0xe4eeff, litA: 0.46, dark: 0x1c2a45, darkA: 0.16, sheenA: 0.09, litT: 0.10, catch: 1.00 },
-  dusk:  { body: 0x7466b4, bodyA: 0.76, lit: 0xe0d8ff, litA: 0.36, dark: 0x2f2857, darkA: 0.18, sheenA: 0.07, litT: 0.06, catch: 0.84 },
-  day:   { body: 0xdde8f6, bodyA: 0.80, lit: 0xf4f8ff, litA: 0.18, dark: 0x94a8c4, darkA: 0.20, sheenA: 0.03, litT: 0.02, catch: 0.40 }
+  night: { body: 0x5b73a8, bodyA: 0.92, lit: 0xeef5ff, litA: 0.62, dark: 0x22314f, darkA: 0.2, sheenA: 0.13, litT: 0.14, catch: 1.00 },
+  dusk:  { body: 0x8878c8, bodyA: 0.84, lit: 0xece5ff, litA: 0.5,  dark: 0x372e63, darkA: 0.22, sheenA: 0.1,  litT: 0.09, catch: 0.84 },
+  day:   { body: 0xe6eefa, bodyA: 0.86, lit: 0xf8fbff, litA: 0.26, dark: 0x9db0cb, darkA: 0.24, sheenA: 0.05, litT: 0.04, catch: 0.40 }
 };
 const _ca = new THREE.Color(), _cb = new THREE.Color();
 function lerpHex(a, b, t) { _ca.setHex(a); _cb.setHex(b); return _ca.lerp(_cb, t).getHex(); }
@@ -161,9 +164,9 @@ function facetTexture(size) {
    almost pure atmospheric silhouette (and is the first thing a low tier
    simplifies). Azimuths are measured from the −z axis, where the cameras look. */
 const LAYOUT = [
-  { name: 'low',  count: 5, yMin: 112, yMax: 152, rMin: 300, rMax: 500, wMin: 210, wMax: 350, qMin: 6, qVar: 3, pMin: 4, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.15, -0.60, -0.05, 0.52, 1.10] },
-  { name: 'mid',  count: 5, yMin: 168, yMax: 228, rMin: 400, rMax: 700, wMin: 320, wMax: 540, qMin: 5, qVar: 3, pMin: 3, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-0.95, -0.42, 0.10, 0.62, 1.18] },
-  { name: 'high', count: 4, yMin: 256, yMax: 336, rMin: 620, rMax: 900, wMin: 420, wMax: 660, qMin: 4, qVar: 3, pMin: 2, pVar: 2, pScale: 0.70, speed: 0.70, order: -6, spread: [-0.86, -0.28, 0.34, 0.94] }
+  { name: 'low',  count: 7, yMin: 108, yMax: 156, rMin: 300, rMax: 500, wMin: 230, wMax: 380, qMin: 7, qVar: 3, pMin: 5, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.30, -0.86, -0.42, 0.02, 0.48, 0.94, 1.34] },
+  { name: 'mid',  count: 7, yMin: 164, yMax: 232, rMin: 400, rMax: 700, wMin: 340, wMax: 580, qMin: 6, qVar: 3, pMin: 4, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-1.10, -0.72, -0.30, 0.12, 0.56, 0.98, 1.36] },
+  { name: 'high', count: 6, yMin: 252, yMax: 344, rMin: 620, rMax: 900, wMin: 450, wMax: 720, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.72, speed: 0.70, order: -6, spread: [-1.02, -0.60, -0.16, 0.30, 0.74, 1.16] }
 ];
 /* the blob atlas paints the middle of each cell, so a quad has to be ~1.7× the
    mass width it is meant to draw. QSCALE keeps that conversion in one place. */
@@ -457,7 +460,7 @@ export function buildClouds(ctx) {
       L.dark.material.color.setHex(key.dark);
       assign(L);
     });
-    sheenMat.opacity = Math.min(0.12, key.sheenA);
+    sheenMat.opacity = Math.min(0.17, key.sheenA);
     return key;
   }
 

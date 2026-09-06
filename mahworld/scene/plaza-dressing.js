@@ -18,6 +18,7 @@
 
 import * as THREE from '../vendor/three/three.module.min.js';
 import { chamferBox, canvasTexture, blobTexture } from './materials.js';
+import { SITES } from './buildings.js';
 
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(1, 1, 1), _e = new THREE.Euler();
 function part(list, geo, x, y, z, ry = 0, rx = 0, rz = 0) {
@@ -36,12 +37,13 @@ function mergeParts(list) {
 
 /* the route network, in plaza coordinates: [from, to] pairs the paths connect */
 const MARKER = [0, 14];
+/* the routes are read from the SITE PLAN, so the paths always arrive where the buildings actually are */
 const ROUTES = [
-  { to: [0, -33], w: 5.2 },        /* MAH MATCH forecourt */
-  { to: [-31, -18], w: 4.2 },      /* MAH GYM apron */
-  { to: [31, -18], w: 4.2 },       /* MAH MARKET apron */
-  { to: [-40, 40], w: 3.6 },       /* west corridor mouth */
-  { to: [40, 40], w: 3.6 }         /* east corridor mouth */
+  { to: SITES.match.approach, w: 5.2 },    /* MAH MATCH forecourt */
+  { to: SITES.gym.approach, w: 4.4 },      /* MAH GYM apron */
+  { to: SITES.market.approach, w: 4.4 },   /* MAH MARKET apron */
+  { to: [-40, 40], w: 3.6 },               /* west corridor mouth */
+  { to: [40, 40], w: 3.6 }                 /* east corridor mouth */
 ];
 const NODES = [[-16, 6], [17, 4]];
 /* masts sit inside the plaza, never in the arrival camera's near foreground (z ≳ 24 at the edges reads
@@ -173,6 +175,50 @@ export function buildDressing(ctx) {
     part(curb, chamferBox(5.2, 0.16, 1.35, 0.05), bx, 0.63, bz, ry);
     part(trim, chamferBox(5.0, 0.03, 0.06, 0.012), bx, 0.72, bz + 0.62, ry);
     const col = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.8, 1.6), M.curb); col.position.set(bx, 0.4, bz); col.rotation.y = ry; col.visible = false; group.add(col); ctx.colliders.push(col);
+  }
+
+  /* ---- 6b. v5 STREET FURNITURE (§12): a civic plaza is furnished, not decorated. Everything here is
+     chromium and dark platinum in the world's own vocabulary, merged into the existing meshes. ---- */
+  {
+    /* WAYFINDING BLADES: one slim upright at the head of each destination route, turned to face the
+       way it points. A machined chromium blade with a lit edge — no text, because no wording for these
+       has been supplied and none is invented. */
+    for (const r of ROUTES.slice(0, 3)) {
+      const dx = r.to[0] - MARKER[0], dz = r.to[1] - MARKER[1], L = Math.hypot(dx, dz) || 1;
+      const bx = MARKER[0] + dx / L * 11, bz = MARKER[1] + dz / L * 11, ang = Math.atan2(dx, dz);
+      part(dark, chamferBox(0.24, 3.1, 1.05, 0.07), bx, 1.55, bz, ang);
+      part(trim, chamferBox(0.3, 0.09, 1.15, 0.03), bx, 3.14, bz, ang);        /* the cap */
+      part(trim, chamferBox(0.34, 0.12, 0.34, 0.04), bx, 0.06, bz, Math.PI / 4);
+      const edge = new THREE.Mesh(own(new THREE.BoxGeometry(0.05, 2.5, 0.04)), M.energy);
+      edge.position.set(bx + Math.cos(ang) * 0.14, 1.6, bz - Math.sin(ang) * 0.14); edge.rotation.y = ang;
+      group.add(edge);
+      const col = new THREE.Mesh(new THREE.BoxGeometry(0.5, 3.2, 1.3), M.curb);
+      col.position.set(bx, 1.6, bz); col.rotation.y = ang; col.visible = false; group.add(col); ctx.colliders.push(col);
+    }
+    /* PLANTED PLINTHS around the civic ring: low chromium-rimmed troughs, six of them, on the diagonals
+       so they never stand between the arrival camera and a destination sign */
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI / 6 + i * Math.PI / 3, R = 12.6;
+      const px = MARKER[0] + Math.cos(a) * R, pz = MARKER[1] + Math.sin(a) * R;
+      if (pz < MARKER[1] - 8) continue;                       /* nothing on the MAH MATCH sight line */
+      part(dark, chamferBox(2.6, 0.62, 2.6, 0.16), px, 0.31, pz, Math.PI / 4);
+      part(trim, chamferBox(2.75, 0.09, 2.75, 0.03), px, 0.66, pz, Math.PI / 4);
+      const col = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.8, 3.0), M.curb);
+      col.position.set(px, 0.4, pz); col.rotation.y = Math.PI / 4; col.visible = false; group.add(col); ctx.colliders.push(col);
+    }
+    /* a second corridor shelter on the west side, mirroring the east one */
+    {
+      const sx = -46, sz = 30;
+      for (const dz of [-2.4, 2.4]) part(dark, chamferBox(0.22, 3.2, 0.22, 0.04), sx, 1.6, sz + dz);
+      part(trim, chamferBox(3.2, 0.18, 6.4, 0.06), sx, 3.3, sz);
+      const col = new THREE.Mesh(new THREE.BoxGeometry(3.4, 3.4, 6.6), M.curb); col.position.set(sx, 1.7, sz); col.visible = false; group.add(col); ctx.colliders.push(col);
+    }
+    /* UTILITY COLUMNS: short machined chromium posts in pairs at the node edges — the small, ordinary
+       street objects whose absence is what makes a scene read as a prototype */
+    for (const [nx, nz] of NODES) for (const sd of [-1, 1]) {
+      part(dark, chamferBox(0.3, 1.15, 0.3, 0.06), nx + sd * 5.6, 0.58, nz - 1.2, Math.PI / 4);
+      part(trim, chamferBox(0.36, 0.07, 0.36, 0.02), nx + sd * 5.6, 1.18, nz - 1.2, Math.PI / 4);
+    }
   }
 
   /* ---- 7. CURB LINE between the plaza circle and the aprons / sidewalk band ---- */

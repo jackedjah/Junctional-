@@ -92,7 +92,15 @@ function buildNodes(anchors) {
   const N = {};
   const put = (id, x, z, kind) => { N[id] = { id, x, z, kind: kind || 'plaza' }; return N[id]; };
   put('marker', 0, 14); put('centre', 0, 0);
-  put('gymApproach', -26, -12); put('matchApproach', 0, -30); put('marketApproach', 26, -12);
+  /* the three approach nodes are derived from the door anchors: a point 14 m back toward the plaza
+     from each entrance, so the network follows the site plan instead of restating it */
+  const approach = (id, fx, fz) => {
+    const d = (anchors.doors || []).find(k => k.id === id);
+    if (!d) return put(id + 'Approach', fx, fz);
+    const L = Math.hypot(d.position.x, d.position.z) || 1;
+    return put(id + 'Approach', d.position.x * (1 - 14 / L), d.position.z * (1 - 14 / L));
+  };
+  approach('gym', -30, -6); approach('match', 0, -44); approach('market', 32, -22);
   put('benchL', -19, 20); put('benchR', 19, 20);
   put('westWalk', -32, 12); put('eastWalk', 32, 12);
   put('corridorL', -44, 44, 'edge'); put('corridorR', 44, 44, 'edge');

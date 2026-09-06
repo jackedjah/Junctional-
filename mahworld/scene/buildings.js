@@ -13,6 +13,23 @@
 import * as THREE from '../vendor/three/three.module.min.js';
 import { softMass, signTexture, diamondOutline, chamferBox, windowGrid } from './materials.js';
 
+/* ---- THE SITE PLAN (v5 §06) ---------------------------------------------------------------------
+   The three destinations used to stand shoulder to shoulder on one line, which read as a wall of
+   boxes. They are now at three DIFFERENT DEPTHS, at three different scales, with three silhouettes
+   a viewer can tell apart from the arrival camera without reading a sign:
+
+     MAH GYM     nearest, left    — BROAD and low, a long curved glazed canopy over the frontage
+     MAH MARKET  midground, right — CIVIC and terraced, receding roof terraces with rails
+     MAH MATCH   furthest, centre — DOMINANT and vertical, a tower rising far above both
+
+   Ground aprons, plaza routes and the life network all read this table, so the site plan is one
+   fact in one place. Distance from the marker is deliberate: 48 m, 62 m, 66 m — near, mid, far. */
+export const SITES = Object.freeze({
+  gym:    { x: -46, z: -14, rotY: 0.52,  W: 40, H: 13, D: 24, openW: 18, openH: 8,  E: 4,   R: 12, radius: 2.6, floorY: 0,   approach: [-30, -6] },
+  market: { x: 50,  z: -36, rotY: -0.52, W: 38, H: 15, D: 24, openW: 22, openH: 7,  E: 2.5, R: 12, radius: 3.4, floorY: 0,   approach: [32, -22] },
+  match:  { x: 0,   z: -66, rotY: 0,     W: 44, H: 38, D: 30, openW: 18, openH: 14, E: 5,   R: 22, radius: 2.0, floorY: 1.8, approach: [0, -44] }
+});
+
 /* ---- v4: merge many small parts into ONE mesh per material (draw-call discipline, brief §52) ---- */
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(1, 1, 1);
 function part(list, geo, x, y, z, ry = 0, rx = 0, rz = 0) {
@@ -102,7 +119,135 @@ function diamondFrame(size, bar, mat, depth = 0.12) {
   grp.rotation.z = Math.PI / 4;
   return grp;
 }
-function box(w, h, d, mat, x, y, z) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); return m; }
+/* v5 §07: NOTHING in MAHWORLD has an un-bevelled 90° corner. Every box in this module is chamfered —
+   a hard edge is what makes a prototype read as a prototype, and a caught edge is what makes a
+   surface read as manufactured. The chamfer scales with the part, so a 0.06 m bar still turns. */
+function box(w, h, d, mat, x, y, z) {
+  const c = Math.min(0.07, w / 4, h / 4, d / 4);
+  const m = new THREE.Mesh(chamferBox(w, h, d, c), mat); m.position.set(x, y, z); return m;
+}
+
+/* ---- SILHOUETTE TREATMENTS (v5 §06 / §08): one per destination, so the three masses differ in
+   PROFILE and not only in signage. Each merges per material; none adds a light. -------------- */
+
+/* MAH GYM — BROAD. A long curved glazed canopy sweeping the whole frontage on slim chromium
+   columns, with a brushed-platinum fascia and a glazed clerestory band above the opening. The
+   read from the plaza is horizontal: a wide, open, well-lit training frontage. */
+function broadCanopy(ctx, g, o) {
+  const { M } = ctx;
+  const { W, H, openH, floorY = 0, seed = 1 } = o;
+  const struct = [], trim = [], dark = [];
+  const cw = W + 5.2, depth = 6.4, cy = floorY + openH + 1.9, segs = 22;
+  /* the canopy shell: a shallow arc swept across the frontage, built from segment planes so it is a
+     CURVE and not a folded plate. Glass over, brushed fascia under. */
+  const shell = [], soffit = [];
+  for (let i = 0; i < segs; i++) {
+    const t0 = i / segs, t1 = (i + 1) / segs;
+    const zOf = t => depth * t, yOf = t => -1.35 * t * t;         /* the sweep falls as it reaches out */
+    const zm = (zOf(t0) + zOf(t1)) / 2, ym = (yOf(t0) + yOf(t1)) / 2;
+    const seg = Math.hypot(zOf(t1) - zOf(t0), yOf(t1) - yOf(t0));
+    const tilt = Math.atan2(yOf(t1) - yOf(t0), zOf(t1) - zOf(t0));
+    shell.push([cw, 0.14, seg, 0, cy + ym, zm, -tilt]);
+    soffit.push([cw - 0.5, 0.05, seg * 0.98, 0, cy + ym - 0.12, zm, -tilt]);
+  }
+  shell.forEach(([w, h, d, x, y, z, rx]) => part(struct, chamferBox(w, h, d, 0.04), x, y, z, 0, rx));
+  soffit.forEach(([w, h, d, x, y, z, rx]) => part(trim, chamferBox(w, h, d, 0.02), x, y, z, 0, rx));
+  /* the leading edge: one mirror-grade nosing running the full width — the canopy's bright line */
+  part(trim, chamferBox(cw + 0.3, 0.2, 0.34, 0.07), 0, cy - 1.42, depth + 0.06);
+  /* slim chromium columns carrying it, and their footings */
+  for (let i = -3; i <= 3; i++) {
+    if (!i) continue;
+    const cx = i * (cw / 7.4);
+    part(struct, new THREE.CylinderGeometry(0.11, 0.15, cy - 1.4 - floorY, 10), cx, floorY + (cy - 1.4 - floorY) / 2, depth - 0.5);
+    part(trim, chamferBox(0.5, 0.09, 0.5, 0.03), cx, floorY + 0.06, depth - 0.5, Math.PI / 4);
+  }
+  /* a clerestory band above the opening: the gym is GLAZED, and light comes out of it */
+  const band = new THREE.Mesh(new THREE.PlaneGeometry(W - 5.5, 2.4), M.crystalGlass || M.glass);
+  band.position.set(0, floorY + openH + 4.3, 0.52); g.add(band);
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(W - 6.0, 2.1), M.interiorSoft);
+  glow.position.set(0, floorY + openH + 4.3, 0.42); g.add(glow);
+  for (let i = -4; i <= 4; i++) part(trim, chamferBox(0.1, 2.5, 0.14, 0.03), i * ((W - 5.5) / 9), floorY + openH + 4.3, 0.56);
+  /* a low brushed plinth running the full frontage: the broad base the mass sits on */
+  part(dark, chamferBox(W + 7, 0.44, 1.6, 0.12), 0, floorY + 0.22, depth + 1.1);
+  merged(g, struct, M.chromeSatin || M.trimSatin, 'gym-canopy', true);
+  merged(g, trim, M.chromeMirror || M.trim, 'gym-canopy-catches', false);
+  merged(g, dark, M.platinumBrushedH || M.structural, 'gym-plinth', true);
+}
+
+/* MAH MARKET — CIVIC. Three receding roof terraces with rails and planted edges, each smaller than
+   the last, so the mass steps back instead of stopping at a parapet. The read is public and low. */
+function terraces(ctx, g, o) {
+  const { M } = ctx;
+  const { W, H, D, E, seed = 3 } = o;
+  const struct = [], trim = [], dark = [];
+  let w = W - 2.2, d = D * 0.82, y = H, zc = -(E + D / 2);
+  for (let i = 0; i < 3; i++) {
+    const th = 2.6 - i * 0.35;
+    part(struct, chamferBox(w, th, d, 0.34), 0, y + th / 2, zc);
+    /* the terrace deck's front edge and its rail: posts every three metres plus a top bar */
+    part(trim, chamferBox(w + 0.5, 0.16, 0.42, 0.06), 0, y + th, zc + d / 2 + 0.1);
+    const posts = Math.max(3, Math.round(w / 3));
+    for (let k = 0; k <= posts; k++) part(trim, chamferBox(0.07, 0.95, 0.07, 0.02), -w / 2 + k * (w / posts), y + th + 0.48, zc + d / 2 + 0.08);
+    part(trim, chamferBox(w + 0.2, 0.07, 0.07, 0.02), 0, y + th + 0.95, zc + d / 2 + 0.08);
+    /* a planted trough along the terrace face, and two service volumes set back */
+    part(dark, chamferBox(w * 0.72, 0.5, 0.7, 0.1), 0, y + th + 0.25, zc + d / 2 - 0.7);
+    if (i < 2) for (const sd of [-1, 1]) part(dark, chamferBox(w * 0.16, 1.1, d * 0.2, 0.14), sd * w * 0.3, y + th + 0.55, zc - d * 0.28);
+    y += th; w *= 0.74; d *= 0.78; zc -= d * 0.06;
+  }
+  /* a light mast on the top terrace: the civic marker of the roof line */
+  part(trim, new THREE.CylinderGeometry(0.07, 0.1, 4.6, 8), w * 0.2, y + 2.3, zc);
+  merged(g, struct, M.platinumBrushed || M.structural, 'market-terraces', true);
+  merged(g, trim, M.chromeSatin || M.trimSatin, 'market-terrace-rails', false);
+  merged(g, dark, M.graphiteDark, 'market-terrace-plant', true);
+}
+
+/* MAH MATCH — DOMINANT. A tower rising far above both neighbours: a tapered vertical shaft with
+   chamfered corner fins, a banded shoulder where it leaves the podium, a recessed lit slot up its
+   whole height, and a crown. This is what makes MAH MATCH read as the anchor from anywhere. */
+function verticalTower(ctx, g, o) {
+  const { M } = ctx;
+  const { W, H, D, E, seed = 2 } = o;
+  const struct = [], trim = [], dark = [], lit = [];
+  const th = 22, tw = W * 0.46, td = D * 0.5, zc = -(E + D * 0.42);
+  /* the shoulder: one wide banded transition so the tower GROWS out of the podium */
+  part(struct, chamferBox(tw + 4.4, 1.5, td + 4.4, 0.4), 0, H + 0.75, zc);
+  part(trim, chamferBox(tw + 5.0, 0.18, td + 5.0, 0.07), 0, H + 1.5, zc);
+  /* the shaft, tapering as it climbs — four stacked sections, each narrower than the one below */
+  let y = H + 1.5, w = tw, d = td;
+  for (let i = 0; i < 4; i++) {
+    const sh = th / 4;
+    part(struct, chamferBox(w, sh, d, 0.5), 0, y + sh / 2, zc);
+    part(trim, chamferBox(w + 0.24, 0.14, d + 0.24, 0.05), 0, y + sh, zc);
+    /* corner fins: vertical chamfered strips that draw the height and catch the moon on their turn */
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      part(dark, chamferBox(0.85, sh - 0.3, 0.85, 0.2), sx * (w / 2 - 0.2), y + sh / 2, zc + sz * (d / 2 - 0.2));
+      part(trim, chamferBox(0.11, sh - 1.0, 0.11, 0.03), sx * (w / 2 + 0.16), y + sh / 2, zc + sz * (d / 2 + 0.16));
+    }
+    y += sh; w *= 0.9; d *= 0.9;
+  }
+  /* the lit slot: one recessed vertical channel up the plaza face, the tower's single light line */
+  part(dark, chamferBox(1.5, th - 1.0, 0.5, 0.14), 0, H + 2 + (th - 1) / 2, zc + td / 2 + 0.2);
+  lit.push(0);
+  const slot = new THREE.Mesh(chamferBox(0.7, th - 2.4, 0.16, 0.05), M.energy);
+  slot.position.set(0, H + 2 + (th - 1) / 2, zc + td / 2 + 0.42); g.add(slot); ctx.reflect(slot, 0.3);
+  /* the crown: four angled planes closing the shaft, and a mirror cap band where they meet the sky */
+  const crownH = 3.4;
+  for (const [sx, sz] of [[0, 1], [0, -1], [-1, 0], [1, 0]]) {
+    const len = sx ? d - 0.6 : w - 0.6;
+    part(struct, chamferBox(sx ? 1.5 : len, crownH, sx ? len : 1.5, 0.08),
+      sx * (w / 2 - 0.7), y + crownH / 2, zc + sz * (d / 2 - 0.7), 0, sz ? sz * -0.3 : 0, sx ? sx * 0.3 : 0);
+  }
+  part(trim, chamferBox(w - 2.0, 0.2, d - 2.0, 0.06), 0, y + crownH - 0.2, zc);
+  /* the mast and its square-diamond head: MAH MATCH's beacon, the highest thing in the district */
+  part(trim, new THREE.CylinderGeometry(0.13, 0.2, 7.0, 8), 0, y + crownH + 3.5, zc);
+  const head = new THREE.Mesh(new THREE.OctahedronGeometry(1.05, 0), M.energyLight);
+  head.position.set(0, y + crownH + 7.6, zc); head.scale.set(1, 1.3, 0.34); g.add(head);
+  (ctx.beacons = ctx.beacons || []).push({ position: world(g, 0, y + crownH + 7.6, zc), building: g.name });
+  ctx.matchRoof = world(g, 0, y + crownH, zc);
+  merged(g, struct, M.structural, 'match-tower', true);
+  merged(g, trim, M.chromeMirror || M.trim, 'match-tower-catches', false);
+  merged(g, dark, M.graphiteMetal || M.graphiteDark, 'match-tower-fins', true);
+}
 
 function sign(ctx, parent, spec) {
   const tex = signTexture(spec);
@@ -229,22 +374,24 @@ export function buildBuildings(ctx) {
   /* ---------------- MAH GYM — training ---------------------------------- */
   {
     const g = new THREE.Group(); g.name = 'MAH GYM';
-    const W = 30, H = 16, openW = 14, openH = 8, E = 4, R = 12;
-    g.position.set(-36, 0, -30); g.rotation.y = 0.32; scene.add(g);
-    const f = facade(ctx, g, { W, H, D: 26, openW, openH, pierDepth: E, roomDepth: R, radius: 1.6, glassMullions: 2 });
-    dressFacade(ctx, g, { W, H, D: 26, openW, openH, E, seed: 1 });
-    crystallize(ctx, g, { W, H, D: 26, openW, E, seed: 1 });
+    const S = SITES.gym, { W, H, D, openW, openH, E, R } = S;
+    g.position.set(S.x, 0, S.z); g.rotation.y = S.rotY; scene.add(g);
+    const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, radius: S.radius, glassMullions: 3 });
+    dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 1, canopy: false });   /* the broad curved canopy replaces the slab canopy */
+    crystallize(ctx, g, { W, H, D, openW, E, seed: 1 });
+    broadCanopy(ctx, g, { W, H, openH, seed: 1 });
+    ctx.entranceLights.push(world(g, 0, openH + 1.2, 4.6));
     action('gym', 'MAH GYM', 'destination', f.glass, world(g, 0, 0, 2), { view: 'gym-entrance', copy: 'Training facility. Preview navigation: the camera moves to the entrance. Training data stays in MAHFITT.' });
     /* upper window band across the piers: interior glow behind glass */
     const windowGlow = M.interiorSoft.clone(); windowGlow.opacity = 0.28; ctx.timeHooks.push(s => { windowGlow.opacity = 0.28 * (1 - s.daylight * 0.5); });
-    [-1, 1].forEach(s => { const gl = new THREE.Mesh(new THREE.PlaneGeometry(6.5, 2.2), M.glass); gl.position.set(s * (W / 2 - 4.2), 11.6, 0.44); g.add(gl); const glow = new THREE.Mesh(new THREE.PlaneGeometry(6.3, 2.0), windowGlow); glow.position.set(s * (W / 2 - 4.2), 11.6, 0.3); g.add(glow);
+    [-1, 1].forEach(s => { const gl = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 2.4), M.crystalGlass || M.glass); gl.position.set(s * (W / 2 - 5.0), 10.5, 0.44); g.add(gl); const glow = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 2.2), windowGlow); glow.position.set(s * (W / 2 - 5.0), 10.5, 0.3); g.add(glow);
       /* a window the life module may put a training silhouette behind (brief §43) */
       const n = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), g.rotation.y);
-      (ctx.lifeAnchors ? ctx.lifeAnchors.windows : []).push({ id: 'gym-window-' + (s < 0 ? 'l' : 'r'), position: world(g, s * (W / 2 - 4.2), 10.6, -0.4), normal: n, size: [6.3, 2.0], building: 'gym' }); });
+      (ctx.lifeAnchors ? ctx.lifeAnchors.windows : []).push({ id: 'gym-window-' + (s < 0 ? 'l' : 'r'), position: world(g, s * (W / 2 - 5.0), 9.8, -0.4), normal: n, size: [7.2, 2.2], building: 'gym' }); });
     /* one light seam on each outer pier: a single vertical energy line, not an outline */
     [-1, 1].forEach(s => { const seam = box(0.08, H * 0.62, 0.06, M.energy, s * (W / 2 - 1.0), H * 0.42, 0.46); g.add(seam); ctx.reflect(seam, 0.35); });
     /* signage on the lintel */
-    sign(ctx, g, { title: 'MAH GYM', sub: 'TRAIN HIGHER', mark: true, width: 12.5, y: 12.1, z: 0.62 });
+    sign(ctx, g, { title: 'MAH GYM', sub: 'TRAIN HIGHER', mark: true, width: 14.5, y: 11.4, z: 0.62 });
     /* interior: platforms, racks, a cable frame — readable, not a machine warehouse */
     const room = g.children.find(c => c.isGroup && c.position.z === -E);
     const plat = (x, z) => { const p = box(3.2, 0.3, 3.2, M.graphiteLight, x, 0.15, z); room.add(p); return p; };
@@ -259,17 +406,18 @@ export function buildBuildings(ctx) {
     out.gym = g;
     /* who is here: one training on a platform, one heading in */
     ctx.residentSpots.push(spot(g, 0, 0.3, -E - 6.5, 0, { id: 'gym-trainee', colour: 'blue', physique: 0.75, sex: 'm', pose: 'spar', seed: 11, note: 'training inside MAH GYM' }));
-    ctx.entranceLights.push(world(g, 0, 7.5, 11));
+
   }
 
   /* ---------------- MAH MATCH — the fighting facility --------------------- */
   {
     const g = new THREE.Group(); g.name = 'MAH MATCH';
-    const W = 44, H = 24, openW = 18, openH = 14, E = 5, R = 22, floorY = 1.8;
-    g.position.set(0, 0, -48); scene.add(g);
-    const f = facade(ctx, g, { W, H, D: 34, openW, openH, pierDepth: E, roomDepth: R, floorY, radius: 1.8, roomW: 38 });
-    dressFacade(ctx, g, { W, H, D: 34, openW, openH, E, floorY, seed: 2, canopy: false });   /* MAH MATCH keeps its own portal frame instead of a canopy */
-    crystallize(ctx, g, { W, H, D: 34, openW, E, floorY, seed: 2 });
+    const S = SITES.match, { W, H, D, openW, openH, E, R, floorY } = S;
+    g.position.set(S.x, 0, S.z); g.rotation.y = S.rotY; scene.add(g);
+    const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, floorY, radius: S.radius, roomW: 38 });
+    dressFacade(ctx, g, { W, H, D, openW, openH, E, floorY, seed: 2, canopy: false });   /* MAH MATCH keeps its own portal frame instead of a canopy */
+    crystallize(ctx, g, { W, H, D, openW, E, floorY, seed: 2, beacon: false });
+    verticalTower(ctx, g, { W, H, D, E, seed: 2 });
     action('match', 'MAH MATCH', 'destination', f.glass, world(g, 0, floorY, 2), { view: 'match-entrance', copy: 'Fighting facility: matches and practice. Choose an action at the entrance.' });
     /* the strong central frame around the opening, with a square-diamond keystone */
     const fT = 1.4, fD = 1.0, fz = 0.55;
@@ -280,13 +428,13 @@ export function buildBuildings(ctx) {
     const key = diamondFrame(2.6, 0.22, M.energyLight, 0.2); key.position.set(0, floorY + openH + fT + 0.6, fz + 0.3); g.add(key);
     ctx.reflect(key.children[0], 0.3);
     /* horizontal structural bands across the piers */
-    [7.5, 13.5, 19.5].forEach(y => [-1, 1].forEach(s => { const b = box((W - openW) / 2 - 1.2, 0.35, 0.3, M.platinum, s * (openW / 2 + (W - openW) / 4 + 0.3), y, 0.5); g.add(b); }));
+    [7.5, 13.5, 19.5, 25.5, 31.5].forEach(y => [-1, 1].forEach(s => { const b = box((W - openW) / 2 - 1.2, 0.35, 0.3, M.platinum, s * (openW / 2 + (W - openW) / 4 + 0.3), y, 0.5); g.add(b); }));
     /* faceted armour-like panel regions on the piers, restrained */
-    [-1, 1].forEach(s => { for (let i = 0; i < 3; i++) { const p = box(3.0, 2.2, 0.28, M.panel, s * (openW / 2 + 5.2 + (i % 2) * 0.4), 10 + i * 3, 0.42); p.rotation.y = s * 0.06; g.add(p); } });
+    [-1, 1].forEach(s => { for (let i = 0; i < 6; i++) { const p = box(3.0, 2.2, 0.28, M.panel, s * (openW / 2 + 5.2 + (i % 2) * 0.4), 10 + i * 4.2, 0.42); p.rotation.y = s * 0.06; g.add(p); } });
     /* the two banners: dark cloth with the red square-diamond, the competitive accent */
     [-1, 1].forEach(s => { const cloth = box(1.8, 8.5, 0.06, M.graphiteDark, s * (openW / 2 + 3.2), floorY + 8.5, 0.62); g.add(cloth); const em = diamondFrame(0.9, 0.09, M.matchRed, 0.06); em.position.set(s * (openW / 2 + 3.2), floorY + 11.4, 0.7); g.add(em); });
     /* signage: the name with its truthful sub-line; the TWO entrance actions below (§09 / §11 of the brief) */
-    sign(ctx, g, { title: 'MAH MATCH', sub: 'MATCHES · PRACTICE', mark: true, width: 15, y: floorY + openH + fT + 4.9, z: 0.62 });
+    sign(ctx, g, { title: 'MAH MATCH', sub: 'MATCHES · PRACTICE', mark: true, width: 17, y: floorY + openH + fT + 5.4, z: 0.62 });
     const entranceAction = (id, title, x, extra) => {
       const panel = box(5.6, 1.5, 0.12, M.graphiteDark, x, floorY + 2.75, -E + 0.42); g.add(panel);
       const edge = box(5.4, 0.03, 0.04, M.energySoft, x, floorY + 1.98, -E + 0.5); g.add(edge);
@@ -341,16 +489,17 @@ export function buildBuildings(ctx) {
   /* ---------------- MAH MARKET — world commerce -------------------------- */
   {
     const g = new THREE.Group(); g.name = 'MAH MARKET';
-    const W = 32, H = 12, openW = 20, openH = 7, E = 2.5, R = 12;
-    g.position.set(36, 0, -30); g.rotation.y = -0.32; scene.add(g);
-    const f = facade(ctx, g, { W, H, D: 22, openW, openH, pierDepth: E, roomDepth: R, radius: 3.0, glassMullions: 3 });
-    dressFacade(ctx, g, { W, H, D: 22, openW, openH, E, seed: 3, windowsUpper: false });   /* the low market: wings, canopy and roof kit, no upper courses */
-    crystallize(ctx, g, { W, H, D: 22, openW, E, seed: 3 });
+    const S = SITES.market, { W, H, D, openW, openH, E, R } = S;
+    g.position.set(S.x, 0, S.z); g.rotation.y = S.rotY; scene.add(g);
+    const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, radius: S.radius, glassMullions: 4 });
+    dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 3, windowsUpper: false, roofKit: false });   /* the civic market: wings and canopy, terraces instead of a roof kit */
+    crystallize(ctx, g, { W, H, D, openW, E, seed: 3, beacon: false });
+    terraces(ctx, g, { W, H, D, E, seed: 3 });
     action('market', 'MAH MARKET', 'destination', f.glass, world(g, 0, 0, 2), { view: 'market-entrance', copy: 'World marketplace. Preview navigation only: nothing is for sale here and no prices exist.' });
     /* a soft continuous sill light under the glass — the welcome line */
     const sill = box(openW, 0.05, 0.08, M.energyLight, 0, 0.06, -E + 0.3); g.add(sill); ctx.reflect(sill, 0.3);
     /* name only: the concept's sub-line ("… NUTRITION …") is not verified and is omitted */
-    sign(ctx, g, { title: 'MAH MARKET', mark: true, width: 13.5, y: 9.15, z: 0.62 });
+    sign(ctx, g, { title: 'MAH MARKET', mark: true, width: 15.5, y: 11.4, z: 0.62 });
     /* interior: shelving zones with abstract merchandise, two display plinths */
     const room = g.children.find(c => c.isGroup && c.position.z === -E);
     const tints = [0x3f5a86, 0x7c8fb0, 0x2f7f8f, 0x8a7ab8, 0x5ea2c8];

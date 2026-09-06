@@ -24,22 +24,25 @@ import { buildBuildings } from './buildings.js';
 import { buildSky } from './sky.js';
 
 export const VIEWS = {
-  establishing:      { pos: [0.6, 3.0, 42],    look: [0, 8.5, -46],    fov: 56, label: 'Arrival', portrait: { pos: [0.6, 2.7, 40], look: [0, 13, -46], fov: 58 } },
-  'in-world':        { pos: [3.5, 1.9, 28],    look: [-1, 7.0, -46],   fov: 60, label: 'In-world', portrait: { pos: [3.5, 1.9, 28], look: [-1, 10, -46], fov: 62 } },
-  'match-approach':  { pos: [1.4, 1.9, -14],   look: [0, 6.5, -48],    fov: 58, label: 'Toward MAH MATCH' },
-  'match-entrance':  { pos: [0.4, 3.0, -37],   look: [0, 4.8, -60],    fov: 54, label: 'MAH MATCH entrance', portrait: { pos: [0.4, 3.4, -28], look: [0, 5.4, -60], fov: 58 } },
-  'gym-entrance':    { pos: [-20, 2.2, -8],    look: [-36, 6, -30],    fov: 56, label: 'MAH GYM entrance' },
-  'market-entrance': { pos: [21, 2.0, -9],     look: [36, 4.5, -30],   fov: 56, label: 'MAH MARKET entrance' },
+  /* v5 §16: the three sites now stand at three depths across a much wider frontage, so the arrival
+     camera stands further back on a narrower lens — the whole site plan reads, nothing is clipped, and
+     the vertical portrait override puts the chromium floor in the lower third and the tower up top */
+  establishing:      { pos: [0.6, 3.2, 58],    look: [0, 17, -66],     fov: 50, label: 'Arrival', portrait: { pos: [0.6, 2.9, 54], look: [0, 26, -66], fov: 54 } },
+  'in-world':        { pos: [3.5, 1.9, 34],    look: [-1, 13, -66],    fov: 56, label: 'In-world', portrait: { pos: [3.5, 1.9, 34], look: [-1, 21, -66], fov: 60 } },
+  'match-approach':  { pos: [1.4, 1.9, -16],   look: [0, 14, -66],     fov: 58, label: 'Toward MAH MATCH' },
+  'match-entrance':  { pos: [0.4, 3.0, -50],   look: [0, 6.0, -78],    fov: 54, label: 'MAH MATCH entrance', portrait: { pos: [0.4, 3.4, -42], look: [0, 9.0, -78], fov: 58 } },
+  'gym-entrance':    { pos: [-25, 2.2, 5],     look: [-46, 6, -14],    fov: 56, label: 'MAH GYM entrance' },
+  'market-entrance': { pos: [27, 2.0, -14],    look: [50, 6.0, -36],   fov: 56, label: 'MAH MARKET entrance' },
   residents:         { pos: [2.2, 1.7, 20.5],  look: [-0.6, 1.2, 12],  fov: 50, label: 'Residents' },
   appearance:        { pos: [0.8, 2.7, 26],    look: [0.2, 1.3, 12],   fov: 52, label: 'Appearance check' },
   'sky-plant':       { pos: [-11.5, 1.5, 28],  look: [-15, 4.5, 18],   fov: 54, label: 'Plant and sky' },
-  practice:          { pos: [-10.5, 4.0, -66],  look: [-7, 2.4, -72],   fov: 54, label: 'Practice zone' },   /* from above the left tier, nothing between the camera and the marks */
-  'gym-side':        { pos: [-8, 2.0, 18],     look: [-34, 6, -30],    fov: 56, label: 'Gym side' },
-  'market-side':     { pos: [8, 2.0, 18],      look: [34, 5, -30],     fov: 56, label: 'Market side' },
+  practice:          { pos: [-10.5, 4.0, -84],  look: [-7, 2.4, -90],   fov: 54, label: 'Practice zone' },   /* from above the left tier, nothing between the camera and the marks */
+  'gym-side':        { pos: [-8, 2.0, 18],     look: [-44, 7, -14],    fov: 56, label: 'Gym side' },
+  'market-side':     { pos: [8, 2.0, 18],      look: [46, 8, -36],     fov: 56, label: 'Market side' },
   /* v4 review views */
-  skyline:           { pos: [2, 2.4, 36],      look: [-8, 34, -260],   fov: 62, label: 'Skyline' },
+  skyline:           { pos: [2, 2.4, 38],      look: [-8, 40, -280],   fov: 62, label: 'Skyline' },
   'plaza-node':      { pos: [-24, 2.0, 16],    look: [8, 3, -20],      fov: 58, label: 'Plaza node' },
-  'match-hall':      { pos: [-10, 4.0, -56],   look: [2, 2.6, -66],    fov: 60, label: 'MAH MATCH hall' }
+  'match-hall':      { pos: [-10, 4.0, -74],   look: [2, 2.6, -84],    fov: 60, label: 'MAH MATCH hall' }
 };
 export const TOUR = ['establishing', 'in-world', 'match-entrance'];
 export const AVATAR_COLOURS = ['purple', 'green', 'blue', 'red', 'silver', 'teal', 'violet', 'emerald', 'crimson', 'platinum'];
@@ -241,7 +244,31 @@ export async function createMahplaza(canvas, options = {}) {
   const envDome = new THREE.Mesh(new THREE.SphereGeometry(50, 24, 12), new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide }));
   const envCols = new Float32Array(envDome.geometry.attributes.position.count * 3); envDome.geometry.setAttribute('color', new THREE.BufferAttribute(envCols, 3)); envScene.add(envDome);
   const envSun = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })); envScene.add(envSun);
-  const envFloor = new THREE.Mesh(new THREE.CircleGeometry(48, 24), new THREE.MeshBasicMaterial({ color: 0x05070c, side: THREE.DoubleSide })); envFloor.rotation.x = Math.PI / 2; envFloor.position.y = -0.5; envScene.add(envFloor);
+  const envFloor = new THREE.Mesh(new THREE.CircleGeometry(48, 24), new THREE.MeshBasicMaterial({ color: 0x0b1220, side: THREE.DoubleSide })); envFloor.rotation.x = Math.PI / 2; envFloor.position.y = -0.5; envScene.add(envFloor);
+  /* v5 §14 — WHAT CHROMIUM REFLECTS. A mirror finish is only as interesting as its surroundings: chrome
+     against a smooth gradient reads as flat grey paint. So the environment scene carries a ring of the
+     district itself — 56 vertical bars of varied height and brightness around the horizon, plus a
+     handful of megatall silhouettes — which is what every polished surface in MAHWORLD now picks up.
+     One merged, vertex-coloured mesh built once; only its brightness follows the clock. */
+  const envCity = (() => {
+    const N = 56, pos = new Float32Array(N * 6 * 3), col = new Float32Array(N * 6 * 3);
+    let s = 20250906;
+    const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+    for (let i = 0; i < N; i++) {
+      const a0 = i / N * Math.PI * 2, a1 = (i + 0.82) / N * Math.PI * 2, r = 46;
+      const h = 1.4 + rnd() * (i % 9 === 0 ? 11 : 4.6);                   /* every ninth bar is a megatall */
+      const x0 = Math.cos(a0) * r, z0 = Math.sin(a0) * r, x1 = Math.cos(a1) * r, z1 = Math.sin(a1) * r;
+      const q = [[x0, -0.4, z0], [x1, -0.4, z1], [x1, h, z1], [x0, -0.4, z0], [x1, h, z1], [x0, h, z0]];
+      q.forEach((p, k) => { pos.set(p, (i * 6 + k) * 3); });
+      const v = 0.1 + rnd() * rnd() * 0.9;                                /* mostly dark, a few bright */
+      for (let k = 0; k < 6; k++) { const t = k === 2 || k === 4 || k === 5 ? 0.45 : 1; col.set([v * t, v * t * 1.02, v * t * 1.12], (i * 6 + k) * 3); }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+    envScene.add(m); return m;
+  })();
   function refreshEnvironment(k, clockState) {
     const pos = envDome.geometry.attributes.position, top = new THREE.Color(k.top), hor = new THREE.Color(k.horizon), tmp = new THREE.Color();
     /* the horizon band carries the district's glow, so reflective trims and glass see a lit city, not a void */
@@ -253,12 +280,15 @@ export async function createMahplaza(canvas, options = {}) {
     /* the city's own glow belongs in the environment map: a bright band at the horizon so metal and glass
        pick up the district rather than a black void (brief §10 city bounce) */
     envDome.geometry.attributes.color.needsUpdate = true;
+    /* the reflected district: bright at night, subdued under daylight when the sky dominates */
+    envCity.material.color.setScalar(0.42 + 0.78 * (1 - clockState.daylight));
     if (envRT) envRT.dispose();
     envRT = pmrem.fromScene(envScene, 0.04, 0.1, 200);
     scene.environment = envRT.texture;
     /* skylight (brief §10): at night the sky and the district behind it are a real fill, so dark planes,
-       bevels and platinum catches keep reading; by day the sun stays the key and the fill stays secondary */
-    scene.environmentIntensity = 0.92 - 0.34 * clockState.daylight;
+       bevels and platinum catches keep reading; by day the sun stays the key and the fill stays secondary.
+       v5 raises it: a chromium world is lit largely BY WHAT IT REFLECTS, and the environment is that. */
+    scene.environmentIntensity = 1.18 - 0.5 * clockState.daylight;
     envDaylight = clockState.daylight;
   }
 
@@ -272,7 +302,7 @@ export async function createMahplaza(canvas, options = {}) {
     M.setTime(s);
     renderer.toneMappingExposure = state.diagnostic ? 1.0 : k.exposure;
     /* atmospheric perspective: a long, subtle falloff — deeper by day, closer at night; the city's far layers live inside it */
-    scene.fog.near = 55 + 45 * s.daylight; scene.fog.far = 640 + 320 * s.daylight;
+    scene.fog.near = 55 + 45 * s.daylight; scene.fog.far = 880 + 260 * s.daylight;   /* v5: the megatalls stand at 380–670 m and must not be eaten by the bank */
     pointLights.forEach(l => { l.intensity = l.userData.base * (1 - 0.7 * s.daylight) * (state.diagnostic ? 0.6 : 1); });
     ctx.timeHooks.forEach(h => { try { h(s); } catch (e) {} });
     const energy = state.diagnostic ? Math.min(0.3, 1 - s.daylight) : 1 - s.daylight;

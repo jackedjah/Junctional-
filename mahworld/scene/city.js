@@ -8,9 +8,11 @@
       roof plant, masts and parapet rails; three short bridges between blocks and
       ONE long walkway crossing behind MAH MATCH (deck y 34, z −122, x −75..75)
       with a thin rail light line, under-deck lights and a slow rail pod.
-   2. BACKGROUND (220–520 m): crystalline towers — four faceted archetypes
-      (tapered obelisk, hexagonal crystal, stepped twin prism, blade) as four
-      InstancedMeshes, each with one or two thin energy strips.
+   2. BACKGROUND (220–670 m): crystalline towers — seven faceted archetypes as
+      seven InstancedMeshes, each with one or two thin energy strips: the four v4
+      forms (tapered obelisk, hexagonal crystal, stepped twin prism, blade) plus
+      three v5 MEGATALLS at 214–392 m (stepped shaft + spire, notched twin blade,
+      crystalline pinnacle), set at overlapping radii for height parallax.
    3. DISTANT (520–850 m): flat dark silhouettes under the fog — tall slabs, a
       colossal tapered form, a suspended ring on pylons, a high platform.
 
@@ -53,7 +55,9 @@ const BLOCKS = [
   { id: 'R5', x: 150,  z: -80,  w: 22, d: 20, h: 36, sb: 0.25, side: -1 }
 ];
 /* bridges between blocks (world endpoints sit just inside the block faces) and the main walkway */
-const WALKWAY = { id: 'city-walkway', ax: -75.5, az: -122, bx: 75.5, bz: -122, y: 34, width: 4.2, pylons: [-52, 52] };
+/* the walkway sits BEHIND MAH MATCH's new site (z −66, body back to −123), so it still crosses the
+   frame without passing through the building */
+const WALKWAY = { id: 'city-walkway', ax: -75.5, az: -150, bx: 75.5, bz: -150, y: 40, width: 4.2, pylons: [-52, 52] };
 const BRIDGES = [
   { id: 'city-bridge-l2-l4', ax: -93.5, az: -124,   bx: -105.5, bz: -124,   y: 36, width: 3.2 },
   { id: 'city-bridge-r3-r4', ax: 64.7,  az: -141.6, bx: 76,     bz: -131,   y: 30, width: 3.2 },
@@ -67,7 +71,15 @@ const TOWERS = [
   [138, 260, 58, 15, 'C', 1], [128, 330, 124, 20, 'A', 1], [145, 400, 90, 19, 'B', 1], [120, 400, 136, 21, 'A', 2],
   [52, 260, 66, 16, 'C', 1], [44, 330, 112, 21, 'A', 2], [56, 420, 130, 22, 'D', 1], [36, 450, 96, 20, 'B', 1], [48, 500, 148, 26, 'A', 2],
   [18, 300, 70, 18, 'C', 1], [8, 380, 90, 20, 'B', 1], [160, 320, 80, 18, 'A', 1], [172, 400, 100, 22, 'D', 1], [150, 480, 118, 22, 'A', 1], [25, 480, 124, 24, 'A', 2],
-  [58, 285, 74, 16, 'B', 1]
+  [58, 285, 74, 16, 'B', 1],
+  /* ---- v5 §09 MEGATALL: the skyline needs a top the eye can climb to. These are 2–3× the tallest
+     v4 tower, set at four different radii so they overlap each other and the towers in front of them —
+     height parallax, not a flat cut-out row. Three new crowns (stepped + spire, notched twin blade,
+     crystalline pinnacle) so no two megatalls end the same way. --------------------------------- */
+  [96, 470, 340, 34, 'E', 2], [70, 545, 296, 30, 'G', 1], [118, 430, 268, 30, 'F', 2],
+  [46, 505, 312, 32, 'E', 2], [30, 420, 236, 27, 'G', 1], [140, 540, 288, 31, 'F', 1],
+  [82, 380, 214, 26, 'G', 1], [58, 600, 366, 38, 'E', 2], [108, 625, 330, 35, 'F', 2],
+  [12, 560, 258, 28, 'E', 1], [156, 455, 226, 27, 'G', 1], [88, 665, 392, 40, 'E', 2]
 ];
 /* distant slabs: bearing, radius, width, height, depth, rotation */
 const SLABS = [
@@ -248,11 +260,37 @@ export function buildCity(ctx) {
     A: faceted(mergeGeos([new THREE.CylinderGeometry(0.60, 0.72, 1, 4, 1).translate(0, 0.5, 0), new THREE.CylinderGeometry(0.03, 0.60, 0.15, 4, 1).translate(0, 1.075, 0)])),
     B: faceted(mergeGeos([new THREE.CylinderGeometry(0.50, 0.56, 1, 6, 1).translate(0, 0.5, 0), new THREE.CylinderGeometry(0.10, 0.50, 0.12, 6, 1).translate(0, 1.06, 0)])),
     C: faceted(mergeGeos([new THREE.CylinderGeometry(0.70, 0.72, 0.62, 4, 1).translate(0, 0.31, 0), new THREE.CylinderGeometry(0.46, 0.50, 1, 4, 1).translate(0.12, 0.5, 0.1), new THREE.CylinderGeometry(0.04, 0.46, 0.12, 4, 1).translate(0.12, 1.06, 0.1)])),
-    D: (() => { const s = new THREE.Shape(); s.moveTo(-0.5, 0); s.lineTo(0.5, 0); s.lineTo(0.5, 0.84); s.lineTo(0.12, 1); s.lineTo(-0.5, 0.9); s.closePath(); const g = new THREE.ExtrudeGeometry(s, { depth: 0.36, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1, curveSegments: 1 }); g.translate(0, 0, -0.18); return faceted(g); })()
+    D: (() => { const s = new THREE.Shape(); s.moveTo(-0.5, 0); s.lineTo(0.5, 0); s.lineTo(0.5, 0.84); s.lineTo(0.12, 1); s.lineTo(-0.5, 0.9); s.closePath(); const g = new THREE.ExtrudeGeometry(s, { depth: 0.36, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1, curveSegments: 1 }); g.translate(0, 0, -0.18); return faceted(g); })(),
+    /* MEGATALL E — the stepped supertall: a long tapering shaft, two setbacks, then a slender spire.
+       The classic "how tall is that" silhouette; the spire is what makes the height legible. */
+    E: faceted(mergeGeos([
+      new THREE.CylinderGeometry(0.40, 0.62, 0.78, 4, 1).translate(0, 0.39, 0),
+      new THREE.CylinderGeometry(0.30, 0.40, 0.13, 4, 1).translate(0, 0.845, 0),
+      new THREE.CylinderGeometry(0.19, 0.30, 0.09, 4, 1).translate(0, 0.955, 0),
+      new THREE.CylinderGeometry(0.03, 0.13, 0.19, 4, 1).translate(0, 1.095, 0)
+    ])),
+    /* MEGATALL F — the notched twin blade: two slabs of different height sharing a core, so the crown
+       is a NOTCH against the sky rather than a point. Reads at any distance, from any bearing. */
+    F: faceted(mergeGeos([
+      new THREE.BoxGeometry(0.86, 1.0, 0.30).translate(-0.20, 0.5, 0),
+      new THREE.BoxGeometry(0.72, 0.83, 0.30).translate(0.38, 0.415, 0),
+      new THREE.BoxGeometry(0.30, 0.62, 0.26).translate(0.09, 0.31, 0),
+      new THREE.CylinderGeometry(0.02, 0.05, 0.16, 4, 1).translate(-0.20, 1.08, 0)
+    ])),
+    /* MEGATALL G — the crystalline pinnacle: an eight-sided shaft narrowing to a faceted point, the
+       purest expression of the world's diamond language at architectural scale. */
+    G: faceted(mergeGeos([
+      new THREE.CylinderGeometry(0.34, 0.56, 0.72, 8, 1).translate(0, 0.36, 0),
+      new THREE.CylinderGeometry(0.22, 0.34, 0.18, 8, 1).translate(0, 0.81, 0),
+      new THREE.CylinderGeometry(0.001, 0.22, 0.22, 8, 1).translate(0, 1.01, 0)
+    ]))
   };
   Object.values(arch).forEach(own);
-  const towerMats = { A: structuralM, B: panelM, C: compositeM, D: structuralM };
-  const byArch = { A: [], B: [], C: [], D: [] };
+  /* megatalls wear the brushed-platinum and satin grades: at that distance a rougher metal keeps them
+     readable as MASS, while the mirror grades would flare into featureless white */
+  const towerMats = { A: structuralM, B: panelM, C: compositeM, D: structuralM,
+    E: (M.platinumBrushed || structuralM), F: (M.graphiteMetal || compositeM), G: (M.panel || panelM) };
+  const byArch = { A: [], B: [], C: [], D: [], E: [], F: [], G: [] };
   const boxStrips = [], hexStrips = [];
   const Rt = rng(SEED + 77);
   TOWERS.forEach(([a, r, h, w, type, strips]) => {
@@ -263,6 +301,9 @@ export function buildCity(ctx) {
       if (type === 'A') { const rr = 0.72 + (0.60 - 0.72) * f, side = rr * Math.SQRT2 * w * 1.02; boxStrips.push(matrixOf(x, y, z, ry + Math.PI / 4, side, 1.1, side).clone()); }
       else if (type === 'C') { const rr = 0.50 + (0.46 - 0.50) * f, side = rr * Math.SQRT2 * w * 1.02, ox = 0.12 * w, oz = 0.1 * w; boxStrips.push(matrixOf(x + ox * Math.cos(ry) + oz * Math.sin(ry), y, z - ox * Math.sin(ry) + oz * Math.cos(ry), ry + Math.PI / 4, side, 1.1, side).clone()); }
       else if (type === 'D') boxStrips.push(matrixOf(x, y, z, ry, w * 1.02, 1.1, 0.36 * w * 1.04).clone());
+      else if (type === 'E') { const rr = 0.62 + (0.40 - 0.62) * Math.min(1, f / 0.78), side = rr * Math.SQRT2 * w * 1.02; boxStrips.push(matrixOf(x, y, z, ry + Math.PI / 4, side, 1.6, side).clone()); }
+      else if (type === 'F') boxStrips.push(matrixOf(x - 0.20 * w * Math.cos(ry), y, z + 0.20 * w * Math.sin(ry), ry, 0.88 * w, 1.6, 0.32 * w).clone());
+      else if (type === 'G') { const rr = 0.56 + (0.34 - 0.56) * Math.min(1, f / 0.72); hexStrips.push(matrixOf(x, y, z, ry, rr * w * 1.03, 1.6, rr * w * 1.03).clone()); }
       else { const rr = 0.56 + (0.50 - 0.56) * f; hexStrips.push(matrixOf(x, y, z, ry, rr * w * 1.03, 1.1, rr * w * 1.03).clone()); }
     }
     stats.towers++;

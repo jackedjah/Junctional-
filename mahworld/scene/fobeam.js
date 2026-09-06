@@ -41,10 +41,10 @@ import { chamferBox, canvasTexture } from './materials.js';
    base  = where the receiver is rooted (plaza ground, MAH MATCH's roof at y 24,
            the walkway deck at y 34, a tower crown)                                          */
 const NODES = {
-  'relay-west':  { p: [-62, 34, -40],  base: [-62, 0, -40],      kind: 'mast',  note: 'plaza-edge relay mast, west of the vehicle corridor' },
-  'relay-east':  { p: [66, 31, -34],   base: [66, 0, -34],       kind: 'mast',  note: 'plaza-edge relay mast, east of the vehicle corridor' },
-  'match-roof':  { p: [0, 30.2, -55],  base: [0, 24, -55],       kind: 'node',  note: 'MAH MATCH roof node' },
-  'walkway-hub': { p: [-52, 41.5, -122], base: [-52, 34, -122],  kind: 'node',  note: 'city walkway hub, over the west pylon' },
+  'relay-west':  { p: [-72, 34, -46],  base: [-72, 0, -46],      kind: 'mast',  note: 'plaza-edge relay mast, west of the vehicle corridor' },
+  'relay-east':  { p: [76, 31, -50],   base: [76, 0, -50],       kind: 'mast',  note: 'plaza-edge relay mast, east of the vehicle corridor' },
+  'match-roof':  { p: [0, 72.0, -78],  base: [0, 65, -78],       kind: 'node',  note: 'MAH MATCH tower crown node' },
+  'walkway-hub': { p: [-52, 47.5, -150], base: [-52, 40, -150],  kind: 'node',  note: 'city walkway hub, over the west pylon' },
   'crown-nw':    { p: [-72.6, 131, -291], base: [-72.6, 125, -291], kind: 'crown', note: 'background tower crown, north-west' },
   'crown-w':     { p: [-111.4, 77, -262], base: [-111.4, 71.5, -262], kind: 'crown', note: 'background tower crown, west' },
   'crown-e':     { p: [118, 111, -265], base: [118, 105.5, -265], kind: 'crown', note: 'background tower crown, east' }
@@ -54,17 +54,17 @@ const NODES = {
    Each is one-way with its own speed, packet count, gauge (trunk lines carry larger
    carriers, which is also what keeps a 300 m route readable) and phase.                      */
 const ROUTES = [
-  { id: 'plaza-west-feed', from: 'relay-west', to: 'match-roof', speed: 15.5, count: 4, gauge: 1.0, gain: 1.00, phase: 0.00,
-    via: [[-58, 52, -18], [-42, 63, -14], [-19, 51, -34]] },
-  /* leaves the roof node in the open, dips behind MAH MATCH's mass, climbs back out to the walkway */
-  { id: 'match-relay', from: 'match-roof', to: 'walkway-hub', speed: 20.5, count: 3, gauge: 1.05, gain: 0.95, phase: 0.37,
-    via: [[-9, 31.5, -78], [-26, 38, -100], [-44, 44, -116]] },
-  { id: 'plaza-east-line', from: 'relay-east', to: 'crown-e', speed: 13.0, count: 5, gauge: 1.55, gain: 0.88, phase: 0.61,
-    via: [[78, 60, -80], [92, 86, -140], [108, 104, -200]] },
-  { id: 'walkway-uplink', from: 'walkway-hub', to: 'crown-nw', speed: 23.5, count: 5, gauge: 1.5, gain: 0.9, phase: 0.18,
-    via: [[-58, 72, -162], [-64, 96, -205], [-70, 118, -250]] },
+  { id: 'plaza-west-feed', tier: 'near', from: 'relay-west', to: 'match-roof', speed: 15.5, count: 7, gauge: 0.46, gain: 1.00, phase: 0.00,
+    via: [[-64, 50, -30], [-46, 66, -30], [-20, 76, -56]] },
+  /* leaves the tower crown in the open, dips behind MAH MATCH's mass, climbs back out to the walkway */
+  { id: 'match-relay', tier: 'near', from: 'match-roof', to: 'walkway-hub', speed: 20.5, count: 6, gauge: 0.48, gain: 0.95, phase: 0.37,
+    via: [[-12, 66, -100], [-30, 56, -122], [-44, 50, -140]] },
+  { id: 'plaza-east-line', tier: 'mid', from: 'relay-east', to: 'crown-e', speed: 13.0, count: 9, gauge: 0.62, gain: 0.88, phase: 0.61,
+    via: [[86, 60, -92], [96, 86, -150], [110, 104, -206]] },
+  { id: 'walkway-uplink', tier: 'mid', from: 'walkway-hub', to: 'crown-nw', speed: 23.5, count: 9, gauge: 0.6, gain: 0.9, phase: 0.18,
+    via: [[-58, 74, -178], [-64, 98, -214], [-70, 118, -252]] },
   /* the trunk: crown to crown across the district, passing behind the midground blocks */
-  { id: 'district-trunk', from: 'crown-w', to: 'crown-e', speed: 18.0, count: 6, gauge: 2.1, gain: 0.8, phase: 0.79,
+  { id: 'district-trunk', tier: 'mid', from: 'crown-w', to: 'crown-e', speed: 18.0, count: 12, gauge: 0.78, gain: 0.8, phase: 0.79,
     via: [[-64, 78, -234], [0, 74, -224], [64, 84, -234]] }
 ];
 
@@ -76,8 +76,21 @@ const FLOWS = [
 ];
 
 const SEG = 128;            /* cached samples per route (arc-length spaced) */
-const RAIL_TS = 100, RAIL_RS = 6, RAIL_R = 0.23;
-const FIELD_TS = 52, FIELD_RS = 6, FIELD_R = 1.85;
+/* v5 §10: MANY more FOBEAMs, each far THINNER and SMALLER than v4's five fat arcs. One beam is now a
+   hairline; what carries the composition is the DENSITY of them and the fact that no two are in phase.
+   Tessellation falls with distance so 40 routes cost less than v4's five did.
+     near  over and around the plaza — the ones a viewer can follow packet by packet
+     mid   across the district, between crowns and hubs
+     far   the distant energy field: hundreds of metres out, sub-pixel-thin, no outer field  */
+const TIER = {
+  near: { railR: 0.085, fieldR: 0.72, ts: 84, rs: 5, fts: 34, frs: 5, rail: 0.62, field: 0.085, packet: 1.0 },
+  mid:  { railR: 0.115, fieldR: 0.95, ts: 66, rs: 5, fts: 28, frs: 5, rail: 0.5,  field: 0.062, packet: 0.72 },
+  far:  { railR: 0.46,  fieldR: 0,    ts: 20, rs: 4, fts: 0,  frs: 0, rail: 0.17, field: 0, packet: 0.34 }
+};
+/* THE DISTANT MAHGIC FIELD (§11): far routes are generated along a band arcing across the sky, denser
+   toward its middle, so together they read as one luminous river of energy — the Milky Way of a world
+   whose infrastructure IS light — rather than as thirty separate drawn lines. */
+const FAR_ROUTES = 30;
 
 function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 function smoothstep(e0, e1, x) { const t = clamp01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); }
@@ -162,9 +175,38 @@ export function buildFobeams(ctx) {
   const nodeIndex = {}, nodeList = [];
   Object.keys(NODES).forEach((k, i) => { nodeIndex[k] = i; nodeList.push(Object.assign({ id: k, flash: 0 }, NODES[k])); });
 
-  ROUTES.forEach((spec, ri) => {
-    const a = NODES[spec.from], b = NODES[spec.to];
+  /* ---- the distant MAHGIC field: FAR_ROUTES generated along one band across the sky --------
+     Bearing runs the width of the visible sky; the band's height is a smooth arc peaking behind the
+     district, so density is highest where the eye already is. Each route is short relative to its
+     radius, carries several tiny packets, and has its own speed, phase and direction. Deterministic. */
+  const FR = rng(31337);
+  const band = (u, jitter) => {
+    const bearing = (-24 + 228 * u) * Math.PI / 180;
+    const r = 380 + FR() * 330;
+    const y = 78 + 232 * Math.sin(Math.PI * u) + (jitter ? (FR() - 0.5) * 96 : 0);
+    return [Math.cos(bearing) * r, y, -Math.sin(bearing) * r];
+  };
+  const farRoutes = [];
+  for (let i = 0; i < FAR_ROUTES; i++) {
+    const u0 = (i + FR() * 0.7) / FAR_ROUTES, u1 = Math.min(1, u0 + 0.03 + FR() * 0.09);
+    const a = band(u0, true), b = band(u1, true);
+    /* the mid point is pushed off the chord by a signed amount that is sometimes almost nothing: a third
+       of the field runs nearly straight, so the sky is not thirty matching arches */
+    const bow = (FR() - 0.42) * 130;
+    const mid = [(a[0] + b[0]) / 2 * (0.9 + FR() * 0.2), (a[1] + b[1]) / 2 + bow, (a[2] + b[2]) / 2 * (0.9 + FR() * 0.2)];
+    farRoutes.push({
+      id: 'mahgic-field-' + i, tier: 'far', p0: a, p1: b, via: [mid],
+      speed: 34 + FR() * 46, count: 3 + Math.floor(FR() * 4), gauge: 1.2 + FR() * 1.5,
+      gain: 0.2 + FR() * FR() * 0.62, phase: FR(), reverse: FR() < 0.5
+    });
+  }
+  const ALL = ROUTES.concat(farRoutes);
+
+  ALL.forEach((spec, ri) => {
+    const T = TIER[spec.tier || 'mid'];
+    const a = spec.p0 ? { p: spec.p0 } : NODES[spec.from], b = spec.p1 ? { p: spec.p1 } : NODES[spec.to];
     const pts = [new THREE.Vector3(...a.p)].concat(spec.via.map(v => new THREE.Vector3(...v)), [new THREE.Vector3(...b.p)]);
+    if (spec.reverse) pts.reverse();
     const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
     /* cache the path ONCE: arc-length spaced points and their tangents. update() only interpolates. */
     const sample = curve.getSpacedPoints(SEG);
@@ -176,16 +218,20 @@ export function buildFobeams(ctx) {
       const l = Math.hypot(dx, dy, dz) || 1; tx[i * 3] = dx / l; tx[i * 3 + 1] = dy / l; tx[i * 3 + 2] = dz / l;
     }
     const len = curve.getLength();
-    routes.push({ id: spec.id, curve, px, tx, len, speed: spec.speed, gauge: spec.gauge, gain: spec.gain, from: nodeIndex[spec.from], to: nodeIndex[spec.to], count: spec.count });
+    routes.push({ id: spec.id, tier: spec.tier || 'mid', curve, px, tx, len, speed: spec.speed, gauge: spec.gauge, gain: spec.gain, pgain: T.packet, from: nodeIndex[spec.from], to: nodeIndex[spec.to], count: spec.count, phase: spec.phase });
 
-    /* RAIL — thin, bright, faded at both ends by vertex colour */
-    const rail = new THREE.TubeGeometry(curve, RAIL_TS, RAIL_R, RAIL_RS, false);
-    paintTube(rail, RAIL_TS, RAIL_RS, u => spec.gain * (0.80 + 0.20 * Math.sin(Math.PI * u)) * smoothstep(0, 0.05, u) * smoothstep(0, 0.05, 1 - u));
+    /* RAIL — a hairline, bright, faded at both ends by vertex colour */
+    const rail = new THREE.TubeGeometry(curve, T.ts, T.railR, T.rs, false);
+    const railK = T.rail / TIER.near.rail;   /* the far tier is dimmer as well as thinner */
+    paintTube(rail, T.ts, T.rs, u => railK * spec.gain * (0.80 + 0.20 * Math.sin(Math.PI * u)) * smoothstep(0, 0.05, u) * smoothstep(0, 0.05, 1 - u));
     railParts.push(rail);
-    /* OUTER FIELD — wide, soft, swelling in the middle of the run */
-    const field = new THREE.TubeGeometry(curve, FIELD_TS, FIELD_R, FIELD_RS, false);
-    paintTube(field, FIELD_TS, FIELD_RS, u => spec.gain * (0.45 + 0.55 * Math.sin(Math.PI * u)) * smoothstep(0, 0.12, u) * smoothstep(0, 0.12, 1 - u));
-    fieldParts.push(field);
+    /* OUTER FIELD — soft, swelling in the middle of the run; the far tier carries none */
+    if (T.fieldR > 0) {
+      const field = new THREE.TubeGeometry(curve, T.fts, T.fieldR, T.frs, false);
+      const fieldK = T.field / TIER.near.field;
+      paintTube(field, T.fts, T.frs, u => fieldK * spec.gain * (0.45 + 0.55 * Math.sin(Math.PI * u)) * smoothstep(0, 0.12, u) * smoothstep(0, 0.12, 1 - u));
+      fieldParts.push(field);
+    }
   });
   function paintTube(geo, ts, rs, fn) {
     const n = geo.attributes.position.count, col = new Float32Array(n * 3), stride = rs + 1;
@@ -201,13 +247,15 @@ export function buildFobeams(ctx) {
   const packets = [];
   routes.forEach((r, ri) => {
     for (let i = 0; i < r.count; i++) {
-      const jitter = (R() - 0.5) * 0.5 / r.count;
+      /* the jitter is a full slot wide, so packets on one route are never evenly spaced and the world
+         never falls into a marching rhythm — asynchrony is the point (§10) */
+      const jitter = (R() - 0.5) * 0.9 / r.count;
       packets.push({
         r: ri,
-        s: ((i / r.count + ROUTES[ri].phase + jitter) % 1 + 1) % 1 * r.len,
-        speed: r.speed * (0.94 + R() * 0.14),          /* 12–26 m/s, and never in lockstep even on one route */
-        size: (0.5 + R() * 0.6) * r.gauge,             /* 0.5–1.1 m, scaled by the route's gauge */
-        gain: 0.72 + R() * 0.34,
+        s: ((i / r.count + r.phase + jitter) % 1 + 1) % 1 * r.len,
+        speed: r.speed * (0.82 + R() * 0.4),           /* no two packets share a speed, even on one route */
+        size: (0.5 + R() * 0.6) * r.gauge,
+        gain: (0.72 + R() * 0.34) * r.pgain,   /* a distant packet is a spark, not a lamp */
         b: 0
       });
     }
@@ -304,8 +352,8 @@ export function buildFobeams(ctx) {
       pk.s += pk.speed * dt;
       if (pk.s >= r.len) {                   /* transfer: the destination brightens, the origin sends again */
         pk.s -= r.len;
-        nodeList[r.to].flash = 1;
-        nodeList[r.from].flash = Math.max(nodeList[r.from].flash, 0.55);
+        if (r.to != null && nodeList[r.to]) nodeList[r.to].flash = 1;
+        if (r.from != null && nodeList[r.from]) nodeList[r.from].flash = Math.max(nodeList[r.from].flash, 0.55);
       }
       sampleAt(r, pk.s, _p, _t);
       state.pos[i * 3] = _p.x; state.pos[i * 3 + 1] = _p.y; state.pos[i * 3 + 2] = _p.z;
@@ -414,13 +462,16 @@ export function buildFobeams(ctx) {
   setTheme(theme);
   step(0, 0.016); orient(null);
 
+  const tierCount = t => routes.filter(r => r.tier === t).length;
   const stats = {
-    routes: routes.map(r => ({ id: r.id, from: nodeList[r.from].id, to: nodeList[r.to].id, length: Math.round(r.len), speed: r.speed, packets: r.count })),
+    routes: routes.filter(r => r.from != null).map(r => ({ id: r.id, tier: r.tier, from: nodeList[r.from].id, to: nodeList[r.to].id, length: Math.round(r.len), speed: r.speed, packets: r.count })),
+    tiers: { near: tierCount('near'), mid: tierCount('mid'), far: tierCount('far') },
+    routeCount: routes.length,
     packets: N,
     receivers: nodeList.length,
     flows: flowMeshes.length,
     drawCalls: 2 + 2 + 3 + flowMeshes.length,          /* rail, field | packets, lights | receivers ×3 | flows */
-    triangles: (RAIL_TS * RAIL_RS * 2 + FIELD_TS * FIELD_RS * 2) * routes.length + N * 10 + nodeList.length * 90 + flowMeshes.length * 120,
+    triangles: routes.reduce((n, r) => { const T = TIER[r.tier]; return n + T.ts * T.rs * 2 + T.fts * T.frs * 2; }, 0) + N * 10 + nodeList.length * 90 + flowMeshes.length * 120,
     legacyHidden: retired.length
   };
   return { group, setTime, setTheme, update, dispose, stats, routes: stats.routes };
