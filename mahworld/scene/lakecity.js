@@ -82,15 +82,15 @@ const TAU = Math.PI * 2, DEG = Math.PI / 180;
    uses its own polar() with cos/-sin, so the site is resolved through the SAME helper terrain.js
    uses, or the lake would land 28 degrees off the water it is supposed to continue. */
 const polar = (aDeg, r) => [r * Math.cos(aDeg * DEG), -r * Math.sin(aDeg * DEG)];
-const SITE = { bearing: 62, r: 700 };   /* the centre of terrain.js's PASS ring, not a free choice */
-const WATER_Y = -1.4;                  /* terrain.js BASIN.y exactly: one water level, one system */
+export const SITE = { bearing: 62, r: 700 };   /* the centre of terrain.js's PASS ring, not a free choice */
+export const WATER_Y = -1.4;           /* terrain.js BASIN.y exactly: one water level, one system */
 const SHORE_Y = 0;                     /* the raw ground plane the land ring sits on */
 
 /* THE LAKE PLAN. An irregular closed polygon in local (x,z), NOT a disc — a disc reads as a pond
    and gives no narrow crossings for a bridge to want to exist at. Radii are sampled at 14 bearings
    and interpolated; the two pinches at index 4 and 10 are where the bridges go, and they are
    deliberately opposite each other so the causeway can run straight through the middle. */
-const LAKE_R = [232, 258, 274, 246, 176, 205, 243, 268, 251, 219, 168, 198, 236, 249];
+export const LAKE_R = [232, 258, 274, 246, 176, 205, 243, 268, 251, 219, 168, 198, 236, 249];
 
 /* AERIAL PERSPECTIVE at 560 m (L05). Verified against terrain.js's near range base 0x0d1526 /
    ridge 0x3a4d76: this city must sit ABOVE the civic district and BELOW that ridge in value. */
@@ -183,8 +183,12 @@ function finish(t) {
   return g;
 }
 
-/* the lake radius at an angle, by interpolating the plan table */
-function lakeR(a) {
+/* the lake radius at an angle, by interpolating the plan table.
+
+   EXPORTED for R5. MAH HAVEN stands on this shore, and a second copy of these fourteen radii in
+   another file is exactly the shape of every L42 defect this project has produced — a shoreline
+   that drifts from the water it is supposed to edge, with nothing failing. One polygon, one truth. */
+export function lakeR(a) {
   const n = LAKE_R.length;
   const f = ((a % TAU) + TAU) % TAU / TAU * n;
   const i = Math.floor(f), k = f - i;
@@ -646,4 +650,7 @@ export function buildLakeCity(ctx) {
   };
 }
 
-export default { buildLakeCity };
+export default { buildLakeCity, SITE, WATER_Y, LAKE_R, lakeR, lakeCentre };
+
+/* the lake centre in WORLD xz, through terrain.js's own polar helper */
+export function lakeCentre() { return polar(SITE.bearing, SITE.r); }

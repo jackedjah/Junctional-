@@ -28,8 +28,8 @@
    composition, and a disc at this altitude erases it. A dome is a second chance to make that
    mistake, so:
      · the shell is CRYSTALLINE GLASS at opacity 0.16, not a mirror and not a tint;
-     · the ribs are 48 meridians on a 3.4 km radius — one every 450 m at the spring, which is a
-       structure you read and not a cage you look through;
+     · only SIXTEEN ribs reach the apex — see the hierarchy note on DOME.MERIDIANS, which is the
+       correction that made this clause true rather than merely claimed;
      · nothing is added inside the apex zone, where a ground camera looks straight up.
    R5 says it in its own words: "Do not make the dome uniformly opaque or mirror-like."
 
@@ -62,8 +62,20 @@ export const DOME = Object.freeze({
   R: HALO.R_OUT + HALO.APRON,                 /* 3434 — springs at the outer rim, not beyond it */
   SPRING_Y: HALO.Y + Math.pow(HALO.R_OUT + HALO.APRON - HALO.R_MID, 2) / (2 * HALO.R_DISH),
   APEX_Y: 3900,                               /* 280 m over MAH CROWN's mast */
-  MERIDIANS: 48,                              /* one rib every 450 m at the spring */
-  RINGS: 14,
+  /* A RIB HIERARCHY, because 48 full-height meridians photographed as a NET.
+     At the spring, 48 ribs is one every 450 m — genuinely sparse in world terms, and it looked it
+     from close up. But meridians CONVERGE: at r 400, the same 48 ribs are one every 52 m, and from
+     the far side of the sanctuary the whole upper dome read as a wireframe cage laid over the sky.
+     That fails R5's own clause ("low visual obstruction in primary viewing zones") by a route the
+     opacity number cannot fix, because the obstruction is the STRUCTURE and not the glass.
+     So the dome is built the way a real one is: 16 PRIMARY ribs carry the full arc to the oculus,
+     and 32 SECONDARY ribs fill the lower half only — where the primaries are far apart and the
+     surface needs support — and stop before the convergence. Sixteen lines meeting overhead is a
+     dome; forty-eight is a net. */
+  MERIDIANS: 16,                              /* primary — full height, heavy */
+  SECONDARY: 32,                              /* infill — lower half only, light */
+  SECONDARY_TO: 0.46,                         /* the fraction of the arc a secondary rib covers */
+  RINGS: 9,
   SEGS: 26,                                   /* segments per meridian, spring to apex */
   PORTAL_DEG: -67.5,                          /* MAH THRESHOLD's bearing — the way out */
   PORTAL_HALF: 0.055,                         /* radians of half-width: a 378 m opening at 3434 */
@@ -162,7 +174,9 @@ export function buildHaloDome(ctx, opts = {}) {
      1. THE SHELL — one low-poly crystalline surface, built by hand because there are no addons
      ============================================================================================== */
   {
-    const MER = DOME.MERIDIANS, SEG = DOME.SEGS;
+    /* the SHELL is tessellated finer than the ribs are spaced — the glass has to be smooth and
+       the structure has to be sparse, and tying them to one number made the second impossible. */
+    const MER = DOME.MERIDIANS * 3, SEG = DOME.SEGS;
     const pos = [], nor = [], col = [];
     const pushV = (a, r, v) => {
       const y = domeY(r), x = Math.cos(a) * r, z = Math.sin(a) * r;
@@ -201,34 +215,56 @@ export function buildHaloDome(ctx, opts = {}) {
      ============================================================================================== */
   {
     const MER = DOME.MERIDIANS, SEG = DOME.SEGS;
+    /* THE PRIMARIES: sixteen, full arc, and HEAVIER than the old forty-eight were. Fewer members
+       carrying the same dome means each one is bigger, which is both structurally honest and what
+       makes them read as ribs rather than as wires. They taper toward the apex because a rib
+       carries less the higher it goes, and a constant section over 3.4 km says "extruded". */
     for (let i = 0; i < MER; i++) {
       const a = (i / MER) * TAU;
       if (inPortal(a)) continue;
-      /* a rib TAPERS toward the apex — it carries less the higher it goes, and a constant section
-         over 3.4 km would be the one thing that says "extruded" */
       for (let s = 0; s < SEG; s++) {
         const r0 = RADII[s], r1 = RADII[s + 1];
-        const t = s / SEG, w = 7.5 - 4.6 * t;
+        const t = s / SEG, w = 13 - 8.2 * t;
         along(P(a, r0), P(a, r1), w, w * 1.35, 0.90 - 0.10 * t, 'plat');
       }
       stats.meridians++;
     }
+    /* THE SECONDARIES: thirty-two light infill ribs across the lower 46% of the arc, offset half a
+       primary bay so they land midway between them. They end where the primaries start closing in
+       on each other, so nothing converges at the apex but the sixteen. */
+    const SEC = DOME.SECONDARY, secTo = Math.round(SEG * DOME.SECONDARY_TO);
+    for (let i = 0; i < SEC; i++) {
+      const a = (i / SEC) * TAU + Math.PI / SEC;
+      if (inPortal(a)) continue;
+      for (let s = 0; s < secTo; s++) {
+        const r0 = RADII[s], r1 = RADII[s + 1];
+        const t = s / SEG;
+        /* and they FADE OUT rather than stopping dead: the last two segments thin to nothing, so
+           the eye reads a member that runs out instead of a bar that was cut */
+        const fade = Math.min(1, (secTo - s) / 3);
+        const w = (5.0 - 2.2 * t) * (0.35 + 0.65 * fade);
+        if (w < 0.9) continue;
+        along(P(a, r0), P(a, r1), w, w * 1.3, 0.80, 'plat');
+      }
+      stats.secondaries = (stats.secondaries || 0) + 1;
+    }
     /* the LATITUDE RINGS: fourteen, spaced by the same cosine so they crowd where the dome is steep.
        Each is a chain of chords between adjacent meridians — a ring on a 3.4 km dome cannot be a
        torus, and a chord is what a real structure would be. */
+    const RMER = MER * 3;   /* the rings follow the SHELL's tessellation, not the ribs' spacing */
     for (let k = 1; k < DOME.RINGS; k++) {
       const r = DOME.R * Math.cos((k / DOME.RINGS) * Math.PI / 2);
-      const w = 5.2 - 3.0 * (k / DOME.RINGS);
-      for (let i = 0; i < MER; i++) {
-        const a0 = (i / MER) * TAU, a1 = ((i + 1) / MER) * TAU;
+      const w = 7.4 - 4.2 * (k / DOME.RINGS);
+      for (let i = 0; i < RMER; i++) {
+        const a0 = (i / RMER) * TAU, a1 = ((i + 1) / RMER) * TAU;
         if (inPortal(a0) || inPortal(a1)) continue;
         along(P(a0, r), P(a1, r), w, w * 1.2, 0.86, 'plat');
       }
       /* and a MAHGIC seam riding the ring — selective, one in three, so the dome has luminous
          latitude lines without becoming a cage of light */
       if (k % 3 === 1) {
-        for (let i = 0; i < MER; i++) {
-          const a0 = (i / MER) * TAU, a1 = ((i + 1) / MER) * TAU;
+        for (let i = 0; i < RMER; i++) {
+          const a0 = (i / RMER) * TAU, a1 = ((i + 1) / RMER) * TAU;
           if (inPortal(a0) || inPortal(a1)) continue;
           const A = P(a0, r), Bp = P(a1, r);
           _v.set(Bp[0] - A[0], Bp[1] - A[1], Bp[2] - A[2]);
@@ -241,21 +277,24 @@ export function buildHaloDome(ctx, opts = {}) {
       }
       /* a DARK CRYSTAL NODE at every rib/ring crossing — R5 §5 asks for them by name, and they are
          also what a real space frame has at its joints */
-      for (let i = 0; i < MER; i += 2) {
-        const a = (i / MER) * TAU;
+      /* a node goes where a PRIMARY rib crosses a ring, and nowhere else — a node on every
+         intersection of a 48-column tessellation is 432 diamonds and is the net again */
+      for (let i = 0; i < DOME.MERIDIANS; i++) {
+        const a = (i / DOME.MERIDIANS) * TAU;
         if (inPortal(a)) continue;
         const nd = own(new THREE.OctahedronGeometry(1, 0));
         const q = P(a, r);
-        put('dark', nd, mat(q[0], q[1], q[2], a, 13 - 6 * (k / DOME.RINGS), 8 - 4 * (k / DOME.RINGS), 13 - 6 * (k / DOME.RINGS)), 0.34);
+        const sc = 22 - 11 * (k / DOME.RINGS);
+        put('dark', nd, mat(q[0], q[1], q[2], a, sc, sc * 0.62, sc), 0.34);
       }
       stats.rings++;
     }
     /* THE APEX OCULUS: the ribs cannot all meet at a point — 48 members converging is a spike, and
        §06 forbids spikes. They land on a ring, and the ring carries a square-diamond keystone. */
     const rA = DOME.R * Math.cos((SEG - 0.5) / SEG * Math.PI / 2) + 40;
-    for (let i = 0; i < MER; i++) {
-      const a0 = (i / MER) * TAU, a1 = ((i + 1) / MER) * TAU;
-      along(P(a0, rA), P(a1, rA), 6.0, 7.0, 1.0, 'plat');
+    for (let i = 0; i < 32; i++) {
+      const a0 = (i / 32) * TAU, a1 = ((i + 1) / 32) * TAU;
+      along(P(a0, rA), P(a1, rA), 11.0, 13.0, 1.0, 'plat');
     }
     const key = own(new THREE.OctahedronGeometry(1, 0));
     put('plat', key, mat(0, DOME.APEX_Y + 26, 0, 0, 66, 44, 66), 1.0);
