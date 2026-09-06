@@ -289,6 +289,43 @@ export function createMaterials(themeIn) {
        having depth rather than being a bright rectangle */
     interiorSoft: new THREE.MeshBasicMaterial({ color: 0xf2d9a8, transparent: true, opacity: 0.5 }),
     interiorSoftCool: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.5 }),
+    /* ================= GLASS SHARDS, WITH REAL REFRACTION (v9, art-directed) ==================
+       "Create these glass shard looking elements all across the buildings and some of the floor",
+       and "actually incorporate physics of light refraction".
+
+       THIS IS THE ONE PLACE IN MAHWORLD THAT BENDS LIGHT. Everything else that looks like glass —
+       crystalGlass, the curtain-wall panes, the crystal crowns — is a transparent SURFACE: it lets
+       colour through unchanged. A shard is a SOLID with an interior. `transmission` makes three
+       render the scene behind it into a buffer and refract the sample through `ior` and `thickness`,
+       so what you see through a shard is genuinely displaced, and `dispersion` splits that
+       displacement per channel, which is where the fringe of colour along a thick edge comes from.
+
+       THE COST IS REAL AND IS WHY THERE ARE THREE GRADES. A transmissive material triggers an extra
+       scene pass. With the plaza's planar mirror already costing a second pass, a world where every
+       pane refracted would render itself three times over. So:
+         shardHero    true refraction with dispersion. For the FEW — a monument, a portal, a handful
+                      of large architectural shards the camera comes close to.
+         shardClear   transmission with no dispersion and a thinner wall. The MIDDLE — cheaper per
+                      pixel, still genuinely refracting.
+         shardFacet   NO transmission. A faceted crystal that fakes it with a low roughness, a strong
+                      environment and a clearcoat. For the MANY — the shards scattered across facades
+                      and inlaid in the floor, where displacement would never be legible anyway.
+       A builder that reaches for shardHero more than a few times per scene has misread this. */
+    shardHero: new THREE.MeshPhysicalMaterial({
+      color: 0xdfe9f7, metalness: 0, roughness: 0.045, transmission: 1, ior: 1.62, thickness: 1.6,
+      dispersion: 2.2, attenuationColor: new THREE.Color(0x9fc4ef), attenuationDistance: 3.4,
+      clearcoat: 1, clearcoatRoughness: 0.03, side: THREE.DoubleSide, envMapIntensity: 2.4, flatShading: true
+    }),
+    shardClear: new THREE.MeshPhysicalMaterial({
+      color: 0xd6e6fb, metalness: 0, roughness: 0.075, transmission: 0.92, ior: 1.48, thickness: 0.75,
+      attenuationColor: new THREE.Color(0x8fb4e6), attenuationDistance: 2.2,
+      clearcoat: 0.9, clearcoatRoughness: 0.06, side: THREE.DoubleSide, envMapIntensity: 2.1, flatShading: true
+    }),
+    shardFacet: new THREE.MeshPhysicalMaterial({
+      color: 0x9fc0e8, metalness: 0.12, roughness: 0.11, transparent: true, opacity: 0.55,
+      clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.45, side: THREE.DoubleSide,
+      envMapIntensity: 2.6, flatShading: true
+    }),
     /* THE PUNGENT ACCENTS. Emissive only — a facade's MASS never takes these, its LIGHT does. */
     accentBlue: new THREE.MeshStandardMaterial({ color: 0x060a14, emissive: ACCENT.blue, emissiveIntensity: 1.45, roughness: 0.5, metalness: 0 }),
     accentCyan: new THREE.MeshStandardMaterial({ color: 0x03121a, emissive: ACCENT.cyan, emissiveIntensity: 1.35, roughness: 0.5, metalness: 0 }),
@@ -311,7 +348,20 @@ export function createMaterials(themeIn) {
   m.glass = m.crystalGlass;
   const ACCENTS = ['accentBlue', 'accentCyan', 'accentViolet', 'accentMagenta', 'accentGreen'];
   const baseEmissive = { energy: 1.3, energyLight: 1.7, matchRed: 1.1, panelLit: 0.7, accentBlue: 1.45, accentCyan: 1.35, accentViolet: 1.40, accentMagenta: 1.30, accentGreen: 1.30 };
-  const baseOpacity = { energySoft: 0.26, interiorSoft: 0.5, interiorSoftCool: 0.5 };
+  const baseOpacity = { energySoft: 0.26, interiorSoft: 0.5, interiorSoftCool: 0.5, shardFacet: 0.55 };
+  /* the shards are a QUALITY LEVER as well as a material family: true refraction costs an extra
+     scene pass, so a low tier drops the two transmissive grades onto the faceted one rather than
+     dropping the shards themselves. The architecture keeps its glass; only the physics gets cheaper. */
+  m.setShardQuality = function (tier) {
+    const on = tier !== 'low';
+    m.shardHero.transmission = on ? 1 : 0;
+    m.shardHero.dispersion = tier === 'high' ? 2.2 : 0;
+    m.shardClear.transmission = on ? 0.92 : 0;
+    m.shardHero.opacity = on ? 1 : 0.6; m.shardHero.transparent = !on;
+    m.shardClear.opacity = on ? 1 : 0.6; m.shardClear.transparent = !on;
+    m.shardHero.needsUpdate = true; m.shardClear.needsUpdate = true;
+    return tier;
+  };
   m.interiorSoft.opacity = baseOpacity.interiorSoft;
   let lastState = null, diagnostic = false;
   /* Time of day scales light strength only. day = 0.3, night = 1. */
