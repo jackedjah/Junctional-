@@ -160,6 +160,7 @@ export async function createMahplaza(canvas, options = {}) {
   const ORING = await optional('./outerring.js');     /* R3-01: dead-zone closure in the outer ring */
   const MFAC = await optional('./mahfacilities.js');  /* R3-08/R3-11: MAH VITAL, FORGE, MODE */
   const MBEAST = await optional('./mahbeasts.js');    /* R3-10: MAHBEASTS, Monkey Dogs L5-7 + boss */
+  const ILINK = await optional('./interlink.js');     /* R2 §5: the routes between the three cities */
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -214,7 +215,7 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null, beasts = null;
+  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null, beasts = null, interlink = null;
   /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
      own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
   if (TERRAIN && TERRAIN.buildTerrain) {
@@ -262,6 +263,25 @@ export async function createMahplaza(canvas, options = {}) {
      and the two peer-city territories are derived from those modules' own sites, not a second
      table (L42). The packs sit OUTSIDE each city rather than in it: a hostile pack in a city's
      streets is a different design decision and not one this pass is authorised to make. */
+  /* R2 §5 — the far-zoom lock asks for multiple BELIEVABLE destinations, and believable includes
+     connected. The route table is built from the two peer modules' own sites and radii, so a city
+     that failed to load has no route to it and the link is never a fiction (the same rule the travel
+     destination table follows). Built AFTER the cities so their stats exist. */
+  if (ILINK && ILINK.buildInterlink) {
+    try {
+      const routes = [];
+      if (lakeCity && lakeCity.stats && lakeCity.stats.site) {
+        routes.push({ id: 'lake', x: lakeCity.stats.site.x, z: lakeCity.stats.site.z,
+          radius: (lakeCity.stats.lake && lakeCity.stats.lake.rMax) || 274, arriveY: 120 });
+      }
+      if (rainforest && rainforest.stats && rainforest.stats.site) {
+        routes.push({ id: 'forest', x: rainforest.stats.site.x, z: rainforest.stats.site.z,
+          radius: 300, arriveY: 150 });
+      }
+      interlink = ILINK.buildInterlink(ctx, { routes });
+      scene.add(interlink.group);
+    } catch (e) { console.info('MAHPLAZA: interlink module failed —', e && e.message); interlink = null; }
+  }
   if (MBEAST && MBEAST.buildMahBeasts) {
     try {
       const terr = [];
@@ -479,7 +499,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -513,7 +533,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -990,6 +1010,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (outerRing && outerRing.update) outerRing.update(t, dt);
     if (facilities && facilities.update) facilities.update(t, dt);
     if (beasts && beasts.update) beasts.update(t, dt);
+    if (interlink && interlink.update) interlink.update(t, dt);
     if (monument && monument.update) monument.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
@@ -1271,6 +1292,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (outerRing && outerRing.setQuality) { try { outerRing.setQuality(quality); } catch (e) {} }
     if (facilities && facilities.setQuality) { try { facilities.setQuality(quality); } catch (e) {} }
     if (beasts && beasts.setQuality) { try { beasts.setQuality(quality); } catch (e) {} }
+    if (interlink && interlink.setQuality) { try { interlink.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
     return quality.name;
   }
@@ -1306,7 +1328,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,

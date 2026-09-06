@@ -400,7 +400,7 @@ export function buildTerrain(ctx) {
     group.add(mesh);
   }
 
-  /* ---------------------------------------------------------------- 3. green corridors */
+  /* ---------------------------------------------------- 3. the planted corridors (L50) */
   /* Planted belts in the valleys, between the city's edge and the land. Kept as ONE merged mesh of
      simple faceted canopies: at 300–600 m a tree is a silhouette and a value, and spending triangles
      on anything more would be spending them where they cannot be seen (§27).
@@ -408,7 +408,24 @@ export function buildTerrain(ctx) {
      valleys the composition is built around. They are twenty-face solids now — a ROUND silhouette
      carrying a FACETED surface, which is the same distinction the massifs and the clouds are drawn
      to, for eight extra triangles each. */
-  const foliageMat = new THREE.MeshStandardMaterial({ color: 0x24503f, roughness: 0.86, metalness: 0.0, flatShading: true, envMapIntensity: 0.7 });
+  /* L50 — THERE WERE GREEN TREES IN MAHWORLD, AND THEY HAD BEEN THERE ALL ALONG.
+     0x24503f: hue 157, saturation 0.38, and by a long way the most saturated thing anywhere in this
+     world. Nothing caught it, because no camera had ever stood out in the 250-510 m ring where these
+     groves live — they were authored to be a value in the middle distance and were only ever judged
+     as one. The first frame shot at a MAHBEAST territory put a camera among them and they filled it.
+
+     Why this is a defect and not a preference: rainforest.js exists BECAUSE "the easy rainforest is
+     a green palette swap", and its file header carries the lock in capitals. A world that argues its
+     nature is crystalline, and then plants ordinary green trees on the ground between its cities,
+     has conceded the argument everywhere except the one place it was watching. R3-03 makes it
+     sharper still — separation may not depend on hue, and this was the only hue in the world.
+
+     So the canopies join the genome instead of being recoloured to grey: DARK CRYSTALLINE TISSUE,
+     the same value the rainforest's trunks and the MAHNIMALS' bodies carry. The geometry does not
+     change — a twenty-face solid with a round silhouette and a faceted surface was already right,
+     and at 300-600 m it is a value and a shape. Only the value was wrong, and it was wrong in the
+     one channel this world does not spend. */
+  const foliageMat = new THREE.MeshStandardMaterial({ color: 0x223046, roughness: 0.62, metalness: 0.22, flatShading: true, envMapIntensity: 0.9 });
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x1b2330, roughness: 0.9, metalness: 0.05 });
   foliageMat.name = 'terrain-foliage'; trunkMat.name = 'terrain-trunk';
   owned.materials.push(foliageMat, trunkMat);
@@ -484,7 +501,7 @@ export function buildTerrain(ctx) {
     const k = 1 + 1.35 * daylight;
     rockMat.color.setScalar(k);
     landMat.color.setScalar(0.9 + 1.1 * daylight);
-    foliageMat.color.setHex(0x24503f).multiplyScalar(0.75 + 0.85 * daylight);
+    foliageMat.color.setHex(0x223046).multiplyScalar(0.75 + 0.85 * daylight);   /* L50: no green */
     waterMat.color.setHex(0x0a1526).multiplyScalar(1 + 1.1 * daylight);
     return state;
   }

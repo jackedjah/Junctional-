@@ -94,7 +94,26 @@ const LAKE_R = [232, 258, 274, 246, 176, 205, 243, 268, 251, 219, 168, 198, 236,
 
 /* AERIAL PERSPECTIVE at 560 m (L05). Verified against terrain.js's near range base 0x0d1526 /
    ridge 0x3a4d76: this city must sit ABOVE the civic district and BELOW that ridge in value. */
-const RECEDE = { env: 0.62, tint: 0x4b6089, mix: 0.34 };
+/* L49 — THE PEER CITIES WERE TINTED TO THE VALUE OF THE MOUNTAINS THEY STAND IN.
+   MEASURED, not reasoned. terrain.js's NEAR massif range stands at r 700 — the SAME radius as this
+   city — and the numbers came out:
+
+       peer-city dark grade after RECEDE .... luminance 69.5
+       terrain near ridge, same radius ...... luminance 75.9      <- 6 counts apart, out of 255
+       RECEDE tint itself ................... luminance 94.5
+       terrain mid ridge (the backdrop) ..... luminance 99.1      <- 5 counts apart
+
+   So the R2 §5 / R3 gate-21 far-zoom lock was not failing because the cities were occluded, and not
+   because they were too dim. They were CAMOUFLAGED: a 34% lerp toward 0x4b6089 pulled the dark mass
+   onto the near ridge's value and the tint itself onto the mid ridge's, so a city seen from any
+   elevated camera had no silhouette against either of the two things it is seen against.
+
+   Aerial perspective is supposed to place a thing IN the ladder, not ON one of its rungs. The mix
+   comes down to 0.18, which separates BOTH ends at once — the platinum rises well clear of the mid
+   ridge and the dark mass falls below the near ridge — and the atmosphere still reads, because 18%
+   of a tint at 700 m is what the mid range itself is carrying. The env reduction is untouched: that
+   is light falling off with distance and it was never the problem. */
+const RECEDE = { env: 0.62, tint: 0x4b6089, mix: 0.18 };
 
 /* TERRACES. Four shelves stepping down to the water on the near (plaza-facing) shore. `t` is the
    fraction of the lake radius the shelf head sits at; the drop is a measured 2.4 m per tread so a

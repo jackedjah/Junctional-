@@ -59,7 +59,7 @@ export const FAMILIES = Object.freeze({
       foreLen: 1.02, hindLen: 0.78,            /* THE MONKEY READ: fore-limbs longer than hind */
       foreR: 0.10, hindR: 0.12,
       headLen: 0.62, headH: 0.36, jaw: 0.26,   /* THE DOG READ: length in the jaw, not the cranium */
-      plates: 6, nodes: 4, claws: 3,
+      plates: 8, nodes: 4, claws: 3,
       eyeR: 0.055, crest: 0.20
     }
   },
@@ -146,7 +146,11 @@ export function buildMahBeasts(ctx, opts = {}) {
   const clawGeo = own(new THREE.OctahedronGeometry(1, 0));
   clawGeo.scale(0.035, 0.035, 0.11);                    /* a premium claw: a cut shard, not a hook */
   const plateGeo = own(new THREE.OctahedronGeometry(1, 0));
-  plateGeo.scale(0.5, 0.14, 0.5);                       /* FLAT: a stone in a setting lies down */
+  /* FLAT, because a stone in a setting lies down — and BIG, because it is the part that has to read.
+     The first cut scaled to 0.5 of a chest half-width, which on a 2.3 m creature is a 24 cm plate:
+     present in the geometry, invisible in the frame, and the whole "jewelry-store" bar sat on it.
+     R3-10's body core is DARK by instruction, so the core cannot carry the read; the gemstone must. */
+  plateGeo.scale(0.95, 0.16, 0.95);
   const ringGeo = own(new THREE.TorusGeometry(1, 0.16, 3, 8));
   ringGeo.rotateX(Math.PI / 2);
   const nodeGeo = own(new THREE.OctahedronGeometry(1, 0));
@@ -176,6 +180,14 @@ export function buildMahBeasts(ctx, opts = {}) {
         gait: 1.4 + 0.7 * frac(seed * 19)
       });
       if (boss) stats.bosses++; else stats.normals++;
+    }
+    /* LAW 2: EVERY EMITTER IS ANSWERED, and it applies to a territory as much as to a lamp. The
+       pack carries MAHGIC veins and gemstone eyes and stands on open unlit ground, so the first
+       render of it came back as seven black shapes with a few white flecks — the jewellery was
+       there and had nothing to be seen against. A pool under the territory is also the thing that
+       tells a viewer at distance that SOMETHING IS HERE, which is what a territory is for. */
+    if (ctx && typeof ctx.lightPool === 'function') {
+      try { ctx.lightPool({ x: anchor.x, z: anchor.z, rx: anchor.r * 2.2, rz: anchor.r * 2.2, k: 0.26, hue: theme.energy }); } catch (e) {}
     }
   });
   const N = beasts.length;
@@ -209,7 +221,9 @@ export function buildMahBeasts(ctx, opts = {}) {
     col.setScalar(b.boss ? 1.0 : 0.72 + 0.24 * frac(b.seed * 23));
     iBody.setColorAt(i, col); iHead.setColorAt(i, col);
     for (let p = 0; p < G.plates; p++) {
-      col.setScalar((b.boss ? 0.92 : 0.62) + 0.34 * frac2(b.seed * 29 + p));
+      /* a cut stone catches: the range runs high and the boss's runs higher, so the plates read as
+         SET INTO the dark body rather than as a slightly paler part of it */
+      col.setScalar((b.boss ? 1.15 : 0.86) + 0.30 * frac2(b.seed * 29 + p));
       iPlate.setColorAt(i * G.plates + p, col);
     }
   }
