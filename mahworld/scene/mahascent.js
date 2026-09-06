@@ -308,6 +308,13 @@ export function buildMahAscent(ctx) {
 
   stats.draws = 4 + (musicLines && musicLines.stats ? musicLines.stats.draws || 1 : 0);
   stats.derived = { threshold: ASCENT.THRESHOLD, deckY: ASCENT.DECK_Y, lowestLineTop: Math.min(...ASCENTS.map(a => a.h)) };
+  /* R4 — WHERE THE DECKS ARE, published once. halo-districts.js rakes its dock beams from these to
+     HALO ARRIVAL, and L42's lesson is that when two files each know where a thing is, one of them is
+     eventually wrong. This is the file that placed them, so this is the file that says where. */
+  stats.sites = ASCENTS.map((A, i) => ({
+    id: A.id != null ? A.id : 'ascent-' + i,
+    x: A.x, y: ASCENT.DECK_Y, z: A.z, r: ASCENT.DECK_R * (0.86 + 0.20 * frac2(i * 5))
+  }));
 
   let quiet = false;
   const _mm = new THREE.Matrix4(), _pp = new THREE.Vector3(), _qq = new THREE.Quaternion(),

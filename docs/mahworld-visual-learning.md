@@ -680,6 +680,110 @@ individual. The per-instance matrix is the joint.
 
 ---
 
+## L51 — A material is only correct at the scale it was measured at, and §07 was measured at 43 m
+**Where it bit.** MAH HALO's shell took `M.paving` unchanged — the black platinum §07 makes a world
+law, roughness 0.34, metalness 0.40 — and the first MAHBEING-height render on the ring came back a
+**sheet of milk**. The material was not wrong. The SCALE was. A polished plane returns the horizon
+at grazing incidence, and on the plaza that never shows because a building interrupts the deck
+within 43 m. On the halo there is 1350 m of uninterrupted plate between a walking eye and the rim,
+essentially all of it grazing, so all of it mirrors the bright sky and the near-black floor law is
+deleted by physics rather than by a wrong colour.
+**The fix, which §07 already contained.** The plaza grades its own floor — hero r0.045 inside 28 m,
+satin r0.13 outside — because one polish across a big field reads as plastic. The halo needs the
+same idea with the grades further apart: the SHELL is honed (r0.62, envMap 0.55) so it returns a
+broad blur and what reads across two kilometres is the laser line rather than the sky, and the
+viewer-following NEAR TILES stay mirror-grade (r0.20) so the surface under your feet is still the
+polished black platinum. The boundary reads as finer plating around you, not as an error.
+**Regression.** Before reusing a material on something an order of magnitude larger, ask what it
+looks like at grazing incidence across its new longest dimension. This is the same lesson as the
+forest floor (measure a floor from the height it is WALKED at) arriving at a new scale.
+
+---
+
+## L52 — A grid with no far ramp has no scale above it, and a ring is not cartesian
+**Where it bit.** The halo's tile shader ran MICRO(1 m) → TILE(8 m) → MEGA(64 m), and only the
+first two had a distance ramp. The multi-kilometre render came back as **graph paper**: forty-seven
+identical 64 m squares from the rim to the horizon, laid diagonally across a ring they had nothing
+to do with. Two failures, one cause. A scale with no ramp never hands over, so there is no larger
+scale for it to hand over TO; and a cartesian grid does not know it is on a ring.
+**The fix.** Ramp MEGA out at four times the tile range, and add the scale a ring actually has:
+POLAR. Sixteen SPOKES (`atan(z,x)`) and a BAND every 300 m of radius (`length(p)`), both computed
+with the same `fwidth` anti-shimmer, both surviving to the horizon because they are the largest
+thing in the ladder. The spoke count matches the sector geometry, so the light and the metal agree
+about where the divisions are.
+**Regression.** Every scale in a grid ladder needs a fade EXCEPT the largest, and the largest must
+be in the coordinate system the object is actually organised in.
+
+---
+
+## L53 — An empty area at world scale cannot be filled with furniture
+**Where it bit.** The first km render of MAH HALO: the shell worked, the curvature worked, the
+laser plating worked, and **95% of every frame was bare plate**. Eight districts totalling 25k
+triangles across 6800 m of ring vanished. The instinct is to add more content to the districts —
+which is wrong twice, because a bench is 8 m and the gap is 2700, so a thousand more benches is a
+thousand more invisible benches, and because R3's density law asks what the empty area IS.
+**The fix.** What a 2.5 km wide ring would actually have: STRUCTURE. Every large span in the real
+world is divided by expansion joints and carried by towers, and both are visible from a distance
+precisely because they are what holds it up. Sixteen sector joints, each a raised platinum rail the
+full width, each carrying four pylons at radial stations chosen to miss the district band. One
+every 805 m along the midline — sparse enough to be grand, close enough that no camera is without
+one. It merges into a draw that already existed.
+**Regression.** Scale the ANSWER to the gap, not the vocabulary to the count. At 100 m the answer
+is furniture; at 1000 m it is architecture; at 3000 m it is structure.
+
+---
+
+## L54 — `ctx.lightPool` is the PLAZA DECK's family, and calling it from altitude invents a defect
+**Where it bit.** Twice in one pass, in `halo.js` and `halo-districts.js`, both in the name of LAW
+2. `ground.js`'s `writePool` defaults `y` to `POOL_Y ≈ 0.24` and never looks at how far out x,z are,
+so a 260 m pool "answering" the ring at (0, −820) painted a glowing oval onto the TERRAIN, 1800 m
+below the thing it was answering; eight district pools at radius 2050 would have done it eight more
+times. `ground.js` says so in its own comment ("only serves the plaza deck") and `broadcast.js`
+already learned it at 185 m.
+**The fix.** LAW 2 is "every emitter is answered ON THE SURFACE IT STANDS ON", not "call the pool
+function". The halo lays its own instanced pool family on the ring, along the shell normal, in one
+draw — and the shell itself needs no pool at all, because the emitter IS the surface: the laser
+lines are emissive and the black metal under them returns them.
+**Regression.** Before calling a `ctx.*` helper from a new altitude or radius, read what surface it
+writes to. A law satisfied in the wrong place is a defect wearing the law's name.
+
+---
+
+## L55 — Geometry that contradicts its own header comment is the header that was right
+**Where it bit.** `halo-districts.js` documented its ascent dock as "36° off vertical over a 1100 m
+climb — a cable-car angle, not a wall", and then aimed the beams at `ringPoint(-90, 0, -70)`: the
+arrival gateway, 70 m inside the MIDLINE, which is 1980 m from the world axis. The transfer decks
+stand within 40 m of that axis. Measured, that is a 1980 m run against an 1100 m climb — **61° off
+vertical**, a near-horizontal wire drawn across two kilometres of sky, docking into nothing.
+**The fix.** The header described a dock at the INNER RIM and the code had drifted to the midline.
+Landing the beams at r 760 gives a 730 m run against a 1136 m climb: 32.7°, the angle the comment
+claimed. It also arrives at the one place on the ring where you can turn round and look straight
+back down at where you came from. The 1220 m left between the pier and the district is not left
+empty — a CONCOURSE SPINE walks you out, so arrival becomes deck → climb → rim → spine → gateway →
+ring instead of a drop onto a pad.
+**Regression.** When prose and geometry disagree, compute the number the prose claims before
+choosing which to change. Here the prose was the design and the code was the drift.
+
+---
+
+## L56 — A NaN scale deletes a whole mesh and reports it as one console line
+**Where it bit.** `halo.js`'s rim placement helper took optional scale arguments —
+`at(x, y, z, ry, sx, sy, sz)` — and every caller omitted them. `Vector3.set(undefined, undefined,
+undefined)` writes NaN, `Matrix4.compose` propagates it, and `mergeSolids`' inverse-transpose
+normal matrix propagates it again, so all **205,824 vertices** of `halo-rims` came out NaN and THE
+TWO RIMS — the parapets that draw the ring's defining circles against the sky, the whole reason the
+inner edge reads as an edge — never drew at all. The only symptom was
+`computeBoundingSphere(): Computed radius is NaN`, one line at the end of a capture log, and every
+render simply showed the inner rim as a bare cut.
+**How it was found.** Not by reading the rim code, which looks correct. By PEELING: one traversal
+that walks every geometry in the built scene and reports the first non-finite position by object
+name. That took one boot and named the mesh exactly.
+**Regression.** Default every optional scale/rotation argument at the helper, never at the call
+site. And keep a NaN sweep in the standing harness: a NaN warning in a log is a missing mesh, not a
+warning — a mesh that fails this way fails silently and looks like a design decision.
+
+---
+
 ## Standing ownership map (reuse, do not rediscover)
 
 | System | Owner |
@@ -698,6 +802,8 @@ individual. The per-instance matrix is the joint.
 | FOBLOCK placement, music diamonds | `fobstations.js` |
 | Upper realm | `sky-layout.js` (contract), `skyrealm.js` (assembly), `sky-*.js` (builders) |
 | Giant rear-city authority monitor (§8) | `broadcast.js` |
+| MAH HALO surface: `haloHeight`/`haloFloor`/`onHalo`/`haloNormal`, the laser-plate shader (`applyHaloGrid`), the shell, the rims, the sector architecture, the viewer-following tile field | `halo.js` |
+| MAH HALO content: the eight districts, the ascent pier, the concourse spine, the overlooks, the event tiles, the ring's own light pools | `halo-districts.js` |
 | Inter-city flight (R2 §9) — writes roam's camera, never its own | `travel.js` |
 | RAINFOREST CITY (R2 §6) — the third destination, organisms + diamond-shard rain | `rainforest.js` |
 | MAHNIMALS — the world's small fauna, land / air / water | `mahnimals.js` |

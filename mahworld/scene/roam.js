@@ -139,6 +139,23 @@ export function createRoam(opts) {
      a module that disposes and re-registers is picked up without rebuilding this controller. */
   let boxes = o.boxes || [];
 
+  /* ---- R4: THE BOUNDS ARE NOW A TWO-STOREY WORLD ----------------------------------------------
+     Every constant in ROAM was measured against a world whose only floor was the ground, and MAH
+     HALO breaks all three of them: its midline is at r 2050 (outside WORLD_R 1000), its deck is at
+     1800 m (above CEIL 700), and a walker standing on it is 2050 m from the origin (outside WALK_R
+     95, which would have yanked them to the plaza on the first frame). Raising the three constants
+     globally would be wrong — WORLD_R's whole reason is that a flyer at ground level never crosses
+     a mountain, and terrain.js's near massifs top out at 370 m.
+
+     So the bound is a function of ALTITUDE, which is the honest statement of the fact: below the
+     transfer decks the world is the ground's world and its old radius holds; above them the only
+     things out there are the sanctuary and open sky, so the world is as wide as the sanctuary is.
+     highY 900 is measured, not picked — mahascent's transfer decks are at 700 and terrain's tallest
+     peak is 370, so nothing solid exists between 900 m and the halo's underside.
+
+     The assembly sets these once the halo is known to have built; the defaults are the pre-R4
+     numbers, so a build WITHOUT the halo behaves exactly as it did. */
+  const bounds = { ceil: ROAM.CEIL, worldR: ROAM.WORLD_R, highY: Infinity, highR: ROAM.WORLD_R };
   const state = { on: false, mode: 'walk', x: 0, y: ROAM.DECK_Y + ROAM.EYE, z: 24, yaw: 0, pitch: 0, speed: 0 };
   const pos = new THREE.Vector3(0, ROAM.DECK_Y + ROAM.EYE, 24);
   const vel = new THREE.Vector3();
@@ -156,8 +173,33 @@ export function createRoam(opts) {
      into things you climb onto rather than things you bump into, using the same list that stops you
      walking through a lamp mast. No new geometry, no raycast. */
   const baseY = (x, z) => (Math.hypot(x, z) <= ROAM.DECK_R + ROAM.APRON ? ROAM.DECK_Y : 0);
+  /* ---- R4: ANALYTIC SURFACES ------------------------------------------------------------------
+     A box list is the wrong shape for a curved floor. MAH HALO is a 2700 m wide ring 1800 m up
+     whose height is a continuous function of x and z, and expressing it as colliders would take
+     thousands of boxes to approximate something one line of arithmetic already knows exactly.
+     So roam accepts SURFACES: functions that answer "how high is the ground at this point, or null
+     if I do not claim it". Null is what keeps the halo's hole open over the plaza and the sky open
+     beyond its outer rim — a surface that claimed everywhere would be a floor at 1800 m across the
+     whole world. */
+  let surfaces = (o && o.surfaces) || [];
+  /* the surface height under this foot, or null if no surface claims it WITHIN A STEP. The step gate
+     is what stops a surface teleporting a walker — the halo only becomes the floor once the walker is
+     already within a step of it, which is what flying up to it does. It is also the honest test of
+     "am I standing on the ring": on the ground 1800 m below, the halo answers 1800, that is far more
+     than a step above the foot, and this returns null. The bounds below rely on exactly that. */
+  function surfaceAt(x, z, footY) {
+    let y = null;
+    for (let i = 0; i < surfaces.length; i++) {
+      let h = null;
+      try { h = surfaces[i](x, z); } catch (e) { h = null; }
+      if (h != null && h <= footY + ROAM.STEP_UP && (y == null || h > y)) y = h;
+    }
+    return y;
+  }
   function floorAt(x, z, footY) {
     let y = baseY(x, z);
+    const s = surfaceAt(x, z, footY);
+    if (s != null && s > y) y = s;
     for (let i = 0; i < boxes.length; i++) {
       const b = boxes[i];
       if (b.max.y > footY + ROAM.STEP_UP || b.max.y <= y) continue;      /* a wall, or lower than we stand */
@@ -249,16 +291,22 @@ export function createRoam(opts) {
     if (fly) {
       pos.y += vel.y * dt;
       if (pos.y < ROAM.FLOOR) { pos.y = ROAM.FLOOR; vel.y = 0; }
-      if (pos.y > ROAM.CEIL) { pos.y = ROAM.CEIL; vel.y = 0; }
+      if (pos.y > bounds.ceil) { pos.y = bounds.ceil; vel.y = 0; }
+      /* the two-storey bound. A flyer climbing out of the plaza is inside the ground world's radius
+         the whole way up (the hole is at r 700 < 1000), then the sanctuary's radius opens above it. */
+      const lim = pos.y >= bounds.highY ? bounds.highR : bounds.worldR;
       const r = Math.hypot(pos.x, pos.z);
-      if (r > ROAM.WORLD_R) { const s = ROAM.WORLD_R / r; pos.x *= s; pos.z *= s; vel.x = vel.z = 0; }
+      if (r > lim) { const s = lim / r; pos.x *= s; pos.z *= s; vel.x = vel.z = 0; }
     } else {
       /* the ground gear stops where the collider set stops describing the world (see the header).
          Only the OUTWARD component of the velocity is killed, never the whole vector: zeroing both
          axes pins the walker to the boundary circle and they cannot walk back in, which is what the
          first cut did and what made the bound feel like a bug instead of an edge. */
+      /* WALK_R describes where the GROUND stops being described by colliders. A walker standing on an
+         analytic surface is not on the ground and that bound is not about them — the surface itself
+         is the description of the world there, and it ends where it ends (null past the rim). */
       const r = Math.hypot(pos.x, pos.z);
-      if (r > ROAM.WALK_R) {
+      if (r > ROAM.WALK_R && surfaceAt(pos.x, pos.z, pos.y - ROAM.EYE) == null) {
         const s = ROAM.WALK_R / r;
         pos.x *= s; pos.z *= s;
         const nx = pos.x / ROAM.WALK_R, nz = pos.z / ROAM.WALK_R, out = vel.x * nx + vel.z * nz;
@@ -293,6 +341,17 @@ export function createRoam(opts) {
     state,
     get pos() { return pos; },
     setBoxes(b) { boxes = b || []; },
+    setSurfaces(s) { surfaces = s || []; },   /* R4: analytic floors, see floorAt */
+    /* R4: raise the roof and widen the upper world once a module that lives up there has built */
+    setBounds(b) {
+      if (!b) return bounds;
+      if (b.ceil != null) bounds.ceil = b.ceil;
+      if (b.worldR != null) bounds.worldR = b.worldR;
+      if (b.highY != null) bounds.highY = b.highY;
+      if (b.highR != null) bounds.highR = b.highR;
+      return bounds;
+    },
+    get bounds() { return bounds; },
     setEnabled(on, seed) {
       on = !!on;
       if (on === state.on) return state.on;

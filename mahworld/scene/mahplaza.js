@@ -111,6 +111,15 @@ export async function createMahplaza(canvas, options = {}) {
      it with margin; the depth buffer loses a little far-field precision and there is nothing
      coplanar out there to lose it on. */
   const camera = new THREE.PerspectiveCamera(54, 1, 0.1, 2600);
+  /* R4: the fog bank is authored by applyTime and SCALED by altitude (updateFrustum, far below).
+     Both have to be declared here, before the first applyTime call, and both write through
+     applyFog so neither can silently overwrite the other's decision. */
+  const fogBase = { near: 55, far: 2350 };
+  let frustumHigh = false;
+  const applyFog = () => {
+    const k = frustumHigh ? 3.4 : 1;
+    scene.fog.near = fogBase.near * k; scene.fog.far = fogBase.far * k;
+  };
   const M = createMaterials(theme);
 
   /* wet reflections: mirrored copies of emissive elements under the floor, built from world matrices once the graph is placed */
@@ -161,6 +170,8 @@ export async function createMahplaza(canvas, options = {}) {
   const MFAC = await optional('./mahfacilities.js');  /* R3-08/R3-11: MAH VITAL, FORGE, MODE */
   const MBEAST = await optional('./mahbeasts.js');    /* R3-10: MAHBEASTS, Monkey Dogs L5-7 + boss */
   const ILINK = await optional('./interlink.js');     /* R2 §5: the routes between the three cities */
+  const HALOM = await optional('./halo.js');          /* R4: MAH HALO, the upper sanctuary surface */
+  const HALOD = await optional('./halo-districts.js');/* R4: the eight districts standing on it */
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -215,7 +226,7 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null, beasts = null, interlink = null;
+  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null, beasts = null, interlink = null, halo = null, haloDistricts = null;
   /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
      own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
   if (TERRAIN && TERRAIN.buildTerrain) {
@@ -301,6 +312,29 @@ export async function createMahplaza(canvas, options = {}) {
   if (MFAC && MFAC.buildMahFacilities) { try { facilities = MFAC.buildMahFacilities(ctx); scene.add(facilities.group); } catch (e) { console.info('MAHPLAZA: facilities module failed —', e && e.message); facilities = null; } }
   if (ORING && ORING.buildOuterRing) { try { outerRing = ORING.buildOuterRing(ctx); scene.add(outerRing.group); } catch (e) { console.info('MAHPLAZA: outer ring module failed —', e && e.message); outerRing = null; } }
   if (MASCENT && MASCENT.buildMahAscent) { try { mahAscent = MASCENT.buildMahAscent(ctx); scene.add(mahAscent.group); } catch (e) { console.info('MAHPLAZA: mah ascent module failed —', e && e.message); mahAscent = null; } }
+  /* ============================================================================================
+     R4 · MAH HALO — the upper sanctuary
+     ============================================================================================
+     Two modules and a strict order. halo.js owns the SURFACE — the contract haloFloor(x,z), the
+     laser-plated tiles, the shell and the two rims. halo-districts.js owns what stands on it, and
+     it needs mahascent's decks to rake its dock beams from, so it builds AFTER the ascent and reads
+     those positions from THAT module's stats rather than from a second table here (L42).
+
+     The halo goes in the scene at world origin: its geometry is authored in world coordinates
+     because a ring 6800 m across has no meaningful local origin — every point on it is 2 km from
+     every other. */
+  if (HALOM && HALOM.buildHalo) {
+    try { halo = HALOM.buildHalo(ctx); scene.add(halo.group); }
+    catch (e) { console.info('MAHPLAZA: halo module failed —', e && e.message); halo = null; }
+  }
+  if (halo && HALOD && HALOD.buildHaloDistricts) {
+    try {
+      haloDistricts = HALOD.buildHaloDistricts(ctx, {
+        transferDecks: (mahAscent && mahAscent.stats && mahAscent.stats.sites) || []
+      });
+      scene.add(haloDistricts.group);
+    } catch (e) { console.info('MAHPLAZA: halo districts module failed —', e && e.message); haloDistricts = null; }
+  }
   /* R3-07 — the three recommended entrances. The two peer-city sites come from THOSE MODULES' own
      stats rather than from a second table here: L42's lesson is that when two files each know where
      a city is, one of them is eventually wrong. Each is pulled back toward the plaza from its city's
@@ -492,14 +526,15 @@ export async function createMahplaza(canvas, options = {}) {
        rings resolved to one flat 0x152c52 and the ladder terrain paid for was deleted before it
        reached the frame: every render came back value-compressed, band means inside 18 counts of
        each other. The bank must sit BEYOND the last thing worth seeing, not in front of it. */
-    scene.fog.near = 55 + 45 * s.daylight; scene.fog.far = 2350 + 700 * s.daylight;
+    fogBase.near = 55 + 45 * s.daylight; fogBase.far = 2350 + 700 * s.daylight;
+    applyFog();
     pointLights.forEach(l => { l.intensity = l.userData.base * (1 - 0.7 * s.daylight) * (state.diagnostic ? 0.6 : 1); });
     ctx.timeHooks.forEach(h => { try { h(s); } catch (e) {} });
     const energy = state.diagnostic ? Math.min(0.3, 1 - s.daylight) : 1 - s.daylight;
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -533,7 +568,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -574,6 +609,20 @@ export async function createMahplaza(canvas, options = {}) {
      camera inside placeCamera(), and every composed view, the tour and the capture harness keep
      working unchanged because turning roam off restores the anchor they were always using. */
   const roam = createRoam({ THREE, boxes: colliderBoxes, onChange: r => { state.roam = r.on ? r.mode : null; } });
+  /* R4 — MAH HALO IS WALKABLE, which is the difference between a sanctuary and a backdrop. A box
+     list cannot describe a 2700 m wide curved deck; one analytic function can, exactly. And because
+     roam's three bounds were all measured against a world whose only floor was the ground, the
+     ceiling and the upper radius move with it — see roam.js's own note on the two-storey bound. */
+  if (halo && HALOM && HALOM.haloFloor) {
+    roam.setSurfaces([HALOM.haloFloor]);
+    roam.setBounds({
+      ceil: HALOM.HALO.CEIL,
+      /* above the transfer decks, nothing solid stands between the plaza and the sanctuary, so the
+         upper world is as wide as the sanctuary plus a margin to see its outer rim from outside */
+      highY: 900,
+      highR: HALOM.HALO.R_OUT + 260
+    });
+  }
   /* R2 §9 — INTER-CITY FLIGHT. The destination table is built from the modules that actually got
      built, so a city that failed to load cannot be flown to and the table is never a fiction. The
      plaza is a destination too: you have to be able to come home. */
@@ -628,6 +677,13 @@ export async function createMahplaza(canvas, options = {}) {
     }
     if (mahAscent && mahAscent.stats) {
       list.push({ id: 'ascent', label: 'MAH ASCENT', sub: 'to the sky realm', x: -30, z: -8, y: 1.9, look: [-30, 240, -22] });
+    }
+    /* R4 — the eight districts are destinations. The list comes from haloDistricts.navSites(), which
+       derives every position from the SAME ringPoint() that placed the district: a nav entry that
+       arrives 40 m off the terrace it names is worse than no entry, and a second table here is how
+       that happens (L42 again). MAH NAV is also the only way in until you have flown up once. */
+    if (haloDistricts && haloDistricts.navSites) {
+      try { for (const S of haloDistricts.navSites()) list.push(S); } catch (e) {}
     }
     if (mahDescent && mahDescent.stats) {
       for (const S of mahDescent.stats.sites) {
@@ -988,6 +1044,36 @@ export async function createMahplaza(canvas, options = {}) {
       for (const T of beasts.stats.territories) best = Math.min(best, Math.hypot(_detEye.x - T.x, _detEye.z - T.z));
       beasts.setDetail(best);
     }
+    /* R4: the halo's PHYSICAL near-field follows the eye. The shell is one surface out to 3400 m;
+       the 26x26 field of real tiles that gives it relief under your feet has to be where you are. */
+    if (halo && halo.setEye) halo.setEye(_detEye.x, _detEye.y, _detEye.z);
+    updateFrustum();
+  }
+
+  /* ---- R4 · THE FRUSTUM IS NOW A FUNCTION OF ALTITUDE ------------------------------------------
+     The 2600 m far plane was measured against the ground world: fly to Lake City and the ridge
+     behind the plaza is 2200 m away. From the halo the far rim of the ring is 6800 m across and the
+     ground is 1800 m down, so a fixed 2600 clips away most of the thing R4 exists to show — and
+     R4's curvature proof needs a multi-kilometre view by definition.
+
+     It cannot simply be raised: near 0.1 with far 8000 is a depth ratio of 80,000, and the plaza's
+     coplanar inlays and 3 cm paving relief are exactly what z-fighting eats first. So both planes
+     move together, and the ratio stays inside what the ground world already survives. The switch is
+     hysteretic on altitude so a hover at the threshold cannot flicker the depth precision. */
+  function updateFrustum() {
+    const y = _detEye.y;
+    const want = frustumHigh ? y > 520 : y > 900;   /* 380 m of hysteresis */
+    if (want === frustumHigh) return;
+    frustumHigh = want;
+    camera.near = want ? 1.2 : 0.1;
+    camera.far = want ? 9000 : 2600;
+    camera.updateProjectionMatrix();
+    /* L34 AT ALTITUDE. The fog bank has to sit beyond the last thing worth seeing, and from the
+       halo the last thing worth seeing is the far rim 6800 m away and the world 1800 m below. Left
+       at 2350 the bank stands in front of the whole sanctuary and R4's curvature proof photographs
+       a wall of haze. The near end opens with it, so the ladder keeps the same SHAPE at both
+       altitudes rather than becoming a hard edge. */
+    applyFog();
   }
 
   function stepWorld(t, dt, nowMs) {
@@ -1011,6 +1097,8 @@ export async function createMahplaza(canvas, options = {}) {
     if (facilities && facilities.update) facilities.update(t, dt);
     if (beasts && beasts.update) beasts.update(t, dt);
     if (interlink && interlink.update) interlink.update(t, dt);
+    if (halo && halo.update) halo.update(t, dt);
+    if (haloDistricts && haloDistricts.update) haloDistricts.update(t, dt);
     if (monument && monument.update) monument.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
@@ -1291,6 +1379,8 @@ export async function createMahplaza(canvas, options = {}) {
     if (mahDescent && mahDescent.setQuality) { try { mahDescent.setQuality(quality); } catch (e) {} }
     if (outerRing && outerRing.setQuality) { try { outerRing.setQuality(quality); } catch (e) {} }
     if (facilities && facilities.setQuality) { try { facilities.setQuality(quality); } catch (e) {} }
+    if (halo && halo.setQuality) { try { halo.setQuality(quality); } catch (e) {} }
+    if (haloDistricts && haloDistricts.setQuality) { try { haloDistricts.setQuality(quality); } catch (e) {} }
     if (beasts && beasts.setQuality) { try { beasts.setQuality(quality); } catch (e) {} }
     if (interlink && interlink.setQuality) { try { interlink.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
@@ -1328,7 +1418,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink, halo: !!halo, haloDistricts: !!haloDistricts }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
