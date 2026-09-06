@@ -598,6 +598,41 @@ world origin with a fixed radius is a candidate. `sky.js`'s horizon bands (fixed
 
 ---
 
+## L44 — Two missing levels of a hierarchy read as "poles and floating fragments"
+**Failure.** The R3 doctrine names it with my own render as the evidence: *the forest can read as
+poles + floating fragments rather than a living environment.* I had spent L35–L39 fixing the canopy's
+material, its density, its floor and its trunk faces, and every one of those was a real fix — and the
+stand still read as poles.
+**Root owner.** Not any of those. The branch system had TWO of its four levels. A tree is
+**trunk → large branch → medium branch → twig/diamond cluster**; this had a trunk, one arm, and ONE
+diamond on the end of it. "Poles with fragments" is a precise description of exactly that structure.
+**Correction.** The arm became the large branch and now ends in a CLUSTER; it carries two medium
+branches that fork off partway along (swung away from the parent bearing — a fork that leaves at the
+parent's own angle reads as a kink, not a branch), each ending in a cluster and each carrying a twig
+with a cluster of its own. ~700 canopy nodes → ~7000.
+**Regression.** When a natural system reads wrong after several correct material fixes, count the
+levels of its hierarchy before touching anything else. No amount of shading fixes a missing tier.
+
+---
+
+## L45 — An InstancedMesh shortens only from the end, so the LOD split lives in the array order
+**Where it bit.** R3-13 asks for "far forest = mass + landmark branches, near forest = premium
+detail". The detail is ~140k triangles of medium branches and twigs plus ~6000 canopy nodes, on a
+city that is 700 m away from the plaza most of the time.
+**The two structural moves that made it a switch instead of a rebuild.**
+1. **Bake into parallel buckets.** A `detail` ROLE that maps to `steepD`/`bandD`/`downD` — the same
+   three grades and the same LAW 1 routing, but its own meshes. This has to happen at BAKE time:
+   once geometry is merged you cannot take it back out, and a forest that can only be all-detail or
+   no-forest has no LOD at all.
+2. **Partition before instancing.** Every landmark node first, every detail node after, stable within
+   each group, so the far tier is `mesh.count = massCount` — one integer, no rebuild, and nothing
+   about the near forest changes when it is switched off and back on.
+**Result.** The world view went 983k → 874k triangles *while gaining the whole hierarchy*; the near
+forest went 391k → 530k. Hysteresis (near 460 m, far 560 m) stops a camera on the boundary
+flickering the stand.
+
+---
+
 ## Standing ownership map (reuse, do not rediscover)
 
 | System | Owner |

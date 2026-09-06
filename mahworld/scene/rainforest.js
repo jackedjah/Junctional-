@@ -105,11 +105,19 @@ const LEVEL = 0.5;
    §07 says the floor is black; a band is not a floor. */
 function newBuckets() {
   const b = {};
-  for (const k of ['steep', 'band', 'down', 'floor']) b[k] = { pos: [], nor: [], col: [], area: 0, up: 0, down: 0, level: 0, maxNy: 0 };
+  for (const k of ['steep', 'band', 'down', 'floor', 'steepD', 'bandD', 'downD'])
+    b[k] = { pos: [], nor: [], col: [], area: 0, up: 0, down: 0, level: 0, maxNy: 0 };
   return b;
 }
+/* R3-13: FAR FOREST = MASS + LANDMARK BRANCHES. NEAR FOREST = PREMIUM DETAIL.
+   The `detail` role is materially identical to `organism` — same three grades, same LAW 1 routing —
+   but it bakes into a PARALLEL set of buckets, so the medium branches, twigs and diamond clusters
+   land in their own meshes and `setDetail(false)` can drop the lot in three visibility flags. That
+   separation has to exist at BAKE time: once geometry is merged you cannot take it back out, and a
+   forest that can only be all-detail or no-forest has no LOD at all. */
 const ROLE = {
   organism: { steep: 'steep', up: 'band', down: 'down' },   /* up-facing organism = PLATINUM band */
+  detail:   { steep: 'steepD', up: 'bandD', down: 'downD' },/* hideable at distance; same grades */
   floor:    { steep: 'floor', up: 'floor', down: 'floor' }  /* §07: the floor is near-black */
 };
 function pushTri(B, role, a, b, c, colr) {
@@ -185,6 +193,9 @@ export function buildRainforest(ctx) {
     down: far(M.platinumMidLit || M.platinumLit, 'under'),
     floor: far(M.paving || M.platinumMidLit, 'floor', 0.10)     /* §07: near-black, metalness 0.40 */
   };
+  /* the detail grades share the mass grades' materials exactly — the LOD split is geometric, not
+     visual, so a viewer walking in never sees the near forest change appearance, only gain parts */
+  GRADE.steepD = GRADE.steep; GRADE.bandD = GRADE.band; GRADE.downD = GRADE.down;
   /* L37 — A POLISHED FLOOR SEEN FROM STANDING HEIGHT IS NOT BLACK, IT IS WHITE.
      The forest floor inherited the plaza's paving unchanged: metalness 0.40, roughness 0.34. On the
      plaza that is right — the deck is 90 m across, broken into tiles with dark joints, and the
@@ -351,6 +362,90 @@ export function buildRainforest(ctx) {
           bake(B, 'organism', g2, mm, 0.70 + 0.20 * (sgm / SEGS));
           g2.dispose();
         }
+
+        /* ---- R3-04 · THE BRANCH HIERARCHY -------------------------------------------------------
+           Named failure in the R3 doctrine, with my own render as its evidence: "the forest can read
+           as poles + floating fragments rather than a living environment." It was structural. A real
+           branch system is TRUNK -> LARGE BRANCH -> MEDIUM BRANCH -> TWIG / DIAMOND CLUSTER, and this
+           stand had two of those four: a trunk and one arm ending in ONE diamond. Two whole levels of
+           the hierarchy were simply absent, which is exactly what "poles with fragments" describes.
+           So: the arm above is now the LARGE BRANCH. It ends in a CLUSTER rather than a node, and it
+           carries MEDIUM BRANCHES that fork off partway along it and themselves end in clusters, each
+           with a TWIG or two. All of it bakes with role 'detail', so R3-13's "far forest = mass +
+           landmark branches, near forest = premium detail" is a visibility flag rather than a rebuild.
+           `spray` is the shared cluster: several diamonds around a point at falling scale, so a tip
+           reads as foliage instead of as one hanging ornament. */
+        const spray = (cx, cy, cz, base, n, seed, tierTint) => {
+          for (let q = 0; q < n; q++) {
+            const qa = gold(seed + q * 7), qe = (frac(seed + q * 3) - 0.5) * 1.5;
+            const rad = base * (0.45 + 0.95 * frac2(seed + q * 5));
+            canopyNodes.push({
+              x: cx + Math.cos(qa) * rad * 1.5, y0: cy + qe * base * 0.9, z: cz + Math.sin(qa) * rad * 1.5,
+              s: base * (0.42 + 0.52 * frac(seed + q * 11)),
+              phase: gold(seed + q * 13), rate: 0.18 + 0.20 * frac2(seed + q * 17),
+              lift: (0.5 + 1.1 * frac(seed + q * 19)) * T.node,
+              tint: tierTint * (0.62 + 0.5 * frac2(seed + q * 23)),
+              tiltX: (frac(seed + q * 29) - 0.5) * 1.5, tiltZ: (frac2(seed + q * 31) - 0.5) * 1.5,
+              detail: true
+            });
+          }
+        };
+        /* the LARGE BRANCH's own tip is a cluster now, not a single node */
+        spray(nx, ny, nz, sc * 0.72, 4, i * 61 + k * 9 + ti * 211, 0.42 + 0.58 * (0.62 + 0.38 * T.at));
+
+        /* MEDIUM BRANCHES: two forks off the large branch, at 0.44 and 0.74 along it, swinging away
+           from the parent's bearing and hanging below it. A fork that leaves at the parent's own
+           angle reads as a kink in one branch; the swing is what makes it a second branch. */
+        for (let mb = 0; mb < 2; mb++) {
+          const u0 = 0.44 + 0.30 * mb;
+          const root = bez(u0);
+          const swing = (mb === 0 ? 1 : -1) * (0.55 + 0.45 * frac(i * 67 + k + ti));
+          const ma = a + swing;
+          const mL = armL * (0.40 - 0.10 * mb);
+          const tipx = root[0] + Math.cos(ma) * mL;
+          const tipz = root[2] + Math.sin(ma) * mL;
+          const tipy = root[1] - mL * (0.30 + 0.24 * frac2(i * 71 + k + mb));   /* medium branches hang */
+          const MSEG = 3;
+          for (let s2 = 0; s2 < MSEG; s2++) {
+            const t0 = s2 / MSEG, t1 = (s2 + 1) / MSEG;
+            /* a quadratic again, with the control point high, so a medium branch also arcs */
+            const q = t => [root[0] + (tipx - root[0]) * t,
+                            root[1] + (tipy - root[1]) * t + Math.sin(t * Math.PI) * mL * 0.16,
+                            root[2] + (tipz - root[2]) * t];
+            const p0 = q(t0), p1 = q(t1);
+            const dx = p1[0] - p0[0], dy = p1[1] - p0[1], dz = p1[2] - p0[2];
+            const segL = Math.hypot(dx, dy, dz);
+            if (segL < 0.05) continue;
+            const w = 0.66 * T.node * (1 - 0.55 * t0);
+            const g3 = chamferBox(w, w, segL, Math.min(0.16, w * 0.3));
+            const mm3 = at((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2, (p0[2] + p1[2]) / 2, -ma);
+            mm3.multiply(new THREE.Matrix4().makeRotationX(Math.atan2(-dy, Math.hypot(dx, dz))));
+            bake(B, 'detail', g3, mm3, 0.68 + 0.22 * t0);
+            g3.dispose();
+          }
+          spray(tipx, tipy, tipz, sc * 0.52, 3, i * 73 + k * 5 + mb * 41 + ti * 307, 0.36 + 0.46 * T.at);
+
+          /* TWIGS: one short spur off each medium branch, ending in a small cluster. This is the
+             fourth level, and it is what stops the midground from being countable sticks. */
+          const twa = ma + (mb === 0 ? -0.8 : 0.8);
+          const tL = mL * 0.42;
+          const tw = 0.34 * T.node;
+          const tx = tipx - Math.cos(ma) * mL * 0.32 + Math.cos(twa) * tL;
+          const tz = tipz - Math.sin(ma) * mL * 0.32 + Math.sin(twa) * tL;
+          const ty = tipy + mL * 0.10 - tL * 0.34;
+          const bx = tipx - Math.cos(ma) * mL * 0.32, bz = tipz - Math.sin(ma) * mL * 0.32;
+          const by = tipy + mL * 0.10;
+          const dtx = tx - bx, dty = ty - by, dtz = tz - bz;
+          const tSeg = Math.hypot(dtx, dty, dtz);
+          if (tSeg > 0.05) {
+            const g4 = chamferBox(tw, tw, tSeg, tw * 0.3);
+            const mm4 = at((bx + tx) / 2, (by + ty) / 2, (bz + tz) / 2, -twa);
+            mm4.multiply(new THREE.Matrix4().makeRotationX(Math.atan2(-dty, Math.hypot(dtx, dtz))));
+            bake(B, 'detail', g4, mm4, 0.74);
+            g4.dispose();
+          }
+          spray(tx, ty, tz, sc * 0.36, 3, i * 79 + k * 3 + mb * 53 + ti * 401, 0.30 + 0.40 * T.at);
+        }
       }
       /* the COLLAR the tier springs from — a band, so a tier is visibly attached to the stem */
       const cr = baseR * (1 - 0.80 * Math.pow(T.at, 0.74)) * 1.5;
@@ -454,8 +549,23 @@ export function buildRainforest(ctx) {
   /* ---- 1b. THE CANOPY, AS ONE INSTANCED MESH -------------------------------------------------
      Every node in the stand, one draw. instanceColor carries the per-node value so a canopy has lit
      leaves and shaded ones without a second material. */
-  let canopyMesh = null;
+  let canopyMesh = null, canopyMassCount = 0;
   {
+    /* R3-13: PARTITION BEFORE INSTANCING. An InstancedMesh can only be shortened from the END, so
+       the LOD split has to exist in the array order: every landmark node (the large-branch tips and
+       the understory) first, every detail node (medium-branch and twig clusters) after. Then the far
+       tier is `canopyMesh.count = canopyMassCount` — one integer, no rebuild, no second mesh. A
+       stable partition keeps each group in its authored order, so nothing about the near forest
+       changes when the far tier is switched off and back on. */
+    const mass = [], det = [];
+    for (const n of canopyNodes) (n.detail ? det : mass).push(n);
+    canopyNodes.length = 0;
+    for (const n of mass) canopyNodes.push(n);
+    for (const n of det) canopyNodes.push(n);
+    canopyMassCount = mass.length;
+    stats.derived.canopyMass = mass.length;
+    stats.derived.canopyDetail = det.length;
+
     const N = canopyNodes.length;
     const nodeGeo = own(new THREE.OctahedronGeometry(1, 0));       /* THE SQUARE DIAMOND, kept sharp */
     nodeGeo.scale(1, 1.5, 0.72);   /* not a flat lozenge: real depth, so each node catches differently */
@@ -608,11 +718,13 @@ export function buildRainforest(ctx) {
   }
 
   /* ---- 3. EMIT THE GRADES, AND MEASURE LAW 1 -------------------------------------------------- */
+  const detailMeshes = [];
   for (const k of Object.keys(B)) {
     const t = B[k];
     if (!t.pos.length) continue;
     const mesh = new THREE.Mesh(own(finish(t)), GRADE[k]);
     mesh.name = 'forest-' + k;
+    if (k.endsWith('D')) detailMeshes.push(mesh);       /* R3-13: the far tier drops these three */
     group.add(mesh);
     stats.law1[k] = {
       metalness: GRADE[k].metalness, m2: +t.area.toFixed(1),
@@ -626,6 +738,7 @@ export function buildRainforest(ctx) {
      soft additive twin scaled up around it which is the aura. Both are driven by one loop; nothing
      is spawned and nothing is random, so a capture reproduces exactly. */
   let rainCore = null, rainAura = null, rainA = null;
+  let detailOn = true;                 /* R3-13: the near/far tier switch, see setDetail */
   {
     const N = RAIN.count;
     const sg = new THREE.OctahedronGeometry(1, 0);
@@ -758,6 +871,25 @@ export function buildRainforest(ctx) {
       }
       musicLines.update(t);
       fauna.forEach(f => f.update(t));
+    },
+    /* R3-13 — FAR FOREST = MASS + LANDMARK BRANCHES. NEAR FOREST = PREMIUM DETAIL.
+       The assembly calls this with the camera's distance from the site. Inside NEAR the whole
+       hierarchy is present; beyond it the medium branches, twigs and their diamond clusters go, and
+       what is left is exactly the massed canopy silhouette the far read was always judged on. The
+       hysteresis band stops a camera hovering on the boundary from flickering the forest. */
+    setDetail(dist) {
+      const NEAR = 460, FAR = 560;
+      const want = detailOn ? dist < FAR : dist < NEAR;
+      if (want === detailOn) return detailOn;
+      detailOn = want;
+      for (const m of detailMeshes) m.visible = want;
+      if (canopyMesh) canopyMesh.count = want ? canopyNodes.length : canopyMassCount;
+      /* the ground layer and the rain are also near-field: nothing about a 5 m fallen shard or a
+         30 cm diamond droplet survives 500 m, and together they are 62k triangles */
+      if (groundMesh) groundMesh.visible = want;
+      if (litterMesh) litterMesh.visible = want;
+      if (rainAura) rainAura.visible = want;
+      return detailOn;
     },
     setQuality(q) {
       const low = q && (q.name === 'low' || q === 'low');

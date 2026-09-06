@@ -815,6 +815,21 @@ export async function createMahplaza(canvas, options = {}) {
   function requestRender() { if (!raf) raf = requestAnimationFrame(frame); }
   /* ONE world step, shared by the animation loop and by `advance()` (validation) so evidence exercises
      exactly the code a viewer's browser runs */
+  /* ---- R3-13 · DETAIL TIERS ------------------------------------------------------------------
+     "Far forest = mass + landmark branches. Near forest = premium detail." A peer city 700 m away
+     is drawing its medium branches, its twigs, 6500 ground instances and a diamond-rain aura that
+     together are a quarter of a million triangles nobody can resolve. Each destination module owns
+     its own near/far switch and its own hysteresis; the assembly's only job is to tell it how far
+     away the eye currently is. Called once per rendered frame, after the camera is placed. */
+  const _detEye = new THREE.Vector3();
+  function updateDetailTiers() {
+    camera.getWorldPosition(_detEye);
+    for (const mod of [lakeCity, rainforest]) {
+      if (!mod || typeof mod.setDetail !== 'function' || !mod.stats || !mod.stats.site) continue;
+      mod.setDetail(Math.hypot(_detEye.x - mod.stats.site.x, _detEye.z - mod.stats.site.z));
+    }
+  }
+
   function stepWorld(t, dt, nowMs) {
     residents.forEach(r => { if (r.userData && r.userData.update) r.userData.update(t, dt); });
     extras.forEach(r => { if (r.userData && r.userData.update) r.userData.update(t, dt); });
@@ -856,6 +871,7 @@ export async function createMahplaza(canvas, options = {}) {
     applyTime(false); placeCamera(0);
     if (mirror) mirror.render(true);   /* a capture screenshots straight after this: never reuse */
     sky.follow(camera);                                  /* L43: the sky is a direction, not a place */
+    updateDetailTiers();
     renderer.render(scene, camera); state.frames++;
     return { advancedSeconds: n * stepSeconds, steps: n, worldTime: advanceClock };
   }
@@ -1074,6 +1090,7 @@ export async function createMahplaza(canvas, options = {}) {
     const t0 = performance.now();
     if (mirror) mirror.render();     /* the reflected view first: the floor samples it this frame */
     sky.follow(camera);                                  /* L43 */
+    updateDetailTiers();
     renderer.render(scene, camera);
     state.ms = state.ms * 0.9 + (performance.now() - t0) * 0.1; state.frames++;
     if (opts.hud) opts.hud(state);
@@ -1115,7 +1132,7 @@ export async function createMahplaza(canvas, options = {}) {
   const _w = new THREE.Vector3();
   function projectResident(r) { r.getWorldPosition(_w); _w.y += (r.userData.height || 1.9) * 0.62; _w.project(camera); const w = canvas.clientWidth, h = canvas.clientHeight; return { x: (_w.x + 1) / 2 * w, y: (1 - _w.y) / 2 * h, inFront: _w.z < 1 && Math.abs(_w.x) < 1 && Math.abs(_w.y) < 1 }; }
   function samplePixels(points) {
-    placeCamera(); sky.follow(camera); if (mirror) mirror.render(); renderer.render(scene, camera);
+    placeCamera(); sky.follow(camera); updateDetailTiers(); if (mirror) mirror.render(); renderer.render(scene, camera);
     const gl = renderer.getContext(), pr = renderer.getPixelRatio(), H = gl.drawingBufferHeight, W = gl.drawingBufferWidth, buf = new Uint8Array(4);
     return points.map(p => { const x = Math.round(p.x * pr), y = Math.round(H - p.y * pr); if (x < 0 || y < 0 || x >= W || y >= H) return null; gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, buf); return [buf[0], buf[1], buf[2]]; });
   }
