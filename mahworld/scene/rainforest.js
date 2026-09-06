@@ -185,6 +185,22 @@ export function buildRainforest(ctx) {
     down: far(M.platinumMidLit || M.platinumLit, 'under'),
     floor: far(M.paving || M.platinumMidLit, 'floor', 0.10)     /* §07: near-black, metalness 0.40 */
   };
+  /* L37 — A POLISHED FLOOR SEEN FROM STANDING HEIGHT IS NOT BLACK, IT IS WHITE.
+     The forest floor inherited the plaza's paving unchanged: metalness 0.40, roughness 0.34. On the
+     plaza that is right — the deck is 90 m across, broken into tiles with dark joints, and the
+     reflection group puts the city back into it. Out here it is ONE unbroken 328 m disc, and from a
+     walker's 1.70 m eye the far 250 m of it sit at grazing incidence, where Fresnel goes to 1 and a
+     smooth surface returns the whole bright horizon. Measured from 34 m looking DOWN it read 20/255
+     and I called it black; measured from eye height looking ACROSS it is a sheet of milk covering
+     the bottom third of the frame. The angle you measure a mirror from decides what you see, so a
+     floor must be judged from the height it is walked at.
+     Roughness is the fix, not colour: a forest floor is not polished stone, and scattering the
+     grazing lobe is what turns the sheet back into ground. The plaza keeps its polish. */
+  if (GRADE.floor) {
+    GRADE.floor.roughness = 0.74;
+    GRADE.floor.metalness = 0.26;
+    GRADE.floor.envMapIntensity *= 0.55;
+  }
 
   const B = newBuckets();
   const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(),
@@ -336,6 +352,88 @@ export function buildRainforest(ctx) {
     }
     stats.organisms++;
   }
+
+  /* ---- 1a. THE UNDERSTORY ---------------------------------------------------------------------
+     L36 — A CANOPY OVERHEAD IS NOT A FOREST; A FOREST IS WHAT YOU CANNOT SEE THROUGH.
+     26 organisms 118–168 m tall over a 268 m spread put every leaf 120 m above a viewer's head. In
+     plan their crowns overlap heavily, so from the plaza at 700 m the stand read as a proper massed
+     ceiling — and that is the only place it was ever judged from. The moment roam let someone walk
+     into it, the same stand read as a plantation: bare stems 50 m apart with open sky between them
+     all the way to the horizon. The failure was never in the canopy. It was in the 0–60 m band the
+     viewer actually occupies, which had nothing in it at all.
+
+     So: a second, shorter class on its own spiral, offset from the first so it fills the gaps rather
+     than doubling the same positions. Same genome — spiralling chamfered stem, platinum growth
+     bands, drooping arms of square-diamond nodes into the shared instanced canopy — at a third the
+     height and twice the number. It is the same organism younger, not a different species, which is
+     what keeps one forest from reading as two. */
+  const UNDER = { count: 58, hMin: 17, hMax: 54, segMin: 3, segMax: 5, baseR: 2.5, spread: 288 };
+  for (let i = 0; i < UNDER.count; i++) {
+    /* the OFFSET spiral: golden angle from a different seed, and sqrt-distributed like the canopy
+       class so the two stay evenly mixed instead of the understory ringing the outside */
+    const rr = UNDER.spread * Math.sqrt(frac(i * 5 + 37));
+    const ang = gold(i * 2 + 11);
+    const ox = Math.cos(ang) * rr, oz = Math.sin(ang) * rr;
+    const h = UNDER.hMin + (UNDER.hMax - UNDER.hMin) * frac2(i * 7 + 13);
+    const segs = Math.round(UNDER.segMin + (UNDER.segMax - UNDER.segMin) * frac(i * 11 + 17));
+    const baseR = UNDER.baseR * (0.72 + 0.62 * frac2(i * 13 + 19));
+
+    let y = GROUND_Y;
+    for (let sgi = 0; sgi < segs; sgi++) {
+      const t = sgi / (segs - 1 || 1);
+      const sh = h / segs * (1.16 - 0.32 * t);
+      const r = baseR * (1 - 0.72 * Math.pow(t, 0.74));
+      const g = chamferBox(r * 2, sh, r * 2, Math.min(0.9, r * 0.26));
+      bake(B, 'organism', g, at(ox, y + sh / 2, oz, ORGANISM.twist * 1.6 * sgi + gold(i * 3)), 0.58 + 0.16 * t);
+      g.dispose();
+      const bg = chamferBox(r * 2.34, 0.7, r * 2.34, 0.24);
+      bake(B, 'organism', bg, at(ox, y + sh, oz, ORGANISM.twist * 1.6 * sgi + gold(i * 3) + 0.3), 1.0);
+      bg.dispose();
+      y += sh;
+    }
+
+    /* ONE tier of arms, wide and low, because the whole job of this class is to close the sight
+       line at head height. The arms are the same four-segment quadratic the canopy class uses. */
+    const arms = 3 + Math.round(2 * frac(i * 17 + 23));
+    const armL = h * 0.62, collarY = GROUND_Y + h * 0.70;
+    for (let k = 0; k < arms; k++) {
+      const a = gold(i * 19 + k * 5 + 3) + k * TAU / arms;
+      const nx = ox + Math.cos(a) * armL, nz = oz + Math.sin(a) * armL;
+      const ny = collarY - armL * 0.24;                 /* the understory hangs; nothing reaches up */
+      canopyNodes.push({
+        x: nx, y0: ny, z: nz, s: 1.9 + 1.5 * frac(i * 23 + k),
+        phase: gold(i * 29 + k + 401), rate: 0.20 + 0.18 * frac2(i * 31 + k),
+        lift: 0.8 + 1.0 * frac(i * 37 + k),
+        /* darker than the crown: this layer sits under 120 m of canopy and should read as shade */
+        tint: 0.30 + 0.34 * frac2(i * 41 + k),
+        tiltX: (frac(i * 43 + k) - 0.5) * 1.1, tiltZ: (frac2(i * 47 + k) - 0.5) * 1.1
+      });
+      stats.canopyArms++;
+      const SEGS = 4;
+      const ctlx = ox + Math.cos(a) * armL * 0.42, ctlz = oz + Math.sin(a) * armL * 0.42;
+      const ctly = collarY + armL * 0.13;
+      const bez = u => {
+        const v = 1 - u;
+        return [v * v * ox + 2 * v * u * ctlx + u * u * nx,
+                v * v * collarY + 2 * v * u * ctly + u * u * ny,
+                v * v * oz + 2 * v * u * ctlz + u * u * nz];
+      };
+      for (let sgm = 0; sgm < SEGS; sgm++) {
+        const p0 = bez(sgm / SEGS), p1 = bez((sgm + 1) / SEGS);
+        const dx = p1[0] - p0[0], dy = p1[1] - p0[1], dz = p1[2] - p0[2];
+        const segL = Math.hypot(dx, dy, dz);
+        if (segL < 0.05) continue;
+        const w = 0.62 * (1 - 0.58 * (sgm / SEGS));
+        const g2 = chamferBox(w, w, segL, Math.min(0.16, w * 0.3));
+        const mm = at((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2, (p0[2] + p1[2]) / 2, -a);
+        mm.multiply(new THREE.Matrix4().makeRotationX(Math.atan2(-dy, Math.hypot(dx, dz))));
+        bake(B, 'organism', g2, mm, 0.68 + 0.22 * (sgm / SEGS));
+        g2.dispose();
+      }
+    }
+    stats.understory = (stats.understory || 0) + 1;
+  }
+
   /* ---- 1b. THE CANOPY, AS ONE INSTANCED MESH -------------------------------------------------
      Every node in the stand, one draw. instanceColor carries the per-node value so a canopy has lit
      leaves and shaded ones without a second material. */
@@ -344,7 +442,23 @@ export function buildRainforest(ctx) {
     const N = canopyNodes.length;
     const nodeGeo = own(new THREE.OctahedronGeometry(1, 0));       /* THE SQUARE DIAMOND, kept sharp */
     nodeGeo.scale(1, 1.5, 0.72);   /* not a flat lozenge: real depth, so each node catches differently */
-    const nodeMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.94, fog: true });
+    /* L35 — A LEAF IS A SOLID, AND MeshBasic HAS NO SOLIDS IN IT.
+       The canopy shipped on MeshBasicMaterial, which is unlit by definition: every node rendered as
+       its flat instanceColor with no shading whatsoever, so 700 white octahedra read as squares of
+       paper stapled to sticks. It was invisible as a fault while fog sat on the stand at 78%; the
+       moment L34 lifted the bank the whole city read as a craft project. The node must be the same
+       PLATINUM the growth bands are — then LAW 1 does the work for free: a faceted leaf turns four
+       ways to the horizon and comes back four values, which is what "canopy" looks like.
+       vertexColors stays FALSE here — this geometry carries no colour attribute, and instanceColor
+       is a separate define that multiplies the material colour per node, which is where the tier
+       value (crown bright, skirt dark) already lives. */
+    const nodeBase = M.platinumLit || M.platinumMidLit || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 });
+    const nodeMat = nodeBase.clone();
+    nodeMat.color = new THREE.Color(0xffffff).lerp(new THREE.Color(RECEDE.tint), RECEDE.mix * 0.55);
+    nodeMat.envMapIntensity = (nodeBase.envMapIntensity !== undefined ? nodeBase.envMapIntensity : 1) * RECEDE.env;
+    nodeMat.vertexColors = false;
+    nodeMat.transparent = true; nodeMat.opacity = 0.94; nodeMat.fog = true;
+    nodeMat.flatShading = true;                    /* §06: the facet is the read, not a smooth blob */
     nodeMat.name = 'forest-canopy-node'; owned.materials.push(nodeMat);
     canopyMesh = new THREE.InstancedMesh(nodeGeo, nodeMat, N);
     canopyMesh.name = 'forest-canopy';

@@ -104,8 +104,13 @@ export async function createMahplaza(canvas, options = {}) {
   renderer.shadowMap.type = THREE.PCFShadowMap;   /* PCFSoft is deprecated in this renderer build and falls back to this anyway */
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0d1f3e, 60, 760);   /* near / far follow the time of day in applyTime: atmospheric perspective, not a fog bank */
-  const camera = new THREE.PerspectiveCamera(54, 1, 0.1, 2000);
+  scene.fog = new THREE.Fog(0x0d1f3e, 60, 2350);  /* near / far follow the time of day in applyTime: atmospheric perspective, not a fog bank */
+  /* FAR PLANE PAST THE FAR RING. terrain.js's outermost range stands at r 1500, so a viewer who
+     has flown 700 m out to Lake City is 2200 m from the ridge behind the plaza — beyond a 2000 m
+     frustum, which clipped the far range out of exactly the wide shots it exists for. 2600 clears
+     it with margin; the depth buffer loses a little far-field precision and there is nothing
+     coplanar out there to lose it on. */
+  const camera = new THREE.PerspectiveCamera(54, 1, 0.1, 2600);
   const M = createMaterials(theme);
 
   /* wet reflections: mirrored copies of emissive elements under the floor, built from world matrices once the graph is placed */
@@ -409,7 +414,15 @@ export async function createMahplaza(canvas, options = {}) {
     M.setTime(s);
     renderer.toneMappingExposure = state.diagnostic ? 1.0 : k.exposure;
     /* atmospheric perspective: a long, subtle falloff — deeper by day, closer at night; the city's far layers live inside it */
-    scene.fog.near = 55 + 45 * s.daylight; scene.fog.far = 880 + 260 * s.daylight;   /* v5: the megatalls stand at 380–670 m and must not be eaten by the bank */
+    /* L34 — FOG FAR IS THE AERIAL LADDER'S CEILING, AND 880 WAS BELOW THE WORLD.
+       terrain.js authors three deliberately-separated value ranges: near (r 620), mid (r 1050,
+       base 0x172440 / ridge 0x51648f) and far (r 1500, base 0x2b3f66 / ridge 0x7a8fb8). Each is
+       lighter than the one in front of it — that IS the world's depth cue, painted into the
+       vertex colours. Linear fog at far = 880 reached 100% at 880 m, so BOTH the mid and far
+       rings resolved to one flat 0x152c52 and the ladder terrain paid for was deleted before it
+       reached the frame: every render came back value-compressed, band means inside 18 counts of
+       each other. The bank must sit BEYOND the last thing worth seeing, not in front of it. */
+    scene.fog.near = 55 + 45 * s.daylight; scene.fog.far = 2350 + 700 * s.daylight;
     pointLights.forEach(l => { l.intensity = l.userData.base * (1 - 0.7 * s.daylight) * (state.diagnostic ? 0.6 : 1); });
     ctx.timeHooks.forEach(h => { try { h(s); } catch (e) {} });
     const energy = state.diagnostic ? Math.min(0.3, 1 - s.daylight) : 1 - s.daylight;
