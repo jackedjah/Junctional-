@@ -275,6 +275,82 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     budget.plaza.d + ' draws / ' + budget.plaza.t + ' tris');
 
   /* ============================================================================================
+     7b. THE AXIS SWEEP — the bug class this file's modules produce more than any other
+     ============================================================================================
+     `mat(x, z, up, -th)` sends a geometry's local +X RADIALLY and its local +Z TANGENTIALLY, which
+     is the opposite of how everyone writes chamferBox(length_along, height, depth_across). Twelve
+     instances were found and fixed in one pass — kerb, P.screen (twice), the STAGE proscenium and
+     deck, P.gateway's lintel, the arrival keystone lintel, FORUM's treads, PLAY's arena boundary,
+     TABLE's terrace, the district pools, and both rim solids. Every one of them was silent.
+
+     These three assert the class directly, from world-space extents of the built scene rather than
+     from the source, because the source is where the mistake looks correct. */
+  const axis = await ev(async () => {
+    const T = await import('/mahworld/vendor/three/three.module.min.js');
+    const H = await import('/mahworld/scene/halo.js');
+    const w = window.MAHWORLD_MAHPLAZA;
+    const out = {};
+    /* (a) THE RIMS. Each of the 384 pieces must be LONG along the rim and THIN across it. Built the
+       other way round they are outward-pointing fins with 55 m gaps: the ring's two defining
+       circles rendered as a comb. Measured from the merged mesh's own bounding box: a ring of
+       tangentially-laid segments is a closed annulus, so its box spans the full diameter in x AND
+       z, and its y extent is only the parapet plus the slab edge. */
+    let rims = null;
+    w.scene.traverse(o => { if (o.name === 'halo-rims' && o.isMesh) rims = o; });
+    if (rims) {
+      rims.geometry.computeBoundingBox();
+      const b = rims.geometry.boundingBox;
+      out.rim = { x: +(b.max.x - b.min.x).toFixed(0), z: +(b.max.z - b.min.z).toFixed(0),
+        y: +(b.max.y - b.min.y).toFixed(1), want: +(2 * (H.HALO.R_OUT + H.HALO.APRON)).toFixed(0) };
+    }
+    /* (b) THE DISTRICT LIGHT POOLS. These are the one other family whose axes are readable from
+       outside the merge, because each pool is an INSTANCE and an instance has its own matrix. A
+       pool must be wide ALONG the ring (D.span) and narrower ACROSS it (the ~170 m district band);
+       built the other way it is stretched hundreds of metres across the width and cut short along
+       the length. Decomposing the instance matrix gives both extents directly. */
+    let pools = null;
+    w.scene.traverse(o => { if (o.name === 'halo-district-pools' && o.isInstancedMesh) pools = o; });
+    if (pools) {
+      const m = new T.Matrix4(), pos = new T.Vector3(), q = new T.Quaternion(), sc = new T.Vector3();
+      const rows = [];
+      for (let i = 0; i < Math.min(pools.count, 8); i++) {
+        pools.getMatrixAt(i, m); m.decompose(pos, q, sc);
+        /* the pool plane is authored in XZ, so sc.x is its RADIAL extent and sc.z its TANGENTIAL
+           one under mat(..., -th) — the same convention everything else on the ring uses */
+        rows.push({ radial: +sc.x.toFixed(0), tangential: +sc.z.toFixed(0) });
+      }
+      out.pools = rows;
+    }
+    return out;
+  });
+  console.log('\nMAH HALO — the axis sweep');
+  if (axis.rim) {
+    console.log('  halo-rims box: x ' + axis.rim.x + '  z ' + axis.rim.z + '  y ' + axis.rim.y +
+      '   (a closed annulus spans ' + axis.rim.want + ' in x and z)');
+    P('the rims are a closed band, not 384 radial fins',
+      Math.abs(axis.rim.x - axis.rim.want) < 120 && Math.abs(axis.rim.z - axis.rim.want) < 120 &&
+      axis.rim.y < 40,
+      'x ' + axis.rim.x + ' / z ' + axis.rim.z + ' / y ' + axis.rim.y + ' vs ' + axis.rim.want);
+  } else {
+    P('the rims are a closed band, not 384 radial fins', false, 'halo-rims mesh not found');
+  }
+  if (axis.pools && axis.pools.length) {
+    const wide = axis.pools.filter(r => r.tangential > r.radial).length;
+    console.log('  district pools (radial x tangential): ' +
+      axis.pools.slice(0, 4).map(r => r.radial + 'x' + r.tangential).join('  '));
+    /* the district-centre pools are the wide ones; the gateway pools are deliberately small, so
+       the assertion is that the WIDE family runs along the ring, not that every instance does */
+    P('the district light pools are wide ALONG the ring, not across it', wide >= 4,
+      wide + ' of ' + axis.pools.length + ' sampled instances are longer tangentially');
+  }
+  /* NOT ASSERTED HERE, and worth saying why rather than faking it: FORUM's tread depth and PLAY's
+     arena tangency are the other two axis defects this pass fixed, and neither is measurable from
+     the built scene — both merge into `halo-d-dark` with every other district's geometry, so there
+     is no mesh to take extents from. A count of tiers or arenas is NOT an axis check, and writing
+     one under that name would be exactly the passing-test-that-measures-nothing this suite already
+     caught itself doing (L60). They stay render-judged until the buckets carry group ranges. */
+
+  /* ============================================================================================
      8. THE NaN SWEEP — L56. A mesh whose positions are NaN does not error, does not warn twice, and
      does not draw: `halo-rims` lost all 205,824 of its vertices to one undefined scale argument and
      the only trace was a single console line at the end of a capture. This walks every geometry in
