@@ -30,7 +30,14 @@ export const VIEWS = {
   /* v6 §45 / §46: the three facilities now stand apart LATERALLY as well as in depth, so the arrival
      camera stands further back on a narrower lens — the whole ecosystem reads, with real gaps between
      the facilities and open sky through the skyline valleys down to the mountains behind. */
-  establishing:      { pos: [0.6, 3.4, 84],    look: [0, 20, -74],     fov: 44, label: 'Arrival', portrait: { pos: [0.6, 3.1, 76], look: [0, 30, -74], fov: 48 } },
+  establishing:      { pos: [0.6, 3.4, 84],    look: [0, 20, -74],     fov: 44, label: 'Arrival',
+    /* THE PHONE HERO (§46). Bottom third platinum floor, then the facilities, then the districts, then
+       mountains / FOBEAMs / moon / sky. It stands further back on a wider lens than the landscape view
+       because §05 (real spacing between the facilities) and §46 (all of them in one portrait frame) pull
+       against each other at a physical camera: with the sites genuinely 120 m apart, holding all three
+       inside a 9:19.5 crop needs about an 88-degree vertical lens, which is a fisheye. This is the
+       honest compromise — MAH MATCH is the hero, and MAH GYM and MAH MARKET enter at the frame edges. */
+    portrait: { pos: [0.6, 4.2, 96], look: [0, 34, -74], fov: 58 } },
   'in-world':        { pos: [3.5, 1.9, 40],    look: [-1, 14, -74],    fov: 52, label: 'In-world', portrait: { pos: [3.5, 1.9, 40], look: [-1, 23, -74], fov: 56 } },
   'match-approach':  { pos: [1.4, 1.9, -18],   look: [0, 15, -74],     fov: 58, label: 'Toward MAH MATCH' },
   'match-entrance':  { pos: [0.4, 3.0, -58],   look: [0, 6.0, -86],    fov: 54, label: 'MAH MATCH entrance', portrait: { pos: [0.4, 3.4, -50], look: [0, 9.0, -86], fov: 58 } },

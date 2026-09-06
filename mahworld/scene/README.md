@@ -6,8 +6,27 @@ system, no network and no interface baked into the world.
 
 | Scene | Page | Status |
 | --- | --- | --- |
-| **MAHPLAZA** — MAH GYM · MAH MATCH · MAH MARKET, a living chromium district under a luminous crystalline night | `mahplaza.html` | **v5** (the chromium city), the current milestone |
+| **MAHPLAZA** — MAH GYM · MAH MATCH · MAH MARKET, a platinum civilization inside a larger world | `mahplaza.html` | **v6** (the platinum ecosystem), the current milestone |
 | Arrival Gate — the MAHWORLD gate plaza | `arrival-gate/plaza.html` | study v1, kept for the record |
+
+## v6 — the platinum ecosystem
+
+MAHWORLD is a civilization inside a LARGER WORLD now, not a city that consumes
+one. A viewer can see where the plaza ends, where the city continues, where the
+mountains begin, and where open land and water are.
+
+| What changed | Where |
+| --- | --- |
+| the reason platinum rendered black: a metal takes no diffuse light, so every metalness ≥ 0.9 surface was lit only by an environment ring that was "mostly dark". That ring is lit now, and a low-metalness `platinumLit` grade carries every horizontal cap | `mahplaza.js`, `materials.js` |
+| three valleys cut through the skyline — the portrait hero frame previously had ZERO open sky at any bearing | `city.js` |
+| four background material families assigned independently of shape; three distant depth bands instead of one flat black | `city.js` |
+| the facilities separated LATERALLY as well as in depth — their side wings had physically collided — with the secondary mass growing backward instead of sideways | `buildings.js` |
+| the natural world: three mountain ranges, a land ring, green corridors in the valleys, and a still reflective basin | `terrain.js` (new) |
+| canonical MAH branding read out of the app source, and signage built into the facade rather than printed on it | `materials.js`, `buildings.js` |
+| flight and flight-LEARNING: seven states as one skill-driven arc, beginners common and the three-resident lesson rarest | `life.js` |
+| furniture with bodies — plinths, overhangs, nosings, underside light — and four ecosystem cameras | `plaza-dressing.js`, `mahplaza.js` |
+
+Contracts: `CONTRACTS_V5.md` and `CONTRACTS_V4.md` both still hold.
 
 ## v5 — the chromium city
 
