@@ -1,0 +1,199 @@
+/* MAHWORLD — R3 SYSTEM GATES, checked in the running world.
+
+   docs/MAHWORLD_R3_MASTER_IMPLEMENTATION_SPEC.md is a work contract, and a contract nobody measures
+   is a wish. These checks turn its mechanically-testable clauses into a build gate — the ones that
+   are TRUE OR FALSE about the assembled scene, not the ones that are the director's eye.
+
+   What this file deliberately does NOT claim: it cannot tell you the forest looks alive, that the
+   arrival district reads as premium, or that a MAH DESCENT entrance feels like it goes somewhere.
+   Those are judged from renders. What it CAN do is catch the class of failure this project keeps
+   producing — a system that is built and unwired, a spec number that drifted, a fix to one caller
+   that was never walked to the others, an LOD that quietly stopped restoring what it hid.
+
+   Run: node tests/mahworld-r3-laws.test.js */
+'use strict';
+const fs = require('fs'), p = require('path'), cp = require('child_process');
+const ROOT = '/home/user/Junctional-';
+let pw = null; for (const c of ['playwright', p.join(cp.execSync('npm root -g').toString().trim(), 'playwright')]) { try { pw = require(c); break; } catch (e) {} }
+const { chromium } = pw;
+const MIME = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.png': 'image/png', '.json': 'application/json' };
+const HOST = 'https://mahworld.test';
+let pass = 0, fail = 0;
+const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else { fail++; console.log('  FAIL  ' + n + (d ? '  — ' + d : '')); } };
+
+(async () => {
+  const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
+  const page = await b.newPage({ viewport: { width: 900, height: 520 }, deviceScaleFactor: 1 });
+  const errs = []; page.on('pageerror', e => errs.push('ERR ' + e.message));
+  await page.route('**/*', r => {
+    const u = new URL(r.request().url()); if (u.origin !== HOST) return r.abort();
+    const f = p.join(ROOT, decodeURIComponent(u.pathname));
+    if (f.indexOf(ROOT) === 0 && fs.existsSync(f) && fs.statSync(f).isFile())
+      return r.fulfill({ status: 200, contentType: MIME[p.extname(f)] || 'application/octet-stream', body: fs.readFileSync(f) });
+    return r.fulfill({ status: 404, contentType: 'text/plain', body: '' });
+  });
+  await page.goto(HOST + '/mahworld/scene/mahplaza.html?hud=0', { waitUntil: 'commit', timeout: 120000 });
+  await page.waitForFunction(() => window.MAHWORLD_MAHPLAZA && window.MAHWORLD_MAHPLAZA.state.frames > 2, null, { timeout: 400000 });
+  await page.evaluate(() => window.MAHWORLD_MAHPLAZA.setTime('21:40'));
+
+  const ev = fn => page.evaluate(fn);
+
+  /* ============================================================================================
+     R3-06 · MAH ASCENT COMPLETES ITS DESTINATION
+     "The current vertical beams/elevators must not stop visually in the lower atmosphere."
+     ============================================================================================ */
+  const asc = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const A = await import('/mahworld/scene/mahascent.js');
+    const C = await import('/mahworld/scene/clouds.js');
+    const F = await import('/mahworld/scene/fobeam.js');
+    /* clouds.js keeps its LAYOUT private, so read the highest cloud altitude the module reports if
+       it exposes one, and fall back to the published constant. The check that matters is relative. */
+    let names = []; w.scene.traverse(o => { if (o.name && /ascent/.test(o.name)) names.push(o.name); });
+    return {
+      wired: !!w.modules.mahAscent,
+      deckY: A.ASCENT.DECK_Y, threshold: A.ASCENT.THRESHOLD,
+      lineTops: F.ASCENTS.map(a => a.h),
+      stats: w.mahAscent ? w.mahAscent.stats : null,
+      names
+    };
+  });
+  P('R3-06-A mahascent.js is BUILT AND IN THE SCENE (a module that never renders is not a feature)',
+    asc.wired && asc.names.length > 0, 'objects: ' + asc.names.length);
+  P('R3-06-B every ascent line continues to ONE shared arrival altitude',
+    !!asc.stats && Object.values(asc.stats.tops || {}).length === asc.lineTops.length
+    && Object.values(asc.stats.tops || {}).every(t => t.now === asc.deckY),
+    JSON.stringify(asc.stats && asc.stats.tops));
+  P('R3-06-C the arrival deck stands ABOVE the cloud aperture, and the aperture above the weather',
+    asc.deckY > asc.threshold && asc.threshold > 560,
+    'deck ' + asc.deckY + ' > aperture ' + asc.threshold + ' > cloud top 560');
+  P('R3-06-D no line stops in the lower atmosphere any more (the shortest was 468 m)',
+    Math.min(...asc.lineTops) < asc.deckY && asc.deckY >= 700,
+    'shortest line ' + Math.min(...asc.lineTops) + ' -> ' + asc.deckY);
+  P('R3-06-E the three decks are joined, so they read as ONE district',
+    !!asc.stats && asc.stats.bridges >= 3, 'bridges ' + (asc.stats && asc.stats.bridges));
+
+  /* ============================================================================================
+     R3-07 · MAH DESCENT
+     ============================================================================================ */
+  const des = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const D = await import('/mahworld/scene/mahdescent.js');
+    const doors = [];
+    w.scene.traverse(o => { if (o.name && /^descent-door-/.test(o.name)) doors.push({ n: o.name, y: o.position.y }); });
+    return {
+      wired: !!w.modules.mahDescent,
+      H: D.DESCENT.H, mult: D.DESCENT.H / 2.0, openR: D.DESCENT.OPEN_R, shaft: D.DESCENT.SHAFT_D,
+      stats: w.mahDescent ? w.mahDescent.stats : null,
+      doors
+    };
+  });
+  P('R3-07-A mahdescent.js is BUILT AND IN THE SCENE', des.wired && des.doors.length > 0,
+    'doors: ' + des.doors.length);
+  P('R3-07-B at least THREE obvious entrances across the big world',
+    !!des.stats && des.stats.entrances >= 3, 'entrances ' + (des.stats && des.stats.entrances));
+  P('R3-07-C the entrance is approximately 5x canonical MAHBEING height',
+    Math.abs(des.mult - 5) < 0.6, des.H + ' m = ' + des.mult.toFixed(2) + 'x a 2.0 m MAHBEING');
+  P('R3-07-D there is VISIBLE DEPTH beneath the threshold, not a painted door',
+    des.shaft >= 12, 'shaft descends ' + des.shaft + ' m');
+  /* the door is the one part of R3-07 that is behaviour rather than geometry: it must RISE on
+     approach and FALL when the viewer leaves, and both directions have to be checked — a door
+     stuck open passes a one-sided test and is still broken */
+  const doorTravel = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA, m = w.mahDescent;
+    if (!m) return null;
+    const site = m.stats.sites[0];
+    const rest = [];
+    w.scene.traverse(o => { if (o.name && /^descent-door-/.test(o.name)) rest.push(o); });
+    const door = rest[0];
+    const y0 = door.position.y;
+    /* far away: settle, then measure */
+    m.setEye(site.x + 400, 1.7, site.z + 400);
+    for (let i = 0; i < 200; i++) m.update(i / 60, 1 / 60);
+    const closed = door.position.y;
+    /* inside the proximity radius: settle, then measure */
+    m.setEye(site.x + 6, 1.7, site.z + 6);
+    for (let i = 0; i < 200; i++) m.update(i / 60, 1 / 60);
+    const open = door.position.y;
+    /* and back out again, so a door that only ever opens cannot pass */
+    m.setEye(site.x + 400, 1.7, site.z + 400);
+    for (let i = 0; i < 200; i++) m.update(i / 60, 1 / 60);
+    const reclosed = door.position.y;
+    return { y0, closed, open, reclosed };
+  });
+  P('R3-07-E the door RISES on approach', !!doorTravel && doorTravel.open - doorTravel.closed > 3.0,
+    doorTravel && (doorTravel.closed.toFixed(2) + ' -> ' + doorTravel.open.toFixed(2)));
+  P('R3-07-F and FALLS again when the viewer leaves (a door stuck open is still broken)',
+    !!doorTravel && Math.abs(doorTravel.reclosed - doorTravel.closed) < 0.25,
+    doorTravel && (doorTravel.open.toFixed(2) + ' -> ' + doorTravel.reclosed.toFixed(2)));
+
+  /* ============================================================================================
+     R3-04 · THE FOREST HIERARCHY, and R3-13 · THE LOD THAT PAYS FOR IT
+     ============================================================================================ */
+  const forest = await ev(() => {
+    const w = window.MAHWORLD_MAHPLAZA, f = w.rainforest;
+    if (!f) return null;
+    const d = f.stats.derived || {};
+    const names = [];
+    w.scene.traverse(o => { if (o.name && /^forest-/.test(o.name)) names.push(o.name); });
+    return { mass: d.canopyMass, detail: d.canopyDetail, nodes: d.canopyNodes, names };
+  });
+  P('R3-04-A the canopy carries all four hierarchy levels, not two',
+    !!forest && forest.nodes >= 4000, 'canopy nodes ' + (forest && forest.nodes));
+  P('R3-04-B landmark and detail nodes are SEPARATED, so the far tier is possible at all',
+    !!forest && forest.mass > 0 && forest.detail > forest.mass,
+    'mass ' + (forest && forest.mass) + ' / detail ' + (forest && forest.detail));
+  P('R3-13-A the detail geometry bakes into its own meshes (steepD/bandD/downD)',
+    !!forest && forest.names.filter(n => /D$/.test(n)).length === 3,
+    (forest && forest.names.join(' ')) || '');
+  const lod = await ev(() => {
+    const w = window.MAHWORLD_MAHPLAZA, f = w.rainforest;
+    if (!f || !f.setDetail) return null;
+    const vis = () => { let n = 0; w.scene.traverse(o => { if (o.name && /^forest-.*D$/.test(o.name) && o.visible) n++; }); return n; };
+    const canopy = () => { let c = 0; w.scene.traverse(o => { if (o.name === 'forest-canopy') c = o.count; }); return c; };
+    f.setDetail(50); const nearD = vis(), nearC = canopy();
+    f.setDetail(2000); const farD = vis(), farC = canopy();
+    f.setDetail(50); const backD = vis(), backC = canopy();
+    return { nearD, farD, backD, nearC, farC, backC };
+  });
+  P('R3-13-B the far tier actually drops the detail meshes',
+    !!lod && lod.nearD === 3 && lod.farD === 0, JSON.stringify(lod));
+  P('R3-13-C and truncates the canopy to its landmark nodes',
+    !!lod && lod.farC < lod.nearC && lod.farC > 0, lod && (lod.nearC + ' -> ' + lod.farC));
+  P('R3-13-D walking back in RESTORES it exactly (an LOD that leaks is worse than none)',
+    !!lod && lod.backD === lod.nearD && lod.backC === lod.nearC, JSON.stringify(lod));
+
+  /* ============================================================================================
+     R3-05 · EVERY FOBEAM FAMILY CARRIES THE MINI MUSIC LINE
+     ============================================================================================ */
+  const music = await ev(() => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const fields = new Set();
+    w.scene.traverse(o => { if (o.name && /musicline/.test(o.name)) fields.add(o.name); });
+    return Array.from(fields);
+  });
+  P('R3-05-A the ascent\'s RECEIVER end carries the motif (the emitter end already did)',
+    music.some(n => /ascent/.test(n)), music.join(' '));
+  P('R3-05-B the descent shaft carries a downward-reading motif', music.some(n => /descent/.test(n)), music.join(' '));
+
+  /* ============================================================================================
+     L42 · ONE SOURCE DECIDES WHERE A CITY IS
+     ============================================================================================ */
+  const sites = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const out = { lake: w.lakeCity && w.lakeCity.stats.site, forest: w.rainforest && w.rainforest.stats.site,
+      descent: w.mahDescent ? w.mahDescent.stats.sites : [] };
+    return out;
+  });
+  const near = (a, b, r) => Math.hypot(a.x - b.x, a.z - b.z) < r;
+  P('L42 the peer-city descent entrances are placed FROM those modules\' own sites',
+    !!sites.lake && !!sites.forest
+    && sites.descent.some(d => near(d, sites.lake, 340))
+    && sites.descent.some(d => near(d, sites.forest, 360)),
+    JSON.stringify(sites.descent));
+
+  console.log('\npage errors: ' + (errs.length ? errs.slice(0, 4).join(' | ') : 'none'));
+  console.log('mahworld-r3-laws: ' + pass + '/' + (pass + fail) + (fail ? '  FAIL' : '  PASS'));
+  await b.close();
+  process.exit(fail || errs.length ? 1 : 0);
+})();

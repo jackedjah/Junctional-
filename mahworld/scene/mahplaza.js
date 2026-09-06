@@ -155,6 +155,10 @@ export async function createMahplaza(canvas, options = {}) {
   const BCAST = await optional('./broadcast.js');     /* v14 §8: the giant rear-city authority monitor */
   const LAKE = await optional('./lakecity.js');       /* R2 §5: the second destination */
   const FOREST = await optional('./rainforest.js');   /* R2 §6: the third destination */
+  const MASCENT = await optional('./mahascent.js');   /* R3-06: the ascent reaches its destination */
+  const MDESCENT = await optional('./mahdescent.js'); /* R3-07: the way down, three entrances */
+  const ORING = await optional('./outerring.js');     /* R3-01: dead-zone closure in the outer ring */
+  const MFAC = await optional('./mahfacilities.js');  /* R3-08/R3-11: MAH VITAL, FORGE, MODE */
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -209,7 +213,7 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null;
+  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null;
   /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
      own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
   if (TERRAIN && TERRAIN.buildTerrain) {
@@ -251,6 +255,29 @@ export async function createMahplaza(canvas, options = {}) {
      terrain.js's PASSES table. Peer of Lake City at the same ring radius, on the other flank, so
      the far-zoom frame has a destination either side of the civic centre (§8). */
   if (FOREST && FOREST.buildRainforest) { try { rainforest = FOREST.buildRainforest(ctx); } catch (e) { console.info('MAHPLAZA: rainforest module failed —', e && e.message); rainforest = null; } }
+  if (MFAC && MFAC.buildMahFacilities) { try { facilities = MFAC.buildMahFacilities(ctx); scene.add(facilities.group); } catch (e) { console.info('MAHPLAZA: facilities module failed —', e && e.message); facilities = null; } }
+  if (ORING && ORING.buildOuterRing) { try { outerRing = ORING.buildOuterRing(ctx); scene.add(outerRing.group); } catch (e) { console.info('MAHPLAZA: outer ring module failed —', e && e.message); outerRing = null; } }
+  if (MASCENT && MASCENT.buildMahAscent) { try { mahAscent = MASCENT.buildMahAscent(ctx); scene.add(mahAscent.group); } catch (e) { console.info('MAHPLAZA: mah ascent module failed —', e && e.message); mahAscent = null; } }
+  /* R3-07 — the three recommended entrances. The two peer-city sites come from THOSE MODULES' own
+     stats rather than from a second table here: L42's lesson is that when two files each know where
+     a city is, one of them is eventually wrong. Each is pulled back toward the plaza from its city's
+     centre so it lands in the arrival district rather than in the middle of the water or the stand. */
+  if (MDESCENT && MDESCENT.buildMahDescent) {
+    try {
+      const sites = [{ id: 'civic', x: 66, y: 0.17, z: 26, ry: -2.28 }];
+      const edge = (mod, pull, id) => {
+        if (!mod || !mod.stats || !mod.stats.site) return;
+        const sx = mod.stats.site.x, sz = mod.stats.site.z;
+        const d = Math.hypot(sx, sz) || 1;
+        sites.push({ id, x: sx - (sx / d) * pull, y: 0.17, z: sz - (sz / d) * pull,
+          ry: Math.atan2(sx / d, sz / d) + Math.PI });   /* the threshold faces back toward the plaza */
+      };
+      edge(lakeCity, 250, 'lake-shore');
+      edge(rainforest, 262, 'forest-root');
+      mahDescent = MDESCENT.buildMahDescent(ctx, { sites });
+      scene.add(mahDescent.group);
+    } catch (e) { console.info('MAHPLAZA: mah descent module failed —', e && e.message); mahDescent = null; }
+  }
 
   /* entrance and plaza point lights, bounded (v3: entrance strength lowered for the glare correction) */
   const pointLights = [], themedLights = [];
@@ -429,7 +456,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -463,7 +490,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -514,6 +541,88 @@ export async function createMahplaza(canvas, options = {}) {
   if (rainforest && rainforest.stats && rainforest.stats.site) {
     travelDest.forest = { x: rainforest.stats.site.x, z: rainforest.stats.site.z, radius: 300, arriveY: 104, label: 'RAINFOREST CITY' };
   }
+  /* ============================================================================================
+     R3-09 · MAH NAV — the compact destination menu
+     ============================================================================================
+     "Small unobtrusive button -> compact list of named destinations -> tap -> short confirm/preview
+      -> teleport -> closes instantly without breaking movement."
+
+     Two things separate this from the Fly-to row that already exists, and both matter:
+
+       · FLY TO is travel.js — REAL TRAVERSAL, eight beats and 20 seconds of world streaming past
+         you, and R2 §9 exists specifically to stop that being a cut. It is the SLOW way, on purpose.
+       · MAH NAV is the fast way, and R3-09 authorises it: "square-diamond contraction -> brief
+         MAHGIC spatial transition -> arrival pulse. Fast, premium, not a generic loading-screen snap."
+
+     Keeping both is the design. A world you can only cross slowly is a chore; a world you can only
+     jump around is small. The menu lists a destination whether or not it can be flown to, because a
+     MAH FORGE 90 m away does not warrant a 20-second flight.
+
+     The presentation is the PAGE'"'"'s, not the renderer'"'"'s: a contracting square diamond and an arrival
+     pulse are two CSS keyframes, they cost no draw call, and they cannot drop a frame in a scene
+     already at 900k triangles. The renderer'"'"'s job is only to be somewhere else when the diamond
+     closes. */
+  const navDest = () => {
+    const list = [
+      { id: 'plaza', label: 'HIGHER TOGETHER', sub: 'the plaza', x: 0, z: -6, y: 1.9, look: [0, 14, -70] },
+      { id: 'gym', label: 'MAH GYM', sub: 'training', x: -52, z: -30, y: 1.9, look: [-64, 8, -46] },
+      { id: 'match', label: 'MAH MATCH', sub: 'combat', x: 0, z: -50, y: 1.9, look: [0, 10, -74] },
+      { id: 'market', label: 'MAH MARKET', sub: 'trade', x: 52, z: -30, y: 1.9, look: [64, 8, -46] }
+    ];
+    if (facilities && facilities.stats) {
+      const F = MFAC.FACILITIES;
+      const face = (k, lab, sub) => {
+        const f = F[k]; if (!f) return;
+        /* stand OUTSIDE the building, on its apron, looking at it — arriving inside a wall is the
+           one failure a teleport must never have (travel.js makes the same choice at city scale) */
+        list.push({ id: k, label: lab, sub, y: 1.9,
+          x: f.x + Math.sin(f.ry) * (f.D * 0.5 + 11), z: f.z + Math.cos(f.ry) * (f.D * 0.5 + 11),
+          look: [f.x, f.H * 0.55, f.z] });
+      };
+      face('vital', 'MAH VITAL', 'recovery + buffs');
+      face('forge', 'MAH FORGE', 'upgrades');
+      face('mode', 'MAH MODE', 'appearance');
+    }
+    if (mahAscent && mahAscent.stats) {
+      list.push({ id: 'ascent', label: 'MAH ASCENT', sub: 'to the sky realm', x: -30, z: -8, y: 1.9, look: [-30, 240, -22] });
+    }
+    if (mahDescent && mahDescent.stats) {
+      for (const S of mahDescent.stats.sites) {
+        const d = Math.hypot(S.x, S.z) || 1;
+        list.push({ id: 'descent-' + S.id, label: 'MAH DESCENT', sub: S.id.replace(/-/g, ' '), y: 1.9,
+          x: S.x - (S.x / d) * 15, z: S.z - (S.z / d) * 15, look: [S.x, 7, S.z] });
+      }
+    }
+    for (const k of ['lake', 'forest']) {
+      const d = travelDest[k]; if (!d) continue;
+      const dist = Math.hypot(d.x, d.z) || 1;
+      list.push({ id: k, label: d.label, sub: 'peer city', y: (d.arriveY || 90) * 0.18 + 2,
+        x: d.x - (d.x / dist) * d.radius * 1.05, z: d.z - (d.z / dist) * d.radius * 1.05,
+        look: [d.x, 60, d.z] });
+    }
+    return list;
+  };
+  /* the teleport itself. It leaves the viewer IN ROAM and standing, because R3-09 says the menu
+     "closes instantly without breaking movement" — a jump that drops you back into a rail camera
+     has broken movement by definition. */
+  function navGoto(id) {
+    const d = navDest().find(v => v.id === id);
+    if (!d) return false;
+    if (travel && travel.flying) travel.cancel();
+    /* setRoam is the assembly's own entry point (roam.js exposes setEnabled, not enable) and it is
+       the one that seeds from the live camera, so a jump from a rail view hands over cleanly */
+    if (!roam.state.on) setRoam(true, { mode: 'walk' });
+    roam.setMode('walk'); roam.releaseAll();
+    roam.pos.set(d.x, d.y != null ? d.y : 1.9, d.z);
+    if (d.look) {
+      const dx = d.look[0] - d.x, dz = d.look[2] - d.z;
+      roam.state.yaw = Math.atan2(dx, -dz);
+      roam.state.pitch = Math.atan2((d.look[1] || 2) - (d.y || 1.9), Math.hypot(dx, dz) || 1) * 0.8;
+    }
+    state.nav = id;
+    return true;
+  }
+
   const travel = createTravel({ THREE, roam, destinations: travelDest });
   state.travel = null;
   const cur = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 54 }, from = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 54 };
@@ -828,6 +937,8 @@ export async function createMahplaza(canvas, options = {}) {
       if (!mod || typeof mod.setDetail !== 'function' || !mod.stats || !mod.stats.site) continue;
       mod.setDetail(Math.hypot(_detEye.x - mod.stats.site.x, _detEye.z - mod.stats.site.z));
     }
+    /* R3-07: the descent doors open on approach, so they need the eye from the same place */
+    if (mahDescent && mahDescent.setEye) mahDescent.setEye(_detEye.x, _detEye.y, _detEye.z);
   }
 
   function stepWorld(t, dt, nowMs) {
@@ -845,6 +956,10 @@ export async function createMahplaza(canvas, options = {}) {
     if (broadcast && broadcast.update) broadcast.update(t, dt);
     if (lakeCity && lakeCity.update) lakeCity.update(t, dt);
     if (rainforest && rainforest.update) rainforest.update(t, dt);
+    if (mahAscent && mahAscent.update) mahAscent.update(t, dt);
+    if (mahDescent && mahDescent.update) mahDescent.update(t, dt);
+    if (outerRing && outerRing.update) outerRing.update(t, dt);
+    if (facilities && facilities.update) facilities.update(t, dt);
     if (monument && monument.update) monument.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
@@ -1121,6 +1236,10 @@ export async function createMahplaza(canvas, options = {}) {
     if (broadcast && broadcast.setQuality) { try { broadcast.setQuality(quality); } catch (e) {} }
     if (lakeCity && lakeCity.setQuality) { try { lakeCity.setQuality(quality); } catch (e) {} }
     if (rainforest && rainforest.setQuality) { try { rainforest.setQuality(quality); } catch (e) {} }
+    if (mahAscent && mahAscent.setQuality) { try { mahAscent.setQuality(quality); } catch (e) {} }
+    if (mahDescent && mahDescent.setQuality) { try { mahDescent.setQuality(quality); } catch (e) {} }
+    if (outerRing && outerRing.setQuality) { try { outerRing.setQuality(quality); } catch (e) {} }
+    if (facilities && facilities.setQuality) { try { facilities.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
     return quality.name;
   }
@@ -1156,10 +1275,11 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
+    navDestinations: () => navDest().map(d => ({ id: d.id, label: d.label, sub: d.sub })), navGoto,
     setDiagnostic, setQuality, get quality() { return quality.name; }, qualities: Object.keys(QUALITY), advance,
     setRoam, setRoamMode, roam,
     travelTo, travelCancel, travel, travelDestinations: () => Object.keys(travelDest),

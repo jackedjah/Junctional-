@@ -227,10 +227,30 @@ is **MAHGIC**.
 
 ## LIVE STATE
 
-**HEAD** `4e17afa` on `claude/mahworld-r2-world-craftsman`.
-**Gate.** R3-04 (gate 6) — forest branch hierarchy and foliage density.
-**Highest-risk unresolved visual defect.** The R2 §5 / R3 gate-21 far-zoom lock still fails: the
-mountain ring hides both peer cities from every elevated camera, so far zoom shows one city, not
-three. Diagnosis started (screen-space projection + peel probe, `scratchpad/lock5.cjs`); not yet run.
-**Suites.** mahplaza 27/27 · crystalline 6/6 · pack 8/8 · skyrealm 16/16 · roam 18/18.
-**Budget.** World view 1776 draws / 983k triangles.
+**Gates closed.** 1 (continuity) · **6** R3-04 forest branch hierarchy · **8** R3-06 MAH ASCENT to
+the Sky Realm arrival district · **9/10** R3-07 MAH DESCENT shared component + 3 entrances · and
+R3-13's near/far detail tiers, which is what pays for gate 6.
+
+**Files owned by R3 so far.** `mahascent.js` (new) · `mahdescent.js` (new) ·
+`tests/mahworld-r3-laws.test.js` (new) · `rainforest.js` (hierarchy + detail buckets + setDetail) ·
+`mahplaza.js` (wiring, `updateDetailTiers`, descent site derivation) · `fobeam.js` (ASCENTS exported
+so one table decides where a line stands).
+
+**Next three actions.**
+1. Gate 2/3 — dead-zone classification and fill. The far-zoom frame shows the ring between the
+   plaza deck (r 43) and the mountain foot (r 620) as almost entirely category F.
+2. Gates 11–13 — MAH VITAL, MAH FORGE, MAH MODE, sited per R3-11 around MAH MATCH.
+3. Gate 14 — MAH NAV, which the travel system already has the destination table for.
+
+**Highest-risk unresolved visual defect.** The far-zoom lock (R2 §5 / R3 gate 21) still fails: the
+mountain ring hides both peer cities from every elevated camera, so far zoom shows one city and two
+mountain ranges. Diagnosis harness written and not yet run — `scratchpad/lock5.cjs` projects each
+site to screen space and peels it, which separates "occluded" from "present but too dim". That
+distinction decides whether the fix is terrain (open the passes wider / drop the ring height on the
+two bearings) or value (a city 700 m away needs to emit light, not just exist).
+
+**Proof renders needed to resume.** `l34.cjs <tag>` gives the standing set: world · farzoom ·
+farzoom-low · ladder (civic street level) · forest (eye height in the stand) · forest-mid · ascent ·
+ascent-top · descent · descent-wide · establishing.
+
+**Suites.** mahplaza 27/27 · crystalline 6/6 · pack 8/8 · skyrealm 16/16 · roam 18/18 · r3 (new).

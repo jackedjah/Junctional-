@@ -107,7 +107,10 @@ const FLOWS = [
    fixed number of times over each line's own height, so a 604 m line runs its bands 55 m apart at
    16.4 m/s and a 468 m line runs them 43 m apart at 12.8 m/s off the SAME shared texture and the
    same single draw call. The file's rule that no two routes share a speed or a phase still holds.  */
-const ASCENTS = [
+/* EXPORTED (R3-06): mahascent.js continues these same three lines up through the cloud decks to
+   the Sky Realm arrival district. One table decides where an ascent stands, or the ground half and
+   the sky half of the same line drift apart — which is the whole failure R3-06 is written against. */
+export const ASCENTS = [
   /* WEST — the near line. Between the plaza field's west edge and MAH GYM's apron; the closest of the
      three to the camera, so it is the one whose pod reads at real size and whose floor flare is big. */
   { id: 'ascent-west',  x: -30, z: -22, h: 520, pod: 1.00, phase: 0.7665 },

@@ -48,6 +48,36 @@
   .roam .lift{display:flex;flex-direction:column;gap:8px;pointer-events:auto}
   .roam .lift button{appearance:none;font:inherit;width:52px;height:44px;font-size:15px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:3px;backdrop-filter:blur(6px);cursor:pointer;touch-action:none}
   .roam .lift button:active{border-color:var(--energy);background:rgba(143,208,255,.18)}
+  /* ---- R3-09 MAH NAV -------------------------------------------------------------------------
+     "A small unobtrusive button/icon" — so it is one square-diamond glyph in the corner, not a bar.
+     The panel is a grid of named destinations and it closes the moment one is chosen; nothing here
+     dims the world or blocks the canvas, because R3-09 says the menu must not break movement. */
+  .navbtn{position:fixed;left:16px;bottom:calc(18px + var(--safe-b));width:44px;height:44px;padding:0;
+    border:1px solid var(--line);border-radius:12px;background:rgba(9,14,24,.72);color:var(--ink);
+    display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(6px);z-index:6}
+  .navbtn i{width:15px;height:15px;background:currentColor;transform:rotate(45deg);border-radius:2px;opacity:.9}
+  .navbtn[aria-expanded="true"]{border-color:var(--ink)}
+  .navpanel{position:fixed;left:16px;bottom:calc(72px + var(--safe-b));width:min(320px,calc(100vw - 32px));
+    max-height:min(52vh,420px);overflow:auto;padding:8px;border:1px solid var(--line);border-radius:14px;
+    background:rgba(7,11,20,.9);backdrop-filter:blur(10px);display:grid;gap:4px;z-index:6}
+  .navpanel button{display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:center;width:100%;
+    padding:9px 10px;border:0;border-radius:9px;background:transparent;color:var(--ink);text-align:left;
+    font:inherit;letter-spacing:.10em;text-transform:uppercase;font-size:11px;cursor:pointer}
+  .navpanel button:hover,.navpanel button:focus-visible{background:rgba(120,170,255,.13);outline:0}
+  .navpanel button i{width:8px;height:8px;background:currentColor;transform:rotate(45deg);border-radius:1px;opacity:.55}
+  .navpanel button s{grid-column:2;text-decoration:none;color:var(--dim);font-size:9px;letter-spacing:.12em}
+  /* the transition: a square diamond that CONTRACTS, then an arrival pulse. Two keyframes, no draw
+     call, and it cannot cost a frame in a scene already at 900k triangles. */
+  .navwipe{position:fixed;inset:0;pointer-events:none;z-index:9;display:grid;place-items:center;opacity:0}
+  .navwipe.on{animation:navjump .62s ease-in-out forwards}
+  .navwipe i{width:56vmax;height:56vmax;background:radial-gradient(closest-side,rgba(180,215,255,.30),rgba(120,170,255,0) 72%);
+    transform:rotate(45deg) scale(1);border-radius:6vmax}
+  .navwipe.on i{animation:navdiamond .62s cubic-bezier(.5,0,.2,1) forwards}
+  @keyframes navjump{0%{opacity:0}18%{opacity:1}62%{opacity:1}100%{opacity:0}}
+  @keyframes navdiamond{0%{transform:rotate(45deg) scale(1)}52%{transform:rotate(45deg) scale(.02)}
+    62%{transform:rotate(45deg) scale(.02)}100%{transform:rotate(45deg) scale(1.4)}}
+  @media (prefers-reduced-motion:reduce){.navwipe.on,.navwipe.on i{animation-duration:.01s}}
+  body[data-roaming] .navbtn{opacity:.85}
   .roam-hint{position:fixed;right:16px;bottom:calc(18px + var(--safe-b));pointer-events:none;color:var(--dim);letter-spacing:.14em;font-size:10px;text-transform:uppercase;text-align:right;line-height:1.9}
   .roam-hint b{color:var(--ink);font-weight:500}
   /* ROAMING CLEARS THE STAGE. The footer is eight rows tall — views, time, world, avatar, roam,
@@ -144,6 +174,10 @@
   <span class="note">Your world theme recolours the world's energy only. Other residents keep their own colours; in this preview they are local fixtures, not live players.</span>
   <span class="clock" data-meter hidden>—</span>
 </footer>
+
+<button class="navbtn" type="button" data-nav aria-expanded="false" aria-controls="navpanel" title="MAH NAV — destinations"><i></i><span class="sr-only">MAH NAV</span></button>
+<div class="navpanel" id="navpanel" data-navpanel hidden role="menu" aria-label="MAH NAV destinations"></div>
+<div class="navwipe" data-navwipe aria-hidden="true"><i></i></div>
 
 <div class="roam" data-roam-pad hidden>
   <div class="stick" data-stick role="application" aria-label="Move: drag to walk"><i></i></div>
@@ -242,6 +276,48 @@
       if (on) document.body.setAttribute('data-roaming', '1'); else document.body.removeAttribute('data-roaming');
     };
     roamBtn.addEventListener('click', () => { world.select(null); world.setRoam(!world.state.roam); paintRoam(); paintViews(); });
+
+    /* ---- R3-09 MAH NAV --------------------------------------------------------------------------
+       The whole interaction is four lines of behaviour: open, choose, jump, close. What takes the
+       care is the ORDER — the diamond has to be closed over the frame BEFORE the camera moves, or
+       the viewer sees the cut the transition exists to hide, and the panel has to close on the same
+       tick as the choice so nothing is left hanging over the world you just arrived in. */
+    const navBtn = $('[data-nav]'), navPanel = $('[data-navpanel]'), navWipe = $('[data-navwipe]');
+    let navOpen = false;
+    const paintNav = () => {
+      navBtn.hidden = hudOff;
+      navBtn.setAttribute('aria-expanded', String(navOpen));
+      navPanel.hidden = !navOpen || hudOff;
+      if (!navOpen) return;
+      navPanel.textContent = '';
+      for (const d of world.navDestinations()) {
+        const b = document.createElement('button');
+        b.type = 'button'; b.setAttribute('role', 'menuitem'); b.dataset.dest = d.id;
+        const i = document.createElement('i'); b.appendChild(i);
+        b.appendChild(document.createTextNode(d.label));
+        if (d.sub) { const sub = document.createElement('s'); sub.textContent = d.sub; b.appendChild(sub); }
+        navPanel.appendChild(b);
+      }
+    };
+    const navJump = id => {
+      navOpen = false; paintNav();
+      navWipe.classList.remove('on');
+      void navWipe.offsetWidth;                    /* restart the animation from the top */
+      navWipe.classList.add('on');
+      /* the diamond reaches its smallest at 52% of 620 ms — move the camera THERE, inside the
+         contraction, so the arrival pulse opens onto the new place */
+      setTimeout(() => { world.navGoto(id); paintViews(); paintRoam(); }, 320);
+      setTimeout(() => navWipe.classList.remove('on'), 700);
+    };
+    navBtn.addEventListener('click', () => { navOpen = !navOpen; paintNav(); });
+    navPanel.addEventListener('click', e => {
+      const b = e.target.closest('button[data-dest]'); if (!b) return;
+      navJump(b.dataset.dest);
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && navOpen) { navOpen = false; paintNav(); }
+    });
+    paintNav();
     roamModeBtn.addEventListener('click', () => { world.setRoamMode(world.state.roam === 'fly' ? 'walk' : 'fly'); paintRoam(); });
     /* the stick. R is the pad radius; the knob is clamped to it and the vector is normalised by it,
        so the reported magnitude is 0..1 and the dead zone is the first 12% of travel. */
