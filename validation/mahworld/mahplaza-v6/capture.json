@@ -1345,6 +1345,406 @@
         "ready": 0,
         "attempts": 7
       }
+    },
+    {
+      "file": "v6-establishing-night-phone.png",
+      "set": "phone",
+      "view": "establishing",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 468,
+      "triangles": 110332,
+      "ms": 17.6,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 374,
+      "textures": 23,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 0,
+        "mid": 10,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-in-world-night-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 441,
+      "triangles": 107512,
+      "ms": 10,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 374,
+      "textures": 23,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 9,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-skyline-night-phone.png",
+      "set": "phone",
+      "view": "skyline",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 435,
+      "triangles": 108108,
+      "ms": 7.7,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 374,
+      "textures": 23,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 12,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-overlook-night-phone.png",
+      "set": "phone",
+      "view": "overlook",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 485,
+      "triangles": 111932,
+      "ms": 7.7,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 407,
+      "textures": 23,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 14,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-valley-right-night-phone.png",
+      "set": "phone",
+      "view": "valley-right",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 339,
+      "triangles": 95320,
+      "ms": 5.9,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 530,
+      "textures": 24,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 0,
+        "mid": 10,
+        "far": 8,
+        "walking": 14,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-match-entrance-night-phone.png",
+      "set": "phone",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 302,
+      "triangles": 91326,
+      "ms": 5.6,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 530,
+      "textures": 24,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 0,
+        "mid": 10,
+        "far": 8,
+        "walking": 15,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-residents-night-phone.png",
+      "set": "phone",
+      "view": "residents",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 356,
+      "triangles": 102422,
+      "ms": 5.6,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 535,
+      "textures": 24,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 6,
+        "mid": 4,
+        "far": 8,
+        "walking": 15,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-in-world-day-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 436,
+      "triangles": 107114,
+      "ms": 7.2,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 535,
+      "textures": 24,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 6,
+        "mid": 4,
+        "far": 8,
+        "walking": 18,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-match-hall-day-phone.png",
+      "set": "phone",
+      "view": "match-hall",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 201,
+      "triangles": 73944,
+      "ms": 4.6,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 535,
+      "textures": 24,
+      "programs": 48,
+      "heapMB": 33.5,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 1,
+        "mid": 9,
+        "far": 8,
+        "walking": 17,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v6-in-world-night-phone-with-controls.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone with controls",
+      "drawCalls": 441,
+      "triangles": 107512,
+      "ms": 30.9,
+      "lights": 12,
+      "shadowCasters": 63,
+      "geometries": 360,
+      "textures": 23,
+      "programs": 48,
+      "heapMB": 24.8,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "terrain": true,
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
     }
   ]
 }
