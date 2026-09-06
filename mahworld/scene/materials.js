@@ -208,6 +208,23 @@ export function createMaterials(themeIn) {
     platinumLitBrushed: new THREE.MeshStandardMaterial({ color: 0xacbacc, roughness: 0.36, metalness: 0.4, roughnessMap: brushH, envMapIntensity: 1.3 }),
     platinumBrushed: new THREE.MeshStandardMaterial({ color: 0x94a3ba, roughness: 0.34, metalness: 0.96, roughnessMap: brushV, envMapIntensity: 1.7 }),
     graphiteMetal: new THREE.MeshStandardMaterial({ color: 0x2c3a4e, roughness: 0.52, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.5 }),
+    /* THE MISSING RUNG (v7, brief §02). Measured across the whole palette: the building masses sit at
+       luminance 49-58 (structural 49, graphite 55, panel 58) and the platinum family at 183-232
+       (platinum 183, platinumLit 194, chromeMirror 232). Nothing lived in between, so every elevation
+       could only be a navy mass wearing hairline highlights — which is exactly the "black/navy
+       dominance" this brief is trying to leave behind. Lightening the masses would have flattened the
+       world; what was missing was a platinum grade broad enough to CARRY a primary elevation.
+
+       platinumMid is that grade, at luminance 142 — a true midtone, not a lightened navy: it is on the
+       platinum's own cool axis, so a pilaster, a spandrel course or a corner turn cut from it belongs
+       to the same metal as the mirror catches above it. High metalness, and therefore for VERTICAL and
+       TILTED faces only: a vertical face reflects the bright horizon band of the environment, which is
+       what makes this read. platinumMidLit is its horizontal partner at low metalness, for the caps,
+       sills and soffits of the same framing — a horizontal mirror faces the near-black zenith and
+       renders black, which is the single most expensive mistake this palette has already made once. */
+    platinumMid: new THREE.MeshStandardMaterial({ color: 0x7e90ae, roughness: 0.24, metalness: 0.94, envMapIntensity: 1.85 }),
+    platinumMidBrushed: new THREE.MeshStandardMaterial({ color: 0x7688a6, roughness: 0.32, metalness: 0.92, roughnessMap: brushV, envMapIntensity: 1.7 }),
+    platinumMidLit: new THREE.MeshStandardMaterial({ color: 0x8b9cb8, roughness: 0.34, metalness: 0.4, envMapIntensity: 1.35 }),
     crystalGlass: new THREE.MeshPhysicalMaterial({ color: 0x2b3f60, roughness: 0.06, metalness: 0.22, transparent: true, opacity: 0.42, side: THREE.DoubleSide, envMapIntensity: 2.0 }),
     /* v5 midtone pass (brief §04): the neutrals move up out of near-black. The world stays a NIGHT world —
        what changed is that its darks are now dark METAL that returns light, not black plastic. */

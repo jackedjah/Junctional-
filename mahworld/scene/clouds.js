@@ -178,10 +178,15 @@ function facetTexture(size) {
    i.e. a solid deck, which is how the sky came to be one flat value. The probe named that one layer
    as +38 of the ~50 luminance the clouds were adding. Fewer and narrower masses on the same spread
    leaves real sky between them, which is where the moon, the galaxy band and the stars live. */
+/* ALTITUDE. The decks used to sit at y 108 / 164 / 252 while the tallest megatall crown stands at
+   about 466 m, so MAHWORLD's clouds hung BELOW its skyline, threading between the towers — which is
+   why the near deck read as a grey smudge of smog over the city rather than as weather above it.
+   Every deck now clears the skyline, and the near deck's radius moves out with its altitude so it
+   still sits inside a 46 deg frame instead of passing overhead. */
 const LAYOUT = [
-  { name: 'low',  count: 5, yMin: 108, yMax: 156, rMin: 300, rMax: 500, wMin: 190, wMax: 300, qMin: 7, qVar: 3, pMin: 5, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.28, -0.70, -0.10, 0.52, 1.18] },
-  { name: 'mid',  count: 4, yMin: 164, yMax: 232, rMin: 400, rMax: 700, wMin: 250, wMax: 400, qMin: 6, qVar: 3, pMin: 4, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-1.05, -0.44, 0.28, 1.02] },
-  { name: 'high', count: 4, yMin: 252, yMax: 344, rMin: 620, rMax: 900, wMin: 330, wMax: 520, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.72, speed: 0.70, order: -6, spread: [-0.95, -0.30, 0.42, 1.10] }
+  { name: 'low',  count: 5, yMin: 215, yMax: 285, rMin: 430, rMax: 680, wMin: 200, wMax: 320, qMin: 7, qVar: 3, pMin: 5, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.28, -0.70, -0.10, 0.52, 1.18] },
+  { name: 'mid',  count: 4, yMin: 305, yMax: 400, rMin: 620, rMax: 900, wMin: 280, wMax: 440, qMin: 6, qVar: 3, pMin: 4, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-1.05, -0.44, 0.28, 1.02] },
+  { name: 'high', count: 4, yMin: 440, yMax: 560, rMin: 900, rMax: 1250, wMin: 380, wMax: 590, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.72, speed: 0.70, order: -6, spread: [-0.95, -0.30, 0.42, 1.10] }
 ];
 /* the blob atlas paints the middle of each cell, so a quad has to be ~1.7× the
    mass width it is meant to draw. QSCALE keeps that conversion in one place. */
