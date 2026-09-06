@@ -132,6 +132,37 @@ visible: they sit behind `if (ctx.cityPresent)`, and the city is always present 
 **Correction.** Before claiming a visual result, confirm the code path actually executes.
 **Regression.** A passing law proves the generator is correct, never that the world changed.
 
+## L16 — A shadowed variable can delete a body part in silence
+**Failure.** Every MAHBEING in MAHWORLD was missing BOTH upper arms and BOTH forearms. What
+remained of each arm was the shoulder cap, the elbow bead and the hand — three disconnected beads
+floating where an arm should be. It had shipped in every render this project has taken.
+**Root owner.** `residents.js`, in the arm loop: `const P = new Poly(), r0 = m.upperR, r1 = ...,
+L = m.upperLen;` shadows the enclosing `const L = LODS[spec.lod]`. `L.armSeg` on a number is
+`undefined`, `Math.max(4, undefined - 2)` is `NaN`, and `lathe()` with `NaN` segments emits ZERO
+triangles. Same shadow in the forearm block via `L = m.foreLen`.
+**Correction.** Rename the locals (`UL`, `FL`). Never introduce a local named `L` inside that loop.
+**Proof.** The figure triangle count moves 536 → 680 per figure; the arms appear.
+**Why it took so long.** At 2 m, seen from 20 m, three beads in a row read as an arm. It only became
+visible when monument.js asked residents.js for the same body at 27 m. **Scale is a diagnostic:**
+if a module has a size parameter, render something at the top of its range once — defects that hide
+inside a few pixels do not hide inside a few hundred.
+**Regression.** A `NaN` segment count fails SILENTLY — no error, no warning, an empty buffer. Any
+generator taking a segment/step count should treat a non-finite one as a bug, not as zero.
+
+## L17 — Re-grading another module's output can destroy what makes it correct
+**Failure.** monument.js pushed both statues through its own LAW 1 normal splitter. LAW 1 was
+satisfied and the statues rendered as faceless black-and-white zigzag.
+**Root owner.** The splitter copies positions and normals only. residents.js paints the dark facial
+chamber, the eyes and the energy accents as PER-VERTEX COLOUR — so the faces went with them. The
+`steep` grade was also `chromeMirror` (metalness 1.0, roughness ~0), which on a ~536-triangle body
+gives every facet an uncorrelated environment sample.
+**Correction.** Check whether the law applies before applying it. residents.js grades itself at
+metalness 0.22 / 0.50 / 0.18 — all below the ~0.9 where LAW 1 bites — so there was nothing to fix
+and the correct action was to leave the module's output alone. `stats.law1.figures` now measures
+the material list and reports `lawOneApplies: false` rather than asserting compliance.
+**Regression.** Before re-materialising geometry you did not build, enumerate what its own materials
+carry — vertex colours, emissive, maps. A grade split preserves none of it.
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)

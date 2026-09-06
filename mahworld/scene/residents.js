@@ -509,8 +509,14 @@ export function createResident(spec = {}) {
     shoulder.rotation.y = -side * pose.yaw * DEG;
     swing.rotation.x = -pose.fwd[idx] * DEG;
     {
-      const P = new Poly(), r0 = m.upperR, r1 = m.upperR * 0.8, L = m.upperLen;
-      lathe(P, [{ y: -L - 0.002, rx: 0, rz: 0 }, { y: -L, rx: r1, rz: r1 }, { y: -L * 0.58, rx: r0 * m.bicep, rz: r0 * m.bicep * 0.95 }, { y: -L * 0.2, rx: r0, rz: r0 }, { y: 0.01, rx: r0 * 0.9, rz: r0 * 0.9 }], Math.max(4, L.armSeg - 2), paintBody);
+      /* UL, not L. `L` is the LOD tier in this scope and shadowing it here cost both arms: with
+         `const L = m.upperLen` in front of it, `L.armSeg` is undefined, Math.max(4, NaN) is NaN,
+         and lathe() builds ZERO segments. Every resident in the world lost its upper arms and
+         forearms and kept only the shoulder cap, the elbow bead and the hand — three beads
+         floating where an arm should be. At 2 m nobody saw it; the monument's 27 m figures made it
+         the whole picture. Do not reintroduce a local named L inside this loop. */
+      const P = new Poly(), r0 = m.upperR, r1 = m.upperR * 0.8, UL = m.upperLen;
+      lathe(P, [{ y: -UL - 0.002, rx: 0, rz: 0 }, { y: -UL, rx: r1, rz: r1 }, { y: -UL * 0.58, rx: r0 * m.bicep, rz: r0 * m.bicep * 0.95 }, { y: -UL * 0.2, rx: r0, rz: r0 }, { y: 0.01, rx: r0 * 0.9, rz: r0 * 0.9 }], Math.max(4, L.armSeg - 2), paintBody);
       swing.add(meshOf(P, mats.body, 'upperArm'));
     }
     const elbow = new THREE.Group(); elbow.position.y = -m.upperLen; swing.add(elbow);
@@ -521,8 +527,8 @@ export function createResident(spec = {}) {
       if (L.armDetail) elbow.add(meshOf(P, mats.dark, 'elbow'));
     }
     {
-      const P = new Poly(), r0 = m.foreR * 1.08, r1 = m.foreR * 0.72, L = m.foreLen;
-      lathe(P, [{ y: -L - 0.002, rx: 0, rz: 0 }, { y: -L, rx: r1, rz: r1 }, { y: -L * 0.55, rx: r0 * 0.95, rz: r0 * 0.95 }, { y: -0.01, rx: r0, rz: r0 }], Math.max(4, L.armSeg - 2), paintBody);
+      const P = new Poly(), r0 = m.foreR * 1.08, r1 = m.foreR * 0.72, FL = m.foreLen;   /* FL, not L — see above */
+      lathe(P, [{ y: -FL - 0.002, rx: 0, rz: 0 }, { y: -FL, rx: r1, rz: r1 }, { y: -FL * 0.55, rx: r0 * 0.95, rz: r0 * 0.95 }, { y: -0.01, rx: r0, rz: r0 }], Math.max(4, L.armSeg - 2), paintBody);
       elbow.add(meshOf(P, mats.body, 'forearm'));
     }
     /* hand: a simplified faceted wedge, flat sides facing front/back */

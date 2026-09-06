@@ -2,33 +2,52 @@
    ============================================================================================
 
    Two colossal MAHBEING figures, Mr. Mah and Mrs. Mah, standing side by side on a tiered circular
-   plinth, each with the INNER arm raised, together holding a glowing SQUARE DIAMOND above and
-   between them, with a vertical light column rising through the diamond into the sky.
+   plinth, with a vertical MAHGIC light column rising between them out of the stone and carrying a
+   glowing SQUARE DIAMOND above the pair, on up into the sky.
 
    ---- THE SPECIES IS NOT SCULPTED HERE, AND THAT IS THE WHOLE POINT --------------------------
    residents.js is the species authority in code. It already builds the canonical MAHBEING —
    square-diamond head with its dark facial chamber and two eyes, a muscular humanoid upper body,
    and ONE CONTINUOUS TEARDROP BELOW THE WAIST WITH NO LEGS. The concept renders appear to give
    the figures legs; they do not have any, and the species sheet outranks the concept art. So this
-   module does not model a body at all: it calls createResident() twice, scales the returned groups
-   to monument size and REPLACES THEIR MATERIALS. Species compliance is then true by construction
-   rather than by inspection, and it stays true if residents.js is ever re-sculpted.
+   module does not model a body at all, and — after one very expensive lesson — it does not re-grade
+   one either. It calls createResident() twice at monument scale and LEAVES THE RESULT ALONE.
+   Species compliance is then true by construction rather than by inspection, and it stays true if
+   residents.js is ever re-sculpted.
+
+   ---- THE FIRST CUT OF THIS FILE RENDERED TWO FACELESS TORSOS -----------------------------------
+   Recorded in full, because the stats block said it had succeeded. That cut asked for the `guard`
+   pose — the only pose whose arms survive residents.js's internal merge as addressable nodes, and
+   therefore the only way to raise an arm from outside — and then pushed every triangle of both
+   statues through this module's LAW 1 normal splitter into three flat platinum grades.
+
+   Two things died there, and only a render showed either of them:
+     · THE VERTEX COLOURS ARE THE SPECIES. residents.js paints the dark facial chamber, the two
+       eyes and the energy accents as per-vertex colour on a white base material. The splitter
+       copies positions and normals and nothing else, so the faces went. The heads were present in
+       the geometry the whole time — the statues were not headless, they were FACELESS, which from
+       44 m is the same picture and a much more misleading stats line.
+     · A 27 m BODY IS THE WRONG PLACE FOR A MIRROR. The `steep` grade was M.chromeMirror, metalness
+       1.0, roughness ~0. On the ~536-triangle facet cut of a `near` resident that gave every facet
+       a hard, uncorrelated environment sample: black and white zigzag, and the arms read as blocks
+       floating clear of the shoulders because neighbouring facets were three stops apart.
+
+   BOTH ARE NOW MOOT, AND MEASURABLY SO. residents.js's own materials are `body` metalness 0.22,
+   `dark` 0.50, `light` 0.18 — every one of them below the ~0.9 at which LAW 1 bites, because below
+   that a surface still takes diffuse light and an up-facing face is lit rather than black. The
+   statues are therefore already correct and the right action is to keep them exactly as built.
+   stats.law1.figures reports the material list, the measured maximum metalness and whether LAW 1
+   applies at all, so this is a measurement and not a claim.
 
    WHAT residents.js GAVE AND WHAT IT DID NOT (recorded honestly, because the next pass will ask):
-     · POSE. Only the `guard` pose is `drivable`, and drivable is exactly what decides whether the
-       arms survive the module's internal merge as addressable nodes: mergeStatic() bakes every
-       mesh into the nearest ancestor flagged userData.animated, so under `stand` the arms are
-       baked into the body and CANNOT be posed. Under `guard` the torso, both swing nodes and both
-       elbow nodes stay live and are handed out through group.userData.parts. This module therefore
-       asks for `guard` and then zeroes the fighting stance it comes with — lean 10 deg, shoulder
-       yaw 28 deg — on those same exposed nodes, which is posing a rig, not hacking a module.
-     · THE HEAD IS THE ONE THING IT WOULD NOT GIVE. headPivot is exposed as parts.head but it is
-       NOT flagged animated, so the head slab is baked into the torso bucket at the pose's own
-       roll — guard carries tilt -4 deg. Both statues therefore hold a 4 degree head roll that
-       cannot be removed from outside residents.js. It reads as a shared glance and it is small,
-       but it is a real residue and it is not asserted away here. IF THE DIRECTOR WANTS DEAD-LEVEL
-       HEADS, residents.js needs either headPivot.userData.animated = true or a drivable pose with
-       tilt 0; both are one-line changes in a file this pass may not edit.
+     · THE ARMS ARE AT REST. Keeping the faces means taking `stand`, and under `stand` mergeStatic()
+       bakes every mesh into the body group, so the arms are not addressable and CANNOT be posed
+       from here. The raised-arm gesture of the concept render is therefore not in this build. The
+       piece is composed the other way instead — the light column carries the diamond above the pair
+       — which is an honest composition rather than a broken arm. To get the gesture back,
+       residents.js needs a new `present` pose: drivable arms, no fighting lean, and
+       headPivot.userData.animated = true so the head survives as its own node. That is a small edit
+       to the species authority and it belongs in that file, not in this one.
      · DETAIL. `near` is the top tier and it is SEG 10 on the body lathes (LODS.near.seg 14, minus
        the builder's own -4), 536 triangles for a whole figure. At 27 m that is a facet roughly
        2 m across. That is not a defect — §06 asks for big designed facets and forbids subdividing
@@ -41,9 +60,9 @@
    reads and an UP- or DOWN-FACING one renders BLACK. This project has shipped that defect four
    times, the last one on a crown cap band routed into a mirror bucket by NAME.
 
-   Nothing here is routed by name. EVERY opaque triangle this module produces — the statues, every
-   plinth course, the diamond's edge catches — goes through one splitter that measures the
-   triangle's OWN normal and sends it to one of three grades:
+   Nothing here is routed by name. EVERY opaque triangle THIS MODULE PRODUCES — every plinth
+   course, both figure seats, the diamond's edge catches — goes through one splitter that measures
+   the triangle's OWN normal and sends it to one of three grades:
 
        |ny| <= 0.50   (face within 30 deg of vertical)   the mirror / steep grade for its role
        ny  >  0.50    (up-facing)                        M.platinumLit      metalness 0.38
@@ -56,10 +75,15 @@
    the lit half of the sky. The measured result is in stats.law1 and in the pass report; the
    mirror bucket's own maximum |ny| is measured after the fact and asserted nowhere.
 
-   A statue's shoulders, deltoids, forearm tops and the crown of its head are horizontal faces as
-   surely as a roof is, which is why the figures are NOT one mirror material. They are three, and
-   the low-metalness partner on the up-facing turns is also what lets the diamond's light land on
-   them at all (LAW 2, below) — a pure mirror statue would have ignored its own light source.
+   THE FIGURES ARE THE EXCEPTION, AND THE REASON IS THE LAW ITSELF. A statue's shoulders, deltoids,
+   forearm tops and the crown of its head are horizontal faces as surely as a roof is — which is
+   exactly why the first cut split them, and exactly why it was wrong to. The law only bites at
+   metalness >= ~0.9, and residents.js grades its own species at 0.22 / 0.50 / 0.18. Below 0.9 the
+   surface still takes diffuse light, so those up-faces are lit, not black, and there is nothing for
+   a splitter to fix. Splitting them anyway cost the faces (see above). The statues therefore keep
+   residents.js's grades untouched and stats.law1.figures measures that they are safe rather than
+   assuming it. The diamond's light lands on them for the same reason (LAW 2, below) — a pure
+   mirror statue would have ignored its own light source, and this one is not a mirror.
 
    ---- LAW 2: EVERY EMITTER IS ANSWERED --------------------------------------------------------
    Two emitters: the diamond core and the light column. Three answers, all of them adjacent
@@ -90,10 +114,11 @@
    of the concept render would give. A MAHBEING's shoulder half-width is 0.328 of half its height,
    so a 50 m pair would be 44 m across the shoulders and would need a base of roughly 25 m radius —
    which does not exist at the centre of this plaza, and whose edge would swallow the match-approach
-   camera whole. The assembled piece still measures 41.96 m from the deck to the diamond's apex,
-   taller than MAH MATCH's 38 m mass and the tallest thing standing on the plaza, with the light
-   column running out of the top of every frame above that. It is colossal by the only measure that
-   counts, which is what it is colossal NEXT TO.
+   camera whole. The assembled piece still stands taller than MAH MATCH's 38 m mass and is the
+   tallest thing on the plaza, with the light column running out of the top of every frame above
+   that. It is colossal by the only measure that counts, which is what it is colossal NEXT TO. The
+   exact figure is not written here: stats.height is measured off the built group every time, and a
+   hard-coded height in a comment is a number that goes stale the first time a course moves.
 
    THE PIECE IS COMPOSED AS A GATE RATHER THAN A WALL, and this was TESTED rather than hoped for.
    The three approaches themselves stay open — nothing of this module lies on the -x or +x
@@ -101,8 +126,10 @@
    z -18 and `match-entrance` at z -58) both stand BEHIND the monument, which is not in their
    frames at all. What is in frame is MAH MATCH seen over and between the figures from the arrival
    side, so the clear air between them was measured by raycast at the heights the sightlines
-   actually use: 6.6 to 8.7 m across the band the MATCH sign is read through, closing to 1.1 m only
-   where the two raised forearms converge under the diamond.
+   actually use: 6.6 to 8.7 m across the band the MATCH sign is read through. With the arms now at
+   rest that gap no longer closes at all below the diamond, which widens the gate — the occlusion
+   figures below were measured on the raised-arm cut and are therefore an UPPER bound on the
+   current one, not a current reading.
 
    THE RESIDUAL IS REAL AND IS NOT TALKED AWAY. Raycasting the whole monument against MAH MATCH's
    signage measures, from `establishing`: 39 % of the sign frame occluded and 0 % of the canonical
@@ -201,15 +228,16 @@ const DIA = { w: 3.30, h: 5.10, d: 1.85 };
    y0 sits BELOW the top course's tread, which is opaque, so the shaft appears to come out of the
    stone rather than to begin in mid-air.
 
-   IT HAS A WAIST, AND THE WAIST IS NOT A FLOURISH. The corridor it has to thread was measured on
-   the built statues: the nearest statue surface to the monument axis is 0.95 m out at the inner
-   shoulder caps (y 20-24) and the two raised forearms close to 1.14 m of clear air under the
-   diamond. A shaft of constant bloom radius would have run straight through Mr. Mah's deltoid, so
-   the column is a 0.44 m thread from the plinth up past the shoulders, keeps that until `knee`, and
-   only then opens to 0.95 m at the crystal. Measured minimum gap between the finished shaft and the
-   statues: 0.19 m, at y 35. The profile is [fraction of the run, radius, alpha]; `at` is the
-   diamond's own fraction, filled in at build time so the bloom cannot drift off the crystal it
-   comes out of. */
+   IT HAS A WAIST, AND THE WAIST IS NOT A FLOURISH. The corridor it has to thread is measured at
+   build time, on the statues as actually built, and reported as stats.axisClearance — the smallest
+   distance from the monument axis to any vertex of either figure. It is NOT written down here: the
+   number this note used to carry was taken off raised forearms that no longer exist, and a stale
+   measurement in a comment is worse than no measurement at all. The shaft is a 0.44 m thread from
+   the plinth up past the shoulders, keeps that until `knee`, and only then opens to 0.95 m at the
+   crystal, which now clears the figures by a wide margin because the arms hang at the sides; the
+   build reports the margin as stats.columnGap and flags a violation into stats.skipped rather than
+   trusting prose. The profile is [fraction of the run, radius, alpha]; `at` is the diamond's own
+   fraction, filled in at build time so the bloom cannot drift off the crystal it comes out of. */
 const COLUMN = { y0: 2.20, y1: 200, sides: 12, waist: 0.44, bloom: 0.95, knee: 0.86 };
 
 /* THE INSCRIPTION BAND on the top course. `h` fits inside that course's STRAIGHT riser — between
@@ -361,12 +389,18 @@ function inscriptionTexture(arcPerRepeat) {
 /* Hand-rolled so the beam can FADE rather than stop: alpha rides on a 4-component vertex colour,
    which is the same trick residents.js uses for its contact blob, and it is why this is not a
    CylinderGeometry. Two shells, the inner one tighter and brighter. */
-function columnProfile(at, fade) {
-  const w = COLUMN.waist, b = COLUMN.bloom, f = a => Math.pow(a, fade || 1);
+function columnProfile(at, fade, waist) {
+  const w = waist > 0 ? waist : COLUMN.waist, b = COLUMN.bloom, f = a => Math.pow(a, fade || 1);
+  /* THE THREAD IS SUBORDINATE TO THE CRYSTAL. The first cut ran the shaft at alpha 0.80-0.86 from
+     the plinth all the way to the gem, which on an additive material saturates to flat white: the
+     column read as a fluorescent tube standing between the figures, at the same value as the
+     FOBEAM ascent lines behind it, and the diamond it is supposed to be feeding read as the
+     dimmer object. The thread now RISES into the gem — faint where it leaves the stone, brightest
+     only at `at`, which is the crystal's own fraction of the run. */
   return [
-    [0, w, 0], [Math.min(0.01, at * 0.1), w, f(0.80)], [at * COLUMN.knee, w * 1.12, f(0.86)],
-    [at, b, 1.00], [at + 0.08, b * 0.84, f(0.70)], [0.45, b * 0.70, f(0.32)],
-    [0.70, b * 0.61, f(0.11)], [1, b * 0.55, 0]
+    [0, w, 0], [Math.min(0.01, at * 0.1), w, f(0.30)], [at * COLUMN.knee, w * 1.12, f(0.46)],
+    [at, b, 1.00], [at + 0.08, b * 0.84, f(0.62)], [0.45, b * 0.70, f(0.26)],
+    [0.70, b * 0.61, f(0.09)], [1, b * 0.55, 0]
   ];
 }
 function columnGeometry(profile, y0, y1, sides, k) {
@@ -468,136 +502,117 @@ export function buildMonument(ctx) {
   }
 
   /* ---- THE TWO FIGURES ----------------------------------------------------------------------- */
-  /* residents.js builds them; this module only poses, scales and re-grades. */
+  /* residents.js builds them, GRADES them and KEEPS them. The header records why in full; the
+     short version is that the previous cut posed a `guard` rig and then pushed every triangle of
+     both statues through this module's LAW 1 splitter, which discards vertex colours — and the
+     vertex colours ARE the species. The dark facial chamber, the two eyes and the energy accents
+     all went, metalness 1.0 landed on a 27 m faceted body, and both figures rendered as faceless
+     black-and-white zigzag. Nothing in stats said so.
+
+     residents.js's own three materials are `body` 0.22, `dark` 0.50, `light` 0.18 metalness — every
+     one of them well below the ~0.9 at which LAW 1 bites, so the statues are already correct and
+     the correct action here is to leave them alone. The audit below MEASURES that rather than
+     asserting it, because that is the difference this module claims to make. */
   const figures = [];
   for (const f of FIGURES) {
     const g = createResident({
-      colour: 'platinum', sex: f.sex, physique: PHYSIQUE, pose: 'guard', lod: 'near',
-      height: f.height, hover: 0.05,          /* + guard's hoverDelta -0.05 = 0: the tip touches */
+      colour: 'platinum', sex: f.sex, physique: PHYSIQUE, pose: 'stand', lod: 'near',
+      height: f.height, hover: 0,             /* stand's hoverDelta is 0: the tip touches the seat */
       seed: f.seed, id: 'monument-' + f.key
     });
     g.name = 'monument-figure-' + f.key;
-    g.position.set(f.x, plinthTop + 0.30, 0);
+    g.position.set(f.x, plinthTop + SEAT_H, 0);
+    g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     group.add(g);
-    figures.push({ spec: f, group: g, parts: g.userData.parts });
+    figures.push({ spec: f, group: g });
     stats.figures++;
   }
-
-  /* Zero the fighting stance `guard` arrives in, on the nodes residents.js exposes. */
-  for (const fig of figures) {
-    fig.parts.torso.rotation.x = 0;                     /* lean 10 deg -> upright */
-    for (const arm of fig.parts.arms) {
-      arm.shoulder.rotation.y = 0;                      /* guard's 28 deg inward yaw -> square */
-      arm.swing.rotation.x = 0;
-      arm.elbow.rotation.x = 0;
-    }
-  }
-
-  /* THE OUTER ARM falls naturally: the canonical abduction the measures already carry, a few
-     degrees of forward set and a soft elbow. THE INNER ARM is raised and straight — the solve
-     below decides by how much. `inner` is the arm on the side facing the axis. */
-  const outerFwd = 6 * DEG, outerElbow = 9 * DEG, abduct = 8 * DEG;
-  const armOf = (fig, inner) => {
-    const want = inner ? (fig.spec.x < 0 ? 1 : -1) : (fig.spec.x < 0 ? -1 : 1);
-    return fig.parts.arms.find(a => a.side === want);
-  };
-  for (const fig of figures) {
-    const o = armOf(fig, false);
-    o.shoulder.rotation.z = o.side * abduct;
-    o.swing.rotation.x = -outerFwd;
-    o.elbow.rotation.x = -outerElbow;
-  }
-
-  /* WHERE THE HAND ACTUALLY IS, measured rather than derived. The forearm and hand were merged
-     into the elbow node, so the terminal point of the arm is the lowest point of that node's own
-     geometry — read it off the bounding boxes and transform it out. */
-  const handLocal = fig => {
-    const arm = armOf(fig, true);
-    let minY = Infinity;
-    arm.elbow.traverse(o => {
-      if (!o.isMesh) return;
-      if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
-      minY = Math.min(minY, o.geometry.boundingBox.min.y);
-    });
-    return new THREE.Vector3(0, minY === Infinity ? 0 : minY, 0);
-  };
-  const handWorld = (fig, tip) => {
-    group.updateMatrixWorld(true);
-    return tip.clone().applyMatrix4(armOf(fig, true).elbow.matrixWorld);
-  };
-
-  /* THE SOLVE. Both raised hands must land ON the diamond's lower flank, not near it — a monument
-     whose hands float 40 cm off the thing they are holding is the defect that gets noticed first.
-     The diamond's height is set by whichever figure reaches highest with a dead-vertical arm; the
-     other figure's shoulder angle is then bisected until its measured fingertip satisfies the
-     octahedron's own surface equation |x|/w + |dy|/h + |z|/d = 1. */
-  /* rotation.z = side * PI puts the arm dead vertical; turning it back toward 0 by `t` leans it
-     inward, for BOTH sides, because the sign of `side` is already in the expression. */
-  const raise = (arm, t) => { arm.shoulder.rotation.z = arm.side * (Math.PI - t); };
-  const tips = figures.map(handLocal);
-  for (const fig of figures) raise(armOf(fig, true), 0);
-  const reach = figures.map((fig, i) => handWorld(fig, tips[i]));
-  const lead = reach[0].y >= reach[1].y ? 0 : 1;
-  /* the taller reach sets the diamond's height, with its own fingertip exactly on the flank */
-  const L = reach[lead];
-  const diamondY = L.y + DIA.h * (1 - Math.abs(L.x) / DIA.w - Math.abs(L.z) / DIA.d);
-  const surface = p => Math.abs(p.x) / DIA.w + Math.abs(p.y - diamondY) / DIA.h + Math.abs(p.z) / DIA.d - 1;
-  figures.forEach((fig, i) => {
-    if (i === lead) return;
-    const arm = armOf(fig, true);
-    const at = t => { raise(arm, t); return surface(handWorld(fig, tips[i])); };
-    /* surface() IS NOT MONOTONE in the tilt, which the first cut of this solve assumed and paid
-       for: past the angle where the fingertip crosses the axis, |x| starts GROWING again and a
-       plain bisection walks into the far branch — it put Mrs. Mah's hand 4.7 m the wrong side of
-       centre at the 40 degree clamp. So the bracket is FOUND by a coarse sweep to the first sign
-       change, and only then bisected. */
-    const MAXT = 34 * DEG, N = 160;
-    let lo = 0, hi = -1, prev = at(0);
-    for (let k = 1; k <= N; k++) {
-      const t = MAXT * k / N, s = at(t);
-      if (prev > 0 && s <= 0) { lo = MAXT * (k - 1) / N; hi = t; break; }
-      prev = s;
-    }
-    if (hi < 0) {                       /* no crossing: the hand cannot reach the flank */
-      raise(arm, 0);
-      stats.skipped.push('no arm solution for ' + fig.spec.key + ' — arm left vertical');
-      stats['tilt_' + fig.spec.key] = 0;
-      return;
-    }
-    for (let k = 0; k < 34; k++) { const mid = (lo + hi) / 2; if (at(mid) > 0) lo = mid; else hi = mid; }
-    raise(arm, (lo + hi) / 2);
-    stats['tilt_' + fig.spec.key] = +((lo + hi) / 2 / DEG).toFixed(2);
-  });
-  stats.diamondY = +diamondY.toFixed(3);
   group.updateMatrixWorld(true);
-  stats.hands = figures.map((fig, i) => {
-    const p = handWorld(fig, tips[i]);
-    return { key: fig.spec.key, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2), onSurface: +surface(p).toFixed(4) };
-  });
 
-  /* ---- BAKE THE FIGURES INTO THE GRADE BUCKETS ------------------------------------------------
-     Posed, so the geometry is final; static, so nothing needs a live node. Both statues are read
-     out through the same normal splitter as the stone and merged into the same three meshes. */
-  const gInv = new THREE.Matrix4();
-  const _m = new THREE.Matrix4();
-  /* snapshot the stone's areas so the LAW 1 audit can say what the FIGURES contributed on their
-     own — a statue's shoulders are the case this law exists for and they should be readable
-     separately from a plinth tread */
-  const beforeFigures = {};
-  for (const k of Object.keys(B)) beforeFigures[k] = { area: B[k].area, level: B[k].level, up: B[k].up, down: B[k].down };
-  group.updateMatrixWorld(true);
-  gInv.copy(group.matrixWorld).invert();
-  const doomed = [];
+  /* WHAT WAS ACTUALLY BUILT, measured off the built groups — L07: a count is not a geometry, and
+     `stats.figures = 2` is exactly the kind of claim that has already shipped over an empty plinth
+     in this project. Triangles and a bounding box are evidence; the counter is not. */
+  const figBox = new THREE.Box3(), _fb = new THREE.Box3();
+  const figMats = new Map();
+  let figTris = 0, figMeshes = 0;
   for (const fig of figures) {
+    figBox.union(_fb.setFromObject(fig.group));
     fig.group.traverse(o => {
       if (!o.isMesh) return;
-      _m.multiplyMatrices(gInv, o.matrixWorld);
-      bakeGeometry(B, 'figure', o.geometry, _m);
-      doomed.push(o);
+      figMeshes++;
+      figTris += o.geometry.getAttribute('position').count / 3;
+      if (o.material) figMats.set(o.material.name || o.material.uuid, o.material.metalness || 0);
     });
   }
-  for (const o of doomed) { if (o.parent) o.parent.remove(o); o.geometry.dispose(); }
-  for (const fig of figures) group.remove(fig.group);
+  const maxFigMetal = figMats.size ? Math.max(...figMats.values()) : 0;
+  stats.law1.figures = {
+    meshes: figMeshes, triangles: figTris,
+    materials: [...figMats].map(([n, m]) => n + ' @ ' + m.toFixed(2)),
+    maxMetalness: +maxFigMetal.toFixed(2),
+    /* the whole content of LAW 1: below 0.9 a surface still takes diffuse light, so an up-facing
+       face is lit rather than black and no orientation split is needed at all */
+    lawOneApplies: maxFigMetal >= 0.9
+  };
+  stats.figureTop = +figBox.max.y.toFixed(2);
+  stats.figureSpan = +(figBox.max.x - figBox.min.x).toFixed(2);
+  if (figMeshes === 0) stats.skipped.push('residents.js returned no meshes — the plinth is EMPTY');
+
+  /* ---- WHERE THE DIAMOND SITS, AND WHY NO ARM REACHES FOR IT ----------------------------------
+     THE ARMS ARE AT REST, AND THAT IS A DECISION, NOT A SHORTFALL. The gesture in the concept
+     render is two raised inner arms meeting under the crystal, and residents.js will not give it:
+     the only pose whose arms survive its internal merge as addressable nodes is `guard`, and
+     asking for `guard` costs the head, the face and every vertex colour on the body (see above).
+     A monument with no face is a worse monument than one with its arms down. So the piece is
+     composed the other way, which the world already had the vocabulary for: THE LIGHT CARRIES THE
+     DIAMOND. Both figures stand square and canonical, the MAHGIC column rises between them out of
+     the plinth, and the crystal is held on that column ABOVE the pair — raised by what they stand
+     for rather than by their hands.
+
+     If the raised-arm gesture is wanted, the change is not in this file: residents.js needs either
+     `headPivot.userData.animated = true` plus animated shoulder nodes on `stand`, or a new
+     `present` pose with drivable arms and no fighting lean. Both are small; both are edits to the
+     species authority, which this pass may not make.
+
+     The height is therefore set by the figures' own crowns, measured, not by a hand solve: the
+     crystal's LOWER POINT clears the taller head by GEM_CLEAR, so it reads as plainly held above
+     the pair and never as a hat on either one. */
+  const GEM_CLEAR = 2.60;
+  const diamondY = figBox.max.y + GEM_CLEAR + DIA.h;
+  stats.diamondY = +diamondY.toFixed(3);
+  stats.gemClear = +(diamondY - DIA.h - figBox.max.y).toFixed(2);
+
+  /* THE COLUMN'S CORRIDOR, re-measured on the statues as built. The old number in COLUMN's note
+     was taken off raised forearms that no longer exist, and a stale measurement is worse than
+     none. This walks both figures' vertices and reports the closest any of them comes to the
+     monument axis, which is what the shaft's waist has to fit inside. */
+  let waist = COLUMN.waist;
+  {
+    let minR = Infinity;
+    const v = new THREE.Vector3();
+    for (const fig of figures) fig.group.traverse(o => {
+      if (!o.isMesh) return;
+      const pos = o.geometry.getAttribute('position');
+      for (let i = 0; i < pos.count; i++) {
+        /* the group is still at the origin and unparented at this point, so o.matrixWorld puts the
+           vertex in GROUP space, whose axis is x = z = 0 — the same space diamondY lives in */
+        v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+        const r = Math.hypot(v.x, v.z);
+        if (r < minR) minR = r;
+      }
+    });
+    stats.axisClearance = +minR.toFixed(2);
+    /* DERIVED, NOT DECLARED (L08). The shaft's widest point below the crystal is waist * 1.12, so
+       the waist that fits this corridor with a fifth of it left as clear air is the value below.
+       COLUMN.waist is a CEILING, not the answer: it stays the design intent and the corridor takes
+       precedence whenever the figures are wider than it assumed. The bloom above `knee` opens over
+       the figures' heads, not past their shoulders, so only the waist is bound by this. */
+    waist = Math.min(COLUMN.waist, (minR * 0.78) / 1.12);
+    stats.columnWaist = +waist.toFixed(3);
+    stats.columnGap = +(minR - waist * 1.12).toFixed(2);
+    if (!(waist > 0.05)) stats.skipped.push('no light-column corridor between the figures: axis clearance ' + minR.toFixed(2) + ' m');
+  }
+
+  const _m = new THREE.Matrix4();
 
   /* ---- THE SQUARE DIAMOND --------------------------------------------------------------------
      The brand figure keeps its points (§06's one exemption). A bright core inside a glass shell,
@@ -647,7 +662,6 @@ export function buildMonument(ctx) {
     stats.law1[k] = {
       metalness: GRADE[k].metalness,
       m2: +t.area.toFixed(2),
-      figures_m2: +(t.area - beforeFigures[k].area).toFixed(2),
       upFacing_m2: +t.up.toFixed(2),
       downFacing_m2: +t.down.toFixed(2),
       withinTenDeg: +t.level.toFixed(2),
@@ -659,6 +673,11 @@ export function buildMonument(ctx) {
   const mirrorMesh = group.getObjectByName('monument-mirror');
   if (reflect && mirrorMesh) { try { reflect(mirrorMesh, 0.3); } catch (e) {} }
   if (reflect) { try { reflect(core, 0.5); } catch (e) {} }
+  /* THE STATUES ARE DELIBERATELY NOT PUT THROUGH reflect(). ctx.reflect() is the older mirrored-COPY
+     path — a duplicate mesh under the deck — and the plaza now also runs a real planar mirror that
+     renders the whole scene from a reflected camera. Registering the figures in both would draw the
+     statues' reflection TWICE, one over the other, at 6 extra draws for the privilege. The emissive
+     diamond core stays in the copy path because an additive core is exactly what that path is for. */
 
   /* ---- THE INSCRIPTION ------------------------------------------------------------------------ */
   const bandR = COURSES[2].r + BAND.proud;
@@ -682,7 +701,7 @@ export function buildMonument(ctx) {
   });
   colMat.name = 'monument-column';
   owned.materials.push(colMat);
-  const colProfile = columnProfile((diamondY - COLUMN.y0) / (COLUMN.y1 - COLUMN.y0), 1);
+  const colProfile = columnProfile((diamondY - COLUMN.y0) / (COLUMN.y1 - COLUMN.y0), 1, waist);
   const column = new THREE.Mesh(own(columnGeometry(colProfile, COLUMN.y0, COLUMN.y1, COLUMN.sides, 1)), colMat);
   column.name = 'monument-light-column';
   column.renderOrder = 7;
@@ -695,7 +714,7 @@ export function buildMonument(ctx) {
   owned.materials.push(coreMat);
   /* the inner core shares the outer shaft's radii and its bloom height exactly — only its alpha
      falls away faster, so the beam has a hot centre that runs out before the halo does */
-  const columnCore = new THREE.Mesh(own(columnGeometry(columnProfile((diamondY - COLUMN.y0) / (COLUMN.y1 - COLUMN.y0), 2.4), COLUMN.y0, COLUMN.y1, COLUMN.sides, 0.42)), coreMat);
+  const columnCore = new THREE.Mesh(own(columnGeometry(columnProfile((diamondY - COLUMN.y0) / (COLUMN.y1 - COLUMN.y0), 2.4, waist), COLUMN.y0, COLUMN.y1, COLUMN.sides, 0.42)), coreMat);
   columnCore.name = 'monument-light-column-core';
   columnCore.renderOrder = 7;
   group.add(columnCore);
