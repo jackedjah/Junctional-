@@ -280,12 +280,41 @@ function verticalTower(ctx, g, o) {
   merged(g, dark, M.graphiteMetal || M.graphiteDark, 'match-tower-fins', true);
 }
 
+/* v6 §18 — SIGNAGE MOUNTED IN ARCHITECTURE, not a bitmap laid on a wall.
+   A MAH name in the world is a piece of built work: a faceted backing panel recessed into the facade,
+   a mirror-grade chromium frame around it with real mounting depth, a lit reveal along its lower edge
+   so the letters are washed from below the way an inset sign actually is, and only then the wordmark
+   itself, standing proud of the panel rather than painted onto it. `mounted: false` keeps the plain
+   plane for the small entrance-action labels, which are display panels rather than facility names. */
 function sign(ctx, parent, spec) {
   const tex = signTexture(spec);
   const mat = ctx.M.signage.clone(); mat.map = tex;
   ctx.signMaterials.push(mat);
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(spec.width, spec.width * (spec.h || 768) / (spec.w || 2048)), mat);
-  mesh.position.set(spec.x || 0, spec.y, spec.z);
+  const height = spec.width * (spec.h || 768) / (spec.w || 2048);
+  const x = spec.x || 0, y = spec.y, z = spec.z;
+  if (spec.mounted !== false) {
+    const M = ctx.M;
+    const pw = spec.width * 1.1, ph = height * 1.26;
+    /* the recess the panel sits in, then the faceted backing panel itself */
+    const reveal = new THREE.Mesh(chamferBox(pw + 0.5, ph + 0.4, 0.34, 0.07), M.graphiteDark);
+    reveal.position.set(x, y, z - 0.44); parent.add(reveal);
+    const backing = new THREE.Mesh(chamferBox(pw, ph, 0.26, 0.09), M.panel);
+    backing.position.set(x, y, z - 0.3); parent.add(backing);
+    /* the chromium frame: four mirror-grade bars with mounting depth, vertical and tilted faces only,
+       which is where a mirror grade actually reaches the horizon band and reads */
+    /* the frame sits BEHIND the wordmark plane: mounting depth must frame the letters, not bury them */
+    const fr = 0.16, fd = 0.26;
+    [[0, ph / 2 + fr / 2, pw + fr * 2, fr], [0, -ph / 2 - fr / 2, pw + fr * 2, fr],
+     [-pw / 2 - fr / 2, 0, fr, ph], [pw / 2 + fr / 2, 0, fr, ph]].forEach(([bx, by, bw, bh]) => {
+      const bar = new THREE.Mesh(chamferBox(bw, bh, fd, 0.045), M.chromeMirror || M.trim);
+      bar.position.set(x + bx, y + by, z - 0.17); parent.add(bar);
+    });
+    /* the lit reveal: a thin unlit strip along the lower edge, washing the letters from below */
+    const wash = new THREE.Mesh(new THREE.PlaneGeometry(pw * 0.9, 0.09), M.interior);
+    wash.position.set(x, y - ph / 2 + 0.16, z - 0.05); parent.add(wash);
+  }
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(spec.width, height), mat);
+  mesh.position.set(x, y, z);
   parent.add(mesh);
   if (spec.reflect !== false) ctx.reflect(mesh, 0.3);
   return mesh;
@@ -431,7 +460,7 @@ export function buildBuildings(ctx) {
     /* one light seam on each outer pier: a single vertical energy line, not an outline */
     [-1, 1].forEach(s => { const seam = box(0.08, H * 0.62, 0.06, M.energy, s * (W / 2 - 1.0), H * 0.42, 0.46); g.add(seam); ctx.reflect(seam, 0.35); });
     /* signage on the lintel */
-    sign(ctx, g, { title: 'MAH GYM', sub: 'TRAIN HIGHER', mark: true, width: 14.5, y: 11.9, z: 0.66 });
+    sign(ctx, g, { title: 'MAH GYM', sub: 'TRAIN HIGHER', mark: true, width: 13.5, y: 11.6, z: 0.84 });
     /* interior: platforms, racks, a cable frame — readable, not a machine warehouse */
     const room = g.children.find(c => c.isGroup && c.position.z === -E);
     const plat = (x, z) => { const p = box(3.2, 0.3, 3.2, M.graphiteLight, x, 0.15, z); room.add(p); return p; };
@@ -474,11 +503,11 @@ export function buildBuildings(ctx) {
     /* the two banners: dark cloth with the red square-diamond, the competitive accent */
     [-1, 1].forEach(s => { const cloth = box(1.8, 8.5, 0.06, M.graphiteDark, s * (openW / 2 + 3.2), floorY + 8.5, 0.62); g.add(cloth); const em = diamondFrame(0.9, 0.09, M.matchRed, 0.06); em.position.set(s * (openW / 2 + 3.2), floorY + 11.4, 0.7); g.add(em); });
     /* signage: the name with its truthful sub-line; the TWO entrance actions below (§09 / §11 of the brief) */
-    sign(ctx, g, { title: 'MAH MATCH', sub: 'MATCHES · PRACTICE', mark: true, width: 17, y: floorY + openH + fT + 5.4, z: 0.62 });
+    sign(ctx, g, { title: 'MAH MATCH', sub: 'MATCHES · PRACTICE', mark: true, width: 16, y: floorY + openH + fT + 5.6, z: 0.8 });
     const entranceAction = (id, title, x, extra) => {
       const panel = box(5.6, 1.5, 0.12, M.graphiteDark, x, floorY + 2.75, -E + 0.42); g.add(panel);
       const edge = box(5.4, 0.03, 0.04, M.energySoft, x, floorY + 1.98, -E + 0.5); g.add(edge);
-      const s = sign(ctx, g, { title, width: 5.2, y: floorY + 2.75, z: -E + 0.5, x, titleSize: 118, w: 2048, h: 320, reflect: false });
+      const s = sign(ctx, g, { title, width: 5.2, y: floorY + 2.75, z: -E + 0.5, x, titleSize: 118, w: 2048, h: 320, reflect: false, mounted: false });
       action(id, title, 'match-action', panel, world(g, x, floorY, 2), extra); s.userData.action = id; ctx.actions[ctx.actions.length - 1].meshes = [panel, s]; ctx.actions[ctx.actions.length - 1].edge = edge;
       return panel;
     };
@@ -543,7 +572,7 @@ export function buildBuildings(ctx) {
     const fascia = new THREE.Mesh(new THREE.PlaneGeometry(openW + 1.6, 0.7), M.interiorSoft);
     fascia.position.set(0, openH + 0.75, 0.58); g.add(fascia);
     /* name only: the concept's sub-line ("… NUTRITION …") is not verified and is omitted */
-    sign(ctx, g, { title: 'MAH MARKET', mark: true, width: 15.5, y: 11.4, z: 0.62 });
+    sign(ctx, g, { title: 'MAH MARKET', mark: true, width: 14.5, y: 11.4, z: 0.8 });
     /* interior: shelving zones with abstract merchandise, two display plinths */
     const room = g.children.find(c => c.isGroup && c.position.z === -E);
     const tints = [0x3f5a86, 0x7c8fb0, 0x2f7f8f, 0x8a7ab8, 0x5ea2c8];

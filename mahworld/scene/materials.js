@@ -283,11 +283,57 @@ export function createMaterials(themeIn) {
   return m;
 }
 
-/* A signage texture: a wordmark, an optional small sub-line and, when `mark`
-   is set, a RESERVED MARK SLOT above the name — an empty square-diamond outline
-   (accepted MAHFITT geometry, see REFERENCE_MANIFEST.md). No pictogram is drawn:
-   the concept sheet's dumbbell / fist / cart icons are not verified FOB or
-   MAHFITT marks, so nothing is invented in their place. Cool white on transparent. */
+/* ================= CANONICAL MAH BRANDING (v6 §17–§19) ==============================================
+
+   The brief requires that any world text containing "MAH" use the branding language ALREADY PRESENT IN
+   THE APP, and forbids approximating it from memory where the real styling exists in source. It was
+   read out of the source, and this is what it says:
+
+     FACE          Space Grotesk everywhere — fob.css:17 `--display`, :25 `--body` ("one face
+                   sitewide"), mahfitt-canonical-components.css:6 `--mf-ui-font`. Already the face
+                   mahplaza.html loads.
+     WEIGHT        canonical MAH text runs 500–800, but NO page in the repository ever loads an 800
+                   master, so an 800 request has always been a synthesised faux-bold. mahplaza.html
+                   loads 400/500/700; titles take 700, sub-lines 500.
+     TRACKING      the rule is TIGHT TITLE against WIDE SUB-LINE, and it holds in the CSS and in the
+                   wordmark asset alike: titles .055em–.10em (mygym.css:4312 .08em, :4794 .055em;
+                   fob.css:3617 .085em), eyebrows and sub-lines .16em–.42em (mygym.css:4311 .2em,
+                   :4793 .19em; music-studio.css:692 .16em; fob.css:3975 .42em). Measured off
+                   images/mahfitt-mark-gold.png the same ratio appears: wordmark ~0.04–0.08em,
+                   sub-line ~0.32–0.40em.
+     CENTRING      a tracked line is always paired with an equal text-indent so it stays optically
+                   centred (fob.css:3975, :4086) — trailing letter-space is compensated, never left.
+     CASE          uppercase, always, and enforced in CSS rather than only in the copy. Sentence case
+                   is never used for a MAH name.
+
+     COLOUR — AND THE ONE DEPARTURE. The canonical identity colour is champagne gold #E9C98F: every
+     opaque pixel of images/mahfitt-mark-gold.png is exactly that value, and it is declared four times
+     across the app as --bright / --gold-bright / --cal-accent. MAHWORLD's light law forbids it —
+     LAW-001 rejects any hue 28–75° above 0.35 saturation, and #E9C98F is hue 38.7° at 0.67. Most of
+     the cream family fails the same test. Both concept images render MAH GYM / MAH MATCH / MAH MARKET
+     in cool white, and REFERENCE_MANIFEST.md already recorded this decision in v3. So the world takes
+     every canonical property EXCEPT the hue, in the one cream value that passes (#EFEAE0, the colour
+     every MAH title takes in gym-app.css:19), with the accent on the sub-line. If the light law is
+     ever relaxed for signage, BRAND.gold below is the only line that has to change.
+
+   The MAHFITT WORDMARK ITSELF is not set in type at all — it is a raster asset in a bespoke chamfered
+   letterform, and fob.css:4038 instructs "use the existing exact gold FOB/SYSTEMS artwork rather than
+   reconstructing the letters in CSS". Nothing here reconstructs it. These are facility names. */
+export const BRAND = Object.freeze({
+  face: '"Space Grotesk", "Helvetica Neue", Arial, sans-serif',
+  titleWeight: 700,          /* loaded; 800 was a faux-bold of a master that does not exist */
+  subWeight: 500,
+  titleTracking: 0.08,       /* em — tight, per mygym.css:4312 */
+  subTracking: 0.30,         /* em — wide, per the wordmark asset's own sub-line */
+  title: '#EFEAE0',          /* gym-app.css:19 --cream, the colour every MAH title takes */
+  sub: '#BFD6F2',            /* the accent role, in the world's blue-white instead of the app's gold */
+  gold: '#E9C98F'            /* canonical, and forbidden in-world by LAW-001. Kept here as the record. */
+});
+
+/* A signage texture in the canonical MAH language: a wordmark, an optional sub-line and, when `mark`
+   is set, a RESERVED MARK SLOT above the name — an empty square-diamond outline (accepted MAHFITT
+   geometry, see REFERENCE_MANIFEST.md). No pictogram is drawn: the concept sheet's dumbbell / fist /
+   cart icons are not verified FOB or MAHFITT marks, so nothing is invented in their place. */
 export function signTexture({ title, sub, mark = false, w = 2048, h = 768, titleSize = 190, subSize = 60 }) {
   return canvasTexture(w, h, (g) => {
     g.clearRect(0, 0, w, h);
@@ -301,17 +347,20 @@ export function signTexture({ title, sub, mark = false, w = 2048, h = 768, title
       g.restore();
       y = h * 0.7;
     }
-    g.fillStyle = 'rgba(236,244,255,0.98)';
-    g.font = `800 ${titleSize}px "Space Grotesk", "Helvetica Neue", Arial, sans-serif`;
-    spaced(g, title, w / 2, y, titleSize * 0.08);
+    g.fillStyle = BRAND.title;
+    g.font = `${BRAND.titleWeight} ${titleSize}px ${BRAND.face}`;
+    spaced(g, title, w / 2, y, titleSize * BRAND.titleTracking);
     if (sub) {
-      g.fillStyle = hexToRgba(0xbfe3ff, 0.9);
-      g.font = `600 ${subSize}px "Space Grotesk", "Helvetica Neue", Arial, sans-serif`;
-      spaced(g, sub, w / 2, y + titleSize * 0.78, subSize * 0.34);
+      g.fillStyle = BRAND.sub;
+      g.font = `${BRAND.subWeight} ${subSize}px ${BRAND.face}`;
+      spaced(g, sub, w / 2, y + titleSize * 0.78, subSize * BRAND.subTracking);
     }
   });
 }
 function hexToRgba(n, a) { return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; }
+/* The canonical centring rule: tracking adds a trailing space after the last glyph, so the app always
+   pairs `letter-spacing: Xem` with `text-indent: Xem` to put it back (fob.css:3975, :4086-4087). The
+   canvas equivalent is to measure the run WITHOUT the trailing gap, which is what this does. */
 function spaced(g, text, cx, y, gap) {
   let total = 0; for (const ch of text) total += g.measureText(ch).width + gap; total -= gap;
   let x = cx - total / 2; const align = g.textAlign; g.textAlign = 'left';
