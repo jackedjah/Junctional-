@@ -531,6 +531,52 @@ give me from two metres away".
 
 ---
 
+## L40 — A fix to a shared module's CALLER has to be walked to every other caller
+**Failure.** Lake City's swimmers shipped at scale 3.4, rendered as nothing on a 550 m lake, and I
+raised them to 9.5 and wrote the lesson down. The rainforest's fauna stayed at 2.6 and 2.1 — a 1.4 m
+grazer on a floor whose fallen litter is 5 m across, under trees 168 m tall. Invisible for the same
+reason, in the same week, from the same shared module.
+**Correction.** Drifters 7.5, grazers 7.0, and the canopy drifters dropped 44 m so something is
+close enough to give them scale.
+**Regression.** `mahnimals.js` was not wrong either time; both defects were in the SPEC a caller
+passed. When a bug turns out to live in how a shared module is called, grep every other call site
+the same day — the lesson is only half-learned until they all agree.
+
+---
+
+## L41 — A form that dissolves into the fog stops dissolving when the fog moves
+**Failure.** L34 pushed night fog far from 880 m to 2350 m. `city.js`'s eight ghost shafts at
+650–860 m — authored to be four-fifths obscured at the foot and gone entirely at the top — snapped
+into focus as hard black bars, darker than the sky behind them, and became the most graphic thing in
+the wide frame.
+**Root owner.** The ghosts, not the fog. They outsourced their own dissolve to an atmosphere setting
+owned by another module, and the comment above them still quoted the old numbers as a design premise.
+**Correction.** `transparent: true, opacity: 0.30, depthWrite: false`. However the fog is tuned, a
+ghost is now always mostly whatever is behind it.
+**Regression.** An effect that depends on another module's constant is a latent break. Either read
+that constant at build time or achieve the effect at the material.
+
+---
+
+## L42 — The backdrop has to be told when the world grows a city where it was standing
+**Failure.** A 90 × 320 m unlit slab filled a quarter of the rainforest's eye-level frame. I assumed
+it was a mountain, then a trunk; peeling scene children named the owner as `city.js`.
+**Root owner.** `city.js`'s distant layer was composed when there was one city and the whole ring
+past 600 m was empty backdrop to arrange. Lake City (62°/700) and Rainforest City (127°/700) then
+landed inside it and nobody told that file. Measured: **five** distant forms standing in a
+destination — the slab at 128° dead centre in the rainforest, the 330 m colossal tapered form and
+the suspended pylon ring both inside the lake, plus a ghost in each. From the plaza every one of
+them was invisibly correct, backdrop behind backdrop.
+**Correction.** A `SITES` keep-out table and `clearOfSites(a, r, half)` that swings an offending
+bearing outward in 3° steps, alternating sides, smallest move first. Nothing is dropped — a hole in
+the far skyline would be its own defect. Every distant placement now goes through it.
+**Regression.** This is `terrain.js`'s PASSES table read from the other side. When a new site is
+added to the world at radius R, every module that places anything near R has to be re-checked —
+placement conflicts are silent from the camera the older module was composed for, and only appear
+once someone can stand in the newer one.
+
+---
+
 ## Standing ownership map (reuse, do not rediscover)
 
 | System | Owner |

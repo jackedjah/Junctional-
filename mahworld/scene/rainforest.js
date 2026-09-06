@@ -658,8 +658,16 @@ export function buildRainforest(ctx) {
 
   /* ---- 6. MAHNIMALS — the forest is inhabited ------------------------------------------------- */
   const fauna = [
-    createMahnimals(ctx, { family: 'drifter', count: 44, centre: [0, stats.derived.canopyY - 26, 0], radius: 210, yLow: -18, yHigh: 26, scale: 2.6, seed: 11 }),
-    createMahnimals(ctx, { family: 'grazer', count: 26, centre: [0, GROUND_Y + 3.2, 0], radius: 240, yLow: 0, yHigh: 2.4, scale: 2.1, seed: 29 })
+    /* L40 — THE SAME SCALE BUG, IN THE SECOND MODULE, UNCARRIED.
+       Lake City's swimmers shipped at 3.4 and rendered as nothing on a 550 m lake; I raised them to
+       9.5 and wrote the lesson down. Then left the rainforest's fauna at 2.6 and 2.1 — a 1.4 m
+       grazer on a floor whose fallen litter is 5 m across, under trees 168 m tall. An animal is
+       sized against the SET it stands in, and this set is enormous. A fix to a shared module's
+       CALLER has to be walked to every other caller the same day, or the lesson is only half true.
+       The canopy drifters also sat at 120 m where nothing is ever close enough to give them scale;
+       they now hang low enough to be met on the way up. */
+    createMahnimals(ctx, { family: 'drifter', count: 54, centre: [0, stats.derived.canopyY - 44, 0], radius: 215, yLow: -26, yHigh: 34, scale: 7.5, seed: 11 }),
+    createMahnimals(ctx, { family: 'grazer', count: 48, centre: [0, GROUND_Y + 3.4, 0], radius: 250, yLow: 0, yHigh: 3.0, scale: 7.0, seed: 29 })
   ];
   for (const f of fauna) { group.add(f.group); }
   stats.mahnimals = { drifters: fauna[0].stats.count, grazers: fauna[1].stats.count };

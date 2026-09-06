@@ -566,6 +566,50 @@ const _srCarM = new THREE.Matrix4(), _srCarQ = new THREE.Quaternion(), _srCarE =
 function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function smooth(t) { t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); }
 function polar(a, r) { const t = a * Math.PI / 180; return [r * Math.cos(t), -r * Math.sin(t)]; }
+
+/* ================================================================================================
+   L42 — THE BACKDROP HAS TO BE TOLD WHEN THE WORLD GROWS A CITY WHERE IT WAS STANDING
+   ================================================================================================
+   This module's distant layer — slabs, ghosts, the colossal tapered form, the ring on pylons — was
+   composed when there was one city and the whole ring beyond 600 m was empty backdrop to arrange.
+   Lake City (bearing 62, r 700) and Rainforest City (bearing 127, r 700) then landed inside it, and
+   nobody told this file. Measured, FIVE distant forms were standing inside a destination: a 90 x 320
+   m slab at bearing 128 planted dead centre in the rainforest, the 330 m colossal form and the
+   pylon ring both inside the lake, plus a ghost each. From the plaza they were invisibly correct —
+   backdrop behind backdrop. From inside either city, walked to, one of them filled a quarter of the
+   frame with a blank unlit face, which is how the rainforest's was found.
+
+   terrain.js already solved this shape of problem with its PASSES table, and this is the same table
+   read from the other side: those bearings are SPOKEN FOR. A placement that lands inside a site is
+   swung outward along the ring — deterministically, smallest move first, either direction — so the
+   backdrop keeps its object count and its silhouette rhythm and simply stands somewhere it is not
+   standing in a city. Nothing is dropped; a hole in the far skyline would be its own defect. */
+const SITES = [
+  { id: 'lake', bearing: 62, r: 700, keepOut: 330 },
+  { id: 'rainforest', bearing: 127, r: 700, keepOut: 400 }
+];
+function insideSite(x, z, pad) {
+  for (const S of SITES) {
+    const [sx, sz] = polar(S.bearing, S.r);
+    if (Math.hypot(x - sx, z - sz) < S.keepOut + (pad || 0)) return S;
+  }
+  return null;
+}
+/* the adjusted bearing for a form at (a, r) of half-width `half`, or the original if it is clear */
+function clearOfSites(a, r, half) {
+  let [x, z] = polar(a, r);
+  if (!insideSite(x, z, half || 0)) return a;
+  /* swing in 3° steps, alternating sides, so the correction is the smallest one that works and two
+     forms displaced from the same site do not pile up on the same shoulder */
+  for (let step = 3; step <= 90; step += 3) {
+    for (const dir of [1, -1]) {
+      const b = a + dir * step;
+      [x, z] = polar(b, r);
+      if (!insideSite(x, z, half || 0)) return b;
+    }
+  }
+  return a;                                  /* nowhere on this ring is clear; leave it where it was */
+}
 /* concatenate geometries (non-indexed) into one static BufferGeometry; disposes the inputs.
    v8: a vertex COLOUR is carried when any part has one, which is what lets all three district accent
    hues share ONE wash mesh instead of costing a draw call each — the wash material is white and the
@@ -797,7 +841,16 @@ export function buildCity(ctx) {
   ];
   /* one step under the farthest band: the ghosts must read as a shade darker than the fogged air they
      stand in, because that difference is all a form at 700 m has left to be seen by */
-  const farGhostM = new THREE.MeshBasicMaterial({ color: 0x0d1626, fog: true }); farGhostM.name = 'city-distant-ghost';
+  /* L41 — A FORM THAT DISSOLVES INTO THE FOG STOPS DISSOLVING WHEN THE FOG MOVES.
+     The ghosts were authored against a night fog of 55 → 880 m: at 650–860 m a ghost's foot was four
+     fifths obscured and its top was gone entirely, which is the whole idea of them. L34 pushed far to
+     2350 to save terrain's value ladder, and at 26–35% fog these eight shafts snapped into focus as
+     hard black bars — the most graphic thing in the wide frame, and darker than the sky they stand
+     against, so they read as cut-outs rather than as a city continuing past where it can be read.
+     A backdrop element must not outsource its own dissolve to an atmosphere setting owned by another
+     module. It dissolves at the material now: transparent at 0.30, so however the fog is tuned the
+     ghost is always mostly whatever is behind it. */
+  const farGhostM = new THREE.MeshBasicMaterial({ color: 0x0d1626, fog: true, transparent: true, opacity: 0.30, depthWrite: false }); farGhostM.name = 'city-distant-ghost';
   farMats.forEach((m, i) => { m.name = 'city-distant-' + i; owned.materials.push(m); });
   owned.materials.push(farGhostM);
   const groundMat = new THREE.MeshBasicMaterial({ color: 0x141d2c, fog: true }); groundMat.name = 'city-ground';
@@ -1638,16 +1691,18 @@ export function buildCity(ctx) {
        single hard corner. It is a three-ring prism now (v11 §06): the taper steepens over the last
        80 m, so the outline turns toward horizontal before the table instead of arriving at it along
        one line. Four extra triangles, on the largest distant form in the frame. */
-    let [x, z] = polar(50, 720); band(720).push(xform(shardPrism(PLAN4, [[90, 0], [62, 250], [46, 330]]), x, 0, z, 0.4));
-    [x, z] = polar(70, 680);                                                                                             /* the suspended ring on two pylons */
+    /* every bearing below goes through clearOfSites (L42): the ring past 600 m is no longer empty */
+    let [x, z] = polar(clearOfSites(50, 720, 90), 720); band(720).push(xform(shardPrism(PLAN4, [[90, 0], [62, 250], [46, 330]]), x, 0, z, 0.4));
+    [x, z] = polar(clearOfSites(70, 680, 130), 680);                                                                     /* the suspended ring on two pylons */
     band(680).push(xform(new THREE.TorusGeometry(115, 7, 6, 44).rotateX(1.25), x, 210, z, 0.1));
     band(680).push(xform(chamferBox(10, 200, 10, 2.6), x - 64, 100, z + 6)); band(680).push(xform(chamferBox(10, 200, 10, 2.6), x + 66, 100, z - 6));
-    [x, z] = polar(128, 640); band(640).push(xform(chamferBox(90, 320, 34, 6), x, 160, z, 0.5));                          /* a tall slab above the ridge line */
-    [x, z] = polar(100, 780);                                                                                            /* a high platform on slim pylons */
+    [x, z] = polar(clearOfSites(128, 640, 50), 640); band(640).push(xform(chamferBox(90, 320, 34, 6), x, 160, z, 0.5));   /* a tall slab above the ridge line */
+    [x, z] = polar(clearOfSites(100, 780, 110), 780);                                                                    /* a high platform on slim pylons */
     band(780).push(xform(chamferBox(210, 14, 70, 4.5), x, 232, z, 0.15));
     [-80, 0, 80].forEach(o => band(780).push(xform(chamferBox(8, 232, 8, 2.0), x + o * Math.cos(0.15), 116, z - o * Math.sin(0.15))));
-    SLABS.forEach(([a, r, w, h, d, ry]) => { const [sx, sz] = polar(a, r); band(r).push(xform(chamferBox(w, h, d, Math.min(6, w / 5)), sx, h / 2, sz, ry)); });
-    GHOSTS.forEach(([a, r, w, h]) => {
+    SLABS.forEach(([a, r, w, h, d, ry]) => { const [sx, sz] = polar(clearOfSites(a, r, w * 0.5), r); band(r).push(xform(chamferBox(w, h, d, Math.min(6, w / 5)), sx, h / 2, sz, ry)); });
+    GHOSTS.forEach(([a0, r, w, h]) => {
+      const a = clearOfSites(a0, r, w * 0.5);
       const [gx, gz] = polar(a, r), gry = (a * 0.37) % 1.5707;
       B.ghost.push(xform(faceted(new THREE.CylinderGeometry(w * 0.28, w * 0.5, h, 4, 1)), gx, h / 2, gz, gry));
       for (const f of [0.34, 0.62]) {
