@@ -22,11 +22,25 @@ brand asset); "RESERVED" means no verified asset exists and nothing was invented
 | Typography | MAHFITT pages load Space Grotesk (`mygym.css`, app pages) | — | signage and the development HUD use Space Grotesk with system fallbacks; HUD controls reuse the app's small uppercase, letter-spaced button shape | ACCEPTED |
 | Music | MAH PLAYER (`mygym.js`, `openAction('music-studio')`) | — | the scene creates no AudioContext and plays nothing | untouched |
 
+## v5 — the chromium material language
+
+| Element | Where it comes from | Status |
+| --- | --- | --- |
+| Chromium / dark platinum as the world's material identity | the v5 brief (§03) and the chromium-city concept image, plus the platinum edge catches already established on the species in `mrmah3d` | DIRECTED by the brief; the five finish grades are this project's own construction |
+| The finish grades (mirror / satin / brushed / graphite / crystalline glass) | no external source: a roughness ladder built here so the world stays one material read at five polishes | ORIGINAL |
+| Architectural-scale diamond floor cells | the square-diamond vocabulary already accepted above (`mygym.css:520`), scaled up to nine metres as a floor module | ADAPTATION of accepted vocabulary |
+| Megatall crowns (stepped shaft + spire, notched twin blade, crystalline pinnacle) | no external source; three profiles authored here so no two megatalls end the same way. They are not modelled on, and are not named after, any real building | ORIGINAL |
+| The distant MAHGIC energy field | the FOBEAM rail + square-diamond + travelling light language above, multiplied and thinned into a band across the sky | ADAPTATION of accepted vocabulary |
+
+Nothing in v5 introduces a new borrowed asset. No mark, logo, wordmark or icon
+was added; the reserved square-diamond slot on the three signs is still empty.
+
 ## What the concept images are, and are not
 
 `mahplaza-landscape-ref.png` and `mahplaza-portrait-ref.png` (user-supplied,
 kept in the session scratch and copied, downscaled, into
-`validation/mahworld/mahplaza-v3/reference/` for the review page) set
+`validation/mahworld/mahplaza-v3/reference/` for the review page), together with
+the night-city and chromium-city images supplied for v4 and v5, set
 composition, mood, ground plan and the three destinations. Their icons,
 sub-lines and lighting are suggestions; where they conflict with the brief
 (yellow light, "nutrition", legs on residents) the brief wins.
