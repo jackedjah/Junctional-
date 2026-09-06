@@ -320,6 +320,66 @@ function sign(ctx, parent, spec) {
   return mesh;
 }
 
+/* ================= THE CURTAIN WALL (v6b) ==========================================================
+   The single largest difference between MAHWORLD and the reference is not colour — it is that in the
+   reference the buildings are DARK FRAMES FULL OF BRIGHT GLASS. They are lanterns: multi-storey
+   curtain walls with lit floor plates visible behind them and people moving inside. MAHWORLD's
+   buildings were dark masses punched with small windows, which is why the world read as heavy however
+   much platinum went onto its trim.
+
+   This builds that read WITHOUT lightening a single mass — which matters, because the mass is the
+   value floor everything bright is measured against. A dark frame stays dark; the glazing between its
+   mullions becomes the light source. Each bay is:
+
+     an unlit INTERIOR PLANE at the back, in cool white, varying per floor so the building has
+     occupancy rather than one flat glow;
+     a FLOOR PLATE and a soffit above it, so the eye reads storeys and gets the building's scale;
+     the GLASS itself in front, which reflects the sky and the district over the light behind it;
+     MULLIONS and a spandrel band, in satin chromium, vertical faces where that grade pays.
+
+   Cost: two merged meshes plus one instanced glass bay per facade, whatever the storey count. */
+function curtainWall(ctx, g, o) {
+  const { M } = ctx;
+  const { W, H, sillY = 0, topY, bays = 6, floors = 3, z = 0.5, seed = 1, lit = 0.72 } = o;
+  const frame = [], plates = [];
+  const wallW = W * 0.92, bayW = wallW / bays;
+  const totalH = topY - sillY, floorH = totalH / floors;
+  let s = (seed * 9301 + 49297) >>> 0;
+  const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  /* the interior: one unlit plane per bay per floor, at its own brightness. Unlit on purpose — an
+     interior seen through glass is a light SOURCE, and shading it would put it back in shadow. */
+  const litMat = M.interior;
+  const dimMat = M.interiorSoft;
+  const glassBay = [];
+  for (let f = 0; f < floors; f++) {
+    const fy = sillY + f * floorH;
+    for (let b = 0; b < bays; b++) {
+      const bx = -wallW / 2 + bayW / 2 + b * bayW;
+      const on = rnd() < lit;
+      const iw = bayW - 0.5, ih = floorH - 0.75;
+      const inner = new THREE.Mesh(new THREE.PlaneGeometry(iw, ih), on ? litMat : dimMat);
+      inner.position.set(bx, fy + floorH * 0.52, z - 0.5);
+      if (on) inner.scale.setScalar(1); else inner.scale.set(1, 0.92, 1);
+      g.add(inner);
+      /* the glass in front of it, which is what makes the light read as being INSIDE something */
+      const pane = new THREE.Mesh(new THREE.PlaneGeometry(iw + 0.3, ih + 0.4), M.crystalGlass || M.glass);
+      pane.position.set(bx, fy + floorH * 0.52, z - 0.06); g.add(pane);
+      glassBay.push(pane);
+      /* the vertical mullion between bays — a satin chromium face, which is where that grade pays */
+      part(frame, chamferBox(0.2, floorH - 0.1, 0.34, 0.05), bx - bayW / 2, fy + floorH / 2, z);
+    }
+    /* the floor plate and its soffit: this is what gives a facade its STOREYS, and storeys are what
+       give a building its scale against a resident standing in front of it */
+    part(plates, chamferBox(wallW + 0.5, 0.34, 0.5, 0.08), 0, fy + 0.1, z + 0.06);
+    part(frame, chamferBox(wallW + 0.7, 0.1, 0.16, 0.03), 0, fy + 0.3, z + 0.24);
+  }
+  part(frame, chamferBox(0.2, totalH, 0.34, 0.05), wallW / 2, sillY + totalH / 2, z);
+  part(plates, chamferBox(wallW + 0.5, 0.4, 0.55, 0.09), 0, topY + 0.1, z + 0.06);
+  merged(g, frame, M.chromeSatin || M.trimSatin, 'curtain-mullions', false);
+  merged(g, plates, M.platinumLit || M.platinum, 'curtain-plates', true);
+  return glassBay;
+}
+
 /* the composed facade: body + room + glass + piers + lintel */
 function facade(ctx, parent, o) {
   const { M } = ctx;
@@ -449,6 +509,9 @@ export function buildBuildings(ctx) {
     dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 1, canopy: false, wings: 'rear' });   /* the broad curved canopy replaces the slab canopy */
     crystallize(ctx, g, { W, H, D, openW, E, seed: 1 });
     broadCanopy(ctx, g, { W, H, openH, seed: 1 });
+    /* MAH GYM is the BRIGHT, OPEN, GLAZED one (§21): two lit storeys of curtain wall above the canopy,
+       so the training inside is what the building shows the plaza */
+    curtainWall(ctx, g, { W, H, sillY: openH + 1.4, topY: H - 0.6, bays: 7, floors: 2, z: 0.62, seed: 11, lit: 0.8 });
     ctx.entranceLights.push(world(g, 0, openH + 1.2, 4.6));
     action('gym', 'MAH GYM', 'destination', f.glass, world(g, 0, 0, 2), { view: 'gym-entrance', copy: 'Training facility. Preview navigation: the camera moves to the entrance. Training data stays in MAHFITT.' });
     /* upper window band across the piers: interior glow behind glass */
@@ -487,6 +550,14 @@ export function buildBuildings(ctx) {
     dressFacade(ctx, g, { W, H, D, openW, openH, E, floorY, seed: 2, canopy: false, wings: 'rear' });   /* MAH MATCH keeps its own portal frame instead of a canopy */
     crystallize(ctx, g, { W, H, D, openW, E, floorY, seed: 2, beacon: false });
     verticalTower(ctx, g, { W, H, D, E, seed: 2 });
+    /* MAH MATCH is the DOMINANT one: its podium carries three lit storeys either side of the portal,
+       and they stop below the tower so the tower stays the silhouette (§20) */
+    [-1, 1].forEach(sd => {
+      const pierW = (W - openW) / 2;
+      const wall = { W: pierW * 0.92, H, sillY: floorY + openH + 1.6, topY: H - 1.2, bays: 3, floors: 3, z: 0.56, seed: 21 + sd, lit: 0.62 };
+      const sub = new THREE.Group(); sub.position.x = sd * (openW / 2 + pierW / 2); g.add(sub);
+      curtainWall(ctx, sub, wall);
+    });
     action('match', 'MAH MATCH', 'destination', f.glass, world(g, 0, floorY, 2), { view: 'match-entrance', copy: 'Fighting facility: matches and practice. Choose an action at the entrance.' });
     /* the strong central frame around the opening, with a square-diamond keystone */
     const fT = 1.4, fD = 1.0, fz = 0.55;
@@ -564,6 +635,9 @@ export function buildBuildings(ctx) {
     dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 3, windowsUpper: false, roofKit: false, wings: 'rear' });   /* the civic market: wings and canopy, terraces instead of a roof kit */
     crystallize(ctx, g, { W, H, D, openW, E, seed: 3, beacon: false, crown: false });   /* the terraces ARE the roof line */
     terraces(ctx, g, { W, H, D, E, seed: 3 });
+    /* MAH MARKET is the SOCIAL, CIVIC one (§22): wide glazing and a busy interior, the most occupied
+       of the three, so it reads as a place people are in rather than a shopfront */
+    curtainWall(ctx, g, { W, H, sillY: openH + 1.2, topY: H - 0.8, bays: 8, floors: 2, z: 0.6, seed: 33, lit: 0.86 });
     action('market', 'MAH MARKET', 'destination', f.glass, world(g, 0, 0, 2), { view: 'market-entrance', copy: 'World marketplace. Preview navigation only: nothing is for sale here and no prices exist.' });
     /* a soft continuous sill light under the glass — the welcome line */
     const sill = box(openW, 0.05, 0.08, M.energyLight, 0, 0.06, -E + 0.3); g.add(sill); ctx.reflect(sill, 0.3);

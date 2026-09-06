@@ -9,6 +9,7 @@
    not cover it. Everything here follows the viewer's world Theme for energy
    and never turns yellow. */
 import * as THREE from '../vendor/three/three.module.min.js';
+import { canvasTexture } from './materials.js';
 
 const KEYS = {
   /* LUMINOUS NIGHT (brief §01, §10, §11): the night stays deep in absolute value but is filled with
@@ -77,15 +78,75 @@ export function buildSky(ctx) {
   const glowTex = radialTexture();
   const sunDisc = new THREE.Mesh(new THREE.CircleGeometry(22, 48), new THREE.MeshBasicMaterial({ color: 0xf6f9ff, fog: false, transparent: true }));
   const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xdde9ff, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); sunHalo.scale.set(200, 200, 1);
-  const moon = new THREE.Mesh(new THREE.CircleGeometry(24, 48), new THREE.MeshBasicMaterial({ map: moonTexture(), fog: false, transparent: true }));
-  const moonHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0x9fc0ff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); moonHalo.scale.set(140, 140, 1);
+  /* THE MOON is a principal of the composition, not a marker: a large disc (radius 58 at 800 →
+     ~8.3° across, 2.4× the old 24) carrying real surface information — soft maria, a brightened
+     limb — and a wide, low outer halo that never closes into a glare disc. Silver-white to pale
+     blue-white; the brightest thing in the sky and never, ever warm. */
+  const moon = new THREE.Mesh(new THREE.CircleGeometry(58, 64), new THREE.MeshBasicMaterial({ map: moonTexture(), fog: false, transparent: true }));
+  const moonHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: moonHaloTexture(), color: 0x9fc0ff, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); moonHalo.scale.set(430, 430, 1);
   g.add(sunDisc, sunHalo, moon, moonHalo);
 
-  /* stars */
-  const starGeo = new THREE.BufferGeometry(); const sp = [];
-  for (let i = 0; i < 700; i++) { const a = Math.random() * Math.PI * 2, e = Math.random() * 0.95 + 0.05, r = 850; sp.push(Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r); }
+  /* ---- THE GALAXY BAND (this world's Milky Way) -------------------------------
+     ONE additive, fog-free, vertex-coloured ribbon laid on a great circle of the dome: it rises
+     out of one horizon, arcs high across the back of the sky and sets in the other. Brightest
+     along its spine, feathered to exactly nothing at both edges, with five denser knots and two
+     dust lanes so it carries structure instead of being a smooth smear. Blue-white to
+     violet-white only — deep space seen THROUGH atmosphere — and held dim enough that it never
+     competes with the moon or the FOBEAM field. It sits behind the whole world (renderOrder −9,
+     just in front of the dome) and fades with the same `stars` key as the star field. */
+  const GAL_R = 866, GAL_U = 132, GAL_V = 16, GAL_GAIN = 0.26;
+  const galPole = new THREE.Vector3(0.223, 0.55, 0.805).normalize();          /* pole of the band's plane */
+  const galA = new THREE.Vector3().crossVectors(galPole, new THREE.Vector3(0, 1, 0)).normalize();   /* horizon crossing */
+  const galB = new THREE.Vector3().crossVectors(galPole, galA).normalize(); if (galB.y < 0) galB.negate();   /* top of the arc */
+  const galWidth = u => 0.20 + 0.17 * Math.sin(Math.max(0, Math.min(Math.PI, u)));   /* half-width in radians: widest at the bulge */
+  const GAL_KNOTS = [[0.17, -0.10, 0.42, 0.075, 0.44], [0.34, 0.13, 0.30, 0.058, 0.34], [0.51, -0.05, 0.62, 0.105, 0.52], [0.69, 0.11, 0.34, 0.062, 0.36], [0.85, -0.13, 0.26, 0.055, 0.30]];
+  function galValue(u, v, y) {
+    const t = Math.max(0, Math.min(1, u / Math.PI));
+    let b = Math.exp(-3.5 * v * v) * (0.74 + 0.26 * Math.sin(t * 9.1 + 0.7) * Math.sin(t * 3.3 + 2.1));   /* spine + lengthwise variation */
+    for (let i = 0; i < GAL_KNOTS.length; i++) { const K = GAL_KNOTS[i], dt = (t - K[0]) / K[3], dv = (v - K[1]) / K[4]; b += K[2] * Math.exp(-(dt * dt + dv * dv)); }
+    b *= 1 - 0.46 * Math.exp(-Math.pow((v - 0.15) / 0.10, 2)) - 0.24 * Math.exp(-Math.pow((v + 0.34) / 0.09, 2));   /* dust lanes */
+    b *= Math.pow(Math.max(0, 1 - v * v), 0.9);                       /* feathered to nothing at both edges */
+    b *= Math.pow(Math.sin(t * Math.PI), 0.30) * smooth((y - 0.015) / 0.20);   /* and into both horizons */
+    return Math.max(0, b);
+  }
+  const galPos = new Float32Array((GAL_U + 1) * (GAL_V + 1) * 3), galCol = new Float32Array((GAL_U + 1) * (GAL_V + 1) * 3), galIdx = [];
+  const galCore = new THREE.Color(0xa8c8ff), galEdge = new THREE.Color(0x8f8ce4), gcol = new THREE.Color(), gdir = new THREE.Vector3();
+  for (let i = 0; i <= GAL_U; i++) {
+    const u = (i / GAL_U) * Math.PI, w = galWidth(u), cu = Math.cos(u), su = Math.sin(u);
+    for (let j = 0; j <= GAL_V; j++) {
+      const v = (j / GAL_V) * 2 - 1, a = w * v, n = (i * (GAL_V + 1) + j) * 3;
+      gdir.set(galA.x * cu + galB.x * su, galA.y * cu + galB.y * su, galA.z * cu + galB.z * su).multiplyScalar(Math.cos(a)).addScaledVector(galPole, Math.sin(a)).normalize();
+      galPos[n] = gdir.x * GAL_R; galPos[n + 1] = gdir.y * GAL_R; galPos[n + 2] = gdir.z * GAL_R;
+      gcol.copy(galEdge).lerp(galCore, Math.min(1, 0.12 + Math.exp(-2.2 * v * v))).multiplyScalar(galValue(u, v, gdir.y) * GAL_GAIN);
+      galCol[n] = gcol.r; galCol[n + 1] = gcol.g; galCol[n + 2] = gcol.b;
+      if (i < GAL_U && j < GAL_V) { const k = i * (GAL_V + 1) + j; galIdx.push(k, k + 1, k + GAL_V + 1, k + 1, k + GAL_V + 2, k + GAL_V + 1); }
+    }
+  }
+  const galaxyGeo = new THREE.BufferGeometry();
+  galaxyGeo.setAttribute('position', new THREE.BufferAttribute(galPos, 3));
+  galaxyGeo.setAttribute('color', new THREE.BufferAttribute(galCol, 3));
+  galaxyGeo.setIndex(galIdx);
+  const galaxy = new THREE.Mesh(galaxyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+  galaxy.renderOrder = -9; g.add(galaxy);
+
+  /* stars — still ONE Points object: a sparse general field PLUS a much denser population
+     clustered along the band's spine, with per-vertex brightness and a blue-white → violet-white
+     tint so the clusters read. Seeded, so the sky is the same sky every session. */
+  const starGeo = new THREE.BufferGeometry(); const sp = [], sc = [];
+  let ss = 20857; const srnd = () => { ss = (ss * 16807) % 2147483647; return (ss - 1) / 2147483646; };
+  const starTint = new THREE.Color(), starWhite = new THREE.Color(0xd8e6ff), starViolet = new THREE.Color(0xbcb8f0), sdir = new THREE.Vector3();
+  function pushStar(x, y, z, bright, violet) { sp.push(x, y, z); starTint.copy(starWhite).lerp(starViolet, violet).multiplyScalar(bright); sc.push(starTint.r, starTint.g, starTint.b); }
+  for (let i = 0; i < 620; i++) { const a = srnd() * Math.PI * 2, e = srnd() * 0.95 + 0.05, r = 850; pushStar(Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r, 0.34 + Math.pow(srnd(), 2.2) * 0.62, srnd() * 0.3); }
+  for (let i = 0; i < 520; i++) {
+    const u = 0.04 + srnd() * (Math.PI - 0.08), cu = Math.cos(u), su = Math.sin(u);
+    const v = Math.max(-1.25, Math.min(1.25, (srnd() + srnd() + srnd() - 1.5) * 0.84)), a = galWidth(u) * v;
+    sdir.set(galA.x * cu + galB.x * su, galA.y * cu + galB.y * su, galA.z * cu + galB.z * su).multiplyScalar(Math.cos(a)).addScaledVector(galPole, Math.sin(a)).normalize();
+    if (sdir.y < 0.05) continue;                                   /* the band's stars stop at the horizon with the band */
+    pushStar(sdir.x * 848, sdir.y * 848, sdir.z * 848, 0.3 + Math.pow(srnd(), 1.8) * 0.85, 0.15 + srnd() * 0.5);
+  }
   starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
-  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xd8e6ff, size: 1.6, sizeAttenuation: true, transparent: true, opacity: 0.85, fog: false, depthWrite: false }));
+  starGeo.setAttribute('color', new THREE.Float32BufferAttribute(sc, 3));
+  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ vertexColors: true, size: 2.2, sizeAttenuation: true, transparent: true, opacity: 0.85, fog: false, depthWrite: false }));
   g.add(stars);
 
   /* clouds: a few broad soft masses, MAHWORLD's own quiet sky, keyed by time */
@@ -184,8 +245,10 @@ export function buildSky(ctx) {
     sunHalo.position.copy(sunDir).multiplyScalar(790); sunHalo.material.opacity = 0.4 * k.sunDisc * (sun.day ? 1 : 0);
     const moonDir = moonDirection(clockState.worldHour, new THREE.Vector3());
     moon.position.copy(moonDir).multiplyScalar(800); moon.lookAt(0, 0, 0); moon.material.opacity = 0.06 + 0.94 * Math.pow(1 - clockState.daylight, 1.5);
-    moonHalo.position.copy(moonDir).multiplyScalar(790); moonHalo.material.opacity = 0.22 * (1 - clockState.daylight);
+    moonHalo.position.copy(moonDir).multiplyScalar(790); moonHalo.material.opacity = 0.3 * (1 - clockState.daylight);
     stars.material.opacity = 0.85 * k.stars;
+    /* the galaxy band is night sky like the stars: it washes out on the same key as daylight rises */
+    galaxy.material.opacity = 0.92 * k.stars;
     haze.material.opacity = k.haze;
     clouds.children.forEach((c, i) => { c.material.opacity = k.clouds * (0.7 + (i % 3) * 0.15); c.material.color.setHex(clockState.daylight > 0.5 ? 0xe4edf9 : 0x8fb0e6); });
     deck.children.forEach((c, i) => { c.material.opacity = k.clouds * (0.55 + (i % 2) * 0.2); c.material.color.setHex(clockState.daylight > 0.5 ? 0xd6e2f2 : 0x7f9fd6); });
@@ -219,7 +282,7 @@ export function buildSky(ctx) {
 
   /* `clouds` / `deck` are the soft sprite clouds and `beams` / `flows` the plain arcs: the assembly hides
      each set when the dedicated v4 module (clouds.js / fobeam.js) is present and takes over that role */
-  return { group: g, setTime, setTheme, update, beams, flows, clouds, deck, bands, additive: [sunHalo, moonHalo, haze].concat(beams.map(b => b.glow), flows) };
+  return { group: g, setTime, setTheme, update, beams, flows, clouds, deck, bands, galaxy, stars, additive: [sunHalo, moonHalo, haze, galaxy].concat(beams.map(b => b.glow), flows) };
 }
 
 function gradientTexture() {

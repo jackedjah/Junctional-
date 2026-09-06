@@ -198,6 +198,31 @@ export function buildCity(ctx) {
     return cols * rows;
   }
 
+  /* ---- v6b GLASS BLOCKS ------------------------------------------------------------------------
+     The reference's midground is not dark masses punched with small windows — it is lit curtain wall.
+     A third of the district's blocks are GLASS blocks now: instead of a windowGrid of individual
+     cells they carry a full-height glazed face with lit floor plates behind it, which is what makes a
+     night city read as inhabited rather than as a silhouette with holes in it. The MASS stays dark;
+     only the glazing is bright, so the value hierarchy the platinum depends on survives. */
+  const glassFaceMat = new THREE.MeshBasicMaterial({ color: 0xc8dcff, toneMapped: true, fog: true });
+  glassFaceMat.name = 'city-curtain'; owned.materials.push(glassFaceMat);
+  const glazedIds = { L2: 1, C3: 1, R2: 1, L5: 1, F2: 1, R5: 1 };
+  function curtainFace(parent, faceW, faceH, seed, place) {
+    const floors = Math.max(3, Math.floor(faceH / 7));
+    const bays = Math.max(3, Math.floor((faceW - 2 * PW) / 4.2));
+    const grid = windowGrid({
+      cols: bays, rows: floors,
+      cellW: (faceW - 2 * PW - 2.2) / bays - 0.5, cellH: (faceH - 5) / floors - 1.1,
+      gapX: 0.5, gapY: 1.1, depth: 0.14, onFraction: 0.82, seed,
+      material: glassFaceMat, tint: 0xd8e8ff, dimTint: 0x35507a
+    });
+    own(grid.geometry);
+    place(grid, 3.2 + grid.userData.windows.totalH / 2);
+    grid.name = 'city-curtain'; parent.add(grid);
+    stats.windows += bays * floors; stats.windowGrids++;
+    return bays * floors;
+  }
+
   BLOCKS.forEach((spec, i) => {
     const R = rng(SEED + i * 131);
     const { x, z, w, d, h } = spec;
@@ -242,8 +267,9 @@ export function buildCity(ctx) {
       if (i % 3 === 0) B.whites.push(P(new THREE.BoxGeometry(0.5, 0.5, 0.5), mx, topY + mh + 0.25, mz));
     }
     /* windows: the front face always, the plaza-facing side face where the block is seen obliquely */
-    facadeWindows(g, w, coreH, 100 + i, (grid, cy) => grid.position.set(0, cy, d / 2 + 0.06));
-    if (spec.side) facadeWindows(g, d, coreH, 200 + i, (grid, cy) => { grid.position.set(spec.side * (w / 2 + 0.06), cy, 0); grid.rotation.y = spec.side * Math.PI / 2; });
+    const face = glazedIds[spec.id] ? curtainFace : facadeWindows;
+    face(g, w, coreH, 100 + i, (grid, cy) => grid.position.set(0, cy, d / 2 + 0.06));
+    if (spec.side) face(g, d, coreH, 200 + i, (grid, cy) => { grid.position.set(spec.side * (w / 2 + 0.06), cy, 0); grid.rotation.y = spec.side * Math.PI / 2; });
     /* rooftop pad for the life module: a low platform with a square-diamond outline in energy */
     if (spec.pad) {
       const py = spec.sb ? coreH : h, pz = spec.sb ? d / 2 - 3.2 : 0;
@@ -409,6 +435,7 @@ export function buildCity(ctx) {
     /* the district reads as a lit city but never outshines the three destinations in front of it:
        windows sit at ~60 % of full at night and 18 % by day (brief §08 window variety, §45 hierarchy) */
     winMat.color.setScalar(0.18 + 0.44 * (1 - d));
+    glassFaceMat.color.setHex(0xc8dcff).multiplyScalar(0.3 + 0.62 * (1 - d));   /* the glazed blocks read as lit interiors at night, glass by day */
     stripMat.color.copy(themeCol).multiplyScalar(1 - 0.7 * d);     /* strips / rail lights: day × 0.3 */
     whiteMat.color.copy(whiteCol).multiplyScalar(0.35 + 0.65 * (1 - d));
     return last;

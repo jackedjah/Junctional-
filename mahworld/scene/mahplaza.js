@@ -241,7 +241,14 @@ export async function createMahplaza(canvas, options = {}) {
   try {
     const F = await import('./flora-and-vehicles.js');
     if (typeof F.createPlanter === 'function' && ctx.planterSpots) {
-      flora = ctx.planterSpots.map((s, i) => { const p = F.createPlanter({ theme, seed: 100 + i, size: s.size, shape: s.shape }); p.position.set(s.x, 0.16 + (Math.hypot(s.x, s.z) < PLAZA_DECK_R ? PLAZA_DECK_Y : 0), s.z); scene.add(p); return p; });
+      /* a spot marked `kind: 'tree'` asks the flora module for its tree; where that module is older and
+         has none, it falls back to a planter, so the scene never depends on the newer export */
+      flora = ctx.planterSpots.map((s, i) => {
+        const make = (s.kind === 'tree' && typeof F.createTree === 'function') ? F.createTree : F.createPlanter;
+        const p = make({ theme, seed: 100 + i, size: s.size, shape: s.shape });
+        p.position.set(s.x, 0.16 + (Math.hypot(s.x, s.z) < PLAZA_DECK_R ? PLAZA_DECK_Y : 0), s.z);
+        scene.add(p); return p;
+      });
     }
     if (typeof F.createVehicleRoute === 'function') {
       /* the craft route follows the corridors and crosses behind the district, never over the plaza centre */

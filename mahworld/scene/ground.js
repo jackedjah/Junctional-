@@ -123,6 +123,59 @@ export function buildGround(ctx) {
   word.rotation.x = -Math.PI / 2; word.position.set(0, FLOOR_TOP + 0.03, 17.5); g.add(word);
   ctx.timeHooks.push(s => { word.material.opacity = 0.55 + 0.45 * (1 - s.daylight); });
 
+  /* ---------------------------------------------------------------------------------------------
+     THE MAHPLAZA MONUMENT (v6b) — the reference's plaza has a HERO OBJECT at its centre, a large
+     crystalline square-diamond standing at the foot of the approach, and its absence is why the middle
+     of this plaza has been reading as floor rather than as a place. It is the world's own reserved
+     mark built at architectural scale: a faceted plinth, a mirror-grade collar, and the diamond itself
+     held above it with an energy core inside, reflected in the chromium floor beneath.
+     No invented emblem — this is the square-diamond the whole world already uses. */
+  {
+    const mx = 0, mz = -4;
+    const monument = new THREE.Group(); monument.name = 'plaza-monument';
+    monument.position.set(mx, FLOOR_TOP, mz); g.add(monument);
+    /* the plinth: three receding faceted courses, dark, so the crystal above reads against them */
+    const courses = [[7.2, 0.5, 0x0], [5.6, 0.62, 0], [4.2, 0.5, 0]];
+    let py = 0;
+    courses.forEach(([cw, ch], i) => {
+      const c = new THREE.Mesh(chamferBox(cw, ch, cw, 0.14), i === 1 ? M.graphiteDark : M.structural);
+      c.rotation.y = Math.PI / 4; c.position.y = py + ch / 2; c.castShadow = true; c.receiveShadow = true; monument.add(c);
+      const rim = new THREE.Mesh(chamferBox(cw + 0.18, 0.09, cw + 0.18, 0.03), M.platinumLit || M.trim);
+      rim.rotation.y = Math.PI / 4; rim.position.y = py + ch; monument.add(rim);
+      py += ch;
+    });
+    /* a lit reveal under the top course, so the plinth sits on light rather than on the floor */
+    const reveal = new THREE.Mesh(new THREE.CircleGeometry(3.4, 4), M.energySoft);
+    reveal.rotation.x = -Math.PI / 2; reveal.rotation.z = Math.PI / 4; reveal.position.y = 0.04; reveal.renderOrder = 6; monument.add(reveal);
+    /* the mirror collar the diamond stands in */
+    const collar = new THREE.Mesh(chamferBox(2.6, 0.34, 2.6, 0.1), M.chromeMirror || M.trim);
+    collar.rotation.y = Math.PI / 4; collar.position.y = py + 0.17; monument.add(collar);
+    /* THE DIAMOND — the square-diamond at architectural scale. The first build made the mistake of
+       wrapping a bright core in an OPAQUE faceted shell, which simply hid it: a crystal reads because
+       light comes THROUGH it. So the core is large and bright, the shell over it is glass, and the
+       only opaque part is the thin mirror edge that catches the moon on its turn. */
+    const dy = py + 5.4;
+    const core = new THREE.Mesh(new THREE.OctahedronGeometry(3.5, 0), M.energyLight);
+    core.scale.set(1, 1.55, 0.34); core.position.y = dy; monument.add(core);
+    const shell = new THREE.Mesh(new THREE.OctahedronGeometry(4.0, 0), M.crystalGlass || M.glass);
+    shell.scale.set(1, 1.55, 0.46); shell.position.y = dy; monument.add(shell);
+    reflect(core, 0.5); reflect(collar, 0.3);
+    /* the edge catches that make it turn: four thin mirror bars along its equator */
+    for (let i = 0; i < 4; i++) {
+      const a = i * Math.PI / 2 + Math.PI / 4;
+      const bar = new THREE.Mesh(chamferBox(0.16, 0.16, 5.6, 0.04), M.chromeMirror || M.trim);
+      bar.position.set(Math.cos(a) * 2.0, dy, Math.sin(a) * 2.0);
+      bar.rotation.y = -a + Math.PI / 2; bar.rotation.x = 0.66; monument.add(bar);
+    }
+    /* a mast carrying the diamond clear of its plinth, so it reads as HELD rather than resting */
+    const mast = new THREE.Mesh(chamferBox(0.34, 2.6, 0.34, 0.06), M.chromeSatin || M.trimSatin);
+    mast.rotation.y = Math.PI / 4; mast.position.y = py + 1.5; monument.add(mast);
+    const col = new THREE.Mesh(new THREE.BoxGeometry(7.6, 12, 7.6), M.curb);
+    col.position.set(mx, FLOOR_TOP + 6, mz); col.visible = false; g.add(col);
+    (ctx.colliders = ctx.colliders || []).push(col);
+    ctx.monument = monument;
+  }
+
   /* 2. aprons: raised slabs in front of the three destinations */
   function apron(x, z, w, d, rotY) {
     const a = new THREE.Mesh(new THREE.BoxGeometry(w, 0.42, d), M.platinumLitBrushed || M.graphiteLight);
@@ -165,10 +218,25 @@ export function buildGround(ctx) {
   });
 
   /* planter spots the flora module fills — sparse, at the plaza edge and building aprons */
+  /* v6b: the plaza was planted at one planter per ~970 m2, and four of the six sat behind or beside the
+     arrival subject. The reference's plaza is flanked by trees the whole way in. `kind: 'tree'` asks the
+     flora module for its tree where it has one, and falls back to a planter where it does not. */
   ctx.planterSpots = [
     { x: -14, z: 24, size: 'medium', shape: 'round' }, { x: 14, z: 24, size: 'medium', shape: 'round' },
     { x: -30, z: 4, size: 'large', shape: 'box' }, { x: 30, z: 4, size: 'large', shape: 'box' },
-    { x: -22, z: -30, size: 'small', shape: 'box' }, { x: 22, z: -30, size: 'small', shape: 'box' }
+    { x: -22, z: -30, size: 'small', shape: 'box' }, { x: 22, z: -30, size: 'small', shape: 'box' },
+    /* the two avenues flanking the approach — the reference's most characteristic planting */
+    { x: -24, z: 18, kind: 'tree', size: 'large' }, { x: 24, z: 18, kind: 'tree', size: 'large' },
+    { x: -27, z: 8, kind: 'tree', size: 'medium' }, { x: 27, z: 8, kind: 'tree', size: 'medium' },
+    { x: -30, z: -3, kind: 'tree', size: 'large' }, { x: 30, z: -3, kind: 'tree', size: 'large' },
+    { x: -33, z: -14, kind: 'tree', size: 'medium' }, { x: 33, z: -14, kind: 'tree', size: 'medium' },
+    /* the plaza edge behind the arrival camera and out toward the corridors */
+    { x: -20, z: 32, kind: 'tree', size: 'medium' }, { x: 20, z: 32, kind: 'tree', size: 'medium' },
+    { x: -36, z: 26, kind: 'tree', size: 'large' }, { x: 36, z: 26, kind: 'tree', size: 'large' },
+    { x: -41, z: 6, kind: 'tree', size: 'medium' }, { x: 41, z: 6, kind: 'tree', size: 'medium' },
+    /* the courtyards the facilities' new spacing opened up */
+    { x: -40, z: -26, kind: 'tree', size: 'large' }, { x: 42, z: -30, kind: 'tree', size: 'large' },
+    { x: -30, z: -36, kind: 'tree', size: 'medium' }, { x: 32, z: -40, kind: 'tree', size: 'medium' }
   ];
 
   scene.add(g);
