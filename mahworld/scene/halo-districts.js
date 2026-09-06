@@ -771,18 +771,20 @@ export function buildHaloDistricts(ctx, opts = {}) {
         const pz = az + Math.sin(dth + Math.PI / 2) * side * 7.4;
         put('plat', chamferBox(2.0, 11, 2.0, 0.5), mat(px, pz, 5.5 + 2.5, rot), 0.90);
       }
-      /* THE KEYSTONE SITS ON ITS COLLAR PIERS, NOT ABOVE THEM. The piers span 2.5 to 13.5 (an 11 m
-         shaft centred at 8); a diamond at 20 with a 3.2 half-height floated 6.5 m clear of the thing
-         carrying it, which is the same "balanced rather than carried" failure mahascent corrected on
-         its own masts. 15.2 puts its lower pyramid down into the pier heads. */
+      /* THE KEYSTONE SITS ON ITS LINTEL, NOT ABOVE IT — and the number that matters is the diamond's
+         EQUATOR, not its lower vertex. An octahedron's bottom half is a thin taper that reads as
+         nothing; what the eye calls "the diamond" is the widest band. Placing the lower vertex just
+         above the lintel therefore still looks like a diamond floating three metres clear, which is
+         what the first two attempts produced. The equator goes 1.7 m over the lintel top and the
+         lower pyramid disappears INTO it, so the figure is carried. */
       const kd = own(new THREE.OctahedronGeometry(1, 0));
       for (const side of [-1, 1]) {
         const cx = ax + Math.cos(dth + Math.PI / 2) * side * 7.4;
         const cz = az + Math.sin(dth + Math.PI / 2) * side * 7.4;
         put('plat', chamferBox(3.2, 1.1, 3.2, 0.35), mat(cx, cz, 13.4, rot + 0.4), 1.0);
       }
-      put('plat', chamferBox(17.6, 1.3, 2.4, 0.4), mat(ax, az, 14.2, rot), 1.0);
-      put('plat', kd, mat(ax, az, 15.2 + 3.2, rot, 4.0, 3.2, 4.0), 1.0);
+      put('plat', chamferBox(2.4, 1.3, 17.6, 0.4), mat(ax, az, 14.2, rot), 1.0);
+      put('plat', kd, mat(ax, az, 16.55, rot, 4.0, 3.2, 4.0), 1.0);
       musicSites.push({ x: ax + Math.cos(dth) * 9, y: ay + 2.8, z: az + Math.sin(dth) * 9, ry: rot, scale: 3.0 });
       spawnPoints.push({ x: ax, z: az, kind: 'dock' });
     });
