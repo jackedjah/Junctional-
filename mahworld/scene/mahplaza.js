@@ -31,7 +31,7 @@ export const VIEWS = {
   'in-world':        { pos: [3.5, 1.9, 34],    look: [-1, 13, -66],    fov: 56, label: 'In-world', portrait: { pos: [3.5, 1.9, 34], look: [-1, 21, -66], fov: 60 } },
   'match-approach':  { pos: [1.4, 1.9, -16],   look: [0, 14, -66],     fov: 58, label: 'Toward MAH MATCH' },
   'match-entrance':  { pos: [0.4, 3.0, -50],   look: [0, 6.0, -78],    fov: 54, label: 'MAH MATCH entrance', portrait: { pos: [0.4, 3.4, -42], look: [0, 9.0, -78], fov: 58 } },
-  'gym-entrance':    { pos: [-25, 2.2, 5],     look: [-46, 6, -14],    fov: 56, label: 'MAH GYM entrance' },
+  'gym-entrance':    { pos: [-21, 2.4, 1],     look: [-46, 7, -14],    fov: 56, label: 'MAH GYM entrance' },
   'market-entrance': { pos: [27, 2.0, -14],    look: [50, 6.0, -36],   fov: 56, label: 'MAH MARKET entrance' },
   residents:         { pos: [2.2, 1.7, 20.5],  look: [-0.6, 1.2, 12],  fov: 50, label: 'Residents' },
   appearance:        { pos: [0.8, 2.7, 26],    look: [0.2, 1.3, 12],   fov: 52, label: 'Appearance check' },

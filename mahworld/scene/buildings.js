@@ -137,7 +137,7 @@ function broadCanopy(ctx, g, o) {
   const { M } = ctx;
   const { W, H, openH, floorY = 0, seed = 1 } = o;
   const struct = [], trim = [], dark = [];
-  const cw = W + 5.2, depth = 6.4, cy = floorY + openH + 1.9, segs = 22;
+  const cw = W + 5.2, depth = 4.6, cy = floorY + openH + 1.35, segs = 22;
   /* the canopy shell: a shallow arc swept across the frontage, built from segment planes so it is a
      CURVE and not a folded plate. Glass over, brushed fascia under. */
   const shell = [], soffit = [];
@@ -151,7 +151,12 @@ function broadCanopy(ctx, g, o) {
     soffit.push([cw - 0.5, 0.05, seg * 0.98, 0, cy + ym - 0.12, zm, -tilt]);
   }
   shell.forEach(([w, h, d, x, y, z, rx]) => part(struct, chamferBox(w, h, d, 0.04), x, y, z, 0, rx));
-  soffit.forEach(([w, h, d, x, y, z, rx]) => part(trim, chamferBox(w, h, d, 0.02), x, y, z, 0, rx));
+  /* the SOFFIT is lit, not plated. A canopy's underside faces the ground: a polished grade there mirrors
+     the dark floor and the entrance goes black. A luminous soffit is what makes an entrance premium. */
+  soffit.forEach(([w, h, d, x, y, z, rx]) => {
+    const pl = new THREE.Mesh(new THREE.PlaneGeometry(w, d), M.interiorSoft);
+    pl.position.set(x, y - 0.06, z); pl.rotation.x = Math.PI / 2 + rx; g.add(pl);
+  });
   /* the leading edge: one mirror-grade nosing running the full width — the canopy's bright line */
   part(trim, chamferBox(cw + 0.3, 0.2, 0.34, 0.07), 0, cy - 1.42, depth + 0.06);
   /* slim chromium columns carrying it, and their footings */
@@ -180,7 +185,9 @@ function terraces(ctx, g, o) {
   const { M } = ctx;
   const { W, H, D, E, seed = 3 } = o;
   const struct = [], trim = [], dark = [];
-  let w = W - 2.2, d = D * 0.82, y = H, zc = -(E + D / 2);
+  /* the first terrace sits just behind the front parapet, not deep in the roof: a terrace you cannot see
+     from the plaza is not a silhouette. Each one then steps BACK and IN from the one below. */
+  let w = W - 2.2, d = D * 0.34, y = H, zc = -(E + D * 0.12);
   for (let i = 0; i < 3; i++) {
     const th = 2.6 - i * 0.35;
     part(struct, chamferBox(w, th, d, 0.34), 0, y + th / 2, zc);
@@ -192,7 +199,7 @@ function terraces(ctx, g, o) {
     /* a planted trough along the terrace face, and two service volumes set back */
     part(dark, chamferBox(w * 0.72, 0.5, 0.7, 0.1), 0, y + th + 0.25, zc + d / 2 - 0.7);
     if (i < 2) for (const sd of [-1, 1]) part(dark, chamferBox(w * 0.16, 1.1, d * 0.2, 0.14), sd * w * 0.3, y + th + 0.55, zc - d * 0.28);
-    y += th; w *= 0.74; d *= 0.78; zc -= d * 0.06;
+    y += th; w *= 0.78; zc -= d * 0.62; d *= 0.92;
   }
   /* a light mast on the top terrace: the civic marker of the roof line */
   part(trim, new THREE.CylinderGeometry(0.07, 0.1, 4.6, 8), w * 0.2, y + 2.3, zc);
@@ -309,23 +316,29 @@ function facade(ctx, parent, o) {
    and one diamond roof beacon. The building stays a building; crystal is its surface language. */
 function crystallize(ctx, g, o) {
   const { M } = ctx;
-  const { W, H, D, openW, E, floorY = 0, seed = 1, beacon = true } = o;
-  const crystal = [], catches = [], deep = [];
+  const { W, H, D, openW, E, floorY = 0, seed = 1, beacon = true, crown: wantCrown = true } = o;
+  const crystal = [], catches = [], deep = [], crown = [];
   const pierW = (W - openW) / 2;
   const R = ((seed * 2654435761) % 1000) / 1000;
   /* CROWN: a tapered faceted cap — four angled planes stepping in toward the roof line, flat shaded so
      each plane takes its own value under the moon; the silhouette turns instead of stopping flat */
   const crownH = 1.9 + R * 0.6, inset = 1.5;
-  for (const [sx, sz, w, d] of [[0, 1, W - 1.2, 0], [0, -1, W - 1.2, 0], [-1, 0, 0, D - 1.2], [1, 0, 0, D - 1.2]]) {
+  if (wantCrown) for (const [sx, sz, w, d] of [[0, 1, W - 1.2, 0], [0, -1, W - 1.2, 0], [-1, 0, 0, D - 1.2], [1, 0, 0, D - 1.2]]) {
     const len = sx ? d : w;
     const geo = chamferBox(sx ? 1.5 : len, crownH, sx ? len : 1.5, 0.06);
     const px = sx * (W / 2 - 0.75), pz = sz ? (sz > 0 ? 0.4 : -(E + D) + 0.4) : -(E + D / 2);
-    part(crystal, geo, px, H + crownH / 2 - 0.2, pz, 0, sz ? sz * -0.22 : 0, sx ? sx * 0.22 : 0);
+    part(crown, geo, px, H + crownH / 2 - 0.2, pz, 0, sz ? sz * -0.22 : 0, sx ? sx * 0.22 : 0);
   }
   /* the crown's bright turn: a thin platinum cap band that only exists where the planes meet the sky */
-  part(catches, chamferBox(W - 2.4, 0.14, 0.5, 0.04), 0, H + crownH - 0.25, 0.2);
-  part(catches, chamferBox(0.5, 0.14, D - 2.4, 0.04), -W / 2 + 1.1, H + crownH - 0.25, -(E + D / 2));
-  part(catches, chamferBox(0.5, 0.14, D - 2.4, 0.04), W / 2 - 1.1, H + crownH - 0.25, -(E + D / 2));
+  if (wantCrown) {
+    part(catches, chamferBox(W - 2.4, 0.14, 0.5, 0.04), 0, H + crownH - 0.25, 0.2);
+    part(catches, chamferBox(0.5, 0.14, D - 2.4, 0.04), -W / 2 + 1.1, H + crownH - 0.25, -(E + D / 2));
+    part(catches, chamferBox(0.5, 0.14, D - 2.4, 0.04), W / 2 - 1.1, H + crownH - 0.25, -(E + D / 2));
+  } else {
+    /* no crown: the mass ends in a low mirror-grade parapet so whatever the module above it builds —
+       terraces, a tower — is what the silhouette actually shows */
+    part(catches, chamferBox(W - 0.8, 0.22, 0.42, 0.06), 0, H - 0.11, 0.16);
+  }
   /* ANGLED INSET CRYSTAL PANELS: shallow rotated facets recessed into each pier, in two courses.
      Their angle is what reads — each catches a different amount of moon and city glow. */
   const rows = Math.max(2, Math.round((H - floorY - 6) / 5.5));
@@ -355,6 +368,9 @@ function crystallize(ctx, g, o) {
     ctx.reflect(dia, 0.3);
     (ctx.beacons = ctx.beacons || []).push({ position: w, building: g.name });
   }
+  /* the crown is BRUSHED PLATINUM: its planes face up and out into a dark night sky, so a polished grade
+     would mirror that darkness and the building would end in a black hat. Brushed catches the hemisphere. */
+  merged(g, crown, M.platinumBrushed || M.composite, 'crystal-crown', true);
   merged(g, crystal, M.composite, 'crystal-panels', true);
   merged(g, catches, M.trim, 'crystal-catches', false);
   merged(g, deep, M.structural, 'crystal-structure', true);
@@ -391,7 +407,7 @@ export function buildBuildings(ctx) {
     /* one light seam on each outer pier: a single vertical energy line, not an outline */
     [-1, 1].forEach(s => { const seam = box(0.08, H * 0.62, 0.06, M.energy, s * (W / 2 - 1.0), H * 0.42, 0.46); g.add(seam); ctx.reflect(seam, 0.35); });
     /* signage on the lintel */
-    sign(ctx, g, { title: 'MAH GYM', sub: 'TRAIN HIGHER', mark: true, width: 14.5, y: 11.4, z: 0.62 });
+    sign(ctx, g, { title: 'MAH GYM', sub: 'TRAIN HIGHER', mark: true, width: 14.5, y: 11.9, z: 0.66 });
     /* interior: platforms, racks, a cable frame — readable, not a machine warehouse */
     const room = g.children.find(c => c.isGroup && c.position.z === -E);
     const plat = (x, z) => { const p = box(3.2, 0.3, 3.2, M.graphiteLight, x, 0.15, z); room.add(p); return p; };
@@ -493,11 +509,15 @@ export function buildBuildings(ctx) {
     g.position.set(S.x, 0, S.z); g.rotation.y = S.rotY; scene.add(g);
     const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, radius: S.radius, glassMullions: 4 });
     dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 3, windowsUpper: false, roofKit: false });   /* the civic market: wings and canopy, terraces instead of a roof kit */
-    crystallize(ctx, g, { W, H, D, openW, E, seed: 3, beacon: false });
+    crystallize(ctx, g, { W, H, D, openW, E, seed: 3, beacon: false, crown: false });   /* the terraces ARE the roof line */
     terraces(ctx, g, { W, H, D, E, seed: 3 });
     action('market', 'MAH MARKET', 'destination', f.glass, world(g, 0, 0, 2), { view: 'market-entrance', copy: 'World marketplace. Preview navigation only: nothing is for sale here and no prices exist.' });
     /* a soft continuous sill light under the glass — the welcome line */
     const sill = box(openW, 0.05, 0.08, M.energyLight, 0, 0.06, -E + 0.3); g.add(sill); ctx.reflect(sill, 0.3);
+    /* a lit fascia band under the entry canopy: the market is the WELCOMING destination, and it reads as
+       lit architecture from the plaza rather than a dark hole under a bright lip */
+    const fascia = new THREE.Mesh(new THREE.PlaneGeometry(openW + 1.6, 0.7), M.interiorSoft);
+    fascia.position.set(0, openH + 0.75, 0.58); g.add(fascia);
     /* name only: the concept's sub-line ("… NUTRITION …") is not verified and is omitted */
     sign(ctx, g, { title: 'MAH MARKET', mark: true, width: 15.5, y: 11.4, z: 0.62 });
     /* interior: shelving zones with abstract merchandise, two display plinths */

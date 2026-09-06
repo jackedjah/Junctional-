@@ -13,32 +13,46 @@ tree when written; the revision at the bottom says when.
   never pushed**: the branch carries the full MAHFITT application source and the
   repository is public. Publishing it is a separate, explicit decision.
 - Other checkouts on this machine (not touched): `.claude/worktrees/agent-a5e618…`
-  (`963b292`) and `.claude/worktrees/agent-af917…` (`4915fac`), both renderer-branch
-  worktrees from earlier agent work.
+  and `.claude/worktrees/agent-af917…`, both renderer-branch worktrees from
+  earlier agent work.
 
-## v4 — AAA closure and the luminous crystalline night (current)
+## v5 — the chromium city (current)
 
-The scene is no longer three buildings on an empty floor. It is a lit district with a
-designed plaza, a living population, an engineered combat hall, diamond clouds and
-FOBEAM infrastructure carrying square-diamond packets.
+MAHWORLD is now a civilization built from chromium, dark platinum, polished
+crystal, reflective glass, a diamond facet language and MAHGIC light. A finish
+is a **roughness, not a hue**: five grades — mirror, satin, brushed, graphite,
+crystalline glass — are the same cool neutral metal at five polishes, ranked by
+how much of the world may wear each. Mirror is rare and focal; graphite is
+everywhere.
 
-| Module (all optional, all guarded) | What it adds |
+| What v5 changed | Where |
 | --- | --- |
-| `city.js` | midground blocks with window grids, bridges, a long walkway, background crystalline towers, distant giants, a rail pod, an elevator |
-| `plaza-dressing.js` | inlaid routes with curb lips, two gathering nodes, ten light masts, rails, bollards, benches, an info pylon, a shelter |
-| `match-interior.js` | the engineered MAH MATCH hall with the two entrance actions mounted in architecture |
-| `clouds.js` | layered diamond clouds: soft masses with crystalline internal planes lit by the moon |
-| `fobeam.js` | 5 routes, 23 travelling square-diamond packets, endpoint receivers, real occlusion; distinct FOBLOW ribbons |
-| `life.js` + `effects.js` | walkers, groups, building entries, eight ambient events with cooldowns, pooled MAHGIC effects |
+| the finish-grade family, two new procedural maps (brushed streaks, the diamond floor), every neutral a step up out of near-black | `materials.js` |
+| the plaza floor became the HERO surface: nine-metre chromium diamond cells with chamfered bevels and mirror-grade joint catches, laid as a **deck** everything else stands on | `ground.js` |
+| the three destinations at three depths with three silhouettes — broad glazed canopy / civic terraces / a dominant tower — from one exported `SITES` plan the ground, paths and crowd all read; no un-bevelled 90° corners anywhere | `buildings.js` |
+| twelve megatalls at 214–392 m with three new crowns, on overlapping radii for height parallax | `city.js` |
+| forty FOBEAM hairlines in near / mid / far tiers, the far tier generated along a band across the sky as one luminous river of energy | `fobeam.js` |
+| diamond clouds hold more of the sky; their crystalline catches are stronger | `clouds.js` |
+| the environment map carries the district itself, so chromium has a city to reflect | `mahplaza.js` |
+| premium lamps, wayfinding blades, planted plinths, a second shelter, utility columns; nothing in the central sight lines | `plaza-dressing.js` |
+| detail tiers, `createImpostor()` and `setLOD()` — the gap v4's header claimed but did not have | `residents.js`, `life.js` |
 
-Night lighting was rebuilt so the world is filled with controlled light while staying deep:
-moon key 1.35 with shadows, hemisphere 1.5, city-bounce fill 0.66, environment 0.92 with a
-horizon glow band, neutrals raised with higher `envMapIntensity`, platinum trims at
-`envMapIntensity` 1.9.
+Contracts: `mahworld/scene/CONTRACTS_V5.md` (v5 additions) and
+`CONTRACTS_V4.md` (the module contract and the standing laws).
 
-`world.advance(seconds)` runs the world deterministically for validation. Headless browsers
-throttle animation frames to under one per second, so evidence could not otherwise observe
-ambient life; it drives the same step function a browser runs.
+## The v4 foundation underneath it
+
+The scene has been a lit district since v4: `city.js` (midground blocks,
+bridges, a walkway, background towers, distant giants, a rail pod, an elevator),
+`plaza-dressing.js`, `match-interior.js`, `clouds.js`, `fobeam.js`, and
+`life.js` + `effects.js` (walkers, groups, building entries, an eight-event
+ambient scheduler with cooldowns, pooled MAHGIC effects). Every module is
+optional and guarded: the assembly imports it if the file exists.
+
+`world.advance(seconds)` runs the world deterministically for validation.
+Headless browsers throttle animation frames to under one per second, so evidence
+could not otherwise observe ambient life; it drives the same step function a
+browser runs.
 
 ## What runs today (latest viewable result)
 
@@ -46,63 +60,39 @@ ambient life; it drives the same step function a browser runs.
   (three@0.185.1 vendored in `mahworld/vendor/three/`, byte-identical to the
   renderer branch's copy). Serve the repo root with any static server and open
   the page; phone portrait or desktop. Full instructions: `mahworld/scene/README.md`.
-- Evidence of the running scene: `validation/mahworld/mahplaza-v3/` (this slice),
-  `validation/mahworld/mahplaza-v2/` (baseline before this slice),
-  `validation/mahworld/phase0/` (control-deck bridge), `validation/mahworld/arrival-gate/`.
-- Static review: `validation/mahworld/mahplaza-v3/Review.html` (relative assets;
-  REFERENCE / BASELINE / AFTER labelled).
+- Evidence: `validation/mahworld/mahplaza-v5/` (this pass),
+  `validation/mahworld/mahplaza-v4/` (the crystalline-night baseline),
+  `validation/mahworld/mahplaza-v3/`, `validation/mahworld/phase0/`.
+- Static review: `validation/mahworld/mahplaza-v5/Review.html`
+  (relative assets; REFERENCE / BASELINE / AFTER labelled).
 
-## Owners changed by this slice (all under `mahworld/scene/` unless noted)
+## Laws kept
 
-| File | Change |
-| --- | --- |
-| `materials.js` | fabricated dumbbell / fist / cart glyphs removed; signage carries a reserved square-diamond mark slot and truthful text only; glare reduced (emissive, additive opacity, reflection); live `retheme()`; `setDiagnostic()` |
-| `buildings.js` | MAH MATCH copy `MAH MATCH / MATCHES · PRACTICE`, two entrance actions `FIND AN OPPONENT` + `PRACTICE WITH A BUDDY` (three-panel wayfinding removed); central ramp through the steps; MAH MARKET subtitle removed; action targets registered for tap navigation |
-| `residents.js` | dark facial chamber with friendly eyes and mouth; `silver`; per-entity `recolour()`; stable ids; `guard` pose with drivable arms for the practice preview; teardrop law unchanged |
-| `flora-and-vehicles.js` | square-diamond leaf (square rotated in-plane, thin depth); sparser planters; live `setTheme()` |
-| `sky.js` | live `setTheme()`; halo / beam glare reduced |
-| `mahplaza.js` | world Theme, local avatar and remote avatars independent (`setWorldTheme`, `setSelfAppearance`, `setRemoteAppearance`, `describeAppearance`, `samplePixels`); tap vs drag; preview navigation; honest opponent state; scripted practice preview with clean exit; diagnostic mode; teardown |
-| `mahplaza.html` | live controls, no debug overlay in the standard preview (`?debug=1` only), route back to the MAHFITT control deck |
-| `tests/mahworld-mahplaza-capture.js` | v3 proof set, same-camera theme checks with state + pixel evidence, diagnostic, recordings, `Review.html` |
-| `tests/mahworld-mahplaza-laws.test.js` | static scene-law test (new) |
-| `MAHWORLD_PHASE0_FOUNDATION.md` §26a, `mahworld/scene/README.md`, `mahworld/scene/REFERENCE_MANIFEST.md` | documentation |
-
-MAHFITT app files, `mahworld/mahworld-domain.js`, `mahworld/mahworld-shell.js`,
-`mahworld/mahworld-menu.css`, `netlify/`, `sw.js`, cache stamps: **unchanged**.
-
-## Stage status (build sequence P0–P12 of the brief)
-
-| Stage | Status | Where |
-| --- | --- | --- |
-| P0 state + manifest | DONE | this file, `mahworld/scene/REFERENCE_MANIFEST.md` |
-| P1 residents (faces, silver, recolour, ids, guard) | DONE | `residents.js` |
-| P2 signage / MAH MATCH actions / ramp / MARKET copy | DONE | `buildings.js`, `materials.js` |
-| P3 glare + diagnostic view | DONE | `materials.js`, `sky.js`, `mahplaza.js` (`setDiagnostic`) |
-| P4 three appearance owners + same-camera checks | DONE, PROVEN | `mahplaza.js`; `capture.json.checks`, `v3-check-*.png` |
-| P5 tap navigation, honest opponent state, practice preview + clean exit | DONE, PROVEN | `mahplaza.js`; `v3-practice-*.png`, `v3-practice-preview.webm` |
-| P6 plants / craft / population density | DONE | `flora-and-vehicles.js`, `mahplaza.js` |
-| P7 camera look / move / reduced motion / teardown | DONE | `v3-camera-movement.webm` |
-| P8 proof set + Review.html | DONE | `validation/mahworld/mahplaza-v3/` |
-| P9 15-minute soak | DONE (15.5 min, concurrent with the capture) | `soak.json` |
-| P10 tests + release gate | DONE | laws 27/27, clock 12/12, Phase 0 96/96, R85A gate PASS on a clean snapshot |
-| P11 scoped commit, package, private artifact | DONE (see the bottom line) | commit on the local branch; `MAHPLAZA_FABLE_VISUAL_SLICE_<rev>.zip` |
-| P12 push / deploy | NOT DONE by design | public repository; full MAHFITT source on the branch |
-
-Visual gates A–H with evidence: `validation/mahworld/mahplaza-v3/gates.json` (rendered in `Review.html`).
+- `world-clock.js` is the one owner of world time.
+- Three independent appearance owners — world Theme, local avatar, each remote
+  avatar. No global tint, filter, overlay or material overwrite.
+- The species law: square-diamond head with a dark facial chamber, humanoid
+  upper body, ONE continuous lower teardrop, no legs, one colour per resident —
+  identical at every detail tier.
+- Blue-white light only; MAH MATCH's red accent is the one exception.
+- No audio, no network, no HUD in the world, no invented product copy, no
+  fabricated marks, no fake players, no "opponent found".
 
 ## Known blockers and dependencies
 
-- Push / publish of this branch: blocked by design (public repository, full MAHFITT source).
-  Delivery is by commit + package ZIP + private artifact.
-- Headless Chromium here runs software GL (SwiftShader): frame times in `capture.json`
-  are not phone numbers; draw calls and triangles are.
-- No live multiplayer, matchmaking, commerce or progression exists; every "other player"
-  in the scene is a labelled local fixture.
+- Push / publish of this branch: blocked by design (public repository, full
+  MAHFITT source). Delivery is by commit + package ZIP + private artifact.
+- Headless Chromium here runs software GL (SwiftShader): frame times in
+  `capture.json` are not phone numbers; draw calls and triangles are.
+- No live multiplayer, matchmaking, commerce or progression exists; every
+  "other player" in the scene is a labelled local fixture.
+- The reserved square-diamond mark slot on the three signs is still empty: no
+  verified FOB or MAHFITT mark file has been supplied.
 
 ## Next exact action
 
-Review `validation/mahworld/mahplaza-v3/Review.html`; decide on the reserved
-mark slot (supply official FOB / MAHFITT mark files, or keep text-only signage);
-then the next slice is the interior walk-in for one destination.
+Review `validation/mahworld/mahplaza-v5/Review.html` at phone size. The open
+decision is still the reserved mark slot — supply official FOB / MAHFITT mark
+files, or keep the signage text-only.
 
-_Revision: started on `9315031`; this version is the one committed with the slice — `git log -1 -- CURRENT_STATE.md` names it. Working tree clean at that commit; branch local, unpushed._
+_Revision: this version is the one committed with the v5 pass — `git log -1 -- CURRENT_STATE.md` names it. Branch local, unpushed._
