@@ -130,7 +130,10 @@ sector architecture, viewer-following tile field) · `halo-districts.js` (eight 
 pier, concourse spine, overlooks, event tiles, the ring's own light pools) · `roam.js` (analytic
 surfaces, two-storey bounds) · `mahplaza.js` (build order, hook lists, `roam.setSurfaces`/
 `setBounds`, altitude-dependent frustum and fog, MAH NAV entries, `setHaloState`) · `mahascent.js`
-(publishes `stats.sites`) · `tests/mahworld-r4-laws.test.js`.
+(publishes `stats.sites`) · `halo-life.js` (item 16: the population — authored nodes, promenade
+field, ring strollers, rails read from `halo-districts.stats.overlookSites`) · `halo-threshold.js`
+(item 19: hold, narrowing causeway, tile run-out, gate, launch gantry, cloud shelf) ·
+`tests/mahworld-r4-laws.test.js`.
 
 **Budget.** halo 7 draws / 127k tris · districts 10 draws / 29k tris · 64 pylons · 676 near tiles ·
 12 overlooks · 63 ring pools. A standing view on the ring: ~310 draws / ~377k triangles, against the
@@ -156,6 +159,38 @@ plaza's ~1800 / ~1.2M.
     eight. Crystal growths dark-on-dark → a platinum crown. HALO TABLE's 4.6 m kiosks over a 300 m
     span → a 168 m serving canopy, L53's answer at district scale.
 
+**Item 16, and what putting the camera at body scale cost.** Every capture until `hC` framed the
+ring from 50–90 m, where a 2.0 m species is a coloured pawn and nothing about it can be judged. At
+12–30 m three things failed at once and none of them was visible in a stats line:
+
+| failure | what the frame showed | the fix |
+| --- | --- | --- |
+| the ring is not inhabited | 83 figures on a 12,900 m circumference — one person per 155 m — so the district-to-district view R4's proof requires read as empty plate | nodes raised where a node is a density; a FIELD in the promenade bands either side of each built core; 132 strollers around the whole ring. The gate is now people-per-km, not a count. |
+| the head was a box | `chamferBox` is a box: a pale carton on a torso, with nothing of the brand figure at the one scale a viewer meets it | the four-segment lathe residents.js already uses — a square standing on its corner — plus the neck residents drops only at its own far tier, and the dark facial chamber |
+| the arms were crossbars | built centred, an arm rotates about its own middle: the swing lifts the top above the shoulder while the bottom flares away | the geometry hangs from the shoulder, and the pose angles came down with it (widest gesture 0.34 rad, was 0.55) |
+
+Two placement corrections came with them. FORUM's amphitheatre photographed EMPTY because every
+figure stood at `haloHeight(x, z)` while its tiers stand 1.5–6.9 m proud — so `NODES` carries a
+LIFT, read off the tread geometry rather than guessed. And a `rail` node at (deg −90, s 0) put two
+people against a rim wall 21 m from the nearest bay, because this file had no way to know ARRIVAL's
+overlooks are at s = ±60: `halo-districts` now publishes `stats.overlookSites` from inside
+`P.overlook` itself, and every rail is read off that (L42, again).
+
+**Item 19 — the threshold.** R4 asks for a transition that is both CLEAR and SPECTACULAR, which pull
+against each other: a door in a wall is clear and dull, a horizon is spectacular and says nothing.
+So it is a sequence at bearing −67.5° (the open plate between ARRIVAL and COMMONS, which puts
+departure beside arrival and radially opposite it): a hold at r 2200 → a 940 m causeway that narrows
+from 30 m to 16 m while its masts grow → a run-out where the tiling breaks into stepping plates with
+widening gaps → the largest square-diamond gateway in the sanctuary at r 3300 → a gantry cantilevered
+past the outer rim into an open launch ring.
+
+*Distinctness is arithmetic, not atmosphere.* Bringing the weather onto the ring is the cheap way to
+make this feel spectacular and it would fail R4's "Sky Realm stays distinct" on the first frame. So
+near the rim every cloud top sits 62 m BELOW the walking surface — you look down into the biome from
+a tiled floor — and only past a third of the way out does it rise above it. The module publishes
+that number and the law suite asserts it from the built geometry. (The plaza's own clouds are a
+different body: `clouds.js` runs at y 215–560 to clear the city's skyline, 1.2 km below this.)
+
 **Open.**
 - **The downward world view is thin at night.** R4 gives it a clause. From 1836 m the world below is
   mostly unlit terrain; the plaza and city are ~23 px and ~160 px respectively. Needs either a
@@ -163,7 +198,8 @@ plaza's ~1800 / ~1.2M.
 - **The extreme view shows the halo over an empty world.** MAHWORLD's built terrain stops at r 1500
   and the halo reaches 3400, so from outside the shell floats over blue. Either the world ring
   extends or the extreme camera stays inside it.
-- R4 order items 15–21, including the Sky Realm transition (item 19).
+- R4 order items 20 (360 / far-zoom / iPhone / performance closure) and 21 (the three-largest-
+  failures loop). Items 15–19 are built and wired.
 - Carried from R3: the far-zoom lock (the mountain ring still hides both peer cities), #101 floor
   shards, #102 transport wiring, #105 flora needles, #106 broadcast monitor.
 

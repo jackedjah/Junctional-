@@ -351,6 +351,112 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
      caught itself doing (L60). They stay render-judged until the buckets carry group ranges. */
 
   /* ============================================================================================
+     7b. ITEM 16 — THE POPULATION, and item 19 — THE THRESHOLD.
+
+     Both of these produced defects that no stats line could show and that a render only revealed
+     once the camera was in the right place, so what is checkable here is checked here.
+
+     The POPULATION gates are density and placement. R4's curvature proof ends on
+     "district-to-district view feels INHABITED", and 83 figures on a 12,900 m circumference is one
+     person per 155 m — a number that looked fine in a stats line and read as an empty plate in the
+     frame. So the gate is people-per-kilometre-of-ring, not a raw count. And every RAIL figure has
+     to be standing on an overlook that halo-districts actually built: the first cut put two people
+     at (deg -90, s 0) where ARRIVAL has no bay, leaning on a rim wall 21 m from open air.
+
+     The THRESHOLD gate is R4's acceptance clause "Sky Realm stays distinct", and it is arithmetic
+     rather than atmosphere: near the rim the cloud must top out BELOW the walking surface, and far
+     out it must rise above it. Measured from the built cloud geometry, not from the constants that
+     were supposed to produce it.
+     ============================================================================================ */
+  const life = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const H = await import('/mahworld/scene/halo.js');
+    const L = w.haloLife; if (!L) return null;
+    const D = w.haloDistricts && w.haloDistricts.stats;
+    const sites = (D && D.overlookSites) || [];
+    /* every rail figure's distance to the nearest built overlook rail */
+    const rails = (L.people || []).filter(p => p.kind === 'rail');
+    let worst = 0;
+    for (const r of rails) {
+      let best = Infinity;
+      for (const S of sites) {
+        const th = S.deg * Math.PI / 180 + S.s / H.HALO.R_MID;
+        best = Math.min(best, Math.hypot(r.x - Math.cos(th) * S.rail, r.z - Math.sin(th) * S.rail));
+      }
+      worst = Math.max(worst, best);
+    }
+    return {
+      wired: !!w.modules.haloLife, figures: L.stats.figures, draws: L.stats.draws,
+      triangles: L.stats.triangles, districts: Object.keys(L.stats.byDistrict).length,
+      perKm: L.stats.figures / (2 * Math.PI * H.HALO.R_MID / 1000),
+      rails: rails.length, overlooks: sites.length, worstRail: worst
+    };
+  });
+  console.log('\nR4-16 — the social life on the ring');
+  if (!life || !life.wired) P('halo-life is built and wired', false, 'module absent');
+  else {
+    P('halo-life is built and wired', true);
+    P('the ring carries at least 30 figures per km of midline',
+      life.perKm >= 30, life.figures + ' figures = ' + life.perKm.toFixed(1) + '/km');
+    P('all eight districts are inhabited', life.districts >= 8, life.districts + ' keys');
+    /* the whole point of part-major instancing: a population costs draws like a prop, not like a cast */
+    P('the population still costs under 10 draws', life.draws < 10, life.draws + ' draws');
+    P('every rail figure stands at an overlook that was built',
+      life.overlooks > 0 && life.worstRail < 6,
+      life.rails + ' rails, ' + life.overlooks + ' bays, worst ' + life.worstRail.toFixed(1) + ' m');
+  }
+
+  const thr = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const H = await import('/mahworld/scene/halo.js');
+    const T = w.haloThreshold; if (!T) return null;
+    const g = w.scene.getObjectByName('halo-threshold-cloud');
+    const rimY = H.haloHeight(H.HALO.R_OUT, 0);
+    let nearTop = -Infinity, farTop = -Infinity, nearest = Infinity;
+    if (g) {
+      const A = g.geometry.attributes.position;
+      for (let i = 0; i < A.count; i++) {
+        const x = A.getX(i), y = A.getY(i), z = A.getZ(i), r = Math.hypot(x, z);
+        nearest = Math.min(nearest, r);
+        if (r < 4100) nearTop = Math.max(nearTop, y);
+        if (r > 4600) farTop = Math.max(farTop, y);
+      }
+    }
+    const nav = (w.navSites ? w.navSites() : []).filter(s => /^halo-(threshold|skygate|flightline)$/.test(s.id));
+    return {
+      wired: !!w.modules.haloThreshold, stats: T.stats, rimY, nearTop, farTop, nearest,
+      /* HALO's own outer limit, read from the module rather than restated here */
+      ringEdge: H.HALO.R_OUT + H.HALO.APRON,
+      hasCloud: !!g, nav: nav.map(s => s.id),
+      /* the causeway has to actually narrow, or "clear" is a claim rather than a shape */
+      narrows: T.stats.causeway ? T.stats.causeway.wOut < T.stats.causeway.wIn : false,
+      gantryPastRim: T.stats.gantry ? T.stats.gantry.outer > H.HALO.R_OUT + H.HALO.APRON : false
+    };
+  });
+  console.log('\nR4-19 — the sky realm threshold');
+  if (!thr || !thr.wired) P('halo-threshold is built and wired', false, 'module absent');
+  else {
+    P('halo-threshold is built and wired', true);
+    P('the causeway narrows as it runs out', thr.narrows,
+      thr.stats.causeway ? thr.stats.causeway.wIn + ' m -> ' + thr.stats.causeway.wOut + ' m' : 'no causeway');
+    P('the run-out breaks the tiling into discrete plates', thr.stats.plates >= 6, thr.stats.plates + ' plates');
+    P('the gantry cantilevers past the outer rim', thr.gantryPastRim,
+      thr.stats.gantry ? 'to r ' + thr.stats.gantry.outer : 'no gantry');
+    P('the cloud biome exists', thr.hasCloud && thr.stats.cloudMasses >= 20, thr.stats.cloudMasses + ' masses');
+    /* SKY REALM STAYS DISTINCT: below the deck near the rim, above it far out */
+    P('near the rim the cloud tops out BELOW the walking surface',
+      thr.hasCloud && thr.nearTop < thr.rimY,
+      'cloud ' + thr.nearTop.toFixed(0) + ' vs deck ' + thr.rimY.toFixed(0));
+    P('far out the cloud rises ABOVE it, so there is somewhere to go',
+      thr.hasCloud && thr.farTop > thr.rimY + 100,
+      'cloud ' + thr.farTop.toFixed(0) + ' vs deck ' + thr.rimY.toFixed(0));
+    P('no cloud mass reaches back over the ring itself',
+      thr.hasCloud && thr.nearest > thr.ringEdge,
+      'nearest mass at r ' + thr.nearest.toFixed(0) + ', ring edge ' + thr.ringEdge);
+    P('MAH NAV carries all three threshold stops', thr.nav.length === 3, thr.nav.join(', '));
+  }
+
+  /* ============================================================================================
      8. THE NaN SWEEP — L56. A mesh whose positions are NaN does not error, does not warn twice, and
      does not draw: `halo-rims` lost all 205,824 of its vertices to one undefined scale argument and
      the only trace was a single console line at the end of a capture. This walks every geometry in

@@ -882,6 +882,88 @@ theme, time), restore it. And when two measurements come back identical, treat t
 | Universal music-line motif (R2 §10/§11) — built ONCE, nothing else may hand-roll a bar graph | `musicline.js` |
 | Free movement: the viewer's own camera | `roam.js` (position, gears, collide-and-slide, input state); `mahplaza.js` owns the handover |
 
+## L61 — A capture distance is a lens on defects, and every distance hides a different set
+**Where it bit.** Every MAH HALO capture until `hC` framed the ring from 50–90 m, because that is
+the distance at which architecture reads. Moving the camera to 12–30 m — MAHBEING scale, the
+distance a person walking the ring is actually at — surfaced **three separate defects in one
+frame**, none of them new and none of them visible from 60 m: the head was a plain box, the arms
+were crossbars, and 83 figures on a 12,900 m circumference read as an empty plate.
+
+**The mechanism.** Angular size. A 0.38 m head slab at 60 m subtends 0.36°; at 12 m it subtends
+1.8°, which is five times the linear resolution and twenty-five times the pixel area. Everything
+about the species below that threshold was invisible-by-arithmetic, so no amount of judging the old
+renders more carefully would have found it.
+
+**The rule.** Every population, prop family and material has a *design distance* — the range a
+viewer meets it at. Capture at THAT distance, not at the distance the surrounding architecture
+wants. When a module's subject is 2 m tall, a 60 m camera is not a wide shot of it; it is a shot of
+something else with it in the background.
+
+---
+
+## L62 — A limb built centred rotates about its middle, and the top goes the wrong way
+**Where it bit.** `halo-life.js` built an arm as `chamferBox(w, len, d)` — centred on its own
+origin, like every other solid in this project — and placed the instance at shoulder height. Rotating
+it outward then lifted the *top* of the bar above the shoulder while the bottom flared away, so the
+dance floor photographed as a field of scarecrows. The compensation had already been baked in: the
+pose table carried `armOut: 0.55`, a number that only looked right because half the bar was
+travelling in the wrong direction.
+
+**The mechanism.** For a box, geometry origin = centre. For a LIMB, the origin has to be the JOINT.
+`geometry.translate(0, -halfLength, 0)` after building is the whole fix, and the pose angles then
+come down to what they should have been all along (0.34 rad for the widest gesture in the
+sanctuary).
+
+**The rule.** Anything that swings — arm, mast head, hinged panel, boom — has its geometry
+translated so the pivot is at the origin, at build time. And when a rig's angles look large in the
+table, suspect the pivot before tuning the angle: a wrong pivot always presents as an angle that
+"needs" to be extreme.
+
+---
+
+## L63 — chamferBox is a box, and the brand figure is not
+**Where it bit.** The far-tier MAHBEING's head was written as `chamferBox(0.19*S*2, 0.215*S*2,
+0.20*S*2)` with a comment calling it "the square-diamond SLAB". It is a rectangular box with
+bevelled edges, and at 12 m it photographed as a pale carton balanced on a torso — the one element
+of the species that carries the MAHWORLD square-diamond identity, rendered as the one shape that
+has none of it.
+
+**The mechanism.** `residents.js` does not build that head as a box either: it *lathes* it over FOUR
+segments, which in front view is a square standing on its corner. `CylinderGeometry(1, 1, 1, 4)`
+gives the same four segments for free, and `rotateX(π/2)` puts the diamond in the frontal plane with
+the depth running back — the authority's own construction, at one primitive.
+
+**The rule.** When a comment names a shape from the brand language, check that the primitive under it
+is that shape. And when a far tier of an existing thing is written, quote the authority's
+CONSTRUCTION and not just its dimensions — copying `headW/headH/headD` into a box reproduced the
+numbers and lost the figure.
+
+---
+
+## L64 — A population is not a composition, and a stats line cannot tell you which you have
+**Where it bit.** `halo-life.js` shipped 83 figures across 24 authored nodes: a dance floor, three
+seated rows, conversation circles, a crowd at the stage. Every one of them was placed for a reason
+and the stats line — `figures: 83, nodes: 24, byDistrict: {…}` — read as a healthy system. The wide
+frame read as an empty plate, because 83 figures on a 12,900 m circumference is **one person per
+155 m**.
+
+**The mechanism.** Authored groups are a COMPOSITION: they say what is happening. A population is a
+DENSITY: it says the place is used. A composition with no population behind it is a cast standing in
+an empty theatre, and no count of cast members fixes it — only the density does.
+
+**The rule.** For anything that has to feel inhabited, the gate is a density against the world's own
+extent (people per km of ring, per hectare of plaza), never a raw count — and the test asserts the
+density, so the number cannot look healthy while the frame is empty. Build both layers: the authored
+groups for what is happening, and a deterministic field plus through-traffic for everyone else.
+
+**The trap inside the fix.** A field figure placed at a random point inside a district stands at
+`haloHeight(x, z)` — the shell — and is buried in whatever furniture is over it, which is the
+empty-auditorium defect again with more figures. Absent a `heightAt()` for the furniture, the field
+goes in the PROMENADE BANDS either side of each built core, where a lift of zero is not an
+assumption.
+
+---
+
 ## Standing diagnostic harness (scratchpad)
 
 | Tool | Purpose |
