@@ -322,7 +322,16 @@ export function buildHalo(ctx) {
                two reads as finer plating around you rather than as an error. */
   const deck = (M.paving || M.graphite || new THREE.MeshStandardMaterial({ color: 0x0b0f16 })).clone();
   deck.name = 'halo-plate'; deck.vertexColors = false;
-  deck.roughness = 0.62; deck.envMapIntensity = 0.55; deck.roughnessMap = null;
+  /* MEASURED, not chosen. The standing view's plate bands read 165 / 168 / 158 at the first cut
+     (the near tiles, which are correct, read 21-26). Restoring §07's floor law on the terraces took
+     them to 99 / 91 / 116 — most of the failure — and the rest is the ENVIRONMENT REFLECTION, which
+     is the part a "darker" value cannot touch: a vertex colour multiplies the base colour, and at
+     grazing incidence Fresnel drives the specular term to 1 whatever the base colour is. The only
+     three knobs on that term are roughness, metalness and envMapIntensity, so those are what move.
+     §07 asks for near-black and REFLECTIVE; at 0.22 the plate still returns the world, it just no
+     longer mirrors the horizon across two kilometres — which leaves the laser lines and the platinum
+     edges as the brightest things on the ring, exactly as the reference has it. */
+  deck.roughness = 0.78; deck.envMapIntensity = 0.22; deck.roughnessMap = null;
   applyHaloGrid(deck, {});
   owned.materials.push(deck);
 
@@ -672,7 +681,11 @@ export function buildHalo(ctx) {
   /* ---- the animation contract (R4's states), driven from setState -----------------------------
      One uniform pair carries every state, because R4 asks for states that are "restrained
      reusable", and eight bespoke animation paths is the opposite of that. */
-  const gridMats = [deck, under];
+  /* EVERY material carrying the grid, including the near tiles. Leaving tileMat out of this list is
+     the silent failure this file is one edit away from at all times: setTime/setTheme/update would
+     drive the shell and the underside while the 676 tiles under the viewer's feet kept a stale line
+     colour and a frozen breath — the one part of the sanctuary nobody could miss. */
+  const gridMats = [deck, tileMat, under];
   let quiet = false, state = 'BASE_IDLE', bandPhase = 0;
 
   return {
@@ -721,8 +734,10 @@ export function buildHalo(ctx) {
       nearNodes.visible = !low;
       /* §19: at the low tier the MICRO grid goes first — it is the scale nobody can see from
          standing height anyway, and it is the most expensive per pixel */
-      const u = deck.userData.haloUniforms;
-      if (u) u.uHaloGain.value.x = low ? 0 : 0.10;
+      const ud = deck.userData.haloUniforms;
+      if (ud) ud.uHaloGain.value.x = low ? 0 : 0.10;
+      const ut = tileMat.userData.haloUniforms;
+      if (ut) ut.uHaloGain.value.x = low ? 0 : 0.16;
     },
     dispose() {
       owned.geometries.forEach(g => g.dispose());

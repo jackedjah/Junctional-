@@ -1425,6 +1425,19 @@ export async function createMahplaza(canvas, options = {}) {
     navDestinations: () => navDest().map(d => ({ id: d.id, label: d.label, sub: d.sub })), navGoto,
     setDiagnostic, setQuality, get quality() { return quality.name; }, qualities: Object.keys(QUALITY), advance,
     setRoam, setRoamMode, roam,
+    /* R4's ANIMATION STATES — BASE_IDLE, EVENT, MUSIC_ACTIVE — reach the sanctuary through here and
+       nowhere else. The renderer deliberately does not listen to audio: MAH PLAYER is the world's
+       one music owner and the standing constraint forbids a second AudioContext, so the page drives
+       this from the player it already has. Default BASE_IDLE, which is a slow breath and not a
+       blink. Returns the state actually set, or null if the halo did not build. */
+    setHaloState(s) {
+      let out = null;
+      if (haloDistricts && haloDistricts.setState) { try { out = haloDistricts.setState(s); } catch (e) {} }
+      if (halo && halo.setState) { try { halo.setState(s); } catch (e) {} }
+      requestRender();
+      return out;
+    },
+    get haloDistrictList() { return haloDistricts ? haloDistricts.districts : []; },
     travelTo, travelCancel, travel, travelDestinations: () => Object.keys(travelDest),
     /* validation: pin or release world time */
     setTime(spec) { if (spec == null || spec === 'live') clock.release(); else clock.freeze(spec); applyTime(true); requestRender(); return clock.state(); },

@@ -129,7 +129,7 @@ export function buildHaloDistricts(ctx, opts = {}) {
      between the two. Left at the plaza's own r0.34 the STAGE's 100 x 44 m deck and FORUM's 150 m
      treads mirror the horizon the same way the shell did, at a smaller scale but from the same
      standing eye. Three grades over sixty times the span is the ladder, not one number. */
-  darkMat.roughness = 0.44; darkMat.envMapIntensity = 0.95;
+  darkMat.roughness = 0.52; darkMat.envMapIntensity = 0.45;
   owned.materials.push(darkMat);
   /* R4's VISUAL SEPARATION list puts TRANSMISSION second, right after silhouette. The overlooks and
      the display surfaces are the only transmissive thing up here, which is what makes an overlook
@@ -176,19 +176,24 @@ export function buildHaloDistricts(ctx, opts = {}) {
      asks for wherever a floor needs an edge: the horizontal you walk on stays near-black, and the
      bright metal is the frame around it — vertical enough to catch the horizon, narrow enough that
      it never becomes the surface. Used by every raised deck in the sanctuary. */
-  function kerb(x, z, th, w, d, up, val) {
+  /* THE ROTATION MUST COME FROM THE CALLER, not be re-derived from th. Most decks up here are laid
+     with mat(..., -th), which puts local X radially and local Z tangentially — but the ascent pier
+     is laid with mat(..., -th + PI/2), because it faces out along the radius. A kerb that assumed
+     -th would have been turned ninety degrees to the deck it edges: four platinum bars lying across
+     the pier instead of around it, and nothing would have failed. So `rot` is the SAME value the
+     caller passed to mat(), and the two offset axes are derived from it.
+     mat()'s yaw sends local +X to (cos rot, -sin rot) and local +Z to (sin rot, cos rot) in world xz. */
+  function kerb(x, z, rot, w, d, up, val) {
     const v = val == null ? 0.98 : val;
-    /* mat(..., -th) turns a box so its local X is RADIAL and its local Z is TANGENTIAL — so `w` is
-       an across-the-ring dimension and `d` an along-the-ring one, matching ringPoint's t and s. */
-    const rx = Math.cos(th), rz = Math.sin(th);      /* radial unit */
-    const tx = -Math.sin(th), tz = Math.cos(th);     /* tangential unit */
+    const ax = Math.cos(rot), az = -Math.sin(rot);   /* where the box's own X points */
+    const bx = Math.sin(rot), bz = Math.cos(rot);    /* where the box's own Z points */
     for (const s of [-1, 1]) {
       /* the two ends, running the full width so the corners close */
       const o1 = s * (d * 0.5 + 0.4);
-      put('plat', chamferBox(w + 1.6, 0.34, 0.8, 0.12), mat(x + tx * o1, z + tz * o1, up, -th), v);
+      put('plat', chamferBox(w + 1.6, 0.34, 0.8, 0.12), mat(x + bx * o1, z + bz * o1, up, rot), v);
       /* the two sides, fitted between them */
       const o2 = s * (w * 0.5 + 0.4);
-      put('plat', chamferBox(0.8, 0.34, d, 0.12), mat(x + rx * o2, z + rz * o2, up, -th), v);
+      put('plat', chamferBox(0.8, 0.34, d, 0.12), mat(x + ax * o2, z + az * o2, up, rot), v);
     }
   }
 
@@ -208,7 +213,7 @@ export function buildHaloDistricts(ctx, opts = {}) {
       const [x, z, th] = ringPoint(deg, s, t);
       put('dark', chamferBox(w, 1.1, d, 0.4), mat(x, z, 0.55, -th, 1, 1, 1), val != null ? val : 0.34);
       put('dark', chamferBox(w, 0.30, d, 0.12), mat(x, z, 1.18, -th, 1, 1, 1), (val != null ? val : 0.34) + 0.14);
-      kerb(x, z, th, w, d, 1.24);
+      kerb(x, z, -th, w, d, 1.24);
       return [x, z, th];
     },
     /* a square-diamond GATEWAY: two piers and a diamond keystone. The brand figure, load-bearing. */
@@ -292,27 +297,81 @@ export function buildHaloDistricts(ctx, opts = {}) {
       return [x, z, th];
     },
     /* a DOWNWARD OVERLOOK — R4 devotes a whole clause to it: "Preserve dramatic overlooks to Civic
-       City, Lake City, Rainforest City, mountains, moon". It is a transparent band cut into the
-       inner rim with a dark-crystal frame and a rail, so you can stand at the edge and look 1800 m
-       straight down at the world you came from. */
+       City, Lake City, Rainforest City, mountains, moon" and "Preserve downward world views".
+
+       ---- WHY THIS IS A CANTILEVER AND NOT A WINDOW IN THE FLOOR ------------------------------
+       The first cut was a glass band set into the deck at r = R_IN + 26, and the render came back
+       COMPLETELY BLACK. The cause is the same curvature that makes the ring safe. The dish rises
+       39.6 m from the midline to each rim, so the last 60 m before the inner edge is an UPHILL
+       slope at the worst grade in the world: the deck is 1838.1 at r 726 and 1841.6 at r 666. An
+       eye 1.7 m above that overlook sits at 1839.8 and the lip 60 m away is 1841.6 — 1.8 m ABOVE
+       it — with a parapet on top. There is no downward view from there at all. The guard rail was
+       deleting the clause it was supposed to make survivable.
+
+       The geometry only works one way: the bay has to project PAST the rim, out over the hole, and
+       STEP DOWN below the crest so nothing is between the eye and the world. That is a cantilevered
+       skywalk — which is also the most dramatic form the clause could take, and "dramatic" is R4's
+       own word. You stand on glass 1836 m above MAHPLAZA with nothing under your feet.
+
+       Struts carry it back to the rim, because a 20 m cantilever with no visible support reads as a
+       mistake, and the rail is on three sides only: the fourth is the edge you came in over. */
     overlook(deg, s, w) {
-      const t = -(HALO.R_MID - HALO.R_IN) + 26;                 /* at the inner rim, over the hole */
-      const [x, z, th] = ringPoint(deg, s, t);
-      put('plat', chamferBox(w + 3, 0.7, 3.0, 0.24), mat(x, z, 0.35, -th), 0.94);
-      put('glass', chamferBox(w, 0.22, 16, 0.06), mat(x, z + 0, 0.2, -th), 0.40);
-      /* the frame, the rail, and the two posts that make it safe to lean on */
+      /* THE RADII ARE THE WHOLE POINT AND THEY ARE MEASURED. The shell ends at R_IN - APRON = 666.
+         A bay centred inside that is buried under the shell; a bay centred outside it is back behind
+         the lip. So the bay STRADDLES the edge: 30 m long, centred at 652, spanning 637 to 667 — its
+         root just catches the shell and its far end hangs 29 m out over open air. From out there the
+         line to MAHPLAZA is 70 degrees below horizontal with nothing in it.
+
+         Flush with the deck, not stepped down: stepping down would bury the root, and the rails are
+         only 1.28 m so they never come between a standing eye and the ground. */
+      const D = 30, rDeck = HALO.R_IN - HALO.APRON - D * 0.5 + 1;
+      const th0 = deg * Math.PI / 180 + s / HALO.R_MID;
+      const x = Math.cos(th0) * rDeck, z = Math.sin(th0) * rDeck, th = th0;
+      const drop = 0.10;
+      /* THE DECK: a dark-crystal frame carrying a glass floor. §07 holds even here — the solid part
+         of a floor you stand on is near-black, and the transparent part is the point of the room. */
+      put('dark', chamferBox(D, 0.55, w + 3.2, 0.22), mat(x, z, drop, -th), 0.26);
+      put('glass', chamferBox(D - 2.6, 0.20, w, 0.06), mat(x, z, drop + 0.34, -th), 0.42);
+      /* the RAIL on three sides — the fourth is the way in */
+      const off = (dr, dt) => [x + Math.cos(th) * dr - Math.sin(th) * dt,
+                               z + Math.sin(th) * dr + Math.cos(th) * dt];
       for (const side of [-1, 1]) {
-        put('dark', chamferBox(1.2, 0.9, 17, 0.3),
-          mat(x + Math.cos(th + Math.PI / 2) * side * (w * 0.5 + 0.6), z + Math.sin(th + Math.PI / 2) * side * (w * 0.5 + 0.6), 0.45, -th), 0.28);
+        const [px, pz] = off(0, side * (w * 0.5 + 1.4));
+        put('plat', chamferBox(D, 0.22, 0.42, 0.08), mat(px, pz, drop + 1.28, -th), 1.0);
+        put('dark', chamferBox(D, 1.0, 0.30, 0.10), mat(px, pz, drop + 0.75, -th), 0.30);
+        for (const f of [-0.36, 0, 0.36]) {
+          const [qx, qz] = off(D * f, side * (w * 0.5 + 1.4));
+          put('plat', chamferBox(0.34, 1.25, 0.34, 0.10), mat(qx, qz, drop + 0.65, -th), 0.96);
+        }
       }
-      const [rx, rz] = ringPoint(deg, s, t - 8.6);
-      put('plat', chamferBox(w + 2, 0.24, 0.5, 0.1), mat(rx, rz, 1.25, -th), 1.0);
+      const [ex, ez] = off(-D * 0.5, 0);              /* the far end, out over the middle of the hole */
+      put('plat', chamferBox(0.42, 0.22, w + 2.8, 0.08), mat(ex, ez, drop + 1.28, -th), 1.0);
+      put('dark', chamferBox(0.30, 1.0, w + 2.8, 0.10), mat(ex, ez, drop + 0.75, -th), 0.30);
+      /* THE STRUTS: two raked legs back up to the rim, so the cantilever is carried and not floating */
       for (const side of [-1, 1]) {
-        put('plat', chamferBox(0.4, 1.3, 0.4, 0.12),
-          mat(rx + Math.cos(th + Math.PI / 2) * side * w * 0.45, rz + Math.sin(th + Math.PI / 2) * side * w * 0.45, 0.65, -th), 0.96);
+        const [ax2, az2] = off(-D * 0.30, side * (w * 0.5 + 0.9));
+        put('plat', chamferBox(15, 0.7, 0.7, 0.2), mat(ax2, az2, drop - 1.6, -th, 1, 1, 1), 0.88);
+      }
+      /* and the THRESHOLD back on the ring proper, so the bay is entered rather than arrived at */
+      const [tx, tz] = ringPoint(deg, s, -(HALO.R_MID - HALO.R_IN) + 20);
+      put('dark', chamferBox(16, 0.42, w + 4, 0.16), mat(tx, tz, 0.22, -th), 0.30);
+      kerb(tx, tz, -th, 16, w + 4, 0.50);
+      /* ROAM CANNOT SEE THIS BAY. haloFloor() answers null past R_IN - APRON, which is exactly where
+         the cantilever hangs — the analytic surface is the RING and the bay is deliberately off it.
+         So the deck is registered the way every other standable object in this world is: an invisible
+         proxy MESH in ctx.colliders. L47 is the reason it is a mesh and not a Box3 — the assembly's
+         filter is `o.isMesh` and a Box3 is dropped without a word. Its top is one step above the
+         shell, so a walker steps onto it exactly as they would onto a bench. */
+      if (ctx && ctx.colliders) {
+        const proxy = new THREE.Mesh(own(new THREE.BoxGeometry(D - 1, 1.2, w + 2.4)));
+        const o = onShell(x, z, drop - 0.25, -th);
+        proxy.position.copy(o.p); proxy.quaternion.copy(o.q);
+        proxy.visible = false; proxy.name = 'halo-overlook-floor-' + deg;
+        proxy.updateMatrixWorld(true);
+        group.add(proxy); ctx.colliders.push(proxy);
       }
       stats.overlooks++;
-      spawnPoints.push({ x: rx, z: rz, kind: 'overlook' });
+      spawnPoints.push({ x, z, kind: 'overlook' });
       return [x, z, th];
     }
   };
@@ -469,7 +528,7 @@ export function buildHaloDistricts(ctx, opts = {}) {
       put('dark', chamferBox(96, 4.0, 40, 1.2), mat(sx, sz, 2.0, -sth), 0.26);
       /* §07: the deck a performer stands on is dark; the platinum is its edge (see kerb above) */
       put('dark', chamferBox(100, 0.4, 44, 0.16), mat(sx, sz, 4.2, -sth), 0.46);
-      kerb(sx, sz, sth, 100, 44, 4.5);
+      kerb(sx, sz, -sth, 100, 44, 4.5);
       /* the shell: three arched ribs over the stage, so it has a silhouette from the whole ring */
       for (let k = 0; k < 3; k++) {
         const t = -78 + k * 13, h = 40 - k * 6, w = 92 - k * 10;
@@ -582,7 +641,7 @@ export function buildHaloDistricts(ctx, opts = {}) {
          touch in MAH HALO obeys the same floor law as the plaza they left */
       put('dark', chamferBox(16, 2.4, 22, 0.7), mat(ax, az, 1.2, rot), 0.30);
       put('dark', chamferBox(15, 0.5, 21, 0.2), mat(ax, az, 2.5, rot), 0.48);
-      kerb(ax, az, dth, 16, 22, 2.7);
+      kerb(ax, az, rot, 16, 22, 2.7);
       /* two collar piers and a keystone diamond: the arrival aperture, the brand figure at the top */
       for (const side of [-1, 1]) {
         const px = ax + Math.cos(dth) * 0 + Math.cos(dth + Math.PI / 2) * side * 7.4;
