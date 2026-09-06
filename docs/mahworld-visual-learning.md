@@ -633,6 +633,53 @@ flickering the stand.
 
 ---
 
+## L46 — A hollow thing built solid occludes the only cue it exists to deliver
+**Failure.** MAH DESCENT's doorway rendered as a flat black rectangle. Every one of R3-07's seven
+downward cues was implemented and none of them was visible.
+**Root owner.** The shaft. I built it as one `chamferBox` filling the shaft volume, which is a solid
+block of black crystal: from the doorway you saw its front FACE, and the MAHGIC beam and the
+descending diamond packets were sealed inside it. An entrance with nothing behind it is the exact
+failure R3-07 is written against, arrived at by implementing the fix for it.
+**Correction.** The shaft is its WALLS — a back panel and two flanks, no floor — plus a lit rim at
+the lip so the eye reads the darkness beyond as depth rather than as an unlit wall. And the beam and
+the packets now start ABOVE the threshold, because a cue that begins at the lip is a cue you cannot
+see until you are standing on the edge; the eye has to watch one ENTER the floor.
+**Regression.** Any recess, shaft, aperture, window or doorway: check that the volume is open, not
+filled. A solid where a void belongs looks correct in code and renders as a wall.
+
+---
+
+## L47 — Two integration points in this codebase fail silently, and both bit in one pass
+**`ctx.colliders` holds MESHES.** `mahplaza.js` builds its roam/camera boxes with
+`(ctx.colliders || []).filter(o => o && o.isMesh)` and then takes each one's own bounding box. A
+`Box3` pushed there is filtered out without a warning — the entrance would have been walkable
+straight through with nothing to say the collider had failed. Push an invisible proxy Mesh sized to
+the mass. Never the merged mesh: its bounding box spans every instance and would wall off a third of
+the world.
+**`ctx.residentSpots` is FLAT.** `buildings.js`'s `spot()` returns `{x, y, z, facing, ...extra}` and
+the assembly spreads it straight onto the resident spec. A nested `{spec: {...}}` with `ry` is
+accepted, ignored, and produces the right number of invisible mannequins.
+**Regression.** Before pushing into any `ctx.*` array, read the CONSUMER, not the other producers —
+producers can be wrong together. Both of these are shapes that a wrong value passes without error.
+
+---
+
+## L48 — Build part-major, not creature-major, or articulation is unaffordable
+**Where it bit.** R3-10 wants a pack of six plus a boss per territory, three territories, with
+animation, hit reaction and defeat behaviour. Built creature-major — a Group per beast holding a
+head, a body and four limbs — that is ~150 draw calls for the population, which §19 and R3-13 both
+forbid, and the obvious rescue (merge each creature into one mesh) buys the budget back by making
+every creature a statue.
+**The architecture that works.** One `InstancedMesh` per PART TYPE across the whole population:
+bodies, heads, jaws, crests, limb segments, claws, plates, joint rings, nodes, eyes, veins. Eleven
+draws for twenty-one fully articulated creatures, and a limb is an instance — an instance has a
+transform, so it can move. Creature-major would have been six times the draws for a pose that could
+not change.
+**Regression.** Whenever a population needs both count and articulation, index by part and not by
+individual. The per-instance matrix is the joint.
+
+---
+
 ## Standing ownership map (reuse, do not rediscover)
 
 | System | Owner |

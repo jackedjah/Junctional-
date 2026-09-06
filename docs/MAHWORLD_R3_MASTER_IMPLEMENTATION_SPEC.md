@@ -227,20 +227,24 @@ is **MAHGIC**.
 
 ## LIVE STATE
 
-**Gates closed.** 1 (continuity) · **6** R3-04 forest branch hierarchy · **8** R3-06 MAH ASCENT to
-the Sky Realm arrival district · **9/10** R3-07 MAH DESCENT shared component + 3 entrances · and
-R3-13's near/far detail tiers, which is what pays for gate 6.
+**Gates closed.** 1 continuity · **2/3** R3-01 dead-zone map + fill · **6** R3-04 forest branch
+hierarchy · **8** R3-06 MAH ASCENT to the Sky Realm arrival district · **9/10** R3-07 MAH DESCENT
+component + 3 entrances · **11/12/13** R3-08 MAH VITAL, FORGE, MODE · **14** R3-09 MAH NAV ·
+**15/16/17** R3-10 MAHBEAST framework + Monkey Dogs L5–7 / Boss L8 + the five provisional families ·
+**18** territories placed · and R3-13's near/far detail and animation tiers throughout.
 
-**Files owned by R3 so far.** `mahascent.js` (new) · `mahdescent.js` (new) ·
-`tests/mahworld-r3-laws.test.js` (new) · `rainforest.js` (hierarchy + detail buckets + setDetail) ·
-`mahplaza.js` (wiring, `updateDetailTiers`, descent site derivation) · `fobeam.js` (ASCENTS exported
-so one table decides where a line stands).
+**Files owned by R3.** New: `mahascent.js` · `mahdescent.js` · `outerring.js` · `mahfacilities.js` ·
+`mahbeasts.js` · `tests/mahworld-r3-laws.test.js`. Changed: `rainforest.js` (hierarchy, detail
+buckets, `setDetail`) · `mahplaza.js` (wiring, `updateDetailTiers`, MAH NAV, site derivation) ·
+`mahplaza.html` (MAH NAV) · `fobeam.js` (ASCENTS exported).
 
 **Next three actions.**
-1. Gate 2/3 — dead-zone classification and fill. The far-zoom frame shows the ring between the
-   plaza deck (r 43) and the mountain foot (r 620) as almost entirely category F.
-2. Gates 11–13 — MAH VITAL, MAH FORGE, MAH MODE, sited per R3-11 around MAH MATCH.
-3. Gate 14 — MAH NAV, which the travel system already has the destination table for.
+1. Gate 4/5 — the global material separation pass and crystallization on the EXISTING major
+   buildings. `buildings.js` and `city.js` predate R3-02's layered-construction rule; the three new
+   facilities are built to it and the older blocks are not, which will read as two vocabularies.
+2. Gate 19 — the remaining support structures around MAH MATCH (FOBLOCK transit nodes, combat
+   service spaces, public artifacts), now that VITAL/FORGE/MODE hold three of its four flanks.
+3. Gate 21 — the far-zoom lock, below.
 
 **Highest-risk unresolved visual defect.** The far-zoom lock (R2 §5 / R3 gate 21) still fails: the
 mountain ring hides both peer cities from every elevated camera, so far zoom shows one city and two
@@ -249,8 +253,26 @@ site to screen space and peels it, which separates "occluded" from "present but 
 distinction decides whether the fix is terrain (open the passes wider / drop the ring height on the
 two bearings) or value (a city 700 m away needs to emit light, not just exist).
 
-**Proof renders needed to resume.** `l34.cjs <tag>` gives the standing set: world · farzoom ·
-farzoom-low · ladder (civic street level) · forest (eye height in the stand) · forest-mid · ascent ·
-ascent-top · descent · descent-wide · establishing.
+**Proof renders needed to resume.** `scratchpad/l34.cjs <tag>` gives the standing set: world ·
+farzoom · farzoom-low · ladder (civic street level) · forest (eye height in the stand) · forest-mid ·
+ascent · ascent-top · descent · descent-wide · beasts · beasts-wide · facilities · establishing.
 
-**Suites.** mahplaza 27/27 · crystalline 6/6 · pack 8/8 · skyrealm 16/16 · roam 18/18 · r3 (new).
+**Suites.** mahplaza 27/27 · crystalline 6/6 · pack 8/8 · skyrealm 16/16 · roam 18/18 ·
+**r3 20/20**.
+
+---
+
+## MODULE CONTRACT ADDITIONS MADE BY R3
+
+Beyond `build*(ctx) -> { group, stats, setTime, setTheme, update, setQuality, dispose }`:
+
+| method | who has it | what the assembly passes |
+|---|---|---|
+| `setDetail(distance)` | `rainforest`, `mahbeasts` | metres from the eye to that system's site, every rendered frame, from `updateDetailTiers()` |
+| `setEye(x, y, z)` | `mahdescent` | the camera's world position, for proximity doors |
+| `hit(i)` `defeat(i)` `revive(i)` `beastAt(i)` | `mahbeasts` | the gameplay surface; pose reads state, so there is no second animation path |
+| `navDestinations()` `navGoto(id)` | the assembly's public API | MAH NAV's menu and teleport |
+
+`ctx` gotchas that fail silently, both hit in this pass and both recorded as L47: **`ctx.colliders`
+holds MESHES** (a `Box3` is filtered out without warning), and **`ctx.residentSpots` is FLAT with a
+`facing` field** (a nested `{spec}` with `ry` is accepted and ignored).
