@@ -61,8 +61,12 @@ const VIEWS = {
     label: 'MAH ASCENT — turning around to the concourse and the pads'
   },
   pads: {
-    site: 'padB', eye: EYE + 5.5, offset: { bearing: 2.55, r: 46 }, lookBearing: 3.02, lookRange: 60, lookY: 8, fov: 48,
-    label: 'Ascent pads — a pod docked, one preparing'
+    /* Stands OUTBOARD of the pad cluster and looks back INTO it, so the four pads read against the
+       concourse behind them. Aimed at the cluster's measured centroid (−17.9, 66.3) rather than at a
+       bearing that felt right: the first version looked outward past the pads at nothing but cloud
+       towers two kilometres away. */
+    site: 'staging', eye: EYE + 6.0, offset: { bearing: 1.50, r: 55 }, lookBearing: -2.034, lookRange: 95, lookY: 12, fov: 50,
+    label: 'Ascent pads — a pod docked, one preparing, the concourse behind'
   },
   overlook: {
     site: 'overlook', eye: EYE + 1.0, lookBearing: 0.02, lookRange: 900, lookY: 90, fov: 50,
@@ -81,7 +85,10 @@ const VIEWS = {
     label: 'High cloud — the cold side: towers, anvils, upper atmosphere'
   },
   islands: {
-    site: 'gateLane', eye: EYE + 10, lookBearing: 1.35, lookRange: 620, lookY: 130, fov: 52,
+    /* Pulled back inboard along the gate lane so the three islands compress from a 102 degree spread
+       into 61 and fit one frame; from the site itself the chain ran past both edges and only the
+       middle island was ever visible. */
+    site: 'gateLane', eye: EYE + 12, offset: { bearing: -1.52, r: 180 }, lookBearing: 1.658, lookRange: 700, lookY: 120, fov: 56,
     label: 'Cloud islands — the traversal chain out over the flats'
   },
   voidview: {
