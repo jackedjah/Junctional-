@@ -438,22 +438,31 @@ export function buildHaloDistricts(ctx, opts = {}) {
   function districtSign(D, x, z, th, up) {
     const tex = signTexture({ title: D.label, sub: D.sub, mark: true });
     owned.textures.push(tex);
-    /* DOUBLE-SIDED, because a ring has TWO along-ring approaches and a PlaneGeometry has one face.
-       A probe of the built scene found every one of the eight signs facing exactly tangentially —
-       which is the right choice, since the promenade runs along the ring and that is the direction
-       a district is walked toward. But at the default FrontSide each sign was legible from only ONE
-       of those two directions, so half of every approach saw a blank. (The tangential facing itself
-       was flagged as a defect by the audit and is NOT one: it is what street signage does. The
-       single-sidedness is.) */
+    /* TWO BACK-TO-BACK PLANES, NOT ONE DOUBLE-SIDED ONE.
+
+       A ring has two along-ring approaches and a PlaneGeometry has one face, so at three's default
+       FrontSide each of the eight signs was legible from only ONE direction — walk toward HALO
+       PULSE from TABLE and you read it, arrive from COMMONS and you see a blank plane. (A probe
+       measured every sign's normal at exactly 0.00 against radial, i.e. perfectly tangential. The
+       audit called that a defect and it is not one: the promenade runs along the ring, so along the
+       ring is the direction a district is walked toward, which is what street signage does.)
+
+       The obvious fix — side: DoubleSide — is WRONG FOR TEXT, and the render said so immediately:
+       from behind, a double-sided plane shows its texture MIRRORED, so HALO STAGE read backwards.
+       Two planes, each FrontSide, the second yawed 180 degrees, is the only correct answer for
+       lettering. They share one material and one geometry, so the cost is one extra draw-free mesh. */
     const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.9, fog: true,
-      toneMapped: true, side: THREE.DoubleSide });
+      toneMapped: true });
     m.name = 'halo-sign-' + D.id; owned.materials.push(m); signMats.push(m);
     if (ctx && ctx.signMaterials) ctx.signMaterials.push(m);
-    const mesh = new THREE.Mesh(own(new THREE.PlaneGeometry(26, 26 * (768 / 2048))), m);
-    const o = onShell(x, z, up, -th);
-    mesh.position.copy(o.p); mesh.quaternion.copy(o.q);
-    mesh.name = 'halo-sign-' + D.id;
-    group.add(mesh);
+    const geo = own(new THREE.PlaneGeometry(26, 26 * (768 / 2048)));
+    for (const face of [0, Math.PI]) {
+      const mesh = new THREE.Mesh(geo, m);
+      const o = onShell(x, z, up, -th + face);
+      mesh.position.copy(o.p); mesh.quaternion.copy(o.q);
+      mesh.name = 'halo-sign-' + D.id + (face ? '-b' : '');
+      group.add(mesh);
+    }
   }
 
   /* ================================================================================================
