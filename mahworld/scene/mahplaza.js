@@ -78,7 +78,7 @@ export async function createMahplaza(canvas, options = {}) {
   renderer.toneMappingExposure = 1.0;
   /* one shadow-mapped key light: the sun by day, the moon by night (brief §21, §40) */
   renderer.shadowMap.enabled = quality.shadows;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;   /* PCFSoft is deprecated in this renderer build and falls back to this anyway */
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x0d1f3e, 60, 760);   /* near / far follow the time of day in applyTime: atmospheric perspective, not a fog bank */
