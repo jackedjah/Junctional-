@@ -254,20 +254,35 @@ export const DECK = Object.freeze({
 
 /* Named features. Each is a smooth, cheap, deterministic displacement; they sum. Kept as data so a
    builder can also DRAW them (a ridge wants a cloud bank on it, a valley wants mist in it). */
+/* SCALE, corrected in v7 after the first render. The first pass gave the deck ridges of 26-44 m
+   spread across a 1150 m radius. Measured from the staging apron at eye height, the heights along a
+   bearing then ran 3, −5, −12, 2, 5, 4 metres over a kilometre, and the tallest thing in the realm
+   subtended 1.8 degrees at 1000 m — so a person standing on it saw a flat lavender field, which is
+   exactly the "white geometry with fog" §49 forbids. That was the layout's fault and not the
+   builder's: no amount of surface treatment rescues terrain with no relief in it.
+
+   THE BANKS SIT ON THE SECTOR BOUNDARIES. That is what "ridges give the realm boundaries and scale"
+   has to mean here: four cloud banks of 96-140 m at 300-360 m out, placed between A|C, C|B, B|D and
+   D|A, so each sector reads as its own room rather than as a quadrant of one field, and so the eye
+   has something with a top edge to measure the sky against.
+
+   NOTHING TALL STANDS IN SECTOR A. The sunset cone is the realm's breathing room (§01, §15) and the
+   cliff beyond it is the view; the two banks nearest it flank the sightline and frame it instead. */
 export const FEATURES = Object.freeze([
   /* the arrival plateau: the one genuinely flat, stable, obviously-safe piece of ground (§06) */
   { kind: 'plateau', bearing: Math.PI, r: 95, radius: 165, h: 7.0, falloff: 70 },
-  /* ridges give the realm boundaries and scale without walling it in (§05) */
-  { kind: 'ridge', bearing: 2.35, r: 250, len: 420, wide: 90, h: 26, rot: 0.7 },
-  { kind: 'ridge', bearing: -2.30, r: 300, len: 520, wide: 110, h: 34, rot: -0.5 },
-  { kind: 'ridge', bearing: -1.20, r: 480, len: 600, wide: 130, h: 44, rot: 0.25 },
-  { kind: 'ridge', bearing: 1.05, r: 520, len: 480, wide: 120, h: 30, rot: -0.3 },
-  /* valleys: soft low ground that reads as depth and holds mist (§05) */
-  { kind: 'valley', bearing: 1.75, r: 330, radius: 210, h: -14, falloff: 150 },
-  { kind: 'valley', bearing: -0.55, r: 260, radius: 150, h: -10, falloff: 110 },
-  { kind: 'valley', bearing: 2.75, r: 380, radius: 180, h: -12, falloff: 130 },
-  /* a long swell running across the training flats, so "flat" is never actually flat */
-  { kind: 'ridge', bearing: 1.55, r: 700, len: 900, wide: 240, h: 18, rot: 1.1 }
+  /* the four boundary banks */
+  { kind: 'ridge', bearing: 0.95, r: 300, len: 520, wide: 150, h: 96, rot: 0.55 },
+  { kind: 'ridge', bearing: 2.42, r: 340, len: 620, wide: 170, h: 128, rot: -0.35 },
+  { kind: 'ridge', bearing: -2.42, r: 360, len: 640, wide: 175, h: 140, rot: 0.30 },
+  { kind: 'ridge', bearing: -0.95, r: 310, len: 540, wide: 155, h: 104, rot: -0.50 },
+  /* interior relief, so no sector is itself a plane */
+  { kind: 'ridge', bearing: 1.55, r: 700, len: 900, wide: 240, h: 62, rot: 1.10 },
+  { kind: 'ridge', bearing: -1.35, r: 620, len: 700, wide: 200, h: 78, rot: 0.20 },
+  /* valleys: low ground that reads as depth and holds the mist corridors (§05) */
+  { kind: 'valley', bearing: 1.75, r: 330, radius: 210, h: -34, falloff: 150 },
+  { kind: 'valley', bearing: -1.75, r: 300, radius: 180, h: -28, falloff: 130 },
+  { kind: 'valley', bearing: 2.75, r: 420, radius: 190, h: -30, falloff: 140 }
 ]);
 
 /* Open voids in the deck — where the cloud simply is not, and the player can see a very long way
@@ -285,8 +300,10 @@ function px(bearing, r) { const d = dir(bearing); return { x: d.x * r, z: d.z * 
 /* The cloud floor's height at a world point. Sum of the named features over a slow global swell.
    Pure, allocation-free and cheap enough to call per vertex at build time and per agent per frame. */
 export function deckHeight(x, z) {
-  /* the slow swell: the whole deck breathes, so nothing reads as a flat plane */
-  let h = Math.sin(x * 0.0021) * Math.cos(z * 0.0018) * 5.5 + Math.sin((x + z) * 0.0037) * 2.4;
+  /* the slow swell: the whole deck breathes, so nothing reads as a flat plane. Raised with the banks
+     — at 5.5 m it was below the noise floor of what an eye 2 m up can read at 200 m. */
+  let h = Math.sin(x * 0.0021) * Math.cos(z * 0.0018) * 15 + Math.sin((x + z) * 0.0037) * 7
+        + Math.sin(x * 0.0058 + 1.7) * Math.cos(z * 0.0049 - 0.4) * 5;
   for (let i = 0; i < FEATURES.length; i++) {
     const f = FEATURES[i], c = px(f.bearing, f.r);
     if (f.kind === 'plateau') {
