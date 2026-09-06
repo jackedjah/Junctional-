@@ -163,6 +163,34 @@ the material list and reports `lawOneApplies: false` rather than asserting compl
 **Regression.** Before re-materialising geometry you did not build, enumerate what its own materials
 carry — vertex colours, emissive, maps. A grade split preserves none of it.
 
+## L18 — A world composed from a camera set is only finished where that set can stand
+**Failure.** Every named view in `VIEWS` is at 1.7–14 m eye height. Put the camera at 235 m and the
+world falls apart: the whole scene collapses into one blue value band (near towers near-black, mid
+city barely brighter, mountains palest — the aerial ladder is the right way round but the range is
+so compressed that nothing reads as FORM), the plaza deck reads as a hard-edged dark RECTANGLE
+sitting on a lighter ground plane with a visible seam, and the ground beyond it is a featureless
+flat sheet with no streets on it.
+**Root owner.** Not one module. It is the acceptance method: composition was judged only where a
+camera was placed, so everything outside that envelope was never judged at all. §42's rear-hemisphere
+failure (L-none, task #96) was the same failure in the horizontal; this is its vertical twin.
+**Correction.** Judge at the extremes of every axis the viewer can move on, not at the convenient
+values. When a viewer gains a new degree of freedom, the acceptance set has to gain it too.
+**Proof.** `skyroads.cjs` — cameras placed from the MEASURED world-space extents of the target
+geometry (`srfind.cjs` traverses the graph and prints them) rather than from guessed bearings. The
+first cut of that script aimed at nothing and produced two frames of empty mountain.
+**Regression.** This is now load-bearing: free roam means the viewer chooses the camera. Anything
+"finished" that was only ever seen from `VIEWS` should be assumed unfinished until seen from roam.
+
+## L19 — Aim from measured extents, not from bearings you reasoned about
+**Failure.** Two render passes aimed at the sky roads produced empty sky and a wall of mountain,
+costing two full captures.
+**Correction.** Traverse the built scene, take the world-space bounding box of the meshes whose name
+matches the target, and place the camera from those numbers. Six lines, and it cannot miss.
+`city-skyroad-deck-near` measured y 54.0–138.7, x −426.5–534.1, z −326.3–−55.8: the whole network
+lives in the negative-z half, which no amount of reasoning about bearing conventions had produced.
+**Regression.** Same family as L03 (peel, don't guess) and L07 (a count is not a geometry). The
+scene graph will answer any question about itself; asking it is always cheaper than being wrong.
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)
