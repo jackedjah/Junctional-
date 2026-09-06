@@ -3,8 +3,10 @@
    Three depth layers so every exterior view has midground, background and
    distant background instead of stopping behind the three destinations:
 
-   1. MIDGROUND (90–220 m): dark steel residential / facility blocks with corner
-      pilasters, spandrel bands and recessed window grids (windowGrid), setbacks,
+   1. MIDGROUND (90–220 m): dark steel residential / facility blocks in THREE
+      massings (stepped / slotted / podium), each wearing a platinum structural
+      frame — base course, piers, spandrel courses, sill, parapet and coping —
+      over recessed window grids or lit curtain wall (windowGrid), with
       roof plant, masts and parapet rails; three short bridges between blocks and
       ONE long walkway crossing behind MAH MATCH (deck y 34, z −122, x −75..75)
       with a thin rail light line, under-deck lights and a slow rail pod.
@@ -33,6 +35,15 @@ const PW = 1.4;                       /* pilaster width */
 const FLOOR = 3.4;                    /* residential floor pitch */
 const WIN = { cellW: 1.5, cellH: 1.35, gapX: 0.95, gapY: FLOOR - 1.35, tint: 0xdde8ff, dimTint: 0x24324a };
 const WHITE = 0xdde8ff;
+/* ---- v7 §02 THE PLATINUM FRAME — the dimensions that decide how much of an elevation is metal.
+   Measured at night the district read: sky 36, ARCHITECTURE 52, chromium plaza floor 95. The floor was
+   doing all of the platinum work because the blocks were a navy mass wearing a hairline trim. The masses
+   are NOT lightened — they are the dark the platinum is measured against, and lifting them would flatten
+   the world. What widens is the FRAME. These numbers put roughly a third of a primary elevation into the
+   platinumMid grade (base + piers + courses + parapet), which is a framed building; at 100 % it would be
+   as wrong as at 0 %. Every band is kept TALLER THAN IT IS DEEP so the face the camera sees is the
+   vertical one — a high-metalness metal takes no diffuse light, so orientation, not hue, decides value. */
+const FR = { base: 1.9, course: 0.72, courseD: 0.32, pier: 0.8, pierD: 0.34, sill: 0.22, sillD: 0.6, cope: 0.26, band: 1.1 };
 
 /* ---- midground blocks: hand-composed so they overlap the gaps between the three destinations
    from the arrival cameras (see the establishing view) — x, z, footprint w × d, total height h,
@@ -54,6 +65,28 @@ const BLOCKS = [
   { id: 'L5', x: -150, z: -72,  w: 24, d: 20, h: 40, sb: 0.25, side: 1 },
   { id: 'R5', x: 150,  z: -80,  w: 22, d: 20, h: 36, sb: 0.25, side: -1 }
 ];
+/* ---- v7 §50-7 THREE BLOCK MASSINGS -------------------------------------------------------------
+   Gate §50-7 stood PARTIAL from v6 for one reason: fifteen blocks were ONE geometry recipe at fifteen
+   scales — the same core mass, the same four pilasters, one crown, one window module. Scale is not
+   variety; a bigger copy of a thing is still that thing. There are three MASSINGS now, and they differ
+   in MASS, not in size or colour:
+
+     stepped  the v6 form kept: a core with one setback shaft above it, two crowns
+     slotted  a slab cut front-to-back by an off-centre slot, a broad low wing beside a slender full-
+              height blade, so the crown is a NOTCH against the sky instead of another flat top
+     podium   a wide low podium carrying a platinum terrace deck, with a slender shaft set back on it
+
+   A block's massing comes from its IDENTITY, never from its size, so shape and scale stay two
+   independent variables — exactly the separation FAMILY_OF already keeps between a tower's shape and
+   its material. Hand-checked against the arrival frame so no two neighbouring blocks share a massing,
+   and so the three podiums (which are the only massing that grows its footprint) stand clear of the
+   blocks beside them. */
+const MASSING = {
+  L1: 'slotted', L2: 'slotted', L3: 'stepped', L4: 'podium', C1: 'stepped',
+  C2: 'slotted', C3: 'stepped', R1: 'podium',  R2: 'stepped', R3: 'podium',
+  R4: 'slotted', F1: 'stepped', F2: 'slotted', L5: 'stepped', R5: 'slotted'
+};
+const MASSING_OF = id => MASSING[id] || 'stepped';
 /* bridges between blocks (world endpoints sit just inside the block faces) and the main walkway */
 /* the walkway sits BEHIND MAH MATCH's new site (z −66, body back to −123), so it still crosses the
    frame without passing through the building */
@@ -133,6 +166,15 @@ export function buildCity(ctx) {
   const theme = ctx.theme || M.theme || { energy: 0x7fc6ff, energyLight: 0xdff1ff, energyDeep: 0x2a63c9 };
   const mat = (k, fb) => M[k] || M[fb] || M.graphite || new THREE.MeshStandardMaterial({ color: 0x1b2433 });
   const structuralM = mat('structural', 'graphite'), compositeM = mat('composite', 'graphiteDark'), panelM = mat('panel', 'graphite'), trimM = mat('trimSatin', 'trim');
+  /* THE MISSING RUNG, spent on the district (see materials.js). platinumMid sits at luminance 142,
+     between the block masses (49–58) and the bright platinum family (183–232) — a grade broad enough to
+     CARRY an elevation rather than outline it. Its two partners are not decoration: platinumMidBrushed
+     puts a directional streak on the piers, which are the tallest single pieces of metal on a facade,
+     and platinumMidLit is the LOW-metalness partner every up-facing piece of the frame must use. A
+     metal at 0.94 metalness is lit only by what it reflects, and a horizontal face reflects the night
+     zenith, which is black — the sill and the coping would vanish in the exact grade that makes the
+     piers read. This world has shipped that bug once already. */
+  const platMidM = mat('platinumMid', 'platinum'), platPierM = mat('platinumMidBrushed', 'platinumMid'), platCapM = mat('platinumMidLit', 'platinumLit');
   const anchors = ctx.lifeAnchors || (ctx.lifeAnchors = { paths: [], pads: [], doors: [], windows: [] });
   anchors.paths = anchors.paths || []; anchors.pads = anchors.pads || [];
 
@@ -174,7 +216,10 @@ export function buildCity(ctx) {
   owned.materials.push(winMat, stripMat, whiteMat, groundMat);
 
   /* static geometry buckets, merged per material at the end */
-  const B = { structural: [], composite: [], trim: [], strips: [], whites: [], far: [], far0: [], far1: [], far2: [] };
+  /* the platinum frame gets THREE buckets, not three meshes per block: every block's framing merges
+     into the same three geometries, so widening the framing across fifteen blocks costs three draw
+     calls in total rather than forty-five */
+  const B = { structural: [], composite: [], trim: [], strips: [], whites: [], platMid: [], platPier: [], platLit: [], far: [], far0: [], far1: [], far2: [] };
   const kitBoxes = [], kitMasts = [];        /* instanced roof kit matrices */
   const stats = { blocks: 0, bridges: 0, towers: 0, giants: 0, windows: 0, windowGrids: 0, pads: 0, paths: 0, drawCalls: 0, triangles: 0 };
   let elevator = null, pod = null;
@@ -185,19 +230,6 @@ export function buildCity(ctx) {
   const kitMast = (parent, x, y, z, r, h) => kitMasts.push(matrixOf(x, y + h / 2, z, 0, r * 2, h, r * 2, parent).clone());
   const elevGeo = own(new THREE.BoxGeometry(1.0, 0.9, 0.35));
 
-  function facadeWindows(parent, faceW, faceH, seed, place) {
-    const cols = Math.floor((faceW - 2 * PW - 1.6 + WIN.gapX) / (WIN.cellW + WIN.gapX));
-    const rows = Math.floor((faceH - 4.6 + WIN.gapY) / (WIN.cellH + WIN.gapY));
-    if (cols < 2 || rows < 2) return 0;
-    /* fewer lit cells and a wider brightness spread: a night city has dark apartments too (brief §08) */
-    const grid = windowGrid({ cols, rows, cellW: WIN.cellW, cellH: WIN.cellH, gapX: WIN.gapX, gapY: WIN.gapY, depth: 0.1, onFraction: 0.4, seed, material: winMat, tint: WIN.tint, dimTint: WIN.dimTint });
-    own(grid.geometry);
-    place(grid, 3.0 + grid.userData.windows.totalH / 2);
-    grid.name = 'city-windows'; parent.add(grid);
-    stats.windows += cols * rows; stats.windowGrids++;
-    return cols * rows;
-  }
-
   /* ---- v6b GLASS BLOCKS ------------------------------------------------------------------------
      The reference's midground is not dark masses punched with small windows — it is lit curtain wall.
      A third of the district's blocks are GLASS blocks now: instead of a windowGrid of individual
@@ -207,58 +239,190 @@ export function buildCity(ctx) {
   const glassFaceMat = new THREE.MeshBasicMaterial({ color: 0xc8dcff, toneMapped: true, fog: true });
   glassFaceMat.name = 'city-curtain'; owned.materials.push(glassFaceMat);
   const glazedIds = { L2: 1, C3: 1, R2: 1, L5: 1, F2: 1, R5: 1 };
-  function curtainFace(parent, faceW, faceH, seed, place) {
-    const floors = Math.max(3, Math.floor(faceH / 7));
-    const bays = Math.max(3, Math.floor((faceW - 2 * PW) / 4.2));
-    const grid = windowGrid({
-      cols: bays, rows: floors,
-      cellW: (faceW - 2 * PW - 2.2) / bays - 0.5, cellH: (faceH - 5) / floors - 1.1,
-      gapX: 0.5, gapY: 1.1, depth: 0.14, onFraction: 0.82, seed,
-      material: glassFaceMat, tint: 0xd8e8ff, dimTint: 0x35507a
-    });
-    own(grid.geometry);
-    place(grid, 3.2 + grid.userData.windows.totalH / 2);
-    grid.name = 'city-curtain'; parent.add(grid);
-    stats.windows += bays * floors; stats.windowGrids++;
-    return bays * floors;
+
+  /* ONE MODULE PER FACE. The glazing and the platinum frame are now cut from the SAME grid, because a
+     pier may only stand in a gap BETWEEN cells and a spandrel course may only sit in a gap between
+     rows. Derive the two separately and the frame reads as paint laid over the glass instead of
+     structure built around it — the same tell that gives a hairline trim away. Punched-window and
+     curtain-wall blocks differ only in this module, so both get the same frame treatment. */
+  function winModule(faceW, faceH, glazed) {
+    if (glazed) {
+      const cols = Math.max(3, Math.floor((faceW - 2 * PW) / 4.2)), rows = Math.max(3, Math.floor(faceH / 7));
+      return { cols, rows, cellW: (faceW - 2 * PW - 2.2) / cols - 0.5, cellH: (faceH - 5) / rows - 1.1, gapX: 0.5, gapY: 1.1,
+        y0: 3.2, depth: 0.14, onFraction: 0.82, tint: 0xd8e8ff, dimTint: 0x35507a, material: glassFaceMat, name: 'city-curtain' };
+    }
+    /* fewer lit cells and a wider brightness spread: a night city has dark apartments too (brief §08) */
+    return { cols: Math.floor((faceW - 2 * PW - 1.6 + WIN.gapX) / (WIN.cellW + WIN.gapX)),
+      rows: Math.floor((faceH - 4.6 + WIN.gapY) / (WIN.cellH + WIN.gapY)),
+      cellW: WIN.cellW, cellH: WIN.cellH, gapX: WIN.gapX, gapY: WIN.gapY,
+      y0: 3.0, depth: 0.1, onFraction: 0.4, tint: WIN.tint, dimTint: WIN.dimTint, material: winMat, name: 'city-windows' };
   }
+  function glaze(parent, mod, seed, place) {
+    if (mod.cols < 2 || mod.rows < 2) return 0;
+    const grid = windowGrid({ cols: mod.cols, rows: mod.rows, cellW: mod.cellW, cellH: mod.cellH, gapX: mod.gapX, gapY: mod.gapY,
+      depth: mod.depth, onFraction: mod.onFraction, seed, material: mod.material, tint: mod.tint, dimTint: mod.dimTint });
+    own(grid.geometry);
+    place(grid, mod.y0 + grid.userData.windows.totalH / 2);
+    grid.name = mod.name; parent.add(grid);
+    stats.windows += mod.cols * mod.rows; stats.windowGrids++;
+    return mod.cols * mod.rows;
+  }
+
+  /* ---- v7 §02 / §03 / §07 THE FRAME ON AN ELEVATION ---------------------------------------------
+     A block used to be a navy mass with a hairline of composite on it, so its whole elevation answered
+     the environment at one value and the plaza floor out-read the architecture two to one. The frame
+     below is what a real building has and this one did not: a base course at the pavement, a PIER on
+     every second bay joint running the full height of the glazing, a spandrel COURSE in every second
+     row gap, a SILL at the foot of the glass, and a parapet band with its coping. The infill panels
+     between them stay dark crystal — that contrast is the point; platinum everywhere would be as flat
+     as navy everywhere.
+     Orientation decides the grade, not taste. Piers and courses are kept taller than they are deep so
+     the face presented to the camera is vertical, and a vertical metal reflects the bright horizon
+     band. The sill and the coping are the two pieces whose read is their TOP face, so they take
+     platinumMidLit, the low-metalness partner that still answers a black zenith. */
+  function frameFace(bm, f, mod) {
+    const inner = f.w - 2 * PW - 0.4;
+    if (inner < 2.2) return;
+    const fm = matrixOf(f.ox, f.yBase, f.oz, f.ry, 1, 1, 1, bm).clone();
+    const F = (geo, lx, ly, lz) => xform(geo, lx, ly, lz, 0, 1, 1, 1, fm);
+    const pitch = mod.cellH + mod.gapY, totalW = mod.cols * mod.cellW + (mod.cols - 1) * mod.gapX;
+    /* the sill answers the same test the glazing does, because a sill with no glass over it is not a
+       sill — it is a band left stranded a storey up a blank wall */
+    if (mod.cols >= 2 && mod.rows >= 2) B.platLit.push(F(chamferBox(inner, FR.sill, FR.sillD, 0.06), 0, mod.y0 - FR.sill / 2, FR.sillD / 2));
+    /* a course marks a FLOOR line, so its pitch follows the module rather than a fixed number: a
+       punched-window module already has one row per storey and takes a course every second row, while
+       a curtain module's row IS a two-storey floor plate and takes one at each */
+    const ch = Math.min(FR.course, mod.gapY - 0.3), step = mod.gapY > 1.6 ? 2 : 1;
+    for (let r = 1; r + 1 < mod.rows; r += step)
+      B.platMid.push(F(chamferBox(inner, ch, FR.courseD, 0.06), 0, mod.y0 + r * pitch + mod.cellH + mod.gapY / 2, FR.courseD / 2));
+    /* the pier is the largest single piece of metal on the elevation, so it carries the brushed grade:
+       a directional streak up a 30 m column is the material response the colour is not allowed to be */
+    const pw = Math.min(FR.pier, mod.gapX - 0.1), ph = f.top - f.foot;
+    if (pw > 0.28 && ph > 6) for (let c = 2; c < mod.cols; c += 2)
+      B.platPier.push(F(chamferBox(pw, ph, FR.pierD, 0.05), -totalW / 2 + c * (mod.cellW + mod.gapX) - mod.gapX / 2, f.foot + ph / 2, FR.pierD / 2));
+  }
+  /* the two pieces of frame that belong to a MASS rather than to one of its faces. Dimensions are the
+     band's own outer footprint, so a wing can be framed without its parapet swallowing the slot beside it.
+     The base course is a PLINTH: its height follows the mass it carries, because a fixed 1.9 m course
+     reads as a plinth on a 60 m tower and as a skirt on a 22 m one. */
+  const baseCourse = (P, cx, cz, bw, bd, bh) => B.platMid.push(P(chamferBox(bw, bh, bd, 0.14), cx, bh / 2, cz));
+  const parapet = (P, cx, cz, bw, bd, top, band) => {
+    B.platMid.push(P(chamferBox(bw, band, bd, 0.18), cx, top - band / 2, cz));
+    B.platLit.push(P(chamferBox(bw + 0.3, FR.cope, bd + 0.3, 0.09), cx, top + FR.cope / 2, cz));   /* the coping faces the sky */
+  };
 
   BLOCKS.forEach((spec, i) => {
     const R = rng(SEED + i * 131);
     const { x, z, w, d, h } = spec;
     const rot = spec.rot != null ? spec.rot : 0.55 * Math.atan2(-x, -z) + (R() - 0.5) * 0.12;
-    const coreH = spec.sb ? Math.round(h * (1 - spec.sb)) : h;
+    const massing = MASSING_OF(spec.id), glazed = !!glazedIds[spec.id];
     const g = new THREE.Group(); g.name = 'city-block-' + spec.id; g.position.set(x, 0, z); g.rotation.y = rot; g.updateMatrix(); group.add(g);
     const bm = g.matrix;
     const P = (geo, lx, ly, lz, lry = 0, sx = 1, sy = 1, sz = 1) => xform(geo, lx, ly, lz, lry, sx, sy, sz, bm);
-    /* core mass, corner pilasters, spandrel bands on the window faces, crown */
-    B.structural.push(P(chamferBox(w, coreH, d, 0.45), 0, coreH / 2, 0));
-    for (const sx of [-1, 1]) for (const sz of [-1, 1]) B.composite.push(P(chamferBox(PW, coreH + 0.5, PW, 0.12), sx * (w / 2 - PW / 2 + 0.42), (coreH + 0.5) / 2, sz * (d / 2 - PW / 2 + 0.42)));
-    for (let y = 3.0 + FLOOR * 4 - 1.0; y < coreH - 2.5; y += FLOOR * 4) {
-      B.composite.push(P(chamferBox(w - 2 * PW - 0.4, 0.5, 0.5, 0.06), 0, y, d / 2 + 0.2));
-      if (spec.side) B.composite.push(P(chamferBox(0.5, 0.5, d - 2 * PW - 0.4, 0.06), spec.side * (w / 2 + 0.2), y, 0));
+    /* every massing answers the same four questions, so the frame, the glazing, the roof kit, the pad
+       and the elevator below are written once and never per family:
+         faces  the elevations that get the platinum frame (and glazing where the block shows one)
+         roof   the deck the parapet rails ring — a terrace on a podium, the low wing on a slot
+         top    the highest roof: plant, mast and beacon
+         pad    where the life module may land */
+    const faces = [], baseH = Math.max(1.1, Math.min(FR.base, h * 0.055));
+    let roofY = h, roofW = w, roofD = d, roofX = 0, roofZ = 0;
+    let topY = h, topW = w, topD = d, topX = 0, topZ = 0;
+    let padY = h, padX = 0, padZ = 0;
+
+    if (massing === 'slotted') {
+      /* SLOTTED: one slab cut front-to-back by an OFF-CENTRE slot. The wide wing carries the glazing,
+         the narrow blade runs past it to full height, and the link between them stops two thirds up —
+         so this block ends in a notch and a shoulder where a stepped block ends in a crown. The slot
+         is only a slot if its edges are metal; a deep reveal with dark returns is just a black gap. */
+      const slotW = Math.max(2.4, w * 0.13), rem = w - slotW, wA = rem * 0.62, wB = rem * 0.38;
+      const xA = -w / 2 + wA / 2, xB = w / 2 - wB / 2, xS = -w / 2 + wA + slotW / 2;
+      const hA = Math.round(h * 0.84), hB = h, hL = Math.round(h * 0.6), slotD = Math.min(6.5, d * 0.34);
+      /* a wing is narrower than a whole block, so its edge piers are narrower too — a full-width
+         pilaster on a 10 m wing would put a fifth of the elevation into metal on width alone */
+      const wp = Math.min(PW, Math.max(0.9, wA * 0.1));
+      B.structural.push(P(chamferBox(wA, hA, d, 0.45), xA, hA / 2, 0));
+      B.structural.push(P(chamferBox(wB, hB, d, 0.4), xB, hB / 2, 0));
+      B.structural.push(P(chamferBox(slotW + 0.8, hL, d - slotD, 0.3), xS, hL / 2, -slotD / 2));
+      for (const sz of [-1, 1]) {
+        B.platMid.push(P(chamferBox(wp, hA + 0.5, wp, 0.12), -w / 2 + wp / 2 - 0.42, (hA + 0.5) / 2, sz * (d / 2 - wp / 2 + 0.42)));
+        B.platMid.push(P(chamferBox(wp, hB + 0.5, wp, 0.12), w / 2 - wp / 2 + 0.42, (hB + 0.5) / 2, sz * (d / 2 - wp / 2 + 0.42)));
+      }
+      B.platMid.push(P(chamferBox(wp * 0.85, hA + 0.4, wp * 0.85, 0.1), xS - slotW / 2 - wp * 0.42, (hA + 0.4) / 2, d / 2 - wp * 0.42 + 0.3));
+      B.platMid.push(P(chamferBox(wp * 0.85, hB + 0.4, wp * 0.85, 0.1), xS + slotW / 2 + wp * 0.42, (hB + 0.4) / 2, d / 2 - wp * 0.42 + 0.3));
+      baseCourse(P, 0, 0, w + 0.6, d + 0.6, baseH);
+      parapet(P, xA, 0, wA + 0.3, d + 0.7, hA, FR.band);
+      parapet(P, xB, 0, wB + 0.3, d + 0.7, hB, 1.0);
+      faces.push({ ox: xA, yBase: 0, oz: d / 2, ry: 0, w: wA, h: hA, top: hA - FR.band, foot: baseH, seed: 100 + i, glaze: true });
+      faces.push({ ox: xB, yBase: 0, oz: d / 2, ry: 0, w: wB, h: hB, top: hB - 1.0, foot: baseH, seed: 400 + i, glaze: true });   /* the blade takes glass only where it is wide enough to hold a module */
+      if (spec.side) { const sh = spec.side > 0 ? hB : hA; faces.push({ ox: spec.side * (w / 2), yBase: 0, oz: 0, ry: spec.side * Math.PI / 2, w: d, h: sh, top: sh - 1.0, foot: baseH, seed: 200 + i, glaze: true }); }
+      roofY = hA; roofW = wA; roofX = xA;
+      topY = hB; topW = wB; topX = xB;
+      padY = hA; padX = xA;
+    } else if (massing === 'podium') {
+      /* PODIUM + SHAFT: a wide low base with a terrace on it and a slender tower set back above. The
+         terrace deck is the reason this massing exists in a platinum brief — it is a large HORIZONTAL
+         plane at eye level, which is precisely the surface a high-metalness grade turns black on. It
+         takes platinumMidLit and reads as the brightest thing on the block. */
+      const ph = Math.max(6.5, Math.round(h * 0.26)), pw = w + 6, pd = d + 5;
+      const sw = w * 0.72, sd = d * 0.74, sh = h - ph, sz0 = -d * 0.06;
+      B.structural.push(P(chamferBox(pw, ph, pd, 0.5), 0, ph / 2, 0));
+      B.structural.push(P(chamferBox(sw, sh, sd, 0.45), 0, ph + sh / 2, sz0));
+      baseCourse(P, 0, 0, pw + 0.6, pd + 0.6, baseH);
+      B.platMid.push(P(chamferBox(pw + 0.5, 0.9, pd + 0.5, 0.16), 0, ph - 0.45, 0));           /* the podium fascia */
+      B.platLit.push(P(chamferBox(pw + 1.1, 0.3, pd + 1.1, 0.1), 0, ph + 0.15, 0));            /* THE TERRACE DECK */
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) B.platMid.push(P(chamferBox(PW * 0.9, sh + 0.4, PW * 0.9, 0.1), sx * (sw / 2 - PW * 0.45 + 0.34), ph + (sh + 0.4) / 2, sz0 + sz * (sd / 2 - PW * 0.45 + 0.34)));
+      parapet(P, 0, sz0, sw + 0.6, sd + 0.6, h, 1.0);
+      /* a face that starts on a deck has no plinth under it, so its piers run from just above the deck */
+      faces.push({ ox: 0, yBase: ph, oz: sz0 + sd / 2, ry: 0, w: sw, h: sh, top: sh - 1.0, foot: 0.3, seed: 100 + i, glaze: true });
+      if (spec.side) faces.push({ ox: spec.side * (sw / 2), yBase: ph, oz: sz0, ry: spec.side * Math.PI / 2, w: sd, h: sh, top: sh - 1.0, foot: 0.3, seed: 200 + i, glaze: true });
+      /* the podium's own elevation is the widest wall this district puts at eye level — it gets the
+         frame and the glass too, or the shaft above it stands on a blank plinth */
+      faces.push({ ox: 0, yBase: 0, oz: pd / 2, ry: 0, w: pw, h: ph, top: ph - 0.9, foot: baseH, seed: 400 + i, glaze: true });
+      roofY = ph + 0.3; roofW = pw; roofD = pd;
+      topY = h; topW = sw; topD = sd; topZ = sz0;
+      padY = ph + 0.3; padZ = Math.min(sz0 + sd / 2 + 3.1, pd / 2 - 3.0);
+    } else {
+      /* STEPPED: the v6 form, kept — a core mass with one setback shaft above it. What changed is the
+         frame it wears: the four corner pilasters are platinum now instead of composite, and the base
+         course, the piers and the courses put a structural grid on the elevation the mass used to lack. */
+      const coreH = spec.sb ? Math.round(h * (1 - spec.sb)) : h;
+      B.structural.push(P(chamferBox(w, coreH, d, 0.45), 0, coreH / 2, 0));
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) B.platMid.push(P(chamferBox(PW, coreH + 0.5, PW, 0.12), sx * (w / 2 - PW / 2 + 0.42), (coreH + 0.5) / 2, sz * (d / 2 - PW / 2 + 0.42)));
+      baseCourse(P, 0, 0, w + 0.6, d + 0.6, baseH);
+      parapet(P, 0, 0, w + 0.7, d + 0.7, coreH, FR.band);
+      faces.push({ ox: 0, yBase: 0, oz: d / 2, ry: 0, w, h: coreH, top: coreH - FR.band, foot: baseH, seed: 100 + i, glaze: true });
+      if (spec.side) faces.push({ ox: spec.side * (w / 2), yBase: 0, oz: 0, ry: spec.side * Math.PI / 2, w: d, h: coreH, top: coreH - FR.band, foot: baseH, seed: 200 + i, glaze: true });
+      roofY = coreH; topY = coreH;
+      padY = spec.sb ? coreH : h;
+      if (spec.sb) {
+        const sw = w * 0.6, sd = d * 0.58, sh = h - coreH, sz0 = -d * 0.14, sx0 = (R() - 0.5) * (w - sw) * 0.5;
+        B.structural.push(P(chamferBox(sw, sh, sd, 0.4), sx0, coreH + sh / 2, sz0));
+        parapet(P, sx0, sz0, sw + 0.5, sd + 0.5, h, 0.9);
+        for (const sx of [-1, 1]) B.platMid.push(P(chamferBox(PW * 0.8, sh + 0.3, PW * 0.8, 0.1), sx0 + sx * (sw / 2 - PW * 0.4 + 0.3), coreH + (sh + 0.3) / 2, sz0 + sd / 2 - PW * 0.4 + 0.3));
+        faces.push({ ox: sx0, yBase: coreH, oz: sz0 + sd / 2, ry: 0, w: sw, h: sh, top: sh - 0.9, foot: 0.3, seed: 300 + i, glaze: true });
+        topY = h; topW = sw; topD = sd; topX = sx0; topZ = sz0;
+        padZ = d / 2 - 3.2;
+      }
     }
-    B.composite.push(P(chamferBox(w + 0.7, 1.1, d + 0.7, 0.18), 0, coreH - 0.55, 0));
-    /* setback volume with its own windows and crown */
-    let topY = coreH, topW = w, topD = d, topX = 0, topZ = 0;
-    if (spec.sb) {
-      const sw = w * 0.6, sd = d * 0.58, sh = h - coreH, sz0 = -d * 0.14, sx0 = (R() - 0.5) * (w - sw) * 0.5;
-      B.structural.push(P(chamferBox(sw, sh, sd, 0.4), sx0, coreH + sh / 2, sz0));
-      B.composite.push(P(chamferBox(sw + 0.5, 0.9, sd + 0.5, 0.15), sx0, h - 0.45, sz0));
-      for (const sx of [-1, 1]) B.composite.push(P(chamferBox(PW * 0.8, sh + 0.3, PW * 0.8, 0.1), sx0 + sx * (sw / 2 - PW * 0.4 + 0.3), coreH + (sh + 0.3) / 2, sz0 + sd / 2 - PW * 0.4 + 0.3));
-      facadeWindows(g, sw, sh, 300 + i, (grid, cy) => grid.position.set(sx0, coreH + cy, sz0 + sd / 2 + 0.06));
-      topY = h; topW = sw; topD = sd; topX = sx0; topZ = sz0;
-    }
-    /* parapet rails on the core roof (front and both sides) */
-    kitBox(bm, 0, coreH, d / 2 - 0.12, 0, w - 0.6, 0.9, 0.12);
-    kitBox(bm, -(w / 2 - 0.12), coreH, 0, 0, 0.12, 0.9, d - 0.6);
-    kitBox(bm, (w / 2 - 0.12), coreH, 0, 0, 0.12, 0.9, d - 0.6);
+    /* the frame and the glazing, cut from one module per face; the frame goes on faces the block turns
+       to the camera even where there is no glass behind it, so a blank flank is still a framed wall */
+    faces.forEach(f => {
+      const mod = winModule(f.w, f.h, glazed);
+      frameFace(bm, f, mod);
+      if (f.glaze) glaze(g, mod, f.seed, (grid, cy) => { grid.position.set(f.ox + 0.06 * Math.sin(f.ry), f.yBase + cy, f.oz + 0.06 * Math.cos(f.ry)); grid.rotation.y = f.ry; });
+    });
+    /* parapet rails on the block's own deck (front and both sides) */
+    kitBox(bm, roofX, roofY, roofZ + roofD / 2 - 0.12, 0, roofW - 0.6, 0.9, 0.12);
+    kitBox(bm, roofX - (roofW / 2 - 0.12), roofY, roofZ, 0, 0.12, 0.9, roofD - 0.6);
+    kitBox(bm, roofX + (roofW / 2 - 0.12), roofY, roofZ, 0, 0.12, 0.9, roofD - 0.6);
     /* roof plant on the top roof (kept to the back half where a pad shares the roof), one mast on most */
+    const shared = spec.pad && padY > topY - 1;
     const n = 2 + Math.floor(R() * 2);
     for (let k = 0; k < n; k++) {
       const bw = 2 + R() * 2.5, bh = 1.2 + R() * 1.8, bd = 2 + R() * 1.5;
       const bx = topX + (R() - 0.5) * Math.max(0, topW - bw - 2.4);
-      const bz = spec.pad && !spec.sb ? topZ - topD / 4 - R() * Math.max(0, topD / 4 - bd / 2 - 0.6) : topZ + (R() - 0.5) * Math.max(0, topD - bd - 2.4);
+      const bz = shared ? topZ - topD / 4 - R() * Math.max(0, topD / 4 - bd / 2 - 0.6) : topZ + (R() - 0.5) * Math.max(0, topD - bd - 2.4);
       kitBox(bm, bx, topY, bz, 0, bw, bh, bd);
     }
     if (R() < 0.7) {
@@ -266,25 +430,20 @@ export function buildCity(ctx) {
       kitMast(bm, mx, topY, mz, 0.22, mh);
       if (i % 3 === 0) B.whites.push(P(new THREE.BoxGeometry(0.5, 0.5, 0.5), mx, topY + mh + 0.25, mz));
     }
-    /* windows: the front face always, the plaza-facing side face where the block is seen obliquely */
-    const face = glazedIds[spec.id] ? curtainFace : facadeWindows;
-    face(g, w, coreH, 100 + i, (grid, cy) => grid.position.set(0, cy, d / 2 + 0.06));
-    if (spec.side) face(g, d, coreH, 200 + i, (grid, cy) => { grid.position.set(spec.side * (w / 2 + 0.06), cy, 0); grid.rotation.y = spec.side * Math.PI / 2; });
     /* rooftop pad for the life module: a low platform with a square-diamond outline in energy */
     if (spec.pad) {
-      const py = spec.sb ? coreH : h, pz = spec.sb ? d / 2 - 3.2 : 0;
-      B.composite.push(P(chamferBox(5.5, 0.3, 5.5, 0.08), 0, py + 0.15, pz));
-      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4, hs = 1.9; B.strips.push(P(new THREE.BoxGeometry(2.7, 0.06, 0.28), Math.cos(a) * hs, py + 0.33, pz + Math.sin(a) * hs, Math.atan2(-Math.cos(a), -Math.sin(a)))); }
-      const position = new THREE.Vector3(0, py + 0.3, pz).applyMatrix4(bm);
+      B.composite.push(P(chamferBox(5.5, 0.3, 5.5, 0.08), padX, padY + 0.15, padZ));
+      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4, hs = 1.9; B.strips.push(P(new THREE.BoxGeometry(2.7, 0.06, 0.28), padX + Math.cos(a) * hs, padY + 0.33, padZ + Math.sin(a) * hs, Math.atan2(-Math.cos(a), -Math.sin(a)))); }
+      const position = new THREE.Vector3(padX, padY + 0.3, padZ).applyMatrix4(bm);
       anchors.pads.push({ id: 'city-pad-' + spec.id, position, facing: Math.atan2(-position.x, -position.z), kind: spec.pad, tier: 'far' });
       stats.pads++;
     }
     /* the elevator: a slim track on the front face and one cool-white car that changes floor every few seconds */
     if (spec.elevator) {
-      const ex = -w / 2 + PW + 1.6;
-      B.composite.push(P(chamferBox(0.7, coreH - 3, 0.3, 0.05), ex, (coreH - 3) / 2 + 1.5, d / 2 + 0.22));
-      const car = new THREE.Mesh(elevGeo, whiteMat); car.name = 'city-elevator'; car.position.set(ex, 3.2, d / 2 + 0.46); g.add(car);
-      elevator = { mesh: car, floors: Math.max(2, Math.floor((coreH - 6.5) / FLOOR)), base: 3.2, floor: 0, dir: 1, from: 3.2, to: 3.2, t0: 0, t1: 0, next: -1, R: rng(SEED + 9001) };
+      const f0 = faces[0], ex = f0.ox - f0.w / 2 + PW + 1.6, th = f0.h - 3, base = f0.yBase + 3.2;
+      B.composite.push(P(chamferBox(0.7, th, 0.3, 0.05), ex, f0.yBase + th / 2 + 1.5, f0.oz + 0.22));
+      const car = new THREE.Mesh(elevGeo, whiteMat); car.name = 'city-elevator'; car.position.set(ex, base, f0.oz + 0.4); g.add(car);
+      elevator = { mesh: car, floors: Math.max(2, Math.floor((f0.h - 6.5) / FLOOR)), base, floor: 0, dir: 1, from: base, to: base, t0: 0, t1: 0, next: -1, R: rng(SEED + 9001) };
     }
     stats.blocks++;
   });
@@ -421,6 +580,12 @@ export function buildCity(ctx) {
   const merged = (list, material, name, shadow) => { if (!list.length) return null; const m = new THREE.Mesh(own(mergeGeos(list)), material); m.name = name; if (shadow) m.castShadow = true; group.add(m); return m; };
   merged(B.structural, structuralM, 'city-structure', true);      /* block bodies, setbacks, decks, pylons — the only shadow casters */
   merged(B.composite, compositeM, 'city-composite', false);
+  /* the whole district's platinum frame in three meshes: fifteen blocks' worth of base courses,
+     spandrel courses, pilasters, reveals and parapet bands (vertical), their piers (vertical, brushed)
+     and their sills, copings and terrace decks (horizontal, low metalness) */
+  merged(B.platMid, platMidM, 'city-frame', false);
+  merged(B.platPier, platPierM, 'city-frame-piers', false);
+  merged(B.platLit, platCapM, 'city-frame-caps', false);
   merged(B.trim, trimM, 'city-rails', false);
   merged(B.strips, stripMat, 'city-energy-lines', false);
   merged(B.whites, whiteMat, 'city-static-lights', false);
@@ -476,7 +641,8 @@ export function buildCity(ctx) {
 
   /* cost bookkeeping (what the establishing view can at most draw from this module) */
   group.traverse(o => { if (o.isMesh && o.geometry) { const g = o.geometry, n = g.index ? g.index.count : g.attributes.position.count; stats.triangles += Math.round(n / 3) * (o.isInstancedMesh ? o.count : 1); stats.drawCalls++; } });
-  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'MeshBasic: windows / energy lines / lights / 3 distant bands / ground'];
+  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'block frame: platinumMid / platinumMidBrushed (vertical) + platinumMidLit (horizontal)', 'MeshBasic: windows / energy lines / lights / 3 distant bands / ground'];
+  stats.massings = BLOCKS.reduce((o, s) => { const k = MASSING_OF(s.id); o[k] = (o[k] || 0) + 1; return o; }, {});
   stats.towerFamilies = Object.keys(byArch).reduce((o, k) => { const f = k.split('|')[1]; o[f] = (o[f] || 0) + byArch[k].length; return o; }, {});
   stats.valleys = ['52-72 deg right', '108-124 deg centre', '128-142 deg left'];
   setTime(ctx.clock && typeof ctx.clock.state === 'function' ? ctx.clock.state() : last);

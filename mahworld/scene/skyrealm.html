@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#2a2450">
+<title>MAHWORLD · UPPER REALM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --ground:#2a2450; --ink:#f3f0ff; --dim:rgba(232,226,255,.66); --line:rgba(214,206,255,.26);
+    --energy:#bcd8ff; --panel:rgba(22,18,48,.58); --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  }
+  html,body{margin:0;height:100%;background:var(--ground);color:var(--ink);font:500 12px/1.4 "Space Grotesk",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;overflow:hidden}
+  canvas#skyrealm{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  .hud{position:fixed;left:0;right:0;pointer-events:none;display:flex;flex-direction:column;gap:6px;padding:calc(12px + var(--safe-t)) 16px 0}
+  .hud--bottom{top:auto;bottom:0;padding:0 16px calc(12px + var(--safe-b));gap:7px}
+  .eyebrow{letter-spacing:.32em;text-transform:uppercase;font-size:10px;color:var(--dim)}
+  .title{letter-spacing:.16em;text-transform:uppercase;font-size:14px;font-weight:700}
+  .note{max-width:44ch;color:var(--dim);letter-spacing:.04em}
+  .row{display:flex;gap:6px;flex-wrap:wrap;pointer-events:auto;align-items:center}
+  .row button{appearance:none;font:inherit;letter-spacing:.18em;text-transform:uppercase;font-size:10px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:8px 10px;min-height:34px;backdrop-filter:blur(6px);cursor:pointer}
+  .row button[aria-pressed="true"]{border-color:var(--energy);box-shadow:0 0 0 1px rgba(188,216,255,.35)}
+  .row button:focus-visible{outline:2px solid var(--energy);outline-offset:2px}
+  .label{color:var(--dim);letter-spacing:.22em;font-size:9px;text-transform:uppercase;min-width:4.6em}
+  .clock{font-variant-numeric:tabular-nums;letter-spacing:.14em;font-size:11px}
+  .clock small{color:var(--dim);letter-spacing:.1em}
+  .fail{position:fixed;inset:0;display:none;place-items:center;padding:24px;text-align:center;background:var(--ground)}
+  .fail p{max-width:36ch;color:var(--dim)}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<canvas id="skyrealm" aria-label="The MAHWORLD upper realm: an ocean of cloud at sunset, ascent pads and a concourse behind, open training flats to one side and cloud towers to the other"></canvas>
+
+<header class="hud" data-hud>
+  <span class="eyebrow">MAHWORLD · UPPER REALM · skybiome</span>
+  <span class="title" data-view-label>Arrival</span>
+  <span class="clock" data-clock>—</span>
+  <span class="note">Reached only by the vertical ascent vehicles. Turn around: the realm is authored in every direction.</span>
+</header>
+
+<footer class="hud hud--bottom" data-hud>
+  <div class="row" data-views></div>
+  <div class="row">
+    <span class="label">Turn</span>
+    <button type="button" data-spin="0">0°</button>
+    <button type="button" data-spin="45">45°</button>
+    <button type="button" data-spin="90">90°</button>
+    <button type="button" data-spin="135">135°</button>
+    <button type="button" data-spin="180">180°</button>
+    <button type="button" data-spin="225">225°</button>
+    <button type="button" data-spin="270">270°</button>
+    <button type="button" data-spin="315">315°</button>
+  </div>
+  <div class="row">
+    <span class="label">Hour</span>
+    <button type="button" data-time="09:30">Day</button>
+    <button type="button" data-time="18:10">Sunset</button>
+    <button type="button" data-time="19:20">Dusk</button>
+    <button type="button" data-time="22:40">Night</button>
+    <span class="label" style="margin-left:10px">Tier</span>
+    <button type="button" data-quality="high">High</button>
+    <button type="button" data-quality="medium">Med</button>
+    <button type="button" data-quality="low">Low</button>
+  </div>
+</footer>
+
+<div class="fail" data-fail><p>This device could not start WebGL for the upper realm.</p></div>
+
+<script type="module">
+  import { createSkyrealm } from './skyrealm.js';
+
+  const q = new URLSearchParams(location.search);
+  const canvas = document.getElementById('skyrealm');
+  const clockEl = document.querySelector('[data-clock]');
+  const viewLabel = document.querySelector('[data-view-label]');
+  const viewsRow = document.querySelector('[data-views]');
+  if (q.get('hud') === '0') document.querySelectorAll('[data-hud]').forEach(n => n.hidden = true);
+
+  function press(sel, match) {
+    document.querySelectorAll(sel).forEach(b => b.setAttribute('aria-pressed', String(match(b))));
+  }
+
+  try {
+    const realm = await createSkyrealm(canvas, {
+      time: q.get('time') || '18:10',
+      quality: q.get('quality') || null,
+      view: q.get('view') || 'arrival',
+      hud: (s) => {
+        if (!s.clock) return;
+        clockEl.innerHTML = s.clock.hhmm + ' <small>' + s.clock.label + ' · ' + (s.band || '') + '</small>';
+      }
+    });
+
+    realm.views().forEach(v => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = v.id; b.title = v.label; b.dataset.view = v.id;
+      b.addEventListener('click', () => {
+        realm.setView(v.id);
+        viewLabel.textContent = v.label;
+        press('[data-view]', x => x.dataset.view === v.id);
+        press('[data-spin]', () => false);
+      });
+      viewsRow.appendChild(b);
+    });
+    press('[data-view]', b => b.dataset.view === realm.state.view);
+    viewLabel.textContent = (realm.views().find(v => v.id === realm.state.view) || {}).label || realm.state.view;
+
+    document.querySelectorAll('[data-spin]').forEach(b => b.addEventListener('click', () => {
+      const r = realm.look360(Number(b.dataset.spin));
+      viewLabel.textContent = b.dataset.spin + '° — sector ' + r.sector + ', ' + r.sectorName;
+      press('[data-spin]', x => x === b);
+      press('[data-view]', () => false);
+    }));
+    document.querySelectorAll('[data-time]').forEach(b => b.addEventListener('click', () => {
+      realm.setTime(b.dataset.time);
+      press('[data-time]', x => x === b);
+    }));
+    press('[data-time]', b => b.dataset.time === (q.get('time') || '18:10'));
+    document.querySelectorAll('[data-quality]').forEach(b => b.addEventListener('click', () => {
+      realm.setQuality(b.dataset.quality);
+      press('[data-quality]', x => x === b);
+    }));
+    press('[data-quality]', b => b.dataset.quality === realm.state.quality);
+  } catch (e) {
+    console.error(e);
+    document.querySelector('[data-fail]').style.display = 'grid';
+  }
+</script>
+</body>
+</html>

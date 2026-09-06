@@ -156,17 +156,59 @@ export const ATMO = Object.freeze({
   })
 });
 
+/* THE BAND ARGUMENT. world-clock.js runs eight bands; this atmosphere has four keys. Snapping
+   between four keys would make the sky jump at every boundary, so a band may be given either as one
+   of the four key names OR as a blend { a, b, t } — and atmoBand(clockState) turns the clock's own
+   state into exactly that. Everything downstream takes `band` and does not care which it got. */
+export function atmoBand(clockState) {
+  const s = clockState || {};
+  const e = typeof s.sunElevation === 'number' ? s.sunElevation : 0.05;
+  const k = String(s.band || '');
+  /* the clock's eight bands map onto the four atmospheric identities; within the twilight bands the
+     blend follows the sun's own elevation, which is what keeps the transition continuous */
+  if (k === 'day' || k === 'morning') return { a: 'day', b: 'day', t: 0 };
+  if (k === 'late-afternoon') return { a: 'day', b: 'dusk', t: smooth((0.42 - e) / 0.34) };
+  if (k === 'sunset' || k === 'dusk') return { a: 'dusk', b: 'night', t: smooth((0.02 - e) / 0.26) };
+  if (k === 'night' || k === 'late-night') return { a: 'night', b: 'night', t: 0 };
+  if (k === 'dawn') return { a: 'night', b: 'dawn', t: smooth((e + 0.18) / 0.24) };
+  /* no band given: fall back to the sun */
+  if (e > 0.42) return { a: 'day', b: 'day', t: 0 };
+  if (e > 0.02) return { a: 'dusk', b: 'day', t: smooth((e - 0.02) / 0.40) };
+  return { a: 'night', b: 'dusk', t: smooth((e + 0.20) / 0.22) };
+}
+function keyPair(band) {
+  if (band && typeof band === 'object' && band.a) return band;
+  const k = ATMO[band] ? band : 'dusk';
+  return { a: k, b: k, t: 0 };
+}
+function stop(band, sectorId, which) {
+  const p = keyPair(band);
+  const A = ATMO[p.a][sectorId][which], B = ATMO[p.b][sectorId][which], t = p.t || 0;
+  if (t <= 0) return A; if (t >= 1) return B;
+  const ar = (A >> 16) & 255, ag = (A >> 8) & 255, ab = A & 255;
+  const br = (B >> 16) & 255, bg = (B >> 8) & 255, bb = B & 255;
+  return ((Math.round(lerp(ar, br, t)) << 16) | (Math.round(lerp(ag, bg, t)) << 8) | Math.round(lerp(ab, bb, t))) >>> 0;
+}
+/* the scalar keys (sun intensity, exposure, star level) blend the same way */
+export function atmoScalar(band, name) {
+  const p = keyPair(band);
+  return lerp(ATMO[p.a][name], ATMO[p.b][name], p.t || 0);
+}
+export function atmoSunColour(band) { const p = keyPair(band); const A = ATMO[p.a].sun, B = ATMO[p.b].sun, t = p.t || 0;
+  if (t <= 0) return A; if (t >= 1) return B;
+  return ((Math.round(lerp((A >> 16) & 255, (B >> 16) & 255, t)) << 16) | (Math.round(lerp((A >> 8) & 255, (B >> 8) & 255, t)) << 8) | Math.round(lerp(A & 255, B & 255, t))) >>> 0; }
+
 /* Blend the four sector stops at a bearing, then blend horizon → mid → zenith by elevation.
    `out` should be a THREE.Color; passing one avoids allocating in a vertex loop. */
 export function atmosphere(bearing, elevation, band, out) {
-  const K = ATMO[band] || ATMO.dusk;
   const w = sectorWeights(bearing);
   let hr = 0, hg = 0, hb = 0, mr = 0, mg = 0, mb = 0, zr = 0, zg = 0, zb = 0;
   for (let i = 0; i < SECTORS.length; i++) {
-    const k = K[SECTORS[i].id], f = w[i];
-    hr += ((k.horizon >> 16) & 255) * f; hg += ((k.horizon >> 8) & 255) * f; hb += (k.horizon & 255) * f;
-    mr += ((k.mid >> 16) & 255) * f; mg += ((k.mid >> 8) & 255) * f; mb += (k.mid & 255) * f;
-    zr += ((k.zenith >> 16) & 255) * f; zg += ((k.zenith >> 8) & 255) * f; zb += (k.zenith & 255) * f;
+    const id = SECTORS[i].id, f = w[i];
+    const h = stop(band, id, 'horizon'), m = stop(band, id, 'mid'), z = stop(band, id, 'zenith');
+    hr += ((h >> 16) & 255) * f; hg += ((h >> 8) & 255) * f; hb += (h & 255) * f;
+    mr += ((m >> 16) & 255) * f; mg += ((m >> 8) & 255) * f; mb += (m & 255) * f;
+    zr += ((z >> 16) & 255) * f; zg += ((z >> 8) & 255) * f; zb += (z & 255) * f;
   }
   /* elevation −1..1; the horizon band is tight and the zenith owns the top half, which is how a real
      sky is distributed — most of the colour drama lives in the first 25 degrees */
@@ -179,10 +221,10 @@ export function atmosphere(bearing, elevation, band, out) {
 }
 /* the ambient/bounce colour a builder should use for things standing in a given direction */
 export function fillFor(bearing, band) {
-  const K = ATMO[band] || ATMO.dusk, w = sectorWeights(bearing);
+  const w = sectorWeights(bearing);
   let r = 0, g = 0, b = 0;
   for (let i = 0; i < SECTORS.length; i++) {
-    const c = K[SECTORS[i].id].fill, f = w[i];
+    const c = stop(band, SECTORS[i].id, 'fill'), f = w[i];
     r += ((c >> 16) & 255) * f; g += ((c >> 8) & 255) * f; b += (c & 255) * f;
   }
   return ((Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(b)) >>> 0;
