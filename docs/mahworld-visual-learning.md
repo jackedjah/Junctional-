@@ -817,6 +817,44 @@ a literal. When a lesson names a ratio, store the ratio.
 
 ---
 
+## L59 — A curved object has more than one curvature, and a test must say which one it means
+**Where it bit.** The R4 law suite failed MAH HALO on its own central claim. `halo.js` publishes
+524.73 m of deviation at 3 km; the test measured 195.65 and called it a failure. Neither number was
+wrong — they are **two different curvatures of the same object**:
+
+| | what it is | at 3 km |
+|---|---|---|
+| DISH | the cross-section, ACROSS the 2700 m width. `d² / (2·R_DISH)` | 195.65 m |
+| RING | the plan curvature AROUND the world axis. `R_MID·(1 − cos(s/2R_MID))` | 524.73 m |
+
+A viewer looking left-right across the band sees the dish; a viewer looking ALONG the ring sees the
+horizon bend away, which is the ring, and which is nearly three times larger. The spec quoted one and
+the test measured the other.
+**The second half of the same bug.** "Accelerating" was tested as a ratio of ratios — `d(3000)/d(1000)
+> d(1000)/d(300)` — across steps of 3× and 3.33×. A **perfect parabola fails that test**. Accelerating
+across unequal steps means deviation-per-metre strictly increasing, which is what it asserts now.
+**Regression.** When a shape curves in more than one plane, name the plane in the variable, the
+assertion and the log line. A test that fails correct geometry costs more than no test, because the
+next person changes the geometry to satisfy it.
+
+---
+
+## L60 — A test that measures nothing passes, and passing is what makes it dangerous
+**Where it bit.** The R4 budget check reported `309 draws / 382154 tris` for "on the ring" and the
+identical `309 draws / 382154 tris` for "on the plaza", and PASSED both assertions. The two frames
+were the same frame: the nav check two blocks above calls `navGoto`, which turns **roam ON**, and
+while roam is on `placeCamera()` uses roam's own position and ignores `setCustomView` entirely. Every
+subsequent "camera" in that suite was the walker standing at HALO ARRIVAL.
+**Why it survived review.** Both numbers were plausible, both assertions were true of them, and the
+suite printed a clean pass. Only reading the two lines *next to each other* showed they were equal.
+**The fix has two parts.** Turn roam off before measuring — and add the guard on the guard: assert
+that the two frames actually differ. Any test that compares two states should first assert the two
+states are distinguishable.
+**Regression.** After a test calls anything that changes global mode (roam, quality, diagnostic,
+theme, time), restore it. And when two measurements come back identical, treat that as the finding.
+
+---
+
 ## Standing ownership map (reuse, do not rediscover)
 
 | System | Owner |

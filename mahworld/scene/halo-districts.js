@@ -323,14 +323,30 @@ export function buildHaloDistricts(ctx, opts = {}) {
       put('glass', chamferBox(0.18, h * 0.78, w, 0.06), mat(x, z, h * 0.52, a), 0.62);
       return [x, z, th];
     },
-    /* a CRYSTAL GROWTH cluster — QUIET's garden, the rainforest's ground family brought upstairs */
+    /* a CRYSTAL GROWTH cluster — QUIET's garden, the rainforest's ground family brought upstairs.
+
+       DARK ON DARK IS NOT A SILHOUETTE. The first cut put the whole cluster in the dark bucket at
+       value 0.50, standing on a near-black plate: from any camera further than about 40 m the
+       growths vanished, and QUIET's garden read as an empty district rather than a quiet one. R3's
+       instruction for exactly this is to solve same-colour readability with material RESPONSE,
+       silhouette, texture and shadow rather than by inventing a hue.
+
+       So a growth is two materials, which is also what a crystal actually is: a dark body that the
+       plate's own light passes into, and a CROWN whose upper facets are platinum and catch the
+       horizon. The crown is the readable part at distance and the body is what you see up close —
+       the same two-tier trick the plaza's own floor shards use. The crown is set WIDER than the
+       body's waist and lower than its apex, so the profile is a faceted stone and never a spike. */
     growth(deg, s, t, n, seed) {
       const [x, z, th] = ringPoint(deg, s, t);
       for (let k = 0; k < n; k++) {
         const a = gold(seed + k), rr = 2 + 7 * frac(seed + k * 3);
         const w = 0.8 + 2.2 * frac2(seed + k * 5), tall = w * (0.5 + 0.7 * frac(seed + k * 7));
+        const gx = x + Math.cos(a) * rr, gz = z + Math.sin(a) * rr, gy = gold(seed + k * 11);
         const g = own(new THREE.OctahedronGeometry(1, 0));
-        put('dark', g, mat(x + Math.cos(a) * rr, z + Math.sin(a) * rr, tall * 0.28, gold(seed + k * 11), w, tall, w * 0.9), 0.50);
+        put('dark', g, mat(gx, gz, tall * 0.28, gy, w, tall, w * 0.9), 0.50);
+        /* the crown: a second, shallower octahedron riding the body's shoulder in platinum */
+        const c = own(new THREE.OctahedronGeometry(1, 0));
+        put('plat', c, mat(gx, gz, tall * 0.62, gy + 0.42, w * 0.66, tall * 0.34, w * 0.60), 0.92);
       }
       return [x, z, th];
     },
