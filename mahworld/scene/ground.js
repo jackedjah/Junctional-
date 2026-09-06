@@ -131,7 +131,9 @@ export function buildGround(ctx) {
      held above it with an energy core inside, reflected in the chromium floor beneath.
      No invented emblem — this is the square-diamond the whole world already uses. */
   {
-    const mx = 0, mz = -4;
+    /* forward of the MAH MATCH approach, not across its portal: a plaza centrepiece the eye lands on
+       first, with the entrance and its two actions still clear behind it */
+    const mx = 0, mz = 7;
     const monument = new THREE.Group(); monument.name = 'plaza-monument';
     monument.position.set(mx, FLOOR_TOP, mz); g.add(monument);
     /* the plinth: three receding faceted courses, dark, so the crystal above reads against them */
@@ -155,16 +157,16 @@ export function buildGround(ctx) {
        light comes THROUGH it. So the core is large and bright, the shell over it is glass, and the
        only opaque part is the thin mirror edge that catches the moon on its turn. */
     const dy = py + 5.4;
-    const core = new THREE.Mesh(new THREE.OctahedronGeometry(3.5, 0), M.energyLight);
+    const core = new THREE.Mesh(new THREE.OctahedronGeometry(2.9, 0), M.energyLight);
     core.scale.set(1, 1.55, 0.34); core.position.y = dy; monument.add(core);
-    const shell = new THREE.Mesh(new THREE.OctahedronGeometry(4.0, 0), M.crystalGlass || M.glass);
+    const shell = new THREE.Mesh(new THREE.OctahedronGeometry(3.35, 0), M.crystalGlass || M.glass);
     shell.scale.set(1, 1.55, 0.46); shell.position.y = dy; monument.add(shell);
     reflect(core, 0.5); reflect(collar, 0.3);
     /* the edge catches that make it turn: four thin mirror bars along its equator */
     for (let i = 0; i < 4; i++) {
       const a = i * Math.PI / 2 + Math.PI / 4;
-      const bar = new THREE.Mesh(chamferBox(0.16, 0.16, 5.6, 0.04), M.chromeMirror || M.trim);
-      bar.position.set(Math.cos(a) * 2.0, dy, Math.sin(a) * 2.0);
+      const bar = new THREE.Mesh(chamferBox(0.16, 0.16, 4.7, 0.04), M.chromeMirror || M.trim);
+      bar.position.set(Math.cos(a) * 1.7, dy, Math.sin(a) * 1.7);
       bar.rotation.y = -a + Math.PI / 2; bar.rotation.x = 0.66; monument.add(bar);
     }
     /* a mast carrying the diamond clear of its plinth, so it reads as HELD rather than resting */

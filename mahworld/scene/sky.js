@@ -94,7 +94,10 @@ export function buildSky(ctx) {
      violet-white only — deep space seen THROUGH atmosphere — and held dim enough that it never
      competes with the moon or the FOBEAM field. It sits behind the whole world (renderOrder −9,
      just in front of the dome) and fades with the same `stars` key as the star field. */
-  const GAL_R = 866, GAL_U = 132, GAL_V = 16, GAL_GAIN = 0.26;
+  /* GAL_GAIN is the whole band's ceiling: through ACES at the night exposure its brightest knot
+     lands near 0.64 in the blue channel against a 0.13 night sky and a 0.90 moon — present, never
+     competing. Raising it above ~0.20 starts to fight the moon and the FOBEAM field. */
+  const GAL_R = 866, GAL_U = 132, GAL_V = 16, GAL_GAIN = 0.17;
   const galPole = new THREE.Vector3(0.223, 0.55, 0.805).normalize();          /* pole of the band's plane */
   const galA = new THREE.Vector3().crossVectors(galPole, new THREE.Vector3(0, 1, 0)).normalize();   /* horizon crossing */
   const galB = new THREE.Vector3().crossVectors(galPole, galA).normalize(); if (galB.y < 0) galB.negate();   /* top of the arc */
@@ -300,16 +303,52 @@ function radialTexture() {
   g.fillStyle = r; g.fillRect(0, 0, 256, 256);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
+/* THE MOON's surface, painted procedurally: a silver-white body lit from the upper right, a few
+   broad soft MARIA (offset from centre so they never read as a face), a scatter of small bright
+   crater catches, a gentle terminator shading and a brightened LIMB so the disc turns instead of
+   sitting flat. Cool throughout — silver-white to pale blue-white — and feathered at the very rim
+   so the edge stays clean at 8° across. */
+const MOON_MARIA = [[-0.30, 0.16, 0.40, 0.30], [0.26, -0.14, 0.27, 0.24], [0.08, 0.44, 0.22, 0.22], [-0.48, -0.30, 0.19, 0.18], [0.42, 0.32, 0.25, 0.20], [-0.10, -0.42, 0.16, 0.15]];
+const MOON_CRATERS = [[0.34, -0.44, 0.055], [-0.52, 0.30, 0.045], [0.12, 0.14, 0.036], [-0.20, -0.18, 0.030], [0.56, 0.06, 0.040], [-0.34, 0.56, 0.032]];
 function moonTexture() {
-  const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
-  const cx = 256, cy = 256, R = 254;
-  const base = g.createRadialGradient(cx - 40, cy - 50, 20, cx, cy, R);
-  base.addColorStop(0, '#dbe4f3'); base.addColorStop(0.7, '#a3b3cd'); base.addColorStop(1, '#5f7394');
-  g.fillStyle = base; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();
-  g.globalAlpha = 0.2; g.fillStyle = '#3b4d6d';
-  [[cx - 90, cy + 40, 46], [cx + 70, cy - 30, 30], [cx + 20, cy + 120, 22], [cx - 140, cy - 90, 18], [cx + 110, cy + 80, 26]].forEach(([x, y, r]) => { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); });
-  g.globalAlpha = 1;
-  const t = g.createRadialGradient(cx + 70, cy - 60, R * 0.5, cx, cy, R); t.addColorStop(0, 'rgba(6,10,20,0)'); t.addColorStop(1, 'rgba(6,10,20,0.7)');
-  g.fillStyle = t; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();
-  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; return tex;
+  return canvasTexture(640, 640, (g, W) => {
+    const cx = W / 2, cy = W / 2, R = W / 2 - 3;
+    g.clearRect(0, 0, W, W);
+    g.save(); g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.clip();
+    const base = g.createRadialGradient(cx + R * 0.26, cy - R * 0.30, R * 0.05, cx, cy, R);
+    base.addColorStop(0, '#f4f7ff'); base.addColorStop(0.42, '#dde6f7'); base.addColorStop(0.78, '#b6c4dd'); base.addColorStop(1, '#96a8c6');
+    g.fillStyle = base; g.fillRect(0, 0, W, W);
+    MOON_MARIA.forEach(([mx, my, mr, a]) => {
+      const x = cx + mx * R, y = cy + my * R, r = mr * R;
+      const m = g.createRadialGradient(x, y, r * 0.18, x, y, r);
+      m.addColorStop(0, 'rgba(94,114,148,' + a + ')'); m.addColorStop(0.6, 'rgba(102,122,156,' + (a * 0.5).toFixed(3) + ')'); m.addColorStop(1, 'rgba(108,128,162,0)');
+      g.fillStyle = m; g.fillRect(0, 0, W, W);
+    });
+    MOON_CRATERS.forEach(([mx, my, mr]) => {
+      const x = cx + mx * R, y = cy + my * R, r = mr * R;
+      const m = g.createRadialGradient(x, y, 0, x, y, r);
+      m.addColorStop(0, 'rgba(238,244,255,0.34)'); m.addColorStop(0.55, 'rgba(220,232,252,0.12)'); m.addColorStop(1, 'rgba(200,218,248,0)');
+      g.fillStyle = m; g.fillRect(0, 0, W, W);
+    });
+    const shade = g.createRadialGradient(cx + R * 0.34, cy - R * 0.36, R * 0.28, cx, cy, R * 1.04);
+    shade.addColorStop(0, 'rgba(10,18,36,0)'); shade.addColorStop(0.62, 'rgba(10,18,36,0.13)'); shade.addColorStop(1, 'rgba(10,18,36,0.40)');
+    g.fillStyle = shade; g.fillRect(0, 0, W, W);
+    const limb = g.createRadialGradient(cx, cy, R * 0.74, cx, cy, R);
+    limb.addColorStop(0, 'rgba(226,236,255,0)'); limb.addColorStop(0.68, 'rgba(228,238,255,0.17)'); limb.addColorStop(0.94, 'rgba(240,246,255,0.40)'); limb.addColorStop(1, 'rgba(240,246,255,0.16)');
+    g.globalCompositeOperation = 'lighter'; g.fillStyle = limb; g.fillRect(0, 0, W, W);
+    g.globalCompositeOperation = 'source-over'; g.restore();
+    const fade = g.createRadialGradient(cx, cy, R * 0.965, cx, cy, R + 2);
+    fade.addColorStop(0, 'rgba(0,0,0,0)'); fade.addColorStop(1, 'rgba(0,0,0,1)');
+    g.globalCompositeOperation = 'destination-out'; g.fillStyle = fade; g.fillRect(0, 0, W, W); g.globalCompositeOperation = 'source-over';
+  });
+}
+/* the moon's outer halo: a wide, low, long-tailed falloff — atmosphere around the disc, never a
+   second bright disc on top of it (the core stays under a third of the sprite's own alpha) */
+function moonHaloTexture() {
+  return canvasTexture(256, 256, (g, W) => {
+    const r = g.createRadialGradient(W / 2, W / 2, 0, W / 2, W / 2, W / 2);
+    r.addColorStop(0, 'rgba(214,230,255,0.30)'); r.addColorStop(0.2, 'rgba(200,220,255,0.24)'); r.addColorStop(0.34, 'rgba(176,204,255,0.13)');
+    r.addColorStop(0.52, 'rgba(146,182,248,0.052)'); r.addColorStop(0.76, 'rgba(112,152,230,0.014)'); r.addColorStop(1, 'rgba(84,124,200,0)');
+    g.clearRect(0, 0, W, W); g.fillStyle = r; g.fillRect(0, 0, W, W);
+  });
 }
