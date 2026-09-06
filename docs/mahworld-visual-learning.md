@@ -435,6 +435,102 @@ changed before believing the feature broke. (Suite back to 18/18.)
 
 ---
 
+## L34 — The fog bank must sit beyond the last thing worth seeing
+**Failure.** Every render sent for weeks came back value-compressed: the mountains, the mid city and
+the far ring all resolved to one flat blue and no frame had depth in it. I had been treating this as
+a lighting problem.
+**Root owner.** `mahplaza.js`, one number. Linear fog reached 100% at 880 m. `terrain.js` authors
+THREE deliberately-separated ranges — near (r 620), mid (r 1050, base `0x172440` / ridge `0x51648f`)
+and far (r 1500, base `0x2b3f66` / ridge `0x7a8fb8`), each lighter than the one in front of it. That
+ladder *is* the world's depth cue, painted into the vertex colours, and the bank was deleting two
+thirds of it before it reached the frame. The camera frustum was also 2000 m, so from anywhere out
+at a peer city the far ring was clipped as well.
+**Correction.** Fog far 880 → 2350 (+700 by day); frustum 2000 → 2600.
+**The measurement lesson, which cost more than the fix.** I built a five-band mean-luminance probe
+and it reported the spread going 17.9 → 21.4 — a 20% move that would not have justified the change
+on its own. The render showed a transformation. **A band mean is the wrong statistic for a value
+ladder**: averaging a horizontal strip mixes sky, ridge and city, and a ladder is about which
+SURFACES separate, not how bright a row of pixels is. When a number and an image disagree about a
+composition, the image is the thing being judged.
+
+---
+
+## L35 — `MeshBasicMaterial` has no solids in it
+**Failure.** The rainforest canopy — ~700 square-diamond nodes, the whole identity of the biome —
+rendered as flat white squares of paper stapled to sticks.
+**Root owner.** `rainforest.js`. The node material was `MeshBasicMaterial`, which is unlit by
+definition: every node returned its flat `instanceColor` with no shading of any kind.
+**Correction.** The same platinum the growth bands use, `flatShading` on, `vertexColors` false
+(the geometry carries no colour attribute; `instanceColor` is a separate define and still applies).
+LAW 1 then does the work for free — a faceted leaf turns four ways to the horizon and comes back
+four values.
+**Regression.** Reach for `MeshBasic` only for things that emit (veins, rain aura, sign faces).
+Anything meant to read as a SOLID takes a standard material or it has no form.
+
+---
+
+## L36 — A canopy overhead is not a forest; a forest is what you cannot see through
+**Failure.** Standing inside the rainforest, it read as a plantation: bare stems ~50 m apart with
+open sky between them to the horizon.
+**Root owner.** Nothing was wrong with the canopy. 26 organisms 118–168 m tall put every leaf 120 m
+above a walker's head, and in plan their crowns overlap — so from the plaza at 700 m the ceiling was
+correctly massed, and that is the only place it had ever been judged from. The 0–60 m band the
+viewer actually occupies had nothing in it at all.
+**Correction.** 58 shorter organisms of the same genome on an offset spiral, one low tier of arms
+each, occupying 17–54 m.
+**Regression.** Every biome authored as scenery has to be re-judged the moment roam lets someone
+stand in it. The defect will not be in the part you designed; it will be in the band you never
+framed.
+
+---
+
+## L37 — The angle you measure a mirror from decides what you see
+**Failure.** The forest floor was a sheet of milk across the bottom third of every eye-level frame —
+§07's black floor, inverted.
+**Root owner.** `rainforest.js` inherited the plaza's polished paving (metalness 0.40, roughness
+0.34). On the plaza that is right: a 90 m deck, broken into tiles with dark joints, with the
+reflection group putting the city back into it. The forest floor is ONE unbroken 328 m disc, and
+from a 1.70 m eye the far 250 m of it sit at grazing incidence where Fresnel goes to 1 and a smooth
+surface returns the entire bright horizon.
+**The measurement I got wrong first.** I probed it from 34 m LOOKING DOWN, measured 20/255, and
+recorded it as black. It is black from there. **A floor must be measured from the height it is
+walked at**, because a mirror's brightness is a function of the angle you meet it at, not a
+property of the material.
+**Correction.** Roughness 0.74 / metalness 0.26 on the forest grade only — scatter the grazing lobe.
+The plaza keeps its polish; a forest floor was never meant to have any.
+
+---
+
+## L38 — Scatter density is per square metre, not per scene
+**Failure.** A ground layer of 340 growths over a 308 m disc rendered and read as *nothing*.
+**Root owner.** Arithmetic. 308 m radius is 298,000 m² — one object every 30 m — so a 30 m near
+field contained THREE of them. The layer existed and was invisible.
+**Correction.** 3000 growths + 3500 litter (one every ~10 m), sized 1–4 m so they still read at the
+60–120 m where most of the visible floor actually is. 6500 instances, two draws, 52k triangles.
+**Second failure inside the same fix.** At 1.5–3.0× height the growths rendered as a row of teeth
+along the sight line — §06's cone failure arriving at a third scale, after floor shards (#101) and
+flora tips (#105). Squatting them to 0.42–0.88× height fixed it.
+**Regression.** Quote scatter density in objects per square metre before writing the count, and
+check any new scattered family for the needle silhouette before rendering it — this world has now
+grown spikes three times in three different modules.
+
+---
+
+## L39 — A face big enough to walk up to needs something on it
+**Failure.** The nearest rainforest trunk filled a quarter of the eye-level frame with a single flat
+quad returning a single value. Not dark, not wrong — blank.
+**Root owner.** Economy that was correct at the distance it was authored for. From the plaza these
+stems are 4 px wide and a smooth chamfered box is the right call; at 30 m one face is 17 × 20 m of
+featureless plane, and 700 m of aerial perspective had been hiding it.
+**Correction.** Eight proud vertical ribs per trunk segment, baked into the same merge — three
+values per segment (face, rib flank, rib front) instead of one, and they read as growth along the
+stem rather than as panelling. Zero extra draws.
+**Regression.** Any surface a viewer can now walk up to needs detail sized for that distance. The
+question to ask of every large flat face is not "is its value right" but "how many values does it
+give me from two metres away".
+
+---
+
 ## Standing ownership map (reuse, do not rediscover)
 
 | System | Owner |

@@ -253,6 +253,27 @@ export function buildRainforest(ctx) {
       const g = chamferBox(r * 2, sh, r * 2, Math.min(1.6, r * 0.26));
       bake(B, 'organism', g, at(ox, y + sh / 2, oz, ORGANISM.twist * sgi + gold(i)), 0.60 + 0.14 * t);
       g.dispose();
+      /* L39 — FLUTING, because a 17 m trunk face is a wall and a wall has to have something on it.
+         From the plaza these stems are 4 px wide and a smooth box was the right economy. From inside
+         the forest the nearest one fills a quarter of the frame with a single flat quad returning a
+         single value: not dark, not wrong, just BLANK, which is the one thing 700 m of aerial
+         perspective was hiding. Four proud ribs per face give the segment three values instead of
+         one — face, rib flank, rib front — and they run vertically, so they read as growth along the
+         stem rather than as panelling. They bake into the same merge, so the whole stand pays two
+         extra draws of nothing and gains the thing that makes it survive being walked through. */
+      for (let f = 0; f < 4; f++) {
+        const fa = f * Math.PI / 2 + ORGANISM.twist * sgi + gold(i);
+        for (let q = -1; q <= 1; q += 2) {
+          const off = r * 0.42 * q;                       /* two ribs per face, off the centre line */
+          const rw = Math.max(0.22, r * 0.13);
+          const rg = chamferBox(rw, sh * 0.94, rw * 0.75, rw * 0.3);
+          bake(B, 'organism', rg,
+            at(ox + Math.cos(fa) * r * 1.02 - Math.sin(fa) * off,
+               y + sh / 2,
+               oz - Math.sin(fa) * r * 1.02 - Math.cos(fa) * off, fa), 0.86);
+          rg.dispose();
+        }
+      }
       /* PLATINUM GROWTH BAND at the joint — the part that makes the family read. Up-facing by
          construction, so it lands in the low-metalness bucket and LAW 1 holds without a special case. */
       const bg = chamferBox(r * 2.38, 1.5, r * 2.38, 0.45);
@@ -491,6 +512,86 @@ export function buildRainforest(ctx) {
     }
   }
 
+  /* ---- 2b. THE GROUND LAYER -------------------------------------------------------------------
+     L38 — A CORRECT FLOOR IS STILL AN EMPTY FLOOR. Once L37 stopped the disc reading as milk, what
+     it read as instead was a void: 328 m of perfect nothing between the viewer's feet and the
+     nearest trunk. §07 asks the floor to be black and reflective; it does not ask it to be bare, and
+     bare is what tells the eye "this is a plane, not a place". Two instanced families fix it for two
+     draws, and both are the square diamond because everything here is:
+
+       GROWTHS  low clusters half-buried in the floor, so they read as coming OUT of it rather than
+                sitting ON it — §13's rule that things root into a surface, at ground scale.
+       LITTER   fallen canopy nodes lying nearly flat. The canopy sheds; the floor is where it lands.
+                These are the only bright things down here, which is what gives the floor its depth:
+                a dark plane with sparse catches reads as far deeper than a dark plane alone. */
+  let groundMesh = null, litterMesh = null;
+  {
+    /* DENSITY IS AN AREA PROBLEM, AND I SIZED IT AS A COUNT. The first cut put 340 growths on a
+       308 m disc — 298,000 m², one every 30 m — and inside a 30 m near field that is THREE objects.
+       The layer rendered and read as nothing. Scatter density has to be quoted per square metre, not
+       per scene: 3000 over the same disc is one every 10 m, which at 2-7 m tall is what actually
+       closes the near ground. 6500 instances across two families costs 52k triangles and two draws. */
+    const GROWTH = 3000, LITTER = 3500, R = ORGANISM.spread + 40;
+    const gGeo = own(new THREE.OctahedronGeometry(1, 0));
+    const lGeo = own(new THREE.OctahedronGeometry(1, 0));
+    lGeo.scale(1, 0.16, 0.68);                 /* a shed leaf lies flat; it does not stand on a point */
+
+    const gMat = (M.graphiteMetal || M.graphite).clone();
+    gMat.color = new THREE.Color(gMat.color).lerp(new THREE.Color(RECEDE.tint), RECEDE.mix * 0.5);
+    gMat.envMapIntensity = (gMat.envMapIntensity || 1) * RECEDE.env;
+    gMat.vertexColors = false; gMat.flatShading = true;
+    gMat.name = 'forest-ground-growth'; owned.materials.push(gMat);
+
+    const lMat = (M.platinumMidLit || M.platinumLit).clone();
+    lMat.color = new THREE.Color(lMat.color).lerp(new THREE.Color(RECEDE.tint), RECEDE.mix * 0.5);
+    lMat.envMapIntensity = (lMat.envMapIntensity || 1) * RECEDE.env * 0.8;
+    lMat.vertexColors = false; lMat.flatShading = true;
+    lMat.name = 'forest-ground-litter'; owned.materials.push(lMat);
+
+    groundMesh = new THREE.InstancedMesh(gGeo, gMat, GROWTH);
+    litterMesh = new THREE.InstancedMesh(lGeo, lMat, LITTER);
+    groundMesh.name = 'forest-ground-growth'; litterMesh.name = 'forest-ground-litter';
+    const col = new THREE.Color();
+
+    for (let i = 0; i < GROWTH; i++) {
+      /* sqrt keeps the scatter even in AREA; a plain frac would pile everything at the centre */
+      const rr = R * Math.sqrt(frac(i * 3 + 101)), a = gold(i * 2 + 7);
+      /* an OUTCROP, not a pebble: 1.1-4.0 m across, so it still reads at the 60-120 m where most of
+         the visible floor actually is. WIDER THAN TALL, deliberately — the first cut used 1.5-3.0x
+         height and the layer rendered as a row of teeth along the sight line, which is §06's cone
+         failure (the same one the plaza's floor shards keep committing) arriving at a third scale.
+         An octahedron squatter than it is wide is a boulder; taller than it is wide is a spike. */
+      const s = 1.1 + 2.9 * frac2(i * 5 + 13);
+      const tall = s * (0.42 + 0.46 * frac(i * 7 + 17));
+      /* HALF-BURIED: the centre sits BELOW the floor, so the disc cuts the octahedron and only its
+         upper half shows. That single offset is the whole difference between a growth and a prop. */
+      const m4 = at(Math.cos(a) * rr, GROUND_Y + 0.12 - tall * 0.42, Math.sin(a) * rr,
+        gold(i * 11 + 3), s, tall, s * (0.7 + 0.5 * frac2(i * 13)));
+      groundMesh.setMatrixAt(i, m4);
+      col.setScalar(0.44 + 0.42 * frac(i * 17 + 5));
+      groundMesh.setColorAt(i, col);
+    }
+    for (let i = 0; i < LITTER; i++) {
+      const rr = R * Math.sqrt(frac2(i * 3 + 211)), a = gold(i * 2 + 29);
+      const s = 1.6 + 3.6 * frac(i * 5 + 31);
+      const m4 = at(Math.cos(a) * rr, GROUND_Y + 0.16 + 0.10 * frac2(i * 7), Math.sin(a) * rr,
+        gold(i * 19 + 11), s, s, s);
+      /* a small tilt off horizontal, so the litter catches at different values instead of all
+         returning the same up-facing near-black (LAW 1 would otherwise make the whole layer vanish) */
+      m4.multiply(new THREE.Matrix4().makeRotationX((frac(i * 23) - 0.5) * 0.7));
+      m4.multiply(new THREE.Matrix4().makeRotationZ((frac2(i * 29) - 0.5) * 0.7));
+      litterMesh.setMatrixAt(i, m4);
+      col.setScalar(0.34 + 0.52 * frac2(i * 37 + 3));
+      litterMesh.setColorAt(i, col);
+    }
+    for (const m of [groundMesh, litterMesh]) {
+      if (m.instanceColor) m.instanceColor.needsUpdate = true;
+      m.instanceMatrix.needsUpdate = true;
+      group.add(m);
+    }
+    stats.ground = { growths: GROWTH, litter: LITTER };
+  }
+
   /* ---- 3. EMIT THE GRADES, AND MEASURE LAW 1 -------------------------------------------------- */
   for (const k of Object.keys(B)) {
     const t = B[k];
@@ -641,6 +742,10 @@ export function buildRainforest(ctx) {
       fauna.forEach(f => f.setQuality(q));
       if (rainAura) rainAura.visible = !low;              /* the aura is the first thing to go */
       if (rainCore) rainCore.count = low ? Math.round(RAIN.count * 0.35) : RAIN.count;
+      /* §19: the ground layer thins rather than disappearing. It is static geometry, so dropping the
+         instance count costs nothing per frame and the floor still has something on it. */
+      if (groundMesh) groundMesh.count = low ? 1100 : 3000;
+      if (litterMesh) litterMesh.count = low ? 1000 : 3500;
     },
     dispose() {
       musicLines.dispose();
