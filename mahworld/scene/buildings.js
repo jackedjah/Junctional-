@@ -541,6 +541,12 @@ function platinumOrder(ctx, g, o) {
   /* a RETURN — the same platinum carried around onto the flank. Without it a viewer walking past the
      corner sees the framing stop at the arris, and the whole elevation collapses back into paint.
      A return ends in the open at both ends, so both of its ends get the lit grade too. */
+  /* THE REAL FLANK IS NOT W/2. softMass() extrudes roundedBoxShape with bevelSize 0.35, so a mass
+     of width W has its actual side face at W/2 + 0.35. Every return below was originally placed at
+     W/2 + 0.02 and rendered NOTHING — fourteen parts buried inside the pier they were meant to turn
+     onto. Centring the bar on the true flank half-embeds it and leaves t/2 standing proud, which is
+     what a return is. */
+  const FLANK = W / 2 + 0.35;
   const ret = (x, y0, y1, zc, dz, t) => [-1, 1].forEach(sd => {
     part(piers, chamferBox(t, y1 - y0, dz, 0.06), sd * x, (y0 + y1) / 2, zc);
     part(caps, chamferBox(t + 0.14, 0.18, dz + 0.14, 0.04), sd * x, y1 + 0.05, zc);
@@ -563,8 +569,12 @@ function platinumOrder(ctx, g, o) {
          one clad corner, and the mass loses its edge */
       pier(sd * (W / 2 - 0.85), 1.3, floorY, floorY + 9.0, z, d, true);
     });
-    course(0, W - 1.2, floorY + 8.28, floorY + 9.02, z, d + 0.1, true);
-    ret(W / 2 + 0.02, floorY + 3.4, floorY + 9.55, -1.9, 2.6, 0.42);   /* y kept inside the pier's flat flank, between its 3.2 m corner radii */
+    /* THE TRANSFER BAND STOPS EITHER SIDE OF THE SIGN. Run full-frontage it passed straight through
+       the mounted sign assembly, whose recess spans y 8.21-14.99 and x +/-7.68. Splitting it is not a
+       retreat: the sign now sits INTO the band's line, which is how a real transfer beam meets a
+       panel let into it, and the market's upper course already does the same thing. */
+    [-1, 1].forEach(sd => course(sd * 13.2, 10.4, floorY + 8.28, floorY + 9.02, z, d + 0.1, true));
+    ret(FLANK, floorY + 3.4, floorY + 9.55, -1.9, 2.6, 0.42);   /* y kept inside the pier's flat flank, between its 3.2 m corner radii */
   } else if (order === 'piered') {
     /* MAH MARKET — PIERED. Its terraces already give it a horizontal roof line, so the wall takes the
        opposite emphasis: a civic order of four full-height mullion piers standing 1.15 m proud of the
@@ -584,7 +594,7 @@ function platinumOrder(ctx, g, o) {
     /* the cornice starts at 15.15 and not at the roof line: the wordmark's chromium frame tops out at
        14.99, and a cornice soffit dropped onto it would eat the sign's mounting depth */
     course(0, W - 0.8, floorY + 15.15, floorY + 16.05, 1.3, 1.3, true);
-    ret(W / 2 + 0.02, floorY + 2.6, floorY + 12.5, -1.5, 2.0, 0.42);
+    ret(FLANK, floorY + 2.6, floorY + 12.5, -1.5, 2.0, 0.42);
   } else {
     /* MAH MATCH — FRAMED. At 38 m a fine grid reads as texture rather than as structure, so the anchor
        takes a colossal order: a 4 m plinth rising out of the entrance stair, a 1.7 m BELT at the portal
@@ -600,18 +610,26 @@ function platinumOrder(ctx, g, o) {
     const tx0 = openW / 2 + 0.6, tcx = (tx0 + x1) / 2, tlen = x1 - tx0;
     const sill = floorY + openH + 1.6, fh = (H - 1.2 - sill) / 3;   /* the podium curtain wall, as its own module lays it out */
     [-1, 1].forEach(sd => {
-      course(sd * cx, len, floorY - 1.2, floorY + 2.8, 0.95, 0.95, true);
+      /* down to the plaza, not to floorY - 1.2: the stair only carries this plinth as far as x 12.3,
+         so from there out to 21.9 its underside was hanging 0.6 m above the ground */
+      course(sd * cx, len, floorY - 1.8, floorY + 2.8, 0.95, 0.95, true);
       course(sd * cx, len, floorY + 13.7, floorY + 15.4, 1.05, 0.58, true);
       for (let f = 0; f < 2; f++) course(sd * tcx, tlen, sill + (f + 1.02) * fh - 0.36, sill + (f + 1.02) * fh + 0.36, 1.05, 0.5, true);
       pier(sd * (W / 2 - 0.55), 1.1, floorY + 2.8, floorY + 34.8, 1.05, 0.42, false);
     });
     /* the attic runs to W − 0.2 rather than W − 1.2 so it caps the corner returns instead of leaving
        their tops open to a black zenith */
-    course(0, W - 0.2, floorY + 34.8, floorY + 36.35, 1.05, 0.75, true);
-    ret(W / 2 + 0.06, floorY + 1.8, floorY + 33.2, -2.2, 3.4, 0.5);
+    /* dropped 0.75 m so the attic's cap clears the crystal crown's 37.66 front plane, and back to
+       W - 1.2: it was widened to W - 0.2 to cap the corner returns, but ret() caps its own ends and
+       the returns now stand at W/2 + 0.35, which no attic of width W reaches anyway. */
+    course(0, W - 1.2, floorY + 34.05, floorY + 35.6, 1.05, 0.75, true);
+    ret(FLANK, floorY + 1.8, floorY + 33.2, -2.2, 3.4, 0.5);
   }
   merged(g, face, M.platinumMid || M.platinum, 'platinum-courses', true);
-  merged(g, piers, M.platinumMidBrushed || M.platinumBrushed, 'platinum-piers', true);
+  /* platinumMid, NOT platinumMidBrushed: mergeParts() carries only position and normal, so a
+     brushed roughnessMap on this geometry samples a single texel forever — a silent constant, not
+     a brush. The grade that actually differs without a UV is the plain one. */
+  merged(g, piers, M.platinumMid || M.platinum, 'platinum-piers', true);
   merged(g, caps, M.platinumMidLit || M.platinumLit, 'platinum-sills', true);
 }
 
