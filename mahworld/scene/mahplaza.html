@@ -54,7 +54,7 @@
      preview, quality, route — which is right for a control deck and wrong for a place you are
      standing in: it covered half the frame and the thumbstick landed on top of the quality row.
      While roaming, everything except the roam row itself and the clock steps out of the way. */
-  body[data-roaming] .hud--bottom > .row:not([data-roam-row]),
+  body[data-roaming] .hud--bottom > .row:not([data-roam-row]):not([data-travel-row]),
   body[data-roaming] .hud--bottom > .note,
   body[data-roaming] .hud > .note{display:none}
   body[data-roaming] .hud--bottom{padding-bottom:calc(170px + var(--safe-b))}
@@ -119,6 +119,13 @@
     <button type="button" data-roam aria-pressed="false">Walk the world</button>
     <button type="button" data-roam-mode aria-pressed="false" hidden>Fly</button>
   </div>
+  <div class="row" role="group" aria-label="Fly to another city" data-travel-row>
+    <span class="label">Fly to</span>
+    <button type="button" data-travel="plaza">MAHPLAZA</button>
+    <button type="button" data-travel="lake">Lake City</button>
+    <button type="button" data-travel="forest">Rainforest</button>
+    <span class="clock" data-travel-beat></span>
+  </div>
   <div class="row" role="group" aria-label="Preview">
     <span class="label">Preview</span>
     <button type="button" data-practice>Practice preview</button>
@@ -159,7 +166,7 @@
   const clockEl = $('[data-clock]'), meter = $('[data-meter]');
   const card = $('[data-card]');
   const viewButtons = $$('[data-view]'), timeButtons = $$('[data-time]'), themeButtons = $$('[data-theme]'), selfButtons = $$('[data-self]');
-  let world = null, repaintRoam = null, lastRoam = null;
+  let world = null, repaintRoam = null, lastRoam = null, lastBeat = null;
   const paintCard = sel => {
     if (!sel) { card.hidden = true; return; }
     card.hidden = false;
@@ -187,6 +194,11 @@
            page chrome follows the WORLD's state rather than assuming its own button is the only way
            in. Repaint only on a change: this runs every 15 frames. */
         if (s.roam !== lastRoam) { lastRoam = s.roam; if (repaintRoam) repaintRoam(); }
+        if (s.travel !== lastBeat) {
+          lastBeat = s.travel;
+          const el = document.querySelector('[data-travel-beat]');
+          if (el) el.textContent = s.travel ? s.travel.toUpperCase() : '';
+        }
       }
     });
   } catch (e) { $('[data-fail]').style.display = 'grid'; console.error(e); }
@@ -224,6 +236,7 @@
       roamModeBtn.textContent = fly ? 'Flying' : 'Fly';
       lift.hidden = !fly;
       roamPad.hidden = !on || hudOff; roamHint.hidden = !on || hudOff;
+      const tr = document.querySelector('[data-travel-row]'); if (tr) tr.hidden = hudOff;
       /* the stage clears while roaming — see the CSS note. Driven off the world's state, so it is
          correct however roam was entered (button, R key, ?roam=1 or the API). */
       if (on) document.body.setAttribute('data-roaming', '1'); else document.body.removeAttribute('data-roaming');
@@ -261,6 +274,13 @@
     /* the keyboard toggles roam too (R), so the page's own chrome has to follow the world's state
        rather than assume it owns it */
     window.addEventListener('keyup', e => { if (e.key === 'r' || e.key === 'R' || e.key === 'Escape') paintRoam(); });
+    /* §9 — FLY TO. Engages roam if it is off, because a flight watched from a fixed camera is the
+       cut the law is written against. The beat is surfaced so the journey names its own stages. */
+    const avail = world.travelDestinations();
+    $$('[data-travel]').forEach(btn => {
+      if (avail.indexOf(btn.dataset.travel) < 0) { btn.hidden = true; return; }
+      btn.addEventListener('click', () => { world.select(null); world.travelTo(btn.dataset.travel); paintRoam(); });
+    });
     if (q.get('roam') === '1') { world.setRoam(true, { mode: q.get('fly') === '1' ? 'fly' : 'walk' }); }
     paintRoam();
 

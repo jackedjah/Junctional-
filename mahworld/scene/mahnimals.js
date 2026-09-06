@@ -89,8 +89,20 @@ export function createMahnimals(ctx, spec = {}) {
   bandGeo.rotateX(Math.PI / 2);
   owned.geometries.push(bandGeo);
 
+  /* THE VEIN RUNS THE BODY'S LONGEST AXIS, which is not always the vertical one. Authored for the
+     DRIFTER — tall, so the vein was `F.h * 0.94` and the other two axes were thin — it became a
+     sliver on the SWIMMER, whose body is flat (h 0.22) and long (d 0.86). On a pitch-black lake the
+     vein is the only part of a dark animal that reads at all, so a swimmer with a vertical vein is
+     an invisible swimmer: 30 of them rendered as nothing on the water. Scaled on the dominant axis,
+     the swimmer gets a bright line down its length — which is also the right read, because a wake
+     runs the way the animal is going. */
   const veinGeo = new THREE.OctahedronGeometry(1, 0);
-  veinGeo.scale(F.w * 0.30, F.h * 0.94, F.d * 0.30);
+  const thin = 0.30, longAxis = Math.max(F.w, F.h, F.d);
+  veinGeo.scale(
+    F.w === longAxis ? F.w * 0.94 : F.w * thin,
+    F.h === longAxis ? F.h * 0.94 : F.h * thin,
+    F.d === longAxis ? F.d * 0.94 : F.d * thin
+  );
   owned.geometries.push(veinGeo);
 
   const dark = (M.graphiteDark || M.graphite || new THREE.MeshStandardMaterial({ color: 0x1f2a3c })).clone();
@@ -98,7 +110,10 @@ export function createMahnimals(ctx, spec = {}) {
   const plat = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
   plat.name = 'mahnimal-band'; owned.materials.push(plat);
   const vein = new THREE.MeshBasicMaterial({
-    color: new THREE.Color(theme.energyLight), transparent: true, opacity: 0.62,
+    /* a caller on a black surface can ask for more — the lake does, because its water returns
+       nothing and the vein is the whole signal there */
+    color: new THREE.Color(theme.energyLight), transparent: true,
+    opacity: Number.isFinite(spec.veinOpacity) ? spec.veinOpacity : 0.62,
     blending: THREE.AdditiveBlending, depthWrite: false, fog: true
   });
   vein.name = 'mahnimal-vein'; owned.materials.push(vein);

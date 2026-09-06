@@ -20,6 +20,7 @@ import * as THREE from '../vendor/three/three.module.min.js';
 import { createWorldClock } from './world-clock.js';
 import { createMaterials, resolveTheme, THEMES, canvasTexture } from './materials.js';
 import { createRoam, ROAM } from './roam.js';   /* v15: the viewer's own camera */
+import { createTravel } from './travel.js';     /* R2 §9: inter-city flight as real traversal */
 import { buildGround } from './ground.js';
 import { buildBuildings } from './buildings.js';
 import { buildSky } from './sky.js';
@@ -490,6 +491,18 @@ export async function createMahplaza(canvas, options = {}) {
      camera inside placeCamera(), and every composed view, the tour and the capture harness keep
      working unchanged because turning roam off restores the anchor they were always using. */
   const roam = createRoam({ THREE, boxes: colliderBoxes, onChange: r => { state.roam = r.on ? r.mode : null; } });
+  /* R2 §9 — INTER-CITY FLIGHT. The destination table is built from the modules that actually got
+     built, so a city that failed to load cannot be flown to and the table is never a fiction. The
+     plaza is a destination too: you have to be able to come home. */
+  const travelDest = { plaza: { x: 0, z: 0, radius: 60, arriveY: 34, label: 'MAHPLAZA' } };
+  if (lakeCity && lakeCity.stats && lakeCity.stats.site) {
+    travelDest.lake = { x: lakeCity.stats.site.x, z: lakeCity.stats.site.z, radius: (lakeCity.stats.lake && lakeCity.stats.lake.rMax) || 274, arriveY: 96, label: 'LAKE CITY' };
+  }
+  if (rainforest && rainforest.stats && rainforest.stats.site) {
+    travelDest.forest = { x: rainforest.stats.site.x, z: rainforest.stats.site.z, radius: 300, arriveY: 104, label: 'RAINFOREST CITY' };
+  }
+  const travel = createTravel({ THREE, roam, destinations: travelDest });
+  state.travel = null;
   const cur = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 54 }, from = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 54 };
   let anim = null, portrait = false;
   /* THE `!v` GUARD IS NOT DEFENSIVE PADDING, IT IS A CRASH FIX. `state.view` is not always a key of
@@ -513,6 +526,10 @@ export async function createMahplaza(canvas, options = {}) {
        the same frame it moves. It takes the whole function and still pays the portrait FOV bias,
        because that bias is what keeps phone framing correct and it is not roam's to drop. */
     if (roam.state.on) {
+      /* §9: the flight WRITES roam's position and heading, then roam integrates as normal — so the
+         viewer is in their own camera the whole way and can take it back at any moment. */
+      if (travel.flying) { travel.update(dt); state.travel = travel.state.beat; }
+      else if (state.travel) state.travel = null;
       roam.step(dt);
       roam.applyTo(camera);
       camera.fov = cur.fov + (state.fovBias || 0); camera.updateProjectionMatrix();
@@ -602,6 +619,15 @@ export async function createMahplaza(canvas, options = {}) {
     return roam.state.on;
   }
   function setRoamMode(m) { const r = roam.setMode(m); requestRender(); return r; }
+  /* §9 public entry. Engages roam first if it is not on, because a flight you watch from a fixed
+     camera is the cut this is written against. */
+  function travelTo(name, opt) {
+    if (!roam.state.on) { if (!setRoam(true, { mode: 'fly' })) return false; }
+    const ok = travel.go(name, opt);
+    if (ok) { state.travel = travel.state.beat; requestRender(); }
+    return ok;
+  }
+  function travelCancel() { const r = travel.cancel(); state.travel = null; return r; }
 
   async function tour({ hold = 900, leg = 3800 } = {}) {
     if (state.touring) return false; state.touring = true;
@@ -720,6 +746,7 @@ export async function createMahplaza(canvas, options = {}) {
       /* roam look is INCREMENTAL — the drag origin is re-based every move — because roam's yaw is
          unbounded and a from-origin delta would fight the wrap at +-PI. The rail camera below is
          absolute, because its yaw is clamped to a window around the anchor and must not drift. */
+      if (travel.flying) travelCancel();       /* the viewer's hand always wins over the flight */
       roam.look(-dx * ROAM.LOOK_DRAG, -dy * ROAM.LOOK_DRAG * 0.62);
       drag.x = e.clientX; drag.y = e.clientY;
       requestRender(); return;
@@ -747,7 +774,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
     const k = e.key;
     if (k === 'r' || k === 'R') { if (roam.state.on) setRoamMode(roam.state.mode === 'fly' ? 'walk' : 'fly'); else setRoam(true); e.preventDefault(); return; }
-    if (roam.key(k, true)) { if (k.indexOf('Arrow') === 0 || k === ' ') e.preventDefault(); requestRender(); return; }
+    if (roam.key(k, true)) { if (travel.flying) travelCancel(); if (k.indexOf('Arrow') === 0 || k === ' ') e.preventDefault(); requestRender(); return; }
     if (k === 'Escape' && roam.state.on) { setRoam(false); return; }
     if (k === 'ArrowUp' || k === 'w' || k === 'W') state.dolly = Math.min(40, state.dolly + 1.5);
     else if (k === 'ArrowDown' || k === 's' || k === 'S') state.dolly = Math.max(-10, state.dolly - 1.5);
@@ -1103,6 +1130,7 @@ export async function createMahplaza(canvas, options = {}) {
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
     setDiagnostic, setQuality, get quality() { return quality.name; }, qualities: Object.keys(QUALITY), advance,
     setRoam, setRoamMode, roam,
+    travelTo, travelCancel, travel, travelDestinations: () => Object.keys(travelDest),
     /* validation: pin or release world time */
     setTime(spec) { if (spec == null || spec === 'live') clock.release(); else clock.freeze(spec); applyTime(true); requestRender(); return clock.state(); },
     renderOnce() { requestRender(); },

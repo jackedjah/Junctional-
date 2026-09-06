@@ -28,7 +28,7 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
 
   const cam = () => page.evaluate(() => { const c = window.MAHWORLD_MAHPLAZA.camera; return { x: +c.position.x.toFixed(3), y: +c.position.y.toFixed(3), z: +c.position.z.toFixed(3) }; });
   const st = () => page.evaluate(() => Object.assign({}, window.MAHWORLD_MAHPLAZA.state));
-  const shot = n => page.screenshot({ path: p.join(SC, 'roam-' + n + '.png') });
+  const shot = n => page.screenshot({ path: p.join(SC, 'roam-' + n + '.png'), timeout: 240000 });
   /* REAL key events drive the input path; advance() drives the integration at a fixed dt. Under
      SwiftShader this page runs near 1 fps and roam clamps a frame to 0.1 s, so a wall-clock key hold
      measures the renderer, not the movement (L14). */
@@ -53,11 +53,17 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
 
   /* R01 — the button exists and enabling roam does not jump the camera */
   const before = await cam();
-  const rb = await page.locator('[data-roam]').boundingBox();
+  /* the page now renders three cities and its rAF loop never idles, so Playwright's actionability
+     waits (boundingBox, click) starve and time out. Both are replaced with direct DOM calls, which
+     still run the real listeners — the input path is what these checks are about, not Playwright. */
+  const tap = sel => page.evaluate(q => { const e = document.querySelector(q); if (e) e.click(); return !!e; }, sel);
+  const rect = sel => page.evaluate(q => { const e = document.querySelector(q); if (!e) return null;
+    const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; }, sel);
+  const rb = await rect('[data-roam]');
   const vp = page.viewportSize();
   P('R00 the roam button is actually on screen', !!rb && rb.y >= 0 && rb.y + rb.height <= vp.height,
     rb ? ('y ' + rb.y.toFixed(0) + '..' + (rb.y + rb.height).toFixed(0) + ' in a ' + vp.height + ' px viewport') : 'no box');
-  await page.locator('[data-roam]').click({ force: true });
+  await tap('[data-roam]');
   await sim(1.0);
   const seeded = await cam(), s1 = await st();
   P('R01 roam engages from the page button', s1.roam === 'walk', 'state.roam=' + s1.roam);
@@ -127,7 +133,7 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
   await draw(); await shot('03-monument-stop');
 
   /* R09 — fly mode climbs, and reaches the sky roads */
-  await page.locator('[data-roam-mode]').click({ force: true }); await settle();
+  await tap('[data-roam-mode]'); await settle();
   const s2 = await st();
   P('R09 fly engages', s2.roam === 'fly', 'state.roam=' + s2.roam);
   await page.evaluate(() => { const r = window.MAHWORLD_MAHPLAZA.roam; r.state.pitch = 0.9; r.state.yaw = Math.PI; });
@@ -168,7 +174,7 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
   await page.evaluate(() => { const r = window.MAHWORLD_MAHPLAZA.roam; r.setMode('walk'); r.pos.set(0, 1.87, 26); r.state.yaw = Math.PI; });
   await settle();
   const sBefore = await cam();
-  const box = await page.locator('[data-stick]').boundingBox();
+  const box = await rect('[data-stick]');
   if (box) {
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();

@@ -74,6 +74,7 @@ import * as THREE from '../vendor/three/three.module.min.js';
 import { chamferBox } from './materials.js';
 import { foblockParts } from './foblock.js';
 import { createMusicLineField } from './musicline.js';
+import { createMahnimals } from './mahnimals.js';
 
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 
@@ -550,6 +551,28 @@ export function buildLakeCity(ctx) {
   group.add(musicLines.group);
   stats.musicLines = musicLines.stats;
 
+  /* ---- 8b. MAHNIMALS — the lake is inhabited too ----------------------------------------------
+     SWIMMERS: the flattened family, running a shallow sine just under the surface, so a pitch-black
+     mirror gets MOVEMENT in it without anything breaking the plane. That is the point of putting
+     them here rather than on the shore — a still black lake is a floor, and a black lake with
+     something moving under it is water. Kept below WATER_Y so the reflection pass never doubles
+     them into the sky. */
+  const fauna = [
+    /* AT the surface, not under it. The first cut put the swimmers 1.6 m below WATER_Y — beneath an
+       OPAQUE plane, so 34 animals rendered exactly nothing. A black mirror cannot show what is under
+       it; what it can show is something BREAKING it. So they ride the line with a shallow bob, backs
+       just proud of the water, and the reading is a wake crossing a still black surface rather than
+       a fish tank. Making the water translucent to reveal them was the other option and it is the
+       wrong one: §07 asks for pitch black, and a lake you can see into is not a mirror.
+       SIZED AGAINST THE WATER, not against a hand (L23). At scale 3.4 a swimmer was about 4 m long
+       in a 550 m lake and vanished from the shore; 9.5 puts it near 11 m, which reads from the
+       terraces and still leaves the spire the only large thing here. */
+    createMahnimals(ctx, { family: 'swimmer', count: 30, centre: [0, WATER_Y + 0.9, 0], radius: 205, yLow: -0.5, yHigh: 0.8, scale: 9.5, seed: 41, veinOpacity: 0.92 }),
+    createMahnimals(ctx, { family: 'drifter', count: 20, centre: [0, 52, 0], radius: 230, yLow: -16, yHigh: 34, scale: 6.5, seed: 67 })
+  ];
+  for (const f of fauna) group.add(f.group);
+  stats.mahnimals = { swimmers: fauna[0].stats.count, drifters: fauna[1].stats.count };
+
   /* ---- 9. LAW 2 — the emitters are answered ------------------------------------------------- */
   const key = new THREE.PointLight(theme.energy, 120, 260, 2);
   key.name = 'lake-key';
@@ -584,16 +607,19 @@ export function buildLakeCity(ctx) {
       const t = th && th.energy ? th : theme;
       key.color.setHex(t.energy);
       musicLines.setTheme(t);
+      fauna.forEach(f => f.setTheme(t));
     },
-    update(t) { musicLines.update(t); },
+    update(t) { musicLines.update(t); fauna.forEach(f => f.update(t)); },
     setQuality(q) {
       const low = q && (q.name === 'low' || q === 'low');
       musicLines.setQuality(q);
+      fauna.forEach(f => f.setQuality(q));
       const crown = group.getObjectByName('lake-spire-crown');
       if (crown) crown.visible = !low;
     },
     dispose() {
       musicLines.dispose();
+      fauna.forEach(f => f.dispose());
       owned.geometries.forEach(g => g.dispose());
       owned.materials.forEach(m => m.dispose());
       if (group.parent) group.parent.remove(group);

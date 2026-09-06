@@ -404,6 +404,35 @@ result: `assert len(old) > 200` and `assert marker in old`. Better, address by L
 both ends. Best, commit a new file before restructuring it — this one was uncommitted, and only the
 reversibility of the corruption saved a rewrite.
 
+## L31 — A part authored for one body shape is a sliver on another
+**Failure.** 30 MAHNIMAL swimmers rendered as nothing on the lake.
+**Root owner.** The MAHGIC vein — the one bright part of an otherwise dark animal — was scaled
+`F.h * 0.94` because it was authored on the DRIFTER, which is tall. A swimmer is FLAT (h 0.22) and
+LONG (d 0.86), so its vein was a sliver, and on pitch-black water a dark animal with no bright part
+is not there.
+**Correction.** Scale the vein on the body's DOMINANT axis, whichever that is. The swimmer then gets
+a bright line down its length, which is also the better read — a wake runs the way the animal goes.
+**Regression.** Any shared part in a family of differently-proportioned bodies has to be defined
+against a measured property of the body, never against whichever axis was longest on the first one.
+
+## L32 — A black mirror cannot show what is under it
+**Failure.** Swimmers were placed 1.6 m BELOW the waterline, beneath an opaque plane. Invisible.
+**Correction.** They ride the line instead, backs just proud, with a shallow bob. A black mirror
+shows what BREAKS it, not what is beneath it. Making the water translucent to reveal them was the
+other option and it is the wrong one — §07 asks for pitch black, and a lake you can see into is not
+a mirror.
+
+## L33 — Playwright's actionability waits starve on a scene that never idles
+**Failure.** The 18-check roam suite began timing out on `boundingBox()`, then on `click()`, then on
+`screenshot()` — after the world grew to three cities and ~700k triangles.
+**Root owner.** Not roam. The page's rAF loop never goes idle, and Playwright's actionability waits
+need the page to settle.
+**Correction.** Measure with `getBoundingClientRect` through `evaluate`, dispatch clicks with
+`element.click()`, and give screenshots a long explicit timeout. All three still exercise the real
+listeners — the input path is what the checks are about, not Playwright's waiting.
+**Regression.** A test that starts failing when the SCENE grows is measuring the harness. Ask what
+changed before believing the feature broke. (Suite back to 18/18.)
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)
@@ -424,6 +453,7 @@ reversibility of the corruption saved a rewrite.
 | FOBLOCK placement, music diamonds | `fobstations.js` |
 | Upper realm | `sky-layout.js` (contract), `skyrealm.js` (assembly), `sky-*.js` (builders) |
 | Giant rear-city authority monitor (§8) | `broadcast.js` |
+| Inter-city flight (R2 §9) — writes roam's camera, never its own | `travel.js` |
 | RAINFOREST CITY (R2 §6) — the third destination, organisms + diamond-shard rain | `rainforest.js` |
 | MAHNIMALS — the world's small fauna, land / air / water | `mahnimals.js` |
 | LAKE CITY (R2 §5) — the second destination | `lakecity.js`; its mountain pass is `terrain.js` PASS |
