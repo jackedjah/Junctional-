@@ -64,6 +64,41 @@
    threaded on the shafts. Everything that was still a raw box — the rail pod, the elevator car, the
    under-deck lights, the pad bars, the tower strips — is chamfered or turned into the square diamond.
 
+   v11 §06 — CUT STONE, NOT SPLINTERS. The law, in the form clouds.js states it best:
+
+       THE SILHOUETTE IS ROUND. THE SURFACE IS CRYSTALLINE.
+
+   Nothing here is smoothed and nothing is subdivided — every change below ADDS a facet. What is
+   corrected is the OUTLINE, in four places where this district was still reading as spikes:
+
+   (1) THE SHARD ARCHETYPES. v9 cut all three from a single CylinderGeometry each, which is one
+       straight taper: a constant tangent from the foot to the tip, one hard corner into the terminal
+       facet, one hard arris into the wall. At 11-39 m — which is what the corner emergences, the
+       terrace fans and the megatall setback shards actually are — that is a splinter glued to a
+       building. They are built from a PLAN and a PROFILE now (see shardPrism): every shard leaves its
+       surface on a HAUNCH, and the blade, the one archetype with an aggressive taper, gains a CROWN
+       facet so its outline turns before the table rather than running straight into it. The
+       CLUSTER's second member is short and broad enough to rejoin the first's outline instead of
+       crossing it, so the pair's outer envelope is one convex line with a designed shoulder in it.
+       Still four and six flat sides; the square diamond in plan is untouched (law 6's exception).
+   (2) THE NEAR GRADE'S SECTION. The fourteen transmissive shards on the four blocks in front of the
+       plaza take the square diamond WITH ITS FOUR ARRISES CHAMFERED — eight sides, the four cut faces
+       lying exactly on the original square's own faces. It is the same figure with a third face at
+       each edge, and it costs no draw call because those fourteen are merged, not instanced.
+   (3) THE RING DECKS. Five saucers were carried on ONE 1 m stalk, which is a couple of pixels at the
+       arrival camera, so they read as grey discs hovering free. Each now stands on a splayed HAUNCH
+       at the parapet (up to 4.7 m across), a tapering PIER, and a flared COLLAR that spreads into the
+       deck's own underbelly. All three open-ended: not one new horizontal face (law 1).
+   (4) THE ARRISES. Every mass, parapet, coping, plinth, course, pier, bridge and distant slab in the
+       district carried a hairline chamfer — 0.45 m on a 22 m block, 0.09 m on a coping, 0.04 m on a
+       38 m walkway pylon — which at 90-220 m is a razor edge and not a chamfer at all. They are
+       widened to where the third face is actually legible. chamferBox's topology does not change with
+       its radius, so this is the one part of the pass that costs NOTHING: same triangles, same draw
+       calls, a facet that can be seen. Tower C's cap, tower D's bevel and tower F's three raw
+       BoxGeometry slabs are corrected in the same spirit, and the colossal distant form gains a crown
+       ring. Measured cost for the whole pass: 84 draw calls before and after, 41 252 -> 45 120
+       triangles (+9.4 %), all of it in the shard sections and the five deck supports.
+
    Life anchors pushed: ctx.lifeAnchors.paths (walkway + 3 bridges, kind
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
@@ -302,6 +337,74 @@ const soffitWash = (w, d) => new THREE.PlaneGeometry(w, d).rotateX(Math.PI / 2);
 const sillWash = (w, d) => new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2);     /* faces UP: onto a sill, a deck, a plinth */
 /* flat facets: non-indexed + per-face normals */
 function faceted(g) { const n = g.index ? g.toNonIndexed() : g; n.computeVertexNormals(); if (n !== g) g.dispose(); return n; }
+/* ---- v11 §06 CUT STONE, NOT SPLINTERS ----------------------------------------------------------
+   THE SILHOUETTE IS ROUND. THE SURFACE IS CRYSTALLINE. A shard's SURFACE must stay planar, cut and
+   faceted; what has to stop reading as a spike is its OUTLINE against whatever is behind it. v9 built
+   every shard from a single CylinderGeometry, which gives a straight taper: one constant tangent from
+   the foot to the tip, meeting the terminal facet at one hard corner, and meeting the wall it grows
+   from at one hard arris. That is the geometry of a splinter, and at 11-39 m — which is what the
+   corner emergences, the terrace fans and the megatall setback shards actually are — it read as a
+   spike glued to a building.
+
+   `shardPrism` separates the two things a shard is made of, so both can be designed:
+     PLAN     the cross-section, as unit points in x/z. Wound like a CylinderGeometry's
+              (x = sin th, z = cos th, th increasing) so the outward faces come out the same way.
+     PROFILE  rings of [radius, height] up the axis. More than two rings is the whole point: it is
+              what lets the silhouette TURN instead of running straight.
+   Caps are fanned from vertex 0, which costs n − 2 triangles where a centre vertex costs n.
+
+   The two moves the profiles make, and neither of them removes a facet — both ADD one:
+     THE HAUNCH   a short flared ring at the foot, so a shard leaves its surface wider than its body.
+                  A shard that steps out of the wall reads as the material breaking; one that meets it
+                  at a single arris reads as an object stuck on.
+     THE CROWN    on the blade — the one archetype with an aggressive taper — a second, steeper facet
+                  before the terminal one, so the outline turns toward horizontal at the tip rather
+                  than arriving at it along a single straight line. This is terrain.js massif()'s
+                  argument, cut into flats instead of sampled: a cone's tangent is the same all the way
+                  to its point, and what stops a form being a cone is the tangent turning at the top.
+   The blade's terminal facet also grows 0.13 -> 0.165 of its own width, because a blunt tip holds a
+   highlight and a hairline aliases away. */
+function shardPrism(plan, profile) {
+  const n = plan.length, m = profile.length;
+  const tris = n * (m - 1) * 2 + 2 * (n - 2);
+  const pos = new Float32Array(tris * 9);
+  let o = 0;
+  const put = (k, i) => { const r = profile[k][0]; pos[o++] = plan[i][0] * r; pos[o++] = profile[k][1]; pos[o++] = plan[i][1] * r; };
+  for (let k = 0; k + 1 < m; k++) for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    put(k, i); put(k, j); put(k + 1, j);
+    put(k, i); put(k + 1, j); put(k + 1, i);
+  }
+  for (let i = 1; i + 1 < n; i++) { put(0, 0); put(0, i + 1); put(0, i); }               /* the foot, facing down */
+  for (let i = 1; i + 1 < n; i++) { put(m - 1, 0); put(m - 1, i); put(m - 1, i + 1); }   /* the terminal facet */
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.computeVertexNormals();      /* non-indexed, so every triangle keeps its own normal: flat facets */
+  return g;
+}
+/* THE PLANS. Four sides is the SQUARE DIAMOND seen in plan — the brand's own figure and law 6's one
+   exception, so it is kept exactly, vertices on the axes. Six sides is the crystal's. Eight is the
+   square diamond WITH ITS FOUR CORNERS CHAMFERED: the four cut faces lie exactly on the original
+   square's own faces, so this is the same figure with a small third face at each arris rather than a
+   different one — more crystalline, not less. It is spent only on the near grade, where a bare
+   four-sided splinter is close enough for its corners to read. The 1.09 rescale keeps the cut section
+   the same visual bulk as the square it came from. */
+const PLAN4 = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+const PLAN6 = [0, 1, 2, 3, 4, 5].map(k => [Math.sin(k * Math.PI / 3), Math.cos(k * Math.PI / 3)]);
+const PLAN8 = (() => { const t = 0.21, a = 1 - t, s = 1.09;
+  return [[t, a], [a, t], [a, -t], [t, -a], [-t, -a], [-a, -t], [-a, t], [-t, a]].map(([u, v]) => [u * s, v * s]); })();
+/* the profiles, in the shard's own unit height. Radius 0.5 is the nominal half-width, so SH's `w` and
+   `t` stay real metres; only the haunch ring exceeds it, by 12 % over the bottom 8 % of the height. */
+const PROF = {
+  blade:   [[0.56, 0], [0.50, 0.085], [0.245, 0.86], [0.165, 1]],   /* haunch, body, crown, table */
+  crystal: [[0.52, 0], [0.46, 0.075], [0.300, 1]],                  /* haunch, body — its table is already broad */
+  cluster: [[0.52, 0], [0.45, 0.085], [0.225, 0.86], [0.150, 1]],
+  /* THE SPUR — the cluster's second member. Shorter and broader than v9's, and it now merges back
+     into the main blade's outline TANGENTIALLY rather than crossing it: its outer edge leaves the
+     haunch at 0.66 of the pair's width and rejoins the main silhouette at about 0.4 of the height, so
+     the cluster's OUTER ENVELOPE is one convex line with a designed shoulder in it, not a fork. */
+  spur:    [[0.38, 0], [0.325, 0.06], [0.170, 0.52]]
+};
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _e = new THREE.Euler();
 function matrixOf(x, y, z, ry = 0, sx = 1, sy = 1, sz = 1, parent = null) {
   _e.set(0, ry, 0); _q.setFromEuler(_e); _p.set(x, y, z); _s.set(sx, sy, sz); _m.compose(_p, _q, _s);
@@ -461,32 +564,50 @@ export function buildCity(ctx) {
      appears nowhere in this district: the destinations and the plaza have first call on the grade that
      makes three render an extra scene pass, and a district that spent it would be taking it from them. */
   const shardFacetM = mat('shardFacet', 'crystalGlass'), shardClearM = mat('shardClear', 'shardFacet');
+  /* v11 §06: the three archetypes are built from a PLAN and a PROFILE now (see shardPrism above), not
+     from one straight-tapered cylinder each. The silhouettes change; the language does not — four and
+     six flat sides, one terminal facet, nothing smooth-shaded, nothing subdivided toward a sphere. */
+  const cluster = (plan) => mergeGeos([
+    shardPrism(plan, PROF.cluster),
+    shardPrism(plan, PROF.spur).rotateZ(0.42).translate(0.31, 0.04, 0.05)
+  ]);
   const shardGeo = {
-    /* THE BLADE — four sides tapering to a small flat facet. The workhorse: reads as a splinter of the
-       wall's own crystal at any scale, and is the cheapest form in the family at 16 triangles. */
-    blade: own(faceted(new THREE.CylinderGeometry(0.13, 0.5, 1, 4, 1).translate(0, 0.5, 0))),
-    /* THE CRYSTAL — six sides, a shallower taper, a broad blunt cap. The mass that still reads as a
-       volume rather than as a line at 200 m, so it carries the mid-distance work. */
-    crystal: own(faceted(new THREE.CylinderGeometry(0.27, 0.46, 1, 6, 1).translate(0, 0.5, 0))),
-    /* THE CLUSTER — two blades fused off axis. A single shard on a corner reads as an object placed
-       there; two growing from one root read as the material breaking, which is the whole point. */
-    cluster: own(faceted(mergeGeos([
-      new THREE.CylinderGeometry(0.13, 0.42, 1, 4, 1).translate(0, 0.5, 0),
-      new THREE.CylinderGeometry(0.10, 0.30, 0.72, 4, 1).translate(0, 0.36, 0).rotateZ(0.36).translate(0.30, 0.07, 0.06)
-    ])))
+    /* THE BLADE — four sides, a haunch at the foot, a crown facet under the table. The workhorse:
+       reads as a splinter of the wall's own crystal at any scale, at 28 triangles. */
+    blade: own(shardPrism(PLAN4, PROF.blade)),
+    /* THE CRYSTAL — six sides, a shallower taper, a broad blunt table. The mass that still reads as a
+       volume rather than as a line at 200 m, so it carries the mid-distance work. It takes the haunch
+       and NOT the crown facet: at 0.30 of 0.46 its table is already a broad top, and the eight extra
+       triangles a crown would cost across 91 instances buy nothing the eye can find at that range. */
+    crystal: own(shardPrism(PLAN6, PROF.crystal)),
+    /* THE CLUSTER — a blade and a SPUR fused at one haunch. A single shard on a corner reads as an
+       object placed there; two growing from one root read as the material breaking, which is the whole
+       point — provided their outlines are related. The spur is short and broad enough to rejoin the
+       blade's outline tangentially, so the pair's outer envelope is one convex line with a shoulder in
+       it. v9's spur was long and thin and CROSSED that outline, which is what made a fork. */
+    cluster: own(cluster(PLAN4))
   };
+  /* ---- THE NEAR GRADE'S OWN SECTION -------------------------------------------------------------
+     The fourteen transmissive shards stand on the four blocks in front of the plaza and are the only
+     ones the camera ever gets near, and at that range a bare four-sided splinter shows its arrises: a
+     90-ish degree edge running the whole length of a 13 m form is what reads as "spike glued on". They
+     take the CHAMFERED square diamond instead — the same figure with a small third face cut along each
+     of its four arrises, which is more crystalline and not less. It costs nothing in draw calls
+     because these fourteen are MERGED into one mesh rather than instanced, so a second geometry family
+     here is free; the instanced three are untouched. */
+  const shardNear = { blade: own(shardPrism(PLAN8, PROF.blade)), crystal: shardGeo.crystal, cluster: own(cluster(PLAN8)) };
   const shardI = { blade: [], crystal: [], cluster: [] };
   /* Place one shard. `grade` 'clear' merges a copy into the transmissive mesh (few, near); anything
      else pushes an instance matrix (many, mid-distance). Geometry grows from y = 0 along +Y, so `y` is
      the shard's FOOT — where it leaves the surface — which is the only anchor that stays right when a
      shard is tilted out of a wall. w / h / t are its real metres. */
   const SH = (grade, kind, x, y, z, rx, ry, rz, w, h, t, parent) => {
-    if (grade === 'clear') { B.shardClear.push(shardGeo[kind].clone().applyMatrix4(poseOf(x, y, z, rx, ry, rz, w, h, t, parent))); stats.shardsClear++; }
+    if (grade === 'clear') { B.shardClear.push(shardNear[kind].clone().applyMatrix4(poseOf(x, y, z, rx, ry, rz, w, h, t, parent))); stats.shardsClear++; }
     else { shardI[kind].push(poseOf(x, y, z, rx, ry, rz, w, h, t, parent).clone()); stats.shardsFacet++; }
   };
 
   /* ---------------------------------------------------------------- 1. midground blocks */
-  const unitKit = own(chamferBox(1, 1, 1, 0.05));
+  const unitKit = own(chamferBox(1, 1, 1, 0.115));
   const kitBox = (parent, x, y, z, ry, sx, sy, sz) => kitBoxes.push(matrixOf(x, y + sy / 2, z, ry, sx, sy, sz, parent).clone());
   const kitMast = (parent, x, y, z, r, h) => kitMasts.push(matrixOf(x, y + h / 2, z, 0, r * 2, h, r * 2, parent).clone());
   const elevGeo = own(chamferBox(1.0, 0.9, 0.35, 0.11));   /* law 6: the car is a rounded lozenge, not a brick sliding up a wall */
@@ -589,35 +710,35 @@ export function buildCity(ctx) {
     const pitch = mod.cellH + mod.gapY, totalW = mod.cols * mod.cellW + (mod.cols - 1) * mod.gapX;
     /* the sill answers the same test the glazing does, because a sill with no glass over it is not a
        sill — it is a band left stranded a storey up a blank wall */
-    if (mod.cols >= 2 && mod.rows >= 2) B.platLit.push(F(chamferBox(inner, FR.sill, FR.sillD, 0.06), 0, mod.y0 - FR.sill / 2, FR.sillD / 2));
+    if (mod.cols >= 2 && mod.rows >= 2) B.platLit.push(F(chamferBox(inner, FR.sill, FR.sillD, 0.1), 0, mod.y0 - FR.sill / 2, FR.sillD / 2));
     /* a course marks a FLOOR line, so its pitch follows the module rather than a fixed number: a
        punched-window module already has one row per storey and takes a course every second row, while
        a curtain module's row IS a two-storey floor plate and takes one at each */
     const ch = Math.min(FR.course, mod.gapY - 0.3), step = mod.gapY > 1.6 ? 2 : 1;
     for (let r = 1; r + 1 < mod.rows; r += step)
-      B.platMid.push(F(chamferBox(inner, ch, FR.courseD, 0.06), 0, mod.y0 + r * pitch + mod.cellH + mod.gapY / 2, FR.courseD / 2));
+      B.platMid.push(F(chamferBox(inner, ch, FR.courseD, 0.09), 0, mod.y0 + r * pitch + mod.cellH + mod.gapY / 2, FR.courseD / 2));
     /* the pier is the largest single piece of metal on the elevation, so it carries the brushed grade:
        a directional streak up a 30 m column is the material response the colour is not allowed to be */
     const pw = Math.min(FR.pier, mod.gapX - 0.1), ph = f.top - f.foot;
     if (pw > 0.28 && ph > 6) for (let c = 2; c < mod.cols; c += 2)
-      B.platPier.push(F(chamferBox(pw, ph, FR.pierD, 0.05), -totalW / 2 + c * (mod.cellW + mod.gapX) - mod.gapX / 2, f.foot + ph / 2, FR.pierD / 2));
+      B.platPier.push(F(chamferBox(pw, ph, FR.pierD, 0.09), -totalW / 2 + c * (mod.cellW + mod.gapX) - mod.gapX / 2, f.foot + ph / 2, FR.pierD / 2));
   }
   /* the two pieces of frame that belong to a MASS rather than to one of its faces. Dimensions are the
      band's own outer footprint, so a wing can be framed without its parapet swallowing the slot beside it.
      The base course is a PLINTH: its height follows the mass it carries, because a fixed 1.9 m course
      reads as a plinth on a 60 m tower and as a skirt on a 22 m one. */
   const baseCourse = (P, cx, cz, bw, bd, bh) => {
-    B.platMid.push(P(chamferBox(bw, bh, bd, 0.14), cx, bh / 2, cz));
+    B.platMid.push(P(chamferBox(bw, bh, bd, 0.34), cx, bh / 2, cz));
     /* law 1, found in this pass: the plinth is 0.6 m wider than the wall it carries, so it leaves a
        0.3 m LEDGE all the way round — a horizontal face, in a metalness-0.94 grade, reflecting the
        near-black zenith and therefore rendering as a dark line at the pavement. That line is the one
        place the district meets the black platinum floor, which is now a near mirror: it is the edge
        the floor most wants to return. It takes the lit grade, like every other cap in this file. */
-    B.platLit.push(P(chamferBox(bw + 0.12, 0.16, bd + 0.12, 0.05), cx, bh + 0.04, cz));
+    B.platLit.push(P(chamferBox(bw + 0.12, 0.16, bd + 0.12, 0.075), cx, bh + 0.04, cz));
   };
   const parapet = (P, cx, cz, bw, bd, top, band) => {
-    B.platMid.push(P(chamferBox(bw, band, bd, 0.18), cx, top - band / 2, cz));
-    B.platLit.push(P(chamferBox(bw + 0.3, FR.cope, bd + 0.3, 0.09), cx, top + FR.cope / 2, cz));   /* the coping faces the sky */
+    B.platMid.push(P(chamferBox(bw, band, bd, 0.34), cx, top - band / 2, cz));
+    B.platLit.push(P(chamferBox(bw + 0.3, FR.cope, bd + 0.3, 0.12), cx, top + FR.cope / 2, cz));   /* the coping faces the sky */
   };
 
   /* ---- v8 §04 THE WORLD ANSWERS THE WINDOWS ------------------------------------------------------
@@ -682,8 +803,8 @@ export function buildCity(ctx) {
       /* A SIGNAGE BAND: one large horizontal gesture across the primary elevation, sized to be read
          from the arrival camera at 150 m. A band you have to squint at is confetti with extra steps. */
       const bw = Math.min(f.w * 0.66, 15), bh = 2.6, by = f.foot + (f.top - f.foot) * 0.64;
-      B.structural.push(F(chamferBox(bw + 1.3, bh + 1.1, 0.4, 0.1), 0, by, 0.24));         /* the reveal it stands in */
-      A.push(F(chamferBox(bw, bh, 0.26, 0.07), 0, by, 0.62));
+      B.structural.push(F(chamferBox(bw + 1.3, bh + 1.1, 0.4, 0.17), 0, by, 0.24));         /* the reveal it stands in */
+      A.push(F(chamferBox(bw, bh, 0.26, 0.1), 0, by, 0.62));
       wash(hwash(bw + 0.9, bh + 0.75), 0, by, 0.46);                                       /* the recess itself, filled with its own colour */
       wash(hwash(bw + 3.4, bh * 3.5), 0, by, 0.40);                                        /* the wall and its frame, dying within ~3 m */
       /* v9: and the CRYSTAL the band lights. A blade at each end of the band, growing out of the wall
@@ -706,7 +827,7 @@ export function buildCity(ctx) {
       sides.forEach(([len, nx, nz, hb, ry]) => {
         const bar = Math.max(2.0, len - 1.6);
         const at = (geo, t, ly) => xform(geo, top.x + nx * (hb + t), ly, top.z + nz * (hb + t), ry, 1, 1, 1, bm);
-        B[hue].push(at(chamferBox(bar, 0.5, 0.22, 0.06), 0.46, cy));
+        B[hue].push(at(chamferBox(bar, 0.5, 0.22, 0.095), 0.46, cy));
         B.accWash.push(paint(at(hwash(bar + 0.6, top.band * 1.6), 0.36, cy), col));                     /* the parapet band it is bolted to */
         B.accWash.push(paint(at(soffitWash(bar + 0.6, 0.26), 0.40, top.y - 0.012), col));               /* the coping's overhang, lit from under */
         B.accWash.push(paint(at(hwash(bar + 1.4, 7.5), 0.13, top.y - top.band - 3.4), col));            /* the elevation below, falling off over ~4 m */
@@ -725,8 +846,8 @@ export function buildCity(ctx) {
          with the horizontal-falloff map, so the light dies about a metre either side of the cut. */
       const y0 = f.foot + 0.5, y1 = f.top - 0.4, sh = y1 - y0, sx = f.w * 0.21;
       if (sh < 6) return;
-      B.structural.push(F(chamferBox(1.5, sh + 0.9, 0.4, 0.1), sx, y0 + sh / 2, 0.24));
-      A.push(F(chamferBox(0.44, sh, 0.26, 0.06), sx, y0 + sh / 2, 0.62));
+      B.structural.push(F(chamferBox(1.5, sh + 0.9, 0.4, 0.17), sx, y0 + sh / 2, 0.24));
+      A.push(F(chamferBox(0.44, sh, 0.26, 0.1), sx, y0 + sh / 2, 0.62));
       wash(vwash(5.2, sh), sx, y0 + sh / 2, 0.40);                                         /* both jambs at once; the reveal masks the middle */
       wash(sillWash(2.8, 1.1), sx, y0 - 0.42, 0.52);                                       /* the plinth the seam stands on */
       wash(soffitWash(2.8, 0.9), sx, y1 + 0.52, 0.48);                                     /* and the parapet soffit it stops under */
@@ -775,15 +896,15 @@ export function buildCity(ctx) {
       /* a wing is narrower than a whole block, so its edge piers are narrower too — a full-width
          pilaster on a 10 m wing would put a fifth of the elevation into metal on width alone */
       const wp = Math.min(PW, Math.max(0.9, wA * 0.1));
-      B.structural.push(P(chamferBox(wA, hA, d, 0.45), xA, hA / 2, 0));
-      B.structural.push(P(chamferBox(wB, hB, d, 0.4), xB, hB / 2, 0));
-      B.structural.push(P(chamferBox(slotW + 0.8, hL, d - slotD, 0.3), xS, hL / 2, -slotD / 2));
+      B.structural.push(P(chamferBox(wA, hA, d, 0.9), xA, hA / 2, 0));
+      B.structural.push(P(chamferBox(wB, hB, d, 0.75), xB, hB / 2, 0));
+      B.structural.push(P(chamferBox(slotW + 0.8, hL, d - slotD, 0.55), xS, hL / 2, -slotD / 2));
       for (const sz of [-1, 1]) {
-        B.platMid.push(P(chamferBox(wp, hA + 0.5, wp, 0.12), -w / 2 + wp / 2 - 0.42, (hA + 0.5) / 2, sz * (d / 2 - wp / 2 + 0.42)));
-        B.platMid.push(P(chamferBox(wp, hB + 0.5, wp, 0.12), w / 2 - wp / 2 + 0.42, (hB + 0.5) / 2, sz * (d / 2 - wp / 2 + 0.42)));
+        B.platMid.push(P(chamferBox(wp, hA + 0.2, wp, wp * 0.21), -w / 2 + wp / 2 - 0.42, (hA + 0.2) / 2, sz * (d / 2 - wp / 2 + 0.42)));
+        B.platMid.push(P(chamferBox(wp, hB + 0.2, wp, wp * 0.21), w / 2 - wp / 2 + 0.42, (hB + 0.2) / 2, sz * (d / 2 - wp / 2 + 0.42)));
       }
-      B.platMid.push(P(chamferBox(wp * 0.85, hA + 0.4, wp * 0.85, 0.1), xS - slotW / 2 - wp * 0.42, (hA + 0.4) / 2, d / 2 - wp * 0.42 + 0.3));
-      B.platMid.push(P(chamferBox(wp * 0.85, hB + 0.4, wp * 0.85, 0.1), xS + slotW / 2 + wp * 0.42, (hB + 0.4) / 2, d / 2 - wp * 0.42 + 0.3));
+      B.platMid.push(P(chamferBox(wp * 0.85, hA + 0.2, wp * 0.85, wp * 0.18), xS - slotW / 2 - wp * 0.42, (hA + 0.2) / 2, d / 2 - wp * 0.42 + 0.3));
+      B.platMid.push(P(chamferBox(wp * 0.85, hB + 0.2, wp * 0.85, wp * 0.18), xS + slotW / 2 + wp * 0.42, (hB + 0.2) / 2, d / 2 - wp * 0.42 + 0.3));
       baseCourse(P, 0, 0, w + 0.6, d + 0.6, baseH);
       parapet(P, xA, 0, wA + 0.3, d + 0.7, hA, FR.band);
       parapet(P, xB, 0, wB + 0.3, d + 0.7, hB, 1.0);
@@ -815,12 +936,12 @@ export function buildCity(ctx) {
          takes platinumMidLit and reads as the brightest thing on the block. */
       const ph = Math.max(6.5, Math.round(h * 0.26)), pw = w + 6, pd = d + 5;
       const sw = w * 0.72, sd = d * 0.74, sh = h - ph, sz0 = -d * 0.06;
-      B.structural.push(P(chamferBox(pw, ph, pd, 0.5), 0, ph / 2, 0));
-      B.structural.push(P(chamferBox(sw, sh, sd, 0.45), 0, ph + sh / 2, sz0));
+      B.structural.push(P(chamferBox(pw, ph, pd, 1.15), 0, ph / 2, 0));
+      B.structural.push(P(chamferBox(sw, sh, sd, 0.9), 0, ph + sh / 2, sz0));
       baseCourse(P, 0, 0, pw + 0.6, pd + 0.6, baseH);
-      B.platMid.push(P(chamferBox(pw + 0.5, 0.9, pd + 0.5, 0.16), 0, ph - 0.45, 0));           /* the podium fascia */
-      B.platLit.push(P(chamferBox(pw + 1.1, 0.3, pd + 1.1, 0.1), 0, ph + 0.15, 0));            /* THE TERRACE DECK */
-      for (const sx of [-1, 1]) for (const sz of [-1, 1]) B.platMid.push(P(chamferBox(PW * 0.9, sh + 0.4, PW * 0.9, 0.1), sx * (sw / 2 - PW * 0.45 + 0.34), ph + (sh + 0.4) / 2, sz0 + sz * (sd / 2 - PW * 0.45 + 0.34)));
+      B.platMid.push(P(chamferBox(pw + 0.5, 0.9, pd + 0.5, 0.3), 0, ph - 0.45, 0));           /* the podium fascia */
+      B.platLit.push(P(chamferBox(pw + 1.1, 0.3, pd + 1.1, 0.14), 0, ph + 0.15, 0));            /* THE TERRACE DECK */
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) B.platMid.push(P(chamferBox(PW * 0.9, sh + 0.2, PW * 0.9, 0.27), sx * (sw / 2 - PW * 0.45 + 0.34), ph + (sh + 0.2) / 2, sz0 + sz * (sd / 2 - PW * 0.45 + 0.34)));
       parapet(P, 0, sz0, sw + 0.6, sd + 0.6, h, 1.0);
       /* a face that starts on a deck has no plinth under it, so its piers run from just above the deck */
       faces.push({ ox: 0, yBase: ph, oz: sz0 + sd / 2, ry: 0, w: sw, h: sh, top: sh - 1.0, foot: 0.3, seed: 100 + i, glaze: true });
@@ -849,8 +970,8 @@ export function buildCity(ctx) {
          frame it wears: the four corner pilasters are platinum now instead of composite, and the base
          course, the piers and the courses put a structural grid on the elevation the mass used to lack. */
       const coreH = spec.sb ? Math.round(h * (1 - spec.sb)) : h;
-      B.structural.push(P(chamferBox(w, coreH, d, 0.45), 0, coreH / 2, 0));
-      for (const sx of [-1, 1]) for (const sz of [-1, 1]) B.platMid.push(P(chamferBox(PW, coreH + 0.5, PW, 0.12), sx * (w / 2 - PW / 2 + 0.42), (coreH + 0.5) / 2, sz * (d / 2 - PW / 2 + 0.42)));
+      B.structural.push(P(chamferBox(w, coreH, d, 0.95), 0, coreH / 2, 0));
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) B.platMid.push(P(chamferBox(PW, coreH + 0.2, PW, 0.3), sx * (w / 2 - PW / 2 + 0.42), (coreH + 0.2) / 2, sz * (d / 2 - PW / 2 + 0.42)));
       baseCourse(P, 0, 0, w + 0.6, d + 0.6, baseH);
       parapet(P, 0, 0, w + 0.7, d + 0.7, coreH, FR.band);
       faces.push({ ox: 0, yBase: 0, oz: d / 2, ry: 0, w, h: coreH, top: coreH - FR.band, foot: baseH, seed: 100 + i, glaze: true });
@@ -865,9 +986,9 @@ export function buildCity(ctx) {
       }
       if (spec.sb) {
         const sw = w * 0.6, sd = d * 0.58, sh = h - coreH, sz0 = -d * 0.14, sx0 = (R() - 0.5) * (w - sw) * 0.5;
-        B.structural.push(P(chamferBox(sw, sh, sd, 0.4), sx0, coreH + sh / 2, sz0));
+        B.structural.push(P(chamferBox(sw, sh, sd, 0.85), sx0, coreH + sh / 2, sz0));
         parapet(P, sx0, sz0, sw + 0.5, sd + 0.5, h, 0.9);
-        for (const sx of [-1, 1]) B.platMid.push(P(chamferBox(PW * 0.8, sh + 0.3, PW * 0.8, 0.1), sx0 + sx * (sw / 2 - PW * 0.4 + 0.3), coreH + (sh + 0.3) / 2, sz0 + sd / 2 - PW * 0.4 + 0.3));
+        for (const sx of [-1, 1]) B.platMid.push(P(chamferBox(PW * 0.8, sh + 0.2, PW * 0.8, 0.24), sx0 + sx * (sw / 2 - PW * 0.4 + 0.3), coreH + (sh + 0.2) / 2, sz0 + sd / 2 - PW * 0.4 + 0.3));
         faces.push({ ox: sx0, yBase: coreH, oz: sz0 + sd / 2, ry: 0, w: sw, h: sh, top: sh - 0.9, foot: 0.3, seed: 300 + i, glaze: true });
         /* THE SETBACK OUTCROP (v9 §01). Where the shaft steps back off the core there is a shoulder,
            and a shoulder is the one horizontal surface on this massing with a vertical wall behind it —
@@ -933,7 +1054,33 @@ export function buildCity(ctx) {
          concentrically on its own roof is a water tank, and the overhang is also what keeps the stalk
          clear of the roof plant the kit scatters across the back half */
       const stalkH = 7 + R() * 4, dr = 5.2 + R() * 2.4, dz = topZ + topD * 0.26, dy = topY + stalkH;
-      B.platMid.push(P(chamferBox(1.0, stalkH + 0.2, 1.0, 0.16), topX, topY + stalkH / 2 - 0.2, dz));   /* ends just under the deck it carries */
+      /* ---- v11 §06 THE SAUCER GETS A SUPPORT THE EYE CAN FIND -------------------------------------
+         The defect this replaces: v9 carried each ring deck on ONE 1.0 m box. At the arrival camera
+         (roughly 150–200 m out) a 1 m stalk against a dark parapet is a couple of pixels, so five
+         saucers read as flat grey discs hovering free over the district — a flying saucer, which is
+         the one mid-century reference this world is not making. A deck is architecture; architecture
+         arrives at the ground.
+         Three pieces, and the middle one is the only one that was there before:
+           THE HAUNCH  a splayed four-sided base standing on the roof at the parapet line, up to 4.7 m
+                       across — twenty times the stalk's silhouette area, so it survives the range.
+                       Scaled off the top roof's own width, because the slotted massing's blade top is
+                       only 6.6 m wide and a fixed haunch would swallow it.
+           THE PIER    the stalk, now tapering out of the haunch instead of standing on nothing.
+           THE COLLAR  an eight-sided capital flaring from the pier into the deck's own underbelly, so
+                       the disc GROWS OUT of the support rather than balancing on a pin.
+         LAW 1: all three are built OPEN-ENDED, so between them they add not one horizontal face. The
+         pier is the vertical structural member and takes platinumMid, like every other pier in this
+         file — 0.94 metalness on a vertical face reflects the lit horizon and reads bright against the
+         mass. The haunch and the collar both present surfaces well off vertical, so both take
+         platinumMidLit, the low-metalness partner, exactly like the coping and the deck they sit
+         between; that also makes the connection the brightest thing at the parapet, which is the
+         point. Turned a quarter of a face so the four-sided pieces show FLATS to the elevations rather
+         than an arris, which is what makes them read as piers and not as diamonds. */
+      const hb = Math.min(2.35, topW * 0.30), hp = hb * 0.60, hq = hb * 0.26;
+      const yH1 = topY + 1.6, yP1 = dy - 1.45, S2 = Math.SQRT2;
+      B.platLit.push(xform(faceted(new THREE.CylinderGeometry(hp * S2, hb * S2, yH1 - topY, 4, 1, true)), topX, (topY + yH1) / 2, dz, Math.PI / 4, 1, 1, 1, bm));
+      B.platMid.push(xform(faceted(new THREE.CylinderGeometry(hq * S2, hp * S2, yP1 - yH1 + 0.14, 4, 1, true)), topX, (yH1 - 0.14 + yP1) / 2, dz, Math.PI / 4, 1, 1, 1, bm));
+      B.platLit.push(xform(faceted(new THREE.CylinderGeometry(dr * 0.335, hq * S2 * 1.02, 0.75, 8, 1, true)), topX, dy - 1.19, dz, 0, 1, 1, 1, bm));
       decks.push(poseOf(topX, dy, dz, 0, R() * Math.PI, 0, dr, 2.4, dr, bm).clone());
       stats.decks++;
     }
@@ -941,8 +1088,10 @@ export function buildCity(ctx) {
     kitBox(bm, roofX, roofY, roofZ + roofD / 2 - 0.12, 0, roofW - 0.6, 0.9, 0.12);
     kitBox(bm, roofX - (roofW / 2 - 0.12), roofY, roofZ, 0, 0.12, 0.9, roofD - 0.6);
     kitBox(bm, roofX + (roofW / 2 - 0.12), roofY, roofZ, 0, 0.12, 0.9, roofD - 0.6);
-    /* roof plant on the top roof (kept to the back half where a pad shares the roof), one mast on most */
-    const shared = spec.pad && padY > topY - 1;
+    /* roof plant on the top roof (kept to the back half where a pad shares the roof — or where a ring
+       deck's haunch now stands in the front half, which is a bigger footprint than the v9 stalk was
+       and would otherwise have plant growing through it), one mast on most */
+    const shared = (spec.pad && padY > topY - 1) || !!DECK[spec.id];
     const n = 2 + Math.floor(R() * 2);
     for (let k = 0; k < n; k++) {
       const bw = 2 + R() * 2.5, bh = 1.2 + R() * 1.8, bd = 2 + R() * 1.5;
@@ -957,7 +1106,7 @@ export function buildCity(ctx) {
     }
     /* rooftop pad for the life module: a low platform with a square-diamond outline in energy */
     if (spec.pad) {
-      B.composite.push(P(chamferBox(5.5, 0.3, 5.5, 0.08), padX, padY + 0.15, padZ));
+      B.composite.push(P(chamferBox(5.5, 0.3, 5.5, 0.14), padX, padY + 0.15, padZ));
       for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4, hs = 1.9; B.strips.push(P(chamferBox(2.7, 0.06, 0.28, 0.028), padX + Math.cos(a) * hs, padY + 0.33, padZ + Math.sin(a) * hs, Math.atan2(-Math.cos(a), -Math.sin(a)))); }
       const position = new THREE.Vector3(padX, padY + 0.3, padZ).applyMatrix4(bm);
       anchors.pads.push({ id: 'city-pad-' + spec.id, position, facing: Math.atan2(-position.x, -position.z), kind: spec.pad, tier: 'far' });
@@ -966,7 +1115,7 @@ export function buildCity(ctx) {
     /* the elevator: a slim track on the front face and one cool-white car that changes floor every few seconds */
     if (spec.elevator) {
       const f0 = faces[0], ex = f0.ox - f0.w / 2 + PW + 1.6, th = f0.h - 3, base = f0.yBase + 3.2;
-      B.composite.push(P(chamferBox(0.7, th, 0.3, 0.05), ex, f0.yBase + th / 2 + 1.5, f0.oz + 0.22));
+      B.composite.push(P(chamferBox(0.7, th, 0.3, 0.09), ex, f0.yBase + th / 2 + 1.5, f0.oz + 0.22));
       const car = new THREE.Mesh(elevGeo, whiteMat); car.name = 'city-elevator'; car.position.set(ex, base, f0.oz + 0.4); g.add(car);
       elevator = { mesh: car, floors: Math.max(2, Math.floor((f0.h - 6.5) / FLOOR)), base, floor: 0, dir: 1, from: base, to: base, t0: 0, t1: 0, next: -1, R: rng(SEED + 9001) };
     }
@@ -978,22 +1127,22 @@ export function buildCity(ctx) {
     const dx = spec.bx - spec.ax, dz = spec.bz - spec.az, L = Math.hypot(dx, dz), ry = Math.atan2(-dz, dx), W = spec.width;
     const bm = new THREE.Matrix4().compose(new THREE.Vector3((spec.ax + spec.bx) / 2, spec.y, (spec.az + spec.bz) / 2), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, ry, 0)), new THREE.Vector3(1, 1, 1));
     const P = (geo, lx, ly, lz, lry = 0) => xform(geo, lx, ly, lz, lry, 1, 1, 1, bm);
-    B.structural.push(P(chamferBox(L, 0.5, W, 0.1), 0, 0.05, 0));                    /* deck: top at y + 0.3 */
-    B.structural.push(P(chamferBox(L, 1.5, W * 0.6, 0.18), 0, -0.95, 0));            /* girder under the deck */
+    B.structural.push(P(chamferBox(L, 0.5, W, 0.16), 0, 0.05, 0));                    /* deck: top at y + 0.3 */
+    B.structural.push(P(chamferBox(L, 1.5, W * 0.6, 0.34), 0, -0.95, 0));            /* girder under the deck */
     for (const s of [-1, 1]) {
-      B.trim.push(P(chamferBox(L, 1.05, 0.1, 0.03), 0, 0.82, s * (W / 2 - 0.08)));   /* handrails */
-      B.strips.push(P(chamferBox(L, 0.16, 0.12, 0.045), 0, 1.4, s * (W / 2 - 0.08)));   /* the thin rail light line, its edges turned so it catches along its length */
+      B.trim.push(P(chamferBox(L, 1.05, 0.1, 0.045), 0, 0.82, s * (W / 2 - 0.08)));   /* handrails */
+      B.strips.push(P(chamferBox(L, 0.16, 0.12, 0.055), 0, 1.4, s * (W / 2 - 0.08)));   /* the thin rail light line, its edges turned so it catches along its length */
     }
     /* under-deck lights along the girder's front edge, none where a pylon stands */
-    for (let u = -L / 2 + 3; u < L / 2 - 2; u += 6) { if (main && spec.pylons.some(px => Math.abs(px - u) < 1.6)) continue; B.strips.push(P(chamferBox(0.5, 0.3, 0.5, 0.09), u, -1.45, W * 0.3 + 0.3)); }
+    for (let u = -L / 2 + 3; u < L / 2 - 2; u += 6) { if (main && spec.pylons.some(px => Math.abs(px - u) < 1.6)) continue; B.strips.push(P(chamferBox(0.5, 0.3, 0.5, 0.12), u, -1.45, W * 0.3 + 0.3)); }
     if (main) {
       /* twin slim pylons either side of the girder with a cross-beam under it; the rail pod hangs below */
       for (const px of spec.pylons) {
-        for (const s of [-1, 1]) B.structural.push(P(chamferBox(1.2, spec.y - 1.9, 1.0), px, -(spec.y - 1.9) / 2 - 1.9 + (spec.y - 1.9) / 2 + 0.05 - (spec.y - 1.9) / 2 + (spec.y - 1.9) / 2 - 0.05 + 0.05 - spec.y + (spec.y - 1.9) / 2 + 1.9 - 0.05, s * 2.1));
-        B.structural.push(P(chamferBox(1.4, 0.6, 5.4, 0.1), px, -1.95, 0));
+        for (const s of [-1, 1]) B.structural.push(P(chamferBox(1.2, spec.y - 1.9, 1.0, 0.22), px, -(spec.y - 1.9) / 2 - 1.9 + (spec.y - 1.9) / 2 + 0.05 - (spec.y - 1.9) / 2 + (spec.y - 1.9) / 2 - 0.05 + 0.05 - spec.y + (spec.y - 1.9) / 2 + 1.9 - 0.05, s * 2.1));
+        B.structural.push(P(chamferBox(1.4, 0.6, 5.4, 0.22), px, -1.95, 0));
         B.whites.push(P(new THREE.OctahedronGeometry(0.34, 0), px, -2.45, 2.9));   /* the pylon's marker: the same square diamond as the mast beacons */
       }
-      pod = { mesh: new THREE.Mesh(own(chamferBox(3.0, 1.0, 0.9, 0.30)), whiteMat), y: -3.0, travel: (L - 6) / 6, dwell: 3, half: L / 2 - 3, frame: bm };
+      pod = { mesh: new THREE.Mesh(own(chamferBox(3.0, 1.0, 0.9, 0.38)), whiteMat), y: -3.0, travel: (L - 6) / 6, dwell: 3, half: L / 2 - 3, frame: bm };
       pod.mesh.name = 'city-rail-pod'; pod.mesh.matrixAutoUpdate = false; group.add(pod.mesh);
     }
     /* life path along the deck (world space) */
@@ -1015,8 +1164,17 @@ export function buildCity(ctx) {
   const arch = {
     A: faceted(mergeGeos([new THREE.CylinderGeometry(0.60, 0.72, 1, 4, 1).translate(0, 0.5, 0), new THREE.CylinderGeometry(0.10, 0.60, 0.15, 4, 1).translate(0, 1.075, 0)])),
     B: faceted(mergeGeos([new THREE.CylinderGeometry(0.50, 0.56, 1, 6, 1).translate(0, 0.5, 0), new THREE.CylinderGeometry(0.10, 0.50, 0.12, 6, 1).translate(0, 1.06, 0)])),
-    C: faceted(mergeGeos([new THREE.CylinderGeometry(0.70, 0.72, 0.62, 4, 1).translate(0, 0.31, 0), new THREE.CylinderGeometry(0.46, 0.50, 1, 4, 1).translate(0.12, 0.5, 0.1), new THREE.CylinderGeometry(0.04, 0.46, 0.12, 4, 1).translate(0.12, 1.06, 0.1)])),
-    D: (() => { const s = new THREE.Shape(); s.moveTo(-0.5, 0); s.lineTo(0.5, 0); s.lineTo(0.5, 0.84); s.lineTo(0.12, 1); s.lineTo(-0.5, 0.9); s.closePath(); const g = new THREE.ExtrudeGeometry(s, { depth: 0.36, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1, curveSegments: 1 }); g.translate(0, 0, -0.18); return faceted(g); })(),
+    /* v11 §06: C's cap closed at 0.04 of its own width — 0.6 m across on a 62 m tower, which is a
+       hairline that aliases rather than a facet that catches. It is a CAP and not a needle (0.12 tall
+       against a 0.46 base), so the fix is not to lengthen it but to widen what it ends on: 0.10 puts a
+       1.5 m table on top of the tower, which the moon can actually find. */
+    C: faceted(mergeGeos([new THREE.CylinderGeometry(0.70, 0.72, 0.62, 4, 1).translate(0, 0.31, 0), new THREE.CylinderGeometry(0.46, 0.50, 1, 4, 1).translate(0.12, 0.5, 0.1), new THREE.CylinderGeometry(0.10, 0.46, 0.12, 4, 1).translate(0.12, 1.06, 0.1)])),
+    /* v11 §06: D's extrusion carried a 0.02 bevel, which on a 22 m tower is 0.4 m — under a pixel at
+       400 m, so every arris on it read as a razor cut. The bevel is 0.05 now (1.1 m: a real chamfer
+       face at each edge, including the crown's own corner) and the extruded depth drops by the same
+       amount either side, so the tower's outer envelope and the energy strip that rings it are
+       unchanged. Bevel segments stay at 1 — this ADDS one facet per arris, it does not round anything. */
+    D: (() => { const s = new THREE.Shape(); s.moveTo(-0.5, 0); s.lineTo(0.5, 0); s.lineTo(0.5, 0.84); s.lineTo(0.12, 1); s.lineTo(-0.5, 0.9); s.closePath(); const g = new THREE.ExtrudeGeometry(s, { depth: 0.30, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 1, curveSegments: 1 }); g.translate(0, 0, -0.15); return faceted(g); })(),
     /* MEGATALL E — the stepped supertall: a long tapering shaft, two setbacks, then a slender spire.
        The classic "how tall is that" silhouette; the spire is what makes the height legible. */
     E: faceted(mergeGeos([
@@ -1026,11 +1184,15 @@ export function buildCity(ctx) {
       new THREE.CylinderGeometry(0.075, 0.13, 0.19, 4, 1).translate(0, 1.095, 0)
     ])),
     /* MEGATALL F — the notched twin blade: two slabs of different height sharing a core, so the crown
-       is a NOTCH against the sky rather than a point. Reads at any distance, from any bearing. */
+       is a NOTCH against the sky rather than a point. Reads at any distance, from any bearing.
+       v11 §06: its three slabs were raw BoxGeometry — twelve triangles and eight razor arrises each,
+       on a 300 m megatall 780 m out, which is the one archetype in this table with no chamfer anywhere
+       on it. They are chamferBoxes now: the same masses, the same notch, one narrow third face along
+       every arris. It costs 48 triangles because F stands exactly once in the whole district. */
     F: faceted(mergeGeos([
-      new THREE.BoxGeometry(0.86, 1.0, 0.30).translate(-0.20, 0.5, 0),
-      new THREE.BoxGeometry(0.72, 0.83, 0.30).translate(0.38, 0.415, 0),
-      new THREE.BoxGeometry(0.30, 0.62, 0.26).translate(0.09, 0.31, 0),
+      chamferBox(0.86, 1.0, 0.30, 0.075).translate(-0.20, 0.5, 0),
+      chamferBox(0.72, 0.83, 0.30, 0.07).translate(0.38, 0.415, 0),
+      chamferBox(0.30, 0.62, 0.26, 0.06).translate(0.09, 0.31, 0),
       new THREE.CylinderGeometry(0.045, 0.05, 0.16, 4, 1).translate(-0.20, 1.08, 0)
     ])),
     /* MEGATALL G — the crystalline pinnacle: an eight-sided shaft narrowing toward a faceted crown,
@@ -1090,11 +1252,11 @@ export function buildCity(ctx) {
       for (let k = 0; k < segs; k++) {
         const fa = (y0 + (y1 - y0) * (k + 0.5) / segs) / h, sy = y0 + (y1 - y0) * (k + 0.5) / segs;
         const ap = (0.62 + (0.40 - 0.62) * Math.min(1, fa / 0.78)) * w / Math.SQRT2;
-        B[seamHue].push(xform(chamferBox(sw, (y1 - y0) / segs, 0.7, 0.1), x + nx * ap, sy, z + nz * ap, ryd));
+        B[seamHue].push(xform(chamferBox(sw, (y1 - y0) / segs, 0.7, 0.16), x + nx * ap, sy, z + nz * ap, ryd));
         for (const sd of [-1, 1]) B.accWash.push(paint(xform(vwash(sw * 7, (y1 - y0) / segs), x + nx * (ap + 0.05) + tx * sd * sw * 3.6, sy, z + nz * (ap + 0.05) + tz * sd * sw * 3.6, ryd), ACCENT[seamHue]));
       }
       const shoulder = 0.40 * Math.SQRT2 * w * 1.04, sap = shoulder / 2 + 0.06;
-      B[seamHue].push(xform(chamferBox(shoulder, 0.9 + h * 0.004, shoulder, 0.12), x, y1 + 0.4, z, ryd));
+      B[seamHue].push(xform(chamferBox(shoulder, 0.9 + h * 0.004, shoulder, 0.3), x, y1 + 0.4, z, ryd));
       /* the shoulder's own answer: the shaft it rings, lit for a few metres under it on all four flats */
       for (let q = 0; q < 4; q++) {
         const qa = ryd + q * Math.PI / 2;
@@ -1177,7 +1339,7 @@ export function buildCity(ctx) {
        showing. At √2 × 1.12 of the top radius the coping matches the shaft's square and overhangs it
        by an eighth, which is a coping rather than a mushroom. */
     const rTop = (w0 / 2) * (1 - taper);
-    B.platLit.push(xform(chamferBox(rTop * 1.585, 0.9, rTop * 1.585, 0.24), x, H + 0.3, z, ry + Math.PI / 4));
+    B.platLit.push(xform(chamferBox(rTop * 1.585, 0.9, rTop * 1.585, 0.4), x, H + 0.3, z, ry + Math.PI / 4));
     /* two of the six wear a collar deck low down, where the shaft is still legible as architecture */
     if (si === 1 || si === 3) { decks.push(poseOf(x, 0.17 * H, z, 0, ry, 0, w0 * 1.6, 3.2, w0 * 1.6).clone()); stats.decks++; }
     stats.shafts++;
@@ -1197,15 +1359,20 @@ export function buildCity(ctx) {
        Distant forms are also CHAMFERED now: eight un-bevelled black rectangles on the horizon was
        exactly the repeated-box read the brief objects to. */
     const band = r => (r < 660 ? B.far0 : r < 760 ? B.far1 : B.far2);
-    let [x, z] = polar(50, 720); band(720).push(xform(new THREE.CylinderGeometry(50, 90, 330, 4, 1), x, 165, z, 0.4));   /* the colossal tapered form */
+    /* THE COLOSSAL TAPERED FORM — 330 m of silhouette at 720 m, so its outline is the whole of it.
+       v9 cut it from one CylinderGeometry, which meant one straight taper meeting a flat top at a
+       single hard corner. It is a three-ring prism now (v11 §06): the taper steepens over the last
+       80 m, so the outline turns toward horizontal before the table instead of arriving at it along
+       one line. Four extra triangles, on the largest distant form in the frame. */
+    let [x, z] = polar(50, 720); band(720).push(xform(shardPrism(PLAN4, [[90, 0], [62, 250], [46, 330]]), x, 0, z, 0.4));
     [x, z] = polar(70, 680);                                                                                             /* the suspended ring on two pylons */
     band(680).push(xform(new THREE.TorusGeometry(115, 7, 6, 44).rotateX(1.25), x, 210, z, 0.1));
-    band(680).push(xform(chamferBox(10, 200, 10, 1.6), x - 64, 100, z + 6)); band(680).push(xform(chamferBox(10, 200, 10, 1.6), x + 66, 100, z - 6));
-    [x, z] = polar(128, 640); band(640).push(xform(chamferBox(90, 320, 34, 4), x, 160, z, 0.5));                          /* a tall slab above the ridge line */
+    band(680).push(xform(chamferBox(10, 200, 10, 2.6), x - 64, 100, z + 6)); band(680).push(xform(chamferBox(10, 200, 10, 2.6), x + 66, 100, z - 6));
+    [x, z] = polar(128, 640); band(640).push(xform(chamferBox(90, 320, 34, 6), x, 160, z, 0.5));                          /* a tall slab above the ridge line */
     [x, z] = polar(100, 780);                                                                                            /* a high platform on slim pylons */
-    band(780).push(xform(chamferBox(210, 14, 70, 2.4), x, 232, z, 0.15));
-    [-80, 0, 80].forEach(o => band(780).push(xform(chamferBox(8, 232, 8, 1.2), x + o * Math.cos(0.15), 116, z - o * Math.sin(0.15))));
-    SLABS.forEach(([a, r, w, h, d, ry]) => { const [sx, sz] = polar(a, r); band(r).push(xform(chamferBox(w, h, d, Math.min(4, w / 6)), sx, h / 2, sz, ry)); });
+    band(780).push(xform(chamferBox(210, 14, 70, 4.5), x, 232, z, 0.15));
+    [-80, 0, 80].forEach(o => band(780).push(xform(chamferBox(8, 232, 8, 2.0), x + o * Math.cos(0.15), 116, z - o * Math.sin(0.15))));
+    SLABS.forEach(([a, r, w, h, d, ry]) => { const [sx, sz] = polar(a, r); band(r).push(xform(chamferBox(w, h, d, Math.min(6, w / 5)), sx, h / 2, sz, ry)); });
     GHOSTS.forEach(([a, r, w, h]) => {
       const [gx, gz] = polar(a, r), gry = (a * 0.37) % 1.5707;
       B.ghost.push(xform(faceted(new THREE.CylinderGeometry(w * 0.28, w * 0.5, h, 4, 1)), gx, h / 2, gz, gry));

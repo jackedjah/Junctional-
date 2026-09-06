@@ -193,8 +193,8 @@ function dressFacade(ctx, g, o) {
       grid.position.set(sd * (W / 2 + wingW / 2 - 0.6), wingH * 0.52, -(E + 2.4) + 0.42); g.add(grid);
       ctx.windowGrids.push(grid);
       /* a parapet trim and one setback step on the wing roof */
-      part(trim, chamferBox(wingW - 0.4, 0.2, 0.3, 0.05), sd * (W / 2 + wingW / 2 - 0.6), wingH - 0.1, -(E + 2.4) + 0.35);
-      part(structural, chamferBox(wingW * 0.55, 1.6, wingD * 0.5, 0.08), sd * (W / 2 + wingW / 2 - 0.6), wingH + 0.8, -(E + 2.4) - wingD * 0.35);
+      part(trim, coping(wingW - 0.4, 0.2, 0.3, 0.05), sd * (W / 2 + wingW / 2 - 0.6), wingH - 0.1, -(E + 2.4) + 0.35);
+      part(structural, coping(wingW * 0.55, 1.6, wingD * 0.5, 0.08), sd * (W / 2 + wingW / 2 - 0.6), wingH + 0.8, -(E + 2.4) - wingD * 0.35);
     });
   } else if (wings === 'rear') {
     const rw = W * 0.72, rh = H * 0.66, rd = D * 0.55, rz = -(E + D + rd * 0.42);
@@ -206,13 +206,13 @@ function dressFacade(ctx, g, o) {
       grid.position.set(sd * (rw / 2 + 0.06), rh * 0.5, rz); grid.rotation.y = sd * Math.PI / 2; g.add(grid);
       ctx.windowGrids.push(grid);
     });
-    part(trim, chamferBox(rw + 0.4, 0.2, rd + 0.4, 0.06), 0, rh - 0.1, rz);
-    part(structural, chamferBox(rw * 0.5, 2.0, rd * 0.5, 0.14), 0, rh + 1.0, rz - rd * 0.14);
+    part(trim, coping(rw + 0.4, 0.2, rd + 0.4, 0.06), 0, rh - 0.1, rz);
+    part(structural, coping(rw * 0.5, 2.0, rd * 0.5, 0.14), 0, rh + 1.0, rz - rd * 0.14);
   }
   /* SECONDARY — entry canopy: a chamfered slab over the opening with a lit underside and two brackets */
   if (canopy) {
     const cw = openW + 2.4, cd = 3.2, cy = floorY + openH + 0.35;
-    part(structural, chamferBox(cw, 0.36, cd, 0.08), 0, cy, cd / 2 - 0.2);
+    part(structural, coping(cw, 0.36, cd, 0.08), 0, cy, cd / 2 - 0.2);
     part(trim, chamferBox(cw + 0.1, 0.06, 0.12, 0.02), 0, cy - 0.21, cd - 0.26);
     const under = new THREE.Mesh(new THREE.PlaneGeometry(cw - 0.8, cd - 0.9), M.interior); under.rotation.x = Math.PI / 2; under.position.set(0, cy - 0.19, cd / 2 - 0.2); g.add(under);
     ctx.reflect(under, 0.26);
@@ -230,15 +230,15 @@ function dressFacade(ctx, g, o) {
   }
   /* SECONDARY — parapet and roof kit: the silhouette stops being a blank slab */
   if (roofKit) {
-    part(trim, chamferBox(W - 0.6, 0.22, 0.34, 0.05), 0, H - 0.11, -0.05);
-    part(trim, chamferBox(0.34, 0.22, D - 0.6, 0.05), -W / 2 + 0.3, H - 0.11, -(E + D / 2));
-    part(trim, chamferBox(0.34, 0.22, D - 0.6, 0.05), W / 2 - 0.3, H - 0.11, -(E + D / 2));
+    part(trim, coping(W - 0.6, 0.22, 0.34, 0.05), 0, H - 0.11, -0.05);
+    part(trim, coping(0.34, 0.22, D - 0.6, 0.05), -W / 2 + 0.3, H - 0.11, -(E + D / 2));
+    part(trim, coping(0.34, 0.22, D - 0.6, 0.05), W / 2 - 0.3, H - 0.11, -(E + D / 2));
     const R = ((seed * 9301 + 49297) % 233280) / 233280;
-    part(structural, chamferBox(W * 0.22, 1.2, D * 0.18, 0.08), -W * 0.26, H + 0.6, -(E + D * 0.45));
-    part(structural, chamferBox(W * 0.16, 2.0, D * 0.14, 0.08), W * (0.18 + R * 0.1), H + 1.0, -(E + D * 0.55));
+    part(structural, coping(W * 0.22, 1.2, D * 0.18, 0.08), -W * 0.26, H + 0.6, -(E + D * 0.45));
+    part(structural, coping(W * 0.16, 2.0, D * 0.14, 0.08), W * (0.18 + R * 0.1), H + 1.0, -(E + D * 0.55));
     for (let i = 0; i < 6; i++) part(dark, new THREE.BoxGeometry(W * 0.14, 0.08, 0.06), W * (0.18 + R * 0.1), H + 0.35 + i * 0.28, -(E + D * 0.55) + D * 0.07);   /* louvred plant screen */
     part(trim, new THREE.CylinderGeometry(0.06, 0.09, 4.2, 6), W * 0.36, H + 2.1, -(E + D * 0.3));
-    part(composite, chamferBox(1.2, 0.9, 1.2, 0.06), -W * 0.05, H + 0.45, -(E + D * 0.7));
+    part(composite, coping(1.2, 0.9, 1.2, 0.06), -W * 0.05, H + 0.45, -(E + D * 0.7));
   }
   /* TERTIARY — upper window courses on both piers (dark recesses, a few lit), vents, light housings, seams */
   if (windowsUpper) {
@@ -284,6 +284,114 @@ function box(w, h, d, mat, x, y, z) {
   const m = new THREE.Mesh(chamferBox(w, h, d, c), mat); m.position.set(x, y, z); return m;
 }
 
+/* ================= LAW 6 — THE SILHOUETTE IS ROUND, THE SURFACE IS CRYSTALLINE ======================
+   clouds.js states the rule and this file is where it costs the most, because these three masses are
+   the architecture closest to every camera. Three tools, and none of them SMOOTHS anything: each one
+   trades a sharp arris for one or two more FACETS, which is the direction's own "big designed facets".
+
+   1. THE COPING. chamferBox extrudes along Z, so its chamfer wraps the front and the back of a member
+      and leaves the two arrises that run WITH the extrusion square. On a vertical member that is
+      exactly right — the turn a viewer reads is the one facing the plaza. On a HORIZONTAL one it is
+      the wrong way round: a parapet, a terrace deck, a cornice cap, a sill or a canopy is read
+      against the sky and from an angle, so the arris that matters is the whole PLAN OUTLINE. The
+      same box extruded VERTICALLY puts the chamfer there instead — every plan edge gains a 45° facet
+      top and bottom — for the identical 28 triangles and the identical bounding box, so no derived
+      height, seam or neighbour in this file moves by a millimetre. It is also the cheapest LAW 1
+      insurance there is: it converts the outer strip of an up-facing plane, which reflects the
+      near-black zenith, into a tilted one that reflects the lit horizon.
+
+   2. THE TWO-COURSE CROWN. Four slabs at ONE tilt give a crown whose silhouette tangent is the same
+      from the eaves to the cap: the roofline runs dead straight and stops on a hard edge, which is
+      the cone's defect one storey tall. terrain.js's massif() header states the cure — "a cone's
+      tangent is the same all the way to its point" — so the profile is built in TWO courses, the
+      lower nearly upright so the mass is held OUT (not bubbled in), the upper leaning five times
+      harder so the tangent TURNS toward the horizontal before the cap. The cap is then a small flat
+      FACET running right round rather than an arris, which is the blunt-tip rule: a blunt tip holds
+      a highlight and an edge aliases into a hairline.
+
+   3. THE MITRE. Two members meeting at a right angle make one sharp arris; cutting the corner at 45°
+      replaces it with a THIRD PLANE lit differently from both. That is more crystalline, not less —
+      it is why a cut stone has corners at all. It is applied where a square corner is actually read:
+      crown corners against the sky, sign surrounds, and the head of MAH MATCH's portal frame.
+
+   NOT TOUCHED, deliberately: every square diamond. The keystone, the banner emblems, the beacon
+   heads, the sign's reserved mark and MAH MATCH's diamond platform are the MAHFITT figure and keep
+   their points (law 6's one exception). Nothing here raises a segment count toward a sphere. */
+
+/* A COPING: chamferBox turned a quarter so its chamfer wraps the plan outline. Same 28 triangles,
+   same bounding box, so it is a drop-in wherever the member is horizontal. */
+function coping(w, h, d, c) { return chamferBox(w, d, h, c).rotateX(-Math.PI / 2); }
+
+/* THE CROWN, in two courses with its four corners mitred. `o` is the ring the crown stands on:
+   centreline half-extents ax / az about (0, zc), the vertical run yBase → yTop, and the blade
+   thickness t. Returns how far the profile has leaned in by the top, so the caller can seat the cap
+   band on the profile it actually built rather than on a guessed inset. */
+const CROWN_SPLIT = 0.56, CROWN_LO = 0.11, CROWN_HI = 0.55;   /* the turn: 6° held, then 31° */
+function crownRing(list, o) {
+  const { ax, az, zc, yBase, yTop, t = 1.5 } = o;
+  /* the mitre, scaled to the ring and hard-bounded: a corner cut wider than the ring's own half-side
+     would leave the four blades with negative length, which chamferBox turns into a degenerate shape
+     rather than an error. MAH GYM lands on the 1.7 m ceiling, the tower on 0.93 m of its 4.2 m side. */
+  const k = Math.min(o.k != null ? o.k : 1.7, 0.22 * Math.min(ax, az), 0.4 * (Math.min(ax, az) + t / 2));
+  const yMid = yBase + (yTop - yBase) * CROWN_SPLIT;
+  let off = 0;
+  for (const [y0, y1, th] of [[yBase, yMid, CROWN_LO], [yMid, yTop, CROWN_HI]]) {
+    const span = y1 - y0, h = span / Math.cos(th), lean = (t / 2) / Math.cos(th);
+    const mid = off + (span / 2) * Math.tan(th);        /* the profile's inward lean at this course's mid-height */
+    const hx = ax + t / 2 - mid - lean, hz = az + t / 2 - mid - lean, yc = (y0 + y1) / 2;
+    for (const sz of [-1, 1]) part(list, chamferBox(2 * hx + t - 2 * k, h, t, 0.06), 0, yc, zc + sz * hz, 0, -sz * th);
+    for (const sx of [-1, 1]) part(list, chamferBox(t, h, 2 * hz + t - 2 * k, 0.06), sx * hx, yc, zc, 0, 0, sx * th);
+    /* THE FOUR MITRES. Tilted about X FIRST and yawed after, so each one leans along its own diagonal
+       instead of along an axis — a corner facet that leaned north would read as a folded plate.
+       The length and the inset are DERIVED, not chosen, and getting them wrong is how a chamfer turns
+       into a spike: a facet k·√2 long, set back k/2 + t/(2√2) along the diagonal, has its outer face
+       land exactly on the two shortened blade ends. Measured, a facet one thickness longer than that
+       projected 0.53 m PAST the crown's own outer face at every corner — four diagonal fins sticking
+       out of the thing being rounded, which is the defect and not the fix. */
+    const cg = chamferBox(k * Math.SQRT2, h, t, 0.06).rotateX(-th);
+    const inset = k / 2 + t / (2 * Math.SQRT2);
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      part(list, cg, sx * (hx + t / 2 - inset), yc, zc + sz * (hz + t / 2 - inset), Math.atan2(sx, sz));
+    }
+    cg.dispose();
+    off += span * Math.tan(th);
+  }
+  return off;
+}
+/* the crown's blunt tip: a cap band running the whole ring, in coping form so the band itself turns
+   at every plan edge. `deck` (optional) closes the middle — a crown ring left open is a hole. */
+function crownCap(list, o, off, capH, capD, deck) {
+  const { ax, az, zc, yTop, t = 1.5 } = o;
+  const hx = ax + t / 2 - off - capD / 2, hz = az + t / 2 - off - capD / 2, y = yTop + capH / 2 - 0.02;
+  for (const sz of [-1, 1]) part(list, coping(2 * hx + capD, capH, capD, capH * 0.28), 0, y, zc + sz * hz);
+  for (const sx of [-1, 1]) part(list, coping(capD, capH, 2 * hz - capD, capH * 0.28), sx * hx, y, zc);
+  if (deck) part(deck, coping(2 * hx - capD, capH * 0.7, 2 * hz - capD, capH * 0.18), 0, y - capH * 0.12, zc);
+}
+/* THE MITRED FRAME: four bars round an opening, each stopped `k` short of the corner, and a fifth
+   bar across the corner at 45°. Built in the XY plane facing +Z, in the caller's own merge bucket,
+   so a chamfered surround costs no draw call of its own. */
+function mitreFrame(list, o) {
+  const { x = 0, y = 0, z = 0, hw, hh, bar, depth, c = 0.045, k, head = true, cill = true } = o;
+  const b2 = bar / 2, S2 = Math.SQRT2;
+  const kk = Math.min(k, hh + b2 - 0.05, hw + b2 - 0.05);
+  /* the members stop where the mitre starts, so the OUTER ENVELOPE (hw + bar/2, hh + bar/2) is
+     unchanged and only its corner is cut — a frame that grew when it was chamfered would move every
+     derived height around it. */
+  if (head) part(list, chamferBox(2 * (hw + b2 - kk), bar, depth, c), x, y + hh, z);
+  if (cill) part(list, chamferBox(2 * (hw + b2 - kk), bar, depth, c), x, y - hh, z);
+  for (const sx of [-1, 1]) part(list, chamferBox(bar, 2 * (hh + b2 - kk), depth, c), x + sx * hw, y, z);
+  /* the mitre bar itself: k·√2 long and set back k/2 + bar/(2√2) − bar/2 from the member centreline,
+     which is the one pair of numbers that lands its outer face exactly on the two shortened ends.
+     Longer, and the bar projects past the frame — a diagonal spike where a chamfer was wanted. */
+  const inset = kk / 2 + bar / (2 * S2) - b2;
+  for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+    if ((sy > 0 && !head) || (sy < 0 && !cill)) continue;
+    part(list, chamferBox(kk * S2, bar, depth, c),
+      x + sx * (hw - inset), y + sy * (hh - inset), z, 0, 0, -sx * sy * Math.PI / 4);
+  }
+  return kk;
+}
+
 /* ---- SILHOUETTE TREATMENTS (v5 §06 / §08): one per destination, so the three masses differ in
    PROFILE and not only in signage. Each merges per material; none adds a light. -------------- */
 
@@ -295,6 +403,15 @@ function broadCanopy(ctx, g, o) {
   const { W, H, openH, floorY = 0, seed = 1, ans = null } = o;
   const struct = [], trim = [], dark = [];
   const cw = W + 5.2, depth = 4.6, cy = floorY + openH + 1.35, segs = 22;
+  /* THE CANOPY'S PLAN PROFILE (law 6). Swept at ONE width the canopy is a 43 x 4.6 m rectangle, and a
+     rectangle reaching 4.6 m out over the approach presents its two outer corners as points: from
+     anywhere but dead ahead they are the sharpest thing on MAH GYM. The width now falls away over the
+     last half of the reach on a convex curve — held full where the canopy is still against the
+     building, turning as it reaches out — so the plan OUTLINE turns instead of stopping on a corner.
+     It is still twenty-two straight segments: the SURFACE stays a run of flat facets and only the
+     ENVELOPE they describe is round, which is the whole of the rule. Costs nothing: the same 22
+     parts at slightly different widths. */
+  const wOf = t => cw * (1 - 0.085 * Math.pow(Math.max(0, (t - 0.52) / 0.48), 1.7));
   /* the canopy shell: a shallow arc swept across the frontage, built from segment planes so it is a
      CURVE and not a folded plate. Glass over, brushed fascia under. */
   const shell = [], soffit = [];
@@ -304,8 +421,9 @@ function broadCanopy(ctx, g, o) {
     const zm = (zOf(t0) + zOf(t1)) / 2, ym = (yOf(t0) + yOf(t1)) / 2;
     const seg = Math.hypot(zOf(t1) - zOf(t0), yOf(t1) - yOf(t0));
     const tilt = Math.atan2(yOf(t1) - yOf(t0), zOf(t1) - zOf(t0));
-    shell.push([cw, 0.14, seg, 0, cy + ym, zm, -tilt]);
-    soffit.push([cw - 0.5, 0.05, seg * 0.98, 0, cy + ym - 0.12, zm, -tilt]);
+    const sw = wOf((t0 + t1) / 2);
+    shell.push([sw, 0.14, seg, 0, cy + ym, zm, -tilt]);
+    soffit.push([sw - 0.5, 0.05, seg * 0.98, 0, cy + ym - 0.12, zm, -tilt]);
   }
   shell.forEach(([w, h, d, x, y, z, rx]) => part(struct, chamferBox(w, h, d, 0.04), x, y, z, 0, rx));
   /* THE SOFFIT IS THE GYM'S ONE BIG GESTURE (law 5). A canopy's underside faces the ground: a polished
@@ -319,8 +437,10 @@ function broadCanopy(ctx, g, o) {
     pl.rotateX(Math.PI / 2 + rx); pl.translate(x, y - 0.06, z);
     (ans ? ans.glow : struct).push(pl);
   });
-  /* the leading edge: one mirror-grade nosing running the full width — the canopy's bright line */
-  part(trim, chamferBox(cw + 0.3, 0.2, 0.34, 0.07), 0, cy - 1.42, depth + 0.06);
+  /* the leading edge: one mirror-grade nosing running the full width — the canopy's bright line. It
+     takes the TIP width so it dies into the turned plan corner instead of overhanging it, and it is
+     a coping so the bright line turns at both ends and along the back as well as the front. */
+  part(trim, coping(wOf(1) + 0.3, 0.2, 0.34, 0.07), 0, cy - 1.42, depth + 0.06);
   /* HOW THE WORLD ANSWERS THE SOFFIT (law 2), in three places a viewer can actually see:
        the fascia   the vertical face under the nosing takes the soffit's colour, which is the line the
                     eye follows across the whole frontage;
@@ -330,7 +450,7 @@ function broadCanopy(ctx, g, o) {
                     owns the floor and this is its published hook), plus the mirrored copy of the
                     soffit itself, which on a near-mirror is most of what the eye reads. */
   if (ans) {
-    const fascia = hwash(cw + 0.3, 1.1, ans.hue); fascia.translate(0, cy - 1.62, depth + 0.26); ans.wash.push(fascia);
+    const fascia = hwash(wOf(1) + 0.3, 1.1, ans.hue); fascia.translate(0, cy - 1.62, depth + 0.26); ans.wash.push(fascia);
     const deck = hwash(W + 6.2, 2.2, ans.hue).rotateX(-Math.PI / 2); deck.translate(0, floorY + 0.47, depth + 0.9); ans.wash.push(deck);
     if (ctx.lightPool) { const p = world(g, 0, 0, depth + 2.6); ctx.lightPool({ x: p.x, y: 0.45, z: p.z, rx: W + 10, rz: 12, rot: g.rotation.y, hue: ans.hue, k: 0.3 }); }
   }
@@ -354,8 +474,10 @@ function broadCanopy(ctx, g, o) {
     const cle = hwash(W - 5.0, 3.6, M.interiorSoft.color); cle.translate(0, floorY + openH + 4.3, 0.62); ans.wash.push(cle);
     ctx.reflect(glow, 0.26);
   }
-  /* a low brushed plinth running the full frontage: the broad base the mass sits on */
-  part(dark, chamferBox(W + 7, 0.44, 1.6, 0.12), 0, floorY + 0.22, depth + 1.1);
+  /* a low brushed plinth running the full frontage: the broad base the mass sits on. A coping, so its
+     deck turns at all four plan edges — the two ends included, which is where a 45 m plinth otherwise
+     stops on a square block standing in the open. */
+  part(dark, coping(W + 7, 0.44, 1.6, 0.12), 0, floorY + 0.22, depth + 1.1);
   merged(g, struct, M.platinumLitBrushed || M.platinumBrushed, 'gym-canopy', true);   /* a canopy top faces the sky: only a LOW-metalness grade reads there (v6) */
   merged(g, trim, M.chromeMirror || M.trim, 'gym-canopy-catches', false);
   merged(g, dark, M.platinumBrushedH || M.structural, 'gym-plinth', true);
@@ -372,15 +494,21 @@ function terraces(ctx, g, o) {
   let w = W - 2.2, d = D * 0.34, y = H, zc = -(E + D * 0.12);
   for (let i = 0; i < 3; i++) {
     const th = 2.6 - i * 0.35;
-    part(struct, chamferBox(w, th, d, 0.34), 0, y + th / 2, zc);
+    /* THE TERRACE STACK IS MAH MARKET'S SILHOUETTE (law 6), so every member in it is a COPING: a
+       terrace read against the sky is read along its whole PLAN outline, and chamferBox's default
+       orientation leaves exactly that outline square — an 8 m arris along each deck's flank, three
+       of them stacked, which is the sawtooth this destination was showing. Turned, each deck gains a
+       0.34 m facet right round its top and bottom: the step still reads as a step, but the step now
+       has a lit turn on it instead of a knife edge. Same triangles, same bounding box. */
+    part(struct, coping(w, th, d, 0.34), 0, y + th / 2, zc);
     /* the terrace deck's front edge and its rail: posts every three metres plus a top bar */
-    part(trim, chamferBox(w + 0.5, 0.16, 0.42, 0.06), 0, y + th, zc + d / 2 + 0.1);
+    part(trim, coping(w + 0.5, 0.16, 0.42, 0.06), 0, y + th, zc + d / 2 + 0.1);
     const posts = Math.max(3, Math.round(w / 3));
     for (let k = 0; k <= posts; k++) part(trim, chamferBox(0.07, 0.95, 0.07, 0.02), -w / 2 + k * (w / posts), y + th + 0.48, zc + d / 2 + 0.08);
-    part(trim, chamferBox(w + 0.2, 0.07, 0.07, 0.02), 0, y + th + 0.95, zc + d / 2 + 0.08);
+    part(trim, coping(w + 0.2, 0.07, 0.07, 0.02), 0, y + th + 0.95, zc + d / 2 + 0.08);
     /* a planted trough along the terrace face, and two service volumes set back */
-    part(dark, chamferBox(w * 0.72, 0.5, 0.7, 0.1), 0, y + th + 0.25, zc + d / 2 - 0.7);
-    if (i < 2) for (const sd of [-1, 1]) part(dark, chamferBox(w * 0.16, 1.1, d * 0.2, 0.14), sd * w * 0.3, y + th + 0.55, zc - d * 0.28);
+    part(dark, coping(w * 0.72, 0.5, 0.7, 0.1), 0, y + th + 0.25, zc + d / 2 - 0.7);
+    if (i < 2) for (const sd of [-1, 1]) part(dark, coping(w * 0.16, 1.1, d * 0.2, 0.14), sd * w * 0.3, y + th + 0.55, zc - d * 0.28);
     y += th; w *= 0.78; zc -= d * 0.62; d *= 0.92;
   }
   /* a light mast on the top terrace: the civic marker of the roof line */
@@ -398,15 +526,17 @@ function verticalTower(ctx, g, o) {
   const { W, H, D, E, seed = 2 } = o;
   const struct = [], trim = [], dark = [], lit = [];
   const th = 22, tw = W * 0.46, td = D * 0.5, zc = -(E + D * 0.42);
-  /* the shoulder: one wide banded transition so the tower GROWS out of the podium */
-  part(struct, chamferBox(tw + 4.4, 1.5, td + 4.4, 0.4), 0, H + 0.75, zc);
-  part(trim, chamferBox(tw + 5.0, 0.18, td + 5.0, 0.07), 0, H + 1.5, zc);
+  /* the shoulder: one wide banded transition so the tower GROWS out of the podium. Both members are
+     copings — a shoulder and its band are read against the sky from 74 m away, so the arris that
+     matters is the plan outline and not the front turn. */
+  part(struct, coping(tw + 4.4, 1.5, td + 4.4, 0.4), 0, H + 0.75, zc);
+  part(trim, coping(tw + 5.0, 0.18, td + 5.0, 0.07), 0, H + 1.5, zc);
   /* the shaft, tapering as it climbs — four stacked sections, each narrower than the one below */
   let y = H + 1.5, w = tw, d = td;
   for (let i = 0; i < 4; i++) {
     const sh = th / 4;
     part(struct, chamferBox(w, sh, d, 0.5), 0, y + sh / 2, zc);
-    part(trim, chamferBox(w + 0.24, 0.14, d + 0.24, 0.05), 0, y + sh, zc);
+    part(trim, coping(w + 0.24, 0.14, d + 0.24, 0.05), 0, y + sh, zc);   /* the setback band turns on all four sides */
     /* corner fins: vertical chamfered strips that draw the height and catch the moon on their turn */
     for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
       part(dark, chamferBox(0.85, sh - 0.3, 0.85, 0.2), sx * (w / 2 - 0.2), y + sh / 2, zc + sz * (d / 2 - 0.2));
@@ -416,17 +546,20 @@ function verticalTower(ctx, g, o) {
   }
   /* the lit slot: one recessed vertical channel up the plaza face, the tower's single light line */
   part(dark, chamferBox(1.5, th - 1.0, 0.5, 0.14), 0, H + 2 + (th - 1) / 2, zc + td / 2 + 0.2);
-  lit.push(0);
   const slot = new THREE.Mesh(chamferBox(0.7, th - 2.4, 0.16, 0.05), M.energy);
   slot.position.set(0, H + 2 + (th - 1) / 2, zc + td / 2 + 0.42); g.add(slot); ctx.reflect(slot, 0.3);
-  /* the crown: four angled planes closing the shaft, and a mirror cap band where they meet the sky */
+  /* THE CROWN, in two courses with its four corners mitred (law 6). It was four planes at one tilt
+     meeting at four square corners and capped by a solid slab: the highest silhouette in the district
+     ran dead straight to a hard arris and stopped, which is the cone's fault at 65 m. Now the profile
+     turns — 6° held, then 31° — the plan is an octagon rather than a square, and the top ends on a
+     flat cap FACET instead of an edge.
+     The cap also stops being an 88 m² slab of mirror chromium lying face-up at the zenith, which
+     under LAW 1 rendered black: it is a mirror RING, whose vertical and 45° faces genuinely see the
+     horizon band, closed by a low-metalness DECK that can take diffuse light. That deck is the only
+     new draw call in this file, and it buys back the tower's black hat. */
   const crownH = 3.4;
-  for (const [sx, sz] of [[0, 1], [0, -1], [-1, 0], [1, 0]]) {
-    const len = sx ? d - 0.6 : w - 0.6;
-    part(struct, chamferBox(sx ? 1.5 : len, crownH, sx ? len : 1.5, 0.08),
-      sx * (w / 2 - 0.7), y + crownH / 2, zc + sz * (d / 2 - 0.7), 0, sz ? sz * -0.3 : 0, sx ? sx * 0.3 : 0);
-  }
-  part(trim, chamferBox(w - 2.0, 0.2, d - 2.0, 0.06), 0, y + crownH - 0.2, zc);
+  const ring = { ax: w / 2 - 0.7, az: d / 2 - 0.7, zc, yBase: y, yTop: y + crownH, t: 1.5 };
+  crownCap(trim, ring, crownRing(struct, ring), 0.2, 0.62, lit);
   /* the mast and its square-diamond head: MAH MATCH's beacon, the highest thing in the district */
   part(trim, new THREE.CylinderGeometry(0.13, 0.2, 7.0, 8), 0, y + crownH + 3.5, zc);
   const head = new THREE.Mesh(new THREE.OctahedronGeometry(1.05, 0), M.energyLight);
@@ -436,6 +569,9 @@ function verticalTower(ctx, g, o) {
   merged(g, struct, M.structural, 'match-tower', true);
   merged(g, trim, M.chromeMirror || M.trim, 'match-tower-catches', false);
   merged(g, dark, M.graphiteMetal || M.graphiteDark, 'match-tower-fins', true);
+  /* LAW 1's horizontal partner: the crown deck is the one UP-FACING plane on this tower, so it wears
+     the low-metalness platinum that takes diffuse light rather than a mirror that returns the zenith. */
+  merged(g, lit, M.platinumLit || M.composite, 'match-tower-crown-deck', false);
 }
 
 /* v6 §18 — SIGNAGE MOUNTED IN ARCHITECTURE, not a bitmap laid on a wall.
@@ -458,15 +594,20 @@ function sign(ctx, parent, spec) {
     reveal.position.set(x, y, z - 0.44); parent.add(reveal);
     const backing = new THREE.Mesh(chamferBox(pw, ph, 0.26, 0.09), M.panel);
     backing.position.set(x, y, z - 0.3); parent.add(backing);
-    /* the chromium frame: four mirror-grade bars with mounting depth, vertical and tilted faces only,
+    /* the chromium frame: mirror-grade bars with mounting depth, vertical and tilted faces only,
        which is where a mirror grade actually reaches the horizon band and reads */
     /* the frame sits BEHIND the wordmark plane: mounting depth must frame the letters, not bury them */
+    /* v11 §06 — THE SURROUND IS MITRED, AND IT IS ONE MESH. The four bars butted into four square
+       corners: at 15 m wide and six storeys up, those corners are the sharpest thing on the elevation
+       and they are what the eye lands on first, because the sign is what it is looking for. Each bar
+       now stops short and a fifth bar crosses the corner at 45°, which is how a real metal surround is
+       mitred — it ADDS a facet turning at its own angle rather than removing one. The four bars were
+       also four draw calls for one piece of trim; merged, the mitred surround costs THREE FEWER draw
+       calls per sign than the square one did, which is what pays for the extra facets. */
     const fr = 0.16, fd = 0.26;
-    [[0, ph / 2 + fr / 2, pw + fr * 2, fr], [0, -ph / 2 - fr / 2, pw + fr * 2, fr],
-     [-pw / 2 - fr / 2, 0, fr, ph], [pw / 2 + fr / 2, 0, fr, ph]].forEach(([bx, by, bw, bh]) => {
-      const bar = new THREE.Mesh(chamferBox(bw, bh, fd, 0.045), M.chromeMirror || M.trim);
-      bar.position.set(x + bx, y + by, z - 0.17); parent.add(bar);
-    });
+    const bars = [];
+    mitreFrame(bars, { x, y, z: z - 0.17, hw: pw / 2 + fr / 2, hh: ph / 2 + fr / 2, bar: fr, depth: fd, c: 0.045, k: Math.min(0.62, ph * 0.16, pw * 0.16) });
+    merged(parent, bars, M.chromeMirror || M.trim, 'sign-frame', false);
     /* THE LIT REVEAL, AND WHAT IT DOES (law 2 / law 3). It was a warm strip, and warm is interior
        light and nothing else — a sign is the one place the direction explicitly forbids it. It takes
        the district's accent now, which is also what makes the three signs read as three places from
@@ -709,10 +850,16 @@ function facade(ctx, parent, o) {
   const lintelH = H - openH - floorY;
   const lintel = new THREE.Mesh(softMass(openW + 0.6, lintelH, E + 0.4, Math.min(radius, lintelH / 3)), M.graphite); lintel.position.set(0, floorY + openH, 0); parent.add(lintel);
   pl.castShadow = pr.castShadow = lintel.castShadow = true; ctx.colliders.push(pl, pr);
-  /* platinum roof trims: the silhouette catches light without a neon outline */
-  parent.add(box(pierW - 1.2, 0.16, 0.22, M.platinum, -W / 2 + pierW / 2, H - 0.32, 0.36));
-  parent.add(box(pierW - 1.2, 0.16, 0.22, M.platinum, W / 2 - pierW / 2, H - 0.32, 0.36));
-  parent.add(box(openW - 0.8, 0.16, 0.22, M.platinum, 0, H - 0.32, 0.36));
+  /* platinum roof trims: the silhouette catches light without a neon outline. Copings, so the three
+     runs turn at their ends as well as across their faces — and ONE mesh, because three bars of the
+     same grade in the same plane were three draw calls for one line. */
+  {
+    const rt = [];
+    part(rt, coping(pierW - 1.2, 0.16, 0.22, 0.04), -W / 2 + pierW / 2, H - 0.32, 0.36);
+    part(rt, coping(pierW - 1.2, 0.16, 0.22, 0.04), W / 2 - pierW / 2, H - 0.32, 0.36);
+    part(rt, coping(openW - 0.8, 0.16, 0.22, 0.04), 0, H - 0.32, 0.36);
+    merged(parent, rt, M.platinum, 'facade-roof-trim', false);
+  }
   /* a faceted crystalline panel region on the lintel: controlled, not everywhere */
   const panels = new THREE.Group();
   const cols = Math.max(3, Math.round(openW / 3.2));
@@ -730,24 +877,29 @@ function crystallize(ctx, g, o) {
   const crystal = [], catches = [], deep = [], crown = [];
   const pierW = (W - openW) / 2;
   const R = ((seed * 2654435761) % 1000) / 1000;
-  /* CROWN: a tapered faceted cap — four angled planes stepping in toward the roof line, flat shaded so
-     each plane takes its own value under the moon; the silhouette turns instead of stopping flat */
-  const crownH = 1.9 + R * 0.6, inset = 1.5;
-  if (wantCrown) for (const [sx, sz, w, d] of [[0, 1, W - 1.2, 0], [0, -1, W - 1.2, 0], [-1, 0, 0, D - 1.2], [1, 0, 0, D - 1.2]]) {
-    const len = sx ? d : w;
-    const geo = chamferBox(sx ? 1.5 : len, crownH, sx ? len : 1.5, 0.06);
-    const px = sx * (W / 2 - 0.75), pz = sz ? (sz > 0 ? 0.4 : -(E + D) + 0.4) : -(E + D / 2);
-    part(crown, geo, px, H + crownH / 2 - 0.2, pz, 0, sz ? sz * -0.22 : 0, sx ? sx * 0.22 : 0);
-  }
-  /* the crown's bright turn: a thin platinum cap band that only exists where the planes meet the sky */
+  /* THE CROWN (law 6). It was four planes at ONE tilt, and it did not close: measured, the two side
+     planes started 4.2 m behind the front plane, so each front corner of the roofline was a gap with
+     two square blade ends facing out of it. Three things change and none of them softens the surface.
+       IT CLOSES.   the side planes now run the full depth, so the crown is a ring and the roofline is
+                    continuous instead of showing its own ends.
+       IT TURNS.    two courses instead of one — nearly upright first so the mass is held out, then
+                    leaning three times harder — so the silhouette's tangent turns toward horizontal
+                    before the cap, which is the difference between a crown and a cone (terrain.js's
+                    massif() header derives the same exponent for a mountain).
+       IT MITRES.   each of the four corners is cut by a fifth plane at 45°, so the crown's plan reads
+                    as an octagon. That ADDS two facets per corner catching light at their own angle:
+                    more crystalline than the square corner it replaces, not less.
+     The cap band follows, in coping form, as a small FLAT facet running right round — a blunt tip
+     holds a highlight where an arris only aliases. */
+  const crownH = 1.9 + R * 0.6;
+  const ring = { ax: W / 2 - 0.75, az: (E + D) / 2, zc: 0.4 - (E + D) / 2, yBase: H - 0.2, yTop: H + crownH - 0.2, t: 1.5 };
   if (wantCrown) {
-    part(catches, chamferBox(W - 2.4, 0.14, 0.5, 0.04), 0, H + crownH - 0.25, 0.2);
-    part(catches, chamferBox(0.5, 0.14, D - 2.4, 0.04), -W / 2 + 1.1, H + crownH - 0.25, -(E + D / 2));
-    part(catches, chamferBox(0.5, 0.14, D - 2.4, 0.04), W / 2 - 1.1, H + crownH - 0.25, -(E + D / 2));
+    crownCap(catches, ring, crownRing(crown, ring), 0.14, 0.5);
   } else {
     /* no crown: the mass ends in a low mirror-grade parapet so whatever the module above it builds —
-       terraces, a tower — is what the silhouette actually shows */
-    part(catches, chamferBox(W - 0.8, 0.22, 0.42, 0.06), 0, H - 0.11, 0.16);
+       terraces, a tower — is what the silhouette actually shows. A coping, so the parapet turns at
+       its ends and along its back as well as across its face. */
+    part(catches, coping(W - 0.8, 0.22, 0.42, 0.06), 0, H - 0.11, 0.16);
   }
   /* ANGLED INSET CRYSTAL PANELS: shallow rotated facets recessed into each pier, in two courses.
      Their angle is what reads — each catches a different amount of moon and city glow. */
@@ -771,7 +923,9 @@ function crystallize(ctx, g, o) {
   /* DIAMOND ROOF BEACON: a slim mast and one square diamond — a FOBEAM endpoint's architectural logic */
   if (beacon) {
     const bx = (R < 0.5 ? -1 : 1) * (W * 0.3), bz = -(E + D * 0.25), bh = 3.4 + R * 2.2;
-    part(deep, new THREE.BoxGeometry(0.22, bh, 0.22), bx, H + crownH + bh / 2 - 0.2, bz);
+    /* the mast was the one raw BoxGeometry left on a silhouette in this file — a 5 m square-cut post
+       standing against the sky, which is precisely the un-bevelled 90° corner v5 §07 forbids. */
+    part(deep, chamferBox(0.22, bh, 0.22, 0.05), bx, H + crownH + bh / 2 - 0.2, bz);
     const dia = new THREE.Mesh(new THREE.OctahedronGeometry(0.62, 0), M.energyLight);
     const w = world(g, bx, H + crownH + bh + 0.3, bz);
     dia.position.set(bx, H + crownH + bh + 0.3, bz); dia.scale.set(1, 1.25, 0.35); g.add(dia);
@@ -825,15 +979,15 @@ function platinumOrder(ctx, g, o) {
      plaza, a soffit under it — both in the LIT grade, which is the whole point of that material. */
   const course = (cx, len, y0, y1, z, d, soffit) => {
     part(face, chamferBox(len, y1 - y0, d, 0.06), cx, (y0 + y1) / 2, z - d / 2);
-    part(caps, chamferBox(len + 0.18, 0.2, d + 0.18, 0.05), cx, y1 + 0.06, z - d / 2);
-    if (soffit) part(caps, chamferBox(len + 0.12, 0.16, d + 0.12, 0.04), cx, y0 - 0.04, z - d / 2);
+    part(caps, coping(len + 0.18, 0.2, d + 0.18, 0.05), cx, y1 + 0.06, z - d / 2);
+    if (soffit) part(caps, coping(len + 0.12, 0.16, d + 0.12, 0.04), cx, y0 - 0.04, z - d / 2);
   };
   /* a PIER — a vertical member, brushed because a brushed streak runs WITH the member it is cut for,
      and deep because depth is the entire point: a pier flush with the glazing cannot cast across the
      bays it divides, and an applied strip is what made the old framing read as paint. */
   const pier = (cx, w, y0, y1, z, d, cap) => {
     part(piers, chamferBox(w, y1 - y0, d, 0.07), cx, (y0 + y1) / 2, z - d / 2);
-    if (cap) part(caps, chamferBox(w + 0.22, 0.22, d + 0.2, 0.05), cx, y1 + 0.1, z - d / 2);
+    if (cap) part(caps, coping(w + 0.22, 0.22, d + 0.2, 0.05), cx, y1 + 0.1, z - d / 2);
   };
   /* a RETURN — the same platinum carried around onto the flank. Without it a viewer walking past the
      corner sees the framing stop at the arris, and the whole elevation collapses back into paint.
@@ -846,8 +1000,8 @@ function platinumOrder(ctx, g, o) {
   const FLANK = W / 2 + 0.35;
   const ret = (x, y0, y1, zc, dz, t) => [-1, 1].forEach(sd => {
     part(piers, chamferBox(t, y1 - y0, dz, 0.06), sd * x, (y0 + y1) / 2, zc);
-    part(caps, chamferBox(t + 0.14, 0.18, dz + 0.14, 0.04), sd * x, y1 + 0.05, zc);
-    part(caps, chamferBox(t + 0.12, 0.16, dz + 0.12, 0.04), sd * x, y0 - 0.04, zc);
+    part(caps, coping(t + 0.14, 0.18, dz + 0.14, 0.04), sd * x, y1 + 0.05, zc);
+    part(caps, coping(t + 0.12, 0.16, dz + 0.12, 0.04), sd * x, y0 - 0.04, zc);
   });
 
   const pierW = (W - openW) / 2, pierX = openW / 2 + pierW / 2;
@@ -1045,9 +1199,18 @@ export function buildBuildings(ctx) {
     const fT = 1.4, fD = 1.0, fz = 0.55;
     {
       const fr = [];
-      part(fr, chamferBox(fT, openH + fT * 2, fD, 0.07), -openW / 2 - fT / 2, floorY + openH / 2 + fT / 2, fz);
-      part(fr, chamferBox(fT, openH + fT * 2, fD, 0.07), openW / 2 + fT / 2, floorY + openH / 2 + fT / 2, fz);
-      part(fr, chamferBox(openW + fT * 2, fT, fD, 0.07), 0, floorY + openH + fT, fz);
+      /* MITRED AT THE HEAD (law 6). A 20.8 m portal frame that stopped in two square corners put the
+         hardest right angle in the district directly above the way in. The head and the two jambs stop
+         1.1 m short and a fifth member crosses each corner at 45°, so the frame turns. Those two
+         members are also the only faces of this frame that a mirror grade at metalness 0.98 can
+         actually use up there: they are TILTED, so they see the horizon band, where the head's own
+         soffit and cap look at the black floor and the black zenith. The frame keeps its cill open —
+         a jamb dies into the stair, it does not stand on a plinth. */
+      /* hh and y are solved, not chosen, so the head still sits at floorY + openH + fT and the jambs
+         still run down to floorY − fT/2: the frame's outer envelope is exactly what it was. */
+      const pk = 1.1, phh = (openH + fT + pk) / 2;
+      mitreFrame(fr, { y: floorY + openH + fT - phh, z: fz,
+        hw: openW / 2 + fT / 2, hh: phh, bar: fT, depth: fD, c: 0.07, k: pk, cill: false });
       merged(g, fr, M.platinum, 'match-portal-frame', true);
       /* LAW 1, ON THE ONE HORIZONTAL THAT MATTERS HERE. M.platinum is metalness 0.98, so this frame is
          lit only by what it reflects: its vertical jambs and front face see the bright horizon band and
@@ -1127,8 +1290,14 @@ export function buildBuildings(ctx) {
     const treads = [], seams = [], _tw = new THREE.Color();
     for (let i = 0; i < steps; i++) {
       const h = rise * (i + 1), total = stairW(i), sideW = (total - rampW) / 2, zc = (steps - i) * run - run / 2;
+      /* THE NOSING (law 6). 0.05 m of chamfer on a 0.225 m riser across a 44 m civic flight is a
+         hairline: at plaza distance it aliases and the eight treads read as eight knife edges stacked
+         up the approach. 0.09 is the most a 0.225 riser will take (chamferBox clamps at h/2) and it is
+         a nosing you can see catch — the same turn, spent where the eye actually lands. The chamfer
+         also carries onto both vertical front corners of every tread, which is where the splayed
+         outer edge of the flight is read from an angle. */
       [-1, 1].forEach(sd => {
-        part(treads, chamferBox(sideW, h, run, 0.05), sd * (rampW / 2 + sideW / 2), h / 2, zc);
+        part(treads, chamferBox(sideW, h, run, 0.09), sd * (rampW / 2 + sideW / 2), h / 2, zc);
         part(seams, chamferBox(sideW - 0.12, 0.025, 0.06, 0.008), sd * (rampW / 2 + sideW / 2), h + 0.02, (steps - i) * run - 0.04);
       });
       /* the portal's light on the treads: full strength on the top step, gone by the fourth down */

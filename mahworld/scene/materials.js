@@ -223,6 +223,27 @@ export function createMaterials(themeIn) {
        the single material that makes canopies, terraces, aprons, path bands, collars and rims read. */
     platinumLit: new THREE.MeshStandardMaterial({ color: 0xb6c4d6, roughness: 0.3, metalness: 0.38, envMapIntensity: 1.4 }),
     platinumLitBrushed: new THREE.MeshStandardMaterial({ color: 0xacbacc, roughness: 0.36, metalness: 0.4, roughnessMap: brushH, envMapIntensity: 1.3 }),
+    /* ---- v11 PAVING: THE WALKING SURFACE IS PART OF THE BLACK FLOOR ------------------------------
+       Direction: "I want the reflective floor almost pitch black."
+
+       The hero deck was already black platinum, and it was not the surface anyone was looking at.
+       A peel at the canonical low camera measured the bright foreground at lum 159; hiding the whole
+       `ground` group only took it to 139, while hiding `plaza-dressing` took it to 27. The paths —
+       and ground.js's own apron slab — were wearing platinumLitBrushed, a LIT platinum at 0xacbacc,
+       so the plaza's actual walking surface was one of the palest things in the world while the
+       black platinum sat underneath it doing nothing for the read.
+
+       This grade keeps that material's OPTICS exactly — roughness, metalness 0.4, the horizontal
+       brush map — and only takes the albedo to near-black. Metalness stays LOW on purpose and must
+       not be raised: paving is a horizontal plane, and LAW 1 (a metal takes no diffuse light, and an
+       up-facing high-metalness face reflects the near-black zenith) is why the bright grade was
+       chosen here in the first place. Black albedo at low metalness still takes the lamps and the
+       hemisphere, so a path is still legible as a path — it is simply legible by its FINISH and its
+       reflections rather than by being pale.
+
+       platinumLitBrushed itself is untouched: buildings.js uses it for the gym canopy top and the
+       market terrace decks, which are architecture and should stay bright. */
+    paving: new THREE.MeshStandardMaterial({ color: 0x0b0f16, roughness: 0.34, metalness: 0.40, roughnessMap: brushH, envMapIntensity: 1.3 }),
     platinumBrushed: new THREE.MeshStandardMaterial({ color: 0x94a3ba, roughness: 0.34, metalness: 0.96, roughnessMap: brushV, envMapIntensity: 1.7 }),
     graphiteMetal: new THREE.MeshStandardMaterial({ color: 0x2c3a4e, roughness: 0.52, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.5 }),
     /* THE MISSING RUNG (v7, brief §02). Measured across the whole palette: the building masses sit at
@@ -258,7 +279,7 @@ export function createMaterials(themeIn) {
     /* `trim` / `trimSatin` / `platinumBrushedH` / `glass` were four materials indistinguishable from
        four others (differing by 1–2 per channel), which made the ranked ladder unreadable. They are
        ALIASES now: same object, one value each, and every existing call site keeps working. */
-    curb: new THREE.MeshStandardMaterial({ color: 0x4a5a76, roughness: 0.58, metalness: 0.34, envMapIntensity: 1.2 }),          /* raised edges, kerbs, steps */
+    curb: new THREE.MeshStandardMaterial({ color: 0x1c2434, roughness: 0.58, metalness: 0.34, envMapIntensity: 1.2 }),          /* raised edges, kerbs, steps. v11: 0x4a5a76 measured lum 149 beside a deck at 25-68 — with the paving taken to black the kerbs became the brightest thing at floor level, and a kerb is floor furniture, not architecture. Darkened to sit just above the paving so an edge still reads as an edge. */
     arena: new THREE.MeshStandardMaterial({ color: 0x1d2129, roughness: 0.86, metalness: 0.06 }),                               /* rubberised impact floor */
     panelLit: new THREE.MeshStandardMaterial({ color: 0x24304a, roughness: 0.4, metalness: 0.2, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */
     /* THE HERO SURFACE — BLACK PLATINUM (v8, art-directed).
@@ -279,7 +300,7 @@ export function createMaterials(themeIn) {
        darkening in mahplaza.js's plaza shader patch, which took it to 69. Do not re-tune the numbers
        here to chase floor brightness — it has now been measured three times that they do not
        control it. */
-    plaza: new THREE.MeshStandardMaterial({ color: 0x090c12, roughness: 0.055, metalness: 0.98, envMapIntensity: 2.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.010, transparent: true, opacity: 0.94 }),
+    plaza: new THREE.MeshStandardMaterial({ color: 0x04060a, roughness: 0.055, metalness: 0.98, envMapIntensity: 2.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.010, transparent: true, opacity: 0.94 }),
     road: new THREE.MeshStandardMaterial({ color: 0x0b0e14, roughness: 0.14, metalness: 0.9, roughnessMap: floorTex, envMapIntensity: 1.9 }),
 
     /* INTERIOR LIGHT IS WARM NOW (v8, art-directed).

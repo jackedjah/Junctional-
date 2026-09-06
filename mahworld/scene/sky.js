@@ -7,7 +7,18 @@
    and the FOB sky infrastructure — FOBEAMS (directed, coherent energy paths)
    and FOBLOWS (soft, broad atmospheric flows). They frame the world; they do
    not cover it. Everything here follows the viewer's world Theme for energy
-   and never turns yellow. */
+   and never turns yellow.
+
+   v11, VISUAL LAW §06 — THE SILHOUETTE IS ROUND, THE SURFACE IS CRYSTALLINE.
+   terrain.js was corrected off ConeGeometry peaks in its v8 pass and sky.js was
+   never included in it, so the world carried two mountain languages depending on
+   which module drew the peak. The ridges here are ROUNDED MASSIFS now (see
+   `skyMassif`), the far drums wear a chamfered crown instead of a 90° arris (see
+   `chamferedDrum`), and both, plus the ring and the quiet capsule towers, merge
+   into single meshes — the outline changed, the faceting did not, and the pass
+   costs fewer draw calls than it replaced. What was left alone and why is noted
+   at each form: the dome, the discs, the sprites, the ribbons and the tube beams
+   have no sharp silhouette to correct. */
 import * as THREE from '../vendor/three/three.module.min.js';
 import { canvasTexture } from './materials.js';
 
@@ -57,11 +68,167 @@ export function moonDirection(worldHour, out) {
   return out;
 }
 
+/* ---- A ROUNDED MASSIF, sky.js's own -------------------------------------------------------------
+   VISUAL LAW §06: THE SILHOUETTE IS ROUND. THE SURFACE IS CRYSTALLINE. An object's OUTLINE against
+   the sky must read as a full, rounded mass; its SURFACE stays cut and planar.
+
+   These peaks were `ConeGeometry(w, h, 5 + rnd() * 3, 1)` — a five-to-seven-sided CONE, the pointiest
+   primitive there is, and twenty of them along the back of the horizon gave it a sawtooth. terrain.js
+   was corrected off exactly that form in its v8 pass ("make it more round looking not so pointy");
+   sky.js was never included in that pass, so the world carried TWO mountain languages depending on
+   which module drew the peak. This is sky.js's own local equivalent — local on purpose, because the
+   two modules deliberately do not import each other and terrain.js's version is tuned for 700–1500 m,
+   painted vertex colours and an UNLIT material, while these ridges stand at 430–560 m on a LIT,
+   FLAT-SHADED material and take their recession from the scene fog instead.
+
+   THE PROFILE, as normalised radius r against normalised height u (0 at the foot, 1 at the summit):
+
+       r(u) = (1 − apron) · (1 − s·u^a)^b   +   apron · e^(−u/k)
+
+   `b` near ½ is the number that does the work: it makes r fall as √(1−u) near the crown, so the
+   silhouette's TANGENT TURNS HORIZONTAL at the summit. A cone's tangent is the same angle all the way
+   to its point — that one exponent is the whole difference between a massif and a spike. `a` above 1
+   holds the flanks out instead of letting them cave in, which keeps the mass MASSIVE rather than
+   bulbous, and the second term is the apron of scree that gives the broad, planted foot.
+
+   `s` is this file's own term and it is the BLUNT TIP. s = 1 − tip^(1/b) makes r(1) = tip exactly, so
+   the form does not taper to a point at all: it tapers to a small FLAT SUMMIT FACET, four to twenty
+   metres across by peak. A needle aliases into a hairline and catches no light; a blunt crown catches it.
+   The cap is a real polygon fanned from a centre vertex, so blunting the tip ADDS facets rather than
+   removing them, and `tx`/`tz` tilt that crown plane (weighted u³, so the flank below is untouched and
+   there is no kink) — otherwise twenty peaks would all wear the same level table.
+
+   Rings are spaced by sin(i/(n−1) · π/2), which spends them where the curve actually turns — the
+   crown — so five rings buy a smooth shoulder rather than a smooth waist. Two angular harmonics then
+   run spurs and gullies down the flanks and fade out toward the crest (`fall`), so the mass reads as
+   ROCK and not as a balloon; the footprint is elliptical and the summit off-centre, so no two peaks in
+   a ridge present the same face.
+
+   NOTE what did NOT change: r, h, w and the ridge radii are exactly the values the old cones used.
+   terrain.js's v8 made the same choice for the same reason — proportion was already right, the form
+   underneath it was the defect. The material keeps flatShading, so the SURFACE stays faceted. */
+const TAU = Math.PI * 2;
+function skyMassif(w, h, rings, slices, rnd) {
+  const a = 1.35 + rnd() * 0.55, b = 0.50 + rnd() * 0.13;
+  const tip = 0.035 + rnd() * 0.040;                                /* summit facet, as a share of the base radius */
+  const s = 1 - Math.pow(tip, 1 / b);                               /* ...chosen so r(1) === tip exactly, for any b */
+  const apron = 0.13 + rnd() * 0.10, kApron = 0.09 + rnd() * 0.09;
+  const k1 = 3 + Math.floor(rnd() * 3), k2 = 6 + Math.floor(rnd() * 4);
+  const p1 = rnd() * TAU, p2 = rnd() * TAU, p3 = rnd() * TAU;
+  const A1 = 0.085 + rnd() * 0.075, A2 = 0.035 + rnd() * 0.045, A3 = 0.05 + rnd() * 0.05;
+  const sz = 0.72 + rnd() * 0.48;                                   /* elliptical footprint, baked so the normals stay true */
+  const lx = (rnd() - 0.5) * 0.24, lz = (rnd() - 0.5) * 0.24;       /* summit off-centre: one steep face, one long back */
+  const tx = (rnd() - 0.5) * 0.40, tz = (rnd() - 0.5) * 0.40;       /* the crown's own tilt, up to about 16° */
+  const nRing = rings * slices, cBase = nRing, cCap = nRing + 1;
+  const pos = new Float32Array((nRing + 2) * 3), idx = [];
+  for (let i = 0; i < rings; i++) {
+    const u = Math.pow(Math.sin((i / (rings - 1)) * Math.PI * 0.5), 1.15);
+    const rad = (1 - apron) * Math.pow(1 - s * Math.pow(u, a), b) + apron * Math.exp(-u / kApron);
+    const fall = Math.pow(1 - u, 0.55), crown = u * u * u;
+    for (let j = 0; j < slices; j++) {
+      const phi = (j / slices) * TAU;
+      const spur = A1 * Math.sin(k1 * phi + p1) + A2 * Math.sin(k2 * phi + p2);
+      const r = w * rad * (1 + spur * fall);
+      const px = r * Math.sin(phi) + lx * w * u * u, pz = r * Math.cos(phi) * sz + lz * w * u * u;
+      const v = (i * slices + j) * 3;
+      /* the crest line wanders with height as well as around the peak, but the term dies at both ends,
+         which is what keeps the summit facet a single clean plane */
+      pos[v] = px;
+      pos[v + 1] = h * u * (1 + A3 * Math.sin(k2 * phi + p3) * u * (1 - u) * 2.2) + (tx * px + tz * pz) * crown;
+      pos[v + 2] = pz;
+    }
+  }
+  const capX = lx * w, capZ = lz * w;
+  pos[cCap * 3] = capX; pos[cCap * 3 + 1] = h + tx * capX + tz * capZ; pos[cCap * 3 + 2] = capZ;
+  for (let i = 0; i < rings - 1; i++) {
+    const lo = i * slices, hi = lo + slices;
+    for (let j = 0; j < slices; j++) { const jn = (j + 1) % slices; idx.push(lo + j, lo + jn, hi + jn, lo + j, hi + jn, hi + j); }
+  }
+  const top = (rings - 1) * slices;
+  /* the summit CAP (a facet, fanned) and the base fan — the foot is buried but the mirror pass looks
+     at this world from under the floor plane, so the underside stays closed */
+  for (let j = 0; j < slices; j++) { const jn = (j + 1) % slices; idx.push(cCap, top + j, top + jn); idx.push(cBase, jn, j); }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setIndex(idx);
+  return geo;
+}
+
+/* A LATHE WITH HARD PROFILE BREAKS. Each band gets its own pair of rings and its own analytic normal,
+   so shading is smooth AROUND the drum and CUT across every break. That is the whole point of a
+   chamfer: it replaces one sharp arris with a small third FACE, and averaging the normals across the
+   break would melt that third face back into a soft fillet — the bubbly failure §06 forbids exactly as
+   firmly as the sharp one. `profile` runs foot to crown as [radius, y] pairs. */
+function revolve(profile, seg) {
+  const bands = profile.length - 1, rows = bands * 2 + 2, vc = rows * seg + 2;
+  const pos = new Float32Array(vc * 3), nor = new Float32Array(vc * 3), idx = [];
+  const put = (row, j, r, y, nr, ny) => {
+    const v = (row * seg + j) * 3, t = (j / seg) * TAU, si = Math.sin(t), co = Math.cos(t);
+    pos[v] = r * si; pos[v + 1] = y; pos[v + 2] = r * co;
+    nor[v] = nr * si; nor[v + 1] = ny; nor[v + 2] = nr * co;
+  };
+  for (let bi = 0; bi < bands; bi++) {
+    const p0 = profile[bi], p1 = profile[bi + 1];
+    const dr = p1[0] - p0[0], dy = p1[1] - p0[1], L = Math.hypot(dr, dy) || 1, nr = dy / L, ny = -dr / L;
+    for (let j = 0; j < seg; j++) { put(bi * 2, j, p0[0], p0[1], nr, ny); put(bi * 2 + 1, j, p1[0], p1[1], nr, ny); }
+    const lo = bi * 2 * seg, hi = lo + seg;
+    for (let j = 0; j < seg; j++) { const jn = (j + 1) % seg; idx.push(lo + j, lo + jn, hi + jn, lo + j, hi + jn, hi + j); }
+  }
+  const rb = bands * 2, rt = rb + 1, cb = rows * seg, ct = cb + 1;
+  for (let j = 0; j < seg; j++) { put(rb, j, profile[0][0], profile[0][1], 0, -1); put(rt, j, profile[bands][0], profile[bands][1], 0, 1); }
+  pos[cb * 3 + 1] = profile[0][1]; nor[cb * 3 + 1] = -1;
+  pos[ct * 3 + 1] = profile[bands][1]; nor[ct * 3 + 1] = 1;
+  for (let j = 0; j < seg; j++) { const jn = (j + 1) % seg; idx.push(cb, rb * seg + jn, rb * seg + j); idx.push(ct, rt * seg + j, rt * seg + jn); }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  geo.setIndex(idx);
+  return geo;
+}
+
+/* A DRUM WHOSE CROWN IS CHAMFERED, not squared off. The old form was CylinderGeometry: a straight wall
+   meeting a flat lid at a 90° arris, which is the sharpest thing a distant structure can show against a
+   luminous sky. The rim now turns through TWO big designed facets — the outline runs 85°, 67.5°, 22.5°,
+   0° from wall to lid — onto a top plate that is still 84% of the drum's width. The silhouette turns
+   horizontal at the top for the same reason the massif's does, while the drum still reads as a drum and
+   not as a dome, and the count of faces went UP, not down. */
+function chamferedDrum(rBase, rTop, h, seg, c) {
+  const rWall = rTop + (rBase - rTop) * (c / h);                    /* where the straight wall stops */
+  return revolve([[rBase, 0], [rWall, h - c], [rWall - 0.2929 * c, h - 0.2929 * c], [rWall - c, h]], seg);
+}
+
+/* Concatenate geometries into ONE static BufferGeometry (position + normal). There is no
+   BufferGeometryUtils in this project — every merge in these files is hand-rolled like this one.
+   Existing normals are kept, so a merged capsule or torus shades exactly as it did before; only parts
+   that arrive without normals get flat face normals computed for them. */
+function mergeGeos(list) {
+  let n = 0;
+  const parts = list.map(src => {
+    const o = src.index ? src.toNonIndexed() : src;
+    if (!o.attributes.normal) o.computeVertexNormals();
+    if (o !== src) src.dispose();
+    n += o.attributes.position.count; return o;
+  });
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3);
+  let o = 0;
+  for (const p of parts) {
+    const c = p.attributes.position.count;
+    pos.set(p.attributes.position.array, o * 3);
+    nor.set(p.attributes.normal.array, o * 3);
+    o += c; p.dispose();
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  return geo;
+}
+
 export function buildSky(ctx) {
   const { M, scene, theme } = ctx;
   const g = new THREE.Group(); g.name = 'sky';
 
-  /* dome with a vertex gradient we repaint on time changes */
+  /* dome with a vertex gradient we repaint on time changes. §06 does not apply to it: a back-side
+     sphere has no silhouette of its own, and its 40 by 20 tessellation only samples the gradient. */
   const domeGeo = new THREE.SphereGeometry(900, 40, 20);
   const colours = new Float32Array(domeGeo.attributes.position.count * 3);
   domeGeo.setAttribute('color', new THREE.BufferAttribute(colours, 3));
@@ -169,38 +336,56 @@ export function buildSky(ctx) {
   [[-420, 118, -430, 620, 70], [60, 132, -520, 760, 84], [520, 108, -400, 560, 64], [-120, 96, -330, 480, 54]].forEach(([x, y, z, w, h]) => { const s = new THREE.Sprite(cloudMat.clone()); s.position.set(x, y, z); s.scale.set(w, h, 1); s.userData.x0 = x; deck.add(s); });
   g.add(deck);
 
-  /* mountains: two dark ridges, fog-affected so they recede */
+  /* mountains: two dark ridges, fog-affected so they recede. ROUNDED MASSIFS (see `skyMassif` above),
+     never cones — and merged into ONE mesh, because twenty separate peaks were twenty draw calls for a
+     silhouette the eye reads as a single ridge line. flatShading stays: round outline, cut surface. */
   const mountainMat = new THREE.MeshStandardMaterial({ color: 0x0c1322, roughness: 0.95, metalness: 0.0, flatShading: true });
-  const ridge = (radius, count, hMin, hMax, seed) => {
+  const ridgeGeos = [];
+  const ridge = (radius, count, hMin, hMax, seed, rings, slices) => {
     let s = seed; const rnd = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
     for (let i = 0; i < count; i++) {
       const a = Math.PI * 0.62 + (i / (count - 1)) * Math.PI * 0.76 + (rnd() - 0.5) * 0.06;   /* the back half of the horizon */
       const x = Math.cos(a) * radius, z = -Math.abs(Math.sin(a) * radius) - 120;
       const h = hMin + rnd() * (hMax - hMin), w = 70 + rnd() * 90;
-      const m = new THREE.Mesh(new THREE.ConeGeometry(w, h, 5 + Math.floor(rnd() * 3), 1), mountainMat);
-      m.position.set(x, h / 2 - 4, z); m.rotation.y = rnd() * Math.PI; g.add(m);
+      const geo = skyMassif(w, h, rings, slices, rnd);
+      geo.rotateY(rnd() * Math.PI);
+      geo.translate(x, -4, z);                                  /* the massif is built foot-at-zero; the old cone was centred */
+      ridgeGeos.push(geo);
     }
   };
   /* when the city module supplies its own distant silhouettes, the old ridges only muddy the skyline —
-     keep one far ridge as a horizon backstop and drop the near one */
+     keep one far ridge as a horizon backstop and drop the near one.
+     The far ridge is taller and reads first, so it carries the extra ring and slice. */
   if (ctx.cityPresent) { /* the city module owns the far silhouette; the ridges only muddied it */ }
-  else { ridge(560, 11, 120, 240, 5); ridge(430, 9, 70, 150, 17); }
+  else { ridge(560, 11, 120, 240, 5, 6, 13); ridge(430, 9, 70, 150, 17, 5, 11); }
+  if (ridgeGeos.length) { const rm = new THREE.Mesh(mergeGeos(ridgeGeos), mountainMat); rm.name = 'sky-ridges'; g.add(rm); }
 
   /* restrained skyline: rounded towers, a few cylinders, one ring — quiet, softened, receding.
      v4: when city.js is present it owns the district; only the ring and the two far cylinders stay */
   const towerMat = new THREE.MeshStandardMaterial({ color: 0x131c2c, roughness: 0.6, metalness: 0.35 });
   const stripMat = new THREE.MeshBasicMaterial({ color: theme.energy, transparent: true, opacity: 0.35, fog: true });
   let s = 3; const rnd = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+  /* every one of these shares towerMat (and every strip shares stripMat), so they are collected and
+     merged: one draw call for the whole quiet skyline instead of one per element */
+  const towerGeos = [], stripGeos = [];
   for (let i = 0; i < (ctx.cityPresent ? 0 : 16); i++) {
     const a = Math.PI * 0.55 + (i / 15) * Math.PI * 0.9, r = 165 + rnd() * 70;
     const x = Math.cos(a) * r, z = -Math.abs(Math.sin(a) * r) - 40;
     if (Math.abs(x) < 26) continue;
     const radius = 5 + rnd() * 5, h = 24 + rnd() * 46;
-    const t = new THREE.Mesh(new THREE.CapsuleGeometry(radius, h, 3, 14), towerMat); t.position.set(x, h / 2, z); g.add(t);
-    if (i % 3 !== 1) { const st = new THREE.Mesh(new THREE.CylinderGeometry(radius + 0.05, radius + 0.05, 0.45, 20, 1, true), stripMat); st.position.set(x, h * (0.45 + rnd() * 0.3), z); g.add(st); }
+    /* the capsule stays: its silhouette is already a full round mass and its caps are only three
+       segments deep, so the shell is faceted rather than a smooth ball. Nothing here to blunt. */
+    const t = new THREE.CapsuleGeometry(radius, h, 3, 14); t.translate(x, h / 2, z); towerGeos.push(t);
+    if (i % 3 !== 1) { const st = new THREE.CylinderGeometry(radius + 0.05, radius + 0.05, 0.45, 20, 1, true); st.translate(x, h * (0.45 + rnd() * 0.3), z); stripGeos.push(st); }
   }
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(28, 1.4, 8, 48), towerMat); ring.position.set(-135, 44, -200); ring.rotation.x = Math.PI / 2.4; ring.rotation.z = 0.3; g.add(ring);
-  [[-205, 12, -60], [205, 16, -80]].forEach(([x, h, z]) => { const cyl = new THREE.Mesh(new THREE.CylinderGeometry(16, 17, h, 24), towerMat); cyl.position.set(x, h / 2, z); g.add(cyl); });
+  const ringGeo = new THREE.TorusGeometry(28, 1.4, 8, 48);
+  /* the ring is already law 6 in miniature — a perfectly round silhouette carried on an eight-sided
+     faceted tube — so only its placement is baked in here, through the same Euler order it used */
+  { const o = new THREE.Object3D(); o.position.set(-135, 44, -200); o.rotation.x = Math.PI / 2.4; o.rotation.z = 0.3; o.updateMatrix(); ringGeo.applyMatrix4(o.matrix); }
+  towerGeos.push(ringGeo);
+  [[-205, 12, -60], [205, 16, -80]].forEach(([x, h, z]) => { const d = chamferedDrum(17, 16, h, 24, h * 0.16); d.translate(x, 0, z); towerGeos.push(d); });
+  const skyline = new THREE.Mesh(mergeGeos(towerGeos), towerMat); skyline.name = 'sky-skyline'; g.add(skyline);
+  if (stripGeos.length) { const sm = new THREE.Mesh(mergeGeos(stripGeos), stripMat); sm.name = 'sky-skyline-strips'; g.add(sm); }
 
   /* FOBEAMS — directed coherent energy pathways from slim masts, long graceful arcs */
   const beamMat = new THREE.MeshBasicMaterial({ color: theme.energyLight, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, fog: false });
@@ -212,6 +397,11 @@ export function buildSky(ctx) {
     const core = new THREE.Mesh(new THREE.TubeGeometry(curve, 120, 0.26, 6, false), beamMat);
     const glow = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 2.2, 6, false), beamGlowMat);
     g.add(core, glow); beams.push({ core, glow });
+    /* the mast is left alone by the §06 pass on purpose: it is slim by design and it already ends in a
+       flat 0.35 m disc rather than a point, so there is no taper to blunt. That disc is 0.385 m2 of
+       up-facing horizontal on a 0.9-metalness grade — a pre-existing law-1 exposure, not one this pass
+       created. Tilting it enough to catch the horizon would mean putting a spike back on the mast, and
+       a low-metalness partner for 0.385 m2 would cost a whole draw call. */
     if (mastAt) { const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.6, 40, 8), mastMat); mast.position.set(mastAt[0], 20, mastAt[1]); g.add(mast); }
   }
   /* the pathways rise from masts at the district's edges and arc BEHIND the destinations, framing them */

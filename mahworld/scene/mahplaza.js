@@ -840,23 +840,35 @@ export async function createMahplaza(canvas, options = {}) {
              out. The NEAR floor keeps its reflection — lamps, seams, the monument, residents, the
              part that reads as "that floor is insane" — and the far floor lets go of it. */
           float coh = 1.0 - 0.72 * smoothstep( 60.0, 300.0, mdist );
-          /* BLACK PLATINUM ABSORBS — HARD. Measured at bearing 180: the deck at 78 m was returning
-             lum 128 against mountains at lum 6-29 and the city ground at lum 12, so the emptiest
-             surface in the frame was ten times brighter than everything behind it. That is the same
-             value inversion this world has already been caught by twice, and §07 asks for
-             ultra-pristine black. A 0.78 tint is a wet grey stone; a black one keeps roughly a
-             third, and cooler than it received. The bright catches come from the studs, the joints
-             and the light pools, which are separate materials and untouched. */
-          mrefl *= vec3( 0.34, 0.40, 0.52 );
-          outgoingLight = mix( outgoingLight, mrefl, uMirrorStrength * coh * ( 0.05 + 0.95 * fres ) );
-          /* THE DECK MAY NOT OUT-VALUE THE ARCHITECTURE (§07). Everything above governs what the
-             floor RETURNS; this governs how much of it survives at a grazing angle, which is the
-             only angle a plaza camera ever sees the middle distance at. Without it the deck measured
-             lum 128 at 78 m against mountains at 6-29 and city ground at 12 — the emptiest surface
-             in the frame was its brightest, which is the value inversion this world has already been
-             caught by twice. Keyed to the same fresnel the reflection uses, so the floor at your
-             feet is untouched and only the far grazing sheet comes down. */
-          outgoingLight *= mix( 1.0, 0.16, fres );
+          /* BLACK PLATINUM ABSORBS. What comes back off this stone is darker and cooler than the
+             thing that cast it; returning it neat is what makes a mirror read as a hole. */
+          mrefl *= vec3( 0.52, 0.60, 0.78 );
+
+          /* ---- v11: ALMOST PITCH BLACK, AND STILL A MIRROR --------------------------------------
+             Direction: "I want the reflective floor almost pitch black."
+
+             Those two words fight each other only while the deck's OWN value and the value it
+             RETURNS are the same number. mix() made them the same number: it REPLACES the surface
+             with the reflection, so the floor could never be darker than what it was reflecting.
+             Reflecting a night sky at lum 90 gave a floor at lum 90, and no amount of tinting the
+             stone could get underneath that — which is exactly why three passes at the material
+             failed to move the measured pixel.
+
+             A real black mirror does not work that way. Obsidian is not a window onto a second
+             city; it is a black surface that ADDS what it catches. Dark reflected content adds
+             nothing and the stone stays black; bright reflected content — a lit window, a lamp, a
+             beam, a sign — adds a streak. So the operator changes from mix to ADD, and the
+             surface's own term is crushed first:
+
+               surface  x 0.11   the deck contributes almost nothing of its own
+               + reflection      the ONLY thing that lifts it above black
+
+             The result is a floor that is nearly pitch black wherever it is returning sky, mountain
+             or dark mass, and carries bright streaks of the city exactly where the city is lit —
+             which is both what the reference frames show and what the direction asks for. It also
+             means the darker the world behind the camera, the blacker the floor, automatically. */
+          outgoingLight *= 0.11;
+          outgoingLight += mrefl * uMirrorStrength * coh * ( 0.05 + 0.95 * fres );
         }
         #include <opaque_fragment>`);
     };

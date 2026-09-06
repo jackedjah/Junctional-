@@ -26,6 +26,76 @@
      energy is a slim luminous heartwood seam up the trunk and a bright core in
      the crown plates — the planter's stem treatment, not an outline. A tree is
      three merged meshes: wood, canopy, heartwood.
+
+   - THE CROWN, CORRECTED IN v8 (visual law 06, "make it more round looking not
+     so pointy"). clouds.js states the rule this world actually obeys:
+
+         THE SILHOUETTE IS ROUND.  THE SURFACE IS CRYSTALLINE.
+
+     v7's crown failed the first half and it failed it structurally, not
+     materially. Two faults, both about the OUTLINE:
+
+       1. THE PLATE ENDED IN A POINT. The canopy plate was the planters' leaf
+          geometry — an octahedron scaled to a flat rhombus — so its long axis
+          ran radially OUT of the shell and finished on a single sharp vertex.
+          Three or four dozen of those on a sphere is a starburst, not a crown.
+       2. NOTHING BOUNDED THE OUTLINE. A plate was seated with its middle on the
+          shell and then pushed out again by a random `puff` of 0.84–1.10, and
+          nothing then checked where its corners landed. MEASURED across the
+          plaza's 18 trees: the worst plate corner stood 24% past the nominal
+          crown ellipsoid and ALL EIGHTEEN trees had corners outside it. That
+          scatter IS the spiky read — the crown had no silhouette, it had
+          thirty-nine of them.
+
+     The fix keeps every plate and keeps the plate crystalline. It is two moves:
+
+       A. A BLUNT DIAMOND (`canopyPlateGeometry`). Both tips of the diamond are
+          cut back to a small FLAT FACET — a chamfered square diamond, six
+          outline edges instead of four, twelve facets instead of eight. This
+          ADDS faceting: where a needle aliased into a hairline and caught no
+          light, a blunt tip carries a facet ~0.3x the plate's width that takes
+          a highlight. The brand's own SQUARE DIAMOND is untouched and is still
+          what the planters, the leaf cores and the craft prow wear — see
+          `leafGeometry`, which this file still builds exactly as it did.
+       B. AN ENVELOPE THAT IS SOLVED, NOT HOPED FOR. The crown is an oblate
+          ellipsoid of semi-axes (canopyR, RY) and every plate is now SEATED
+          against it: given the plate's frame, buildTree solves a quadratic per
+          plate CORNER and takes the tightest, so the plate slides along its own
+          radius until its outermost corner lies exactly ON that ellipsoid (or,
+          for the deep plates, on a shell at a chosen fraction of it) and no
+          corner is outside. Random radial scatter is gone; the outline is a
+          chain of blunt facets on one smooth surface. All six corners are
+          tested and not just the tip because the corner that breaks the outline
+          is not always the tip: down in the skirt the shell normal points DOWN,
+          the plate stands nearly on end, and it is the plate's INNER corner that
+          hangs below the crown as a fringe. The plates near the outline are the
+          small ones and the big ones sit BEHIND them: about a fifth are seated
+          at 0.62–0.78 of the envelope at 1.2x the size, so the crown reads as a
+          full mass rather than a hollow shell of leaves.
+
+     MEASURED, over the plaza's own 18 trees at four bearings each, by rasterizing
+     the canopy's orthographic silhouette:
+
+                                          v7          v8
+       canopy vertices outside the crown   18/18 trees  0/18 trees
+       widest point / median outline       1.205        1.125
+       median outline / nominal crown      0.958        0.967
+       notch floor between plates          0.738        0.737
+       share of the outline actually full  61.0%        74.8%
+
+     Read that as: the crown is the same SIZE it was and the gaps between its
+     plates are no deeper, but nothing sticks out of it any more and it is a
+     seventh less transparent. The widest point of the crown is no longer a spike
+     — it is the envelope, which every outline plate now shares.
+
+     WHAT IT COST. The plate went from 8 triangles to 12, so a canopy costs 1.5x
+     what it did: 200/248/312 -> 300/372/468 by size, a tree 341/365/465 ->
+     441/489/621, and the plaza's whole flora and craft population 10,370 ->
+     13,146 triangles (+26.8%), MEASURED by traversing the built groups. NO NEW
+     DRAW CALLS: still 132 across 6 planters, 18 trees and 3 craft, still three
+     merged meshes per tree, still one geometry per (size, seed). The fullness
+     came free of that — plate size (0.30 -> 0.36) buys coverage without widening
+     the crown, because the envelope, not the plate, decides the outline now.
    - VEHICLES: compact, load-bearing, purposeful craft derived from the
      square-diamond language: a softened (chamfered) rhombus hull with a heavy
      platinum belt, a forward cabin, one energy seam around the belt, a nose
@@ -39,16 +109,16 @@
      element to ~25% by full day and restores it at night.
    - Performance: every geometry is shared; stems, halos, leaves and cores of a
      planter are four InstancedMeshes; a tree merges its trunk + branches, its
-     whole canopy and its heartwood into one geometry each (3 draw calls; 325 /
-     437 / 541 triangles for small / medium / large) and trees of the same size
-     + seed share those geometries through a ref-counted cache, so the plaza's
-     24 trees cost 24 x 3 draw calls and about 11k triangles however many
-     distinct designs stand in it; materials are cached per theme. Eight
-     planters plus five vehicles stay well under 6,000 triangles.
+     whole canopy and its heartwood into one geometry each (3 draw calls; 441 /
+     489 / 621 triangles for small / medium / large, MEASURED off the built
+     groups in v8) and trees of the same size + seed share those geometries
+     through a ref-counted cache, so the plaza's 18 trees cost 18 x 3 draw calls
+     and 11.1k triangles however many distinct designs stand in it; materials are
+     cached per theme. Its 6 planters plus 3 craft add 2.1k more.
      The canopy budget was 400 in the first build and the crowns came out as
      parasols: a dozen big plates on a nearly-vertical shell normal, seen
      edge-on from eye level. Mass needs COUNT, so the plate count roughly
-     doubled and each plate shrank. 541 triangles against a ~150k scene is the
+     doubled and each plate shrank. 621 triangles against a ~150k scene is the
      right side of that trade for the only vegetation the camera gets near.
    - THE THEME IS ENERGY ONLY. Stems, leaves, cores, seams, undersides and the
      heartwood take the world energy colour. Bark, canopy, planter rim, planter
@@ -86,6 +156,30 @@ const TREE_TRUNK_SIDES = 5, TREE_BRANCH_SIDES = 4, TREE_SEAM_SIDES = 5;
 const TREE_CROWN_CORES = 3;           /* how many crown plates carry a lit core */
 const GOLDEN = 2.399963229728653;     /* golden angle — an even shell from a deterministic sequence */
 
+/* v8 crown geometry (see the header). PLATE_CHAMFER is how much of each diamond tip
+   is cut back to a flat facet, as a fraction of the plate's length. */
+const PLATE_CHAMFER = 0.32;
+const PLATE_DEEP = 0.22;              /* share of plates seated deep in the mass rather than on the outline */
+const PLATE_DEEP_GAIN = 1.20;         /* and they are bigger, because their job is mass, not outline */
+/* The crown ellipsoid the plates are seated against is this multiple of (canopyR, RY).
+   It is not 1.0 because a crown whose every plate is bounded by the NOMINAL ellipsoid comes
+   out about a tenth narrower than v7's — v7's apparent width WAS its spikes. MEASURED across
+   the plaza's 18 trees at four bearings, 1.10 puts the median outline back at 0.967 of the
+   nominal crown against v7's 0.958, so the trees are the size they were, while the widest
+   point of the crown falls from 1.205x the median (a spike) to 1.125x (the envelope itself). */
+const CROWN_ENVELOPE = 1.10;
+/* The six outline corners of a canopy plate as (across, along) offsets from the plate's
+   OWN CENTRE, in units of its size. The envelope solve tests all six, because the corner
+   that breaks the crown's outline is not always the outer one: on the lowest plates of the
+   skirt the shell normal points down, the plate stands nearly on end, and it is the INNER
+   corner that hangs below the crown. MEASURED before this was six-sided: the outer chamfer
+   sat at 1.000 envelopes on every plate of a large tree — exactly seated — while the inner
+   corners of the skirt reached 1.142, and that hanging fringe was the last of the spikes. */
+const PLATE_CORNERS = [
+  [PLATE_CHAMFER * 0.5, PLATE_CHAMFER * 0.5 - 0.5], [0.5, 0], [PLATE_CHAMFER * 0.5, 0.5 - PLATE_CHAMFER * 0.5],
+  [-PLATE_CHAMFER * 0.5, 0.5 - PLATE_CHAMFER * 0.5], [-0.5, 0], [-PLATE_CHAMFER * 0.5, PLATE_CHAMFER * 0.5 - 0.5]
+];
+
 /* Planter proportions shared by the geometry and the planting (v7 three-band tub). */
 const PLANTER_LIP = 0.09;             /* how far the soil sits below the rim (the dark void) */
 const PLANTER_INNER = 0.74;           /* inner radius as a fraction of the outer radius — the rest is rim */
@@ -102,7 +196,7 @@ const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vecto
 /* build-time scratch for the merge kit (never touched by update()) */
 const _ta = new THREE.Vector3(), _tb = new THREE.Vector3(), _tc = new THREE.Vector3();
 const _ea = new THREE.Vector3(), _eb = new THREE.Vector3(), _fn = new THREE.Vector3(), _bc = new THREE.Vector3(), _ref = new THREE.Vector3();
-const _u = new THREE.Vector3(), _w = new THREE.Vector3(), _dir = new THREE.Vector3();
+const _u = new THREE.Vector3(), _w = new THREE.Vector3(), _dir = new THREE.Vector3(), _pc = new THREE.Vector3();
 const _col = new THREE.Color();
 
 /* ---------------------------------------------------------------- helpers */
@@ -233,6 +327,35 @@ function stemGeometry() {   /* unit height, base at origin, slight taper */
 function leafGeometry() {   /* square-diamond: a SQUARE rotated 45° in the plate plane (local XY), thin depth; unit height, bottom vertex at origin */
   if (!GEO.leaf) { const g = new THREE.OctahedronGeometry(1, 0); g.scale(0.5, 0.5, 0.09); g.translate(0, 0.5, 0); GEO.leaf = g; }
   return GEO.leaf;
+}
+/* CANOPY PLATE (v8) — the same square diamond with both tips CUT BACK to a flat
+   facet. Same convention as leafGeometry: unit length along +Y (0 → 1), unit
+   width across X, thin in Z, so a plate drops into the same frame the sharp leaf
+   used. Cutting fraction PLATE_CHAMFER off each tip along both of its edges turns
+   the four-corner rhombus into a six-edge outline; wrapping that outline to the
+   two ±Z apexes gives 12 facets instead of 8. THE CHAMFER IS NOT A SMOOTHING —
+   it replaces one arris with a third face, so the plate is MORE crystalline and
+   its outer end now carries a facet 0.32x the plate width that takes a highlight
+   where a vertex could only alias into a hairline.
+   Area lost to the two cuts is 9%: the plate is 0.455 against the rhombus' 0.50.
+   THE BRAND FIGURE IS NOT THIS. leafGeometry above is the MAHFITT square diamond
+   and it keeps its four points — planter leaves, the crown cores and the craft
+   prow all still wear it, sharp, on purpose. This is foliage. */
+function canopyPlateGeometry() {
+  if (GEO.plate) return GEO.plate;
+  const hw = PLATE_CHAMFER * 0.5;                 /* half-width of a chamfer facet = 0.16 */
+  const lo = hw, hi = 1 - hw;                     /* where the two flats sit along the length */
+  const pos = new Float32Array([
+    hw, lo, 0, 0.5, 0.5, 0, hw, hi, 0, -hw, hi, 0, -0.5, 0.5, 0, -hw, lo, 0,   /* outline, CCW seen from +Z */
+    0, 0.5, 0.09, 0, 0.5, -0.09                                                 /* the two ridge apexes */
+  ]);
+  const idx = [];
+  for (let i = 0; i < 6; i++) { const j = (i + 1) % 6; idx.push(i, j, 6, i, 7, j); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setIndex(idx);
+  GEO.plate = g;
+  return g;
 }
 function discGeometry() {   /* unit disc facing +Y */
   if (!GEO.disc) { const g = new THREE.CircleGeometry(1, 10); g.rotateX(-Math.PI / 2); GEO.disc = g; }
@@ -615,9 +738,27 @@ function designTree(T, R, heightOverride) {
     const n = new THREE.Vector3((p.x - centre.x) / (canopyR * canopyR), (p.y - centre.y) / (RY * RY), (p.z - centre.z) / (canopyR * canopyR));
     if (n.lengthSq() < 1e-9) n.set(0, 1, 0);
     n.normalize().addScaledVector(UP, 0.42).normalize();
+    /* v8 — TWO POPULATIONS, and this is what makes a cluster read as one round mass.
+       An OUTLINE plate is seated so its blunt outer facet lands on the crown envelope
+       (buildTree solves for it), and it is the smaller of the two. A DEEP plate is
+       seated at 0.62–0.78 of that envelope and is 1.2x the size: it never reaches the
+       silhouette, it stands behind the outline plates and stops the crown reading as a
+       hollow shell of leaves. `env` is the fraction of the envelope its tip may reach.
+       Every draw is unconditional so the seeded sequence does not fork. */
+    const deep = R() < PLATE_DEEP, depth = R(), grow = R();
+    const env = deep ? 0.62 + 0.16 * depth : 0.975 + 0.025 * depth;
     /* smaller plates than the first build (which ran to half the canopy radius, so a crown was only
-       a dozen readable leaves). Smaller AND more of them is what makes a canopy read as mass. */
-    plates.push({ p, n, s: canopyR * (0.30 + 0.11 * R()) * (0.86 + 0.30 * rr), roll: (R() - 0.5) * 0.9 });
+       a dozen readable leaves). Smaller AND more of them is what makes a canopy read as mass.
+       0.36 rather than v7's 0.30: the tip chamfers take ~9% of the plate's area back, and the rest
+       is bought deliberately. Once the envelope is a hard bound, plate size no longer widens the
+       crown — it only closes the gaps between plates, so it is the one lever that rounds the
+       outline for nothing. MEASURED over the plaza's 18 trees at four bearings, walking 0.32 →
+       0.36 lifts the share of the outlined crown actually covered from 68% to 75% and lifts the
+       notch floor between neighbouring plates from 0.712 to 0.737 of the median outline, at the
+       same plate count and the same triangle count. Past ~0.42 the plates start reading as a
+       dozen big blades again, which is the failure the first build shipped. */
+    const s = canopyR * (0.36 + 0.11 * grow) * (0.86 + 0.30 * rr) * (deep ? PLATE_DEEP_GAIN : 1);
+    plates.push({ p, n, s, env, roll: (R() - 0.5) * 0.62 });
   }
 
   const seamA = R() * TAU;
@@ -650,21 +791,52 @@ function buildTree(D) {
     col.setRGB(lerp(0.11, 1, k), lerp(0.14, 1, k), lerp(0.22, 1, k));
   };
 
-  const leaf = leafGeometry();
+  const leaf = leafGeometry(), plate = canopyPlateGeometry();
   const crown = D.plates.slice().sort((a, b) => b.p.y - a.p.y).slice(0, TREE_CROWN_CORES);
+  /* THE CROWN ENVELOPE (v8). One oblate ellipsoid, semi-axes (canopyR, RY), and every
+     plate is seated against it rather than scattered around it. */
+  const cR2 = D.canopyR * D.canopyR * CROWN_ENVELOPE * CROWN_ENVELOPE, rY2 = D.RY * D.RY * CROWN_ENVELOPE * CROWN_ENVELOPE;
   for (const pl of D.plates) {
-    /* plate frame: local +Z is the plate normal, local +Y runs outward along the shell */
+    /* plate frame: local +Z is the plate normal, local +Y runs outward along the shell.
+       The roll about that normal is ±0.31 rad rather than v7's ±0.45: enough that no two
+       plates present the same facet angle, little enough that the blunt outer facet stays
+       roughly tangent to the envelope instead of turning a side corner into the outline. */
     _u.set(pl.p.x - D.centre.x, 0, pl.p.z - D.centre.z);
     if (_u.lengthSq() < 1e-8) _u.set(1, 0, 0);
     _u.addScaledVector(pl.n, -_u.dot(pl.n));
     if (_u.lengthSq() < 1e-8) _u.set(-pl.n.z, 0, pl.n.x);
     _u.normalize().applyAxisAngle(pl.n, pl.roll);
     _w.crossVectors(_u, pl.n).normalize();
+    /* SEAT THE PLATE ON THE ENVELOPE. q is the plate's offset from the crown centre and d
+       is one corner's offset from the plate's own middle. Slide the plate along q by a
+       scalar k until E(k·q + d) = env² — one quadratic per corner, and the SMALLEST root
+       wins, so no corner of the plate can leave the crown. This is the whole of the
+       silhouette fix: it replaces the random 0.84–1.10 `puff` that used to throw plate
+       tips 22% past the crown with a solve that puts the outermost corner exactly ON it
+       (or, for a deep plate, on the shell at `env` of it). Build time only. */
+    _v2.subVectors(pl.p, D.centre);
+    const eq = (_v2.x * _v2.x + _v2.z * _v2.z) / cR2 + _v2.y * _v2.y / rY2;
+    let kFit = Infinity;
+    for (const c of PLATE_CORNERS) {
+      _v3.copy(_w).multiplyScalar(c[0] * pl.s).addScaledVector(_u, c[1] * pl.s);
+      const bd = (_v2.x * _v3.x + _v2.z * _v3.z) / cR2 + _v2.y * _v3.y / rY2;
+      const ed = (_v3.x * _v3.x + _v3.z * _v3.z) / cR2 + _v3.y * _v3.y / rY2;
+      const disc = bd * bd - eq * (ed - pl.env * pl.env);
+      if (!(eq > 1e-9) || disc <= 0) continue;      /* a plate wider than the crown itself: leave it */
+      const ki = (-bd + Math.sqrt(disc)) / eq;
+      if (ki < kFit) kFit = ki;
+    }
+    const k = isFinite(kFit) ? Math.min(1.25, Math.max(0.05, kFit)) : 1;
+    _pc.copy(D.centre).addScaledVector(_v2, k);                  /* the seated plate centre */
     _m.makeBasis(_w, _u, pl.n);
     _q.setFromRotationMatrix(_m);
-    _v.copy(pl.p).addScaledVector(_u, -0.5 * pl.s);              /* the plate's middle sits on the shell */
-    _m.compose(_v, _q, _s.set(pl.s * 0.92, pl.s, pl.s * 0.30));
-    appendGeo(canopy, leaf, _m, null, tint);
+    _v.copy(_pc).addScaledVector(_u, -0.5 * pl.s);               /* the plate's middle sits on the seat */
+    /* square in plane (1.00, not v7's 0.92): the outline is the brand's own square diamond
+       with its two ends chamfered, and a square tip gives the widest flat facet to catch a
+       highlight. `_pc` is handed to appendGeo as the winding reference, so every one of the
+       twelve facets is forced to face away from the plate's centre. */
+    _m.compose(_v, _q, _s.set(pl.s, pl.s, pl.s * 0.30));
+    appendGeo(canopy, plate, _m, _pc, tint);
     if (crown.indexOf(pl) >= 0) appendGeo(accent, leaf, _m2.multiplyMatrices(_m, TREE_CORE_LOCAL), null, null);
   }
   return {

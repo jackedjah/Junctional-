@@ -38,6 +38,13 @@ class Merger {
   constructor() { this.buckets = new Map(); this.geos = new Map(); }
   box(w, h, d) { return this._geo('b' + w + ',' + h + ',' + d, () => new THREE.BoxGeometry(w, h, d)); }
   cbox(w, h, d, c = 0.04) { return this._geo('c' + w + ',' + h + ',' + d + ',' + c, () => chamferBox(w, h, d, c)); }
+  /* A COPING — the same chamfered box extruded VERTICALLY (buildings.js carries the identical helper
+     and the identical reason, law 6). chamferBox wraps its chamfer round the FRONT and BACK of a
+     member and leaves the two arrises that run with the extrusion square, which is right for anything
+     read face-on and wrong for anything read against the ceiling or from above: a cap, a deck, a
+     light head. Turned, the chamfer wraps the whole PLAN outline instead, for the same 28 triangles
+     and the same bounding box, so nothing already dimensioned off these members moves. */
+  cop(w, h, d, c = 0.04) { return this._geo('p' + w + ',' + h + ',' + d + ',' + c, () => chamferBox(w, d, h, c).rotateX(-HALF)); }
   _geo(key, make) { let g = this.geos.get(key); if (!g) { g = make(); this.geos.set(key, g); } return g; }
   add(mat, geo, matrix, flags = 0) {
     const key = mat.uuid + ':' + flags;
@@ -85,6 +92,27 @@ function ring(B, mat, size, w, thick, y, cx, cz, flags = 0) {
   for (let i = 0; i < 4; i++) {
     const a = i * HALF, len = i % 2 === 0 ? size : size - 2 * w;
     B.add(mat, B.box(len, thick, w), mul(D, at(Math.cos(a) * hi, 0, Math.sin(a) * hi, HALF - a)), flags);
+  }
+}
+
+/* THE MITRE (law 6, and the same construction buildings.js uses on the sign surrounds and on MAH
+   MATCH's portal frame). Four bars butted round an opening make four square corners; stopping each
+   bar `k` short and running a fifth across the corner at 45° replaces that arris with a THIRD PLANE
+   lit differently from both — more crystalline, not less, which is the distinction §06 is drawing.
+   The length k·√2 and the set-back k/2 + bar/(2√2) − bar/2 are the one pair that lands the mitre's
+   outer face exactly on the two shortened ends: longer, and the bar projects past the frame as a
+   diagonal spike, which is the defect rather than the fix. The outer envelope (hw + bar/2,
+   hh + bar/2) is unchanged, so nothing dimensioned off the frame moves. */
+function mitreFrame(B, mat, o, flags = 0) {
+  const { x = 0, y = 0, z = 0, hw, hh, bar, depth, c = 0.04, k, cill = true } = o;
+  const b2 = bar / 2, kk = Math.min(k, hh + b2 - 0.05, hw + b2 - 0.05);
+  B.add(mat, B.cbox(2 * (hw + b2 - kk), bar, depth, c), at(x, y + hh, z), flags);
+  if (cill) B.add(mat, B.cbox(2 * (hw + b2 - kk), bar, depth, c), at(x, y - hh, z), flags);
+  for (const sx of [-1, 1]) B.add(mat, B.cbox(bar, 2 * (hh + b2 - kk), depth, c), at(x + sx * hw, y, z), flags);
+  const inset = kk / 2 + bar / (2 * Math.SQRT2) - b2;
+  for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+    if (sy < 0 && !cill) continue;
+    B.add(mat, B.cbox(kk * Math.SQRT2, bar, depth, c), at(x + sx * (hw - inset), y + sy * (hh - inset), z, 0, 0, -sx * sy * D45), flags);
   }
 }
 
@@ -139,8 +167,14 @@ export function buildMatchInterior(ctx, room, dims) {
     const a = i * HALF, r = 8.75, x = PX + Math.cos(a) * r, z = PZ + Math.sin(a) * r;
     B.add(M.composite, B.cbox(0.9, 0.35, 0.9, 0.05), at(x, 0.175, z), RECV);
     B.add(M.structural, B.cbox(0.5, 3.6, 0.5, 0.04), at(x, 0.35 + 1.8, z), CAST | RECV);
-    B.add(M.trim, B.cbox(0.62, 0.06, 0.62, 0.02), at(x, 3.98, z));
-    B.add(M.energyLight, B.box(0.34, 0.22, 0.34), at(x, 4.12, z));
+    /* the pylon's cap and its light head are the two things in this hall read from BELOW, against a
+       lit truss, so both turn on their plan outline (law 6). The head was a raw box: a 34 cm cube of
+       emissive with eight square corners at each of the diamond's four tips, which is four little
+       spikes of light where the platform's own points already carry the figure. Blunted, it holds a
+       highlight on a facet instead of aliasing on an edge — and it is the same emitter, not a new one:
+       the mat pool, the boundary ring and the truss below it already answer it. */
+    B.add(M.trim, B.cop(0.62, 0.06, 0.62, 0.02), at(x, 3.98, z));
+    B.add(M.energyLight, B.cop(0.34, 0.22, 0.34, 0.05), at(x, 4.12, z));
     B.add(M.energyLight, B.box(0.05, 2.2, 0.05), at(x - Math.cos(a) * 0.265, 2.3, z - Math.sin(a) * 0.265));
   }
 
@@ -224,9 +258,11 @@ export function buildMatchInterior(ctx, room, dims) {
   const actionMounts = {};
   [['findOpponent', -1], ['practiceBuddy', 1]].forEach(([id, s]) => {
     const cx = s * (openW / 4 + 1.0), cy = 2.75, fz = -1.22, fw = 6.8, fh = 2.4, bar = 0.22, fd = 0.4;
-    B.add(M.structural, B.cbox(fw, bar, fd, 0.04), at(cx, cy + fh / 2 - bar / 2, fz), CAST);
-    B.add(M.structural, B.cbox(fw, bar, fd, 0.04), at(cx, cy - fh / 2 + bar / 2, fz), CAST);
-    [-1, 1].forEach(k => B.add(M.structural, B.cbox(bar, fh - 2 * bar, fd, 0.04), at(cx + k * (fw / 2 - bar / 2), cy, fz), CAST));
+    /* MITRED (law 6). These two frames stand at eye level three metres inside the entrance glass —
+       the closest architecture to the camera anywhere in MAH MATCH — and they had four square
+       corners each. Cutting them costs one extra bar per corner and no draw call: the whole frame
+       is already one merge bucket. */
+    mitreFrame(B, M.structural, { x: cx, y: cy, z: fz, hw: fw / 2 - bar / 2, hh: fh / 2 - bar / 2, bar, depth: fd, c: 0.04, k: 0.34 }, CAST);
     const ow = fw - 2 * bar, oh = fh - 2 * bar;
     B.add(M.composite, B.box(ow, oh, 0.05), at(cx, cy, fz - fd / 2 + 0.08));                  /* recess back, face at z ≈ -1.315 */
     const bz = fz + fd / 2 - 0.03;                                                             /* slim polished bezel at the mouth */
@@ -288,8 +324,16 @@ export function buildMatchInterior(ctx, room, dims) {
   courses({ cols: 16, rows: 4, cellW: 2.1, cellH: 2.9, gapX: 0.25, gapY: 0.45 }, 0, coursesY, backZ + 0.05, 0, 9);
 
   /* ---- 8. threshold: inner portal frame just inside the glass --------------- */
-  [-1, 1].forEach(s => B.add(M.structural, B.cbox(0.5, 13.5, 0.5, 0.05), at(s * 8.55, 6.75, -0.6), CAST));
-  B.add(M.structural, B.cbox(17.6, 0.6, 0.5, 0.05), at(0, 13.8, -0.6), CAST);
+  /* MITRED at the head (law 6), and written out rather than passed through mitreFrame because the
+     jamb and the head are deliberately different sections (0.5 and 0.6) and the frame stands on the
+     floor rather than on a cill. The outer corner stays exactly where it was, at (8.8, 14.1): the
+     jamb stops at 13.2, the head at x 7.9, and a 0.9 m mitre closes the corner between them. */
+  const TK = 0.9, TX = 8.8, TY = 14.1, TB = 0.6, TI = TB / (2 * Math.SQRT2);
+  const TJ = TY - TK;                                     /* the jamb runs from the floor to where the mitre starts */
+  [-1, 1].forEach(s => B.add(M.structural, B.cbox(0.5, TJ, 0.5, 0.05), at(s * 8.55, TJ / 2, -0.6), CAST));
+  B.add(M.structural, B.cbox(2 * (TX - TK), TB, 0.5, 0.05), at(0, TY - TB / 2, -0.6), CAST);
+  [-1, 1].forEach(s => B.add(M.structural, B.cbox(TK * Math.SQRT2, TB, 0.5, 0.05),
+    at(s * (TX - TK / 2 - TI), TY - TK / 2 - TI, -0.6, 0, 0, -s * D45), CAST));
   B.add(M.interior, B.box(16.4, 0.03, 0.2), at(0, 13.485, -0.6));
   B.add(M.trimSatin, B.box(17.0, 0.02, 0.5), at(0, 0.01, -0.55));
 

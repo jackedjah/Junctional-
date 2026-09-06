@@ -28,7 +28,21 @@
    3. THE FLOOR ANSWERS THE LIGHT. Everything bright standing on the plaza is registered for the
       assembly's mirrored copy AND lays a pooled, tinted gradient on the floor beneath it (see
       lightPool below). An emissive is not a light; the pool and the reflection are how the world
-      says it noticed. */
+      says it noticed.
+
+   v11 §06 — CRYSTALLINE SMOOTHNESS, applied to a floor. "THE SILHOUETTE IS ROUND. THE SURFACE IS
+   CRYSTALLINE." Nothing about the floor's PROFILE changed and nothing about its materials changed:
+   the relief is still 3 cm across nine metres and every value in the black-platinum block below is
+   still what v8/v9 measured. Three forms were points and are now facets.
+     · THE CELL TABLE was an eight-sided pyramid 8 mm proud, so each cell wore a faint eight-way
+       starburst in reflection. It is one flat facet now and the crown band took the 8 mm (§CROWN_RISE).
+     · THE STANDING SHARDS drew a straight taper and capped it — a cone with a bevel, and reported as
+       "pointy blue cones". They carry terrain.js's massif profile now and end on a table (§shardGeo).
+     · THE FLUSH INLAYS were squashed four-sided lozenges whose two acute plan corners were 33° points
+       lying in the paving. Their corners are CUT — chamfered into a third face each, eight plan
+       facets instead of four — and the squash floor rose so no inlay is a sliver.
+   What was deliberately LEFT sharp: the crossing studs, the shard sockets and the monument's crystal
+   are all the square-diamond brand figure, which §06 exempts by name. */
 import * as THREE from '../vendor/three/three.module.min.js';
 import { canvasTexture, chamferBox, fobMark } from './materials.js';
 import { SITES } from './buildings.js';
@@ -45,9 +59,18 @@ export const FLOOR_TOP = 0.17;   /* the laid floor's deck level: everything inla
    furniture and the dressing module all stand at FLOOR_TOP, so the table apex has to land exactly
    there and the relief has to live underneath it. A cell is 3 cm of relief across nine metres — a
    paving camber, invisible in silhouette, decisive in reflection. */
-const CELL_RIM = 0.14;        /* the turned perimeter: 3 cm below the table apex */
+const CELL_RIM = 0.14;        /* the turned perimeter: 3 cm below the table */
 const CELL_CHAMFER = 0.05;    /* the 45° turn between the cell's side and its crown — the bright hairline */
-const CROWN_RISE = 0.022;     /* the crown band's climb; 1.2° across a 1.07 m band */
+/* v11 §06: the crown band's climb — 1.6° across a 1.07 m band, and it now lands ON the table.
+   It was 0.022, which left the table 8 mm short of FLOOR_TOP and forced the eight table triangles to
+   fan up to a centre apex: a 0.14° eight-sided pyramid on every one of the sixty-nine cells. Under
+   flatShading eight facets 0.14° apart return eight different slices of a horizon-graded environment,
+   so each cell wore a faint eight-way STARBURST radiating from its middle — the jagged failure in
+   light rather than in profile, repeated across the whole plaza. The band takes the missing 8 mm
+   instead, which makes the table a single flat facet exactly at FLOOR_TOP and turns the crown break
+   from 1.2° to 1.6°: one BIG designed facet per cell with a harder turn around it, which is the law
+   read correctly. The relief is still 3 cm across nine metres and the silhouette is still flat. */
+const CROWN_RISE = 0.030;
 const CROWN_INNER = 0.74;     /* where the crown stops and the flat table begins */
 const CELL_CORNER = 0.55;     /* the cut corner — this is what opens the socket at every crossing */
 const JOINT_TOP = 0.133;      /* the joint catch stops a hair below the cell rim, never level with it */
@@ -80,6 +103,10 @@ function place(list, geo, x, y, z, ry = 0) {
    FLOOR_TOP exactly. Octagonal in plan (law: every box chamfered), and the four cut corners are what
    open the socket the stud is inlaid into. Wound counter-clockwise seen from above (+x toward −z), so
    every face comes out with an outward normal and no fix-up pass is needed.
+   THE TABLE IS ONE FACET, not a fan to a raised apex (v11 §06 — see CROWN_RISE). The centre vertex
+   sits at exactly the same height as the ring it fans from, so all eight table triangles are coplanar
+   and the nine-metre table returns ONE slice of the world. The per-cell tilt below still gives each
+   cell its own value; what is gone is the eight-way variation WITHIN a cell.
    56 triangles: 16 side, 16 turned edge, 16 crown, 8 table. */
 function crystalCell(size, corner) {
   const h = size / 2, k = h - corner;
@@ -91,14 +118,14 @@ function crystalCell(size, corner) {
   const A = ring(1, 0);                                        /* the buried foot, hidden in the joint */
   const B = ring(1, CELL_RIM - CELL_CHAMFER);                  /* the side's top */
   const C = ring(1 - CELL_CHAMFER / h, CELL_RIM);              /* the turned edge — this is the hairline that catches */
-  const D = ring(CROWN_INNER, CELL_RIM + CROWN_RISE);          /* the crown band's inner edge */
-  const apex = [0, FLOOR_TOP, 0];
+  const D = ring(CROWN_INNER, CELL_RIM + CROWN_RISE);          /* the crown band's inner edge — this IS the table's rim */
+  const table = [0, CELL_RIM + CROWN_RISE, 0];                 /* level with D, so the table is flat; and CELL_RIM + CROWN_RISE === FLOOR_TOP */
   for (let i = 0; i < 8; i++) {
     const j = (i + 1) % 8;
     quad(A[i], A[j], B[j], B[i]);
     quad(B[i], B[j], C[j], C[i]);
     quad(C[i], C[j], D[j], D[i]);
-    tri(D[i], D[j], apex);
+    tri(D[i], D[j], table);
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
@@ -147,11 +174,24 @@ function shardRandom(seed) { let s = (seed >>> 0) || 9; return () => { s = (s * 
    same ring broken ±25% is a crystal. Deterministic, never animated, exactly like the floor cells' own
    per-cell tilt above.
 
-   AND THE TIP IS TRUNCATED. The direction that asked for shards is the same direction that asked for
-   everything sharp in the architecture to be rounded off, and people walk on this floor: every piece
-   below closes on a small crown ring lifted off the last ring, never drawn to a needle.
-   Triangles: sides * (2 * (rings - 1) + 2). */
-function shardGeo(sides, profile, rad, hgt, wide, jit, rnd) {
+   AND THE TIP IS TRUNCATED — v11 §06 made this real rather than nominal. Every piece used to close on
+   a crown lifted 7% of its own height above the last ring, which on a 2.1 m standing shard is a 15 cm
+   cap climbing off a 36 cm ring: a point with a bevel on it, and the reason the standing pieces were
+   reported as "pointy blue cones". `crownLift` is now an argument and every caller passes ~0.02, so a
+   shard ends on a SMALL FLAT FACET a few degrees off level — a table that holds a highlight where a
+   needle aliased into a hairline and caught nothing. The y-jitter is scaled by the ring's own radius
+   fraction for the same reason: a wide ring can wander and still read as cut, but the small ring that
+   makes the table cannot, or the table comes out torn instead of designed.
+
+   AND THE PLAN CORNERS ARE CUT. `cut` chamfers every corner of every ring IN PLAN: each corner vertex
+   becomes two, placed along the two edges that met there, so one sharp arris is replaced by a small
+   third face. That is the crystalline answer rather than the smooth one — it ADDS a facet per corner.
+   It is what the flush inlays need: they are four-sided AND squashed on one axis, so their two acute
+   corners were rhombus points lying in the paving, which is exactly the form §06 names. The standing
+   and hero pieces are six- and eight-sided and their plan corners are already obtuse, so they pass
+   cut = 0 and pay nothing for it.
+   Triangles: n * (2 * (rings - 1) + 2), where n = sides, or 2 * sides when cut > 0. */
+function shardGeo(sides, profile, rad, hgt, wide, jit, rnd, cut = 0, crownLift = 0.02) {
   const pos = [];
   const tri = (a, b, c) => { pos.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]); };
   const quad = (a, b, c, d) => { tri(a, b, c); tri(a, c, d); };
@@ -165,21 +205,32 @@ function shardGeo(sides, profile, rad, hgt, wide, jit, rnd) {
       const rr = rad * pr * (1 - jit + rnd() * jit * 2);
       /* the base ring stays level: it meets a socket, or it is buried in the paving, and a broken
          base ring would show daylight under one edge of every piece */
-      const yy = hgt * ph + (k === 0 ? 0 : (rnd() - 0.5) * jit * hgt * 0.5);
+      const yy = hgt * ph + (k === 0 ? 0 : (rnd() - 0.5) * jit * hgt * 0.5 * pr);
       out.push([Math.cos(a) * rr, yy, -Math.sin(a) * rr * wide]);
     }
-    return out;
+    if (!(cut > 0)) return out;
+    /* the chamfer: each corner's two replacements sit ON the edges that met there, so the original
+       edges stay dead straight and the new face across the corner is a genuine flat, not a fillet.
+       Winding is preserved — arriving from i−1 the first vertex met is the one on that edge. */
+    const chamfered = [];
+    for (let i = 0; i < sides; i++) {
+      const p = out[i], a = out[(i - 1 + sides) % sides], b = out[(i + 1) % sides];
+      chamfered.push([p[0] + (a[0] - p[0]) * cut, p[1] + (a[1] - p[1]) * cut, p[2] + (a[2] - p[2]) * cut]);
+      chamfered.push([p[0] + (b[0] - p[0]) * cut, p[1] + (b[1] - p[1]) * cut, p[2] + (b[2] - p[2]) * cut]);
+    }
+    return chamfered;
   });
+  const n = rings[0].length;
   const top = rings[rings.length - 1], bot = rings[0];
   let ty = 0, by = 0;
-  for (let i = 0; i < sides; i++) { ty += top[i][1]; by += bot[i][1]; }
-  const crown = [0, ty / sides + hgt * 0.07, 0];      /* blunt, not pointed (LAW 6) */
-  const foot = [0, by / sides - hgt * 0.05, 0];
+  for (let i = 0; i < n; i++) { ty += top[i][1]; by += bot[i][1]; }
+  const crown = [0, ty / n + hgt * crownLift, 0];     /* a small flat table, not a point (LAW 6) */
+  const foot = [0, by / n - hgt * 0.05, 0];
   for (let k = 0; k < rings.length - 1; k++) {
     const A = rings[k], B = rings[k + 1];
-    for (let i = 0; i < sides; i++) { const j = (i + 1) % sides; quad(A[i], A[j], B[j], B[i]); }
+    for (let i = 0; i < n; i++) { const j = (i + 1) % n; quad(A[i], A[j], B[j], B[i]); }
   }
-  for (let i = 0; i < sides; i++) { const j = (i + 1) % sides; tri(top[i], top[j], crown); tri(bot[j], bot[i], foot); }
+  for (let i = 0; i < n; i++) { const j = (i + 1) % n; tri(top[i], top[j], crown); tri(bot[j], bot[i], foot); }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
   g.computeVertexNormals();
@@ -285,8 +336,8 @@ export function buildGround(ctx) {
     c.fillStyle = rg; c.fillRect(0, 0, w, h);
   });
   const poolGeo = new THREE.PlaneGeometry(1, 1); poolGeo.rotateX(-Math.PI / 2);
-  const poolThemedMat = new THREE.MeshBasicMaterial({ map: poolTex, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false });
-  const poolFixedMat = new THREE.MeshBasicMaterial({ map: poolTex, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false });
+  const poolThemedMat = new THREE.MeshBasicMaterial({ map: poolTex, transparent: true, opacity: 0.20, blending: THREE.AdditiveBlending, depthWrite: false });
+  const poolFixedMat = new THREE.MeshBasicMaterial({ map: poolTex, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false });
   const POOL_CAP = 32;
   const poolThemed = new THREE.InstancedMesh(poolGeo, poolThemedMat, POOL_CAP);
   const poolFixed = new THREE.InstancedMesh(poolGeo, poolFixedMat, POOL_CAP);
@@ -353,8 +404,8 @@ export function buildGround(ctx) {
      to 69 and 47 m from 85 to 49 while leaving the deck at your feet untouched. The correction lives
      there, next to the measurement that found it. */
   const heroMat = new THREE.MeshStandardMaterial({ color: 0x080b11, roughness: 0.045, metalness: 0.98, envMapIntensity: 2.9, transparent: true, opacity: 0.86, flatShading: true });
-  const satinMat = new THREE.MeshStandardMaterial({ color: 0x0a0e16, roughness: 0.13, metalness: 0.96, envMapIntensity: 2.2, transparent: true, opacity: 0.92, flatShading: true });
-  const contrastMat = new THREE.MeshStandardMaterial({ color: 0x0d1220, roughness: 0.085, metalness: 0.97, envMapIntensity: 2.5, transparent: true, opacity: 0.88, flatShading: true });
+  const satinMat = new THREE.MeshStandardMaterial({ color: 0x0a0e16, roughness: 0.30, metalness: 0.96, envMapIntensity: 2.2, transparent: true, opacity: 0.92, flatShading: true });
+  const contrastMat = new THREE.MeshStandardMaterial({ color: 0x0d1220, roughness: 0.20, metalness: 0.97, envMapIntensity: 2.5, transparent: true, opacity: 0.88, flatShading: true });
   ctx.floorMaterials = [heroMat, satinMat, contrastMat];
   {
     const hero = [], satin = [], contrast = [], joints = [], outerJoints = [], studs = [], outerStuds = [];
@@ -505,6 +556,9 @@ export function buildGround(ctx) {
     /* the plinth: three receding faceted courses, dark, so the crystal above reads against them */
     const courses = [[7.2, 0.5, 0x0], [5.6, 0.62, 0], [4.2, 0.5, 0]];
     let py = 0;
+    /* v11 §06 audited these and LEFT THEM. A 0.5 m course already carries a 14 cm chamfer — 56% of
+       its half-height — so widening it further would eat the course and turn a cut block into a
+       frustum. The monument's crystal is the brand's square diamond and keeps its points by law. */
     courses.forEach(([cw, ch], i) => {
       const c = new THREE.Mesh(chamferBox(cw, ch, cw, 0.14), i === 1 ? M.graphiteDark : M.structural);
       c.rotation.y = Math.PI / 4; c.position.y = py + ch / 2; c.castShadow = true; c.receiveShadow = true; monument.add(c);
@@ -656,15 +710,28 @@ export function buildGround(ctx) {
        on the narrow axis so a thin sliver still gets a collar wide enough to read as a turned edge */
     const socketAt = (x, z, rad, wide, ry) => setShard(sockets, shardSocket(rad * 1.3, rad * wide * 1.3 + 0.28), x, 0, z, ry, 0, 0);
 
+    /* THE SILHOUETTE OF A STANDING CRYSTAL (v11 §06). Every profile below is sampled from the SAME
+       curve terrain.js's massif() uses and for the same stated reason —
+           r(u) = (1 − u^a)^b,  with b = ½ and a = 1.9
+       — because b near ½ makes the radius fall fastest just under the summit, which is what turns the
+       silhouette's tangent HORIZONTAL there, and a above 1 holds the flanks out so the mass stays
+       massive instead of caving in. A cone's tangent is the same all the way to its point; that is
+       what the standing pieces were, and it is what the eye read as "pointy blue cones".
+       The curve is then TRUNCATED short of zero: the last ring is the table, not a tip. */
     for (const [x, z, h, rad, ry, tx, tz] of HERO) {
       /* eight sides and four rings: the heroes are the only pieces the camera comes close enough to
-         read facet by facet, and a richer section is where the dispersion fringes live */
-      setShard(heroes, shardGeo(8, [[1.0, 0.0], [0.95, 0.22], [0.70, 0.58], [0.30, 1.0]], rad, h, 0.62, 0.22, rnd), x, FLOOR_TOP - 0.12, z, ry, tx, tz);
+         read facet by facet, and a richer section is where the dispersion fringes live.
+         0.70 at u = 0.58 was under the curve (0.80) and pinched the waist; the shoulder is fuller now. */
+      setShard(heroes, shardGeo(8, [[1.0, 0.0], [0.96, 0.22], [0.78, 0.58], [0.30, 1.0]], rad, h, 0.62, 0.22, rnd, 0, 0.02), x, FLOOR_TOP - 0.12, z, ry, tx, tz);
       socketAt(x, z, rad, 0.62, ry);
       addCollider(x, z, rad, h);
     }
     for (const [x, z, h, rad, ry, tx, tz] of STANDING) {
-      setShard(standing, shardGeo(6, [[1.0, 0.0], [0.88, 0.34], [0.46, 1.0]], rad, h, 0.55, 0.25, rnd), x, FLOOR_TOP - 0.10, z, ry, tx, tz);
+      /* a fourth ring is what buys the shoulder: three rings could only draw a straight taper from
+         0.88 to 0.46 and then cap it, and a straight taper IS the cone. r = 1.00 / 0.93 / 0.70 / 0.36
+         at u = 0 / 0.36 / 0.70 / 1.00 is the massif curve above, and its per-ring slope steepens
+         −0.19, −0.68, −1.13, so the mass is full through the middle and turns over at the crown. */
+      setShard(standing, shardGeo(6, [[1.0, 0.0], [0.93, 0.36], [0.70, 0.70], [0.36, 1.0]], rad, h, 0.55, 0.25, rnd, 0, 0.02), x, FLOOR_TOP - 0.10, z, ry, tx, tz);
       socketAt(x, z, rad, 0.55, ry);
       if (h >= 1.5) addCollider(x, z, rad, h);              /* anything at head height; the low pieces are stepped over, not walked around */
     }
@@ -718,8 +785,18 @@ export function buildGround(ctx) {
       const rad = 0.55 + rnd() * rnd() * 1.7;                 /* squared so most are small and a few are big slabs */
       /* MEASURED across the 48 pieces this produces: the ridge stands 8.5-19.3 cm above the deck.
          Clear of the cells' own per-cell tilt, low enough to walk over, and deep enough that a raking
-         light finds a lit face and a dark one on the same piece. */
-      setShard(inlays, shardGeo(4, [[1.0, 0.0], [0.72, 0.62], [0.30, 1.0]], rad, 0.17 + rnd() * 0.10, 0.30 + rnd() * 0.42, 0.26, rnd),
+         light finds a lit face and a dark one on the same piece.
+         v11 §06, and this is the one place on the plaza floor that was genuinely a field of points.
+         An inlay is FOUR-SIDED and squashed on one axis, so its two corners on the long axis were
+         acute rhombus points lying flush in the paving — the form §06 names, forty-eight times over,
+         and at a walking camera's grazing angle a 33° point tapers into a hairline that catches no
+         light at all. Two changes, both of them cuts rather than smoothing:
+           the squash floor rises 0.30 → 0.46, so the sharpest corner any inlay can have opens from
+             33° to 50° before anything else is done to it, and it costs nothing;
+           cut = 0.26 chamfers all four plan corners, which replaces each point with a small third
+             face. The piece goes from four plan facets to eight — more crystalline, not less, and it
+             is why this is the only shard family that pays for the chamfer. */
+      setShard(inlays, shardGeo(4, [[1.0, 0.0], [0.72, 0.62], [0.30, 1.0]], rad, 0.17 + rnd() * 0.10, 0.46 + rnd() * 0.34, 0.26, rnd, 0.26, 0.02),
         x, FLOOR_TOP - 0.10, z, rnd() * Math.PI * 2, (rnd() - 0.5) * 0.05, (rnd() - 0.5) * 0.05);
       placed.push([x, z]);                                    /* so the rest of the scatter keeps clear of it too */
       want--;
@@ -799,7 +876,7 @@ export function buildGround(ctx) {
     if (accent) ctx.lightPool({ x: S.x + fx * (out + 14), y: 0.04, z: S.z + fz * (out + 14), rx: S.W + 20, rz: 30, rot: S.rotY, hue: accent.emissive, k: 0.2 });
   });
   {
-    const slab = new THREE.Mesh(mergeGeos(apronSlab), M.platinumLitBrushed || M.graphiteLight);
+    const slab = new THREE.Mesh(mergeGeos(apronSlab), M.paving || M.platinumLitBrushed || M.graphiteLight);   /* v11: the apron is FLOOR, not architecture — it joins the black paving family */
     slab.name = 'aprons'; slab.receiveShadow = true; g.add(slab);
     const edge = new THREE.Mesh(mergeGeos(apronEdge), M.trim);          /* a mirror-grade nosing on the apron step */
     edge.name = 'apron-nosings'; g.add(edge);
@@ -875,8 +952,8 @@ export function buildGround(ctx) {
   ctx.timeHooks.push(s => {
     const night = 1 - (s && typeof s.daylight === 'number' ? s.daylight : 0);
     const k = 0.28 + 0.72 * night;
-    poolThemedMat.color.copy(M.energySoft.color); poolThemedMat.opacity = 0.5 * k;
-    poolFixedMat.opacity = 0.55 * k;
+    poolThemedMat.color.copy(M.energySoft.color); poolThemedMat.opacity = 0.20 * k;   /* v11: was 0.5 — see the pitch-black note below */
+    poolFixedMat.opacity = 0.22 * k;
     seamMat.color.copy(M.energySoft.color); seamMat.opacity = 0.5 * k;
     if (monumentLight) { monumentLight.color.copy(M.energySoft.color); monumentLight.intensity = 30 * (0.3 + 0.7 * night); }
     /* the wordmark holds at night and steps back under daylight, exactly as before */

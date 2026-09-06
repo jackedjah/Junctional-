@@ -14,7 +14,23 @@
    appearance-check area (|x| < 6, 10 < z < 24).
 
    Draw-call discipline: every static part is merged per material, masts /
-   bollards / rail posts are instanced. */
+   bollards / rail posts are instanced.
+
+   v11 §06 — CRYSTALLINE SMOOTHNESS, swept over the furniture. "THE SILHOUETTE IS ROUND. THE SURFACE
+   IS CRYSTALLINE." The finding worth recording first is a NEGATIVE one: this file's chamfers were
+   already generous — 0.07 on a 0.46 m seat block, 0.14 on a 0.44 m planter, 0.06 on a 0.18 m shelter
+   roof, each a third to two thirds of the half-dimension it cuts — so there was no global chamfer
+   deficit and no blanket widening was done. Widening a chamfer that already eats half a form does not
+   make it rounder, it makes it a frustum. FOUR SPECIFIC FORMS were wrong, and only those four moved:
+     · the LAMP COWL met its top plate in one sharp arris and closed on a 1.21 m² flat disc. It is
+       rim-chamfered and crowned now (facetCowl below): one arris becomes two turns and eight facets.
+     · the BOLLARD CAP was a square diamond over an axis-aligned post — four 9.6 cm horns per bollard.
+       The post is turned to meet it.
+     · the WAYFINDING BLADE stood on a 0.34 m plate a third of its own footprint, on a different
+       bearing, its corners loose in the air. It is a base plate on the blade's own plan now.
+     · the BENCH SEAT was extruded from a SELF-INTERSECTING section — a corner radius larger than the
+       seat was thick. Corrected at the call site; the note there traces the outline.
+   The square-diamond luminaire head keeps its points: it is the brand figure, §06's one exemption. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
 import { chamferBox, softMass, canvasTexture, blobTexture } from './materials.js';
@@ -25,6 +41,40 @@ function part(list, geo, x, y, z, ry = 0, rx = 0, rz = 0) {
   _e.set(rx, ry, rz); _q.setFromEuler(_e); _p.set(x, y, z); _m4.compose(_p, _q, _s);
   const g = geo.index ? geo.toNonIndexed() : geo.clone(); g.applyMatrix4(_m4); list.push(g); return list;
 }
+/* A FACETED COWL — v11 §06. `rings` is [radius, y] bottom to top; the piece is closed with a flat
+   octagon at the last ring and a flat one at the first, and every band between them is a designed
+   facet. This exists because the lamp shade was CylinderGeometry(0.62, 0.30, 0.34, 8), which meets
+   its top plate in ONE sharp arris and closes on a 1.21 m2 dead-flat disc. §06's own technique for a
+   sharp arris is to replace it with a small third face, so the profile below turns twice on the way
+   over the rim instead of once, and the plate that used to be flat becomes a shallow crown of eight
+   facets closing on a table an eighth the area.
+   That second point is also LAW 1 arithmetic and not only taste: the cowl is chromeMirror at
+   metalness 1.0, an UP-FACING mirror face reflects the near-black zenith, and this takes the plaza's
+   dead-flat mirror plate area from 19.4 m2 across sixteen masts to 1.8 m2. (The remainder sits at
+   6.5 m, above every camera in this world, which is why it was never the visible defect the bench top
+   was.) Wound so +x turns toward −z, the same winding the rest of this world uses.
+   Triangles: sides * (2 * (rings - 1) + 2). */
+function facetCowl(rings, sides) {
+  const pos = [];
+  const tri = (a, b, c) => { pos.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]); };
+  const band = rings.map(([r, y]) => {
+    const out = [];
+    for (let i = 0; i < sides; i++) { const a = i / sides * Math.PI * 2; out.push([Math.cos(a) * r, y, -Math.sin(a) * r]); }
+    return out;
+  });
+  for (let k = 0; k < band.length - 1; k++) {
+    const A = band[k], B = band[k + 1];
+    for (let i = 0; i < sides; i++) { const j = (i + 1) % sides; tri(A[i], A[j], B[j]); tri(A[i], B[j], B[i]); }
+  }
+  const top = band[band.length - 1], bot = band[0];
+  const tc = [0, rings[rings.length - 1][1], 0], bc = [0, rings[0][1], 0];
+  for (let i = 0; i < sides; i++) { const j = (i + 1) % sides; tri(top[i], top[j], tc); tri(bot[j], bot[i], bc); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.computeVertexNormals();
+  return g;
+}
+
 function mergeParts(list) {
   let n = 0; for (const g of list) n += g.getAttribute('position').count;
   const pos = new Float32Array(n * 3), nrm = new Float32Array(n * 3); let o = 0;
@@ -112,8 +162,16 @@ export function buildDressing(ctx) {
      square-diamond luminaire beneath it throwing a soft pool. Poles / shades / luminaires are instanced;
      the collars and brackets merge into the trim mesh. */
   const poleGeo = own(new THREE.CylinderGeometry(0.10, 0.21, 6.4, 10));
-  const headGeo = own(new THREE.OctahedronGeometry(0.34, 0));
-  const shadeGeo = own(new THREE.CylinderGeometry(0.62, 0.30, 0.34, 8));
+  const headGeo = own(new THREE.OctahedronGeometry(0.34, 0));      /* the square-diamond luminaire: the brand figure, and §06's one exemption — it keeps its points */
+  /* the cowl, rim-chamfered and crowned (facetCowl above): throat 0.30, rim 0.62, a 5.5 x 8 cm
+     chamfer band back to 0.565, then the crown to 0.19 and a small table. MEASURED as dihedral turns
+     between consecutive faces, which is the only honest way to say whether an arris got blunter:
+       before   flank 133.3 deg off level, then the flat plate — ONE arris of 133.3 deg
+       after    140.9 / 55.5 / 9.8 / 0 — turns of 85.4, 45.7 and 9.8 deg
+     The sharpest edge on the fixture drops from 133 to 85 degrees and the piece gains two facets.
+     The rim sits a little lower than the old flat top so the chamfer has room; the cowl still
+     occupies 0.34 m of height plus a 6.5 cm crown. */
+  const shadeGeo = own(facetCowl([[0.30, -0.170], [0.62, 0.090], [0.565, 0.170], [0.19, 0.235]], 8));
   const poles = new THREE.InstancedMesh(poleGeo, M.chromeSatin || M.trimSatin, MASTS.length);
   const heads = new THREE.InstancedMesh(headGeo, M.energyLight, MASTS.length);
   const shades = new THREE.InstancedMesh(shadeGeo, M.chromeMirror || M.trim, MASTS.length);
@@ -161,9 +219,17 @@ export function buildDressing(ctx) {
   const bollardMesh = new THREE.InstancedMesh(bollard, M.curb, bolls.length);
   const bollCapGeo = own(chamferBox(0.32, 0.05, 0.32, 0.015));
   const bollCaps = new THREE.InstancedMesh(bollCapGeo, M.platinumLit || M.trimSatin, bolls.length);
+  /* v11 §06: THE POST IS TURNED TO MEET ITS CAP. The cap was already a square diamond on the bearing
+     every plinth, collar and foot ring in this file uses, and the post alone was left axis-aligned —
+     so the cap's four corners stood 9.6 cm proud of the post's faces while the post's own corners
+     stood 2.4 cm proud of the cap's edges. Four horns and four exposed arrises on each of eight
+     bollards, at knee height, at the corridor mouth. Turned, the two are concentric and the cap
+     becomes an even 3 cm rim the whole way round, which is what a bollard cap is. No geometry, no
+     triangles and no draw calls change: it is one quaternion. */
+  _e.set(0, Math.PI / 4, 0); _q.setFromEuler(_e);
   bolls.forEach((b, i) => {
-    _p.set(b[0], b[1], b[2]); _q.identity(); _m4.compose(_p, _q, _s); bollardMesh.setMatrixAt(i, _m4);
-    _p.set(b[0], b[1] + 0.47, b[2]); _e.set(0, Math.PI / 4, 0); _q.setFromEuler(_e); _m4.compose(_p, _q, _s); bollCaps.setMatrixAt(i, _m4);
+    _p.set(b[0], b[1], b[2]); _m4.compose(_p, _q, _s); bollardMesh.setMatrixAt(i, _m4);
+    _p.set(b[0], b[1] + 0.47, b[2]); _m4.compose(_p, _q, _s); bollCaps.setMatrixAt(i, _m4);
   });
   bollardMesh.instanceMatrix.needsUpdate = true; bollCaps.instanceMatrix.needsUpdate = true;
   bollardMesh.castShadow = true; group.add(bollardMesh, bollCaps);
@@ -201,7 +267,18 @@ export function buildDressing(ctx) {
      mass under the light edge is the entire reason the platinum above it reads. */
   for (const [bx, bz, ry] of [[-19, 21, 0.5], [19, 21, -0.5], [-16, 10.5, 0.2], [17, 8.5, -0.2]]) {
     part(dark, chamferBox(4.5, 0.46, 0.95, 0.09), bx, 0.23, bz, ry);                 /* the plinth, set back */
-    const seat = new THREE.Mesh(own(softMass(5.2, 0.17, 1.35, 0.16, 0.05)), M.platinumLit || M.curb);
+    /* v11 §06, and this one was a real geometric fault rather than a matter of taste. softMass rounds
+       its shape in ELEVATION — width against thickness — and it was asked for a corner radius of
+       0.16 m on a seat 0.17 m thick. roundedBoxShape has no clamp, so the two arcs at each end
+       overshot each other and the outline doubled back: traced, it runs (2.600, 0.160) then
+       (2.600, 0.010), a bowtie. Both ends of all four bench seats were extruded from a
+       self-intersecting section. 0.075 is the largest radius this thickness can actually carry
+       (h/2 = 0.085), so the ends are now a true continuous round-over instead of a crossed one — and
+       it is the rounding the direction asked for, arriving by being correct rather than by being
+       softer. Cost: 440 -> 444 triangles per seat, from the triangulator, not from me.
+       materials.js owns softMass and is another worker's file, so the clamp is applied HERE, at the
+       call; the report says what the shared fix would be. */
+    const seat = new THREE.Mesh(own(softMass(5.2, 0.17, 1.35, 0.075, 0.045)), M.platinumLit || M.curb);
     seat.position.set(bx, 0.46, bz + 0.675); seat.rotation.y = ry; seat.castShadow = true; group.add(seat);
     part(trim, chamferBox(5.06, 0.05, 0.09, 0.018), bx, 0.5, bz + 0.66, ry);          /* the nosing */
     /* the light in the shadow of the overhang — this is what makes a 0.17 m slab read as thick */
@@ -223,7 +300,12 @@ export function buildDressing(ctx) {
       const bx = MARKER[0] + dx / L * 11 + px * 2.6 * side, bz = MARKER[1] + dz / L * 11 + pz * 2.6 * side, ang = Math.atan2(dx, dz);
       part(dark, chamferBox(0.24, 3.1, 1.05, 0.07), bx, 1.55, bz, ang);
       part(trim, chamferBox(0.3, 0.09, 1.15, 0.03), bx, 3.14, bz, ang);        /* the cap */
-      part(trim, chamferBox(0.34, 0.12, 0.34, 0.04), bx, 0.06, bz, Math.PI / 4);
+      /* v11 §06: the foot was a 0.34 m square diamond turned 45° under a blade 1.05 m deep on a
+         different bearing — so a 3.1 m blade stood on a plate a third of its own footprint, its two
+         ends cantilevered over nothing, and the plate's corners poked 10 cm out of the blade's flanks
+         as four loose points. It is a base plate now: the blade's own plan with a 9 cm rim all round,
+         on the blade's own bearing. Same 28 triangles, same merged mesh. */
+      part(trim, chamferBox(0.42, 0.12, 1.23, 0.05), bx, 0.06, bz, ang);
       const edge = new THREE.Mesh(own(new THREE.BoxGeometry(0.05, 2.5, 0.04)), M.energy);
       edge.position.set(bx + Math.cos(ang) * 0.14, 1.6, bz - Math.sin(ang) * 0.14); edge.rotation.y = ang;
       group.add(edge);
@@ -279,7 +361,7 @@ export function buildDressing(ctx) {
     if (shadow) m.castShadow = true; if (receive) m.receiveShadow = true;
     group.add(m); return m;
   };
-  add(slab, M.platinumLitBrushed || M.graphiteLight, 'dressing-paths', false, true);
+  add(slab, M.paving || M.platinumLitBrushed || M.graphiteLight, 'dressing-paths', false, true);
   add(curb, M.curb, 'dressing-curbs', true, true);
   /* the 82 merged trim parts are almost all HORIZONTAL caps — foot rings, collars, brackets, bench
      edges, fascias, rims. On a mirror grade they reflect a near-black zenith and render black; on the
