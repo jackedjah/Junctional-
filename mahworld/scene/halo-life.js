@@ -18,9 +18,9 @@
      · a crowd is not a cast. The plaza's residents are NAMED fixtures with ids, poses and notes,
        each one placed for a reason. A sanctuary's social life is a population.
 
-   So this is part-major (L48): one InstancedMesh per PART TYPE across the whole population. Five
-   parts and a shadow is SIX DRAWS for the entire inhabited ring, and because a limb is an instance
-   and an instance has a transform, they can still move.
+   So this is part-major (L48): one InstancedMesh per PART TYPE across the whole population. Four
+   parts — drop, torso, head, arm — and a shadow is FIVE DRAWS for the entire inhabited ring, and
+   because a limb is an instance and an instance has a transform, they can still move.
 
    ---- THE SPECIES IS NOT INVENTED HERE --------------------------------------------------------
    residents.js is the authority and this file is its far-tier echo, not a second species. From it:
@@ -62,24 +62,36 @@ export const LIFE = Object.freeze({
    [district degrees, along-ring metres, across-ring metres, count, kind], and the kind decides the
    grouping: a RING faces inward at a centre, a ROW faces one way, a PAIR turns to each other.
    ================================================================================================ */
+/* [deg, along, across, count, kind, LIFT] — and the LIFT is not optional bookkeeping.
+
+   The first cut left it out and put every figure at haloHeight(x, z), the SHELL height. HALO FORUM's
+   amphitheatre tiers stand 1.5 to 6.9 m proud of the shell, so its three seated rows were buried
+   inside the blocks they were meant to be sitting on and the render came back with an empty
+   auditorium. The terraces in ARRIVAL, PULSE and TABLE do the same thing at 1.48 m, and the event
+   tile fields at 0.30. A figure stands on the STRUCTURE at its point, not on the surface under it —
+   the same mistake, at body scale, that put a capture camera inside those same tiers. */
 const NODES = [
-  /* ARRIVAL — people who have just stepped off the pier and are orienting */
-  [-90, -40, -20, 3, 'cluster'], [-90, 60, -26, 2, 'pair'], [-90, 0, 44, 2, 'rail'],
-  /* COMMONS — R4's intentional emptiness, so the few here are widely spaced pairs */
-  [-45, -170, 10, 2, 'pair'], [-45, 40, -30, 2, 'pair'], [-45, 200, 40, 3, 'cluster'],
-  /* PULSE — the dance floor. The largest gathering on the ring, facing the rig. */
-  [0, 0, 0, 9, 'crowd'], [0, -110, 38, 3, 'row'], [0, 110, 38, 3, 'row'],
-  /* TABLE — served at the kiosks and seated under the canopy */
-  [45, -100, -44, 2, 'row'], [45, -20, -44, 2, 'row'], [45, 60, -44, 2, 'row'],
-  [45, 0, 18, 4, 'cluster'],
-  /* PLAY — two of the three arenas in use, with spectators on the tier */
-  [90, -108, 0, 4, 'ring'], [90, 108, 0, 3, 'ring'], [90, 0, 48, 3, 'row'],
+  /* ARRIVAL — people who have just stepped off the pier and are orienting, on the terraces (1.48) */
+  [-90, -40, -20, 3, 'cluster', 1.48], [-90, 60, -26, 2, 'pair', 1.48],
+  /* and two at an overlook rail. THE RAIL MUST BE AT AN OVERLOOK: the bays straddle the shell's
+     inner edge at r 637-667, which is t = -1398 from the midline, not the -20 the first cut used. */
+  [-90, 0, -(HALO.R_MID - HALO.R_IN) - 12, 2, 'rail', 0.44],
+  /* COMMONS — R4's intentional emptiness, so the few here are widely spaced pairs on open plate */
+  [-45, -170, 10, 2, 'pair', 0], [-45, 40, -30, 2, 'pair', 0], [-45, 200, 40, 3, 'cluster', 0],
+  /* PULSE — the dance floor, on the event tiles (0.30); the flanking rows on terraces */
+  [0, 0, 0, 9, 'crowd', 0.30], [0, -110, 38, 3, 'row', 1.48], [0, 110, 38, 3, 'row', 1.48],
+  /* TABLE — served along the kiosk line at plate level, and seated on the terrace */
+  [45, -100, -44, 2, 'row', 0], [45, -20, -44, 2, 'row', 0], [45, 60, -44, 2, 'row', 0],
+  [45, 0, 18, 4, 'cluster', 1.48],
+  /* PLAY — two of the three arenas in use, on their terraces, with spectators outboard */
+  [90, -108, 0, 4, 'ring', 1.48], [90, 108, 0, 3, 'ring', 1.48], [90, 0, 48, 3, 'row', 0],
   /* QUIET — low stimulation is a design constraint, so this is the sparsest district on the ring */
-  [135, -150, 20, 1, 'single'], [135, 60, -30, 2, 'pair'],
-  /* FORUM — the amphitheatre, seated on the tiers facing the speaker platform */
-  [180, -40, 34, 4, 'row'], [180, 30, 56, 4, 'row'], [180, -10, 78, 3, 'row'],
-  /* STAGE — the crowd field in front of the proscenium */
-  [-135, 0, -6, 8, 'crowd'], [-135, -120, 40, 3, 'row'], [-135, 120, 40, 3, 'row']
+  [135, -150, 20, 1, 'single', 0], [135, 60, -30, 2, 'pair', 0],
+  /* FORUM — seated ON the amphitheatre tiers. t = 20 + k*11 and the tread top is 1.5 + k*0.9, so
+     these three rows sit on tiers k = 1, 3 and 5 and their lifts are read off that, not guessed. */
+  [180, -40, 31, 4, 'row', 2.40], [180, 30, 53, 4, 'row', 4.20], [180, -10, 75, 3, 'row', 6.00],
+  /* STAGE — the crowd field on the event tiles in front of the proscenium */
+  [-135, 0, -6, 8, 'crowd', 0.30], [-135, -120, 40, 3, 'row', 0], [-135, 120, 40, 3, 'row', 0]
 ];
 
 /* the concourse spine is a MOVEMENT field, so the people on it are spread along its length rather
@@ -102,7 +114,7 @@ export function buildHaloLife(ctx, opts = {}) {
   /* ---- WHERE EVERY FIGURE STANDS, resolved once ----------------------------------------------- */
   const people = [];
   for (let n = 0; n < NODES.length; n++) {
-    const [deg, s, t, count, kind] = NODES[n];
+    const [deg, s, t, count, kind, lift] = NODES[n];
     const [cx, cz, cth] = ringPoint(deg, s, t);
     stats.nodes++;
     for (let i = 0; i < count; i++) {
@@ -144,7 +156,7 @@ export function buildHaloLife(ctx, opts = {}) {
       const ct = Math.cos(cth), st2 = Math.sin(cth);
       const x = cx + (-st2 * dx) + (ct * dz);
       const z = cz + (ct * dx) + (st2 * dz);
-      people.push({ x, z, face, deg, kind, seed: n * 13 + i });
+      people.push({ x, z, face, deg, kind, lift: lift || 0, seed: n * 13 + i });
       stats.byDistrict[deg] = (stats.byDistrict[deg] || 0) + 1;
     }
   }
@@ -154,7 +166,7 @@ export function buildHaloLife(ctx, opts = {}) {
     const lat = (frac(i * 7) - 0.5) * 16;
     const x = Math.cos(th) * r - Math.sin(th) * lat;
     const z = Math.sin(th) * r + Math.cos(th) * lat;
-    people.push({ x, z, face: (frac2(i * 3) > 0.5 ? 0 : Math.PI), deg: -90, kind: 'walk', seed: 900 + i });
+    people.push({ x, z, face: (frac2(i * 3) > 0.5 ? 0 : Math.PI), deg: -90, kind: 'walk', lift: 0.5, seed: 900 + i });
   }
   stats.figures = people.length;
 
@@ -247,7 +259,7 @@ export function buildHaloLife(ctx, opts = {}) {
   function write(t) {
     for (let i = 0; i < N; i++) {
       const P = people[i], pose = poseFor(P.kind);
-      const y0 = haloHeight(P.x, P.z);
+      const y0 = haloHeight(P.x, P.z) + P.lift;   /* stand on the STRUCTURE, not the shell under it */
       haloNormal(P.x, P.z, _n); _qn.setFromUnitVectors(_up, _n);
       _e.set(0, P.face, 0); _qy.setFromEuler(_e);
       _q.copy(_qn).multiply(_qy);
