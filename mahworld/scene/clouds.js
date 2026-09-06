@@ -35,7 +35,7 @@ import { canvasTexture } from './materials.js';
    dark undersides. Dusk takes MAHWORLD's violet. Day is brighter and softer
    and the crystalline catches weaken — they never take over the sky. */
 const KEYS = {
-  night: { body: 0x4a5f8f, bodyA: 0.80, lit: 0xe4eeff, litA: 0.46, dark: 0x1c2a45, darkA: 0.16, sheenA: 0.09, litT: 0.10, catch: 1.00 },
+  night: { body: 0x4a5f8f, bodyA: 0.86, lit: 0xe4eeff, litA: 0.46, dark: 0x1c2a45, darkA: 0.16, sheenA: 0.09, litT: 0.10, catch: 1.00 },
   dusk:  { body: 0x7466b4, bodyA: 0.76, lit: 0xe0d8ff, litA: 0.36, dark: 0x2f2857, darkA: 0.18, sheenA: 0.07, litT: 0.06, catch: 0.84 },
   day:   { body: 0xdde8f6, bodyA: 0.80, lit: 0xf4f8ff, litA: 0.18, dark: 0x94a8c4, darkA: 0.20, sheenA: 0.03, litT: 0.02, catch: 0.40 }
 };
@@ -143,12 +143,13 @@ function facetTexture(size) {
         const m = Math.abs(u) + Math.abs(v);
         let a = (1.02 - m) / 0.62; a = a < 0 ? 0 : a > 1 ? 1 : a; a = a * a * (3 - 2 * a);
         const crest = Math.exp(-Math.pow((m - 0.5) / 0.17, 2)) * (v < 0 ? 0.5 : 0.1);
-        const lum = Math.min(1.25, 0.5 + 0.5 * (0.5 - v * 0.5) + crest * 0.45);
+        /* one blue-white ratio at every brightness: the sheet is never neutral grey */
+        const lum = Math.max(0.34, Math.min(1, 0.5 + 0.5 * (0.5 - v * 0.5) + crest * 0.45));
         const i = (y * W + x) * 4;
-        d[i] = Math.min(255, Math.round(196 * lum + 40));
-        d[i + 1] = Math.min(255, Math.round(214 * lum + 32));
-        d[i + 2] = Math.min(255, Math.round(238 * lum + 15));
-        d[i + 3] = Math.round(255 * a * (0.52 + 0.48 * Math.min(1, lum)));
+        d[i] = Math.round(214 * lum);
+        d[i + 1] = Math.round(230 * lum);
+        d[i + 2] = Math.round(252 * lum);
+        d[i + 3] = Math.round(255 * a * (0.52 + 0.48 * lum));
       }
     }
     g.putImageData(img, 0, 0);
@@ -160,9 +161,9 @@ function facetTexture(size) {
    almost pure atmospheric silhouette (and is the first thing a low tier
    simplifies). Azimuths are measured from the −z axis, where the cameras look. */
 const LAYOUT = [
-  { name: 'low',  count: 4, yMin: 108, yMax: 148, rMin: 300, rMax: 500, wMin: 200, wMax: 340, qMin: 6, qVar: 3, pMin: 4, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.02, -0.34, 0.30, 1.06] },
-  { name: 'mid',  count: 4, yMin: 168, yMax: 224, rMin: 400, rMax: 700, wMin: 300, wMax: 500, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.80, speed: 1.00, order: -4, spread: [-0.78, -0.16, 0.46, 1.20] },
-  { name: 'high', count: 4, yMin: 256, yMax: 336, rMin: 620, rMax: 900, wMin: 400, wMax: 640, qMin: 4, qVar: 3, pMin: 1, pVar: 2, pScale: 0.55, speed: 0.70, order: -6, spread: [-1.24, -0.52, 0.12, 0.86] }
+  { name: 'low',  count: 5, yMin: 112, yMax: 152, rMin: 300, rMax: 500, wMin: 210, wMax: 350, qMin: 6, qVar: 3, pMin: 4, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.15, -0.60, -0.05, 0.52, 1.10] },
+  { name: 'mid',  count: 5, yMin: 168, yMax: 228, rMin: 400, rMax: 700, wMin: 320, wMax: 540, qMin: 5, qVar: 3, pMin: 3, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-0.95, -0.42, 0.10, 0.62, 1.18] },
+  { name: 'high', count: 4, yMin: 256, yMax: 336, rMin: 620, rMax: 900, wMin: 420, wMax: 660, qMin: 4, qVar: 3, pMin: 2, pVar: 2, pScale: 0.70, speed: 0.70, order: -6, spread: [-0.86, -0.28, 0.34, 0.94] }
 ];
 /* the blob atlas paints the middle of each cell, so a quad has to be ~1.7× the
    mass width it is meant to draw. QSCALE keeps that conversion in one place. */
@@ -349,7 +350,7 @@ export function buildClouds(ctx) {
       omega: L.speed / ((L.rMin + L.rMax) / 2) * (li === 1 ? -1 : 1),
       rot0: li * 0.37, lastAssign: -99,
       opacityPhase: R() * Math.PI * 2, opacityRate: (0.021 + R() * 0.016) * Math.PI * 2,
-      litScale: li === 2 ? 0.55 : li === 1 ? 0.85 : 1,
+      litScale: li === 2 ? 0.72 : li === 1 ? 0.95 : 1,
       baseBodyA: KEYS.night.bodyA
     });
   });

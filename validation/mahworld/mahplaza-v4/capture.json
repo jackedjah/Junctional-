@@ -1,0 +1,2080 @@
+{
+  "renderer": "three@0.185.1 (mahworld/vendor/three)",
+  "gl": "headless Chromium, ANGLE/SwiftShader software GL — ms/frame is NOT a phone number; draw calls, triangles, lights and shadow casters are",
+  "ranAt": "2026-09-06T00:51:12.597Z",
+  "revision": "1e2eb1b+working-tree",
+  "errors": [],
+  "logs": [],
+  "chromium": "141.0.7390.37",
+  "life": {
+    "stills": [
+      {
+        "file": "v4-life-in-world-0s.png",
+        "atS": 0,
+        "life": {
+          "stats": {
+            "near": 4,
+            "mid": 6,
+            "far": 8,
+            "walking": 8,
+            "activeEvents": 0,
+            "events": 0,
+            "ready": 0
+          },
+          "log": []
+        }
+      },
+      {
+        "file": "v4-life-in-world-20s.png",
+        "atS": 20,
+        "life": {
+          "stats": {
+            "near": 6,
+            "mid": 4,
+            "far": 8,
+            "walking": 16,
+            "activeEvents": 0,
+            "events": 3,
+            "ready": 0,
+            "attempts": 3
+          },
+          "log": [
+            {
+              "t": 58,
+              "id": "B",
+              "name": "levitation drill",
+              "where": [
+                -84,
+                46.3,
+                -124
+              ]
+            },
+            {
+              "t": 63,
+              "name": "conversation",
+              "where": [
+                16.181457140808526,
+                0,
+                18.018329974770477
+              ]
+            },
+            {
+              "t": 68,
+              "id": "D",
+              "name": "bridge dash",
+              "where": [
+                65.06466794750158,
+                30.3,
+                -141.25792210234366
+              ]
+            },
+            {
+              "t": 68,
+              "id": "A",
+              "name": "training strike",
+              "where": [
+                84,
+                42.3,
+                -126
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "file": "v4-life-in-world-40s.png",
+        "atS": 40,
+        "life": {
+          "stats": {
+            "near": 4,
+            "mid": 6,
+            "far": 8,
+            "walking": 14,
+            "activeEvents": 1,
+            "events": 8,
+            "ready": 0,
+            "attempts": 8
+          },
+          "log": [
+            {
+              "t": 58,
+              "id": "B",
+              "name": "levitation drill",
+              "where": [
+                -84,
+                46.3,
+                -124
+              ]
+            },
+            {
+              "t": 63,
+              "name": "conversation",
+              "where": [
+                16.181457140808526,
+                0,
+                18.018329974770477
+              ]
+            },
+            {
+              "t": 68,
+              "id": "D",
+              "name": "bridge dash",
+              "where": [
+                65.06466794750158,
+                30.3,
+                -141.25792210234366
+              ]
+            },
+            {
+              "t": 68,
+              "id": "A",
+              "name": "training strike",
+              "where": [
+                84,
+                42.3,
+                -126
+              ]
+            },
+            {
+              "t": 91,
+              "id": "F",
+              "name": "projectile practice",
+              "where": [
+                7,
+                2.05,
+                -72
+              ]
+            },
+            {
+              "t": 91,
+              "id": "E",
+              "name": "gym window silhouette",
+              "where": [
+                -25.874084108956083,
+                10.6,
+                -33.77701302188705
+              ]
+            },
+            {
+              "t": 96,
+              "id": "C",
+              "name": "distant sparring",
+              "where": [
+                -60.32698375943095,
+                40.3,
+                -142.38153449448038
+              ]
+            },
+            {
+              "t": 101,
+              "id": "G",
+              "name": "group enters MAH MATCH",
+              "where": [
+                40.70550095696551,
+                0,
+                36.74863398416322
+              ]
+            },
+            {
+              "t": 103,
+              "id": "H",
+              "name": "leaves MAH MARKET",
+              "where": [
+                35.370866878767764,
+                0,
+                -25.601529163835117
+              ]
+            },
+            {
+              "t": 108,
+              "name": "enters gym",
+              "where": [
+                -33.62601993855938,
+                0,
+                -25.661137974856302
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "file": "v4-life-in-world-60s.png",
+        "atS": 60,
+        "life": {
+          "stats": {
+            "near": 4,
+            "mid": 6,
+            "far": 8,
+            "walking": 13,
+            "activeEvents": 0,
+            "events": 10,
+            "ready": 0,
+            "attempts": 10
+          },
+          "log": [
+            {
+              "t": 58,
+              "id": "B",
+              "name": "levitation drill",
+              "where": [
+                -84,
+                46.3,
+                -124
+              ]
+            },
+            {
+              "t": 63,
+              "name": "conversation",
+              "where": [
+                16.181457140808526,
+                0,
+                18.018329974770477
+              ]
+            },
+            {
+              "t": 68,
+              "id": "D",
+              "name": "bridge dash",
+              "where": [
+                65.06466794750158,
+                30.3,
+                -141.25792210234366
+              ]
+            },
+            {
+              "t": 68,
+              "id": "A",
+              "name": "training strike",
+              "where": [
+                84,
+                42.3,
+                -126
+              ]
+            },
+            {
+              "t": 91,
+              "id": "F",
+              "name": "projectile practice",
+              "where": [
+                7,
+                2.05,
+                -72
+              ]
+            },
+            {
+              "t": 91,
+              "id": "E",
+              "name": "gym window silhouette",
+              "where": [
+                -25.874084108956083,
+                10.6,
+                -33.77701302188705
+              ]
+            },
+            {
+              "t": 96,
+              "id": "C",
+              "name": "distant sparring",
+              "where": [
+                -60.32698375943095,
+                40.3,
+                -142.38153449448038
+              ]
+            },
+            {
+              "t": 101,
+              "id": "G",
+              "name": "group enters MAH MATCH",
+              "where": [
+                40.70550095696551,
+                0,
+                36.74863398416322
+              ]
+            },
+            {
+              "t": 103,
+              "id": "H",
+              "name": "leaves MAH MARKET",
+              "where": [
+                35.370866878767764,
+                0,
+                -25.601529163835117
+              ]
+            },
+            {
+              "t": 108,
+              "name": "enters gym",
+              "where": [
+                -33.62601993855938,
+                0,
+                -25.661137974856302
+              ]
+            },
+            {
+              "t": 142,
+              "id": "D",
+              "name": "bridge dash",
+              "where": [
+                75,
+                34.3,
+                -122
+              ]
+            },
+            {
+              "t": 144,
+              "id": "B",
+              "name": "levitation drill",
+              "where": [
+                -84,
+                46.3,
+                -124
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "framed": {
+      "file": "v4-life-event.png",
+      "event": {
+        "name": "levitation drill",
+        "where": [
+          -84,
+          46.3,
+          -124
+        ],
+        "t": 144
+      }
+    },
+    "modulePresent": true,
+    "summary": {
+      "stats": {
+        "near": 0,
+        "mid": 10,
+        "far": 8,
+        "walking": 16,
+        "activeEvents": 0,
+        "events": 10,
+        "ready": 0,
+        "attempts": 10
+      },
+      "log": [
+        {
+          "t": 58,
+          "id": "B",
+          "name": "levitation drill",
+          "where": [
+            -84,
+            46.3,
+            -124
+          ]
+        },
+        {
+          "t": 63,
+          "name": "conversation",
+          "where": [
+            16.181457140808526,
+            0,
+            18.018329974770477
+          ]
+        },
+        {
+          "t": 68,
+          "id": "D",
+          "name": "bridge dash",
+          "where": [
+            65.06466794750158,
+            30.3,
+            -141.25792210234366
+          ]
+        },
+        {
+          "t": 68,
+          "id": "A",
+          "name": "training strike",
+          "where": [
+            84,
+            42.3,
+            -126
+          ]
+        },
+        {
+          "t": 91,
+          "id": "F",
+          "name": "projectile practice",
+          "where": [
+            7,
+            2.05,
+            -72
+          ]
+        },
+        {
+          "t": 91,
+          "id": "E",
+          "name": "gym window silhouette",
+          "where": [
+            -25.874084108956083,
+            10.6,
+            -33.77701302188705
+          ]
+        },
+        {
+          "t": 96,
+          "id": "C",
+          "name": "distant sparring",
+          "where": [
+            -60.32698375943095,
+            40.3,
+            -142.38153449448038
+          ]
+        },
+        {
+          "t": 101,
+          "id": "G",
+          "name": "group enters MAH MATCH",
+          "where": [
+            40.70550095696551,
+            0,
+            36.74863398416322
+          ]
+        },
+        {
+          "t": 103,
+          "id": "H",
+          "name": "leaves MAH MARKET",
+          "where": [
+            35.370866878767764,
+            0,
+            -25.601529163835117
+          ]
+        },
+        {
+          "t": 108,
+          "name": "enters gym",
+          "where": [
+            -33.62601993855938,
+            0,
+            -25.661137974856302
+          ]
+        },
+        {
+          "t": 142,
+          "id": "D",
+          "name": "bridge dash",
+          "where": [
+            75,
+            34.3,
+            -122
+          ]
+        },
+        {
+          "t": 144,
+          "id": "B",
+          "name": "levitation drill",
+          "where": [
+            -84,
+            46.3,
+            -124
+          ]
+        }
+      ]
+    }
+  },
+  "quality": [
+    {
+      "file": "v4-quality-high-in-world-night.png",
+      "tier": "high",
+      "drawCalls": 649,
+      "triangles": 109420,
+      "ms": 37.5,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 544,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 6,
+        "mid": 8,
+        "far": 10,
+        "walking": 10,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-quality-medium-in-world-night.png",
+      "tier": "medium",
+      "drawCalls": 650,
+      "triangles": 109480,
+      "ms": 20.1,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 544,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 6,
+        "mid": 8,
+        "far": 10,
+        "walking": 10,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-quality-low-in-world-night.png",
+      "tier": "low",
+      "drawCalls": 567,
+      "triangles": 90122,
+      "ms": 200.9,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 544,
+      "textures": 24,
+      "programs": 77,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "low",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 11,
+        "mid": 3,
+        "far": 10,
+        "walking": 11,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    }
+  ],
+  "captures": [
+    {
+      "file": "v4-establishing-night-phone.png",
+      "set": "phone",
+      "view": "establishing",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 411,
+      "triangles": 89298,
+      "ms": 31.9,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 333,
+      "textures": 22,
+      "programs": 45,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-in-world-night-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 397,
+      "triangles": 87246,
+      "ms": 14.7,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 333,
+      "textures": 22,
+      "programs": 45,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-skyline-night-phone.png",
+      "set": "phone",
+      "view": "skyline",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 424,
+      "triangles": 89542,
+      "ms": 9.9,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 337,
+      "textures": 22,
+      "programs": 45,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 9,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-match-entrance-night-phone.png",
+      "set": "phone",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 248,
+      "triangles": 73102,
+      "ms": 7.5,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 337,
+      "textures": 22,
+      "programs": 45,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 11,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-match-hall-night-phone.png",
+      "set": "phone",
+      "view": "match-hall",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 185,
+      "triangles": 63608,
+      "ms": 6.3,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 342,
+      "textures": 22,
+      "programs": 45,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 0,
+        "mid": 10,
+        "far": 8,
+        "walking": 12,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-residents-night-phone.png",
+      "set": "phone",
+      "view": "residents",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 366,
+      "triangles": 82196,
+      "ms": 7.5,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 377,
+      "textures": 23,
+      "programs": 45,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 0,
+        "mid": 10,
+        "far": 8,
+        "walking": 12,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-in-world-day-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 394,
+      "triangles": 87166,
+      "ms": 9,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 377,
+      "textures": 23,
+      "programs": 45,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 6,
+        "mid": 4,
+        "far": 8,
+        "walking": 15,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-match-hall-day-phone.png",
+      "set": "phone",
+      "view": "match-hall",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 181,
+      "triangles": 63516,
+      "ms": 6.1,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 377,
+      "textures": 23,
+      "programs": 45,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 6,
+        "mid": 4,
+        "far": 8,
+        "walking": 16,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-in-world-night-phone-with-controls.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone with controls",
+      "drawCalls": 387,
+      "triangles": 87034,
+      "ms": 35.9,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 316,
+      "textures": 22,
+      "programs": 44,
+      "heapMB": 20.7,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 7,
+        "mid": 3,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-noui-in-world-night.png",
+      "set": "noui",
+      "view": "in-world",
+      "time": "night",
+      "label": "no labels",
+      "drawCalls": 622,
+      "triangles": 107988,
+      "ms": 37.2,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 533,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-noui-establishing-night.png",
+      "set": "noui",
+      "view": "establishing",
+      "time": "night",
+      "label": "no labels",
+      "drawCalls": 669,
+      "triangles": 111714,
+      "ms": 18.5,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 533,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-noui-skyline-night.png",
+      "set": "noui",
+      "view": "skyline",
+      "time": "night",
+      "label": "no labels",
+      "drawCalls": 663,
+      "triangles": 110578,
+      "ms": 13.1,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 533,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 9,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-noui-match-hall-night.png",
+      "set": "noui",
+      "view": "match-hall",
+      "time": "night",
+      "label": "no labels",
+      "drawCalls": 228,
+      "triangles": 73086,
+      "ms": 8,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 535,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 4,
+        "mid": 6,
+        "far": 8,
+        "walking": 10,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-establishing-night-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "night",
+      "label": "wide",
+      "title": "Arrival — plaza, three destinations, skyline behind",
+      "drawCalls": 694,
+      "triangles": 112532,
+      "ms": 39.8,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 543,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 6,
+        "mid": 8,
+        "far": 10,
+        "walking": 10,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-in-world-night-wide.png",
+      "set": "core",
+      "view": "in-world",
+      "time": "night",
+      "label": "wide",
+      "title": "In-world — ground level, foreground / midground / background",
+      "drawCalls": 649,
+      "triangles": 109420,
+      "ms": 21.4,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 544,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 6,
+        "mid": 8,
+        "far": 10,
+        "walking": 10,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-skyline-night-wide.png",
+      "set": "core",
+      "view": "skyline",
+      "time": "night",
+      "label": "wide",
+      "title": "Skyline — the district behind MAH MATCH (midground blocks, walkway, towers, distant forms)",
+      "drawCalls": 697,
+      "triangles": 112440,
+      "ms": 14.2,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 544,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 6,
+        "mid": 8,
+        "far": 10,
+        "walking": 10,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-plaza-node-night-wide.png",
+      "set": "core",
+      "view": "plaza-node",
+      "time": "night",
+      "label": "wide",
+      "title": "Plaza node — foreground composition: paths, seating, masts, curbs",
+      "drawCalls": 569,
+      "triangles": 98822,
+      "ms": 11.7,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 556,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 6,
+        "mid": 8,
+        "far": 10,
+        "walking": 11,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-gym-entrance-night-wide.png",
+      "set": "core",
+      "view": "gym-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "MAH GYM — massing, canopy, courses, interior",
+      "drawCalls": 300,
+      "triangles": 78852,
+      "ms": 9,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 561,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 6,
+        "mid": 8,
+        "far": 10,
+        "walking": 14,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-match-entrance-night-wide.png",
+      "set": "core",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "MAH MATCH — exterior and the two entrance actions in architecture",
+      "drawCalls": 268,
+      "triangles": 80038,
+      "ms": 7,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 561,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 0,
+        "mid": 14,
+        "far": 10,
+        "walking": 16,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-match-hall-night-wide.png",
+      "set": "core",
+      "view": "match-hall",
+      "time": "night",
+      "label": "wide",
+      "title": "MAH MATCH hall — the engineered arena, tiers, truss, bays",
+      "drawCalls": 223,
+      "triangles": 73058,
+      "ms": 7,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 561,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 0,
+        "mid": 14,
+        "far": 10,
+        "walking": 16,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-market-entrance-night-wide.png",
+      "set": "core",
+      "view": "market-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "MAH MARKET — massing and interior",
+      "drawCalls": 332,
+      "triangles": 77432,
+      "ms": 7.6,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 561,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 0,
+        "mid": 14,
+        "far": 10,
+        "walking": 19,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-residents-night-wide.png",
+      "set": "core",
+      "view": "residents",
+      "time": "night",
+      "label": "wide",
+      "title": "Residents — crystalline humanoids, contact grounding, own colours",
+      "drawCalls": 516,
+      "triangles": 100486,
+      "ms": 9.8,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 561,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 7,
+        "mid": 7,
+        "far": 10,
+        "walking": 21,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-appearance-night-wide.png",
+      "set": "core",
+      "view": "appearance",
+      "time": "night",
+      "label": "wide",
+      "title": "Appearance check camera",
+      "drawCalls": 636,
+      "triangles": 107800,
+      "ms": 11.6,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 561,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 7,
+        "mid": 7,
+        "far": 10,
+        "walking": 21,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-sky-plant-night-wide.png",
+      "set": "core",
+      "view": "sky-plant",
+      "time": "night",
+      "label": "wide",
+      "title": "Sky, atmosphere bands, plant detail",
+      "drawCalls": 492,
+      "triangles": 99026,
+      "ms": 11.2,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 565,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 10,
+        "mid": 4,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-establishing-day-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "day",
+      "label": "wide",
+      "title": "Arrival — plaza, three destinations, skyline behind",
+      "drawCalls": 723,
+      "triangles": 115280,
+      "ms": 12.4,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 579,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 10,
+        "mid": 4,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v4-in-world-day-wide.png",
+      "set": "core",
+      "view": "in-world",
+      "time": "day",
+      "label": "wide",
+      "title": "In-world — ground level, foreground / midground / background",
+      "drawCalls": 673,
+      "triangles": 112108,
+      "ms": 11.9,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 580,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 10,
+        "mid": 4,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 1,
+        "events": 1,
+        "ready": 0,
+        "attempts": 1
+      }
+    },
+    {
+      "file": "v4-skyline-day-wide.png",
+      "set": "core",
+      "view": "skyline",
+      "time": "day",
+      "label": "wide",
+      "title": "Skyline — the district behind MAH MATCH (midground blocks, walkway, towers, distant forms)",
+      "drawCalls": 709,
+      "triangles": 114844,
+      "ms": 12,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 7,
+        "mid": 7,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 1,
+        "ready": 0,
+        "attempts": 1
+      }
+    },
+    {
+      "file": "v4-plaza-node-day-wide.png",
+      "set": "core",
+      "view": "plaza-node",
+      "time": "day",
+      "label": "wide",
+      "title": "Plaza node — foreground composition: paths, seating, masts, curbs",
+      "drawCalls": 570,
+      "triangles": 99256,
+      "ms": 11.3,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 7,
+        "mid": 7,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 1,
+        "ready": 0,
+        "attempts": 1
+      }
+    },
+    {
+      "file": "v4-gym-entrance-day-wide.png",
+      "set": "core",
+      "view": "gym-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "MAH GYM — massing, canopy, courses, interior",
+      "drawCalls": 296,
+      "triangles": 78748,
+      "ms": 7.8,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 7,
+        "mid": 7,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 1,
+        "ready": 0,
+        "attempts": 1
+      }
+    },
+    {
+      "file": "v4-match-entrance-day-wide.png",
+      "set": "core",
+      "view": "match-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "MAH MATCH — exterior and the two entrance actions in architecture",
+      "drawCalls": 256,
+      "triangles": 79746,
+      "ms": 7.1,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 1,
+        "mid": 13,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 1,
+        "ready": 0,
+        "attempts": 1
+      }
+    },
+    {
+      "file": "v4-match-hall-day-wide.png",
+      "set": "core",
+      "view": "match-hall",
+      "time": "day",
+      "label": "wide",
+      "title": "MAH MATCH hall — the engineered arena, tiers, truss, bays",
+      "drawCalls": 230,
+      "triangles": 73178,
+      "ms": 6.8,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 1,
+        "mid": 13,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 1,
+        "ready": 0,
+        "attempts": 1
+      }
+    },
+    {
+      "file": "v4-market-entrance-day-wide.png",
+      "set": "core",
+      "view": "market-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "MAH MARKET — massing and interior",
+      "drawCalls": 338,
+      "triangles": 78038,
+      "ms": 7.2,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 24,
+      "programs": 45,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 1,
+        "mid": 13,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 1,
+        "ready": 0,
+        "attempts": 1
+      }
+    },
+    {
+      "file": "v4-residents-day-wide.png",
+      "set": "core",
+      "view": "residents",
+      "time": "day",
+      "label": "wide",
+      "title": "Residents — crystalline humanoids, contact grounding, own colours",
+      "drawCalls": 515,
+      "triangles": 100466,
+      "ms": 197.1,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 25,
+      "programs": 46,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 3,
+        "mid": 11,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 3,
+        "ready": 0,
+        "attempts": 3
+      }
+    },
+    {
+      "file": "v4-appearance-day-wide.png",
+      "set": "core",
+      "view": "appearance",
+      "time": "day",
+      "label": "wide",
+      "title": "Appearance check camera",
+      "drawCalls": 642,
+      "triangles": 108988,
+      "ms": 69.5,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 25,
+      "programs": 46,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 3,
+        "mid": 11,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 3,
+        "ready": 0,
+        "attempts": 3
+      }
+    },
+    {
+      "file": "v4-sky-plant-day-wide.png",
+      "set": "core",
+      "view": "sky-plant",
+      "time": "day",
+      "label": "wide",
+      "title": "Sky, atmosphere bands, plant detail",
+      "drawCalls": 495,
+      "triangles": 99482,
+      "ms": 24.4,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 25,
+      "programs": 46,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 11,
+        "mid": 3,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 4,
+        "ready": 0,
+        "attempts": 4
+      }
+    },
+    {
+      "file": "v4-establishing-dusk-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "dusk",
+      "label": "wide",
+      "drawCalls": 727,
+      "triangles": 116022,
+      "ms": 15.3,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 25,
+      "programs": 46,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 11,
+        "mid": 3,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 4,
+        "ready": 0,
+        "attempts": 4
+      }
+    },
+    {
+      "file": "v4-skyline-dusk-wide.png",
+      "set": "core",
+      "view": "skyline",
+      "time": "dusk",
+      "label": "wide",
+      "drawCalls": 721,
+      "triangles": 115778,
+      "ms": 13.5,
+      "lights": 13,
+      "shadowCasters": 54,
+      "geometries": 586,
+      "textures": 25,
+      "programs": 46,
+      "heapMB": 22,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 11,
+        "mid": 3,
+        "far": 10,
+        "walking": 22,
+        "activeEvents": 0,
+        "events": 5,
+        "ready": 0,
+        "attempts": 5
+      }
+    }
+  ],
+  "modules": {
+    "city": true,
+    "dressing": true,
+    "matchInterior": true,
+    "life": true,
+    "clouds": true,
+    "fobeams": true
+  }
+}
