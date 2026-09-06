@@ -19,6 +19,7 @@
 import * as THREE from '../vendor/three/three.module.min.js';
 import { createWorldClock } from './world-clock.js';
 import { createMaterials, resolveTheme, THEMES } from './materials.js';
+import { createRoam, ROAM } from './roam.js';   /* v15: the viewer's own camera */
 import { buildGround } from './ground.js';
 import { buildBuildings } from './buildings.js';
 import { buildSky } from './sky.js';
@@ -90,7 +91,7 @@ export async function createMahplaza(canvas, options = {}) {
   let quality = resolveQuality(opts.quality);
   const clock = createWorldClock();
   if (opts.time) clock.freeze(opts.time);
-  const state = { version: 'mahplaza-v4', view: 'establishing', yaw: 0, pitch: 0, dolly: 0, touring: false, frames: 0, ms: 0, reduced: reducedMotion(), theme: theme.name, clock: null, selection: null, practice: null, diagnostic: false, appearance: null, quality: quality.name };
+  const state = { version: 'mahplaza-v4', view: 'establishing', roam: null, yaw: 0, pitch: 0, dolly: 0, touring: false, frames: 0, ms: 0, reduced: reducedMotion(), theme: theme.name, clock: null, selection: null, practice: null, diagnostic: false, appearance: null, quality: quality.name };
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, opts.pixelRatioCap, quality.pixelRatio));
@@ -457,6 +458,11 @@ export async function createMahplaza(canvas, options = {}) {
   }
 
   /* ---- camera ------------------------------------------------------------ */
+  /* ROAM (v15): the viewer's own camera. roam.js owns position, heading, collide-and-slide and the
+     two gears; this file owns only the handover — when roam is on it REPLACES the anchored rail
+     camera inside placeCamera(), and every composed view, the tour and the capture harness keep
+     working unchanged because turning roam off restores the anchor they were always using. */
+  const roam = createRoam({ THREE, boxes: colliderBoxes, onChange: r => { state.roam = r.on ? r.mode : null; } });
   const cur = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 54 }, from = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 54 };
   let anim = null, portrait = false;
   /* THE `!v` GUARD IS NOT DEFENSIVE PADDING, IT IS A CRASH FIX. `state.view` is not always a key of
@@ -475,6 +481,16 @@ export async function createMahplaza(canvas, options = {}) {
   const smooth = { yaw: 0, pitch: 0, dolly: 0 };
   let smoothing = true;
   function placeCamera(dt = 0) {
+    /* THE HANDOVER. placeCamera is the only writer of camera.position in this file (frame, resize,
+       advance and samplePixels all route through it), so roam has to live HERE or be overwritten on
+       the same frame it moves. It takes the whole function and still pays the portrait FOV bias,
+       because that bias is what keeps phone framing correct and it is not roam's to drop. */
+    if (roam.state.on) {
+      roam.step(dt);
+      roam.applyTo(camera);
+      camera.fov = cur.fov + (state.fovBias || 0); camera.updateProjectionMatrix();
+      return;
+    }
     if (smoothing && dt > 0 && !state.reduced) { const k = 1 - Math.exp(-dt * 11); smooth.yaw += (state.yaw - smooth.yaw) * k; smooth.pitch += (state.pitch - smooth.pitch) * k; smooth.dolly += (state.dolly - smooth.dolly) * k; }
     else { smooth.yaw = state.yaw; smooth.pitch = state.pitch; smooth.dolly = state.dolly; }
     dirV.subVectors(cur.look, cur.pos).normalize().applyAxisAngle(upV, smooth.yaw);
@@ -495,6 +511,9 @@ export async function createMahplaza(canvas, options = {}) {
   }
   function setView(name, { instant = false, duration = 2800 } = {}) {
     if (!VIEWS[name]) return Promise.resolve(false);
+    /* choosing a composed view is how you leave roam: the anchor set and the viewer's own camera are
+       two different cameras and there is no sensible blend of them */
+    if (roam.state.on) roam.setEnabled(false);
     state.view = name; state.yaw = 0; state.pitch = 0; state.dolly = 0; smooth.yaw = 0; smooth.pitch = 0; smooth.dolly = 0;
     if (anim && anim.resolve) { const r = anim.resolve; anim = null; r(false); }
     if (instant || state.reduced) { applyView(name); requestRender(); return Promise.resolve(true); }
@@ -529,6 +548,34 @@ export async function createMahplaza(canvas, options = {}) {
       fov
     });
   }
+  /* ---- ROAM: the public entry ------------------------------------------------------------------
+     setRoam(true) hands roam the camera's CURRENT position and look direction, so entering is a
+     handover rather than a cut — you keep standing where the view left you. Leaving restores the
+     anchored view that was active, which is why state.view is remembered rather than overwritten. */
+  let roamPrevView = 'establishing';
+  const _seedPos = new THREE.Vector3(), _seedDir = new THREE.Vector3();
+  function setRoam(on, { mode } = {}) {
+    on = !!on;
+    if (on === roam.state.on) { if (on && mode) roam.setMode(mode); return roam.state.on; }
+    if (on) {
+      if (state.touring || practice.running) return false;   /* both drive setView; do not fight them */
+      roamPrevView = VIEWS[state.view] ? state.view : 'establishing';
+      placeCamera(0);                                        /* make sure the anchor camera is settled */
+      _seedPos.copy(camera.position);
+      camera.getWorldDirection(_seedDir);
+      if (mode) roam.setMode(mode);
+      roam.setEnabled(true, { pos: _seedPos, dir: _seedDir });
+      state.view = 'roam';
+      anim = null;
+    } else {
+      roam.setEnabled(false);
+      setView(roamPrevView, { instant: true });
+    }
+    requestRender();
+    return roam.state.on;
+  }
+  function setRoamMode(m) { const r = roam.setMode(m); requestRender(); return r; }
+
   async function tour({ hold = 900, leg = 3800 } = {}) {
     if (state.touring) return false; state.touring = true;
     try { await setView(TOUR[0], { instant: true }); await sleep(hold); for (let i = 1; i < TOUR.length; i++) { await setView(TOUR[i], { duration: leg }); await sleep(hold); } } finally { state.touring = false; }
@@ -637,7 +684,23 @@ export async function createMahplaza(canvas, options = {}) {
   const L = [];
   const on = (target, type, fn, o) => { target.addEventListener(type, fn, o); L.push([target, type, fn, o]); };
   on(el, 'pointerdown', e => { if (state.touring) return; el.setPointerCapture(e.pointerId); drag = { id: e.pointerId, x: e.clientX, y: e.clientY, yaw: state.yaw, pitch: state.pitch, t0: performance.now(), moved: 0 }; });
-  on(el, 'pointermove', e => { if (!drag || e.pointerId !== drag.id) return; const dx = (e.clientX - drag.x) / el.clientWidth, dy = (e.clientY - drag.y) / el.clientHeight; drag.moved = Math.max(drag.moved, Math.hypot(e.clientX - drag.x, e.clientY - drag.y)); if (drag.moved < 6) return; state.yaw = THREE.MathUtils.clamp(drag.yaw - dx * 1.7, -1.1, 1.1); state.pitch = THREE.MathUtils.clamp(drag.pitch + dy * 0.9, -0.4, 0.45); requestRender(); });
+  on(el, 'pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = (e.clientX - drag.x) / el.clientWidth, dy = (e.clientY - drag.y) / el.clientHeight;
+    drag.moved = Math.max(drag.moved, Math.hypot(e.clientX - drag.x, e.clientY - drag.y));
+    if (drag.moved < 6) return;
+    if (roam.state.on) {
+      /* roam look is INCREMENTAL — the drag origin is re-based every move — because roam's yaw is
+         unbounded and a from-origin delta would fight the wrap at +-PI. The rail camera below is
+         absolute, because its yaw is clamped to a window around the anchor and must not drift. */
+      roam.look(-dx * ROAM.LOOK_DRAG, -dy * ROAM.LOOK_DRAG * 0.62);
+      drag.x = e.clientX; drag.y = e.clientY;
+      requestRender(); return;
+    }
+    state.yaw = THREE.MathUtils.clamp(drag.yaw - dx * 1.7, -1.1, 1.1);
+    state.pitch = THREE.MathUtils.clamp(drag.pitch + dy * 0.9, -0.4, 0.45);
+    requestRender();
+  });
   const endDrag = e => { if (!drag || e.pointerId !== drag.id) return; const d = drag; drag = null; if (e.type === 'pointerup' && d.moved < 8 && performance.now() - d.t0 < 450 && !pinch) { const a = pick(e.clientX, e.clientY); select(a ? a.id : null); } };
   on(el, 'pointerup', endDrag); on(el, 'pointercancel', endDrag);
   on(el, 'wheel', e => { e.preventDefault(); state.dolly = THREE.MathUtils.clamp(state.dolly + (e.deltaY < 0 ? 1.2 : -1.2), -10, 40); requestRender(); }, { passive: false });
@@ -645,9 +708,20 @@ export async function createMahplaza(canvas, options = {}) {
   on(el, 'touchstart', e => { if (e.touches.length === 2) pinch = { d: dist(e.touches), dolly: state.dolly }; }, { passive: true });
   on(el, 'touchmove', e => { if (pinch && e.touches.length === 2) { state.dolly = THREE.MathUtils.clamp(pinch.dolly + (dist(e.touches) - pinch.d) / 20, -10, 40); requestRender(); } }, { passive: true });
   on(el, 'touchend', () => { setTimeout(() => { pinch = null; }, 50); });
+  /* roam takes the movement keys ONLY while it is on, and never takes Escape, so every existing
+     exit keeps working. keyup is registered for it too — a held key that never lifts is a camera
+     that never stops. */
+  on(window, 'keyup', e => {
+    if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    if (roam.key(e.key, false)) requestRender();
+  });
+  on(window, 'blur', () => { if (roam.state.on) { roam.releaseAll(); requestRender(); } });
   on(window, 'keydown', e => {
     if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
     const k = e.key;
+    if (k === 'r' || k === 'R') { if (roam.state.on) setRoamMode(roam.state.mode === 'fly' ? 'walk' : 'fly'); else setRoam(true); e.preventDefault(); return; }
+    if (roam.key(k, true)) { if (k.indexOf('Arrow') === 0 || k === ' ') e.preventDefault(); requestRender(); return; }
+    if (k === 'Escape' && roam.state.on) { setRoam(false); return; }
     if (k === 'ArrowUp' || k === 'w' || k === 'W') state.dolly = Math.min(40, state.dolly + 1.5);
     else if (k === 'ArrowDown' || k === 's' || k === 'S') state.dolly = Math.max(-10, state.dolly - 1.5);
     else if (k === 'ArrowLeft' || k === 'a' || k === 'A') state.yaw = Math.min(1.1, state.yaw + 0.08);
@@ -697,7 +771,18 @@ export async function createMahplaza(canvas, options = {}) {
   let advanceClock = 0;
   function advance(seconds, stepSeconds = 1 / 30) {
     const n = Math.max(1, Math.round(seconds / stepSeconds));
-    for (let i = 0; i < n; i++) { advanceClock += stepSeconds; stepWorld(advanceClock, stepSeconds, advanceClock * 1000); }
+    /* THE VIEWER'S CAMERA IS PART OF THE WORLD STEP. advance() exists so evidence exercises exactly
+       the code a viewer's browser runs, and it used to step everything except the one thing the
+       viewer actually drives — it called placeCamera(0) once at the end, so a roam camera integrated
+       nothing. Stepping roam inside the loop makes a capture reproduce a walk deterministically at a
+       fixed dt, which also takes the acceptance harness off the software renderer's real frame rate
+       (L14: under SwiftShader this page runs near 1 fps, and roam's own anti-teleport clamp caps a
+       frame at 0.1 s, so wall-clock key holds measure the renderer, not the movement). */
+    for (let i = 0; i < n; i++) {
+      advanceClock += stepSeconds;
+      if (roam.state.on) roam.step(stepSeconds);
+      stepWorld(advanceClock, stepSeconds, advanceClock * 1000);
+    }
     applyTime(false); placeCamera(0);
     if (mirror) mirror.render(true);   /* a capture screenshots straight after this: never reuse */
     renderer.render(scene, camera); state.frames++;
@@ -920,8 +1005,13 @@ export async function createMahplaza(canvas, options = {}) {
     renderer.render(scene, camera);
     state.ms = state.ms * 0.9 + (performance.now() - t0) * 0.1; state.frames++;
     if (opts.hud) opts.hud(state);
+    /* ROAM KEEPS THE LOOP ALIVE. Under prefers-reduced-motion this loop parks itself the moment
+       nothing is settling, which is right for an ambient scene and fatal for a camera the viewer is
+       driving — a held key would move you one frame and stop. A viewer holding W has asked for
+       motion explicitly, so roam counts as a reason to keep asking for frames, and reduced-motion
+       still governs everything roam does not touch. */
     const settling = Math.abs(smooth.yaw - state.yaw) + Math.abs(smooth.pitch - state.pitch) + Math.abs(smooth.dolly - state.dolly) > 0.002;
-    if (!hidden && (anim || !state.reduced || ctx.updateHooks.length || settling)) raf = requestAnimationFrame(frame);
+    if (!hidden && (anim || !state.reduced || ctx.updateHooks.length || settling || roam.state.on)) raf = requestAnimationFrame(frame);
   }
   /* quality tier at run time (validation and the page's Preview row) */
   function setQuality(name) {
@@ -979,6 +1069,7 @@ export async function createMahplaza(canvas, options = {}) {
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
     setDiagnostic, setQuality, get quality() { return quality.name; }, qualities: Object.keys(QUALITY), advance,
+    setRoam, setRoamMode, roam,
     /* validation: pin or release world time */
     setTime(spec) { if (spec == null || spec === 'live') clock.release(); else clock.freeze(spec); applyTime(true); requestRender(); return clock.state(); },
     renderOnce() { requestRender(); },

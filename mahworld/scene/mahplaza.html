@@ -38,6 +38,27 @@
   .card .pill[data-status="local-preview"]{border-color:rgba(143,208,255,.5);color:var(--energy)}
   .card p{margin:0;color:var(--dim)}
   .card .row button{background:rgba(143,208,255,.08)}
+  /* ROAM. The stick sits bottom-LEFT and the whole rest of the canvas stays the look surface, which
+     is the scheme every phone player already knows. pointer-events are off on the container so the
+     canvas keeps receiving drags everywhere the pad is not. */
+  .roam{position:fixed;left:0;bottom:0;padding:0 0 calc(18px + var(--safe-b)) 18px;pointer-events:none;display:flex;align-items:flex-end;gap:14px}
+  .stick{width:132px;height:132px;border-radius:50%;border:1px solid var(--line);background:rgba(6,12,28,.42);backdrop-filter:blur(6px);pointer-events:auto;position:relative;touch-action:none}
+  .stick i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:rgba(143,208,255,.20);border:1px solid var(--energy);transform:translate(var(--kx,0px),var(--ky,0px));transition:transform .08s linear}
+  .stick[data-active="1"] i{transition:none;background:rgba(143,208,255,.34)}
+  .roam .lift{display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+  .roam .lift button{appearance:none;font:inherit;width:52px;height:44px;font-size:15px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:3px;backdrop-filter:blur(6px);cursor:pointer;touch-action:none}
+  .roam .lift button:active{border-color:var(--energy);background:rgba(143,208,255,.18)}
+  .roam-hint{position:fixed;right:16px;bottom:calc(18px + var(--safe-b));pointer-events:none;color:var(--dim);letter-spacing:.14em;font-size:10px;text-transform:uppercase;text-align:right;line-height:1.9}
+  .roam-hint b{color:var(--ink);font-weight:500}
+  /* ROAMING CLEARS THE STAGE. The footer is eight rows tall — views, time, world, avatar, roam,
+     preview, quality, route — which is right for a control deck and wrong for a place you are
+     standing in: it covered half the frame and the thumbstick landed on top of the quality row.
+     While roaming, everything except the roam row itself and the clock steps out of the way. */
+  body[data-roaming] .hud--bottom > .row:not([data-roam-row]),
+  body[data-roaming] .hud--bottom > .note,
+  body[data-roaming] .hud > .note{display:none}
+  body[data-roaming] .hud--bottom{padding-bottom:calc(170px + var(--safe-b))}
+  @media (min-width:900px){ body[data-roaming] .hud--bottom{padding-bottom:calc(12px + var(--safe-b));padding-left:180px} }
   .fail{position:fixed;inset:0;display:none;place-items:center;padding:24px;text-align:center;background:var(--ground)}
   .fail p{max-width:34ch;color:var(--dim)}
   [hidden]{display:none!important}
@@ -93,6 +114,11 @@
     <button type="button" data-self="red" style="--sw:#e0453f"><i class="swatch"></i>Red</button>
     <button type="button" data-self="silver" style="--sw:#aebbcb"><i class="swatch"></i>Silver</button>
   </div>
+  <div class="row" role="group" aria-label="Move around the world yourself" data-roam-row>
+    <span class="label">Roam</span>
+    <button type="button" data-roam aria-pressed="false">Walk the world</button>
+    <button type="button" data-roam-mode aria-pressed="false" hidden>Fly</button>
+  </div>
   <div class="row" role="group" aria-label="Preview">
     <span class="label">Preview</span>
     <button type="button" data-practice>Practice preview</button>
@@ -112,6 +138,15 @@
   <span class="clock" data-meter hidden>—</span>
 </footer>
 
+<div class="roam" data-roam-pad hidden>
+  <div class="stick" data-stick role="application" aria-label="Move: drag to walk"><i></i></div>
+  <div class="lift" data-lift hidden>
+    <button type="button" data-lift-up aria-label="Rise">▲</button>
+    <button type="button" data-lift-down aria-label="Descend">▼</button>
+  </div>
+</div>
+<div class="roam-hint" data-roam-hint hidden>Drag anywhere to look<br><b>W A S D</b> move · <b>Shift</b> sprint · <b>R</b> fly · <b>Esc</b> exit</div>
+
 <div class="fail" data-fail><p>This scene needs WebGL. Open it in a current Safari, Chrome or Firefox.</p></div>
 
 <script type="module">
@@ -124,7 +159,7 @@
   const clockEl = $('[data-clock]'), meter = $('[data-meter]');
   const card = $('[data-card]');
   const viewButtons = $$('[data-view]'), timeButtons = $$('[data-time]'), themeButtons = $$('[data-theme]'), selfButtons = $$('[data-self]');
-  let world = null;
+  let world = null, repaintRoam = null, lastRoam = null;
   const paintCard = sel => {
     if (!sel) { card.hidden = true; return; }
     card.hidden = false;
@@ -148,6 +183,10 @@
         if (s.frames % 15) return;
         if (s.clock) clockEl.innerHTML = 'MAHWORLD ' + s.clock.hhmm + ' · ' + s.clock.label + (s.clock.frozen ? ' <small>· pinned for validation</small>' : ' <small>· 1 real min ≈ ' + s.clock.worldMinutesPerRealMinute.toFixed(1) + ' world min</small>');
         if (!meter.hidden) meter.textContent = s.view.toUpperCase() + ' · ' + s.ms.toFixed(1) + ' ms/frame · world ' + s.theme + (s.diagnostic ? ' · diagnostic' : '');
+        /* roam can be entered from the button, from the R key, from ?roam=1 or from the API, so the
+           page chrome follows the WORLD's state rather than assuming its own button is the only way
+           in. Repaint only on a change: this runs every 15 frames. */
+        if (s.roam !== lastRoam) { lastRoam = s.roam; if (repaintRoam) repaintRoam(); }
       }
     });
   } catch (e) { $('[data-fail]').style.display = 'grid'; console.error(e); }
@@ -169,6 +208,62 @@
     $('[data-card-practice]').addEventListener('click', async () => { await world.practicePreview(); paintViews(); });
     $('[data-card-exit]').addEventListener('click', () => { world.practiceExit(); paintViews(); });
     $('[data-card-dismiss]').addEventListener('click', () => { world.select(null); card.hidden = true; });
+    /* ---- ROAM: the viewer drives the camera ----------------------------------------------------
+       The stick is a virtual thumbstick, not a d-pad: it reports a CONTINUOUS vector, so a small
+       push walks and a full push runs, which is how a phone player expects to move. The rest of the
+       canvas stays the look surface, so the two never fight over the same pointer. */
+    const roamBtn = $('[data-roam]'), roamModeBtn = $('[data-roam-mode]'), roamPad = $('[data-roam-pad]'),
+      roamHint = $('[data-roam-hint]'), stick = $('[data-stick]'), knob = stick.querySelector('i'),
+      lift = $('[data-lift]');
+    const hudOff = q.get('hud') === '0';
+    const paintRoam = repaintRoam = () => {
+      const on = !!world.state.roam, fly = world.state.roam === 'fly';
+      roamBtn.setAttribute('aria-pressed', String(on));
+      roamBtn.textContent = on ? 'Leave roam' : 'Walk the world';
+      roamModeBtn.hidden = !on; roamModeBtn.setAttribute('aria-pressed', String(fly));
+      roamModeBtn.textContent = fly ? 'Flying' : 'Fly';
+      lift.hidden = !fly;
+      roamPad.hidden = !on || hudOff; roamHint.hidden = !on || hudOff;
+      /* the stage clears while roaming — see the CSS note. Driven off the world's state, so it is
+         correct however roam was entered (button, R key, ?roam=1 or the API). */
+      if (on) document.body.setAttribute('data-roaming', '1'); else document.body.removeAttribute('data-roaming');
+    };
+    roamBtn.addEventListener('click', () => { world.select(null); world.setRoam(!world.state.roam); paintRoam(); paintViews(); });
+    roamModeBtn.addEventListener('click', () => { world.setRoamMode(world.state.roam === 'fly' ? 'walk' : 'fly'); paintRoam(); });
+    /* the stick. R is the pad radius; the knob is clamped to it and the vector is normalised by it,
+       so the reported magnitude is 0..1 and the dead zone is the first 12% of travel. */
+    let stickId = null;
+    const R = 46, DEAD = 0.12;
+    const setKnob = (dx, dy) => { knob.style.setProperty('--kx', dx.toFixed(1) + 'px'); knob.style.setProperty('--ky', dy.toFixed(1) + 'px'); };
+    const stickMove = e => {
+      const r = stick.getBoundingClientRect();
+      let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+      const d = Math.hypot(dx, dy);
+      if (d > R) { dx *= R / d; dy *= R / d; }
+      setKnob(dx, dy);
+      const mag = Math.min(1, d / R);
+      const k = mag < DEAD ? 0 : (mag - DEAD) / (1 - DEAD);
+      const nx = d > 0 ? dx / Math.max(d, 1e-6) : 0, ny = d > 0 ? dy / Math.max(d, 1e-6) : 0;
+      world.roam.setStick(nx * k, -ny * k);          /* screen-up is forward */
+    };
+    stick.addEventListener('pointerdown', e => { stickId = e.pointerId; stick.setPointerCapture(e.pointerId); stick.dataset.active = '1'; stickMove(e); e.preventDefault(); });
+    stick.addEventListener('pointermove', e => { if (e.pointerId === stickId) stickMove(e); });
+    const stickEnd = e => { if (e.pointerId !== stickId) return; stickId = null; stick.dataset.active = '0'; setKnob(0, 0); world.roam.setStick(0, 0); };
+    stick.addEventListener('pointerup', stickEnd); stick.addEventListener('pointercancel', stickEnd);
+    /* the lift buttons are press-and-hold, so they behave like the keys they stand in for */
+    const holdLift = (el, v) => {
+      const down = e => { world.roam.setVertical(v); e.preventDefault(); };
+      const up = () => world.roam.setVertical(0);
+      el.addEventListener('pointerdown', down); el.addEventListener('pointerup', up);
+      el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
+    };
+    holdLift($('[data-lift-up]'), 1); holdLift($('[data-lift-down]'), -1);
+    /* the keyboard toggles roam too (R), so the page's own chrome has to follow the world's state
+       rather than assume it owns it */
+    window.addEventListener('keyup', e => { if (e.key === 'r' || e.key === 'R' || e.key === 'Escape') paintRoam(); });
+    if (q.get('roam') === '1') { world.setRoam(true, { mode: q.get('fly') === '1' ? 'fly' : 'walk' }); }
+    paintRoam();
+
     if (q.get('view') && world.views.indexOf(q.get('view')) > -1) { world.setView(q.get('view'), { instant: true }); }
     if (q.get('time')) window.__pinned = q.get('time');
     if (q.get('diagnostic') === '1') { world.setDiagnostic(true); $('[data-diagnostic]').setAttribute('aria-pressed', 'true'); }

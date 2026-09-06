@@ -191,6 +191,32 @@ lives in the negative-z half, which no amount of reasoning about bearing convent
 **Regression.** Same family as L03 (peel, don't guess) and L07 (a count is not a geometry). The
 scene graph will answer any question about itself; asking it is always cheaper than being wrong.
 
+## L20 — When the viewer gains a degree of freedom, the harness must gain it too
+**Failure.** Roam's first acceptance run reported the camera moving 0.11 m in 1.5 s of held W, and
+flying reaching 22 m instead of 219 m. Nothing was wrong with roam.
+**Root owner.** Two things compounding. Under SwiftShader this page runs near 1 fps, and roam clamps
+a frame to 0.1 s so a backgrounded tab cannot teleport the viewer — so 1.5 s of wall-clock key hold
+is about two frames, i.e. 0.2 s of simulated motion. And `advance()`, the deterministic step the
+whole evidence harness is built on, stepped every resident, cloud and beam and then called
+`placeCamera(0)` ONCE — so it stepped everything in the world except the thing the viewer drives.
+**Correction.** `advance()` now steps roam inside its loop, at its own fixed dt. Acceptance drives
+the real key and pointer events (the input path) but the fixed-dt integrator (the motion), so the
+measurement is of the movement and not of the renderer.
+**Regression.** L14 said software frame times are not device numbers. This is the sharper form: a
+wall-clock measurement of anything integrated per frame measures the renderer.
+
+## L21 — A test that passes without exercising the thing is worse than no test
+**Failure.** "Walking into the monument does not enter its collider" passed. The walker had spent
+eight seconds marching in the opposite direction — `yaw = Math.PI` faces +z and the monument is at
+z −6.5. The assertion was true and meant nothing.
+**Correction.** Every negative assertion needs a positive partner that proves the subject was
+reached: the test now also requires the walker to END UP at the collider's near face (z 1.5–6),
+so "did not pass through" can only be satisfied by having arrived. Same shape as the earlier
+`stats.stations = 4` over four empty plinths (L07).
+**Regression.** Three tests in this session asserted the right thing about the wrong situation
+(R03 asserted deck height at a position outside the deck; R07 measured a bound while stopped
+against a collider). Before trusting a green test, ask what would have to be true for it to fail.
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)
@@ -210,6 +236,7 @@ scene graph will answer any question about itself; asking it is always cheaper t
 | FOBLOCK genome (parts only, builds nothing) | `foblock.js` |
 | FOBLOCK placement, music diamonds | `fobstations.js` |
 | Upper realm | `sky-layout.js` (contract), `skyrealm.js` (assembly), `sky-*.js` (builders) |
+| Free movement: the viewer's own camera | `roam.js` (position, gears, collide-and-slide, input state); `mahplaza.js` owns the handover |
 
 ## Standing diagnostic harness (scratchpad)
 
@@ -222,3 +249,6 @@ scene graph will answer any question about itself; asking it is always cheaper t
 | `peel.cjs` / `subpeel.cjs` | hide scene children one at a time to find the true owner |
 | `crop.cjs` | crop and magnify a region of a render |
 | `sweep.cjs` | find collision-free placements across bearings × radii |
+| `srfind.cjs` | traverse the built graph for a named mesh family and print its world extents |
+| `tests/mahworld-roam.test.js` | 18 roam acceptance checks driven through the real page |
+| `roamtour.cjs` | the walkthrough capture — 13 stations a person would stop at |
