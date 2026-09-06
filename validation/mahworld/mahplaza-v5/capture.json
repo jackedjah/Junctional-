@@ -1,0 +1,1338 @@
+{
+  "renderer": "three@0.185.1 (mahworld/vendor/three)",
+  "gl": "headless Chromium, ANGLE/SwiftShader software GL — ms/frame is NOT a phone number; draw calls, triangles, lights and shadow casters are",
+  "ranAt": "2026-09-06T01:54:22.096Z",
+  "revision": "bd06e25",
+  "errors": [],
+  "logs": [],
+  "chromium": "141.0.7390.37",
+  "modules": {
+    "city": true,
+    "dressing": true,
+    "matchInterior": true,
+    "life": true,
+    "clouds": true,
+    "fobeams": true
+  },
+  "captures": [
+    {
+      "file": "v5-establishing-night-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "night",
+      "label": "wide",
+      "title": "Arrival — plaza, three destinations, skyline behind",
+      "drawCalls": 789,
+      "triangles": 134602,
+      "ms": 47.5,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 620,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 0,
+        "mid": 14,
+        "far": 10,
+        "walking": 10,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-in-world-night-wide.png",
+      "set": "core",
+      "view": "in-world",
+      "time": "night",
+      "label": "wide",
+      "title": "In-world — ground level, foreground / midground / background",
+      "drawCalls": 702,
+      "triangles": 129496,
+      "ms": 19.5,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 620,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 0,
+        "mid": 14,
+        "far": 10,
+        "walking": 10,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-skyline-night-wide.png",
+      "set": "core",
+      "view": "skyline",
+      "time": "night",
+      "label": "wide",
+      "title": "Skyline — the district behind MAH MATCH (midground blocks, walkway, towers, distant forms)",
+      "drawCalls": 769,
+      "triangles": 133732,
+      "ms": 11.1,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 622,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 0,
+        "mid": 14,
+        "far": 10,
+        "walking": 11,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-plaza-node-night-wide.png",
+      "set": "core",
+      "view": "plaza-node",
+      "time": "night",
+      "label": "wide",
+      "title": "Plaza node — foreground composition: paths, seating, masts, curbs",
+      "drawCalls": 613,
+      "triangles": 118396,
+      "ms": 8.3,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 620,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 7,
+        "mid": 7,
+        "far": 10,
+        "walking": 14,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-gym-entrance-night-wide.png",
+      "set": "core",
+      "view": "gym-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "MAH GYM — massing, canopy, courses, interior",
+      "drawCalls": 310,
+      "triangles": 86612,
+      "ms": 6.2,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 630,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 7,
+        "mid": 7,
+        "far": 10,
+        "walking": 15,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-match-entrance-night-wide.png",
+      "set": "core",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "MAH MATCH — exterior and the two entrance actions in architecture",
+      "drawCalls": 293,
+      "triangles": 89458,
+      "ms": 5.8,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 623,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 2,
+        "mid": 12,
+        "far": 10,
+        "walking": 16,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-match-hall-night-wide.png",
+      "set": "core",
+      "view": "match-hall",
+      "time": "night",
+      "label": "wide",
+      "title": "MAH MATCH hall — the engineered arena, tiers, truss, bays",
+      "drawCalls": 231,
+      "triangles": 77090,
+      "ms": 5.3,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 623,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 2,
+        "mid": 12,
+        "far": 10,
+        "walking": 17,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-market-entrance-night-wide.png",
+      "set": "core",
+      "view": "market-entrance",
+      "time": "night",
+      "label": "wide",
+      "title": "MAH MARKET — massing and interior",
+      "drawCalls": 298,
+      "triangles": 87902,
+      "ms": 4.7,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 623,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 2,
+        "mid": 12,
+        "far": 10,
+        "walking": 18,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-residents-night-wide.png",
+      "set": "core",
+      "view": "residents",
+      "time": "night",
+      "label": "wide",
+      "title": "Residents — crystalline humanoids, contact grounding, own colours",
+      "drawCalls": 576,
+      "triangles": 119376,
+      "ms": 6.3,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 623,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 10,
+        "mid": 4,
+        "far": 10,
+        "walking": 18,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-appearance-night-wide.png",
+      "set": "core",
+      "view": "appearance",
+      "time": "night",
+      "label": "wide",
+      "title": "Appearance check camera",
+      "drawCalls": 628,
+      "triangles": 124832,
+      "ms": 7.6,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 623,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 10,
+        "mid": 4,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-sky-plant-night-wide.png",
+      "set": "core",
+      "view": "sky-plant",
+      "time": "night",
+      "label": "wide",
+      "title": "Sky, atmosphere bands, plant detail",
+      "drawCalls": 573,
+      "triangles": 119720,
+      "ms": 7.7,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 630,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 10,
+        "mid": 4,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-establishing-day-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "day",
+      "label": "wide",
+      "title": "Arrival — plaza, three destinations, skyline behind",
+      "drawCalls": 790,
+      "triangles": 135812,
+      "ms": 9,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 640,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 9,
+        "mid": 5,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-in-world-day-wide.png",
+      "set": "core",
+      "view": "in-world",
+      "time": "day",
+      "label": "wide",
+      "title": "In-world — ground level, foreground / midground / background",
+      "drawCalls": 710,
+      "triangles": 130436,
+      "ms": 8.7,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 640,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 9,
+        "mid": 5,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-skyline-day-wide.png",
+      "set": "core",
+      "view": "skyline",
+      "time": "day",
+      "label": "wide",
+      "title": "Skyline — the district behind MAH MATCH (midground blocks, walkway, towers, distant forms)",
+      "drawCalls": 765,
+      "triangles": 134612,
+      "ms": 8.6,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 640,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 8,
+        "mid": 6,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-plaza-node-day-wide.png",
+      "set": "core",
+      "view": "plaza-node",
+      "time": "day",
+      "label": "wide",
+      "title": "Plaza node — foreground composition: paths, seating, masts, curbs",
+      "drawCalls": 625,
+      "triangles": 119796,
+      "ms": 7.6,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 640,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 8,
+        "mid": 6,
+        "far": 10,
+        "walking": 22,
+        "activeEvents": 0,
+        "events": 2,
+        "ready": 0,
+        "attempts": 2
+      }
+    },
+    {
+      "file": "v5-gym-entrance-day-wide.png",
+      "set": "core",
+      "view": "gym-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "MAH GYM — massing, canopy, courses, interior",
+      "drawCalls": 300,
+      "triangles": 86426,
+      "ms": 6.1,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 8,
+        "mid": 6,
+        "far": 10,
+        "walking": 22,
+        "activeEvents": 0,
+        "events": 2,
+        "ready": 0,
+        "attempts": 2
+      }
+    },
+    {
+      "file": "v5-match-entrance-day-wide.png",
+      "set": "core",
+      "view": "match-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "MAH MATCH — exterior and the two entrance actions in architecture",
+      "drawCalls": 296,
+      "triangles": 89550,
+      "ms": 4.9,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 8,
+        "mid": 6,
+        "far": 10,
+        "walking": 22,
+        "activeEvents": 0,
+        "events": 2,
+        "ready": 0,
+        "attempts": 2
+      }
+    },
+    {
+      "file": "v5-match-hall-day-wide.png",
+      "set": "core",
+      "view": "match-hall",
+      "time": "day",
+      "label": "wide",
+      "title": "MAH MATCH hall — the engineered arena, tiers, truss, bays",
+      "drawCalls": 229,
+      "triangles": 76994,
+      "ms": 4.7,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 8,
+        "mid": 6,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 2,
+        "ready": 0,
+        "attempts": 2
+      }
+    },
+    {
+      "file": "v5-market-entrance-day-wide.png",
+      "set": "core",
+      "view": "market-entrance",
+      "time": "day",
+      "label": "wide",
+      "title": "MAH MARKET — massing and interior",
+      "drawCalls": 292,
+      "triangles": 87674,
+      "ms": 5.3,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 4,
+        "mid": 10,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 2,
+        "ready": 0,
+        "attempts": 2
+      }
+    },
+    {
+      "file": "v5-residents-day-wide.png",
+      "set": "core",
+      "view": "residents",
+      "time": "day",
+      "label": "wide",
+      "title": "Residents — crystalline humanoids, contact grounding, own colours",
+      "drawCalls": 572,
+      "triangles": 119006,
+      "ms": 7,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 4,
+        "mid": 10,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 3,
+        "ready": 0,
+        "attempts": 3
+      }
+    },
+    {
+      "file": "v5-appearance-day-wide.png",
+      "set": "core",
+      "view": "appearance",
+      "time": "day",
+      "label": "wide",
+      "title": "Appearance check camera",
+      "drawCalls": 639,
+      "triangles": 126036,
+      "ms": 7.3,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 4,
+        "mid": 10,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 3,
+        "ready": 0,
+        "attempts": 3
+      }
+    },
+    {
+      "file": "v5-sky-plant-day-wide.png",
+      "set": "core",
+      "view": "sky-plant",
+      "time": "day",
+      "label": "wide",
+      "title": "Sky, atmosphere bands, plant detail",
+      "drawCalls": 568,
+      "triangles": 119122,
+      "ms": 8.1,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 9,
+        "mid": 5,
+        "far": 10,
+        "walking": 23,
+        "activeEvents": 0,
+        "events": 3,
+        "ready": 0,
+        "attempts": 3
+      }
+    },
+    {
+      "file": "v5-establishing-dusk-wide.png",
+      "set": "core",
+      "view": "establishing",
+      "time": "dusk",
+      "label": "wide",
+      "drawCalls": 785,
+      "triangles": 135386,
+      "ms": 8.4,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 9,
+        "mid": 5,
+        "far": 10,
+        "walking": 24,
+        "activeEvents": 0,
+        "events": 3,
+        "ready": 0,
+        "attempts": 3
+      }
+    },
+    {
+      "file": "v5-skyline-dusk-wide.png",
+      "set": "core",
+      "view": "skyline",
+      "time": "dusk",
+      "label": "wide",
+      "drawCalls": 762,
+      "triangles": 134672,
+      "ms": 7.5,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 644,
+      "textures": 26,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "18:45",
+        "label": "DUSK"
+      },
+      "quality": "high",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 42,
+      "life": {
+        "near": 6,
+        "mid": 8,
+        "far": 10,
+        "walking": 21,
+        "activeEvents": 0,
+        "events": 3,
+        "ready": 0,
+        "attempts": 3
+      }
+    },
+    {
+      "file": "v5-establishing-night-phone.png",
+      "set": "phone",
+      "view": "establishing",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 435,
+      "triangles": 104552,
+      "ms": 15,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 351,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 31.6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 0,
+        "mid": 10,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-in-world-night-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 428,
+      "triangles": 103358,
+      "ms": 10.6,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 351,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 31.6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 5,
+        "mid": 5,
+        "far": 8,
+        "walking": 9,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-skyline-night-phone.png",
+      "set": "phone",
+      "view": "skyline",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 423,
+      "triangles": 103868,
+      "ms": 7.7,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 351,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 31.6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 5,
+        "mid": 5,
+        "far": 8,
+        "walking": 12,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-match-entrance-night-phone.png",
+      "set": "phone",
+      "view": "match-entrance",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 274,
+      "triangles": 87944,
+      "ms": 5.9,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 351,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 31.6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 5,
+        "mid": 5,
+        "far": 8,
+        "walking": 14,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-match-hall-night-phone.png",
+      "set": "phone",
+      "view": "match-hall",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 202,
+      "triangles": 69306,
+      "ms": 4.6,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 355,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 31.6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 1,
+        "mid": 9,
+        "far": 8,
+        "walking": 14,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-residents-night-phone.png",
+      "set": "phone",
+      "view": "residents",
+      "time": "night",
+      "label": "phone",
+      "drawCalls": 379,
+      "triangles": 100980,
+      "ms": 5.8,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 387,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 31.6,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 1,
+        "mid": 9,
+        "far": 8,
+        "walking": 15,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-in-world-day-phone.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 417,
+      "triangles": 102714,
+      "ms": 8,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 390,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 31.6,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 5,
+        "mid": 5,
+        "far": 8,
+        "walking": 15,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-match-hall-day-phone.png",
+      "set": "phone",
+      "view": "match-hall",
+      "time": "day",
+      "label": "phone",
+      "drawCalls": 188,
+      "triangles": 68986,
+      "ms": 4.8,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 390,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 31.6,
+      "clock": {
+        "hhmm": "12:30",
+        "label": "DAY"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 5,
+        "mid": 5,
+        "far": 8,
+        "walking": 17,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    },
+    {
+      "file": "v5-in-world-night-phone-with-controls.png",
+      "set": "phone",
+      "view": "in-world",
+      "time": "night",
+      "label": "phone with controls",
+      "drawCalls": 428,
+      "triangles": 103358,
+      "ms": 33.8,
+      "lights": 12,
+      "shadowCasters": 62,
+      "geometries": 346,
+      "textures": 24,
+      "programs": 47,
+      "heapMB": 23.4,
+      "clock": {
+        "hhmm": "22:30",
+        "label": "NIGHT"
+      },
+      "quality": "medium",
+      "modules": {
+        "city": true,
+        "dressing": true,
+        "matchInterior": true,
+        "life": true,
+        "clouds": true,
+        "fobeams": true
+      },
+      "residents": 36,
+      "life": {
+        "near": 5,
+        "mid": 5,
+        "far": 8,
+        "walking": 8,
+        "activeEvents": 0,
+        "events": 0,
+        "ready": 0
+      }
+    }
+  ]
+}
