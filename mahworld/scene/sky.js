@@ -227,13 +227,29 @@ export function buildSky(ctx) {
   const { M, scene, theme } = ctx;
   const g = new THREE.Group(); g.name = 'sky';
 
+  /* ---- L43 — THE CELESTIAL SPHERE FOLLOWS THE VIEWER ------------------------------------------
+     The dome is a 900 m sphere and it was parented at the world origin, which was fine while every
+     camera stood on a 90 m plaza. It is not fine now. terrain.js's far range stands at r 1500, roam
+     flies to y 700 and out to r 1000, and the far-zoom composition wants a camera at 1180 m — all of
+     them OUTSIDE the sphere. From any of those the world renders as a snow globe: a visible glass
+     bubble with the mountains beyond it lit against pure black, and a hard horizontal edge where the
+     dome stops. That is the R2 far-zoom lock failing in the most literal way available.
+     Growing the radius only moves the wall. The correct answer is that a celestial sphere has no
+     position — it is a direction. Everything infinitely far away (dome, stars, galaxy band, sun,
+     moon and their halos) goes in this group, and the group is re-centred on the camera every frame,
+     so the viewer can never reach the edge because the edge travels with them. The parallax stays
+     right for free: an object at infinity should not shift when you move, and now it does not.
+     Everything TERRESTRIAL — clouds, haze, the horizon bands, the sky ridges, the far skyline, the
+     beams and flows — stays parented to the world, because those things do have positions. */
+  const sphere = new THREE.Group(); sphere.name = 'sky-celestial'; g.add(sphere);
+
   /* dome with a vertex gradient we repaint on time changes. §06 does not apply to it: a back-side
      sphere has no silhouette of its own, and its 40 by 20 tessellation only samples the gradient. */
   const domeGeo = new THREE.SphereGeometry(900, 40, 20);
   const colours = new Float32Array(domeGeo.attributes.position.count * 3);
   domeGeo.setAttribute('color', new THREE.BufferAttribute(colours, 3));
   const dome = new THREE.Mesh(domeGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
-  dome.renderOrder = -10; g.add(dome);
+  dome.renderOrder = -10; sphere.add(dome);
   function paintDome(k) {
     /* three stops: horizon → mid (low sky, where the atmosphere is thickest) → zenith */
     const pos = domeGeo.attributes.position; const top = new THREE.Color(k.top), mid = new THREE.Color(k.mid), hor = new THREE.Color(k.horizon), below = hor.clone().multiplyScalar(0.55), tmp = new THREE.Color();
@@ -251,7 +267,7 @@ export function buildSky(ctx) {
      blue-white; the brightest thing in the sky and never, ever warm. */
   const moon = new THREE.Mesh(new THREE.CircleGeometry(58, 64), new THREE.MeshBasicMaterial({ map: moonTexture(), fog: false, transparent: true }));
   const moonHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: moonHaloTexture(), color: 0x9fc0ff, transparent: true, opacity: 0.36, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); moonHalo.scale.set(430, 430, 1);
-  g.add(sunDisc, sunHalo, moon, moonHalo);
+  sphere.add(sunDisc, sunHalo, moon, moonHalo);
 
   /* ---- THE GALAXY BAND (this world's Milky Way) -------------------------------
      ONE additive, fog-free, vertex-coloured ribbon laid on a great circle of the dome: it rises
@@ -297,7 +313,7 @@ export function buildSky(ctx) {
   galaxyGeo.setAttribute('color', new THREE.BufferAttribute(galCol, 3));
   galaxyGeo.setIndex(galIdx);
   const galaxy = new THREE.Mesh(galaxyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
-  galaxy.renderOrder = -9; g.add(galaxy);
+  galaxy.renderOrder = -9; sphere.add(galaxy);
 
   /* stars — still ONE Points object: a sparse general field PLUS a much denser population
      clustered along the band's spine, with per-vertex brightness and a blue-white → violet-white
@@ -317,7 +333,7 @@ export function buildSky(ctx) {
   starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
   starGeo.setAttribute('color', new THREE.Float32BufferAttribute(sc, 3));
   const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ vertexColors: true, size: 2.2, sizeAttenuation: true, transparent: true, opacity: 0.85, fog: false, depthWrite: false }));
-  g.add(stars);
+  sphere.add(stars);
 
   /* clouds: a few broad soft masses, MAHWORLD's own quiet sky, keyed by time */
   const clouds = new THREE.Group();
@@ -475,7 +491,12 @@ export function buildSky(ctx) {
 
   /* `clouds` / `deck` are the soft sprite clouds and `beams` / `flows` the plain arcs: the assembly hides
      each set when the dedicated v4 module (clouds.js / fobeam.js) is present and takes over that role */
-  return { group: g, setTime, setTheme, update, beams, flows, clouds, deck, bands, galaxy, stars, additive: [sunHalo, moonHalo, haze, galaxy].concat(beams.map(b => b.glow), flows) };
+  /* L43: the assembly calls this every frame with its live camera. The celestial group is re-centred
+     on the eye, so the dome, the stars, the band, the sun and the moon are directions rather than
+     places and no camera can ever reach the edge of the sky. */
+  function follow(camera) { if (camera) sphere.position.copy(camera.position); }
+
+  return { group: g, setTime, setTheme, update, follow, beams, flows, clouds, deck, bands, galaxy, stars, additive: [sunHalo, moonHalo, haze, galaxy].concat(beams.map(b => b.glow), flows) };
 }
 
 function gradientTexture() {

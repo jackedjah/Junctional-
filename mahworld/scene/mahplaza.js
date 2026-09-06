@@ -855,6 +855,7 @@ export async function createMahplaza(canvas, options = {}) {
     }
     applyTime(false); placeCamera(0);
     if (mirror) mirror.render(true);   /* a capture screenshots straight after this: never reuse */
+    sky.follow(camera);                                  /* L43: the sky is a direction, not a place */
     renderer.render(scene, camera); state.frames++;
     return { advancedSeconds: n * stepSeconds, steps: n, worldTime: advanceClock };
   }
@@ -1072,6 +1073,7 @@ export async function createMahplaza(canvas, options = {}) {
     placeCamera(dt);
     const t0 = performance.now();
     if (mirror) mirror.render();     /* the reflected view first: the floor samples it this frame */
+    sky.follow(camera);                                  /* L43 */
     renderer.render(scene, camera);
     state.ms = state.ms * 0.9 + (performance.now() - t0) * 0.1; state.frames++;
     if (opts.hud) opts.hud(state);
@@ -1113,7 +1115,7 @@ export async function createMahplaza(canvas, options = {}) {
   const _w = new THREE.Vector3();
   function projectResident(r) { r.getWorldPosition(_w); _w.y += (r.userData.height || 1.9) * 0.62; _w.project(camera); const w = canvas.clientWidth, h = canvas.clientHeight; return { x: (_w.x + 1) / 2 * w, y: (1 - _w.y) / 2 * h, inFront: _w.z < 1 && Math.abs(_w.x) < 1 && Math.abs(_w.y) < 1 }; }
   function samplePixels(points) {
-    placeCamera(); if (mirror) mirror.render(); renderer.render(scene, camera);
+    placeCamera(); sky.follow(camera); if (mirror) mirror.render(); renderer.render(scene, camera);
     const gl = renderer.getContext(), pr = renderer.getPixelRatio(), H = gl.drawingBufferHeight, W = gl.drawingBufferWidth, buf = new Uint8Array(4);
     return points.map(p => { const x = Math.round(p.x * pr), y = Math.round(H - p.y * pr); if (x < 0 || y < 0 || x >= W || y >= H) return null; gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, buf); return [buf[0], buf[1], buf[2]]; });
   }

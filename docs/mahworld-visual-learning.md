@@ -577,6 +577,27 @@ once someone can stand in the newer one.
 
 ---
 
+## L43 — A celestial sphere has no position; it is a direction
+**Failure.** Aimed the first far-zoom camera the R2 lock asks for (high, wide, all three destinations
+in frame) and MAHWORLD rendered as a **snow globe**: a visible glass bubble with a hard horizontal
+edge, the mountains beyond it lit against pure black, and the world sitting inside it.
+**Root owner.** `sky.js`. The dome is a 900 m sphere parented at the world origin — correct while
+every camera stood on a 90 m plaza. It is not correct now: `terrain.js`'s far range stands at r 1500,
+roam flies to y 700 and out to r 1000, and a far-zoom camera wants 1180 m. All of those are OUTSIDE
+the sphere.
+**Correction.** Not a bigger radius — that only moves the wall. A `sky-celestial` group holds
+everything infinitely far away (dome, stars, galaxy band, sun, moon, halos) and is re-centred on the
+camera before every frame, so the edge travels with the viewer and can never be reached. Parallax
+comes out right for free: a thing at infinity should not shift when you move, and now it does not.
+Everything terrestrial — clouds, haze, horizon bands, sky ridges, far skyline, beams, flows — stays
+parented to the world, because those things do have positions.
+**Regression.** The same question as L18, L37, L39 and L42, in its largest form: *from which camera
+was this authored, and can the viewer now stand somewhere else?* Every element positioned at the
+world origin with a fixed radius is a candidate. `sky.js`'s horizon bands (fixed planes at z −262 /
+−470 / −690) are the next one — they read as a floating grey slab from above and are still unfixed.
+
+---
+
 ## Standing ownership map (reuse, do not rediscover)
 
 | System | Owner |

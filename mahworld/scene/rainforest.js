@@ -216,7 +216,8 @@ export function buildRainforest(ctx) {
      stems share a phase. The canopy nodes and the vein are kept OUT of the merge because they are
      what animates; the trunk and roots are static and merge into the shared grade buckets. */
   const canopyNodes = [];      /* placement data for the instanced canopy — the part that breathes */
-  const veinMats = [];
+  const veinNodes = [];        /* placement data for the instanced veins (§19) */
+  const veinMats = [];         /* the themed additive materials: now ONE vein + ONE rain aura */
 
   for (let i = 0; i < ORGANISM.count; i++) {
     /* placement: a sunflower spiral so the stand is even without a grid and without randomness */
@@ -358,19 +359,14 @@ export function buildRainforest(ctx) {
       cg.dispose();
     }
 
-    /* THE MAHGIC VEIN — root to crown, the organism's circulation, and the only theme colour on it */
-    {
-      const vm = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(theme.energy), transparent: true, opacity: 0.30,
-        blending: THREE.AdditiveBlending, depthWrite: false, fog: true
-      });
-      vm.name = 'forest-vein'; owned.materials.push(vm); veinMats.push(vm);
-      const vg = own(new THREE.CylinderGeometry(baseR * 0.16, baseR * 0.07, h, 5, 1, true));
-      const v = new THREE.Mesh(vg, vm);
-      v.position.set(ox, GROUND_Y + h / 2, oz);
-      v.name = 'forest-vein'; v.renderOrder = 5;
-      group.add(v);
-    }
+    /* THE MAHGIC VEIN — root to crown, the organism's circulation, and the only theme colour on it.
+       Collected here, emitted as ONE instanced mesh after the loop (see 1c). The first cut gave every
+       organism its own Mesh AND its own cloned material: 26 draw calls and 26 material objects, all
+       written to the same opacity and the same colour on every single frame, for one visual. That is
+       exactly what §19 asks instancing to prevent, and it was in a file whose own header argues the
+       point about the canopy. The taper ratio is constant (0.16 : 0.07), so a unit cylinder scaled
+       per instance is the same geometry every organism was getting. */
+    veinNodes.push({ x: ox, y: GROUND_Y + h / 2, z: oz, r: baseR, h });
     stats.organisms++;
   }
 
@@ -495,6 +491,25 @@ export function buildRainforest(ctx) {
     if (canopyMesh.instanceColor) canopyMesh.instanceColor.needsUpdate = true;
     group.add(canopyMesh);
   }
+  /* ---- 1c. THE VEINS, AS ONE INSTANCED MESH (§19) --------------------------------------------- */
+  let veinMesh = null;
+  if (veinNodes.length) {
+    const vg = own(new THREE.CylinderGeometry(0.16, 0.07, 1, 5, 1, true));
+    const vm = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(theme.energy), transparent: true, opacity: 0.30,
+      blending: THREE.AdditiveBlending, depthWrite: false, fog: true
+    });
+    vm.name = 'forest-vein'; owned.materials.push(vm); veinMats.push(vm);
+    veinMesh = new THREE.InstancedMesh(vg, vm, veinNodes.length);
+    veinMesh.name = 'forest-vein'; veinMesh.renderOrder = 5; veinMesh.frustumCulled = false;
+    for (let i = 0; i < veinNodes.length; i++) {
+      const n = veinNodes[i];
+      veinMesh.setMatrixAt(i, at(n.x, n.y, n.z, 0, n.r, n.h, n.r));
+    }
+    veinMesh.instanceMatrix.needsUpdate = true;
+    group.add(veinMesh);
+  }
+
   {
     const lo = ARMS.tiers[0], hi = ARMS.tiers[ARMS.tiers.length - 1];
     stats.derived.canopyY = +(GROUND_Y + ORGANISM.hMin * lo.at).toFixed(1);
