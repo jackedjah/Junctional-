@@ -255,7 +255,7 @@ export async function createMahplaza(canvas, options = {}) {
   /* the laid chromium floor is a DECK: 9 m diamond cells whose tops sit 0.17 above the raw ground plane
      (ground.js FLOOR_TOP / FIELD_RADIUS). Anything that stands on the plaza stands on the deck. */
   const PLAZA_DECK_Y = 0.17, PLAZA_DECK_R = 43;
-  let residents = [], flora = null, vehicles = null, R = null;
+  let residents = [], flora = null, vehicles = null, fobpods = null, R = null;
   const walkers = [], extras = [];
   try {
     R = await import('./residents.js');
@@ -281,6 +281,16 @@ export async function createMahplaza(canvas, options = {}) {
       const loop = [[-56, 15, 60], [-58, 18, -20], [-46, 22, -110], [20, 24, -136], [70, 21, -84], [66, 17, 10], [40, 15, 66], [-20, 14, 74]].map(p => new THREE.Vector3(...p));
       vehicles = F.createVehicleRoute(loop, { theme, count: 3, speed: 8 });
       if (vehicles && vehicles.group) scene.add(vehicles.group);
+    }
+    /* THE PARKED FLEET (§6A/§6B). buildFobPods() has existed for two passes and WAS NEVER CALLED —
+       nothing in the repository referenced it outside its own file, so nine FOBLOCK pods, the parked
+       shuttle, their apron placement search and the ascent-pad keep-out that was written to fix a
+       shuttle planted inside a launch pad all rendered exactly zero pixels. L15, again: a passing law
+       proves the generator is correct, never that the world contains its output. It builds its own
+       group and adds it to the scene, so this is the whole wiring. */
+    if (typeof F.buildFobPods === 'function') {
+      fobpods = F.buildFobPods(ctx);
+      if (fobpods && fobpods.group && !fobpods.group.parent) scene.add(fobpods.group);
     }
   } catch (e) { console.info('MAHPLAZA: flora / vehicles module not available —', e && e.message); }
   const byId = id => residents.find(r => r.userData && r.userData.id === id) || null;
@@ -377,7 +387,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -411,7 +421,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -449,8 +459,16 @@ export async function createMahplaza(canvas, options = {}) {
   /* ---- camera ------------------------------------------------------------ */
   const cur = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 54 }, from = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 54 };
   let anim = null, portrait = false;
-  const viewSpec = n => { const v = VIEWS[n]; return portrait && v.portrait ? v.portrait : v; };
-  const applyView = n => { const v = viewSpec(n); cur.pos.set(...v.pos); cur.look.set(...v.look); cur.fov = v.fov; };
+  /* THE `!v` GUARD IS NOT DEFENSIVE PADDING, IT IS A CRASH FIX. `state.view` is not always a key of
+     VIEWS: setCustomView() sets it to the literal 'custom' (and look360, every scratch diagnostic and
+     the capture harness all go through setCustomView), and roam sets it to 'roam'. resize() calls
+     applyView(state.view) whenever the PORTRAIT FLAG FLIPS, so on the old code `VIEWS['custom']` was
+     undefined and `v.portrait` threw a TypeError — i.e. rotating a phone while in any custom view
+     killed the scene. On a phone-first product that is the worst possible place for it.
+     Returning null is also the RIGHT behaviour and not just a safe one: a custom or roam camera was
+     placed deliberately, and a portrait flip has no business overwriting it with a table entry. */
+  const viewSpec = n => { const v = VIEWS[n]; if (!v) return null; return portrait && v.portrait ? v.portrait : v; };
+  const applyView = n => { const v = viewSpec(n); if (!v) return false; cur.pos.set(...v.pos); cur.look.set(...v.look); cur.fov = v.fov; return true; };
   applyView('establishing');
   const dirV = new THREE.Vector3(), rightV = new THREE.Vector3(), targetV = new THREE.Vector3(), upV = new THREE.Vector3(0, 1, 0), probeV = new THREE.Vector3();
   /* the camera has weight (brief §37): look / move inputs set targets, the camera follows them with critical damping; it never enters a collider (§38) */
@@ -667,6 +685,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (fobeams && fobeams.update) fobeams.update(t, dt);
     if (dressing && dressing.update) dressing.update(t, dt);
     if (fobstations && fobstations.update) fobstations.update(t, dt);
+    if (fobpods && fobpods.update) fobpods.update(t, dt);
     if (monument && monument.update) monument.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
@@ -919,6 +938,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (terrain && terrain.setQuality) { try { terrain.setQuality(quality); } catch (e) {} }
     if (clouds && clouds.setQuality) { try { clouds.setQuality(quality); } catch (e) {} }
     if (monument && monument.setQuality) { try { monument.setQuality(quality); } catch (e) {} }
+    if (fobpods && fobpods.setQuality) { try { fobpods.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
     return quality.name;
   }
@@ -954,7 +974,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,

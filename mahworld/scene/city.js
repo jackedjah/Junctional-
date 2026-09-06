@@ -101,7 +101,7 @@
 
    v13 §8 / §6D — SKY ROADS AND SKYBLOCK CARRIERS. The district had FOBEAM energy routes and six
    shafts that leave the frame, and no elevated ROADWAY at all; §8 makes one mandatory and §11 gates
-   on it. Six curved decks at four elevation tiers (79 m / 121-138 m / 186-192 m and ONE rare
+   on it. Six curved decks at four elevation tiers (60-89 m / 126-138 m / 186-192 m and ONE rare
    very-high at 280-298 m), each a Catmull-Rom through control points placed against the TOWERS,
    SHAFTS and BLOCKS tables in this file, with real deck thickness, a rounded edge profile and a
    keel girder underneath. Twenty-seven supports, none of them decided in advance: every one is the
@@ -398,17 +398,24 @@ const SR_TIER = {
    every camera. Every road here is now near-level with a gentle undulation and no segment steeper
    than about 8 %, and the SUPPORTS absorb the difference instead: a column can be 55 m long. */
 const SKYROADS = [
-  /* LOW, centre corridor — the one that lands on BUILDINGS. It runs over the roofs of C3 (64 m),
-     C1 (54 m) and C2 (70 m), so three of its four supports are columns standing on a block. */
+  /* LOW, centre corridor — the one that lands on BUILDINGS. It runs over the roofs of C3 and C1.
+     ITS HEIGHT IS A CORRECTION, not a preference. At 78-81 m its keel underside sat at 76.4 and the
+     CRYSTAL BLADE SHARDS growing off C1's roof reach a MEASURED 81.9 m in the built group, so the
+     first cut of this road had 447 shard vertices standing inside its deck — the shards speared it.
+     The build's own collision test could not see that: it tests the deck against the BLOCKS / TOWERS
+     / SHAFTS tables, and a shard is in none of them. Lifted 8 m, the worst clearance along the whole
+     road is +2.6 m to the tallest thing under it. It is still the lowest centre road there is. */
   { id: 'sr-low-centre', tier: 'low', carriers: 2, speed: 15.0,
-    ctrl: [[76, 196, 79], [86, 214, 81], [97, 190, 80], [104, 202, 78]] },
+    ctrl: [[76, 196, 87], [86, 214, 89], [97, 190, 88], [104, 202, 86]] },
   /* MID, centre corridor — the long one. It is held INSIDE the 265-340 m ring of shafts for its
      whole length rather than weaving through it: the first cut crossed radius 340 at bearing 80,
      which is exactly where the 720 m shaft at 78|340 stands, and the build's own collision test
-     caught it. Starts on the roof of the 62 m tower at 75|300, brackets out to the shaft and to
-     100|340, and spans its middle on one pier. */
+     caught it. Brackets out to the shaft and to 100|340, and spans its middle on one pier.
+     ITS HEIGHT IS ALSO A CORRECTION. At 121-125 m its keel underside sat at 118.3 and the RING DECK
+     over the tower at 75|300 reaches a MEASURED 122.7 m — the saucer stood inside the deck. Same
+     blind spot: a ring deck is not in the anchor tables either. Lifted 7 m. */
   { id: 'sr-mid-centre', tier: 'mid', carriers: 2, speed: 17.5,
-    ctrl: [[77, 296, 121], [82, 312, 123], [90, 322, 125], [100, 306, 121]] },
+    ctrl: [[77, 296, 128], [82, 312, 130], [90, 322, 132], [100, 306, 128]] },
   /* HIGH, centre corridor — 186-192 m, which is 18-19 deg from the establishing camera: above the
      midground entirely, still a clear 8 deg under the moon at its highest. */
   { id: 'sr-high-centre', tier: 'high', carriers: 1, speed: 19.0,
@@ -1705,7 +1712,17 @@ export function buildCity(ctx) {
        shaft is 17 m across at its foot and 10 m at 600 m, and using the foot value would have put
        every bracket on the high roads 7 m short of the flank it is tied to. */
     const srAnchors = [];
-    BLOCKS.forEach(b => srAnchors.push({ x: b.x, z: b.z, top: b.h, h0: Math.max(b.w, b.d) * 0.5, tp: 0, H: b.h, kind: 'block', id: b.id }));
+    /* VERIFIER CORRECTION — A TABLE IS NOT A ROOF. `b.h` is a block's tallest point, and for the SIX
+       SLOTTED blocks that point is the NARROW BLADE, which stands off-centre: the wide wing that
+       actually occupies the block's own (x, z) only reaches round(h * 0.84), and the slot beside it
+       is a void down to round(h * 0.6). Measured against the BUILT group by ray-casting down each
+       anchor's axis, all six slotted blocks sit 3.7-10.7 m BELOW their table height at their centre
+       (L1 34/29.3, L2 62/52.3, C2 70/59.3, R4 42/35.3, F2 22/18.3, R5 36/30.3) — and C2 was carrying
+       a column, so its 5.4 m pad and the feet of both raking legs stood in mid air 10.7 m above the
+       roof, with one corner over the slot. That is the "four plinths with nothing on them" failure.
+       A column needs a roof it can stand on across the whole pad, and a slotted block does not have
+       one at its centre, so it is a BRACKET anchor only — its flank is real at every height. */
+    BLOCKS.forEach(b => srAnchors.push({ x: b.x, z: b.z, top: b.h, h0: Math.max(b.w, b.d) * 0.5, tp: 0, H: b.h, kind: 'block', id: b.id, noColumn: MASSING_OF(b.id) === 'slotted' }));
     TOWERS.forEach(([a, r, h, w]) => { const [x, z] = polar(a, r); srAnchors.push({ x, z, top: h, h0: w * 0.5, tp: 0, H: h, kind: 'tower', id: 'T' + a + '|' + r }); });
     SHAFTS.forEach(([a, r, w0, H, taper]) => { const [x, z] = polar(a, r); srAnchors.push({ x, z, top: H, h0: w0 * 0.5, tp: taper, H, kind: 'shaft', id: 'S' + a + '|' + r }); });
     const halfAt = (an, y) => an.h0 * (1 - an.tp * Math.max(0, Math.min(1, y / an.H)));
@@ -1801,7 +1818,7 @@ export function buildCity(ctx) {
              horizontal, which is not a column, it is a cantilever pretending to be one. The rake is
              capped against the column's OWN height (plus a 12 m allowance so a short one can still
              step sideways off a parapet), which is the only test that stays right at every tier. */
-          if (an.top <= keelY - CLEAR_MIN && !columnUsed[an.id] && hd <= Math.min(COLUMN_REACH, Math.max(12, (keelY - an.top) * 1.35)) && (keelY - an.top) <= COLUMN_MAX) {
+          if (an.top <= keelY - CLEAR_MIN && !an.noColumn && !columnUsed[an.id] && hd <= Math.min(COLUMN_REACH, Math.max(12, (keelY - an.top) * 1.35)) && (keelY - an.top) <= COLUMN_MAX) {
             const eff = (keelY - an.top) + hd * 0.6;
             if (!best || eff < best.eff) best = { kind: 'column', an, hd, eff };
           } else if (an.top > p.y + 3 && hd >= ah + W + 2.0 && hd <= ah + W + BRACKET_REACH) {
@@ -1920,8 +1937,18 @@ export function buildCity(ctx) {
         washGeos.push(paint(srRibbon(pts, s * (W - 0.28), T2 + 0.05, s * (W - 3.30), T2 + 0.05), tint));
         washGeos.push(paint(srRibbon(pts, s * (W + 0.05), T2 - 0.55, s * (K + 0.05), -T2 - G * 0.75), tint));
       }
-      /* and the keel's own soffit, so the light does not stop at the fascia's bottom edge */
-      washGeos.push(paint(srRibbon(pts, K - 0.05, -T2 - G + 0.10, -(K - 0.05), -T2 - G + 0.10), tint));
+      /* and the keel's own soffit, so the light does not stop at the fascia's bottom edge.
+         VERIFIER CORRECTION. This strip was first laid at -T2-G+0.10, which is 0.10 m ABOVE the
+         soffit — that is INSIDE the girder. Measured against the keel section at every tier, 82-87 %
+         of the strip sat within the solid and was depth-tested away, and because the falloff map is
+         brightest along a strip's CENTRE LINE, the buried part was precisely its bright core: what
+         survived was two ~10 %-alpha slivers at the outer edges. An emitter whose answer renders
+         inside the thing it is answering is exactly the law 2 defect this section was written to
+         avoid. It now hangs 0.05 m UNDER the soffit, and inside the soffit's own flat half-width
+         (K - kc) so the falloff dies before the girder's bottom arris rather than fringing past it
+         against the sky. */
+      const soffitHalf = Math.max(0.30, K - kc - 0.04);
+      washGeos.push(paint(srRibbon(pts, soffitHalf, -T2 - G - 0.05, -soffitHalf, -T2 - G - 0.05), tint));
 
       /* ---- THE MOTION TRACK. Sampled independently of the geometry and far more finely, because a
          carrier reading its ride off a 14-segment deck would visibly step through the corners. Five
