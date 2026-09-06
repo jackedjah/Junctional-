@@ -1,12 +1,31 @@
-/* MAHWORLD :: MAHPLAZA FLORA AND VEHICLES — diamond vegetation planters and
-   square-diamond sky craft, one ES module, no dependencies beyond three.
+/* MAHWORLD :: MAHPLAZA FLORA AND VEHICLES — diamond vegetation planters,
+   crystalline TREES and square-diamond sky craft, one ES module, no
+   dependencies beyond three.
 
    Art law (brief "MAHPLAZA landscape / portrait concept"):
-   - DIAMOND VEGETATION: a graphite planter (chamfered box or faceted low
+   - DIAMOND VEGETATION: a banded planter (chamfered box or faceted low
      cylinder) → a few thin luminous stems that rise like controlled blue-white
      lasers with a slight outward lean → each stem ends in a SQUARE-DIAMOND
      crystalline leaf (a flattened octahedron with a bright inner core). Some
      stems fork once. Sparse and calm: 3–9 leaves per planter, never a bouquet.
+   - THE PLANTER IS THREE BANDS, not one grey tub (v7 correction). A planter
+     reads as a planter because of its rim: PLATINUM RIM (the low-metalness
+     horizontal grade — a flat cap facing a night sky reflects an almost black
+     zenith, so only a diffuse platinum reads there), MIDTONE BODY (the
+     graphite-blue structural value the rest of the plaza wears) and a DARK
+     INTERIOR VOID (the inner wall and the soil floor, near-black). Bright rim,
+     midtone body, black soil. Nothing on the plaza is a neutral grey.
+   - TREES (v7): the plaza is flanked by real trees, not scaled-up houseplants.
+     A slim tapered trunk with a flared root collar, two or three branch tiers,
+     and a broad canopy of large SQUARE-DIAMOND leaf plates massed on an oblate
+     shell — the same leaf motif as the planters, grown up and grouped instead
+     of scattered. The plates tilt roughly 40° off horizontal so the canopy
+     shows area to the sky AND to a viewer standing 20–40 m away; upper faces
+     are lit and undersides are dark because the light is BAKED INTO VERTEX
+     COLOURS at build time (one face = one facet = one colour). The tree's only
+     energy is a slim luminous heartwood seam up the trunk and a bright core in
+     the crown plates — the planter's stem treatment, not an outline. A tree is
+     three merged meshes: wood, canopy, heartwood.
    - VEHICLES: compact, load-bearing, purposeful craft derived from the
      square-diamond language: a softened (chamfered) rhombus hull with a heavy
      platinum belt, a forward cabin, one energy seam around the belt, a nose
@@ -19,8 +38,22 @@
    - Time of day: setTime({ daylight, sunElevation }) subdues every emissive
      element to ~25% by full day and restores it at night.
    - Performance: every geometry is shared; stems, halos, leaves and cores of a
-     planter are four InstancedMeshes; materials are cached per theme. Eight
+     planter are four InstancedMeshes; a tree merges its trunk + branches, its
+     whole canopy and its heartwood into one geometry each (3 draw calls; 325 /
+     437 / 541 triangles for small / medium / large) and trees of the same size
+     + seed share those geometries through a ref-counted cache, so the plaza's
+     24 trees cost 24 x 3 draw calls and about 11k triangles however many
+     distinct designs stand in it; materials are cached per theme. Eight
      planters plus five vehicles stay well under 6,000 triangles.
+     The canopy budget was 400 in the first build and the crowns came out as
+     parasols: a dozen big plates on a nearly-vertical shell normal, seen
+     edge-on from eye level. Mass needs COUNT, so the plate count roughly
+     doubled and each plate shrank. 541 triangles against a ~150k scene is the
+     right side of that trade for the only vegetation the camera gets near.
+   - THE THEME IS ENERGY ONLY. Stems, leaves, cores, seams, undersides and the
+     heartwood take the world energy colour. Bark, canopy, planter rim, planter
+     body and planter void are NATURE AND STRUCTURE: fixed values that no
+     Theme may repaint. setTheme() touches the emissive set and nothing else.
 
    Materials are SHARED per theme, so setTime() on any planter or vehicle (or
    on a route) retunes every object of that theme — call it once per frame per
@@ -40,14 +73,37 @@ export const PLANTER_SIZES = Object.freeze({
   large:  { r: 0.64, h: 0.68, stem: [2.0, 3.2], leaf: [0.34, 0.45], stems: [3, 5], leaves: 7 }
 });
 
+export const TREE_SIZES = Object.freeze({
+  /* h: overall tree height (m, canopy crown included); canopy: canopy RADIUS (m);
+     tiers: min/max branch tiers; plates: min/max canopy leaf plates.
+     Human scale: the skirt of a medium tree hangs at ~2.6 m, so the plaza walks under it. */
+  small:  { h: [3.2, 4.2], canopy: [1.45, 1.95], tiers: [2, 2], plates: [24, 30] },
+  medium: { h: [4.4, 6.0], canopy: [1.95, 2.75], tiers: [2, 3], plates: [30, 38] },
+  large:  { h: [6.0, 8.2], canopy: [2.60, 3.50], tiers: [3, 3], plates: [38, 48] }
+});
+const TREE_MAX_BRANCHES = 8;          /* triangle budget: 8 branches × 8 tris */
+const TREE_TRUNK_SIDES = 5, TREE_BRANCH_SIDES = 4, TREE_SEAM_SIDES = 5;
+const TREE_CROWN_CORES = 3;           /* how many crown plates carry a lit core */
+const GOLDEN = 2.399963229728653;     /* golden angle — an even shell from a deterministic sequence */
+
+/* Planter proportions shared by the geometry and the planting (v7 three-band tub). */
+const PLANTER_LIP = 0.09;             /* how far the soil sits below the rim (the dark void) */
+const PLANTER_INNER = 0.74;           /* inner radius as a fraction of the outer radius — the rest is rim */
+const PBAND = { body: 0, rim: 1, void: 2 };
+
 /* Night-time emissive levels; day multiplies them by DAY_FACTOR. */
-const NIGHT = Object.freeze({ stem: 1.9, halo: 0.34, leaf: 0.9, seam: 2.2, underside: 1.7, glass: 0.22, shell: 0.06, platinum: 0.04 });
+const NIGHT = Object.freeze({ stem: 1.9, halo: 0.34, leaf: 0.9, seam: 2.2, underside: 1.7, glass: 0.22, shell: 0.06, platinum: 0.04, canopy: 0.5 });
 const DAY_FACTOR = 0.25;
 
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
 const _m = new THREE.Matrix4(), _m2 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion();
 const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _s = new THREE.Vector3();
+/* build-time scratch for the merge kit (never touched by update()) */
+const _ta = new THREE.Vector3(), _tb = new THREE.Vector3(), _tc = new THREE.Vector3();
+const _ea = new THREE.Vector3(), _eb = new THREE.Vector3(), _fn = new THREE.Vector3(), _bc = new THREE.Vector3(), _ref = new THREE.Vector3();
+const _u = new THREE.Vector3(), _w = new THREE.Vector3(), _dir = new THREE.Vector3();
+const _col = new THREE.Color();
 
 /* ---------------------------------------------------------------- helpers */
 function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
@@ -84,7 +140,11 @@ export function resolveTheme(theme) {
 const THEME_CACHE = new Map();
 
 /* Shared material set for a theme (cached). Returns
-   { stem, leaf, seam, underside, shell, planter, halo, platinum, glass, theme, setTime, time } */
+   { stem, leaf, seam, underside, shell, planter, planterRim, planterVoid, bark,
+     canopy, halo, platinum, glass, theme, setTime, setTheme, time }.
+   ENERGY (recoloured by the Theme): stem, leaf, halo, seam, underside, shell,
+   platinum, glass. NATURE AND STRUCTURE (never recoloured): planter, planterRim,
+   planterVoid, bark, canopy. */
 export function themeMaterials(theme) {
   const t = resolveTheme(theme);
   const key = t.energy.toString(16) + ':' + t.energyLight.toString(16);
@@ -93,8 +153,20 @@ export function themeMaterials(theme) {
   const energy = new THREE.Color(t.energy), light = new THREE.Color(t.energyLight);
   const m = {
     theme: t, key,
-    /* graphite planter body */
-    planter: new THREE.MeshStandardMaterial({ color: 0x1b1e25, roughness: 0.62, metalness: 0.28, flatShading: true }),
+    /* ---- the three planter bands (v7). A tub is a rim, a body and a void. ----
+       BODY: the plaza's own midtone structural blue-graphite, not a neutral grey. */
+    planter: new THREE.MeshStandardMaterial({ color: 0x3d4c68, roughness: 0.46, metalness: 0.46, flatShading: true, envMapIntensity: 1.35 }),
+    /* RIM: the LOW-metalness platinum grade. A horizontal cap reflects the near-black
+       zenith, so a mirror grade renders black up there and only this one reads. */
+    planterRim: new THREE.MeshStandardMaterial({ color: 0xb6c4d6, roughness: 0.3, metalness: 0.38, flatShading: true, envMapIntensity: 1.4 }),
+    /* VOID: the inner wall and the soil — the darkest value in the object, on purpose,
+       and contained inside the tub instead of being the tub. */
+    planterVoid: new THREE.MeshStandardMaterial({ color: 0x080b11, roughness: 0.94, metalness: 0.04 }),
+    /* tree wood: a midtone crystalline trunk that catches the horizon on its vertical facets */
+    bark: new THREE.MeshStandardMaterial({ color: 0x4a5a76, roughness: 0.44, metalness: 0.5, envMapIntensity: 1.35 }),
+    /* tree canopy: pale crystal foliage whose top-lit / dark-underside shading is baked
+       into the vertex colours of the merged canopy (see buildTree) */
+    canopy: new THREE.MeshStandardMaterial({ color: 0xcfe2f5, vertexColors: true, roughness: 0.34, metalness: 0.12, emissive: 0x16283f, emissiveIntensity: NIGHT.canopy, envMapIntensity: 1.25 }),
     /* laser stem: pale rod by day, white-hot core at night; also the prow light */
     stem: new THREE.MeshStandardMaterial({ color: 0x8fa3b8, emissive: light, emissiveIntensity: NIGHT.stem, roughness: 0.35, metalness: 0.1 }),
     /* additive aura around each stem and the root glow disc */
@@ -126,11 +198,16 @@ export function themeMaterials(theme) {
       m.glass.emissiveIntensity = NIGHT.glass * f;
       m.shell.emissiveIntensity = NIGHT.shell * f;
       m.platinum.emissiveIntensity = NIGHT.platinum * f;
+      /* the canopy is not a lamp: this is a night-lift on foliage, a fixed cool value
+         that only follows the hour — the Theme never touches it */
+      m.canopy.emissiveIntensity = NIGHT.canopy * f;
       m.time = { daylight, sunElevation, factor: f };
       return m.time;
     }
   };
   for (const k of ['planter', 'stem', 'halo', 'leaf', 'seam', 'underside', 'shell', 'platinum', 'glass']) m[k].name = 'mahplaza-' + k + '-' + t.name;
+  /* nature and structure keep ONE name: they belong to no theme */
+  for (const k of ['planterRim', 'planterVoid', 'bark', 'canopy']) m[k].name = 'mahplaza-' + k;
   /* live world-Theme change: recolour this shared set in place (every planter and
      vehicle built from it follows); the cache is re-keyed so later lookups agree */
   m.setTheme = function (themeIn) {
@@ -161,20 +238,135 @@ function discGeometry() {   /* unit disc facing +Y */
   if (!GEO.disc) { const g = new THREE.CircleGeometry(1, 10); g.rotateX(-Math.PI / 2); GEO.disc = g; }
   return GEO.disc;
 }
+/* Surface of revolution with one MATERIAL BAND per profile segment — the lathe
+   this module needs, since three's LatheGeometry emits a single group and a
+   planter is three values. profile: [[r, y], ...] bottom → top; bands[i] is the
+   material index of the segment between point i and i + 1. Faces are wound with
+   the lathe convention (dP/ds × dP/dφ), which points OUT on the tub wall, UP on
+   the rim and the soil and IN on the void wall — exactly what a pot needs.
+   Non-indexed, so computeVertexNormals() bakes one normal per facet. */
+function revolveGeometry(profile, segments, phiStart, bands) {
+  const cs = [], sn = [];
+  for (let s = 0; s < segments; s++) { const a = phiStart + (s / segments) * TAU; cs.push(Math.cos(a)); sn.push(Math.sin(a)); }
+  const buckets = new Map();
+  const at = (p, s) => new THREE.Vector3(p[0] * cs[s], p[1], p[0] * sn[s]);
+  const raw = (arr, a, b, c) => {
+    _ea.subVectors(b, a); _eb.subVectors(c, a);
+    if (_ea.cross(_eb).lengthSq() < 1e-12) return;              /* collapsed at the axis */
+    arr.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+  };
+  for (let b = 0; b < profile.length - 1; b++) {
+    const p0 = profile[b], p1 = profile[b + 1], mi = bands[Math.min(bands.length - 1, b)];
+    let arr = buckets.get(mi); if (!arr) { arr = []; buckets.set(mi, arr); }
+    for (let s = 0; s < segments; s++) {
+      const s2 = (s + 1) % segments;
+      const A = at(p0, s), B = at(p0, s2), C = at(p1, s2), D = at(p1, s);
+      raw(arr, A, D, C); raw(arr, A, C, B);
+    }
+  }
+  const keys = [...buckets.keys()].sort((a, b) => a - b);
+  const total = keys.reduce((acc, k) => acc + buckets.get(k).length, 0);
+  const pos = new Float32Array(total);
+  const g = new THREE.BufferGeometry();
+  let off = 0;
+  for (const k of keys) { const arr = buckets.get(k); pos.set(arr, off); g.addGroup(off / 3, arr.length / 3, k); off += arr.length; }
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.computeVertexNormals();
+  return g;
+}
+
+/* Three-band planter tub: PLATINUM RIM (top chamfer + flat annulus) over a
+   MIDTONE BODY (bottom chamfer + wall) around a DARK VOID (inner wall + soil). */
 function planterBaseGeometry(size, shape) {
-  const key = 'base:' + size + ':' + shape;
+  const key = 'base:v7:' + size + ':' + shape;
   if (GEO[key]) return GEO[key];
   const S = PLANTER_SIZES[size] || PLANTER_SIZES.medium;
   const box = shape === 'box';
   const r = box ? S.r * Math.SQRT2 : S.r;      /* lathe radius reaches the corner of a box */
-  const h = S.h, c = (box ? Math.SQRT2 : 1) * 0.09 * h, lip = 0.07, ri = r * 0.8;
+  const h = S.h, c = (box ? Math.SQRT2 : 1) * 0.09 * h, lip = PLANTER_LIP, ri = r * PLANTER_INNER;
   const profile = [
-    new THREE.Vector2(r - c, 0), new THREE.Vector2(r, c), new THREE.Vector2(r, h - c), new THREE.Vector2(r - c, h),
-    new THREE.Vector2(ri, h), new THREE.Vector2(ri, h - lip), new THREE.Vector2(0, h - lip)
+    [r - c, 0],        /* ↓ body: bottom chamfer                */
+    [r, c],            /* ↓ body: outer wall                    */
+    [r, h - c],        /* ↓ rim: top chamfer (catches the light)*/
+    [r - c, h],        /* ↓ rim: flat annulus — the platinum lip*/
+    [ri, h],           /* ↓ void: inner wall dropping to soil   */
+    [ri, h - lip],     /* ↓ void: the soil floor                */
+    [0, h - lip]
   ];
-  const g = new THREE.LatheGeometry(profile, box ? 4 : 10, box ? Math.PI / 4 : 0);
-  g.computeVertexNormals();
+  const bands = [PBAND.body, PBAND.body, PBAND.rim, PBAND.rim, PBAND.void, PBAND.void];
+  const g = revolveGeometry(profile, box ? 4 : 10, box ? Math.PI / 4 : 0, bands);
   GEO[key] = g;
+  return g;
+}
+
+/* --------------------------------------------------- merge kit (no addons)
+   BufferGeometryUtils is an addon and this module vendors nothing but the core,
+   so the trees merge their own buffers. Every builder appends flat-shaded
+   triangles into one sink and finishSink() turns it into a single geometry.
+   `ref` forces a face to point away from a reference point; `tint` bakes a
+   vertex colour per face (one face is one facet, so no smoothing is wanted). */
+function sink(withColour) { return { pos: [], nrm: [], col: withColour ? [] : null, tris: 0 }; }
+function pushFace(out, a, b, c, ref, tint) {
+  _ea.subVectors(b, a); _eb.subVectors(c, a); _fn.crossVectors(_ea, _eb);
+  const len2 = _fn.lengthSq();
+  if (len2 < 1e-14) return;
+  _fn.multiplyScalar(1 / Math.sqrt(len2));
+  if (ref) {
+    _bc.copy(a).add(b).add(c).multiplyScalar(1 / 3).sub(ref);
+    if (_fn.dot(_bc) < 0) { const t = b; b = c; c = t; _fn.negate(); }
+  }
+  out.pos.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+  out.nrm.push(_fn.x, _fn.y, _fn.z, _fn.x, _fn.y, _fn.z, _fn.x, _fn.y, _fn.z);
+  if (out.col) {
+    tint(_col, a, _fn); out.col.push(_col.r, _col.g, _col.b);
+    tint(_col, b, _fn); out.col.push(_col.r, _col.g, _col.b);
+    tint(_col, c, _fn); out.col.push(_col.r, _col.g, _col.b);
+  }
+  out.tris++;
+}
+function appendGeo(out, src, matrix, ref, tint) {
+  const p = src.attributes.position, ix = src.index, n = ix ? ix.count : p.count;
+  for (let i = 0; i < n; i += 3) {
+    _ta.fromBufferAttribute(p, ix ? ix.getX(i) : i).applyMatrix4(matrix);
+    _tb.fromBufferAttribute(p, ix ? ix.getX(i + 1) : i + 1).applyMatrix4(matrix);
+    _tc.fromBufferAttribute(p, ix ? ix.getX(i + 2) : i + 2).applyMatrix4(matrix);
+    pushFace(out, _ta, _tb, _tc, ref, tint);
+  }
+}
+/* tapered prism through a chain of { p, r } nodes — trunk, branch, heartwood seam */
+function appendTube(out, nodes, sides, roll) {
+  const rings = [];
+  for (let i = 0; i < nodes.length; i++) {
+    _dir.subVectors(nodes[Math.min(nodes.length - 1, i + 1)].p, nodes[Math.max(0, i - 1)].p);
+    if (_dir.lengthSq() < 1e-10) _dir.set(0, 1, 0);
+    _dir.normalize();
+    _u.set(0, 1, 0);
+    if (Math.abs(_dir.y) > 0.94) _u.set(1, 0, 0);
+    _u.cross(_dir).normalize();
+    _w.crossVectors(_dir, _u).normalize();
+    const ring = [];
+    for (let k = 0; k < sides; k++) {
+      const a = roll + (k / sides) * TAU;
+      ring.push(new THREE.Vector3().copy(nodes[i].p).addScaledVector(_u, Math.cos(a) * nodes[i].r).addScaledVector(_w, Math.sin(a) * nodes[i].r));
+    }
+    rings.push(ring);
+  }
+  for (let i = 0; i < rings.length - 1; i++) {
+    const A = rings[i], B = rings[i + 1];
+    _ref.copy(nodes[i].p).add(nodes[i + 1].p).multiplyScalar(0.5);
+    for (let k = 0; k < sides; k++) {
+      const j = (k + 1) % sides;
+      pushFace(out, A[k], A[j], B[j], _ref, null);
+      pushFace(out, A[k], B[j], B[k], _ref, null);
+    }
+  }
+}
+function finishSink(out) {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(out.pos, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(out.nrm, 3));
+  if (out.col) g.setAttribute('color', new THREE.Float32BufferAttribute(out.col, 3));
+  g.computeBoundingSphere();
   return g;
 }
 
@@ -290,7 +482,9 @@ function outwardRoll(st, q) {
 }
 
 /* createPlanter({ theme, seed, size: 'small'|'medium'|'large', shape: 'box'|'round' })
-   → Group with origin at ground centre; userData { setTime(state), triangles, leaves, size, shape } */
+   → Group with origin at ground centre; userData { setTime(state), triangles, leaves, size, shape }.
+   The tub is ONE mesh in three material bands (platinum rim, midtone body, dark
+   interior void) — see planterBaseGeometry. */
 export function createPlanter(opts) {
   const o = opts || {};
   const size = PLANTER_SIZES[o.size] ? o.size : 'medium';
@@ -301,15 +495,17 @@ export function createPlanter(opts) {
   const group = new THREE.Group();
   group.name = 'planter-' + size + '-' + shape;
 
-  const base = new THREE.Mesh(planterBaseGeometry(size, shape), mats.planter);
+  /* three bands, one mesh: [body, rim, void] must match the group indices the
+     revolve wrote (PBAND) */
+  const base = new THREE.Mesh(planterBaseGeometry(size, shape), [mats.planter, mats.planterRim, mats.planterVoid]);
   base.name = 'base'; base.castShadow = true; base.receiveShadow = true;
   group.add(base);
   let tris = triangles(base.geometry);
 
-  const lip = 0.07, floorY = S.h - lip;
-  const ri = (shape === 'box' ? S.r * Math.SQRT2 : S.r) * 0.8;
+  const floorY = S.h - PLANTER_LIP;
+  const ri = (shape === 'box' ? S.r * Math.SQRT2 : S.r) * PLANTER_INNER;
   const disc = new THREE.Mesh(discGeometry(), mats.halo);
-  disc.name = 'root-glow'; disc.position.y = floorY + 0.004; disc.scale.setScalar(ri * 0.9);
+  disc.name = 'root-glow'; disc.position.y = floorY + 0.004; disc.scale.setScalar(ri * 0.88);
   group.add(disc);
   tris += triangles(disc.geometry);
 
@@ -347,6 +543,215 @@ export function createPlanter(opts) {
     kind: 'planter', size, shape, leaves: n, theme: mats.theme.name, triangles: tris,
     setTime(state) { return mats.setTime(state); },
     setTheme(theme) { const t = mats.setTheme(theme); group.userData.theme = t.name; return t; }
+  };
+  return group;
+}
+
+/* ---------------------------------------------------------------- trees */
+/* A tree is DESIGNED first (pure numbers, seeded) and then BUILT into three
+   merged geometries, so two trees with the same size and seed share one build. */
+function designTree(T, R, heightOverride) {
+  let height = lerp(T.h[0], T.h[1], R());
+  let canopyR = lerp(T.canopy[0], T.canopy[1], R());
+  let r0 = height * (0.023 + 0.007 * R());                       /* slim: ~0.15 m at the foot of a 6 m tree */
+  if (Number.isFinite(heightOverride)) {
+    const k = Math.min(11, Math.max(2.4, heightOverride)) / height;
+    height *= k; canopyR *= k; r0 *= k;
+  }
+  const RY = canopyR * 0.62;                                     /* canopy is oblate: broad, not tall */
+  const cy = height - RY;                                        /* canopy centre — crown reaches `height` */
+  const trunkTop = cy - RY * 0.38;                               /* the fork sits low in the canopy */
+  const leanA = R() * TAU, lean = Math.tan(THREE.MathUtils.degToRad(2 + 6 * R()));
+  const lx = Math.cos(leanA) * lean * trunkTop, lz = Math.sin(leanA) * lean * trunkTop;
+  const axis = t => new THREE.Vector3(lx * Math.pow(t, 1.4), trunkTop * t, lz * Math.pow(t, 1.4));
+  const radius = t => r0 * (1 - 0.58 * t) * (t < 0.02 ? 1.16 : 1);   /* flared root collar at the foot */
+
+  const trunk = [0, 0.36, 0.7, 1].map(t => ({ p: axis(t), r: radius(t) }));
+  trunk.push({ p: axis(1.10), r: 0 });                           /* the leader closes the tube inside the canopy */
+
+  const tiers = irange(R, T.tiers[0], T.tiers[1]);
+  const branches = [];
+  const a0 = R() * TAU;
+  for (let i = 0; i < tiers; i++) {
+    const t = 0.50 + 0.46 * ((i + 0.45) / tiers);
+    const base = axis(t), br = radius(t);
+    const count = irange(R, 2, 3);
+    for (let k = 0; k < count && branches.length < TREE_MAX_BRANCHES; k++) {
+      const a = a0 + i * 2.39 + (k / count) * TAU + (R() - 0.5) * 0.6;
+      const el = THREE.MathUtils.degToRad(30 + 28 * R());
+      const len = canopyR * (0.46 + 0.34 * R());
+      const dir = new THREE.Vector3(Math.cos(a) * Math.cos(el), Math.sin(el), Math.sin(a) * Math.cos(el));
+      /* three nodes so a branch SWEEPS — rises off the trunk, then levels out under
+         the canopy — and ends at radius 0, which closes the tube with no cap */
+      branches.push([
+        { p: base.clone().addScaledVector(dir, -br * 0.5), r: br * 0.62 },   /* start inside the trunk */
+        { p: base.clone().addScaledVector(dir, len * 0.55).addScaledVector(UP, len * 0.12), r: br * 0.34 },
+        { p: base.clone().addScaledVector(dir, len).addScaledVector(UP, len * 0.10), r: 0 }
+      ]);
+    }
+  }
+
+  /* canopy plates on an oblate shell, distributed crown → skirt by the golden angle */
+  const centre = new THREE.Vector3(lx, cy, lz);
+  const nPlate = irange(R, T.plates[0], T.plates[1]);
+  const spin = R() * TAU;
+  const plates = [];
+  for (let i = 0; i < nPlate; i++) {
+    const v = (i + 0.5) / nPlate;
+    const yy = 0.94 - 1.70 * v;                                  /* crown (+0.94) down past the equator (−0.76) */
+    const rr = Math.sqrt(Math.max(0.04, 1 - yy * yy));
+    const a = spin + i * GOLDEN;
+    const puff = 0.84 + 0.26 * R();
+    const p = new THREE.Vector3(
+      centre.x + Math.cos(a) * rr * canopyR * puff,
+      centre.y + yy * RY * (0.92 + 0.16 * R()),
+      centre.z + Math.sin(a) * rr * canopyR * puff
+    );
+    /* plate normal: the shell normal tipped toward the sky. The tip is 0.42, not the 0.85 of the
+       first build — at 0.85 every plate faced so nearly straight up that a camera at eye level saw
+       the canopy edge-on, which is what made the first trees read as parasols rather than as crowns.
+       At 0.42 the crown still lies back to catch the light while the flanks turn out to the viewer
+       and the skirt stands up as the silhouette at 20–40 m. */
+    const n = new THREE.Vector3((p.x - centre.x) / (canopyR * canopyR), (p.y - centre.y) / (RY * RY), (p.z - centre.z) / (canopyR * canopyR));
+    if (n.lengthSq() < 1e-9) n.set(0, 1, 0);
+    n.normalize().addScaledVector(UP, 0.42).normalize();
+    /* smaller plates than the first build (which ran to half the canopy radius, so a crown was only
+       a dozen readable leaves). Smaller AND more of them is what makes a canopy read as mass. */
+    plates.push({ p, n, s: canopyR * (0.30 + 0.11 * R()) * (0.86 + 0.30 * rr), roll: (R() - 0.5) * 0.9 });
+  }
+
+  const seamA = R() * TAU;
+  const seam = [0.20, 0.97].map(t => {
+    const p = axis(t), rr = radius(t);
+    return { p: new THREE.Vector3(p.x + Math.cos(seamA) * rr * 0.86, p.y, p.z + Math.sin(seamA) * rr * 0.86), r: Math.max(0.011, rr * 0.19) };
+  });
+
+  return { height, canopyR, RY, cy, centre, trunk, branches, plates, seam, tiers };
+}
+
+/* One core matrix reused by every crown plate: a small diamond sharing the plate's
+   frame, standing proud of both faces so it reads through an opaque leaf. */
+const TREE_CORE_LOCAL = new THREE.Matrix4().compose(new THREE.Vector3(0, 0.33, 0), new THREE.Quaternion(), new THREE.Vector3(0.34, 0.34, 1.8));
+
+function buildTree(D) {
+  const wood = sink(false), canopy = sink(true), accent = sink(false);
+  appendTube(wood, D.trunk, TREE_TRUNK_SIDES, 0.3);
+  for (const b of D.branches) appendTube(wood, b, TREE_BRANCH_SIDES, 0.6);
+  appendTube(accent, D.seam, TREE_SEAM_SIDES, 0);
+
+  /* BAKED LIGHT. k rises with how far a facet faces the sky and with how high it
+     sits in the canopy, so the crown is lit, the skirt is halved and every
+     underside falls to a cool near-black. No light in the scene has to do this. */
+  const yBase = D.cy - D.RY, span = 2 * D.RY;
+  const tint = (col, p, nrm) => {
+    const up = clamp01(nrm.y * 0.5 + 0.5);
+    const depth = clamp01((p.y - yBase) / span);
+    const k = clamp01(0.10 + 0.90 * Math.pow(up, 1.55) * (0.42 + 0.58 * depth));
+    col.setRGB(lerp(0.11, 1, k), lerp(0.14, 1, k), lerp(0.22, 1, k));
+  };
+
+  const leaf = leafGeometry();
+  const crown = D.plates.slice().sort((a, b) => b.p.y - a.p.y).slice(0, TREE_CROWN_CORES);
+  for (const pl of D.plates) {
+    /* plate frame: local +Z is the plate normal, local +Y runs outward along the shell */
+    _u.set(pl.p.x - D.centre.x, 0, pl.p.z - D.centre.z);
+    if (_u.lengthSq() < 1e-8) _u.set(1, 0, 0);
+    _u.addScaledVector(pl.n, -_u.dot(pl.n));
+    if (_u.lengthSq() < 1e-8) _u.set(-pl.n.z, 0, pl.n.x);
+    _u.normalize().applyAxisAngle(pl.n, pl.roll);
+    _w.crossVectors(_u, pl.n).normalize();
+    _m.makeBasis(_w, _u, pl.n);
+    _q.setFromRotationMatrix(_m);
+    _v.copy(pl.p).addScaledVector(_u, -0.5 * pl.s);              /* the plate's middle sits on the shell */
+    _m.compose(_v, _q, _s.set(pl.s * 0.92, pl.s, pl.s * 0.30));
+    appendGeo(canopy, leaf, _m, null, tint);
+    if (crown.indexOf(pl) >= 0) appendGeo(accent, leaf, _m2.multiplyMatrices(_m, TREE_CORE_LOCAL), null, null);
+  }
+  return {
+    wood: finishSink(wood), canopy: finishSink(canopy), accent: finishSink(accent),
+    info: { height: D.height, canopyR: D.canopyR, plates: D.plates.length, branches: D.branches.length, tiers: D.tiers }
+  };
+}
+
+/* ref-counted share: identical (size, seed, height) trees are one build */
+const TREE_GEO = new Map();
+function acquireTree(key, build) {
+  let e = TREE_GEO.get(key);
+  if (!e) { e = { g: build(), uses: 0 }; TREE_GEO.set(key, e); }
+  e.uses++;
+  return e.g;
+}
+function releaseTree(key) {
+  const e = TREE_GEO.get(key);
+  if (!e || --e.uses > 0) return;
+  for (const k of ['wood', 'canopy', 'accent']) e.g[k].dispose();
+  TREE_GEO.delete(key);
+}
+
+/* createTree({ theme, seed, size: 'small'|'medium'|'large' | height in m, height })
+   → Group with origin at ground centre, +Y up; three meshes (wood, canopy,
+   heartwood), 325 / 437 / 541 triangles by size; userData
+   { setTime(state), setTheme(theme), dispose(), triangles, height, canopyRadius } */
+export function createTree(opts) {
+  const o = opts || {};
+  const size = TREE_SIZES[o.size] ? o.size : 'medium';
+  const T = TREE_SIZES[size];
+  const mats = themeMaterials(o.theme);
+  const seed = o.seed == null ? 'tree:' + size : o.seed;
+  const hIn = Number.isFinite(o.height) ? o.height : (Number.isFinite(o.size) ? o.size : null);
+  const key = size + '|' + String(seed) + '|' + (hIn == null ? '-' : hIn.toFixed(3));
+  const G = acquireTree(key, () => buildTree(designTree(T, rng(seed), hIn)));
+
+  const group = new THREE.Group();
+  group.name = 'tree-' + size;
+  const wood = new THREE.Mesh(G.wood, mats.bark);
+  wood.name = 'trunk'; wood.castShadow = true; wood.receiveShadow = true;
+  const foliage = new THREE.Mesh(G.canopy, mats.canopy);
+  foliage.name = 'canopy'; foliage.castShadow = true;
+  const heart = new THREE.Mesh(G.accent, mats.stem);
+  heart.name = 'heartwood';
+  group.add(wood, foliage, heart);
+
+  let released = false;
+  group.userData = {
+    kind: 'tree', size, theme: mats.theme.name,
+    height: G.info.height, canopyRadius: G.info.canopyR, plates: G.info.plates, branches: G.info.branches, tiers: G.info.tiers,
+    triangles: triangles(G.wood) + triangles(G.canopy) + triangles(G.accent), meshes: 3,
+    setTime(state) { return mats.setTime(state); },
+    setTheme(theme) { const t = mats.setTheme(theme); group.userData.theme = t.name; return t; },
+    /* materials are shared per theme and are never disposed here — only this tree's
+       share of the merged geometry is given back */
+    dispose() { if (released) return; released = true; group.remove(wood, foliage, heart); releaseTree(key); }
+  };
+  return group;
+}
+
+/* createGrove({ theme, seed, count, size, radius }) → Group of 2–5 trees in a
+   loose stand (the concept shows trees in groups, never one alone). */
+export function createGrove(opts) {
+  const o = opts || {};
+  const mats = themeMaterials(o.theme);
+  const R = rng(o.seed == null ? 'grove' : o.seed);
+  const size = TREE_SIZES[o.size] ? o.size : 'medium';
+  const count = Math.min(5, Math.max(2, Math.round(Number.isFinite(o.count) ? o.count : 3)));
+  const radius = Number.isFinite(o.radius) ? o.radius : 2.6;
+  const group = new THREE.Group();
+  group.name = 'grove-' + size;
+  const trees = [];
+  let tris = 0;
+  const a0 = R() * TAU;
+  for (let i = 0; i < count; i++) {
+    const t = createTree({ theme: mats.theme, seed: String(o.seed == null ? 'grove' : o.seed) + ':' + i, size });
+    const a = a0 + (i / count) * TAU + (R() - 0.5) * 0.6, rr = radius * (0.35 + 0.65 * R());
+    t.position.set(Math.cos(a) * rr, 0, Math.sin(a) * rr);
+    t.rotation.y = R() * TAU;
+    trees.push(t); group.add(t); tris += t.userData.triangles;
+  }
+  group.userData = {
+    kind: 'grove', size, count, theme: mats.theme.name, triangles: tris, trees,
+    setTime(state) { return mats.setTime(state); },
+    setTheme(theme) { const t = mats.setTheme(theme); group.userData.theme = t.name; return t; },
+    dispose() { for (const t of trees) t.userData.dispose(); }
   };
   return group;
 }

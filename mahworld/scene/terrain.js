@@ -59,19 +59,28 @@ const VALLEYS = [
 
 /* Three ranges, near to far. Each is a ring arc of faceted peaks.
      r      distance from the marker
-     h      peak height range — the tallest megatall crown sits at ~466 m and subtends 35 deg from
-            665 m, so a range must be tall enough for its own distance to beat that or it reads as a
-            low band behind the city rather than as the horizon
+     h      peak height range
+     w      peak base RADIUS — this is what decides whether a range reads as mountains or as shards
      base   the deep colour at the foot of the range
      ridge  the moonlit colour along its tops                                                        */
 /* The values are set AGAINST THE NIGHT SKY, not in isolation: the horizon key is 0x1d3d6e, so the near
    range has to sit clearly BELOW that to read as a silhouette, and the far range clearly ABOVE it to
    read as haze. A range painted near the sky's own value is invisible however large it is — which is
-   exactly what the first build of this module proved. */
+   exactly what the first build of this module proved.
+
+   PROPORTION, corrected in v7. The first build reasoned that a range must out-top the tallest megatall
+   (~466 m, subtending 35 deg from 665 m) "or it reads as a low band behind the city". Once the cloud
+   deck that had been hiding all of this was lifted, that reasoning proved backwards: the near range
+   subtended 38.7 deg — past the top of a 46 deg frame — so the mountains did not sit behind the city,
+   they loomed over it, and the megatalls read as small things at their feet. Brief §11 asks the
+   TOWERS to frame the MOUNTAINS. So each range now tops out just under the tallest tower: 28 / 25.5 /
+   23.7 deg, near to far. The peaks are also far broader relative to their height (base diameter now
+   about 1.6x the height, against 0.75x before): a cone that is much taller than it is wide is a shard,
+   and thirty shards in a row are a sawtooth, not a horizon. */
 const RANGES = [
-  { id: 'near', r: 700, count: 26, hMin: 320, hMax: 560, wMin: 100, wMax: 210, base: 0x080e1b, ridge: 0x33456b, seed: 91 },
-  { id: 'mid', r: 1050, count: 22, hMin: 430, hMax: 680, wMin: 160, wMax: 320, base: 0x172440, ridge: 0x51648f, seed: 137 },
-  { id: 'far', r: 1500, count: 18, hMin: 560, hMax: 820, wMin: 250, wMax: 450, base: 0x2b3f66, ridge: 0x7a8fb8, seed: 211 }
+  { id: 'near', r: 700, count: 20, hMin: 210, hMax: 370, wMin: 180, wMax: 330, base: 0x0d1526, ridge: 0x3a4d76, seed: 91 },
+  { id: 'mid', r: 1050, count: 18, hMin: 300, hMax: 500, wMin: 260, wMax: 460, base: 0x172440, ridge: 0x51648f, seed: 137 },
+  { id: 'far', r: 1500, count: 15, hMin: 400, hMax: 660, wMin: 380, wMax: 650, base: 0x2b3f66, ridge: 0x7a8fb8, seed: 211 }
 ];
 
 const LAND_INNER = 600, LAND_OUTER = 1750;

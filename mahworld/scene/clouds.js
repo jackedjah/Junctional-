@@ -34,13 +34,23 @@ import { canvasTexture } from './materials.js';
    Night is the anchor: a moonlit blue-grey mass, restrained silver catches,
    dark undersides. Dusk takes MAHWORLD's violet. Day is brighter and softer
    and the crystalline catches weaken — they never take over the sky. */
-/* v5 §13: the diamond clouds were correct but too faint to be part of the composition. The bodies sit
-   a value higher and hold more of the sky, and the crystalline catches inside them are stronger — the
-   sky now has weather in it, and that weather is made of crystal. */
+/* v5 §13 raised the bodies "a value higher" so the clouds would hold more of the sky. MEASURED in v7,
+   that had overshot into an overcast: at night the body was 0x5b73a8 (luminance 112) at 0.92 alpha
+   across three overlapping decks, so a vertical profile of the establishing frame read a DEAD FLAT
+   124 from the zenith to the skyline — the dome's own 58 → 34 → 16 gradient never reached the camera,
+   the moon halo, galaxy band and stars were painted over, and the empty sky out-valued the whole
+   architectural band (65.8) by 1.8×. That is what made the city read as black cut-outs.
+
+   THE LAW THIS ENCODES. A night cloud is lit by a moon, so its BODY is darker than the sky it hangs
+   in front of near the horizon and only a little brighter than the zenith; its CRESTS are what
+   approach the moon's value. Visibility comes from that contrast and from the crystal facets — never
+   from covering the sky in pale blue. So the body sits between the dome's mid (34) and horizon (58)
+   keys, the alpha lets the star field and the galaxy band read through the thinner edges, and the lit
+   facets are pushed UP to keep the clouds every bit as present as v5 wanted them. */
 const KEYS = {
-  night: { body: 0x5b73a8, bodyA: 0.92, lit: 0xeef5ff, litA: 0.62, dark: 0x22314f, darkA: 0.2, sheenA: 0.13, litT: 0.14, catch: 1.00 },
-  dusk:  { body: 0x8878c8, bodyA: 0.84, lit: 0xece5ff, litA: 0.5,  dark: 0x372e63, darkA: 0.22, sheenA: 0.1,  litT: 0.09, catch: 0.84 },
-  day:   { body: 0xe6eefa, bodyA: 0.86, lit: 0xf8fbff, litA: 0.26, dark: 0x9db0cb, darkA: 0.24, sheenA: 0.05, litT: 0.04, catch: 0.40 }
+  night: { body: 0x243352, bodyA: 0.60, lit: 0xeef5ff, litA: 0.74, dark: 0x121a2c, darkA: 0.3,  sheenA: 0.10, litT: 0.14, catch: 1.00 },
+  dusk:  { body: 0x50458a, bodyA: 0.62, lit: 0xece5ff, litA: 0.60, dark: 0x241d42, darkA: 0.3,  sheenA: 0.1,  litT: 0.09, catch: 0.84 },
+  day:   { body: 0xe6eefa, bodyA: 0.72, lit: 0xf8fbff, litA: 0.26, dark: 0x9db0cb, darkA: 0.24, sheenA: 0.05, litT: 0.04, catch: 0.40 }
 };
 const _ca = new THREE.Color(), _cb = new THREE.Color();
 function lerpHex(a, b, t) { _ca.setHex(a); _cb.setHex(b); return _ca.lerp(_cb, t).getHex(); }
@@ -163,10 +173,15 @@ function facetTexture(size) {
    Three decks. The near deck carries the readable crystal; the far deck is
    almost pure atmospheric silhouette (and is the first thing a low tier
    simplifies). Azimuths are measured from the −z axis, where the cameras look. */
+/* COVERAGE. The masses have to stay DISCRETE. v5's mid deck ran seven masses up to 580 wide (986
+   after QSCALE) at radius 400–700, which is ~70° of sky each spaced 23° apart — a threefold overlap,
+   i.e. a solid deck, which is how the sky came to be one flat value. The probe named that one layer
+   as +38 of the ~50 luminance the clouds were adding. Fewer and narrower masses on the same spread
+   leaves real sky between them, which is where the moon, the galaxy band and the stars live. */
 const LAYOUT = [
-  { name: 'low',  count: 7, yMin: 108, yMax: 156, rMin: 300, rMax: 500, wMin: 230, wMax: 380, qMin: 7, qVar: 3, pMin: 5, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.30, -0.86, -0.42, 0.02, 0.48, 0.94, 1.34] },
-  { name: 'mid',  count: 7, yMin: 164, yMax: 232, rMin: 400, rMax: 700, wMin: 340, wMax: 580, qMin: 6, qVar: 3, pMin: 4, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-1.10, -0.72, -0.30, 0.12, 0.56, 0.98, 1.36] },
-  { name: 'high', count: 6, yMin: 252, yMax: 344, rMin: 620, rMax: 900, wMin: 450, wMax: 720, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.72, speed: 0.70, order: -6, spread: [-1.02, -0.60, -0.16, 0.30, 0.74, 1.16] }
+  { name: 'low',  count: 5, yMin: 108, yMax: 156, rMin: 300, rMax: 500, wMin: 190, wMax: 300, qMin: 7, qVar: 3, pMin: 5, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.28, -0.70, -0.10, 0.52, 1.18] },
+  { name: 'mid',  count: 4, yMin: 164, yMax: 232, rMin: 400, rMax: 700, wMin: 250, wMax: 400, qMin: 6, qVar: 3, pMin: 4, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-1.05, -0.44, 0.28, 1.02] },
+  { name: 'high', count: 4, yMin: 252, yMax: 344, rMin: 620, rMax: 900, wMin: 330, wMax: 520, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.72, speed: 0.70, order: -6, spread: [-0.95, -0.30, 0.42, 1.10] }
 ];
 /* the blob atlas paints the middle of each cell, so a quad has to be ~1.7× the
    mass width it is meant to draw. QSCALE keeps that conversion in one place. */

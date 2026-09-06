@@ -83,7 +83,7 @@ export function buildSky(ctx) {
      limb — and a wide, low outer halo that never closes into a glare disc. Silver-white to pale
      blue-white; the brightest thing in the sky and never, ever warm. */
   const moon = new THREE.Mesh(new THREE.CircleGeometry(58, 64), new THREE.MeshBasicMaterial({ map: moonTexture(), fog: false, transparent: true }));
-  const moonHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: moonHaloTexture(), color: 0x9fc0ff, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); moonHalo.scale.set(430, 430, 1);
+  const moonHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: moonHaloTexture(), color: 0x9fc0ff, transparent: true, opacity: 0.36, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); moonHalo.scale.set(430, 430, 1);
   g.add(sunDisc, sunHalo, moon, moonHalo);
 
   /* ---- THE GALAXY BAND (this world's Milky Way) -------------------------------
@@ -248,7 +248,7 @@ export function buildSky(ctx) {
     sunHalo.position.copy(sunDir).multiplyScalar(790); sunHalo.material.opacity = 0.4 * k.sunDisc * (sun.day ? 1 : 0);
     const moonDir = moonDirection(clockState.worldHour, new THREE.Vector3());
     moon.position.copy(moonDir).multiplyScalar(800); moon.lookAt(0, 0, 0); moon.material.opacity = 0.06 + 0.94 * Math.pow(1 - clockState.daylight, 1.5);
-    moonHalo.position.copy(moonDir).multiplyScalar(790); moonHalo.material.opacity = 0.3 * (1 - clockState.daylight);
+    moonHalo.position.copy(moonDir).multiplyScalar(790); moonHalo.material.opacity = 0.36 * (1 - clockState.daylight);
     stars.material.opacity = 0.85 * k.stars;
     /* the galaxy band is night sky like the stars: it washes out on the same key as daylight rises */
     galaxy.material.opacity = 0.92 * k.stars;
