@@ -554,7 +554,7 @@ export function buildHalo(ctx) {
        symptom was one console warning about a NaN bounding sphere, which is why the inner rim read
        as a bare cut with no parapet in every render and nothing failed. */
     const at = (x, y, z, ry, sx, sy, sz) => {
-      _p.set(x, y, z); _e.set(0, ry, 0); _q.setFromEuler(_e);
+      _p.set(x, y, z); _e.set(0, ry == null ? 0 : ry, 0); _q.setFromEuler(_e);
       _s.set(sx == null ? 1 : sx, sy == null ? 1 : sy, sz == null ? 1 : sz);
       return _m.compose(_p, _q, _s).clone();
     };
@@ -565,11 +565,19 @@ export function buildHalo(ctx) {
         const x = Math.cos(a) * rr, z = Math.sin(a) * rr, y = haloHeight(x, z);
         /* the PARAPET: a platinum band standing on the lip. It does not need to be a collider — the
            dish already curls 39.6 m over the last 1350 m, which is the guard rail. This is the part
-           you can SEE, and it is what draws the ring's outline against the sky from the ground. */
-        rimSolid.push({ geo: chamferBox(chord * 1.02, 2.4, 1.6, 0.35),
+           you can SEE, and it is what draws the ring's outline against the sky from the ground.
+
+           THE CHORD IS AN ALONG-THE-RIM MEASURE AND IT WAS IN THE RADIAL SLOT. at(..., -a) sends
+           local +X to (cos a, sin a) — RADIAL — and local +Z to (-sin a, cos a) — TANGENTIAL. The
+           first cut put `chord` (which is TAU * rr / RSEG, the arc BETWEEN segments) on X, so each
+           of the 384 parapet pieces was a 57 m fin pointing outward, 1.6 m wide along the rim, with
+           55 m of gap to the next one. The two defining circles of MAH HALO — the thing that says
+           "halo" from the ground — were built as a COMB. It photographed as a dashed line in every
+           render of this pass and was twice written off as "a balustrade". The chord belongs on Z. */
+        rimSolid.push({ geo: chamferBox(1.6, 2.4, chord * 1.02, 0.35),
           matrix: at(x, y + 1.2, z, -a), value: 1.0 });
         /* and the slab's edge, so the ring reads as a thing with thickness */
-        rimSolid.push({ geo: chamferBox(chord * 1.02, HALO.THICK, 2.2, 0.5),
+        rimSolid.push({ geo: chamferBox(2.2, HALO.THICK, chord * 1.02, 0.5),
           matrix: at(x + Math.cos(a) * sign * 0.9, y - HALO.THICK * 0.5, z + Math.sin(a) * sign * 0.9, -a), value: 0.42 });
       }
     }
@@ -665,11 +673,39 @@ export function buildHalo(ctx) {
         _tq.setFromUnitVectors(_up, _tn);          /* the tile lies ON the shell, not flat in the world */
         _tp.set(x, y + 0.17, z); _ts.set(1, 1, 1);
         nearTiles.setMatrixAt(t++, _tm.compose(_tp, _tq, _ts));
-        if (Math.abs(x % HALO.MEGA) < T * 0.5 && Math.abs(z % HALO.MEGA) < T * 0.5 && n < nearNodes.count) {
-          _tp.set(x, y + 0.42, z);
+      }
+    }
+    /* ---- THE SQUARE-DIAMOND NODES, and why they had never once drawn ---------------------------
+       R4's plating spec names them: "load-bearing base, dark-crystal field, platinum perimeter,
+       laser channels, SQUARE-DIAMOND NODES". The first cut placed one wherever a TILE CENTRE landed
+       on a MEGA crossing:
+
+           if ( Math.abs( x % HALO.MEGA ) < T * 0.5 && ... )
+
+       which is unsatisfiable. The field is N = 26 tiles wide, so half = 12.5, and a tile centre is
+       cx + (i - 12.5) * 8 with cx a multiple of 8 — always congruent to 4 mod 8, never to 0. A value
+       4 mod 8 is 4, 12, 20 ... 60 mod 64, and none of those is under 4. Measured across four field
+       positions: 0 hits out of 104. All nineteen node instances stayed parked 4000 m below the ring
+       from the day the file was written, and nothing errored, warned, or looked obviously wrong —
+       the plating simply had no nodes and read as a plain grid.
+
+       A node belongs to the CROSSING, not to a tile, so it is placed by walking the crossings inside
+       the near field directly. That is also self-checking: the loop bounds are the field's extent, so
+       if the field moves the nodes move with it and the count is whatever the arithmetic says. */
+    {
+      const M = HALO.MEGA, ext = half * T;
+      const x0 = Math.ceil((cx - ext) / M) * M, z0 = Math.ceil((cz - ext) / M) * M;
+      for (let X = x0; X <= cx + ext && n < nearNodes.count; X += M) {
+        for (let Z = z0; Z <= cz + ext && n < nearNodes.count; Z += M) {
+          const rr2 = Math.hypot(X, Z);
+          if (rr2 < HALO.R_IN + 64 || rr2 > HALO.R_OUT - 40 || !onHalo(X, Z)) continue;
+          const yy = haloHeight(X, Z);
+          haloNormal(X, Z, _tn); _tq.setFromUnitVectors(_up, _tn);
+          _tp.set(X, yy + 0.42, Z); _ts.set(1, 1, 1);
           nearNodes.setMatrixAt(n++, _tm.compose(_tp, _tq, _ts));
         }
       }
+      stats.nearNodes = n;
     }
     for (; n < nearNodes.count; n++) {
       _tp.set(0, HALO.Y - 4000, 0); _ts.set(0.001, 0.001, 0.001);

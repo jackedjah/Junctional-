@@ -158,11 +158,10 @@ export function buildHaloDistricts(ctx, opts = {}) {
   });
   glassMat.name = 'halo-d-glass'; owned.materials.push(glassMat);
 
-  const glow = new THREE.MeshBasicMaterial({
-    color: new THREE.Color(theme.energyLight), transparent: true, opacity: 0.46,
-    blending: THREE.AdditiveBlending, depthWrite: false, fog: true
-  });
-  glow.name = 'halo-d-glow'; owned.materials.push(glow);
+  /* (there was a `glow` MeshBasicMaterial here. It was built, named, pushed to owned.materials and
+     driven by BOTH setTime and setTheme every frame — while being attached to no mesh, no instanced
+     mesh and no line: a material animating in the dark since the file was written. Deleted rather
+     than given a job, because inventing a use for dead code is how dead code survives.) */
   /* the one place warm light is legal in this world is INSIDE a building (mahplaza LAW-001's
      exemption is by ROLE, and the identifier has to name an interior light). MAH TABLE's counters
      are interiors, and a food district lit in the same cold blue as everything else is a morgue. */
@@ -242,7 +241,11 @@ export function buildHaloDistricts(ctx, opts = {}) {
         put('plat', chamferBox(2.2, h, 2.2, 0.6), mat(gx, gz, h / 2, -th), 0.90);
         put('plat', chamferBox(3.4, 0.5, 3.4, 0.16), mat(gx, gz, h, -th + 0.4), 1.0);
       }
-      put('plat', chamferBox(w + 2, 1.0, 1.6, 0.3), mat(x, z, h + 0.5, -th), 1.0);
+      /* THE LINTEL SPANS THE WAY ITS PIERS ARE SEPARATED. The piers are offset along
+         (cos(th+PI/2), sin(th+PI/2)) — TANGENTIAL — and the lintel was authored on local X, which
+         mat(..., -th) sends RADIALLY: the arrival gateway's crossbeam stood ninety degrees to the
+         two piers under it. Fourth instance of this bug in one file (kerb, screen, proscenium). */
+      put('plat', chamferBox(1.6, 1.0, w + 2, 0.3), mat(x, z, h + 0.5, -th), 1.0);
       const dia = own(new THREE.OctahedronGeometry(1, 0));
       put('plat', dia, mat(x, z, h + 4.2, -th, 3.0, 2.4, 3.0), 1.0);
       return [x, z, th];
@@ -452,6 +455,7 @@ export function buildHaloDistricts(ctx, opts = {}) {
   for (const D of DISTRICTS) {
     const half = D.span * 0.5;
     const rec = { id: D.id, deg: D.deg, span: D.span, parts: {} };
+    const pre = { seats: stats.seats, kiosks: stats.kiosks, overlooks: stats.overlooks };
 
     if (D.id === 'arrival') {
       /* BROAD TERRACES. R4 names them, and they are the answer to "the tiny top platform": three
@@ -475,7 +479,11 @@ export function buildHaloDistricts(ctx, opts = {}) {
         if (k % 3 === 1) P.growth(D.deg, s + 22, t - 26, 5, k * 17);
       }
       P.mast(D.deg, -half + 40, -10, 16, 1); P.mast(D.deg, half - 40, -10, 16, 2);
-      P.overlook(D.deg, 0, 56);
+      /* COMMONS' own overlook is offset along the ring, because the blanket per-district pass at
+         the end of this loop also calls P.overlook(D.deg, 0, ...) — and P.overlook derives its
+         position entirely from (deg, s), so two calls at s = 0 build two bays in exactly the same
+         place: doubled geometry, z-fighting glass and two colliders on one point. */
+      P.overlook(D.deg, -150, 56);
       districtSign(D, ...(() => { const [x, z, th] = ringPoint(D.deg, 0, -62); return [x, z, th]; })(), 12);
 
     } else if (D.id === 'pulse') {
@@ -511,7 +519,9 @@ export function buildHaloDistricts(ctx, opts = {}) {
           P.seat(D.deg, s + (j % 2 ? 5 : -5), t, gold(k * 7 + j), false);
         }
       }
-      P.terrace(D.deg, 0, 20, D.span * 0.8, 74, 0.32);
+      /* D.span is ALONG the ring (the table says so) and P.terrace's `w` is the RADIAL dimension,
+         so this had the dining terrace 240 m deep and 74 m wide — inside out. */
+      P.terrace(D.deg, 0, 20, 74, D.span * 0.8, 0.32);
       for (const s of [-90, 90]) P.mast(D.deg, s, 56, 14, s);
       /* ---- THE SERVING CANOPY, and why TABLE needed one -------------------------------------
          L53 at district scale. TABLE's whole vocabulary was six 4.6 m kiosks and twenty-four 3.4 m
@@ -560,7 +570,12 @@ export function buildHaloDistricts(ctx, opts = {}) {
         for (let k = 0; k < 40; k++) {
           const a = (k / 40) * TAU;
           const [bx, bz, bth] = ringPoint(D.deg, s + Math.cos(a) * R, Math.sin(a) * R);
-          put('plat', chamferBox(TAU * R / 40 * 1.05, 0.30, 0.9, 0.1), mat(bx, bz, 0.2, -bth), 1.0);
+          /* A BOUNDARY SEGMENT MUST LIE ALONG THE BOUNDARY. Each of the 40 pieces was yawed to -bth
+             — the RING's radial direction — so all forty pointed outward from the world axis and the
+             arena read as a 40-spoke asterisk instead of a circle. The segment's own tangent at
+             parameter a is (-sin a, cos a) in the district's (along, across) frame, so the extra yaw
+             is a itself; the 4.95 m length goes on local Z, which -bth sends tangential. */
+          put('plat', chamferBox(0.9, 0.30, TAU * R / 40 * 1.05, 0.1), mat(bx, bz, 0.2, -bth + a), 1.0);
         }
         P.terrace(D.deg, s, 0, 40, 40, 0.26);
         for (const side of [-1, 1]) P.mast(D.deg, s + side * 34, -34, 11 + 3 * g, g * 5 + side);
@@ -590,11 +605,15 @@ export function buildHaloDistricts(ctx, opts = {}) {
         const t = 20 + k * 11;
         const w = 150 - k * 6;
         const [x, z, th] = ringPoint(D.deg, 0, t);
-        put('dark', chamferBox(w, 1.5 + k * 0.9, 9, 0.3), mat(x, z, (1.5 + k * 0.9) * 0.5, -th), 0.30 + 0.05 * k);
+        /* THE TIERS STEP RADIALLY, SO A TREAD SPANS TANGENTIALLY. t = 20 + k*11 moves each tier
+           11 m further out across the ring, and the tread's 150 m was authored on local X — also
+           radial — so seven treads each 150 m deep overlapped one another almost completely and the
+           amphitheatre was a solid block, not a stair. The 9 m is the radial depth of one step. */
+        put('dark', chamferBox(9, 1.5 + k * 0.9, w, 0.3), mat(x, z, (1.5 + k * 0.9) * 0.5, -th), 0.30 + 0.05 * k);
         /* §07 again: a 150 m tread in platinum is a 150 m mirror. The TREAD is dark and the NOSING —
            the front lip, the part that is nearly vertical to a seated eye — carries the metal. That
            is also how a real stepped auditorium reads: the edge catches, the seat does not. */
-        put('dark', chamferBox(w, 0.2, 9.4, 0.08), mat(x, z, 1.5 + k * 0.9, -th), 0.42 + 0.04 * k);
+        put('dark', chamferBox(9.4, 0.2, w, 0.08), mat(x, z, 1.5 + k * 0.9, -th), 0.42 + 0.04 * k);
         const [nx2, nz2] = ringPoint(D.deg, 0, t - 4.4);
         put('plat', chamferBox(0.6, 0.34, w, 0.1), mat(nx2, nz2, 1.62 + k * 0.9, -th), 1.0);
       }
@@ -614,10 +633,13 @@ export function buildHaloDistricts(ctx, opts = {}) {
          light-sculpture rig. R4 allows "a sanctuary relay of the giant civic authority hologram" —
          the relay's PLINTH is here; broadcast.js already owns what stands on it. */
       const [sx, sz, sth] = ringPoint(D.deg, 0, -78);
-      put('dark', chamferBox(96, 4.0, 40, 1.2), mat(sx, sz, 2.0, -sth), 0.26);
+      /* the deck's LONG axis is tangential — it faces a crowd sitting outboard and its proscenium
+         piers are spaced tangentially. Authored on local X the stage was 96 m DEEP and 40 m wide,
+         the wrong way round to everything built around it. */
+      put('dark', chamferBox(40, 4.0, 96, 1.2), mat(sx, sz, 2.0, -sth), 0.26);
       /* §07: the deck a performer stands on is dark; the platinum is its edge (see kerb above) */
-      put('dark', chamferBox(100, 0.4, 44, 0.16), mat(sx, sz, 4.2, -sth), 0.46);
-      kerb(sx, sz, -sth, 100, 44, 4.5);
+      put('dark', chamferBox(44, 0.4, 100, 0.16), mat(sx, sz, 4.2, -sth), 0.46);
+      kerb(sx, sz, -sth, 44, 100, 4.5);
       /* the shell: three arched ribs over the stage, so it has a silhouette from the whole ring */
       for (let k = 0; k < 3; k++) {
         const t = -78 + k * 13, h = 40 - k * 6, w = 92 - k * 10;
@@ -666,7 +688,11 @@ export function buildHaloDistricts(ctx, opts = {}) {
        three districts that authored their own above keep them and get this one alongside; ARRIVAL is
        the exception because the concourse spine already lands there. */
     if (D.id !== 'arrival') P.overlook(D.deg, 0, 52);
-    rec.parts = { seats: stats.seats, kiosks: stats.kiosks, overlooks: stats.overlooks };
+    /* THESE ARE THIS DISTRICT'S OWN COUNTS. stats.seats/kiosks/overlooks are sanctuary-wide running
+       totals that no one resets between districts, so snapshotting them verbatim recorded a
+       cumulative prefix sum — QUIET appeared to have every seat built before it. */
+    rec.parts = { seats: stats.seats - pre.seats, kiosks: stats.kiosks - pre.kiosks,
+      overlooks: stats.overlooks - pre.overlooks };
     stats.districts.push(rec);
   }
 
@@ -696,8 +722,8 @@ export function buildHaloDistricts(ctx, opts = {}) {
     const DOCK_R = HALO.R_IN + 60;
     const dth = -90 * Math.PI / 180;
     const dockCx = Math.cos(dth) * DOCK_R, dockCz = Math.sin(dth) * DOCK_R;
-    const [gx, gz, gth] = ringPoint(-90, 0, -70);
-    const gy = haloHeight(gx, gz);
+    /* (the gateway coordinates the first cut aimed at are gone with it — the beams land on the
+       pier at DOCK_R now, so nothing here needs ringPoint(-90, 0, -70) any more) */
     const beamMat = new THREE.MeshBasicMaterial({
       color: new THREE.Color(theme.energyLight), transparent: true, opacity: 0.24,
       blending: THREE.AdditiveBlending, depthWrite: false, fog: true
@@ -892,7 +918,10 @@ export function buildHaloDistricts(ctx, opts = {}) {
       const [x, z, th] = ringPoint(D.deg, 0, 0);
       /* §07's correction (v11 §100: pools washed the black floor pale) says a pool over a near-black
          reflective deck is a WIDE, WEAK gradient, never a bright disc. 0.10 across 400 m is a breath. */
-      pools.setMatrixAt(np++, mat(x, z, 0.34, -th, D.span * 0.9, 1, 170));
+      /* sx is RADIAL and sz is TANGENTIAL under mat(..., -th). D.span is the district's extent
+         ALONG the ring and 170 is the band ACROSS it, so the two were swapped: every pool was
+         stretched hundreds of metres across the ring's width and cut short along its length. */
+      pools.setMatrixAt(np++, mat(x, z, 0.34, -th, 170, 1, D.span * 0.9));
       const [gx, gz, gth] = ringPoint(D.deg, 0, -30);
       pools.setMatrixAt(np++, mat(gx, gz, 0.36, -gth, 78, 1, 54));
     }
@@ -962,7 +991,6 @@ export function buildHaloDistricts(ctx, opts = {}) {
     },
     setTime(s) {
       const night = 1 - (s && s.daylight != null ? s.daylight : 0);
-      glow.opacity = 0.16 + 0.34 * night;
       interiorWarm.opacity = 0.10 + 0.26 * night;
       /* the answer follows the emitter: by day the sanctuary reads on its own reflections */
       if (_pools) _pools.opacity = 0.08 + 0.26 * night;
@@ -975,7 +1003,6 @@ export function buildHaloDistricts(ctx, opts = {}) {
     },
     setTheme(th) {
       if (!th || th.energyLight == null) return;
-      glow.color.setHex(th.energyLight);
       for (const m of GRIDDED) {
         const u = m.userData.haloUniforms; if (u) u.uHaloLine.value.setHex(th.energyLight);
       }
