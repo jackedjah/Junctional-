@@ -93,16 +93,66 @@
      every plate on ONE surface at 1.10 of it, exactly attained (verified over
      1,906 plates: the seating solve never falls back and never clamps). The
      roundness comes from the plates SHARING a surface, not from a smaller one.
-     WHAT IS STILL POINTY, and this pass made it worse, not better: the BARE
-     BRANCH TIPS. appendTube closes a tube by running its radius to zero, so a
-     branch ends in a true needle, and the wood is byte-identical to v7. Pulling
-     the canopy in from a scattered 1.24 to a uniform 1.10 uncovered them.
-     MEASURED over 54 trees / 347 branches, tips ending outside their own tree's
-     outermost canopy point: v7 5, worst 10.8 cm; v8 8, worst 32.0 cm (1.16x the
-     canopy shell, on a large tree). It is ~2% of branches, but a zero-radius tip
-     is exactly the hairline law 06 names. Blunting it needs an END CAP in
-     appendTube — which the trunk and the heartwood seam also run through — so it
-     is a shape decision for the director, not a tidy-up. Left as found, flagged.
+     WHAT WAS STILL POINTY IN v8, and what v9 does about it: the BARE BRANCH TIPS.
+     appendTube closed a tube by running its radius to zero, so a branch ended in
+     a true needle, and the wood was byte-identical to v7. Pulling the canopy in
+     from a scattered 1.24 to a uniform 1.10 uncovered them.
+
+     v9 FIXES IT IN TWO MOVES, and the second one only exists because the first
+     one MEASURED AS A NO-OP.
+
+       A. THE BLUNT END (§06's own prescribed technique). appendTube now takes a
+          `caps` mask and lays an END-CAP FAN on every FREE end, and a branch
+          finishes on TIP_FACET (0.32) of the radius it started from instead of
+          on zero. A branch tip is now a small flat facet 1.6-2.6 cm across that
+          can hold a highlight where a hairline could only alias. The trunk
+          leader gets the same treatment and the heartwood seam — whose two ends
+          were open HOLES in the wood — is closed at both. A branch's start and
+          the trunk's foot are not capped: they are buried in the trunk and in
+          the deck, and four triangles for a face nobody can see is not a fix.
+       B. THE TIP IS SEATED, the wood half of v8's plate-seating solve. Blunting
+          a tip does not put it under foliage, so a branch that would finish
+          outside the crown is moved along its own direction until it lies on a
+          shell at BRANCH_SEAT (0.94) of the crown envelope.
+          THE DIRECTION OF THAT MOVE IS THE WHOLE POINT AND IT IS THE OPPOSITE
+          OF WHAT WAS ASSUMED. The obvious reading of "a tip outside the canopy"
+          is a branch reaching too FAR, so the first cut of this solve clamped
+          the length to the far intersection — and re-measuring returned all
+          seven offenders byte-identical, because not one of them was long. They
+          are SHORT: a low-tier branch starts about 1.4 RY below the crown centre
+          on a large tree while the foliage stops around 0.9 RY below it, and a
+          short shallow limb never gets up into the canopy at all. It ends in open
+          air UNDER the skirt, short of the near intersection. So the seat is the
+          INTERVAL [L1, L2] and not the ceiling L2, and the fix mostly LENGTHENS.
+          Bounded both ways (BRANCH_FLOOR 0.55, BRANCH_REACH 1.45) so a seed keeps
+          the tree it was given.
+
+     MEASURED, same 54-tree population as v8 (ground.js's 18 tree spots, seeds
+     106-123, at all three sizes) and the same 347 branch tips, taking a tip as
+     outside when it stands past the canopy's own outermost point in the direction
+     the tip points:
+
+                                     v8            v9
+       branch tips                  347           347
+       tips outside the canopy        7             0
+       worst tip, standing proud   33.9 cm       0.0 cm
+       worst as a multiple of the
+         canopy shell               1.174x        —
+       tips ending on zero radius   347             0
+
+     (v8's own header reports 8 tips / 32.0 cm for this population. The 7 / 33.9
+     here is the same seven trees — seeds 107, 120 and 123 exactly as it names —
+     measured against the canopy's MEASURED support rather than the analytic
+     ellipsoid, which is a slightly different question and gives a slightly
+     different count. Both go to zero.)
+
+     WHAT IT MOVED. The seating solve is nearly invisible in the silhouette,
+     which is the point: over the 54 trees the mean widest reach of the WOOD
+     goes 1.436 -> 1.446 m, the widest single tree 2.198 -> 2.208 m, mean tree
+     height is unchanged to the millimetre, and the largest change to any one
+     tree's reach is 8.8 cm. WHAT IT COST: the end caps plus the un-collapsed
+     final band take the 54-tree population from 30,762 to 34,618 triangles
+     (+12.5%), all of it wood (6,054 -> 9,370). No new draw calls.
 
      WHAT IT COST. The plate went from 8 triangles to 12, so a canopy costs 1.5x
      what it did: 200/248/312 -> 300/372/468 by size, a tree 341/365/465 ->
@@ -112,15 +162,44 @@
      merged meshes per tree, still one geometry per (size, seed). The fullness
      came free of that — plate size (0.30 -> 0.36) buys coverage without widening
      the crown, because the envelope, not the plate, decides the outline now.
-   - VEHICLES: compact, load-bearing, purposeful craft derived from the
-     square-diamond language: a softened (chamfered) rhombus hull with a heavy
-     platinum belt, a forward cabin, one energy seam around the belt, a nose
-     seam running down the prow, a tail bar and a lit underside plate. +Z is
-     forward. They ride a closed sky route tangent to the path with a little
-     banking.
+   - TRANSPORT (v9, §6). THE RHOMBUS IS RETIRED. Up to v8 this module built a
+     chamfered rhombus hull with a belt, a cabin and a prow light. It had no
+     wheels, no grille and no exhaust, so it passed the letter of §6 — and it
+     failed the substance, because §6 does not say "not a car", it says where
+     transport COMES FROM: FOBLOCK + square diamond + platinum module + black
+     crystal + MAHGIC propulsion, and §11 gates on "transport derives from the
+     genome's geometry". A rhombus derives from nothing here but itself.
+     Every hull is now ONE EVALUATION OF foblock.js: a rounded square in plan
+     with a flat table top and bottom, a tight fillet on every edge, a circular
+     engraved medallion on the nose and the TWO LATERAL RINGS that identify the
+     family — which on a craft are exactly what §4 calls "soft connection
+     points". A pod docks to the world through rings.
+       POD (§6A)      the genome at pod scale, PROPORTIONS UNTOUCHED. 1.90 m
+                      wide, hovering 0.34 m clear of the deck on a MAHGIC
+                      underglow, no wheels and no undercarriage. A square-diamond
+                      emblem on each flank, a dark crystal pane forward of it,
+                      two accent strips low on the body.
+       SHUTTLE (§6B)  the same evaluation elongated along the genome's DEPTH axis
+                      only — 2.30 x 5.14 x 2.35 — which is what "elongated
+                      multi-resident floating block" means. Still a rounded
+                      square in section, still a flat table top; NOT a rhombus
+                      and NOT a wedge. Three diamond glazing panes run aft of the
+                      rings, where a cabin is.
+     The pods park in ones and twos on the aprons and idle; three shuttles ride
+     the closed sky route, tangent to the path with a little banking. +Z forward.
+     LAW 1 is re-measured after the stretch rather than inherited — see
+     splitByNormal() and the §6 section header, which is where the reasoning
+     lives.
    - Colour: stems, leaves, seams and undersides take the ENVIRONMENT energy
      colour of the viewing player's world theme ({ energy, energyLight }); the
      canonical theme is blue-white. No yellow or amber anywhere in this file.
+     THE ONE PLACE THAT NOW CONTRADICTS THE REFERENCE, flagged rather than
+     decided quietly: the hero render's pods carry "warm amber accent light
+     strips low on the body". Warm is not available to a vehicle in MAHWORLD —
+     hue 28-75 is reserved for light coming from INSIDE A BUILDING, a test
+     enforces it by identifier, and this file's own standing law is the line
+     above. The strips are therefore the world energy colour. If the director
+     wants them amber it is a change to the warm-light law, not to this file.
    - Time of day: setTime({ daylight, sunElevation }) subdues every emissive
      element to ~25% by full day and restores it at night.
    - Performance: every geometry is shared; stems, halos, leaves and cores of a
@@ -129,8 +208,26 @@
      489 / 621 triangles for small / medium / large, MEASURED off the built
      groups in v8) and trees of the same size + seed share those geometries
      through a ref-counted cache, so the plaza's 18 trees cost 18 x 3 draw calls
-     and 11.1k triangles however many distinct designs stand in it; materials are
-     cached per theme. Its 6 planters plus 3 craft add 2.1k more.
+     and 12.5k triangles however many distinct designs stand in it; materials are
+     cached per theme.
+     THE PODS ARE INSTANCED, and that is what makes an idle bob affordable:
+     merging five pods by role would give the same seven draw calls but ONE
+     transform, so every pod would bob in unison, which reads worse than not
+     bobbing at all. One InstancedMesh per role, one instance per pod: seven
+     draw calls for the whole pod fleet and a hover of its own for each craft.
+     MEASURED off the built groups for the whole flora + transport population
+     (6 planters, 18 trees, 5 parked pods, 1 parked shuttle, 3 route shuttles):
+
+                       v8 (rhombus)      v9 (genome)
+       draw calls           114              125     (header budget 132)
+       triangles         13,146           21,440
+         trees           12,510           14,514
+         planters         1,428            1,428
+         transport          636            7,562  (9 craft, ~840 each)
+
+     One genome evaluation costs ~808 triangles, of which the two connection
+     rings are 240 and the medallion 80; setQuality('low') drops the rings, the
+     flank emblems and the accent strips, which is 45% of a craft.
      The canopy budget was 400 in the first build and the crowns came out as
      parasols: a dozen big plates on a nearly-vertical shell normal, seen
      edge-on from eye level. Mass needs COUNT, so the plate count roughly
@@ -138,14 +235,24 @@
      right side of that trade for the only vegetation the camera gets near.
    - THE THEME IS ENERGY ONLY. Stems, leaves, cores, seams, undersides and the
      heartwood take the world energy colour. Bark, canopy, planter rim, planter
-     body and planter void are NATURE AND STRUCTURE: fixed values that no
-     Theme may repaint. setTheme() touches the emissive set and nothing else.
+     body, planter void and the two transport metal grades are NATURE AND
+     STRUCTURE: fixed values that no Theme may repaint — a platinum is a FINISH,
+     not a colour. setTheme() touches the emissive set and nothing else.
+   - LAW 2. buildFobPods() answers every emitter it places: each parked craft
+     lays a themed pool on the deck through ctx.lightPool, which is the surface
+     that actually shows an underglow. The sky route carries the same emitter
+     set the v8 rhombus carried and no more, and takes an optional `lightPool`
+     so an assembly that has one can answer those too.
 
    Materials are SHARED per theme, so setTime() on any planter or vehicle (or
    on a route) retunes every object of that theme — call it once per frame per
    theme, not once per object. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
+/* THE GENOME. foblock.js is built from a photograph of the real FOB SYSTEMS object and hands out
+   parts keyed by material role; §6 roots ALL transport in it and §11 gates on "transport derives
+   from the genome's geometry". This module builds nothing of its own for a hull. */
+import { foblockParts } from './foblock.js';
 
 export const CANONICAL_THEME = Object.freeze({ energy: 0x7fc6ff, energyLight: 0xdff1ff, name: 'canonical' });
 
@@ -169,6 +276,18 @@ export const TREE_SIZES = Object.freeze({
 });
 const TREE_MAX_BRANCHES = 8;          /* triangle budget: 8 branches × 8 tris */
 const TREE_TRUNK_SIDES = 5, TREE_BRANCH_SIDES = 4, TREE_SEAM_SIDES = 5;
+/* v9 BLUNT WOOD (§06, and the regression v8 shipped knowingly — see the header).
+   TIP_FACET is the radius a branch or the trunk leader ENDS on, as a fraction of the radius that
+   segment started from. 0 is a needle; anything with a facet takes a highlight. 0.32 of the
+   branch's own base is three times §06's own floor and still a small facet at 1.6–2.6 cm across.
+   BRANCH_SEAT seats the tip against the crown the way v8 seats a canopy plate: a bare stick
+   outside the foliage is a spike whatever its end looks like, so a branch that would finish
+   outside is pulled back along its own direction until its tip lies on a shell at this fraction
+   of the crown envelope. Both are build-time only. */
+const TIP_FACET = 0.32;
+const BRANCH_SEAT = 0.94;
+const BRANCH_FLOOR = 0.55;            /* a seated branch never loses more than this much of its sweep */
+const BRANCH_REACH = 1.45;            /* nor gains more than this much of it */
 const TREE_CROWN_CORES = 3;           /* how many crown plates carry a lit core */
 const GOLDEN = 2.399963229728653;     /* golden angle — an even shell from a deterministic sequence */
 
@@ -289,8 +408,22 @@ export function themeMaterials(theme) {
     underside: new THREE.MeshStandardMaterial({ color: 0x000000, emissive: energy, emissiveIntensity: NIGHT.underside, roughness: 0.5, metalness: 0 }),
     /* dark crystalline hull */
     shell: new THREE.MeshPhysicalMaterial({ color: 0x1c212b, emissive: energy, emissiveIntensity: NIGHT.shell, roughness: 0.35, metalness: 0.45, clearcoat: 0.7, clearcoatRoughness: 0.15, flatShading: true }),
-    /* platinum belt */
+    /* platinum belt; on a genome-derived craft it is the medallion rim and the two connection rings */
     platinum: new THREE.MeshStandardMaterial({ color: 0xaab2bb, emissive: energy, emissiveIntensity: NIGHT.platinum, roughness: 0.32, metalness: 0.5, flatShading: true }),
+    /* ---- THE LAW 1 PAIR for §6 transport. ONE GRADE OF METAL, READ AT TWO ORIENTATIONS. -------
+       podShell is materials.js's `platinumMid` — the same colour, roughness, metalness and
+       environment strength, repeated here because this module's factories take a THEME rather than
+       the world palette and a pod built from a route has no ctx.M to reach for. High metalness, so
+       it takes NO diffuse light and is lit only by scene.environment: legal on a VERTICAL or tilted
+       face, which reflects the bright horizon band, and that is why a polished platinum pod on a
+       near-black plaza reads as the dark chrome the reference render shows.
+       podCap is its horizontal partner at LOW metalness — materials.js's `platinumLit` numbers, the
+       same grade this file already uses for the planter rim. An up-facing or down-facing face
+       reflects the near-black zenith, so a mirror grade renders BLACK there whatever its hex says.
+       EVERY horizontal triangle on a craft in this module wears podCap, and which triangles those
+       are is MEASURED by splitByNormal() after the stretch, never inherited from a bucket name. */
+    podShell: new THREE.MeshStandardMaterial({ color: 0x7e90ae, roughness: 0.24, metalness: 0.94, envMapIntensity: 1.85 }),
+    podCap: new THREE.MeshStandardMaterial({ color: 0xb6c4d6, roughness: 0.30, metalness: 0.38, envMapIntensity: 1.40 }),
     /* cabin glass */
     glass: new THREE.MeshPhysicalMaterial({ color: 0x0a1220, emissive: energy, emissiveIntensity: NIGHT.glass, roughness: 0.06, metalness: 0.3, clearcoat: 1, clearcoatRoughness: 0.05, flatShading: true }),
     time: { daylight: 0, sunElevation: -1, factor: 1 },
@@ -316,8 +449,9 @@ export function themeMaterials(theme) {
     }
   };
   for (const k of ['planter', 'stem', 'halo', 'leaf', 'seam', 'underside', 'shell', 'platinum', 'glass']) m[k].name = 'mahplaza-' + k + '-' + t.name;
-  /* nature and structure keep ONE name: they belong to no theme */
-  for (const k of ['planterRim', 'planterVoid', 'bark', 'canopy']) m[k].name = 'mahplaza-' + k;
+  /* nature and structure keep ONE name: they belong to no theme. The two transport metal grades
+     join them — a platinum is a FINISH, not a colour, and no Theme may repaint it. */
+  for (const k of ['planterRim', 'planterVoid', 'bark', 'canopy', 'podShell', 'podCap']) m[k].name = 'mahplaza-' + k;
   /* live world-Theme change: recolour this shared set in place (every planter and
      vehicle built from it follows); the cache is re-keyed so later lookups agree */
   m.setTheme = function (themeIn) {
@@ -477,8 +611,22 @@ function appendGeo(out, src, matrix, ref, tint) {
     pushFace(out, _ta, _tb, _tc, ref, tint);
   }
 }
-/* tapered prism through a chain of { p, r } nodes — trunk, branch, heartwood seam */
-function appendTube(out, nodes, sides, roll) {
+/* END CAP (v9). A fan from the ring's own centre out to its rim, wound to face AWAY from the
+   tube — this is the flat facet §06 asks a taper to finish on, and it is what turns a branch from
+   a hairline into a small cut end that can hold a highlight. A ring of (near) zero radius has no
+   facet to cap and is skipped, so a tube that genuinely wants to close on a point still can. */
+function capRing(out, ring, centre, inward) {
+  if (!ring || ring.length < 3) return;
+  if (centre.distanceToSquared(ring[0]) < 1e-8) return;
+  _ref.copy(inward);
+  for (let k = 0; k < ring.length; k++) pushFace(out, centre, ring[k], ring[(k + 1) % ring.length], _ref, null);
+}
+/* tapered prism through a chain of { p, r } nodes — trunk, branch, heartwood seam.
+   `caps` is a bitmask: 1 caps the START ring, 2 caps the END ring. A branch's start is buried
+   inside the trunk and a trunk's foot is buried in the deck, so neither is worth four triangles;
+   what needs the facet is every FREE end — the branch tip, the trunk leader, and both ends of the
+   heartwood seam, which were open holes in the wood before this. */
+function appendTube(out, nodes, sides, roll, caps) {
   const rings = [];
   for (let i = 0; i < nodes.length; i++) {
     _dir.subVectors(nodes[Math.min(nodes.length - 1, i + 1)].p, nodes[Math.max(0, i - 1)].p);
@@ -504,6 +652,11 @@ function appendTube(out, nodes, sides, roll) {
       pushFace(out, A[k], B[j], B[k], _ref, null);
     }
   }
+  const last = rings.length - 1;
+  if (last < 1) return;
+  const c = caps == null ? 2 : caps;
+  if (c & 1) capRing(out, rings[0], nodes[0].p, nodes[1].p);
+  if (c & 2) capRing(out, rings[last], nodes[last].p, nodes[last - 1].p);
 }
 function finishSink(out) {
   const g = new THREE.BufferGeometry();
@@ -514,70 +667,376 @@ function finishSink(out) {
   return g;
 }
 
-/* Rings-and-caps hull builder for the vehicles. outline: [[x, z], ...] in
-   unit length; rings: [{ y, s, dz }] bottom → top; matFor(part, band, seg)
-   → material index. Flat-shaded, winding forced outward from `centre`. */
-function ringVerts(outline, ring) { return outline.map(([x, z]) => new THREE.Vector3(x * ring.s * (ring.sx || 1), ring.y, z * ring.s + (ring.dz || 0))); }
-function hullGeometry(outline, rings, matFor, opts) {
-  const o = opts || {};
-  const R = rings.map(r => ringVerts(outline, r));
-  const centre = o.centre || new THREE.Vector3(0, (rings[0].y + rings[rings.length - 1].y) / 2, 0);
-  const buckets = new Map();
-  const push = (mi, a, b, c) => {
-    _v.subVectors(b, a); _v2.subVectors(c, a); _v3.crossVectors(_v, _v2);
-    _v.copy(a).add(b).add(c).multiplyScalar(1 / 3).sub(centre);
-    if (_v3.dot(_v) < 0) { const t = b; b = c; c = t; }
-    let arr = buckets.get(mi); if (!arr) { arr = []; buckets.set(mi, arr); }
-    arr.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-  };
-  const fan = (ring, mi) => {
-    const cen = ring.reduce((acc, p) => acc.add(p), new THREE.Vector3()).multiplyScalar(1 / ring.length);
-    for (let i = 0; i < ring.length; i++) push(mi, cen, ring[i], ring[(i + 1) % ring.length]);
-  };
-  const n = outline.length;
-  for (let b = 0; b < R.length - 1; b++) for (let i = 0; i < n; i++) {
-    const j = (i + 1) % n, mi = matFor('band', b, i);
-    push(mi, R[b][i], R[b][j], R[b + 1][j]);
-    push(mi, R[b][i], R[b + 1][j], R[b + 1][i]);
+/* ================================================================= §6 TRANSPORT
+   TRANSPORT IS NOT A CAR AND IT IS NOT A RHOMBUS EITHER.
+
+   Up to v8 this module built "square-diamond sky craft": a chamfered rhombus hull with a belt,
+   a cabin and a prow light. It had no wheels, no grille and no exhaust, so it passed the letter
+   of §6 — and it failed the substance of it, because §6 does not say "not a car", it says where
+   transport COMES FROM: FOBLOCK + square diamond + platinum module + black crystal + MAHGIC
+   propulsion, and §11 gates on "transport derives from the genome's geometry". A rhombus derives
+   from nothing in this world but itself. The rhombus is retired here; every hull below is one
+   evaluation of foblock.js.
+
+   WHAT THAT BUYS, read off the genome's own header: the body is a ROUNDED SQUARE IN PLAN with a
+   FLAT TABLE top and bottom and a tight fillet on every edge, it carries a circular engraved
+   medallion, and it carries TWO LATERAL RINGS at mid height — the family's identifying feature
+   and, on a vehicle, exactly what §4 calls "soft connection points": a pod docks to the world
+   through rings. The rings become the craft's lateral hover collars, seen as two circles from
+   the front and as thin standing hoops from the flank.
+
+     POD (§6A)      one evaluation at POD.size, PROPORTIONS UNTOUCHED. "Small personal hovering
+                    rounded block" is the genome at pod scale and nothing else — no stretch, no
+                    taper, no nose. It floats POD.hover clear of the deck with no undercarriage.
+     SHUTTLE (§6B)  the same evaluation stretched along the genome's DEPTH axis only, which is
+                    what "elongated multi-resident floating block" means: still a rounded square
+                    in section, still a flat table top, just long. NOT a rhombus and not a wedge.
+
+   LAW 1, AND WHY IT IS RE-MEASURED HERE. The genome splits its own shell into `shell` (normals
+   more vertical than horizontal — a mirror grade is legal) and `cap` (up/down facing — a mirror
+   grade renders BLACK against a near-black zenith and only a low-metalness partner reads). It
+   does that split by MEASURING each triangle's normal. But it measures the UNSTRETCHED block,
+   and scaling a body along Z transforms its normals by diag(1, 1, 1/S): at the shuttle's stretch
+   a face that measured |ny| = 0.50 measures 0.83 afterwards and has silently become a cap. So
+   splitByNormal() takes the split AGAIN, on the transformed triangles, and the cap bucket is the
+   only thing that ever reaches a low-metalness grade. This project has shipped a flat up-facing
+   mirror four times by trusting a bucket label instead of a normal; it is not doing it again.
+
+   LAW 2. Every pod and the parked shuttle lay a pool on the deck through ctx.lightPool for their
+   MAHGIC underglow and their accent strips — buildFobPods() answers each emitter it places, on
+   the surface that shows it. The craft on the sky route carry the SAME emitter set the v8 rhombus
+   carried and no more; createVehicleRoute() now accepts a `lightPool` so an assembly that has one
+   can answer those too (see the note in createVehicleRoute).
+
+   COLOUR. The reference render reads "warm amber accent strips low on the body". WARM IS NOT
+   AVAILABLE TO A VEHICLE in this world: hue 28-75 is reserved for light coming from inside a
+   building and a test enforces it, and this module's own law is "no yellow or amber anywhere in
+   this file". So the accent strips and the underglow take the world ENERGY colour like every
+   other seam here. Flagged for the director rather than decided quietly.  */
+
+/* The size ladder for transport, in the genome's own unit: `size` is the block's WIDTH in metres
+   and every other proportion follows from it inside foblock.js. */
+export const POD = Object.freeze({
+  size: 1.90,        /* a one-being block: 1.90 wide x 1.63 deep x 1.94 tall */
+  hover: 0.34,       /* how far the flat base floats clear of whatever it is parked on */
+  bob: 0.038,        /* idle bob, half-amplitude in metres */
+  rate: 0.55         /* idle bob, radians per second */
+});
+export const SHUTTLE = Object.freeze({
+  size: 2.30,
+  stretch: 2.60,     /* along the genome's DEPTH axis only: 2.30 x 5.14 x 2.35 */
+  hover: 0.46,
+  bob: 0.055,
+  rate: 0.38
+});
+const CAP_BAND = 0.62;     /* foblock.js P.capBand — the two must agree or LAW 1 has a seam in it */
+
+/* ---- merge kit, again (three's BufferGeometryUtils is an addon and does not exist here) ----
+   Position + normal only, index-aware because TorusGeometry arrives INDEXED. */
+function mergeParts(list) {
+  const flat = [];
+  for (const g0 of list) {
+    const g = g0.getIndex() ? g0.toNonIndexed() : g0;
+    if (!g.getAttribute('normal')) g.computeVertexNormals();
+    flat.push(g);
   }
-  if (o.capBottom !== false) fan(R[0], matFor('bottom', -1, -1));
-  if (o.capTop !== false && R.length > 1) fan(R[R.length - 1], matFor('top', -1, -1));
-  const keys = [...buckets.keys()].sort((a, b) => a - b);
-  const total = keys.reduce((s, k) => s + buckets.get(k).length, 0);
-  const pos = new Float32Array(total);
-  const g = new THREE.BufferGeometry();
-  let off = 0;
-  for (const k of keys) { const arr = buckets.get(k); pos.set(arr, off); g.addGroup(off / 3, arr.length / 3, k); off += arr.length; }
-  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  g.computeVertexNormals();
+  let n = 0;
+  for (const g of flat) n += g.getAttribute('position').count;
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3);
+  let o = 0;
+  for (const g of flat) {
+    const p = g.getAttribute('position'), q = g.getAttribute('normal');
+    pos.set(p.array.subarray(0, p.count * 3), o * 3);
+    nor.set(q.array.subarray(0, q.count * 3), o * 3);
+    o += p.count;
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  out.computeBoundingSphere();
+  return out;
+}
+
+/* LAW 1, MEASURED. Re-split a set of geometries into { shell, cap } by each triangle's OWN
+   normal, after every transform has been applied. Flat normals, one per facet, which is what the
+   genome emits anyway and what §06 wants: a rounded silhouette made of cut faces. */
+function splitByNormal(geos, band) {
+  const shell = { p: [], n: [] }, cap = { p: [], n: [] };
+  const B = band == null ? CAP_BAND : band;
+  for (const g0 of geos) {
+    const g = g0.getIndex() ? g0.toNonIndexed() : g0;
+    const p = g.getAttribute('position');
+    for (let i = 0; i + 2 < p.count; i += 3) {
+      _ta.fromBufferAttribute(p, i); _tb.fromBufferAttribute(p, i + 1); _tc.fromBufferAttribute(p, i + 2);
+      _ea.subVectors(_tb, _ta); _eb.subVectors(_tc, _ta); _fn.crossVectors(_ea, _eb);
+      const L = _fn.length();
+      if (L < 1e-12) continue;
+      _fn.multiplyScalar(1 / L);
+      const out = Math.abs(_fn.y) > B ? cap : shell;
+      out.p.push(_ta.x, _ta.y, _ta.z, _tb.x, _tb.y, _tb.z, _tc.x, _tc.y, _tc.z);
+      for (let k = 0; k < 3; k++) out.n.push(_fn.x, _fn.y, _fn.z);
+    }
+  }
+  const mk = s => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(s.p, 3));
+    g.setAttribute('normal', new THREE.Float32BufferAttribute(s.n, 3));
+    return g;
+  };
+  return { shell: mk(shell), cap: mk(cap) };
+}
+
+/* THE BRAND FIGURE. A square diamond — a square rotated 45 degrees — flattened through its own
+   normal so it sits ON a face as an emblem or a pane instead of standing off it as a caltrop.
+   §06's ONE exemption: it keeps its four points. Unit width across X, unit height up Y, thin
+   through Z, so it drops into a face frame the same way the planter leaf does. */
+function emblemGeometry() {
+  if (!GEO.emblem) {
+    const diamondEmblem = new THREE.OctahedronGeometry(1, 0);   /* the square-diamond brand figure */
+    diamondEmblem.scale(0.5, 0.5, 0.055);
+    GEO.emblem = diamondEmblem;
+  }
+  return GEO.emblem;
+}
+function barGeometry() {
+  if (!GEO.bar) GEO.bar = new THREE.BoxGeometry(1, 1, 1);
+  return GEO.bar;
+}
+
+/* A flat quad in the XZ plane facing DOWN — the underglow plate. Built rather than taken from
+   PlaneGeometry so its winding and its normal are explicit; it is emissive at metalness 0, so it
+   is a horizontal face LAW 1 has nothing to say about, and it is counted in the audit anyway. */
+function underplateGeometry() {
+  if (GEO.underplate) return GEO.underplate;
+  const g = new THREE.PlaneGeometry(1, 1);
+  g.rotateX(Math.PI / 2);                   /* normal now points at -Y */
+  GEO.underplate = g;
   return g;
 }
 
-/* Unit vehicle (length 1, nose at +Z 0.5, tail at −0.5). Shared by every vehicle; proportions vary by scale. */
-const HULL_OUTLINE = [[0.03, 0.5], [0.29, 0.03], [0.29, -0.09], [0.10, -0.5], [-0.10, -0.5], [-0.29, -0.09], [-0.29, 0.03], [-0.03, 0.5]];
-const HULL_RINGS = [
-  { y: -0.155, s: 0.52, dz: -0.03 },  /* bottom plate */
-  { y: -0.10, s: 0.90, dz: -0.005 },  /* lower bevel */
-  { y:  0.00, s: 1.00, dz: 0 },       /* belt (widest) */
-  { y:  0.065, s: 0.88, dz: 0.01 },   /* upper bevel */
-  { y:  0.12, s: 0.50, dz: 0.05 }     /* top deck, shifted forward */
-];
-const DECK_Y = 0.12, BEVEL_Y = 0.065, BOTTOM_Y = -0.155;
-const CABIN_RINGS = [
-  { y: -0.05, s: 0.55, dz: -0.02 },
-  { y:  0.00, s: 1.00, dz: 0 },
-  { y:  0.04, s: 0.84, dz: 0.01 },
-  { y:  0.065, s: 0.42, dz: 0.05 }
-];
-const MAT = { shell: 0, platinum: 1, glass: 2 };
-function vehicleGeometry() {
-  if (GEO.hull) return GEO;
-  GEO.hull = hullGeometry(HULL_OUTLINE, HULL_RINGS, (part, band) => (part === 'band' && (band === 1 || band === 2)) ? MAT.platinum : MAT.shell);
-  GEO.cabin = hullGeometry(HULL_OUTLINE, CABIN_RINGS, (part, band, seg) => (part === 'band' && band >= 1 && (seg === 7 || seg === 0 || seg === 6)) ? MAT.glass : MAT.shell);
-  GEO.beltSeam = hullGeometry(HULL_OUTLINE, [{ y: -0.007, s: 1.012, dz: 0 }, { y: 0.007, s: 1.012, dz: 0 }], () => 0, { capBottom: false, capTop: false });
-  GEO.underPlate = hullGeometry(HULL_OUTLINE, [{ y: BOTTOM_Y - 0.004, s: 0.46, dz: -0.03 }], () => 0, { capTop: false, centre: new THREE.Vector3(0, 1, 0) });
-  GEO.bar = new THREE.BoxGeometry(1, 1, 1);
-  return GEO;
+/* THE FLANK'S OWN X AT A POINT, EXACT. The body is a SUPERELLIPSE in plan, so its side is not a
+   plane: toward the ends it turns hard around the corner, and an emblem seated at a fixed x would
+   float off that corner on a long body and sink into it on a short one. This slices the body's
+   triangle soup with the plane y = y0 and then with the plane z = z0 and returns the largest |x|
+   of the crossings — the surface the renderer ACTUALLY draws, a 20-sided plan rather than the
+   ideal curve, so nothing seated on it can bury itself in a facet.
+   MEASURED rather than re-derived: foblock.js keeps its plan exponent private, and a hand-copied
+   copy of it here is exactly how two files drift apart. (The first cut of this binned the shell's
+   vertices by z instead, and with 20 sides most bins came out empty and were filled from their
+   neighbours around the corner — which seated a flank emblem 28 cm inside the body. The audit
+   caught it; a bin is not a surface.)
+   Build time only, and a handful of queries against ~440 triangles. */
+const _slice = [];
+function flankX(geos, y0, z0) {
+  let best = 0;
+  for (const g of geos) {
+    const p = g.getAttribute('position');
+    for (let i = 0; i + 2 < p.count; i += 3) {
+      _ta.fromBufferAttribute(p, i); _tb.fromBufferAttribute(p, i + 1); _tc.fromBufferAttribute(p, i + 2);
+      _slice.length = 0;
+      for (let e = 0; e < 3; e++) {
+        const A = e === 0 ? _ta : e === 1 ? _tb : _tc, B = e === 0 ? _tb : e === 1 ? _tc : _ta;
+        const dA = A.y - y0, dB = B.y - y0;
+        if ((dA > 0 && dB > 0) || (dA < 0 && dB < 0)) continue;
+        const t = Math.abs(dA - dB) < 1e-12 ? 0 : dA / (dA - dB);
+        _slice.push(A.x + (B.x - A.x) * t, A.z + (B.z - A.z) * t);
+      }
+      for (let k = 0; k + 3 < _slice.length; k += 2) {
+        const ax = _slice[k], az = _slice[k + 1], bx = _slice[k + 2], bz = _slice[k + 3];
+        const dA = az - z0, dB = bz - z0;
+        if ((dA > 0 && dB > 0) || (dA < 0 && dB < 0)) continue;
+        const t = Math.abs(dA - dB) < 1e-12 ? 0 : dA / (dA - dB);
+        const x = Math.abs(ax + (bx - ax) * t);
+        if (x > best) best = x;
+      }
+    }
+  }
+  return best;
+}
+/* SEAT AND SIZE A PLATE TOGETHER. A FLAT plate on a CURVED flank can be flush at its middle or at
+   its ends but not both, and which way that error runs decides whether the plate reads at all: a
+   plate seated on the flank's value under its own CENTRE has its ends buried, and a 0.57 m emblem
+   on a 1.9 m pod measured 12 cm inside the body — invisible. Proud is the safe direction (a badge
+   standing off a curve is what a badge does), so:
+     · shrink the plate until the flank falls away by no more than `tol` across its own footprint;
+     · seat it on the MAXIMUM of the flank over that footprint, plus a small lift.
+   It is then proud everywhere by between `lift` and `lift + tol`, and buried nowhere. Adaptive
+   rather than hand-tuned, so it stays right if the genome's plan or this module's stations move. */
+function fitPlate(geos, y0, z0, size, tol) {
+  let s = size;
+  for (let i = 0; i < 7; i++) {
+    let lo = Infinity, hi = 0;
+    for (let k = 0; k <= 6; k++) {
+      const v = flankX(geos, y0, z0 + (k / 6 - 0.5) * s);
+      if (v > 0) { if (v < lo) lo = v; if (v > hi) hi = v; }
+    }
+    if (!isFinite(lo)) break;
+    if (hi - lo <= tol) return { size: s, x: hi, drop: hi - lo };
+    s *= 0.82;
+  }
+  return { size: s, x: flankX(geos, y0, z0), drop: 0 };
+}
+
+/* ---------------------------------------------------------------- one hull, by role
+   Returns merged geometry per material bucket for ONE craft, in the craft's own frame:
+   origin at the body centre in X/Z, y = 0 at the flat base, +Z forward. The buckets are the
+   material roles this module actually owns, which is fewer than the genome's seven because two
+   pairs share a grade:  shell | cap | platinum (medallion rim + connection rings) |
+   crystal (medallion recess + the diamond glazing) | emblem | accent | underglow.        */
+const HULL_CACHE = new Map();
+function hullParts(spec) {
+  const hit = HULL_CACHE.get(spec.key);
+  if (hit) { hit.uses++; return hit.g; }
+
+  const w = spec.size, S = spec.stretch || 1;
+  const parts = foblockParts({ tier: 'standard', size: w, medallion: true, rings: true, diamond: true, energy: false });
+
+  /* the genome's real extents, MEASURED off what it returned rather than re-derived from its
+     private ratios — this stays true if those ratios are ever retuned */
+  const box = new THREE.Box3();
+  for (const g of parts.shell.concat(parts.cap)) { g.computeBoundingBox(); box.union(g.boundingBox); }
+  const hx = box.max.x, hy = box.max.y, hz = box.max.z;
+  const HZ = hz * S;                                   /* half LENGTH once stretched */
+
+  const stretch = new THREE.Matrix4().makeScale(1, 1, S);
+  const body = [];
+  for (const g of parts.shell) body.push(g.clone().applyMatrix4(stretch));
+  for (const g of parts.cap) body.push(g.clone().applyMatrix4(stretch));
+  /* LAW 1, on the TRANSFORMED triangles — and with a band that knows whether this craft holds
+     its attitude. A parked pod is only ever Y-rotated, which leaves |ny| untouched, so the
+     genome's own 0.62 is exact. A craft on the sky route BANKS up to 0.38 rad and pitches with
+     the curve, so a face that measures |ny| = 0.50 parked can measure 0.83 mid-turn: its band is
+     tightened to 0.24, which is cos(acos(0.62) + 26 degrees) and therefore guarantees that no
+     triangle in the mirror-grade bucket can become an up-facing mirror at any attitude the route
+     puts it in. MEASURED across the loop, this is what takes the exposed mirror area to zero. */
+  const split = splitByNormal(body, spec.capBand);
+
+  const platinum = [];
+  for (const g of parts.rim) platinum.push(g.clone().applyMatrix4(stretch));
+  /* THE CONNECTION RINGS ARE NOT STRETCHED. They are the identifying feature of the family and a
+     ring squashed to an ellipse stops being one; on an elongated body they sit at mid length and
+     read as lateral hover collars. */
+  for (const g of parts.ring) platinum.push(g.clone());
+
+  const crystal = [];
+  for (const g of parts.dark) crystal.push(g.clone().applyMatrix4(stretch));
+
+  const emblem = [];
+  for (const g of parts.diamond) emblem.push(g.clone().applyMatrix4(stretch));   /* the engraved nose mark */
+
+  /* THE FLANK EMBLEM, which is what the reference render leads with: a bright square diamond on
+     the side of the body. It stands clear of the connection ring in Z so the ring never hides it. */
+  const em = emblemGeometry();
+  const EMBLEM_Y = hy * 0.54, ACCENT_Y = hy * 0.26;
+  const TOL = w * 0.015;
+  const fitted = [];
+  const flankPlace = (sx, z, size, into, lift) => {
+    const f = fitPlate(body, EMBLEM_Y, z, size, TOL);
+    if (sx < 0) fitted.push({ z: +z.toFixed(3), size: +f.size.toFixed(3), proud: +(w * lift).toFixed(4), drop: +f.drop.toFixed(4) });
+    _q.setFromAxisAngle(UP, sx > 0 ? Math.PI / 2 : -Math.PI / 2);
+    _m.compose(_v.set(sx * (f.x + w * lift), EMBLEM_Y, z), _q, _s.set(f.size, f.size, f.size));
+    into.push(em.clone().applyMatrix4(_m));
+  };
+  for (const sx of [-1, 1]) {
+    flankPlace(sx, HZ * spec.emblemZ, w * spec.emblem, emblem, 0.005);
+    /* diamond glazing (§6B "diamond glazing", §6A "black crystalline glass"): panes of the same
+       figure in the dark crystal grade, forward of the emblem */
+    for (let i = 0; i < spec.panes; i++) {
+      const t = spec.panes === 1 ? 0 : i / (spec.panes - 1) - 0.5;
+      flankPlace(sx, HZ * (spec.paneZ + t * spec.paneSpan), w * spec.pane, crystal, 0.002);
+    }
+  }
+
+  /* THE ACCENT STRIPS, low on the body — thin bars let into the flank and standing a few
+     millimetres proud of it. A bar is straight and the flank is not, so it goes through the same
+     fitPlate() as the emblems, at half the tolerance: it is shortened until the side falls away by
+     under a centimetre along its whole length, and there is no gap under its ends.
+     The reference calls these amber; see the colour note in the module header. */
+  const accent = [];
+  const fitStrip = fitPlate(body, ACCENT_Y, 0, HZ * 0.86, TOL * 0.5);
+  for (const sx of [-1, 1]) {
+    _m.compose(_v.set(sx * (fitStrip.x + w * 0.006), ACCENT_Y, 0), _q.identity(), _s.set(w * 0.022, w * 0.030, fitStrip.size));
+    accent.push(barGeometry().clone().applyMatrix4(_m));
+  }
+
+  /* THE MAHGIC UNDERGLOW — the propulsion, and the only thing holding the craft off the ground.
+     One down-facing emissive plate under the flat base.
+     ITS SIZE IS THE BASE TABLE'S, MEASURED, NOT THE BODY'S. The fillet insets the table by a fifth
+     of the width on every side, so a plate scaled from the body's half-extents stands PROUD of the
+     base and glows past the craft's own silhouette — the first cut of this did exactly that and the
+     horizontal-face audit measured 31.4 m2 of emissive underside across nine craft against the v8
+     rhombus fleet's 4.9. At 0.62 of the table it sits inside the shadow of the body, which is where
+     an underglow belongs: what the viewer reads is the POOL it lays on the deck and its copy in the
+     mirror floor, not the strip itself. */
+  let bx = 0, bz = 0;
+  for (const g of parts.cap) {
+    const p = g.getAttribute('position');
+    for (let i = 0; i < p.count; i++) {
+      if (p.getY(i) > 1e-4) continue;
+      bx = Math.max(bx, Math.abs(p.getX(i)));
+      bz = Math.max(bz, Math.abs(p.getZ(i)));
+    }
+  }
+  const underglow = [];
+  _m.compose(_v.set(0, -w * 0.008, 0), _q.identity(), _s.set(bx * 2 * 0.62, 1, bz * S * 2 * 0.62));
+  underglow.push(underplateGeometry().clone().applyMatrix4(_m));
+
+  const g = {
+    shell: split.shell, cap: split.cap,
+    platinum: mergeParts(platinum), crystal: mergeParts(crystal),
+    emblem: mergeParts(emblem), accent: mergeParts(accent), underglow: mergeParts(underglow),
+    info: { width: w, halfW: hx, halfL: HZ, height: hy, footprint: Math.max(hx, HZ) }
+  };
+  /* the working copies have all been folded into the seven role buffers above */
+  for (const arr of [body, platinum, crystal, emblem, accent, underglow]) for (const gg of arr) gg.dispose();
+  /* the rings reach further sideways than the body does; the footprint has to know that */
+  const rb = new THREE.Box3();
+  for (const gg of parts.ring) { gg.computeBoundingBox(); rb.union(gg.boundingBox); }
+  g.info.footprint = Math.max(g.info.footprint, Math.abs(rb.min.x), Math.abs(rb.max.x));
+  g.info.triangles = ROLES.reduce((n, k) => n + triangles(g[k]), 0);
+  g.info.plates = fitted;
+  g.info.strip = { size: +fitStrip.size.toFixed(3), drop: +fitStrip.drop.toFixed(4) };
+  for (const k of Object.keys(parts)) for (const gg of parts[k]) gg.dispose();
+  HULL_CACHE.set(spec.key, { g, uses: 1 });
+  return g;
+}
+const ROLES = ['shell', 'cap', 'platinum', 'crystal', 'emblem', 'accent', 'underglow'];
+function releaseHull(key) {
+  const e = HULL_CACHE.get(key);
+  if (!e || --e.uses > 0) return;
+  for (const k of ROLES) e.g[k].dispose();
+  HULL_CACHE.delete(key);
+}
+
+/* The two specs the world actually builds. `emblem` / `pane` are NOMINAL sizes as a fraction of
+   the genome's width — fitPlate() shrinks any of them that will not lie on the flank. `*Z` are
+   stations along the half-length, POSITIVE FORWARD. They are chosen to keep every plate clear of
+   the two connection rings, which stand proud of the flank at mid length: on the pod the emblem
+   sits aft and the single dark pane forward, and on the shuttle the emblem rides forward with the
+   three glazing panes running aft of the rings, which is where a shuttle's cabin is anyway. */
+const POD_SPEC = Object.freeze({
+  key: 'pod', size: POD.size, stretch: 1, capBand: CAP_BAND,
+  emblem: 0.30, emblemZ: -0.27, pane: 0.30, paneZ: 0.31, paneSpan: 0, panes: 1
+});
+const SHUTTLE_SPEC = Object.freeze({
+  key: 'shuttle', size: SHUTTLE.size, stretch: SHUTTLE.stretch, capBand: CAP_BAND,
+  emblem: 0.26, emblemZ: 0.34, pane: 0.26, paneZ: -0.34, paneSpan: 0.42, panes: 3
+});
+/* the same shuttle, split at the tighter band because it is going to bank (see splitByNormal's
+   call site). Its own cache key, so the parked one keeps the crisper split. */
+const SHUTTLE_ROUTE_SPEC = Object.freeze(Object.assign({}, SHUTTLE_SPEC, { key: 'shuttle-route', capBand: 0.24 }));
+
+/* Material for each role. The two grades that matter are the LAW 1 pair:
+     shell -> podShell, a HIGH-metalness platinum, legal because every triangle in that bucket was
+              measured to be more vertical than horizontal, and on a black plaza under a night sky
+              a polished platinum reads as the dark chrome the reference render shows;
+     cap   -> podCap, the LOW-metalness platinum, which is the only grade an up-facing or
+              down-facing face may wear. */
+function hullMaterials(mats) {
+  return {
+    shell: mats.podShell, cap: mats.podCap, platinum: mats.platinum,
+    crystal: mats.glass, emblem: mats.leaf, accent: mats.seam, underglow: mats.underside
+  };
 }
 
 /* ------------------------------------------------------------- planters */
@@ -711,7 +1170,40 @@ function designTree(T, R, heightOverride) {
   const radius = t => r0 * (1 - 0.58 * t) * (t < 0.02 ? 1.16 : 1);   /* flared root collar at the foot */
 
   const trunk = [0, 0.36, 0.7, 1].map(t => ({ p: axis(t), r: radius(t) }));
-  trunk.push({ p: axis(1.10), r: 0 });                           /* the leader closes the tube inside the canopy */
+  /* v9: the leader ends on a facet inside the canopy, not on a point. It was r = 0 — a five-sided
+     needle standing in the crown — and the same appendTube runs the trunk, so the fix is one law. */
+  trunk.push({ p: axis(1.10), r: radius(1) * TIP_FACET });
+
+  /* THE CROWN, KNOWN BEFORE THE BRANCHES ARE CUT. Its centre and semi-axes do not depend on any
+     seeded draw made after this point, so computing them here seats the branch tips without
+     touching the random stream — every tree keeps the design its seed already gave it except for
+     the ~2% of branches that finished outside their own foliage. */
+  const centre = new THREE.Vector3(lx, cy, lz);
+  const seatA = canopyR * CROWN_ENVELOPE * BRANCH_SEAT, seatB = RY * CROWN_ENVELOPE * BRANCH_SEAT;
+  const seatA2 = seatA * seatA, seatB2 = seatB * seatB;
+  /* THE TWO LENGTHS AT WHICH A BRANCH CROSSES THE CROWN. E(base + L·u) = 1 is one quadratic,
+     a·L² + 2b·L + c = 1; its roots are L1, where the branch ENTERS the foliage, and L2, where it
+     would leave it again on the far side. Returns null when the trajectory misses the crown.
+
+     WHICH DIRECTION THE FIX ACTUALLY RUNS, because the first cut of this solve measured as an
+     exact no-op and the measurement is the only reason it was caught: the assumption was that an
+     exposed tip is a branch reaching too FAR, so clamping to L2 would fix it. It changed nothing —
+     every one of the seven offending tips came back byte-identical. They are the opposite case.
+     A tip on the lowest tier starts about 1.4 RY BELOW the crown centre on a large tree while the
+     foliage stops around 0.9 RY below it, and a short low-elevation limb simply never gets up into
+     the canopy: it ends in open air under the skirt, short of L1, not past L2. So the seat is the
+     INTERVAL and not the ceiling. */
+  const seatSpan = (base, u) => {
+    const qx = base.x - centre.x, qy = base.y - centre.y, qz = base.z - centre.z;
+    const a = (u.x * u.x + u.z * u.z) / seatA2 + (u.y * u.y) / seatB2;
+    const b = (qx * u.x + qz * u.z) / seatA2 + (qy * u.y) / seatB2;
+    const c = (qx * qx + qz * qz) / seatA2 + (qy * qy) / seatB2;
+    if (!(a > 1e-9)) return null;
+    const disc = b * b - a * (c - 1);
+    if (disc <= 0) return null;
+    const s = Math.sqrt(disc);
+    return [(-b - s) / a, (-b + s) / a];
+  };
 
   const tiers = irange(R, T.tiers[0], T.tiers[1]);
   const branches = [];
@@ -723,20 +1215,36 @@ function designTree(T, R, heightOverride) {
     for (let k = 0; k < count && branches.length < TREE_MAX_BRANCHES; k++) {
       const a = a0 + i * 2.39 + (k / count) * TAU + (R() - 0.5) * 0.6;
       const el = THREE.MathUtils.degToRad(30 + 28 * R());
-      const len = canopyR * (0.46 + 0.34 * R());
+      let len = canopyR * (0.46 + 0.34 * R());
       const dir = new THREE.Vector3(Math.cos(a) * Math.cos(el), Math.sin(el), Math.sin(a) * Math.cos(el));
-      /* three nodes so a branch SWEEPS — rises off the trunk, then levels out under
-         the canopy — and ends at radius 0, which closes the tube with no cap */
+      /* SEAT THE TIP. The tip travels along dir + 0.10 UP, so that combined direction is what the
+         quadratic is solved for; the branch is shortened only when it would finish outside the
+         crown, and never lengthened. This is the wood half of v8's plate-seating solve. */
+      /* SEAT THE TIP UNDER THE FOLIAGE. Keep the seeded length where it already lands inside the
+         crown; otherwise move it to just past L1 (a tip a tenth of the chord inside the shell,
+         so it is genuinely under leaves rather than balanced on the surface) or back to L2. The
+         move is bounded both ways — BRANCH_FLOOR of the seeded length at the short end,
+         BRANCH_REACH at the long end — so a seed keeps the tree it was given. */
+      const span = seatSpan(base, _v.copy(dir).addScaledVector(UP, 0.10));
+      if (span) {
+        const lo = Math.max(span[0], 0), hi = span[1];
+        if (hi > lo) {
+          const want = Math.min(Math.max(len, lo + (hi - lo) * 0.10), hi);
+          len = Math.min(Math.max(want, len * BRANCH_FLOOR), len * BRANCH_REACH);
+        }
+      }
+      /* three nodes so a branch SWEEPS — rises off the trunk, then levels out under the canopy —
+         and ends on a small FLAT FACET (v9, §06): TIP_FACET of the radius it started from, capped
+         by appendTube, where it used to run to zero and close as a needle */
       branches.push([
         { p: base.clone().addScaledVector(dir, -br * 0.5), r: br * 0.62 },   /* start inside the trunk */
         { p: base.clone().addScaledVector(dir, len * 0.55).addScaledVector(UP, len * 0.12), r: br * 0.34 },
-        { p: base.clone().addScaledVector(dir, len).addScaledVector(UP, len * 0.10), r: 0 }
+        { p: base.clone().addScaledVector(dir, len).addScaledVector(UP, len * 0.10), r: br * 0.62 * TIP_FACET }
       ]);
     }
   }
 
   /* canopy plates on an oblate shell, distributed crown → skirt by the golden angle */
-  const centre = new THREE.Vector3(lx, cy, lz);
   const nPlate = irange(R, T.plates[0], T.plates[1]);
   const spin = R() * TAU;
   const plates = [];
@@ -797,9 +1305,9 @@ const TREE_CORE_LOCAL = new THREE.Matrix4().compose(new THREE.Vector3(0, 0.33, 0
 
 function buildTree(D) {
   const wood = sink(false), canopy = sink(true), accent = sink(false);
-  appendTube(wood, D.trunk, TREE_TRUNK_SIDES, 0.3);
-  for (const b of D.branches) appendTube(wood, b, TREE_BRANCH_SIDES, 0.6);
-  appendTube(accent, D.seam, TREE_SEAM_SIDES, 0);
+  appendTube(wood, D.trunk, TREE_TRUNK_SIDES, 0.3, 2);          /* the leader's facet; the foot is in the deck */
+  for (const b of D.branches) appendTube(wood, b, TREE_BRANCH_SIDES, 0.6, 2);   /* the blunt tip (v9) */
+  appendTube(accent, D.seam, TREE_SEAM_SIDES, 0, 3);            /* the seam was open at both ends */
 
   /* BAKED LIGHT. k rises with how far a facet faces the sky and with how high it
      sits in the canopy, so the crown is lit, the skirt is halved and every
@@ -950,78 +1458,235 @@ export function createGrove(opts) {
 }
 
 /* ------------------------------------------------------------- vehicles */
-function strip(a, b, w, t, material, outwardHint) {
-  /* thin emissive bar from a to b, standing t/2 + a hair off the surface along outwardHint */
-  const dir = _v.subVectors(b, a); const len = dir.length();
-  const nrm = _v2.crossVectors(new THREE.Vector3(1, 0, 0), dir).normalize();
-  if (nrm.dot(outwardHint) < 0) nrm.negate();
-  const mesh = new THREE.Mesh(vehicleGeometry().bar, material);
-  mesh.scale.set(w, t, len);
-  mesh.position.copy(a).add(b).multiplyScalar(0.5).addScaledVector(nrm, t / 2 + 0.002);
-  _m.lookAt(a, b, nrm);
-  mesh.quaternion.setFromRotationMatrix(_m);
-  return mesh;
+
+/* One craft, as seven meshes sharing one cached hull. `origin` decides where y = 0 is: a craft
+   built for a route is centred on its own body so the curve can carry it, while one parked on the
+   deck stands on its base. Both are the same geometry. */
+function craftGroup(spec, mats, name) {
+  const G = hullParts(spec);
+  const M = hullMaterials(mats);
+  const group = new THREE.Group();
+  group.name = name;
+  let tris = 0;
+  for (const k of ROLES) {
+    const t = triangles(G[k]);
+    if (!t) continue;
+    const mesh = new THREE.Mesh(G[k], M[k]);
+    mesh.name = name + '-' + k;
+    if (k === 'shell' || k === 'cap' || k === 'platinum') { mesh.castShadow = true; mesh.receiveShadow = true; }
+    group.add(mesh);
+    tris += t;
+  }
+  group.userData = { hullKey: spec.key, triangles: tris, info: G.info };
+  return group;
 }
 
-/* createVehicle({ theme, seed, length }) → Group with origin at body centre,
-   +Z forward; userData { setTime(state), triangles, length } */
+/* createVehicle({ theme, seed, length }) → the §6B SHUTTLE: the genome elongated along its depth
+   axis, origin at the body centre, +Z forward. `length` is honoured as the craft's overall LENGTH
+   in metres (the v8 signature took the same argument and meant the same thing), applied as a
+   uniform scale on the shared hull so every craft on a route is still one geometry.
+   userData { setTime(state), triangles, length } */
 export function createVehicle(opts) {
   const o = opts || {};
   const mats = themeMaterials(o.theme);
   const R = rng(o.seed == null ? 'vehicle' : o.seed);
-  const G = vehicleGeometry();
-  const L = Number.isFinite(o.length) ? Math.min(6, Math.max(3, o.length)) : lerp(3.4, 5.6, R());
-  const wVar = lerp(0.92, 1.08, R()), hVar = lerp(0.92, 1.10, R());
-  const cabinScale = lerp(0.32, 0.40, R()), cabinZ = lerp(0.04, 0.09, R());
-
   const group = new THREE.Group();
-  group.name = 'vehicle';
-  const body = new THREE.Group();
-  body.name = 'body';
-  body.scale.set(L * wVar, L * hVar, L);
+  group.name = 'shuttle';
+  const body = craftGroup(SHUTTLE_ROUTE_SPEC, mats, 'shuttle');
+  const natural = body.userData.info.halfL * 2;
+  const L = Number.isFinite(o.length) ? Math.min(9, Math.max(3, o.length)) : lerp(4.4, 6.2, R());
+  const k = L / natural;
+  body.scale.setScalar(k);
+  body.position.y = -body.userData.info.height * 0.5 * k;   /* the route carries it by its middle */
   group.add(body);
-  let tris = 0;
-  const add = (mesh, name) => { mesh.name = name; body.add(mesh); tris += triangles(mesh.geometry); return mesh; };
-
-  const hullMats = [mats.shell, mats.platinum, mats.glass];
-  const hull = add(new THREE.Mesh(G.hull, hullMats), 'hull');
-  hull.castShadow = true;
-  const cabin = add(new THREE.Mesh(G.cabin, hullMats), 'cabin');
-  cabin.scale.set(cabinScale * 0.9, 0.9, cabinScale * 1.3);   /* long, low canopy sitting forward on the deck */
-  cabin.position.set(0, DECK_Y + 0.05 * 0.9 - 0.006, cabinZ);
-
-  add(new THREE.Mesh(G.beltSeam, mats.seam), 'belt-seam');
-  add(new THREE.Mesh(G.underPlate, mats.underside), 'underside');
-
-  /* nose seam: two short bars down the prow flat, deck edge → belt */
-  const deckNose = new THREE.Vector3(0, DECK_Y, 0.5 * 0.5 + 0.05);
-  const bevelNose = new THREE.Vector3(0, BEVEL_Y, 0.5 * 0.88 + 0.01);
-  const beltNose = new THREE.Vector3(0, 0, 0.5);
-  const out = new THREE.Vector3(0, 0.4, 1);
-  add(strip(deckNose, bevelNose, 0.014, 0.008, mats.seam, out), 'nose-seam-upper');
-  add(strip(bevelNose, beltNose, 0.014, 0.008, mats.seam, out), 'nose-seam-lower');
-
-  /* prow light: a small bright square-diamond at the very nose */
-  const prow = add(new THREE.Mesh(leafGeometry(), mats.stem), 'prow-light');
-  prow.quaternion.setFromUnitVectors(UP, new THREE.Vector3(0, 0, 1));
-  prow.position.set(0, 0, 0.478);
-  prow.scale.set(0.075, 0.09, 0.14);   /* width, length (along +Z), thickness */
-
-  /* tail bar: a wide seam across the blunt stern */
-  const tail = add(new THREE.Mesh(G.bar, mats.seam), 'tail-bar');
-  tail.scale.set(0.17, 0.014, 0.012);
-  tail.position.set(0, 0, -0.504);
-
   group.userData = {
-    kind: 'vehicle', length: L, theme: mats.theme.name, triangles: tris,
-    setTime(state) { return mats.setTime(state); }
+    kind: 'vehicle', length: L, theme: mats.theme.name, triangles: body.userData.triangles,
+    hullKey: SHUTTLE_ROUTE_SPEC.key,
+    setTime(state) { return mats.setTime(state); },
+    dispose() { releaseHull(SHUTTLE_ROUTE_SPEC.key); }
   };
   return group;
 }
 
-/* createVehicleRoute(points, { theme, count (3..5), speed (m/s, default 9), seeds, length, bank })
+/* ------------------------------------------------- the plaza's parked transport (module contract)
+   THE PODS ARE INSTANCED, and that is what makes an idle bob affordable. Merging five pods by role
+   would give the same seven draw calls but ONE transform, so every pod would bob in unison, which
+   is worse than not bobbing at all. One InstancedMesh per role and one instance per pod costs the
+   same seven draw calls and gives every craft its own hover.  */
+
+/* Bearing convention shared with fobstations.js and sky-layout.js: dir(b) = (sin b, 0, -cos b),
+   so a Y-rotation that points a craft's local +Z along bearing f is ry = PI - f. */
+const yawFor = deg => Math.PI - deg * Math.PI / 180;
+
+/* WHERE THEY PARK. The reference shows pods "in ones and twos, parked and idling, not in traffic",
+   so these are two pairs and a single, on the aprons rather than the polished centre. The bearings
+   dodge everything that is already spoken for: the three facility approaches run out along -z, -x
+   and +x, fobstations.js holds the four diagonals at r = 33 and the music diamonds at r ~ 40, and
+   the two market residents stand at (24, -14) and (25.8, -12.2). Every candidate is still TESTED
+   against ctx.colliders and ctx.planterSpots before it is built, and a rejected one is counted in
+   stats.skipped rather than dropped silently. */
+const POD_SPOTS = [
+  { x:  16.0, z: -18.0, face: 118 },
+  { x:  19.5, z: -20.0, face: 104 },
+  { x: -16.0, z: -18.0, face: 242 },
+  { x: -19.5, z: -20.0, face: 256 },
+  { x: -13.0, z:  28.5, face: 196 }
+];
+/* one §6B shuttle stands with them, so the apron reads as transport rather than as furniture */
+const SHUTTLE_SPOT = { x: 30.0, z: -20.5, face: 96 };
+const DECK_Y = 0.17;          /* ground.js FLOOR_TOP — anything on the plaza stands here */
+
+/* buildFobPods(ctx) → the module contract { group, stats, setTime, setTheme, update, setQuality,
+   dispose }. ctx carries THREE, scene, M, theme, colliders, lightPool, planterSpots, reflect. */
+export function buildFobPods(ctx) {
+  const c = ctx || {};
+  const mats = themeMaterials(c.theme);
+  const group = new THREE.Group();
+  group.name = 'fobpods';
+  const stats = { pods: 0, shuttles: 0, skipped: [], pools: 0, poolsDropped: 0, draws: 0, triangles: 0 };
+
+  /* collider boxes, computed once — the same test fobstations.js runs, for the same reason: a
+     craft that silently intersects a bench only shows up in a render three rounds later. */
+  const boxes = (c.colliders || []).map(o => { o.updateMatrixWorld(true); return new THREE.Box3().setFromObject(o); });
+  const planted = c.planterSpots || [];
+  const clear = (x, z, r, h) => {
+    const b = new THREE.Box3(new THREE.Vector3(x - r, DECK_Y - 0.3, z - r), new THREE.Vector3(x + r, DECK_Y + h, z + r));
+    for (const o of boxes) if (o.intersectsBox(b)) return false;
+    /* planting is not a collider — ground.js hands its spots over instead, and a large tree's
+       canopy is 3.5 m of radius that a parked craft must not stand inside */
+    for (const s of planted) {
+      const keep = r + (s.kind === 'tree' ? 3.6 : 1.1);
+      if ((s.x - x) * (s.x - x) + (s.z - z) * (s.z - z) < keep * keep) return false;
+    }
+    return true;
+  };
+
+  /* ---- the pods, one InstancedMesh per role --------------------------------------------------
+     REFERENCE COUNTING, spelled out because getting it wrong leaks a buffer per teardown and
+     nothing complains: hullParts() takes a reference every time it is called and craftGroup()
+     calls it too, so `refs` tallies what this builder actually took and dispose() gives back
+     exactly that many. */
+  const refs = [];
+  const podG = hullParts(POD_SPEC); refs.push(POD_SPEC.key);
+  const podR = podG.info.footprint + 0.25;
+  stats.footprint = +podR.toFixed(3);
+  const placed = [];
+  for (const sp of POD_SPOTS) {
+    if (!clear(sp.x, sp.z, podR, podG.info.height + POD.hover + 0.4)) { stats.skipped.push('pod@' + sp.x + ',' + sp.z); continue; }
+    placed.push(sp);
+  }
+  const podMeshes = [];
+  const podMat = hullMaterials(mats);
+  if (placed.length) {
+    for (const k of ROLES) {
+      if (!triangles(podG[k])) continue;
+      const im = new THREE.InstancedMesh(podG[k], podMat[k], placed.length);
+      im.name = 'fobpod-' + k;
+      if (k === 'shell' || k === 'cap' || k === 'platinum') { im.castShadow = true; im.receiveShadow = true; }
+      im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      group.add(im);
+      podMeshes.push(im);
+      /* NOT ctx.reflect(). The assembly's mirrored-copy helper clones one plain Mesh from
+         mesh.geometry at mesh.matrixWorld, which for an InstancedMesh is ONE pod at the group's
+         own origin rather than five at their spots — a phantom on the deck. The pods are carried
+         by the plaza's real planar mirror pass instead, which sees the scene as it is. */
+    }
+    placed.forEach((sp, i) => {
+      _q.setFromAxisAngle(UP, yawFor(sp.face));
+      _v.set(sp.x, DECK_Y + POD.hover, sp.z);
+      _m.compose(_v, _q, _s.setScalar(1));
+      for (const im of podMeshes) im.setMatrixAt(i, _m);
+      /* LAW 2: the underglow and the accent strips are answered on the deck they float over. The
+         pool is themed (hue null), so ground.js's own time hook carries it with the world Theme
+         and the hour, exactly like the seat seams and the monument. */
+      if (c.lightPool) {
+        if (c.lightPool({ x: sp.x, z: sp.z, rx: 6.2, rz: 6.2, k: 0.30 })) stats.pools++;
+        else stats.poolsDropped++;
+      }
+      stats.pods++;
+    });
+    for (const im of podMeshes) { im.instanceMatrix.needsUpdate = true; im.computeBoundingSphere(); }
+  }
+
+  /* ---- one parked shuttle -------------------------------------------------------------------- */
+  let parked = null;
+  const sh = SHUTTLE_SPOT;
+  const shG = hullParts(SHUTTLE_SPEC); refs.push(SHUTTLE_SPEC.key);
+  if (clear(sh.x, sh.z, shG.info.footprint + Math.max(0, shG.info.halfL - shG.info.footprint) * 0.5 + 0.3, shG.info.height + SHUTTLE.hover + 0.4)) {
+    parked = craftGroup(SHUTTLE_SPEC, mats, 'fobshuttle'); refs.push(SHUTTLE_SPEC.key);
+    parked.position.set(sh.x, DECK_Y + SHUTTLE.hover, sh.z);
+    parked.rotation.y = yawFor(sh.face);
+    group.add(parked);
+    if (c.lightPool) {
+      if (c.lightPool({ x: sh.x, z: sh.z, rx: 8.4, rz: 8.4, rot: parked.rotation.y, k: 0.30 })) stats.pools++;
+      else stats.poolsDropped++;
+    }
+    if (c.reflect) { parked.traverse(o => { if (o.isMesh && !/-cap$/.test(o.name)) { try { c.reflect(o); } catch (e) {} } }); }
+    stats.shuttles++;
+  } else {
+    stats.skipped.push('shuttle@' + sh.x + ',' + sh.z);
+  }
+
+  /* ---- measure, honestly (a count is not a geometry) ----------------------------------------- */
+  group.traverse(o => {
+    if (!o.isMesh) return;
+    stats.draws++;
+    const g = o.geometry, idx = g.getIndex();
+    stats.triangles += ((idx ? idx.count : g.getAttribute('position').count) / 3) * (o.isInstancedMesh ? o.count : 1);
+  });
+  if (c.scene) c.scene.add(group);
+
+  const phase = placed.map((sp, i) => (i * GOLDEN) % TAU);
+  const shPhase = 1.7;
+  let disposed = false;
+  return {
+    group, stats,
+    setTime(clockState) { return mats.setTime(clockState); },
+    setTheme(theme) { return mats.setTheme(theme); },
+    /* THE IDLE. A parked pod is not still: it hangs on its underglow and breathes. One sine per
+       craft, no allocation, and the amplitude is small enough (3.8 cm) that it reads as hover
+       rather than as bouncing. */
+    update(t) {
+      const tt = Number.isFinite(t) ? t : 0;
+      if (podMeshes.length) {
+        placed.forEach((sp, i) => {
+          _q.setFromAxisAngle(UP, yawFor(sp.face));
+          _v.set(sp.x, DECK_Y + POD.hover + Math.sin(tt * POD.rate + phase[i]) * POD.bob, sp.z);
+          _m.compose(_v, _q, _s.setScalar(1));
+          for (const im of podMeshes) im.setMatrixAt(i, _m);
+        });
+        for (const im of podMeshes) im.instanceMatrix.needsUpdate = true;
+      }
+      if (parked) parked.position.y = DECK_Y + SHUTTLE.hover + Math.sin(tt * SHUTTLE.rate + shPhase) * SHUTTLE.bob;
+    },
+    /* LOD: on a low tier the lateral rings, the flank emblems and the accent strips go — the
+       rounded block, its caps, its glazing and its underglow are what carry the read at distance. */
+    setQuality(q) {
+      const low = q && (q.name === 'low' || q === 'low');
+      group.traverse(o => { if (o.isMesh && /-(platinum|emblem|accent)$/.test(o.name)) o.visible = !low; });
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      for (const k of refs) releaseHull(k);
+      if (group.parent) group.parent.remove(group);
+    }
+  };
+}
+
+/* createVehicleRoute(points, { theme, count (3..5), speed (m/s, default 9), seeds, length, bank,
+                                lightPool })
    points: closed CatmullRom loop in the sky (THREE.Vector3[] or {x,y,z}[])
-   → { group, curve, vehicles, update(tSeconds), setTime(state), triangles } */
+   → { group, curve, vehicles, update(tSeconds), setTime(state), setTheme(theme), dispose(),
+       triangles }
+
+   LAW 2 AND THE SKY ROUTE, stated plainly rather than glossed. A craft on this loop carries the
+   SAME emitter set the v8 rhombus carried — an underglow plate and the accent strips, no more —
+   and it flies 14-24 m over the district, where this module has no surface of its own to answer
+   on. `lightPool` is the hook for an assembly that does: pass ground.js's ctx.lightPool and each
+   waypoint the route passes low over gets a pool laid under it. When it is absent nothing new is
+   emitted that was not already there, but the debt is real and it is the assembly's to settle —
+   one line in the caller (`lightPool: ctx.lightPool`). */
 export function createVehicleRoute(points, opts) {
   const o = opts || {};
   const mats = themeMaterials(o.theme);
@@ -1048,6 +1713,23 @@ export function createVehicleRoute(points, opts) {
     vehicles.push(v); group.add(v); tris += v.userData.triangles;
   }
 
+  /* LAW 2, where the caller has given this route somewhere to answer on. A craft is only worth a
+     pool where it passes LOW — the loop climbs to 24 m over the district and a pool under that is
+     a stain, not an answer — so the sample walks the curve and lays one under each waypoint that
+     sits within POOL_CEILING of the ground. Themed, so ground.js's clock hook carries it. */
+  let pools = 0;
+  if (typeof o.lightPool === 'function') {
+    const POOL_CEILING = 20;
+    const probe = new THREE.Vector3();
+    const n = Math.max(4, Math.min(10, pts.length));
+    for (let i = 0; i < n; i++) {
+      curve.getPointAt(i / n, probe);
+      if (probe.y > POOL_CEILING) continue;
+      const rr = 4 + probe.y * 0.55;
+      if (o.lightPool({ x: probe.x, z: probe.z, rx: rr, rz: rr, k: 0.16 })) pools++;
+    }
+  }
+
   const up = new THREE.Vector3(0, 1, 0);
   const pos = new THREE.Vector3(), tan = new THREE.Vector3(), tan2 = new THREE.Vector3(), left = new THREE.Vector3(), look = new THREE.Vector3();
   function update(tSeconds) {
@@ -1070,11 +1752,26 @@ export function createVehicleRoute(points, opts) {
   }
   update(0);
 
+  let released = false;
   return {
-    group, curve, vehicles, length, speed, count,
+    group, curve, vehicles, length, speed, count, pools,
     update,
     setTime(state) { return mats.setTime(state); },
     setTheme(theme) { return mats.setTheme(theme); },
+    /* the same LOD the parked craft use: at 60-137 m the rings, the flank emblems and the accent
+       strips are sub-pixel detail on a phone, and they are 45% of a craft's triangles */
+    setQuality(q) {
+      const low = q && (q.name === 'low' || q === 'low');
+      group.traverse(o => { if (o.isMesh && /-(platinum|emblem|accent)$/.test(o.name)) o.visible = !low; });
+    },
+    /* the craft share ONE cached hull through hullParts(); this gives back their references so a
+       torn-down route frees the buffers instead of leaking them (v8 had no dispose at all) */
+    dispose() {
+      if (released) return;
+      released = true;
+      for (const v of vehicles) { if (v.userData && v.userData.dispose) v.userData.dispose(); }
+      if (group.parent) group.parent.remove(group);
+    },
     triangles: tris
   };
 }
