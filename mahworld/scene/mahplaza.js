@@ -119,6 +119,10 @@ export async function createMahplaza(canvas, options = {}) {
      for reflection — the monument, the inlaid marks, the ring, the furniture, the residents — stands
      on it. */
   const reflections = new THREE.Group(); reflections.scale.y = -1; reflections.position.y = 2 * 0.17; scene.add(reflections);
+  /* declared here, assigned far below once the scene graph exists. It has to be declared BEFORE
+     resize() is first called: `typeof x` does NOT protect a let/const in its temporal dead zone the
+     way it protects an undeclared name, so the guard inside resize() threw rather than skipping. */
+  let mirror = null;
   const mirrorQueue = [], themedReflections = [];
   const reflect = (mesh, dim = 0.4) => { mirrorQueue.push([mesh, dim]); return mesh; };
   function buildReflections() {
@@ -603,6 +607,7 @@ export async function createMahplaza(canvas, options = {}) {
   function resize() {
     const w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h;
+    if (mirror) mirror.resize();
     const wasPortrait = portrait; portrait = camera.aspect < 0.8;
     state.fovBias = camera.aspect < 0.8 ? 14 : camera.aspect < 1.1 ? 7 : 0;
     if (wasPortrait !== portrait && !anim) applyView(state.view);
@@ -635,9 +640,159 @@ export async function createMahplaza(canvas, options = {}) {
   function advance(seconds, stepSeconds = 1 / 30) {
     const n = Math.max(1, Math.round(seconds / stepSeconds));
     for (let i = 0; i < n; i++) { advanceClock += stepSeconds; stepWorld(advanceClock, stepSeconds, advanceClock * 1000); }
-    applyTime(false); placeCamera(0); renderer.render(scene, camera); state.frames++;
+    applyTime(false); placeCamera(0);
+    if (mirror) mirror.render(true);   /* a capture screenshots straight after this: never reuse */
+    renderer.render(scene, camera); state.frames++;
     return { advancedSeconds: n * stepSeconds, steps: n, worldTime: advanceClock };
   }
+  /* ============================ THE FLOOR IS A MIRROR ============================================
+     "Extremely much more reflective, almost so that it's like a mirror to the rest of the city."
+
+     Roughness alone could never do this, and it is worth being precise about why. A metal's
+     roughness controls how sharply it returns the ENVIRONMENT MAP, and the environment map here is a
+     128x64 equirect of sky and a ring of window bars. It contains no buildings, no residents, no
+     signage — so no matter how polished the floor became, the city was never in it. The old
+     mirrored-copy trick reflected only the handful of emissive meshes explicitly registered with
+     ctx.reflect(); everything else in MAHWORLD simply had no reflection at all.
+
+     A real mirror needs a real second view. This renders the whole scene from a camera reflected
+     through the plaza plane into an offscreen target, and feeds that texture back into M.plaza
+     projected in screen space — the classic planar reflection, hand-rolled because Reflector is a
+     three addon and this project vendors only the core.
+
+     THREE THINGS THAT MAKE IT CORRECT RATHER THAN JUST SHINY:
+       - the mirror plane is the DECK TOP (FLOOR_TOP = 0.17), the same plane the old mirrored copies
+         were finally corrected to; a reflection that does not meet its object at the contact line is
+         the first thing an eye notices on a mirror
+       - an OBLIQUE NEAR PLANE clips the reflected camera exactly at the mirror, so nothing below the
+         floor leaks into the image and no separate clipping pass is needed
+       - the blend is FRESNEL-WEIGHTED: weak looking straight down, near-total at grazing angles,
+         which is why a wet street mirrors the far city but not your own feet
+     The old mirrored-copy group is switched OFF wherever this runs — two reflection systems on one
+     plane would double every light — and stays as the low tier's fallback. */
+  const MIRROR_Y = 0.17;
+  mirror = (() => {
+    if (!quality.reflections) return null;
+    const size = new THREE.Vector2();
+    renderer.getSize(size);
+    const rt = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, type: THREE.HalfFloatType, depthBuffer: true });
+    rt.texture.name = 'plaza-mirror';
+    const cam = new THREE.PerspectiveCamera();
+    const texMatrix = new THREE.Matrix4();
+    const normal = new THREE.Vector3(0, 1, 0);
+    const mirrorPos = new THREE.Vector3(0, MIRROR_Y, 0);
+    const view = new THREE.Vector3(), target = new THREE.Vector3(), up = new THREE.Vector3(), look = new THREE.Vector3();
+    const rot = new THREE.Matrix4(), plane = new THREE.Plane(), q = new THREE.Vector4(), cp = new THREE.Vector4();
+    let strength = { value: 0.9 }, hidden = [];
+    /* A REFLECTION ONLY CHANGES WHEN THE VIEW DOES. The city behind it is static; the mirror pass is
+       a second full scene render, so redrawing it every frame doubles the whole cost to show an
+       identical image. It is redrawn when the camera has actually moved, and forced whenever
+       something else needs it fresh. That is what keeps a mirror affordable on a phone, and it is
+       why a capture — which moves the camera, then screenshots — still gets a correct frame. */
+    const lastPos = new THREE.Vector3(NaN, NaN, NaN), lastQuat = new THREE.Quaternion(0, 0, 0, 0);
+    let dirty = true;
+    return {
+      rt, texMatrix, strength,
+      /* every mesh that must not appear in its own reflection: the floor itself, and the legacy
+         mirrored copies. Collected once, after the graph exists. */
+      collect() {
+        hidden.length = 0;
+        scene.traverse(o => {
+          if (!o.isMesh) return;
+          const m = o.material;
+          const mats = Array.isArray(m) ? m : [m];
+          if (mats.some(x => x === M.plaza || x === M.road)) hidden.push(o);
+        });
+        hidden.push(reflections);
+      },
+      resize() {
+        dirty = true;
+        renderer.getSize(size);
+        /* half resolution: a reflection is read through a rough-ish, fresnel-weighted blend and at
+           grazing angles, where the eye cannot resolve what full resolution would buy */
+        rt.setSize(Math.max(2, Math.floor(size.x * 0.5)), Math.max(2, Math.floor(size.y * 0.5)));
+      },
+      invalidate() { dirty = true; },
+      render(force) {
+        if (!force && !dirty
+          && camera.position.distanceToSquared(lastPos) < 1e-8
+          && Math.abs(camera.quaternion.dot(lastQuat)) > 0.9999999) return;
+        dirty = false;
+        lastPos.copy(camera.position); lastQuat.copy(camera.quaternion);
+        mirrorPos.set(0, MIRROR_Y, 0);
+        normal.set(0, 1, 0);
+        view.subVectors(mirrorPos, camera.position);
+        view.reflect(normal).negate().add(mirrorPos);
+        rot.extractRotation(camera.matrixWorld);
+        look.set(0, 0, -1).applyMatrix4(rot);
+        target.copy(camera.position).add(look);
+        look.subVectors(mirrorPos, target).reflect(normal).negate().add(mirrorPos);
+        cam.position.copy(view);
+        up.set(0, 1, 0).applyMatrix4(rot).reflect(normal).negate();
+        cam.up.copy(up);
+        cam.lookAt(look);
+        cam.near = camera.near; cam.far = camera.far; cam.fov = camera.fov; cam.aspect = camera.aspect;
+        cam.updateMatrixWorld(); cam.updateProjectionMatrix();
+
+        /* project world space into this target's UVs: bias * projection * view */
+        texMatrix.set(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
+        texMatrix.multiply(cam.projectionMatrix).multiply(cam.matrixWorldInverse);
+
+        /* OBLIQUE NEAR PLANE — clip the reflected view exactly at the mirror so the world below the
+           floor can never leak into it. Cheaper and tighter than a clipping plane, and it is what
+           stops the underside of the deck appearing in its own surface. */
+        plane.setFromNormalAndCoplanarPoint(normal, mirrorPos).applyMatrix4(cam.matrixWorldInverse);
+        q.set(plane.normal.x, plane.normal.y, plane.normal.z, plane.constant);
+        const p = cam.projectionMatrix;
+        cp.set((Math.sign(q.x) + p.elements[8]) / p.elements[0], (Math.sign(q.y) + p.elements[9]) / p.elements[5], -1, (1 + p.elements[10]) / p.elements[14]);
+        q.multiplyScalar(2 / q.dot(cp));
+        p.elements[2] = q.x; p.elements[6] = q.y; p.elements[10] = q.z + 1 - 0.0000001; p.elements[14] = q.w;
+
+        const wasVis = hidden.map(o => o.visible);
+        hidden.forEach(o => { o.visible = false; });
+        const prevTarget = renderer.getRenderTarget();
+        const prevShadow = renderer.shadowMap.autoUpdate;
+        renderer.shadowMap.autoUpdate = false;         /* the shadow maps from the main pass are reused */
+        renderer.setRenderTarget(rt);
+        renderer.clear();
+        renderer.render(scene, cam);
+        renderer.setRenderTarget(prevTarget);
+        renderer.shadowMap.autoUpdate = prevShadow;
+        hidden.forEach((o, i) => { o.visible = wasVis[i]; });
+      },
+      dispose() { rt.dispose(); }
+    };
+  })();
+
+  if (mirror) {
+    mirror.resize();
+    mirror.collect();
+    reflections.visible = false;   /* the planar pass supersedes the mirrored copies */
+    /* Patch the floor's shader rather than replacing the material: M.plaza keeps its diamond
+       roughness and bump maps, its metalness and its place in the palette, and gains one projected
+       sample on top. */
+    M.plaza.onBeforeCompile = (shader) => {
+      shader.uniforms.tPlazaMirror = { value: mirror.rt.texture };
+      shader.uniforms.uMirrorMatrix = { value: mirror.texMatrix };
+      shader.uniforms.uMirrorStrength = mirror.strength;
+      shader.vertexShader = 'uniform mat4 uMirrorMatrix;\nvarying vec4 vMirrorCoord;\n' + shader.vertexShader
+        .replace('#include <project_vertex>', '#include <project_vertex>\n  vMirrorCoord = uMirrorMatrix * ( modelMatrix * vec4( transformed, 1.0 ) );');
+      shader.fragmentShader = 'uniform sampler2D tPlazaMirror;\nuniform float uMirrorStrength;\nvarying vec4 vMirrorCoord;\n' + shader.fragmentShader
+        .replace('#include <opaque_fragment>', `
+        {
+          vec3 mrefl = texture2DProj( tPlazaMirror, vMirrorCoord ).rgb;
+          /* FRESNEL. A mirror floor returns almost everything at a grazing angle and very little
+             looking straight down at your feet — that asymmetry is most of what reads as "wet
+             polished stone" rather than "a picture pasted on the ground". */
+          float ndv = clamp( dot( normalize( vViewPosition ), normal ), 0.0, 1.0 );
+          float fres = pow( 1.0 - ndv, 2.6 );
+          outgoingLight = mix( outgoingLight, mrefl, uMirrorStrength * ( 0.16 + 0.84 * fres ) );
+        }
+        #include <opaque_fragment>`);
+    };
+    M.plaza.needsUpdate = true;
+  }
+
   function frame(now) {
     raf = 0;
     if (advanceClock < now / 1000) advanceClock = now / 1000;
@@ -646,7 +801,9 @@ export async function createMahplaza(canvas, options = {}) {
     if (anim) { const k = Math.min(1, (now - anim.t0) / anim.dur), e = ease(k); cur.pos.lerpVectors(from.pos, new THREE.Vector3(...anim.to.pos), e); cur.look.lerpVectors(from.look, new THREE.Vector3(...anim.to.look), e); cur.fov = from.fov + (anim.to.fov - from.fov) * e; if (k >= 1) { const r = anim.resolve; anim = null; r(true); } }
     if (!state.reduced || ctx.updateHooks.length) stepWorld(now / 1000, dt, now);
     placeCamera(dt);
-    const t0 = performance.now(); renderer.render(scene, camera);
+    const t0 = performance.now();
+    if (mirror) mirror.render();     /* the reflected view first: the floor samples it this frame */
+    renderer.render(scene, camera);
     state.ms = state.ms * 0.9 + (performance.now() - t0) * 0.1; state.frames++;
     if (opts.hud) opts.hud(state);
     const settling = Math.abs(smooth.yaw - state.yaw) + Math.abs(smooth.pitch - state.pitch) + Math.abs(smooth.dolly - state.dolly) > 0.002;
@@ -677,7 +834,7 @@ export async function createMahplaza(canvas, options = {}) {
   const _w = new THREE.Vector3();
   function projectResident(r) { r.getWorldPosition(_w); _w.y += (r.userData.height || 1.9) * 0.62; _w.project(camera); const w = canvas.clientWidth, h = canvas.clientHeight; return { x: (_w.x + 1) / 2 * w, y: (1 - _w.y) / 2 * h, inFront: _w.z < 1 && Math.abs(_w.x) < 1 && Math.abs(_w.y) < 1 }; }
   function samplePixels(points) {
-    placeCamera(); renderer.render(scene, camera);
+    placeCamera(); if (mirror) mirror.render(); renderer.render(scene, camera);
     const gl = renderer.getContext(), pr = renderer.getPixelRatio(), H = gl.drawingBufferHeight, W = gl.drawingBufferWidth, buf = new Uint8Array(4);
     return points.map(p => { const x = Math.round(p.x * pr), y = Math.round(H - p.y * pr); if (x < 0 || y < 0 || x >= W || y >= H) return null; gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, buf); return [buf[0], buf[1], buf[2]]; });
   }

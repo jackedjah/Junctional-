@@ -180,12 +180,14 @@ export function buildSkyStructures(ctx) {
     placements.push(p);
     return p;
   }
-  /* a footprint is only legal if EVERY sampled point of it has cloud under it */
-  function footprintSolid(cx, cz, r, spokes = 12) {
-    if (!layout.deckSolid(cx, cz)) return false;
+  /* A footprint is only legal if EVERY sampled point of it has cloud under it AND is off the rim.
+     deckEdge() is the contract's own "how close to an edge is this", and a structure standing where it
+     reads below ~0.2 is standing on cloud the terrain module is already dissolving into air. */
+  function footprintSolid(cx, cz, r, spokes = 12, minEdge = 0.2) {
+    if (!layout.deckSolid(cx, cz) || layout.deckEdge(cx, cz) < minEdge) return false;
     for (let a = 0; a < spokes; a++) {
-      const th = a / spokes * TAU;
-      if (!layout.deckSolid(cx + Math.cos(th) * r, cz + Math.sin(th) * r)) return false;
+      const th = a / spokes * TAU, x = cx + Math.cos(th) * r, z = cz + Math.sin(th) * r;
+      if (!layout.deckSolid(x, z) || layout.deckEdge(x, z) < minEdge * 0.5) return false;
     }
     return true;
   }
@@ -289,17 +291,20 @@ export function buildSkyStructures(ctx) {
 
   /* a ribbon of deck that CONFORMS to the cloud: paths and flat markings follow the floor instead of
      levelling it, which is the other half of contract law 1 (§03) */
-  function ribbon(scope, key, x0, z0, x1, z1, width, lift, steps, endY) {
+  function ribbon(scope, key, x0, z0, x1, z1, width, lift, steps, endY, startY) {
     const dx = x1 - x0, dz = z1 - z0, len = Math.sqrt(dx * dx + dz * dz);
     if (len < 1) return;
     const ux = -dz / len, uz = dx / len;      /* across the ribbon */
     const n = steps || Math.max(6, Math.round(len / 6));
     const pos = new Float32Array(n * 6 * 3), uv = new Float32Array(n * 6 * 2);
     let o = 0, uo = 0;
+    /* a path LEAVES the apron at the apron's own top and ARRIVES on the pad at the pad's own deck; in
+       between it belongs to the cloud. Without those two ramps the walkways would start and end in a
+       two-to-five metre step, which is the exact failure a level platform on rolling terrain invites. */
     const yAt = (t) => {
       const x = x0 + dx * t, z = z0 + dz * t;
       let y = ground(x, z) + lift;
-      /* the last 18% of a path lifts onto whatever it arrives at, so a walkway meets a pad deck */
+      if (startY != null && t < 0.18) y = y + (startY - y) * (1 - t / 0.18);
       if (endY != null && t > 0.82) y = y + (endY - y) * ((t - 0.82) / 0.18);
       return y;
     };
@@ -504,8 +509,10 @@ export function buildSkyStructures(ctx) {
     for (let i = 0; i < 4; i++) {
       const a = i * HALF_PI + Math.PI / 4;
       const gx = cx + Math.cos(a) * 6.1, gz = cz + Math.sin(a) * 6.1;
-      put('B', 'satin', chamferBox(0.55, 3.5, 1.05, 0.08), gx, deckY + 1.6, gz, -a + HALF_PI, 0, Math.cos(a) * 0 + 0.14 * (a < Math.PI ? 1 : -1));
-      put('B', 'energy', chamferBox(0.30, 0.14, 0.72, 0.03), gx, deckY + 3.28, gz, -a + HALF_PI);
+      /* ry = −a + PI/2 puts each blade's local +Z on the outward radius, so rx = −0.16 leans all four
+         INWARD over the recess — the read of a guide that folds down onto a docked pod */
+      put('B', 'satin', chamferBox(0.55, 3.5, 1.05, 0.08), gx, deckY + 1.6, gz, -a + HALF_PI, -0.16);
+      put('B', 'energy', chamferBox(0.30, 0.14, 0.72, 0.03), cx + Math.cos(a) * 5.54, deckY + 3.28, cz + Math.sin(a) * 5.54, -a + HALF_PI, -0.16);
     }
     washCard(cx, deckY - 2.1, cz, PAD_R * 2.1, PAD_R * 2.1, 0, 'fill', 1.0);
 
@@ -539,12 +546,12 @@ export function buildSkyStructures(ctx) {
       const dx = p.x - stagingP.x, dz = p.z - stagingP.z, len = Math.sqrt(dx * dx + dz * dz);
       const sx = stagingP.x + dx / len * (APRON_R - 1.2), sz = stagingP.z + dz / len * (APRON_R - 1.2);
       const ex = p.x - dx / len * (PAD_R - 0.6), ez = p.z - dz / len * (PAD_R - 0.6);
-      ribbon('B', 'lit', sx, sz, ex, ez, 4.8, 0.24, 0, p.deckY - 0.1);
+      ribbon('B', 'lit', sx, sz, ex, ez, 4.8, 0.24, 0, p.deckY - 0.1, APRON_Y - 0.15);
       /* two hairlines of light down the edges — the only thing that makes a path read at dusk */
-      const ux = -(ez - sz) / Math.sqrt((ex - sx) * (ex - sx) + (ez - sz) * (ez - sz));
-      const uz = (ex - sx) / Math.sqrt((ex - sx) * (ex - sx) + (ez - sz) * (ez - sz));
-      ribbon('B', 'energy', sx + ux * 2.3, sz + uz * 2.3, ex + ux * 2.3, ez + uz * 2.3, 0.16, 0.30, 0, p.deckY - 0.04);
-      ribbon('B', 'energy', sx - ux * 2.3, sz - uz * 2.3, ex - ux * 2.3, ez - uz * 2.3, 0.16, 0.30, 0, p.deckY - 0.04);
+      const rl = Math.sqrt((ex - sx) * (ex - sx) + (ez - sz) * (ez - sz));
+      const ux = -(ez - sz) / rl, uz = (ex - sx) / rl;
+      ribbon('B', 'energy', sx + ux * 2.3, sz + uz * 2.3, ex + ux * 2.3, ez + uz * 2.3, 0.16, 0.30, 0, p.deckY - 0.04, APRON_Y - 0.09);
+      ribbon('B', 'energy', sx - ux * 2.3, sz - uz * 2.3, ex - ux * 2.3, ez - uz * 2.3, 0.16, 0.30, 0, p.deckY - 0.04, APRON_Y - 0.09);
     }
   })();
 
@@ -558,7 +565,10 @@ export function buildSkyStructures(ctx) {
   (function buildConcourse() {
     const s = SITES.concourse, p = layout.siteAt('concourse');
     const yaw = faceIn(s.bearing), c = Math.cos(yaw), sn = Math.sin(yaw);
-    const W = 44, D = 26;
+    /* the terrace is DEEPER than the mass on purpose: the front 9 m of it is the sheltered concourse
+       — canopy, columns, the head of the stair — and a building that fills its own podium leaves
+       nowhere to arrive */
+    const W = 44, D = 30;
     /* local (lx, lz) -> world; +Z is toward the apron */
     const wx = (lx, lz) => p.x + lx * c + lz * sn;
     const wz = (lx, lz) => p.z - lx * sn + lz * c;
@@ -581,24 +591,25 @@ export function buildSkyStructures(ctx) {
 
     /* THE COLONNADE. Ten legs, each finding its OWN ground — the building's answer to a sloping site,
        and the reason you can see cloud running underneath the thing you are walking into. */
-    for (const [lx, lz] of [[-20, -11], [-20, 0], [-20, 11], [-7, -11.5], [-7, 11.5], [7, -11.5], [7, 11.5], [20, -11], [20, 0], [20, 11]]) {
+    for (const [lx, lz] of [[-20, -13], [-20, 0], [-20, 13], [-7, -13.5], [-7, 13.5], [7, -13.5], [7, 13.5], [20, -13], [20, 0], [20, 13]]) {
       const fx = wx(lx * 1.06, lz * 1.06), fz = wz(lx * 1.06, lz * 1.06);
       strut('B', 'satin', fx, ground(fx, fz) - 2.0, fz, wx(lx, lz), TER - 2.4, wz(lx, lz), 0.85, 0.62, 8);
     }
     /* one horizontal brace course, so the legs read as a structure */
-    for (const lz of [-11, 11]) strut('B', 'satin', wx(-20, lz), TER - 5.6, wz(-20, lz), wx(20, lz), TER - 5.6, wz(20, lz), 0.28, 0.28, 6);
+    for (const lz of [-13, 13]) strut('B', 'satin', wx(-20, lz), TER - 5.6, wz(-20, lz), wx(20, lz), TER - 5.6, wz(20, lz), 0.28, 0.28, 6);
 
     /* --- the mass: three faceted volumes, stepping back --- */
     const LV = [
-      { w: 42, d: 24, h: 12, c: 3.6, dz: 0, key: 'brushed' },
-      { w: 32, d: 19, h: 9.5, c: 3.0, dz: -2.0, key: 'mid' },
-      { w: 21, d: 13.5, h: 8.0, c: 2.3, dz: -4.0, key: 'mid' }
+      { w: 42, d: 20, h: 12, c: 3.6, dz: -4.0, key: 'brushed' },
+      { w: 32, d: 16, h: 9.5, c: 3.0, dz: -6.0, key: 'mid' },
+      { w: 21, d: 12, h: 8.0, c: 2.3, dz: -8.0, key: 'mid' }
     ];
     let y = TER;
     LV.forEach((L, li) => {
-      /* the core is pushed BACK 2.4 m on the two lower levels; the front of that gap becomes piers */
-      const coreD = li < 2 ? L.d - 2.4 : L.d;
-      const coreDz = li < 2 ? L.dz - 1.2 : L.dz;
+      /* the core is pushed BACK 3.2 m on the two lower levels; the front of that gap becomes piers, and
+         the glass hangs in the gap between them, which is what makes the glazing genuinely DEEP */
+      const coreD = li < 2 ? L.d - 3.2 : L.d;
+      const coreDz = li < 2 ? L.dz - 1.6 : L.dz;
       put('B', L.key, massGeo(L.w, coreD, L.h, L.c, 0.3), wx(0, coreDz), y, wz(0, coreDz), yaw);
       /* parapet cap — HORIZONTAL, so it must not be a mirror grade or it renders black */
       put('B', 'midLit', massGeo(L.w + 1.0, L.d + 1.0, 0.55, L.c + 0.4, 0.12), wx(0, L.dz), y + L.h - 0.2, wz(0, L.dz), yaw);
@@ -618,7 +629,9 @@ export function buildSkyStructures(ctx) {
           if (i < nBays - 1) {
             const bx = px2 + pierW / 2 + bayW / 2, bh = L.h - 3.4;
             put('B', 'glass', new THREE.PlaneGeometry(bayW - 0.2, bh), wx(bx, glassZ), y + 1.7 + bh / 2, wz(bx, glassZ), yaw);
-            put('B', 'warm', new THREE.PlaneGeometry(bayW - 0.5, bh - 0.5), wx(bx, glassZ - 0.35), y + 1.7 + bh / 2, wz(bx, glassZ - 0.35), yaw);
+            /* the warm plane sits 0.55 m BEHIND the glass and 0.35 m in front of the core's face — it
+               has to be inside the gap or the room is buried in the mass and nothing lights up */
+            put('B', 'warm', new THREE.PlaneGeometry(bayW - 0.5, bh - 0.5), wx(bx, glassZ - 0.55), y + 1.7 + bh / 2, wz(bx, glassZ - 0.55), yaw);
             /* WHAT THE GLASS REFLECTS comes from layout.atmosphere() at the bearing this pane faces */
             washCard(wx(bx, glassZ + 0.05), y + 1.7 + bh / 2, wz(bx, glassZ + 0.05), bayW - 0.3, bh, s.bearing + Math.PI, 'sky', 0.55, 0.18);
             /* a mullion pair per bay: the fine vertical grain that stops a facade reading as a slab */
@@ -630,6 +643,17 @@ export function buildSkyStructures(ctx) {
         put('B', 'midLit', chamferBox(span + 1.2, 0.55, 2.9, 0.10), wx(0, faceZ), y + 1.45, wz(0, faceZ), yaw);
         put('B', 'midLit', chamferBox(span + 1.2, 0.8, 2.9, 0.12), wx(0, faceZ), y + L.h - 1.6, wz(0, faceZ), yaw);
       }
+      /* THE SIDE ELEVATIONS. Budget headroom is spent HERE (§45/§46 say near the player and on the
+         hero silhouettes): without them the mass is a bare octagonal prism on three of its four sides,
+         and this is the one building in the realm. Two shadow-gap courses per level, and a fin order
+         on the flanks — vertical, so the high-metal grade reflects the horizon and reads. */
+      for (const t of [0.34, 0.70]) {
+        put('X', 'lit', massGeo(L.w + 0.28, coreD + 0.28, 0.16, L.c + 0.1, 0.04), wx(0, coreDz), y + L.h * t, wz(0, coreDz), yaw);
+      }
+      for (const side of [-1, 1]) for (let f = 0; f < 5; f++) {
+        const lz2 = coreDz - coreD * 0.34 + f * coreD * 0.17;
+        put('X', 'satin', chamferBox(0.30, L.h - 1.4, 0.70, 0.06), wx(side * (L.w / 2 + 0.12), lz2), y + L.h / 2, wz(side * (L.w / 2 + 0.12), lz2), yaw);
+      }
       y += L.h;
     });
     concourse.topY = y;
@@ -637,32 +661,38 @@ export function buildSkyStructures(ctx) {
     /* --- the sheltered concourse at its foot: a canopy on six columns, warm underneath ---
        This is the piece that does the emotional work. You come up the steps out of open cloud and
        there is a lit soffit over your head before you are indoors. */
-    const canY = TER + 5.4, canZ = D / 2 + 2.2;
-    put('B', 'midLit', massGeo(34, 10, 0.7, 2.2, 0.16), wx(0, canZ), canY, wz(0, canZ), yaw);
-    put('B', 'lit', massGeo(34.8, 10.8, 0.16, 2.4, 0.04), wx(0, canZ), canY + 0.72, wz(0, canZ), yaw);
-    put('B', 'warm', new THREE.PlaneGeometry(30, 7.4).rotateX(HALF_PI), wx(0, canZ), canY - 0.03, wz(0, canZ), yaw);
-    washCard(wx(0, canZ), canY - 0.10, wz(0, canZ), 32, 8.4, yaw, 'fill', 0.9);
+    const canY = TER + 5.4, canZ = 10.5;      /* over the terrace, not over the void beyond it */
+    put('B', 'midLit', massGeo(28, 9, 0.7, 2.2, 0.16), wx(0, canZ), canY, wz(0, canZ), yaw);
+    put('B', 'lit', massGeo(28.8, 9.8, 0.16, 2.4, 0.04), wx(0, canZ), canY + 0.72, wz(0, canZ), yaw);
+    put('B', 'warm', new THREE.PlaneGeometry(24, 6.6).rotateX(HALF_PI), wx(0, canZ), canY - 0.03, wz(0, canZ), yaw);
+    washCard(wx(0, canZ), canY - 0.10, wz(0, canZ), 26, 7.6, yaw, 'fill', 0.9);
     for (let i = 0; i < 6; i++) {
-      const lx = -14 + i * 5.6;
-      strut('B', 'satin', wx(lx, canZ + 3.0), TER, wz(lx, canZ + 3.0), wx(lx, canZ + 3.0), canY - 0.3, wz(lx, canZ + 3.0), 0.30, 0.24, 8);
+      const lx = -11.5 + i * 4.6;
+      strut('B', 'satin', wx(lx, canZ + 3.1), TER, wz(lx, canZ + 3.1), wx(lx, canZ + 3.1), canY - 0.3, wz(lx, canZ + 3.1), 0.30, 0.24, 8);
     }
-    /* steps down to walkway level: eight chamfered risers, wide enough to be a place to sit */
-    const stepBase = ground(wx(0, D / 2 + 12), wz(0, D / 2 + 12)) + 0.24;
-    const nStep = 8, rise = (TER - stepBase) / nStep;
+    /* THE STAIR, and it is a solid stepped MASS rather than a flight of floating treads: each riser is
+       cut down to the cloud beneath it, because the ground falls away under the flight and a tread
+       hovering over that gap is exactly the failure contract law 1 exists to prevent. */
+    const nStep = 8;
+    const stepBase = ground(wx(0, D / 2 + 0.6 + nStep * 1.4), wz(0, D / 2 + 0.6 + nStep * 1.4));
+    const rise = Math.max(0.16, (TER - stepBase - 0.3) / nStep);
     for (let i = 0; i < nStep; i++) {
-      const lz = D / 2 + 3.0 + (nStep - i) * 1.15;
-      put('B', 'midLit', chamferBox(17, Math.max(0.12, rise), 1.35, 0.05), wx(0, lz), stepBase + rise * (i + 0.5), wz(0, lz), yaw);
+      const lz = D / 2 + 0.6 + i * 1.4;
+      const sxw = wx(0, lz), szw = wz(0, lz);
+      const treadY = TER - (i + 1) * rise;
+      const hh = Math.max(0.35, treadY - (ground(sxw, szw) - 1.4));
+      put('B', 'midLit', chamferBox(17, hh, 1.5, 0.06), sxw, treadY - hh / 2, szw, yaw);
     }
     /* and the ribbon that reaches the apron */
-    const footX = wx(0, D / 2 + 13.5), footZ = wz(0, D / 2 + 13.5);
+    const footX = wx(0, D / 2 + 0.6 + nStep * 1.4 + 1.6), footZ = wz(0, D / 2 + 0.6 + nStep * 1.4 + 1.6);
     const ddx = footX - stagingP.x, ddz = footZ - stagingP.z, dl = Math.sqrt(ddx * ddx + ddz * ddz);
-    ribbon('B', 'lit', stagingP.x + ddx / dl * (APRON_R - 1.2), stagingP.z + ddz / dl * (APRON_R - 1.2), footX, footZ, 6.4, 0.24, 0, stepBase);
+    ribbon('B', 'lit', stagingP.x + ddx / dl * (APRON_R - 1.2), stagingP.z + ddz / dl * (APRON_R - 1.2), footX, footZ, 6.4, 0.24, 0, stepBase + 0.2, APRON_Y - 0.15);
 
     /* --- THE CANTED SIGNAGE BLADE ---
-       At the high end of the terrace, raked back 9 degrees so it catches the sunset on its face and
-       the cold sky on its edge. It carries the wordmark, the canonical sub-line and the canonical
-       mark — and nothing else exists to put on it. */
-    const bx = 16.5, bz = D / 2 - 1.0, rake = -0.157;
+       At the high end of the terrace, clear of the canopy, raked back 9 degrees so it catches the
+       sunset on its face and the cold sky on its edge. It carries the wordmark, the canonical
+       sub-line and the canonical mark — and nothing else exists to put on it. */
+    const bx = 19.0, bz = 11.0, rake = -0.157;
     const bladeH = 15.5;
     concourse.blade = { x: wx(bx, bz), z: wz(bx, bz), y: TER, h: bladeH };
     put('B', 'mid', chamferBox(5.6, bladeH, 0.85, 0.16), wx(bx, bz), TER + bladeH / 2, wz(bx, bz), yaw, rake);
@@ -689,8 +719,13 @@ export function buildSkyStructures(ctx) {
   (function queuePylon() {
     const s = SITES.queuePylon, p = layout.siteAt('queuePylon');
     const yaw = faceIn(s.bearing);
-    const gy = ground(p.x, p.z);
-    place('queuePylon', p.x, p.z, { radius: 1.6, baseY: gy - 1.0, topY: gy + 6.0 });
+    /* MEASURED: this site is 11.8 m from the apron's centre, i.e. it stands ON the apron, whose top is
+       1.9 m above the cloud there. Taking its base from the cloud would bury it to the knee — a thing
+       standing on a built platform takes ITS height, not the terrain's. */
+    const dxA = p.x - stagingP.x, dzA = p.z - stagingP.z;
+    const onApron = Math.sqrt(dxA * dxA + dzA * dzA) < APRON_R - 1.5;
+    const gy = onApron ? APRON_Y : ground(p.x, p.z);
+    place('queuePylon', p.x, p.z, { radius: 1.6, baseY: onApron ? apronMin - 1.8 : gy - 1.0, topY: gy + 6.0 });
     put('B', 'midLit', chamferBox(3.0, 0.34, 1.5, 0.07), p.x, gy + 0.17, p.z, yaw);
     put('B', 'mid', chamferBox(2.5, 0.9, 1.1, 0.10), p.x, gy + 0.79, p.z, yaw);
     put('B', 'mid', chamferBox(2.7, 4.6, 0.42, 0.09), p.x, gy + 3.4, p.z, yaw);
@@ -754,7 +789,9 @@ export function buildSkyStructures(ctx) {
      sculpture, nothing that competes with the sun. */
   (function overlook() {
     const s = SITES.overlook, p = layout.siteAt('overlook');
-    const r0 = s.r - 17, r1 = s.r + 25, halfArc = 0.135;
+    /* 32 m deep and 54 m of arc: generous, because panoramic is the whole point, but sector A carries
+       an `architecture` weight of 0.05 in the contract and this is the largest thing allowed in it */
+    const r0 = s.r - 13, r1 = s.r + 19, halfArc = 0.115;
     const segs = 22, rings = 4;
     let gMax = -Infinity, gMin = Infinity;
     for (let i = 0; i <= segs; i++) for (let j = 0; j <= rings; j++) {
@@ -879,13 +916,15 @@ export function buildSkyStructures(ctx) {
       const a = i * HALF_PI + Math.PI / 4;
       put('A', 'lit', chamferBox(2.0, 0.10, 0.20, 0.03), p.x + Math.cos(a) * 1.4, gy + 0.10, p.z + Math.sin(a) * 1.4, -a + HALF_PI);
     }
-    /* and one line of light along the last metres of floor, following the real edge */
+    /* and one line of light along the last metres of floor. It FINDS the edge with deckEdge() rather
+       than being drawn at a radius that looked right: the rim moves with the bearing, and a light line
+       that misses it by ten metres is a light line about nothing. */
     for (let i = -6; i <= 6; i++) {
       const b = s.bearing + i * 0.016;
       const d = layout.dir(b);
-      let rr = DECK.cliffRadius;
-      while (rr > 200 && !layout.deckSolid(d.x * rr, d.z * rr)) rr -= 2;
-      const ex = d.x * (rr - 2.5), ez = d.z * (rr - 2.5);
+      let rr = DECK.cliffRadius + 20;
+      while (rr > 200 && layout.deckEdge(d.x * rr, d.z * rr) < 0.06) rr -= 1.5;
+      const ex = d.x * (rr - 1.5), ez = d.z * (rr - 1.5);
       put('A', 'energy', chamferBox(1.4, 0.09, 0.22, 0.02), ex, ground(ex, ez) + 0.10, ez, faceOut(b) + HALF_PI);
     }
   })();
@@ -963,7 +1002,7 @@ export function buildSkyStructures(ctx) {
       frameParts.push(g.index ? g.toNonIndexed() : g);
     }
     const frameGeo = own.g(mergeList(frameParts));
-    const ringGeo = own.g(new THREE.TorusGeometry(0.33, 0.018, 4, 20));
+    const ringGeo = own.g(new THREE.TorusGeometry(0.33, 0.018, 5, 24));
 
     const fm = new THREE.InstancedMesh(frameGeo, matFor('satin'), GATE_MAX);
     const em = new THREE.InstancedMesh(ringGeo, mat.energy, GATE_MAX);
@@ -1035,25 +1074,34 @@ export function buildSkyStructures(ctx) {
   /* ---- launch pylons: vertical, for flight practice ----------------------------------------------
      Five, on a 37 degree flank, so every one finds its own ground on three splayed feet and the row
      steps down the slope. Varied heights, because a row of identical masts reads as a fence. */
-  const PYLON_MAX = 5;
-  const pylonGroups = [];
+  /* Five, but only TWO draw-call groups: the first three are the low-tier set and always drawn, the
+     last two are dropped below 'high'. Five separate groups would have cost twenty draw calls for
+     nine hundred triangles, which is exactly the trade §45 says not to make. */
+  const PYLON_MAX = 5, PYLON_CORE = 3;
+  const pylonGroups = [new THREE.Group(), new THREE.Group()];
   (function launchPylons() {
     const s = SITES.launchPylons, p = layout.siteAt('launchPylons');
     const across = s.bearing + HALF_PI;
     const HS = [34, 24, 42, 27, 31];
+    pylonGroups[0].name = 'sky-pylons-core'; pylonGroups[1].name = 'sky-pylons-extra';
+    group.add(pylonGroups[0], pylonGroups[1]);
+    const SET = [{ P: {} }, { P: {} }];
     for (let i = 0; i < PYLON_MAX; i++) {
       const off = (i - 2) * 46;
       const x = p.x + Math.sin(across) * off, z = p.z - Math.cos(across) * off;
       if (!footprintSolid(x, z, 3.5)) continue;
       const gy = ground(x, z), H = HS[i];
-      const gsub = new THREE.Group(); gsub.name = 'sky-pylon-' + i;
-      pylonGroups.push(gsub); group.add(gsub);
-      const B = { P: {} };
-      /* three splayed feet */
+      const B = SET[i < PYLON_CORE ? 0 : 1];
+      /* three splayed feet, each to ITS OWN ground: on a 37 degree flank the downhill foot lands two
+         metres below the uphill one, and the recorded base is the lowest of the three — a legged
+         structure's reach is its longest leg, not the height under its centre */
+      let footMin = Infinity;
       for (let k = 0; k < 3; k++) {
         const a = k / 3 * TAU + 0.5;
         const fx = x + Math.cos(a) * 2.9, fz = z + Math.sin(a) * 2.9;
-        pylonStrut(B, fx, ground(fx, fz) - 1.6, fz, x + Math.cos(a) * 0.85, gy + 3.4, z + Math.sin(a) * 0.85, 0.34, 0.24);
+        const fy = ground(fx, fz) - 1.6;
+        if (fy < footMin) footMin = fy;
+        pylonStrut(B, fx, fy, fz, x + Math.cos(a) * 0.85, gy + 3.4, z + Math.sin(a) * 0.85, 0.34, 0.24);
       }
       const parts = B.P;
       pylonPut(parts, 'mid', new THREE.CylinderGeometry(0.48, 1.15, H, 9), x, gy + 2.4 + H / 2, z);
@@ -1062,13 +1110,16 @@ export function buildSkyStructures(ctx) {
       pylonPut(parts, 'energy', new THREE.CylinderGeometry(0.42, 0.42, 0.5, 10), x, gy + 2.4 + H + 0.5, z);
       /* the strip up the leading edge: the pylon has a FRONT, and a resident lines up on it */
       pylonPut(parts, 'energy', chamferBox(0.16, H - 3, 0.13, 0.03), x + Math.sin(s.bearing) * 0.9, gy + 2.4 + H / 2, z - Math.cos(s.bearing) * 0.9, faceOut(s.bearing));
+      place('launchPylon' + i, x, z, { radius: 2.9, baseY: footMin, topY: gy + 2.4 + H + 0.8 });
+    }
+    for (let sIdx = 0; sIdx < 2; sIdx++) {
+      const parts = SET[sIdx].P;
       for (const key of Object.keys(parts)) {
+        if (!parts[key].length) continue;
         const mesh = new THREE.Mesh(own.g(mergeList(parts[key])), matFor(key));
-        mesh.name = 'sky-pylon-' + i + '-' + key;
-        mesh.castShadow = false; mesh.receiveShadow = false;
-        meshes.push(mesh); gsub.add(mesh);
+        mesh.name = 'sky-pylons-' + (sIdx ? 'extra' : 'core') + '-' + key;
+        meshes.push(mesh); pylonGroups[sIdx].add(mesh);
       }
-      place('launchPylon' + i, x, z, { radius: 3.0, topY: gy + 2.4 + H + 0.8 });
     }
     function pylonPut(parts, key, geo, px2, py2, pz2, ry, rx) {
       _v.set(px2, py2, pz2); _eu.set(rx || 0, ry || 0, 0, 'YXZ'); _q.setFromEuler(_eu); _sc.set(1, 1, 1);
@@ -1104,11 +1155,11 @@ export function buildSkyStructures(ctx) {
     put('D', 'midLit', massGeo(9.4, 9.4, 0.7, 2.6, 0.16), p.x, BASE - 0.7, p.z);
     put('D', 'lit', massGeo(10.0, 10.0, 0.16, 2.8, 0.04), p.x, BASE, p.z);
     washCard(p.x, BASE - 0.8, p.z, 11, 11, 0, 'fill', 0.9);
-    put('D', 'mid', new THREE.CylinderGeometry(0.7, 1.5, 48, 10), p.x, BASE + 24, p.z);
+    put('D', 'mid', new THREE.CylinderGeometry(0.7, 1.5, 48, 12), p.x, BASE + 24, p.z);
     for (const h of [15, 28, 40]) put('D', 'lit', new THREE.CylinderGeometry(1.9, 1.9, 0.5, 12, 1, true), p.x, BASE + h, p.z);
     put('D', 'energy', chamferBox(0.16, 44, 0.16, 0.03), p.x + 1.1, BASE + 24, p.z);
     /* the head: a crystal octahedron with a lit core — the cold side's single warm-free beacon */
-    put('D', 'glass', new THREE.OctahedronGeometry(3.6, 0), p.x, BASE + 51, p.z);
+    put('D', 'glass', new THREE.OctahedronGeometry(3.6, 1), p.x, BASE + 51, p.z);
     put('D', 'energyLight', new THREE.OctahedronGeometry(1.5, 0), p.x, BASE + 51, p.z);
     for (let k = 0; k < 4; k++) {
       const a = k / 4 * TAU;
@@ -1169,13 +1220,13 @@ export function buildSkyStructures(ctx) {
     const p = layout.siteAt(name);
     const S = i === 0 ? 1.0 : 1.32;
     place(name, p.x, p.z, { floating: true, topY: p.y + 30 * S, radius: 15 * S });
-    put('D', 'mid', new THREE.CylinderGeometry(0.1, 2.2, 26 * S, 10), p.x, p.y + 13 * S, p.z);
-    put('D', 'mid', new THREE.CylinderGeometry(2.2, 0.1, 26 * S, 10), p.x, p.y - 13 * S, p.z);
-    put('D', 'mid', new THREE.CylinderGeometry(1.5, 1.5, 30 * S, 10), p.x, p.y, p.z);
+    put('D', 'mid', new THREE.CylinderGeometry(0.1, 2.2, 26 * S, 14), p.x, p.y + 13 * S, p.z);
+    put('D', 'mid', new THREE.CylinderGeometry(2.2, 0.1, 26 * S, 14), p.x, p.y - 13 * S, p.z);
+    put('D', 'mid', new THREE.CylinderGeometry(1.5, 1.5, 30 * S, 12), p.x, p.y, p.z);
     const RS = [[14 * S, 11 * S], [0, 14 * S], [-14 * S, 8.5 * S]];
     for (const [dy, rr] of RS) {
-      put('D', 'midLit', new THREE.CylinderGeometry(rr, rr, 0.6 * S, 16), p.x, p.y + dy, p.z);
-      put('D', 'mid', new THREE.CylinderGeometry(rr, rr * 0.86, 1.4 * S, 16), p.x, p.y + dy - 1.0 * S, p.z);
+      put('D', 'midLit', new THREE.CylinderGeometry(rr, rr, 0.6 * S, 20), p.x, p.y + dy, p.z);
+      put('D', 'mid', new THREE.CylinderGeometry(rr, rr * 0.86, 1.4 * S, 20), p.x, p.y + dy - 1.0 * S, p.z);
       washCard(p.x, p.y + dy - 1.9 * S, p.z, rr * 2, rr * 2, 0, 'fill', 0.8);
     }
     put('D', 'energy', new THREE.CylinderGeometry(14.1 * S, 14.1 * S, 0.3 * S, 16, 1, true), p.x, p.y + 0.5 * S, p.z);
@@ -1291,9 +1342,9 @@ export function buildSkyStructures(ctx) {
      rebuild would allocate and because the tiers have to be switchable at runtime (§45). The counts
      ride on layout.QUALITY so this module degrades in step with the cloud and the life modules. */
   const QT = {
-    high: { gates: GATE_MAX, targets: TARGET_MAX, pylons: PYLON_MAX, trim: true },
-    medium: { gates: 5, targets: 10, pylons: 4, trim: true },
-    low: { gates: 3, targets: 6, pylons: 3, trim: false }
+    high: { gates: GATE_MAX, targets: TARGET_MAX, pylonsExtra: true, trim: true },
+    medium: { gates: 5, targets: 10, pylonsExtra: true, trim: true },
+    low: { gates: 3, targets: 6, pylonsExtra: false, trim: false }
   };
   function setQuality(t) {
     tier = QUALITY[t] ? t : 'high';
@@ -1303,7 +1354,7 @@ export function buildSkyStructures(ctx) {
     qBeams = (QUALITY[tier] && QUALITY[tier].beams) || 1;
     if (gateLane.mesh) { gateLane.mesh.count = q.gates; gateLane.energyMesh.count = q.gates; }
     if (targets.mesh) { targets.mesh.count = q.targets; targets.core.count = q.targets; }
-    for (let i = 0; i < pylonGroups.length; i++) pylonGroups[i].visible = i < q.pylons;
+    pylonGroups[1].visible = q.pylonsExtra;
     for (const m of bucketMeshes) if (m.userData.scope === 'X') m.visible = q.trim;
     if (atlasMeshes.actions) atlasMeshes.actions.visible = q.trim;
     /* the wash is never dropped: it is the contract's own colour on the architecture, it is one draw

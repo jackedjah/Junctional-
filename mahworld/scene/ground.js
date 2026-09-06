@@ -52,6 +52,7 @@ const CROWN_INNER = 0.74;     /* where the crown stops and the flat table begins
 const CELL_CORNER = 0.55;     /* the cut corner — this is what opens the socket at every crossing */
 const JOINT_TOP = 0.133;      /* the joint catch stops a hair below the cell rim, never level with it */
 const STUD_APEX = 0.168;      /* the inlaid stud's point, just under the table so nothing stands proud */
+const POOL_Y = FLOOR_TOP + 0.07;  /* where light lying ON the floor sits: clear of every tilted cell corner */
 
 /* merge a list of geometries into one static BufferGeometry (position + normal); disposes the inputs */
 function mergeGeos(list) {
@@ -106,10 +107,10 @@ function crystalCell(size, corner) {
 }
 
 /* THE INLAID STUD. Four cut cell corners leave a square-diamond socket at every lattice crossing;
-   this fills it with a four-facet mirror boss whose faces sit 3.4° off horizontal. At a plaza
-   camera's 2–6° depression that is the difference between reflecting the bright horizon band and
-   reflecting the ground below it, so a stud always shows a lit half and a dark half — a cut stone
-   turning, which is exactly what the reference frames put at every joint intersection.
+   this fills it with a four-facet mirror boss 3.5 cm proud of the joints, whose faces sit 2.1° off
+   horizontal. At a plaza camera's 2–6° depression that is the difference between reflecting the
+   bright horizon band and reflecting the dark ground below it, so a stud always shows a lit half and
+   a dark half — a cut stone turning, which is what the reference frames put at every intersection.
    12 triangles: 8 buried skirt, 4 facets. */
 function crystalStud(reach, foot, base) {
   const P = [[reach, 0], [0, -reach], [-reach, 0], [0, reach]];
@@ -179,8 +180,8 @@ export function buildGround(ctx) {
      "Every ounce of light must have a specific purpose in terms of how artifacts around it respond."
      An emissive material is a bright rectangle that lights nothing: at metalness 0.98 the plaza floor
      does not even take diffuse light from a real lamp. So every emitter that stands on or over this
-     ground lays a POOL — a soft elliptical gradient in the emitter's own hue, sitting 1 cm above the
-     floor plane, additive, falling to nothing within a few metres. Bright at the source, gone by the
+     ground lays a POOL — a soft elliptical gradient in the emitter's own hue, lying just above the
+     surface it falls on, additive, and gone within a few metres. Bright at the source, nothing at the
      rim; never a uniform wash.
 
      Two instanced fields, one draw call each, because a pool's hue comes from one of two places:
@@ -221,7 +222,11 @@ export function buildGround(ctx) {
     const themed = p.hue == null, mesh = themed ? poolThemed : poolFixed;
     const i = themed ? nThemed : nFixed;
     if (i >= POOL_CAP) return null;                       /* a silently dropped pool beats a resized buffer mid-scene */
-    writePool(mesh, i, { x: p.x, y: p.y == null ? FLOOR_TOP + 0.012 : p.y, z: p.z, rx: p.rx, rz: p.rz == null ? p.rx : p.rz, rot: p.rot || 0, hue: p.hue == null ? null : p.hue, k: p.k == null ? 0.5 : p.k });
+    /* POOL_Y clears the whole deck. A cell's per-cell tilt lifts its far corner as much as 4 cm above
+       FLOOR_TOP, and a pool that sat at the nominal deck height was bitten into by exactly those
+       corners — the field is transparent but it still writes depth. Seven centimetres over a soft
+       gradient is invisible from any camera in this world and it clears every one of them. */
+    writePool(mesh, i, { x: p.x, y: p.y == null ? POOL_Y : p.y, z: p.z, rx: p.rx, rz: p.rz == null ? p.rx : p.rz, rot: p.rot || 0, hue: p.hue == null ? null : p.hue, k: p.k == null ? 0.5 : p.k });
     if (themed) nThemed++; else nFixed++;
     mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     return mesh;
@@ -240,7 +245,7 @@ export function buildGround(ctx) {
      All three are near-black metals: what separates them is how sharply they return the world, which
      is the only property a black mirror has. Cells stay semi-transparent over the mirrored emissive
      copies the assembly builds under the deck.
-     Cost: five merged meshes, 69 cells, 134 joints, 76 studs, no per-frame work.                    */
+     Cost: seven merged meshes — 69 cells, 120 joints, 52 studs — and no per-frame work.               */
   const heroMat = new THREE.MeshStandardMaterial({ color: 0x080b11, roughness: 0.045, metalness: 0.98, envMapIntensity: 2.9, transparent: true, opacity: 0.86, flatShading: true });
   const satinMat = new THREE.MeshStandardMaterial({ color: 0x0a0e16, roughness: 0.13, metalness: 0.96, envMapIntensity: 2.2, transparent: true, opacity: 0.92, flatShading: true });
   const contrastMat = new THREE.MeshStandardMaterial({ color: 0x0d1220, roughness: 0.085, metalness: 0.97, envMapIntensity: 2.5, transparent: true, opacity: 0.88, flatShading: true });
@@ -265,8 +270,12 @@ export function buildGround(ctx) {
       const here = inField(i, j);
       if (here) {
         const geo = cellGeo.clone();
-        /* a shallow per-cell tilt (< 0.4°): each cell takes its own value under one light, which is what
-           separates a laid floor from a printed pattern. Deterministic, never animated. */
+        /* a shallow per-cell tilt (up to 0.55°, and the asymmetric modulus that produces it is deliberate
+           and unchanged): each cell takes its own value under one light, which is what separates a laid
+           floor from a printed pattern. On a mirror it matters more, not less — 0.55° of tilt swings the
+           reflected ray a whole degree, and at the 2-6° depression the plaza cameras look down at, that
+           is the difference between two cells returning two different slices of the horizon.
+           Deterministic, never animated. */
         const t = ((i * 7 + j * 13) % 5 - 2) * 0.0016;
         geo.applyMatrix4(_m4.makeRotationX(t)); geo.applyMatrix4(_m4.makeRotationZ(t * 0.7));
         geo.translate(x, 0, z);
@@ -318,7 +327,7 @@ export function buildGround(ctx) {
          it along the stretch that crosses the laid floor, so the seam lights the stone it is set in. */
       const line = [];
       for (let k = 0; k <= 6; k++) { const rr = 27 + k * (52 - 27) / 6; line.push([Math.cos(a) * rr, Math.sin(a) * rr]); }
-      channelRibbons.push(glowRibbon(line, 0.85, FLOOR_TOP + 0.014, 0.5, false, t => Math.pow(Math.sin(Math.PI * t), 0.6)));
+      channelRibbons.push(glowRibbon(line, 0.85, POOL_Y, 0.5, false, t => Math.pow(Math.sin(Math.PI * t), 0.6)));
     }
     chGeo.dispose();
     const channels = new THREE.Mesh(mergeGeos(parts), M.energySoft);
@@ -338,7 +347,7 @@ export function buildGround(ctx) {
   {
     const ringPath = [];
     for (let i = 0; i < 96; i++) { const a = i / 96 * Math.PI * 2; ringPath.push([Math.cos(a) * PLAZA_RADIUS, Math.sin(a) * PLAZA_RADIUS]); }
-    const parts = [glowRibbon(ringPath, 1.7, FLOOR_TOP + 0.014, 1, true, null)].concat(channelRibbons);
+    const parts = [glowRibbon(ringPath, 1.7, POOL_Y, 1, true, null)].concat(channelRibbons);
     const seams = new THREE.Mesh(mergeSeams(parts), seamMat);
     seams.name = 'floor-seam-glow'; seams.renderOrder = 5; g.add(seams);
   }
@@ -362,7 +371,7 @@ export function buildGround(ctx) {
   reflect(mark, 0.4);
   /* the mark is a light source of its own now that the floor is black: it lays a low pool the width
      of the lockup, which is also what keeps the wordmark legible on near-black stone */
-  ctx.lightPool({ x: 0, z: 14.4, rx: 21, rz: 15, k: 0.24 });
+  ctx.lightPool({ x: 1.1, z: 14.0, rx: 21, rz: 15, k: 0.24 });
   const wordTex = canvasTexture(2048, 512, (c, w, h) => { c.clearRect(0, 0, w, h); c.fillStyle = 'rgba(225,238,255,0.92)'; c.font = '700 300px "Space Grotesk", "Helvetica Neue", Arial, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; let total = 0; const gap = 44; for (const ch of 'MAHPLAZA') total += c.measureText(ch).width + gap; let x = w / 2 - (total - gap) / 2; c.textAlign = 'left'; for (const ch of 'MAHPLAZA') { c.fillText(ch, x, h / 2); x += c.measureText(ch).width + gap; } });
   const word = new THREE.Mesh(new THREE.PlaneGeometry(11, 2.75), new THREE.MeshBasicMaterial({ map: wordTex, transparent: true, depthWrite: false }));
   word.rotation.x = -Math.PI / 2; word.position.set(0, FLOOR_TOP + 0.03, 17.5);
@@ -481,10 +490,10 @@ export function buildGround(ctx) {
          theme, off the nosing    the apron's lit lip, pooled where it overhangs the plaza;
          accent, out on the floor the district's signage band overhead, wide and weak — the one place
                                   a pungent hue touches the ground, and it is a big single gesture. */
-    ctx.lightPool({ x: S.x + fx * out, y: 0.44, z: S.z + fz * out, rx: S.W + 4, rz: 13, rot: S.rotY, hue: M.interiorSoft.color, k: 0.34 });
-    ctx.lightPool({ x: S.x + fx * (out + 9), y: 0.03, z: S.z + fz * (out + 9), rx: S.W + 6, rz: 12, rot: S.rotY, k: 0.26 });
+    ctx.lightPool({ x: S.x + fx * out, y: 0.45, z: S.z + fz * out, rx: S.W + 4, rz: 13, rot: S.rotY, hue: M.interiorSoft.color, k: 0.34 });
+    ctx.lightPool({ x: S.x + fx * (out + 9), y: 0.05, z: S.z + fz * (out + 9), rx: S.W + 6, rz: 12, rot: S.rotY, k: 0.26 });
     const accent = M[ctx.districtAccent[k]];
-    if (accent) ctx.lightPool({ x: S.x + fx * (out + 14), y: 0.03, z: S.z + fz * (out + 14), rx: S.W + 20, rz: 30, rot: S.rotY, hue: accent.emissive, k: 0.2 });
+    if (accent) ctx.lightPool({ x: S.x + fx * (out + 14), y: 0.04, z: S.z + fz * (out + 14), rx: S.W + 20, rz: 30, rot: S.rotY, hue: accent.emissive, k: 0.2 });
   });
   {
     const slab = new THREE.Mesh(mergeGeos(apronSlab), M.platinumLitBrushed || M.graphiteLight);
@@ -520,7 +529,7 @@ export function buildGround(ctx) {
       place(routeSymbols, symGeo, sp.x + (px + pz) * c45, 0.03, sp.z + (pz - px) * c45, -a + Math.PI / 2 + Math.PI / 4);
     }
     /* the symbol is the only bright thing on a dark lane; it pools where it lies */
-    ctx.lightPool({ x: sp.x, y: 0.02, z: sp.z, rx: 9, rz: 9, k: 0.3 });
+    ctx.lightPool({ x: sp.x, y: 0.06, z: sp.z, rx: 9, rz: 9, k: 0.3 });
     return curve;
   }
   ctx.roads = [corridor(-1), corridor(1)];
@@ -570,8 +579,9 @@ export function buildGround(ctx) {
     /* the wordmark holds at night and steps back under daylight, exactly as before */
     word.material.opacity = 0.55 + 0.45 * night;
   });
-  /* park the pool slots nobody claimed at zero scale rather than leaving them at the identity matrix,
-     where they would each render a one-metre blob of light at the world origin */
+  /* park the slots nobody claimed at zero scale. three allocates an InstancedMesh's matrix buffer
+     zero-filled, so they are already degenerate — this makes that an intention rather than a lucky
+     default, and it is what keeps ctx.lightPool safe to leave half-used. */
   _m4.makeScale(0, 0, 0);
   for (let i = nThemed; i < POOL_CAP; i++) poolThemed.setMatrixAt(i, _m4);
   for (let i = nFixed; i < POOL_CAP; i++) poolFixed.setMatrixAt(i, _m4);
