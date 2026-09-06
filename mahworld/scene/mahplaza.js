@@ -112,7 +112,7 @@ export async function createMahplaza(canvas, options = {}) {
   /* v4 modules are optional at load: the assembly integrates whichever exist (see CONTRACTS_V4.md) */
   const optional = async (name) => { try { return await import(name); } catch (e) { if (!/Failed to fetch|Cannot find|Failed to resolve|404|import/i.test(String(e && e.message))) console.info('MAHPLAZA optional module ' + name + ' —', e && e.message); return null; } };
   const CITY = await optional('./city.js'), DRESS = await optional('./plaza-dressing.js'), MATCHI = await optional('./match-interior.js'), LIFE = await optional('./life.js');
-  const CLOUDS = await optional('./clouds.js'), FOBEAM = await optional('./fobeam.js');
+  const CLOUDS = await optional('./clouds.js'), FOBEAM = await optional('./fobeam.js'), TERRAIN = await optional('./terrain.js');
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -167,7 +167,13 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null;
+  let city = null, dressing = null, terrain = null;
+  /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
+     own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
+  if (TERRAIN && TERRAIN.buildTerrain) {
+    try { terrain = TERRAIN.buildTerrain(ctx); if (terrain && terrain.group && !terrain.group.parent) scene.add(terrain.group); }
+    catch (e) { console.info('MAHPLAZA: terrain module failed —', e && e.message); terrain = null; }
+  }
   if (CITY && CITY.buildCity) { try { city = CITY.buildCity(ctx); if (city && city.group && !city.group.parent) scene.add(city.group); } catch (e) { console.info('MAHPLAZA: city module failed —', e && e.message); city = null; } }
   if (DRESS && DRESS.buildDressing) { try { dressing = DRESS.buildDressing(ctx); if (dressing && dressing.group && !dressing.group.parent) scene.add(dressing.group); } catch (e) { console.info('MAHPLAZA: dressing module failed —', e && e.message); dressing = null; } }
 
@@ -320,7 +326,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [city, dressing, matchInterior, life, clouds, fobeams].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -622,6 +628,7 @@ export async function createMahplaza(canvas, options = {}) {
     reflections.visible = quality.reflections;
     if (life && life.setBudget) { try { life.setBudget(quality.life); } catch (e) {} }
     if (city && city.setQuality) { try { city.setQuality(quality); } catch (e) {} }
+    if (terrain && terrain.setQuality) { try { terrain.setQuality(quality); } catch (e) {} }
     if (clouds && clouds.setQuality) { try { clouds.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
     return quality.name;
@@ -658,7 +665,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams }, city, dressing, matchInterior, life, clouds, fobeams,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams }, terrain, city, dressing, matchInterior, life, clouds, fobeams,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
