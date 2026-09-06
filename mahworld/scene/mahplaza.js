@@ -174,6 +174,8 @@ export async function createMahplaza(canvas, options = {}) {
   const HALOD = await optional('./halo-districts.js');/* R4: the eight districts standing on it */
   const HALOL = await optional('./halo-life.js');      /* R4-16: the social life on the ring */
   const HALOT = await optional('./halo-threshold.js'); /* R4-19: where HALO ends and SKY REALM begins */
+  const CROWNM = await optional('./mah-crown.js');     /* R5: MAH CROWN, the ultra-tall central landmark */
+  const DOMEM = await optional('./halo-dome.js');      /* R5: the sanctuary dome and its climbing routes */
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -228,7 +230,7 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null, beasts = null, interlink = null, halo = null, haloDistricts = null, haloLife = null, haloThreshold = null;
+  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null, beasts = null, interlink = null, halo = null, haloDistricts = null, haloLife = null, haloThreshold = null, mahCrown = null, haloDome = null;
   /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
      own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
   if (TERRAIN && TERRAIN.buildTerrain) {
@@ -350,6 +352,27 @@ export async function createMahplaza(canvas, options = {}) {
   if (halo && HALOT && HALOT.buildHaloThreshold) {
     try { haloThreshold = HALOT.buildHaloThreshold(ctx); scene.add(haloThreshold.group); }
     catch (e) { console.info('MAHPLAZA: halo threshold module failed —', e && e.message); haloThreshold = null; }
+  }
+  /* ================================================================================================
+     R5 — MAH CROWN. The sanctuary's ultra-tall central landmark, carried across the halo's hole on
+     eight spars from the inner rim. Built after the halo (it is founded on the rim's own height)
+     and before the life (its plinth is a place people stand).
+     ============================================================================================== */
+  if (halo && CROWNM && CROWNM.buildMahCrown) {
+    try { mahCrown = CROWNM.buildMahCrown(ctx); scene.add(mahCrown.group); }
+    catch (e) { console.info('MAHPLAZA: mah crown module failed —', e && e.message); mahCrown = null; }
+  }
+  /* R5 — THE HALO DOME. Built after MAH CROWN so its apex clearance can be measured against the
+     tower it has to clear rather than asserted, and after the threshold so its portal frames a gate
+     that already exists. */
+  if (halo && DOMEM && DOMEM.buildHaloDome) {
+    try {
+      haloDome = DOMEM.buildHaloDome(ctx);
+      scene.add(haloDome.group);
+      if (mahCrown && CROWNM) {
+        haloDome.stats.crownClearance = +(DOMEM.DOME.APEX_Y - CROWNM.CROWN.MAST_TOP).toFixed(1);
+      }
+    } catch (e) { console.info('MAHPLAZA: halo dome module failed —', e && e.message); haloDome = null; }
   }
   /* R4-16 — MAHBEING SOCIAL LIFE. Built after the districts AND after the threshold, because it
      stands on their furniture: the dance floor, the amphitheatre tiers, the kiosk line, the overlook
@@ -567,7 +590,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold, mahCrown, haloDome].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -601,7 +624,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold, mahCrown, haloDome].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -647,9 +670,18 @@ export async function createMahplaza(canvas, options = {}) {
      roam's three bounds were all measured against a world whose only floor was the ground, the
      ceiling and the upper radius move with it — see roam.js's own note on the two-storey bound. */
   if (halo && HALOM && HALOM.haloFloor) {
-    roam.setSurfaces([HALOM.haloFloor]);
+    /* R5 — the crown's plinth is the second analytic surface in the world. crownFloor() answers a
+       height inside a 240 m square at the sanctuary's centre and null everywhere else, exactly as
+       haloFloor() does for the ring, so the two compose without either knowing about the other. */
+    const surfaces = [HALOM.haloFloor];
+    if (mahCrown && CROWNM && CROWNM.crownFloor) surfaces.push(CROWNM.crownFloor);
+    roam.setSurfaces(surfaces);
     roam.setBounds({
-      ceil: HALOM.HALO.CEIL,
+      /* THE CEILING HAS TO CLEAR THE THING IT IS OVER. R4 set it at 2600 to clear a 1800 m ring;
+         MAH CROWN's mast is at 3620, so a 2600 m ceiling makes the sanctuary's own landmark
+         unreachable and unviewable from above — which would fail R5's observation clause with a
+         constant nobody would think to look at. It clears the mast by 220 m. */
+      ceil: mahCrown ? CROWNM.CROWN.MAST_TOP + 220 : HALOM.HALO.CEIL,
       /* above the transfer decks, nothing solid stands between the plaza and the sanctuary, so the
          upper world is as wide as the sanctuary plus a margin to see its outer rim from outside */
       highY: 900,
@@ -722,6 +754,13 @@ export async function createMahplaza(canvas, options = {}) {
        rather than something you are teleported past: the hold, the gate, and the flight line. */
     if (haloThreshold && haloThreshold.navSites) {
       try { for (const S of haloThreshold.navSites()) list.push(S); } catch (e) {}
+    }
+    /* R5 — MAH CROWN is the sanctuary's central destination, so it is a nav stop */
+    if (mahCrown && mahCrown.navSites) {
+      try { for (const S of mahCrown.navSites()) list.push(S); } catch (e) {}
+    }
+    if (haloDome && haloDome.navSites) {
+      try { for (const S of haloDome.navSites()) list.push(S); } catch (e) {}
     }
     if (mahDescent && mahDescent.stats) {
       for (const S of mahDescent.stats.sites) {
@@ -1095,6 +1134,19 @@ export async function createMahplaza(canvas, options = {}) {
     /* R4-19: the threshold's near detail. Measured to the GATE, because that is the object whose
        run-out plates and kerbs stop resolving — the cloud beyond it is meant to be seen from
        everywhere and is never the thing being tiered. */
+    /* R5 — the crown's band and glass tiers. Measured to the AXIS, because the tower is a vertical
+       line and its distance from a viewer is a horizontal distance, not a distance to a centroid
+       1.8 km up. */
+    if (mahCrown && mahCrown.setDetail) {
+      mahCrown.setDetail(Math.hypot(_detEye.x, _detEye.z));
+    }
+    /* R5 — the dome's climbing holds are the near field. Measured to the SHELL, not to the axis:
+       a viewer standing on the ring at r 2050 is 1400 m from the dome's spring, not 2050 m from
+       anything, and tiering on the wrong distance is how a near field ends up never being near. */
+    if (haloDome && haloDome.setDetail) {
+      const rE = Math.hypot(_detEye.x, _detEye.z);
+      haloDome.setDetail(Math.hypot(DOMEM.DOME.R - rE, _detEye.y - DOMEM.DOME.SPRING_Y));
+    }
     if (haloThreshold && haloThreshold.setDetail && haloThreshold.stats.gate) {
       const G = haloThreshold.stats, th = G.deg * Math.PI / 180;
       haloThreshold.setDetail(Math.hypot(_detEye.x - Math.cos(th) * G.gateR,
@@ -1154,6 +1206,8 @@ export async function createMahplaza(canvas, options = {}) {
     if (haloDistricts && haloDistricts.update) haloDistricts.update(t, dt);
     if (haloLife && haloLife.update) haloLife.update(t, dt);
     if (haloThreshold && haloThreshold.update) haloThreshold.update(t, dt);
+    if (mahCrown && mahCrown.update) mahCrown.update(t, dt);
+    if (haloDome && haloDome.update) haloDome.update(t, dt);
     if (monument && monument.update) monument.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
@@ -1438,6 +1492,8 @@ export async function createMahplaza(canvas, options = {}) {
     if (haloDistricts && haloDistricts.setQuality) { try { haloDistricts.setQuality(quality); } catch (e) {} }
     if (haloLife && haloLife.setQuality) { try { haloLife.setQuality(quality); } catch (e) {} }
     if (haloThreshold && haloThreshold.setQuality) { try { haloThreshold.setQuality(quality); } catch (e) {} }
+    if (mahCrown && mahCrown.setQuality) { try { mahCrown.setQuality(quality); } catch (e) {} }
+    if (haloDome && haloDome.setQuality) { try { haloDome.setQuality(quality); } catch (e) {} }
     if (beasts && beasts.setQuality) { try { beasts.setQuality(quality); } catch (e) {} }
     if (interlink && interlink.setQuality) { try { interlink.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
@@ -1475,7 +1531,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink, halo: !!halo, haloDistricts: !!haloDistricts, haloLife: !!haloLife, haloThreshold: !!haloThreshold }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink, halo: !!halo, haloDistricts: !!haloDistricts, haloLife: !!haloLife, haloThreshold: !!haloThreshold, mahCrown: !!mahCrown, haloDome: !!haloDome }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold, mahCrown, haloDome,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,

@@ -364,7 +364,14 @@ export function buildHalo(ctx, opts = {}) {
      which is what makes a 6800 m ceiling read as engineered rather than as weather. */
   under.roughness = 0.82; under.envMapIntensity = 0.14; under.roughnessMap = null;
   under.color.setHex(0x121a26);
-  applyHaloGrid(under, { gainMicro: 0, gainTile: 0.06, gainMega: 0.30, node: 0.35, tileFar: 220 });
+  /* AND THE GRID ON IT IS A WHISPER, NOT A CEILING PATTERN. L57 fixed the underside's VALUE and
+     left its LINES alone, and from the establishing camera — 1000 m below the ring and 2400 m out,
+     which is the frame the whole world is judged from — the MEGA grid and the polar spokes read as
+     a bright white lattice across the top third of the sky. A line at gain 0.30 on a 0x121a26 field
+     is a 6:1 contrast ratio, and there are thousands of them; the eye reads the pattern, not the
+     arc. The plating still exists so the underside is not a blank, but it sits at the threshold of
+     visible rather than above it: MEGA 0.12, nodes 0.12, and the tile scale essentially off. */
+  applyHaloGrid(under, { gainMicro: 0, gainTile: 0.02, gainMega: 0.12, node: 0.12, tileFar: 160 });
   owned.materials.push(under);
 
   /* the RIM is platinum: LAW 1's partner, a vertical band that catches the horizon, and the thing
