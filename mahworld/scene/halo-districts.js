@@ -438,7 +438,15 @@ export function buildHaloDistricts(ctx, opts = {}) {
   function districtSign(D, x, z, th, up) {
     const tex = signTexture({ title: D.label, sub: D.sub, mark: true });
     owned.textures.push(tex);
-    const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.9, fog: true, toneMapped: true });
+    /* DOUBLE-SIDED, because a ring has TWO along-ring approaches and a PlaneGeometry has one face.
+       A probe of the built scene found every one of the eight signs facing exactly tangentially —
+       which is the right choice, since the promenade runs along the ring and that is the direction
+       a district is walked toward. But at the default FrontSide each sign was legible from only ONE
+       of those two directions, so half of every approach saw a blank. (The tangential facing itself
+       was flagged as a defect by the audit and is NOT one: it is what street signage does. The
+       single-sidedness is.) */
+    const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.9, fog: true,
+      toneMapped: true, side: THREE.DoubleSide });
     m.name = 'halo-sign-' + D.id; owned.materials.push(m); signMats.push(m);
     if (ctx && ctx.signMaterials) ctx.signMaterials.push(m);
     const mesh = new THREE.Mesh(own(new THREE.PlaneGeometry(26, 26 * (768 / 2048))), m);
