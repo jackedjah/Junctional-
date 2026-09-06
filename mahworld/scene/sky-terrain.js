@@ -18,7 +18,11 @@
                       corridors), and the sector-A CLIFF, where the deck stops and cloud pours over
                       the edge into 300 m of open air.
      3  DETACHED      layout.ISLANDS as landable soft lumps, layout.TOWERS as the cold side's hero
-                      vertical architecture — 620–1500 m of cloud, 1.4–3 km out (§17).
+                      vertical architecture — 620–1500 m of cloud, 1.4–3 km out (§17). Each of these
+                      CLOSES ITS OWN OUTER ENVELOPE on a convex curve rather than ending on a
+                      full-width mass (§06): a column crowns, a shelf and an anvil taper to lenses,
+                      an island's dome and root both meet their poles with a horizontal tangent. The
+                      masses inside stay individually lumpy — the MASS is what has to be round.
      4  THE SEA       the rolling cloud ocean out to seaRadius*0.75, cheap per square metre and
                       enormous in extent (§33, §46).
      5  THE DRIFT     the realm's weather: mist banks crossing the low ground on one wind, wisps that
@@ -1032,9 +1036,17 @@ export function buildSkyTerrain(ctx) {
         const yy = baseY + T.h * 0.55;
         for (let i = 0; i < 7; i++) {
           const u = (i / 6 - 0.5) * T.w * 1.6;
+          /* THE ENDS OF THE SHELF (§06). Seven equal masses in a row gave a 700 m cloud two square
+             ends: the row simply stopped, and a mass that stops is a cut sheet rather than weather.
+             The same convex envelope the realm's peaks use closes them — full through the middle,
+             44 % at the ends, and with the tangent turning as it closes, so the shelf reads as a
+             lens seen edge-on. It costs nothing: these are the same seven masses, re-sized. */
+          const e = i / 3 - 1;                             /* −1 .. +1 across the row */
+          const env = Math.pow(1 - e * e * 0.86, 0.42);
           addQuad(towerSet, {
             x: cx + tx * u, y: yy + (R() - 0.5) * T.h * 0.16, z: cz + tz * u,
-            w: T.w * (0.72 + R() * 0.3), h: T.h * (0.30 + R() * 0.16), roll: (R() - 0.5) * 0.14,
+            w: T.w * (0.72 + R() * 0.3) * env, h: T.h * (0.30 + R() * 0.16) * (0.62 + 0.38 * env),
+            roll: (R() - 0.5) * 0.14,
             cell: (k + i) & 3, flip: R() < 0.5, base: 1.0, aTop: 0.80, aBot: 0.52, cool: 0.30,
             imp: T.h / T.r, grp: 6, run: k
           });
@@ -1054,22 +1066,43 @@ export function buildSkyTerrain(ctx) {
         for (let i = 0; i < N; i++) {
           const t = i / (N - 1);
           const flare = 1 + 0.34 * Math.pow(1 - t, 2.0);   /* wide, soft foot */
+          /* THE CROWN (§06). The stack used to end on a mass exactly as wide as the ones below it,
+             so a kilometre of cloud finished on a flat cut — and the per-mass width jitter of ±17 %
+             sat ON that silhouette, where it read as a torn edge rather than as a rounding mass.
+             Both are answered by the curve the realm's peaks were corrected to: an outer envelope
+             of pow(1 − c², 0.42) over the top third of the column, whose tangent turns horizontal
+             at the summit, so the outline CLOSES instead of stopping. It bottoms out at 0.55 and
+             never at zero — a cumulus tower rounds over, it does not taper to a point, and a
+             column that ran to nothing would just be the spike this law forbids. The jitter is
+             damped to nothing as the envelope closes, so the last masses sit ON the curve rather
+             than across it: the elements stay individually lumpy, the MASS is what is round.
+             No extra quads — these are the same nine masses, re-sized. */
+          const c = clamp01((t - 0.62) / 0.38);
+          const crown = 0.55 + 0.45 * Math.pow(1 - c * c, 0.42);
           const u = (R() - 0.5) * T.w * 0.30;
           addQuad(towerSet, {
             x: cx + tx * u, y: baseY + T.h * (0.06 + t * 0.72), z: cz + tz * u,
-            w: T.w * flare * (0.86 + R() * 0.3), h: T.h * (0.20 + R() * 0.08),
+            w: T.w * flare * crown * (0.86 + R() * 0.3 * (1 - c)),
+            h: T.h * (0.20 + R() * 0.08) * (0.80 + 0.20 * crown),
             roll: (R() - 0.5) * 0.18, cell: (k * 3 + i) & 3, flip: R() < 0.5,
             base: 0.96 + 0.14 * t, aTop: 0.84, aBot: 0.56, cool: 0.42 * (1 - t),
             imp: T.h / T.r, grp: 6, run: k
           });
         }
         if (T.kind === 'anvil') {
-          /* the anvil: the top spreads and shears, which is what says "this is 1.5 km of weather" */
+          /* the anvil: the top spreads and shears, which is what says "this is 1.5 km of weather".
+             Its ends take the same closing envelope as the shelf's (§06) — an anvil that ends on a
+             full-size mass is a plate, and a plate has corners. The shear is untouched: the row is
+             still offset −0.42 .. +0.58, so the spread stays asymmetric and the envelope simply
+             follows it. */
           for (let i = 0; i < 6; i++) {
             const u = (i / 5 - 0.42) * T.w * 2.0;
+            const e = (i / 5) * 2 - 1;
+            const env = Math.pow(1 - e * e * 0.80, 0.42);
             addQuad(towerSet, {
               x: cx + tx * u, y: baseY + T.h * (0.86 + R() * 0.12), z: cz + tz * u,
-              w: T.w * (0.9 + R() * 0.5), h: T.h * (0.11 + R() * 0.06), roll: (R() - 0.5) * 0.1,
+              w: T.w * (0.9 + R() * 0.5) * env, h: T.h * (0.11 + R() * 0.06) * (0.66 + 0.34 * env),
+              roll: (R() - 0.5) * 0.1,
               cell: (k + i + 1) & 3, flip: R() < 0.5, base: 1.16, aTop: 0.86, aBot: 0.58, cool: 0.1,
               imp: T.h / T.r * 1.2, grp: 6, run: k
             });

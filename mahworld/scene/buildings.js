@@ -339,8 +339,19 @@ function crownRing(list, o) {
     const span = y1 - y0, h = span / Math.cos(th), lean = (t / 2) / Math.cos(th);
     const mid = off + (span / 2) * Math.tan(th);        /* the profile's inward lean at this course's mid-height */
     const hx = ax + t / 2 - mid - lean, hz = az + t / 2 - mid - lean, yc = (y0 + y1) / 2;
+    /* BOTH PAIRS OF BLADES TAKE THE CHAMFER ON THEIR LONG TOP ARRIS, which is the same orientation
+       rule coping() is built on, applied to the members that carry the crown's own roofline. A blade
+       is read along its length, so the edge that must turn is the one running WITH it. chamferBox
+       bevels only the eight edges bounding the two ends of its extrusion, so the axis it is extruded
+       along decides which four arrises stay square: extruded across the thickness (the front and back
+       blades) the long top-outer arris turns; extruded along the length (which is how the side blades
+       were written) it does NOT, and a 25–32 m square 90° edge is left at the very top of the crown —
+       the one place this whole pass exists to blunt. The side blades are therefore built the same way
+       round as the front and back and quarter-turned into place: identical 28 triangles, identical
+       bounding box, and the four square arrises move to the 1.5 m blade ends, where the corner mitre
+       covers them. */
     for (const sz of [-1, 1]) part(list, chamferBox(2 * hx + t - 2 * k, h, t, 0.06), 0, yc, zc + sz * hz, 0, -sz * th);
-    for (const sx of [-1, 1]) part(list, chamferBox(t, h, 2 * hz + t - 2 * k, 0.06), sx * hx, yc, zc, 0, 0, sx * th);
+    for (const sx of [-1, 1]) part(list, chamferBox(2 * hz + t - 2 * k, h, t, 0.06).rotateY(Math.PI / 2), sx * hx, yc, zc, 0, 0, sx * th);
     /* THE FOUR MITRES. Tilted about X FIRST and yawed after, so each one leans along its own diagonal
        instead of along an axis — a corner facet that leaned north would read as a folded plate.
        The length and the inset are DERIVED, not chosen, and getting them wrong is how a chamfer turns

@@ -77,16 +77,32 @@
      the canopy's orthographic silhouette:
 
                                           v7          v8
-       canopy vertices outside the crown   18/18 trees  0/18 trees
+       worst canopy vertex, in NOMINAL crowns  1.240        1.100
+       and it is now the SAME 1.100 on every plate — one shell, not a scatter
        widest point / median outline       1.205        1.125
-       median outline / nominal crown      0.958        0.967
        notch floor between plates          0.738        0.737
        share of the outline actually full  61.0%        74.8%
 
      Read that as: the crown is the same SIZE it was and the gaps between its
-     plates are no deeper, but nothing sticks out of it any more and it is a
+     plates are no deeper, but no PLATE sticks out of it any more and it is a
      seventh less transparent. The widest point of the crown is no longer a spike
      — it is the envelope, which every outline plate now shares.
+     SAY THE BOUND OUT LOUD, because it is easy to misread this table: the crown
+     is bounded by CROWN_ENVELOPE x (canopyR, RY), which is 1.10 x nominal, NOT by
+     the nominal ellipsoid. v8 does not put the canopy inside `canopyR`; it puts
+     every plate on ONE surface at 1.10 of it, exactly attained (verified over
+     1,906 plates: the seating solve never falls back and never clamps). The
+     roundness comes from the plates SHARING a surface, not from a smaller one.
+     WHAT IS STILL POINTY, and this pass made it worse, not better: the BARE
+     BRANCH TIPS. appendTube closes a tube by running its radius to zero, so a
+     branch ends in a true needle, and the wood is byte-identical to v7. Pulling
+     the canopy in from a scattered 1.24 to a uniform 1.10 uncovered them.
+     MEASURED over 54 trees / 347 branches, tips ending outside their own tree's
+     outermost canopy point: v7 5, worst 10.8 cm; v8 8, worst 32.0 cm (1.16x the
+     canopy shell, on a large tree). It is ~2% of branches, but a zero-radius tip
+     is exactly the hairline law 06 names. Blunting it needs an END CAP in
+     appendTube — which the trunk and the heartwood seam also run through — so it
+     is a shape decision for the director, not a tidy-up. Left as found, flagged.
 
      WHAT IT COST. The plate went from 8 triangles to 12, so a canopy costs 1.5x
      what it did: 200/248/312 -> 300/372/468 by size, a tree 341/365/465 ->
@@ -337,7 +353,12 @@ function leafGeometry() {   /* square-diamond: a SQUARE rotated 45° in the plat
    it replaces one arris with a third face, so the plate is MORE crystalline and
    its outer end now carries a facet 0.32x the plate width that takes a highlight
    where a vertex could only alias into a hairline.
-   Area lost to the two cuts is 9%: the plate is 0.455 against the rhombus' 0.50.
+   Area lost to the two cuts is 10.2%: the plate is 0.4488 against the rhombus'
+   0.5000. The blunt end is not literally one facet — it is the two triangles that
+   share the 0.32-long tip edge, meeting at a 171 degree dihedral (a 9 degree
+   ridge), so it reads as a flat tip rather than being one. What matters is that
+   the OUTLINE loses its corner. The solid stays a closed manifold (V8 E18 F12,
+   Euler 2) with 12 distinct facet normals, up from the octahedron's 8.
    THE BRAND FIGURE IS NOT THIS. leafGeometry above is the MAHFITT square diamond
    and it keeps its four points — planter leaves, the crown cores and the craft
    prow all still wear it, sharp, on purpose. This is foliage. */

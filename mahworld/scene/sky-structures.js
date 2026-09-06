@@ -38,6 +38,14 @@
    chromeSatin / chromeMirror, which reflect the bright horizon band and read as metal. In a white
    cloud world a black platform top is the loudest possible mistake.
 
+   FORM (§06): THE SILHOUETTE IS ROUND, THE SURFACE IS CRYSTALLINE. Nothing in this file tapers to a
+   point. Every mass is an octagon in plan with a bevelled top and bottom (massGeo) or a chamfered
+   box (chamferBox), so a corner is always a third FACE rather than an arris; and where a form has to
+   narrow — the two suspended towers — it narrows on the convex profile in bluntTaperSides() and
+   finishes on a small flat facet, never on a needle. The ONE exception is the brand's own figure:
+   the square diamond that crowns the relay and each suspended tower, the target diamonds, the gate
+   frames, the ring markers and the inlaid plates keep their points on purpose.
+
    SIGNAGE (§35, §36). Only layout.SIGNAGE, and only these six surfaces: the concourse blade
    (MAH ASCENT + the canonical sub-line + the canonical mark), the queue pylon (ASCENT QUEUE + the
    mark + a live pad-state list), a threshold plate on the apron (UPPER REALM), four wayfinding
@@ -115,6 +123,90 @@ function massGeo(w, d, h, c, bevel = 0.35) {
   g.rotateX(-HALF_PI);          /* +Z extrusion becomes +Y */
   g.translate(0, bevel, 0);
   g.computeVertexNormals();
+  return g;
+}
+
+/* ------------------------------------------------------- A TAPER THAT ENDS IN A FACET (§06)
+   THE SILHOUETTE IS ROUND, THE SURFACE IS CRYSTALLINE — and a cone fails the first half of that.
+   CylinderGeometry's taper is LINEAR, so its silhouette tangent at the tip is the same as at the
+   base: the outline never turns, and the form runs on to a point. Worse, a point a few centimetres
+   across a kilometre away is a fraction of a pixel — it aliases into a crawling hairline and
+   catches no light at all, so it neither reads as mass nor as detail.
+
+   This is the profile terrain.js's massif() uses and the one sky-atmosphere.js's peaks were
+   corrected to, written here for a solid of revolution:
+
+       r(u) = tip + (base - tip) * pow(1 - u*u, 0.42)        u = 0 at the base, 1 at the tip
+
+   Two properties do the work. The radius HOLDS — at u = 0.5 it is still 87 % of the base, where a
+   cone is at 50 % — so the form keeps its shoulders; and dr/du goes to −infinity as u → 1, i.e. the
+   silhouette tangent turns HORIZONTAL and the outline closes like a dome instead of converging.
+   It stops at `tip` rather than at zero, so the form finishes on a small FLAT n-gon that takes a
+   real highlight.
+
+   THE SURFACE IS NOT SMOOTHED, because a rounded silhouette carried by a smooth-shaded tube is the
+   bubbly failure rather than the fix. CylinderGeometry gives smooth radial normals; these sides are
+   emitted non-indexed with ONE flat normal per quad, and with few segments and few rings, so the
+   result is a ring of big planar facets that catch the horizon differently from one another.
+   Sides and cap are separate geometries on purpose: a cap is a HORIZONTAL face, and horizontal
+   faces in this realm take a low-metalness grade (see the material law in the header). */
+const TAPER_EXP = 0.42;
+function taperRadius(base, tip, u) { return tip + (base - tip) * Math.pow(Math.max(0, 1 - u * u), TAPER_EXP); }
+/* the swept sides, base at local y = 0 and tip at y = +len; place it with put()'s rx = PI to point down */
+function bluntTaperSides(base, tip, len, seg = 10, rings = 4) {
+  const n = seg * rings * 6;
+  const pos = new Float32Array(n * 3), nrm = new Float32Array(n * 3), uv = new Float32Array(n * 2);
+  let o = 0, uo = 0;
+  const emit = (px, py, pz, nx, ny, nz, u, v) => {
+    pos[o] = px; pos[o + 1] = py; pos[o + 2] = pz;
+    nrm[o] = nx; nrm[o + 1] = ny; nrm[o + 2] = nz; o += 3;
+    uv[uo] = u; uv[uo + 1] = v; uo += 2;
+  };
+  for (let k = 0; k < rings; k++) {
+    const t0 = k / rings, t1 = (k + 1) / rings;
+    const r0 = taperRadius(base, tip, t0), r1 = taperRadius(base, tip, t1);
+    const y0 = len * t0, y1 = len * t1;
+    /* the profile's own outward normal in the (radius, y) plane, before it is swept round */
+    const dr = r1 - r0, dy = y1 - y0, pl = Math.sqrt(dr * dr + dy * dy) || 1;
+    const nr = dy / pl, ny = -dr / pl;
+    for (let j = 0; j < seg; j++) {
+      const a0 = (j / seg) * TAU, a1 = ((j + 1) / seg) * TAU, am = (a0 + a1) * 0.5;
+      const c0 = Math.cos(a0), s0 = Math.sin(a0), c1 = Math.cos(a1), s1 = Math.sin(a1);
+      const nx = Math.cos(am) * nr, nz = Math.sin(am) * nr;
+      const u0 = j / seg, u1 = (j + 1) / seg;
+      /* wound (A, C, B) / (A, D, C) so the front face is the outward one */
+      emit(c0 * r0, y0, s0 * r0, nx, ny, nz, u0, t0);
+      emit(c1 * r1, y1, s1 * r1, nx, ny, nz, u1, t1);
+      emit(c1 * r0, y0, s1 * r0, nx, ny, nz, u1, t0);
+      emit(c0 * r0, y0, s0 * r0, nx, ny, nz, u0, t0);
+      emit(c0 * r1, y1, s0 * r1, nx, ny, nz, u0, t1);
+      emit(c1 * r1, y1, s1 * r1, nx, ny, nz, u1, t1);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  return g;
+}
+/* the flat facet the taper ends on — its own geometry so it can wear the horizontal grade */
+function bluntTaperCap(tip, y, seg = 10) {
+  const n = seg * 3;
+  const pos = new Float32Array(n * 3), nrm = new Float32Array(n * 3), uv = new Float32Array(n * 2);
+  let o = 0, uo = 0;
+  const emit = (x, z) => {
+    pos[o] = x; pos[o + 1] = y; pos[o + 2] = z;
+    nrm[o] = 0; nrm[o + 1] = 1; nrm[o + 2] = 0; o += 3;
+    uv[uo] = 0.5 + x / (tip * 2); uv[uo + 1] = 0.5 + z / (tip * 2); uo += 2;
+  };
+  for (let j = 0; j < seg; j++) {
+    const a0 = (j / seg) * TAU, a1 = ((j + 1) / seg) * TAU;
+    emit(0, 0); emit(Math.cos(a1) * tip, Math.sin(a1) * tip); emit(Math.cos(a0) * tip, Math.sin(a0) * tip);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
   return g;
 }
 
@@ -1410,8 +1502,26 @@ export function buildSkyStructures(ctx) {
     const p = layout.siteAt(name);
     const S = i === 0 ? 1.0 : 1.32;
     place(name, p.x, p.z, { floating: true, topY: p.y + 30 * S, radius: 15 * S });
-    put('D', 'mid', new THREE.CylinderGeometry(0.1, 2.2, 26 * S, 14), p.x, p.y + 13 * S, p.z);
-    put('D', 'mid', new THREE.CylinderGeometry(2.2, 0.1, 26 * S, 14), p.x, p.y - 13 * S, p.z);
+    /* THE TWO NOSES (§06). These were a pair of CylinderGeometry cones running to radius 0.10 — a
+       26 m needle above the body and another below it, on the two forms in this realm that are
+       NOTHING BUT silhouette. MEASURED against the cold-side camera the assembly actually uses
+       (fov 54, looking at these from the relay): one 1080-line pixel spans 0.77 m at 880 m and
+       1.03 m at 1180 m, so those 0.20 m tips were a quarter of a pixel and the last SEVEN metres
+       of each spike measured under two. They aliased into a crawling hairline, and the brand
+       diamond on top sat on a 0.36 m stalk — too thin to see, so it read as detached from the
+       tower under it. Both are now the blunt convex profile above: the width holds through the
+       body, the outline closes with a horizontal tangent, the diamond now seats on a 2.31 m neck,
+       and each nose finishes on a flat facet — 1.24 m across above, 1.90 m below — that catches
+       an actual highlight instead of a subpixel flicker. The tip
+       radii are not symmetric on purpose. The upper one is 0.62 because it has to stay INSIDE the
+       crowning square-diamond, whose square section at that height inscribes a circle of 0.707 x S;
+       the lower one is exposed and is 0.95, which is the smallest facet still worth a pixel.
+       The caps are separate and wear midLit: they are the only horizontal faces on the piece, and
+       platinumMid at metalness 0.94 would render them black (contract law, header). */
+    put('D', 'mid', bluntTaperSides(2.2, 0.62, 26 * S), p.x, p.y, p.z);
+    put('D', 'midLit', bluntTaperCap(0.62, 26 * S), p.x, p.y, p.z);
+    put('D', 'mid', bluntTaperSides(2.2, 0.95, 26 * S), p.x, p.y, p.z, 0, Math.PI);
+    put('D', 'midLit', bluntTaperCap(0.95, 26 * S), p.x, p.y, p.z, 0, Math.PI);
     put('D', 'mid', new THREE.CylinderGeometry(1.5, 1.5, 30 * S, 12), p.x, p.y, p.z);
     const RS = [[14 * S, 11 * S], [0, 14 * S], [-14 * S, 8.5 * S]];
     for (const [dy, rr] of RS) {
