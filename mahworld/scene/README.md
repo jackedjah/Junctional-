@@ -6,8 +6,23 @@ system, no network and no interface baked into the world.
 
 | Scene | Page | Status |
 | --- | --- | --- |
-| **MAHPLAZA** — MAH GYM · MAH MATCH · MAH MARKET, residents, sky, day/night, preview navigation | `mahplaza.html` | **slice v3** (reference-locked visible plaza slice), the current milestone |
+| **MAHPLAZA** — MAH GYM · MAH MATCH · MAH MARKET, a living district, luminous crystalline night | `mahplaza.html` | **v4** (AAA closure + crystalline night), the current milestone |
 | Arrival Gate — the MAHWORLD gate plaza | `arrival-gate/plaza.html` | study v1, kept for the record |
+
+## The v4 world modules
+
+Each is optional: the assembly imports it if the file exists and drives it through
+`setTime` / `setTheme` / `update` / `setQuality`, so any one can be removed without
+breaking the page. Contracts: `CONTRACTS_V4.md`.
+
+| Module | Owns |
+| --- | --- |
+| `city.js` | the MAHWORLD district: midground blocks with recessed window grids, bridges and a long walkway, background crystalline towers, distant giants, a travelling rail pod and an elevator |
+| `plaza-dressing.js` | the plaza's civic design: inlaid routes with curb lips, two gathering nodes, light masts with square-diamond luminaires and soft pools, corridor rails and bollards, benches, an info pylon, a shelter |
+| `match-interior.js` | the engineered MAH MATCH combat hall: chamfered platform, energy boundary, barrier rails, tiered seating, lighting truss, training bays, and the two entrance actions mounted in recessed display frames |
+| `clouds.js` | the diamond cloud system: layered soft cloud masses with crystalline internal planes lit by the moon, drifting per layer |
+| `fobeam.js` | FOBEAM infrastructure in the canonical language — rail core, soft outer field, travelling square-diamond packets with their travelling light, endpoint receivers, per-route direction; plus the distinct broad FOBLOW ribbons |
+| `life.js` + `effects.js` | ambient world life on a path network, conversation groups, building entries, an eight-event scheduler with cooldowns, distance tiers, and pooled crystalline MAHGIC effects |
 
 ## Renderer and dependencies
 

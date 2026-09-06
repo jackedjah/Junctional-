@@ -16,6 +16,30 @@ tree when written; the revision at the bottom says when.
   (`963b292`) and `.claude/worktrees/agent-af917…` (`4915fac`), both renderer-branch
   worktrees from earlier agent work.
 
+## v4 — AAA closure and the luminous crystalline night (current)
+
+The scene is no longer three buildings on an empty floor. It is a lit district with a
+designed plaza, a living population, an engineered combat hall, diamond clouds and
+FOBEAM infrastructure carrying square-diamond packets.
+
+| Module (all optional, all guarded) | What it adds |
+| --- | --- |
+| `city.js` | midground blocks with window grids, bridges, a long walkway, background crystalline towers, distant giants, a rail pod, an elevator |
+| `plaza-dressing.js` | inlaid routes with curb lips, two gathering nodes, ten light masts, rails, bollards, benches, an info pylon, a shelter |
+| `match-interior.js` | the engineered MAH MATCH hall with the two entrance actions mounted in architecture |
+| `clouds.js` | layered diamond clouds: soft masses with crystalline internal planes lit by the moon |
+| `fobeam.js` | 5 routes, 23 travelling square-diamond packets, endpoint receivers, real occlusion; distinct FOBLOW ribbons |
+| `life.js` + `effects.js` | walkers, groups, building entries, eight ambient events with cooldowns, pooled MAHGIC effects |
+
+Night lighting was rebuilt so the world is filled with controlled light while staying deep:
+moon key 1.35 with shadows, hemisphere 1.5, city-bounce fill 0.66, environment 0.92 with a
+horizon glow band, neutrals raised with higher `envMapIntensity`, platinum trims at
+`envMapIntensity` 1.9.
+
+`world.advance(seconds)` runs the world deterministically for validation. Headless browsers
+throttle animation frames to under one per second, so evidence could not otherwise observe
+ambient life; it drives the same step function a browser runs.
+
 ## What runs today (latest viewable result)
 
 - `mahworld/scene/mahplaza.html` — the MAHPLAZA slice on the permitted renderer

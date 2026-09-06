@@ -150,6 +150,7 @@ export async function createMahplaza(canvas, options = {}) {
     } catch (e) { console.info('MAHPLAZA: match-interior module failed —', e && e.message); matchInterior = null; }
   }
   const sky = buildSky(ctx);
+  ctx.sky = sky;   /* the v4 sky modules retire the placeholders they replace through this handle */
   /* the v4 sky modules take over from the sky's own placeholders when they exist */
   let clouds = null, fobeams = null;
   if (CLOUDS && CLOUDS.buildClouds) {

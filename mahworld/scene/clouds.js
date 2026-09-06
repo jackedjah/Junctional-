@@ -274,7 +274,7 @@ export function buildClouds(ctx) {
        with a draw range instead of rebuilding anything ---- */
     const bodyMat = new THREE.MeshBasicMaterial({
       map: atlas, color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false, fog: false,
-      vertexColors: true, side: THREE.DoubleSide, blending: THREE.NormalBlending
+      vertexColors: true, side: THREE.DoubleSide, forceSinglePass: true, blending: THREE.NormalBlending
     });
     materials.push(bodyMat);
 
@@ -326,8 +326,8 @@ export function buildClouds(ctx) {
     const bodyFront = build(front, L.order, 'front', 0.5);
 
     /* ---- the two crystal meshes: caught by the moon, and turned away ---- */
-    const litMat = new THREE.MeshBasicMaterial({ map: facet, color: KEYS.night.lit, transparent: true, opacity: KEYS.night.litA, depthWrite: false, fog: false, side: THREE.DoubleSide, blending: THREE.NormalBlending });
-    const darkMat = new THREE.MeshBasicMaterial({ map: facet, color: KEYS.night.dark, transparent: true, opacity: KEYS.night.darkA, depthWrite: false, fog: false, side: THREE.DoubleSide, blending: THREE.NormalBlending });
+    const litMat = new THREE.MeshBasicMaterial({ map: facet, color: KEYS.night.lit, transparent: true, opacity: KEYS.night.litA, depthWrite: false, fog: false, side: THREE.DoubleSide, forceSinglePass: true, blending: THREE.NormalBlending });
+    const darkMat = new THREE.MeshBasicMaterial({ map: facet, color: KEYS.night.dark, transparent: true, opacity: KEYS.night.darkA, depthWrite: false, fog: false, side: THREE.DoubleSide, forceSinglePass: true, blending: THREE.NormalBlending });
     materials.push(litMat, darkMat);
     const cap = Math.max(1, planes.length);
     const lit = new THREE.InstancedMesh(sheetGeo, litMat, cap);
@@ -356,7 +356,7 @@ export function buildClouds(ctx) {
 
   /* ---- the theme sheen: a faint energy tint on a few low-deck sheets near
      the beam altitudes. Never more than a breath of colour (≤ 0.12). ---- */
-  const sheenMat = new THREE.MeshBasicMaterial({ map: facet, color: theme.energy, transparent: true, opacity: 0.09, depthWrite: false, fog: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
+  const sheenMat = new THREE.MeshBasicMaterial({ map: facet, color: theme.energy, transparent: true, opacity: 0.09, depthWrite: false, fog: false, side: THREE.DoubleSide, forceSinglePass: true, blending: THREE.AdditiveBlending });
   materials.push(sheenMat);
   const sheen = new THREE.InstancedMesh(sheetGeo, sheenMat, Math.max(1, sheenSource.length));
   sheen.name = 'cloud-energy-sheen';
