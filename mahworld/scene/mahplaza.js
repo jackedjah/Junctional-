@@ -172,6 +172,7 @@ export async function createMahplaza(canvas, options = {}) {
   const ILINK = await optional('./interlink.js');     /* R2 §5: the routes between the three cities */
   const HALOM = await optional('./halo.js');          /* R4: MAH HALO, the upper sanctuary surface */
   const HALOD = await optional('./halo-districts.js');/* R4: the eight districts standing on it */
+  const HALOL = await optional('./halo-life.js');      /* R4-16: the social life on the ring */
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -226,7 +227,7 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null, beasts = null, interlink = null, halo = null, haloDistricts = null;
+  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null, rainforest = null, mahAscent = null, mahDescent = null, outerRing = null, facilities = null, beasts = null, interlink = null, halo = null, haloDistricts = null, haloLife = null;
   /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
      own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
   if (TERRAIN && TERRAIN.buildTerrain) {
@@ -334,6 +335,13 @@ export async function createMahplaza(canvas, options = {}) {
       });
       scene.add(haloDistricts.group);
     } catch (e) { console.info('MAHPLAZA: halo districts module failed —', e && e.message); haloDistricts = null; }
+  }
+  /* R4-16 — MAHBEING SOCIAL LIFE. Built after the districts because it stands on their furniture:
+     the dance floor, the amphitheatre tiers, the kiosk line, the overlook rails. It is a POPULATION
+     and not a cast, so it does not go through ctx.residentSpots — see halo-life.js's header. */
+  if (halo && HALOL && HALOL.buildHaloLife) {
+    try { haloLife = HALOL.buildHaloLife(ctx); scene.add(haloLife.group); }
+    catch (e) { console.info('MAHPLAZA: halo life module failed —', e && e.message); haloLife = null; }
   }
   /* R3-07 — the three recommended entrances. The two peer-city sites come from THOSE MODULES' own
      stats rather than from a second table here: L42's lesson is that when two files each know where
@@ -534,7 +542,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -568,7 +576,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -1047,6 +1055,13 @@ export async function createMahplaza(canvas, options = {}) {
     /* R4: the halo's PHYSICAL near-field follows the eye. The shell is one surface out to 3400 m;
        the 26x26 field of real tiles that gives it relief under your feet has to be where you are. */
     if (halo && halo.setEye) halo.setEye(_detEye.x, _detEye.y, _detEye.z);
+    /* R4-16: the population's animation AND visibility tiers. The ring is 6800 m across, so without
+       a far cut the crowd is paid for from every camera in the world — measured against the nearest
+       point of the ring, not its centre, or a viewer standing ON it reads as 2050 m away. */
+    if (haloLife && haloLife.setDetail) {
+      const rEye = Math.hypot(_detEye.x, _detEye.z);
+      haloLife.setDetail(Math.hypot(Math.abs(rEye - HALOM.HALO.R_MID), _detEye.y - HALOM.HALO.Y));
+    }
     updateFrustum();
   }
 
@@ -1099,6 +1114,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (interlink && interlink.update) interlink.update(t, dt);
     if (halo && halo.update) halo.update(t, dt);
     if (haloDistricts && haloDistricts.update) haloDistricts.update(t, dt);
+    if (haloLife && haloLife.update) haloLife.update(t, dt);
     if (monument && monument.update) monument.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
@@ -1381,6 +1397,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (facilities && facilities.setQuality) { try { facilities.setQuality(quality); } catch (e) {} }
     if (halo && halo.setQuality) { try { halo.setQuality(quality); } catch (e) {} }
     if (haloDistricts && haloDistricts.setQuality) { try { haloDistricts.setQuality(quality); } catch (e) {} }
+    if (haloLife && haloLife.setQuality) { try { haloLife.setQuality(quality); } catch (e) {} }
     if (beasts && beasts.setQuality) { try { beasts.setQuality(quality); } catch (e) {} }
     if (interlink && interlink.setQuality) { try { interlink.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
@@ -1418,7 +1435,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink, halo: !!halo, haloDistricts: !!haloDistricts }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink, halo: !!halo, haloDistricts: !!haloDistricts, haloLife: !!haloLife }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
