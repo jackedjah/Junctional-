@@ -16,9 +16,33 @@ const all = FILES.map(f => stripComments(src[f])).join('\n');
 
 /* ---- light law: no yellow / amber / orange energy anywhere in the scene sources ---- */
 function hsl(hex) { const r = ((hex >> 16) & 255) / 255, g = ((hex >> 8) & 255) / 255, b = (hex & 255) / 255; const max = Math.max(r, g, b), min = Math.min(r, g, b); const l = (max + min) / 2; if (max === min) return { h: 0, s: 0, l }; const d = max - min; const s = l > 0.5 ? d / (2 - max - min) : d / (max + min); let h; if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)); else if (max === g) h = (b - r) / d + 2; else h = (r - g) / d + 4; return { h: h * 60, s, l }; }
+/* LAW-001 WAS AMENDED IN v8, ON DIRECTION, AND THE AMENDMENT IS NARROW.
+   The original law forbade every warm literal anywhere in the scene, and it earned its keep: it is
+   what kept MAHWORLD from drifting into the amber-and-teal of every other sci-fi city, and it is why
+   the canonical champagne gold #E9C98F is still kept out of the world's surfaces.
+
+   The direction is now explicit: "most of the windows of the buildings should have yellow or an
+   off-white lighting faintly coming out of it." That is a real reversal and it is the right one —
+   cool interiors made every lit window agree with the signage, which flattened the city into one
+   blue. What is NOT reversed is the thing the law was actually protecting: warm may be LIGHT COMING
+   FROM INSIDE A BUILDING, and nothing else. It may not be a surface, a material's base colour, a
+   sign, a seam, a beam, an emissive trim, or a resident.
+
+   So the exemption is by ROLE, not by file: a warm literal passes only if the identifier it is
+   assigned to names an interior light. Everything else still fails, including a warm value smuggled
+   into a material called `panel` or `trim`. */
+const WARM_ROLE = /(^|[^A-Za-z])(interior|interiorPale|interiorSoft|windowWarm|roomLight|lamplight)([^A-Za-z]|$)/;
 const yellows = [];
-for (const f of FILES) { const m = stripComments(src[f]).match(/0x[0-9a-fA-F]{6}\b/g) || []; for (const hx of m) { const { h, s, l } = hsl(parseInt(hx, 16)); if (h >= 28 && h <= 75 && s > 0.35 && l > 0.2) yellows.push(f + ':' + hx); } }
-P('LAW-001 no yellow, amber or orange colour literal in any scene module (hue 28–75° with saturation)', yellows.length === 0, yellows.join(' '));
+for (const f of FILES) {
+  const lines = stripComments(src[f]).split('\n');
+  lines.forEach((line, i) => {
+    for (const hx of line.match(/0x[0-9a-fA-F]{6}\b/g) || []) {
+      const { h, s, l } = hsl(parseInt(hx, 16));
+      if (h >= 28 && h <= 75 && s > 0.35 && l > 0.2 && !WARM_ROLE.test(line)) yellows.push(f + ':' + (i + 1) + ':' + hx);
+    }
+  });
+}
+P('LAW-001 warm colour only as interior light; never a surface, sign, seam, beam or resident', yellows.length === 0, yellows.join(' '));
 const cssYellow = (html.match(/#[0-9a-fA-F]{6}\b/g) || []).filter(hx => { const { h, s, l } = hsl(parseInt(hx.slice(1), 16)); return h >= 28 && h <= 75 && s > 0.35 && l > 0.2; });
 P('LAW-002 the page chrome has no yellow either', cssYellow.length === 0, cssYellow.join(' '));
 

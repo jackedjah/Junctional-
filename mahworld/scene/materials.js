@@ -44,10 +44,27 @@ export const NEUTRALS = Object.freeze({
   chromiumSatin: 0xbecddf, /* satin chromium: broad structural framing */
   platinumDark: 0x94a3ba,  /* brushed dark platinum: large secondary surfaces */
   panel: 0x2c3c58,         /* faceted crystalline wall panels */
-  plaza: 0x18202e,         /* the hero chromium plaza ground */
-  road: 0x141b26,          /* smooth roadway */
+  plaza: 0x090c12,         /* BLACK PLATINUM: the hero plaza ground (v8) */
+  road: 0x0b0e14,          /* smooth roadway, the floor's darker sibling */
   glassTint: 0x2b3f60,
-  interior: 0xd7e8ff       /* interior light, cool white */
+  interior: 0xffeccd,      /* interior light, WARM off-white (v8) */
+  interiorPale: 0xfff6e4,  /* the palest warm interior, for deep rooms */
+  interiorCool: 0xd7e8ff   /* the old cool white: signage wash and MAHGIC-lit interiors only */
+});
+
+/* THE PUNGENT ACCENT FAMILY (v8, art-directed).
+   The world's darks became darker and its floor became black platinum, and the direction is that
+   the buildings answer that with saturated primary and secondary colour. These are EMISSIVE accent
+   hues, never surface paint: a facade's mass stays graphite and its LIGHT is what carries the hue.
+   They are deliberately close to full saturation — "pungent" is the brief's word — and they are
+   used sparingly and large: a signage band, a portal reveal, a full-height glazing wash. Scattered
+   confetti of five colours would read as a games arcade, not a civilisation. */
+export const ACCENT = Object.freeze({
+  blue: 0x2f7bff,
+  cyan: 0x22d3ee,
+  violet: 0x8b5cf6,
+  magenta: 0xe23bd0,
+  green: 0x27d17c
 });
 
 /* Canvas helper shared by signage. */
@@ -244,15 +261,40 @@ export function createMaterials(themeIn) {
     curb: new THREE.MeshStandardMaterial({ color: 0x4a5a76, roughness: 0.58, metalness: 0.34, envMapIntensity: 1.2 }),          /* raised edges, kerbs, steps */
     arena: new THREE.MeshStandardMaterial({ color: 0x1d2129, roughness: 0.86, metalness: 0.06 }),                               /* rubberised impact floor */
     panelLit: new THREE.MeshStandardMaterial({ color: 0x24304a, roughness: 0.4, metalness: 0.2, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */
-    /* THE HERO SURFACE (brief §05): super-polished chromium laid in architectural-scale diamond cells.
-       Its roughness map is the diamond field itself, so the plane is jointed, polished stone-metal even
-       between the modelled bevels; ground.js lays the bevels and the mirror catches on top of it. */
-    plaza: new THREE.MeshStandardMaterial({ color: 0x18202e, roughness: 0.54, metalness: 0.94, envMapIntensity: 1.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.006, transparent: true, opacity: 0.92 }),
-    road: new THREE.MeshStandardMaterial({ color: 0x141b26, roughness: 0.4, metalness: 0.6, roughnessMap: floorTex, envMapIntensity: 1.2 }),
+    /* THE HERO SURFACE — BLACK PLATINUM (v8, art-directed).
+       The direction is "black platinum with extreme shine, contrasted with the pungent colour of the
+       buildings", and the three reference frames all show the same thing: a near-black floor that is
+       almost entirely REFLECTION. So the base colour drops from 0x18202e to 0x090c12 and the
+       roughness from 0.54 to 0.055 — the single biggest change in this pass. A metal at roughness
+       0.055 returns a sharp, near-mirror image of everything above it, which is what turns every sign
+       band, window and resident in the world into a second copy of itself on the ground. The floor
+       stops being a surface with a colour and becomes the instrument the rest of the city is read in.
+       The diamond field stays as the roughness and bump map, so the polish is JOINTED — a laid floor
+       of enormous black slabs, not one poured mirror — and the joints catch the light differently
+       from the faces, which is what keeps it crystalline rather than glassy. */
+    plaza: new THREE.MeshStandardMaterial({ color: 0x090c12, roughness: 0.055, metalness: 0.98, envMapIntensity: 2.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.010, transparent: true, opacity: 0.94 }),
+    road: new THREE.MeshStandardMaterial({ color: 0x0b0e14, roughness: 0.14, metalness: 0.9, roughnessMap: floorTex, envMapIntensity: 1.9 }),
 
-    /* interior light: unlit cool white, dimmed by day */
+    /* INTERIOR LIGHT IS WARM NOW (v8, art-directed).
+       "Most of the windows should have yellow or an off-white light faintly coming out." That is a
+       deliberate reversal: MAHWORLD's interiors were cool white, which made every lit window agree
+       with the signage and flattened the whole city into one blue. Warm interiors do the opposite —
+       they read as PEOPLE inside, they separate a lit room from a lit sign at a glance, and they are
+       what the cold blue accents now contrast against. `interiorCool` survives for the places where
+       the light genuinely is MAHGIC rather than domestic: signage washes and energy-lit interiors. */
     interior: new THREE.MeshBasicMaterial({ color: NEUTRALS.interior, toneMapped: true }),
-    interiorSoft: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.5 }),
+    interiorPale: new THREE.MeshBasicMaterial({ color: NEUTRALS.interiorPale, toneMapped: true }),
+    interiorCool: new THREE.MeshBasicMaterial({ color: NEUTRALS.interiorCool, toneMapped: true }),
+    /* the soft spill behind a window: warm, translucent, and the thing that makes a lit room read as
+       having depth rather than being a bright rectangle */
+    interiorSoft: new THREE.MeshBasicMaterial({ color: 0xf2d9a8, transparent: true, opacity: 0.5 }),
+    interiorSoftCool: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.5 }),
+    /* THE PUNGENT ACCENTS. Emissive only — a facade's MASS never takes these, its LIGHT does. */
+    accentBlue: new THREE.MeshStandardMaterial({ color: 0x060a14, emissive: ACCENT.blue, emissiveIntensity: 1.45, roughness: 0.5, metalness: 0 }),
+    accentCyan: new THREE.MeshStandardMaterial({ color: 0x03121a, emissive: ACCENT.cyan, emissiveIntensity: 1.35, roughness: 0.5, metalness: 0 }),
+    accentViolet: new THREE.MeshStandardMaterial({ color: 0x0c0718, emissive: ACCENT.violet, emissiveIntensity: 1.40, roughness: 0.5, metalness: 0 }),
+    accentMagenta: new THREE.MeshStandardMaterial({ color: 0x150618, emissive: ACCENT.magenta, emissiveIntensity: 1.30, roughness: 0.5, metalness: 0 }),
+    accentGreen: new THREE.MeshStandardMaterial({ color: 0x04140c, emissive: ACCENT.green, emissiveIntensity: 1.30, roughness: 0.5, metalness: 0 }),
     /* ENERGY — the Theme. Strengths were lowered in the v3 slice (glare correction):
        readable seams and signs, no bloom-like wash */
     energy: new THREE.MeshStandardMaterial({ color: 0x0a0f18, emissive: theme.energy, emissiveIntensity: 1.3, roughness: 0.5, metalness: 0 }),
@@ -267,8 +309,9 @@ export function createMaterials(themeIn) {
   m.trimSatin = m.chromeSatin;
   m.platinumBrushedH = m.platinumLitBrushed;
   m.glass = m.crystalGlass;
-  const baseEmissive = { energy: 1.3, energyLight: 1.7, matchRed: 1.1, panelLit: 0.7 };
-  const baseOpacity = { energySoft: 0.26, interiorSoft: 0.5 };
+  const ACCENTS = ['accentBlue', 'accentCyan', 'accentViolet', 'accentMagenta', 'accentGreen'];
+  const baseEmissive = { energy: 1.3, energyLight: 1.7, matchRed: 1.1, panelLit: 0.7, accentBlue: 1.45, accentCyan: 1.35, accentViolet: 1.40, accentMagenta: 1.30, accentGreen: 1.30 };
+  const baseOpacity = { energySoft: 0.26, interiorSoft: 0.5, interiorSoftCool: 0.5 };
   m.interiorSoft.opacity = baseOpacity.interiorSoft;
   let lastState = null, diagnostic = false;
   /* Time of day scales light strength only. day = 0.3, night = 1. */
@@ -282,7 +325,13 @@ export function createMaterials(themeIn) {
     m.panelLit.emissiveIntensity = Math.min(diagnostic ? 0.6 : 9, baseEmissive.panelLit * (1 - d * 0.5));
     m.energySoft.opacity = diagnostic ? 0 : baseOpacity.energySoft * k;
     m.interiorSoft.opacity = baseOpacity.interiorSoft * (1 - d * 0.5);
+    m.interiorSoftCool.opacity = baseOpacity.interiorSoftCool * (1 - d * 0.5);
+    /* the three interior whites dim together: a lit room is still lit at noon, just not against
+       a black sky, and a room that stayed at night strength by day reads as a light box */
     m.interior.color.setHex(NEUTRALS.interior).multiplyScalar(1 - d * 0.35);
+    m.interiorPale.color.setHex(NEUTRALS.interiorPale).multiplyScalar(1 - d * 0.35);
+    m.interiorCool.color.setHex(NEUTRALS.interiorCool).multiplyScalar(1 - d * 0.35);
+    for (const a of ACCENTS) m[a].emissiveIntensity = Math.min(diagnostic ? 1 : 9, baseEmissive[a] * k);
     m.signage.color.setScalar(1 - d * 0.25);
   };
   /* Live world-Theme change: recolours the ENERGY materials only. Neutrals,
