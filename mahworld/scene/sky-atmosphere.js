@@ -625,7 +625,9 @@ export function buildSkyAtmosphere(ctx) {
      surface the terrain module actually builds. The lowest 90 m of visible rock also dissolves into
      the sea colour, which is what guarantees the requirement that a peak reads BEHIND the cloud sea's
      edge and never in front of it, even if the near cloud is absent or the camera drops below it. */
-  const PEAK_SIDES = 16, PEAK_ROWS = 6;
+  /* nine rows rather than six: a rounded summit closing with a vertical tangent needs the resolution
+     near the top, and at six the dome read as a stack of rings */
+  const PEAK_SIDES = 16, PEAK_ROWS = 9;
   const peakOrder = layout.PEAKS.map((p, i) => i).sort((a, b) => (layout.PEAKS[b].h / layout.PEAKS[b].r) - (layout.PEAKS[a].h / layout.PEAKS[a].r));
   const peakRanges = [];                 /* cumulative index counts, in prominence order, for setQuality */
   let peaksGeo = null, peaksBE = null, peaksSea = null, peaksNrm = null, peaksHaze = null;
@@ -638,8 +640,13 @@ export function buildSkyAtmosphere(ctx) {
       const first = pos.length / 3;
       for (let ri = 0; ri <= PEAK_ROWS; ri++) {
         const u = ri / PEAK_ROWS;
-        /* a concave profile: a mountain's flanks flare at the foot and steepen toward the summit */
-        const rw = w * Math.pow(1 - u, 1.32);
+        /* ROUNDED, NOT POINTY (v8, on direction). This was pow(1 - u, 1.32): concave, flaring at the
+           foot and steepening to a sharp apex — a cone, and the render showed a row of sharp pink
+           triangles on the horizon. pow(1 - u*u, 0.42) is the opposite curve: broad shoulders that
+           hold their width most of the way up, then a summit that closes with a vertical tangent,
+           which is what makes a silhouette read as a domed massif instead of a spike. Measured on
+           the same peak, the radius at 80% height goes from 12% of the base to 65% of it. */
+        const rw = w * Math.pow(1 - u * u, 0.42);
         const y = baseY + h * u;
         for (let ai = 0; ai < PEAK_SIDES; ai++) {
           const a = twist + (ai / PEAK_SIDES) * TAU;
