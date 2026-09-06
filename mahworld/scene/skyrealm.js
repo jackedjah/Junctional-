@@ -97,7 +97,6 @@ const VIEWS = {
 /* the §43 rotation proof: one standing position, eight bearings */
 const SPIN_SITE = 'staging', SPIN_EYE = EYE + 0.6;
 
-const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 function reducedMotion() { try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
 
 export async function createSkyrealm(canvas, options = {}) {
@@ -213,31 +212,39 @@ export async function createSkyrealm(canvas, options = {}) {
   envTex.colorSpace = THREE.SRGBColorSpace;
   envTex.needsUpdate = true;
   let envRT = null, envAt = null;
-  const _ec = new THREE.Color();
+  const _ec = new THREE.Color(), _ef = new THREE.Color();
+  const TAU = Math.PI * 2;
+  /* THE EQUIRECT CONVENTION, taken from three's own equirectUv() rather than assumed:
+       u = atan2(dir.z, dir.x) / 2PI + 0.5      v = asin(dir.y) / PI + 0.5
+     Two consequences that are easy to get wrong and that both matter here.
+     LATITUDE IS A SINE, not a linear ramp: y = sin((v − 0.5)·PI). Treating the row index as a
+     linear elevation squashes the horizon band toward the poles and puts the sun's reflection at
+     the wrong height.
+     AZIMUTH IS OFFSET BY A QUARTER TURN from this world's bearings. dir(0) = (0,0,−1) sits at
+     u = 0.25, so bearing = (u − 0.25)·2PI. Getting this wrong rotates the entire environment 90
+     degrees, which would put the sunset's reflection on the cold flank of everything metal. */
   function paintEnvironment(band, clockState) {
     const sun = L.sunDirection(band && band.a ? band.a : 'dusk');
-    for (let y = 0; y < ENV_H; y++) {
-      /* v runs top (elevation +1) to bottom (−1), the equirect convention three expects */
-      const elev = 1 - (y + 0.5) / ENV_H * 2;
-      for (let x = 0; x < ENV_W; x++) {
-        /* u = 0 at −Z, increasing toward +X, matching the layout's bearing convention */
-        const bearing = ((x + 0.5) / ENV_W) * Math.PI * 2 - Math.PI;
-        L.atmosphere(bearing, elev, band, _ec);
-        if (elev < -0.02) {
+    for (let row = 0; row < ENV_H; row++) {
+      const v = (row + 0.5) / ENV_H;
+      const lat = (v - 0.5) * Math.PI;
+      const ey = Math.sin(lat), er = Math.cos(lat);
+      for (let col = 0; col < ENV_W; col++) {
+        const u = (col + 0.5) / ENV_W;
+        const bearing = (u - 0.25) * TAU;
+        L.atmosphere(bearing, ey, band, _ec);
+        if (ey < -0.02) {
           /* BELOW THE HORIZON IS NOT GROUND HERE — it is the cloud ocean, and it is bright. This is
              the half of the environment the city version did not have, and it is what lights the
              undersides of every platform, pod and railing in the realm. */
-          const t = Math.min(1, (-elev - 0.02) / 0.42);
-          const f = L.fillFor(bearing, band);
-          _ec.lerp(_ec.clone().setHex(f), 0.55 * t).multiplyScalar(1 + 0.42 * t);
+          const t = Math.min(1, (-ey - 0.02) / 0.42);
+          _ef.setHex(L.fillFor(bearing, band));
+          _ec.lerp(_ef, 0.55 * t).multiplyScalar(1 + 0.42 * t);
         }
         /* the sun's own disc, so a mirror grade has something to catch */
-        const d = Math.acos(clamp(
-          Math.sin(bearing) * Math.cos(Math.asin(clamp(elev, -1, 1))) * sun.x +
-          elev * sun.y +
-          -Math.cos(bearing) * Math.cos(Math.asin(clamp(elev, -1, 1))) * sun.z, -1, 1));
-        if (d < 0.13) _ec.multiplyScalar(1 + 5.5 * (1 - d / 0.13) * Math.max(0, sun.y + 0.24));
-        const i = (y * ENV_W + x) * 4;
+        const dot = Math.sin(bearing) * er * sun.x + ey * sun.y + -Math.cos(bearing) * er * sun.z;
+        if (dot > 0.9915) _ec.multiplyScalar(1 + 5.5 * ((dot - 0.9915) / 0.0085) * Math.max(0, sun.y + 0.24));
+        const i = (row * ENV_W + col) * 4;
         envData[i] = Math.min(255, Math.round(Math.sqrt(_ec.r) * 255));
         envData[i + 1] = Math.min(255, Math.round(Math.sqrt(_ec.g) * 255));
         envData[i + 2] = Math.min(255, Math.round(Math.sqrt(_ec.b) * 255));
