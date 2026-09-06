@@ -147,6 +147,7 @@ export async function createMahplaza(canvas, options = {}) {
   const FOBST = await optional('./fobstations.js');   /* v12 §4: the FOBLOCK family */
   const MONU = await optional('./monument.js');       /* v12 §5: HIGHER TOGETHER, the hero public art */
   const BCAST = await optional('./broadcast.js');     /* v14 §8: the giant rear-city authority monitor */
+  const LAKE = await optional('./lakecity.js');       /* R2 §5: the second destination */
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -201,7 +202,7 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null;
+  let city = null, dressing = null, terrain = null, fobstations = null, monument = null, broadcast = null, lakeCity = null;
   /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
      own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
   if (TERRAIN && TERRAIN.buildTerrain) {
@@ -233,6 +234,12 @@ export async function createMahplaza(canvas, options = {}) {
       if (broadcast && broadcast.group && !broadcast.group.parent) scene.add(broadcast.group);
     } catch (e) { console.info('MAHPLAZA: broadcast module failed —', e && e.message); broadcast = null; }
   }
+
+  /* R2 §5 — LAKE CITY, the second destination. Placed at bearing 62 / r 560, which is the corridor
+     terrain.js already reserved for water: its BASIN sits at the same bearing with a far shore at
+     r ~= 460, so the two bodies read as ONE system. Built after the civic city so it can be judged
+     against it, and it registers no colliders because roam's ground gear does not reach 560 m. */
+  if (LAKE && LAKE.buildLakeCity) { try { lakeCity = LAKE.buildLakeCity(ctx); } catch (e) { console.info('MAHPLAZA: lake city module failed —', e && e.message); lakeCity = null; } }
 
   /* entrance and plaza point lights, bounded (v3: entrance strength lowered for the glare correction) */
   const pointLights = [], themedLights = [];
@@ -403,7 +410,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -437,7 +444,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -776,6 +783,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (fobstations && fobstations.update) fobstations.update(t, dt);
     if (fobpods && fobpods.update) fobpods.update(t, dt);
     if (broadcast && broadcast.update) broadcast.update(t, dt);
+    if (lakeCity && lakeCity.update) lakeCity.update(t, dt);
     if (monument && monument.update) monument.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
@@ -1046,6 +1054,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (monument && monument.setQuality) { try { monument.setQuality(quality); } catch (e) {} }
     if (fobpods && fobpods.setQuality) { try { fobpods.setQuality(quality); } catch (e) {} }
     if (broadcast && broadcast.setQuality) { try { broadcast.setQuality(quality); } catch (e) {} }
+    if (lakeCity && lakeCity.setQuality) { try { lakeCity.setQuality(quality); } catch (e) {} }
     resize(); requestRender();
     return quality.name;
   }
@@ -1081,7 +1090,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,

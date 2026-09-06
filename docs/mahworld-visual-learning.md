@@ -326,6 +326,33 @@ family — measured at 10 sites × 7 bars = 70 instances in **1 draw call, 140 t
 `scale.y` to 1.4700, which is exactly band 3 (0.35) × the site scale (4.2). The number confirms the
 audio path drives geometry; a screenshot could not have.
 
+## L25 — A mass occupies an ARC, not a bearing
+**Failure.** Lake City had to stand in a mountain pass, so terrain.js was given a PASS wedge and every
+peak whose BEARING fell inside it was pushed to the shoulder. The render did not change. Second
+attempt, same lever, same result.
+**Root owner.** A massif is 180–650 m wide. One pushed to bearing 45.5 at r 700 still spans to 59
+degrees, so a 47–77 pass was half full of the mountain that had just been moved out of it. Moving a
+centre out of a wedge does not move the body out of it.
+**Correction.** Push by the massif's own ARC: `halfDeg = (w/2)/r × 180/π`, and clear the wedge by
+that much plus a margin, so a wide peak is displaced further than a narrow one.
+**Proof.** PEELING found it, not reasoning (L03): hiding `terrain-land` changed nothing; hiding the
+three `terrain-range-*` meshes revealed the whole city, lake, terraces, docks and bridges intact
+behind them. The city had been correct the entire time and was simply behind a mountain.
+**Still unresolved, stated plainly.** Even by arc, the ring at bearing 62 partly occludes the city
+from some altitudes. Two attempts at the same lever is the §15 threshold and the method should
+change rather than the constant: either site the city where terrain genuinely has no ring (the only
+true gaps are bearings 176–184 and 356–4), or give terrain.js a real cut rather than a push.
+
+## L26 — Verify a placement by peeling BEFORE tuning what you placed
+**Failure.** Two passes were spent on the lake's water material — base value, emissive, an additive
+sheen, a shoreline rim — to make a lake "read", while the lake was not visible at all because a
+mountain stood in front of it. The material work was not wrong, but none of it could have been
+judged from those frames.
+**Correction.** When a new object does not read, establish that it is UNOCCLUDED before touching its
+material. One peel costs one render; a material iteration costs a render and a wrong belief.
+**Regression.** Same family as L03 and L15: prove the pixels can reach the camera before reasoning
+about what colour they are.
+
 ---
 
 ## Standing ownership map (reuse, do not rediscover)
@@ -346,6 +373,7 @@ audio path drives geometry; a screenshot could not have.
 | FOBLOCK placement, music diamonds | `fobstations.js` |
 | Upper realm | `sky-layout.js` (contract), `skyrealm.js` (assembly), `sky-*.js` (builders) |
 | Giant rear-city authority monitor (§8) | `broadcast.js` |
+| LAKE CITY (R2 §5) — the second destination | `lakecity.js`; its mountain pass is `terrain.js` PASS |
 | Universal music-line motif (R2 §10/§11) — built ONCE, nothing else may hand-roll a bar graph | `musicline.js` |
 | Free movement: the viewer's own camera | `roam.js` (position, gears, collide-and-slide, input state); `mahplaza.js` owns the handover |
 

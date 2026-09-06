@@ -103,6 +103,36 @@ const LAND_HORIZON = 0x1c3355;   /* the last ring, sitting just under the horizo
    44 deg and 75 deg. Nothing in city.js, ground.js or buildings.js occupies this region. */
 const BASIN = { bearing: 62, r: 330, rx: 210, rz: 130, y: -1.4 };
 
+/* R2 §5 — THE LAKE CITY PASS. The BASIN above reserved a bearing for water; it did not reserve the
+   ROOM a city on that water needs. Measured on the built scene: the near range's peaks reach inward
+   to about r 535, so the only clear annulus was 330 (the district's edge) to 535, and a lake city
+   sized to be a destination rather than a pond does not fit in 205 m of it. The first placement
+   attempt put its camera inside a mountain flank, which is how this was found.
+
+   So the range OPENS here. Every peak of every range whose bearing falls inside PASS is pushed out
+   of it to the nearer shoulder, which turns a reserved bearing into a reserved VOLUME: a genuine
+   mountain pass with a lake city standing in it, the mid range still closing the horizon behind.
+   That is §13 — water occupies terrain — and it is also the composition §8 asks for, because the
+   city then has a ridge line to be read against instead of empty sky.
+
+   The width is measured, not chosen: the city's own lake is 274 m at its widest, so it subtends
+   about 22 degrees at r 700 and the pass is opened to 30 to leave a shoulder either side. */
+const PASS = { from: 44, to: 80 };
+/* PUSH BY THE EDGE, NOT BY THE CENTRE. The first cut of this moved a peak's BEARING out of the pass
+   and rendered no differently, because a massif is 180-650 m WIDE: one pushed to 45.5 deg at r 700
+   still spans to 59 deg, and the pass was half full of the mountain that had just been moved out of
+   it. A peak occupies an ARC, so the arc is what has to clear. halfDeg is the massif's own half
+   width converted to degrees at its own radius, so a wide peak is pushed further than a narrow one
+   and the pass ends up genuinely empty rather than nominally empty. */
+const clearPass = (a, w, rr) => {
+  const halfDeg = (w * 0.5) / Math.max(1, rr) * (180 / Math.PI);
+  const m = ((a % 360) + 360) % 360;
+  if (m + halfDeg <= PASS.from || m - halfDeg >= PASS.to) return a;      /* already clear */
+  return (m < (PASS.from + PASS.to) / 2)
+    ? PASS.from - halfDeg - 2
+    : PASS.to + halfDeg + 2;
+};
+
 const D2R = Math.PI / 180, TAU = Math.PI * 2;
 function rng(seed) { let s = seed >>> 0 || 1; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function polar(aDeg, r) { const t = aDeg * D2R; return [r * Math.cos(t), -r * Math.sin(t)]; }
@@ -260,9 +290,12 @@ export function buildTerrain(ctx) {
       const V = VALLEYS[i % VALLEYS.length];
       if (i % 2 === 0) a = lerp(a, V.from + rand() * (V.to - V.from), 0.72);
       const rr = R.r * (0.9 + rand() * 0.24);
-      const [x, z] = polar(a, rr);
       const h = lerp(R.hMin, R.hMax, rand() * rand() + rand() * 0.3);
       const w = lerp(R.wMin, R.wMax, rand());
+      /* R2 §5: keep the Lake City pass genuinely open. The width and radius have to be drawn first
+         because clearPass pushes by the massif's ARC, not by its centre — see PASS. */
+      a = clearPass(a, w, rr);
+      const [x, z] = polar(a, rr);
       /* a ROUNDED MASSIF, not a cone: broad apron, full shoulders, a summit whose tangent is
          horizontal, spurs and gullies down the flanks. Still rock — no neon edge, no glowing crystal
          spike (§43) — and at exactly the height and base radius the range was measured at. */

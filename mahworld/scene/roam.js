@@ -101,8 +101,12 @@ const DEG = Math.PI / 180;
                   covering every composed camera in VIEWS (the establishing eye is 84 m out), which
                   matters because entering roam from a view outside this bound would otherwise yank
                   the viewer sideways on the first frame. The first cut used 52 and did exactly that.
-     WORLD_R      560 m — inside terrain.js's LAND_INNER of 600, so a flyer never reaches the land
-                  ring's inner edge and never sees the seam it would show from outside.
+     WORLD_R      1000 m. It was 560 while the plaza was the only destination; R2 §5 put LAKE CITY
+                  at r 700 in terrain.js's mountain pass, and a bound that stops short of a
+                  destination is a bound that makes the world smaller than it is. 1000 clears the
+                  city's far shore (700 + 274) with margin and still stops well inside the near
+                  range, so a flyer never crosses a mountain and never reaches the land ring's inner
+                  edge at LAND_INNER 600 in a direction where that ring is the only thing left.
      CEIL         700 m — above the highest sky road (298.5) and the monument's column top (200),
                   below the point where the world is only sky. */
 export const ROAM = Object.freeze({
@@ -110,7 +114,7 @@ export const ROAM = Object.freeze({
   WALK: 4.2, RUN: 11.0, FLY: 22.0, BOOST: 70.0,
   TAU_GROUND: 0.14, TAU_AIR: 0.40,
   BODY_R: 0.45, STEP_UP: 0.62,
-  WALK_R: 95, WORLD_R: 560, FLOOR: 0.90, CEIL: 700,
+  WALK_R: 95, WORLD_R: 1000, FLOOR: 0.90, CEIL: 700,
   PITCH_MAX: 82 * DEG,
   LOOK_DRAG: 2.6,          /* radians per full screen width of drag */
   KEY_LOOK: 1.9            /* radians per second on the arrow keys */
