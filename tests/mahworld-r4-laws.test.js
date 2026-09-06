@@ -81,30 +81,60 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
      deviation an eye standing there actually sees. Because the cross-section is a parabola of
      radius R_DISH, that drop over a distance d is exactly d^2 / (2 * R_DISH).
      ============================================================================================ */
+  /* THERE ARE TWO CURVATURES AND THE FIRST CUT OF THIS TEST CONFLATED THEM, which is worth saying
+     plainly because it failed the world for the test's own arithmetic:
+
+       DISH   the cross-section, ACROSS the ring's 2700 m width. A parabola of radius R_DISH, so the
+              drop from the tangent plane at distance d is d^2 / (2 * R_DISH). This is what a viewer
+              standing still and looking left-right across the band sees.
+       RING   the plan curvature, AROUND the world axis at radius R_MID. The sagitta of an arc of
+              length s is R_MID * (1 - cos(s / (2 * R_MID))). This is what a viewer looking ALONG
+              the ring sees — the horizon bending away — and it is the larger of the two by a factor
+              of nearly three at 3 km.
+
+     R4's claim ("appears locally flat but reveals gradual world-scale curvature at immense
+     distance") is made by both, so both are asserted, each against its own number. */
   const lad = await ev(async () => {
     const H = await import('/mahworld/scene/halo.js');
-    const at = d => H.haloHeight(H.HALO.R_MID + d, 0) - H.HALO.Y;
-    return { d50: at(50), d150: at(150), d300: at(300), d1000: at(1000), d3000: at(3000),
+    const dish = d => H.haloHeight(H.HALO.R_MID + d, 0) - H.HALO.Y;
+    const ring = s => H.HALO.R_MID * (1 - Math.cos(s / (2 * H.HALO.R_MID)));
+    const D = [50, 150, 300, 1000, 3000];
+    return {
+      dish: D.map(dish), ring: D.map(ring), at: D,
       rim: H.haloHeight(H.HALO.R_OUT, 0) - H.HALO.Y,
       /* the worst walkable grade, as a percentage: dy/dd at the rim */
-      grade: 100 * (H.HALO.R_OUT - H.HALO.R_MID) / H.HALO.R_DISH };
+      grade: 100 * (H.HALO.R_OUT - H.HALO.R_MID) / H.HALO.R_DISH,
+      /* what the module itself publishes, so the spec and the world cannot drift apart */
+      published: (window.MAHWORLD_MAHPLAZA.halo || {}).stats
+        ? window.MAHWORLD_MAHPLAZA.halo.stats.curvature : null
+    };
   });
   console.log('\nMAH HALO — the curvature ladder');
-  console.log('  50m ' + lad.d50.toFixed(2) + '   150m ' + lad.d150.toFixed(2) + '   300m ' + lad.d300.toFixed(2) +
-    '   1km ' + lad.d1000.toFixed(2) + '   3km ' + lad.d3000.toFixed(2) + '   rim ' + lad.rim.toFixed(1) +
-    '   worst grade ' + lad.grade.toFixed(2) + '%');
-  /* LOCALLY FLAT: at 50 m — the width of a district terrace — the drop must be under a step, or the
-     ring reads as a dish from where a person stands and the whole premise is broken. */
-  P('locally flat: under 0.25 m of deviation across 50 m', lad.d50 < 0.25, lad.d50.toFixed(3) + ' m');
-  P('locally flat: under 2 m across 150 m', lad.d150 < 2, lad.d150.toFixed(2) + ' m');
-  /* GRADUAL: it must be MONOTONIC and accelerating — a ladder, not a step. */
-  P('the ladder is monotonic and accelerating',
-    lad.d50 < lad.d150 && lad.d150 < lad.d300 && lad.d300 < lad.d1000 && lad.d1000 < lad.d3000 &&
-    (lad.d3000 / lad.d1000) > (lad.d1000 / lad.d300),
-    [lad.d50, lad.d150, lad.d300, lad.d1000, lad.d3000].map(v => v.toFixed(1)).join(' < '));
-  /* CURVED AT WORLD SCALE: at 3 km the deviation must be larger than anything else in the world,
-     or "world-scale curvature" is a claim no camera can photograph. city.js's tallest ghost is 900 m. */
-  P('world-scale curvature: over 300 m of deviation at 3 km', lad.d3000 > 300, lad.d3000.toFixed(1) + ' m');
+  console.log('  across the ring (DISH):  ' + lad.at.map((d, i) => d + 'm ' + lad.dish[i].toFixed(2)).join('   '));
+  console.log('  along  the ring (RING):  ' + lad.at.map((d, i) => d + 'm ' + lad.ring[i].toFixed(2)).join('   '));
+  console.log('  rim rise ' + lad.rim.toFixed(1) + ' m   worst grade ' + lad.grade.toFixed(2) + '%');
+  /* LOCALLY FLAT: at 50 m — the width of a district terrace — the drop must be under a step in BOTH
+     directions, or the ring reads as a dish from where a person stands and the premise is broken. */
+  P('locally flat across the ring: under 0.25 m at 50 m', lad.dish[0] < 0.25, lad.dish[0].toFixed(3) + ' m');
+  P('locally flat along the ring: under 0.25 m at 50 m', lad.ring[0] < 0.25, lad.ring[0].toFixed(3) + ' m');
+  P('still near-flat at 150 m in both directions', lad.dish[1] < 2 && lad.ring[1] < 2,
+    'dish ' + lad.dish[1].toFixed(2) + ' / ring ' + lad.ring[1].toFixed(2));
+  /* GRADUAL: monotonic, and ACCELERATING in the only sense that is well defined across unequal
+     steps — the deviation PER METRE strictly increases. (The first cut compared ratios of ratios
+     over 3x and 3.33x steps, which a perfect parabola fails; that was the test being wrong.) */
+  const slope = a => a.map((v, i) => v / lad.at[i]);
+  const rising = a => { const s = slope(a); return s.every((v, i) => i === 0 || v > s[i - 1]); };
+  P('the dish ladder is monotonic and accelerating', rising(lad.dish), slope(lad.dish).map(v => v.toFixed(4)).join(' < '));
+  P('the ring ladder is monotonic and accelerating', rising(lad.ring), slope(lad.ring).map(v => v.toFixed(4)).join(' < '));
+  /* CURVED AT WORLD SCALE: at 3 km the deviation must dwarf anything else in the world, or
+     "world-scale curvature" is a claim no camera can photograph. city.js's tallest ghost is 900 m
+     and terrain.js's highest peak is 370. */
+  P('world-scale curvature along the ring: over 300 m at 3 km', lad.ring[4] > 300, lad.ring[4].toFixed(1) + ' m');
+  P('world-scale curvature across the ring: over 150 m at 3 km', lad.dish[4] > 150, lad.dish[4].toFixed(1) + ' m');
+  /* and the module's PUBLISHED figure must be the ring one, since that is what the spec quotes */
+  P('halo.js publishes the ring curvature it claims',
+    !!lad.published && Math.abs(lad.published.arc3000.deviation - lad.ring[4]) < 1,
+    lad.published ? String(lad.published.arc3000.deviation) : 'not published');
   /* AND IT MUST STILL BE WALKABLE: over ~8% and the rim rise is a hill, not a floor. */
   P('the worst grade is walkable (under 8%)', lad.grade > 0 && lad.grade < 8, lad.grade.toFixed(2) + '%');
 
@@ -218,19 +248,30 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
      ============================================================================================ */
   const budget = await ev(() => {
     const w = window.MAHWORLD_MAHPLAZA;
+    /* ROAM MUST BE OFF FIRST. The nav check above called navGoto, which turns roam ON — and while
+       roam is on, placeCamera() uses roam's own position and IGNORES setCustomView entirely. The
+       first cut of this check did not do this, so both measurements were taken from the same roam
+       camera standing at HALO ARRIVAL and came back byte-identical (309 draws / 382154 tris for
+       "the ring" and "the plaza" alike), which is exactly the shape of a passing test that measures
+       nothing. */
+    if (w.roam && w.roam.state.on) w.setRoam(false);
     w.setCustomView({ pos: [0, 1801.7, -2010], look: [400, 1802, -2100], fov: 56 });
     w.advance(0.3, 1 / 30);
     const a = { d: w.renderer.info.render.calls, t: w.renderer.info.render.triangles };
     w.setCustomView({ pos: [0, 3.4, 84], look: [0, 14, -40], fov: 54 });
     w.advance(0.3, 1 / 30);
     const b = { d: w.renderer.info.render.calls, t: w.renderer.info.render.triangles };
-    return { halo: a, plaza: b };
+    return { halo: a, plaza: b, distinct: !(a.d === b.d && a.t === b.t) };
   });
   console.log('\nMAH HALO — budget');
   console.log('  on the ring: ' + budget.halo.d + ' draws / ' + budget.halo.t + ' tris');
   console.log('  on the plaza: ' + budget.plaza.d + ' draws / ' + budget.plaza.t + ' tris');
+  /* the guard on the guard: if the two frames are identical the camera never moved and neither
+     assertion below means anything (see the note in the probe) */
+  P('the two budget frames are actually different cameras', budget.distinct,
+    budget.halo.d + '/' + budget.halo.t + ' vs ' + budget.plaza.d + '/' + budget.plaza.t);
   P('the sanctuary costs under 400 draws from a standing eye', budget.halo.d < 400, String(budget.halo.d));
-  P('the plaza view is unchanged in order of magnitude', budget.plaza.d < 400 && budget.plaza.t > 100000,
+  P('the plaza view still draws the whole city', budget.plaza.d > 900 && budget.plaza.t > 900000,
     budget.plaza.d + ' draws / ' + budget.plaza.t + ' tris');
 
   /* ============================================================================================

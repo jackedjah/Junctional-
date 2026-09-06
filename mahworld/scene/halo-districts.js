@@ -130,6 +130,23 @@ export function buildHaloDistricts(ctx, opts = {}) {
      treads mirror the horizon the same way the shell did, at a smaller scale but from the same
      standing eye. Three grades over sixty times the span is the ladder, not one number. */
   darkMat.roughness = 0.56; darkMat.envMapIntensity = 0.30;
+  /* ---- CHANGE OF METHOD, after two weak iterations on envMapIntensity ------------------------
+     The concourse spine is a 26 m by 1180 m slab walked at 1.7 m, so it is pure grazing over its
+     whole length, and a directional moon puts a specular path down it that no reduction of the
+     environment term removes: 0.45 then 0.30 both came back a mirror. R3's rule is that two
+     iterations with weak improvement mean CHANGE METHOD, and the method here was wrong. A flat
+     surface with nothing on it reflects; a surface with structure has something else to show.
+
+     So the district decks take the SAME laser plating the shell wears, computed from the same world
+     XZ, which means the plating is continuous across the whole sanctuary — step off the open plate
+     onto a terrace and the tile lines carry straight over the kerb instead of stopping at it. That
+     is what R4's "physical laser-plated tiles" means at district scale, it is one line instead of a
+     material argument, and it gives every dark deck line structure in place of a mirror.
+
+     Lower gains than the shell: a district deck is READ AT WALKING DISTANCE, where the shell's
+     values would be a lightbox underfoot. */
+  applyHaloGrid(darkMat, { micro: 1, tile: 8, mega: 64, gainMicro: 0.05, gainTile: 0.20,
+    gainMega: 0.34, node: 0.5, microFar: 30, tileFar: 340 });
   owned.materials.push(darkMat);
   /* R4's VISUAL SEPARATION list puts TRANSMISSION second, right after silhouette. The overlooks and
      the display surfaces are the only transmissive thing up here, which is what makes an overlook
@@ -288,17 +305,22 @@ export function buildHaloDistricts(ctx, opts = {}) {
     screen(deg, s, t, w, h, ry) {
       const [x, z, th] = ringPoint(deg, s, t);
       const a = -th + (ry || 0);
-      /* THE POSTS AND THE PANEL MUST SPAN THE SAME AXIS. mat(x,z,up,a) sends local +X to
-         (cos a, -sin a) and local +Z to (sin a, cos a). The first cut spanned the base and the glass
-         along local X and then offset the posts along local Z — a screen turned ninety degrees to
-         the two posts holding it, and nothing failed. Both now use the X axis. */
-      const px = Math.cos(a), pz = -Math.sin(a);
-      put('plat', chamferBox(w + 1.4, 0.5, 1.2, 0.2), mat(x, z, 0.6, a), 0.9);
+      /* THE POSTS AND THE PANEL MUST SPAN THE SAME AXIS, AND IT MUST BE THE TANGENTIAL ONE.
+         mat(x,z,up,a) sends local +X to (cos a, -sin a) and local +Z to (sin a, cos a); with a = -th
+         that is RADIAL and TANGENTIAL respectively. Two mistakes were made here in turn. The first
+         cut spanned the base and glass along X while offsetting the posts along Z — a screen turned
+         ninety degrees to the two posts holding it. The correction moved the posts to X, which made
+         them agree on the WRONG axis: the panel's face normal then pointed along the ring, so from
+         HALO STAGE and HALO FORUM — where the audience sits OUTBOARD and looks inward — every screen
+         was edge-on, a blade instead of a display. A screen faces radially, so it SPANS tangentially:
+         thin on X, tall on Y, long on Z, with its posts offset along Z. */
+      const px = Math.sin(a), pz = Math.cos(a);
+      put('plat', chamferBox(1.2, 0.5, w + 1.4, 0.2), mat(x, z, 0.6, a), 0.9);
       for (const side of [-1, 1]) {
         put('plat', chamferBox(0.7, h, 0.7, 0.2),
           mat(x + px * side * w * 0.5, z + pz * side * w * 0.5, h / 2, a), 0.94);
       }
-      put('glass', chamferBox(w, h * 0.78, 0.18, 0.06), mat(x, z, h * 0.52, a), 0.62);
+      put('glass', chamferBox(0.18, h * 0.78, w, 0.06), mat(x, z, h * 0.52, a), 0.62);
       return [x, z, th];
     },
     /* a CRYSTAL GROWTH cluster — QUIET's garden, the rainforest's ground family brought upstairs */
@@ -672,8 +694,18 @@ export function buildHaloDistricts(ctx, opts = {}) {
         const pz = az + Math.sin(dth + Math.PI / 2) * side * 7.4;
         put('plat', chamferBox(2.0, 11, 2.0, 0.5), mat(px, pz, 5.5 + 2.5, rot), 0.90);
       }
+      /* THE KEYSTONE SITS ON ITS COLLAR PIERS, NOT ABOVE THEM. The piers span 2.5 to 13.5 (an 11 m
+         shaft centred at 8); a diamond at 20 with a 3.2 half-height floated 6.5 m clear of the thing
+         carrying it, which is the same "balanced rather than carried" failure mahascent corrected on
+         its own masts. 15.2 puts its lower pyramid down into the pier heads. */
       const kd = own(new THREE.OctahedronGeometry(1, 0));
-      put('plat', kd, mat(ax, az, 20, rot, 4.0, 3.2, 4.0), 1.0);
+      for (const side of [-1, 1]) {
+        const cx = ax + Math.cos(dth + Math.PI / 2) * side * 7.4;
+        const cz = az + Math.sin(dth + Math.PI / 2) * side * 7.4;
+        put('plat', chamferBox(3.2, 1.1, 3.2, 0.35), mat(cx, cz, 13.4, rot + 0.4), 1.0);
+      }
+      put('plat', chamferBox(17.6, 1.3, 2.4, 0.4), mat(ax, az, 14.2, rot), 1.0);
+      put('plat', kd, mat(ax, az, 15.2 + 3.2, rot, 4.0, 3.2, 4.0), 1.0);
       musicSites.push({ x: ax + Math.cos(dth) * 9, y: ay + 2.8, z: az + Math.sin(dth) * 9, ry: rot, scale: 3.0 });
       spawnPoints.push({ x: ax, z: az, kind: 'dock' });
     });
@@ -824,6 +856,10 @@ export function buildHaloDistricts(ctx, opts = {}) {
     var _pools = poolMat;
   }
 
+  /* EVERY material carrying the injected grid uniforms. One list, so setTime / setTheme / update
+     cannot drive one and forget the other — the exact defect halo.js had with its near tiles. */
+  const GRIDDED = [eventMat, darkMat];
+
   const _mm = new THREE.Matrix4(), _pp = new THREE.Vector3(), _qq = new THREE.Quaternion(),
     _ee = new THREE.Euler(), _ss = new THREE.Vector3();
   let quiet = false, state = 'BASE_IDLE';
@@ -858,10 +894,18 @@ export function buildHaloDistricts(ctx, opts = {}) {
         }
         _dockPackets.instanceMatrix.needsUpdate = true;
       }
-      const u = eventMat.userData.haloUniforms;
-      if (u) {
-        u.uHaloPulse.value = 0.5 + 0.5 * Math.sin(t * 0.9);
-        u.uHaloBand.value = (state === 'EVENT' || state === 'MUSIC_ACTIVE') ? (t * 0.22) % 1 : 0;
+      /* BOTH gridded materials, not just the event tiles. darkMat carries the same injected
+         uniforms now (see applyHaloGrid on it above), and leaving it out of these three drivers is
+         exactly the silent failure halo.js already had with its near-tile material: the district
+         decks would keep a stale line colour and a frozen breath while everything else moved. */
+      const pulse = 0.5 + 0.5 * Math.sin(t * 0.9);
+      const band = (state === 'EVENT' || state === 'MUSIC_ACTIVE') ? (t * 0.22) % 1 : 0;
+      for (const m of GRIDDED) {
+        const u = m.userData.haloUniforms; if (!u) continue;
+        u.uHaloPulse.value = pulse;
+        /* the travelling band belongs to the EVENT FLOOR. A whole sanctuary pulsing in unison is
+           the strobe R3-12 and R4 both forbid, so the district decks only breathe. */
+        if (m === eventMat) u.uHaloBand.value = band;
       }
       if (musicLines && musicLines.update) musicLines.update(t);
     },
@@ -872,15 +916,18 @@ export function buildHaloDistricts(ctx, opts = {}) {
       /* the answer follows the emitter: by day the sanctuary reads on its own reflections */
       if (_pools) _pools.opacity = 0.08 + 0.26 * night;
       signMats.forEach(m => { m.opacity = 0.5 + 0.42 * night; });
-      const u = eventMat.userData.haloUniforms;
-      if (u) u.uHaloLine.value.setHex(theme.energyLight || 0xdff1ff).multiplyScalar(0.4 + 0.6 * night);
+      for (const m of GRIDDED) {
+        const u = m.userData.haloUniforms; if (!u) continue;
+        u.uHaloLine.value.setHex(theme.energyLight || 0xdff1ff).multiplyScalar(0.4 + 0.6 * night);
+      }
       if (musicLines && musicLines.setTime) musicLines.setTime(s);
     },
     setTheme(th) {
       if (!th || th.energyLight == null) return;
       glow.color.setHex(th.energyLight);
-      const u = eventMat.userData.haloUniforms;
-      if (u) u.uHaloLine.value.setHex(th.energyLight);
+      for (const m of GRIDDED) {
+        const u = m.userData.haloUniforms; if (u) u.uHaloLine.value.setHex(th.energyLight);
+      }
       if (musicLines && musicLines.setTheme) musicLines.setTheme(th);
     },
     setQuality(q) {
