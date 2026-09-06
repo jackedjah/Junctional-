@@ -81,8 +81,11 @@ const PLATEAU = FEATURES.find(f => f.kind === 'plateau');
 const PLATEAU_XZ = layout.xz({ bearing: PLATEAU.bearing, r: PLATEAU.r });
 const FLATS_XZ = layout.xz({ bearing: 1.75, r: 400 });   /* the centre of gravity of sector C's flats */
 function stability(x, z) {
-  const p = 1 - smooth((Math.hypot(x - PLATEAU_XZ.x, z - PLATEAU_XZ.z) - PLATEAU.radius) / 90);
-  const f = 0.62 * (1 - smooth((Math.hypot(x - FLATS_XZ.x, z - FLATS_XZ.z) - 300) / 260));
+  const dpx = x - PLATEAU_XZ.x, dpz = z - PLATEAU_XZ.z, dfx = x - FLATS_XZ.x, dfz = z - FLATS_XZ.z;
+  /* sqrt rather than Math.hypot throughout: cloudTopAt() is called per agent per frame by other
+     modules, and hypot is a variadic builtin that allocates an argument array on every call */
+  const p = 1 - smooth((Math.sqrt(dpx * dpx + dpz * dpz) - PLATEAU.radius) / 90);
+  const f = 0.62 * (1 - smooth((Math.sqrt(dfx * dfx + dfz * dfz) - 300) / 260));
   return p + f > 1 ? 1 : p + f;
 }
 
@@ -102,6 +105,28 @@ export function surfaceDetail(x, z) {
    platform's feet should touch. */
 export function cloudTopAt(x, z) { return layout.deckHeight(x, z) + surfaceDetail(x, z); }
 
+/* THE LOBE FIELD — the same billow() that shapes the surface, read a second time as DENSITY and as a
+   SELF-SHADOW with a direction.
+
+   This is the answer to the module's named failure mode. Measured on the first build, the deck spanned
+   only 21 screen levels across a whole kilometre at midday: geometrically it was a heightfield, but
+   tonally it was one flat white value — "white concrete disguised with fog" exactly (§49). The reason
+   is that a cloud floor is genuinely GENTLE, so slope-based shading has almost nothing to work with.
+
+   What actually models a cumulus deck is not slope, it is (a) how THICK the cloud is here, and (b) that
+   each lobe's sunward flank is bright while its lee flank sits in the shadow of the lobe in front. Both
+   come out of one extra billow() evaluation, offset toward the sun. The result is a surface with real
+   internal structure and a readable light direction — and the crystalline quality arrives through that
+   lighting rather than through faceting the geometry into shards (§04). */
+const _lobe = new Float64Array(2);          /* [density, lit-flank] — build-time scratch, never per frame */
+function lobeShade(x, z, sxh, szh, scale, reach) {
+  const a = billow(x * scale, z * scale) * 0.5 + 0.5;
+  /* sample TOWARD the sun: if the cloud ahead of us is thicker, we are standing in its shadow */
+  const b = billow((x + sxh * reach) * scale, (z + szh * reach) * scale) * 0.5 + 0.5;
+  _lobe[0] = a;
+  _lobe[1] = clamp01(0.5 + (a - b) * 2.4);
+}
+
 /* THE CLOUD SEA (§33). It lies 300 m below the deck, which is what makes the sunset cliff a cliff: you
    walk to the edge of sector A and there is an ocean a long way down and 6.75 km across. It also shows
    through every void in the deck, which is what gives a hole its depth (§05, §38). */
@@ -109,7 +134,7 @@ const SEA = Object.freeze({ y: -300, inner: 150, outer: DECK.seaRadius * 0.75, r
 function seaHeight(x, z) {
   /* swell damped with distance: past ~2 km the ring spacing is wider than the swell, so keeping the
      amplitude there would alias into a sawtooth. Flattening into haze is also what distance does. */
-  const damp = 1 - 0.78 * smooth((Math.hypot(x, z) - 2100) / 3600);
+  const damp = 1 - 0.78 * smooth((Math.sqrt(x * x + z * z) - 2100) / 3600);
   return SEA.y + damp * (22 * Math.sin(x * 0.0028) * Math.cos(z * 0.0031)
                        + 13 * Math.sin(x * 0.0015 - z * 0.0019 + 1.3)
                        +  7 * Math.sin((x + z) * 0.0061));
@@ -296,6 +321,8 @@ export function buildSkyTerrain(ctx) {
   const dRad = new Float32Array(dCount);
   const dEdge = new Float32Array(dCount);
   const dHgt = new Float32Array(dCount);
+  const dRelief = new Float32Array(dCount);      /* how high this point sits among its 90 m neighbours */
+  const dStab = new Float32Array(dCount);        /* 1 where the floor must read as trustworthy ground */
   const dSolid = new Uint8Array(dCount);
   const UVS = 1 / 260;                            /* the vapour skin tiles every 260 m */
 
@@ -308,12 +335,18 @@ export function buildSkyTerrain(ctx) {
     const hx = cloudTopAt(x + e, z) - cloudTopAt(x - e, z);
     const hz = cloudTopAt(x, z + e) - cloudTopAt(x, z - e);
     let nx = -hx / (2 * e), ny = 1, nz = -hz / (2 * e);
-    const inv = 1 / Math.hypot(nx, ny, nz);
+    const inv = 1 / Math.sqrt(nx * nx + ny * ny + nz * nz);
     dNor[v * 3] = nx * inv; dNor[v * 3 + 1] = ny * inv; dNor[v * 3 + 2] = nz * inv;
     dBear[v] = layout.bearingOf(x, z);
     dRad[v] = Math.hypot(x, z);
     dEdge[v] = layout.deckEdge(x, z);
     dHgt[v] = y;
+    /* MACRO RELIEF at 90 m: this is what makes a valley read as a valley and a ridge as a ridge, and
+       it is the reason the mist corridors have somewhere dark to sit (§05) */
+    const q = 90;
+    const around = (cloudTopAt(x + q, z) + cloudTopAt(x - q, z) + cloudTopAt(x, z + q) + cloudTopAt(x, z - q)) * 0.25;
+    dRelief[v] = clamp01(0.5 + (y - around) / 26);
+    dStab[v] = stability(x, z);
     dSolid[v] = layout.deckSolid(x, z) ? 1 : 0;
   }
   writeVert(0, 0, 0);
@@ -364,19 +397,24 @@ export function buildSkyTerrain(ctx) {
   skinGeo.setIndex(deckIndex);
   skinGeo.boundingSphere = deckGeo.boundingSphere;
 
+  /* THE DECK WRITES DEPTH — it is ground, and things stand behind it. But a transparent surface that
+     writes depth also occludes with its INVISIBLE fragments, and this deck has plenty of those: the
+     quads that straddle a void rim or the sunset cliff fade to alpha 0 while still covering open air.
+     Without alphaTest they would silently punch a hole in the sky exactly where the brief wants the
+     player to see 300 m straight down (§05, §38). alphaTest discards them before the depth write. */
   const deckMat = own.m(new THREE.MeshBasicMaterial({
-    vertexColors: true, transparent: true, side: THREE.FrontSide, depthWrite: true,
+    vertexColors: true, transparent: true, alphaTest: 0.02, side: THREE.FrontSide, depthWrite: true,
     /* fog off on purpose: the aerial perspective here is baked PER BEARING out of atmosphere(), which
        a single scene fog colour cannot do — the sunset side has to recede warm while the cold side
        recedes violet, or the four sectors stop being one sky (§48) */
     fog: false
   }));
   deckMat.name = 'skyterrain-deck';
-  const underMat = own.m(new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, side: THREE.BackSide, depthWrite: true, fog: false }));
+  const underMat = own.m(new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, alphaTest: 0.02, side: THREE.BackSide, depthWrite: true, fog: false }));
   underMat.name = 'skyterrain-deck-under';
   const vapour = own.t(vapourTexture(512, 'skybiome-vapour'));
   const skinMat = own.m(new THREE.MeshBasicMaterial({
-    map: vapour, vertexColors: true, transparent: true, side: THREE.FrontSide,
+    map: vapour, vertexColors: true, transparent: true, alphaTest: 0.008, side: THREE.FrontSide,
     depthWrite: false, fog: false, opacity: 0.85
   }));
   skinMat.name = 'skyterrain-vapour-skin';
@@ -392,32 +430,53 @@ export function buildSkyTerrain(ctx) {
   function bakeDeck() {
     const top = deckGeo.attributes.color.array, und = underGeo.attributes.color.array, skn = skinGeo.attributes.color.array;
     const sx = _sun.x, sy = _sun.y, sz = _sun.z;
+    /* the sun's direction in PLAN — which way a cloud lobe's shadow falls across the deck */
+    const shl = Math.sqrt(sx * sx + sz * sz) || 1, sxh = sx / shl, szh = sz / shl;
+    /* HOW HARD THE MODELLING BITES. Under a strong key a cumulus deck is deeply shaped, with real
+       shadow in the gaps between its lobes; at night the sky is the only source and the whole surface
+       flattens, which is also physically what happens. This is the term that decides whether the floor
+       reads as cloud or as poured white (§49). */
+    const aoS = 0.34 + 0.34 * sunStr;
     for (let v = 0; v < dCount; v++) {
+      const x = dPos[v * 3], z = dPos[v * 3 + 2];
       const bear = dBear[v], edge = dEdge[v], r = dRad[v];
       sampleLUT(lutFill, bear, _c);                 /* the sector's own bounce colour */
       sampleLUT(lutSky, bear, _c2);
       sampleLUT(lutHaze, bear, _c3);
       const up = dNor[v * 3 + 1];
       const ndl = dNor[v * 3] * sx + up * sy + dNor[v * 3 + 2] * sz;
-      const lit = smooth((ndl + 0.25) / 1.0);
+      const slopeLit = smooth((ndl + 0.25) / 1.0);
       const back = backlight(bear);
 
-      /* THE FLOOR VALUE. 0.66 x fill is the darkest this world's cloud is ever allowed to be — a cloud
-         shadow is filled by the rest of the cloud, so it is soft and coloured, never black (§14). */
-      let cr = _c.r * (0.66 + 0.28 * up), cg = _c.g * (0.66 + 0.28 * up), cb = _c.b * (0.66 + 0.28 * up);
-      /* skylight on the horizontal, then the key on the slopes that face it */
-      cr += (_c2.r - cr) * 0.16 * up; cg += (_c2.g - cg) * 0.16 * up; cb += (_c2.b - cb) * 0.16 * up;
-      const kf = 0.34 * lit * sunStr;
+      lobeShade(x, z, sxh, szh, 1, 58);
+      const density = _lobe[0], flank = _lobe[1];
+      /* the three things that model a cloud floor: where it is thick, which flank of a lobe faces the
+         sun, and whether it sits high or low in the macro relief */
+      const modelling = 0.34 * density + 0.38 * flank + 0.28 * dRelief[v];
+      /* THE STABLE ZONES stay even. The arrival plateau and the training flats have to read as
+         trustworthy ground, so the lobe modelling fades out over them (§04, §06). */
+      const shade = 1 - aoS * (1 - 0.66 * dStab[v]) * (1 - modelling);
+      /* the sun reaches a crown far more than it reaches the gap between two lobes */
+      const lit = slopeLit * (0.26 + 0.74 * modelling);
+
+      /* THE FLOOR VALUE (§14). Even at its deepest the cloud sits at (1 - aoS) x its own sector fill —
+         a soft, coloured, clearly-lit shadow. Nothing in this realm is ever crushed to black. */
+      let cr = _c.r * shade, cg = _c.g * shade, cb = _c.b * shade;
+      /* skylight on the horizontal, occluded in the same places */
+      const sf = 0.18 * up * shade;
+      cr += (_c2.r - cr) * sf; cg += (_c2.g - cg) * sf; cb += (_c2.b - cb) * sf;
+      /* the key */
+      const kf = 0.46 * lit * sunStr;
       cr += (sunCol.r - cr) * kf; cg += (sunCol.g - cg) * kf; cb += (sunCol.b - cb) * kf;
-      const gain = (0.88 + 0.30 * lit) * (1 + 0.10 * clamp01(dHgt[v] / 45));
+      const gain = (0.80 + 0.48 * lit * sunStr) * (1 + 0.16 * clamp01(dHgt[v] / 45));
       cr *= gain; cg *= gain; cb *= gain;
       /* RIM SCATTER. Where the deck thins toward an edge, light comes THROUGH it: the rim glows rather
          than ending. This is what turns a cut boundary into a cloud that fades into air (§01, §49). */
       const rim = (1 - smooth(edge / 0.55)) * (0.55 + 0.45 * back);
-      const rf = 0.44 * rim * sunStr;
-      cr += (sunCol.r * 1.10 - cr) * rf; cg += (sunCol.g * 1.08 - cg) * rf; cb += (sunCol.b * 1.06 - cb) * rf;
+      const rf = 0.46 * rim * sunStr;
+      cr += (sunCol.r * 1.14 - cr) * rf; cg += (sunCol.g * 1.11 - cg) * rf; cb += (sunCol.b * 1.08 - cb) * rf;
       /* aerial perspective, per bearing */
-      const hz = 0.44 * smooth((r - 260) / 900);
+      const hz = 0.40 * smooth((r - 300) / 950);
       cr += (_c3.r - cr) * hz; cg += (_c3.g - cg) * hz; cb += (_c3.b - cb) * hz;
 
       const alpha = smooth(edge / 0.42);
@@ -425,20 +484,22 @@ export function buildSkyTerrain(ctx) {
       top[o4] = cr; top[o4 + 1] = cg; top[o4 + 2] = cb; top[o4 + 3] = alpha;
 
       /* THE UNDERSIDE. Seen from a void or from below the cliff. It is lit almost entirely by bounce
-         off the cloud sea 300 m under it, so it is soft, blue and clearly NOT dark. */
-      let ur = _c.r * 0.58, ug = _c.g * 0.58, ub = _c.b * 0.58;
+         off the cloud sea 300 m under it, so it is soft, blue and clearly NOT dark — but it still
+         carries the lobe structure, because a cloud base is bumpy from underneath too. */
+      const ushade = 0.72 + 0.28 * density;
+      let ur = _c.r * 0.56 * ushade, ug = _c.g * 0.56 * ushade, ub = _c.b * 0.56 * ushade;
       ur += (_c3.r * 0.95 - ur) * 0.48; ug += (_c3.g * 0.95 - ug) * 0.48; ub += (_c3.b * 0.95 - ub) * 0.48;
-      const ug2 = 1 + 0.35 * rim;                   /* the rim is thin from below too */
+      const ug2 = 1 + 0.40 * rim;                   /* the rim is thin from below too */
       und[o4] = ur * ug2; und[o4 + 1] = ug * ug2; und[o4 + 2] = ub * ug2; und[o4 + 3] = alpha;
 
-      /* THE VAPOUR SKIN. Near-white, tinted by the same sector fill, thicker in the hollows (where
-         vapour pools) and thinner on the crowns — so the surface is unevenly dense, which is the whole
-         difference between cloud and poured white concrete (§49). */
-      const pool = clamp01(0.62 - dHgt[v] / 34);
-      let sr2 = 0.86 + 0.20 * lit, sg2 = 0.88 + 0.18 * lit, sb2 = 0.92 + 0.14 * lit;
+      /* THE VAPOUR SKIN. Near-white, tinted by the same sector fill, and laid on unevenly — thick over
+         a lobe and over the hollows where vapour pools, thin on the shoulders. That unevenness is what
+         stops a heightfield from reading as one solid material. */
+      const pool = clamp01(0.30 + 0.55 * density + 0.42 * (1 - dRelief[v]));
+      let sr2 = 0.86 + 0.22 * flank, sg2 = 0.88 + 0.19 * flank, sb2 = 0.92 + 0.15 * flank;
       sr2 = sr2 * (0.55 + 0.45 * _c.r); sg2 = sg2 * (0.55 + 0.45 * _c.g); sb2 = sb2 * (0.55 + 0.45 * _c.b);
       skn[o4] = sr2; skn[o4 + 1] = sg2; skn[o4 + 2] = sb2;
-      skn[o4 + 3] = alpha * (0.16 + 0.40 * pool + 0.16 * rim);
+      skn[o4 + 3] = alpha * (0.10 + 0.44 * pool + 0.18 * rim) * (1 - 0.45 * dStab[v]);
     }
     deckGeo.attributes.color.needsUpdate = true;
     underGeo.attributes.color.needsUpdate = true;
@@ -505,7 +566,7 @@ export function buildSkyTerrain(ctx) {
   const sPos = new Float32Array(sCount * 3);
   const sCol = new Float32Array(sCount * 4);
   const sBear = new Float32Array(sCount), sRad = new Float32Array(sCount), sUp = new Float32Array(sCount);
-  let seaGeo = null, seaMesh = null;
+  let seaGeo = null;
   {
     const ratio = SEA.outer / SEA.inner;
     for (let i = 0; i <= seaRings; i++) {
@@ -539,20 +600,32 @@ export function buildSkyTerrain(ctx) {
     mesh.frustumCulled = false;
     mesh.renderOrder = -10;                          /* the backdrop everything else stands in front of */
     group.add(mesh);
-    seaGeo = g; seaMesh = mesh;
+    seaGeo = g;
   }
   function bakeSea() {
+    const sx = _sun.x, sz = _sun.z;
+    const shl = Math.sqrt(sx * sx + sz * sz) || 1, sxh = sx / shl, szh = sz / shl;
+    const aoS = 0.30 + 0.30 * sunStr;
     for (let v = 0; v < sCount; v++) {
       const bear = sBear[v], r = sRad[v], crest = sUp[v];
       sampleLUT(lutFill, bear, _c);
       sampleLUT(lutHaze, bear, _c3);
       const back = backlight(bear);
-      let cr = _c.r * (0.70 + 0.24 * crest), cg = _c.g * (0.70 + 0.24 * crest), cb = _c.b * (0.70 + 0.24 * crest);
-      const kf = 0.30 * crest * sunStr * (0.5 + 0.5 * back);
+      /* the same lobe reading as the deck, at 3.6x the wavelength: an ocean of cloud is made of the
+         same masses, just seen from further away. Without this the sea is one flat disc. */
+      lobeShade(sPos[v * 3], sPos[v * 3 + 2], sxh, szh, 0.28, 330);
+      const density = _lobe[0], flank = _lobe[1];
+      const modelling = 0.34 * density + 0.36 * flank + 0.30 * crest;
+      const shade = 1 - aoS * (1 - modelling);
+      let cr = _c.r * shade, cg = _c.g * shade, cb = _c.b * shade;
+      const kf = 0.34 * modelling * sunStr * (0.5 + 0.5 * back);
       cr += (sunCol.r - cr) * kf; cg += (sunCol.g - cg) * kf; cb += (sunCol.b - cb) * kf;
-      /* the ocean melts into the horizon: by 6.75 km it is 88% atmosphere, which is what makes the
-         realm read as vast rather than as a big white disc (§33) */
-      const hz = 0.10 + 0.78 * smooth((r - 500) / 5200);
+      const gain = 0.86 + 0.34 * modelling * sunStr;
+      cr *= gain; cg *= gain; cb *= gain;
+      /* the ocean melts into the horizon: by 6.75 km it is ~90% atmosphere, which is what makes the
+         realm read as vast rather than as a big white disc (§33). The modelling survives up close,
+         where the cliff overlooks it, and dissolves where distance would dissolve it anyway. */
+      const hz = 0.08 + 0.82 * smooth((r - 700) / 5000);
       cr += (_c3.r - cr) * hz; cg += (_c3.g - cg) * hz; cb += (_c3.b - cb) * hz;
       const o = v * 4;
       sCol[o] = cr; sCol[o + 1] = cg; sCol[o + 2] = cb; sCol[o + 3] = 1;
@@ -671,6 +744,7 @@ export function buildSkyTerrain(ctx) {
     set.geo.index.needsUpdate = true;
     set.geo.setDrawRange(0, w);
     set.drawn = w / 6;
+    set.drawnRuns = keepRuns.length;
   }
   function bakeQuads(set) {
     const col = set.geo.attributes.color.array;
@@ -848,7 +922,7 @@ export function buildSkyTerrain(ctx) {
         if (i < ST - 1) { idx[io++] = a; idx[io++] = dd; idx[io++] = c; }
       }
       runs.push({ id: k, ioStart, ioEnd: io, imp: (I.rx + I.rz) / Math.max(120, I.r) });
-      meta[k] = { b: layout.bearingOf(cx, cz), base, count: vo - base, ry, cy };
+      meta[k] = { b: layout.bearingOf(cx, cz), base, count: vo - base, ry, cy, cx, cz, rx: I.rx, rz: I.rz };
       islandInfo.push({ index: k, x: cx, y: I.y, z: cz, rx: I.rx, rz: I.rz, top: I.y, bearing: I.bearing, r: I.r });
       /* a feathered skin around the equator so the lump never shows a hard sphere edge (§49) */
       for (let q = 0; q < 8; q++) {
@@ -896,6 +970,7 @@ export function buildSkyTerrain(ctx) {
   function bakeIslands() {
     const col = islandsSet.geo.attributes.color.array;
     const pos = islandsSet.geo.attributes.position.array;
+    const sx = _sun.x, sy = _sun.y, sz = _sun.z;
     for (let k = 0; k < islandsSet.meta.length; k++) {
       const m = islandsSet.meta[k];
       sampleLUT(lutFill, m.b, _c);
@@ -903,16 +978,30 @@ export function buildSkyTerrain(ctx) {
       sampleLUT(lutHaze, m.b, _c3);
       const back = backlight(m.b);
       for (let v = m.base; v < m.base + m.count; v++) {
+        const px = pos[v * 3], py = pos[v * 3 + 1], pz = pos[v * 3 + 2];
         /* one gradient, top to root: crown catches the key, the root stays in soft blue bounce */
-        const t = clamp01((pos[v * 3 + 1] - (m.cy - m.ry * 1.45)) / (m.ry * 2.45));
-        let cr = _c.r * (0.58 + 0.30 * t), cg = _c.g * (0.58 + 0.30 * t), cb = _c.b * (0.58 + 0.30 * t);
-        const kf = (0.14 + 0.36 * back) * sunStr * Math.pow(t, 1.4);
+        const t = clamp01((py - (m.cy - m.ry * 1.45)) / (m.ry * 2.45));
+        /* AND a real light direction across the lump. The ellipsoid's own gradient is close enough to
+           a normal here, and without it an island is one flat blob however well it is graded — the
+           same flatness that made the deck read as concrete before the lobe pass. */
+        let nx = (px - m.cx) / m.rx, ny = (py - m.cy) / m.ry, nz = (pz - m.cz) / m.rz;
+        const ninv = 1 / Math.max(1e-4, Math.sqrt(nx * nx + ny * ny + nz * nz));
+        const ndl = (nx * sx + ny * sy + nz * sz) * ninv;
+        const lit = smooth((ndl + 0.42) / 1.10);
+        /* the shading depth follows the key, as it does on the deck: hard shaping under a strong sun,
+           and at night an island is lit by the whole sky, so its dark side lifts rather than blackens */
+        const depth = 0.34 + 0.30 * sunStr;
+        const shade = (1 - depth) + depth * lit;
+        let cr = _c.r * (0.58 + 0.26 * t) * shade, cg = _c.g * (0.58 + 0.26 * t) * shade, cb = _c.b * (0.58 + 0.26 * t) * shade;
+        const kf = (0.16 + 0.38 * back) * sunStr * lit * Math.pow(t, 0.9);
         cr += (sunCol.r - cr) * kf; cg += (sunCol.g - cg) * kf; cb += (sunCol.b - cb) * kf;
-        const sky = 0.26 * (1 - t);
-        cr += (_c2.r * 0.66 - cr) * sky; cg += (_c2.g * 0.66 - cg) * sky; cb += (_c2.b * 0.66 - cb) * sky;
-        const hz = 0.30 * smooth((Math.hypot(pos[v * 3], pos[v * 3 + 2]) - 300) / 1200);
+        /* the root is lit from below by the cloud sea, never from nothing (§14) */
+        const sky = 0.30 * (1 - t);
+        cr += (_c2.r * 0.70 - cr) * sky; cg += (_c2.g * 0.70 - cg) * sky; cb += (_c2.b * 0.70 - cb) * sky;
+        const rr = Math.sqrt(px * px + pz * pz);
+        const hz = 0.30 * smooth((rr - 300) / 1200);
         cr += (_c3.r - cr) * hz; cg += (_c3.g - cg) * hz; cb += (_c3.b - cb) * hz;
-        const g2 = 0.94 + 0.26 * back;
+        const g2 = (0.90 + 0.30 * back) * (1 + 0.22 * lit);
         col[v * 4] = cr * g2; col[v * 4 + 1] = cg * g2; col[v * 4 + 2] = cb * g2; col[v * 4 + 3] = 1;
       }
     }
@@ -1110,7 +1199,7 @@ export function buildSkyTerrain(ctx) {
   const puffCol = new Float32Array(SLOTS * PUFF_V * 4);
   const slots = [];
   for (let s = 0; s < SLOTS; s++) slots.push({ i: s, live: false, x: 0, z: 0, r: 40, s: 1, t: 0, life: 2.6, seed: s * 1.7, b: 0, tint: new THREE.Color(1, 1, 1) });
-  let pressGeo = null, pressMesh = null, puffGeo = null, puffMesh = null;
+  let pressGeo = null, puffGeo = null;
   {
     /* the unit bowl: 1 at the centre, 0 at the rim, with a soft shoulder */
     pressDip[0] = 1;
@@ -1148,7 +1237,7 @@ export function buildSkyTerrain(ctx) {
     mesh.name = 'skyterrain-disturb-press';
     mesh.frustumCulled = false; mesh.renderOrder = 8;
     group.add(mesh);
-    pressGeo = g; pressMesh = mesh;
+    pressGeo = g;
 
     const qidx = [];
     for (let s = 0; s < SLOTS; s++) for (let p = 0; p < PUFFS; p++) {
@@ -1175,7 +1264,7 @@ export function buildSkyTerrain(ctx) {
     pmesh.name = 'skyterrain-disturb-vapour';
     pmesh.frustumCulled = false; pmesh.renderOrder = 9;
     group.add(pmesh);
-    puffGeo = pg; puffMesh = pmesh;
+    puffGeo = pg;
   }
 
   /* The public hook. Costs one slot write; never allocates; ignores anything off the cloud floor,
@@ -1206,12 +1295,13 @@ export function buildSkyTerrain(ctx) {
       const v = (o + 1 + (i - 1) * PS_SEG + j) * 3;
       pressBase[v] = px; pressBase[v + 1] = cloudTopAt(px, pz) + 0.35; pressBase[v + 2] = pz;
     }
+    /* the vapour band starts on the bowl's own outer ring — the same points, already sampled, so this
+       costs nothing rather than another 28 cloudTopAt evaluations */
     for (let j = 0; j < PS_SEG; j++) {
-      const a = (j / PS_SEG) * TAU;
+      const src = (o + 1 + (PS_RING - 1) * PS_SEG + j) * 3;
       for (let k = 0; k < 2; k++) {
-        const px = x + Math.cos(a) * slot.r, pz = z + Math.sin(a) * slot.r;
         const v = (o + PRESS_V + k * PS_SEG + j) * 3;
-        pressBase[v] = px; pressBase[v + 1] = cloudTopAt(px, pz) + 0.9; pressBase[v + 2] = pz;
+        pressBase[v] = pressBase[src]; pressBase[v + 1] = pressBase[src + 1] + 0.55; pressBase[v + 2] = pressBase[src + 2];
       }
     }
     return true;
@@ -1317,7 +1407,9 @@ export function buildSkyTerrain(ctx) {
         const px = S.x + Math.cos(a) * rr, pz = S.z + Math.sin(a) * rr;
         const py = pressBase[o * 3 + 1] + 3 + 16 * u;
         let nx = camX - px, nz = camZ - pz;
-        const inv = 1 / Math.max(1e-3, Math.hypot(nx, nz));
+        /* sqrt, not Math.hypot: hypot is variadic and allocates an argument array on every call, which
+           is exactly the kind of thing that must never appear in a per-frame loop (§45) */
+        const inv = 1 / Math.max(1e-3, Math.sqrt(nx * nx + nz * nz));
         nx *= inv; nz *= inv;
         const rxv = nz, rzv = -nx;                    /* right = up x normal */
         const w = S.r * (0.40 + 0.55 * u) * (0.7 + 0.3 * Math.sin(a * 3.1));
@@ -1392,7 +1484,7 @@ export function buildSkyTerrain(ctx) {
     disturbSlots: SLOTS,
     drawCalls: 0, triangles: 0, trianglesPeak: 0, disturbTrianglesPeak: 0,
     get band() { return band; },
-    get drawnTowers() { return towerFinished.drawn; },
+    get drawnTowers() { return towerFinished.drawnRuns; },
     get drawnIslands() { return islandsSet.drawn; }
   };
   /* MEASURED, not estimated: what this module actually submits at the tier it was built at, counting

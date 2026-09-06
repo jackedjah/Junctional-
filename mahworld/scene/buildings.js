@@ -539,9 +539,13 @@ function platinumOrder(ctx, g, o) {
     if (cap) part(caps, chamferBox(w + 0.22, 0.22, d + 0.2, 0.05), cx, y1 + 0.1, z - d / 2);
   };
   /* a RETURN — the same platinum carried around onto the flank. Without it a viewer walking past the
-     corner sees the framing end at the arris, and the whole elevation collapses back into paint. */
-  const ret = (x, y0, y1, zc, dz, t) => [-1, 1].forEach(sd =>
-    part(piers, chamferBox(t, y1 - y0, dz, 0.06), sd * x, (y0 + y1) / 2, zc));
+     corner sees the framing stop at the arris, and the whole elevation collapses back into paint.
+     A return ends in the open at both ends, so both of its ends get the lit grade too. */
+  const ret = (x, y0, y1, zc, dz, t) => [-1, 1].forEach(sd => {
+    part(piers, chamferBox(t, y1 - y0, dz, 0.06), sd * x, (y0 + y1) / 2, zc);
+    part(caps, chamferBox(t + 0.14, 0.18, dz + 0.14, 0.04), sd * x, y1 + 0.05, zc);
+    part(caps, chamferBox(t + 0.12, 0.16, dz + 0.12, 0.04), sd * x, y0 - 0.04, zc);
+  });
 
   const pierW = (W - openW) / 2, pierX = openW / 2 + pierW / 2;
   if (order === 'banded') {
@@ -552,15 +556,15 @@ function platinumOrder(ctx, g, o) {
        clerestory and crown own the elevation above it; a parapet here would only fight them. */
     const z = 0.66, d = 0.5, len = pierW - 0.4;
     [-1, 1].forEach(sd => {
-      course(sd * pierX, len, floorY, floorY + 0.94, z, d, false);
-      course(sd * pierX, len, floorY + 1.98, floorY + 2.62, z, d, false);
-      course(sd * pierX, len, floorY + 6.52, floorY + 7.26, z, d, false);
+      course(sd * pierX, len, floorY, floorY + 0.94, z, d, false);        /* the plinth's underside is the apron; nothing to soffit */
+      course(sd * pierX, len, floorY + 1.98, floorY + 2.62, z, d, true);
+      course(sd * pierX, len, floorY + 6.62, floorY + 7.36, z, d, true);  /* clear of the 6.4 m recessed seam, which stays a seam */
       /* the quoin: without it the courses read as four stripes painted on a navy pier rather than as
          one clad corner, and the mass loses its edge */
       pier(sd * (W / 2 - 0.85), 1.3, floorY, floorY + 9.0, z, d, true);
     });
     course(0, W - 1.2, floorY + 8.28, floorY + 9.02, z, d + 0.1, true);
-    ret(W / 2 + 0.02, floorY + 3.4, floorY + 9.7, -1.9, 2.6, 0.42);
+    ret(W / 2 + 0.02, floorY + 3.4, floorY + 9.55, -1.9, 2.6, 0.42);   /* y kept inside the pier's flat flank, between its 3.2 m corner radii */
   } else if (order === 'piered') {
     /* MAH MARKET — PIERED. Its terraces already give it a horizontal roof line, so the wall takes the
        opposite emphasis: a civic order of four full-height mullion piers standing 1.15 m proud of the
@@ -596,12 +600,14 @@ function platinumOrder(ctx, g, o) {
     const tx0 = openW / 2 + 0.6, tcx = (tx0 + x1) / 2, tlen = x1 - tx0;
     const sill = floorY + openH + 1.6, fh = (H - 1.2 - sill) / 3;   /* the podium curtain wall, as its own module lays it out */
     [-1, 1].forEach(sd => {
-      course(sd * cx, len, floorY - 1.2, floorY + 2.8, 0.95, 0.95, false);
+      course(sd * cx, len, floorY - 1.2, floorY + 2.8, 0.95, 0.95, true);
       course(sd * cx, len, floorY + 13.7, floorY + 15.4, 1.05, 0.58, true);
       for (let f = 0; f < 2; f++) course(sd * tcx, tlen, sill + (f + 1.02) * fh - 0.36, sill + (f + 1.02) * fh + 0.36, 1.05, 0.5, true);
       pier(sd * (W / 2 - 0.55), 1.1, floorY + 2.8, floorY + 34.8, 1.05, 0.42, false);
     });
-    course(0, W - 1.2, floorY + 34.8, floorY + 36.35, 1.05, 0.75, true);
+    /* the attic runs to W − 0.2 rather than W − 1.2 so it caps the corner returns instead of leaving
+       their tops open to a black zenith */
+    course(0, W - 0.2, floorY + 34.8, floorY + 36.35, 1.05, 0.75, true);
     ret(W / 2 + 0.06, floorY + 1.8, floorY + 33.2, -2.2, 3.4, 0.5);
   }
   merged(g, face, M.platinumMid || M.platinum, 'platinum-courses', true);

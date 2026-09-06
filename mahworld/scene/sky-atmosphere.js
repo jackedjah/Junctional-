@@ -20,7 +20,7 @@
      1  THE DOME (§42)              one world-space sphere at DECK.domeRadius, vertex-coloured from
                                     atmosphere(), carrying the sun's own scattering and the warm
                                     sector-A horizon band inside those same vertex colours.
-     2  SUN + HALO (§15)            a small disc at layout.sunDirection(band) and a wide, low-alpha
+     2  SUN + HALO (§15)            a small disc at the contract's sun direction and a wide, low-alpha
                                     halo. The bulk of the sun's light lives in the dome, which is why
                                     the halo never has to close into a glare blob.
      3  STARS + UPPER AIR (§18)     one Points object, seeded, density and brightness weighted by
@@ -52,10 +52,17 @@
      LAW 2 — no atmospheric colour is authored here. Search this file for a hex literal: there are
      none in the sky. The scalars below are STRENGTHS, not colours.
 
+   THE BAND MAY BE A BLEND. The contract's `band` argument is either one of the four key names or its
+   own { a, b, t } pair, and atmoBand(clockState) turns the world clock's eight bands into one. BAND
+   is therefore held here exactly as given and passed through to atmosphere() and fillFor() untouched,
+   and every per-band number this module owns — sun glow, horizon glow, disc opacity, fog near/far —
+   resolves through the SAME pair. Otherwise the dome would cross-fade through a sunset while the sun
+   glow, the star level and the fog snapped at the boundary, which is the seam §41 exists to prevent.
+
    FOG. This module sets nothing global — every object it owns is fog:false and carries its own
    painted aerial perspective, because the realm is 9 km deep and a linear fog tuned for a 1 km deck
    would erase all of it. The assembly asks fog(band) for the colour and near/far it should apply to
-   everyone else.
+   everyone else, and gets a blended answer for the same reason.
 
    COST (§45, §46). Measured, not estimated — see stats.drawCalls / stats.triangles. Quality is spent
    on the dome's azimuth resolution (that IS the module) and on the sunset horizon; the cloud sea
@@ -114,7 +121,8 @@ export function buildSkyAtmosphere(ctx) {
   const IA = layout.SECTORS.findIndex(s => s.id === 'A');
 
   let theme = (ctx && ctx.theme) || (ctx && ctx.M && ctx.M.theme) || { energy: 0x7fc6ff, energyLight: 0xdff1ff, energyDeep: 0x2f6ea8 };
-  let BAND = 'dusk', daylight = 0, tierName = 'high';
+  /* BAND is either a key name or the contract's { a, b, t } blend — see pairOf() below */
+  let BAND = 'dusk', daylight = 0, tierName = 'high', starLevel = 0.3;
 
   const group = new THREE.Group(); group.name = 'sky-atmosphere';
   const geometries = [], materials = [], textures = [];
@@ -131,6 +139,43 @@ export function buildSkyAtmosphere(ctx) {
   const sky = (c, bearing, elev) => c.setHex(layout.atmosphere(bearing, elev, BAND));
   const fill = (c, bearing) => c.setHex(layout.fillFor(bearing, BAND));
   const warmA = bearing => { layout.sectorWeights(bearing, _w4); return _w4[IA]; };
+
+  /* THE BAND MAY BE A BLEND. world-clock.js runs eight bands and this atmosphere has four keys, so
+     the contract allows `band` to be either a key name or its own { a, b, t } pair, and gives
+     atmoBand(clockState) to build one. BAND is therefore passed through to atmosphere() and
+     fillFor() completely untouched, and every per-band number this module owns is resolved through
+     the SAME pair — otherwise the sky would cross-fade continuously while the sun glow, the star
+     level and the fog snapped at each boundary, which is the exact seam §41 exists to prevent. */
+  function pairOf(band) {
+    if (band && typeof band === 'object' && band.a) return band;
+    return { a: layout.ATMO[band] ? band : 'dusk', b: layout.ATMO[band] ? band : 'dusk', t: 0 };
+  }
+  function bandNum(table) { const p = pairOf(BAND), a = table[p.a], b = table[p.b]; return a + (b - a) * (p.t || 0); }
+  function bandScalar(name) {
+    if (layout.atmoScalar) return layout.atmoScalar(BAND, name);
+    const p = pairOf(BAND), a = layout.ATMO[p.a][name], b = layout.ATMO[p.b][name];
+    return a + (b - a) * (p.t || 0);
+  }
+  function bandHex(key) {
+    const p = pairOf(BAND), t = p.t || 0;
+    const A = layout.ATMO[p.a][key], B = layout.ATMO[p.b][key];
+    if (t <= 0) return A;
+    if (t >= 1) return B;
+    const r = ((A >> 16) & 255) + (((B >> 16) & 255) - ((A >> 16) & 255)) * t;
+    const g = ((A >> 8) & 255) + (((B >> 8) & 255) - ((A >> 8) & 255)) * t;
+    const b = (A & 255) + ((B & 255) - (A & 255)) * t;
+    return ((Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(b)) >>> 0;
+  }
+  /* layout.sunDirection() only knows the four key NAMES, so handing it a blend would silently snap
+     the sun back to the dusk elevation. The elevation blends exactly like every other key. */
+  function sunDirFor(out) {
+    const p = pairOf(BAND), t = p.t || 0;
+    const ea = layout.SUN_ELEV[p.a], eb = layout.SUN_ELEV[p.b];
+    const e = ea + (eb - ea) * t;
+    const d = layout.dir(layout.SUN_BEARING);
+    return out.set(d.x * Math.cos(e), Math.sin(e), d.z * Math.cos(e)).normalize();
+  }
+  function bandLabel() { const p = pairOf(BAND); return (p.t || 0) > 0.001 ? p.a + '->' + p.b + '@' + p.t.toFixed(2) : p.a; }
 
   /* Bake per-vertex bearing and elevation-as-seen-from-the-origin once, so a repaint never pays for
      atan2 or a square root. Every painted surface in this module uses these two numbers and nothing
@@ -169,10 +214,9 @@ export function buildSkyAtmosphere(ctx) {
   group.add(dome);
 
   function paintDome() {
-    const K = layout.ATMO[BAND] || layout.ATMO.dusk;
-    layout.sunDirection(BAND, _sunDir);
-    _csun.setHex(K.sun); _cvoid.setHex(K.void);
-    const gA = SUN_GLOW[BAND] || 0, hA = HORIZON_GLOW[BAND] || 0;
+    sunDirFor(_sunDir);
+    _csun.setHex(bandHex('sun')); _cvoid.setHex(bandHex('void'));
+    const gA = bandNum(SUN_GLOW), hA = bandNum(HORIZON_GLOW);
     const p = domeGeo.attributes.position;
     /* the two pole colours, averaged over eight bearings */
     let zr = 0, zg = 0, zb = 0, nr = 0, ng = 0, nb = 0;
@@ -234,14 +278,14 @@ export function buildSkyAtmosphere(ctx) {
 
   const SUN_R = 8900;
   function placeSun() {
-    const K = layout.ATMO[BAND] || layout.ATMO.dusk;
-    layout.sunDirection(BAND, _sunDir);
+    const sunHex = bandHex('sun');
+    sunDirFor(_sunDir);
     sunDisc.position.copy(_sunDir).multiplyScalar(SUN_R);
     sunDisc.lookAt(0, 0, 0);
     sunHalo.position.copy(_sunDir).multiplyScalar(SUN_R - 60);
-    sunMat.color.setHex(K.sun);
-    haloMat.color.setHex(K.sun);
-    const d = SUN_DISC[BAND] != null ? SUN_DISC[BAND] : 0.9;
+    sunMat.color.setHex(sunHex);
+    haloMat.color.setHex(sunHex);
+    const d = bandNum(SUN_DISC);
     sunMat.opacity = d;
     haloMat.opacity = 0.42 * d;
   }
@@ -540,8 +584,7 @@ export function buildSkyAtmosphere(ctx) {
   group.add(voidHazeMesh, voidCloudMesh);
 
   function paintVoid(part) {
-    const K = layout.ATMO[BAND] || layout.ATMO.dusk;
-    _cvoid.setHex(K.void);
+    _cvoid.setHex(bandHex('void'));
     const col = part.geo.attributes.color.array, meta = part.meta;
     const n = meta.length / VOID_META;
     /* city light is a night fact: by day the world below is just more haze */
@@ -657,9 +700,9 @@ export function buildSkyAtmosphere(ctx) {
   group.add(peaks);
 
   function paintPeaks() {
-    const K = layout.ATMO[BAND] || layout.ATMO.dusk;
-    layout.sunDirection(BAND, _sunDir);
-    _csun.setHex(K.sun);
+    sunDirFor(_sunDir);
+    _csun.setHex(bandHex('sun'));
+    const sunI = bandScalar('sunI');
     const p = peaksGeo.attributes.position, col = peaksGeo.attributes.color.array;
     const n = p.count;
     for (let i = 0; i < n; i++) {
@@ -677,7 +720,7 @@ export function buildSkyAtmosphere(ctx) {
       let d = nx * _sunDir.x + ny * _sunDir.y + nz * _sunDir.z;
       if (d > 0) {
         const wA = warmA(bearing);
-        const rim = d * d * d * wA * 0.46 * (K.sunI / 3.3);
+        const rim = d * d * d * wA * 0.46 * (sunI / 3.3);
         r += _csun.r * rim; g += _csun.g * rim; b += _csun.b * rim;
       }
       /* THE WATERLINE. Below the local cloud-sea height the rock becomes the sea, so there is never a
@@ -759,9 +802,8 @@ export function buildSkyAtmosphere(ctx) {
   group.add(farSea);
 
   function paintSea() {
-    const K = layout.ATMO[BAND] || layout.ATMO.dusk;
-    layout.sunDirection(BAND, _sunDir);
-    _csun.setHex(K.sun);
+    _csun.setHex(bandHex('sun'));
+    const sunI = bandScalar('sunI');
     const col = seaGeo.attributes.color.array, n = seaMeta.length / 2;
     for (let i = 0; i < n; i++) {
       const rf = seaMeta[i * 2], alpha = seaMeta[i * 2 + 1], bearing = seaBE.b[i];
@@ -776,7 +818,7 @@ export function buildSkyAtmosphere(ctx) {
       /* backlit cloud: the ocean burns where the sun goes into it, sector-A weighted and nowhere else */
       const wA = warmA(bearing);
       if (wA > 0.02) {
-        const k = wA * wA * 0.30 * (K.sunI / 3.3) * (1 - t * 0.5);
+        const k = wA * wA * 0.30 * (sunI / 3.3) * (1 - t * 0.5);
         r += _csun.r * k; g += _csun.g * k; b += _csun.b * k;
       }
       const o = i * 4;
@@ -835,8 +877,8 @@ export function buildSkyAtmosphere(ctx) {
   group.add(farBanks);
 
   function paintBanks() {
-    const K = layout.ATMO[BAND] || layout.ATMO.dusk;
-    _csun.setHex(K.sun);
+    _csun.setHex(bandHex('sun'));
+    const sunI = bandScalar('sunI');
     const col = bankGeo.attributes.color.array, p = bankGeo.attributes.position, n = p.count;
     for (let i = 0; i < n; i++) {
       const bearing = bankBE.b[i];
@@ -848,7 +890,7 @@ export function buildSkyAtmosphere(ctx) {
       let b = _c.b * 0.62 + _cfill.b * 0.44;
       const wA = warmA(bearing);
       if (wA > 0.02) {
-        const k = wA * wA * 0.42 * (K.sunI / 3.3);
+        const k = wA * wA * 0.42 * (sunI / 3.3);
         r += _csun.r * k; g += _csun.g * k; b += _csun.b * k;
       }
       const o = i * 3;
@@ -875,8 +917,8 @@ export function buildSkyAtmosphere(ctx) {
   group.add(limbMesh);
 
   function paintLimb() {
-    const K = layout.ATMO[BAND] || layout.ATMO.dusk;
-    _csun.setHex(K.sun);
+    _csun.setHex(bandHex('sun'));
+    const sunI = bandScalar('sunI');
     const col = limbGeo.attributes.color.array, n = limbGeo.attributes.position.count;
     for (let i = 0; i < n; i++) {
       const e = limbBE.e[i], bearing = limbBE.b[i];
@@ -886,8 +928,8 @@ export function buildSkyAtmosphere(ctx) {
       const prof = Math.exp(-(de * de) / (s * s));
       sky(_c, bearing, 0.0);
       const wA = warmA(bearing);
-      const k = prof * (0.16 + 0.22 * (K.sunI / 3.3));
-      const warm = wA * wA * prof * 0.30 * (K.sunI / 3.3);
+      const k = prof * (0.16 + 0.22 * (sunI / 3.3));
+      const warm = wA * wA * prof * 0.30 * (sunI / 3.3);
       const o = i * 3;
       col[o] = _c.r * k + _csun.r * warm;
       col[o + 1] = _c.g * k + _csun.g * warm;
@@ -901,16 +943,15 @@ export function buildSkyAtmosphere(ctx) {
 
   function setTime(state) {
     const b = state && state.band;
-    if (b && layout.ATMO[b]) BAND = b;
-    else if (state && typeof state.sunElevation === 'number') {
-      /* the shared world clock predates the four-band contract, so a caller may only have an
-         elevation. The breakpoints are the contract's own SUN_ELEV values read as thresholds. */
-      const e = state.sunElevation;
-      BAND = e <= -0.10 ? 'night' : e >= 0.32 ? 'day' : (state.worldHour != null && ((state.worldHour % 24) + 24) % 24 < 12) ? 'dawn' : 'dusk';
-    }
-    daylight = state && typeof state.daylight === 'number' ? state.daylight
-      : (BAND === 'day' ? 1 : BAND === 'night' ? 0 : 0.4);
-    const K = layout.ATMO[BAND] || layout.ATMO.dusk;
+    /* atmoBand() is the contract's own converter from the clock's eight bands to this atmosphere's
+       four keys, and it returns a BLEND rather than a snap. Prefer it always: it is what keeps the
+       sky continuous through a sunset instead of cutting from dusk to night in one frame. A caller
+       that hands over a bare key name still works, because pairOf() accepts either. */
+    if (layout.atmoBand && state && (state.band || typeof state.sunElevation === 'number')) BAND = layout.atmoBand(state);
+    else if (b && layout.ATMO[b]) BAND = b;
+    if (state && typeof state.daylight === 'number') daylight = state.daylight;
+    else if (state && typeof state.sunElevation === 'number') daylight = smooth((state.sunElevation + 0.20) / 0.55);
+    else daylight = 1 - bandScalar('stars');
     paintDome();
     placeSun();
     paintAirglow();
@@ -921,13 +962,15 @@ export function buildSkyAtmosphere(ctx) {
     paintBanks();
     paintLimb();
     /* stars, airglow and aurora are night sky: they wash out on the band's own stars key, so the
-       cold side keeps a trace of them through dusk and dawn and loses them entirely at noon (§18) */
-    starMat.opacity = 0.92 * K.stars;
-    stars.visible = K.stars > 0.01;
-    airglowMat.opacity = K.stars;
-    airglowMesh.visible = K.stars > 0.01 && tierName !== 'low';
-    auroraMat.opacity = 0.6 * K.stars;
-    aurora.visible = K.stars > 0.02 && tierName !== 'low';
+       cold side keeps a trace of them through dusk and dawn and loses them entirely at noon (§18).
+       Cached here because update() reads it every frame and must not re-resolve the band blend. */
+    starLevel = bandScalar('stars');
+    starMat.opacity = 0.92 * starLevel;
+    stars.visible = starLevel > 0.01;
+    airglowMat.opacity = starLevel;
+    airglowMesh.visible = starLevel > 0.01 && tierName !== 'low';
+    auroraMat.opacity = 0.6 * starLevel;
+    aurora.visible = starLevel > 0.02 && tierName !== 'low';
     limbMat.opacity = 1;
     return state;
   }
@@ -954,7 +997,7 @@ export function buildSkyAtmosphere(ctx) {
     auroraDrift = 0.5 + 0.5 * Math.sin(t * 6e-5);
     if (aurora.visible) {
       aurora.rotation.y = t * 2.2e-7;
-      auroraMat.opacity = 0.6 * (layout.ATMO[BAND] || layout.ATMO.dusk).stars * (0.35 + 0.65 * auroraDrift);
+      auroraMat.opacity = 0.6 * starLevel * (0.35 + 0.65 * auroraDrift);
     }
     /* the halo swells by two percent over half a minute: enough that the sun is not a decal */
     const s = 3600 * (1 + 0.02 * Math.sin(t * 2.1e-4));
@@ -982,8 +1025,8 @@ export function buildSkyAtmosphere(ctx) {
     voidHaze.geo.setDrawRange(0, hz[Math.max(0, Math.min(hz.length, Math.round(hz.length * (0.5 + 0.5 * Q.mist)))) - 1] || hz[hz.length - 1]);
     /* the drifting lower decks are the most expensive fill in the module and the least load-bearing */
     voidCloudMesh.visible = tierName !== 'low';
-    airglowMesh.visible = tierName !== 'low' && (layout.ATMO[BAND] || layout.ATMO.dusk).stars > 0.01;
-    aurora.visible = tierName !== 'low' && (layout.ATMO[BAND] || layout.ATMO.dusk).stars > 0.02;
+    airglowMesh.visible = tierName !== 'low' && starLevel > 0.01;
+    aurora.visible = tierName !== 'low' && starLevel > 0.02;
     return tierName;
   }
 
@@ -993,7 +1036,7 @@ export function buildSkyAtmosphere(ctx) {
      of the horizon with the sunset view weighted double: that is where the player is looking, and the
      directional truth lives in the dome (§41), not in the fog. */
   function fog(bandIn) {
-    const b = (bandIn && layout.ATMO[bandIn]) ? bandIn : BAND;
+    const b = (bandIn && (layout.ATMO[bandIn] || (typeof bandIn === 'object' && bandIn.a))) ? bandIn : BAND;
     let r = 0, g = 0, bl = 0, w = 0;
     for (let i = 0; i < 24; i++) {
       const bearing = -Math.PI + (i + 0.5) * (TAU / 24);
@@ -1001,10 +1044,15 @@ export function buildSkyAtmosphere(ctx) {
       const hx = layout.atmosphere(bearing, 0.045, b);
       r += ((hx >> 16) & 255) * wt; g += ((hx >> 8) & 255) * wt; bl += (hx & 255) * wt; w += wt;
     }
-    const F = FOG_BAND[b] || FOG_BAND.dusk;
+    /* near/far blend across a band pair for the same reason the colour does: a fog plane that jumps
+       1200 m at the dusk-to-night boundary pops every silhouette in the realm at once */
+    const p = pairOf(b), t = p.t || 0;
+    const FA = FOG_BAND[p.a] || FOG_BAND.dusk, FB = FOG_BAND[p.b] || FOG_BAND.dusk;
     return {
       color: ((Math.round(r / w) << 16) | (Math.round(g / w) << 8) | Math.round(bl / w)) >>> 0,
-      near: F.near, far: F.far, band: b
+      near: FA.near + (FB.near - FA.near) * t,
+      far: FA.far + (FB.far - FA.far) * t,
+      band: b
     };
   }
 
@@ -1057,7 +1105,8 @@ export function buildSkyAtmosphere(ctx) {
   stats.voidsOpen = layout.VOIDS.filter(v => { const d = layout.dir(v.bearing); return !layout.deckSolid(d.x * v.r, d.z * v.r); }).length;
   stats.voidsTotal = layout.VOIDS.length;
   stats.seaHandoffRadius = SEA_IN;
-  Object.defineProperty(stats, 'band', { get: () => BAND });
+  Object.defineProperty(stats, 'band', { get: () => bandLabel() });
+  Object.defineProperty(stats, 'bandBlend', { get: () => BAND });
   Object.defineProperty(stats, 'quality', { get: () => tierName });
 
   return { group, setTime, setTheme, update, setQuality, dispose, stats, fog, sampleDome, dome, peaks, farSea, stars: stars };
