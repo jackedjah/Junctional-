@@ -143,6 +143,7 @@ export async function createMahplaza(canvas, options = {}) {
   const optional = async (name) => { try { return await import(name); } catch (e) { if (!/Failed to fetch|Cannot find|Failed to resolve|404|import/i.test(String(e && e.message))) console.info('MAHPLAZA optional module ' + name + ' —', e && e.message); return null; } };
   const CITY = await optional('./city.js'), DRESS = await optional('./plaza-dressing.js'), MATCHI = await optional('./match-interior.js'), LIFE = await optional('./life.js');
   const CLOUDS = await optional('./clouds.js'), FOBEAM = await optional('./fobeam.js'), TERRAIN = await optional('./terrain.js');
+  const FOBST = await optional('./fobstations.js');   /* v12 §4: the FOBLOCK family */
   ctx.cityPresent = !!(CITY && CITY.buildCity);
 
   /* ---- light rig ------------------------------------------------------- */
@@ -197,7 +198,7 @@ export async function createMahplaza(canvas, options = {}) {
     try { fobeams = FOBEAM.buildFobeams(ctx); if (fobeams && fobeams.group && !fobeams.group.parent) scene.add(fobeams.group); if (fobeams) { sky.beams.forEach(b => { b.core.visible = false; b.glow.visible = false; }); sky.flows.forEach(f => { f.visible = false; }); } }
     catch (e) { console.info('MAHPLAZA: fobeam module failed —', e && e.message); fobeams = null; }
   }
-  let city = null, dressing = null, terrain = null;
+  let city = null, dressing = null, terrain = null, fobstations = null;
   /* TERRAIN builds before the city so the natural world is behind it in the draw order and the city's
      own ground annulus lands on top of the land ring rather than the other way round (v6 §01) */
   if (TERRAIN && TERRAIN.buildTerrain) {
@@ -206,6 +207,10 @@ export async function createMahplaza(canvas, options = {}) {
   }
   if (CITY && CITY.buildCity) { try { city = CITY.buildCity(ctx); if (city && city.group && !city.group.parent) scene.add(city.group); } catch (e) { console.info('MAHPLAZA: city module failed —', e && e.message); city = null; } }
   if (DRESS && DRESS.buildDressing) { try { dressing = DRESS.buildDressing(ctx); if (dressing && dressing.group && !dressing.group.parent) scene.add(dressing.group); } catch (e) { console.info('MAHPLAZA: dressing module failed —', e && e.message); dressing = null; } }
+  /* v12 §4 — THE FOBLOCK FAMILY. Runs LAST of the world builders on purpose: it tests every
+     candidate position against ctx.colliders, and that list is only complete once ground.js and
+     plaza-dressing.js have pushed their benches, planters, bollards and stairs. */
+  if (FOBST && FOBST.buildFobstations) { try { fobstations = FOBST.buildFobstations(ctx); } catch (e) { console.info('MAHPLAZA: fobstations module failed —', e && e.message); fobstations = null; } }
 
   /* entrance and plaza point lights, bounded (v3: entrance strength lowered for the glare correction) */
   const pointLights = [], themedLights = [];
@@ -366,7 +371,7 @@ export async function createMahplaza(canvas, options = {}) {
     residents.concat(extras).forEach(r => { if (r.userData && r.userData.setEnergy) r.userData.setEnergy(energy); });
     if (flora) flora.forEach(p => { if (p.userData && p.userData.setTime) p.userData.setTime(s); });
     if (vehicles && vehicles.setTime) vehicles.setTime(s);
-    [terrain, city, dressing, matchInterior, life, clouds, fobeams].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
+    [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
@@ -400,7 +405,7 @@ export async function createMahplaza(canvas, options = {}) {
     else if (vehicles && vehicles.setTheme) vehicles.setTheme(theme);
     themedLights.forEach(l => l.color.setHex(theme.energy));
     themedReflections.forEach(([m, src]) => { if (m.emissive && src.emissive) m.emissive.copy(src.emissive); if (!src.emissive) m.color.copy(src.color); });
-    [city, dressing, matchInterior, life, clouds, fobeams].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
+    [city, dressing, matchInterior, life, clouds, fobeams, fobstations].forEach(mod => { if (mod && typeof mod.setTheme === 'function') { try { mod.setTheme(theme); } catch (e) {} } });
     if (opts.persist) writeStore(STORE.world, theme.name);
     applyTime(true); requestRender();
     return describeAppearance();
@@ -655,6 +660,7 @@ export async function createMahplaza(canvas, options = {}) {
     if (clouds && clouds.update) clouds.update(t, dt);
     if (fobeams && fobeams.update) fobeams.update(t, dt);
     if (dressing && dressing.update) dressing.update(t, dt);
+    if (fobstations && fobstations.update) fobstations.update(t, dt);
     if (matchInterior && matchInterior.update) matchInterior.update(t, dt);
     if (life && life.update) life.update(t, dt);
     ctx.updateHooks.slice().forEach(h => h(t, dt));
@@ -940,7 +946,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
-    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams }, terrain, city, dressing, matchInterior, life, clouds, fobeams,
+    modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,

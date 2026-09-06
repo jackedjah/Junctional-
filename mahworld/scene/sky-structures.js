@@ -138,11 +138,22 @@ function massGeo(w, d, h, c, bevel = 0.35) {
 
        r(u) = tip + (base - tip) * pow(1 - u*u, 0.42)        u = 0 at the base, 1 at the tip
 
-   Two properties do the work. The radius HOLDS — at u = 0.5 it is still 87 % of the base, where a
-   cone is at 50 % — so the form keeps its shoulders; and dr/du goes to −infinity as u → 1, i.e. the
-   silhouette tangent turns HORIZONTAL and the outline closes like a dome instead of converging.
-   It stops at `tip` rather than at zero, so the form finishes on a small FLAT n-gon that takes a
-   real highlight.
+   Two properties do the work. The radius HOLDS — at u = 0.5 it is still 92 % of the base (2.02 of
+   2.20 on the tower above), where a cone is at 50 % — so the form keeps its shoulders; and it stops
+   at `tip` rather than at zero, so the form finishes on a small FLAT n-gon that takes a real
+   highlight instead of running on to a point.
+
+   WHAT THE TESSELLATION ACTUALLY DELIVERS, because the analytic curve and the mesh are not the same
+   claim and a later reader should not have to rediscover this. Analytically dr/du → −infinity as
+   u → 1, so the continuous profile does close with a horizontal tangent — but that collapse lives
+   in the last ~2 % of u, and rings are spaced EVENLY in u, so no ring ever samples it. MEASURED on
+   the tower above (base 2.2, tip 0.62, 4 rings): r = 2.200 / 2.158 / 2.020 / 1.737 / 0.620, whose
+   chords sit 0.4 / 1.2 / 2.5 / 9.7 degrees off vertical. So this is not a dome. It is a shaft that
+   holds its width, turns through four increasing slopes, and ends on a blunt chamfered nose and a
+   real facet — which is the §06 technique "blunt a taper", not "round it off", and is deliberately
+   where this stops. Adding rings does NOT buy the dome (evenly spaced, a 5th ring makes the last
+   chord STEEPER, 11.2 degrees); only a tip-dense reparametrisation would, and that would spend
+   segments on a sub-pixel nose and drift toward the bubbly failure the direction forbids.
 
    THE SURFACE IS NOT SMOOTHED, because a rounded silhouette carried by a smooth-shaded tube is the
    bubbly failure rather than the fix. CylinderGeometry gives smooth radial normals; these sides are
@@ -1510,7 +1521,9 @@ export function buildSkyStructures(ctx) {
        of each spike measured under two. They aliased into a crawling hairline, and the brand
        diamond on top sat on a 0.36 m stalk — too thin to see, so it read as detached from the
        tower under it. Both are now the blunt convex profile above: the width holds through the
-       body, the outline closes with a horizontal tangent, the diamond now seats on a 2.31 m neck,
+       body, the outline turns through four increasing slopes instead of running at one constant
+       angle to a point (MEASURED, 0.4 / 1.2 / 2.5 / 9.7 degrees off vertical — a blunt chamfered
+       nose, not a dome; see the profile note on bluntTaperSides), the diamond seats on a 2.31 m neck,
        and each nose finishes on a flat facet — 1.24 m across above, 1.90 m below — that catches
        an actual highlight instead of a subpixel flicker. The tip
        radii are not symmetric on purpose. The upper one is 0.62 because it has to stay INSIDE the
@@ -1522,6 +1535,11 @@ export function buildSkyStructures(ctx) {
     put('D', 'midLit', bluntTaperCap(0.62, 26 * S), p.x, p.y, p.z);
     put('D', 'mid', bluntTaperSides(2.2, 0.95, 26 * S), p.x, p.y, p.z, 0, Math.PI);
     put('D', 'midLit', bluntTaperCap(0.95, 26 * S), p.x, p.y, p.z, 0, Math.PI);
+    /* NOTE, measured, left standing rather than deleted on a verifier's own authority: this 1.5 m
+       body is now entirely INSIDE the blunt profile above, which never drops below 1.95 m over the
+       cylinder's own +-15 S. It was visible when the noses were cones (r 1.07 at 14 S). It costs 96
+       triangles across both towers and renders nothing; its up/down caps are buried, so it is waste,
+       not a law-1 exposure. Delete it when someone owns this form again. */
     put('D', 'mid', new THREE.CylinderGeometry(1.5, 1.5, 30 * S, 12), p.x, p.y, p.z);
     const RS = [[14 * S, 11 * S], [0, 14 * S], [-14 * S, 8.5 * S]];
     for (const [dy, rr] of RS) {

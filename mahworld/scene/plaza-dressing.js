@@ -51,10 +51,17 @@ function part(list, geo, x, y, z, ry = 0, rx = 0, rz = 0) {
    That second point is also LAW 1 arithmetic and not only taste: the cowl is chromeMirror at
    metalness 1.0 and an UP-FACING mirror face reflects the near-black zenith. MEASURED by summing the
    area of every triangle whose normal is within 10 deg of level, across all sixteen masts: 17.40 m2
-   of dead-flat up-facing mirror before, 1.63 m2 after. The remainder sits at 6.5 m and EVERY camera
-   in VIEWS stands between y 1.5 and y 4.2, so nothing in this world ever looks down on it - which is
-   why it was never the visible defect the 6.4 m2 bench top was, and why it is not worth a second
-   material and a second draw call to partner. Wound +x toward -z, this world's usual winding.
+   of dead-flat up-facing mirror before, 1.63 m2 after; measured again by orientation band, the whole
+   fixture family goes 18.24 m2 -> 2.48 m2 within 10 deg of level, with 13.04 m2 landing at 10-26 deg.
+   THE REMAINDER IS NOT UNSEEN, and an earlier note here claimed it was. It sits at y 6.28-6.52, and
+   while seventeen of the nineteen entries in mahplaza.js VIEWS do stand between y 1.5 and y 4.2, TWO
+   do not: `natural-edge` at y 4.5 and `overlook` at y 16, which looks down on all sixteen masts at
+   6-17 degrees of depression. At that depression a level mirror still returns the lit horizon band rather
+   than the zenith, so the residual is a small risk and not the black-plate defect the 6.4 m2 bench top
+   was - but it is a risk, not an absence, and it is left unpartnered as a COST choice: the only
+   zero-draw-call partner is a platinumLit crown merged into dressing-trim, ~512 triangles for 16 caps
+   at 50-90 m. If a reviewer wants it, that is the change; do not justify leaving it by claiming
+   nothing can see it. Wound +x toward -z, this world's usual winding.
    Triangles: sides * (2 * (rings - 1) + 2). */
 function facetCowl(rings, sides) {
   const pos = [];

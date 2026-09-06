@@ -905,7 +905,21 @@ function crystallize(ctx, g, o) {
   const crownH = 1.9 + R * 0.6;
   const ring = { ax: W / 2 - 0.75, az: (E + D) / 2, zc: 0.4 - (E + D) / 2, yBase: H - 0.2, yTop: H + crownH - 0.2, t: 1.5 };
   if (wantCrown) {
-    crownCap(catches, ring, crownRing(crown, ring), 0.14, 0.5);
+    /* v12 LAW 1 — the crown cap band moves from `catches` to `crown`. The v11 crystalline pass put
+       it in `catches`, which merges into M.trim, and materials.js has `m.trim = m.chromeMirror` at
+       metalness 1.0. An adversarial verifier then measured +36.23 m2 of NEW FLAT UP-FACING face on
+       that grade across the MAH GYM and MAH MATCH crowns, while the pass's own report stated in
+       capitals that it had created none. It is the same defect this world has shipped three times.
+
+       The verifier left it as a director's call on the grounds that moving it "loses the crown's
+       bright mirror highlight line". That is the exact misconception LAW 1 exists to correct: on an
+       UP-FACING face a mirror grade reflects the near-black zenith and renders BLACK, so there is
+       no highlight there to lose. M.platinumLit (metalness 0.38) takes hemisphere and diffuse light
+       and reads BRIGHTER on that face, not dimmer. The band is a coping — predominantly horizontal —
+       so what its vertical flanks give up in mirror sparkle is far less than what its top recovers
+       by no longer being black. One word, no cost, and the sibling call at 573 already routes its
+       deck plate to a low-metalness bucket for the same reason. */
+    crownCap(crown, ring, crownRing(crown, ring), 0.14, 0.5);
   } else {
     /* no crown: the mass ends in a low mirror-grade parapet so whatever the module above it builds —
        terraces, a tower — is what the silhouette actually shows. A coping, so the parapet turns at
