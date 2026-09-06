@@ -192,10 +192,21 @@ export function createMaterials(themeIn) {
          graphiteMetal    0.52  structural depth, building mass, the dark that holds the light
          crystalGlass     0.06  windows and light-transmitting sections
        ===================================================================================== */
+    /* ORIENTATION, NOT HUE, is what decides whether a platinum surface reads.
+       A metal takes no diffuse light: a metalness-1.0 surface is lit ONLY by what it reflects. A
+       VERTICAL or TILTED face reflects the horizon band, which is the brightest thing in this world's
+       environment — so mirror and satin grades belong there, on mast shafts, mullions, portal frames,
+       blade faces, apron nosings and cell chamfers. A HORIZONTAL cap facing a night sky reflects the
+       ZENITH, which is almost black, so the same hex renders black no matter how bright it looks in
+       the source. Every horizontal cap therefore uses `platinumLit` — a LOW-metalness platinum that
+       takes diffuse light from the hemisphere and reads at something near its own value. */
     chromeMirror: new THREE.MeshStandardMaterial({ color: 0xdfe9f7, roughness: 0.03, metalness: 1.0, envMapIntensity: 2.7 }),
     chromeSatin: new THREE.MeshStandardMaterial({ color: 0xbecddf, roughness: 0.17, metalness: 1.0, envMapIntensity: 2.1 }),
+    /* THE HORIZONTAL GRADE. Low metalness on purpose — this is the world's platinum FRAMING, and it is
+       the single material that makes canopies, terraces, aprons, path bands, collars and rims read. */
+    platinumLit: new THREE.MeshStandardMaterial({ color: 0xb6c4d6, roughness: 0.3, metalness: 0.38, envMapIntensity: 1.4 }),
+    platinumLitBrushed: new THREE.MeshStandardMaterial({ color: 0xacbacc, roughness: 0.36, metalness: 0.4, roughnessMap: brushH, envMapIntensity: 1.3 }),
     platinumBrushed: new THREE.MeshStandardMaterial({ color: 0x94a3ba, roughness: 0.34, metalness: 0.96, roughnessMap: brushV, envMapIntensity: 1.7 }),
-    platinumBrushedH: new THREE.MeshStandardMaterial({ color: 0x8d9bb2, roughness: 0.36, metalness: 0.96, roughnessMap: brushH, envMapIntensity: 1.6 }),
     graphiteMetal: new THREE.MeshStandardMaterial({ color: 0x2c3a4e, roughness: 0.52, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.5 }),
     crystalGlass: new THREE.MeshPhysicalMaterial({ color: 0x2b3f60, roughness: 0.06, metalness: 0.22, transparent: true, opacity: 0.42, side: THREE.DoubleSide, envMapIntensity: 2.0 }),
     /* v5 midtone pass (brief §04): the neutrals move up out of near-black. The world stays a NIGHT world —
@@ -210,8 +221,9 @@ export function createMaterials(themeIn) {
     composite: new THREE.MeshStandardMaterial({ color: 0x33435e, roughness: 0.3, metalness: 0.62, roughnessMap: brushH, envMapIntensity: 1.6 }),     /* brushed platinum composite */
     /* mirror / satin catches (brief §03): the same language as Mr. Mah's edge catches — these read as
        bright turns of the surface under moonlight and city glow, never as an outline */
-    trim: new THREE.MeshStandardMaterial({ color: 0xdfe9f7, roughness: 0.04, metalness: 1.0, envMapIntensity: 2.6 }),
-    trimSatin: new THREE.MeshStandardMaterial({ color: 0xa8b7cb, roughness: 0.19, metalness: 0.98, envMapIntensity: 1.9 }),
+    /* `trim` / `trimSatin` / `platinumBrushedH` / `glass` were four materials indistinguishable from
+       four others (differing by 1–2 per channel), which made the ranked ladder unreadable. They are
+       ALIASES now: same object, one value each, and every existing call site keeps working. */
     curb: new THREE.MeshStandardMaterial({ color: 0x4a5a76, roughness: 0.58, metalness: 0.34, envMapIntensity: 1.2 }),          /* raised edges, kerbs, steps */
     arena: new THREE.MeshStandardMaterial({ color: 0x1d2129, roughness: 0.86, metalness: 0.06 }),                               /* rubberised impact floor */
     panelLit: new THREE.MeshStandardMaterial({ color: 0x24304a, roughness: 0.4, metalness: 0.2, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */
@@ -220,7 +232,7 @@ export function createMaterials(themeIn) {
        between the modelled bevels; ground.js lays the bevels and the mirror catches on top of it. */
     plaza: new THREE.MeshStandardMaterial({ color: 0x18202e, roughness: 0.54, metalness: 0.94, envMapIntensity: 1.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.006, transparent: true, opacity: 0.92 }),
     road: new THREE.MeshStandardMaterial({ color: 0x141b26, roughness: 0.4, metalness: 0.6, roughnessMap: floorTex, envMapIntensity: 1.2 }),
-    glass: new THREE.MeshPhysicalMaterial({ color: 0x2b3f60, roughness: 0.06, metalness: 0.22, transparent: true, opacity: 0.42, side: THREE.DoubleSide, envMapIntensity: 2.0 }),
+
     /* interior light: unlit cool white, dimmed by day */
     interior: new THREE.MeshBasicMaterial({ color: NEUTRALS.interior, toneMapped: true }),
     interiorSoft: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.5 }),
@@ -233,6 +245,11 @@ export function createMaterials(themeIn) {
     /* MAH MATCH competitive accent — the one place red is allowed as a world colour */
     matchRed: new THREE.MeshStandardMaterial({ color: 0x140a0e, emissive: 0xff3b57, emissiveIntensity: 1.1, roughness: 0.5, metalness: 0 })
   };
+  /* the aliases: one object per value, so nothing in the scene can drift apart by two channels */
+  m.trim = m.chromeMirror;
+  m.trimSatin = m.chromeSatin;
+  m.platinumBrushedH = m.platinumLitBrushed;
+  m.glass = m.crystalGlass;
   const baseEmissive = { energy: 1.3, energyLight: 1.7, matchRed: 1.1, panelLit: 0.7 };
   const baseOpacity = { energySoft: 0.26, interiorSoft: 0.5 };
   m.interiorSoft.opacity = baseOpacity.interiorSoft;

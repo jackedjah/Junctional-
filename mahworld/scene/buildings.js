@@ -198,7 +198,7 @@ function broadCanopy(ctx, g, o) {
   for (let i = -4; i <= 4; i++) part(trim, chamferBox(0.1, 2.5, 0.14, 0.03), i * ((W - 5.5) / 9), floorY + openH + 4.3, 0.56);
   /* a low brushed plinth running the full frontage: the broad base the mass sits on */
   part(dark, chamferBox(W + 7, 0.44, 1.6, 0.12), 0, floorY + 0.22, depth + 1.1);
-  merged(g, struct, M.platinumBrushed || M.trimSatin, 'gym-canopy', true);   /* brushed: a canopy top facing the night sky must not mirror it into black */
+  merged(g, struct, M.platinumLitBrushed || M.platinumBrushed, 'gym-canopy', true);   /* a canopy top faces the sky: only a LOW-metalness grade reads there (v6) */
   merged(g, trim, M.chromeMirror || M.trim, 'gym-canopy-catches', false);
   merged(g, dark, M.platinumBrushedH || M.structural, 'gym-plinth', true);
 }
@@ -227,7 +227,7 @@ function terraces(ctx, g, o) {
   }
   /* a light mast on the top terrace: the civic marker of the roof line */
   part(trim, new THREE.CylinderGeometry(0.07, 0.1, 4.6, 8), w * 0.2, y + 2.3, zc);
-  merged(g, struct, M.platinumBrushed || M.structural, 'market-terraces', true);
+  merged(g, struct, M.platinumLitBrushed || M.structural, 'market-terraces', true);   /* horizontal terrace decks: low-metalness platinum */
   merged(g, trim, M.chromeSatin || M.trimSatin, 'market-terrace-rails', false);
   merged(g, dark, M.graphiteDark, 'market-terrace-plant', true);
 }
@@ -394,7 +394,7 @@ function crystallize(ctx, g, o) {
   }
   /* the crown is BRUSHED PLATINUM: its planes face up and out into a dark night sky, so a polished grade
      would mirror that darkness and the building would end in a black hat. Brushed catches the hemisphere. */
-  merged(g, crown, M.platinumBrushed || M.composite, 'crystal-crown', true);
+  merged(g, crown, M.platinumLit || M.composite, 'crystal-crown', true);
   merged(g, crystal, M.composite, 'crystal-panels', true);
   merged(g, catches, M.trim, 'crystal-catches', false);
   merged(g, deep, M.structural, 'crystal-structure', true);

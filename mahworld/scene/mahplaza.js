@@ -263,8 +263,14 @@ export async function createMahplaza(canvas, options = {}) {
       const x0 = Math.cos(a0) * r, z0 = Math.sin(a0) * r, x1 = Math.cos(a1) * r, z1 = Math.sin(a1) * r;
       const q = [[x0, -0.4, z0], [x1, -0.4, z1], [x1, h, z1], [x0, -0.4, z0], [x1, h, z1], [x0, h, z0]];
       q.forEach((p, k) => { pos.set(p, (i * 6 + k) * 3); });
-      const v = 0.1 + rnd() * rnd() * 0.9;                                /* mostly dark, a few bright */
-      for (let k = 0; k < 6; k++) { const t = k === 2 || k === 4 || k === 5 ? 0.45 : 1; col.set([v * t, v * t * 1.02, v * t * 1.12], (i * 6 + k) * 3); }
+      /* v6 ROOT CAUSE. A metal takes no diffuse light, so EVERY metalness ≥ 0.9 surface in MAHWORLD —
+         the whole platinum family — is lit by this ring and nothing else. v5 made it "mostly dark, a
+         few bright" (0.1 + rnd² × 0.9), which is why platinum surfaces rendered near-black however
+         bright their hex looked. The district a chromium city reflects has to BE lit: the floor is
+         raised well off zero and every fourth bar is a hot window wall. */
+      const hot = (i % 4 === 0);
+      const v = hot ? 0.86 + rnd() * 0.34 : 0.28 + rnd() * 0.72;
+      for (let k = 0; k < 6; k++) { const t = k === 2 || k === 4 || k === 5 ? 0.55 : 1; col.set([v * t, v * t * 1.02, v * t * 1.12], (i * 6 + k) * 3); }
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -275,8 +281,10 @@ export async function createMahplaza(canvas, options = {}) {
   function refreshEnvironment(k, clockState) {
     const pos = envDome.geometry.attributes.position, top = new THREE.Color(k.top), hor = new THREE.Color(k.horizon), tmp = new THREE.Color();
     /* the horizon band carries the district's glow, so reflective trims and glass see a lit city, not a void */
-    const band = hor.clone().lerp(new THREE.Color(k.hemiSky), 0.45).multiplyScalar(1 + 0.5 * (1 - clockState.daylight));
-    for (let i = 0; i < pos.count; i++) { const ny = pos.getY(i) / 50; const a = Math.max(0, ny); tmp.copy(hor).lerp(top, a); if (ny > -0.05 && ny < 0.16) tmp.lerp(band, 1 - Math.abs(ny - 0.055) / 0.105); envCols[i * 3] = tmp.r; envCols[i * 3 + 1] = tmp.g; envCols[i * 3 + 2] = tmp.b; }
+    /* the horizon band is what a vertical or tilted mirror grade actually sees, so it is wider and
+       brighter in v6 — this and the city ring above it are the world's real key light for metal */
+    const band = hor.clone().lerp(new THREE.Color(k.hemiSky), 0.6).multiplyScalar(1 + 0.95 * (1 - clockState.daylight));
+    for (let i = 0; i < pos.count; i++) { const ny = pos.getY(i) / 50; const a = Math.max(0, ny); tmp.copy(hor).lerp(top, a); if (ny > -0.12 && ny < 0.26) tmp.lerp(band, 1 - Math.abs(ny - 0.07) / 0.19); envCols[i * 3] = tmp.r; envCols[i * 3 + 1] = tmp.g; envCols[i * 3 + 2] = tmp.b; }
     envDome.geometry.attributes.color.needsUpdate = true;
     envSun.position.copy(lights.dir.position).normalize().multiplyScalar(45); envSun.lookAt(0, 0, 0);
     envSun.material.color.setHex(k.sun).multiplyScalar(0.55 + 1.25 * clockState.daylight);
@@ -284,7 +292,7 @@ export async function createMahplaza(canvas, options = {}) {
        pick up the district rather than a black void (brief §10 city bounce) */
     envDome.geometry.attributes.color.needsUpdate = true;
     /* the reflected district: bright at night, subdued under daylight when the sky dominates */
-    envCity.material.color.setScalar(0.42 + 0.78 * (1 - clockState.daylight));
+    envCity.material.color.setScalar(0.62 + 0.9 * (1 - clockState.daylight));
     if (envRT) envRT.dispose();
     envRT = pmrem.fromScene(envScene, 0.04, 0.1, 200);
     scene.environment = envRT.texture;

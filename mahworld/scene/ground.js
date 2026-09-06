@@ -125,7 +125,7 @@ export function buildGround(ctx) {
 
   /* 2. aprons: raised slabs in front of the three destinations */
   function apron(x, z, w, d, rotY) {
-    const a = new THREE.Mesh(new THREE.BoxGeometry(w, 0.42, d), M.platinumBrushedH || M.graphiteLight);
+    const a = new THREE.Mesh(new THREE.BoxGeometry(w, 0.42, d), M.platinumLitBrushed || M.graphiteLight);
     a.position.set(x, 0.21, z); a.rotation.y = rotY; a.receiveShadow = true; g.add(a);
     const lip = new THREE.Mesh(new THREE.BoxGeometry(w, 0.02, 0.06), M.energySoft);
     lip.position.set(0, 0.22, d / 2 - 0.03); a.add(lip);

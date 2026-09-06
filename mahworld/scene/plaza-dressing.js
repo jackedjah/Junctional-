@@ -242,9 +242,12 @@ export function buildDressing(ctx) {
     if (shadow) m.castShadow = true; if (receive) m.receiveShadow = true;
     group.add(m); return m;
   };
-  add(slab, M.platinumBrushedH || M.graphiteLight, 'dressing-paths', false, true);
+  add(slab, M.platinumLitBrushed || M.graphiteLight, 'dressing-paths', false, true);
   add(curb, M.curb, 'dressing-curbs', true, true);
-  add(trim, M.chromeMirror || M.trim, 'dressing-trim', false, false);
+  /* the 82 merged trim parts are almost all HORIZONTAL caps — foot rings, collars, brackets, bench
+     edges, fascias, rims. On a mirror grade they reflect a near-black zenith and render black; on the
+     low-metalness platinum grade they become the world's visible platinum framing (v6). */
+  add(trim, M.platinumLit || M.trim, 'dressing-trim', false, false);
   /* v5: street furniture is BRUSHED PLATINUM, not near-black metal. A flat top facing a dark night sky
      mirrors nothing, so a polished grade would read as a black cut-out on the bright chromium floor; a
      brushed grade picks up the hemisphere and the district glow and stays a readable midtone. */
