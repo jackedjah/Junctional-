@@ -99,10 +99,28 @@
        ring. Measured cost for the whole pass: 84 draw calls before and after, 41 252 -> 45 120
        triangles (+9.4 %), all of it in the shard sections and the five deck supports.
 
+   v13 §8 / §6D — SKY ROADS AND SKYBLOCK CARRIERS. The district had FOBEAM energy routes and six
+   shafts that leave the frame, and no elevated ROADWAY at all; §8 makes one mandatory and §11 gates
+   on it. Six curved decks at four elevation tiers (79 m / 121-138 m / 186-192 m and ONE rare
+   very-high at 280-298 m), each a Catmull-Rom through control points placed against the TOWERS,
+   SHAFTS and BLOCKS tables in this file, with real deck thickness, a rounded edge profile and a
+   keel girder underneath. Twenty-seven supports, none of them decided in advance: every one is the
+   result of a search against those same tables, and the result is 7 columns standing on roofs, 19
+   brackets tied into flanks and 1 pier to the ground. Nine SKYBLOCK CARRIERS ride them, grown from
+   foblock.js's genome rather than modelled here.
+
+   The part of it that took the most work is where they are NOT. This file's three valleys and
+   terrain.js's basin are the composition the last three passes were built around, so the two
+   forbidden bearing bands (50-74 and 106-144, the valleys plus a margin) are checked at every
+   sample of every road and the worst margin is reported; the moon's own track then caps how high
+   the centre corridor's roads may go. Section header at SR_BLOCKED carries the whole argument.
+   Measured cost for the pass: 84 -> 95 draw calls, 45 120 -> 59 250 triangles.
+
    Life anchors pushed: ctx.lifeAnchors.paths (walkway + 3 bridges, kind
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
 import { chamferBox, windowGrid, canvasTexture, ACCENT } from './materials.js';
+import { foblockParts } from './foblock.js';   /* §6D: a SKYBLOCK CARRIER is an elongated FOBLOCK, so it grows from the genome */
 
 const SEED = 4417;
 const PW = 1.4;                       /* pilaster width */
@@ -287,6 +305,255 @@ const GHOSTS = [
 /* the five blocks that carry a floating ring deck (v9 §12, the Jetsons gesture). Five of fifteen:
    a saucer terrace over every block would be a pattern, over five it is a civic amenity. */
 const DECK = { L1: 1, R1: 1, F2: 1, R5: 1, C3: 1 };
+
+/* ================================================================================================
+   v13 §8 / §6D — THE SKY ROADS AND THE SKYBLOCK CARRIERS
+   ================================================================================================
+
+   The district had FOBEAM energy routes and six shafts that leave the frame, and no elevated
+   roadway anywhere. §8 makes one mandatory — "low/mid/high/rare very-high tiers, smooth curves and
+   structural support" — and §11 gates on it. This section is that system, and almost all of the
+   thinking in it went into ONE question, because it is the question sky roads are always got wrong
+   on: WHERE A ROAD IS ALLOWED TO BE.
+
+   ---- THE COMPOSITION ARITHMETIC (§8, §13) ----------------------------------------------------
+   This file's own v6 header cut THREE VALLEYS into the skyline and every pass since has been built
+   around them — 52-72 deg right (terrain.js also puts its water BASIN at bearing 62 inside it),
+   108-124 deg centre, 128-142 deg left. A ribbon drawn across any of them undoes three passes of
+   work in one line, and it would do it at exactly the elevation where the mountains are: a deck at
+   130 m and 340 m out sits 20 deg up, which is the middle of a range that tops out at 28 deg.
+
+   So the valleys are widened by a 2 deg margin and the centre and left ones merge (they are only
+   4 deg apart), giving two FORBIDDEN BEARING BANDS: 50-74 and 106-144. Every sample of every road
+   below is tested against them at build time and the worst margin is reported in stats. What is
+   left is three legal corridors — 0-50 on the right flank, 74-106 through the centre, 144-180 on
+   the left flank — and all six roads live in those.
+
+   THE MOON falls out of the same arithmetic, and it is worth writing down because it looks like
+   luck. sky.js's moonDirection was SAMPLED hour by hour rather than reasoned about, because the
+   first estimate of it here was wrong by 4 deg: across 18:00-06:00 it sweeps bearing 61 -> 86 ->
+   113 at elevations 21 -> 30.5 -> 22 deg, and the disc subtends 4.15 deg (r 58 at 800 m), so its
+   LOWER LIMB never falls below 16.9 deg. Its two low positions, 61.4 and 112.6 deg, sit inside the
+   right and centre valleys, which this network already leaves empty. The part of its track that
+   crosses a legal corridor is bearings 74-106, and there its limb is 24.4 deg or higher — so the
+   centre roads are capped in height instead. The build MEASURES the highest sample any road
+   reaches inside a conservative 57-117 window as seen from the establishing camera (0, 3.4, 84):
+   18.98 deg, which leaves 5.4 deg of clear sky under the moon at its worst hour. The one RARE
+   very-high tier, which does reach 32 deg, is on the RIGHT FLANK at bearings 12-46, where the moon
+   never goes at all.
+
+   The three FOBEAM ascent lines stand at radius 37-39 m and the plaza is inside 126 m; the nearest
+   road here is at radius 190. Nothing crosses an ascent route.
+
+   ---- WHY THEY ARE CURVES AND NOT ARCS --------------------------------------------------------
+   A constant-radius arc is a curve, but it is also a road that never decides anything: it cannot
+   reach a tower, so it can only ever be supported by piers from the ground, which is what makes a
+   sky road read as scenery. Each road here is a CATMULL-ROM through control points given in
+   (bearing, radius, height), so the curve is smooth by construction — there is no straight segment
+   anywhere and therefore no angle where two of them meet — and the control points are placed
+   against the real TOWERS, SHAFTS and BLOCKS tables above, so the curve threads the district.
+
+   ---- SUPPORT LOGIC IS DERIVED, NOT DRAWN (§3) ------------------------------------------------
+   Nothing here decides in advance what carries the road. Support stations are laid at ~55 m of arc
+   and each one SEARCHES the anchor set — fifteen midground blocks, twenty-three towers, six shafts,
+   with a shaft's half-width taken at the deck's own height off its own taper — and the answer
+   decides the structure:
+       COLUMN   the anchor's roof is below the deck: a raking pair of legs off that roof, with a pad
+                on it and a saddle under the keel. This is the one the reference render shows.
+       BRACKET  the anchor stands past the deck: two ties out to its flank plus a collar band.
+       PIER     nothing within reach: a tapered pier to the ground with a splayed foot and a haunch.
+   A station whose deck would INTERSECT an anchor is a build-time failure, counted and reported.
+
+   ---- LAW 1 ------------------------------------------------------------------------------------
+   A road deck is the largest horizontal surface anyone can add to this world, and a mirror grade on
+   it renders BLACK. Every triangle the sweep emits is routed by its OWN measured normal into a cap
+   bucket (low metalness) or a side bucket, its world area accumulated as it goes, and the totals
+   land in stats.skyRoads.horizontalArea. Nothing here is asserted.
+
+   ---- LAW 2 ------------------------------------------------------------------------------------
+   The rims are edge-lit, so: a wash strip runs inboard of each rim along the deck it lies on, a
+   second falls down the fascia under it, the keel carries a third, and every carrier drags its own
+   wash on the deck beneath it. The two LOW roads also lay a pool through ctx.lightPool at the foot
+   of their tallest pier, where a 75-135 m column of lit structure actually meets ground the plaza
+   floor system can paint.                                                                          */
+const SR_BLOCKED = [[50, 74], [106, 144]];      /* the three valleys plus a 2 deg margin, merged */
+const SR_CAPBAND = 0.62;                        /* |ny| above this is a horizontal face (foblock.js's own threshold) */
+/* The four tiers. `dim` is a GREY the ribbons are vertex-painted with, so one emissive material and
+   one wash material carry all four tiers at four brightnesses for one draw call each and the HUE
+   still comes from the world Theme. Deck widths are broad on purpose (§8: "broad curved rings") and
+   narrow with height, which is the same recession the value grades make. */
+const SR_TIER = {
+  low:   { halfW: 4.80, thick: 1.34, keelW: 2.10, keelD: 2.30, far: false, dim: 0xffffff, pier: 150, recede: 1.00 },
+  mid:   { halfW: 4.40, thick: 1.22, keelW: 1.90, keelD: 2.10, far: false, dim: 0xdcdcdc, pier: 150, recede: 0.86 },
+  high:  { halfW: 4.00, thick: 1.10, keelW: 1.70, keelD: 1.90, far: true,  dim: 0xb4b4b4, pier: 195, recede: 0.72 },
+  /* the very-high tier is the only one with NO pier budget, and that is the point of it: a rare
+     road at 290 m is carried by the towers it threads or it does not exist. */
+  vhigh: { halfW: 3.70, thick: 1.00, keelW: 1.55, keelD: 1.75, far: true,  dim: 0x9c9c9c, pier: 0,   recede: 0.66 }
+};
+/* THE NETWORK. ctrl = [bearing, radius, deck centre height]; every point was placed against the
+   TOWERS / SHAFTS / BLOCKS tables above and the two forbidden bands, and the build re-checks both.
+   THE HEIGHTS ARE THE PART THAT GOT REWRITTEN. The first cut of this table put the control points
+   at whatever height each anchor happened to want, which gave the mid centre road a 51 % grade
+   between its first two points — that is a ramp, not a road, and it would have read as one from
+   every camera. Every road here is now near-level with a gentle undulation and no segment steeper
+   than about 8 %, and the SUPPORTS absorb the difference instead: a column can be 55 m long. */
+const SKYROADS = [
+  /* LOW, centre corridor — the one that lands on BUILDINGS. It runs over the roofs of C3 (64 m),
+     C1 (54 m) and C2 (70 m), so three of its four supports are columns standing on a block. */
+  { id: 'sr-low-centre', tier: 'low', carriers: 2, speed: 15.0,
+    ctrl: [[76, 196, 79], [86, 214, 81], [97, 190, 80], [104, 202, 78]] },
+  /* MID, centre corridor — the long one. It is held INSIDE the 265-340 m ring of shafts for its
+     whole length rather than weaving through it: the first cut crossed radius 340 at bearing 80,
+     which is exactly where the 720 m shaft at 78|340 stands, and the build's own collision test
+     caught it. Starts on the roof of the 62 m tower at 75|300, brackets out to the shaft and to
+     100|340, and spans its middle on one pier. */
+  { id: 'sr-mid-centre', tier: 'mid', carriers: 2, speed: 17.5,
+    ctrl: [[77, 296, 121], [82, 312, 123], [90, 322, 125], [100, 306, 121]] },
+  /* HIGH, centre corridor — 186-192 m, which is 18-19 deg from the establishing camera: above the
+     midground entirely, still a clear 8 deg under the moon at its highest. */
+  { id: 'sr-high-centre', tier: 'high', carriers: 1, speed: 19.0,
+    ctrl: [[78, 452, 186], [85, 472, 190], [96, 508, 192], [104, 452, 187]] },
+  /* MID, right flank — five anchors and four clear spans, the most structurally legible of the six. */
+  { id: 'sr-mid-right', tier: 'mid', carriers: 2, speed: 16.5,
+    ctrl: [[12, 528, 126], [22, 472, 134], [30, 456, 138], [46, 402, 130]] },
+  /* LOW, left flank — brackets off the 560 m shaft at 148|330 and the two towers at 160 and 172. */
+  { id: 'sr-low-left', tier: 'low', carriers: 1, speed: 14.0,
+    ctrl: [[147, 356, 60], [160, 342, 66], [172, 428, 72]] },
+  /* THE RARE VERY-HIGH, on the right flank where the moon never travels. One road, one carrier,
+     280-298 m, carried entirely on the two 620/660 m shafts and the towers between them — there is
+     no pier tier at this height and there should not be. It runs directly ABOVE sr-mid-right at the
+     same bearings and 155 m higher, so the two read as one interchange seen in section. */
+  { id: 'sr-vhigh-right', tier: 'vhigh', carriers: 1, speed: 21.0,
+    ctrl: [[12, 534, 280], [22, 470, 290], [46, 400, 298]] }
+];
+/* THE CARRIER, grown from foblock.js's genome and not invented here (§6D: "a carrier is an
+   elongated FOBLOCK, not a new species"). `stretch` runs along local +Z, which is the genome's
+   DEPTH axis — so the medallion and the square-diamond mark end up on the NOSE, and the two lateral
+   connection rings stay circular at mid height on the flanks, tracking just inside the deck's rim
+   lights. Nothing is scaled that would turn a ring into an ellipse. */
+const SR_CAR = { size: 3.6, stretch: 2.75, clear: 0.62, dwell: 2.6 };
+const SR_MOT = 96;      /* motion samples per road: the carriers read off this, never off the geometry */
+
+/* ---- sky-road geometry helpers (module level so they allocate nothing per frame) ------------- */
+/* Route ONE triangle by its OWN measured normal. This is the whole of law 1's enforcement in this
+   file: `cap` collects every face whose normal is more vertical than horizontal and the caller
+   clads it in a LOW-metalness grade, `side` takes everything else and may take a mirror. The area
+   is accumulated in world metres as it goes, so the module can REPORT the horizontal face it made
+   instead of claiming it made none. */
+function srTri(B, ax, ay, az, bx, by, bz, cx, cy, cz) {
+  const ux = bx - ax, uy = by - ay, uz = bz - az, vx = cx - ax, vy = cy - ay, vz = cz - az;
+  const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+  const L = Math.sqrt(nx * nx + ny * ny + nz * nz);
+  if (!(L > 1e-9)) return;
+  /* B.band lets a caller ROUTE at a tighter threshold than it MEASURES at. The carriers need that:
+     they are placed with pitch and bank, so a face sitting just inside the vertical band in the
+     prototype's own frame can tip past it in the world. Routing at 0.49 and reporting at 0.62 means
+     the extra margin is spent on the safe side and the number reported is still the real one. */
+  const k = ny / L, a = L * 0.5, band = B.band || SR_CAPBAND;
+  (Math.abs(k) > band ? B.cap : B.side).push(ax, ay, az, bx, by, bz, cx, cy, cz);
+  if (k > SR_CAPBAND) B.up += a; else if (k < -SR_CAPBAND) B.down += a; else B.vert += a;
+}
+/* uniform Catmull-Rom through the control points, with the two ends linearly extrapolated so the
+   curve starts and finishes ON the first and last control point rather than short of them */
+function srSpline(ctrl, n) {
+  const P = ctrl.slice();
+  P.unshift(ctrl[0].map((v, i) => 2 * v - ctrl[1][i]));
+  P.push(ctrl[ctrl.length - 1].map((v, i) => 2 * v - ctrl[ctrl.length - 2][i]));
+  const segs = P.length - 3, out = [];
+  for (let s = 0; s <= n; s++) {
+    const g = (s / n) * segs, si = Math.min(segs - 1, Math.floor(g)), t = g - si;
+    const p0 = P[si], p1 = P[si + 1], p2 = P[si + 2], p3 = P[si + 3], t2 = t * t, t3 = t2 * t, r = [];
+    for (let i = 0; i < 3; i++) {
+      r.push(0.5 * ((2 * p1[i]) + (-p0[i] + p2[i]) * t + (2 * p0[i] - 5 * p1[i] + 4 * p2[i] - p3[i]) * t2 + (-p0[i] + 3 * p1[i] - 3 * p2[i] + p3[i]) * t3));
+    }
+    out.push(r);
+  }
+  return out;
+}
+/* how far a bearing sits outside the two forbidden bands; negative means it is inside one */
+function srMargin(a) {
+  let m = 999;
+  for (const [lo, hi] of SR_BLOCKED) m = Math.min(m, a < lo ? lo - a : a > hi ? a - hi : -Math.min(a - lo, hi - a));
+  return m;
+}
+/* one triangle, wound so it faces the given direction */
+function srTriOut(B, a, b, c, ox, oy, oz) {
+  const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
+  const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+  if (nx * ox + ny * oy + nz * oz < 0) srTri(B, a[0], a[1], a[2], c[0], c[1], c[2], b[0], b[1], b[2]);
+  else srTri(B, a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
+}
+function srQuad(B, a, b, c, d, ox, oy, oz) { srTriOut(B, a, b, c, ox, oy, oz); srTriOut(B, a, c, d, ox, oy, oz); }
+/* Sweep a CLOSED CONVEX section along a sampled centreline. `sec` is [[v, y], ...] in the road's own
+   cross-section frame — v across (along the horizontal right vector), y in world up — and the
+   winding of every quad is decided against the section's own outward direction, so a section can be
+   written either way round and still come out facing the world. Convex is required only so the end
+   caps can be fanned from vertex 0; the deck slab and the keel are therefore swept as two separate
+   convex tubes rather than as one concave profile. */
+function srSweep(B, pts, sec, capEnds, open) {
+  const n = pts.length, m = sec.length, edges = open ? m - 1 : m;
+  let cv = 0, cy = 0;
+  for (const s of sec) { cv += s[0]; cy += s[1]; }
+  cv /= m; cy /= m;
+  const wp = (i, k) => { const p = pts[i], s = sec[k]; return [p.x + p.rx * s[0], p.y + s[1], p.z + p.rz * s[0]]; };
+  for (let i = 0; i + 1 < n; i++) for (let k = 0; k < edges; k++) {
+    const k2 = (k + 1) % m, p = pts[i];
+    const mv = (sec[k][0] + sec[k2][0]) * 0.5 - cv, my = (sec[k][1] + sec[k2][1]) * 0.5 - cy;
+    srQuad(B, wp(i, k), wp(i, k2), wp(i + 1, k2), wp(i + 1, k), p.rx * mv, my, p.rz * mv);
+  }
+  if (!capEnds) return;
+  for (const [i, s] of [[0, -1], [n - 1, 1]]) {
+    const p = pts[i], o0 = wp(i, 0);
+    for (let k = 1; k + 1 < m; k++) srTriOut(B, o0, wp(i, k), wp(i, k + 1), p.tx * s, p.ty * s, p.tz * s);
+  }
+}
+/* Feed an ordinary THREE geometry through the same by-measured-normal router, so the supports obey
+   law 1 on exactly the same terms the swept deck does and land in the same two buckets. */
+function srBucket(B, g) {
+  const n = g.index ? g.toNonIndexed() : g;
+  const p = n.attributes.position.array, c = n.attributes.position.count;
+  for (let i = 0; i + 2 < c; i += 3) {
+    const o = i * 3;
+    srTri(B, p[o], p[o + 1], p[o + 2], p[o + 3], p[o + 4], p[o + 5], p[o + 6], p[o + 7], p[o + 8]);
+  }
+  if (n !== g) n.dispose();
+  g.dispose();
+}
+/* a tapered member between two points — the one primitive every column, tie and stay is cut from.
+   Open-ended on purpose: a strut's two end discs are buried in the pad and the saddle, and an
+   unbuilt disc is one fewer horizontal face to have to answer for. */
+const _srUp = new THREE.Vector3(0, 1, 0), _srD = new THREE.Vector3(), _srQ3 = new THREE.Quaternion(), _srM3 = new THREE.Matrix4(), _srP3 = new THREE.Vector3(), _srS3 = new THREE.Vector3(1, 1, 1);
+function srStrut(ax, ay, az, bx, by, bz, r0, r1, sides) {
+  const dx = bx - ax, dy = by - ay, dz = bz - az, L = Math.sqrt(dx * dx + dy * dy + dz * dz);
+  if (!(L > 0.05)) return null;
+  const g = new THREE.CylinderGeometry(r1, r0, L, sides || 6, 1, true);
+  _srD.set(dx / L, dy / L, dz / L); _srQ3.setFromUnitVectors(_srUp, _srD);
+  _srP3.set((ax + bx) * 0.5, (ay + by) * 0.5, (az + bz) * 0.5);
+  g.applyMatrix4(_srM3.compose(_srP3, _srQ3, _srS3));
+  return g;
+}
+/* A RIBBON: a quad strip swept along the centreline between two cross-section offsets, carrying a
+   uv that runs 0..1 along the road and 0..1 across the strip, which is exactly what the district's
+   shared falloff map wants — the light is full along the strip's middle and gone at both of its
+   edges, and it dies away over the last 14 % at each end of the road rather than stopping. */
+function srRibbon(pts, aV, aY, bV, bY) {
+  const n = pts.length, q = n - 1;
+  const pos = new Float32Array(q * 18), uv = new Float32Array(q * 12);
+  let o = 0, t = 0;
+  const put = (p, v, y, u, w) => { pos[o++] = p.x + p.rx * v; pos[o++] = p.y + y; pos[o++] = p.z + p.rz * v; uv[t++] = u; uv[t++] = w; };
+  for (let i = 0; i < q; i++) {
+    const p0 = pts[i], p1 = pts[i + 1], u0 = i / q, u1 = (i + 1) / q;
+    put(p0, aV, aY, u0, 0); put(p0, bV, bY, u0, 1); put(p1, bV, bY, u1, 1);
+    put(p0, aV, aY, u0, 0); put(p1, bV, bY, u1, 1); put(p1, aV, aY, u1, 0);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  g.computeVertexNormals();
+  return g;
+}
+/* scratch for the carriers — one of each, reused every frame for every carrier (no allocation) */
+const _srCarM = new THREE.Matrix4(), _srCarQ = new THREE.Quaternion(), _srCarE = new THREE.Euler(), _srCarP = new THREE.Vector3(), _srCarS = new THREE.Vector3(1, 1, 1);
 
 /* ---- small deterministic helpers ------------------------------------------------------------ */
 function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -1399,6 +1666,412 @@ export function buildCity(ctx) {
       const gh = new THREE.Mesh(own(mergeGeos(B.ghost)), farGhostM); gh.name = 'city-far-ghosts'; gh.frustumCulled = false; distant.add(gh);
     }
   }
+  /* ---------------------------------------------------------------- 4. THE SKY ROADS (v13 §8 / §6D) */
+  /* See the long note above SR_BLOCKED for the composition arithmetic, the support logic and the two
+     laws this section is most exposed to. What follows is the build. */
+  const srStats = { roads: 0, tiers: {}, deckArea: 0, upArea: 0, downArea: 0, sideArea: 0,
+    columns: 0, brackets: 0, piers: 0, unsupported: 0, stations: 0, collisions: [], minBearingMargin: 999,
+    maxGrade: 0, maxSpan: 0, maxSpanAt: '', tallestPier: 0, carriers: 0, pools: 0, elevMax: 0, elevMoon: 0, supports: [] };
+  const srCars = [];              /* the runtime carrier state; filled below, read by update() */
+  let srCarMeshes = null, srDarkMesh = null, srWashMesh = null, srSetTime = null;
+  {
+    /* ---- THE GRADES. Four MeshStandard materials for the whole network: two for horizontal face,
+       two for vertical, each in a NEAR and a FAR value. The far pair is this file's own glassFar /
+       glassDeep argument applied to a road — metalness falls away with range so a 500 m deck takes
+       the hemisphere and the fog the way the mountains do, and the base colour is lerped toward the
+       night horizon key 0x1d3d6e, which is what "distance buys value" means for something that
+       starts BRIGHTER than the sky (a mountain converges on the same key from below).
+       LAW 1 decides the split within each pair, not distance: `cap` is every face the router
+       measured as horizontal and it never goes above metalness 0.40. */
+    const srCapNear = new THREE.MeshStandardMaterial({ color: 0x93a3bd, roughness: 0.42, metalness: 0.40, envMapIntensity: 1.30 });
+    const srCapFar = new THREE.MeshStandardMaterial({ color: 0x64799c, roughness: 0.54, metalness: 0.24, envMapIntensity: 0.86 });
+    const srSideNear = new THREE.MeshStandardMaterial({ color: 0x8496b4, roughness: 0.28, metalness: 0.90, envMapIntensity: 1.85 });
+    const srSideFar = new THREE.MeshStandardMaterial({ color: 0x566e94, roughness: 0.46, metalness: 0.32, envMapIntensity: 1.05 });
+    srCapNear.name = 'city-skyroad-deck-near'; srCapFar.name = 'city-skyroad-deck-far';
+    srSideNear.name = 'city-skyroad-side-near'; srSideFar.name = 'city-skyroad-side-far';
+    owned.materials.push(srCapNear, srCapFar, srSideNear, srSideFar);
+    /* THE RIM LIGHT and THE WASH IT THROWS. One emissive material and one wash material carry all
+       four tiers: the HUE is the world Theme's (so setTime/setTheme own it exactly as they own every
+       other emitter in this district) and the per-tier BRIGHTNESS rides on the vertices as a grey,
+       which is the same trick the accent washes use to put three hues in one draw call. DoubleSide
+       because an edge light is meant to be seen from under the deck as well as from over it. */
+    const srRimM = new THREE.MeshBasicMaterial({ color: theme.energy, vertexColors: true, side: THREE.DoubleSide, toneMapped: true, fog: true });
+    const srWashM = new THREE.MeshBasicMaterial({ color: theme.energy, map: washTex, vertexColors: true, side: THREE.DoubleSide, transparent: true, opacity: 0.42, depthWrite: false, toneMapped: true, fog: true });
+    srRimM.name = 'city-skyroad-rims'; srWashM.name = 'city-skyroad-wash';
+    owned.materials.push(srRimM, srWashM);
+
+    /* ---- THE ANCHOR SET. Everything in this district a support is allowed to land on, with a
+       shaft's half-width taken off its own taper at whatever height it is asked about — a 30 m
+       shaft is 17 m across at its foot and 10 m at 600 m, and using the foot value would have put
+       every bracket on the high roads 7 m short of the flank it is tied to. */
+    const srAnchors = [];
+    BLOCKS.forEach(b => srAnchors.push({ x: b.x, z: b.z, top: b.h, h0: Math.max(b.w, b.d) * 0.5, tp: 0, H: b.h, kind: 'block', id: b.id }));
+    TOWERS.forEach(([a, r, h, w]) => { const [x, z] = polar(a, r); srAnchors.push({ x, z, top: h, h0: w * 0.5, tp: 0, H: h, kind: 'tower', id: 'T' + a + '|' + r }); });
+    SHAFTS.forEach(([a, r, w0, H, taper]) => { const [x, z] = polar(a, r); srAnchors.push({ x, z, top: H, h0: w0 * 0.5, tp: taper, H, kind: 'shaft', id: 'S' + a + '|' + r }); });
+    const halfAt = (an, y) => an.h0 * (1 - an.tp * Math.max(0, Math.min(1, y / an.H)));
+
+    const BRACKET_REACH = 27, COLUMN_REACH = 44, COLUMN_MAX = 76, CLEAR_MIN = 2.0;
+    const srB = { cap: [], side: [], up: 0, down: 0, vert: 0 };
+    const rimGeos = [], washGeos = [], srCapNearG = [], srCapFarG = [], srSideNearG = [], srSideFarG = [];
+
+    SKYROADS.forEach((road, ri) => {
+      const T = SR_TIER[road.tier], W = T.halfW, T2 = T.thick * 0.5;
+      /* ---- the centreline. Segment count comes from the arc it actually has to cover, so a 100 m
+         ribbon and a 270 m one are tessellated at the same 14 m of chord rather than at the same
+         number of pieces — the chord's sagitta on a 450 m radius at that spacing is 0.2 m, which is
+         well under a pixel at this range, and the curve is smooth by construction anyway. */
+      const probe = srSpline(road.ctrl, 64);
+      let arc = 0;
+      const wpt = p => { const [x, z] = polar(p[0], p[1]); return [x, p[2], z]; };
+      for (let i = 1; i < probe.length; i++) {
+        const a = wpt(probe[i - 1]), b = wpt(probe[i]);
+        arc += Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+      }
+      const segs = Math.max(14, Math.min(34, Math.round(arc / 14)));
+      const raw = srSpline(road.ctrl, segs);
+      const pts = raw.map(p => { const [x, z] = polar(p[0], p[1]); return { x, y: p[2], z, bearing: p[0], rx: 0, rz: 0, tx: 0, ty: 0, tz: 0 }; });
+      for (let i = 0; i < pts.length; i++) {
+        const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+        const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z, L3 = Math.hypot(dx, dy, dz), Lh = Math.hypot(dx, dz) || 1;
+        pts[i].tx = dx / L3; pts[i].ty = dy / L3; pts[i].tz = dz / L3;
+        pts[i].rx = dz / Lh; pts[i].rz = -dx / Lh;                       /* up x tangent, horizontal */
+        srStats.maxGrade = Math.max(srStats.maxGrade, Math.abs(dy) / Lh);
+        srStats.minBearingMargin = Math.min(srStats.minBearingMargin, srMargin(pts[i].bearing));
+        /* the elevation this sample subtends at the establishing camera (0, 3.4, 84). The number
+           that actually matters is the second one: the moon only travels bearings 57-117, so what
+           the guard is about is how high a road gets INSIDE that band, not how high it gets. */
+        const el = Math.atan2(pts[i].y - 3.4, Math.hypot(pts[i].x, pts[i].z - 84)) * 180 / Math.PI;
+        srStats.elevMax = Math.max(srStats.elevMax, el);
+        if (pts[i].bearing >= 57 && pts[i].bearing <= 117) srStats.elevMoon = Math.max(srStats.elevMoon, el);
+      }
+
+      /* ---- THE DECK. Two convex swept tubes: a slab with a rounded edge rolled onto all four of
+         its arrises (§06 — the SILHOUETTE is round, the surface stays cut: two facets per quarter,
+         not a smooth roll), and a keel girder under it that gives the road structural depth from
+         below. This is what stops it being a ribbon of zero thickness. */
+      const r = Math.min(T2 * 0.80, W * 0.22), s45 = Math.SQRT1_2, rx = r * s45;
+      const deckSec = [
+        [W - r, T2], [W - r + rx, T2 - r + rx], [W, T2 - r],
+        [W, -(T2 - r)], [W - r + rx, -(T2 - r) - rx], [W - r, -T2],
+        [-(W - r), -T2], [-(W - r) - rx, -(T2 - r) - rx], [-W, -(T2 - r)],
+        [-W, T2 - r], [-(W - r) - rx, T2 - r + rx], [-(W - r), T2]
+      ];
+      const K = T.keelW, G = T.keelD, kc = Math.min(0.42, K * 0.34, G * 0.24);
+      const keelSec = [
+        [K, -T2 + 0.20], [K, -T2 - G + kc], [K - kc, -T2 - G],
+        [-(K - kc), -T2 - G], [-K, -T2 - G + kc], [-K, -T2 + 0.20]
+      ];
+      const before = { cap: srB.cap.length, side: srB.side.length };
+      srSweep(srB, pts, deckSec, true, false);
+      /* the keel is swept OPEN along its last edge: that edge is its top, it is buried inside the
+         deck slab, and building it added a MEASURED 4771 m2 of up-facing face that nothing can ever
+         see — face this section would then have had to report and answer for under law 1, on top of
+         the triangles. (Measured by building it both ways: 16924 m2 up closed, 12153 m2 open.) The
+         end caps still fan the whole closed section, so the girder is closed where it is seen. */
+      srSweep(srB, pts, keelSec, true, true);
+
+      /* ---- SUPPORT PLANNING, in two passes, and the ORDER is the whole argument.
+         PASS 1 asks the city: stations every ~44 m of arc each SEARCH the anchor set, and whatever
+         they find is what carries the road there. Nothing about that is written down in advance.
+         PASS 2 asks the ground, and only where pass 1 left a hole: a gap longer than 112 m, or an
+         end cantilevering more than 46 m past its last support, gets exactly as many piers as it
+         needs and no more. Doing it the other way round — pier first, wherever a station happened
+         to fall — put three 188 m piers at 45 m centres under the high road, which is scaffolding
+         and not a bridge. A pier is what a sky road does when the city cannot carry it. */
+      const cum = [0];
+      for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y, pts[i].z - pts[i - 1].z));
+      const MAX_SPAN = 112, MAX_OVERHANG = 46;
+      const stations = [];
+      { const n = Math.max(2, Math.round(arc / 44) + 1);
+        for (let k = 0; k < n; k++) stations.push(Math.round((k / (n - 1)) * (pts.length - 1))); }
+      srStats.stations += stations.length;
+      const columnUsed = {};     /* one column per anchor per road: three A-frames fanning off one crown is not support logic, it is a mistake repeated */
+      const plan = [];
+      stations.forEach(si => {
+        const p = pts[si], keelY = p.y - T2 - G;
+        let best = null;
+        for (const an of srAnchors) {
+          const hd = Math.hypot(an.x - p.x, an.z - p.z), ah = halfAt(an, Math.min(an.top, p.y));
+          if (an.top > keelY - CLEAR_MIN && hd < ah + W + 2.0) {
+            srStats.collisions.push(road.id + '@' + p.bearing.toFixed(1) + 'deg hits ' + an.id + ' (top ' + an.top + ', keel ' + keelY.toFixed(1) + ', gap ' + (hd - ah - W).toFixed(1) + ')');
+            continue;
+          }
+          /* A COLUMN MAY NOT LIE DOWN. The first build of this search accepted any anchor within
+             44 m and produced a 7.8 m rise raked over 32.7 m of plan — a strut at 13 degrees off
+             horizontal, which is not a column, it is a cantilever pretending to be one. The rake is
+             capped against the column's OWN height (plus a 12 m allowance so a short one can still
+             step sideways off a parapet), which is the only test that stays right at every tier. */
+          if (an.top <= keelY - CLEAR_MIN && !columnUsed[an.id] && hd <= Math.min(COLUMN_REACH, Math.max(12, (keelY - an.top) * 1.35)) && (keelY - an.top) <= COLUMN_MAX) {
+            const eff = (keelY - an.top) + hd * 0.6;
+            if (!best || eff < best.eff) best = { kind: 'column', an, hd, eff };
+          } else if (an.top > p.y + 3 && hd >= ah + W + 2.0 && hd <= ah + W + BRACKET_REACH) {
+            const eff = (hd - ah - W) * 2.4;
+            if (!best || eff < best.eff) best = { kind: 'bracket', an, hd, ah, eff };
+          }
+        }
+        /* A station with nothing in reach is NOT a defect — a bridge spans between its supports and
+           these stations are only where the search is run. What would be a defect is a long unheld
+           span, so pass 2 measures exactly that. */
+        if (!best) { srStats.unsupported++; return; }
+        if (best.kind === 'column') columnUsed[best.an.id] = 1;
+        plan.push({ si, best });
+      });
+      if (T.pier > 0) {
+        /* an OVERHANG (deck past the last support) and a SPAN (deck between two supports) need
+           different pier counts, and the first cut of this told them apart by testing whether the
+           gap started at sample 0 — which is wrong the moment the first support IS at sample 0, and
+           it put two 189 m piers 45 m apart under the high road. The distinction is carried
+           explicitly now. */
+        const gaps = [];
+        if (!plan.length) gaps.push({ a: 0, b: pts.length - 1, over: true });
+        else {
+          if (cum[plan[0].si] > MAX_OVERHANG) gaps.push({ a: 0, b: plan[0].si, over: true });
+          for (let k = 1; k < plan.length; k++) if (cum[plan[k].si] - cum[plan[k - 1].si] > MAX_SPAN) gaps.push({ a: plan[k - 1].si, b: plan[k].si, over: false });
+          const lz = plan[plan.length - 1].si;
+          if (cum[pts.length - 1] - cum[lz] > MAX_OVERHANG) gaps.push({ a: lz, b: pts.length - 1, over: true });
+        }
+        for (const { a: ga, b: gb, over } of gaps) {
+          const len = cum[gb] - cum[ga], n = Math.max(1, Math.ceil(len / MAX_SPAN) - (over ? 0 : 1));
+          for (let k = 1; k <= n; k++) {
+            const target = cum[ga] + (len * k) / (n + 1);
+            let si = ga;
+            for (let i = ga; i <= gb; i++) if (Math.abs(cum[i] - target) < Math.abs(cum[si] - target)) si = i;
+            if (si === ga || si === gb) continue;
+            if (pts[si].y - T2 - G <= T.pier) plan.push({ si, best: { kind: 'pier' } });
+          }
+        }
+        plan.sort((a, b) => a.si - b.si);
+      }
+      for (let k = 1; k < plan.length; k++) {
+        const span = cum[plan[k].si] - cum[plan[k - 1].si];
+        if (span > srStats.maxSpan) { srStats.maxSpan = span; srStats.maxSpanAt = road.id; }
+      }
+
+      plan.forEach(({ si, best }) => {
+        const p = pts[si], keelY = p.y - T2 - G;
+        const tx = p.tx, ty = p.ty, tz = p.tz, splay = 2.6;
+
+        if (best.kind === 'column') {
+          /* THE COLUMN — the support the reference render shows and the one §3 wants most: a pair
+             of raking legs standing on something that is already in the world, with a pad on the
+             roof they land on and a saddle under the keel they carry. */
+          const an = best.an;
+          for (const s of [-1, 1]) {
+            const g = srStrut(an.x + tx * s * 0.9, an.top, an.z + tz * s * 0.9,
+              p.x + tx * s * splay, keelY + 0.5, p.z + tz * s * splay, 1.15, 0.78, 6);
+            if (g) srBucket(srB, g);
+          }
+          srBucket(srB, chamferBox(5.4, 0.72, 5.4, 0.22).translate(an.x, an.top + 0.36, an.z));   /* the pad on the roof */
+          srBucket(srB, new THREE.CylinderGeometry(1.5, 2.7, 2.1, 6, 1).translate(p.x, keelY + 1.05, p.z));  /* the saddle under the keel */
+          srStats.columns++; srStats.supports.push(road.id + ' column onto ' + an.kind + ' ' + an.id + ' (' + (keelY - an.top).toFixed(1) + ' m rise, ' + best.hd.toFixed(1) + ' m rake)');
+        } else if (best.kind === 'bracket') {
+          /* THE BRACKET — the anchor stands past the deck, so the road ties INTO its flank: two
+             raking ties off the keel and a collar band round the anchor to receive them. */
+          const an = best.an, ty2 = p.y - 3.4, ah = halfAt(an, ty2);
+          const ux = (an.x - p.x) / best.hd, uz = (an.z - p.z) / best.hd;
+          for (const s of [-1, 1]) {
+            const g = srStrut(p.x + tx * s * splay + ux * (W * 0.6), keelY + 0.4, p.z + tz * s * splay + uz * (W * 0.6),
+              an.x - ux * (ah + 0.2), ty2, an.z - uz * (ah + 0.2), 0.92, 0.62, 6);
+            if (g) srBucket(srB, g);
+          }
+          srBucket(srB, new THREE.CylinderGeometry(ah + 0.9, ah + 0.9, 3.6, 6, 1, true).translate(an.x, ty2, an.z));
+          srStats.brackets++; srStats.supports.push(road.id + ' bracket to ' + an.kind + ' ' + an.id + ' (clear ' + (best.hd - best.ah - W).toFixed(1) + ' m)');
+        } else {
+          /* THE PIER — pass 1 left a span the city could not hold, so the road goes to the ground on
+             a real tapered pier with a splayed foot and a haunch that spreads into the keel. The
+             very-high tier has no pier budget at all, which is why it never reaches this branch: a
+             rare road at 290 m is carried by the towers it threads or it is in the wrong place. */
+          const h = keelY - 2.4;
+          srBucket(srB, new THREE.CylinderGeometry(1.55, 3.30, h, 6, 1, true).translate(p.x, 2.4 + h * 0.5, p.z));
+          srBucket(srB, new THREE.CylinderGeometry(2.90, 1.55, 4.20, 6, 1, true).translate(p.x, keelY - 0.4, p.z));
+          srBucket(srB, new THREE.CylinderGeometry(3.90, 5.00, 2.40, 6, 1).translate(p.x, 1.2, p.z));
+          srStats.piers++; srStats.tallestPier = Math.max(srStats.tallestPier, keelY);
+          srStats.supports.push(road.id + ' pier ' + keelY.toFixed(0) + ' m to ground @ ' + p.bearing.toFixed(0) + 'deg');
+        }
+      });
+
+      /* ---- LAW 2, ON THE GROUND. ground.js exposes ctx.lightPool so the module that OWNS an
+         emitter answers it on the surface that shows it, and the two LOW roads are the only part of
+         this network where that surface is the district floor: their decks run 60-81 m up over open
+         ground at radius 190-428, edge-lit along their whole length, and a broad faint ellipse under
+         each is what ties them to the world instead of leaving them floating. Two per low road, at
+         the third points, deliberately wide (34 m) and weak (k 0.13) — a tight bright pool under a
+         70 m deck would read as a spotlight rather than as spill. The mid, high and very-high roads
+         get NONE, because a pool cast from 190 or 290 m would be a lie; those tiers are answered on
+         their own decks, fascias, keels and supports instead. ground.js's field caps at 32 and this
+         takes four, which the build re-counts rather than assuming. */
+      if (road.tier === 'low' && ctx.lightPool) {
+        for (const f of [0.34, 0.68]) {
+          let target = cum[pts.length - 1] * f, si = 0;
+          for (let i = 0; i < pts.length; i++) if (Math.abs(cum[i] - target) < Math.abs(cum[si] - target)) si = i;
+          if (ctx.lightPool({ x: pts[si].x, z: pts[si].z, rx: 34, rz: 34, k: 0.13 })) srStats.pools++;
+        }
+      }
+
+      /* ---- THE RIMS AND WHAT THEY LIGHT (law 2). Four ribbons per side: the emissive line on the
+         deck top and the one on the fascia, then the wash each of them throws — inboard across the
+         deck it lies on, and downward across the fascia and keel below it. An emissive rectangle
+         that lights nothing is the defect this world has been corrected for repeatedly; these two
+         are built together so that cannot happen. */
+      const tint = T.dim;
+      for (const s of [-1, 1]) {
+        rimGeos.push(paint(srRibbon(pts, s * (W - 0.94), T2 + 0.03, s * (W - 0.30), T2 + 0.03), tint));
+        rimGeos.push(paint(srRibbon(pts, s * (W + 0.03), T2 - 0.16, s * (W + 0.03), T2 - 0.52), tint));
+        washGeos.push(paint(srRibbon(pts, s * (W - 0.28), T2 + 0.05, s * (W - 3.30), T2 + 0.05), tint));
+        washGeos.push(paint(srRibbon(pts, s * (W + 0.05), T2 - 0.55, s * (K + 0.05), -T2 - G * 0.75), tint));
+      }
+      /* and the keel's own soffit, so the light does not stop at the fascia's bottom edge */
+      washGeos.push(paint(srRibbon(pts, K - 0.05, -T2 - G + 0.10, -(K - 0.05), -T2 - G + 0.10), tint));
+
+      /* ---- THE MOTION TRACK. Sampled independently of the geometry and far more finely, because a
+         carrier reading its ride off a 14-segment deck would visibly step through the corners. Five
+         numbers per sample, in one Float32Array, so update() does two lerps and no allocation. */
+      const mraw = srSpline(road.ctrl, SR_MOT - 1), mot = new Float32Array(SR_MOT * 6);
+      let yawAcc = 0, prevYaw = null;
+      const mw = mraw.map(p => { const [x, z] = polar(p[0], p[1]); return [x, p[2], z]; });
+      for (let i = 0; i < SR_MOT; i++) {
+        const a = mw[Math.max(0, i - 1)], b = mw[Math.min(SR_MOT - 1, i + 1)];
+        const dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2], L3 = Math.hypot(dx, dy, dz) || 1;
+        let yaw = Math.atan2(dx, dz);
+        if (prevYaw != null) { let d = yaw - prevYaw; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; yawAcc += d; }
+        else yawAcc = yaw;
+        prevYaw = yaw;
+        const o = i * 6;
+        mot[o] = mw[i][0]; mot[o + 1] = mw[i][1] + T2 + SR_CAR.clear; mot[o + 2] = mw[i][2];
+        mot[o + 3] = yawAcc; mot[o + 4] = -Math.asin(Math.max(-1, Math.min(1, dy / L3)));
+      }
+      /* BANK, from the track's own turn rate — a guided carrier leans into its curve and a flying
+         one does not, and that difference is the whole of "guided rather than flying". Capped at
+         6.3 deg: past that a block on a road starts to read as an aircraft. */
+      for (let i = 1; i < SR_MOT - 1; i++) {
+        const o = i * 6, ds = Math.hypot(mw[i + 1][0] - mw[i - 1][0], mw[i + 1][2] - mw[i - 1][2]) || 1;
+        mot[o + 5] = Math.max(-0.11, Math.min(0.11, -(mot[o + 9] - mot[o - 3]) / ds * 260));
+      }
+      mot[5] = mot[11]; mot[(SR_MOT - 1) * 6 + 5] = mot[(SR_MOT - 2) * 6 + 5];
+
+      for (let c = 0; c < road.carriers; c++) {
+        srCars.push({ mot, travel: arc / road.speed, phase: (c / road.carriers) + ri * 0.137, value: T.recede });
+        srStats.carriers++;
+      }
+      srStats.roads++;
+      srStats.tiers[road.tier] = (srStats.tiers[road.tier] || 0) + 1;
+      srStats.deckArea += arc * W * 2;
+      const list = T.far ? srCapFarG : srCapNearG, sideList = T.far ? srSideFarG : srSideNearG;
+      /* the two buckets are drained per road so each road's faces reach the grade its own range
+         wants; the router itself never sees a tier */
+      const capSlice = srB.cap.splice(before.cap), sideSlice = srB.side.splice(before.side);
+      list.push(capSlice); sideList.push(sideSlice);
+      srStats.upArea = srB.up; srStats.downArea = srB.down; srStats.sideArea = srB.vert;
+    });
+
+    /* the supports were bucketed into srB as they were built, and the per-road splice above already
+       carried them off with their own road's slice, so nothing is left over */
+    const srMeshOf = (slices, material, name) => {
+      let n = 0;
+      for (const s of slices) n += s.length;
+      if (!n) return null;
+      const pos = new Float32Array(n);
+      let o = 0;
+      for (const s of slices) { pos.set(s, o); o += s.length; }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      g.computeVertexNormals();      /* non-indexed, so every triangle keeps its own normal: flat facets */
+      const m = new THREE.Mesh(own(g), material); m.name = name; m.castShadow = false; group.add(m);
+      return m;
+    };
+    srMeshOf(srCapNearG, srCapNear, 'city-skyroad-deck-near');
+    srMeshOf(srCapFarG, srCapFar, 'city-skyroad-deck-far');
+    srMeshOf(srSideNearG, srSideNear, 'city-skyroad-side-near');
+    srMeshOf(srSideFarG, srSideFar, 'city-skyroad-side-far');
+    if (rimGeos.length) { const m = new THREE.Mesh(own(mergeGeos(rimGeos)), srRimM); m.name = 'city-skyroad-rims'; group.add(m); }
+    if (washGeos.length) { const m = new THREE.Mesh(own(mergeGeos(washGeos)), srWashM); m.name = 'city-skyroad-wash'; m.renderOrder = 3; group.add(m); }
+
+    /* ---- THE SKYBLOCK CARRIERS ------------------------------------------------------------------
+       §6D: "a carrier is an elongated FOBLOCK, not a new species". So it is not modelled here at
+       all — foblock.js hands over the genome's parts and the only thing this file does to them is
+       stretch them 2.75x along the genome's own DEPTH axis, which puts the engraved medallion and
+       the square-diamond mark on the NOSE and leaves the two lateral connection rings circular at
+       mid height, where they track just inside the deck's rim lights. The rings are the one part
+       deliberately NOT stretched: a scaled torus is an ellipse, and the ring is the single most
+       identifying feature of the reference object.
+
+       All the carriers are one prototype in five InstancedMeshes, so nine of them cost five draw
+       calls and the per-frame work is one matrix each. AERIAL PERSPECTIVE rides on the INSTANCE
+       COLOUR — the same mechanism windowGrid uses to put a whole facade's brightness spread in one
+       material — so a carrier on the 500 m high road sits back from one on the 200 m low road
+       without a second material. */
+    const cp = foblockParts({ tier: 'standard', size: SR_CAR.size, medallion: true, rings: true, diamond: true, energy: true });
+    const stretch = new THREE.Matrix4().makeScale(1, 1, SR_CAR.stretch);
+    const darks = [], glows = [];
+    /* LAW 1, AND THE TRAP THE STRETCH SETS. foblock.js already splits its shell into `shell` and
+       `cap` by measured normal — but it does that BEFORE this file scales the block 2.75x through
+       Z, and a non-uniform scale rotates every normal it touches. Faces that sat at |ny| 0.55 in
+       the genome come out past 0.62 once the block is long, and the two connection rings (which are
+       deliberately NOT stretched) are tori: their crowns and soffits point straight up and down
+       whatever anyone does to the body. The first build of this trusted the genome's split and
+       measured 137.8 m2 of horizontal face sitting at metalness 0.92 — small, but it is precisely
+       the bug this project has shipped four times, and the audit caught it because the audit
+       measures instead of asking. So the whole assembled carrier is re-routed through the SAME
+       by-normal router the road decks use, after the stretch. */
+    const cb = { cap: [], side: [], up: 0, down: 0, vert: 0, band: 0.49 };
+    for (const k of ['shell', 'rim', 'cap']) for (const g of cp[k]) srBucket(cb, g.applyMatrix4(stretch));
+    for (const g of cp.ring) srBucket(cb, g);                               /* NOT stretched: a scaled torus is an ellipse */
+    for (const g of cp.dark) darks.push(g.applyMatrix4(stretch));
+    for (const k of ['diamond', 'energy']) for (const g of cp[k]) glows.push(g.applyMatrix4(stretch));
+    const srGeoOf = arr => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(arr), 3)); g.computeVertexNormals(); return g; };
+    const body = [srGeoOf(cb.side)], caps = [srGeoOf(cb.cap)];
+    srStats.carrierHorizontal = { up: +cb.up.toFixed(2), down: +cb.down.toFixed(2), vertical: +cb.vert.toFixed(2), note: 'per carrier, local frame — the horizontal share wears metalness 0.38' };
+    /* THE WASH THE CARRIER DRAGS (law 2). A quad lying on the deck under the block, built in the
+       block's own local frame so it rides on the SAME matrix — one pose per carrier per frame, not
+       two — and carrying the falloff map so the light dies before it reaches the deck's rims.
+       Its size is MEASURED off the stretched prototype rather than recomputed from the genome's own
+       proportion constants, which this file does not own and must not restate. */
+    const cbox = new THREE.Box3();
+    for (const g of body.concat(caps)) { g.computeBoundingBox(); cbox.union(g.boundingBox); }
+    srStats.carrierSize = [+(cbox.max.x - cbox.min.x).toFixed(2), +(cbox.max.y - cbox.min.y).toFixed(2), +(cbox.max.z - cbox.min.z).toFixed(2)];
+    const washQuad = sillWash((cbox.max.x - cbox.min.x) * 1.28, (cbox.max.z - cbox.min.z) * 1.34).translate(0, -SR_CAR.clear + 0.07, 0);
+    const carBodyM = new THREE.MeshStandardMaterial({ color: 0x9fb0c9, roughness: 0.22, metalness: 0.92, envMapIntensity: 1.70 });
+    const carCapM = new THREE.MeshStandardMaterial({ color: 0x93a3bd, roughness: 0.40, metalness: 0.38, envMapIntensity: 1.20 });
+    const carDarkM = mat('graphiteDark', 'graphite');
+    const carGlowM = new THREE.MeshBasicMaterial({ color: theme.energy, toneMapped: true, fog: true });
+    const carWashM = new THREE.MeshBasicMaterial({ color: theme.energy, map: washTex, transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide, toneMapped: true, fog: true });
+    carBodyM.name = 'city-carrier-body'; carCapM.name = 'city-carrier-cap';
+    carGlowM.name = 'city-carrier-energy'; carWashM.name = 'city-carrier-wash';
+    owned.materials.push(carBodyM, carCapM, carGlowM, carWashM);
+    if (srCars.length) {
+      const mk = (list, material, name) => {
+        const im = new THREE.InstancedMesh(own(mergeGeos(list)), material, srCars.length);
+        im.name = name; im.frustumCulled = false; im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        group.add(im); return im;
+      };
+      srCarMeshes = [mk(body, carBodyM, 'city-carriers'), mk(caps, carCapM, 'city-carriers-cap'), mk(glows, carGlowM, 'city-carriers-energy')];
+      srDarkMesh = mk(darks, carDarkM, 'city-carriers-medallion');
+      srWashMesh = mk([washQuad], carWashM, 'city-carrier-wash');
+      srCarMeshes.push(srDarkMesh, srWashMesh);
+      /* the recession, baked once per carrier into its instance colour */
+      const _cc = new THREE.Color();
+      srCars.forEach((c, i) => {
+        _cc.setScalar(c.value);
+        srCarMeshes.forEach(m => m.setColorAt(i, _cc));
+      });
+      srCarMeshes.forEach(m => { if (m.instanceColor) m.instanceColor.needsUpdate = true; });
+    }
+    srStats.grades = ['deck cap near 0x93a3bd metalness 0.40', 'deck cap far 0x64799c metalness 0.24 env 0.86',
+      'side near 0x8496b4 metalness 0.90', 'side far 0x566e94 metalness 0.32 env 1.05',
+      'rims + washes: ONE material each, hue from the Theme, per-tier brightness on the vertices',
+      'carriers: one instance colour per tier carries their recession (windowGrid\'s own mechanism)'];
+    /* One hook for everything this section lights. It follows the district's existing curve exactly
+       — energy lines and rail lights are already dimmed x0.3 by day here — so a sky road never
+       becomes the one thing in the city that ignores the clock. setTheme calls setTime, so the hue
+       is re-copied from themeCol on both paths and there is no second entry point to keep in step. */
+    srSetTime = d => {
+      srRimM.color.copy(themeCol).multiplyScalar(1 - 0.7 * d);
+      srWashM.color.copy(themeCol); srWashM.opacity = 0.42 * (1 - 0.7 * d);
+      carGlowM.color.copy(themeCol).multiplyScalar(1 - 0.7 * d);
+      carWashM.color.copy(themeCol); carWashM.opacity = 0.50 * (1 - 0.7 * d);
+    };
+  }
+
   /* The district ground: an annulus from the plaza slab's edge out to the horizon. It stops at 620 m
      now rather than 900 — beyond that the terrain module owns the world, and the city's ground plane
      must not paint over the natural land or the mountains standing behind it (§10, §41). */
@@ -1461,6 +2134,7 @@ export function buildCity(ctx) {
     spillWarmM.opacity = 0.44 * (1 - 0.72 * d);
     spillCoolM.opacity = 0.40 * (1 - 0.72 * d);
     accentWashM.opacity = 0.50 * (1 - 0.66 * d);
+    if (srSetTime) srSetTime(d);        /* the sky roads' rims, their washes and the carriers */
     return last;
   }
   function setTheme(t) { if (t && t.energy != null) themeCol.setHex(t.energy); setTime(last); return t; }
@@ -1489,8 +2163,41 @@ export function buildCity(ctx) {
         e.t1 = t + Math.max(0.8, Math.abs(e.to - e.from) / 2.4); e.next = e.t1 + 2.5 + e.R() * 3;
       }
     }
+    /* ---- THE SKYBLOCK CARRIERS. One matrix per carrier per frame, composed into module-level
+       scratch and written to the five instanced meshes — nothing here allocates. The ride is a
+       ping-pong with a dwell at each end, eased by this file's own `ramp`, which is the same motion
+       language the walkway's rail pod already speaks; a carrier that looped and snapped back to its
+       start would read as a texture rather than as a vehicle. The block is symmetrical along its
+       travel axis, so the return leg needs no turn-around and gets none. */
+    if (srCarMeshes) {
+      for (let ci = 0; ci < srCars.length; ci++) {
+        const c = srCars[ci], cyc = 2 * (c.travel + SR_CAR.dwell);
+        let ph = (t + c.phase * cyc) % cyc; if (ph < 0) ph += cyc;
+        let u;
+        if (ph < c.travel) u = ramp(ph / c.travel);
+        else if (ph < c.travel + SR_CAR.dwell) u = 1;
+        else if (ph < 2 * c.travel + SR_CAR.dwell) u = 1 - ramp((ph - c.travel - SR_CAR.dwell) / c.travel);
+        else u = 0;
+        const f = u * (SR_MOT - 1), i0 = Math.min(SR_MOT - 2, Math.floor(f)), k = f - i0, o = i0 * 6, o2 = o + 6;
+        const m = c.mot;
+        _srCarP.set(m[o] + (m[o2] - m[o]) * k, m[o + 1] + (m[o2 + 1] - m[o + 1]) * k, m[o + 2] + (m[o2 + 2] - m[o + 2]) * k);
+        _srCarE.set(m[o + 4] + (m[o2 + 4] - m[o + 4]) * k, m[o + 3] + (m[o2 + 3] - m[o + 3]) * k, m[o + 5] + (m[o2 + 5] - m[o + 5]) * k, 'YXZ');
+        _srCarQ.setFromEuler(_srCarE);
+        _srCarM.compose(_srCarP, _srCarQ, _srCarS);
+        for (let mi = 0; mi < srCarMeshes.length; mi++) srCarMeshes[mi].setMatrixAt(ci, _srCarM);
+      }
+      for (let mi = 0; mi < srCarMeshes.length; mi++) srCarMeshes[mi].instanceMatrix.needsUpdate = true;
+    }
   }
-  function setQuality(q) { distant.visible = !q || q.farLayers !== false; return distant.visible; }
+  function setQuality(q) {
+    distant.visible = !q || q.farLayers !== false;
+    /* the two pieces of the sky roads a phone can lose without losing the road: the engraved
+       medallion recess on a 9 m carrier at 200–500 m, and the wash it drags */
+    const low = !!(q && (q.name === 'low' || q === 'low'));
+    if (srDarkMesh) srDarkMesh.visible = !low;
+    if (srWashMesh) srWashMesh.visible = !low;
+    return distant.visible;
+  }
   function dispose() {
     if (group.parent) group.parent.remove(group);
     owned.geometries.forEach(g => g.dispose()); owned.geometries.length = 0;
@@ -1500,7 +2207,9 @@ export function buildCity(ctx) {
 
   /* cost bookkeeping (what the establishing view can at most draw from this module) */
   group.traverse(o => { if (o.isMesh && o.geometry) { const g = o.geometry, n = g.index ? g.index.count : g.attributes.position.count; stats.triangles += Math.round(n / 3) * (o.isInstancedMesh ? o.count : 1); stats.drawCalls++; } });
-  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'block frame: platinumMid / platinumMidBrushed (vertical) + platinumMidLit (horizontal)', 'MeshBasic: windows / curtain / energy lines / lights / 3 distant bands + 1 ghost band / ground', 'accent: accentViolet (left) / accentBlue (centre) / accentCyan (right)', 'wash: warm spill / cool spill / accent (vertex-coloured)', 'shards: M.shardFacet (instanced, the many) + M.shardClear (merged, 14 near) — NO shardHero in this district', 'shafts: four value bands stepping toward the night sky'];
+  stats.materials = ['tower families: platinum / glass / graphite / violet', 'structural', 'composite', 'trimSatin', 'block frame: platinumMid / platinumMidBrushed (vertical) + platinumMidLit (horizontal)', 'MeshBasic: windows / curtain / energy lines / lights / 3 distant bands + 1 ghost band / ground', 'accent: accentViolet (left) / accentBlue (centre) / accentCyan (right)', 'wash: warm spill / cool spill / accent (vertex-coloured)', 'shards: M.shardFacet (instanced, the many) + M.shardClear (merged, 14 near) — NO shardHero in this district', 'shafts: four value bands stepping toward the night sky',
+    'sky roads: deck cap near/far (metalness 0.40 / 0.24, LAW 1) + side near/far (0.90 / 0.32, vertical only) + 1 vertex-tinted rim + 1 vertex-tinted wash',
+    'carriers: body / cap / medallion / energy / wash, five instanced meshes for nine carriers, recession on the instance colour'];
   stats.districtHues = ACCENT_DISTRICT;
   /* v9 bookkeeping: the shard budget and the four mechanisms the vertical depth is built from */
   stats.shards = { facet: stats.shardsFacet, clear: stats.shardsClear, hero: 0,
@@ -1514,6 +2223,29 @@ export function buildCity(ctx) {
   stats.massings = BLOCKS.reduce((o, s) => { const k = MASSING_OF(s.id); o[k] = (o[k] || 0) + 1; return o; }, {});
   stats.towerFamilies = Object.keys(byArch).reduce((o, k) => { const f = k.split('|')[1]; o[f] = (o[f] || 0) + byArch[k].length; return o; }, {});
   stats.valleys = ['52-72 deg right', '108-124 deg centre', '128-142 deg left'];
+  /* v13 §8 — the sky-road network, reported from what was MEASURED during the build rather than
+     from what was intended. horizontalArea is the world-space area of every face the by-normal
+     router put in the LOW-metalness bucket; if it were ever routed to a mirror grade that number is
+     exactly how much of this district would render black. */
+  srStats.deckArea = Math.round(srStats.deckArea);
+  stats.skyRoads = {
+    roads: srStats.roads, tiers: srStats.tiers, carriers: srStats.carriers,
+    deckTopArea: srStats.deckArea + ' m2 (nominal deck footprint)',
+    horizontalArea: { up: +srStats.upArea.toFixed(2), down: +srStats.downArea.toFixed(2), grade: 'platinum-class LOW metalness only: 0.40 near / 0.24 far — never a mirror (LAW 1)' },
+    verticalArea: +srStats.sideArea.toFixed(2),
+    supports: { columnsOntoRoofs: srStats.columns, bracketsToFlanks: srStats.brackets, groundPiers: srStats.piers,
+      stationsSearched: srStats.stations, stationsWithNothingInReach: srStats.unsupported },
+    tallestPier: +srStats.tallestPier.toFixed(1) + ' m',
+    longestClearSpan: +srStats.maxSpan.toFixed(1) + ' m on ' + srStats.maxSpanAt,
+    steepestGrade: (srStats.maxGrade * 100).toFixed(1) + ' %',
+    composition: { minBearingMarginToAValley: +srStats.minBearingMargin.toFixed(2) + ' deg',
+      maxElevationAtEstablishingCamera: +srStats.elevMax.toFixed(2) + ' deg',
+      maxElevationInsideTheMoonsBearingBand: +srStats.elevMoon.toFixed(2) + ' deg, against a moon whose lower limb over a legal corridor is never under 24.4 deg',
+      moonGuard: 'sampled from sky.js hour by hour: bearing 61-113, elevation 21-30.5 deg, disc 4.15 deg. Its two lowest positions (61.4 and 112.6 deg) fall inside valleys this network already avoids; over the legal 74-106 corridor its lower limb is 24.4 deg or higher',
+      collisions: srStats.collisions },
+    lightPools: srStats.pools, grades: srStats.grades, carrierSize: srStats.carrierSize,
+    support: srStats.supports
+  };
   setTime(ctx.clock && typeof ctx.clock.state === 'function' ? ctx.clock.state() : last);
   update(0);
   return { group, setTime, setTheme, update, dispose, stats, setQuality, anchors: { paths: anchors.paths.filter(p => /^city-/.test(p.id)), pads: anchors.pads.filter(p => /^city-/.test(p.id)) } };

@@ -174,9 +174,16 @@
      engraved medallion on the nose and the TWO LATERAL RINGS that identify the
      family — which on a craft are exactly what §4 calls "soft connection
      points". A pod docks to the world through rings.
-       POD (§6A)      the genome at pod scale, PROPORTIONS UNTOUCHED. 1.90 m
-                      wide, hovering 0.34 m clear of the deck on a MAHGIC
-                      underglow, no wheels and no undercarriage. A square-diamond
+       POD (§6A)      the genome at pod scale, PROPORTIONS UNTOUCHED. The BLOCK
+                      is 1.90 m wide, 1.63 deep and 1.94 tall; the CRAFT is 3.22 m
+                      across, because the two connection rings stand 0.66 m proud
+                      of each flank (foblock's ringOut 0.62 + ringR 0.175 +
+                      ringTube 0.052 = 0.847 of the width, either side). Say both
+                      numbers: a placement test that uses 1.90 is testing the
+                      wrong object, which is why the footprint below is MEASURED
+                      off the built rings and not off the block. Hovers 0.34 m
+                      clear of the deck on a MAHGIC underglow, no wheels and no
+                      undercarriage. A square-diamond
                       emblem on each flank, a dark crystal pane forward of it,
                       two accent strips low on the body.
        SHUTTLE (§6B)  the same evaluation elongated along the genome's DEPTH axis
@@ -221,13 +228,25 @@
                        v8 (rhombus)      v9 (genome)
        draw calls           114              125     (header budget 132)
        triangles         13,146           21,440
-         trees           12,510           14,514
+         trees           11,082           12,450
          planters         1,428            1,428
-         transport          636            7,562  (9 craft, ~840 each)
+         transport          636            7,562  (9 craft)
 
-     One genome evaluation costs ~808 triangles, of which the two connection
-     rings are 240 and the medallion 80; setQuality('low') drops the rings, the
-     flank emblems and the accent strips, which is 45% of a craft.
+     (v9's first report gave the tree row as 12,510 -> 14,514. Both were wrong and
+     the columns did not add up: 12,510 is trees PLUS planters, and 14,514 is the
+     v8 whole-population total with the tree delta added to it. The delta itself,
+     +1,368, was right. Re-measured by traversing both built populations through
+     one code path; the totals and the draw calls were always correct.)
+     A craft costs 826 triangles at pod scale and 858 at shuttle scale (the
+     shuttle carries four more glazing panes): shell 240 + cap 200 + platinum 304,
+     of which the two connection rings are 240 and the medallion rim 64, + crystal
+     32 + emblem 24 + accent 24 + underglow 2. setQuality('low') drops the rings,
+     the flank emblems and the accent strips: MEASURED on the parked fleet, that
+     is 4,988 -> 2,876 triangles, 42% of a craft.
+     ONE COST THIS TABLE DOES NOT CARRY: the parked shuttle registers its six
+     non-cap meshes with ctx.reflect(), which the assembly turns into six more
+     draw calls in its mirrored-copy group (the same convention fobstations.js
+     follows). Counted there, not here.
      The canopy budget was 400 in the first build and the crowns came out as
      parasols: a dozen big plates on a nearly-vertical shell normal, seen
      edge-on from eye level. Mass needs COUNT, so the plate count roughly
@@ -1532,8 +1551,31 @@ const POD_SPOTS = [
   { x: -19.5, z: -20.0, face: 256 },
   { x: -13.0, z:  28.5, face: 196 }
 ];
-/* one §6B shuttle stands with them, so the apron reads as transport rather than as furniture */
-const SHUTTLE_SPOT = { x: 30.0, z: -20.5, face: 96 };
+/* THE ASCENT PADS ARE INVISIBLE TO ctx.colliders, AND THAT COST THE FIRST CUT OF THIS FILE A
+   SHUTTLE. ground.js, plaza-dressing.js and monument.js all push invisible collider Meshes, so
+   clear() sees benches, masts, stairs and the monument. fobeam.js pushes NOTHING: its three ASCENT
+   launch pads are real architecture — two chamfered courses (8.4 m and 6.6 m square, turned 45°),
+   a coping, four canted mast blades and four buttresses, standing 0.17 m to 1.70 m above the deck
+   — and they are simply not in the list. The v9 SHUTTLE_SPOT was (30, -20.5); ASCENT EAST is at
+   (32, -18); a 45°-turned 6.6 m course has a half-diagonal of 4.67 m and |dx| + |dz| there is 4.50,
+   so the shuttle's CENTRE stood inside the pad's second course and its flat base (DECK_Y + 0.46 =
+   0.63) sat 3 cm BELOW that course's top at 0.66. A parked shuttle was planted in a launch pad and
+   clear() returned true, because the pad is not a collider.
+   Until fobeam.js registers colliders of its own, this table is the keep-out. The radius is the
+   CIRCUMSCRIBED radius of the outer course (8.4 × √2 / 2 = 5.94), which is conservative: the pad
+   is a diamond, not a disc, so the corners are the only places it actually reaches that far. */
+const ASCENT_PADS = [
+  { x: -30.0, z: -22.0 },     /* fobeam.js ascent-west  */
+  { x:  32.0, z: -18.0 },     /* fobeam.js ascent-east  */
+  { x: -13.0, z: -37.0 }      /* fobeam.js ascent-north */
+];
+const ASCENT_PAD_R = 5.94;
+/* one §6B shuttle stands on the east apron, so the apron reads as transport rather than as
+   furniture. MEASURED clearances at (33.5, 15.5), worst first: deck edge 3.22 m (r = 36.9 against
+   ground.js FIELD_RADIUS 43), large tree at (24, 18) 3.35 m, lamp mast at (26, 16) 4.30 m,
+   ascent-east pad 33.5 m. It faces the plaza centre, the same convention fobstations.js derives,
+   so its flank — the emblem, the glazing and the accent strip — is what the arrival view sees. */
+const SHUTTLE_SPOT = { x: 33.5, z: 15.5, face: 295 };
 const DECK_Y = 0.17;          /* ground.js FLOOR_TOP — anything on the plaza stands here */
 
 /* buildFobPods(ctx) → the module contract { group, stats, setTime, setTheme, update, setQuality,
@@ -1557,6 +1599,11 @@ export function buildFobPods(ctx) {
     for (const s of planted) {
       const keep = r + (s.kind === 'tree' ? 3.6 : 1.1);
       if ((s.x - x) * (s.x - x) + (s.z - z) * (s.z - z) < keep * keep) return false;
+    }
+    /* and the ASCENT pads, which are architecture that registers no collider — see ASCENT_PADS */
+    for (const a of ASCENT_PADS) {
+      const keep = r + ASCENT_PAD_R;
+      if ((a.x - x) * (a.x - x) + (a.z - z) * (a.z - z) < keep * keep) return false;
     }
     return true;
   };
@@ -1649,12 +1696,16 @@ export function buildFobPods(ctx) {
     update(t) {
       const tt = Number.isFinite(t) ? t : 0;
       if (podMeshes.length) {
-        placed.forEach((sp, i) => {
+        /* an indexed for, not forEach: a callback literal in a per-frame method allocates a fresh
+           closure every frame, and this runs at 60 Hz on a phone. Everything else here is the
+           module's build-time scratch, reused — update() allocates nothing. */
+        for (let i = 0; i < placed.length; i++) {
+          const sp = placed[i];
           _q.setFromAxisAngle(UP, yawFor(sp.face));
           _v.set(sp.x, DECK_Y + POD.hover + Math.sin(tt * POD.rate + phase[i]) * POD.bob, sp.z);
           _m.compose(_v, _q, _s.setScalar(1));
           for (const im of podMeshes) im.setMatrixAt(i, _m);
-        });
+        }
         for (const im of podMeshes) im.instanceMatrix.needsUpdate = true;
       }
       if (parked) parked.position.y = DECK_Y + SHUTTLE.hover + Math.sin(tt * SHUTTLE.rate + shPhase) * SHUTTLE.bob;
