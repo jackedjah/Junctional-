@@ -177,6 +177,20 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       dome.meridians <= 20, dome.meridians + ' primary ribs');
     P('lower-half infill exists so the spring is not bare',
       dome.secondary >= 16, dome.secondary + ' secondaries');
+    /* R7 §8 — "clear crystalline PANELS". The shell passed every gate above while being one
+       smoothly-shaded membrane at 234 m per panel, because nothing here measured a panel. */
+    P('the shell is a panel field, not a membrane (panels under 160 m across)',
+      dome.stats.panelW != null && dome.stats.panelW <= 160 && dome.stats.panelW >= 47,
+      dome.stats.panelW + ' m per panel at the spring');
+    /* ...and the panel field must SHED columns, or it is the 48-rib net defect at four times the
+       density. Two numbers, because either alone can be satisfied by the wrong shape. */
+    P('the panel field sheds columns toward the oculus, so nothing converges overhead',
+      dome.stats.panelColumns >= 128 && dome.stats.panelColumnsApex <= 24 && dome.stats.panelSteps >= 6,
+      dome.stats.panelColumns + ' at the spring -> ' + dome.stats.panelColumnsApex +
+      ' at the oculus in ' + dome.stats.panelSteps + ' steps');
+    P('every panel column count is a multiple of 16, so the ribs land on seams',
+      dome.stats.panelColumns % 16 === 0 && dome.stats.panelColumnsApex % 16 === 0,
+      dome.stats.panelColumns + ' / ' + dome.stats.panelColumnsApex);
   }
 
   /* ============================================================================================
@@ -189,6 +203,21 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       dome.stats.holds >= 200, dome.stats.holds + ' holds');
     /* "resting shelves at long intervals" — a 2 km climb with nowhere to stop is not a route */
     P('resting shelves exist along the routes', dome.stats.shelves >= 8, dome.stats.shelves + ' shelves');
+    /* R7 §9 — the routes must be GRADED. They were four bearings with identical geometry, which
+       is a climbing surface with no climbing decision, and every gate above passed anyway. A
+       grade has to be visible as geometry, so it is gated as geometry: strictly fewer holds,
+       strictly narrower channel, strictly smaller holds from EASY to ADVANCED. */
+    const gr = dome.stats.grades || [];
+    P('the routes carry three distinct grades',
+      new Set(gr.map(g => g.grade)).size >= 3, gr.map(g => g.grade + '@' + g.deg).join(', '));
+    const easy = gr.find(g => g.grade === 'EASY'), adv = gr.find(g => g.grade === 'ADVANCED');
+    P('the easy route has strictly more holds, a wider channel and bigger holds than the advanced one',
+      !!easy && !!adv && easy.holds > adv.holds && easy.channel > adv.channel && easy.hold > adv.hold,
+      easy && adv ? ('EASY ' + easy.holds + ' holds / ' + easy.channel.toFixed(1) + ' m / hold ' + easy.hold +
+        '   vs   ADVANCED ' + adv.holds + ' holds / ' + adv.channel.toFixed(1) + ' m / hold ' + adv.hold) : 'missing');
+    P('the advanced route commits: strictly fewer rest shelves than the easy one',
+      !!easy && !!adv && adv.shelves < easy.shelves,
+      easy && adv ? (easy.shelves + ' vs ' + adv.shelves + ' shelves') : 'missing');
     /* and the holds must be near the SURFACE, not floating near it — measured, because a hold
        placed by a yaw-only helper on a curved shell is exactly the "floating strut" defect again */
     const grip = await ev(async () => {

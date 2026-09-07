@@ -964,6 +964,64 @@ assumption.
 
 ---
 
+## L65 — A gate on a property is not a gate on the feature
+**Where it bit.** R7 §8 asks the HALO dome for "clear crystalline **panels**". The R5 suite gated
+the dome on `opacity < 0.25` and `primary ribs <= 20`, and both passed for four passes while the
+shell had **no panels at all**: one smoothly-shaded membrane whose every vertex carried the
+ellipsoid's analytic normal, with panels averaging 234 m across — 6,485 px wide at climbing range,
+so a climber was pressed against a single flat plane. The same round, §9 asks for graded routes;
+four routes existed at four bearings with *identical* holds, channel width, hold size, shelf
+spacing and drift. Every climbing gate passed. The dome had a climbing surface and no climbing
+decision.
+
+**The mechanism.** `opacity` measured the glass. Rib count measured the structure. Neither can see
+whether the PANEL exists, because a panel is not a property of either — it is the thing between
+them. Likewise `routes >= 4` counts start points, and a start point is not a grade.
+
+**The rule.** When a brief names a noun, measure that noun. If the brief says panels, publish and
+gate the panel's width, count and convergence; if it says grades, gate the geometry a climber
+reads before committing — strictly fewer holds, strictly narrower channel, strictly smaller holds,
+strictly fewer rests from EASY to ADVANCED. A label no test can distinguish from its neighbour is
+not a grade, and a property that would read the same with the feature deleted is not a gate.
+
+**The corollary that saved a pass.** Ask what would be WRONG before rendering. The panel field's
+real risk was cracks in the rows where the column count drops, not appearance. Counting edges —
+every interior edge shared by exactly two triangles, boundary edges equal to the spring ring plus
+the oculus ring — falsified that in one second with no renderer running.
+
+---
+
+## L66 — A merged mesh has no single owner, so its bounding box names the wrong family
+**Where it bit.** Twice in one pass, on two unrelated modules.
+
+`halo-rims` merges the two rim circles **and** the pylon stations, whose shafts are 78 m tall. The
+R4 gate read the merged bounding box, found `y 131.7` against a limit of 40, and reported *"the
+rims are a closed band, not 384 radial fins"*. The rims were a perfect closed band. The gate was
+reading the pylons and printing the rims' name, which sent two passes of diagnosis to the radius —
+the one term that was never wrong.
+
+`halo-life`'s people share a `kind` string that names a POSE, not a place: both halo-districts'
+overlook bays and halo-threshold's departure gate legitimately produce `kind: 'rail'`. The gate
+measured all 22 rail figures against the 12 district bays and reported a worst case of 2,697 m,
+reading as a wiring bug. Nothing was miswired — four threshold figures were standing exactly where
+they belong, 2.7 km from the nearest bay.
+
+**The mechanism.** Merging is how this project buys draw calls, and a `kind` is how it buys shared
+animation. Both deliberately erase the distinction the gate then tries to recover from the outside.
+A bounding box over two families reports the union and attributes it to whichever name is on the
+mesh; a filter over a shared pose name returns two populations and attributes them to whichever
+table the test happens to hold.
+
+**The rule.** Measure a family from the family, not from what it was merged into. The module that
+builds it publishes its own numbers (`stats.rimBand`, `stats.overlookSites`, `stats.walkSites`) and
+the gate reads those. Where a merged box still proves something real — x and z prove the annulus is
+closed, because nothing else on the ring reaches that diameter — keep that term and drop only the
+one the merge invalidated. And when splitting a gate, gate BOTH halves: the pylons get their own
+assertion, the threshold rails get measured against the threshold's table. Narrowing a gate until
+it passes is how a defect gets excused; splitting it is how two get found.
+
+---
+
 ## Standing diagnostic harness (scratchpad)
 
 | Tool | Purpose |

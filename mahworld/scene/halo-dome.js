@@ -23,6 +23,30 @@
    and the last 800 m of radius is a walkable dome you can rest on. The steepness is authored by
    the geometry rather than decorated onto it.
 
+   ---- R7 §8/§9 :: WHAT PASSED EVERY GATE AND WAS STILL WRONG -----------------------------------
+   Two defects survived the whole R5 suite, and both survived because nothing MEASURED the thing
+   the brief actually asked for. They are worth stating as rules, not as history.
+
+   1. A GATE ON A PROPERTY IS NOT A GATE ON THE FEATURE. "Clear crystalline panels" was gated as
+      opacity < 0.25 and rib count <= 20. The shell passed both while having no panels at all:
+      one smoothly-shaded membrane, every vertex carrying the ellipsoid's analytic normal, panels
+      averaging 234 m across — 6,485 px wide at climbing range. Opacity measured the glass and rib
+      count measured the structure; neither could see that the PANEL did not exist. When a brief
+      names a noun, measure that noun.
+
+   2. FOUR ROUTES AT FOUR BEARINGS ARE ONE ROUTE. The climbing routes differed only in where they
+      started. Holds, channel width, hold size, shelf spacing and drift were identical, so the
+      dome had a climbing surface and no climbing DECISION. A grade is geometry a climber reads
+      before committing, so it is now gated as geometry — strictly fewer holds, strictly narrower
+      channel, strictly smaller holds, strictly fewer rests from EASY to ADVANCED. A label that no
+      test can distinguish from its neighbour is not a grade.
+
+   And one method note, since it saved a pass: the panel field's real risk was cracks in the
+   reduction rows, not appearance. Counting edges — every interior edge shared by exactly two
+   triangles, boundary edges exactly equal to the spring ring plus the oculus ring — falsified
+   that in a second, with no renderer. Ask what would be WRONG, then measure that, before
+   rendering anything.
+
    ---- WHY IT DOES NOT CLOSE THE SKY -----------------------------------------------------------
    R4 built MAH HALO as a ring so MAHWORLD'S NIGHT SKY survives — the moon is a principal of the
    composition, and a disc at this altitude erases it. A dome is a second chance to make that
@@ -77,9 +101,33 @@ export const DOME = Object.freeze({
   SECONDARY_TO: 0.46,                         /* the fraction of the arc a secondary rib covers */
   RINGS: 9,
   SEGS: 26,                                   /* segments per meridian, spring to apex */
+  /* the SHELL is tessellated separately from the STRUCTURE — the glass has to be a panel field
+     and the ribs have to be sparse, and tying them to one number made the second impossible */
+  PANEL_W: 128,                               /* target panel width in metres; see the shell block */
+  PANEL_SEGS: 42,                             /* shell rings, spring to oculus */
   PORTAL_DEG: -67.5,                          /* MAH THRESHOLD's bearing — the way out */
   PORTAL_HALF: 0.055,                         /* radians of half-width: a 378 m opening at 3434 */
-  ROUTES: Object.freeze([22.5, 112.5, 202.5, 292.5])   /* four authored climbing routes */
+  /* FOUR AUTHORED CLIMBING ROUTES, GRADED (R7 §9).
+     They were four bearings and nothing else, which meant four identical climbs at four compass
+     points — the dome had a climbing SURFACE but no climbing DECISION. A grade is not a label;
+     it is the geometry a climber reads before committing:
+
+       channel   how wide the recess between the ridges is — a wide channel is a staircase,
+                 a narrow one is a line you have to stay on
+       holds     diamonds per rung, and `hold` their size — fewer and smaller is harder
+       every     rungs are placed every Nth step, so the advanced route has REACH between holds
+       rest      steps between resting shelves — a long run without one is the commitment
+       drift     how far the line wanders off its bearing; a wandering line crosses the fall line
+       band      a continuous grip batten across the channel, which is what makes EASY easy
+
+     The drift signs alternate so no two routes lean the same way, and the bearings are the
+     original four so nothing that navigates to them moves. */
+  ROUTES: Object.freeze([
+    Object.freeze({ deg: 22.5,  grade: 'EASY',         channel: 4.7, holds: 4, hold: 1.30, every: 1, rest:  7, drift: -0.055, band: true }),
+    Object.freeze({ deg: 112.5, grade: 'INTERMEDIATE', channel: 3.2, holds: 3, hold: 1.00, every: 1, rest: 11, drift:  0.125, band: false }),
+    Object.freeze({ deg: 202.5, grade: 'INTERMEDIATE', channel: 3.0, holds: 3, hold: 0.95, every: 1, rest: 12, drift: -0.140, band: false }),
+    Object.freeze({ deg: 292.5, grade: 'ADVANCED',     channel: 2.1, holds: 2, hold: 0.76, every: 2, rest: 17, drift:  0.205, band: false })
+  ])
 });
 
 /* the dome's height above the world at a given radius. Pure, exported, the ONLY definition. */
@@ -174,31 +222,89 @@ export function buildHaloDome(ctx, opts = {}) {
   const putSeam = (geo, matrix, value) => SB.push({ geo, matrix, value });
 
   /* ================================================================================================
-     1. THE SHELL — one low-poly crystalline surface, built by hand because there are no addons
+     1. THE SHELL — a CRYSTALLINE PANEL FIELD, built by hand because there are no addons
+
+     R7 §8 asks for "clear crystalline panels", and what stood here was not panels. It was one
+     smoothly-shaded membrane: every vertex carried the ellipsoid's analytic gradient, so adjacent
+     triangles shaded as one continuous surface by construction. Measured, the panels averaged
+     234 m across and 2.7° of facet deviation — which is the worst of both worlds, a silhouette
+     coarse enough to see and a shading model that hides the fact. At climbing range one panel is
+     6,485 px wide. A climber was pressed against a single flat plane.
+
+     Two things fix it, and neither is more polygons in the naive sense:
+
+     1. FLAT SHADING. The normal is the TRIANGLE's own, not the ellipsoid's. Each panel then
+        catches the environment as its own plane, which is the entire difference between glass
+        and a bubble. This costs nothing — it is the same vertex count, written differently.
+
+     2. A RING-REDUCED COLUMN COUNT. A uniform meridian grid fine enough to make panels is the
+        NET defect R5 named, because meridians converge: 176 columns at the spring would be 176
+        lines meeting overhead. So the field SHEDS columns as the radius shrinks, the way a real
+        crystalline dome does — 176 at the spring, 16 at the oculus, in 11 steps. Panel width
+        stays near constant (123 m) instead of collapsing to nothing, and where the count drops
+        the row resolves in TRIANGULAR panels, which is more crystalline, not less.
+
+     Every count is a multiple of 16, so all sixteen primary ribs land on a panel seam at every
+     height rather than crossing a panel's middle.
+
+     The size was bounded, not picked. Below ~47 m the seams fall under two pixels at the far
+     side and become noise (THE PREFILTER LAW); above ~160 m the panel stops being a feature at
+     climbing range. 123 x 104 m sits inside that band and is WIDER THAN TALL (§06).
      ============================================================================================== */
+  const PANEL_N = [];      /* columns per shell ring — published so the rings can follow the seams */
+  const PANEL_R = [];
   {
-    /* the SHELL is tessellated finer than the ribs are spaced — the glass has to be smooth and
-       the structure has to be sparse, and tying them to one number made the second impossible. */
-    const MER = DOME.MERIDIANS * 3, SEG = DOME.SEGS;
+    const SEG = DOME.PANEL_SEGS;
+    for (let s = 0; s <= SEG; s++) PANEL_R.push(DOME.R * Math.cos((s / SEG) * Math.PI / 2));
+    let prev = 1e9;
+    for (let s = 0; s <= SEG; s++) {
+      const want = TAU * PANEL_R[s] / DOME.PANEL_W;
+      /* snapped to 16 so the primaries always sit on a seam, and monotone so the field only ever
+         sheds columns — a count that rose again would tear the row above it */
+      const n = Math.min(prev, Math.max(16, Math.round(want / 16) * 16));
+      PANEL_N.push(n); prev = n;
+    }
+  }
+  {
+    const SEG = DOME.PANEL_SEGS;
     const pos = [], nor = [], col = [];
-    const pushV = (a, r, v) => {
-      const y = domeY(r), x = Math.cos(a) * r, z = Math.sin(a) * r;
-      /* the shell normal: the ellipsoid's gradient, so the glass shades as a dome and not as a fan
-         of flat panels. dy/dr is the slope; the normal is (-dy/dr * radial + up), normalised. */
-      const m = domeSlope(r);
-      _n.set(-m * Math.cos(a), 1, -m * Math.sin(a)).normalize();
-      pos.push(x, y, z); nor.push(_n.x, _n.y, _n.z); col.push(v, v, v);
+    const A = [0, 0, 0], B = [0, 0, 0], C = [0, 0, 0];
+    const at = (out, a, r) => { out[0] = Math.cos(a) * r; out[1] = domeY(r); out[2] = Math.sin(a) * r; return out; };
+    /* one FLAT-SHADED panel triangle: the normal is the plane's, so the facet is real */
+    const tri = (p, q, w, v) => {
+      _v.set(q[0] - p[0], q[1] - p[1], q[2] - p[2]);
+      _n.set(w[0] - p[0], w[1] - p[1], w[2] - p[2]).cross(_v).normalize();
+      if (_n.y < 0) _n.multiplyScalar(-1);              /* every shell facet faces the sky */
+      for (const t of [p, q, w]) { pos.push(t[0], t[1], t[2]); nor.push(_n.x, _n.y, _n.z); col.push(v, v, v); }
     };
-    for (let i = 0; i < MER; i++) {
-      const a0 = (i / MER) * TAU, a1 = ((i + 1) / MER) * TAU;
-      if (inPortal(a0) || inPortal(a1)) continue;          /* the way out stays open */
-      for (let s = 0; s < SEG; s++) {
-        const r0 = RADII[s], r1 = RADII[s + 1];
-        /* value falls toward the apex: a dome read from below is brightest where it is steepest and
-           catching the horizon, and palest overhead is exactly the "lit lid" L57 warned about */
-        const v0 = 0.62 - 0.42 * (s / SEG), v1 = 0.62 - 0.42 * ((s + 1) / SEG);
-        pushV(a0, r0, v0); pushV(a1, r0, v0); pushV(a1, r1, v1);
-        pushV(a0, r0, v0); pushV(a1, r1, v1); pushV(a0, r1, v1);
+    for (let s = 0; s < SEG; s++) {
+      const r0 = PANEL_R[s], r1 = PANEL_R[s + 1], n0 = PANEL_N[s], n1 = PANEL_N[s + 1];
+      /* value falls toward the apex: a dome read from below is brightest where it is steepest and
+         catching the horizon, and palest overhead is exactly the "lit lid" L57 warned about */
+      const base = 0.62 - 0.42 * (s / SEG);
+      for (let i = 0; i < n0; i++) {
+        const a0 = (i / n0) * TAU, a1 = ((i + 1) / n0) * TAU;
+        if (inPortal(a0) || inPortal(a1)) continue;      /* the way out stays open */
+        /* PER-PANEL CRYSTAL DOMAINS. A crystal is not one value across a field — it is many
+           panes cut from the same block, each catching the light a little differently. The
+           spread is small on purpose: ±0.055 reads as glass with grain, and anything wider
+           reads as dirt. Deterministic, from the golden sequence already in this module. */
+        const v = base * (0.945 + 0.11 * gold(s * 31 + i * 7));
+        at(A, a0, r0); at(B, a1, r0);
+        if (n1 === n0) {
+          at(C, a1, r1); tri(A, B, C, v);
+          at(B, a1, r1); at(C, a0, r1); tri(A, B, C, v);
+        } else {
+          /* A REDUCTION ROW. The ring above carries fewer columns, so a panel below spans a
+             fraction of one above. Fanning each lower edge to its single nearest upper vertex
+             gives triangular panels with no cracks and no T-junctions. */
+          const j0 = Math.floor(i * n1 / n0), j1 = Math.floor((i + 1) * n1 / n0);
+          at(C, (j0 / n1) * TAU, r1); tri(A, B, C, v);
+          if (j1 !== j0) {                               /* the panel that straddles a seam above */
+            at(A, a1, r0); at(B, (j0 / n1) * TAU, r1); at(C, (j1 % n1 / n1) * TAU, r1);
+            tri(A, B, C, v * 0.985);
+          }
+        }
         stats.panels++;
       }
     }
@@ -211,6 +317,10 @@ export function buildHaloDome(ctx, opts = {}) {
     mesh.name = 'dome-shell'; mesh.frustumCulled = false; mesh.renderOrder = 2;
     group.add(mesh); stats.draws++;
     stats.triangles += pos.length / 9;
+    stats.panelColumns = PANEL_N[0];
+    stats.panelColumnsApex = PANEL_N[PANEL_N.length - 1];
+    stats.panelSteps = PANEL_N.filter((v, i) => i && v !== PANEL_N[i - 1]).length;
+    stats.panelW = +(TAU * DOME.R / PANEL_N[0]).toFixed(1);
   }
 
   /* ================================================================================================
@@ -254,9 +364,19 @@ export function buildHaloDome(ctx, opts = {}) {
     /* the LATITUDE RINGS: fourteen, spaced by the same cosine so they crowd where the dome is steep.
        Each is a chain of chords between adjacent meridians — a ring on a 3.4 km dome cannot be a
        torus, and a chord is what a real structure would be. */
-    const RMER = MER * 3;   /* the rings follow the SHELL's tessellation, not the ribs' spacing */
+    /* the rings genuinely follow the SHELL's tessellation now, which the old fixed 48 only
+       claimed to: a ring takes HALF the panel column count at its own radius, so every chord
+       end lands on a panel seam instead of cutting across panels at an irrational stride.
+       Half, not all, because a chord per panel is twice the geometry for a line the eye reads
+       as continuous either way. */
+    const columnsAt = r => {
+      let best = 0, bd = Infinity;
+      for (let s = 0; s < PANEL_R.length; s++) { const d = Math.abs(PANEL_R[s] - r); if (d < bd) { bd = d; best = s; } }
+      return PANEL_N[best];
+    };
     for (let k = 1; k < DOME.RINGS; k++) {
       const r = DOME.R * Math.cos((k / DOME.RINGS) * Math.PI / 2);
+      const RMER = Math.max(16, columnsAt(r) / 2);
       const w = 7.4 - 4.2 * (k / DOME.RINGS);
       for (let i = 0; i < RMER; i++) {
         const a0 = (i / RMER) * TAU, a1 = ((i + 1) / RMER) * TAU;
@@ -350,10 +470,13 @@ export function buildHaloDome(ctx, opts = {}) {
   {
     const inst = [];
     for (let ri = 0; ri < DOME.ROUTES.length; ri++) {
-      const baseA = DOME.ROUTES[ri] * Math.PI / 180;
+      const G = DOME.ROUTES[ri];
+      const before = { holds: stats.holds, shelves: stats.shelves };
+      const baseA = G.deg * Math.PI / 180;
       /* a route does not run straight up: it drifts in bearing as it climbs, which is what makes it
-         a ROUTE and not a ladder. The drift is deterministic and different per route. */
-      const drift = (ri % 2 ? 1 : -1) * (0.10 + 0.05 * gold(ri * 7));
+         a ROUTE and not a ladder. The drift is the GRADE's, so the easy line stays near its fall
+         line and the advanced one crosses it. */
+      const drift = G.drift;
       const steps = 46;
       let prev = null;
       for (let s = 0; s <= steps; s++) {
@@ -364,35 +487,47 @@ export function buildHaloDome(ctx, opts = {}) {
         if (prev) {
           /* THE CHANNEL: two parallel platinum ridges with a recess between them. You climb INSIDE
              it. The pair is what makes it readable as a route from a distance — a single line is a
-             seam, two lines 6 m apart is a thing with a width, and a width is what says "for you". */
+             seam, two lines apart is a thing with a WIDTH, and a width is what says "for you".
+             The width is the grade's: 9.4 m on the easy line, 4.2 m on the advanced one. */
           for (const side of [-1, 1]) {
-            const off = side * 3.2;
+            const off = side * G.channel;
             const A = [prev[0] - Math.sin(a) * off, prev[1], prev[2] + Math.cos(a) * off];
             const Bp = [q[0] - Math.sin(a) * off, q[1], q[2] + Math.cos(a) * off];
             along(A, Bp, 1.5, 2.4, 0.98, 'plat');
           }
           /* the recessed floor of the channel, in dark crystal */
-          along(prev, q, 5.4, 0.7, 0.24, 'dark');
+          along(prev, q, G.channel * 1.69, 0.7, 0.24, 'dark');
+          /* a BROAD GRIP BAND across the channel — §8 asks for them by name, and they are what
+             separates a staircase from a wall. Only the EASY route has them; on the others the
+             absence IS the grade. */
+          if (G.band) {
+            const off = G.channel * 0.92;
+            const A = [q[0] - Math.sin(a) * off, q[1] + 0.8, q[2] + Math.cos(a) * off];
+            const Bp = [q[0] + Math.sin(a) * off, q[1] + 0.8, q[2] - Math.cos(a) * off];
+            along(A, Bp, 2.6, 0.9, 0.92, 'plat');
+          }
         }
-        /* HANDHOLD CLUSTERS: three or four diamonds staggered across the channel, every step.
-           Instanced, so 1,400 of them are one draw. */
-        const n = 3 + (s % 2);
+        /* HANDHOLD CLUSTERS: diamonds staggered across the channel. How many, how big and how
+           often is the GRADE — the advanced route asks for reach between them. Instanced, so
+           every hold on the dome is one draw. */
+        const n = (s % G.every) ? 0 : G.holds;
         for (let h = 0; h < n; h++) {
-          const lat = ((h / (n - 1)) - 0.5) * 5.2 + (frac(ri * 13 + s * 5 + h) - 0.5) * 1.1;
+          const lat = (n === 1 ? 0 : (h / (n - 1)) - 0.5) * G.channel * 1.63
+            + (frac(ri * 13 + s * 5 + h) - 0.5) * 1.1;
           const dr = (frac(s * 7 + h * 3) - 0.5) * 9;
           const rr = r + dr;
           const aa = a + lat / Math.max(1, rr);
           const m = domeSlope(rr);
           _n.set(-m * Math.cos(aa), 1, -m * Math.sin(aa)).normalize();
           _qq.setFromUnitVectors(_up, _n);
-          _p.set(Math.cos(aa) * rr, domeY(rr) + 0.9, Math.sin(aa) * rr);
-          _s.set(1, 1, 1);
+          _p.set(Math.cos(aa) * rr, domeY(rr) + 0.9 * G.hold, Math.sin(aa) * rr);
+          _s.set(G.hold, G.hold, G.hold);
           inst.push(_m.compose(_p, _qq, _s).clone());
           stats.holds++;
         }
         /* RESTING SHELVES at long intervals — R5 asks for them, and a 2 km climb without one is a
            route nobody believes. A shelf is a real platform: dark deck, platinum lip. */
-        if (s > 0 && s % 11 === 0) {
+        if (s > 0 && s % G.rest === 0) {
           const m = domeSlope(r);
           _n.set(-m * Math.cos(a), 1, -m * Math.sin(a)).normalize();
           _qq.setFromUnitVectors(_up, _n);
@@ -406,6 +541,12 @@ export function buildHaloDome(ctx, opts = {}) {
         prev = q;
       }
       stats.routes++;
+      /* published per route, so a test gates the GRADING rather than judging a render: the same
+         count on every route is the defect this replaced, and only a number catches it */
+      (stats.grades || (stats.grades = [])).push({
+        deg: G.deg, grade: G.grade, holds: stats.holds - before.holds,
+        shelves: stats.shelves - before.shelves, channel: G.channel * 2, hold: G.hold
+      });
     }
     if (inst.length) {
       holds = new THREE.InstancedMesh(holdGeo, platinum, inst.length);
@@ -469,16 +610,16 @@ export function buildHaloDome(ctx, opts = {}) {
     update() { },
     /* the four routes, published so a future climbing system reads them rather than re-deriving */
     routes() {
-      return DOME.ROUTES.map((deg, i) => {
-        const a = deg * Math.PI / 180;
-        return { id: 'dome-route-' + i, deg, startR: DOME.R,
+      return DOME.ROUTES.map((G, i) => {
+        const a = G.deg * Math.PI / 180;
+        return { id: 'dome-route-' + i, deg: G.deg, grade: G.grade, startR: DOME.R,
           start: [Math.cos(a) * DOME.R, DOME.SPRING_Y, Math.sin(a) * DOME.R],
           topR: DOME.R * Math.cos(0.86 * Math.PI / 2) };
       });
     },
     navSites() {
       /* the foot of route 0, on the ring's outer apron, looking up the dome */
-      const a = DOME.ROUTES[0] * Math.PI / 180;
+      const a = DOME.ROUTES[0].deg * Math.PI / 180;
       const r = HALO.R_OUT - 30;
       const x = Math.cos(a) * r, z = Math.sin(a) * r;
       return [{ id: 'dome-route', label: 'DOME ROUTE', sub: 'the climb', x, z,

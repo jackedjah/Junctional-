@@ -292,9 +292,15 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     const out = {};
     /* (a) THE RIMS. Each of the 384 pieces must be LONG along the rim and THIN across it. Built the
        other way round they are outward-pointing fins with 55 m gaps: the ring's two defining
-       circles rendered as a comb. Measured from the merged mesh's own bounding box: a ring of
-       tangentially-laid segments is a closed annulus, so its box spans the full diameter in x AND
-       z, and its y extent is only the parapet plus the slab edge. */
+       circles rendered as a comb.
+
+       THE MESH IS NOT THE BAND. `halo-rims` is a merge of two unrelated families: these two
+       circles, and the pylon stations, whose shafts are 78 m tall. So the merged box's x and z
+       still prove the annulus is CLOSED — nothing else on the ring reaches that diameter — but
+       its y extent is the pylons' and says nothing about the band's section. Reading it as the
+       band's reported a correct rim as a 131.7 m fin for two passes and sent the diagnosis to
+       the radius, which was never wrong. The section is read from the band's own published
+       numbers instead; the pylons get their own gate below, so nothing goes unmeasured. */
     let rims = null;
     w.scene.traverse(o => { if (o.name === 'halo-rims' && o.isMesh) rims = o; });
     if (rims) {
@@ -303,6 +309,12 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       out.rim = { x: +(b.max.x - b.min.x).toFixed(0), z: +(b.max.z - b.min.z).toFixed(0),
         y: +(b.max.y - b.min.y).toFixed(1), want: +(2 * (H.HALO.R_OUT + H.HALO.APRON)).toFixed(0) };
     }
+    const hs = w.halo && w.halo.stats;
+    out.band = (hs && hs.rimBand) ? {
+      section: +(hs.rimBand.yHi - hs.rimBand.yLo).toFixed(1), pieces: hs.rimBand.pieces,
+      radial: +hs.rimBand.radial.toFixed(1), tangential: +hs.rimBand.tangential.toFixed(1)
+    } : null;
+    out.pylons = (hs && hs.pylons) || 0;
     /* (b) THE DISTRICT LIGHT POOLS. These are the one other family whose axes are readable from
        outside the merge, because each pool is an INSTANCE and an instance has its own matrix. A
        pool must be wide ALONG the ring (D.span) and narrower ACROSS it (the ~170 m district band);
@@ -328,9 +340,22 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     console.log('  halo-rims box: x ' + axis.rim.x + '  z ' + axis.rim.z + '  y ' + axis.rim.y +
       '   (a closed annulus spans ' + axis.rim.want + ' in x and z)');
     P('the rims are a closed band, not 384 radial fins',
-      Math.abs(axis.rim.x - axis.rim.want) < 120 && Math.abs(axis.rim.z - axis.rim.want) < 120 &&
-      axis.rim.y < 40,
-      'x ' + axis.rim.x + ' / z ' + axis.rim.z + ' / y ' + axis.rim.y + ' vs ' + axis.rim.want);
+      Math.abs(axis.rim.x - axis.rim.want) < 120 && Math.abs(axis.rim.z - axis.rim.want) < 120,
+      'x ' + axis.rim.x + ' / z ' + axis.rim.z + ' vs ' + axis.rim.want);
+    /* the defect the closed-annulus check cannot see on its own: a comb of fins ALSO spans the
+       full diameter. What separates a band from a comb is the piece's own section — thin across
+       the rim, as long as the chord along it. Measured from the band, not from the merge. */
+    P('each band piece is thin across the rim and as long as the chord along it',
+      !!axis.band && axis.band.tangential > axis.band.radial * 8,
+      axis.band ? (axis.band.radial + ' m radial x ' + axis.band.tangential + ' m tangential, ' +
+        axis.band.pieces + ' pieces') : 'halo.stats.rimBand not published');
+    P('the band\'s own section is a parapet plus a slab edge, not a fin',
+      !!axis.band && axis.band.section < 40,
+      axis.band ? (axis.band.section + ' m of section') : 'not published');
+    /* and the family whose height the old gate was actually reading, gated on its own terms */
+    P('the pylon stations are built and are the tall thing in that merge',
+      axis.pylons > 0 && axis.rim.y > 40,
+      axis.pylons + ' pylons, merged box y ' + axis.rim.y + ' m');
   } else {
     P('the rims are a closed band, not 384 radial fins', false, 'halo-rims mesh not found');
   }
@@ -374,22 +399,40 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     const L = w.haloLife; if (!L) return null;
     const D = w.haloDistricts && w.haloDistricts.stats;
     const sites = (D && D.overlookSites) || [];
-    /* every rail figure's distance to the nearest built overlook rail */
-    const rails = (L.people || []).filter(p => p.kind === 'rail');
-    let worst = 0;
-    for (const r of rails) {
+    const T = w.haloThreshold;
+    const walk = (T && T.stats && T.stats.walkSites) || [];
+    /* THERE ARE TWO POPULATIONS OF RAIL FIGURES, and this gate used to be blind to that.
+       `kind` names a POSE — "leaning on a rail" — and two modules legitimately produce it:
+       halo-districts' overlook bays, and halo-threshold's departure gate, which sits at a
+       bearing no district occupies. Measuring all 22 against the 12 district bays reported a
+       worst case of 2697 m and read as a wiring bug in halo-life. Nothing was miswired: the
+       four threshold figures were standing exactly where they belong, 2.7 km from the nearest
+       bay. What separates the populations is WHERE, and `deg` already carries it.
+       So each population is measured against its own table, and both must pass. */
+    const near = (r, tbl) => {
       let best = Infinity;
-      for (const S of sites) {
-        const th = S.deg * Math.PI / 180 + S.s / H.HALO.R_MID;
-        best = Math.min(best, Math.hypot(r.x - Math.cos(th) * S.rail, r.z - Math.sin(th) * S.rail));
+      for (const S of tbl) {
+        const x = S.rail != null ? Math.cos(S.deg * Math.PI / 180 + S.s / H.HALO.R_MID) * S.rail : S.x;
+        const z = S.rail != null ? Math.sin(S.deg * Math.PI / 180 + S.s / H.HALO.R_MID) * S.rail : S.z;
+        best = Math.min(best, Math.hypot(r.x - x, r.z - z));
       }
-      worst = Math.max(worst, best);
-    }
+      return best;
+    };
+    /* the exported person renames `deg` to `district` (halo-life's own export map), and reading
+       the internal name here put all 22 rails in the bay bucket and none in the gate bucket —
+       `undefined !== 'threshold'` is true for everyone. Read the shape that is exported. */
+    const rails = (L.people || []).filter(p => p.kind === 'rail');
+    const bayRails = rails.filter(p => p.district !== 'threshold');
+    const gateRails = rails.filter(p => p.district === 'threshold');
+    let worst = 0, worstGate = 0;
+    for (const r of bayRails) worst = Math.max(worst, near(r, sites));
+    for (const r of gateRails) worstGate = Math.max(worstGate, near(r, walk));
     return {
       wired: !!w.modules.haloLife, figures: L.stats.figures, draws: L.stats.draws,
       triangles: L.stats.triangles, districts: Object.keys(L.stats.byDistrict).length,
       perKm: L.stats.figures / (2 * Math.PI * H.HALO.R_MID / 1000),
-      rails: rails.length, overlooks: sites.length, worstRail: worst
+      rails: bayRails.length, overlooks: sites.length, worstRail: worst,
+      gateRails: gateRails.length, walkSites: walk.length, worstGate
     };
   });
   console.log('\nR4-16 — the social life on the ring');
@@ -401,9 +444,14 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     P('all eight districts are inhabited', life.districts >= 8, life.districts + ' keys');
     /* the whole point of part-major instancing: a population costs draws like a prop, not like a cast */
     P('the population still costs under 10 draws', life.draws < 10, life.draws + ' draws');
-    P('every rail figure stands at an overlook that was built',
-      life.overlooks > 0 && life.worstRail < 6,
+    P('every bay rail figure stands at an overlook that was built',
+      life.overlooks > 0 && life.rails > 0 && life.worstRail < 6,
       life.rails + ' rails, ' + life.overlooks + ' bays, worst ' + life.worstRail.toFixed(1) + ' m');
+    /* and the OTHER rail population, against its own table — the threshold's gate figures. Without
+       this the fix above would just be a narrower gate, which is how a defect gets excused. */
+    P('every threshold rail figure stands at a published walk site',
+      life.walkSites > 0 && life.gateRails > 0 && life.worstGate < 6,
+      life.gateRails + ' gate rails, ' + life.walkSites + ' walk sites, worst ' + life.worstGate.toFixed(1) + ' m');
   }
 
   const thr = await ev(async () => {

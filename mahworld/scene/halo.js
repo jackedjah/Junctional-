@@ -691,11 +691,26 @@ export function buildHalo(ctx, opts = {}) {
            55 m of gap to the next one. The two defining circles of MAH HALO — the thing that says
            "halo" from the ground — were built as a COMB. It photographed as a dashed line in every
            render of this pass and was twice written off as "a balustrade". The chord belongs on Z. */
-        rimSolid.push({ geo: chamferBox(1.6, 2.4, chord * 1.02, 0.35),
-          matrix: at(x, y + 1.2, z, -a), value: 1.0 });
+        /* the band's section, named once and used by both the geometry and the published stat —
+           two literals for one dimension is how a stat drifts away from the thing it describes */
+        const PAR_RAD = 1.6, PAR_H = 2.4, FAS_RAD = 2.2, LEN = chord * 1.02;
+        rimSolid.push({ geo: chamferBox(PAR_RAD, PAR_H, LEN, 0.35),
+          matrix: at(x, y + PAR_H * 0.5, z, -a), value: 1.0 });
         /* and the slab's edge, so the ring reads as a thing with thickness */
-        rimSolid.push({ geo: chamferBox(2.2, HALO.THICK, chord * 1.02, 0.5),
+        rimSolid.push({ geo: chamferBox(FAS_RAD, HALO.THICK, LEN, 0.5),
           matrix: at(x + Math.cos(a) * sign * 0.9, y - HALO.THICK * 0.5, z + Math.sin(a) * sign * 0.9, -a), value: 0.42 });
+        /* THE BAND'S OWN SECTION, PUBLISHED. `halo-rims` is a merge of two unrelated families —
+           these two circles, and the pylon stations pushed into the same array above, whose shafts
+           are 78 m tall. A bounding box on the merged mesh therefore reports the PYLONS' height
+           and attributes it to the band, which is how a correct rim read as a 131.7 m fin for two
+           passes, sending the diagnosis to the radius — the one term that was never wrong. The
+           band is the only thing that can measure the band, so it does. (L66.) */
+        const R = stats.rimBand || (stats.rimBand = { yLo: Infinity, yHi: -Infinity, pieces: 0,
+          radial: 0, tangential: 0 });
+        R.yLo = Math.min(R.yLo, y - HALO.THICK); R.yHi = Math.max(R.yHi, y + PAR_H); R.pieces += 2;
+        /* and the term that caught the original defect: a band piece must be NARROW across the rim
+           and as long as the chord along it. Swap those two slots and the ring is a comb. */
+        R.radial = Math.max(R.radial, PAR_RAD, FAS_RAD); R.tangential = Math.max(R.tangential, LEN);
       }
     }
     if (rimSolid.length) {
