@@ -236,7 +236,13 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
   console.log('\nR6 — THE CRYSTAL CLOUDS');
   if (R) {
     P('the clouds exist and are numerous enough to be weather',
-      R.cloudN > 1500, R.cloudN + ' lobes in 2 draws');
+      R.cloudN > 400, R.cloudN + ' lobes in 2 draws');
+    /* THE NUMBER THE FIRST CUT GOT WRONG BY TWENTY TIMES. Cloud area standing in front of the
+       dome, against the dome's own frontal silhouette: over 100% is a lid, and a lid is the one
+       thing "around that top dome area" rules out. */
+    P('the mantle is weather around the dome, not a lid over it',
+      R.stats.clouds.coverPct > 15 && R.stats.clouds.coverPct < 85,
+      R.stats.clouds.coverPct + '% of the dome\'s frontal silhouette');
     /* THE ONE HARD RULE FROM THE DIRECTION: "around that top dome area but not inside of it" */
     P('NOT ONE cloud is inside the dome', R.cloudsInside === 0,
       R.cloudsInside + ' of ' + R.cloudN + ' lobes sit under the shell');
