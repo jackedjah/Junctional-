@@ -249,6 +249,47 @@ export function applyPlatinumFinish(material, opts = {}) {
   return material;
 }
 
+/* ================================================================================================
+   THE CLOUD LOBE — THE WORLD'S ONE CLOUD GENOME.
+
+   It lives here rather than in mah-rain.js because MAHWORLD has two cloud systems and R6 §5 has
+   one rule for both. halo-threshold.js built its shelf out of THREE CROSSED BILLBOARD QUADS per
+   mass — two vertical at ninety degrees plus a horizontal — and crossed planes seen obliquely are
+   a star by construction. That is the "random shard silhouette" §5 forbids by name, and it cost
+   six rounds of blaming the OTHER cloud system before a raycast named the object: 202 of 364 rays
+   over the frame that showed it hit halo-threshold-cloud, not a crystal cloud at all.
+
+   A crystal cloud is not a sphere with a soft texture on it and it is not a
+   billboard — both of those are how you get vapour, and the direction is explicit that these are
+   "crystal like, not any clouds, very worldlike".
+
+   So it is a subdivided icosahedron, deformed by three summed directional harmonics of its own
+   surface direction, left NON-INDEXED so computeVertexNormals gives FLAT per-face normals. Eighty
+   facets, every one catching the sky at its own angle: that is the whole crystal read, and it costs
+   nothing at run time because the deformation happens once at build.
+
+   And it has no sharp edges. An icosahedron's facets meet at obtuse angles everywhere, the
+   deformation is bounded to +/-26% of the radius so it can never fold a face through another, and
+   nothing is ever scaled to a point — the flattening is 0.30 at its most extreme, which is a
+   lozenge, not a blade.
+   ============================================================================================== */
+export function cloudLobeGeometry(detail) {
+  const g = new THREE.IcosahedronGeometry(1, detail).toNonIndexed();
+  const P = g.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < P.count; i++) {
+    v.fromBufferAttribute(P, i).normalize();
+    const k = 1
+      + 0.150 * Math.sin(v.x * 2.7 + v.y * 1.9)
+      + 0.085 * Math.sin(v.y * 4.3 - v.z * 3.1 + 1.7)
+      + 0.045 * Math.sin(v.z * 6.9 + v.x * 5.2 - 0.8);
+    P.setXYZ(i, v.x * k, v.y * k, v.z * k);
+  }
+  g.computeVertexNormals();     /* non-indexed -> per-face normals -> faceted crystal */
+  return g;
+}
+
+
 /* One mesh for a facade of recessed window cells: InstancedMesh of thin boxes with per-window brightness
    (instance colour × material colour). `material` should be an unlit MeshBasicMaterial (windows glow),
    or a dark MeshStandardMaterial for unlit recesses. Local origin at the grid centre, cells in the XY plane facing +Z. */

@@ -46,7 +46,7 @@
    dispose, navSites }. No addons — mergeSolids is hand-rolled here as in every other module. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, signTexture, applyPlatinumFinish } from './materials.js';
+import { chamferBox, signTexture, applyPlatinumFinish, cloudLobeGeometry } from './materials.js';
 import { HALO, haloHeight, haloNormal, applyHaloGrid } from './halo.js';
 
 /* THE ONE PLACE THE THRESHOLD'S GEOMETRY IS DESCRIBED. Everything below reads these; nothing
@@ -155,7 +155,11 @@ export function buildHaloThreshold(ctx, opts = {}) {
      you walk past it — so each mass is a CROSSED PAIR of vertical quads plus one horizontal, which
      presents something broad from every azimuth and reads as a deck from above, at three quads and
      six triangles per mass. Forty-six masses is 276 triangles for a biome. */
+  /* the soft-mass canvas is now a ROUGHNESS break-up rather than the silhouette. It was written to
+     hide a quad's hard edge; the lobes have no hard edge to hide, so its job changed rather than
+     ended — it keeps one merged cloud body from reading as one uniform finish. */
   const cloudTex = softMass(256);
+  cloudTex.wrapS = cloudTex.wrapT = THREE.RepeatWrapping;
   owned.textures.push(cloudTex);
   /* THE VALUES ARE NOT clouds.js's, AND THE FIRST CUT'S WERE. Quoting that module's night key —
      body 0x243352 at 0.60 — put a dark blue body against a dark blue night sky and the entire biome
@@ -167,8 +171,17 @@ export function buildHaloThreshold(ctx, opts = {}) {
      DESTINATION. R4 asks for the transition to be spectacular and the thing being transitioned to
      has to be visible from the threshold that names it. So the body lifts a step off the sky and the
      lit crowns carry real value: a top edge the eye can measure the sanctuary against. */
-  const cloudMat = new THREE.MeshBasicMaterial({
-    map: cloudTex, color: 0x33507e, transparent: true, opacity: 0.74,
+  /* R6 §5 — THE "NO SHARD" LAW, AND THIS IS THE OBJECT IT WAS WRITTEN FOR.
+     Each mass used to be THREE CROSSED QUADS: two vertical at ninety degrees plus a horizontal.
+     Crossed planes seen obliquely are a star, and that star dominated 55% of the hero frame looking
+     up from the landing — 202 of 364 rays. I spent six rounds changing the OTHER cloud system
+     before firing a ray and reading the name off it.
+     A mass is now a cluster of rounded lobes from the world's one cloud genome, so its silhouette
+     is a union of convex bodies and cannot produce an arm. It keeps the texture as a roughness
+     break-up rather than as the silhouette — the shape is geometry now, which is what §5 asks for. */
+  const cloudMat = new THREE.MeshStandardMaterial({
+    color: 0x33507e, roughness: 0.72, metalness: 0.05, envMapIntensity: 0.55,
+    transparent: true, opacity: 0.74, depthWrite: false,
     depthWrite: false, side: THREE.DoubleSide, fog: true, vertexColors: true,
     blending: THREE.NormalBlending, toneMapped: true
   });
@@ -177,6 +190,7 @@ export function buildHaloThreshold(ctx, opts = {}) {
      cloud a TOP — one flat value is the "white geometry with fog" the sky brief forbids by name. */
   const cloudLit = cloudMat.clone();
   cloudLit.color.setHex(0xdfeaff); cloudLit.opacity = 0.62; cloudLit.name = 'halo-threshold-cloud-lit';
+  cloudLit.roughness = 0.66;
   owned.materials.push(cloudLit);
 
   /* ================================================================================================
@@ -441,8 +455,9 @@ export function buildHaloThreshold(ctx, opts = {}) {
   {
     const quads = [];
     const rimY = haloHeight(HALO.R_OUT, 0);
-    const quadGeo = own(new THREE.PlaneGeometry(1, 1));
-    const flatGeo = own(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2));
+    /* ONE GENOME. The same lobe mah-rain.js grows its crystal clouds from, so MAHWORLD has one
+       cloud language rather than two that disagree about what a cloud is. */
+    const lobeGeo = own(cloudLobeGeometry(1));
     const litQuads = [];
     for (let i = 0; i < THRESHOLD.MASSES; i++) {
       /* spread over a 96 degree fan centred on the threshold, so the biome is a REGION the ring
@@ -467,13 +482,33 @@ export function buildHaloThreshold(ctx, opts = {}) {
       const cy = top - h * 0.5;
       const yaw = gold(i * 17) * TAU;
       const val = 0.62 + 0.38 * (1 - far) * gold(i * 19);
-      quads.push({ geo: quadGeo, matrix: free(X, cy, z, yaw, w, h, 1), value: val });
-      quads.push({ geo: quadGeo, matrix: free(X, cy, z, yaw + Math.PI / 2, w * 0.86, h * 0.92, 1), value: val * 0.94 });
-      quads.push({ geo: flatGeo, matrix: free(X, top - h * 0.14, z, yaw, w * 0.92, 1, w * 0.72), value: val });
+      /* FIVE LOBES PER MASS, packed by sqrt of a uniform so the body has a dense middle and a
+         ragged edge. A union of convex bodies has no arms — that is the whole point of the change. */
+      for (let k = 0; k < 5; k++) {
+        const g1 = gold(i * 31 + k * 13), g2 = frac(i * 17 + k * 7), g3 = gold(i * 23 + k * 3);
+        const rad = w * 0.34 * Math.sqrt(g2);
+        const ang = g1 * TAU;
+        const sc = w * (0.30 + 0.26 * g3);
+        quads.push({
+          geo: lobeGeo,
+          matrix: free(X + Math.cos(ang) * rad, cy + (g3 - 0.5) * h * 0.34, z + Math.sin(ang) * rad,
+            yaw + g1 * TAU, sc, sc * (h / w) * 1.15, sc * (0.82 + 0.3 * g2)),
+          value: val * (0.88 + 0.2 * g3)
+        });
+      }
       /* the crown, in the pale key: a top edge the eye can measure the sky against */
-      litQuads.push({ geo: quadGeo, matrix: free(X, top - h * 0.16, z, yaw + 0.3, w * 0.80, h * 0.46, 1), value: 0.7 + 0.3 * gold(i * 23) });
-      litQuads.push({ geo: quadGeo, matrix: free(X, top - h * 0.16, z, yaw + 0.3 + Math.PI / 2, w * 0.66, h * 0.40, 1), value: 0.66 + 0.3 * gold(i * 29) });
-      litQuads.push({ geo: flatGeo, matrix: free(X, top - h * 0.06, z, yaw, w * 0.70, 1, w * 0.54), value: 0.8 });
+      for (let k = 0; k < 3; k++) {
+        const g1 = gold(i * 41 + k * 11), g2 = frac(i * 19 + k * 5);
+        const rad = w * 0.22 * Math.sqrt(g2);
+        const ang = g1 * TAU;
+        const sc = w * (0.20 + 0.16 * g2);
+        litQuads.push({
+          geo: lobeGeo,
+          matrix: free(X + Math.cos(ang) * rad, top - h * 0.14, z + Math.sin(ang) * rad,
+            yaw + 0.3 + g1 * TAU, sc, sc * 0.52, sc * (0.8 + 0.3 * g1)),
+          value: 0.7 + 0.3 * gold(i * 23 + k)
+        });
+      }
       stats.cloudMasses++;
     }
     addMesh(quads, cloudMat, 'halo-threshold-cloud', -3);

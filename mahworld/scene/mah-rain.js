@@ -78,6 +78,7 @@
    buildMahRain(ctx, opts) -> the standard module contract, plus seaAt/crystalSeaBed/navSites. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
+import { cloudLobeGeometry } from './materials.js';
 
 const TAU = Math.PI * 2;
 const gold = i => (i * 0.6180339887) % 1;
@@ -350,37 +351,6 @@ function shardGeometry(sides, rings) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
   g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
-  return g;
-}
-
-/* ================================================================================================
-   THE CLOUD LOBE. A crystal cloud is not a sphere with a soft texture on it and it is not a
-   billboard — both of those are how you get vapour, and the direction is explicit that these are
-   "crystal like, not any clouds, very worldlike".
-
-   So it is a subdivided icosahedron, deformed by three summed directional harmonics of its own
-   surface direction, left NON-INDEXED so computeVertexNormals gives FLAT per-face normals. Eighty
-   facets, every one catching the sky at its own angle: that is the whole crystal read, and it costs
-   nothing at run time because the deformation happens once at build.
-
-   And it has no sharp edges. An icosahedron's facets meet at obtuse angles everywhere, the
-   deformation is bounded to +/-26% of the radius so it can never fold a face through another, and
-   nothing is ever scaled to a point — the flattening is 0.30 at its most extreme, which is a
-   lozenge, not a blade.
-   ============================================================================================== */
-function cloudLobeGeometry(detail) {
-  const g = new THREE.IcosahedronGeometry(1, detail).toNonIndexed();
-  const P = g.attributes.position;
-  const v = new THREE.Vector3();
-  for (let i = 0; i < P.count; i++) {
-    v.fromBufferAttribute(P, i).normalize();
-    const k = 1
-      + 0.150 * Math.sin(v.x * 2.7 + v.y * 1.9)
-      + 0.085 * Math.sin(v.y * 4.3 - v.z * 3.1 + 1.7)
-      + 0.045 * Math.sin(v.z * 6.9 + v.x * 5.2 - 0.8);
-    P.setXYZ(i, v.x * k, v.y * k, v.z * k);
-  }
-  g.computeVertexNormals();     /* non-indexed -> per-face normals -> faceted crystal */
   return g;
 }
 
