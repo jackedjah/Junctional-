@@ -46,7 +46,7 @@
    dispose, navSites }. No addons — mergeSolids is hand-rolled here as in every other module. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, signTexture } from './materials.js';
+import { chamferBox, signTexture, applyPlatinumFinish } from './materials.js';
 import { HALO, haloHeight, haloNormal, applyHaloGrid } from './halo.js';
 
 /* THE ONE PLACE THE THRESHOLD'S GEOMETRY IS DESCRIBED. Everything below reads these; nothing
@@ -134,7 +134,9 @@ export function buildHaloThreshold(ctx, opts = {}) {
 
   /* ---- materials. Two solids and one cloud. --------------------------------------------------- */
   const platinum = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
-  platinum.vertexColors = true; platinum.name = 'halo-th-platinum'; owned.materials.push(platinum);
+  platinum.vertexColors = true; platinum.name = 'halo-th-platinum';
+  platinum.envMapIntensity = 1.55; applyPlatinumFinish(platinum);
+  owned.materials.push(platinum);
   const darkMat = (M.paving || M.graphiteMetal || new THREE.MeshStandardMaterial({ color: 0x0b0f16 })).clone();
   darkMat.vertexColors = true; darkMat.name = 'halo-th-dark';
   darkMat.roughness = 0.56; darkMat.envMapIntensity = 0.30;

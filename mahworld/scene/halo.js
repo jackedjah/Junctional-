@@ -76,7 +76,7 @@
    buildHalo(ctx) -> the standard module contract, plus surfaceAt/onHalo for roam and the districts. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox } from './materials.js';
+import { chamferBox, applyPlatinumFinish } from './materials.js';
 
 const TAU = Math.PI * 2;
 
@@ -377,6 +377,9 @@ export function buildHalo(ctx, opts = {}) {
   /* the RIM is platinum: LAW 1's partner, a vertical band that catches the horizon, and the thing
      that draws the ring's two enormous circles in the sky */
   const rimMat = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
+  /* the rim is the ring's EDGE — kilometres of vertical fascia with a cap on top, which is the
+     exact mix the single metalness 0.38 could not serve (see applyPlatinumFinish in materials.js) */
+  rimMat.envMapIntensity = 1.55; applyPlatinumFinish(rimMat);
   rimMat.name = 'halo-rim'; rimMat.vertexColors = true;
   owned.materials.push(rimMat);
 

@@ -51,7 +51,7 @@
    setDetail(distance). */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox } from './materials.js';
+import { chamferBox, applyPlatinumFinish } from './materials.js';
 import { HALO, haloHeight } from './halo.js';
 
 const TAU = Math.PI * 2;
@@ -146,6 +146,9 @@ export function buildHaloDome(ctx, opts = {}) {
 
   /* ---- materials ------------------------------------------------------------------------------ */
   const platinum = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
+  /* the dome's ribs and diamond nodes are almost all vertical or raked, which is the case the
+     single 0.38 compromise served worst — see applyPlatinumFinish */
+  platinum.envMapIntensity = 1.55; applyPlatinumFinish(platinum);
   platinum.vertexColors = true; platinum.name = 'dome-platinum'; owned.materials.push(platinum);
   const darkMat = (M.graphiteMetal || M.paving || new THREE.MeshStandardMaterial({ color: 0x0b0f16 })).clone();
   darkMat.vertexColors = true; darkMat.name = 'dome-dark';

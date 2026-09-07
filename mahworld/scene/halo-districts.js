@@ -49,7 +49,7 @@
    buildHaloDistricts(ctx, { transferDecks }) -> the standard module contract. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, signTexture } from './materials.js';
+import { chamferBox, signTexture, applyPlatinumFinish } from './materials.js';
 import { HALO, haloHeight, haloNormal, onHalo, applyHaloGrid } from './halo.js';
 import { createMusicLineField } from './musicline.js';
 
@@ -150,7 +150,10 @@ export function buildHaloDistricts(ctx, opts = {}) {
   const put = (b, geo, matrix, value) => B[b].push({ geo, matrix, value });
 
   const platinum = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
-  platinum.vertexColors = true; platinum.name = 'halo-d-platinum'; owned.materials.push(platinum);
+  platinum.vertexColors = true; platinum.name = 'halo-d-platinum';
+  /* the verticals now live on the environment; the caps barely touch it (see applyPlatinumFinish) */
+  platinum.envMapIntensity = 1.55; applyPlatinumFinish(platinum);
+  owned.materials.push(platinum);
   const darkMat = (M.paving || M.graphiteMetal || new THREE.MeshStandardMaterial({ color: 0x0b0f16 })).clone();
   darkMat.vertexColors = true; darkMat.name = 'halo-d-dark';
   /* THE MIDDLE GRADE (L51). §07's plaza runs hero r0.045 / satin r0.13 across 43 m; halo.js's shell

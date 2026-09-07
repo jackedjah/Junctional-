@@ -66,7 +66,7 @@
    buildMahHaven(ctx, opts) -> the standard module contract, plus zones() and navSites(). */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, signTexture } from './materials.js';
+import { chamferBox, signTexture, applyPlatinumFinish } from './materials.js';
 
 const TAU = Math.PI * 2;
 const DEG = Math.PI / 180;
@@ -193,6 +193,9 @@ export function buildMahHaven(ctx, opts = {}) {
   /* ---- materials. R5 §17: "softer materials, more natural surface variation, less dense emission,
      platinum/diamond used as refined infrastructure rather than constant visual dominance." ---- */
   const platinum = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
+  /* softer than the halo's: R5 §17 asks this district for refined infrastructure rather than
+     constant visual dominance, so its verticals take a duller polish than MAH HALO's */
+  applyPlatinumFinish(platinum, { rEdge: 0.30, rFlat: 0.46, breakUp: 0.085 });
   platinum.vertexColors = true; platinum.name = 'haven-platinum'; owned.materials.push(platinum);
   const darkMat = (M.paving || M.graphiteMetal || new THREE.MeshStandardMaterial({ color: 0x0b0f16 })).clone();
   darkMat.vertexColors = true; darkMat.name = 'haven-dark';
@@ -231,14 +234,36 @@ export function buildMahHaven(ctx, opts = {}) {
                                WC[1] + tz * gx * Math.cos(a) + az * gz * Math.sin(a)];
     /* the surface. Still water in this world is a near-black reflective plane (LAW 1 and §07 both),
        so its VALUE comes from what it returns rather than from its colour — which is also why it
-       must not be given a lit blue: a lake painted blue at night is a swimming pool. */
+       must not be given a lit blue: a lake painted blue at night is a swimming pool.
+
+       THE FAN IS WOUND (C, p1, p0) AND THAT ORDER IS THE WHOLE SURFACE. Written the other way round
+       it disappeared, and it disappeared COMPLETELY rather than badly: this frame's basis is
+       left-handed in XZ (tx,tz = -uz,ux against ax,az = -ux,-uz), so (C, p0, p1) winds clockwise
+       seen from above and its front face points at the lakebed. MeshStandardMaterial is FrontSide,
+       so every camera in a world that stands ABOVE its water culled it — and Raycaster honours
+       material.side, so eighty-four probe rays through three cameras agreed with the renderer and
+       reported the paving behind it. Two sessions were spent on the LEVEL of a surface that was
+       never being drawn at any level.
+
+       What hid it was the next line, not this one: nor.push(0,1,0) ASSERTS an upward normal the
+       winding does not support. Had the normal been derived from the winding — the way quad() does
+       it a few lines below, which is why the bund was always visible — the water would have shaded
+       as a dark lid and been obviously wrong instead of absent. An authored normal that contradicts
+       its winding does not make a surface look wrong. It makes it not exist. */
     for (let i = 0; i < SEG; i++) {
       const a0 = (i / SEG) * TAU, a1 = ((i + 1) / SEG) * TAU;
       const p0 = EP(a0, HAVEN.WATER_RX, HAVEN.WATER_RZ);
       const p1 = EP(a1, HAVEN.WATER_RX, HAVEN.WATER_RZ);
-      pos.push(WC[0], waterY, WC[1], p0[0], waterY, p0[1], p1[0], waterY, p1[1]);
+      pos.push(WC[0], waterY, WC[1], p1[0], waterY, p1[1], p0[0], waterY, p0[1]);
       for (let k = 0; k < 3; k++) nor.push(0, 1, 0);
       col.push(0.30, 0.30, 0.30, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22);
+    }
+    /* and the winding is now ASSERTED rather than trusted, because the failure above was silent.
+       The cross product of the first triangle must agree with the normal every vertex claims. */
+    {
+      const cx = pos[3] - pos[0], cz = pos[5] - pos[2];
+      const dx = pos[6] - pos[0], dz = pos[8] - pos[2];
+      stats.waterFacesUp = (cz * dx - cx * dz) > 0;
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));

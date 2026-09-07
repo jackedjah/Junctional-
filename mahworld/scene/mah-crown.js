@@ -52,7 +52,7 @@
    and heightAt/contains so roam can stand on the plinth. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox } from './materials.js';
+import { chamferBox, applyPlatinumFinish } from './materials.js';
 import { HALO, haloHeight } from './halo.js';
 
 const TAU = Math.PI * 2;
@@ -134,6 +134,9 @@ export function buildMahCrown(ctx, opts = {}) {
      verticality, sharp but controlled specular rhythm, dark depth, clear crystalline hierarchy,
      selective luminous bands." ---------------------------------------------------------------- */
   const platinum = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
+  /* a 1790 m tower is almost entirely vertical surface — this is the material split that decides
+     whether MAH CROWN is drawn metal or a pale grey stick (see applyPlatinumFinish) */
+  platinum.envMapIntensity = 1.55; applyPlatinumFinish(platinum);
   platinum.vertexColors = true; platinum.name = 'crown-platinum'; owned.materials.push(platinum);
   const darkMat = (M.graphiteMetal || M.paving || new THREE.MeshStandardMaterial({ color: 0x0b0f16 })).clone();
   darkMat.vertexColors = true; darkMat.name = 'crown-dark';

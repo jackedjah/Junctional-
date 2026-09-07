@@ -167,6 +167,88 @@ export function chamferBox(w, h, d, c = 0.04) {
   g.computeVertexNormals();
   return g;
 }
+/* ---- LAW 1, APPLIED PER FRAGMENT INSTEAD OF PER MATERIAL --------------------------------------
+
+   The world's platinum has been one compromise number for its whole life, and the compromise is
+   visible in every render: metalness 0.38.
+
+   It is a compromise because ONE merged bucket carries both kinds of surface. A HORIZONTAL cap
+   faces the near-black zenith, and a metal takes no diffuse light, so a high-metalness cap renders
+   BLACK — that is LAW 1, and it is why `platinumLit` exists at 0.38 rather than at 1.0. But a
+   VERTICAL face sees the bright horizon band, which is the only place platinum reads as metal at
+   all, and §07 says platinum is FOR verticals and edges. At 0.38 the caps are right and the
+   verticals are wrong: a mast shaft keeps 90% of a pale Lambert term and reads as grey plastic.
+
+   The two cases want opposite numbers and they are in the same draw call. But the merged geometry
+   already carries a correct world normal, so the split costs no material, no bucket, no draw call,
+   no attribute and no texture — only the arithmetic below.
+
+     albedo 0xb6c4d6 = linear (0.478, 0.556, 0.685)
+     diffuse = albedo * (1 - metalness):  0.38 -> (0.296,0.345,0.425)   a strong pale Lambert
+                                          0.94 -> (0.029,0.033,0.041)   a 10.3x drop
+     F0      = mix(0.04, albedo, metal):  0.38 -> (0.206,0.236,0.285)
+                                          0.94 -> (0.452,0.525,0.646)   a 2.2x rise
+
+   So a shaft loses 90% of its flat term and gains 120% of its horizon catch — dark metal with a
+   bright turn, which is the language materials.js has described in prose since v5 without ever
+   implementing it.
+
+   AND THE CHAMFERS ARE THE POINT. chamferBox bevels are 45°, so abs(nY) = 0.707 on a top bevel;
+   smoothstep(0.55, 0.92, 0.707) = 0.387, giving metalness 0.71 and roughness 0.29 on every bevel in
+   the world. chamferBox's own comment calls a bevel "the cheapest way to give light a place to
+   live", and until now the light had nowhere to live once it got there.
+
+   The break-up is the other half of the complaint. This family carries NO roughness map, so every
+   merged body shares one perfectly uniform finish — which is what "no micro-variation" means in
+   channel terms. Two octaves in world space at 0.92 m and 4.30 m, ±0.075: at r 0.22 ± 0.075 the GGX
+   lobe half-width (0.644·α) swings from 0.0135 to 0.0567 rad, a 4.2x change across a metre of mast.
+   That is drawn metal rather than a painted cylinder. */
+export function applyPlatinumFinish(material, opts = {}) {
+  const u = {
+    /* x = metalness horizontal (LAW 1: stays diffuse-lit, or the cap renders black)
+       y = metalness vertical   (§07: platinum is FOR verticals; lit by the horizon band)
+       z = roughness horizontal, w = roughness vertical */
+    uPlatMR: {
+      value: new THREE.Vector4(
+        opts.mFlat != null ? opts.mFlat : 0.34, opts.mEdge != null ? opts.mEdge : 0.94,
+        opts.rFlat != null ? opts.rFlat : 0.40, opts.rEdge != null ? opts.rEdge : 0.22)
+    },
+    uPlatBreak: { value: opts.breakUp != null ? opts.breakUp : 0.075 }
+  };
+  material.userData.platUniforms = u;
+  material.onBeforeCompile = shader => {
+    Object.assign(shader.uniforms, u);
+    shader.vertexShader = 'varying vec3 vPlatW;\nvarying vec3 vPlatN;\n' + shader.vertexShader
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+      vec4 platW = vec4( transformed, 1.0 ); vec3 platN = objectNormal;
+      #ifdef USE_INSTANCING
+        platW = instanceMatrix * platW; platN = mat3( instanceMatrix ) * platN;
+      #endif
+      platW = modelMatrix * platW;
+      vPlatW = platW.xyz; vPlatN = normalize( mat3( modelMatrix ) * platN );`);
+    shader.fragmentShader =
+      'varying vec3 vPlatW;\nvarying vec3 vPlatN;\nuniform vec4 uPlatMR;\nuniform float uPlatBreak;\n'
+      + shader.fragmentShader
+        /* roughnessmap_fragment runs BEFORE metalnessmap_fragment in r185's meshphysical_frag, and
+           each chunk appears exactly once, so both writes land and neither is overwritten. */
+        .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+      float platUp = smoothstep( 0.55, 0.92, abs( vPlatN.y ) );
+      {
+        vec3 bp = vPlatW;
+        float b = sin( bp.x * 6.83 ) * sin( bp.y * 6.83 + 1.3 ) * sin( bp.z * 6.83 - 0.7 ) * 0.60
+                + sin( bp.x * 1.461 + 2.2 ) * sin( bp.z * 1.461 ) * 0.40;
+        roughnessFactor = clamp( mix( uPlatMR.w, uPlatMR.z, platUp ) + b * uPlatBreak, 0.06, 1.0 );
+      }`)
+        .replace('#include <metalnessmap_fragment>', `#include <metalnessmap_fragment>
+      metalnessFactor = mix( uPlatMR.y, uPlatMR.x, smoothstep( 0.55, 0.92, abs( vPlatN.y ) ) );`);
+  };
+  /* three caches compiled programs by material signature; two platinums with different splits are
+     different programs and must say so, or the second one silently wears the first one's shader. */
+  material.customProgramCacheKey = () => 'plat|' + u.uPlatMR.value.toArray().join(',') + '|' + u.uPlatBreak.value;
+  material.needsUpdate = true;
+  return material;
+}
+
 /* One mesh for a facade of recessed window cells: InstancedMesh of thin boxes with per-window brightness
    (instance colour × material colour). `material` should be an unlit MeshBasicMaterial (windows glow),
    or a dark MeshStandardMaterial for unlit recesses. Local origin at the grid centre, cells in the XY plane facing +Z. */
