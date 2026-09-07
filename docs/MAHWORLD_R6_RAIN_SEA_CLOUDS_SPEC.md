@@ -89,14 +89,46 @@ faceted, not because the surface is a mirror.
 | 4 | the sea ended at a line | correct geometry, and a horizon nobody would build |
 | 5 | one facet filled the frame | plates were **39 × 49 m**, seen from 2.3 m up |
 | 6 | the sea was pale violet | 0.30 metalness × envMap 1.55 returns most of the sky at grazing |
-| 7 | the lobes were **starfish** | ±0.28 of harmonic beat lobes an icosahedron; flattening a lobed ball makes a star — points, on the one system that may have none |
+| 7 | the lobes were **starfish** | see below — three wrong diagnoses before the right one |
+| 8 | the sea was flat at noon | every wave was **174 m or longer**; a swimmer sees 50 m, one *eighteenth* of the longest |
+| 9 | a speckle band at the horizon | one pixel spans hundreds of metres; a **2.6 m sine sampled once inside it** |
+| 10 | residual moiré under that | at 1500 m the facets are 58 m and an **84 m wave had 1.5 samples per wavelength** |
 
-**And two of the gates were measuring the wrong thing.** The end-radius gate took the *smallest*
-radius among end vertices, which makes a genuinely blunt disc indistinguishable from a needle. The
-visibility gate fired three rays through a volume that is 0.05% rain — a lottery, not a measurement;
-it counts shards inside a viewer's 32° cone now.
+### The starfish, which took three attempts and one measurement
 
----
+1. **Blamed the deformation.** Halved the harmonics ±0.28 → ±0.155. The stars persisted.
+2. **Blamed accumulation, and was right about the cause but wrong about the cure.** A single lobe at
+   alpha 0.11 cannot make a *white* shape, so the shape had to be overlap: 12 lobes of ~200 m radius
+   in a 250 m disc stack ~15 deep, `1 − 0.89¹⁵` = **0.83**. Solved for a 0.55 core by *spreading the
+   lobes out* — which fixed the core and made the outline **worse**.
+3. **Measured it instead.** Rasterise the lobe's projected triangles, bin the outline radius by
+   angle: from the camera that photographed the stars, one lobe is **0.77 min/max — convex.**
+
+   *(The first version of that measurement binned vertices, left bins empty, and reported 0.000 for
+   a perfect sphere. A metric that returns zero for everything is a fact about the metric.)*
+
+So the star is the **union**. Lightly-overlapping discs meet at cusps and scallop; heavily-overlapping
+discs merge. Step 2 had moved `r_lobe/R_cluster` from 0.80 to **0.51** — the wrong way for the outline
+while being the right way for the core. Both at once needs heavy overlap *and* far lower alpha: at
+r/R 0.71 with 24 lobes the centre stacks 24 deep, and `1 − (1−a)²⁴ = 0.55` wants **a = 0.033**.
+
+And the coverage gate was measuring the wrong quantity — it summed lobe areas, counting every overlap
+twice, so the design that actually looks like cloud read 144% and failed. What stands in front of the
+dome is the **union of the cluster discs**: 16 × 300 m against 11 km² = **41%**.
+
+### One law, three channels, three times
+
+*A detail drawn at a scale the framebuffer cannot resolve does not read as detail — it reads as noise.*
+That argument is written into `halo.js` in my own words, and it then had to be applied twice more:
+
+| channel | the unresolvable detail | the prefilter |
+| --- | --- | --- |
+| halo grid | constant-**pixel** lines that could not dim | real widths in metres, dimmed by true/drawn |
+| sea, fragment | 2.6 m ripple at the horizon | each octave dies as `fwidth` reaches its wavelength |
+| sea, vertex | 84 m wave on a 58 m facet | facet size from the grading constants; each wave damped at its own wavelength |
+
+The mesh's facet size is a *known function of radius* — the rings were graded by a constant this file
+owns — so the third one needs no derivative at all, only the arithmetic that built the mesh.
 
 ## LIVE STATE
 
@@ -106,7 +138,14 @@ surface, `ctx.swimVolumes`) · `tests/mahworld-r6-rain-sea.test.js`.
 **Budget.** curtain 1 draw / 5,000 instances · sea 1 draw / ~78k facets · clouds 2 draws / 512 lobes.
 The entire cloud drift is two counter-turning group rotations a frame.
 
-**Gates.** R6 at 36/37 before the veil-radius fix; R5 remains 51/51.
+**Gates.** R6 **37/37**. R5 **51/51**, no regression.
+
+| r | facet | waves the mesh can carry |
+| --- | --- | --- |
+| 2300 | 28 m | 6 of 6 |
+| 3400 | 42 m | 6 of 6 |
+| 4200 | 52 m | 4 of 6 |
+| 5200 | 64 m | 4 of 6 |
 
 **Open.**
 - The cloud masses read as soft plates rather than volumes; more lobes per cluster at lower alpha
