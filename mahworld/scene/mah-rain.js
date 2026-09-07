@@ -95,9 +95,17 @@ export const RAIN = Object.freeze({
   BAND: 560,             /* radial thickness of the curtain at the top */
   GROUND_Y: -1.4,        /* the world's water level, terrain.js BASIN.y */
 
-  COUNT: 3200,           /* one InstancedMesh, one draw call */
+  /* COUNT AND SECTION, both raised after the first curtain measured as a near-vacuum. 3200 shards
+     at 1.9 m of radius over an annulus 21.6 km round, 560 m deep and 1843 m tall is a fill fraction
+     of 4.8e-4 — three rays fired across it in the law suite hit nothing at all, which is not a probe
+     artefact, it is the curtain being 0.05% rain by volume.
+     And the section was a needle by this project's own law: 210 m long at 3.8 m across is 55:1,
+     where L58 records 23:1 as the ratio that aliases to a crawling hairline. Widened to 8.4 m at the
+     longest, which is 25:1 — and it costs NOTHING, because the triangle count is per instance and a
+     wider instance is the same instance. */
+  COUNT: 5000,           /* one InstancedMesh, one draw call */
   LEN_MIN: 52, LEN_MAX: 210,
-  RAD_MIN: 0.55, RAD_MAX: 1.9,
+  RAD_MIN: 1.40, RAD_MAX: 4.20,
   SPEED_MIN: 0.030, SPEED_MAX: 0.062,   /* fraction of the fall span per second */
   SIDES: 8, RINGS: 9,
 
@@ -124,8 +132,12 @@ export const CLOUD = Object.freeze({
      the aggregate builds its density by overlap the way cloud actually does, and its edges are soft
      because they are the union of many soft edges rather than one hard one. */
   APEX_Y: 3900,
-  MANTLE_CLUSTERS: 26,
-  PER_CLUSTER: 14,
+  /* 16 x 12, not 26 x 14. The clustered first cut still measured 122% of the dome's frontal
+     silhouette — better than the 2000% of the scatter before it, and still a lid. 192 lobes at a
+     mean radius of 109 m is 7.1 km^2 against the dome's 11 km^2: 65%, which is weather you can see
+     the dome through. */
+  MANTLE_CLUSTERS: 16,
+  PER_CLUSTER: 12,
   CLUSTER_R: 250,        /* the disc a cluster's lobes are packed into */
   CLUSTER_FLAT: 0.42,    /* and it is FLATTER than it is wide: a cloud is a raft, not a ball */
   OFF_MIN: 110, OFF_MAX: 400,   /* how far off the dome's surface, along its normal */
@@ -137,8 +149,15 @@ export const CLOUD = Object.freeze({
      ground level, less clouds be appearance." A power curve on the height fraction: at 90% of the
      way up the odds are 0.81, at 10% they are 0.016, so the ground gets wisps and the sky gets
      weather without a single hand-placed exception. Clustered for the same reason as the mantle. */
-  VEIL_CLUSTERS: 22,
-  VEIL_PER: 10,
+  /* 40 x 8, STRATIFIED, with a floor. Two requirements pull against each other here: the clouds
+     must come DOWN to ground level, and there must be FEWER of them as they do. With 22 clusters
+     drawn from a 2.1 power the lowest one landed at 370 m — the curve is right and the tail is
+     simply undersampled, which is a sampling failure wearing a distribution's clothes.
+     40 strata put the lowest draw an order of magnitude lower, and the bottom 3 of those 40 are
+     placed explicitly in the ground band. Three of forty is 7.5%: still "less", and now it exists. */
+  VEIL_CLUSTERS: 40,
+  VEIL_PER: 8,
+  GROUND_CLUSTERS: 3, GROUND_LO: 58, GROUND_HI: 250,
   VEIL_R_IN: 2500, VEIL_R_OUT: 5300,
   VEIL_TOP: 2100, VEIL_POW: 2.1,
 
@@ -154,14 +173,18 @@ export const CLOUD = Object.freeze({
 
 export const SEA = Object.freeze({
   LEVEL: -1.4,
-  R_IN: 2520,            /* inside terrain's broken land edge at 2600, so the coast overlaps */
+  /* INSIDE terrain's broken land edge at 2600 AT EVERY BEARING, not on average. The first cut used
+     2520 with harmonics of 165 and 78, so the shore ran out to 2763 — 163 m PAST the land — and at
+     those bearings the coast was a gap of nothing rather than a coast. The amplitudes are now sized
+     so R_IN + A1 + A2 = 2572, which clears 2600 everywhere. */
+  R_IN: 2380,
   R_OUT: 5600,
   DEPTH_MAX: 46,
   SEG: 320, RINGS: 54,
   /* the inner shore is NOT a circle. Two slow harmonics, so the coast has bays and headlands at the
      scale a coast has them, and the eye never finds the centre by following the shoreline. */
-  SHORE_A1: 165, SHORE_N1: 3,
-  SHORE_A2: 78, SHORE_N2: 7,
+  SHORE_A1: 130, SHORE_N1: 3,
+  SHORE_A2: 62, SHORE_N2: 7,
   /* the swell, in metres and in radians per metre. Four waves, deliberately non-harmonic periods so
      the pattern never visibly repeats: 885, 1224, 331 and 174 m. */
   WAVE: Object.freeze([
@@ -224,10 +247,13 @@ function shardGeometry(sides, rings) {
       tri(a, b, c); tri(a, c, d);
     }
   }
-  /* the two caps. They are FANS to a centre vertex that sits at the blunt radius, not to a point —
-     which is the entire difference between a shard and a needle. */
+  /* THE TWO CAPS, AND THEY ARE FLAT DISCS. The first cut fanned them to a centre vertex lifted
+     0.55 of the end radius beyond the last ring, and called that blunt — but a fan centre sitting ON
+     THE AXIS is a point however shallow the cone around it, and the law suite measured exactly that:
+     minimum end radius 0.000. A flat disc terminates the shard with a real face of radius 0.17
+     instead, which is what a broken piece of glass actually ends in. */
   for (const [i, dir] of [[0, -1], [rings, 1]]) {
-    const centre = [0, ring[i].y + dir * ring[i].r * 0.55, 0];
+    const centre = [0, ring[i].y, 0];
     for (let s = 0; s < sides; s++) {
       const a = V(i, s), b = V(i, s + 1);
       if (dir < 0) tri(centre, b, a); else tri(centre, a, b);
@@ -399,6 +425,13 @@ export function buildMahRain(ctx, opts = {}) {
         const py = cy + dt * CLOUD.CLUSTER_FLAT;
         let fx = px + Math.cos(a) * (dt * 0.35), fz = pz + Math.sin(a) * (dt * 0.35);
         let fr = Math.hypot(fx, fz);
+        /* THE CLUSTER CENTRE WAS WALKED OUT; ITS MEMBERS WERE ONLY COUNTED. 20 of 584 lobes ended up
+           under the shell because the scatter that gives a cloud its shape can carry a lobe back
+           inside after the centre has been cleared. Counting a violation is not enforcing a rule. */
+        let lobeGuard = 0;
+        while (insideDome(fr, py) && lobeGuard++ < 30) {
+          fx += Math.cos(a) * 45; fz += Math.sin(a) * 45; fr = Math.hypot(fx, fz);
+        }
         if (insideDome(fr, py)) cloudViolations++;
         const sc = CLOUD.LOBE_MIN + (CLOUD.LOBE_MAX - CLOUD.LOBE_MIN) * Math.pow(g3, 1.4);
         const flat = CLOUD.FLAT_MIN + (CLOUD.FLAT_MAX - CLOUD.FLAT_MIN) * frac(c * 29 + k * 11);
@@ -424,8 +457,16 @@ export function buildMahRain(ctx, opts = {}) {
     let vi = 0;
     for (let c = 0; c < CLOUD.VEIL_CLUSTERS; c++) {
       const a = gold(c * 3 + 1) * TAU;
-      const u = frac(c * 5 + 2);
-      const cy = Math.max(46, CLOUD.VEIL_TOP * Math.pow(u, 1 / CLOUD.VEIL_POW));
+      /* STRATIFIED, not sampled. One stratum per cluster with a deterministic jitter inside it, so
+         the whole 0..1 range is covered and the thin tail of the power curve is actually populated
+         instead of being left to chance with forty draws. */
+      const u = (c + 0.15 + 0.7 * frac(c * 5 + 2)) / CLOUD.VEIL_CLUSTERS;
+      /* and the lowest few are placed IN the ground band by name. The power curve is the rule for
+         how density falls; this is the direction's explicit floor — clouds that come all the way
+         down — and three of forty keeps it rare. */
+      const cy = (c < CLOUD.GROUND_CLUSTERS)
+        ? CLOUD.GROUND_LO + (CLOUD.GROUND_HI - CLOUD.GROUND_LO) * gold(c * 29 + 4)
+        : Math.max(46, CLOUD.VEIL_TOP * Math.pow(u, 1 / CLOUD.VEIL_POW));
       const cr = CLOUD.VEIL_R_IN + (CLOUD.VEIL_R_OUT - CLOUD.VEIL_R_IN) * gold(c * 7 + 3);
       const cx = Math.cos(a) * cr, cz = Math.sin(a) * cr;
       const tx = -Math.sin(a), tz = Math.cos(a);

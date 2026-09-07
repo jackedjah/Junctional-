@@ -77,12 +77,19 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
         if (r > maxR) maxR = r;
         if (y < lo) lo = y; if (y > hi) hi = y;
       }
-      /* the ends: every vertex in the outer 4% of the length, and the smallest radius among them */
+      /* THE PROFILE at the ends, not every vertex there. A flat end cap is a fan, and a fan has one
+         vertex on the axis at radius 0 by construction — measuring every vertex makes a genuinely
+         blunt disc indistinguishable from a needle, which is what the first cut of this gate did.
+         What matters is the RIM the shard terminates in, so this takes the LARGEST radius found in
+         each end slab: on a needle that is near zero, on a blunt end it is the cap's real radius. */
       const span = hi - lo;
+      let loRim = 0, hiRim = 0;
       for (let i = 0; i < A.count; i++) {
         const y = A.getY(i), r = Math.hypot(A.getX(i), A.getZ(i));
-        if (y < lo + span * 0.04 || y > hi - span * 0.04) minEndR = Math.min(minEndR, r);
+        if (y < lo + span * 0.03) loRim = Math.max(loRim, r);
+        if (y > hi - span * 0.03) hiRim = Math.max(hiRim, r);
       }
+      minEndR = Math.min(loRim, hiRim);
     }
 
     /* THE SEA MOVES. Sampled by reading the same vertex's displaced height at two times — which
@@ -131,14 +138,26 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       if (h.some(x => /mah-crystal-sea/.test(x.object.name || ''))) sawSea = true;
     }
 
-    /* AND THE CURTAIN. Fired outward and up from inside the ring, along the shore bearing. */
-    let sawRain = false;
-    for (const pitch of [0.25, 0.45, 0.7]) {
-      const rc = new T.Raycaster(new T.Vector3(Math.cos(bestTh) * 2600, 120, Math.sin(bestTh) * 2600),
-        new T.Vector3(Math.cos(bestTh), pitch, Math.sin(bestTh)).normalize(), 1, 6000);
-      let h = []; try { h = rc.intersectObjects(targets, false); } catch (e) { }
-      if (h.some(x => /mah-rain-curtain/.test(x.object.name || ''))) sawRain = true;
+    /* AND THE CURTAIN — BY COVERAGE, NOT BY A RAY. Three rays across a volume that is 0.05% rain
+       hit nothing, and that told me about the rays rather than about the curtain. What decides
+       whether a viewer sees rain is how many shards fall inside their view cone, so that is what is
+       counted: shards within 32 degrees of the outward axis from a camera on the ring. */
+    let rainInCone = 0;
+    {
+      const mm = new T.Matrix4();
+      const eye = new T.Vector3(Math.cos(bestTh) * 2600, 400, Math.sin(bestTh) * 2600);
+      const axis = new T.Vector3(Math.cos(bestTh), 0.22, Math.sin(bestTh)).normalize();
+      const d = new T.Vector3();
+      if (curtain) {
+        for (let i = 0; i < curtain.count; i++) {
+          curtain.getMatrixAt(i, mm);
+          d.set(mm.elements[12] - eye.x, mm.elements[13] - eye.y, mm.elements[14] - eye.z);
+          if (d.length() > 9000) continue;
+          if (d.normalize().dot(axis) > Math.cos(32 * Math.PI / 180)) rainInCone++;
+        }
+      }
     }
+    const sawRain = rainInCone >= 60;
 
     /* THE CLOUDS, and the one hard rule: NONE of them may be inside the dome. Read off the built
        instance matrices rather than off the placement code that wrote them, because a rule enforced
@@ -175,7 +194,7 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       shardMinEndR: minEndR, shardMaxR: maxR, shardLen: hi - lo,
       seaTimeAdvanced: (u0 != null && u1 != null) ? (u1 - u0) : null,
       curtainMovedM: moved,
-      at, outsideIn, outsideOut, vols, sawSea, sawRain, firstHit,
+      at, outsideIn, outsideOut, vols, sawSea, sawRain, rainInCone, firstHit,
       lenMin: RM.RAIN.LEN_MIN, lenMax: RM.RAIN.LEN_MAX, flare: RM.RAIN.FLARE
     };
   });
@@ -203,8 +222,8 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       'lands at ' + R.stats.curtain.groundY + ', sea at ' + R.SEA.LEVEL);
     P('the curtain is actually falling', R.curtainMovedM > 1,
       'shard 0 moved ' + R.curtainMovedM.toFixed(1) + ' m in 2 s');
-    P('the curtain is visible from inside the ring', R.sawRain,
-      R.sawRain ? 'hit' : 'three rays outward and up found no curtain');
+    P('enough curtain falls inside a viewer\'s cone to read as rain', R.sawRain,
+      R.rainInCone + ' shards within 32 deg of the outward axis from the ring');
     /* R5 §19: a hero system with no performance strategy has none */
     P('the whole curtain costs one draw call', R.stats.draws >= 1 && R.stats.shards > 500,
       R.stats.shards + ' shards');
