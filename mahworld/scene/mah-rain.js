@@ -483,7 +483,15 @@ export function buildMahRain(ctx, opts = {}) {
            its bottom third, and with three samples that is not unlikely — it is what happened. */
         ? CLOUD.GROUND_LO + (CLOUD.GROUND_HI - CLOUD.GROUND_LO) * ((c + 0.5) / CLOUD.GROUND_CLUSTERS)
         : Math.max(46, CLOUD.VEIL_TOP * Math.pow(u, 1 / CLOUD.VEIL_POW));
-      const cr = CLOUD.VEIL_R_IN + (CLOUD.VEIL_R_OUT - CLOUD.VEIL_R_IN) * gold(c * 7 + 3);
+      /* THE VEIL'S INNER RADIUS DEPENDS ON ITS HEIGHT, and it has to. VEIL_R_IN is 2500 and the
+         dome's footprint reaches 3434, so any veil cluster drawn inside that radius ABOVE the
+         spring height is in the dome's interior volume by definition — which is where the last 27
+         violations came from, and no amount of walking individual lobes out fixes a rule that the
+         cluster centres break by construction.
+         Above the spring you must be outside the footprint; below it the space is open sky under
+         the halo, and cloud may drift as far in as it likes. */
+      const rMin = (cy > TOP_Y - 60) ? (TOP_R + 70) : CLOUD.VEIL_R_IN;
+      const cr = rMin + (CLOUD.VEIL_R_OUT - rMin) * gold(c * 7 + 3);
       const cx = Math.cos(a) * cr, cz = Math.sin(a) * cr;
       const tx = -Math.sin(a), tz = Math.cos(a);
       /* the low ones are SMALLER as well as rarer. Fewer of the same clouds lower down is a
@@ -497,10 +505,16 @@ export function buildMahRain(ctx, opts = {}) {
         const px = cx + tx * Math.cos(ang) * rad + Math.cos(a) * Math.sin(ang) * rad * 0.55;
         const pz = cz + tz * Math.cos(ang) * rad + Math.sin(a) * Math.sin(ang) * rad * 0.55;
         const py = Math.max(30, cy + (g3 - 0.5) * CLOUD.CLUSTER_R * CLOUD.CLUSTER_FLAT);
-        if (insideDome(Math.hypot(px, pz), py)) cloudViolations++;
+        /* and the same walk-out the mantle uses, as a backstop: the scatter that gives a cluster
+           its shape can still carry one lobe across the line its centre respects. */
+        let vx = px, vz = pz, vr = Math.hypot(px, pz), vg = 0;
+        while (insideDome(vr, py) && vg++ < 30) {
+          vx += Math.cos(a) * 45; vz += Math.sin(a) * 45; vr = Math.hypot(vx, vz);
+        }
+        if (insideDome(vr, py)) cloudViolations++;
         const sc = (CLOUD.LOBE_MIN + (CLOUD.LOBE_MAX - CLOUD.LOBE_MIN) * Math.pow(frac(c * 11 + k * 7), 1.6)) * shrink;
         const flat = CLOUD.FLAT_MIN + (CLOUD.FLAT_MAX - CLOUD.FLAT_MIN) * gold(c * 41 + k * 3);
-        _cp.set(px, py, pz);
+        _cp.set(vx, py, vz);
         _ce.set(gold(c * 17 + k * 9) * 0.4, gold(c * 19 + k * 13) * TAU, gold(c * 23 + k) * 0.4);
         _cq.setFromEuler(_ce);
         _cs.set(sc, sc * flat, sc * (0.7 + 0.55 * frac(c * 29 + k * 5)));
