@@ -214,11 +214,26 @@ export const SEA = Object.freeze({
   SHORE_A2: 62, SHORE_N2: 7,
   /* the swell, in metres and in radians per metre. Four waves, deliberately non-harmonic periods so
      the pattern never visibly repeats: 885, 1224, 331 and 174 m. */
+  /* SIX WAVES, AND THE LAST TWO ARE THE ONES A SWIMMER SEES.
+     The first cut had four, at wavelengths of 885, 698, 331 and 174 m. Every one of those is
+     correct for a sea three kilometres across and useless at the only eye that matters: from 2.3 m
+     above the water you can see about fifty metres of surface, which is one EIGHTEENTH of the
+     longest wave. The swim frame came back as a single flat sheet of navy and the arithmetic says
+     it had to — there was no relief at that scale to see.
+     But GEOMETRY CANNOT CARRY THEM. The mesh is about 20 m at the shore, so Nyquist puts the
+     shortest representable wave at 40 m and anything under roughly 80 m aliases visibly. A 17 m
+     wave on a 20 m mesh is not chop, it is noise — which is the same class of error as the halo
+     grid drawing lines it could not resolve.
+     So the geometric table stops at 88 m, and everything finer moves into the fragment ripple,
+     where a normal perturbation costs no tessellation at all and reads strongly on a near-black
+     surface at grazing incidence. Geometry for the swell, gradient for the chop. */
   WAVE: Object.freeze([
-    { ax: 0.00710, az: 0.00430, amp: 3.4, spd: 0.55 },
-    { ax: -0.00520, az: 0.00900, amp: 2.5, spd: 0.41 },
-    { ax: 0.01800, az: -0.01100, amp: 1.15, spd: 0.83 },
-    { ax: 0.03300, az: 0.02700, amp: 0.46, spd: 1.20 }
+    { ax: 0.00710, az: 0.00430, amp: 3.4, spd: 0.55 },    /* 885 m */
+    { ax: -0.00520, az: 0.00900, amp: 2.5, spd: 0.41 },   /* 698 m */
+    { ax: 0.01800, az: -0.01100, amp: 1.15, spd: 0.83 },  /* 331 m */
+    { ax: 0.03300, az: 0.02700, amp: 0.46, spd: 1.20 },   /* 174 m */
+    { ax: 0.05900, az: 0.04600, amp: 0.75, spd: 1.95 },   /*  84 m — the shortest the mesh holds */
+    { ax: -0.04100, az: 0.05300, amp: 0.42, spd: 2.40 }   /*  94 m, crossing it */
   ]),
   FACET: 0.86            /* how much of the normal comes from the true triangle rather than the mesh */
 });
@@ -733,6 +748,8 @@ export function buildMahRain(ctx, opts = {}) {
       uSeaW1: { value: new THREE.Vector4(W[1].ax, W[1].az, W[1].amp, W[1].spd) },
       uSeaW2: { value: new THREE.Vector4(W[2].ax, W[2].az, W[2].amp, W[2].spd) },
       uSeaW3: { value: new THREE.Vector4(W[3].ax, W[3].az, W[3].amp, W[3].spd) },
+      uSeaW4: { value: new THREE.Vector4(W[4].ax, W[4].az, W[4].amp, W[4].spd) },
+      uSeaW5: { value: new THREE.Vector4(W[5].ax, W[5].az, W[5].amp, W[5].spd) },
       /* x = inner shore mean, y = outer radius: the envelope that flattens the swell where it meets
          the land, because a 7 m swell running into a coastline cuts through it */
       uSeaEnv: { value: new THREE.Vector2(SEA.R_IN, SEA.R_OUT) },
@@ -743,7 +760,9 @@ export function buildMahRain(ctx, opts = {}) {
       uSeaGlow: { value: new THREE.Color(0x2c4a63) },
       uSeaGlowI: { value: 0.06 },
       /* the micro-ripple: amplitude in radians of normal tilt, and its two wavelengths in metres */
-      uSeaRipple: { value: new THREE.Vector3(0.085, 3.7, 13.1) }
+      /* THE CHOP LIVES HERE NOW. Amplitude in radians of normal tilt, then three wavelengths in
+         metres — 2.6, 8.3 and 21 — which is the whole band the mesh cannot represent. */
+      uSeaRipple: { value: new THREE.Vector4(0.160, 2.6, 8.3, 21.0) }
     };
     seaMat.userData.seaUniforms = seaU;
     seaMat.onBeforeCompile = sh => {
@@ -751,6 +770,7 @@ export function buildMahRain(ctx, opts = {}) {
       sh.vertexShader = [
         'uniform float uSeaT;',
         'uniform vec4 uSeaW0; uniform vec4 uSeaW1; uniform vec4 uSeaW2; uniform vec4 uSeaW3;',
+        'uniform vec4 uSeaW4; uniform vec4 uSeaW5;',
         'uniform vec2 uSeaEnv; uniform vec4 uSeaShore;',
         'varying float vSeaH;',
         'varying vec3 vSeaW;',
@@ -788,6 +808,10 @@ export function buildMahRain(ctx, opts = {}) {
         '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
         '  w = uSeaW3; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
         '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
+        '  w = uSeaW4; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
+        '  w = uSeaW5; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
         '  transformed.y += h * env;',
         '  transformed.xz += lat * env;',
         '  vSeaH = h * env;',
@@ -796,7 +820,7 @@ export function buildMahRain(ctx, opts = {}) {
       ].join('\n'));
       sh.fragmentShader = [
         'uniform float uSeaFacet; uniform vec3 uSeaGlow; uniform float uSeaGlowI;',
-        'uniform vec3 uSeaRipple; uniform float uSeaT;',
+        'uniform vec4 uSeaRipple; uniform float uSeaT;',
         'uniform vec2 uSeaEnv;',
         'varying float vSeaH;',
         'varying vec3 vSeaW;',
@@ -828,11 +852,15 @@ export function buildMahRain(ctx, opts = {}) {
            swell, so it reads as the texture ON the crystal rather than as more swell. */
         '  {',
         '    vec2 rp = vSeaW.xz;',
-        '    float k1 = 6.2831853 / uSeaRipple.y, k2 = 6.2831853 / uSeaRipple.z;',
-        '    float dx = sin( rp.x * k1 + uSeaT * 1.7 ) * cos( rp.y * k1 * 0.83 - uSeaT * 1.1 )',
-        '             + 0.55 * sin( rp.x * k2 - uSeaT * 0.7 );',
-        '    float dz = cos( rp.x * k1 * 0.91 - uSeaT * 1.3 ) * sin( rp.y * k1 + uSeaT * 1.9 )',
-        '             + 0.55 * sin( rp.y * k2 + uSeaT * 0.6 );',
+        '    float k1 = 6.2831853 / uSeaRipple.y;',
+        '    float k2 = 6.2831853 / uSeaRipple.z;',
+        '    float k3 = 6.2831853 / uSeaRipple.w;',
+        '    float dx = 0.42 * sin( rp.x * k1 + uSeaT * 2.9 ) * cos( rp.y * k1 * 0.83 - uSeaT * 2.1 )',
+        '             + 0.70 * sin( rp.x * k2 - uSeaT * 1.3 ) * cos( rp.y * k2 * 1.17 + uSeaT * 0.9 )',
+        '             + 1.00 * sin( rp.x * k3 + uSeaT * 0.8 );',
+        '    float dz = 0.42 * cos( rp.x * k1 * 0.91 - uSeaT * 2.3 ) * sin( rp.y * k1 + uSeaT * 3.1 )',
+        '             + 0.70 * cos( rp.x * k2 * 1.09 + uSeaT * 1.1 ) * sin( rp.y * k2 - uSeaT * 1.5 )',
+        '             + 1.00 * sin( rp.y * k3 - uSeaT * 0.7 );',
         '    vec3 rt = normalize( cross( vec3( 0.0, 0.0, 1.0 ), normal ) );',
         '    vec3 rb = cross( normal, rt );',
         '    normal = normalize( normal + ( rt * dx + rb * dz ) * uSeaRipple.x );',
