@@ -136,9 +136,19 @@ export const CLOUD = Object.freeze({
      silhouette — better than the 2000% of the scatter before it, and still a lid. 192 lobes at a
      mean radius of 109 m is 7.1 km^2 against the dome's 11 km^2: 65%, which is weather you can see
      the dome through. */
+  /* CLUSTER GEOMETRY, SOLVED FROM THE ALPHA RATHER THAN CHOSEN.
+     Halving the lobe deformation did not stop the clusters photographing as starbursts, because the
+     deformation was never the cause. A single lobe at alpha 0.11 cannot produce a WHITE shape — so
+     every white shape in the frame was accumulation, and that is arithmetic, not opinion.
+     With 12 lobes of ~200 m radius packed into a 250 m disc, every lobe overlaps every other at the
+     core: about 15 layers, 1 - 0.89^15 = 0.83 alpha. The core saturated and the "arms" were simply
+     where fewer lobes happened to stack. A cloud with a blown-out core and ragged arms is a star.
+     Solving for a core near 0.55 instead: 1 - (1-a)^n = 0.55 at a = 0.075 wants n = 7.6 layers, and
+     n at the centre is about N * (r_lobe / R_cluster)^2 * 2. With N = 20 and R = 340 that gives a
+     mean lobe radius near 170 — more lobes, smaller, spread wider, at two thirds the alpha. */
   MANTLE_CLUSTERS: 16,
-  PER_CLUSTER: 12,
-  CLUSTER_R: 250,        /* the disc a cluster's lobes are packed into */
+  PER_CLUSTER: 20,
+  CLUSTER_R: 340,        /* the disc a cluster's lobes are packed into */
   CLUSTER_FLAT: 0.42,    /* and it is FLATTER than it is wide: a cloud is a raft, not a ball */
   OFF_MIN: 110, OFF_MAX: 400,   /* how far off the dome's surface, along its normal */
   /* the mantle stops at 72% of the way up the meridian and its density falls as the 2.4 power of
@@ -156,7 +166,7 @@ export const CLOUD = Object.freeze({
      40 strata put the lowest draw an order of magnitude lower, and the bottom 3 of those 40 are
      placed explicitly in the ground band. Three of forty is 7.5%: still "less", and now it exists. */
   VEIL_CLUSTERS: 40,
-  VEIL_PER: 8,
+  VEIL_PER: 14,
   /* THE GROUND BAND SPANS 58 TO 480, NOT 58 TO 250, AND ITS CLUSTERS ARE SPREAD ACROSS IT.
      Bunched into the bottom 200 m they broke the very rule they exist to complete: the histogram
      came back 0-200m:24, 200-500:0, 500-900:32 — more cloud at the ground than just above it, which
@@ -170,8 +180,11 @@ export const CLOUD = Object.freeze({
 
   /* SIZE. World clouds beside a 3434 m dome, so hundreds of metres across and FLATTENED — a cloud
      as tall as it is wide is a boulder. */
-  LOBE_MIN: 105, LOBE_MAX: 330,
+  LOBE_MIN: 80, LOBE_MAX: 300,
   FLAT_MIN: 0.20, FLAT_MAX: 0.40,
+  /* TILT, and it is small. At +/-0.45 rad the flattened lobes met at crossing angles and their
+     overlaps read as blades laid over each other; a cloud's parts lie broadly the same way up. */
+  TILT: 0.22,
   /* the two layers counter-rotate, which is the whole parallax budget: two numbers, no per-frame
      CPU, and the sky stops reading as a fixed lattice the moment anything moves */
   SPIN_MANTLE: 0.0000160, SPIN_VEIL: -0.0000105,
@@ -374,7 +387,7 @@ export function buildMahRain(ctx, opts = {}) {
       /* LOW, on purpose. Density comes from OVERLAP inside a cluster, not from opacity — which is
          how cloud actually builds, and the reason the first cut read as rubble: a thousand separate
          blobs at alpha 0.30 are a thousand visible silhouettes. Fourteen at 0.11 are one cloud. */
-      uCloudA: { value: new THREE.Vector2(0.11, 0.30) },
+      uCloudA: { value: new THREE.Vector2(0.075, 0.26) },
       uCloudGlow: { value: new THREE.Color(0x9fc4e8) },
       uCloudGlowI: { value: 0.08 }
     };
@@ -450,9 +463,10 @@ export function buildMahRain(ctx, opts = {}) {
         const sc = CLOUD.LOBE_MIN + (CLOUD.LOBE_MAX - CLOUD.LOBE_MIN) * Math.pow(g3, 1.4);
         const flat = CLOUD.FLAT_MIN + (CLOUD.FLAT_MAX - CLOUD.FLAT_MIN) * frac(c * 29 + k * 11);
         _cp.set(fx, py, fz);
-        _ce.set(gold(c * 19 + k) * 0.45, gold(c * 23 + k * 5) * TAU, gold(c * 29 + k * 7) * 0.45);
+        _ce.set((gold(c * 19 + k) - 0.5) * CLOUD.TILT, gold(c * 23 + k * 5) * TAU,
+          (gold(c * 29 + k * 7) - 0.5) * CLOUD.TILT);
         _cq.setFromEuler(_ce);
-        _cs.set(sc, sc * flat, sc * (0.74 + 0.46 * frac(c * 31 + k * 3)));
+        _cs.set(sc, sc * flat, sc * (0.86 + 0.28 * frac(c * 31 + k * 3)));
         mantle.setMatrixAt(mi++, _cm.compose(_cp, _cq, _cs));
       }
     }
@@ -515,9 +529,10 @@ export function buildMahRain(ctx, opts = {}) {
         const sc = (CLOUD.LOBE_MIN + (CLOUD.LOBE_MAX - CLOUD.LOBE_MIN) * Math.pow(frac(c * 11 + k * 7), 1.6)) * shrink;
         const flat = CLOUD.FLAT_MIN + (CLOUD.FLAT_MAX - CLOUD.FLAT_MIN) * gold(c * 41 + k * 3);
         _cp.set(vx, py, vz);
-        _ce.set(gold(c * 17 + k * 9) * 0.4, gold(c * 19 + k * 13) * TAU, gold(c * 23 + k) * 0.4);
+        _ce.set((gold(c * 17 + k * 9) - 0.5) * CLOUD.TILT, gold(c * 19 + k * 13) * TAU,
+          (gold(c * 23 + k) - 0.5) * CLOUD.TILT);
         _cq.setFromEuler(_ce);
-        _cs.set(sc, sc * flat, sc * (0.7 + 0.55 * frac(c * 29 + k * 5)));
+        _cs.set(sc, sc * flat, sc * (0.86 + 0.28 * frac(c * 29 + k * 5)));
         veil.setMatrixAt(vi++, _cm.compose(_cp, _cq, _cs));
       }
     }
@@ -908,7 +923,7 @@ export function buildMahRain(ctx, opts = {}) {
          disappears unless it closes up. */
       const c = cloudUniforms;
       if (c) {
-        c.uCloudA.value.set(0.09 + 0.07 * (1 - day), 0.26 + 0.12 * day);
+        c.uCloudA.value.set(0.062 + 0.048 * (1 - day), 0.22 + 0.10 * day);
         c.uCloudGlowI.value = 0.04 + 0.13 * (1 - day);
       }
     },
