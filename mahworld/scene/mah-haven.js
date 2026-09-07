@@ -81,6 +81,12 @@ export const HAVEN = Object.freeze({
      exactly one place in MAHWORLD that is clear of both: world bearing 340, r 400, relief 0.0 m,
      rock 0 of 25, built 0 of 25. See the header for the three measured failures that preceded it. */
   SITE_DEG: 340,
+  /* SITE_R IS THE SWEEP'S SAMPLE CENTRE, NOT THE WATERLINE. The two are 30 m apart and that is
+     legitimate — the sweep tested a 5 x 5 grid reaching 140 m either side of r 400, and SHORE_R 430
+     sits well inside the footprint it proved clear — but they are still two numbers naming one
+     place, which is how L42 failures start. The rule: SHORE_R is where the district is BUILT and is
+     the only one geometry may read; SITE_R is the RECORD of what was measured, and the law suite
+     asserts the waterline stays inside that measurement rather than on top of it. */
   SITE_R: 400,
   /* THE WATER THIS DISTRICT CUTS. An ellipse laid with its long axis TANGENTIAL, so it reads as a
      lake across your view rather than a canal down it, sitting outboard of the built ground. Its

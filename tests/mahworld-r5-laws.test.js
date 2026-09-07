@@ -238,8 +238,15 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
        inside MAH CITY; the fourth was measured. This gate is that measurement, kept: the built shore
        must be SITE_R from the origin on SITE_DEG, and the water's near edge must land on it. */
     const D = Math.PI / 180;
-    const wantShore = [H.SITE_R * Math.cos(H.SITE_DEG * D), -H.SITE_R * Math.sin(H.SITE_DEG * D)];
+    /* ON SITE_DEG AT SHORE_R, not at SITE_R. Those are two numbers for one place and the first cut
+       of this gate asserted the wrong one, failing by exactly their 30 m difference: SITE_R 400 is
+       where the world sweep SAMPLED, and SHORE_R 430 is where the waterline was then drawn. The
+       sweep tested a 5 x 5 grid reaching 140 m either side of its centre, so the second gate below
+       is the one that actually preserves the measurement — the waterline has to stay inside the
+       footprint that was proved clear, not sit on the sample point. */
+    const wantShore = [H.SHORE_R * Math.cos(H.SITE_DEG * D), -H.SHORE_R * Math.sin(H.SITE_DEG * D)];
     const shoreDrift = Math.hypot(s.site.shore[0] - wantShore[0], s.site.shore[1] - wantShore[1]);
+    const sweptBy = Math.abs(H.SHORE_R - H.SITE_R);
     const nearEdgeDrift = Math.abs(s.water.nearR - H.SHORE_R);
 
     /* CAN THE WATER ACTUALLY BE SEEN. This is the gate the district failed for three rounds while
@@ -274,16 +281,18 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       const A = q.attributes.position;
       for (let i = 0; i < A.count; i++) { const y = A.getY(i); if (y < minY) minY = y; if (y > maxY) maxY = y; }
     });
-    return { stats: s, HAVEN: H, shoreDrift, nearEdgeDrift, sawWater, firstHit, banned, minY, maxY,
+    return { stats: s, HAVEN: H, shoreDrift, sweptBy, nearEdgeDrift, sawWater, firstHit, banned, minY, maxY,
       zones: s.zones.map(z => z.id), waterY: s.waterY, facesUp: !!s.waterFacesUp };
   });
   console.log('\nR5 §10-§15 — MAH HAVEN');
   if (!haven) P('MAH HAVEN exists', false, 'module absent or failed to build');
   else {
     P('MAH HAVEN exists', true);
-    P('it stands on the one site the world sweep found clear',
+    P('its waterline is built where the module says it is',
       haven.shoreDrift < 1.5, haven.shoreDrift.toFixed(2) + ' m from bearing '
-      + haven.HAVEN.SITE_DEG + ' r ' + haven.HAVEN.SITE_R);
+      + haven.HAVEN.SITE_DEG + ' r ' + haven.HAVEN.SHORE_R);
+    P('and that waterline is inside the footprint the world sweep proved clear',
+      haven.sweptBy <= 140, haven.sweptBy + ' m from the swept centre at r ' + haven.HAVEN.SITE_R);
     P('the reservoir\'s near edge lands on the waterline',
       haven.nearEdgeDrift < 0.01, 'near r ' + haven.stats.water.nearR + ' vs shore ' + haven.HAVEN.SHORE_R);
     /* THE RESERVOIR IS ABOVE GRADE ON PURPOSE. The site was chosen for flat ground at y 0, so a
