@@ -392,14 +392,16 @@ export async function createMahplaza(canvas, options = {}) {
     }
     catch (e) { console.info('MAHPLAZA: halo life module failed —', e && e.message); haloLife = null; }
   }
-  /* R5 — MAH HAVEN. Built after LAKE CITY because it stands on THAT lake: the polygon, the water
-     level and the centre all come from lakecity.js's own exports rather than a second table, so the
-     shoreline cannot drift from the water it edges (L42). If lakecity did not load, the module gets
-     no lake and falls back to a conservative inland radius rather than guessing a shoreline. */
+  /* R5 — MAH HAVEN. It stands on terrain.js's BASIN, not on Lake City's lake: a 60-bearing ground
+     sweep of that lake's whole perimeter returned rock at every single one, with 95 to 435 m of
+     relief, because it sits at r 700 ringed by the near range. The basin's ellipse, its half-extents
+     and its water level all come from terrain.js's own export rather than a second table, so the
+     shoreline cannot drift from the water it edges (L42). */
   if (HAVENM && HAVENM.buildMahHaven) {
     try {
       mahHaven = HAVENM.buildMahHaven(ctx, {
-        lake: (LAKE && LAKE.lakeR) ? { centre: LAKE.lakeCentre(), lakeR: LAKE.lakeR, waterY: LAKE.WATER_Y } : null
+        water: (TERRAIN && TERRAIN.BASIN) ? { centre: TERRAIN.basinCentre(),
+          rx: TERRAIN.BASIN.rx, rz: TERRAIN.BASIN.rz, y: TERRAIN.BASIN.y } : null
       });
       scene.add(mahHaven.group);
     } catch (e) { console.info('MAHPLAZA: mah haven module failed —', e && e.message); mahHaven = null; }

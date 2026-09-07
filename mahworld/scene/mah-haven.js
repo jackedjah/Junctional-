@@ -23,17 +23,33 @@
    moment. What is NOT taken: the signage, the business identity, the real architecture, the people,
    the exact planting. Those are named in the manifest and they stay out.
 
-   ---- WHERE, AND WHY IT IS NOT A NEW LAKE -----------------------------------------------------
-   R2 §5 already cut a lake for LAKE CITY: an irregular 14-sided polygon at bearing 62, r 700, with
-   its water at y -1.4, which is terrain.js's BASIN.y exactly. MAH HAVEN stands on THAT water. A
-   second body of water for a second waterfront district would be two systems where the world has
-   one, and the shoreline would drift from it the first time either was edited — so lakecity.js now
-   exports its polygon and this file reads it. One lake, one water level, one truth (L42).
+   ---- WHERE, AND HOW THE SITE WAS FOUND -------------------------------------------------------
+   Two placements failed before this one and both failed the same way: a district built inside a
+   mountain. The first sat at local bearing 232 on LAKE CITY's lake and photographed a black lake;
+   the second moved to 118 for the light and a raycast down the reveal axis found `terrain-range-near`
+   FOUR METRES in front of the camera. terrain.js's own header records this exact failure — "The
+   first placement attempt put its camera inside a mountain flank, which is how this was found" —
+   so the third attempt stopped guessing and swept.
 
-   The site is bearing 118 in the lake's own local frame — clear of Lake City's terrace arc and
-   chosen for the LIGHT, which is a measurement rather than a preference; see the note on
-   HAVEN.SHORE_DEG. From MAH HAVEN you look back across 400 m of open water at the city you came
-   from, which is how R5's "immediate contrast from dense MAH City" gets built rather than asserted.
+   THE SWEEP KILLED THE LAKE OUTRIGHT. Sixty bearings around LAKE CITY's shore, each sampling a
+   5 x 5 grid of this district's own footprint: EVERY ONE returned rock, with 95 to 435 m of relief.
+   That water sits at r 700, ringed by the near range, and Lake City works there only because it cut
+   terraces into the flank. There is no shore to stand on.
+
+   So MAH HAVEN stands on the world's OTHER water — terrain.js's BASIN, an ellipse 210 x 130 at
+   bearing 62, r 330, water at y -1.4. The same sweep over its perimeter found a run of bearings
+   with ZERO relief and ZERO rock, and one of them is remarkable:
+
+       ellipse parameter 66 deg     relief 0.0 m     rock 0/25     ground 25/25
+       view axis 3 degrees off the world's fixed sun bearing of 243.4
+
+   Three degrees. The sun comes almost straight down the water at you, which is the reference
+   photograph, and it is flat buildable ground. That is not a taste decision and it was not
+   available to reasoning — only to measurement.
+
+   The basin also sits BETWEEN MAH CITY and LAKE CITY inside terrain.js's pass, so the district is
+   on the Lake City direction R5 asks for, and looking across its water you have the city you came
+   from — which is how "an immediate contrast from dense MAH City" gets built rather than asserted.
 
    ---- THIS PASS IS FOOTPRINTS -----------------------------------------------------------------
    R5 §13 lists exactly what to establish and §15 draws a hard line: "Do not prematurely introduce
@@ -55,23 +71,13 @@ const frac = i => (i * 0.7548776662) % 1;
 const polar = (aDeg, r) => [r * Math.cos(aDeg * DEG), -r * Math.sin(aDeg * DEG)];
 
 export const HAVEN = Object.freeze({
-  /* THE SHORE BEARING IS A LIGHTING DECISION AND IT WAS MADE BY MEASUREMENT.
-
-     The reference's whole power is that the sun comes TOWARD you across the water. MAHWORLD's
-     directional light is fixed at (-80, 120, 160), which through terrain.js's own polar helper is
-     bearing 243.4 — the sun never moves in this world, only its colour and intensity do, so no
-     choice of render time can rescue a district that faces the wrong way. The first cut sat at
-     bearing 232, whose outward view looks at 52: 168 degrees from the light, fully backlit, and the
-     reveal frame came back with a black lake.
-
-     A shore bearing S looks outward along S + 180, so front-light wants S = 63.4. That is inside
-     LAKE CITY's own terraces, which occupy the arc -46 to +78 (its TERRACE.arcFrom/arcTo) — this
-     district may not be built on top of the one it is meant to contrast with. 118 is the closest
-     legal bearing: the view axis lands at 298, 54.6 degrees off the light, which is a three-quarter
-     front light raking across the water rather than a dead-on sun path. It also puts the district's
-     260 m of frontage clear of both bridge pinches in the lake polygon (indices 4 and 10, at 103
-     and 257 degrees). */
-  SHORE_DEG: 118,
+  /* THE SHORE BEARING IS THE ELLIPSE PARAMETER ON terrain.js's BASIN, and it was measured, not
+     chosen. See the header: a 60-bearing sweep of both bodies of water in the world, sampling this
+     district's own 5 x 5 footprint at each, is what produced it. 66 is the one bearing that is both
+     flat buildable ground (relief 0.0 m, rock 0 of 25 samples) and front-lit — its outward view
+     axis lands 3 degrees off MAHWORLD's fixed sun bearing of 243.4, so the light comes down the
+     water at you exactly as it does in the reference. */
+  SHORE_DEG: 66,
   /* how far the district reaches back from the waterline, and how wide along the shore */
   DEPTH: 300,
   HALF_W: 260,
@@ -95,31 +101,33 @@ export function buildMahHaven(ctx, opts = {}) {
     shorelineM: 0, waterY: HAVEN.WATER_Y
   };
 
-  /* ---- THE LAKE, read from the module that cut it ------------------------------------------- */
-  const lake = opts.lake || null;                   /* { centre:[x,z], lakeR(a), waterY } */
-  const LC = lake && lake.centre ? lake.centre : polar(62, 700);
-  const waterY = (lake && typeof lake.waterY === 'number') ? lake.waterY : HAVEN.WATER_Y;
+  /* ---- THE WATER, read from the module that cut it ------------------------------------------ */
+  const W = opts.water || null;                     /* { centre:[x,z], rx, rz, y } — terrain's BASIN */
+  const LC = W && W.centre ? W.centre : polar(62, 330);
+  const RX = (W && W.rx) || 210, RZ = (W && W.rz) || 130;
+  const waterY = (W && typeof W.y === 'number') ? W.y : HAVEN.WATER_Y;
   stats.waterY = waterY;
-  const lakeR = (lake && typeof lake.lakeR === 'function')
-    ? lake.lakeR
-    /* the fallback is deliberately a CIRCLE and deliberately smaller than the real polygon's
-       minimum: if lakecity did not load there is no lake to stand on, and a haven built to a
-       guessed shoreline that overlaps the water is worse than one built slightly inland. */
-    : (() => 160);
 
-  /* the shore point and the outward normal at this district's bearing, in world xz */
+  /* THE SHORE POINT AND THE OUTWARD NORMAL, and the normal is NOT the radius.
+     An ellipse's outward normal is its gradient, (px/rx^2, pz/rz^2) normalised — on a 210 x 130
+     ellipse the radial direction and the true normal differ by up to 17 degrees, so a district laid
+     along the radius would sit visibly skewed to its own waterline, with the entrance corridor
+     meeting the shore at an angle nobody would build. */
   const aS = HAVEN.SHORE_DEG * DEG;
-  const rS = lakeR(aS);
-  /* the lake's local frame uses the same cos/-sin polar as everything else in this world */
-  const nx = Math.cos(aS), nz = -Math.sin(aS);      /* unit vector from lake centre outward */
-  const SHORE = [LC[0] + nx * rS, LC[1] + nz * rS];
+  const px = RX * Math.cos(aS), pz = RZ * Math.sin(aS);
+  let gx = px / (RX * RX), gz = pz / (RZ * RZ);
+  const gl = Math.hypot(gx, gz) || 1; gx /= gl; gz /= gl;
+  const nx = gx, nz = gz;                            /* unit vector from the water outward */
+  const rS = Math.hypot(px, pz);
+  const SHORE = [LC[0] + px, LC[1] + pz];
   /* the AXIS runs from the shore INLAND (away from the water). Everything in the entrance sequence
      is placed as a distance back along it, so the sequence cannot come apart. */
   const ax = nx, az = nz;                           /* inland is +axis */
   const tx = -nz, tz = nx;                          /* along the shore */
   const site = (back, lat) => [SHORE[0] + ax * back + tx * lat, SHORE[1] + az * back + tz * lat];
   stats.site = { deg: HAVEN.SHORE_DEG, shore: [+SHORE[0].toFixed(1), +SHORE[1].toFixed(1)],
-    lakeCentre: [+LC[0].toFixed(1), +LC[1].toFixed(1)], shoreR: +rS.toFixed(1) };
+    waterCentre: [+LC[0].toFixed(1), +LC[1].toFixed(1)], shoreR: +rS.toFixed(1),
+    rx: RX, rz: RZ, normal: [+nx.toFixed(3), +nz.toFixed(3)] };
 
   /* the yaw that turns a box's local +X along the SHORE and its +Z inland. Written once, because
      the axis convention is this project's most productive source of defects. */

@@ -101,7 +101,12 @@ const LAND_HORIZON = 0x1c3355;   /* the last ring, sitting just under the horizo
 
 /* the still basin: a wide, quiet body of water sitting in the right valley, framed by the towers at
    44 deg and 75 deg. Nothing in city.js, ground.js or buildings.js occupies this region. */
-const BASIN = { bearing: 62, r: 330, rx: 210, rz: 130, y: -1.4 };
+/* EXPORTED for R5. MAH HAVEN stands on this water, and a second copy of these five numbers in
+   another file is the shape of every L42 defect this project has produced. One basin, one truth. */
+export const BASIN = { bearing: 62, r: 330, rx: 210, rz: 130, y: -1.4 };
+/* its centre in WORLD xz, through this file's own polar helper, so a caller cannot re-derive it
+   with a different sign convention — which is exactly how a lake once landed 28 degrees off */
+export function basinCentre() { return polar(BASIN.bearing, BASIN.r); }
 
 /* R2 §5 / §6 — THE CITY PASSES. The BASIN above reserved a bearing for water; it did not reserve the
    ROOM a city on that water needs. Measured on the built scene: the near range's peaks reach inward
