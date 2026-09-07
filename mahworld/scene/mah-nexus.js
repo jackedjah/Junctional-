@@ -611,15 +611,29 @@ export function buildMahNexus(ctx, opts = {}) {
   /* the bore is seen FROM WITHIN, so it renders BackSide — the faces pointing away from a traveller
      are the ones that surround them. Liquid dark metal, per §15, so a tunnel reads as machined
      rather than as a cave. */
-  /* AND IT IS SATIN, NOT A MIRROR. The first bore went in at metalness 0.88 / roughness 0.17 —
-     §15's liquid dark metal, which is the right grade for a JOINT and the wrong one for a 40 m
-     bore. The interior render came back reading as open sky: a near-mirror tube reflects the
-     environment so completely that a traveller inside it sees the world, not a tunnel. §16 asks for
-     "dark-but-readable recesses" and §17 for tube interior reflections tuned rather than maximal,
-     so the bore drops to a satin grade that takes light instead of returning the sky whole. */
+  /* THE BORE IS DOUBLE-SIDED, AND FINDING OUT WHY COST TWO WRONG DIAGNOSES.
+
+     The interior render came back showing open sky. I called it a mirror — §15's liquid dark metal
+     at metalness 0.88 seemed an obvious culprit for a 40 m tube returning the environment whole —
+     dropped it to satin, and THE FRAME DID NOT MOVE. A mirror would have moved. Two attempts on one
+     defect with no improvement is the point at which the method is wrong, not the value.
+
+     So the pixels got named instead. The probe: `nexus-bore-interior` exists, is visible, carries
+     24192 triangles and side 1 — it built fine — and 87 of 100 rays from inside the shaft hit
+     `nexus-tube`, the solid outer member, while ZERO hit the bore.
+
+     BackSide was the assumption. This file's sweep winds so that the OUTWARD face is the back face,
+     which means BackSide renders the bore only into the solid it sits inside, and a traveller sees
+     straight through it. Exactly the portal-cap bug in a new place, and there I already learned the
+     answer: do not reason about a winding in a hand-built frame, decide it by measurement or make
+     the question moot. DoubleSide makes it moot. It costs backface culling on 24k interior-tier
+     triangles, which is nothing, and it cannot be wrong in either winding.
+
+     The satin grade stays, on its own merits: §16 asks for dark-but-readable recesses and §17 for
+     tube reflections tuned rather than maximal. */
   const boreMat = mkMat(M.graphiteDark || M.structural, {
     name: 'nexus-bore', color: new THREE.Color(0x1a2432),
-    roughness: 0.38, metalness: 0.40, envMapIntensity: 0.85, side: THREE.BackSide
+    roughness: 0.38, metalness: 0.40, envMapIntensity: 0.85, side: THREE.DoubleSide
   });
   const glassMat = mkMat(M.crystalGlass, {
     name: 'nexus-diamond-glass', color: new THREE.Color(0x20355c),
