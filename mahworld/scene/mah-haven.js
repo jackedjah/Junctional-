@@ -91,7 +91,18 @@ export const HAVEN = Object.freeze({
   WATER_RX: 200,         /* half-extent ALONG the shore */
   WATER_RZ: 95,          /* half-extent ACROSS it, so the near edge is at 430 */
   SHORE_R: 430,
-  WATER_Y: -1.4,         /* terrain.js's BASIN.y — the world's ONE water level */
+  /* THE WATER SITS ABOVE GRADE, AND THAT IS THE POINT.
+     The first cut put it at terrain.js's BASIN.y of -1.4 and it rendered INVISIBLE: the site was
+     chosen for being flat ground at y 0, so a surface 1.4 m below that is under the terrain. Cutting
+     a depression is not available — terrain.js's mesh is not this module's to reshape, and the pass
+     system that let LAKE CITY cut its lake is a terrain-side feature.
+     So MAH HAVEN's water is a RESERVOIR: a made body held above grade behind a low bund. That is
+     not a workaround dressed as a reason — it is the correct typology for this district. R5 wants
+     agriculture here, the farm rows already have a water channel running off it, and a reservoir on
+     flat ground beside a growing region is what a rural community actually builds. The world's
+     single water LEVEL still governs everything natural; this one is infrastructure. */
+  WATER_Y: 0.30,
+  BUND_H: 1.15,          /* the retaining bank: low enough to see over from a standing eye */
   GROUND_Y: 0,
   /* how far the district reaches back from the waterline, and how wide along it */
   DEPTH: 170,
@@ -152,6 +163,22 @@ export function buildMahHaven(ctx, opts = {}) {
 
   const B = { plat: [], dark: [], stone: [], green: [] };
   const put = (b, geo, matrix, value) => B[b].push({ geo, matrix, value });
+  /* a flat quad in WORLD space, for anything that follows a curve. A curved bank made of boxes is a
+     polygon with corners, and this district's whole water edge is a curve. */
+  const _qn = new THREE.Vector3(), _qa = new THREE.Vector3(), _qb = new THREE.Vector3();
+  function quad(bucket, p0, p1, p2, p3, value) {
+    _qa.set(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]);
+    _qb.set(p3[0] - p0[0], p3[1] - p0[1], p3[2] - p0[2]);
+    _qn.crossVectors(_qa, _qb).normalize();
+    const g = new THREE.BufferGeometry();
+    const P = new Float32Array([p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2],
+                                p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p3[0], p3[1], p3[2]]);
+    const N = new Float32Array(18);
+    for (let i = 0; i < 6; i++) { N[i * 3] = _qn.x; N[i * 3 + 1] = _qn.y; N[i * 3 + 2] = _qn.z; }
+    g.setAttribute('position', new THREE.BufferAttribute(P, 3));
+    g.setAttribute('normal', new THREE.BufferAttribute(N, 3));
+    put(bucket, g, new THREE.Matrix4(), value);
+  }
   /* DECLARED HERE, WITH THE OTHER STATE, NOT NEXT TO sign(). Written beside the function that
      fills it — below the build that calls it — a `const` is in the temporal dead zone, the first
      sign() throws a ReferenceError, the assembly's guarded catch turns it into one console line,
@@ -189,22 +216,22 @@ export function buildMahHaven(ctx, opts = {}) {
   greenMat.name = 'haven-growth'; owned.materials.push(greenMat);
 
   /* ================================================================================================
-     0. THE WATER. R5 §13's first item, and this district cuts it because the world had no shore
-        with room beside it — see the header. The LEVEL is not invented: it is terrain.js's BASIN.y,
-        the one number lakecity.js also uses, so MAHWORLD still has a single water plane.
+     0. THE WATER — a reservoir, held above grade. R5 §13's first item, and this district cuts it
+        because the world had no shore with room beside it. See the header, and see the note on
+        HAVEN.WATER_Y for why it sits above the ground rather than in it.
      ============================================================================================== */
   {
     const SEG = 72;
     const pos = [], nor = [], col = [];
-    /* a fan from the centre, laid flat. Still water in this world is a near-black reflective plane
-       (LAW 1 and §07 both), so its VALUE comes from what it returns rather than from its colour —
-       which is also why it must not be given a lit blue: a lake painted blue at night is a pool. */
+    const EP = (a, gx, gz) => [WC[0] + tx * gx * Math.cos(a) + ax * gz * Math.sin(a),
+                               WC[1] + tz * gx * Math.cos(a) + az * gz * Math.sin(a)];
+    /* the surface. Still water in this world is a near-black reflective plane (LAW 1 and §07 both),
+       so its VALUE comes from what it returns rather than from its colour — which is also why it
+       must not be given a lit blue: a lake painted blue at night is a swimming pool. */
     for (let i = 0; i < SEG; i++) {
       const a0 = (i / SEG) * TAU, a1 = ((i + 1) / SEG) * TAU;
-      const p0 = [WC[0] + tx * HAVEN.WATER_RX * Math.cos(a0) + ax * HAVEN.WATER_RZ * Math.sin(a0),
-                  WC[1] + tz * HAVEN.WATER_RX * Math.cos(a0) + az * HAVEN.WATER_RZ * Math.sin(a0)];
-      const p1 = [WC[0] + tx * HAVEN.WATER_RX * Math.cos(a1) + ax * HAVEN.WATER_RZ * Math.sin(a1),
-                  WC[1] + tz * HAVEN.WATER_RX * Math.cos(a1) + az * HAVEN.WATER_RZ * Math.sin(a1)];
+      const p0 = EP(a0, HAVEN.WATER_RX, HAVEN.WATER_RZ);
+      const p1 = EP(a1, HAVEN.WATER_RX, HAVEN.WATER_RZ);
       pos.push(WC[0], waterY, WC[1], p0[0], waterY, p0[1], p1[0], waterY, p1[1]);
       for (let k = 0; k < 3; k++) nor.push(0, 1, 0);
       col.push(0.30, 0.30, 0.30, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22);
@@ -219,12 +246,32 @@ export function buildMahHaven(ctx, opts = {}) {
     });
     waterMat.name = 'haven-water'; owned.materials.push(waterMat);
     const mesh = new THREE.Mesh(g, waterMat);
-    mesh.name = 'haven-water'; mesh.frustumCulled = false; mesh.renderOrder = -1;
+    mesh.name = 'haven-water'; mesh.frustumCulled = false;
     group.add(mesh); stats.draws++;
     stats.triangles += SEG;
+
+    /* THE BUND that holds it: a stone bank from grade up to the waterline, ringing the whole
+       ellipse, with a platinum cap so the edge reads from a distance. Built as quads rather than as
+       boxes because it follows a curve, and a curve made of boxes is a polygon with corners. */
+    for (let i = 0; i < SEG; i++) {
+      const a0 = (i / SEG) * TAU, a1 = ((i + 1) / SEG) * TAU;
+      const oIn0 = EP(a0, HAVEN.WATER_RX, HAVEN.WATER_RZ);
+      const oIn1 = EP(a1, HAVEN.WATER_RX, HAVEN.WATER_RZ);
+      const oOut0 = EP(a0, HAVEN.WATER_RX + 7, HAVEN.WATER_RZ + 7);
+      const oOut1 = EP(a1, HAVEN.WATER_RX + 7, HAVEN.WATER_RZ + 7);
+      /* the outer face, grade to bund top */
+      quad('stone', [oOut0[0], 0, oOut0[1]], [oOut1[0], 0, oOut1[1]],
+        [oOut1[0], HAVEN.BUND_H, oOut1[1]], [oOut0[0], HAVEN.BUND_H, oOut0[1]], 0.26);
+      /* the crest */
+      quad('stone', [oOut0[0], HAVEN.BUND_H, oOut0[1]], [oOut1[0], HAVEN.BUND_H, oOut1[1]],
+        [oIn1[0], HAVEN.BUND_H, oIn1[1]], [oIn0[0], HAVEN.BUND_H, oIn0[1]], 0.34);
+      /* and the inner face down to the waterline, which is the bit the light rakes */
+      quad('plat', [oIn0[0], HAVEN.BUND_H, oIn0[1]], [oIn1[0], HAVEN.BUND_H, oIn1[1]],
+        [oIn1[0], waterY - 0.1, oIn1[1]], [oIn0[0], waterY - 0.1, oIn0[1]], 0.92);
+    }
     stats.water = { centre: [+WC[0].toFixed(1), +WC[1].toFixed(1)], rx: HAVEN.WATER_RX,
-      rz: HAVEN.WATER_RZ, y: waterY, nearR: HAVEN.WATER_R - HAVEN.WATER_RZ,
-      farR: HAVEN.WATER_R + HAVEN.WATER_RZ };
+      rz: HAVEN.WATER_RZ, y: waterY, bund: HAVEN.BUND_H,
+      nearR: HAVEN.WATER_R - HAVEN.WATER_RZ, farR: HAVEN.WATER_R + HAVEN.WATER_RZ };
   }
 
   /* ================================================================================================
