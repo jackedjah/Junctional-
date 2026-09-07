@@ -143,7 +143,7 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     /* THE CLOUDS, and the one hard rule: NONE of them may be inside the dome. Read off the built
        instance matrices rather than off the placement code that wrote them, because a rule enforced
        by the code that also asserts it is not a gate. */
-    let cloudsInside = 0, cloudN = 0, lowest = 1e9, highest = -1e9;
+    let cloudsInside = 0, cloudN = 0, lowest = 1e9, highest = -1e9, mantleN = 0, aboveApex = 0;
     const bandCount = [0, 0, 0, 0, 0];   /* 0-200, 200-500, 500-900, 900-1400, 1400+ */
     {
       const mm = new T.Matrix4();
@@ -162,6 +162,7 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
           if (r < DM.DOME.R && y < surf(r) && y > DM.DOME.SPRING_Y - 30) cloudsInside++;
           const k = y < 200 ? 0 : y < 500 ? 1 : y < 900 ? 2 : y < 1400 ? 3 : 4;
           bandCount[k]++;
+          if (nm === 'mah-cloud-mantle') { mantleN++; if (y > DM.DOME.APEX_Y) aboveApex++; }
         }
       }
     }
@@ -169,6 +170,7 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     return {
       stats: s, DOME: { R: DM.DOME.R, SPRING_Y: DM.DOME.SPRING_Y, APEX_Y: DM.DOME.APEX_Y },
       cloudsInside, cloudN, cloudLow: lowest, cloudHigh: highest, bandCount,
+      aboveApexFrac: mantleN ? aboveApex / mantleN : 0, mantleN, aboveApex,
       SEA: { LEVEL: RM.SEA.LEVEL, R_IN: RM.SEA.R_IN, R_OUT: RM.SEA.R_OUT, DEPTH_MAX: RM.SEA.DEPTH_MAX },
       shardMinEndR: minEndR, shardMaxR: maxR, shardLen: hi - lo,
       seaTimeAdvanced: (u0 != null && u1 != null) ? (u1 - u0) : null,
@@ -247,9 +249,14 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     P('density falls monotonically toward the ground',
       B[0] < B[1] && B[1] < B[2] && B[2] < B[3],
       '0-200m:' + B[0] + '  200-500:' + B[1] + '  500-900:' + B[2] + '  900-1400:' + B[3] + '  1400+:' + B[4]);
-    P('the apex keeps its sky (the mantle thins before it)',
-      R.cloudHigh < R.DOME.APEX_Y + 200,
-      'highest lobe ' + R.cloudHigh.toFixed(0) + ' vs apex ' + R.DOME.APEX_Y);
+    /* "the apex keeps its sky" is about DENSITY, not about a ceiling. A lobe drifting above the
+       apex is still "around" the dome and is not the failure; a HOOD over it is. So the gate is the
+       fraction of the mantle sitting above the apex plane, which is what a hood actually looks
+       like — the first cut of this gate asserted an absolute maximum height and would have failed
+       on one lobe 218 m high while a genuine hood at 25% passed. */
+    P('the apex is not hooded (under an eighth of the mantle sits above it)',
+      R.aboveApexFrac < 0.125,
+      (R.aboveApexFrac * 100).toFixed(1) + '% of the mantle above y ' + R.DOME.APEX_Y);
   }
 
   console.log('\nR6 — the swim contract (groundwork, per R5 §13\'s rule)');

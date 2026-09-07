@@ -292,6 +292,13 @@ export function buildMahRain(ctx, opts = {}) {
      rather than a margin someone hopes is large enough. */
   const insideDome = (r, y) => r < TOP_R && y < domeSurfaceY(r) && y > TOP_Y - 30;
 
+  /* DECLARED HERE, WITH THE OTHER STATE. These are live scene objects and a live uniform block,
+     and they are NOT allowed in `stats`: stats is this module's PUBLISHED contract, the thing a
+     harness serialises and a law suite reads, and a THREE.Group in it makes JSON.stringify throw on
+     a circular parent/children reference. The first cut put them there for convenience and the very
+     first capture run died on it before taking a single frame. A published number is data; a
+     published object is a leak. */
+  let cloudSpinA = null, cloudSpinB = null, cloudUniforms = null;
   let cloudViolations = 0;
   {
     const lobe = own(cloudLobeGeometry(1));
@@ -418,8 +425,7 @@ export function buildMahRain(ctx, opts = {}) {
       bandsFromGround: bands.map((b, k) => b + 'm:' + hist[k]).join(' '),
       apexY: APEX_Y, domeR: TOP_R
     };
-    stats.cloudSpin = { a: spinA, b: spinB };
-    stats.cloudUniforms = cloudU;
+    cloudSpinA = spinA; cloudSpinB = spinB; cloudUniforms = cloudU;
   }
 
   /* ==============================================================================================
@@ -696,9 +702,9 @@ export function buildMahRain(ctx, opts = {}) {
          price of two quaternions a frame, which is why the drift is a carrier rotation and not a
          per-instance recompose like the rain's — the rain has to fall in a straight line and clouds
          only have to move. */
-      if (stats.cloudSpin) {
-        stats.cloudSpin.a.rotation.y = T * CLOUD.SPIN_MANTLE * TAU * 60;
-        stats.cloudSpin.b.rotation.y = T * CLOUD.SPIN_VEIL * TAU * 60;
+      if (cloudSpinA) {
+        cloudSpinA.rotation.y = T * CLOUD.SPIN_MANTLE * TAU * 60;
+        cloudSpinB.rotation.y = T * CLOUD.SPIN_VEIL * TAU * 60;
       }
     },
     setTime(s) {
@@ -713,7 +719,7 @@ export function buildMahRain(ctx, opts = {}) {
       /* the clouds DENSIFY at night and open at noon, which is the honest way round: a lit cloud is
          read by its shading and needs to stay airy, and an unlit one is read by its silhouette and
          disappears unless it closes up. */
-      const c = stats.cloudUniforms;
+      const c = cloudUniforms;
       if (c) {
         c.uCloudA.value.set(0.24 + 0.14 * (1 - day), 0.40 + 0.14 * day);
         c.uCloudGlowI.value = 0.04 + 0.13 * (1 - day);
@@ -722,7 +728,7 @@ export function buildMahRain(ctx, opts = {}) {
     setTheme(t) {
       if (t && t.energyLight) {
         rainU.uRainRim.value.setHex(t.energyLight);
-        if (stats.cloudUniforms) stats.cloudUniforms.uCloudGlow.value.setHex(t.energyLight);
+        if (cloudUniforms) cloudUniforms.uCloudGlow.value.setHex(t.energyLight);
       }
     },
     setDetail(dist) {
@@ -742,12 +748,12 @@ export function buildMahRain(ctx, opts = {}) {
       /* the clouds outlive the rain by a long way. A curtain at 26 km is a smear, but the cloud
          mantle IS the world's silhouette at that range — it is the thing that says there is weather
          around the dome — so it only stops at the far tier. */
-      if (stats.cloudSpin) {
+      if (cloudSpinA) {
         const on = dist < CLOUD.LOD_FAR;
-        stats.cloudSpin.a.visible = on;
-        stats.cloudSpin.b.visible = on;
+        cloudSpinA.visible = on;
+        cloudSpinB.visible = on;
       }
-      return { shards: visibleCount, widthGain, clouds: stats.cloudSpin ? stats.cloudSpin.a.visible : false };
+      return { shards: visibleCount, widthGain, clouds: cloudSpinA ? cloudSpinA.visible : false };
     },
     setState() { },
     setQuality(q) {
