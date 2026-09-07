@@ -212,7 +212,84 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     smooth.pct + '% sharp');
 
   /* ============================================================================================
-     5. CONTRACT, COST AND DETERMINISM.
+     5. §07 / LAW 1 — THE HERO OBJECT HAS TO BE BRIGHTER THAN THE CITY.
+
+     The first build made the whole complex a pure metal at metalness 0.94-0.95 and it went dark:
+     measured from the approach camera at 09:20, nexus-trunk 89.6, nexus-shell 36.7 and the tube
+     families 23.8, against a sky at 167. v7's own notes put this world's building masses at 49-58,
+     so the newest and most important object in MAHWORLD was darker than the darkest thing in it.
+
+     The cause was LAW 1 read backwards. A metal takes NO diffuse light, so a broad surface made
+     entirely of metal is only as bright as what it happens to reflect — and most of a 400 m complex
+     is not pointing at the horizon band. MAHWORLD's own answer was already in the scene: crown-plat
+     and halo-rims, the brightest architecture in the world, carry #b6c4d6 at metalness 0.38 and
+     reserve 0.9+ for edges. The finish shader takes that split as options, so it is set explicitly
+     now rather than inherited.
+
+     This gate is the measurement, kept: classify by raycast, read the same pixel out of the
+     framebuffer, and require the trunk to out-value the city masses it is supposed to dominate.
+     ============================================================================================ */
+  console.log('\nR6 §07 — the hero object out-values the city');
+  const val = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const T = await import('/mahworld/vendor/three/three.module.min.js');
+    const m = await import('/mahworld/scene/mah-nexus.js');
+    const N = m.NEXUS, D = Math.PI / 180;
+    const cx = N.R * Math.cos(N.BEARING * D), cz = -N.R * Math.sin(N.BEARING * D);
+    const k = 2600 / N.R;
+    w.setTime('09:20');
+    w.setCustomView({ pos: [cx * k, 60, cz * k], look: [cx, 900, cz], fov: 56 });
+    w.camera.near = 0.5; w.camera.far = 60000; w.camera.updateProjectionMatrix();
+    w.advance(8, 1 / 30);
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    w.scene.updateMatrixWorld(true); w.camera.updateMatrixWorld(true);
+    const all = []; w.scene.traverse(o => { if (o.isMesh && o.visible && o.geometry) all.push(o); });
+    const cv = w.renderer.domElement, W = cv.width, H = cv.height;
+    const c2 = document.createElement('canvas'); c2.width = W; c2.height = H;
+    c2.getContext('2d').drawImage(cv, 0, 0);
+    const px = c2.getContext('2d').getImageData(0, 0, W, H).data;
+    const rc = new T.Raycaster(); rc.far = 60000;
+    /* the atmosphere is SKIPPED, not classified: rain and cloud lie in front of the monument and
+       the sky in equal measure, so they cannot separate the two. The pixel still contains them,
+       which is the honest number because it is what a viewer sees. */
+    const SKIP = ['rain', 'cloud', 'veil', 'mantle', 'curtain', 'fog', 'beam', 'fobeam'];
+    const tokOf = o => String(o && o.name || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    const bins = {};
+    for (let iy = -0.85; iy <= 0.85; iy += 0.04) for (let ix = -0.9; ix <= 0.9; ix += 0.04) {
+      rc.setFromCamera(new T.Vector2(ix, iy), w.camera);
+      let h = []; try { h = rc.intersectObjects(all, false); } catch (e) {}
+      /* the sky in this world is a MESH, and an UNNAMED one — so `no hit means sky` never fires
+         and `hit.object.name` is the empty string. Both go to the SKY bin by name here, which is
+         the third time in this round that an object's name has decided a measurement's fate. */
+      let nm = 'SKY';
+      for (const hit of h) {
+        const t = tokOf(hit.object);
+        if (t.some(x => SKIP.includes(x))) continue;
+        nm = (!t.length || t.includes('sky')) ? 'SKY' : (hit.object.name || 'SKY');
+        break;
+      }
+      const sx = Math.round((ix * 0.5 + 0.5) * (W - 1)), sy = Math.round((0.5 - iy * 0.5) * (H - 1));
+      const o = (sy * W + sx) * 4;
+      (bins[nm] = bins[nm] || []).push(0.2126 * px[o] + 0.7152 * px[o + 1] + 0.0722 * px[o + 2]);
+    }
+    const med = k2 => { const a = bins[k2]; if (!a || a.length < 12) return null; a.slice().sort(); a.sort((x, y) => x - y); return +a[Math.floor(a.length / 2)].toFixed(1); };
+    return { trunk: med('nexus-trunk'), tube: med('nexus-tube'), shell: med('nexus-shell'), sky: med('SKY'),
+      seen: Object.keys(bins).filter(n => n.indexOf('nexus') === 0) };
+  });
+  P('the value probe found the complex at all', val.seen.length >= 2, JSON.stringify(val.seen));
+  /* 58 is the top of v7's measured range for this world's building masses. The trunk is the hero
+     vertical and must clear it; below that the monument is competing with warehouses. */
+  P('the trunk out-values every building mass in the world', val.trunk != null && val.trunk > 70,
+    'trunk ' + val.trunk + '  (world building masses measure 49-58)');
+  P('the tube family is platinum casing, not a recess', val.tube != null && val.tube > 70,
+    'tubes ' + val.tube);
+  /* and it must stay an OBJECT, not become a hole in the sky or a light source brighter than it */
+  P('the complex still reads darker than the sky behind it',
+    val.trunk != null && val.sky != null && val.trunk < val.sky - 15,
+    'trunk ' + val.trunk + '  sky ' + val.sky);
+
+  /* ============================================================================================
+     6. CONTRACT, COST AND DETERMINISM.
      ============================================================================================ */
   console.log('\nthe module contract');
   const api = await ev(() => {

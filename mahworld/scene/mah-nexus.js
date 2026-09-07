@@ -373,19 +373,44 @@ export function buildMahNexus(ctx, opts = {}) {
      LAW 1 decides every assignment here and nothing else does. A metal takes no diffuse light; it
      is lit only by the environment, and a horizontal high-metalness face reflects the near-black
      zenith and renders BLACK. So:
-       VERTICAL and TILTED surfaces  -> high-metalness platinum, which sees the bright horizon band
-       HORIZONTAL decks             -> low-metalness dark plate, which still takes the lamps
-     §07 states the same law as an art direction: platinum is for VERTICALS and EDGES. */
+       VERTICAL and TILTED surfaces  -> the higher metalness, which sees the bright horizon band
+       HORIZONTAL decks             -> low metalness, which still takes the lamps
+     §07 states the same law as an art direction: platinum is for VERTICALS and EDGES.
+
+     THE FIRST BUILD MADE THE WHOLE COMPLEX A PURE METAL AND IT WENT DARK. Measured against the
+     world it stands in, at 09:20 from the approach camera:
+
+         nexus-trunk    median  89.6      nexus-shell  36.7      nexus-recess  23.8
+         crown-plat     #b6c4d6  metalness 0.38  env 1.55        halo-rims  the same
+
+     So MAHWORLD's brightest architecture — MAH CROWN's elevations and the halo rims — carries its
+     primary surfaces at metalness 0.38, not 0.94, and reserves the high metalness for EDGES. That
+     is LAW 1 read correctly: a metal takes no diffuse light, so a broad surface made entirely of
+     metal can only be as bright as whatever it happens to reflect, and most of a complex this size
+     is not pointing at the horizon band. My shell at metalness 0.95 was a mirror aimed at nothing.
+
+     The finish shader is where the split belongs, and it already takes the numbers as options:
+     mEdge is what a VERTICAL face gets and mFlat what a HORIZONTAL one gets. Verticals stay
+     properly metallic so the horizon band still rakes across them; the flats drop far enough to
+     take diffuse light instead of reflecting the near-black zenith.
+
+     nexus-recess held the STRAIGHT and SPIRAL tube families, which is why seven of the thirteen
+     tubes measured 23.8 — graphiteDark is a recess material and those are not recesses. §4 calls
+     every tube a premium destination portal with a PLATINUM CASING, so they get one. */
   const mkMat = (src, over) => { const m = (src || new THREE.MeshStandardMaterial()).clone(); Object.assign(m, over || {}); owned.materials.push(m); return m; };
-  const shellMat = mkMat(M.platinumMid || M.platinum, { name: 'nexus-shell', envMapIntensity: 1.9, roughness: 0.23, metalness: 0.95 });
-  applyPlatinumFinish(shellMat, { scale: 3.6 });
-  const trunkMat = mkMat(M.platinumMidBrushed || M.platinumBrushed || M.platinumMid, { name: 'nexus-trunk', envMapIntensity: 1.75, roughness: 0.30, metalness: 0.94 });
-  applyPlatinumFinish(trunkMat, { scale: 6.2 });
+  const shellMat = mkMat(M.platinumMid || M.platinum, { name: 'nexus-shell', color: new THREE.Color(0xb6c4d6), envMapIntensity: 1.62, roughness: 0.30, metalness: 0.42 });
+  applyPlatinumFinish(shellMat, { mFlat: 0.30, mEdge: 0.58, rFlat: 0.36, rEdge: 0.26, breakUp: 0.070 });
+  const trunkMat = mkMat(M.platinumMidBrushed || M.platinumBrushed || M.platinumMid, { name: 'nexus-trunk', color: new THREE.Color(0xaebbd0), envMapIntensity: 1.72, roughness: 0.28, metalness: 0.50 });
+  applyPlatinumFinish(trunkMat, { mFlat: 0.32, mEdge: 0.66, rFlat: 0.34, rEdge: 0.24, breakUp: 0.062 });
+  /* §4: platinum casing, and a tube is mostly vertical so it earns a higher edge metalness than
+     the base does — this is the grade that separates the tube family from the mass it climbs. */
+  const tubeMat = mkMat(M.platinum || M.platinumMid, { name: 'nexus-tube', color: new THREE.Color(0xa9b8cd), envMapIntensity: 1.85, roughness: 0.22, metalness: 0.58 });
+  applyPlatinumFinish(tubeMat, { mFlat: 0.34, mEdge: 0.74, rFlat: 0.32, rEdge: 0.19, breakUp: 0.055 });
   const deckMat = mkMat(M.paving || M.graphiteDark, { name: 'nexus-deck', envMapIntensity: 1.35 });
   const recessMat = mkMat(M.graphiteDark || M.structural, { name: 'nexus-recess', roughness: 0.54, metalness: 0.72, envMapIntensity: 1.2 });
 
   /* ---- ACCUMULATORS. One merge per material, so this whole complex is four draws at full detail. */
-  const bins = { shell: [], trunk: [], deck: [], recess: [] };
+  const bins = { shell: [], trunk: [], tube: [], deck: [], recess: [] };
   /* every member that is supposed to REACH the ceiling records where it claims to land, so §3 can
      be checked against the intent and not against whatever vertex happens to be near the top */
   const landings = [];
@@ -514,7 +539,7 @@ export function buildMahNexus(ctx, opts = {}) {
         new THREE.Vector3(sx + (lx - sx) * 0.35, y0 + (ly - y0) * 0.5, sz + (lz - sz) * 0.35),
         new THREE.Vector3(lx, ly, lz)
       ], lx, ly, lz, LAND_TAIL));
-      push('recess', sweptTube(curve, NEXUS.TUBE_STATIONS, NEXUS.TUBE_RADIAL, () => S.R, () => S.N, () => 0, true, true));
+      push('tube', sweptTube(curve, NEXUS.TUBE_STATIONS, NEXUS.TUBE_RADIAL, () => S.R, () => S.N, () => 0, true, true));
     }
     stats.parts.straight = S.COUNT;
   }
@@ -539,7 +564,7 @@ export function buildMahNexus(ctx, opts = {}) {
       }
       const last = pts[pts.length - 1];
       const curve = new THREE.CatmullRomCurve3(landVertical(pts, last.x, last.y, last.z, LAND_TAIL));
-      push('recess', sweptTube(curve, NEXUS.TUBE_STATIONS + 24, NEXUS.TUBE_RADIAL, () => S.R, () => S.N, () => 0, true, true));
+      push('tube', sweptTube(curve, NEXUS.TUBE_STATIONS + 24, NEXUS.TUBE_RADIAL, () => S.R, () => S.N, () => 0, true, true));
     }
     stats.parts.spiral = S.COUNT;
   }
@@ -572,7 +597,7 @@ export function buildMahNexus(ctx, opts = {}) {
   }
 
   /* ---- MERGE. One draw per material family. ---------------------------------------------------- */
-  const matFor = { shell: shellMat, trunk: trunkMat, deck: deckMat, recess: recessMat };
+  const matFor = { shell: shellMat, trunk: trunkMat, tube: tubeMat, deck: deckMat, recess: recessMat };
   for (const key of Object.keys(bins)) {
     const list = bins[key]; if (!list.length) continue;
     const merged = mergeGeoms(list);
@@ -608,7 +633,7 @@ export function buildMahNexus(ctx, opts = {}) {
     /* and the independent check: the highest vertex anywhere in the complex must reach the ceiling.
        The declared landings could all be right and the geometry still stop short of them. */
     let top = -1e9;
-    for (const key of ['trunk', 'recess', 'shell']) {
+    for (const key of ['trunk', 'tube', 'shell']) {
       const mesh = group.children.find(c => c.name === 'nexus-' + key);
       if (!mesh) continue;
       const P = mesh.geometry.attributes.position;
