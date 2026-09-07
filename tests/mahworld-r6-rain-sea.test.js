@@ -159,6 +159,24 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     }
     const sawRain = rainInCone >= 60;
 
+    /* IS THE SEA BURIED? Eight bearings, the terrain height at each one's shore radius. */
+    let buriedBearings = 0, worstBury = null;
+    {
+      const ground = targets.filter(o => /^terrain/i.test(o.name || ''));
+      for (let d = 0; d < 360; d += 45) {
+        const th = d * Math.PI / 180;
+        const r = RM.shoreR(th);
+        const x = Math.cos(th) * r, z = Math.sin(th) * r;
+        const rc = new T.Raycaster(new T.Vector3(x, 900, z), new T.Vector3(0, -1, 0), 1, 1800);
+        let h = []; try { h = rc.intersectObjects(ground, false); } catch (e) { }
+        if (h.length && h[0].point.y > RM.SEA.LEVEL + 0.5) {
+          buriedBearings++;
+          const over = h[0].point.y - RM.SEA.LEVEL;
+          if (worstBury == null || over > worstBury) worstBury = over;
+        }
+      }
+    }
+
     /* THE CLOUDS, and the one hard rule: NONE of them may be inside the dome. Read off the built
        instance matrices rather than off the placement code that wrote them, because a rule enforced
        by the code that also asserts it is not a gate. */
@@ -189,6 +207,7 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     return {
       stats: s, DOME: { R: DM.DOME.R, SPRING_Y: DM.DOME.SPRING_Y, APEX_Y: DM.DOME.APEX_Y },
       cloudsInside, cloudN, cloudLow: lowest, cloudHigh: highest, bandCount,
+      buriedBearings, worstBury,
       aboveApexFrac: mantleN ? aboveApex / mantleN : 0, mantleN, aboveApex,
       SEA: { LEVEL: RM.SEA.LEVEL, R_IN: RM.SEA.R_IN, R_OUT: RM.SEA.R_OUT, DEPTH_MAX: RM.SEA.DEPTH_MAX },
       shardMinEndR: minEndR, shardMaxR: maxR, shardLen: hi - lo,
@@ -246,11 +265,21 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       R.stats.seaFacesUp ? 'CCW from above' : 'CLOCKWISE — FrontSide will cull it, as MAH HAVEN\'s did');
     P('the sea is visible from a swimmer\'s eye', R.sawSea,
       R.sawSea ? 'hit' : 'the outward ray hits ' + R.firstHit + ' and never the sea');
-    /* it must MEET the land. terrain.js's land ring ends at 2600 and a 24-bearing raycast found
-       ground at 17/24 there and 0/24 by r 3000 — so an inner shore beyond 2600 leaves a gap. */
-    P('its inner shore overlaps the land\'s edge instead of leaving a gap',
-      R.stats.sea.shoreMax < 2600 && R.stats.sea.shoreMin > 1800,
-      'shore runs ' + R.stats.sea.shoreMin + ' to ' + R.stats.sea.shoreMax + ', land ends at 2600');
+    /* A SHORELINE IS WHERE THE GROUND CROSSES THE WATER LEVEL, and nothing else will do.
+       The first version of this gate compared the shore's RADIUS against the land's extent and
+       passed — while the sea's whole inner region sat under twenty metres of terrain, because the
+       land at r 2400 averages y +19.7 and the water is at -1.4. A frame-naming probe found
+       terrain-land in front of the camera standing 220 m out in what should have been open water.
+       That is the identical defect as MAH HAVEN's reservoir, in the same pass, on a different body
+       of water — and the HAVEN gate that catches it ("held above grade, not sunk under the ground
+       it stands on") was never written for the sea.
+       So this one raycasts: at eight bearings, the terrain height AT the shore radius must be at or
+       below the waterline. A sea you cannot see because it is buried reports every other number
+       correctly. */
+    P('the terrain at the shore is at or below the waterline, at every bearing tested',
+      R.buriedBearings === 0,
+      R.buriedBearings + ' of 8 bearings have ground above the water at the shore'
+      + (R.worstBury != null ? (', worst +' + R.worstBury.toFixed(1) + ' m') : ''));
     P('the shore is not a circle', R.stats.sea.shoreMax - R.stats.sea.shoreMin > 200,
       (R.stats.sea.shoreMax - R.stats.sea.shoreMin) + ' m between its nearest and furthest bearing');
     P('it reaches past the dome, so the ring\'s horizon is water',
