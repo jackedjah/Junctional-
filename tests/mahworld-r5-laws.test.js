@@ -10,7 +10,7 @@
        "dome remains visually clear enough"             -> opacity and rib count
        "climbable ridges/holds read intentionally"      -> counts and route continuity
        "MAH THRESHOLD remains distinct"                 -> two systems, two bearings, one portal
-       "MAH HAVEN water is physically established"      -> the shore sits ON lakecity's polygon
+       "MAH HAVEN water is physically established"      -> a ray down the reveal axis hits the water
        "footprints exist without overbuilding"          -> zones present, and NOTHING named livestock
 
    Every number below is read out of the ASSEMBLED SCENE rather than out of a constant, because the
@@ -232,15 +232,37 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
      ============================================================================================ */
   const haven = await ev(async () => {
     const w = window.MAHWORLD_MAHPLAZA; if (!w.mahHaven) return null;
-    const L = await import('/mahworld/scene/lakecity.js');
+    const T = await import('/mahworld/vendor/three/three.module.min.js');
     const s = w.mahHaven.stats, H = w.mahHaven.HAVEN;
-    /* THE SHORE MUST SIT ON THE LAKE THAT ALREADY EXISTS. Derived here from lakecity's OWN export,
-       so a drift between the two files fails here rather than in a render six rounds later. */
-    const c = L.lakeCentre();
-    const a = H.SHORE_DEG * Math.PI / 180;
-    const want = L.lakeR(a);
-    const dx = s.site.shore[0] - c[0], dz = s.site.shore[1] - c[1];
-    const got = Math.hypot(dx, dz);
+    /* THE SHORE SITS WHERE THE WORLD SWEEP SAID IT COULD. Three sitings failed inside mountains or
+       inside MAH CITY; the fourth was measured. This gate is that measurement, kept: the built shore
+       must be SITE_R from the origin on SITE_DEG, and the water's near edge must land on it. */
+    const D = Math.PI / 180;
+    const wantShore = [H.SITE_R * Math.cos(H.SITE_DEG * D), -H.SITE_R * Math.sin(H.SITE_DEG * D)];
+    const shoreDrift = Math.hypot(s.site.shore[0] - wantShore[0], s.site.shore[1] - wantShore[1]);
+    const nearEdgeDrift = Math.abs(s.water.nearR - H.SHORE_R);
+
+    /* CAN THE WATER ACTUALLY BE SEEN. This is the gate the district failed for three rounds while
+       every stat about it read correct: the surface existed, sat at the right level, was the right
+       size — and was wound face-down, so MeshStandardMaterial's FrontSide culled it from every
+       camera in a world whose cameras all stand above their water. Nothing that reports a NUMBER
+       could catch that. A ray can, and it is the same ray the renderer casts.
+       Fired from the rail, down the reveal axis, through the district's own frame. */
+    const ux = Math.cos(H.SITE_DEG * D), uz = -Math.sin(H.SITE_DEG * D);
+    const nx = -ux, nz = -uz, tx = -uz, tz = ux;
+    const site = (bk, lat) => [s.site.shore[0] + nx * bk + tx * lat, s.site.shore[1] + nz * bk + tz * lat];
+    w.scene.updateMatrixWorld(true);
+    const targets = [];
+    w.scene.traverse(o => { if (o.isMesh && o.visible && o.geometry && o.matrixWorld) targets.push(o); });
+    const eye = site(2, 0);
+    let sawWater = false, firstHit = '(nothing)';
+    for (const pitch of [-0.02, -0.06, -0.14]) {
+      const rc = new T.Raycaster(new T.Vector3(eye[0], 1.7, eye[1]),
+        new T.Vector3(-nx, pitch, -nz).normalize(), 0.5, 2000);
+      let h = []; try { h = rc.intersectObjects(targets, false); } catch (e) { }
+      if (h.length && firstHit === '(nothing)') firstHit = h[0].object.name || '(unnamed)';
+      if (h.some(x => /haven-water/.test(x.object.name || ''))) sawWater = true;
+    }
     /* and NOTHING in this district may be an animal — R5 §15 is explicit */
     const banned = [];
     w.mahHaven.group.traverse(o => {
@@ -252,19 +274,30 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       const A = q.attributes.position;
       for (let i = 0; i < A.count; i++) { const y = A.getY(i); if (y < minY) minY = y; if (y > maxY) maxY = y; }
     });
-    return { stats: s, HAVEN: H, wantR: want, gotR: got, banned, minY, maxY,
-      zones: s.zones.map(z => z.id), waterY: s.waterY, lakeWaterY: L.WATER_Y };
+    return { stats: s, HAVEN: H, shoreDrift, nearEdgeDrift, sawWater, firstHit, banned, minY, maxY,
+      zones: s.zones.map(z => z.id), waterY: s.waterY, facesUp: !!s.waterFacesUp };
   });
   console.log('\nR5 §10-§15 — MAH HAVEN');
   if (!haven) P('MAH HAVEN exists', false, 'module absent or failed to build');
   else {
     P('MAH HAVEN exists', true);
-    P('its shore sits ON the lake that already exists, not on a second one',
-      Math.abs(haven.gotR - haven.wantR) < 1.5,
-      'shore r ' + haven.gotR.toFixed(1) + ' vs lake r ' + haven.wantR.toFixed(1));
-    P('it uses the world\'s single water level',
-      Math.abs(haven.waterY - haven.lakeWaterY) < 0.01,
-      'haven ' + haven.waterY + ' vs lake ' + haven.lakeWaterY);
+    P('it stands on the one site the world sweep found clear',
+      haven.shoreDrift < 1.5, haven.shoreDrift.toFixed(2) + ' m from bearing '
+      + haven.HAVEN.SITE_DEG + ' r ' + haven.HAVEN.SITE_R);
+    P('the reservoir\'s near edge lands on the waterline',
+      haven.nearEdgeDrift < 0.01, 'near r ' + haven.stats.water.nearR + ' vs shore ' + haven.HAVEN.SHORE_R);
+    /* THE RESERVOIR IS ABOVE GRADE ON PURPOSE. The site was chosen for flat ground at y 0, so a
+       surface at the world's natural water level of -1.4 is UNDER it — which is what shipped, twice.
+       This gate is the reason the module no longer accepts a waterY option from the assembly. */
+    P('the reservoir is held above grade, not sunk under the ground it stands on',
+      haven.waterY > 0 && haven.waterY < haven.HAVEN.BUND_H,
+      'water ' + haven.waterY + ' m, bund ' + haven.HAVEN.BUND_H + ' m');
+    /* THE TWO GATES THAT WOULD HAVE CAUGHT THE WINDING. One is arithmetic on the first triangle;
+       the other is the renderer's own question, asked with the renderer's own primitive. */
+    P('the water surface faces UP', haven.facesUp,
+      'first triangle winds ' + (haven.facesUp ? 'CCW from above' : 'CLOCKWISE — FrontSide will cull it'));
+    P('the water is visible from the rail', haven.sawWater,
+      haven.sawWater ? 'hit' : 'reveal axis hits ' + haven.firstHit + ' and never the water');
     /* §11: the reveal. A corridor that is not narrow reveals nothing. */
     P('the entrance corridor is narrow (under 10 m) and long (over 60 m)',
       haven.HAVEN.APPROACH_W < 10 && haven.HAVEN.APPROACH_LEN > 60,

@@ -63,9 +63,11 @@
        it takes its value from what it reflects, exactly like every other surface in this world;
      · a line costs no triangle, so MICRO/STANDARD/MEGA scales are free and a 2700 m ring can carry
        a 1 m grid without a geometry budget;
-     · the lines are anti-aliased with fwidth and FADE OUT as they approach a pixel wide, which is
-       the only way to satisfy R4's "lines do not shimmer" — a geometric line at 3 km is aliasing,
-       and no amount of care in the mesh fixes it.
+     · the lines have a real width in MILLIMETRES and are prefiltered against the pixel, so they
+       fade as they go sub-pixel instead of aliasing — which is the only way to satisfy R4's "lines
+       do not shimmer". A geometric line at 3 km is aliasing, and no amount of care in the mesh
+       fixes it; a line of constant PIXEL width, which is what this shipped with for several rounds,
+       does not alias but cannot dim either, and fills the far field with a solid sheet instead.
 
    ---- WHAT THIS FILE OWNS AND WHAT IT DOES NOT -------------------------------------------------
    This file owns THE SURFACE: the analytic shell, the shell mesh, the tile shader, the near-field
@@ -135,11 +137,24 @@ export function haloFloor(x, z) {
    present as literal strings, `instanceMatrix` is three's own instanced world-position pattern, and
    the renderer is WebGL2 so fwidth() is core GLSL ES 3.00 and needs no extension.
 
-   THE ANTI-SHIMMER RULE, which is the whole reason this is a shader. `f` below is the distance to
-   the nearest grid line measured IN SCREEN-DERIVATIVE UNITS — i.e. in pixels. A line is drawn where
-   that pixel distance is under the line width, so a line is always about the same number of pixels
-   wide however far away it is, and when a whole grid cell shrinks below a pixel the term goes to
-   zero and the grid FADES OUT instead of aliasing into moiré. Geometry cannot do this. */
+   THE ANTI-SHIMMER RULE, which is the whole reason this is a shader. Distance to the nearest grid
+   line is measured IN SCREEN-DERIVATIVE UNITS — i.e. in pixels — so the line can be drawn at a
+   width the framebuffer can actually resolve. Geometry cannot do this.
+
+   AND THE PARAGRAPH THAT USED TO BE HERE WAS WRONG, WHICH COST THE RING ITS DEPTH FOR SEVERAL
+   ROUNDS. It claimed that "when a whole grid cell shrinks below a pixel the term goes to zero and
+   the grid fades out". It does the opposite. With a constant PIXEL width there is nothing in the
+   expression that knows the distance, so brightness is constant everywhere — and once the cell is
+   under a pixel the pixel-distance to a line can no longer exceed the width ANYWHERE, so the term
+   goes to ONE across the whole surface and the grid becomes a filled emissive sheet. The halo's
+   underside photographed as a pale lightbox and its lines read as razor-hard at every range; those
+   are the same defect, seen far and near.
+
+   A line dims with distance only if it has a real WIDTH to lose. So the joints are measured in
+   METRES, drawn at max(true half-width, uHaloWidth) pixels so they never fall into aliasing, and
+   then multiplied by true/drawn — an energy-conserving prefilter that holds the cell's mean. Where
+   the joint still covers a pixel nothing changes; where it has gone sub-pixel it fades as 1/distance
+   like the real 24 mm channel it represents. */
 export function applyHaloGrid(material, opts = {}) {
   const o = {
     micro: opts.micro != null ? opts.micro : HALO.MICRO,
@@ -152,8 +167,33 @@ export function applyHaloGrid(material, opts = {}) {
     gainMega: opts.gainMega != null ? opts.gainMega : 0.62,
     microFar: opts.microFar != null ? opts.microFar : 34,
     tileFar: opts.tileFar != null ? opts.tileFar : 560,
-    width: opts.width != null ? opts.width : 1.05,     /* line half-width, in pixels */
-    node: opts.node != null ? opts.node : 1.0          /* square-diamond node brightness at MEGA crossings */
+    /* uHaloWidth USED TO MEAN "the line is this many pixels wide, at every distance". That is the
+       defect below, and its meaning is now the MINIMUM half-width we will draw at before we start
+       paying the difference back in brightness. */
+    width: opts.width != null ? opts.width : 0.60,     /* minimum drawn half-width, in pixels */
+    node: opts.node != null ? opts.node : 1.0,         /* square-diamond node brightness at MEGA crossings */
+    /* THE KERFS, IN METRES. These are joints in a plated surface, so they have a real width, and
+       giving them one is what lets them behave: a channel that is invisible from a kilometre away
+       was, until now, exactly as bright there as it is underfoot.
+
+       AND THEY ARE SIZED TO THE OBJECT, which is the correction the first cut needed. Sized as
+       millimetre kerfs — 24 mm in the 8 m tile, 130 mm in the 64 m mega — the arithmetic is right
+       and the ring goes BLACK between about 200 m and the horizon: at a 5 deg grazing angle a pixel
+       covers 3.8 m of deck at 300 m out, so a 130 mm joint is 0.017 px and correctly disappears.
+       Correct, and useless: R4 asks the grid to make the ring's curvature legible, and a featureless
+       band from 200 m to 2700 m shows no curvature at all.
+
+       The error was reading these as sheet-metal seams. This is a 2700 m ring whose plate module is
+       64 m; its MEGA joint is not a kerf, it is a CHANNEL — a recessed service run wide enough to
+       walk in — and its 16 sector joints are structural, several metres across. Sized as what they
+       actually are, the near field keeps full plating, MEGA carries the curvature out to ~500 m,
+       and past that the sixteen spokes hold the far field alone. Three ranges, three scales. */
+    kerfMicro: opts.kerfMicro != null ? opts.kerfMicro : 0.008,   /* a plate joint, seen underfoot */
+    kerfTile: opts.kerfTile != null ? opts.kerfTile : 0.050,      /* the walking tile's seam */
+    kerfMega: opts.kerfMega != null ? opts.kerfMega : 1.20,       /* a district channel, not a kerf */
+    kerfSpoke: opts.kerfSpoke != null ? opts.kerfSpoke : 3.50,    /* 16 structural joints */
+    kerfBand: opts.kerfBand != null ? opts.kerfBand : 2.40,       /* the 300 m district boundary */
+    nodeSize: opts.nodeSize != null ? opts.nodeSize : 4.00        /* half-diagonal, metres */
   };
   const u = {
     uHaloLine: { value: new THREE.Color(0xdff1ff) },
@@ -161,6 +201,8 @@ export function applyHaloGrid(material, opts = {}) {
     uHaloScale: { value: new THREE.Vector3(o.micro, o.tile, o.mega) },
     uHaloFade: { value: new THREE.Vector2(o.microFar, o.tileFar) },
     uHaloWidth: { value: o.width },
+    uHaloKerf: { value: new THREE.Vector4(o.kerfMicro, o.kerfTile, o.kerfMega, o.kerfSpoke) },
+    uHaloKerf2: { value: new THREE.Vector2(o.kerfBand, o.nodeSize) },
     uHaloNode: { value: o.node },
     uHaloPulse: { value: 0 },        /* BASE_IDLE breathing; the audio contract writes this */
     uHaloBand: { value: 0 }          /* MUSIC_ACTIVE: a travelling band, normalised 0..1 */
@@ -182,22 +224,54 @@ export function applyHaloGrid(material, opts = {}) {
       varying vec3 vHaloW;
       uniform vec3 uHaloLine; uniform vec3 uHaloGain; uniform vec3 uHaloScale;
       uniform vec2 uHaloFade; uniform float uHaloWidth; uniform float uHaloNode;
+      uniform vec4 uHaloKerf; uniform vec2 uHaloKerf2;
       uniform float uHaloPulse; uniform float uHaloBand;
-      /* distance to the nearest line of a square grid, in PIXELS, then shaped to a line */
-      float haloGrid( vec2 p, float period, float w ) {
+
+      /* ---- WHY THESE LINES ARE PREFILTERED, AND WHAT THEY WERE DOING BEFORE ---------------------
+         Every one of these functions used to take a width in PIXELS and shape a line to it. A line
+         of constant pixel width has constant brightness at every distance — it cannot dim, because
+         nothing in the expression knows how far away it is. Underfoot that is a crisp joint. At a
+         kilometre it is the same crisp joint, drawn across cells that have shrunk below a pixel, and
+         at that point f can no longer exceed the width anywhere on the surface: the grid stops
+         being lines and becomes a SHEET. That is the pale lightbox the halo's underside has been
+         photographing as, and the razor-hard white lines at every distance are the same defect seen
+         from closer. One cause, two complaints.
+
+         The fix is a prefilter, and it is the standard one: give the joint a real width in METRES,
+         work out how many pixels that is here, draw it at max(true, uHaloWidth) so it never falls
+         into aliasing, and then DIM IT BY true/drawn so the cell's mean brightness is conserved.
+         Where the joint is wider than the floor, the ratio is 1 and nothing changes. Where it has
+         gone sub-pixel, the ratio falls off as 1/distance and the line fades out the way a real
+         24 mm channel in an 8 m plate does.
+
+         Measured at the establishing camera (2900 m, 1280 px, 89 deg horizontal): the MEGA joint at
+         130 mm falls to 2.4% of its old value, TILE at 24 mm to 0.45%, and the 2.2 m sector spokes
+         hold 41% — so the far ring keeps its sixteen structural joints and loses the graph paper,
+         which is the hierarchy the geometry actually has. */
+      float haloGrid( vec2 p, float period, float kerf ) {
         vec2 q = p / period;
         vec2 dq = fwidth( q );
+        float d = max( max( dq.x, dq.y ), 1e-8 );          /* cells per pixel */
+        float wpx = ( 0.5 * kerf / period ) / d;           /* the joint's true half-width, in pixels */
+        float drawn = max( wpx, uHaloWidth );
         vec2 f = abs( fract( q - 0.5 ) - 0.5 ) / max( dq, vec2( 1e-8 ) );
         float m = min( f.x, f.y );
-        return 1.0 - clamp( m / max( w, 1e-4 ), 0.0, 1.0 );
+        float line = 1.0 - clamp( m / drawn, 0.0, 1.0 );
+        return line * min( 1.0, wpx / drawn );
       }
       /* the CROSSINGS of the MEGA grid carry the square diamond: a small rotated-square node where
-         two district lines meet, which is where this world puts its brand figure */
-      float haloNodeAt( vec2 p, float period ) {
+         two district lines meet, which is where this world puts its brand figure. A node is an AREA
+         rather than a line, so its energy falls with the SQUARE of the over-draw ratio. */
+      float haloNodeAt( vec2 p, float period, float size ) {
         vec2 q = fract( p / period + 0.5 ) - 0.5;
         vec2 dq = fwidth( p / period );
-        float dia = ( abs( q.x ) + abs( q.y ) ) / max( max( dq.x, dq.y ), 1e-8 );
-        return 1.0 - clamp( dia / 4.0, 0.0, 1.0 );
+        float d = max( max( dq.x, dq.y ), 1e-8 );
+        float wpx = ( size / period ) / d;
+        float drawn = max( wpx, uHaloWidth * 2.0 );
+        float dia = ( abs( q.x ) + abs( q.y ) ) / max( dq.x + dq.y, 1e-8 ) * 2.0;
+        float node = 1.0 - clamp( dia / drawn, 0.0, 1.0 );
+        float r = min( 1.0, wpx / drawn );
+        return node * r * r;
       }
       /* ---- THE SECTOR SCALE, and why it is POLAR ------------------------------------------------
          The first cut stopped at MEGA — a 64 m cartesian grid with no distance ramp — and the
@@ -211,22 +285,30 @@ export function applyHaloGrid(material, opts = {}) {
          are the reason the plate reads as one enormous engineered ring rather than as tiling. The
          spoke count is 16 — two per district, so the structure the eye reads is the structure the
          world is actually divided into. */
-      float haloSpoke( vec2 p, float n, float w ) {
+      float haloSpoke( vec2 p, float n, float kerf ) {
         /* +0.5 puts the spokes at HALF-SECTOR bearings — 11.25 deg and every 22.5 deg after. Without
            it the sixteen spokes land on multiples of 22.5, which includes every multiple of 45, which
            is every district centre bearing: spoke 12 would run straight down the middle of the
            ARRIVAL concourse and its pylons would stand in the walking channel. Offset, each district
            sits centred between two joints 402 m either side. The geometry carries the same +0.5. */
         float a = atan( p.y, p.x ) * n / 6.28318530718 + 0.5;
-        float da = fwidth( a );
-        float f = abs( fract( a - 0.5 ) - 0.5 ) / max( da, 1e-8 );
-        return 1.0 - clamp( f / max( w, 1e-4 ), 0.0, 1.0 );
+        float da = max( fwidth( a ), 1e-8 );
+        /* a spoke of fixed WORLD width subtends less angle the further out it runs, so its half-width
+           in spoke-units is a function of radius — which is also why it is the one scale that stays
+           legible to the horizon: it is 2.2 m of real joint, not a pixel convention. */
+        float rr = max( length( p ), 1.0 );
+        float wpx = ( 0.5 * kerf / rr * n / 6.28318530718 ) / da;
+        float drawn = max( wpx, uHaloWidth );
+        float f = abs( fract( a - 0.5 ) - 0.5 ) / da;
+        return ( 1.0 - clamp( f / drawn, 0.0, 1.0 ) ) * min( 1.0, wpx / drawn );
       }
-      float haloBandLine( vec2 p, float period, float w ) {
+      float haloBandLine( vec2 p, float period, float kerf ) {
         float r = length( p ) / period;
-        float dr = fwidth( r );
-        float f = abs( fract( r - 0.5 ) - 0.5 ) / max( dr, 1e-8 );
-        return 1.0 - clamp( f / max( w, 1e-4 ), 0.0, 1.0 );
+        float dr = max( fwidth( r ), 1e-8 );
+        float wpx = ( 0.5 * kerf / period ) / dr;
+        float drawn = max( wpx, uHaloWidth );
+        float f = abs( fract( r - 0.5 ) - 0.5 ) / dr;
+        return ( 1.0 - clamp( f / drawn, 0.0, 1.0 ) ) * min( 1.0, wpx / drawn );
       }
     ` + shader.fragmentShader.replace(
       '#include <emissivemap_fragment>',
@@ -239,13 +321,16 @@ export function applyHaloGrid(material, opts = {}) {
         /* MEGA now ramps out too, at four times the tile range, so it hands the frame to the sector
            scale instead of tiling to the horizon on its own */
         float fMega  = 1.0 - smoothstep( uHaloFade.y * 2.2, uHaloFade.y * 4.4, hd );
-        float g = haloGrid( hp, uHaloScale.x, uHaloWidth ) * uHaloGain.x * fMicro
-                + haloGrid( hp, uHaloScale.y, uHaloWidth ) * uHaloGain.y * fTile
-                + haloGrid( hp, uHaloScale.z, uHaloWidth * 1.25 ) * uHaloGain.z * fMega;
-        g += haloNodeAt( hp, uHaloScale.z ) * uHaloNode * 0.9 * fMega;
-        /* the two scales that never fade: 16 spokes and a band every 300 m of radius */
-        g += haloSpoke( hp, 16.0, uHaloWidth * 2.4 ) * uHaloGain.z * 1.15;
-        g += haloBandLine( hp, 300.0, uHaloWidth * 2.0 ) * uHaloGain.z * 0.80;
+        float g = haloGrid( hp, uHaloScale.x, uHaloKerf.x ) * uHaloGain.x * fMicro
+                + haloGrid( hp, uHaloScale.y, uHaloKerf.y ) * uHaloGain.y * fTile
+                + haloGrid( hp, uHaloScale.z, uHaloKerf.z ) * uHaloGain.z * fMega;
+        g += haloNodeAt( hp, uHaloScale.z, uHaloKerf2.y ) * uHaloNode * 0.9 * fMega;
+        /* the two scales that carry the far field: 16 spokes and a band every 300 m of radius. They
+           no longer "never fade" — they fade like everything else, just far more slowly, because a
+           2.2 m joint is a hundred times wider than a tile kerf and stays real for a hundred times
+           longer. That difference IS the hierarchy; asserting it with a never was the old model. */
+        g += haloSpoke( hp, 16.0, uHaloKerf.w ) * uHaloGain.z * 1.15;
+        g += haloBandLine( hp, 300.0, uHaloKerf2.x ) * uHaloGain.z * 0.80;
         /* BASE_IDLE: a slow breath, never a blink (R3-12, and R4's animation states).
            MUSIC_ACTIVE: one travelling band along the ring, and only one. */
         float breath = 0.88 + 0.12 * uHaloPulse;

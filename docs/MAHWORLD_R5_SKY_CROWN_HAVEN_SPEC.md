@@ -110,21 +110,52 @@ instead of two objects that intersect.
 
 ## MAH HAVEN
 
-**It stands on the lake that already exists.** R2 cut an irregular 14-sided polygon at bearing 62,
-r 700, water at `terrain.js`'s `BASIN.y`. A second body of water would be two systems where the
-world has one, and the shoreline would drift from it the first time either was edited — so
-`lakecity.js` now exports its polygon, water level and centre, and this district reads them.
+**It cuts its own water, because the world had no shore with room beside it.** Four sitings, each
+measured rather than judged, and the sequence is the finding:
 
-**The shore bearing is a lighting decision, made by measurement.** MAHWORLD's directional light is
-fixed at (−80, 120, 160) — bearing 243.4 — and the clock changes its colour and intensity but never
-its azimuth. So orientation decides once and for all whether a district is front-lit, and no choice
-of render hour can rescue one that faces the wrong way.
+| # | site | what the measurement said |
+| --- | --- | --- |
+| 1 | LAKE CITY's lake, local bearing 232 | the reveal came back black. Read as a lighting problem |
+| 2 | local bearing 118, chosen to face the sun | a raycast down the reveal axis hit `terrain-range-near` **4 m** in front of the camera. Never a lighting problem — both sites were inside a mountain |
+| 3 | `terrain.js`'s BASIN, ellipse param 66 | flat and front-lit, and standing **inside MAH CITY** — "is anything already here" had been an `r < 300` guess, not a measurement |
+| **4** | **world bearing 340, r 400** | **relief 0.0 m · rock 0/25 · built 0/25 · ground 25/25** |
 
-| bearing | view axis | off the light | verdict |
-| --- | --- | --- | --- |
-| 232 (first cut) | 52° | 168° | fully backlit — the reveal came back with a black lake |
-| 63.4 (ideal) | 243.4° | 0° | inside LAKE CITY's terrace arc (−46 to +78). Not available |
-| **118 (built)** | **298°** | **54.6°** | three-quarter front light raking across the water; clears both bridge pinches at 103 and 257 |
+The fourth attempt swept the whole world — bearing × radius, raycasting a 5×5 grid of the district's
+own footprint for both mountain relief and existing architecture — and returned **exactly one** site
+clear of both. R5 §13 lists "lake/body-of-water boundary" among the things MAH HAVEN *establishes*;
+the constraint that it reuse an existing lake was mine, and L42 is about one truth, not one object.
+
+**The water is a reservoir, held above grade at y 0.30 behind a 1.15 m bund.** The site was chosen
+for flat ground at y 0, so a surface at the world's natural water level of −1.4 sits *under* it —
+which is what shipped, twice. Cutting a depression is not available: `terrain.js`'s mesh is not this
+module's to reshape. A made body on flat ground beside a growing region is the correct typology
+anyway; the farm rows already run a channel off it.
+
+**The light is the accepted cost.** MAHWORLD's directional light is fixed at (−80, 120, 160) —
+bearing 243.4 — and the clock changes its colour and intensity but never its azimuth, so orientation
+decides once and for all whether a district is front-lit. This site's view axis is 83° off the sun
+rather than the 3° the basin offered: the light rakes *across* the water instead of coming down it.
+That is the right trade, because the other site was inside a city.
+
+### The bug that hid the water for three rounds
+
+Every published number about the reservoir was correct — level, size, position, shoreline metres —
+and it was invisible in every frame. A grid of rays through the three waterfront cameras, 84
+samples, returned `haven-water` **zero** times.
+
+The triangle fan was wound `(centre, p0, p1)`. This district's frame is left-handed in XZ, so that
+order winds **clockwise seen from above** and the front face points at the lakebed;
+`MeshStandardMaterial` is `FrontSide`, so every camera in a world whose cameras all stand above
+their water culled it — and `Raycaster` honours `material.side`, which is why the probe agreed with
+the renderer instead of contradicting it.
+
+What made it *silent* rather than merely wrong was `nor.push(0,1,0)`: an authored normal the winding
+does not support. Had the normal been derived from the winding — the way `quad()` does it forty
+lines below, which is why the bund was always visible — the surface would have shaded as a dark lid
+and been obviously broken. **An authored normal that contradicts its winding does not make a surface
+look wrong. It makes it not exist.** The winding is now asserted in `stats.waterFacesUp` from the
+first triangle's own cross product, and the law suite fires a ray down the reveal axis, because no
+number could have caught this.
 
 ### The entrance is the whole district
 
@@ -173,6 +204,15 @@ capture cameras to it; `mah-haven.js` lost seven. **The R5 law suite now opens w
 which costs one line and would have caught both.
 
 **Open.**
+
+- The reservoir reads as polished metal rather than water: mirror-flat at roughness 0.09 with a hard
+  specular path. Correct for LAW 1 and §07, but a still lake wants a softer graded sheen.
+- The halo grid's prefilter is new this round; the near-field gains were tuned against the old
+  constant-pixel model and may now be reading dim underfoot.
+- Carried from R4: the downward world view is thin at night, and the halo (r 3400) outruns the
+  terrain (r 1500).
+- Long-standing: #101 floor shards · #102 transport wiring · #105 flora needles · #106 broadcast
+  monitor.
 - The dome's ribs invert value between day and night (dark lines on a bright sky, lit lines on a
   dark one). Physically correct; wants a noon frame before it is called.
 - The PBR material pass — procedural roughness break-up, normal micro-depth and vertex-AO — is
