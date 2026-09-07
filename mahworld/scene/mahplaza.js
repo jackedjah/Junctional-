@@ -104,17 +104,28 @@ export async function createMahplaza(canvas, options = {}) {
   renderer.shadowMap.type = THREE.PCFShadowMap;   /* PCFSoft is deprecated in this renderer build and falls back to this anyway */
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0d1f3e, 60, 2350);  /* near / far follow the time of day in applyTime: atmospheric perspective, not a fog bank */
+  /* R7 §16 / §27 — THE FOG WAS OPAQUE BEFORE THE WORLD ENDED.
+     far 2350 was set when the outermost thing worth seeing was terrain's far range at r 1500. The
+     world has grown past it: MAH NEXUS stands at r 1750 with a canopy reaching r 2950, the crystal
+     sea runs to 3014 and MAH HALO's rim to 3400. Linear fog replaces a pixel by (d-near)/(far-near),
+     so from the plaza MAH NEXUS was 74% fog colour and from a wide camera 100% — which is why a
+     value probe measured every one of its surfaces at exactly 195.8, the fog itself. §16 forbids
+     "excessive fog masking detail" and §27 gates far views; this is that number, derived from the
+     world's own extents rather than from what used to be in it. 5400 leaves a viewer 2 km out at
+     36% aerial perspective, which is atmosphere, where 85% was erasure. */
+  scene.fog = new THREE.Fog(0x0d1f3e, 60, 5400);  /* near / far follow the time of day in applyTime: atmospheric perspective, not a fog bank */
   /* FAR PLANE PAST THE FAR RING. terrain.js's outermost range stands at r 1500, so a viewer who
      has flown 700 m out to Lake City is 2200 m from the ridge behind the plaza — beyond a 2000 m
      frustum, which clipped the far range out of exactly the wide shots it exists for. 2600 clears
      it with margin; the depth buffer loses a little far-field precision and there is nothing
      coplanar out there to lose it on. */
-  const camera = new THREE.PerspectiveCamera(54, 1, 0.1, 2600);
+  /* and the FRUSTUM has to reach at least as far as the fog now does, or the fix is invisible:
+     a viewer at MAH HAVEN is ~2900 m from MAH NEXUS, which 2600 clipped outright. */
+  const camera = new THREE.PerspectiveCamera(54, 1, 0.1, 7000);
   /* R4: the fog bank is authored by applyTime and SCALED by altitude (updateFrustum, far below).
      Both have to be declared here, before the first applyTime call, and both write through
      applyFog so neither can silently overwrite the other's decision. */
-  const fogBase = { near: 55, far: 2350 };
+  const fogBase = { near: 55, far: 5400 };
   let frustumHigh = false;
   const applyFog = () => {
     const k = frustumHigh ? 3.4 : 1;
