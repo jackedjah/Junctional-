@@ -625,12 +625,23 @@ export function buildMahRain(ctx, opts = {}) {
        rod, which is what every first cut of falling glass looks like. */
     uRainA: { value: new THREE.Vector2(0.055, 0.72) },
     uRainRim: { value: new THREE.Color(0xeaf4ff) },
-    uRainGlow: { value: 0.30 }
+    uRainGlow: { value: 0.30 },
+    /* THE NEAR FADE, and it is what the "starfish" actually needed.
+       Four times I diagnosed those radiating white blades as a cloud defect — deformation, then
+       accumulation, then the union of the lobes — and changed the clouds each time. They persisted
+       because they were never clouds. EVERY frame that showed them has the rain curtain in it, and
+       the cameras that showed them worst stand at r 3600-3900, INSIDE a curtain that runs 3434 to
+       4189. They are shards passing within metres of the lens, drawn at enormous screen size with a
+       hard rim, crossing each other at every angle. Long glass crossing long glass is a star.
+       Every rain system fades its particles near the camera for exactly this reason. Below 20 m a
+       shard contributes nothing and by 170 m it is at full strength — so the curtain you stand in
+       reads as depth rather than as blades across the lens. */
+    uRainNear: { value: new THREE.Vector2(20.0, 170.0) }
   };
   rainMat.userData.rainUniforms = rainU;
   rainMat.onBeforeCompile = sh => {
     Object.assign(sh.uniforms, rainU);
-    sh.fragmentShader = 'uniform vec2 uRainA;\nuniform vec3 uRainRim;\nuniform float uRainGlow;\n'
+    sh.fragmentShader = 'uniform vec2 uRainA;\nuniform vec3 uRainRim;\nuniform float uRainGlow;\nuniform vec2 uRainNear;\n'
       + sh.fragmentShader
         /* AFTER the normal chunks, because a Fresnel term needs a normal, and diffuseColor is still
            in scope here — it is declared at the top of main and consumed at opaque_fragment. */
@@ -638,8 +649,9 @@ export function buildMahRain(ctx, opts = {}) {
       {
         float rainNdv = abs( dot( normalize( vViewPosition ), normal ) );
         float rainF = pow( 1.0 - rainNdv, 3.0 );
-        diffuseColor.a *= clamp( uRainA.x + uRainA.y * rainF, 0.0, 1.0 );
-        totalEmissiveRadiance += uRainRim * rainF * uRainGlow;
+        float rainNear = smoothstep( uRainNear.x, uRainNear.y, length( vViewPosition ) );
+        diffuseColor.a *= clamp( uRainA.x + uRainA.y * rainF, 0.0, 1.0 ) * rainNear;
+        totalEmissiveRadiance += uRainRim * rainF * uRainGlow * rainNear;
       }`);
   };
   rainMat.customProgramCacheKey = () => 'rain';

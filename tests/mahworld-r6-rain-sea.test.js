@@ -195,6 +195,9 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       seaTimeAdvanced: (u0 != null && u1 != null) ? (u1 - u0) : null,
       curtainMovedM: moved,
       at, outsideIn, outsideOut, vols, sawSea, sawRain, rainInCone, firstHit,
+      rainNear: (function () { const m = curtain && curtain.material;
+        const u = m && m.userData && m.userData.rainUniforms;
+        return u && u.uRainNear ? [u.uRainNear.value.x, u.uRainNear.value.y] : null; })(),
       lenMin: RM.RAIN.LEN_MIN, lenMax: RM.RAIN.LEN_MAX, flare: RM.RAIN.FLARE
     };
   });
@@ -227,6 +230,14 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     /* R5 §19: a hero system with no performance strategy has none */
     P('the whole curtain costs one draw call', R.stats.draws >= 1 && R.stats.shards > 500,
       R.stats.shards + ' shards');
+    /* THE NEAR FADE. Four rounds were spent blaming the clouds for radiating white blades that were
+       always shards passing within metres of the lens — the cameras that showed them worst stand
+       INSIDE the curtain. A shard at 5 m is drawn at enormous screen size with a hard rim, and long
+       glass crossing long glass is a star. This asserts the fade exists and starts far enough out
+       to cover a viewer standing in the rain. */
+    P('shards fade out near the lens, so standing in the rain is depth and not blades',
+      R.rainNear && R.rainNear[0] <= 30 && R.rainNear[1] >= 120,
+      R.rainNear ? ('fades ' + R.rainNear[0] + ' m to ' + R.rainNear[1] + ' m') : 'no fade uniform');
   }
 
   console.log('\nR6 — THE CRYSTAL SEA');
