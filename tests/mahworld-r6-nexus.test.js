@@ -433,6 +433,28 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     S.triDetail > S.triApproach * 0.25, S.triDetail + ' of ' + S.triApproach);
   /* R7 §5 / PASS 4 — a route has to be enterable, and "sufficient internal diameter" is a number */
   P('§5: every route has a real bore', S.boreMin > 30, 'narrowest ' + S.boreMin + ' m internal');
+
+  /* R7 §5 / PASS 5 — "existing FOB vehicles fit the network", and EXISTING is the operative word.
+     §0 forbids inventing a transport family; §6 says the established language remains. So the gate
+     checks two things a new craft would fail: that the craft in this complex come from
+     flora-and-vehicles' canonical genome, and that they actually fit the bore they run in. */
+  const veh = await ev(async () => {
+    const f = await import('/mahworld/scene/flora-and-vehicles.js');
+    const g = window.MAHWORLD_MAHPLAZA.mahNexus.group;
+    const inst = g.children.find(c => c.isInstancedMesh && /vehicles/.test(c.name || ''));
+    return { shuttle: f.SHUTTLE ? f.SHUTTLE.size : null, pod: f.POD ? f.POD.size : null,
+      hasCreate: typeof f.createVehicle === 'function',
+      instanced: !!inst, count: inst ? inst.count : 0, draws: inst ? 1 : 0 };
+  });
+  P('§0/§6: the craft are the EXISTING exported genome, not a new family',
+    veh.hasCreate && veh.shuttle != null, 'SHUTTLE ' + veh.shuttle + ', POD ' + veh.pod);
+  P('§5: craft are actually present in the network', S.parts.vehicles >= 40,
+    S.parts.vehicles + ' craft');
+  P('§5: and they fit the routes they run in', S.vehicleFitRatio > 2,
+    'bore is ' + S.vehicleFitRatio + 'x the craft');
+  /* §24 again: 75 craft must not be 75 draws. This is the instancing clause, checked. */
+  P('§24: the whole fleet is one draw', veh.instanced && veh.count === S.parts.vehicles && veh.draws === 1,
+    veh.count + ' instances in ' + veh.draws + ' draw');
   /* and the tier must actually TOGGLE — a budget split that never changes what is drawn is a
      comment, not a strategy. */
   const lod = await ev(async () => {

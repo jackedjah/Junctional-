@@ -94,6 +94,7 @@
 
 import * as THREE from '../vendor/three/three.module.min.js';
 import { applyPlatinumFinish } from './materials.js';
+import { createVehicle, SHUTTLE } from './flora-and-vehicles.js';
 
 const TAU = Math.PI * 2;
 const DEG = Math.PI / 180;
@@ -335,6 +336,9 @@ export const NEXUS = Object.freeze({
   SITE_CLEAR_R: 400,        /* measured: relief 0.0 inside this, 105.5 m of rock outside it */
   LAND_MARGIN: 140,         /* how far inside the halo annulus a landing must stay to have ceiling */
 
+  /* R7 §5 — the craft are the EXISTING genome, placed. Three abreast because one 8.6 m shuttle in
+     a 39.6 m bore is a speck, and a subway-scale network runs groups. */
+  VEHICLES: Object.freeze({ CLUSTERS: 3, ABREAST: 3, SPACING: 11.5, STAGGER: 7, LO: 0.18, HI: 0.82, DOCKED: 2, DOCK_LIFT: 5 }),
   LOD_INTERIOR: 460,   /* the bores draw only when a viewer could plausibly be inside one */
   LOD_NEAR: 1400, LOD_MID: 4200, LOD_FAR: 26000
 });
@@ -653,6 +657,9 @@ export function buildMahNexus(ctx, opts = {}) {
   /* every member that is supposed to REACH the ceiling records where it claims to land, so §3 can
      be checked against the intent and not against whatever vertex happens to be near the top */
   const landings = [];
+  /* every route's curve and section radius, kept so PASS 5 can place craft along them */
+  const routeCurves = [];
+  let vehicleMesh = null;
   const land = (id, x, y, z) => { landings.push({ id, x, y, z }); return y; };
   /* R7 §24 — TWO TIERS OF GEOMETRY, NOT ONE.
 
@@ -1115,6 +1122,7 @@ export function buildMahNexus(ctx, opts = {}) {
       ], lx, ly, lz, LAND_TAIL));
       push('tube', sweptTube(curve, NEXUS.TUBE_STATIONS, NEXUS.TUBE_RADIAL, () => S.R, () => S.N, () => 0, true, true));
       interior(() => boreOf(curve, S.R, S.N));
+      routeCurves.push({ curve, r: S.R });
     }
     stats.parts.straight = S.COUNT;
   }
@@ -1141,6 +1149,7 @@ export function buildMahNexus(ctx, opts = {}) {
       const curve = new THREE.CatmullRomCurve3(landVertical(pts, last.x, last.y, last.z, LAND_TAIL));
       push('tube', sweptTube(curve, NEXUS.TUBE_STATIONS + 24, NEXUS.TUBE_RADIAL, () => S.R, () => S.N, () => 0, true, true));
       interior(() => boreOf(curve, S.R, S.N));
+      routeCurves.push({ curve, r: S.R });
     }
     stats.parts.spiral = S.COUNT;
     stats.boreStraight = +((NEXUS.STRAIGHT.R - NEXUS.BORE.WALL) * 2).toFixed(1);
@@ -1212,6 +1221,106 @@ export function buildMahNexus(ctx, opts = {}) {
     stats.parts.mahgic = G.COUNT;
   });
 
+  /* PLACED LAST, AND THE COUNT IS WHY. This block first sat before the tube families, so
+     routeCurves was still empty when it ran: 12 craft appeared at the halo terminals and ZERO in
+     the routes, against an expected 75. The stat caught it immediately — which is the argument for
+     publishing a count rather than trusting a loop. */
+  /* R7 §5 / PASS 5 — THE EXISTING FOB VEHICLES, IN THE NETWORK.
+
+     The acceptance clause is "existing FOB vehicles fit the network", and the operative word is
+     EXISTING: §0 forbids inventing a transport family and §6 says the established language remains.
+     So nothing is designed here. flora-and-vehicles.js already exports the canonical genome —
+     SHUTTLE at 2.30 x 5.14 x 2.35, "a one-being block" scaled up — and createVehicle builds it.
+
+     THE FIT, MEASURED RATHER THAN ASSERTED: a 2.35 m craft in a 39.6 m bore is a ratio of 17. It
+     passes "sufficient internal diameter" so trivially that the interesting question inverts — a
+     lone pod in that shaft is a speck. The answer is not to shrink a bore I have already accepted
+     on silhouette grounds, nor to inflate a craft whose proportions mean "one being". It is to run
+     them the way a subway-scale network actually would: in ABREAST GROUPS. Three craft across a
+     40 m shaft reads as transit; one reads as litter.
+
+     ONE DRAW. buildFobPods is the plaza's placer, with its own apron search and ascent-pad
+     keep-outs, so reusing it here would mean changing a contract the plaza depends on. Instead the
+     genome is built ONCE, its geometry harvested, and every craft in this complex is an instance of
+     it — which is §24's instancing clause and also the only way 75 vehicles cost less than 75
+     draws. */
+  {
+    let proto = null, protoMat = null;
+    try {
+      const v = createVehicle({ theme, seed: 'mah-nexus', length: 8.6 });
+      const parts = [];
+      v.traverse(o => { if (o.isMesh && o.geometry) { o.updateMatrixWorld(true); parts.push(o); } });
+      if (parts.length) {
+        const geos = [];
+        for (const o of parts) {
+          const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+          g.applyMatrix4(o.matrixWorld);
+          if (!g.getAttribute('normal')) g.computeVertexNormals();
+          geos.push(g);
+        }
+        proto = mergeGeoms(geos);
+        for (const g of geos) g.dispose();
+        protoMat = parts[0].material;
+      }
+      if (v.userData && typeof v.userData.dispose === 'function') v.userData.dispose();
+    } catch (e) { proto = null; }
+
+    if (proto) {
+      owned.geometries.push(proto);
+      const placements = [];
+      const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _up = new THREE.Vector3(0, 0, 1);
+      const _pos = new THREE.Vector3(), _sc = new THREE.Vector3(1, 1, 1);
+      /* IN THE ROUTES — three clusters up each shaft, three craft abreast, all facing the way the
+         route runs. The abreast offset comes off the curve's own frame, so a spiral's groups bank
+         with it instead of staying stubbornly world-flat. */
+      const V = NEXUS.VEHICLES;
+      for (const R of routeCurves) {
+        for (let c = 0; c < V.CLUSTERS; c++) {
+          const t = V.LO + (V.HI - V.LO) * (c / Math.max(1, V.CLUSTERS - 1));
+          const P0 = R.curve.getPointAt(t), T0 = R.curve.getTangentAt(t).normalize();
+          let N0 = new THREE.Vector3(0, 1, 0);
+          if (Math.abs(T0.dot(N0)) > 0.92) N0.set(1, 0, 0);
+          const B0 = new THREE.Vector3().crossVectors(T0, N0).normalize();
+          N0.crossVectors(B0, T0).normalize();
+          const bore = R.r - NEXUS.BORE.WALL;
+          for (let k = 0; k < V.ABREAST; k++) {
+            const off = (k - (V.ABREAST - 1) / 2) * V.SPACING;
+            const lift = (gold(c * 5 + k * 3) - 0.5) * V.STAGGER;
+            _pos.set(P0.x + B0.x * off + N0.x * lift, P0.y + B0.y * off + N0.y * lift,
+              P0.z + B0.z * off + N0.z * lift);
+            _q.setFromUnitVectors(_up, T0);
+            placements.push(_m.clone().compose(_pos, _q, _sc));
+          }
+        }
+      }
+      /* DOCKED at the halo terminals — §6 "clear docking", §7's terrace given something to serve */
+      for (const L of landings) {
+        if (L.id.indexOf('primary-') !== 0) continue;
+        const aDeg = Math.atan2(-L.z, L.x) / DEG;
+        for (let k = 0; k < V.DOCKED; k++) {
+          const a2 = aDeg + (k - (V.DOCKED - 1) / 2) * 9;
+          const rr = NEXUS.PRIMARY.R1 * NEXUS.ENTRY.TERRACE_R * 0.72;
+          const [dx, dz] = polar(a2, rr);
+          _pos.set(L.x + dx, L.y - NEXUS.ENTRY.TERRACE_DROP + V.DOCK_LIFT, L.z + dz);
+          _q.setFromUnitVectors(_up, new THREE.Vector3(Math.cos(a2 * DEG), 0, -Math.sin(a2 * DEG)));
+          placements.push(_m.clone().compose(_pos, _q, _sc));
+        }
+      }
+      const inst = new THREE.InstancedMesh(proto, protoMat, placements.length);
+      for (let i = 0; i < placements.length; i++) inst.setMatrixAt(i, placements[i]);
+      inst.instanceMatrix.needsUpdate = true;
+      inst.name = 'nexus-vehicles-interior';
+      inst.frustumCulled = true;
+      group.add(inst);
+      vehicleMesh = inst;
+      stats.parts.vehicles = placements.length;
+      stats.vehicleLength = 8.6;
+      stats.vehicleFitRatio = +((NEXUS.STRAIGHT.R - NEXUS.BORE.WALL) * 2 / SHUTTLE.size).toFixed(1);
+      stats.draws++;
+    }
+  }
+
+
   /* ---- MERGE. One draw per material family. ---------------------------------------------------- */
   const matFor = { shell: shellMat, trunk: trunkMat, tube: tubeMat, bore: boreMat, deck: deckMat, recess: recessMat, glass: glassMat, mahgic: mahgicMat };
   const detailMeshes = [], interiorMeshes = [];
@@ -1236,6 +1345,7 @@ export function buildMahNexus(ctx, opts = {}) {
       else stats.triSilhouette += tri;
     }
   }
+  if (vehicleMesh) interiorMeshes.push(vehicleMesh);
   stats.triInterior = Math.round(stats.triInterior);
   /* what a viewer outside the complex actually pays: everything but the bores */
   stats.triApproach = Math.round(stats.triSilhouette + stats.triDetail);
