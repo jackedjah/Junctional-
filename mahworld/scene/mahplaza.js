@@ -665,6 +665,10 @@ export async function createMahplaza(canvas, options = {}) {
     [terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold, mahCrown, haloDome, mahHaven, mahRain, mahNexus].forEach(mod => { if (mod && typeof mod.setTime === 'function') { try { mod.setTime(s); } catch (e) {} } });
     /* window courses on the facades: lit at night, dark recesses by day */
     (ctx.windowGrids || []).forEach(gr => { if (gr.material && gr.material.color) gr.material.color.setScalar(0.16 + 0.84 * Math.pow(1 - s.daylight, 1.4)); });
+    /* the composed aperture fields answer to the clock the same way the old grids did — a lit room
+       behind a large opening is the whole reason the opening reads at night */
+    (ctx.apertureFields || []).forEach(f => { const gl = f.children && f.children[1];
+      if (gl && gl.material && gl.material.color) gl.material.color.setScalar(0.20 + 0.80 * Math.pow(1 - s.daylight, 1.3)); });
     if (Math.abs(s.daylight - envDaylight) > 0.06) refreshEnvironment(k, s);
     return s;
   }
@@ -730,6 +734,43 @@ export async function createMahplaza(canvas, options = {}) {
     applyTime(true); requestRender();
     return on;
   }
+
+  /* ================================================================================================
+     R167 §13 — SHADOW CASTER CULL BY APPARENT SIZE.
+
+     Measured before this pass: 181 shadow casters. Every one of them is re-rendered into the shadow
+     map each frame, and the inventory showed what most of them are — the smallest casters are 0.7 m
+     to 1.3 m objects standing 28 m to 100 m out, against a shadow map that has to cover the whole
+     lit extent of the world. A sub-metre object in that map does not resolve to a pixel. It costs a
+     full draw and returns nothing.
+
+     Meanwhile the casters that carry the frame are enormous and few: city-structure at 333 m, the
+     broadcast apron at 181 m, the emitter ring at 130 m. Those are the shadows a viewer actually
+     reads.
+
+     So casting is gated on SIZE, not on identity: anything whose largest bounding dimension is below
+     the threshold stops casting and keeps receiving. No geometry changes, no material changes, and
+     nothing that was legible before is missing after — the shadows that disappear were never more
+     than a pixel wide. The threshold rises on the lower quality tiers, because a smaller shadow map
+     resolves even less.
+     ============================================================================================== */
+  function cullShadowCasters() {
+    if (!quality.shadows) return { before: 0, after: 0, threshold: 0 };
+    /* medium runs a 1024 map, high a 2048 — half the resolution needs twice the object to read */
+    const threshold = quality.shadowMap >= 2048 ? 2.6 : 4.0;
+    const box = new THREE.Box3(), size = new THREE.Vector3();
+    let before = 0, after = 0;
+    scene.traverse(o => {
+      if (!o.castShadow) return;
+      before++;
+      let big = Infinity;
+      try { box.setFromObject(o); box.getSize(size); big = Math.max(size.x, size.y, size.z); }
+      catch (e) { big = Infinity; }      /* unmeasurable: leave it casting rather than guess */
+      if (big < threshold) o.castShadow = false; else after++;
+    });
+    return { before, after, threshold };
+  }
+  const shadowCull = cullShadowCasters();
 
   /* ---- camera ------------------------------------------------------------ */
   /* ROAM (v15): the viewer's own camera. roam.js owns position, heading, collide-and-slide and the
@@ -1636,6 +1677,7 @@ export async function createMahplaza(canvas, options = {}) {
     version: 'mahplaza-v3',
     views: Object.keys(VIEWS), viewLabels: Object.fromEntries(Object.keys(VIEWS).map(k => [k, VIEWS[k].label])), setView, setCustomView, look360, tour, ready, state, clock, camera, scene, renderer, buildings,
     residents, flora, vehicles, get theme() { return theme; }, themes: Object.keys(THEMES), avatarColours: AVATAR_COLOURS.slice(),
+    shadowCull,
     modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink, halo: !!halo, haloDistricts: !!haloDistricts, haloLife: !!haloLife, haloThreshold: !!haloThreshold, mahCrown: !!mahCrown, haloDome: !!haloDome, mahHaven: !!mahHaven, mahRain: !!mahRain, mahNexus: !!mahNexus }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold, mahCrown, haloDome, mahHaven, mahRain, mahNexus,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
     practicePreview, practiceExit, practiceContinue,

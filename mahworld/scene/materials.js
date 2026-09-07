@@ -314,6 +314,165 @@ export function windowGrid({ cols = 8, rows = 6, cellW = 1.2, cellH = 1.6, gapX 
   return mesh;
 }
 
+/* ================================================================================================
+   R167 §5 — THE APERTURE KIT, and why the window grid had to go.
+
+   windowGrid() above tiles a facade with cols x rows identical boxes. It is cheap and it was right
+   for a city read from 400 m, but at approach and street range it is the single loudest thing
+   saying "generated": every opening the same size, the same spacing, the same brightness class,
+   wrapped around every mass. R167 names it directly — square-window repetition is no longer the
+   premium language.
+
+   WHAT REPLACES IT IS NOT A DIFFERENT TILE. Rounding the corners of forty-eight rectangles, or
+   swapping them for forty-eight diamonds, is the same defect wearing a costume. What makes the
+   reference interiors read as expensive is the OPPOSITE of tiling: a small number of large,
+   deliberately placed openings with broad unbroken wall between them. The wall is the luxury. The
+   glass is only where someone decided there should be a view.
+
+   So this builds a COMPOSED FIELD, not a grid:
+     - typically three to seven apertures on a facade instead of forty-eight cells;
+     - placed on a deterministic golden walk with an enforced minimum gap, then rejected if they
+       would break the solid-wall budget, so openings never drift into a row;
+     - every family cut from ONE shared profile, instance-scaled — so the whole kit is two draw
+       calls per facade and FEWER triangles than the grid it replaces.
+
+   THE PROFILE is the MAHWORLD signature and it is one shape: a plate whose head arches and whose
+   sides taper inward slightly toward the top. Scaled tall and narrow it is a tapered slit; scaled
+   wide it is a panoramic opening; scaled long and low it is a ribbon. The taper is built into the
+   outline rather than applied per instance, because a non-uniform scale cannot taper anything —
+   and it is what stops the family reading as a stretched rectangle at any size.
+   ============================================================================================== */
+
+export const APERTURE = Object.freeze({
+  /* AN APERTURE IS A FRACTION OF ITS WALL, NOT A FIXED NUMBER OF METRES.
+     The first cut wrote these as absolute sizes — a 9 m panoramic, a 1.5 x 8.2 m slit — and then
+     required 1.6 m of margin at every edge and 2.4 m of wall between neighbours. On the wide test
+     facades that composed beautifully. On the world's actual building piers, which measure three
+     and a half to eight metres across, every candidate fell outside the legal area and the field
+     placed NOTHING: MAH GYM came back with zero openings on both piers. A blank wall is a worse
+     failure than the grid it replaced, and only building it and counting found it.
+
+     So a family is now a PROPORTION with clamps. A slit is a third of its wall wide whatever wall
+     it is given; the margins and the minimum gap scale with the surface too. The same table now
+     serves a 3.5 m pier and a 48 m civic elevation without either one being a special case. */
+  PANORAMIC: { wf: 0.72, hf: 0.34, wMin: 2.2, wMax: 11.0, hMin: 1.6, hMax: 5.2, max: 2, tag: 'panoramic' },
+  TAPERED:   { wf: 0.30, hf: 0.42, wMin: 0.7, wMax: 2.6,  hMin: 2.0, hMax: 9.0, max: 4, tag: 'tapered' },
+  ARCH:      { wf: 0.46, hf: 0.40, wMin: 1.4, wMax: 5.0,  hMin: 1.8, hMax: 6.0, max: 1, tag: 'arch' },
+  RIBBON:    { wf: 0.82, hf: 0.16, wMin: 3.0, wMax: 16.0, hMin: 0.8, hMax: 2.6, max: 2, tag: 'ribbon' },
+  PORTAL:    { wf: 0.40, hf: 0.50, wMin: 1.6, wMax: 6.0,  hMin: 2.2, hMax: 7.0, max: 1, tag: 'portal' },
+  MAX_GLASS_FRACTION: 0.30,
+  GAP_FRACTION: 0.14,        /* wall between openings, as a fraction of the smaller wall dimension */
+  GAP_MIN: 0.7, GAP_MAX: 3.0,
+  EDGE_FRACTION: 0.10, EDGE_MIN: 0.45, EDGE_MAX: 2.0
+});
+
+let _apertureProfile = null;
+/* ONE geometry for the whole kit. Unit height, unit width, thin in Z, origin at the centre. */
+function apertureGeometry() {
+  if (_apertureProfile) return _apertureProfile;
+  const S = new THREE.Shape();
+  const hw = 0.5, tw = 0.5 * 0.84;      /* the taper: the head is 84% of the sill width */
+  const hh = 0.5, shoulder = 0.5 * 0.42;
+  S.moveTo(-hw, -hh);
+  S.lineTo(hw, -hh);
+  S.lineTo(hw * 0.985, shoulder);       /* the sides lean in as they rise */
+  /* the arched head — one quadratic per side, meeting at the crown. This is the line the reference
+     frames all share: not a semicircle sitting on a rectangle, but a continuous shoulder. */
+  S.quadraticCurveTo(tw * 1.02, hh * 0.93, 0, hh);
+  S.quadraticCurveTo(-tw * 1.02, hh * 0.93, -hw * 0.985, shoulder);
+  S.lineTo(-hw, -hh);
+  const g = new THREE.ExtrudeGeometry(S, { depth: 1, bevelEnabled: false, curveSegments: 6 });
+  g.translate(0, 0, -0.5);
+  _apertureProfile = g;
+  return g;
+}
+
+/* Compose the openings for one facade. Deterministic, and it REFUSES rather than crowds: an
+   aperture that cannot find a place with MIN_GAP of wall around it is simply not placed, which is
+   why the results have holes in them instead of rows. */
+export function composeApertures({ W, H, families, seed = 1, sillY = 3.0 }) {
+  const clamp = (v, lo, hi) => v < lo ? lo : (v > hi ? hi : v);
+  const R = seeded(seed * 1291 + 7);
+  const edge = clamp(Math.min(W, H) * APERTURE.EDGE_FRACTION, APERTURE.EDGE_MIN, APERTURE.EDGE_MAX);
+  const gap = clamp(Math.min(W, H) * APERTURE.GAP_FRACTION, APERTURE.GAP_MIN, APERTURE.GAP_MAX);
+  const sill = Math.min(sillY, H * 0.22);          /* a short wall cannot afford a tall sill */
+  const head = Math.max(sill + 0.6, H - edge);
+  const placed = [], area = Math.max(1, W * H);
+  let glassArea = 0;
+  const fits = (x, y, w, h) => {
+    if (x - w / 2 < edge || x + w / 2 > W - edge) return false;
+    if (y - h / 2 < sill || y + h / 2 > head) return false;
+    for (const q of placed) {
+      const gx = Math.abs(x - q.x) - (w + q.w) / 2, gy = Math.abs(y - q.y) - (h + q.h) / 2;
+      if (gx < gap && gy < gap) return false;
+    }
+    return true;
+  };
+  for (const fam of families) {
+    const F = APERTURE[fam]; if (!F) continue;
+    const want = 1 + Math.floor(R() * F.max);
+    for (let i = 0; i < want; i++) {
+      const w = clamp(F.wf * W, F.wMin, F.wMax) * (0.86 + R() * 0.28);
+      const h = clamp(F.hf * H, F.hMin, F.hMax) * (0.88 + R() * 0.24);
+      if (w > W - 2 * edge || h > head - sill) continue;      /* will not fit this wall at all */
+      if (glassArea + w * h > area * APERTURE.MAX_GLASS_FRACTION) break;
+      /* sample INSIDE the legal rectangle rather than across the whole wall — the previous version
+         sampled 0..W and threw away nearly every candidate on a narrow pier */
+      const xLo = edge + w / 2, xHi = W - edge - w / 2;
+      const yLo = sill + h / 2, yHi = head - h / 2;
+      let ok = false;
+      for (let t = 0; t < 12 && !ok; t++) {
+        const u = ((seed * 0.6180339887 + i * 0.7548776662 + t * 0.3819660113) % 1);
+        const v = ((i * 0.6180339887 + t * 0.2360679775 + seed * 0.1149) % 1);
+        const x = xLo + u * Math.max(0, xHi - xLo);
+        const y = yLo + v * Math.max(0, yHi - yLo);
+        if (fits(x, y, w, h)) { placed.push({ x, y, w, h, fam: F.tag }); glassArea += w * h; ok = true; }
+      }
+    }
+  }
+  return { placed, glassFraction: +(glassArea / area).toFixed(3) };
+}
+
+/* Build the facade's openings as TWO instanced meshes: the glass, and the sculpted reveal that
+   frames it. Local origin at the facade centre, openings in XY facing +Z — the same convention
+   windowGrid() used, so a caller swaps one for the other without moving anything. */
+export function apertureField({ W, H, families = ['TAPERED'], seed = 1, sillY = 3.0,
+                                glassMaterial = null, frameMaterial = null, depth = 0.55 }) {
+  const comp = composeApertures({ W, H, families, seed, sillY });
+  const group = new THREE.Group();
+  group.name = 'aperture-field';
+  if (!comp.placed.length) { group.userData.apertures = comp; return group; }
+
+  const geo = apertureGeometry();
+  const gMat = glassMaterial || new THREE.MeshBasicMaterial({ color: 0x9fc0f0, toneMapped: true });
+  const fMat = frameMaterial || new THREE.MeshStandardMaterial({ color: 0xb6c4d6, roughness: 0.3, metalness: 0.42 });
+  const glass = new THREE.InstancedMesh(geo, gMat, comp.placed.length);
+  const frame = new THREE.InstancedMesh(geo, fMat, comp.placed.length);
+  glass.name = 'aperture-glass'; frame.name = 'aperture-frame';
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color();
+  const pos = new THREE.Vector3(), sc = new THREE.Vector3();
+  const R = seeded(seed * 31 + 5);
+  comp.placed.forEach((a, i) => {
+    /* the FRAME sits proud of the wall and is slightly larger all round: that lip is the whole
+       reason the opening reads as sculpted rather than cut with scissors */
+    pos.set(a.x - W / 2, a.y - H / 2, depth * 0.30);
+    sc.set(a.w + 0.9, a.h + 0.9, depth);
+    frame.setMatrixAt(i, m4.compose(pos, q, sc));
+    /* the GLASS sits back inside it — the recess is what gives a facade depth at grazing angles */
+    pos.set(a.x - W / 2, a.y - H / 2, -depth * 0.42);
+    sc.set(a.w, a.h, depth * 0.5);
+    glass.setMatrixAt(i, m4.compose(pos, q, sc));
+    /* brightness varies per opening, but far less than the grid's did: these are rooms, not pixels */
+    const v = 0.55 + R() * 0.45;
+    glass.setColorAt(i, col.setRGB(v * 0.82, v * 0.90, v));
+  });
+  glass.instanceMatrix.needsUpdate = true; frame.instanceMatrix.needsUpdate = true;
+  if (glass.instanceColor) glass.instanceColor.needsUpdate = true;
+  group.add(frame); group.add(glass);
+  group.userData.apertures = comp;
+  return group;
+}
+
 export function createMaterials(themeIn) {
   const theme = resolveTheme(themeIn);
   const floorTex = surfaceTexture('floor'), wallTex = surfaceTexture('wall');

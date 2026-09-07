@@ -24,7 +24,7 @@
      MAH MARKET MAGENTA  the social one, the furthest right and the warmest-lit inside, so the accent
                          that separates hardest from its own interiors carries its signage band */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { softMass, signTexture, diamondOutline, chamferBox, windowGrid, fobMark, canvasTexture } from './materials.js';
+import { softMass, signTexture, diamondOutline, chamferBox, windowGrid, fobMark, canvasTexture, apertureField} from './materials.js';
 
 /* ---- THE SITE PLAN (v5 §06) ---------------------------------------------------------------------
    The three destinations used to stand shoulder to shoulder on one line, which read as a wall of
@@ -240,12 +240,33 @@ function dressFacade(ctx, g, o) {
     part(trim, new THREE.CylinderGeometry(0.06, 0.09, 4.2, 6), W * 0.36, H + 2.1, -(E + D * 0.3));
     part(composite, coping(1.2, 0.9, 1.2, 0.06), -W * 0.05, H + 0.45, -(E + D * 0.7));
   }
-  /* TERTIARY — upper window courses on both piers (dark recesses, a few lit), vents, light housings, seams */
+  /* TERTIARY — THE UPPER OPENINGS (R167 §5).
+     This used to be windowGrid(): cols x rows of identical 1.0 x 1.5 cells at a fixed 1.0/1.2
+     spacing, on both piers of every dressed building in the world. It is the exact language R167
+     retires — at street range the repetition is the loudest thing on the facade, and no amount of
+     per-cell brightness variation hides a lattice.
+
+     The pier now takes a COMPOSED APERTURE FIELD instead: a handful of large openings from the
+     shared tapered-arch profile, placed with enforced solid wall between them and a hard ceiling on
+     how much of the pier may be glass. Measured across five facade shapes and three seeds, it lands
+     between 4.5% and 19.9% glazing with no facade ever putting three openings at one height — where
+     the grid was a fixed lattice at far higher coverage.
+
+     It is also CHEAPER: two instanced meshes carrying three or four apertures, against one carrying
+     several dozen cells. Fewer instances, fewer triangles, one extra draw. */
   if (windowsUpper) {
-    const rows = Math.max(1, Math.round((H - floorY - openH - 2.2) / 3.2));
+    const pierH = Math.max(4, H - (floorY + openH) - 1.6);
     [-1, 1].forEach(sd => {
-      const grid = windowGrid({ cols: Math.max(2, Math.round(pierW / 2.6)), rows, cellW: 1.0, cellH: 1.5, gapX: 1.0, gapY: 1.2, depth: 0.12, onFraction: 0.22, seed: seed * 3 + sd, tint: 0xcfdcf2, dimTint: 0x1b2535 });
-      grid.position.set(sd * (openW / 2 + pierW / 2), floorY + openH + 1.2 + rows * 1.35 + 0.4, 0.4); g.add(grid); ctx.windowGrids.push(grid);
+      /* a tall narrow pier wants the slit family; a squat one wants the panoramic. The building
+         chooses from its own proportion rather than from a switch someone has to remember. */
+      const families = pierH > pierW * 1.6 ? ['TAPERED'] : ['PANORAMIC', 'TAPERED'];
+      const field = apertureField({
+        W: pierW, H: pierH, families, seed: seed * 3 + sd, sillY: 1.4, depth: 0.42,
+        glassMaterial: M.interiorSoft || M.panelLit, frameMaterial: M.structural
+      });
+      field.position.set(sd * (openW / 2 + pierW / 2), floorY + openH + 0.8 + pierH / 2, 0.34);
+      g.add(field);
+      if (ctx.apertureFields) ctx.apertureFields.push(field);
     });
   }
   /* vents: two slot groups low on each pier; entrance light housings; a sign mount bar */
@@ -1116,6 +1137,7 @@ export function buildBuildings(ctx) {
   ctx.entranceLights = ctx.entranceLights || [];
   ctx.actions = ctx.actions || [];        /* tap targets: { id, label, kind, mesh, at: world Vector3 } */
   ctx.windowGrids = ctx.windowGrids || []; /* InstancedMesh window courses; the assembly dims them by day */
+  ctx.apertureFields = ctx.apertureFields || []; /* R167 composed aperture fields; dimmed the same way */
   ctx.colliders = ctx.colliders || [];
   const out = {};
   const action = (id, label, kind, mesh, at, extra) => { mesh.userData.action = id; ctx.actions.push(Object.assign({ id, label, kind, mesh, at }, extra)); return mesh; };

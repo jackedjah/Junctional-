@@ -376,7 +376,11 @@
     /* the stick. R is the pad radius; the knob is clamped to it and the vector is normalised by it,
        so the reported magnitude is 0..1 and the dead zone is the first 12% of travel. */
     let stickId = null;
-    const R = 46, DEAD = 0.12;
+    /* DEAD ZONE. 0.12 of a 46 px radius is 5.5 px of thumb travel that does nothing at all, and on
+       a stick this size that reads as the control ignoring you before it obeys you. R167 §12 asks
+       for "very small"; 0.05 is about 2 px, past the noise floor of a capacitive touch and under
+       the threshold where a person notices dead travel. */
+    const R = 46, DEAD = 0.05;
     const setKnob = (dx, dy) => { knob.style.setProperty('--kx', dx.toFixed(1) + 'px'); knob.style.setProperty('--ky', dy.toFixed(1) + 'px'); };
     const stickMove = e => {
       const r = stick.getBoundingClientRect();

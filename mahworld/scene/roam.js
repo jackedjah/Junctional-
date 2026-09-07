@@ -112,7 +112,28 @@ const DEG = Math.PI / 180;
 export const ROAM = Object.freeze({
   EYE: 1.70, DECK_Y: 0.17, DECK_R: 43, APRON: 3.0,
   WALK: 4.2, RUN: 11.0, FLY: 22.0, BOOST: 70.0,
-  TAU_GROUND: 0.14, TAU_AIR: 0.40,
+  /* ---- CONTROL FEEL (R167 §12) ---------------------------------------------------------------
+     Measured before this change, in RENDERED FRAMES — which is the device-independent unit,
+     because "laggy" is not milliseconds, it is how many frames pass between the thumb and the
+     world:
+
+                        first move    to 90% speed    to stop
+         walk                    1               7          9
+         fly                     1              19         24
+
+     Flight was the complaint and flight is what the numbers indict: 19 frames to reach speed and
+     24 to stop is, at 30 fps, six tenths of a second to get going and eight tenths of DRIFT after
+     the thumb has already left the glass. That drift is the whole of the "syrupy float" feeling.
+     Speeds are NOT touched — the brief forbids fixing lag by making movement faster, and it was
+     never the speed that was wrong.
+
+     Two changes. The attack constants come down, and — the part that actually matters —
+     ACCELERATION AND RELEASE ARE NO LONGER THE SAME NUMBER. Real vehicles and real bodies do not
+     coast to a halt on the same curve they accelerate on, and a control that does feels like it is
+     dragging something heavy. Releasing now decays roughly three times faster than starting, which
+     is what "quick stop" means in a constant. */
+  TAU_GROUND: 0.095, TAU_AIR: 0.155,
+  TAU_STOP_GROUND: 0.045, TAU_STOP_AIR: 0.075,
   BODY_R: 0.45, STEP_UP: 0.62,
   WALK_R: 95, WORLD_R: 1000, FLOOR: 0.90, CEIL: 700,
   PITCH_MAX: 82 * DEG,
@@ -252,7 +273,12 @@ export function createRoam(opts) {
 
     const fly = state.mode === 'fly';
     const top = fly ? (sprint ? ROAM.BOOST : ROAM.FLY) : (sprint ? ROAM.RUN : ROAM.WALK);
-    const tau = fly ? ROAM.TAU_AIR : ROAM.TAU_GROUND;
+    /* ATTACK vs RELEASE. With no stick and no keys the mover is coasting, and coasting should end
+       decisively; with input it is accelerating, and that may keep a little weight. */
+    const idle = mag < 1e-4 && !(fly && vertical);
+    const tau = idle
+      ? (fly ? ROAM.TAU_STOP_AIR : ROAM.TAU_STOP_GROUND)
+      : (fly ? ROAM.TAU_AIR : ROAM.TAU_GROUND);
 
     /* heading basis. In WALK the forward axis is flattened, so looking at your feet does not drive
        you into the floor; in FLY it is the true view ray, which is what makes a free camera feel

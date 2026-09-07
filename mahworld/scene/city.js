@@ -119,7 +119,7 @@
    Life anchors pushed: ctx.lifeAnchors.paths (walkway + 3 bridges, kind
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, windowGrid, canvasTexture, ACCENT } from './materials.js';
+import { chamferBox, windowGrid, canvasTexture, ACCENT, apertureField } from './materials.js';
 import { foblockParts } from './foblock.js';   /* §6D: a SKYBLOCK CARRIER is an elongated FOBLOCK, so it grows from the genome */
 
 const SEED = 4417;
@@ -1005,7 +1005,36 @@ export function buildCity(ctx) {
     ic.needsUpdate = true;
     return lit;
   }
-  function glaze(parent, mod, seed, place) {
+  /* R167 §5 — THE NEAR BLOCKS GET APERTURES; THE SKYLINE KEEPS ITS GRID.
+     This file already knows which blocks a player can walk up to: `near` is the same test the
+     transmissive shard grade uses, and its comment says it outright — the four blocks in front of
+     the plaza are the only ones the camera ever gets close to. That is exactly the set where a
+     tiled window grid betrays itself, and exactly the set R167 wants reauthored.
+
+     The distant towers keep windowGrid. At 150 m a curtain wall IS a field of small lit cells, the
+     grid is the cheapest possible way to draw one, and replacing it would spend triangles on
+     something no one can resolve while flattening the skyline's read. R167 says selectively, and
+     says do not homogenize the city. So the language changes where it is legible and nowhere else. */
+  function glazeApertures(parent, mod, seed, place, f) {
+    const W = Math.max(2, f.w), H = Math.max(3, f.h);
+    /* proportion picks the family, as it does on the dressed buildings: a tall elevation takes
+       slits, a broad one takes a panoramic opening and a ribbon */
+    const families = H > W * 1.25 ? ['TAPERED', 'RIBBON'] : ['PANORAMIC', 'TAPERED'];
+    const field = apertureField({
+      W, H, families, seed: seed * 7 + 3, sillY: Math.min(3.0, H * 0.14), depth: 0.5,
+      glassMaterial: mod.material, frameMaterial: M.chromeSatin || M.structural
+    });
+    if (!field.userData.apertures.placed.length) return 0;
+    field.name = 'city-aperture-field';
+    place(field, mod.y0 + H / 2);
+    parent.add(field);
+    stats.apertureFields = (stats.apertureFields || 0) + 1;
+    stats.apertures = (stats.apertures || 0) + field.userData.apertures.placed.length;
+    return field.userData.apertures.placed.length;
+  }
+
+  function glaze(parent, mod, seed, place, f) {
+    if (f && f.nearBlock) { const n = glazeApertures(parent, mod, seed, place, f); if (n) return n; }
     if (mod.cols < 2 || mod.rows < 2) return 0;
     const grid = windowGrid({ cols: mod.cols, rows: mod.rows, cellW: mod.cellW, cellH: mod.cellH, gapX: mod.gapX, gapY: mod.gapY,
       depth: mod.depth, onFraction: mod.onFraction, seed, material: mod.material, tint: mod.tint, dimTint: mod.dimTint });
@@ -1339,7 +1368,7 @@ export function buildCity(ctx) {
       const mod = winModule(f.w, f.h, glazed, light);
       frameFace(bm, f, mod);
       if (f.glaze) {
-        glaze(g, mod, f.seed, (grid, cy) => { grid.position.set(f.ox + 0.06 * Math.sin(f.ry), f.yBase + cy, f.oz + 0.06 * Math.cos(f.ry)); grid.rotation.y = f.ry; });
+        glaze(g, mod, f.seed, (grid, cy) => { grid.position.set(f.ox + 0.06 * Math.sin(f.ry), f.yBase + cy, f.oz + 0.06 * Math.cos(f.ry)); grid.rotation.y = f.ry; }, { w: f.w, h: f.h, nearBlock: near });
         spillFace(bm, f, mod, light);        /* law 2: no lit face leaves this loop without the wall answering it */
         if (mod.cols >= 2 && mod.rows >= 2) { if (light.cool) stats.coolFaces++; else stats.warmFaces++; }
       }
