@@ -1,0 +1,553 @@
+/* MAHWORLD R6 :: MAH RAIN and THE CRYSTAL SEA
+   ================================================================================================
+
+   The direction, verbatim:
+
+       "Using the dome at the top, take the perimeter circle area of the dome and create glass shards
+        of very long pieces of rain falling down towards the floor, but keep it in that circle shape
+        and let it go even wider. And then once it hits around the regular ground floor, that's going
+        to create huge bodies of crystallized and extremely crystal shard looking like water, which
+        will be extremely flowy, extremely malleable, but completely crystal, and very interesting to
+        interact with... but it's supposed to be able to abide by all the swim functions when our
+        characters start actually doing activities and competing with each other."
+
+   and the standing note that governs everything from here:
+
+       "graphics should be looking extremely realistic, no sharp edges, no overly premium areas
+        premium. This only comes after supreme detail."
+
+   ---- WHERE IT GOES, MEASURED BEFORE IT WAS WRITTEN ---------------------------------------------
+   The curtain falls from the dome's perimeter, and whatever it lands in has to stand on something.
+   So the annulus was raycast first — terrain height at 24 bearings, r 1800 out to 5400:
+
+       r 1800   ground 24/24   mean  177.6      the far range
+       r 2400   ground 24/24   mean   19.7      the land ring, falling away
+       r 2600   ground 17/24   mean    5.3      the land's EDGE — already broken up
+       r 2800   ground  1/24   mean   28.3
+       r 3000+  ground  0/24   -                NOTHING. And nothing at 3434, 4200, 5400 either.
+
+   terrain.js builds its land ring from 600 to 2600 and its far range at 1500. The halo's outer rim
+   is at 3400 and the dome springs at 3434, so BOTH of them have been standing over void for two
+   layers — which is the R4 carry-over note "the halo outruns the terrain", never closed.
+
+   This closes it. The sea's inner shore is at 2520, INSIDE the land's broken edge at 2600, so the
+   two overlap and there is a real coast rather than a seam; it runs out to 5600, well past the dome,
+   so the horizon from the ring is water rather than an edge. The rain lands at 3400-4200, in open
+   sea. One system answers the direction and the oldest open defect in the world at the same time.
+
+   ---- ONE LEVEL, STILL (L42) --------------------------------------------------------------------
+   The sea sits at y -1.4. That is terrain.js's BASIN.y, which lakecity.js also uses, and it is now
+   the level of the largest body of water in the world as well. MAH HAVEN's reservoir at +0.30 is the
+   documented exception: it is infrastructure held above grade, and its header says so.
+
+   ---- WHY THE SHARDS HAVE NO POINTS -------------------------------------------------------------
+   "Very long pieces" and "no sharp edges" are not in conflict; a needle is what you get when you
+   forget the second one. Every shard is a lathe of eight sides whose radius follows
+   sin(pi*t)^0.42 and is CLAMPED to 0.17 at both ends, so it swells through its middle and closes to
+   a blunt rounded cap. There is no vertex where the surface comes to a point, at either end, at any
+   length. It reads as a long lozenge of glass, which is what a 60 m raindrop of crystal would be.
+
+   §06 forbids cones and needles for repeated ARCHITECTURAL elements and L58 derives their section
+   from their height. Rain is not architecture — a shard 120 m long at L58's w = h/6 would be 20 m
+   across, which is a pillar. The law the rain answers instead is the one behind L58: nothing may
+   alias into a crawling hairline. The shards are prefiltered by size instead: the LOD drops the
+   count and RAISES the minimum width with distance, so a shard is never thinner than about 1.4
+   pixels at the range it is drawn at.
+
+   ---- AND WHY THE SEA IS FACETED IN THE FRAGMENT SHADER -----------------------------------------
+   "Extremely flowy, extremely malleable, but completely crystal" is a contradiction in a normal
+   water shader, where flow means smooth. It is not a contradiction if the SURFACE moves smoothly and
+   the SHADING is flat: four summed directional waves displace the mesh (vertically, and laterally,
+   which is what makes the facets stretch and compress as the swell passes), and the normal is then
+   taken from the screen-space derivative of the view position — cross(dFdx, dFdy) — which is the
+   true facet normal of whatever triangle the fragment landed on. So the crystal plates are real
+   geometry, they slide and tilt against each other as the swell moves through, and none of it is a
+   texture. That is the whole trick, and it costs one varying that meshphysical already declares.
+
+   ---- THE SWIM CONTRACT -------------------------------------------------------------------------
+   R5 §13's rule applies here too: this pass lays groundwork, it does not invent the activity system.
+   What it publishes is the SHAPE the swim functions will need, and publishes it as measurements
+   rather than as a promise:
+
+       seaAt(x, z)          -> { inside, surfaceY, bedY, depth } or null
+       crystalSeaBed(x, z)  -> the bed height, as a roam surface function, so a walker in the
+                               shallows stands on the bed instead of falling through the world
+       ctx.swimVolumes      -> the assembly's registry, so roam.js can add a swim mode without this
+                               file knowing anything about roam
+
+   buildMahRain(ctx, opts) -> the standard module contract, plus seaAt/crystalSeaBed/navSites. */
+
+import * as THREE from '../vendor/three/three.module.min.js';
+
+const TAU = Math.PI * 2;
+const gold = i => (i * 0.6180339887) % 1;
+const frac = i => (i * 0.7548776662) % 1;
+
+export const RAIN = Object.freeze({
+  /* THE CURTAIN. Top radius and height are the dome's own perimeter and spring, quoted rather than
+     re-derived — halo-dome.js owns them and this file must not be a second opinion about where the
+     dome is. The assembly passes them in; these are the fallbacks. */
+  TOP_R: 3434,
+  TOP_Y: 1841.6,
+  /* "let it go even wider": the curtain flares as it descends, so it lands at 4189 rather than
+     falling in a cylinder. A cylinder of rain reads as a wall; a flare reads as weather. */
+  FLARE: 1.22,
+  BAND: 560,             /* radial thickness of the curtain at the top */
+  GROUND_Y: -1.4,        /* the world's water level, terrain.js BASIN.y */
+
+  COUNT: 3200,           /* one InstancedMesh, one draw call */
+  LEN_MIN: 52, LEN_MAX: 210,
+  RAD_MIN: 0.55, RAD_MAX: 1.9,
+  SPEED_MIN: 0.030, SPEED_MAX: 0.062,   /* fraction of the fall span per second */
+  SIDES: 8, RINGS: 9,
+
+  /* the detail tiers. A curtain 1843 m tall seen from 8 km is a veil, not 3200 objects. */
+  LOD_NEAR: 2600, LOD_MID: 7000, LOD_FAR: 26000
+});
+
+export const SEA = Object.freeze({
+  LEVEL: -1.4,
+  R_IN: 2520,            /* inside terrain's broken land edge at 2600, so the coast overlaps */
+  R_OUT: 5600,
+  DEPTH_MAX: 46,
+  SEG: 320, RINGS: 54,
+  /* the inner shore is NOT a circle. Two slow harmonics, so the coast has bays and headlands at the
+     scale a coast has them, and the eye never finds the centre by following the shoreline. */
+  SHORE_A1: 165, SHORE_N1: 3,
+  SHORE_A2: 78, SHORE_N2: 7,
+  /* the swell, in metres and in radians per metre. Four waves, deliberately non-harmonic periods so
+     the pattern never visibly repeats: 885, 1224, 331 and 174 m. */
+  WAVE: Object.freeze([
+    { ax: 0.00710, az: 0.00430, amp: 3.4, spd: 0.55 },
+    { ax: -0.00520, az: 0.00900, amp: 2.5, spd: 0.41 },
+    { ax: 0.01800, az: -0.01100, amp: 1.15, spd: 0.83 },
+    { ax: 0.03300, az: 0.02700, amp: 0.46, spd: 1.20 }
+  ]),
+  FACET: 0.86            /* how much of the normal comes from the true triangle rather than the mesh */
+});
+
+/* the inner shore radius at a bearing — the ONE definition, used by the mesh, the bed, the swim
+   test and the law suite alike */
+export function shoreR(theta) {
+  return SEA.R_IN
+    + SEA.SHORE_A1 * Math.sin(SEA.SHORE_N1 * theta + 0.7)
+    + SEA.SHORE_A2 * Math.sin(SEA.SHORE_N2 * theta - 1.9);
+}
+/* the bed. A basin: it falls away from the shore, bottoms out across the middle of the annulus and
+   lifts again at the outer edge, so the sea has a far bank rather than a cliff into nothing. */
+export function seaBedY(x, z) {
+  const r = Math.hypot(x, z);
+  const th = Math.atan2(z, x);
+  const rIn = shoreR(th);
+  if (r < rIn || r > SEA.R_OUT) return null;
+  const u = (r - rIn) / (SEA.R_OUT - rIn);
+  return SEA.LEVEL - SEA.DEPTH_MAX * Math.sin(Math.PI * Math.min(1, Math.max(0, u)));
+}
+/* a roam surface: f(x, z) -> y or null. The BED, not the surface — you stand on the bottom in the
+   shallows, and the swim system will lift you off it. */
+export function crystalSeaBed(x, z) { return seaBedY(x, z); }
+export function inCrystalSea(x, z) {
+  const r = Math.hypot(x, z);
+  return r <= SEA.R_OUT && r >= shoreR(Math.atan2(z, x));
+}
+
+/* ================================================================================================
+   THE SHARD. Eight sides, nine rings, blunt at both ends. ~144 triangles.
+   ================================================================================================ */
+function shardGeometry(sides, rings) {
+  const pos = [], nor = [];
+  const prof = t => 0.17 + 0.83 * Math.pow(Math.sin(Math.PI * t), 0.42);
+  const ring = [];
+  for (let i = 0; i <= rings; i++) {
+    const t = i / rings;
+    ring.push({ y: (t - 0.5), r: prof(t) });
+  }
+  const V = (i, s) => {
+    const a = (s / sides) * TAU;
+    return [Math.cos(a) * ring[i].r, ring[i].y, Math.sin(a) * ring[i].r];
+  };
+  const push = (p, n) => { pos.push(p[0], p[1], p[2]); nor.push(n[0], n[1], n[2]); };
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const norm = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+  const tri = (a, b, c) => { const n = norm(cross(sub(b, a), sub(c, a))); push(a, n); push(b, n); push(c, n); };
+  for (let i = 0; i < rings; i++) {
+    for (let s = 0; s < sides; s++) {
+      const a = V(i, s), b = V(i, s + 1), c = V(i + 1, s + 1), d = V(i + 1, s);
+      tri(a, b, c); tri(a, c, d);
+    }
+  }
+  /* the two caps. They are FANS to a centre vertex that sits at the blunt radius, not to a point —
+     which is the entire difference between a shard and a needle. */
+  for (const [i, dir] of [[0, -1], [rings, 1]]) {
+    const centre = [0, ring[i].y + dir * ring[i].r * 0.55, 0];
+    for (let s = 0; s < sides; s++) {
+      const a = V(i, s), b = V(i, s + 1);
+      if (dir < 0) tri(centre, b, a); else tri(centre, a, b);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
+  return g;
+}
+
+export function buildMahRain(ctx, opts = {}) {
+  const M = (ctx && ctx.M) || {};
+  const theme = (ctx && ctx.theme) || { energy: 0x7fc6ff, energyLight: 0xdff1ff };
+  const group = new THREE.Group(); group.name = 'mah-rain';
+  const owned = { geometries: [], materials: [], textures: [] };
+  const own = g => { owned.geometries.push(g); return g; };
+
+  /* the dome tells this file where its perimeter is. A second opinion about the dome's radius is
+     how two files come to disagree about one object (L42), so it is an INPUT. */
+  const TOP_R = opts.topR != null ? opts.topR : RAIN.TOP_R;
+  const TOP_Y = opts.topY != null ? opts.topY : RAIN.TOP_Y;
+  const GROUND_Y = opts.groundY != null ? opts.groundY : RAIN.GROUND_Y;
+  const SPAN = TOP_Y - GROUND_Y;
+
+  const stats = {
+    draws: 0, triangles: 0, shards: 0,
+    curtain: { topR: TOP_R, topY: +TOP_Y.toFixed(1), groundY: GROUND_Y, span: +SPAN.toFixed(1),
+      landR: +(TOP_R * RAIN.FLARE).toFixed(0), band: RAIN.BAND },
+    sea: null, swim: null
+  };
+
+  /* ==============================================================================================
+     1. THE CURTAIN
+     ============================================================================================ */
+  const shard = own(shardGeometry(RAIN.SIDES, RAIN.RINGS));
+  const rainMat = new THREE.MeshStandardMaterial({
+    color: 0xd7e8ff, roughness: 0.06, metalness: 0.0,
+    envMapIntensity: 2.1, transparent: true, opacity: 1.0, depthWrite: false,
+    side: THREE.FrontSide
+  });
+  rainMat.name = 'mah-rain-glass'; owned.materials.push(rainMat);
+  const rainU = {
+    /* x = the alpha a face-on fragment keeps, y = how much the grazing rim adds on top.
+       Glass is CLEAR through its faces and BRIGHT at its turns; a uniform 0.4 opacity is a plastic
+       rod, which is what every first cut of falling glass looks like. */
+    uRainA: { value: new THREE.Vector2(0.055, 0.72) },
+    uRainRim: { value: new THREE.Color(0xeaf4ff) },
+    uRainGlow: { value: 0.22 }
+  };
+  rainMat.userData.rainUniforms = rainU;
+  rainMat.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, rainU);
+    sh.fragmentShader = 'uniform vec2 uRainA;\nuniform vec3 uRainRim;\nuniform float uRainGlow;\n'
+      + sh.fragmentShader
+        /* AFTER the normal chunks, because a Fresnel term needs a normal, and diffuseColor is still
+           in scope here — it is declared at the top of main and consumed at opaque_fragment. */
+        .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+      {
+        float rainNdv = abs( dot( normalize( vViewPosition ), normal ) );
+        float rainF = pow( 1.0 - rainNdv, 3.0 );
+        diffuseColor.a *= clamp( uRainA.x + uRainA.y * rainF, 0.0, 1.0 );
+        totalEmissiveRadiance += uRainRim * rainF * uRainGlow;
+      }`);
+  };
+  rainMat.customProgramCacheKey = () => 'rain';
+
+  const curtain = new THREE.InstancedMesh(shard, rainMat, RAIN.COUNT);
+  curtain.name = 'mah-rain-curtain';
+  curtain.frustumCulled = false;
+  curtain.renderOrder = 6;          /* transparent, and it must come after the solid world */
+  group.add(curtain);
+  stats.draws++;
+  stats.triangles += (shard.attributes.position.count / 3) * RAIN.COUNT;
+  stats.shards = RAIN.COUNT;
+
+  /* THE INSTANCE STATE. Each shard is a bearing, a radius band position, a length, a width, a fall
+     phase and a fall speed. The phase is what makes the curtain continuous: a shard that reaches the
+     sea reappears at the dome, and because every phase is a different irrational fraction the
+     curtain never pulses. */
+  const S = [];
+  for (let i = 0; i < RAIN.COUNT; i++) {
+    const a = gold(i * 7) * TAU;
+    const bandU = frac(i * 3);
+    const len = RAIN.LEN_MIN + (RAIN.LEN_MAX - RAIN.LEN_MIN) * Math.pow(frac(i * 11), 1.7);
+    S.push({
+      a,
+      bandU,
+      len,
+      rad: RAIN.RAD_MIN + (RAIN.RAD_MAX - RAIN.RAD_MIN) * gold(i * 13),
+      phase: gold(i * 17),
+      speed: RAIN.SPEED_MIN + (RAIN.SPEED_MAX - RAIN.SPEED_MIN) * frac(i * 19),
+      /* a slow tangential drift, so the curtain rotates a little and never reads as a fixed lattice */
+      drift: (gold(i * 23) - 0.5) * 0.00028
+    });
+  }
+
+  const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(),
+    _e = new THREE.Euler(), _s = new THREE.Vector3();
+  let widthGain = 1, visibleCount = RAIN.COUNT;
+
+  /* THE MOTION IS ON THE CPU, AND THAT IS THE CORRECT CHOICE HERE, NOT A COMPROMISE.
+     A vertex-shader fall would have to displace AFTER instanceMatrix is applied, and in r185 that
+     happens inside project_vertex — so the world position that worldpos_vertex hands to fog and to
+     the environment would still be the undisplaced one, and a curtain 1843 m tall would be fogged
+     for where it is not. Composing 3200 matrices is about 120k float operations a frame, which is
+     nothing, and every downstream chunk then sees the truth. */
+  function place(t) {
+    for (let i = 0; i < visibleCount; i++) {
+      const s = S[i];
+      const fall = (s.phase + t * s.speed) % 1;
+      const y = TOP_Y - fall * SPAN;
+      /* the flare: the radius grows as the shard descends, so the curtain opens outward */
+      const k = 1 + (RAIN.FLARE - 1) * fall;
+      const r = (TOP_R + (s.bandU - 0.5) * RAIN.BAND) * k;
+      const a = s.a + t * s.drift * TAU;
+      _p.set(Math.cos(a) * r, y, Math.sin(a) * r);
+      /* the shard leans the way it is travelling — outward, by the flare's own slope. This is the
+         detail that stops the curtain reading as a bead curtain hanging straight down. */
+      const lean = Math.atan2((RAIN.FLARE - 1) * TOP_R, SPAN);
+      _e.set(0, -a, -lean);
+      _q.setFromEuler(_e);
+      _s.set(s.rad * widthGain, s.len, s.rad * widthGain);
+      curtain.setMatrixAt(i, _m.compose(_p, _q, _s));
+    }
+    for (let i = visibleCount; i < RAIN.COUNT; i++) {
+      _s.set(0, 0, 0);
+      curtain.setMatrixAt(i, _m.compose(_p.set(0, TOP_Y, 0), _q.identity(), _s));
+    }
+    curtain.instanceMatrix.needsUpdate = true;
+  }
+
+  /* ==============================================================================================
+     2. THE CRYSTAL SEA
+     ============================================================================================ */
+  {
+    /* the mesh: an annulus whose inner edge follows shoreR() exactly, built directly rather than by
+       deforming a RingGeometry, because a ring's inner edge is a circle and this one is not. */
+    const SEG = SEA.SEG, RINGS = SEA.RINGS;
+    const tri = [];
+    const P = (si, ri) => {
+      const th = (si / SEG) * TAU;
+      const rIn = shoreR(th);
+      /* the rings are packed toward the shore — that is where a swimmer is, and where the facets
+         need to be small enough to read as plates rather than as continents */
+      const u = Math.pow(ri / RINGS, 1.45);
+      const r = rIn + (SEA.R_OUT - rIn) * u;
+      return [Math.cos(th) * r, SEA.LEVEL, Math.sin(th) * r];
+    };
+    for (let si = 0; si < SEG; si++) {
+      for (let ri = 0; ri < RINGS; ri++) {
+        const a = P(si, ri), b = P(si + 1, ri), c = P(si + 1, ri + 1), d = P(si, ri + 1);
+        tri.push(a, b, c, a, c, d);
+      }
+    }
+    const pos = new Float32Array(tri.length * 3), nor = new Float32Array(tri.length * 3);
+    for (let i = 0; i < tri.length; i++) {
+      pos[i * 3] = tri[i][0]; pos[i * 3 + 1] = tri[i][1]; pos[i * 3 + 2] = tri[i][2];
+      nor[i * 3] = 0; nor[i * 3 + 1] = 1; nor[i * 3 + 2] = 0;
+    }
+    const g = own(new THREE.BufferGeometry());
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, SEA.LEVEL, 0), SEA.R_OUT * 1.05);
+
+    const seaMat = new THREE.MeshStandardMaterial({
+      color: 0x16222f, roughness: 0.13, metalness: 0.30,
+      envMapIntensity: 1.55, transparent: true, opacity: 0.94
+    });
+    seaMat.name = 'mah-crystal-sea'; owned.materials.push(seaMat);
+
+    const W = SEA.WAVE;
+    const seaU = {
+      uSeaT: { value: 0 },
+      uSeaFacet: { value: SEA.FACET },
+      /* the swell, packed as four (ax, az, amp, spd) rows */
+      uSeaW0: { value: new THREE.Vector4(W[0].ax, W[0].az, W[0].amp, W[0].spd) },
+      uSeaW1: { value: new THREE.Vector4(W[1].ax, W[1].az, W[1].amp, W[1].spd) },
+      uSeaW2: { value: new THREE.Vector4(W[2].ax, W[2].az, W[2].amp, W[2].spd) },
+      uSeaW3: { value: new THREE.Vector4(W[3].ax, W[3].az, W[3].amp, W[3].spd) },
+      /* x = inner shore mean, y = outer radius: the envelope that flattens the swell where it meets
+         the land, because a 7 m swell running into a coastline cuts through it */
+      uSeaEnv: { value: new THREE.Vector2(SEA.R_IN, SEA.R_OUT) },
+      uSeaGlow: { value: new THREE.Color(0x2c4a63) },
+      uSeaGlowI: { value: 0.10 }
+    };
+    seaMat.userData.seaUniforms = seaU;
+    seaMat.onBeforeCompile = sh => {
+      Object.assign(sh.uniforms, seaU);
+      sh.vertexShader = [
+        'uniform float uSeaT;',
+        'uniform vec4 uSeaW0; uniform vec4 uSeaW1; uniform vec4 uSeaW2; uniform vec4 uSeaW3;',
+        'uniform vec2 uSeaEnv;',
+        'varying float vSeaH;',
+        ''
+      ].join('\n') + sh.vertexShader.replace('#include <begin_vertex>', [
+        '#include <begin_vertex>',
+        '{',
+        '  vec2 sp = transformed.xz;',
+        '  float sr = length( sp );',
+        /* taper to nothing at both edges: the shore, so the swell does not saw into the land, and
+           the outer rim, so the sea meets the horizon flat instead of with a visible cut */
+        '  float env = smoothstep( uSeaEnv.x - 40.0, uSeaEnv.x + 320.0, sr )',
+        '            * ( 1.0 - smoothstep( uSeaEnv.y - 900.0, uSeaEnv.y, sr ) );',
+        '  float h = 0.0; vec2 lat = vec2( 0.0 );',
+        /* four directional waves. The LATERAL term is what makes it malleable rather than merely
+           bumpy: each wave drags the surface along its own direction as it passes, so the facets
+           stretch on the back of a swell and crowd on its face, which is what crystal plates riding
+           a moving surface would actually do. */
+        '  vec4 w;',
+        '  w = uSeaW0; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
+        '  w = uSeaW1; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
+        '  w = uSeaW2; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
+        '  w = uSeaW3; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
+        '  transformed.y += h * env;',
+        '  transformed.xz += lat * env;',
+        '  vSeaH = h * env;',
+        '}'
+      ].join('\n'));
+      sh.fragmentShader = [
+        'uniform float uSeaFacet; uniform vec3 uSeaGlow; uniform float uSeaGlowI;',
+        'varying float vSeaH;',
+        ''
+      ].join('\n') + sh.fragmentShader.replace('#include <normal_fragment_maps>', [
+        '#include <normal_fragment_maps>',
+        '{',
+        /* THE FACET. vViewPosition is meshphysical's own varying (it is -mvPosition.xyz), so the
+           cross product of its screen derivatives is the true plane of the triangle this fragment
+           landed on, in view space — the same space `normal` is already in. No extra varying, no
+           flat qualifier, no second geometry. */
+        '  vec3 sfx = dFdx( vViewPosition );',
+        '  vec3 sfy = dFdy( vViewPosition );',
+        '  vec3 sfn = normalize( cross( sfx, sfy ) );',
+        '  if ( sfn.z < 0.0 ) sfn = -sfn;',
+        '  normal = normalize( mix( normal, sfn, uSeaFacet ) );',
+        /* the crests carry a little internal light, the troughs none — the depth cue that stops a
+           dark reflective sea reading as a sheet of slate at night */
+        '  totalEmissiveRadiance += uSeaGlow * uSeaGlowI * clamp( vSeaH * 0.22 + 0.35, 0.0, 1.0 );',
+        '}'
+      ].join('\n'));
+    };
+    seaMat.customProgramCacheKey = () => 'crystalsea';
+
+    const sea = new THREE.Mesh(g, seaMat);
+    sea.name = 'mah-crystal-sea';
+    sea.frustumCulled = false;
+    sea.renderOrder = 2;
+    group.add(sea);
+    stats.draws++;
+    stats.triangles += pos.length / 9;
+
+    /* WHICH WAY IS UP. The same assertion mah-haven.js now carries, for the same reason: an
+       authored normal that contradicts its winding does not make a surface look wrong, it makes it
+       not exist, and this sea is built by hand out of raw triangles exactly like that one was. */
+    {
+      const ax = pos[3] - pos[0], az = pos[5] - pos[2];
+      const bx = pos[6] - pos[0], bz = pos[8] - pos[2];
+      stats.seaFacesUp = (az * bx - ax * bz) > 0;
+    }
+
+    stats.sea = {
+      level: SEA.LEVEL, rIn: SEA.R_IN, rOut: SEA.R_OUT, depthMax: SEA.DEPTH_MAX,
+      shoreMin: +(SEA.R_IN - SEA.SHORE_A1 - SEA.SHORE_A2).toFixed(0),
+      shoreMax: +(SEA.R_IN + SEA.SHORE_A1 + SEA.SHORE_A2).toFixed(0),
+      facets: pos.length / 9,
+      swellM: +W.reduce((a, c) => a + c.amp, 0).toFixed(2)
+    };
+
+    /* ---- THE SWIM REGISTRY. The assembly owns roam; this file owns the water. ----------------- */
+    const volume = {
+      id: 'mah-crystal-sea',
+      label: 'THE CRYSTAL SEA',
+      surfaceY: () => SEA.LEVEL,
+      contains: (x, z) => inCrystalSea(x, z),
+      bedY: (x, z) => seaBedY(x, z),
+      depthAt: (x, z) => { const b = seaBedY(x, z); return b == null ? 0 : SEA.LEVEL - b; }
+    };
+    if (ctx && Array.isArray(ctx.swimVolumes)) ctx.swimVolumes.push(volume);
+    else if (ctx) ctx.swimVolumes = [volume];
+    stats.swim = { volumes: 1, surfaceY: SEA.LEVEL, maxDepth: SEA.DEPTH_MAX };
+  }
+
+  /* ---- the module contract --------------------------------------------------------------------- */
+  let T = 0;
+  place(0);
+
+  return {
+    group, stats, RAIN, SEA,
+    seaAt(x, z) {
+      if (!inCrystalSea(x, z)) return null;
+      const bed = seaBedY(x, z);
+      return { inside: true, surfaceY: SEA.LEVEL, bedY: bed, depth: SEA.LEVEL - bed };
+    },
+    crystalSeaBed,
+    update(dt) {
+      T += (dt || 0);
+      place(T);
+      const u = seaMatUniforms(); if (u) u.uSeaT.value = T;
+    },
+    setTime(s) {
+      /* R5 §17's note applied to weather: the rain is LIT at day and GLOWS at night, and it must
+         never do both. A curtain that emits at noon is a light show; one that only reflects at
+         midnight disappears. */
+      const day = (s && s.daylight != null) ? s.daylight : 0;
+      rainU.uRainGlow.value = 0.10 + 0.30 * (1 - day);
+      rainU.uRainA.value.set(0.040 + 0.030 * day, 0.62 + 0.18 * (1 - day));
+      const u = seaMatUniforms();
+      if (u) u.uSeaGlowI.value = 0.05 + 0.16 * (1 - day);
+    },
+    setTheme(t) {
+      if (t && t.energyLight) { rainU.uRainRim.value.setHex(t.energyLight); }
+    },
+    setDetail(dist) {
+      /* the count falls and the SHARDS GET WIDER, which is the half of an LOD that is usually
+         forgotten: dropping the count alone thins a veil until it is a scatter of hairlines, and a
+         hairline is the one thing L58 exists to prevent. */
+      let n = RAIN.COUNT, w = 1;
+      if (dist > RAIN.LOD_FAR) { n = 0; w = 1; }
+      else if (dist > RAIN.LOD_MID) { n = Math.round(RAIN.COUNT * 0.28); w = 2.6; }
+      else if (dist > RAIN.LOD_NEAR) { n = Math.round(RAIN.COUNT * 0.58); w = 1.6; }
+      if (n !== visibleCount || w !== widthGain) {
+        visibleCount = n; widthGain = w;
+        curtain.visible = n > 0;
+        curtain.count = Math.max(1, n);
+        place(T);
+      }
+      return { shards: visibleCount, widthGain };
+    },
+    setState() { },
+    setQuality(q) {
+      if (q === 'low') { curtain.count = Math.round(RAIN.COUNT * 0.35); visibleCount = curtain.count; }
+      else { curtain.count = RAIN.COUNT; visibleCount = RAIN.COUNT; }
+      place(T);
+    },
+    swimVolumes() { return (ctx && ctx.swimVolumes) ? ctx.swimVolumes.slice() : []; },
+    navSites() {
+      /* the coast, at the bearing where the shore reaches furthest in — you arrive where the land
+         and the sea actually meet, not at a point on a circle */
+      let best = 0, bestR = 1e9;
+      for (let d = 0; d < 360; d += 5) {
+        const th = d * Math.PI / 180, r = shoreR(th);
+        if (r < bestR) { bestR = r; best = th; }
+      }
+      const x = Math.cos(best) * (bestR - 90), z = Math.sin(best) * (bestR - 90);
+      const lx = Math.cos(best) * (bestR + 1400), lz = Math.sin(best) * (bestR + 1400);
+      return [{ id: 'crystal-sea', label: 'THE CRYSTAL SEA', sub: 'where the rain lands',
+        x, z, y: SEA.LEVEL + 3.2, look: [lx, SEA.LEVEL + 40, lz] }];
+    },
+    dispose() {
+      for (const g of owned.geometries) { try { g.dispose(); } catch (e) { } }
+      for (const m of owned.materials) { try { m.dispose(); } catch (e) { } }
+      for (const t of owned.textures) { try { t.dispose(); } catch (e) { } }
+      if (group.parent) group.parent.remove(group);
+    }
+  };
+
+  /* declared as a function so both update() and setTime() reach the sea's uniforms without either of
+     them closing over a `const` that is defined inside the block above — the temporal-dead-zone
+     failure this project has now paid for twice */
+  function seaMatUniforms() {
+    const m = owned.materials.find(x => x.name === 'mah-crystal-sea');
+    return m ? m.userData.seaUniforms : null;
+  }
+}
+
+export default { buildMahRain, RAIN, SEA, shoreR, seaBedY, crystalSeaBed, inCrystalSea };
