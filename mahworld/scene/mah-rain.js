@@ -105,6 +105,37 @@ export const RAIN = Object.freeze({
   LOD_NEAR: 2600, LOD_MID: 7000, LOD_FAR: 26000
 });
 
+export const CLOUD = Object.freeze({
+  /* THE MANTLE. "Clouds very present around that top dome area, but not inside of it" — so these are
+     placed on the dome's OWN surface of revolution, pushed outward along its normal, and the
+     not-inside rule is a hard geometric test rather than a hope: every lobe's centre is checked
+     against domeY(r) and the ones that fall inside are pushed out until they do not. The law suite
+     counts violations and the count has to be zero. */
+  APEX_Y: 3900,
+  MANTLE: 1500,          /* lobes hugging the shell */
+  OFF_MIN: 90, OFF_MAX: 430,   /* how far off the dome's surface, along its normal */
+  /* the mantle thins toward the apex on purpose: a dome wearing a full hood loses its apex, and the
+     apex is where MAH CROWN's mast comes through. Density falls as the fourth power of the climb. */
+  APEX_FALL: 4.0,
+
+  /* THE DESCENT. "Elements of clouds that go back down to ground level, but as you go closer to the
+     ground level, less clouds be appearance." A power curve on the height fraction: at 90% of the
+     way up the odds are 0.81, at 10% they are 0.016, so the ground gets wisps and the sky gets
+     weather without a single hand-placed exception. */
+  VEIL: 900,
+  VEIL_R_IN: 2500, VEIL_R_OUT: 5300,
+  VEIL_TOP: 2100, VEIL_POW: 2.1,
+
+  /* SIZE. These are world clouds beside a 3434 m dome, so they are hundreds of metres across and
+     FLATTENED — a cloud that is as tall as it is wide is a boulder. */
+  LOBE_MIN: 95, LOBE_MAX: 430,
+  FLAT_MIN: 0.30, FLAT_MAX: 0.58,
+  /* the two layers counter-rotate, which is the whole parallax budget: two numbers, no per-frame
+     CPU, and the sky stops reading as a fixed lattice the moment anything moves */
+  SPIN_MANTLE: 0.0000160, SPIN_VEIL: -0.0000105,
+  LOD_FAR: 30000
+});
+
 export const SEA = Object.freeze({
   LEVEL: -1.4,
   R_IN: 2520,            /* inside terrain's broken land edge at 2600, so the coast overlaps */
@@ -192,6 +223,37 @@ function shardGeometry(sides, rings) {
   return g;
 }
 
+/* ================================================================================================
+   THE CLOUD LOBE. A crystal cloud is not a sphere with a soft texture on it and it is not a
+   billboard — both of those are how you get vapour, and the direction is explicit that these are
+   "crystal like, not any clouds, very worldlike".
+
+   So it is a subdivided icosahedron, deformed by three summed directional harmonics of its own
+   surface direction, left NON-INDEXED so computeVertexNormals gives FLAT per-face normals. Eighty
+   facets, every one catching the sky at its own angle: that is the whole crystal read, and it costs
+   nothing at run time because the deformation happens once at build.
+
+   And it has no sharp edges. An icosahedron's facets meet at obtuse angles everywhere, the
+   deformation is bounded to +/-26% of the radius so it can never fold a face through another, and
+   nothing is ever scaled to a point — the flattening is 0.30 at its most extreme, which is a
+   lozenge, not a blade.
+   ============================================================================================== */
+function cloudLobeGeometry(detail) {
+  const g = new THREE.IcosahedronGeometry(1, detail).toNonIndexed();
+  const P = g.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < P.count; i++) {
+    v.fromBufferAttribute(P, i).normalize();
+    const k = 1
+      + 0.150 * Math.sin(v.x * 2.7 + v.y * 1.9)
+      + 0.085 * Math.sin(v.y * 4.3 - v.z * 3.1 + 1.7)
+      + 0.045 * Math.sin(v.z * 6.9 + v.x * 5.2 - 0.8);
+    P.setXYZ(i, v.x * k, v.y * k, v.z * k);
+  }
+  g.computeVertexNormals();     /* non-indexed -> per-face normals -> faceted crystal */
+  return g;
+}
+
 export function buildMahRain(ctx, opts = {}) {
   const M = (ctx && ctx.M) || {};
   const theme = (ctx && ctx.theme) || { energy: 0x7fc6ff, energyLight: 0xdff1ff };
@@ -212,6 +274,153 @@ export function buildMahRain(ctx, opts = {}) {
       landR: +(TOP_R * RAIN.FLARE).toFixed(0), band: RAIN.BAND },
     sea: null, swim: null
   };
+
+  /* ==============================================================================================
+     0. THE CRYSTAL CLOUDS — the mantle around the dome, and the veils that come down
+     ============================================================================================ */
+  const APEX_Y = opts.apexY != null ? opts.apexY : CLOUD.APEX_Y;
+  const DOME_H = APEX_Y - TOP_Y;
+  /* the dome's own surface of revolution, quoted so this file cannot hold a second opinion about
+     the shape it is not allowed to be inside of */
+  const domeSurfaceY = r => {
+    const t = Math.min(1, Math.max(0, r / TOP_R));
+    return TOP_Y + DOME_H * Math.sqrt(Math.max(0, 1 - t * t));
+  };
+  /* INSIDE THE DOME is: within its footprint AND under its shell AND above the halo it covers.
+     "Not inside of it" is the direction's one hard geometric constraint on this system, so it is a
+     predicate with a name, used by the placement, published in stats and asserted by the tests —
+     rather than a margin someone hopes is large enough. */
+  const insideDome = (r, y) => r < TOP_R && y < domeSurfaceY(r) && y > TOP_Y - 30;
+
+  let cloudViolations = 0;
+  {
+    const lobe = own(cloudLobeGeometry(1));
+    const cloudMat = new THREE.MeshStandardMaterial({
+      /* SOFT, not premium. The standing direction is explicit — "no overly premium areas premium,
+         this only comes after supreme detail" — and a cloud at roughness 0.1 is a chrome balloon.
+         0.62 is a diffuse crystal: it holds its facets because the GEOMETRY is faceted, not because
+         the finish is a mirror, which is the difference between crystal and costume jewellery. */
+      color: 0xc9dcf2, roughness: 0.62, metalness: 0.06,
+      envMapIntensity: 0.85, transparent: true, opacity: 1.0,
+      depthWrite: false, side: THREE.FrontSide
+    });
+    cloudMat.name = 'mah-cloud-crystal'; owned.materials.push(cloudMat);
+    const cloudU = {
+      /* x = the alpha a face-on fragment keeps, y = what the grazing rim adds. A cloud is dense at
+         its turning edges and airy through its middle; a uniform alpha is a jellyfish. */
+      uCloudA: { value: new THREE.Vector2(0.30, 0.46) },
+      uCloudGlow: { value: new THREE.Color(0x9fc4e8) },
+      uCloudGlowI: { value: 0.08 }
+    };
+    cloudMat.userData.cloudUniforms = cloudU;
+    cloudMat.onBeforeCompile = sh => {
+      Object.assign(sh.uniforms, cloudU);
+      sh.fragmentShader = 'uniform vec2 uCloudA;\nuniform vec3 uCloudGlow;\nuniform float uCloudGlowI;\n'
+        + sh.fragmentShader.replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+      {
+        float cNdv = abs( dot( normalize( vViewPosition ), normal ) );
+        float cF = pow( 1.0 - cNdv, 2.0 );
+        diffuseColor.a *= clamp( uCloudA.x + uCloudA.y * cF, 0.0, 1.0 );
+        totalEmissiveRadiance += uCloudGlow * uCloudGlowI * ( 0.35 + 0.65 * cF );
+      }`);
+    };
+    cloudMat.customProgramCacheKey = () => 'mahcloud';
+
+    const _cm = new THREE.Matrix4(), _cp = new THREE.Vector3(), _cq = new THREE.Quaternion(),
+      _ce = new THREE.Euler(), _cs = new THREE.Vector3();
+    const lobeTris = lobe.attributes.position.count / 3;
+
+    /* ---- THE MANTLE ---------------------------------------------------------------------------
+       Parameterised on the dome's own meridian rather than on a bounding box: r = R cos(phi),
+       y = SPRING + H sin(phi), which is exactly the surface domeY() describes. The lobe is then
+       pushed out along that surface's true normal — for an ellipsoid of semi-axes (R, H) the
+       outward normal is proportional to (x/R^2, y'/H^2), NOT to the radius, and a mantle laid on
+       the radius sits at an angle to the shell it is supposed to hug. */
+    const mantle = new THREE.InstancedMesh(lobe, cloudMat, CLOUD.MANTLE);
+    mantle.name = 'mah-cloud-mantle';
+    mantle.frustumCulled = false; mantle.renderOrder = 5;
+    for (let i = 0; i < CLOUD.MANTLE; i++) {
+      const a = gold(i * 5) * TAU;
+      /* climb, weighted DOWN so the apex keeps its sky (see CLOUD.APEX_FALL) */
+      const phi = (Math.PI / 2) * Math.pow(frac(i * 7), CLOUD.APEX_FALL / 2.6);
+      const r0 = TOP_R * Math.cos(phi);
+      const y0 = TOP_Y + DOME_H * Math.sin(phi);
+      let nx = r0 / (TOP_R * TOP_R), ny = (y0 - TOP_Y) / (DOME_H * DOME_H);
+      const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+      const off = CLOUD.OFF_MIN + (CLOUD.OFF_MAX - CLOUD.OFF_MIN) * gold(i * 11);
+      let r = r0 + nx * off, y = y0 + ny * off;
+      /* the hard rule, enforced rather than assumed: if this landed inside, walk it out along the
+         same normal until it is not. It cannot loop — the normal points outward by construction. */
+      let guard = 0;
+      while (insideDome(r, y) && guard++ < 40) { r += nx * 40; y += ny * 40; }
+      if (insideDome(r, y)) cloudViolations++;
+      const sc = CLOUD.LOBE_MIN + (CLOUD.LOBE_MAX - CLOUD.LOBE_MIN) * Math.pow(frac(i * 13), 1.6);
+      const flat = CLOUD.FLAT_MIN + (CLOUD.FLAT_MAX - CLOUD.FLAT_MIN) * gold(i * 17);
+      _cp.set(Math.cos(a) * r, y, Math.sin(a) * r);
+      _ce.set(gold(i * 19) * 0.5, gold(i * 23) * TAU, gold(i * 29) * 0.5);
+      _cq.setFromEuler(_ce);
+      _cs.set(sc, sc * flat, sc * (0.72 + 0.5 * frac(i * 31)));
+      mantle.setMatrixAt(i, _cm.compose(_cp, _cq, _cs));
+    }
+    mantle.instanceMatrix.needsUpdate = true;
+    group.add(mantle);
+    stats.draws++; stats.triangles += lobeTris * CLOUD.MANTLE;
+
+    /* ---- THE DESCENT ---------------------------------------------------------------------------
+       The height is drawn as TOP * u^(1/POW) from a uniform u, which puts the density where the
+       direction asks for it: thick aloft, thinning all the way down, wisps at the sea. There is no
+       floor exception and no hand-placed low cloud — the curve is the whole rule. */
+    const veil = new THREE.InstancedMesh(lobe, cloudMat, CLOUD.VEIL);
+    veil.name = 'mah-cloud-veil';
+    veil.frustumCulled = false; veil.renderOrder = 5;
+    for (let i = 0; i < CLOUD.VEIL; i++) {
+      const a = gold(i * 3 + 1) * TAU;
+      const u = frac(i * 5 + 2);
+      const y = Math.max(38, CLOUD.VEIL_TOP * Math.pow(u, 1 / CLOUD.VEIL_POW));
+      const r = CLOUD.VEIL_R_IN + (CLOUD.VEIL_R_OUT - CLOUD.VEIL_R_IN) * gold(i * 7 + 3);
+      if (insideDome(r, y)) { cloudViolations++; }
+      /* the low ones are SMALLER as well as rarer. A 400 m cloud fifty metres over the sea is a
+         ceiling, and the direction asks for fewer near the ground, not for the same clouds lower. */
+      const near = Math.min(1, y / CLOUD.VEIL_TOP);
+      const sc = (CLOUD.LOBE_MIN * (0.34 + 0.66 * near))
+        + (CLOUD.LOBE_MAX - CLOUD.LOBE_MIN) * Math.pow(frac(i * 11 + 4), 1.9) * (0.25 + 0.75 * near);
+      const flat = CLOUD.FLAT_MIN + (CLOUD.FLAT_MAX - CLOUD.FLAT_MIN) * gold(i * 13 + 5);
+      _cp.set(Math.cos(a) * r, y, Math.sin(a) * r);
+      _ce.set(gold(i * 17 + 6) * 0.42, gold(i * 19 + 7) * TAU, gold(i * 23 + 8) * 0.42);
+      _cq.setFromEuler(_ce);
+      _cs.set(sc, sc * flat, sc * (0.7 + 0.55 * frac(i * 29 + 9)));
+      veil.setMatrixAt(i, _cm.compose(_cp, _cq, _cs));
+    }
+    veil.instanceMatrix.needsUpdate = true;
+    group.add(veil);
+    stats.draws++; stats.triangles += lobeTris * CLOUD.VEIL;
+
+    /* the two layers live on their own carriers so a single group rotation is the entire drift
+       budget — no per-frame matrix work, and counter-rotation reads as depth */
+    const spinA = new THREE.Group(); spinA.name = 'mah-cloud-spin-mantle';
+    const spinB = new THREE.Group(); spinB.name = 'mah-cloud-spin-veil';
+    group.remove(mantle); group.remove(veil);
+    spinA.add(mantle); spinB.add(veil);
+    group.add(spinA); group.add(spinB);
+
+    /* how the density actually came out, by band, so "less as you go closer to the ground" is a
+       published measurement rather than a claim about a power curve */
+    const bands = [0, 200, 500, 900, 1400, 2100];
+    const hist = new Array(bands.length).fill(0);
+    for (let i = 0; i < CLOUD.VEIL; i++) {
+      const u = frac(i * 5 + 2);
+      const y = Math.max(38, CLOUD.VEIL_TOP * Math.pow(u, 1 / CLOUD.VEIL_POW));
+      for (let k = bands.length - 1; k >= 0; k--) if (y >= bands[k]) { hist[k]++; break; }
+    }
+    stats.clouds = {
+      mantle: CLOUD.MANTLE, veil: CLOUD.VEIL, lobeTris,
+      insideDome: cloudViolations,
+      bandsFromGround: bands.map((b, k) => b + 'm:' + hist[k]).join(' '),
+      apexY: APEX_Y, domeR: TOP_R
+    };
+    stats.cloudSpin = { a: spinA, b: spinB };
+    stats.cloudUniforms = cloudU;
+  }
 
   /* ==============================================================================================
      1. THE CURTAIN
@@ -483,6 +692,14 @@ export function buildMahRain(ctx, opts = {}) {
       T += (dt || 0);
       place(T);
       const u = seaMatUniforms(); if (u) u.uSeaT.value = T;
+      /* the entire cloud animation: two group rotations, counter-turning. 2400 lobes drift for the
+         price of two quaternions a frame, which is why the drift is a carrier rotation and not a
+         per-instance recompose like the rain's — the rain has to fall in a straight line and clouds
+         only have to move. */
+      if (stats.cloudSpin) {
+        stats.cloudSpin.a.rotation.y = T * CLOUD.SPIN_MANTLE * TAU * 60;
+        stats.cloudSpin.b.rotation.y = T * CLOUD.SPIN_VEIL * TAU * 60;
+      }
     },
     setTime(s) {
       /* R5 §17's note applied to weather: the rain is LIT at day and GLOWS at night, and it must
@@ -493,9 +710,20 @@ export function buildMahRain(ctx, opts = {}) {
       rainU.uRainA.value.set(0.040 + 0.030 * day, 0.62 + 0.18 * (1 - day));
       const u = seaMatUniforms();
       if (u) u.uSeaGlowI.value = 0.05 + 0.16 * (1 - day);
+      /* the clouds DENSIFY at night and open at noon, which is the honest way round: a lit cloud is
+         read by its shading and needs to stay airy, and an unlit one is read by its silhouette and
+         disappears unless it closes up. */
+      const c = stats.cloudUniforms;
+      if (c) {
+        c.uCloudA.value.set(0.24 + 0.14 * (1 - day), 0.40 + 0.14 * day);
+        c.uCloudGlowI.value = 0.04 + 0.13 * (1 - day);
+      }
     },
     setTheme(t) {
-      if (t && t.energyLight) { rainU.uRainRim.value.setHex(t.energyLight); }
+      if (t && t.energyLight) {
+        rainU.uRainRim.value.setHex(t.energyLight);
+        if (stats.cloudUniforms) stats.cloudUniforms.uCloudGlow.value.setHex(t.energyLight);
+      }
     },
     setDetail(dist) {
       /* the count falls and the SHARDS GET WIDER, which is the half of an LOD that is usually
@@ -511,7 +739,15 @@ export function buildMahRain(ctx, opts = {}) {
         curtain.count = Math.max(1, n);
         place(T);
       }
-      return { shards: visibleCount, widthGain };
+      /* the clouds outlive the rain by a long way. A curtain at 26 km is a smear, but the cloud
+         mantle IS the world's silhouette at that range — it is the thing that says there is weather
+         around the dome — so it only stops at the far tier. */
+      if (stats.cloudSpin) {
+        const on = dist < CLOUD.LOD_FAR;
+        stats.cloudSpin.a.visible = on;
+        stats.cloudSpin.b.visible = on;
+      }
+      return { shards: visibleCount, widthGain, clouds: stats.cloudSpin ? stats.cloudSpin.a.visible : false };
     },
     setState() { },
     setQuality(q) {

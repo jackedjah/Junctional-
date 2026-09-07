@@ -140,8 +140,35 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       if (h.some(x => /mah-rain-curtain/.test(x.object.name || ''))) sawRain = true;
     }
 
+    /* THE CLOUDS, and the one hard rule: NONE of them may be inside the dome. Read off the built
+       instance matrices rather than off the placement code that wrote them, because a rule enforced
+       by the code that also asserts it is not a gate. */
+    let cloudsInside = 0, cloudN = 0, lowest = 1e9, highest = -1e9;
+    const bandCount = [0, 0, 0, 0, 0];   /* 0-200, 200-500, 500-900, 900-1400, 1400+ */
+    {
+      const mm = new T.Matrix4();
+      const H = DM.DOME.APEX_Y - DM.DOME.SPRING_Y;
+      const surf = r => { const t = Math.min(1, Math.max(0, r / DM.DOME.R));
+        return DM.DOME.SPRING_Y + H * Math.sqrt(Math.max(0, 1 - t * t)); };
+      for (const nm of ['mah-cloud-mantle', 'mah-cloud-veil']) {
+        const im = w.scene.getObjectByName(nm);
+        if (!im) continue;
+        for (let i = 0; i < im.count; i++) {
+          im.getMatrixAt(i, mm);
+          const x = mm.elements[12], y = mm.elements[13], z = mm.elements[14];
+          const r = Math.hypot(x, z);
+          cloudN++;
+          if (y < lowest) lowest = y; if (y > highest) highest = y;
+          if (r < DM.DOME.R && y < surf(r) && y > DM.DOME.SPRING_Y - 30) cloudsInside++;
+          const k = y < 200 ? 0 : y < 500 ? 1 : y < 900 ? 2 : y < 1400 ? 3 : 4;
+          bandCount[k]++;
+        }
+      }
+    }
+
     return {
-      stats: s, DOME: { R: DM.DOME.R, SPRING_Y: DM.DOME.SPRING_Y },
+      stats: s, DOME: { R: DM.DOME.R, SPRING_Y: DM.DOME.SPRING_Y, APEX_Y: DM.DOME.APEX_Y },
+      cloudsInside, cloudN, cloudLow: lowest, cloudHigh: highest, bandCount,
       SEA: { LEVEL: RM.SEA.LEVEL, R_IN: RM.SEA.R_IN, R_OUT: RM.SEA.R_OUT, DEPTH_MAX: RM.SEA.DEPTH_MAX },
       shardMinEndR: minEndR, shardMaxR: maxR, shardLen: hi - lo,
       seaTimeAdvanced: (u0 != null && u1 != null) ? (u1 - u0) : null,
@@ -202,6 +229,27 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       R.stats.sea.facets + ' facets');
     P('it uses the world\'s single natural water level',
       Math.abs(R.SEA.LEVEL + 1.4) < 0.001, 'sea ' + R.SEA.LEVEL + ', terrain BASIN.y -1.4');
+  }
+
+  console.log('\nR6 — THE CRYSTAL CLOUDS');
+  if (R) {
+    P('the clouds exist and are numerous enough to be weather',
+      R.cloudN > 1500, R.cloudN + ' lobes in 2 draws');
+    /* THE ONE HARD RULE FROM THE DIRECTION: "around that top dome area but not inside of it" */
+    P('NOT ONE cloud is inside the dome', R.cloudsInside === 0,
+      R.cloudsInside + ' of ' + R.cloudN + ' lobes sit under the shell');
+    P('the mantle reaches the dome\'s upper surface', R.cloudHigh > R.DOME.SPRING_Y + 900,
+      'highest lobe at ' + R.cloudHigh.toFixed(0) + ' m, dome springs at ' + R.DOME.SPRING_Y.toFixed(0));
+    P('and clouds come all the way down to the ground', R.cloudLow < 120,
+      'lowest lobe at ' + R.cloudLow.toFixed(0) + ' m');
+    /* "as you go closer to the ground level, less clouds be appearance" — monotonic, measured */
+    const B = R.bandCount;
+    P('density falls monotonically toward the ground',
+      B[0] < B[1] && B[1] < B[2] && B[2] < B[3],
+      '0-200m:' + B[0] + '  200-500:' + B[1] + '  500-900:' + B[2] + '  900-1400:' + B[3] + '  1400+:' + B[4]);
+    P('the apex keeps its sky (the mantle thins before it)',
+      R.cloudHigh < R.DOME.APEX_Y + 200,
+      'highest lobe ' + R.cloudHigh.toFixed(0) + ' vs apex ' + R.DOME.APEX_Y);
   }
 
   console.log('\nR6 — the swim contract (groundwork, per R5 §13\'s rule)');

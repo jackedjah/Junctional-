@@ -426,6 +426,7 @@ export async function createMahplaza(canvas, options = {}) {
       const domeY = (haloDome && DOMEM && DOMEM.DOME) ? DOMEM.DOME.SPRING_Y : undefined;
       mahRain = RAINM.buildMahRain(ctx, {
         topR: domeR, topY: domeY,
+        apexY: (haloDome && DOMEM && DOMEM.DOME) ? DOMEM.DOME.APEX_Y : undefined,
         groundY: (TERRAIN && TERRAIN.BASIN) ? TERRAIN.BASIN.y : undefined
       });
       scene.add(mahRain.group);
