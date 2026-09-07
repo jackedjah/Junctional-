@@ -419,10 +419,20 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
   P('§24: the far silhouette is cheap — few draws', S.drawsFar <= 6, S.drawsFar + ' draws at distance');
   P('§24: the far silhouette is cheap — few triangles', S.triSilhouette < 150000,
     S.triSilhouette + ' silhouette triangles');
-  P('§24: the near tier stays inside a hero object\'s budget', S.triangles < 280000,
-    S.triangles + ' near (' + S.triSilhouette + ' silhouette + ' + S.triDetail + ' detail)');
+  /* THE APPROACH tier is what a viewer OUTSIDE the complex pays, and it is the number that used to
+     be called "near". PASS 4's route interiors are a third tier: 183k triangles of bore, rib and
+     audio that are occluded by the member they line unless you are inside it. Raising the budget to
+     cover them would have been wrong twice — the cost is real, and the geometry is unresolvable
+     from anywhere but within. */
+  P('§24: the approach tier stays inside a hero object\'s budget', S.triApproach < 280000,
+    S.triApproach + ' approach (' + S.triSilhouette + ' silhouette + ' + S.triDetail + ' detail)');
+  P('§24: the interiors are a third tier, not part of the approach cost',
+    S.triInterior > 0 && S.triApproach + S.triInterior === S.triangles,
+    S.triInterior + ' interior, total ' + S.triangles);
   P('§24: detail is a real fraction of the cost, so dropping it is worth doing',
-    S.triDetail > S.triangles * 0.25, S.triDetail + ' of ' + S.triangles);
+    S.triDetail > S.triApproach * 0.25, S.triDetail + ' of ' + S.triApproach);
+  /* R7 §5 / PASS 4 — a route has to be enterable, and "sufficient internal diameter" is a number */
+  P('§5: every route has a real bore', S.boreMin > 30, 'narrowest ' + S.boreMin + ' m internal');
   /* and the tier must actually TOGGLE — a budget split that never changes what is drawn is a
      comment, not a strategy. */
   const lod = await ev(async () => {
@@ -436,6 +446,23 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
   P('§24: the detail tier is actually dropped at distance',
     lod.total > 0 && lod.near === lod.total && lod.far === 0,
     lod.near + ' detail meshes near, ' + lod.far + ' far, of ' + lod.total);
+  /* and the interiors drop at a much tighter range than the detail does — that is the whole point
+     of splitting them out, so the gate checks the two thresholds are genuinely different. */
+  const lodI = await ev(async () => {
+    const n = window.MAHWORLD_MAHPLAZA.mahNexus;
+    const m = await import('/mahworld/scene/mah-nexus.js');
+    const seen = () => n.group.children.filter(c => c.isMesh && c.visible && /-interior$/.test(c.name)).length;
+    n.setDetail(200); const inside = seen();
+    n.setDetail(900); const outside = seen();
+    n.setDetail(200);
+    return { inside, outside, total: n.group.children.filter(c => /-interior$/.test(c.name)).length,
+      thr: m.NEXUS.LOD_INTERIOR, near: m.NEXUS.LOD_NEAR };
+  });
+  P('§24: route interiors drop as soon as you are not in one',
+    lodI.total > 0 && lodI.inside === lodI.total && lodI.outside === 0,
+    lodI.inside + ' in, ' + lodI.outside + ' out, of ' + lodI.total);
+  P('§24: the interior threshold is far tighter than the detail one',
+    lodI.thr < lodI.near * 0.5, lodI.thr + ' m vs ' + lodI.near + ' m');
 
   const nav = await ev(() => window.MAHWORLD_MAHPLAZA.mahNexus.navSites());
   P('it is somewhere you can be sent', nav.length >= 1 && nav[0].id === 'mah-nexus', JSON.stringify(nav));

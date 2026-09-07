@@ -249,6 +249,27 @@ export const NEXUS = Object.freeze({
      brighter version of it; the gate below now holds the rails under the trunk they run on. */
   MAHGIC: Object.freeze({ COUNT: 6, R: 3.4, OFFSET: 1.30, OPACITY: 0.15, STATIONS: 64, RADIAL: 8 }),
 
+  /* R7 §5 / PASS 4 — THE ROUTES HAVE TO BE TRAVERSABLE FROM THE INSIDE.
+
+     "Each route must look traversable from the inside, contain sufficient internal diameter for
+     MAHBEINGS / transport." Up to this pass every route was a SOLID swept member: §26's tube-interior
+     proof camera had nothing to photograph, because there was no inside. A transport network whose
+     tubes are solid is a sculpture of a transport network.
+
+     WALL 4.2 m on a 24 m member leaves a 39.6 m bore, and on the 27 m spiral a 45.6 m one. For
+     scale, that is wider than the whole MAH MATCH approach corridor, so "sufficient for MAHBEINGS
+     and pods" is not a claim here, it is a published number the gate reads.
+
+     RIBS every 58 m are structure AND they are the only thing that gives a smooth vertical bore a
+     sense of speed and scale — a featureless tunnel reads as a still image however fast you move
+     through it. AUDIO groups are §20's miniature vertical music-line motif, placed rather than
+     invented: six groups per route, five bars each, on the established FOBEAM language. */
+  BORE: Object.freeze({
+    WALL: 4.2, RIB_EVERY: 58, RIB_SEC: 1.9, RIB_PROUD: 1.5,
+    AUDIO_GROUPS: 6, AUDIO_BARS: 5, AUDIO_H: 7.5, AUDIO_R: 0.5, AUDIO_SPREAD: 3.4,
+    STATIONS: 96, RADIAL: 18
+  }),
+
   /* THE TUBE FAMILIES — §2: "some straight, some gently spiraling, some branch-like, some paired".
      Entropy in route variety is allowed; chaos is not. So the variety is enumerated, not random. */
   STRAIGHT: Object.freeze({ COUNT: 4, SEAT_TIER: 0, SEAT_R: 262, LAND_R: 300, R: 24, N: 3.4, PHASE: 45 }),
@@ -314,6 +335,7 @@ export const NEXUS = Object.freeze({
   SITE_CLEAR_R: 400,        /* measured: relief 0.0 inside this, 105.5 m of rock outside it */
   LAND_MARGIN: 140,         /* how far inside the halo annulus a landing must stay to have ceiling */
 
+  LOD_INTERIOR: 460,   /* the bores draw only when a viewer could plausibly be inside one */
   LOD_NEAR: 1400, LOD_MID: 4200, LOD_FAR: 26000
 });
 
@@ -586,6 +608,19 @@ export function buildMahNexus(ctx, opts = {}) {
   /* R7 §15 / §5 — CLEAR DIAMOND GLASS, "transparent, real thickness, clean edge response". §5 asks
      that a route have "glass / crystal enclosure where appropriate"; the deepest ring of every
      portal is that enclosure, so looking into a door now shows crystal depth instead of a hole. */
+  /* the bore is seen FROM WITHIN, so it renders BackSide — the faces pointing away from a traveller
+     are the ones that surround them. Liquid dark metal, per §15, so a tunnel reads as machined
+     rather than as a cave. */
+  /* AND IT IS SATIN, NOT A MIRROR. The first bore went in at metalness 0.88 / roughness 0.17 —
+     §15's liquid dark metal, which is the right grade for a JOINT and the wrong one for a 40 m
+     bore. The interior render came back reading as open sky: a near-mirror tube reflects the
+     environment so completely that a traveller inside it sees the world, not a tunnel. §16 asks for
+     "dark-but-readable recesses" and §17 for tube interior reflections tuned rather than maximal,
+     so the bore drops to a satin grade that takes light instead of returning the sky whole. */
+  const boreMat = mkMat(M.graphiteDark || M.structural, {
+    name: 'nexus-bore', color: new THREE.Color(0x1a2432),
+    roughness: 0.38, metalness: 0.40, envMapIntensity: 0.85, side: THREE.BackSide
+  });
   const glassMat = mkMat(M.crystalGlass, {
     name: 'nexus-diamond-glass', color: new THREE.Color(0x20355c),
     roughness: 0.05, metalness: 0.18, transparent: true, opacity: 0.38, envMapIntensity: 2.3
@@ -600,7 +635,7 @@ export function buildMahNexus(ctx, opts = {}) {
   owned.materials.push(mahgicMat);
 
   /* ---- ACCUMULATORS. One merge per material, so this whole complex is four draws at full detail. */
-  const bins = { shell: [], trunk: [], tube: [], deck: [], recess: [], glass: [], mahgic: [] };
+  const bins = { shell: [], trunk: [], tube: [], bore: [], deck: [], recess: [], glass: [], mahgic: [] };
   /* every member that is supposed to REACH the ceiling records where it claims to land, so §3 can
      be checked against the intent and not against whatever vertex happens to be near the top */
   const landings = [];
@@ -618,13 +653,22 @@ export function buildMahNexus(ctx, opts = {}) {
      connectors, the MAHGIC rails. The detail meshes merge separately and setDetail simply stops
      drawing them, which is also the prefilter law — a portal 4 km away is not detail, it is noise
      that costs 80k triangles to draw. */
-  const bins2 = { shell: [], trunk: [], tube: [], deck: [], recess: [], glass: [], mahgic: [] };
-  let DETAIL = false;
+  const bins2 = { shell: [], trunk: [], tube: [], bore: [], deck: [], recess: [], glass: [], mahgic: [] };
+  /* A THIRD TIER, because a bore is invisible from outside its own tube.
+
+     PASS 4's interiors took the detail tier from 105k triangles to 288k and blew §24's near budget
+     at 418k. Raising the budget would be the wrong answer twice over: the cost is real, and the
+     geometry is unresolvable from anywhere except INSIDE the member — which is a far tighter range
+     than LOD_NEAR's 1400 m. This is the prefilter law at its most literal: a tunnel wall you are
+     not in is not detail at any distance, it is occluded. */
+  const bins3 = { shell: [], trunk: [], tube: [], bore: [], deck: [], recess: [], glass: [], mahgic: [] };
+  let TIER = 0;
   const push = (bin, geo) => {
-    const target = DETAIL ? bins2[bin] : bins[bin];
+    const target = TIER === 2 ? bins3[bin] : TIER === 1 ? bins2[bin] : bins[bin];
     if (Array.isArray(geo)) { for (const g of geo) target.push(g); } else target.push(geo);
   };
-  const detail = (fn) => { DETAIL = true; try { fn(); } finally { DETAIL = false; } };
+  const detail = (fn) => { const p0 = TIER; TIER = 1; try { fn(); } finally { TIER = p0; } };
+  const interior = (fn) => { const p0 = TIER; TIER = 2; try { fn(); } finally { TIER = p0; } };
   const at = (geo, x, y, z) => { const m = new THREE.Matrix4().makeTranslation(x, y, z); geo.applyMatrix4(m); return geo; };
 
   /* ================================ THE BASE ================================================== */
@@ -891,6 +935,79 @@ export function buildMahNexus(ctx, opts = {}) {
     stats.parts.portals = n;
   });
 
+  /* R7 §5 / PASS 4 — THE INSIDE OF A ROUTE.
+
+     Four things, and each earns its place against a stated clause rather than being tunnel dressing:
+
+       BORE    §5 "sufficient internal diameter" — the shell a traveller is actually inside of,
+               rendered BackSide because the faces pointing away are the ones that surround them.
+       RIBS    §5 "clear directionality" and §3's engineered read. They are also the only thing that
+               gives a smooth vertical bore any sense of speed: a featureless tunnel is a still
+               image no matter how fast you move through it.
+       ROUTE   §6 "route lights, directional MAHGIC" — one line down the bore, not a light show.
+       AUDIO   §20's miniature vertical music-line motif, which every FOBEAM family keeps. Placed
+               on the established language, not reinvented: six groups, five bars, sparse.
+
+     All of it is DETAIL tier. A bore is invisible from outside the tube by definition, so drawing
+     it at range is the prefilter law's exact failure case. */
+  const boreOf = (curve, outerR, sectionN) => {
+    const B = NEXUS.BORE, inner = outerR - B.WALL;
+    push('bore', sweptTube(curve, B.STATIONS, B.RADIAL, () => inner, () => sectionN, () => 0, false, false));
+    /* RIBS — proud of the bore wall, spaced by arc length so a spiral gets the same rhythm as a
+       straight run rather than a compressed one. */
+    const len = curve.getLength();
+    const ribs = Math.max(4, Math.round(len / B.RIB_EVERY));
+    for (let k = 1; k < ribs; k++) {
+      const t = k / ribs;
+      const P0 = curve.getPointAt(t), T0 = curve.getTangentAt(t).normalize();
+      let N0 = new THREE.Vector3(0, 1, 0);
+      if (Math.abs(T0.dot(N0)) > 0.92) N0.set(1, 0, 0);
+      const B0 = new THREE.Vector3().crossVectors(T0, N0).normalize();
+      N0.crossVectors(B0, T0).normalize();
+      const pts = [], STEPS = 22, rr = inner + B.RIB_PROUD;
+      for (let i = 0; i < STEPS; i++) {
+        const phi = (i / STEPS) * TAU, r2 = superR(phi, rr, sectionN);
+        pts.push(new THREE.Vector3(
+          P0.x + N0.x * Math.cos(phi) * r2 + B0.x * Math.sin(phi) * r2,
+          P0.y + N0.y * Math.cos(phi) * r2 + B0.y * Math.sin(phi) * r2,
+          P0.z + N0.z * Math.cos(phi) * r2 + B0.z * Math.sin(phi) * r2));
+      }
+      push('tube', sweptTube(new THREE.CatmullRomCurve3(pts, true), 40, 7,
+        () => B.RIB_SEC, () => 3.2, () => 0, false, false));
+    }
+    /* ROUTE LINE — one, down the bore's flank, following the route rather than inventing a path */
+    {
+      const pts = [];
+      for (let k = 0; k <= 14; k++) {
+        const t = k / 14, P0 = curve.getPointAt(t), T0 = curve.getTangentAt(t).normalize();
+        let N0 = new THREE.Vector3(0, 1, 0);
+        if (Math.abs(T0.dot(N0)) > 0.92) N0.set(1, 0, 0);
+        const B0 = new THREE.Vector3().crossVectors(T0, N0).normalize();
+        pts.push(new THREE.Vector3(P0.x + B0.x * inner * 0.88, P0.y + B0.y * inner * 0.88, P0.z + B0.z * inner * 0.88));
+      }
+      push('mahgic', sweptTube(new THREE.CatmullRomCurve3(pts), 60, 6, () => 1.5, () => 2.6, () => 0, false, false));
+    }
+    /* AUDIO — §20, and it stays miniature. Vertical bars in a group, in the route's own frame. */
+    for (let g = 0; g < B.AUDIO_GROUPS; g++) {
+      const t = 0.12 + 0.76 * (g / (B.AUDIO_GROUPS - 1));
+      const P0 = curve.getPointAt(t), T0 = curve.getTangentAt(t).normalize();
+      let N0 = new THREE.Vector3(0, 1, 0);
+      if (Math.abs(T0.dot(N0)) > 0.92) N0.set(1, 0, 0);
+      const B0 = new THREE.Vector3().crossVectors(T0, N0).normalize();
+      N0.crossVectors(B0, T0).normalize();
+      for (let k = 0; k < B.AUDIO_BARS; k++) {
+        const off = (k - (B.AUDIO_BARS - 1) / 2) * B.AUDIO_SPREAD;
+        const h = B.AUDIO_H * (0.45 + 0.55 * gold(g * 7 + k * 3));
+        const base = new THREE.Vector3(
+          P0.x - N0.x * inner * 0.9 + B0.x * off, P0.y - N0.y * inner * 0.9 + B0.y * off,
+          P0.z - N0.z * inner * 0.9 + B0.z * off);
+        const tip = base.clone().addScaledVector(N0, h);
+        push('mahgic', sweptTube(new THREE.LineCurve3(base, tip), 2, 5,
+          () => B.AUDIO_R, () => 3.0, () => 0, true, true));
+      }
+    }
+  };
+
   /* ================================ R7 §7 — THE HALO ENTRY POINTS =============================
      "Each dome entry needs: physical docking collar, threshold frame, square-diamond node, local
      landing terrace, clean backside."
@@ -983,6 +1100,7 @@ export function buildMahNexus(ctx, opts = {}) {
         new THREE.Vector3(lx, ly, lz)
       ], lx, ly, lz, LAND_TAIL));
       push('tube', sweptTube(curve, NEXUS.TUBE_STATIONS, NEXUS.TUBE_RADIAL, () => S.R, () => S.N, () => 0, true, true));
+      interior(() => boreOf(curve, S.R, S.N));
     }
     stats.parts.straight = S.COUNT;
   }
@@ -1008,8 +1126,12 @@ export function buildMahNexus(ctx, opts = {}) {
       const last = pts[pts.length - 1];
       const curve = new THREE.CatmullRomCurve3(landVertical(pts, last.x, last.y, last.z, LAND_TAIL));
       push('tube', sweptTube(curve, NEXUS.TUBE_STATIONS + 24, NEXUS.TUBE_RADIAL, () => S.R, () => S.N, () => 0, true, true));
+      interior(() => boreOf(curve, S.R, S.N));
     }
     stats.parts.spiral = S.COUNT;
+    stats.boreStraight = +((NEXUS.STRAIGHT.R - NEXUS.BORE.WALL) * 2).toFixed(1);
+    stats.boreSpiral = +((NEXUS.SPIRAL.R - NEXUS.BORE.WALL) * 2).toFixed(1);
+    stats.boreMin = Math.min(stats.boreStraight, stats.boreSpiral);
   }
 
   /* BRANCH — §2's "branch-like", and this is where the word ORGANISM has to be earned. Each branch
@@ -1077,30 +1199,40 @@ export function buildMahNexus(ctx, opts = {}) {
   });
 
   /* ---- MERGE. One draw per material family. ---------------------------------------------------- */
-  const matFor = { shell: shellMat, trunk: trunkMat, tube: tubeMat, deck: deckMat, recess: recessMat, glass: glassMat, mahgic: mahgicMat };
-  const detailMeshes = [];
-  stats.triSilhouette = 0; stats.triDetail = 0;
-  for (const [set, isDetail] of [[bins, false], [bins2, true]]) {
+  const matFor = { shell: shellMat, trunk: trunkMat, tube: tubeMat, bore: boreMat, deck: deckMat, recess: recessMat, glass: glassMat, mahgic: mahgicMat };
+  const detailMeshes = [], interiorMeshes = [];
+  stats.triSilhouette = 0; stats.triDetail = 0; stats.triInterior = 0;
+  for (const [set, kind] of [[bins, 0], [bins2, 1], [bins3, 2]]) {
     for (const key of Object.keys(set)) {
       const list = set[key]; if (!list.length) continue;
       const merged = mergeGeoms(list);
       for (const g of list) g.dispose();
       owned.geometries.push(merged);
       const mesh = new THREE.Mesh(merged, matFor[key]);
-      mesh.name = 'nexus-' + key + (isDetail ? '-detail' : '');
+      mesh.name = 'nexus-' + key + (kind === 1 ? '-detail' : kind === 2 ? '-interior' : '');
       mesh.castShadow = false; mesh.receiveShadow = false;
       group.add(mesh);
-      if (isDetail) detailMeshes.push(mesh);
+      if (kind === 1) detailMeshes.push(mesh);
+      if (kind === 2) interiorMeshes.push(mesh);
       stats.draws++;
       const tri = merged.attributes.position.count / 3;
       stats.triangles += tri;
-      if (isDetail) stats.triDetail += tri; else stats.triSilhouette += tri;
+      if (kind === 1) stats.triDetail += tri;
+      else if (kind === 2) stats.triInterior += tri;
+      else stats.triSilhouette += tri;
     }
   }
+  stats.triInterior = Math.round(stats.triInterior);
+  /* what a viewer outside the complex actually pays: everything but the bores */
+  stats.triApproach = Math.round(stats.triSilhouette + stats.triDetail);
   stats.triangles = Math.round(stats.triangles);
   stats.triSilhouette = Math.round(stats.triSilhouette);
   stats.triDetail = Math.round(stats.triDetail);
-  stats.drawsFar = stats.draws - detailMeshes.length;
+  /* what each range actually pays in draw calls. drawsFar subtracts BOTH optional tiers — the
+     first version subtracted only the detail meshes and reported 7 for a far silhouette that is
+     really 4, which is a budget gate lying in the safe direction. */
+  stats.drawsFar = stats.draws - detailMeshes.length - interiorMeshes.length;
+  stats.drawsApproach = stats.draws - interiorMeshes.length;
 
   /* ---- THE §3 GATE, asserted here rather than believed. --------------------------------------
      "The upward MAH NEXUS trunks connect PHYSICALLY into the underside." A number in stats is a
@@ -1223,10 +1355,12 @@ export function buildMahNexus(ctx, opts = {}) {
          rails simply stop being drawn past LOD_NEAR. Below that range they are unresolvable, so
          drawing them buys noise at the cost of most of this object's triangle budget. */
       const wantDetail = d <= NEXUS.LOD_NEAR;
-      const next = d > NEXUS.LOD_MID ? 0.34 : wantDetail ? 1 : 0.7;
+      const wantInterior = d <= NEXUS.LOD_INTERIOR;
+      const next = (d > NEXUS.LOD_MID ? 4 : wantInterior ? 1 : wantDetail ? 2 : 3);
       if (next === tier) return;
       tier = next;
       for (const m of detailMeshes) m.visible = wantDetail;
+      for (const m of interiorMeshes) m.visible = wantInterior;
       group.visible = d < NEXUS.LOD_FAR;
     },
     navSites() {
