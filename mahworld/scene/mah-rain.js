@@ -187,7 +187,14 @@ export const SEA = Object.freeze({
   R_IN: 2380,
   R_OUT: 5600,
   DEPTH_MAX: 46,
-  SEG: 320, RINGS: 54,
+  /* TESSELLATION, SIZED FROM THE SWIMMER'S EYE RATHER THAN FROM THE SEA'S DIAMETER.
+     At 320 x 54 the facets near the shore measure about 39 m radially by 49 m round, and from an
+     eye 2.3 m above the water a single plate fills a third of the frame as one flat colour. Crystal
+     needs several facets in view to read AS crystal; one facet reads as a wall.
+     512 x 76 with the rings crowded harder toward the shore puts them near 20 m there, and the
+     fragment ripple below supplies the detail under that — geometry for the plates, gradient for
+     the surface of each plate. One draw either way. */
+  SEG: 512, RINGS: 76, RING_POW: 1.70,
   /* the inner shore is NOT a circle. Two slow harmonics, so the coast has bays and headlands at the
      scale a coast has them, and the eye never finds the centre by following the shoreline. */
   SHORE_A1: 130, SHORE_N1: 3,
@@ -657,7 +664,7 @@ export function buildMahRain(ctx, opts = {}) {
       const rIn = shoreR(th);
       /* the rings are packed toward the shore — that is where a swimmer is, and where the facets
          need to be small enough to read as plates rather than as continents */
-      const u = Math.pow(ri / RINGS, 1.45);
+      const u = Math.pow(ri / RINGS, SEA.RING_POW);
       const r = rIn + (SEA.R_OUT - rIn) * u;
       return [Math.cos(th) * r, SEA.LEVEL, Math.sin(th) * r];
     };
@@ -677,9 +684,14 @@ export function buildMahRain(ctx, opts = {}) {
     g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
     g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, SEA.LEVEL, 0), SEA.R_OUT * 1.05);
 
+    /* DARKER, AND LESS OF THE ENVIRONMENT. The first render came back pale violet: at grazing
+       incidence a 0.30-metalness surface at envMapIntensity 1.55 returns most of the sky, and most
+       of this sky at night is a lit horizon band. §07's rule for water in this world is that it
+       reads near-black and takes its value from what it returns, not from its own colour — so the
+       albedo drops and the environment term comes down with it. */
     const seaMat = new THREE.MeshStandardMaterial({
-      color: 0x16222f, roughness: 0.13, metalness: 0.30,
-      envMapIntensity: 1.55, transparent: true, opacity: 0.94
+      color: 0x0d151f, roughness: 0.15, metalness: 0.26,
+      envMapIntensity: 1.00, transparent: true, opacity: 0.95
     });
     seaMat.name = 'mah-crystal-sea'; owned.materials.push(seaMat);
 
@@ -700,7 +712,9 @@ export function buildMahRain(ctx, opts = {}) {
          water glassy flat — see the note in the vertex injection. */
       uSeaShore: { value: new THREE.Vector4(SEA.SHORE_A1, SEA.SHORE_N1, SEA.SHORE_A2, SEA.SHORE_N2) },
       uSeaGlow: { value: new THREE.Color(0x2c4a63) },
-      uSeaGlowI: { value: 0.10 }
+      uSeaGlowI: { value: 0.06 },
+      /* the micro-ripple: amplitude in radians of normal tilt, and its two wavelengths in metres */
+      uSeaRipple: { value: new THREE.Vector3(0.085, 3.7, 13.1) }
     };
     seaMat.userData.seaUniforms = seaU;
     seaMat.onBeforeCompile = sh => {
@@ -753,6 +767,7 @@ export function buildMahRain(ctx, opts = {}) {
       ].join('\n'));
       sh.fragmentShader = [
         'uniform float uSeaFacet; uniform vec3 uSeaGlow; uniform float uSeaGlowI;',
+        'uniform vec3 uSeaRipple; uniform float uSeaT;',
         'uniform vec2 uSeaEnv;',
         'varying float vSeaH;',
         'varying vec3 vSeaW;',
@@ -777,6 +792,22 @@ export function buildMahRain(ctx, opts = {}) {
         '  vec3 sfn = normalize( cross( sfx, sfy ) );',
         '  if ( sfn.z < 0.0 ) sfn = -sfn;',
         '  normal = normalize( mix( normal, sfn, uSeaFacet ) );',
+        /* AND THE SURFACE OF EACH PLATE. A 20 m facet is still enormous under a swimmer's chin, and
+           no tessellation this world can afford reaches centimetres across three kilometres. So the
+           plate is geometry and its SURFACE is a gradient: two octaves at 3.7 m and 13.1 m tilting
+           the normal by up to 0.085 rad. It is deliberately an order of magnitude finer than the
+           swell, so it reads as the texture ON the crystal rather than as more swell. */
+        '  {',
+        '    vec2 rp = vSeaW.xz;',
+        '    float k1 = 6.2831853 / uSeaRipple.y, k2 = 6.2831853 / uSeaRipple.z;',
+        '    float dx = sin( rp.x * k1 + uSeaT * 1.7 ) * cos( rp.y * k1 * 0.83 - uSeaT * 1.1 )',
+        '             + 0.55 * sin( rp.x * k2 - uSeaT * 0.7 );',
+        '    float dz = cos( rp.x * k1 * 0.91 - uSeaT * 1.3 ) * sin( rp.y * k1 + uSeaT * 1.9 )',
+        '             + 0.55 * sin( rp.y * k2 + uSeaT * 0.6 );',
+        '    vec3 rt = normalize( cross( vec3( 0.0, 0.0, 1.0 ), normal ) );',
+        '    vec3 rb = cross( normal, rt );',
+        '    normal = normalize( normal + ( rt * dx + rb * dz ) * uSeaRipple.x );',
+        '  }',
         /* the crests carry a little internal light, the troughs none — the depth cue that stops a
            dark reflective sea reading as a sheet of slate at night */
         '  totalEmissiveRadiance += uSeaGlow * uSeaGlowI * clamp( vSeaH * 0.22 + 0.35, 0.0, 1.0 );',
