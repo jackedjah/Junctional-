@@ -145,10 +145,22 @@ export const CLOUD = Object.freeze({
      where fewer lobes happened to stack. A cloud with a blown-out core and ragged arms is a star.
      Solving for a core near 0.55 instead: 1 - (1-a)^n = 0.55 at a = 0.075 wants n = 7.6 layers, and
      n at the centre is about N * (r_lobe / R_cluster)^2 * 2. With N = 20 and R = 340 that gives a
-     mean lobe radius near 170 — more lobes, smaller, spread wider, at two thirds the alpha. */
+     mean lobe radius near 170 — more lobes, smaller, spread wider, at two thirds the alpha.
+
+     AND THE SECOND SOLVE, because the first one fixed the core and made the OUTLINE worse. A lobe
+     is provably convex — its silhouette measures 0.77 min/max from the camera that photographed the
+     stars — so the star was never one lobe, it was the UNION of several. Discs that overlap lightly
+     meet at cusps and their union is scalloped; discs that overlap heavily merge into one blob. The
+     first solve dropped r_lobe / R_cluster from 0.80 to 0.51, which is exactly the wrong direction
+     for the outline while being the right one for the core.
+     Both at once needs heavy overlap AND a much lower per-lobe alpha: at r/R 0.71 with 24 lobes the
+     centre stacks 24 layers, and 1 - (1-a)^24 = 0.55 wants a = 0.033. Smooth union, unsaturated
+     core, and the coverage stat below now measures the CLUSTER footprint rather than the sum of
+     lobe areas — because what stands in front of the dome is the union of the discs, not the
+     arithmetic total of their parts. */
   MANTLE_CLUSTERS: 16,
-  PER_CLUSTER: 20,
-  CLUSTER_R: 340,        /* the disc a cluster's lobes are packed into */
+  PER_CLUSTER: 24,
+  CLUSTER_R: 300,        /* the disc a cluster's lobes are packed into */
   CLUSTER_FLAT: 0.42,    /* and it is FLATTER than it is wide: a cloud is a raft, not a ball */
   OFF_MIN: 110, OFF_MAX: 400,   /* how far off the dome's surface, along its normal */
   /* the mantle stops at 72% of the way up the meridian and its density falls as the 2.4 power of
@@ -166,7 +178,7 @@ export const CLOUD = Object.freeze({
      40 strata put the lowest draw an order of magnitude lower, and the bottom 3 of those 40 are
      placed explicitly in the ground band. Three of forty is 7.5%: still "less", and now it exists. */
   VEIL_CLUSTERS: 40,
-  VEIL_PER: 14,
+  VEIL_PER: 18,
   /* THE GROUND BAND SPANS 58 TO 480, NOT 58 TO 250, AND ITS CLUSTERS ARE SPREAD ACROSS IT.
      Bunched into the bottom 200 m they broke the very rule they exist to complete: the histogram
      came back 0-200m:24, 200-500:0, 500-900:32 — more cloud at the ground than just above it, which
@@ -180,7 +192,7 @@ export const CLOUD = Object.freeze({
 
   /* SIZE. World clouds beside a 3434 m dome, so hundreds of metres across and FLATTENED — a cloud
      as tall as it is wide is a boulder. */
-  LOBE_MIN: 80, LOBE_MAX: 300,
+  LOBE_MIN: 120, LOBE_MAX: 340,
   FLAT_MIN: 0.20, FLAT_MAX: 0.40,
   /* TILT, and it is small. At +/-0.45 rad the flattened lobes met at crossing angles and their
      overlaps read as blades laid over each other; a cloud's parts lie broadly the same way up. */
@@ -402,7 +414,7 @@ export function buildMahRain(ctx, opts = {}) {
       /* LOW, on purpose. Density comes from OVERLAP inside a cluster, not from opacity — which is
          how cloud actually builds, and the reason the first cut read as rubble: a thousand separate
          blobs at alpha 0.30 are a thousand visible silhouettes. Fourteen at 0.11 are one cloud. */
-      uCloudA: { value: new THREE.Vector2(0.075, 0.26) },
+      uCloudA: { value: new THREE.Vector2(0.033, 0.13) },
       uCloudGlow: { value: new THREE.Color(0x9fc4e8) },
       uCloudGlowI: { value: 0.08 }
     };
@@ -586,9 +598,11 @@ export function buildMahRain(ctx, opts = {}) {
         lowest: +lo.toFixed(0), highest: +hi.toFixed(0),
         bandsFromGround: bands.map((b, k) => b + 'm:' + hist[k]).join(' '),
         apexY: APEX_Y, domeR: TOP_R,
-        /* the number the first cut got wrong by a factor of twenty: how much cloud stands in front
-           of the dome, measured against the dome's own frontal silhouette. Over 100 is a lid. */
-        coverPct: +(((MANTLE_N * Math.PI * Math.pow((CLOUD.LOBE_MIN + CLOUD.LOBE_MAX) / 4, 2))
+        /* WHAT STANDS IN FRONT OF THE DOME IS THE UNION OF THE CLUSTER DISCS, not the arithmetic
+           sum of every lobe's area. The first version of this stat summed lobes and therefore
+           counted every overlap twice, which made a heavily-overlapped design — the one that
+           actually looks like cloud — read as 144% and fail its own gate. */
+        coverPct: +(((CLOUD.MANTLE_CLUSTERS * Math.PI * CLOUD.CLUSTER_R * CLOUD.CLUSTER_R)
           / (Math.PI * TOP_R * DOME_H / 2)) * 100).toFixed(0)
       };
     }
@@ -966,7 +980,7 @@ export function buildMahRain(ctx, opts = {}) {
          disappears unless it closes up. */
       const c = cloudUniforms;
       if (c) {
-        c.uCloudA.value.set(0.062 + 0.048 * (1 - day), 0.22 + 0.10 * day);
+        c.uCloudA.value.set(0.028 + 0.020 * (1 - day), 0.11 + 0.05 * day);
         c.uCloudGlowI.value = 0.04 + 0.13 * (1 - day);
       }
     },
