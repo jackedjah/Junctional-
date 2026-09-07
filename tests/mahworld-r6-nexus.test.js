@@ -199,6 +199,47 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     'exponents ' + expo.min + '..' + expo.max + ' across ' + expo.n + ' families');
 
   /* ============================================================================================
+     3b. §4 — THE TUBULAR DIAMOND ENTRY SYSTEM, and §7's DISTAL DETAIL LAW.
+
+     "Every transport tube entry should feel like a premium destination portal." Before this pass
+     every tube in the complex met the deck as a bare capped cylinder, which is exactly what §7
+     means by "even a simple door" being a quality gate.
+     ============================================================================================ */
+  console.log('\nR6 §4 — every tube has a door, and no platform stands in front of one');
+  const portal = await ev(async () => {
+    const m = await import('/mahworld/scene/mah-nexus.js');
+    const P = m.NEXUS.PORTAL;
+    return { w: P.W, h: P.H, ratio: +(P.W / P.H).toFixed(2),
+      jambDepth: P.JAMB_D, throatDepth: P.THROAT_D,
+      nodeRatio: +(P.NODE_W / P.NODE_H).toFixed(2),
+      expo: [P.CASING_N, P.JAMB_N, P.THROAT_N],
+      doors: m.doorBearings(), petals: m.petalBearings() };
+  });
+  P('there is a portal at every tube entry, plus the main door (§10)',
+    S.parts.portals === portal.doors.length + 1,
+    S.parts.portals + ' portals for ' + portal.doors.length + ' tubes');
+  /* §06 is a standing world law and it applies to every diamond in the world, doors included: a
+     diamond taller than it is wide reads as a spike, which §5 forbids by name. */
+  P('§06: the portal mouth is WIDER THAN TALL', portal.ratio > 1.15,
+    portal.w + ' x ' + portal.h + ' = ' + portal.ratio + ':1');
+  P('§06: the status node is wider than tall too', portal.nodeRatio > 1.15, portal.nodeRatio + ':1');
+  P('§4: the jamb is physically deep, not a painted line', portal.jambDepth >= 10,
+    portal.jambDepth + ' m');
+  P('§4: the throat goes deeper still', portal.throatDepth > portal.jambDepth, portal.throatDepth + ' m');
+  /* the depth reads off the CORNER RADIUS changing, not off a shadow — so the three rings must
+     round off monotonically as they recede. This is the mechanism, checked as a sequence. */
+  P('§4: the frame rounds off as it recedes, so the depth reads without a shadow',
+    portal.expo[0] > portal.expo[1] && portal.expo[1] > portal.expo[2], portal.expo.join(' > '));
+  /* THE COLLISION THE RENDER CAUGHT. Petals on a 36-degree phase and straight tubes on 45 put a
+     158 m wide platform nine degrees off a transport entry — it filled the lower half of that
+     portal's own proof frame. The bearings are derived from the door gaps now, not phased. */
+  P('§8 platforms do not stand in front of §4 doors', S.petalDoorSep > 14,
+    'closest petal is ' + S.petalDoorSep + ' deg from a door');
+  P('the petal bearings are derived from the doors, not a fixed phase',
+    JSON.stringify(S.petalBearings) === JSON.stringify(portal.petals.map(b2 => +b2.toFixed(1))),
+    JSON.stringify(S.petalBearings) + ' vs ' + JSON.stringify(portal.petals));
+
+  /* ============================================================================================
      4. THE SURFACE IS SMOOTH, NOT FACETED. §5 asks for blended curvature; a non-indexed sweep
         would give flat shards, so the normals are measured rather than assumed.
      ============================================================================================ */

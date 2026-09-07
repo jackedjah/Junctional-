@@ -233,6 +233,34 @@ export const NEXUS = Object.freeze({
   BRANCH: Object.freeze({ COUNT: 6, SPLIT_AT: 0.44, SEAT_R: 96, LAND_R: 660, R0: 33, R1: 21, N: 3.4, PHASE: 30 }),
   TUBE_STATIONS: 80, TUBE_RADIAL: 20,
 
+  /* THE TUBULAR DIAMOND ENTRY SYSTEM — §4, which is the most specified section in the whole master
+     and describes a DOOR rather than a hole:
+
+         large-radius rounded rectangular / rounded diamond mouth,   no razor corners,
+         deep physical jamb,   crystal-clear or smoked transparent tube throat,
+         platinum casing,   black-crystal recess,   square-diamond status node
+
+     Every one of those is a piece of geometry here except the internal traveling light and the
+     audio-reactive line group, which are motion and belong to PASS 10.
+
+     THE MOUTH IS WIDER THAN TALL, and that is not a proportion I chose. §06 is a standing world law
+     — square diamonds are WIDER THAN TALL — and it exists because a diamond taller than it is wide
+     reads as a spike, which is the one silhouette §5 forbids by name. 46 x 34 is 1.35:1.
+
+     The four rings are concentric and each is a rounded square of DECREASING exponent, so the mouth
+     is squarest at the outside and rounds off as it goes in. That is the "deep physical jamb" as a
+     sequence rather than as a single recessed box: the eye reads depth from the corner radius
+     changing, not from the shadow. */
+  PORTAL: Object.freeze({
+    W: 46, H: 34,              /* §06: wider than tall, 1.35:1 */
+    CASING: 7.0, CASING_N: 4.6,   /* the outer platinum frame: squarest, and the only bright ring */
+    JAMB_IN: 6.5, JAMB_D: 15, JAMB: 5.0, JAMB_N: 3.8,   /* the deep recess, in black crystal */
+    THROAT_D: 22, THROAT_N: 3.2,  /* the smoked tube throat the jamb leads into */
+    NODE_W: 11, NODE_H: 7,     /* §4's square-diamond status node — wider than tall again */
+    NODE_UP: 27, NODE_D: 2.6,
+    SILL: 3.0                  /* §4's "clean floor transition": a low sill, not a step */
+  }),
+
   /* CIVIC PETALS — §8. Blocked as masses this pass; they exist because they widen the base in the
      GROUND FAR silhouette and because §8 forbids them being floating islands: each is tied to the
      plinth by a neck.
@@ -240,12 +268,56 @@ export const NEXUS = Object.freeze({
      OUT and A are sized by the SITE, not by taste. The footprint probe returned relief 0.0 out to
      half-extent 400 m and 105.5 m at 500 m, so the whole complex has to close inside 400. The
      widest petal is OUT + A * 1.10 (the 1.10 is the top of the per-petal size sequence below) =
-     310 + 79.2 = 389 m. Nothing in this module may reach past 400 without re-measuring the site. */
-  PETALS: Object.freeze({ COUNT: 5, OUT: 310, A: 72, H: 44, N: 4.0, PHASE: 36, SEAT_LO: 30, SEAT_VARY: 9 }),
+     310 + 79.2 = 389 m. Nothing in this module may reach past 400 without re-measuring the site.
+
+     AND THEIR BEARINGS ARE NOT A PHASE OFFSET ANY MORE. The first §4 render showed a petal parked
+     squarely in front of a tube entry, filling the lower half of the frame: petals on a 36 degree
+     phase and straight tubes on 45 put one nine degrees off a door, and a petal is 158 m wide.
+     §8's platforms were standing on §4's entrances.
+
+     A fixed phase cannot express "not in front of a door", so it is replaced by a RULE: collect
+     every tube bearing, find the angular gaps between them, and put the petals in the widest ones.
+     It is deterministic, it needs no magic numbers, and it stays correct if the tube counts ever
+     change — which a hand-tuned phase would not. */
+  PETALS: Object.freeze({ COUNT: 5, OUT: 310, A: 72, H: 44, N: 4.0, SEAT_LO: 30, SEAT_VARY: 9 }),
   SITE_CLEAR_R: 400,        /* measured: relief 0.0 inside this, 105.5 m of rock outside it */
 
   LOD_NEAR: 1400, LOD_MID: 4200, LOD_FAR: 26000
 });
+
+/* WHERE THE PETALS STAND — one definition, because two would drift.
+
+   §8's platforms may not block §4's doors, and a fixed phase offset cannot express that: the first
+   build had petals on 36 degrees and straight tubes on 45, which put a 158 m wide platform nine
+   degrees off a transport entry, filling the lower half of that portal's own proof frame.
+
+   So the bearings are DERIVED. Collect every tube bearing, measure the angular gaps between
+   consecutive ones around the circle, and hand the widest COUNT of them their midpoints. Nothing to
+   tune, and it stays correct if a tube family ever changes count — which a hand-picked phase would
+   silently not.
+
+   The builder and nexusSurface both call this. When they each had their own copy of the placement,
+   the walkable surface and the geometry were one edit away from disagreeing about where the ground
+   was, which is L42's whole warning. */
+export function petalBearings() {
+  const doors = [];
+  for (const FAM of [NEXUS.STRAIGHT, NEXUS.SPIRAL])
+    for (let i = 0; i < FAM.COUNT; i++) doors.push((((FAM.PHASE + (360 / FAM.COUNT) * i) % 360) + 360) % 360);
+  doors.sort((a, b) => a - b);
+  const gaps = doors.map((d, i) => {
+    const nxt = doors[(i + 1) % doors.length] + (i + 1 === doors.length ? 360 : 0);
+    return { mid: ((d + nxt) / 2) % 360, span: nxt - d };
+  }).sort((a, b) => b.span - a.span);
+  return gaps.slice(0, NEXUS.PETALS.COUNT).map(g => g.mid).sort((a, b) => a - b);
+}
+/* the tube-entry bearings, exported for the same reason: a test that re-derives them is not
+   testing the module, it is testing its own copy of the rule. */
+export function doorBearings() {
+  const doors = [];
+  for (const FAM of [NEXUS.STRAIGHT, NEXUS.SPIRAL])
+    for (let i = 0; i < FAM.COUNT; i++) doors.push((((FAM.PHASE + (360 / FAM.COUNT) * i) % 360) + 360) % 360);
+  return doors.sort((a, b) => a - b);
+}
 
 /* halo.js's cross-section, quoted rather than re-derived — L42. The underside is the slab's
    lower face, and every trunk in this file terminates ON it. */
@@ -489,8 +561,19 @@ export function buildMahNexus(ctx, opts = {}) {
   /* ---- CIVIC PETALS (§8): tied to the plinth by a neck, never floating. --------------------- */
   {
     const P = NEXUS.PETALS;
+    /* the shared rule, not a second copy of it */
+    const bearings = petalBearings(), doors = doorBearings();
+    stats.petalBearings = bearings.map(b2 => +b2.toFixed(1));
+    stats.doorBearings = doors;
+    /* the closest any petal comes to any door, published so a test can hold it open */
+    let minSep = 360;
+    for (const b2 of bearings) for (const d of doors) {
+      const raw = Math.abs(b2 - d) % 360;
+      minSep = Math.min(minSep, Math.min(raw, 360 - raw));
+    }
+    stats.petalDoorSep = +minSep.toFixed(1);
     for (let i = 0; i < P.COUNT; i++) {
-      const aDeg = P.PHASE + (360 / P.COUNT) * i;
+      const aDeg = bearings[i];
       const [px, pz] = polar(aDeg, P.OUT);
       const y = P.SEAT_LO + P.SEAT_VARY * gold(i + 3);
       const petal = tierSolid(P.A * (0.82 + 0.28 * frac(i + 1)), y, y + P.H, P.N, 3.0);
@@ -607,6 +690,94 @@ export function buildMahNexus(ctx, opts = {}) {
         u => K.R0 + (K.R1 - K.R0) * (u * u * (3 - 2 * u)), () => K.N, () => 0, true, true));
     }
     stats.parts.tertiary = K.COUNT;
+  }
+
+  /* ================================ §4 — THE TUBE ENTRIES ======================================
+     One portal at the foot of every transport tube. §7's distal detail law is the reason this is
+     built now rather than later: "Even a simple door" is a quality gate, and until this pass every
+     tube in the complex met the deck as a bare cylinder ending in a cap.
+
+     THE FRAME IS THE SAME GENOME AS EVERYTHING ELSE. A rounded-diamond picture frame is a closed
+     superellipse curve swept with a small section — which is exactly sweptTube with the curve lying
+     in a vertical plane instead of climbing. No second way to make a rounded shape exists in this
+     file, which is the whole point of L42.
+
+     `bearing` faces the frame outward; `oval(w, h, n)` returns the closed curve in that plane. */
+  const portalAt = (px, py, pz, aDeg, scale) => {
+    const P = NEXUS.PORTAL, s = scale == null ? 1 : scale;
+    /* the outward normal and the two in-plane axes: U across the door, V up it */
+    const ux = Math.cos(aDeg * DEG), uz = -Math.sin(aDeg * DEG);
+    const tx = -uz, tz = ux;
+    const oval = (w, h, n, depth) => {
+      const pts = [], STEPS = 40;
+      for (let i = 0; i < STEPS; i++) {
+        const phi = (i / STEPS) * TAU;
+        const rr = superR(phi, 1, n);
+        const a = Math.cos(phi) * rr * w * 0.5, b2 = Math.sin(phi) * rr * h * 0.5;
+        pts.push(new THREE.Vector3(
+          px + tx * a + ux * depth, py + b2, pz + tz * a + uz * depth));
+      }
+      return new THREE.CatmullRomCurve3(pts, true);
+    };
+    /* 1. CASING — the outer platinum frame. The only bright ring, per §4 "platinum casing". */
+    push('tube', sweptTube(oval(P.W * s, P.H * s, P.CASING_N, 0), 92, 12,
+      () => P.CASING * s * 0.5, () => 3.6, () => 0, false, false));
+    /* 2. JAMB — inset and set BACK, in the recess material. §4 "deep physical jamb" plus
+          "black-crystal recess": one member does both because the depth is what makes it read. */
+    push('recess', sweptTube(oval((P.W - P.JAMB_IN * 2) * s, (P.H - P.JAMB_IN * 2) * s, P.JAMB_N, -P.JAMB_D * s * 0.5), 92, 10,
+      () => P.JAMB * s * 0.5, () => 3.4, () => 0, false, false));
+    /* 3. THROAT — deeper still and rounder, the smoked tube the jamb leads into. Rounder on
+          purpose: the sequence 4.6 -> 3.8 -> 3.2 is the eye reading depth off the corner radius
+          rather than off a shadow, which is what makes a shallow door look deep. */
+    push('recess', sweptTube(oval((P.W - P.JAMB_IN * 3.4) * s, (P.H - P.JAMB_IN * 3.4) * s, P.THROAT_N, -P.THROAT_D * s), 60, 10,
+      () => P.JAMB * s * 0.36, () => 3.2, () => 0, false, false));
+    /* 4. STATUS NODE — §4's square diamond, and §06's law applies to it too: wider than tall. */
+    {
+      const ny = py + P.NODE_UP * s;
+      const c = oval(P.NODE_W * s, P.NODE_H * s, 2.6, 0);
+      push('tube', sweptTube(c, 34, 8, () => P.NODE_D * s * 0.5, () => 3.0, () => 0, false, false));
+    }
+    /* 5. SILL — §4's "clean floor transition", and the first version of it was a BLACK BLOCK IN THE
+       DOORWAY. I swept it along the door's depth with a section radius of P.W * 0.34, which is
+       15.6 m on a 34 m opening — the member filled the entire lower half of the portal — and put it
+       in `deck`, which is paving at 0x0b0f16. The proof frame showed a solid black wedge where the
+       threshold should be. Two mistakes in one line: a section sized off the wrong dimension, and a
+       floor material used for a piece of the door.
+
+       A threshold runs ACROSS an opening, not into it. So it sweeps along the door's width with a
+       small section, and it belongs to the portal's own platinum family, which makes it the bright
+       line under a dark throat instead of a mass blocking it. */
+    {
+      const halfW = (P.W * s - P.CASING * s) * 0.5;
+      const yb = py - P.H * s * 0.5 + P.SILL * s * 0.5;
+      const a = new THREE.Vector3(px - tx * halfW + ux * P.CASING * s * 0.3, yb, pz - tz * halfW + uz * P.CASING * s * 0.3);
+      const b2 = new THREE.Vector3(px + tx * halfW + ux * P.CASING * s * 0.3, yb, pz + tz * halfW + uz * P.CASING * s * 0.3);
+      push('tube', sweptTube(new THREE.LineCurve3(a, b2), 6, 10,
+        () => P.SILL * s * 0.5, () => 4.0, () => 0, true, true));
+    }
+  };
+  {
+    let n = 0;
+    /* every straight and spiral tube gets one, at its own seat, facing out along its own bearing */
+    for (const [FAM, tag] of [[NEXUS.STRAIGHT, 'straight'], [NEXUS.SPIRAL, 'spiral']]) {
+      for (let i = 0; i < FAM.COUNT; i++) {
+        const aDeg = FAM.PHASE + (360 / FAM.COUNT) * i;
+        const [sx, sz] = polar(aDeg, FAM.SEAT_R);
+        const y0 = NEXUS.SEAT_Y[FAM.SEAT_TIER];
+        portalAt(sx, y0 + NEXUS.PORTAL.H * 0.5 + 1.5, sz, aDeg, 1);
+        n++;
+      }
+    }
+    /* and the MAIN ENTRANCE — §10's "Entry: premium door/portal", on the plinth's outward face,
+       facing back down the pass toward the city. It is the same door at 2.4x, because a civic
+       entrance and a platform gate should be recognisably the same object at different scales. */
+    {
+      const aDeg = NEXUS.BEARING + 180;      /* faces the approach, which comes from the world centre */
+      const [ex, ez] = polar(aDeg, NEXUS.TIERS[0].a * 0.985);
+      portalAt(ex, NEXUS.PORTAL.H * 1.25 + 4, ez, aDeg, 2.4);
+      n++;
+    }
+    stats.parts.portals = n;
   }
 
   /* ================================ RING NODES (§2) ===========================================
@@ -906,7 +1077,7 @@ export function nexusSurface(x, z) {
   }
   const P = NEXUS.PETALS;
   for (let i = 0; i < P.COUNT; i++) {
-    const aDeg = P.PHASE + (360 / P.COUNT) * i;
+    const aDeg = petalBearings()[i];
     const [px, pz] = polar(aDeg, P.OUT);
     const ex = lx - px, ez = lz - pz;
     const a = P.A * (0.82 + 0.28 * frac(i + 1)) * 0.9585;
@@ -949,4 +1120,4 @@ function mergeGeoms(list) {
      §10 MOVEMENT                       approach convergence, boarding, travel, dock
    ================================================================================================ */
 
-export default { buildMahNexus, NEXUS, nexusSurface, nexusCentre, haloUnderY };
+export default { buildMahNexus, NEXUS, nexusSurface, nexusCentre, haloUnderY, petalBearings, doorBearings };
