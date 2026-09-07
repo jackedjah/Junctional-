@@ -126,7 +126,11 @@ export function buildMahHaven(ctx, opts = {}) {
   };
 
   /* ---- THE FRAME. Everything is placed as (back-from-the-waterline, along-the-shore). --------- */
-  const waterY = (opts.waterY != null) ? opts.waterY : HAVEN.WATER_Y;
+  /* THE RESERVOIR SETS ITS OWN LEVEL. This used to accept opts.waterY, and the assembly passed
+     terrain.js's BASIN.y through it — which is the world's NATURAL water plane at -1.4 and put this
+     district's water back under the ground it is held above. A body of water that is infrastructure
+     does not take the level of one that is landscape. */
+  const waterY = HAVEN.WATER_Y;
   stats.waterY = waterY;
 
   const aS = HAVEN.SITE_DEG * DEG;

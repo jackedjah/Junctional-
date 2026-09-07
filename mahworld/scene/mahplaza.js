@@ -400,11 +400,12 @@ export async function createMahplaza(canvas, options = {}) {
   if (HAVENM && HAVENM.buildMahHaven) {
     try {
       mahHaven = HAVENM.buildMahHaven(ctx, {
-        /* only the LEVEL comes from terrain — the district cuts its own ellipse, because a world
-           sweep found exactly one site clear of both mountain and architecture and it has no
-           existing shoreline. One water plane, three bodies of water (L42 is about one truth, not
-           one object). */
-        waterY: (TERRAIN && TERRAIN.BASIN) ? TERRAIN.BASIN.y : -1.4
+        /* NO waterY. It was passed here as terrain.js's BASIN.y and it silently overrode the
+           district's own level: MAH HAVEN's water is a RESERVOIR held above grade, and the assembly
+           handing it the world's natural water plane put it back under the ground it is supposed to
+           sit on. The stats line said `waterY: -1.4` on the very next render, which is the whole
+           argument for publishing a number rather than trusting it. */
+        groundY: 0
       });
       scene.add(mahHaven.group);
     } catch (e) { console.info('MAHPLAZA: mah haven module failed —', e && e.message); mahHaven = null; }
