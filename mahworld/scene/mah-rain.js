@@ -567,7 +567,7 @@ export function buildMahRain(ctx, opts = {}) {
        rod, which is what every first cut of falling glass looks like. */
     uRainA: { value: new THREE.Vector2(0.055, 0.72) },
     uRainRim: { value: new THREE.Color(0xeaf4ff) },
-    uRainGlow: { value: 0.22 }
+    uRainGlow: { value: 0.30 }
   };
   rainMat.userData.rainUniforms = rainU;
   rainMat.onBeforeCompile = sh => {
@@ -885,7 +885,7 @@ export function buildMahRain(ctx, opts = {}) {
          never do both. A curtain that emits at noon is a light show; one that only reflects at
          midnight disappears. */
       const day = (s && s.daylight != null) ? s.daylight : 0;
-      rainU.uRainGlow.value = 0.10 + 0.30 * (1 - day);
+      rainU.uRainGlow.value = 0.14 + 0.38 * (1 - day);
       rainU.uRainA.value.set(0.040 + 0.030 * day, 0.62 + 0.18 * (1 - day));
       const u = seaMatUniforms();
       if (u) u.uSeaGlowI.value = 0.05 + 0.16 * (1 - day);
