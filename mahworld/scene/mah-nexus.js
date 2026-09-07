@@ -124,13 +124,22 @@ export const NEXUS = Object.freeze({
 
   /* THE BASE — §2 "wide circular/rounded-square civic base". Three tiers, each a rounded square
      that gets rounder as it rises, so the plan turns from civic (square, addressable, has corners
-     you can stand on) to structural (round, which is what a trunk springs from). */
+     you can stand on) to structural (round, which is what a trunk springs from).
+
+     THE BASE GAINS ITS PRESENCE IN HEIGHT, BECAUSE WIDTH IS NOT AVAILABLE. §2 asks for a "massive
+     premium central base" and the first build gave it 92 m under a 1702 m trunk — five per cent of
+     the object, which reads as a footing, not as half of what the brief describes. The obvious fix
+     is to widen it and the SITE FORBIDS THAT: the footprint probe returned relief 0.0 m out to
+     400 m and 105.5 m of rock past it, so 400 is a wall, and the tube families already stand at
+     r 262 with the petals closing at 389. Height costs nothing. At 208 m the base is twelve per
+     cent of the complex and reads as architecture from the pass mouth, while the trunk still
+     dominates it four to one — which is §8's requirement stated as a ratio, not an adjective. */
   TIERS: Object.freeze([
-    { a: 300, y0: 0,  y1: 26, n: 4.0, mat: 'deck'  },   /* PLINTH: the ground address */
-    { a: 232, y0: 26, y1: 60, n: 4.6, mat: 'deck'  },   /* CONCOURSE: the level §9 will open up */
-    { a: 168, y0: 60, y1: 92, n: 6.0, mat: 'plate' }    /* COLLAR: where the trunk springs */
+    { a: 300, y0: 0,   y1: 64,  n: 4.0, mat: 'deck'  },   /* PLINTH: the ground address */
+    { a: 236, y0: 64,  y1: 140, n: 4.6, mat: 'deck'  },   /* CONCOURSE: the level §9 will open up */
+    { a: 176, y0: 140, y1: 208, n: 6.0, mat: 'plate' }    /* COLLAR: where the trunk springs */
   ]),
-  SPRING_Y: 92,
+  SPRING_Y: 208,
 
   /* WHERE EACH FAMILY STANDS, and this table exists because the first build had none.
 
@@ -144,10 +153,10 @@ export const NEXUS = Object.freeze({
      primary trunks at r 186, and the COLLAR carries the core alone. Reading inward from the ground
      the members get fewer and heavier until there is one, which is what makes the centre dominant
      without making it merely taller. */
-  SEAT_Y: Object.freeze([26, 60, 92]),   /* the top of each tier, in order */
+  SEAT_Y: Object.freeze([64, 140, 208]),   /* the top of each tier, in order */
 
-  /* THE CORE TRUNK. 1730 m of rise on a 236 m section is 7.3:1 — the Washington Monument is 10:1
-     and reads as monumental, not slender. §2's "not a crystal spike" is a proportion instruction
+  /* THE CORE TRUNK. 1586 m of rise on a 300 m section is 5.3:1 — the Washington Monument is 10:1
+     and reads as monumental, not slender, so this is stockier still. §2's "not a crystal spike" is a proportion instruction
      before it is a shape instruction, and this is the proportion that answers it. The waist is what
      stops it reading as an extrusion: it draws IN through the lower third and flares out again into
      a capital, so the silhouette has a profile rather than an outline. */
@@ -191,7 +200,7 @@ export const NEXUS = Object.freeze({
      half-extent 400 m and 105.5 m at 500 m, so the whole complex has to close inside 400. The
      widest petal is OUT + A * 1.10 (the 1.10 is the top of the per-petal size sequence below) =
      310 + 79.2 = 389 m. Nothing in this module may reach past 400 without re-measuring the site. */
-  PETALS: Object.freeze({ COUNT: 5, OUT: 310, A: 72, H: 17, N: 4.0, PHASE: 36 }),
+  PETALS: Object.freeze({ COUNT: 5, OUT: 310, A: 72, H: 44, N: 4.0, PHASE: 36, SEAT_LO: 30, SEAT_VARY: 9 }),
   SITE_CLEAR_R: 400,        /* measured: relief 0.0 inside this, 105.5 m of rock outside it */
 
   LOD_NEAR: 1400, LOD_MID: 4200, LOD_FAR: 26000
@@ -434,7 +443,7 @@ export function buildMahNexus(ctx, opts = {}) {
     for (let i = 0; i < P.COUNT; i++) {
       const aDeg = P.PHASE + (360 / P.COUNT) * i;
       const [px, pz] = polar(aDeg, P.OUT);
-      const y = 10 + 3 * gold(i + 3);
+      const y = P.SEAT_LO + P.SEAT_VARY * gold(i + 3);
       const petal = tierSolid(P.A * (0.82 + 0.28 * frac(i + 1)), y, y + P.H, P.N, 3.0);
       for (const g of (Array.isArray(petal) ? petal : [petal])) push('shell', at(g, px, 0, pz));
       /* THE NECK. §8: "They are not floating random islands." So there is a member, and it is not
@@ -683,8 +692,12 @@ export function buildMahNexus(ctx, opts = {}) {
     const bad = [];
     for (const S2 of seats) {
       const T2 = NEXUS.TIERS[S2.tier];
-      /* the section is a superellipse, so its narrowest reach is on the DIAGONAL — check there */
-      const narrow = superR(Math.PI / 4, T2.a, T2.n);
+      /* THE NARROWEST REACH IS THE EDGE MIDPOINT, NOT THE DIAGONAL. A superellipse is
+         r(phi) = a / (|cos|^n + |sin|^n)^(1/n): at phi 0 that is exactly `a`, and at phi PI/4 with
+         n 6 it is 1.26a. The corners of a rounded square sit FURTHER out than its flats — that is
+         what makes it look like a square. The first gate checked the diagonal and called it the
+         narrow point. It passed anyway, which is the dangerous kind of wrong. */
+      const narrow = T2.a;
       if (S2.r + S2.w > narrow) bad.push(S2.id + ' needs ' + (S2.r + S2.w).toFixed(0) + ' has ' + narrow.toFixed(0));
     }
     stats.seatsOK = bad.length === 0;
@@ -737,7 +750,7 @@ export function nexusSurface(x, z) {
     const [px, pz] = polar(aDeg, P.OUT);
     const ex = lx - px, ez = lz - pz;
     const a = P.A * (0.82 + 0.28 * frac(i + 1)) * 0.9585;
-    if (superR(Math.atan2(ez, ex), a, P.N) >= Math.hypot(ex, ez)) return NEXUS.GROUND_Y + 10 + 3 * gold(i + 3) + P.H + 0.35;
+    if (superR(Math.atan2(ez, ex), a, P.N) >= Math.hypot(ex, ez)) return NEXUS.GROUND_Y + P.SEAT_LO + P.SEAT_VARY * gold(i + 3) + P.H + 0.35;
   }
   return null;
 }
