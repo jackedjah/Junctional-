@@ -205,11 +205,37 @@ export const CLOUD = Object.freeze({
 
 export const SEA = Object.freeze({
   LEVEL: -1.4,
-  /* INSIDE terrain's broken land edge at 2600 AT EVERY BEARING, not on average. The first cut used
-     2520 with harmonics of 165 and 78, so the shore ran out to 2763 — 163 m PAST the land — and at
-     those bearings the coast was a gap of nothing rather than a coast. The amplitudes are now sized
-     so R_IN + A1 + A2 = 2572, which clears 2600 everywhere. */
-  R_IN: 2380,
+  /* ---- THE COASTLINE IS MEASURED, NOT ASSERTED --------------------------------------------------
+     The first two versions of this shore were a radius with two sine waves over it, and both were
+     BURIED: a frame-naming probe found terrain-land in front of every waterfront camera, including
+     one standing 220 m out in what should have been open water.
+
+     What the world actually has, from a 36-bearing raycast for where terrain last stands above the
+     waterline: terrain-land is a flat sheet at y -0.1 reaching r 2600, with mountain ranges pushing
+     through at a handful of bearings. The sea is at -1.4, so that sheet sits 1.3 m PROUD of the
+     water — not the twenty metres the mean height suggested, and it does not matter, because 1.3 m
+     of ground over a sea hides all of it just as completely.
+
+         bearing 330   land to 2910      the deepest headland
+         bearing 340   land to 2820
+         bearing 320   land to 2635
+         every other   land to 2600      the ring geometry's own outer edge
+
+     So LAND_EDGE is that measurement, kept as a table and read by shoreR(). A shoreline is where the
+     ground crosses the water level; it is not a radius, and it is not a number anyone gets to pick.
+
+     THE MODULATION IS ADDITIVE AND ONLY EVER POSITIVE, which is the whole reason the sea is now
+     safe. Two harmonics scaled into 0..1 push the water OUTWARD from the measured land edge by 25 to
+     245 m and never inward, so no amount of art direction on the coast's shape can bury it again.
+     The shore runs 2625 to 3155 — not a circle, and not on top of the land. */
+  LAND_EDGE: Object.freeze([
+    2605, 2600, 2600, 2600, 2600, 2600, 2600, 2600, 2600, 2605, 2600, 2600,
+    2600, 2600, 2600, 2600, 2600, 2600, 2605, 2600, 2600, 2600, 2600, 2600,
+    2600, 2600, 2600, 2600, 2600, 2605, 2600, 2600, 2635, 2910, 2820, 2600
+  ]),
+  SHORE_OFF: 25,          /* the minimum clearance past the measured land edge */
+  SHORE_A1: 150, SHORE_N1: 3,
+  SHORE_A2: 70, SHORE_N2: 7,
   R_OUT: 5600,
   DEPTH_MAX: 46,
   /* TESSELLATION, SIZED FROM THE SWIMMER'S EYE RATHER THAN FROM THE SEA'S DIAMETER.
@@ -220,12 +246,7 @@ export const SEA = Object.freeze({
      fragment ripple below supplies the detail under that — geometry for the plates, gradient for
      the surface of each plate. One draw either way. */
   SEG: 512, RINGS: 120, RING_POW: 1.70,
-  /* the inner shore is NOT a circle. Two slow harmonics, so the coast has bays and headlands at the
-     scale a coast has them, and the eye never finds the centre by following the shoreline. */
-  SHORE_A1: 130, SHORE_N1: 3,
-  SHORE_A2: 62, SHORE_N2: 7,
-  /* the swell, in metres and in radians per metre. Four waves, deliberately non-harmonic periods so
-     the pattern never visibly repeats: 885, 1224, 331 and 174 m. */
+
   /* SIX WAVES, AND THE LAST TWO ARE THE ONES A SWIMMER SEES.
      The first cut had four, at wavelengths of 885, 698, 331 and 174 m. Every one of those is
      correct for a sea three kilometres across and useless at the only eye that matters: from 2.3 m
@@ -253,9 +274,22 @@ export const SEA = Object.freeze({
 /* the inner shore radius at a bearing — the ONE definition, used by the mesh, the bed, the swim
    test and the law suite alike */
 export function shoreR(theta) {
-  return SEA.R_IN
-    + SEA.SHORE_A1 * Math.sin(SEA.SHORE_N1 * theta + 0.7)
-    + SEA.SHORE_A2 * Math.sin(SEA.SHORE_N2 * theta - 1.9);
+  /* the measured land edge, smoothly interpolated between the 36 samples, then pushed outward by a
+     strictly POSITIVE modulation — see the note on LAND_EDGE for why the sign matters */
+  const T = SEA.LAND_EDGE, n = T.length;
+  let a = theta % (Math.PI * 2); if (a < 0) a += Math.PI * 2;
+  const f = a / (Math.PI * 2) * n;
+  const i0 = Math.floor(f), k = f - i0, sm = k * k * (3 - 2 * k);
+  const edge = T[i0 % n] * (1 - sm) + T[(i0 + 1) % n] * sm;
+  return edge + SEA.SHORE_OFF
+    + SEA.SHORE_A1 * (0.5 + 0.5 * Math.sin(SEA.SHORE_N1 * theta + 0.7))
+    + SEA.SHORE_A2 * (0.5 + 0.5 * Math.sin(SEA.SHORE_N2 * theta - 1.9));
+}
+/* the widest and narrowest the coast gets, for stats and for the shader's taper anchor */
+export function shoreRange() {
+  let lo = Infinity, hi = -Infinity;
+  for (let d = 0; d < 360; d += 1) { const r = shoreR(d * Math.PI / 180); if (r < lo) lo = r; if (r > hi) hi = r; }
+  return { min: lo, max: hi };
 }
 /* the bed. A basin: it falls away from the shore, bottoms out across the middle of the annulus and
    lifts again at the outer edge, so the sea has a far bank rather than a cliff into nothing. */
@@ -778,11 +812,11 @@ export function buildMahRain(ctx, opts = {}) {
       uSeaW5: { value: new THREE.Vector4(W[5].ax, W[5].az, W[5].amp, W[5].spd) },
       /* x = inner shore mean, y = outer radius: the envelope that flattens the swell where it meets
          the land, because a 7 m swell running into a coastline cuts through it */
-      uSeaEnv: { value: new THREE.Vector2(SEA.R_IN, SEA.R_OUT) },
-      /* the shore's own harmonics, so the vertex shader can compute the LOCAL shore radius instead
-         of the mean. Anchoring the swell's taper to the mean shore is what made the first 400 m of
-         water glassy flat — see the note in the vertex injection. */
-      uSeaShore: { value: new THREE.Vector4(SEA.SHORE_A1, SEA.SHORE_N1, SEA.SHORE_A2, SEA.SHORE_N2) },
+      /* x is the NARROWEST the coast gets. The shore is a measured 36-entry table now and GLSL
+         cannot hold it, but the taper only needs "how far past the shore am I" — anchoring it to
+         the minimum makes the swell fully on by the time water exists at a headland, and correct
+         at the bearings where the coast actually is nearest. */
+      uSeaEnv: { value: new THREE.Vector2(shoreRange().min, SEA.R_OUT) },
       /* the mesh's own grading, so the vertex shader can work out how big a facet is HERE and damp
          any wave this part of the mesh cannot carry — see the note in the injection */
       uSeaMesh: { value: new THREE.Vector3(SEA.RINGS, SEA.RING_POW, SEA.SEG) },
@@ -800,7 +834,7 @@ export function buildMahRain(ctx, opts = {}) {
         'uniform float uSeaT;',
         'uniform vec4 uSeaW0; uniform vec4 uSeaW1; uniform vec4 uSeaW2; uniform vec4 uSeaW3;',
         'uniform vec4 uSeaW4; uniform vec4 uSeaW5;',
-        'uniform vec2 uSeaEnv; uniform vec4 uSeaShore; uniform vec3 uSeaMesh;',
+        'uniform vec2 uSeaEnv; uniform vec3 uSeaMesh;',
         'varying float vSeaH;',
         'varying vec3 vSeaW;',
         ''
@@ -818,9 +852,7 @@ export function buildMahRain(ctx, opts = {}) {
            facets, because a flat mesh has one facet normal.
            Now the local shore is computed from the same two harmonics shoreR() uses, and the ramp
            is 90 m — a surf zone, not a third of a kilometre of dead water. */
-        '  float sth = atan( transformed.z, transformed.x );',
-        '  float rIn = uSeaEnv.x + uSeaShore.x * sin( uSeaShore.y * sth + 0.7 )',
-        '                        + uSeaShore.z * sin( uSeaShore.w * sth - 1.9 );',
+        '  float rIn = uSeaEnv.x;',
         '  float env = smoothstep( rIn + 6.0, rIn + 96.0, sr )',
         '            * ( 1.0 - smoothstep( uSeaEnv.y - 900.0, uSeaEnv.y, sr ) );',
         /* HOW BIG IS A FACET HERE, and therefore which waves this part of the mesh can carry.
@@ -960,9 +992,10 @@ export function buildMahRain(ctx, opts = {}) {
     }
 
     stats.sea = {
-      level: SEA.LEVEL, rIn: SEA.R_IN, rOut: SEA.R_OUT, depthMax: SEA.DEPTH_MAX,
-      shoreMin: +(SEA.R_IN - SEA.SHORE_A1 - SEA.SHORE_A2).toFixed(0),
-      shoreMax: +(SEA.R_IN + SEA.SHORE_A1 + SEA.SHORE_A2).toFixed(0),
+      level: SEA.LEVEL, landEdge: Math.min.apply(null, SEA.LAND_EDGE),
+      rOut: SEA.R_OUT, depthMax: SEA.DEPTH_MAX,
+      shoreMin: +shoreRange().min.toFixed(0),
+      shoreMax: +shoreRange().max.toFixed(0),
       facets: pos.length / 9,
       swellM: +W.reduce((a, c) => a + c.amp, 0).toFixed(2)
     };
