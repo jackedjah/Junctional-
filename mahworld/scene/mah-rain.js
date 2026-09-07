@@ -157,7 +157,14 @@ export const CLOUD = Object.freeze({
      placed explicitly in the ground band. Three of forty is 7.5%: still "less", and now it exists. */
   VEIL_CLUSTERS: 40,
   VEIL_PER: 8,
-  GROUND_CLUSTERS: 3, GROUND_LO: 58, GROUND_HI: 250,
+  /* THE GROUND BAND SPANS 58 TO 480, NOT 58 TO 250, AND ITS CLUSTERS ARE SPREAD ACROSS IT.
+     Bunched into the bottom 200 m they broke the very rule they exist to complete: the histogram
+     came back 0-200m:24, 200-500:0, 500-900:32 — more cloud at the ground than just above it, which
+     is the opposite of the direction. The stratified curve's own lowest draw lands at about 620 m,
+     so this band has to reach up to meet it rather than huddle under it. Spread evenly, the three
+     clusters land near 121, 269 and 417 m: one below 200 and two above, and the fall is monotonic
+     from the ground all the way to the dome. */
+  GROUND_CLUSTERS: 3, GROUND_LO: 58, GROUND_HI: 480,
   VEIL_R_IN: 2500, VEIL_R_OUT: 5300,
   VEIL_TOP: 2100, VEIL_POW: 2.1,
 
@@ -465,7 +472,9 @@ export function buildMahRain(ctx, opts = {}) {
          how density falls; this is the direction's explicit floor — clouds that come all the way
          down — and three of forty keeps it rare. */
       const cy = (c < CLOUD.GROUND_CLUSTERS)
-        ? CLOUD.GROUND_LO + (CLOUD.GROUND_HI - CLOUD.GROUND_LO) * gold(c * 29 + 4)
+        /* SPREAD, not scattered. Three clusters drawn at random from a 420 m band can all land in
+           its bottom third, and with three samples that is not unlikely — it is what happened. */
+        ? CLOUD.GROUND_LO + (CLOUD.GROUND_HI - CLOUD.GROUND_LO) * ((c + 0.5) / CLOUD.GROUND_CLUSTERS)
         : Math.max(46, CLOUD.VEIL_TOP * Math.pow(u, 1 / CLOUD.VEIL_POW));
       const cr = CLOUD.VEIL_R_IN + (CLOUD.VEIL_R_OUT - CLOUD.VEIL_R_IN) * gold(c * 7 + 3);
       const cx = Math.cos(a) * cr, cz = Math.sin(a) * cr;
