@@ -185,6 +185,47 @@ export const NEXUS = Object.freeze({
     { at: 0.82, r: 396, sec: 14, n: 4.0 }
   ]),
 
+  /* TERTIARY CONNECTORS — §3's third tier, and the reason it exists is a sentence in §3 rather than
+     a structural intuition: "Do not make every support identical." A complex with primaries and
+     branches and nothing between them has TWO sizes of member, and two sizes is not a hierarchy.
+
+     Each connector leaves a primary trunk and merges INWARD and UPWARD into the core, the way a
+     limb rejoins a body. Two things keep this from becoming a wheel of spokes, which is what a
+     radial connector wants to be: they sit at eight DIFFERENT heights that step around the complex,
+     and they arrive at the core tangentially rather than pointing at its axis. A spoke says
+     "machine"; a merge says "organism", and §2 asked for the second one by name.
+
+     Widths are the hierarchy stated as numbers, and the gate below checks the ladder is strictly
+     decreasing: core 150 > primary 46 > branch 33 > tertiary 22 > mahgic 3.4. */
+  TERTIARY: Object.freeze({
+    COUNT: 8, R0: 22, R1: 15, N: 3.4,
+    LO: 0.14, HI: 0.78,       /* fraction of the rise: where the lowest and highest connector sit */
+    TANGENT: 0.34,            /* how far off-axis it meets the core, as a fraction of the core radius */
+    STATIONS: 28, RADIAL: 14
+  }),
+
+  /* FOBEAM / MAHGIC LINES — §3's fourth tier, "some carry MAHGIC/FOBEAM traffic".
+
+     The GAUGE IS QUOTED FROM fobeam.js, not invented: that module's own rails run 0.085 to 0.46 m
+     and its route gauges 0.46 to 0.78, and they read across kilometres because they are ADDITIVE
+     EMISSIVE, not lit solids. A lit solid at that section would be L58's crawling hairline; an
+     additive one glows wider than its geometry and is the world's established answer.
+
+     v10 §13 is the other half of the brief here — "FOBEAM lines over-bright, arcs lattice the sky"
+     — so there are six, they follow members that already exist, and they do not cross. A line that
+     invents its own path is what turns a structure into a lattice.
+
+     AND THEY CAME IN TOO BRIGHT ANYWAY, exactly as v10 §13 predicted. Measured on the first build, from
+     the trunk-up camera: the rails rendered at luminance 191.7 against a trunk at 108.8 and a tube
+     at 99.2 — eighty-three points brighter than the structure they exist to accent — and from the
+     world camera at 254.8, past the sky's own 195.8 and into clipped white. A fourth tier that
+     out-values the first three is not an accent, it is the subject.
+
+     Opacity 0.42 -> 0.15 and the colour drops from energyLight (0xdff1ff, near-white) to energy
+     (0x7fc6ff, the theme's actual blue). An accent has to be a COLOUR against the metal, not a
+     brighter version of it; the gate below now holds the rails under the trunk they run on. */
+  MAHGIC: Object.freeze({ COUNT: 6, R: 3.4, OFFSET: 1.30, OPACITY: 0.15, STATIONS: 64, RADIAL: 8 }),
+
   /* THE TUBE FAMILIES — §2: "some straight, some gently spiraling, some branch-like, some paired".
      Entropy in route variety is allowed; chaos is not. So the variety is enumerated, not random. */
   STRAIGHT: Object.freeze({ COUNT: 4, SEAT_TIER: 0, SEAT_R: 262, LAND_R: 300, R: 24, N: 3.4, PHASE: 45 }),
@@ -417,9 +458,17 @@ export function buildMahNexus(ctx, opts = {}) {
   applyPlatinumFinish(tubeMat, { mFlat: 0.34, mEdge: 0.74, rFlat: 0.32, rEdge: 0.19, breakUp: 0.055 });
   const deckMat = mkMat(M.paving || M.graphiteDark, { name: 'nexus-deck', envMapIntensity: 1.35 });
   const recessMat = mkMat(M.graphiteDark || M.structural, { name: 'nexus-recess', roughness: 0.54, metalness: 0.72, envMapIntensity: 1.2 });
+  /* §3 tier 4. ADDITIVE and unlit, which is fobeam.js's convention for every energy line in this
+     world: a lit solid at this section would be L58's crawling hairline, an additive one glows
+     wider than its geometry. depthWrite off so it never punches a hole in the metal behind it. */
+  const mahgicMat = new THREE.MeshBasicMaterial({
+    name: 'nexus-mahgic', color: theme.energy, transparent: true, opacity: NEXUS.MAHGIC.OPACITY,
+    blending: THREE.AdditiveBlending, depthTest: true, depthWrite: false, fog: true
+  });
+  owned.materials.push(mahgicMat);
 
   /* ---- ACCUMULATORS. One merge per material, so this whole complex is four draws at full detail. */
-  const bins = { shell: [], trunk: [], tube: [], deck: [], recess: [] };
+  const bins = { shell: [], trunk: [], tube: [], deck: [], recess: [], mahgic: [] };
   /* every member that is supposed to REACH the ceiling records where it claims to land, so §3 can
      be checked against the intent and not against whatever vertex happens to be near the top */
   const landings = [];
@@ -463,22 +512,25 @@ export function buildMahNexus(ctx, opts = {}) {
   /* ================================ THE CORE TRUNK ============================================
      One member, ground collar to halo underside. The waist and the capital are what make it a
      PROFILE rather than an extrusion — §2's "not a generic tower" lives entirely in this function. */
+  const CORE_Y0 = NEXUS.SEAT_Y[NEXUS.CORE.SEAT_TIER];
+  const CORE_RUN = capY - CORE_Y0;
+  /* THE CORE'S PROFILE, HOISTED. The tertiary connectors have to arrive ON the trunk's surface, and
+     a connector that guesses the radius it is merging into either floats off it or buries itself in
+     it. There is one profile function and both callers use it — L42, applied before it can bite. */
+  const coreRadiusAt = t => {
+    const C = NEXUS.CORE;
+    if (t <= C.WAIST_AT) { const u = t / C.WAIST_AT, e = u * u * (3 - 2 * u); return C.R0 + (C.R_WAIST - C.R0) * e; }
+    if (t <= C.CAP_AT) { const u = (t - C.WAIST_AT) / (C.CAP_AT - C.WAIST_AT), e = u * u * (3 - 2 * u); return C.R_WAIST + (C.R_CAP - C.R_WAIST) * e * 0.62; }
+    const u = (t - C.CAP_AT) / (1 - C.CAP_AT), e = u * u * (3 - 2 * u);
+    return C.R_WAIST + (C.R_CAP - C.R_WAIST) * (0.62 + 0.38 * e);
+  };
   {
     const C = NEXUS.CORE;
-    const y0 = NEXUS.SEAT_Y[C.SEAT_TIER], run = capY - y0;
     const pts = [];
-    for (let i = 0; i <= 8; i++) pts.push(new THREE.Vector3(0, y0 + run * (i / 8), 0));
+    for (let i = 0; i <= 8; i++) pts.push(new THREE.Vector3(0, CORE_Y0 + CORE_RUN * (i / 8), 0));
     land('core', 0, capY, 0);
     const curve = new THREE.CatmullRomCurve3(pts);
-    const radius = t => {
-      /* two eased segments: R0 -> waist -> R_CAP, and the cap flare is short and late so it reads
-         as a capital meeting a ceiling rather than as a funnel. */
-      if (t <= C.WAIST_AT) { const u = t / C.WAIST_AT, e = u * u * (3 - 2 * u); return C.R0 + (C.R_WAIST - C.R0) * e; }
-      if (t <= C.CAP_AT) { const u = (t - C.WAIST_AT) / (C.CAP_AT - C.WAIST_AT), e = u * u * (3 - 2 * u); return C.R_WAIST + (C.R_CAP - C.R_WAIST) * e * 0.62; }
-      const u = (t - C.CAP_AT) / (1 - C.CAP_AT), e = u * u * (3 - 2 * u);
-      return C.R_WAIST + (C.R_CAP - C.R_WAIST) * (0.62 + 0.38 * e);
-    };
-    push('trunk', sweptTube(curve, C.STATIONS, C.RADIAL, radius,
+    push('trunk', sweptTube(curve, C.STATIONS, C.RADIAL, coreRadiusAt,
       t => C.N0 + (C.N1 - C.N0) * t, t => C.TWIST * t, true, true));
     stats.parts.core = 1;
     stats.coreR0 = C.R0; stats.coreCap = C.R_CAP;
@@ -508,6 +560,53 @@ export function buildMahNexus(ctx, opts = {}) {
     }
     stats.parts.primary = P.COUNT;
     stats.primaryAspect = +(rise / (P.R0 * 2)).toFixed(1);
+  }
+
+  /* ================================ TERTIARY CONNECTORS (§3 tier 3) ===========================
+     Eight members, each leaving a primary trunk and merging inward and upward into the core.
+
+     Two decisions stop this reading as a wheel of spokes, which is the shape a radial connector
+     naturally wants to be and which would say "machine" where §2 asked for "organism":
+
+       · the heights STEP around the complex rather than repeating at ring level, so no two
+         connectors are ever seen as a pair, and
+       · each arrives TANGENTIALLY — offset sideways from the core's axis by a third of its radius —
+         so it merges into the trunk's flank the way a limb rejoins a body, instead of pointing at
+         the centre like a strut.
+
+     The arrival radius comes from coreRadiusAt, the same function the core itself is swept with,
+     because a connector that guesses the trunk's width either floats off it or buries itself. */
+  {
+    const K = NEXUS.TERTIARY, P = NEXUS.PRIMARY;
+    for (let i = 0; i < K.COUNT; i++) {
+      /* the connector belongs to a primary, but there are 8 of these and 6 of those, so they
+         precess: no primary carries the same number, and the pattern never closes on itself. */
+      const host = i % P.COUNT;
+      const aDeg = P.PHASE + (360 / P.COUNT) * host;
+      const t = K.LO + (K.HI - K.LO) * (i / (K.COUNT - 1));
+      const y = CORE_Y0 + CORE_RUN * t;
+      /* where the host primary actually is at this height — its own eased lean, quoted */
+      const e = t * t * (3 - 2 * t);
+      const hostR = P.SEAT_R + (P.LAND_R + P.LAND_VARY * (gold(host + 1) - 0.5) * 2 - P.SEAT_R) * e;
+      const [hx, hz] = polar(aDeg, hostR - P.R0 * 0.45);
+      /* and where it meets the core: on the surface, offset off-axis, and slightly higher — the
+         rise across the merge is what makes it read as growth rather than as bracing. */
+      const tEnd = Math.min(0.98, t + 0.052);
+      const yEnd = CORE_Y0 + CORE_RUN * tEnd;
+      const cR = coreRadiusAt(tEnd) * 0.86;
+      const tanDeg = aDeg + (i % 2 ? K.TANGENT : -K.TANGENT) * 57.3;
+      const [cx2, cz2] = polar(tanDeg, cR);
+      const pts = [
+        new THREE.Vector3(hx, y, hz),
+        new THREE.Vector3(hx + (cx2 - hx) * 0.34, y + (yEnd - y) * 0.22, hz + (cz2 - hz) * 0.34),
+        new THREE.Vector3(hx + (cx2 - hx) * 0.72, y + (yEnd - y) * 0.66, hz + (cz2 - hz) * 0.72),
+        new THREE.Vector3(cx2, yEnd, cz2)
+      ];
+      const curve = new THREE.CatmullRomCurve3(pts);
+      push('trunk', sweptTube(curve, K.STATIONS, K.RADIAL,
+        u => K.R0 + (K.R1 - K.R0) * (u * u * (3 - 2 * u)), () => K.N, () => 0, true, true));
+    }
+    stats.parts.tertiary = K.COUNT;
   }
 
   /* ================================ RING NODES (§2) ===========================================
@@ -605,8 +704,45 @@ export function buildMahNexus(ctx, opts = {}) {
     stats.parts.branch = B.COUNT;
   }
 
+  /* ================================ MAHGIC LINES (§3 tier 4) ==================================
+     "some carry MAHGIC/FOBEAM traffic." Six rails, each running the full height ALONGSIDE a
+     primary trunk it already belongs to.
+
+     Two laws govern this and they pull against each other. L58 says a repeated element takes its
+     section from its height, and 1586 m of rise on a 3.4 m rail is 466:1 — a crawling hairline if
+     it were a lit solid. It is not a lit solid: fobeam.js runs the whole world's energy on rails of
+     0.085 to 0.46 m, and they read across kilometres because ADDITIVE EMISSIVE glows wider than its
+     geometry. This gauge is quoted from that module rather than invented, and it is seven times
+     heavier than fobeam's own because it is seen against a bright metal flank rather than sky.
+
+     The other law is v10 §13 — "FOBEAM lines over-bright, arcs lattice the sky" — which is why
+     there are six rather than sixty, why every one FOLLOWS a member that already exists instead of
+     inventing a path, and why the opacity is 0.42 and not 1. A line with its own route is what
+     turns a structure into a lattice. */
+  {
+    const G = NEXUS.MAHGIC, P = NEXUS.PRIMARY;
+    for (let i = 0; i < G.COUNT; i++) {
+      const aDeg = P.PHASE + (360 / P.COUNT) * i;
+      const landR = P.LAND_R + P.LAND_VARY * (gold(i + 1) - 0.5) * 2;
+      const y0 = NEXUS.SEAT_Y[P.SEAT_TIER];
+      const [lx, lz] = polar(aDeg, landR);
+      const ly = haloUnderY(CX + lx, CZ + lz) - groundY;
+      const pts = [];
+      for (let k = 0; k <= 10; k++) {
+        const t = k / 10, e = t * t * (3 - 2 * t);
+        /* the primary's own centreline, pushed out to its flank so the rail lies ON the trunk */
+        const rr = (P.SEAT_R + (landR - P.SEAT_R) * e) + (P.R0 + (P.R1 - P.R0) * t) * G.OFFSET;
+        const [x, z] = polar(aDeg + 3.5, rr);
+        pts.push(new THREE.Vector3(x, y0 + (ly - y0) * t, z));
+      }
+      push('mahgic', sweptTube(new THREE.CatmullRomCurve3(pts), G.STATIONS, G.RADIAL,
+        () => G.R, () => 2.6, () => 0, false, false));
+    }
+    stats.parts.mahgic = G.COUNT;
+  }
+
   /* ---- MERGE. One draw per material family. ---------------------------------------------------- */
-  const matFor = { shell: shellMat, trunk: trunkMat, tube: tubeMat, deck: deckMat, recess: recessMat };
+  const matFor = { shell: shellMat, trunk: trunkMat, tube: tubeMat, deck: deckMat, recess: recessMat, mahgic: mahgicMat };
   for (const key of Object.keys(bins)) {
     const list = bins[key]; if (!list.length) continue;
     const merged = mergeGeoms(list);
@@ -702,6 +838,30 @@ export function buildMahNexus(ctx, opts = {}) {
     }
     stats.seatsOK = bad.length === 0;
     stats.seatFaults = bad;
+  }
+
+  /* ---- THE §3 HIERARCHY GATE. "Do not make every support identical." -------------------------
+     A hierarchy is not a list of names, it is a ladder of sizes, so it gets checked as one. Each
+     tier must be strictly narrower than the one above it — and the ratios matter as much as the
+     order: two tiers within a few per cent of each other are the same tier wearing two labels,
+     which is exactly the failure §3 is warning about. */
+  {
+    const ladder = [
+      { id: 'core', w: NEXUS.CORE.R0 },
+      { id: 'primary', w: NEXUS.PRIMARY.R0 },
+      { id: 'branch', w: NEXUS.BRANCH.R0 },
+      { id: 'tertiary', w: NEXUS.TERTIARY.R0 },
+      { id: 'mahgic', w: NEXUS.MAHGIC.R }
+    ];
+    const faults = [];
+    for (let i = 1; i < ladder.length; i++) {
+      const a = ladder[i - 1], b2 = ladder[i];
+      if (b2.w >= a.w) faults.push(b2.id + ' >= ' + a.id);
+      else if (b2.w > a.w * 0.88) faults.push(b2.id + ' is only ' + Math.round(100 * b2.w / a.w) + '% of ' + a.id);
+    }
+    stats.hierarchy = ladder.map(l => l.id + ':' + l.w).join(' > ');
+    stats.hierarchyOK = faults.length === 0;
+    stats.hierarchyFaults = faults;
   }
 
   /* ---- CONTRACT ------------------------------------------------------------------------------- */

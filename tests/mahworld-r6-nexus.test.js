@@ -170,6 +170,17 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     'height:width ' + S.primaryAspect + ':1');
   P('the hierarchy §3 asks for is all present',
     S.parts.core === 1 && S.parts.primary >= 4 && S.parts.rings >= 2, JSON.stringify(S.parts));
+  /* §3 names FOUR tiers — PRIMARY TRUNKS, SECONDARY BRANCHES, TERTIARY CONNECTORS, FOBEAM/MAHGIC
+     LINES — and the first build had two of them. A tier that is not built is not a hierarchy. */
+  P('all four §3 tiers are built, not just named',
+    S.parts.primary > 0 && S.parts.branch > 0 && S.parts.tertiary > 0 && S.parts.mahgic > 0,
+    JSON.stringify(S.parts));
+  /* and "do not make every support identical" is a LADDER OF SIZES, not a list of labels. Two
+     tiers within a few per cent of each other are one tier wearing two names. */
+  P('§3: the tier widths strictly decrease, with real gaps between them', S.hierarchyOK === true,
+    S.hierarchy + (S.hierarchyFaults && S.hierarchyFaults.length ? '  faults: ' + S.hierarchyFaults.join(', ') : ''));
+  P('every member stands on a deck wide enough to carry it', S.seatsOK === true,
+    JSON.stringify(S.seatFaults || []));
   P('all three tube families exist (§2: straight, spiralling, branch-like)',
     S.parts.straight > 0 && S.parts.spiral > 0 && S.parts.branch > 0, JSON.stringify(S.parts));
   P('the sanctuary is not held up by toothpicks (§3)', S.parts.primary + S.parts.branch >= 10,
@@ -273,7 +284,8 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       (bins[nm] = bins[nm] || []).push(0.2126 * px[o] + 0.7152 * px[o + 1] + 0.0722 * px[o + 2]);
     }
     const med = k2 => { const a = bins[k2]; if (!a || a.length < 12) return null; a.slice().sort(); a.sort((x, y) => x - y); return +a[Math.floor(a.length / 2)].toFixed(1); };
-    return { trunk: med('nexus-trunk'), tube: med('nexus-tube'), shell: med('nexus-shell'), sky: med('SKY'),
+    return { trunk: med('nexus-trunk'), tube: med('nexus-tube'), shell: med('nexus-shell'),
+      mahgic: med('nexus-mahgic'), sky: med('SKY'),
       seen: Object.keys(bins).filter(n => n.indexOf('nexus') === 0) };
   });
   P('the value probe found the complex at all', val.seen.length >= 2, JSON.stringify(val.seen));
@@ -287,6 +299,13 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
   P('the complex still reads darker than the sky behind it',
     val.trunk != null && val.sky != null && val.trunk < val.sky - 15,
     'trunk ' + val.trunk + '  sky ' + val.sky);
+  /* v10 §13, made permanent for this module. The first MAHGIC build measured 191.7 against a trunk
+     at 108.8 and hit 254.8 — clipped white — at world distance. §3's fourth tier is an ACCENT: a
+     tier that out-values the three above it is not accenting the structure, it has replaced it.
+     The rails may be brighter than the metal (they are light), but not by more than a third. */
+  P('§3 tier 4 accents the structure instead of replacing it (v10 §13)',
+    val.mahgic == null || (val.trunk != null && val.mahgic < val.trunk * 1.35),
+    'mahgic ' + val.mahgic + '  trunk ' + val.trunk);
 
   /* ============================================================================================
      6. CONTRACT, COST AND DETERMINISM.
