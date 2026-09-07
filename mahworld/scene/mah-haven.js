@@ -24,32 +24,37 @@
    the exact planting. Those are named in the manifest and they stay out.
 
    ---- WHERE, AND HOW THE SITE WAS FOUND -------------------------------------------------------
-   Two placements failed before this one and both failed the same way: a district built inside a
-   mountain. The first sat at local bearing 232 on LAKE CITY's lake and photographed a black lake;
-   the second moved to 118 for the light and a raycast down the reveal axis found `terrain-range-near`
-   FOUR METRES in front of the camera. terrain.js's own header records this exact failure — "The
-   first placement attempt put its camera inside a mountain flank, which is how this was found" —
-   so the third attempt stopped guessing and swept.
+   Three placements failed before this one, each measured rather than judged, and the sequence is
+   worth keeping because it is what the measurements actually said:
 
-   THE SWEEP KILLED THE LAKE OUTRIGHT. Sixty bearings around LAKE CITY's shore, each sampling a
-   5 x 5 grid of this district's own footprint: EVERY ONE returned rock, with 95 to 435 m of relief.
-   That water sits at r 700, ringed by the near range, and Lake City works there only because it cut
-   terraces into the flank. There is no shore to stand on.
+     1. LAKE CITY's lake, local bearing 232. The reveal frame photographed a black lake. I read that
+        as a lighting problem.
+     2. Local bearing 118, chosen to face the world's fixed sun. A raycast down the reveal axis found
+        `terrain-range-near` FOUR METRES in front of the camera. It was never a lighting problem;
+        both sites were inside a mountain. terrain.js's own header records this exact failure.
+     3. A 60-bearing ground sweep then killed that lake outright: EVERY bearing returned rock, with
+        95 to 435 m of relief. It sits at r 700 ringed by the near range, and Lake City works there
+        only because it cut terraces into the flank. So the district moved to terrain.js's BASIN,
+        whose perimeter has a run of perfectly flat bearings — and the render came back standing
+        INSIDE MAH CITY, because "is anything already here" had been my own r < 300 guess rather
+        than a measurement.
 
-   So MAH HAVEN stands on the world's OTHER water — terrain.js's BASIN, an ellipse 210 x 130 at
-   bearing 62, r 330, water at y -1.4. The same sweep over its perimeter found a run of bearings
-   with ZERO relief and ZERO rock, and one of them is remarkable:
+   The fourth attempt swept the WORLD — bearing x radius, raycasting a 5 x 5 grid of this district's
+   own footprint for mountain relief AND for existing architecture — and returned exactly one site
+   that is clear of both:
 
-       ellipse parameter 66 deg     relief 0.0 m     rock 0/25     ground 25/25
-       view axis 3 degrees off the world's fixed sun bearing of 243.4
+       world bearing 340, r 400     relief 0.0 m     rock 0/25     built 0/25     ground 25/25
 
-   Three degrees. The sun comes almost straight down the water at you, which is the reference
-   photograph, and it is flat buildable ground. That is not a taste decision and it was not
-   available to reasoning — only to measurement.
+   One. In the whole world. Its view axis is 83 degrees off the sun rather than the 3 degrees the
+   basin offered, so the light rakes across the water instead of coming down it — that is the cost,
+   and it is the right trade, because the other site was inside a city.
 
-   The basin also sits BETWEEN MAH CITY and LAKE CITY inside terrain.js's pass, so the district is
-   on the Lake City direction R5 asks for, and looking across its water you have the city you came
-   from — which is how "an immediate contrast from dense MAH City" gets built rather than asserted.
+   ---- SO IT CUTS ITS OWN WATER ----------------------------------------------------------------
+   R5 §13 lists "lake/body-of-water boundary" among the things MAH HAVEN ESTABLISHES. The constraint
+   that it reuse an existing lake was mine, taken for L42 reasons — and L42 is about one TRUTH, not
+   one object. The world has ONE WATER LEVEL, y -1.4, which is terrain.js's BASIN.y and which
+   lakecity.js also uses; this district takes that number from terrain's export and cuts its own
+   ellipse at it. One level, one convention, three bodies of water.
 
    ---- THIS PASS IS FOOTPRINTS -----------------------------------------------------------------
    R5 §13 lists exactly what to establish and §15 draws a hard line: "Do not prematurely introduce
@@ -71,18 +76,26 @@ const frac = i => (i * 0.7548776662) % 1;
 const polar = (aDeg, r) => [r * Math.cos(aDeg * DEG), -r * Math.sin(aDeg * DEG)];
 
 export const HAVEN = Object.freeze({
-  /* THE SHORE BEARING IS THE ELLIPSE PARAMETER ON terrain.js's BASIN, and it was measured, not
-     chosen. See the header: a 60-bearing sweep of both bodies of water in the world, sampling this
-     district's own 5 x 5 footprint at each, is what produced it. 66 is the one bearing that is both
-     flat buildable ground (relief 0.0 m, rock 0 of 25 samples) and front-lit — its outward view
-     axis lands 3 degrees off MAHWORLD's fixed sun bearing of 243.4, so the light comes down the
-     water at you exactly as it does in the reference. */
-  SHORE_DEG: 66,
-  /* how far the district reaches back from the waterline, and how wide along the shore */
-  DEPTH: 300,
-  HALF_W: 260,
-  GROUND_Y: 0,           /* terrain.js's raw ground plane, the same one the lake lip rises to */
-  WATER_Y: -1.4,         /* lakecity.js's WATER_Y — overridden from its export when available */
+  /* THE SITE, and it is the only one. A world sweep — bearing x radius, raycasting a 5 x 5 grid of
+     this district's own footprint for mountain relief AND for existing architecture — returned
+     exactly one place in MAHWORLD that is clear of both: world bearing 340, r 400, relief 0.0 m,
+     rock 0 of 25, built 0 of 25. See the header for the three measured failures that preceded it. */
+  SITE_DEG: 340,
+  SITE_R: 400,
+  /* THE WATER THIS DISTRICT CUTS. An ellipse laid with its long axis TANGENTIAL, so it reads as a
+     lake across your view rather than a canal down it, sitting outboard of the built ground. Its
+     near edge lands at r 430 — the waterline — and its far edge at 620, where the ground starts to
+     rise into the range and the surface simply disappears under it, which is what a lake in a
+     valley does. */
+  WATER_R: 525,          /* the ellipse centre's radius */
+  WATER_RX: 200,         /* half-extent ALONG the shore */
+  WATER_RZ: 95,          /* half-extent ACROSS it, so the near edge is at 430 */
+  SHORE_R: 430,
+  WATER_Y: -1.4,         /* terrain.js's BASIN.y — the world's ONE water level */
+  GROUND_Y: 0,
+  /* how far the district reaches back from the waterline, and how wide along it */
+  DEPTH: 170,
+  HALF_W: 190,
   /* the entrance sequence, measured BACK from the waterline along the axis */
   APPROACH_LEN: 96,      /* the narrow corridor */
   APPROACH_W: 7.4,       /* two people wide, and that is the whole trick */
@@ -101,33 +114,24 @@ export function buildMahHaven(ctx, opts = {}) {
     shorelineM: 0, waterY: HAVEN.WATER_Y
   };
 
-  /* ---- THE WATER, read from the module that cut it ------------------------------------------ */
-  const W = opts.water || null;                     /* { centre:[x,z], rx, rz, y } — terrain's BASIN */
-  const LC = W && W.centre ? W.centre : polar(62, 330);
-  const RX = (W && W.rx) || 210, RZ = (W && W.rz) || 130;
-  const waterY = (W && typeof W.y === 'number') ? W.y : HAVEN.WATER_Y;
+  /* ---- THE FRAME. Everything is placed as (back-from-the-waterline, along-the-shore). --------- */
+  const waterY = (opts.waterY != null) ? opts.waterY : HAVEN.WATER_Y;
   stats.waterY = waterY;
 
-  /* THE SHORE POINT AND THE OUTWARD NORMAL, and the normal is NOT the radius.
-     An ellipse's outward normal is its gradient, (px/rx^2, pz/rz^2) normalised — on a 210 x 130
-     ellipse the radial direction and the true normal differ by up to 17 degrees, so a district laid
-     along the radius would sit visibly skewed to its own waterline, with the entrance corridor
-     meeting the shore at an angle nobody would build. */
-  const aS = HAVEN.SHORE_DEG * DEG;
-  const px = RX * Math.cos(aS), pz = RZ * Math.sin(aS);
-  let gx = px / (RX * RX), gz = pz / (RZ * RZ);
-  const gl = Math.hypot(gx, gz) || 1; gx /= gl; gz /= gl;
-  const nx = gx, nz = gz;                            /* unit vector from the water outward */
-  const rS = Math.hypot(px, pz);
-  const SHORE = [LC[0] + px, LC[1] + pz];
-  /* the AXIS runs from the shore INLAND (away from the water). Everything in the entrance sequence
-     is placed as a distance back along it, so the sequence cannot come apart. */
-  const ax = nx, az = nz;                           /* inland is +axis */
-  const tx = -nz, tz = nx;                          /* along the shore */
+  const aS = HAVEN.SITE_DEG * DEG;
+  /* the RADIAL unit vector at this bearing, through the world's own polar convention */
+  const ux = Math.cos(aS), uz = -Math.sin(aS);
+  const SHORE = [ux * HAVEN.SHORE_R, uz * HAVEN.SHORE_R];
+  const WC = [ux * HAVEN.WATER_R, uz * HAVEN.WATER_R];   /* the water's centre */
+  /* INLAND is toward the origin, because you arrive from MAH CITY and the water is beyond. So the
+     approach walks OUTWARD and the reveal happens at the shore, which is the sequence the reference
+     photograph is: you are in a corridor, and then you are not. */
+  const ax = -ux, az = -uz;                          /* +back = inland = toward the city */
+  const tx = -uz, tz = ux;                           /* along the shore */
   const site = (back, lat) => [SHORE[0] + ax * back + tx * lat, SHORE[1] + az * back + tz * lat];
-  stats.site = { deg: HAVEN.SHORE_DEG, shore: [+SHORE[0].toFixed(1), +SHORE[1].toFixed(1)],
-    waterCentre: [+LC[0].toFixed(1), +LC[1].toFixed(1)], shoreR: +rS.toFixed(1),
-    rx: RX, rz: RZ, normal: [+nx.toFixed(3), +nz.toFixed(3)] };
+  stats.site = { deg: HAVEN.SITE_DEG, shore: [+SHORE[0].toFixed(1), +SHORE[1].toFixed(1)],
+    waterCentre: [+WC[0].toFixed(1), +WC[1].toFixed(1)], shoreR: HAVEN.SHORE_R,
+    rx: HAVEN.WATER_RX, rz: HAVEN.WATER_RZ, axis: [+ax.toFixed(3), +az.toFixed(3)] };
 
   /* the yaw that turns a box's local +X along the SHORE and its +Z inland. Written once, because
      the axis convention is this project's most productive source of defects. */
@@ -183,6 +187,45 @@ export function buildMahHaven(ctx, opts = {}) {
     emissive: 0x0b1f18, emissiveIntensity: 0.22, vertexColors: true
   });
   greenMat.name = 'haven-growth'; owned.materials.push(greenMat);
+
+  /* ================================================================================================
+     0. THE WATER. R5 §13's first item, and this district cuts it because the world had no shore
+        with room beside it — see the header. The LEVEL is not invented: it is terrain.js's BASIN.y,
+        the one number lakecity.js also uses, so MAHWORLD still has a single water plane.
+     ============================================================================================== */
+  {
+    const SEG = 72;
+    const pos = [], nor = [], col = [];
+    /* a fan from the centre, laid flat. Still water in this world is a near-black reflective plane
+       (LAW 1 and §07 both), so its VALUE comes from what it returns rather than from its colour —
+       which is also why it must not be given a lit blue: a lake painted blue at night is a pool. */
+    for (let i = 0; i < SEG; i++) {
+      const a0 = (i / SEG) * TAU, a1 = ((i + 1) / SEG) * TAU;
+      const p0 = [WC[0] + tx * HAVEN.WATER_RX * Math.cos(a0) + ax * HAVEN.WATER_RZ * Math.sin(a0),
+                  WC[1] + tz * HAVEN.WATER_RX * Math.cos(a0) + az * HAVEN.WATER_RZ * Math.sin(a0)];
+      const p1 = [WC[0] + tx * HAVEN.WATER_RX * Math.cos(a1) + ax * HAVEN.WATER_RZ * Math.sin(a1),
+                  WC[1] + tz * HAVEN.WATER_RX * Math.cos(a1) + az * HAVEN.WATER_RZ * Math.sin(a1)];
+      pos.push(WC[0], waterY, WC[1], p0[0], waterY, p0[1], p1[0], waterY, p1[1]);
+      for (let k = 0; k < 3; k++) nor.push(0, 1, 0);
+      col.push(0.30, 0.30, 0.30, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
+    g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
+    own(g);
+    const waterMat = new THREE.MeshStandardMaterial({
+      color: 0x121a24, metalness: 0.62, roughness: 0.09, envMapIntensity: 1.25, vertexColors: true
+    });
+    waterMat.name = 'haven-water'; owned.materials.push(waterMat);
+    const mesh = new THREE.Mesh(g, waterMat);
+    mesh.name = 'haven-water'; mesh.frustumCulled = false; mesh.renderOrder = -1;
+    group.add(mesh); stats.draws++;
+    stats.triangles += SEG;
+    stats.water = { centre: [+WC[0].toFixed(1), +WC[1].toFixed(1)], rx: HAVEN.WATER_RX,
+      rz: HAVEN.WATER_RZ, y: waterY, nearR: HAVEN.WATER_R - HAVEN.WATER_RZ,
+      farR: HAVEN.WATER_R + HAVEN.WATER_RZ };
+  }
 
   /* ================================================================================================
      1. THE ENTRANCE SEQUENCE — the one moment this district is for

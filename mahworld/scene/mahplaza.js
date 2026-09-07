@@ -400,8 +400,11 @@ export async function createMahplaza(canvas, options = {}) {
   if (HAVENM && HAVENM.buildMahHaven) {
     try {
       mahHaven = HAVENM.buildMahHaven(ctx, {
-        water: (TERRAIN && TERRAIN.BASIN) ? { centre: TERRAIN.basinCentre(),
-          rx: TERRAIN.BASIN.rx, rz: TERRAIN.BASIN.rz, y: TERRAIN.BASIN.y } : null
+        /* only the LEVEL comes from terrain — the district cuts its own ellipse, because a world
+           sweep found exactly one site clear of both mountain and architecture and it has no
+           existing shoreline. One water plane, three bodies of water (L42 is about one truth, not
+           one object). */
+        waterY: (TERRAIN && TERRAIN.BASIN) ? TERRAIN.BASIN.y : -1.4
       });
       scene.add(mahHaven.group);
     } catch (e) { console.info('MAHPLAZA: mah haven module failed —', e && e.message); mahHaven = null; }
