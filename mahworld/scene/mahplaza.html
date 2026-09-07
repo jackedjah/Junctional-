@@ -68,6 +68,47 @@
   .navpanel button s{grid-column:2;text-decoration:none;color:var(--dim);font-size:9px;letter-spacing:.12em}
   /* the transition: a square diamond that CONTRACTS, then an arrival pulse. Two keyframes, no draw
      call, and it cannot cost a frame in a scene already at 900k triangles. */
+  /* ================================================================================================
+     MOBILE HUD — the live iPhone defect, and the whole of its fix.
+
+     THE DEFECT. The bottom HUD is ten .row groups and every one of them is flex-wrap:wrap. At
+     desktop width each row is a single line and the HUD is short. At 390 px it wraps into a
+     623 px tall wall of buttons — measured on real WebKit at iPhone 12 Pro, against a 664 px
+     viewport. The HUD is pointer-events:none but its ROWS are pointer-events:auto, so hit-testing
+     the middle of the screen returned button[data-roam], not the canvas. The world was rendering
+     the whole time, underneath. Nothing could be tapped in it because nothing in it was reachable.
+
+     WHY THE AUTOMATED TEST MISSED IT. It called element.click(), which dispatches straight at the
+     node and ignores what is painted on top. A finger cannot do that. Any check for "can the user
+     tap this" has to hit-test the POINT, not click the ELEMENT.
+
+     THE FIX, and it is layout only — no world code, no gameplay, no 3D. On phones the two rows the
+     journey actually needs (camera views: Arrival / In-world, and move: Walk the world) stay out
+     as single-line scrollable strips, and the remaining eight go behind a Controls toggle. The
+     canvas gets the screen back.
+     ============================================================================================== */
+  .morebtn{display:none;align-items:center;gap:8px;align-self:flex-start;appearance:none;font:inherit;
+    letter-spacing:.18em;text-transform:uppercase;font-size:10px;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:3px;padding:8px 10px;min-height:34px;pointer-events:auto;
+    backdrop-filter:blur(6px);cursor:pointer}
+  .morebtn i{width:7px;height:7px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;
+    transform:rotate(45deg) translate(-1px,-1px);transition:transform .25s ease}
+  .morebtn[aria-expanded="true"] i{transform:rotate(-135deg) translate(-1px,-1px)}
+
+  @media (max-width:560px){
+    .morebtn{display:inline-flex;order:-1}
+    /* the eight secondary rows fold away until asked for */
+    .hud--bottom .row:not([data-row="primary"]){display:none}
+    body[data-more="1"] .hud--bottom .row:not([data-row="primary"]){display:flex}
+    /* and the rows that stay never wrap into a wall again: one line each, scrolled sideways */
+    .hud--bottom .row{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x;overscroll-behavior-x:contain}
+    .hud--bottom .row::-webkit-scrollbar{display:none}
+    .hud--bottom .row>*{flex:0 0 auto}
+    /* a hard ceiling, so even fully expanded the HUD can never take the whole screen again */
+    .hud--bottom{max-height:52vh;overflow-y:auto;overscroll-behavior:contain}
+    .card{max-width:none}
+  }
   .navwipe{position:fixed;inset:0;pointer-events:none;z-index:9;display:grid;place-items:center;opacity:0}
   .navwipe.on{animation:navjump .62s ease-in-out forwards}
   .navwipe i{width:56vmax;height:56vmax;background:radial-gradient(closest-side,rgba(180,215,255,.30),rgba(120,170,255,0) 72%);
@@ -106,13 +147,19 @@
 </header>
 
 <footer class="hud hud--bottom" data-hud>
+  <!-- MOBILE CONTROLS TOGGLE. Only shown on narrow screens (see the media query). On a phone the
+       ten control rows wrap into a 623 px wall that buries the canvas; the primary rows stay out
+       and the rest live behind this. -->
+  <button class="morebtn" type="button" data-more aria-expanded="false" aria-label="More controls">
+    <span>Controls</span><i aria-hidden="true"></i>
+  </button>
   <section class="card" data-card hidden aria-live="polite">
     <div class="kicker"><span data-card-label>—</span><span class="pill" data-card-status>—</span></div>
     <p data-card-copy></p>
     <div class="row"><button type="button" data-card-go hidden>Go</button><button type="button" data-card-practice hidden>Start local practice preview</button><button type="button" data-card-exit hidden>Exit practice</button><button type="button" data-card-dismiss>Dismiss</button></div>
     <p data-card-step hidden></p>
   </section>
-  <div class="row" role="group" aria-label="Camera views">
+  <div class="row" role="group" aria-label="Camera views" data-row="primary">
     <span class="label">View</span>
     <button type="button" data-view="establishing" aria-pressed="true">Arrival</button>
     <button type="button" data-view="in-world" aria-pressed="false">In-world</button>
@@ -144,7 +191,7 @@
     <button type="button" data-self="red" style="--sw:#e0453f"><i class="swatch"></i>Red</button>
     <button type="button" data-self="silver" style="--sw:#aebbcb"><i class="swatch"></i>Silver</button>
   </div>
-  <div class="row" role="group" aria-label="Move around the world yourself" data-roam-row>
+  <div class="row" role="group" aria-label="Move around the world yourself" data-roam-row data-row="primary">
     <span class="label">Roam</span>
     <button type="button" data-roam aria-pressed="false">Walk the world</button>
     <button type="button" data-roam-mode aria-pressed="false" hidden>Fly</button>
@@ -282,7 +329,14 @@
        care is the ORDER — the diamond has to be closed over the frame BEFORE the camera moves, or
        the viewer sees the cut the transition exists to hide, and the panel has to close on the same
        tick as the choice so nothing is left hanging over the world you just arrived in. */
-    const navBtn = $('[data-nav]'), navPanel = $('[data-navpanel]'), navWipe = $('[data-navwipe]');
+    /* the mobile Controls toggle — a body flag the media query reads; no effect above 560 px */
+  const moreBtn = $('[data-more]');
+  if (moreBtn) moreBtn.addEventListener('click', () => {
+    const on = document.body.dataset.more === '1';
+    document.body.dataset.more = on ? '0' : '1';
+    moreBtn.setAttribute('aria-expanded', String(!on));
+  });
+  const navBtn = $('[data-nav]'), navPanel = $('[data-navpanel]'), navWipe = $('[data-navwipe]');
     let navOpen = false;
     const paintNav = () => {
       navBtn.hidden = hudOff;
