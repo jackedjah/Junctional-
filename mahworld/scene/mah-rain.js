@@ -219,7 +219,7 @@ export const SEA = Object.freeze({
      512 x 76 with the rings crowded harder toward the shore puts them near 20 m there, and the
      fragment ripple below supplies the detail under that — geometry for the plates, gradient for
      the surface of each plate. One draw either way. */
-  SEG: 512, RINGS: 76, RING_POW: 1.70,
+  SEG: 512, RINGS: 120, RING_POW: 1.70,
   /* the inner shore is NOT a circle. Two slow harmonics, so the coast has bays and headlands at the
      scale a coast has them, and the eye never finds the centre by following the shoreline. */
   SHORE_A1: 130, SHORE_N1: 3,
@@ -771,6 +771,9 @@ export function buildMahRain(ctx, opts = {}) {
          of the mean. Anchoring the swell's taper to the mean shore is what made the first 400 m of
          water glassy flat — see the note in the vertex injection. */
       uSeaShore: { value: new THREE.Vector4(SEA.SHORE_A1, SEA.SHORE_N1, SEA.SHORE_A2, SEA.SHORE_N2) },
+      /* the mesh's own grading, so the vertex shader can work out how big a facet is HERE and damp
+         any wave this part of the mesh cannot carry — see the note in the injection */
+      uSeaMesh: { value: new THREE.Vector3(SEA.RINGS, SEA.RING_POW, SEA.SEG) },
       uSeaGlow: { value: new THREE.Color(0x2c4a63) },
       uSeaGlowI: { value: 0.06 },
       /* the micro-ripple: amplitude in radians of normal tilt, and its two wavelengths in metres */
@@ -785,7 +788,7 @@ export function buildMahRain(ctx, opts = {}) {
         'uniform float uSeaT;',
         'uniform vec4 uSeaW0; uniform vec4 uSeaW1; uniform vec4 uSeaW2; uniform vec4 uSeaW3;',
         'uniform vec4 uSeaW4; uniform vec4 uSeaW5;',
-        'uniform vec2 uSeaEnv; uniform vec4 uSeaShore;',
+        'uniform vec2 uSeaEnv; uniform vec4 uSeaShore; uniform vec3 uSeaMesh;',
         'varying float vSeaH;',
         'varying vec3 vSeaW;',
         ''
@@ -808,24 +811,49 @@ export function buildMahRain(ctx, opts = {}) {
         '                        + uSeaShore.z * sin( uSeaShore.w * sth - 1.9 );',
         '  float env = smoothstep( rIn + 6.0, rIn + 96.0, sr )',
         '            * ( 1.0 - smoothstep( uSeaEnv.y - 900.0, uSeaEnv.y, sr ) );',
+        /* HOW BIG IS A FACET HERE, and therefore which waves this part of the mesh can carry.
+           The rings are graded toward the shore, so facet size is a known function of radius rather
+           than something to guess: at 1500 m out they measure about 58 by 48 m, and an 84 m wave
+           sampled 1.5 times per wavelength is not a wave, it is moiré. The coast frame showed
+           exactly that band of interference once the fragment ripple stopped masking it.
+           Each wave is damped as the local facet approaches its own wavelength — the same
+           prefilter as the ripple and the halo grid, applied in the vertex stage where the
+           geometry actually is. */
+        '  float uu = clamp( ( sr - rIn ) / max( uSeaEnv.y - rIn, 1.0 ), 0.0, 1.0 );',
+        '  float xg = pow( max( uu, 1e-5 ), 1.0 / uSeaMesh.y );',
+        '  float fRad = ( uSeaEnv.y - rIn ) * uSeaMesh.y * pow( max( xg, 1e-4 ), uSeaMesh.y - 1.0 ) / uSeaMesh.x;',
+        '  float fCirc = 6.2831853 * sr / uSeaMesh.z;',
+        '  float facet = max( fRad, fCirc );',
         '  float h = 0.0; vec2 lat = vec2( 0.0 );',
         /* four directional waves. The LATERAL term is what makes it malleable rather than merely
            bumpy: each wave drags the surface along its own direction as it passes, so the facets
            stretch on the back of a swell and crowd on its face, which is what crystal plates riding
            a moving surface would actually do. */
         '  vec4 w;',
-        '  w = uSeaW0; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
-        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
-        '  w = uSeaW1; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
-        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
-        '  w = uSeaW2; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
-        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
-        '  w = uSeaW3; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
-        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
-        '  w = uSeaW4; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
-        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
-        '  w = uSeaW5; { vec2 d = vec2( w.x, w.y ); float ph = dot( sp, d ) + uSeaT * w.w;',
-        '    h += sin( ph ) * w.z; lat += normalize( d ) * cos( ph ) * w.z * 0.85; }',
+        '  w = uSeaW0; { vec2 d = vec2( w.x, w.y ); float wl = 6.2831853 / length( d );',
+        '    float g = 1.0 - smoothstep( wl * 0.22, wl * 0.50, facet );',
+        '    float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z * g; lat += normalize( d ) * cos( ph ) * w.z * 0.85 * g; }',
+        '  w = uSeaW1; { vec2 d = vec2( w.x, w.y ); float wl = 6.2831853 / length( d );',
+        '    float g = 1.0 - smoothstep( wl * 0.22, wl * 0.50, facet );',
+        '    float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z * g; lat += normalize( d ) * cos( ph ) * w.z * 0.85 * g; }',
+        '  w = uSeaW2; { vec2 d = vec2( w.x, w.y ); float wl = 6.2831853 / length( d );',
+        '    float g = 1.0 - smoothstep( wl * 0.22, wl * 0.50, facet );',
+        '    float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z * g; lat += normalize( d ) * cos( ph ) * w.z * 0.85 * g; }',
+        '  w = uSeaW3; { vec2 d = vec2( w.x, w.y ); float wl = 6.2831853 / length( d );',
+        '    float g = 1.0 - smoothstep( wl * 0.22, wl * 0.50, facet );',
+        '    float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z * g; lat += normalize( d ) * cos( ph ) * w.z * 0.85 * g; }',
+        '  w = uSeaW4; { vec2 d = vec2( w.x, w.y ); float wl = 6.2831853 / length( d );',
+        '    float g = 1.0 - smoothstep( wl * 0.22, wl * 0.50, facet );',
+        '    float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z * g; lat += normalize( d ) * cos( ph ) * w.z * 0.85 * g; }',
+        '  w = uSeaW5; { vec2 d = vec2( w.x, w.y ); float wl = 6.2831853 / length( d );',
+        '    float g = 1.0 - smoothstep( wl * 0.22, wl * 0.50, facet );',
+        '    float ph = dot( sp, d ) + uSeaT * w.w;',
+        '    h += sin( ph ) * w.z * g; lat += normalize( d ) * cos( ph ) * w.z * 0.85 * g; }',
         '  transformed.y += h * env;',
         '  transformed.xz += lat * env;',
         '  vSeaH = h * env;',
