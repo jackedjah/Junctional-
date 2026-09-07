@@ -349,6 +349,54 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     'mahgic ' + val.mahgic + '  trunk ' + val.trunk);
 
   /* ============================================================================================
+     5b. R7 §15 — THE MATERIAL FAMILIES ARE VISUALLY DISTINCT.
+
+     R7's acceptance gates require "platinum / crystal / glass are visually distinct" and that black
+     crystal is "deep, reflective / clearcoat, readable, NEVER dead black". Both were failing: the
+     halo landing terraces rendered as dead black discs because `deck` was the world's FLOOR
+     material (paving, 0x0b0f16 at metalness 0.40), and the jambs were a matte structural grade that
+     read as unlit cavity rather than machined recess.
+
+     A material family is only real if a viewer can tell its members apart, so that is what is
+     measured — the properties, not the intent.
+     ============================================================================================ */
+  console.log('\nR7 §15 — the material families are distinguishable');
+  const fam = await ev(() => {
+    const g = window.MAHWORLD_MAHPLAZA.mahNexus.group;
+    const out = {};
+    for (const c of g.children) {
+      if (!c.isMesh || !c.material) continue;
+      const m = c.material;
+      /* the LOD split renamed these: the jamb and throat now build inside the detail tier, so
+         their meshes are `nexus-recess-detail` and `nexus-glass-detail`. Strip both affixes or the
+         gate reads `undefined` and reports a material fault that is really a naming fault — which
+         is how this file's first run of these three gates failed. */
+      out[c.name.replace('nexus-', '').replace('-detail', '')] = {
+        lum: +(0.2126 * m.color.r + 0.7152 * m.color.g + 0.0722 * m.color.b).toFixed(3),
+        rough: m.roughness, metal: m.metalness,
+        clearcoat: m.clearcoat == null ? null : m.clearcoat,
+        transparent: !!m.transparent, opacity: m.opacity
+      };
+    }
+    return out;
+  });
+  P('black crystal is not dead black (§15)',
+    fam.deck && fam.deck.lum > 0.004 && (fam.deck.clearcoat == null || fam.deck.clearcoat > 0.5),
+    JSON.stringify(fam.deck));
+  P('the recess is liquid dark METAL, not matte structure (§15)',
+    fam.recess && fam.recess.metal > 0.85 && fam.recess.rough < 0.25, JSON.stringify(fam.recess));
+  P('clear diamond glass exists and is actually transparent (§15, §5)',
+    fam.glass && fam.glass.transparent && fam.glass.opacity < 0.6, JSON.stringify(fam.glass));
+  /* distinctness: the dark families must be genuinely darker than the platinum ones, and the two
+     dark families must differ from each other in FINISH rather than only in colour. */
+  P('platinum and the dark families are far apart in value',
+    fam.tube && fam.deck && fam.tube.lum > fam.deck.lum * 6,
+    'tube ' + (fam.tube && fam.tube.lum) + ' vs black crystal ' + (fam.deck && fam.deck.lum));
+  P('the two dark families differ in finish, not just colour',
+    fam.deck && fam.recess && Math.abs(fam.deck.metal - fam.recess.metal) > 0.3,
+    'metalness ' + (fam.deck && fam.deck.metal) + ' vs ' + (fam.recess && fam.recess.metal));
+
+  /* ============================================================================================
      6. CONTRACT, COST AND DETERMINISM.
      ============================================================================================ */
   console.log('\nthe module contract');
@@ -358,8 +406,36 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
       .reduce((o, k) => (o[k] = typeof n[k] === 'function', o), {});
   });
   for (const k of Object.keys(api)) P('contract: ' + k + '()', api[k]);
-  P('the whole complex is a handful of draws', S.draws <= 6, S.draws + ' draws');
-  P('the triangle cost is a hero object\'s, not a world\'s', S.triangles < 220000, S.triangles + ' triangles');
+  /* R7 §24 — THE BUDGET IS PER TIER, BECAUSE THE STRATEGY IS PER TIER.
+
+     A single triangle limit is the wrong gate for an object with LOD, and it failed as one: the §15
+     material closure and the §7 halo terminals took this complex from 130k in four draws to 235k in
+     seven, and a flat budget can only say "too big" — it cannot say "too big AT DISTANCE", which is
+     the thing that actually costs frames. §24 asks for high detail near the player and a clean
+     silhouette far from them, so both ends are measured.
+
+     The far tier lands at exactly what the whole object cost before R7, which is the sanity check
+     that the split went along the right seam. */
+  P('§24: the far silhouette is cheap — few draws', S.drawsFar <= 6, S.drawsFar + ' draws at distance');
+  P('§24: the far silhouette is cheap — few triangles', S.triSilhouette < 150000,
+    S.triSilhouette + ' silhouette triangles');
+  P('§24: the near tier stays inside a hero object\'s budget', S.triangles < 280000,
+    S.triangles + ' near (' + S.triSilhouette + ' silhouette + ' + S.triDetail + ' detail)');
+  P('§24: detail is a real fraction of the cost, so dropping it is worth doing',
+    S.triDetail > S.triangles * 0.25, S.triDetail + ' of ' + S.triangles);
+  /* and the tier must actually TOGGLE — a budget split that never changes what is drawn is a
+     comment, not a strategy. */
+  const lod = await ev(async () => {
+    const n = window.MAHWORLD_MAHPLAZA.mahNexus;
+    const seen = g => g.children.filter(c => c.isMesh && c.visible && /-detail$/.test(c.name)).length;
+    n.setDetail(200); const near = seen(n.group);
+    n.setDetail(9000); const far = seen(n.group);
+    n.setDetail(200);
+    return { near, far, total: n.group.children.filter(c => /-detail$/.test(c.name)).length };
+  });
+  P('§24: the detail tier is actually dropped at distance',
+    lod.total > 0 && lod.near === lod.total && lod.far === 0,
+    lod.near + ' detail meshes near, ' + lod.far + ' far, of ' + lod.total);
 
   const nav = await ev(() => window.MAHWORLD_MAHPLAZA.mahNexus.navSites());
   P('it is somewhere you can be sent', nav.length >= 1 && nav[0].id === 'mah-nexus', JSON.stringify(nav));

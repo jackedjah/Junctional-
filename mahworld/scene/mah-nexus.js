@@ -171,10 +171,33 @@ export const NEXUS = Object.freeze({
   /* PRIMARY TRUNKS — §3's top tier of the hierarchy. Six, on the collar, leaning gently OUTWARD so
      they land on the halo underside spread wider than the base: the ring is carried, not poked. */
   PRIMARY: Object.freeze({
-    COUNT: 6, SEAT_TIER: 1, SEAT_R: 186, LAND_R: 430, LAND_VARY: 130, R0: 46, R1: 38, N: 3.6,
+    COUNT: 6, SEAT_TIER: 1, SEAT_R: 156, LAND_R: 980, LAND_VARY: 240, R0: 76, R1: 58, N: 3.6,
     PHASE: 12,                      /* degrees, so no trunk sits on a base corner */
+    FLARE: 2.4,                     /* see below: the exponent that makes this a tree */
     STATIONS: 72, RADIAL: 26
   }),
+  /* R7 §5 / §2 — THE PRIMARIES ARE THE TREE, AND THEY WERE A CAGE.
+
+     R6 built six trunks of equal section leaning evenly outward on a smoothstep, tied by three ring
+     collars. Measured, everything passed; looked at against the R7 key art, it is plainly the wrong
+     object. The art shows a TREE: a trunk that goes up and then MUSHROOMS, on a few branches thick
+     enough to be structure rather than scaffolding, with the flare concentrated high. R7 §3 asks for
+     "smooth tubular branches" and "large-radius curves"; §5 asks that a route "look traversable from
+     the inside" and "contain sufficient internal diameter".
+
+     Three numbers carry that whole change:
+
+       R0  46 -> 76   a branch as thick as a building, not a mast. 152 m of internal diameter is a
+                      route you can believe MAHBEINGS and FOB pods move through, which §5 requires.
+       SEAT_R 186 -> 156   they now spring from INSIDE the collar's shadow rather than standing off
+                      it, so low down they read as one mass with the core — the trunk of the tree —
+                      and only separate as they climb.
+       FLARE  smoothstep -> t^2.4   this is the tree. A smoothstep spreads the lean evenly over the
+                      rise, which is a cage splaying; t^2.4 holds the branches close through the
+                      lower half and throws them outward in the top third, which is a canopy.
+
+     The seat arithmetic still has to hold: 156 + 76 = 232 against the concourse's 236 m half-extent.
+     Four metres of margin, and the gate checks it rather than this comment. */
 
   /* RING NODES — §2's "reconnecting through rings/nodes". Three collars that tie the primaries and
      the tube families into one object. In silhouette they are what turns six verticals into a
@@ -198,7 +221,7 @@ export const NEXUS = Object.freeze({
      Widths are the hierarchy stated as numbers, and the gate below checks the ladder is strictly
      decreasing: core 150 > primary 46 > branch 33 > tertiary 22 > mahgic 3.4. */
   TERTIARY: Object.freeze({
-    COUNT: 8, R0: 22, R1: 15, N: 3.4,
+    COUNT: 8, R0: 26, R1: 18, N: 3.4,
     LO: 0.14, HI: 0.78,       /* fraction of the rise: where the lowest and highest connector sit */
     TANGENT: 0.34,            /* how far off-axis it meets the core, as a fraction of the core radius */
     STATIONS: 28, RADIAL: 14
@@ -230,8 +253,16 @@ export const NEXUS = Object.freeze({
      Entropy in route variety is allowed; chaos is not. So the variety is enumerated, not random. */
   STRAIGHT: Object.freeze({ COUNT: 4, SEAT_TIER: 0, SEAT_R: 262, LAND_R: 300, R: 24, N: 3.4, PHASE: 45 }),
   SPIRAL: Object.freeze({ COUNT: 3, SEAT_TIER: 0, SEAT_R: 240, LAND_R: 380, R: 27, N: 3.2, TURNS: 1.15, PHASE: 20 }),
-  BRANCH: Object.freeze({ COUNT: 6, SPLIT_AT: 0.44, SEAT_R: 96, LAND_R: 660, R0: 33, R1: 21, N: 3.4, PHASE: 30 }),
+  BRANCH: Object.freeze({ COUNT: 6, SPLIT_AT: 0.44, SEAT_R: 96, LAND_R: 660, R0: 44, R1: 28, N: 3.4, PHASE: 30 }),
   TUBE_STATIONS: 80, TUBE_RADIAL: 20,
+
+  /* R7 §7 — WHERE A ROUTE ARRIVES. Every number here is a fraction of the branch it terminates, so
+     the terminal scales with its route instead of being a fixed fitting bolted onto varying tubes. */
+  ENTRY: Object.freeze({
+    COLLAR_DROP: 46, COLLAR_R: 1.34, COLLAR_SEC: 11,   /* the gripping ring, wider than the branch */
+    TERRACE_DROP: 96, TERRACE_R: 2.15,                 /* the deck you arrive onto */
+    DOOR_DROP: 78, DOOR_SCALE: 0.72                    /* the threshold, on the terrace's outer edge */
+  }),
 
   /* THE TUBULAR DIAMOND ENTRY SYSTEM — §4, which is the most specified section in the whole master
      and describes a DOOR rather than a hole:
@@ -281,6 +312,7 @@ export const NEXUS = Object.freeze({
      change — which a hand-tuned phase would not. */
   PETALS: Object.freeze({ COUNT: 5, OUT: 310, A: 72, H: 44, N: 4.0, SEAT_LO: 30, SEAT_VARY: 9 }),
   SITE_CLEAR_R: 400,        /* measured: relief 0.0 inside this, 105.5 m of rock outside it */
+  LAND_MARGIN: 140,         /* how far inside the halo annulus a landing must stay to have ceiling */
 
   LOD_NEAR: 1400, LOD_MID: 4200, LOD_FAR: 26000
 });
@@ -528,8 +560,36 @@ export function buildMahNexus(ctx, opts = {}) {
      the base does — this is the grade that separates the tube family from the mass it climbs. */
   const tubeMat = mkMat(M.platinum || M.platinumMid, { name: 'nexus-tube', color: new THREE.Color(0xa9b8cd), envMapIntensity: 1.85, roughness: 0.22, metalness: 0.58 });
   applyPlatinumFinish(tubeMat, { mFlat: 0.34, mEdge: 0.74, rFlat: 0.32, rEdge: 0.19, breakUp: 0.055 });
-  const deckMat = mkMat(M.paving || M.graphiteDark, { name: 'nexus-deck', envMapIntensity: 1.35 });
-  const recessMat = mkMat(M.graphiteDark || M.structural, { name: 'nexus-recess', roughness: 0.54, metalness: 0.72, envMapIntensity: 1.2 });
+  /* R7 §15 — BLACK CRYSTAL, and the render is what caught this one. The halo landing terraces came
+     back as DEAD BLACK DISCS hanging under the ceiling, because `deck` was M.paving: colour
+     0x0b0f16 at metalness 0.40, which is the world's FLOOR material and is meant to be near-black.
+     §15 is explicit that black crystal is "deep, reflective / clearcoat, readable, NEVER dead
+     black", and a horizontal plate of near-black paving 1700 m up with nothing to reflect but the
+     ground is exactly dead black.
+
+     Clearcoat is the difference. A clearcoat layer gives a dark surface a bright specular skin that
+     survives when the diffuse term is almost nothing, so the terrace reads as polished stone rather
+     than a hole. The albedo also comes up off pure black and onto the world's blue axis, so it
+     belongs to the same family as the platinum it sits against. */
+  const deckMat = mkMat(M.paving || M.graphiteDark, {
+    name: 'nexus-black-crystal', color: new THREE.Color(0x0e1622),
+    roughness: 0.16, metalness: 0.38, envMapIntensity: 1.95
+  });
+  if ('clearcoat' in deckMat) { deckMat.clearcoat = 1.0; deckMat.clearcoatRoughness = 0.09; }
+  /* R7 §15 — LIQUID DARK METAL: "smooth premium black-chrome for joints / recesses". The jambs and
+     throats were graphiteDark at roughness 0.54, which is a matte structural grade — it read as
+     unlit cavity rather than as a machined recess. Black chrome is dark AND sharp. */
+  const recessMat = mkMat(M.graphiteDark || M.structural, {
+    name: 'nexus-liquid-dark', color: new THREE.Color(0x131b28),
+    roughness: 0.13, metalness: 0.93, envMapIntensity: 2.15
+  });
+  /* R7 §15 / §5 — CLEAR DIAMOND GLASS, "transparent, real thickness, clean edge response". §5 asks
+     that a route have "glass / crystal enclosure where appropriate"; the deepest ring of every
+     portal is that enclosure, so looking into a door now shows crystal depth instead of a hole. */
+  const glassMat = mkMat(M.crystalGlass, {
+    name: 'nexus-diamond-glass', color: new THREE.Color(0x20355c),
+    roughness: 0.05, metalness: 0.18, transparent: true, opacity: 0.38, envMapIntensity: 2.3
+  });
   /* §3 tier 4. ADDITIVE and unlit, which is fobeam.js's convention for every energy line in this
      world: a lit solid at this section would be L58's crawling hairline, an additive one glows
      wider than its geometry. depthWrite off so it never punches a hole in the metal behind it. */
@@ -540,12 +600,31 @@ export function buildMahNexus(ctx, opts = {}) {
   owned.materials.push(mahgicMat);
 
   /* ---- ACCUMULATORS. One merge per material, so this whole complex is four draws at full detail. */
-  const bins = { shell: [], trunk: [], tube: [], deck: [], recess: [], mahgic: [] };
+  const bins = { shell: [], trunk: [], tube: [], deck: [], recess: [], glass: [], mahgic: [] };
   /* every member that is supposed to REACH the ceiling records where it claims to land, so §3 can
      be checked against the intent and not against whatever vertex happens to be near the top */
   const landings = [];
   const land = (id, x, y, z) => { landings.push({ id, x, y, z }); return y; };
-  const push = (bin, geo) => { if (Array.isArray(geo)) { for (const g of geo) bins[bin].push(g); } else bins[bin].push(geo); };
+  /* R7 §24 — TWO TIERS OF GEOMETRY, NOT ONE.
+
+     The §15 material closure and the §7 halo entries took this complex from 130k triangles in four
+     draws to 235k in seven, and the module's own budget gate failed — correctly. §24 does not ask
+     for a bigger budget, it asks for "high detail near player, clean silhouette at distance" and
+     names far-branch simplification specifically.
+
+     So every push declares whether it is SILHOUETTE or DETAIL. Silhouette is what the object is at
+     any range: base, core, primaries, rings, the three route families. Detail is what only exists
+     when you are close enough to resolve it: the eight portals, the six halo terminals, the tertiary
+     connectors, the MAHGIC rails. The detail meshes merge separately and setDetail simply stops
+     drawing them, which is also the prefilter law — a portal 4 km away is not detail, it is noise
+     that costs 80k triangles to draw. */
+  const bins2 = { shell: [], trunk: [], tube: [], deck: [], recess: [], glass: [], mahgic: [] };
+  let DETAIL = false;
+  const push = (bin, geo) => {
+    const target = DETAIL ? bins2[bin] : bins[bin];
+    if (Array.isArray(geo)) { for (const g of geo) target.push(g); } else target.push(geo);
+  };
+  const detail = (fn) => { DETAIL = true; try { fn(); } finally { DETAIL = false; } };
   const at = (geo, x, y, z) => { const m = new THREE.Matrix4().makeTranslation(x, y, z); geo.applyMatrix4(m); return geo; };
 
   /* ================================ THE BASE ================================================== */
@@ -628,13 +707,45 @@ export function buildMahNexus(ctx, opts = {}) {
       const [sx, sz] = polar(aDeg, P.SEAT_R);
       /* the landings are NOT a uniform ring. Six trunks arriving at one radius read as a cage
          clamped round the core; spreading them keeps §3's hierarchy legible from underneath. */
-      const [lx, lz] = polar(aDeg, P.LAND_R + P.LAND_VARY * (gold(i + 1) - 0.5) * 2);
+      /* THE CANOPY REACH, AND THE CEILING DECIDES IT.
+
+         At LAND_R 430 the branches ran 274 m out over a 1586 m rise — a ten degree lean, which is a
+         bundle leaning, not a tree opening. The key art's canopy is nearer forty. So the reach goes
+         to 980, and that immediately runs into a hard geometric fact: MAH HALO's hole is r 700, and
+         this complex stands at r 1750, so a branch thrown 1200 m INWARD lands at world r 550 — over
+         open sky, with no ceiling to meet at all. §3's "connect physically" would fail silently and
+         the render would show a branch ending in air.
+
+         So the reach is CLAMPED by the ceiling rather than chosen: the landing's world radius is
+         held inside the halo annulus with a margin, and the local radius is recovered from that.
+         The canopy therefore leans OUTWARD — branches facing away from the world centre reach far,
+         branches facing back toward the plaza are pulled in — which is not a compromise but the
+         truer shape: a tree growing under a ring reaches where the ring actually is. */
+      const wantR = P.LAND_R + P.LAND_VARY * (gold(i + 1) - 0.5) * 2;
+      let [lx, lz] = polar(aDeg, wantR);
+      {
+        const wr = Math.hypot(CX + lx, CZ + lz);
+        const lo = NEXUS.HALO_R_IN + NEXUS.LAND_MARGIN, hi = NEXUS.HALO_R_OUT - NEXUS.LAND_MARGIN;
+        if (wr < lo || wr > hi) {
+          const want = Math.min(hi, Math.max(lo, wr));
+          /* walk the local radius until the world radius lands in band — one bisection, no guessing */
+          let a2 = 0, b2 = wantR;
+          for (let k = 0; k < 28; k++) {
+            const m2 = (a2 + b2) * 0.5, [mx, mz] = polar(aDeg, m2);
+            if (Math.hypot(CX + mx, CZ + mz) < want) a2 = m2; else b2 = m2;
+          }
+          [lx, lz] = polar(aDeg, (a2 + b2) * 0.5);
+        }
+      }
       const y0 = NEXUS.SEAT_Y[P.SEAT_TIER];
       /* land ON the underside, measured at the landing point's own world position */
       const ly = land('primary-' + i, lx, haloUnderY(CX + lx, CZ + lz) - groundY, lz);
       const pts = [];
-      for (let k = 0; k <= 6; k++) {
-        const t = k / 6, e = t * t * (3 - 2 * t);           /* eased lean: vertical at the seat */
+      for (let k = 0; k <= 10; k++) {
+        /* THE FLARE. t^2.4 holds the branch in close through the lower half and throws it outward
+           in the top third — a canopy. The smoothstep this replaces spread the lean evenly, which
+           is what made six trunks read as a cage splaying rather than a tree opening. */
+        const t = k / 10, e = Math.pow(t, P.FLARE);
         pts.push(new THREE.Vector3(sx + (lx - sx) * e, y0 + (ly - y0) * t, sz + (lz - sz) * e));
       }
       const curve = new THREE.CatmullRomCurve3(landVertical(pts, lx, ly, lz, LAND_TAIL));
@@ -659,7 +770,7 @@ export function buildMahNexus(ctx, opts = {}) {
 
      The arrival radius comes from coreRadiusAt, the same function the core itself is swept with,
      because a connector that guesses the trunk's width either floats off it or buries itself. */
-  {
+  detail(() => {
     const K = NEXUS.TERTIARY, P = NEXUS.PRIMARY;
     for (let i = 0; i < K.COUNT; i++) {
       /* the connector belongs to a primary, but there are 8 of these and 6 of those, so they
@@ -690,7 +801,7 @@ export function buildMahNexus(ctx, opts = {}) {
         u => K.R0 + (K.R1 - K.R0) * (u * u * (3 - 2 * u)), () => K.N, () => 0, true, true));
     }
     stats.parts.tertiary = K.COUNT;
-  }
+  });
 
   /* ================================ §4 — THE TUBE ENTRIES ======================================
      One portal at the foot of every transport tube. §7's distal detail law is the reason this is
@@ -729,7 +840,7 @@ export function buildMahNexus(ctx, opts = {}) {
     /* 3. THROAT — deeper still and rounder, the smoked tube the jamb leads into. Rounder on
           purpose: the sequence 4.6 -> 3.8 -> 3.2 is the eye reading depth off the corner radius
           rather than off a shadow, which is what makes a shallow door look deep. */
-    push('recess', sweptTube(oval((P.W - P.JAMB_IN * 3.4) * s, (P.H - P.JAMB_IN * 3.4) * s, P.THROAT_N, -P.THROAT_D * s), 60, 10,
+    push('glass', sweptTube(oval((P.W - P.JAMB_IN * 3.4) * s, (P.H - P.JAMB_IN * 3.4) * s, P.THROAT_N, -P.THROAT_D * s), 60, 10,
       () => P.JAMB * s * 0.36, () => 3.2, () => 0, false, false));
     /* 4. STATUS NODE — §4's square diamond, and §06's law applies to it too: wider than tall. */
     {
@@ -756,7 +867,7 @@ export function buildMahNexus(ctx, opts = {}) {
         () => P.SILL * s * 0.5, () => 4.0, () => 0, true, true));
     }
   };
-  {
+  detail(() => {
     let n = 0;
     /* every straight and spiral tube gets one, at its own seat, facing out along its own bearing */
     for (const [FAM, tag] of [[NEXUS.STRAIGHT, 'straight'], [NEXUS.SPIRAL, 'spiral']]) {
@@ -778,7 +889,60 @@ export function buildMahNexus(ctx, opts = {}) {
       n++;
     }
     stats.parts.portals = n;
-  }
+  });
+
+  /* ================================ R7 §7 — THE HALO ENTRY POINTS =============================
+     "Each dome entry needs: physical docking collar, threshold frame, square-diamond node, local
+     landing terrace, clean backside."
+
+     MAH NEXUS stands at r 1750, under MAH HALO — the DOME springs at r 3434, which is MAH ASCENT's
+     territory, not this module's. So these are HALO entries, and R7 §5's requirement that a route
+     "terminate at a real dome / HALO entry point" is satisfied at the ceiling this complex actually
+     touches. Before this pass every branch simply ended flush against the underside: a 152 m tube
+     meeting a slab with nothing to say it was a destination.
+
+     Every part of the entry is geometry that already exists in this file. The collar is the ring
+     genome; the threshold and its node are portalAt, rotated to face DOWN. R7 §14 asks that a
+     junction look manufactured and load-bearing, and the cheapest way to be sure of that is to make
+     it out of the same parts as everything else rather than inventing a fitting. */
+  detail(() => {
+    const P = NEXUS.PRIMARY;
+    let entries = 0;
+    for (const L of landings) {
+      if (L.id.indexOf('primary-') !== 0) continue;   /* the six big routes get real terminals */
+      const rr = Math.hypot(L.x, L.z) || 1;
+      const aDeg = Math.atan2(-L.z, L.x) / DEG;
+      /* 1. THE DOCKING COLLAR — a ring around the branch just under the ceiling, thicker than the
+            branch it grips, which is what makes it read as a fitting and not a stripe. */
+      {
+        const cy = L.y - NEXUS.ENTRY.COLLAR_DROP;
+        const pts = [], STEPS = 30;
+        for (let i = 0; i < STEPS; i++) {
+          const phi = (i / STEPS) * TAU, cr = superR(phi, P.R1 * NEXUS.ENTRY.COLLAR_R, 3.6);
+          pts.push(new THREE.Vector3(L.x + Math.cos(phi) * cr, cy, L.z + Math.sin(phi) * cr));
+        }
+        push('tube', sweptTube(new THREE.CatmullRomCurve3(pts, true), 64, 10,
+          () => NEXUS.ENTRY.COLLAR_SEC, () => 3.4, () => 0, false, false));
+      }
+      /* 2. THE LANDING TERRACE — §7's "local landing terrace", a low deck ringing the branch where
+            it meets the ceiling, so an arrival has somewhere to stand before it is anywhere. */
+      {
+        const ty = L.y - NEXUS.ENTRY.TERRACE_DROP;
+        const inner = new THREE.Vector3(L.x, ty, L.z);
+        const outer = new THREE.Vector3(L.x, ty + 1.2, L.z);
+        push('deck', sweptTube(new THREE.LineCurve3(inner, outer), 2, 44,
+          () => P.R1 * NEXUS.ENTRY.TERRACE_R, () => 3.2, () => 0, true, true));
+      }
+      /* 3. THE THRESHOLD — portalAt facing DOWN and outward along the branch's own bearing, so the
+            arrival reads as the same door family as the ground entries. One genome, two ends. */
+      portalAt(L.x + Math.cos(aDeg * DEG) * (P.R1 * NEXUS.ENTRY.TERRACE_R * 0.86),
+        L.y - NEXUS.ENTRY.DOOR_DROP,
+        L.z - Math.sin(aDeg * DEG) * (P.R1 * NEXUS.ENTRY.TERRACE_R * 0.86),
+        aDeg, NEXUS.ENTRY.DOOR_SCALE);
+      entries++;
+    }
+    stats.parts.haloEntries = entries;
+  });
 
   /* ================================ RING NODES (§2) ===========================================
      Three collars. Each is a closed sweep around the core at its own radius — a rounded-square ring,
@@ -890,7 +1054,7 @@ export function buildMahNexus(ctx, opts = {}) {
      there are six rather than sixty, why every one FOLLOWS a member that already exists instead of
      inventing a path, and why the opacity is 0.42 and not 1. A line with its own route is what
      turns a structure into a lattice. */
-  {
+  detail(() => {
     const G = NEXUS.MAHGIC, P = NEXUS.PRIMARY;
     for (let i = 0; i < G.COUNT; i++) {
       const aDeg = P.PHASE + (360 / P.COUNT) * i;
@@ -910,23 +1074,33 @@ export function buildMahNexus(ctx, opts = {}) {
         () => G.R, () => 2.6, () => 0, false, false));
     }
     stats.parts.mahgic = G.COUNT;
-  }
+  });
 
   /* ---- MERGE. One draw per material family. ---------------------------------------------------- */
-  const matFor = { shell: shellMat, trunk: trunkMat, tube: tubeMat, deck: deckMat, recess: recessMat, mahgic: mahgicMat };
-  for (const key of Object.keys(bins)) {
-    const list = bins[key]; if (!list.length) continue;
-    const merged = mergeGeoms(list);
-    for (const g of list) g.dispose();
-    owned.geometries.push(merged);
-    const mesh = new THREE.Mesh(merged, matFor[key]);
-    mesh.name = 'nexus-' + key;
-    mesh.castShadow = false; mesh.receiveShadow = false;
-    group.add(mesh);
-    stats.draws++;
-    stats.triangles += merged.attributes.position.count / 3;
+  const matFor = { shell: shellMat, trunk: trunkMat, tube: tubeMat, deck: deckMat, recess: recessMat, glass: glassMat, mahgic: mahgicMat };
+  const detailMeshes = [];
+  stats.triSilhouette = 0; stats.triDetail = 0;
+  for (const [set, isDetail] of [[bins, false], [bins2, true]]) {
+    for (const key of Object.keys(set)) {
+      const list = set[key]; if (!list.length) continue;
+      const merged = mergeGeoms(list);
+      for (const g of list) g.dispose();
+      owned.geometries.push(merged);
+      const mesh = new THREE.Mesh(merged, matFor[key]);
+      mesh.name = 'nexus-' + key + (isDetail ? '-detail' : '');
+      mesh.castShadow = false; mesh.receiveShadow = false;
+      group.add(mesh);
+      if (isDetail) detailMeshes.push(mesh);
+      stats.draws++;
+      const tri = merged.attributes.position.count / 3;
+      stats.triangles += tri;
+      if (isDetail) stats.triDetail += tri; else stats.triSilhouette += tri;
+    }
   }
   stats.triangles = Math.round(stats.triangles);
+  stats.triSilhouette = Math.round(stats.triSilhouette);
+  stats.triDetail = Math.round(stats.triDetail);
+  stats.drawsFar = stats.draws - detailMeshes.length;
 
   /* ---- THE §3 GATE, asserted here rather than believed. --------------------------------------
      "The upward MAH NEXUS trunks connect PHYSICALLY into the underside." A number in stats is a
@@ -1036,7 +1210,7 @@ export function buildMahNexus(ctx, opts = {}) {
   }
 
   /* ---- CONTRACT ------------------------------------------------------------------------------- */
-  let detail = 1;
+  let tier = 1;
   const api = {
     group, stats,
     setTime() {},
@@ -1045,9 +1219,14 @@ export function buildMahNexus(ctx, opts = {}) {
     setQuality() {},
     setDetail(distance) {
       const d = distance == null ? 0 : distance;
-      const next = d > NEXUS.LOD_MID ? 0.34 : d > NEXUS.LOD_NEAR ? 0.7 : 1;
-      if (next === detail) return;
-      detail = next;
+      /* the detail tier is what §24 asks for: the portals, halo terminals, connectors and MAHGIC
+         rails simply stop being drawn past LOD_NEAR. Below that range they are unresolvable, so
+         drawing them buys noise at the cost of most of this object's triangle budget. */
+      const wantDetail = d <= NEXUS.LOD_NEAR;
+      const next = d > NEXUS.LOD_MID ? 0.34 : wantDetail ? 1 : 0.7;
+      if (next === tier) return;
+      tier = next;
+      for (const m of detailMeshes) m.visible = wantDetail;
       group.visible = d < NEXUS.LOD_FAR;
     },
     navSites() {
