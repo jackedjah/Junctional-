@@ -49,24 +49,30 @@ Inner shore **2277–2572** (inside the land's broken edge at 2600 at *every* be
 out to 5600 — past the dome, so the ring's horizon is water. Level **y −1.4**: `terrain.js`'s
 `BASIN.y`, which `lakecity.js` also uses.
 
-**Flowy and faceted at once**, which a normal water shader cannot do. Four summed directional waves
-displace the mesh vertically *and laterally* — the lateral term makes the plates stretch on the back
-of a swell and crowd on its face — and the normal comes from `cross(dFdx, dFdy)` of `vViewPosition`,
-the true facet of whatever triangle the fragment landed on. Real geometry sliding against itself, no
-texture, one varying `meshphysical` already declares.
+**Flowy and faceted at once**, which a normal water shader cannot do. **Six** summed directional
+waves (757 → 84 m) displace the mesh vertically *and laterally* — the lateral term makes the plates
+stretch on the back of a swell and crowd on its face — and the normal comes from `cross(dFdx, dFdy)`
+of `vViewPosition`, the true facet of whatever triangle the fragment landed on. Real geometry sliding
+against itself, no texture, one varying `meshphysical` already declares.
 
-**Tessellation is sized from the swimmer, not from the sea.** 512 × 76 with rings crowded toward the
-shore puts facets near 20 m there; a fragment ripple at 3.7 m and 13.1 m supplies the surface of each
-plate, because no tessellation this world can afford reaches centimetres across three kilometres.
+**Tessellation is sized from the swimmer, not from the sea.** 512 × 120 with rings crowded toward the
+shore puts facets near 28 m there. Below what the mesh can carry, the chop moves into a **fragment
+ripple at 2.6, 8.3 and 21 m** — because no tessellation this world can afford reaches centimetres
+across three kilometres. Geometry for the swell, gradient for the chop, and both prefiltered.
 
 **Swim groundwork** (R5 §13's rule — lay the shape, not the activity system):
 `seaAt(x,z) → {inside, surfaceY, bedY, depth}` · `crystalSeaBed` as a roam surface · a volume on
 `ctx.swimVolumes`, without this file knowing anything about roam.
 
 ### THE CRYSTAL CLOUDS
-**16 mantle clusters × 12** on the dome's surface of revolution, pushed out along the true *ellipsoid*
+**16 mantle clusters × 24** on the dome's surface of revolution, pushed out along the true *ellipsoid*
 normal `(x/R², y'/H²)` — a mantle laid on the *radius* sits at an angle to the shell it hugs, and on a
-dome 3434 × 2058 that is a visible error. **40 veil clusters × 8** coming down outside it.
+dome 3434 × 2058 that is a visible error. **40 veil clusters × 18** coming down outside it, whose
+inner radius depends on their height: above the spring you must be outside the dome's footprint,
+below it the space is open sky under the halo.
+
+Lobe alpha is **0.033**, and the cluster geometry is solved rather than chosen — see the starfish
+section below for why both numbers are what they are.
 
 **"Not inside of it" is a predicate, not a margin.** `insideDome(r, y)` is written once, used by the
 placement, published in stats, and asserted off the *built instance matrices* — a rule enforced by
@@ -135,7 +141,7 @@ owns — so the third one needs no derivative at all, only the arithmetic that b
 **Built and wired.** `mah-rain.js` · `mahplaza.js` (build order, hooks, nav, detail tier, roam
 surface, `ctx.swimVolumes`) · `tests/mahworld-r6-rain-sea.test.js`.
 
-**Budget.** curtain 1 draw / 5,000 instances · sea 1 draw / ~78k facets · clouds 2 draws / 512 lobes.
+**Budget.** curtain 1 draw / 5,000 instances · sea 1 draw / 123k facets · clouds 2 draws / 1,104 lobes.
 The entire cloud drift is two counter-turning group rotations a frame.
 
 **Gates.** R6 **37/37**. R5 **51/51**, no regression.
