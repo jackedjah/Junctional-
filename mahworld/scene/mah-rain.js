@@ -840,11 +840,20 @@ export function buildMahRain(ctx, opts = {}) {
         '    float sr2 = length( vSeaW.xz );',
         '    diffuseColor.a *= 1.0 - smoothstep( uSeaEnv.y - 1100.0, uSeaEnv.y - 40.0, sr2 );',
         '  }',
+        /* HOW MANY METRES OF WATER THIS PIXEL COVERS. Everything below is prefiltered against
+           it, for the same reason the halo grid is: a detail drawn at a scale the framebuffer
+           cannot resolve does not read as detail, it reads as noise — and the coast frame came
+           back with a band of dense speckle along the horizon where one pixel spans hundreds of
+           metres and a 2.6 m sine was being sampled once inside it. */
+        '  float seaFw = max( length( fwidth( vSeaW.xz ) ), 1e-4 );',
         '  vec3 sfx = dFdx( vViewPosition );',
         '  vec3 sfy = dFdy( vViewPosition );',
         '  vec3 sfn = normalize( cross( sfx, sfy ) );',
         '  if ( sfn.z < 0.0 ) sfn = -sfn;',
-        '  normal = normalize( mix( normal, sfn, uSeaFacet ) );',
+        /* the facet normal goes the same way: at the horizon a single pixel straddles many
+           triangles and its screen derivative is the noise between them, not a plate */
+        '  float facetK = 1.0 - smoothstep( 14.0, 90.0, seaFw );',
+        '  normal = normalize( mix( normal, sfn, uSeaFacet * facetK ) );',
         /* AND THE SURFACE OF EACH PLATE. A 20 m facet is still enormous under a swimmer's chin, and
            no tessellation this world can afford reaches centimetres across three kilometres. So the
            plate is geometry and its SURFACE is a gradient: two octaves at 3.7 m and 13.1 m tilting
@@ -855,12 +864,18 @@ export function buildMahRain(ctx, opts = {}) {
         '    float k1 = 6.2831853 / uSeaRipple.y;',
         '    float k2 = 6.2831853 / uSeaRipple.z;',
         '    float k3 = 6.2831853 / uSeaRipple.w;',
-        '    float dx = 0.42 * sin( rp.x * k1 + uSeaT * 2.9 ) * cos( rp.y * k1 * 0.83 - uSeaT * 2.1 )',
-        '             + 0.70 * sin( rp.x * k2 - uSeaT * 1.3 ) * cos( rp.y * k2 * 1.17 + uSeaT * 0.9 )',
-        '             + 1.00 * sin( rp.x * k3 + uSeaT * 0.8 );',
-        '    float dz = 0.42 * cos( rp.x * k1 * 0.91 - uSeaT * 2.3 ) * sin( rp.y * k1 + uSeaT * 3.1 )',
-        '             + 0.70 * cos( rp.x * k2 * 1.09 + uSeaT * 1.1 ) * sin( rp.y * k2 - uSeaT * 1.5 )',
-        '             + 1.00 * sin( rp.y * k3 - uSeaT * 0.7 );',
+        /* each octave dies as the pixel footprint reaches its own wavelength, so the chop is
+           present under your chin, fades through the middle distance and is simply gone at the
+           horizon — which is what chop does to a real eye anyway */
+        '    float a1 = 0.42 * ( 1.0 - smoothstep( uSeaRipple.y * 0.35, uSeaRipple.y * 1.5, seaFw ) );',
+        '    float a2 = 0.70 * ( 1.0 - smoothstep( uSeaRipple.z * 0.35, uSeaRipple.z * 1.5, seaFw ) );',
+        '    float a3 = 1.00 * ( 1.0 - smoothstep( uSeaRipple.w * 0.35, uSeaRipple.w * 1.5, seaFw ) );',
+        '    float dx = a1 * sin( rp.x * k1 + uSeaT * 2.9 ) * cos( rp.y * k1 * 0.83 - uSeaT * 2.1 )',
+        '             + a2 * sin( rp.x * k2 - uSeaT * 1.3 ) * cos( rp.y * k2 * 1.17 + uSeaT * 0.9 )',
+        '             + a3 * sin( rp.x * k3 + uSeaT * 0.8 );',
+        '    float dz = a1 * cos( rp.x * k1 * 0.91 - uSeaT * 2.3 ) * sin( rp.y * k1 + uSeaT * 3.1 )',
+        '             + a2 * cos( rp.x * k2 * 1.09 + uSeaT * 1.1 ) * sin( rp.y * k2 - uSeaT * 1.5 )',
+        '             + a3 * sin( rp.y * k3 - uSeaT * 0.7 );',
         '    vec3 rt = normalize( cross( vec3( 0.0, 0.0, 1.0 ), normal ) );',
         '    vec3 rb = cross( normal, rt );',
         '    normal = normalize( normal + ( rt * dx + rb * dz ) * uSeaRipple.x );',
