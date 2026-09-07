@@ -30,10 +30,10 @@
    one, and the shoreline would drift from it the first time either was edited — so lakecity.js now
    exports its polygon and this file reads it. One lake, one water level, one truth (L42).
 
-   The site is the lake's SOUTH-WEST shore, bearing 232 in the lake's own local frame — across the
-   water from Lake City's own terraces, which is the point: from MAH HAVEN you look ACROSS at the
-   city you came from, over 400 m of open water, and R5 asks for "an immediate contrast from dense
-   MAH City".
+   The site is bearing 118 in the lake's own local frame — clear of Lake City's terrace arc and
+   chosen for the LIGHT, which is a measurement rather than a preference; see the note on
+   HAVEN.SHORE_DEG. From MAH HAVEN you look back across 400 m of open water at the city you came
+   from, which is how R5's "immediate contrast from dense MAH City" gets built rather than asserted.
 
    ---- THIS PASS IS FOOTPRINTS -----------------------------------------------------------------
    R5 §13 lists exactly what to establish and §15 draws a hard line: "Do not prematurely introduce
@@ -55,8 +55,23 @@ const frac = i => (i * 0.7548776662) % 1;
 const polar = (aDeg, r) => [r * Math.cos(aDeg * DEG), -r * Math.sin(aDeg * DEG)];
 
 export const HAVEN = Object.freeze({
-  /* the bearing on the LAKE's own local frame that this district occupies */
-  SHORE_DEG: 232,
+  /* THE SHORE BEARING IS A LIGHTING DECISION AND IT WAS MADE BY MEASUREMENT.
+
+     The reference's whole power is that the sun comes TOWARD you across the water. MAHWORLD's
+     directional light is fixed at (-80, 120, 160), which through terrain.js's own polar helper is
+     bearing 243.4 — the sun never moves in this world, only its colour and intensity do, so no
+     choice of render time can rescue a district that faces the wrong way. The first cut sat at
+     bearing 232, whose outward view looks at 52: 168 degrees from the light, fully backlit, and the
+     reveal frame came back with a black lake.
+
+     A shore bearing S looks outward along S + 180, so front-light wants S = 63.4. That is inside
+     LAKE CITY's own terraces, which occupy the arc -46 to +78 (its TERRACE.arcFrom/arcTo) — this
+     district may not be built on top of the one it is meant to contrast with. 118 is the closest
+     legal bearing: the view axis lands at 298, 54.6 degrees off the light, which is a three-quarter
+     front light raking across the water rather than a dead-on sun path. It also puts the district's
+     260 m of frontage clear of both bridge pinches in the lake polygon (indices 4 and 10, at 103
+     and 257 degrees). */
+  SHORE_DEG: 118,
   /* how far the district reaches back from the waterline, and how wide along the shore */
   DEPTH: 300,
   HALF_W: 260,
@@ -151,9 +166,13 @@ export function buildMahHaven(ctx, opts = {}) {
   stoneMat.name = 'haven-stone'; owned.materials.push(stoneMat);
   /* the planting: MAHWORLD's crystalline organisms, not Earth flowers. Two values so a bed has
      depth rather than being one painted mass. */
+  /* AND IT IS NOT NEON. 0x2f6f52 at emissive 0.28 photographed as saturated jade against grey
+     stone — MAHWORLD's organisms glow, but a RURAL district whose planting out-saturates its
+     architecture is a theme park. Desaturated toward the world's cool neutral, with the emissive
+     kept for night, where it is the thing that says these are living crystal and not shrubs. */
   const greenMat = new THREE.MeshStandardMaterial({
-    color: 0x2f6f52, roughness: 0.66, metalness: 0.10, envMapIntensity: 0.45,
-    emissive: 0x0d2a1e, emissiveIntensity: 0.28, vertexColors: true
+    color: 0x3f5f4e, roughness: 0.74, metalness: 0.08, envMapIntensity: 0.38,
+    emissive: 0x0b1f18, emissiveIntensity: 0.22, vertexColors: true
   });
   greenMat.name = 'haven-growth'; owned.materials.push(greenMat);
 
@@ -172,13 +191,20 @@ export function buildMahHaven(ctx, opts = {}) {
         const d = 2.6 + 1.5 * frac(i * 7 + (side > 0 ? 1 : 0));
         put3('stone', chamferBox(d, 0.85, A / 12 - 0.8, 0.18), back, side * (W * 0.5 + d * 0.5), 0.42, 0.30);
         put3('plat', chamferBox(d + 0.3, 0.16, A / 12 - 0.8, 0.06), back, side * (W * 0.5 + d * 0.5), 0.92, 0.98);
-        /* what grows in it: low crystalline clusters, three per bed, wider than tall (§06) */
-        for (let g = 0; g < 3; g++) {
+        /* WHAT GROWS IN IT, and the scale is the whole difference between a bed and a camp.
+           The first cut put THREE organisms per bed at up to 2.6 m across, and they photographed as
+           green tents standing in a planter — an object that big is a tree, and a tree every four
+           metres down a 96 m corridor is an avenue, not a flower bed. Nine per bed at 0.35-0.85 m
+           reads as PLANTING: the eye takes the mass, not the individuals, which is what a bed is.
+           They are still square diamonds and still wider than tall (§06) — the same organism the
+           rest of the world grows, at the size a border plant actually is. */
+        for (let g = 0; g < 9; g++) {
           const o = new THREE.OctahedronGeometry(1, 0);
-          const sc = 0.5 + 0.35 * frac(i * 11 + g * 5 + (side > 0 ? 3 : 0));
-          put3('green', own(o), back + (g - 1) * (A / 36), side * (W * 0.5 + d * 0.5) + (frac(g * 13) - 0.5) * d * 0.5,
-            1.1 + sc * 0.5, 0.5 + 0.5 * gold(i * 3 + g), gold(i + g) * TAU);
-          o.scale(sc * 1.5, sc, sc * 1.5);
+          const sc = 0.35 + 0.5 * frac(i * 11 + g * 5 + (side > 0 ? 3 : 0));
+          o.scale(sc * 1.35, sc * 0.8, sc * 1.35);
+          put3('green', own(o), back + ((g % 3) - 1) * (A / 40),
+            side * (W * 0.5 + d * 0.5) + (frac(g * 13 + i) - 0.5) * d * 0.72,
+            0.95 + sc * 0.4, 0.42 + 0.5 * gold(i * 3 + g), gold(i + g * 3) * TAU);
         }
         stats.beds++;
       }
@@ -374,10 +400,16 @@ export function buildMahHaven(ctx, opts = {}) {
       const b = 20 + 250 * frac(i * 3), l = (gold(i * 5) - 0.5) * 480;
       /* keep it out of the built zones: everything above sits within |lat| < 210 and back < 240 */
       if (Math.abs(l) < 200 && b < 230) continue;
+      /* two tiers, so the reserve has a canopy and an understorey rather than one blob size —
+         a wood reads as a wood because its scales are nested, and a field of identical 6 m
+         octahedra reads as scenery props however carefully they are scattered */
+      const big = frac(i * 17) > 0.72;
       const o = new THREE.OctahedronGeometry(1, 0);
-      const sc = 0.9 + 2.6 * frac(i * 11);
-      o.scale(sc * 1.7, sc, sc * 1.7);
-      put3('green', own(o), b, l, 0.9 + sc * 0.5, 0.4 + 0.5 * gold(i), gold(i * 7) * TAU);
+      const sc = big ? (2.4 + 2.2 * frac(i * 11)) : (0.6 + 1.1 * frac(i * 11));
+      o.scale(sc * 1.55, sc * (big ? 1.15 : 0.85), sc * 1.55);
+      put3('green', own(o), b, l, 0.7 + sc * (big ? 0.9 : 0.55), 0.35 + 0.45 * gold(i), gold(i * 7) * TAU);
+      /* a stem under the canopy tier, so the big ones stand rather than rest on the ground */
+      if (big) put3('dark', chamferBox(sc * 0.5, sc * 1.5, sc * 0.5, sc * 0.12), b, l, sc * 0.75, 0.20);
     }
   }
 
