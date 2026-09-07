@@ -125,6 +125,12 @@ export function buildMahHaven(ctx, opts = {}) {
 
   const B = { plat: [], dark: [], stone: [], green: [] };
   const put = (b, geo, matrix, value) => B[b].push({ geo, matrix, value });
+  /* DECLARED HERE, WITH THE OTHER STATE, NOT NEXT TO sign(). Written beside the function that
+     fills it — below the build that calls it — a `const` is in the temporal dead zone, the first
+     sign() throws a ReferenceError, the assembly's guarded catch turns it into one console line,
+     and the ENTIRE DISTRICT silently does not exist. This is the second time in two modules; the
+     rule is now: every array a builder closes over is declared with the buckets. */
+  const signMats = [];
 
   /* ---- materials. R5 §17: "softer materials, more natural surface variation, less dense emission,
      platinum/diamond used as refined infrastructure rather than constant visual dominance." ---- */
@@ -376,7 +382,6 @@ export function buildMahHaven(ctx, opts = {}) {
   }
 
   /* ---- signage ---------------------------------------------------------------------------------- */
-  const signMats = [];
   function sign(title, sub, back, lat, up, size) {
     const tex = signTexture({ title, sub, mark: true });
     owned.textures.push(tex);
