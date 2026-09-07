@@ -1,0 +1,6 @@
+{
+  "name": "mahworld-shader-lab",
+  "private": true,
+  "type": "module",
+  "description": "Marks the shader lab's files as ES modules for Node tooling, exactly as mahworld/package.json does. Nothing here is installed or bundled; the browser ignores this file. The lab is an isolated dev surface and imports NOTHING from production MAHWORLD except the vendored Three.js build."
+}

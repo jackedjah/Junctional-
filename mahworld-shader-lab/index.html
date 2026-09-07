@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#05080f">
+<title>MAHWORLD SHADER LAB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap">
+<style>
+/* ==================================================================================================
+   MAHWORLD SHADER LAB — chrome.
+
+   LOCOMOTIVE, translated rather than copied. Three things were taken and nothing else:
+     1. RESTRAINT. One family, two weights, one accent. Emphasis is carried by CASE and
+        LETTER-SPACING, never by piling on weight or colour — which is why every label here is
+        uppercase at wide tracking and the only large type is the scene name.
+     2. CORNER ANCHORS AND AIR. The centre of the frame belongs to the work, so the chrome retreats
+        to the four corners and the space between them is left alone.
+     3. A DECISIVE TAKEOVER. The menu is the whole screen, its items reveal in sequence, and
+        choosing one commits the entire scene. A menu that only closes itself is a dropdown.
+   No Locomotive colour, string, asset or layout is reproduced.
+   ================================================================================================ */
+  :root{
+    --void:#05080f; --ink:#eef4ff; --dim:rgba(205,225,255,.52); --faint:rgba(205,225,255,.30);
+    --line:rgba(190,220,255,.16); --line-hi:rgba(190,220,255,.34);
+    --accent:#8fd0ff;
+    --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
+    --pad:clamp(16px,3.2vw,34px);
+    --ease:cubic-bezier(.16,1,.3,1);          /* a long tail — premium motion decelerates slowly */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--void);color:var(--ink);
+    font:400 12px/1.45 "Space Grotesk",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  canvas#lab{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+  /* micro-label: the only typographic device the chrome needs */
+  .lbl{font-size:9px;letter-spacing:.30em;text-transform:uppercase;color:var(--dim);line-height:1}
+
+  .corner{position:fixed;z-index:3;pointer-events:none}
+  .tl{top:calc(var(--pad) + var(--safe-t));left:calc(var(--pad) + var(--safe-l))}
+  .bl{bottom:calc(var(--pad) + var(--safe-b));left:calc(var(--pad) + var(--safe-l))}
+  .tr{top:calc(var(--pad) + var(--safe-t));right:calc(var(--pad) + var(--safe-r));pointer-events:auto;z-index:6}
+  /* above the takeover on purpose: the trigger rotates into an X and becomes the way out. Left
+     under the overlay it was invisible exactly when it was needed. */
+  .br{bottom:calc(var(--pad) + var(--safe-b));right:calc(var(--pad) + var(--safe-r));pointer-events:auto}
+
+  /* ---- top left: identity ---- */
+  .mark{display:flex;align-items:center;gap:9px}
+  .mark i{width:9px;height:9px;background:var(--accent);transform:rotate(45deg);border-radius:1.5px;flex:none}
+  .mark span{font-size:10px;letter-spacing:.26em;text-transform:uppercase}
+
+  /* ---- bottom left: the scene, named. The one place large type is allowed. ---- */
+  .scene{max-width:min(52vw,30ch)}
+  .scene h1{margin:.42em 0 0;font-weight:400;letter-spacing:-.02em;line-height:.98;
+    font-size:clamp(34px,7.4vw,72px)}
+  .scene p{margin:.9em 0 0;color:var(--dim);max-width:26ch;font-size:12px;letter-spacing:.01em}
+  /* the name and note swap on a scene change: out, then in — never a crossfade, which reads as
+     a glitch rather than as a decision */
+  .swap{display:block;transition:opacity .34s var(--ease),transform .34s var(--ease)}
+  .scene[data-swapping="1"] .swap{opacity:0;transform:translateY(10px)}
+
+  /* ---- top right: the menu trigger ---- */
+  .trigger{appearance:none;background:none;border:0;padding:6px 0 6px 14px;margin:0;cursor:pointer;
+    color:var(--ink);font:inherit;display:flex;align-items:center;gap:11px}
+  .trigger .lbl{color:var(--ink);transition:color .3s var(--ease)}
+  .trigger:hover .lbl{color:var(--accent)}
+  .trigger i{position:relative;width:18px;height:10px;flex:none}
+  .trigger i::before,.trigger i::after{content:"";position:absolute;left:0;right:0;height:1px;
+    background:currentColor;transition:transform .42s var(--ease),opacity .28s var(--ease)}
+  .trigger i::before{top:0}
+  .trigger i::after{bottom:0}
+  body[data-menu="1"] .trigger i::before{transform:translateY(4.5px) rotate(45deg)}
+  body[data-menu="1"] .trigger i::after{transform:translateY(-4.5px) rotate(-45deg)}
+  .trigger:focus-visible{outline:1px solid var(--accent);outline-offset:6px}
+
+  /* ---- bottom right: controls + meter ---- */
+  .panel{width:clamp(216px,25vw,262px);display:flex;flex-direction:column;gap:0;
+    transition:opacity .3s var(--ease)}
+  .panel .head{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .panel .head button{appearance:none;background:none;border:0;padding:0 0 0 12px;margin:0;
+    color:var(--dim);font:inherit;font-size:14px;line-height:1;cursor:pointer}
+  .panel .head button:hover{color:var(--ink)}
+  .sliders{display:flex;flex-direction:column;gap:2px;padding-top:4px}
+
+  .ctl{padding:9px 0 4px}
+  .ctl .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:3px}
+  .ctl output{font-size:10px;letter-spacing:.08em;color:var(--ink);font-variant-numeric:tabular-nums}
+  /* the palette control is a NAMED PAIR, not a number — the one thing taken from the MAMESON
+     reference's interface, where the colour slider reads purple at one end and pink at the other.
+     A director can act on "toward warm"; nobody can act on "0.42". */
+  .ctl[data-pair="1"] .top{justify-content:flex-start}
+  .ctl[data-pair="1"] .end{transition:color .3s var(--ease)}
+  .ctl[data-pair="1"] .arrow{flex:1;text-align:center;color:var(--faint);letter-spacing:.2em;font-size:9px}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:none;
+    margin:0;cursor:pointer;display:block}
+  input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--line-hi)}
+  input[type=range]::-moz-range-track{height:1px;background:var(--line-hi)}
+  /* a square-diamond thumb: even the bench speaks the language */
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:9px;height:9px;
+    margin-top:-4px;background:var(--accent);border:0;transform:rotate(45deg);border-radius:1.5px}
+  input[type=range]::-moz-range-thumb{width:9px;height:9px;background:var(--accent);border:0;
+    transform:rotate(45deg);border-radius:1.5px}
+  input[type=range]:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
+
+  .meter{margin-top:13px;padding-top:11px;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:9px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--faint)}
+  .meter b{font-weight:400;color:var(--dim);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+  .meter b[data-m="fps"]{color:var(--ink)}
+  .panel[data-collapsed="1"] .sliders,.panel[data-collapsed="1"] .meter{display:none}
+
+  /* ================================================================================================
+     THE WORLD MENU — a full takeover.
+     Items reveal in sequence from a clipped baseline, which is how a premium menu announces itself:
+     the list assembles rather than appearing. Choosing one commits the whole scene.
+     ============================================================================================== */
+  .menu{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:center;
+    padding:calc(var(--pad) + var(--safe-t)) calc(var(--pad) + var(--safe-r))
+            calc(var(--pad) + var(--safe-b)) calc(var(--pad) + var(--safe-l));
+    background:rgba(5,8,15,.90);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    opacity:0;visibility:hidden;transition:opacity .5s var(--ease),visibility .5s}
+  body[data-menu="1"] .menu{opacity:1;visibility:visible}
+
+  .menu ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;
+    gap:clamp(2px,1.2vh,10px)}
+  .menu li{overflow:hidden}
+  .menu button{appearance:none;background:none;border:0;margin:0;color:var(--ink);font:inherit;
+    cursor:pointer;width:100%;text-align:left;display:flex;align-items:baseline;gap:clamp(12px,2.4vw,26px);
+    padding:clamp(5px,1vh,11px) 0;
+    transform:translateY(105%);transition:transform .62s var(--ease),color .3s var(--ease)}
+  body[data-menu="1"] .menu button{transform:translateY(0)}
+  /* the stagger. Index-driven so adding a scene needs no new CSS. */
+  body[data-menu="1"] .menu li:nth-child(1) button{transition-delay:.05s}
+  body[data-menu="1"] .menu li:nth-child(2) button{transition-delay:.11s}
+  body[data-menu="1"] .menu li:nth-child(3) button{transition-delay:.17s}
+  body[data-menu="1"] .menu li:nth-child(4) button{transition-delay:.23s}
+  body[data-menu="1"] .menu li:nth-child(5) button{transition-delay:.29s}
+
+  .menu .idx{font-size:10px;letter-spacing:.20em;color:var(--faint);flex:none;width:2.6em;
+    transition:color .3s var(--ease)}
+  .menu .nm{font-size:clamp(38px,10.5vw,104px);line-height:.94;letter-spacing:-.025em;font-weight:400}
+  .menu .nt{margin-left:auto;text-align:right;max-width:22ch;color:var(--dim);font-size:11px;
+    letter-spacing:.01em;display:none}
+  @media (min-width:820px){ .menu .nt{display:block} }
+  .menu button:hover .nm,.menu button:focus-visible .nm{color:var(--accent)}
+  .menu button:hover .idx,.menu button:focus-visible .idx{color:var(--accent)}
+  .menu button[aria-current="true"] .idx{color:var(--accent)}
+  .menu button:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
+  .menu .foot{margin-top:clamp(20px,5vh,54px);display:flex;justify-content:space-between;gap:16px;
+    border-top:1px solid var(--line);padding-top:14px}
+
+  body[data-menu="1"] .panel{opacity:0;pointer-events:none}
+  body[data-menu="1"] .scene{opacity:0;transition:opacity .3s var(--ease)}
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.01ms !important}
+    .menu button{transform:none}
+  }
+  /* on a phone the panel is a bottom sheet, because a control you cannot reach with a thumb is
+     not a control */
+  @media (max-width:640px){
+    .br{left:calc(var(--pad) + var(--safe-l))}
+    .panel{width:auto}
+    .scene{max-width:74vw}
+    .scene p{display:none}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="lab"></canvas>
+
+<div class="corner tl" data-chrome>
+  <div class="mark"><i></i><span>MAHWORLD · Shader Lab</span></div>
+</div>
+
+<div class="corner bl" data-chrome>
+  <div class="scene" data-scene>
+    <div class="lbl swap" data-scene-idx>Scene 01</div>
+    <h1 class="swap" data-scene-name>Origin</h1>
+    <p class="swap" data-scene-note>The diamond at rest. Clear air, cool palette.</p>
+  </div>
+</div>
+
+<div class="corner tr">
+  <button class="trigger" data-menu-toggle aria-expanded="false" aria-controls="worldmenu">
+    <span class="lbl">World</span><i aria-hidden="true"></i>
+  </button>
+</div>
+
+<div class="corner br">
+  <section class="panel" data-panel aria-label="Shader controls">
+    <div class="head">
+      <span class="lbl">Controls</span>
+      <button type="button" data-collapse aria-expanded="true" aria-label="Collapse controls">–</button>
+    </div>
+    <div class="sliders" data-sliders></div>
+    <div class="meter">
+      <span>FPS</span><b data-m="fps">–</b>
+      <span>Draws</span><b data-m="draws">–</b>
+      <span>Triangles</span><b data-m="triangles">–</b>
+      <span>Textures</span><b data-m="textures">–</b>
+      <span>Pixel ratio</span><b data-m="pixelRatio">–</b>
+    </div>
+  </section>
+</div>
+
+<nav class="menu" id="worldmenu" data-menu aria-label="World menu">
+  <ol data-menu-list></ol>
+  <div class="foot">
+    <span class="lbl">Select a state — the scene commits</span>
+    <span class="lbl" data-menu-count></span>
+  </div>
+</nav>
+
+<script type="module">
+  import { createShaderLab, CONTROLS, SCENES, THEME_ENDS } from './lab.js';
+
+  const canvas = document.getElementById('lab');
+  const lab = createShaderLab(canvas);
+  /* exposed for the same reason mahplaza exposes its world: a probe or a headless test should read
+     numbers out of the running page rather than judge a screenshot */
+  window.MAHWORLD_SHADER_LAB = lab;
+
+  const $ = s => document.querySelector(s);
+  const q = new URLSearchParams(location.search);
+  if (q.get('hud') === '0') document.querySelectorAll('[data-chrome]').forEach(el => el.hidden = true);
+
+  /* ---- controls, built from the one table in lab.js so a slider can never disagree with the
+     uniform it drives (adding a control there adds it here) ---- */
+  const host = $('[data-sliders]');
+  const ui = new Map();
+  for (const [key, label, min, max, step, dflt] of CONTROLS) {
+    const wrap = document.createElement('div');
+    wrap.className = 'ctl';
+    const id = 'ctl-' + key;
+    const pair = key === 'themeMix';
+    if (pair) wrap.dataset.pair = '1';
+    wrap.innerHTML = pair
+      ? '<div class="top"><label class="lbl end" for="' + id + '" data-end="0">' + THEME_ENDS[0] +
+        '</label><span class="arrow">&#8596;</span><span class="lbl end" data-end="1">' + THEME_ENDS[1] + '</span></div>'
+      : '<div class="top"><label class="lbl" for="' + id + '">' + label +
+        '</label><output for="' + id + '"></output></div>';
+    const input = document.createElement('input');
+    input.type = 'range'; input.id = id;
+    input.min = min; input.max = max; input.step = step; input.value = dflt;
+    const out = wrap.querySelector('output');
+    const ends = wrap.querySelectorAll('.end');
+    const paint = v => {
+      if (out) out.textContent = Number(v).toFixed(2);
+      if (ends.length) {           /* the ACTIVE end brightens — the pair reads without a number */
+        ends[0].style.color = v < 0.5 ? 'var(--ink)' : 'var(--faint)';
+        ends[1].style.color = v >= 0.5 ? 'var(--ink)' : 'var(--faint)';
+      }
+    };
+    input.addEventListener('input', () => { const v = Number(input.value); lab.set(key, v, true); paint(v); });
+    paint(Number(dflt));
+    wrap.appendChild(input);
+    host.appendChild(wrap);
+    ui.set(key, { input, paint });
+  }
+  /* a preset eases the uniforms, so the sliders have to follow the SCENE rather than the click */
+  const syncSliders = () => {
+    for (const [key, c] of ui) {
+      const v = lab.state[key];
+      if (Math.abs(Number(c.input.value) - v) > 0.005) { c.input.value = v; c.paint(v); }
+    }
+  };
+
+  const panel = $('[data-panel]');
+  $('[data-collapse]').addEventListener('click', e => {
+    const on = panel.dataset.collapsed === '1';
+    panel.dataset.collapsed = on ? '0' : '1';
+    e.currentTarget.setAttribute('aria-expanded', String(on));
+    e.currentTarget.textContent = on ? '–' : '+';
+  });
+
+  /* ---- the world menu ---- */
+  const list = $('[data-menu-list]');
+  SCENES.forEach((S, i) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.scene = S.id;
+    b.innerHTML = '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span>' +
+      '<span class="nm">' + S.name + '</span><span class="nt">' + S.note + '</span>';
+    b.addEventListener('click', () => { commit(S.id); closeMenu(); });
+    li.appendChild(b); list.appendChild(li);
+  });
+  $('[data-menu-count]').textContent = SCENES.length + ' states';
+
+  const sceneEl = $('[data-scene]');
+  function commit(id) {
+    const S = SCENES.find(s => s.id === id); if (!S) return;
+    lab.goScene(id);
+    /* out, then in — a swap reads as a decision; a crossfade reads as a glitch */
+    sceneEl.dataset.swapping = '1';
+    setTimeout(() => {
+      $('[data-scene-idx]').textContent = 'Scene ' + String(SCENES.indexOf(S) + 1).padStart(2, '0');
+      $('[data-scene-name]').textContent = S.name;
+      $('[data-scene-note]').textContent = S.note;
+      sceneEl.dataset.swapping = '0';
+    }, 340);
+    for (const b of list.querySelectorAll('button'))
+      b.setAttribute('aria-current', String(b.dataset.scene === id));
+  }
+  commit(SCENES[0].id);
+
+  const toggle = $('[data-menu-toggle]');
+  const openMenu = () => { document.body.dataset.menu = '1'; toggle.setAttribute('aria-expanded', 'true');
+    const f = list.querySelector('button'); if (f) setTimeout(() => f.focus(), 420); };
+  const closeMenu = () => { document.body.dataset.menu = '0'; toggle.setAttribute('aria-expanded', 'false');
+    const l = toggle.querySelector('.lbl'); if (l) l.textContent = 'World'; };
+  const tlabel = toggle.querySelector('.lbl');
+  toggle.addEventListener('click', () => {
+    const open = document.body.dataset.menu === '1';
+    if (open) closeMenu(); else openMenu();
+    tlabel.textContent = open ? 'World' : 'Close';
+  });
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.body.dataset.menu === '1') { closeMenu(); toggle.focus(); }
+  });
+  window.MAHWORLD_SHADER_LAB.ui = { openMenu, closeMenu, commit };
+
+  /* the meter is read from the renderer twice a second — cheap, and the only honest answer to
+     "is this still light enough for a phone" */
+  const cells = {};
+  for (const el of document.querySelectorAll('[data-m]')) cells[el.dataset.m] = el;
+  setInterval(() => {
+    const i = lab.info();
+    for (const k in cells) if (i[k] != null) cells[k].textContent = i[k];
+    syncSliders();
+  }, 500);
+</script>
+</body>
+</html>
