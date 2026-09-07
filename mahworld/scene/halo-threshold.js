@@ -63,7 +63,14 @@ export const THRESHOLD = Object.freeze({
   GATE_R: 3300,
   GATE_W: 46, GATE_H: 26,
   GANTRY_IN: 3380, GANTRY_OUT: 3560, GANTRY_RISE: 26,
-  SHELF_IN: 3500, SHELF_OUT: 5200,
+  /* SHELF_IN IS DERIVED, NOT CHOSEN. R4's second law is that no mass reaches back over the ring,
+     and a mass is not a point: at the inner edge its width is up to 420 m and a lobe may sit 0.45
+     of a half-width from the centre, so the body reaches ~189 m further in than its centre does.
+     3500 put that reach at r 3311, inside a ring edge of 3434. The constant now states the
+     arithmetic instead of a number that happened to work before the masses had volume:
+         ring 3434 + 30 clearance + 189 reach = 3653, taken to 3660. */
+  SHELF_IN: 3660, SHELF_OUT: 5200,
+  RISE: 991, RISE_POW: 3.5,   /* see the rise curve where the shelf is built */
   SHELF_DROP: 62,        /* how far below the rim the nearest cloud tops sit — the distinctness gap */
   MASSES: 68             /* 46 left visible gaps of open sky between banks at the fan's edges */
 });
@@ -473,22 +480,47 @@ export function buildHaloThreshold(ctx, opts = {}) {
       const w = 240 + 620 * far + 180 * gold(i * 11);
       const h = 90 + 300 * far + 60 * frac(i * 13);
       const topNear = rimY - THRESHOLD.SHELF_DROP;
-      /* the rise starts at 0.16 of the way out, not 0.34. At 0.34 the biome only cleared the deck
-         past r 4078, and the deck itself hides everything below it — so from the gate, which is the
-         one place this whole sequence exists to be looked from, there was nothing above the horizon
-         at all. It still tops out BELOW the walking surface near the rim, which is the distinctness
-         clause; it just stops taking 600 m to start climbing. */
-      const top = topNear + (far > 0.16 ? (far - 0.16) * 1180 : 0) - 40 * gold(i * 7);
+      /* THE RISE IS A CURVE, BECAUSE TWO LAWS PULL AGAINST EACH OTHER ON A STRAIGHT LINE.
+
+         R4 requires both that the shelf tops out BELOW the walking surface near the rim (its test
+         band is r < 4100) and that it rises above it far out, so there is somewhere to go. The
+         original rise began at far 0.34 — which is r 4078, tuned to start just inside that band.
+         An earlier round moved it to 0.16 for a good reason (at 0.34 nothing climbed until 600 m
+         out, so from the gate there was no biome above the horizon at all) and thereby broke the
+         first law: the near band then contained masses already climbing, and they measured 2328
+         against a deck at 1840.
+
+         A LINE cannot satisfy both. A CURVE can: pow(far, 3.5) leaves the shelf climbing from the
+         very first mass, so it reads as a rising biome from the gate, while contributing only 2.6
+         per cent of its total lift by the time it reaches the near band's edge. Both clauses hold
+         because the shape of the rise changed, not because either was traded away. */
+      const top = topNear + Math.pow(far, THRESHOLD.RISE_POW) * THRESHOLD.RISE - 40 * gold(i * 7);
       const cy = top - h * 0.5;
       const yaw = gold(i * 17) * TAU;
       const val = 0.62 + 0.38 * (1 - far) * gold(i * 19);
       /* FIVE LOBES PER MASS, packed by sqrt of a uniform so the body has a dense middle and a
          ragged edge. A union of convex bodies has no arms — that is the whole point of the change. */
+      /* A UNITS ERROR, AND IT BROKE TWO R4 LAWS.
+
+         `w` and `h` are the mass's WIDTH and HEIGHT — the envelope the billboard version filled
+         exactly, because a quad of width w IS w wide. A lobe is a radius, so `sc = w * 0.56` made a
+         body 1120 m across inside a 1040 m envelope, and offsetting it by another 0.34w put the
+         outer edge nearly a full width past where the mass was supposed to end.
+
+         Both R4 gates that failed are that one mistake seen from two directions: the shelf reached
+         BACK OVER THE RING (nearest mass r 3241 against a ring edge of 3434) and it TOPPED OUT
+         ABOVE THE WALKING SURFACE near the rim (2328 against a deck at 1840), which is the
+         distinctness clause R4 puts on its acceptance list. Neither gate was wrong. The geometry
+         was, and I did not run R4 after changing it.
+
+         The envelope is now arithmetic: a lobe centre may sit at most OFF from the mass centre and
+         a lobe may be at most RAD across, and OFF + RAD is half a width. Nothing to tune. */
+      const OFF = 0.17, RAD_LO = 0.15, RAD_HI = 0.13;   /* 0.17 + 0.28 = 0.45 of a half-width */
       for (let k = 0; k < 5; k++) {
         const g1 = gold(i * 31 + k * 13), g2 = frac(i * 17 + k * 7), g3 = gold(i * 23 + k * 3);
-        const rad = w * 0.34 * Math.sqrt(g2);
+        const rad = w * OFF * Math.sqrt(g2);
         const ang = g1 * TAU;
-        const sc = w * (0.30 + 0.26 * g3);
+        const sc = w * (RAD_LO + RAD_HI * g3);
         quads.push({
           geo: lobeGeo,
           matrix: free(X + Math.cos(ang) * rad, cy + (g3 - 0.5) * h * 0.34, z + Math.sin(ang) * rad,
@@ -497,14 +529,16 @@ export function buildHaloThreshold(ctx, opts = {}) {
         });
       }
       /* the crown, in the pale key: a top edge the eye can measure the sky against */
+      /* the crown carries the same correction, and sits lower so its own radius cannot lift the
+         mass's top edge past the `top` the distinctness rule computed for it */
       for (let k = 0; k < 3; k++) {
         const g1 = gold(i * 41 + k * 11), g2 = frac(i * 19 + k * 5);
-        const rad = w * 0.22 * Math.sqrt(g2);
+        const rad = w * 0.10 * Math.sqrt(g2);
         const ang = g1 * TAU;
-        const sc = w * (0.20 + 0.16 * g2);
+        const sc = w * (0.085 + 0.065 * g2);
         litQuads.push({
           geo: lobeGeo,
-          matrix: free(X + Math.cos(ang) * rad, top - h * 0.14, z + Math.sin(ang) * rad,
+          matrix: free(X + Math.cos(ang) * rad, top - h * 0.26, z + Math.sin(ang) * rad,
             yaw + 0.3 + g1 * TAU, sc, sc * 0.52, sc * (0.8 + 0.3 * g1)),
           value: 0.7 + 0.3 * gold(i * 23 + k)
         });
@@ -513,6 +547,36 @@ export function buildHaloThreshold(ctx, opts = {}) {
     }
     addMesh(quads, cloudMat, 'halo-threshold-cloud', -3);
     addMesh(litQuads, cloudLit, 'halo-threshold-cloud-lit', -2);
+    /* THE SHELF MEASURES ITSELF NOW.
+
+       R4 states two laws about this biome — it tops out BELOW the walking surface near the rim, and
+       no mass reaches back over the ring — and until the units error above, this module asserted
+       neither. The test caught it, four commits after the fact, because I had stopped running R4.
+       A module that publishes its own compliance fails at BUILD time instead, in the stats line of
+       the very render that introduced the fault. */
+    {
+      const RING = HALO.R_OUT + HALO.APRON;
+      let nearTop = -Infinity, farTop = -Infinity, nearest = Infinity;
+      for (const q of quads.concat(litQuads)) {
+        const e = q.matrix.elements;
+        const cx2 = e[12], cy2 = e[13], cz2 = e[14];
+        /* the lobe's own extent, taken off the matrix rather than from the numbers that made it */
+        const sx = Math.hypot(e[0], e[1], e[2]), sy = Math.hypot(e[4], e[5], e[6]),
+          sz2 = Math.hypot(e[8], e[9], e[10]);
+        const rXZ = Math.max(sx, sz2);
+        const r2 = Math.hypot(cx2, cz2);
+        nearest = Math.min(nearest, r2 - rXZ);
+        const t = cy2 + sy;
+        if (r2 < 4100) nearTop = Math.max(nearTop, t);
+        if (r2 > 4600) farTop = Math.max(farTop, t);
+      }
+      stats.cloudNearestR = +nearest.toFixed(1);
+      stats.cloudTopNear = +nearTop.toFixed(1);
+      stats.cloudTopFar = +farTop.toFixed(1);
+      stats.cloudClearsRing = nearest > RING;
+      stats.cloudBelowDeckNearRim = nearTop < rimY;
+      stats.cloudRisesFarOut = farTop > rimY + 100;
+    }
   }
 
   /* ---- the two solid families ----------------------------------------------------------------- */
