@@ -159,6 +159,15 @@ export function buildMahCrown(ctx, opts = {}) {
     blending: THREE.AdditiveBlending, depthWrite: false, fog: true, toneMapped: true
   });
   lineMat.name = 'crown-mahgic-line'; owned.materials.push(lineMat);
+  /* THE ONE PLACE WARM LIGHT IS LEGAL IN THIS WORLD IS INSIDE A BUILDING. mahplaza LAW-001's
+     exemption is by ROLE and it requires the identifier to name the role — halo-districts relies on
+     exactly this for MAH TABLE's counters. Here it buys the reference's single strongest emotional
+     note: a tower whose every light is cold, and then four windows that are not. */
+  const interiorWarm = new THREE.MeshBasicMaterial({
+    color: 0xffd7a2, transparent: true, opacity: 0.42,
+    blending: THREE.AdditiveBlending, depthWrite: false, fog: true, side: THREE.DoubleSide
+  });
+  interiorWarm.name = 'crown-interior-light'; owned.materials.push(interiorWarm);
 
   const LB = [];   /* the luminous band bucket, merged separately so it can be dimmed as one */
   const putLine = (geo, matrix, value) => LB.push({ geo, matrix, value });
@@ -276,6 +285,78 @@ export function buildMahCrown(ctx, opts = {}) {
         put('glass', chamferBox(0.8, h * 0.94, (w0 + w1) * 0.5 * 0.62, 0.2),
           at(Math.cos(a) * rm, (y0 + y1) * 0.5, Math.sin(a) * rm, -a), 0.44);
       }
+
+      /* ---- R5 §3, THE FACADE LANGUAGE ---------------------------------------------------------
+         The height proof passed, so the detail is authorised — and R5 is specific about what it is:
+         "long clean luminous runs, BROKEN BY AUTHORED DIAMOND NODES, alternating clear / smoked /
+         reflective crystalline bands, occasional large facet planes, rare hero windows/interior
+         glimpses". The banding alone was the reference's LEFT tower; these four additions are what
+         the right one has, and what stops 1.5 km of shaft reading as a knitted sleeve. */
+
+      /* 1. THE VERTICAL MAHGIC CHANNELS. The reference's second tower carries a VERTICAL dash
+         rhythm where the first carries horizontal bands, and a tower with both reads as a building
+         with two elevations rather than as an extrusion. Four per flat, running the segment's full
+         height, so the eye can travel up as well as across. */
+      for (let q = 0; q < 4; q++) {
+        const a = q * Math.PI / 2 + Math.PI / 4;
+        for (let c = -1; c <= 1; c++) {
+          const lat = c * (w0 + w1) * 0.25 * 0.52;
+          const rm = (w0 + w1) * 0.25 * 0.97;
+          const cx = Math.cos(a) * rm - Math.sin(a) * lat;
+          const cz = Math.sin(a) * rm + Math.cos(a) * lat;
+          putLine(chamferBox(0.5, h * 0.92, 0.9, 0.12), at(cx, (y0 + y1) * 0.5, cz, -a),
+            0.42 + 0.3 * frac(k * 5 + q * 3 + c));
+        }
+      }
+
+      /* 2. THE AUTHORED DIAMOND NODES. Large — 0.22 of the segment's width, so they are structure
+         and not studs — on every fifth band, alternating which flats carry them so the tower reads
+         as turning rather than as repeating. §06 holds at 3 km up: wider than tall. */
+      for (let b = 5; b < n; b += 5) {
+        const t = b / n, y = y0 + h * t, w = w0 + (w1 - w0) * t;
+        for (let q = (b / 5) % 2; q < 4; q += 2) {
+          const a = q * Math.PI / 2 + Math.PI / 4;
+          const rm = w * 0.5 * 0.99;
+          const nd = own(new THREE.OctahedronGeometry(1, 0));
+          const sc = w * 0.22;
+          put('plat', nd, at(Math.cos(a) * rm, y, Math.sin(a) * rm, -a, sc, sc * 0.62, sc), 1.0);
+          putLine(chamferBox(0.4, 0.4, sc * 1.9, 0.1), at(Math.cos(a) * rm, y, Math.sin(a) * rm, -a), 1.0);
+          stats.nodes++;
+        }
+      }
+
+      /* 3. A LARGE FACET PLANE, once per segment. R5 asks for "occasional large facet planes...
+         broad readable facets rather than noisy micro-triangles" — one canted crystal plane over a
+         third of an elevation, which is the element that catches the sky when nothing else does. */
+      {
+        const a = ((k * 3) % 4) * Math.PI / 2 + Math.PI / 4;
+        const rm = (w0 + w1) * 0.25 * 1.02;
+        const fh = h * 0.34, fy = y0 + h * (0.30 + 0.12 * frac(k * 7));
+        const face = own(chamferBox(1.4, fh, (w0 + w1) * 0.5 * 0.78, 0.5));
+        face.rotateX(0.055);                       /* canted, so it takes a different sky than the flat */
+        put('plat', face, at(Math.cos(a) * rm, fy, Math.sin(a) * rm, -a), 0.86);
+        stats.facets = (stats.facets || 0) + 1;
+      }
+
+      /* 4. THE HERO WINDOWS. The reference's coldest quality is that almost every light on it is
+         blue — and then three or four windows are WARM, and those are the ones that say people are
+         inside. mahplaza LAW-001 exempts interior light by ROLE and requires the identifier to name
+         it, which halo-districts already relies on for its kiosk counters. Two per segment, placed
+         deterministically, and they are the only warm light in the sanctuary. */
+      for (let hw = 0; hw < 2; hw++) {
+        const t = 0.18 + 0.55 * frac(k * 11 + hw * 7);
+        const y = y0 + h * t, w = w0 + (w1 - w0) * t;
+        const a = (Math.floor(frac(k * 13 + hw * 5) * 4)) * Math.PI / 2 + Math.PI / 4;
+        const rm = w * 0.5 * 1.005;
+        const geo = own(new THREE.PlaneGeometry(w * 0.20, 5.5));
+        const mesh = new THREE.Mesh(geo, interiorWarm);
+        mesh.position.set(Math.cos(a) * rm, y, Math.sin(a) * rm);
+        mesh.rotation.y = -a + Math.PI / 2;
+        mesh.renderOrder = 5;
+        mesh.name = 'crown-interior-light-' + k + '-' + hw;
+        group.add(mesh);
+        stats.heroWindows = (stats.heroWindows || 0) + 1;
+      }
       stats.segments++;
     }
   }
@@ -348,6 +429,8 @@ export function buildMahCrown(ctx, opts = {}) {
       const night = 1 - (s && s.daylight != null ? s.daylight : 0);
       lineMat.opacity = 0.22 + 0.52 * night;
       darkMat.envMapIntensity = 0.62 + 0.30 * night;
+      /* and the hero windows are a NIGHT effect almost entirely: a warm window at noon is a stain */
+      interiorWarm.opacity = 0.06 + 0.44 * night;
     },
     setTheme(t) {
       if (t && t.energyLight) lineMat.color.setHex(t.energyLight);
