@@ -523,6 +523,56 @@ export function buildMonument(ctx) {
      one of them well below the ~0.9 at which LAW 1 bites, so the statues are already correct and
      the correct action here is to leave them alone. The audit below MEASURES that rather than
      asserting it, because that is the difference this module claims to make. */
+  /* R170 D3 — THE STATUES ARE MADE OF WHAT THE ASCENT POD IS MADE OF.
+     "Take whatever the elevator thing looks like, whatever that's made out of, put that on our
+     statues." The elevator is MAH ASCENT and its pod's hull is fobeam.js's podShellMat, which is
+     M.platinumLit — roughness 0.30, metalness 0.38, envMapIntensity 1.4. These two figures were
+     wearing residents.js's walking-around grade: roughness 0.34, metalness 0.22, envMapIntensity
+     at the palette default. Same family, one rung down, and a 27 m public monument standing at the
+     centre of the world was finished like a pedestrian.
+
+     WHAT MOVES AND WHAT DOES NOT, because both halves matter:
+       · the FINISH moves — roughness, metalness and environment response come from the pod's hull,
+         so the statues take the same crisp platinum the vehicle does.
+       · the COLOUR does not. The body grade is white multiplied by VERTEX COLOURS, and the vertex
+         colours ARE the species: the dark facial chamber, the two eyes, the energy accents. This
+         module's header records that a previous pass discarded them and shipped two faceless
+         black-and-white figures with nothing in stats saying so. Keeping the material white and
+         moving only the finish is the whole difference between grading a statue and erasing it.
+       · the `dark` and `light` grades do not move either. Those are the face and the emblem — the
+         part of a MAHBEING that is not metal at all — and the direction asked about what the figures
+         are MADE of, not about their faces.
+
+     THE CLONE IS LOAD-BEARING. residents.js caches one material set per palette name and hands the
+     same three objects to every resident wearing that palette; the plaza is full of them. Mutating
+     the shared `body` would re-finish the entire population to match two statues. So this owns its
+     own copy, keyed by the material it replaces, and hands it only to the figures it built.
+
+     LAW 1 IS NOT DISTURBED. 0.38 is still far below the ~0.9 at which a metal stops taking diffuse
+     light, so the header's reasoning holds unchanged: the up-facing shoulders, deltoids and crowns
+     of both figures are still lit by the diamond's PointLight rather than rendering black, and
+     stats.law1.figures below still MEASURES that rather than assuming it. It measures the new
+     number, which is the point of measuring it. */
+  const POD_FINISH = M.platinumLit || M.platinumMidLit || null;
+  const statueGrade = new Map();
+  const statueGradeOf = (mat) => {
+    if (!mat || !POD_FINISH) return mat;
+    /* only the BODY grade is re-finished; the face and the emblem keep residents.js's own */
+    if (!/-body$/.test(mat.name || '')) return mat;
+    let g = statueGrade.get(mat.name);
+    if (!g) {
+      g = mat.clone();
+      g.roughness = POD_FINISH.roughness;
+      g.metalness = POD_FINISH.metalness;
+      g.envMapIntensity = POD_FINISH.envMapIntensity;
+      g.name = 'monument-statue-hull';
+      g.userData.moduleOwned = true;
+      owned.materials.push(g);
+      statueGrade.set(mat.name, g);
+    }
+    return g;
+  };
+
   const figures = [];
   for (const f of FIGURES) {
     const g = createResident({
@@ -532,11 +582,18 @@ export function buildMonument(ctx) {
     });
     g.name = 'monument-figure-' + f.key;
     g.position.set(f.x, plinthTop + SEAT_H, 0);
-    g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    g.traverse(o => {
+      if (!o.isMesh) return;
+      o.castShadow = true; o.receiveShadow = true;
+      o.material = statueGradeOf(o.material);
+    });
     group.add(g);
     figures.push({ spec: f, group: g });
     stats.figures++;
   }
+  stats.statueHull = POD_FINISH
+    ? { from: 'ascent pod hull (M.platinumLit)', roughness: POD_FINISH.roughness, metalness: POD_FINISH.metalness, envMapIntensity: POD_FINISH.envMapIntensity, grades: statueGrade.size }
+    : { from: 'unavailable — figures keep residents.js grades', grades: 0 };
   group.updateMatrixWorld(true);
 
   /* WHAT WAS ACTUALLY BUILT, measured off the built groups — L07: a count is not a geometry, and

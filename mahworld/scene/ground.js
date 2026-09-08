@@ -336,11 +336,18 @@ export function buildGround(ctx) {
      surface that actually shows it, without any of them needing to touch this file. */
   const poolTex = canvasTexture(128, 128, (c, w, h) => {
     /* the falloff of a real pool of light, not of fog: nearly all of it inside the middle third */
+    /* R170 D2 — and the falloff itself was the third cause. At 0.36 of the radius this curve was
+       still at 23% alpha, so a "few metres" pool was in truth a broad disc with a soft edge, and a
+       dozen of them overlapping is a sheet. The energy is pulled hard into the middle third the
+       comment above always claimed for it: half gone by a fifth of the radius, effectively nothing
+       past half. What survives is the bright centre — the part that says an emitter is standing
+       there — and what goes is the skirt, which said nothing and covered everything. */
     const rg = c.createRadialGradient(64, 64, 0, 64, 64, 64);
     rg.addColorStop(0.00, 'rgba(255,255,255,1)');
-    rg.addColorStop(0.16, 'rgba(255,255,255,0.60)');
-    rg.addColorStop(0.36, 'rgba(255,255,255,0.23)');
-    rg.addColorStop(0.62, 'rgba(255,255,255,0.06)');
+    rg.addColorStop(0.10, 'rgba(255,255,255,0.62)');
+    rg.addColorStop(0.22, 'rgba(255,255,255,0.26)');
+    rg.addColorStop(0.42, 'rgba(255,255,255,0.07)');
+    rg.addColorStop(0.68, 'rgba(255,255,255,0.015)');
     rg.addColorStop(1.00, 'rgba(255,255,255,0)');
     c.fillStyle = rg; c.fillRect(0, 0, w, h);
   });
@@ -363,6 +370,27 @@ export function buildGround(ctx) {
   }
   /* lay a pool of light on the ground. hue null = the world Theme; otherwise the emitter's own hue.
      rx / rz are the ellipse's full width and depth, rot aligns it with whatever throws the light. */
+  /* R170 D2 — THE FLOOR IS PITCH BLACK, AND A POOL IS A POOL OF LIGHT, NOT A FIELD OF IT.
+     The direction is unambiguous: "the entire floor needs to be pitch black looking." It was not.
+     A raycast grid through the plaza's own forward sightline came back with floor-light-pools-themed
+     as the FIRST HIT across the entire lower third of the frame — every pixel of near floor was
+     being read through an additive gradient, and additive gradients do not have a black point. The
+     pools were individually reasonable and collectively a wash: twelve callers across five modules,
+     several asking for 26-30 m radii at k up to 0.5, overlapping into one continuous pale sheet.
+
+     The fix is HERE and not at the twelve call sites, because that is the only place that can hold
+     the line. Every module that owns an emitter is right to answer it on the ground; none of them
+     can see what the other eleven are laying down, and a rule enforced in eleven files is a rule
+     that drifts on the twelfth. So the ceiling lives at the door: a pool may be as bright as its
+     owner likes within POOL_MAX_R metres, and it may not be wider than that, ever.
+
+     POOL_GAIN is the second half, and it is the half that makes the floor black rather than merely
+     less pale: the deck is a mirror at metalness 0.98, so what the eye reads as "the floor" is
+     almost entirely REFLECTION, and every unit of additive light laid on top competes directly with
+     the sky and towers the mirror is carrying. Halving the gain does not dim the world — it hands
+     the floor back to the reflection, which is where this world's floor was always meant to live. */
+  const POOL_MAX_R = 15;
+  const POOL_GAIN = 0.42;
   ctx.lightPool = function lightPool(p) {
     const themed = p.hue == null, mesh = themed ? poolThemed : poolFixed;
     const i = themed ? nThemed : nFixed;
@@ -371,7 +399,10 @@ export function buildGround(ctx) {
        FLOOR_TOP, and a pool that sat at the nominal deck height was bitten into by exactly those
        corners — the field is transparent but it still writes depth. Seven centimetres over a soft
        gradient is invisible from any camera in this world and it clears every one of them. */
-    writePool(mesh, i, { x: p.x, y: p.y == null ? POOL_Y : p.y, z: p.z, rx: p.rx, rz: p.rz == null ? p.rx : p.rz, rot: p.rot || 0, hue: p.hue == null ? null : p.hue, k: p.k == null ? 0.5 : p.k });
+    const rx0 = p.rx, rz0 = p.rz == null ? p.rx : p.rz;
+    writePool(mesh, i, { x: p.x, y: p.y == null ? POOL_Y : p.y, z: p.z,
+      rx: Math.min(rx0, POOL_MAX_R), rz: Math.min(rz0, POOL_MAX_R), rot: p.rot || 0,
+      hue: p.hue == null ? null : p.hue, k: (p.k == null ? 0.5 : p.k) * POOL_GAIN });
     if (themed) nThemed++; else nFixed++;
     mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     return mesh;

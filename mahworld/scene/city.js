@@ -185,21 +185,45 @@ const FR = { base: 1.9, course: 0.72, courseD: 0.32, pier: 0.8, pierD: 0.34, sil
 /* ---- midground blocks: hand-composed so they overlap the gaps between the three destinations
    from the arrival cameras (see the establishing view) — x, z, footprint w × d, total height h,
    setback fraction sb, which side face also gets windows, rooftop pad kind --------------------- */
+/* R170 D1 — FIFTEEN BLOCKS WAS A DISTRICT NOBODY COULD READ. TEN IS A DISTRICT.
+   "Consider removing a lot of the city here. It looks very, very confusing still."
+
+   The confusion was never the far layer — the slabs, ghosts and shafts are four fifths fog by their
+   own feet and behave. It was this table. Fifteen lit-window masses inside a 300 x 200 m band behind
+   the plaza, and from the two cameras that matter FIVE of them stood directly behind another one:
+   not beside it, where an overlap builds depth, but ON it, where an overlap builds an edge that
+   belongs to neither building. That is what reads as noise — not the number of buildings, the number
+   of silhouettes that cannot be assigned to a mass.
+
+   The five that went, and what each was standing behind (bearing from the plaza, near-enough shared):
+     L5  24 m in front of L2 on the same bearing, and 22 m shorter — a smaller box occluding the base
+         of a bigger one, so L2 lost its ground line and L5 never got a skyline.
+     C2  15 m behind C1 and 16 m taller, straddling the centre-left sightline: the pair read as one
+         building with a step in it, which is what MASSING is for and not what two buildings are for.
+     R4  filling the one piece of open air between R2 and R3, closing the right valley into a wall.
+     F1  and
+     F2  the two low flank boxes nearest the plaza, at z -22 and -10. These are the ones that crowded
+         the arrival frame's edges, and they were crowding it in front of MAH GYM, MAH MARKET and
+         MAH FORGE — real destinations with real signage that the eye could not get to.
+
+   TEN REMAIN AND NOT ONE DESTINATION WAS TOUCHED. Every block the world can actually send a player
+   to is still standing — L3 (training pad + elevator), R2 (training), R3 (levitate) — and so is
+   every block the DECK table rings a terrace around. Two things did leave with the five, and are
+   named here rather than discovered later: R4's training pad, of which two others remain, and C2's
+   CROWN gesture, which leaves R2 carrying the district's only crown. That is the correct trade —
+   a crown is a skyline event and C2 could not deliver one from behind C1 — but it means the crown
+   is now a singular gesture in this district and should stay that way deliberately, not by default.
+   DETAIL DID NOT DECREASE HERE — OCCLUSION DID. */
 const BLOCKS = [
   { id: 'L1', x: -104, z: -46,  w: 22, d: 18, h: 34, sb: 0.25, side: 1 },
   { id: 'L2', x: -150, z: -96,  w: 30, d: 24, h: 62, sb: 0.30, side: 1 },
   { id: 'L3', x: -62,  z: -150, w: 26, d: 22, h: 56, sb: 0.28, side: 0, pad: 'training', elevator: true },
   { id: 'L4', x: -112, z: -148, w: 18, d: 16, h: 46, sb: 0,    side: 1, pad: 'levitate', rot: 0 },
   { id: 'C1', x: -26,  z: -186, w: 30, d: 24, h: 54, sb: 0.30, side: 0 },   /* off the centre sightline: the portrait hero must see sky above MAH MATCH */
-  { id: 'C2', x: -38,  z: -196, w: 24, d: 22, h: 70, sb: 0.25, side: 0 },
   { id: 'C3', x: 44,   z: -190, w: 28, d: 22, h: 64, sb: 0.30, side: 0 },
   { id: 'R1', x: 106,  z: -50,  w: 20, d: 18, h: 30, sb: 0,    side: -1 },
   { id: 'R2', x: 116,  z: -112, w: 28, d: 24, h: 50, sb: 0.30, side: -1, pad: 'training' },
   { id: 'R3', x: 74,   z: -164, w: 24, d: 20, h: 52, sb: 0.28, side: 0, pad: 'levitate' },
-  { id: 'R4', x: 84,   z: -126, w: 18, d: 16, h: 42, sb: 0,    side: -1, pad: 'training', rot: 0 },
-  { id: 'F1', x: -108, z: -22,  w: 22, d: 18, h: 26, sb: 0,    side: 1 },
-  { id: 'F2', x: 114,  z: -10,  w: 20, d: 16, h: 22, sb: 0,    side: -1 },
-  { id: 'L5', x: -150, z: -72,  w: 24, d: 20, h: 40, sb: 0.25, side: 1 },
   { id: 'R5', x: 150,  z: -80,  w: 22, d: 20, h: 36, sb: 0.25, side: -1 }
 ];
 /* ---- v7 §50-7 THREE BLOCK MASSINGS -------------------------------------------------------------
@@ -218,10 +242,11 @@ const BLOCKS = [
    its material. Hand-checked against the arrival frame so no two neighbouring blocks share a massing,
    and so the three podiums (which are the only massing that grows its footprint) stand clear of the
    blocks beside them. */
+/* one row per block in BLOCKS and no rows for anything else: a massing for a block that no longer
+   stands is dead data that reads like a promise, and this file has four tables keyed by block id */
 const MASSING = {
   L1: 'slotted', L2: 'slotted', L3: 'stepped', L4: 'podium', C1: 'stepped',
-  C2: 'slotted', C3: 'stepped', R1: 'podium',  R2: 'stepped', R3: 'podium',
-  R4: 'slotted', F1: 'stepped', F2: 'slotted', L5: 'stepped', R5: 'slotted'
+  C3: 'stepped', R1: 'podium',  R2: 'stepped', R3: 'podium',  R5: 'slotted'
 };
 const MASSING_OF = id => MASSING[id] || 'stepped';
 /* ---- v8 §02 PUNGENT DISTRICT COLOUR ------------------------------------------------------------
@@ -236,7 +261,7 @@ const MASSING_OF = id => MASSING[id] || 'stepped';
    R5 28.0° — every one of them clear of 52–72°, 108–124° and 128–142°, so no gesture draws the eye
    into a hole the composition is deliberately keeping open. */
 const ACCENT_DISTRICT = { L: 'violet', F: 'violet', C: 'blue', R: 'cyan' };
-const GESTURE = { L1: 'seam', L2: 'band', C2: 'crown', C3: 'band', R2: 'crown', R5: 'band' };
+const GESTURE = { L1: 'seam', L2: 'band', C3: 'band', R2: 'crown', R5: 'band' };
 /* the two megatalls that wear a full-height seam, keyed by their own bearing|radius row in TOWERS.
    Landmarks, so they take their district's hue: 88° is the centre's tallest, 46° is the right's. */
 const TOWER_SEAM = { '88|665': 'blue', '46|505': 'cyan' };
@@ -318,9 +343,10 @@ const GHOSTS = [
   [86, 700, 46, 760], [102, 650, 42, 660], [76, 730, 44, 800], [38, 690, 40, 700],
   [148, 700, 42, 680], [18, 760, 44, 720], [92, 860, 50, 900], [156, 820, 44, 700]
 ];
-/* the five blocks that carry a floating ring deck (v9 §12, the Jetsons gesture). Five of fifteen:
-   a saucer terrace over every block would be a pattern, over five it is a civic amenity. */
-const DECK = { L1: 1, R1: 1, F2: 1, R5: 1, C3: 1 };
+/* the blocks that carry a floating ring deck (v9 §12, the Jetsons gesture). Four of ten — F2 left
+   with the D1 thinning: a saucer terrace over every block would be a pattern, over four it is a
+   civic amenity, and the ratio the gesture depends on is unchanged by the block that went. */
+const DECK = { L1: 1, R1: 1, R5: 1, C3: 1 };
 
 /* ================================================================================================
    v13 §8 / §6D — THE SKY ROADS AND THE SKYBLOCK CARRIERS
@@ -981,7 +1007,7 @@ export function buildCity(ctx) {
      the hue is chosen per face and rides on the grid's instance colours instead. */
   const glassFaceMat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: true, fog: true });
   glassFaceMat.name = 'city-curtain'; owned.materials.push(glassFaceMat);
-  const glazedIds = { L2: 1, C3: 1, R2: 1, L5: 1, F2: 1, R5: 1 };
+  const glazedIds = { L2: 1, C3: 1, R2: 1, R5: 1 };
 
   /* ONE MODULE PER FACE. The glazing and the platinum frame are now cut from the SAME grid, because a
      pier may only stand in a gap BETWEEN cells and a spandrel course may only sit in a gap between

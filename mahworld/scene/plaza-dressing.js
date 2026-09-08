@@ -524,7 +524,39 @@ export function buildDressing(ctx) {
     if (shadow) m.castShadow = true; if (receive) m.receiveShadow = true;
     group.add(m); return m;
   };
-  add(slab, M.paving || M.platinumLitBrushed || M.graphiteLight, 'dressing-paths', false, true);
+  /* R170 D2 — THE ROAD IS NOT PAINTED ON THE FLOOR. IT IS THE FLOOR.
+     "That x looking road that drives through the middle needs to be extremely platinum and pitch
+     black just like the rest of the floor" — and the operative words are the last five.
+
+     THE BED'S COLOUR WAS NEVER THE PROBLEM. M.paving is 0x0e0f11, black by any measure, and three
+     earlier passes that went after the material's own values are recorded in ground.js as having
+     moved the measured pixel by nothing. The real cause is one the material cannot see: mahplaza.js
+     owns a shader patch that crushes the plaza deck to ELEVEN PERCENT of its own value and then ADDS
+     the planar reflection back — that is what makes this world's floor a black mirror rather than a
+     grey one. It is applied to M.plaza and to everything in ctx.floorMaterials. The path slab was
+     in neither list. So the deck around the road was rendering at 0.11x and the road was rendering
+     at 1.00x, and the X came out five pale ribbons across a black plaza — not because it was light,
+     but because everything around it had been darkened and it had not.
+
+     So it joins the list. The road now goes through the same crush and the same mirror as the deck
+     it crosses, which is the only way it can be "just like the rest of the floor": one surface,
+     one treatment, one value family.
+
+     A CLONE IS NOT OPTIONAL HERE. patchMirror() installs an onBeforeCompile on the material it is
+     given, and M.paving is shared with every paved thing in the world — handing it over would put
+     the plaza's planar reflection on pavements in districts that have no such floor and no such
+     mirror. The clone is what keeps this to the five ribbons it is meant for.
+
+     AND THE PATH STAYS LEGIBLE, WHICH IS THE WHOLE POINT OF IT EXISTING. The finish is untouched:
+     the bed is still matte at roughness 0.34 where the deck is a mirror at 0.055. Through the same
+     patch a matte bed returns almost no reflection, so it reads as the BLACKEST thing in frame while
+     the deck beside it carries the city in streaks — the ribbon is still unmistakable, and now it is
+     unmistakable in the way the direction asked for. The chromeMirror rails and the diamond course
+     are untouched too, and with the bed under them finally black they are the only platinum on it. */
+  const pathBedMat = (M.paving || M.platinumLitBrushed || M.graphiteLight).clone();
+  pathBedMat.name = 'dressing-path-bed'; pathBedMat.userData.moduleOwned = true;
+  (ctx.floorMaterials = ctx.floorMaterials || []).push(pathBedMat);
+  add(slab, pathBedMat, 'dressing-paths', false, true);
   add(curb, M.curb, 'dressing-curbs', true, true);
   /* the 82 merged trim parts are almost all HORIZONTAL caps — foot rings, collars, brackets, bench
      edges, fascias, rims. On a mirror grade they reflect a near-black zenith and render black; on the
@@ -558,7 +590,7 @@ export function buildDressing(ctx) {
   function dispose() {
     if (group.parent) group.parent.remove(group);
     owned.forEach(g => { if (g && g.dispose) g.dispose(); });
-    poolMat.dispose(); seamMat.dispose();
+    poolMat.dispose(); seamMat.dispose(); pathBedMat.dispose();
   }
   setTime(ctx.clock && ctx.clock.state ? ctx.clock.state() : null);
   return { group, setTime, setTheme, update, dispose, stats };
