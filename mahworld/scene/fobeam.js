@@ -177,6 +177,41 @@ const POD_RINGS = [
 const POD_W = 2.6, POD_H = 4.2;              /* 5.2 m across the belt: large enough to be a vehicle, small enough to be in a plaza */
 const POD_BOTTOM = POD_RINGS[0].y * POD_H;   /* −1.76 m: the emitter face sits below the pod's origin */
 const GLASS_BANDS = [6, 7, 8], GLASS_SEGS = [1, 2, 5, 6, 9, 10, 13, 14];
+/* ---- R170 D4: THE CAR HAS DOORS -----------------------------------------------------------------
+   "Let's start enhancing that elevator thing more so that there's doors."
+
+   THE APERTURE IS CUT FROM THE HULL'S OWN LOFT, which is the only way it can fit. loftHull's `only`
+   filter already cuts the glazing and the corner seams out of the same section the hull is lofted
+   from, so a cell list is this file's existing vocabulary for "a hole exactly here": the hull is
+   built with these cells OMITTED, the recessed jamb is built from the SAME cells inset, and the two
+   leaves are built from one cell each. Nothing is measured twice, so nothing can drift apart.
+
+   WHY BANDS 2-6 AND SEGMENTS 1-2, and not a doorway from the shared kit. materials.js's
+   doorwayParts() is the canonical three-tier door and it refuses anything under 2.2 m, correctly:
+   it is architecture, sized for a wall. This is a 4.2 m tall square diamond whose widest line is a
+   belt, and the band where its section is near-constant — rings 2 to 7, s 0.66 through 1.00 back to
+   0.86 — is 2.27 m tall and no taller. A canonical doorway does not fit a vehicle this size and
+   forcing one in would have meant growing the pod, which has its own stated reason for being 5.2 m
+   across ("large enough to be a vehicle, small enough to be in a plaza"). So the pod gets a HATCH in
+   the canonical LANGUAGE — recessed reveal, split leaves, a lit sill — at vehicle scale, and the
+   2.27 m aperture still clears a 2.0 m MAHBEING walking through it.
+   Segments 1 and 2 straddle outline vertex 2, which is the centre of a FLANK. A door on a flank and
+   never on a point: the four points are the brand figure and they stay whole.
+
+   THE LEAVES SWING, and that is a consequence of the shape rather than a style choice. A leaf that
+   slid sideways would have to follow a superellipse whose radius runs from 0.84 to 1.00 and would
+   cut through the hull within a few degrees; a leaf that retracted up or down would have to hide
+   inside a shell that is NARROWER above and below the belt than the leaf is wide, and would poke
+   out of the crown. Hinged at its outer edge, a leaf is lofted from the hull so it matches it
+   exactly when shut, and once it is open it is supposed to be off the hull. */
+const DOOR = Object.freeze({
+  BAND: [2, 6],            /* ring 2 (y -1.26) to ring 7 (y +1.01): the near-constant section */
+  SEGS: [1, 2],            /* the two cells either side of flank centre 2, at 45 deg */
+  INSET: 0.155,            /* how far the LINER sits behind the hull line: the wall thickness you see through the opening */
+  SWING: 1.31,             /* radians a leaf opens to: 75 deg, clear of the opening at walking height */
+  SILL_Y: -1.26            /* the threshold line, at the bottom of the aperture */
+});
+const doorCell = (b, i) => b >= DOOR.BAND[0] && b <= DOOR.BAND[1] && (i === DOOR.SEGS[0] || i === DOOR.SEGS[1]);
 const SEAM_N = 48;                           /* the seam outline is finer than the hull's so one segment is a 0.34 m seam, not a facet */
 const BAND_REPEAT = 11;                      /* travel bands per line, in the line's own height */
 const BAND_RATE = 0.30;                      /* texture v per second — upward, and the only motion cue the eye needs */
@@ -752,9 +787,14 @@ export function buildFobeams(ctx) {
        emitter face point straight up and straight down, and a mirror grade there would reflect the
        near-black zenith and render a black lid on a white pod. */
     const outline = sqOutline(POD_N, POD_P), seamOutline = sqOutline(SEAM_N, POD_P);
-    const hullGeo = own(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, capTop: true, capBottom: true }));
-    const beltGeo = own(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: 0.018, only: b => b === 4 || b === 5 }));
-    const glassGeo = own(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: 0.008, only: (b, i) => GLASS_BANDS.indexOf(b) >= 0 && GLASS_SEGS.indexOf(i) >= 0 }));
+    /* the hull is now built with the door aperture MISSING — a real hole in the shell, not a panel
+       drawn on it. Everything that fills that hole below is lofted from the same outline and rings. */
+    const hullGeo = own(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, capTop: true, capBottom: true, only: (b, i) => !doorCell(b, i) }));
+    const beltGeo = own(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: 0.018, only: (b, i) => (b === 4 || b === 5) && !doorCell(b, i) }));
+    /* band 6 segments 1 and 2 are now doorway, so the glazing gives them up: a window in a door
+       opening is a window onto the inside of the door. The pod is asymmetric now, and it should be —
+       a vehicle with a boarding side is asymmetric, and here that asymmetry is information. */
+    const glassGeo = own(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: 0.008, only: (b, i) => GLASS_BANDS.indexOf(b) >= 0 && GLASS_SEGS.indexOf(i) >= 0 && !doorCell(b, i) }));
     /* the eight corner seams: one segment of a 48-sample outline is a 0.34 m seam sitting exactly on
        the hull it was lofted from, running keel to crown up all four corners of the diamond */
     const seamGeo = own(loftHull(seamOutline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: 0.020, only: (b, i) => b >= 1 && b <= 8 && (i % (SEAM_N / 4) === 0) }));
@@ -771,6 +811,127 @@ export function buildFobeams(ctx) {
     /* the underside field: the square-diamond column of energy the pod stands on where it meets the
        line. It is the pod's contact with the track and it spools up long before anything moves. */
     const fieldGeo = own(column(profile(7, v => 1.0 - 0.72 * Math.pow(v, 0.75)), 8, v => 1.25 * Math.pow(1 - v, 1.5)));
+
+    /* ---- R170 D4: THE DOORWAY AND WHAT IS BEHIND IT ------------------------------------------
+       A hole in a hull is a hole until there is something behind it. Four pieces, and each one is
+       lofted or placed off the SAME numbers the hull is, so the aperture cannot drift from its own
+       frame the way a hand-placed door always eventually does.
+
+         LINER    the hull's own loft, inset by DOOR.INSET, over every cell the door does NOT
+                  occupy. It is the cabin wall, it is what you see through the opening, and it is
+                  the only piece that emits — see the material note below for why the lighting has
+                  to live here and could not live on the fittings.
+         FITTINGS a floor plate at the sill, a low bench across the far wall and a ceiling coffer —
+                  the "other interior elements" the direction asks for, and the reason a lit pod at
+                  25 m reads as somewhere you could stand rather than as a sealed lozenge. All three
+                  are square diamonds, because everything in this world is. They do NOT emit: they
+                  are objects standing in front of a lit wall.
+         COVE     a band of the liner at the ceiling line, in the additive seam grade — a lift's
+                  light where a lift's light goes, and the value the leaves are read against.
+         LEAVES   one hull cell each, hinged at their outer edges. Closed they ARE the hull.
+
+       FIVE DRAW CALLS FOR EVERY POD IN THE WORLD however many pods there are: liner, fittings,
+       cove, and one per leaf — the two leaves are different cells of the hull and so cannot share a
+       geometry. Instanced like everything else here, so the count does not move if a fourth ascent
+       line is ever added. */
+    /* THERE IS NO JAMB PANEL ACROSS THE OPENING, AND THAT WAS THE THIRD MISTAKE THIS DOORWAY MADE.
+       The first cut lofted the aperture's own cells inset by a few centimetres and called it a
+       reveal. It is not a reveal — `only: doorCell` at a smaller `grow` reproduces the SAME curved
+       surface a few centimetres further in, so what it actually builds is a blanking plate over the
+       hole. Cut the hull, put a panel behind it, and the door has never once been open: from the pad
+       you see a recessed panel where a doorway should be, and once that panel was made emissive to
+       light the cabin it became a glowing panel, which is why two rounds of lighting work could not
+       make the opening read as an opening. The hole was closed the whole time.
+       So it is gone. The liner below is the far wall, the fittings stand in front of it, and what
+       you see through the aperture is the inside of the car — which is what an open door is.
+
+       THE CAR HAS TO HAVE AN INSIDE, and the first cut proved it by not having one. With the
+       aperture cut and the leaves open, a camera on the door normal looked straight through the hull
+       and out the other side: loftHull winds every face to point radially OUTWARD, so the far wall
+       of the pod is backfacing from within and culls away. The opening read as a bite taken out of
+       the car rather than as a doorway into it — a hole, which is exactly what the reveal was
+       supposed to prevent, at the one distance where anybody can tell.
+       So the pod gets a LINER: the same loft, inset, over every segment the door does not occupy,
+       across the bands the cabin actually encloses. It shares the cabin's grade and mesh, so it is
+       free in draws, and the cabin material is cloned to DoubleSide because a liner is a surface you
+       are meant to see from the inside — which is the one thing the hull's own winding cannot do. */
+    const linerGeo = loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: -DOOR.INSET,
+      only: (b, i) => b >= DOOR.BAND[0] && b <= DOOR.BAND[1] + 1 && !doorCell(b, i) });
+    /* the flank the door sits on, and the tangent it opens across — derived from the outline rather
+       than typed, so a change to POD_N or POD_P moves the door with the face it belongs to */
+    const dV = (i) => [outline[(i % POD_N) * 2] * POD_W, outline[(i % POD_N) * 2 + 1] * POD_W];
+    const hingeA = dV(DOOR.SEGS[0]), hingeB = dV(DOOR.SEGS[1] + 1);   /* the two OUTER edges of the pair */
+    /* TWO BUCKETS, AND THE SPLIT IS THE WHOLE READ.
+       A single emissive cabin was the second failure of this doorway and the exact opposite of the
+       first: the black cavity became a flat white panel, because one uniform emissive over every
+       surface leaves no shading anywhere and a floor, a bench and a ceiling all render at the same
+       value. Nothing in there was legible as a thing.
+       So the LINING emits and the FITTINGS do not. The walls are the light source; the floor plate,
+       the bench and the coffer keep the palette's ordinary down-facing platinum and read as dark
+       objects standing in front of a lit wall — which is exactly how a lift cabin looks from outside
+       at night, and it is form the geometry already had and the material was throwing away. */
+    const cabinParts = [linerGeo], fitParts = [];
+    {
+      const sillY = DOOR.SILL_Y * POD_H, headY = POD_RINGS[DOOR.BAND[1] + 1].y * POD_H;
+      const _cm = new THREE.Matrix4(), _cq = new THREE.Quaternion(), _ce = new THREE.Euler(), _cp = new THREE.Vector3(), _cs = new THREE.Vector3(1, 1, 1);
+      const place = (geo, x, y, z, ry) => {
+        _ce.set(0, ry || 0, 0); _cq.setFromEuler(_ce); _cp.set(x, y, z); _cm.compose(_cp, _cq, _cs);
+        geo.applyMatrix4(_cm); fitParts.push(geo); return geo;
+      };
+      /* the floor: a square diamond turned 45 deg so its points sit under the hull's points, 3.1 m
+         across — a walkable plate for two, which is what a car this size is */
+      place(chamferBox(3.1, 0.10, 3.1, 0.05), 0, sillY + 0.05, 0, Math.PI / 4);
+      /* the bench, across the wall OPPOSITE the door so a rider faces out through the glazing */
+      const back = -0.7071, bx = back * 1.02 * POD_W * 0.62, bz = back * 1.02 * POD_W * 0.62;
+      place(chamferBox(1.9, 0.12, 0.52, 0.05), bx, sillY + 0.52, bz, Math.PI / 4);
+      place(chamferBox(1.9, 0.44, 0.14, 0.04), bx * 1.14, sillY + 0.30, bz * 1.14, Math.PI / 4);
+      /* the ceiling coffer: a recessed square diamond the interior light sits in, so the cabin is lit
+         from a fitting rather than glowing all over like a lamp shade */
+      place(chamferBox(2.0, 0.12, 2.0, 0.05), 0, headY - 0.06, 0, Math.PI / 4);
+    }
+    const cabinGeo = own(mergeGeos(cabinParts, ['position', 'normal']));
+    const fitGeo = own(mergeGeos(fitParts, ['position', 'normal']));
+    /* the two lit pieces: the coffer's panel and a threshold line at the sill — the same "one energy
+       line at the step" the doorway kit puts under its own opening */
+    const doorGlowParts = [];
+    {
+      const sillY = DOOR.SILL_Y * POD_H, headY = POD_RINGS[DOOR.BAND[1] + 1].y * POD_H;
+      const _gm = new THREE.Matrix4(), _gq = new THREE.Quaternion(), _ge = new THREE.Euler(), _gp = new THREE.Vector3(), _gs = new THREE.Vector3(1, 1, 1);
+      const lit = (geo, x, y, z, ry) => {
+        _ge.set(0, ry || 0, 0); _gq.setFromEuler(_ge); _gp.set(x, y, z); _gm.compose(_gp, _gq, _gs);
+        geo.applyMatrix4(_gm); doorGlowParts.push(geo); return geo;
+      };
+      lit(chamferBox(1.66, 0.05, 1.66, 0.03), 0, headY - 0.14, 0, Math.PI / 4);
+      const mx = (hingeA[0] + hingeB[0]) / 2, mz = (hingeA[1] + hingeB[1]) / 2;
+      lit(chamferBox(1.5, 0.035, 0.12, 0.015), mx * 0.86, sillY + 0.11, mz * 0.86, Math.atan2(mx, mz));
+      /* THE COVE, and it is the piece that makes the cabin somewhere rather than something.
+         A coffer plate facing straight down and a threshold line at the floor are both invisible to
+         the camera that matters — a walker on the pad looks slightly UP into a car docked six metres
+         over their head, and sees neither. What they can see is the back of the cabin through the
+         open door, so the light goes THERE: a continuous band running round the liner just under the
+         ceiling, which is where a lift's light has always lived. It reads through the doorway from
+         outside, it puts a value behind the leaves so they have something to be silhouetted against,
+         and it is the same additive seam grade as every other lit line on this vehicle. */
+      lit(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: -0.135,
+        only: (b, i) => b === DOOR.BAND[1] && !doorCell(b, i) }), 0, 0, 0, 0);
+    }
+    const doorGlowGeo = own(mergeGeos(doorGlowParts, ['position']));
+    /* podSeamMat carries vertexColors: true, and a geometry handed to a vertexColors material with
+       no `color` attribute does not fall back to white — the attribute reads as zero and an ADDITIVE
+       material multiplied by zero is invisible. This module would have compiled, linked, drawn two
+       lit pieces every frame and shown nothing. The attribute is written explicitly for that reason;
+       the animation rides on instanceColor above it. */
+    {
+      const n = doorGlowGeo.attributes.position.count, c = new Float32Array(n * 3);
+      c.fill(1);
+      doorGlowGeo.setAttribute('color', new THREE.BufferAttribute(c, 3));
+    }
+    /* one leaf, twice — each is a single hull cell column, so shut they close the hole exactly */
+    const leafGeo = own(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: -0.012,
+      only: (b, i) => doorCell(b, i) && i === DOOR.SEGS[0] }));
+    const leafGeoB = own(loftHull(outline, POD_RINGS, { sx: POD_W, sy: POD_H, grow: -0.012,
+      only: (b, i) => doorCell(b, i) && i === DOOR.SEGS[1] }));
+
     const shellMesh = new THREE.InstancedMesh(hullGeo, podShellMat, N_ASC);
     const beltMesh = new THREE.InstancedMesh(beltGeo, podBeltMat, N_ASC);
     const glassMesh = new THREE.InstancedMesh(glassGeo, podGlassMat, N_ASC);
@@ -784,9 +945,68 @@ export function buildFobeams(ctx) {
     shellMesh.name = 'ascent-pod-shell'; beltMesh.name = 'ascent-pod-belt'; glassMesh.name = 'ascent-pod-glass';
     seamMesh.name = 'ascent-pod-seams'; fieldMesh2.name = 'ascent-pod-field';
 
+    /* the four doorway meshes. The jamb and cabin take platinumMidLit rather than the hull's grade
+       for a LAW 1 reason and not a decorative one: a cabin floor plate and a ceiling coffer are
+       horizontal faces, and a horizontal mirror under a night zenith renders black — the pod would
+       have had a black floor and a black ceiling seen through its own open door. The lit pieces
+       reuse podSeamMat, which is already additive, already themed and already driven by the clock,
+       so the doorway costs no new material at all. */
+    /* DoubleSide, and a clone to get it: the liner's faces are wound outward like every other loft
+       in this file, and the whole point of a liner is to be seen from the side that winding culls.
+       A clone rather than a mutation because M.platinumMidLit is the palette's own down-facing
+       grade and half the world is wearing it — turning that DoubleSide globally would double the
+       fragment work on every horizontal soffit in MAHWORLD to fix one cabin. */
+    const cabinMat = (M.platinumMidLit || M.platinumLit || podShellMat).clone();
+    cabinMat.side = THREE.DoubleSide;
+    /* AND IT EMITS, because nothing else was ever going to light it. The cabin is an enclosed box on
+       a vehicle six metres in the air at night: the key light does not reach inside it, the
+       environment it is metal enough to reflect is the near-black zenith, and the one lit thing in
+       there is a cove band that lights only itself. The first cut had all of that and rendered a
+       black cavity behind a real doorway — the geometry was right and the read was wrong.
+       A lift interior is lit from within, so the liner is: the palette's own cool interior hue at a
+       low intensity, which is the same answer residents.js gives for a surface that has to carry
+       value in the dark. It is deliberately CONSTANT rather than clock-driven — a lift's cabin light
+       does not go off in the afternoon, and the pod flies at every hour. */
+    cabinMat.color = new THREE.Color(0x8f99a6);
+    cabinMat.emissive = new THREE.Color(0x9fb2cb);
+    cabinMat.emissiveIntensity = 0.62;
+    cabinMat.name = 'ascent-pod-cabin'; cabinMat.userData.moduleOwned = true;
+    owned.materials.push(cabinMat);
+    const cabinMesh = new THREE.InstancedMesh(cabinGeo, cabinMat, N_ASC);
+    /* the fittings take the palette's shared grade unaltered — no clone, no emissive, no DoubleSide.
+       They are lit by the wall behind them the way objects in a room are. */
+    const fitMesh = new THREE.InstancedMesh(fitGeo, M.platinumMidLit || M.platinumLit || podShellMat, N_ASC);
+    fitMesh.name = 'ascent-pod-fittings';
+    const doorGlowMesh = new THREE.InstancedMesh(doorGlowGeo, podSeamMat, N_ASC);
+    const leafMeshA = new THREE.InstancedMesh(leafGeo, podShellMat, N_ASC);
+    const leafMeshB = new THREE.InstancedMesh(leafGeoB, podShellMat, N_ASC);
+    cabinMesh.name = 'ascent-pod-cabin'; doorGlowMesh.name = 'ascent-pod-door-glow';
+    leafMeshA.name = 'ascent-pod-door-a'; leafMeshB.name = 'ascent-pod-door-b';
+    doorGlowMesh.renderOrder = 7;
+    [cabinMesh, fitMesh, doorGlowMesh, leafMeshA, leafMeshB].forEach(m => {
+      m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); m.frustumCulled = false; ascentGroup.add(m);
+    });
+    ascent.door = {
+      cabin: cabinMesh, fit: fitMesh, glow: doorGlowMesh, a: leafMeshA, b: leafMeshB,
+      hingeA, hingeB, swing: DOOR.SWING
+    };
+
     /* ---- per-line state, allocated ONCE ------------------------------------------------------ */
-    ASCENTS.forEach(A => ascent.lines.push({ id: A.id, x: A.x, z: A.z, h: A.h, pod: A.pod, phase: A.phase,
-      w: A.w, charge: 0, burst: 0, podOn: 0, podY: DOCK_Y, field: 3.2 }));
+    /* EVERY POD TURNS ITS DOOR TOWARD THE PLAZA, AND THE ANGLE IS DERIVED, NOT TYPED.
+       A door on a fixed bearing serves whichever pad happens to face the right way and presents the
+       other two edge-on. The turn is a QUARTER at a time because the hull is four-fold symmetric:
+       a multiple of 90 deg maps the square diamond exactly onto itself, so the belt still meets the
+       four blades the cradle clearance was measured against, and the four points stay on the axes.
+       The door's own outward bearing is the flank at 45 deg; the wanted bearing is from the pad to
+       the plaza centre; the yaw is the difference, rounded to the nearest quarter turn. Measured
+       error after rounding: 9 deg west, 16 deg east, 26 deg north — every door faces the arrival. */
+    const Q = Math.PI / 2, FLANK = Math.PI / 4;
+    ASCENTS.forEach(A => {
+      const want = Math.atan2(-A.z, -A.x);            /* pad -> plaza centre, as an outline angle */
+      const yaw = Math.round((FLANK - want) / Q) * Q;
+      ascent.lines.push({ id: A.id, x: A.x, z: A.z, h: A.h, pod: A.pod, phase: A.phase,
+        w: A.w, yaw, charge: 0, burst: 0, podOn: 0, podY: DOCK_Y, field: 3.2, door: 0 });
+    });
     ascent.meshes = { core: coreMesh, band: bandMesh, sheath: sheathMesh, floor: floorMesh, reveal: revealMesh,
       shell: shellMesh, belt: beltMesh, glass: glassMesh, seam: seamMesh, field: fieldMesh2 };
     ascent.tex = bandTex;
@@ -803,7 +1023,8 @@ export function buildFobeams(ctx) {
     });
     coreMesh.instanceMatrix.needsUpdate = bandMesh.instanceMatrix.needsUpdate = sheathMesh.instanceMatrix.needsUpdate = true;
     revealMesh.instanceMatrix.needsUpdate = true;
-    [coreMesh, bandMesh, sheathMesh, revealMesh, floorMesh, shellMesh, beltMesh, glassMesh, seamMesh, fieldMesh2]
+    [coreMesh, bandMesh, sheathMesh, revealMesh, floorMesh, shellMesh, beltMesh, glassMesh, seamMesh, fieldMesh2,
+     cabinMesh, fitMesh, doorGlowMesh, leafMeshA, leafMeshB]
       .forEach(m => { for (let i = 0; i < m.count; i++) m.setColorAt(i, grey); m.instanceColor.needsUpdate = true; });
   }
 
@@ -902,6 +1123,10 @@ export function buildFobeams(ctx) {
      every scratch vector were made at build time. */
   const _lm = new THREE.Matrix4(), _lp = new THREE.Vector3(), _lq = new THREE.Quaternion(), _ls = new THREE.Vector3();
   const _upAxis = new THREE.Vector3(0, 1, 0);
+  /* the door's scratch set, allocated here with every other one for the same stated reason: update()
+     allocates nothing, and SKY-LAW-014 measures that rather than trusting it */
+  const _dm = new THREE.Matrix4(), _dh = new THREE.Matrix4(), _dr = new THREE.Matrix4(), _dt = new THREE.Matrix4();
+  const _dq = new THREE.Quaternion(), _dp = new THREE.Vector3();
   function stepAscent(t) {
     const A = ascent, MS = A.meshes;
     if (!MS) return;
@@ -912,6 +1137,14 @@ export function buildFobeams(ctx) {
       const L = A.lines[i];
       let u = ((t / CYCLE + L.phase) % 1 + 1) % 1;
       let charge = 0, burst = 0, podOn = 0, podY = DOCK_Y, field = 3.2;
+      /* THE DOORS ARE PART OF THE DEPARTURE, NOT A DECORATION ON IT. They open once the car has
+         settled on its field and they are shut and sealed well before ignition — U_SHUT is a
+         quarter of the way from PREP to READY, so the last thing that happens before the line goes
+         hot is the doors closing, which is exactly the beat that tells a watcher it is leaving.
+         A door open during a launch would say the opposite of everything else in this cycle. */
+      const U_OPEN = U_DOCK + 0.012, U_SHUT = U_PREP + (U_READY - U_PREP) * 0.25;
+      let door = 0;
+      if (u >= U_OPEN && u < U_SHUT) door = smoothstep(U_OPEN, U_OPEN + 0.020, u) * (1 - smoothstep(U_SHUT - 0.030, U_SHUT, u));
       if (u >= U_ARRIVE && u < U_DOCK) {
         /* ARRIVAL: the same energy in reverse. It comes down the line out of the sky, decelerating
            hard, and the burst peaks at the moment it settles onto its field. */
@@ -938,7 +1171,7 @@ export function buildFobeams(ctx) {
       } else if (u >= U_GONE && u < U_COLD) {
         charge = 1 - smoothstep(U_GONE, U_COLD, u);            /* the pad cools over ~11 s */
       }
-      L.charge = charge; L.burst = burst; L.podOn = podOn; L.podY = podY; L.field = field;
+      L.charge = charge; L.burst = burst; L.podOn = podOn; L.podY = podY; L.field = field; L.door = door;
 
       /* THE RANK WEIGHTS THE STANDING LINE. IT DOES NOT WEIGHT THE EVENT.
          A launch is the loudest thing this module does, and a secondary line that could not announce
@@ -957,10 +1190,34 @@ export function buildFobeams(ctx) {
       const rev = 0.85 + 0.60 * charge + 1.9 * burst;
       MS.reveal.instanceColor.setXYZ(i, rev, rev, rev);
 
-      /* the pod: one transform for the hull family, one for the field it stands on */
+      /* the pod: one transform for the hull family, one for the field it stands on. The yaw is the
+         quarter turn that aims this car's door at the plaza, computed once at build. */
       const s = L.pod * podOn;
-      _lq.identity(); _lp.set(L.x, podY, L.z); _ls.set(s, s, s); _lm.compose(_lp, _lq, _ls);
+      _lq.setFromAxisAngle(_upAxis, L.yaw); _lp.set(L.x, podY, L.z); _ls.set(s, s, s); _lm.compose(_lp, _lq, _ls);
       MS.shell.setMatrixAt(i, _lm); MS.belt.setMatrixAt(i, _lm); MS.glass.setMatrixAt(i, _lm); MS.seam.setMatrixAt(i, _lm);
+      /* the doorway rides the same transform: the jamb, the cabin and the two lit pieces are part of
+         the car and never move relative to it. Only the LEAVES get a transform of their own. */
+      if (A.door) {
+        const D = A.door;
+        D.cabin.setMatrixAt(i, _lm); D.fit.setMatrixAt(i, _lm); D.glow.setMatrixAt(i, _lm);
+        /* a leaf swings about a VERTICAL axis through its own outer edge, so shut it lies exactly on
+           the hull it was lofted from and open it stands clear of the opening. The hinge point is in
+           the pod's local frame, so the swing is composed BEFORE the pod's own transform: the leaf
+           matrix is podMatrix * T(h) * Ry(theta) * T(-h), and the two leaves turn opposite ways. */
+        const th = door * D.swing;
+        _dq.setFromAxisAngle(_upAxis, th);
+        _dp.set(D.hingeA[0], 0, D.hingeA[1]);
+        _dh.makeTranslation(_dp.x, 0, _dp.z).multiply(_dr.makeRotationFromQuaternion(_dq)).multiply(_dt.makeTranslation(-_dp.x, 0, -_dp.z));
+        D.a.setMatrixAt(i, _dm.multiplyMatrices(_lm, _dh));
+        _dq.setFromAxisAngle(_upAxis, -th);
+        _dp.set(D.hingeB[0], 0, D.hingeB[1]);
+        _dh.makeTranslation(_dp.x, 0, _dp.z).multiply(_dr.makeRotationFromQuaternion(_dq)).multiply(_dt.makeTranslation(-_dp.x, 0, -_dp.z));
+        D.b.setMatrixAt(i, _dm.multiplyMatrices(_lm, _dh));
+        /* the threshold line and the coffer brighten as the doors open: the cabin lighting up is how
+           a car at 25 m says it is boarding rather than merely parked */
+        const dg = 0.30 + 0.95 * door + 0.9 * burst;
+        D.glow.instanceColor.setXYZ(i, dg, dg, dg);
+      }
       const fw = (1.5 + 1.1 * burst) * s;
       _lp.set(L.x, podY + POD_BOTTOM * s, L.z); _ls.set(fw, -L.field * podOn, fw); _lm.compose(_lp, _lq, _ls);
       MS.field.setMatrixAt(i, _lm);
@@ -985,6 +1242,12 @@ export function buildFobeams(ctx) {
     MS.seam.instanceColor.needsUpdate = MS.field.instanceColor.needsUpdate = true;
     MS.shell.instanceMatrix.needsUpdate = MS.belt.instanceMatrix.needsUpdate = MS.glass.instanceMatrix.needsUpdate = true;
     MS.seam.instanceMatrix.needsUpdate = MS.field.instanceMatrix.needsUpdate = true;
+    if (A.door) {
+      const D = A.door;
+      D.cabin.instanceMatrix.needsUpdate = D.fit.instanceMatrix.needsUpdate = D.glow.instanceMatrix.needsUpdate = true;
+      D.a.instanceMatrix.needsUpdate = D.b.instanceMatrix.needsUpdate = true;
+      if (D.glow.instanceColor) D.glow.instanceColor.needsUpdate = true;
+    }
   }
 
   /* THE FLOOR'S SECOND COPY. On black platinum at roughness 0.055 the reflection of a vertical light
@@ -1153,6 +1416,13 @@ export function buildFobeams(ctx) {
   stats.musicLines = musicLines.stats;
   return {
     group, setTime, update, dispose, stats, routes: stats.routes, ascent: stats.ascent,
+    /* THE LIVE LINE STATE, and it is exported so the doors can be MEASURED rather than photographed.
+       stats.ascent is a snapshot taken at build and can say nothing about whether a leaf ever moved;
+       a render can show a 140-pixel pod and settle nothing. These are the same objects stepAscent
+       writes every frame — charge, burst, podY, and `door`, the 0..1 the leaves swing on — so a law
+       can advance the clock and assert the one thing that actually matters about a door on a
+       vehicle: that it is open while the car is docked and shut before the line goes hot. */
+    ascentLines: ascent.lines,
     setTheme(th) { setTheme(th); musicLines.setTheme(th); },
     setQuality(q) { musicLines.setQuality(q); },
     /* the world's single audio surface: hand it normalized band energy and every FOBEAM endpoint

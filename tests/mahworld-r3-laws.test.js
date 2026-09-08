@@ -102,6 +102,55 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     !!rank.upper && rank.upper.length === ws.length && rank.upper.every((v, i) => Math.abs(v - ws[i]) < 1e-3),
     'upper instanceColor ' + JSON.stringify(rank.upper));
 
+  /* ---- THE ELEVATOR HAS DOORS ---------------------------------------------------------------
+     "Let's start enhancing that elevator thing more so that there's doors." A door on a vehicle is
+     three claims, and each one has failed once already in this module's history, so each is checked
+     rather than trusted:
+       · the APERTURE is a real hole in the hull, not a panel drawn on it. The first cut lofted the
+         aperture's own cells inset and called it a reveal — which builds a blanking plate across
+         the opening, so the door was never open at all and two rounds of lighting work went into
+         making a closed panel look like a doorway. The hull's triangle count is the evidence: cells
+         removed from a loft cannot be faked.
+       · the CABIN exists behind it, because a hole with nothing behind it culls straight through to
+         the far side of the world.
+       · the LEAVES actually MOVE, and move in time with the departure rather than at random. */
+  const door = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA, F = w.fobeams;
+    const grab = n => { let m = null; w.scene.traverse(o => { if (o.name === n) m = o; }); return m; };
+    const tris = m => m ? (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3 : 0;
+    const names = ['ascent-pod-shell', 'ascent-pod-cabin', 'ascent-pod-fittings', 'ascent-pod-door-a', 'ascent-pod-door-b', 'ascent-pod-door-glow'];
+    const got = {}; names.forEach(n => { const m = grab(n); got[n] = m ? { tris: tris(m), count: m.count } : null; });
+    /* walk a whole cycle and record, per line, the extremes of `door` and whether it was ever open
+       while no car was on the line — the one state that would be a door hanging in empty air */
+    const seen = (F.ascentLines || []).map(L => ({ id: L.id, max: 0, openWithNoPod: 0 }));
+    for (let k = 0; k < 40; k++) {
+      w.advance(3, 1 / 30);
+      (F.ascentLines || []).forEach((L, i) => {
+        const d = L.door || 0;
+        if (d > seen[i].max) seen[i].max = d;
+        if (d > 0.02 && L.podOn < 0.02) seen[i].openWithNoPod++;
+      });
+    }
+    return { meshes: got, seen };
+  });
+  const dm = door.meshes;
+  P('R3-06-I the ascent car carries a doorway: two leaves, a cabin and a lit sill, all instanced',
+    !!dm['ascent-pod-door-a'] && !!dm['ascent-pod-door-b'] && !!dm['ascent-pod-cabin'] &&
+    !!dm['ascent-pod-fittings'] && !!dm['ascent-pod-door-glow'] &&
+    dm['ascent-pod-door-a'].count === ws.length,
+    JSON.stringify(dm));
+  P('R3-06-J the aperture is a HOLE in the hull, and there is a lined cabin behind it',
+    !!dm['ascent-pod-shell'] && !!dm['ascent-pod-cabin'] &&
+    dm['ascent-pod-shell'].tris < 360 && dm['ascent-pod-cabin'].tris > 60,
+    'hull ' + (dm['ascent-pod-shell'] && dm['ascent-pod-shell'].tris) +
+    ' tris (a whole 16x10 loft with caps is 352), cabin ' + (dm['ascent-pod-cabin'] && dm['ascent-pod-cabin'].tris));
+  P('R3-06-K every car opens its doors somewhere in the cycle',
+    door.seen.length > 0 && door.seen.every(s => s.max > 0.9),
+    JSON.stringify(door.seen.map(s => s.id + ' max ' + s.max.toFixed(2))));
+  P('R3-06-L and no line ever holds a door open with no car on it',
+    door.seen.every(s => s.openWithNoPod === 0),
+    JSON.stringify(door.seen.map(s => s.id + ' ' + s.openWithNoPod)));
+
   /* ============================================================================================
      R3-07 · MAH DESCENT
      ============================================================================================ */
