@@ -74,22 +74,19 @@ function mulberry(seed) {
 
 /* --------------------------------------------------------------- materials */
 const MATERIALS = new Map();
-const ENERGY = { body: [0.10, 0.5], dark: [0.03, 0.22], light: [0.22, 1.3] };   /* [day, +night] emissive */
-/* The night glow follows each facet's brightness (dark planes stay dark, catches
-   flare) so the crystal keeps its cut when lit from inside.  One shared program. */
-const FACET_GLOW = `#include <emissivemap_fragment>
-#ifdef USE_COLOR
-	totalEmissiveRadiance *= 0.35 + 0.65 * clamp( dot( vColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) ) / uFacetLum, 0.0, 2.2 );
-#endif`;
-function facetGlow(material, lum) {
-  material.onBeforeCompile = shader => {
-    shader.uniforms.uFacetLum = { value: Math.max(lum, 1e-3) };
-    shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform float uFacetLum;')
-      .replace('#include <emissivemap_fragment>', FACET_GLOW);
-  };
-  material.customProgramCacheKey = () => 'mahworld-resident-facet-glow';
-}
+/* R1 CHARACTERIZATION — THE EMISSIVE BUDGET MOVED TO WHERE THE LAW PUTS IT.
+   `body` and `darkM` between them carry ~99% of a figure's surface, and both used to hold an
+   emissive in the player's saturated hue: at night that was 0.60 across four fifths of the body.
+   The species sheet spends its emissive in four places — the chest life-core, the two eyes, the
+   mouth and the foot point — which together are a fraction of a percent of the surface, and the
+   law's range is 1-8%. A body that lights itself is also a body that cannot be sculpted by a key
+   light, which is why these figures never showed a lit side and a shadow side.
+   So the crystal is LIT now rather than lit-from-within, and the budget went to `light`, the
+   material the emblem, eyes and mouth are actually made of. This is only affordable because the
+   night key went from 1.35 to 2.15 in the same pass — the moon replaces the glow. */
+const ENERGY = { body: [0.0, 0.03], dark: [0.0, 0.02], light: [0.30, 1.60] };   /* [day, +night] emissive */
+/* R1: the per-facet night-glow shader lived here. It is gone with the emissive it scaled — see the
+   ENERGY note above. Removing it also removes a customProgramCacheKey and its shader variant. */
 const luminance = c => 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
 function materialsFor(name) {
   if (MATERIALS.has(name)) return MATERIALS.get(name);
@@ -98,7 +95,9 @@ function materialsFor(name) {
   const body = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, flatShading: true, roughness: 0.34, metalness: 0.22, emissive: hue.clone(), emissiveIntensity: ENERGY.body[0] });
   const darkM = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, flatShading: true, roughness: 0.26, metalness: 0.5, emissive: hue.clone(), emissiveIntensity: ENERGY.dark[0] });
   const lightM = new THREE.MeshStandardMaterial({ color: light.clone(), flatShading: true, roughness: 0.16, metalness: 0.18, emissive: hue.clone().lerp(light, 0.45), emissiveIntensity: ENERGY.light[0] });
-  facetGlow(body, luminance(hue)); facetGlow(darkM, luminance(dark));
+  /* facetGlow is not applied any more: it scaled emissive by facet brightness, and with the body
+     emissive down at 0.03 it was only smearing the random facet noise — at the cost of a custom
+     shader program and its own cache key. Two fewer material variants to compile. */
   body.name = 'resident-' + name + '-body'; darkM.name = 'resident-' + name + '-dark'; lightM.name = 'resident-' + name + '-light';
   const set = {
     name, body, dark: darkM, light: lightM, energy: 0,
@@ -194,14 +193,23 @@ function painter(rng, cols, tier) {
       else if (r < 0.19) _c.copy(dark).lerp(light, 0.32);
       else _c.copy(dark).multiplyScalar(0.75 + 0.5 * rng());
     } else if (tier === 'torso') {
-      if (r < 0.2) _c.copy(base).lerp(dark, 0.3 + 0.18 * rng());
-      else if (r < 0.3) _c.copy(base).lerp(light, 0.28 + 0.24 * rng());
-      else _c.copy(base).multiplyScalar(0.88 + 0.2 * rng());
-      if (ny > 0.55 && rng() < 0.5) _c.lerp(light, 0.16);
+      /* R1 CHARACTERIZATION — DARK IS THE GROUND, COLOUR IS THE ACCENT.
+         Both of these tiers used to open with `_c.copy(base)` on the majority branch, so 72% of
+         every facet on the largest volumes was the full-saturation player colour. Measured on a
+         built figure that came out 79% saturated / 16% near-black. The species sheet is the exact
+         inverse — a dark crystalline body at 70-85%, platinum on the high planes at 10-25%, and the
+         player's identity carried by the life-core, the eyes and the mouth rather than by the skin.
+         A plaza of saturated figures is the rainbow the sheet's own colour note warns against.
+         Each palette's OWN `dark` is the ground, which is what keeps the platinum and silver themes
+         legitimately lighter than the chromatic ones — the sheet shows exactly that. */
+      if (r < 0.80) _c.copy(dark).multiplyScalar(0.92 + 0.20 * rng()).lerp(base, 0.05 + 0.07 * rng());
+      else if (r < 0.93) _c.copy(dark).lerp(light, 0.45 + 0.25 * rng());
+      else _c.copy(base).lerp(dark, 0.45);
+      if (ny > 0.55 && rng() < 0.5) _c.lerp(light, 0.16);   /* the platinum catch on up-facing planes */
     } else {
-      if (r < 0.16) _c.copy(base).lerp(dark, 0.62 + 0.22 * rng());
-      else if (r < 0.28) _c.copy(base).lerp(light, 0.45 + 0.35 * rng());
-      else _c.copy(base).multiplyScalar(0.78 + 0.34 * rng());
+      if (r < 0.72) _c.copy(dark).multiplyScalar(0.85 + 0.35 * rng()).lerp(base, 0.06 + 0.10 * rng());
+      else if (r < 0.90) _c.copy(dark).lerp(light, 0.55 + 0.30 * rng());
+      else _c.copy(base).lerp(dark, 0.35);                  /* the coloured seam, deliberately a tenth */
       if (ny > 0.55 && rng() < 0.5) _c.lerp(light, 0.25);   /* upward facets catch the sky */
     }
     return _c;
@@ -397,7 +405,17 @@ export function createResident(spec = {}) {
   /* the detail tier drives the lathe segment count and which small features are built at all; the
      SPECIES is identical at every tier — square-diamond head, one continuous teardrop, no legs */
   const SEG = Math.max(6, L.seg - 4), s = m.scale;
+  /* R1 CHARACTERIZATION — THE CALM PAINTER IS WIRED NOW.
+     painter() has always had a third tier, 'torso', and this file's own header describes it as what
+     keeps "the torso, head and arms ... one volume, few shallow dark planes, small facets ... so a
+     figure reads as a sculpted crystal person, not a heap of triangles". It was unreachable: only
+     'body' and 'dark' were ever constructed, so the strong-cut tier meant for the lower teardrop
+     alone was painting the torso, the head rim and both arms as well. The module diagnosed its own
+     defect and never connected the cure. The broad volumes take the calm tier; the teardrop keeps
+     the strong cut, which is exactly the reference's own division — smooth swelling masses, with
+     the faceting concentrated at the terminations. */
   const paintBody = painter(rng, mats.colours, 'body'), paintDark = painter(rng, mats.colours, 'dark');
+  const paintTorso = painter(rng, mats.colours, 'torso');
   const paintLight = () => mats.colours.light;
 
   const group = new THREE.Group();
@@ -440,7 +458,7 @@ export function createResident(spec = {}) {
       { y: T(m.chestY), rx: m.chestRx, rz: m.chestRz, z: m.bustZ },
       { y: T(m.shoulderY), rx: m.chestRx * 0.9, rz: m.chestRz * 0.88 },
       { y: T(m.shoulderY) + 0.04 * s, rx: 0, rz: 0 }
-    ], SEG, paintBody);
+    ], SEG, paintTorso);
     torso.add(meshOf(P, mats.body, 'chest'));
   }
   /* chest emblem: one small bright diamond plate */
@@ -469,7 +487,7 @@ export function createResident(spec = {}) {
       { y: -d * 0.2, rx: w, rz: h },
       { y: d * 0.2, rx: w, rz: h },
       { y: d / 2, rx: w * 0.72, rz: h * 0.72 }
-    ], 4, paintBody, { twist: false });
+    ], 4, paintTorso, { twist: false });
     const rimG = rim.build(); rimG.rotateX(Math.PI / 2); rimG.translate(0, hc, 0);
     const rimM = new THREE.Mesh(rimG, mats.body); rimM.name = 'headRim'; headPivot.add(rimM);
     /* dark front and back panels (the head core) */
@@ -516,7 +534,7 @@ export function createResident(spec = {}) {
          floating where an arm should be. At 2 m nobody saw it; the monument's 27 m figures made it
          the whole picture. Do not reintroduce a local named L inside this loop. */
       const P = new Poly(), r0 = m.upperR, r1 = m.upperR * 0.8, UL = m.upperLen;
-      lathe(P, [{ y: -UL - 0.002, rx: 0, rz: 0 }, { y: -UL, rx: r1, rz: r1 }, { y: -UL * 0.58, rx: r0 * m.bicep, rz: r0 * m.bicep * 0.95 }, { y: -UL * 0.2, rx: r0, rz: r0 }, { y: 0.01, rx: r0 * 0.9, rz: r0 * 0.9 }], Math.max(4, L.armSeg - 2), paintBody);
+      lathe(P, [{ y: -UL - 0.002, rx: 0, rz: 0 }, { y: -UL, rx: r1, rz: r1 }, { y: -UL * 0.58, rx: r0 * m.bicep, rz: r0 * m.bicep * 0.95 }, { y: -UL * 0.2, rx: r0, rz: r0 }, { y: 0.01, rx: r0 * 0.9, rz: r0 * 0.9 }], Math.max(4, L.armSeg - 2), paintTorso);
       swing.add(meshOf(P, mats.body, 'upperArm'));
     }
     const elbow = new THREE.Group(); elbow.position.y = -m.upperLen; swing.add(elbow);
@@ -528,7 +546,7 @@ export function createResident(spec = {}) {
     }
     {
       const P = new Poly(), r0 = m.foreR * 1.08, r1 = m.foreR * 0.72, FL = m.foreLen;   /* FL, not L — see above */
-      lathe(P, [{ y: -FL - 0.002, rx: 0, rz: 0 }, { y: -FL, rx: r1, rz: r1 }, { y: -FL * 0.55, rx: r0 * 0.95, rz: r0 * 0.95 }, { y: -0.01, rx: r0, rz: r0 }], Math.max(4, L.armSeg - 2), paintBody);
+      lathe(P, [{ y: -FL - 0.002, rx: 0, rz: 0 }, { y: -FL, rx: r1, rz: r1 }, { y: -FL * 0.55, rx: r0 * 0.95, rz: r0 * 0.95 }, { y: -0.01, rx: r0, rz: r0 }], Math.max(4, L.armSeg - 2), paintTorso);
       elbow.add(meshOf(P, mats.body, 'forearm'));
     }
     /* hand: a simplified faceted wedge, flat sides facing front/back */

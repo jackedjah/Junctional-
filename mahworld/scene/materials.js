@@ -35,22 +35,24 @@ export function resolveTheme(nameOrTheme) {
 /* Fixed world neutrals (the architecture does not follow the Theme).
    v5: every value moved up a step out of near-black. MAHWORLD is a chromium civilization at
    night — its darks are dark METAL, which returns light, not black plastic which swallows it. */
-export const NEUTRALS = Object.freeze({
-  graphite: 0x2c3a50,      /* main building mass */
-  graphiteDark: 0x1f2a3c,  /* recesses, undersides */
-  graphiteLight: 0x3d4c68, /* aprons, sidewalks, sills */
-  platinum: 0xa9b8cd,      /* bright metal catches */
-  chromium: 0xdfe9f7,      /* mirror-grade chromium: focal trim and hero catches only */
-  chromiumSatin: 0xbecddf, /* satin chromium: broad structural framing */
-  platinumDark: 0x94a3ba,  /* brushed dark platinum: large secondary surfaces */
-  panel: 0x2c3c58,         /* faceted crystalline wall panels */
-  plaza: 0x090c12,         /* BLACK PLATINUM: the hero plaza ground (v8) */
-  road: 0x0b0e14,          /* smooth roadway, the floor's darker sibling */
-  glassTint: 0x2b3f60,
+/* R1 CHARACTERIZATION — THIS TABLE NOW HOLDS ONLY WHAT IT ACTUALLY SERVES.
+   It used to carry fourteen keys and be read for three. The other eleven were a second copy of the
+   metal and mass palette, and they had ALREADY drifted from the materials they claimed to define —
+   `plaza: 0x090c12` here against `color: 0x04060a` on the actual material, a full stop of luminance
+   apart. Nothing outside this file ever imported it, so the drift was invisible and free to grow.
+
+   That is the same fault twice in one codebase: two tables describing one thing, where changing the
+   real one leaves the copy quietly wrong (L42). It became load-bearing the moment the metal ladder
+   was desaturated, because a stale duplicate of the OLD blue palette sitting next to the new one is
+   exactly how the blue comes back. So it is trimmed to the three interior whites it is read for,
+   and named for them. The metals and masses have one home: createMaterials below. */
+export const INTERIOR_WHITES = Object.freeze({
   interior: 0xffeccd,      /* interior light, WARM off-white (v8) */
   interiorPale: 0xfff6e4,  /* the palest warm interior, for deep rooms */
   interiorCool: 0xd7e8ff   /* the old cool white: signage wash and MAHGIC-lit interiors only */
 });
+/* kept as an alias because the name appears in the scene-law suite's file scan */
+export const NEUTRALS = INTERIOR_WHITES;
 
 /* THE PUNGENT ACCENT FAMILY (v8, art-directed).
    The world's darks became darker and its floor became black platinum, and the direction is that
@@ -664,12 +666,12 @@ export function createMaterials(themeIn) {
        ZENITH, which is almost black, so the same hex renders black no matter how bright it looks in
        the source. Every horizontal cap therefore uses `platinumLit` — a LOW-metalness platinum that
        takes diffuse light from the hemisphere and reads at something near its own value. */
-    chromeMirror: new THREE.MeshStandardMaterial({ color: 0xdfe9f7, roughness: 0.03, metalness: 1.0, envMapIntensity: 2.7 }),
-    chromeSatin: new THREE.MeshStandardMaterial({ color: 0xbecddf, roughness: 0.17, metalness: 1.0, envMapIntensity: 2.1 }),
+    chromeMirror: new THREE.MeshStandardMaterial({ color: 0xe7e8e9, roughness: 0.03, metalness: 1.0, envMapIntensity: 2.7 }),
+    chromeSatin: new THREE.MeshStandardMaterial({ color: 0xc9cbce, roughness: 0.17, metalness: 1.0, envMapIntensity: 2.1 }),
     /* THE HORIZONTAL GRADE. Low metalness on purpose — this is the world's platinum FRAMING, and it is
        the single material that makes canopies, terraces, aprons, path bands, collars and rims read. */
-    platinumLit: new THREE.MeshStandardMaterial({ color: 0xb6c4d6, roughness: 0.3, metalness: 0.38, envMapIntensity: 1.4 }),
-    platinumLitBrushed: new THREE.MeshStandardMaterial({ color: 0xacbacc, roughness: 0.36, metalness: 0.4, roughnessMap: brushH, envMapIntensity: 1.3 }),
+    platinumLit: new THREE.MeshStandardMaterial({ color: 0xc0c3c6, roughness: 0.3, metalness: 0.38, envMapIntensity: 1.4 }),
+    platinumLitBrushed: new THREE.MeshStandardMaterial({ color: 0xb6b9bc, roughness: 0.36, metalness: 0.4, roughnessMap: brushH, envMapIntensity: 1.3 }),
     /* ---- v11 PAVING: THE WALKING SURFACE IS PART OF THE BLACK FLOOR ------------------------------
        Direction: "I want the reflective floor almost pitch black."
 
@@ -690,9 +692,9 @@ export function createMaterials(themeIn) {
 
        platinumLitBrushed itself is untouched: buildings.js uses it for the gym canopy top and the
        market terrace decks, which are architecture and should stay bright. */
-    paving: new THREE.MeshStandardMaterial({ color: 0x0b0f16, roughness: 0.34, metalness: 0.40, roughnessMap: brushH, envMapIntensity: 1.3 }),
-    platinumBrushed: new THREE.MeshStandardMaterial({ color: 0x94a3ba, roughness: 0.34, metalness: 0.96, roughnessMap: brushV, envMapIntensity: 1.7 }),
-    graphiteMetal: new THREE.MeshStandardMaterial({ color: 0x2c3a4e, roughness: 0.52, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.5 }),
+    paving: new THREE.MeshStandardMaterial({ color: 0x0e0f11, roughness: 0.34, metalness: 0.40, roughnessMap: brushH, envMapIntensity: 1.3 }),
+    platinumBrushed: new THREE.MeshStandardMaterial({ color: 0x9fa2a7, roughness: 0.34, metalness: 0.96, roughnessMap: brushV, envMapIntensity: 1.7 }),
+    graphiteMetal: new THREE.MeshStandardMaterial({ color: 0x36393e, roughness: 0.52, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.5 }),
     /* THE MISSING RUNG (v7, brief §02). Measured across the whole palette: the building masses sit at
        luminance 49-58 (structural 49, graphite 55, panel 58) and the platinum family at 183-232
        (platinum 183, platinumLit 194, chromeMirror 232). Nothing lived in between, so every elevation
@@ -707,28 +709,28 @@ export function createMaterials(themeIn) {
        what makes this read. platinumMidLit is its horizontal partner at low metalness, for the caps,
        sills and soffits of the same framing — a horizontal mirror faces the near-black zenith and
        renders black, which is the single most expensive mistake this palette has already made once. */
-    platinumMid: new THREE.MeshStandardMaterial({ color: 0x7e90ae, roughness: 0.24, metalness: 0.94, envMapIntensity: 1.85 }),
-    platinumMidBrushed: new THREE.MeshStandardMaterial({ color: 0x7688a6, roughness: 0.32, metalness: 0.92, roughnessMap: brushV, envMapIntensity: 1.7 }),
-    platinumMidLit: new THREE.MeshStandardMaterial({ color: 0x8b9cb8, roughness: 0.34, metalness: 0.4, envMapIntensity: 1.35 }),
-    crystalGlass: new THREE.MeshPhysicalMaterial({ color: 0x2b3f60, roughness: 0.06, metalness: 0.22, transparent: true, opacity: 0.42, side: THREE.DoubleSide, envMapIntensity: 2.0 }),
+    platinumMid: new THREE.MeshStandardMaterial({ color: 0x8b8f96, roughness: 0.24, metalness: 0.94, envMapIntensity: 1.85 }),
+    platinumMidBrushed: new THREE.MeshStandardMaterial({ color: 0x82878e, roughness: 0.32, metalness: 0.92, roughnessMap: brushV, envMapIntensity: 1.7 }),
+    platinumMidLit: new THREE.MeshStandardMaterial({ color: 0x979ba1, roughness: 0.34, metalness: 0.4, envMapIntensity: 1.35 }),
+    crystalGlass: new THREE.MeshPhysicalMaterial({ color: 0x343e4f, roughness: 0.06, metalness: 0.22, transparent: true, opacity: 0.42, side: THREE.DoubleSide, envMapIntensity: 2.0 }),
     /* v5 midtone pass (brief §04): the neutrals move up out of near-black. The world stays a NIGHT world —
        what changed is that its darks are now dark METAL that returns light, not black plastic. */
-    graphite: new THREE.MeshStandardMaterial({ color: 0x2c3a50, roughness: 0.42, metalness: 0.62, roughnessMap: wallTex, envMapIntensity: 1.5 }),
-    graphiteDark: new THREE.MeshStandardMaterial({ color: 0x1f2a3c, roughness: 0.52, metalness: 0.5, envMapIntensity: 1.25 }),
-    graphiteLight: new THREE.MeshStandardMaterial({ color: 0x3d4c68, roughness: 0.46, metalness: 0.46, roughnessMap: floorTex, envMapIntensity: 1.35 }),
-    platinum: new THREE.MeshStandardMaterial({ color: 0xa9b8cd, roughness: 0.2, metalness: 0.98, envMapIntensity: 2.0 }),
-    panel: new THREE.MeshStandardMaterial({ color: 0x2c3c58, roughness: 0.24, metalness: 0.66, flatShading: true, envMapIntensity: 1.7 }),
+    graphite: new THREE.MeshStandardMaterial({ color: 0x36393e, roughness: 0.42, metalness: 0.62, roughnessMap: wallTex, envMapIntensity: 1.5 }),
+    graphiteDark: new THREE.MeshStandardMaterial({ color: 0x27292d, roughness: 0.52, metalness: 0.5, envMapIntensity: 1.25 }),
+    graphiteLight: new THREE.MeshStandardMaterial({ color: 0x474b53, roughness: 0.46, metalness: 0.46, roughnessMap: floorTex, envMapIntensity: 1.35 }),
+    platinum: new THREE.MeshStandardMaterial({ color: 0xb4b7ba, roughness: 0.2, metalness: 0.98, envMapIntensity: 2.0 }),
+    panel: new THREE.MeshStandardMaterial({ color: 0x373b42, roughness: 0.24, metalness: 0.66, flatShading: true, envMapIntensity: 1.7 }),
     /* the physical family — the same dark world, differentiated by roughness and metalness, not by colour */
-    structural: new THREE.MeshStandardMaterial({ color: 0x27354a, roughness: 0.5, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.55 }),   /* dark structural metal: broad muted highlight */
-    composite: new THREE.MeshStandardMaterial({ color: 0x33435e, roughness: 0.3, metalness: 0.62, roughnessMap: brushH, envMapIntensity: 1.6 }),     /* brushed platinum composite */
+    structural: new THREE.MeshStandardMaterial({ color: 0x313439, roughness: 0.5, metalness: 0.9, roughnessMap: wallTex, envMapIntensity: 1.55 }),   /* dark structural metal: broad muted highlight */
+    composite: new THREE.MeshStandardMaterial({ color: 0x3e4249, roughness: 0.3, metalness: 0.62, roughnessMap: brushH, envMapIntensity: 1.6 }),     /* brushed platinum composite */
     /* mirror / satin catches (brief §03): the same language as Mr. Mah's edge catches — these read as
        bright turns of the surface under moonlight and city glow, never as an outline */
     /* `trim` / `trimSatin` / `platinumBrushedH` / `glass` were four materials indistinguishable from
        four others (differing by 1–2 per channel), which made the ranked ladder unreadable. They are
        ALIASES now: same object, one value each, and every existing call site keeps working. */
-    curb: new THREE.MeshStandardMaterial({ color: 0x1c2434, roughness: 0.58, metalness: 0.34, envMapIntensity: 1.2 }),          /* raised edges, kerbs, steps. v11: 0x4a5a76 measured lum 149 beside a deck at 25-68 — with the paving taken to black the kerbs became the brightest thing at floor level, and a kerb is floor furniture, not architecture. Darkened to sit just above the paving so an edge still reads as an edge. */
-    arena: new THREE.MeshStandardMaterial({ color: 0x1d2129, roughness: 0.86, metalness: 0.06 }),                               /* rubberised impact floor */
-    panelLit: new THREE.MeshStandardMaterial({ color: 0x24304a, roughness: 0.4, metalness: 0.2, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */
+    curb: new THREE.MeshStandardMaterial({ color: 0x222427, roughness: 0.58, metalness: 0.34, envMapIntensity: 1.2 }),          /* raised edges, kerbs, steps. v11: 0x4a5a76 measured lum 149 beside a deck at 25-68 — with the paving taken to black the kerbs became the brightest thing at floor level, and a kerb is floor furniture, not architecture. Darkened to sit just above the paving so an edge still reads as an edge. */
+    arena: new THREE.MeshStandardMaterial({ color: 0x202124, roughness: 0.86, metalness: 0.06 }),                               /* rubberised impact floor */
+    panelLit: new THREE.MeshStandardMaterial({ color: 0x2d3036, roughness: 0.4, metalness: 0.2, emissive: 0xcfe0ff, emissiveIntensity: 0.7 }),   /* illuminated panel, restrained */
     /* THE HERO SURFACE — BLACK PLATINUM (v8, art-directed).
        The direction is "black platinum with extreme shine, contrasted with the pungent colour of the
        buildings", and the three reference frames all show the same thing: a near-black floor that is
@@ -747,8 +749,8 @@ export function createMaterials(themeIn) {
        darkening in mahplaza.js's plaza shader patch, which took it to 69. Do not re-tune the numbers
        here to chase floor brightness — it has now been measured three times that they do not
        control it. */
-    plaza: new THREE.MeshStandardMaterial({ color: 0x04060a, roughness: 0.055, metalness: 0.98, envMapIntensity: 2.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.010, transparent: true, opacity: 0.94 }),
-    road: new THREE.MeshStandardMaterial({ color: 0x0b0e14, roughness: 0.14, metalness: 0.9, roughnessMap: floorTex, envMapIntensity: 1.9 }),
+    plaza: new THREE.MeshStandardMaterial({ color: 0x060607, roughness: 0.055, metalness: 0.98, envMapIntensity: 2.6, roughnessMap: diamondTex, bumpMap: diamondTex, bumpScale: 0.010, transparent: true, opacity: 0.94 }),
+    road: new THREE.MeshStandardMaterial({ color: 0x0d0e0f, roughness: 0.14, metalness: 0.9, roughnessMap: floorTex, envMapIntensity: 1.9 }),
 
     /* INTERIOR LIGHT IS WARM NOW (v8, art-directed).
        "Most of the windows should have yellow or an off-white light faintly coming out." That is a
@@ -763,7 +765,7 @@ export function createMaterials(themeIn) {
     /* the soft spill behind a window: warm, translucent, and the thing that makes a lit room read as
        having depth rather than being a bright rectangle */
     interiorSoft: new THREE.MeshBasicMaterial({ color: 0xf2d9a8, transparent: true, opacity: 0.5 }),
-    interiorSoftCool: new THREE.MeshBasicMaterial({ color: 0x8fb4e6, transparent: true, opacity: 0.5 }),
+    interiorSoftCool: new THREE.MeshBasicMaterial({ color: 0x9fb2cb, transparent: true, opacity: 0.5 }),
     /* ================= GLASS SHARDS, WITH REAL REFRACTION (v9, art-directed) ==================
        "Create these glass shard looking elements all across the buildings and some of the floor",
        and "actually incorporate physics of light refraction".
@@ -787,17 +789,17 @@ export function createMaterials(themeIn) {
                       and inlaid in the floor, where displacement would never be legible anyway.
        A builder that reaches for shardHero more than a few times per scene has misread this. */
     shardHero: new THREE.MeshPhysicalMaterial({
-      color: 0xdfe9f7, metalness: 0, roughness: 0.045, transmission: 1, ior: 1.62, thickness: 1.6,
+      color: 0xe6e8ec, metalness: 0, roughness: 0.045, transmission: 1, ior: 1.62, thickness: 1.6,
       dispersion: 2.2, attenuationColor: new THREE.Color(0x9fc4ef), attenuationDistance: 3.4,
       clearcoat: 1, clearcoatRoughness: 0.03, side: THREE.DoubleSide, envMapIntensity: 2.4, flatShading: true
     }),
     shardClear: new THREE.MeshPhysicalMaterial({
-      color: 0xd6e6fb, metalness: 0, roughness: 0.075, transmission: 0.92, ior: 1.48, thickness: 0.75,
+      color: 0xe1e5e9, metalness: 0, roughness: 0.075, transmission: 0.92, ior: 1.48, thickness: 0.75,
       attenuationColor: new THREE.Color(0x8fb4e6), attenuationDistance: 2.2,
       clearcoat: 0.9, clearcoatRoughness: 0.06, side: THREE.DoubleSide, envMapIntensity: 2.1, flatShading: true
     }),
     shardFacet: new THREE.MeshPhysicalMaterial({
-      color: 0x9fc0e8, metalness: 0.12, roughness: 0.11, transparent: true, opacity: 0.55,
+      color: 0xb3bdca, metalness: 0.12, roughness: 0.11, transparent: true, opacity: 0.55,
       clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.45, side: THREE.DoubleSide,
       envMapIntensity: 2.6, flatShading: true
     }),

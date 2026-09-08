@@ -25,9 +25,29 @@ import { canvasTexture } from './materials.js';
 const KEYS = {
   /* LUMINOUS NIGHT (brief §01, §10, §11): the night stays deep in absolute value but is filled with
      controlled light — a moon that is a real key, sky and city bounce that keep dark planes readable,
-     and a horizon that glows with the district behind it. Never daylight; never a black field. */
-  night: { top: 0x081226, mid: 0x102446, horizon: 0x1d3d6e, fog: 0x152c52, hemiSky: 0x74a0dc, hemiGround: 0x1e2a3f, hemiI: 1.5, sun: 0xbcd6ff, sunI: 1.35, fillI: 0.66, exposure: 1.06, stars: 1.0, haze: 0.62, infra: 1.0, sunDisc: 0, clouds: 0.18, bands: 0.5 },
-  dusk:  { top: 0x1a1a48, mid: 0x3d3688, horizon: 0x7466b4, fog: 0x3c3672, hemiSky: 0x8a8ed4, hemiGround: 0x1c1f38, hemiI: 1.15, sun: 0xd8dbff, sunI: 1.3, fillI: 0.42, exposure: 1.02, stars: 0.35, haze: 0.55, infra: 0.8, sunDisc: 0.7, clouds: 0.3, bands: 0.5 },
+     and a horizon that glows with the district behind it. Never daylight; never a black field.
+
+     R1 CHARACTERIZATION — THE MOON WAS NOT A KEY. The paragraph above says "a moon that is a real
+     key" and the day row below says "the sun is the KEY (light has a direction; shadows read)".
+     Night did not do either: sunI 1.35 against hemiI 1.5 meant the HEMISPHERE out-lit the moon,
+     0.9:1. A hemisphere light has no direction and casts no shadow, so for the state this world is
+     almost always in, the dominant source was a dome with no position — which is precisely the
+     "brighten the world using ambient everywhere" the direction forbids, and the reason platinum
+     could never show the moving bright bands that make it read as metal.
+
+     And that dome was the most saturated light in MAHWORLD: hemiSky 0x74a0dc, saturation 0.60,
+     arriving on every surface from every angle. A blue palette lit by a blue dome is why the world
+     reads as one hue. Day was already right at 6:1 and is untouched.
+
+       night   key:hemi  0.9:1 -> 3.07:1     hemiSky sat 0.60 -> 0.14
+       dusk    key:hemi  1.1:1 -> 3.36:1     hemiSky sat 0.46 -> 0.14
+
+     The hemisphere colours are desaturated at CONSTANT LUMINANCE (drift under 0.15/255), and the
+     energy the dome loses is handed to the moon rather than deleted, so the night keeps its overall
+     level and gains a direction. Night stays more ambient than day on purpose — sky glow and city
+     bounce are real — but 3:1 is a night with shadows in it and 0.9:1 is a light box. */
+  night: { top: 0x081226, mid: 0x102446, horizon: 0x1d3d6e, fog: 0x152c52, hemiSky: 0x919cac, hemiGround: 0x27292e, hemiI: 0.70, sun: 0xbcd6ff, sunI: 2.15, fillI: 0.34, exposure: 1.06, stars: 1.0, haze: 0.62, infra: 1.0, sunDisc: 0, clouds: 0.18, bands: 0.5 },
+  dusk:  { top: 0x1a1a48, mid: 0x3d3688, horizon: 0x7466b4, fog: 0x3c3672, hemiSky: 0x8f91ab, hemiGround: 0x1f2025, hemiI: 0.58, sun: 0xd8dbff, sunI: 1.95, fillI: 0.28, exposure: 1.02, stars: 0.35, haze: 0.55, infra: 0.8, sunDisc: 0.7, clouds: 0.3, bands: 0.5 },
   /* day: the sun is the KEY (light has a direction; shadows read), sky fill stays secondary */
   day:   { top: 0x5f87bd, mid: 0x8fb0d8, horizon: 0xc4d5ea, fog: 0xb3c6df, hemiSky: 0xcfdff3, hemiGround: 0x2a3340, hemiI: 0.55, sun: 0xf3f7ff, sunI: 3.3, fillI: 0.12, exposure: 0.98, stars: 0.0, haze: 0.22, infra: 0.3, sunDisc: 1, clouds: 0.42, bands: 0.34 }
 };
