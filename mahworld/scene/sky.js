@@ -20,7 +20,7 @@
    at each form: the dome, the discs, the sprites, the ribbons and the tube beams
    have no sharp silhouette to correct. */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { canvasTexture } from './materials.js';
+import { canvasTexture, setCelestialPath } from './materials.js';
 
 const KEYS = {
   /* LUMINOUS NIGHT (brief §01, §10, §11): the night stays deep in absolute value but is filled with
@@ -549,6 +549,25 @@ export function buildSky(ctx) {
        magnitude hierarchy survives the fade — a dust star at dusk must still be fainter than a
        bright one at dusk, and scaling all three off one number would flatten them back together
        exactly where the sky is hardest to hold. */
+    /* R170 D6 — AND THE FLOOR IS TOLD WHERE THEY ARE.
+       "The floor is platinum, so it has that reflective property, so it corresponds with how the
+       sun and the moon are moving with the time of day."
+       This is the only place in the world that knows where both bodies are, so it is the only place
+       that should be telling the ground. One write per clock change reaches every registered ground
+       surface — the plaza's four grades, city.js's 126-620 m field and terrain.js's land out to
+       2600 m — so the path they all show is by construction the SAME path, on the same bearing, from
+       the same body. Two tables describing one sky is how a floor and its horizon drift apart.
+       Whichever body is up owns the path, and it brings its own colour: the sun's is the key light's
+       own warm white, the moon's is cold blue. The handover happens exactly when the lighting's does,
+       because both read `sun.day` — the floor cannot be catching a sun the sky has already set. */
+    const celDir = sun.day ? sunDir : moonDir;
+    setCelestialPath(celDir, sun.day ? k.sun : 0xa8c6ff,
+      /* the sun is far brighter than the moon, but this world's night is its hero look, so the day
+         path is held a little under rather than allowed to blow the deck out: full at night, about
+         three quarters at noon. The path is never switched OFF by daylight — a polished floor at
+         midday has the hottest path it will ever have, and killing it would contradict the physics
+         the whole feature is built on. */
+      0.74 + 0.26 * (1 - clockState.daylight));
     for (const t of starTiers) t.pts.material.opacity = t.base * k.stars;
     /* the galaxy band is night sky like the stars: it washes out on the same key as daylight rises */
     galaxy.material.opacity = 0.92 * k.stars;

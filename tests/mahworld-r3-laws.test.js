@@ -151,6 +151,53 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
     door.seen.every(s => s.openWithNoPod === 0),
     JSON.stringify(door.seen.map(s => s.id + ' ' + s.openWithNoPod)));
 
+  /* ---- THE SUN AND THE MOON ON THE FLOOR -----------------------------------------------------
+     "The floor is platinum, so it has that reflective property, so it corresponds with how the sun
+     and the moon are moving with the time of day."
+     THIS FEATURE FAILED SILENTLY TWICE BEFORE IT WORKED, in two different ways, and both are the
+     reason these checks exist rather than a render:
+       1. mahplaza's mirror patch assigned onBeforeCompile flatly instead of chaining, which deleted
+          the path from the four PLAZA grades while leaving it on the two outer rings. The world
+          looked fine. The hero floor had no path at all.
+       2. The path was injected before <opaque_fragment>, which is the chunk that ASSIGNS
+          gl_FragColor, so it was computed and immediately overwritten — while every "did the
+          replace match" flag reported success, because the replace HAD matched.
+     So: the patch is on every ground surface, every one of its four replaces matched, and the
+     direction it points actually changes with the clock and hands over between the two bodies. */
+  const cel = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const S = await import('/mahworld/scene/materials.js');
+    const mats = [], seen = new Set();
+    w.scene.traverse(o => {
+      if (!o.isMesh || !o.material) return;
+      for (const m of (Array.isArray(o.material) ? o.material : [o.material])) {
+        if (!m || !m.userData || !m.userData.mahCelestial || seen.has(m.uuid)) continue;
+        seen.add(m.uuid);
+        mats.push({ mesh: o.name || '?', applied: m.userData.mahCelestial.applied });
+      }
+    });
+    /* read the live direction at two hours that are certainly on opposite sides of the handover */
+    const sample = (t) => { w.setTime(t); w.advance(0.2, 1 / 30); const c = S.setCelestialPath();
+      return { d: [c.dir.x, c.dir.y, c.dir.z], col: c.color.getHexString(),
+               sky: c.uniforms.length ? c.uniforms[0].uCelSky.value : null }; };
+    const night = sample('23:00'), noon = sample('12:00');
+    return { mats, night, noon, n: mats.length };
+  });
+  const allLanded = cel.mats.length > 0 && cel.mats.every(m =>
+    m.applied && m.applied.vDecl && m.applied.vWrite && m.applied.fDecl && m.applied.fApply);
+  P('R3-08-A every ground surface in the world carries the celestial path, all four replaces matched',
+    allLanded && cel.n >= 6,
+    cel.n + ' surfaces: ' + JSON.stringify(cel.mats.map(m => m.mesh)));
+  const moved = Math.hypot(cel.night.d[0] - cel.noon.d[0], cel.night.d[1] - cel.noon.d[1], cel.night.d[2] - cel.noon.d[2]);
+  P('R3-08-B the path MOVES with the clock rather than sitting at a fixed bearing',
+    moved > 0.5, 'direction moved ' + moved.toFixed(3) + ' between 23:00 and 12:00');
+  P('R3-08-C and the two bodies hand over: the night path is not the colour of the day path',
+    cel.night.col !== cel.noon.col,
+    'night #' + cel.night.col + ' vs noon #' + cel.noon.col);
+  P('R3-08-D the day sky holds the path back rather than letting it blow the deck out',
+    cel.noon.sky != null && cel.noon.sky < cel.night.sky,
+    'sky factor noon ' + cel.noon.sky + ' < night ' + cel.night.sky);
+
   /* ============================================================================================
      R3-07 · MAH DESCENT
      ============================================================================================ */

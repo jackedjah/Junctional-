@@ -44,7 +44,7 @@
    What was deliberately LEFT sharp: the crossing studs, the shard sockets and the monument's crystal
    are all the square-diamond brand figure, which §06 exempts by name. */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { canvasTexture, chamferBox, fobMark, cutGem, gemGirdle, GEM } from './materials.js';
+import { canvasTexture, chamferBox, fobMark, cutGem, gemGirdle, GEM, applyCelestialPath } from './materials.js';
 import { SITES } from './buildings.js';
 
 export const PLAZA_RADIUS = 27;
@@ -447,6 +447,21 @@ export function buildGround(ctx) {
   const satinMat = new THREE.MeshStandardMaterial({ color: 0x0a0e16, roughness: 0.30, metalness: 0.96, envMapIntensity: 2.2, transparent: true, opacity: 0.92, flatShading: true });
   const contrastMat = new THREE.MeshStandardMaterial({ color: 0x0d1220, roughness: 0.20, metalness: 0.97, envMapIntensity: 2.5, transparent: true, opacity: 0.88, flatShading: true });
   ctx.floorMaterials = [heroMat, satinMat, contrastMat];
+  /* R170 D6 — THE DECK CATCHES THE SUN AND THE MOON.
+     The four grades that make up the plaza floor all take the celestial path, and they take it at
+     DIFFERENT tunings, because that difference is the whole reason this world has four grades:
+       hero      roughness 0.045, the polished centre — the tightest, brightest path
+       plaza     the base plane under everything, one step softer
+       contrast  roughness 0.20
+       satin     roughness 0.30, the outer field — the broadest and dimmest
+     A path that was identical on all four would flatten a floor system the rest of this file spends
+     six hundred lines building. Read across the plaza at night you now get a beam that sharpens as
+     it crosses the hero field and softens on the satin, which is what a real polished floor does
+     and is exactly the "local variation" the detail bible asks for instead of decoration. */
+  applyCelestialPath(heroMat, { az: 88, el: 4.6, gain: 1.30 });
+  applyCelestialPath(contrastMat, { az: 62, el: 5.4, gain: 0.92 });
+  applyCelestialPath(satinMat, { az: 42, el: 6.4, gain: 0.70 });
+  if (M.plaza) applyCelestialPath(M.plaza, { az: 76, el: 5.0, gain: 1.12 });
   {
     const hero = [], satin = [], contrast = [], joints = [], outerJoints = [], studs = [], outerStuds = [];
     const inset = 0.42;                                   /* the joint width between two cells */

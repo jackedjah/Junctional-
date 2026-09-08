@@ -1534,7 +1534,21 @@ export async function createMahplaza(canvas, options = {}) {
        (they no longer need to let anything through), and they join the hidden list in collect() so
        the field does not render into its own reflection. */
     const patchMirror = (mat) => {
-      mat.onBeforeCompile = (shader) => {
+      /* R170 D6 — THIS CHAINS, AND IT DID NOT, AND THAT SILENTLY DELETED ANOTHER MODULE'S SHADER.
+         onBeforeCompile is ONE slot on a material. This used to assign into it flatly, which is
+         fine while nothing else patches the plaza floor and catastrophic the moment something does:
+         ground.js applies the celestial sun/moon path to these same four grades during its build,
+         mahplaza patches the mirror onto them afterwards, and the assignment threw the earlier
+         function away. The materials still compiled, still rendered, still mirrored — and carried no
+         path at all, while the two OUTER ground rings (which mahplaza never touches) carried it
+         correctly. A floor feature that worked everywhere except the hero surface, with nothing
+         anywhere reporting a problem.
+         Caught by reading back applyCelestialPath's own per-replace flags rather than by looking at
+         a render, because a missing highlight looks exactly like a highlight that is meant to be
+         subtle. Any future patch on these materials must chain the same way. */
+      const prev = mat.onBeforeCompile;
+      mat.onBeforeCompile = (shader, renderer) => {
+        if (prev) prev(shader, renderer);
         shader.uniforms.tPlazaMirror = { value: mirror.rt.texture };
         shader.uniforms.uMirrorMatrix = { value: mirror.texMatrix };
         shader.uniforms.uMirrorStrength = mirror.strength;

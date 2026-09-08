@@ -50,6 +50,7 @@
    everything merges to a handful of draw calls. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
+import { applyCelestialPath } from './materials.js';
 
 /* The three valleys city.js leaves open, in its polar convention (bearing degrees). Mountains and
    planting concentrate here, because these are the only bearings a viewer can see through. */
@@ -415,6 +416,18 @@ export function buildTerrain(ctx) {
      sits darkest where it meets the city and lifts toward the mountains, which reads as distance. */
   const landMat = new THREE.MeshBasicMaterial({ vertexColors: true, fog: false });
   landMat.name = 'terrain-land'; owned.materials.push(landMat);
+  /* R170 D6 — THE PATH REACHES THE HORIZON, and this is the surface that proves it can.
+     This ring is a MeshBasicMaterial: it is unlit by design, it has no normals worth the name and it
+     would never take a specular highlight from a light in the scene. The celestial path does not
+     care — it is analytic, it derives everything from the world position and one direction vector,
+     and <opaque_fragment> is present in a basic material exactly as it is in a standard one. So the
+     moon runs all the way from under itself at 2600 m, across the land, over city.js's field and
+     onto the plaza deck as ONE unbroken column, which is the only way "the entire ground" can share
+     one sky rather than three surfaces each doing their own thing.
+     The widest azimuth and the loosest elevation of any surface here: at this radius the path is
+     nearly edge-on, and a tight lobe would vanish into a single row of pixels. Dim, because the far
+     land is background and the detail bible is explicit that background stays quiet. */
+  applyCelestialPath(landMat, { az: 22, el: 8.5, gain: 0.62 });
   {
     const seg = 96, rings = 7;
     const land = new THREE.RingGeometry(LAND_INNER, LAND_OUTER, seg, rings).toNonIndexed();

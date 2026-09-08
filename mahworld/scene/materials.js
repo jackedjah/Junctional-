@@ -1317,3 +1317,152 @@ function mergeGeometries(list) {
   out.computeBoundingSphere();
   return out;
 }
+
+/* =================================================================================================
+   R170 D6 — THE CELESTIAL PATH: THE SUN AND THE MOON ON A PLATINUM FLOOR
+   =================================================================================================
+   Direction: "Make sure that the sun and the moon reflects accordingly to the floor, because the
+   floor is platinum so it has that reflective property to it, so it corresponds with how the sun
+   and the moon are moving with the time of day."
+
+   WHY THIS IS NOT THE PLANAR MIRROR. mahplaza owns a planar reflection pass, and it is the right
+   instrument for the plaza deck: it returns the actual city, upside down, where a viewer is close
+   enough to read it. It is the WRONG instrument for this, twice over. Its render target is sized
+   and aimed for a 260 m deck, so projecting it across the 620 m city ring and the 2600 m land ring
+   samples outside its own coverage; and the sun and moon are not IN it — they sit on the sky dome
+   at radius 800 with `fog: false`, and a reflection pass that hid the floor from itself was never
+   going to bring them back.
+
+   So the path is ANALYTIC, which is also what it physically is. A polished floor under a single
+   distant source does not return a disc — it returns a COLUMN, the glitter path you see running
+   toward you across water or wet stone. That column is the microfacet distribution seen edge-on:
+   the surface's slope variation is symmetric, but the geometry of a grazing view stretches the lobe
+   enormously along the vertical and barely at all across it. Two separate tolerances is therefore
+   not a cheat, it is the shape of the thing:
+
+       TIGHT IN AZIMUTH    the path is narrow left-to-right, so it reads as a beam pointing at you
+       LOOSE IN ELEVATION  the path runs from under the source all the way to your feet
+
+   WHAT THIS BUYS THAT NOTHING ELSE COULD. It costs about fifteen ALU and no render target, so it
+   works on EVERY ground surface at EVERY distance — the deck, the 620 m ring and the land out to
+   2600 m all catch the same moon on the same bearing, which is the only way "the entire ground" can
+   share one sky. It needs no shadow map, no second pass and no texture. And because it is driven
+   from one direction vector, it tracks the clock exactly: the path swings round the world as the
+   sun rises and sets, hands over to the moon at dusk, and lies down toward the horizon as either
+   one drops — all of which is the direction's "corresponds with how they are moving".
+
+   ONE SOURCE, MANY CONSUMERS. Every patched material shares the SAME uniform objects, held in the
+   module-level registry below, so the assembly writes the sun/moon direction ONCE per clock change
+   and every ground surface in the world turns with it. Two tables describing one sky is how the
+   floor and the horizon drift apart, and this file has paid for that lesson elsewhere. */
+const CELESTIAL = {
+  dir: new THREE.Vector3(0.4, 0.6, 0.7).normalize(),
+  color: new THREE.Color(0xdfeaff),
+  gain: { value: 1.0 },
+  uniforms: []          /* every patched material's uniform set, written together by setCelestialPath */
+};
+
+/* Register a ground material to catch the sun and the moon.
+     `az`   azimuth tightness — higher is a narrower path. 90 is a hard beam, 26 a broad sheen.
+     `el`   elevation looseness — LOWER stretches the path further toward the viewer.
+     `gain` how bright this surface's path is: a polished deck takes more than a matte field.
+   Horizontal surfaces only. Every caller is a floor, and the shader assumes the up normal for the
+   reflection so a ring's own vertex normals cannot wobble the path — see the note at `N` below. */
+export function applyCelestialPath(mat, { az = 62, el = 5.5, gain = 1.0 } = {}) {
+  if (!mat || mat.userData.mahCelestial) return mat;
+  const u = {
+    uCelDir: { value: CELESTIAL.dir },
+    uCelColor: { value: CELESTIAL.color },
+    uCelGain: { value: gain },
+    uCelSky: { value: 1.0 }
+  };
+  CELESTIAL.uniforms.push(u);
+  mat.userData.mahCelestial = { az, el, gain, applied: {} };
+  const prev = mat.onBeforeCompile;
+  mat.onBeforeCompile = (shader, renderer) => {
+    if (prev) prev(shader, renderer);
+    const rec = mat.userData.mahCelestial.applied;
+    const swap = (src, find, repl, key) => {
+      const out = src.replace(find, repl);
+      rec[key] = out !== src;           /* a replace that matched nothing returns the string unchanged */
+      return out;
+    };
+    shader.uniforms.uCelDir = u.uCelDir;
+    shader.uniforms.uCelColor = u.uCelColor;
+    shader.uniforms.uCelGain = u.uCelGain;
+    shader.uniforms.uCelSky = u.uCelSky;
+    /* the world position has to be carried explicitly. MeshBasicMaterial has no vViewPosition and
+       none of these materials can be relied on to define worldpos varyings, so this patch brings
+       its own rather than borrowing one that exists in some material classes and not others —
+       the same mistake that made an earlier patch here silently inert on basic materials. */
+    shader.vertexShader = swap(shader.vertexShader, '#include <common>',
+      '#include <common>\nvarying vec3 vMahCelW;', 'vDecl');
+    shader.vertexShader = swap(shader.vertexShader, '#include <project_vertex>',
+      '#include <project_vertex>\nvMahCelW = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;', 'vWrite');
+    shader.fragmentShader = swap(shader.fragmentShader, '#include <common>',
+      '#include <common>\nvarying vec3 vMahCelW;\nuniform vec3 uCelDir;\nuniform vec3 uCelColor;\n' +
+      'uniform float uCelGain;\nuniform float uCelSky;', 'fDecl');
+    shader.fragmentShader = swap(shader.fragmentShader, '#include <opaque_fragment>', `#include <opaque_fragment>
+      {
+        /* N IS THE UP AXIS AND NOT THE SHADED NORMAL, deliberately. Every caller is a horizontal
+           floor, and two of them carry a diamond roughness map whose job is to break the surface
+           up — feeding that broken normal into a reflection this sharp would shatter the path into
+           speckle at exactly the distances where it should be reading as one clean column. The
+           relief still shows: it is in the roughness, which is what the path's own falloff rides. */
+        vec3 N = vec3( 0.0, 1.0, 0.0 );
+        vec3 V = normalize( vMahCelW - cameraPosition );
+        vec3 R = reflect( V, N );
+        vec3 L = normalize( uCelDir );
+        /* the path only exists where the reflected ray is going UP toward a source that is itself
+           above the horizon: below either, there is nothing up there to catch */
+        float up = step( 0.001, R.y ) * smoothstep( -0.06, 0.10, L.y );
+        vec2 ra = normalize( R.xz + vec2( 1e-5 ) ), la = normalize( L.xz + vec2( 1e-5 ) );
+        float dAz = 1.0 - dot( ra, la );          /* 0 on the bearing of the source */
+        float dEl = abs( R.y - L.y );             /* 0 at the perfect mirror angle */
+        float path = exp( -dAz * ${az.toFixed(1)} ) * exp( -dEl * ${el.toFixed(2)} ) * up;
+        /* THE PATH IS ADDED AFTER <opaque_fragment>, AND IT TOOK TWO WRONG ANSWERS TO GET HERE.
+           <opaque_fragment> is the chunk that ASSIGNS gl_FragColor: literally
+           gl_FragColor = vec4( outgoingLight, diffuseColor.a ).
+             · Writing gl_FragColor BEFORE it means the include overwrites the path one line later.
+               That was the first cut, and it reported success the whole time — the replace matched,
+               so every applied flag came back true. Landing a patch and having an effect are two
+               different claims and only the first was being checked.
+             · Writing outgoingLight before it looks correct and is still wrong HERE, because
+               mahplaza's mirror patch multiplies outgoingLight by 0.11 to make this floor a black
+               mirror, and that patch is applied after this one, so it lands closer to the include
+               and runs last. The path was being computed, added, and then crushed to a ninth of
+               itself by a completely different module's shader. Nothing was broken; two correct
+               patches were simply fighting over one variable.
+           Adding to gl_FragColor AFTER the include settles it: the path is applied to the finished
+           colour, so no upstream term can scale it away, and it still passes through tone mapping,
+           colour space and fog — which is what you want, because a reflection of the moon should be
+           tone mapped like light and should recede with distance like everything else.
+           And it dies back with the day: uCelSky is 1 at night and about three quarters at noon, so
+           a floor under a bright sky returns a broader, weaker sheen than a beam. */
+        gl_FragColor.rgb += uCelColor * ( path * uCelGain * uCelSky );
+      }`, 'fApply');
+    /* a distinct program per tuning, so two surfaces with different path shapes do not share one
+       compiled shader and quietly take each other's numbers */
+    mat.customProgramCacheKey = () => 'mahcel:' + az + ':' + el;
+  };
+  mat.needsUpdate = true;
+  return mat;
+}
+
+/* THE ONE WRITE. The assembly calls this from its clock, and every registered ground surface turns
+   with it — deck, city ring and land ring on the same bearing at the same instant.
+     `dir`      unit vector toward whichever body is up (sky.js's sunDirection / moonDirection)
+     `color`    that body's own colour: the sun's path is warm-white, the moon's is cold blue
+     `sky`      0..1, how much of the path survives the ambient sky — 1 at night, near 0 at noon
+
+   CALLED WITH NO ARGUMENTS IT READS AND DOES NOT WRITE, which is not a convenience — it is a bug
+   this function already caused once. The first cut defaulted a missing `sky` to 1 and wrote it, so
+   a probe that called setCelestialPath() to ASK what the sky factor was silently set it to 1 on
+   every surface first, and then dutifully reported 1 back at every hour of the day. An accessor
+   that changes what it is measuring is worse than no accessor. */
+export function setCelestialPath(dir, color, sky) {
+  if (dir) CELESTIAL.dir.copy(dir).normalize();
+  if (color != null) CELESTIAL.color.set(color);
+  if (sky != null) for (const u of CELESTIAL.uniforms) u.uCelSky.value = sky;
+  return CELESTIAL;
+}

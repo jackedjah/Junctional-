@@ -119,7 +119,7 @@
    Life anchors pushed: ctx.lifeAnchors.paths (walkway + 3 bridges, kind
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, windowGrid, canvasTexture, ACCENT, apertureField, doorwayParts, applyDistanceDim } from './materials.js';
+import { chamferBox, windowGrid, canvasTexture, ACCENT, apertureField, doorwayParts, applyDistanceDim, applyCelestialPath } from './materials.js';
 import { foblockParts } from './foblock.js';   /* §6D: a SKYBLOCK CARRIER is an elongated FOBLOCK, so it grows from the genome */
 
 /* R170 §5 — THE DISTANCE-DIM CURVE, in metres of view depth. See applyDistanceDim in materials.js.
@@ -958,6 +958,14 @@ export function buildCity(ctx) {
        everywhere it is ever seen. Carrying it would cost a derivative pair per fragment across the
        largest single surface in the world to render something that cannot be resolved. So the plaza
        keeps its bump, where a walker stands two metres from the stone, and the field does not. */
+  }
+  /* R170 D6 — AND THE FIELD CATCHES THE SAME MOON THE DECK DOES. This is the surface that makes the
+     path a WORLD feature rather than a plaza feature: it runs from 126 m to 620 m, so the column of
+     light crosses the whole middle distance and arrives at the deck instead of starting there.
+     Broader and dimmer than the deck's grades because this is the satin end of the floor, and its
+     azimuth is the widest of any surface — at this radius a tight path would be a thread. */
+  applyCelestialPath(groundMat, { az: 34, el: 7.0, gain: 0.78 });
+  {
   }
   owned.materials.push(winMat, stripMat, whiteMat, groundMat, spillWarmM, spillCoolM, accentWashM);
 
