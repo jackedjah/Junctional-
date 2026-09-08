@@ -175,6 +175,16 @@ export const NEXUS = Object.freeze({
     COUNT: 6, SEAT_TIER: 1, SEAT_R: 156, LAND_R: 980, LAND_VARY: 240, R0: 76, R1: 58, N: 3.6,
     PHASE: 12,                      /* degrees, so no trunk sits on a base corner */
     FLARE: 2.4,                     /* see below: the exponent that makes this a tree */
+    /* THE CAPITAL (R170 §14). The branch TAPERS as it climbs — 76 m at the seat, 58 m at the top —
+       so it arrived at the halo underside as its own thinnest section butting a slab. Geometrically
+       it touched (the gate measures a 17 m overlap and has always passed); compositionally it read
+       as attached afterward, which is the one thing §14 forbids.
+       Every column that has ever carried a ceiling widens before it gets there. CAP_GAIN is how many
+       times its own radius the branch opens to at the very top, CAP_RUN the fraction of the climb
+       that opening happens over. u^2 makes the onset imperceptible and the arrival decisive — a
+       fillet, not a cone — so what you see is a branch that BECOMES structure rather than a tube
+       with a trumpet stuck on it. 58 x 2.05 = 119 m across 206 m of run at this scale. */
+    CAP_GAIN: 2.05, CAP_RUN: 0.13,
     STATIONS: 72, RADIAL: 26
   }),
   /* R7 §5 / §2 — THE PRIMARIES ARE THE TREE, AND THEY WERE A CAGE.
@@ -379,6 +389,21 @@ export function doorBearings() {
 
 /* halo.js's cross-section, quoted rather than re-derived — L42. The underside is the slab's
    lower face, and every trunk in this file terminates ON it. */
+/* A PRIMARY'S RADIUS AT FRACTION t OF ITS CLIMB — the taper, then the capital (see PRIMARY.CAP_*).
+   EXPORTED AND USED BY EVERY CONSUMER, because the halo entry fittings sit in the top 96 m of the
+   run and that is exactly where the capital opens: a collar sized off the old constant R1 would now
+   be INSIDE the branch it is supposed to grip, and would simply vanish. One radius, one source —
+   this is the L42 rule, and the entry fittings are precisely the second table that would have
+   drifted. */
+export function primaryR(t) {
+  const P = NEXUS.PRIMARY;
+  const r = P.R0 + (P.R1 - P.R0) * t;
+  const lo = 1 - P.CAP_RUN;
+  if (t <= lo) return r;
+  const u = (t - lo) / P.CAP_RUN;
+  return r * (1 + (P.CAP_GAIN - 1) * u * u);
+}
+
 export function haloUnderY(x, z) {
   const d = Math.hypot(x, z), u = d - NEXUS.HALO_R_MID;
   return NEXUS.HALO_Y + (u * u) / (2 * NEXUS.HALO_R_DISH) - NEXUS.HALO_THICK / 2;
@@ -869,7 +894,7 @@ export function buildMahNexus(ctx, opts = {}) {
       }
       const curve = new THREE.CatmullRomCurve3(landVertical(pts, lx, ly, lz, LAND_TAIL));
       push('trunk', sweptTube(curve, P.STATIONS, P.RADIAL,
-        t => P.R0 + (P.R1 - P.R0) * t, () => P.N, t => 0.18 * t, true, true));
+        t => primaryR(t), () => P.N, t => 0.18 * t, true, true));
     }
     stats.parts.primary = P.COUNT;
     stats.primaryAspect = +(rise / (P.R0 * 2)).toFixed(1);
@@ -1104,13 +1129,22 @@ export function buildMahNexus(ctx, opts = {}) {
       if (L.id.indexOf('primary-') !== 0) continue;   /* the six big routes get real terminals */
       const rr = Math.hypot(L.x, L.z) || 1;
       const aDeg = Math.atan2(-L.z, L.x) / DEG;
+      /* THE FITTINGS RIDE THE CAPITAL. Each sits a known DROP below the ceiling, so its own t is
+         1 - drop/run, and its size comes from primaryR at that t. Before the capital existed these
+         were all sized off the constant P.R1 and it made no difference; with a branch that opens
+         to 2.05x in its last 206 m, a collar sized off R1 would be buried inside the flare. */
+      /* the PRIMARY's own base, not the core's — they sit on different seat tiers, and using the
+         core's would put every fitting at the wrong t on a taller run. */
+      const runM = Math.max(1, L.y - NEXUS.SEAT_Y[P.SEAT_TIER]);
+      const tAt = d => Math.max(0, Math.min(1, 1 - d / runM));
+      const rAt = d => primaryR(tAt(d));
       /* 1. THE DOCKING COLLAR — a ring around the branch just under the ceiling, thicker than the
             branch it grips, which is what makes it read as a fitting and not a stripe. */
       {
         const cy = L.y - NEXUS.ENTRY.COLLAR_DROP;
         const pts = [], STEPS = 30;
         for (let i = 0; i < STEPS; i++) {
-          const phi = (i / STEPS) * TAU, cr = superR(phi, P.R1 * NEXUS.ENTRY.COLLAR_R, 3.6);
+          const phi = (i / STEPS) * TAU, cr = superR(phi, rAt(NEXUS.ENTRY.COLLAR_DROP) * NEXUS.ENTRY.COLLAR_R, 3.6);
           pts.push(new THREE.Vector3(L.x + Math.cos(phi) * cr, cy, L.z + Math.sin(phi) * cr));
         }
         push('tube', sweptTube(new THREE.CatmullRomCurve3(pts, true), 64, 10,
@@ -1123,13 +1157,13 @@ export function buildMahNexus(ctx, opts = {}) {
         const inner = new THREE.Vector3(L.x, ty, L.z);
         const outer = new THREE.Vector3(L.x, ty + 1.2, L.z);
         push('deck', sweptTube(new THREE.LineCurve3(inner, outer), 2, 44,
-          () => P.R1 * NEXUS.ENTRY.TERRACE_R, () => 3.2, () => 0, true, true));
+          () => rAt(NEXUS.ENTRY.TERRACE_DROP) * NEXUS.ENTRY.TERRACE_R, () => 3.2, () => 0, true, true));
       }
       /* 3. THE THRESHOLD — portalAt facing DOWN and outward along the branch's own bearing, so the
             arrival reads as the same door family as the ground entries. One genome, two ends. */
-      portalAt(L.x + Math.cos(aDeg * DEG) * (P.R1 * NEXUS.ENTRY.TERRACE_R * 0.86),
+      portalAt(L.x + Math.cos(aDeg * DEG) * (rAt(NEXUS.ENTRY.TERRACE_DROP) * NEXUS.ENTRY.TERRACE_R * 0.86),
         L.y - NEXUS.ENTRY.DOOR_DROP,
-        L.z - Math.sin(aDeg * DEG) * (P.R1 * NEXUS.ENTRY.TERRACE_R * 0.86),
+        L.z - Math.sin(aDeg * DEG) * (rAt(NEXUS.ENTRY.TERRACE_DROP) * NEXUS.ENTRY.TERRACE_R * 0.86),
         aDeg, NEXUS.ENTRY.DOOR_SCALE);
       entries++;
     }
@@ -1265,7 +1299,7 @@ export function buildMahNexus(ctx, opts = {}) {
       for (let k = 0; k <= 10; k++) {
         const t = k / 10, e = t * t * (3 - 2 * t);
         /* the primary's own centreline, pushed out to its flank so the rail lies ON the trunk */
-        const rr = (P.SEAT_R + (landR - P.SEAT_R) * e) + (P.R0 + (P.R1 - P.R0) * t) * G.OFFSET;
+        const rr = (P.SEAT_R + (landR - P.SEAT_R) * e) + primaryR(t) * G.OFFSET;
         const [x, z] = polar(aDeg + 3.5, rr);
         pts.push(new THREE.Vector3(x, y0 + (ly - y0) * t, z));
       }
@@ -1353,7 +1387,11 @@ export function buildMahNexus(ctx, opts = {}) {
         const aDeg = Math.atan2(-L.z, L.x) / DEG;
         for (let k = 0; k < V.DOCKED; k++) {
           const a2 = aDeg + (k - (V.DOCKED - 1) / 2) * 9;
-          const rr = NEXUS.PRIMARY.R1 * NEXUS.ENTRY.TERRACE_R * 0.72;
+          /* the docked craft ride the terrace, so they ride the capital with it — parked off the
+             old constant radius they would now sit inside the flared branch. */
+          const pr = primaryR(Math.max(0, Math.min(1, 1 - NEXUS.ENTRY.TERRACE_DROP /
+            Math.max(1, L.y - NEXUS.SEAT_Y[NEXUS.PRIMARY.SEAT_TIER]))));
+          const rr = pr * NEXUS.ENTRY.TERRACE_R * 0.72;
           const [dx, dz] = polar(a2, rr);
           _pos.set(L.x + dx, L.y - NEXUS.ENTRY.TERRACE_DROP + V.DOCK_LIFT, L.z + dz);
           _q.setFromUnitVectors(_up, new THREE.Vector3(Math.cos(a2 * DEG), 0, -Math.sin(a2 * DEG)));
