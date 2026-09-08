@@ -156,5 +156,15 @@ P('LAW-099 one marking per plate, not one per face — the plate is transmissive
 P('LAW-100 the marking clears the bore instead of being cut in half by it',
   /y - PLATE\.B \* 0\.\d+/.test(BLD));
 
+/* ---- R167 §F the plaza names the world once ---------------------------------------------------- */
+P('LAW-101 there is ONE destination table, at module scope where every builder can reach it',
+  /const CORE_DEST = Object\.freeze\(\[/.test(MP) && /const list = CORE_DEST\.map/.test(MP),
+  'nav menu must read the hoisted table');
+P('LAW-102 the assembly hands that table to the modules that name the world on a surface',
+  /directory: CORE_DEST/.test(MP));
+P('LAW-103 the plaza directory board draws from it and states no destination of its own',
+  /ctx\.directory/.test(src['plaza-dressing.js']) &&
+  !/MAH GYM|MAH MATCH|MAH MARKET/.test(stripComments(src['plaza-dressing.js'])));
+
 console.log('mahworld-mahplaza-laws: ' + passed + '/' + (passed + failed) + ' PASS');
 if (failed) process.exit(1);

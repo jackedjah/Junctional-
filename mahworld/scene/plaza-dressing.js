@@ -33,7 +33,7 @@
    The square-diamond luminaire head keeps its points: it is the brand figure, §06's one exemption. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, softMass, canvasTexture, blobTexture } from './materials.js';
+import { chamferBox, softMass, canvasTexture, blobTexture, BRAND } from './materials.js';
 import { SITES } from './buildings.js';
 
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(1, 1, 1), _e = new THREE.Euler();
@@ -95,6 +95,54 @@ function mergeParts(list) {
 }
 
 /* the route network, in plaza coordinates: [from, to] pairs the paths connect */
+/* THE DIRECTORY BOARD FACE. Portrait, because the pylon it goes on is 1.0 x 1.5 m and a landscape
+   sign texture stretched onto it would be the one thing on the plaza that is not proportioned.
+   Everything on it comes from ctx.directory, which the assembly fills from its single destination
+   table — so this cannot drift from the nav menu, and it invents no copy of its own. */
+function directoryTexture(ctx) {
+  const rows = ((ctx && ctx.directory) || []).slice(0, 5);
+  return canvasTexture(768, 1152, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    /* the ground: a dark slab, not a glow. The type is the light here. */
+    g.fillStyle = 'rgba(12,17,26,0.90)'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(191,214,242,0.30)'; g.lineWidth = 3;
+    g.strokeRect(16, 16, w - 32, h - 32);
+    /* the mark: the brand's square diamond, WIDER THAN TALL (§06), drawn as an outline */
+    const cx = w / 2, my = 150, mw = 104, mh = 78;
+    g.strokeStyle = 'rgba(239,234,224,0.92)'; g.lineWidth = 7;
+    g.beginPath(); g.moveTo(cx, my - mh); g.lineTo(cx + mw, my); g.lineTo(cx, my + mh); g.lineTo(cx - mw, my); g.closePath(); g.stroke();
+    g.lineWidth = 4; const im = 0.46;
+    g.beginPath(); g.moveTo(cx, my - mh * im); g.lineTo(cx + mw * im, my); g.lineTo(cx, my + mh * im); g.lineTo(cx - mw * im, my); g.closePath(); g.stroke();
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = BRAND.titleWeight + ' 74px ' + BRAND.face;
+    g.letterSpacing = Math.round(74 * BRAND.titleTracking) + 'px';
+    g.fillStyle = BRAND.title; g.fillText('MAHPLAZA', cx, 300);
+    g.font = BRAND.subWeight + ' 26px ' + BRAND.face;
+    g.letterSpacing = Math.round(26 * BRAND.subTracking) + 'px';
+    g.fillStyle = BRAND.sub; g.fillText('DIRECTORY', cx, 358);
+    g.letterSpacing = '0px';
+    g.strokeStyle = 'rgba(191,214,242,0.42)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(90, 404); g.lineTo(w - 90, 404); g.stroke();
+    /* one row per destination: the name in cream, what it is in the world's blue-white beneath it */
+    let y = 480;
+    g.textAlign = 'left';
+    for (const d of rows) {
+      g.font = BRAND.titleWeight + ' 46px ' + BRAND.face;
+      g.letterSpacing = Math.round(46 * BRAND.titleTracking) + 'px';
+      g.fillStyle = BRAND.title; g.fillText(String(d.label || '').toUpperCase(), 96, y);
+      g.font = BRAND.subWeight + ' 24px ' + BRAND.face;
+      g.letterSpacing = Math.round(24 * BRAND.subTracking) + 'px';
+      g.fillStyle = BRAND.sub; g.fillText(String(d.sub || '').toUpperCase(), 98, y + 44);
+      g.letterSpacing = '0px';
+      /* the marker that says this line is a place you can go: the same diamond, small */
+      g.strokeStyle = 'rgba(191,214,242,0.55)'; g.lineWidth = 3;
+      const dy = y + 8, dw = 15, dh = 11, dx = w - 108;
+      g.beginPath(); g.moveTo(dx, dy - dh); g.lineTo(dx + dw, dy); g.lineTo(dx, dy + dh); g.lineTo(dx - dw, dy); g.closePath(); g.stroke();
+      y += 142;
+    }
+  });
+}
+
 const MARKER = [0, 14];
 /* the routes are read from the SITE PLAN, so the paths always arrive where the buildings actually are */
 const ROUTES = [
@@ -254,9 +302,24 @@ export function buildDressing(ctx) {
     part(dark, chamferBox(1.3, 2.3, 0.36, 0.07), px, 1.15, pz, ry);
     part(trim, chamferBox(1.4, 0.07, 0.44, 0.02), px, 2.36, pz, ry);
     part(trim, chamferBox(1.16, 1.66, 0.06, 0.02), px + nx * 0.185, 1.3, pz + nz * 0.185, ry);   /* the bezel */
-    const face = new THREE.Mesh(own(new THREE.PlaneGeometry(1.0, 1.5)), M.panelLit);
+    /* R167 §F — THE PYLON SAYS SOMETHING. Its lit face was a blank panel: correct as architecture
+       and useless as signage, and at ground level in roam it was the only thing in the plaza that
+       could have told a player where anything is. It is a DIRECTORY now — the brand's diamond, the
+       place you are standing in, and the destinations that actually exist, drawn from ctx.directory
+       so this board and the nav menu read the same table (L42). No invented copy: every string on
+       it is a name the world already uses.
+
+       Drawn rather than lit-plain because the reference plaza's pylons are dark slabs with light
+       type on them, not glowing rectangles — the panel reads as a surface with information on it,
+       which is what "signage integrated into architecture" means. */
+    const dirTex = directoryTexture(ctx);
+    const dirMat = new THREE.MeshBasicMaterial({ map: dirTex, transparent: true, toneMapped: true, fog: true });
+    dirMat.name = 'plaza-directory'; dirMat.userData.moduleOwned = true;
+    owned.push(dirTex, dirMat);   /* this module's dispose() calls .dispose() on everything it owns */
+    if (ctx.signMaterials) ctx.signMaterials.push(dirMat);
+    const face = new THREE.Mesh(own(new THREE.PlaneGeometry(1.0, 1.5)), dirMat);
     face.position.set(px + nx * 0.215, 1.3, pz + nz * 0.215);
-    face.rotation.y = ry; group.add(face);
+    face.rotation.y = ry; face.name = 'plaza-directory'; group.add(face);
     const col = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.6, 0.7), M.curb); col.position.set(px, 1.3, pz); col.visible = false; group.add(col); ctx.colliders.push(col);
   }
   {

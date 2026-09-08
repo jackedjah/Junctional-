@@ -86,6 +86,20 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const readStore = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const writeStore = (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, String(v)); } catch (e) {} };
 
+/* R167 §F — THE WORLD'S DESTINATIONS, ONCE.
+   These four were declared inside navDest(), a closure created long after the plaza modules are
+   built — so the plaza's own directory board could not read them and would have had to restate
+   them. Two tables describing one thing is how they drift apart (L42): rename a destination in the
+   menu and the sign standing out on the floor keeps the old name, and nothing fails. One table now,
+   read by the nav menu and by the sign in front of the buildings.
+   navDest() copies each row because callers downstream extend the list with facility entries. */
+const CORE_DEST = Object.freeze([
+  { id: 'plaza', label: 'HIGHER TOGETHER', sub: 'the plaza', x: 0, z: -6, y: 1.9, look: [0, 14, -70] },
+  { id: 'gym', label: 'MAH GYM', sub: 'training', x: -52, z: -30, y: 1.9, look: [-64, 8, -46] },
+  { id: 'match', label: 'MAH MATCH', sub: 'combat', x: 0, z: -50, y: 1.9, look: [0, 10, -74] },
+  { id: 'market', label: 'MAH MARKET', sub: 'trade', x: 52, z: -30, y: 1.9, look: [64, 8, -46] }
+]);
+
 export async function createMahplaza(canvas, options = {}) {
   const opts = Object.assign({ theme: null, self: null, time: null, pixelRatioCap: 2, hud: null, onSelect: null, onPractice: null, persist: true, quality: null }, options);
   let theme = resolveTheme(opts.theme || (opts.persist && readStore(STORE.world)) || 'canonical');
@@ -165,7 +179,9 @@ export async function createMahplaza(canvas, options = {}) {
     mirrorQueue.length = 0;
   }
 
-  const ctx = { THREE, scene, M, theme, clock, reflect, timeHooks: [], updateHooks: [], signMaterials: [], residentSpots: [], entranceLights: [], actions: [], colliders: [], swimVolumes: [], lifeAnchors: { paths: [], pads: [], doors: [], windows: [] } };
+  const ctx = { THREE, scene, M, theme, clock, reflect, timeHooks: [], updateHooks: [], signMaterials: [], residentSpots: [], entranceLights: [], actions: [], colliders: [], swimVolumes: [], lifeAnchors: { paths: [], pads: [], doors: [], windows: [] },
+    /* the one destination table, handed to the modules that have to name the world on a surface */
+    directory: CORE_DEST };
   /* v4 modules are optional at load: the assembly integrates whichever exist (see CONTRACTS_V4.md) */
   const optional = async (name) => { try { return await import(name); } catch (e) { if (!/Failed to fetch|Cannot find|Failed to resolve|404|import/i.test(String(e && e.message))) console.info('MAHPLAZA optional module ' + name + ' —', e && e.message); return null; } };
   const CITY = await optional('./city.js'), DRESS = await optional('./plaza-dressing.js'), MATCHI = await optional('./match-interior.js'), LIFE = await optional('./life.js');
@@ -838,12 +854,7 @@ export async function createMahplaza(canvas, options = {}) {
      already at 900k triangles. The renderer'"'"'s job is only to be somewhere else when the diamond
      closes. */
   const navDest = () => {
-    const list = [
-      { id: 'plaza', label: 'HIGHER TOGETHER', sub: 'the plaza', x: 0, z: -6, y: 1.9, look: [0, 14, -70] },
-      { id: 'gym', label: 'MAH GYM', sub: 'training', x: -52, z: -30, y: 1.9, look: [-64, 8, -46] },
-      { id: 'match', label: 'MAH MATCH', sub: 'combat', x: 0, z: -50, y: 1.9, look: [0, 10, -74] },
-      { id: 'market', label: 'MAH MARKET', sub: 'trade', x: 52, z: -30, y: 1.9, look: [64, 8, -46] }
-    ];
+    const list = CORE_DEST.map(d => Object.assign({}, d));
     if (facilities && facilities.stats) {
       const F = MFAC.FACILITIES;
       const face = (k, lab, sub) => {
