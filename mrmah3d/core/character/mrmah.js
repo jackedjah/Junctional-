@@ -74,9 +74,27 @@ export function createMrMah(options) {
      (variants.js). The head is shared: the face is the identity. */
   var P = proportionsFor(opts.variant);
   var isMrs = P.name === 'mrs-mah';
+  /* `authoringMaster` is MR. MAH'S R136+ authoring layer and nothing else: the
+     arm master, the muscle bellies, the forearm origin, the elbow-continuity
+     skin, the crystal atlas, the fine crystal surface and the cranial crown.
+
+     It has to be gated on the MALE, not on "not female". Mrs. Mah's proportion
+     set carries `maleAnatomy === true` — deliberately, because her arms are
+     built by the shared male limb path and then sculpted by her own refiners —
+     so `opts.maleAnatomy && opts.authoringMaster` inside limbs.js let his
+     authoring layer onto her arms, and her `mrs-shoulder-*` returns threw
+     rather than sculpt geometry they did not recognise:
+
+       Posterior return exceeded local depth envelope
+       ANTERIOR_LATERAL_DELTOID: 0.01226
+
+     That is her refiners' safety gate doing its job, ten minutes into a build,
+     and it is why she failed to mount in a browser while building fine in a
+     Node harness that passed no flag. */
+  var authoring = opts.authoringMaster === true && P.name === 'male';
   var head = buildHead(materials, {economicalGlow: P.name !== 'female', facetedMouth: P.name !== 'female', faceStyle: P.faceStyle});
-  var body = buildBody(materials, P, { authoringMaster: opts.authoringMaster === true, cranialGeometry: head.geometry });
-  var limbs = buildLimbs(materials, P, { authoringMaster: opts.authoringMaster === true, torsoGeometry: body.group.getObjectByName('torso').geometry });
+  var body = buildBody(materials, P, { authoringMaster: authoring, cranialGeometry: head.geometry });
+  var limbs = buildLimbs(materials, P, { authoringMaster: authoring, torsoGeometry: body.group.getObjectByName('torso').geometry });
   if (isMrs) refineMrsArms(limbs);
   rig.add(body.group);
   rig.add(limbs.group);
@@ -85,7 +103,7 @@ export function createMrMah(options) {
   // R144: preserve the retained sculpt; crystallize its authored surface groups.
   // The female, Mrs. Mah and shipping paths remain independent of this gate:
   // Mrs. Mah carries her own crystal planes and cranial growths.
-  if (opts.authoringMaster === true && P.name === 'male') {
+  if (authoring) {
     applyAnatomicalCrystalAtlas(body, limbs, materials);
     applyFineCrystalSurface(body, limbs);
     addMrCranialCrown(head, materials);
