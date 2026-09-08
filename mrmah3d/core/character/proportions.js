@@ -2203,10 +2203,21 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     where Astra's own did. Fading in over 0.88-1.02 keeps the handoff to the
     knee continuous without asking a narrow row to carry a wide groove. */
  region:[0.88,1.46,0.14], sideFade:0.06, projection:0.94,
- lobes:{seam:[0,0.30],head:[0.70,0.75],rf:[0.42,0.28],valley:[1.00,0.30],
+ /* R241 — the seam's HALF-WIDTH goes 0.30 -> 0.34 while its amplitude drops
+    (below). `dome`'s steepest wall is at 0.707 of the half-width and its slope
+    there is 1.5 * amplitude / half-width, so the two together take the inner
+    wall to 0.49 of its previous steepness: the channel is eased, not merely
+    widened. Every other lobe is untouched. */
+ lobes:{seam:[0,0.34],head:[0.70,0.75],rf:[0.42,0.28],valley:[1.00,0.30],
         vl:[1.42,0.55],vm:[0.30,0.32],itb:[1.95,0.30]},
  depth:[[0.80,0.128],[0.87,0.148],[0.95,0.180],[1.03,0.200],[1.10,0.215],[1.23,0.215],[1.32,0.205],[1.41,0.180],[1.46,0.165]],
- seam:[[0.80,0],[0.87,0.22],[0.95,0.26],[1.03,0.28],[1.10,0.30],[1.23,0.30],[1.32,0.22],[1.41,0.14],[1.46,0.08]],
+ /* R241 — the central descent's amplitude, Astra's own profile scaled to
+    0.55. Measured on the FINAL mesh, this control moves ONLY the channel
+    floor: with it zeroed the floor goes 0.1479 -> 0.2085 at y 1.220 and the
+    crown stays at 0.2517 to four decimals, so the quad crowns cannot be
+    touched by changing it. Astra's 0.30 put the floor at 0.1479 and the valley
+    at 0.1039 deep, which read as a split rather than a separation. */
+ seam:[[0.80,0],[0.87,0.121],[0.95,0.143],[1.03,0.154],[1.10,0.165],[1.23,0.165],[1.32,0.121],[1.41,0.077],[1.46,0.044]],
  head:[[0.80,0],[0.87,0.06],[0.95,0.28],[1.03,0.32],[1.10,0.36],[1.23,0.34],[1.32,0.26],[1.41,0.16],[1.46,0.09]],
  rf:[[0.80,0],[0.87,0],[0.95,0.08],[1.03,0.10],[1.10,0.10],[1.23,0.10],[1.32,0.07],[1.41,0.04],[1.46,0.02]],
  vl:[[0.80,0],[0.87,0.16],[0.95,0.22],[1.03,0.26],[1.10,0.28],[1.23,0.28],[1.32,0.26],[1.41,0.22],[1.46,0.14]],

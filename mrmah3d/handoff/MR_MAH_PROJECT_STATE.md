@@ -1119,3 +1119,79 @@ STILL OPEN, unchanged: the knee-band wedge (55 degrees at y0.673 x +/-0.043)
 and its representation constraint from R237, with two fixes proposed and
 awaiting approval; and the near-degenerate slivers in the sparse loft columns,
 which the clay does not show.
+
+
+R241 — THE CENTRAL DESCENT IS EASED. THE SEAM CONTROL MOVES ONLY THE FLOOR,
+AND THAT WAS VERIFIED ON THE FINAL MESH BEFORE IT WAS TOUCHED.
+---------------------------------------------------------------------------
+SCOPE NOTE. This turn carried two briefs. The first asked for central-valley
+softening AND rectus/vastus emphasis AND knee-region structure AND lower-leg
+anatomy. The second, later one narrows to the central separation alone and says
+plainly "Do not add knee, shin, calf, crystal, or material work in this task"
+and "one candidate, with at most one focused revision". The narrower brief is
+the one followed. Knee, shin and calf anatomy were NOT attempted and remain
+open work.
+
+OWNERSHIP, VERIFIED FIRST (the brief asked for this explicitly). Zeroing
+`astraQuad.seam` and rebuilding, measured on the final mesh at y 1.220:
+
+    seam 0.30 (R240)   floor 0.1479   crown 0.2517   valley 0.1039
+    seam 0.00          floor 0.2085   crown 0.2517   valley 0.0432
+
+The crown is IDENTICAL to four decimals at both settings. So this control moves
+the channel FLOOR and nothing else — the quad crowns cannot be harmed by
+changing it, and the floor responds linearly at 0.202 units of depth per unit
+of coefficient. That is what made a single bounded correction safe.
+
+THE CORRECTION — one lobe, two numbers, nothing else touched:
+  amplitude   Astra's own seam profile scaled to 0.55 (peak 0.30 -> 0.165)
+  half-width  0.30 -> 0.34 radians
+`dome`'s steepest wall sits at 0.707 of its half-width and its slope there is
+1.5 * amplitude / half-width, so the pair takes the inner wall to 0.49 of its
+previous steepness — the channel is EASED, not merely widened, which the brief
+ruled out. `head`, `rf`, `valley`, `vl`, `vm` and `itb` are untouched.
+
+RESULT, on the built mesh:
+
+    y 1.220   floor 0.1479 -> 0.1752   (+18%)
+              crown 0.2517 -> 0.2517   (identical)
+              valley depth 0.1039 -> 0.0766   (-26%)
+              crown/floor 1.702 -> 1.437
+    y 1.140   floor 0.1482 -> 0.1754, crown 0.2540 unchanged, depth -26%
+
+Section at y 1.220, anterior z by angle from the seam:
+    R240   0:0.148  7:0.154  14:0.185  21:0.236  29:0.252  43:0.214  62:0.136
+    R241   0:0.175  6:0.180  13:0.200  21:0.235  29:0.252  43:0.214  62:0.136
+Identical from 29 degrees outward. The change is confined to the inner quarter
+of the section, and the profile still rises monotonically from the midline —
+NO CENTRE RIDGE; the midline remains the minimum.
+
+GATES
+  quad crown projection  PRESERVED EXACTLY (0.2517 / 0.2540 / 0.2454 / 0.2141)
+  outer sweep            untouched, identical from 29 degrees out
+  front + side outline   zero pixels changed
+  knee band              y < 0.9 max |dz| 0.000013; the change lives in
+                         y 0.9-1.45 only
+  face turns             knee 55 (=), quad max 78 -> 74, taper 47 (=) — the
+                         eased wall slightly IMPROVES the quad band
+  R240 cleanup           held: no panel, no block artifact, no new seams
+  topology               12288 vertices, 4096 triangles, unchanged
+  BufferGeometry         0 non-finite, 0 degenerate, 0 non-unit normals
+  Mrs. Mah               14 meshes, both checksums, both bbox corners IDENTICAL
+  contracts              376/376
+
+VISUAL. At the quad framing the channel reads as a broad soft valley between
+two convex masses instead of a dark stripe. At ordinary full-character distance
+the two quad volumes read before the centre, which is the brief's success test.
+The separation is still clearly present close up. Honest scale: this is a real
+but measured move — a 26% reduction, not a transformation — and the remaining
+headroom is known and one number away (the natural two-dome valley with the
+seam at zero is 0.0432, so about half the present depth is still authored).
+
+The earlier 71% seam-to-crown figure was a restoration diagnostic and is NOT
+being preserved as a target; it is 44% now by the same measure, deliberately.
+
+R241 IS A CANDIDATE AND IS NOT USER-APPROVED. Retained fallback: A3, 28d1f04.
+
+STILL OPEN: knee-region structure, lower-leg / shin / calf read, and the
+R237 knee-band wedge with its two proposed fixes.
