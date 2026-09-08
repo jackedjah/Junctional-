@@ -1,3 +1,7 @@
+import {createElbowContinuity,createFoldedElbowContinuity,createBoundElbowSkin} from './elbow-continuity.js';
+import { maleUpperAngle, maleBicepsReturn, maleBicepsSurface, maleBicepsFacingNormals } from './arm-anatomy.js';
+import { authorArmMaster, authorForearmOrigin, authorDistalArmContactReturn, authorMuscleBellies, authorForearmBellies, fitShoulderTorsoAttachment } from './arm-master.js';
+import { maleUpperProfile, maleForeProfile, maleUpperShape, maleForeShape, maleForePlanes, maleUpperPlanes, maleUpperSectionFaces, maleUpperSectionNormals, maleShoulderArm, blendArmSeam, maleElbowEnvelope, maleWristSurface, maleArmRecesses, maleTricepsSurface } from './arm-anatomy.js';
 /* MR.MAH 3D :: LIMBS
    Arms and hands, as real articulated faceted structures.
 
@@ -12,10 +16,10 @@
    small bright tip diamond the reference shows above it. */
 
 import {
-  Group, Mesh, EdgesGeometry, LineSegments, Vector3, PointLight
+  Group, Mesh, EdgesGeometry, LineSegments, Vector3, Quaternion, PointLight, Ray
 } from '../../vendor/three/three.module.min.js';
-import { segment, diamondPlate, facetedGeometry, mergeGeometries, limbSideDirection } from './forge.js';
-import { ARMS, HAND } from './proportions.js';
+import { segment, diamondPlate, facetedGeometry, mergeGeometries, limbSideDirection, sculptSurfaceRegion } from './forge.js';
+import { ARMS, HAND, MRMAH_MORPHOLOGY } from './proportions.js';
 import { REGIONS } from './regions.js';
 
 /* R95 — THE ARM'S STRIPS ARE NAMED, NOT ROLLED.
@@ -371,7 +375,24 @@ function buildArm(materials, spec, options) {
   var bendK = Math.max(0, upperVec.clone().normalize().dot(foreVec0.clone().normalize()));
   bendK = bendK * bendK;
   var upperEnd = upperVec.clone().add(upperVec.clone().normalize().multiplyScalar(0.06 * bendK));
-  var upperGeo = segment(
+  var continuous = opts.maleAnatomy ? maleShoulderArm(spec, upperEnd.toArray(), upperInner, opts.legacyArms) : null;
+  var junction = opts.maleAnatomy ? maleElbowEnvelope(spec,upperVec.toArray(),foreVec0.toArray(),bendK) : null;
+  /* R166 pin — a proportion set whose regional refiners were authored against
+     an earlier arm keeps that arm (see `armDesign` in arm-anatomy.js). Only the
+     R123+ male surfaces are withheld; the ring cage, steps and samples are the
+     same, so this is the retained arm, not a reduced one. */
+  var legacyArms=!!opts.legacyArms;
+  var sectionControl=opts.maleAnatomy&&!legacyArms&&MRMAH_MORPHOLOGY.arms.planeDesign.sectionFaces, sectionFrames=[];
+  var upperGeo = continuous ? segment(continuous.start, continuous.end,
+    continuous.radius, continuous.radius, 24,
+    { depthRatio: 1.12, crystal: 0, facet: 0, steps: 18, normalWeight: 'angle', anatomicalPhase: true, angleAt: function(d,t){return maleUpperAngle(d,t,upperInner,legacyArms);},
+      samplesT: [-.40,-.34,-.26,-.16,-.08,0,.08,.16,.25,.315,.39,.47,.54,.61,.69,.78,.88,.95,1].map(h=>(h+.40)/1.40),
+      profile: continuous.profile, shape: continuous.shape, centreAt: continuous.centreAt,
+      surfaceWorld: junction ? function(p,t){var q=maleUpperPlanes(p,t,spec,upperEnd.toArray(),legacyArms);return sectionControl?q:junction(q,t,false);} : undefined,
+      ringWorld: sectionControl ? function(points,t,angles){var q=maleUpperSectionFaces(points,t,angles,upperInner).map(p=>junction(p,t,false));sectionFrames.push({h:-.4+1.4*t,angles,points:q});return q;} : undefined,
+      lift: ARMS_.classLift, classes: REGIONS.UPPER_ARM.classes, columns: true,
+      zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner), coat: REGIONS.UPPER_ARM.coat }
+  ) : segment(
     [0, 0, 0], upperEnd.toArray(),
     spec.upperRadius, spec.foreRadius * 1.02, 16,   /* R105: twelve sides — a belly needs vertices to be round; R108 c: sixteen, so the horseshoe's two heads and its tendon flat each land on their own vertices */
     /* R90: depthRatio goes above 1 and the cross-section is now SHAPED.
@@ -393,8 +414,8 @@ function buildArm(materials, spec, options) {
        depth where it belongs (a 1.28 front, a 1.20 rear at the peak); on a
        tube that was ALSO 1.18 deeper than wide the arm was a lens — 0.20
        wide by 0.45 deep at the biceps. */
-    { depthRatio: 1.12, crystal: 0.012, steps: 10, fg: [1, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first; R108 c: 1.12 — the side view measured the cap at 1.27x the arm's depth against the reference's ~1.1, and the depth belongs to the biceps / triceps, not the cap */
-      profile: ARMS_.profiles.upper, shape: function (t, d) { return ARMS_.shapes.upper(t, d, upperInner); }, lift: ARMS_.classLift,
+    { depthRatio: 1.12, crystal: opts.maleAnatomy ? 0 : 0.012, facet: opts.maleAnatomy ? 0 : 0.010, steps: 10, fg: [1, 3],   /* R105: seven rings so the belly can PEAK; R107: ten rings, fourteen sides, less jitter — the belly is a curve first; R108 c: 1.12 — the side view measured the cap at 1.27x the arm's depth against the reference's ~1.1, and the depth belongs to the biceps / triceps, not the cap */
+      profile: opts.maleAnatomy ? maleUpperProfile : ARMS_.profiles.upper, shape: function (t, d) { return opts.maleAnatomy ? maleUpperShape(t, d, upperInner, legacyArms) : ARMS_.shapes.upper(t, d, upperInner, false); }, lift: ARMS_.classLift,
       classes: REGIONS.UPPER_ARM.classes, columns: true, zoneAt: armZone(REGIONS.UPPER_ARM.classes, upperInner),
       coat: REGIONS.UPPER_ARM.coat,
       /* R91: the upper arm meets the deltoid at the deltoid's value and reaches
@@ -406,6 +427,9 @@ function buildArm(materials, spec, options) {
         return ARMS_.deltoidLift + (ARMS_.classLift - ARMS_.deltoidLift) * k * k * (3 - 2 * k);
       } }
   );
+  if (opts.maleAnatomy) maleArmRecesses(upperGeo,spec,upperEnd.toArray());
+  if (opts.maleAnatomy && !legacyArms) {maleTricepsSurface(upperGeo,spec,upperEnd.toArray());maleBicepsReturn(upperGeo,spec,upperEnd.toArray());maleBicepsSurface(upperGeo,spec,upperEnd.toArray());}
+  if (opts.maleAnatomy && opts.authoringMaster) authorArmMaster(upperGeo,spec,upperEnd.toArray());
   var upper = clad(shoulderJoint, upperGeo, materials, 0, null, root.name + '-upper');
   owned.push(upperGeo, upper.edges, upper.minorEdges);
 
@@ -416,17 +440,68 @@ function buildArm(materials, spec, options) {
   shoulderJoint.add(elbowJoint);
 
   var foreVec = wrist.clone().sub(elbow);
+  var foreAxis=foreVec.clone().normalize();
+  var palmDirection=new Vector3(0,0,1).applyQuaternion(new Quaternion().setFromUnitVectors(new Vector3(0,1,0),foreAxis));
+  var thumbDirection=new Vector3(-1,0,0).applyQuaternion(new Quaternion().setFromUnitVectors(new Vector3(0,1,0),foreAxis));
+  var foreFrame={thumb:thumbDirection.toArray(),palm:palmDirection.toArray()};
+  var foreFront=new Vector3(0,0,1).addScaledVector(foreAxis,-foreAxis.z).normalize();
+  var forePositive=new Vector3().fromArray(limbSideDirection(spec.elbow,spec.wrist));
+  var forePalmAngle=Math.atan2(palmDirection.dot(forePositive),palmDirection.dot(foreFront));
   var foreStart = foreVec.clone().normalize().multiplyScalar(-0.045 * bendK);
   var foreGeo = segment(
     foreStart.toArray(), foreVec.toArray(),
-    spec.foreRadius, spec.wristRadius, 16,   /* R108 c: sixteen sides — the brachioradialis, extensor and flexor masses are three columns */
+    spec.foreRadius, spec.wristRadius, opts.maleAnatomy ? 18 : 16,   /* sample the asymmetric male forearm territories */
     /* R98: five steps so the extensor belly just under the elbow has a ring
        to peak on and the taper into the wrist has two to fall through. */
-    { depthRatio: 1.06, crystal: 0.010, steps: 9, fg: [1, 2],
-      profile: ARMS_.profiles.fore, shape: function (t, d) { return ARMS_.shapes.fore(t, d, foreInner); }, lift: ARMS_.classLift,
+    { depthRatio: 1.06, crystal: opts.maleAnatomy ? 0 : 0.010, facet: opts.maleAnatomy ? 0 : undefined, steps: opts.maleAnatomy ? 10 : 9, fg: [1, 2], normalWeight: opts.maleAnatomy ? 'angle' : undefined,
+      samplesT: opts.maleAnatomy ? [0,.055,.12,.20,.30,.42,.55,.67,.79,.90,1] : undefined,
+      surfaceWorld: opts.maleAnatomy ? function(p,t){
+        var shaped=maleForePlanes(p,t,foreFrame,spec,bendK);
+        var q=junction?junction(shaped,t,true):shaped;
+        // The last disc is seated inside the new wrist transition.
+        var k=Math.max(0,Math.min(1,(t-.88)/.12));k=k*k*(3-2*k);
+        var axial=q[0]*foreAxis.x+q[1]*foreAxis.y+q[2]*foreAxis.z;
+        return q.map(function(v,i){var c=[foreAxis.x,foreAxis.y,foreAxis.z][i]*axial;return c+(v-c)*(1-.14*k);});
+      } : undefined,
+      profile: opts.maleAnatomy ? function(t) { return maleForeProfile(t,bendK); } : ARMS_.profiles.fore, shape: function (t, d) { return opts.maleAnatomy ? maleForeShape(t, d, foreInner, forePalmAngle) : ARMS_.shapes.fore(t, d, foreInner, false); }, lift: ARMS_.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes, foreInner),
       coat: REGIONS.FOREARM.coat }
   );
+  if (opts.maleAnatomy && opts.authoringMaster) authorArmMaster(foreGeo,spec,foreVec.toArray(),foreFrame);
+  if (opts.maleAnatomy) blendArmSeam(upperGeo,foreGeo,upperVec.toArray(),junction);
+  if (sectionControl) maleUpperSectionNormals(upperGeo,sectionFrames,upperEnd.toArray(),spec,upperInner);
+  if (opts.maleAnatomy && !legacyArms) maleBicepsFacingNormals(upperGeo,spec,upperEnd.toArray());
+  if(opts.maleAnatomy && opts.authoringMaster)authorForearmOrigin(foreGeo,foreAxis,palmDirection,thumbDirection,foreVec.length(),spec.shoulder[0]<0?'R':'L');
+  // R177: the nearly straight arm's two end surfaces competed at the
+  // same depth. Fit only the buried upper-arm end to the final forearm.
+  if(opts.maleAnatomy && opts.authoringMaster && bendK>.85){
+    seatUpperArmOverlap(upperGeo,foreGeo,upperVec,foreAxis);
+    // The radial return now owns the surface from the joint origin onward.
+    // Its atlas can end at that measured ownership boundary, not an old band.
+    if(foreGeo.userData.forearmOriginSupport)foreGeo.userData.forearmOriginSupport.jointReturnStartH=0;
+    // Edge buffers are owned already, but have not been uploaded at mount.
+    // Refresh them after this last positional correction, without new nodes.
+    for(const [edge,angle]of [[upper.edges,48],[upper.minorEdges,36]]){const updated=new EdgesGeometry(upperGeo,angle);edge.copy(updated);updated.dispose();}
+  }
+  if(opts.maleAnatomy && opts.authoringMaster){
+    if(spec.shoulder[0]>0)authorDistalArmContactReturn(upperGeo,foreGeo,spec);
+    // One final anatomical owner follows the retained joint construction.
+    // Static rest-space muscle bellies supersede the old arm facets/returns.
+    authorMuscleBellies(upperGeo,spec,upperEnd.toArray());
+    if(opts.torsoGeometry)fitShoulderTorsoAttachment(upperGeo,opts.torsoGeometry,spec);
+    authorForearmBellies(foreGeo,foreAxis,palmDirection,thumbDirection,foreVec.length(),spec.shoulder[0]<0?'R':'L');
+    // R190: the final muscle surfaces supersede the earlier joint stock.
+    // Reconcile only the buried distal overlap against the final forearm.
+    if(bendK>.85){
+      seatUpperArmOverlap(upperGeo,foreGeo,upperVec,foreAxis,{finalSurfaces:true});
+      upperGeo.userData.finalElbowSeating={version:'R190',owner:'buried distal upper-arm overlap',source:'final retained upper and forearm muscle skins',maxInward:upperGeo.userData.elbowOverlapSeating.maxInward,clearance:.00035,limit:.016,status:'PARTIAL: static overlap artifact reduced; rigid and skinned deformation gates remain open'};
+    }
+    // R186: preserve the new skin's geometric normals; the old proximity
+    // average includes unrelated forearm normals across the elbow bend.
+    foreGeo.userData.armDiamondOverlayDisabled={version:'R185',reason:'retain forearm mass; stop decorative arm diamond partitioning'};
+    foreGeo.userData.supersededArmAtlas={planes:foreGeo.userData.diamondPlaneAtlas?.length||0,reason:'R185 muscle-belly art'};foreGeo.userData.diamondPlaneAtlas=[];
+    for(const [edge,angle]of [[upper.edges,48],[upper.minorEdges,36]]){const updated=new EdgesGeometry(upperGeo,angle);edge.copy(updated);updated.dispose();}
+  }
   var fore = clad(elbowJoint, foreGeo, materials, 0, null, root.name + '-fore');
   owned.push(foreGeo, fore.edges, fore.minorEdges);
 
@@ -461,7 +536,16 @@ function buildArm(materials, spec, options) {
      at 0.12 of the radius, four steps, so what shows is a sphere. */
   var elbowGeo = segment([0, -eR * 0.95, 0], [0, eR * 0.95, 0], eR, eR, 8,
     { depthRatio: 1.0, crystal: 0.015, steps: 8,   /* eight steps: on the folded arm the ball's lower half IS the elbow's point, and four steps drew it as a shelf */
-      profile: function (t) { return 0.12 + Math.pow(Math.sin(t * Math.PI), 0.8) * 0.88; } });
+      profile: function (t) { return 0.12 + Math.pow(Math.sin(t * Math.PI), 0.8) * 0.88; },
+      surfaceWorld: junction && junction.knob ? function(p){return junction.knob(p);} : undefined });
+  if(junction && junction.knob){
+    var ep=elbowGeo.attributes.position,en=elbowGeo.attributes.aSmooth;
+    for(var ei=0;ei<ep.count;ei++){var ef=junction.normal([ep.getX(ei),ep.getY(ei),ep.getZ(ei)],true);if(ef)en.setXYZ(ei,ef.n[0],ef.n[1],ef.n[2]);}
+  }
+  // R179: measured radial cap protrusion, distinct from the R177 upper-end
+  // contact. Preserve the posterior pseudo-joint and the folded envelope.
+  if(opts.maleAnatomy && opts.authoringMaster && bendK>.85)
+    seatRadialElbowCap(elbowGeo,upperGeo,foreGeo,upperVec,foreAxis,palmDirection,thumbDirection);
   var elbowKnob = new Mesh(elbowGeo, materials.joint || materials.cavity);
   elbowKnob.name = root.name + '-elbow-knob';
   elbowJoint.add(elbowKnob);
@@ -479,7 +563,7 @@ function buildArm(materials, spec, options) {
   var lateral = new Vector3(0, 0, 1).cross(upDir);
   if (lateral.lengthSq() < 1e-6) lateral.set(1, 0, 0);
   lateral.normalize();
-  var pinHalf = eR * 0.90, pinR = eR * 0.34;   /* R108 c: 0.90 — at 1.00 the boss showed as a spike on the outer elbow of the compressed joint */   /* R99: bosses just proud of the tube — compression, not a bolt; R108: flush — the bosses show only where the elbow compression exposes them, as the epicondyles, not as a bolt through the arm */
+  var pinHalf = eR * (opts.maleAnatomy ? .76 : 0.90), pinR = eR * 0.34;   /* R108 c: 0.90 — at 1.00 the boss showed as a spike on the outer elbow of the compressed joint */   /* R99: bosses just proud of the tube — compression, not a bolt; R108: flush — the bosses show only where the elbow compression exposes them, as the epicondyles, not as a bolt through the arm */
   var pinGeo = segment(
     lateral.clone().multiplyScalar(-pinHalf).toArray(),
     lateral.clone().multiplyScalar(pinHalf).toArray(),
@@ -487,10 +571,20 @@ function buildArm(materials, spec, options) {
     { depthRatio: 1.0, crystal: 0.0, steps: 2,
       /* a boss at each end, a waist through the joint */
       profile: function (t) { var e = Math.abs(t - 0.5) * 2; return 0.72 + 0.28 * e * e; } });
+  // R170: the internal hinge must not pierce the existing anatomical shell.
+  // Clip only protruding pin vertices to the measured shell support planes.
+  if(opts.maleAnatomy && opts.authoringMaster)seatElbowPin(pinGeo,elbowGeo);
   var pin = new Mesh(pinGeo, materials.joint || materials.cavity);
   pin.name = root.name + '-elbow-pin';
   elbowJoint.add(pin);
   owned.push(pinGeo);
+
+  if(opts.maleAnatomy && opts.authoringMaster){
+    const bridgeGeo=bendK>.85?createElbowContinuity(upperGeo,foreGeo,upperVec,foreAxis,palmDirection,thumbDirection):createFoldedElbowContinuity(upperGeo,foreGeo,upperVec,foreAxis);
+    const bridge=createBoundElbowSkin(bridgeGeo,materials.body,elbowJoint,foreAxis);bridge.name=root.name+'-elbow-skin';owned.push(bridgeGeo,bridge.skeleton);
+    elbowKnob.visible=false;pin.visible=false;
+    for(const part of [upper,fore])for(const [edge,angle]of [[part.edges,48],[part.minorEdges,36]]){const g=new EdgesGeometry((part===upper?upperGeo:foreGeo),angle);edge.copy(g);g.dispose();}
+  }
 
   /* Wrist joint, oriented so the hand continues along the forearm axis. */
   var wristJoint = new Group();
@@ -507,9 +601,27 @@ function buildArm(materials, spec, options) {
      wrist in the clay. A hair proud (1.08) with its ends drawn in so it is a
      band on the wrist, the compression before the hand expands. */
   var cR = spec.wristRadius * ARMS_.profiles.fore(1) * 1.08;
-  var cuffGeo = segment([0, -0.026, 0], [0, 0.022, 0], cR, cR * 0.97, 10,
-    { depthRatio: 0.92, crystal: 0.006, steps: 2,
-      profile: function (t) { return 0.90 + 0.10 * Math.sin(t * Math.PI); } });
+  var fitWrist=opts.maleAnatomy&&opts.authoringMaster;
+  var wristSurface=opts.maleAnatomy?maleWristSurface(spec,HAND_,foreVec.length()-foreStart.dot(foreAxis),bendK,fitWrist):null;
+  if(fitWrist)wristSurface=fitWristToForearm(wristSurface,foreGeo,foreVec,wristJoint.quaternion);
+  var cuffGeo = segment([0, opts.maleAnatomy?-.042:-0.026, 0], [0, opts.maleAnatomy?.030:0.022, 0], cR, cR * 0.97, 10,
+    { depthRatio: 0.92, crystal: fitWrist?0:0.006, steps: fitWrist?4:2,
+      samplesT: fitWrist?[0,.25,7/12,.8,1]:undefined,
+      ringWorld: fitWrist?function(points,t){return fitWristColumns(points,HAND_,wristSurface,t);}:undefined,
+      profile: function (t) { return 0.90 + 0.10 * Math.sin(t * Math.PI); },
+      surfaceWorld: wristSurface });
+  if(fitWrist)cuffGeo.userData.wristConnectorFit={version:'R171',source:'existing pentagonal palm root',palmRootY:0,radialPalmClearance:.0002,previousBlendEndY:.015,columns:10,structuralCorners:5,stations:[-.042,-.024,0,.0156,.030],method:'five palm-corner columns plus five edge support columns; transition closes at actual palm root; hand and forearm geometry unchanged',status:'inspect palm seam'};
+  if(fitWrist)cuffGeo.userData.wristForearmFit=wristSurface.fit;
+  if(wristSurface){
+    var wp=cuffGeo.attributes.position,wn=cuffGeo.attributes.aSmooth;
+    for(var wi=0;wi<wp.count;wi++){
+      var wy=wp.getY(wi),wa=Math.atan2(wp.getZ(wi),wp.getX(wi)),eps=.0001;
+      var at=function(a,y){return new Vector3().fromArray(wristSurface([Math.cos(a),y,Math.sin(a)]));};
+      var tang=at(wa+eps,wy).sub(at(wa-eps,wy));
+      var along=at(wa,wy+eps).sub(at(wa,wy-eps));
+      var normal=along.cross(tang).normalize();wn.setXYZ(wi,normal.x,normal.y,normal.z);
+    }
+  }
   var cuff = new Mesh(cuffGeo, materials.joint || materials.cavity);
   cuff.name = root.name + '-wrist-cuff';
   wristJoint.add(cuff);
@@ -529,17 +641,18 @@ function buildArm(materials, spec, options) {
   };
 }
 
-export function buildLimbs(materials, P) {
+export function buildLimbs(materials, P, options={}) {
   var ARMS_ = (P && P.ARMS) || ARMS, HAND_ = (P && P.HAND) || HAND;
   var group = new Group();
   group.name = 'mrmah-limbs';
 
   /* The lowered arm's hand is relaxed and partly closed; the raised one is
      open and carries the tip diamond. */
-  var right = buildArm(materials, ARMS_.right, { name: 'arm-right', openHand: false, arms: ARMS_, hand: HAND_ });
+  var legacyArms = !!(P && P.legacyArms);
+  var right = buildArm(materials, ARMS_.right, { name: 'arm-right', maleAnatomy: !P || P.name !== 'female', legacyArms: legacyArms, authoringMaster: options.authoringMaster, torsoGeometry: options.torsoGeometry, openHand: false, arms: ARMS_, hand: HAND_ });
   /* R98 — the raised hand carries the crystal's own lamp (see buildHand). */
   var handLamp = null;
-  var left = buildArm(materials, ARMS_.left, { name: 'arm-left', openHand: true, tipDiamond: true, arms: ARMS_, hand: HAND_,
+  var left = buildArm(materials, ARMS_.left, { name: 'arm-left', maleAnatomy: !P || P.name !== 'female', legacyArms: legacyArms, authoringMaster: options.authoringMaster, torsoGeometry: options.torsoGeometry, openHand: true, tipDiamond: true, arms: ARMS_, hand: HAND_,
     makeLamp: function () {
       handLamp = new PointLight(materials.emissive.color.clone(), 0.95, 0.56, 2);   /* R101: fingertips, palm and a grazing of forearm */
       return handLamp;
@@ -556,4 +669,142 @@ export function buildLimbs(materials, P) {
     handLamp: handLamp,
     dispose: function () { right.dispose(); left.dispose(); if (handLamp && handLamp.dispose) handLamp.dispose(); }
   };
+}
+
+function seatElbowPin(pin,shell){
+ const p=shell.attributes.position,planes=[],a=new Vector3(),b=new Vector3(),c=new Vector3();
+ for(let i=0;i<p.count;i+=3){a.fromBufferAttribute(p,i);b.fromBufferAttribute(p,i+1);c.fromBufferAttribute(p,i+2);const n=b.clone().sub(a).cross(c.clone().sub(a));if(n.lengthSq()<1e-18)continue;n.normalize();const d=n.dot(a);if(d<=0)throw new Error('Elbow shell must contain its hinge origin');planes.push({n,d});}
+ const margin=.0005;let changed=0,maxDisplacement=0;
+ sculptSurfaceRegion(pin,{name:'R170 internal elbow pin seating',sample:before=>{const q=new Vector3(...before),r=q.length();if(r<1e-9)return null;const dir=q.clone().divideScalar(r);let limit=Infinity;for(const {n,d}of planes){const dot=n.dot(dir);if(dot>1e-9)limit=Math.min(limit,(d-margin)/dot);}if(r<=limit)return null;const delta=r-limit;if(delta>.020)throw new Error('Elbow pin exceeds local seating limit');changed++;maxDisplacement=Math.max(maxDisplacement,delta);return dir.multiplyScalar(limit).toArray();}});
+ pin.userData.elbowPinSeating={version:'R170',support:'existing anatomical elbow shell triangle halfspaces, rest-local frame',clearance:margin,changedTriangleCorners:changed,maxDisplacement,method:'Only pin vertices outside shell interior move; anatomical shell, muscles and transforms unchanged.',status:'inspect folded/open poses'};
+}
+
+// R171: longitudinal support columns track the unchanged palm pentagon.
+// Ring winding follows increasing XZ angle, as in the original +Y segment.
+function fitWristColumns(points,hand,surface,t){
+ const y=-.042+.072*t,u=Math.max(0,y/hand.palmLength),w=hand.palmHalfWidth*(.55+.45*u),d=hand.palmHalfDepth*(.75+.25*u),ridge=hand.palmHalfDepth*(1.02+.30*u);
+ const corners=[[-w,d],[0,ridge],[w,d],[w,-d],[-w,-d]].map(q=>Math.atan2(q[1],q[0])).sort((a,b)=>a-b),angles=[];
+ for(let i=0;i<5;i++){const a=corners[i],b=i===4?corners[0]+Math.PI*2:corners[i+1];angles.push(a,(a+b)/2);}
+ return angles.map(a=>surface([Math.cos(a),y,Math.sin(a)]));
+}
+
+
+// R174: fit the proximal connector to the ACTUAL retained forearm triangles,
+// not its older analytic radius profile. Only excess outward radius is seated;
+// the palm-root interval and hand stay unchanged. Coordinates are wrist-local.
+function fitWristToForearm(surface,geometry,origin,rotation){
+ const inverse=rotation.clone().invert(),position=geometry.attributes.position,triangles=[];
+ for(let i=0;i<position.count;i+=3){
+  const ps=[0,1,2].map(j=>new Vector3().fromBufferAttribute(position,i+j).sub(origin).applyQuaternion(inverse));
+  if(Math.max(...ps.map(p=>p.y))>-.065)triangles.push(ps);
+ }
+ const cache=new Map(),fit={version:'R174',source:'retained distal forearm triangles in rest wrist frame',radialClearance:.0002,fullFitThroughY:-.024,fadeEndY:-.012,maxRadialCorrection:0,queries:0,misses:0};
+ const sample=point=>{
+  const p=surface(point),y=p[1],r=Math.hypot(p[0],p[2]);
+  if(y>=-.012||r<1e-8)return p;
+  const n=new Vector3(p[0]/r,0,p[2]/r),key=Math.atan2(n.z,n.x).toFixed(9)+':'+y.toFixed(9);
+  let foreR=cache.get(key);
+  if(foreR===undefined){
+   const ray=new Ray(n.clone().multiplyScalar(.3).add(new Vector3(0,y,0)),n.clone().negate()),hit=new Vector3();foreR=-Infinity;
+   for(const[a,b,c]of triangles)if(ray.intersectTriangle(a,b,c,false,hit))foreR=Math.max(foreR,hit.dot(n));
+   if(!Number.isFinite(foreR)){fit.misses++;throw new Error('Wrist fit outside distal forearm support');}
+   cache.set(key,foreR);fit.queries++;
+  }
+  const t=Math.max(0,Math.min(1,(y+.024)/.012)),weight=1-t*t*(3-2*t),correction=Math.max(0,r-(foreR-fit.radialClearance))*weight;
+  fit.maxRadialCorrection=Math.max(fit.maxRadialCorrection,correction);
+  return [n.x*(r-correction),y,n.z*(r-correction)];
+ };
+ sample.fit=fit;return sample;
+}
+
+// R177: finite clearance at the existing rigid-segment overlap. This is
+// interior seating, not a circumferential anatomical groove. The folded
+// arm uses a different joint envelope and never enters this correction.
+export function seatUpperArmOverlap(upper,fore,elbowOffset,axis,options={}){
+ const p=fore.attributes.position,stock=[],cache=new Map();
+ // Radial probes have fixed axial height. Triangles outside this local
+ // interval cannot intersect them; omit the rest of the forearm at mount.
+ for(let i=0;i<p.count;i+=3){const tri=[0,1,2].map(j=>new Vector3().fromBufferAttribute(p,i+j)),h=tri.map(v=>v.dot(axis));if(Math.max(...h)>=-.021&&Math.min(...h)<=.076)stock.push(...tri);}
+ const jointNormals=Object.fromEntries(['aSmooth','aMoldNormal'].filter(n=>upper.attributes[n]).map(n=>[n,upper.attributes[n].array.slice()]));
+ const clearance=.00035,fade=[-.020,0],samples=[];
+ const smooth=x=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t);};
+ let moved=0,maxInward=0;
+ sculptSurfaceRegion(upper,{name:'R177 measured upper-arm end seating inside forearm',sample:before=>{
+  const q=new Vector3(...before).sub(elbowOffset),h=q.dot(axis);if(h<=fade[0]||h>.075)return null;
+  const radial=q.clone().addScaledVector(axis,-h),radius=radial.length();if(radius<1e-8)return null;const d=radial.divideScalar(radius),key=before.join(',');
+  let support=cache.get(key);if(support===undefined){
+   const c=axis.clone().multiplyScalar(h),ray=new Ray(c.clone().addScaledVector(d,.5),d.clone().negate()),hit=new Vector3();support=-Infinity;
+   for(let i=0;i<stock.length;i+=3)if(ray.intersectTriangle(stock[i],stock[i+1],stock[i+2],false,hit))support=Math.max(support,hit.clone().sub(c).dot(d));
+   if(!Number.isFinite(support))throw new Error('Upper overlap has no forearm support');cache.set(key,support);
+  }
+  const amount=Math.max(0,radius-support+clearance)*smooth((h-fade[0])/(fade[1]-fade[0]));
+   if(amount>(options.finalSurfaces ? .016 : .012))throw new Error('Upper overlap exceeds local seating allowance '+amount);if(amount<1e-8)return null;
+  moved++;maxInward=Math.max(maxInward,amount);samples.push({h,beforeRadius:radius,supportRadius:support,afterRadius:radius-amount});
+  return q.addScaledVector(d,-amount).add(elbowOffset).toArray();
+ }});
+ // Measured barycentric contact constraints. Correct only the corners
+ // participating in a protruding chord, without extending a neighboring
+ // plane outside its footprint or adding global subdivision.
+ const fitted=upper.attributes.position,corrections=new Map(),keyOf=v=>v.toArray().map(x=>Math.round(x*1e6)).join(',');let contacts=0,maxResidual=0;
+ for(let i=0;i<fitted.count;i+=3){const vs=[0,1,2].map(j=>new Vector3().fromBufferAttribute(fitted,i+j).sub(elbowOffset)),hs=vs.map(v=>v.dot(axis));if(hs.every(h=>h<0)||hs.every(h=>h>.075))continue;
+  for(const w of [[1/3,1/3,1/3],[.6,.2,.2],[.2,.6,.2],[.2,.2,.6],[.5,.5,0],[0,.5,.5],[.5,0,.5]]){
+   const q=vs.reduce((v,p,j)=>v.addScaledVector(p,w[j]),new Vector3()),h=q.dot(axis);if(h<0||h>.065)continue;const c=axis.clone().multiplyScalar(h),radial=q.clone().sub(c),radius=radial.length();if(radius<.025)continue;const d=radial.divideScalar(radius),ray=new Ray(c.clone().addScaledVector(d,.5),d.clone().negate()),hit=new Vector3();let support=-Infinity;
+   for(let j=0;j<stock.length;j+=3)if(ray.intersectTriangle(stock[j],stock[j+1],stock[j+2],false,hit))support=Math.max(support,hit.clone().sub(c).dot(d));
+   const error=radius-support;if(error<=2e-7)continue;
+   const dirs=vs.map((v,j)=>v.clone().addScaledVector(axis,-hs[j]).normalize()),influence=w.reduce((t,v,j)=>t+(hs[j]>=0?v*Math.max(0,dirs[j].dot(d)):0),0);
+   if(influence<.25)throw new Error('Elbow contact lacks local movable support');
+    const amount=(error+clearance)/influence;if(amount>.003)throw new Error('Elbow barycentric contact exceeds local allowance '+amount);
+   contacts++;maxResidual=Math.max(maxResidual,error);
+   for(let j=0;j<3;j++){if(hs[j]<0||w[j]===0)continue;const k=keyOf(vs[j].clone().add(elbowOffset)),old=corrections.get(k);if(!old||old.amount<amount)corrections.set(k,{amount,d:dirs[j]});}
+  }
+ }
+ let contactCorners=0,maxContactCorrection=0;
+ if(corrections.size)sculptSurfaceRegion(upper,{name:'R177 barycentric contact seating on measured forearm support',sample:before=>{const c=corrections.get(keyOf(new Vector3(...before)));if(!c)return null;contactCorners++;maxContactCorrection=Math.max(maxContactCorrection,c.amount);return new Vector3(...before).addScaledVector(c.d,-c.amount).toArray();}});
+ // Joint normals belong to the retained common envelope, not the buried
+ // end-face triangles. Preserve that field through interior fitting.
+ for(const[n,array]of Object.entries(jointNormals)){upper.attributes[n].array.set(array);upper.attributes[n].needsUpdate=true;}
+ upper.userData.elbowOverlapSeating={version:'R177',frame:'actual elbow origin and forearm longitudinal axis; full retained forearm triangles',axis:axis.toArray(),elbowOffset:elbowOffset.toArray(),clearance,fade,changedTriangleCorners:moved,maxInward,samples,contactCorrection:{contacts,contactCorners,maxContactCorrection,maxResidual,uniqueVertices:corrections.size,method:'one measured barycentric constraint pass; fixed forearm surface and unchanged topology'},method:'only excess radial upper-end positions move inward; final forearm support measured before atlas; no cap, muscle-belly or pose change',status:'PARTIAL verify contact and supported poses'};
+}
+
+// Use the union of the two final arm surfaces as support, not a scaled ball.
+// Only the radial cap patch exposed above that union can move, inward only.
+function seatRadialElbowCap(cap,upper,fore,offset,axis,front,outer){
+ const stock=[],cache=new Map(),smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
+ for(const [g,shift]of [[upper,offset],[fore,new Vector3()]]){
+  const p=g.attributes.position;
+  for(let i=0;i<p.count;i+=3){const tri=[0,1,2].map(j=>new Vector3().fromBufferAttribute(p,i+j).sub(shift)),h=tri.map(v=>v.dot(axis));if(Math.max(...h)>=-.046&&Math.min(...h)<=.041)stock.push(...tri);}
+ }
+ const normalStock=Object.fromEntries(['aSmooth','aMoldNormal'].filter(n=>cap.attributes[n]).map(n=>[n,cap.attributes[n].array.slice()]));
+ const clearance=.00025,samples=[];let changed=0,maxInward=0;
+ sculptSurfaceRegion(cap,{name:'R179 radial cap seating against final arm union',sample:before=>{
+  const q=new Vector3(...before),h=q.dot(axis),a=Math.atan2(q.dot(outer),q.dot(front));
+  const w=smooth(-.045,-.020,h)*(1-smooth(.010,.040,h))*smooth(-.60,-.40,a)*(1-smooth(.25,.45,a));if(w<=0)return null;
+  const c=axis.clone().multiplyScalar(h),d=q.clone().sub(c),r=d.length();if(r<1e-8)return null;d.divideScalar(r);
+  const key=before.join(',');let support=cache.get(key);
+  if(support===undefined){const ray=new Ray(c.clone().addScaledVector(d,.5),d.clone().negate()),hit=new Vector3();support=-Infinity;
+   for(let i=0;i<stock.length;i+=3)if(ray.intersectTriangle(stock[i],stock[i+1],stock[i+2],false,hit))support=Math.max(support,hit.clone().sub(c).dot(d));
+   if(!Number.isFinite(support))throw new Error('Radial elbow cap has no final arm support');cache.set(key,support);
+  }
+  const amount=Math.max(0,r-support+clearance)*w;if(amount>.004)throw new Error('Radial cap exceeds local seating allowance '+amount);if(amount<1e-8)return null;
+  changed++;maxInward=Math.max(maxInward,amount);samples.push({h,angle:a,beforeRadius:r,supportRadius:support,afterRadius:r-amount,weight:w});return q.addScaledVector(d,-amount).toArray();
+ }});
+ // One bounded triangle-interior contact pass. A single fitted corner can
+ // leave its neighboring chord outside a different supporting arm triangle.
+ const points=Array.from({length:cap.attributes.position.count},(_,i)=>new Vector3().fromBufferAttribute(cap.attributes.position,i)),corrections=new Map(),keyOf=p=>p.toArray().map(v=>Math.round(v*1e6)).join(',');let contacts=0,maxResidual=0;
+ for(let hi=0;hi<=16;hi++)for(let ai=0;ai<=24;ai++){
+  const h=-.020+.030*hi/16,a=-.40+.65*ai/24,c=axis.clone().multiplyScalar(h),d=front.clone().multiplyScalar(Math.cos(a)).addScaledVector(outer,Math.sin(a)),ray=new Ray(c.clone().addScaledVector(d,.5),d.clone().negate()),hit=new Vector3();let support=-Infinity,radius=-Infinity,triangle=-1,capPoint=null;
+  for(let i=0;i<stock.length;i+=3)if(ray.intersectTriangle(stock[i],stock[i+1],stock[i+2],false,hit))support=Math.max(support,hit.clone().sub(c).dot(d));
+  for(let i=0;i<points.length;i+=3)if(ray.intersectTriangle(points[i],points[i+1],points[i+2],false,hit)){const r=hit.clone().sub(c).dot(d);if(r>radius){radius=r;triangle=i;capPoint=hit.clone();}}
+  if(triangle<0||!Number.isFinite(support)||radius-support<=2e-7)continue;
+  const vs=points.slice(triangle,triangle+3),e0=vs[1].clone().sub(vs[0]),e1=vs[2].clone().sub(vs[0]),v=capPoint.clone().sub(vs[0]),x=e0.dot(e0),y=e0.dot(e1),z=e1.dot(e1),det=x*z-y*y,u=(z*v.dot(e0)-y*v.dot(e1))/det,t=(x*v.dot(e1)-y*v.dot(e0))/det,w=[1-u-t,u,t];
+  const dirs=vs.map(p=>p.clone().addScaledVector(axis,-p.dot(axis)).normalize()),active=vs.map(p=>{const h=p.dot(axis),a=Math.atan2(p.dot(outer),p.dot(front));return h>-.045&&h<.040&&a>-.60&&a<.45;});
+  const influence=w.reduce((s,v,j)=>s+(active[j]?Math.max(0,v)*Math.max(0,dirs[j].dot(d)):0),0);if(influence<.25)throw new Error('Radial cap contact has insufficient local support');
+  const amount=(radius-support+clearance)/influence;if(amount>.002)throw new Error('Radial cap chord correction exceeds allowance');contacts++;maxResidual=Math.max(maxResidual,radius-support);
+  for(let j=0;j<3;j++)if(active[j]&&w[j]>1e-7){const k=keyOf(vs[j]),old=corrections.get(k);if(!old||old.amount<amount)corrections.set(k,{amount,d:dirs[j]});}
+ }
+ let contactCorners=0,maxContactCorrection=0;
+ if(corrections.size)sculptSurfaceRegion(cap,{name:'R179 radial cap measured triangle-contact seating',sample:before=>{const q=new Vector3(...before),c=corrections.get(keyOf(q));if(!c)return null;contactCorners++;maxContactCorrection=Math.max(maxContactCorrection,c.amount);return q.addScaledVector(c.d,-c.amount).toArray();}});
+ // Retain the existing joint envelope field through this interior fitting.
+ for(const[n,array]of Object.entries(normalStock)){cap.attributes[n].array.set(array);cap.attributes[n].needsUpdate=true;}
+ cap.userData.radialCapSeating={version:'R179',frame:{axis:axis.toArray(),front:front.toArray(),outer:outer.toArray()},axialSupport:[-.045,.040],angleSupport:[-.60,.45],clearance,changedTriangleCorners:changed,maxInward,samples,contactCorrection:{contacts,contactCorners,maxContactCorrection,maxResidual,uniqueVertices:corrections.size,surfaceSamples:425},method:'radial cap only; actual union of final upper and forearm triangles; posterior cap, arm crowns and bone frames protected',status:'PARTIAL inspect local rim and supported poses'};
 }

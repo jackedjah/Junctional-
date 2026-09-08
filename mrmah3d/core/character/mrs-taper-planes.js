@@ -1,0 +1,11 @@
+import {Vector3,EdgesGeometry} from '../../vendor/three/three.module.min.js';
+import {taperPlanes} from './mrs-taper-planes-data.js';
+export function shapeMrsTaperPlanes(g){const p=g.attributes.position,edited=new Set();let maxMove=0;for(const [i,x,y,z] of taperPlanes.position){maxMove=Math.max(maxMove,Math.hypot(x-p.getX(i),y-p.getY(i),z-p.getZ(i)));p.setXYZ(i,x,y,z);edited.add(Math.floor(i/3));}refresh(g,edited);const meta={parent:taperPlanes.parent,method:taperPlanes.method,maxMove,changedCorners:taperPlanes.position.length};g.userData.mrsTaperPlanes=meta;return meta;}
+function refresh(g,edited){
+ const p=g.attributes.position,groups=new Map(),keys=[];
+ for(let i=0;i<p.count;i++){const k=[p.getX(i),p.getY(i),p.getZ(i)].map(v=>Math.round(v*1e7)).join(',');keys.push(k);if(!groups.has(k))groups.set(k,{n:new Vector3(),active:false});if(edited.has(Math.floor(i/3)))groups.get(k).active=true;}
+ for(let i=0;i<p.count;i+=3){const v=[0,1,2].map(j=>new Vector3().fromBufferAttribute(p,i+j)),cross=v[1].clone().sub(v[0]).cross(v[2].clone().sub(v[0])),len=cross.length();if(edited.has(i/3)&&len<1e-12)throw Error('Edited face collapsed');if(!len)continue;const n=cross.clone().normalize();for(let j=0;j<3;j++){const a=groups.get(keys[i+j]);if(a.active)a.n.addScaledVector(n,v[(j+1)%3].clone().sub(v[j]).angleTo(v[(j+2)%3].clone().sub(v[j])));}if(edited.has(i/3))for(let j=0;j<3;j++){g.attributes.aPhysicalNormal.setXYZ(i+j,n.x,n.y,n.z);g.attributes.aBary.setW(i+j,len/(v[0].distanceTo(v[1])+v[1].distanceTo(v[2])+v[2].distanceTo(v[0])));}}
+ for(const group of groups.values())if(group.active)group.n.normalize();for(let i=0;i<p.count;i++){const a=groups.get(keys[i]);if(a.active)for(const n of ['normal','aSmooth','aMoldNormal','aCrystalNormal'])g.attributes[n]?.setXYZ(i,a.n.x,a.n.y,a.n.z);}
+ for(const a of Object.values(g.attributes))a.needsUpdate=true;g.computeBoundingBox();g.computeBoundingSphere();
+}
+export function refineMrsTaperPlanes({body}){const mesh=body.group.getObjectByName('torso');shapeMrsTaperPlanes(mesh.geometry);const siblings=mesh.parent.children,start=siblings.indexOf(mesh);for(const o of siblings.slice(start+1,start+3).filter(o=>o.isLineSegments)){const old=o.geometry;o.geometry=new EdgesGeometry(mesh.geometry,30);old.dispose();}}

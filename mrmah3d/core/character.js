@@ -22,7 +22,13 @@ export { HEIGHT as CHARACTER_HEIGHT };
 
 export function createCharacter(options) {
   var opts = options || {};
-  var mah = createMrMah({ tint: opts.tint, envMap: opts.envMap, variant: opts.variant });
+  /* R136+ — Mr. Mah's authored sculpt (arm master, anatomical crystal atlas,
+     fine crystal surface, cranial crown) is gated on `authoringMaster`, which
+     is what the retained handoff mounts him with. It is DEFAULT ON here so the
+     lab and the review viewer show the accepted character rather than the
+     stock pipeline; a host that wants the cheaper build passes false. */
+  var mah = createMrMah({ tint: opts.tint, envMap: opts.envMap, variant: opts.variant,
+    authoringMaster: opts.authoringMaster !== false });
   if (opts.parent) opts.parent.add(mah.root);
 
   /* Shadow flags are the renderer's business, not the character's: the

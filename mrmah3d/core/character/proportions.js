@@ -387,6 +387,9 @@ function chestShape(k, erectorK, latK, opts) {
   var lk = latK == null ? 1.0 : latK;   /* R107: the lat is scaled on its own, not by the pec's k — the under-pec shelf ring (k 0.5) was pinching the lat too, a groove all round the torso */
   var o = opts || {};
   var ik = o.insertion == null ? 0.12 : o.insertion;
+  // R109 Astra: compact anterior bellies leave ribcage/back depth independent.
+  var pa = o.pecAt == null ? 0.55 : o.pecAt;
+  var pw = o.pecW == null ? 0.54 : o.pecW;
   var kk = Math.max(k, 1e-3);
   /* STRENGTHS ARE LARGE ON PURPOSE.
 
@@ -408,8 +411,8 @@ function chestShape(k, erectorK, latK, opts) {
        the 15-degree vertex sits on the pec's rolled inner edge rather than
        already on its crown — the reference's pecs roll away from the sternum,
        they do not meet it in a V one vertex wide. */
-    var sternum = -lobe(a, 0, 0.30) * 0.440;
-    var pec = (belly(a, 0.64, 0.44) + belly(a, -0.64, 0.44)) * 0.560;   /* R105; R106; R107: each pec a full BELLY that falls fast into the trench and the armpit */
+    var sternum = -lobe(a, 0, 0.30) * (o.maleAnatomy ? 0.10 : 0.440);
+    var pec = o.maleAnatomy ? domePair(a, pa, pw) * 0.66 : (belly(a, 0.64, 0.44) + belly(a, -0.64, 0.44)) * 0.560;   /* R105; R106; R107: each pec a full BELLY that falls fast into the trench and the armpit */
     /* R108: the lat's upper mass is the flare under the armpit — a belly on
        the 105 vertex (0.42 wide, where R107's 0.56 reached from 60 to 150
        degrees and rounded the whole flank into a barrel). */
@@ -420,7 +423,8 @@ function chestShape(k, erectorK, latK, opts) {
        falls into the armpit, faint on the under-pec ring. */
     var insertion = -(lobe(a, 1.28, 0.22) + lobe(a, -1.28, 0.22)) * ik / kk;
     var back = backTerms(a, { flat: o.flat, spine: o.spine, erector: ek, erectorAt: o.erectorAt, erectorW: o.erectorW, kite: o.kite, valley: o.valley, valleyAt: o.valleyAt, teres: o.teres, latBack: o.latBack }) / kk;
-    return 1 + (sternum + pec + lat + insertion + back) * k;
+    var under = o.maleAnatomy ? -domePair(a, 0.99, 0.33) * (o.under || 0) : 0;
+    return 1 + (sternum + pec + lat + insertion + back) * k + under;
   };
 }
 
@@ -471,7 +475,7 @@ function coreShape(k, rectusK, latK, latShift, erectorK, opts) {
        than deep), so the belly is centred on 0.30 with its tail gone by 60
        degrees; the linea is deep enough that the two bellies' overlap on the
        0 vertex still leaves a trench. */
-    var linea = -lobe(a, 0, 0.20) * (0.34 + 0.50 * rk);   /* R100; R102; R106; R107: narrow and deep between the bellies; R108: deeper where the blocks are taller — the columns have to outrank the rows */
+    var linea = -lobe(a, 0, 0.20) * (o.maleAnatomy ? 0.24 : (0.34 + 0.50 * rk));   /* R100; R102; R106; R107: narrow and deep between the bellies; R108: deeper where the blocks are taller — the columns have to outrank the rows */
     /* R108 b: the belly is WINDOWED — zero past 0.72 rad. A quarter of its
        height was still landing on the 45-degree vertex, so the block rows
        alternated on the flank too and the abdomen read as ribs running
@@ -479,7 +483,9 @@ function coreShape(k, rectusK, latK, latShift, erectorK, opts) {
        -0.64 / 0.0 / -0.56 row to row). */
     var ae = Math.abs(frontDelta(a));
     var win = ae <= 0.40 ? 1 : ae >= 0.66 ? 0 : (function (t) { return 1 - t * t * (3 - 2 * t); }((ae - 0.40) / 0.26));
-    var rectus = (belly(a, 0.30, 0.28) + belly(a, -0.30, 0.28)) * rk * win;   /* R107: raised bellies with a rounded apex either side of the linea */
+    var rectus = o.maleAnatomy
+      ? domePair(a, o.rectusAt == null ? 0.36 : o.rectusAt, 0.43) * rk
+      : (belly(a, 0.30, 0.28) + belly(a, -0.30, 0.28)) * rk * win;   /* R107: raised bellies with a rounded apex either side of the linea */
     var semilunar = -(lobe(a, 0.78, 0.16) + lobe(a, -0.78, 0.16)) * vk;
     var oblique = (lobe(a, 1.12 + os, 0.34) + lobe(a, -1.12 - os, 0.34)) * ok;
     var serratus = (lobe(a, sc, 0.13) + lobe(a, -sc, 0.13)) * sk;   /* R105; R107; R108: a tooth per ring, stepping round the ribcage row by row */
@@ -1198,37 +1204,40 @@ export var TORSO = {
     /* THE LOWER THIGH: the VL inserting toward the knee, the RF tendon
        fading and the vastus medialis teardrop medial and low; the
        hamstrings end into the knee behind. */
-    { y: 0.870, w: 0.193, d: 0.148, fg: [1, 2], facet: -0.0030, zc: 0.008, crystal: 0.0200, crystalY: 0.0070, hero: 0.18,
+    { y: 0.870, w: 0.190, d: 0.148, fg: [1, 2], facet: -0.0030, zc: 0.008, crystal: 0.0200, crystalY: 0.0070, hero: 0.18,
       shape: thighShape({ seam: 0.22, head: 0.06, vl: 0.16, valley: 0.06, vm: 0.20, itb: 0.04, ham: 0.16, hamCleft: 0.10 }), columns: true, classesAt: taperClasses },
     /* THE LONG DESCENT: from the apex the quad falls away on a convex
        curve (0.397 -> 0.357 -> 0.318 -> 0.262 -> 0.220 of half-width);
        the hamstring columns are restrained so the posterior stays lean. */
-    { y: 0.950, w: 0.216, d: 0.180, fg: [1, 4], facet: 0.0040, zc: 0.006, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
-      shape: thighShape({ seam: 0.26, head: 0.28, rf: 0.08, vl: 0.22, valley: 0.10, vm: 0.14, itb: 0.06, ham: 0.20, hamCleft: 0.14 }), columns: true, classesAt: taperClasses },
+    { y: 0.950, w: 0.207, d: 0.180, fg: [1, 4], facet: 0.0040, zc: 0.006, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
+      shape: thighShape({ seam: 0.26, head: 0.28, rf: 0.08, vl: 0.22, valley: 0.10, vm: 0.14, itb: 0.06, ham: 0.26, hamCleft: 0.20 }), columns: true, classesAt: taperClasses },
     /* THE GLUTEAL FOLD: a shallow crease under the modest shelf (the glute
        goes slightly negative, darkened by the ring's cav), the hamstrings
        beginning under it. */
-    { y: 1.030, w: 0.246, d: 0.200, fg: [1, 4], facet: -0.0040, crystal: 0.0300, crystalY: 0.0070, hero: 0.14,
+    { y: 1.030, w: 0.230, d: 0.200, fg: [1, 4], facet: -0.0040, crystal: 0.0300, crystalY: 0.0070, hero: 0.14,
       shape: thighShape({ seam: 0.28, head: 0.32, rf: 0.10, vl: 0.26, valley: 0.12, vm: 0.04, itb: 0.06, glute: -0.04, gluteC: 0.52, gluteW: 0.42, ham: 0.14, hamCleft: 0.12 }), columns: true, classesAt: taperClasses, cav: 0.25 },
+    /* Astra R109: contain the quad sweep inside the lat block while retaining
+       its front depth. This changes the muscle envelope, never the single
+       taper below the knee; no additional rings or calf volume. */
     /* THE QUAD MASS: the two front columns at full head, the broad lateral
        sweep, a glute that is already only a low shelf behind. */
-    { y: 1.100, w: 0.277, d: 0.215, fg: [1, 4], facet: 0.0045, zc: -0.008, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
-      shape: thighShape({ seam: 0.30, head: 0.36, rf: 0.10, vl: 0.28, valley: 0.12, itb: 0.06, glute: 0.10, gluteC: 0.50, gluteW: 0.40, cleft: 0.18, ham: 0.08 }), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },
+    { y: 1.100, w: 0.255, d: 0.215, fg: [1, 4], facet: 0.0045, zc: -0.008, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
+      shape: thighShape({ seam: 0.34, head: 0.44, rf: 0.12, vl: 0.28, valley: 0.12, itb: 0.06, glute: 0.10, gluteC: 0.50, gluteW: 0.40, cleft: 0.18, ham: 0.08 }), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },
     /* THE QUAD MAXIMUM — t 0.59, 0.265 of height at the silhouette, 0.76 of
        the shoulders and just under twice the belt. R108 d's apex was the
        1.200 row at 0.188; this one is the widest row of the whole lower
        body and every row below it is narrower. */
-    { y: 1.230, w: 0.308, d: 0.215, fg: [1, 4], facet: -0.0045, zc: -0.016, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
-      shape: thighShape({ seam: 0.30, head: 0.34, rf: 0.10, vl: 0.28, valley: 0.12, itb: 0.05, glute: 0.20, gluteC: 0.56, gluteW: 0.48, cleft: 0.24 }), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },
+    { y: 1.230, w: 0.280, d: 0.215, fg: [1, 4], facet: -0.0045, zc: -0.016, crystal: 0.0360, crystalY: 0.0090, hero: 0.22,
+      shape: thighShape({ seam: 0.34, head: 0.42, rf: 0.12, vl: 0.28, valley: 0.12, itb: 0.05, glute: 0.20, gluteC: 0.56, gluteW: 0.48, cleft: 0.24 }), columns: false, classesAt: null, zoneAt: quadZone(1), coat: 1.0 },
     /* THE UPPER QUAD / GLUTE SHELF: the mass still rising to the apex, the
        glute at its fullest here and small (0.20 — structural, never
        dominant), the RF / VL rising out of their origins under the belt. */
-    { y: 1.320, w: 0.286, d: 0.205, fg: [1, 4], facet: 0.0045, zc: -0.020, crystal: 0.0360, crystalY: 0.0090, hero: 0.16,
+    { y: 1.320, w: 0.262, d: 0.205, fg: [1, 4], facet: 0.0045, zc: -0.020, crystal: 0.0360, crystalY: 0.0090, hero: 0.16,
       shape: thighShape({ seam: 0.22, head: 0.26, rf: 0.07, vl: 0.26, valley: 0.09, glute: 0.20, gluteC: 0.60, gluteW: 0.50, cleft: 0.22 }), zoneAt: quadZone(0) },
     /* THE PELVIC TRANSITION: the flare straight out of the belt, about 48
        degrees off vertical (the hero's flare runs 30-50 degrees), the glute
        medius a low lateral-posterior shelf tying into the hip. */
-    { y: 1.410, w: 0.230, d: 0.180, fg: [1, 4], facet: 0.0035, zc: -0.016, crystal: 0.0300, crystalY: 0.0080, hero: 0.10,
+    { y: 1.410, w: 0.221, d: 0.180, fg: [1, 4], facet: 0.0035, zc: -0.016, crystal: 0.0300, crystalY: 0.0080, hero: 0.10,
       shape: thighShape({ seam: 0.14, head: 0.16, rf: 0.04, vl: 0.22, valley: 0.06, glute: 0.14, gluteC: 0.66, gluteW: 0.50, cleft: 0.16 }), zoneAt: quadZone(0) },
     /* THE BELT — the waist. Still the narrowest point on the character and
        still a crease, but the R109 hero's waist is 0.44 of its shoulders
@@ -1236,7 +1245,7 @@ export var TORSO = {
        height; 0.201 here is 0.134. The waist stays SHORT: the ring above
        is within 2% of it and the flare below leaves at 48 degrees. */
     { y: 1.480, w: 0.197, d: 0.155, fg: [1, 1], facet: -0.0070, crystal: 0.0300, crystalY: 0.0080,
-      shape: coreShape(1.0, 0.06), hero: 0.04, zoneAt: coreZone(0), cav: 0.35 },   /* R102: the belt is a crease */
+      shape: coreShape(1.0, 0.06, 0, 0, 0.08, { maleAnatomy: true }), hero: 0.04, zoneAt: coreZone(0), cav: 0.35 },   /* R102: the belt is a crease */
     /* R96 — THE ABDOMINAL ROWS. Three blocks a side between the belt and the
        pectoral turn, as bulge rings (full rectus lobes) alternating with
        crease rings (almost none), so each pair steps out of the abdomen by
@@ -1264,19 +1273,19 @@ export var TORSO = {
     /* R109: the two rows under the lat block follow the belt out — the waist
        is a short pinch (1.545 within 2% of the belt), not a funnel. */
     { y: 1.545, w: 0.202, d: 0.152, fg: [1, 4], facet: 0.0040, crystal: 0.0220, crystalY: 0.0050,
-      shape: coreShape(1.0, 0.26, 0.0, 0.0, 0.34, { obliqueShift: 0.0, oblique: 0.14, spine: 0.34, valley: 0.14, erectorAt: 0.36, erectorW: 0.25, latBack: 0.08 }), hero: 0.08, zoneAt: coreZone(1) },
+      shape: coreShape(1.0, 0.34, 0.0, 0.0, 0.34, { maleAnatomy: true, obliqueShift: 0.0, oblique: 0.14, spine: 0.34, valley: 0.14, erectorAt: 0.36, erectorW: 0.25, latBack: 0.08 }), hero: 0.08, zoneAt: coreZone(1) },
     { y: 1.605, w: 0.232, d: 0.160, fg: [1, 4], facet: -0.0040, crystal: 0.0220, crystalY: 0.0050,
-      shape: coreShape(1.0, 0.08, 0.10, 0.34, 0.34, { obliqueShift: 0.10, oblique: 0.14, spine: 0.34, valley: 0.14, erectorAt: 0.36, erectorW: 0.25, latBack: 0.14 }), hero: 0.03, zoneAt: coreZone(1), cav: 0.75 },   /* R102: abdominal crease */
-    { y: 1.665, w: 0.310, d: 0.176, fg: [1, 4], facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
-      shape: coreShape(0.95, 0.26, 0.26, 0.24, 0.28, { obliqueShift: 0.18, oblique: 0.14, spine: 0.32, valley: 0.14, erectorAt: 0.34, erectorW: 0.24, latBack: 0.22 }), hero: 0.08, zoneAt: coreZone(2) },
-    { y: 1.725, w: 0.330, d: 0.198, fg: [1, 4], facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
-      shape: coreShape(0.90, 0.08, 0.36, 0.12, 0.22, { obliqueShift: 0.26, oblique: 0.12, spine: 0.28, serratus: 0.035, serratusAt: 1.05, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.32 }), hero: 0.03, zoneAt: coreZone(2), cav: 0.75 },   /* R102: abdominal crease */
+      shape: coreShape(1.0, 0.16, 0.10, 0.34, 0.34, { maleAnatomy: true, obliqueShift: 0.10, oblique: 0.14, spine: 0.34, valley: 0.14, erectorAt: 0.36, erectorW: 0.25, latBack: 0.14 }), hero: 0.03, zoneAt: coreZone(1), cav: 0.75 },   /* R102: abdominal crease */
+    { y: 1.665, w: 0.280, d: 0.176, fg: [1, 4], facet: 0.0040, crystal: 0.0240, crystalY: 0.0050,
+      shape: coreShape(0.95, 0.36, 0.26, 0.24, 0.28, { maleAnatomy: true, obliqueShift: 0.18, oblique: 0.14, spine: 0.32, valley: 0.14, erectorAt: 0.34, erectorW: 0.24, latBack: 0.22 }), hero: 0.08, zoneAt: coreZone(2) },
+    { y: 1.725, w: 0.317, d: 0.203, fg: [1, 4], facet: -0.0040, crystal: 0.0240, crystalY: 0.0050,
+      shape: coreShape(0.90, 0.16, 0.36, 0.12, 0.22, { maleAnatomy: true, obliqueShift: 0.26, oblique: 0.12, spine: 0.28, serratus: 0.09, serratusAt: 1.05, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.32 }), hero: 0.03, zoneAt: coreZone(2), cav: 0.75 },   /* R102: abdominal crease */
     /* the lat hands over to chestShape's lat on the ring above at the SAME
        strength (0.34 here against 0.33 there): R108's first cut had 0.52
        against 0.30, and the flank normal flipped from facing down to facing
        up across 0.05 of height — a ledge on top of the lat. */
-    { y: 1.780, w: 0.342, d: 0.222, fg: [1, 4], facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
-      shape: coreShape(0.85, 0.24, 0.34, 0.0, 0.18, { obliqueShift: 0.36, oblique: 0.06, spine: 0.26, serratus: 0.035, serratusAt: 1.20, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.36 }), hero: 0.08, zoneAt: coreZone(3) },
+    { y: 1.780, w: 0.342, d: 0.226, fg: [1, 4], facet: 0.0040, crystal: 0.0260, crystalY: 0.0060,
+      shape: coreShape(0.85, 0.30, 0.34, 0.0, 0.18, { maleAnatomy: true, obliqueShift: 0.36, oblique: 0.06, spine: 0.26, serratus: 0.09, serratusAt: 1.20, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.36 }), hero: 0.08, zoneAt: coreZone(3) },
     /* R97 — THE LOWER PEC TURN: a crease ring where the chest shelf ends and
        a belly ring above it, so the pectoral is a mass with a lower edge
        that falls into shadow rather than a plane that fades into the abs. */
@@ -1294,19 +1303,19 @@ export var TORSO = {
        0.80 / 0.95 / 1.0 down from the groove ring to 1.895, and the ring
        under it drops the front 0.13 in 0.065 — steep, but the spline rounds
        it and the under-pec is the one crease the chest needs. */
-    { y: 1.830, w: 0.336, d: 0.276, fg: [2, 2], facet: -0.0040,   /* R107: not narrower than either neighbour — that was a groove all round */ crystal: 0.0300, crystalY: 0.0080,
-      shape: chestShape(0.55, 0.17, 1.10, { insertion: 0.04, spine: 0.26, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.34 }), zoneAt: pecUnderZone, cav: 0.60 },
-    { y: 1.895, w: 0.328, d: 0.316, fg: [2, 2], facet: 0.0035, crystal: 0.0320, crystalY: 0.0080,
-      shape: chestShape(1.0, 0.15, 1.0, { insertion: 0.14, kite: 0.06, erectorAt: 0.34, erectorW: 0.24, valley: 0.14, valleyAt: 0.60, latBack: 0.28 }), hero: 0.30, zoneAt: pecZone(0) },
+    { y: 1.830, w: 0.336, d: 0.242, fg: [2, 2], facet: -0.0040,   /* R107: not narrower than either neighbour — that was a groove all round */ crystal: 0.0300, crystalY: 0.0080,
+      shape: chestShape(0.56, 0.17, 1.10, { maleAnatomy: true, pecAt: 0.55, pecW: 0.54, under: 0.02, insertion: 0.04, spine: 0.26, erectorAt: 0.32, erectorW: 0.22, valley: 0.16, valleyAt: 0.55, latBack: 0.34 }), zoneAt: pecUnderZone, cav: 0.60 },
+    { y: 1.895, w: 0.328, d: 0.256, fg: [2, 2], facet: 0.0035, crystal: 0.0320, crystalY: 0.0080,
+      shape: chestShape(0.78, 0.15, 1.0, { maleAnatomy: true, insertion: 0.14, kite: 0.06, erectorAt: 0.34, erectorW: 0.24, valley: 0.14, valleyAt: 0.60, latBack: 0.28 }), hero: 0.30, zoneAt: pecZone(0) },
     /* R106 — THE PEC IS A DOME: a crown ring between two shoulder rings, so
        the mass rounds over in the vertical as well as across. Three bands
        over 0.22 units made a hexagonal profile that the clay view read as a
        flat plate with a slot beneath it. */
-    { y: 1.935, w: 0.336, d: 0.320, fg: [2, 2], facet: -0.0030, crystal: 0.0340, crystalY: 0.0080,
-      shape: chestShape(0.95, 0.13, 0.90, { insertion: 0.14, kite: 0.10, valley: 0.10, valleyAt: 0.66, latBack: 0.20 }), hero: 0.34, zoneAt: pecZone(0) },
+    { y: 1.935, w: 0.336, d: 0.264, fg: [2, 2], facet: -0.0030, crystal: 0.0340, crystalY: 0.0080,
+      shape: chestShape(0.94, 0.13, 0.90, { maleAnatomy: true, insertion: 0.14, kite: 0.10, valley: 0.10, valleyAt: 0.66, latBack: 0.20 }), hero: 0.34, zoneAt: pecZone(0) },
     /* the pectoral line — the strongest cross-section shaping on the body */
-    { y: 1.970, w: 0.338, d: 0.315, fg: [2, 2], facet: 0.0035, crystal: 0.0340, crystalY: 0.0080,
-      shape: chestShape(0.80, 0.10, 0.75, { insertion: 0.10, kite: 0.14, valley: 0.06, valleyAt: 0.72, latBack: 0.10 }), hero: 0.34, zoneAt: pecZone(0) },
+    { y: 1.970, w: 0.338, d: 0.270, fg: [2, 2], facet: 0.0035, crystal: 0.0340, crystalY: 0.0080,
+      shape: chestShape(0.92, 0.10, 0.75, { maleAnatomy: true, insertion: 0.10, kite: 0.14, valley: 0.06, valleyAt: 0.72, latBack: 0.10 }), hero: 0.34, zoneAt: pecZone(0) },
     /* R103 — THE SHOULDER GIRDLE SITS 0.05 LOWER. The trap could only slope
        at 22 degrees from a shoulder line at 2.170 to a neck base at 2.215;
        the references' traps climb at about 40 degrees into a visible neck,
@@ -1314,8 +1323,8 @@ export var TORSO = {
        shoulder line at 2.120 the slope is 41 degrees, the cap's crest meets
        it, and the neck is embedded in a rising upper torso. The head does
        not move. */
-    { y: 2.050, w: 0.330, d: 0.295, fg: [2, 2], facet: -0.0035, crystal: 0.0300, crystalY: 0.0060,
-      shape: chestShape(0.55, 0.08, 0.40, { insertion: 0.06, kite: 0.16, valley: 0.02 }), hero: 0.40, zoneAt: pecZone(1) },   /* R107: the pec FADES up into the clavicle; R108: the clavicular sweep — 0.55 here, 0.30 on the groove ring */
+    { y: 2.050, w: 0.330, d: 0.278, fg: [2, 2], facet: -0.0035, crystal: 0.0300, crystalY: 0.0060,
+      shape: chestShape(0.55, 0.08, 0.40, { maleAnatomy: true, insertion: 0.06, kite: 0.16, valley: 0.02 }), hero: 0.40, zoneAt: pecZone(1) },   /* R107: the pec FADES up into the clavicle; R108: the clavicular sweep — 0.55 here, 0.30 on the groove ring */
     /* R100 — the groove under the clavicle (subclavicleShape): its own dark,
        uncoated zone, so the collarbone above it reads as a bar with shadow
        beneath. */
@@ -1766,7 +1775,7 @@ export var ARMS = {
        pi, and rear-OUTER is pi + inner*x (the bump wraps), rear-INNER is
        pi - inner*x. The R107 table had the long and lateral heads swapped
        by exactly this sign, which is one reason the horseshoe never read. */
-    upper: function (t, d, inner) {
+    upper: function (t, d, inner, maleAnatomy) {
       var inn = inner || 1, out = -inn;
       /* R108 c — SCULPTED INSIDE THE SAME CIRCUMFERENCE. The first pass's
          section was a round limb with modest bellies (biceps 0.28, heads
@@ -1848,6 +1857,18 @@ export var ARMS = {
       var e = Math.pow(Math.max(0, (t - 0.76) / 0.24), 2);
       var radialOrigin = Math.pow(bump(d, out * 0.85, 0.50), 0.7) * 0.14 * Math.pow(Math.max(0, (t - 0.70) / 0.30), 1.5);
       var elbow = -bump(d, 0, 0.62) * 0.12 * e + bump(d, Math.PI, 0.42) * 0.08 * e + radialOrigin;
+      // R109 Astra: expose posterior heads and side separations inside the
+      // accepted envelope; profile and nominal radius remain unchanged.
+      if (maleAnatomy) {
+        biceps *= 1.08;
+        triLong *= 1.28;
+        triLat *= 1.23;
+        tendon *= 1.12;
+        septOut *= 1.40;
+        septIn *= 1.25;
+        brach *= 1.25;
+        insertion += 0.10 * bump(d, out * 1.45, 0.48) * top;
+      }
       return 1 + biceps + triLong + triLat + tendon + septOut + septIn + brach + insertion + elbow;
     },
     /* R108 — THE FOREARM'S MASSES ARE PLACED BY `inner`, all of them.
@@ -1862,7 +1883,7 @@ export var ARMS = {
        bone — as a flat between the two rear groups. Thickest just under the
        elbow, a long taper, and a wrist that flattens front-to-back so the
        tendons read as a compression before the hand expands again. */
-    fore: function (t, d, inner) {
+    fore: function (t, d, inner, maleAnatomy) {
       var inn = inner || 1, out = -inn;
       /* R108 c — A CLUSTER, NOT A CLUB. The brachioradialis is the dominant
          mass and it originates HIGH, on the outer arm above the elbow line
@@ -1885,6 +1906,11 @@ export var ARMS = {
                         - bump(d, inn * 0.02, 0.22) * 0.05 * swell;                  /* and between the brachioradialis and the flexors */
       var w = Math.pow(Math.max(0, (t - 0.66) / 0.34), 2);
       var wrist = -(bump(d, 0, 0.70) * 0.12 + bump(d, Math.PI, 0.70) * 0.08) * w;   /* the wrist is wider than it is deep: tendons */
+      if (maleAnatomy) {
+        brachioradialis *= 1.18;
+        extensor *= 1.22;
+        radialChannel *= 1.55;
+      }
       return 1 + brachioradialis + extensor + flexor + fcu + ulna + radialChannel + wrist;
     }
   }
@@ -2016,3 +2042,375 @@ export var SHAPES = {
   pecZone: pecZone, coreZone: coreZone, taperClasses: taperClasses,
   neckClasses: neckClasses
 };
+
+/* R111 fixed authored morphology. Estimates from the revised male mold, not
+   calibrated anatomy, medical data, or a growth simulation. +Y superior,
+   +Z anterior; paired territories mirror X in the rest frame. Poses use the
+   existing shoulder/elbow/wrist rig and do not replace these rest forms.
+   This is the executable shape owner; myofascial.js evaluates these fields. */
+export const MRMAH_MORPHOLOGY = {
+  rectus:{originFootprint:'lower rib/costal and sternum sheet',insertionFootprint:'compact fictional lower anterior root',support:'continuous abdominal wall',bellies:[{x:.062,y:1.544,width:.073,length:.105,projection:.084},{x:.079,y:1.671,width:.092,length:.076,projection:.105},{x:.092,y:1.791,width:.099,length:.073,projection:.101}],separationDepth:.011,referencePanel:'mold large front and upper-body inset',confidence:'authored relief; exact hidden attachments not observable'},
+  back:{originFootprint:'broad spinal/iliac-inspired trunk sheet and scapular planes',insertionFootprint:'proximal posterior upper-arm region beneath rear deltoid',support:'posterior ribcage and lumbar axis',bellyPeak:[.21,1.85],neighborOverlap:'scapular planes over teres/lat sheet; narrow integrated erectors',referencePanel:'mold large rear',confidence:'stylized attachment interpretation'},
+  posteriorSheets: 'back.sheets owns counter-clockwise XY footprints, crown/extent, plane depth/tilt and physical bevel; back.axillaryFold retains a longitudinal attachment sheet',
+  reference: {construction:'ADCDB126-E4E7-474A-8D95-8C6008531149/1-Photo-1.jpg male clay guide',presence:'2-Photo-2.jpg',confidence:'authored interpretation; attachment footprints partly occluded'},
+  protected: {crown:3,helmetBase:2.268,tip:0,shoulderX:.4895,shoulderY:1.954,waistY:1.48},
+  // Same sampling cost, concentrated at crests, rolling returns and insertions.
+  sampleY:[0,.15,.44,.55,.66,.77,.87,.97,1.06,1.14,1.22,1.28,1.34,1.40,1.45,1.48,1.515,1.545,1.575,1.605,1.635,1.665,1.695,1.725,1.752,1.78,1.805,1.83,1.855,1.88,1.905,1.93,1.955,1.98,2.005,2.03,2.055,2.08,2.105,2.13,2.155,2.18,2.20,2.22,2.24,2.26,2.28,2.30,2.318,2.335],
+  pec:{originFootprint:[[.018,1.88,.23],[.028,2.11,.22],[.23,2.11,.18]],insertionFootprint:[[.38,2.04,.10],[.445,1.98,.09]],support:['sternum','clavicle','proximal humerus'],lower:1.805,lowerCurve:.175,upper:2.133,upperSlope:.095,projection:.225,bellyX:.195,bellyY:2.000,bellyWidth:.205,bellyHeight:.135,medialReturn:.071,lateralEnd:.423,bellyPower:1.35,inferiorReturn:{centreX:.18,lowY:1.825,curvature:2.2,width:.10,continuation:.45},neighbor:'anterior deltoid overlies lateral convergence; local axillary recess'},
+  neck:{originFootprint:[[.04,2.10,.18],[.24,2.12,.12]],insertionFootprint:[[.08,2.30,.05],[.06,2.335,-.02]],support:['clavicular arc','posterior helmet seat'],anteriorRoute:[[2.10,.060],[2.17,.071],[2.25,.060],[2.335,.036]],anteriorRelief:.034,throatValley:.012},
+  arms:{frame:'project +Z into each rest bone normal plane; mirrored inner/outer side; pose transports this basis; forearm +Z follows palm and positive angle turns toward thumb',originFootprint:'clavicle/acromion/scapular spine into cap; shoulder-to-humeral anterior and posterior routes',insertionFootprint:'cap to lateral humerus; biceps to radius side; brachialis and triceps toward ulna/olecranon',bellyPeaks:{biceps:.50,tricepsLong:.35,tricepsLateral:.54,brachialis:.66,brachioradialis:.24},proximalTransition:[-.30,.15],distalTransition:[.78,1],neighborOverlap:'one shoulder/upper-arm surface, existing articulated elbow/forearm junction; radius crest above fuller flexor belly, bounded dorsal/ulnar planes'},
+  lower:{fictional:true,attachment:'compact root into broad common quad/posterior sheets; paired relief merges inside one envelope',maximumY:1.22,noSecondaryExpansion:true},
+  TRUNK_WIDTH:[[1.40,.233],[1.48,.21518],[1.55,.224],[1.67,.278],[1.81,.350],[1.94,.345],[2.07,.329],[2.12,.285],[2.18,.137],[2.23,.094],[2.29,.079],[2.318,.066],[2.335,.056]],
+  TRUNK_FRONT:[[1.40,.173],[1.48,.178],[1.62,.180],[1.76,.222],[1.85,.236],[1.96,.246],[2.08,.224],[2.15,.157],[2.23,.079],[2.29,.062],[2.335,.054]],
+  TRUNK_BACK:[[1.40,.190],[1.48,.165],[1.63,.174],[1.80,.205],[1.98,.244],[2.10,.215],[2.18,.150],[2.23,.112],[2.29,.109],[2.335,.101]],
+  TRUNK_PATHS:{
+  rectus:[[1.38,.045,.033],[1.59,.059,.047],[1.76,.080,.060],[1.85,.085,.055]],
+  oblique:[[1.43,.125,.035],[1.62,.207,.055],[1.84,.310,.035]],
+  lat:[[1.46,.060,.028],[1.75,.213,.108],[1.91,.281,.080],[2.09,.319,.032]],
+  erector:[[1.40,.047,.029],[1.67,.055,.031],[1.82,.065,.036],[1.97,.076,.045]]
+},
+  LOWER_WIDTH:[[0,0],[.20,.035],[.43,.084],[.68,.151],[.88,.211],[1.08,.289],[1.22,.318],[1.33,.279],[1.48,.21518],[1.56,.227]],
+  LOWER_FRONT:[[0,0],[.20,.026],[.43,.060],[.68,.100],[.88,.148],[1.08,.201],[1.23,.221],[1.34,.201],[1.48,.175],[1.56,.178]],
+  LOWER_BACK:[[0,0],[.20,.025],[.43,.057],[.68,.094],[.88,.139],[1.08,.176],[1.25,.208],[1.36,.197],[1.48,.160],[1.56,.163]],
+  LOWER_PATHS:{
+  rectusFemoris:[[.76,.043,.026],[1.03,.113,.052],[1.23,.131,.060],[1.48,.083,.032]],
+  vastusLateralis:[[.79,.099,.029],[1.06,.219,.075],[1.26,.228,.065],[1.45,.161,.027]],
+  vastusMedialis:[[.70,.034,.023],[.90,.071,.041],[1.06,.098,.034],[1.30,.124,.022]],
+  hamstring:[[.66,.039,.027],[.94,.090,.041],[1.14,.129,.055],[1.33,.155,.039]],
+  glute:[[1.02,.116,.038],[1.27,.150,.080],[1.46,.130,.047]]
+},
+};
+
+// R112: broad attachments and belly sheets from the latest male clay guide.
+// These visible surface footprints are authored interpretations, not scans.
+MRMAH_MORPHOLOGY.back.axillaryFold=[[1.76,.14,.25,0],[1.85,.18,.335,.025],[1.96,.24,.37,.035],[2.075,.31,.38,0]];
+
+
+MRMAH_MORPHOLOGY.lower.planeDesign={quadTerritory:[.10,.95],quadProjection:.058,kneeAccentY:.75,kneeRelief:.012,kind:'paired interior chevron; no new joint or external expansion'};
+
+// R114 front cross-sections: support, crown and return are independent.
+// Coordinates remain the same authored rest frame; no camera-specific fields.
+MRMAH_MORPHOLOGY.pec.surface={
+ supportDepth:[[1.77,.275],[1.84,.285],[1.90,.300],[1.97,.338],[2.035,.320],[2.09,.240],[2.14,.180],[2.18,.125]],
+ crownDepth:[[1.77,.295],[1.84,.305],[1.885,.335],[1.935,.385],[1.98,.434],[2.035,.450],[2.07,.434],[2.12,.270],[2.18,.135]],
+ crownFootprint:[[0,0],[.035,.56],[.082,1],[.254,.98],[.325,.58],[.423,0]],
+ lowerCurve:.095,sideExponent:.45,blend:[1.81,2.17,.075],
+ projectionScale:.80,inferiorProjectionScale:.725,sternumSupport:.014,lowerSternumSeparation:.025,
+ route:'broad clavicular and sternum stock; crown rolls inward before lateral humeral tie-in',
+ reference:'2561CD55-A0FF-4099-B425-90010006EA5A/2-Photo-2.jpg'
+};
+MRMAH_MORPHOLOGY.rectus.crown={projectionScale:.4898,sideTurn:.75,crownConvexity:.19,wallDepth:.047,medialWidth:.028,medialSupport:.012,
+ widthScales:[.98,.935,.90],lengthScales:[1.07,1.07,1],intersectionFill:.003};
+
+MRMAH_MORPHOLOGY.arms.planeDesign={
+ biceps:{crownBreadth:1.18,crownConvexity:.18,projection:.477},
+ brachialis:{origin:.45,peak:.67,insertion:.88,angularCentre:1.46,angularWidth:.50,projection:.058},
+ triceps:{longProjection:.47,lateralProjection:.46,longBreadth:.98,lateralBreadth:.85},
+ deltoid:{anteriorEnd:.035,posteriorEnd:.065,lateralEnd:.315,valleyWidth:.048,valleyDepth:.040},
+ attachment:'outer deltoid boundaries descend obliquely into the humeral surface; brachialis emerges distal to biceps alongside posterior triceps',
+ reference:'latest male guide shoulder and arm close-up; authored local rest frame'
+};
+
+// R114 broad anatomical footprints, counter-clockwise in mirrored XY.
+// Fixed physical bevels keep narrow insertion ends from becoming knife edges.
+MRMAH_MORPHOLOGY.back.sheets={
+ upperTrap:{footprint:[[.003,2.08],[.19,2.115],[.14,2.22],[.035,2.335],[.001,2.30]],crown:[.075,2.19],extent:[.12,.17],depth:.038,tilt:[-.06,.01],bevel:.060},
+ middleTrap:{footprint:[[.008,1.77],[.055,1.81],[.225,2.045],[.175,2.17],[.018,2.23]],crown:[.078,2.04],extent:[.16,.25],depth:.025,tilt:[.03,.02],bevel:.075},
+ infraspinatus:{footprint:[[.095,2.015],[.235,1.94],[.360,2.025],[.358,2.095],[.23,2.15],[.125,2.13]],crown:[.235,2.045],extent:[.15,.12],depth:.063,tilt:[.04,.01],bevel:.065},
+ teres:{footprint:[[.175,1.885],[.25,1.85],[.390,1.99],[.37,2.065],[.285,2.00]],crown:[.30,1.955],extent:[.14,.14],depth:.066,tilt:[.05,0],bevel:.060},
+ lat:{footprint:[[.040,1.52],[.115,1.55],[.300,1.78],[.390,1.96],[.345,2.015],[.170,1.90],[.065,1.71]],crown:[.205,1.795],extent:[.21,.28],depth:.078,tilt:[.10,.04],bevel:.085}
+};
+MRMAH_MORPHOLOGY.back.planeDesign={crownConvexity:.20,edgeStart:.42,projectionScale:.83,axialIntegration:.006,spinalFloorWidth:.12,spinalFloor:.028,outerReliefExponent:.35};
+
+// R115: explicit male fields, continued from the frozen R114 B0.
+// One active profile per region; references are artwork, not calibrated scans.
+MRMAH_MORPHOLOGY.pec.surface={"supportDepth":[[1.4,0.228],[1.48,0.236],[1.6,0.239],[1.74,0.268],[1.84,0.289],[1.92,0.301],[2.015,0.3],[2.08,0.271],[2.14,0.172],[2.18,0.125],[2.335,0.054]],"crownDepth":[[1.77,0.284],[1.85,0.329],[1.9,0.367],[1.94,0.389],[2.015,0.398],[2.065,0.391],[2.11,0.326],[2.155,0.175],[2.18,0.125]],"crownFootprint":[[0,0],[0.006,0.3],[0.014,0.85],[0.035,1],[0.26,1],[0.34,0.7],[0.423,0]],"lowerCurve":0.07,"sideExponent":0.45,"blend":[1.825,2.19,0.085],"projectionScale":1,"inferiorProjectionScale":1,"sternumSupport":0.028,"lowerSternumSeparation":0,"route":"R120 / PDF23: consistent connected support; four broad oblique crown/return facing directions within one pec envelope.","reference":"3F8C5D7B-8C2B-4C0C-9C00-6C393710665B/1-Photo-1.jpg","moldPlanes":{"frontDepth":0.397,"crownConvexity":0.007,"crownX":0.17,"halfWidth":0.23,"verticalTilt":0.13,"outerStart":0.23,"outerDepth":0.397,"outerSlope":0.93,"bevel":0.018,"outerBevel":0.02},"sternumSurface":[[1.825,0.245],[1.885,0.28],[1.94,0.326],[2.015,0.37],[2.065,0.36],[2.13,0.22],[2.18,0.125]],"envelope":{"lower":[[0,1.93],[0.04,1.917],[0.12,1.897],[0.21,1.913],[0.29,1.955],[0.36,2.003],[0.423,2.035]],"upper":[[0,2.18],[0.1,2.174],[0.22,2.154],[0.32,2.119],[0.423,2.068]],"lowerReturn":0.104,"upperReturn":0.071,"planarReturn":true,"returnCage":{"height":0.094,"section":[[0,0],[0.18,0.18],[0.52,0.63],[1,1]],"supportLift":0.012,"supportBelow":0.04,"supportAbove":0.067,"medialFade":0.036,"lateralFade":[0.27,0.37],"crownJoin":0.012,"relativeToCrown":true}},"connectedSupport":{"region":[1.4,2.2,0.09],"sideSlope":[[1.4,0.5],[1.6,0.48],[1.75,0.33],[1.87,0.25],[2.015,0.32],[2.14,0.2]],"sideStart":0.11,"midlineHalfWidth":0.026,"midlineRecess":0.007,"thoracicMidline":{"halfWidth":0.015,"recess":0.006,"region":[1.91,2.18,0.035]},"rectusMidline":{"halfWidth":0.012,"recess":0.007,"region":[1.655,1.905,0.025],"source":"Craftsman p10; medial wall frame follows narrower actual column border, same recess depth"}},"facingPlanes":{"source":"PDF 23 / T02; PDF31 anatomy-following fan","fillet":0.004,"faces":[{"name":"clavicular-slope","at":[0.17,2.04],"z":0.385,"slope":[0.05,-0.9]},{"name":"inferior-oblique-face","at":[0.17,1.99],"z":0.386,"slope":[0.2,0.85]},{"name":"outer-attachment-turn","at":[0.25,2.02],"z":0.386,"slope":[-1,0.15]},{"name":"medial-return","at":[0.05,2.01],"z":0.386,"slope":[0.85,-0.07]}],"baselineCrownDepth":[[1.77,0.284],[1.85,0.329],[1.9,0.367],[1.94,0.389],[2.015,0.398],[2.065,0.391],[2.11,0.326],[2.155,0.175],[2.18,0.125]],"front":{"at":[0.17,2.01],"z":0.385,"slope":[0.04,0.06]}},"surfaceCage":{"source":"Craftsman pp8-9; P40 T02/T03; approximate rest-space authoring, not calibrated reconstruction","boundary":[[0.012,1.917],[0.13,1.901],[0.27,1.948],[0.402,2.064],[0.3,2.124],[0.13,2.161],[0.012,2.151]],"crown":[[0.04,1.965,0.36],[0.14,1.949,0.37],[0.26,1.984,0.367],[0.33,2.06,0.311],[0.255,2.094,0.337],[0.13,2.1,0.35],[0.036,2.087,0.33]],"crest":[0.16,2.035,0.384],"baselineSlope":[0.04,0.06],"alignedRows":true,"baselineLower":[[0,1.93],[0.04,1.917],[0.12,1.897],[0.21,1.913],[0.29,1.955],[0.36,2.003],[0.423,2.035]],"baselineReturnSection":[[0,0],[0.18,0.18],[0.52,0.63],[1,1]]}};
+MRMAH_MORPHOLOGY.rectus.crown={"wallDepth":0.047};
+MRMAH_MORPHOLOGY.rectus.patches=[{"name":"lower","footprint":[[1.405,0.002,0.048],[1.45,0.002,0.105],[1.52,0.002,0.132],[1.585,0.002,0.139],[1.61,0.002,0.13]],"crest":[0.066,1.559],"extent":[0.065,0.109],"projection":0.05,"convexity":[0.0025,0.002],"sidePlane":-0.12,"flow":-0.06,"returns":{"medial":0.014,"lateral":0.03,"longitudinal":0.045},"contour":[[0.005,1.428],[0.069,1.476],[0.126,1.586],[0.124,1.64],[0.013,1.649],[0.003,1.547]],"edgeReturns":[0.04012,0.024,0.024,0.036579999999999994,0.037,0.037],"verticalPlane":0.05,"planarReturn":true,"crownSideOnly":true,"returnFillet":0.003},{"name":"middle","footprint":[[1.603,0.002,0.129],[1.635,0.002,0.152],[1.675,0.002,0.157],[1.715,0.002,0.15],[1.737,0.002,0.136]],"crest":[0.073,1.699],"extent":[0.072,0.074],"projection":0.053,"convexity":[0.0025,0.002],"sidePlane":-0.16,"flow":0.11,"returns":{"medial":0.014,"lateral":0.033,"longitudinal":0.034},"contour":[[0.004,1.627],[0.105,1.648],[0.143,1.706],[0.123,1.752],[0.01,1.752],[0.003,1.699]],"edgeReturns":[0.024,0.021,0.023,0.024,0.016,0.016],"verticalPlane":0.01,"planarReturn":true,"crownSideOnly":true,"returnFillet":0.003,"crownSurface":{"z":0.305,"slope":[-0.09,0.12],"source":"PDF24 / T01; local final surface plane, approximate B0 crown anchor","reliefBaseline":0.053},"shapeContract":{"state":"UNRESOLVED","source":"Craftsman pp8/10; P40 T01/T03","protected":["crest","crownSurface","lower patch"],"edit":"medial and transverse footprints return over different local distances; no crown multiplier"}},{"name":"upper","footprint":[[1.737,0.002,0.137],[1.765,0.002,0.157],[1.8,0.002,0.164],[1.835,0.002,0.159],[1.868,0.002,0.129]],"crest":[0.077,1.826],"extent":[0.079,0.069],"projection":0.051,"convexity":[0.0025,0.002],"sidePlane":-0.19,"flow":0.18,"returns":{"medial":0.014,"lateral":0.032,"longitudinal":0.031},"contour":[[0.004,1.755],[0.105,1.785],[0.151,1.827],[0.132,1.879],[0.009,1.898],[0.003,1.824]],"edgeReturns":[0.023,0.02,0.022,0.026,0.014,0.014],"verticalPlane":-0.035,"planarReturn":true,"crownSideOnly":true,"returnFillet":0.003,"crownSurface":{"z":0.333,"slope":[-0.13,0.16],"source":"PDF24 / T01; local final surface plane, approximate B0 crown anchor","reliefBaseline":0.051},"shapeContract":{"state":"UNRESOLVED","source":"Craftsman pp8/10; P40 T01/T03","protected":["crest","crownSurface","lower patch"],"edit":"medial and transverse footprints return over different local distances; no crown multiplier"}}];
+MRMAH_MORPHOLOGY.rectus.organization={"lineaDepth":0.006,"lineaHalfWidth":0.011,"flankProjection":0.023,"reference":"astra-r117/references/regional-boundaries.json","method":"independent per-edge rectus returns and crown directions; two short rib sheets over one long oblique sheet","flankTurn":{"startX":0.135,"slope":0.61,"region":[1.47,1.93,0.12],"slopeProfile":[[1.47,0.61],[1.62,0.54],[1.76,0.29],[1.85,0.15],[1.93,0.1]]},"bridgeRecess":0.024,"columnProfile":[[1.405,0],[1.48,0.018],[1.59,0.028],[1.66,0.03],[1.74,0.032],[1.84,0.031],[1.91,0]],"lateralSheets":[{"footprint":[[0.117,1.465],[0.196,1.555],[0.274,1.745],[0.244,1.778],[0.168,1.635]],"crown":[0.192,1.64],"extent":[0.09,0.17],"depth":0.026,"tilt":[-0.22,0.095],"bevel":0.029,"planeReturns":true,"returnFillet":0.003},{"footprint":[[0.166,1.701],[0.247,1.774],[0.319,1.865],[0.288,1.881],[0.183,1.783]],"crown":[0.227,1.79],"extent":[0.083,0.08],"depth":0.03,"tilt":[-0.11,0.04],"bevel":0.023,"planeReturns":true,"returnFillet":0.003},{"footprint":[[0.183,1.796],[0.278,1.872],[0.343,1.935],[0.306,1.944],[0.197,1.863]],"crown":[0.258,1.863],"extent":[0.088,0.076],"depth":0.034,"tilt":[-0.17,-0.03],"bevel":0.022,"planeReturns":true,"returnFillet":0.003}],"sampleX":[0,0.014,0.031,0.056,0.082,0.108,0.137,0.171,0.225,0.29,1],"surfaceSamples":{"patch":"middle","region":[1.65,1.755,0.025],"source":"PDF24/31; rest-space crest and lateral-return samples within existing allocation"},"supportReturn":{"outer":0.133,"width":0.041,"region":[1.655,1.875,0.025],"source":"PDF24-25: independent lateral column support; verified max(crown,bed) concealed return at 52% of middle-footprint samples"}};
+MRMAH_MORPHOLOGY.arms.planeDesign={"biceps":{"crownBreadth":1.24,"crownConvexity":0.09,"projection":0.46,"bellySpan":[0.35,0.57]},"brachialis":{"origin":0.4,"peak":0.69,"insertion":0.9,"angularCentre":1.48,"angularWidth":0.52,"projection":0.19},"triceps":{"longProjection":0.47,"lateralProjection":0.48,"longBreadth":1.08,"lateralBreadth":0.93,"longSpan":[0.24,0.43],"lateralSpan":[0.43,0.6]},"deltoid":{"anteriorEnd":0.09,"posteriorEnd":0.15,"lateralEnd":0.34,"valleyWidth":0.056,"valleyDepth":0.042},"attachment":"outer deltoid boundaries descend obliquely into the humeral surface; brachialis emerges distal to biceps alongside posterior triceps","reference":"PDF26-27 / T03 and T01: longitudinally distinct bellies; B0-integral-preserving envelope; retain local wedge returns.","angularSamples":[0,0.24,0.48,0.7,0.89,1.05,1.22,1.42,1.61,1.82,2.03,2.23,2.47,2.72,3.141592653589793,3.45,3.82,4.17,4.55,4.94,5.3,5.62,5.91,6.12,6.283185307179586],"crowns":{"base":1.085,"growth":0.24,"convexity":0.065,"method":"bounded normal-direction redistribution; same arm axis and insertion footprints"},"regionalPlanes":{"brachialisCrown":1.12,"brachialisTilt":0.24,"armLimit":0.032,"forearmTurn":0.75,"deltFacing":1.15,"deltReturnSlope":0.3,"preserveReturns":true,"sideFaces":[{"name":"biceps-lateral-return","normal":[0.6,0.8],"offset":1.1,"region":[0.24,0.38,0.73,0.9],"limit":0.022},{"name":"triceps-lateral-return","normal":[0.75,-0.66],"offset":1.13,"region":[0.2,0.35,0.72,0.89],"limit":0.023},{"name":"brachialis-facing","normal":[1,0.2],"offset":1.16,"region":[0.42,0.55,0.76,0.9],"limit":0.01},{"name":"cap-anterior-turn","normal":[0.55,0.84],"offset":1.12,"region":[-0.31,-0.15,0.08,0.27],"limit":0.016},{"name":"cap-posterior-turn","normal":[0.63,-0.78],"offset":1.15,"region":[-0.3,-0.1,0.14,0.32],"limit":0.016}]}};
+MRMAH_MORPHOLOGY.back.sheets={"upperTrap":{"footprint":[[0.004,2.077],[0.183,2.119],[0.137,2.225],[0.035,2.335],[0.001,2.298]],"crown":[0.072,2.2],"extent":[0.11,0.15],"depth":0.037,"tilt":[-0.13,0.085],"bevel":0.025,"planeReturns":true,"surfaceFrame":{"depth":0.154506,"reliefBaseline":0.037,"slope":[-0.35,-0.85],"returnWidth":0.035,"limit":0.027,"source":"PDF28-29 / T03; B0 mesh depth at named crown; visual facing-direction trial"}},"middleTrap":{"footprint":[[0.02,1.72],[0.105,1.885],[0.184,2.099],[0.109,2.246],[0.013,2.171]],"crown":[0.073,2.047],"extent":[0.11,0.3],"depth":0.034,"tilt":[0.04,0.065],"bevel":0.033,"planeReturns":true,"surfaceFrame":{"depth":0.293284,"reliefBaseline":0.034,"slope":[-0.2,-0.28],"returnWidth":0.032,"limit":0.027,"source":"PDF28-29 / T03; B0 mesh depth at named crown; visual facing-direction trial"}},"infraspinatus":{"footprint":[[0.142,1.962],[0.263,1.95],[0.369,2.047],[0.332,2.139],[0.209,2.175],[0.113,2.08]],"crown":[0.244,2.07],"extent":[0.13,0.11],"depth":0.052,"tilt":[-0.025,0.16],"bevel":0.032,"planeReturns":true,"edgeReturns":[0.024,0.03,0.05,0.047,0.031,0.029],"returnFillet":0.004,"surfaceFrame":{"depth":0.239864,"reliefBaseline":0.052,"slope":[-0.46,-0.1],"returnWidth":0.027,"limit":0.027,"source":"PDF28-29 / T03; B0 mesh depth at named crown; visual facing-direction trial"}},"teres":{"footprint":[[0.178,1.86],[0.292,1.89],[0.391,2.02],[0.366,2.077],[0.242,1.989]],"crown":[0.288,1.962],"extent":[0.12,0.13],"depth":0.039,"tilt":[0.08,-0.09],"bevel":0.027,"planeReturns":true,"edgeReturns":[0.04,0.034,0.03,0.021,0.026],"returnFillet":0.004,"surfaceFrame":{"depth":0.25525,"reliefBaseline":0.039,"slope":[0.18,-0.22],"returnWidth":0.024,"limit":0.027,"source":"PDF28-29 / T03; B0 mesh depth at named crown; visual facing-direction trial"}},"lat":{"footprint":[[0.063,1.483],[0.166,1.621],[0.298,1.759],[0.387,1.96],[0.288,1.941],[0.141,1.808]],"crown":[0.22,1.811],"extent":[0.16,0.31],"depth":0.061,"tilt":[0.02,-0.045],"bevel":0.043,"planeReturns":true,"edgeReturns":[0.059,0.052,0.037,0.025,0.031,0.054],"returnFillet":0.004,"surfaceFrame":{"depth":0.27846,"reliefBaseline":0.061,"slope":[0.22,0.19],"returnWidth":0.04,"limit":0.027,"source":"PDF28-29 / T03; B0 mesh depth at named crown; visual facing-direction trial","outerTurn":[0.245,-0.45,0.65]}}};
+MRMAH_MORPHOLOGY.lower.planeDesign={"quadTerritory":[0.1,0.95],"quadProjection":0.058,"kneeAccentY":0.75,"kneeRelief":0.012,"kind":"paired interior chevron; no new joint or external expansion","crownLimit":0.033,"crownConvexity":0.011,"directionalCrown":true,"quadFaces":{"crestQ":0.44,"upperOblique":0.065,"outerSlope":0.08,"innerSlope":0.018,"returnWidth":0.018},"surfaceFaces":{"source":"PDF30-31 / T01 longitudinal quad faces; one continuous surface","depth":[[0.6,0.093],[0.77,0.135],[0.97,0.19],[1.14,0.233],[1.22,0.239],[1.34,0.212],[1.46,0.184]],"crestQ":0.41,"convexity":0.005,"innerTurn":0.3,"outerTurn":0.52,"innerSlope":0.58,"outerSlope":0.72,"boundary":[0.1,0.94],"edgeWidth":0.15,"region":[0.62,1.44,0.15],"linearFaces":true}};
+MRMAH_MORPHOLOGY.sampleY=[0,0.15,0.44,0.55,0.66,0.77,0.87,0.97,1.06,1.14,1.22,1.28,1.34,1.4,1.45,1.48,1.535,1.585,1.61,1.63,1.65,1.675,1.695,1.735,1.755,1.78,1.805,1.825,1.845,1.865,1.885,1.91,1.935,1.96,1.985,2.01,2.035,2.06,2.085,2.11,2.135,2.16,2.18,2.2,2.22,2.24,2.26,2.28,2.3,2.335];
+MRMAH_MORPHOLOGY.neck.anteriorRelief=0.02;
+MRMAH_MORPHOLOGY.matureFit={"baseline": "astra-r117/B0", "reference": "astra-r117/references", "torso": "One continuous costal/abdominal support, independent directed crowns and a neighbour-derived recessed midline. No whole-ring depth scaling.", "confidence": "Manual image boundaries; support is an authored approximation, not scan data."};
+MRMAH_MORPHOLOGY.rectus.organization.columnBed=.029;
+
+
+// R119 spinal floor is derived from the two local support rims; it closes the
+// broad inherited hollow while preserving the neighbouring trap/erector crowns.
+MRMAH_MORPHOLOGY.back.midlineReturn={region:[1.53,2.28,.09],halfWidth:[[1.53,.020],[1.78,.034],[2.12,.041],[2.28,.020]],depth:.009,floorFraction:.23};
+
+// R118 rest-surface boundaries. Widths belong to their named local regions.
+// Primary anatomy is preserved outside these finite corridors. No striations.
+export const MRMAH_RECESSES = {
+  torsoFront: [
+    {name:'under-pec-return',class:'A',mirror:true,path:[[.038,1.897],[.12,1.894],[.205,1.909],[.295,1.956]],width:.042,regionWidth:.38,depthT:.010,maxDepth:.006,floor:.20,walls:[.70,1.35],fade:.22,widthEnds:.65},
+    {name:'rectus-upper-intersection',class:'B',mirror:true,path:[[.021,1.760],[.071,1.769],[.132,1.790]],width:.042,regionWidth:.145,depthT:.015,maxDepth:.009,floor:.22,walls:[.75,1.30],fade:.20},
+    {name:'linea-alba',class:'A',path:[[0,1.49],[0,1.64],[0,1.79],[0,1.89]],width:.036,regionWidth:.29,depthT:.014,maxDepth:.007,floor:.20,walls:[1,1],fade:.15}
+  ],
+  torsoRear: [
+    {name:'scapular-teres-overlap',thicknessBySide:{"1": 0.6955422607755954, "-1": 0.6955422607755954},class:'A',mirror:true,path:[[.14,2.095],[.23,2.047],[.30,2.02],[.347,2.052]],width:.064,regionWidth:.29,depthT:.025,maxDepth:.015,floor:.20,walls:[1.45,.70],fade:.20},
+    {name:'lat-upper-return',thicknessBySide:{"1": 0.3305855977744146, "-1": 0.35346846914098284},class:'A',mirror:true,path:[[.12,1.826],[.207,1.872],[.296,1.941],[.344,1.999]],width:.060,regionWidth:.34,depthT:.024,maxDepth:.013,floor:.20,walls:[.75,1.35],fade:.22},
+    {name:'erector-lumbar-return',thicknessBySide:{"1": 0.5555852838493072, "-1": 0.5555852838493072},class:'B',mirror:true,path:[[.035,1.47],[.076,1.62],[.106,1.775],[.141,1.897]],width:.042,regionWidth:.22,depthT:.012,maxDepth:.006,floor:.18,walls:[1.25,.80],fade:.25}
+  ], lower: [
+    {name:'quad-inner-return',alpha:1,class:'B',mirror:true,path:[[.044,.73],[.068,.95],[.109,1.18],[.14,1.35]],width:.049,regionWidth:.285,depthT:.012,maxDepth:.005,floor:.20,walls:[.80,1.30],fade:.28,widthEnds:.60},
+  ],
+  // Arm paths are (outer angle in radians, shoulder-to-elbow t). The builder
+  // converts this named bone chart to surface-length units before fitting.
+  upperArm: [
+    {name:'deltoid-anterior-insertion',alpha:1,class:'A',path:[[.28,.055],[.78,.19],[1.20,.285],[1.48,.325]],width:.050,regionWidth:.32,depthT:.026,maxDepth:.009,floor:.23,walls:[.70,1.45],fade:.22},
+    {name:'deltoid-posterior-insertion',alpha:1,class:'A',path:[[2.80,.14],[2.27,.24],[1.77,.31],[1.48,.325]],width:.047,regionWidth:.32,depthT:.022,maxDepth:.008,floor:.22,walls:[1.35,.80],fade:.22},
+    {name:'brachialis-anterior',alpha:1,class:'A',path:[[1.02,.44],[.93,.60],[.86,.73],[1.05,.85]],width:.044,regionWidth:.21,depthT:.026,maxDepth:.0085,floor:.22,walls:[.75,1.40],fade:.20},
+    {name:'brachialis-posterior',alpha:1,class:'B',path:[[1.96,.48],[1.83,.64],[1.67,.77],[1.29,.87]],width:.041,regionWidth:.21,depthT:.014,maxDepth:.005,floor:.18,walls:[1.20,.85],fade:.24},
+    {name:'triceps-distal-return',alpha:1,class:'B',path:[[2.40,.66],[2.24,.75],[2.13,.83],[2.40,.89]],width:.042,regionWidth:.24,depthT:.012,maxDepth:.0045,floor:.18,walls:[.85,1.25],fade:.25}
+  ], forearm: []
+};
+
+// R122: constrain shared edges on the existing outer pec cage.
+MRMAH_MORPHOLOGY.pec.surface.surfaceCage.conformOuterReturn = true;
+
+// R122: restore local costal support below the fixed pec crown, P40 p23.
+MRMAH_MORPHOLOGY.pec.surface.connectedSupport.underPecPlane = {x:[.10,.335,.028], y:[1.895,1.99,.024], origin:[.22,1.945], z:.295, slope:[-.36,.18]};
+
+MRMAH_MORPHOLOGY.pec.surface.surfaceCage.returnBevel = .0035;
+
+// R122: lower crown turns inward before the connected costal return.
+MRMAH_MORPHOLOGY.pec.surface.surfaceCage.crown[1][2] = .350;
+MRMAH_MORPHOLOGY.pec.surface.surfaceCage.crown[2][2] = .346;
+
+// R122: crown directions share the same crest and return vertices.
+MRMAH_MORPHOLOGY.pec.surface.surfaceCage.conformCrownFan = true;
+
+// R123 / Craftsman p9: restore a local medial attachment, not a raised strip.
+// floorOffsetZ is an axial construction distance, not claimed normal depth.
+MRMAH_MORPHOLOGY.arms.planeDesign.regionalPlanes.preserveBrachialisReturns = true;
+// R132 / P40 pp26–27: side-plane half-spaces previously crossed the bellies.
+// Rest-chart angular footprints now preserve the broad biceps/triceps crowns.
+Object.assign(MRMAH_MORPHOLOGY.arms.planeDesign.regionalPlanes.sideFaces.find(f=>f.name==='biceps-lateral-return'),{
+  angularRegion:[.44,.66,1.08,1.24]
+});
+Object.assign(MRMAH_MORPHOLOGY.arms.planeDesign.regionalPlanes.sideFaces.find(f=>f.name==='triceps-lateral-return'),{
+ angularRegion:[1.65,1.83,2.45,2.72]
+});
+// Shoulder-pivot to elbow h / angular half-footprint in radians. The support
+// radius and existing longitudinal crown projection are unchanged. Biceps
+// breadth now narrows independently toward its distal attachment. Triceps
+// width trials remain in evidence only; their current crowns are retained.
+MRMAH_MORPHOLOGY.arms.planeDesign.biceps.footprintWidth=[
+ [.10,.62],[.315,1.14],[.47,1.12],[.61,.93],[.78,.56],[.94,.24]
+];
+// P40 pp26–27 / Craftsman11. This is a rest-frame shape trial, not a depth
+// recovered from artwork. The crown level and direction use actual mesh rays.
+MRMAH_MORPHOLOGY.arms.planeDesign.triceps.surface={
+ name:'lateral triceps directional crown and return',angle:2.33,crest:[.52,.003],
+ facingAnchors:[[.39,-.035],[.47,.040],[.66,.005]],
+ footprint:[[.30,-.045],[.38,-.073],[.65,-.058],[.78,0],[.64,.062],[.42,.074]],
+ crownHalfWidth:.052,convexity:.003,returnWidth:.018,axialFade:[.30,.40,.62,.76],limit:.018,
+ source:'R133 / P40 pp26–27, Craftsman11; h is humeral position, transverse values are model units'
+};
+MRMAH_MORPHOLOGY.arms.planeDesign.triceps.longSurface={
+ name:'long triceps posterior crown and taper',angle:3.72,crest:[.43,.006],
+ facingAnchors:[[.35,-.025],[.43,.042],[.61,.010]],
+ footprint:[[.30,-.018],[.38,-.062],[.62,-.042],[.72,.016],[.56,.077],[.34,.046]],
+ crownHalfWidth:.050,convexity:.0035,returnWidth:.020,axialFade:[.30,.39,.55,.70],limit:.016,
+ source:'R133 / P40 pp26–27, Craftsman11; distinct proximal long-head facing with preserved distal tendon'
+};
+// R135 / Craftsman11: tapered anterior belly below the cap, with a gently
+// convex longitudinal facing region. Support rays are sampled from the final
+// mesh; values define a local footprint, not a global arm-size correction.
+MRMAH_MORPHOLOGY.arms.planeDesign.biceps.surface={
+ name:'biceps anterior belly and proximal attachment',angle:-.06,crest:[.47,0],
+ facingAnchors:[[.30,-.030],[.36,.035],[.66,.005]],
+ footprint:[[.18,-.025],[.29,-.090],[.53,-.096],[.75,-.030],[.76,.028],[.56,.080],[.31,.044]],
+ crownHalfWidth:.074,convexity:.006,crownStations:[.18,.28,.40,.50,.64,.76],
+ facingSlopeX:-.18,sideTurns:[[.043,.50],[.038,.72]],sideBevel:.012,angularBounds:[-.72,.45],moldNormals:true,
+ crestDrift:-.10,returnWidth:.025,axialFade:[.18,.30,.62,.76],limit:.022,
+ source:'R135 / P40 pp26–27; h in actual humeral rest frame, transverse lengths in model units; crown depth from B0 surface'
+};
+// R136 authoring layer. These cages share the live anatomical owner and rig,
+// but opt in independently of the shipping mesh/tier. Coordinates are rest
+// h/angle landmarks; named quads are readable regions, not triangle quotas.
+MRMAH_MORPHOLOGY.arms.authoringMaster={
+ source:'AAA redirect / Mr. Mah arm branch; original clay and Craftsman11 remain visual authority',
+ cap:{id:'DELTOID',
+  primarySurface:{source:'R142 / P40pp26-27 and Craftsman11; primary cap replacement; R140 measured lateral apex locks span',
+   apexB0:{L:[.1764407455921173,-.007685027085244656,.014914414845407009],R:[-.1802702397108078,-.006673261523246765,.015886880457401276]},
+   angles:[-.50,.12,.65,1.05,1.52,2.0,2.55,3.10,3.64],
+   starts:[-.30,-.30,-.30,-.30,-.30,-.30,-.30,-.30,-.30],
+   superior:[-.22,-.22,-.20,-.18,-.16,-.18,-.20,-.22,-.22],
+   crests:[-.10,-.10,-.075,.015,.06,.015,-.08,-.10,-.10],
+   returns:[.06,.09,.13,.19,.265,.185,.11,.065,.065],
+   ends:[.16,.23,.32,.405,.46,.41,.28,.22,.20],
+   offsets:[[0,0,0,0,0,0,0,0,0],[0,0,.002,.002,0,.002,.002,0,0],[0,-.008,-.012,-.004,0,-.004,-.012,-.010,0],[0,-.003,-.010,-.012,-.020,-.014,-.008,-.003,0],[0,0,0,0,0,0,0,0,0]],
+   owners:['anterior deltoid medial support','anterior deltoid crown','anterior/lateral deltoid turn','lateral deltoid anterior face','lateral deltoid posterior face','posterior deltoid outer turn','posterior deltoid crown','posterior medial support'],
+   faceConvexity:.0015,axialBlend:.12,angularBlend:.20,safetyLimit:.050},
+ },
+ brachialis:{id:'BRACHIALIS',owners:['anterior brachialis return','posterior brachialis face'],
+  grid:[[[.33,1.14],[.33,1.45],[.33,1.78]],[[.54,1.12],[.54,1.48],[.54,1.91]],[[.70,1.18],[.70,1.33],[.70,1.48]],[[.88,1.07],[.88,1.16],[.88,1.25]]],
+  radialOffsets:[[0,0,0],[0,.012,0],[0,0,0],[0,0,0]],limit:.018,edgeBlend:.004},
+ // R138: independent longitudinal masses. h is measured along the retained
+ // humeral axis; angles use the mirrored front/outward chart. Unequal row
+ // positions place the anterior crest distal to the posterior long-head crest.
+ // The h>=.70 tendon/seam bridge and all pocket targets remain untouched.
+ biceps:{id:'BICEPS',owners:['medial biceps turn','anterior biceps crown','lateral biceps return'],
+  primaryBelly:{source:'R143 / P40pp26-27, Craftsman11 and clay arm crop; R142 fixed comparison family',
+   rows:[[.26,-.08,.25,0],[.38,.10,.70,.80],[.50,.13,.70,1],[.63,.18,.52,.75],[.76,.23,.16,0]],
+   peak:[.50,.10],peakSupportH:[.34,.40,.46,.52],peakSupportAngles:[-.20,-.06,.12,.25],rimStations:41,
+   crownSides:[.48,.40],convexity:.0025,phases:[.38,.55],
+   axialBlend:.035,edgeBlend:.20,capBlend:.04,safetyLimit:.035},
+  grid:[[[.17,-.48],[.14,-.12],[.17,.40],[.23,.92]],
+   [[.33,-.48],[.36,-.12],[.38,.47],[.36,1.03]],
+   [[.51,-.40],[.50,-.06],[.49,.44],[.51,.94]],
+   [[.58,-.25],[.65,.02],[.65,.27],[.58,.72]]],
+  radialOffsets:[[0,0,0,0],[0,.006,.008,0],[0,.008,.006,0],[0,0,0,0]],
+  limit:.022,edgeBlend:.027,radialProjection:true},
+ triceps:{id:'TRICEPS',owners:['lateral triceps turn','posterolateral triceps crown','long-head posterior face'],
+  primaryBelly:{source:'R146 precision arm pivot / original male clay arm and posterior reference; actual B0 support',
+   rows:[[.24,3.28,.40,0],[.34,3.22,1.04,.94],[.43,3.16,1.07,1],[.57,3.12,.85,.72],[.70,3.0,.26,0]],
+   peak:[.39,3.20],peakSupportH:[.30,.37,.44],peakSupportAngles:[2.70,3.10,3.40,3.75],rimStations:41,
+   crownSides:[.42,.48],convexity:.003,phases:[.36,.53],axialBlend:.035,edgeBlend:.20,capBlend:.04,safetyLimit:.045},
+  grid:[[[.15,1.98],[.08,2.60],[.09,3.38],[.15,4.40]],
+   [[.31,1.92],[.34,2.54],[.29,3.35],[.29,4.40]],
+   [[.52,2.03],[.53,2.48],[.47,3.22],[.48,4.30]],
+   [[.57,2.19],[.64,2.65],[.65,3.24],[.57,4.01]]],
+  radialOffsets:[[0,0,0,0],[0,.005,.009,0],[0,.005,.002,0],[0,0,0,0]],
+  limit:.024,edgeBlend:.030,radialProjection:true,
+  attachedReturn:{source:'R139 / P40pp26-27, Craftsman11; R138 measured posterior rebound, no reference-derived numeric depth',
+   interval:[.49,.675],angles:[2.15,4.40],angularSamples:33,angularFade:.23,tangentStep:.01,endpointBlend:.018,safetyLimit:.025}},
+ forearm:{id:'FOREARM',owners:['radial flexor','radial sweep','radial extensor','extensor','ulnar extensor','ulnar return','ulnar flexor','flexor'],
+  angles:[-.40,.385,1.17,1.955,2.74,3.525,4.31,5.095,5.88318530718],rows:[.10,.46,.87],limit:.018,edgeBlend:.008,closed:true},
+ // Frozen R136 FULL support thickness: changing adjacent masses must not
+ // silently deepen the already retained pocket targets in this comparison.
+ pockets:[{id:'BRACHIALIS_UPPER',owner:'deltoid / brachialis convergence',h:.425,angle:1.14,lengthH:.024,widthW:.012,depthT:.009,supportThicknessB0:{R:.334746626498713,L:.2867075698676086}},
+  {id:'BRACHIALIS_LOWER',owner:'brachialis / elbow tendon return',h:.835,angle:1.10,lengthH:.022,widthW:.010,depthT:.008,supportThicknessB0:{R:.31256419754598497,L:.2209675904366021}}],
+ refinement:{passes:2,edgesPerPass:5000,minEdge:.0035,pocketEdges:256,pocketPasses:5,minPocketEdge:.00055}
+};
+
+MRMAH_MORPHOLOGY.pec.surface.connectedSupport.thoracicBridge = {
+  region:[1.95,2.175,.035],halfWidth:.040,floorHalfWidth:.006,floorOffsetZ:.019
+};
+
+// R124 / Craftsman p10: oblique paired rectus shields on the existing wall.
+// Crown positions/depths and the recovered lower patch remain unchanged.
+MRMAH_MORPHOLOGY.rectus.patches[1].contour = [
+  [.004,1.627],[.105,1.648],[.143,1.706],[.145,1.754],[.010,1.727],[.003,1.699]
+];
+MRMAH_MORPHOLOGY.rectus.patches[2].contour = [
+  [.004,1.752],[.110,1.777],[.148,1.826],[.156,1.881],[.009,1.898],[.003,1.824]
+];
+// A single shared path is evaluated between these two attachment outlines,
+// instead of retaining a separately authored horizontal intersection track.
+MRMAH_MORPHOLOGY.rectus.organization.sharedIntersection = {
+  lowerPatch:1, upperPatch:2, stations:[.021,.050,.080,.110,.128],
+  source:'Craftsman p10 / P40 pp24-25, T01/T03; approximate outline authoring'
+};
+
+// R124 / Craftsman p9: local costal support meets the unchanged pec return.
+// This raises only the existing bounded support plane, not the pec crown.
+MRMAH_MORPHOLOGY.pec.surface.connectedSupport.underPecPlane.z = .313;
+
+// R125: final R124 mesh floor, measured once in the rest chart. Local FULL
+// thickness and outward normals are recorded; no extra cut or screenshot depth.
+Object.assign(MRMAH_RECESSES.torsoFront.find(c=>c.name==='rectus-upper-intersection'),{
+ alpha:1, fixedFloor:{source:"Measured R124-clay-0c3711f3a682 actual final triangles; paired average in canonical positive-X rest chart",points:[
+  [0,0.021,1.742604716981132,0.29921629185545795,-0.20625038126742606,-0.16337778266235545,0.9647634323290728,0.5579063904718504],
+  [0.041666666666666664,0.025622025767202218,1.7436119697662489,0.3000109715248394,-0.08220849904465241,-0.1730302923201985,0.9814796384155975,0.5763050315094458],
+  [0.08333333333333333,0.03024405153440443,1.7446192225513655,0.2997958873831986,0.08748382599026311,-0.20200940886325644,0.9754684920184881,0.5874458705287966],
+  [0.125,0.03486607730160665,1.7456264753364823,0.2991765996964685,0.155053294774059,-0.20185630212771224,0.9670638598722602,0.6098254006432505],
+  [0.16666666666666666,0.03948810306880886,1.746633728121599,0.2981775685861777,0.12994094756383767,-0.1786684345670882,0.9752912081196867,0.5894586708041543],
+  [0.20833333333333334,0.04411012883601108,1.7476409809067157,0.2981669184618172,0.1295601208232636,-0.17685597499438382,0.9756721473943217,0.5869038621381749],
+  [0.25,0.0487321546032133,1.7486482336918323,0.298563787531074,0.1395953768368477,-0.18403045645552918,0.9729573073175143,0.5913190425725948],
+  [0.2916666666666667,0.053354180370415505,1.7496554864769491,0.2978917448004519,0.13587736539795303,-0.16772956061402203,0.9764241578682589,0.5826181897300953],
+  [0.3333333333333333,0.057976206137617725,1.7506627392620657,0.2971636368470708,0.13142710403177926,-0.1502943217841343,0.9798665894729072,0.5745599114818263],
+  [0.375,0.06259823190481995,1.7516699920471825,0.29643552889368974,0.12697660671785158,-0.132978759808063,0.982951469191806,0.5689924686822909],
+  [0.4166666666666667,0.06722025767202217,1.7526772448322991,0.29590023995238773,0.12266051338734575,-0.14059830268929827,0.9824390646429128,0.5684216821437822],
+  [0.4583333333333333,0.07184228343922439,1.753684497617416,0.29539408512384924,0.11835681669992205,-0.15192987818278078,0.9812792548790717,0.5703087857387426],
+  [0.5,0.07646430920642659,1.7546917504025326,0.29485741803742416,0.18023932600642384,-0.18363488757737184,0.9663291434212239,0.5916139373185079],
+  [0.5416666666666666,0.08108633497362881,1.7556990031876494,0.29431537283126097,0.252819561041114,-0.21784314378282843,0.9426699498031069,0.6389051313384619],
+  [0.5833333333333334,0.08570836074083102,1.756706255972766,0.2933706030533242,0.308605577964686,-0.23035483658293177,0.9228755314298525,0.6122274542917858],
+  [0.625,0.09033038650803324,1.7577135087578828,0.29138822319279556,0.34973393335628844,-0.19581660751133717,0.9161561177451636,0.5944899063970069],
+  [0.6666666666666666,0.09495241227523546,1.7587207615429994,0.2895485648760629,0.3889831198983872,-0.15531797220521062,0.908057520173793,0.5865920872201349],
+  [0.7083333333333334,0.09957443804243768,1.7597280143281162,0.2877089065593303,0.42744197367699444,-0.11379325611599024,0.8968525263395517,0.5850057332120615],
+  [0.75,0.10419646380963989,1.7607352671132328,0.2857759084180209,0.4695359974178238,-0.07492891518235442,0.8797281425522575,0.6305791800106977],
+  [0.7916666666666666,0.1088184895768421,1.7617425198983496,0.28274268051976015,0.5307688822719115,-0.07063743821528637,0.8445677864648918,0.6634354242432575],
+  [0.8333333333333334,0.11282413032261526,1.7641032338981582,0.27990435029619265,0.5717636202868763,-0.11152972684220722,0.8128022407369134,0.6762001999950762],
+  [0.875,0.11661809774196144,1.7669287412130923,0.2774168000258533,0.611324407250003,-0.1596905416294424,0.7751008966673487,0.6923006287702815],
+  [0.9166666666666666,0.12041206516130763,1.7697542485280264,0.27489783411838864,0.6344112989660892,-0.19846051943979826,0.7470848184562747,0.6973058731447517],
+  [0.9583333333333334,0.12420603258065382,1.7725797558429606,0.2723084230895748,0.5784730046899367,-0.1862068883606588,0.7941636969618024,0.6996423138504541],
+  [1,0.128,1.7754052631578947,0.26972670394049747,0.5180510342748678,-0.17218760247370768,0.8378392181326297,0.6224435370856538]
+ ]}
+});
+
+// Same eight edge splits: two floor and one on each wall per mirrored side.
+MRMAH_RECESSES.torsoFront.find(c=>c.name==='rectus-upper-intersection').sampleBands=[{at:0,count:2,h:[.2,.85]},{at:-.62,count:1,h:[.2,.85]},{at:.62,count:1,h:[.2,.85]}];
+
+// R125 / Craftsman p10: a longer lateral wall under the unchanged middle
+// crown, inside its existing attachment outline. No extra belly projection.
+MRMAH_MORPHOLOGY.rectus.patches[1].edgeReturns[2] = .035;
+// R126: inferior/oblique return joins the existing continuous column stock.
+// Footprint, crown frame, upper floor and lower-ab landmark remain fixed.
+MRMAH_MORPHOLOGY.rectus.patches[1].supportReturns={
+  0:{width:.046,endEase:.18},
+  1:{width:.034,endEase:.18}
+};
+MRMAH_MORPHOLOGY.arms.planeDesign.deltoid.insertionNarrowing=.72;
+// R127 / Craftsman p10: the measured inferior trough reverses sharply at
+// Y1.630, beneath the preserved middle crown. Local column stock only.
+MRMAH_MORPHOLOGY.rectus.organization.inferiorSupport={
+  region:[1.600,1.667,.013],lateral:[.018,.113,.021],
+  stock:[[1.600,.032],[1.630,.038],[1.667,.032]],
+  source:'R126 actual XY sections; local support trial, not artwork depth'
+};
+// R128 / Craftsman p11, P40 pp26-27: landmarks are existing angular
+// columns, in the pre-elbow arm frame. Their positions stay unchanged.
+MRMAH_MORPHOLOGY.arms.planeDesign.sectionFaces={
+  landmarks:[.48,1.05,1.22,1.61,2.03,2.72],region:[.30,.47,.72,.90],moldNormals:true,
+  wedgeBounds:[[.30,1.22,1.61],[.39,1.28,1.46],[.47,1.20,1.58],[.61,1.22,1.61],[.69,1.19,1.49],[.78,1.12,1.29],[.90,1.22,1.61]],
+  normalFaces:[0,.65,1,.25,0],
+  capFaces:{landmarks:[.24,.89,1.61,2.23,2.72],region:[-.30,-.16,.12,.31],
+    source:'R131 / P40 p26, Craftsman11: wrapped cap faces between existing front, lateral and rear crests; rest-ring anchors held'},
+  source:'R127 measured pre-elbow columns; biceps return / brachialis face / triceps turn; no final-pose anchor reuse'
+};
+// R134 / Craftsman11: measured crown/valley rails are retained. The transverse
+// coordinate runs crown 0 to existing floor 1; rise is a fraction of this
+// local wall span, not extra groove depth or a whole-arm scale factor.
+MRMAH_MORPHOLOGY.arms.planeDesign.sectionFaces.bicepsReturn={
+ region:[.36,.47,.61,.74],profile:[[0,0],[.42,.14],[.72,.065],[1,0]],
+ angles:[.48,1.05],stations:[.36,.40,.47,.54,.61,.69,.74],
+ crestFlow:[[.36,.34],[.47,.38],[.61,.50],[.72,.62],[.84,.62]],
+ source:'R134 / P40 pp26–27; bounded biceps-facing turn into the preserved brachialis valley'
+};
+// R129 / P40pp28–29: a shared rear-facing crown and attached lower return.
+MRMAH_MORPHOLOGY.back.sheets.infraspinatus.surfacePatch={
+ source:'R129 / Craftsman p12; P40 pp28–29: local rear crown and attached return; model-space authoring, not calibrated scan',
+ boundary:[[.112,1.956],[.245,1.935],[.313,2.020],[.278,2.110],[.180,2.130],[.096,2.075]],
+ crown:[[.150,2.004,.297],[.237,1.983,.2653],[.282,2.038,.239],[.250,2.089,.2442],[.182,2.105,.269],[.131,2.070,.2947]],
+ crest:[.208,2.049,.269],
+ inferiorReturn:{name:'scapular-inferior-return',class:'B',mirror:true,
+  path:[[.148,1.984],[.238,1.964],[.294,2.022]],width:.026,regionWidth:.19,
+  depthT:.010,maxDepth:.004,alpha:.5,floor:.20,walls:[.85,1.25],fade:.24,widthEnds:.65}
+};
+// R130: one attached diagonal lat facing region below the retained scapular
+// return. Depth coordinates describe the sculpt surface, not recess relief.
+MRMAH_MORPHOLOGY.back.sheets.lat.surfacePatch={
+ name:'teres lat connected diagonal crown',source:'Craftsman p12 / P40 pp28–29; R129 final rest-XY support',
+ sampleRegion:[.105,.340,1.69,2.005],upperLimit:[.24,1.941,.65],
+ boundary:[[.125,1.740],[.215,1.720],[.310,1.860],[.310,1.940],[.244,1.918],[.130,1.900]],
+ crown:[[.160,1.802,.26132],[.209,1.787,.27537],[.272,1.867,.28152],[.279,1.901,.27919],[.231,1.893,.26815],[.174,1.869,.25678]],
+ crest:[.224,1.838,.275]
+};
+MRMAH_MORPHOLOGY.back.sheets.teres.attachment={
+ source:'R131: P40 pp28–29 / Craftsman12; R130 actual lat edge loop and scapular inferior-floor path',
+ range:[.168,.309],endFade:.023,
+ lower:[[.168,1.883],[.231,1.905],[.279,1.913],[.309,1.960]],
+ upper:[[.168,1.964],[.238,1.946],[.294,2.004],[.309,2.010]],
+ face:[.231,1.928,.269],slope:[-.30,.08],walls:[.32,.28],limit:.030
+};
+// R127: hold the recorded B0 midline directions while adjacent stock changes.
+// Interpolated smooth normals otherwise turn unchanged lower floor vertices.
+Object.assign(MRMAH_RECESSES.torsoFront.find(c=>c.name==='linea-alba'),{
+ thickness:0.5164339091314187,
+ thicknessSource:'R126 incoming full opposing ray at channel middle; model units',
+ referenceNormals:{"source":"R126-clay-928da1a2c956 incoming mesh linea-alba station normals; frozen rest-frame comparison","points":[[0,-0.0020356558806969532,-0.2700785331930077,0.9628361449454673],[0.041666666666666664,-0.002242397383800189,-0.17377829829362337,0.9847822473502179],[0.08333333333333333,-0.00242743282932015,-0.07568644799323847,0.9971287124338692],[0.125,-0.00228732074612268,-0.009773655138146915,0.9999496206454828],[0.16666666666666666,-0.0014402247140814976,-0.017382211847521974,0.9998478806618838],[0.20833333333333334,-0.0005930244110334355,-0.024989927854761514,0.9996875270942724],[0.25,-1.4851789958249148e-15,-0.04865725586274682,0.9988155342463928],[0.2916666666666667,-2.559503929406378e-16,-0.10971267490893243,0.993963343873569],[0.3333333333333333,2.806026398015924e-17,-0.29092680397004106,0.956745313409884],[0.375,1.0645665880642569e-16,-0.3676589976462103,0.9299606773674809],[0.4166666666666667,3.896761214281229e-16,-0.27715479615785354,0.9608252801455104],[0.4583333333333333,-9.652142728463805e-16,-0.0513757499641376,0.9986793941579161],[0.5,-7.279430308503043e-16,-0.12198539299021688,0.9925318956572742],[0.5416666666666666,-1.0545455309052094e-15,-0.16908532446965666,0.9856014169272438],[0.5833333333333334,-7.957322946210218e-16,-0.19231421467055665,0.9813334004484139],[0.625,-5.670081286432986e-16,-0.21737963348540978,0.9760871349145778],[0.6666666666666666,1.041761042486817e-15,-0.24584642373010832,0.9693087928720734],[0.7083333333333334,1.1258255611389915e-15,-0.2653057045270684,0.9641643444690309],[0.75,6.794211699120481e-16,-0.2567230446468283,0.966485011962039],[0.7916666666666666,0.00012048053623178459,-0.2202378891413084,0.9754461838927974],[0.8333333333333334,0.001325248032140491,-0.09991423745814586,0.9949951702751179],[0.875,0.0016802899354137952,0.022148578027718815,0.9997532781226991],[0.9166666666666666,0.0007314853481195936,0.014915507196208893,0.9998884900699003],[0.9583333333333334,-1.0978343278034034e-16,0.1019490120065735,0.9947896254740916],[1,3.9900736300441416e-16,0.2587924772590087,0.9659329447296772]]}
+});

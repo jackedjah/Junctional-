@@ -15,11 +15,21 @@ import {
   Group, Mesh, TorusGeometry, EdgesGeometry, LineSegments, Object3D,
   BufferGeometry, Float32BufferAttribute, MeshBasicMaterial, PlaneGeometry
 } from '../../vendor/three/three.module.min.js';
-import { diamondCrystal } from './forge.js';
+import { diamondCrystal, facetedGeometry } from './forge.js';
 import { HEAD } from './proportions.js';
 import { REGIONS } from './regions.js';
+import { growMrsCranialProjections } from './mrs-cranial-growths.js';
 
-export function buildHead(materials) {
+export function buildHead(materials, options) {
+  // R111 male budget redistribution: only the soft additive companions use
+  // fewer segments. Shell, visor, pivots and the visible eye/smile strokes are
+  // byte-identical. Omitted options retain every existing variant default.
+  var economicalGlow=!!(options && options.economicalGlow);
+  var facetedMouth=!!(options && options.facetedMouth);
+  /* R166 (Mrs. Mah) — the ONE head, with a feminine face style layered on it:
+     cranial projections, upper-lash fins and a fuller lip. Absent for every
+     other variant, so the male head is byte-identical to its retained form. */
+  var mrsFace=options && options.faceStyle;
   var group = new Group();
   group.name = 'mrmah-head';
 
@@ -53,6 +63,8 @@ export function buildHead(materials) {
        produce. `classLift` in proportions.js is kept only as the fallback. */
     classes: REGIONS.HEAD_SHELL.classes
   });
+
+  if(mrsFace)growMrsCranialProjections(geo);
 
   /* R100 — four materials: the crystal casing, the display GLASS, the cavity
      (walls and channel floor), and the bezel the glass stands on. */
@@ -181,8 +193,9 @@ export function buildHead(materials) {
   /* R95: reviewed as ~40% too large and twice too heavy against the luminous
      references; the guardian references sit between. Rings a shade smaller,
      the stroke thinner, and the soft companion carries the glow. */
-  var eyeR = HEAD.halfWidth * 0.118;
-  var eyeGap = HEAD.halfWidth * 0.280;
+  var eyeR = HEAD.halfWidth * (facetedMouth ? 0.125 : 0.118);
+  if(mrsFace)eyeR*=mrsFace.eyeScale;
+  var eyeGap = HEAD.halfWidth * (facetedMouth ? 0.273 : 0.280);
   var eyeY = HEAD.halfHeight * 0.06;
 
   /* R90 — STROKE WEIGHT RE-DERIVED FOR THE SMALLER HEAD.
@@ -218,13 +231,29 @@ export function buildHead(materials) {
        companion below carries the eye at app scale (its opacity rises as he
        shrinks — see setScaleHint), and it is thinner too: at 0.46 of the ring
        radius it was the goggle, not the core ring. */
-    var eye = new Mesh(new TorusGeometry(eyeR, eyeR * 0.075, 6, 48), materials.emissive);
+    var eye = new Mesh(new TorusGeometry(eyeR, eyeR * (facetedMouth ? 0.09 : 0.075), 6, 48), materials.emissive);
     eye.position.set(side * eyeGap, eyeY, 0);
     eye.name = side < 0 ? 'eye-left' : 'eye-right';
     face.add(eye);
     eyes.push(eye);
+    if(mrsFace){
+      // Five crystalline upper-lash fins. Eye-owned geometry follows blink,
+      // gaze, icons and disposal through the inherited face hierarchy.
+      for(var li=0;li<mrsFace.lashCount;li++){
+        var angle=(27+li*19)*Math.PI/180,cs=Math.cos(angle)*side,sn=Math.sin(angle);
+        var r=eyeR*1.035,len=eyeR*(.38-.035*li),w=eyeR*.10;
+        var px=cs*r,py=sn*r,tx=-sn*side,ty=Math.cos(angle);
+        var tipX=cs*(r+len)+side*.003,tipY=sn*(r+len);
+        var pts=[px-tx*w,py-ty*w,.001,px+tx*w,py+ty*w,.001,tipX,tipY,.002,
+          px,py,.008,px,py,-.002];
+        var tris=side>0?[[0,1,3],[1,2,3],[2,0,3],[1,0,4],[2,1,4],[0,2,4]]:
+          [[1,0,3],[2,1,3],[0,2,3],[0,1,4],[1,2,4],[2,0,4]];
+        var finGeo=facetedGeometry(pts,tris);finGeo.setAttribute('aSmooth',finGeo.attributes.normal.clone());
+        var fin=new Mesh(finGeo,materials.head||materials.body);fin.name='eye-lash-'+li;eye.add(fin);
+      }
+    }
 
-    var soft = new Mesh(new TorusGeometry(eyeR * 1.04, eyeR * 0.20, 6, 32), materials.emissiveSoft);
+    var soft = new Mesh(new TorusGeometry(eyeR * 1.04, eyeR * 0.20, economicalGlow ? 4 : 6, economicalGlow ? 24 : 32), materials.emissiveSoft);
     soft.position.copy(eye.position);
     face.add(soft);
   });
@@ -250,23 +279,58 @@ export function buildHead(materials) {
      at 0.57, sitting on the cavity floor. */
   var smileR = HEAD.halfWidth * 0.225;
   var smileArc = Math.PI * 0.55;
-  var smile = new Mesh(
+  var smile;
+  var lips=null;
+  if(facetedMouth){
+    smile=new Group();
+    smile.position.set(0,-display.halfHeight*.405,.005);
+    var w=display.halfWidth*.22;
+    function lip(points,centreY,name){
+      var area=points.reduce(function(s,p,i){var q=points[(i+1)%points.length];return s+p[0]*q[1]-q[0]*p[1];},0);
+      if(area<0)points.reverse();
+      var pos=[],faces=[],n=points.length;
+      points.forEach(p=>pos.push(p[0],p[1],.002));
+      pos.push(0,centreY,.013);
+      points.forEach(p=>pos.push(p[0],p[1],-.003));
+      for(var i=0;i<n;i++){var j=(i+1)%n;faces.push([i,j,n],[i,n+1+i,n+1+j,j]);}
+      for(var i=1;i<n-1;i++)faces.push([n+1,n+1+i+1,n+1+i]);
+      var g=facetedGeometry(pos,faces);
+      // A handful of intentional lip planes, not indiscriminate body faceting.
+      g.setAttribute('aSmooth',g.attributes.normal.clone());
+      var mesh=new Mesh(g,materials.emissiveSmile||materials.emissive);mesh.name=name;smile.add(mesh);return mesh;
+    }
+    lips={upper:lip([[-w,0],[-w*.44,.011],[0,.006],[w*.44,.011],[w,0],[0,-.003]],.003,'smile-upper'),
+      lower:lip([[-w,-.006],[0,-.009],[w,-.006],[w*.44,-.018],[0,-.021],[-w*.44,-.018]],-.013,'smile-lower')};
+    if(mrsFace){
+      [lips.upper,lips.lower].forEach(function(mesh){
+        var p=mesh.geometry.attributes.position;
+        for(var i=0;i<p.count;i++)p.setXYZ(i,p.getX(i)*1.13,p.getY(i)*1.28+.004*Math.pow(Math.abs(p.getX(i))/w,2),p.getZ(i)*1.1);
+        p.needsUpdate=true;mesh.geometry.computeVertexNormals();
+        mesh.geometry.setAttribute('aSmooth',mesh.geometry.attributes.normal.clone());
+        mesh.geometry.computeBoundingBox();mesh.geometry.computeBoundingSphere();
+      });
+    }
+  }else{
+  smile = new Mesh(
     new TorusGeometry(smileR, smileR * 0.058, 6, 40, smileArc),
     materials.emissiveSmile || materials.emissive
   );
   smile.rotation.z = Math.PI + (Math.PI - smileArc) / 2;
   /* position.y is the arc's CENTRE; the belly hangs one radius below it. */
   smile.position.set(0, -HEAD.halfHeight * 0.40 + smileR, 0);
+  }
   smile.name = 'smile';
   face.add(smile);
 
+  if(!facetedMouth){
   var smileSoft = new Mesh(
-    new TorusGeometry(smileR, smileR * 0.15, 6, 40, smileArc),
+    new TorusGeometry(smileR, smileR * 0.15, economicalGlow ? 4 : 6, economicalGlow ? 24 : 40, smileArc),
     materials.emissiveSoft
   );
   smileSoft.rotation.copy(smile.rotation);
   smileSoft.position.copy(smile.position);
   face.add(smileSoft);
+  }
 
   /* R100 — A CONTENT SLOT ON THE GLASS. Proof that the display can host more
      than the face: `setIcon('dumbbell')` draws a tiny pixel dumbbell — two
@@ -313,6 +377,15 @@ export function buildHead(materials) {
     setIcon: setIcon,
     eyes: eyes,
     smile: smile,
+    mouthParts: lips,
+    setMouthExpression: lips ? function(v){
+      // Reuse smoothly blended state channels; no new loop or state machine.
+      var openness=Math.max(0,Math.min(1,(v.elbowOpen||0)/.26));
+      var warmth=Math.max(.25,Math.min(1.3,v.smile));
+      smile.scale.x=.86+.14*warmth;smile.scale.y=.78+.22*warmth;
+      lips.lower.position.y=-.012*openness;
+      lips.upper.rotation.z=0;lips.lower.rotation.z=0;
+    } : null,
     geometry: geo,
     edges: edges,
     /* Blink by squashing the rings vertically — cheaper and more readable at

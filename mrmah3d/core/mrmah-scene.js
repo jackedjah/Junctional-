@@ -90,8 +90,11 @@ export function createMrMahScene(host, options) {
     /* R96: the character's energy tint is derived from the theme unless the
        host passes its own (palette.js deriveTheme). */
     tint: opts.tint || palette.tint,
-    /* R96: 'male' (default) or 'female' — a proportion set on the one renderer */
+    /* R96: 'male' (default), 'female' or 'mrs-mah' — a proportion set on the
+       one renderer. R166: Mrs. Mah is a proportion set plus regional refiners,
+       not a second character; the head, face, symbols and material are shared. */
     variant: opts.variant,
+    authoringMaster: opts.authoringMaster,
     envMap: stageBox.environment
   });
 

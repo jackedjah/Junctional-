@@ -13,14 +13,46 @@
 
 import { Group, MathUtils, MeshBasicMaterial, MeshLambertMaterial } from '../../vendor/three/three.module.min.js';
 import { createCrystalMaterials } from './materials.js';
+import { applyAnatomicalCrystalAtlas } from './crystal-atlas.js';
+import { applyFineCrystalSurface } from './fine-crystal.js';
+import { addMrCranialCrown } from './cranial-crown.js';
 import { buildHead } from './head.js';
 import { buildBody } from './body.js';
 import { buildLimbs } from './limbs.js';
 import { createStateMachine } from './states.js';
+import { createHeroPresentation } from './hero-pose.js';
 import { setInnerLight, setRimDirections } from './crystal-shader.js';
 import { HALO_LAYER } from '../bloom.js';
 import { HEIGHT, FLOAT, HEAD } from './proportions.js';
 import { proportionsFor } from './variants.js';
+/* R166 (Mrs. Mah) — her regional refiners. Each takes the already-built solids
+   and sculpts one region of the SHARED pipeline's output; none of them is
+   reachable for any other variant, and none of them is a second character. */
+import { refineMrsArms } from './mrs-limbs.js';
+import { createMrsHeroPose } from './mrs-hero-pose.js';
+import { joinMrsShoulderSurfaces } from './mrs-shoulder-union.js';
+import { refineMrsShoulderCrease } from './mrs-shoulder-crease.js';
+import { refineMrsForearmFlow } from './mrs-proximal-forearm-flow.js';
+import { refineMrsHingeReturns } from './mrs-forearm-hinge-return.js';
+import { joinMrsElbowSurfaces } from './mrs-elbow-union.js';
+import { refineMrsElbowCrease } from './mrs-elbow-crease.js';
+import { refineMrsWristBridges } from './mrs-wrist-convergence.js';
+import { refineMrsElbowReturn } from './mrs-elbow-return.js';
+import { refineMrsMuscleTrueLowerBody } from './mrs-muscle-true-teardrop.js';
+import { refineMrsPosteriorTransition } from './mrs-posterior-transition.js';
+import { refineMrsChestSupport } from './mrs-chest-support.js';
+import { refineMrsChestAttachment } from './mrs-chest-attachment.js';
+import { refineMrsObliqueIntegration } from './mrs-oblique-integration.js';
+import { refineMrsThighRails } from './mrs-thigh-rails.js';
+import { refineMrsThighOptics } from './mrs-thigh-optics.js';
+import { refineMrsTorsoOptics } from './mrs-torso-optics.js';
+import { refineMrsBackOptics } from './mrs-back-optics.js';
+import { refineMrsTaperOptics } from './mrs-taper-optics.js';
+import { refineMrsTaperPlanes } from './mrs-taper-planes.js';
+import { refineMrsHamstringBelly } from './mrs-hamstring-belly.js';
+import { refineMrsGluteFold } from './mrs-glute-fold.js';
+import { refineMrsThighPrimary } from './mrs-thigh-primary.js';
+import { refineMrsCalfCrown } from './mrs-calf-crown.js';
 
 export function createMrMah(options) {
   var opts = options || {};
@@ -41,12 +73,28 @@ export function createMrMah(options) {
   /* R96 — one renderer, one body pipeline, a PROPORTION SET per variant
      (variants.js). The head is shared: the face is the identity. */
   var P = proportionsFor(opts.variant);
-  var head = buildHead(materials);
-  var body = buildBody(materials, P);
-  var limbs = buildLimbs(materials, P);
+  var isMrs = P.name === 'mrs-mah';
+  var head = buildHead(materials, {economicalGlow: P.name !== 'female', facetedMouth: P.name !== 'female', faceStyle: P.faceStyle});
+  var body = buildBody(materials, P, { authoringMaster: opts.authoringMaster === true, cranialGeometry: head.geometry });
+  var limbs = buildLimbs(materials, P, { authoringMaster: opts.authoringMaster === true, torsoGeometry: body.group.getObjectByName('torso').geometry });
+  if (isMrs) refineMrsArms(limbs);
   rig.add(body.group);
   rig.add(limbs.group);
   rig.add(head.group);
+
+  // R144: preserve the retained sculpt; crystallize its authored surface groups.
+  // The female, Mrs. Mah and shipping paths remain independent of this gate:
+  // Mrs. Mah carries her own crystal planes and cranial growths.
+  if (opts.authoringMaster === true && P.name === 'male') {
+    applyAnatomicalCrystalAtlas(body, limbs, materials);
+    applyFineCrystalSurface(body, limbs);
+    addMrCranialCrown(head, materials);
+  }
+
+  if (P.stature) rig.scale.setScalar(P.stature);
+  if (P.armLateralScale) limbs.group.scale.x = P.armLateralScale;
+  if (isMrs) root.name = 'mrs-mah';
+
 
   /* R94 — flag every solid of his for the silhouette-halo pass (bloom.js
      renders HALO_LAYER alone as a mask). Meshes only: the edge lines would
@@ -84,6 +132,40 @@ export function createMrMah(options) {
     bodyRotY: body.group.rotation.y,
     bodyRotX: body.group.rotation.x
   };
+
+  /* R166 — Mrs. Mah's regional sculpt runs on the built solids, after the rest
+     pose has been captured and before anything animates. Her arms, shoulders
+     and elbows are unions and creases on the shared limb geometry; her lower
+     body is the muscle-true teardrop and its optical planes. */
+  if (isMrs) {
+    joinMrsShoulderSurfaces({ body: body, limbs: limbs });
+    refineMrsShoulderCrease({ body: body, limbs: limbs });
+    refineMrsForearmFlow({ limbs: limbs });
+    refineMrsHingeReturns({ limbs: limbs });
+    joinMrsElbowSurfaces({ limbs: limbs });
+    refineMrsElbowCrease({ limbs: limbs });
+    refineMrsWristBridges({ limbs: limbs });
+    refineMrsElbowReturn({ limbs: limbs });
+    refineMrsMuscleTrueLowerBody({ body: body });
+    refineMrsPosteriorTransition({ body: body });
+    refineMrsChestSupport({ body: body });
+    refineMrsChestAttachment({ body: body });
+    refineMrsObliqueIntegration({ body: body });
+    refineMrsThighRails({ body: body });
+    refineMrsThighOptics({ body: body });
+    refineMrsTorsoOptics({ body: body });
+    refineMrsBackOptics({ body: body });
+    refineMrsTaperOptics({ body: body });
+    refineMrsTaperPlanes({ body: body });
+    refineMrsHamstringBelly({ body: body });
+    refineMrsGluteFold({ body: body });
+    refineMrsThighPrimary({ body: body });
+    refineMrsCalfCrown({ body: body });
+  }
+  var heroPose = isMrs ? createMrsHeroPose({ body: body, head: head, limbs: limbs, handSpec: P.HAND }) : null;
+
+  // Presentation is independent of sculpt ownership and behavior states.
+  var presentation = P.name === 'male' ? createHeroPresentation(body, limbs, head, rest) : null;
 
   function setYaw(radians) {
     yaw = Number(radians) || 0;
@@ -125,6 +207,18 @@ export function createMrMah(options) {
       head.group.rotation.x = rest.headRotX;
       head.group.rotation.z = rest.headRotZ;
       head.setBlink(0);
+      if (isMrs) {
+        // Restore the actual relaxed pose after any animated state.
+        limbs.left.shoulderJoint.rotation.copy(rest.leftShoulder);
+        limbs.right.shoulderJoint.rotation.copy(rest.rightShoulder);
+        limbs.left.elbowJoint.rotation.copy(rest.leftElbow);
+        limbs.right.elbowJoint.rotation.copy(rest.rightElbow);
+        limbs.left.wristJoint.rotation.copy(rest.leftWrist);
+        limbs.right.wristJoint.rotation.copy(rest.rightWrist);
+        body.group.rotation.x = rest.bodyRotX; body.group.rotation.y = rest.bodyRotY;
+        float.rotation.set(0, 0, 0); float.position.x = 0;
+      }
+      if (heroPose) heroPose.apply();
       return;
     }
 
@@ -200,10 +294,12 @@ export function createMrMah(options) {
        the micro-shift the brief asks for, applied to both sides so it reads as
        posture rather than as a gesture on one arm. */
     var set = v.shoulderSet || 0;
-    limbs.left.shoulderJoint.rotation.z = rest.leftShoulder.z - lift + set
+    /* Mrs. Mah's raised arm is the OTHER side, so the lift's sign follows the
+       variant rather than being written into the state table. */
+    limbs.left.shoulderJoint.rotation.z = rest.leftShoulder.z + (isMrs ? lift : -lift) + set
       - Math.sin(time * 0.72) * 0.030 * v.sway;
     limbs.left.elbowJoint.rotation.z = rest.leftElbow.z + open * 0.30 + Math.sin(time * 0.72 + 0.7) * 0.024 * v.sway;
-    limbs.right.shoulderJoint.rotation.z = rest.rightShoulder.z + lift * 0.35 - set
+    limbs.right.shoulderJoint.rotation.z = rest.rightShoulder.z + (isMrs ? -lift : lift) * 0.35 - set
       + Math.sin(time * 0.66 + 1.9) * 0.020 * v.sway;
     limbs.right.elbowJoint.rotation.z = rest.rightElbow.z - open * 0.10 + Math.sin(time * 0.66 + 2.4) * 0.018 * v.sway;
 
@@ -264,14 +360,18 @@ export function createMrMah(options) {
       innerY + Math.sin(time * 0.53) * 0.06);
 
     /* Smile expression: the arc scales horizontally with the state. */
+    if(head.setMouthExpression)head.setMouthExpression(v);
+    else{
     head.smile.scale.x = 0.55 + 0.45 * MathUtils.clamp(v.smile, 0, 1.4);
     head.smile.scale.y = 0.5 + 0.5 * MathUtils.clamp(v.smile, 0, 1.4);
+    }
 
     /* Blink. */
     blinkTimer -= dt * v.blinkRate;
     if (blinkTimer <= 0) { blink = 1; blinkTimer = 2.2 + Math.random() * 3.4; }
     if (blink > 0) { blink = Math.max(0, blink - dt * 7.5); }
     head.setBlink(blink > 0.5 ? (1 - blink) * 2 : blink * 2);
+    if (heroPose) heroPose.apply();
   }
 
   return {
@@ -283,7 +383,19 @@ export function createMrMah(options) {
     limbs: limbs,
     materials: materials,
     states: states,
-    height: HEIGHT,
+    height: HEIGHT * (P.stature || 1),
+    variant: P.name,
+
+    /* R166 — Mrs. Mah's hero poses. The male's equivalent is `presentation`
+       below; neither surface is reachable for the other variant. */
+    poseNames: heroPose ? heroPose.names : ['neutral'],
+    setPose: function (name) {
+      if (heroPose) return heroPose.set(name);
+      if (name !== 'neutral') throw new Error('Hero pose is Mrs. Mah only');
+      return 'neutral';
+    },
+    getPose: function () { return heroPose ? heroPose.get() : 'neutral'; },
+    poseDiagnostics: heroPose ? heroPose.diagnostics : null,
 
     /* R91: the scene drives this so the crystal's reflections sweep even when
        the body is momentarily still. See the note at renderFrame. */
@@ -334,6 +446,16 @@ export function createMrMah(options) {
           return;
         }
         if (!o.isMesh) return;
+        // Clay must not turn additive glow companions into opaque gray plates.
+        // The head's pale diagnostic patch had the same cause: its four
+        // material groups were collapsed into one material below.
+        var sourceMat=o.userData.__mat || o.material;
+        if (mode && (sourceMat===materials.emissiveSoft || o.name==='display-shadow')) {
+          if (o.userData.__debugVisible===undefined) o.userData.__debugVisible=o.visible;
+          o.visible=false;
+        } else if (!mode && o.userData.__debugVisible!==undefined) {
+          o.visible=o.userData.__debugVisible;delete o.userData.__debugVisible;
+        }
         if (mode) {
           if (!o.userData.__mat) o.userData.__mat = o.material;
           var colour = 0x171a20;
@@ -343,7 +465,12 @@ export function createMrMah(options) {
               if (o.name.indexOf(GROUP_COLOURS[i][0]) !== -1) { colour = GROUP_COLOURS[i][1]; break; }
             }
           }
-          if (mode === 'clay') {
+          /* R166 — `crystal` is the same matte read taken over the CRYSTAL
+             plane normals (`aCrystalNormal`, written by the optical refiners)
+             rather than the smooth ones: it shows the anatomy-following facet
+             planes with no material, no coat and no bloom. Where a solid has
+             no crystal normal it falls back to the smooth one. */
+          if (mode === 'clay' || mode === 'crystal') {
             /* Lit clay: a Lambert surface has no specular term, so nothing but
                the form's own turning can make a value change. Emitters stay
                flat so the face and symbols still locate. */
@@ -354,14 +481,18 @@ export function createMrMah(options) {
                which is what the brief's "smooth matte grey clay, no facets"
                gate asks to see. Restored with the view. */
             var g = o.geometry;
-            if (g && g.attributes && g.attributes.aSmooth && !o.userData.__facetNormal) {
-              o.userData.__facetNormal = g.attributes.normal;
-              g.setAttribute('normal', g.attributes.aSmooth);
+            if (g && g.attributes && g.attributes.aSmooth) {
+              if (!o.userData.__facetNormal) o.userData.__facetNormal = g.attributes.normal;
+              g.setAttribute('normal', mode === 'crystal' ? (g.attributes.aCrystalNormal || g.attributes.aSmooth) : g.attributes.aSmooth);
             }
             if (!o.userData.__clay) o.userData.__clay = new MeshLambertMaterial({ toneMapped: false });
-            o.userData.__clay.color.setHex(emitter ? 0x1a1c22 : 0x9a9ea6);
-            o.userData.__clay.emissive.setHex(emitter ? 0x000000 : 0x14161a);
+            o.userData.__clay.color.setHex(/eye|smile/.test(o.name) ? 0xbfc5ce : emitter ? 0x1a1c22 : 0x9a9ea6);
+            o.userData.__clay.emissive.setHex(0x000000);
             o.material = o.userData.__clay;
+            if (o.name==='head-shell' && Array.isArray(sourceMat)) {
+              if (!o.userData.__clayFace) o.userData.__clayFace=new MeshLambertMaterial({color:0x10151e,toneMapped:false});
+              o.material=[o.userData.__clay,o.userData.__clayFace,o.userData.__clayFace,o.userData.__clay];
+            }
           } else {
             if (!o.userData.__dbg) o.userData.__dbg = new MeshBasicMaterial({ toneMapped: false });
             o.userData.__dbg.color.setHex(colour);
@@ -373,10 +504,14 @@ export function createMrMah(options) {
           if (o.userData.__facetNormal) { o.geometry.setAttribute('normal', o.userData.__facetNormal); delete o.userData.__facetNormal; }
           if (o.userData.__dbg) { o.userData.__dbg.dispose(); delete o.userData.__dbg; }
           if (o.userData.__clay) { o.userData.__clay.dispose(); delete o.userData.__clay; }
+          if (o.userData.__clayFace) { o.userData.__clayFace.dispose(); delete o.userData.__clayFace; }
         }
       });
       return mode;
     },
+    setPresentationPose: function (name) { return presentation ? presentation.set(name) : 'neutral'; },
+    getPresentationPose: function () { return presentation ? presentation.get() : 'neutral'; },
+    presentationInfo: presentation ? presentation.stats : null,
     setState: states.set,
     getState: states.get,
     stateNames: states.names,
@@ -386,6 +521,8 @@ export function createMrMah(options) {
     isPlaceholder: false,
 
     dispose: function () {
+      if (presentation) presentation.dispose();
+      if (heroPose) heroPose.dispose();
       head.dispose();
       body.dispose();
       limbs.dispose();

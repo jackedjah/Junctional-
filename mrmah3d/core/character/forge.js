@@ -11,7 +11,7 @@
    stacked on top — a lofted ring cage is what lets the torso carry a front
    ridge and a measured taper at the same time. */
 
-import { BufferGeometry, Float32BufferAttribute } from '../../vendor/three/three.module.min.js';
+import { BufferGeometry, Float32BufferAttribute, Vector3, Vector2, ShapeUtils, Ray } from '../../vendor/three/three.module.min.js';
 
 /* Build a geometry from explicit vertex positions and triangle indices,
    with FLAT per-face normals. Vertices are expanded per-face rather than
@@ -286,7 +286,7 @@ function facetClass(i, area, lift, classes, jitterIndex, classIndex) {
    what makes it blendable. */
 export function facetedGeometry(positions, faces, groups, options) {
   var opts = options || {};
-  var pos = [], nor = [], fac = [], smo = [], bar = [];
+  var pos = [], nor = [], fac = [], smo = [], bar = [], mold = [];
   /* R94 — `aInner` marks the solid that carries the internal light (the torso).
      The shader's light is gated in each mesh's OWN space, and an arm's local
      origin is its shoulder joint, so without this flag the upper arms sat
@@ -334,11 +334,22 @@ export function facetedGeometry(positions, faces, groups, options) {
        so leaving it raw weights each face's vote by its size — which is what
        makes a hero plane dominate the corner it shares with a sliver. */
     var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
-    [[a, ax, ay, az], [b, bx, by, bz], [c, cx, cy, cz]].forEach(function (v) {
+    var corners=[[a, ax, ay, az], [b, bx, by, bz], [c, cx, cy, cz]];
+    corners.forEach(function (v, i) {
       var kk = key(v[1], v[2], v[3]);
       var e = normAcc[kk];
       if (!e) { e = normAcc[kk] = [0, 0, 0]; }
-      e[0] += nx; e[1] += ny; e[2] += nz;
+      var weight=1;
+      if(opts.normalWeight==='angle'){
+        // Unequal anatomical rings should not let their largest triangles
+        // dominate a valley normal. Corner weighting uses the same real faces.
+        var p=corners[(i+1)%3],q=corners[(i+2)%3];
+        var pa=[p[1]-v[1],p[2]-v[2],p[3]-v[3]],qa=[q[1]-v[1],q[2]-v[2],q[3]-v[3]];
+        var lengths=Math.hypot.apply(null,pa)*Math.hypot.apply(null,qa);
+        var cosine=lengths>1e-20?(pa[0]*qa[0]+pa[1]*qa[1]+pa[2]*qa[2])/lengths:1;
+        weight=Math.acos(Math.max(-1,Math.min(1,cosine)))/(Math.hypot(nx,ny,nz)||1);
+      }
+      e[0] += nx*weight; e[1] += ny*weight; e[2] += nz*weight;
     });
   }
   (groups || [{ faces: faces, material: 0 }]).forEach(function (g) {
@@ -372,6 +383,18 @@ export function facetedGeometry(positions, faces, groups, options) {
     var sb = smoothAt(bx, by, bz) || [nx, ny, nz];
     var sc = smoothAt(cx, cy, cz) || [nx, ny, nz];
     smo.push(sa[0], sa[1], sa[2], sb[0], sb[1], sb[2], sc[0], sc[1], sc[2]);
+    if(opts.vertexNormals){
+      [a,b,c].forEach(function(id,j){
+        var base=[sa,sb,sc][j],field=opts.vertexNormals[id];
+        // The analytical direction belongs to this same sampled surface.
+        // Bound its influence so it cannot conceal a poorly resolved face.
+        var dot=field ? base[0]*field[0]+base[1]*field[1]+base[2]*field[2] : 0;
+        var w=dot>.90?.65:dot>.65?.30:0;
+        var v=base.map(function(n,k){return n*(1-w)+(field?field[k]:n)*w;}),l=Math.hypot.apply(null,v)||1;
+        mold.push(v[0]/l,v[1]/l,v[2]/l);
+      });
+    }
+
     /* The fourth component is the triangle's INRADIUS, and it is what makes the
        chamfer a constant width instead of a constant fraction.
 
@@ -466,6 +489,7 @@ export function facetedGeometry(positions, faces, groups, options) {
   geo.setAttribute('normal', new Float32BufferAttribute(nor, 3));
   geo.setAttribute('aFacet', new Float32BufferAttribute(fac, 4));
   geo.setAttribute('aSmooth', new Float32BufferAttribute(smo, 3));
+  if(opts.vertexNormals)geo.setAttribute('aMoldNormal',new Float32BufferAttribute(mold,3));
   geo.setAttribute('aBary', new Float32BufferAttribute(bar, 4));
   var inn = new Float32Array(pos.length / 3);
   if (innerFlag) inn.fill(1);
@@ -589,6 +613,9 @@ function refineSections(sections, n) {
         shape: (A.shape || B.shape) ? (function (fa, fb, w) {
           return function (a) { return (fa ? fa(a) : 1) * (1 - w) + (fb ? fb(a) : 1) * w; };
         }(A.shape, B.shape, sm)) : undefined,
+        widthShape: (A.widthShape || B.widthShape) ? (function (fa, fb, w) {
+          return function (a) { return (fa ? fa(a) : 1) * (1 - w) + (fb ? fb(a) : 1) * w; };
+        }(A.widthShape, B.widthShape, sm)) : undefined,
         hero: B.hero, coat: B.coat, classesAt: B.classesAt, zoneAt: B.zoneAt, columns: B.columns, fg: B.fg,
         refined: true
       });
@@ -612,15 +639,19 @@ export function loft(sections, sides, options) {
   var positions = [];
   var index = [];
   var rings = [];
+  var vertexNormals = opts.normalAt ? [] : null;
   var vertexCavity = [];   /* R102 — per position, see the ring loop */
 
   function push(x, y, z) { positions.push(x, y, z); return positions.length / 3 - 1; }
 
   sections.forEach(function (s, ri) {
     if (s.w <= 1e-6 && s.d <= 1e-6) { rings.push({ point: push(0, s.y, 0), verts: null }); return; }
-    var verts = [];
-    for (var i = 0; i < sides; i++) {
-      var a = phase + (i / sides) * Math.PI * 2;
+    var verts = [], ringAngles = opts.surfaceRing ? [] : null;
+    var ringSides = opts.sidesAt ? Math.max(3,Math.round(opts.sidesAt(s))) : sides;
+    for (var i = 0; i < ringSides; i++) {
+      var a = phase + (i / ringSides) * Math.PI * 2;
+      if (opts.angleAt) a = opts.angleAt(a, s);
+      if (ringAngles) ringAngles.push(a);
       var guard = reliefWeight(a);
 
       /* Alternating facet relief. Pulling every other vertex slightly in
@@ -666,7 +697,15 @@ export function loft(sections, sides, options) {
       /* R94 — `zc` shifts a ring's centre front-to-back. The neck sits BEHIND
          the chin, not under its point, and a loft whose rings all share one
          axis cannot say that. */
-      var vi = push(Math.cos(a) * s.w * r, s.y - drop + yJit, Math.sin(a) * s.d * r + (s.zc || 0));
+      // An anterior muscle can project forward without widening the ribcage.
+      // Default remains radial, preserving all existing limb and variant lofts.
+      var widthR = s.widthShape ? (relief + jitter) * s.widthShape(a) : r;
+      var point = [Math.cos(a) * s.w * widthR, s.y - drop + yJit, Math.sin(a) * s.d * r + (s.zc || 0)];
+      // Optional continuous anatomical field, evaluated at mount only. Existing
+      // topology and default variant path are unchanged; normals use the result.
+      if (opts.surface) point = opts.surface(a, s, point);
+      var vi = push(point[0], point[1], point[2]);
+      if(vertexNormals)vertexNormals[vi]=opts.normalAt(a,s,point);
       /* R102 — CAVITY. How far this vertex sits INSIDE the ring's nominal
          surface, from the anatomical multiplier alone: a sternum valley at
          0.76 is a full cavity, an oblique groove at 0.95 a quarter of one, a
@@ -680,8 +719,20 @@ export function loft(sections, sides, options) {
          CREASE ring (under the pec, between abdominal blocks, the belt, the
          knee, under the glute) is a valley between the rings either side of
          it, which the multiplier alone cannot know. */
-      vertexCavity[vi] = Math.max(0, Math.min(1, (1 - mul) / 0.22 + (s.cav || 0)));
+      vertexCavity[vi] = Math.max(0, Math.min(1, opts.cavityAt ? opts.cavityAt(a, s, point) : (1 - mul) / 0.22 + (s.cav || 0)));
       verts.push(vi);
+    }
+    // Optional connected section authoring, after individual surface controls
+    // and before faces/normals. No topology or default caller changes.
+    if(opts.surfaceRing){
+      const points=verts.map(vi=>positions.slice(vi*3,vi*3+3));
+      const shaped=opts.surfaceRing(ringAngles,s,points);
+      for(let i=0;i<verts.length;i++){
+        const vi=verts[i],p=shaped[i];
+        positions[vi*3]=p[0];positions[vi*3+1]=p[1];positions[vi*3+2]=p[2];
+        if(vertexNormals)vertexNormals[vi]=opts.normalAt(ringAngles[i],s,p);
+        if(opts.cavityAt)vertexCavity[vi]=Math.max(0,Math.min(1,opts.cavityAt(ringAngles[i],s,p)));
+      }
     }
     rings.push({ point: null, verts: verts });
   });
@@ -740,7 +791,11 @@ export function loft(sections, sides, options) {
       fg: s.fg !== undefined ? s.fg : lo.fg
     };
   }
-  function midAngle(i) { return phase + ((i + 0.5) / sides) * Math.PI * 2; }
+  var bandSides=sides;
+  function midAngle(i) {
+    var a = phase + ((i + 0.5) / bandSides) * Math.PI * 2;
+    return opts.angleAt ? opts.angleAt(a, sections[0]) : a;
+  }
   /* R95 — the zone function also receives the band's mid HEIGHT, so a zone
      boundary can run diagonally across the bands (a pectoral's lower edge, an
      oblique) instead of only vertically, and may return `index` to name its
@@ -770,20 +825,37 @@ export function loft(sections, sides, options) {
     var lo = rings[r], hi = rings[r + 1];
     var spec = bandSpec(r);
     var bandLift = spec.lift;
+    bandSides=(hi.verts||lo.verts||[]).length||sides;
     if (lo.point != null && hi.verts) {
-      for (var i = 0; i < sides; i++) {
+      for (var i = 0; i < hi.verts.length; i++) {
         var z0 = quadZone(spec, i, r);
-        pushFace([lo.point, hi.verts[i], hi.verts[(i + 1) % sides]], bandLift, quadClasses(spec, i, z0), quadSeed(spec, i, r, z0), quadIndex(z0), quadCoat(spec, z0));
+        pushFace([lo.point, hi.verts[i], hi.verts[(i + 1) % hi.verts.length]], bandLift, quadClasses(spec, i, z0), quadSeed(spec, i, r, z0), quadIndex(z0), quadCoat(spec, z0));
       }
     } else if (lo.verts && hi.point != null) {
-      for (var i2 = 0; i2 < sides; i2++) {
+      for (var i2 = 0; i2 < lo.verts.length; i2++) {
         var z1 = quadZone(spec, i2, r);
-        pushFace([lo.verts[i2], hi.point, lo.verts[(i2 + 1) % sides]], bandLift, quadClasses(spec, i2, z1), quadSeed(spec, i2, r, z1), quadIndex(z1), quadCoat(spec, z1));
+        pushFace([lo.verts[i2], hi.point, lo.verts[(i2 + 1) % lo.verts.length]], bandLift, quadClasses(spec, i2, z1), quadSeed(spec, i2, r, z1), quadIndex(z1), quadCoat(spec, z1));
       }
     } else if (lo.verts && hi.verts) {
-      for (var i3 = 0; i3 < sides; i3++) {
-        var a1 = lo.verts[i3], b1 = lo.verts[(i3 + 1) % sides];
-        var c1 = hi.verts[(i3 + 1) % sides], d1 = hi.verts[i3];
+      // Stitch differing sample densities by angular progress. Each boundary
+      // edge is used once; this allocates resolution without duplicate shells.
+      if(lo.verts.length!==hi.verts.length){
+        var li=0,hj=0,nl=lo.verts.length,nh=hi.verts.length;
+        while(li<nl||hj<nh){
+          var ln=(li+1)/nl,hn=(hj+1)/nh,a0=lo.verts[li%nl],d0=hi.verts[hj%nh];
+          var ci=Math.floor((li/nl+hj/nh)*.5*bandSides),zz=quadZone(spec,ci,r);
+          var args=[bandLift,quadClasses(spec,ci,zz),quadSeed(spec,ci,r,zz),quadIndex(zz),quadCoat(spec,zz),groupKey(spec,ci,r)];
+          if(Math.abs(ln-hn)<1e-10){
+            var bn=lo.verts[(li+1)%nl],cn=hi.verts[(hj+1)%nh];
+            pushFace.apply(null,[[a0,d0,cn]].concat(args));pushFace.apply(null,[[a0,cn,bn]].concat(args));li++;hj++;
+          }else if(ln<hn){pushFace.apply(null,[[a0,d0,lo.verts[(li+1)%nl]]].concat(args));li++;}
+          else{pushFace.apply(null,[[a0,d0,hi.verts[(hj+1)%nh]]].concat(args));hj++;}
+        }
+        continue;
+      }
+      for (var i3 = 0; i3 < lo.verts.length; i3++) {
+        var a1 = lo.verts[i3], b1 = lo.verts[(i3 + 1) % lo.verts.length];
+        var c1 = hi.verts[(i3 + 1) % hi.verts.length], d1 = hi.verts[i3];
         var z2 = quadZone(spec, i3, r);
         var qc = quadClasses(spec, i3, z2), qs = quadSeed(spec, i3, r, z2), qi = quadIndex(z2), qk = quadCoat(spec, z2), qg = groupKey(spec, i3, r);
         /* Alternate the diagonal of each quad, checkerboard fashion. Combined
@@ -822,6 +894,16 @@ export function loft(sections, sides, options) {
            domed shoulders, a clavicle shelf and real pec planes. Lesson, again:
            a culled face and a black face look identical — read the geometry. */
         var alt = spec.columns ? (i3 % 2 === 0) : ((i3 + r) % 2 === 0);
+        if(opts.diagonalTarget){
+          var sample={y:(sections[r].y+sections[r+1].y)/2};
+          var target=opts.diagonalTarget(midAngle(i3),sample);
+          if(target){
+            var error=function(i,j){var e=0;for(var k=0;k<3;k++){var d=(positions[3*i+k]+positions[3*j+k])*.5-target[k];e+=d*d;}return e;};
+            var ac=error(a1,c1),bd=error(b1,d1);
+            if(Math.abs(ac-bd)>1e-14)alt=ac<bd;
+          }
+        }
+
         if (alt) {
           pushFace([a1, c1, b1], bandLift, qc, qs, qi, qk, qg);
           pushFace([a1, d1, c1], bandLift, qc, qs, qi, qk, qg);
@@ -835,21 +917,30 @@ export function loft(sections, sides, options) {
 
   /* Caps, only where the end is a real ring rather than a point. */
   var first = rings[0], last = rings[rings.length - 1];
+  // A deformed/curved loft must close at its actual end-ring centroid. Leaving
+  // the cap centre on the undeformed axis produces an exposed fan/spike even
+  // when every ring vertex is correctly buried. Legacy straight lofts unchanged.
+  function capCentre(ring, section) {
+    if (!opts.surface && !opts.surfaceRing) return push(0, section.y, 0);
+    var sum = [0, 0, 0];
+    ring.verts.forEach(function (vi) { for (var k=0;k<3;k++) sum[k]+=positions[vi*3+k]/ring.verts.length; });
+    return push(sum[0],sum[1],sum[2]);
+  }
   /* Caps wound outward too (see the note above): bottom cap faces down, top
      cap faces up. */
   if (capBottom && first.verts) {
-    var cb = push(0, sections[0].y, 0);
-    for (var i4 = 0; i4 < sides; i4++) pushFace([cb, first.verts[i4], first.verts[(i4 + 1) % sides]], sections[0].hero);
+    var cb = capCentre(first, sections[0]);
+    for (var i4 = 0; i4 < first.verts.length; i4++) pushFace([cb, first.verts[i4], first.verts[(i4 + 1) % first.verts.length]], sections[0].hero);
   }
   if (capTop && last.verts) {
-    var ct = push(0, sections[sections.length - 1].y, 0);
-    for (var i5 = 0; i5 < sides; i5++) pushFace([ct, last.verts[(i5 + 1) % sides], last.verts[i5]], sections[sections.length - 1].hero);
+    var ct = capCentre(last, sections[sections.length - 1]);
+    for (var i5 = 0; i5 < last.verts.length; i5++) pushFace([ct, last.verts[(i5 + 1) % last.verts.length], last.verts[i5]], sections[sections.length - 1].hero);
   }
 
   return { geometry: facetedGeometry(positions, faces, null,
       { lift: opts.lift, faceLift: faceLift, classes: opts.classes, faceClasses: faceClasses, faceSeed: faceSeed,
         faceClassIndex: faceClassIndex, inner: opts.inner, coat: opts.coat, faceCoat: faceCoat,
-        vertexCavity: vertexCavity, faceGroup: faceGroup }),
+        vertexCavity: vertexCavity, vertexNormals: vertexNormals, faceGroup: faceGroup, normalWeight: opts.normalWeight }),
     positions: positions, faces: faces };
 }
 
@@ -965,7 +1056,7 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
     : Math.atan2((px * zx + py * zy + pz * zz) / pl, (px * rx + py * ry + pz * rz) / pl);
 
   for (var k = 0; k <= STEPS; k++) {
-    var t = k / STEPS;
+    var t = opts.samplesT ? opts.samplesT[k] : k / STEPS;
     var r = radiusA + (radiusB - radiusA) * t;
     if (profile) r *= profile(t);
     /* Relief fades out at both ends so the joints still meet cleanly. */
@@ -1011,7 +1102,28 @@ export function segment(a, b, radiusA, radiusB, sides, options) {
     });
   }
 
-  var built = loft(rings, sides || 6, { capTop: true, capBottom: true, phase: opts.phase, lift: opts.lift, classes: opts.classes, coat: opts.coat });
+  var built = loft(rings, sides || 6, { capTop: true, capBottom: true, phase: opts.anatomicalPhase ? frontAngle : opts.phase, lift: opts.lift, classes: opts.classes, coat: opts.coat, normalWeight: opts.normalWeight,
+    // Explicit opt-in: allocate limb columns in its anatomical frame before
+    // shape evaluation. All callers without this option keep their old mesh.
+    angleAt: opts.angleAt ? function(angle,section){return frontAngle+opts.angleAt(angle-frontAngle,section.y/len);} : undefined,
+    // A build-time world-space centerline offset, projected into the tube's
+    // frame before normals are calculated. Default straight segments unchanged.
+    surfaceRing: opts.ringWorld ? function(angles,section,points){
+      const world=points.map(p=>[a[0]+rx*p[0]+ux*p[1]+zx*p[2],a[1]+ry*p[0]+uy*p[1]+zy*p[2],a[2]+rz*p[0]+uz*p[1]+zz*p[2]]);
+      const shaped=opts.ringWorld(world,section.y/len,angles.map(v=>v-frontAngle));
+      return shaped.map(p=>{const q=p.map((v,i)=>v-a[i]);return [rx*q[0]+ry*q[1]+rz*q[2],ux*q[0]+uy*q[1]+uz*q[2],zx*q[0]+zy*q[1]+zz*q[2]];});
+    } : undefined,
+    surface: opts.centreAt || opts.surfaceWorld ? function (angle, section, point) {
+      var c = opts.centreAt ? opts.centreAt(section.y / len) : [0,0,0];
+      var local=[point[0] + rx*c[0] + ry*c[1] + rz*c[2],
+              point[1] + ux*c[0] + uy*c[1] + uz*c[2],
+              point[2] + zx*c[0] + zy*c[1] + zz*c[2]];
+      if (!opts.surfaceWorld) return local;
+      var world=[a[0]+rx*local[0]+ux*local[1]+zx*local[2],a[1]+ry*local[0]+uy*local[1]+zy*local[2],a[2]+rz*local[0]+uz*local[1]+zz*local[2]];
+      var shaped=opts.surfaceWorld(world,section.y/len,angle-frontAngle);
+      var q=shaped.map(function(v,i){return v-a[i];});
+      return [rx*q[0]+ry*q[1]+rz*q[2],ux*q[0]+uy*q[1]+uz*q[2],zx*q[0]+zy*q[1]+zz*q[2]];
+    } : undefined });
 
   var p = built.geometry.attributes.position.array;
   var n = built.geometry.attributes.normal.array;
@@ -1277,4 +1389,408 @@ export function diamondPlate(half, depth) {
     faces.push([b[i], b[j], f[j], f[i]]);
   }
   return facetedGeometry(P, faces);
+}
+
+/* R118. Opt-in, build-time recess fitting against the immutable incoming mesh.
+   A channel is a surface path with a finite floor and independent wall rolls.
+   Its depth is TOTAL depth below a chord between its B0 rims, not an additive
+   dent. UV is a rest-surface chart, never a direction toward the world origin.
+   Callers own anatomical paths and must opt in (the female path never does). */
+export function sculptSurfaceRecesses(geometry, frame, channels) {
+  if (!channels.length) return geometry;
+  if(frame.refine)refineRecessEdges(geometry,frame,channels,frame.refine);
+  const V = a => new Vector3(...a), clamp = x => Math.max(0, Math.min(1, x));
+  const smooth = x => { x=clamp(x);return x*x*(3-2*x); };
+  const pos=geometry.attributes.position, old=pos.array.slice();
+  const normals=geometry.attributes.aSmooth.array.slice();
+  const points=Array.from({length:pos.count},(_,i)=>V(Array.from(old.slice(i*3,i*3+3))));
+  const point=i=>points[i];
+  const ns=Array.from({length:pos.count},(_,i)=>V(Array.from(normals.slice(i*3,i*3+3))));
+  const uv=Array.from({length:pos.count},(_,i)=>frame.project(point(i)));
+  // Index only this chart's triangles. The original complete mesh is retained
+  // for full-thickness rays; no radius/diameter substitution is made.
+  const tris=[];
+  for(let i=0;i<pos.count;i+=3){
+    if(![i,i+1,i+2].every(j=>frame.accept(point(j))))continue;
+    const a=uv[i],b=uv[i+1],c=uv[i+2];
+    const det=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
+    if(Math.abs(det)<1e-12||Math.max(a[0],b[0],c[0])-Math.min(a[0],b[0],c[0])>(frame.seamSpan||Infinity))continue;
+    tris.push({i,a,b,c,det,min:[Math.min(a[0],b[0],c[0]),Math.min(a[1],b[1],c[1])],max:[Math.max(a[0],b[0],c[0]),Math.max(a[1],b[1],c[1])]});
+  }
+  function sample(u,v){
+    for(const t of tris){
+      if(u<t.min[0]-1e-7||u>t.max[0]+1e-7||v<t.min[1]-1e-7||v>t.max[1]+1e-7)continue;
+      const a=((t.b[1]-t.c[1])*(u-t.c[0])+(t.c[0]-t.b[0])*(v-t.c[1]))/t.det;
+      const b=((t.c[1]-t.a[1])*(u-t.c[0])+(t.a[0]-t.c[0])*(v-t.c[1]))/t.det,c=1-a-b;
+      if(Math.min(a,b,c)<-1e-6)continue;
+      const p=new Vector3(),n=new Vector3();
+      [a,b,c].forEach((w,j)=>{p.addScaledVector(point(t.i+j),w);n.addScaledVector(ns[t.i+j],w);});
+      return {p,n:n.normalize()};
+    }
+    return null;
+  }
+  function thickness(p,n){
+    const ray=new Ray(p.clone().addScaledVector(n,-1e-5),n.clone().negate()),hit=new Vector3();let far=0;
+    for(let i=0;i<pos.count;i+=3)if(ray.intersectTriangle(point(i),point(i+1),point(i+2),false,hit)){
+      const d=p.distanceTo(hit);if(d>1e-4)far=Math.max(far,d);
+    }
+    return far||null;
+  }
+  const delta=new Float64Array(old.length),weights=new Float64Array(pos.count),records=[];
+  for(const ch of channels){
+    const paths=ch.mirror?[1,-1]:[1];
+    for(const sign of paths){
+      const path=ch.path.map(p=>[sign*p[0],p[1]]),lengths=[0];
+      for(let k=1;k<path.length;k++)lengths.push(lengths[k-1]+Math.hypot(path[k][0]-path[k-1][0],path[k][1]-path[k-1][1]));
+      const total=lengths.at(-1),count=ch.samples||25,stations=[];
+      for(let k=0;k<count;k++){
+        const h=k/(count-1),l=h*total;let j=1;while(j<path.length-1&&lengths[j]<l)j++;
+        const a=path[j-1],b=path[j],len=lengths[j]-lengths[j-1],f=(l-lengths[j-1])/len;
+        const u=a[0]+(b[0]-a[0])*f,v=a[1]+(b[1]-a[1])*f;
+        const du=-(b[1]-a[1])/len*sign,dv=(b[0]-a[0])/len*sign;
+        const half=ch.width*.5*(ch.widthEnds==null?1:(ch.widthEnds+(1-ch.widthEnds)*Math.sin(Math.PI*h)));
+        const center=sample(u,v),left=sample(u-du*half,v-dv*half),right=sample(u+du*half,v+dv*half);
+        if(!center||!left||!right){stations.push(null);continue;}
+        stations.push({u,v,du,dv,half,center,left,right,h});
+      }
+      const middle=stations[Math.floor(count/2)]||stations.find(Boolean);
+      if(!middle){records.push({name:ch.name,sign,status:'UNRESOLVED',reason:'No complete rim cross-section'});continue;}
+      if(ch.referenceNormals){
+        const refs=ch.referenceNormals.points;
+        for(const s of stations){if(!s)continue;
+          let j=1;while(j<refs.length-1&&refs[j][0]<s.h)j++;
+          const a=refs[j-1],b=refs[j],t=clamp((s.h-a[0])/(b[0]-a[0]));
+          s.direction=new Vector3(sign*(a[1]+(b[1]-a[1])*t),a[2]+(b[2]-a[2])*t,a[3]+(b[3]-a[3])*t).normalize();
+        }
+      }
+      if(ch.fixedFloor){
+        const refs=ch.fixedFloor.points;
+        for(const s of stations){if(!s)continue;
+          let j=1;while(j<refs.length-1&&refs[j][0]<s.h)j++;
+          const a=refs[j-1],b=refs[j],t=clamp((s.h-a[0])/(b[0]-a[0]));
+          const at=k=>a[k]+(b[k]-a[k])*t;
+          s.fixed={p:new Vector3(sign*at(1),at(2),at(3)),n:new Vector3(sign*at(4),at(5),at(6)).normalize(),T:at(7)};
+        }
+      }
+      // Optional measured rest calibration keeps the opposite anatomical wall
+      // from changing this channel's target during a separate regional edit.
+      const T=middle.fixed?.T??ch.thicknessBySide?.[sign]??ch.thickness??thickness(middle.center.p,middle.center.n);
+      if(!T){records.push({name:ch.name,sign,status:'UNRESOLVED',reason:'No opposing surface thickness hit'});continue;}
+      const target=Math.min(ch.maxDepth||Infinity,ch.depthT*T,.04*T);
+      const record={name:ch.name,sign,class:ch.class,T,W:ch.regionWidth,requestedCorridor:ch.width,target,alpha:ch.alpha??.5,changedVertices:0,maxDisplacement:0,floorVertices:0,sections:[]};
+      if(ch.referenceNormals)record.directionSource=ch.referenceNormals.source;
+      if(ch.fixedFloor){record.fixedFloorSource=ch.fixedFloor.source;record.target=null;record.targetMode='Fixed B0 floor positions, no extra depth target';}
+      for(const s of stations){if(!s)continue;
+        const chord=s.left.p.clone().add(s.right.p).multiplyScalar(.5);
+        const sectionNormal=s.fixed?.n??s.direction??s.center.n;
+        s.d0=chord.clone().sub(s.center.p).dot(sectionNormal);
+        s.depth=s.fixed?chord.clone().sub(s.fixed.p).dot(sectionNormal):s.d0+(ch.alpha??.5)*(target-s.d0);
+        s.fade=smooth(s.h/(ch.fade||.18))*smooth((1-s.h)/(ch.fade||.18));
+        record.sections.push({h:s.h,uv:[s.u,s.v],normal:sectionNormal.toArray(),rims:[s.left.p.toArray(),s.right.p.toArray()],B0:s.center.p.toArray(),dB0:s.d0,dTrial:s.depth,corridorChord:s.left.p.distanceTo(s.right.p),...(s.fixed?{fixedFloor:s.fixed.p.toArray()}:{})});
+      }
+      // Every proposal is computed from B0. Crossings blend, never add depths.
+      for(let i=0;i<pos.count;i++){
+        if(!frame.accept(point(i)))continue;
+        const [u,v]=uv[i];let best=null,dist=Infinity;
+        for(const s of stations){if(!s)continue;const d=Math.hypot(u-s.u,v-s.v);if(d<dist){dist=d;best=s;}}
+        // Authoring pockets opt into a continuous rest-path section. Nearest
+        // station fitting remains the established default for runtime anatomy.
+        if(ch.continuousStations){
+          let along=0,walk=0,near=Infinity;
+          for(let j=1;j<path.length;j++){
+            const a=path[j-1],b=path[j],dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy);
+            const t=clamp(((u-a[0])*dx+(v-a[1])*dy)/(len*len)),d=Math.hypot(u-a[0]-t*dx,v-a[1]-t*dy);
+            if(d<near){near=d;along=(walk+t*len)/total;}walk+=len;
+          }
+          const at=along*(count-1),k=Math.min(count-2,Math.floor(at)),a=stations[k],b=stations[k+1],t=at-k;
+          if(a&&b){
+            const mix=(x,y)=>x+(y-x)*t,vec=(x,y)=>x.clone().lerp(y,t);
+            best={u:mix(a.u,b.u),v:mix(a.v,b.v),du:mix(a.du,b.du),dv:mix(a.dv,b.dv),half:mix(a.half,b.half),
+              left:{p:vec(a.left.p,b.left.p)},right:{p:vec(a.right.p,b.right.p)},center:{p:vec(a.center.p,b.center.p),n:vec(a.center.n,b.center.n).normalize()},
+              fade:smooth(along/(ch.fade||.18))*smooth((1-along)/(ch.fade||.18)),
+              ...(a.direction&&b.direction?{direction:vec(a.direction,b.direction).normalize()}:{}),
+              ...(a.fixed&&b.fixed?{fixed:{p:vec(a.fixed.p,b.fixed.p),n:vec(a.fixed.n,b.fixed.n).normalize()}}:{})};
+            dist=near;
+          }
+        }
+        if(!best||dist>best.half+total/count)continue;
+        const q=((u-best.u)*best.du+(v-best.v)*best.dv)/best.half;
+        if(Math.abs(q)>=1||!best.fade)continue;
+        const floor=ch.floor??.20,wall=q<0?(ch.walls?.[0]??.85):(ch.walls?.[1]??1.25);
+        const roll=1-smooth(Math.pow(clamp((Math.abs(q)-floor)/(1-floor)),wall));
+        const chord=best.left.p.clone().lerp(best.right.p,(q+1)*.5);
+        const normal=best.fixed?.n??best.direction??best.center.n;
+        // A measured immutable floor connects separately to each current rim.
+        // Moving one muscle wall cannot pull the opposite wall through a chord.
+        // Default channels retain their previous interpolated-rim construction.
+        const desired=best.fixed
+          ? best.fixed.p.clone().lerp(q<0?best.left.p:best.right.p,1-roll).sub(point(i)).dot(normal)*(ch.alpha??1)
+          : (chord.sub(point(i)).dot(normal)-target*roll)*(ch.alpha??.5);
+        const shift=Math.max(-.04*T,Math.min(.04*T,desired))*best.fade;
+        // Vanish at the original rims, retain their existing crowns exactly.
+        const influence=smooth((1-Math.abs(q))/.14);
+        if(Math.abs(shift*influence)<1e-8)continue;
+        for(let j=0;j<3;j++)delta[i*3+j]+=normal.getComponent(j)*shift*influence;
+        weights[i]+=influence;record.changedVertices++;record.maxDisplacement=Math.max(record.maxDisplacement,Math.abs(shift*influence));if(Math.abs(q)<=floor)record.floorVertices++;
+      }
+      records.push(record);
+    }
+  }
+  for(let i=0;i<pos.count;i++)if(weights[i])for(let j=0;j<3;j++)pos.array[i*3+j]=old[i*3+j]+delta[i*3+j]/Math.max(1,weights[i]);
+  finishLocalSurfaceDeformation(geometry,old,weights);
+  const previous=geometry.userData.recessFit?.channels||[];
+  geometry.userData.recessFit={frame:frame.name,definition:'B0 triangle-interpolated rims; signed floor depth along interpolated B0 ordinary normal. T is opposing-hit FULL thickness on that normal at the middle station. W is the named local chart region width. No added depth at crossings.',channels:previous.concat(records)};
+  return geometry;
+}
+
+// A bounded rest-surface correction sampled once from immutable incoming
+// positions. No topology changes, additive overlapping fields or frame updates.
+export function sculptSurfaceRegion(geometry,spec){
+ const pos=geometry.attributes.position,old=pos.array.slice(),weights=new Float64Array(pos.count),changed=new Map();
+ for(let i=0;i<pos.count;i++){
+  const before=Array.from(old.slice(i*3,i*3+3)),after=spec.sample(before);if(!after)continue;
+  const delta=Math.hypot(...after.map((v,j)=>v-before[j]));if(delta<1e-8)continue;
+  for(let j=0;j<3;j++)pos.array[i*3+j]=after[j];weights[i]=1;
+  changed.set(before.map(v=>Math.round(v*1e6)).join(','),{before,after,delta});
+ }
+ finishLocalSurfaceDeformation(geometry,old,weights);
+ geometry.userData.surfaceRegions=(geometry.userData.surfaceRegions||[]).concat({name:spec.name,changedVertices:changed.size,maxDisplacement:Math.max(0,...[...changed.values()].map(p=>p.delta)),samples:[...changed.values()]});
+ return geometry;
+}
+
+function finishLocalSurfaceDeformation(geometry,old,weights){
+  const pos=geometry.attributes.position,V=a=>new Vector3(...a);
+  // Welded-position normal reconstruction; ordinary clay never exposes raw
+  // triangles. Keep the authored normal offset only away from changed faces.
+  const acc=new Map(),keys=[],dirty=new Set(),faceNormals=[];
+  const key=p=>p.map(v=>Math.round(v*1e6)).join(',');
+  for(let i=0;i<pos.count;i++)keys.push(key(Array.from(old.slice(i*3,i*3+3))));
+  for(let i=0;i<pos.count;i+=3){
+    const ps=[i,i+1,i+2].map(j=>V(Array.from(pos.array.slice(j*3,j*3+3))));
+    const n=ps[1].clone().sub(ps[0]).cross(ps[2].clone().sub(ps[0])).normalize();faceNormals.push(n);
+    const changed=[i,i+1,i+2].some(j=>weights[j]>0);
+    for(let j=0;j<3;j++){
+      const angle=ps[(j+1)%3].clone().sub(ps[j]).angleTo(ps[(j+2)%3].clone().sub(ps[j]));
+      const k=keys[i+j];if(!acc.has(k))acc.set(k,new Vector3());acc.get(k).addScaledVector(n,angle);if(changed)dirty.add(k);
+    }
+    const perimeter=ps[0].distanceTo(ps[1])+ps[1].distanceTo(ps[2])+ps[2].distanceTo(ps[0]);
+    const area2=ps[1].clone().sub(ps[0]).cross(ps[2].clone().sub(ps[0])).length();
+    if(changed&&geometry.attributes.aBary)for(let j=0;j<3;j++)geometry.attributes.aBary.setW(i+j,area2/perimeter);
+  }
+  for(let i=0;i<pos.count;i++)if(dirty.has(keys[i])){
+    const n=acc.get(keys[i]).clone().normalize();geometry.attributes.aSmooth.setXYZ(i,n.x,n.y,n.z);
+    if(geometry.attributes.aMoldNormal)geometry.attributes.aMoldNormal.setXYZ(i,n.x,n.y,n.z);
+    const f=faceNormals[Math.floor(i/3)];geometry.attributes.normal.setXYZ(i,f.x,f.y,f.z);
+  }
+  for(const name of ['position','normal','aSmooth','aMoldNormal','aBary'])if(geometry.attributes[name])geometry.attributes[name].needsUpdate=true;
+  geometry.computeBoundingBox();geometry.computeBoundingSphere();
+}
+
+// R122 opt-in local constrained chart. Retain the entire patch boundary and
+// reuse its interior vertex count. Recover authored internal edges by flips;
+// no isolated vertex snap with the old fan, subdivision, or detached surface.
+export function conformSurfacePatch(geometry,spec){
+ const p=geometry.attributes.position,attrs=Object.entries(geometry.attributes);
+ const facing=spec.facing??1;
+ if(geometry.index)throw new Error('Surface patch requires the expanded loft');
+ const V=a=>new Vector3(...a),key=a=>a.map(v=>Math.round(v*1e6)).join(','),edge=(a,b)=>a<b?a+','+b:b+','+a;
+ const points=[],representatives=[],ids=[],map=new Map();
+ for(let i=0;i<p.count;i++){const v=[p.getX(i),p.getY(i),p.getZ(i)],k=key(v);if(!map.has(k)){map.set(k,points.length);points.push(v);representatives.push(i);}ids.push(map.get(k));}
+ const selected=[],oldFaces=[],uses=new Map();
+ for(let i=0;i<p.count;i+=3){const t=ids.slice(i,i+3),[a,b,c]=t.map(j=>points[j]);const frontArea=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);if(facing*frontArea>1e-10&&t.every(j=>spec.accept(points[j]))){selected.push(i/3);oldFaces.push(t);for(let k=0;k<3;k++){const a=t[k],b=t[(k+1)%3],e=edge(a,b);if(!uses.has(e))uses.set(e,[]);uses.get(e).push([a,b]);}}}
+ if(!selected.length)return;
+ const boundaryEdges=[...uses.values()].filter(a=>a.length===1).map(a=>a[0]);
+ const next=new Map(boundaryEdges);if(next.size!==boundaryEdges.length)throw new Error('Patch boundary branches');
+ const boundary=[boundaryEdges[0][0]];let at=next.get(boundary[0]);
+ while(at!==boundary[0]&&boundary.length<=boundaryEdges.length){boundary.push(at);at=next.get(at);}
+ if(at!==boundary[0]||boundary.length!==boundaryEdges.length)throw new Error('Patch must be a single disk');
+ const border=new Set(boundary),interior=[...new Set(oldFaces.flat())].filter(i=>!border.has(i));
+ const q=points.map(v=>[spec.sign*v[0],v[1]]),cross=(a,b,c)=>(q[b][0]-q[a][0])*(q[c][1]-q[a][1])-(q[b][1]-q[a][1])*(q[c][0]-q[a][0]);
+ const oriented=t=>cross(...t)>0?t:[t[0],t[2],t[1]];
+ const constraintPairs=[],claimed=new Set(),landmarks=new Map(),originalPointCount=points.length;let insertedLandmarks=0;
+ for(const path of spec.paths||[spec.path]){let previous=null;for(const xy of path){const k=key(xy);let best=landmarks.get(k);
+  if(best===undefined){let d=Infinity;best=-1;for(const id of interior)if(!claimed.has(id)){const dd=Math.hypot(q[id][0]-xy[0],q[id][1]-xy[1]);if(dd<d){d=dd;best=id;}}
+   if(spec.insertConstraints&&d>1e-7){
+    // Opt-in bounded authoring: add a landmark at its actual location instead
+    // of borrowing a distant crown sample. Attribute support is interpolated
+    // from the immutable old triangles below; all border vertices stay fixed.
+    if(++insertedLandmarks>(spec.maxInsertedVertices??32))throw new Error('Local constraint vertex budget exceeded');
+    best=points.length;points.push([xy[0]*spec.sign,xy[1],0]);q.push(xy.slice());interior.push(best);
+   }else if(best<0||d>.05)throw new Error('Insufficient interior samples for cage');
+   claimed.add(best);q[best]=xy.slice();landmarks.set(k,best);}
+  if(previous!==null&&previous!==best)constraintPairs.push([previous,best]);previous=best;
+ }}
+ let tris=spec.insertConstraints?oldFaces.map(t=>oriented(t.slice())):ShapeUtils.triangulateShape(boundary.map(i=>new Vector2(...q[i])),[]).map(t=>oriented(t.map(i=>boundary[i])));
+ // Insert the remaining local samples, including both incident triangles when
+ // a point lies on an edge. This preserves a manifold triangulation.
+ for(const id of spec.insertConstraints?[...claimed].filter(i=>i>=originalPointCount):[...claimed,...interior.filter(i=>!claimed.has(i))]){
+  let found=0;const out=[];
+  for(const t of tris){if([0,1,2].every(k=>cross(t[k],t[(k+1)%3],id)>=-1e-11)){
+    found++;for(let k=0;k<3;k++){const a=[t[k],t[(k+1)%3],id];if(Math.abs(cross(...a))>1e-11)out.push(oriented(a));}
+   }else out.push(t);}
+  if(!found)throw new Error('Cage sample outside selected patch '+JSON.stringify({id,point:q[id],constraint:claimed.has(id),boundary:boundary.map(i=>q[i])}));tris=out;
+ }
+ const recovered=new Set();let flips=0;
+ function edgeMap(){const m=new Map();tris.forEach((t,i)=>t.forEach((a,j)=>{const b=t[(j+1)%3],e=edge(a,b);if(!m.has(e))m.set(e,[]);m.get(e).push({i,a,b,c:t[(j+2)%3]});}));return m;}
+ const crosses=(a,b,c,d)=>cross(a,b,c)*cross(a,b,d)<-1e-18&&cross(c,d,a)*cross(c,d,b)<-1e-18;
+ function recoverStrip(a,b){
+  // An edge-flip sequence can cycle on a valid narrow quadrilateral. Recover
+  // the crossed strip directly, retaining its boundary and vertex allocation.
+  const es=edgeMap(),removed=new Set();
+  for(const [,v]of es)if(v.length===2&&crosses(a,b,v[0].a,v[0].b))for(const t of v)removed.add(t.i);
+  if(!removed.size)throw new Error('No crossed strip for posterior cage edge');
+  const uses=new Map();for(const i of removed)for(let j=0;j<3;j++){const t=tris[i],u=t[j],v=t[(j+1)%3],k=edge(u,v);if(!uses.has(k))uses.set(k,[]);uses.get(k).push([u,v]);}
+  for(const [k,v]of uses)if(v.length===2&&recovered.has(k))throw new Error('Posterior strip crosses a prior constraint');
+  const boundary=[...uses.values()].filter(v=>v.length===1).map(v=>v[0]),next=new Map(boundary),loop=[a];let at=next.get(a);
+  while(at!==a&&loop.length<=boundary.length){if(at===undefined)throw new Error('Open posterior strip');loop.push(at);at=next.get(at);}
+  if(loop.length!==boundary.length||at!==a||!loop.includes(b))throw new Error('Posterior strip is not a single disk');
+  const vertices=new Set([...removed].flatMap(i=>tris[i])),border=new Set(loop);
+  const j=loop.indexOf(b),chains=[loop.slice(0,j+1),loop.slice(j).concat([a])];
+  let replacement=chains.flatMap(chain=>ShapeUtils.triangulateShape(chain.map(i=>new Vector2(...q[i])),[]).map(t=>oriented(t.map(i=>chain[i]))));
+  for(const id of vertices){if(border.has(id))continue;let found=false;const out=[];
+   for(const t of replacement){if([0,1,2].every(j=>cross(t[j],t[(j+1)%3],id)>=-1e-11)){
+    found=true;for(let j=0;j<3;j++){const next=[t[j],t[(j+1)%3],id];if(Math.abs(cross(...next))>1e-11)out.push(oriented(next));}
+   }else out.push(t);}
+   if(!found)throw new Error('Posterior strip lost an interior sample');replacement=out;
+  }
+  if(replacement.length!==removed.size)throw new Error('Posterior strip changed triangle allocation');
+  [...removed].forEach((i,k)=>{tris[i]=replacement[k];});
+  const finalEdges=edgeMap();if(!finalEdges.has(edge(a,b))||[...recovered].some(k=>!finalEdges.has(k)))throw new Error('Posterior strip lost a constraint');
+ }
+ for(const [a,b] of constraintPairs){
+  const target=edge(a,b);let count=0;
+  while(true){const es=edgeMap();if(es.has(target)){recovered.add(target);break;}
+   if(facing<0&&count===80){recoverStrip(a,b);recovered.add(target);break;}
+   const candidates=[...es].filter(([e,v])=>v.length===2&&!recovered.has(e)&&crosses(a,b,v[0].a,v[0].b)&&crosses(v[0].a,v[0].b,v[0].c,v[1].c));
+   candidates.sort((u,v)=>Number(crosses(a,b,u[1][0].c,u[1][1].c))-Number(crosses(a,b,v[1][0].c,v[1][1].c)));
+   if(!candidates.length||count++>500)throw new Error('Could not recover cage edge '+JSON.stringify({from:q[a],to:q[b],attempts:count}));
+   const [,v]=candidates[0],u=v[0],w=v[1];tris[u.i]=oriented([u.c,w.c,u.a]);tris[w.i]=oriented([w.c,u.c,u.b]);flips++;
+  }
+ }
+ if(tris.length!==oldFaces.length+2*insertedLandmarks)throw new Error('Local patch changed triangle allocation');
+ // Ear insertion can leave long sliver fans. Improve only unconstrained
+ // diagonals using the planar empty-circle criterion; authored turns stay put.
+ const inCircle=(a,b,c,d)=>{const ax=q[a][0]-q[d][0],ay=q[a][1]-q[d][1],bx=q[b][0]-q[d][0],by=q[b][1]-q[d][1],cx=q[c][0]-q[d][0],cy=q[c][1]-q[d][1];return (ax*ax+ay*ay)*(bx*cy-by*cx)-(bx*bx+by*by)*(ax*cy-ay*cx)+(cx*cx+cy*cy)*(ax*by-ay*bx);};
+ let qualityFlips=0;
+ for(let pass=0;!spec.insertConstraints&&pass<2000;pass++){
+  let changed=false;
+  for(const [e,v]of edgeMap()){if(v.length!==2||recovered.has(e))continue;const [u,w]=v;
+   if(crosses(u.a,u.b,u.c,w.c)&&inCircle(u.a,u.b,u.c,w.c)>1e-13){tris[u.i]=oriented([u.c,w.c,u.a]);tris[w.i]=oriented([w.c,u.c,u.b]);qualityFlips++;changed=true;break;}}
+  if(!changed)break;if(pass===1999)throw new Error('Patch diagonal optimization did not settle');
+ }
+ const weights=new Map();
+ for(const id of [...border,...interior]){
+  if(border.has(id)){weights.set(id,[[representatives[id],1]]);continue;}
+  const xy=q[id];let sample;
+  for(const t of oldFaces){const a=points[t[0]],b=points[t[1]],c=points[t[2]],x=xy[0]*spec.sign,y=xy[1];
+   const det=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
+   const u=((b[1]-c[1])*(x-c[0])+(c[0]-b[0])*(y-c[1]))/det,v=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/det,w=1-u-v;
+   if(Math.min(u,v,w)>=-1e-8){sample=t.map((j,k)=>[representatives[j],[u,v,w][k]]);break;}
+  }
+  if(!sample)throw new Error('No old attribute support at new sample');weights.set(id,sample);
+ }
+ // Geometry is changed only after all topology and attribute checks succeed.
+ for(const id of interior)points[id]=spec.sample(q[id][0]*spec.sign,q[id][1]);
+ const index=new Map(selected.map((i,k)=>[i,k])),out=Object.fromEntries(attrs.map(([n])=>[n,[]])),dirty=new Set([...border,...interior].map(i=>key(points[i])));
+ const faceSlots=Array.from({length:p.count/3},(_,f)=>({f,local:index.get(f)}));
+ if(insertedLandmarks)for(let local=selected.length;local<tris.length;local++)faceSlots.push({f:selected.at(-1),local});
+ for(const{f,local}of faceSlots){
+  const replacement=local!==undefined,tri=replacement?(spec.sign*facing>0?tris[local]:[...tris[local]].reverse()):ids.slice(f*3,f*3+3);
+  const ps=tri.map(i=>V(points[i])),n=ps[1].clone().sub(ps[0]).cross(ps[2].clone().sub(ps[0]));
+  const radius=n.length()/(ps[0].distanceTo(ps[1])+ps[1].distanceTo(ps[2])+ps[2].distanceTo(ps[0]));n.normalize();
+  for(let j=0;j<3;j++)for(const [name,a] of attrs){
+   if(!replacement){out[name].push(...a.array.slice((f*3+j)*a.itemSize,(f*3+j+1)*a.itemSize));continue;}
+   if(name==='position'){out[name].push(...points[tri[j]]);continue;}
+   if(name==='normal'){out[name].push(...n.toArray());continue;}
+   if(name==='aBary'){out[name].push(j===0?1:0,j===1?1:0,j===2?1:0,radius);continue;}
+   const vals=Array.from({length:a.itemSize},(_,k)=>weights.get(tri[j]).reduce((sum,[i,w])=>sum+a.array[i*a.itemSize+k]*w,0));
+   if(name==='aSmooth'||name==='aMoldNormal'){const d=Math.hypot(...vals)||1;for(let k=0;k<vals.length;k++)vals[k]/=d;}
+   out[name].push(...vals);
+  }
+ }
+ for(const [name,a]of attrs)geometry.setAttribute(name,new Float32BufferAttribute(out[name],a.itemSize,a.normalized));
+ const pos=geometry.attributes.position,acc=new Map(),keys=[];
+ for(let i=0;i<pos.count;i++)keys.push(key([pos.getX(i),pos.getY(i),pos.getZ(i)]));
+ for(let i=0;i<pos.count;i+=3){const ps=[i,i+1,i+2].map(j=>new Vector3().fromBufferAttribute(pos,j)),n=ps[1].clone().sub(ps[0]).cross(ps[2].clone().sub(ps[0])).normalize();
+  for(let j=0;j<3;j++){const k=keys[i+j];if(!dirty.has(k))continue;const angle=ps[(j+1)%3].clone().sub(ps[j]).angleTo(ps[(j+2)%3].clone().sub(ps[j]));if(!acc.has(k))acc.set(k,new Vector3());acc.get(k).addScaledVector(n,angle);}}
+ for(let i=0;i<pos.count;i++)if(acc.has(keys[i])){
+  const n=acc.get(keys[i]).clone().normalize();
+  // An inserted constraint must not erase an existing authored facing on
+  // an unchanged incident surface. Ordinary normals still follow geometry.
+  const unchangedFacing=spec.insertConstraints&&n.distanceTo(new Vector3().fromBufferAttribute(geometry.attributes.aSmooth,i))<2e-6;
+  if(!unchangedFacing)geometry.attributes.aSmooth.setXYZ(i,n.x,n.y,n.z);
+  if(geometry.attributes.aMoldNormal&&!unchangedFacing)geometry.attributes.aMoldNormal.setXYZ(i,n.x,n.y,n.z);
+ }
+ // One authored crown facing, derived from the actual triangles inside it.
+ // Ordinary smooth normals/positions remain unchanged for geometry proof.
+ let crownNormal=null,crownNormalCorners=0;
+ if(spec.normalCrown&&geometry.attributes.aMoldNormal){
+  const poly=spec.normalCrown,distance=p=>{if(p.z*facing<=0)return -Infinity;const x=p.x*spec.sign,y=p.y;let d=Infinity;
+   for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length],dx=b[0]-a[0],dy=b[1]-a[1];d=Math.min(d,(dx*(y-a[1])-dy*(x-a[0]))/Math.hypot(dx,dy));}return d;};
+  const normal=new Vector3();
+  for(let i=0;i<pos.count;i+=3){const ps=[i,i+1,i+2].map(j=>new Vector3().fromBufferAttribute(pos,j));if(ps.every(p=>distance(p)>-1e-6))normal.add(ps[1].clone().sub(ps[0]).cross(ps[2].clone().sub(ps[0])));}
+  if(normal.length()>1e-8){normal.normalize();crownNormal=normal.toArray();
+   for(let i=0;i<pos.count;i++){const d=distance(new Vector3().fromBufferAttribute(pos,i));if(d<0)continue;const w=Math.min(1,d/.008),n=new Vector3().fromBufferAttribute(geometry.attributes.aSmooth,i).lerp(normal,w*w*(3-2*w)).normalize();geometry.attributes.aMoldNormal.setXYZ(i,n.x,n.y,n.z);crownNormalCorners++;}
+  }
+ }
+ geometry.computeBoundingBox();geometry.computeBoundingSphere();
+ geometry.userData.surfacePatches=(geometry.userData.surfacePatches||[]).concat({name:spec.name,sign:spec.sign,triangles:tris.length,interiorVertices:interior.length,boundaryVertices:boundary.length,insertedLandmarks,flips,qualityFlips,constraintEdges:constraintPairs.map(([a,b])=>[points[a],points[b]]),boundaryPositions:boundary.map(i=>points[i]),...(crownNormal?{crownNormal,crownNormalCorners}:{})});
+}
+
+// Split selected EXISTING edges and reconcile both incident triangles. Midpoints
+// lie exactly on B0's triangulated surface before recess fitting. This adds no
+// spherical smoothing, no new objects, no per-groove material and no T-junctions.
+export function refineRecessEdges(geometry,frame,channels,maxEdges){
+  const p=geometry.attributes.position,indices=geometry.index?.array||Array.from({length:p.count},(_,i)=>i);
+  const points=Array.from({length:p.count},(_,i)=>new Vector3().fromBufferAttribute(p,i));
+  const key=v=>v.toArray().map(x=>Math.round(x*1e6)).join(','),keys=points.map(key),edges=new Map();
+  function distance(uv,path,sign=1){let best=Infinity,signed=0,h=0,walk=0;const total=path.slice(1).reduce((sum,p,i)=>sum+Math.hypot(p[0]-path[i][0],p[1]-path[i][1]),0);for(let j=1;j<path.length;j++){
+    const a=path[j-1],b=path[j],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((uv[0]-a[0])*dx+(uv[1]-a[1])*dy)/(dx*dx+dy*dy)));
+    const d=Math.hypot(uv[0]-a[0]-dx*t,uv[1]-a[1]-dy*t);
+    const length=Math.hypot(dx,dy);
+    if(d<best){best=d;signed=sign*((uv[1]-a[1])*dx-(uv[0]-a[0])*dy)/length;h=(walk+t*length)/total;}walk+=length;
+  }return {distance:best,signed,h};}
+  for(let i=0;i<indices.length;i+=3)for(let j=0;j<3;j++){
+    const a=indices[i+j],b=indices[i+(j+1)%3],k=[keys[a],keys[b]].sort().join('|');if(edges.has(k))continue;
+    const mid=points[a].clone().add(points[b]).multiplyScalar(.5);if(!frame.accept(mid))continue;
+    const uv=frame.project(mid);let score=Infinity,q=0,h=0;
+    for(const c of channels)for(const sign of c.mirror?[1,-1]:[1]){const d=distance(uv,c.path.map(p=>[sign*p[0],p[1]]),sign),s=d.distance/(c.width*.5);if(s<score){score=s;q=d.signed/(c.width*.5);h=d.h;}}
+    if(score<1.15&&points[a].distanceTo(points[b])>(frame.minEdgeLength??.009))edges.set(k,{a,b,score,q,h,uv,side:uv[0]<0?-1:1});
+  }
+  const ranked=[...edges].sort((a,b)=>a[1].score-b[1].score);
+  const choose=list=>{
+    if(!frame.sampleBands)return list.slice(0,frame.symmetric?Math.floor(maxEdges/2):maxEdges);
+    const used=new Set(),out=[];
+    for(const band of frame.sampleBands)for(const e of [...list].filter(e=>e[1].h>=(band.h?.[0]??0)&&e[1].h<=(band.h?.[1]??1)).sort((a,b)=>Math.abs(a[1].q-band.at)-Math.abs(b[1].q-band.at)).filter(e=>!used.has(e[0])).slice(0,band.count)){used.add(e[0]);out.push(e);}
+    return out.slice(0,frame.symmetric?Math.floor(maxEdges/2):maxEdges);
+  };
+  const chosen=frame.symmetric?[-1,1].flatMap(sign=>choose(ranked.filter(e=>e[1].side===sign))):choose(ranked);
+  const selected=new Set(chosen.map(([k])=>k));
+  if(!selected.size)return;
+  const attrs=Object.entries(geometry.attributes),out=Object.fromEntries(attrs.map(([k])=>[k,[]]));
+  const ek=(a,b)=>[keys[a],keys[b]].sort().join('|');
+  function emit(tri){
+    const ps=tri.map(weights=>weights.reduce((v,[i,w])=>v.addScaledVector(points[i],w),new Vector3()));
+    const area2=ps[1].clone().sub(ps[0]).cross(ps[2].clone().sub(ps[0])).length();
+    const radius=area2/(ps[0].distanceTo(ps[1])+ps[1].distanceTo(ps[2])+ps[2].distanceTo(ps[0]));
+    tri.forEach((weights,corner)=>{for(const [name,a]of attrs){
+      if(name==='aBary'){out[name].push(corner===0?1:0,corner===1?1:0,corner===2?1:0,radius);continue;}
+      const v=Array.from({length:a.itemSize},(_,k)=>weights.reduce((s,[i,w])=>s+a.array[i*a.itemSize+k]*w,0));
+      if(name==='normal'||name==='aSmooth'||name==='aMoldNormal'){const l=Math.hypot(...v)||1;for(let k=0;k<3;k++)v[k]/=l;}
+      out[name].push(...v);
+    }});
+  }
+  for(let i=0;i<indices.length;i+=3){
+    const ids=Array.from(indices.slice(i,i+3)),v=ids.map(id=>[[id,1]]),m=ids.map((id,j)=>[[id,.5],[ids[(j+1)%3],.5]]),yes=ids.map((id,j)=>selected.has(ek(id,ids[(j+1)%3]))),n=yes.filter(Boolean).length;
+    if(n===0){emit(v);continue;}
+    if(n===3){emit([v[0],m[0],m[2]]);emit([m[0],v[1],m[1]]);emit([m[2],m[1],v[2]]);emit([m[0],m[1],m[2]]);continue;}
+    if(n===1){const j=yes.indexOf(true),a=j,b=(j+1)%3,c=(j+2)%3;emit([v[a],m[a],v[c]]);emit([m[a],v[b],v[c]]);continue;}
+    const j=yes.indexOf(false),a=j,b=(j+1)%3,c=(j+2)%3;
+    emit([v[c],m[c],m[b]]);emit([v[a],v[b],m[b]]);emit([v[a],m[b],m[c]]);
+  }
+  for(const [name,a]of attrs)geometry.setAttribute(name,new Float32BufferAttribute(out[name],a.itemSize,a.normalized));
+  geometry.setIndex(null);
+  // Segment meshes have one existing material. Keep its single range.
+  if(geometry.groups.length===1)geometry.groups[0].count=geometry.attributes.position.count;
+  geometry.userData.recessRefinement={edges:selected.size,addedTriangles:geometry.attributes.position.count/3-indices.length/3,...(frame.sampleBands?{sampleLocations:chosen.map(([,e])=>({uv:e.uv,q:e.q,h:e.h}))}:{})};
 }

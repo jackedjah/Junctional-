@@ -12,11 +12,13 @@
    stiffens slightly in the upper third. */
 
 import {
-  Group, Mesh, EdgesGeometry, LineSegments, PlaneGeometry, Vector3,
+  Group, Mesh, EdgesGeometry, LineSegments, PlaneGeometry, Vector3, Raycaster, Ray,
   BufferGeometry, Float32BufferAttribute
 } from '../../vendor/three/three.module.min.js';
-import { loft, segment, diamondPlate, facetedGeometry } from './forge.js';
-import { TORSO, INSIGNIA, HEAD, ARMS } from './proportions.js';
+import { loft, segment, diamondPlate, facetedGeometry, sculptSurfaceRecesses, sculptSurfaceRegion, refineRecessEdges, conformSurfacePatch } from './forge.js';
+import { torsoMoldNormal, torsoSurface, torsoAngle, torsoCavity, maleTorsoSections, pectoralSurfacePatch, scapularConstruction, scapularSurfacePatch, teresLatSurfacePatch, teresAttachmentRegion, anatomicalReturnRegions, quadKneeSurfacePatch, rectusIntersectionPath } from './myofascial.js';
+import { maleDeltoid } from './arm-anatomy.js';
+import { TORSO, INSIGNIA, HEAD, ARMS, MRMAH_RECESSES, MRMAH_MORPHOLOGY } from './proportions.js';
 import { REGIONS } from './regions.js';
 
 function lit(group, geo, materials, opts) {
@@ -114,8 +116,88 @@ function lit(group, geo, materials, opts) {
 /* R96 — `P` is an optional PROPORTION SET (see variants.js). The male canon
    is the default; a variant hands in its own TORSO / ARMS / INSIGNIA and the
    builder is otherwise identical — one renderer, one body pipeline. */
-export function buildBody(materials, P) {
+
+// Male authoring only: recover actual floor/sidewall edges in the retained
+// under-pec stock. The previous field has already run exactly once. These are
+// total surface constraints, never a second additive recess.
+function constrainUnderPecReturn(g,materials){
+  const stock=g.clone(),probe=new Mesh(stock,materials.body);probe.updateMatrixWorld(true);
+  const ray=(point,normal)=>{
+    const n=new Vector3(...normal),origin=new Vector3(...point).addScaledVector(n,.3);
+    const hit=new Raycaster(origin,n.clone().negate(),0,.6).intersectObject(probe,false)[0];
+    if(!hit)throw new Error('Under-pec constraint outside retained stock');return hit.point;
+  };
+  const support=(x,y)=>ray([x,y,.3],[0,0,1]).toArray();
+  const records=[];
+  for(const channel of g.userData.recessFit.channels.filter(c=>c.name==='under-pec-return')){
+    const sign=channel.sign,rows=[],sections=[];
+    for(const h of [.125,.25,.5,.75,20/24]){
+      const s=channel.sections.find(s=>Math.abs(s.h-h)<1e-8),n=new Vector3(...s.normal);
+      const originalFloor=ray(s.B0,s.normal),rims=s.rims.map(p=>ray(p,s.normal));
+      const baselineDepth=rims[0].clone().add(rims[1]).multiplyScalar(.5).sub(originalFloor).dot(n);
+      // Retained .006 ceiling is a local total-depth design limit, not a
+      // reference scan. Only an already excessive medial station is restored.
+      const targetDepth=baselineDepth+.5*(Math.min(baselineDepth,.006)-baselineDepth);
+      const floor=originalFloor.clone().addScaledVector(n,baselineDepth-targetDepth);
+      const cross=rims[1].clone().sub(rims[0]);cross.addScaledVector(n,-cross.dot(n)).normalize();
+      const half=.014*(.65+.35*Math.sin(Math.PI*h));
+      const atEnd=h===.125||h===20/24;
+      const row=[-half,-.0018,0,.0018,half].map((q,j)=>{
+        const p=floor.clone().addScaledVector(cross,q);
+        return atEnd||j===0||j===4?support(p.x,p.y):p.toArray();
+      });
+      rows.push(row);
+      sections.push({h,normal:s.normal,floor:floor.toArray(),frozenRims:rims.map(p=>p.toArray()),
+        fullThickness:channel.T,baselineDepth,targetDepth,floorWidth:.0036,corridorWidth:2*half});
+    }
+    const triangles=[];
+    for(let i=0;i<rows.length-1;i++)for(let j=0;j<4;j++){
+      triangles.push([rows[i][j],rows[i+1][j],rows[i+1][j+1]],[rows[i][j],rows[i+1][j+1],rows[i][j+1]]);
+    }
+    const sample=(x,y)=>{
+      for(const[a,b,c]of triangles){
+        const d=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
+        const u=((b[1]-c[1])*(x-c[0])+(c[0]-b[0])*(y-c[1]))/d;
+        const v=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/d,w=1-u-v;
+        if(Math.min(u,v,w)>-1e-8)return[x,y,u*a[2]+v*b[2]+w*c[2]];
+      }
+      return support(x,y);
+    };
+    const pathY=x=>x<.12?1.897+(x-.038)*(-.003)/.082:x<.205?1.894+(x-.12)*.015/.085:1.909+(x-.205)*.047/.09;
+    conformSurfacePatch(g,{name:'R173 under-pec constrained floor and returns',sign,insertConstraints:true,maxInsertedVertices:25,
+      accept:p=>p[2]>.015&&p[0]*sign>.035&&p[0]*sign<.325&&Math.abs(p[1]-pathY(p[0]*sign))<.052,
+      paths:rows.map(row=>row.map(p=>[p[0]*sign,p[1]])).concat([0,1,2,3,4].map(j=>rows.map(row=>[row[j][0]*sign,row[j][1]]))),sample});
+    records.push({name:'under-pec-return',sign,source:'retained R171 final stock; normal-ray floor locks',sections});
+  }
+  g.userData.pectoralReturnConstraints=records;stock.dispose();
+}
+
+// R189: the retained neck skin fans into the actual posterior/side skull.
+// Keep the anterior jaw/display and the complete cranial geometry unchanged.
+function fitCervicalAttachment(g,headGeometry){
+ const hp=headGeometry.attributes.position,triangles=[];
+ for(let i=0;i<hp.count;i+=3){const ps=[0,1,2].map(k=>new Vector3().fromBufferAttribute(hp,i+k).add(new Vector3(0,HEAD.centreY,0)));if(Math.min(...ps.map(p=>p.y))<2.44)triangles.push(ps);}
+ const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);},supports=[];
+ let changed=0,maxTravel=0;
+ sculptSurfaceRegion(g,{name:'R189 cervical-to-cranial side and posterior attachment',sample:before=>{
+  const p=new Vector3(...before);if(p.y<=2.20)return null;
+  const d=new Vector3(p.x,0,p.z+.025),r=d.length();if(r<.001)return null;d.divideScalar(r);
+  const rear=1-smooth(-.30,.60,d.z),t=Math.max(0,Math.min(1,(p.y-2.20)/.135));if(rear<1e-6)return null;
+  const upperY=2.335+.055*rear,c=new Vector3(0,upperY,-.025),ray=new Ray(c.clone().addScaledVector(d,.6),d.clone().negate()),hit=new Vector3();let target=-Infinity;
+  for(const ps of triangles)if(ray.intersectTriangle(...ps,false,hit)){const rr=hit.clone().sub(c).dot(d);if(rr>0)target=Math.max(target,rr);}
+  if(!Number.isFinite(target))throw new Error('R189 neck attachment has no cranial support');
+  const radialBlend=smooth(.45,1,t)*rear,rr=r+(target-.0025-r)*radialBlend;
+  const q=new Vector3(d.x*rr,p.y+.055*rear*smooth(0,1,t),-.025+d.z*rr),travel=p.distanceTo(q);
+  if(travel>.10)throw new Error('R189 neck attachment exceeds bounded local fit');
+  if(travel<1e-8)return null;changed++;maxTravel=Math.max(maxTravel,travel);
+  if(t>.999)supports.push({before,after:q.toArray(),cranialRadius:target,buriedOffset:.0025,posteriorWeight:rear});return q.toArray();
+ }});
+ g.userData.cervicalAttachment={version:'R189',owner:'posterior cervical and lateral cranial attachment',source:'actual retained head triangles',changedCorners:changed,maxTravel,supports,protected:'torso y <= 2.20, anterior throat, all head/face vertices',representation:'existing neck topology extended into posterior skull; no additional connector object',status:'TRIAL clay multi-view and cranial support required'};
+}
+
+export function buildBody(materials, P, options = {}) {
   var TORSO_ = (P && P.TORSO) || TORSO, ARMS_ = (P && P.ARMS) || ARMS, INSIGNIA_ = (P && P.INSIGNIA) || INSIGNIA;
+  var maleAnatomy = !P || P.name !== 'female';
   var group = new Group();
   group.name = 'mrmah-body';
   var owned = [];
@@ -131,11 +213,25 @@ export function buildBody(materials, P) {
      the crown meets the head. Hero edges have to be rare BY CONSTRUCTION; on a
      shape with this many real breaks, no threshold makes them rare. The
      structural and secondary tiers describe the form perfectly well without it. */
-  var torsoLoft = loft(TORSO_.rings, TORSO_.sides || 8,
-    { capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true, refine: TORSO_.refine || 0, jitter: TORSO_.jitter == null ? 1 : TORSO_.jitter,   /* R107: spline-refined rings, half the jitter — see forge.js */
+  // Pecs and rectus project off a ribcage; their depth is not lateral mass.
+  var torsoRings = maleAnatomy ? TORSO_.rings.map(function (ring) {
+    if (ring.y < 1.480 || ring.y > 2.120 || !ring.shape) return ring;
+    return Object.assign({}, ring, { widthShape: function (angle) {
+      var front = Math.max(0, Math.sin(angle));
+      var weight = 1 - 0.88 * Math.pow(front, 4);
+      return 1 + (ring.shape(angle) - 1) * weight;
+    } });
+  }) : TORSO_.rings;
+  if (maleAnatomy) torsoRings = maleTorsoSections(TORSO_.rings);
+  /* R166 — a proportion set may OWN its torso. Mrs. Mah's is authored by
+     `mrs-authoring.js` from her own ring cage; nothing below the hook may be
+     applied to it, because every male myofascial surface, recess channel and
+     scapular construction is measured in HIS chart. */
+  var torsoLoft = (P && P.buildTorso) ? P.buildTorso() : loft(torsoRings, maleAnatomy ? 64 : (TORSO_.sides || 8),
+    { sidesAt: maleAnatomy ? function(s){return s.y>0&&s.y<=.44?16:s.y<1.515?32:s.y>2.13?(s.y<=2.16?32:16):s.y>=2.03?56:s.y<1.83?48:64;} : undefined, capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true, refine: maleAnatomy ? 0 : (TORSO_.refine || 0), jitter: TORSO_.jitter == null ? 1 : TORSO_.jitter,   /* R120: move 32 samples from the plain terminal stock to the upper torso; fixed triangle budget. */
       /* R98 — the body's default platinum share; the ring table and the zone
          functions in proportions.js refine it per plane. */
-      coat: REGIONS.BODY.coat });
+      coat: REGIONS.BODY.coat, normalWeight: maleAnatomy ? 'angle' : undefined, normalAt: maleAnatomy ? torsoMoldNormal : undefined, diagonalTarget: maleAnatomy ? function(a,s){return s.y>=1.49&&s.y<=2.20?torsoSurface(a,s,[0,s.y,0]):null;} : undefined, surface: maleAnatomy ? torsoSurface : undefined, angleAt: maleAnatomy ? torsoAngle : undefined, cavityAt: maleAnatomy ? torsoCavity : undefined });
   /* edgeAngle 42, down from the 52 default. With the ring table thinned and the
      crystal relief raised to compensate, the torso's structural breaks are real
      but not extreme — at 52 almost none of them qualified and the front of the
@@ -186,6 +282,92 @@ export function buildBody(materials, P) {
      bright cyan verticals either side of the emblem — the "neon lines" on the
      core the brief rules out. The reference's sternum is a dark groove between
      two masses, not a pair of lines. */
+  /* Every channel, patch and construction below is measured in HIS rest chart,
+     so a proportion set that owns its torso is excluded from all of it. */
+  if (maleAnatomy && !(P && P.buildTorso)) {
+    for(const sign of [-1,1]){const patch=pectoralSurfacePatch(sign);if(patch)conformSurfacePatch(torsoLoft.geometry,patch);}
+    // Both sides fit against the SAME immutable incoming torso. In particular,
+    // front sculpting cannot change the rear's full-thickness calibration.
+    const intersection=rectusIntersectionPath();
+    const frontRecesses=MRMAH_RECESSES.torsoFront.map(c=>c.name==='rectus-upper-intersection'&&intersection?{...c,path:intersection}:c);
+    refineRecessEdges(torsoLoft.geometry,{name:'upper rectus floor and wall sampling',project:p=>[p.x,p.y],accept:p=>p.z>.015,symmetric:true,sampleBands:frontRecesses.find(c=>c.name==='rectus-upper-intersection')?.sampleBands},frontRecesses.filter(c=>c.name==='rectus-upper-intersection'),8);
+    const posteriorB0=torsoLoft.geometry.clone();posteriorB0.userData={};
+    sculptSurfaceRecesses(torsoLoft.geometry, {name:'torso-front XY',project:p=>[p.x,p.y],accept:p=>p.z>0.015}, frontRecesses.concat(MRMAH_RECESSES.lower));
+    const scapula=scapularConstruction(options.authoringMaster===true);
+    const rearRecesses=scapula?.inferiorReturn?MRMAH_RECESSES.torsoRear.filter(c=>c.name!=='scapular-teres-overlap'):MRMAH_RECESSES.torsoRear;
+    sculptSurfaceRecesses(posteriorB0, {name:'torso-rear XY',project:p=>[p.x,p.y],accept:p=>p.z < -0.015}, rearRecesses);
+    const g=torsoLoft.geometry,p=posteriorB0.attributes.position;
+    for(let i=0;i<p.count;i++)if(p.getZ(i)<0)for(const name of ['position','normal','aSmooth','aMoldNormal','aBary']){
+      const a=g.attributes[name],b=posteriorB0.attributes[name];if(!a||!b)continue;
+      for(let j=0;j<a.itemSize;j++)a.array[i*a.itemSize+j]=b.array[i*b.itemSize+j];
+      a.needsUpdate=true;
+    }
+    if(!g.userData.recessFit)g.userData.recessFit={channels:[]};
+    g.userData.recessFit.channels.push(...(posteriorB0.userData.recessFit?.channels||[]));
+    g.computeBoundingBox();g.computeBoundingSphere();posteriorB0.dispose();
+    if(MRMAH_MORPHOLOGY.back.sheets.infraspinatus.surfacePatch){
+      // The narrow inferior floor needs local wall samples, not a wider cut.
+      // Two shared edge midpoints per side; ordinary runtime stays unchanged.
+      if(options.authoringMaster===true)refineRecessEdges(g,{
+        name:'R166 scapular inferior wall samples',project:p=>[p.x,p.y],
+        accept:p=>p.z<-.015&&Math.abs(p.x)>.14&&Math.abs(p.x)<.315&&p.y>1.95&&p.y<2.04,
+        symmetric:true,minEdgeLength:.012,sampleBands:[{at:0,h:[.22,.72],count:2}]
+      },[scapula.inferiorReturn],4);
+      // Same immutable final stock for both sides; after fitting so a back
+      // edit cannot recalibrate the front recess floors.
+      const stock=g.clone(),probe=new Mesh(stock,materials.body);probe.updateMatrixWorld(true);
+      const supportAt=(x,y)=>{
+        const hit=new Raycaster(new Vector3(x,y,-1),new Vector3(0,0,1),0,2).intersectObject(probe)[0];
+        if(!hit)throw new Error('Scapular cage outside actual posterior support');return -hit.point.z;
+      };
+      for(const sign of [-1,1])conformSurfacePatch(g,scapularSurfacePatch(sign,supportAt,scapula));
+      stock.dispose();
+      if(scapula.inferiorReturn)sculptSurfaceRecesses(g,{name:'scapular final inferior return',project:p=>[p.x,p.y],accept:p=>p.z<-.015},[scapula.inferiorReturn]);
+    }
+    if(MRMAH_MORPHOLOGY.back.sheets.lat.surfacePatch){
+      // The adjacent lat starts from the completed scapula/return stock.
+      // A bounded lower chart keeps the retained crown and spinal channel out.
+      const stock=g.clone(),probe=new Mesh(stock,materials.body);probe.updateMatrixWorld(true);
+      const supportAt=(x,y)=>{
+        const hit=new Raycaster(new Vector3(x,y,-1),new Vector3(0,0,1),0,2).intersectObject(probe)[0];
+        if(!hit)throw new Error('Teres/lat cage outside actual posterior support');return -hit.point.z;
+      };
+      for(const sign of [-1,1])conformSurfacePatch(g,teresLatSurfacePatch(sign,supportAt));
+      stock.dispose();
+    }
+    const teres=teresAttachmentRegion(options.authoringMaster===true?scapula:undefined);if(teres)sculptSurfaceRegion(g,teres);
+    if(options.authoringMaster===true){
+      // Immutable incoming support; returned surfaces are total targets.
+      // Finish before lit()/atlas/hero ancestry so every representation agrees.
+      const stock=g.clone(),probe=new Mesh(stock,materials.body);
+      const supportAt=(x,y,hemisphere)=>{
+        const hit=new Raycaster(new Vector3(x,y,hemisphere),new Vector3(0,0,-hemisphere),0,2).intersectObject(probe,false)[0];
+        if(!hit)throw new Error('Anatomical return outside retained support');
+        return hit.point.z*hemisphere;
+      };
+      for(const region of anatomicalReturnRegions(supportAt))sculptSurfaceRegion(g,region);
+      stock.dispose();
+      // The protected center strip removes the spare samples the old whole-
+      // half chart borrowed. Split only 16 existing edges near the two owned
+      // return paths; midpoint support and adjacent faces remain reconciled.
+      const lowerFrame={name:'quad/knee local cage samples',project:p=>[p.x,p.y],accept:p=>p.z>.04&&Math.abs(p.x)>.025&&Math.abs(p.x)<.17,symmetric:true,minEdgeLength:.012};
+      refineRecessEdges(g,{...lowerFrame,accept:p=>lowerFrame.accept(p)&&p.y>.92&&p.y<1.32,sampleBands:[{at:0,h:[0,.27],count:1},{at:0,h:[.27,.60],count:1},{at:0,h:[.60,.84],count:1},{at:0,h:[.84,1],count:1}]},[{path:[[.045,1.28],[.044,1.14],[.042,.97],[.039,.93]],width:.065,mirror:true}],8);
+      refineRecessEdges(g,{...lowerFrame,accept:p=>lowerFrame.accept(p)&&p.y>.58&&p.y<.95},[{path:[[.064,.90],[.129,.79],[.063,.645],[.039,.79],[.064,.90]],width:.055,mirror:true}],8);
+      const fitted=g.clone(),lowerProbe=new Mesh(fitted,materials.body);lowerProbe.updateMatrixWorld(true);
+      const lowerSupport=(x,y)=>{
+        const hit=new Raycaster(new Vector3(x,y,1),new Vector3(0,0,-1),0,2).intersectObject(lowerProbe,false)[0];
+        if(!hit)throw new Error('Quad/knee cage outside retained supporting surface');return hit.point.z;
+      };
+      for(const sign of [-1,1])conformSurfacePatch(g,quadKneeSurfacePatch(sign,lowerSupport));
+      fitted.dispose();
+      constrainUnderPecReturn(g,materials);
+      authorBodyMuscleCrowns(g,materials);
+      if(options.cranialGeometry)fitCervicalAttachment(g,options.cranialGeometry);
+      authorBodyInsetReturns(g,materials);
+
+    }
+
+  }
   var torsoParts = lit(group, torsoLoft.geometry, materials,
     { rim: false, edgeAngle: 48, minorAngle: 36 });
   torsoParts.mesh.name = 'torso';   /* R99: named for the anatomical-group debug view */
@@ -210,6 +392,8 @@ export function buildBody(materials, P) {
      deltoid closes over the top of the arm and the two become one form. */
   var deltoidGeos = [];
   [-1, 1].forEach(function (side) {
+    // R111 male cap is part of the shoulder-owned upper-arm surface.
+    if (maleAnatomy) return;
     var spec = side < 0 ? ARMS_.right : ARMS_.left;
     var joint = spec.shoulder;
     /* PROPORTION CORRECTION — the heroic pass overshot here.
@@ -355,9 +539,10 @@ export function buildBody(materials, P) {
        top in a crease. The joint at 0.7 and the elbow / wrist move with it
        (ARMS). */
     var D = ARMS_.deltoid || { innerX: 0.220, innerY: 2.045, outerX: 0.605, outerY: 1.915, r0: 0.228 };   /* R108: 0.235 -> 0.228 with the arm 0.158 / 1.06 deep — the cap is 1.4x the arm's depth from the side, down from 1.6x */   /* R107 c: rooted deeper and higher, so the dome grows OUT of the trapezius slope */   /* R107 b: higher and further in, so the dome ENCLOSES the torso's shoulder corner (the flat plate the rear clay showed above the caps) */
-    var inner = [side * D.innerX, D.innerY, 0.0];
-    var outer = [side * D.outerX, D.outerY, 0.02];
-    var deltoidR0 = D.r0;
+    var anatomicalD = maleAnatomy ? maleDeltoid(spec, side, !!(P && P.legacyArms)) : null;
+    var inner = anatomicalD ? anatomicalD.start : [side * D.innerX, D.innerY, 0.0];
+    var outer = anatomicalD ? anatomicalD.end : [side * D.outerX, D.outerY, 0.02];
+    var deltoidR0 = anatomicalD ? anatomicalD.r0 : D.r0;
     /* R108: which sign of the cap's ring angle is UP. `segment` hands its
        shape function the angle from the limb's front, and +pi/2 is world
        up on the axis that points +x and world DOWN on the one that points
@@ -390,7 +575,7 @@ export function buildBody(materials, P) {
        still closes over the top of the limb rather than standing proud of it
        (the blown-white-wedge failure), while reaching the 0.598 half-width the
        reference measures across the shoulders. */
-    var deltoidR1 = spec.upperRadius * 1.00;
+    var deltoidR1 = anatomicalD ? anatomicalD.r1 : spec.upperRadius * 1.00;
     /* Root choke x belly swell. The choke keeps the inboard end inside the
        chest; the swell is the deltoid's own belly. t^1.3 puts its peak at
        t ~ 0.59 rather than at the midpoint, which places the widest part of the
@@ -425,9 +610,10 @@ export function buildBody(materials, P) {
     var geo = segment(
       inner, outer,
       deltoidR0, deltoidR1, 16,   /* R108 c: sixteen sides so the three heads' plane changes land on vertices */
-      { depthRatio: 0.88, crystal: 0.012, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 2],   /* R108 c: 0.88 deep for its width — with the arm at 1.12 the side view lands near the reference's cap-to-arm ratio */   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first; R108: 0.92 deep for its width (see the shape) */
+      { depthRatio: anatomicalD ? anatomicalD.depthRatio : 0.88, crystal: maleAnatomy ? 0 : 0.012, facet: maleAnatomy ? 0 : 0.010, steps: 12, lift: ARMS_.deltoidLift, fg: [2, 2],   /* R108 c: 0.88 deep for its width — with the arm at 1.12 the side view lands near the reference's cap-to-arm ratio */   /* R105: eight rings, a spherical cap; R107: fourteen sides, twelve rings, a third less jitter — the cap is a smooth dome first; R108: 0.92 deep for its width (see the shape) */
         classes: REGIONS.DELT.classes,
-        profile: deltoidProfile,
+        profile: anatomicalD ? anatomicalD.profile : deltoidProfile,
+        centreAt: anatomicalD ? anatomicalD.centreAt : undefined,
         /* R97 — THREE HEADS. `d` is the angle from the cap's front (+z): a
            front-delt lobe, a rear-delt lobe, and named planes for each — the
            front steel-blue, the crest lit sapphire, the rear sapphire — so the
@@ -438,6 +624,7 @@ export function buildBody(materials, P) {
            grooves between the heads so the plane flow changes three times
            across the shoulder. */
         shape: function (t, d) {
+          if (anatomicalD) return anatomicalD.shape(t, d);
           var ad = Math.abs(d);
           /* R102: the three heads are CARVED — the grooves between them are
              twice as deep (and the cavity term in the shader keeps them
@@ -469,11 +656,11 @@ export function buildBody(materials, P) {
           /* round 3: bellies (pow 0.55) rather than soft bumps, so each head
              is a plateau with its own edge and the valleys between the three
              form themselves. */
-          var front = 0.13 * Math.pow(Math.exp(-Math.pow((d + upSign * 0.18) / 0.56, 2)), 0.55) * frontEnv;
+          var front = (maleAnatomy ? 0.22 : 0.13) * Math.pow(Math.exp(-Math.pow((d + upSign * 0.18) / 0.56, 2)), 0.55) * frontEnv;
           var rearD = d - upSign * (Math.PI / 2 + 1.30);
           while (rearD > Math.PI) rearD -= Math.PI * 2;
           while (rearD < -Math.PI) rearD += Math.PI * 2;
-          var rear = 0.13 * Math.pow(Math.exp(-Math.pow(rearD / 0.62, 2)), 0.55) * rearEnv;
+          var rear = (maleAnatomy ? 0.23 : 0.13) * Math.pow(Math.exp(-Math.pow(rearD / 0.62, 2)), 0.55) * rearEnv;
           /* R108 — UP AND DOWN ARE DIFFERENT SIDES OF THIS TUBE. The cap's
              axis runs outward, so its ring's +/-pi/2 are the crest and the
              UNDERSIDE, and `upSign` (from the segment's basis, per side) says
@@ -490,10 +677,10 @@ export function buildBody(materials, P) {
           var lateral = 0.09 * up * crestEnv;   /* R108 c: the lateral head is the dominant cap */
           var pitEnv = 1 - Math.min(1, Math.max(0, (t - 0.40) / 0.32));
           pitEnv = pitEnv * pitEnv * (3 - 2 * pitEnv);
-          var pit = -0.18 * downB * pitEnv;
+          var pit = -(maleAnatomy ? 0.24 : 0.18) * downB * pitEnv;
           var vEnv = Math.min(1, Math.max(0, (t - 0.55) / 0.45));
           vEnv = vEnv * vEnv * (3 - 2 * vEnv);
-          var vee = 0.70 * Math.exp(-Math.pow((d + upSign * Math.PI / 2) / 0.50, 2)) * vEnv * vEnv;
+          var vee = (maleAnatomy ? 1.05 : 0.70) * Math.exp(-Math.pow((d + upSign * Math.PI / 2) / 0.50, 2)) * vEnv * vEnv;
           /* the cap is a rounded TRIANGLE from the side, not a circle: full
              across its upper quadrants (clavicle to scapular spine) and drawn
              in below (the pit) toward the insertion */
@@ -519,7 +706,7 @@ export function buildBody(materials, P) {
           var gA = d - upSign * (Math.PI / 2 - spread), gP = d - upSign * (Math.PI / 2 + spread);
           while (gA > Math.PI) gA -= Math.PI * 2; while (gA < -Math.PI) gA += Math.PI * 2;
           while (gP > Math.PI) gP -= Math.PI * 2; while (gP < -Math.PI) gP += Math.PI * 2;
-          var grooves = -0.09 * (Math.exp(-Math.pow(gA / 0.40, 2)) + Math.exp(-Math.pow(gP / 0.40, 2))) * gEnv;   /* round 2: 0.36 wide — at 0.24 (14 degrees) a groove fell between two of sixteen vertices and vanished; round 3: 0.42 */
+          var grooves = -(maleAnatomy ? 0.12 : 0.09) * (Math.exp(-Math.pow(gA / 0.40, 2)) + Math.exp(-Math.pow(gP / 0.40, 2))) * gEnv;   /* round 2: 0.36 wide — at 0.24 (14 degrees) a groove fell between two of sixteen vertices and vanished; round 3: 0.42 */
           return 1 + front + rear + lateral + broad + pit + vee + grooves;
         },
         zoneAt: function (d, t) {
@@ -627,7 +814,23 @@ export function buildBody(materials, P) {
   /* ---- chest insignia ------------------------------------------------- */
   /* Emissive, sitting slightly proud of the chest ridge so it is never
      swallowed by the prow. */
-  function chestZ(y) {
+  function chestZ(y, x, half) {
+    // Identity marks must clear the sculpted surface, not the old ring radius.
+    // Sample their footprint once at build time; no per-frame raycasting.
+    if (maleAnatomy) {
+      var ray = new Raycaster(new Vector3(), new Vector3(0, 0, -1));
+      var depth = 0, h = half || 0.012;
+      torsoParts.mesh.updateMatrixWorld(true);
+      for (var iy = -2; iy <= 2; iy++) {
+        for (var ix = -2; ix <= 2; ix++) {
+          if (Math.abs(ix) + Math.abs(iy) > 2) continue;
+          ray.ray.origin.set((x || 0) + ix * h / 2, y + iy * h / 2, 2);
+          var hit = ray.intersectObject(torsoParts.mesh, false)[0];
+          if (hit) depth = Math.max(depth, hit.point.z);
+        }
+      }
+      return depth + 0.008;
+    }
     /* interpolate the torso's front depth at height y */
     var r = TORSO_.rings;
     for (var i = 0; i < r.length - 1; i++) {
@@ -651,7 +854,7 @@ export function buildBody(materials, P) {
      mistake. */
   var throatGeo = diamondPlate(INSIGNIA_.throatHalf, 0.008);
   var throat = new Mesh(throatGeo, materials.emissive);
-  throat.position.set(0, INSIGNIA_.throatY, chestZ(INSIGNIA_.throatY) + 0.010);
+  throat.position.set(0, INSIGNIA_.throatY, chestZ(INSIGNIA_.throatY, 0, INSIGNIA_.throatHalf) + 0.010);
   throat.name = 'throat-gem';
   group.add(throat);
   var throatGlow = new Mesh(diamondPlate(INSIGNIA_.throatHalf * 2.1, 0.004), materials.emissiveSoft);
@@ -661,7 +864,7 @@ export function buildBody(materials, P) {
 
   var emblemGeo = diamondPlate(INSIGNIA_.emblemHalf, 0.012);
   var emblem = new Mesh(emblemGeo, materials.emissive);
-  emblem.position.set(0, INSIGNIA_.emblemY, chestZ(INSIGNIA_.emblemY) + 0.012);
+  emblem.position.set(0, INSIGNIA_.emblemY, chestZ(INSIGNIA_.emblemY, 0, INSIGNIA_.emblemHalf) + 0.012);
   emblem.name = 'chest-emblem';
   group.add(emblem);
   /* R95: a white-hot core inside the emblem, as every reference draws it — a
@@ -704,7 +907,7 @@ export function buildBody(materials, P) {
     var inner = triangle(1, 0.58, 0.009);
     var mo = new Mesh(outer, materials.emissive);
     var mi = new Mesh(inner, materials.face);
-    mo.position.set((si - 1) * INSIGNIA_.symbolSpacing, sy, sz);
+    mo.position.set((si - 1) * INSIGNIA_.symbolSpacing, sy, maleAnatomy ? chestZ(sy, (si - 1) * INSIGNIA_.symbolSpacing, sh) + 0.012 : sz);
     mi.position.copy(mo.position);
     mi.position.x += sh * 0.05;
     symbols.add(mo);
@@ -721,4 +924,107 @@ export function buildBody(materials, P) {
     chestZ: chestZ,
     dispose: function () { owned.forEach(function (g) { if (g && g.dispose) g.dispose(); }); }
   };
+}
+
+
+// R186: muscle crowns and their attached returns, before the existing diamond
+// atlas. Refit the interior of named footprints to actual retained boundary
+// depths. Width, height, center seams, terminal point and attachment edges stay.
+export function authorBodyInsetReturns(g,materials){
+ const stock=g.clone(),probe=new Mesh(stock,materials.body);probe.updateMatrixWorld(true);
+ const records=[],ease=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
+ const regions=[
+  {name:'pec-serratus inferior overlap',side:1,a:[.211,1.910],b:[.267,1.941],half:.010,depth:.0045},
+  {name:'rectus-oblique lateral insertion',side:1,a:[.130,1.733],b:[.143,1.683],half:.009,depth:.0040},
+  {name:'lat-erector lumbar convergence',side:-1,a:[.077,1.627],b:[.096,1.696],half:.010,depth:.0045},
+  {name:'glute-hamstring medial return',side:-1,a:[.074,1.184],b:[.151,1.155],half:.011,depth:.0040}
+ ];
+ try{for(const r of regions)for(const sign of [-1,1]){
+  const dx=r.b[0]-r.a[0],dy=r.b[1]-r.a[1],len=Math.hypot(dx,dy),u=[dx/len,dy/len],v=[-u[1],u[0]];
+  const support=(x,y)=>{const hit=new Raycaster(new Vector3(sign*x,y,r.side),new Vector3(0,0,-r.side),0,2).intersectObject(probe,false)[0];if(!hit)throw new Error('R189 missing body return support '+r.name);return r.side*hit.point.z;};
+  const rows=[],stationRecords=[];
+  for(const t of [0,.20,.40,.60,.80,1]){
+   const x=r.a[0]+t*dx,y=r.a[1]+t*dy,w=r.half*(.5+.5*Math.sin(Math.PI*t));
+   const left=support(x-v[0]*w,y-v[1]*w),right=support(x+v[0]*w,y+v[1]*w),original=support(x,y),fade=ease(t/.20)*ease((1-t)/.20);
+   // One total depth from immutable retained rims. Existing deeper floors are
+   // left alone; short tapered channels never cut through broad crown fields.
+   const floor=Math.min(original,(left+right)*.5-r.depth*fade),limited=Math.max(original-.005,floor);
+   const row=[-1,-.22,0,.22,1].map(q=>{
+    const px=x+v[0]*w*q,py=y+v[1]*w*q,old=support(px,py),target=q<0?limited+(left-limited)*Math.abs(q):limited+(right-limited)*q;
+    const depth=t===0||t===1||Math.abs(q)===1?old:Math.max(old-.005,Math.min(old,target));
+    return[px,py,r.side*depth];
+   });rows.push(row);stationRecords.push({t,retainedFloor:original,rimDepth:(left+right)*.5,totalTarget:limited,halfWidth:w});
+  }
+  const faces=[];for(let i=0;i<rows.length-1;i++)for(let j=0;j<4;j++)faces.push([rows[i][j],rows[i+1][j],rows[i+1][j+1]],[rows[i][j],rows[i+1][j+1],rows[i][j+1]]);
+  const sample=(x,y)=>{const ax=Math.abs(x);for(const[a,b,c]of faces){const d=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);if(Math.abs(d)<1e-14)continue;const s=((b[1]-c[1])*(ax-c[0])+(c[0]-b[0])*(y-c[1]))/d,t=((c[1]-a[1])*(ax-c[0])+(a[0]-c[0])*(y-c[1]))/d,k=1-s-t;if(Math.min(s,t,k)>=-1e-8)return[x,y,s*a[2]+t*b[2]+k*c[2]];}return[x,y,r.side*support(ax,y)];};
+  const accept=p=>{const x=p[0]*sign-r.a[0],y=p[1]-r.a[1],along=x*u[0]+y*u[1],across=x*v[0]+y*v[1];return p[2]*r.side>.04&&along>=0&&along<=len&&Math.abs(across)<r.half;};
+  // Split existing edges instead of rebuilding a chart whose narrow footprint
+  // can cross a nonconvex boundary. Added points lie on the retained surface.
+  refineRecessEdges(g,{name:'R189 '+r.name+' wall samples',project:p=>[p.x,p.y],accept:p=>p.z*r.side>.04,minEdgeLength:.003,sampleBands:[{at:0,h:[.15,.85],count:4}]},[{path:[r.a,r.b].map(p=>[p[0]*sign,p[1]]),width:r.half*2}],12);
+  let changed=0,maxTravel=0;
+  sculptSurfaceRegion(g,{name:'R189 '+r.name,sample:p=>{if(!accept(p))return null;const q=sample(p[0],p[1]),travel=Math.max(0,Math.min(.005,(p[2]-q[2])*r.side));if(travel<1e-9)return null;changed++;maxTravel=Math.max(maxTravel,travel);return[p[0],p[1],p[2]-r.side*travel];}});
+  r.changedTriangleCorners=(r.changedTriangleCorners||0)+changed;r.maxTravel=Math.max(r.maxTravel||0,maxTravel);
+  records.push({...r,sign,stations:stationRecords});
+ }}finally{stock.dispose();}
+ g.userData.bodyInsetReturns={version:'R189-D',records,source:'immutable post-R186 muscle crowns',maxInset:.005,representation:'short anatomically owned floors and tapered geometric sidewalls; unchanged crown and silhouette anchors',status:'TRIAL'};
+}
+
+function authorBodyMuscleCrowns(geometry,materials){
+ const M=MRMAH_MORPHOLOGY,regions=[
+  {name:'PECTORAL',side:1,center:M.pec.surface.surfaceCage.crest.slice(0,2),boundary:M.pec.surface.surfaceCage.boundary,plateau:.30,lift:.004},
+  ...M.rectus.patches.filter(p=>p.name!=='lower').map(p=>({name:'RECTUS_'+p.name.toUpperCase(),side:1,center:p.crest,boundary:p.contour,plateau:.22,lift:.006})),
+  {name:'SERRATUS_UPPER',side:1,center:[.226,1.847],boundary:[[.166,1.833],[.231,1.817],[.301,1.889],[.258,1.91]],plateau:.16,lift:.003},
+  {name:'SERRATUS_LOWER',side:1,center:[.213,1.769],boundary:[[.157,1.745],[.215,1.739],[.285,1.814],[.251,1.825]],plateau:.16,lift:.003},
+  {name:'OBLIQUE',side:1,center:[.177,1.624],boundary:[[.127,1.485],[.190,1.533],[.247,1.731],[.216,1.752],[.158,1.65]],plateau:.22,lift:.002},
+  {name:'SCAPULAR_BELLY',side:-1,center:[.208,2.049],boundary:M.back.sheets.infraspinatus.surfacePatch.boundary,plateau:.28,lift:.004},
+  {name:'TERES',side:-1,center:[.260,1.963],boundary:[[.182,1.911],[.258,1.92],[.315,1.985],[.301,2.027],[.221,1.982]],plateau:.22,lift:.004},
+  {name:'LAT',side:-1,center:[.224,1.838],boundary:M.back.sheets.lat.surfacePatch.boundary,plateau:.26,lift:.006},
+  {name:'MIDDLE_TRAP',side:-1,center:[.065,2.06],boundary:[[.022,1.81],[.075,1.918],[.126,2.07],[.097,2.195],[.025,2.183]],plateau:.25,lift:.003},
+  {name:'GLUTE',side:-1,center:[.146,1.292],boundary:[[.043,1.194],[.153,1.14],[.263,1.249],[.233,1.386],[.120,1.438],[.045,1.35]],plateau:.26,lift:.035},
+  {name:'HAMSTRING',side:-1,center:[.112,1.028],boundary:[[.031,.719],[.100,.833],[.197,1.098],[.170,1.211],[.073,1.157]],plateau:.19,lift:.030}
+ ];
+ const stock=geometry.clone(),probe=new Mesh(stock,materials.body);probe.updateMatrixWorld(true);
+ const support=(x,y,side)=>{let sum=0;for(const sign of [-1,1]){const hit=new Raycaster(new Vector3(sign*x,y,side),new Vector3(0,0,-side),0,2).intersectObject(probe,false)[0];if(!hit)return NaN;sum+=side*hit.point.z;}return sum/2;};
+ const ease=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);};
+ const edgeAt=(region,angle)=>{const c=region.center,d=[Math.cos(angle),Math.sin(angle)];let distance=Infinity;
+  for(let j=0;j<region.boundary.length;j++){const a=region.boundary[j],b=region.boundary[(j+1)%region.boundary.length],e=[b[0]-a[0],b[1]-a[1]],v=[a[0]-c[0],a[1]-c[1]],den=d[0]*e[1]-d[1]*e[0];if(Math.abs(den)<1e-12)continue;const r=(v[0]*e[1]-v[1]*e[0])/den,u=(v[0]*d[1]-v[1]*d[0])/den;if(r>0&&u>=-1e-7&&u<=1.0000001)distance=Math.min(distance,r);}
+  if(!Number.isFinite(distance))throw new Error('R186 muscle center outside authored footprint '+region.name);return {distance,x:c[0]+d[0]*distance,y:c[1]+d[1]*distance};
+ };
+ for(const r of regions){
+  r.crownB0=support(...r.center,r.side);if(!Number.isFinite(r.crownB0))throw new Error('R186 crown missing '+r.name);
+  r.edges=Array.from({length:65},(_,i)=>{const angle=-Math.PI+2*Math.PI*i/64,e=edgeAt(r,angle),requested=e.distance;let depth=support(e.x,e.y,r.side);
+   if(!Number.isFinite(depth)){let lo=0,hi=1;for(let j=0;j<24;j++){const t=(lo+hi)/2,x=r.center[0]+(e.x-r.center[0])*t,y=r.center[1]+(e.y-r.center[1])*t;if(Number.isFinite(support(x,y,r.side)))lo=t;else hi=t;}const fit=lo*.985;if(fit<.60)throw new Error('R186 footprint requires re-authoring '+r.name);e.distance*=fit;e.x=r.center[0]+Math.cos(angle)*e.distance;e.y=r.center[1]+Math.sin(angle)*e.distance;depth=support(e.x,e.y,r.side);}
+   if(!Number.isFinite(depth))throw new Error('R186 unresolved boundary '+r.name);return{angle,...e,requestedDistance:requested,depth};
+  });r.changed=0;r.maxTravel=0;
+ }
+ let changed=0,maxTravel=0;
+ const targetAt=p=>{
+  const x=Math.abs(p[0]),y=p[1],side=Math.sign(p[2]);if(x<=.014||Math.abs(p[2])<.04||y<.68||y>2.20)return null;
+  let deltaSum=0,weightSum=0;
+  for(const r of regions){if(r.side!==side)continue;const dx=x-r.center[0],dy=y-r.center[1],angle=Math.atan2(dy,dx),distance=Math.hypot(dx,dy),index=(angle+Math.PI)/(2*Math.PI)*64,j=Math.min(63,Math.floor(index)),f=index-j,extent=r.edges[j].distance*(1-f)+r.edges[j+1].distance*f,q=distance/extent;if(q>=1)continue;
+   const bd=r.edges[j].depth*(1-f)+r.edges[j+1].depth*f;
+   const w=ease((x-.014)/.015);
+   // Preserve authored diamond elevations. A compact organic crown raises
+   // the muscle interior and meets the unchanged insertion with zero slope.
+   // No replacement by a flat radial plate, no cumulative groove cut.
+   const d=r.lift*(1-q*q)**3;deltaSum+=w*d;weightSum+=w;r.changed++;r.maxTravel=Math.max(r.maxTravel,Math.abs(w*d));
+  }
+  if(weightSum===0)return null;const delta=deltaSum/Math.max(1,weightSum);if(Math.abs(delta)<1e-8)return null;changed++;maxTravel=Math.max(maxTravel,Math.abs(delta));return[p[0],p[1],p[2]+side*delta];
+ };
+ // Respect steep retained faces with a local displacement line search. This
+ // holds welded neighbors together and limits only the offending triangles;
+ // it does not shrink all muscle fields to satisfy one small boundary face.
+ const pos=geometry.attributes.position,nodes=[],map=new Map(),ids=[],key=p=>p.map(x=>x.toFixed(6)).join(',');
+ for(let i=0;i<pos.count;i++){const p=[pos.getX(i),pos.getY(i),pos.getZ(i)],k=key(p);if(!map.has(k)){const q=targetAt(p);map.set(k,nodes.length);nodes.push({p,delta:q?q[2]-p[2]:0,alpha:1});}ids.push(map.get(k));}
+ const normal=ps=>new Vector3(...ps[1]).sub(new Vector3(...ps[0])).cross(new Vector3(...ps[2]).sub(new Vector3(...ps[0])));
+ let passes=0,minimumNormalDot=1;
+ for(;passes<18;passes++){const bad=new Set();minimumNormalDot=1;
+  for(let i=0;i<pos.count;i+=3){const ns=ids.slice(i,i+3).map(j=>nodes[j]),ps=[0,1,2].map(k=>[pos.getX(i+k),pos.getY(i+k),pos.getZ(i+k)]),qs=ps.map((p,k)=>[p[0],p[1],p[2]+ns[k].delta*ns[k].alpha]),a=normal(ps),b=normal(qs);if(a.lengthSq()<1e-24)continue;const dot=a.normalize().dot(b.normalize());minimumNormalDot=Math.min(minimumNormalDot,dot);if(dot<.10)for(let k=0;k<3;k++)if(Math.abs(ns[k].delta)>1e-12)bad.add(ids[i+k]);}
+  if(!bad.size)break;for(const i of bad)nodes[i].alpha*=.5;
+ }
+ if(passes===18)throw new Error('R186 constrained body return did not preserve face orientation');
+ const orientationFit={passes,minimumNormalDot,constrainedUnique:nodes.filter(n=>n.alpha<1).length,minimumAlpha:Math.min(...nodes.map(n=>n.alpha)),method:'local shared-vertex displacement line search; raw normal cosine >=.10'};
+ sculptSurfaceRegion(geometry,{name:'R186 whole-body muscle crowns with boundary-owned returns',sample:p=>{const n=nodes[map.get(key(p))];if(Math.abs(n.delta)<1e-12)return null;return[p[0],p[1],p[2]+n.delta*n.alpha];}});
+ geometry.userData.bodyMuscleCrowns={version:'R202-lower',reference:'GOLD male mold; user-approved Mrs-photo belly/overlap structure, adapted to male body',regions,orientationFit,changedTriangleCorners:changed,maxTravel,limit:.030,frame:'paired rest XY footprints, depth along front/back; immutable mirrored boundary samples',preserved:'front quad/knee and fused point; all X/Y positions, narrow centerline, lower-ab landmark, tip below .68, head/neck, topology and diamond atlas ownership',method:'bounded compact muscle-crown support under retained diamond surfaces; nonadditive overlap; no old face flattening or new trench'};
+ stock.dispose();
 }

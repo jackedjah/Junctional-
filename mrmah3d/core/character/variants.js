@@ -23,6 +23,7 @@
    a smaller waist, a broader hip transition, a larger but restrained glute
    region, and — as canon demands — ONE lower crystalline body. */
 
+import { mrsProportions } from './mrs-anatomy.js';
 import { MALE, SHAPES } from './proportions.js';
 import { REGIONS } from './regions.js';
 
@@ -227,9 +228,10 @@ function femaleProportions() {
            INSIGNIA: INSIGNIA, POSE: POSE, FLOAT: M.FLOAT };
 }
 
-export var VARIANT_NAMES = ['male', 'female'];
+export var VARIANT_NAMES = ['male', 'female', 'mrs-mah'];
 
 export function proportionsFor(variant) {
+  if (variant === 'mrs-mah') return mrsProportions();
   if (variant === 'female') return femaleProportions();
   var m = {}; Object.keys(MALE).forEach(function (k) { m[k] = MALE[k]; });
   m.name = 'male';
