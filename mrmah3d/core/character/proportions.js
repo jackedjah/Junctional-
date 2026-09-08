@@ -2202,7 +2202,7 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     where the body is too narrow for a 0.30-radian descent: the field must end
     where Astra's own did. Fading in over 0.88-1.02 keeps the handoff to the
     knee continuous without asking a narrow row to carry a wide groove. */
- region:[0.88,1.46,0.14], sideFade:0.06, projection:1.00,
+ region:[0.88,1.46,0.14], sideFade:0.06, projection:0.94,
  lobes:{seam:[0,0.30],head:[0.70,0.75],rf:[0.42,0.28],valley:[1.00,0.30],
         vl:[1.42,0.55],vm:[0.30,0.32],itb:[1.95,0.30]},
  depth:[[0.80,0.128],[0.87,0.148],[0.95,0.180],[1.03,0.200],[1.10,0.215],[1.23,0.215],[1.32,0.205],[1.41,0.180],[1.46,0.165]],

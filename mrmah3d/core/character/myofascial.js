@@ -768,7 +768,30 @@ export function quadKneeSurfacePatch(sign,supportAt){
     moved the outlier 55 -> 50 only; and Fritsch-Carlson monotone cubic
     interpolation of the lower profiles, which removes the piecewise-linear
     corners at the y=0.70 knot, did not move it at all (55 -> 55, twice). */
- const paths=[medial,crown,...crown.map((p,i)=>[p,medial[i]]),knee.concat([knee[0]]),...knee.map(p=>[center,p])];
+ /* R240 — THE QUAD RAILS KEEP THEIR LANDMARKS AND GIVE UP THEIR EDGES.
+
+    With the Astra field restored the anterior quad is a smooth angular
+    surface, and the R164 rails' FORCED EDGES — `medial`, `crown` and the rungs
+    between them — became hard planar breaks across it: constraint edges are
+    excluded from `conformSurfacePatch`'s empty-circle pass, so the
+    triangulation could not relieve them. Measured on the built mesh, the quad
+    band's worst adjacent-face turn was 123 degrees.
+
+    As SINGLE-POINT paths the rails still claim and move their vertices, so the
+    anatomy is still sampled where it was authored, and they register no pair,
+    so the diagonals are free. Quad band 123 -> 81 degrees, p99 123 -> 79,
+    p90 33 -> 31, with the knee band EXACTLY unchanged at 56 / 55 — which is
+    the point: the kite keeps its edges and its crest, and only the quad's
+    scaffolding relaxes.
+
+    Two neighbouring options were measured and rejected. Dropping the rails
+    from `paths` altogether took the KNEE from 56 to 112, because the kite's
+    landmarks were left with nothing above them. Dropping the crown rail's
+    landmarks as well bought 81 -> 79 and gave up the rail's anatomy support
+    for it; the residual 79 at y 1.100 x +/-0.131 is a near-degenerate sliver
+    in a sparse column of the loft (n = 8 neighbours) and does not belong to
+    the rails at all. */
+ const paths=[...medial.map(p=>[p]),...crown.map(p=>[p]),knee.concat([knee[0]]),...knee.map(p=>[center,p])];
  return{name:'R164 quad medial rails and knee kite',sign,facing:1,
   accept:p=>p[2]>.04&&p[0]*sign>.015&&p[0]*sign<.21&&p[1]>.55&&p[1]<1.40,
   paths,sample};

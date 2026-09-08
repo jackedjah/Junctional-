@@ -1049,3 +1049,73 @@ measurements were taken from.
 
 R239 IS A CANDIDATE AND IS NOT USER-APPROVED. The retained baseline is still
 A3 at 28d1f04.
+
+
+R240 — SURFACE CLEANUP ON R239. THE PANEL AND THE SEAMS WERE THE OLD RAILS'
+FORCED EDGES, AND THE ANATOMY IS BIT-IDENTICAL AFTERWARDS.
+---------------------------------------------------------------------------
+BRIEF: keep R239 as the active candidate and continue from it. Surface cleanup
+only — the hard rectangular panel, the upper outer-thigh quadrilateral, harsh
+facet seams made newly visible by the restored field. Do not flatten the front
+again, do not lose the centre valley or the outer sweep. Reduce the side
+projection surgically only if the front read survives it.
+
+OWNER, FOUND BY ISOLATION (four runs, each built and measured):
+  remove the y .92-1.32 refineRecessEdges split   quad max 123 -> 123  (no-op)
+  remove the whole quad/knee patch                quad max 123 ->  60
+  rails out of `paths`, kite kept                 quad 123 -> 79, KNEE 56 -> 112
+  rails as SINGLE-POINT paths, kite kept          quad 123 ->  81, KNEE 56 (=)
+
+So the panel and the seams are the R164 quad rails' FORCED EDGES, not the
+split. `conformSurfacePatch` excludes constraint edges from its empty-circle
+pass, so with the Astra field steep across them the triangulation could not
+relieve them and they read as hard planar breaks. Note the first line: the
+refineRecessEdges split, which this document has blamed for the rectangular
+panel since R238, is NOT the owner. That attribution was wrong and is
+corrected here.
+
+THE CHANGE — one line in `quadKneeSurfacePatch`. `medial` and `crown` become
+single-point paths, so they still claim and move their vertices (the anatomy is
+sampled where it was authored) and register no pair (the diagonals are free).
+The knee kite keeps its edges and its crest untouched. Dropping the crown
+rail's landmarks as well was also measured: 81 -> 79 degrees for the loss of
+the rail's anatomy support, and rejected. The residual 78-81 at y 1.015 / 1.100
+x +/-0.117-0.131 is a near-degenerate sliver in a sparse column of the loft
+(n = 8 neighbours) and does not belong to the rails.
+
+SIDE PROJECTION — REDUCED, per the brief's rule. R239 put the quad crown at
+0.268 against the baseline's 0.239 and Astra's own 0.245-0.259, i.e. slightly
+deeper than Astra itself. `astraQuad.projection` 1.00 -> 0.94 lands it at 0.252,
+inside Astra's band, and cuts the delta over the baseline from +12% to +5%.
+The scale is uniform, so the seam-to-crown RISE — which is what carries the
+front read — is unchanged at 70% (R239 71%, Astra 70-76%), and the extreme
+close-up before and after is visually equivalent. The brief's condition ("if it
+can be reduced without sacrificing the restored front read, do so") is met.
+
+RESULT
+  quad band max      123 -> 78 degrees; p99 123 -> 76; p90 33 -> 32
+  knee band          55 / 55, EXACTLY the R239 and baseline values
+  taper              47, identical
+  section y 1.220    seam 0.148, crown 0.252, rise 70%
+                     (R239 0.157 / 0.268 / 71%; baseline 0.208 / 0.239 / 15%)
+  front outline      zero pixels changed against R239, front and lower-front
+  half-width         identical at every row
+  topology           12288 vertices, 4096 triangles, unchanged
+  BufferGeometry     0 non-finite, 0 degenerate, 0 non-unit normals
+  Mrs. Mah           14 meshes, both checksums, both bbox corners — IDENTICAL
+  contracts          376/376
+
+VISUAL. The rectangular panel is gone. The upper outer-thigh quadrilateral is
+gone. The vertical seams down the quad are gone. What remains is the R239
+anatomy: two convex anterior columns, a broad central valley, the outer sweep,
+and the longitudinal flow into the taper — now on a continuous surface. This is
+the largest visible improvement of the recent passes and it cost no anatomy:
+between R239 and the rails change the section is identical to three decimals at
+every sampled angle and height, because only the triangulation moved.
+
+R240 IS A CANDIDATE AND IS NOT USER-APPROVED. Retained baseline: A3, 28d1f04.
+
+STILL OPEN, unchanged: the knee-band wedge (55 degrees at y0.673 x +/-0.043)
+and its representation constraint from R237, with two fixes proposed and
+awaiting approval; and the near-degenerate slivers in the sparse loft columns,
+which the clay does not show.
