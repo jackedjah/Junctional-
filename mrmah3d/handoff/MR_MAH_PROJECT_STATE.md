@@ -851,3 +851,75 @@ recorded before the edit.
 
 NEXT: STOP FOR REVIEW. Calf, eyes, crystallization and platinum are not
 started. A1 remains BLOCKED — WAITING FOR R168/R169 EYE SOURCE.
+
+
+R238 — COMPARISON SHEETS AND HONEST VERDICT ON THE VISIBLE BENEFIT
+---------------------------------------------------------------------------
+No source was edited for this entry. The sheets in
+validation/mrmah3d/R238-quad/SHEET-*.png are crops of the captures already
+made for R238 — same camera, framing, pose, lighting, material, tier and image
+scale, both halves on the identical crop rectangle and magnification. A PLAIN
+(pixels only) and a LABELLED variant of each; the labelled one names the
+checkpoints and outlines, per side, where the surface actually moved, with the
+GAP between the boxes being the bit-identical inner face.
+
+FINAL LIVE OWNER AND PARAMETER, after the ineffective trial was reverted:
+  reverted   myofascial.js lowerField -> `plate` crest (via quadFaces).
+             Built and measured: max |dz| 0.0003. It is clipped and then
+             overwritten downstream; it owns y > 1.34 only.
+  retained   proportions.js MRMAH_MORPHOLOGY.lower.planeDesign.surfaceFaces,
+             read at myofascial.js torsoSurface. Two scalars became height
+             profiles: outerTurn 0.52 -> 0.66 (outerTurnProfile) and
+             outerSlope 0.72 -> 0.86 (outerSlopeProfile). Nothing else.
+
+MEASURABLE SURFACE CHANGE THAT REACHED THE FINISHED MESH (already recorded
+above; repeated here as the summary): at y 1.220 everything inboard of q 0.44
+is unchanged to five decimals, q 0.629 goes 0.21016 -> 0.22378 (+0.0136) and
+q 0.802 goes 0.13170 -> 0.13849 (+0.0068), with the peak depth unchanged at
+0.23900. Against a limb depth of 0.239 at that height those are +5.7% and
++2.8%. 46 of 2020 columns moved, all in y 1.0-1.4, max |dz| 0.0142.
+
+IN THE FRAME, over the changed band only (mean luma of lit pixels):
+  front view   right band 53.9 -> 57.2 (+3.4 of 255), 14167 px changed
+               left band  75.9 -> 74.5 (-1.4), 2324 px changed
+  3/4 view     left band  81.1 -> 83.0 (+1.9), 5769 px changed
+               right band 99.3 -> 97.4 (-1.9), 2412 px changed
+
+VERDICT, split as the brief asks:
+
+  PRESERVATION  PASS. Outline unchanged by zero pixels in front, lower-front
+                and side; peak depth unchanged; inner face and the whole knee
+                band bit-identical; face turns identical in all three bands;
+                topology unchanged; Mrs. Mah's fourteen meshes identical.
+
+  IMPROVEMENT   REAL BUT MODEST, and worth saying plainly. It is the right
+                DIRECTION and it is not a transformation. What genuinely
+                improved: the outer third of the quad used to end in a large
+                near-black wedge where the surface turned away early, and there
+                is now a graded turning surface between the lit front and the
+                dark side — the outer-band zoom shows this most clearly, and
+                the three-quarter shows a flat plane meeting the side in a
+                straight bevel becoming a rounded convex mass. So the quad has
+                an outer sweep it did not have, and the inner face is preserved
+                as a distinct plane beside it.
+                What did NOT improve: the front view still reads as a fairly
+                smooth volume. A few luma over one band is a change a viewer
+                would need the side-by-side to notice. The two things still
+                stopping this region from reading as a full connected belly are
+                unchanged by this pass and are NOT the outer sweep: the
+                engraved vertical scratches down the centre (the VM ribbon and
+                the midline channel) still read as LINES rather than as
+                boundaries between masses, and the rectangular panel on the
+                upper quad is still there. Neither was in this pass's scope.
+
+KNEE / RIDGE DEFECTS STILL OPEN, unchanged by R238:
+  - the knee-band wedge, max 55 degrees at y0.673 x +/-0.043, about 8x its
+    local neighbours. The R237 representation constraint stands and the two
+    proposed fixes still await approval.
+  - the rectangular panel on the upper quad, y .92-1.32: the refineRecessEdges
+    split, present identically in both builds.
+  - the pre-existing midline-channel turns at x +/-0.04 (71, 69, 64 degrees),
+    identical before and after.
+
+The candidate is a candidate. It is NOT user-approved, and the retained
+baseline remains A3 at 28d1f04.
