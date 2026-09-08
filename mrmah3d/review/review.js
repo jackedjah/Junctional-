@@ -160,11 +160,24 @@ function place() {
    set here, after the mode is applied, it does. */
 function isolate(on) {
   if (!scene) return;
-  var keep = scene.parts.character.root;
-  scene.parts.stage.scene.children.forEach(function (o) {
-    if (o === keep || o.isLight || o.isCamera) return;
-    if (o.userData.__rvVisible === undefined) o.userData.__rvVisible = o.visible;
-    o.visible = on ? false : o.userData.__rvVisible;
+  /* The character is not a direct child of the scene — it is parented to the
+     stage's SUBJECT group, so an identity test against the scene's children
+     hides him along with the world. Walk up from his root and keep every
+     ancestor. (The first capture with this on came back an empty frame.) */
+  var keep = [];
+  for (var o = scene.parts.character.root; o; o = o.parent) keep.push(o);
+  scene.parts.stage.scene.children.forEach(function (child) {
+    if (keep.indexOf(child) !== -1 || child.isLight || child.isCamera) return;
+    if (child.userData.__rvVisible === undefined) child.userData.__rvVisible = child.visible;
+    child.visible = on ? false : child.userData.__rvVisible;
+  });
+  /* The stage subject may carry world objects beside him (the floor, the
+     contact glow); hide those too, one level down, and only there. */
+  var subject = scene.parts.character.root.parent;
+  if (subject && subject !== scene.parts.stage.scene) subject.children.forEach(function (child) {
+    if (child === scene.parts.character.root || child.isLight || child.isCamera) return;
+    if (child.userData.__rvVisible === undefined) child.userData.__rvVisible = child.visible;
+    child.visible = on ? false : child.userData.__rvVisible;
   });
 }
 

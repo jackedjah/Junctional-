@@ -1,0 +1,31 @@
+{
+  "build": "R223-knee-recovery-3dd94ff46ba8",
+  "baseline": "R206-master-c97b5c84ac38",
+  "retained": true,
+  "installed": true,
+  "decision": "Recover accepted R203 knee carving under current PAL directive; no other source change",
+  "sourceHashes": {
+    "arm-anatomy.js": "571da2629c146cb29b96b1539c0bfc615ddf9dc3cde44ac9aa9dce24189930b2",
+    "arm-master.js": "6d71747cc988984fe74bc7b290c2a13749076dd4dc052827ed12c5a1208c0569",
+    "body.js": "3dd94ff46ba8cb7ca8236e560ab2e0096ce5742cf8a6a2d6b3753ed424c73eea",
+    "cranial-crown.js": "de50e3eceb157f89c90a1668f561f75ff91fb8d2785b21af41c6b0053abdd288",
+    "crystal-atlas.js": "2a5a6218003fc05da5e3e6f0145156ebe595bce7320f0b88a030e600cc61b3f0",
+    "crystal-shader.js": "e01388d035bc0b8f324e6d61e7d057731b5e561a162a02d2e804e4be885901e8",
+    "elbow-continuity.js": "cdb33065a583ebf173b0dcd10c9195875ba859f0f9d2b63a5c3f3c010e4478b8",
+    "fine-crystal.js": "0411de0edefe9872a01f0247ad143f4cc14ae6fd7a05a0c86dd1c129689d6fc9",
+    "forge.js": "7702f5883a7e597beda7f63f0d572568a290381aff511177cf356d60a2a8c394",
+    "head.js": "d50b389e9c16e03d31172656c78c6034b80a4ffd15fde8f062e5ec6b3d651b20",
+    "hero-pose.js": "29640c91b5878741a6a72f0e8cd5c1b9b67b965dcd04167de723bae49d158dfd",
+    "limbs.js": "cc979f9df3685302b95382a2e875c5ba9e914e16adac8238d103864e0ed70852",
+    "materials.js": "d0875180a452086df18427ab5eace8a5aad35459eb07e0875d2d64ba3b62994a",
+    "mrmah.js": "bcbf103e9dcebe358ce8a696163dabf595422a81e6b5367013bb28abc87c9e33",
+    "myofascial.js": "7a1a7eb2f9766fb6ab9540a00a9c0d91b143fffb75e55728c793748fc09c2652",
+    "proportions.js": "119440f5fb74d6e125bd2cef66ec9933b2ea74e7d4eff57567e0d8abbbdce70c",
+    "regions.js": "db2538502007af9ee5ad84f9aecd39872a0e09d4aeccd8b16e89361a5379d55a",
+    "states.js": "35d2b5f1b7b5fec053fd3b8a1228309f1cc561f4181364b8768b0667b0a76a5c",
+    "variants.js": "6b42cc85f86bbaadc336a8ba5f829e302cf8f5df652a1ac450114c69c8a338f7",
+    "mrmah3d/core/character.js": "7419ab2de7645cb66f4c19c2634493bd53638a8f067eb08b47a01803c60b7d72",
+    "mrmah3d/lab/lab.js": "cf3c752441151a848f557f5c48688f73b9ce84af9aaca588af578a5d12e2e956"
+  },
+  "validation": "Exact accepted historical body hash;20 other sources exact R206. Historical matched clay reviewed. New installed runtime proof pending."
+}

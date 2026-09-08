@@ -34,6 +34,13 @@ const OUT = positional[1] || 'validation/mrmah3d/proof';
 const WHO = flag('who', 'male,mrs-mah').split(',').filter(Boolean);
 const SURFACES = flag('surface', 'material,clay').split(',').filter(Boolean);
 const TIER = flag('tier', 'high');
+/* --isolate hides the world. Both retained evidence sets are an isolated
+   figure, and the package's rule is that value is compared over the BODY: with
+   the world in, the mist and floor glow are most of what any histogram counts
+   and a silhouette is read against a lit cloudscape rather than against
+   nothing. Use it for every sculpt comparison. */
+const ISOLATE = args.includes('--isolate');
+const VIEW_FILTER = flag('views', '');
 
 /* The seven named views. `surface: 'clay'` is forced on the two that exist to
    judge the SCULPT — a lit crystal flatters a form the clay would reject, and
@@ -73,18 +80,19 @@ for (const who of WHO) {
   await page.waitForTimeout(1200);
 
   for (const surface of SURFACES) {
-    for (const view of VIEWS) {
+    for (const view of VIEWS.filter(v => !VIEW_FILTER || VIEW_FILTER.split(',').some(f => v.id.includes(f)))) {
       const set = {
         yawDeg: view.yawDeg,
         pitchDeg: view.pitchDeg ?? 0,
         zoom: view.zoom ?? 1,
         framing: view.framing,
         spinning: false,
-        surface: surface === 'material' ? '' : surface
+        surface: surface === 'material' ? '' : surface,
+        isolated: ISOLATE
       };
       await page.evaluate(s => window.__MRMAH_REVIEW.set(s), set);
       await page.waitForTimeout(420);
-      const name = `${who}__${surface}__${view.id}.png`;
+      const name = `${who}__${surface}${ISOLATE ? '-iso' : ''}__${view.id}.png`;
       await page.locator('#stage').screenshot({ path: join(OUT, name) });
       manifest.push({ who, surface, view: view.id, file: name, ...set });
       console.log(`captured  ${name}`);

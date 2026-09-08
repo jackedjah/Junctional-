@@ -1203,14 +1203,46 @@ export var TORSO = {
       shape: lowerLegShape({ notch: 0.05, caps: 0.06, pit: 0.03 }), columns: true, classesAt: taperClasses, cav: 0.25 },
     /* THE LOWER THIGH: the VL inserting toward the knee, the RF tendon
        fading and the vastus medialis teardrop medial and low; the
-       hamstrings end into the knee behind. */
+       hamstrings end into the knee behind.
+
+       R232 — THE VL SWEEP FADES TO NOTHING HERE, AND THAT IS WHAT MAKES THE
+       KNEE. This row's `w` was authored at 0.190 against 0.208 on the ring
+       below it, an 8.7% pinch, and the built outline came out 5.2% WIDER
+       instead: `domePair(a, 1.42, 0.55)` peaks essentially AT the side angle,
+       so a 0.16 sweep multiplies this ring by 1.152 while the ring below —
+       `lowerLegShape`, which has no term that reaches the side at all —
+       multiplies by exactly 1.000. The pinch was not weakened, its SIGN was
+       reversed, and the whole lower body measured as one strictly monotonic
+       run from the hip to the point: 0.364, 0.333, 0.291, 0.252, 0.219,
+       0.208, 0.189. There was no knee in the silhouette to sculpt on.
+
+       That is why the R226-R230 trials plateaued. Every one of them was a
+       local surface deformation — a belly, a return fan, a compression, a
+       plane study — laid on an outline that is a plain cone, and no recess
+       cut into a cone makes a knee. The owner of a silhouette event is the
+       ring table, and the fault was the one this package already names: a
+       ring's `w` is not its silhouette (R95-BB). It had never been applied
+       to these two rows, because the thigh grammar and the lower-leg grammar
+       meet exactly here and their side multipliers differ by 15%.
+
+       So the sweep fades as an insertion should — 0.22 to 0.12 on the descent
+       row, 0.16 to 0.03 here — and every `w`, `d`, class, cavity, facet group
+       and recess channel is untouched. Measured outline, hip downward:
+       0.291, 0.234, 0.195 (the knee), 0.208 (the calf), 0.189. The knee lands
+       within 2% of the R106 godform plate's 0.192 and the calf stands 6.6%
+       proud of it against the plate's 5.5% — one convergence with a swell on
+       it, which is what R109 said was worth more than two matched widths,
+       rather than the thigh-bulb-over-calf-bulb it rejected. */
     { y: 0.870, w: 0.190, d: 0.148, fg: [1, 2], facet: -0.0030, zc: 0.008, crystal: 0.0200, crystalY: 0.0070, hero: 0.18,
-      shape: thighShape({ seam: 0.22, head: 0.06, vl: 0.16, valley: 0.06, vm: 0.20, itb: 0.04, ham: 0.16, hamCleft: 0.10 }), columns: true, classesAt: taperClasses },
+      shape: thighShape({ seam: 0.22, head: 0.06, vl: 0.03, valley: 0.06, vm: 0.20, itb: 0.04, ham: 0.16, hamCleft: 0.10 }), columns: true, classesAt: taperClasses },
     /* THE LONG DESCENT: from the apex the quad falls away on a convex
        curve (0.397 -> 0.357 -> 0.318 -> 0.262 -> 0.220 of half-width);
-       the hamstring columns are restrained so the posterior stays lean. */
+       the hamstring columns are restrained so the posterior stays lean.
+       R232: the sweep begins to insert on this row (0.22 -> 0.12) so the
+       descent into the knee is a curve rather than the cliff a full sweep
+       above a bare one would make. */
     { y: 0.950, w: 0.207, d: 0.180, fg: [1, 4], facet: 0.0040, zc: 0.006, crystal: 0.0300, crystalY: 0.0070, hero: 0.20,
-      shape: thighShape({ seam: 0.26, head: 0.28, rf: 0.08, vl: 0.22, valley: 0.10, vm: 0.14, itb: 0.06, ham: 0.26, hamCleft: 0.20 }), columns: true, classesAt: taperClasses },
+      shape: thighShape({ seam: 0.26, head: 0.28, rf: 0.08, vl: 0.12, valley: 0.10, vm: 0.14, itb: 0.06, ham: 0.26, hamCleft: 0.20 }), columns: true, classesAt: taperClasses },
     /* THE GLUTEAL FOLD: a shallow crease under the modest shelf (the glute
        goes slightly negative, darkened by the ring's cav), the hamstrings
        beginning under it. */
