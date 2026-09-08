@@ -1669,7 +1669,17 @@ export async function createMahplaza(canvas, options = {}) {
   function dispose() {
     practiceExit(); cancelAnimationFrame(raf); raf = 0;
     L.forEach(([t, type, fn, o]) => t.removeEventListener(type, fn, o)); L.length = 0;
-    scene.traverse(o => { if (o.isMesh && o.geometry) o.geometry.dispose(); });
+    scene.traverse(o => {
+      if (o.isMesh && o.geometry) o.geometry.dispose();
+      /* materials.js disposes what it made; a module that makes its own flags it here so the same
+         walk collects it, along with any texture hanging off it */
+      const mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+      for (const m of mats) {
+        if (!m || !m.userData || !m.userData.moduleOwned) continue;
+        if (m.map && m.map.dispose) m.map.dispose();
+        m.dispose();
+      }
+    });
     if (envRT) envRT.dispose(); pmrem.dispose(); M.dispose(); renderer.dispose();
   }
 
@@ -1684,6 +1694,8 @@ export async function createMahplaza(canvas, options = {}) {
        authored in three files (city blocks, facilities, landmark portals) and the only way to
        check that they still form a ladder is to read them from one place. */
     doorTiers: (ctx.doorTiers || []).slice(),
+    /* R167 E — the rooms brought to the reference interiors, with the sizes they came out at */
+    interiors: (ctx.interiors || []).slice(),
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
     navDestinations: () => navDest().map(d => ({ id: d.id, label: d.label, sub: d.sub })), navGoto,

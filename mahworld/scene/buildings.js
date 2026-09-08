@@ -24,7 +24,7 @@
      MAH MARKET MAGENTA  the social one, the furthest right and the warmest-lit inside, so the accent
                          that separates hardest from its own interiors carries its signage band */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { softMass, signTexture, diamondOutline, chamferBox, windowGrid, fobMark, canvasTexture, apertureField} from './materials.js';
+import { softMass, signTexture, diamondOutline, chamferBox, windowGrid, fobMark, canvasTexture, apertureField, archOutline } from './materials.js';
 
 /* ---- THE SITE PLAN (v5 §06) ---------------------------------------------------------------------
    The three destinations used to stand shoulder to shoulder on one line, which read as a wall of
@@ -845,6 +845,347 @@ function curtainWall(ctx, g, o) {
 }
 
 /* the composed facade: body + room + glass + piers + lintel */
+/* ==================================================================================================
+   R167 §E — THE REPRESENTATIVE PREMIUM INTERIOR, and why it is this room.
+
+   WHAT WAS THERE. Every destination's "interior" was the same six boxes: a floor slab, a ceiling
+   slab, a back wall, two side walls, three ceiling coves and a glowing rectangle on the back wall.
+   That is the room a player looks straight into from the plaza and walks into from the entrance —
+   the single most-seen interior in the world — and at human scale it was a shoebox with a light in
+   it. Hard corners everywhere, one flat wall at the end of it, and nothing beyond.
+
+   WHAT REFERENCES 06-09 ACTUALLY TEACH, with the human subject ignored as instructed. Every one of
+   those frames is the same four moves:
+
+     ONE OR TWO LARGE SCULPTED OPENINGS, never a grid, with BROAD WALL MASS between and around them.
+     A STRUCTURAL FRAME THAT IS ITSELF THE LANDMARK — in 09 a single white member sweeps across the
+       whole view and is simultaneously wall, column and mullion. The room is not a box with holes;
+       it is a piece of structure with glass between its limbs.
+     THE WALL TURNS INTO THE CEILING. There is no arris in any of those rooms. A cove does more for
+       "premium" than any amount of trim, because a hard 90 degrees is what reads as a game box.
+     A STRONG EXTERIOR VIEW, and very little furniture — a table and two seats, not a set dressing.
+
+   AND THE ONE COLOUR NOTE, from 06: a single saturated accent (there, an orange couch) against an
+   otherwise neutral shell. MAHWORLD already has that language — one district hue used large — so
+   the accent here is MAH GYM's own cyan and there is exactly one of it. The brief says do not make
+   every interior white, and this one is not white: it is the world's graphite, its platinum, and
+   one cyan line, with the brightness coming from the view rather than from the walls.
+
+   THE OPENINGS ARE CUT WITH archOutline, THE SAME LINE AS EVERY WINDOW AND EVERY DOOR IN THE WORLD.
+   That is the point of having exported it: an interior that invented its own opening shape would be
+   a second architectural language inside the first (L42).
+
+   Selective by design (R167 priority 7): `premium` is opt-in and only MAH GYM passes it. MAH MATCH
+   is an arena lit by its own combat platform and MAH MARKET is a hall — a panoramic mountain view
+   belongs in neither, and adding one to all three would be homogenising exactly what the brief says
+   to keep distinct.
+   ================================================================================================== */
+let _viewTex = null;
+/* THE VIEW BEYOND THE OPENINGS, drawn rather than loaded — there are no image files in this world.
+   A cold sky gradient, a bank of cloud, and a mountain silhouette below it, which is what 06 and 07
+   both put outside their glass. It is the brightest thing in the room on purpose: in the references
+   the interior is mid-value and the WINDOW carries the light. */
+function interiorViewTexture() {
+  if (_viewTex) return _viewTex;
+  _viewTex = canvasTexture(1024, 512, (g, w, h) => {
+    const sky = g.createLinearGradient(0, 0, 0, h);
+    sky.addColorStop(0.00, '#4d7cb8'); sky.addColorStop(0.42, '#9dc0e4');
+    sky.addColorStop(0.72, '#cfe0f0'); sky.addColorStop(1.00, '#e8f0f8');
+    g.fillStyle = sky; g.fillRect(0, 0, w, h);
+    /* cloud banks: overlapping soft ellipses on two levels, deterministic offsets */
+    for (let band = 0; band < 2; band++) {
+      const y = h * (0.34 + band * 0.16), a = 0.30 - band * 0.11;
+      g.fillStyle = 'rgba(255,255,255,' + a + ')';
+      for (let i = 0; i < 22; i++) {
+        const u = ((i * 0.6180339887 + band * 0.37) % 1);
+        const r = h * (0.05 + 0.075 * ((i * 0.7548776662) % 1));
+        g.beginPath(); g.ellipse(u * w, y + Math.sin(i * 2.3999632) * h * 0.035, r * 2.4, r, 0, 0, Math.PI * 2); g.fill();
+      }
+    }
+    /* the ridge line: two ranges, the far one paler, so the view has depth rather than a cut-out */
+    for (let range = 0; range < 2; range++) {
+      const base = h * (0.70 + range * 0.10), amp = h * (0.17 - range * 0.06);
+      g.fillStyle = range ? '#6f88a8' : '#93aac6';
+      g.beginPath(); g.moveTo(0, h);
+      for (let x = 0; x <= w; x += 16) {
+        const t = x / w * 9 + range * 3.1;
+        const k = Math.sin(t) * 0.5 + Math.sin(t * 2.3 + 1.1) * 0.32 + Math.sin(t * 4.7 + 2.2) * 0.18;
+        g.lineTo(x, base - k * amp);
+      }
+      g.lineTo(w, h); g.closePath(); g.fill();
+    }
+  });
+  return _viewTex;
+}
+
+/* ==================================================================================================
+   THE MAH GYM WEIGHT PLATE — to the director's spec, and the spec is unusually precise, so here it
+   is written down where the numbers live:
+
+     a SQUARE DIAMOND, and WIDER THAN TALL, which is §06 and is not negotiable — the brand figure is
+       never a spike wearing its name;
+     NOT extremely flat. It is a solid you can read from the side, not a disc;
+     NARROWED IN AT THE WIDTH. The section pinches: full thickness at the hub, thin at the rim, so
+       the plate is a lens rather than a slab and every one of its eight faces is a facet;
+     it SLIDES ONTO A BAR the way a real plate does, so it has a bore and the bore clears the bar;
+     SUPER CRYSTALLIZED, SUPER PREMIUM — the world's clear-diamond grade, not painted rubber;
+     450 on every plate.
+
+   The pinch is what makes the whole thing work optically. A flat plate in a transmissive material is
+   a pane and reads as glass; a plate whose faces slope from hub to rim has four facets a side that
+   each take a different slice of the environment, which is what "crystallized" actually means here.
+   flatShading on shardClear then gives the facet break for free — no extra geometry, no smoothing
+   groups, and the same 48 triangles whichever way the light moves.
+
+   Eight faces, one bore, twenty-four quads. Every plate merges into one mesh and the numerals ride a
+   single instanced quad family, so a loaded rack costs two draw calls however many plates are on it. */
+const PLATE = Object.freeze({
+  A: 0.345,     /* half-width: the LONG diagonal, horizontal — wider than tall (§06) */
+  B: 0.255,     /* half-height: the short diagonal */
+  HUB_T: 0.118, /* thickness at the hub — not extremely flat */
+  RIM_T: 0.040, /* thickness at the rim — this difference IS the narrowing */
+  HUB_F: 0.44,  /* where the flat hub face stops and the facet starts, as a fraction of the outline */
+  BORE: 0.086,  /* half-diagonal of the square-diamond bore; the rack bars are 0.08 square and a
+                   rhombus of half-diagonal d admits an axis-aligned square of side d, so this
+                   clears them — a bore that does not clear its bar is a plate welded to a rack */
+  LB: 450
+});
+
+function weightPlateGeometry() {
+  const { A, B, HUB_T, RIM_T, HUB_F, BORE } = PLATE;
+  /* four rings, each a diamond: right, top, left, bottom */
+  const ring = (a, b, z) => [[a, 0, z], [0, b, z], [-a, 0, z], [0, -b, z]];
+  const bore = BORE, hubA = A * HUB_F, hubB = B * HUB_F;
+  const zH = HUB_T / 2, zR = RIM_T / 2;
+  const bF = ring(bore, bore, zH), bK = ring(bore, bore, -zH);
+  const hF = ring(hubA, hubB, zH), hK = ring(hubA, hubB, -zH);
+  const oF = ring(A, B, zR), oK = ring(A, B, -zR);
+  const v = [];
+  const quad = (p, q, r, s) => { v.push(...p, ...q, ...r, ...p, ...r, ...s); };
+  for (let i = 0; i < 4; i++) {
+    const j = (i + 1) % 4;
+    quad(bF[i], hF[i], hF[j], bF[j]);       /* the flat hub face, front */
+    quad(hF[i], oF[i], oF[j], hF[j]);       /* THE FACET: hub to rim, front */
+    quad(oF[i], oK[i], oK[j], oF[j]);       /* the rim band — the plate's own edge */
+    quad(hK[j], oK[j], oK[i], hK[i]);       /* the facet, back */
+    quad(bK[j], hK[j], hK[i], bK[i]);       /* the hub face, back */
+    quad(bK[i], bK[j], bF[j], bF[i]);       /* the bore wall */
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(v), 3));
+  g.computeVertexNormals();
+  return g;
+}
+
+let _plateNumTex = null;
+/* the marking, drawn once and shared by every plate: 450, in the world's own condensed caps, on a
+   transparent ground so it sits ON the hub rather than in a panel stuck to it */
+function plateNumberTexture() {
+  if (_plateNumTex) return _plateNumTex;
+  _plateNumTex = canvasTexture(256, 116, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '700 74px "Helvetica Neue", Arial, sans-serif';
+    g.fillStyle = 'rgba(228,241,255,0.95)';
+    g.fillText(String(PLATE.LB), w * 0.42, h * 0.5);
+    /* the unit rides beside the number rather than under it — the plate's lower half is a wedge and
+       a second line stacked there would run off the diamond's edge */
+    g.font = '600 26px "Helvetica Neue", Arial, sans-serif';
+    g.fillStyle = 'rgba(188,213,241,0.70)';
+    g.fillText('LB', w * 0.83, h * 0.60);
+  });
+  return _plateNumTex;
+}
+
+/* Load `spots` with plates. Each spot is [x, y, z, axis] where axis 'x' means the plate is threaded
+   on a bar running along x (so its faces point along x) and 'z' means it stands on a peg pointing at
+   the room's front. Returns the geometry list plus the numeral matrices, both for the caller to
+   merge — this file's rule is that nothing small gets a draw call of its own. */
+const _pp = new THREE.Vector3(), _pq = new THREE.Quaternion(), _pe = new THREE.Euler(), _ps = new THREE.Vector3(1, 1, 1);
+function loadPlates(spots) {
+  const body = [], marks = [];
+  const geo = weightPlateGeometry();
+  for (const [x, y, z, axis, face = 1] of spots) {
+    const g = geo.clone();
+    if (axis === 'x') g.rotateY(Math.PI / 2);
+    g.translate(x, y, z);
+    body.push(g);
+    /* THE NUMERAL SITS BELOW THE BORE, AND ONLY ON THE FACE THAT LOOKS AT THE ROOM.
+       Centred on the hub it was cut in half by the bore and read "4 0" — the 5 was inside the hole.
+       And put on both faces it was worse than useless: the plate is a TRANSMISSIVE material, so the
+       far-side numeral shows through reversed and lands on top of the near one. One numeral, in the
+       lower half where the diamond is still wide enough to carry it, and the ghost of it seen faintly
+       through 12 cm of crystal is the material doing its job rather than a collision. */
+    const off = face * (PLATE.HUB_T / 2 + 0.006);
+    const ry = axis === 'x' ? face * Math.PI / 2 : (face > 0 ? 0 : Math.PI);
+    _pe.set(0, ry, 0); _pq.setFromEuler(_pe);
+    _pp.set(axis === 'x' ? x + off : x, y - PLATE.B * 0.46, axis === 'x' ? z : z + off);
+    marks.push(new THREE.Matrix4().compose(_pp, _pq, _ps));
+  }
+  geo.dispose();
+  return { body, marks };
+}
+
+function premiumRoom(ctx, room, o) {
+  const { M } = ctx;
+  const { rw, rh, R, ans } = o;
+  const plat = [], dark = [];
+  /* the cyan seam and the two floor washes go into the building's OWN answer buckets rather than
+     into meshes of their own: this file already merges every emitter and every wash per district,
+     so the room's light costs the same nothing the facade's does (law 2, and the draw budget). */
+  const glow = ans ? ans.glow : plat, wash = ans ? ans.wash : plat;
+
+  /* ---- 1. THE WALL TURNS INTO THE CEILING ------------------------------------------------------
+     A quarter-round fillet where each wall meets the slab above it. This is the cheapest thing in
+     the room and the one that changes its character most: with the arris gone the ceiling stops
+     being a lid and becomes the top of a volume. Swept as an extruded profile so a run of any
+     length is one geometry, and the two side runs and the back run are the same profile turned. */
+  const CV = Math.min(1.25, rh * 0.16, rw * 0.09);
+  /* the profile fills the concave corner: one leg out along the ceiling, one down the wall, a curve
+     between them. Drawn once at the origin, with +x the ceiling leg and -y the wall leg. */
+  const coveProfile = () => {
+    const s = new THREE.Shape();
+    s.moveTo(0, 0); s.lineTo(CV, 0);
+    s.quadraticCurveTo(CV * 0.24, -CV * 0.24, 0, -CV);
+    s.lineTo(0, 0);
+    return s;
+  };
+  const coveRun = len => new THREE.ExtrudeGeometry(coveProfile(), { depth: len, bevelEnabled: false, curveSegments: 5 });
+  /* LEFT wall: the corner is at x = -rw/2 and the ceiling leg runs into the room, so the profile is
+     used as drawn. RIGHT wall: the same profile mirrored in x. Both run the room's depth. */
+  plat.push(coveRun(R).translate(-rw / 2, rh, -R));
+  plat.push(coveRun(R).scale(-1, 1, 1).translate(rw / 2, rh, -R));
+  /* BACK wall: the ceiling leg has to run in +z instead of +x. rotateY(-90) turns the profile that
+     way and turns the extrusion with it, so the run then lies along -x and is placed from the right
+     hand corner across the full width. */
+  plat.push(coveRun(rw).rotateY(-Math.PI / 2).translate(rw / 2, rh, -R));
+
+  /* ---- 2. THE END WALL IS A FRAME, NOT A SLAB --------------------------------------------------
+     Two tall openings with a broad pier between them and broad mass round them — reference 06's
+     composition exactly, and the reason it reads as premium is the ratio: the wall keeps more than
+     half its area. Cut as ONE extruded shape with two holes, so the reveals of the openings are the
+     extrusion's own walls and the whole end of the room is a single mesh. */
+  const oW = Math.min(rw * 0.30, 7.2), oH = Math.min(rh * 0.74, 6.6);
+  const oX = rw * 0.215, oY = 0.55 + oH / 2;
+  const endShape = new THREE.Shape();
+  endShape.moveTo(-rw / 2, 0); endShape.lineTo(rw / 2, 0);
+  endShape.lineTo(rw / 2, rh); endShape.lineTo(-rw / 2, rh); endShape.lineTo(-rw / 2, 0);
+  for (const sd of [-1, 1]) {
+    const hole = new THREE.Path();
+    archOutline(hole, oW / 2, oH / 2);
+    /* archOutline draws about its own centre, so the hole is translated by re-walking its points */
+    const pts = hole.getPoints(24).map(pt => new THREE.Vector2(pt.x + sd * oX, pt.y + oY));
+    endShape.holes.push(new THREE.Path(pts));
+  }
+  const endWall = new THREE.ExtrudeGeometry(endShape, { depth: 0.9, bevelEnabled: false, curveSegments: 10 });
+  endWall.translate(0, 0, -R - 0.9 + 0.02);
+  dark.push(endWall);
+
+  /* the reveal lining: a platinum band standing proud of each opening, so the cut reads as a made
+     edge rather than a hole in a board — the same lip the doorway kit puts round its own opening */
+  for (const sd of [-1, 1]) {
+    const ring = new THREE.Shape();
+    archOutline(ring, oW / 2 + 0.30, oH / 2 + 0.24);
+    const inner = new THREE.Path();
+    archOutline(inner, oW / 2, oH / 2);
+    ring.holes.push(inner);
+    const band = new THREE.ExtrudeGeometry(ring, { depth: 0.34, bevelEnabled: false, curveSegments: 10 });
+    band.translate(sd * oX, oY, -R + 0.06);
+    plat.push(band);
+  }
+
+  /* ---- 3. THE VIEW, SET INTO THE OPENINGS ------------------------------------------------------
+     THE ROOM IS DRAWN INSIDE THE BUILDING'S OWN SOLID MASS, and that is the fact this took two
+     wrong attempts to respect. facade() puts the block's body behind the reveal and then draws the
+     room's slabs within that volume: there is no empty space behind the end wall to put a backdrop
+     in. Set 1.6 m back the view was inside the body; moved to 1.05 m it was still inside it. A ray
+     fired through the opening said so plainly — an unnamed solid from 16 m to 33.5 m, with the view
+     plane at 17.05 m, in the middle of it. Neither render could have been read any other way, and
+     neither guess would have been resolved by another one.
+
+     So the view is not a backdrop at all: it is the GLAZING. Each opening carries an arch-shaped
+     panel cut from the same archOutline as the hole it sits in, set just inside the reveal, and the
+     two panels take DIFFERENT HALVES of one panorama — which is what makes them read as two windows
+     onto one world instead of two copies of a picture. The UVs are rewritten from the vertex
+     positions because ShapeGeometry maps them in model units, and the shape is 7 metres wide. */
+  const viewMat = new THREE.MeshBasicMaterial({ map: interiorViewTexture(), toneMapped: true, fog: false });
+  viewMat.name = 'interior-view';
+  /* the assembly's dispose() walks the scene disposing GEOMETRY and then asks materials.js to
+     dispose the materials IT made. This one is made here, so it flags itself to be collected on
+     that same walk — otherwise the material and its canvas texture outlive the world. */
+  viewMat.userData.moduleOwned = true;
+  /* AND IT KNOWS WHAT TIME IT IS. A fixed bright panorama is a picture hung on a wall: at 20:10 the
+     world outside these windows is dark, and a sunlit mountain range behind them would say the room
+     is a diorama. This is unlit basic material, so nothing else moves it — the exposure change
+     across the day brightens it a little and that is not the same thing, which is exactly what the
+     first day/night pair looked like and why it needed a law rather than a glance. The world clock
+     already drives every other interior in this file, so the view follows it on the same daylight. */
+  if (ctx.timeHooks) ctx.timeHooks.push(st => {
+    const d = st.daylight == null ? 1 : st.daylight;
+    viewMat.color.setRGB(0.15 + 0.85 * d, 0.20 + 0.80 * d, 0.32 + 0.68 * d);
+  });
+  /* BOTH ARCHES AS ONE ShapeGeometry, and not through merged(). mergeParts() in this file copies
+     position and normal and nothing else — which is right for every other thing it merges, and
+     silently fatal here: the panes came back with no uv attribute at all, so both windows sampled a
+     single texel of the panorama and rendered as flat grey. That looked exactly like the occlusion
+     bug it had just replaced, which is the trap. ShapeGeometry takes an array of shapes, so the two
+     openings are one geometry, one draw call, with their UVs intact. */
+  const paneShapes = [-1, 1].map(sd => {
+    const outline = archOutline(new THREE.Path(), oW / 2 - 0.05, oH / 2 - 0.05);
+    return new THREE.Shape(outline.getPoints(28).map(pt => new THREE.Vector2(pt.x + sd * oX, pt.y + oY)));
+  });
+  const paneGeo = new THREE.ShapeGeometry(paneShapes, 12);
+  {
+    const pos = paneGeo.attributes.position, uv = paneGeo.attributes.uv;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), y = pos.getY(i);
+      /* each opening takes its own half of the panorama, so the two are two windows onto one world
+         rather than two prints of the same picture */
+      const half = x < 0 ? 0.02 : 0.52;
+      uv.setXY(i, half + ((x - (x < 0 ? -oX : oX)) / oW + 0.5) * 0.46,
+                  ((y - oY) / oH + 0.5) * 0.88 + 0.06);
+    }
+    uv.needsUpdate = true;
+  }
+  paneGeo.translate(0, 0, -R + 0.14);
+  const viewMesh = new THREE.Mesh(paneGeo, viewMat);
+  viewMesh.name = 'interior-view'; room.add(viewMesh);
+  /* and the view answers into the room (law 2): a wash on the floor in front of each opening, in the
+     sky's own value, so the light in the picture exists on a surface too */
+  for (const sd of [-1, 1]) {
+    const fw = hwash(oW * 1.5, R * 0.42, 0xbcd4ea).rotateX(-Math.PI / 2);
+    fw.translate(sd * oX, 0.06, -R + R * 0.20); wash.push(fw);
+  }
+
+  /* ---- 4. THE ONE ACCENT, AND ONE PIECE OF STRUCTURE --------------------------------------------
+     A single cyan line let into the pier between the two openings, running its full height. It is
+     the room's only saturated colour and it is used LARGE and ONCE — the same rule the exteriors
+     follow, and reference 06's orange couch is the same idea from the other direction. */
+  const seam = chamferBox(0.22, rh * 0.78, 0.14, 0.04);
+  seam.translate(0, rh * 0.42, -R + 0.30);
+  glow.push(seam);
+
+  /* ---- 5. WHAT IS DELIBERATELY NOT ADDED --------------------------------------------------------
+     Furniture. The first cut put a bench, a table and two stools in here, on the reading that every
+     reference frame has a seating group in it. Then the before-capture showed what is actually on
+     this floor: three training platforms, two racks, a cable frame and a row of free weights, laid
+     out between z -1 and z -10 by the block below. The lounge would have stood inside the middle
+     platform.
+
+     And the lesson would have been the wrong one anyway. What makes 06 and 08 read as premium is
+     not that they contain a couch, it is that they contain very little — more empty floor than
+     furniture. This room is already furnished, with the things a training hall is furnished with.
+     What it lacked was architecture, which is everything above. Reference 09 has no furniture worth
+     the name at all and is the most premium frame of the four.
+     The cable frame at z -9.5 now stands two and a half metres in front of the openings, so it is
+     read as a silhouette against the sky rather than as a post in a grey box — the existing asset
+     gets better by what was built behind it, which is the whole point of refining rather than adding.
+*/
+  merged(room, plat, M.platinumLit || M.platinum, 'gym-interior-frame', false);
+  merged(room, dark, M.graphiteLight, 'gym-interior-mass', false);
+  return { openings: 2, cove: +CV.toFixed(2), openW: +oW.toFixed(2), openH: +oH.toFixed(2) };
+}
+
 function facade(ctx, parent, o) {
   const { M } = ctx;
   const { W, H, D, openW, openH, pierDepth: E, roomDepth: R, floorY = 0, radius = 1.4, glassMullions = 0, cool = false, ans = null } = o;
@@ -855,7 +1196,7 @@ function facade(ctx, parent, o) {
   const rw = o.roomW || openW + 6, rh = o.roomH || openH + 1.2;
   room.add(box(rw, 0.2, R, M.graphiteLight, 0, -0.1, -R / 2));
   room.add(box(rw, 0.2, R, M.graphiteDark, 0, rh + 0.1, -R / 2));
-  room.add(box(rw, rh, 0.2, M.graphiteLight, 0, rh / 2, -R + 0.1));
+  if (!o.premium) room.add(box(rw, rh, 0.2, M.graphiteLight, 0, rh / 2, -R + 0.1));   /* R167 E: the premium room's end wall IS its openings */
   room.add(box(0.2, rh, R, M.graphiteDark, -rw / 2, rh / 2, -R / 2));
   room.add(box(0.2, rh, R, M.graphiteDark, rw / 2, rh / 2, -R / 2));
   /* THE ROOM IS LIT FROM WITHIN, AND WARM (v8). This is the one interior a viewer sees straight into
@@ -866,7 +1207,11 @@ function facade(ctx, parent, o) {
   for (let i = 1; i <= 3; i++) part(coves, chamferBox(rw * 0.7, 0.05, 0.25, 0.012), 0, rh - 0.05, -R * i / 4);
   merged(room, coves, cool ? M.interiorCool : M.interior, 'room-coves', false);
   /* a low luminous band across the back wall: the interior always reads from the plaza as lit architecture, not a screen */
-  const backGlow = new THREE.Mesh(new THREE.PlaneGeometry(rw * 0.82, rh * 0.16), cool ? M.interiorSoftCool : M.interiorSoft); backGlow.position.set(0, rh * 0.36, -R + 0.25); room.add(backGlow);
+  if (!o.premium) { const backGlow = new THREE.Mesh(new THREE.PlaneGeometry(rw * 0.82, rh * 0.16), cool ? M.interiorSoftCool : M.interiorSoft); backGlow.position.set(0, rh * 0.36, -R + 0.25); room.add(backGlow); }
+  /* R167 E — one room in the world is brought to the reference interiors. Opt-in, and only MAH GYM
+     opts in: a panoramic mountain view belongs in neither an arena nor a market hall. */
+  const premium = o.premium ? premiumRoom(ctx, room, { rw, rh, R, ans }) : null;
+  if (premium) (ctx.interiors = ctx.interiors || []).push(Object.assign({ name: o.name || 'room', rw: +rw.toFixed(1), rh: +rh.toFixed(1), depth: R }, premium));
   parent.add(room);
   /* AND THE ROOM'S LIGHT LEAVES IT (law 2). A lit interior behind glass throws light forward: onto the
      glass line itself, onto the floor of the room in front of the coves, and onto the reveal it is
@@ -1159,7 +1504,7 @@ export function buildBuildings(ctx) {
        three pieces, all large, no confetti (law 5). ground.js published the hue plan before this
        module ran, so the pool already lying on the floor out front is the colour of this building. */
     const A = answers(ctx, 'gym');
-    const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, radius: S.radius, glassMullions: 3, ans: A });
+    const f = facade(ctx, g, { W, H, D, openW, openH, pierDepth: E, roomDepth: R, radius: S.radius, glassMullions: 3, ans: A, premium: true, name: 'MAH GYM' });
     dressFacade(ctx, g, { W, H, D, openW, openH, E, seed: 1, canopy: false, wings: 'rear' });   /* the broad curved canopy replaces the slab canopy */
     crystallize(ctx, g, { W, H, D, openW, E, seed: 1 });
     broadCanopy(ctx, g, { W, H, openH, seed: 1, ans: A });
@@ -1196,8 +1541,37 @@ export function buildBuildings(ctx) {
     /* cable frame */
     [[-2.2, -9.5], [2.2, -9.5]].forEach(([x, z]) => room.add(box(0.12, 3.4, 0.12, M.platinum, x, 2.0, z)));
     room.add(box(4.6, 0.1, 0.1, M.platinum, 0, 3.6, -9.5));
-    /* free weights: a few low faceted blocks */
-    for (let i = 0; i < 4; i++) room.add(box(0.6, 0.35, 0.35, M.panel, -6 + i * 0.9, 0.47, -1.2));
+    /* THE PLATES. What was here was four low faceted blocks — a placeholder that said "weights are
+       somewhere over there" and cost four draw calls to say it. They are square-diamond crystal
+       plates now, to the spec at PLATE above: loaded on the rack bars where a bar carries weight,
+       and standing on two pegs of a plate tree where a gym stores it.
+
+       The bar plates sit INBOARD of the collars on each rack's upper bar, because a plate parked at
+       the very end of a bar reads as a prop laid against it rather than as weight threaded on. The
+       tree pegs point at the room's front so the numerals face a player walking in, which is the
+       only orientation that makes the marking worth drawing at all. */
+    /* the plinth top has to clear the plate's own half-height or the plate is buried in it: the
+       first cut put both at y 0.62 and the render showed four diamonds sawn off at the waist */
+    const PEG_Y = 0.30 + PLATE.B + 0.04;
+    const treePeg = (x) => { room.add(box(0.09, 0.09, 1.05, M.platinum, x, PEG_Y, -1.35));
+                             room.add(box(0.58, 0.30, 0.85, M.graphiteLight, x, 0.15, -1.30)); };
+    treePeg(-5.6); treePeg(-4.35);
+    const loaded = loadPlates([
+      [-4.5 - 0.78, 2.1, -4.0, 'x', -1], [-4.5 + 0.78, 2.1, -4.0, 'x', 1],   /* left rack, upper bar */
+      [4.5 - 0.78, 2.1, -4.0, 'x', -1], [4.5 + 0.78, 2.1, -4.0, 'x', 1],     /* right rack, upper bar */
+      [-5.6, PEG_Y, -1.62, 'z'], [-5.6, PEG_Y, -1.30, 'z'],           /* the tree, two per peg */
+      [-4.35, PEG_Y, -1.62, 'z'], [-4.35, PEG_Y, -1.30, 'z']
+    ]);
+    merged(room, loaded.body, M.shardClear || M.crystalGlass, 'gym-weight-plates', false);
+    {
+      const numTex = plateNumberTexture();
+      const numMat = new THREE.MeshBasicMaterial({ map: numTex, transparent: true, opacity: 0.92, toneMapped: true, depthWrite: false });
+      numMat.name = 'plate-numeral'; numMat.userData.moduleOwned = true;
+      const numMesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.205, 0.092), numMat, loaded.marks.length);
+      loaded.marks.forEach((m, i) => numMesh.setMatrixAt(i, m));
+      numMesh.instanceMatrix.needsUpdate = true;
+      numMesh.name = 'gym-weight-plate-numerals'; room.add(numMesh);
+    }
     /* THE TRAINING FLOOR IS A WARM, INHABITED ROOM SEEN THROUGH GLASS. That is the contrast the whole
        pass turns on: a cyan soffit and a cyan portal, and behind them a room lit the colour of a room.
        One luminaire over each platform, merged into a single fitting mesh, and the light they make

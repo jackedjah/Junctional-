@@ -122,5 +122,39 @@ P('LAW-085 the light ladder runs step -> head -> full, one rung per tier',
 P('LAW-086 every doorway reports into one channel, so the ladder can be measured from one place',
   /ctx\.doorTiers/.test(src['city.js']) && /ctx\.doorTiers/.test(src['buildings.js']) && /doorTiers:/.test(MP));
 
+/* ---- R167 §E the representative interior ----------------------------------------------------- */
+const BLD = src['buildings.js'];
+P('LAW-090 the premium interior is opt-in, not the default for every destination',
+  (stripComments(BLD).match(/premium:\s*true/g) || []).length === 1,
+  String((stripComments(BLD).match(/premium:\s*true/g) || []).length) + ' buildings opt in');
+P('LAW-091 its openings are cut with the world\'s one opening outline, not a shape of their own',
+  /archOutline/.test(BLD) && /archOutline/.test(MAT));
+P('LAW-092 the wall turns into the ceiling — there is a cove, on all three runs',
+  /coveRun\(R\)/.test(BLD) && /coveRun\(rw\)/.test(BLD));
+P('LAW-093 the view is glazing set into the openings, not a backdrop behind a solid mass',
+  /ShapeGeometry\(paneShapes/.test(BLD) && !/PlaneGeometry\(rw \* 1\.5/.test(BLD));
+P('LAW-094 the view knows what time it is', /timeHooks\.push\(st =>[\s\S]{0,220}?viewMat\.color/.test(BLD));
+
+/* ---- the MAH GYM weight plate, to the director's spec ---------------------------------------- */
+const plate = {};
+{
+  const m = BLD.match(/const PLATE = Object\.freeze\(\{([\s\S]*?)\}\);/);
+  if (m) for (const [, k, v] of m[1].matchAll(/(\w+):\s*(-?[\d.]+)/g)) plate[k] = parseFloat(v);
+}
+P('LAW-095 the plate exists as one table', Object.keys(plate).length >= 6);
+P('LAW-096 it is a SQUARE DIAMOND, and WIDER THAN TALL (§06)', plate.A > plate.B,
+  plate.A + ' x ' + plate.B);
+P('LAW-097 it is NOT extremely flat, and the section NARROWS toward the width',
+  plate.HUB_T >= 0.10 && plate.HUB_T > plate.RIM_T * 2,
+  'hub ' + plate.HUB_T + ' vs rim ' + plate.RIM_T);
+/* the rack bars in this file are 0.08 square; a rhombus of half-diagonal d admits an axis-aligned
+   square of side d, so a bore smaller than the bar is a plate welded to the rack it hangs on */
+P('LAW-098 the bore clears the bar it threads onto', plate.BORE >= 0.08,
+  'bore ' + plate.BORE + ' vs bar 0.08');
+P('LAW-099 one marking per plate, not one per face — the plate is transmissive and two collide',
+  !/for \(const sd of \[-1, 1\]\) \{\s*const off = sd \* \(PLATE\.HUB_T/.test(BLD));
+P('LAW-100 the marking clears the bore instead of being cut in half by it',
+  /y - PLATE\.B \* 0\.\d+/.test(BLD));
+
 console.log('mahworld-mahplaza-laws: ' + passed + '/' + (passed + failed) + ' PASS');
 if (failed) process.exit(1);

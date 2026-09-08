@@ -370,7 +370,7 @@ export const APERTURE = Object.freeze({
    real width and height rather than as a unit square scaled non-uniformly — a taper survives a
    uniform scale and is destroyed by an anisotropic one. Writes into a THREE.Shape or a THREE.Path,
    which is what lets the same line serve as an outline and as the hole inside it. */
-function archOutline(P, hw, hh) {
+export function archOutline(P, hw, hh) {
   const tw = hw * 0.84;                 /* the taper: the head is 84% of the sill width */
   const shoulder = hh * 0.42;
   P.moveTo(-hw, -hh);
