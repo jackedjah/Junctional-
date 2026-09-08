@@ -1421,3 +1421,68 @@ sections 2, 3 and 4 — the centre, the fused read and the contour — which the
 brief's own priority order puts first.
 
 R244 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.
+
+
+R245 — MUSCLE ORGANISATION WITHIN THE THIGH MASSES. THE LOBES WERE OUTBOARD OF
+WHAT THE FRONT VIEW READS, AND R244'S CENTRE FIX HAD SWAMPED THEM.
+---------------------------------------------------------------------------
+Base R244 (da607c2), clean tree, designated branch. NOTE: the brief names
+`MR_MAH_LOWER_BODY_CONSOLIDATED_MASTER.md`; that file does not exist in this
+repository. The handoff directory holds MR_MAH_MASTER.md, MR_MAH_PROJECT_STATE.md
+and the two steer packs. This pass follows MR_MAH_MASTER.md's regional loop and
+this file's open items, and the discrepancy is recorded rather than papered over.
+
+DIAGNOSIS, measured on the built mesh. The anterior section at y 1.220 read
+
+    ring angle 0.00  0.06  0.15  0.28  0.46  0.68  0.93  1.19
+    depth      .232  .235  .251  .265  .265  .219  .137  .099
+
+— ONE monotonic hump with no internal structure at all. Two causes, both found
+by measurement:
+  - R244 widened `head` to 0.86 rad to fill the midline, and that broad dome
+    swamped every smaller lobe riding on it;
+  - `valley` sat at 1.00 rad and `vl` at 1.42, both OUTBOARD of the columns the
+    front view actually reads. The mesh samples the anterior at ring angles
+    0, 0.06, 0.15, 0.28, 0.46, 0.68, 0.93 and 1.19 rad, so a lobe centred at
+    1.42 puts its peak past the last column that carries the front read.
+
+THE CHANGE — placement, not depth. `rf` in to 0.34 (hw 0.30) and up to 0.20;
+`valley` in to 0.66 (hw 0.22) and up to 0.17, which sets it BETWEEN the columns
+at 0.46 and 0.68; `vl` in to 1.02 (hw 0.44) and up to 0.32, landing it on the
+0.93 and 1.19 columns instead of past them.
+
+`head` is deliberately NOT narrowed. Narrowing it was built and measured twice
+(0.76 and 0.72 rad, with the seam cut to 0.55 and 0.40 to compensate) and it
+re-opened the centre valley from 0.0332 to 0.0576 and 0.0662. The centre is
+therefore exactly as R244 left it — floor 0.2318 at y 1.220, unchanged to four
+decimals — which is what the review asked for.
+
+RESULT
+  section y 1.220   .232 .235 .251 .273 .269 .214 .148 .107
+                    an RF crown at 0.28 rad with an inversion at 0.46, and the
+                    outer columns fuller (0.93: .137 -> .148, 1.19: .099 -> .107)
+  crown             0.2650 -> 0.2733 (+3.1%)
+  centre floor      0.2318, IDENTICAL
+  front / side      outlines zero pixels changed
+  envelope          |x|max identical at every ring row 0.45-0.90
+  knee band         51 max, p90 30 — unchanged
+  quad band         65 max — unchanged
+  taper             47 — unchanged
+  Mrs. Mah          14 meshes IDENTICAL;  contracts 376/376
+
+THE KNEE-ADJACENT PATCH — status changed, and this is the useful finding. It no
+longer has a single owner. Zeroing each contributing term in turn and rebuilding:
+
+    notch zeroed   51 -> 49        shins zeroed   51 -> 50
+    tendon zeroed  51 -> 51        (soleus build failed, retest)
+
+No term moves it more than 2 degrees, where every earlier knee artifact had ONE
+owner worth 8-60 degrees. The remaining 51 at y0.605 x+/-0.037, 48 at y0.747 and
+47 at y0.827 are the shin and notch anatomy crossing the loft's rings at this
+sampling density — distributed, not a defect with a fix. Reducing them further
+means removing the tibial ridge and centre channel the brief asks to keep, so
+they are RECORDED and not chased, per the standing curvature law. This is a
+different status from "open with two proposed fixes"; the single-owner knee
+wedge was closed in R242.
+
+R245 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.

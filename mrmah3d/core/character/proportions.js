@@ -2232,8 +2232,23 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     there is 1.5 * amplitude / half-width, so the two together take the inner
     wall to 0.49 of its previous steepness: the channel is eased, not merely
     widened. Every other lobe is untouched. */
- lobes:{seam:[0,0.40],head:[0.64,0.86],rf:[0.42,0.28],valley:[1.00,0.30],
-        vl:[1.42,0.55],vm:[0.30,0.32],itb:[1.95,0.30]},
+ /* R245 — the lobes that organise the quad move INBOARD, to where the front
+    view can see them. Measured on the built mesh, R244's section was one
+    monotonic hump — 0.232 / 0.242 / 0.257 / 0.265 / 0.219 / 0.137 / 0.099 from
+    the seam outward, with no internal structure at all — because R244 widened
+    `head` to 0.86 rad to fill the centre and that broad dome swamped everything
+    riding on it. `valley` at 1.00 rad and `vl` at 1.42 both sat outboard of the
+    columns the front view actually reads (the mesh samples the anterior at ring
+    angles 0, 0.06, 0.15, 0.28, 0.46, 0.68, 0.93 and 1.19 rad).
+
+    So `rf` comes in to 0.34 and broadens, `valley` to 0.66 — between the two
+    columns at 0.46 and 0.68 — and `vl` to 1.02, where it lands on the 0.93 and
+    1.19 columns instead of past them. `head` is NOT narrowed: narrowing it was
+    built and measured and re-opened the centre valley from 0.033 to 0.058-0.066
+    even with the seam cut further, because `head` is what fills the midline
+    now. The centre therefore stays exactly as R244 left it. */
+ lobes:{seam:[0,0.40],head:[0.64,0.86],rf:[0.34,0.30],valley:[0.66,0.22],
+        vl:[1.02,0.44],vm:[0.30,0.32],itb:[1.95,0.30]},
  depth:[[0.80,0.128],[0.87,0.148],[0.95,0.180],[1.03,0.200],[1.10,0.215],[1.23,0.215],[1.32,0.205],[1.41,0.180],[1.46,0.165]],
  /* R241 — the central descent's amplitude, Astra's own profile scaled to
     0.55. Measured on the FINAL mesh, this control moves ONLY the channel
@@ -2261,9 +2276,9 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     for; it is not removed. */
  seam:[[0.8,0.0000],[0.87,0.0434],[0.95,0.0511],[1.03,0.0553],[1.1,0.0588],[1.23,0.0588],[1.32,0.0434],[1.41,0.0280],[1.46,0.0154]],
  head:[[0.80,0],[0.87,0.06],[0.95,0.28],[1.03,0.32],[1.10,0.36],[1.23,0.34],[1.32,0.26],[1.41,0.16],[1.46,0.09]],
- rf:[[0.80,0],[0.87,0],[0.95,0.10],[1.03,0.125],[1.10,0.13],[1.23,0.13],[1.32,0.09],[1.41,0.05],[1.46,0.025]],
- vl:[[0.80,0],[0.87,0.16],[0.95,0.22],[1.03,0.26],[1.10,0.28],[1.23,0.28],[1.32,0.26],[1.41,0.22],[1.46,0.14]],
- valley:[[0.80,0],[0.87,0.06],[0.95,0.10],[1.03,0.12],[1.10,0.12],[1.23,0.12],[1.32,0.09],[1.41,0.06],[1.46,0.03]],
+ rf:[[0.80,0.0000],[0.87,0.0000],[0.95,0.1538],[1.03,0.1923],[1.10,0.2000],[1.23,0.2000],[1.32,0.1385],[1.41,0.0769],[1.46,0.0385]],
+ vl:[[0.80,0.0000],[0.87,0.1829],[0.95,0.2514],[1.03,0.2971],[1.10,0.3200],[1.23,0.3200],[1.32,0.2971],[1.41,0.2514],[1.46,0.1600]],
+ valley:[[0.80,0.0000],[0.87,0.0850],[0.95,0.1417],[1.03,0.1700],[1.10,0.1700],[1.23,0.1700],[1.32,0.1275],[1.41,0.0850],[1.46,0.0425]],
  vm:[[0.80,0],[0.87,0.20],[0.95,0.15],[1.03,0.09],[1.10,0.05],[1.23,0.02],[1.46,0]],
  itb:[[0.80,0],[0.87,0.04],[0.95,0.06],[1.03,0.06],[1.10,0.06],[1.23,0.05],[1.32,0],[1.46,0]]};
 /* R242 — ASTRA'S LOWER-LEG GRAMMAR, from the same R109 checkpoint.
