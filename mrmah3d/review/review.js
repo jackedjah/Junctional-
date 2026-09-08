@@ -47,6 +47,12 @@ var FRAMINGS = {
   full:  { t: 0.52, scale: 1.00 },
   torso: { t: 0.66, scale: 0.46 },   /* chest, shoulders, both arms */
   lower: { t: 0.30, scale: 0.44 },   /* the quad / knee / calf architecture */
+  /* R233: a REGION close-up. The precision brief's proof list asks for a
+     close-up of the changed region, and `lower` is not one — it holds the whole
+     1.5-unit teardrop, where an insertion valley 0.011 units deep is a couple
+     of pixels of shading. The first A2 comparison was taken at `lower` and read
+     as no change on a mesh that had measurably moved. */
+  quad:  { t: 0.38, scale: 0.20 },   /* the upper quad, close */
   head:  { t: 0.86, scale: 0.24 }
 };
 

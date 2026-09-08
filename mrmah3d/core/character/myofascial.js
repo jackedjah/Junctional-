@@ -40,6 +40,31 @@ export function ribbonField(x,y,track,amplitude) {
   const width=profileAt(track.map(p=>[p[0],p[2]]),y);
   return amplitude*gauss(Math.abs(x)-center,width)*windowAt(y,first[0],last[0],Math.min(.09,(last[0]-first[0])*.25));
 }
+/* R233 / A2 — THE INSERTION SEAM BETWEEN TWO AUTHORED BELLIES.
+
+   `ribbonField` above adds a belly. This subtracts the valley BETWEEN two of
+   them, and it is the quad's missing half: `maleUpperShape` separates the arm's
+   masses with explicit NEGATIVE terms — `septa`, the biceps `tendon`, the
+   deltoid `grooves` — while the anterior quad had one central groove and
+   nothing else, which is why the arms read at stage conditioning and the thigh
+   read as a plate.
+
+   The valley's POSITION is not authored here. It is the midpoint between the
+   two tracks' own centrelines at that height, and its width comes from their
+   own widths, so the anatomy tables decide where the insertion falls and this
+   function only decides how deep it is. `narrow` tightens it below the mean of
+   the two bellies, because an insertion is narrower than either muscle.
+
+   It is subtractive and interior by construction: at the outer contour the
+   Gaussian is already zero, so a seam cannot move the silhouette. */
+export function insertionSeam(x,y,a,b,depth,narrow) {
+  const y0=Math.max(a[0][0],b[0][0]), y1=Math.min(a[a.length-1][0],b[b.length-1][0]);
+  if(y<=y0||y>=y1)return 0;
+  const ca=profileAt(a.map(p=>[p[0],p[1]]),y), cb=profileAt(b.map(p=>[p[0],p[1]]),y);
+  const wa=profileAt(a.map(p=>[p[0],p[2]]),y), wb=profileAt(b.map(p=>[p[0],p[2]]),y);
+  const mid=(ca+cb)*.5, w=Math.max(.014,(wa+wb)*.5*(narrow==null?.55:narrow));
+  return depth*gauss(Math.abs(x)-mid,w)*windowAt(y,y0,y1,Math.min(.10,(y1-y0)*.25));
+}
 export const TRUNK_PATHS = MORPHOLOGY.TRUNK_PATHS;
 
 // A muscle sheet has independently authored medial/lateral attachment routes.
@@ -281,6 +306,35 @@ export function lowerField(x,y,front) {
     const face=.044-P.outerSlope*Math.max(0,q-crest)-P.innerSlope*Math.max(0,crest-q);
     const plate=Math.max(0,face)*windowAt(y,.52,1.48,.22)*smooth((q-.10)/.16)*smooth((.97-q)/.16);
     return plate+kneeAccent+bevel+.017*ribbonField(x,y,LOWER_PATHS.vastusMedialis,1)
+      /* R233 / A2 — THE VASTUS LATERALIS' INSERTION. Measured on the anterior
+         quad's own relief profile, the baseline had ONE belly at x 0.10-0.13
+         and one bump at 0.21-0.23 that is the rail bevel, separated by a 3-7%
+         dip: the master's conditioning gate scored insertion visibility and
+         valley depth several categories under the arms, and this is why.
+
+         `LOWER_PATHS` already authors `rectusFemoris`, `vastusLateralis` and
+         `hamstring` in the retained source and `lowerField` reads none of
+         them — three of the five owners the brief names exist and are simply
+         not connected. Two methods were solved numerically before touching the
+         mesh and both were rejected on the numbers: connecting the ribbons on
+         top of the plate widened the single tent and dropped the valleys to
+         0-1%, and cutting the plate to a support sheet so the ribbons carried
+         the projection ballooned peak relief 62 -> 78-102, which is the size
+         increase the brief forbids.
+
+         What the arm actually does is separate, not add. So this is one
+         subtractive term at the RF/VL boundary, placed at the midpoint of
+         those two authored centrelines rather than at a chosen x. The
+         VM/RF seam was solved too and is deliberately NOT taken: their
+         centres are 0.015 apart at mid-thigh, so a seam between them cuts
+         the belly instead of separating two, and it cost 8% of the peak for
+         nothing.
+
+         0.011 units is 3.9% of the local half-width, inside the brief's 2-5%
+         valley band. Solved: separation 3% -> 28% at y 1.06, 6% -> 30% at
+         1.18, 7% -> 36% at 1.30, with peak relief 62.1 -> 60.9, i.e. 1.9%.
+         Interior by construction — at the contour the Gaussian is zero. */
+      -.011*insertionSeam(x,y,LOWER_PATHS.rectusFemoris,LOWER_PATHS.vastusLateralis,1,.55)
       -.012*gauss(x,.022)*windowAt(y,.78,1.44,.17);
   }
   if(front) return quadPlane+kneeAccent

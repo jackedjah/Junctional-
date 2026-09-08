@@ -127,3 +127,109 @@ him it is not connected to the mesh. Measure the built envelope
 (tools/mrmah3d-profile.mjs, or a windowed envelope over the built torso) before
 and after. Do not restore a literal plate knee-and-calf: R109 tested it and the
 director rejected it.
+
+
+---
+
+R233 / FINAL PRECISION CLOSURE — PASS A
+
+FROZEN CHECKPOINT: git tag `mr-mah-R232-frozen` at f8388da, taken before any
+Pass A edit.
+
+A1 EYES — BLOCKED, NOT ATTEMPTED. The master (§7) says restore the accepted
+R168/R169 eye/face runtime and explicitly forbids inventing a replacement. That
+runtime is NOT in this repository or in either retained handoff: the only
+R168/R169 strings here are the male ARM branch's own revision counter in
+arm-master.js and crystal-atlas.js, and Mrs. Mah's MASTER.md names "Character
+Creator/R168/R169" as a separate project it is scoped out of. His current eyes
+are plain emissive torus rings in head.js (TorusGeometry, tube 0.09 of the eye
+radius) with no iris ring, no lid, no expression parameters — which is the
+"plain empty ring" §7 rules out. The signature-face sheet in the closure pack
+is art direction, not a runtime. A1 needs the R168/R169 source supplied.
+
+CONDITIONING GATE (§3), SCORED ON THE FROZEN BUILD at identical lighting,
+isolated clay, low tier (validation/mrmah3d/R233-A-baseline/):
+
+  region              belly  insertion  valley  conditioning
+  chest                 ***      ***      ***      elite
+  deltoid               ***      **       **       elite
+  biceps / triceps      ***      ***      ***      elite
+  forearm               ***      ***      ***      elite
+  abs / oblique         ***      ***      ***      elite
+  upper quad            *        -        -        soft
+  medial quad           *        *        *        soft
+  knee transition       -        *        *        soft
+  calf                  -        -        -        soft
+  posterior hamstring   -        -        -        soft
+
+The gate FAILS exactly as the master states. Every lower region reads three or
+more categories under the arms.
+
+OWNERS LOCATED. The anterior quad is `lowerField` (myofascial.js), reached
+through `torsoSurface`; the ring table is not connected to him. Measured on the
+relief profile, the baseline anterior quad is ONE tent (`plate`, peak 0.0595 at
+x 0.10-0.13) plus the rail bevel at x 0.21-0.23, separated by a 3-7% dip.
+
+AND `LOWER_PATHS` ALREADY AUTHORS `rectusFemoris`, `vastusLateralis` AND
+`hamstring` IN THE RETAINED SOURCE, AND `lowerField` READS NONE OF THEM. Three
+of the five owners §4 names exist and are simply not connected.
+
+A2 — TWO METHODS SOLVED NUMERICALLY AND REJECTED BEFORE TOUCHING THE MESH:
+  connecting the ribbons on top of the plate widened the single tent and
+  dropped valleys to 0-1%;
+  cutting the plate to a support sheet so the ribbons carried the projection
+  ballooned peak relief 62 -> 78-102, the size increase §1 forbids.
+What the arm actually does is SEPARATE, not add — `maleUpperShape` carries
+`septa`, a biceps `tendon` and deltoid `grooves`, all negative, and the quad
+had one central groove and nothing else.
+
+A2 KEPT (latent): one subtractive `insertionSeam` at the RF/VL boundary,
+placed at the midpoint of those two authored centrelines so the anatomy tables
+decide where the insertion falls. 0.011 units = 3.9% of the local half-width,
+inside the §6 band. It produces a true local minimum on the mesh's own
+vertices at y 1.06 (55.8, 53.2, 15.7, 21.6 — a valley where the baseline slid
+monotonically) at a cost of 0.7% of peak relief.
+
+IT DOES NOT YET READ, AND THAT IS THE REAL FINDING OF THIS PASS. Rendered at
+identical framing, close on the region, it moved 5% of pixels but only 0.03%
+of them by four luma or more. Measured angular vertex spacing:
+
+    lower body, y 1.06     32 sides on a 0.285 half-width     0.0560
+    upper arm              24 sides on a 0.160 radius         0.0419
+    chest                  48-64 sides                        denser
+
+THE ARM SAMPLES ITS OWN SURFACE A THIRD MORE FINELY THAN THE QUAD, ON A MASS A
+THIRD THE SIZE. An insertion valley is about 0.03 wide, so two adjacent quad
+vertices both take nearly the same displacement, the GRADIENT barely changes,
+and shading reads gradient. That is the mechanical cause of the whole §1
+conditioning mismatch, and the line that sets it carries the note "R120: move
+32 samples from the plain terminal stock to the upper torso; fixed triangle
+budget" — the trade is documented and traceable.
+
+A2b — RESOLUTION RAISE: TRIED AND REVERTED. Raising the quad band (y 0.52-1.48)
+from 32 to 48 sides costs +3,134 triangles (+1.8%, not a mobile question) and
+transformed the read: the same close-up went from 0.03% to 47.6% of pixels
+changed by four luma or more, with real belly structure appearing. It is
+reverted because it FAILS the §16 gate: it introduces hard bright triangular
+wedges and knife-edged seams, which §2 rejects by name.
+
+The cause is measured, not guessed. `torsoMoldNormal` takes a finite difference
+of `torsoSurface` with e = 0.002 rad, while the vertex spacing is 0.196 (32
+sides) or 0.131 (48) — a step 65 to 98 times finer than the gap it has to
+describe. Every vertex therefore gets the ANALYTIC surface's normal while the
+triangle between them is a flat chord, and where the surface turns hard the
+per-vertex normals disagree with their own facet. Raising resolution made the
+surface turn harder, so it made the mismatch visible.
+
+NEXT ACTION (A2c, precisely specified): match the normal's differencing step to
+the vertex spacing before raising resolution. `torsoMoldNormal(a,s)` cannot see
+the ring's side count today; forge's loft knows it (`ringSides`) and would have
+to stamp it on the section. That change touches the chest and back normals too,
+which are mastered, so it is its own bounded delta with its own proof — NOT to
+be stacked on the resolution raise. Order: fix the step, prove the upper body is
+unchanged, then re-apply the 48-side quad band, then the seam reads and A3-A5
+(medial/adductor, knee, calf) become possible at all.
+
+ANTI-REGRESSION: do not raise lower-body resolution while the normal step is
+0.002 — the result is knife-edged seams. Do not tune `lowerField` amplitudes to
+chase a read the sampling cannot carry; the field is already correct.

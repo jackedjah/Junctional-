@@ -53,6 +53,10 @@ const VIEWS = [
   { id: '05-lower-front', yawDeg: 0,   framing: 'lower' },
   { id: '06-lower-threequarter', yawDeg: -40, framing: 'lower' },
   { id: '07-torso-arms', yawDeg: -22,  framing: 'torso' },
+  /* R233: the region close-ups the precision brief's proof list requires. A
+     0.011-unit insertion valley does not survive whole-body framing. */
+  { id: '10-quad-front', yawDeg: 0,    framing: 'quad' },
+  { id: '11-quad-threequarter', yawDeg: -34, framing: 'quad' },
   { id: '08-head',       yawDeg: -20,  framing: 'head' },
   { id: '09-hero',       yawDeg: -28,  framing: 'full', pitchDeg: 6, zoom: 0.86 }
 ];
