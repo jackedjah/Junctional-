@@ -72,6 +72,11 @@
     "pos": [0, 1.6, 19], "look": [0, 0.15, -3], "fov": 55
   },
 
+  "match-anchor": {
+    "why": "13. MATCH ANCHOR — MAH MATCH (0,-74) and its tower from the MAH MARKET approach, on a diagonal because the monument stands dead on the plaza axis. ADDED after a form pass on that tower rendered three suite views with byte-identical triangle counts: the district's tallest silhouette, the thing buildings.js calls 'the anchor from anywhere', was not visible from a single camera in the suite. A landmark with no diagnostic view cannot be judged, so it cannot be corrected.",
+    "pos": [56, 9, -12], "look": [0, 42, -88], "fov": 46
+  },
+
   "color-contrast": {
     "why": "12. COLOR / CONTRAST HERO — the neutral silver/graphite/black foundation with its purple, sky-blue and clean-red accents, and the frame to check for yellow/orange/amber contamination.",
     "pos": [-26, 5.5, 30], "look": [40, 14, -60], "fov": 60

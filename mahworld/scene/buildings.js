@@ -24,7 +24,7 @@
      MAH MARKET MAGENTA  the social one, the furthest right and the warmest-lit inside, so the accent
                          that separates hardest from its own interiors carries its signage band */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { softMass, signTexture, diamondOutline, chamferBox, windowGrid, fobMark, canvasTexture, apertureField, archOutline } from './materials.js';
+import { softMass, signTexture, diamondOutline, chamferBox, windowGrid, fobMark, canvasTexture, apertureField, archOutline, roundedBoxShape } from './materials.js';
 
 /* ---- THE SITE PLAN (v5 §06) ---------------------------------------------------------------------
    The three destinations used to stand shoulder to shoulder on one line, which read as a wall of
@@ -343,6 +343,33 @@ function box(w, h, d, mat, x, y, z) {
    same bounding box, so it is a drop-in wherever the member is horizontal. */
 function coping(w, h, d, c) { return chamferBox(w, d, h, c).rotateX(-Math.PI / 2); }
 
+/* A PLAN-ROUNDED PRISM — the same trick as coping(), but the plan outline turns on a real radius
+   instead of a 45° cut. Width w on x, height h on y, depth d on z, centred on its own origin so it
+   drops into part() exactly where a chamferBox would.
+
+   WHY IT EXISTS. WORLD01_MASTER §4 asks for large continuous curves and softened tower corners, and
+   §10 asks MAH MATCH for a rounded armoured core. What was built instead was four stacked
+   chamferBox masses at c = 0.5 — on a 20 m shaft that is a 2.5% cut, which from the plaza is
+   indistinguishable from a primitive box, and a box is what the long sightline showed. A chamfer
+   cannot be scaled into a curve either: raising c only widens one flat facet, so the silhouette
+   gains an arris rather than losing one. The radius has to come from the SHAPE.
+
+   The corner radius is clamped against BOTH half-extents, because the tower tapers and a radius that
+   is comfortable on the base section would swallow the plan of the top one. */
+function roundPrism(w, h, d, r, bevel = 0.12) {
+  const b = Math.min(bevel, h / 2 - 0.005);
+  const rr = Math.max(0.04, Math.min(r, w / 2 - 0.02, d / 2 - 0.02));
+  const g = new THREE.ExtrudeGeometry(roundedBoxShape(w, d, rr), {
+    depth: h - 2 * b, bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: 2, curveSegments: 5
+  });
+  /* roundedBoxShape runs y = 0..d in its own plane, and the extrusion runs z = 0..depth: centre both
+     BEFORE the rotation, so the rotated result is centred on x/y/z like every other primitive here. */
+  g.translate(0, -d / 2, -(h - 2 * b) / 2);
+  g.rotateX(-Math.PI / 2);   /* shape plane XY -> plan XZ; extrusion +z -> up */
+  g.computeVertexNormals();
+  return g;
+}
+
 /* THE CROWN, in two courses with its four corners mitred. `o` is the ring the crown stands on:
    centreline half-extents ax / az about (0, zc), the vertical run yBase → yTop, and the blade
    thickness t. Returns how far the profile has leaned in by the top, so the caller can seat the cap
@@ -556,30 +583,53 @@ function terraces(ctx, g, o) {
 function verticalTower(ctx, g, o) {
   const { M } = ctx;
   const { W, H, D, E, seed = 2 } = o;
-  const struct = [], trim = [], dark = [], lit = [];
+  const struct = [], trim = [], dark = [], lit = [], glow = [];
   const th = 22, tw = W * 0.46, td = D * 0.5, zc = -(E + D * 0.42);
-  /* the shoulder: one wide banded transition so the tower GROWS out of the podium. Both members are
-     copings — a shoulder and its band are read against the sky from 74 m away, so the arris that
-     matters is the plan outline and not the front turn. */
-  part(struct, coping(tw + 4.4, 1.5, td + 4.4, 0.4), 0, H + 0.75, zc);
-  part(trim, coping(tw + 5.0, 0.18, td + 5.0, 0.07), 0, H + 1.5, zc);
+  /* THE PLAN RADIUS. One number governs the whole tower so shoulder, shaft, setback bands and the
+     crown ring all turn on the SAME curve — §4's "large continuous curves" is a property of the
+     silhouette, and a shoulder that turns at 4 m over a shaft that turns at 1 reads as two buildings
+     stacked. It is expressed as a FRACTION of the narrow plan dimension, so the taper carries it up
+     without the top section's corners meeting in the middle. */
+  const PLAN_R = 0.22;
+  /* the shoulder: one wide banded transition so the tower GROWS out of the podium. A shoulder and its
+     band are read against the sky from 74 m away, so the outline that matters is the plan one. */
+  const shW = tw + 4.4, shD = td + 4.4;
+  part(struct, roundPrism(shW, 1.5, shD, PLAN_R * Math.min(shW, shD), 0.22), 0, H + 0.75, zc);
+  part(trim, roundPrism(shW + 0.6, 0.18, shD + 0.6, PLAN_R * Math.min(shW, shD) + 0.3, 0.05), 0, H + 1.5, zc);
   /* the shaft, tapering as it climbs — four stacked sections, each narrower than the one below */
   let y = H + 1.5, w = tw, d = td;
   for (let i = 0; i < 4; i++) {
-    const sh = th / 4;
-    part(struct, chamferBox(w, sh, d, 0.5), 0, y + sh / 2, zc);
-    part(trim, coping(w + 0.24, 0.14, d + 0.24, 0.05), 0, y + sh, zc);   /* the setback band turns on all four sides */
-    /* corner fins: vertical chamfered strips that draw the height and catch the moon on their turn */
+    const sh = th / 4, r = PLAN_R * Math.min(w, d);
+    part(struct, roundPrism(w, sh, d, r, 0.16), 0, y + sh / 2, zc);
+    part(trim, roundPrism(w + 0.24, 0.14, d + 0.24, r + 0.12, 0.045), 0, y + sh, zc);   /* the setback band turns all the way round */
+    /* THE CROSS-CORE ARMOUR (§10). These were four fins jammed into the four corners, which is where
+       a rounded shell has no corner to jam into — a square strip at the bounding-box corner of a mass
+       that now turns at 3 m would hang in air off the curve. They move to the CARDINAL axes instead,
+       one rib on each flank and one up the back, half-round in plan so the rib itself is armour and
+       not a spike. The fourth arm of the cross is the light channel on the plaza face below. */
+    const rib = sh - 0.6;
+    for (const sx of [-1, 1]) part(dark, roundPrism(0.9, rib, 1.7, 0.45, 0.14), sx * (w / 2 + 0.14), y + sh / 2, zc);
+    part(dark, roundPrism(1.7, rib, 0.9, 0.45, 0.14), 0, y + sh / 2, zc - d / 2 - 0.14);
+    /* the bright catches ride the TURN — placed on the 45° diagonal at the corner radius, which is a
+       point on the rounded surface rather than a point outside it, so they still draw the height. */
+    const cx = w / 2 - r, cz = d / 2 - r, k = (r + 0.13) * Math.SQRT1_2;
     for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
-      part(dark, chamferBox(0.85, sh - 0.3, 0.85, 0.2), sx * (w / 2 - 0.2), y + sh / 2, zc + sz * (d / 2 - 0.2));
-      part(trim, chamferBox(0.11, sh - 1.0, 0.11, 0.03), sx * (w / 2 + 0.16), y + sh / 2, zc + sz * (d / 2 + 0.16));
+      part(trim, chamferBox(0.11, sh - 1.0, 0.11, 0.03), sx * (cx + k), y + sh / 2, zc + sz * (cz + k), Math.PI / 4);
     }
+    /* THE LIGHT CHANNEL, PER SECTION. It used to be one 22 m bar pinned to the BASE section's front
+       face while the shaft tapered away behind it — by the top course the shaft had stepped back
+       2.2 m and the light was floating in front of the building. Each section now carries its own,
+       riding its own face, and the four read as one line because they share x and their gaps land on
+       the setback bands. */
+    const fz = zc + d / 2;
+    part(dark, roundPrism(1.5, sh - 0.5, 0.55, 0.27, 0.12), 0, y + sh / 2, fz + 0.16);
+    part(glow, roundPrism(0.7, sh - 1.1, 0.18, 0.09, 0.06), 0, y + sh / 2, fz + 0.4);
     y += sh; w *= 0.9; d *= 0.9;
   }
-  /* the lit slot: one recessed vertical channel up the plaza face, the tower's single light line */
-  part(dark, chamferBox(1.5, th - 1.0, 0.5, 0.14), 0, H + 2 + (th - 1) / 2, zc + td / 2 + 0.2);
-  const slot = new THREE.Mesh(chamferBox(0.7, th - 2.4, 0.16, 0.05), M.energy);
-  slot.position.set(0, H + 2 + (th - 1) / 2, zc + td / 2 + 0.42); g.add(slot); ctx.reflect(slot, 0.3);
+  /* four segments, ONE draw call — splitting the channel per section is a geometry fix, and it has
+     no business costing the hero landmark three extra draws to make. */
+  const chan = merged(g, glow, M.energy, 'match-tower-channel', false);
+  if (chan) ctx.reflect(chan, 0.3);
   /* THE CROWN, in two courses with its four corners mitred (law 6). It was four planes at one tilt
      meeting at four square corners and capped by a solid slab: the highest silhouette in the district
      ran dead straight to a hard arris and stopped, which is the cone's fault at 65 m. Now the profile
