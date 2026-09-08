@@ -108,12 +108,38 @@ const RANGES = [
      clusters    walked by the golden angle around the full compass
      base/crest  crystalline tissue at the foot, moonlit platinum along the crowns — no hue (L50) */
 const BELT = Object.freeze({
-  inset: 46, depth: 165, rMin: 300, rMax: 605, gapDeg: 9, waterMargin: 30,
-  clusters: 84, perCluster: [8, 16], spreadDeg: 5.4,
-  hMin: 15, hMax: 30, crownRatio: [0.27, 0.37],
-  base: 0x3a4761, crest: 0xd6dfec
+  /* ---- THINNED AND SCATTERED -------------------------------------------------------------------
+     Direction: "the trees look too perfectly aligned, they don't resemble anything scattered around
+     the area — make sure you can see each individual tree with space around it, and lessen the
+     amount."
+
+     All three complaints are one number each and they were all wrong in the same direction. 84
+     clusters walked by the golden angle around the compass, 8-16 trees apiece, inside a 165 m band
+     is roughly a thousand trees at four trees per hundred square metres — that is a HEDGE, and a
+     hedge laid on a circle reads as a circle. The individual tree could not be seen at all, which
+     also meant every leaf shard added to it was invisible.
+
+     clusters 84 -> 60 and perCluster 8-16 -> 4-8 takes the belt from about 1000 trees to about 250,
+     and the crown-separation test below guarantees the survivors never merge into one mass.
+     The band deepens 165 -> 240 and the cluster spread widens 5.4 -> 11 degrees, so the same trees
+     occupy two and a half times the ground. And each cluster now takes a RADIAL OFFSET of its own
+     (see clusterPush below), so the outer rank stops being a smooth arc at a fixed inset from the
+     rock: some clumps stand well forward of the treeline, some sit back in the lee of it.
+     Fewer trees also pays for better ones — LEAF_N goes up, not down. */
+  inset: 46, depth: 240, rMin: 300, rMax: 605, gapDeg: 9, waterMargin: 30,
+  clusters: 60, perCluster: [4, 8], spreadDeg: 11.0, clusterPush: 78, minGap: 0.95,
+  /* CROWN RATIO WAS THE OTHER HALF OF "blobs": at 0.27-0.37 a 30 m tree carried a 9 m crown on a
+     21 m bare pole, so the belt read as a picket of trunks with lumps on top. A broadleaf crown is
+     roughly half the tree's height across, and the crown sits LOW on the trunk. */
+  hMin: 15, hMax: 30, crownRatio: [0.44, 0.60],
+  base: 0x4c5c78, crest: 0xe4ebf6
 });
-const FOOT_BOUND = 1.16;      /* massif() ridge modulation A1+A2 tops out at 0.16 of w — see nearFeet */
+/* THE FOOT BOUND IS COUPLED TO massif()'s AMPLITUDES and must move with them: it is what the belt,
+   the passes and the placement tests use to know where a massif's skirt actually reaches. A1 now
+   tops out at 0.28 and A2 at 0.15, so a spur can stand 0.43 of w proud of the nominal radius. Left
+   at 1.16 this would have planted the treeline inside the rock on every bearing with a big spur —
+   the kind of coupled constant that goes stale silently because nothing crashes. */
+const FOOT_BOUND = 1.44;
 /* §06: the canopy diamond is WIDER THAN TALL. 0.74, not 0.60 — at 0.60 the crown was a pancake and
    three overlapping pancakes are still a parasol; 0.74 keeps the figure wider than tall while giving
    the mass enough height to break its own silhouette. */
@@ -234,7 +260,13 @@ function massif(w, h, rings, slices, rand) {
   const apron = 0.13 + rand() * 0.10, kApron = 0.09 + rand() * 0.09;
   const k1 = 3 + Math.floor(rand() * 3), k2 = 6 + Math.floor(rand() * 4);
   const p1 = rand() * TAU, p2 = rand() * TAU, p3 = rand() * TAU;
-  const A1 = 0.085 + rand() * 0.075, A2 = 0.035 + rand() * 0.045, A3 = 0.05 + rand() * 0.05;
+  /* AMPLITUDES, RAISED. At 0.085-0.16 the ridge system displaced the radius by at most a sixth of
+     the peak's own width, which on a 900 m massif is a ripple — visible in a wireframe, invisible
+     under fog at 1200 m, and the reason these still read as domes after the ridge function was
+     fixed. A real range's spurs stand out by a third of the massif's radius or more. A3 drives the
+     CREST LINE rather than the plan, and it is what breaks the single apex into a summit ridge with
+     subsidiary tops, which is the other half of "not a blob". */
+  const A1 = 0.16 + rand() * 0.12, A2 = 0.075 + rand() * 0.075, A3 = 0.11 + rand() * 0.10;
   const sz = 0.72 + rand() * 0.48;                                  /* elliptical footprint: the old post-hoc geo.scale, baked in so the normals stay true */
   const lx = (rand() - 0.5) * 0.26, lz = (rand() - 0.5) * 0.26;     /* summit off-centre: one steep face, one long back */
   const apex = rings * slices, vc = apex + 1;
@@ -247,15 +279,41 @@ function massif(w, h, rings, slices, rand) {
     const fall = Math.pow(1 - u, 0.55);
     for (let j = 0; j < slices; j++) {
       const phi = (j / slices) * TAU;
-      const s1 = Math.sin(k1 * phi + p1), s2 = Math.sin(k2 * phi + p2), ridge = A1 * s1 + A2 * s2;
-      const r = w * rad * (1 + ridge * fall);
+      /* ---- RIDGES AND GULLIES, NOT A MODULATED DOME ------------------------------------------
+         Direction: "the mountains look like blobs of messiness — make them much more realistic."
+         They did, and the arithmetic here is why. Two smooth sine terms added to a radius produce a
+         dome with gentle bumps on it, because a sine has no CREASE: its extremes are round at both
+         ends, so a spur and a gully are the same soft shape mirrored. Real relief is the opposite —
+         a ridge is a sharp arris and a gully is a broad V, and the asymmetry between them is most
+         of what reads as rock.
+
+         So the radial term is built from |sin| ridges rather than sine bumps. |sin| has a CORNER at
+         every zero, which becomes the crease of a gully, and a round top, which becomes the back of
+         a spur. Three ranks of them at rising frequency give a primary ridge system, secondary
+         spurs off it, and a fine crenellation on the crest — the same hierarchy a real massif has.
+         The fine rank is faded out at the foot (`fall`) so the apron stays a smooth talus slope and
+         the detail lives where the light actually catches it. */
+      const g1 = Math.abs(Math.sin(k1 * phi * 0.5 + p1));            /* primary ridge system */
+      const g2 = Math.abs(Math.sin(k2 * phi * 0.5 + p2));            /* secondary spurs */
+      const g3 = Math.abs(Math.sin((k2 + 7) * phi * 0.5 + p3));      /* crest crenellation */
+      const ridge = A1 * (g1 * 2 - 1) + A2 * (g2 * 2 - 1) * 0.85 + A3 * 0.42 * (g3 * 2 - 1) * u;
+      /* the gullies CUT: a spur stands proud by `ridge` but a gully is pulled in harder than it is
+         pushed out, which is what stops the plan outline from being a circle with dents in it. */
+      const cut = ridge < 0 ? 1.55 : 1.0;
+      const r = w * rad * (1 + ridge * cut * fall);
       const v = i * slices + j;
       /* the crest line wanders with height as well as around the peak, so the shoulder is never a
          perfect ring — but the term dies at both ends, which keeps the single apex clean */
       pos[v * 3] = r * Math.sin(phi) + lx * w * u * u;
-      pos[v * 3 + 1] = h * (u * (1 + A3 * Math.sin(k2 * phi + p3) * u * (1 - u) * 2.2) - 0.5);
+      /* THE CREST LINE. The old term died at u = 1 (the u(1-u) window), which guaranteed one clean
+         apex — a cone. It now survives to the top, so the summit region rises and falls around the
+         peak and the massif carries a summit RIDGE with two or three tops on it instead of a point.
+         `g1` is reused deliberately: the high ground follows the primary spur system, the way a real
+         summit ridge is the head of its own spurs rather than an unrelated wobble. */
+      const crest = A3 * (g1 - 0.5) * 2.0 * Math.pow(u, 1.4) + A3 * 0.5 * Math.sin(k2 * phi + p3) * u * (1 - u) * 2.2;
+      pos[v * 3 + 1] = h * (u * (1 + crest) - 0.5);
       pos[v * 3 + 2] = r * Math.cos(phi) * sz + lz * w * u * u;
-      ao[v] = Math.max(0, -ridge) / (A1 + A2) * fall;               /* 0 on a spur crest, 1 in the floor of a gully */
+      ao[v] = Math.min(1, Math.max(0, -ridge) / (A1 + A2) * fall);   /* 0 on a spur crest, 1 in the floor of a gully */
     }
   }
   /* the summit is ONE vertex the last ring fans into, so the crown carries no degenerate quad and
@@ -274,11 +332,19 @@ function massif(w, h, rings, slices, rand) {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setIndex(new THREE.BufferAttribute(idx, 1));
-  /* SMOOTH normals, on purpose. The massif's whole job is to read as a curved mass at 700–1500 m, and
-     the shading gradient across a dome is what says "round" before the silhouette does. The rock
-     character comes from the spurs, not from faceting the shading. */
+  geo.setAttribute('aAo', new THREE.BufferAttribute(ao, 1));   /* carried through the un-index below */
+  /* FLAT normals now, and the reversal is deliberate. The old note argued for smooth shading on the
+     grounds that a gradient across a dome is what says "round" — which was true of the dome this
+     used to be, and is exactly the problem. Now that the surface carries creased ridges and cut
+     gullies, smooth normals average those creases away and hand back the blob: the geometry has the
+     relief and the shading hides it. Faceting is what lets a spur catch light on one plane and drop
+     it on the next, which is how rock reads at any distance, and it is also this world's own
+     surface language everywhere else. Cost is the un-indexing, ~9k extra vertices per range. */
   geo.computeVertexNormals();
-  return { geo, ao };
+  const flat = geo.toNonIndexed();
+  flat.computeVertexNormals();
+  geo.dispose();
+  return { geo: flat, ao: flat.getAttribute('aAo').array };
 }
 
 /* Paint a peak's vertices: deep and blue at the foot, lifting toward moonlit silver along the ridge,
@@ -553,6 +619,37 @@ export function buildTerrain(ctx) {
     };
 
     const canopy = [], trunks = [], rand = rng(4242);
+    const placed = [];   /* [x, z, crownWidth] of every tree already standing, for the spacing test */
+    /* THE LEAF, authored once. A square diamond with both tips cut back to a flat facet: twelve
+       facets instead of eight, and an outer end that takes a highlight rather than aliasing to a
+       point. Built here rather than imported because flora-and-vehicles.js caches its own copy for
+       the hero trees and two modules sharing one mutable cached geometry is how a scale applied in
+       one place silently resizes the other. */
+    const LEAF_SRC = (() => {
+      const c = 0.30;                                    /* chamfer fraction off each tip */
+      const v = [], f = [];
+      const push = (x, y, z) => { v.push(x, y, z); return v.length / 3 - 1; };
+      const tipA = [push(-0.5 + c * 0.5, c * 0.5, 0), push(-0.5 + c * 0.5, -c * 0.5, 0)];
+      const tipB = [push(0.5 - c * 0.5, c * 0.5, 0), push(0.5 - c * 0.5, -c * 0.5, 0)];
+      const top = push(0, 0.5, 0), bot = push(0, -0.5, 0);
+      const apF = push(0, 0, 0.5), apB = push(0, 0, -0.5);
+      const ring = [tipA[0], top, tipB[0], tipB[1], bot, tipA[1]];
+      for (let q = 0; q < ring.length; q++) {
+        const a = ring[q], b = ring[(q + 1) % ring.length];
+        f.push(a, b, apF); f.push(b, a, apB);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(v), 3));
+      g.setIndex(f);
+      return g.toNonIndexed();
+    })();
+    /* leaves per lobe: full count at the belt's near edge, a third of it at the back */
+    /* MEASURED OFF THE RENDER, not guessed. [11,34] gave crowns you could see straight through —
+       a cloud of debris rather than a bush. The near rank doubles and the leaves grow, so blades
+       OVERLAP; the far rank drops, because a tree at 600 m is four pixels of silhouette and paying
+       thirty-four leaves for it is the whole triangle budget spent where nothing can resolve it. */
+    const LEAF_N = [16, 64];
+    const _euler = new THREE.Euler(), _quat = new THREE.Quaternion();
     const cBase = new THREE.Color(BELT.base), cCrest = new THREE.Color(BELT.crest), _c = new THREE.Color();
     /* paint one crown: dark at its underside, platinum along the top, and brighter on the flank the
        moon reaches — the same three terms paintPeak uses on the rock, so belt and range agree about
@@ -565,8 +662,11 @@ export function buildTerrain(ctx) {
       for (let i = 0; i < n; i++) {
         const up = Math.min(1, Math.max(0, (pos.getY(i) - (cy - h * 0.5)) / h));
         const mo = Math.max(0, nor.getX(i) * moon.x + nor.getY(i) * moon.y + nor.getZ(i) * moon.z);
-        _c.copy(cBase).lerp(cCrest, Math.pow(up, 0.85) * lift);
-        _c.multiplyScalar(0.80 + 0.42 * mo);
+        /* the exponent came down and the floor came up: with the crown made of separate blades,
+           a leaf's `up` is its own position in the lobe rather than a point on a smooth shell, so
+           the old 0.85 power left two thirds of every crown sitting at the base colour. */
+        _c.copy(cBase).lerp(cCrest, Math.pow(up, 0.62) * lift);
+        _c.multiplyScalar(0.86 + 0.46 * mo);
         col[i * 3] = _c.r; col[i * 3 + 1] = _c.g; col[i * 3 + 2] = _c.b;
       }
       geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
@@ -578,7 +678,11 @@ export function buildTerrain(ctx) {
          than it finds a tree. */
       const a = (ci * 137.50776405 + 11) % 360;
       if (inGap(a)) continue;
-      const rOut = beltOuter(a);
+      /* the cluster's own stand-off from the treeline, so the belt's outer edge is ragged. Squared
+         so most clumps sit near the rock and a few stand well out on the open ground — which is how
+         a real wood's edge breaks up, rather than every clump being equally adventurous. */
+      const push = BELT.clusterPush * rand() * rand();
+      const rOut = Math.max(BELT.rMin + 12, beltOuter(a) - push);
       const n = BELT.perCluster[0] + Math.floor(rand() * (BELT.perCluster[1] - BELT.perCluster[0] + 1));
       let planted = 0;
       for (let i = 0; i < n; i++) {
@@ -601,32 +705,95 @@ export function buildTerrain(ctx) {
         const grow = 0.62 + 0.38 * dr;
         const th = lerp(BELT.hMin, BELT.hMax, rand() * 0.55 + 0.45 * grow);
         const tw = th * (BELT.crownRatio[0] + rand() * (BELT.crownRatio[1] - BELT.crownRatio[0]));
-        const cy = th - tw * CROWN_SQUAT;              /* the crown's centre — its top reaches `th` */
+        /* SPACE AROUND EVERY TREE, enforced rather than hoped for. It sits HERE, after `tw`
+           exists: the first cut put it above, where `tw` is still in its temporal dead zone, so the
+           whole terrain module threw on its first tree and the render came back with no mountains
+           and no trees at all — a total build failure that looked like a composition change. Two trees whose crowns overlap
+           are one blob with two trunks, and no amount of leaf detail survives that — you cannot see
+           a shard on a crown you cannot see the edge of. A candidate is rejected if it lands inside
+           minGap crown-radii of one already planted; the check is against this cluster and its
+           neighbours only, which is all that can ever be close enough to matter. */
+        {
+          let clash = false;
+          for (let q = placed.length - 1; q >= 0 && q > placed.length - 40; q--) {
+            /* the requirement is CROWN-RELATIVE. A flat additive term looked reasonable and was
+               not: at these crown widths it demanded ~50 m between trees, which rejected most of
+               every cluster and thinned the belt to a scatter of singles. What the eye needs is
+               simply that two crowns do not touch — so the test is the two crown RADII plus a
+               margin of the same order, which keeps a clear gap at any tree size. */
+            const P = placed[q], ddx = P[0] - tx, ddz = P[1] - tz;
+            const need = (P[2] + tw) * BELT.minGap;
+            if (ddx * ddx + ddz * ddz < need * need) { clash = true; break; }
+          }
+          if (clash) continue;
+        }
 
-        /* THREE MASSES, ALWAYS, AND THE FIRST CUT'S ONE WAS THE WHOLE PROBLEM. A single squat
-           diamond on a bare stick is a PARASOL, and that is exactly what the first belt rendered:
-           a field of black tents at the treeline. A crown reads as a crown when overlapping masses
-           break its silhouette, so every tree gets a leader and two subordinates — the subordinates
-           smaller, seated lower, thrown off-axis by the golden angle so no two trees repeat the same
-           arrangement, and overlapping the leader rather than hanging clear of it. Three octahedra
-           is 24 triangles: at 300-600 m that is the cheapest silhouette fix available and the only
-           one that changes what the shape IS rather than how bright it is. */
+        /* the crown's centre. It used to sit so the crown's TOP reached `th`, which with a small
+           crown put the whole mass at the very tip of the pole; now the crown is seated a further
+           quarter of its own height down the trunk, so foliage starts at about 55% of tree height
+           the way a real canopy does. */
+        const cy = th - tw * CROWN_SQUAT * 1.28;
+
+        /* ---- A BUSH OF SHARDS, NOT A BLOB ------------------------------------------------------
+           Direction: "make the trees much fuller with tons of little shards of diamonds that are
+           actually detailed at each particular shard, and make sure it comes out to a full bush of
+           shard-like leaves."
+
+           What stood here was three overlapping octahedra. That was a real fix in its time — it
+           replaced ONE octahedron, which read as a parasol — but three smooth eight-sided lumps is
+           still a lump, and at any distance you can resolve it there is no foliage in it at all.
+           The crown had a silhouette and no substance.
+
+           So the crown is now built from LEAVES. Each leaf is a square diamond — section 6's brand
+           figure, wider than tall — with both tips CHAMFERED, so it carries twelve facets and a flat
+           tip that takes a highlight instead of aliasing into a hairline. They are scattered over
+           three overlapping ellipsoid lobes (the same leader-and-two-subordinates massing that
+           worked, kept), each leaf pushed out to the lobe SHELL and tilted to face outward along the
+           surface normal with a random roll, which is what makes a canopy read as thousands of
+           separate blades catching light at different angles rather than as one shaded surface.
+
+           DENSITY FALLS WITH DISTANCE, and that is not a compromise, it is the only way this is
+           affordable. The belt runs 300-605 m; a tree at the near edge gets the full leaf count, one
+           at the back gets a third of it, and the count is derived from the tree's own radius rather
+           than from a quality tier, so it needs no runtime switch and cannot fall out of step. */
         const yaw0 = rand() * TAU;
-        const crown = (w, y, x0, z0, lift) => {
-          const c = new THREE.OctahedronGeometry(1, 0).toNonIndexed();
-          c.scale(w, w * CROWN_SQUAT, w * (0.86 + rand() * 0.28));
-          c.rotateY(rand() * TAU);
-          c.translate(x0, y, z0);
-          paintCrown(c, w * CROWN_SQUAT * 2, y, lift);
-          canopy.push(c);
+        const tR = Math.hypot(tx, tz);
+        const near = 1 - Math.min(1, Math.max(0, (tR - BELT.rMin) / (BELT.rMax - BELT.rMin)));
+        const leafN = Math.round(LEAF_N[0] + (LEAF_N[1] - LEAF_N[0]) * near);
+        /* one lobe: leaves scattered on the shell of an ellipsoid, each facing out of it */
+        const lobe = (w, y, x0, z0, lift, n) => {
+          const ry = w * CROWN_SQUAT;
+          for (let q = 0; q < n; q++) {
+            /* the golden angle up a spiral gives an even shell distribution with no lattice and no
+               clumping — the same trick the cluster bearings use, one dimension up */
+            const t2 = (q + 0.5) / n, ph = Math.acos(1 - 2 * t2), th2 = q * 2.3999632 + yaw0;
+            const sx = Math.sin(ph) * Math.cos(th2), sy = Math.cos(ph), sz2 = Math.sin(ph) * Math.sin(th2);
+            /* sit the leaf just inside the shell, with a little scatter so the surface is not a
+               perfect eggshell of blades */
+            /* two ranks: most leaves on the shell, a third pulled deep inside so the crown has a
+               body behind its surface and does not read as a hollow eggshell of blades */
+            const pull = (q % 3 === 2) ? 0.30 + 0.30 * rand() : 0.78 + 0.26 * rand();
+            const px = x0 + sx * w * pull, py = y + sy * ry * pull, pz = z0 + sz2 * w * pull;
+            const g = LEAF_SRC.clone();
+            const ls = w * (0.30 + 0.16 * rand());
+            g.scale(ls * 1.35, ls, ls * 0.16);          /* WIDER THAN TALL — section 6 */
+            /* face the leaf out of the lobe: yaw to the bearing, pitch to the elevation, roll free */
+            _euler.set(Math.asin(Math.max(-1, Math.min(1, sy))) * -0.9, Math.atan2(sx, sz2), rand() * TAU);
+            g.applyQuaternion(_quat.setFromEuler(_euler));
+            g.translate(px, py, pz);
+            paintCrown(g, ry * 2, y, lift * (0.62 + 0.5 * Math.max(0, sy)));
+            canopy.push(g);
+          }
         };
-        crown(tw, cy, tx, tz, 0.72 + 0.28 * rand());
+        placed.push([tx, tz, tw]);
+        lobe(tw, cy, tx, tz, 0.72 + 0.28 * rand(), leafN);
         for (let k = 0; k < 2; k++) {
           const sw = tw * (0.56 + rand() * 0.20);
-          const sy = cy - tw * CROWN_SQUAT * (0.42 + 0.34 * k);
+          const sy2 = cy - tw * CROWN_SQUAT * (0.42 + 0.34 * k);
           const oa = yaw0 + k * 2.3999632;                 /* the golden angle: two masses, never opposed */
           const off = tw * (0.40 + 0.22 * rand());
-          crown(sw, sy, tx + Math.cos(oa) * off, tz + Math.sin(oa) * off, 0.44 + 0.22 * rand());
+          lobe(sw, sy2, tx + Math.cos(oa) * off, tz + Math.sin(oa) * off, 0.44 + 0.22 * rand(),
+            Math.max(5, Math.round(leafN * 0.45)));
         }
 
         /* the trunk: four sides, yawed 45 deg so its plan section is the square diamond, not a square */

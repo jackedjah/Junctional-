@@ -200,6 +200,7 @@ export async function createMahplaza(canvas, options = {}) {
   const ORING = await optional('./outerring.js');     /* R3-01: dead-zone closure in the outer ring */
   const MFAC = await optional('./mahfacilities.js');  /* R3-08/R3-11: MAH VITAL, FORGE, MODE */
   const CFURN = await optional('./campus-furnishing.js'); /* CAMPUS: the props that make the quad a place */
+  const CFRONT = await optional('./campus-frontage.js');  /* CAMPUS: the named buildings that hold the quad */
   const MBEAST = await optional('./mahbeasts.js');    /* R3-10: MAHBEASTS, Monkey Dogs L5-7 + boss */
   const ILINK = await optional('./interlink.js');     /* R2 §5: the routes between the three cities */
   const HALOM = await optional('./halo.js');          /* R4: MAH HALO, the upper sanctuary surface */
@@ -353,6 +354,11 @@ export async function createMahplaza(canvas, options = {}) {
      every bench, lamp and pylon it places, and anything that tests against ctx.colliders has to see
      a complete list. It also has to run after mahfacilities so it never stands a banner pylon in a
      doorway that was placed after it. */
+  /* FRONTAGE before FURNISHING: the terraces register footprint colliders, and the furnishing pass
+     tests nothing against them yet but will when its placement learns to avoid a doorway. Build
+     order is the cheapest place to keep that option open. */
+  let frontage = null;
+  if (CFRONT && CFRONT.buildCampusFrontage) { try { frontage = CFRONT.buildCampusFrontage(ctx); } catch (e) { console.info('MAHPLAZA: campus frontage failed —', e && e.message); frontage = null; } }
   let furnishing = null;
   if (CFURN && CFURN.buildCampusFurnishing) { try { furnishing = CFURN.buildCampusFurnishing(ctx); } catch (e) { console.info('MAHPLAZA: campus furnishing failed —', e && e.message); furnishing = null; } }
   if (ORING && ORING.buildOuterRing) { try { outerRing = ORING.buildOuterRing(ctx); scene.add(outerRing.group); } catch (e) { console.info('MAHPLAZA: outer ring module failed —', e && e.message); outerRing = null; } }

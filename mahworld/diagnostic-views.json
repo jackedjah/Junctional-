@@ -72,6 +72,11 @@
     "pos": [0, 1.6, 19], "look": [0, 0.15, -3], "fov": 55
   },
 
+  "frontage-street": {
+    "why": "CAMPUS 11 — NAMED FRONTAGE, read the way a player reads a high street: at eye height, close, and at an ANGLE rather than square on, because an angled view is what exposes a building whose flanks are blank. Aimed along the terrace between MAH MATCH and MAH MARKET.",
+    "pos": [22, 2.2, -96], "look": [56, 6.5, -102], "fov": 55
+  },
+
   "quad-social": {
     "why": "CAMPUS 12 — NPC / SOCIAL CLUSTER, at eye height. Standing 14 m from a rest cluster on the quad's edge, which is the distance a player actually reads street furniture from. Every other campus camera is 100 m or more out, so nothing in the suite could say whether a bench reads as a bench.",
     "pos": [-4, 1.75, -74], "look": [1, 1.10, -93], "fov": 55

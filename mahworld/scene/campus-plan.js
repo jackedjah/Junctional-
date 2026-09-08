@@ -104,7 +104,10 @@ export const CAMPUS = {
   /* ---- THE OPEN ARC (§11, §19). No facility, no block, no landmark may be placed between these
      bearings: it carries the arrival approach and the rear sightline out toward the sea, and it is
      the reserve for future districts. Measured the long way round, through 180. ---- */
-  OPEN_ARC: { from: 66, to: 294 },
+  /* NARROWED from 66-294 by the frontage pass. A 228 degree reserve is why three quarters of the
+     quad had no edge at all, and a sightline you can see the coast down is forty degrees wide, not
+     two hundred. Still dead astern, still uninterrupted, still the reserve for future districts. */
+  OPEN_ARC: { from: 158, to: 202 },
 
   /* ---- THE CIVIC SYMBOL (§1). The quad keeps its orientation landmark and the landmark stops
      being an obstruction: master §1 permits "a small refined civic symbol" at the centre and §18
