@@ -233,3 +233,92 @@ unchanged, then re-apply the 48-side quad band, then the seam reads and A3-A5
 ANTI-REGRESSION: do not raise lower-body resolution while the normal step is
 0.002 — the result is knife-edged seams. Do not tune `lowerField` amplitudes to
 chase a read the sampling cannot carry; the field is already correct.
+
+
+---
+
+R233 / A2c — WEDGE RECOVERY: THE CROWN IS A C1 DOME
+
+A1 EYES — BLOCKED, WAITING FOR R168/R169 EYE SOURCE. Not failed, not
+attempted. The R168 pack supplied (mrmah3d/handoff/r168-eyes/) contains the
+runtime SPEC, the data contract, the preset seed, the acceptance checklist and
+the reference boards — and ZERO source files. §7 forbids inventing a
+replacement, so this stays blocked until the runtime is supplied. His eyes
+remain plain emissive torus rings with no iris ring, lid or expression
+parameters. Anatomy closure is not waiting on it.
+
+RECOVERY STATUS: the hard triangular wedges were never in a committed build.
+They came from the A2b 48-side resolution trial, which was reverted before the
+Pass A commit; HEAD carried only the latent narrow seam. Verified at 02cda04:
+`sidesAt` is the retained rule, working tree clean.
+
+THE DISCONTINUITY (step 4), FOUND AND MEASURED. It is not resolution. The
+anterior quad's dominant term — its whole mass — was PIECEWISE LINEAR:
+
+    face = .044 - outerSlope*max(0, q-crest) - innerSlope*max(0, crest-q)
+
+clamped by max(0, face). Its derivative jumps from +0.018 to -0.080 across the
+crest, a 5.4x CORNER, and the clamp adds a second. A first-derivative
+discontinuity is invisible while it falls between samples and renders as a hard
+crease the moment a vertex lands on it. Subdivision did not create the wedges;
+it revealed a crease already authored into the field. That is why more
+triangles is not the fix and why the 48-side trial had to be reverted.
+
+Supporting measurement, kept for the record: six of the eight terms in
+`lowerField`'s anterior return are authored BELOW the mesh's Nyquist limit —
+anterior vertex spacing at y 1.06 is 0.0560 and the central groove (0.022), the
+two bevel terms (0.023 / 0.025), the vastus-medialis ribbon (0.034) and the
+rectus-femoris path (0.052) are all narrower. Below Nyquist a feature either
+vanishes (the flat plate at 32 sides) or lands on one vertex and spikes (the
+wedges at 48). The field is authored at a spatial frequency the topology cannot
+represent.
+
+THE ONE BROAD SMOOTH-FALLOFF CORRECTION (step 5). The tent became a smoothstep
+DOME with the same crest position, the same peak and the same footprint — only
+the manner of falloff changes. Zero derivative at the crest and at both ends,
+so there is no corner anywhere for a vertex to find. No subdivision, no
+sharpened seam, no added triangles.
+
+MEASURED AT THE MESH'S OWN VERTEX POSITIONS:
+
+                                   frozen tent   narrow seam   A2c dome
+    worst first-derivative jump       0.332         0.331       0.025
+    max sample-rate curvature         53.4          56.5        44.7
+    peak relief                       57.5          56.5        57.6
+
+13x smoother across the crest, 16% less curvature at the sample rate, and the
+mass is unchanged. Zero slope at the crest is also the anatomically right
+shape — this package's own rule is that a belly is a plateau with steep flanks,
+not a cone — so the quad reads fuller at identical volume.
+
+ALSO REVERTED: the A2 narrow insertion seam, helper and call. It RAISED
+sample-rate curvature (53.4 -> 56.5) while delivering nothing visible (0.03% of
+pixels by four luma), which makes it a per-vertex spike rather than an
+insertion. Its finding is kept here; the geometry is gone.
+
+KEEP GATE — ALL SIX PASS:
+    ridges disappear            yes (visual; derivative jump 0.332 -> 0.025)
+    quad belly more readable    yes (dome crown, fuller crest at equal mass)
+    insertion still visible     yes (the central seam is untouched)
+    fleshy, not mechanical      yes (C1 everywhere in the crown)
+    no puffiness                yes (peak +0.2%)
+    fused silhouette intact     yes (outer contour change 0.00000 units, exact)
+
+376/376 static contracts pass. Proof:
+validation/mrmah3d/R233-A2c/male__clay-iso__{05-lower-front,
+06-lower-threequarter,03-side,10-quad-front,11-quad-threequarter}.png,
+isolated clay, low tier, identical framing to R233-A-baseline.
+
+REMAINING, AND NOT A2c's BUSINESS: the faint rectangular soft patches mid-thigh
+are the `fg` flat-shaded facet groups — the crystal layer. Pass 2, not anatomy.
+
+NEXT: A3, the medial/adductor to knee transition. Same discipline — prove the
+built-mesh owner, measure the contour and the vertex spacing, one bounded
+change, neutral clay proof. Note before starting: the same corner test should
+be run on every remaining lower-body term, because `Math.max(0, ...)` and
+piecewise-linear falloff appear elsewhere in `lowerField` and in `thighShape`.
+
+ANTI-REGRESSION: never author a lower-body term with a first-derivative
+discontinuity — it is invisible until a vertex lands on it and then it is a
+wedge. Never raise lower-body resolution as a fix for a soft read; it sharpens
+creases before it adds form. Do not re-add a sub-Nyquist insertion seam.

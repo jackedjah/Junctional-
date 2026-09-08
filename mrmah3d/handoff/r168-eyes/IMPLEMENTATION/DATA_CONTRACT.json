@@ -1,0 +1,26 @@
+{
+  "eyeSystemVersion": 1,
+  "eyePresetId": "mah_original_signature",
+  "eyeParams": {
+    "width": 1.0,
+    "height": 1.0,
+    "openness": 1.0,
+    "spacing": 1.0,
+    "cant": 0.0,
+    "irisScale": 1.0,
+    "gazeX": 0.0,
+    "gazeY": 0.0,
+    "upperLid": 0.0,
+    "lowerLid": 0.0,
+    "blink": 0.0,
+    "detailIntensity": 1.0
+  },
+  "detailLayers": [],
+  "expressionDefaults": {
+    "blinkCadence": "normal",
+    "restingExpression": "neutral"
+  },
+  "migration": {
+    "legacyCircleEyes": "mah_original_signature"
+  }
+}

@@ -1,0 +1,33 @@
+CONTINUE — R168 CHARACTER CREATOR / EYE + FACE SYSTEM
+
+Continue autonomously from the newest legitimate implementation state.
+
+Read START_HERE.md and treat R168_MASTER_AUTONOMOUS_IMPLEMENTATION_PROMPT.txt as controlling.
+
+Do not restart broad character development.
+Do not touch anatomy/world systems unrelated to character creation.
+
+Continue the current implementation sequence:
+AUDIT OWNER
+→ DATA CONTRACT
+→ LIVE MALLEABLE EYE RENDERER
+→ SIGNATURE PRESETS
+→ WELCOMING PRESET CATALOG
+→ EYES CREATOR STEP
+→ MOBILE TUNING
+→ PERSISTENCE
+→ EXPRESSION PROOF
+→ ACCEPTANCE GATE.
+
+The canonical visual priority is:
+01_CANONICAL_EYE_SELECTION_WELCOMING_PIXEL.png
+then
+02_CANONICAL_SIGNATURE_FACES.png.
+
+Keep the black MAHBEING face-display field.
+Keep cyan/ice-blue as the canonical preview color.
+Do not let the catalog drift back toward uniformly sharp/aggressive/anime eyes.
+
+The eyes must remain genuinely malleable: width, openness/close, gaze, and expression changes must affect the real live preview.
+
+Continue implementation without stopping for tiny approvals. Only surface a checkpoint for a meaningful completed gate or a true blocking dependency.

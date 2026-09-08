@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "id": "friendly",
+      "label": "Friendly",
+      "presets": ["classic", "soft", "friendly", "calm", "happy", "kind", "warm", "serene", "playful", "wide", "dreamy", "curious"]
+    },
+    {
+      "id": "personality",
+      "label": "Personality",
+      "presets": ["focused", "determined", "alert", "confident", "tired", "smiley", "intense", "half_lid", "heavy_lid"]
+    },
+    {
+      "id": "shape",
+      "label": "Shape",
+      "presets": ["round", "almond", "angular", "upturn", "downturn", "narrow", "slit"]
+    },
+    {
+      "id": "special",
+      "label": "MAHWORLD",
+      "presets": ["mah_original_signature", "diamond", "star", "ring", "multi_ring", "spiral", "cross", "horizon", "vertical", "fracture", "glow", "custom"]
+    }
+  ]
+}

@@ -1,0 +1,463 @@
+MAHWORLD / MAHBEING
+R168 — CHARACTER CREATOR + EYE / SIGNATURE FACE SYSTEM
+AUTONOMOUS IMPLEMENTATION PASS
+
+======================================================================
+0. PRIMARY DIRECTIVE
+======================================================================
+
+Continue from the newest legitimate existing MAHWORLD / MAHBEING character-creation implementation.
+
+READ FIRST:
+- START_HERE.md
+- REFERENCE_MAP.md
+- IMPLEMENTATION/CHARACTER_CREATOR_FLOW.md
+- IMPLEMENTATION/EYE_FACE_RUNTIME_SPEC.md
+- IMPLEMENTATION/DATA_CONTRACT.json
+- ACCEPTANCE_CHECKLIST.md
+- every image in CURRENT_REFERENCES/
+
+Do NOT restart the character creator from scratch if a functioning owner already exists.
+Audit ownership first, then extend the canonical system.
+
+This pass is focused on the MAIN CHARACTER SELECTION / CREATION EXPERIENCE and the new EYE + SIGNATURE FACE identity layer.
+
+Do NOT spend this autonomous window on:
+- arm anatomy
+- body sculpt reconstruction
+- MAHWORLD architecture
+- combat
+- world expansion
+- hair implementation beyond preserving a compatible step/slot
+- unrelated UI redesigns
+
+======================================================================
+1. PRODUCT GOAL
+======================================================================
+
+Create a premium, highly readable MAHBEING character-creation flow in which the player can select and customize eyes that live naturally inside the canonical black face-display area.
+
+The eyes must no longer be limited to simple circles.
+
+The system must support:
+- normal/welcoming human-readable eyes
+- soft eyes
+- calm eyes
+- kind eyes
+- round eyes
+- almond eyes
+- wide eyes
+- narrow eyes
+- playful eyes
+- half-lid eyes
+- angular/focused eyes
+- stylized MAHWORLD signature eyes
+- special geometric/MAHGIC variants
+
+Do NOT make the entire catalog aggressive, slanted, anime-coded, or combat-coded.
+A large portion of the catalog must feel appropriate for ordinary friendly residents.
+
+Target visual language:
+PIXEL / LOW-POLY PRECISION
++
+MAHWORLD CRYSTAL / CYAN LIGHT
++
+BLACK FACE-DISPLAY NEGATIVE SPACE
++
+GAME-CHARACTER READABILITY
+-
+EXCESSIVE ANIME LINEWORK
+-
+GIANT GLOSSY DOLL IRIS LANGUAGE
+
+======================================================================
+2. CANONICAL REFERENCE PRIORITY
+======================================================================
+
+PRIMARY UI / CATALOG TARGET:
+CURRENT_REFERENCES/01_CANONICAL_EYE_SELECTION_WELCOMING_PIXEL.png
+
+PRIMARY SIGNATURE / EXPRESSION TARGET:
+CURRENT_REFERENCES/02_CANONICAL_SIGNATURE_FACES.png
+
+IMPLEMENTATION / MODULAR SYSTEM REFERENCE:
+CURRENT_REFERENCES/03_EYE_SYSTEM_IMPLEMENTATION_BOARD.png
+
+LESS-ANIME DIRECTION:
+CURRENT_REFERENCES/04_LESS_ANIME_UI_DIRECTION.png
+
+CANONICAL FACE / HEAD MATERIAL CONTEXT:
+CURRENT_REFERENCES/05_MRS_MAH_FACE_REFERENCE.jpeg
+CURRENT_REFERENCES/06_MR_MAH_FACE_REFERENCE_A.jpeg
+CURRENT_REFERENCES/07_MR_MAH_FACE_REFERENCE_B.jpeg
+
+If the images disagree, preserve these controlling rules:
+1. welcoming/general-use catalog over all-aggressive catalog
+2. pixel/faceted readability over smooth anime illustration
+3. black face display remains visually dominant
+4. cyan/ice-blue remains canonical preview color
+5. runtime malleability is required
+
+======================================================================
+3. CHARACTER CREATOR FLOW
+======================================================================
+
+Add / preserve a clear main creation flow approximately equivalent to:
+
+SELECT MAHBEING BASE
+→ BODY / PHYSIQUE
+→ HEAD / FACE FRAME
+→ EYES
+→ FACE DETAILS
+→ HAIR
+→ COLOR / THEME
+→ REVIEW / CONFIRM
+
+Use existing project terminology if canonical ownership already differs.
+Do not duplicate an existing step under a second owner.
+
+EYES must be an explicit selectable step, not hidden inside generic face details.
+
+The EYES screen must include:
+- live character preview
+- eye-style catalog/grid or performant equivalent
+- selected-state indication
+- name of selected style
+- left/right cycling controls where appropriate
+- advanced/customize entry
+- save/continue
+- back navigation that preserves state
+
+All selections must persist in the character appearance model.
+
+======================================================================
+4. EYE LIBRARY — BASE CATALOG
+======================================================================
+
+Ship an initial catalog of approximately 40 authored presets based on the reference sheet.
+
+The catalog should intentionally span four bands:
+
+A. FRIENDLY / EVERYDAY CORE
+Examples:
+Classic
+Soft
+Friendly
+Calm
+Happy
+Kind
+Warm
+Curious
+Serene
+Playful
+Wide
+Dreamy
+
+B. PERSONALITY / MOOD
+Examples:
+Focused
+Determined
+Alert
+Confident
+Tired
+Smiley
+Intense
+Half-Lid
+Heavy-Lid
+
+C. SHAPE-LED VARIANTS
+Examples:
+Round
+Almond
+Angular
+Upturn
+Downturn
+Narrow
+Slit
+
+D. MAHWORLD / SPECIAL
+Examples:
+Diamond
+Star
+Ring
+Multi-Ring
+Spiral
+Cross
+Horizon
+Vertical
+Fracture
+Glow
+Custom
+
+Names may be refined for canonical tone, but preserve broad visual diversity.
+
+Do NOT let special geometric eyes dominate the first screen.
+Default browsing should expose friendly/everyday eyes first.
+
+======================================================================
+5. EYES ARE MALLEABLE — NOT STATIC ONLY
+======================================================================
+
+The eye preset is a STARTING FORM.
+The runtime character appearance model must support independent parameters for at least:
+
+- eye width
+- eye height / openness
+- horizontal spacing
+- vertical placement
+- lid angle / cant
+- upper-lid position
+- lower-lid position
+- iris size
+- iris/pupil X offset
+- iris/pupil Y offset
+- gaze direction
+- blink amount
+- blink speed/default cadence metadata
+- expression openness multiplier
+- optional lash/detail intensity where relevant
+
+If the current renderer is 2D/SVG/canvas, implement these as transforms/paths/masks appropriate to the owner.
+If the current renderer is Three.js, implement via geometry, morph targets, shader uniforms, UV transforms, sprite transforms, or another maintainable runtime method.
+
+Do NOT fake malleability by storing sliders that do not affect the actual preview.
+Every exposed control must visibly change the live face.
+
+Required behaviors:
+- widen / narrow
+- open / close
+- half-lid
+- blink
+- wink if supported
+- look left/right/up/down
+- neutral reset
+
+======================================================================
+6. BLACK FACE DISPLAY IS CANONICAL
+======================================================================
+
+The black area seen behind the eye references represents the MAHBEING face-display region.
+Keep it.
+
+Do not add a conventional skin-tone face plane behind the eyes.
+Do not require a full white sclera for every style.
+
+The eye system should use the black field as intentional negative space.
+White/ice-blue eye pixels, cyan cores, and selective highlights should read strongly against it.
+
+The face must remain recognizable at:
+- full-body gameplay distance
+- character creator medium distance
+- face close-up
+
+======================================================================
+7. SIGNATURE FACES
+======================================================================
+
+Create / preserve signature defaults for the progenitor/original characters.
+
+MR. MAH SIGNATURE DEFAULT:
+- immediately recognizable
+- welcoming but focused
+- not angry by default
+- slightly more compact / intentional than the old circles
+- pixel/faceted cyan/ice-blue construction
+- black face-display field retained
+- capable of opening wider for surprise/excitement and narrowing for focus
+
+MRS. MAH SIGNATURE DEFAULT:
+- kind / confident / inviting
+- may use tasteful lash/detail treatment
+- not automatically hyper-feminine or doll/anime-coded
+- same underlying system as every MAHBEING
+- capable of full expression range
+
+Both defaults must be implemented as normal presets + parameter values inside the same system.
+Do NOT hard-code a separate face renderer exclusively for Mr. or Mrs. Mah.
+
+Also create a "MAH Original" / signature-family preset that evokes the original simple-circle heritage without literally reverting to two unchanged circles.
+It should feel like the EVOLUTION of the original face:
+- friendly
+- iconic
+- extremely readable
+- rounder/open geometry
+- subtle pixel/faceted edge character
+- restrained cyan core
+
+======================================================================
+8. EXPRESSIONS
+======================================================================
+
+The eye system must be animation/expression-ready.
+At minimum prove these states in preview:
+
+Neutral
+Happy
+Focused
+Calm
+Curious
+Determined
+Surprised
+Tired / relaxed
+Playful
+
+Expressions should primarily use:
+- eye openness
+- lid position
+- cant
+- iris/gaze position
+- optional detail layer
+
+Do not require swapping the entire eye asset for every expression unless the renderer truly demands it.
+Favor parameterized continuity.
+
+======================================================================
+9. UI / EXPERIENCE QUALITY
+======================================================================
+
+Match the current MAHWORLD premium visual language:
+- dark navy / black
+- cyan / ice-blue active states
+- precise thin luminous separators
+- controlled glow
+- strong spacing
+- readable labels
+- low visual clutter
+
+Avoid turning the creator into a giant poster.
+The reference sheets explain the system; the actual runtime UI should be simpler.
+
+Mobile first-class requirements:
+- large touch targets
+- no tiny 40-tile unreadable grid forced onto a phone
+- use carousel/category tabs/paged grid if necessary
+- live preview remains visible
+- selected option is unmistakable
+- no accidental horizontal page overflow
+
+Desktop/tablet may show denser grids.
+
+======================================================================
+10. DATA / PERSISTENCE CONTRACT
+======================================================================
+
+Store selected eye identity separately from adjustable parameters.
+
+Conceptually:
+
+eyePresetId
++
+eyeParams
++
+eyeDetailLayers
++
+expression defaults
+
+See IMPLEMENTATION/DATA_CONTRACT.json.
+
+Requirements:
+- backward-compatible default for existing characters using old circles
+- migrate old circle eyes to a canonical legacy/original preset automatically
+- no appearance loss on save/reload
+- creator back/forward navigation preserves edits
+- future eye presets can be added without schema redesign
+
+======================================================================
+11. PERFORMANCE / RUNTIME
+======================================================================
+
+Do not create 40 heavyweight independent renderers running simultaneously.
+Catalog thumbnails may use lightweight previews/sprites while the selected character uses the live runtime implementation.
+
+Avoid:
+- per-frame allocations for static selection UI
+- unnecessary texture swaps
+- duplicate animation loops
+- 40 live Three.js character heads
+- expensive postprocessing for tiny thumbnails
+
+The live face should remain cheap enough for MAHWORLD gameplay use.
+
+======================================================================
+12. AUTONOMOUS IMPLEMENTATION ORDER
+======================================================================
+
+PASS 1 — AUDIT
+Find the canonical character creator, appearance model, face renderer, save owner, and preview owner.
+
+PASS 2 — DATA
+Add the eye preset + parameter contract with backward-compatible migration.
+
+PASS 3 — RUNTIME EYE OWNER
+Implement one shared parameterized eye renderer capable of width/open/close/gaze/blink.
+
+PASS 4 — SIGNATURE PRESETS
+Implement Mr. Mah, Mrs. Mah, and MAH Original signature defaults.
+
+PASS 5 — CATALOG
+Add the broader welcoming 40-style preset set or equivalent initial catalog.
+
+PASS 6 — CHARACTER CREATOR UI
+Add EYES as a dedicated creation step and connect all controls to live state.
+
+PASS 7 — MOBILE
+Tune layout for iPhone-size screens and touch.
+
+PASS 8 — PERSISTENCE
+Save/reload/back/forward/new-character regression tests.
+
+PASS 9 — EXPRESSION PROOF
+Show meaningful live expression changes without rebuilding the face.
+
+PASS 10 — ACCEPTANCE
+Run the checklist and only then call the eye/face creator pass complete.
+
+======================================================================
+13. DO NOT STOP FOR MICRO-APPROVALS
+======================================================================
+
+Continue autonomously.
+Do not stop after auditing.
+Do not stop after producing mockups.
+Do not return a recommendation instead of implementation.
+
+IMPLEMENT
+→ PREVIEW
+→ TEST
+→ COMPARE TO REFERENCES
+→ FIX
+→ RE-TEST
+
+Surface a checkpoint only when:
+- a major implementation pass is complete
+- a blocking architectural conflict genuinely requires user input
+- acceptance testing is ready for review
+
+Do not spend the work window narrating tiny edits.
+
+======================================================================
+14. COMPLETION GATE
+======================================================================
+
+Do NOT call this system complete until:
+
+[ ] EYES exists as a real character-creation step
+[ ] friendly/everyday eye choices are prominent
+[ ] special/angular eyes still exist but do not dominate
+[ ] black face-display region is preserved
+[ ] selected eyes render live on the actual character preview
+[ ] width adjustment works
+[ ] height/openness adjustment works
+[ ] closing/blinking works
+[ ] gaze movement works
+[ ] spacing/placement adjustment works if exposed
+[ ] Mr. Mah signature preset exists
+[ ] Mrs. Mah signature preset exists
+[ ] MAH Original/signature-family preset exists
+[ ] expressions are parameterized and visibly distinct
+[ ] choices persist across save/reload
+[ ] old circle-eye characters migrate safely
+[ ] mobile UI is usable
+[ ] no unrelated systems were regressed
+
+Continue until these gates genuinely pass.

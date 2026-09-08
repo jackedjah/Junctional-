@@ -1,0 +1,96 @@
+[
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "03-side",
+    "file": "male__clay-iso__03-side.png",
+    "yawDeg": -90,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false,
+    "isolated": true
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "05-lower-front",
+    "file": "male__clay-iso__05-lower-front.png",
+    "yawDeg": 0,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "lower",
+    "spinning": false,
+    "isolated": true
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "06-lower-threequarter",
+    "file": "male__clay-iso__06-lower-threequarter.png",
+    "yawDeg": -40,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "lower",
+    "spinning": false,
+    "isolated": true
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "10-quad-front",
+    "file": "male__clay-iso__10-quad-front.png",
+    "yawDeg": 0,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "quad",
+    "spinning": false,
+    "isolated": true
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "11-quad-threequarter",
+    "file": "male__clay-iso__11-quad-threequarter.png",
+    "yawDeg": -34,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "quad",
+    "spinning": false,
+    "isolated": true
+  },
+  {
+    "who": "male",
+    "info": {
+      "version": "0.1.0-phase1",
+      "tier": "low",
+      "pixelRatio": 1,
+      "width": 872,
+      "height": 998,
+      "fov": 32,
+      "camAspect": 0.874,
+      "reducedMotion": false,
+      "placeholder": false,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 130,
+        "fps": 20,
+        "avgMs": 0.93,
+        "tierDrops": 0
+      },
+      "drawCalls": 5,
+      "triangles": 124169,
+      "geometries": 83,
+      "textures": 18
+    },
+    "errors": []
+  }
+]
