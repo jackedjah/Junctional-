@@ -1845,11 +1845,43 @@ export function buildCity(ctx) {
      and a surface means less of the environment survives the trip. Fog then does the rest, and it does
      a great deal — a 600 m shaft at 265 m radius has its foot 265 m away and its top 655 m away, which
      across a 55→880 m fog is the difference between one quarter and three quarters obscured. */
+  /* ---- THE LADDER WENT THE WRONG WAY, AND IT WAS MEASURED GOING THE WRONG WAY ------------------
+     The argument above is careful and it is half right. What it never checked is the thing §12
+     twelve hundred lines up already discovered about the TOWERS, and then fixed only for them:
+
+         "A metal takes no diffuse light, so beyond the reach of the plaza's own lamps those towers
+          were lit by whatever the night environment returned — and that is LESS than the sky behind
+          them... The skyline became a row of flat near-black cut-outs pasted on a lighter sky."
+
+     That is exactly what the shafts still do. A framebuffer probe of `dome-vastness` (scratchpad
+     darkbars.cjs — read the canvas, find the columns under the frame's own median, raycast the
+     middle of each dark run) names the three darkest verticals in the frame as city-shaft-band-1, 2
+     and 3 at 521, 528 and 783 m, at luminance 59 against a frame median of 75. Not black, which is
+     worth saying plainly because the eye reads them as black and the eye is wrong by a factor of
+     three — but 0.79 of the sky they stand in front of, hard-edged, and full height. That is the
+     cut-out, and it is why the dome reads as a cage rather than a shell.
+
+     THE TWO ARGUMENTS CONFLICT AND ONLY ONE OF THEM IS ABOUT THE SHAFT. Altitude says the top of a
+     shaft sits against a darker zenith, so it should be darker. Distance says the top of a shaft is
+     also its FARTHEST point — this file's own note two paragraphs up puts a 600 m shaft's foot at
+     265 m and its top at 655 m — so it should take more hemisphere and more fog, like the far
+     towers and like terrain.js's ranges. Both are real; the file resolved them one way for towers
+     (glassFar / glassDeep: metalness falls, colour climbs) and the opposite way for shafts, which
+     is precisely the kind of split L42 exists to prevent.
+
+     So the shafts join the ladder the towers are already on. METALNESS is what actually moves:
+     0.85 at the foot, where a shaft is near and should still read as a metal, down to 0.30 at the
+     top, where it should behave like a distant mountain and let the hemisphere and the fog reach
+     it. The colour climbs only gently toward the horizon key — enough that the upper bands stop
+     sitting under the sky, not so far that they pop out of it, because the zenith argument above is
+     still true and a shaft top that out-values the sky would be the inverse defect. Law 4 is
+     unbroken: nothing here is lightened to fake depth. It is lightened because less metal and more
+     atmosphere between the eye and a surface is what the surface actually looks like. */
   const shaftBand = [
-    new THREE.MeshStandardMaterial({ color: 0x2a3750, roughness: 0.50, metalness: 0.88, envMapIntensity: 1.55 }),
-    new THREE.MeshStandardMaterial({ color: 0x243149, roughness: 0.46, metalness: 0.88, envMapIntensity: 1.35 }),
-    new THREE.MeshStandardMaterial({ color: 0x1e2a41, roughness: 0.44, metalness: 0.88, envMapIntensity: 1.12 }),
-    new THREE.MeshStandardMaterial({ color: 0x18233a, roughness: 0.42, metalness: 0.88, envMapIntensity: 0.90 })
+    new THREE.MeshStandardMaterial({ color: 0x2a3750, roughness: 0.50, metalness: 0.85, envMapIntensity: 1.55 }),
+    new THREE.MeshStandardMaterial({ color: 0x30405c, roughness: 0.47, metalness: 0.66, envMapIntensity: 1.32 }),
+    new THREE.MeshStandardMaterial({ color: 0x394a69, roughness: 0.46, metalness: 0.46, envMapIntensity: 1.14 }),
+    new THREE.MeshStandardMaterial({ color: 0x445676, roughness: 0.46, metalness: 0.30, envMapIntensity: 1.00 })
   ];
   shaftBand.forEach((m, i) => { m.name = 'city-shaft-band-' + i; owned.materials.push(m); });
   /* THE RING DECK, shared by the block saucers and the shaft collars: a lens, not a plate. Three lathe

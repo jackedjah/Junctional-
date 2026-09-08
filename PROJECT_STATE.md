@@ -1,10 +1,9 @@
 # MAHWORLD WORLD 01 — CURRENT STATE
 
 ACTIVE PRIORITY:
-P2 VALUE — the black shafts. Spacing has now had a measured pass and the next spaciousness gain is
-smaller than the value gain: roughly ten pure-black vertical bars slice the sky in `dome-vastness`
-and `high-overview`, and a world read through a picket fence cannot read as an open shell no matter
-how much air is opened behind it.
+P3 MONUMENT MATERIAL — the two figures still read as dark low-poly mannequins rather than polished
+platinum. SPACE and VALUE have each had a measured pass; the monument's finish is now the largest
+unaddressed item in the direction and the one that does not depend on anything upstream.
 
 CURRENT BEST CHECKPOINT:
 branch `claude-mahworld-phase0-control-deck`, HEAD of the SPATIAL COMPOSITION RECOVERY pass.
@@ -70,6 +69,26 @@ of spacing. Altitudes and radii untouched — they were settled against the skyl
 
 NOTHING WAS ADDED BACK.
 
+## THIS PASS — P2 VALUE, THE SHAFTS THAT READ AS CUT-OUTS
+
+`scratchpad/darkbars.cjs` reads the FRAMEBUFFER (not a screenshot), finds the columns whose mean
+luminance sits under the frame's own median, and raycasts the middle of each dark run. It named the
+three darkest verticals in `dome-vastness` as `city-shaft-band-1/2/3` at 521, 528 and 783 m,
+luminance **59 against a frame median of 75**.
+
+They are NOT black — the eye reads them as black and is wrong by a factor of three, which is exactly
+why this needed a framebuffer read rather than a look. What they are is 0.79 of the sky they stand
+in front of, hard-edged and full height: the cut-out defect city.js's own §12 note describes, which
+was fixed for the TOWERS (glassFar / glassDeep: metalness falls with range, colour climbs toward the
+horizon key) and never applied to the SHAFTS. The shaft ladder ran the other way — metalness a flat
+0.88 through all four bands, colour DARKENING with altitude — on a sound argument about the night
+zenith that simply missed that a shaft's higher segments are also its farther ones (this file puts a
+600 m shaft's foot at 265 m and its top at 655 m). Two ladders for one law is the L42 failure.
+
+Fixed: metalness 0.85 → 0.30 across the four bands, colour climbing gently toward the horizon key.
+Result: object dark bars 54 → 28 columns of 1280 (−48 %); bands 2 and 3 left the dark list entirely.
+Nothing over-lightened; no form pops out of the sky.
+
 ## SIGHTLINES THAT IMPROVED
 
 - `plaza-hero` — the pole that crossed the left of frame is gone; stars and open sky read to the
@@ -80,11 +99,8 @@ NOTHING WAS ADDED BACK.
 
 ## CURRENT DEFECTS (ranked by measured frame cost)
 
-1. **P2 VALUE — the black shafts.** `city-shaft-band-0/1/2` plus `city-towers-A-graphite` = 6.3 % of
-   `dome-vastness`, rendered as pure black bars floor-to-frame-top. This is LAW 1 arithmetic: a
-   metal shaft under a near-black zenith returns near-black. It destroys depth separation (every bar
-   is the same value at every distance), it cages the dome, and it is the reason the world still
-   reads compressed after the air was opened. THIS IS THE NEXT ACTION.
+1. ~~P2 VALUE — the shafts.~~ **DONE this pass.** See below; band 1 at 520 m is the one that
+   remains, at 0.80 of sky value. Worth a second look only if a later frame still shows it.
 2. §23 COLOUR — the city still carries WARM window light (city.js WARM table, NEUTRALS.interior
    0xffeccd, spillWarmM), which the master file names as a strict exclusion. Visible directly on
    MAH MATCH's facade in `match-anchor`. Unresolved conflict, and it is now a rendered fact rather
@@ -117,11 +133,18 @@ NOTHING WAS ADDED BACK.
 
 ## NEXT ACTION
 
-P2 VALUE. Open `city.js`, find the material behind `city-shaft-band-0/1/2` and
-`city-towers-A-graphite`, and give the megatall shafts a value that RISES WITH DISTANCE — the same
-aerial-perspective ladder `glassFar`/`glassDeep` and fobstations' RECEDE table already encode, which
-these bands evidently never joined. Judge on `dome-vastness` and `high-overview` only. Do not touch
-the monument, the floor or the clouds in the same pass.
+P3 MONUMENT MATERIAL, and ONLY the material. The direction: "the two central figures must stop
+reading as dark low-poly mannequins — move them toward polished platinum, liquid silver, deep
+graphite reflections, broad bright silver highlight bands, controlled roughness. Preserve their
+canonical geometry. Bright enough to read against the city but not glowing like emissive objects."
+
+`monument.js` currently clones only `/-body$/` materials through `statueGradeOf()` and moves
+roughness / metalness / envMapIntensity across from `M.platinumLit`, leaving colour as white ×
+vertex colours. Start by MEASURING what the figures actually render at — `darkbars.cjs`'s framebuffer
+read against the `monument-close` and `monument-34` cameras, compared with the plinth's own platinum
+nosings in the same frame, which are the reference value the figures should be near. Judge on
+`monument-close` + `monument-34`. Do not touch scale (see the negative result below), the floor, or
+the city in the same pass.
 
 ## NEGATIVE RESULTS (do not re-test)
 
@@ -143,6 +166,18 @@ the monument, the floor or the clouds in the same pass.
 - **A landmark with no diagnostic camera cannot be corrected.** Three suite views rendered with
   byte-identical triangle counts across a full rebuild of MAH MATCH's tower, because the tallest
   thing in the district was not visible from any camera in the suite.
+- **A "before" needs the same CLOCK, not just the same camera.** `views.cjs` advanced world time
+  0.4 s per view, so a frame shot sixth in a batch saw a different sky from the same frame shot
+  first — and a before/after pair taken that way appeared to swing the whole image toward violet,
+  which no material edit in that pass could have caused. The runner now re-stamps the time before
+  every screenshot. A shared camera table is necessary and was never sufficient.
+- **Read the framebuffer, not a screenshot, and render synchronously first.** The renderer runs
+  without `preserveDrawingBuffer`, so a `drawImage` from the canvas after a yield returns a sheet of
+  zeros. The first run of `darkbars.cjs` duly reported median luminance 0, no dark bars, no defect —
+  believable-looking output from a broken read. It was only caught because zero is impossible.
+- **The eye over-reads hard edges.** The shafts that looked pure black measured 59 against a sky
+  median of 75 — 0.79, not 0.0. They read as black because they were the only hard-edged dark
+  verticals in a soft frame. Fix the contrast that is actually there, not the one that is perceived.
 - **Rank the frame before you cut it.** Coverage is not intuition: the objects that felt biggest in
   `plaza-hero` (the monument, the statues) were 5.3 %, and the objects that felt incidental (three
   music masts) were 3.9 % — with one of them five metres from the lens.
