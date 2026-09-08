@@ -43,11 +43,11 @@ CURRENT VISUAL STATUS — R231: Nine clean installed CURRENT_STATE renders saved
 
 ---
 
-R232 RECONSTRUCTION + KNEE SILHOUETTE (this repository)
+R232 RECONSTRUCTION + KNEE SLOPE (this repository)
 
 ACCEPTED BASE: R223-knee-recovery-3dd94ff46ba8, reconstructed into the one
 renderer at mrmah3d/core/character/. All 21 retained sources installed; the
-shared files are his (they are the later base — proportions.js is hers plus 248
+shared files are his (they are the later base - proportions.js is hers plus 248
 appended lines with no edits) with Mrs. Mah's variant-gated work re-applied on
 top. Mounted as createMrMah({authoringMaster:true}); the scene entry threads
 that flag so hosts get his accepted sculpt, not the stock pipeline. Builds
@@ -57,60 +57,73 @@ each, captured through mrmah3d/review/.
 
 VERIFIED AGAINST EVIDENCE: the clay front and lower-front match
 reference/handoff/CURRENT_STATE_01 and _05 in every respect that identifies the
-character — cranial crown, diamond head and face plate, pec shelves with the
+character - cranial crown, diamond head and face plate, pec shelves with the
 sternum valley, three abdominal pairs, obliques, deltoid head separation,
 biceps / triceps / brachialis / forearm masses, one fused teardrop to one point,
 belt pinch, quad bloom, medial seam. His pose differs (the retained evidence was
 captured with both arms lowered; the canonical rest presents the crystal), which
 is presentation, not sculpt.
 
-ACTIVE REGION: the knee within the fused teardrop. RESOLVED THIS PASS — see
-below. The medial return is next.
+THE OWNER OF HIS LOWER-BODY OUTLINE, ESTABLISHED BY MEASUREMENT. This is what
+the R226-R231 plateau needed. `maleTorsoSections` (myofascial.js) rebuilds every
+male ring as `{w: .2, d: .2, shape: undefined}` - a uniform cylinder - and
+discards the ring table's shape functions entirely. His whole silhouette is then
+produced by `torsoSurface` out of three tables in MRMAH_MORPHOLOGY: LOWER_WIDTH,
+LOWER_FRONT and LOWER_BACK, through `lowerField`. The ring table below y 1.45 in
+proportions.js is read by the female variant and, in part, by Mrs. Mah; for HIM
+it is documentation.
 
-CURRENT DEFECT, RE-DIAGNOSED BY MEASUREMENT: the lower body had NO KNEE IN ITS
-SILHOUETTE. Measured off the built outline with tools/mrmah3d-profile.mjs, and
-confirmed analytically against the ring table, the half-width ran strictly
-monotonically from the point to the hip: 0.189, 0.208, 0.219, 0.252, 0.291,
-0.333, 0.364. The y 0.870 row was AUTHORED as an 8.7% pinch (w 0.190 under the
-0.208 below it) and came out 5.2% WIDER. The cause is the rule this package
-already carries and had not applied here: a ring's `w` is not its silhouette.
-`thighShape`'s vastus-lateralis sweep, `domePair(a, 1.42, 0.55)`, peaks
-essentially AT the side angle, so a 0.16 sweep multiplied that ring by 1.152
-while the ring below it — `lowerLegShape`, which has no term reaching the side —
-multiplied by exactly 1.000. The pinch was not weakened; its sign was reversed.
+A pass was spent on that table before this was checked, and the error is
+recorded because the loop is supposed to catch it and did. The ring arithmetic
+was right about the table - the y 0.870 row is authored as an 8.7% pinch and
+evaluates 5.2% WIDER, because thighShape's vastus-lateralis sweep peaks at the
+side angle while the row below it has no lateral term - and it changed nothing
+in the character. Two captures at identical framing came back BIT-IDENTICAL and
+the built envelope did not move by a ten-thousandth. The trial was reverted; the
+diagnosis is now a comment on those rows so the next pass does not repeat it.
 
-WHY THE R226-R230 TRIALS PLATEAUED: every one of them was a local surface
-deformation — a bounded belly, a four-plane return fan, a shared-coordinate
-compression, a taper-owner plane study — applied to an outline that is a plain
-cone from the hip to the point. No recess cut into a cone makes a knee. This is
-the "change the LOCAL method/owner" the handoff asks for: the owner of a
-silhouette event is the ring table, not a surface sculpt on top of it.
+WHY R226-R230 PLATEAUED: measured off the built mesh, all three lower profiles
+ran strictly monotonically from the point to the hip - 0.145, 0.177, 0.208,
+0.247, 0.283, 0.306, 0.318 in width, and the same in depth. A plain convex cone
+with no knee and no calf in it. Every one of those trials was a local surface
+deformation laid on that cone. No recess cut into a cone makes a knee.
 
-CHANGE MADE: two numbers, both the vastus lateralis fading into its insertion as
-the anatomy requires. y 0.950 vl 0.22 -> 0.12, y 0.870 vl 0.16 -> 0.03. Every
-`w`, `d`, class table, cavity, facet group, zone and recess channel on those
-rows is untouched, so the recovered R223 knee carving is intact and no
-insertion valley is filled.
+CHANGE MADE: the knee as a change of SLOPE in LOWER_WIDTH / LOWER_FRONT /
+LOWER_BACK, which is the smallest correct owner. Not a bulb: the R106 plate's
+literal knee-and-calf is the shape R109 tested and the director rejected as "a
+thigh bulb over a calf bulb", and its verdict - ONE convergence with a swell on
+it - is respected. The run stays monotonic; the slope carries the landmark.
 
-RESULT, MEASURED ON THE OUTLINE (hip downward): 0.291, 0.234, 0.195, 0.208,
-0.189. A knee at 0.195 — within 2% of the R106 godform plate's 0.192 — with the
-calf standing 6.6% proud of it against the plate's 5.5%. One convergence with a
-swell on it, which is what R109 judged worth more than two matched widths, and
-not the thigh-bulb-over-calf-bulb it rejected. 376/376 static contracts pass.
+RESULT, MEASURED ON THE BUILT MESH (widest |x| within +-0.02, before -> after):
 
-MASTERED / LOCKED, UNCHANGED THIS PASS: head/face/crown, arms/hands, torso,
-upper-thigh envelope and hip apex (0.364 at y 1.230), posterior structure,
-material sources, fused tip.
+    y 0.66   0.1453 -> 0.1507    the calf's excess over the straight line
+    y 0.77   0.1767 -> 0.1751
+    y 0.87   0.2076 -> 0.1971    the knee, 5.1% narrower
+    y 0.97   0.2474 -> 0.2414
+    y 1.06   0.2830 -> 0.2824
+    y 1.13   0.3057 -> 0.3059    quad apex, unchanged
+    y 1.22   0.3180 -> 0.3180    hip, unchanged
 
-NEXT ACTION: the medial return, measured the same way. The seam channel
-(`thighShape`'s `dome(a, 0, 0.30) * seam`) runs 0.34, 0.34, 0.22 down the thigh
-and then STOPS DEAD at y 0.870 — the rows below use `lowerLegShape`, which has
-no seam term at all. That discontinuity, not a local bump, is the "abrupt
-medial/crown handoff" the state file has been describing. Verify it on the
-lower-front clay before editing, and fade the channel across the grammar change
-rather than adding a return.
+Contour slope through the knee band fell from 0.285/0.309 to 0.222/0.220 while
+the quad's descent rose from 0.398 to 0.443: the break at the knee went from
+1.35x to 2.0x. Depth at the knee fell 9.5% (0.1625 -> 0.1471), which is the step
+R102 measured on the reference (0.092 against a 0.101 calf) and is where the
+knee reads before it reads in width. 376/376 static contracts pass.
 
-ANTI-REGRESSION: never restore the vl sweep on the two knee rows without
-re-authoring their `w` — the sweep is what cancelled the pinch. Never judge a
-lower-body correction from the ring table; measure the outline. Do not fill the
-knee recesses to soften the new concavity.
+MASTERED / LOCKED, UNCHANGED THIS PASS: head/face/crown, arms/hands, torso, quad
+apex and hip (0.318 at y 1.22, exact), belt, posterior structure, material
+sources, fused tip, and every knee recess and insertion valley - the change is
+in three width/depth profiles and touches no channel, cavity or class table.
+
+NEXT ACTION: judge the new break on the lower-front and lower-3/4 clay at
+identical framing (validation/mrmah3d/R232-knee/before vs after, tier low and
+isolated so no bloom halo thickens the outline). If it reads, the same
+measurement applies to the medial return: `lowerField`'s `rail` profile
+[[.56,.028],[.80,.103],[1.10,.237],[1.29,.228],[1.46,.154]] is the front seam's
+owner and it, too, runs smoothly through the knee band.
+
+ANTI-REGRESSION: never judge a lower-body correction from the ring table - for
+him it is not connected to the mesh. Measure the built envelope
+(tools/mrmah3d-profile.mjs, or a windowed envelope over the built torso) before
+and after. Do not restore a literal plate knee-and-calf: R109 tested it and the
+director rejected it.
