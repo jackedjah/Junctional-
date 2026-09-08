@@ -423,8 +423,19 @@ export function buildTerrain(ctx) {
        third takes the last third of the ring up to the horizon key so the ground ARRIVES at the sky
        instead of stopping against it. The knee sits at 0.62 because that is where the rear ranges
        stand — the lift has to happen behind them, not in front. */
+    /* R170 D5 — THE NEAR STOP IS THE CITY'S FLOOR, NOT A STONE COLOUR OF ITS OWN.
+       "Extend that to the entire map until the border is hit." This ring starts at 600 m and
+       city.js's ground ring ends at 620, so those twenty metres are where the built floor hands over
+       to the land — and they were handing over from a blue-grey disc to a different blue-grey. Now
+       that the city ring is black platinum, this one starts from the same near-black and the join
+       has nothing to show. The MID stop comes down with it so the black field carries most of the
+       way out instead of lifting almost immediately.
+       THE THIRD STOP AND THE KNEE ARE UNTOUCHED, deliberately. They are the fix for a real defect
+       recorded above — two stops ran dark ground straight into the sky and left a hard rim — and the
+       knee sits at 0.62 because that is where the rear ranges stand, so the lift has to happen
+       behind them. Extending the black floor is not a licence to take the horizon with it. */
     const col = new Float32Array(n * 3), c = new THREE.Color();
-    const near = new THREE.Color(0x131b2b), mid = new THREE.Color(0x222c44), far = new THREE.Color(LAND_HORIZON);
+    const near = new THREE.Color(0x0b1018), mid = new THREE.Color(0x18213a), far = new THREE.Color(LAND_HORIZON);
     for (let i = 0; i < n; i++) {
       const r = Math.hypot(pos.getX(i), pos.getY(i));
       const t = Math.min(1, (r - LAND_INNER) / (LAND_OUTER - LAND_INNER));

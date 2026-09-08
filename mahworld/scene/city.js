@@ -910,7 +910,55 @@ export function buildCity(ctx) {
   const farGhostM = new THREE.MeshBasicMaterial({ color: 0x0d1626, fog: true, transparent: true, opacity: 0.30, depthWrite: false }); farGhostM.name = 'city-distant-ghost';
   farMats.forEach((m, i) => { m.name = 'city-distant-' + i; owned.materials.push(m); });
   owned.materials.push(farGhostM);
-  const groundMat = new THREE.MeshBasicMaterial({ color: 0x141d2c, fog: true }); groundMat.name = 'city-ground';
+  /* ---- R170 D5: ONE FLOOR, FROM THE PLAZA TO THE MOUNTAINS ------------------------------------
+     "Start adding some uniformity across the floor, across the entire grounded map. We have the
+     black platinum floor on the main city area, but extend that to the entire map."
+
+     THE GROUNDED MAP IS THREE SURFACES AND THEY WERE THREE DIFFERENT MATERIALS:
+       ground.js    a 260 x 260 m plane of M.plaza — black platinum, roughness 0.055, metalness 0.98,
+                    the diamond lattice in its roughness and bump maps, and mahplaza's mirror patch
+                    on top. This is the floor the direction is pointing AT.
+       this file    a ring from 126 m to 620 m, and it was a flat unlit MeshBasicMaterial at
+                    0x141d2c. No lattice, no metal, no response to anything — a painted blue-grey
+                    disc, and from any camera above the deck it is most of the ground in frame.
+                    This is the one that broke the uniformity.
+       terrain.js   600 m to 2600 m, painted with a radial gradient that lifts into the horizon key.
+
+     THIS RING JOINS THE FAMILY. Not by copying M.plaza — by taking the SATIN grade, which is the
+     vocabulary ground.js already uses for its own outer field: same near-black colour family, same
+     metalness, roughness 0.30 instead of 0.055. A plaza deck is polished and the ground around a
+     city is not, and saying that with the two grades the floor system already owns is what makes
+     the transition read as one material finished two ways rather than as two materials meeting.
+     The diamond maps come from M.plaza itself and are repeat-scaled by the SAME rule ground.js uses
+     — one painted diamond per 9 m cell — so the lattice runs straight off the deck and out to the
+     treeline without a seam or a change of scale.
+
+     WHAT IT DELIBERATELY DOES NOT TAKE IS THE MIRROR. mahplaza's planar pass is sized and aimed for
+     the plaza; projecting it across a 620 m ring would sample outside its own coverage, and a
+     reflective field at that radius is exactly the "mirror duplicates the city" failure v10 was
+     written against. The material identity extends; the planar reflection stays where it belongs. */
+  const groundMat = new THREE.MeshStandardMaterial({
+    color: 0x0a0e16, roughness: 0.30, metalness: 0.96, envMapIntensity: 2.2, fog: true
+  });
+  groundMat.name = 'city-ground';
+  if (M.plaza && M.plaza.roughnessMap) {
+    /* the maps are SHARED with M.plaza and must not be re-repeated here: ground.js already set
+       their repeat for its own 260 m plane, and a texture's repeat is a property of the texture,
+       not of the material using it. Cloning is what lets this ring carry the same lattice at its
+       own scale without silently re-tiling the plaza's floor underneath it. */
+    const rm = M.plaza.roughnessMap.clone(); rm.needsUpdate = true;
+    const rep = (620 * 2) / (4 * 9.0);          /* ground.js's rule: one painted diamond per 9 m cell */
+    rm.repeat.set(rep, rep);
+    groundMat.roughnessMap = rm;
+    owned.textures.push(rm);
+    /* THE ROUGHNESS MAP EARNS ITS PLACE HERE AND THE BUMP MAP DOES NOT, and the difference is
+       geometry rather than taste. The lattice reads at this radius because roughness changes what
+       the surface RETURNS, which survives any distance. The bump is 1 cm of relief on a 9 m cell,
+       and the nearest part of this ring is 126 m from the plaza — that relief is far below a pixel
+       everywhere it is ever seen. Carrying it would cost a derivative pair per fragment across the
+       largest single surface in the world to render something that cannot be resolved. So the plaza
+       keeps its bump, where a walker stands two metres from the stone, and the field does not. */
+  }
   owned.materials.push(winMat, stripMat, whiteMat, groundMat, spillWarmM, spillCoolM, accentWashM);
 
   /* static geometry buckets, merged per material at the end */
