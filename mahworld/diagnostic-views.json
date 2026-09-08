@@ -1,0 +1,79 @@
+{
+  "_": [
+    "MAHWORLD WORLD 01 — THE FIXED DIAGNOSTIC CAMERA SUITE (WORLD01_MASTER.md sections 13 and 27).",
+    "",
+    "This is data, not a script, because the master file names the camera suite as its own ownership",
+    "boundary and because every evidence run in this project has so far carried its own private copy",
+    "of the cameras. Two tables describing one view is how evidence stops being comparable between",
+    "passes: a 'sightline' rendered last week from a slightly different position is not a before.",
+    "One file, read by whatever harness is running.",
+    "",
+    "EVERY POSITION IS DERIVED FROM A REAL WORLD COORDINATE, not eyeballed. The sites are",
+    "buildings.js SITES — gym (-58,-10), market (62,-34), match (0,-74) — the ascent pads are",
+    "fobeam.js ASCENTS (-30,-22), (32,-18), (-13,-37), the monument is monument.js SITE (0,-6.5),",
+    "and MAH NEXUS stands at bearing 126 / radius 1750, world (-1028.6,-1415.8). If a site moves,",
+    "the camera aimed at it should move with it and this file should be corrected, not re-guessed.",
+    "",
+    "Render ONLY the views needed to judge the active correction (master section 13)."
+  ],
+
+  "plaza-hero": {
+    "why": "1. MAIN PLAZA HERO — the arrival frame: central monument plus the three facilities.",
+    "pos": [0, 3.2, 46], "look": [0, 7.5, -6.5], "fov": 58
+  },
+
+  "building-away": {
+    "why": "2. BUILDING-AWAY — stand beside MAH MARKET (62,-34) and look AWAY from its facade, out past the plaza's east flank. This is the master file's core spaciousness test: the eye must find world depth, not another wall.",
+    "pos": [78, 4.0, -22], "look": [420, 60, 180], "fov": 62
+  },
+
+  "long-sightline": {
+    "why": "3. LONG SIGHTLINE — standing ON the deck looking deep into the world. Telephoto on purpose: a wide lens flattens midground and background into the same patch.",
+    "pos": [0, 6.0, 40], "look": [0, 26, -760], "fov": 40
+  },
+
+  "monument-close": {
+    "why": "4. MONUMENT CLOSE — proves Mr. Mah / Mrs. Mah anatomy and material. Raised to the figures' own height rather than shot from the deck, so the read is the sculpture and not the plinth.",
+    "pos": [0, 15, 26], "look": [0, 19, -6.5], "fov": 40
+  },
+
+  "monument-34": {
+    "why": "5. MONUMENT 3/4 — silhouette and premium metal response from three-quarters, where a statue either has a back and a side or does not.",
+    "pos": [23, 17, 19], "look": [0, 18, -6.5], "fov": 38
+  },
+
+  "backside": {
+    "why": "6. BACKSIDE / OPPOSITE DISTRICT — behind MAH MATCH looking back over the plaza. Proves the world is 360 degrees and not a stage set.",
+    "pos": [0, 9, -132], "look": [0, 12, 60], "fov": 62
+  },
+
+  "high-overview": {
+    "why": "7. HIGH OVERVIEW — density, spacing and district organisation in one frame: the deck, city.js's 126-620 m ring and terrain.js's land beyond.",
+    "pos": [40, 780, 1010], "look": [0, 80, -260], "fov": 58
+  },
+
+  "dome-vastness": {
+    "why": "8. DOME VASTNESS — low, with deck-scale reference in the foreground, looking up and out across the enclosed volume. The dome must read as a containing world shell, not a ceiling over the city.",
+    "pos": [0, 2.0, 62], "look": [-260, 620, -900], "fov": 72
+  },
+
+  "void-bridge": {
+    "why": "9. VOID / BRIDGE — an elevated route crossing open span with the world below and beyond it.",
+    "pos": [-70, 190, 130], "look": [60, 150, -320], "fov": 55
+  },
+
+  "distant-district": {
+    "why": "10. DISTANT DISTRICT — MAH NEXUS on bearing 126 at 1750 m, seen from the deck. Enough space between here and there to communicate real travel.",
+    "pos": [0, 6, 40], "look": [-1028.6, 320, -1415.8], "fov": 45
+  },
+
+  "floor-text": {
+    "why": "11. FLOOR-TEXT LEGIBILITY — shallow angle at walking height over the plaza wordmark, which is the angle that exposes text buried under an overlay or fighting the deck for depth.",
+    "pos": [0, 1.6, 19], "look": [0, 0.15, -3], "fov": 55
+  },
+
+  "color-contrast": {
+    "why": "12. COLOR / CONTRAST HERO — the neutral silver/graphite/black foundation with its purple, sky-blue and clean-red accents, and the frame to check for yellow/orange/amber contamination.",
+    "pos": [-26, 5.5, 30], "look": [40, 14, -60], "fov": 60
+  }
+}

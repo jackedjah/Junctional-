@@ -206,7 +206,22 @@ const FR = { base: 1.9, course: 0.72, courseD: 0.32, pier: 0.8, pierD: 0.34, sil
          the arrival frame's edges, and they were crowding it in front of MAH GYM, MAH MARKET and
          MAH FORGE — real destinations with real signage that the eye could not get to.
 
-   TEN REMAIN AND NOT ONE DESTINATION WAS TOUCHED. Every block the world can actually send a player
+   P0 TOOK TWO MORE, AND THEY WERE THE TWO THAT CLOSED THE PRIMARY VIEW.
+   C1 (-26,-186) and C3 (44,-190) stood immediately BEHIND MAH MATCH at the far end of the plaza's
+   forward axis, and the LONG-SIGHTLINE diagnostic showed what that cost: from the deck the midground
+   ran as one unbroken wall from the left edge of frame to the right, with the two colossal MAHBEING
+   figures and MAH MATCH in the middle and generic lit-window massing filling every degree either
+   side of them. The eye stopped at 114 m. WORLD01_MASTER section 2 asks the opposite of exactly this
+   — "the eye should be able to travel through the scene", "do not fill every gap" — and its density
+   rule wants ONE dominant destination, a few supporting forms, and open visual breathing room.
+   Removing them is the whole correction. MAH MATCH keeps the centre as the single destination, and
+   what appears either side of it is not emptiness: the treeline at 300-605 m, the ranges behind it,
+   and the towers and shafts at 300-780 m were always there and were being hidden by two boxes at
+   190 m. This is the master file's own instruction to make the world bigger BY USING SPACE, and it
+   is a removal rather than an addition.
+   Neither carried a pad, an elevator or any destination the world can send a player to.
+
+   EIGHT REMAIN AND NOT ONE DESTINATION WAS TOUCHED. Every block the world can actually send a player
    to is still standing — L3 (training pad + elevator), R2 (training), R3 (levitate) — and so is
    every block the DECK table rings a terrace around. Two things did leave with the five, and are
    named here rather than discovered later: R4's training pad, of which two others remain, and C2's
@@ -219,8 +234,6 @@ const BLOCKS = [
   { id: 'L2', x: -150, z: -96,  w: 30, d: 24, h: 62, sb: 0.30, side: 1 },
   { id: 'L3', x: -62,  z: -150, w: 26, d: 22, h: 56, sb: 0.28, side: 0, pad: 'training', elevator: true },
   { id: 'L4', x: -112, z: -148, w: 18, d: 16, h: 46, sb: 0,    side: 1, pad: 'levitate', rot: 0 },
-  { id: 'C1', x: -26,  z: -186, w: 30, d: 24, h: 54, sb: 0.30, side: 0 },   /* off the centre sightline: the portrait hero must see sky above MAH MATCH */
-  { id: 'C3', x: 44,   z: -190, w: 28, d: 22, h: 64, sb: 0.30, side: 0 },
   { id: 'R1', x: 106,  z: -50,  w: 20, d: 18, h: 30, sb: 0,    side: -1 },
   { id: 'R2', x: 116,  z: -112, w: 28, d: 24, h: 50, sb: 0.30, side: -1, pad: 'training' },
   { id: 'R3', x: 74,   z: -164, w: 24, d: 20, h: 52, sb: 0.28, side: 0, pad: 'levitate' },
@@ -245,8 +258,8 @@ const BLOCKS = [
 /* one row per block in BLOCKS and no rows for anything else: a massing for a block that no longer
    stands is dead data that reads like a promise, and this file has four tables keyed by block id */
 const MASSING = {
-  L1: 'slotted', L2: 'slotted', L3: 'stepped', L4: 'podium', C1: 'stepped',
-  C3: 'stepped', R1: 'podium',  R2: 'stepped', R3: 'podium',  R5: 'slotted'
+  L1: 'slotted', L2: 'slotted', L3: 'stepped', L4: 'podium',
+  R1: 'podium',  R2: 'stepped', R3: 'podium',  R5: 'slotted'
 };
 const MASSING_OF = id => MASSING[id] || 'stepped';
 /* ---- v8 §02 PUNGENT DISTRICT COLOUR ------------------------------------------------------------
@@ -261,7 +274,7 @@ const MASSING_OF = id => MASSING[id] || 'stepped';
    R5 28.0° — every one of them clear of 52–72°, 108–124° and 128–142°, so no gesture draws the eye
    into a hole the composition is deliberately keeping open. */
 const ACCENT_DISTRICT = { L: 'violet', F: 'violet', C: 'blue', R: 'cyan' };
-const GESTURE = { L1: 'seam', L2: 'band', C3: 'band', R2: 'crown', R5: 'band' };
+const GESTURE = { L1: 'seam', L2: 'band', R2: 'crown', R5: 'band' };
 /* the two megatalls that wear a full-height seam, keyed by their own bearing|radius row in TOWERS.
    Landmarks, so they take their district's hue: 88° is the centre's tallest, 46° is the right's. */
 const TOWER_SEAM = { '88|665': 'blue', '46|505': 'cyan' };
@@ -343,10 +356,10 @@ const GHOSTS = [
   [86, 700, 46, 760], [102, 650, 42, 660], [76, 730, 44, 800], [38, 690, 40, 700],
   [148, 700, 42, 680], [18, 760, 44, 720], [92, 860, 50, 900], [156, 820, 44, 700]
 ];
-/* the blocks that carry a floating ring deck (v9 §12, the Jetsons gesture). Four of ten — F2 left
-   with the D1 thinning: a saucer terrace over every block would be a pattern, over four it is a
-   civic amenity, and the ratio the gesture depends on is unchanged by the block that went. */
-const DECK = { L1: 1, R1: 1, R5: 1, C3: 1 };
+/* the blocks that carry a floating ring deck (v9 §12, the Jetsons gesture). Three of eight — F2 left
+   with the D1 thinning and C3 with the P0 sight corridor: a saucer terrace over every block would
+   be a pattern, over three it is a civic amenity, and the ratio the gesture depends on holds. */
+const DECK = { L1: 1, R1: 1, R5: 1 };
 
 /* ================================================================================================
    v13 §8 / §6D — THE SKY ROADS AND THE SKYBLOCK CARRIERS
@@ -965,6 +978,21 @@ export function buildCity(ctx) {
      Broader and dimmer than the deck's grades because this is the satin end of the floor, and its
      azimuth is the widest of any surface — at this radius a tight path would be a thread. */
   applyCelestialPath(groundMat, { az: 34, el: 7.0, gain: 0.78 });
+  /* R170 P0 — AND IT JOINS THE DECK'S OWN GRADE, WHICH IS THE HALF D5 MISSED.
+     D5 gave this ring the plaza's colour, metalness and lattice and stopped there. What it did not
+     give it was the CRUSH: mahplaza patches every material in ctx.floorMaterials to eleven percent
+     of its own value and lifts it back with a grazing sheen, and that patch is the only reason this
+     world's ground is black. The deck had it; this ring did not.
+     The BUILDING-AWAY diagnostic is what found it, and the failure is worse than "slightly light".
+     At metalness 0.96 and envMapIntensity 2.2 with nothing crushing it, a horizontal surface seen at
+     a grazing angle returns nearly the whole environment — so from any camera looking OUT across the
+     world the entire middle distance rendered as a pale silver sheet, brighter than the mountains
+     and brighter than the treeline in front of it. Distance cannot read against that: the trees stop
+     being a layer at 300 m and become a black cut-out pasted on a white wall, which is precisely the
+     flattening the spaciousness priority exists to remove.
+     Pushing it into ctx.floorMaterials is the whole fix — one list, one patch, the same value
+     behaviour from the deck to the treeline. This is what D5 should have done. */
+  (ctx.floorMaterials = ctx.floorMaterials || []).push(groundMat);
   {
   }
   owned.materials.push(winMat, stripMat, whiteMat, groundMat, spillWarmM, spillCoolM, accentWashM);
@@ -1063,7 +1091,7 @@ export function buildCity(ctx) {
      the hue is chosen per face and rides on the grid's instance colours instead. */
   const glassFaceMat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: true, fog: true });
   glassFaceMat.name = 'city-curtain'; owned.materials.push(glassFaceMat);
-  const glazedIds = { L2: 1, C3: 1, R2: 1, R5: 1 };
+  const glazedIds = { L2: 1, R2: 1, R5: 1 };
 
   /* ONE MODULE PER FACE. The glazing and the platinum frame are now cut from the SAME grid, because a
      pier may only stand in a gap BETWEEN cells and a spandrel course may only sit in a gap between

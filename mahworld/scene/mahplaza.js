@@ -164,6 +164,10 @@ export async function createMahplaza(canvas, options = {}) {
      resize() is first called: `typeof x` does NOT protect a let/const in its temporal dead zone the
      way it protects an undeclared name, so the guard inside resize() threw rather than skipping. */
   let mirror = null;
+  /* R170 P0 — THE FLOOR'S GRAZING RETURN IS A CLOCK VALUE, NOT A CONSTANT.
+     Every material patched by patchFloor registers its sheen-colour uniform here so applyTime can
+     write them together. One list, one write, the same horizon on every ground surface. */
+  const floorSkyUniforms = [];
   const mirrorQueue = [], themedReflections = [];
   const reflect = (mesh, dim = 0.4) => { mirrorQueue.push([mesh, dim]); return mesh; };
   function buildReflections() {
@@ -659,6 +663,20 @@ export async function createMahplaza(canvas, options = {}) {
     if (!force && lastApplied && Math.abs(lastApplied.sunElevation - s.sunElevation) < 0.004 && lastApplied.worldHour === s.worldHour) return s;
     lastApplied = s;
     const k = sky.setTime(s, lights);
+    /* R170 P0 — AND THE GROUND IS TOLD WHAT THE HORIZON LOOKS LIKE RIGHT NOW.
+       A fixed silver here was a real defect and the BUILDING-AWAY diagnostic is what exposed it: at
+       a grazing outward view the fresnel term saturates to 1 across the ENTIRE visible ground, so a
+       constant pale colour turned the whole world's floor into a white sheet brighter than the
+       mountains behind it — the exact "pale sheet brighter than the architecture" failure ground.js
+       already records, reintroduced from the other side.
+       The physics says what to do instead: a metal at a grazing angle returns THE SKY IT IS ACTUALLY
+       LOOKING AT, and at night near the horizon that is deep navy, not daylight silver. Driving the
+       sheen from the clock's own horizon key fixes the night blowout and makes the day case correct
+       for free — the floor is dark when the sky is dark and bright when the sky is bright, which is
+       what "extremely platinum" means on a surface that reflects nothing else.
+       k.horizon is the same key the sky dome and the depth bands are painted from, so the floor and
+       the horizon it returns can never drift apart. */
+    for (const u of floorSkyUniforms) u.value.setHex(k.horizon);
     M.setTime(s);
     renderer.toneMappingExposure = state.diagnostic ? 1.0 : k.exposure;
     /* atmospheric perspective: a long, subtle falloff — deeper by day, closer at night; the city's far layers live inside it */
@@ -1607,7 +1625,19 @@ export async function createMahplaza(canvas, options = {}) {
            the deck came back reading as wet slate. What a metal returns at a grazing angle is the
            SKY'S BRIGHTNESS carrying only a trace of its hue, which is why polished steel outdoors
            looks silver and not blue. */
-        shader.uniforms.uFloorSky = { value: new THREE.Color(0x8ea4c4) };
+        /* SEEDED FROM THE SKY THAT EXISTS RIGHT NOW, not from a constant, and that is the whole bug
+           this line fixes. The clock write below in applyTime only fires when the clock ticks, and a
+           material's uniforms are created at its FIRST COMPILE — which happens on the first render,
+           after applyTime has already run. So between compile and the next tick the floor rendered
+           at whatever default was typed here, and the default was a daylight silver: at a grazing
+           outward view the fresnel term saturates to 1 across the entire visible ground, so that
+           single constant turned the world's floor into a white sheet brighter than the mountains.
+           Two renders were spent adjusting the sheen STRENGTH before measuring told me the COLOUR
+           was doing it, and that the clock had never overwritten it at all.
+           scene.fog.color is the assembly's own horizon value and is correct at every hour, so the
+           uniform is born right and the clock only has to keep it right. */
+        shader.uniforms.uFloorSky = { value: new THREE.Color(scene.fog ? scene.fog.color.getHex() : 0x152c52) };
+        floorSkyUniforms.push(shader.uniforms.uFloorSky);
         shader.fragmentShader = 'uniform float uFloorSheen;\nuniform float uFloorBase;\nuniform vec3 uFloorSky;\n' + shader.fragmentShader
           .replace('#include <opaque_fragment>', `
           {
