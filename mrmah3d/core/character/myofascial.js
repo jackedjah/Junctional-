@@ -698,7 +698,23 @@ export const QUAD_KNEE_LAYOUT={
  // These first three positions are actual retained R163 crown vertices.
  crown:[[.08444856107234955,1.2799999713897705],[.13451461493968964,1.1399999856948853],[.10884512960910797,.9700000286102295],[.064,.90]],
  medial:[[.075,1.292],[.044,1.14],[.042,.97],[.039,.90]],
- knee:[[.064,.90],[.129,.79],[.063,.645],[.039,.79]],center:[.065,.79]
+ /* R242 — THE KITE'S BOTTOM CORNER SITS ON A RING NOW (0.645 -> 0.660).
+
+    The loft's natural rings in this band are 0.550 / 0.660 / 0.770 / 0.870,
+    carrying 174 / 170 / 154 / 168 vertices. The kite's bottom corner at y 0.645
+    pulled vertices onto a 24-vertex row 0.015 BELOW the 170-vertex ring, and
+    the fan stitching those two rows held the sliver that has read as the knee
+    wedge since R235. On the ring the same landmark claims a vertex already
+    there and moves it in x only, so no thin row exists. Knee band 55 -> 47
+    degrees, p90 33 -> 29, p99 55 -> 47.
+
+    The 0.790 corner is deliberately NOT moved. Measured: moving both took the
+    band to 101 degrees and moving 0.790 alone to 82, because landing a
+    landmark on a row that already has a vertex nearby crowds it into a thin
+    triangle. 0.790 sits 0.020 above the 154-vertex ring at 0.770 and that gap
+    is tolerable; 0.645's was not. This is R237's proposed fix (a), narrowed by
+    measurement to the one corner that needed it. */
+ knee:[[.064,.90],[.129,.79],[.063,.66],[.039,.79]],center:[.065,.79]
 };
 export function quadKneeSurfacePatch(sign,supportAt){
  const {crown,medial,knee,center}=QUAD_KNEE_LAYOUT;
@@ -1042,6 +1058,22 @@ export function torsoSurface(a,section,raw) {
    // point and waist remain unchanged. Boundaries blend into the shared wall.
    anatomyFront+=(target-anatomyFront)*weight;
  }
+ /* R242 — ASTRA'S LOWER-LEG GRAMMAR, ANTERIOR. A small multiplicative relief
+    on the surface already there: the coefficients are 2-6% of the local radius
+    and nothing here replaces the taper, so its outline cannot move. `notch`
+    carries the centre channel on down from the quad's seam, `caps` are the
+    patellae at the knee row and `shins` the tibial ridges below them. */
+ const LL=MORPHOLOGY.lower.astraLowerLeg;
+ if(LL&&front>0){
+   const w=windowAt(yy,...LL.region);
+   if(w>0){
+     const c=k=>profileAt(LL[k],yy),B=LL.lobes;
+     const m=1-dome(a,B.notch[0],B.notch[1])*c('notch')
+              +domePair(a,B.caps[0],B.caps[1])*c('caps')
+              +domePair(a,B.shins[0],B.shins[1])*c('shins');
+     anatomyFront*=1+(m-1)*w*smooth(front/LL.sideFade);
+   }
+ }
  const p=MORPHOLOGY.pec.surface,blend=windowAt(yy,...p.blend)*smooth(front/.20);
  // Numeric fit: fill the excessive upper sternum recess locally. The midline
  // was already recessed; subtracting its projection would deepen a false cut.
@@ -1091,6 +1123,22 @@ export function torsoSurface(a,section,raw) {
  }
 
  let posterior=posteriorStock+posteriorResponse*backRelief+rear*neckField(x,yy,false);
+ /* R242 — ASTRA'S LOWER-LEG GRAMMAR, POSTERIOR. `pit` is the hollow behind
+    the knee, `tendon` the Achilles ridge on the midline, `hollow` the pair
+    either side of it, and `soleus` the one light calf term Astra defined but
+    left at zero. Multiplicative on the posterior depth for the same reason as
+    the anterior: this is internal form, and the silhouette is not its job. */
+ if(LL&&rear>0){
+   const w=windowAt(yy,...LL.region);
+   if(w>0){
+     const c=k=>profileAt(LL[k],yy),B=LL.lobes;
+     const m=1-dome(a,B.pit[0],B.pit[1])*c('pit')
+              +dome(a,B.tendon[0],B.tendon[1])*c('tendon')
+              -domePair(a,B.hollow[0],B.hollow[1])*c('hollow')
+              +domePair(a,B.soleus[0],B.soleus[1])*c('soleus');
+     posterior*=1+(m-1)*w*smooth(rear/LL.sideFade);
+   }
+ }
  const spinal=MORPHOLOGY.back.midlineReturn;
  if(spinal&&rear>0){
    const hw=profileAt(spinal.halfWidth,yy),q=Math.abs(x)/hw;

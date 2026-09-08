@@ -2217,13 +2217,73 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     crown stays at 0.2517 to four decimals, so the quad crowns cannot be
     touched by changing it. Astra's 0.30 put the floor at 0.1479 and the valley
     at 0.1039 deep, which read as a split rather than a separation. */
- seam:[[0.80,0],[0.87,0.121],[0.95,0.143],[1.03,0.154],[1.10,0.165],[1.23,0.165],[1.32,0.121],[1.41,0.077],[1.46,0.044]],
+ /* R242 — scaled again, to 0.776 of R241's values. The rectus and vastus
+    medialis coefficients above were raised, which lifts the CROWN; left alone
+    the seam would then have widened the valley from 0.0766 to 0.0841 even
+    though its floor had not moved. Since this control moves the floor linearly
+    at 0.202 units per unit of coefficient, lifting the floor by the same amount
+    the crown gained holds the channel where R241 put it: the muscle grows and
+    the separation does not. */
+ seam:[[0.80,0],[0.87,0.094],[0.95,0.111],[1.03,0.120],[1.10,0.128],[1.23,0.128],[1.32,0.094],[1.41,0.060],[1.46,0.034]],
  head:[[0.80,0],[0.87,0.06],[0.95,0.28],[1.03,0.32],[1.10,0.36],[1.23,0.34],[1.32,0.26],[1.41,0.16],[1.46,0.09]],
- rf:[[0.80,0],[0.87,0],[0.95,0.08],[1.03,0.10],[1.10,0.10],[1.23,0.10],[1.32,0.07],[1.41,0.04],[1.46,0.02]],
+ rf:[[0.80,0],[0.87,0],[0.95,0.10],[1.03,0.125],[1.10,0.13],[1.23,0.13],[1.32,0.09],[1.41,0.05],[1.46,0.025]],
  vl:[[0.80,0],[0.87,0.16],[0.95,0.22],[1.03,0.26],[1.10,0.28],[1.23,0.28],[1.32,0.26],[1.41,0.22],[1.46,0.14]],
  valley:[[0.80,0],[0.87,0.06],[0.95,0.10],[1.03,0.12],[1.10,0.12],[1.23,0.12],[1.32,0.09],[1.41,0.06],[1.46,0.03]],
- vm:[[0.80,0],[0.87,0.20],[0.95,0.14],[1.03,0.04],[1.10,0],[1.46,0]],
+ vm:[[0.80,0],[0.87,0.20],[0.95,0.15],[1.03,0.09],[1.10,0.05],[1.23,0.02],[1.46,0]],
  itb:[[0.80,0],[0.87,0.04],[0.95,0.06],[1.03,0.06],[1.10,0.06],[1.23,0.05],[1.32,0],[1.46,0]]};
+/* R242 — ASTRA'S LOWER-LEG GRAMMAR, from the same R109 checkpoint.
+
+   `lowerLegShape` and the ring rows y 0.300-0.810 of commit 0c05b31, verbatim.
+   Astra's own comment is the design: on ONE fused mass the centre front is the
+   channel between the two columns all the way down — `notch` at 0, `caps` (the
+   patellae) at +/-29 degrees on the knee, `shins` (the tibial ridges) at
+   +/-26 degrees below it, and the centre is never a ridge. Behind: `pit` the
+   posterior hollow, `tendon` the Achilles ridge, `hollow` the pair either side
+   of it.
+
+   Every coefficient here is 0.02-0.06 — two to six percent of the local radius
+   — because Astra's handoff is explicit that this body has NO calf belly in the
+   outer silhouette and its lower-leg musculature is "suggested only by internal
+   form". That is also why this set is applied as a small MULTIPLICATIVE relief
+   on the surface already there rather than replacing it: the taper's outline
+   cannot move.
+
+   ONE term is not Astra's: `soleus` is a lobe `lowerLegShape` defines but the
+   R109 rows never used. It is added here at 0.015-0.025, the lightest value
+   that registers, because the brief asks for a light soleus / calf read. It is
+   the only invented number in this table. */
+MRMAH_MORPHOLOGY.lower.astraLowerLeg={
+ source:"R109 Astra, commit 0c05b31, lowerLegShape + the rings y 0.300-0.810; soleus added",
+ /* The region reaches 0.98, not 0.90, so this set's centre channel hands over
+    to the quad's `seam` (which fades in from 0.88) with an overlap instead of a
+    gap. Ending it at 0.90 left `notch` at full strength on the 0.870 ring and
+    zero on the next, and that row step measured 58 degrees at y 0.827. */
+ region:[0.14,0.98,0.14], sideFade:0.06,
+ lobes:{notch:[0,0.30],caps:[0.50,0.32],shins:[0.45,0.30],
+        pit:[3.14159265,0.70],tendon:[3.14159265,0.35],
+        hollow:[2.54159265,0.40],soleus:[2.34159265,0.70]},
+ notch:[[0.14,0],[0.30,0.02],[0.44,0.03],[0.55,0.03],[0.64,0.03],[0.72,0.036],[0.81,0.034],[0.90,0.022],[0.98,0]],
+ /* `caps` is kept at zero and the ridge is carried by `shins` alone. Astra's
+    rows swap between them — shins to y 0.72, caps at 0.81 — and its own comment
+    says why that is dangerous: "the columns FLIPPED between the two rings and
+    the clay showed a zigzag of seams across the shin". Astra could afford the
+    swap because its rings are denser here; this loft has rings at 0.770 and
+    0.870, so the swap lands across ONE band and measured as a 59-degree row
+    seam at y 0.743 and 0.827. The two lobes are the same ridge anyway — 29 and
+    26 degrees off the midline — so `shins` carries it continuously and simply
+    swells at the knee row instead. */
+ caps:[[0.14,0],[0.98,0]],
+ /* The tibial crest is a SHIN feature and it is tapered through the knee
+    rather than held at full strength across it. Isolated, holding it at 0.045
+    on the 0.81 row put a 58-degree turn at y 0.827 (zeroing `shins` alone took
+    the band 58 -> 50); tapered, the ridge still reads down the shin and the
+    knee rows stop carrying it. Astra's own rows also drop shins to zero at
+    0.810 — this keeps a trace instead of a hard stop. */
+ shins:[[0.14,0],[0.30,0.02],[0.44,0.03],[0.55,0.04],[0.64,0.04],[0.72,0.035],[0.81,0.020],[0.90,0.008],[0.98,0]],
+ pit:[[0.14,0],[0.64,0],[0.72,0.02],[0.81,0.028],[0.90,0.018],[0.98,0]],
+ tendon:[[0.14,0],[0.30,0.03],[0.44,0.04],[0.55,0.03],[0.64,0],[0.90,0]],
+ hollow:[[0.14,0],[0.30,0.02],[0.44,0.03],[0.55,0.02],[0.64,0],[0.90,0]],
+ soleus:[[0.14,0],[0.30,0.015],[0.44,0.025],[0.55,0.025],[0.64,0.02],[0.72,0],[0.90,0]]};
 MRMAH_MORPHOLOGY.lower.planeDesign={"quadTerritory":[0.1,0.95],"quadProjection":0.058,"kneeAccentY":0.75,"kneeRelief":0.012,"kind":"paired interior chevron; no new joint or external expansion","crownLimit":0.033,"crownConvexity":0.011,"directionalCrown":true,"quadFaces":{"crestQ":0.44,"upperOblique":0.065,"outerSlope":0.08,"innerSlope":0.018,"returnWidth":0.018},"surfaceFaces":{"source":"PDF30-31 / T01 longitudinal quad faces; one continuous surface","depth":[[0.6,0.093],[0.77,0.135],[0.97,0.19],[1.14,0.233],[1.22,0.239],[1.34,0.212],[1.46,0.184]],"crestQ":0.41,"convexity":0.005,"innerTurn":0.3,"outerTurn":0.52,"innerSlope":0.58,"outerSlope":0.72,"outerTurnProfile":[[0.62,0.52],[0.98,0.52],[1.16,0.62],[1.44,0.66]],"outerSlopeProfile":[[0.62,0.72],[0.98,0.72],[1.16,0.82],[1.44,0.86]],"boundary":[0.1,0.94],"edgeWidth":0.15,"region":[0.62,1.44,0.15],"linearFaces":true}};
 MRMAH_MORPHOLOGY.sampleY=[0,0.15,0.44,0.55,0.66,0.77,0.87,0.97,1.06,1.14,1.22,1.28,1.34,1.4,1.45,1.48,1.535,1.585,1.61,1.63,1.65,1.675,1.695,1.735,1.755,1.78,1.805,1.825,1.845,1.865,1.885,1.91,1.935,1.96,1.985,2.01,2.035,2.06,2.085,2.11,2.135,2.16,2.18,2.2,2.22,2.24,2.26,2.28,2.3,2.335];
 MRMAH_MORPHOLOGY.neck.anteriorRelief=0.02;

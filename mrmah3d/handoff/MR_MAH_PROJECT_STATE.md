@@ -1195,3 +1195,92 @@ R241 IS A CANDIDATE AND IS NOT USER-APPROVED. Retained fallback: A3, 28d1f04.
 
 STILL OPEN: knee-region structure, lower-leg / shin / calf read, and the
 R237 knee-band wedge with its two proposed fixes.
+
+
+R242 — LOWER-BODY ANATOMY REFINEMENT: THE KNEE WEDGE, ASTRA'S LOWER-LEG
+GRAMMAR, AND A 3% FULLER QUAD WITH THE CHANNEL HELD WHERE IT WAS.
+---------------------------------------------------------------------------
+Base R241 (b9e87c0). Four bounded changes, each measured, all in the lower body.
+
+1. THE KNEE WEDGE — the R237 fix, narrowed by measurement to one corner.
+   The loft's natural rings in this band carry 174 / 170 / 154 / 168 vertices at
+   y 0.550 / 0.660 / 0.770 / 0.870. `QUAD_KNEE_LAYOUT.knee`'s bottom corner sat
+   at y 0.645 — a 24-vertex row 0.015 BELOW a 170-vertex ring — and the fan
+   between them held the sliver that has read as the knee wedge since R235.
+   Moved onto 0.660 the landmark claims a vertex already on the ring and moves
+   it in x only. Knee band 55 -> 47 degrees, p90 33 -> 29.
+   Both other variants were built and rejected: moving the 0.790 corner too
+   gave 101 degrees, moving 0.790 alone 82, because landing a landmark on a row
+   that already has a vertex nearby crowds it into a thin triangle. And the
+   knee crest was checked against R237's gate — relief at y 0.85 / 0.90 / 0.95
+   went 0.0210 / 0.0246 / 0.0417 -> 0.0218 / 0.0286 / 0.0540, i.e. slightly
+   STRONGER, the opposite of A3b's failure.
+
+2. ASTRA'S LOWER-LEG GRAMMAR — `MRMAH_MORPHOLOGY.lower.astraLowerLeg`, ported
+   from `lowerLegShape` and the rings y 0.300-0.810 of the same R109 checkpoint.
+   Anterior: `notch` (the centre channel continuing down from the quad's seam),
+   `shins` (the tibial ridges). Posterior: `pit`, `tendon`, `hollow`, plus a
+   light `soleus`.
+   Applied as a small MULTIPLICATIVE relief on the surface already there, not as
+   a replacement, because Astra's handoff is explicit that this body has NO calf
+   belly in the outer silhouette and its lower-leg musculature is "suggested only
+   by internal form". Measured: the outer envelope |x|max is IDENTICAL at every
+   ring row from y 0.45 to 0.90; only the z span moves, by 0.005.
+   ONE number here is not Astra's: `soleus` is a lobe `lowerLegShape` defines
+   but the R109 rows never used, added at 0.015-0.025 because the brief asks for
+   a light calf read. It is the only invented value in the table.
+
+   Two faults were found and fixed by measurement while fitting it:
+   - Astra's rows SWAP from `shins` (to y 0.72) to `caps` (at 0.81). Astra's own
+     comment warns why that is dangerous — "the columns FLIPPED between the two
+     rings and the clay showed a zigzag of seams across the shin" — and it could
+     afford it because its rings are denser here. On this loft the swap lands
+     across ONE band and measured 59 degrees at y 0.743. The two lobes are the
+     same ridge (29 and 26 degrees off the midline), so `caps` is held at zero
+     and `shins` carries it continuously.
+   - `notch` and `pit` ending at y 0.90 left a gap before the quad's `seam`
+     fades in at 0.88, and that row step measured 58 degrees at y 0.827. The
+     region reaches 0.98 now so the two overlap.
+   - The tibial crest is tapered THROUGH the knee rather than held across it
+     (isolated: zeroing `shins` alone took the band 58 -> 50).
+
+3. RECTUS AND VASTUS MEDIALIS — rf 0.10 -> 0.13, vm carried higher (0.04 -> 0.09
+   at y 1.03, and a trace to 1.23 where it was zero). Crown 0.2517 -> 0.2596 at
+   y 1.220, +3.1%: "slightly more muscular overall", and slight, as asked.
+
+4. THE SEAM, COMPENSATED. Raising the crown widened the valley from 0.0766 to
+   0.0841 even though its floor had not moved, which would have undone R241.
+   Since the seam control moves the floor linearly at 0.202 units per unit of
+   coefficient, its profile is scaled again to 0.776 and the floor rises by what
+   the crown gained. Valley depth at y 1.220 is 0.0766 — R241's figure exactly —
+   with crown/floor 1.419 against R241's 1.437 and R240's 1.702. The muscle
+   grows; the separation does not.
+
+RESULT
+  knee band          max 55 -> 54, p90 33 -> 30, p99 55 -> 54; the y 0.673
+                     wedge that has been the standing artifact since R235 is
+                     GONE. What remains is 53 at y 0.827 and 51 at y 0.605.
+  quad band          74 -> 76 on the known near-degenerate sliver column at
+                     y 1.100 x +/-0.130 (n = 8), not a new location; R240 was 78.
+  taper              47, unchanged.
+  centre channel     valley depth 0.0766, identical to R241.
+  crown              0.2517 -> 0.2596 (+3.1%).
+  silhouette         front and side outlines zero pixels changed; the lower-leg
+                     envelope |x|max identical at every ring row.
+  topology           12288 vertices, 4096 triangles, unchanged.
+  BufferGeometry     0 non-finite, 0 degenerate, 0 non-unit normals.
+  Mrs. Mah           14 meshes, both checksums, both bbox corners IDENTICAL.
+  contracts          376/376.
+
+VISUAL. The knee now converges as a band rather than ending in a chevron notch,
+and the taper below it carries longitudinal shin structure with the centre
+channel running on down instead of stopping. The quad is fractionally fuller
+and otherwise as R241 left it. Honest scale: this is a SUBTLE pass, as the brief
+asked — the knee and shin changes are visible in the close-up and modest at
+ordinary distance.
+
+R242 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.
+
+STILL OPEN: the near-degenerate sliver columns in the quad (a loft sampling
+property, not an authored feature); the 53-degree turn at y 0.827; and no
+crystal or material work has begun.
