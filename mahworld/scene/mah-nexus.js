@@ -93,7 +93,7 @@
    buildMahNexus(ctx, opts) -> the standard module contract, plus navSites() and nexusSurface(). */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { applyPlatinumFinish } from './materials.js';
+import { applyPlatinumFinish, applyDistanceDim } from './materials.js';
 import { createVehicle, SHUTTLE } from './flora-and-vehicles.js';
 
 const TAU = Math.PI * 2;
@@ -578,14 +578,68 @@ export function buildMahNexus(ctx, opts = {}) {
      tubes measured 23.8 — graphiteDark is a recess material and those are not recesses. §4 calls
      every tube a premium destination portal with a PLATINUM CASING, so they get one. */
   const mkMat = (src, over) => { const m = (src || new THREE.MeshStandardMaterial()).clone(); Object.assign(m, over || {}); owned.materials.push(m); return m; };
-  const shellMat = mkMat(M.platinumMid || M.platinum, { name: 'nexus-shell', color: new THREE.Color(0xb6c4d6), envMapIntensity: 1.62, roughness: 0.30, metalness: 0.42 });
-  applyPlatinumFinish(shellMat, { mFlat: 0.30, mEdge: 0.58, rFlat: 0.36, rEdge: 0.26, breakUp: 0.070 });
-  const trunkMat = mkMat(M.platinumMidBrushed || M.platinumBrushed || M.platinumMid, { name: 'nexus-trunk', color: new THREE.Color(0xaebbd0), envMapIntensity: 1.72, roughness: 0.28, metalness: 0.50 });
-  applyPlatinumFinish(trunkMat, { mFlat: 0.32, mEdge: 0.66, rFlat: 0.34, rEdge: 0.24, breakUp: 0.062 });
+  /* ---- THE CHROMIUM PASS (R170 §12, §29) -------------------------------------------------------
+     DIRECTION: the MAH TREE's material must become "one of the most premium materials in the entire
+     world — deep chromium / silver metallic body, dark environmental reflections, bright clean
+     highlight streaks... museum-grade concept-car chrome, not cheap chrome shader."
+
+     WHAT WAS HERE WAS SATIN, AND THE NUMBERS SAY SO PLAINLY. applyPlatinumFinish's own default —
+     the palette's considered chromium — is mEdge 0.94 / rEdge 0.22. This module overrode it DOWN,
+     to 0.58 / 0.66 / 0.74 on the three grades. At metalness 0.66 a surface is still taking most of
+     its value from diffuse light, and diffuse light on a 1586 m trunk at night is a flat grey wash:
+     no environment folded in it, no highlight that travels as you move, nothing to reflect the city
+     it rises out of. That is exactly the "cheap chrome shader" read, and it was a choice, not a
+     limitation.
+
+     THE HIERARCHY IS THE POINT, NOT THE SHINE. §8: "if everything is equally reflective, nothing
+     feels special." So the three grades now SEPARATE instead of clustering:
+       SHELL  the civic base mass — barely moved. It is the quiet dark alloy the trunk stands out
+              against, and making it shinier would cost the trunk its authority.
+       TRUNK  near-mirror on its verticals. This is the hero surface.
+       TUBE   the transport casing, one step tighter again, so the tubes read as machined against
+              the sculpted mass they climb.
+     mFlat stays LOW on all three, and that is LAW 1 doing its job: a metal takes no diffuse light,
+     so a horizontal face at 0.94 renders black under a dark zenith. The whole reason this world has
+     a per-fragment platinum finish is so a vertical can be a mirror while the cap above it is not.
+
+     COLOUR: pulled off the blue axis and UP. 0xaebbd0 is a dark blue-grey — before the environment
+     contributes anything, the body is already three stops down and tinted. Chromium is a bright
+     near-neutral; the theme's influence belongs in what it REFLECTS, which is a world already full
+     of the theme's own light. §12's "subtle theme-color influence", not a blue trunk. */
+  const shellMat = mkMat(M.platinumMid || M.platinum, { name: 'nexus-shell', color: new THREE.Color(0xb9bec6), envMapIntensity: 1.75, roughness: 0.30, metalness: 0.42 });
+  applyPlatinumFinish(shellMat, { mFlat: 0.30, mEdge: 0.62, rFlat: 0.36, rEdge: 0.24, breakUp: 0.070 });
+  const trunkMat = mkMat(M.platinumMidBrushed || M.platinumBrushed || M.platinumMid, { name: 'nexus-trunk', color: new THREE.Color(0xc6cad0), envMapIntensity: 2.60, roughness: 0.28, metalness: 0.50 });
+  applyPlatinumFinish(trunkMat, { mFlat: 0.32, mEdge: 0.94, rFlat: 0.32, rEdge: 0.085, breakUp: 0.040 });
   /* §4: platinum casing, and a tube is mostly vertical so it earns a higher edge metalness than
      the base does — this is the grade that separates the tube family from the mass it climbs. */
-  const tubeMat = mkMat(M.platinum || M.platinumMid, { name: 'nexus-tube', color: new THREE.Color(0xa9b8cd), envMapIntensity: 1.85, roughness: 0.22, metalness: 0.58 });
-  applyPlatinumFinish(tubeMat, { mFlat: 0.34, mEdge: 0.74, rFlat: 0.32, rEdge: 0.19, breakUp: 0.055 });
+  const tubeMat = mkMat(M.platinum || M.platinumMid, { name: 'nexus-tube', color: new THREE.Color(0xcfd2d6), envMapIntensity: 2.85, roughness: 0.22, metalness: 0.58 });
+  applyPlatinumFinish(tubeMat, { mFlat: 0.34, mEdge: 0.96, rFlat: 0.30, rEdge: 0.070, breakUp: 0.034 });
+
+  /* ---- THE HERO WAS INVISIBLE FROM THE WORLD'S OWN CAMERA (R170 §2, §25, §32) -------------------
+     Rendered from the plaza, this 1586 m tree was a barely-perceptible ghost — a faint arc high in
+     the frame and nothing else. Not because it is small or badly shaped, but because it stands 1750 m
+     away and mahplaza.js's fog runs to 2350 m at night: at that range the fog has taken about 77% of
+     it, and 77% of a silhouette is a rumour. It is the same defect the HALO dome had, one order of
+     magnitude closer, and it is the reason the note keeps asking for MAH TREE AUTHORITY — the
+     authority was authored, and the atmosphere was eating it.
+
+     THE FIX IS AERIAL PERSPECTIVE INSTEAD OF FOG, which is what terrain.js has always done for the
+     mountains standing right behind this thing. Fog off, and applyDistanceDim's `air` mode mixes the
+     fragment toward the night horizon key with distance instead of toward the fog colour — so the
+     tree still RECEDES (§32: background is quiet, atmospheric, silhouette-driven) but arrives at a
+     quiet silhouette rather than at nothing.
+
+     THE NUMBERS ARE THE OBJECT'S OWN. NEAR 600 is past the whole city, so nothing changes for a
+     camera anywhere near the trunk; FAR 2600 is beyond the far side of the world; 0.62 leaves 38%
+     of the material's own value at maximum distance, which against a 0x1d3d6e sky is a legible dark
+     mass with its chromium catches surviving on the lit flank. Because the mix runs on view depth
+     rather than on a per-object switch, the SAME material reads as full chromium at the base and as
+     a silhouette from the plaza, which is what a real 1.5 km object does. */
+  const NEXUS_AIR = 0x1d3d6e;
+  [shellMat, trunkMat, tubeMat].forEach(m => {
+    m.fog = false;
+    applyDistanceDim(m, 600, 2600, 0.62, NEXUS_AIR);
+  });
   /* R7 §15 — BLACK CRYSTAL, and the render is what caught this one. The halo landing terraces came
      back as DEAD BLACK DISCS hanging under the ceiling, because `deck` was M.paving: colour
      0x0b0f16 at metalness 0.40, which is the world's FLOOR material and is meant to be near-black.

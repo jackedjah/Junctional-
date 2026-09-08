@@ -119,8 +119,24 @@
    Life anchors pushed: ctx.lifeAnchors.paths (walkway + 3 bridges, kind
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, windowGrid, canvasTexture, ACCENT, apertureField, doorwayParts } from './materials.js';
+import { chamferBox, windowGrid, canvasTexture, ACCENT, apertureField, doorwayParts, applyDistanceDim } from './materials.js';
 import { foblockParts } from './foblock.js';   /* §6D: a SKYBLOCK CARRIER is an elongated FOBLOCK, so it grows from the genome */
+
+/* R170 §5 — THE DISTANCE-DIM CURVE, in metres of view depth. See applyDistanceDim in materials.js.
+   NEAR is set past the far edge of the built district (the megatalls stand inside r 400 and the
+   walking cameras all sit under 70 m), so no gameplay-distance frame changes by a single pixel.
+   FAR is the aerial establishing distance. FLOOR is what a level-4 form is worth from up there:
+   present, countable if you look for it, and no longer the subject.
+
+   FLOOR WAS CHOSEN BY RENDERING BOTH ENDS, not by taste. At 0.00 — every lit window black — the
+   aerial view finally showed buildings and roads, and lost the thing that makes MAHWORLD read as
+   inhabited: a dark city with no lights in it is a model, not a civilization. At 1.00 (no dim) the
+   windows were the whole image. 0.28 is where the window field becomes a TEXTURE on a mass rather
+   than a mass of its own, which is what §4 asks a small form to be at distance.
+   The curve was also widened, 220/750 to 260/900: at 750 the falloff completed before the city's
+   own far edge and the transition was legible as a band moving across the district when the camera
+   pulled back. Ending it at the establishing distance itself makes the recession continuous. */
+const DIM_NEAR = 260, DIM_FAR = 900, DIM_FLOOR = 0.28;
 
 const SEED = 4417;
 const PW = 1.4;                       /* pilaster width */
@@ -797,6 +813,21 @@ export function buildCity(ctx) {
   spillWarmM.name = 'city-window-spill-warm'; spillCoolM.name = 'city-window-spill-cool'; accentWashM.name = 'city-accent-wash';
   const stripMat = new THREE.MeshBasicMaterial({ color: theme.energy, toneMapped: true, fog: true }); stripMat.name = 'city-energy';
   const whiteMat = new THREE.MeshBasicMaterial({ color: WHITE, toneMapped: true, fog: true }); whiteMat.name = 'city-lights';
+  /* R170 §4/§5/§6 — THE SIX LEVEL-4 FAMILIES, AND WHY THEY ARE THE ONES THAT RECEDE.
+     Every material listed here paints a form measured in ones of metres: a window cell is 1.5 x 1.35,
+     a light strip is a few centimetres wide, a mast lamp is a point. From the plaza they are the
+     texture of a lived-in city and they must stay exactly as they are — DIM_NEAR is 220 m, past the
+     far edge of the built district, so nothing a walking or standing camera sees is touched at all.
+     From 900 m they were the entire image: ten thousand sub-pixel white dots with no building
+     underneath them. They now fall to DIM_FLOOR, which is what lets the megatalls, the destination
+     masses and the plaza read as SHAPES from the air.
+
+     What is deliberately NOT in this list: every opaque architectural grade in this file. Those are
+     the large forms, and the whole point is that they keep their contrast while the sparkle on them
+     goes quiet. Nor is anything outside city.js — the monument gem, the hero FOBEAM, the MAH NEXUS
+     energy and destination signage are level 1 and are never passed to this. */
+  [winMat, spillWarmM, spillCoolM, accentWashM, stripMat, whiteMat]
+    .forEach(m => applyDistanceDim(m, DIM_NEAR, DIM_FAR, DIM_FLOOR));
   /* v6 §07 / §08 / §25 / §44 — THE BACKGROUND MATERIAL FAMILIES.
      In v5, twenty-six of thirty-nine towers wore one of two materials, and all twelve distant
      silhouettes were a single flat 0x0a1322. Material is the only depth cue a silhouette has left, so

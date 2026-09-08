@@ -994,6 +994,107 @@ export function softMass(w, h, d, radius = 1.2, bevel = 0.35) {
   g.translate(0, 0, -d - bevel);
   return g;
 }
+/* ---- DISTANCE DIM — the small forms stop shouting from a kilometre away ----------------------
+   R170 §4/§5/§6, and the far-view render that made it undeniable: from 900 m the city read as one
+   uniform speckle of white rectangles with no building, no road and no landmark legible in it.
+
+   THE CAUSE WAS NOT DENSITY. It was that the SMALLEST forms in this world are its BRIGHTEST. Every
+   lit window is `city-windows`, a MeshBasicMaterial at 0xffffff — pure white, unlit, and therefore
+   rendered at exactly the same value whether it is 40 m away or 900. A window is a 1.5 x 1.35 m
+   cell; at 900 m it is under a pixel, and a sub-pixel white dot next to ten thousand others is not
+   architecture, it is noise. Meanwhile the megatalls that ARE the silhouette carry no such lift, so
+   the hierarchy was exactly inverted: level 4 shouting, level 1 silent.
+
+   FOG WAS NEVER GOING TO FIX THIS. mahplaza.js runs its far plane at 2350 m and the whole city sits
+   inside 900, so fog has barely started. And §5 forbids the lazy version anyway — "never hide poor
+   composition with excessive fog". What is needed is not less visibility, it is less DOMINANCE:
+   the small forms should recede while the large silhouettes stay crisp.
+
+   SO THIS DIMS BY VIEW DEPTH, PER FRAGMENT, AND ONLY WHERE IT IS ASKED TO. It is applied by hand to
+   named level-4 families; nothing is dimmed by class, by name matching, or globally. The hero
+   emissives — the monument gem, the hero FOBEAM, destination signage, MAH NEXUS energy — are simply
+   never passed to it, which is what makes this a hierarchy rather than a filter.
+
+   IT CARRIES ITS OWN VARYING rather than borrowing `vFogDepth`. That varying only exists when
+   USE_FOG is defined, so a material with fog off would compile to an error — a defect that would
+   appear only for whichever material someone later turned fog off on. One extra float varying is
+   cheaper than that class of bug.
+
+   Basic and Standard materials take different injection points on purpose. A MeshBasicMaterial has
+   no lighting to speak of, so the whole fragment dims. A MeshStandardMaterial's body should keep
+   responding to the world's light — only its EMISSION is level-4 noise — so just the emissive term
+   is scaled and the lit surface underneath recedes naturally with the rest of the scene.
+
+   ONE FUNCTION, TWO BEHAVIOURS, because they are the same measurement. Pass `air` and the fragment
+   mixes TOWARD that colour with distance instead of multiplying toward black: that is aerial
+   perspective, and it is what a LARGE form at distance needs (recede, never vanish), where the
+   multiply is what a SMALL form needs (stop shouting). Splitting them into two near-identical
+   functions would be the same L42 drift this project keeps paying for — the curve, the varying and
+   the injection points are identical and only the final blend differs. */
+export function applyDistanceDim(mat, near = 220, far = 750, floor = 0.18, air = null) {
+  if (!mat || mat.userData.mahDistanceDim) return mat;
+  mat.userData.mahDistanceDim = { near, far, floor, air: air || null };
+  /* EVERY REPLACE IS CHECKED, AND THAT IS NOT DEFENSIVENESS — IT IS THIS EXACT BUG.
+     The first cut of this shipped, compiled, produced programs with the right cache key, and dimmed
+     NOTHING. Setting the floor to 0.0 — which should have rendered every lit window in the city
+     pure black — changed the far view by less than the frame-to-frame animation noise. A
+     String.replace that finds no match returns the string unchanged and reports nothing, so a
+     shader patch aimed at a chunk name the material does not contain fails completely silently. It
+     is the same failure class as a filter that matches the thing it was meant to exclude, and this
+     project has now met it often enough to instrument it: `mat.userData.mahDistanceDim.applied`
+     records what actually landed, and a probe can read it back from the page. */
+  const prev = mat.onBeforeCompile;
+  mat.onBeforeCompile = (shader, renderer) => {
+    if (prev) prev(shader, renderer);
+    const rec = mat.userData.mahDistanceDim;
+    const swap = (src, find, repl, key) => {
+      const out = src.replace(find, repl);
+      rec[key] = out !== src;
+      return out;
+    };
+    shader.vertexShader = swap(shader.vertexShader, '#include <common>',
+      '#include <common>\nvarying float vMahDepth;', 'vDecl');
+    shader.vertexShader = swap(shader.vertexShader, '#include <project_vertex>',
+      '#include <project_vertex>\nvMahDepth = -mvPosition.z;', 'vWrite');
+    const head = '#include <common>\nvarying float vMahDepth;\n' +
+      'float mahDim() { return mix(1.0, ' + floor.toFixed(4) + ', smoothstep(' +
+      near.toFixed(1) + ', ' + far.toFixed(1) + ', vMahDepth)); }';
+    shader.fragmentShader = swap(shader.fragmentShader, '#include <common>', head, 'fDecl');
+    if (air) {
+      /* AERIAL PERSPECTIVE, and it goes in AFTER the fragment is assembled for every material class.
+         `floor` here reads as "how much of the air is mixed in at full distance": 0.82 leaves a
+         large form as a quiet silhouette sitting just off the sky, which is what §32 asks a
+         background mass to be, and never at zero, which is what fog was doing to it. */
+      const c = new THREE.Color(air);
+      const mixIn = 'gl_FragColor.rgb = mix( gl_FragColor.rgb, vec3(' +
+        c.r.toFixed(4) + ', ' + c.g.toFixed(4) + ', ' + c.b.toFixed(4) + '), (1.0 - mahDim()) );';
+      shader.fragmentShader = swap(shader.fragmentShader, '#include <opaque_fragment>',
+        '#include <opaque_fragment>\n' + mixIn, 'fApply');
+    } else if (mat.isMeshBasicMaterial) {
+      /* THE INJECTION POINT IS <opaque_fragment>, NOT <tonemapping_fragment>. That was the bug:
+         three's meshbasic fragment shader does not carry a tonemapping include at all — tone
+         mapping is applied to basic materials elsewhere — so the replace matched nothing and the
+         multiply was never emitted. <opaque_fragment> is the chunk that assembles gl_FragColor,
+         it is present in every material that writes one, and appending after it means we are
+         scaling the colour the material actually produced. */
+      shader.fragmentShader = swap(shader.fragmentShader, '#include <opaque_fragment>',
+        '#include <opaque_fragment>\ngl_FragColor.rgb *= mahDim();', 'fApply');
+    } else {
+      shader.fragmentShader = swap(shader.fragmentShader, '#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mahDim();', 'fApply');
+    }
+    rec.ok = !!(rec.vDecl && rec.vWrite && rec.fDecl && rec.fApply);
+    if (!rec.ok && typeof console !== 'undefined') {
+      console.warn('MAHWORLD applyDistanceDim: patch did not land on "' + (mat.name || mat.type) + '"', rec);
+    }
+  };
+  /* three caches programs by this key, so two materials that differ ONLY in their dim curve must
+     not share one. Without this the second material silently renders with the first one's numbers. */
+  mat.customProgramCacheKey = () => 'mahdim:' + near + ':' + far + ':' + floor + ':' + (air || 'x');
+  mat.needsUpdate = true;
+  return mat;
+}
+
 /* ---- THE CUT — the brand diamond as a cut stone, and the ONE place it is cut ------------------
    R2, on direction: "the actual diamond in the middle is super stale looking. It has no depth to
    it. It needs to have more depth and a glistening and platinumness and glow."

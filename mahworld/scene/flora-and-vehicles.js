@@ -1544,12 +1544,22 @@ const yawFor = deg => Math.PI - deg * Math.PI / 180;
    the two market residents stand at (24, -14) and (25.8, -12.2). Every candidate is still TESTED
    against ctx.colliders and ctx.planterSpots before it is built, and a rejected one is counted in
    stats.skipped rather than dropped silently. */
+/* R170 §18 — THE FIFTH POD WAS PARKED IN THE ARRIVAL CORRIDOR.
+   Four of these sit at x ±16..19.5, z −18..−20: flanking the monument's forecourt, off the axis,
+   doing exactly what a parked fleet should do. The fifth stood at (−13, 28.5) — 11 m in front of
+   the arrival mark and 13 m off the centre line, which puts it INSIDE the plaza's own long
+   sightline, in the near foreground, between the camera and everything the plaza exists to show.
+   §18 asks for sight corridors that "intentionally reveal landmarks", and the approach from the
+   north is the one corridor this world cannot afford to park in.
+   It is MOVED, not deleted (§17: reposition before removing). At (−31, 24) it stands on the plaza's
+   west flank, still on the apron, still read as part of the fleet from any camera that turns to
+   look — and out of the wedge between the arrival mark and the monument. */
 const POD_SPOTS = [
   { x:  16.0, z: -18.0, face: 118 },
   { x:  19.5, z: -20.0, face: 104 },
   { x: -16.0, z: -18.0, face: 242 },
   { x: -19.5, z: -20.0, face: 256 },
-  { x: -13.0, z:  28.5, face: 196 }
+  { x: -31.0, z:  24.0, face: 208 }
 ];
 /* THE ASCENT PADS ARE INVISIBLE TO ctx.colliders, AND THAT COST THE FIRST CUT OF THIS FILE A
    SHUTTLE. ground.js, plaza-dressing.js and monument.js all push invisible collider Meshes, so

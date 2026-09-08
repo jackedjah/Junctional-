@@ -339,9 +339,18 @@ export function buildDressing(ctx) {
   luminaires.push(heads);
 
   /* ---- 4. CORRIDOR EDGES: rails, bollards, barrier segments ------------------- */
+  /* R170 §17 — THE RAIL WAS 62 POSTS, AND A RAIL IS NOT READ BY COUNTING ITS POSTS.
+     2.6 m spacing over 80 m, both sides: 62 posts and 62 base plates, and from the plaza's own long
+     sightline they line up into a picket fence across the middle distance — one of the few things in
+     this world that manages to be simultaneously invisible up close and dominant at 60 m. What the
+     eye actually reads as "there is a rail there" is the CONTINUOUS TOP BAR six lines below, an 80 m
+     run at y 0.95 that is unchanged. The posts are what hold it up; at 5.2 m they still do that, and
+     there are 31 of them instead of 62.
+     This is the §17 test answered honestly: the posts have a function (they carry the rail), so they
+     are not removed — they are halved, which is the smallest change that stops them competing. */
   const railPost = own(chamferBox(0.1, 0.95, 0.1, 0.02));
   const postMats = [];
-  for (const sd of [-1, 1]) for (let z = 40; z > -40; z -= 2.6) postMats.push([sd * 39.6, 0.48, z]);
+  for (const sd of [-1, 1]) for (let z = 40; z > -40; z -= 5.2) postMats.push([sd * 39.6, 0.48, z]);
   const posts = new THREE.InstancedMesh(railPost, M.chromeSatin || M.trimSatin, postMats.length);
   /* base plates: the vertical shaft earns its metalness 1.0, the horizontal plate does not (§15) */
   const plateGeo = own(chamferBox(0.24, 0.05, 0.24, 0.015));
