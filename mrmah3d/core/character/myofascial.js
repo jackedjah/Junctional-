@@ -909,9 +909,48 @@ export function torsoSurface(a,section,raw) {
      const i=Math.max(0,F.depth.findIndex(p=>p[0]>=yy)-1),a=F.depth[i],b=F.depth[Math.min(i+1,F.depth.length-1)];
      if(yy>=F.depth[0][0]&&yy<=F.depth.at(-1)[0])crest=a[1]+(b[1]-a[1])*clamp((yy-a[0])/(b[0]-a[0]||1));
    }
+   /* R238 — THE QUAD'S CROWN SAT ON THE INNER HALF OF ITS OWN SURFACE.
+
+      This block, not `lowerField`, is the live owner of the anterior quad: the
+      line above clips `anatomyFront` to `lowerPlane`, and then `anatomyFront +=
+      (target-anatomyFront)*weight` REPLACES it wherever the weight is 1, which
+      is q 0.25-0.85 over y 0.77-1.29. An edit to `plate` in `lowerField` was
+      built and measured first and moved the mesh by 0.0003 — it only survives
+      where this weight tapers. Locate the owner in the built mesh, not in the
+      first function that looks like it.
+
+      Evaluated through this chain at the mesh's own anterior sample columns
+      (measured: q 0.000 0.059 0.145 0.280 0.440 0.628 0.800 0.928), the
+      cross-section came out
+
+          y 1.20   q0.145  q0.280  q0.440  q0.628  q0.800
+                   0.2090  0.2338  0.2375  0.2128  0.1736
+
+      — a crown at q 0.28-0.44 and then ONE straight ramp all the way out. The
+      mass is inboard and the whole outer half is a plane, which is why the
+      front view reads as a smooth sheet with the VM ribbon and the midline
+      channel scratched onto it. There is no outer sweep to separate anything
+      from, so engraving another groove could not have produced one.
+
+      So the OUTER FACE'S TURN migrates outboard as it rises — 0.52 at the knee
+      to 0.66 at the belt — and steepens with it. Same crest depth, same inner
+      face, same footprint: the crown simply extends out to q 0.63 and the
+      lateral fall begins where a vastus lateralis begins. Predicted and then
+      measured at y 1.20: q0.628 +0.0247, q0.800 +0.0188, q0.440 and everything
+      inboard unchanged, peak depth unchanged at 0.2375. Mass moves; none is
+      added. `lowerField` writes Z only and so does this, so the FRONT
+      silhouette cannot move at all.
+
+      Both profiles carry EQUAL knots at y 0.62 and 0.98. `profileAt` is
+      Fritsch-Carlson monotone cubic, so a flat pair forces a zero tangent at
+      both ends of that span: the segment is exactly constant and every vertex
+      at or below y 0.98 is bit-identical. The unresolved knee band (0.58-0.95)
+      and its landmarks are untouched by construction, not by tuning. */
+   const outerTurn=F.outerTurnProfile?profileAt(F.outerTurnProfile,yy):F.outerTurn;
+   const outerSlope=F.outerSlopeProfile?profileAt(F.outerSlopeProfile,yy):F.outerSlope;
    const central=crest-F.convexity*Math.pow(q-F.crestQ,2);
    const inner=crest-width*F.innerSlope*Math.max(0,F.innerTurn-q);
-   const outer=crest-width*F.outerSlope*Math.max(0,q-F.outerTurn);
+   const outer=crest-width*outerSlope*Math.max(0,q-outerTurn);
    const target=Math.min(central,inner,outer);
    const weight=windowAt(yy,...F.region)*smooth((q-F.boundary[0])/F.edgeWidth)
      *smooth((F.boundary[1]-q)/F.edgeWidth);

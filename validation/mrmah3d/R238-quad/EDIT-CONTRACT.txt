@@ -1,0 +1,52 @@
+R238 — ANTERIOR-QUAD PROTOTYPE — BOUNDED EDIT CONTRACT (recorded before editing)
+
+BASELINE CHECKPOINT   28d1f04, working tree clean, verified bit-identical to
+                      the documented A3 sculpt (2050 unique vertex positions,
+                      zero differences against the A3 dump).
+
+EXACT OWNER           mrmah3d/core/character/myofascial.js :: lowerField(x,y,true)
+                      under MORPHOLOGY.lower.planeDesign.directionalCrown, the
+                      `plate` term. Verified live: it is the anterior quad's
+                      whole mass. Its crest is
+                        crest = quadFaces.crestQ + quadFaces.upperOblique*(y-1.08)
+                      and the parameters live in
+                      proportions.js :: MRMAH_MORPHOLOGY.lower.planeDesign.quadFaces.
+
+BOUNDED REGION        y 0.98 .. 1.46, anterior only (z > 0). One variable
+                      family: WHERE the existing dome's crest sits laterally.
+                      Amplitude (0.044), footprint (qIn 0.10, qOut), and the
+                      A2c C1 smoothstep dome shape are NOT touched.
+
+PROTECTED BOUNDARY    y <= 0.98 is bit-identical by construction: the new term
+                      is multiplied by smooth((y-0.98)/0.26), which is exactly
+                      zero at and below 0.98. So the knee band (0.58-0.95), its
+                      landmarks, QUAD_KNEE_LAYOUT, the patch `paths` and the
+                      refineRecessEdges split are all untouched, as is every
+                      posterior term, the upper body and the terminal point.
+                      `lowerField` writes Z only, so the FRONT silhouette
+                      cannot move at all.
+
+SAMPLING              Measured on the built mesh, the anterior columns in this
+                      band are q = 0.000 0.059 0.145 0.280 0.440 0.628 0.800
+                      0.928 (max gap 0.19). Any feature must be wider than that
+                      or it is invisible. The crest is moved BETWEEN columns
+                      (0.44 -> 0.65), so it is carried by real vertices the
+                      whole way.
+
+ONE INTENDED VISIBLE IMPROVEMENT
+                      The quad's fullest point currently sits at q 0.44 — the
+                      middle of the surface — so it reads as one smooth mound
+                      with scratches on it and has no outer sweep. Moving the
+                      crest outboard, and letting it migrate outboard as it
+                      rises, turns the same mass into a vastus-lateralis sweep
+                      running high-and-lateral to low-and-medial, with the
+                      inner surface becoming a long lean plane that the
+                      existing VM ribbon and midline channel then read AGAINST
+                      as separation. Redistribution, not size: peak relief
+                      stays 0.044.
+
+PREDICTED (arithmetic, before building) at y 1.34, relief at the sample columns
+                      q      0.280   0.440   0.628   0.800   0.928
+             before   0.0223  0.0437  0.0326  0.0113  0.0008
+             after    0.0112  0.0299  0.0438  0.0237  0.0020
+                      outer sweep +110%, inner plane -50%, peak unchanged.

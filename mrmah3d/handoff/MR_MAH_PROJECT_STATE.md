@@ -723,3 +723,131 @@ guessed at. A1 remains BLOCKED — WAITING FOR R168/R169 EYE SOURCE. Stage B
 (one anterior-quad organization pass) is NOT started; the steer requires the
 user to accept a Stage A result first, and the honest Stage A result is a
 revert plus a proposal.
+
+
+R238 — ANTERIOR-QUAD PROTOTYPE. THE CROWN WAS ON THE INNER HALF OF ITS OWN
+SURFACE, AND THE OWNER WAS NOT THE FUNCTION THAT LOOKED LIKE IT.
+---------------------------------------------------------------------------
+BRIEF: one independent anterior-quad prototype above the unresolved knee band.
+Better muscle ORGANIZATION, not more size, more smoothness or another engraved
+groove: a full elongated volume with a coherent outer sweep and controlled
+inner separation. Keep A3, park the knee repair, Mrs. Mah read-only. One
+localized shape experiment; preserve the knee landmarks and triangulation.
+
+BASELINE   28d1f04, working tree clean, verified bit-identical to the A3 sculpt
+           (2050 unique vertex positions, zero differences) before any edit.
+
+THE FIRST OWNER WAS THE WRONG ONE, and it was caught by measuring rather than
+reading. `lowerField`'s `plate` term is documented here (R233 / A2c) as "the
+anterior quad's whole mass", so the first edit moved its crest outboard. Built
+and compared: max |dz| 0.0003, i.e. nothing. Reverted.
+
+`torsoSurface` runs TWO more stages after `lowerField` returns:
+  - `anatomyFront -= max(0, anatomyFront - lowerPlane) * lowerPlaneWeight`
+    clips the anterior surface to LOWER_FRONT + crownLimit 0.033, which is
+    below the plate's own 0.044 peak; and then
+  - `if(front>0 && L.surfaceFaces)` blends `anatomyFront` onto
+    `min(central, inner, outer)` with a weight that REACHES 1 over q 0.25-0.85,
+    y 0.77-1.29 — where it is 1 the surface simply IS that target.
+So `MRMAH_MORPHOLOGY.lower.planeDesign.surfaceFaces` is the live owner of the
+anterior quad, and `plate` only survives at the edges where that weight tapers
+(which is exactly where the 0.0003 showed up). This is the "duplicated baseline
+is a silent no-op" trap again, one layer further down. `plate` is not dead —
+it owns y > 1.34 — but it does not own the quad.
+
+THE FAULT, evaluated through the live chain at the mesh's own anterior sample
+columns (measured on the built mesh: q = 0.000 0.059 0.145 0.280 0.440 0.628
+0.800 0.928, max gap 0.19 — nothing narrower than that can be seen):
+
+    y 1.20    q0.145  q0.280  q0.440  q0.628  q0.800
+              0.2090  0.2338  0.2375  0.2128  0.1736
+
+A crown at q 0.28-0.44 and then ONE straight ramp all the way out. The mass is
+inboard and the entire outer half of the quad is a plane — `surfaceFaces` is
+`linearFaces:true`, three flat faces combined with a hard `min()`. That is why
+the front view reads as a smooth sheet with the VM ribbon and the midline
+channel scratched onto it. There was no outer sweep for an inner separation to
+be separate FROM, so no additional groove could have produced one.
+
+THE CHANGE — one variable family, two numbers, both as height profiles:
+    outerTurn   0.52  ->  0.66   (outerTurnProfile)
+    outerSlope  0.72  ->  0.86   (outerSlopeProfile)
+The outer face's turn migrates outboard as it rises and steepens with it, which
+is the vastus lateralis' own line. Crest depth, inner face, convexity,
+footprint, region and every other coefficient are untouched.
+
+Both profiles carry EQUAL knots at y 0.62 and 0.98. `profileAt` is
+Fritsch-Carlson monotone cubic, so a flat pair forces a zero tangent at both
+ends: that span is exactly constant and everything at or below y 0.98 is
+bit-identical BY CONSTRUCTION rather than by tuning.
+
+MEASURED ON THE BUILT MESH (before -> after, anterior z at the real columns):
+
+    y 1.220   |x| 0.0000-0.1399  (q 0 - 0.441)   UNCHANGED to five decimals
+              |x| 0.1995 (q 0.629)   0.21016 -> 0.22378   +0.0136
+              |x| 0.2544 (q 0.802)   0.13170 -> 0.13849   +0.0068
+              peak depth 0.23900 at |x| 0.1399   UNCHANGED
+    y 1.340   |x| 0.1724   0.18607 -> 0.19961   +0.0135
+              |x| 0.2199   0.13794 -> 0.14915   +0.0112
+
+Whole-torso band scan: 46 of 2020 (x,y) columns moved, all of them in
+y 1.0-1.4, max |dz| 0.0142. Every band at or below y 1.0 is exactly zero, as
+is every band above 1.5.
+
+GATES
+  silhouette        ZERO pixels of outline change in the front, lower-front AND
+                    side captures (per-row leftmost/rightmost lit pixel, matched
+                    frames). `surfaceFaces` writes Z only, so the front outline
+                    cannot move; the side outline is the peak depth, which is
+                    unchanged. Not asserted from that argument — measured.
+  knee band         NOT regressed. On the 3036-sample world grid the mean |dz|
+                    over y 0.56-0.99 is 0.000002 and the single worst sample is
+                    0.000593, at y 0.990 — above the band, inside the fade.
+  new wedge/dent    NONE. Adjacent-face turns are identical to the baseline:
+                    knee max 55, quad max 71 (379 faces), taper max 47. The
+                    quad's top outliers are the pre-existing midline-channel
+                    pair at x +/-0.04, untouched.
+  topology          unchanged: 12288 vertices, 4096 triangles, same counts
+                    before and after. Six vertices at y 1.06/1.14/1.28 shifted
+                    by <= 0.0005 in x,y — they are the refineRecessEdges split
+                    points, which are placed by raycast onto the surface they
+                    sit on, so they ride it. No split was added or removed.
+  BufferGeometry    0 non-finite positions, 0 degenerate triangles, 0 non-unit
+                    normals, min triangle area 7.3e-7, all nine attributes at
+                    equal count, bounds and bounding sphere recomputed clean.
+  Mrs. Mah          UNCHANGED, proven not asserted. Her whole body group built
+                    under baseline and candidate and compared mesh by mesh: 14
+                    meshes, vertex counts, an order-independent AND an
+                    order-dependent position checksum and both bounding-box
+                    corners — identical.
+  contracts         376/376.
+
+VISUAL (matched clay, pose frozen with reducedMotion:'reduce', identical
+camera, framing, lighting and material):
+  three-quarter   the strongest read. The upper thigh's outer surface was a
+                  flat plane meeting the dark side in a straight bevel; it is
+                  now a rounded convex shoulder turning into the side, with a
+                  soft longitudinal ridge running hip-to-knee. No hard edge.
+  quad front      the lit mass carries visibly further outboard on both sides
+                  and the early dark cliff at the outer third is gone.
+  lower front     the upper thigh reads rounder; outline identical.
+  side guard      no bulge, no puffiness; 813 changed pixels, all interior
+                  shading.
+
+KEEP-CANDIDATE.
+
+NOT FIXED, and still open: the knee-band wedge is exactly as R237 left it —
+max 55 degrees at y0.673 x +/-0.043, about 8x its local neighbours — and the
+representation constraint stands (the crest is carried by one relocated vertex
+per side sitting 0.015-0.020 from a ring, so a sampled crest and the sliver are
+the same feature). The two proposed ways out are unchanged and still await
+approval. Also unchanged and outside this pass: the rectangular panel on the
+upper quad, which is the refineRecessEdges split at y .92-1.32 and is present
+identically in both captures.
+
+Proof: validation/mrmah3d/R238-quad/ — seven matched clay views before and
+after, five before/after comparison sheets, and the bounded-edit contract
+recorded before the edit.
+
+NEXT: STOP FOR REVIEW. Calf, eyes, crystallization and platinum are not
+started. A1 remains BLOCKED — WAITING FOR R168/R169 EYE SOURCE.
