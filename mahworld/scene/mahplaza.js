@@ -199,6 +199,7 @@ export async function createMahplaza(canvas, options = {}) {
   const MDESCENT = await optional('./mahdescent.js'); /* R3-07: the way down, three entrances */
   const ORING = await optional('./outerring.js');     /* R3-01: dead-zone closure in the outer ring */
   const MFAC = await optional('./mahfacilities.js');  /* R3-08/R3-11: MAH VITAL, FORGE, MODE */
+  const CFURN = await optional('./campus-furnishing.js'); /* CAMPUS: the props that make the quad a place */
   const MBEAST = await optional('./mahbeasts.js');    /* R3-10: MAHBEASTS, Monkey Dogs L5-7 + boss */
   const ILINK = await optional('./interlink.js');     /* R2 §5: the routes between the three cities */
   const HALOM = await optional('./halo.js');          /* R4: MAH HALO, the upper sanctuary surface */
@@ -348,6 +349,12 @@ export async function createMahplaza(canvas, options = {}) {
     } catch (e) { console.info('MAHPLAZA: mahbeasts module failed —', e && e.message); beasts = null; }
   }
   if (MFAC && MFAC.buildMahFacilities) { try { facilities = MFAC.buildMahFacilities(ctx); scene.add(facilities.group); } catch (e) { console.info('MAHPLAZA: facilities module failed —', e && e.message); facilities = null; } }
+  /* CAMPUS FURNISHING runs LAST of the ground-level builders on purpose: it registers colliders for
+     every bench, lamp and pylon it places, and anything that tests against ctx.colliders has to see
+     a complete list. It also has to run after mahfacilities so it never stands a banner pylon in a
+     doorway that was placed after it. */
+  let furnishing = null;
+  if (CFURN && CFURN.buildCampusFurnishing) { try { furnishing = CFURN.buildCampusFurnishing(ctx); } catch (e) { console.info('MAHPLAZA: campus furnishing failed —', e && e.message); furnishing = null; } }
   if (ORING && ORING.buildOuterRing) { try { outerRing = ORING.buildOuterRing(ctx); scene.add(outerRing.group); } catch (e) { console.info('MAHPLAZA: outer ring module failed —', e && e.message); outerRing = null; } }
   if (MASCENT && MASCENT.buildMahAscent) { try { mahAscent = MASCENT.buildMahAscent(ctx); scene.add(mahAscent.group); } catch (e) { console.info('MAHPLAZA: mah ascent module failed —', e && e.message); mahAscent = null; } }
   /* ============================================================================================

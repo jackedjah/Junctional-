@@ -1,9 +1,8 @@
 # WORLD 01 CAMPUS RECONSTRUCTION — CURRENT STATE
 
 ACTIVE PHASE:
-P2 complete as a PLAN and as a re-siting; P5 (roads/sidewalks) not started. Next is the road loop
-and the forecourt paving, because `road-street` currently renders an empty band — the loop exists in
-`campus-plan.js` as a radius and has no geometry yet.
+P6 SOCIAL / furnishing has landed as a kit. P5 (roads/sidewalks) still not started, and the two
+things that would most change the world now are FRAMING BUILDINGS around the quad and the SHORELINE.
 
 CURRENT BEST CHECKPOINT:
 branch `claude-mahworld-phase0-control-deck`. Pre-campus checkpoint frozen at tag
@@ -56,6 +55,12 @@ MASTERED:
 - MAH MATCH's tower turns on a real plan radius with cross-core armour ribs.
 
 CURRENT DEFECT:
+0. **The quad is framed on three bearings out of 360.** Everything else is open floor to the
+   treeline. This is now the single biggest reason the place does not read as a real town, and the
+   furnishing pass is what made it obvious: props at the correct human scale read as scattered
+   specks across ground that has no walls around it.
+0b. **The shoreline is a blanket.** Land meets sea as a value change at r 2600 with no built
+   transition — no beach, no promenade, no steps, no moorings. Named by the direction, not started.
 1. **No roads.** The loop boulevard, sidewalks, forecourt paving and crossings are a plan and not
    geometry. `road-street` renders an empty band. This is the next action.
 2. **Nothing between the campus and the horizon.** Removing the unnamed city removed the entire
@@ -79,10 +84,20 @@ Draw calls fell sharply with the unnamed city removed — `quad-hero` 1370 draws
 off-origin abort.
 
 NEXT ACTION:
-P5 ROADS. Build the primary loop boulevard at CAMPUS.LOOP_R (186 m) as real geometry with a
-carriageway, kerbs and a rear service edge, then the three radial approach walks from the quad edge
-to each facility forecourt. Keep them as SURFACES, not as glowing edge lines — the floor now has no
-lines and a path that reinvents them would be the only grid left in the frame.
+FRAMING BUILDINGS, then the SHORELINE.
+
+The furnishing pass proved that street furniture cannot fill a 192 m quad on its own — human-scaled
+props are the right scale and the wrong instrument for that much ground. What the reference town
+actually uses to make a plaza feel held is CONTINUOUS BUILDING FRONTAGE on every side; MAHWORLD has
+buildings on three bearings out of 360 and open floor everywhere else. So the next pass is master
+section 7's placeholder buildings, built to the standard this world now holds itself to: a name, a
+real entrance, windows with interior depth, a canopy, a forecourt. Two-storey social frontage at
+the quad edge between the three facilities, not another ring of towers.
+
+Then the shoreline. It is a genuinely separate job and should not be smuggled into a campus pass:
+the coast is at r 2600-5600, the sea mesh, the shore bed and the swim volume all key off SEA in
+mah-rain.js, and "no more blanket implications" means built beach, promenade, steps, railings,
+moorings and a real land-to-water transition — not a tinted band where the two meet.
 
 LAST LEARNED RULE:
 A "line on the floor" is not one thing. This floor drew its grid from six independent families PLUS

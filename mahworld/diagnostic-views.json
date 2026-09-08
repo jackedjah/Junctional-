@@ -72,6 +72,16 @@
     "pos": [0, 1.6, 19], "look": [0, 0.15, -3], "fov": 55
   },
 
+  "quad-social": {
+    "why": "CAMPUS 12 — NPC / SOCIAL CLUSTER, at eye height. Standing 14 m from a rest cluster on the quad's edge, which is the distance a player actually reads street furniture from. Every other campus camera is 100 m or more out, so nothing in the suite could say whether a bench reads as a bench.",
+    "pos": [-4, 1.75, -74], "look": [1, 1.10, -93], "fov": 55
+  },
+
+  "gym-training": {
+    "why": "CAMPUS 4 — MAH GYM APPROACH, framed on the training ground rather than the doors: the mats and plate racks on the gym's flank are the one place the campus states its function with objects instead of a sign, so this is the frame that proves an object is identifiable without a label.",
+    "pos": [-96, 3.2, -18], "look": [-124, 1.4, -56], "fov": 52
+  },
+
   "quad-hero": {
     "why": "CAMPUS 1 — CENTRAL QUAD HERO (reconstruction master section 21). Standing on the far forecourt line at the head of the quad, looking straight down the arrival axis across 264 m of open campus to MAH MATCH. This is the frame that says whether the middle of the world reads as a quadrangle or as a yard full of objects.",
     "pos": [0, 3.6, 132], "look": [0, 14, -132], "fov": 60
