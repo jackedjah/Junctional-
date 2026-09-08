@@ -707,7 +707,39 @@ export function quadKneeSurfacePatch(sign,supportAt){
    return [x,y,incoming+(target-incoming)*attachment];
   }return[x,y,incoming];
  };
- const paths=[medial,crown,...crown.map((p,i)=>[p,medial[i]]),knee.concat([knee[0]]),...knee.map(p=>[center,p])];
+ /* R236 / A3b — THE KNEE KITE NO LONGER FORCES EDGES INTO THE MESH.
+
+    `conformSurfacePatch` inserts a vertex for every landmark in `paths`. The
+    medial and crown rails run ALONG the limb and their landmarks land near
+    existing ring vertices, so they cost nothing. The knee kite does not: it is
+    a closed quadrilateral plus a centre point, five landmarks per side, dropped
+    into a band whose natural rings are y 0.55 / 0.66 / 0.77 / 0.87.
+
+    Measured in the built mesh, those insertions were still present after A3 and
+    are the residual central ridge. Row populations in the band came out
+    y0.645 -> 2 vertices, y0.660 -> 7, y0.770 -> 5, y0.790 -> 4, and the
+    inserted rows sit exactly on the kite: y0.645 x+/-0.0630 is its bottom
+    corner [.063,.645]; y0.790 x+/-0.0390 its left corner [.039,.79]; y0.790
+    x+/-0.0650 its centre [.065,.79]. Connecting a two-vertex row to a
+    seven-vertex row across a 0.015 gap can only make a fan of slivers — one of
+    them, area 2.6e-4 with normal [-0.42,-0.70,0.58], meets its neighbour
+    [0.10,-0.06,0.99] at the 55 degrees the brief flagged, against local
+    neighbours at a median of 7.
+
+    Only the forced EDGES go. `sample` above is untouched and still carries the
+    kite's triangles, so the knee's authored surface — its depth, its medial
+    rails, its adductor channel — is displaced exactly as before onto whatever
+    vertices exist. This spreads the directional change across the ring
+    neighbours instead of concentrating it on five inserted points, which is
+    what the brief asks for, and it flattens nothing.
+
+    Two earlier hypotheses for this same 55 degrees were measured and REFUTED,
+    recorded so they are not retried: zeroing `kneeAccent` moved it 55 -> 50
+    only (it contributes about a tenth); and Fritsch-Carlson monotone cubic
+    interpolation of the lower profiles, which removes the piecewise-linear
+    corners at the y=0.70 knot, did not move it at all (55 -> 55). The corner
+    was never the owner here — the inserted vertices were. */
+ const paths=[medial,crown,...crown.map((p,i)=>[p,medial[i]])];
  return{name:'R164 quad medial rails and knee kite',sign,facing:1,
   accept:p=>p[2]>.04&&p[0]*sign>.015&&p[0]*sign<.21&&p[1]>.55&&p[1]<1.40,
   paths,sample};

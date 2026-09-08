@@ -489,3 +489,119 @@ the central adductor channel at y0.673 — A5's region (mechanical ridge/divot
 continuity). Do not chase them before looking.
 
 NEXT: STOP FOR VISUAL REVIEW, per the brief. A4 (knee -> calf) is not started.
+
+
+R236 / A3b — THE RESIDUAL ADDUCTOR-CHANNEL RIDGE WAS THE KNEE KITE'S OWN
+INSERTED VERTICES
+---------------------------------------------------------------------------
+BRIEF: the A3 proof still showed an angular ridge / faceted staircase through
+the central adductor -> knee transition. Work ONLY that discontinuity. Do not
+touch quad mass, hip width, outer silhouette, chest, arms, head, global
+lower-body width, calf or the crystal layer. One bounded correction that
+spreads the directional change across neighbouring samples WITHOUT flattening
+the adductor anatomy.
+
+ACTIVE OWNER (measured, not assumed): `quadKneeSurfacePatch` in myofascial.js
+passes its `paths` list to `conformSurfacePatch`, which INSERTS A VERTEX for
+every landmark. The medial and crown rails run along the limb and land near
+existing ring vertices, so they cost nothing. The knee kite does not — it is a
+closed quadrilateral plus a centre point, five landmarks per side, dropped into
+a band whose natural rings are y 0.55 / 0.66 / 0.77 / 0.87.
+
+Raw triangle probe at y0.673 x0.043 showed the row populations:
+
+  y 0.645 ->  2 vertices   (-0.0630, 0.1122) (0.0630, 0.1122)
+  y 0.660 ->  7 vertices
+  y 0.770 ->  5 vertices
+  y 0.790 ->  4 vertices   (-0.0650) (-0.0390) (0.0390) (0.0650)
+
+y0.645 and y0.790 are not rings. They are QUAD_KNEE_LAYOUT.knee corners
+[.063,.645] and [.039,.79] and center [.065,.79], exactly. Connecting a
+two-vertex row to a seven-vertex row across a 0.015 gap can only make a fan of
+slivers, and one of them — area 2.6e-4, normal [-0.42,-0.70,0.58] — meets its
+neighbour [0.10,-0.06,0.99] at the flagged 55 degrees, against local
+neighbours at a median of 7.
+
+TWO HYPOTHESES MEASURED AND REFUTED FIRST, recorded so they are not retried:
+  - zeroing `kneeAccent` moved the outlier 55 -> 50 only. It contributes about
+    a tenth. NOT the owner.
+  - Fritsch-Carlson monotone cubic on the lower profiles, re-applied against
+    this residual after the R235 sliver was gone: 55 -> 55. NOT the owner, for
+    the second time. The piecewise-linear knot is definitively not what makes
+    this corner.
+
+THE CORRECTION — one line. The kite loop and its five spokes come out of
+`paths`; `medial`, `crown` and the rungs between them stay:
+
+  -  const paths=[medial,crown,...crown.map((p,i)=>[p,medial[i]]),
+  -                knee.concat([knee[0]]),...knee.map(p=>[center,p])];
+  +  const paths=[medial,crown,...crown.map((p,i)=>[p,medial[i]])];
+
+Only the forced EDGES go. `sample` is untouched and still carries the kite's
+displacement, so the knee's authored surface — its depth, its medial rails, its
+adductor channel — is applied exactly as before onto whatever vertices exist.
+That is what spreads the directional change across the ring neighbours instead
+of concentrating it on five inserted points, and it flattens nothing. It is
+also not subdivision, which the recovery brief rules out; it is the opposite.
+
+BEFORE / AFTER (ground truth, adjacent-face angles on built triangles,
+anterior only):
+
+                            A3        A3b
+  knee band y .58-.95 max   55°       47°
+  knee band p99             55°       47°
+  knee band p90             29°       28°
+  outlier at y0.673         present   GONE
+  outliers at y0.738 / y0.827  47/46° GONE
+  quad y .95-1.45           379 faces, max 71°   IDENTICAL
+  taper y .20-.58            65 faces, max 47°   IDENTICAL
+
+WHAT ACTUALLY MOVED (whole-torso vertex-set comparison of the two builds):
+EIGHT positions, and nothing else. 12288 vertices, 2050 unique positions in
+both; 8 only in A3, 8 only in A3b.
+
+  only in A3   x -0.129 .. 0.129   y rows 0.645, 0.790   (the kite corners)
+  only in A3b  x -0.140 .. 0.140   y rows 0.660, 0.770   (the natural rings)
+
+Windowed outer envelope over y 0.55-0.98: every real ring row (0.55, 0.65/0.67,
+0.75/0.77, 0.85/0.87, 0.95/0.97) is bit-identical to five decimal places. The
+two rows that lose width are the inserted kite corners themselves, interior
+points at |x| 0.063 and 0.129 where the outline is 0.151 and 0.197 — they never
+reached the silhouette.
+
+VISUAL (isolated neutral clay, identical framing, 4x magnified centre-channel
+close-up before and after):
+  centre channel  the hard diagonal wedge and the chevron kink at its foot are
+                  GONE. It reads as one soft longitudinal groove.
+  adductors       still separated — the channel and the two bellies either side
+                  remain readable in the front and quad three-quarter.
+  below the knee  the taper is continuous; magnified 4x it shows no staircase.
+  quad / hip /    unchanged, and proven unchanged at the mesh, not by eye.
+  silhouette
+  puffiness       none; nothing on the outline moved.
+
+Frame-level diff of the lower-front capture is bounded to x350-522 y374-607 —
+the adductor/knee band and nothing else. The three-quarter captures show a thin
+scatter of sub-8-luma differences across the whole body; that is the idle
+animation's phase, not geometry (the proof tool waits a fixed 420 ms and the
+body is breathing), and the vertex comparison above is what settles it.
+
+REFERENCE PARITY: BETTER. The R106 anatomy sheets want belly -> shallow
+longitudinal channel -> smooth distal transition -> knee. That is now what the
+clay shows.
+
+KEEP. 376/376 contracts pass.
+
+HONEST REMAINDER, unchanged in kind from A3 but smaller: the top outlier in the
+band is now 47° at y0.605 x±0.037, whose local neighbourhood (n=27) has a
+median of 5° — still a high ratio by the diagnostic. Magnified 4x it is
+invisible: the below-knee taper reads smooth. Per the curvature law the angle is
+a measurement and the clay is the authority, so it is recorded and NOT chased.
+Also still standing from earlier passes and outside this brief: the rectangular
+panel visible on the upper quad in both builds (the quad's own y .92-1.32 split
+in body.js, pre-existing and identical before and after), and
+`torsoMoldNormal`'s differencing step of 0.002 rad against 0.131-0.196 vertex
+spacing.
+
+NEXT: STOP FOR VISUAL REVIEW, per the brief. A4 (knee -> calf) is not started.
+A1 remains BLOCKED — WAITING FOR R168/R169 EYE SOURCE.
