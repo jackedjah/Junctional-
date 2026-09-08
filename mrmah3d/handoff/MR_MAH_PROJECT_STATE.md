@@ -1544,3 +1544,63 @@ ANSWERS TO THE BRIEF'S SIX QUESTIONS
 Per the brief's priority order this pass stopped after the safe quad step and
 did NOT advance shin/calf. R246 IS A CANDIDATE AND IS NOT USER-APPROVED.
 Fallback: A3, 28d1f04.
+
+
+R247 — PHASE 3, THE KNEE TRANSITION. THE QUAD'S OWN DISTAL COEFFICIENTS WERE
+DEAD CODE.
+---------------------------------------------------------------------------
+Base R246 (6baade2). The consolidated master's phase list puts phases 1 and 2
+(centre calming, quad organisation) at R244-R246; this pass is PHASE 3 and
+nothing else. Phases 4 (shin/calf beyond R242), 5 (arms) and 6 (shoulder) were
+NOT attempted — see the note at the end.
+
+THE DEFECT, measured on the built mesh. The anterior profile by ring angle:
+
+    y 0.870   0.133  0.135  0.140  0.136  0.084  0.052    <- flat, no structure
+    y 1.060   0.232  0.237  0.247  0.269  0.208  0.146    <- a real crown
+
+`astraQuad.region` began at 0.88, so the quad's organisation switched on
+abruptly between those rows rather than landing into the knee. Worse, its own
+coefficient table carries knots at y 0.80 and 0.87 — vl 0.16, vm 0.20,
+valley 0.06 — and the region made every one of them DEAD CODE. The distal quad
+had authored values that could never reach the mesh.
+
+THE CHANGE — one number. `region` 0.88 -> 0.80, so the authored 0.80 and 0.87
+coefficients do their job and the field fades in over 0.80-0.94.
+
+    y 0.870 after   0.137  0.140  0.145  0.133  0.084  0.057
+                    a crest and a fall: the distal quad arriving.
+
+AND THE KNEE BAND GOT QUIETER, not harsher: median 8 -> 7, p90 30 -> 29, max 51
+unchanged. A structure that tapers strains the surface less than one that stops.
+Reaching further down was built and rejected: 0.74 gave p90 32, 0.70 gave max 53.
+
+GATES
+  centre           floor 0.2390, valley 0.0413 at y 1.220 — IDENTICAL to R246
+  front / side     outlines zero pixels changed
+  envelope         |x|max identical at every ring row 0.45-0.90
+  knee band        median 7, p90 29, max 51 — improved
+  quad band        67 (R246 65) — the known sliver column, within its range
+  taper            47 — unchanged; one fused point
+  topology         12288 vertices, 4096 triangles
+  BufferGeometry   0 non-finite, 0 degenerate, 0 non-unit normals
+  Mrs. Mah         14 meshes IDENTICAL
+  contracts        376/376
+
+VISUAL: the distal quad masses now converge into the knee instead of fading
+out, and the transition is graded rather than abrupt. No facets, no notch, no
+smoothing away — the landmark is more present, not less.
+
+WHAT WAS NOT TOUCHED, and why it is not a claim of completion:
+  - Phase 4 (shin / calf beyond what R242 built) — not attempted.
+  - Phase 5 (arms, both characters) — NOT STARTED. The master describes the
+    arms as reading like stacked circles rather than one integrated limb, on
+    BOTH characters. That is a large region with its own owners
+    (`arm-anatomy.js`, `limbs.js`) which this session has only touched once, to
+    stop `authoringMaster` leaking into Mrs. Mah. It deserves its own diagnosis
+    pass and should not be started as an afterthought at the end of a lower-body
+    pass. Nothing about the arms has been measured this session.
+  - Phase 6 (shoulder / deltoid / torso connection) — not started.
+  - A1 eyes — still BLOCKED on the R168/R169 runtime source.
+
+R247 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.

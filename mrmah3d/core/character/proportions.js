@@ -2218,7 +2218,22 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     where the body is too narrow for a 0.30-radian descent: the field must end
     where Astra's own did. Fading in over 0.88-1.02 keeps the handoff to the
     knee continuous without asking a narrow row to carry a wide groove. */
- region:[0.88,1.46,0.14], sideFade:0.06, projection:0.94,
+ /* R247 (Phase 3, the knee transition) — the field reaches DOWN to 0.80 now.
+    Its own coefficient table has knots at y 0.80 and 0.87 — vl 0.16, vm 0.20,
+    valley 0.06 — but a region starting at 0.88 made every one of them dead
+    code, so the quad's organisation stopped ABRUPTLY at the knee instead of
+    landing into it. Measured on the built mesh, the anterior profile at y 0.870
+    was 0.133 / 0.135 / 0.140 / 0.136 — flat — while y 1.060 had a real crown.
+    That gap is what "the distal quad landing into the knee is not refined
+    enough" is made of.
+
+    At 0.80 the profile becomes 0.137 / 0.140 / 0.145 / 0.133: a crest and a
+    fall, the distal quad arriving. And the knee band gets QUIETER rather than
+    harsher — median 8 -> 7, p90 30 -> 29, max 51 unchanged — because a
+    structure that tapers strains the surface less than one that stops.
+    Reaching further was measured and rejected: 0.74 gave p90 32 and 0.70 gave
+    max 53. */
+ region:[0.80,1.46,0.14], sideFade:0.06, projection:0.94,
  /* R243 — `head`'s half-width goes 0.75 -> 0.80 so the two quad domes MEET
     nearer the midline: measured, that alone lifts the channel floor 0.1918 ->
     0.2011 at y 1.220 while the crown moves 0.0012. This is the part of the fix
