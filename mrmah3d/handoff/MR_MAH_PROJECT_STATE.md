@@ -923,3 +923,129 @@ KNEE / RIDGE DEFECTS STILL OPEN, unchanged by R238:
 
 The candidate is a candidate. It is NOT user-approved, and the retained
 baseline remains A3 at 28d1f04.
+
+
+R239 — THE ASTRA R109 ANTERIOR QUAD, RESTORED. THE FLAT SHIELD WAS A
+POST-ASTRA REGRESSION, AND IT IS NAMED.
+---------------------------------------------------------------------------
+BRIEF: do not continue the flat-sheet quad direction; restore the Astra
+implementation as literally as possible. Real volumetric quad mass, outer
+sweep, readable belly, longitudinal flow into the taper, a front that reads as
+anatomy rather than a smoothed shield with incisions. Mrs. Mah read-only.
+
+ASTRA EXISTS IN THIS REPOSITORY AND IT WAS FOUND, NOT APPROXIMATED.
+`ASTRA_HANDOFF.md` and commit 0c05b31, "R109 ASTRA TAKEOVER HANDOFF". Its
+`character/` directory has no `myofascial.js` at all: the Astra lower body is a
+RING-SHAPE implementation, `thighShape` in proportions.js, built from
+`domePair` lobes around the ring. `git log -S` puts the whole current chain —
+`surfaceFaces`, `linearFaces`, `lowerPlaneWeight` — at c7dbe13, the R223
+reconstruction. So the flat front is not something this pass introduced; it
+arrived with the R223 fork and replaced Astra.
+
+THE REGRESSION, MEASURED ON BOTH BUILT MESHES at matched heights (0c05b31
+checked out in a worktree and built headlessly; anterior z by angle from the
+front seam):
+
+    ASTRA y 1.100    0 deg 0.152 | 20 deg 0.240 | 37 deg 0.259 | 53 deg 0.192
+    A3    y 1.140    0 deg 0.200 | 21 deg 0.221 | 30 deg 0.233 | 43 deg 0.204
+
+Astra's section rises 70% from the seam to the quad crown. The R223-lineage
+section rises 15%. THAT is the whole of "a flat shield with incisions instead
+of quadriceps mass" — the crown was never the problem, the CENTRAL DESCENT and
+the convex columns either side of it were missing, and no groove engraved on a
+flat field could have produced them. It also explains why R238's outer-sweep
+edit was only a modest win: it moved the right region by the wrong quantity.
+
+THE RESTORATION. `MRMAH_MORPHOLOGY.lower.astraQuad` carries Astra's own lobe
+geometry and its own per-row coefficients verbatim from 0c05b31 —
+
+  seam   centre 0.00 rad, half-width 0.30   the central descent (single dome)
+  head   0.70 / 0.75                        the thigh column's roundness
+  rf     0.42 / 0.28                        the rectus ridge on it
+  valley 1.00 / 0.30                        the RF / VL separation
+  vl     1.42 / 0.55                        the lateral sweep, 50 to 113 deg
+  vm     0.30 / 0.32                        the medial teardrop, low
+  itb    1.95 / 0.30                        the flat outboard of the sweep
+
+— with the posterior terms (glute, cleft, ham, hamCleft) deliberately left out
+because this restoration is anterior only. `dome` and `domePair` are copied
+verbatim into myofascial.js. Angles are radians from the front seam, which is
+already `torsoSurface`'s convention (front = max(0, sin a)), so the lobes
+needed no re-basing.
+
+`torsoSurface` evaluates it and the TWO FLATTENERS yield to it: the
+`lowerPlane` clip (which capped the front at LOWER_FRONT + 0.033, below the
+plate's own peak) and the `surfaceFaces` min-of-three-planes blend are both
+scaled by (1 - astraWeight). Outside the quad band they are untouched.
+
+TWO THINGS THE FIRST BUILD GOT WRONG, both caught by measuring:
+  - the peak came out 0.298 against Astra's own 0.245, 25% too deep, because
+    the port applied `m` to the depth alone. In Astra the shape multiplied a
+    ring RADIUS and the ring turned that into depth, so z was sin(a)*d*shape.
+    Multiplying by `front` (= sin a), the same falloff `anteriorStock` already
+    uses, fixed it in one term.
+  - carrying the field down to y 0.80 put 60-66 degree creases on the front
+    MIDLINE at y 0.837 and 0.937, where the body is too narrow to carry a
+    0.30-radian descent. Astra's own lowest thighShape row is y 0.870 and below
+    it the rings hand over to `lowerLegShape`, which has no seam. The region is
+    0.88-1.46 now, which is Astra's own extent, and both creases are gone.
+
+RESULT, on the built mesh (anterior z by angle from the seam):
+
+    y 1.220   BASELINE A3   0 deg 0.208 -> crown 0.239   rise 15%
+              R238          0 deg 0.208 -> crown 0.239   rise 15%
+              R239          0 deg 0.157 -> crown 0.268   rise 71%
+              ASTRA 1.230   0 deg 0.139 -> crown 0.245   rise 76%
+
+Astra parity on the thing that matters. The seam drops 0.208 -> 0.157 and the
+crown rises 0.239 -> 0.268.
+
+GATES
+  front silhouette  ZERO pixels of outline change (astraQuad writes Z only;
+                    LOWER_WIDTH still owns the outline). Half-width at every
+                    measured row identical: 0.241 0.282 0.306 0.318 0.302 0.275.
+  side projection   DELIBERATELY CHANGED and reported as such: the quad crown
+                    goes 0.239 -> 0.268, +12%. That is the brief's "the quad
+                    mass actually projects", and it is close to Astra's own
+                    0.245-0.259. NOTE: the outline extractor reports 0 px on
+                    the side capture, but that is NOT evidence about the thigh
+                    — the lowered hand is the frontmost thing at those rows.
+                    The mesh number above is the honest one.
+  knee band         y 0.56-0.76 max |dz| 0.00012; the field fades in above
+                    0.88. Adjacent-face max 56 deg against the baseline's 55.
+                    The 55 deg at y0.673 x +/-0.043 is unchanged.
+  taper             max 47 deg, identical. One fused point, untouched.
+  topology          12288 vertices, 4096 triangles, unchanged.
+  BufferGeometry    0 non-finite, 0 degenerate, 0 non-unit normals, attributes
+                    at equal count, bounds and sphere clean.
+  Mrs. Mah          14 meshes, both checksums, both bbox corners — IDENTICAL.
+  contracts         376/376.
+
+VISUAL — the front and three-quarter both change decisively. The quad reads as
+two convex columns with a broad central valley between them, an outer sweep
+falling to the contour on each side, and a longitudinal flow that carries into
+the taper. The centre is now subordinate: a valley between two masses instead
+of an incision on a dead surface.
+
+HONEST REMAINDER. The quad band's adjacent-face maximum went 71 -> 123 degrees,
+at y 1.028 and 1.072, x +/-0.125-0.134. Probed: `tri689` and its mirror are
+NEAR-DEGENERATE slivers — three almost collinear vertices spanning three rows
+in one column, area 7.4e-4 against a 3e-3 neighbourhood — left over from the
+loft's changing side count, present in the baseline too, where their normals
+happened to point forward. A steeper field swings an ill-conditioned normal;
+the clay debug view shades from `aSmooth`, which is area-weighted, so a
+near-zero-area face contributes almost nothing to it. Per the standing
+curvature law the number is a diagnostic and the clay is the authority, and the
+clay does not show a sliver there. What the clay DOES show, and what is real,
+is that the steeper field makes the pre-existing facet seams more visible in
+the extreme close-up than R238 did — the rectangular panel from the
+refineRecessEdges split at y .92-1.32 and a hard quadrilateral on the upper
+outer thigh. Those are faceting, they are separately owned, and the brief puts
+them after the anatomy ("muscle mass first, then crystallisation later").
+
+Proof: validation/mrmah3d/R239-astra-quad/ — seven matched clay views plus four
+labelled R238-vs-R239 comparisons, and the Astra R109 torso vertex dump the
+measurements were taken from.
+
+R239 IS A CANDIDATE AND IS NOT USER-APPROVED. The retained baseline is still
+A3 at 28d1f04.

@@ -7,6 +7,21 @@ import { MRMAH_MORPHOLOGY as MORPHOLOGY } from './proportions.js';
 export const clamp = x => Math.max(0, Math.min(1, x));
 const smooth = x => { const t = clamp(x); return t * t * (3 - 2 * t); };
 const gauss = (x, w) => Math.exp(-Math.pow(x / w, 2));
+/* R239: `dome` and `domePair` verbatim from the R109 Astra checkpoint
+   (0c05b31, proportions.js). Compact support — exactly zero beyond one
+   half-width, with zero slope at the edge — which is what lets a belly, the
+   valley beside it and the next belly be authored independently. `centre` is
+   radians from the FRONT SEAM. */
+const dome = (a, centre, hw) => {
+  let e = a - Math.PI / 2 - centre;
+  while (e > Math.PI) e -= Math.PI * 2;
+  while (e < -Math.PI) e += Math.PI * 2;
+  const u = e / hw;
+  if (u >= 1 || u <= -1) return 0;
+  const s = 1 - u * u;
+  return s * Math.sqrt(s);
+};
+const domePair = (a, centre, hw) => dome(a, centre, hw) + dome(a, -centre, hw);
 const windowAt = (y, a, b, fade) => smooth((y-a)/fade) * smooth((b-y)/fade);
 // Shape-preserving cubic profile. Derivatives share physical Y spacing; short
 // sampling intervals cannot turn into the shoulders of separate stacked bulbs.
@@ -899,9 +914,55 @@ export function torsoSurface(a,section,raw) {
  // Integrated quad-facing planes: only the excessive anterior crown is
  // clipped. X, the posterior field and the shared terminal topology stay put.
  const qLower=Math.abs(x)/Math.max(.001,width),L=MORPHOLOGY.lower.planeDesign;
+ /* R239 — THE ASTRA ANTERIOR QUAD REPLACES THE TWO FLATTENERS.
+
+    Everything below in this block — the `lowerPlane` clip and the
+    `surfaceFaces` min-of-three-planes blend — is what turned the anterior
+    lower body into a shield. The clip caps the front at LOWER_FRONT + 0.033,
+    and `surfaceFaces` (`linearFaces:true`) then REPLACES the surface, wherever
+    its weight reaches 1, with the smaller of a near-flat central face and two
+    straight ramps. Between them the front section could only rise 15% from the
+    seam to the crown; every muscle read after that had to be engraved on top
+    of it, which is exactly the "smoothed shield with incisions" the brief
+    rejects.
+
+    `astraWeight` is how much of this vertex the restored Astra field owns. The
+    two flatteners are scaled by (1 - astraWeight), so outside the quad band
+    they behave exactly as before and inside it they get out of the way rather
+    than fighting the anatomy. Nothing here touches X: LOWER_WIDTH still owns
+    the silhouette, and the posterior is untouched. */
+ const AQ=MORPHOLOGY.lower.astraQuad;
+ const astraWeight=(AQ&&front>0)?windowAt(yy,...AQ.region)*smooth(front/AQ.sideFade):0;
  const lowerPlane=profileAt(LOWER_FRONT,yy)+L.crownLimit-L.crownConvexity*Math.pow(qLower-.42,2);
- const lowerPlaneWeight=windowAt(yy,.70,1.45,.16)*smooth((qLower-.12)/.18)*smooth((.94-qLower)/.20)*front;
+ const lowerPlaneWeight=windowAt(yy,.70,1.45,.16)*smooth((qLower-.12)/.18)*smooth((.94-qLower)/.20)*front*(1-astraWeight);
  anatomyFront-=Math.max(0,anatomyFront-lowerPlane)*lowerPlaneWeight;
+ if(astraWeight>0){
+   /* Astra's own thighShape, evaluated at this vertex's ring angle. The seam
+      is a single dome on the midline (the central DESCENT, broad at 0.30 rad
+      half-width — a valley between two masses, never an incision); `head` is
+      the thigh column's roundness peaking 40 degrees off the seam; `rf` a
+      subtle ridge on it; `valley` the RF / VL separation at 57 degrees; `vl`
+      the lateral sweep from 50 to 113 degrees; `vm` the medial teardrop low
+      and beside the seam; `itb` the flat outboard of the sweep. */
+   const c=k=>profileAt(AQ[k],yy);
+   const Lb=AQ.lobes;
+   const m=1
+     -dome(a,Lb.seam[0],Lb.seam[1])*c('seam')
+     +domePair(a,Lb.head[0],Lb.head[1])*c('head')
+     +domePair(a,Lb.rf[0],Lb.rf[1])*c('rf')
+     -domePair(a,Lb.valley[0],Lb.valley[1])*c('valley')
+     +domePair(a,Lb.vl[0],Lb.vl[1])*c('vl')
+     +domePair(a,Lb.vm[0],Lb.vm[1])*c('vm')
+     -domePair(a,Lb.itb[0],Lb.itb[1])*c('itb');
+   /* `front` (= sin a) is Astra's own loft factor: there the shape multiplied a
+      RING RADIUS and the ring turned the radius into depth, so z was
+      sin(a) * d * shape(a). Applying m to the depth alone dropped that factor
+      and the first build came back 25% too deep at the crown — 0.298 against
+      Astra's own 0.245 — which would have read as an inflated thigh in the
+      side view. This is the same falloff `anteriorStock` already uses. */
+   const astraTarget=front*profileAt(AQ.depth,yy)*m*AQ.projection;
+   anatomyFront+=(astraTarget-anatomyFront)*astraWeight;
+ }
  if(front>0&&L.surfaceFaces){
    const F=L.surfaceFaces,q=qLower;
    let crest=profileAt(F.depth,yy);
@@ -953,7 +1014,7 @@ export function torsoSurface(a,section,raw) {
    const outer=crest-width*outerSlope*Math.max(0,q-outerTurn);
    const target=Math.min(central,inner,outer);
    const weight=windowAt(yy,...F.region)*smooth((q-F.boundary[0])/F.edgeWidth)
-     *smooth((F.boundary[1]-q)/F.edgeWidth);
+     *smooth((F.boundary[1]-q)/F.edgeWidth)*(1-astraWeight);   /* R239: yields to the restored quad */
    // Two facing fields inside the one exterior. X, posterior stock, terminal
    // point and waist remain unchanged. Boundaries blend into the shared wall.
    anatomyFront+=(target-anatomyFront)*weight;
