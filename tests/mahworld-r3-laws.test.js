@@ -73,6 +73,35 @@ const P = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); } else 
   P('R3-06-E the three decks are joined, so they read as ONE district',
     !!asc.stats && asc.stats.bridges >= 3, 'bridges ' + (asc.stats && asc.stats.bridges));
 
+  /* ---- THE RANK ---------------------------------------------------------------------------
+     Three verticals at one brightness are not a hierarchy of ascent lines; they are three bars
+     ruled through the frame. ASCENTS.w is the only per-line intensity control that exists (h scales
+     the geometry, pod scales the vehicle, and all three columns share one material at one opacity),
+     and it is read by TWO modules — fobeam's ground columns and mahascent's upper continuation. So
+     the table is checked, and then the place the sky half actually consumes it is checked, because a
+     rank that lives only in a table is a comment. */
+  const rank = await ev(async () => {
+    const w = window.MAHWORLD_MAHPLAZA;
+    const F = await import('/mahworld/scene/fobeam.js');
+    let up = null; w.scene.traverse(o => { if (o.name === 'ascent-upper-core') up = o; });
+    return {
+      table: F.ASCENTS.map(a => ({ id: a.id, h: a.h, w: a.w })),
+      upper: up && up.instanceColor ? Array.from({ length: up.count }, (_, i) => up.instanceColor.getX(i)) : null
+    };
+  });
+  const ws = rank.table.map(a => a.w);
+  P('R3-06-F every ascent line carries a RANK, and no two lines share one',
+    ws.length > 0 && ws.every(v => typeof v === 'number' && v > 0) && new Set(ws).size === ws.length,
+    JSON.stringify(ws));
+  P('R3-06-G exactly ONE line is the hero, and the rank order follows the height order',
+    ws.filter(v => v >= 1).length === 1
+    && rank.table.slice().sort((a, b) => b.w - a.w).map(a => a.h)
+       .every((h, i, arr) => i === 0 || arr[i - 1] >= h),
+    JSON.stringify(rank.table));
+  P('R3-06-H the rank REACHES the sky half, not just the ground half',
+    !!rank.upper && rank.upper.length === ws.length && rank.upper.every((v, i) => Math.abs(v - ws[i]) < 1e-3),
+    'upper instanceColor ' + JSON.stringify(rank.upper));
+
   /* ============================================================================================
      R3-07 · MAH DESCENT
      ============================================================================================ */

@@ -152,6 +152,7 @@ export function buildMahAscent(ctx) {
      1. THE CONTINUATION + 2. THE CLOUD PENETRATION
      ============================================================================================ */
   const beams = [];
+  const _rank = new THREE.Color();
   const upperGeo = own(new THREE.CylinderGeometry(1, 1, 1, 7, 1, true));
   const upperCore = new THREE.InstancedMesh(upperGeo, beamMat, ASCENTS.length);
   const upperSheath = new THREE.InstancedMesh(upperGeo, sheathMat, ASCENTS.length);
@@ -166,6 +167,11 @@ export function buildMahAscent(ctx) {
     /* the core keeps fobeam's line radius so the join is invisible; the sheath is the soft halo */
     upperCore.setMatrixAt(i, at(A.x, mid, A.z, 0, 0.62 * A.pod, len, 0.62 * A.pod));
     upperSheath.setMatrixAt(i, at(A.x, mid, A.z, 0, 1.85 * A.pod, len, 1.85 * A.pod));
+    /* the same rank fobeam.js gives the ground half. These upper columns never change brightness, so
+       one write at build is the whole animation — and without it the hierarchy would be correct from
+       the plaza and then flatten out the moment you stood on the deck the lines arrive at. */
+    upperCore.setColorAt(i, _rank.setScalar(A.w));
+    upperSheath.setColorAt(i, _rank.setScalar(A.w));
     beams.push({ x: A.x, z: A.z, from, to, phase: A.phase, pod: A.pod });
     stats.lines++;
 
@@ -236,6 +242,7 @@ export function buildMahAscent(ctx) {
     }
     stats.decks++;
   });
+  upperCore.instanceColor.needsUpdate = upperSheath.instanceColor.needsUpdate = true;
 
   /* ============================================================================================
      THE LIGHT BRIDGES — what makes three pads one district

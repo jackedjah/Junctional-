@@ -110,15 +110,30 @@ const FLOWS = [
 /* EXPORTED (R3-06): mahascent.js continues these same three lines up through the cloud decks to
    the Sky Realm arrival district. One table decides where an ascent stands, or the ground half and
    the sky half of the same line drift apart — which is the whole failure R3-06 is written against. */
+/* `w` IS THE LINE'S RANK, AND IT IS THE ONLY THING IN THIS TABLE THAT IS ABOUT COMPOSITION.
+   Every other column here is a fact about where a line stands. `w` is a judgement about which line
+   the eye is supposed to find first, and it exists because until it did there was NO per-line
+   intensity knob at all: `pod` scales the vehicle, `h` scales the geometry, and all three columns
+   ran through one shared material at one opacity. Three verticals at identical brightness do not
+   read as a hierarchy of ascent lines — they read as three bars ruled through the frame, which is
+   exactly the failure the direction names: lasers are punctuation, not wallpaper.
+   The rank follows the height rank on purpose. Two signals saying the same thing (the tallest line
+   is also the brightest) compound into one clear reading; two signals disagreeing would cancel.
+   Consumed by stepAscent below and by mahascent.js's upper continuation, so a line keeps its rank
+   whether you are standing on the plaza or standing on the arrival deck 604 m above it. */
 export const ASCENTS = [
   /* WEST — the near line. Between the plaza field's west edge and MAH GYM's apron; the closest of the
-     three to the camera, so it is the one whose pod reads at real size and whose floor flare is big. */
-  { id: 'ascent-west',  x: -30, z: -22, h: 520, pod: 1.00, phase: 0.7665 },
-  /* EAST — between the field's east edge and MAH MARKET's apron, and the shortest of the three. */
-  { id: 'ascent-east',  x:  32, z: -18, h: 468, pod: 0.92, phase: 0.3000 },
+     three to the camera, so it is the one whose pod reads at real size and whose floor flare is big.
+     SECONDARY: nearest the camera, so it needs the least brightness to hold its place in the frame. */
+  { id: 'ascent-west',  x: -30, z: -22, h: 520, pod: 1.00, phase: 0.7665, w: 0.62 },
+  /* EAST — between the field's east edge and MAH MARKET's apron, and the shortest of the three.
+     SECONDARY, and the quietest: shortest line, furthest off the plaza's forward axis. */
+  { id: 'ascent-east',  x:  32, z: -18, h: 468, pod: 0.92, phase: 0.3000, w: 0.52 },
   /* NORTH — on the field's far edge in front of MAH MATCH's west flank, so the tallest line has the
-     district's tallest dark mass behind it to be read against. */
-  { id: 'ascent-north', x: -13, z: -37, h: 604, pod: 1.06, phase: 0.6120 }
+     district's tallest dark mass behind it to be read against.
+     HERO: tallest, nearly dead ahead on the plaza's forward sightline, and standing against the one
+     backdrop dark enough to take it. This is the ascent line the world is introduced by. */
+  { id: 'ascent-north', x: -13, z: -37, h: 604, pod: 1.06, phase: 0.6120, w: 1.30 }
 ];
 /* ground.js FLOOR_TOP: the laid deck is 0.17 above the raw ground plane and everything that stands
    on the plaza stands on the DECK. A pad sunk to y = 0 would show a 17 cm gap along its whole rim. */
@@ -771,7 +786,7 @@ export function buildFobeams(ctx) {
 
     /* ---- per-line state, allocated ONCE ------------------------------------------------------ */
     ASCENTS.forEach(A => ascent.lines.push({ id: A.id, x: A.x, z: A.z, h: A.h, pod: A.pod, phase: A.phase,
-      charge: 0, burst: 0, podOn: 0, podY: DOCK_Y, field: 3.2 }));
+      w: A.w, charge: 0, burst: 0, podOn: 0, podY: DOCK_Y, field: 3.2 }));
     ascent.meshes = { core: coreMesh, band: bandMesh, sheath: sheathMesh, floor: floorMesh, reveal: revealMesh,
       shell: shellMesh, belt: beltMesh, glass: glassMesh, seam: seamMesh, field: fieldMesh2 };
     ascent.tex = bandTex;
@@ -925,7 +940,17 @@ export function buildFobeams(ctx) {
       }
       L.charge = charge; L.burst = burst; L.podOn = podOn; L.podY = podY; L.field = field;
 
-      const beam = 1 + 0.55 * charge + 2.1 * burst;
+      /* THE RANK WEIGHTS THE STANDING LINE. IT DOES NOT WEIGHT THE EVENT.
+         A launch is the loudest thing this module does, and a secondary line that could not announce
+         its own launch would not be a quieter line, it would be a broken one. So the rank scales the
+         resting-and-charging term in full, and the burst only three-fifths of the way: at rest the
+         three columns sit at 1.30 / 0.62 / 0.52 — a real ladder, readable at a glance from the plaza
+         — while a departure still roughly triples whichever line is departing.
+         Only the three COLUMNS are ranked. The pad reveals, the pods, the seams and the floor pool
+         below are near-field architecture at the walker's own scale; dimming those would remove
+         detail to solve a problem that is entirely about the far verticals. */
+      const w = L.w, ev = 0.35 + 0.65 * w;
+      const beam = w * (1 + 0.55 * charge) + ev * 2.1 * burst;
       MS.core.instanceColor.setXYZ(i, beam, beam, beam);
       MS.band.instanceColor.setXYZ(i, beam, beam, beam);
       MS.sheath.instanceColor.setXYZ(i, beam, beam, beam);
