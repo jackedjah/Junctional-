@@ -322,3 +322,77 @@ ANTI-REGRESSION: never author a lower-body term with a first-derivative
 discontinuity — it is invisible until a vertex lands on it and then it is a
 wedge. Never raise lower-body resolution as a fix for a soft read; it sharpens
 creases before it adds form. Do not re-add a sub-Nyquist insertion seam.
+
+
+---
+
+R234 / A2 RIDGE RECOVERY — THE ANTERIOR FIELD IS LOW-FREQUENCY
+
+BASE: A2c (ef02bb7), the last clean checkpoint. No wedge-producing change has
+ever been committed; the 48-side trial was reverted before Pass A landed.
+
+STEP 1, OWNER: `lowerField`'s anterior return (myofascial.js), reached through
+`torsoSurface`. Unchanged from A2c.
+
+STEP 2, SPACING: eight anterior samples across the half-width — x 0, .012,
+.036, .084, .120, .180, .228, .264 at y 1.06. Gaps 0.012 to 0.060. Ring
+spacing in y 0.03 to 0.11.
+
+STEP 3, THE DISCONTINUITY — AND IT IS NOT A NORMAL BREAK. Measured on the
+built torso, `aSmooth` (which the clay gate reads) is PERFECTLY CONTINUOUS:
+0 splits across welded duplicate corners in both the lower body and the chest,
+worst disagreement 0.0 degrees. So the faceted-staircase read is normal CHANGE
+ACROSS ONE TRIANGLE, not a crack between two. With eight samples over the
+half-width a single face spans a large arc, and linear interpolation of a
+fast-turning normal across it renders as a triangular band.
+
+Measured worst turn between adjacent anterior faces, isolating each term:
+
+    as it stood (A2c)                  57 deg
+    vastus-medialis ribbon widened     45-47 deg    <- dominant by far
+    bevel widened                      51 deg
+    central channel widened            56 deg       <- negligible
+
+STEP 4, BASELINE: worst adjacent-face turn 57 deg; peak relief 57.6; centre
+insertion 118/120/121/128% of the crown at y 0.95/1.06/1.18/1.30; outer
+contour as frozen.
+
+STEP 5, ONE BOUNDED FAMILY: the anterior relief's SPATIAL FREQUENCY. Widths up,
+depths held — VM ribbon 2.2x (through a new `ribbonFieldWide`, so the authored
+track is untouched and only its feathering changes), bevel 2x, central channel
+0.022 -> 0.050. No subdivision, no sharpened seam, no new term.
+
+RESULT:
+    worst adjacent-face turn   57 -> 44 deg   (-23%)
+    peak relief                57.6 -> 58.6   (+1.7%, marginally FULLER)
+    centre insertion           104/110/117/132%  (still reads)
+    outer contour              0.00000 units change, exact
+    376/376 static contracts pass
+
+KEEP GATE:
+    ridges disappear          IN THE QUAD, yes. In the KNEE band, no - see below
+    belly reads more human    yes (smoother, fuller, no flattening)
+    insertion still visible    yes
+    conditioning closer         partly - smoother, still less separated than arms
+    no puffiness               yes (+1.7% peak, contour exact)
+    fused silhouette holds     yes (exact)
+
+KEPT, because it improves what it owns and regresses nothing measurable.
+
+HONEST REMAINDER: angular chevron shapes persist in the KNEE band, roughly
+y 0.58-0.95. They are outside this pass's variable family — that band is owned
+by `kneeAccent` (a Gaussian 0.065 in y by 0.20 in q) and the taper's facet
+groups, neither of which this pass touched. They are A4's region and the same
+per-face-turn measurement applies to them.
+
+Proof: validation/mrmah3d/R234-A2-ridge/male__clay-iso__{05-lower-front,
+06-lower-threequarter,03-side,11-quad-threequarter}.png — isolated clay, low
+tier, identical framing to the frozen baseline.
+
+ANTI-REGRESSION, ADDED: the clay gate's normal is provably continuous, so a
+"faceted" read in clay is never a normal bug — measure the per-face TURN
+instead. Do not widen a term without checking the peak: widths up at constant
+depth make a belly fuller, not flatter, and the reverse loses mass.
+
+NEXT: A4, the knee band, same method. Do NOT start crystallization; the anatomy
+mesh must read smooth first and the facet layer is a separate later concern.

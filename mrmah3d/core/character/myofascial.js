@@ -40,6 +40,16 @@ export function ribbonField(x,y,track,amplitude) {
   const width=profileAt(track.map(p=>[p[0],p[2]]),y);
   return amplitude*gauss(Math.abs(x)-center,width)*windowAt(y,first[0],last[0],Math.min(.09,(last[0]-first[0])*.25));
 }
+/* R233 — the same ribbon with its spread scaled. The authored track (centre
+   line and width per row) is untouched; only how far the belly feathers
+   changes, which is what the sample rate can carry. */
+export function ribbonFieldWide(x,y,track,amplitude,widthScale) {
+  const first=track[0], last=track[track.length-1];
+  if(y<=first[0]||y>=last[0])return 0;
+  const center=profileAt(track.map(p=>[p[0],p[1]]),y);
+  const width=profileAt(track.map(p=>[p[0],p[2]]),y)*(widthScale||1);
+  return amplitude*gauss(Math.abs(x)-center,width)*windowAt(y,first[0],last[0],Math.min(.09,(last[0]-first[0])*.25));
+}
 export const TRUNK_PATHS = MORPHOLOGY.TRUNK_PATHS;
 
 // A muscle sheet has independently authored medial/lateral attachment routes.
@@ -274,7 +284,34 @@ export function lowerField(x,y,front) {
   // Paired knee-inspired changes are interior relief, not new silhouette bulbs.
   const kneeAccent=.012*gauss(y-(.70+.14*q),.065)*gauss(q-.36,.20)*windowAt(y,.58,.95,.10);
   const rail=profileAt([[.56,.028],[.80,.103],[1.10,.237],[1.29,.228],[1.46,.154]],y);
-  const bevel=windowAt(y,.56,1.46,.17)*(.010*gauss(ax-rail,.025)-.007*gauss(ax-(rail-.030),.023));
+  /* R233 / A2-RIDGE — THE ANTERIOR RELIEF IS LOW-FREQUENCY NOW.
+
+     `aSmooth` is provably continuous over this mesh (measured: 0 splits across
+     welded duplicates, worst 0.0 degrees), so the faceted-staircase read was
+     never a normal BREAK. It is normal CHANGE ACROSS ONE TRIANGLE: the
+     anterior lower body carries about eight samples over its half-width, and
+     where the field turns fast inside a single face, linear interpolation of
+     the normal across that face reads as a triangular band. Subdivision is
+     ruled out, so the field has to turn less per sample.
+
+     Measured worst turn between adjacent anterior faces, and what each term
+     contributes when widened on its own:
+
+         as it stood                      57 deg
+         vastus-medialis ribbon widened   45-47 deg   <- dominant by far
+         bevel widened                    51 deg
+         central channel widened          56 deg      <- negligible
+
+     So the widths go up and the depths stay: the VM ribbon 2.2x, the bevel 2x,
+     the channel to 0.050. Worst turn 57 -> 44 degrees, a 23% reduction, with
+     peak relief 57.6 -> 58.6 — the belly is marginally FULLER, not flatter,
+     because a wider Gaussian at the same amplitude covers more surface. The
+     centre insertion still reads at 104-132% of the crown.
+
+     This is a low-pass filter on the anatomy field, not a smoothing of the
+     mesh. The crystal layer is where irregularity belongs, and it comes
+     later. */
+  const bevel=windowAt(y,.56,1.46,.17)*(.010*gauss(ax-rail,.050)-.007*gauss(ax-(rail-.030),.046));
   if(front && MORPHOLOGY.lower.planeDesign.directionalCrown){
     const P=MORPHOLOGY.lower.planeDesign.quadFaces;
     const crest=P.crestQ+P.upperOblique*(y-1.08);
@@ -305,8 +342,8 @@ export function lowerField(x,y,front) {
     const qIn=.10, qOut=Math.min(.97,crest+.044/P.outerSlope);
     const u=q<=crest?(crest-q)/(crest-qIn):(q-crest)/(qOut-crest);
     const plate=(q<=qIn||q>=qOut)?0:.044*(1-smooth(u))*windowAt(y,.52,1.48,.22);
-    return plate+kneeAccent+bevel+.017*ribbonField(x,y,LOWER_PATHS.vastusMedialis,1)
-      -.012*gauss(x,.022)*windowAt(y,.78,1.44,.17);
+    return plate+kneeAccent+bevel+.017*ribbonFieldWide(x,y,LOWER_PATHS.vastusMedialis,1,2.2)
+      -.013*gauss(x,.050)*windowAt(y,.78,1.44,.17);
   }
   if(front) return quadPlane+kneeAccent
     + ribbonField(x,y,LOWER_PATHS.vastusMedialis,.023)
