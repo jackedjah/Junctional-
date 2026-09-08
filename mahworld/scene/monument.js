@@ -553,24 +553,142 @@ export function buildMonument(ctx) {
      of both figures are still lit by the diamond's PointLight rather than rendering black, and
      stats.law1.figures below still MEASURES that rather than assuming it. It measures the new
      number, which is the point of measuring it. */
+  /* ---- THE FIGURES WERE THE DARKEST LARGE OBJECT IN THEIR OWN HERO FRAME -----------------------
+     Direction: "the two central figures must stop reading as dark low-poly mannequins — move them
+     toward polished platinum, liquid silver, deep graphite reflections, broad bright silver
+     highlight bands, controlled roughness. Bright enough to read against the city but not glowing."
+
+     MEASURED FIRST, because "too dark" is a feeling and a material pass needs a number.
+     scratchpad/valuecheck.cjs raycasts a grid and reads the RENDERED PIXEL at each hit, grouped by
+     material. On `monument-close` it returned:
+
+         monument-statue-hull   23.6 % of frame at value  33.0
+         resident-platinum-dark  4.8 %             at     30.3
+         (same frame, for scale)  city-tower-platinum 64.7 · facade-wash 72.3 · vital-polished 93.2
+         (frame mean 49.4)
+
+     So the hero monument rendered at ONE THIRD of the frame mean and at HALF the value of a city
+     tower four hundred metres behind it. The near object was out-valued by the far one, which is
+     the inversion this project keeps having to correct, and here it was on the landmark itself.
+
+     WHERE THE VALUE HAS TO COME FROM, AND WHERE IT MUST NOT. Not from metalness: the header's LAW 1
+     reasoning is exactly right and is why these figures are the module's one exception — a statue's
+     shoulders, deltoids and the crown of its head are horizontal faces, and past metalness ~0.9 they
+     would stop taking diffuse light and render black. So the grade stays well under that. Not from
+     emissive either; the direction rules that out in the same sentence, and residents.js has already
+     moved this species' emissive budget to the four places the sheet allows.
+
+     It comes from the two levers that are actually free here:
+       · ENVIRONMENT. A vertical, polished, low-roughness surface returns the lit horizon band, and
+         these figures were reflecting it at 1.4 while the city's own platinum reads it at 2.0.
+       · A SILVER TINT ON THE CLONE. statueGradeOf copied roughness, metalness and envMapIntensity
+         and left `color` at white — so what actually shipped was residents.js's PLATINUM PALETTE
+         vertex colours, whose `dark` is 0x27303d (value 48 of 255) across most of a figure's
+         turned-away facets. The material multiplies colour by vertex colour, so a tint above white
+         lifts the whole ladder without touching the facet PATTERN, which is canonical geometry and
+         is not being redesigned. Bias it cool, which is what makes it read as silver and not chrome.
+
+     AND THE DARK GRADE JOINS THE PASS. `-dark` was never re-finished at all — it kept residents.js's
+     player grade, which is why it measured 30.3, statistically indistinguishable from the hull it is
+     supposed to CONTRAST with. A figure whose lit planes and shadow planes are the same value is a
+     silhouette, and that is most of what "low-poly mannequin" describes. It now takes a deep
+     graphite of its own: still darker than the hull by design, so the figures have a lit side and a
+     shadow side, but lifted out of the flat.
+
+     METALNESS IS THE WRONG LEVER ON THE DARK GRADE, AND THE FIRST ATTEMPT PROVED IT. Raising `-dark`
+     from 0.50 to 0.58 with a 1.35 tint made it DARKER, 30.3 to 17.4, which is the opposite of what
+     more environment and more tint should do. The reason is that a metal's reflection is tinted by
+     its own base colour, and this one's base is 0x27303d — so metalness trades away diffuse light
+     the PointLight was actually delivering, in exchange for a reflection of the sky multiplied by a
+     near-black. On a DARK surface, more metal is less light. Both grades therefore keep metalness
+     modest and take their value from environment and tint, which is also what makes them read as
+     polished stone-metal rather than chrome.
+
+     THE TINTS BELOW ARE MODEST BECAUSE MOST OF THE VALUE NOW LIVES IN THE VERTEX COLOURS. Raising
+     the tint alone plateaued at 53 — see SILVERISE further down for why a multiplier cannot fix a
+     contrast problem, and what does. */
+  const STATUE_GRADE = {
+    /* the polished platinum hull. 0.42 is less than half of law 1's ~0.9 threshold, so the
+       shoulders, deltoids and crown still take the diamond's PointLight. */
+    hull: { roughness: 0.22, metalness: 0.42, envMapIntensity: 3.00, tint: [1.46, 1.47, 1.50] },
+    /* the deep graphite planes turned away from the light: lifted out of near-black into an actual
+       graphite, and kept clearly BELOW the hull so the figures have a lit side and a shadow side */
+    dark: { roughness: 0.28, metalness: 0.40, envMapIntensity: 2.40, tint: [1.50, 1.51, 1.56] }
+  };
   const POD_FINISH = M.platinumLit || M.platinumMidLit || null;
   const statueGrade = new Map();
   const statueGradeOf = (mat) => {
     if (!mat || !POD_FINISH) return mat;
-    /* only the BODY grade is re-finished; the face and the emblem keep residents.js's own */
-    if (!/-body$/.test(mat.name || '')) return mat;
+    /* the face and the emblem keep residents.js's own grades: they are the species' identity and
+       the emblem is one of the four places the emissive budget is allowed to be spent. */
+    const role = /-body$/.test(mat.name || '') ? 'hull' : /-dark$/.test(mat.name || '') ? 'dark' : null;
+    if (!role) return mat;
     let g = statueGrade.get(mat.name);
     if (!g) {
+      const S = STATUE_GRADE[role];
       g = mat.clone();
-      g.roughness = POD_FINISH.roughness;
-      g.metalness = POD_FINISH.metalness;
-      g.envMapIntensity = POD_FINISH.envMapIntensity;
-      g.name = 'monument-statue-hull';
+      g.roughness = S.roughness;
+      g.metalness = S.metalness;
+      g.envMapIntensity = S.envMapIntensity;
+      /* written straight into the components rather than through setRGB, which would run the value
+         through a colour-space conversion; these are working-space multipliers, not a colour. */
+      g.color.r = S.tint[0]; g.color.g = S.tint[1]; g.color.b = S.tint[2];
+      g.name = 'monument-statue-' + role;
       g.userData.moduleOwned = true;
       owned.materials.push(g);
       statueGrade.set(mat.name, g);
     }
     return g;
+  };
+
+  /* ---- SILVERISE: THE VALUE IS IN THE VERTEX COLOURS, SO THAT IS WHERE THE FIX GOES -------------
+     The grade above moved the hull from 33 to 53 and then stopped moving, and the render says why.
+     What a material tint CANNOT do is change the SHAPE of a distribution: multiplying by 2 turns a
+     near-black facet into a slightly-less-near-black one and drives the bright facets toward clipping
+     at the same time. And the range is the whole complaint — residents.js's `platinum` palette runs
+     dark 0x27303d (linear 0.021) to light 0xf4f8fc (linear 0.93), a 44:1 spread painted at random
+     across the facets. A 44:1 random spread on a faceted body IS what "low-poly mannequin" names;
+     no amount of overall brightness fixes it, because the problem is contrast, not level.
+
+     Two transforms, per vertex, on the figures' own geometry only:
+
+       DESATURATE toward the vertex's own luminance. The palette is a cool blue-grey and doubling it
+         doubled the blue with it; the direction asks for silver, and silver is a neutral. A little
+         of the cast is kept (0.76, not 1.0) so the figures still sit in the world's cool key rather
+         than turning into grey plaster.
+       COMPRESS with a square root. c^0.5 maps 0.021 to 0.145 and 0.93 to 0.964: the graphite lifts
+         out of near-black by a factor of seven while the highlights barely move. That is exactly
+         "deep graphite reflections" at one end and "broad bright silver highlight bands" at the
+         other, and it is the same curve a real polished metal's response has — most of a mirror's
+         range lives near the top.
+
+     THE FACET PATTERN IS UNTOUCHED. Which facet is bright and which is dark does not change; only
+     how far apart they sit. The canonical geometry the direction says to preserve is preserved by
+     construction — no vertex moves, no triangle is added or removed.
+
+     IT CLONES. residents.js caches materials per colour but hands back geometry per call, and this
+     module has no business assuming that stays true: a shared buffer edited in place would silverise
+     every MAHBEING on the plaza. The clone is disposed with the rest of the module's geometry; the
+     SOURCE is deliberately not disposed, because this module cannot know whether residents.js holds
+     it, and it costs nothing to leave — the swap happens before the figure is ever rendered, so the
+     original never reaches the GPU and there is no buffer to free. */
+  const SILVER = { desat: 0.76, gamma: 0.5 };
+  const silverise = (geo) => {
+    const src = geo && geo.getAttribute && geo.getAttribute('color');
+    if (!src) return geo;
+    const out = geo.clone();
+    const a = out.getAttribute('color');
+    for (let i = 0; i < a.count; i++) {
+      const r = a.getX(i), gg = a.getY(i), b = a.getZ(i);
+      const L = 0.2126 * r + 0.7152 * gg + 0.0722 * b;
+      a.setXYZ(i,
+        Math.pow(r + (L - r) * SILVER.desat, SILVER.gamma),
+        Math.pow(gg + (L - gg) * SILVER.desat, SILVER.gamma),
+        Math.pow(b + (L - b) * SILVER.desat, SILVER.gamma));
+    }
+    a.needsUpdate = true;
+    owned.geometries.push(out);
+    return out;
   };
 
   const figures = [];
@@ -585,15 +703,21 @@ export function buildMonument(ctx) {
     g.traverse(o => {
       if (!o.isMesh) return;
       o.castShadow = true; o.receiveShadow = true;
+      o.geometry = silverise(o.geometry);
       o.material = statueGradeOf(o.material);
     });
     group.add(g);
     figures.push({ spec: f, group: g });
     stats.figures++;
   }
+  /* report the grade that SHIPPED, not the one it was derived from. This line used to echo
+     POD_FINISH's roughness / metalness / envMapIntensity, which stopped being what the figures wear
+     the moment STATUE_GRADE above took over — a stat describing a value the build no longer uses is
+     the L42 failure in miniature, and it is the kind that survives for passes because it still
+     prints a plausible number. */
   stats.statueHull = POD_FINISH
-    ? { from: 'ascent pod hull (M.platinumLit)', roughness: POD_FINISH.roughness, metalness: POD_FINISH.metalness, envMapIntensity: POD_FINISH.envMapIntensity, grades: statueGrade.size }
-    : { from: 'unavailable — figures keep residents.js grades', grades: 0 };
+    ? { derivedFrom: 'ascent pod hull (M.platinumLit)', hull: STATUE_GRADE.hull, dark: STATUE_GRADE.dark, grades: statueGrade.size }
+    : { derivedFrom: 'unavailable — figures keep residents.js grades', grades: 0 };
   group.updateMatrixWorld(true);
 
   /* WHAT WAS ACTUALLY BUILT, measured off the built groups — L07: a count is not a geometry, and

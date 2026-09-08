@@ -1,23 +1,33 @@
 # MAHWORLD WORLD 01 — CURRENT STATE
 
 ACTIVE PRIORITY:
-P3 MONUMENT MATERIAL — the two figures still read as dark low-poly mannequins rather than polished
-platinum. SPACE and VALUE have each had a measured pass; the monument's finish is now the largest
-unaddressed item in the direction and the one that does not depend on anything upstream.
+P4 FLOOR — legibility and seam noise. SPACE, VALUE and the MONUMENT MATERIAL have each had a
+measured pass and all three hold. The two remaining named items in the direction are the plaza
+wordmark's legibility at a shallow angle (§22, still never verified) and the repeated small panel
+lines the long sightline shows across the deck (directive 6). Both are floor; do them together.
 
 CURRENT BEST CHECKPOINT:
-branch `claude-mahworld-phase0-control-deck`, HEAD of the SPATIAL COMPOSITION RECOVERY pass.
-Evidence: scratchpad `dv/p5-*.png` (before) against `dv/p6-*.png` (after), same fixed cameras.
+branch `claude-mahworld-phase0-control-deck`, HEAD after P3 MONUMENT MATERIAL.
+Evidence, same fixed cameras throughout: `dv/p5-*` → `dv/p6-*` (spacing), `dv/q0-` → `dv/q1-`
+(shafts, clock-matched), `dv/r1-` → `dv/r2-` (monument).
 
-## THE INSTRUMENT THAT MADE THIS PASS POSSIBLE
+## THE THREE INSTRUMENTS — USE THEM BEFORE CHANGING ANYTHING
 
-`scratchpad/coverage.cjs` raycasts a dense grid through a suite camera and reports SCREEN COVERAGE
-PER OWNING MODULE plus a depth-band histogram. Every de-clutter pass before this one picked its
-targets by eye, which is how a pass removes whatever is easiest to find rather than whatever is
-actually eating the frame. Ranked coverage changes that: it named the sky as closed, ranked three
-lamp masts above MAH MATCH, and cleared the monument of a charge it did not deserve.
+All three live in the scratchpad and all three read the RUNNING SCENE rather than a screenshot.
+Every pass before them picked its targets by eye, which is how a pass fixes whatever is easiest to
+find rather than whatever is actually wrong.
 
-USE IT BEFORE REMOVING ANYTHING. A screenshot cannot tell you that eleven poles are 4 % of a frame.
+- **`coverage.cjs <view>`** — screen coverage per owning module, plus a depth-band histogram.
+  Answers "who owns this frame". It named the sky as closed at 0.0 %, ranked three music masts
+  above MAH MATCH, and cleared the monument of a charge it did not deserve.
+- **`darkbars.cjs <view>`** — reads the framebuffer, finds columns under the frame's own median,
+  raycasts the middle of each dark run. Answers "which shapes are dark, and what are they".
+- **`valuecheck.cjs <view>`** — raycast grid plus the rendered pixel at each hit, grouped by
+  material: coverage AND value in one table. Answers "what value does this material actually
+  render at, next to what". This is where a material pass starts.
+
+A screenshot cannot tell you that eleven poles are 4 % of a frame, or that the hero monument is
+rendering at a third of its own frame's mean.
 
 ## MASTERED
 
@@ -89,6 +99,48 @@ Fixed: metalness 0.85 → 0.30 across the four bands, colour climbing gently tow
 Result: object dark bars 54 → 28 columns of 1280 (−48 %); bands 2 and 3 left the dark list entirely.
 Nothing over-lightened; no form pops out of the sky.
 
+## THIS PASS — P3 MONUMENT MATERIAL
+
+`scratchpad/valuecheck.cjs` raycasts a grid and reads the RENDERED PIXEL at each hit, grouped by
+material — coverage AND value in one table, which is what a material pass has to start from.
+On `monument-close`, before → after:
+
+| material                 | cover | before | after | in-frame reference          |
+|--------------------------|-------|--------|-------|-----------------------------|
+| monument-statue-hull     | 23.6% |  33.0  | 77.4  | city-tower-platinum 64.7    |
+| monument-statue-dark     |  4.8% |  30.3  | 52.8  | facade-wash 72.2            |
+| (frame mean)             |       |  49.4  | 61.5  | vital-polished 93.3         |
+
+The hero monument had been rendering at ONE THIRD of its own frame's mean and at HALF the value of a
+city tower four hundred metres behind it. The near object was out-valued by the far one — the same
+inversion this project keeps correcting, this time on the landmark itself.
+
+Three findings, in the order they were forced:
+
+1. **`-dark` was never re-graded at all.** It kept residents.js's player grade and measured 30.3,
+   indistinguishable from the hull it is supposed to contrast with. A figure whose lit planes and
+   shadow planes are the same value is a silhouette, and that is most of what "low-poly mannequin"
+   describes.
+2. **Metalness is the wrong lever on a dark surface.** Raising `-dark` from 0.50 to 0.58 with more
+   environment and more tint made it DARKER (30.3 → 17.4), because a metal's reflection is tinted by
+   its own base colour and this one's base is 0x27303d. Metalness traded away diffuse the PointLight
+   was actually delivering. Both grades now keep metalness modest — also required by LAW 1, since
+   past ~0.9 the figures' shoulders and crowns would stop taking diffuse and render black.
+3. **A tint cannot fix a contrast problem, and that was the real defect.** Raising the tint alone
+   plateaued at 53. The palette runs dark 0x27303d (linear 0.021) to light 0xf4f8fc (linear 0.93) —
+   a 44:1 random spread across the facets. Multiplying it doubles the near-blacks into slightly
+   less-near-blacks while driving the highlights to clipping. The fix is SILVERISE: per vertex,
+   desaturate 0.76 toward the vertex's own luminance (the palette is blue; silver is neutral), then
+   apply a square root (0.021 → 0.145, 0.93 → 0.964). Graphite lifts out of near-black by a factor
+   of seven, highlights barely move, and the facet PATTERN is untouched — no vertex moves, no
+   triangle changes, canonical geometry preserved by construction. It clones the geometry so a
+   shared buffer could never silverise every MAHBEING on the plaza.
+
+Rendered result: the figures read as polished platinum with a legible light-to-dark gradient across
+each rounded mass, deep graphite in the turned-away planes, and bright silver catches — lit, not
+glowing, and now the brightest non-emissive architectural object in their own frame, which is what
+the module header says a plaza monument should be.
+
 ## SIGHTLINES THAT IMPROVED
 
 - `plaza-hero` — the pole that crossed the left of frame is gone; stars and open sky read to the
@@ -105,18 +157,21 @@ Nothing over-lightened; no form pops out of the sky.
    0xffeccd, spillWarmM), which the master file names as a strict exclusion. Visible directly on
    MAH MATCH's facade in `match-anchor`. Unresolved conflict, and it is now a rendered fact rather
    than a code reading.
-3. §6/§7 MONUMENT — the directive asks for reduced screen dominance and for the figures to stop
-   reading as dark low-poly mannequins. THE FIRST HALF IS NOT SUPPORTED BY MEASUREMENT: the monument
-   owns 5.3 % of `plaza-hero` — less than the clouds, the fobeams, the city or the ground — and it
-   was 5.3 % before this pass and 5.3 % after. It is not what blocks the city. What made it FEEL
-   dominant is that it had no open sky to sit against and no value separation from the district
-   behind it, which is defects 1 and 2. Do not shrink the hero landmark until those are fixed and
-   the frame is re-judged; the second half (material recovery — polished platinum, liquid silver,
-   broad bright highlight bands) is real and independent and should be done regardless.
-4. §22 FLOOR TEXT — plaza wordmark legibility at shallow angle still unverified.
-5. FLOOR SEAM NOISE (directive 6) — `long-sightline` shows heavy repeated small panel lines and a
-   scatter of small pale objects across the deck. Not yet measured; measure before cutting.
-6. §26 DOME — still reads more as a ceiling than a shell, but defect 1 is upstream of it.
+3. ~~§7 MONUMENT MATERIAL.~~ **DONE this pass.** The other half of that directive item — reduced
+   screen dominance — remains NOT SUPPORTED BY MEASUREMENT and was not done: the monument owns 5.3 %
+   of `plaza-hero`, unchanged before and after every pass so far, less than the clouds, the fobeams,
+   the city or the ground. What made it feel dominant was having no open sky to sit against and no
+   value separation from the district behind it. Both are now fixed, and the arrival frame reads in
+   layers. Re-judge before shrinking anything; shrinking the hero would cost the landmark and buy
+   about two per cent of frame.
+4. **§22 FLOOR TEXT** — plaza wordmark legibility at shallow angle STILL unverified. Next action.
+5. **FLOOR SEAM NOISE** (directive 6) — `long-sightline` shows repeated small panel lines and a
+   scatter of small pale objects across the deck. Measure with `valuecheck.cjs` before cutting: the
+   last three de-clutter passes that skipped measuring removed the wrong things.
+6. §26 DOME — still reads more as a ceiling than a shell, though defect 1's fix has helped.
+7. FOREGROUND SHARDS — four pale translucent standing shards remain in the arrival frame. Already
+   cut 14 → 8 once; they are the last repeated small form on the deck. Low priority, and the
+   direction explicitly says not to keep removing until the plaza is bare.
 
 ## LOCKED / DO NOT REGRESS
 
@@ -133,18 +188,13 @@ Nothing over-lightened; no form pops out of the sky.
 
 ## NEXT ACTION
 
-P3 MONUMENT MATERIAL, and ONLY the material. The direction: "the two central figures must stop
-reading as dark low-poly mannequins — move them toward polished platinum, liquid silver, deep
-graphite reflections, broad bright silver highlight bands, controlled roughness. Preserve their
-canonical geometry. Bright enough to read against the city but not glowing like emissive objects."
-
-`monument.js` currently clones only `/-body$/` materials through `statueGradeOf()` and moves
-roughness / metalness / envMapIntensity across from `M.platinumLit`, leaving colour as white ×
-vertex colours. Start by MEASURING what the figures actually render at — `darkbars.cjs`'s framebuffer
-read against the `monument-close` and `monument-34` cameras, compared with the plinth's own platinum
-nosings in the same frame, which are the reference value the figures should be near. Judge on
-`monument-close` + `monument-34`. Do not touch scale (see the negative result below), the floor, or
-the city in the same pass.
+P4 FLOOR. Two items, one surface. First §22: render `floor-text` (1.6 m eye height, shallow angle
+over the plaza wordmark) — it has never been rendered since the floor was re-graded twice, and
+legibility at a grazing angle is the case that exposes text buried under an overlay or fighting the
+deck for depth. Then directive 6: run `valuecheck.cjs` on `long-sightline` to rank what is actually
+drawing the seam lines before cutting any of them, since the panel lattice is canonical MAH diamond
+organisation and the noise may be a separate overlay riding on top of it. Do not touch the monument,
+the shafts or the clouds in the same pass.
 
 ## NEGATIVE RESULTS (do not re-test)
 
