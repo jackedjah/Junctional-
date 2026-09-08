@@ -125,15 +125,23 @@ export const ASCENTS = [
   /* WEST — the near line. Between the plaza field's west edge and MAH GYM's apron; the closest of the
      three to the camera, so it is the one whose pod reads at real size and whose floor flare is big.
      SECONDARY: nearest the camera, so it needs the least brightness to hold its place in the frame. */
-  { id: 'ascent-west',  x: -30, z: -22, h: 520, pod: 1.00, phase: 0.7665, w: 0.62 },
+  /* CAMPUS RECONSTRUCTION §1 / §5: these three stood at r 36-39, which is INSIDE the 96 m quad the
+     master requires to be kept mostly open — three 500 m vertical lines rising out of the middle of
+     the social field. They move to the quad's own edge, into the gaps BETWEEN the facility bearings
+     (match 0, market 66, gym 294), so an ascent line now terminates a path instead of interrupting
+     one. §5's "integrated into paths/roads" is the whole point: an elevator you walk to along an
+     edge is infrastructure, an elevator in the middle of the quad is a monument.
+     Their RANK is unchanged — hero north, two secondaries — because that hierarchy was measured and
+     is not what was wrong. Only where they stand. */
+  { id: 'ascent-west',  x: -87, z: -64, h: 520, pod: 1.00, phase: 0.7665, w: 0.62 },
   /* EAST — between the field's east edge and MAH MARKET's apron, and the shortest of the three.
      SECONDARY, and the quietest: shortest line, furthest off the plaza's forward axis. */
-  { id: 'ascent-east',  x:  32, z: -18, h: 468, pod: 0.92, phase: 0.3000, w: 0.52 },
+  { id: 'ascent-east',  x:  87, z: -64, h: 468, pod: 0.92, phase: 0.3000, w: 0.52 },
   /* NORTH — on the field's far edge in front of MAH MATCH's west flank, so the tallest line has the
      district's tallest dark mass behind it to be read against.
      HERO: tallest, nearly dead ahead on the plaza's forward sightline, and standing against the one
      backdrop dark enough to take it. This is the ascent line the world is introduced by. */
-  { id: 'ascent-north', x: -13, z: -37, h: 604, pod: 1.06, phase: 0.6120, w: 1.30 }
+  { id: 'ascent-north', x: -24, z: -114, h: 604, pod: 1.06, phase: 0.6120, w: 1.30 }
 ];
 /* ground.js FLOOR_TOP: the laid deck is 0.17 above the raw ground plane and everything that stands
    on the plaza stands on the DECK. A pad sunk to y = 0 would show a 17 cm gap along its whole rim. */

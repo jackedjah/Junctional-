@@ -186,6 +186,11 @@
 import * as THREE from '../vendor/three/three.module.min.js';
 import { createResident } from './residents.js';
 import { canvasTexture, chamferBox, cutGem, gemGirdle, GEM, BRAND } from './materials.js';
+import { CAMPUS } from './campus-plan.js';
+
+/* the one number the campus plan owns about this piece: how large the civic symbol is allowed to be
+   in an open quad. Read once, used everywhere below, never re-typed. */
+const CIVIC_S = CAMPUS.CIVIC.scale;
 
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 const DECK_Y = 0.17;               /* ground.js FLOOR_TOP — the plaza deck everything stands on */
@@ -193,7 +198,31 @@ const DECK_Y = 0.17;               /* ground.js FLOOR_TOP — the plaza deck eve
 /* WHERE IT STANDS. See the header: this is the measured centre of the largest circle behind the
    MAHPLAZA marker that clears ground.js's centrepiece, the dressing cluster and the approach
    camera. The module re-measures the clearance at build time and reports it. */
-const SITE = { x: 0, z: -6.5 };
+/* ---- CAMPUS RECONSTRUCTION: THE CIVIC SYMBOL, NOT THE OBSTRUCTION ------------------------------
+   The reconstruction master is explicit twice over. §1: "Remove, relocate, or dramatically reduce
+   the current giant Mr./Mrs. monument. It currently blocks sightlines." §18: "The current huge
+   statues should not remain as-is... Never again use giant low-fidelity approximations."
+
+   It is NOT removed, and the reason is in the same section. §1 permits the quad "a small refined
+   civic symbol" and lists what a surviving Mr./Mrs. piece must be: canonical character geometry,
+   platinum/liquid-silver material, small enough to preserve openness, placed as refined civic art.
+   The material half of that was done in the pass before this one — the figures now render as
+   polished platinum at 77 against a frame mean of 62, measured, not asserted. What was still wrong
+   was the SIZE, and only the size: a 34 m piece standing at the centre of what is now a 192 m quad.
+
+   So it stays on the axis, where a campus memorial belongs and where the master wants the quad's
+   orientation landmark, and it comes down to 0.32 — roughly 11 m to the crystal, a piece a person
+   can walk up to and stand next to rather than one that fills the arrival frame. The scale is a
+   GROUP transform rather than fifteen edited constants, because every proportion inside this module
+   was tuned against every other one (the plinth courses pin FIGURES[].x, which pins the column's
+   waist, which was measured off the built statues) and re-deriving that chain by hand is how a
+   careful piece of geometry gets quietly broken.
+
+   THREE THINGS DO NOT SCALE WITH A GROUP and are corrected explicitly below: the collider, which is
+   added to the scene in world coordinates; the deck light pool, whose radius is passed to ground.js
+   as a number; and the key light, whose `distance` is in world units — a 78 m falloff around an 11 m
+   sculpture would light the whole quad from inside the statue. */
+const SITE = { x: 0, z: 0 };
 
 /* THE PLINTH. Three stepped courses, broadest at the bottom, each one rounded in plan (28 sides)
    and blunted at every arris with a two-turn nosing rather than a single sharp edge — §06's own
@@ -961,12 +990,15 @@ export function buildMonument(ctx) {
      One real light at the diamond, so the low-metalness up-faces of both figures and every platinum
      nosing on the plinth are MODELLED by the thing they are holding, and one pool on the deck so
      the black platinum underneath shows that something is standing on it. */
-  const keyLight = new THREE.PointLight(ctx.theme.energy, 62, 78, 2);
+  /* distance is in WORLD units and does not inherit the group scale, so it is scaled here; the
+     intensity follows d^2, which is what keeps the illuminance on the figures the same as it was
+     when the light stood 78 m from a 34 m piece rather than 25 m from an 11 m one. */
+  const keyLight = new THREE.PointLight(ctx.theme.energy, 62 * CIVIC_S * CIVIC_S, 78 * CIVIC_S, 2);
   keyLight.name = 'monument-key';
   keyLight.position.set(0, diamondY, 0);
   group.add(keyLight);
   if (ctx.lightPool) {
-    const p = ctx.lightPool({ x: SITE.x, z: SITE.z, rx: 34, rz: 34, k: 0.34 });
+    const p = ctx.lightPool({ x: SITE.x, z: SITE.z, rx: 34 * CIVIC_S, rz: 34 * CIVIC_S, k: 0.34 });
     if (p) stats.pools++; else stats.skipped.push('deck light pool dropped: ground.js pool buffer full');
   }
 
@@ -975,10 +1007,13 @@ export function buildMonument(ctx) {
      boxes the camera dolly must stay out of, and anything placed after this module tests against
      the same list. The figures' shoulders overhang it by about 2 m at 20 m of height, which no
      camera in VIEWS can reach. */
-  const cw = (baseR + 0.35) * 2;
-  const collider = new THREE.Mesh(new THREE.BoxGeometry(cw, plinthTop + 34, cw), M.curb || M.graphiteDark);
+  /* the collider is added to the SCENE, not to the group, so it takes the civic scale by hand or it
+     would keep a 34 m keep-out box around an 11 m sculpture and push every later placement test —
+     and the camera dolly — out of the middle of the open quad. */
+  const cw = (baseR + 0.35) * 2 * CIVIC_S, ch = (plinthTop + 34) * CIVIC_S;
+  const collider = new THREE.Mesh(new THREE.BoxGeometry(cw, ch, cw), M.curb || M.graphiteDark);
   collider.name = 'monument-collider';
-  collider.position.set(SITE.x, (plinthTop + 34) / 2, SITE.z);
+  collider.position.set(SITE.x, ch / 2, SITE.z);
   collider.visible = false;
   scene.add(collider);
   (ctx.colliders = ctx.colliders || []).push(collider);
@@ -987,6 +1022,7 @@ export function buildMonument(ctx) {
 
   /* ---- place, measure, report ------------------------------------------------------------------ */
   group.position.set(SITE.x, DECK_Y, SITE.z);
+  group.scale.setScalar(CIVIC_S);
   scene.add(group);
   group.updateMatrixWorld(true);
 

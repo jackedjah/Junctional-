@@ -72,6 +72,31 @@
     "pos": [0, 1.6, 19], "look": [0, 0.15, -3], "fov": 55
   },
 
+  "quad-hero": {
+    "why": "CAMPUS 1 — CENTRAL QUAD HERO (reconstruction master section 21). Standing on the far forecourt line at the head of the quad, looking straight down the arrival axis across 264 m of open campus to MAH MATCH. This is the frame that says whether the middle of the world reads as a quadrangle or as a yard full of objects.",
+    "pos": [0, 3.6, 132], "look": [0, 14, -132], "fov": 60
+  },
+
+  "quad-edge-across": {
+    "why": "CAMPUS 2 — QUAD EDGE LOOKING ACROSS. Standing on the quad's edge at MAH GYM's bearing (294 deg, r 96) and looking clean across the open field to MAH MARKET at the opposite bearing. Proves facility SPACING: two destinations, 241 m apart, with the whole quad between them.",
+    "pos": [-87.7, 3.4, -39.1], "look": [120.6, 10, -53.7], "fov": 62
+  },
+
+  "road-street": {
+    "why": "CAMPUS 3 — ROAD / STREET. Standing on the primary loop boulevard behind MAH MATCH (bearing 0, r 186) looking along the loop toward the market side. The loop rings the campus BEHIND the facilities, which is master section 4's road-versus-pedestrian separation: vehicles and service at the back, the quad kept for people.",
+    "pos": [0, 2.4, -186], "look": [119.6, 8, -142.5], "fov": 55
+  },
+
+  "campus-overview": {
+    "why": "CAMPUS 10 — HIGH OVERVIEW of the reconstructed plan. Low enough to read the concentric plan (quad 96, facade line 132, loop 186, district past 205) and the three facility bearings, where the old high-overview sits at 780 m and reads the continent instead.",
+    "pos": [0, 430, 620], "look": [0, 30, -110], "fov": 56
+  },
+
+  "waterfront": {
+    "why": "CAMPUS 8 — WATERFRONT / SEA RELATION. Standing on the rear of the loop looking out along the reserved open arc (bearings 66 through 294, where no facility or block may stand) toward the coast. Master section 11: the sea is the world boundary and must not be walled off. This view is what proves the corridor is actually clear.",
+    "pos": [0, 3.0, 200], "look": [0, 30, 2600], "fov": 50
+  },
+
   "match-anchor": {
     "why": "13. MATCH ANCHOR — MAH MATCH (0,-74) and its tower from the MAH MARKET approach, on a diagonal because the monument stands dead on the plaza axis. ADDED after a form pass on that tower rendered three suite views with byte-identical triangle counts: the district's tallest silhouette, the thing buildings.js calls 'the anchor from anywhere', was not visible from a single camera in the suite. A landmark with no diagnostic view cannot be judged, so it cannot be corrected.",
     "pos": [56, 9, -12], "look": [0, 42, -88], "fov": 46

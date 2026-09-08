@@ -676,7 +676,23 @@ export async function createMahplaza(canvas, options = {}) {
        what "extremely platinum" means on a surface that reflects nothing else.
        k.horizon is the same key the sky dome and the depth bands are painted from, so the floor and
        the horizon it returns can never drift apart. */
-    for (const u of floorSkyUniforms) u.value.setHex(k.horizon);
+    /* ---- R-CAMPUS D10: THE HUE FOLLOWS THE SKY, THE LEVEL DOES NOT ---------------------------
+       The paragraph above is right about the physics and wrong about the direction, and the daytime
+       render is what showed it. Driving the grazing return straight from the horizon key gives a
+       floor that is dark at night and PALE at noon — at 13:20 the horizon key is a near-white blue,
+       0.62 of it at a grazing angle is a light grey sheet, and the surface stops reading as metal at
+       all. The direction has been consistent across three separate notes: "extremely platinum",
+       "almost pitch black", "platinum reflectiveness, but not like a mirror". That is a DARK
+       polished metal in every light, not a surface that turns into pale stone at midday.
+       So the horizon key still supplies the COLOUR — the floor is still returning the sky it is
+       actually looking at, and it still turns with the clock — but its luminance is capped. At night
+       the key is already below the ceiling and passes through untouched, so nothing that was tuned
+       in the dark moves; by day it is scaled down to the ceiling and the floor stays platinum. */
+    for (const u of floorSkyUniforms) {
+      u.value.setHex(k.horizon);
+      const L = 0.2126 * u.value.r + 0.7152 * u.value.g + 0.0722 * u.value.b;
+      if (L > FLOOR_SKY_CAP) u.value.multiplyScalar(FLOOR_SKY_CAP / L);
+    }
     M.setTime(s);
     renderer.toneMappingExposure = state.diagnostic ? 1.0 : k.exposure;
     /* atmospheric perspective: a long, subtle falloff — deeper by day, closer at night; the city's far layers live inside it */
@@ -1587,6 +1603,9 @@ export async function createMahplaza(canvas, options = {}) {
      spread is the whole reason polished stone reads as polished. The fresnel exponent goes up with
      it so the lift stays at genuinely grazing angles instead of washing the near deck. */
   const FLOOR_SHEEN = 0.62;   /* how much horizon sky a grazing angle returns: the platinum itself */
+  /* the ceiling on that return's LUMINANCE, so a bright sky cannot wash the metal into pale stone.
+     Night horizon keys sit well under this and are unaffected; see the note in applyTime. */
+  const FLOOR_SKY_CAP = 0.30;
   const FLOOR_BASE = 0.075;   /* the surface's own term, crushed: this is what keeps it near-black */
   {
     /* `mirror` is null by construction now, but the guard stays: it is the one line that would have

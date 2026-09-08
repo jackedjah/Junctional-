@@ -35,6 +35,7 @@
 import * as THREE from '../vendor/three/three.module.min.js';
 import { chamferBox, softMass, canvasTexture, blobTexture, BRAND } from './materials.js';
 import { SITES } from './buildings.js';
+import { SMOOTH_FLOOR } from './ground.js';
 
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(1, 1, 1), _e = new THREE.Euler();
 function part(list, geo, x, y, z, ry = 0, rx = 0, rz = 0) {
@@ -281,13 +282,20 @@ export function buildDressing(ctx) {
         cx + Math.sin(ang) * t, 0.062, cz + Math.cos(ang) * t, ang + Math.PI / 4);
     }
   }
-  {
-    /* the rails and the diamond course are the same grade and the same purpose, so they are one mesh */
+  /* R-CAMPUS D10: the path network drew three kinds of LINE on the floor — a bright rail down each
+     edge, a diamond course along it, and an additive seam glow under both. Under SMOOTH_FLOOR the
+     floor carries no lines at all, and a path that keeps its own would simply become the only grid
+     left in the frame. The ROUTES themselves are untouched: they still exist as circulation, still
+     drive the aprons and the node placement, and the campus master's sidewalks (section 4) will be
+     built as real walking surfaces rather than as glowing edging. */
+  if (!SMOOTH_FLOOR) {
     const railMesh = new THREE.Mesh(own(mergeParts(rails.concat(marks))), M.trim || M.chromeMirror || M.platinumLit);
     railMesh.name = 'dressing-path-rails'; group.add(railMesh);
     if (ctx.reflect) { try { ctx.reflect(railMesh, 0.35); } catch (e) {} }
     const seamMesh = new THREE.Mesh(own(mergeParts(seams)), seamMat);
     seamMesh.name = 'dressing-path-seams'; seamMesh.renderOrder = 5; group.add(seamMesh);
+  } else {
+    rails.forEach(q => q.dispose()); marks.forEach(q => q.dispose()); seams.forEach(q => q.dispose());
   }
 
   /* ---- 2. NODES: a seating ring segment, a planter surround, a mast ---------- */

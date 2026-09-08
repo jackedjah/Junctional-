@@ -120,6 +120,7 @@
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
 import { chamferBox, windowGrid, canvasTexture, ACCENT, apertureField, doorwayParts, applyDistanceDim, applyCelestialPath } from './materials.js';
+import { SMOOTH_FLOOR } from './ground.js';
 import { foblockParts } from './foblock.js';   /* §6D: a SKYBLOCK CARRIER is an elongated FOBLOCK, so it grows from the genome */
 
 /* R170 §5 — THE DISTANCE-DIM CURVE, in metres of view depth. See applyDistanceDim in materials.js.
@@ -229,15 +230,51 @@ const FR = { base: 1.9, course: 0.72, courseD: 0.32, pier: 0.8, pierD: 0.34, sil
    a crown is a skyline event and C2 could not deliver one from behind C1 — but it means the crown
    is now a singular gesture in this district and should stay that way deliberately, not by default.
    DETAIL DID NOT DECREASE HERE — OCCLUSION DID. */
-const BLOCKS = [
-  { id: 'L1', x: -104, z: -46,  w: 22, d: 18, h: 34, sb: 0.25, side: 1 },
-  { id: 'L2', x: -150, z: -96,  w: 30, d: 24, h: 62, sb: 0.30, side: 1 },
-  { id: 'L3', x: -62,  z: -150, w: 26, d: 22, h: 56, sb: 0.28, side: 0, pad: 'training', elevator: true },
-  { id: 'L4', x: -112, z: -148, w: 18, d: 16, h: 46, sb: 0,    side: 1, pad: 'levitate', rot: 0 },
-  { id: 'R1', x: 106,  z: -50,  w: 20, d: 18, h: 30, sb: 0,    side: -1 },
-  { id: 'R2', x: 116,  z: -112, w: 28, d: 24, h: 50, sb: 0.30, side: -1, pad: 'training' },
-  { id: 'R3', x: 74,   z: -164, w: 24, d: 20, h: 52, sb: 0.28, side: 0, pad: 'levitate' },
-  { id: 'R5', x: 150,  z: -80,  w: 22, d: 20, h: 36, sb: 0.25, side: -1 }
+/* ---- CAMPUS RECONSTRUCTION: THE DISTRICT MOVES OUT PAST THE LOOP ROAD --------------------------
+   These eight are the right eight and none of them moves relative to the others. What changed is
+   the radius they all sit at. campus-plan.js puts the facility facades at 132 m and the primary
+   loop boulevard at 186; this table's nearest block stood at 114 m and its furthest at 186, so the
+   background district was INSIDE the campus — L1 and R1 would have been closer to the quad than
+   MAH GYM and MAH MARKET, and every block from L2 outward would have been standing on the road.
+
+   Every position is multiplied by 1.85, which is the smallest factor that clears campus-plan's
+   DISTRICT_R of 205 for the nearest block (114 -> 210). Multiplying rather than re-tabulating is
+   the point: the district's own near-to-far spread was tuned over several passes and is worth
+   keeping, so the range moves 114-186 -> 210-343 and the relative depth inside it is untouched.
+   The four id-keyed tables below (MASSING / GESTURE / DECK / glazedIds) key on id, not position,
+   so they follow automatically and cannot fall out of step. */
+/* ==== R-CAMPUS D9 — THE UNNAMED CITY IS REMOVED ==================================================
+   Director, verbatim: "remove all buildings that don't have a designated name, especially the ones
+   with the yellow lights around it in them."
+
+   EVERY building this module makes is unnamed. The three destinations (MAH GYM, MAH MATCH,
+   MAH MARKET) come from buildings.js; MAH VITAL, MAH FORGE and MAH MODE from mahfacilities.js;
+   MAH NEXUS, MAH HAVEN and the rest from their own modules. What city.js builds is generic filler:
+   eight lettered mid-rise blocks, the background towers, the shafts, the ghosts and the distant
+   giants. None of them carries a MAH name, none is a destination the world can send a player to,
+   and the mid-rise blocks are precisely where the amber window light lives — city-window-spill-warm
+   and the WARM tint table — which the campus master's colour section names as a strict exclusion
+   (no yellow, orange, amber, bronze, gold warmth). One instruction removes both problems.
+
+   IT IS A SWITCH, NOT A DELETION. The tables took several passes to tune and the campus master's
+   own section 7 asks for placeholder buildings to come BACK later — with real entrances, windows
+   and names, which is exactly what these lack. So the data stays and one constant decides whether
+   it is built. Turning it on again is one word.
+
+   WHAT SURVIVES: the city GROUND ring, because it is the floor and the world stands on it; the sky
+   roads, which are transport infrastructure rather than buildings; and every named facility, which
+   this module never owned. */
+const BUILD_UNNAMED = false;
+
+const BLOCKS = !BUILD_UNNAMED ? [] : [
+  { id: 'L1', x: -192, z: -85,  w: 22, d: 18, h: 34, sb: 0.25, side: 1 },
+  { id: 'L2', x: -278, z: -178, w: 30, d: 24, h: 62, sb: 0.30, side: 1 },
+  { id: 'L3', x: -115, z: -278, w: 26, d: 22, h: 56, sb: 0.28, side: 0, pad: 'training', elevator: true },
+  { id: 'L4', x: -207, z: -274, w: 18, d: 16, h: 46, sb: 0,    side: 1, pad: 'levitate', rot: 0 },
+  { id: 'R1', x: 196,  z: -93,  w: 20, d: 18, h: 30, sb: 0,    side: -1 },
+  { id: 'R2', x: 215,  z: -207, w: 28, d: 24, h: 50, sb: 0.30, side: -1, pad: 'training' },
+  { id: 'R3', x: 137,  z: -303, w: 24, d: 20, h: 52, sb: 0.28, side: 0, pad: 'levitate' },
+  { id: 'R5', x: 278,  z: -148, w: 22, d: 20, h: 36, sb: 0.25, side: -1 }
 ];
 /* ---- v7 §50-7 THREE BLOCK MASSINGS -------------------------------------------------------------
    Gate §50-7 stood PARTIAL from v6 for one reason: fifteen blocks were ONE geometry recipe at fifteen
@@ -279,13 +316,22 @@ const GESTURE = { L1: 'seam', L2: 'band', R2: 'crown', R5: 'band' };
    Landmarks, so they take their district's hue: 88° is the centre's tallest, 46° is the right's. */
 const TOWER_SEAM = { '88|665': 'blue', '46|505': 'cyan' };
 /* bridges between blocks (world endpoints sit just inside the block faces) and the main walkway */
-/* the walkway sits BEHIND MAH MATCH's new site (z −66, body back to −123), so it still crosses the
-   frame without passing through the building */
-const WALKWAY = { id: 'city-walkway', ax: -75.5, az: -150, bx: 75.5, bz: -150, y: 40, width: 4.2, pylons: [-52, 52] };
-const BRIDGES = [
-  { id: 'city-bridge-l2-l4', ax: -93.5, az: -124,   bx: -105.5, bz: -124,   y: 36, width: 3.2 },
-  { id: 'city-bridge-r3-r4', ax: 64.7,  az: -141.6, bx: 76,     bz: -131,   y: 30, width: 3.2 },
-  { id: 'city-bridge-r4-r2', ax: 92.5,  az: -124,   bx: 107.5,  bz: -124,   y: 30, width: 3.2 }
+/* THE SPANS MOVE WITH THE DISTRICT, at the same 1.85. Their endpoints are hand-placed against block
+   faces, so a bridge left at its old radius while the blocks moved out would be a walkway hanging in
+   open air over the campus loop road — and the walkway in particular is a 151 m span that used to
+   cross behind MAH MATCH at z -150. MAH MATCH's facade is now at z -132 with its mass reaching to
+   about -160, so the walkway has to clear that too: at 1.85 it crosses at z -278, well behind the
+   building, which is where a district-scale span belongs.
+   NOT FIXED HERE, and named so it is not discovered as a surprise: two of these three bridges are
+   ids that reference R4, a block removed in the D1 thinning pass. They have been spanning to a
+   building that does not exist since then. That is a real defect and it is the ARCHITECTURE phase's
+   to resolve (§9 forbids unsupported thin geometry); this pass only moves them so the question is
+   asked at the right radius. */
+const WALKWAY = !BUILD_UNNAMED ? null : { id: 'city-walkway', ax: -140, az: -278, bx: 140, bz: -278, y: 40, width: 4.2, pylons: [-96, 96] };
+const BRIDGES = !BUILD_UNNAMED ? [] : [
+  { id: 'city-bridge-l2-l4', ax: -173,  az: -229,   bx: -195,   bz: -229,   y: 36, width: 3.2 },
+  { id: 'city-bridge-r3-r4', ax: 120,   az: -262,   bx: 141,    bz: -242,   y: 30, width: 3.2 },
+  { id: 'city-bridge-r4-r2', ax: 171,   az: -229,   bx: 199,    bz: -229,   y: 30, width: 3.2 }
 ];
 /* background towers: bearing a° (x = r cos a, z = −r sin a), radius r, height, width, archetype, strips */
 /* ---- v6 §09 / §11 THE THREE VALLEYS ------------------------------------------------------------
@@ -300,7 +346,7 @@ const BRIDGES = [
      LEFT VALLEY   128°–142°   framed by the towers at 120° and 145°
 
    Nothing was moved into the valleys to compensate. Open sky IS the feature. */
-const TOWERS = [
+const TOWERS = !BUILD_UNNAMED ? [] : [
   [104, 300, 128, 22, 'A', 2], [100, 340, 150, 24, 'A', 2],
   [75, 300, 62, 15, 'C', 1],
   [81, 450, 160, 26, 'A', 2], [103, 470, 158, 24, 'B', 1],
@@ -321,7 +367,7 @@ const TOWERS = [
 /* distant slabs: bearing, radius, width, height, depth, rotation */
 /* distant slabs: bearing, radius, width, height, depth, rotation. The 62°, 112° and 140° slabs were
    the ones closing the three valleys and are gone; the rest keep the far layer populated. */
-const SLABS = [
+const SLABS = !BUILD_UNNAMED ? [] : [
   [30, 700, 60, 210, 30, 0.3], [40, 820, 70, 260, 34, -0.2], [78, 830, 54, 230, 28, 0.1],
   [95, 640, 40, 150, 24, -0.4], [15, 620, 56, 220, 28, 0.4], [166, 690, 48, 190, 26, 0.25]
 ];
@@ -341,7 +387,7 @@ const SLABS = [
    Hand-checked against the three valleys AND against the TOWERS table above, so no shaft stands in
    a valley and none intersects an existing tower: the closest approach is 42 m between the 78°|340
    shaft and the 75°|300 tower, which is 17 m of clear air with both half-widths taken off. */
-const SHAFTS = [
+const SHAFTS = !BUILD_UNNAMED ? [] : [
   [100, 265, 30, 600, 0.42], [78, 340, 34, 720, 0.40], [104, 420, 28, 640, 0.44],
   [46, 370, 32, 660, 0.40], [148, 330, 26, 560, 0.44], [22, 440, 30, 620, 0.42]
 ];
@@ -352,7 +398,7 @@ const SHAFTS = [
    completely before it ends. A form that fades out instead of stopping is the whole idea.
    bearing, radius, width, height — all clear of the three valleys with their angular width taken
    into account (the widest subtends 3.8°). */
-const GHOSTS = [
+const GHOSTS = !BUILD_UNNAMED ? [] : [
   [86, 700, 46, 760], [102, 650, 42, 660], [76, 730, 44, 800], [38, 690, 40, 700],
   [148, 700, 42, 680], [18, 760, 44, 720], [92, 860, 50, 900], [156, 820, 44, 700]
 ];
@@ -954,7 +1000,10 @@ export function buildCity(ctx) {
     color: 0x0a0e16, roughness: 0.30, metalness: 0.96, envMapIntensity: 2.2, fog: true
   });
   groundMat.name = 'city-ground';
-  if (M.plaza && M.plaza.roughnessMap) {
+  /* SMOOTH_FLOOR (ground.js) removes the lattice from the plaza's own maps; this ring cloned them,
+     so without the same guard the grid would survive out here and the floor would be smooth only
+     inside 260 m. Imported rather than re-declared: one switch, one source. */
+  if (!SMOOTH_FLOOR && M.plaza && M.plaza.roughnessMap) {
     /* the maps are SHARED with M.plaza and must not be re-repeated here: ground.js already set
        their repeat for its own 260 m plane, and a texture's repeat is a property of the texture,
        not of the material using it. Cloning is what lets this ring carry the same lattice at its
@@ -1705,7 +1754,7 @@ export function buildCity(ctx) {
     anchors.paths.push({ id: spec.id, points: pts, kind: 'bridge' });
     stats.paths++; stats.bridges++;
   }
-  span(WALKWAY, true);
+  if (WALKWAY) span(WALKWAY, true);
   BRIDGES.forEach(b => span(b, false));
 
   /* ---------------------------------------------------------------- 2. background towers */
@@ -1937,7 +1986,7 @@ export function buildCity(ctx) {
 
   /* ---------------------------------------------------------------- 3. distant silhouettes */
   const distant = new THREE.Group(); distant.name = 'city-distant'; group.add(distant);
-  {
+  if (BUILD_UNNAMED) {
     /* v6 §44: the distant layer is sorted into THREE depth bands by radius and drawn in three values.
        A form at 620 m and a form at 830 m used to be the same 0x0a1322, which is why the far layer read
        as one paper cut-out; giving them different values restores aerial perspective before the fog

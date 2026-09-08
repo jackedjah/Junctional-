@@ -25,6 +25,7 @@
                          that separates hardest from its own interiors carries its signage band */
 import * as THREE from '../vendor/three/three.module.min.js';
 import { softMass, signTexture, diamondOutline, chamferBox, windowGrid, fobMark, canvasTexture, apertureField, archOutline, roundedBoxShape } from './materials.js';
+import { siteOf } from './campus-plan.js';
 
 /* ---- THE SITE PLAN (v5 §06) ---------------------------------------------------------------------
    The three destinations used to stand shoulder to shoulder on one line, which read as a wall of
@@ -42,10 +43,29 @@ import { softMass, signTexture, diamondOutline, chamferBox, windowGrid, fobMark,
    the market's wing). v6 pushes them apart LATERALLY as well and grows their secondary mass backward
    instead of sideways, so each facility has its own territory and the ground between them is free for
    courtyards, planting and paths (§05). */
+/* ---- CAMPUS RECONSTRUCTION: POSITION MOVED OUT, DIMENSIONS STAYED --------------------------------
+   The note above is still the right argument and it is why the three silhouettes differ. What it
+   could not fix is that the whole argument was being made inside a 75 m radius: gym at 58 m from
+   the centre, market at 71, match at 74, with city.js's nearest background block at 114. Three
+   destinations, a deck and a skyline inside one 190 m disc is not a campus, it is a diorama, and no
+   amount of lateral separation at that radius makes a facility read as somewhere you travel to.
+
+   So the x / z / rotY / approach of every site now comes from campus-plan.js, which owns the macro
+   topology for the whole world and nothing else. The facade line moves to 132 m with a 36 m
+   forecourt in front of it — master §3's "approach space, entry forecourt, surrounding paths".
+
+   WHAT STAYS HERE IS EVERYTHING THIS FILE ACTUALLY BUILDS. W, H, D, the opening, the pier and room
+   depths, the corner radius and the floor level are facade construction, and the plan has no
+   business knowing them; the plan has no business being duplicated here either. One truth, one
+   source, split along the seam where the responsibility actually changes. */
+const _site = name => {
+  const p = siteOf(name);
+  return { x: p.x, z: p.z, rotY: p.rotY, approach: p.approach };
+};
 export const SITES = Object.freeze({
-  gym:    { x: -58, z: -10, rotY: 0.62,  W: 38, H: 13, D: 24, openW: 18, openH: 8,  E: 4,   R: 12, radius: 3.2, floorY: 0,   approach: [-36, -4] },
-  market: { x: 62,  z: -34, rotY: -0.62, W: 36, H: 15, D: 24, openW: 22, openH: 7,  E: 2.5, R: 12, radius: 4.0, floorY: 0,   approach: [38, -20] },
-  match:  { x: 0,   z: -74, rotY: 0,     W: 44, H: 38, D: 30, openW: 18, openH: 14, E: 5,   R: 22, radius: 2.6, floorY: 1.8, approach: [0, -48] }
+  gym:    Object.assign(_site('gym'),    { W: 38, H: 13, D: 24, openW: 18, openH: 8,  E: 4,   R: 12, radius: 3.2, floorY: 0 }),
+  market: Object.assign(_site('market'), { W: 36, H: 15, D: 24, openW: 22, openH: 7,  E: 2.5, R: 12, radius: 4.0, floorY: 0 }),
+  match:  Object.assign(_site('match'),  { W: 44, H: 38, D: 30, openW: 18, openH: 14, E: 5,   R: 22, radius: 2.6, floorY: 1.8 })
 });
 
 /* ---- v4: merge many small parts into ONE mesh per material (draw-call discipline, brief §52) ---- */

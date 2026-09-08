@@ -1,233 +1,92 @@
-# MAHWORLD WORLD 01 — CURRENT STATE
+# WORLD 01 CAMPUS RECONSTRUCTION — CURRENT STATE
 
-ACTIVE PRIORITY:
-P4 FLOOR — legibility and seam noise. SPACE, VALUE and the MONUMENT MATERIAL have each had a
-measured pass and all three hold. The two remaining named items in the direction are the plaza
-wordmark's legibility at a shallow angle (§22, still never verified) and the repeated small panel
-lines the long sightline shows across the deck (directive 6). Both are floor; do them together.
+ACTIVE PHASE:
+P2 complete as a PLAN and as a re-siting; P5 (roads/sidewalks) not started. Next is the road loop
+and the forecourt paving, because `road-street` currently renders an empty band — the loop exists in
+`campus-plan.js` as a radius and has no geometry yet.
 
 CURRENT BEST CHECKPOINT:
-branch `claude-mahworld-phase0-control-deck`, HEAD after P3 MONUMENT MATERIAL.
-Evidence, same fixed cameras throughout: `dv/p5-*` → `dv/p6-*` (spacing), `dv/q0-` → `dv/q1-`
-(shafts, clock-matched), `dv/r1-` → `dv/r2-` (monument).
+branch `claude-mahworld-phase0-control-deck`. Pre-campus checkpoint frozen at tag
+`world01-precampus-checkpoint` (795fd43). Evidence: `dv/c1-*` and `dv/c2-*`, daytime 13:20.
 
-## THE THREE INSTRUMENTS — USE THEM BEFORE CHANGING ANYTHING
+LOCKED / PRESERVE:
+- Facility NAMES and identities: MAH GYM, MAH MATCH, MAH MARKET (buildings.js); MAH VITAL,
+  MAH FORGE, MAH MODE (mahfacilities.js); MAH ASCENT, MAH NEXUS, MAH HAVEN, the crystal sea.
+- Renderer: vendored three r185, ES modules, no bundler, no addons, no image files.
+- LAW 1 (metals ≥0.9 take no diffuse), §06 diamonds wider than tall, L42 one-truth-one-source,
+  determinism (golden ratio/angle, never Math.random).
+- The fixed camera suite lives ONLY in `mahworld/diagnostic-views.json`.
+- The planar mirror stays retired behind one `return null`.
 
-All three live in the scratchpad and all three read the RUNNING SCENE rather than a screenshot.
-Every pass before them picked its targets by eye, which is how a pass fixes whatever is easiest to
-find rather than whatever is actually wrong.
+REMOVED / RELOCATED (this pass):
+- **The unnamed city.** `city.js` BUILD_UNNAMED = false switches off the eight lettered mid-rise
+  blocks, the background towers, the shafts that do not end, the ghosts, the distant giants, the
+  walkway and the bridges. None carried a MAH name; the mid-rise blocks were also where the amber
+  window light lived (`city-window-spill-warm`, the WARM table), which the colour section names as a
+  strict exclusion. The city GROUND ring survives — it is the floor. Sky roads survive — transport,
+  not buildings. A switch, not a deletion: the tables are intact and §7's placeholder buildings will
+  come back with names, entrances and windows.
+- **All floor lines.** `ground.js` SMOOTH_FLOOR = true switches off six independent line families
+  (joint catches, crossing studs, contrast-cell checker, routing channels, seam glow, edge ring) and
+  clears the roughnessMap/bumpMap that painted the lattice into the SURFACE — which is what carried
+  the grid out over the ring and the land where there are no cells at all. `plaza-dressing.js` drops
+  its path rails, diamond course and path seams under the same switch; the ROUTES themselves survive
+  as circulation.
+- **The giant monument.** Scaled to 0.32 (about 11 m to the crystal) and moved to the exact centre of
+  the quad. It is now the "small refined civic symbol" §1 permits rather than the obstruction §18
+  forbids. Collider, deck light pool and key-light distance/intensity scaled explicitly — none of
+  the three inherits a group scale.
+- **The three ASCENT lines** left the middle of the quad (r 36–39) for the forecourt edges
+  (r 108–116), each ~30–35 m from its facility's facade, in the gaps between facility bearings.
 
-- **`coverage.cjs <view>`** — screen coverage per owning module, plus a depth-band histogram.
-  Answers "who owns this frame". It named the sky as closed at 0.0 %, ranked three music masts
-  above MAH MATCH, and cleared the monument of a charge it did not deserve.
-- **`darkbars.cjs <view>`** — reads the framebuffer, finds columns under the frame's own median,
-  raycasts the middle of each dark run. Answers "which shapes are dark, and what are they".
-- **`valuecheck.cjs <view>`** — raycast grid plus the rendered pixel at each hit, grouped by
-  material: coverage AND value in one table. Answers "what value does this material actually
-  render at, next to what". This is where a material pass starts.
+MASTERED:
+- **The campus plan has an owner.** `campus-plan.js` holds the macro topology and nothing else:
+  quad 96 m, facade line 132, service band 168, loop boulevard 186, district beyond 205. Facility
+  positions, facings and approach points are DERIVED from one bearing each; buildings.js keeps only
+  the dimensions it actually builds. Before this, four files each held a fragment of a site plan and
+  none held the plan — which is why the whole campus fitted inside a 190 m disc.
+- **Facilities are separate destinations.** Facade line 132 m (was 58/71/74), 144 m between MAH MATCH
+  and each neighbour, 241 m between MAH GYM and MAH MARKET, with a 36 m forecourt in front of every
+  entrance. The 228° arc behind MARKET and GYM is reserved open — arrival approach, rear sea
+  sightline, and the reserve for future districts.
+- Floor: one smooth platinum surface across the whole grounded map, no lines, no lattice, no mirror.
+  The grazing return still takes the sky's COLOUR from the clock's horizon key but its luminance is
+  capped (FLOOR_SKY_CAP 0.30) so the metal cannot wash out to pale stone at midday.
+- Monument material: polished platinum, measured 33 → 77 against a frame mean of 62.
+- MAH MATCH's tower turns on a real plan radius with cross-core armour ribs.
 
-A screenshot cannot tell you that eleven poles are 4 % of a frame, or that the hero monument is
-rendering at a third of its own frame's mean.
+CURRENT DEFECT:
+1. **No roads.** The loop boulevard, sidewalks, forecourt paving and crossings are a plan and not
+   geometry. `road-street` renders an empty band. This is the next action.
+2. **Nothing between the campus and the horizon.** Removing the unnamed city removed the entire
+   background layer, so the middle distance is now bare floor to the treeline. This is the honest
+   cost of the removal and the master's §7 answer is placeholder buildings WITH names and entrances —
+   not the generic blocks that were there.
+3. Lamp masts still cross the lens in `quad-edge-across`; the treeline still reads as a repeated
+   spiky form (§9 "spike forests").
+4. The floor's mid-distance band is still lighter than the foreground; the cap helped, it did not
+   finish the job.
+5. Law suites unverified against the removal at time of writing — see PERFORMANCE STATUS.
 
-## MASTERED
+CURRENT EVIDENCE:
+`dv/c1-campus-overview`, `c1-quad-hero`, `c1-quad-edge-across`, `c1-road-street`, `c1-waterfront`
+(daytime 13:20, floor lines gone, unnamed city gone) and `c2-quad-hero`, `c2-quad-edge-across`
+(after the floor luminance cap).
 
-- Ground VALUE is correct everywhere: plaza plane, 126–620 m ring and land all read as dark platinum
-  with a grazing sheen driven by the clock's own horizon key. No pale sheet.
-- One floor across the whole grounded map: deck (260 m) + city ring (126–620 m) + land (600–2600 m),
-  one diamond lattice at one scale, no seams. No planar reflection; metal reads as a value RANGE
-  (base 0.075, grazing 0.62, fresnel^5).
-- Sun and moon reflect on every ground surface as an analytic glitter path that tracks the clock and
-  hands over between bodies by colour, to 2600 m. Laws R3-08-A..D.
-- ASCENT lines ranked: one hero (north, 1.30), two secondary (0.62 / 0.52). Laws R3-06-F..H.
-- The ascent car is an elevator: cut aperture, two hinged leaves, lined and lit cabin. R3-06-I..L.
-- City is 8 blocks (from 15). Every block that stacked behind another, or closed the forward view,
-  is gone; all four id-keyed tables (MASSING/GESTURE/DECK/glazedIds) stay in sync.
-- MAH MATCH's tower turns on a real plan radius (roundPrism), with cross-core armour ribs on the
-  cardinal axes and a per-section light channel that rides the taper instead of floating off it.
-- THE SKY IS OPEN (this pass). See below.
+PERFORMANCE STATUS:
+Draw calls fell sharply with the unnamed city removed — `quad-hero` 1370 draws / 2.38 M tris,
+`road-street` 288 / 1.24 M, `waterfront` 181 / 1.22 M. Console clean apart from the harness's own
+off-origin abort.
 
-## THIS PASS — WHAT WAS REMOVED OR MOVED, AND WHAT IT BOUGHT
+NEXT ACTION:
+P5 ROADS. Build the primary loop boulevard at CAMPUS.LOOP_R (186 m) as real geometry with a
+carriageway, kerbs and a rear service edge, then the three radial approach walks from the quad edge
+to each facility forecourt. Keep them as SURFACES, not as glowing edge lines — the floor now has no
+lines and a path that reinvents them would be the only grid left in the frame.
 
-Measured on `plaza-hero`, 1936 rays, before → after:
-
-| owner                      | before | after | note                                        |
-|----------------------------|--------|-------|---------------------------------------------|
-| sky (open air visible)     |  5.6 % | 10.2 %| **+82 % more visible sky**                  |
-| diamond-clouds             | 14.2 % | 11.8 %| decks narrowed, gaps opened                 |
-| fobstations (music masts)  |  4.7 % |  0.1 %| relocated out of the arrival cone           |
-| plaza-dressing             |  4.4 % |  3.4 %| 16 lamp masts → 8                           |
-| city / GYM / MARKET / links| 16.8 % | 18.4 %| distance REVEALED where clutter had been    |
-| depth band 0–30 m          | 38.1 % | 33.7 %| foreground thinned                          |
-| depth band 600 m+          | 15.2 % | 17.7 %| far layer opened                            |
-
-REMOVED — eight lamp masts (`plaza-dressing.js` MASTS, 16 → 8). The existing rule kept posts out of
-the central band but never guarded DISTANCE FROM THE CAMERA, so the z 32 and z 24 pairs stood 14 and
-22 m off the arrival lens and read as columns up the full height of frame. Those two rows went, plus
-the two positions that merely doubled a neighbour. Instanced with painted pools, not real lights, so
-the plaza lost no illumination — only the repetition.
-
-MOVED — three MUSIC square-diamonds (`fobstations.js` MUSIC), r 39–41 → r 70–76, azimuths swung into
-the flanks and rear. They were 3.9 % of the arrival frame — more than MAH MATCH, MAH GYM or the
-monument's figures each own — because deg 185 / r 40.5 put a 5.4 m mast 5.5 m in front of the lens.
-They are infrastructure, so all three survive at full size and function; they only left the corridor.
-
-NARROWED — all three cloud decks (`clouds.js` LAYOUT), plus low deck 5 masses → 4. A mass of width W
-at radius r subtends 2·atan(W·QSCALE/2 / r) and only leaves sky if that is smaller than the spacing
-between adjacent azimuths. Shipped values: low ~60° wide at ~35° spacing (1.7× overlap, a solid
-lid), mid 48° at 38°, high 39° at 39°. All three decks were closed. Now ~30° of cloud against 38–46°
-of spacing. Altitudes and radii untouched — they were settled against the skyline.
-
-NOTHING WAS ADDED BACK.
-
-## THIS PASS — P2 VALUE, THE SHAFTS THAT READ AS CUT-OUTS
-
-`scratchpad/darkbars.cjs` reads the FRAMEBUFFER (not a screenshot), finds the columns whose mean
-luminance sits under the frame's own median, and raycasts the middle of each dark run. It named the
-three darkest verticals in `dome-vastness` as `city-shaft-band-1/2/3` at 521, 528 and 783 m,
-luminance **59 against a frame median of 75**.
-
-They are NOT black — the eye reads them as black and is wrong by a factor of three, which is exactly
-why this needed a framebuffer read rather than a look. What they are is 0.79 of the sky they stand
-in front of, hard-edged and full height: the cut-out defect city.js's own §12 note describes, which
-was fixed for the TOWERS (glassFar / glassDeep: metalness falls with range, colour climbs toward the
-horizon key) and never applied to the SHAFTS. The shaft ladder ran the other way — metalness a flat
-0.88 through all four bands, colour DARKENING with altitude — on a sound argument about the night
-zenith that simply missed that a shaft's higher segments are also its farther ones (this file puts a
-600 m shaft's foot at 265 m and its top at 655 m). Two ladders for one law is the L42 failure.
-
-Fixed: metalness 0.85 → 0.30 across the four bands, colour climbing gently toward the horizon key.
-Result: object dark bars 54 → 28 columns of 1280 (−48 %); bands 2 and 3 left the dark list entirely.
-Nothing over-lightened; no form pops out of the sky.
-
-## THIS PASS — P3 MONUMENT MATERIAL
-
-`scratchpad/valuecheck.cjs` raycasts a grid and reads the RENDERED PIXEL at each hit, grouped by
-material — coverage AND value in one table, which is what a material pass has to start from.
-On `monument-close`, before → after:
-
-| material                 | cover | before | after | in-frame reference          |
-|--------------------------|-------|--------|-------|-----------------------------|
-| monument-statue-hull     | 23.6% |  33.0  | 77.4  | city-tower-platinum 64.7    |
-| monument-statue-dark     |  4.8% |  30.3  | 52.8  | facade-wash 72.2            |
-| (frame mean)             |       |  49.4  | 61.5  | vital-polished 93.3         |
-
-The hero monument had been rendering at ONE THIRD of its own frame's mean and at HALF the value of a
-city tower four hundred metres behind it. The near object was out-valued by the far one — the same
-inversion this project keeps correcting, this time on the landmark itself.
-
-Three findings, in the order they were forced:
-
-1. **`-dark` was never re-graded at all.** It kept residents.js's player grade and measured 30.3,
-   indistinguishable from the hull it is supposed to contrast with. A figure whose lit planes and
-   shadow planes are the same value is a silhouette, and that is most of what "low-poly mannequin"
-   describes.
-2. **Metalness is the wrong lever on a dark surface.** Raising `-dark` from 0.50 to 0.58 with more
-   environment and more tint made it DARKER (30.3 → 17.4), because a metal's reflection is tinted by
-   its own base colour and this one's base is 0x27303d. Metalness traded away diffuse the PointLight
-   was actually delivering. Both grades now keep metalness modest — also required by LAW 1, since
-   past ~0.9 the figures' shoulders and crowns would stop taking diffuse and render black.
-3. **A tint cannot fix a contrast problem, and that was the real defect.** Raising the tint alone
-   plateaued at 53. The palette runs dark 0x27303d (linear 0.021) to light 0xf4f8fc (linear 0.93) —
-   a 44:1 random spread across the facets. Multiplying it doubles the near-blacks into slightly
-   less-near-blacks while driving the highlights to clipping. The fix is SILVERISE: per vertex,
-   desaturate 0.76 toward the vertex's own luminance (the palette is blue; silver is neutral), then
-   apply a square root (0.021 → 0.145, 0.93 → 0.964). Graphite lifts out of near-black by a factor
-   of seven, highlights barely move, and the facet PATTERN is untouched — no vertex moves, no
-   triangle changes, canonical geometry preserved by construction. It clones the geometry so a
-   shared buffer could never silverise every MAHBEING on the plaza.
-
-Rendered result: the figures read as polished platinum with a legible light-to-dark gradient across
-each rounded mass, deep graphite in the turned-away planes, and bright silver catches — lit, not
-glowing, and now the brightest non-emissive architectural object in their own frame, which is what
-the module header says a plaza monument should be.
-
-## SIGHTLINES THAT IMPROVED
-
-- `plaza-hero` — the pole that crossed the left of frame is gone; stars and open sky read to the
-  right of the moon where a continuous cloud smear used to sit; MAH MARKET and the west blocks now
-  separate from each other with air between them.
-- `dome-vastness` — sky is 41.0 % of the frame and the cloud smears have broken into discrete masses.
-- `long-sightline` / `building-away` — unchanged, as expected: neither faces the objects that moved.
-
-## CURRENT DEFECTS (ranked by measured frame cost)
-
-1. ~~P2 VALUE — the shafts.~~ **DONE this pass.** See below; band 1 at 520 m is the one that
-   remains, at 0.80 of sky value. Worth a second look only if a later frame still shows it.
-2. §23 COLOUR — the city still carries WARM window light (city.js WARM table, NEUTRALS.interior
-   0xffeccd, spillWarmM), which the master file names as a strict exclusion. Visible directly on
-   MAH MATCH's facade in `match-anchor`. Unresolved conflict, and it is now a rendered fact rather
-   than a code reading.
-3. ~~§7 MONUMENT MATERIAL.~~ **DONE this pass.** The other half of that directive item — reduced
-   screen dominance — remains NOT SUPPORTED BY MEASUREMENT and was not done: the monument owns 5.3 %
-   of `plaza-hero`, unchanged before and after every pass so far, less than the clouds, the fobeams,
-   the city or the ground. What made it feel dominant was having no open sky to sit against and no
-   value separation from the district behind it. Both are now fixed, and the arrival frame reads in
-   layers. Re-judge before shrinking anything; shrinking the hero would cost the landmark and buy
-   about two per cent of frame.
-4. **§22 FLOOR TEXT** — plaza wordmark legibility at shallow angle STILL unverified. Next action.
-5. **FLOOR SEAM NOISE** (directive 6) — `long-sightline` shows repeated small panel lines and a
-   scatter of small pale objects across the deck. Measure with `valuecheck.cjs` before cutting: the
-   last three de-clutter passes that skipped measuring removed the wrong things.
-6. §26 DOME — still reads more as a ceiling than a shell, though defect 1's fix has helped.
-7. FOREGROUND SHARDS — four pale translucent standing shards remain in the arrival frame. Already
-   cut 14 → 8 once; they are the last repeated small form on the deck. Low priority, and the
-   direction explicitly says not to keep removing until the plaza is bare.
-
-## LOCKED / DO NOT REGRESS
-
-- Renderer: vendored three r185, ES modules, no bundler, no addons, no image files (procedural only).
-- LAW 1: metals at metalness ≥ ~0.9 take no diffuse; horizontal faces need a lit grade.
-- §06: square diamonds WIDER THAN TALL; the brand figure keeps its points.
-- L42: one truth, one source. No second table describing the same thing.
-- Determinism: golden ratio / golden angle, never Math.random.
-- The fixed camera suite lives in `mahworld/diagnostic-views.json` and nowhere else. Thirteen views.
-- MAHWORLD world work stays on `claude-mahworld-phase0-control-deck`, separate from Astra's
-  canonical mrmah3d character work on `claude/mrmah-3d-renderer-poc-1nyunz`.
-- The planar mirror is retired behind one `return null` and must not be re-enabled without direction.
-- Never push MAHFITT source publicly; no deployment/visibility changes without explicit authorization.
-
-## NEXT ACTION
-
-P4 FLOOR. Two items, one surface. First §22: render `floor-text` (1.6 m eye height, shallow angle
-over the plaza wordmark) — it has never been rendered since the floor was re-graded twice, and
-legibility at a grazing angle is the case that exposes text buried under an overlay or fighting the
-deck for depth. Then directive 6: run `valuecheck.cjs` on `long-sightline` to rank what is actually
-drawing the seam lines before cutting any of them, since the panel lattice is canonical MAH diamond
-organisation and the noise may be a separate overlay riding on top of it. Do not touch the monument,
-the shafts or the clouds in the same pass.
-
-## NEGATIVE RESULTS (do not re-test)
-
-- Fog is NOT what washes the ground pale. Switching `scene.fog` off at runtime left the floor exactly
-  as bright. The cause was a uniform's DEFAULT value.
-- The monument is NOT what blocks the city from the arrival camera. Measured at 5.3 % of the frame,
-  behind it on the axis there is only MAH MATCH and then open ground; every city block sits at
-  |x| ≥ 62. Shrinking it would cost the hero landmark and buy about two per cent of frame.
-
-## LEARNED RULES
-
-- A uniform's default is live code. Uniforms are created at a material's FIRST COMPILE, on the first
-  render — after the clock has run — so anything written "every tick" does not own the value until
-  the tick after compile. Seed from real state at patch time.
-- `onBeforeCompile` is ONE slot. Every patch must chain `prev` or it silently deletes another
-  module's shader.
-- A patch that MATCHES is not a patch that has an EFFECT. `applied` flags prove a `String.replace`
-  found its anchor, nothing more.
-- **A landmark with no diagnostic camera cannot be corrected.** Three suite views rendered with
-  byte-identical triangle counts across a full rebuild of MAH MATCH's tower, because the tallest
-  thing in the district was not visible from any camera in the suite.
-- **A "before" needs the same CLOCK, not just the same camera.** `views.cjs` advanced world time
-  0.4 s per view, so a frame shot sixth in a batch saw a different sky from the same frame shot
-  first — and a before/after pair taken that way appeared to swing the whole image toward violet,
-  which no material edit in that pass could have caused. The runner now re-stamps the time before
-  every screenshot. A shared camera table is necessary and was never sufficient.
-- **Read the framebuffer, not a screenshot, and render synchronously first.** The renderer runs
-  without `preserveDrawingBuffer`, so a `drawImage` from the canvas after a yield returns a sheet of
-  zeros. The first run of `darkbars.cjs` duly reported median luminance 0, no dark bars, no defect —
-  believable-looking output from a broken read. It was only caught because zero is impossible.
-- **The eye over-reads hard edges.** The shafts that looked pure black measured 59 against a sky
-  median of 75 — 0.79, not 0.0. They read as black because they were the only hard-edged dark
-  verticals in a soft frame. Fix the contrast that is actually there, not the one that is perceived.
-- **Rank the frame before you cut it.** Coverage is not intuition: the objects that felt biggest in
-  `plaza-hero` (the monument, the statues) were 5.3 %, and the objects that felt incidental (three
-  music masts) were 3.9 % — with one of them five metres from the lens.
+LAST LEARNED RULE:
+A "line on the floor" is not one thing. This floor drew its grid from six independent families PLUS
+two texture maps, which is why three previous passes each removed one and the grid survived. Before
+removing a visual feature, enumerate every family that produces it — the roughnessMap in particular
+paints lines onto surfaces that have no geometry at all, which is how the lattice reached the ring
+and the land.

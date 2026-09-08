@@ -47,6 +47,31 @@ import * as THREE from '../vendor/three/three.module.min.js';
 import { canvasTexture, chamferBox, fobMark, cutGem, gemGirdle, GEM, applyCelestialPath } from './materials.js';
 import { SITES } from './buildings.js';
 
+/* ==== R-CAMPUS D10 — THE FLOOR HAS NO LINES ====================================================
+   Director, verbatim: "Get rid of all of the lines on the floor and make the floor extremely smooth
+   all the way throughout with its platinum reflectiveness, but not like a mirror, though."
+
+   The floor was drawing its lines from SIX independent families, which is why previous attempts to
+   calm it only ever removed one of them:
+     · floor-joint-catches / -outer   the recessed grid between every diamond cell
+     · floor-crossing-studs / -outer  the opaque mirror studs where four cut corners meet
+     · floor-contrast-cells           alternating cell VALUES, a checker even with no seam drawn
+     · routing-channels               four inlaid MAHGIC lines running out to the district
+     · floor-seam-glow                the additive answer those channels and the ring cast
+     · the circulation ring           one inset ring at the plaza edge
+   plus the roughnessMap and bumpMap on M.plaza, which paint the lattice into the SURFACE rather
+   than into geometry — the reason the ring beyond the deck showed the same grid.
+
+   All of it is switched off together, because it is one decision and not six. What is left is the
+   platinum itself: one value across the whole field, smooth, taking the sky and the sun as a broad
+   reflection. NOT a mirror — the D7 grade is unchanged (base 0.075, grazing sheen 0.62, fresnel^5),
+   so the floor still reads as polished metal with a value RANGE rather than a duplicate of the
+   world hanging upside down under it.
+
+   A SWITCH, NOT A DELETION: every family above stays in the file. The lattice is MAHWORLD's
+   identity language and a later pass may want a trace of it back at a fraction of this strength. */
+export const SMOOTH_FLOOR = true;
+
 export const PLAZA_RADIUS = 27;
 /* THE HERO SURFACE (v5 §05): the plaza floor is laid in ARCHITECTURAL-SCALE diamond cells — nine metres
    across, the width of a room, not a tile pattern. A resident standing on one covers a fifth of it. */
@@ -317,8 +342,15 @@ export function buildGround(ctx) {
   const plaza = new THREE.Mesh(new THREE.PlaneGeometry(260, 260, 1, 1), M.plaza);
   plaza.rotation.x = -Math.PI / 2; plaza.renderOrder = 2; plaza.receiveShadow = true; g.add(plaza);
   /* the diamond roughness map is scaled so ONE painted diamond matches ONE modelled cell (9 m) */
-  if (M.plaza.roughnessMap) { const r = 260 / (4 * DIAMOND_CELL); M.plaza.roughnessMap.repeat.set(r, r); }
-  if (M.plaza.bumpMap) { const r = 260 / (4 * DIAMOND_CELL); M.plaza.bumpMap.repeat.set(r, r); }
+  if (SMOOTH_FLOOR) {
+    /* the lattice lives in these two maps as much as in the geometry: a roughness map IS a pattern of
+       lines whether or not anything is modelled, and it is what carried the grid out across the ring
+       and the land where there are no cells at all. */
+    M.plaza.roughnessMap = null; M.plaza.bumpMap = null; M.plaza.needsUpdate = true;
+  } else {
+    if (M.plaza.roughnessMap) { const r = 260 / (4 * DIAMOND_CELL); M.plaza.roughnessMap.repeat.set(r, r); }
+    if (M.plaza.bumpMap) { const r = 260 / (4 * DIAMOND_CELL); M.plaza.bumpMap.repeat.set(r, r); }
+  }
 
   /* ---------------------------------------------------------------------------------------------
      THE LIGHT POOLS (v8, and the single biggest thing this file does for the direction).
@@ -446,6 +478,18 @@ export function buildGround(ctx) {
   const heroMat = new THREE.MeshStandardMaterial({ color: 0x080b11, roughness: 0.045, metalness: 0.98, envMapIntensity: 2.9, transparent: true, opacity: 0.86, flatShading: true });
   const satinMat = new THREE.MeshStandardMaterial({ color: 0x0a0e16, roughness: 0.30, metalness: 0.96, envMapIntensity: 2.2, transparent: true, opacity: 0.92, flatShading: true });
   const contrastMat = new THREE.MeshStandardMaterial({ color: 0x0d1220, roughness: 0.20, metalness: 0.97, envMapIntensity: 2.5, transparent: true, opacity: 0.88, flatShading: true });
+  if (SMOOTH_FLOOR) {
+    /* one value across the whole field: same colour, same roughness, same metal, same envMap — the
+       cells still exist as geometry and still take the celestial path, they simply stop being a
+       checker. Opacity goes to 1 so the field reads as one continuous surface rather than as two
+       interleaved sheets with the darker one showing through. */
+    contrastMat.color.copy(satinMat.color);
+    contrastMat.roughness = satinMat.roughness;
+    contrastMat.metalness = satinMat.metalness;
+    contrastMat.envMapIntensity = satinMat.envMapIntensity;
+    contrastMat.transparent = satinMat.transparent; contrastMat.opacity = satinMat.opacity;
+    contrastMat.flatShading = satinMat.flatShading;
+  }
   ctx.floorMaterials = [heroMat, satinMat, contrastMat];
   /* R170 D6 — THE DECK CATCHES THE SUN AND THE MOON.
      The four grades that make up the plaza floor all take the celestial path, and they take it at
@@ -517,13 +561,22 @@ export function buildGround(ctx) {
     const add = (list, mat, name, order) => { if (!list.length) return; const mesh = new THREE.Mesh(mergeGeos(list), mat); mesh.name = name; mesh.receiveShadow = true; if (order) mesh.renderOrder = order; field.add(mesh); };
     add(satin, satinMat, 'floor-satin-field', 3);
     add(hero, heroMat, 'floor-hero-field', 3);
+    /* the contrast cells are a CHECKER, not a seam, and they read as a grid even with every joint
+       gone. They keep their OWN material and it is matched to the satin grade instead — pointing the
+       mesh at satinMat would have left contrastMat with no mesh at all, and a material that is never
+       used is a material that never compiles: law R3-08-A caught exactly that, because the celestial
+       path's shader replace can only run on a material something actually draws with. */
     add(contrast, contrastMat, 'floor-contrast-cells', 3);
-    add(outerJoints, M.trimSatin, 'floor-joint-catches-outer', 3);
-    add(joints, M.trim, 'floor-joint-catches', 3);
+    if (!SMOOTH_FLOOR) {
+      add(outerJoints, M.trimSatin, 'floor-joint-catches-outer', 3);
+      add(joints, M.trim, 'floor-joint-catches', 3);
+    }
     /* the studs are OPAQUE mirror, so they draw before the transparent field and the field's own alpha
        never washes them out — they are the hardest catch on the floor and they have to stay hard */
-    add(outerStuds, M.trimSatin, 'floor-crossing-studs-outer');
-    add(studs, M.trim, 'floor-crossing-studs');
+    if (!SMOOTH_FLOOR) {
+      add(outerStuds, M.trimSatin, 'floor-crossing-studs-outer');
+      add(studs, M.trim, 'floor-crossing-studs');
+    }
   }
 
   /* MAHGIC routing channels: four thin inlaid lines running from the disc edge out toward the district,
@@ -542,16 +595,21 @@ export function buildGround(ctx) {
       channelRibbons.push(glowRibbon(line, 0.85, POOL_Y, 0.5, false, t => Math.pow(Math.sin(Math.PI * t), 0.6)));
     }
     chGeo.dispose();
-    const channels = new THREE.Mesh(mergeGeos(parts), M.energySoft);
-    channels.name = 'routing-channels'; channels.renderOrder = 5; g.add(channels); reflect(channels, 0.35);
+    if (SMOOTH_FLOOR) { parts.forEach(q => q.dispose()); channelRibbons.length = 0; }
+    else {
+      const channels = new THREE.Mesh(mergeGeos(parts), M.energySoft);
+      channels.name = 'routing-channels'; channels.renderOrder = 5; g.add(channels); reflect(channels, 0.35);
+    }
   }
   const under = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshBasicMaterial({ color: 0x02040a, fog: false }));
   under.rotation.x = -Math.PI / 2; under.position.y = -80; g.add(under);
 
   /* the circulation ring: one restrained inset ring at the plaza edge */
-  const ring = new THREE.Mesh(new THREE.RingGeometry(PLAZA_RADIUS - 0.09, PLAZA_RADIUS + 0.09, 128), M.energySoft);
-  ring.rotation.x = -Math.PI / 2; ring.position.y = FLOOR_TOP + 0.02; ring.renderOrder = 4; g.add(ring);
-  reflect(ring, 0.35);
+  if (!SMOOTH_FLOOR) {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(PLAZA_RADIUS - 0.09, PLAZA_RADIUS + 0.09, 128), M.energySoft);
+    ring.rotation.x = -Math.PI / 2; ring.position.y = FLOOR_TOP + 0.02; ring.renderOrder = 4; g.add(ring);
+    reflect(ring, 0.35);
+  }
   /* THE SEAM GLOW: the ring's and the channels' answer, in one vertex-coloured additive mesh. Its
      colour and strength are copied from M.energySoft every time hook, so a Theme change or a sunrise
      carries the glow with the seam that casts it and neither can drift from the other. */
@@ -559,9 +617,11 @@ export function buildGround(ctx) {
   {
     const ringPath = [];
     for (let i = 0; i < 96; i++) { const a = i / 96 * Math.PI * 2; ringPath.push([Math.cos(a) * PLAZA_RADIUS, Math.sin(a) * PLAZA_RADIUS]); }
-    const parts = [glowRibbon(ringPath, 1.7, POOL_Y, 1, true, null)].concat(channelRibbons);
-    const seams = new THREE.Mesh(mergeSeams(parts), seamMat);
-    seams.name = 'floor-seam-glow'; seams.renderOrder = 5; g.add(seams);
+    const parts = SMOOTH_FLOOR ? [] : [glowRibbon(ringPath, 1.7, POOL_Y, 1, true, null)].concat(channelRibbons);
+    if (parts.length) {
+      const seams = new THREE.Mesh(mergeSeams(parts), seamMat);
+      seams.name = 'floor-seam-glow'; seams.renderOrder = 5; g.add(seams);
+    }
   }
 
   /* THE MAHPLAZA CIVIC MARKER: the canonical MAHFITT mark + the MAHPLAZA wordmark, inlaid.
