@@ -1680,6 +1680,10 @@ export async function createMahplaza(canvas, options = {}) {
     shadowCull,
     modules: { terrain: !!terrain, city: !!city, dressing: !!dressing, matchInterior: !!matchInterior, life: !!life, clouds: !!clouds, fobeams: !!fobeams, fobstations: !!fobstations, monument: !!monument, fobpods: !!fobpods, broadcast: !!broadcast, lakeCity: !!lakeCity, rainforest: !!rainforest, mahAscent: !!mahAscent, mahDescent: !!mahDescent, outerRing: !!outerRing, facilities: !!facilities, beasts: !!beasts, interlink: !!interlink, halo: !!halo, haloDistricts: !!haloDistricts, haloLife: !!haloLife, haloThreshold: !!haloThreshold, mahCrown: !!mahCrown, haloDome: !!haloDome, mahHaven: !!mahHaven, mahRain: !!mahRain, mahNexus: !!mahNexus }, terrain, city, dressing, matchInterior, life, clouds, fobeams, fobstations, monument, fobpods, broadcast, lakeCity, rainforest, mahAscent, mahDescent, outerRing, facilities, beasts, interlink, halo, haloDistricts, haloLife, haloThreshold, mahCrown, haloDome, mahHaven, mahRain, mahNexus,
     actions: ctx.actions.map(a => ({ id: a.id, label: a.label, kind: a.kind })), select, go, pick,
+    /* R167 §D — every doorway in the world, from every module, in ONE list. The three tiers are
+       authored in three files (city blocks, facilities, landmark portals) and the only way to
+       check that they still form a ladder is to read them from one place. */
+    doorTiers: (ctx.doorTiers || []).slice(),
     practicePreview, practiceExit, practiceContinue,
     setWorldTheme, setSelfAppearance, setRemoteAppearance, describeAppearance, residentScreenSamples, samplePixels,
     navDestinations: () => navDest().map(d => ({ id: d.id, label: d.label, sub: d.sub })), navGoto,

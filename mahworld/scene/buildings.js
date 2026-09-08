@@ -689,6 +689,14 @@ function sign(ctx, parent, spec) {
    whole assembly merges into the building's accent mesh, so a portal costs no draw call of its own. */
 function portal(ctx, g, o) {
   const { openW, openH, E, floorY = 0, brow = 0.62, z = -0.55, ans } = o;
+  /* R167 §D — TIER 3 REPORTS ITSELF INTO THE SAME LADDER.
+     The geometry below is unchanged and stays unchanged: these three openings are hand-sized to
+     masses that are locked, and they already sit correctly above the tier 2 facility entrances.
+     What was missing is that nobody could SEE the ladder — the local doors were measured in one
+     file, the facility doors in another, and the landmarks nowhere at all, which is exactly the
+     condition L42 warns about. One channel now carries all three tiers, so the monotonic test in
+     tests/ can fail if a future pass makes a facility door out-scale a landmark threshold. */
+  (ctx.doorTiers || (ctx.doorTiers = [])).push({ tier: 3, kind: 'LANDMARK', w: openW, h: openH, name: g.name || 'landmark' });
   /* THE BROW, mounted UNDER THE LINTEL and inside the reveal rather than on the wall above it. Two
      reasons, and both are architectural: the elevation above every one of these openings is already
      spoken for — a transfer band on MAH GYM, a platinum portal frame on MAH MATCH, a cornice order on

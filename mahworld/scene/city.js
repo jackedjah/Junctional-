@@ -119,7 +119,7 @@
    Life anchors pushed: ctx.lifeAnchors.paths (walkway + 3 bridges, kind
    'bridge') and ctx.lifeAnchors.pads (5 rooftop pads, tier 'far'). */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, windowGrid, canvasTexture, ACCENT, apertureField } from './materials.js';
+import { chamferBox, windowGrid, canvasTexture, ACCENT, apertureField, doorwayParts } from './materials.js';
 import { foblockParts } from './foblock.js';   /* §6D: a SKYBLOCK CARRIER is an elongated FOBLOCK, so it grows from the genome */
 
 const SEED = 4417;
@@ -1033,6 +1033,49 @@ export function buildCity(ctx) {
     return field.userData.apertures.placed.length;
   }
 
+  /* R167 §D — THE WAY IN, at the one scale the player shares.
+     Fifteen blocks stood on walkable ground with nothing at eye level: their lowest opening was at
+     3.0 m on every one of them, because a window sits above a sill and a sill is above a head. So
+     the street read as a row of plinths and there was nowhere the eye could say "in there".
+
+     This is a TIER 1 doorway and it stays tier 1: human-sized, unlit except for a line at the step.
+     The hierarchy only means anything if the ordinary case is ordinary — a facility entrance is
+     legible from a block away precisely because the fifteen doors around it are not.
+
+     It is placed PROUD OF THE PLINTH, not on the wall behind it. The base course is 0.6 m wider
+     than the mass it carries, so the elevation is set 0.3 m back from what a walker actually meets;
+     a doorway on the wall plane would have been a shape buried in the plinth up to 1.9 m. Standing
+     the surround out past the plinth face is also what a real entrance does to a base course: it
+     interrupts it. Everything merges into the block's own buckets, so fifteen doors cost nothing. */
+  function doorway(bm, f, kind, headroom, id) {
+    const parts = doorwayParts(kind, f.w, f.h, headroom);
+    if (!parts.spec.h || parts.spec.h < 2.2) return 0;
+    /* stood one reveal-depth in front of the PLINTH face, not the wall behind it. The base course
+       is 0.6 m wider than the mass it carries (baseCourse above), so the surface a walker actually
+       meets is 0.3 m proud of the elevation; and with no CSG in this renderer the recess is made by
+       standing the surround out over that surface rather than by cutting into it. */
+    const dm = matrixOf(f.ox, f.yBase, f.oz + 0.3 + parts.spec.reveal, f.ry, 1, 1, 1, bm).clone();
+    const put = (list, bucket) => list.forEach(geo => bucket.push(geo.applyMatrix4(dm)));
+    put(parts.reveal, B.platPier);      /* a vertical metal surround takes the brushed grade */
+    put(parts.leaf, B.composite);       /* the leaf is DARK: the light at a local door is the step */
+    put(parts.sill, B.platLit);         /* the step reads by its top face, like every cap in this file */
+    put(parts.canopy, B.platLit);
+    put(parts.glow, B.strips);
+    stats.doorways = (stats.doorways || 0) + 1;
+    /* the record carries WHERE and WHICH WAY, not just how big. A district rotates its blocks, so
+       nothing outside this file can derive a doorway's world position from the block table without
+       reproducing that rotation — and a probe that guesses the position measures the wrong wall.
+       The matrix already holds both: column 3 is the origin, column 2 is the outward normal. */
+    const e = dm.elements;
+    (ctx.doorTiers || (ctx.doorTiers = [])).push({
+      tier: parts.spec.tier, kind, w: +parts.spec.w.toFixed(2), h: +parts.spec.h.toFixed(2),
+      reveal: parts.spec.reveal, name: 'block-' + id,
+      x: +e[12].toFixed(2), y: +e[13].toFixed(2), z: +e[14].toFixed(2),
+      nx: +e[8].toFixed(4), nz: +e[10].toFixed(4)
+    });
+    return 1;
+  }
+
   function glaze(parent, mod, seed, place, f) {
     if (f && f.nearBlock) { const n = glazeApertures(parent, mod, seed, place, f); if (n) return n; }
     if (mod.cols < 2 || mod.rows < 2) return 0;
@@ -1373,6 +1416,20 @@ export function buildCity(ctx) {
         if (mod.cols >= 2 && mod.rows >= 2) { if (light.cool) stats.coolFaces++; else stats.warmFaces++; }
       }
     });
+    /* R167 §D — ONE WAY IN PER BLOCK, on its widest ground-level front.
+       The gate that picked "every face at yBase 0 facing forward" looked right and was wrong: the
+       SLOTTED massing pushes two such faces, the broad wing and the slender blade, so five of the
+       fifteen blocks would have come back with two front doors each — a street where half the
+       buildings have two fronts. Choosing the single widest ground-level front instead is both the
+       correct count and the correct architecture: the door goes on the principal elevation, which
+       on a slotted block is the wing and not the blade.
+       mod.y0 is where the glazing starts on that face, and that is exactly the headroom the door's
+       surround has to fit under, so it is measured here rather than assumed. */
+    const fronts = faces.filter(f => f.glaze && f.yBase === 0 && f.ry === 0);
+    if (fronts.length) {
+      const front = fronts.reduce((a, b) => (b.w > a.w ? b : a));
+      doorway(bm, front, 'LOCAL', winModule(front.w, front.h, glazed, faceLight(front.seed * 17 + i)).y0 - 0.15, spec.id);
+    }
     /* ---- v9 §02 THE CORNER EMERGENCE AND THE FRACTURE RUN ------------------------------------------
        Two more ways the crystal reads as the building's own material and not as applied trim.
        THE CORNER: a cluster grows out of the vertical arris where two elevations meet, at 45° in plan

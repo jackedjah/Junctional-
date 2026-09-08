@@ -366,21 +366,29 @@ export const APERTURE = Object.freeze({
   EDGE_FRACTION: 0.10, EDGE_MIN: 0.45, EDGE_MAX: 2.0
 });
 
+/* THE OPENING OUTLINE, at any size. One routine, because the doorway kit needs the same line at a
+   real width and height rather than as a unit square scaled non-uniformly — a taper survives a
+   uniform scale and is destroyed by an anisotropic one. Writes into a THREE.Shape or a THREE.Path,
+   which is what lets the same line serve as an outline and as the hole inside it. */
+function archOutline(P, hw, hh) {
+  const tw = hw * 0.84;                 /* the taper: the head is 84% of the sill width */
+  const shoulder = hh * 0.42;
+  P.moveTo(-hw, -hh);
+  P.lineTo(hw, -hh);
+  P.lineTo(hw * 0.985, shoulder);       /* the sides lean in as they rise */
+  /* the arched head — one quadratic per side, meeting at the crown. This is the line the reference
+     frames all share: not a semicircle sitting on a rectangle, but a continuous shoulder. */
+  P.quadraticCurveTo(tw * 1.02, hh * 0.93, 0, hh);
+  P.quadraticCurveTo(-tw * 1.02, hh * 0.93, -hw * 0.985, shoulder);
+  P.lineTo(-hw, -hh);
+  return P;
+}
+
 let _apertureProfile = null;
 /* ONE geometry for the whole kit. Unit height, unit width, thin in Z, origin at the centre. */
 function apertureGeometry() {
   if (_apertureProfile) return _apertureProfile;
-  const S = new THREE.Shape();
-  const hw = 0.5, tw = 0.5 * 0.84;      /* the taper: the head is 84% of the sill width */
-  const hh = 0.5, shoulder = 0.5 * 0.42;
-  S.moveTo(-hw, -hh);
-  S.lineTo(hw, -hh);
-  S.lineTo(hw * 0.985, shoulder);       /* the sides lean in as they rise */
-  /* the arched head — one quadratic per side, meeting at the crown. This is the line the reference
-     frames all share: not a semicircle sitting on a rectangle, but a continuous shoulder. */
-  S.quadraticCurveTo(tw * 1.02, hh * 0.93, 0, hh);
-  S.quadraticCurveTo(-tw * 1.02, hh * 0.93, -hw * 0.985, shoulder);
-  S.lineTo(-hw, -hh);
+  const S = archOutline(new THREE.Shape(), 0.5, 0.5);
   const g = new THREE.ExtrudeGeometry(S, { depth: 1, bevelEnabled: false, curveSegments: 6 });
   g.translate(0, 0, -0.5);
   _apertureProfile = g;
@@ -471,6 +479,163 @@ export function apertureField({ W, H, families = ['TAPERED'], seed = 1, sillY = 
   group.add(frame); group.add(glass);
   group.userData.apertures = comp;
   return group;
+}
+
+/* ==============================================================================================
+   R167 §D — THE DOORWAY KIT, and why a door is not a small window.
+
+   WHAT THE WORLD ACTUALLY HAD, counted before anything was written. Twenty-three masses stand on
+   ground a player can walk on. THREE of them had anything at ground level that reads as a way in
+   — MAH GYM, MAH MARKET, MAH MATCH — and all three got the same gesture from the same function.
+   The fifteen city blocks had ZERO. Their lowest opening sat at exactly 3.0 m on every single
+   block, because the aperture field starts at a sill and a sill is above head height. So the
+   street read as a row of plinths, and there was no hierarchy to refine: there was one tier and
+   twenty blank walls.
+
+   THE HIERARCHY IS A SCALING RULE, NOT A DECORATION BUDGET. This is the part worth stating,
+   because it is what makes the three tiers legible instead of merely different:
+
+     TIER 1 (LOCAL) is ABSOLUTE.     3.2 m to the head on a 20 m block and 3.2 m on a 70 m tower.
+     TIER 2 (FACILITY) is HINGED.    A fixed core plus a small fraction of the wall.
+     TIER 3 (LANDMARK) is PROPORTIONAL. It grows with the mass it is cut into.
+
+   That is how a real street tells you which door is yours. A human-sized opening in a large wall
+   says "this is an entrance for one person at a time"; an opening that scales with the building
+   says "this is the way into somewhere". The player never reads the table — they read the fact
+   that the door beside them is the same size as them, and the one across the plaza is not.
+
+   AND THE LIGHT FOLLOWS THE SAME LADDER, low to high, because "do not put a giant glowing
+   doorway on every building" is the whole risk here:
+
+     TIER 1  a lit line at the SILL only. A doorstep. Visible at 20 m, gone at 150 m.
+     TIER 2  a lit line across the HEAD, plus a projecting canopy. Reads from a block away.
+     TIER 3  head, jambs, threshold and a pool on the floor — which portal() in buildings.js
+             already builds, and keeps building. This kit sizes it; it does not replace it.
+
+   The reveal and the leaf are cut from apertureGeometry() — the SAME tapered arch the windows
+   use. One opening profile for the whole world at five sizes is what makes a facade read as one
+   building; a separate door shape would have been a second language on the same wall (L42).
+
+   Returns GEOMETRIES BY ROLE, not a Group, because every caller here merges. city.js pushes them
+   straight into the block's existing platinum/composite/strip buckets, so fifteen doorways cost
+   no draw call at all.
+
+   WHERE THE CALLER PUTS IT. Local origin is the centre of the sill, +Z out of the wall, and the
+   surround's front face is at z = 0 with the reveal tunnelling back to z = -reveal. There is no
+   CSG in this renderer, so the recess is made by standing the surround OUT rather than by cutting
+   the mass: place the origin one `reveal` in front of whatever solid the door belongs to — the
+   plinth face on a city block, the wall plane on a facility — and the tunnel is real depth over a
+   real surface. `spec.reveal` is on the returned spec so the caller can do that without knowing
+   the tier.
+   ============================================================================================== */
+export const DOORWAY = Object.freeze({
+  /* w/h are the absolute core; wf/hf the fraction of the wall added on top. lip is how far the
+     surround stands proud, reveal how deep the opening cuts, sillOut how far the step projects. */
+  LOCAL:    Object.freeze({ tier: 1, w: 2.8, h: 3.2, wf: 0.00, hf: 0.000, reveal: 0.42, lip: 0.26, mullions: 1, head: 0,    canopy: 0,   sill: 0.13, sillOut: 0.60, glow: 'sill' }),
+  FACILITY: Object.freeze({ tier: 2, w: 4.6, h: 5.0, wf: 0.05, hf: 0.030, reveal: 0.95, lip: 0.50, mullions: 2, head: 0.30, canopy: 2.1, sill: 0.18, sillOut: 1.25, glow: 'head' }),
+  LANDMARK: Object.freeze({ tier: 3, w: 7.0, h: 7.0, wf: 0.20, hf: 0.150, reveal: 1.80, lip: 0.85, mullions: 0, head: 0.58, canopy: 0,   sill: 0.24, sillOut: 2.10, glow: 'full' }),
+  /* a doorway never eats its wall: past these fractions it stops being a door and becomes a gap */
+  W_MAX_FRACTION: 0.52,
+  H_MAX_FRACTION: 0.60
+});
+
+/* The size this tier takes on this wall. Exported on its own because callers that only need to
+   know how much wall a door will occupy — an aperture field deciding where its sill starts —
+   must not have to build the geometry to find out. */
+export function doorwaySpec(kind, wallW, wallH, headroom = Infinity) {
+  const D = DOORWAY[kind] || DOORWAY.LOCAL;
+  const w = Math.min(D.w + D.wf * wallW, wallW * DOORWAY.W_MAX_FRACTION);
+  /* HEADROOM is what stands ABOVE the doorway on this particular elevation, and it is a hard cap
+     rather than a preference: on a city block the glazing begins at 3.0 m, and a 3.2 m door with a
+     0.26 m lip over it would have driven its surround straight through the bottom row of windows.
+     The lip is subtracted here, once, so no caller has to remember that the surround is taller
+     than the opening it surrounds. */
+  let h = Math.min(D.h + D.hf * wallH, wallH * DOORWAY.H_MAX_FRACTION);
+  if (isFinite(headroom)) h = Math.min(h, headroom - D.lip);
+  return { kind, tier: D.tier, w, h, reveal: D.reveal, lip: D.lip, mullions: D.mullions,
+           head: D.head, canopy: D.canopy, sill: D.sill, sillOut: D.sillOut, glow: D.glow };
+}
+
+export function doorwayParts(kind, wallW, wallH, headroom = Infinity) {
+  const S = doorwaySpec(kind, wallW, wallH, headroom);
+  const out = { spec: S, reveal: [], leaf: [], sill: [], glow: [], canopy: [] };
+  if (S.w < 1.4 || S.h < 2.2) return out;                 /* the wall is too small to take a door */
+
+  /* THE SURROUND IS A RING, NOT A SLAB, and getting that wrong is worth the paragraph.
+     The first cut reused the aperture trick: a solid arch standing slightly proud with a smaller
+     solid arch behind it. On a window that reads correctly, because the glass covers the middle
+     and the frame only shows as a lip. On a doorway standing PROUD OF THE PLINTH it does not,
+     because there is no wall in front of the leaf to hide it — and the render showed exactly that:
+     a platinum tombstone leaning against each block, with the dark leaf buried out of sight behind
+     the plinth. Nothing had been cut, and only looking at it found that.
+
+     So the surround is an extruded RING: the arch outline with the same outline inset by `lip` as
+     a hole. The extrusion generates the walls of that hole for free, and those walls ARE the jambs
+     of the reveal — the tunnel a player sees into. One geometry gives the lip, both jambs, the
+     soffit and the depth, and because it is built at the door's real width and height the taper is
+     the authored line rather than an anisotropically stretched one. */
+  const hw = S.w / 2, hh = S.h / 2;
+  const ring = new THREE.Shape();
+  archOutline(ring, hw + S.lip, hh + S.lip * 0.5);
+  ring.holes.push(archOutline(new THREE.Path(), hw, hh));
+  const surround = new THREE.ExtrudeGeometry(ring, { depth: S.reveal, bevelEnabled: false, curveSegments: 8 });
+  surround.translate(0, hh + S.lip * 0.5, -S.reveal);      /* the front face lands on the wall plane */
+  out.reveal.push(surround);
+
+  /* THE LEAF, set at the BACK of the reveal so the ring reads as depth rather than as trim. Dark:
+     at tier 1 a doorway is a shadow with a lit step, and a bright panel here is exactly the
+     "glowing doorway on every building" the brief rules out.
+     It is deep enough to reach the wall behind it. A caller stands this whole assembly one reveal
+     forward of whatever solid it is cut into (there is no CSG here — the recess is made by standing
+     the surround out, not by subtracting from the mass), which leaves a gap behind the leaf that a
+     thin panel would show at a grazing angle. */
+  const leafShape = archOutline(new THREE.Shape(), hw - 0.04, hh - 0.04);
+  const leaf = new THREE.ExtrudeGeometry(leafShape, { depth: S.reveal + 0.5, bevelEnabled: false, curveSegments: 8 });
+  leaf.translate(0, hh, -S.reveal * 2 - 0.47);
+  out.leaf.push(leaf);
+  /* the mullions that divide it into leaves, standing IN the reveal in front of the leaf — which is
+     what gives a doorway its human-scale reading: two leaves means two people wide.
+     A mullion runs to the LINE OF THE ARCH ABOVE IT, not to a fixed height: the first cut stopped
+     every one of them 0.30 m short, and under a curved head that left the centre post hanging in
+     the opening with a visible cut end — the render showed a floating bar before anything else.
+     The outline's own height at this x is what it has to meet, so it is evaluated here. */
+  for (let m = 1; m <= S.mullions; m++) {
+    const x = -hw + (m * S.w) / (S.mullions + 1);
+    const u = Math.min(1, Math.abs(x) / hw);
+    /* the arch height at x, from the same shoulder-and-crown line archOutline draws */
+    const top = hh * (u < 0.42 ? 1 - 0.14 * (u / 0.42) * (u / 0.42) : 0.86 - 0.44 * ((u - 0.42) / 0.58));
+    const mh = hh + top - 0.06;
+    out.reveal.push(chamferBox(0.11, mh, 0.14, 0.03).translate(x, mh / 2, -S.reveal * 0.45));
+  }
+  /* THE SILL: a step at the ground plane, wider than the reveal and projecting out onto the
+     pavement. It is the piece that reads from above, so it takes the lit-cap grade. */
+  out.sill.push(chamferBox(S.w + 2 * S.lip + 0.35, S.sill, S.sillOut, 0.04)
+    .translate(0, S.sill / 2, S.sillOut / 2 - 0.05));
+  /* THE LIGHT, on the ladder above. One thin line at tier 1, at the step. */
+  if (S.glow === 'sill' || S.glow === 'full') {
+    out.glow.push(chamferBox(S.w - 0.20, 0.075, 0.14, 0.025)
+      .translate(0, S.sill + 0.05, S.sillOut - 0.10));
+  }
+  /* a line across the head at tier 2 and above, set INSIDE the reveal so it lights the way in
+     rather than the wall — the same argument portal() makes about a brow under a lintel */
+  /* AT THE SPRING LINE, not under the crown. Tucked against the head it was a bar 5 m wide sitting
+     at a height the arch only reaches in the middle, so its outer two thirds were buried in the
+     masonry either side and the render showed almost nothing. The spring line is where the arch
+     leaves the jamb, it is the full width of the opening there, and a lit band across it is a
+     transom — the thing that actually says "an entrance, not a hole". */
+  if (S.head > 0) {
+    out.glow.push(chamferBox(S.w - 0.24, S.head, 0.22, 0.05)
+      .translate(0, hh * 1.42, -S.reveal + 0.10));
+  }
+  /* THE CANOPY at tier 2: the one part that projects into the street, and the reason a facility
+     entrance is findable from a block away when its light is not yet resolvable. */
+  if (S.canopy > 0) {
+    out.canopy.push(chamferBox(S.w + 2 * S.lip + 1.5, 0.30, S.canopy, 0.08)
+      .translate(0, S.h + 0.42, S.canopy / 2 - 0.1));
+    for (const sd of [-1, 1]) out.reveal.push(chamferBox(0.16, 0.62, S.canopy * 0.78, 0.04)
+      .translate(sd * (S.w / 2 + S.lip + 0.55), S.h + 0.04, S.canopy * 0.40));
+  }
+  return out;
 }
 
 export function createMaterials(themeIn) {

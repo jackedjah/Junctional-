@@ -40,7 +40,7 @@
    buildMahFacilities(ctx) -> the standard module contract. */
 
 import * as THREE from '../vendor/three/three.module.min.js';
-import { chamferBox, signTexture } from './materials.js';
+import { chamferBox, signTexture, doorwayParts } from './materials.js';
 
 const TAU = Math.PI * 2;
 
@@ -91,7 +91,7 @@ export function buildMahFacilities(ctx) {
   const mirror = grade(M.platinumLit || M.platinum, 0.06, 'mode-mirror');        /* showroom */
   const darkM = grade(M.graphiteMetal || M.graphite, null, 'facility-dark');
 
-  const B = { polished: [], worked: [], mirror: [], dark: [] };
+  const B = { polished: [], worked: [], mirror: [], dark: [], doorGlow: [] };
   const put = (b, geo, matrix, value) => B[b].push({ geo, matrix, value });
 
   function merge(list) {
@@ -134,6 +134,48 @@ export function buildMahFacilities(ctx) {
   const vitalCore = emit(0.52, 'vital-core');
   const forgeSeam = emit(0.34, 'forge-seam');
   const modeEdge = emit(0.30, 'mode-edge');
+  /* the door head lines merge with the rest of the facility, so both entrances share ONE material
+     and ONE draw call; vertexColors because merge() bakes a value per piece into the geometry */
+  const doorGlowM = emit(0.44, 'facility-door-glow'); doorGlowM.vertexColors = true;
+
+  /* ---- R167 §D — TIER 2, THE FACILITY ENTRANCE ------------------------------------------------
+     MAH VITAL and MAH FORGE are 11 and 15 m of mass standing on their own aprons, and neither had
+     anything at ground level: the sign told you what the building was and the building told you
+     nothing about how to enter it. A tier 2 doorway is the middle rung — twice the height of the
+     local doors out in the city, with a canopy that projects into the approach and a lit line
+     across the head rather than at the step, which is what makes it findable from the plaza while
+     the fifteen city doors stay quiet.
+
+     MAH MODE gets NOTHING, deliberately. It is the colonnade: R3-03 separates it from the other
+     two by being the one you can see through, and a door is a thing you cut into a mass. Putting
+     an entrance on it would have answered a checklist and contradicted the building.
+
+     It goes exactly where the sign goes — fwd is the facility's own front vector, already used for
+     signage and pods — so the way in and the name are on the same elevation. */
+  function facilityDoor(F, fwd, y0) {
+    const parts = doorwayParts('FACILITY', F.W, F.H, F.H * 0.72);
+    if (!parts.spec.h) return 0;
+    /* one reveal-depth proud of the wall: the recess is made by standing the surround out, since
+       nothing here subtracts geometry from a mass */
+    const off = F.D * 0.5 + parts.spec.reveal;
+    const m = at(F.x + fwd[0] * off, y0, F.z + fwd[1] * off, F.ry);
+    parts.reveal.forEach(g => put('polished', g, m, 0.92));
+    parts.leaf.forEach(g => put('dark', g, m, 0.16));
+    parts.sill.forEach(g => put('polished', g, m, 1.0));
+    parts.canopy.forEach(g => put('polished', g, m, 1.0));
+    parts.glow.forEach(g => put('doorGlow', g, m, 1.0));
+    stats.doorways = (stats.doorways || 0) + 1;
+    if (ctx) (ctx.doorTiers || (ctx.doorTiers = [])).push({
+      tier: parts.spec.tier, kind: 'FACILITY', w: +parts.spec.w.toFixed(2), h: +parts.spec.h.toFixed(2),
+      reveal: parts.spec.reveal, name: 'facility',
+      x: +(F.x + fwd[0] * off).toFixed(2), y: y0, z: +(F.z + fwd[1] * off).toFixed(2),
+      nx: +fwd[0].toFixed(4), nz: +fwd[1].toFixed(4) });
+    /* what the doorway occupies, so the SIGN can be hung clear of it. MAH VITAL's name sat at
+       0.52 of its height, the canopy landed at 0.58, and the first render had the projecting soffit
+       cutting straight through the lettering. The name goes above the way in — that is the order
+       they are read in — so the sign asks the door how tall it came out rather than assuming. */
+    return y0 + parts.spec.h + (parts.spec.canopy > 0 ? 0.9 : 0.3);
+  }
 
   const signs = [];
   function signage(title, sub, x, y, z, ry, w) {
@@ -203,8 +245,9 @@ export function buildMahFacilities(ctx) {
       put('polished', chamferBox(F.W * 0.30, 0.36, 2.2, 0.1), at(px, y0 + 0.2, pz, F.ry), 0.92);
       vitalPods.push({ x: px, y: y0 + 1.1, z: pz, ry: F.ry, phase: gold(k * 7) });
     }
+    const vitalDoorTop = facilityDoor(F, fwd, y0);
     signage('MAH VITAL', 'RECOVERY + BUFFS',
-      F.x + fwd[0] * (F.D * 0.5 + 0.2), y0 + F.H * 0.52, F.z + fwd[1] * (F.D * 0.5 + 0.2), F.ry, F.W * 0.62);
+      F.x + fwd[0] * (F.D * 0.5 + 0.2), Math.max(y0 + F.H * 0.52, vitalDoorTop + 1.15), F.z + fwd[1] * (F.D * 0.5 + 0.2), F.ry, F.W * 0.62);
     stats.built.push('vital');
     stats.separation.vital = { silhouette: 'upright jewel, stepping in to a crown', roughness: 0.14, motion: 'steady breath' };
   }
@@ -256,8 +299,9 @@ export function buildMahFacilities(ctx) {
       put('worked', chamferBox(0.4, 0.4, F.D * 0.9, 0.12),
         at(F.x + Math.cos(F.ry) * side * F.W * 0.52, y0 + F.H * 0.34, F.z - Math.sin(F.ry) * side * F.W * 0.52, F.ry), 1.0);
     }
+    const forgeDoorTop = facilityDoor(F, fwd, y0);
     signage('MAH FORGE', 'ARMOR + MAHGIC + ABILITIES',
-      F.x + fwd[0] * (F.D * 0.5 + 0.2), y0 + F.H * 0.76, F.z + fwd[1] * (F.D * 0.5 + 0.2), F.ry, F.W * 0.58);
+      F.x + fwd[0] * (F.D * 0.5 + 0.2), Math.max(y0 + F.H * 0.76, forgeDoorTop + 1.15), F.z + fwd[1] * (F.D * 0.5 + 0.2), F.ry, F.W * 0.58);
     stats.built.push('forge');
     stats.separation.forge = { silhouette: 'broad block, stepping out, no crown', roughness: 0.52, motion: 'slow strike' };
   }
@@ -309,7 +353,7 @@ export function buildMahFacilities(ctx) {
   }
 
   /* ---- emit ---------------------------------------------------------------------------------- */
-  const MATS = { polished, worked, mirror, dark: darkM };
+  const MATS = { polished, worked, mirror, dark: darkM, doorGlow: doorGlowM };
   for (const k of Object.keys(B)) {
     if (!B[k].length) continue;
     const mesh = new THREE.Mesh(own(merge(B[k])), MATS[k]);
