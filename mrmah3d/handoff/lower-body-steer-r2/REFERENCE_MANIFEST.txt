@@ -1,0 +1,23 @@
+MAH LOWER BODY STEER R2 — FULL PACKAGE
+
+Included items:
+- START_HERE.md
+- WHAT_IS_IN_THIS_PACKAGE.md
+- SEND_NOW.txt
+- AFTER_KNEE_APPROVAL.txt
+- MR_MAH_LOWER_BODY_STEER.md
+- PRIMARY references:
+  - MRS_BLUE_LOWER_BODY_FOCUS.png
+  - MRS_BLUE_RENDER_CROP.png
+  - MR_OWN_FINAL_RENDER_REFERENCE.jpeg
+- CONTEXT references:
+  - MRS_EARLIER_CLAY_CONTEXT_DO_NOT_RESTORE.png
+  - CLAUDE_KNEE_DIAGNOSIS_REPORTED_NOT_VERIFIED.png
+- ORIGINAL USER UPLOADS:
+  - IMG_0423_UPDATED_BLUE_MRS_REFERENCE.png
+  - 7050B521_MRS_BLUE_CROP_REFERENCE.png
+  - IMG_0422_MRS_CLAY_CONTEXT_REFERENCE.png
+- THREEJS_APPLICATION.md
+
+Intent:
+Everything needed is packaged together so Claude can read the instructions and inspect the relevant images without ambiguity.

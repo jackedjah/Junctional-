@@ -1,0 +1,4 @@
+Extract this overlay beside the existing character project; do not overwrite source or reset either character.
+Read MAH_LOWER_BODY_STEER_R1/MR_MAH_LOWER_BODY_STEER.md.
+Treat the updated BLUE Mrs. Mah image as muscle-organization reference only. Her earlier clay image is history, NOT a restoration target. Mrs. Mah is read-only.
+Finish and validate the current Mr. Mah knee-kite experiment first. Show matched before/after clay proof. Separate artifact repair from anatomy completion. Preserve accepted work, update state, and STOP for my review. Do not begin a new quad edit until I approve this result.

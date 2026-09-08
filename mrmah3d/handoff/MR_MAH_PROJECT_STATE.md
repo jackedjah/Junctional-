@@ -605,3 +605,121 @@ spacing.
 
 NEXT: STOP FOR VISUAL REVIEW, per the brief. A4 (knee -> calf) is not started.
 A1 remains BLOCKED — WAITING FOR R168/R169 EYE SOURCE.
+
+
+R237 — THE KNEE-KITE EXPERIMENT IS FINISHED, AND IT REVERTS. THE WEDGE AND THE
+CREST ARE THE SAME FEATURE.
+---------------------------------------------------------------------------
+BRIEF: MAH_LOWER_BODY_STEER_R2 (filed at mrmah3d/handoff/lower-body-steer-r2/).
+Finish and VALIDATE the knee-kite experiment. Matched before/after clay. Keep
+ARTIFACT REPAIR separate from ANATOMY COMPLETION. Mrs. Mah read-only, and a
+shared-code change needs proof her output is unchanged. Stage A retention gate:
+"retain only if the unwanted wedge decreases WITHOUT reducing the knee
+landmark, muscle relief, or accepted neighbouring shape. Otherwise revert only
+that experiment." After TWO technically distinct failed trials, freeze and
+report the representation constraint rather than continue.
+
+STATUS
+  ARTIFACT REPAIR   proposed / tested / REJECTED (both trials)
+  ANATOMY PARITY    pending — not improved, not regressed; the sculpt is the
+                    accepted A3 checkpoint, bit-identical
+  CRYSTAL FINISH    deferred, untouched
+
+WHAT R236 GOT WRONG. The A3b record above claims the deletion "flattens
+nothing". It does. The claim was reasoned from the source ("`sample` is
+untouched") and never measured, and the gate that would have caught it — the
+knee LANDMARK, as opposed to the knee's authoring function — was not in the
+brief until R2 added it.
+
+THE MECHANISM, read out of forge.js rather than assumed. A path in
+`conformSurfacePatch` does two separable things:
+  - each POINT claims the nearest unclaimed interior vertex and MOVES it onto
+    the landmark (`q[best]=xy.slice()`, line ~1620). Every interior vertex is
+    then displaced by `sample` (line ~1693). So a landmark decides WHERE the
+    authored surface is evaluated — it is anatomy, not decoration.
+  - each consecutive PAIR registers a constraint edge, recovered by edge flips
+    and thereafter excluded from the empty-circle pass that cleans up diagonals
+    (`recovered.has(e)`). So a constraint edge aligns triangles with a feature.
+`quadKneeSurfacePatch` does NOT set `insertConstraints`, so the kite never
+inserted vertices at all — it relocated four existing ones per side. The A3b
+note's "inserts a vertex for every landmark" was wrong about the mechanism and
+right about the row populations.
+
+TRIAL 1 — A3b, delete the kite from `paths`. (Commit f73ed89, now reverted.)
+  knee band max/p99  55 -> 47 degrees; the y0.673/0.738/0.827 outliers gone
+  vertex set         8 positions out (y rows 0.645, 0.790), 8 in (0.660, 0.770)
+  KNEE LANDMARK      FAILED. Raycast on a fixed world grid (x -0.17..0.17 by
+                     0.005, y 0.56..0.99 by 0.01, 3036 samples), peak-to-centre
+                     relief in the band:
+                        y 0.750   0.0154 -> 0.0128   -17%
+                        y 0.800   0.0161 -> 0.0099   -38%
+                        y 0.850   0.0185 -> 0.0067   -64%
+                     The channel FLOOR is identical at every row (0.1149,
+                     0.1238, 0.1323); the PEAK beside it collapsed. The owner
+                     is the landmark `[.129,.79]`, the lateral crest of the
+                     medial mass: with no vertex there its authored target is
+                     never evaluated and the crest is interpolated away.
+  clay               the wedge goes AND the band goes soft — the crest's
+                     light/dark break is gone. Visible, not marginal.
+  VERDICT            REVERT. The wedge decreased by reducing muscle relief,
+                     which is exactly what the gate excludes.
+
+TRIAL 2 — A3c, keep all five kite landmarks as SINGLE-POINT paths. A one-point
+path claims and moves its vertex identically but registers no pair, so the
+anatomy is sampled and the diagonals are free.
+  vertex set         BIT-IDENTICAL to A3. 2050 unique positions, zero
+                     differences. Only the triangulation of the same points
+                     changed.
+  knee band max      55 -> 79 degrees. WORSE.
+  clay               a stack of rectangular tiles down the channel. A planar
+                     Delaunay diagonal is chosen in the (x,y) projection and
+                     cuts ACROSS a ridge in z. The constraint edges were doing
+                     real work.
+  VERDICT            REVERT.
+
+THE REPRESENTATION CONSTRAINT, which is the actual finding. The crest is
+carried by ONE relocated vertex per side, sitting 0.015-0.020 from a ring
+(kite rows y 0.645 / 0.790 against rings at 0.660 / 0.770). The fan that
+stitches that sparse row to a dense ring across that gap IS the sliver, and
+the constraint edge that holds the crest IS the 55-degree turn. At this
+resolution the two are the same feature: a sampled crest with a 55-degree
+turn, or a smooth band with no crest. Not both.
+
+PROPOSED, NOT DONE — both exceed "artifact repair" and move the accepted
+sculpt, so they wait for approval:
+  (a) move QUAD_KNEE_LAYOUT.knee's rows onto the ring heights (0.645 -> 0.660,
+      0.790 -> 0.770) so the crest is carried by a full row and no thin band
+      exists. Cost: the knee landmark shifts 0.015-0.020 units, about 1.5% of
+      lower-body height.
+  (b) give the band a real ring at the crest height in the lower table, so the
+      crest is a ring feature rather than a patch landmark. Larger, and it
+      touches the accepted lower-body ring structure.
+Estimated by the same measurement in both cases; neither is speculative.
+
+MRS. MAH — UNTOUCHED, PROVEN. `myofascial.js` is imported by exactly two files
+(`body.js` and `crystal-atlas.js`, which reads QUAD_KNEE_LAYOUT and was not
+edited); `limbs.js`, `mrmah.js` and `mrs-mah.js` do not import it, and the
+lower-body patch block is inside `if (maleAnatomy && ...)` where
+`maleAnatomy = !P || P.name !== 'female'`. That is the argument; the proof is
+that her whole body group was built under A3, A3b and A3c and compared mesh by
+mesh — 14 meshes, vertex counts, an order-independent AND an order-dependent
+position checksum, and both bounding-box corners: IDENTICAL in all three.
+
+CAPTURE METHOD — worth keeping. Every earlier "matched" pair differed across
+the WHOLE frame by a few luma, and it was the idle animation: the proof tool
+waits a fixed 420 ms and the body breathes. The R237 set is driven from a
+browser context created with reducedMotion:'reduce', and the frame diff between
+two builds is then bounded to the knee band and nothing else (x357-506,
+y378-608 of the lower framing). Use that for any before/after from now on.
+Nothing in tools/ was edited; the driver is a scratch script.
+
+Proof: validation/mrmah3d/R237-knee-gate/ — six matched clay views per build
+for all three, plus the 5x band crops and a three-up comparison sheet, with a
+README recording the capture settings.
+
+NET: the tree is back at the A3 sculpt, bit-identical, 376/376 contracts pass.
+The knee-band wedge is STILL PRESENT and is now understood rather than
+guessed at. A1 remains BLOCKED — WAITING FOR R168/R169 EYE SOURCE. Stage B
+(one anterior-quad organization pass) is NOT started; the steer requires the
+user to accept a Stage A result first, and the honest Stage A result is a
+revert plus a proposal.
