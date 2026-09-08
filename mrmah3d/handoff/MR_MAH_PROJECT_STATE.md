@@ -1346,3 +1346,78 @@ The channel's remaining depth is now mostly GEOMETRIC rather than authored: with
 the seam at zero the two domes alone leave about 0.050 of valley, against the
 0.060 present. Further softening therefore has little room left in this control
 and would have to come from the dome spacing itself.
+
+
+R244 — THE OUTER CONTOUR DESCENDS CLEANLY, AND THE CENTRE IS QUIET.
+---------------------------------------------------------------------------
+Base R243 (6804a44), clean tree, designated branch — verified before editing,
+as the brief asks. Live owners re-verified from the built mesh, not assumed:
+LOWER_WIDTH owns the outline; `astraQuad` (seam / head / rf / vl / valley / vm)
+owns the anterior quad; `astraLowerLeg` owns the shin and calf.
+
+THE DIRECTOR'S MARKUP WAS MEASURED, NOT EYEBALLED. The blue strokes trace the
+outer contour on both sides. `readmarkup.mjs` decodes the JPEG in chromium,
+isolates the saturated blue, and `mapmarkup.mjs` maps it into world units by
+calibrating the sheet from two unambiguous landmarks — the terminal point
+(world y 0) and the lower body's own widest row (y 1.220, half-width 0.318).
+Filed at validation/mrmah3d/R244-contour-and-centre/DIRECTOR-blue-markup.jpg.
+
+Honest limits of that measurement: the stroke has real thickness (about 0.015
+world at this scale) and the render's edge extraction failed at two rows, so
+the per-row numbers carry roughly +/-0.02. What it shows CONSISTENTLY is the
+markup sitting outside the current outline through the knee and upper shin —
+which agrees with a defect measurable directly in the table.
+
+THE DEFECT, in LOWER_WIDTH's own slopes:
+
+    y .43-.62  0.279   .62-.70  0.325   .70-.78  0.175  <- flat spot
+    y .78-.88  0.230   .88-.98  0.460  <- flare   .98-1.08  0.430
+
+The knee-to-thigh run went nearly straight and then kicked out. That is exactly
+the "random side swell that fights the taper" the brief rules out, and it is why
+the descent did not read as authored. Four inner knots are re-authored so the
+slope eases 0.310 / 0.330 / 0.340 / 0.350 / 0.320 — one continuous bloom. The
+apex (1.22, .318), everything above it, the knots below .62 and the terminal
+point are untouched: this neither slims the form nor moves its widest mass.
+Largest change +0.022 at y .88.
+
+    y .70  .163 -> .162     y .78  .177 -> .188
+    y .88  .200 -> .222     y .98  .246 -> .257
+
+THE CENTRE, from both sides again. `head` moves in to 0.64 rad and widens to
+0.86 so the two quad domes carry most of the midline themselves, and only then
+is the seam scaled to 0.70. Swept across five builds before choosing.
+
+    y 1.220     floor   crown   valley
+    R243        0.2012  0.2608  0.0596
+    R244        0.2318  0.2650  0.0332
+
+The valley is 44% below R243, 57% below R240 and 68% below R239 — present and
+clearly subordinate, not removed (crown/floor 1.143). The outer sweep is
+untouched: at 42 / 62 / 71 degrees the section reads 0.219 / 0.137 / 0.099
+against R243's 0.217 / 0.138 / 0.100.
+
+SURFACE QUALITY improved as a side effect, which is the useful evidence that
+the contour was genuinely strained: removing the pinch and quieting the centre
+took the knee band 54 -> 51 and the quad band 73 -> 65, p90 30 -> 27.
+
+GATES
+  fused read      front and three-quarter both read as ONE teardrop; the
+                  dividing line is now a soft internal transition.
+  side profile    outline zero pixels changed; crown +0.0042 (+1.6%).
+  taper           one continuous descent to one point.
+  knee band       51 max (was 54), p90 29.
+  quad band       65 max (was 73), p90 27.
+  taper band      47, unchanged.
+  topology        12288 vertices, 4096 triangles, unchanged.
+  BufferGeometry  0 non-finite, 0 degenerate, 0 non-unit normals.
+  Mrs. Mah        14 meshes, both checksums, both bbox corners IDENTICAL.
+  contracts       376/376.
+
+SCOPE. The brief's sections 5-7 (rectus, vastus lateralis, vastus medialis,
+knee delicacy, tibialis, soleus) were built in R242 and refined in R243; they
+are preserved and re-verified here rather than re-done blind. This pass is
+sections 2, 3 and 4 — the centre, the fused read and the contour — which the
+brief's own priority order puts first.
+
+R244 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.

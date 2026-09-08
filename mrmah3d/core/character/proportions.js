@@ -2116,7 +2116,23 @@ export const MRMAH_MORPHOLOGY = {
 
      Nothing at or above y 1.08 moves: the quad apex, the hip and the belt are
      mastered and are exactly as they were. */
-  LOWER_WIDTH:[[0,0],[.20,.035],[.43,.084],[.62,.137],[.70,.163],[.78,.177],[.88,.200],[.98,.246],[1.08,.289],[1.22,.318],[1.33,.279],[1.48,.21518],[1.56,.227]],
+  /* R244 — THE OUTER CONTOUR DESCENDS CLEANLY NOW. The director's markup traces
+     the outer line and asks for "a more elegant, intentional narrowing", "no
+     random side swell that fights the taper" and a descent that is "cleaner and
+     more authored", while keeping the teardrop broad at the top. Read as
+     SLOPES, the old table had a pinch and then a flare:
+
+        y .43-.62  0.279    y .62-.70  0.325    y .70-.78  0.175   <- flat spot
+        y .78-.88  0.230    y .88-.98  0.460   <- flare      .98-1.08  0.430
+
+     The knee-to-thigh run went nearly straight and then kicked out, which is
+     exactly the swell the markup rules out. The four inner knots are re-authored
+     so the slope eases 0.310 / 0.330 / 0.340 / 0.350 / 0.320 — one continuous
+     bloom instead of a flat then a kick. The apex (1.22, .318), everything
+     above it, the knots below .62 and the terminal point are untouched, so this
+     neither slims the form nor moves its widest mass: it only removes the pinch,
+     +0.022 at y .88 being the largest change. */
+  LOWER_WIDTH:[[0,0],[.20,.035],[.43,.084],[.62,.137],[.70,.162],[.78,.188],[.88,.222],[.98,.257],[1.08,.289],[1.22,.318],[1.33,.279],[1.48,.21518],[1.56,.227]],
   LOWER_FRONT:[[0,0],[.20,.026],[.43,.060],[.62,.091],[.70,.106],[.78,.111],[.88,.136],[.98,.170],[1.08,.201],[1.23,.221],[1.34,.201],[1.48,.175],[1.56,.178]],
   LOWER_BACK:[[0,0],[.20,.025],[.43,.057],[.62,.086],[.70,.102],[.78,.106],[.88,.130],[.98,.153],[1.08,.176],[1.25,.208],[1.36,.197],[1.48,.160],[1.56,.163]],
   LOWER_PATHS:{
@@ -2216,7 +2232,7 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     there is 1.5 * amplitude / half-width, so the two together take the inner
     wall to 0.49 of its previous steepness: the channel is eased, not merely
     widened. Every other lobe is untouched. */
- lobes:{seam:[0,0.40],head:[0.70,0.80],rf:[0.42,0.28],valley:[1.00,0.30],
+ lobes:{seam:[0,0.40],head:[0.64,0.86],rf:[0.42,0.28],valley:[1.00,0.30],
         vl:[1.42,0.55],vm:[0.30,0.32],itb:[1.95,0.30]},
  depth:[[0.80,0.128],[0.87,0.148],[0.95,0.180],[1.03,0.200],[1.10,0.215],[1.23,0.215],[1.32,0.205],[1.41,0.180],[1.46,0.165]],
  /* R241 — the central descent's amplitude, Astra's own profile scaled to
@@ -2237,7 +2253,13 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     dome above, the floor at y 1.220 goes 0.1830 -> 0.2011 and the valley
     0.0766 -> 0.0597, a 22% cut on top of R241's 26%: the channel is now 43%
     shallower than R240 and the crown is untouched at 0.2608. */
- seam:[[0.80,0],[0.87,0.062],[0.95,0.073],[1.03,0.079],[1.10,0.084],[1.23,0.084],[1.32,0.062],[1.41,0.040],[1.46,0.022]],
+ /* R244 — scaled again to 0.70. With `head` moved in to 0.64 rad and widened
+    to 0.86 the two quad domes now carry most of the centre themselves, so the
+    authored groove can come down again: floor 0.2012 -> 0.2318 at y 1.220 and
+    valley 0.0596 -> 0.0332, which is 57% below R243 and 68% below R240. The
+    channel is present and clearly subordinate, which is what the brief asks
+    for; it is not removed. */
+ seam:[[0.8,0.0000],[0.87,0.0434],[0.95,0.0511],[1.03,0.0553],[1.1,0.0588],[1.23,0.0588],[1.32,0.0434],[1.41,0.0280],[1.46,0.0154]],
  head:[[0.80,0],[0.87,0.06],[0.95,0.28],[1.03,0.32],[1.10,0.36],[1.23,0.34],[1.32,0.26],[1.41,0.16],[1.46,0.09]],
  rf:[[0.80,0],[0.87,0],[0.95,0.10],[1.03,0.125],[1.10,0.13],[1.23,0.13],[1.32,0.09],[1.41,0.05],[1.46,0.025]],
  vl:[[0.80,0],[0.87,0.16],[0.95,0.22],[1.03,0.26],[1.10,0.28],[1.23,0.28],[1.32,0.26],[1.41,0.22],[1.46,0.14]],
