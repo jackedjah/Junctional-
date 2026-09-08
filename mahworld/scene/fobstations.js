@@ -69,11 +69,24 @@ const faceCentre = deg => -deg * Math.PI / 180;
 
 /* THE MUSIC SQUARE-DIAMONDS. Three, further out and higher, so they read against the sky rather
    than against the deck. Mounted on slender masts: §4 calls them infrastructure, and
-   infrastructure stands on something. */
+   infrastructure stands on something.
+
+   RELOCATED, NOT REMOVED. A coverage probe through the arrival camera measured these three at 3.9%
+   of the whole frame — masts 2.0, crystals 1.9 — which is more of the hero view than MAH MATCH,
+   MAH GYM or the monument's figures each own. The reason is geometric: a station at deg d sits at
+   (sin d, -cos d) * r, and plaza-hero stands at z 46, so deg 185 / r 40.5 put a 5.4 m mast at
+   (-3.5, 40.3) — FIVE AND A HALF METRES in front of the lens, with the other two crossing the
+   forward-left and forward-right corridors at 30 and 40 m.
+   They are infrastructure, not decoration, and the direction is explicit that functional objects
+   are not to be deleted — so all three survive at full size and full function. They move OUT of the
+   forward cone instead: r 39-41 becomes r 70-76, and the azimuths swing into the flanks and the
+   rear hemisphere. That serves this table's own stated intent better than the old radius did
+   ("further out and higher, so they read against the sky rather than against the deck"), and it
+   opens the arrival corridor without putting anything back into it. */
 const MUSIC = [
-  { deg: 75, r: 39.5, h: 6.2, size: 2.1 },
-  { deg: 185, r: 40.5, h: 5.4, size: 1.8 },
-  { deg: 295, r: 39.0, h: 6.8, size: 2.3 }
+  { deg: 55, r: 74.0, h: 6.2, size: 2.1 },
+  { deg: 158, r: 70.0, h: 5.4, size: 1.8 },
+  { deg: 305, r: 76.0, h: 6.8, size: 2.3 }
 ];
 
 /* THE TWO LARGE PIECES, both in the rear hemisphere. */

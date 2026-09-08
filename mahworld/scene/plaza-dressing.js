@@ -175,8 +175,18 @@ const NODES = [[-16, 6], [17, 4]];
 /* Lamps line the plaza's EDGES and its route flanks. None stands in the central band (|x| < 15 between
    z −22 and z 26): a lit civic square is not a forest of posts, and the camera must be able to see the
    three destinations from the marker without a column across the lens. */
-const MASTS = [[-17, 24], [17, 24], [-26, 16], [26, 16], [-17, -12], [17, -12], [-27, -25], [27, -25], [-34, -14], [34, -14],
-  [-22, 32], [22, 32], [-36, 2], [36, 2], [-19, -28], [19, -28]];
+/* SIXTEEN BECAME EIGHT — the spacing pass, and the cut was chosen by where a post lands in the
+   ARRIVAL LENS rather than by which row was easiest to delete. The rule above kept masts out of the
+   central band, which is why none of them stands in front of a destination sign; what it did not
+   guard is DISTANCE FROM THE CAMERA. plaza-hero stands at z 46, so the z 32 and z 24 pairs were 14
+   and 22 m off the lens — near enough that a 6 m pole is a column up the full height of the frame,
+   which is the same defect the central-band rule exists to prevent, just displaced sideways.
+   So the two nearest rows go, and of the remaining eight positions the two that merely doubled a
+   neighbour (z -14 beside z -12, z -28 beside z -25) go with them. What is left is one post per
+   plaza edge and one per route flank: still a lit civic square, at half the picket. They are
+   instanced with painted light pools rather than real lights, so this costs the plaza no
+   illumination — only the repetition. Nothing replaces them. */
+const MASTS = [[-26, 16], [26, 16], [-17, -12], [17, -12], [-27, -25], [27, -25], [-36, 2], [36, 2]];
 /* the deck the plaza is laid on: ground.js lays 9 m chromium diamond cells whose tops sit here */
 const DECK = 0.17;
 

@@ -265,10 +265,35 @@ function facetTexture(size) {
    why the near deck read as a grey smudge of smog over the city rather than as weather above it.
    Every deck now clears the skyline, and the near deck's radius moves out with its altitude so it
    still sits inside a 46 deg frame instead of passing overhead. */
+/* ---- THE SKY WAS CLOSED, AND IT WAS MEASURED CLOSED ------------------------------------------
+   A raycast coverage probe through the arrival camera (48x48 rays, plaza-hero) returned SKY 0.0%.
+   Not "little sky" — none. Every ray in the frame landed on geometry, and the single largest owner
+   after the ground itself was this module at 14.2%, with the low deck's body quads alone at 11.9%.
+   A world whose master file opens on spaciousness, breathing room and a dome that must read as a
+   containing shell had no open air anywhere in its hero view.
+
+   THE CAUSE IS THE ARITHMETIC ABOVE, APPLIED TO THE WRONG DECK. The note about v5's mid deck is
+   exactly right and was exactly the bug here: a mass of width W at radius r subtends
+   2*atan(W*QSCALE/2 / r), and it only leaves sky if that is SMALLER than the spacing between
+   adjacent azimuths. Measured on the shipped numbers:
+
+     low   masses ~60 deg wide, spaced ~35 deg  ->  1.7x overlap, i.e. a solid lid
+     mid   masses ~48 deg wide, spaced ~38 deg  ->  overlapping
+     high  masses ~39 deg wide, spaced ~39 deg  ->  edge to edge, no gap
+
+   So all three decks were closed and the low one was closed twice over. The fix is the one the note
+   already names — FEWER AND NARROWER MASSES ON THE SAME SPREAD — applied with the gap solved for
+   rather than guessed: every deck now runs roughly 30 deg of cloud against 38-46 deg of spacing, so
+   7-13 deg of real sky sits between neighbours and the moon, the galaxy band and the stars have
+   somewhere to be seen through.
+
+   ALTITUDES AND RADII ARE UNTOUCHED. They were settled against the skyline (every deck clears the
+   megatall crowns) and against the halo threshold's own cloud biome, and this correction is about
+   angular coverage, not height. Nothing is added to replace what is narrowed. */
 const LAYOUT = [
-  { name: 'low',  count: 5, yMin: 215, yMax: 285, rMin: 430, rMax: 680, wMin: 200, wMax: 320, qMin: 7, qVar: 3, pMin: 5, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.28, -0.70, -0.10, 0.52, 1.18] },
-  { name: 'mid',  count: 4, yMin: 305, yMax: 400, rMin: 620, rMax: 900, wMin: 280, wMax: 440, qMin: 6, qVar: 3, pMin: 4, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-1.05, -0.44, 0.28, 1.02] },
-  { name: 'high', count: 4, yMin: 440, yMax: 560, rMin: 900, rMax: 1250, wMin: 380, wMax: 590, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.72, speed: 0.70, order: -6, spread: [-0.95, -0.30, 0.42, 1.10] }
+  { name: 'low',  count: 4, yMin: 215, yMax: 285, rMin: 430, rMax: 680, wMin: 140, wMax: 210, qMin: 7, qVar: 3, pMin: 5, pVar: 2, pScale: 1.00, speed: 1.55, order: -2, spread: [-1.32, -0.52, 0.34, 1.20] },
+  { name: 'mid',  count: 4, yMin: 305, yMax: 400, rMin: 620, rMax: 900, wMin: 200, wMax: 310, qMin: 6, qVar: 3, pMin: 4, pVar: 3, pScale: 0.95, speed: 1.00, order: -4, spread: [-1.05, -0.44, 0.28, 1.02] },
+  { name: 'high', count: 4, yMin: 440, yMax: 560, rMin: 900, rMax: 1250, wMin: 320, wMax: 470, qMin: 5, qVar: 3, pMin: 3, pVar: 2, pScale: 0.72, speed: 0.70, order: -6, spread: [-0.95, -0.30, 0.42, 1.10] }
 ];
 /* the blob atlas paints the middle of each cell, so a quad has to be larger than the mass width it is
    meant to draw. QSCALE keeps that conversion in one place — and it has to MOVE when the atlas does:
