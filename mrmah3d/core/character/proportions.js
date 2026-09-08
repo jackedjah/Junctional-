@@ -2218,7 +2218,13 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     where the body is too narrow for a 0.30-radian descent: the field must end
     where Astra's own did. Fading in over 0.88-1.02 keeps the handoff to the
     knee continuous without asking a narrow row to carry a wide groove. */
- /* R247 (Phase 3, the knee transition) — the field reaches DOWN to 0.80 now.
+ /* R248 — `projection` 0.94 -> 0.870, which is COMPENSATION, not a slimming.
+    The bridge above lifts the whole anterior including the crown, so the global
+    scale is trimmed by exactly the amount the crown gained: measured, the crown
+    lands at 0.2805 against R247's 0.2803. The side profile is held to a
+    thousandth while the channel floor rises 0.2390 -> 0.2549.
+
+    R247 (Phase 3, the knee transition) — the field reaches DOWN to 0.80 now.
     Its own coefficient table has knots at y 0.80 and 0.87 — vl 0.16, vm 0.20,
     valley 0.06 — but a region starting at 0.88 made every one of them dead
     code, so the quad's organisation stopped ABRUPTLY at the knee instead of
@@ -2233,7 +2239,7 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     structure that tapers strains the surface less than one that stops.
     Reaching further was measured and rejected: 0.74 gave p90 32 and 0.70 gave
     max 53. */
- region:[0.80,1.46,0.14], sideFade:0.06, projection:0.94,
+ region:[0.80,1.46,0.14], sideFade:0.06, projection:0.870,
  /* R243 — `head`'s half-width goes 0.75 -> 0.80 so the two quad domes MEET
     nearer the midline: measured, that alone lifts the channel floor 0.1918 ->
     0.2011 at y 1.220 while the crown moves 0.0012. This is the part of the fix
@@ -2275,7 +2281,7 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     even with the seam cut further, because `head` is what fills the midline
     now. The centre therefore stays exactly as R244 left it. */
  lobes:{seam:[0,0.40],head:[0.64,0.86],rf:[0.34,0.30],valley:[0.66,0.22],
-        vl:[1.02,0.44],vm:[0.30,0.32],itb:[1.95,0.30]},
+        vl:[1.02,0.44],vm:[0.30,0.32],itb:[1.95,0.30],bridge:[0,0.62]},
  depth:[[0.80,0.128],[0.87,0.148],[0.95,0.180],[1.03,0.200],[1.10,0.215],[1.23,0.215],[1.32,0.205],[1.41,0.180],[1.46,0.165]],
  /* R241 — the central descent's amplitude, Astra's own profile scaled to
     0.55. Measured on the FINAL mesh, this control moves ONLY the channel
@@ -2301,6 +2307,15 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     valley 0.0596 -> 0.0332, which is 57% below R243 and 68% below R240. The
     channel is present and clearly subordinate, which is what the brief asks
     for; it is not removed. */
+ /* R248 — `bridge` is a WIDE, shallow positive dome on the midline: the one
+    control that lifts the channel floor without widening `head`. R245 measured
+    that widening `head` to fill the centre swamps the quad organisation riding
+    on it, and the seam has only 0.007 of headroom left, so neither could soften
+    the centre further. A dome at centre 0 with half-width 0.62 — wider than the
+    seam's 0.40 — raises the whole inner flank rather than just un-cutting the
+    groove, and at 0.28 rad it contributes 0.71 of its peak, so it lifts the
+    floor faster than the crown. */
+ bridge:[[0.80,0.0000],[0.95,0.0900],[1.03,0.1500],[1.10,0.1800],[1.23,0.1800],[1.32,0.1350],[1.41,0.0750],[1.46,0.0000]],
  seam:[[0.8,0.0000],[0.87,0.0174],[0.95,0.0204],[1.03,0.0221],[1.1,0.0235],[1.23,0.0235],[1.32,0.0174],[1.41,0.0112],[1.46,0.0062]],
  head:[[0.80,0],[0.87,0.06],[0.95,0.28],[1.03,0.32],[1.10,0.36],[1.23,0.34],[1.32,0.26],[1.41,0.16],[1.46,0.09]],
  rf:[[0.80,0.0000],[0.87,0.0000],[0.95,0.1769],[1.03,0.2211],[1.10,0.2300],[1.23,0.2300],[1.32,0.1593],[1.41,0.0884],[1.46,0.0443]],

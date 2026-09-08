@@ -1604,3 +1604,80 @@ WHAT WAS NOT TOUCHED, and why it is not a claim of completion:
   - A1 eyes — still BLOCKED on the R168/R169 runtime source.
 
 R247 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.
+
+
+R248 — PHASE 1 AGAIN: A MIDLINE BRIDGE, AND THE FIRST TIME THE CENTRE LINE WAS
+MEASURED AS THE EYE SEES IT.
+---------------------------------------------------------------------------
+Base R247 (9d3b747). Priority 1 of the brief: soften the central division
+further. NOTE on the brief itself: it carries three "lower body only" blocks and
+two "arms only" blocks. The staged order at its end resolves them — arms are
+phase 5, after the lower body — so this pass stays on the lower body and the arm
+requirements are filed for phase 5, unstarted.
+
+THE CENTRE WAS BEING MEASURED WRONG. Every previous pass judged it by the
+GEOMETRIC valley (crown minus floor). Measured instead as the eye sees it — the
+luma dip across the midline in the rendered clay, against the flanks at 40% out
+— R247 read:
+
+    row 210  15.2%      row 290  24.3%
+    row 250  30.9%      row 330  22.0%
+
+A 31% dip where the geometric valley is only 15% of the local depth. That gap is
+why three successive geometric reductions kept coming back as "still reads as a
+split": the visible line is driven by the SLOPE at the midline, not the depth,
+and the two were being conflated.
+
+THE CONTROL THAT WAS MISSING. R245 established that widening `head` fills the
+centre but swamps the quad organisation riding on it, and the seam has only
+0.007 of headroom left. Neither could soften the centre further. `bridge` is a
+new lobe in astraQuad: a WIDE (half-width 0.62, against the seam's 0.40),
+shallow positive dome on the midline. Because it is wider than the seam it
+raises the whole inner flank rather than un-cutting the groove, and at 0.28 rad
+it contributes 0.71 of its peak — so it lifts the floor faster than the crown.
+It is a separate term, so `head` keeps its width and the quad keeps its
+organisation.
+
+`projection` 0.94 -> 0.870 is COMPENSATION, not slimming: the bridge lifts the
+whole anterior including the crown, so the global scale is trimmed by exactly
+what the crown gained.
+
+RESULT at y 1.220
+  floor          0.2390 -> 0.2549
+  crown          0.2803 -> 0.2805     (held to a thousandth)
+  valley         0.0413 -> 0.0256     (-38%)
+
+VISIBLE centre-line dip, the metric that matters:
+  row 210   15.2% -> 4.8%      row 290   24.3% -> 13.6%
+  row 250   30.9% -> 18.0%     row 330   22.0% -> 10.3%
+A 42-68% reduction in what the eye actually reads.
+
+AND THE QUAD GOT BETTER, not worse: the RF/VL dip at y 1.220 went 0.015 -> 0.020,
+because the bridge lifts the inner columns more than it lifts the crown. Quad
+band adjacent-face max 65 -> 57, p99 60 -> 51.
+
+GATES
+  front / side outlines   zero pixels changed
+  envelope                |x|max identical at every ring row 0.45-0.90
+  knee band               51 max, p90 30 — unchanged (R247's phase-3 win holds)
+  quad band               57 max — improved
+  taper                   47 — unchanged; one fused point
+  topology                12288 vertices, 4096 triangles
+  BufferGeometry          0 non-finite, 0 degenerate, 0 non-unit normals
+  Mrs. Mah                14 meshes IDENTICAL
+  contracts               376/376
+
+HONEST REMAINDER. At y 1.060 and 1.140 the valley is now 0.0120 and 0.0117 —
+about 4.7% of the local depth. That is genuinely subtle, and it is close to the
+floor of "a valley still exists". If the next review wants it quieter still, the
+bridge is the control, but the bilateral read starts to go.
+
+STAGED ORDER STATUS
+  1 centre calming        R244, R246, R248 — this pass
+  2 quad organisation     R245, R246 — holds, improved again here
+  3 knee transition       R247 — holds
+  4 shin / calf           R242 built the grammar; NOT advanced since
+  5 arms                  NOT STARTED on either character, not measured at all
+  6 shoulder / torso      NOT STARTED
+
+R248 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.

@@ -986,6 +986,7 @@ export function torsoSurface(a,section,raw) {
    const c=k=>profileAt(AQ[k],yy);
    const Lb=AQ.lobes;
    const m=1
+     +(Lb.bridge?domePair(a,Lb.bridge[0],Lb.bridge[1])*c('bridge')/2:0)
      -dome(a,Lb.seam[0],Lb.seam[1])*c('seam')
      +domePair(a,Lb.head[0],Lb.head[1])*c('head')
      +domePair(a,Lb.rf[0],Lb.rf[1])*c('rf')
