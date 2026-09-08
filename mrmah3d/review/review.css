@@ -1,0 +1,135 @@
+/* MAH 3D REVIEW — development-only styling.
+
+   Deliberately neutral: a mid-dark ground so neither the platinum nor the
+   sapphire is flattered, and no gradient behind the figure that could be
+   mistaken for the scene's own atmosphere. Judging value against a styled
+   page is how a build gets accepted for the wrong reason. */
+
+:root {
+  color-scheme: dark;
+
+  /* THE THEME TOKENS the renderer reads at mount (palette.js). Declared here
+     with the same canonical values the lab uses, so a capture taken on this
+     page and one taken there are the same character under the same light. A
+     page that leaves them unset does not get "no theme" — palette.js derives
+     an energy palette from whatever it finds, and the first capture from this
+     page came back orange. `?bright=r,g,b` still overrides, which is how a
+     member's non-default theme is reviewed. */
+  --ink-rgb: 14, 17, 20;
+  --bright-rgb: 79, 227, 255;
+  --card-rgb: 27, 32, 38;
+
+  --rv-ink: #0e1114;
+  --rv-ground: #14181d;
+  --rv-line: #262c34;
+  --rv-text: #c9d0d8;
+  --rv-dim: #7b8590;
+  --rv-on: #7fd4e8;
+  --rv-stage-h: 78vh;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--rv-ink);
+  color: var(--rv-text);
+  font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.rv-flag {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding: 7px 14px;
+  background: #2a1d10;
+  border-bottom: 1px solid #4a3418;
+  color: #e8c48a;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.rv-flag b { letter-spacing: 0.10em; }
+.rv-flag span { color: #b99a68; }
+
+.rv { padding: 14px; max-width: 1400px; margin: 0 auto; }
+
+/* THE GLASS BOX. Everything inside is WebGL; everything outside is DOM. */
+.rv-stage {
+  position: relative;
+  height: var(--rv-stage-h);
+  min-height: 340px;
+  background: var(--rv-ground);
+  border: 1px solid var(--rv-line);
+  border-radius: 4px;
+  overflow: hidden;
+  touch-action: none;          /* the orbit gesture owns the pointer */
+  cursor: grab;
+}
+.rv-stage[data-dragging] { cursor: grabbing; }
+.rv-stage canvas { display: block; }
+
+.rv-fallback, .rv-hint {
+  margin: 8px 2px 0;
+  color: var(--rv-dim);
+  font-size: 11px;
+}
+
+.rv-panel {
+  margin-top: 12px;
+  border: 1px solid var(--rv-line);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.rv-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+.rv-label {
+  width: 74px;
+  flex: 0 0 74px;
+  color: var(--rv-dim);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.rv-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+button {
+  font: inherit;
+  font-size: 12px;
+  color: var(--rv-text);
+  background: #1b2027;
+  border: 1px solid var(--rv-line);
+  border-radius: 3px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+button:hover { border-color: #3a434e; }
+button[aria-pressed="true"] {
+  color: var(--rv-ink);
+  background: var(--rv-on);
+  border-color: var(--rv-on);
+}
+button[disabled] { opacity: 0.35; cursor: default; }
+
+.rv-readout {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rv-line);
+  white-space: pre;
+  overflow-x: auto;
+  color: var(--rv-dim);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.rv-readout[data-error] { color: #ef8b7a; }
+
+@media (max-width: 620px) {
+  :root { --rv-stage-h: 62vh; }
+  .rv-label { width: 100%; flex-basis: 100%; }
+}

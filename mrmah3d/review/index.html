@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" data-mrmah-review="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- DEVELOPMENT-ONLY SURFACE. Not linked from any MAHFITT page, not part of the
+     app shell, and excluded from indexing. It loads no MAHFITT production
+     script or stylesheet, so it cannot affect the accepted application.
+
+     This is the DIAGNOSTIC turntable the final-refinement pack asks for: both
+     characters, 360 degrees, zoom, the four named views, and the surface modes
+     the muscle-belly and crystallization laws are judged in. It is a harness,
+     not a product surface, and it adds no renderer logic — everything it drives
+     is already public on createMrMahScene(). -->
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#0E1114">
+<meta name="color-scheme" content="dark">
+<title>MAH 3D REVIEW · development only</title>
+<link rel="stylesheet" href="./review.css">
+</head>
+<body>
+
+<div class="rv-flag" role="note">
+  <b>DEVELOPMENT REVIEW TURNTABLE</b>
+  <span>Not production &middot; diagnosis only &middot; no MAHFITT surface loads this</span>
+</div>
+
+<main class="rv">
+  <div class="rv-stage" id="stage" data-mrmah-host aria-label="MAH 3D review stage">
+    <noscript><p class="rv-fallback">This review page requires JavaScript.</p></noscript>
+  </div>
+
+  <p class="rv-hint">Drag to orbit &middot; wheel or pinch to zoom &middot; double-click to reset</p>
+
+  <div class="rv-panel">
+    <div class="rv-row">
+      <span class="rv-label">Character</span>
+      <div class="rv-group" id="who">
+        <button type="button" data-who="male" aria-pressed="true">Mr.&nbsp;Mah</button>
+        <button type="button" data-who="mrs-mah">Mrs.&nbsp;Mah</button>
+        <button type="button" data-who="female">female&nbsp;proto</button>
+      </div>
+    </div>
+
+    <div class="rv-row">
+      <span class="rv-label">View</span>
+      <div class="rv-group" id="views">
+        <button type="button" data-yaw="0" aria-pressed="true">front</button>
+        <button type="button" data-yaw="-40">3/4</button>
+        <button type="button" data-yaw="-90">side</button>
+        <button type="button" data-yaw="180">rear</button>
+        <button type="button" data-yaw="40">3/4&nbsp;L</button>
+      </div>
+    </div>
+
+    <div class="rv-row">
+      <span class="rv-label">Surface</span>
+      <div class="rv-group" id="surface">
+        <button type="button" data-surface="" aria-pressed="true">material</button>
+        <button type="button" data-surface="clay">clay</button>
+        <button type="button" data-surface="crystal">crystal&nbsp;planes</button>
+        <button type="button" data-surface="mass">mass</button>
+        <button type="button" data-surface="groups">groups</button>
+      </div>
+    </div>
+
+    <div class="rv-row">
+      <span class="rv-label">Framing</span>
+      <div class="rv-group" id="framing">
+        <button type="button" data-zoom="full" aria-pressed="true">whole</button>
+        <button type="button" data-zoom="torso">torso&nbsp;/&nbsp;arms</button>
+        <button type="button" data-zoom="lower">lower&nbsp;body</button>
+        <button type="button" data-zoom="head">head</button>
+      </div>
+    </div>
+
+    <div class="rv-row">
+      <span class="rv-label">Motion</span>
+      <div class="rv-group" id="motion">
+        <button type="button" data-act="spin">Spin 360</button>
+        <button type="button" data-act="still" aria-pressed="true">Hold still</button>
+        <button type="button" data-act="pose">Pose</button>
+        <button type="button" data-act="isolate">Isolate</button>
+        <button type="button" data-act="reset">Reset view</button>
+      </div>
+    </div>
+
+    <div class="rv-readout" id="readout" aria-live="polite">starting&hellip;</div>
+  </div>
+</main>
+
+<script type="module" src="./review.js"></script>
+</body>
+</html>

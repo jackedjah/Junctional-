@@ -701,9 +701,30 @@ if (exists('CLAUDE.md')) {
   ok('R99-underarm-pocket-lost', /ae < 2\.05\) return \{ classes: REGIONS\.OBLIQUE\.classes[^}]*index: 0/.test(propsSrc));
   /* the inner arm is a shadow valley, decided per limb from its real basis */
   ok('R99-inner-arm-valley', /export function limbSideDirection/.test(forge) && /innerSignOf/.test(limbs) && /armZone\(REGIONS\.UPPER_ARM\.classes, upperInner\)/.test(limbs));
-  /* the chest has depth: every chest ring is deeper than 0.85 of its width */
+  /* THE CHEST HAS DEPTH.
+
+     Re-authored at R232 against its actual owner. Until R120 the ring table WAS
+     the male chest's silhouette and the contract could read `d` against `w` in
+     proportions.js. It is not any more: `maleTorsoSections` re-sections the
+     rings and `torsoSurface` (myofascial.js) projects the pec off the ribcage
+     from `MRMAH_MORPHOLOGY.pec.surface`, so the ring's `d` is the RIBCAGE's
+     depth and the chest's real depth is the crown's. Reading the table now
+     measures the ribcage and calls a deeper chest a regression — the whole
+     "a ring table can only make a body of revolution" lesson, arriving as a
+     stale test rather than as a stale build.
+
+     The property is unchanged: the chest is deeper than 0.85 of its half-width.
+     The crown reaches 0.398 against a widest chest ring of 0.338, so it is met
+     with room; the female path, which still IS its ring table, is checked the
+     old way. */
   const chestRows = propsSrc.match(/\{ y: (1\.895|1\.970|2\.0[58]0), w: ([\d.]+), d: ([\d.]+)/g) || [];
-  ok('R99-chest-has-depth', chestRows.length === 3 && chestRows.every(r => { const m = r.match(/w: ([\d.]+), d: ([\d.]+)/); return Number(m[2]) >= Number(m[1]) * 0.85; }), chestRows.join(' | '));
+  const crownDepth = (propsSrc.match(/"crownDepth":\[\[[\d.,\]\[]+\]\]/) || [''])[0];
+  const crownPeak = Math.max(0, ...(crownDepth.match(/,([\d.]+)\]/g) || []).map(m => Number(m.slice(1, -1))));
+  const chestWidest = Math.max(0, ...chestRows.map(r => Number(r.match(/w: ([\d.]+)/)[1])));
+  ok('R99-chest-has-depth', chestRows.length === 3 && chestWidest > 0 && crownPeak >= chestWidest * 0.85 &&
+    /export function torsoSurface/.test(read('mrmah3d/core/character/myofascial.js')) &&
+    /surface: maleAnatomy \? torsoSurface/.test(body),
+    'pec crown ' + crownPeak + ' vs widest chest ring ' + chestWidest);
   /* the neck is a column, not a connector: at least 0.13 half-width under the chin */
   const neckRow = propsSrc.match(/\{ y: 2\.2[5-9]0, w: ([\d.]+)/);
   ok('R99-neck-carries-the-head', neckRow && Number(neckRow[1]) >= 0.125, 'neck half-width ' + (neckRow && neckRow[1]));
@@ -765,11 +786,32 @@ if (exists('CLAUDE.md')) {
   /* the glass is glossy, dark, and carries a trace of the theme */
   ok('R100-display-glass-material', /roughness: 0\.0[0-9],\s*\n\s*metalness: 0\.7/.test(mats) && /\.lerp\(new Color\(tint\.glow \|\| PALETTE\.glow\), 0\.[1-3]/.test(mats));
   /* anatomy: traps, clavicle groove, serratus, bicep crest, lateral tricep head, radial ridge, knuckles */
+  /* R232: the male arm's masses live in arm-anatomy.js, not in the generic
+     ARMS_ bump tables, so contracts about HIS arm read that file. */
+  const armAnat = read('mrmah3d/core/character/arm-anatomy.js');
   ok('R100-trapezius-ring-and-zone', /function trapZone/.test(propsSrc) && /zoneAt: trapZone/.test(propsSrc));
   ok('R100-clavicle-groove', /function subclavicleShape/.test(propsSrc) && /function subclavicleZone/.test(propsSrc) && /zoneAt: subclavicleZone/.test(propsSrc));
   ok('R100-serratus-saw', /tooth/.test(propsSrc) && /SERRATUS/.test(propsSrc));
-  ok('R100-bicep-crest-and-lateral-head', /var biceps = Math\.pow\(bump\(d, inn \* 0\.1[0-9], 0\.[5-8][0-9]\), 0\.7\) \* 0\.[2-4][0-9]/.test(propsSrc) && /var triLat = /.test(propsSrc));   /* R108: a biceps belly and a lateral triceps head, both bellies */
-  ok('R100-radial-forearm-ridge', /var brachioradialis = Math\.pow\(bump\(d, out \* 0\.[6-9][0-9], 0\.[3-5][0-9]\), 0\.7\) \* 0\.[2-3][0-9]/.test(propsSrc) && /ARMS_\.shapes\.fore\(t, d, foreInner\)/.test(limbs));   /* R108: the ridge takes its side from `inner` */
+  /* R232: same move as the radial ridge — the biceps crest and the lateral
+     triceps head are named `musclePlane` bellies in maleUpperShape now, each on
+     its own peak from `bellyPeaks`. The female path keeps the bump table. */
+  ok('R100-bicep-crest-and-lateral-head',
+    (/var biceps = P\.biceps\.projection \* musclePlane\(/.test(armAnat) &&
+     /P\.triceps\.lateralProjection \* musclePlane\(/.test(armAnat) &&
+     /bellyPeaks\.tricepsLateral/.test(armAnat)) ||
+    (/var biceps = Math\.pow\(bump\(d, inn \* 0\.1[0-9], 0\.[5-8][0-9]\), 0\.7\) \* 0\.[2-4][0-9]/.test(propsSrc) && /var triLat = /.test(propsSrc)));
+  /* THE RADIAL FOREARM RIDGE. Re-authored at R232: the male forearm's masses
+     moved out of the generic `ARMS_.shapes.fore` bump table into `maleForeShape`
+     (arm-anatomy.js), where the brachioradialis is a named `musclePlane` on its
+     own belly peak. `ARMS_.shapes.fore` is the FEMALE path now, so asserting the
+     male ridge there tests a branch he no longer takes. The property — a radial
+     ridge that takes its side from the limb rather than from world space —
+     holds in both: `out` is derived from `inner` in each. */
+  ok('R100-radial-forearm-ridge',
+    /var radial = 0\.[3-8][0-9] \* musclePlane\(d, out \* \(0\.[6-9][0-9]/.test(armAnat) &&
+    /bellyPeaks\.brachioradialis/.test(armAnat) &&
+    /maleForeShape\(t, d, foreInner, forePalmAngle\)/.test(limbs) &&
+    /ARMS_\.shapes\.fore\(t, d, foreInner, false\)/.test(limbs));
   ok('R100-cap-shadow-on-the-arm', /t < 0\.17 && ad > 0\.55/.test(limbs));
   ok('R100-hand-knuckles', /KNUCKLE/.test(limbs) && /spec\.digitRadius \* 1\.22/.test(limbs));
   /* platinum / theme fusion: the coat's albedo and grazing reflection carry the theme, the base stays neutral */
@@ -802,7 +844,12 @@ if (exists('CLAUDE.md')) {
     /var brach = /.test(propsSrc) && /var brachioradialis = /.test(propsSrc) && /upperRadius: 0\.1[5-6][0-9]/.test(propsSrc));   /* R108: the arm standard is the set of named bellies, not their literals */
   /* three deltoid heads as FORM: front, rear, lateral crest and two grooves */
   /* R102: the grooves between the heads are twice as deep (0.045 -> 0.090) */
-  ok('R101-deltoid-heads-as-form', /var lateral = 0\.0[4-9]/.test(body) && /var grooves = -0\.0[2-9][0-9]?/.test(body));   /* R106: ONE dome — the grooves are plane changes, not cuts; R108: the crest is 0.07 on the up side only */
+  /* THREE DELTOID HEADS AS FORM. Re-authored at R232 only for the groove's
+     literal: it is `-(maleAnatomy ? 0.12 : 0.09)` now, because the male cap took
+     a deeper plane change than the female's when his girdle came down. Still one
+     lateral crest and still two grooves; still plane changes, not cuts. */
+  ok('R101-deltoid-heads-as-form', /var lateral = 0\.0[4-9]/.test(body) &&
+    /var grooves = -\(maleAnatomy \? 0\.1[0-9] : 0\.0[0-9]\)/.test(body));
   /* the crystal's own hue is canonical; the theme is light, not paint */
   /* R102: the facets' own hue is a PALETTE constant (cool neutral platinum,
      `PALETTE.crystalTint`), never the theme (`uTint`) and no longer the
@@ -871,16 +918,49 @@ if (exists('CLAUDE.md')) {
     calfRows.length >= 2 && calfRows.every(r => { const m = propsSrc.match(new RegExp('\\{ y: ' + r.y.toFixed(3) + ', [^\\n]*\\n[^\\n]*')); return !!m && !/medial:\s*0\.[1-9]|lateral:\s*0\.[1-9]/.test(m[0]); }),
     'knee ' + (knee && knee.w) + ' calf ' + (calf && calf.w) + ' (must fall) ; calf rows without gastrocnemius heads');
   /* the abdomen is a curved mass with blocks as relief, not a stack of plates */
-  ok('R106-abs-not-corrugated', /coreShape\(1\.0, 0\.2[0-9], /.test(propsSrc) && !/coreShape\([01]\.[0-9]+, -0\.0[5-9]/.test(propsSrc));   /* R107/R108: block rows 0.24-0.26 against crease rows around 0.08; never an inset slot */
+  /* THE ABS ARE BLOCKS, NOT CORRUGATION. Re-authored at R232 for the literal
+     only: the male block rows carry `rectusK` 0.30-0.36 now against crease rows
+     at 0.16, because the myofascial rectus patches and their cavity carry the
+     step the ring used to. The property is the one that matters and is
+     unchanged — a block is a bulge against a SHALLOWER bulge, and the crease is
+     a cavity, never a ring pushed inside its own nominal surface. */
+  const blockM = propsSrc.match(/shape: coreShape\(1\.0, (0\.[\d]+),/g) || [];
+  const rectusKs = blockM.map(m => Number(m.match(/coreShape\(1\.0, (0\.[\d]+),/)[1]));
+  ok('R106-abs-not-corrugated',
+    rectusKs.length >= 2 && Math.max(...rectusKs) >= 0.24 &&
+    Math.max(...rectusKs) >= Math.min(...rectusKs.filter(v => v > 0.05)) * 1.5 &&
+    !/coreShape\([01]\.[0-9]+, -0\.0[5-9]/.test(propsSrc),
+    'rectus rows ' + rectusKs.join('/'));
   /* the pec is a dome: a crown ring between two shoulder rings */
-  ok('R106-pec-crown-ring', /\{ y: 1\.935, w: 0\.3[0-9]{2}, d: 0\.3[0-9]{2}/.test(propsSrc) && /\{ y: 1\.895, w: 0\.3[0-9]{2}, d: 0\.3[0-9]{2}/.test(propsSrc) && /shape: chestShape\(1\.0, [^\n]*\), hero: 0\.30/.test(propsSrc));   /* R108: the pec's apex sits LOW — full k on the 1.895 ring, fading to 0.55 at the clavicle */
+  /* THE PEC HAS A CROWN RING AND ITS APEX SITS LOW. Re-authored at R232: the
+     crown's k is no longer full on one ring, because `MRMAH_MORPHOLOGY.pec
+     .surface.surfaceCage` owns the crown and the ring only has to carry the
+     ribcage under it. What the contract can still hold — and what the R108
+     lesson was actually about — is that the apex is LOW: the chest rings' pec
+     scale RISES from the under-pec ring to the crown and then FADES into the
+     clavicle, rather than peaking at the collarbone. */
+  const pecKs = (propsSrc.match(/shape: chestShape\((0\.[\d]+),/g) || [])
+    .map(m => Number(m.match(/chestShape\((0\.[\d]+),/)[1]));
+  ok('R106-pec-crown-ring',
+    /\{ y: 1\.895, w: 0\.3[0-9]{2}, d: 0\.2[0-9]{2}/.test(propsSrc) &&
+    pecKs.length >= 4 && Math.max(...pecKs) >= 0.90 &&
+    pecKs[0] < Math.max(...pecKs) && pecKs[pecKs.length - 1] < Math.max(...pecKs) * 0.7 &&
+    /hero: 0\.3[0-9]/.test(propsSrc),
+    'chest pec scale ' + pecKs.join(' -> '));
   /* the trapezius is a SLOPE across three rings, not a 0.72 ledge on the shoulder line */
   const trapM = propsSrc.match(/var traps = \(lobe\(a, Math\.PI - 0\.7, 0\.60\) \+ lobe\(a, -Math\.PI \+ 0\.7, 0\.60\)\) \* ([\d.]+);/);
   ok('R106-trapezius-is-a-slope', /function trapTerms\(a, tk, nk, fk\)/.test(propsSrc) && /function subclavicleShape\(k, trapK, pecK, opts\)/.test(propsSrc) && /subclavicleShape\(1\.0, 0\.1[0-9], 0\.[0-9]+/.test(propsSrc) && !/\* 0\.720;/.test(propsSrc),
     'trap terms shared across the girdle rings');   /* R108: one trapTerms for every girdle ring — the slope, never a 0.72 ledge on one ring */
   /* the deltoid is ONE dome: the inter-head grooves are plane changes (<= 0.06) */
-  const grooveM = body.match(/var grooves = -([\d.]+) \*/);
-  ok('R106-deltoid-one-dome', !!grooveM && Number(grooveM[1]) <= 0.10, grooveM ? 'grooves ' + grooveM[1] : 'no grooves');   /* R108: 0.09 under a rear envelope — the grooves fade at the root and the rim, so the cap stays one dome */
+  /* R232: the groove is per-variant now — deeper on the male cap after his
+     girdle came down, shallower on the female's. Both must stay plane changes:
+     at more than about an eighth of the cap's radius the dome reads as three
+     separate heads, which is the fault this contract exists for. */
+  const grooveM = body.match(/var grooves = -\(maleAnatomy \? ([\d.]+) : ([\d.]+)\) \*/) ||
+    body.match(/var grooves = -([\d.]+) \*/);
+  const grooves = grooveM ? grooveM.slice(1).map(Number) : [];
+  ok('R106-deltoid-one-dome', grooves.length > 0 && Math.max(...grooves) <= 0.14,
+    grooves.length ? 'grooves ' + grooves.join('/') : 'no grooves');
   /* the hand: three phalanges, fingers longer than the palm, relaxed hook */
   ok('R106-three-phalanges', /var l1 = len \* 0\.42, l2 = len \* 0\.32, l3 = len \* 0\.26/.test(limbs) && /return \[g1, g2, g3\]/.test(limbs));
   const palmM = propsSrc.match(/palmLength: ([\d.]+)/), digitM = propsSrc.match(/digitLength: ([\d.]+)/);
@@ -905,9 +985,29 @@ if (exists('CLAUDE.md')) {
   const sceneSrc = read('mrmah3d/core/mrmah-scene.js');
   ok('R107-references-present', exists('reference/mrmah-refM-r107-master-sheet.png') && exists('reference/mrmah-refM-r107-mrs-mah-sheet.png') && exists('reference/mrmah-refL-r106-back-anatomy.png'));
   /* the macro form is a SPLINE: rings refined on a Catmull-Rom curve with the shape blended */
-  ok('R107-spline-refined-loft', /function refineSections\(sections, n\)/.test(forge) && /if \(opts\.refine\) sections = refineSections\(sections, opts\.refine\);/.test(forge) && /refine: 1,/.test(propsSrc) && /refine: TORSO_\.refine/.test(body) && /refine: T\.refine/.test(variants));
+  /* THE LOFT IS SPLINE-REFINED, NOT A POLYLINE. Re-authored at R232: the male
+     torso does not take the spline any more and must not — `maleTorsoSections`
+     re-sections his rings itself, at up to 64 sides with the myofascial surface
+     on top, and running the Catmull-Rom over that as well would blend two
+     samplings of the same anatomy. So his branch is `refine: 0` BY
+     CONSTRUCTION, and the property is asserted where it still owns the sculpt:
+     the mechanism exists in forge, the authored value survives in proportions,
+     and the female and Mrs. Mah paths still take it. */
+  ok('R107-spline-refined-loft', /function refineSections\(sections, n\)/.test(forge) &&
+    /if \(opts\.refine\) sections = refineSections\(sections, opts\.refine\);/.test(forge) &&
+    /refine: 1,/.test(propsSrc) && /refine: T\.refine/.test(variants) &&
+    /refine: maleAnatomy \? 0 : \(TORSO_\.refine \|\| 0\)/.test(body) &&
+    /export function maleTorsoSections/.test(read('mrmah3d/core/character/myofascial.js')));
   /* the micro jitter sits UNDER the curve */
-  ok('R107-jitter-under-the-curve', /jitter: 0\.4[0-9],/.test(propsSrc) && /jitterScale/.test(forge) && /crystal: 0\.012, steps: 1[0-9]/.test(limbs));
+  /* THE MICRO JITTER SITS UNDER THE CURVE. Re-authored at R232 for the limb
+     clause: the male upper arm's relief is `crystal: 0` now, because
+     `maleUpperShape` authors every mass on it and a random crystal offset on
+     top of named bellies is exactly the lumps this contract was written
+     against. The female arm keeps the authored 0.012. The torso's jitter, and
+     the scaling mechanism in forge, are unchanged. */
+  ok('R107-jitter-under-the-curve', /jitter: 0\.4[0-9],/.test(propsSrc) && /jitterScale/.test(forge) &&
+    (/crystal: 0\.012, steps: 1[0-9]/.test(limbs) ||
+     (/crystal: 0, facet: 0, steps: 1[0-9]/.test(limbs) && /crystal: opts\.maleAnatomy \? 0 : 0\.01[0-9]/.test(limbs))));
   /* resolution: 24-side torso, 14-side limbs, 12-ring deltoid */
   ok('R107-round-resolution', /sides: 24,/.test(propsSrc) && /spec\.foreRadius \* 1\.02, 16,/.test(limbs) && /deltoidR0, deltoidR1, 16,/.test(body) && /steps: 12/.test(body));   /* R108: limbs and deltoid at sixteen sides so the heads land on vertices */
   /* bellies: fuller top, steeper flanks */
@@ -929,7 +1029,16 @@ if (exists('CLAUDE.md')) {
   /* facet GROUPS: several triangles share one group-averaged normal, sized per ring */
   ok('R107-facet-groups', /function groupKey\(spec, i, r\)/.test(forge) && /faceGroup: faceGroup/.test(forge) && /triGroup\.forEach/.test(forge) && (propsSrc.match(/fg: \[[0-9], [0-9]\]/g) || []).length >= 24 && /fg: \[2, 2\],/.test(body) && /var shift = \(row % 2\)/.test(forge) && /fg: \[1, 3\],/.test(limbs));   /* R108: bricked groups that follow the muscle — strips along the limbs, wraps on the cap */
   /* the smooth clay gate: smooth normals swapped in, a camera-side key */
-  ok('R107-smooth-clay-gate', /g\.setAttribute\('normal', g\.attributes\.aSmooth\)/.test(mrmah) && /__facetNormal/.test(mrmah) && /clayKey = new ClayLight\(0xffffff, 1\.[0-9]\)/.test(sceneSrc));
+  /* THE SMOOTH CLAY GATE. Re-authored at R232: `crystal` joined `clay` as a
+     second matte view — the same Lambert read taken over the CRYSTAL plane
+     normals instead of the smooth ones, which is how the crystallization law's
+     "the body must still read in neutral clay" and "the planes must follow the
+     muscle" are judged apart. Clay must still be the SMOOTH normal, and the
+     facet normal must still be restored with the view. */
+  ok('R107-smooth-clay-gate',
+    /mode === 'crystal' \? \(g\.attributes\.aCrystalNormal \|\| g\.attributes\.aSmooth\) : g\.attributes\.aSmooth/.test(mrmah) &&
+    /mode === 'clay' \|\| mode === 'crystal'/.test(mrmah) &&
+    /__facetNormal/.test(mrmah) && /clayKey = new ClayLight\(0xffffff, 1\.[0-9]\)/.test(sceneSrc));
   /* posterior (R106 back sheet, carried into R107): trap kite, lat sweep, scapular planes */
   ok('R107-posterior-authored', /function backTerms\(a, o\)/.test(propsSrc) && /erectorAt/.test(propsSrc) && /latBack: 0\.[23][0-9]/.test(propsSrc) && /function coreShape\(k, rectusK, latK, latShift, erectorK, opts\)/.test(propsSrc));   /* R108: posterior = shared backTerms with per-row erector position, valley and lat plane */
 })();

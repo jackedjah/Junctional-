@@ -1,0 +1,234 @@
+[
+  {
+    "who": "male",
+    "surface": "",
+    "view": "01-front",
+    "file": "male__material__01-front.png",
+    "yawDeg": 0,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "",
+    "view": "02-threequarter",
+    "file": "male__material__02-threequarter.png",
+    "yawDeg": -40,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "",
+    "view": "03-side",
+    "file": "male__material__03-side.png",
+    "yawDeg": -90,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "",
+    "view": "04-rear",
+    "file": "male__material__04-rear.png",
+    "yawDeg": 180,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "",
+    "view": "05-lower-front",
+    "file": "male__material__05-lower-front.png",
+    "yawDeg": 0,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "lower",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "",
+    "view": "06-lower-threequarter",
+    "file": "male__material__06-lower-threequarter.png",
+    "yawDeg": -40,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "lower",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "",
+    "view": "07-torso-arms",
+    "file": "male__material__07-torso-arms.png",
+    "yawDeg": -22,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "torso",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "",
+    "view": "08-head",
+    "file": "male__material__08-head.png",
+    "yawDeg": -20,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "head",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "",
+    "view": "09-hero",
+    "file": "male__material__09-hero.png",
+    "yawDeg": -28,
+    "pitchDeg": 6,
+    "zoom": 0.86,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "01-front",
+    "file": "male__clay__01-front.png",
+    "yawDeg": 0,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "02-threequarter",
+    "file": "male__clay__02-threequarter.png",
+    "yawDeg": -40,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "03-side",
+    "file": "male__clay__03-side.png",
+    "yawDeg": -90,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "04-rear",
+    "file": "male__clay__04-rear.png",
+    "yawDeg": 180,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "05-lower-front",
+    "file": "male__clay__05-lower-front.png",
+    "yawDeg": 0,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "lower",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "06-lower-threequarter",
+    "file": "male__clay__06-lower-threequarter.png",
+    "yawDeg": -40,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "lower",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "07-torso-arms",
+    "file": "male__clay__07-torso-arms.png",
+    "yawDeg": -22,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "torso",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "08-head",
+    "file": "male__clay__08-head.png",
+    "yawDeg": -20,
+    "pitchDeg": 0,
+    "zoom": 1,
+    "framing": "head",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "surface": "clay",
+    "view": "09-hero",
+    "file": "male__clay__09-hero.png",
+    "yawDeg": -28,
+    "pitchDeg": 6,
+    "zoom": 0.86,
+    "framing": "full",
+    "spinning": false
+  },
+  {
+    "who": "male",
+    "info": {
+      "version": "0.1.0-phase1",
+      "tier": "high",
+      "pixelRatio": 1,
+      "width": 872,
+      "height": 998,
+      "fov": 32,
+      "camAspect": 0.874,
+      "reducedMotion": false,
+      "placeholder": false,
+      "contextLost": false,
+      "destroyed": false,
+      "loop": {
+        "running": true,
+        "visible": true,
+        "onScreen": true,
+        "paused": false,
+        "destroyed": false
+      },
+      "stats": {
+        "frames": 404,
+        "fps": 20,
+        "avgMs": 2.78,
+        "tierDrops": 0
+      },
+      "drawCalls": 1,
+      "triangles": 2,
+      "geometries": 88,
+      "textures": 24
+    },
+    "errors": []
+  }
+]
