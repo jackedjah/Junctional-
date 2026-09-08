@@ -352,7 +352,37 @@ export function buildBody(materials, P, options = {}) {
       // return paths; midpoint support and adjacent faces remain reconciled.
       const lowerFrame={name:'quad/knee local cage samples',project:p=>[p.x,p.y],accept:p=>p.z>.04&&Math.abs(p.x)>.025&&Math.abs(p.x)<.17,symmetric:true,minEdgeLength:.012};
       refineRecessEdges(g,{...lowerFrame,accept:p=>lowerFrame.accept(p)&&p.y>.92&&p.y<1.32,sampleBands:[{at:0,h:[0,.27],count:1},{at:0,h:[.27,.60],count:1},{at:0,h:[.60,.84],count:1},{at:0,h:[.84,1],count:1}]},[{path:[[.045,1.28],[.044,1.14],[.042,.97],[.039,.93]],width:.065,mirror:true}],8);
-      refineRecessEdges(g,{...lowerFrame,accept:p=>lowerFrame.accept(p)&&p.y>.58&&p.y<.95},[{path:[[.064,.90],[.129,.79],[.063,.645],[.039,.79],[.064,.90]],width:.055,mirror:true}],8);
+      /* R235 / A3 — THE KNEE-BAND EDGE SPLIT IS REMOVED. It was the wedges.
+
+         Measured on the built anterior surface, the knee band carried adjacent
+         faces meeting at 103 and 90 degrees where their own local neighbours
+         sat at a median of 6-7 degrees — a 14.9x outlier, clustered in a
+         mirrored pair at y 0.832-0.850, x +/-0.095 to +/-0.119. No reference
+         supports a fold there: the teardrop sheet's Mr. Mah notes read "CALVES
+         MERGE CLEANLY INTO POINT" and "NO DISCONNECTED SURFACE", and the
+         blueprint's own "KNEE ACCENT" close-up shows a gentle narrowing with
+         the longitudinal columns running through it, never a transverse fold.
+         The clay test settles it: `maleTorsoSections` zeroes crystal, facet and
+         fg on this torso, so there is no crystal layer here to explain an
+         angular break — anything visible in clay is macro anatomy.
+
+         The call this replaces split up to 8 existing edges along a CLOSED
+         DIAMOND loop [[.064,.90],[.129,.79],[.063,.645],[.039,.79]] whose
+         right corner sits at x 0.129, y 0.79 — exactly where the outliers are.
+         Splitting eight edges along a closed contour in a mesh whose faces are
+         0.05 to 0.11 across cannot produce a smooth transition: it produces
+         long slivers whose normals disagree with their neighbours, and it left
+         inserted vertices at y 0.82 where the ring table has no ring at all.
+
+         Two things justify removal over tuning. The brief rules out solving
+         this with subdivision, and this call IS subdivision. And the knee
+         landmark does not depend on it: the recess is authored by
+         `MRMAH_RECESSES.lower` through `sculptSurfaceRecesses` above and by
+         `lowerField`'s kneeAccent, both untouched — this only added sampling
+         for them, and the sampling is what broke.
+
+         The quad's own split at y .92-1.32 stays; that band reads clean. */
+
       const fitted=g.clone(),lowerProbe=new Mesh(fitted,materials.body);lowerProbe.updateMatrixWorld(true);
       const lowerSupport=(x,y)=>{
         const hit=new Raycaster(new Vector3(x,y,1),new Vector3(0,0,-1),0,2).intersectObject(lowerProbe,false)[0];

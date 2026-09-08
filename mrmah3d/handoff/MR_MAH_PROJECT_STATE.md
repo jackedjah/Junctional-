@@ -396,3 +396,96 @@ depth make a belly fuller, not flatter, and the reverse loses mass.
 
 NEXT: A4, the knee band, same method. Do NOT start crystallization; the anatomy
 mesh must read smooth first and the facet layer is a separate later concern.
+
+
+---
+
+R235 / A3 — THE KNEE-BAND WEDGES WERE AN EDGE SPLIT
+
+BASE: R234 (0682f6e), the accepted checkpoint carrying the broad-field /
+VM-ribbon smoothing. That quad field is LOCKED and was not touched.
+
+METHOD NOTE — the curvature law was applied as a DIAGNOSTIC, not a target. No
+angle was optimised toward a number. Outliers were flagged only where a turn was
+both substantially sharper than its own immediate neighbours AND unsupported by
+the accepted reference.
+
+REFERENCE FIRST. Two sheets govern this region.
+`reference/handoff/MAHWORLD_Teardrop_Anatomy_Reference_Sheet.png` — Mr. Mah's
+lower-body notes read "QUADS FEED DIRECTLY INTO TEARDROP / ADDUCTORS BLEND INTO
+CENTER LINE / HAMSTRINGS WRAP TO REAR / CALVES MERGE CLEANLY INTO POINT /
+CRYSTAL PLANES FOLLOW MUSCLE BELLY / NO DISCONNECTED SURFACE", and its muscle
+map runs LONGITUDINAL columns converging on the point.
+The Crystal Anatomy Blueprint carries a close-up literally titled "KNEE ACCENT
+(BOTH)" — so a knee accent IS reference-supported, but it is shown as a gentle
+narrowing with the columns running THROUGH it, never a transverse fold.
+
+THE CLAY TEST SETTLES OWNERSHIP. `maleTorsoSections` zeroes crystal, crystalY,
+facet, cav and fg on the male torso, so his lower body carries NO crystal layer
+at all. Anything visible in a neutral-clay render there is macro anatomy by
+construction — it cannot be intentional crystallization.
+
+MEASURED, on real triangles of the built mesh (adjacent-face normal angles,
+anterior only, each outlier reported with its own local neighbourhood):
+
+  BEFORE
+    knee band y .58-.95   faces 208   median 6°  p90 33°  p99 90°  max 103°
+    worst 103° at y0.832 x+/-0.119   neighbours n=10 median 7° range 1-90°
+                                     ratio 14.9x   reference support: NONE
+    second 90° at y0.832 x+/-0.095   neighbours n=16 median 6°   ratio 14.9x
+
+  AFTER
+    knee band y .58-.95   faces 184   median 5°  p90 29°  p99 55°  max 55°
+    worst  55° at y0.673 x+/-0.043   neighbours n=17 median 7° range 0-41°
+                                     ratio 8.1x    location: adductor channel
+    quad  y .95-1.45      faces 379   median 7°  p90 28°  p99 69°  max 71°  IDENTICAL
+    taper y .20-.58       faces  65   median 4°  p90 23°  p99 47°  max 47°  IDENTICAL
+
+THE OWNER, body.js: a `refineRecessEdges` call splitting up to EIGHT existing
+edges along a CLOSED DIAMOND loop [[.064,.90],[.129,.79],[.063,.645],[.039,.79]]
+in the band y .58-.95. Its right corner is x 0.129 at y 0.79 — exactly where the
+outliers sit. Splitting eight edges along a closed contour in a mesh whose faces
+are 0.05-0.11 across cannot make a smooth transition: it makes long slivers
+whose normals disagree with their neighbours. It had left inserted vertices at
+y 0.82, where the ring table has no ring at all — which is what first exposed it.
+
+THE CORRECTION: that one call is REMOVED. Two things justify removal over
+tuning. The brief rules out solving this with subdivision, and this call IS
+subdivision. And the knee landmark does not depend on it — the recess is
+authored by `MRMAH_RECESSES.lower` through `sculptSurfaceRecesses` and by
+`lowerField`'s kneeAccent, both untouched; the split only added SAMPLING for
+them, and the sampling is what broke. The quad's own split at y .92-1.32 stays.
+
+A REJECTED ATTEMPT, recorded so it is not repeated. The first hypothesis was
+that the profile tables' piecewise-linear knots were the corners — `profileAt`
+is linear, and the R232 knee pass inserted knots at y .62/.70/.78/.88/.98 whose
+slope jumps reach 300-380% in LOWER_FRONT/LOWER_BACK. Fritsch-Carlson monotone
+cubic interpolation was implemented for the lower profiles only and measured:
+the knee outlier did not move (103° -> 104°). WRONG OWNER; reverted. It did
+improve the quad's tail (p99 69° -> 63°, max 71° -> 64°) at no cost, so it is
+kept on file as a candidate for a later pass with its own proof — it is NOT in
+this build.
+
+VISUAL (isolated neutral clay, low tier, identical framing):
+  quad        unchanged — measured bit-identical, 379 faces, same distribution
+  knee        wedges GONE. The extreme close-up shows continuous fleshy surface
+              with a soft longitudinal centre channel where the diamond cage's
+              hard triangles were.
+  calf        unchanged, smooth convergence to the point
+  silhouette  bit-identical across all 24 comparable bands (0.00000 units)
+
+Proof: validation/mrmah3d/R235-A3/male__clay-iso__{05-lower-front,
+06-lower-threequarter,03-side,11-quad-threequarter}.png
+
+REFERENCE PARITY: BETTER. The band now reads as the sheet's continuous
+longitudinal flow rather than a transverse cage.
+
+KEEP. 376/376 contracts pass.
+
+HONEST REMAINDER: the knee band still holds outliers at 55°, 47°, 46° and 45°
+with local ratios of 8x to 17x. They are smaller and no longer read as hard
+wedges in clay, but they are still outliers by the rule. The 55° pair sits on
+the central adductor channel at y0.673 — A5's region (mechanical ridge/divot
+continuity). Do not chase them before looking.
+
+NEXT: STOP FOR VISUAL REVIEW, per the brief. A4 (knee -> calf) is not started.
