@@ -804,13 +804,24 @@ export function buildGround(ctx) {
        same pieces spread evenly read as three lonely objects — and five more out on the flanks where
        the lateral cameras cross the floor. Every one of them is under 2.2 m: they are what a resident
        walks between, not what a resident walks around. */
+    /* R170 D8 — FOURTEEN BECAME EIGHT, AND THE OUTCROP IDEA SURVIVED IT.
+       "Gotta space things out, it just looks messy." These are the loosest objects on the deck: pale
+       translucent bodies at chest height scattered across an otherwise black floor, and fourteen of
+       them is a field rather than a set of incidents.
+       WHAT WAS CUT AND WHAT WAS NOT MATTERS. The note above explains that these are THREE FAMILIES
+       at the feet of the three hero shards, because "a big crystal with two or three smaller ones
+       around it reads as ONE outcrop breaking through the paving, where the same pieces spread
+       evenly read as three lonely objects". Cutting a cluster to one piece would have destroyed
+       exactly that. So each cluster loses its SMALLEST member and keeps a large and a medium — still
+       an outcrop, with half the pieces — and the five lone flankers are cut to the two widest, which
+       are the ones far enough out to read as their own event rather than as strays.
+       Result: three outcrops and two outliers, all of them further apart than any two shards were
+       before. The floor between them is now the authored empty space the direction keeps asking for. */
     const STANDING = [
-      [-10.4, 2.6, 1.50, 0.62, 0.9, 0.06, -0.05], [-6.4, -1.6, 0.95, 0.48, -0.5, -0.05, 0.07], [-9.9, -1.2, 1.90, 0.70, 2.1, 0.04, 0.08],
-      [9.9, 27.6, 1.60, 0.60, 0.4, -0.06, 0.05], [5.9, 28.9, 0.85, 0.44, 1.7, 0.05, -0.04], [9.2, 23.6, 1.25, 0.52, -1.1, 0.03, 0.06],
-      [-9.9, 27.6, 1.35, 0.58, -0.7, 0.05, -0.06], [-5.9, 28.9, 1.05, 0.46, 2.4, -0.04, 0.05], [-9.2, 23.6, 1.80, 0.66, 1.2, 0.06, 0.03],
-      [-15.8, 30.6, 2.10, 0.78, 0.3, 0.04, -0.07], [16.4, 31.2, 1.70, 0.68, -1.4, -0.05, 0.05],
-      [-23.4, 12.6, 1.30, 0.55, 2.0, 0.06, 0.04], [22.8, 11.4, 1.45, 0.60, -0.9, -0.03, -0.06],
-      [-2.8, 33.8, 1.10, 0.50, 1.5, 0.05, 0.05]
+      [-10.4, 2.6, 1.50, 0.62, 0.9, 0.06, -0.05], [-9.9, -1.2, 1.90, 0.70, 2.1, 0.04, 0.08],
+      [9.9, 27.6, 1.60, 0.60, 0.4, -0.06, 0.05], [9.2, 23.6, 1.25, 0.52, -1.1, 0.03, 0.06],
+      [-9.2, 23.6, 1.80, 0.66, 1.2, 0.06, 0.03], [-15.8, 30.6, 2.10, 0.78, 0.3, 0.04, -0.07],
+      [-23.4, 12.6, 1.30, 0.55, 2.0, 0.06, 0.04], [22.8, 11.4, 1.45, 0.60, -0.9, -0.03, -0.06]
     ];
 
     const inlays = [], standing = [], sockets = [], heroes = [];

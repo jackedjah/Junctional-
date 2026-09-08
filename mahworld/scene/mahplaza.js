@@ -1422,6 +1422,19 @@ export async function createMahplaza(canvas, options = {}) {
      plane would double every light — and stays as the low tier's fallback. */
   const MIRROR_Y = 0.17;
   mirror = (() => {
+    /* R170 D7 — THE PLANAR PASS IS RETIRED. "Remove the reflection across the floor, but keep it
+       extremely platinum." Returning null here is the whole switch: every call site downstream is
+       already guarded by `if (mirror)`, because the pass was always optional on the low quality
+       tier, so nothing else has to change and no render target is ever allocated.
+       THE IMPLEMENTATION BELOW IS KEPT AND IS UNREACHABLE, deliberately. It is a working oblique
+       near-plane planar reflection with a movement-keyed cache, it took real effort to get right,
+       and removing a feature on a direction note is not the same as deciding it can never come
+       back — deleting it would make that decision permanent and expensive to undo. One line
+       restores it. If a later pass settles that the floor will never reflect the world again, this
+       block should be deleted outright rather than left here indefinitely: dead code that nobody
+       has decided about is worse than either choice. */
+    return null;
+    /* eslint-disable no-unreachable */
     if (!quality.reflections) return null;
     const size = new THREE.Vector2();
     renderer.getSize(size);
@@ -1516,10 +1529,52 @@ export async function createMahplaza(canvas, options = {}) {
     };
   })();
 
-  if (mirror) {
-    mirror.resize();
-    mirror.collect();
-    reflections.visible = false;   /* the planar pass supersedes the mirrored copies */
+  /* ===============================================================================================
+     R170 D7 — THE FLOOR NO LONGER REFLECTS THE WORLD, AND IS MORE PLATINUM FOR IT
+     ===============================================================================================
+     "I'm thinking we should remove the reflection across the floor, but keep it extremely platinum."
+
+     WHAT GOES is the PLANAR PASS: the second full render of the scene from a mirrored camera, and
+     the projected sample that put an upside-down city on the deck. What stays is everything that
+     made the floor read as polished stone in the first place — the near-black base, the crushed
+     surface term, the fresnel that brightens it at a grazing angle, the diamond lattice, and D6's
+     sun and moon path. A black mirror and a polished black floor differ by exactly one thing: what
+     is IN the reflection. Take the city out and the material is unchanged.
+
+     THIS IS NOT A DOWNGRADE ANYWHERE, WHICH IS WORTH BEING PRECISE ABOUT:
+       · the planar pass was a SECOND FULL SCENE RENDER. It was already cached against camera
+         movement, but every real move paid for the whole world twice. Removing it is the single
+         largest performance change this project has made, and "performance is part of the artwork".
+       · it was also the source of a defect this file has fought twice by name — "the mirror
+         duplicates the city" — which the coherence falloff, the vertical smear and the strength
+         reduction were all written to manage. That problem no longer exists rather than being
+         managed.
+       · and it removes the shader-ordering trap D6 walked into: with nothing multiplying
+         outgoingLight after another module's patch, the floor has one owner again.
+
+     WHAT REPLACES IT IS NOT NOTHING. Simply dropping the patch would have taken the crush with it,
+     and ground.js's own notes record what the floor measures without it: lum 128 at 78 m, a pale
+     sheet brighter than the architecture. So the patch stays and only its reflection term changes —
+     the surface is still crushed, and what lifts it now is a fresnel-keyed SKY sheen instead of a
+     projected city. That is what a polished black floor does under an open sky: nearly black
+     looking down at your feet, brightening toward the horizon where the grazing angle takes over.
+     Plus D6's celestial path, which is applied separately and is now the only image in the floor. */
+  /* WHAT "EXTREMELY PLATINUM" COSTS ONCE THE MIRROR IS GONE, measured on the first render rather
+     than assumed: with the reflection removed the deck went FLAT. Not too bright and not too dark —
+     flat. The mirror had been supplying all of the floor's contrast, because a mirror is bright
+     where it catches something and black where it does not, and taking it out left a surface whose
+     darkest and lightest parts were nearly the same value. A slate deck, not a metal one.
+     Metal is not a value, it is a RANGE. So the base goes further down and the grazing return goes
+     up, which widens the gap between the floor at your feet and the floor at the horizon — that
+     spread is the whole reason polished stone reads as polished. The fresnel exponent goes up with
+     it so the lift stays at genuinely grazing angles instead of washing the near deck. */
+  const FLOOR_SHEEN = 0.62;   /* how much horizon sky a grazing angle returns: the platinum itself */
+  const FLOOR_BASE = 0.075;   /* the surface's own term, crushed: this is what keeps it near-black */
+  {
+    /* `mirror` is null by construction now, but the guard stays: it is the one line that would have
+       to change to bring the pass back, and leaving it makes the switch symmetrical. */
+    if (mirror) { mirror.dispose(); mirror = null; }
+    reflections.visible = false;   /* the legacy mirrored copies stay off: they were the older answer */
     /* Patch the floor's shader rather than replacing the material: M.plaza keeps its diamond
        roughness and bump maps, its metalness and its place in the palette, and gains one projected
        sample on top. */
@@ -1533,100 +1588,55 @@ export async function createMahplaza(canvas, options = {}) {
        So the patch is a named function applied to all four, the three field grades become OPAQUE
        (they no longer need to let anything through), and they join the hidden list in collect() so
        the field does not render into its own reflection. */
-    const patchMirror = (mat) => {
-      /* R170 D6 — THIS CHAINS, AND IT DID NOT, AND THAT SILENTLY DELETED ANOTHER MODULE'S SHADER.
-         onBeforeCompile is ONE slot on a material. This used to assign into it flatly, which is
-         fine while nothing else patches the plaza floor and catastrophic the moment something does:
-         ground.js applies the celestial sun/moon path to these same four grades during its build,
-         mahplaza patches the mirror onto them afterwards, and the assignment threw the earlier
-         function away. The materials still compiled, still rendered, still mirrored — and carried no
-         path at all, while the two OUTER ground rings (which mahplaza never touches) carried it
-         correctly. A floor feature that worked everywhere except the hero surface, with nothing
-         anywhere reporting a problem.
-         Caught by reading back applyCelestialPath's own per-replace flags rather than by looking at
-         a render, because a missing highlight looks exactly like a highlight that is meant to be
-         subtle. Any future patch on these materials must chain the same way. */
+    const patchFloor = (mat) => {
+      /* THIS CHAINS, AND ONCE UPON A TIME IT DID NOT, WHICH SILENTLY DELETED ANOTHER MODULE'S
+         SHADER. onBeforeCompile is ONE slot on a material. Assigning into it flatly is fine while
+         nothing else patches the plaza floor and catastrophic the moment something does: ground.js
+         applies the celestial sun/moon path to these same four grades during its build, and a flat
+         assignment here threw that function away. The materials still compiled and still rendered,
+         and the hero floor carried no path at all while the two outer ground rings carried it
+         correctly. Caught by reading back per-replace flags, not by looking at a render — a missing
+         highlight looks exactly like a highlight that is meant to be subtle. Any future patch on
+         these materials must chain the same way. */
       const prev = mat.onBeforeCompile;
       mat.onBeforeCompile = (shader, renderer) => {
         if (prev) prev(shader, renderer);
-        shader.uniforms.tPlazaMirror = { value: mirror.rt.texture };
-        shader.uniforms.uMirrorMatrix = { value: mirror.texMatrix };
-        shader.uniforms.uMirrorStrength = mirror.strength;
-        shader.vertexShader = 'uniform mat4 uMirrorMatrix;\nvarying vec4 vMirrorCoord;\n' + shader.vertexShader
-          .replace('#include <project_vertex>', '#include <project_vertex>\n  vMirrorCoord = uMirrorMatrix * ( modelMatrix * vec4( transformed, 1.0 ) );');
-        shader.fragmentShader = 'uniform sampler2D tPlazaMirror;\nuniform float uMirrorStrength;\nvarying vec4 vMirrorCoord;\n' + shader.fragmentShader
+        shader.uniforms.uFloorSheen = { value: FLOOR_SHEEN };
+        shader.uniforms.uFloorBase = { value: FLOOR_BASE };
+        /* a platinum horizon rather than a blue one: the first cut used the sky's own deep blue and
+           the deck came back reading as wet slate. What a metal returns at a grazing angle is the
+           SKY'S BRIGHTNESS carrying only a trace of its hue, which is why polished steel outdoors
+           looks silver and not blue. */
+        shader.uniforms.uFloorSky = { value: new THREE.Color(0x8ea4c4) };
+        shader.fragmentShader = 'uniform float uFloorSheen;\nuniform float uFloorBase;\nuniform vec3 uFloorSky;\n' + shader.fragmentShader
           .replace('#include <opaque_fragment>', `
           {
-            /* SURFACE BREAK-UP. The plaza is cut stone, not a pond: ground.js sets every cell crown
-               about 1.2 degrees off its own table and every joint is a real edge. Pushing the
-               projected sample along the BUMPED normal is what puts that relief into the reflection,
-               so the returned city is broken across the lattice instead of arriving whole — and it is
-               the cheapest available stand-in for a roughness-convolved probe. */
-            vec4 mcoord = vMirrorCoord;
-            mcoord.xy += normal.xz * 0.085 * mcoord.w;
-            /* ROUGHNESS CONVOLUTION GROWS WITH PATH LENGTH. A perfectly sharp planar pass returns the
-               skyline as legibly upside down as it is right way up, and no amount of dimming fixes
-               that — a dim duplicate is still a duplicate. Real polished stone smears a reflection
-               VERTICALLY, and it smears the far ones more than the near ones, because the reflected
-               ray has travelled further across the same micro-relief. Three taps up the view axis,
-               widening with distance: the bench two metres away stays crisp, the tower four hundred
-               metres away arrives as a streak of its own light. This, not the strength, is what turns
-               "the city is duplicated upside down" into "that floor is insane". */
-            float mdist = length( vViewPosition );
-            float smear = ( 0.0035 + 0.030 * smoothstep( 18.0, 140.0, mdist ) ) * mcoord.w;
-            vec4 mup = mcoord + vec4( 0.0, smear, 0.0, 0.0 );
-            vec4 mdn = mcoord - vec4( 0.0, smear, 0.0, 0.0 );
-            vec3 mrefl = texture2DProj( tPlazaMirror, mcoord ).rgb * 0.40
-              + texture2DProj( tPlazaMirror, mup ).rgb * 0.30
-              + texture2DProj( tPlazaMirror, mdn ).rgb * 0.30;
-            /* FRESNEL. A mirror floor returns almost everything at a grazing angle and very little
-               looking straight down at your feet — that asymmetry is most of what reads as "wet
-               polished stone" rather than "a picture pasted on the ground". */
+            /* THE SURFACE'S OWN TERM IS CRUSHED, and that has not changed with the reflection going.
+               ground.js records three separate attempts to darken this floor from the material side
+               that all moved the measured pixel by nothing — at a grazing angle the deck's value is
+               not governed by any parameter on these materials. The lever that responded was here,
+               and it still is. Eleven percent is what makes the floor black. */
+            outgoingLight *= uFloorBase;
+            /* AND WHAT LIFTS IT IS THE SKY, NOT THE CITY. A polished black floor under an open sky
+               is nearly black looking down at your feet and brightens toward the horizon, because a
+               grazing ray returns far more than a normal one — that asymmetry is most of what reads
+               as "wet polished stone" rather than "a dark surface". So the fresnel that used to key
+               a projected reflection now keys a plain horizon colour instead. No render target, no
+               second scene pass, no upside-down city: one colour, one curve, and the floor's own
+               relief already breaking it up through the roughness map.
+               D6's sun and moon path is added separately, after the fragment is assembled, and is
+               now the only IMAGE the floor carries. That is the whole difference between a mirror
+               and a polished floor, and it is the one the direction asked for. */
             float ndv = clamp( dot( normalize( vViewPosition ), normal ), 0.0, 1.0 );
-            float fres = pow( 1.0 - ndv, 4.0 );
-            /* COHERENCE FALLS OFF WITH PATH LENGTH — the correction §10 actually asks for. Every plaza
-               camera looks at this floor at a 2-12 degree depression, so fresnel alone was near 1.0
-               across the whole visible deck and the far half returned the skyline sharply enough to
-               be read as a second city hanging upside down. That is the one reaction the law rules
-               out. The NEAR floor keeps its reflection — lamps, seams, the monument, residents, the
-               part that reads as "that floor is insane" — and the far floor lets go of it. */
-            float coh = 1.0 - 0.72 * smoothstep( 60.0, 300.0, mdist );
-            /* BLACK PLATINUM ABSORBS. What comes back off this stone is darker and cooler than the
-               thing that cast it; returning it neat is what makes a mirror read as a hole. */
-            mrefl *= vec3( 0.52, 0.60, 0.78 );
-
-            /* ---- v11: ALMOST PITCH BLACK, AND STILL A MIRROR --------------------------------------
-               Direction: "I want the reflective floor almost pitch black."
-
-               Those two words fight each other only while the deck's OWN value and the value it
-               RETURNS are the same number. mix() made them the same number: it REPLACES the surface
-               with the reflection, so the floor could never be darker than what it was reflecting.
-               Reflecting a night sky at lum 90 gave a floor at lum 90, and no amount of tinting the
-               stone could get underneath that — which is exactly why three passes at the material
-               failed to move the measured pixel.
-
-               A real black mirror does not work that way. Obsidian is not a window onto a second
-               city; it is a black surface that ADDS what it catches. Dark reflected content adds
-               nothing and the stone stays black; bright reflected content — a lit window, a lamp, a
-               beam, a sign — adds a streak. So the operator changes from mix to ADD, and the
-               surface's own term is crushed first:
-
-                 surface  x 0.11   the deck contributes almost nothing of its own
-                 + reflection      the ONLY thing that lifts it above black
-
-               The result is a floor that is nearly pitch black wherever it is returning sky, mountain
-               or dark mass, and carries bright streaks of the city exactly where the city is lit —
-               which is both what the reference frames show and what the direction asks for. It also
-               means the darker the world behind the camera, the blacker the floor, automatically. */
-            outgoingLight *= 0.11;
-            outgoingLight += mrefl * uMirrorStrength * coh * ( 0.05 + 0.95 * fres );
+            float fres = pow( 1.0 - ndv, 5.0 );
+            outgoingLight += uFloorSky * ( uFloorSheen * ( 0.02 + 0.98 * fres ) );
           }
           #include <opaque_fragment>`);
       };
       mat.needsUpdate = true;
     };
-    patchMirror(M.plaza);
-    (ctx.floorMaterials || []).forEach(m => { m.transparent = false; m.opacity = 1; patchMirror(m); });
+    patchFloor(M.plaza);
+    (ctx.floorMaterials || []).forEach(m => { m.transparent = false; m.opacity = 1; patchFloor(m); });
   }
 
   function frame(now) {

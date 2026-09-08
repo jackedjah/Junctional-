@@ -289,9 +289,14 @@ export function buildDressing(ctx) {
     }
     part(slab, chamferBox(9.5, 0.06, 9.5, 0.05), nx, 0.03, nz, Math.PI / 4);
   }
-  /* the civic ring around the MAHPLAZA marker: one inlaid band, no glow */
-  for (let i = 0; i < 48; i++) {
-    const a = i / 48 * Math.PI * 2, R = 9.2;
+  /* the civic ring around the MAHPLAZA marker: one inlaid band, no glow.
+     R170 D8 — and sixteen marks rather than forty-eight, for the same reason as the curb ring below.
+     At radius 9.2 the circumference is 57.8 m; forty-eight 1.25 m blocks left five centimetres of
+     gap, which is a solid ring that happens to be built out of separate pieces. Sixteen leaves
+     2.4 m of open deck between marks, so the figure reads as a deliberate course laid around the
+     marker instead of a hairline someone drew on the floor. */
+  for (let i = 0; i < 16; i++) {
+    const a = i / 16 * Math.PI * 2, R = 9.2;
     part(curb, chamferBox(1.25, 0.05, 0.34, 0.02), MARKER[0] + Math.cos(a) * R, 0.028, MARKER[1] + Math.sin(a) * R, -a + Math.PI / 2);
   }
 
@@ -510,9 +515,16 @@ export function buildDressing(ctx) {
     }
   }
 
-  /* ---- 7. CURB LINE between the plaza circle and the aprons / sidewalk band ---- */
-  for (let i = 0; i < 64; i++) {
-    const a = i / 64 * Math.PI * 2, R = 27.9;
+  /* ---- 7. CURB LINE between the plaza circle and the aprons / sidewalk band ----
+     R170 D8 — TWENTY-FOUR MARKS, NOT SIXTY-FOUR. "Gotta space things out, it just looks messy."
+     At radius 27.9 the circumference is 175 m, so sixty-four 2.6 m blocks sat with fourteen
+     centimetres between them: that is not a dashed civic edge, it is a continuous ring drawn the
+     expensive way, and at any distance the gaps closed up and it read as one grey band round the
+     whole deck. Twenty-four gives a 7.3 m pitch — a 2.6 m mark and 4.7 m of open floor — which is
+     the same figure this world already uses for the ascent emitter outline, where the note reads
+     "four marks, not a ring". The line still describes the circle; it just lets the floor through. */
+  for (let i = 0; i < 24; i++) {
+    const a = i / 24 * Math.PI * 2, R = 27.9;
     if (Math.sin(a) < -0.55 && Math.abs(Math.cos(a)) < 0.5) continue;   /* leave the MAH MATCH approach open */
     part(curb, chamferBox(2.6, 0.12, 0.3, 0.03), Math.cos(a) * R, 0.06, Math.sin(a) * R, -a + Math.PI / 2);
   }
