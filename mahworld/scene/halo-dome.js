@@ -193,14 +193,71 @@ export function buildHaloDome(ctx, opts = {}) {
   }
 
   /* ---- materials ------------------------------------------------------------------------------ */
+  /* R2 — THE DOME WAS NOT DIM. IT WAS ERASED, AND HAD BEEN SINCE IT WAS BUILT.
+     DIRECTION: "we also don't even see the bottom of the dome — the bottom of the dome should be
+     visible from this area and the town."
+
+     Measured, not argued. The dome springs at r 3434, y 1841.6, so the springing line stands
+     hypot(3434, 1841.6) = 3897 m from the plaza; the apex is 3900 m up. Every point on this
+     structure is within 3 m of 3900 m from the world origin. mahplaza.js's fog runs to
+     `2350 + 700 * daylight` — 2350 m at night, 3050 m at noon. THE ENTIRE DOME HAS ALWAYS BEEN
+     PAST THE FAR PLANE OF THE FOG, at every hour, from every camera on the ground. It was not
+     rendering faintly; it was rendering as 100% fog colour, which is to say as sky. Nothing about
+     its geometry, its panels, its ribs or its seams was ever visible from the plaza, and no amount
+     of work on any of them would have changed that.
+
+     THE FIX IS THE ONE THIS WORLD ALREADY USES FOR THINGS PAST THE FOG. terrain.js's rock and land
+     both run `fog: false` and carry their aerial perspective as painted VALUE instead, for exactly
+     this reason — its own note says the fog "would otherwise erase everything past 860 m". The dome
+     is four times further out than the mountains and belongs in the same category: an object whose
+     recession is a decision, not a fog integral.
+
+     SO THE VALUES ARE SET AGAINST THE NIGHT SKY, and they are set LOW. The night horizon key is
+     0x1d3d6e; the far mountain range sits just above it at 0x7a8fb8 to read as haze. The dome is
+     further than the far range and must sit nearer the sky than that — near enough that what you
+     read is one enormous arc springing off the horizon and the faintest suggestion of ribs inside
+     it, and not a lattice of bright lines across the whole sky, which is a named defect of this
+     project (R4 §13) and is the thing this change is most able to break. RECESSION is that
+     multiplier, applied to every one of the four grades; the seams take it twice, because additive
+     blending does not care how dim you made the surface underneath.
+
+     AND RECESSION IS A LERP TOWARD THE SKY, NOT A MULTIPLY TOWARD BLACK. The first cut of this
+     multiplied every grade's colour by 0.30 and the apex oculus came back as a solid BLACK DISC
+     punched in the night sky — because 0xb6c4d6 * 0.3 is 0x363a40, which is darker than the sky it
+     sits in front of. Aerial perspective does not darken things; it pulls everything, light and
+     dark alike, toward the colour of the air between. So `AIR` is the night sky's own horizon key,
+     the same 0x1d3d6e terrain.js sets its ranges against, and each grade is mixed toward it. What
+     that leaves is a compressed value range straddling the sky — ribs a little above it, dark
+     members a little below — which is what a structure 3.9 km away looks like and is exactly enough
+     to draw one enormous arc without latticing the sky.
+
+     THIS IS BAKED FOR NIGHT, and deliberately: the sky's horizon runs from 0x1d3d6e at night to
+     0xc4d5ea at noon, so a single mix cannot be right at both. terrain.js made the same call for
+     the same reason ("the values are set AGAINST THE NIGHT SKY, not in isolation") and this world
+     is judged at night. If the day frame ever becomes the subject, the fix is a clock hook here,
+     not a compromise value. */
+  const RECESSION = 0.30;
+  const AIR = new THREE.Color(0x1d3d6e);
+  /* mix a grade's own colour toward the air: 0 leaves it alone, 1 dissolves it into the sky */
+  const recede = (mat, k) => { mat.color.lerp(AIR, k); return mat; };
   const platinum = (M.platinumLit || M.platinum || new THREE.MeshStandardMaterial({ color: 0xb6c4d6 })).clone();
   /* the dome's ribs and diamond nodes are almost all vertical or raked, which is the case the
      single 0.38 compromise served worst — see applyPlatinumFinish */
-  platinum.envMapIntensity = 1.55; applyPlatinumFinish(platinum);
+  platinum.envMapIntensity = 1.55 * RECESSION; applyPlatinumFinish(platinum);
+  /* the ribs are the arc. They mix 68% into the air, which leaves them a little ABOVE the sky —
+     enough to draw a line at 3.9 km and not enough to become a lattice. */
+  recede(platinum, 0.68);
+  platinum.fog = false;
   platinum.vertexColors = true; platinum.name = 'dome-platinum'; owned.materials.push(platinum);
   const darkMat = (M.graphiteMetal || M.paving || new THREE.MeshStandardMaterial({ color: 0x0b0f16 })).clone();
   darkMat.vertexColors = true; darkMat.name = 'dome-dark';
-  darkMat.roughness = 0.28; darkMat.envMapIntensity = 0.9;
+  darkMat.roughness = 0.28; darkMat.envMapIntensity = 0.9 * RECESSION;
+  /* the dark grade mixes FURTHER into the air than the ribs do, because it starts at near-black and
+     a near-black member at 3.9 km is a hole in the horizon — which is exactly what the apex oculus
+     rendered as on the first cut of this change. It still lands a little under the sky, so the
+     oculus reads as a disc rather than as a void. */
+  recede(darkMat, 0.80);
+  darkMat.fog = false;
   owned.materials.push(darkMat);
   /* THE SHELL. Opacity 0.16 is the whole argument of R5 §5 in one number: enough to read as a
      surface when the light rakes across it, far too little to take the sky away. DoubleSide because
@@ -208,14 +265,16 @@ export function buildHaloDome(ctx, opts = {}) {
      behind it is never occluded by a pane. */
   const shellMat = new THREE.MeshStandardMaterial({
     color: 0x9fc4ea, metalness: 0.06, roughness: 0.04, transparent: true, opacity: 0.16,
-    envMapIntensity: 1.25, side: THREE.DoubleSide, depthWrite: false, vertexColors: true
+    envMapIntensity: 1.25 * RECESSION, side: THREE.DoubleSide, depthWrite: false, vertexColors: true,
+    fog: false
   });
+  recede(shellMat, 0.55);
   shellMat.name = 'dome-shell'; owned.materials.push(shellMat);
   /* the MAHGIC seams — selective, never a lattice of light (R4's own correction: over-bright beams
      that latticed the sky were a named defect and this is the same geometry at four times the size) */
   const seamMat = new THREE.MeshBasicMaterial({
-    color: theme.energyLight || 0xdff1ff, transparent: true, opacity: 0.34,
-    blending: THREE.AdditiveBlending, depthWrite: false, fog: true, toneMapped: true
+    color: theme.energyLight || 0xdff1ff, transparent: true, opacity: 0.34 * RECESSION * RECESSION,
+    blending: THREE.AdditiveBlending, depthWrite: false, fog: false, toneMapped: true
   });
   seamMat.name = 'dome-mahgic-seam'; owned.materials.push(seamMat);
   const SB = [];
@@ -586,10 +645,15 @@ export function buildHaloDome(ctx, opts = {}) {
     group, stats, DOME, domeY, domeSlope,
     setTime(s) {
       const night = 1 - (s && s.daylight != null ? s.daylight : 0);
-      seamMat.opacity = 0.12 + 0.26 * night;
+      /* RECESSION is applied HERE as well as at construction, and it has to be. This hook rewrites
+         both opacities every time the clock moves, so a recession set only in the constructor is
+         undone by the first tick — which is the quiet kind of failure that makes a change look like
+         it did nothing. The seam takes it squared for the reason given at the material: additive
+         blending ignores how dim the surface behind it is. */
+      seamMat.opacity = (0.12 + 0.26 * night) * RECESSION * RECESSION;
       /* by day the shell has the sky behind it and needs less of its own value; at night it is the
          only thing between the sanctuary and the stars and has to read as a surface */
-      shellMat.opacity = 0.10 + 0.08 * night;
+      shellMat.opacity = (0.10 + 0.08 * night) * (0.45 + 0.55 * RECESSION);
     },
     setTheme(t) { if (t && t.energyLight) seamMat.color.setHex(t.energyLight); },
     setDetail(dist) {

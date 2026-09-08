@@ -144,13 +144,30 @@ function directoryTexture(ctx) {
 }
 
 const MARKER = [0, 14];
-/* the routes are read from the SITE PLAN, so the paths always arrive where the buildings actually are */
+/* THE ROUTE NETWORK. Every destination end is read from the SITE PLAN, so a path always arrives
+   where the building actually is; a hand-typed endpoint is how a road ends up in a wall (L42).
+
+   R2 added the last three rows, on the direction's own list — "leading to certain buildings and
+   DIRECTORIES and OUTSIDE OF THE MAP and other parts of the map". The first five go to the three
+   destinations and the two corridor mouths; the sixth is the short spur to the directory pylon,
+   which is the one object on this plaza that tells a newcomer where anything is and had no path to
+   it; the last two run past the deck edge and out of the plaza entirely, north-west and north-east,
+   so the eye is given somewhere the world continues to rather than a rim it stops at.
+
+   `w` is the bed width, and the widths are a HIERARCHY, not a preference: MAH MATCH is the primary
+   approach and reads widest, the two flanking destinations are secondary, and a spur is a spur. */
 const ROUTES = [
   { to: SITES.match.approach, w: 5.2 },    /* MAH MATCH forecourt */
   { to: SITES.gym.approach, w: 4.4 },      /* MAH GYM apron */
   { to: SITES.market.approach, w: 4.4 },   /* MAH MARKET apron */
   { to: [-40, 40], w: 3.6 },               /* west corridor mouth */
-  { to: [40, 40], w: 3.6 }                 /* east corridor mouth */
+  { to: [40, 40], w: 3.6 },                /* east corridor mouth */
+  /* THE DIRECTORY. The pylon body stands at (20, 14) yawed −0.5, so its READABLE face looks along
+     (sin −0.5, cos −0.5) = (−0.48, 0.88). The spur ends 3.4 m out along that normal — in front of
+     the board, where someone reading it would stand — and not at the post, which is its back. */
+  { to: [20 + Math.sin(-0.5) * 3.4, 14 + Math.cos(-0.5) * 3.4], w: 2.8 },
+  { from: [-40, 40], to: [-62, 74], w: 3.2 },  /* and out of the plaza: north-west, past the deck edge */
+  { from: [40, 40], to: [62, 74], w: 3.2 }     /* north-east, the same */
 ];
 const NODES = [[-16, 6], [17, 4]];
 /* masts sit inside the plaza, never in the arrival camera's near foreground (z ≳ 24 at the edges reads
@@ -175,27 +192,92 @@ export function buildDressing(ctx) {
   const curb = [], slab = [], trim = [], dark = [];
   const pools = [], luminaires = [];
 
-  /* ---- 1. PATHS: inlaid bands of a lighter, rougher stone with a curb lip ---- */
-  const chevron = canvasTexture(64, 256, (c, w, h) => {
-    c.clearRect(0, 0, w, h);
-    c.strokeStyle = 'rgba(150,180,220,0.5)'; c.lineWidth = 4;
-    for (let i = 0; i < 3; i++) { const y = 40 + i * 88; c.beginPath(); c.moveTo(14, y + 22); c.lineTo(w / 2, y); c.lineTo(w - 14, y + 22); c.stroke(); }
+  /* ---- 1. PATHS -------------------------------------------------------------------------------
+     DIRECTION, R2: "think about pathways and streets that would be obvious to walk on and around
+     and leading to certain buildings and directories and outside of the map and other parts of the
+     map ... using our theming and branding of the square diamonds."
+
+     THE PATHS WERE ALREADY HERE. FIVE OF THEM. THEY WERE INVISIBLE, AND THE REASON IS TWO NUMBERS.
+     The bed was M.paving at 0x0e0f11 and the deck it crosses is M.plaza at 0x060607 — luminance 15
+     against luminance 6, a nine-count difference on a 255 scale, which no eye reads as an edge and
+     no screenshot has ever shown. The guidance chevrons were a 0.5-alpha stroke on a 0.22-opacity
+     material, i.e. an effective alpha of about 0.11 on a near-black floor. So the network was
+     complete, correctly routed off the shared SITE PLAN, and completely unreadable — which is why
+     the note came back asking for pathways in a plaza that already had five.
+
+     THE FIX IS NOT TO MAKE THE PATH LIGHTER. This world's ground is near-black on purpose (v11 took
+     the paving to black deliberately, and R1 kept it there); a grey ribbon across it would undo that
+     and would be the "basic" the direction warns against in the same breath. A path here reads by
+     FINISH and by EDGE, which is how this world already distinguishes everything else:
+
+       · THE BED stays matte black — M.paving, roughness 0.34. What changes is the thing it crosses:
+         the deck is a MIRROR at roughness 0.055 and metalness 0.98. A matte ribbon laid across a
+         black mirror is unmistakable at any hour, because the mirror carries the sky and the towers
+         and the path does not. The value difference was never going to do this. The FINISH always
+         could, and it was already there, unhelped.
+       · THE RAILS are the line that makes it obvious. One continuous chromeMirror rail down each
+         flank — the palette's own "focal trim, hero catches, portal frames" grade — standing 4 cm
+         proud of the bed. Under LAW 1 a mirror grade takes no diffuse and is lit by the environment
+         alone, so at night these are moonlit silver hairlines running out of the plaza toward each
+         destination, and by day they are the same line in daylight. This replaces M.curb, which at
+         0x222427 was doing the same nine-count nothing the bed was.
+       · THE DIAMONDS are the branding, and they are the paving unit, not a decal. A square diamond
+         is set flush in the bed on a fixed pitch down the centre of every route, in the same mirror
+         grade as the rails. Walking a route you cross one diamond, then another, then another: the
+         brand IS the road surface. The chevron texture is gone — a decal that could not be seen
+         replaced by geometry that catches light is the whole trade.
+       · THE JOINT is one energy line inside each rail, the world's own MAHGIC seam, laid at the
+         same low value as every other seam on this plaza and driven by the clock with them.
+
+     AND THE NETWORK NOW GOES WHERE THE DIRECTION SAYS. Three destinations and two corridor mouths
+     were the old five; a spur to the DIRECTORY pylon and two routes running clear off the deck to
+     the world beyond it are the new three. See ROUTES. */
+  const RAIL = { w: 0.14, h: 0.075, out: 0.02 };  /* the flank rail: width, height above the bed, and how far it sits outboard of the bed edge */
+  const DIAMOND_PITCH = 5.6;                      /* metres between centre diamonds — one per stride-and-a-half, not a chequerboard */
+  const DIAMOND_R = 0.62;                         /* half-diagonal of a centre diamond */
+  const seamMat = new THREE.MeshBasicMaterial({
+    color: (ctx.theme && ctx.theme.energy) || 0x7fc6ff, transparent: true, opacity: 0.30,
+    blending: THREE.AdditiveBlending, depthWrite: false, fog: false
   });
-  chevron.wrapS = chevron.wrapT = THREE.RepeatWrapping;
-  const guideMat = new THREE.MeshBasicMaterial({ map: chevron, transparent: true, opacity: 0.22, depthWrite: false });
-  owned.push(chevron);
+  seamMat.name = 'dressing-path-seam'; seamMat.userData.moduleOwned = true;
+  const seams = [], rails = [], marks = [];
   for (const r of ROUTES) {
-    const dx = r.to[0] - MARKER[0], dz = r.to[1] - MARKER[1];
+    const from = r.from || MARKER;
+    const dx = r.to[0] - from[0], dz = r.to[1] - from[1];
     const len = Math.hypot(dx, dz), ang = Math.atan2(dx, dz);
-    const cx = MARKER[0] + dx / 2, cz = MARKER[1] + dz / 2;
+    const cx = from[0] + dx / 2, cz = from[1] + dz / 2;
+    /* the unit vector ACROSS the route — everything flanking it is offset along this */
+    const nx = Math.cos(ang), nz = -Math.sin(ang);
     part(slab, chamferBox(r.w, 0.05, len, 0.03), cx, 0.025, cz, ang);
-    /* the curb lip either side: where the path stone meets the plaza stone */
-    for (const sd of [-1, 1]) part(curb, chamferBox(0.16, 0.07, len, 0.02), cx + Math.cos(ang) * sd * r.w / 2, 0.035, cz - Math.sin(ang) * sd * r.w / 2, ang);
-    /* guidance chevrons, restrained */
-    const guide = new THREE.Mesh(own(new THREE.PlaneGeometry(r.w * 0.5, len)), guideMat);
-    guide.rotation.x = -Math.PI / 2; guide.rotation.z = -ang; guide.position.set(cx, 0.058, cz);
-    guide.material.map.repeat.set(1, Math.max(2, Math.round(len / 9)));
-    guide.renderOrder = 5; group.add(guide);
+    for (const sd of [-1, 1]) {
+      const off = sd * (r.w / 2 + RAIL.out);
+      part(rails, chamferBox(RAIL.w, RAIL.h, len, 0.025), cx + nx * off, 0.05, cz + nz * off, ang);
+      /* the seam sits INSIDE its rail, in the rail's own shadow, which is where a light line belongs:
+         on top of the bed it would read as paint, and outside the rail it would light the deck the
+         path is supposed to be distinct from */
+      const so = sd * (r.w / 2 - 0.30);
+      part(seams, chamferBox(0.10, 0.012, len - 0.4, 0.004), cx + nx * so, 0.058, cz + nz * so, ang);
+    }
+    /* THE DIAMOND COURSE. Whole diamonds only: a pitch that does not divide the run leaves a clipped
+       one at the far end, and a half diamond is not the brand figure. The count is floored and the
+       course is centred on the run, so both ends finish on clear bed. */
+    const nD = Math.max(1, Math.floor((len - 3.0) / DIAMOND_PITCH));
+    const span = (nD - 1) * DIAMOND_PITCH;
+    for (let i = 0; i < nD; i++) {
+      const t = (len - span) / 2 + i * DIAMOND_PITCH - len / 2;
+      /* §06's square diamond, WIDER THAN TALL in plan: the across-axis half is the full radius and
+         the along-axis half is shorter, so a walker meets the wide face of the figure, not its point */
+      part(marks, chamferBox(DIAMOND_R * 2 * 0.72, 0.022, DIAMOND_R * 2 * 0.72, 0.05),
+        cx + Math.sin(ang) * t, 0.062, cz + Math.cos(ang) * t, ang + Math.PI / 4);
+    }
+  }
+  {
+    /* the rails and the diamond course are the same grade and the same purpose, so they are one mesh */
+    const railMesh = new THREE.Mesh(own(mergeParts(rails.concat(marks))), M.trim || M.chromeMirror || M.platinumLit);
+    railMesh.name = 'dressing-path-rails'; group.add(railMesh);
+    if (ctx.reflect) { try { ctx.reflect(railMesh, 0.35); } catch (e) {} }
+    const seamMesh = new THREE.Mesh(own(mergeParts(seams)), seamMat);
+    seamMesh.name = 'dressing-path-seams'; seamMesh.renderOrder = 5; group.add(seamMesh);
   }
 
   /* ---- 2. NODES: a seating ring segment, a planter surround, a mast ---------- */
@@ -452,18 +534,22 @@ export function buildDressing(ctx) {
     daylight = s ? s.daylight : daylight;
     const k = 1 - 0.7 * daylight;
     poolMat.opacity = 0.13 * k;
+    /* the route seams are the same class of light as the pools and step back with them: a wayfinding
+       line that holds full strength at noon is signage, and this world's seams are architecture */
+    seamMat.opacity = 0.30 * k;
     return s;
   }
-  function setTheme(t) { if (t && t.energy != null) poolMat.color.setHex(t.energy); return t; }
+  function setTheme(t) { if (t && t.energy != null) { poolMat.color.setHex(t.energy); seamMat.color.setHex(t.energy); } return t; }
   function update(t) {
     /* one very slow breath so the pools are not perfectly static at night; imperceptible by day */
     breath = 0.94 + Math.sin(t * 0.3) * 0.06;
     poolMat.opacity = 0.13 * (1 - 0.7 * daylight) * breath;
+    seamMat.opacity = 0.30 * (1 - 0.7 * daylight) * breath;
   }
   function dispose() {
     if (group.parent) group.parent.remove(group);
     owned.forEach(g => { if (g && g.dispose) g.dispose(); });
-    poolMat.dispose(); guideMat.dispose();
+    poolMat.dispose(); seamMat.dispose();
   }
   setTime(ctx.clock && ctx.clock.state ? ctx.clock.state() : null);
   return { group, setTime, setTheme, update, dispose, stats };

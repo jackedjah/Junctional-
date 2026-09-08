@@ -1451,7 +1451,9 @@ export async function createMahplaza(canvas, options = {}) {
           if (!o.isMesh) return;
           const m = o.material;
           const mats = Array.isArray(m) ? m : [m];
-          if (mats.some(x => x === M.plaza || x === M.road)) hidden.push(o);
+          /* R1 c2: the three cell-field grades are floor too. Without them here the field
+             rendered into its own reflection — the plaza reflecting the plaza. */
+          if (mats.some(x => x === M.plaza || x === M.road || (ctx.floorMaterials || []).indexOf(x) >= 0)) hidden.push(o);
         });
         hidden.push(reflections);
       },
@@ -1521,82 +1523,96 @@ export async function createMahplaza(canvas, options = {}) {
     /* Patch the floor's shader rather than replacing the material: M.plaza keeps its diamond
        roughness and bump maps, its metalness and its place in the palette, and gains one projected
        sample on top. */
-    M.plaza.onBeforeCompile = (shader) => {
-      shader.uniforms.tPlazaMirror = { value: mirror.rt.texture };
-      shader.uniforms.uMirrorMatrix = { value: mirror.texMatrix };
-      shader.uniforms.uMirrorStrength = mirror.strength;
-      shader.vertexShader = 'uniform mat4 uMirrorMatrix;\nvarying vec4 vMirrorCoord;\n' + shader.vertexShader
-        .replace('#include <project_vertex>', '#include <project_vertex>\n  vMirrorCoord = uMirrorMatrix * ( modelMatrix * vec4( transformed, 1.0 ) );');
-      shader.fragmentShader = 'uniform sampler2D tPlazaMirror;\nuniform float uMirrorStrength;\nvarying vec4 vMirrorCoord;\n' + shader.fragmentShader
-        .replace('#include <opaque_fragment>', `
-        {
-          /* SURFACE BREAK-UP. The plaza is cut stone, not a pond: ground.js sets every cell crown
-             about 1.2 degrees off its own table and every joint is a real edge. Pushing the
-             projected sample along the BUMPED normal is what puts that relief into the reflection,
-             so the returned city is broken across the lattice instead of arriving whole — and it is
-             the cheapest available stand-in for a roughness-convolved probe. */
-          vec4 mcoord = vMirrorCoord;
-          mcoord.xy += normal.xz * 0.085 * mcoord.w;
-          /* ROUGHNESS CONVOLUTION GROWS WITH PATH LENGTH. A perfectly sharp planar pass returns the
-             skyline as legibly upside down as it is right way up, and no amount of dimming fixes
-             that — a dim duplicate is still a duplicate. Real polished stone smears a reflection
-             VERTICALLY, and it smears the far ones more than the near ones, because the reflected
-             ray has travelled further across the same micro-relief. Three taps up the view axis,
-             widening with distance: the bench two metres away stays crisp, the tower four hundred
-             metres away arrives as a streak of its own light. This, not the strength, is what turns
-             "the city is duplicated upside down" into "that floor is insane". */
-          float mdist = length( vViewPosition );
-          float smear = ( 0.0035 + 0.030 * smoothstep( 18.0, 140.0, mdist ) ) * mcoord.w;
-          vec4 mup = mcoord + vec4( 0.0, smear, 0.0, 0.0 );
-          vec4 mdn = mcoord - vec4( 0.0, smear, 0.0, 0.0 );
-          vec3 mrefl = texture2DProj( tPlazaMirror, mcoord ).rgb * 0.40
-            + texture2DProj( tPlazaMirror, mup ).rgb * 0.30
-            + texture2DProj( tPlazaMirror, mdn ).rgb * 0.30;
-          /* FRESNEL. A mirror floor returns almost everything at a grazing angle and very little
-             looking straight down at your feet — that asymmetry is most of what reads as "wet
-             polished stone" rather than "a picture pasted on the ground". */
-          float ndv = clamp( dot( normalize( vViewPosition ), normal ), 0.0, 1.0 );
-          float fres = pow( 1.0 - ndv, 4.0 );
-          /* COHERENCE FALLS OFF WITH PATH LENGTH — the correction §10 actually asks for. Every plaza
-             camera looks at this floor at a 2-12 degree depression, so fresnel alone was near 1.0
-             across the whole visible deck and the far half returned the skyline sharply enough to
-             be read as a second city hanging upside down. That is the one reaction the law rules
-             out. The NEAR floor keeps its reflection — lamps, seams, the monument, residents, the
-             part that reads as "that floor is insane" — and the far floor lets go of it. */
-          float coh = 1.0 - 0.72 * smoothstep( 60.0, 300.0, mdist );
-          /* BLACK PLATINUM ABSORBS. What comes back off this stone is darker and cooler than the
-             thing that cast it; returning it neat is what makes a mirror read as a hole. */
-          mrefl *= vec3( 0.52, 0.60, 0.78 );
+    /* R1 c2 — EVERY FLOOR MATERIAL GETS THE MIRROR, NOT JUST THE BASE PLANE.
+       The projected reflection was patched onto M.plaza alone. But ground.js lays THREE cell-field
+       grades (hero / satin / contrast) over that base plane at renderOrder 3, covering the whole
+       44 m hero field, and they were transparent at opacity 0.86-0.92 — so across the plaza a
+       player was looking at 86-92% un-mirrored material with a sliver of the real reflection
+       leaking through underneath. The world's principal surface, and the mirror never reached it.
 
-          /* ---- v11: ALMOST PITCH BLACK, AND STILL A MIRROR --------------------------------------
-             Direction: "I want the reflective floor almost pitch black."
+       So the patch is a named function applied to all four, the three field grades become OPAQUE
+       (they no longer need to let anything through), and they join the hidden list in collect() so
+       the field does not render into its own reflection. */
+    const patchMirror = (mat) => {
+      mat.onBeforeCompile = (shader) => {
+        shader.uniforms.tPlazaMirror = { value: mirror.rt.texture };
+        shader.uniforms.uMirrorMatrix = { value: mirror.texMatrix };
+        shader.uniforms.uMirrorStrength = mirror.strength;
+        shader.vertexShader = 'uniform mat4 uMirrorMatrix;\nvarying vec4 vMirrorCoord;\n' + shader.vertexShader
+          .replace('#include <project_vertex>', '#include <project_vertex>\n  vMirrorCoord = uMirrorMatrix * ( modelMatrix * vec4( transformed, 1.0 ) );');
+        shader.fragmentShader = 'uniform sampler2D tPlazaMirror;\nuniform float uMirrorStrength;\nvarying vec4 vMirrorCoord;\n' + shader.fragmentShader
+          .replace('#include <opaque_fragment>', `
+          {
+            /* SURFACE BREAK-UP. The plaza is cut stone, not a pond: ground.js sets every cell crown
+               about 1.2 degrees off its own table and every joint is a real edge. Pushing the
+               projected sample along the BUMPED normal is what puts that relief into the reflection,
+               so the returned city is broken across the lattice instead of arriving whole — and it is
+               the cheapest available stand-in for a roughness-convolved probe. */
+            vec4 mcoord = vMirrorCoord;
+            mcoord.xy += normal.xz * 0.085 * mcoord.w;
+            /* ROUGHNESS CONVOLUTION GROWS WITH PATH LENGTH. A perfectly sharp planar pass returns the
+               skyline as legibly upside down as it is right way up, and no amount of dimming fixes
+               that — a dim duplicate is still a duplicate. Real polished stone smears a reflection
+               VERTICALLY, and it smears the far ones more than the near ones, because the reflected
+               ray has travelled further across the same micro-relief. Three taps up the view axis,
+               widening with distance: the bench two metres away stays crisp, the tower four hundred
+               metres away arrives as a streak of its own light. This, not the strength, is what turns
+               "the city is duplicated upside down" into "that floor is insane". */
+            float mdist = length( vViewPosition );
+            float smear = ( 0.0035 + 0.030 * smoothstep( 18.0, 140.0, mdist ) ) * mcoord.w;
+            vec4 mup = mcoord + vec4( 0.0, smear, 0.0, 0.0 );
+            vec4 mdn = mcoord - vec4( 0.0, smear, 0.0, 0.0 );
+            vec3 mrefl = texture2DProj( tPlazaMirror, mcoord ).rgb * 0.40
+              + texture2DProj( tPlazaMirror, mup ).rgb * 0.30
+              + texture2DProj( tPlazaMirror, mdn ).rgb * 0.30;
+            /* FRESNEL. A mirror floor returns almost everything at a grazing angle and very little
+               looking straight down at your feet — that asymmetry is most of what reads as "wet
+               polished stone" rather than "a picture pasted on the ground". */
+            float ndv = clamp( dot( normalize( vViewPosition ), normal ), 0.0, 1.0 );
+            float fres = pow( 1.0 - ndv, 4.0 );
+            /* COHERENCE FALLS OFF WITH PATH LENGTH — the correction §10 actually asks for. Every plaza
+               camera looks at this floor at a 2-12 degree depression, so fresnel alone was near 1.0
+               across the whole visible deck and the far half returned the skyline sharply enough to
+               be read as a second city hanging upside down. That is the one reaction the law rules
+               out. The NEAR floor keeps its reflection — lamps, seams, the monument, residents, the
+               part that reads as "that floor is insane" — and the far floor lets go of it. */
+            float coh = 1.0 - 0.72 * smoothstep( 60.0, 300.0, mdist );
+            /* BLACK PLATINUM ABSORBS. What comes back off this stone is darker and cooler than the
+               thing that cast it; returning it neat is what makes a mirror read as a hole. */
+            mrefl *= vec3( 0.52, 0.60, 0.78 );
 
-             Those two words fight each other only while the deck's OWN value and the value it
-             RETURNS are the same number. mix() made them the same number: it REPLACES the surface
-             with the reflection, so the floor could never be darker than what it was reflecting.
-             Reflecting a night sky at lum 90 gave a floor at lum 90, and no amount of tinting the
-             stone could get underneath that — which is exactly why three passes at the material
-             failed to move the measured pixel.
+            /* ---- v11: ALMOST PITCH BLACK, AND STILL A MIRROR --------------------------------------
+               Direction: "I want the reflective floor almost pitch black."
 
-             A real black mirror does not work that way. Obsidian is not a window onto a second
-             city; it is a black surface that ADDS what it catches. Dark reflected content adds
-             nothing and the stone stays black; bright reflected content — a lit window, a lamp, a
-             beam, a sign — adds a streak. So the operator changes from mix to ADD, and the
-             surface's own term is crushed first:
+               Those two words fight each other only while the deck's OWN value and the value it
+               RETURNS are the same number. mix() made them the same number: it REPLACES the surface
+               with the reflection, so the floor could never be darker than what it was reflecting.
+               Reflecting a night sky at lum 90 gave a floor at lum 90, and no amount of tinting the
+               stone could get underneath that — which is exactly why three passes at the material
+               failed to move the measured pixel.
 
-               surface  x 0.11   the deck contributes almost nothing of its own
-               + reflection      the ONLY thing that lifts it above black
+               A real black mirror does not work that way. Obsidian is not a window onto a second
+               city; it is a black surface that ADDS what it catches. Dark reflected content adds
+               nothing and the stone stays black; bright reflected content — a lit window, a lamp, a
+               beam, a sign — adds a streak. So the operator changes from mix to ADD, and the
+               surface's own term is crushed first:
 
-             The result is a floor that is nearly pitch black wherever it is returning sky, mountain
-             or dark mass, and carries bright streaks of the city exactly where the city is lit —
-             which is both what the reference frames show and what the direction asks for. It also
-             means the darker the world behind the camera, the blacker the floor, automatically. */
-          outgoingLight *= 0.11;
-          outgoingLight += mrefl * uMirrorStrength * coh * ( 0.05 + 0.95 * fres );
-        }
-        #include <opaque_fragment>`);
+                 surface  x 0.11   the deck contributes almost nothing of its own
+                 + reflection      the ONLY thing that lifts it above black
+
+               The result is a floor that is nearly pitch black wherever it is returning sky, mountain
+               or dark mass, and carries bright streaks of the city exactly where the city is lit —
+               which is both what the reference frames show and what the direction asks for. It also
+               means the darker the world behind the camera, the blacker the floor, automatically. */
+            outgoingLight *= 0.11;
+            outgoingLight += mrefl * uMirrorStrength * coh * ( 0.05 + 0.95 * fres );
+          }
+          #include <opaque_fragment>`);
+      };
+      mat.needsUpdate = true;
     };
-    M.plaza.needsUpdate = true;
+    patchMirror(M.plaza);
+    (ctx.floorMaterials || []).forEach(m => { m.transparent = false; m.opacity = 1; patchMirror(m); });
   }
 
   function frame(now) {

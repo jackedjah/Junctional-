@@ -335,25 +335,95 @@ export function buildSky(ctx) {
   const galaxy = new THREE.Mesh(galaxyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
   galaxy.renderOrder = -9; sphere.add(galaxy);
 
-  /* stars — still ONE Points object: a sparse general field PLUS a much denser population
-     clustered along the band's spine, with per-vertex brightness and a blue-white → violet-white
-     tint so the clusters read. Seeded, so the sky is the same sky every session. */
-  const starGeo = new THREE.BufferGeometry(); const sp = [], sc = [];
+  /* STARS. (R2 — direction: "we're looking at the sky, there's no clear contrast because their
+     stars are not that good.")
+
+     WHY THEY WERE NOT GOOD, AS A NUMBER. One Points object, `size: 2.2`, `sizeAttenuation: true`,
+     on a sphere of radius 850 that follows the camera — so every star in the sky sat at exactly
+     850 m, forever. three computes an attenuated point as `size * (viewportHeight / 2) / distance`,
+     which on a 720 px canvas is 2.2 * 360 / 850 = 0.93 PIXELS. Every star in MAHWORLD was a
+     sub-pixel dot, and all 1,140 of them were the same sub-pixel dot: the per-vertex brightness
+     varied, but a value range spread across objects too small to resolve is a value range the eye
+     never receives. That is the whole of "not that good", and no amount of tinting or seeding
+     would have fixed it, because the defect was in the size, and the size was one number.
+
+     WHAT A SKY NEEDS INSTEAD IS A MAGNITUDE HIERARCHY. Real star fields read because a handful of
+     stars are unmistakably brighter and BIGGER than the rest, a middle population gives the sky its
+     structure, and a fine dust underneath gives it depth. Three tiers, three Points objects, three
+     sizes — because PointsMaterial carries one size for the whole object and there is no per-vertex
+     size without a custom shader, and three draw calls is the honest price of the thing being asked
+     for. sizeAttenuation is now OFF on all three: the sphere is at a fixed radius, so attenuation
+     was only ever converting a constant into a smaller constant, and off means the sizes below are
+     PIXELS and can be reasoned about.
+
+     THE BRIGHT TIER IS ROUND. A PointsMaterial with no map draws a SQUARE, which at 1 px nobody can
+     tell and at 6 px is unmistakably a rectangle — so the top tier carries a soft radial sprite and
+     the two below it stay square, where square is sub-pixel and free.
+
+     CONTRAST IS ALSO A GROUND, not only a figure. The night sky's own top value is 0x081226, which
+     is dark enough; what flattened it was that the brightest thing in it was 0.93 px across. With
+     the hierarchy in place the field carries its own contrast, so the gradient stays as it is. */
   let ss = 20857; const srnd = () => { ss = (ss * 16807) % 2147483647; return (ss - 1) / 2147483646; };
   const starTint = new THREE.Color(), starWhite = new THREE.Color(0xd8e6ff), starViolet = new THREE.Color(0xbcb8f0), sdir = new THREE.Vector3();
-  function pushStar(x, y, z, bright, violet) { sp.push(x, y, z); starTint.copy(starWhite).lerp(starViolet, violet).multiplyScalar(bright); sc.push(starTint.r, starTint.g, starTint.b); }
-  for (let i = 0; i < 620; i++) { const a = srnd() * Math.PI * 2, e = srnd() * 0.95 + 0.05, r = 850; pushStar(Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r, 0.34 + Math.pow(srnd(), 2.2) * 0.62, srnd() * 0.3); }
-  for (let i = 0; i < 520; i++) {
-    const u = 0.04 + srnd() * (Math.PI - 0.08), cu = Math.cos(u), su = Math.sin(u);
-    const v = Math.max(-1.25, Math.min(1.25, (srnd() + srnd() + srnd() - 1.5) * 0.84)), a = galWidth(u) * v;
-    sdir.set(galA.x * cu + galB.x * su, galA.y * cu + galB.y * su, galA.z * cu + galB.z * su).multiplyScalar(Math.cos(a)).addScaledVector(galPole, Math.sin(a)).normalize();
-    if (sdir.y < 0.05) continue;                                   /* the band's stars stop at the horizon with the band */
-    pushStar(sdir.x * 848, sdir.y * 848, sdir.z * 848, 0.3 + Math.pow(srnd(), 1.8) * 0.85, 0.15 + srnd() * 0.5);
+  /* the three tiers, brightest first. `n` is the general field; `band` is the extra population
+     seeded along the galaxy's spine, which is what makes the band read as stars rather than as a
+     painted smear. `size` is in PIXELS at a device pixel ratio of 1. */
+  const STAR_TIERS = [
+    { key: 'bright', n: 54, band: 26, size: 6.4, opacity: 1.00, round: true, gain: [0.86, 0.14], violet: 0.22 },
+    { key: 'mid', n: 340, band: 200, size: 2.5, opacity: 0.92, round: false, gain: [0.52, 0.44], violet: 0.34 },
+    { key: 'dust', n: 1500, band: 900, size: 1.3, opacity: 0.62, round: false, gain: [0.24, 0.40], violet: 0.44 }
+  ];
+  const starRound = canvasTexture(64, 64, (c, w, h) => {
+    const g2 = c.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+    /* a hot centre, a short falloff, and a long faint skirt — a star, not a blob */
+    g2.addColorStop(0, 'rgba(255,255,255,1)');
+    g2.addColorStop(0.16, 'rgba(255,255,255,0.92)');
+    g2.addColorStop(0.42, 'rgba(255,255,255,0.24)');
+    g2.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g2; c.fillRect(0, 0, w, h);
+  });
+  const starTiers = [];
+  for (const T of STAR_TIERS) {
+    const sp = [], sc = [];
+    const pushStar = (x, y, z, bright, violet) => {
+      sp.push(x, y, z);
+      starTint.copy(starWhite).lerp(starViolet, violet).multiplyScalar(bright);
+      sc.push(starTint.r, starTint.g, starTint.b);
+    };
+    /* the general field: elevation biased away from the horizon exactly as before */
+    for (let i = 0; i < T.n; i++) {
+      const a = srnd() * Math.PI * 2, e = srnd() * 0.95 + 0.05, r = 850;
+      pushStar(Math.cos(a) * Math.cos(e) * r, Math.sin(e) * r, Math.sin(a) * Math.cos(e) * r,
+        T.gain[0] + Math.pow(srnd(), 2.2) * T.gain[1], srnd() * T.violet);
+    }
+    /* and the band's own population, on the galaxy's spine */
+    for (let i = 0; i < T.band; i++) {
+      const u = 0.04 + srnd() * (Math.PI - 0.08), cu = Math.cos(u), su = Math.sin(u);
+      const v = Math.max(-1.25, Math.min(1.25, (srnd() + srnd() + srnd() - 1.5) * 0.84)), a = galWidth(u) * v;
+      sdir.set(galA.x * cu + galB.x * su, galA.y * cu + galB.y * su, galA.z * cu + galB.z * su).multiplyScalar(Math.cos(a)).addScaledVector(galPole, Math.sin(a)).normalize();
+      if (sdir.y < 0.05) continue;                                 /* the band's stars stop at the horizon with the band */
+      pushStar(sdir.x * 848, sdir.y * 848, sdir.z * 848,
+        T.gain[0] + Math.pow(srnd(), 1.8) * (T.gain[1] + 0.18), 0.15 + srnd() * T.violet);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(sc, 3));
+    const mat = new THREE.PointsMaterial({
+      vertexColors: true, size: T.size, sizeAttenuation: false,
+      transparent: true, opacity: T.opacity, fog: false, depthWrite: false
+    });
+    if (T.round) { mat.map = starRound; mat.alphaTest = 0.01; mat.blending = THREE.AdditiveBlending; }
+    mat.name = 'sky-stars-' + T.key;
+    const pts = new THREE.Points(geo, mat);
+    pts.name = 'sky-stars-' + T.key;
+    pts.frustumCulled = false;
+    sphere.add(pts);
+    starTiers.push({ pts, base: T.opacity });
   }
-  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
-  starGeo.setAttribute('color', new THREE.Float32BufferAttribute(sc, 3));
-  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ vertexColors: true, size: 2.2, sizeAttenuation: true, transparent: true, opacity: 0.85, fog: false, depthWrite: false }));
-  sphere.add(stars);
+  /* the returned handle stays ONE object, because everything downstream — the module contract, the
+     quality tiers, the world clock — has always been handed a single `stars`. Its material is the
+     brightest tier's, so anything that reads stars.material.opacity still reads a real number. */
+  const stars = starTiers[0].pts;
 
   /* clouds: a few broad soft masses, MAHWORLD's own quiet sky, keyed by time */
   const clouds = new THREE.Group();
@@ -475,7 +545,11 @@ export function buildSky(ctx) {
     const moonDir = moonDirection(clockState.worldHour, new THREE.Vector3());
     moon.position.copy(moonDir).multiplyScalar(800); moon.lookAt(0, 0, 0); moon.material.opacity = 0.06 + 0.94 * Math.pow(1 - clockState.daylight, 1.5);
     moonHalo.position.copy(moonDir).multiplyScalar(790); moonHalo.material.opacity = 0.36 * (1 - clockState.daylight);
-    stars.material.opacity = 0.85 * k.stars;
+    /* every tier follows the clock, not just the handle. Each keeps its OWN base alpha so the
+       magnitude hierarchy survives the fade — a dust star at dusk must still be fainter than a
+       bright one at dusk, and scaling all three off one number would flatten them back together
+       exactly where the sky is hardest to hold. */
+    for (const t of starTiers) t.pts.material.opacity = t.base * k.stars;
     /* the galaxy band is night sky like the stars: it washes out on the same key as daylight rises */
     galaxy.material.opacity = 0.92 * k.stars;
     haze.material.opacity = k.haze;

@@ -234,9 +234,31 @@ export const SEA = Object.freeze({
     2600, 2600, 2600, 2600, 2600, 2600, 2605, 2600, 2600, 2600, 2600, 2600,
     2600, 2600, 2600, 2600, 2600, 2605, 2600, 2600, 2635, 2910, 2820, 2600
   ]),
-  SHORE_OFF: 25,          /* the minimum clearance past the measured land edge */
-  SHORE_A1: 150, SHORE_N1: 3,
-  SHORE_A2: 70, SHORE_N2: 7,
+  /* R1 c2 — THE SEA HAD TO REACH THE LAND, AND IT NEVER DID.
+     SHORE_OFF was +25 with both harmonics scaled into 0..1 and therefore strictly non-negative, so
+     the minimum possible gap between the measured land edge and the water was 27 m and the maximum
+     243 m: a void ring of 2.28 km around the entire continent, at every bearing, permanently. The
+     director's own statement of the world is that the ocean sits outside the mainland perimeter and
+     that mainland-plus-ocean is essentially all there is to see — so an annulus of nothing between
+     them is the single largest hole in the viewable world.
+
+     The positive-only modulation is a GUARD, added when an earlier coast buried the land, and it is
+     kept whole: the shape still varies outward only, and the water never crosses the shoreline.
+
+     The first attempt at this took SHORE_OFF to -60 so the coast could cut 58 m inland, and the
+     sea suite caught it immediately: at 1 of its 8 tested bearings the terrain there stands 1.3 m
+     ABOVE the waterline, so the water would have run into a low rise instead of meeting a beach.
+     The gate was right and the change was wrong — cutting inland is only safe where the ground has
+     already fallen, and this terrain has not.
+
+     So the coast HUGS instead of cutting. The offset comes to 0 and the two harmonics are halved,
+     which closes the moat by making the variation smaller rather than by moving the water onto the
+     land: the gap now runs 1 to 89 m with a mean of 45, against 27 to 243 with a mean of 135. The
+     coast still varies by 88 m — bays and headlands, not a circle — but the land edge is always
+     within sight of the water instead of a kilometre-scale ring of nothing. */
+  SHORE_OFF: 0,           /* the coast meets the measured land edge at its closest bearings */
+  SHORE_A1: 60, SHORE_N1: 3,
+  SHORE_A2: 30, SHORE_N2: 7,
   R_OUT: 5600,
   DEPTH_MAX: 46,
   /* TESSELLATION, SIZED FROM THE SWIMMER'S EYE RATHER THAN FROM THE SEA'S DIAMETER.

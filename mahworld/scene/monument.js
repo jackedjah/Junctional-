@@ -185,7 +185,7 @@
 
 import * as THREE from '../vendor/three/three.module.min.js';
 import { createResident } from './residents.js';
-import { canvasTexture, chamferBox, BRAND } from './materials.js';
+import { canvasTexture, chamferBox, cutGem, gemGirdle, GEM, BRAND } from './materials.js';
 
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 const DECK_Y = 0.17;               /* ground.js FLOOR_TOP — the plaza deck everything stands on */
@@ -223,6 +223,16 @@ const PHYSIQUE = 0.9;              /* hero end of residents.js's untrained -> he
    points. Half-extents in metres; the height ratio is ground.js's monument crystal, so the two
    diamonds on this plaza are the same gem at two scales. */
 const DIA = { w: 3.30, h: 5.10, d: 1.85 };
+
+/* THE CUT, THE GIRDLE AND THE SPIN all live in materials.js now — see the note at cutGem() there.
+   They were written here first, and then ground.js turned out to hold the OTHER brand diamond, built
+   the same wrong way, and the one an arrival camera actually looks at. Two files cutting the same
+   gem two ways is precisely how the pair drifted apart to begin with (L42), so the cut moved into
+   the kit and both stones call it. What stays here is the one thing that is genuinely local: how
+   big this particular stone is, how high above the figures it is held, and how bright its halo
+   burns — a gem 38.9 m up in open sky needs a different alpha from one standing at head height on
+   the deck, which is exactly why THIS number did not follow the cut into materials.js. */
+const GEM_AURA_A = 0.11;
 
 /* THE LIGHT COLUMN. Rises from inside the plinth, through the diamond, and fades out at height.
    y0 sits BELOW the top course's tread, which is opaque, so the shaft appears to come out of the
@@ -614,33 +624,76 @@ export function buildMonument(ctx) {
 
   const _m = new THREE.Matrix4();
 
-  /* ---- THE SQUARE DIAMOND --------------------------------------------------------------------
-     The brand figure keeps its points (§06's one exemption). A bright core inside a glass shell,
-     because a crystal reads by light coming THROUGH it, and four mirror bars on the equator that
-     catch the moon on the turn — the same construction as ground.js's plaza crystal, one scale up. */
-  const diamondCoreGeo = own(new THREE.OctahedronGeometry(1, 0));   /* THE SQUARE DIAMOND, brand figure */
-  const diamondShellGeo = own(new THREE.OctahedronGeometry(1, 0));  /* square-diamond glass over the core */
-  const core = new THREE.Mesh(diamondCoreGeo, M.energyLight);
-  core.name = 'monument-diamond-core';
-  core.scale.set(DIA.w * 0.86, DIA.h * 0.86, DIA.d * 0.86);
-  core.position.set(0, diamondY, 0);
-  group.add(core);
-  const shell = new THREE.Mesh(diamondShellGeo, M.crystalGlass || M.glass);
-  shell.name = 'monument-diamond-shell';
-  shell.scale.set(DIA.w, DIA.h, DIA.d);
-  shell.position.set(0, diamondY, 0);
-  group.add(shell);
-  /* the equator catches, measured into the grade buckets like everything else */
-  {
-    const barGeo = chamferBox(0.20, 0.20, DIA.w * 1.62, 0.05);
-    for (let i = 0; i < 4; i++) {
-      const a = i * Math.PI / 2 + Math.PI / 4;
-      _m.compose(
-        new THREE.Vector3(Math.cos(a) * DIA.w * 0.52, diamondY, Math.sin(a) * DIA.d * 0.52),
-        new THREE.Quaternion().setFromEuler(new THREE.Euler(0.66, -a + Math.PI / 2, 0)),
-        new THREE.Vector3(1, 1, 1));
-      bakeGeometry(B, 'gem', barGeo, _m);
-    }
+  /* ---- THE SQUARE DIAMOND ----------------------------------------------------------------------
+     DIRECTION, R2: "the actual diamond in the middle is super stale looking. It has no depth to it.
+     It needs to have more depth and a glistening and platinumness and glow."
+
+     WHAT WAS THERE, AND WHY IT LOOKED FLAT. Two OctahedronGeometry(1, 0) — the second at 0.86 of the
+     first — one emissive, one glass, plus four bars on the equator. An octahedron has EIGHT faces, so
+     from any viewpoint you see three of them. Three facets cannot glisten: a gem sparkles because
+     dozens of small planes at slightly different angles catch the environment differently as you
+     move, and eight big ones catch it all at once or not at all. Worse, the inner solid stood at 0.86
+     of the outer, i.e. 14% of a 3.3 m gem — 23 cm of glass — so there was no INTERIOR to look into.
+     The two shells read as one white lozenge with a dark chevron where the core's silhouette
+     crossed it, which is exactly "stale" and exactly "no depth".
+
+     WHAT IT IS NOW: A CUT STONE, in three nested layers, because that is how a real one works.
+       · the SHELL is the cut — ten rings from crown point to culet, sixteen plan vertices each,
+         flat-shaded, ~256 facets. See CUT for the profile and for what `flute` does.
+       · the HEART sits at 0.62 and is chromeMirror, YAWED HALF A FACET off the shell so its facets
+         never line up with the ones in front of them. This is the layer doing most of the work: what
+         you actually see inside a diamond is the environment, folded twice, and a mirror behind glass
+         is the cheapest honest version of that. It is also why the gem now has a value RANGE instead
+         of one white note — the heart carries the darks.
+       · the FIRE sits at 0.30, emissive, and is the only part that glows. Small on purpose: a core
+         that fills the stone is a lamp, and a lamp has no depth.
+     PLATINUMNESS is the GIRDLE: a proud sixteen-sided band on the widest line, in the palette's own
+     platinum. It replaces the four equator bars, which were four objects doing worse what one
+     continuous line does — and the direction asked for less clutter, not more of it.
+     GLOW is the AURA: the same cut at 1.5, additive, no depth write, so the stone sits in a soft
+     halo of its own shape rather than in a sphere that would read as a bubble around it. It is
+     driven by the clock below with everything else this module owns.
+
+     §06 IS NOT BROKEN BY ANY OF THIS. The four cardinal points and both apexes are exactly where the
+     octahedron put them — `flute` moves only the diagonal vertices, and the plan radius is the L1
+     norm, which IS the square diamond. The silhouette is unchanged; only the surface inside it is. */
+  const gemGeo = own(cutGem(DIA.w, DIA.h, DIA.d));
+  const auraMat = new THREE.MeshBasicMaterial({
+    color: ctx.theme.energyLight, transparent: true, opacity: GEM_AURA_A,
+    blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide, fog: false
+  });
+  /* THE HALO IS A RIM, AND IT IS BackSide FOR THAT REASON. An additive DoubleSide shell renders
+     its far wall AND its near wall, so what you get is a translucent SLAB whose brightest part is
+     the middle — the longest path through it — and at any close camera it washes the whole frame
+     with a pale diamond. BackSide renders only the far wall, which the opaque heart hides across
+     the body of the stone and which survives around the silhouette: the glow ends up where a glow
+     belongs, hugging the edge, and costs half as many fragments doing it. */
+  auraMat.name = 'monument-gem-aura';
+  owned.materials.push(auraMat);
+  const gemLayer = (name, s, mat, yaw, order) => {
+    const m = new THREE.Mesh(gemGeo, mat);
+    m.name = 'monument-diamond-' + name;
+    if (Array.isArray(s)) m.scale.set(s[0], s[1], s[2]); else m.scale.setScalar(s);
+    m.rotation.y = yaw;
+    m.position.set(0, diamondY, 0);
+    if (order) m.renderOrder = order;
+    group.add(m);
+    return m;
+  };
+  const fire = gemLayer('fire', GEM.LAYERS.fire, M.energyLight, 0);
+  const heart = gemLayer('heart', GEM.LAYERS.heart, M.chromeMirror || M.platinum, GEM.YAW);
+  const shell = gemLayer('shell', GEM.LAYERS.shell, M.crystalGlass || M.glass, 0, 6);
+  const aura = gemLayer('aura', GEM.AURA, auraMat, GEM.YAW, 5);
+  aura.frustumCulled = false;
+  /* THE GIRDLE, from the kit's own solver. Baked into this module's shared 'gem' bucket exactly as
+     the four equator bars it replaces were, so it costs no extra draw call and takes the same LAW 1
+     up/down/steep split every other surface here takes. */
+  for (const b of gemGirdle(DIA.w, DIA.h, DIA.d)) {
+    const barGeo = chamferBox(b.w, b.h, b.len, b.chamfer);
+    _m.compose(new THREE.Vector3(b.x, diamondY, b.z),
+      new THREE.Quaternion().setFromEuler(new THREE.Euler(0, b.yaw, 0)),
+      new THREE.Vector3(1, 1, 1));
+    bakeGeometry(B, 'gem', barGeo, _m);
     barGeo.dispose();
   }
 
@@ -672,7 +725,7 @@ export function buildMonument(ctx) {
   /* the mirror grade's own footing in the black platinum below it */
   const mirrorMesh = group.getObjectByName('monument-mirror');
   if (reflect && mirrorMesh) { try { reflect(mirrorMesh, 0.3); } catch (e) {} }
-  if (reflect) { try { reflect(core, 0.5); } catch (e) {} }
+  if (reflect) { try { reflect(fire, 0.5); } catch (e) {} }
   /* THE STATUES ARE DELIBERATELY NOT PUT THROUGH reflect(). ctx.reflect() is the older mirrored-COPY
      path — a duplicate mesh under the deck — and the plaza now also runs a real planar mirror that
      renders the whole scene from a reflected camera. Registering the figures in both would draw the
@@ -788,11 +841,15 @@ export function buildMonument(ctx) {
       colMat.opacity = 0.5 * (0.30 + 0.70 * night);
       coreMat.opacity = 0.45 * (0.30 + 0.70 * night);
       bandMat.opacity = 0.55 + 0.40 * night;
+      /* the gem's halo is the one part of "glow" this module owns outright. It nearly disappears in
+         daylight — a glow that holds its strength at noon reads as a decal stuck on the sky. */
+      auraMat.opacity = GEM_AURA_A * (0.16 + 0.84 * night);
     },
     setTheme(theme) {
       const t = theme && theme.energy ? theme : ctx.theme;
       colMat.color.setHex(t.energy);
       coreMat.color.setHex(t.energyLight);
+      auraMat.color.setHex(t.energyLight);
       keyLight.color.setHex(t.energy);
     },
     update(t) {
@@ -801,10 +858,20 @@ export function buildMonument(ctx) {
       const k = 0.94 + 0.06 * Math.sin(t * 0.31);
       colMat.opacity = 0.5 * (0.30 + 0.70 * night) * k;
       coreMat.opacity = 0.45 * (0.30 + 0.70 * night) * (1.94 - k);
+      auraMat.opacity = GEM_AURA_A * (0.16 + 0.84 * night) * (1.94 - k);
+      /* AND THE STONE TURNS. Not the monument — the monument is stone and stone does not move — but
+         the gem it holds, at a fifth of a degree a second. This is what converts a cut into a
+         GLISTEN: a facet that is bright this second is dark the next, because it turned, and every
+         facet takes its turn. A still gem with 256 facets is still a still gem. The heart runs the
+         other way and slower, so the two layers' facets cross rather than travel together. */
+      shell.rotation.y = t * GEM.SPIN;
+      heart.rotation.y = GEM.YAW - t * GEM.SPIN * 0.55;
+      fire.rotation.y = t * GEM.SPIN * 0.30;
     },
     setQuality(q) {
       const low = q && (q.name === 'low' || q === 'low');
-      shell.visible = !low;                 /* the glass over the core is the first thing to go */
+      shell.visible = !low;                 /* the glass over the heart is the first thing to go */
+      aura.visible = !low;
       columnCore.visible = !low;
     },
     dispose() {

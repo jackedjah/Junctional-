@@ -803,6 +803,24 @@ export function createMaterials(themeIn) {
       clearcoat: 1, clearcoatRoughness: 0.05, ior: 1.45, side: THREE.DoubleSide,
       envMapIntensity: 2.6, flatShading: true
     }),
+    /* BLACK CRYSTAL, and the FLOOR's own grade. The plaza's 48 inlays and 14 standing pieces were
+       wearing shardFacet — a PALE grade at luminance 195 — so the "pointy blue cones" defect was
+       fixed as geometry in v11 and left standing as colour. Once the world stopped being blue they
+       became the loudest thing in every plaza frame, which is how a leftover tint announces itself.
+
+       This is the DARK_DIAMOND the master pack asks for and the palette did not have: near-black,
+       barely metallic, hard clearcoat, and a high env intensity so it reads by CATCH — the horizon
+       band broken across the facet jitter — instead of by tint. That is what black crystal actually
+       does, and it is the species sheet's body material.
+
+       It is a NEW grade rather than an edit to shardFacet because city.js instances shardFacet
+       across the whole skyline shard field; changing it there would darken the far city, which is a
+       different decision on a different surface. */
+    shardObsidian: new THREE.MeshPhysicalMaterial({
+      color: 0x0e1218, metalness: 0.10, roughness: 0.09, transparent: true, opacity: 0.72,
+      clearcoat: 1, clearcoatRoughness: 0.04, ior: 1.52, side: THREE.DoubleSide,
+      envMapIntensity: 3.2, flatShading: true
+    }),
     /* THE PUNGENT ACCENTS. Emissive only — a facade's MASS never takes these, its LIGHT does. */
     accentBlue: new THREE.MeshStandardMaterial({ color: 0x060a14, emissive: ACCENT.blue, emissiveIntensity: 1.45, roughness: 0.5, metalness: 0 }),
     accentCyan: new THREE.MeshStandardMaterial({ color: 0x03121a, emissive: ACCENT.cyan, emissiveIntensity: 1.35, roughness: 0.5, metalness: 0 }),
@@ -976,6 +994,154 @@ export function softMass(w, h, d, radius = 1.2, bevel = 0.35) {
   g.translate(0, 0, -d - bevel);
   return g;
 }
+/* ---- THE CUT — the brand diamond as a cut stone, and the ONE place it is cut ------------------
+   R2, on direction: "the actual diamond in the middle is super stale looking. It has no depth to
+   it. It needs to have more depth and a glistening and platinumness and glow."
+
+   THERE ARE TWO BRAND DIAMONDS ON THIS PLAZA and both were built the same wrong way. ground.js's
+   plaza crystal stands at (0, 7.2, 7) between the two statues — the one an arrival camera actually
+   looks at, and the one the note is about — and monument.js's gem is held 38.9 m up over the
+   figures' heads. monument.js's own comment already claims they are "the same gem at two scales",
+   and until now that was true only in the sense that both were an OctahedronGeometry(1, 0) inside a
+   slightly larger OctahedronGeometry(1, 0), which is eight faces, of which any viewpoint sees
+   three. Three facets cannot glisten. Worse, both put the inner solid at 86-87% of the outer, so
+   there was no interior to look into either: what rendered was a white lozenge with a dark chevron
+   across it, twice, at two scales. Exactly "stale", exactly "no depth", and the same defect copied.
+
+   So the cut lives HERE, in the kit, and both diamonds call it. Two files cutting the same gem two
+   ways is how the pair drifted apart in the first place, and L42 is the standing law about it: one
+   truth, one source.
+
+   THE CUT ITSELF. Ten rings from the crown point down to the culet, sixteen plan vertices each,
+   flat-shaded, about 256 facets — read CUT for what `flute` does and why its sign alternates. The
+   silhouette is untouched by any of it: the plan radius is the L1 norm, which IS the square diamond,
+   and flute rides on sin(2a)^2, which is zero on all four axes. §06's exemption — the brand figure
+   keeps its points — survives the whole construction, on both stones. */
+const CUT = [
+  [1.000, 0.000, 0.00],
+  [0.795, 0.215, +0.11],   /* the star facets under the crown point */
+  [0.470, 0.615, -0.08],   /* crown mains */
+  [0.130, 0.930, +0.06],   /* crown break, just above the girdle */
+  [0.042, 1.000, 0.00],    /* girdle top — the widest line */
+  [-0.042, 1.000, 0.00],   /* girdle bottom */
+  [-0.150, 0.920, -0.06],  /* pavilion break */
+  [-0.540, 0.545, +0.08],  /* pavilion mains */
+  [-0.815, 0.195, -0.11],
+  [-1.000, 0.000, 0.00]
+];
+/* The kit's public handle on the cut. Everything a caller needs to build the layers and the band:
+     N        plan vertices per ring
+     YAW      half a facet — the yaw that keeps two nested layers' facets from lining up
+     LAYERS   the three nested scales, outermost first, and what each one is FOR
+     AURA     the halo's scale
+     GIRDLE   t (half-height as a fraction of h, matching CUT's girdle rings), bar width, how far
+              the band stands proud, and its chamfer */
+export const GEM = Object.freeze({
+  N: 16,
+  YAW: Math.PI / 16,
+  /* THE FIRE IS A NEEDLE, NOT A BALL, and that is a correction rather than a flourish. The first cut
+     scaled all three layers uniformly — shell 1.00, heart 0.62, fire 0.30 — and the fire rendered
+     EXACTLY ZERO PIXELS, because the heart is opaque chromeMirror and a 0.30 solid sits entirely
+     inside a 0.60 one. The glow layer was invisible in both diamonds and the render simply looked
+     "dark", which is the failure mode this project keeps meeting: a layer that is present in the
+     graph, correct in its own terms, and occluded by the layer in front of it.
+     Scaling it 0.24 across and 0.86 tall pushes its crown point and its culet OUT through the
+     heart's own points while its waist stays hidden — so what reads is a bright vertical needle of
+     light running through the middle of the stone, seen through the glass. Which is what fire in a
+     diamond actually looks like. */
+  LAYERS: Object.freeze({ shell: 1.00, heart: 0.60, fire: Object.freeze([0.24, 0.86, 0.24]) }),
+  /* 1.16, not 1.50. At 1.50 the halo was 10 m across on the plaza stone — wider than the monument's
+     whole plinth — and being additive and DoubleSide it washed a 30-degree frame from edge to edge.
+     A halo hugs its object; anything past about 1.2 is fog with a shape. */
+  AURA: 1.16,
+  GIRDLE: Object.freeze({ t: 0.030, w: 0.11, proud: 1.035, chamfer: 0.025 }),
+  SPIN: 0.0035              /* rad/s: a fifth of a degree a second — see the note in gemGirdle */
+});
+
+/* THE SQUARE DIAMOND IN PLAN IS THE L1 NORM, and nothing else is. r = 1 / (|cos a| + |sin a|) puts
+   the four points exactly on the axes at radius 1 and the diagonals at 1/sqrt(2) — a square rotated
+   45 degrees, which is the brand figure. `flute` then rides on sin(2a)^2, which is ZERO on all four
+   axes and 1 on all four diagonals, so faceting the flanks can never move a point. */
+function gemPlanR(a, flute) {
+  const k = 1 / (Math.abs(Math.cos(a)) + Math.abs(Math.sin(a)));
+  if (!flute) return k;
+  const s = Math.sin(2 * a);
+  return k * (1 + flute * s * s);
+}
+
+/* Build the cut as ONE non-indexed geometry with per-face normals written by hand. Flat shading is
+   not requested from the material on purpose: three different materials hang off this same geometry
+   at every call site (glass, mirror, emissive) and only one of them carries flatShading, so baking
+   the facet normals into the buffer is what makes all three read as a cut stone rather than one. */
+export function cutGem(w, h, d) {
+  const pos = [], nor = [];
+  const ring = (i) => {
+    const t = CUT[i][0], r = CUT[i][1], f = CUT[i][2];
+    const out = [];
+    for (let j = 0; j < GEM.N; j++) {
+      const a = (j / GEM.N) * Math.PI * 2, k = gemPlanR(a, f) * r;
+      out.push(new THREE.Vector3(Math.cos(a) * k * w, t * h, Math.sin(a) * k * d));
+    }
+    return out;
+  };
+  const rings = CUT.map((c, i) => (c[1] === 0 ? null : ring(i)));
+  const apexTop = new THREE.Vector3(0, CUT[0][0] * h, 0);
+  const apexBot = new THREE.Vector3(0, CUT[CUT.length - 1][0] * h, 0);
+  const ab = new THREE.Vector3(), ac = new THREE.Vector3(), n = new THREE.Vector3(), cen = new THREE.Vector3();
+  /* WINDING IS DECIDED BY MEASUREMENT, not by reasoning about it. The surface is star-convex about
+     the origin at every flute this table uses, so "outward" is simply "away from the centre": if a
+     face normal disagrees with its own triangle's centroid, the triangle is emitted the other way
+     round. A gem with half its facets inside-out is a bug you only see from one side, on one layer,
+     at one time of day — which is exactly the kind that survives a render pass. */
+  const tri = (A, B, C) => {
+    ab.subVectors(B, A); ac.subVectors(C, A); n.crossVectors(ab, ac).normalize();
+    cen.copy(A).add(B).add(C).multiplyScalar(1 / 3);
+    if (n.dot(cen) < 0) { n.negate(); const T = B; B = C; C = T; }
+    pos.push(A.x, A.y, A.z, B.x, B.y, B.z, C.x, C.y, C.z);
+    for (let k = 0; k < 3; k++) nor.push(n.x, n.y, n.z);
+  };
+  for (let i = 0; i < CUT.length - 1; i++) {
+    const lo = rings[i], hi = rings[i + 1];
+    for (let j = 0; j < GEM.N; j++) {
+      const jn = (j + 1) % GEM.N;
+      if (!lo) { tri(apexTop, hi[jn], hi[j]); continue; }        /* crown fan */
+      if (!hi) { tri(apexBot, lo[j], lo[jn]); continue; }        /* pavilion fan */
+      tri(lo[j], lo[jn], hi[jn]);
+      tri(lo[j], hi[jn], hi[j]);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
+  return g;
+}
+
+/* THE GIRDLE — the widest line of the stone, standing proud of it in platinum. This returns the
+   PLACEMENTS rather than a mesh, because the two call sites put them into different buckets:
+   monument.js bakes them into its shared 'gem' grade split, ground.js builds a mesh. Each entry is
+   { x, z, len, yaw, h, w } in the gem's own local space, ready for chamferBox(w, h, len) placed at
+   (x, 0, z) yawed by `yaw`.
+
+   chamferBox extrudes along +z, and a yaw of θ sends +z to (sinθ, cosθ) — so a bar lies on its
+   chord when θ = atan2(dx, dz). Getting that pair the wrong way round is what left the four equator
+   bars this replaces pointing radially OUTWARD from both diamonds instead of around them. */
+export function gemGirdle(w, h, d) {
+  const G = GEM.GIRDLE, out = [];
+  for (let j = 0; j < GEM.N; j++) {
+    const a0 = (j / GEM.N) * Math.PI * 2, a1 = ((j + 1) / GEM.N) * Math.PI * 2, am = (a0 + a1) * 0.5;
+    const k0 = gemPlanR(a0), k1 = gemPlanR(a1), km = gemPlanR(am);
+    const x0 = Math.cos(a0) * k0 * w, z0 = Math.sin(a0) * k0 * d;
+    const x1 = Math.cos(a1) * k1 * w, z1 = Math.sin(a1) * k1 * d;
+    out.push({
+      x: Math.cos(am) * km * w * G.proud, z: Math.sin(am) * km * d * G.proud,
+      len: Math.hypot(x1 - x0, z1 - z0) * 1.02,
+      yaw: Math.atan2(x1 - x0, z1 - z0),
+      h: h * G.t * 2, w: G.w, chamfer: G.chamfer
+    });
+  }
+  return out;
+}
+
 /* A square-diamond outline (four thin bars) in the XZ plane, for ground markers and boundaries. */
 export function diamondOutline(size, bar, mat, thickness = 0.02) {
   const grp = new THREE.Group(); const half = size / 2;

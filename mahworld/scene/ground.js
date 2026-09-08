@@ -44,7 +44,7 @@
    What was deliberately LEFT sharp: the crossing studs, the shard sockets and the monument's crystal
    are all the square-diamond brand figure, which §06 exempts by name. */
 import * as THREE from '../vendor/three/three.module.min.js';
-import { canvasTexture, chamferBox, fobMark } from './materials.js';
+import { canvasTexture, chamferBox, fobMark, cutGem, gemGirdle, GEM } from './materials.js';
 import { SITES } from './buildings.js';
 
 export const PLAZA_RADIUS = 27;
@@ -76,6 +76,15 @@ const CELL_CORNER = 0.55;     /* the cut corner — this is what opens the socke
 const JOINT_TOP = 0.133;      /* the joint catch stops a hair below the cell rim, never level with it */
 const STUD_APEX = 0.168;      /* the inlaid stud's point, just under the table so nothing stands proud */
 const POOL_Y = FLOOR_TOP + 0.07;  /* where light lying ON the floor sits: clear of every tilted cell corner */
+/* the plaza gem's halo alpha at night; the clock hook scales it from here.
+   THE PLAZA GEM DOES NOT SPIN, and monument.js's does. That is a deliberate split, not an oversight.
+   monument.js owns a per-frame update() the assembly already calls, so a turn there is free; this
+   file returns a Group and has only a clock hook, so a spin here would mean pushing a permanent
+   entry onto ctx.updateHooks — and mahplaza.js keeps its RAF alive whenever that array is non-empty,
+   which would defeat prefers-reduced-motion for one rotating object. The glisten this stone needs
+   comes from the viewer moving past 256 facets, which is what happens in roam and in every camera
+   move; a hero object is not worth a permanent frame loop. */
+const PLAZA_GEM_AURA = 0.13;
 
 /* merge a list of geometries into one static BufferGeometry (position + normal); disposes the inputs */
 function mergeGeos(list) {
@@ -546,7 +555,7 @@ export function buildGround(ctx) {
      mark built at architectural scale: a faceted plinth, a mirror-grade collar, and the diamond itself
      held above it with an energy core inside, reflected in the chromium floor beneath.
      No invented emblem — this is the square-diamond the whole world already uses. */
-  let monumentLight = null;
+  let monumentLight = null, plazaGem = null, plazaGemAuraMat = null;
   {
     /* forward of the MAH MATCH approach, not across its portal: a plaza centrepiece the eye lands on
        first, with the entrance and its two actions still clear behind it */
@@ -577,23 +586,88 @@ export function buildGround(ctx) {
        what read; the cap that closes it is the low-metalness partner, which is the grade that can. */
     const collarCap = new THREE.Mesh(chamferBox(2.72, 0.05, 2.72, 0.02), M.platinumMidLit || M.platinumLit);
     collarCap.rotation.y = Math.PI / 4; collarCap.position.y = py + 0.345; monument.add(collarCap);
-    /* THE DIAMOND — the square-diamond at architectural scale. The first build made the mistake of
-       wrapping a bright core in an OPAQUE faceted shell, which simply hid it: a crystal reads because
-       light comes THROUGH it. So the core is large and bright, the shell over it is glass, and the
-       only opaque part is the thin mirror edge that catches the moon on its turn. */
+    /* THE DIAMOND — the square-diamond at architectural scale, and THE ONE THE NOTE IS ABOUT.
+       DIRECTION, R2: "the actual diamond in the middle is super stale looking. It has no depth to
+       it. It needs to have more depth and a glistening and platinumness and glow."
+
+       IT TOOK A RAYCAST TO ESTABLISH WHICH DIAMOND THAT WAS. There are two brand stones on this
+       plaza and the obvious suspect was the wrong one: monument.js's gem is held at y 38.9, which
+       from the arrival mark is 29.6 degrees above the camera axis — past the top edge of a 29-degree
+       half-frame. The stone filling the middle of the arrival frame is THIS one, standing at
+       (0, 7.2, 7) between the two statues. Reasoning about it would have re-cut the wrong gem
+       beautifully; a ray fired down the arrival axis at the pixel the pale shape occupies came back
+       with an unnamed hit at 39 m, and 39 m along that axis is exactly here.
+
+       WHAT WAS WRONG, AS NUMBERS. An OctahedronGeometry has EIGHT faces, so any viewpoint sees
+       three of them: three facets cannot glisten, however good the material on them is. And the
+       emissive core stood at 2.9 x 1.55 inside a 3.35 x 1.55 shell — 87% — which left 25 cm of
+       glass between them, so there was no INTERIOR to look into either. What rendered was a white
+       lozenge with a dark chevron across it. Stale, and no depth, precisely as described.
+
+       THE CUT NOW COMES FROM THE KIT (materials.js cutGem — read its note for what the ten rings and
+       the alternating flute are doing). monument.js's own comment already claimed these two stones
+       were "the same gem at two scales"; that is now true in the only sense that matters, which is
+       that one function cuts both. Three nested layers, and each has a job:
+         · SHELL, the cut itself, in glass.
+         · HEART at 0.62, in chromeMirror, YAWED HALF A FACET so its facets never line up with the
+           ones in front of them. This is the layer that gives the stone a value RANGE instead of one
+           white note — what you see inside a real diamond is the environment folded twice, and a
+           mirror behind glass is the honest cheap version of that.
+         · FIRE at 0.30, emissive, small on purpose: a core that fills the stone is a lamp, and a
+           lamp has no depth. This is the layer that replaces the old 87% core.
+       PLATINUMNESS is the girdle — one proud sixteen-sided band on the widest line, from the kit's
+       own solver, in the palette's platinum. It replaces four radial equator bars that were pointing
+       the wrong way (see gemGirdle's note) and were four objects doing worse what one line does.
+       GLOW is the aura at 1.5, additive, in the stone's own shape rather than a sphere, driven by
+       this file's clock hook with the rest of the plaza's light. */
     const dy = py + 5.4;
-    const core = new THREE.Mesh(new THREE.OctahedronGeometry(2.9, 0), M.energyLight);
-    core.scale.set(1, 1.55, 0.34); core.position.y = dy; monument.add(core);
-    const shell = new THREE.Mesh(new THREE.OctahedronGeometry(3.35, 0), M.crystalGlass || M.glass);
-    shell.scale.set(1, 1.55, 0.46); shell.position.y = dy; monument.add(shell);
-    reflect(core, 0.5); reflect(collar, 0.3);
-    /* the edge catches that make it turn: four thin mirror bars along its equator */
-    for (let i = 0; i < 4; i++) {
-      const a = i * Math.PI / 2 + Math.PI / 4;
-      const bar = new THREE.Mesh(chamferBox(0.16, 0.16, 4.7, 0.04), M.chromeMirror || M.trim);
-      bar.position.set(Math.cos(a) * 1.7, dy, Math.sin(a) * 1.7);
-      bar.rotation.y = -a + Math.PI / 2; bar.rotation.x = 0.66; monument.add(bar);
+    const GW = 3.35, GH = 3.35 * 1.55, GD = 3.35 * 0.46;      /* the shell's own half-extents, unchanged */
+    const gemGeo = cutGem(GW, GH, GD);
+    const gemLayer = (name, s, mat, yaw, order) => {
+      const m = new THREE.Mesh(gemGeo, mat);
+      m.name = 'plaza-diamond-' + name;
+      if (Array.isArray(s)) m.scale.set(s[0], s[1], s[2]); else m.scale.setScalar(s);
+      m.rotation.y = yaw; m.position.y = dy;
+      if (order) m.renderOrder = order;
+      monument.add(m);
+      return m;
+    };
+    plazaGemAuraMat = new THREE.MeshBasicMaterial({
+      color: M.theme.energyLight, transparent: true, opacity: PLAZA_GEM_AURA,
+      blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide, fog: false
+    });
+    /* THE HALO IS A RIM, AND IT IS BackSide FOR THAT REASON. An additive DoubleSide shell renders
+       its far wall AND its near wall, so what you get is a translucent SLAB whose brightest part is
+       the middle — the longest path through it — and at any close camera it washes the whole frame
+       with a pale diamond. BackSide renders only the far wall, which the opaque heart hides across
+       the body of the stone and which survives around the silhouette: the glow ends up where a glow
+       belongs, hugging the edge, and costs half as many fragments doing it. */
+    plazaGemAuraMat.name = 'plaza-diamond-aura'; plazaGemAuraMat.userData.moduleOwned = true;
+    const fire = gemLayer('fire', GEM.LAYERS.fire, M.energyLight, 0);
+    plazaGem = {
+      fire,
+      heart: gemLayer('heart', GEM.LAYERS.heart, M.chromeMirror || M.trim, GEM.YAW),
+      shell: gemLayer('shell', GEM.LAYERS.shell, M.crystalGlass || M.glass, 0, 6),
+      aura: gemLayer('aura', GEM.AURA, plazaGemAuraMat, GEM.YAW, 5)
+    };
+    plazaGem.aura.frustumCulled = false;
+    /* the girdle: one merged mesh, because sixteen bars are one object */
+    {
+      const bars = [];
+      for (const b of gemGirdle(GW, GH, GD)) {
+        const g2 = chamferBox(b.w, b.h, b.len, b.chamfer);
+        g2.rotateY(b.yaw); g2.translate(b.x, dy, b.z);
+        bars.push(g2.index ? g2.toNonIndexed() : g2);
+      }
+      /* platinumLit, NOT platinum: LAW 1 again. A girdle is a band with up-facing and
+         down-facing surfaces on it, and at metalness 0.98 those take no diffuse light and render
+         near-black under a dark zenith — the very defect this project has shipped four times. The
+         low-metalness partner is the grade that CAN be lit, and the monument's own point light is
+         30 cm away. This is the platinum the direction asked to see. */
+      const band = new THREE.Mesh(mergeGeos(bars), M.platinumLit || M.platinum || M.trim);
+      band.name = 'plaza-diamond-girdle'; monument.add(band);
     }
+    reflect(fire, 0.5); reflect(collar, 0.3);
     /* a mast carrying the diamond clear of its plinth, so it reads as HELD rather than resting */
     const mast = new THREE.Mesh(chamferBox(0.34, 2.6, 0.34, 0.06), M.chromeSatin || M.trimSatin);
     mast.rotation.y = Math.PI / 4; mast.position.y = py + 1.5; monument.add(mast);
@@ -744,7 +818,15 @@ export function buildGround(ctx) {
        inlay hides it completely and nothing clips, so listing plaza-dressing.js's furniture here would
        only be a second copy of its table waiting to drift out of date — and a table that lies is worse
        than no table. The three route ends come from the shared SITE PLAN for the same reason. */
-    const ROUTES = [[SITES.match.approach, 3.6], [SITES.gym.approach, 3.2], [SITES.market.approach, 3.2], [[-40, 40], 2.8], [[40, 40], 2.8]];
+    /* R2 added the directory spur to plaza-dressing's network, and it runs across the laid field like
+       the other five, so it gets the same keep-out. Its endpoint is the pylon's READABLE FACE — the
+       post stands at (20, 14) yawed −0.5 and the path stops 3.4 m out along its normal — restated
+       from the same three numbers plaza-dressing uses rather than from a fourth hand-typed pair.
+       The two routes R2 runs OFF the deck are not listed, and do not need to be: they start at the
+       corridor mouths at r 57 and this test rejects everything past r 37.5 already. */
+    const ROUTES = [[SITES.match.approach, 3.6], [SITES.gym.approach, 3.2], [SITES.market.approach, 3.2],
+      [[-40, 40], 2.8], [[40, 40], 2.8],
+      [[20 + Math.sin(-0.5) * 3.4, 14 + Math.cos(-0.5) * 3.4], 2.2]];
     const placed = HERO.concat(STANDING);
     function freeFloor(x, z) {
       const r = Math.hypot(x, z);
@@ -828,7 +910,11 @@ export function buildGround(ctx) {
       g.add(mesh); return mesh;
     };
     /* named apart from the floor's own `heroMat` above, which is black platinum and a different thing */
-    const facetMat = M.shardFacet || M.crystalGlass, shardHeroMat = M.shardHero || facetMat;
+    /* R1 c2: the FLOOR takes black crystal, not the skyline's pale facet grade. These 62 pieces wore
+       shardFacet (luminance 195, a pale blue) — v11 fixed the "pointy blue cones" as GEOMETRY and
+       left the colour, and once the world stopped being blue they became the loudest thing in the
+       plaza. shardObsidian reads by catch instead of by tint, which is what black crystal does. */
+    const facetMat = M.shardObsidian || M.shardFacet || M.crystalGlass, shardHeroMat = M.shardHero || facetMat;
     shardMesh(inlays, facetMat, 'floor-shards-inlaid', false);
     shardMesh(standing, facetMat, 'floor-shards-standing', true);
     shardMesh(heroes, shardHeroMat, 'floor-shards-hero', true);
@@ -871,9 +957,16 @@ export function buildGround(ctx) {
          accent, out on the floor the district's signage band overhead, wide and weak — the one place
                                   a pungent hue touches the ground, and it is a big single gesture. */
     ctx.lightPool({ x: S.x + fx * out, y: 0.45, z: S.z + fz * out, rx: S.W + 4, rz: 13, rot: S.rotY, hue: M.interiorSoft.color, k: 0.34 });
-    ctx.lightPool({ x: S.x + fx * (out + 9), y: 0.05, z: S.z + fz * (out + 9), rx: S.W + 6, rz: 12, rot: S.rotY, k: 0.26 });
+    /* R1 c2 — TWO OF THE THREE POOLS PER SITE WERE LAID UNDER THE FLOOR THEY FALL ON.
+       y 0.05 and y 0.04 against FLOOR_TOP 0.17: six of the nine district pools were depth-clipped
+       by the deck, which is the exact failure the note at POOL_Y in this file already warns about
+       ("a pool that sat at the floor's own height was buried by it"). Dropping the y lets both fall
+       through to POOL_Y. The theme pool at y 0.45 is correct as written — it lands on the apron
+       slab, whose top is 0.42 — and is left alone. The accent pool moves out 3 m so its near edge
+       clears the apron step rather than fighting it. */
+    ctx.lightPool({ x: S.x + fx * (out + 9), z: S.z + fz * (out + 9), rx: S.W + 6, rz: 12, rot: S.rotY, k: 0.26 });
     const accent = M[ctx.districtAccent[k]];
-    if (accent) ctx.lightPool({ x: S.x + fx * (out + 14), y: 0.04, z: S.z + fz * (out + 14), rx: S.W + 20, rz: 30, rot: S.rotY, hue: accent.emissive, k: 0.2 });
+    if (accent) ctx.lightPool({ x: S.x + fx * (out + 17), z: S.z + fz * (out + 17), rx: S.W + 20, rz: 30, rot: S.rotY, hue: accent.emissive, k: 0.2 });
   });
   {
     const slab = new THREE.Mesh(mergeGeos(apronSlab), M.paving || M.platinumLitBrushed || M.graphiteLight);   /* v11: the apron is FLOOR, not architecture — it joins the black paving family */
@@ -956,6 +1049,9 @@ export function buildGround(ctx) {
     poolFixedMat.opacity = 0.22 * k;
     seamMat.color.copy(M.energySoft.color); seamMat.opacity = 0.5 * k;
     if (monumentLight) { monumentLight.color.copy(M.energySoft.color); monumentLight.intensity = 30 * (0.3 + 0.7 * night); }
+    /* the plaza gem's halo follows the same clock as its light: a glow that holds full strength at
+       noon reads as a decal stuck on the sky rather than as a stone with fire in it */
+    if (plazaGemAuraMat) { plazaGemAuraMat.color.copy(M.energyLight.emissive || M.energySoft.color); plazaGemAuraMat.opacity = PLAZA_GEM_AURA * (0.18 + 0.82 * night); }
     /* the wordmark holds at night and steps back under daylight, exactly as before */
     word.material.opacity = 0.55 + 0.45 * night;
   });
@@ -976,29 +1072,27 @@ export function buildGround(ctx) {
   return g;
 }
 
-/* planter spots the flora module fills — sparse, at the plaza edge and building aprons */
-/* v6b: the plaza was planted at one planter per ~970 m2, and four of the six sat behind or beside the
-   arrival subject. The reference's plaza is flanked by trees the whole way in. `kind: 'tree'` asks the
-   flora module for its tree where it has one, and falls back to a planter where it does not.
-   v9: hoisted to module scope unchanged, because the shard field below has to know where the planting
-   stands and a second hand-typed copy of these coordinates would drift the first time one moves. */
-const PLANTER_SPOTS = [
-  { x: -14, z: 24, size: 'medium', shape: 'round' }, { x: 14, z: 24, size: 'medium', shape: 'round' },
-  { x: -30, z: 4, size: 'large', shape: 'box' }, { x: 30, z: 4, size: 'large', shape: 'box' },
-  { x: -22, z: -30, size: 'small', shape: 'box' }, { x: 22, z: -30, size: 'small', shape: 'box' },
-  /* the two avenues flanking the approach — the reference's most characteristic planting */
-  { x: -24, z: 18, kind: 'tree', size: 'large' }, { x: 24, z: 18, kind: 'tree', size: 'large' },
-  { x: -27, z: 8, kind: 'tree', size: 'medium' }, { x: 27, z: 8, kind: 'tree', size: 'medium' },
-  { x: -30, z: -3, kind: 'tree', size: 'large' }, { x: 30, z: -3, kind: 'tree', size: 'large' },
-  { x: -33, z: -14, kind: 'tree', size: 'medium' }, { x: 33, z: -14, kind: 'tree', size: 'medium' },
-  /* the plaza edge behind the arrival camera and out toward the corridors */
-  { x: -20, z: 32, kind: 'tree', size: 'medium' }, { x: 20, z: 32, kind: 'tree', size: 'medium' },
-  { x: -36, z: 26, kind: 'tree', size: 'large' }, { x: 36, z: 26, kind: 'tree', size: 'large' },
-  { x: -41, z: 6, kind: 'tree', size: 'medium' }, { x: 41, z: 6, kind: 'tree', size: 'medium' },
-  /* the courtyards the facilities' new spacing opened up */
-  { x: -40, z: -26, kind: 'tree', size: 'large' }, { x: 42, z: -30, kind: 'tree', size: 'large' },
-  { x: -30, z: -36, kind: 'tree', size: 'medium' }, { x: 32, z: -40, kind: 'tree', size: 'medium' }
-];
+/* THE PLAZA IS NOT PLANTED. (R2, direction: "There should be no trees in that area. Really, the tree
+   should be in the outskirts right before the mountains.")
+
+   This table held twenty-four spots — eighteen trees and six planters — every one of them inside 42 m
+   of the world origin, i.e. inside the one part of the world every arrival camera looks at. Standing
+   at the arrival mark they filled the middle band of the frame with pale crowns in front of the
+   monument, the directory and all three destinations, and the note that came back was "way too much
+   noise in the middle of the main city — I cannot even focus on what anything is". They were not bad
+   trees. They were in the way of everything the plaza exists to show.
+
+   THE TREES DID NOT LEAVE THE WORLD, THEY MOVED TO THE EDGE OF IT. terrain.js §3 now plants a
+   continuous MAH TREELINE in the outskirts, solved per bearing against the near mountain range's own
+   footprints so it stands exactly where the direction puts it. Nature at the horizon FRAMES the city;
+   nature in the plaza stands in front of it.
+
+   THE ARRAY STAYS, EMPTY, AND IS STILL EXPORTED ON ctx. Three consumers read it — the shard field
+   below (it will not stand a shard where planting stands), flora-and-vehicles' parked-craft clearance
+   test, and mahplaza's flora loop — and all three are correct against an empty table: no spot, no
+   exclusion, nothing built. Deleting it would mean editing three call sites to remove a dependency
+   that will come back the moment anything is planted deliberately again. */
+const PLANTER_SPOTS = [];
 
 /* the seam ribbons carry a COLOUR attribute, which mergeGeos does not know about — it merges the two
    attributes a solid surface needs. This is the same concatenation for position + color. */

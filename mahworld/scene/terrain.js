@@ -96,6 +96,28 @@ const RANGES = [
    own edge. The rear ranges stand at 1650–2120, so the land has to outrun them, and its outermost
    value has to arrive at the horizon sky (0x1d3d6e) or the edge itself draws a line across the rear
    of the world — which is exactly what the 180° proof showed. */
+/* R2 — MAH TREELINE. Read with section 3 of buildTerrain; every number here is a relation to the
+   near range or to the built world, never a free radius.
+     inset       how far short of the mountains' inner edge the outermost rank stands
+     depth       how far the belt runs back toward the city from that rank
+     rMin/rMax   the clamp: rMin keeps it outside the city (the old groves ran to 250 and never
+                 touched anything, so 300 is a margin on a measured fact), rMax keeps a bearing with
+                 no massif in front of it from planting trees out on the open land ring
+     gapDeg      half-width of the opening kept at each mountain pass, so the ways out stay open
+     clusters    walked by the golden angle around the full compass
+     base/crest  crystalline tissue at the foot, moonlit platinum along the crowns — no hue (L50) */
+const BELT = Object.freeze({
+  inset: 46, depth: 165, rMin: 300, rMax: 605, gapDeg: 9, waterMargin: 30,
+  clusters: 84, perCluster: [8, 16], spreadDeg: 5.4,
+  hMin: 15, hMax: 30, crownRatio: [0.27, 0.37],
+  base: 0x3a4761, crest: 0xd6dfec
+});
+const FOOT_BOUND = 1.16;      /* massif() ridge modulation A1+A2 tops out at 0.16 of w — see nearFeet */
+/* §06: the canopy diamond is WIDER THAN TALL. 0.74, not 0.60 — at 0.60 the crown was a pancake and
+   three overlapping pancakes are still a parasol; 0.74 keeps the figure wider than tall while giving
+   the mass enough height to break its own silhouette. */
+const CROWN_SQUAT = 0.74;
+
 const LAND_INNER = 600, LAND_OUTER = 2600;
 const LAND_HORIZON = 0x1c3355;   /* the last ring, sitting just under the horizon key so it dissolves */
 
@@ -301,6 +323,11 @@ export function buildTerrain(ctx) {
   rockMat.name = 'terrain-rock';
   owned.materials.push(rockMat);
   const rangeGroups = [];
+  /* R2 — WHERE THE MOUNTAINS BEGIN, recorded as they are placed rather than guessed afterwards.
+     The treeline in section 3 stands "in the outskirts right before the mountains" (direction), and
+     the only honest reading of "right before" is a measured one: the near range's own massif discs.
+     A second hand-typed radius table would be the L42 defect again, so the belt reads THIS. */
+  const nearFeet = [];
   RANGES.forEach((R, ri) => {
     const rand = rng(R.seed);
     const peaks = [];
@@ -318,6 +345,12 @@ export function buildTerrain(ctx) {
          because clearPass pushes by the massif's ARC, not by its centre — see PASSES. */
       a = clearPass(a, w, rr);
       const [x, z] = polar(a, rr);
+      /* the massif's footprint is elliptical (massif()'s own `sz` is 0.72-1.20) and then yawed by a
+         random angle, so its orientation is not knowable here. FOOT_BOUND is the circumscribing disc:
+         `w` plus the ridge modulation's outward bulge (A1+A2 tops out at 0.16 of w). Bounding it from
+         OUTSIDE is the safe direction — a belt kept slightly too far from the range is a composition
+         note; one pushed into the rock is trees growing out of a mountainside. */
+      if (R.id === 'near') nearFeet.push({ x, z, r: w * FOOT_BOUND });
       /* a ROUNDED MASSIF, not a cone: broad apron, full shoulders, a summit whose tangent is
          horizontal, spurs and gullies down the flanks. Still rock — no neon edge, no glowing crystal
          spike (§43) — and at exactly the height and base radius the range was measured at. */
@@ -357,6 +390,7 @@ export function buildTerrain(ctx) {
       const h = lerp(RE.hMin, RE.hMax, rand() * rand() + rand() * 0.3);
       const w = lerp(RE.wMin, RE.wMax, rand());
       const M2 = massif(w, h, Math.max(4, R.rings - 1), Math.max(12, R.slices - 2), rand);
+      if (R.id === 'near') nearFeet.push({ x, z, r: w * FOOT_BOUND });
       const geo = M2.geo;
       geo.rotateY(rand() * Math.PI * 2);
       geo.rotateZ((rand() - 0.5) * 0.09);
@@ -405,63 +439,186 @@ export function buildTerrain(ctx) {
     group.add(mesh);
   }
 
-  /* ---------------------------------------------------- 3. the planted corridors (L50) */
-  /* Planted belts in the valleys, between the city's edge and the land. Kept as ONE merged mesh of
-     simple faceted canopies: at 300–600 m a tree is a silhouette and a value, and spending triangles
-     on anything more would be spending them where they cannot be seen (§27).
-     v8: the canopies were 6-sided cones, i.e. a hundred and fifty small spikes standing in the three
-     valleys the composition is built around. They are twenty-face solids now — a ROUND silhouette
-     carrying a FACETED surface, which is the same distinction the massifs and the clouds are drawn
-     to, for eight extra triangles each. */
-  /* L50 — THERE WERE GREEN TREES IN MAHWORLD, AND THEY HAD BEEN THERE ALL ALONG.
-     0x24503f: hue 157, saturation 0.38, and by a long way the most saturated thing anywhere in this
-     world. Nothing caught it, because no camera had ever stood out in the 250-510 m ring where these
-     groves live — they were authored to be a value in the middle distance and were only ever judged
-     as one. The first frame shot at a MAHBEAST territory put a camera among them and they filled it.
+  /* ---------------------------------------------------- 3. MAH TREELINE — the outskirts belt
+     DIRECTION, R2: "There should be no trees in that area. Really, the tree should be in the
+     outskirts right before the mountains." Two separate defects sat behind that one sentence.
 
-     Why this is a defect and not a preference: rainforest.js exists BECAUSE "the easy rainforest is
-     a green palette swap", and its file header carries the lock in capitals. A world that argues its
-     nature is crystalline, and then plants ordinary green trees on the ground between its cities,
-     has conceded the argument everywhere except the one place it was watching. R3-03 makes it
-     sharper still — separation may not depend on hue, and this was the only hue in the world.
+     THE FIRST WAS PLACEMENT AT THE CENTRE. ground.js carried twenty-four PLANTER_SPOTS, every one of
+     them inside 42 m of the world origin, eighteen of them full trees. Standing in the plaza they
+     filled the middle third of every frame with pale parasols in front of the monument, the
+     directory and the three destinations — which is exactly the "I cannot even focus on what
+     anything is" the direction names. That table is now empty (see ground.js) and the planting
+     lives out here.
 
-     So the canopies join the genome instead of being recoloured to grey: DARK CRYSTALLINE TISSUE,
-     the same value the rainforest's trunks and the MAHNIMALS' bodies carry. The geometry does not
-     change — a twenty-face solid with a round silhouette and a faceted surface was already right,
-     and at 300-600 m it is a value and a shape. Only the value was wrong, and it was wrong in the
-     one channel this world does not spend. */
-  const foliageMat = new THREE.MeshStandardMaterial({ color: 0x223046, roughness: 0.62, metalness: 0.22, flatShading: true, envMapIntensity: 0.9 });
-  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x1b2330, roughness: 0.9, metalness: 0.05 });
+     THE SECOND WAS PLACEMENT BY NUMBER. This section used to plant five groves per valley at
+     `250 + rand() * 260`, so where the treeline stood had nothing to do with where the mountains
+     stand: at some bearings it finished 400 m short of the range, at others it ran into the rock.
+     A belt described as "right before the mountains" cannot be authored as a radius — it is a
+     RELATION, and the only thing that knows it is nearFeet, the near range's own massif discs
+     recorded above as they were placed.
+
+     So the belt is solved per bearing. footAt(a) casts the ray from the world origin along `a` and
+     returns the distance at which it first ENTERS a near massif — the mountains' true inner edge on
+     that line. The treeline's outer rank stands BELT.inset short of it and the belt runs BELT.depth
+     inward from there, clamped into [BELT.rMin, BELT.rMax] so a bearing with no massif in front of
+     it (the passes, the open rear) still gets a treeline rather than an empty horizon or a forest
+     growing out of the plaza.
+
+     WHY THE BELT IS UNBROKEN AND THE OLD GROVES WERE NOT. Five scattered clumps in three valleys are
+     read as five objects; a continuous band is read as a HORIZON, and a horizon is what separates
+     the dark city ground from the dark mountains behind it. That separation is the whole job. It is
+     also what earns the removal at the centre: the eye gets its nature back at the edge of the
+     world, where it frames the city instead of standing in front of it.
+
+     WHAT A TREE IS HERE. §06's square diamond, WIDER THAN TALL, is the canopy: an octahedron scaled
+     to (w, w * CROWN_SQUAT, w), which is eight faces, a round-enough silhouette at 300-600 m and the
+     brand shape at any distance you can resolve it. The trunk is a four-sided prism yawed 45 deg, so
+     its plan section is the same diamond. No hue: L50 killed the one green in this world and it does
+     not come back — these carry the crystalline genome's dark tissue, lifting to moonlit platinum
+     along the crowns, painted per-vertex exactly as paintPeak paints the rock behind them. */
+  /* METALNESS 0.18, NOT 0.30, and envMapIntensity up. LAW 1 cuts both ways: the more metal a grade
+     is, the more of its value has to come from scene.environment and the less from the lights. At
+     0.30 with envMapIntensity 1.15 the first cut of this belt rendered as a row of BLACK TENTS at
+     470 m — the painted crest never arrived because there was too little diffuse to carry it and too
+     little environment to replace it. A treeline is foliage, not chrome. */
+  const foliageMat = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.52, metalness: 0.18, flatShading: true, envMapIntensity: 1.7 });
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x2a3446, roughness: 0.85, metalness: 0.08 });
   foliageMat.name = 'terrain-foliage'; trunkMat.name = 'terrain-trunk';
   owned.materials.push(foliageMat, trunkMat);
   {
-    const canopy = [], trunks = [];
-    const rand = rng(4242);
-    VALLEYS.forEach((V, vi) => {
-      const groves = 5;
-      for (let gi = 0; gi < groves; gi++) {
-        const a = V.from + (gi / (groves - 1)) * (V.to - V.from) + (rand() - 0.5) * 3;
-        const rr = 250 + rand() * 260;
-        const [gx, gz] = polar(a, rr);
-        const n = 7 + Math.floor(rand() * 7);
-        for (let i = 0; i < n; i++) {
-          const tx = gx + (rand() - 0.5) * 90, tz = gz + (rand() - 0.5) * 90;
-          const th = 9 + rand() * 13, tw = 4.5 + rand() * 5;
-          const c = new THREE.IcosahedronGeometry(1, 0);
-          c.scale(tw, th * 0.46, tw * (0.82 + rand() * 0.30));
-          c.rotateY(rand() * 3);
-          c.translate(tx, th * 0.66, tz);              /* the crown still meets the trunk top at 0.5h */
-          canopy.push(c);
-          const t = new THREE.CylinderGeometry(0.5, 0.8, th * 0.5, 5).toNonIndexed();
-          t.translate(tx, th * 0.25, tz);
-          trunks.push(t);
-          stats.trees++;
-        }
-        stats.groves++;
+    /* ray from the origin along bearing `a` against the recorded massif discs: the entry distance is
+       where the mountains begin on that line. A miss contributes nothing, and a disc BEHIND the
+       origin on that bearing (b <= 0) is not in front of anyone looking that way. */
+    const footAt = (aDeg) => {
+      const t = aDeg * D2R, dx = Math.cos(t), dz = -Math.sin(t);
+      let best = Infinity;
+      for (let i = 0; i < nearFeet.length; i++) {
+        const f = nearFeet[i];
+        const b = f.x * dx + f.z * dz;
+        if (b <= 0) continue;
+        const d2 = f.x * f.x + f.z * f.z - b * b, rr2 = f.r * f.r;
+        if (d2 >= rr2) continue;
+        const t0 = b - Math.sqrt(rr2 - d2);
+        if (t0 > 0 && t0 < best) best = t0;
       }
-    });
-    if (canopy.length) { const m = new THREE.Mesh(own(mergeGeos(canopy)), foliageMat); m.name = 'terrain-groves'; m.frustumCulled = false; group.add(m); }
+      return best;
+    };
+    /* the belt's outer rank on a bearing, and the inner limit that keeps it out of the built world */
+    const beltOuter = (aDeg) => {
+      const f = footAt(aDeg);
+      const r = (f === Infinity ? BELT.rMax : f - BELT.inset);
+      return Math.max(BELT.rMin + BELT.depth * 0.5, Math.min(BELT.rMax, r));
+    };
+    /* the two mountain passes are the world's ways OUT — the routes to LAKE CITY and RAINFOREST CITY
+       that terrain.js already opens in the rock. A belt drawn straight across them would close by
+       planting what the range was cleared to leave open, so each pass keeps a gap of its own. */
+    const inGap = (aDeg) => {
+      for (const P of PASSES) {
+        const c = (P.from + P.to) * 0.5;
+        let d = Math.abs(((aDeg - c) % 360 + 540) % 360 - 180);
+        if (d < BELT.gapDeg) return true;
+      }
+      return false;
+    };
+    /* BASIN is water. terrain.js owns it eight lines above; a tree standing in the lake is the same
+       class of defect as a tree standing in a mountain, and it is knowable here for free. */
+    const [BX, BZ] = polar(BASIN.bearing, BASIN.r);
+    const inBasin = (x, z) => {
+      const u = (x - BX) / (BASIN.rx + BELT.waterMargin), v = (z - BZ) / (BASIN.rz + BELT.waterMargin);
+      return u * u + v * v < 1;
+    };
+
+    const canopy = [], trunks = [], rand = rng(4242);
+    const cBase = new THREE.Color(BELT.base), cCrest = new THREE.Color(BELT.crest), _c = new THREE.Color();
+    /* paint one crown: dark at its underside, platinum along the top, and brighter on the flank the
+       moon reaches — the same three terms paintPeak uses on the rock, so belt and range agree about
+       where the light is coming from. */
+    const paintCrown = (geo, h, cy, lift) => {
+      const pos = geo.attributes.position, n = pos.count;
+      geo.computeVertexNormals();
+      const nor = geo.attributes.normal;
+      const col = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        const up = Math.min(1, Math.max(0, (pos.getY(i) - (cy - h * 0.5)) / h));
+        const mo = Math.max(0, nor.getX(i) * moon.x + nor.getY(i) * moon.y + nor.getZ(i) * moon.z);
+        _c.copy(cBase).lerp(cCrest, Math.pow(up, 0.85) * lift);
+        _c.multiplyScalar(0.80 + 0.42 * mo);
+        col[i * 3] = _c.r; col[i * 3 + 1] = _c.g; col[i * 3 + 2] = _c.b;
+      }
+      geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    };
+
+    for (let ci = 0; ci < BELT.clusters; ci++) {
+      /* clusters walk the compass by the golden angle rather than by an even step: an even step at a
+         belt this long lays the clumps out on a visible lattice, and the eye finds a lattice faster
+         than it finds a tree. */
+      const a = (ci * 137.50776405 + 11) % 360;
+      if (inGap(a)) continue;
+      const rOut = beltOuter(a);
+      const n = BELT.perCluster[0] + Math.floor(rand() * (BELT.perCluster[1] - BELT.perCluster[0] + 1));
+      let planted = 0;
+      for (let i = 0; i < n; i++) {
+        /* spread within the cluster in POLAR terms, so a clump follows the belt's curve instead of
+           sitting as a square patch across it */
+        const da = (rand() - 0.5) * BELT.spreadDeg;
+        const dr = rand() * rand();                    /* biased outward: the belt thickens at the rock */
+        /* SAMPLE INSIDE THE BELT, DO NOT SAMPLE AND REJECT. The first cut drew rr from
+           [rOut − depth, rOut] and dropped anything under rMin, which on a bearing whose rOut sat at
+           the clamp threw away half of every cluster — the belt came out at 204 trees where the
+           table asks for roughly four times that, and the loss was invisible because a thinner
+           treeline still looks like a treeline. The inner edge is a clamp on the RANGE, not a filter
+           on the draw. */
+        const rIn = Math.max(BELT.rMin, rOut - BELT.depth);
+        const rr = rIn + (rOut - rIn) * dr;
+        const [tx, tz] = polar(a + da, rr);
+        if (inBasin(tx, tz)) continue;
+        /* trees grow with the belt's depth: tallest at the mountain foot, smaller as it thins toward
+           the city, which is what makes the band read as a receding edge rather than a wall */
+        const grow = 0.62 + 0.38 * dr;
+        const th = lerp(BELT.hMin, BELT.hMax, rand() * 0.55 + 0.45 * grow);
+        const tw = th * (BELT.crownRatio[0] + rand() * (BELT.crownRatio[1] - BELT.crownRatio[0]));
+        const cy = th - tw * CROWN_SQUAT;              /* the crown's centre — its top reaches `th` */
+
+        /* THREE MASSES, ALWAYS, AND THE FIRST CUT'S ONE WAS THE WHOLE PROBLEM. A single squat
+           diamond on a bare stick is a PARASOL, and that is exactly what the first belt rendered:
+           a field of black tents at the treeline. A crown reads as a crown when overlapping masses
+           break its silhouette, so every tree gets a leader and two subordinates — the subordinates
+           smaller, seated lower, thrown off-axis by the golden angle so no two trees repeat the same
+           arrangement, and overlapping the leader rather than hanging clear of it. Three octahedra
+           is 24 triangles: at 300-600 m that is the cheapest silhouette fix available and the only
+           one that changes what the shape IS rather than how bright it is. */
+        const yaw0 = rand() * TAU;
+        const crown = (w, y, x0, z0, lift) => {
+          const c = new THREE.OctahedronGeometry(1, 0).toNonIndexed();
+          c.scale(w, w * CROWN_SQUAT, w * (0.86 + rand() * 0.28));
+          c.rotateY(rand() * TAU);
+          c.translate(x0, y, z0);
+          paintCrown(c, w * CROWN_SQUAT * 2, y, lift);
+          canopy.push(c);
+        };
+        crown(tw, cy, tx, tz, 0.72 + 0.28 * rand());
+        for (let k = 0; k < 2; k++) {
+          const sw = tw * (0.56 + rand() * 0.20);
+          const sy = cy - tw * CROWN_SQUAT * (0.42 + 0.34 * k);
+          const oa = yaw0 + k * 2.3999632;                 /* the golden angle: two masses, never opposed */
+          const off = tw * (0.40 + 0.22 * rand());
+          crown(sw, sy, tx + Math.cos(oa) * off, tz + Math.sin(oa) * off, 0.44 + 0.22 * rand());
+        }
+
+        /* the trunk: four sides, yawed 45 deg so its plan section is the square diamond, not a square */
+        const trunkH = cy - tw * CROWN_SQUAT * 0.55;
+        const t = new THREE.CylinderGeometry(th * 0.034, th * 0.062, trunkH, 4).toNonIndexed();
+        t.rotateY(Math.PI / 4);
+        t.translate(tx, trunkH * 0.5, tz);
+        trunks.push(t);
+        planted++;
+        stats.trees++;
+      }
+      if (planted) stats.groves++;
+    }
+    if (canopy.length) { const m = new THREE.Mesh(own(mergeGeos(canopy)), foliageMat); m.name = 'terrain-treeline'; m.frustumCulled = false; group.add(m); }
     if (trunks.length) { const m = new THREE.Mesh(own(mergeGeos(trunks)), trunkMat); m.name = 'terrain-trunks'; m.frustumCulled = false; group.add(m); }
+    stats.treelineR = [BELT.rMin, BELT.rMax];
   }
 
   /* ---------------------------------------------------------------- 4. the basin */
