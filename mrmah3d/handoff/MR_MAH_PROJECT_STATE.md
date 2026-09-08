@@ -1486,3 +1486,61 @@ different status from "open with two proposed fixes"; the single-owner knee
 wedge was closed in R242.
 
 R245 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.
+
+
+R246 — MORE QUAD SEPARATION, AND THE CENTRE HELD BY ARITHMETIC.
+---------------------------------------------------------------------------
+Base R245 (2a77854). One controlled step: `rf` x1.15, `valley` x1.60, `vl` x1.25
+on the R245 placements, with the seam cut to 0.40 to compensate.
+
+THE PROTECTION IS MEASURED, NOT JUDGED. The brief's rule is that a quad move
+which strengthens the middle line is too aggressive. Two facts settle it:
+  - these three lobes CANNOT deepen the midline. Their supports start at 0.06,
+    0.44 and 0.58 rad, and a four-build sweep confirmed the centre floor stays
+    0.2318 to four decimals at every strength tried, up to x1.90 on `valley`.
+  - what they DO move is the crown, 0.2733 -> 0.2803, and a taller crown over an
+    unmoved floor is a louder centre line by contrast even though the groove is
+    untouched. The seam control moves the floor linearly, so cutting it to 0.40
+    lifts the floor to 0.2390 and holds the centre valley at 0.0413 against
+    R245's 0.0414.
+So the masses grew and the middle did not, by construction rather than by eye.
+
+SECTION at y 1.220, ring angle from the seam:
+
+    R245   .232 .235 .251 .273 .269 .214 .148 .107
+    R246   .239 .242 .258 .280 .272 .209 .151 .111
+
+  crown to dip (0.28 -> 0.68)   0.059 -> 0.071   +20% RF/VL separation
+  outer columns (0.93 / 1.19)   .148/.107 -> .151/.111   fuller VL
+  centre floor                  .232 -> .239   HIGHER, i.e. quieter
+  centre valley                 0.0414 -> 0.0413
+
+GATES
+  front / side outlines   zero pixels changed
+  envelope                |x|max identical at every ring row 0.45-0.90
+  knee band               51 max, p90 30 — unchanged
+  quad band               65 max — unchanged
+  taper                   47 — unchanged; one fused point
+  topology                12288 vertices, 4096 triangles
+  BufferGeometry          0 non-finite, 0 degenerate, 0 non-unit normals
+  Mrs. Mah                14 meshes IDENTICAL
+  contracts               376/376
+
+ANSWERS TO THE BRIEF'S SIX QUESTIONS
+  1. quad organisation more readable — YES: the RF crown rises and the RF/VL
+     dip deepens 20%, and the front and quad close-up show it.
+  2. centre line too strong — NO: floor RAISED 0.232 -> 0.239, contrast held at
+     0.0413 against 0.0414.
+  3. fused teardrop intact — YES: outlines zero pixels, one point, no split
+     impression in three-quarter.
+  4. three-quarter — improved slightly (more internal definition, same fused
+     read); not regressed.
+  5. knee harshness — UNCHANGED at 51/30. Not reduced this pass. R245 established
+     it has no single owner (zeroing notch 51->49, shins 51->50, tendon 51->51),
+     so reducing it means removing the shin and channel anatomy the brief keeps.
+  6. OPEN: the distributed knee-band turns above; shin/calf clarity beyond what
+     R242 built; no crystal or material work has begun; A1 eyes still BLOCKED.
+
+Per the brief's priority order this pass stopped after the safe quad step and
+did NOT advance shin/calf. R246 IS A CANDIDATE AND IS NOT USER-APPROVED.
+Fallback: A3, 28d1f04.
