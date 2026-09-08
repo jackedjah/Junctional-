@@ -2203,12 +2203,20 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     where Astra's own did. Fading in over 0.88-1.02 keeps the handoff to the
     knee continuous without asking a narrow row to carry a wide groove. */
  region:[0.88,1.46,0.14], sideFade:0.06, projection:0.94,
- /* R241 — the seam's HALF-WIDTH goes 0.30 -> 0.34 while its amplitude drops
+ /* R243 — `head`'s half-width goes 0.75 -> 0.80 so the two quad domes MEET
+    nearer the midline: measured, that alone lifts the channel floor 0.1918 ->
+    0.2011 at y 1.220 while the crown moves 0.0012. This is the part of the fix
+    that makes the centre a separation between two neighbouring masses rather
+    than a groove cut into one surface — the floor is filled from the muscle
+    side, not only carved less.
+
+    R241 — the seam's HALF-WIDTH goes 0.30 -> 0.34 (0.40 at R243) while its
+    amplitude drops
     (below). `dome`'s steepest wall is at 0.707 of the half-width and its slope
     there is 1.5 * amplitude / half-width, so the two together take the inner
     wall to 0.49 of its previous steepness: the channel is eased, not merely
     widened. Every other lobe is untouched. */
- lobes:{seam:[0,0.34],head:[0.70,0.75],rf:[0.42,0.28],valley:[1.00,0.30],
+ lobes:{seam:[0,0.40],head:[0.70,0.80],rf:[0.42,0.28],valley:[1.00,0.30],
         vl:[1.42,0.55],vm:[0.30,0.32],itb:[1.95,0.30]},
  depth:[[0.80,0.128],[0.87,0.148],[0.95,0.180],[1.03,0.200],[1.10,0.215],[1.23,0.215],[1.32,0.205],[1.41,0.180],[1.46,0.165]],
  /* R241 — the central descent's amplitude, Astra's own profile scaled to
@@ -2224,7 +2232,12 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     at 0.202 units per unit of coefficient, lifting the floor by the same amount
     the crown gained holds the channel where R241 put it: the muscle grows and
     the separation does not. */
- seam:[[0.80,0],[0.87,0.094],[0.95,0.111],[1.03,0.120],[1.10,0.128],[1.23,0.128],[1.32,0.094],[1.41,0.060],[1.46,0.034]],
+ /* R243 — the central descent, scaled to 0.66 of R242's values (0.44 of the
+    Astra original), on a 0.40-radian half-width. Together with the wider `head`
+    dome above, the floor at y 1.220 goes 0.1830 -> 0.2011 and the valley
+    0.0766 -> 0.0597, a 22% cut on top of R241's 26%: the channel is now 43%
+    shallower than R240 and the crown is untouched at 0.2608. */
+ seam:[[0.80,0],[0.87,0.062],[0.95,0.073],[1.03,0.079],[1.10,0.084],[1.23,0.084],[1.32,0.062],[1.41,0.040],[1.46,0.022]],
  head:[[0.80,0],[0.87,0.06],[0.95,0.28],[1.03,0.32],[1.10,0.36],[1.23,0.34],[1.32,0.26],[1.41,0.16],[1.46,0.09]],
  rf:[[0.80,0],[0.87,0],[0.95,0.10],[1.03,0.125],[1.10,0.13],[1.23,0.13],[1.32,0.09],[1.41,0.05],[1.46,0.025]],
  vl:[[0.80,0],[0.87,0.16],[0.95,0.22],[1.03,0.26],[1.10,0.28],[1.23,0.28],[1.32,0.26],[1.41,0.22],[1.46,0.14]],

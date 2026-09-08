@@ -1284,3 +1284,65 @@ R242 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.
 STILL OPEN: the near-degenerate sliver columns in the quad (a loft sampling
 property, not an authored feature); the 53-degree turn at y 0.827; and no
 crystal or material work has begun.
+
+
+R243 — THE CENTRAL SPLIT, CORRECTED FROM BOTH SIDES. THE 3/4 READ IS THE FIX
+THAT MATTERED.
+---------------------------------------------------------------------------
+Base R242 (43e780f). The brief's items 4 and 5 — rectus, vastus lateralis,
+vastus medialis, knee delicacy, tibialis / shin direction, light soleus, and
+the knee-region artifact — were all delivered in R242, which is this pass's
+BASE; they are preserved here and were re-verified, not re-done. The new work
+is items 1-3: the centre channel, the three-quarter read, the side profile.
+
+TWO CONTROLS, SWEPT AND MEASURED before choosing. Five builds at y 1.220:
+
+    seam x   seam hw   head hw     floor    crown    valley   crown/floor
+    1.00     0.34      0.75        0.1830   0.2596   0.0766   1.419   (R242)
+    0.66     0.40      0.75        0.1918   0.2596   0.0678   1.354
+    0.66     0.40      0.80        0.2011   0.2608   0.0597   1.297   <- taken
+    0.47     0.44      0.80        0.2060   0.2608   0.0548   1.266
+    0.78     0.38      0.78        0.1942   0.2603   0.0662   1.341
+
+The crown moves by at most 0.0012 across the whole sweep, so the side profile
+was never at risk from either control — which is what made the decisive option
+safe to take rather than another timid step.
+
+THE FIX IS FROM BOTH SIDES, and that is the point. `head`'s half-width goes
+0.75 -> 0.80 so the two quad domes MEET nearer the midline — measured alone it
+lifts the floor 0.1918 -> 0.2011 — and only then is the seam scaled to 0.66.
+The floor is filled from the MUSCLE side, not merely carved less, so the centre
+reads as a separation between two neighbouring masses rather than a groove cut
+into one surface. The seam's half-width also goes 0.34 -> 0.40, feathering the
+transition.
+
+RESULT at y 1.220
+  floor          0.1830 -> 0.2012
+  valley depth   0.0766 -> 0.0596   (-22% here, -43% against R240, -55% against
+                                     R239's restoration diagnostic)
+  crown          0.2596 -> 0.2608   (+0.5%, i.e. the quad is not reduced)
+  crown/floor    1.419 -> 1.296
+
+GATES
+  three-quarter  FIXED, and this was the actual complaint: the dark line that
+                 ran the full length of the thigh and split it into two masses
+                 is gone; the lower body reads as one continuous fused teardrop
+                 with an internal soft valley.
+  front          controlled definition rather than a split; both quad masses
+                 still read.
+  side profile   PROTECTED. Outline zero pixels changed; crown +0.0012.
+  silhouette     front and side outlines zero pixels; the lower-leg envelope
+                 |x|max identical at every ring row from 0.45 to 0.90.
+  knee band      54 max, p90 30 — unchanged from R242; R242's knee fix holds.
+  quad band      76 -> 73, p90 30 -> 27 — slightly better.
+  taper          47, unchanged. One fused point.
+  topology       12288 vertices, 4096 triangles, unchanged.
+  Mrs. Mah       14 meshes, both checksums, both bbox corners IDENTICAL.
+  contracts      376/376.
+
+R243 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.
+
+The channel's remaining depth is now mostly GEOMETRIC rather than authored: with
+the seam at zero the two domes alone leave about 0.050 of valley, against the
+0.060 present. Further softening therefore has little room left in this control
+and would have to come from the dome spacing itself.
