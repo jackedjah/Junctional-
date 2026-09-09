@@ -240,10 +240,21 @@ export function buildBody(materials, P, options = {}) {
         p90 adjacent-face turn from 30 to 34 degrees, and carrying 48 all the way
         down to the 0.44 ring made `quadKneeSurfacePatch` fail outright — it
         could not recover its own cage edge [0.064,0.90]-[0.129,0.79] against the
-        denser rings. The knee's topology is Stage B's to change, not Stage A's.
+        denser rings.
+
+        R254 — AND 0.92 WAS WRONG TOO, FOR A REASON THAT INVALIDATES BOTH OF THE
+        ABOVE. It put the stitch across y 0.87-0.97, which is the knee band the
+        render actually shows, and the dark chevron there has survived every pass
+        since. The constraint that drove it there — `quadKneeSurfacePatch`'s cage
+        — belongs to the AUTHORING MASTER path, and neither the lab nor the review
+        page enables `authoringMaster`, so that function never runs in the mesh
+        that is drawn. A visible artifact was being protected by a function with
+        no presence in the product. The boundary is 1.10: the quad belly keeps its
+        twelve anterior columns and the stitch lands in the smooth mid-thigh
+        instead of in the knee.
         Mrs. Mah is not affected: her
         torso comes from `P.buildTorso()` and never reaches this option. */
-      sidesAt: maleAnatomy ? function(s){return s.y>0&&s.y<=.44?16:s.y<.92?32:s.y<1.515?48:s.y>2.13?(s.y<=2.16?32:16):s.y>=2.03?56:s.y<1.83?48:64;} : undefined, capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true, refine: maleAnatomy ? 0 : (TORSO_.refine || 0), jitter: TORSO_.jitter == null ? 1 : TORSO_.jitter,   /* R120: move 32 samples from the plain terminal stock to the upper torso; fixed triangle budget. */
+      sidesAt: maleAnatomy ? function(s){return s.y>0&&s.y<=.44?16:s.y<1.10?32:s.y<1.515?48:s.y>2.13?(s.y<=2.16?32:16):s.y>=2.03?56:s.y<1.83?48:64;} : undefined, capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true, refine: maleAnatomy ? 0 : (TORSO_.refine || 0), jitter: TORSO_.jitter == null ? 1 : TORSO_.jitter,   /* R120: move 32 samples from the plain terminal stock to the upper torso; fixed triangle budget. */
       /* R98 — the body's default platinum share; the ring table and the zone
          functions in proportions.js refine it per plane. */
       coat: REGIONS.BODY.coat, normalWeight: maleAnatomy ? 'angle' : undefined, normalAt: maleAnatomy ? torsoMoldNormal : undefined, diagonalTarget: maleAnatomy ? function(a,s){return s.y>=1.49&&s.y<=2.20?torsoSurface(a,s,[0,s.y,0]):null;} : undefined, surface: maleAnatomy ? torsoSurface : undefined, angleAt: maleAnatomy ? torsoAngle : undefined, cavityAt: maleAnatomy ? torsoCavity : undefined });

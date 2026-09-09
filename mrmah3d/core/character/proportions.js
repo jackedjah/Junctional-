@@ -2193,7 +2193,14 @@ MRMAH_MORPHOLOGY.back.axillaryFold=[[1.76,.14,.25,0],[1.85,.18,.335,.025],[1.96,
 MRMAH_MORPHOLOGY.lower.posterior={
  source:"MAHWORLD Teardrop Anatomy Reference Sheet, muscle map: hamstrings",
  region:[0.72,1.30,0.12], sideFade:0.06,
- lobes:{bicepsFemoris:[0.50,0.42],medialHam:[0.22,0.30]},
+ /* R254 — `medialHam`'s half-width goes 0.30 -> 0.34. THE REAR HAD NEVER BEEN
+    RENDERED until now, and the first rear capture shows a continuous dark stripe
+    down the whole taper: the same "long dark stripe" section 5 rules out, on the
+    face nobody had looked at. Worked through, the medial pair at 0.22 rad on a
+    0.30 half-width overlaps on the rear seam at only 0.63 of its own crown — a
+    37% valley, authored by accident. At 0.34 it is 0.83, a 17% valley: the
+    hamstrings still meet in a groove, but a soft one. */
+ lobes:{bicepsFemoris:[0.50,0.42],medialHam:[0.22,0.34]},
  bicepsFemoris:[[0.72,0],[0.80,0.05],[0.90,0.10],[1.00,0.14],[1.10,0.14],[1.20,0.11],[1.30,0]],
  medialHam:[[0.72,0],[0.80,0.04],[0.90,0.08],[1.00,0.10],[1.10,0.09],[1.20,0.06],[1.30,0]]};
 MRMAH_MORPHOLOGY.lower.planeDesign={quadTerritory:[.10,.95],quadProjection:.058,kneeAccentY:.75,kneeRelief:.012,kind:'paired interior chevron; no new joint or external expansion'};

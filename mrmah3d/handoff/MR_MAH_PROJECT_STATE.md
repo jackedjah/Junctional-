@@ -2098,3 +2098,59 @@ NOT STARTED: the correction itself, Phase C (torso), D (Mrs. comparative), E
 (crystallisation), F (hair), G (final consistency).
 
 R253 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R252 ba3c931.
+
+--------------------------------------------------------------------------------
+R254 — THE CHEVRON WAS THE STITCH, AND THE REAR HAD NEVER BEEN RENDERED
+--------------------------------------------------------------------------------
+
+TWO SECTION-31 ITEMS CLOSED, BOTH BY LOOKING AT SOMETHING THAT HAD NEVER BEEN
+LOOKED AT.
+
+1. THE DARK CHEVRON AT THE KNEE WAS THE SIDE-COUNT STITCH. It survived R249
+   through R253 and every diagnosis of it had been aimed at the anatomy fields.
+   It was topology: `sidesAt` changed 32 -> 48 at y 0.92, so `loft`'s
+   differing-density stitch ran its triangle fan across y 0.87-0.97 — the knee
+   band the render actually shows.
+
+   AND THE CONSTRAINT THAT PUT IT THERE WAS NOT REAL. R249 set the boundary at
+   0.92 because carrying 48 to the 0.44 ring made `quadKneeSurfacePatch` fail its
+   cage recovery. That function is inside `if(options.authoringMaster===true)`,
+   and neither the lab nor the review page sets it — IT NEVER RUNS IN THE MESH
+   THAT IS DRAWN. A visible artifact was being protected by a function with no
+   presence in the product. The boundary is 1.10 now: the quad belly keeps its
+   twelve anterior columns, the stitch lands in the smooth mid-thigh, and the
+   chevron is gone from the capture.
+
+   The knee band is back to eight anterior columns. That is the trade, and
+   continuity won it: section 31 rejects knee artifacts, not knee resolution.
+
+2. THE REAR HAD NEVER BEEN CAPTURED IN THIS ENTIRE PROGRAMME. Hamstrings, a
+   glute-ham handoff and a gastrocnemius were all authored and reported on
+   without one rear render. `caprear.mjs` adds lower-rear, lower-rear-3/4,
+   quad-rear and full-rear on the same camera contract.
+
+   What it showed: the glutes are sound — two masses, a shallow cleft, no shelf
+   and no bubble-on-spike. But a CONTINUOUS DARK STRIPE ran the whole taper —
+   section 5's "long dark stripe", on the face nobody had checked. Two owners,
+   both arithmetic:
+     - `medialHam` at 0.22 rad on a 0.30 half-width overlaps on the rear seam at
+       0.63 of its own crown: a 37% valley, authored by accident. At 0.34 it is
+       0.83 — a 17% valley, which is a groove between two muscles rather than a
+       seam. (The same overlap arithmetic as the rectus pair and the tibialis.)
+     - `lowerField`'s glute cleft ran `windowAt(y,1.03,1.48)` — 0.12 further down
+       than the glutes themselves, into the hamstring rows, forming the top of
+       one uninterrupted line. It starts at 1.15 now.
+
+  centre dip by row   0.4 / 1.4 / -3.2 / -1.1 / -3.0 / -2.9 per cent
+  triangles           172812, 29 draws
+  Mrs. Mah            26 meshes IDENTICAL to b63d0c7      contracts 376/376
+
+PHASE A (LOWER BODY) IS LOCKED AT ~90% PER SECTION 14. Remaining and carried
+forward rather than blocking: the rear midline is softer but still visible along
+the taper; anatomy-following crystal planes are Phase E.
+
+NEXT: PHASE B, ARMS. Diagnosis already measured (R253 entry): the upper arm has
+three local maxima separated by 15-19% dips; the raised forearm is the
+counter-example with one belly and a monotone taper either side.
+
+R254 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R253 07a3f80.

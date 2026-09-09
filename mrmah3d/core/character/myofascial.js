@@ -364,9 +364,13 @@ export function lowerField(x,y,front) {
     + ribbonField(x,y,LOWER_PATHS.vastusMedialis,.023)
     + bevel
     - .014*gauss(x,.023)*windowAt(y,.78,1.44,.17);
+  /* R254 — the glute cleft's window starts at 1.15, not 1.03. It is a legitimate
+     named recess between the two gluteal masses, but it was running 0.12 further
+     down than the glutes do and continuing into the hamstring rows, where it read
+     as the top of one uninterrupted rear seam. */
   return .023*windowAt(y,.56,1.44,.22)*smooth((q-.10)/.27)*smooth((.93-q)/.30)
     +ribbonField(x,y,LOWER_PATHS.glute,.032)
-    -.016*gauss(x,.027)*windowAt(y,1.03,1.48,.13);
+    -.016*gauss(x,.027)*windowAt(y,1.15,1.48,.13);
 }
 
 function lowerSurface(a,section,raw) {
