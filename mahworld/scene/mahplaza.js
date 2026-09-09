@@ -201,6 +201,7 @@ export async function createMahplaza(canvas, options = {}) {
   const MFAC = await optional('./mahfacilities.js');  /* R3-08/R3-11: MAH VITAL, FORGE, MODE */
   const CFURN = await optional('./campus-furnishing.js'); /* CAMPUS: the props that make the quad a place */
   const CFRONT = await optional('./campus-frontage.js');  /* CAMPUS: the named buildings that hold the quad */
+  const MINF = await optional('./mineral-floor.js');      /* CAMPUS: the faceted mineral deck and its streets */
   const MBEAST = await optional('./mahbeasts.js');    /* R3-10: MAHBEASTS, Monkey Dogs L5-7 + boss */
   const ILINK = await optional('./interlink.js');     /* R2 §5: the routes between the three cities */
   const HALOM = await optional('./halo.js');          /* R4: MAH HALO, the upper sanctuary surface */
@@ -227,6 +228,10 @@ export async function createMahplaza(canvas, options = {}) {
 
   /* ---- the world ------------------------------------------------------- */
   buildGround(ctx);
+  /* the mineral deck goes in straight after ground.js, because ground.js is what publishes
+     ctx.lightPool and ctx.floorMaterials and the mineral surface has to join both. */
+  let mineral = null;
+  if (MINF && MINF.buildMineralFloor) { try { mineral = MINF.buildMineralFloor(ctx); } catch (e) { console.info('MAHPLAZA: mineral floor failed —', e && e.message); mineral = null; } }
   const buildings = buildBuildings(ctx);
   /* doors: where ambient residents may enter and leave (derived from the destination actions) */
   ctx.actions.filter(a => a.kind === 'destination').forEach(a => { const g = buildings[a.id]; ctx.lifeAnchors.doors.push({ id: a.id, position: a.at.clone(), facing: g ? g.rotation.y : 0, building: a.id }); });
@@ -272,6 +277,16 @@ export async function createMahplaza(canvas, options = {}) {
   if (TERRAIN && TERRAIN.buildTerrain) {
     try { terrain = TERRAIN.buildTerrain(ctx); if (terrain && terrain.group && !terrain.group.parent) scene.add(terrain.group); }
     catch (e) { console.info('MAHPLAZA: terrain module failed —', e && e.message); terrain = null; }
+  }
+  /* ---- SEAT THE ASCENT OUTPOSTS ON REAL ROCK -------------------------------------------------
+     fobeam.js builds above, before there is any terrain to ask, so its nine landscape ascents sit
+     on the flat until this line runs. terrain.js's sampleTop is a raycast against the rock it
+     actually built, so the outposts search their own bearings for a shoulder or a summit and seat
+     themselves against the geometry rather than against a tabulated elevation — which is how the
+     first cut ended up with a landing buried inside a mountain and nothing in frame to show it. */
+  if (fobeams && fobeams.seatOutposts && terrain && terrain.sampleTop) {
+    try { fobeams.seatOutposts(terrain.sampleTop); }
+    catch (e) { console.info('MAHPLAZA: outpost seating failed —', e && e.message); }
   }
   if (CITY && CITY.buildCity) { try { city = CITY.buildCity(ctx); if (city && city.group && !city.group.parent) scene.add(city.group); } catch (e) { console.info('MAHPLAZA: city module failed —', e && e.message); city = null; } }
   if (DRESS && DRESS.buildDressing) { try { dressing = DRESS.buildDressing(ctx); if (dressing && dressing.group && !dressing.group.parent) scene.add(dressing.group); } catch (e) { console.info('MAHPLAZA: dressing module failed —', e && e.message); dressing = null; } }

@@ -107,6 +107,16 @@
     "pos": [0, 430, 620], "look": [0, 30, -110], "fov": 56
   },
 
+  "outpost-flank": {
+    "why": "CAMPUS 21 — THE ASCENT OUTPOST NETWORK, close. Aimed at fobeam.js 'out-flank-a', which SEARCHES bearing 52 for a shoulder and seated itself at radius 582, ground 86, on a peak of 196 — 44 percent of the way up, which is what the flank kind asks for. The camera stands at radius 380 on the same bearing where terrain.js sampleTop reports 0, i.e. in clear air; the first version of this camera was placed by eye and rendered the inside of a mountain. The outposts stand on terrain no table can predict, so a floating or buried landing has nothing else in frame to give it away.",
+    "pos": [299.4, 150, -233.9], "look": [458.6, 100, -358.3], "fov": 52
+  },
+
+  "outpost-grove": {
+    "why": "CAMPUS 22 — AN OUTPOST AMONG THE TREES. Aimed at 'out-tree-a', seated at bearing 24, radius 330, on flat ground inside the treeline belt. Proves the second half of the direction — an ascent standing BETWEEN trees, at a scale that reads as infrastructure beside a crown rather than as a second monument. Camera at radius 250 on the same bearing, sampled clear.",
+    "pos": [101.7, 22, -228.3], "look": [134.2, 24, -301.4], "fov": 54
+  },
+
   "waterfront": {
     "why": "CAMPUS 8 — WATERFRONT / SEA RELATION. Standing on the rear of the loop looking out along the reserved open arc (bearings 66 through 294, where no facility or block may stand) toward the coast. Master section 11: the sea is the world boundary and must not be walled off. This view is what proves the corridor is actually clear.",
     "pos": [0, 3.0, 200], "look": [0, 30, 2600], "fov": 50

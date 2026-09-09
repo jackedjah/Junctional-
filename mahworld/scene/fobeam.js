@@ -143,6 +143,131 @@ export const ASCENTS = [
      backdrop dark enough to take it. This is the ascent line the world is introduced by. */
   { id: 'ascent-north', x: -24, z: -114, h: 604, pod: 1.06, phase: 0.6120, w: 1.30 }
 ];
+/* ---- THE ASCENT OUTPOSTS ----------------------------------------------------------------------
+   Direction: "put some elevators on the side of and on top of some mountains and in between some
+   other trees on the map — same style as that big connector to the dome, connected to the tree
+   addition and the ceiling dome. We're adding infrastructure, not environmental stuff."
+
+   These are the same MAH ASCENT line the plaza runs, placed out in the landscape. They are NOT a
+   second implementation of it: the outpost beams are extra instances of the SAME three geometries
+   in the SAME three materials the central lines use, created a few hundred lines below where those
+   already exist. One truth, one source — a mirrored copy of the beam profile in another module is
+   how two things that are meant to be identical drift apart, and this world has paid for that
+   before.
+
+   WHAT IS DIFFERENT is only what should be: an outpost is INFRASTRUCTURE, so it gets no pad
+   architecture, no pod, no doors and no rank in the plaza's lighting hierarchy — the reconstruction
+   master is explicit that local nodes should read as infrastructure and the main ascent stays the
+   monument. Each one gets a LANDING instead: a small hexagonal deck with a rim and four legs, so
+   the beam visibly stands on something built.
+
+   ---- THE SITES ARE FOUND, NOT TABULATED, AND THAT IS THE CORRECTION ---------------------------
+   The first cut of this table wrote nine (bearing, radius, elevation) triples by eye, because the
+   world had no way to ask how high the ground was. Two diagnostic cameras aimed at the result
+   settled it: at bearing 44 / radius 688 there was no outpost in frame at all — the deck asserted
+   at y 132 was buried inside a range that rises past 300 there — and the camera placed to watch the
+   treeline node stood inside a ridge. Nine numbers, and the two that were checked were both wrong.
+   Guessing an elevation in a landscape generated from a seed is not a thing that can be got right
+   by trying harder; it is a thing that has to stop being guessed.
+
+   So terrain.js now exports sampleTop(x, z) — a raycast against the rock it actually built — and
+   each outpost carries a bearing and a KIND rather than a position. At seat time the node marches
+   outward along its bearing, samples the ground every few metres, and takes the radius that best
+   satisfies its kind: `grove` wants flat ground inside the treeline belt, `flank` wants the
+   steepest mid-height shoulder it can find, `summit` wants the highest point on the bearing. The
+   placement is then a property of the terrain rather than of my eye, it stays correct if the
+   terrain seed or the range radii ever change, and — the part that matters for the direction — a
+   node asked to stand on the side of a mountain provably stands on the side of a mountain.
+
+   `h` is the beam's own height above its landing, `w` its width. Bearings avoid the three mountain
+   passes and the reserved rear sightline; the rest is measured. */
+const OUTPOSTS = [
+  /* among the trees — the treeline belt runs r 300-605, so the search window is inside it */
+  /* WIDTHS. `w / 0.62` is the horizontal scale applied to the shared beam geometry, whose natural
+     width is what the three plaza ascents render at. The first cut set these at 0.26-0.34, which is
+     HALF the plaza beam, and the render showed the result: a node 200 m out was a hairline scratch
+     against a mountain, not a piece of infrastructure. These now match the plaza lines in world
+     width and are simply further away, which is what "the same style as that big connector" means
+     — and it keeps the lighting hierarchy intact, because a line that is the same size but three
+     hundred metres back cannot out-rank the one you are standing under. */
+  { id: 'out-tree-a', deg: 24,  kind: 'grove', from: 330, to: 520, h: 470, w: 0.58 },
+  { id: 'out-tree-b', deg: 96,  kind: 'grove', from: 320, to: 500, h: 448, w: 0.55 },
+  { id: 'out-tree-c', deg: 138, kind: 'grove', from: 360, to: 560, h: 496, w: 0.58 },
+  { id: 'out-tree-d', deg: 252, kind: 'grove', from: 340, to: 530, h: 462, w: 0.55 },
+  { id: 'out-tree-e', deg: 318, kind: 'grove', from: 320, to: 500, h: 440, w: 0.56 },
+  /* on the flanks of the near range: a shoulder part-way up, not a summit and not the foot */
+  /* the windows are WIDE because the ranges are placed from a seed and their radii vary by bearing:
+     a 300 m window centred on the nominal ring radius found no mountain at all on bearing 44 and
+     dropped that node onto the flat. The search is cheap; let it look. */
+  { id: 'out-flank-a', deg: 52,  kind: 'flank', from: 480, to: 1250, h: 396, w: 0.70 },
+  { id: 'out-flank-b', deg: 118, kind: 'flank', from: 480, to: 1250, h: 372, w: 0.68 },
+  { id: 'out-flank-c', deg: 286, kind: 'flank', from: 480, to: 1250, h: 410, w: 0.70 },
+  /* and one on top of a summit, which is the one you see from the whole campus */
+  { id: 'out-summit',  deg: 74,  kind: 'summit', from: 520, to: 1150, h: 300, w: 0.86 }
+];
+
+/* THE SEARCH. Two passes along the bearing at 6 m steps — fine enough to land on a shoulder of a
+   range whose facets are tens of metres across, cheap enough that nine nodes cost a few hundred
+   raycasts against a handful of merged meshes, once, at build time.
+
+   IT IS TWO PASSES BECAUSE ONE WAS NOT ENOUGH, AND THE FIRST PROBE SAID SO. A single pass scoring
+   "higher is better, steeper is better" put the flank node meant for the side of a mountain at
+   ground 304 — on a summit — and put every grove node on the first flat sample it met, so all five
+   crowded the inner edge of their windows. A score with no target has no middle: it always walks to
+   an end of the window. So pass one just measures the bearing and records its highest point, and
+   pass two scores against a target derived from it — 45 % of the local peak for a flank, which is
+   what "part way up the side" means in numbers.
+
+   The slope term is sampled 14 m to either side along the same bearing, which is the scale of the
+   landing itself: what matters is whether the deck's own footprint sits on a slope, not whether the
+   mountain does. A flank wants slope; a grove refuses it.
+
+   Heights clamp at 0. The ranges are translated down by 26 m so their skirts sit below the world
+   floor, and a ray that passes over a peak can hit one of those skirts and report a NEGATIVE
+   ground — which the first probe duly showed as a landing seated at -11.3. Below zero there is no
+   ground here, there is only geometry.
+
+   Deterministic, no rand(), and it returns the middle of the window rather than nothing if the
+   sampler is missing — a world built without terrain still gets its outposts, on the flat. */
+function seekSite(sample, deg, kind, from, to) {
+  const t = deg * Math.PI / 180, sx = Math.sin(t), sz = -Math.cos(t);
+  const STEP = 6, PROBE = 14;
+  const at = r => Math.max(0, sample(sx * r, sz * r));
+
+  /* pass one: what does this bearing look like? */
+  let peak = 0;
+  for (let r = from; r <= to; r += STEP) peak = Math.max(peak, at(r));
+  const target = peak * 0.45;
+  const mid = (from + to) / 2, span = (to - from) / 2 || 1;
+
+  /* pass two: score every sample against what this kind is actually looking for */
+  let best = null;
+  for (let r = from; r <= to; r += STEP) {
+    const y = at(r);
+    const slope = Math.abs(at(r + PROBE) - at(r - PROBE)) / (PROBE * 2);
+    let score;
+    if (kind === 'summit') {
+      score = y;                                            /* the one kind that IS an extreme */
+    } else if (kind === 'grove') {
+      if (y > 12) continue;                                 /* never halfway up a foothill */
+      /* flat first, then a gentle pull toward the middle of the belt so five nodes on five
+         bearings do not all stack against the inner edge at the same radius */
+      score = 100 - y * 5 - slope * 70 - Math.abs(r - mid) / span * 14;
+    } else {
+      if (y < 25 || peak < 90) continue;                    /* no mountain here to stand on */
+      /* the shoulder: near the target height, and on a real slope rather than a shelf */
+      score = 120 - Math.abs(y - target) / Math.max(1, target) * 130 + Math.min(slope, 1.4) * 55;
+    }
+    if (best === null || score > best.score) best = { score, r, x: sx * r, z: sz * r, y, peak };
+  }
+  /* A FLANK THAT FOUND NO MOUNTAIN GOES TO THE HIGH GROUND, NOT TO THE FLAT. The first run of this
+     search dropped exactly one node that way and it became a tenth grove node standing in a field,
+     which is not what the table asked for and not what a reader of the table would expect. */
+  if (!best && kind === 'flank') return seekSite(sample, deg, 'summit', from, to);
+  if (best) return best;
+  return { score: 0, r: mid, x: sx * mid, z: sz * mid, y: 0, peak };
+}
+
 /* ground.js FLOOR_TOP: the laid deck is 0.17 above the raw ground plane and everything that stands
    on the plaza stands on the DECK. A pad sunk to y = 0 would show a 17 cm gap along its whole rim. */
 const DECK_Y = 0.17;
@@ -388,6 +513,14 @@ function lyingQuad() {
 
 export function buildFobeams(ctx) {
   const scene = ctx.scene, M = ctx.M || {};
+  /* assigned by the outpost block below and exported on the contract, so mahplaza.js can re-seat the
+     nine landings against real rock once terrain has built. Null if the ascent family is switched
+     off entirely — the caller checks.
+     `outpostSeats` is held HERE and copied onto stats at the bottom of the file rather than written
+     from inside the build block: `stats` is still in its temporal dead zone down there, and a write
+     to it throws, which takes the whole module out of the scene with a console.info nobody reads. */
+  let outpostSeater = null;
+  let outpostSeats = [];
   const theme = ctx.theme || M.theme || { energy: 0x7fc6ff, energyLight: 0xdff1ff, energyDeep: 0x2a63c9 };
   const group = new THREE.Group(); group.name = 'fobeams';
   const owned = { geometries: [], materials: [], textures: [] };
@@ -1031,6 +1164,93 @@ export function buildFobeams(ctx) {
     });
     coreMesh.instanceMatrix.needsUpdate = bandMesh.instanceMatrix.needsUpdate = sheathMesh.instanceMatrix.needsUpdate = true;
     revealMesh.instanceMatrix.needsUpdate = true;
+
+    /* ---- THE OUTPOSTS ------------------------------------------------------------------------
+       Same geometry, same materials, own instanced meshes. Own meshes rather than extra instances
+       on the central three because the plaza's lines carry pads, pods, doors and a lighting rank
+       that iterate by index: growing those arrays for nine beams that have none of those things is
+       how an index goes out of range three passes later. Three extra draw calls buys total
+       independence and an identical look. */
+    const N_OUT = OUTPOSTS.length;
+    const oCore = new THREE.InstancedMesh(coreGeo, beamCoreMat, N_OUT);
+    const oBand = new THREE.InstancedMesh(bandGeo, beamBandMat, N_OUT);
+    const oSheath = new THREE.InstancedMesh(sheathGeo, beamSheathMat, N_OUT);
+    oCore.renderOrder = 6; oBand.renderOrder = 5; oSheath.renderOrder = 4;
+    oCore.name = 'outpost-line-core'; oBand.name = 'outpost-line-travel'; oSheath.name = 'outpost-line-sheath';
+    [oCore, oBand, oSheath].forEach(m => { m.frustumCulled = false; ascentGroup.add(m); });
+
+    /* the landing: a hexagonal deck, a rim, and four legs. Built once and instanced, in the world's
+       own platinum and graphite so an outpost reads as the same civilisation as the plaza pads. */
+    const landParts = [], legParts = [];
+    {
+      const deck = new THREE.CylinderGeometry(5.6, 5.2, 0.55, 6);
+      const rim = new THREE.CylinderGeometry(6.05, 6.05, 0.20, 6, 1, true);
+      landParts.push(deck.clone().translate(0, -0.28, 0));
+      landParts.push(rim.clone().translate(0, 0.02, 0));
+      /* a low rail, so the deck reads as somewhere a person can stand */
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
+        const post = new THREE.CylinderGeometry(0.12, 0.14, 1.25, 6);
+        landParts.push(post.clone().translate(Math.cos(a) * 5.2, 0.62, Math.sin(a) * 5.2));
+        post.dispose();
+      }
+      const hoop = new THREE.TorusGeometry(5.2, 0.075, 5, 18).rotateX(Math.PI / 2);
+      landParts.push(hoop.clone().translate(0, 1.18, 0));
+      deck.dispose(); rim.dispose(); hoop.dispose();
+      /* four legs, long enough to reach ground from any of the seated heights this table uses */
+      const leg = new THREE.CylinderGeometry(0.42, 0.62, 1, 6);
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+        legParts.push(leg.clone().translate(Math.cos(a) * 3.5, 0, Math.sin(a) * 3.5));
+      }
+      leg.dispose();
+    }
+    /* mergeGeos takes the attribute list explicitly — it has no default, and omitting it took the
+       WHOLE fobeam module down with "attrs is not iterable", which meant the central ascent lines
+       vanished along with the outposts and three renders came back looking like a composition
+       change. A module that dies quietly returns a plausible picture. */
+    const landGeo = own(mergeGeos(landParts, ['position', 'normal', 'uv']));
+    const legGeo = own(mergeGeos(legParts, ['position', 'normal', 'uv']));
+    const landMesh = new THREE.InstancedMesh(landGeo, M.platinumLit || M.platinum, N_OUT);
+    const legMesh = new THREE.InstancedMesh(legGeo, M.graphiteDark || M.graphite, N_OUT);
+    landMesh.name = 'outpost-landing'; legMesh.name = 'outpost-legs';
+    landMesh.castShadow = landMesh.receiveShadow = true;
+    ascentGroup.add(landMesh); ascentGroup.add(legMesh);
+
+    /* ---- SEATING. Called once here with a flat-ground fallback so the outposts exist even if the
+       terrain module is absent or failed, and called AGAIN by mahplaza.js the moment terrain has
+       built and can be asked how high the rock is. mahplaza builds fobeams before terrain — moving
+       that order to suit one table would reshuffle the scene graph for every module that follows,
+       so the seating is deferred instead of the build. Re-running it only rewrites five instance
+       matrices, which is why it is a function rather than an inline block. ------------------- */
+    const _om = new THREE.Matrix4(), _op = new THREE.Vector3(), _oq = new THREE.Quaternion(), _os = new THREE.Vector3();
+    const FLAT = () => 0;
+    function seatOutposts(sample) {
+      const s = typeof sample === 'function' ? sample : FLAT;
+      const seats = [];
+      OUTPOSTS.forEach((O, i) => {
+        const site = seekSite(s, O.deg, O.kind, O.from, O.to);
+        /* the deck stands clear of the ground it found: on rock that is the legs' business, on the
+           flat it is the laid deck's 0.17. A summit node sits a little proud of its own peak. */
+        const y0 = site.y > 1 ? site.y + (O.kind === 'summit' ? 4.5 : 3.2) : DECK_Y;
+        const x = site.x, z = site.z;
+        _oq.identity();
+        /* the beam, seated on the landing's deck and scaled to its own height */
+        _op.set(x, y0 + 0.4, z); _os.set(O.w / 0.62, O.h, O.w / 0.62); _om.compose(_op, _oq, _os);
+        oCore.setMatrixAt(i, _om); oBand.setMatrixAt(i, _om); oSheath.setMatrixAt(i, _om);
+        _op.set(x, y0, z); _os.set(1, 1, 1); _om.compose(_op, _oq, _os); landMesh.setMatrixAt(i, _om);
+        /* the legs run from the deck down INTO whatever it stands on, so the join is never a gap */
+        const legH = Math.max(6, y0 - Math.max(0, site.y - 5));
+        _op.set(x, y0 - 0.55 - legH / 2, z); _os.set(1, legH, 1); _om.compose(_op, _oq, _os);
+        legMesh.setMatrixAt(i, _om);
+        seats.push({ id: O.id, kind: O.kind, r: Math.round(site.r), ground: +site.y.toFixed(1), deck: +y0.toFixed(1), peak: +(site.peak || 0).toFixed(1) });
+      });
+      [oCore, oBand, oSheath, landMesh, legMesh].forEach(m => { m.instanceMatrix.needsUpdate = true; });
+      outpostSeats = seats;
+      return seats;
+    }
+    outpostSeater = seatOutposts;
+    seatOutposts(null);
     [coreMesh, bandMesh, sheathMesh, revealMesh, floorMesh, shellMesh, beltMesh, glassMesh, seamMesh, fieldMesh2,
      cabinMesh, fitMesh, doorGlowMesh, leafMeshA, leafMeshB]
       .forEach(m => { for (let i = 0; i < m.count; i++) m.setColorAt(i, grey); m.instanceColor.needsUpdate = true; });
@@ -1422,8 +1642,16 @@ export function buildFobeams(ctx) {
   /* stats is assembled further down this file than the field is built, so the count is attached
      here rather than at the build site — where `stats` is still in its temporal dead zone. */
   stats.musicLines = musicLines.stats;
+  /* the outposts report from here for the same reason the music lines do — see the note above. The
+     seats are a live reference, so a later re-seat against terrain shows up without re-publishing. */
+  stats.outposts = OUTPOSTS.length;
+  Object.defineProperty(stats, 'outpostSeats', { get: () => outpostSeats, enumerable: true });
   return {
     group, setTime, update, dispose, stats, routes: stats.routes, ascent: stats.ascent,
+    /* re-seat the ascent outposts against a terrain height sampler. mahplaza builds this module
+       before terrain, so at build time there is no rock to ask and the nine landings sit on the
+       flat; this is how they find the mountains afterwards. Returns the seats it chose. */
+    seatOutposts(sample) { return outpostSeater ? outpostSeater(sample) : []; },
     /* THE LIVE LINE STATE, and it is exported so the doors can be MEASURED rather than photographed.
        stats.ascent is a snapshot taken at build and can say nothing about whether a leaf ever moved;
        a render can show a 140-pixel pod and settle nothing. These are the same objects stepAscent

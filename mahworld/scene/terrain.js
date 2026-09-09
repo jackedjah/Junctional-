@@ -873,8 +873,40 @@ export function buildTerrain(ctx) {
     owned.materials.forEach(m => m.dispose());
   }
 
+  /* ---------------------------------------------------------------- the height sampler
+     WHY THIS EXISTS. Nothing in this world could ask how high the ground is. Every module that
+     wanted to stand something on a mountain therefore GUESSED an elevation and wrote it into a
+     table, and the guesses were wrong in both directions at once: the ascent outposts put a landing
+     at y 132 on a bearing where the near range rises past 300, so the platform was inside the rock,
+     and put a diagnostic camera on flat ground that turned out to be a ridge face. A picture of the
+     inside of a mountain is not a picture you can correct from.
+
+     It is a RAYCAST against the built meshes rather than a second evaluation of massif(), and that
+     is the whole point. massif() consumes a seeded rand() in sequence and the ranges are rotated,
+     tilted and translated after it returns; a formula that re-derived any of that would be a second
+     table describing one thing, and this project has paid for that repeatedly. The geometry in the
+     scene IS the terrain, so the geometry is what gets asked.
+
+     Only the ROCK is sampled. The treeline, the land ring and the basin water are not ground you
+     stand on — a caller asking for the height at a point in the forest wants the forest floor, which
+     is 0, not the top of a crown. A miss returns 0 for the same reason: off the ranges, this world
+     is flat.
+
+     Cheap enough to call freely at build time (a handful of merged meshes, no BVH), and deliberately
+     not called per frame by anything. */
+  const _sampleRay = new THREE.Raycaster();
+  const _sampleDown = new THREE.Vector3(0, -1, 0);
+  const _sampleFrom = new THREE.Vector3();
+  function sampleTop(x, z) {
+    _sampleFrom.set(x, 4000, z);
+    _sampleRay.set(_sampleFrom, _sampleDown);
+    _sampleRay.far = 4200;
+    const hits = _sampleRay.intersectObjects(rangeGroups, false);
+    return hits.length ? hits[0].point.y : 0;
+  }
+
   group.traverse(o => { if (o.isMesh && o.geometry) { const g = o.geometry, n = g.index ? g.index.count : g.attributes.position.count; stats.triangles += Math.round(n / 3); stats.drawCalls++; } });
   setTime(ctx.clock && ctx.clock.state ? ctx.clock.state() : { daylight: 0 });
 
-  return { group, setTime, setTheme, update, setQuality, dispose, stats, basin };
+  return { group, setTime, setTheme, update, setQuality, dispose, stats, basin, sampleTop };
 }

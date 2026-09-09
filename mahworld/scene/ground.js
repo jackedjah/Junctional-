@@ -72,6 +72,18 @@ import { SITES } from './buildings.js';
    identity language and a later pass may want a trace of it back at a fraction of this strength. */
 export const SMOOTH_FLOOR = true;
 
+/* ==== R-CAMPUS D11 — THE MINERAL FLOOR TAKES OVER THE DECK =====================================
+   Direction: "make the entire floor have random diamond elements to it, like a supreme premium
+   mineral rock all across — not completely flat, with ridges and entropy and multiple sizes of
+   faces on the shards, darker, and patterns that imitate streets you can follow to the buildings."
+
+   mineral-floor.js builds that surface: a jittered polar tessellation with multi-octave relief and
+   street corridors cut into it, covering r 0-420. It stands where this file's diamond field used to,
+   so the field is switched off rather than left underneath to z-fight with it at the same height.
+   The light pools, the shard outcrops and the wordmark all stay — they sit ON the deck and the deck
+   is simply made of something else now. */
+export const MINERAL_DECK = true;
+
 export const PLAZA_RADIUS = 27;
 /* THE HERO SURFACE (v5 §05): the plaza floor is laid in ARCHITECTURAL-SCALE diamond cells — nine metres
    across, the width of a room, not a tile pattern. A resident standing on one covers a fifth of it. */
@@ -557,7 +569,7 @@ export function buildGround(ctx) {
       }
     }
     cellGeo.dispose(); studGeo.dispose();
-    const field = new THREE.Group(); field.rotation.y = Math.PI / 4; field.name = 'plaza-diamond-floor'; g.add(field);
+    const field = new THREE.Group(); field.rotation.y = Math.PI / 4; field.name = 'plaza-diamond-floor'; if (!MINERAL_DECK) g.add(field);
     const add = (list, mat, name, order) => { if (!list.length) return; const mesh = new THREE.Mesh(mergeGeos(list), mat); mesh.name = name; mesh.receiveShadow = true; if (order) mesh.renderOrder = order; field.add(mesh); };
     add(satin, satinMat, 'floor-satin-field', 3);
     add(hero, heroMat, 'floor-hero-field', 3);
