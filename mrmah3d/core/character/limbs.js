@@ -456,14 +456,14 @@ function buildArm(materials, spec, options) {
     { depthRatio: 1.06, crystal: opts.maleAnatomy ? 0 : 0.010, facet: opts.maleAnatomy ? 0 : undefined, steps: opts.maleAnatomy ? 10 : 9, fg: [1, 2], normalWeight: opts.maleAnatomy ? 'angle' : undefined,
       samplesT: opts.maleAnatomy ? [0,.055,.12,.20,.30,.42,.55,.67,.79,.90,1] : undefined,
       surfaceWorld: opts.maleAnatomy ? function(p,t){
-        var shaped=maleForePlanes(p,t,foreFrame,spec,bendK);
+        var shaped=maleForePlanes(p,t,foreFrame,spec,bendK,legacyArms);
         var q=junction?junction(shaped,t,true):shaped;
         // The last disc is seated inside the new wrist transition.
         var k=Math.max(0,Math.min(1,(t-.88)/.12));k=k*k*(3-2*k);
         var axial=q[0]*foreAxis.x+q[1]*foreAxis.y+q[2]*foreAxis.z;
         return q.map(function(v,i){var c=[foreAxis.x,foreAxis.y,foreAxis.z][i]*axial;return c+(v-c)*(1-.14*k);});
       } : undefined,
-      profile: opts.maleAnatomy ? function(t) { return maleForeProfile(t,bendK); } : ARMS_.profiles.fore, shape: function (t, d) { return opts.maleAnatomy ? maleForeShape(t, d, foreInner, forePalmAngle) : ARMS_.shapes.fore(t, d, foreInner, false); }, lift: ARMS_.classLift,
+      profile: opts.maleAnatomy ? function(t) { return maleForeProfile(t,bendK,legacyArms); } : ARMS_.profiles.fore, shape: function (t, d) { return opts.maleAnatomy ? maleForeShape(t, d, foreInner, forePalmAngle) : ARMS_.shapes.fore(t, d, foreInner, false); }, lift: ARMS_.classLift,
       classes: REGIONS.FOREARM.classes, columns: true, zoneAt: armZone(REGIONS.FOREARM.classes, foreInner),
       coat: REGIONS.FOREARM.coat }
   );
@@ -526,7 +526,16 @@ function buildArm(materials, spec, options) {
      origin (up to 1.14 of its radius) and the wedge on the outside of the
      bend showed that ring's flat disc past a ball sized to the bare radius.
      On the hanging arm the tubes overlap and the ball stays flush. */
-  var eR = spec.foreRadius * ARMS_.profiles.fore(0) * (1.0 + 0.12 * (1 - bendK));
+  /* R255 — SIZED FROM THE PROFILE THE FOREARM IS ACTUALLY BUILT WITH. This read
+     `ARMS_.profiles.fore(0)` — the generic profile, 0.77 — while the male arm is
+     lofted with `maleForeProfile`, whose pose burial takes its root to 0.63 on a
+     straight elbow (0.52 before R255 raised it). The ball was therefore 1.47x the tube it emerges into and
+     read as a bead between two tapers. Taking the same function makes it flush
+     with the forearm's own root by construction, in every pose. Gated on
+     `legacyArms` so Mrs. Mah, whose arms come through this same path, is
+     untouched. */
+  var foreRoot = (opts.maleAnatomy && !legacyArms) ? maleForeProfile(0, bendK, false) : ARMS_.profiles.fore(0);
+  var eR = spec.foreRadius * foreRoot * (1.0 + 0.12 * (1 - bendK));
   /* A BALL, not a drum: its end discs closed to half the radius so they sit
      inside both tubes (a drum's disc showed as a bright flat lid on the
      outside of the bend as soon as it was sized to the upper arm). */
@@ -602,7 +611,7 @@ function buildArm(materials, spec, options) {
      band on the wrist, the compression before the hand expands. */
   var cR = spec.wristRadius * ARMS_.profiles.fore(1) * 1.08;
   var fitWrist=opts.maleAnatomy&&opts.authoringMaster;
-  var wristSurface=opts.maleAnatomy?maleWristSurface(spec,HAND_,foreVec.length()-foreStart.dot(foreAxis),bendK,fitWrist):null;
+  var wristSurface=opts.maleAnatomy?maleWristSurface(spec,HAND_,foreVec.length()-foreStart.dot(foreAxis),bendK,fitWrist,legacyArms):null;
   if(fitWrist)wristSurface=fitWristToForearm(wristSurface,foreGeo,foreVec,wristJoint.quaternion);
   var cuffGeo = segment([0, opts.maleAnatomy?-.042:-0.026, 0], [0, opts.maleAnatomy?.030:0.022, 0], cR, cR * 0.97, 10,
     { depthRatio: 0.92, crystal: fitWrist?0:0.006, steps: fitWrist?4:2,

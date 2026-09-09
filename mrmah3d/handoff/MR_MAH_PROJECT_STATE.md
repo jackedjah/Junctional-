@@ -2154,3 +2154,62 @@ three local maxima separated by 15-19% dips; the raised forearm is the
 counter-example with one belly and a monotone taper either side.
 
 R254 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R253 07a3f80.
+
+--------------------------------------------------------------------------------
+R255 — PHASE B: THE ELBOW BALL WAS SIZED FROM THE WRONG PROFILE
+--------------------------------------------------------------------------------
+
+FIRST, THE THING THAT IS NOT WRONG. `maleUpperShape` is not a primitive: it
+already authors a biceps with a footprint taper, a triceps long head and lateral
+head on their own axes, a brachialis wedge with asymmetric returns, intermuscular
+septa and a distal tendon. The anatomy IS in the runtime path. The "stacked
+capsules" read is not missing muscle.
+
+WHAT IS WRONG IS THE JOINT SIZING, and it is a plain bug.
+
+  var eR = spec.foreRadius * ARMS_.profiles.fore(0) * (1 + .12*(1-bendK));
+
+`ARMS_.profiles.fore` is the GENERIC profile and returns 0.77 at the root. The
+male forearm is not lofted with it — it is lofted with `maleForeProfile`, whose
+pose-burial term takes the root to 0.524 on a straight elbow. So the ball was
+sized from a function the tube does not use:
+
+  upper arm distal 0.1201  ->  BALL 0.0862  ->  forearm root 0.0586  ->  belly 0.098
+
+The ball stood at 1.47x the tube it emerges into. That is section 16's "tiny neck
+between two balloons", measured, and it is what reads as a bead on a string.
+
+FIXED TWO WAYS, BOTH BOUNDED AND RUNTIME-ONLY:
+  - the ball takes `maleForeProfile` — the same function the forearm is built
+    with — so it is flush with that tube's own root by construction, in any pose;
+  - the root burial comes 0.32 -> 0.18 so the forearm RE-EXPANDS out of the joint
+    instead of pinching first and blooming later.
+
+  new chain   upper 0.1201 -> ball 0.0707 -> root 0.0707 -> belly 0.1120 -> wrist 0.065
+  forearm     0.071 0.089 0.107 0.111 0.112 0.108 0.103 0.094 0.085 0.075 0.065
+              one belly, monotone either side — section 17's shape.
+
+AND A SHARED-CODE LEAK THAT SECTION 0 NAMES EXPLICITLY. The first cut moved MRS.
+MAH: her proportion set carries `maleAnatomy === true` on purpose (her arms come
+through this same path and are then sculpted by her own R166 refiners), so an
+edit gated on `maleAnatomy` reaches her. Gating on `legacyArms` — the existing
+R166-retained view she already carries — fixed the elbow solids but NOT her
+forearm, because `maleForeProfile` has TWO INTERNAL CALLERS inside
+arm-anatomy.js (`maleForePlanes`, `maleWristSurface`) that passed only
+(t, straightness), so the new default reached her through them. Both now take
+and forward `legacy`.
+
+  Verified by hash, not by inspection: Mrs. Mah 26 meshes IDENTICAL to b63d0c7.
+  contracts 376/376    triangles 172812
+
+STANDING LESSON: when adding a parameter to a shared limb function, grep for
+INTERNAL callers in the same module before believing a call-site gate. A default
+argument is a silent propagation channel, and `maleAnatomy` is not a character
+discriminator on this project — `legacyArms` is.
+
+STILL OPEN IN PHASE B: the deltoid cap's sphericality, the biceps/triceps
+territory split in the side view, and the forearm's flexor/extensor asymmetry are
+NOT yet addressed. The improvement here is at the elbow only, and it is modest at
+full-character distance.
+
+R255 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R254 2f36747.

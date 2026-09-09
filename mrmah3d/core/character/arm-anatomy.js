@@ -147,12 +147,25 @@ function upperEnvelope(t) {
 export function maleUpperProfile(t) {
   return upperEnvelope(t) * (1 - 0.08 * (1 - smooth(0, 0.20, t)));
 }
-export function maleForeProfile(t, straightness) {
+export function maleForeProfile(t, straightness, legacy) {
   const base=0.77 + 0.29 * Math.pow(Math.max(0, Math.sin(Math.pow(t, 0.80) * Math.PI)), 1.1) - 0.19 * Math.pow(t, 1.2);
   // Pose-supported burial of the proximal end disc. The long muscle envelope
   // is unchanged; a straight elbow lets its hidden origin extend up under the
   // humeral surface. At a folded elbow the joint retains the full root size.
-  return base*(1-.32*(straightness||0)*(1-smooth(0,.22,t)));
+  /* R255 — the burial is 0.18, not 0.32. At 0.32 the male forearm's root came
+     out at 0.524 of its radius while the elbow ball was still being sized from
+     the GENERIC `ARMS.profiles.fore(0)` = 0.77 (see limbs.js), so the ball stood
+     at 1.47x the tube it emerges into: upper arm 0.120, ball 0.086, root 0.059,
+     belly 0.098 — a bead on a string, which is section 16's "tiny neck between
+     two balloons" exactly. The ball is sized from this function now, and the
+     root comes up to meet it so the forearm RE-EXPANDS out of the joint instead
+     of pinching first and blooming later. */
+  /* GATED ON THE GENERATION, NOT ON `maleAnatomy`. Mrs. Mah's proportion set
+     carries `maleAnatomy === true` — her arms are built by this same path and
+     then sculpted by her own R166 refiners — so an ungated edit here moved HER
+     forearm and elbow too (measured: arm-right-fore and both elbow solids
+     changed hash). `legacy` is the existing R166-retained view; she keeps 0.32. */
+  return base*(1-(legacy?.32:.18)*(straightness||0)*(1-smooth(0,.22,t)));
 }
 /* R111: cap and upper arm share ONE closed surface in the existing shoulder
    joint. h remains the humeral coordinate used by both homologous arms. No
@@ -270,10 +283,10 @@ export function maleForeShape(t, d, inner, palmAngle) {
 // radial clamp changed both coordinates together and kept the forearm conical.
 // This moves only the ulna-facing width or dorsal depth, leaving the thumb
 // crest and flexor belly free. It runs before the shared elbow projection.
-export function maleForePlanes(point,t,frame,spec,straightness){
+export function maleForePlanes(point,t,frame,spec,straightness,legacy){
   const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);
   const x=dot(point,frame.thumb),z=dot(point,frame.palm);
-  const r=(spec.foreRadius+(spec.wristRadius-spec.foreRadius)*t)*maleForeProfile(t,straightness);
+  const r=(spec.foreRadius+(spec.wristRadius-spec.foreRadius)*t)*maleForeProfile(t,straightness,legacy);
   const w=smooth(.10,.29,t)*(1-smooth(.72,.94,t));
   const ulna=-r*(.88+.08*t),dorsal=-r*(1.00+.05*Math.sin(Math.PI*t));
   const P=MRMAH_MORPHOLOGY.arms.planeDesign.regionalPlanes;
@@ -532,13 +545,13 @@ export function blendArmSeam(upper,fore,elbowOffset,junction) {
 
 // Existing wrist connector, shaped between the actual distal forearm and the
 // preserved pentagonal palm footprint. Coordinates are the wrist's own frame.
-export function maleWristSurface(spec,hand,foreLength,straightness,closeAtPalm=false){
+export function maleWristSurface(spec,hand,foreLength,straightness,closeAtPalm=false,legacy){
   return function(point){
     const y=point[1],length=Math.hypot(point[0],point[2])||1;
     const x=point[0]/length,z=point[2]/length;
     const t=Math.max(0,Math.min(1,1+y/foreLength));
     const angle=Math.atan2(-x,z/1.06);
-    const r=(spec.foreRadius+(spec.wristRadius-spec.foreRadius)*t)*maleForeProfile(t,straightness);
+    const r=(spec.foreRadius+(spec.wristRadius-spec.foreRadius)*t)*maleForeProfile(t,straightness,legacy);
     const foreR=r*maleForeShape(t,angle,-1,0)/Math.sqrt(x*x+z*z/(1.06*1.06));
     const u=Math.max(0,y/hand.palmLength),w=hand.palmHalfWidth*(.55+.45*u),d=hand.palmHalfDepth*(.75+.25*u),ridge=hand.palmHalfDepth*(1.02+.30*u);
     const polygon=[[-w,d],[0,ridge],[w,d],[w,-d],[-w,-d]];
