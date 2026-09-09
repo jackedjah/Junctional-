@@ -976,23 +976,32 @@ export function torsoSurface(a,section,raw) {
  const lowerPlaneWeight=windowAt(yy,.70,1.45,.16)*smooth((qLower-.12)/.18)*smooth((.94-qLower)/.20)*front*(1-astraWeight);
  anatomyFront-=Math.max(0,anatomyFront-lowerPlane)*lowerPlaneWeight;
  if(astraWeight>0){
-   /* Astra's own thighShape, evaluated at this vertex's ring angle. The seam
-      is a single dome on the midline (the central DESCENT, broad at 0.30 rad
-      half-width — a valley between two masses, never an incision); `head` is
-      the thigh column's roundness peaking 40 degrees off the seam; `rf` a
-      subtle ridge on it; `valley` the RF / VL separation at 57 degrees; `vl`
-      the lateral sweep from 50 to 113 degrees; `vm` the medial teardrop low
-      and beside the seam; `itb` the flat outboard of the sweep. */
+   /* The anterior thigh, as five named masses and nothing else: `rf` the
+      RECTUS FEMORIS, the long central belly of each side, broadest through the
+      mid thigh and tapering into the knee; `vl` the VASTUS LATERALIS, the outer
+      sweep that wraps toward the side view; `vm` the VASTUS MEDIALIS, smaller,
+      medial and distal, arriving as the other two taper; `valley` the RF/VL
+      intermuscular boundary between them; `itb` the iliotibial flat outboard of
+      the sweep. */
    const c=k=>profileAt(AQ[k],yy);
    const Lb=AQ.lobes;
+   /* R251 — EVERY TERM HERE IS A NAMED MUSCLE, and the ones that were not are
+      gone. `head` (a generic thigh-column roundness), `bridge` (a midline dome
+      that filled the channel) and `seam` (an authored central descent) had no
+      anatomical owner between them, and they were what made the surface read as
+      procedural rather than sculpted: the centre was a groove cut in and then
+      partly filled back, and the mass around it was one anonymous hump.
+
+      The central valley is now what is LEFT BETWEEN THE TWO RECTUS BELLIES.
+      `rf` is centred 0.44 rad off the midline with a 0.64 half-width, so each
+      belly's tail crosses the seam and the pair overlaps there at 0.765 of its
+      own crown: a broad, shallow, soft-edged valley that no control authors
+      directly. Nothing subtracts on the midline any more. */
    const m=1
-     +(Lb.bridge?domePair(a,Lb.bridge[0],Lb.bridge[1])*c('bridge')/2:0)
-     -dome(a,Lb.seam[0],Lb.seam[1])*c('seam')
-     +domePair(a,Lb.head[0],Lb.head[1])*c('head')
      +domePair(a,Lb.rf[0],Lb.rf[1])*c('rf')
-     -domePair(a,Lb.valley[0],Lb.valley[1])*c('valley')
      +domePair(a,Lb.vl[0],Lb.vl[1])*c('vl')
      +domePair(a,Lb.vm[0],Lb.vm[1])*c('vm')
+     -domePair(a,Lb.valley[0],Lb.valley[1])*c('valley')
      -domePair(a,Lb.itb[0],Lb.itb[1])*c('itb');
    /* `front` (= sin a) is Astra's own loft factor: there the shape multiplied a
       RING RADIUS and the ring turned the radius into depth, so z was
@@ -1059,18 +1068,24 @@ export function torsoSurface(a,section,raw) {
    // point and waist remain unchanged. Boundaries blend into the shared wall.
    anatomyFront+=(target-anatomyFront)*weight;
  }
- /* R242 — ASTRA'S LOWER-LEG GRAMMAR, ANTERIOR. A small multiplicative relief
-    on the surface already there: the coefficients are 2-6% of the local radius
-    and nothing here replaces the taper, so its outline cannot move. `notch`
-    carries the centre channel on down from the quad's seam, `caps` are the
-    patellae at the knee row and `shins` the tibial ridges below them. */
+ /* THE LOWER LEG, ANTERIOR. A small multiplicative relief on the surface
+    already there: the coefficients are 2-6% of the local radius and nothing
+    here replaces the taper, so its outline cannot move.
+
+    R251 — `notch` is GONE. It was a dome on the anterior midline with no muscle
+    behind it, the quad's `seam` one segment further down, and the same defect.
+    What is left is `shins`, the TIBIALIS ANTERIOR, whose two ridges now carry a
+    0.55 radian half-width so the mirrored pair overlaps on the midline at 0.38
+    of its own crest: the shin's centre channel is the gap between them, not a
+    control. `caps` (the patellae) stays at zero — R242 measured that swapping
+    it against `shins` across one ring put a 59 degree row seam at y 0.827, and
+    the knee's read is owned by the quad taper above it instead. */
  const LL=MORPHOLOGY.lower.astraLowerLeg;
  if(LL&&front>0){
    const w=windowAt(yy,...LL.region);
    if(w>0){
      const c=k=>profileAt(LL[k],yy),B=LL.lobes;
-     const m=1-dome(a,B.notch[0],B.notch[1])*c('notch')
-              +domePair(a,B.caps[0],B.caps[1])*c('caps')
+     const m=1+domePair(a,B.caps[0],B.caps[1])*c('caps')
               +domePair(a,B.shins[0],B.shins[1])*c('shins');
      anatomyFront*=1+(m-1)*w*smooth(front/LL.sideFade);
    }

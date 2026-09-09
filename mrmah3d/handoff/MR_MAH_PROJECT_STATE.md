@@ -1854,3 +1854,77 @@ STILL OPEN AFTER PASS 1-2
 
 R250 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R249 813c5cd, then R248
 b63d0c7.
+
+--------------------------------------------------------------------------------
+R251 — ANATOMICAL OWNERSHIP: EVERY ANTERIOR TERM IS A NAMED MUSCLE
+--------------------------------------------------------------------------------
+
+The brief's rule: any relief that cannot be named is a defect. Four controls
+could not be named and are REMOVED, not reduced.
+
+  `head`    a generic thigh-column roundness (0.36 at its peak) — it was most of
+            the anterior and every muscle rode on it as a ripple.
+  `bridge`  a dome on the midline that filled the channel back in (R248-R250).
+  `seam`    an authored central descent — a groove cut on the midline.
+  `notch`   the same control one segment down, on the anterior lower leg.
+
+THE CENTRAL VALLEY IS NOW A CONSEQUENCE. `rf` sits 0.44 rad off the midline on a
+0.64 half-width, so each rectus belly's tail crosses the seam and the mirrored
+pair overlaps there at 0.765 of its own crown. Nothing subtracts on the midline
+any more. Likewise on the shin: `shins` (tibialis anterior) goes from a 0.30 to
+a 0.55 half-width and its pair overlaps at 0.38, so the shin's centre channel is
+the gap between the two ridges.
+
+WHAT REMAINS, AND WHAT EACH OWNS
+  rf      RECTUS FEMORIS      centre 0.44  hw 0.64  peak 0.52 at y 1.10
+  vl      VASTUS LATERALIS    centre 0.98  hw 0.50  peak 0.66 at y 1.23
+  vm      VASTUS MEDIALIS     centre 0.26  hw 0.30  peak 0.32 at y 0.95
+  valley  RF/VL boundary      centre 0.74  hw 0.28  peak 0.22
+  itb     iliotibial flat     centre 1.95  hw 0.30
+  shins   TIBIALIS ANTERIOR / pit POPLITEAL / tendon ACHILLES / hollow / soleus
+  caps    the patellae, held at ZERO (R242: swapping it against `shins` across
+          one ring put a 59 degree row seam at y 0.827)
+
+THE GLUTE OWNS THE POSTERIOR PROJECTION. R250's side read was inverted against
+the brief — at y 1.22 the anterior was 0.2684 and the posterior 0.2274, so the
+front of the pelvis/upper thigh was the dominant mass. LOWER_BACK comes up at
+the glute rows and astraQuad's `depth` comes down by the same amount, so the
+hierarchy inverts without the side getting thicker.
+
+  rear / front           R250    R251
+    y 1.14               0.829   0.837   (anterior quad's own peak — correct)
+    y 1.22               0.847   1.036
+    y 1.28               1.037   1.104
+    y 1.34               1.066   1.116
+  glute peak vs pelvis   1.42x   1.50x
+  depth / width y1.22    1.559   1.536   (R248 1.630)
+  depth / width y0.87    1.355   1.356   (knee approach, held by design)
+  total depth y1.22      0.4959  0.4885  (it did not swell)
+
+  centre dip by row      R248    R250    R251
+    210                  4.8%    2.9%    0.7%
+    250                 18.0%   13.2%    3.7%
+    290                 13.6%   13.1%    2.8%
+    330                 10.3%    9.5%    4.7%
+
+  Mrs. Mah               26 meshes, vertex hashes IDENTICAL to b63d0c7
+  contracts              376/376
+
+WHAT DID NOT IMPROVE, HONESTLY.
+  - THE FRONT QUAD READ IS LESS EMPHATIC THAN R250'S. The quiet centre was
+    bought with a wide rectus, and a wide rectus is a flatter one. In the
+    three-quarter the vastus lateralis reads better than it ever has — it is a
+    mass with a boundary now, not a stripe — but front-on the three influences
+    are softer than the pass before. That is the trade the brief asks for
+    ("success is NOT more definition"), and it is still a cost.
+  - THE KNEE DOES NOT READ. Section 5 is not achieved. The dark chevron at the
+    distal quad is present in R248, R250 and R251 alike and is unchanged; there
+    is no narrowing, no patellar plane, no plane change. `caps` is still zero.
+  - SHIN AND CALF ARE MARGINAL. Removing `notch` and widening the tibialis is
+    the right ownership, but at 2-5% of the local radius the read is barely
+    above the surface noise floor.
+  - The y 1.42-1.50 anterior step is still the torso's `pec.surface.supportDepth`
+    arriving over the lower body. Untouched, as before.
+
+R251 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R250 3eb833d, then R249
+813c5cd, then R248 b63d0c7.
