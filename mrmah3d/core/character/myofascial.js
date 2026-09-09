@@ -998,6 +998,7 @@ export function torsoSurface(a,section,raw) {
       own crown: a broad, shallow, soft-edged valley that no control authors
       directly. Nothing subtracts on the midline any more. */
    const m=1
+     +(Lb.add?dome(a,Lb.add[0],Lb.add[1])*c('add'):0)
      +domePair(a,Lb.rf[0],Lb.rf[1])*c('rf')
      +domePair(a,Lb.vl[0],Lb.vl[1])*c('vl')
      +domePair(a,Lb.vm[0],Lb.vm[1])*c('vm')
@@ -1148,11 +1149,30 @@ export function torsoSurface(a,section,raw) {
    const w=windowAt(yy,...LL.region);
    if(w>0){
      const c=k=>profileAt(LL[k],yy),B=LL.lobes;
+     /* R252 — `gastroc` is added because nothing here was building a calf:
+        `pit` and `hollow` are both SUBTRACTIVE and `soleus` was 2%. The
+        gastrocnemius is the rear and rear-lateral mass the sheet draws, the
+        soleus the lower, wider support beneath it. */
      const m=1-dome(a,B.pit[0],B.pit[1])*c('pit')
               +dome(a,B.tendon[0],B.tendon[1])*c('tendon')
               -domePair(a,B.hollow[0],B.hollow[1])*c('hollow')
+              +(B.gastroc?domePair(a,B.gastroc[0],B.gastroc[1])*c('gastroc'):0)
               +domePair(a,B.soleus[0],B.soleus[1])*c('soleus');
      posterior*=1+(m-1)*w*smooth(rear/LL.sideFade);
+   }
+ }
+ /* R252 — THE HAMSTRINGS, from the teardrop sheet's muscle map. Two named
+    bellies on the rear thigh and no groove between them: the posterior midline
+    dip is what is left where the two mirrored pairs overlap, the same rule the
+    anterior now follows. Multiplicative, so the taper's outline cannot move. */
+ const HAM=MORPHOLOGY.lower.posterior;
+ if(HAM&&rear>0){
+   const w=windowAt(yy,...HAM.region);
+   if(w>0){
+     const c=k=>profileAt(HAM[k],yy),B=HAM.lobes;
+     const m=1+domePair(a+Math.PI,B.bicepsFemoris[0],B.bicepsFemoris[1])*c('bicepsFemoris')
+              +domePair(a+Math.PI,B.medialHam[0],B.medialHam[1])*c('medialHam');
+     posterior*=1+(m-1)*w*smooth(rear/HAM.sideFade);
    }
  }
  const spinal=MORPHOLOGY.back.midlineReturn;

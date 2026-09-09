@@ -2150,8 +2150,16 @@ export const MRMAH_MORPHOLOGY = {
      changes, not the thickness. The pelvis stays restrained — 1.48 is
      untouched at 0.152 — so the glute's upper edge is a real fall rather than
      an equal rear-facing bulge, and 1.08 is untouched so its lower transition
-     into the thigh stays smooth instead of becoming a shelf. */
-  LOWER_BACK:[[0,0],[.20,.025],[.43,.057],[.62,.086],[.70,.102],[.78,.106],[.88,.130],[.98,.153],[1.08,.176],[1.25,.2225],[1.36,.2018],[1.48,.1520],[1.56,.1549]],
+     into the thigh stays smooth instead of becoming a shelf.
+
+     R252 — and now it comes back down, because the HAMSTRINGS carry the rear
+     thigh instead. The glute rows go 0.2225 -> 0.2080 and 0.2018 -> 0.1930, and
+     the rows beneath them 0.176 -> 0.163 and 0.153 -> 0.144, so the mass the new
+     posterior group adds is paid for out of the generic profile under it rather
+     than added on top of it. That is the brief's "reduce any bubble-like
+     upper/rear projection": the glute stops being the only rear mass, so it
+     stops having to be a sphere. */
+  LOWER_BACK:[[0,0],[.20,.025],[.43,.057],[.62,.086],[.70,.102],[.78,.106],[.88,.126],[.98,.1440],[1.08,.1630],[1.25,.2080],[1.36,.1930],[1.48,.1520],[1.56,.1549]],
   LOWER_PATHS:{
   rectusFemoris:[[.76,.043,.026],[1.03,.113,.052],[1.23,.131,.060],[1.48,.083,.032]],
   vastusLateralis:[[.79,.099,.029],[1.06,.219,.075],[1.26,.228,.065],[1.45,.161,.027]],
@@ -2166,6 +2174,28 @@ export const MRMAH_MORPHOLOGY = {
 MRMAH_MORPHOLOGY.back.axillaryFold=[[1.76,.14,.25,0],[1.85,.18,.335,.025],[1.96,.24,.37,.035],[2.075,.31,.38,0]];
 
 
+/* R252 — THE HAMSTRINGS. The teardrop sheet draws them as the green mass on the
+   rear thigh, running from under the glute down to the calf handoff and wrapping
+   to the outside ("HAMSTRINGS WRAP TO REAR"), and this build had NO posterior
+   thigh term at all: LOWER_BACK was a plain profile and every rear plane came
+   from it. That is why the glute read as a sphere — there was nothing below it
+   for it to become.
+
+   Two named bellies and the valley their meeting makes, exactly as on the
+   anterior: `bicepsFemoris` the outer posterior head at 0.50 rad off the rear
+   seam, `medialHam` the semimembranosus/semitendinosus side at 0.22 rad, and no
+   authored groove between them — the dip on the posterior midline is what is
+   left where the two pairs overlap. Applied multiplicatively for the same reason
+   as the lower leg: this is internal form and the taper's outline is not its to
+   move. It fades out by y 1.30 where the glute takes over and by 0.72 where the
+   calf does, so the glute-to-hamstring handoff and the hamstring-to-knee descent
+   are both continuous. */
+MRMAH_MORPHOLOGY.lower.posterior={
+ source:"MAHWORLD Teardrop Anatomy Reference Sheet, muscle map: hamstrings",
+ region:[0.72,1.30,0.12], sideFade:0.06,
+ lobes:{bicepsFemoris:[0.50,0.42],medialHam:[0.22,0.30]},
+ bicepsFemoris:[[0.72,0],[0.80,0.05],[0.90,0.10],[1.00,0.14],[1.10,0.14],[1.20,0.11],[1.30,0]],
+ medialHam:[[0.72,0],[0.80,0.04],[0.90,0.08],[1.00,0.10],[1.10,0.09],[1.20,0.06],[1.30,0]]};
 MRMAH_MORPHOLOGY.lower.planeDesign={quadTerritory:[.10,.95],quadProjection:.058,kneeAccentY:.75,kneeRelief:.012,kind:'paired interior chevron; no new joint or external expansion'};
 
 // R114 front cross-sections: support, crown and return are independent.
@@ -2271,14 +2301,45 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     what lets the hierarchy invert without the side getting thicker: measured,
     total depth at y 1.22 goes 0.4959 -> 0.4885 while rear over front goes
     0.847 -> 1.04. */
- region:[0.80,1.46,0.14], sideFade:0.06, projection:0.870,
- lobes:{rf:[0.44,0.64],vl:[0.98,0.50],vm:[0.26,0.30],valley:[0.74,0.28],itb:[1.95,0.30]},
- depth:[[0.80,0.1359],[0.87,0.1294],[0.95,0.1712],[1.03,0.1967],[1.10,0.2088],[1.23,0.1880],[1.32,0.1795],[1.41,0.1628],[1.46,0.1696]],
- rf:[[0.80,0.06],[0.87,0.16],[0.95,0.38],[1.03,0.48],[1.10,0.52],[1.23,0.46],[1.32,0.33],[1.41,0.20],[1.46,0.11]],
- vl:[[0.80,0.04],[0.87,0.26],[0.95,0.44],[1.03,0.54],[1.10,0.62],[1.23,0.66],[1.32,0.64],[1.41,0.48],[1.46,0.30]],
- vm:[[0.80,0.06],[0.87,0.30],[0.95,0.32],[1.03,0.23],[1.10,0.15],[1.23,0.10],[1.32,0.08],[1.41,0.05],[1.46,0]],
- valley:[[0.80,0],[0.87,0.07],[0.95,0.15],[1.03,0.20],[1.10,0.22],[1.23,0.21],[1.32,0.15],[1.41,0.08],[1.46,0.03]],
- itb:[[0.80,0],[0.87,0.04],[0.95,0.06],[1.03,0.06],[1.10,0.06],[1.23,0.05],[1.32,0],[1.46,0]]};
+ /* R252 — THE KNEE WAS 0.20 TOO HIGH, AND THE MIDLINE HAD AN OWNER ALL ALONG.
+    Measured off `reference/handoff/MAHWORLD_Teardrop_Anatomy_Reference_Sheet.png`
+    — the MUSCLE MAP panel, which is the landmark authority for this species —
+    the quad mass runs from t 0.13 to t 0.56 of the teardrop's height and the
+    calf group takes over from t 0.56 to 0.77. On this build's chart (top y 1.53,
+    point y 0) that puts the QUAD/CALF HANDOFF at y 0.673, and the field ended at
+    0.80 with its fade starting at 0.94. The knee was reading a seventh of the
+    whole lower body too high. The region reaches 0.66 now with a tighter 0.10
+    fade, so the quad is at full strength through y 0.76 and hands over across
+    0.66-0.80 where the sheet puts it.
+
+    And the sheet names the centre line's owner outright: "ADDUCTORS BLEND INTO
+    CENTER LINE", drawn as a violet column down the inner thigh. `add` is that
+    group — a single dome ON the midline, which is exactly the shape `bridge`
+    was, except that this one is a muscle. It is what fills the channel from the
+    inside instead of a filler dome doing it, and it reaches the distal medial
+    thigh the way the adductor magnus does.
+
+    ITS FIRST AMPLITUDE WAS WRONG BY A FACTOR OF TWO AND THE RENDER SAID SO. At
+    a 0.16 peak the measured centre dip went NEGATIVE — minus 6 to minus 8 per
+    cent across the thigh rows, i.e. the midline was brighter than the flanks,
+    which is a central RIDGE and is the one thing sections 4 and 9 rule out
+    outright. The adductor adds its whole coefficient at the seam and nothing at
+    the rectus crown, so it moves the dip almost one-for-one; at 0.07 on a wider
+    0.50 half-width it is a restrained inner fullness that leaves a shallow
+    valley instead of filling it past flat. Measured again at 0.07 the column
+    still ran minus 1.5 / minus 0.4 / minus 3.1 per cent — flat, not a valley —
+    so it is 0.05. The relationship is close to linear at this size: about 0.8
+    points of dip per 0.01 of coefficient. */
+ region:[0.66,1.46,0.10], sideFade:0.06, projection:0.870,
+ lobes:{rf:[0.44,0.64],vl:[0.98,0.50],vm:[0.26,0.30],valley:[0.74,0.28],itb:[1.95,0.30],add:[0,0.50]},
+ depth:[[0.66,0.1168],[0.72,0.1210],[0.80,0.1291],[0.87,0.1227],[0.95,0.1473],[1.03,0.1712],[1.10,0.1821],[1.23,0.1725],[1.32,0.1690],[1.41,0.1560],[1.46,0.1640]],
+ rf:[[0.66,0.02],[0.72,0.06],[0.80,0.11],[0.87,0.18],[0.95,0.38],[1.03,0.48],[1.10,0.52],[1.23,0.46],[1.32,0.33],[1.41,0.20],[1.46,0.11]],
+ vl:[[0.66,0.02],[0.72,0.07],[0.80,0.13],[0.87,0.26],[0.95,0.44],[1.03,0.54],[1.10,0.62],[1.23,0.66],[1.32,0.64],[1.41,0.48],[1.46,0.30]],
+ vm:[[0.66,0.04],[0.72,0.11],[0.80,0.20],[0.87,0.30],[0.95,0.32],[1.03,0.23],[1.10,0.14],[1.23,0.10],[1.32,0.08],[1.41,0.05],[1.46,0]],
+ valley:[[0.66,0],[0.72,0.02],[0.80,0.04],[0.87,0.07],[0.95,0.15],[1.03,0.20],[1.10,0.22],[1.23,0.21],[1.32,0.15],[1.41,0.07],[1.46,0.03]],
+ itb:[[0.66,0],[0.80,0.02],[0.87,0.04],[0.95,0.06],[1.03,0.06],[1.10,0.06],[1.23,0.05],[1.32,0],[1.46,0]],
+ add:[[0.66,0],[0.72,0.015],[0.80,0.028],[0.87,0.038],[0.95,0.045],[1.03,0.050],[1.10,0.050],[1.23,0.042],[1.32,0.028],[1.41,0.014],[1.46,0]]};
+
 /* R242 — ASTRA'S LOWER-LEG GRAMMAR, from the same R109 checkpoint.
 
    `lowerLegShape` and the ring rows y 0.300-0.810 of commit 0c05b31, verbatim.
@@ -2306,7 +2367,20 @@ MRMAH_MORPHOLOGY.lower.astraLowerLeg={
     to the quad's `seam` (which fades in from 0.88) with an overlap instead of a
     gap. Ending it at 0.90 left `notch` at full strength on the 0.870 ring and
     zero on the next, and that row step measured 58 degrees at y 0.827. */
- region:[0.14,0.98,0.14], sideFade:0.06,
+ /* R252 — RE-ZONED TO THE SHEET, AND THE CALF IS NO LONGER A RUMOUR. The muscle
+    map puts the calf group from t 0.56 to 0.77 of the teardrop, i.e. y 0.673 down
+    to 0.352, and this set ran to 0.98 — overlapping the quad by a third of its
+    own length and peaking above the knee. It runs 0.12 to 0.82 now, so the
+    handover happens across 0.66-0.82 where the sheet puts the knee.
+
+    And the amplitudes come up. Astra's 2-6% was authored for a body whose
+    lower-leg musculature is "suggested only by internal form", which is still the
+    rule — the outline does not move, these are multiplicative — but at 0.02-0.03
+    the gastrocnemius and soleus sat below the surface's own noise floor and the
+    brief reads the soleus as absent. `gastroc` is NEW and named: `pit` (a hollow)
+    and `hollow` (a pair beside the Achilles) are both SUBTRACTIVE and `soleus`
+    was 2%, so nothing in this table was building a calf at all. */
+ region:[0.12,0.82,0.10], sideFade:0.06,
  /* R251 — `notch` IS REMOVED. It was an authored dome on the anterior midline
     of the lower leg with no muscle behind it: the same unowned central-channel
     control as the quad's `seam`, one segment further down. The shin's midline
@@ -2316,7 +2390,7 @@ MRMAH_MORPHOLOGY.lower.astraLowerLeg={
     tibialis anterior, `pit` the popliteal hollow, `tendon` the Achilles,
     `hollow` the pair either side of it, `soleus` the calf's lower support.
     `caps` stays at zero — see below. */
- lobes:{caps:[0.50,0.32],shins:[0.45,0.55],
+ lobes:{caps:[0.50,0.32],shins:[0.45,0.55],gastroc:[2.59159265,0.45],
         pit:[3.14159265,0.70],tendon:[3.14159265,0.35],
         hollow:[2.54159265,0.40],soleus:[2.34159265,0.70]},
 
@@ -2329,18 +2403,19 @@ MRMAH_MORPHOLOGY.lower.astraLowerLeg={
     seam at y 0.743 and 0.827. The two lobes are the same ridge anyway — 29 and
     26 degrees off the midline — so `shins` carries it continuously and simply
     swells at the knee row instead. */
- caps:[[0.14,0],[0.98,0]],
+ caps:[[0.12,0],[0.82,0]],
  /* The tibial crest is a SHIN feature and it is tapered through the knee
     rather than held at full strength across it. Isolated, holding it at 0.045
     on the 0.81 row put a 58-degree turn at y 0.827 (zeroing `shins` alone took
     the band 58 -> 50); tapered, the ridge still reads down the shin and the
     knee rows stop carrying it. Astra's own rows also drop shins to zero at
     0.810 — this keeps a trace instead of a hard stop. */
- shins:[[0.14,0],[0.30,0.030],[0.44,0.042],[0.55,0.050],[0.64,0.050],[0.72,0.042],[0.81,0.024],[0.90,0.010],[0.98,0]],
- pit:[[0.14,0],[0.64,0],[0.72,0.02],[0.81,0.028],[0.90,0.018],[0.98,0]],
- tendon:[[0.14,0],[0.30,0.03],[0.44,0.04],[0.55,0.03],[0.64,0],[0.90,0]],
- hollow:[[0.14,0],[0.30,0.02],[0.44,0.03],[0.55,0.02],[0.64,0],[0.90,0]],
- soleus:[[0.14,0],[0.30,0.015],[0.44,0.025],[0.55,0.025],[0.64,0.02],[0.72,0],[0.90,0]]};
+ shins:[[0.12,0],[0.26,0.030],[0.38,0.050],[0.48,0.065],[0.58,0.075],[0.66,0.070],[0.74,0.040],[0.82,0]],
+ pit:[[0.12,0],[0.40,0],[0.52,0.020],[0.62,0.030],[0.70,0.026],[0.78,0.012],[0.82,0]],
+ tendon:[[0.12,0],[0.26,0.045],[0.36,0.050],[0.46,0.035],[0.56,0.015],[0.66,0],[0.82,0]],
+ hollow:[[0.12,0],[0.26,0.030],[0.36,0.040],[0.46,0.030],[0.56,0.012],[0.66,0],[0.82,0]],
+ soleus:[[0.12,0],[0.26,0.030],[0.34,0.050],[0.44,0.055],[0.52,0.045],[0.62,0.020],[0.72,0],[0.82,0]],
+ gastroc:[[0.12,0],[0.30,0.020],[0.40,0.045],[0.50,0.070],[0.58,0.075],[0.66,0.060],[0.74,0.030],[0.82,0]]};
 MRMAH_MORPHOLOGY.lower.planeDesign={"quadTerritory":[0.1,0.95],"quadProjection":0.058,"kneeAccentY":0.75,"kneeRelief":0.012,"kind":"paired interior chevron; no new joint or external expansion","crownLimit":0.033,"crownConvexity":0.011,"directionalCrown":true,"quadFaces":{"crestQ":0.44,"upperOblique":0.065,"outerSlope":0.08,"innerSlope":0.018,"returnWidth":0.018},"surfaceFaces":{"source":"PDF30-31 / T01 longitudinal quad faces; one continuous surface","depth":[[0.6,0.093],[0.77,0.135],[0.97,0.19],[1.14,0.233],[1.22,0.239],[1.34,0.212],[1.46,0.184]],"crestQ":0.41,"convexity":0.005,"innerTurn":0.3,"outerTurn":0.52,"innerSlope":0.58,"outerSlope":0.72,"outerTurnProfile":[[0.62,0.52],[0.98,0.52],[1.16,0.62],[1.44,0.66]],"outerSlopeProfile":[[0.62,0.72],[0.98,0.72],[1.16,0.82],[1.44,0.86]],"boundary":[0.1,0.94],"edgeWidth":0.15,"region":[0.62,1.44,0.15],"linearFaces":true}};
 MRMAH_MORPHOLOGY.sampleY=[0,0.15,0.44,0.55,0.66,0.77,0.87,0.97,1.06,1.14,1.22,1.28,1.34,1.4,1.45,1.48,1.535,1.585,1.61,1.63,1.65,1.675,1.695,1.735,1.755,1.78,1.805,1.825,1.845,1.865,1.885,1.91,1.935,1.96,1.985,2.01,2.035,2.06,2.085,2.11,2.135,2.16,2.18,2.2,2.22,2.24,2.26,2.28,2.3,2.335];
 MRMAH_MORPHOLOGY.neck.anteriorRelief=0.02;

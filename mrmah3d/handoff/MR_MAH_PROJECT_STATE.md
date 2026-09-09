@@ -1928,3 +1928,109 @@ WHAT DID NOT IMPROVE, HONESTLY.
 
 R251 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R250 3eb833d, then R249
 813c5cd, then R248 b63d0c7.
+
+--------------------------------------------------------------------------------
+R252 — STANDARD-SIZE NORMALIZATION, PASSES 1-7 OF THE MD-PAL LADDER
+--------------------------------------------------------------------------------
+
+THE LANDMARK AUTHORITY WAS IN THE REPOSITORY ALL ALONG.
+`reference/handoff/MAHWORLD_Teardrop_Anatomy_Reference_Sheet.png` — the MUSCLE
+MAP -> TEARDROP FLOW panel — colour-codes every lower-body mass onto the teardrop
+and states the species rules outright: "QUADS FEED DIRECTLY INTO TEARDROP",
+"ADDUCTORS BLEND INTO CENTER LINE", "HAMSTRINGS WRAP TO REAR", "CALVES MERGE
+CLEANLY INTO POINT". Measured off it (teardrop top t 0, point t 1):
+
+  quads        t 0.13 - 0.56      world y 1.33 -> 0.673
+  calf group   t 0.56 - 0.77      world y 0.673 -> 0.352
+  taper        t 0.77 - 1.00      world y 0.352 -> 0
+
+§14 AUDIT, measured on the built RUNTIME mesh against that:
+
+  head 0.366 hw                CORRECT (locked by the R101 head law)
+  neck 0.31 head-widths        CORRECT
+  waist / abdomen / pelvis     CORRECT (0.63 / 0.91 / 0.60)
+  upper arms  x-span 0.391     TOO LARGE     (Pass 9, not started)
+  forearms    x-span 0.236     TOO LARGE     (Pass 9, not started)
+  torso surface                see brief §11 TOO ROCKY (Pass 10, not started)
+  glutes                       SLIGHTLY LARGE - corrected here
+  upper thigh / anterior quad  TOO LARGE     - corrected here
+  rectus femoris               CORRECT
+  vastus lateralis             CORRECT
+  vastus medialis              SLIGHTLY SMALL - corrected here
+  ADDUCTOR                     ABSENT        - added here
+  HAMSTRING                    ABSENT        - added here
+  KNEE                         WRONG PLACE   - 0.80/0.87 against a canon of 0.673
+  tibialis                     TOO SMALL     - raised here
+  gastrocnemius                ABSENT        - added here (pit and hollow are
+                               both SUBTRACTIVE and soleus was 2%, so nothing in
+                               that table was building a calf at all)
+  soleus                       NEARLY ABSENT - raised here
+  terminal taper               CORRECT
+
+WHAT CHANGED
+  - astraQuad region 0.80 -> 0.66 with a 0.10 fade. The quad reaches the
+    canonical knee at 0.673 instead of stopping a seventh of the lower body
+    above it, and rf / vl / vm / valley / itb all gained distal knots.
+  - `add` — THE ADDUCTOR GROUP, the centre line's owner per the sheet. A single
+    dome ON the midline, which is exactly the shape `bridge` was, except that
+    this one is a muscle.
+  - `lower.posterior` — THE HAMSTRINGS. `bicepsFemoris` at 0.50 rad off the rear
+    seam, `medialHam` at 0.22, no authored groove between them. This build had
+    NO posterior thigh term at all, which is why the glute read as a sphere:
+    there was nothing below it for it to become.
+  - astraLowerLeg region 0.14-0.98 -> 0.12-0.82, amplitudes roughly doubled, and
+    `gastroc` added as a named rear/rear-lateral mass.
+  - LOWER_BACK comes DOWN at every glute row (0.2225 -> 0.2080, 0.2018 ->
+    0.1930, 0.176 -> 0.163, 0.153 -> 0.144): the hamstring is paid for out of the
+    generic profile under it, not added on top.
+  - astraQuad `depth` re-solved twice so the anterior gives back exactly what the
+    adductor and the extended quad added, and then 8% more at the belly rows —
+    the brief's first REDUCE item.
+
+MEASURED
+
+  depth / width          R248    R251    R252        rear / front   R251   R252
+    y 0.87               1.356   1.356   1.418         y 0.97       0.75   0.82
+    y 0.97               1.545   1.587   1.597         y 1.06       0.76   0.82
+    y 1.06               1.618   1.640   1.636         y 1.14       0.84   0.99
+    y 1.14               1.644   1.632   1.636         y 1.22       1.04   1.10
+    y 1.22               1.630   1.536   1.530         y 1.28       1.10   1.07
+    y 1.28               1.662   1.540   1.485         y 1.34       1.12   1.08
+    y 1.34               1.633   1.528   1.484
+    y 1.40               1.625   1.554   1.513
+
+  centre dip by row      R248     R251     R252
+    210                  4.8%     0.7%    -0.6%
+    250                 18.0%     3.7%     0.8%
+    290                 13.6%     2.8%    -2.3%
+    330                 10.3%     4.7%     2.8%
+
+  Mrs. Mah   26 meshes, vertex hashes IDENTICAL to b63d0c7
+  contracts  376/376        triangles 173178, 29 draws
+
+THE ADDUCTOR'S FIRST AMPLITUDE WAS WRONG BY A FACTOR OF THREE AND ONLY THE
+RENDER SAID SO. At a 0.16 peak the centre dip went to minus 6 to minus 8 per
+cent — the midline BRIGHTER than the flanks, i.e. a central ridge, the one thing
+sections 4 and 9 rule out. It adds its whole coefficient at the seam and nothing
+at the rectus crown, so it moves the dip almost one-for-one: about 0.8 points per
+0.01. It is 0.05.
+
+TWO TOOL FACTS WORTH KEEPING
+  - `tests/mrmah3d.test.js` reads every source as TEXT and never imports it, so
+    376/376 passed twice in this pass over a proportions.js with a SYNTAX ERROR
+    in it. A green suite is not evidence that the module loads. The capture is.
+  - The static server on 8123 dies between passes; a capture that ends in a bare
+    "Node.js v22.22.2" is ERR_CONNECTION_REFUSED, not a render fault.
+
+STILL OPEN
+  - THE DARK CHEVRON at the distal quad is unchanged and is present identically
+    in R248. `lowerField`'s own `kneeAccent` is a POSITIVE 0.012 bump centred at
+    y 0.70 + 0.14q (0.75 at its lateral centre), so it is not the chevron's
+    owner. Next pass should isolate it before touching anything near the knee.
+  - Passes 9-12 (shoulders/arms, torso rockiness, sculpt-guide comparison, the
+    two characters side by side) are NOT STARTED and are not measured beyond the
+    x-spans in the audit above.
+  - The y 1.42-1.50 anterior step is still the torso's support surface.
+
+R252 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R251 f4f37f2, then R250
+3eb833d.
