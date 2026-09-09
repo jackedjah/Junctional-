@@ -2213,3 +2213,51 @@ NOT yet addressed. The improvement here is at the elbow only, and it is modest a
 full-character distance.
 
 R255 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R254 2f36747.
+
+--------------------------------------------------------------------------------
+R256 — DELTOID CAP: ATTEMPTED, REVERTED, AND THE OWNER IS NOT THE PROFILE
+--------------------------------------------------------------------------------
+
+MEASURED FIRST, AND THE MEASUREMENT WAS RIGHT. `maleShoulderArm`'s cap profile is
+`.945*(.015+.985*sin((h+.40)/.40*pi/2)^.48)`, and at exponent 0.48 that tracks a
+TRUE HEMISPHERE of the same radius to within 2-4% at every height (0.845 against
+0.866 at mid-cap). The cap really is a sphere, which is section 15's "ball
+attached to the torso" as arithmetic rather than as an impression.
+
+THE CHANGE WAS SOUND AND THE GATE REFUSED IT. At 0.66 the upper dome comes in
+6-19% while h=0 — the shoulder LINE and therefore the front-view shoulder width —
+is unchanged to four decimals. Tests passed. Mrs. Mah hashed identical. The male
+built without throwing in Node. And the review page then would not mount:
+
+  R185 scoped muscle volume exceeded
+    {delta: 0.101, h: -0.223, a: 1.797, r: 0.0917,
+     target: {radius: 0.1932, owner: "LATERAL_DELTOID"}}
+
+THE CAP'S RADIUS IS OWNED BY R185's SCOPED MUSCLE-VOLUME SYSTEM, NOT BY THIS
+EXPONENT. Narrowing the profile drops the surface inside the authored
+LATERAL_DELTOID envelope and its safety gate throws rather than sculpt a shape it
+does not recognise — the same class of guard as Mrs. Mah's `mrs-shoulder-*`
+returns. Reverted; the scene mounts again in 43s and the tree is clean at R255.
+
+TWO THINGS THIS ESTABLISHES.
+
+  1. THE DELTOID CANNOT BE RESHAPED FROM THE PROFILE ALONE. Any real change to
+     the shoulder cap has to move the R185 volume targets WITH it, and those are
+     an authored, gated system covering the whole deltoid region. That is a
+     scope expansion, not a bounded regional edit, and section 33 stops for it.
+
+  2. A NODE BUILD IS NOT A MOUNT TEST. `buildLimbs` in a Node harness completed
+     without throwing while the browser refused to mount, because the volume
+     gate runs in a path the harness does not reach. Three separate checks —
+     376/376 contracts, an offline male build, and Mrs. Mah's hashes — all passed
+     over a build that could not render. The mount check (`mountcheck.mjs`,
+     scratch) is the cheap one that actually catches this, and a capture that
+     hangs before its first "captured" line IS a mount failure, not a slow
+     render.
+
+PHASE B STATUS: the elbow (R255) is done and kept. The DELTOID is blocked on the
+scope question above. The biceps/triceps side-view territory split and the
+forearm's flexor/extensor asymmetry are untouched and are NOT blocked — they live
+in `maleUpperShape` / `maleForeShape`, which are not volume-gated.
+
+HEAD OF BRANCH REMAINS R255 fd2d96b.
