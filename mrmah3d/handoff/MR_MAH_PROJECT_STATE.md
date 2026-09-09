@@ -1681,3 +1681,107 @@ STAGED ORDER STATUS
   6 shoulder / torso      NOT STARTED
 
 R248 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: A3, 28d1f04.
+
+--------------------------------------------------------------------------------
+R249 — STAGE A: THREE QUADRICEPS INFLUENCES INSIDE THE FUSED MASS
+--------------------------------------------------------------------------------
+
+The escalation brief's verdict on R248 was that the fused identity is preserved
+and the remaining fault is UNDER-DEFINITION: one broad smooth upper mass plus one
+generic taper. Measured on the built section that is literally true.
+
+WHAT THE SECTION ACTUALLY WAS. At y 1.10 the anterior ran 0.257 / 0.265 / 0.278 /
+0.293 / 0.296 / 0.267 / 0.179 — a single dome from the midline to x 0.098, then a
+0.117 CLIFF (dz/dx -2.40) into an outer shelf at 0.186 that never recovers. One
+mass, one gorge, one dead flank. No material or lighting change can put three
+bellies on that.
+
+TWO CAUSES, BOTH FIXED.
+
+  RESOLUTION. The thigh carried 32 sides — EIGHT anterior sample columns from the
+  midline to the flank — and `torsoAngle`'s front knots cluster three of them
+  inside r 0.15, density authored for the sternum and the linea alba on a region
+  whose midline is meant to be QUIET. The quad crown, the RF/VL boundary and the
+  lateral sweep shared the remaining three. R105's lesson, unchanged: a belly
+  needs vertices to be round, and no amplitude fixes resolution. The thigh band is
+  48 sides now (body.js `sidesAt`), which is twelve anterior columns.
+
+  ORGANISATION. `head` was 0.36 — it WAS the generic column — and `rf` sat at 0.34
+  rad, inside head's own peak, so the two simply fused into one hump. `valley` was
+  0.272 on a 0.22 rad half-width: a gorge, not a plane change. Now `head` 0.24
+  supports the column instead of being it; `rf` moves out to 0.44 and gains
+  amplitude; `valley` halves to 0.16-0.18 and widens to 0.30; `vl` grows to
+  0.58-0.62 on a 0.52 half-width at 0.96, which lifts the outer shelf and lets the
+  sweep wrap toward the side view; `vm` is carried at a restrained value through
+  the whole thigh (a bridge plateau with nothing beside it is the flat medial
+  table the first candidate showed at y 1.22-1.32).
+
+  AND EACH BELLY PEAKS AT ITS OWN HEIGHT. The first build gave all three a flat
+  plateau over y 0.95-1.23 and the clay showed three parallel RIDGES, not three
+  volumes: two masses that swell at the same height meet in a vertical stripe.
+  `rf` peaks at 1.10, `vl` HIGHER at 1.23-1.32, `vm` LOWER at 0.95, so every
+  boundary runs diagonally.
+
+THE SIDE PROFILE IS PINNED, NOT ESTIMATED. `depth` is re-solved so the CROWN depth
+of every row equals R248's: 0.1569 against 0.1570 at y 0.87, 0.2978 at 1.10,
+0.2897 at 1.23, 0.2477 at 1.32. X is owned by LOWER_WIDTH and was not touched.
+
+MEASURED, matched clay captures, same camera / framing / lighting / material /
+frozen pose:
+
+  front outline          0 px changed, 992 lit rows
+  side outline           0 px changed, 992 lit rows
+  centre dip by row      210  4.8% -> 4.0%      250  18.0% -> 16.5%
+                         290  13.6% -> 16.3%    330  10.3% -> 11.9%
+  section plane changes  3 -> 5 (48-column section, y 0.95-1.32)
+  the RF/VL cliff        dz/dx -2.40 -> -1.33
+  outer shelf at y 1.10  0.186 -> 0.198
+  knee band turns        max 51 (unchanged), p90 30 -> 31
+  quad band turns        max 57 -> 59, p90 26 (was 26)
+  triangles              173449 -> 173319, 29 draws
+  Mrs. Mah               26 meshes, vertex hashes IDENTICAL to b63d0c7
+  contracts              376/376
+
+TWO THINGS FOUND ALONG THE WAY, BOTH WORTH KEEPING.
+
+  `authoringMaster` IS OFF IN EVERY RENDERED SURFACE. Neither the lab nor the
+  review page passes it, so `refineRecessEdges`, `conformSurfacePatch`
+  (quadKneeSurfacePatch), `authorBodyMuscleCrowns` and the anatomical return
+  regions DO NOT RUN in the mesh that is drawn. The scratch tools `vdump.mjs` and
+  `kturn.mjs` build with `{authoringMaster:true}`, so they have been measuring a
+  DIFFERENT mesh from the captures — its anterior columns are moved and some are
+  consumed. For anything about the rendered lower body, `torsoSurface` sampled at
+  the `torsoAngle` columns is the ground truth, and the captures are the arbiter.
+
+  THE 48-SIDE BAND CANNOT REACH THE KNEE YET. Carried down to the 0.44 ring,
+  `quadKneeSurfacePatch` fails outright — "Could not recover cage edge
+  [0.064,0.90]-[0.129,0.79]" — against the denser rings; carried to 0.78 the new
+  stitch lands inside the knee band and took its p90 turn 30 -> 34. The boundary
+  is 0.92, above the patch. The knee's topology is Stage B's to change.
+
+HONEST REMAINDER.
+  - The centre is BETTER at the two upper rows and WORSE at the two lower ones
+    (290: 13.6 -> 16.3, 330: 10.3 -> 11.9). `bridge` was extended down to y 0.87
+    to pay for the new medial mass and it recovered only part of it. If the review
+    wants those rows quieter, `bridge` is still the control and it is still
+    monotone: zeroing it takes the dip to 13.2 / 29.9 / 22.6 / 21.1.
+  - In the THREE-QUARTER the vastus lateralis now reads clearly as a wrapping
+    mass. In the FRONT the three influences are readable but not emphatic.
+  - The largest untaken lever is the SAMPLE DISTRIBUTION: four of the twelve
+    columns still sit inside r 0.15 on a midline that is supposed to be quiet.
+    Redistributing `torsoAngle`'s front knots for the thigh band would give every
+    belly ~50% more samples and make them rounder rather than deeper — better
+    curvature, not more amplitude. It touches a function shared with the whole
+    male torso, so it was NOT done in the same pass as a topology change.
+  - Knee (Stage B) and shin/calf (Stage C) are untouched. The angular streaks
+    near the knee are present in R248 and R249 alike.
+
+STAGED ORDER STATUS
+  1 centre calming        R244, R246, R248 — mixed here, see remainder
+  2 quad organisation     R249 — this pass
+  3 knee transition       R247 — holds, NOT advanced
+  4 shin / calf           R242 built the grammar; NOT advanced since
+  5 arms                  NOT STARTED on either character, not measured at all
+  6 shoulder / torso      NOT STARTED
+
+R249 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R248, b63d0c7.

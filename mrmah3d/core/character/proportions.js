@@ -2280,9 +2280,77 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     built and measured and re-opened the centre valley from 0.033 to 0.058-0.066
     even with the seam cut further, because `head` is what fills the midline
     now. The centre therefore stays exactly as R244 left it. */
- lobes:{seam:[0,0.40],head:[0.64,0.86],rf:[0.34,0.30],valley:[0.66,0.22],
-        vl:[1.02,0.44],vm:[0.30,0.32],itb:[1.95,0.30],bridge:[0,0.62]},
- depth:[[0.80,0.128],[0.87,0.148],[0.95,0.180],[1.03,0.200],[1.10,0.215],[1.23,0.215],[1.32,0.205],[1.41,0.180],[1.46,0.165]],
+ /* R249 STAGE A — THREE QUADRICEPS INFLUENCES INSIDE THE FUSED MASS.
+
+    R248 preserved the fused identity and the brief's verdict was that the
+    remaining fault is UNDER-DEFINITION: one broad smooth upper mass and one
+    generic taper. Measured on the built section that is literally true. At
+    y 1.10 the anterior ran 0.257 / 0.265 / 0.278 / 0.293 / 0.296 / 0.267 /
+    0.179 — a single dome from the midline to x 0.098, then a 0.117 CLIFF
+    (dz/dx -2.40) into a low outer shelf at 0.186 that never recovers. So the
+    front view had exactly one mass on it: everything past x 0.13 was turned
+    away from the camera. Three bellies cannot be read off that section however
+    the material is lit.
+
+    Two things were wrong and both are fixed here.
+
+    RESOLUTION FIRST. The thigh rings carried 32 sides, which is EIGHT anterior
+    sample columns from the midline to the flank, and `torsoAngle`'s knots
+    cluster three of them inside r 0.15 — density authored for the sternum and
+    the linea alba, on a region whose midline is supposed to be quiet. The quad
+    crown, the RF/VL boundary and the lateral sweep shared the remaining three.
+    R105's lesson applies unchanged: a belly needs vertices to be round, and no
+    amplitude fixes resolution. The thigh band is 48 sides now (body.js), which
+    is twelve anterior columns, and the lobes below are placed ON them: VM at
+    0.232/0.338, RF at 0.338/0.456, the valley at 0.600/0.761, VL at
+    0.927/1.097/1.279.
+
+    THEN ORGANISATION. `head` was 0.36 — the generic convex column, and it
+    swamped everything riding on it — and `valley` was 0.272 on a 0.22 radian
+    half-width, which is not a plane change but a gorge. `head` comes down to
+    0.24 so it supports the column rather than being it; `rf` moves OUT to 0.44
+    (it sat at 0.34, inside head's own peak, where the two simply fused into one
+    hump) and gains amplitude; `valley` halves to 0.16 and widens to 0.30, so
+    the RF/VL border is a change of plane and not a cut; `vl` grows to 0.58 on a
+    0.52 half-width and moves in to 0.96, which lifts the outer shelf from 0.186
+    to 0.198 and lets the sweep wrap toward the side view instead of falling off
+    the frame; `vm` is carried at a restrained value through the WHOLE thigh
+    rather than only at the knee, because the flat medial table the first
+    candidate produced at y 1.22-1.32 is what a bridge plateau with nothing
+    beside it looks like — a restrained inner support is both the anatomy and
+    the fix. `bridge` rises 0.18 -> 0.28 to pay for the midline value `head`
+    gave up: measured, it fills the centre nearly three times faster than it
+    fills the RF (0.28 at the seam against 0.098 at 0.44 rad), which is the one
+    control that can calm the middle without flattening the muscle.
+
+    EACH BELLY PEAKS AT ITS OWN HEIGHT. The first R249 build gave all three
+    influences a flat plateau over y 0.95-1.23, and the clay showed the result:
+    three long parallel RIDGES, not three volumes. A belly is read as a mass
+    because it starts, swells and ends, and if two neighbouring masses swell at
+    the same height their boundary is a vertical stripe. So `rf` peaks at y 1.10
+    (0.38) and is down to 0.19 by 1.32; `vl` peaks HIGHER, at 1.23-1.32 (0.62 /
+    0.60), which is where the lateral sweep belongs and which makes the RF/VL
+    border run diagonally; `vm` peaks LOWER, at 0.95 (0.30), emerging toward the
+    knee as the other two are already tapering. `valley` follows the pair it
+    separates and is strongest where both are present.
+
+    AND THE BRIDGE REACHES THE DISTAL THIGH. With `vm` now peaking at y 0.95
+    the lower rows gained a medial mass, and the measured centre dip at the two
+    lowest sampled rows went the wrong way (13.6 -> 16.7 and 10.3 -> 12.5 per
+    cent) because `bridge` was still fading out from y 0.95 down. Carried to
+    0.87 at 0.11 and 0.95 at 0.21 it pays for that, and it is the same control
+    R248 proved: isolated, zeroing `bridge` takes the dip from 4.8 / 18.0 / 13.6
+    / 10.3 to 13.2 / 29.9 / 22.6 / 21.1, so it owns most of what the eye reads
+    as the central division and it moves the crown by almost nothing.
+
+    THE SIDE PROFILE IS PINNED, NOT ESTIMATED. `depth` below is re-solved so the
+    CROWN depth of every row equals R248's to a ten-thousandth (0.1569 against
+    0.1570 at y 0.87, 0.2978 against 0.2978 at 1.10, 0.2897 at 1.23). X is owned
+    by LOWER_WIDTH and is untouched, so the front outline cannot move either:
+    only the section's internal organisation changes. */
+ lobes:{seam:[0,0.40],head:[0.64,0.86],rf:[0.44,0.28],valley:[0.72,0.30],
+        vl:[0.96,0.52],vm:[0.26,0.30],itb:[1.95,0.30],bridge:[0,0.62]},
+ depth:[[0.80,0.1233],[0.87,0.1315],[0.95,0.1671],[1.03,0.1865],[1.10,0.2025],[1.23,0.2092],[1.32,0.2012],[1.41,0.1789],[1.46,0.1697]],
  /* R241 — the central descent's amplitude, Astra's own profile scaled to
     0.55. Measured on the FINAL mesh, this control moves ONLY the channel
     floor: with it zeroed the floor goes 0.1479 -> 0.2085 at y 1.220 and the
@@ -2315,13 +2383,13 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     seam's 0.40 — raises the whole inner flank rather than just un-cutting the
     groove, and at 0.28 rad it contributes 0.71 of its peak, so it lifts the
     floor faster than the crown. */
- bridge:[[0.80,0.0000],[0.95,0.0900],[1.03,0.1500],[1.10,0.1800],[1.23,0.1800],[1.32,0.1350],[1.41,0.0750],[1.46,0.0000]],
+ bridge:[[0.80,0.0000],[0.87,0.1100],[0.95,0.2100],[1.03,0.2600],[1.10,0.2800],[1.23,0.2600],[1.32,0.1900],[1.41,0.1000],[1.46,0.0000]],
  seam:[[0.8,0.0000],[0.87,0.0174],[0.95,0.0204],[1.03,0.0221],[1.1,0.0235],[1.23,0.0235],[1.32,0.0174],[1.41,0.0112],[1.46,0.0062]],
- head:[[0.80,0],[0.87,0.06],[0.95,0.28],[1.03,0.32],[1.10,0.36],[1.23,0.34],[1.32,0.26],[1.41,0.16],[1.46,0.09]],
- rf:[[0.80,0.0000],[0.87,0.0000],[0.95,0.1769],[1.03,0.2211],[1.10,0.2300],[1.23,0.2300],[1.32,0.1593],[1.41,0.0884],[1.46,0.0443]],
- vl:[[0.80,0.0000],[0.87,0.2286],[0.95,0.3143],[1.03,0.3714],[1.10,0.4000],[1.23,0.4000],[1.32,0.3714],[1.41,0.3143],[1.46,0.2000]],
- valley:[[0.80,0.0000],[0.87,0.1360],[0.95,0.2267],[1.03,0.2720],[1.10,0.2720],[1.23,0.2720],[1.32,0.2040],[1.41,0.1360],[1.46,0.0680]],
- vm:[[0.80,0],[0.87,0.20],[0.95,0.15],[1.03,0.09],[1.10,0.05],[1.23,0.02],[1.46,0]],
+ head:[[0.80,0],[0.87,0.04],[0.95,0.19],[1.03,0.22],[1.10,0.24],[1.23,0.24],[1.32,0.20],[1.41,0.13],[1.46,0.07]],
+ rf:[[0.80,0.02],[0.87,0.08],[0.95,0.22],[1.03,0.32],[1.10,0.38],[1.23,0.31],[1.32,0.19],[1.41,0.09],[1.46,0.04]],
+ vl:[[0.80,0.04],[0.87,0.24],[0.95,0.40],[1.03,0.48],[1.10,0.54],[1.23,0.62],[1.32,0.60],[1.41,0.46],[1.46,0.28]],
+ valley:[[0.80,0],[0.87,0.05],[0.95,0.12],[1.03,0.16],[1.10,0.18],[1.23,0.17],[1.32,0.12],[1.41,0.07],[1.46,0.03]],
+ vm:[[0.80,0.06],[0.87,0.28],[0.95,0.30],[1.03,0.22],[1.10,0.14],[1.23,0.10],[1.32,0.08],[1.41,0.05],[1.46,0]],
  itb:[[0.80,0],[0.87,0.04],[0.95,0.06],[1.03,0.06],[1.10,0.06],[1.23,0.05],[1.32,0],[1.46,0]]};
 /* R242 — ASTRA'S LOWER-LEG GRAMMAR, from the same R109 checkpoint.
 

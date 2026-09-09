@@ -228,7 +228,22 @@ export function buildBody(materials, P, options = {}) {
      applied to it, because every male myofascial surface, recess channel and
      scapular construction is measured in HIS chart. */
   var torsoLoft = (P && P.buildTorso) ? P.buildTorso() : loft(torsoRings, maleAnatomy ? 64 : (TORSO_.sides || 8),
-    { sidesAt: maleAnatomy ? function(s){return s.y>0&&s.y<=.44?16:s.y<1.515?32:s.y>2.13?(s.y<=2.16?32:16):s.y>=2.03?56:s.y<1.83?48:64;} : undefined, capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true, refine: maleAnatomy ? 0 : (TORSO_.refine || 0), jitter: TORSO_.jitter == null ? 1 : TORSO_.jitter,   /* R120: move 32 samples from the plain terminal stock to the upper torso; fixed triangle budget. */
+    { /* R249 — THE THIGH IS 48 SIDES. At 32 it had eight anterior sample
+        columns from the midline to the flank and `torsoAngle` puts three of
+        them inside r 0.15, so the rectus, the RF/VL border and the lateral
+        sweep shared three columns between them. Three overlapping bellies
+        cannot be described on three samples; R105 settled this on the arms
+        ("the fault was resolution, and no amplitude fixes resolution") and it
+        is the same fault here. 48 gives twelve columns and the astraQuad lobes
+        are placed on them. The boundary is 0.92 and not lower for two measured
+        reasons: at 0.78 the new stitch landed inside the knee band and took its
+        p90 adjacent-face turn from 30 to 34 degrees, and carrying 48 all the way
+        down to the 0.44 ring made `quadKneeSurfacePatch` fail outright — it
+        could not recover its own cage edge [0.064,0.90]-[0.129,0.79] against the
+        denser rings. The knee's topology is Stage B's to change, not Stage A's.
+        Mrs. Mah is not affected: her
+        torso comes from `P.buildTorso()` and never reaches this option. */
+      sidesAt: maleAnatomy ? function(s){return s.y>0&&s.y<=.44?16:s.y<.92?32:s.y<1.515?48:s.y>2.13?(s.y<=2.16?32:16):s.y>=2.03?56:s.y<1.83?48:64;} : undefined, capTop: true, capBottom: false, lift: TORSO_.classLift, inner: true, refine: maleAnatomy ? 0 : (TORSO_.refine || 0), jitter: TORSO_.jitter == null ? 1 : TORSO_.jitter,   /* R120: move 32 samples from the plain terminal stock to the upper torso; fixed triangle budget. */
       /* R98 — the body's default platinum share; the ring table and the zone
          functions in proportions.js refine it per plane. */
       coat: REGIONS.BODY.coat, normalWeight: maleAnatomy ? 'angle' : undefined, normalAt: maleAnatomy ? torsoMoldNormal : undefined, diagonalTarget: maleAnatomy ? function(a,s){return s.y>=1.49&&s.y<=2.20?torsoSurface(a,s,[0,s.y,0]):null;} : undefined, surface: maleAnatomy ? torsoSurface : undefined, angleAt: maleAnatomy ? torsoAngle : undefined, cavityAt: maleAnatomy ? torsoCavity : undefined });
