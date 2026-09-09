@@ -2034,3 +2034,67 @@ STILL OPEN
 
 R252 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R251 f4f37f2, then R250
 3eb833d.
+
+--------------------------------------------------------------------------------
+R253 — PHASE A: THE SIDE PROFILE'S MASS MOVES DOWN THE CHAIN
+--------------------------------------------------------------------------------
+
+THE DEFECT, MEASURED. The anterior fell 0.2231 at y 0.97 to 0.1565 at y 0.87 —
+THIRTY PER CENT ACROSS ONE 0.10 BAND — and then ran as a plain cone to the point.
+That step is the "large upper bulb / empty long cone".
+
+AND A DEAD-CODE FINDING THAT EXPLAINS WHY R252's DISTAL KNOTS DID NOTHING. The
+astraQuad region was [0.66, 1.46, 0.10]: `windowAt` fades IN across 0.66-0.76, so
+the weight AT 0.66 is exactly zero. Every distal coefficient R252 added at y 0.66
+was multiplied by nothing. The region starts at 0.58 now.
+
+THE CORRECTION IS BOUNDED AND IN BOTH DIRECTIONS — the brief's 15-30% band for a
+clear large error, applied as a REDISTRIBUTION rather than a trim:
+
+  anterior          R252     R253            posterior        R252     R253
+    y 0.66         0.1269   0.1343  +6%        y 0.66        0.1010   0.1104  +9%
+    y 0.77         0.1397   0.1643 +18%        y 0.77        0.1217   0.1384 +14%
+    y 0.87         0.1565   0.1800 +15%        y 0.87        0.1533   0.1704 +11%
+    y 0.97         0.2231   0.2050  -8%        y 0.97        0.1820   0.1962  +8%
+    y 1.06         0.2544   0.2273 -11%        y 1.22        0.2546   0.2491  -2%
+    y 1.14         0.2515   0.2243 -11%
+    y 1.22         0.2318   0.2094 -10%
+
+  depth / width      R248            R253
+    y 0.66           1.484           1.639      the distal chain now carries depth
+    y 0.87           1.356           1.603
+    y 1.14           1.644           1.541
+    y 1.28           1.662           1.413      the bulb is 15% down on R248
+    y 1.34           1.633           1.431
+
+  centre dip by row  0.4 / 1.1 / -3.7 / 0.1 / -0.6 / -2.9 per cent — subordinate
+  mask half-width at rows 370 / 410:  54 / 43  ->  93 / 80. The lower leg is
+  reading as a lit mass for the first time rather than as an unlit spike.
+
+  Mrs. Mah  26 meshes IDENTICAL to b63d0c7      contracts 376/376
+
+  (An earlier "MRS CHANGED" line in this session was an EMPTY hash file from a
+  background chain that raced the diff, not a regression. Check `wc -l` on a
+  hash file before believing a difference.)
+
+--------------------------------------------------------------------------------
+PHASE B OPENED — THE ARM DIAGNOSIS, MEASURED
+--------------------------------------------------------------------------------
+
+`armprof.mjs` bins each arm mesh along its own principal axis and reports the
+mean radius per bin. Normalised, from the shoulder end down:
+
+  arm-right-upper  0.36 0.78 0.95 0.96 0.81 0.87 0.84 1.00 0.87 0.91 0.78 0.67 0.48 0.41
+  arm-right-fore   0.62 0.88 0.92 0.98 0.93 0.77 0.90 0.84 1.00 0.81 0.47 0.47 0.51 0.30
+  arm-left-fore    0.23 0.33 0.51 0.61 0.65 0.69 0.86 0.92 1.00 0.98 0.98 0.85 0.65 0.42
+
+The upper arm has THREE local maxima (0.96, 1.00, 0.91) separated by two dips of
+15-19%, and the lowered forearm has three more. That is the "ball + oval + oval +
+cone" read, and it is now a number rather than an impression. The raised forearm
+(arm-left-fore) is the counter-example: one belly, monotone either side — which
+is what all four segments should look like.
+
+NOT STARTED: the correction itself, Phase C (torso), D (Mrs. comparative), E
+(crystallisation), F (hair), G (final consistency).
+
+R253 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R252 ba3c931.
