@@ -2261,3 +2261,62 @@ forearm's flexor/extensor asymmetry are untouched and are NOT blocked — they l
 in `maleUpperShape` / `maleForeShape`, which are not volume-gated.
 
 HEAD OF BRANCH REMAINS R255 fd2d96b.
+
+--------------------------------------------------------------------------------
+CORRECTION — `authoringMaster` IS ON IN THE RENDER. R249-R255 SAID OTHERWISE.
+--------------------------------------------------------------------------------
+
+`mrmah3d/core/character.js:31`
+
+    authoringMaster: opts.authoringMaster !== false
+
+IT DEFAULTS TO TRUE, and its own comment says so: "DEFAULT ON here so the lab and
+the review viewer show the accepted character rather than the stock pipeline".
+I read `opts.authoringMaster` in mrmah.js, saw that neither the lab nor the review
+page sets it, and concluded it was off — missing this defaulting layer between
+`mrmah-scene.js` and `mrmah.js`. Verified the right way in the end, by logging
+from inside a mounted page: `authoringMaster= true name= male authoring= true`.
+
+WHAT THAT INVALIDATES, EXPLICITLY.
+
+  R249 / R254 — "quadKneeSurfacePatch never runs in the mesh that is drawn", and
+  the claim that R249's 0.92 side-count boundary was protecting a function with
+  no presence in the product. WRONG: it does run. The R249 constraint was real.
+  The chevron fix itself STANDS — the capture shows the chevron gone and the
+  scene mounts, so the 1.10 boundary satisfies the cage — but it was kept for a
+  reason that was not true, and the risk I claimed was absent was actually there.
+
+  R255 — "the arms look like stacked ovals because the anatomy authored for them
+  is not running". WRONG. The elbow-ball bug is still real and the fix still
+  valid (`maleForeProfile` feeds the loft, upstream of the authoring pass, and
+  the capture shows the bead gone), but the diagnosis framing around it was not.
+  The two `armprof` profiles I compared were a no-flag Node build against a
+  flagged one; the browser renders the flagged one, so the "runtime vs authoring"
+  contrast I drew was between two builds, one of which nothing renders.
+
+  R249-R253 MEASUREMENTS. `profile.mjs`, `vdump-runtime.mjs` and `armprof.mjs`
+  all call `buildBody`/`buildLimbs` with `{}`, which does NOT pass through
+  character.js's defaulting, so they measured the stock pipeline. Same rows, both
+  builds:
+
+     y      front (no auth / auth)     rear (no auth / auth)    d/w (no auth / auth)
+    0.97      0.2050  /  0.1925          0.1964 / 0.2202          1.583 / 1.627
+    1.14      0.2243  /  0.2165          0.2483 / 0.2528          1.548 / 1.537
+    1.28      0.1998  /  0.1979          0.2263 / 0.2575          1.413 / 1.510
+
+  The REAR is understated by up to 14% and depth/width by up to 0.10. Direction
+  and sign of every reported change hold; the absolute values in R249-R255 do
+  not. Every KEEP decision was ultimately made on a CAPTURE, and the captures
+  were always the product build, so the conclusions stand.
+
+TOOL RULE FROM NOW ON: any harness that measures geometry must pass
+`{authoringMaster:true}` explicitly, because it is bypassing the layer that would
+have defaulted it. A bare `{}` measures a build nothing renders.
+
+AND THE MOUNT CHECK IS NOT OPTIONAL. R256 passed 376/376 contracts, an offline
+male build and Mrs. Mah's hashes over a build that could not mount. The gate that
+caught it (`authorMuscleBellies`, R185 scoped volume) lives in exactly the layer
+I had written off. `mountcheck.mjs` runs in ~45s and is now the check that goes
+between the tests and any capture.
+
+HEAD OF BRANCH REMAINS R255 fd2d96b (geometry unchanged by this entry).
