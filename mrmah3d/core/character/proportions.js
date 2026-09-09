@@ -2134,7 +2134,12 @@ export const MRMAH_MORPHOLOGY = {
      +0.022 at y .88 being the largest change. */
   LOWER_WIDTH:[[0,0],[.20,.035],[.43,.084],[.62,.137],[.70,.162],[.78,.188],[.88,.222],[.98,.257],[1.08,.289],[1.22,.318],[1.33,.279],[1.48,.21518],[1.56,.227]],
   LOWER_FRONT:[[0,0],[.20,.026],[.43,.060],[.62,.091],[.70,.106],[.78,.111],[.88,.136],[.98,.170],[1.08,.201],[1.23,.221],[1.34,.201],[1.48,.175],[1.56,.178]],
-  LOWER_BACK:[[0,0],[.20,.025],[.43,.057],[.62,.086],[.70,.102],[.78,.106],[.88,.130],[.98,.153],[1.08,.176],[1.25,.208],[1.36,.197],[1.48,.160],[1.56,.163]],
+  /* R250 — the posterior half of the same 5 per cent trim. The side profile is
+     BOTH contours, and taking only the front would have moved the whole mass
+     backward rather than slimmed it: the axis has to stay where it is. Graded
+     exactly like the anterior — nothing at or below y 1.08, full from 1.25 —
+     so the glute keeps its shape and only its projection comes in. */
+  LOWER_BACK:[[0,0],[.20,.025],[.43,.057],[.62,.086],[.70,.102],[.78,.106],[.88,.130],[.98,.153],[1.08,.176],[1.25,.1976],[1.36,.1872],[1.48,.1520],[1.56,.1549]],
   LOWER_PATHS:{
   rectusFemoris:[[.76,.043,.026],[1.03,.113,.052],[1.23,.131,.060],[1.48,.083,.032]],
   vastusLateralis:[[.79,.099,.029],[1.06,.219,.075],[1.26,.228,.065],[1.45,.161,.027]],
@@ -2343,14 +2348,35 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     / 10.3 to 13.2 / 29.9 / 22.6 / 21.1, so it owns most of what the eye reads
     as the central division and it moves the crown by almost nothing.
 
-    THE SIDE PROFILE IS PINNED, NOT ESTIMATED. `depth` below is re-solved so the
-    CROWN depth of every row equals R248's to a ten-thousandth (0.1569 against
-    0.1570 at y 0.87, 0.2978 against 0.2978 at 1.10, 0.2897 at 1.23). X is owned
-    by LOWER_WIDTH and is untouched, so the front outline cannot move either:
-    only the section's internal organisation changes. */
+    THE SIDE PROFILE IS SOLVED, NOT ESTIMATED. `depth` below is re-solved so the
+    CROWN depth of every row is a STATED multiple of R248's — 1.000 at y 0.87,
+    0.95, 1.03; 0.988 at 1.10; 0.950 at 1.23, 1.32 and 1.41. X is owned by
+    LOWER_WIDTH and is untouched, so the front outline cannot move at all.
+
+    R250 — THE UPPER HALF COMES DOWN 5 PER CENT, AND THE CENTRE FLOOR RISES.
+    Measured on the runtime mesh, depth over width ran 1.36 at y 0.87, 1.63
+    through the thigh and then 1.86 and 2.03 at y 1.45 and 1.48: the top of the
+    lower body is twice as deep as it is wide. Mrs. Mah — the quality reference
+    for this shape — falls the other way over the same rows (1.48 -> 1.46), so
+    this is not the species, it is a local overbuild. The trim is graded: full
+    strength from y 1.23 up, nothing at 1.06 and below, so the distal quad and
+    the knee approach keep every unit of the volume they had and only the bulb
+    loses any.
+
+    ONE PART OF THAT STEP IS NOT THE LOWER BODY'S TO FIX, and it was isolated
+    rather than guessed. Above y ~1.42 `astraWeight` is zero and the front is
+    owned by `connectedFront`, i.e. the torso's `pec.surface.supportDepth` —
+    0.228 at y 1.40 and 0.236 at 1.48 — arriving over a lower body that reaches
+    0.187. Zeroing `lowerWall` moved the front at y 1.48 by 0.001 and zeroing
+    `coreField` by 0.002, so neither owns it. The 26 per cent step from thigh to
+    abdomen belongs to the torso's support surface and is Pass 4's, not Pass 1's.
+
+    `bridge` rises again (0.28 -> 0.32 at its peak, and 0.13 at y 0.87) because
+    the trim lowers the crown and the floor with it, and the centre must not be
+    allowed to come back with the reduced depth. */
  lobes:{seam:[0,0.40],head:[0.64,0.86],rf:[0.44,0.28],valley:[0.72,0.30],
         vl:[0.96,0.52],vm:[0.26,0.30],itb:[1.95,0.30],bridge:[0,0.62]},
- depth:[[0.80,0.1233],[0.87,0.1315],[0.95,0.1671],[1.03,0.1865],[1.10,0.2025],[1.23,0.2092],[1.32,0.2012],[1.41,0.1789],[1.46,0.1697]],
+ depth:[[0.80,0.1233],[0.87,0.1301],[0.95,0.1651],[1.03,0.1846],[1.10,0.1976],[1.23,0.1960],[1.32,0.1887],[1.41,0.1686],[1.46,0.1612]],
  /* R241 — the central descent's amplitude, Astra's own profile scaled to
     0.55. Measured on the FINAL mesh, this control moves ONLY the channel
     floor: with it zeroed the floor goes 0.1479 -> 0.2085 at y 1.220 and the
@@ -2383,7 +2409,7 @@ MRMAH_MORPHOLOGY.lower.astraQuad={
     seam's 0.40 — raises the whole inner flank rather than just un-cutting the
     groove, and at 0.28 rad it contributes 0.71 of its peak, so it lifts the
     floor faster than the crown. */
- bridge:[[0.80,0.0000],[0.87,0.1100],[0.95,0.2100],[1.03,0.2600],[1.10,0.2800],[1.23,0.2600],[1.32,0.1900],[1.41,0.1000],[1.46,0.0000]],
+ bridge:[[0.80,0.0000],[0.87,0.1300],[0.95,0.2400],[1.03,0.2900],[1.10,0.3200],[1.23,0.3000],[1.32,0.2200],[1.41,0.1150],[1.46,0.0000]],
  seam:[[0.8,0.0000],[0.87,0.0174],[0.95,0.0204],[1.03,0.0221],[1.1,0.0235],[1.23,0.0235],[1.32,0.0174],[1.41,0.0112],[1.46,0.0062]],
  head:[[0.80,0],[0.87,0.04],[0.95,0.19],[1.03,0.22],[1.10,0.24],[1.23,0.24],[1.32,0.20],[1.41,0.13],[1.46,0.07]],
  rf:[[0.80,0.02],[0.87,0.08],[0.95,0.22],[1.03,0.32],[1.10,0.38],[1.23,0.31],[1.32,0.19],[1.41,0.09],[1.46,0.04]],

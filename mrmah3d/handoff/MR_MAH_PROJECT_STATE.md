@@ -1785,3 +1785,72 @@ STAGED ORDER STATUS
   6 shoulder / torso      NOT STARTED
 
 R249 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R248, b63d0c7.
+
+--------------------------------------------------------------------------------
+R250 — MD-PAL PASS 1: CENTRE LINE AND UPPER-HALF SIDE PROFILE
+--------------------------------------------------------------------------------
+
+MEASURE. Depth over width on the runtime mesh: 1.36 at y 0.87, 1.62-1.66 through
+the thigh, then 1.86 at y 1.45 and 2.03 at 1.48. Mrs. Mah — the protocol's own
+quality reference for this shape — falls the other way over the same rows, 1.48
+-> 1.46. Front z fell 0.2820 (y 1.22) to 0.2095 (1.40) and then RE-SWELLED to
+0.2432 and 0.2668 while the width was still falling: a step, not a taper.
+
+DIAGNOSE. Two owners, and both were isolated rather than argued.
+  - The bulb over y 1.15-1.40 is the lower body's own depth, and it is where the
+    "too thick from the side" reads.
+  - The step at y 1.42-1.50 is NOT the lower body's. Above ~1.42 `astraWeight` is
+    zero and the front is `connectedFront`, i.e. the torso's
+    `pec.surface.supportDepth` (0.228 at 1.40, 0.236 at 1.48) arriving over a
+    lower body that reaches 0.187. Zeroing `lowerWall` moved y 1.48 by 0.001 and
+    zeroing `coreField` by 0.002 — neither owns it. That 26% step is the torso's
+    support surface and belongs to Pass 4.
+
+ADJUST. A graded 5% depth trim: full from y 1.23 up, zero at 1.06 and below, on
+BOTH contours — anterior through the astraQuad `depth` solve, posterior through
+LOWER_BACK — because taking only the front would move the mass backward instead
+of slimming it. And `bridge` rises 0.28 -> 0.32 at its peak so the centre does
+not come back with the reduced depth.
+
+LOCK, matched clay, same camera / framing / lighting / material / frozen pose:
+
+  centre dip by row      R248            R249            R250
+    210                  4.8%            4.0%            2.9%
+    250                 18.0%           16.5%           13.2%
+    290                 13.6%           16.3%           13.1%
+    330                 10.3%           11.9%            9.5%
+  depth/width y1.14      1.644           1.644           1.613
+  depth/width y1.22      1.630           1.630           1.559
+  depth/width y1.34      1.633           1.633           1.560
+  depth/width y0.87      1.356           1.356           1.355   (held, by design)
+  front outline          IDENTICAL to 0.000 px on every outline row (geometry)
+  side outline           mean 0.66 / 0.50 px, worst 4 px over the lower body
+  Mrs. Mah               26 meshes, vertex hashes IDENTICAL to b63d0c7
+  contracts              376/376
+
+R250 IS THE FIRST PASS WHOSE CENTRE IS QUIETER THAN R248 AT EVERY MEASURED ROW
+while carrying R249's quad organisation.
+
+A TOOL CORRECTION THAT INVALIDATES AN EARLIER CLAIM. `silhcmp.mjs` finds the
+leftmost and rightmost pixel above luma 40, and the review stage draws a 1-PIXEL
+BORDER at luma 43.3 down columns 0 and W-1. So every row reported "lit" from 0 to
+871 and every comparison it was ever given answered "0 px changed" — including
+the "front and side outlines 0 px" lines recorded for R248 and R249. Those lines
+were vacuous. `silh2.mjs` excludes a 4px margin, and the front silhouette is now
+settled from GEOMETRY instead: max |x| per row, built mesh, R248 against R250 —
+every outline row (width > 0.15) identical to 0.000 px. The 14-16 px worst-row
+difference the corrected image tool reports at rows 546-550 is the shaded right
+flank crossing the luma threshold, not a silhouette move: the lit left edge is
+identical at every row and LOWER_WIDTH was never touched.
+
+STILL OPEN AFTER PASS 1-2
+  - The y 1.42-1.50 step (torso support surface) — Pass 4.
+  - From the side the lower two thirds is still a plain straight cone: no knee,
+    no shin, no calf event. That is Pass 3 and it is the largest remaining gap.
+  - The front read of the three quad influences is present but not emphatic. The
+    untaken lever is `torsoAngle`'s front knots: four of twelve thigh columns
+    still sit inside r 0.15, on a midline that is meant to be quiet.
+  - Torso bumpiness (Pass 4) and arms (Pass 5) not started, not measured.
+
+R250 IS A CANDIDATE AND IS NOT USER-APPROVED. Fallback: R249 813c5cd, then R248
+b63d0c7.
