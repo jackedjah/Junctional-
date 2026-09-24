@@ -1,0 +1,42 @@
+{
+  "released_at": "2026-09-24T23:08:23.220Z",
+  "build_label": "ASTRA_M7_REFERENCE_LOCK_PRIVATE_20260924",
+  "deploy_id": "6ab5acc1077641dc53f2b30b",
+  "url": "https://6ab5acc1077641dc53f2b30b--mahworld-test-preview.netlify.app",
+  "state": "ready",
+  "context": "deploy-preview",
+  "published_at": null,
+  "edge_gate_present": true,
+  "package": {
+    "entries": 181,
+    "bytes": 122978858,
+    "sha256": "3613f88fc484073181da6b59096404510d82769e55047c98d117645417de2e56",
+    "record_sha256": "143a8007f86163b3443a4153ae05ac59751a3684c0b2e64ab705ede2a80df9ba"
+  },
+  "release_checks": {
+    "test_programs": 56,
+    "checks_passed": 1518,
+    "checks_failed": 0,
+    "javascript_files": 104,
+    "secret_scan_files": 181,
+    "fresh_extraction_files": 181,
+    "fresh_extraction_smoke": "7/7",
+    "focused_m7_views": 8,
+    "focused_m7_console_errors": 0
+  },
+  "gate_check": {
+    "password_form": true,
+    "private_asset_status": 401,
+    "wrong_password_refused": true,
+    "password_value_served": false,
+    "authenticated_hosted_gameplay": "NOT RUN - MAHDEMO_PW unavailable"
+  },
+  "preserved": {
+    "production_deploy": "6aac25101f17ce5ed37166e4",
+    "m6q_deploy": "6ab594d507b647b41d599401",
+    "m6_deploy": "6ab586ec9ad382fa1b83f1be",
+    "m5c_deploy": "6ab454bf3a60c4bf88b1334a"
+  },
+  "source_checkpoint": "861cc1bbbf4915e542cf98d2d545564a37a8af0f",
+  "physical_phone_acceptance": "OWNER_PENDING"
+}

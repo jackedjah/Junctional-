@@ -2,6 +2,14 @@
 
 Updated 2026-09-24 (M7 reference-locked implementation S1-S4 locally closed; protected M6Q/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
 
+## M7 protected private candidate — owner review pending
+
+- Build `ASTRA_M7_REFERENCE_LOCK_PRIVATE_20260924` is ready at protected immutable draft `6ab5acc1077641dc53f2b30b`: `https://6ab5acc1077641dc53f2b30b--mahworld-test-preview.netlify.app`. It is `deploy-preview`, `published_at = null`; the all-path edge gate is present.
+- Release gate passed 56 programs / 1,518 checks, 104 JavaScript files, security/boundary scans, exact 181-file extraction and 7/7 extracted smoke. ZIP SHA-256 is `3613f88fc484073181da6b59096404510d82769e55047c98d117645417de2e56`.
+- Unauthenticated play and assets are gated; wrong password is refused; no password value is served. Authenticated hosted gameplay is not claimed because `MAHDEMO_PW` was unavailable.
+- Production `6aac25101f17ce5ed37166e4` and M6Q/M6/M5C draft IDs remain unchanged. Source checkpoint `861cc1bbbf4915e542cf98d2d545564a37a8af0f` is remotely verified; the release-record commit is the final M7 checkpoint.
+- Remaining acceptance: owner physical-phone review. Stop after the final record push; no production promotion, password removal, new feature pass or unrelated lane work.
+
 ## Active M7 checkpoint — S1-S4 locally closed
 
 - Full-world legacy ridge ownership is corrected: the obsolete 26-cone near wall is suppressed only in district mode, while the layered macro/far-world boundary remains. `M7_REGION_TABLE.md` records the actual five-sanctuary topology without multiplying the world scale.

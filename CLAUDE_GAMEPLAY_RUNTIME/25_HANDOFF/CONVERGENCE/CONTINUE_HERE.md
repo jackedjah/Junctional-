@@ -1,5 +1,12 @@
 # CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (M7 reference-locked implementation active)
 
+## M7 reference-locked private candidate — delivered for owner review
+- Playable protected draft: `https://6ab5acc1077641dc53f2b30b--mahworld-test-preview.netlify.app`; deploy/build ID `6ab5acc1077641dc53f2b30b`; visible build label `ASTRA_M7_REFERENCE_LOCK_PRIVATE_20260924`. API state is `ready`, context `deploy-preview`, `published_at = null`, with one edge gate present.
+- Package is 181 entries / 122,978,858 bytes / SHA-256 `3613f88fc484073181da6b59096404510d82769e55047c98d117645417de2e56`. The one authorized pipeline passed 56 programs / 1,518 checks, 104-file JavaScript syntax, CSS/boundary/secret scans, ZIP integrity, exact fresh extraction and 7/7 extracted browser smoke.
+- Gate proof: a fresh visit renders the password form; a private asset returns `401 application/json`; a deliberately wrong password is refused with attempts remaining; no password value is in the served page. `MAHDEMO_PW` was unavailable, so authenticated hosted gameplay is explicitly not claimed.
+- Production remains `6aac25101f17ce5ed37166e4`. M6Q `6ab594d507b647b41d599401`, M6 `6ab586ec9ad382fa1b83f1be`, and M5C `6ab454bf3a60c4bf88b1334a` remain ready/unpublished and unchanged.
+- Reviewed pre-release source checkpoint is `861cc1bbbf4915e542cf98d2d545564a37a8af0f`; exact durable record is `m7_reference_lock/private_candidate_release.json`. Physical-phone acceptance is owner-pending. Stop here; do not promote production or expand M7 without a new instruction.
+
 ## M7 reference-locked implementation — S1-S4 local closure
 - Cause-owned layout correction: the intrusive blue wall from reference C was the legacy near `cityScene` 26-cone ridge. Full-world mode now suppresses that obsolete layer and retains the intentional macro/far-world ridges; standalone mode keeps only a bounded 12-segment fallback. The five current sanctuaries and their actual registry routes/ecology are recorded in `M7_REGION_TABLE.md`.
 - The NEXUS / ASCENT / HALO landmark is now a complete world feature: smoothly flared 24 m platinum trunk, blue glazed core and veins, eight curved joined branches, 8.5 m upper deck, 32.2 m glass-dome apex, promenade, benches, focus crystal, noncombat Visionary guide and one visible cabin/shaft. The upper realm is usable rather than decorative.

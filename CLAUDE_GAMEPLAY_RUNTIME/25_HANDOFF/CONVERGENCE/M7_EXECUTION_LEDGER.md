@@ -17,9 +17,15 @@ Updated 2026-09-24 after the bounded local runtime check. This file maps the pac
 - `M7-LIT-01..03`, `M7-SKY-01..05`, `M7-ECO-01..06`: Moon-traced night lighting, connected cloud layers, local pooled fixtures, region identities, 41 dense refill patches × 64 shards, tree wind/aura, ponds/waterfall/shore and day switch are retained.
 - `M7-FAU-01..04`, `M7-NPC-01..02`, `M7-ARC-01..04`, `M7-ACT-05..07`: fish/school LOD, source-color Dogkie, bounded residents, corrected building scales/doors/interiors, black MAH MATCH, blue MAH GYM, slow mist aura, controls/camera/resource contracts and pending owner choices remain unchanged. The upper guide is deliberately noncombat at altitude 24 m and is excluded from ground-resident wandering logic.
 
+## Release closure
+
+- `M7-QA-05..07` are `VERIFIED_FOR_CANDIDATE`: build `ASTRA_M7_REFERENCE_LOCK_PRIVATE_20260924`, package 181 entries / 122,978,858 bytes / SHA-256 `3613f88fc484073181da6b59096404510d82769e55047c98d117645417de2e56`; 56 programs / 1,518 checks, 104-file syntax, boundary/secret scans, exact extraction and 7/7 extracted smoke passed. Protected draft `6ab5acc1077641dc53f2b30b` is ready, `deploy-preview`, `published_at = null`, with its edge gate present. Source checkpoint `861cc1bbbf4915e542cf98d2d545564a37a8af0f` was remotely verified before release; final release-record checkpoint follows.
+- `M7-QA-06` is verified: production remains `6aac25101f17ce5ed37166e4`; M6Q/M6/M5C remain ready, unpublished and unchanged. Fresh play and a private asset return the gate, wrong password is refused, and no password value is served.
+- `M7-QA-08` is `OWNER_REVIEW_PENDING`: exact release record is `m7_reference_lock/private_candidate_release.json`; implementation stops here for phone review.
+
 ## Intentionally bounded / owner review pending
 
 - `M7-TRE-12`: existing controller/flight support around the dome is preserved; no new claim of a bespoke climbing system is made.
 - `M7-QA-03`: desktop headless instrumentation was collected (final sample 336 draw calls, 1,831,701 triangles, 13.5 ms render sample), but this is not a physical-phone performance claim.
-- `M7-QA-05..08`: release/package/deploy status is recorded only after the single authorized release pipeline and protected draft deployment complete.
+- Authenticated hosted gameplay was not run because `MAHDEMO_PW` was unavailable; protection was instead checked unauthenticated and with an intentionally wrong password. The Netlify CLI ignored the existing defensive `/.netlify/images` redirect because that reserved path is no longer accepted in redirect syntax; this package contains no raster image files for that service, and the all-path edge gate is deployed.
 - Reference dimensions not present in the supplied image remain authored/measured runtime choices, not claimed source measurements. Physical-phone acceptance remains owner-only.
