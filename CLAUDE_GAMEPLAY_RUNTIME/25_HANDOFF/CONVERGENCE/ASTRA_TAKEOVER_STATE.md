@@ -1,6 +1,13 @@
 # MAHWORLD Astra takeover state
 
-Updated 2026-09-24 (protected M6 preview delivered; production and M5C preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+Updated 2026-09-24 (post-M6 quality continuation checkpoint 01; protected M6/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+
+## Active post-M6 checkpoint 01 — foreground cohesion
+
+- Preserved verified recovery base: public GitHub repository `jackedjah/Junctional-`, branch `backup/mahworld-m6-20260924T190351Z`, incoming tip `fa5576a0cb988eb226a880340aeeff8e0f9cdb98`. M6 deploy/package and production were not touched.
+- Foreground source changes are limited to `lab/world/terrain.js` and `lab/world/gear.js`: restrained regional overlay; world-space satin road detail without changing junction ownership/collision; less clipped, denser crystal flora; softened geology beds; and a smaller `16 m` interaction hint. Resource authority remains unchanged.
+- Focused local verification: source syntax/diff checks clean; static build/private scan clean at 180 files / 207.1 MB; one reused floor/junction view completed with zero unresolved/runtime errors and visibly restored road surface detail. No package/deploy/physical-phone claim.
+- Next source milestone is the cloud/horizon shell, followed by one bounded representative movement/equipment/action check and the authorized release gates.
 
 ## Current release checkpoint — protected M6 candidate
 

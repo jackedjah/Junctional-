@@ -1,4 +1,11 @@
-# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (protected M6 preview delivered)
+# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (post-M6 quality continuation active)
+
+## Post-M6 quality continuation — checkpoint 01 foreground surface/resource presentation
+- Continuity: work continues from the verified M6 release/recovery tip `fa5576a0cb988eb226a880340aeeff8e0f9cdb98` on `backup/mahworld-m6-20260924T190351Z`. The M6 candidate, production, current assets, JOB A/B requirements, and Character/MAHFITT/S08 boundaries remain unchanged.
+- `terrain.js` keeps the authored one-owner 128-segment junction topology, but reduces the region-overlay dominance and adds subtle world-space satin grain/veining to opaque road cores. The causeway now reads as a reflective constructed surface instead of a flat saturated slab; no collider, route, ownership, width, or junction height changed.
+- `gear.js` keeps all 41 authoritative resource nodes and the existing attack/drop/refill logic, but restrains white/emissive clipping, adds denser low-growth color variation and a softly lobed geology bed, and limits the instructional sprite to a smaller near-only view (`16 m`, five-metre fade).
+- Minimal check only: edited JavaScript syntax and `git diff --check` pass; the static build reports 180 files / 207.1 MB and a clean private-content scan. The reused M6 floor/junction view completed with zero unresolved/runtime errors; inspected image SHA-256 is `fcff1f60623dab7aec91b931ec96c0816f0e6e1875421a8224ec52b1a184c9de`.
+- Next: propagate the same premium restraint into the cloud/horizon shell, then run the bounded matched-view gameplay/gear check. No package or deployment has run at this checkpoint.
 
 ## M6 protected private preview — owner phone review next
 - New visible build `ASTRA_M6_PRIVATE_20260924`; immutable Netlify draft `6ab586ec9ad382fa1b83f1be`: `https://6ab586ec9ad382fa1b83f1be--mahworld-test-preview.netlify.app`. API state is `ready`, context `deploy-preview`, `published_at = null`.

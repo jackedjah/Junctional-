@@ -1,0 +1,31 @@
+{
+  "checkpoint": "POST_M6_QUALITY_01_FOREGROUND",
+  "generated_at": "2026-09-24T17:01:53.8814684-04:00",
+  "recovery_branch": "backup/mahworld-m6-20260924T190351Z",
+  "incoming_remote_commit": "fa5576a0cb988eb226a880340aeeff8e0f9cdb98",
+  "implemented": [
+    "lower-dominance continuous class-region tint over the existing platinum/graphite substrate",
+    "world-space satin road grain and restrained night emission without topology/collision changes",
+    "resource-bush albedo/emission restraint, dense low-growth variation, and softly lobed geology beds",
+    "smaller near-only resource interaction hint while preserving attack/drop/refill authority"
+  ],
+  "changed_source": [
+    "26_LOCAL_AUTHORITY/lab/world/terrain.js",
+    "26_LOCAL_AUTHORITY/lab/world/gear.js"
+  ],
+  "checks": {
+    "javascript_syntax": "PASS",
+    "git_diff_check": "PASS",
+    "static_build": "PASS: 180 files / 207.1 MB",
+    "private_content_scan": "PASS",
+    "focused_floor_view": "PASS: 0 unresolved / 0 console errors",
+    "inspected_image_sha256": "fcff1f60623dab7aec91b931ec96c0816f0e6e1875421a8224ec52b1a184c9de"
+  },
+  "not_run": [
+    "broad regression",
+    "soak",
+    "package",
+    "deployment",
+    "physical-phone acceptance"
+  ]
+}
