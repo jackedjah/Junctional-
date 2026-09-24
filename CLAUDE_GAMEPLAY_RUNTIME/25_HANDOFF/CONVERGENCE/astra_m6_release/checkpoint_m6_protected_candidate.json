@@ -11,7 +11,6 @@
   "m5c_deploy_id": "6ab454bf3a60c4bf88b1334a",
   "package_sha256": "82d5433350d9785e665fe9b5b74b88e07ddbf2c40a1c9e36c3a1a4fea87ab02c",
   "verified_pre_release_checkpoint": "6fa4e33e9ee4d35171bf3eaa4cff5606c559999e",
-  "release_source_commit": null,
-  "final_release_record_commit": null,
+  "release_source_commit": "4c67128617fde811c3bdc506b74f2ae8fdfa3157",
   "physical_phone_acceptance": "PENDING_OWNER"
 }

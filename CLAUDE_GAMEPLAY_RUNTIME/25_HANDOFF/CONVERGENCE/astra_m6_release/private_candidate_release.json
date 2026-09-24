@@ -8,8 +8,7 @@
     "worktree_clean": false,
     "verified_backup_branch": "backup/mahworld-m6-20260924T190351Z",
     "verified_pre_release_checkpoint": "6fa4e33e9ee4d35171bf3eaa4cff5606c559999e",
-    "release_source_commit": null,
-    "final_release_record_commit": null,
+    "release_source_commit": "4c67128617fde811c3bdc506b74f2ae8fdfa3157",
     "note": "Built from the preserved current M1-M6 dirty gameplay worktree; no checkout or reset to an older source state."
   },
   "package": {

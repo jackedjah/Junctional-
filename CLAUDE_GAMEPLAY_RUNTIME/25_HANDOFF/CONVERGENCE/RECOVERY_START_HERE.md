@@ -6,6 +6,7 @@ Updated 2026-09-24 for the emergency M6 backup and protected M6 preview release.
 
 - Build `ASTRA_M6_PRIVATE_20260924`; immutable draft `6ab586ec9ad382fa1b83f1be`: `https://6ab586ec9ad382fa1b83f1be--mahworld-test-preview.netlify.app`.
 - Package SHA-256 `82d5433350d9785e665fe9b5b74b88e07ddbf2c40a1c9e36c3a1a4fea87ab02c`; release record `astra_m6_release/private_candidate_release.json`.
+- Scoped release source/evidence checkpoint: `4c67128617fde811c3bdc506b74f2ae8fdfa3157` on `backup/mahworld-m6-20260924T190351Z`.
 - Production remains `6aac25101f17ce5ed37166e4`; M5C remains `6ab454bf3a60c4bf88b1334a`. Physical-phone acceptance and authenticated hosted gameplay remain open.
 
 ## Recovery identity
