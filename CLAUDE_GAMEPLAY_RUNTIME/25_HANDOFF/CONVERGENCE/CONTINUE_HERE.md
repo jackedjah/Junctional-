@@ -1,5 +1,13 @@
 # CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (post-M6 quality continuation active)
 
+## Post-M6 quality continuation — checkpoint 02 world/gameplay presentation
+- GitHub continuity: checkpoint 01 is verified at `80b96391c29e275cdac1c3b238b713b90c5e15d3` on `backup/mahworld-m6-20260924T190351Z`. M6, M5C, production, assets, JOB A/B and Character/MAHFITT/S08 boundaries remain preserved.
+- The foreground pass is now joined by lower/longer atmospheric cloud carriers, a subdued connected distant cloud bank in place of the bright circular skyland strip, shouldered far massifs/towers, continuous bridge arches, and added macro-ridge strata. The registered actual Moon remains authoritative.
+- Equipment presentation now samples the source-rig HAND→FINGERS span for the visible palm center while retaining the host grip/ownership/projectile authority. A representative physical-MAHGIC barbell pose received bounded presentation tuning; damage, costs, cooldowns, cadence profiles and exercise selection are unchanged.
+- One bounded NIGHT visual/action run completed 11 views with zero console/runtime errors. It rechecked the floor/junction, Moon/cloud/horizon, source Dogkie, blue MAH GYM/canopy aura, resource break + three refills, complete L0 equipment and representative physical/physical-MAHGIC actions. Static build remains clean at 180 files / 207.1 MB; the preserved focused checks are 98/98.
+- Honest visual remainder: after two focused pose attempts, the accepted `PA_PUSH` load still places the bar shaft through the rear neck/head silhouette even though two-hand midpoint/grip metrics are zero-error. The close resource prompt is readable and no longer clipped but remains visually prominent. These are recorded, not hidden or called complete.
+- Next: push this checkpoint, then run the authorized release gate/package exactly once from the preserved source and deploy one new protected unpublished candidate. No production promotion or physical-phone claim.
+
 ## Post-M6 quality continuation — checkpoint 01 foreground surface/resource presentation
 - Continuity: work continues from the verified M6 release/recovery tip `fa5576a0cb988eb226a880340aeeff8e0f9cdb98` on `backup/mahworld-m6-20260924T190351Z`. The M6 candidate, production, current assets, JOB A/B requirements, and Character/MAHFITT/S08 boundaries remain unchanged.
 - `terrain.js` keeps the authored one-owner 128-segment junction topology, but reduces the region-overlay dominance and adds subtle world-space satin grain/veining to opaque road cores. The causeway now reads as a reflective constructed surface instead of a flat saturated slab; no collider, route, ownership, width, or junction height changed.

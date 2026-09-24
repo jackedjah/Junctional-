@@ -1,6 +1,14 @@
 # MAHWORLD Astra takeover state
 
-Updated 2026-09-24 (post-M6 quality continuation checkpoint 01; protected M6/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+Updated 2026-09-24 (post-M6 quality continuation checkpoint 02; protected M6/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+
+## Active post-M6 checkpoint 02 — world/gameplay presentation
+
+- Checkpoint 01 is remotely verified at `80b96391c29e275cdac1c3b238b713b90c5e15d3` on `backup/mahworld-m6-20260924T190351Z`. The current source adds lower/longer Moon-keyed cloud carriers, connected subdued distant banks, layered far massifs/towers/arches and macro-ridge strata without replacing the actual Moon or route authority.
+- Visible equipment sockets now use the source HAND→FINGERS palm span; authoritative equipment ownership, projectile/special behavior, damage, costs and exercise selection are unchanged. The crystal prompt/material pass remains near-only and preserves the existing break/drop/refill system.
+- Bounded proof is current: 180-file clean static build; 11 NIGHT views; zero console/runtime errors; break + three drops/refills; complete L0 equipment; zero-error debug palm/midpoint grips; representative `PA_PUSH` accepted under its existing PHYSICAL_MAGIC profile. Existing focused checks remain 98/98.
+- Exact visual remainder: after two focused presentation attempts, the bar shaft still intersects the rear neck/head silhouette during the inspected `PA_PUSH` load. The close bush prompt remains more prominent than ideal. Both are recorded rather than extended into an open-ended investigation.
+- Next action is the single authorized release gate/package and one new protected unpublished draft. Preserve M6/M5C/production and do not claim physical-phone acceptance.
 
 ## Active post-M6 checkpoint 01 — foreground cohesion
 

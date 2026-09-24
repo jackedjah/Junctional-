@@ -1,0 +1,52 @@
+{
+  "checkpoint": "POST_M6_QUALITY_02_WORLD_GAMEPLAY",
+  "generated_at": "2026-09-24T18:15:00-04:00",
+  "recovery_branch": "backup/mahworld-m6-20260924T190351Z",
+  "parent_remote_commit": "80b96391c29e275cdac1c3b238b713b90c5e15d3",
+  "implemented": [
+    "longer lower world-cloud carriers with restrained moonlit opacity and the actual Moon left authoritative",
+    "subdued connected distant cloud banks replacing the bright circular skyland strip",
+    "layered shouldered far massifs, towers, continuous bridge arches, and added macro-ridge strata",
+    "source-rig palm-center equipment sockets while retaining the existing authoritative grip and ownership system",
+    "representative physical-MAHGIC barbell pose tuning without changing damage, costs, cooldowns, or exercise selection",
+    "near-only lower-contrast crystal-bush prompt and material restraint while preserving all refill behavior"
+  ],
+  "changed_source": [
+    "26_LOCAL_AUTHORITY/lab/world/sky.js",
+    "26_LOCAL_AUTHORITY/lab/farWorld.js",
+    "26_LOCAL_AUTHORITY/lab/world/macro.js",
+    "26_LOCAL_AUTHORITY/lab/world/gear.js",
+    "26_LOCAL_AUTHORITY/lab/fieldScene.js",
+    "26_LOCAL_AUTHORITY/lab/PresentationAdapter.js",
+    "26_LOCAL_AUTHORITY/lab/RigAnimator.js"
+  ],
+  "focused_checks": {
+    "javascript_syntax": "PASS",
+    "static_build": "PASS: 180 files / 207.1 MB",
+    "private_content_scan": "PASS",
+    "bounded_visual_action_probe": "PASS: 11 views / 0 console errors / 0 runtime unresolved",
+    "preserved_focused_tests": "PASS: 98/98",
+    "resource_interaction": "PASS: break plus three drops and three refills",
+    "equipment_debug": "PASS: complete L0 geometry, two zero-error dumbbell palm grips, zero-error two-hand barbell midpoint",
+    "representative_attack_authority": "PASS: PA_PUSH accepted in PHYSICAL_MAGIC with preserved BALANCED profile"
+  },
+  "inspected_images": {
+    "floor": "6a96864c1bbef80e56a4106fbf081c51cf2536ad5114ffbaaee198836d9bce34",
+    "moon_cloud_horizon": "0efc2b8a10bf8e0d146f4d00f51195be8feb3a66fe43cd30a56b5e1448be7884",
+    "resource_bush": "3e3a4bc2a1b05af720011129a4d5d62f6e6f5ea94e32bbcc11adddcc94259369",
+    "barbell_rest_grip": "d43ee1abcc4175f8b7c22d0591fecfc3b2288f14bb9bce3d785821ac003264ab",
+    "barbell_physical_mahgic_load": "6ce4987a3addfe8512687f1b1520de0bb4b42e28c07bc6e34ac0c49a6ce88dcd"
+  },
+  "honest_open_items": [
+    "The representative PA_PUSH load pose still places the bar shaft through the rear neck/head silhouette in the inspected frame after two bounded pose attempts; authority and grip math pass, but this visual intersection remains open.",
+    "The near resource instruction remains visually prominent at close range even after two bounded scale/contrast passes; it is no longer clipped and disappears outside the near interaction radius.",
+    "Exact raw ornate-temple parity remains unavailable because the missing original source was not recovered.",
+    "Authenticated hosted gameplay and physical-phone acceptance are not claimed."
+  ],
+  "not_run": [
+    "broad audit",
+    "long soak",
+    "physical-phone acceptance",
+    "production deployment"
+  ]
+}

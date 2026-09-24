@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-24T20:20:56.958Z",
- "source": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\packages\\deploy_ASTRA_M6_PRIVATE_20260924",
+ "generated_at": "2026-09-24T21:16:08.095Z",
+ "source": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
  "scope": "one bounded M6 visual session",
  "screenshots": [
   "01_floor_road_and_rest_integrity.png",
@@ -28,22 +28,22 @@
      "build_ms": {
       "fixtures": 2,
       "water": 17,
-      "coast": 17,
-      "terrain": 32,
-      "macro": 3,
-      "meadow": 17,
-      "forest": 2747,
-      "architecture": 757,
-      "celestial": 473,
-      "sky": 8,
+      "coast": 18,
+      "terrain": 30,
+      "macro": 2,
+      "meadow": 16,
+      "forest": 2611,
+      "architecture": 726,
+      "celestial": 443,
+      "sky": 29,
       "atmosphere": 0,
-      "props": 715,
-      "matchHall": 10,
+      "props": 613,
+      "matchHall": 15,
       "guides": 0,
-      "creatures": 273,
-      "wildlife": 346,
-      "gear": 11,
-      "signage": 9
+      "creatures": 194,
+      "wildlife": 262,
+      "gear": 8,
+      "signage": 8
      },
      "fixtures": 164,
      "water": {
@@ -95,12 +95,12 @@
        "damp": 0.99,
        "amp_m": 0.07,
        "ring_speed_mps": 3.94,
-       "impulses": 32,
+       "impulses": 25,
        "dropped": 0,
        "steps": 0,
        "active": false,
        "in_water": false,
-       "pending": 32,
+       "pending": 25,
        "origin": [
         0,
         3.9375
@@ -155,7 +155,7 @@
          150
         ],
         "passes": 5,
-        "tris": 960
+        "tris": 1440
        },
        {
         "id": "RIDGE_MID",
@@ -165,7 +165,7 @@
          230
         ],
         "passes": 5,
-        "tris": 848
+        "tris": 1272
        }
       ],
       "waterfalls": [
@@ -357,12 +357,12 @@
        "transitions": 121,
        "rewrites": 1,
        "timing_ms": {
-        "build_ms": 2747.1,
-        "assemble_ms": 1.4,
-        "first_classify_ms": 0.11,
+        "build_ms": 2610.6,
+        "assemble_ms": 0.7,
+        "first_classify_ms": 0.055,
         "first_rewrite_ms": 0.055,
         "last_classify_ms": 0,
-        "max_classify_ms": 0.11,
+        "max_classify_ms": 0.055,
         "last_rewrite_ms": 0.055,
         "max_rewrite_ms": 0.055,
         "runtime_bake_ms": 0
@@ -499,13 +499,13 @@
         "seed": 3238878957
        },
        "cloud": {
-        "tau": 0.012,
-        "coverage": 0.012,
-        "transmission": 0.988,
-        "disc": 0.993,
-        "halo": 0.984,
-        "rays": 0.977,
-        "key": 0.993
+        "tau": 0.083,
+        "coverage": 0.08,
+        "transmission": 0.92,
+        "disc": 0.954,
+        "halo": 0.894,
+        "rays": 0.847,
+        "key": 0.951
        }
       },
       "moon": {
@@ -557,13 +557,13 @@
         "seed": 3238878957
        },
        "cloud": {
-        "tau": 0.075,
-        "coverage": 0.072,
-        "transmission": 0.928,
-        "disc": 0.958,
-        "halo": 0.904,
-        "rays": 0.861,
-        "key": 0.955
+        "tau": 0.065,
+        "coverage": 0.063,
+        "transmission": 0.937,
+        "disc": 0.963,
+        "halo": 0.916,
+        "rays": 0.878,
+        "key": 0.961
        }
       }
      },
@@ -571,8 +571,8 @@
       "wind": {
        "dir_deg": 28,
        "speed_mps": 2.4,
-       "now_mps": 2.51,
-       "travel_m": 41.95,
+       "now_mps": 2.43,
+       "travel_m": 39.37,
        "gust": 0.35
       },
       "cloud_cards": "OLD_SOFT_FEATHERED",
@@ -594,7 +594,7 @@
         "kind": "CLOUD",
         "count": 12,
         "alt_m": 118,
-        "opacity": 0.28,
+        "opacity": 0.16,
         "occludes": true,
         "depth_write": true,
         "silhouette": {
@@ -606,14 +606,14 @@
          "radius_max": 0.97,
          "seed": 289
         },
-        "alpha_test": 0.055
+        "alpha_test": 0.04
        },
        {
         "id": "CUMULUS_MID",
         "kind": "CLOUD",
         "count": 26,
         "alt_m": 190,
-        "opacity": 0.36,
+        "opacity": 0.21,
         "occludes": true,
         "depth_write": true,
         "silhouette": {
@@ -625,14 +625,14 @@
          "radius_max": 1.0079,
          "seed": 420
         },
-        "alpha_test": 0.055
+        "alpha_test": 0.04
        },
        {
         "id": "CIRRUS_HIGH",
         "kind": "CLOUD",
         "count": 14,
         "alt_m": 330,
-        "opacity": 0.16,
+        "opacity": 0.09,
         "occludes": false,
         "depth_write": false,
         "silhouette": {
@@ -644,34 +644,34 @@
          "radius_max": 1.02,
          "seed": 551
         },
-        "alpha_test": 0.012
+        "alpha_test": 0.008
        }
       ],
       "celestial_optics": {
        "model": "T=exp(-tau)",
        "sun": {
-        "tau": 0.012,
-        "transmission": 0.988,
-        "coverage": 0.012,
-        "disc": 0.993,
-        "halo": 0.984,
-        "rays": 0.977,
-        "key": 0.993,
-        "phase_u": 0.281,
-        "phase_v": 0.312,
-        "travel_m": 41.95
+        "tau": 0.083,
+        "transmission": 0.92,
+        "coverage": 0.08,
+        "disc": 0.954,
+        "halo": 0.894,
+        "rays": 0.847,
+        "key": 0.951,
+        "phase_u": 0.274,
+        "phase_v": 0.304,
+        "travel_m": 39.37
        },
        "moon": {
-        "tau": 0.075,
-        "transmission": 0.928,
-        "coverage": 0.072,
-        "disc": 0.958,
-        "halo": 0.904,
-        "rays": 0.861,
-        "key": 0.955,
-        "phase_u": 0.665,
-        "phase_v": 0.312,
-        "travel_m": 41.95
+        "tau": 0.065,
+        "transmission": 0.937,
+        "coverage": 0.063,
+        "disc": 0.963,
+        "halo": 0.916,
+        "rays": 0.878,
+        "key": 0.961,
+        "phase_u": 0.658,
+        "phase_v": 0.304,
+        "travel_m": 39.37
        }
       },
       "draw_calls": 4,
@@ -948,7 +948,7 @@
          "SWIM",
          "SWIM",
          "SWIM",
-         "BREACH",
+         "RISE",
          "SWIM",
          "SWIM",
          "SWIM",
@@ -957,38 +957,38 @@
          "SWIM",
          "SWIM",
          "SWIM",
-         "BREACH"
+         "RISE"
         ],
         "positions": [
          [
-          -7,
+          -6,
           -1.4,
           -122
          ],
          [
-          -4,
+          -3,
           -2,
           -120
          ],
          [
-          -2,
-          -2,
+          -1,
+          -2.1,
           -118
          ],
          [
-          270,
+          271,
           -1.4,
-          51
+          50
          ],
          [
-          273,
+          274,
           -1.5,
-          51
+          50
          ],
          [
           277,
           -2,
-          51
+          50
          ],
          [
           -27,
@@ -996,7 +996,7 @@
           226
          ],
          [
-          -26,
+          -25,
           -0.4,
           229
          ],
@@ -1016,9 +1016,9 @@
           223
          ],
          [
-          -150,
+          -151,
           -0.3,
-          221
+          222
          ],
          [
           144,
@@ -1031,14 +1031,14 @@
           106
          ],
          [
-          141,
-          0.2,
-          107
+          140,
+          -0.2,
+          108
          ],
          [
           -91,
           -0.4,
-          32
+          31
          ],
          [
           -88,
@@ -1077,7 +1077,7 @@
          ],
          [
           28,
-          0.2,
+          -0.2,
           251
          ]
         ]
@@ -1110,29 +1110,29 @@
         ],
         "positions": [
          [
-          144,
+          146,
           94,
-          407
+          404
          ],
          [
-          -104,
+          -101,
           94,
-          71
+          69
          ],
          [
-          203,
+          206,
           94,
-          198
+          196
          ],
          [
-          -100,
-          95.7,
-          370
+          -98,
+          96,
+          368
          ],
          [
-          19,
+          22,
           94,
-          363
+          362
          ]
         ]
        },
@@ -1209,7 +1209,7 @@
        "mid_schools": 20,
        "mid_agents": 228,
        "far_silhouettes": 120,
-       "breaches": 15,
+       "breaches": 12,
        "reach_m": 260,
        "near_schools": 13,
        "draw_calls": 2
@@ -1242,22 +1242,22 @@
     "build_ms": {
      "fixtures": 2,
      "water": 17,
-     "coast": 17,
-     "terrain": 32,
-     "macro": 3,
-     "meadow": 17,
-     "forest": 2747,
-     "architecture": 757,
-     "celestial": 473,
-     "sky": 8,
+     "coast": 18,
+     "terrain": 30,
+     "macro": 2,
+     "meadow": 16,
+     "forest": 2611,
+     "architecture": 726,
+     "celestial": 443,
+     "sky": 29,
      "atmosphere": 0,
-     "props": 715,
-     "matchHall": 10,
+     "props": 613,
+     "matchHall": 15,
      "guides": 0,
-     "creatures": 273,
-     "wildlife": 346,
-     "gear": 11,
-     "signage": 9
+     "creatures": 194,
+     "wildlife": 262,
+     "gear": 8,
+     "signage": 8
     },
     "fixtures": 164,
     "water": {
@@ -1309,12 +1309,12 @@
       "damp": 0.99,
       "amp_m": 0.07,
       "ring_speed_mps": 3.94,
-      "impulses": 32,
+      "impulses": 25,
       "dropped": 0,
       "steps": 0,
       "active": false,
       "in_water": false,
-      "pending": 32,
+      "pending": 25,
       "origin": [
        0,
        3.9375
@@ -1369,7 +1369,7 @@
         150
        ],
        "passes": 5,
-       "tris": 960
+       "tris": 1440
       },
       {
        "id": "RIDGE_MID",
@@ -1379,7 +1379,7 @@
         230
        ],
        "passes": 5,
-       "tris": 848
+       "tris": 1272
       }
      ],
      "waterfalls": [
@@ -1571,12 +1571,12 @@
       "transitions": 121,
       "rewrites": 1,
       "timing_ms": {
-       "build_ms": 2747.1,
-       "assemble_ms": 1.4,
-       "first_classify_ms": 0.11,
+       "build_ms": 2610.6,
+       "assemble_ms": 0.7,
+       "first_classify_ms": 0.055,
        "first_rewrite_ms": 0.055,
        "last_classify_ms": 0,
-       "max_classify_ms": 0.11,
+       "max_classify_ms": 0.055,
        "last_rewrite_ms": 0.055,
        "max_rewrite_ms": 0.055,
        "runtime_bake_ms": 0
@@ -1713,13 +1713,13 @@
        "seed": 3238878957
       },
       "cloud": {
-       "tau": 0.012,
-       "coverage": 0.012,
-       "transmission": 0.988,
-       "disc": 0.993,
-       "halo": 0.984,
-       "rays": 0.977,
-       "key": 0.993
+       "tau": 0.083,
+       "coverage": 0.08,
+       "transmission": 0.92,
+       "disc": 0.954,
+       "halo": 0.894,
+       "rays": 0.847,
+       "key": 0.951
       }
      },
      "moon": {
@@ -1771,13 +1771,13 @@
        "seed": 3238878957
       },
       "cloud": {
-       "tau": 0.075,
-       "coverage": 0.072,
-       "transmission": 0.928,
-       "disc": 0.958,
-       "halo": 0.904,
-       "rays": 0.861,
-       "key": 0.955
+       "tau": 0.065,
+       "coverage": 0.063,
+       "transmission": 0.937,
+       "disc": 0.963,
+       "halo": 0.916,
+       "rays": 0.878,
+       "key": 0.961
       }
      }
     },
@@ -1785,8 +1785,8 @@
      "wind": {
       "dir_deg": 28,
       "speed_mps": 2.4,
-      "now_mps": 2.51,
-      "travel_m": 41.95,
+      "now_mps": 2.43,
+      "travel_m": 39.37,
       "gust": 0.35
      },
      "cloud_cards": "OLD_SOFT_FEATHERED",
@@ -1808,7 +1808,7 @@
        "kind": "CLOUD",
        "count": 12,
        "alt_m": 118,
-       "opacity": 0.28,
+       "opacity": 0.16,
        "occludes": true,
        "depth_write": true,
        "silhouette": {
@@ -1820,14 +1820,14 @@
         "radius_max": 0.97,
         "seed": 289
        },
-       "alpha_test": 0.055
+       "alpha_test": 0.04
       },
       {
        "id": "CUMULUS_MID",
        "kind": "CLOUD",
        "count": 26,
        "alt_m": 190,
-       "opacity": 0.36,
+       "opacity": 0.21,
        "occludes": true,
        "depth_write": true,
        "silhouette": {
@@ -1839,14 +1839,14 @@
         "radius_max": 1.0079,
         "seed": 420
        },
-       "alpha_test": 0.055
+       "alpha_test": 0.04
       },
       {
        "id": "CIRRUS_HIGH",
        "kind": "CLOUD",
        "count": 14,
        "alt_m": 330,
-       "opacity": 0.16,
+       "opacity": 0.09,
        "occludes": false,
        "depth_write": false,
        "silhouette": {
@@ -1858,34 +1858,34 @@
         "radius_max": 1.02,
         "seed": 551
        },
-       "alpha_test": 0.012
+       "alpha_test": 0.008
       }
      ],
      "celestial_optics": {
       "model": "T=exp(-tau)",
       "sun": {
-       "tau": 0.012,
-       "transmission": 0.988,
-       "coverage": 0.012,
-       "disc": 0.993,
-       "halo": 0.984,
-       "rays": 0.977,
-       "key": 0.993,
-       "phase_u": 0.281,
-       "phase_v": 0.312,
-       "travel_m": 41.95
+       "tau": 0.083,
+       "transmission": 0.92,
+       "coverage": 0.08,
+       "disc": 0.954,
+       "halo": 0.894,
+       "rays": 0.847,
+       "key": 0.951,
+       "phase_u": 0.274,
+       "phase_v": 0.304,
+       "travel_m": 39.37
       },
       "moon": {
-       "tau": 0.075,
-       "transmission": 0.928,
-       "coverage": 0.072,
-       "disc": 0.958,
-       "halo": 0.904,
-       "rays": 0.861,
-       "key": 0.955,
-       "phase_u": 0.665,
-       "phase_v": 0.312,
-       "travel_m": 41.95
+       "tau": 0.065,
+       "transmission": 0.937,
+       "coverage": 0.063,
+       "disc": 0.963,
+       "halo": 0.916,
+       "rays": 0.878,
+       "key": 0.961,
+       "phase_u": 0.658,
+       "phase_v": 0.304,
+       "travel_m": 39.37
       }
      },
      "draw_calls": 4,
@@ -2162,7 +2162,7 @@
         "SWIM",
         "SWIM",
         "SWIM",
-        "BREACH",
+        "RISE",
         "SWIM",
         "SWIM",
         "SWIM",
@@ -2171,38 +2171,38 @@
         "SWIM",
         "SWIM",
         "SWIM",
-        "BREACH"
+        "RISE"
        ],
        "positions": [
         [
-         -7,
+         -6,
          -1.4,
          -122
         ],
         [
-         -4,
+         -3,
          -2,
          -120
         ],
         [
-         -2,
-         -2,
+         -1,
+         -2.1,
          -118
         ],
         [
-         270,
+         271,
          -1.4,
-         51
+         50
         ],
         [
-         273,
+         274,
          -1.5,
-         51
+         50
         ],
         [
          277,
          -2,
-         51
+         50
         ],
         [
          -27,
@@ -2210,7 +2210,7 @@
          226
         ],
         [
-         -26,
+         -25,
          -0.4,
          229
         ],
@@ -2230,9 +2230,9 @@
          223
         ],
         [
-         -150,
+         -151,
          -0.3,
-         221
+         222
         ],
         [
          144,
@@ -2245,14 +2245,14 @@
          106
         ],
         [
-         141,
-         0.2,
-         107
+         140,
+         -0.2,
+         108
         ],
         [
          -91,
          -0.4,
-         32
+         31
         ],
         [
          -88,
@@ -2291,7 +2291,7 @@
         ],
         [
          28,
-         0.2,
+         -0.2,
          251
         ]
        ]
@@ -2324,29 +2324,29 @@
        ],
        "positions": [
         [
-         144,
+         146,
          94,
-         407
+         404
         ],
         [
-         -104,
+         -101,
          94,
-         71
+         69
         ],
         [
-         203,
+         206,
          94,
-         198
+         196
         ],
         [
-         -100,
-         95.7,
-         370
+         -98,
+         96,
+         368
         ],
         [
-         19,
+         22,
          94,
-         363
+         362
         ]
        ]
       },
@@ -2423,7 +2423,7 @@
       "mid_schools": 20,
       "mid_agents": 228,
       "far_silhouettes": 120,
-      "breaches": 15,
+      "breaches": 12,
       "reach_m": 260,
       "near_schools": 13,
       "draw_calls": 2
@@ -2712,15 +2712,15 @@
      {
       "id": "WILD_DOGKIE_06",
       "state": "IDLE",
-      "hover_m": 0.001,
-      "gait_weight": 0.018,
+      "hover_m": 0.044,
+      "gait_weight": 0.634,
       "attack_weight": 0
      },
      {
       "id": "WILD_DOGKIE_07",
       "state": "IDLE",
-      "hover_m": 0.015,
-      "gait_weight": 0.219,
+      "hover_m": 0.07,
+      "gait_weight": 1,
       "attack_weight": 0
      },
      {
@@ -2740,8 +2740,8 @@
      {
       "id": "WILD_DOGKIE_10",
       "state": "ROAM",
-      "hover_m": 0.069,
-      "gait_weight": 0.979,
+      "hover_m": 0.022,
+      "gait_weight": 0.316,
       "attack_weight": 0
      }
     ],
@@ -2762,22 +2762,22 @@
      "build_ms": {
       "fixtures": 2,
       "water": 17,
-      "coast": 17,
-      "terrain": 32,
-      "macro": 3,
-      "meadow": 17,
-      "forest": 2747,
-      "architecture": 757,
-      "celestial": 473,
-      "sky": 8,
+      "coast": 18,
+      "terrain": 30,
+      "macro": 2,
+      "meadow": 16,
+      "forest": 2611,
+      "architecture": 726,
+      "celestial": 443,
+      "sky": 29,
       "atmosphere": 0,
-      "props": 715,
-      "matchHall": 10,
+      "props": 613,
+      "matchHall": 15,
       "guides": 0,
-      "creatures": 273,
-      "wildlife": 346,
-      "gear": 11,
-      "signage": 9
+      "creatures": 194,
+      "wildlife": 262,
+      "gear": 8,
+      "signage": 8
      },
      "fixtures": 164,
      "water": {
@@ -2829,12 +2829,12 @@
        "damp": 0.99,
        "amp_m": 0.07,
        "ring_speed_mps": 3.94,
-       "impulses": 126,
+       "impulses": 124,
        "dropped": 0,
-       "steps": 251,
+       "steps": 256,
        "active": false,
        "in_water": false,
-       "pending": 61,
+       "pending": 59,
        "origin": [
         -135,
         17.0625
@@ -2889,7 +2889,7 @@
          150
         ],
         "passes": 5,
-        "tris": 960
+        "tris": 1440
        },
        {
         "id": "RIDGE_MID",
@@ -2899,7 +2899,7 @@
          230
         ],
         "passes": 5,
-        "tris": 848
+        "tris": 1272
        }
       ],
       "waterfalls": [
@@ -3088,12 +3088,12 @@
        }
       ],
       "lifecycle": {
-       "transitions": 171,
+       "transitions": 145,
        "rewrites": 7,
        "timing_ms": {
-        "build_ms": 2747.1,
-        "assemble_ms": 1.4,
-        "first_classify_ms": 0.11,
+        "build_ms": 2610.6,
+        "assemble_ms": 0.7,
+        "first_classify_ms": 0.055,
         "first_rewrite_ms": 0.055,
         "last_classify_ms": 0,
         "max_classify_ms": 0.11,
@@ -3233,13 +3233,13 @@
         "seed": 3238878957
        },
        "cloud": {
-        "tau": 1.238,
-        "coverage": 0.71,
-        "transmission": 0.29,
-        "disc": 0.588,
-        "halo": 0.188,
-        "rays": 0.084,
-        "key": 0.56
+        "tau": 1.076,
+        "coverage": 0.659,
+        "transmission": 0.341,
+        "disc": 0.618,
+        "halo": 0.234,
+        "rays": 0.116,
+        "key": 0.591
        }
       },
       "moon": {
@@ -3305,8 +3305,8 @@
       "wind": {
        "dir_deg": 28,
        "speed_mps": 2.4,
-       "now_mps": 2.75,
-       "travel_m": 94.62,
+       "now_mps": 2.58,
+       "travel_m": 91.49,
        "gust": 0.35
       },
       "cloud_cards": "OLD_SOFT_FEATHERED",
@@ -3328,7 +3328,7 @@
         "kind": "CLOUD",
         "count": 12,
         "alt_m": 118,
-        "opacity": 0.28,
+        "opacity": 0.16,
         "occludes": true,
         "depth_write": true,
         "silhouette": {
@@ -3340,14 +3340,14 @@
          "radius_max": 0.97,
          "seed": 289
         },
-        "alpha_test": 0.055
+        "alpha_test": 0.04
        },
        {
         "id": "CUMULUS_MID",
         "kind": "CLOUD",
         "count": 26,
         "alt_m": 190,
-        "opacity": 0.36,
+        "opacity": 0.21,
         "occludes": true,
         "depth_write": true,
         "silhouette": {
@@ -3359,14 +3359,14 @@
          "radius_max": 1.0079,
          "seed": 420
         },
-        "alpha_test": 0.055
+        "alpha_test": 0.04
        },
        {
         "id": "CIRRUS_HIGH",
         "kind": "CLOUD",
         "count": 14,
         "alt_m": 330,
-        "opacity": 0.16,
+        "opacity": 0.09,
         "occludes": false,
         "depth_write": false,
         "silhouette": {
@@ -3378,22 +3378,22 @@
          "radius_max": 1.02,
          "seed": 551
         },
-        "alpha_test": 0.012
+        "alpha_test": 0.008
        }
       ],
       "celestial_optics": {
        "model": "T=exp(-tau)",
        "sun": {
-        "tau": 1.238,
-        "transmission": 0.29,
-        "coverage": 0.71,
-        "disc": 0.588,
-        "halo": 0.188,
-        "rays": 0.084,
-        "key": 0.56,
-        "phase_u": 0.418,
-        "phase_v": 0.491,
-        "travel_m": 94.62
+        "tau": 1.076,
+        "transmission": 0.341,
+        "coverage": 0.659,
+        "disc": 0.618,
+        "halo": 0.234,
+        "rays": 0.116,
+        "key": 0.591,
+        "phase_u": 0.41,
+        "phase_v": 0.481,
+        "travel_m": 91.49
        },
        "moon": {
         "tau": 1.259,
@@ -3403,9 +3403,9 @@
         "halo": 0.183,
         "rays": 0.081,
         "key": 0.556,
-        "phase_u": 0.802,
-        "phase_v": 0.491,
-        "travel_m": 94.62
+        "phase_u": 0.794,
+        "phase_v": 0.481,
+        "travel_m": 91.49
        }
       },
       "draw_calls": 4,
@@ -3696,17 +3696,17 @@
         "positions": [
          [
           -32,
-          -1.6,
-          -137
+          -1.7,
+          -136
          ],
          [
           -34,
-          -1.8,
+          -1.7,
           -134
          ],
          [
           -36,
-          -1.1,
+          -2.3,
           -132
          ],
          [
@@ -3715,27 +3715,27 @@
           224
          ],
          [
-          -19,
+          -20,
           -0.4,
           223
          ],
          [
-          -22,
+          -23,
           -0.4,
           221
          ],
          [
-          -114,
+          -115,
           -0.4,
           224
          ],
          [
           -117,
-          -0.3,
+          -0.4,
           222
          ],
          [
-          -120,
+          -122,
           -0.3,
           220
          ],
@@ -3745,14 +3745,14 @@
           98
          ],
          [
-          147,
+          146,
           -0.4,
           96
          ],
          [
-          145,
+          144,
           -0.3,
-          93
+          94
          ],
          [
           -95,
@@ -3760,7 +3760,7 @@
           33
          ],
          [
-          -95,
+          -94,
           -0.4,
           36
          ],
@@ -3776,7 +3776,7 @@
          ],
          [
           -28,
-          -0.4,
+          -0.3,
           267
          ],
          [
@@ -3797,21 +3797,21 @@
          [
           40,
           -0.4,
-          261
+          260
          ],
          [
-          241,
-          -1.6,
+          242,
+          -1.7,
           54
          ],
          [
-          243,
-          -1.3,
+          244,
+          -1.2,
           56
          ],
          [
-          245,
-          -1.8,
+          246,
+          -1.7,
           59
          ]
         ]
@@ -3844,29 +3844,29 @@
         ],
         "positions": [
          [
-          -10,
+          -6,
           94,
-          419
+          421
          ],
          [
-          -234,
+          -233,
           94,
-          13
+          17
          ],
          [
-          97,
+          96,
           94,
-          113
+          117
          ],
          [
-          -237,
-          99.8,
-          321
+          -236,
+          99.3,
+          326
          ],
          [
-          -61,
-          95.7,
-          272
+          -63,
+          96,
+          275
          ]
         ]
        },
@@ -3904,7 +3904,7 @@
           155
          ],
          [
-          -155,
+          -154,
           2.6,
           17
          ],
@@ -3949,7 +3949,7 @@
        "mid_schools": 20,
        "mid_agents": 228,
        "far_silhouettes": 120,
-       "breaches": 51,
+       "breaches": 50,
        "reach_m": 260,
        "near_schools": 13,
        "draw_calls": 2
@@ -3961,7 +3961,7 @@
       ],
       "grips": [
        {
-        "id": "EQ_BARBELL_6",
+        "id": "EQ_BARBELL_5",
         "kind": "BARBELL",
         "state": "HELD",
         "grip": {
@@ -3970,7 +3970,7 @@
           "HAND_R"
          ],
          "palm_mid_error_m": 0,
-         "hand_span_m": 0.689
+         "hand_span_m": 0.688
         }
        }
       ],
@@ -4003,22 +4003,22 @@
     "build_ms": {
      "fixtures": 2,
      "water": 17,
-     "coast": 17,
-     "terrain": 32,
-     "macro": 3,
-     "meadow": 17,
-     "forest": 2747,
-     "architecture": 757,
-     "celestial": 473,
-     "sky": 8,
+     "coast": 18,
+     "terrain": 30,
+     "macro": 2,
+     "meadow": 16,
+     "forest": 2611,
+     "architecture": 726,
+     "celestial": 443,
+     "sky": 29,
      "atmosphere": 0,
-     "props": 715,
-     "matchHall": 10,
+     "props": 613,
+     "matchHall": 15,
      "guides": 0,
-     "creatures": 273,
-     "wildlife": 346,
-     "gear": 11,
-     "signage": 9
+     "creatures": 194,
+     "wildlife": 262,
+     "gear": 8,
+     "signage": 8
     },
     "fixtures": 164,
     "water": {
@@ -4070,12 +4070,12 @@
       "damp": 0.99,
       "amp_m": 0.07,
       "ring_speed_mps": 3.94,
-      "impulses": 126,
+      "impulses": 124,
       "dropped": 0,
-      "steps": 251,
+      "steps": 256,
       "active": false,
       "in_water": false,
-      "pending": 61,
+      "pending": 59,
       "origin": [
        -135,
        17.0625
@@ -4130,7 +4130,7 @@
         150
        ],
        "passes": 5,
-       "tris": 960
+       "tris": 1440
       },
       {
        "id": "RIDGE_MID",
@@ -4140,7 +4140,7 @@
         230
        ],
        "passes": 5,
-       "tris": 848
+       "tris": 1272
       }
      ],
      "waterfalls": [
@@ -4329,12 +4329,12 @@
       }
      ],
      "lifecycle": {
-      "transitions": 171,
+      "transitions": 145,
       "rewrites": 7,
       "timing_ms": {
-       "build_ms": 2747.1,
-       "assemble_ms": 1.4,
-       "first_classify_ms": 0.11,
+       "build_ms": 2610.6,
+       "assemble_ms": 0.7,
+       "first_classify_ms": 0.055,
        "first_rewrite_ms": 0.055,
        "last_classify_ms": 0,
        "max_classify_ms": 0.11,
@@ -4474,13 +4474,13 @@
        "seed": 3238878957
       },
       "cloud": {
-       "tau": 1.238,
-       "coverage": 0.71,
-       "transmission": 0.29,
-       "disc": 0.588,
-       "halo": 0.188,
-       "rays": 0.084,
-       "key": 0.56
+       "tau": 1.076,
+       "coverage": 0.659,
+       "transmission": 0.341,
+       "disc": 0.618,
+       "halo": 0.234,
+       "rays": 0.116,
+       "key": 0.591
       }
      },
      "moon": {
@@ -4546,8 +4546,8 @@
      "wind": {
       "dir_deg": 28,
       "speed_mps": 2.4,
-      "now_mps": 2.75,
-      "travel_m": 94.62,
+      "now_mps": 2.58,
+      "travel_m": 91.49,
       "gust": 0.35
      },
      "cloud_cards": "OLD_SOFT_FEATHERED",
@@ -4569,7 +4569,7 @@
        "kind": "CLOUD",
        "count": 12,
        "alt_m": 118,
-       "opacity": 0.28,
+       "opacity": 0.16,
        "occludes": true,
        "depth_write": true,
        "silhouette": {
@@ -4581,14 +4581,14 @@
         "radius_max": 0.97,
         "seed": 289
        },
-       "alpha_test": 0.055
+       "alpha_test": 0.04
       },
       {
        "id": "CUMULUS_MID",
        "kind": "CLOUD",
        "count": 26,
        "alt_m": 190,
-       "opacity": 0.36,
+       "opacity": 0.21,
        "occludes": true,
        "depth_write": true,
        "silhouette": {
@@ -4600,14 +4600,14 @@
         "radius_max": 1.0079,
         "seed": 420
        },
-       "alpha_test": 0.055
+       "alpha_test": 0.04
       },
       {
        "id": "CIRRUS_HIGH",
        "kind": "CLOUD",
        "count": 14,
        "alt_m": 330,
-       "opacity": 0.16,
+       "opacity": 0.09,
        "occludes": false,
        "depth_write": false,
        "silhouette": {
@@ -4619,22 +4619,22 @@
         "radius_max": 1.02,
         "seed": 551
        },
-       "alpha_test": 0.012
+       "alpha_test": 0.008
       }
      ],
      "celestial_optics": {
       "model": "T=exp(-tau)",
       "sun": {
-       "tau": 1.238,
-       "transmission": 0.29,
-       "coverage": 0.71,
-       "disc": 0.588,
-       "halo": 0.188,
-       "rays": 0.084,
-       "key": 0.56,
-       "phase_u": 0.418,
-       "phase_v": 0.491,
-       "travel_m": 94.62
+       "tau": 1.076,
+       "transmission": 0.341,
+       "coverage": 0.659,
+       "disc": 0.618,
+       "halo": 0.234,
+       "rays": 0.116,
+       "key": 0.591,
+       "phase_u": 0.41,
+       "phase_v": 0.481,
+       "travel_m": 91.49
       },
       "moon": {
        "tau": 1.259,
@@ -4644,9 +4644,9 @@
        "halo": 0.183,
        "rays": 0.081,
        "key": 0.556,
-       "phase_u": 0.802,
-       "phase_v": 0.491,
-       "travel_m": 94.62
+       "phase_u": 0.794,
+       "phase_v": 0.481,
+       "travel_m": 91.49
       }
      },
      "draw_calls": 4,
@@ -4937,17 +4937,17 @@
        "positions": [
         [
          -32,
-         -1.6,
-         -137
+         -1.7,
+         -136
         ],
         [
          -34,
-         -1.8,
+         -1.7,
          -134
         ],
         [
          -36,
-         -1.1,
+         -2.3,
          -132
         ],
         [
@@ -4956,27 +4956,27 @@
          224
         ],
         [
-         -19,
+         -20,
          -0.4,
          223
         ],
         [
-         -22,
+         -23,
          -0.4,
          221
         ],
         [
-         -114,
+         -115,
          -0.4,
          224
         ],
         [
          -117,
-         -0.3,
+         -0.4,
          222
         ],
         [
-         -120,
+         -122,
          -0.3,
          220
         ],
@@ -4986,14 +4986,14 @@
          98
         ],
         [
-         147,
+         146,
          -0.4,
          96
         ],
         [
-         145,
+         144,
          -0.3,
-         93
+         94
         ],
         [
          -95,
@@ -5001,7 +5001,7 @@
          33
         ],
         [
-         -95,
+         -94,
          -0.4,
          36
         ],
@@ -5017,7 +5017,7 @@
         ],
         [
          -28,
-         -0.4,
+         -0.3,
          267
         ],
         [
@@ -5038,21 +5038,21 @@
         [
          40,
          -0.4,
-         261
+         260
         ],
         [
-         241,
-         -1.6,
+         242,
+         -1.7,
          54
         ],
         [
-         243,
-         -1.3,
+         244,
+         -1.2,
          56
         ],
         [
-         245,
-         -1.8,
+         246,
+         -1.7,
          59
         ]
        ]
@@ -5085,29 +5085,29 @@
        ],
        "positions": [
         [
-         -10,
+         -6,
          94,
-         419
+         421
         ],
         [
-         -234,
+         -233,
          94,
-         13
+         17
         ],
         [
-         97,
+         96,
          94,
-         113
+         117
         ],
         [
-         -237,
-         99.8,
-         321
+         -236,
+         99.3,
+         326
         ],
         [
-         -61,
-         95.7,
-         272
+         -63,
+         96,
+         275
         ]
        ]
       },
@@ -5145,7 +5145,7 @@
          155
         ],
         [
-         -155,
+         -154,
          2.6,
          17
         ],
@@ -5190,7 +5190,7 @@
       "mid_schools": 20,
       "mid_agents": 228,
       "far_silhouettes": 120,
-      "breaches": 51,
+      "breaches": 50,
       "reach_m": 260,
       "near_schools": 13,
       "draw_calls": 2
@@ -5202,7 +5202,7 @@
      ],
      "grips": [
       {
-       "id": "EQ_BARBELL_6",
+       "id": "EQ_BARBELL_5",
        "kind": "BARBELL",
        "state": "HELD",
        "grip": {
@@ -5211,7 +5211,7 @@
          "HAND_R"
         ],
         "palm_mid_error_m": 0,
-        "hand_span_m": 0.689
+        "hand_span_m": 0.688
        }
       }
      ],
@@ -5245,7 +5245,7 @@
     ],
     "grips": [
      {
-      "id": "EQ_BARBELL_6",
+      "id": "EQ_BARBELL_5",
       "kind": "BARBELL",
       "state": "HELD",
       "grip": {
@@ -5254,7 +5254,7 @@
         "HAND_R"
        ],
        "palm_mid_error_m": 0,
-       "hand_span_m": 0.689
+       "hand_span_m": 0.688
       }
      }
     ],
@@ -5290,11 +5290,11 @@
   },
   "casts": [
    {
-    "command_id": "play-PLAYER_A-5ojtnj-14",
+    "command_id": "play-PLAYER_A-gjr6k1-14",
     "seq": 14,
     "accepted": true,
-    "version": 422,
-    "tick": 402,
+    "version": 416,
+    "tick": 396,
     "duplicate": false,
     "cast_id": "CAST_PLAYER_A_1",
     "equipment_ids": [],
@@ -5309,11 +5309,11 @@
     "aim_source": "LOCK"
    },
    {
-    "command_id": "play-PLAYER_A-5ojtnj-15",
+    "command_id": "play-PLAYER_A-gjr6k1-15",
     "seq": 15,
     "accepted": true,
-    "version": 446,
-    "tick": 425,
+    "version": 440,
+    "tick": 419,
     "duplicate": false,
     "cast_id": "CAST_PLAYER_A_2",
     "equipment_ids": [],
@@ -5333,9 +5333,9 @@
    {
     "id": "RF_3",
     "kind": "MAHGIC_REFILL",
-    "x": 15.99,
+    "x": 17.88,
     "y": 0.45,
-    "z": 54.62,
+    "z": 55.61,
     "age_s": 0.6,
     "overflow_held": false,
     "source": "NODE_RB_NEXUS_INTRO"
@@ -5343,19 +5343,9 @@
    {
     "id": "RF_4",
     "kind": "MAHGIC_REFILL",
-    "x": 17.82,
+    "x": 16.13,
     "y": 0.45,
-    "z": 54.33,
-    "age_s": 0.6,
-    "overflow_held": false,
-    "source": "NODE_RB_NEXUS_INTRO"
-   },
-   {
-    "id": "RF_5",
-    "kind": "MAHGIC_REFILL",
-    "x": 17.18,
-    "y": 0.45,
-    "z": 56.09,
+    "z": 54.4,
     "age_s": 0.6,
     "overflow_held": false,
     "source": "NODE_RB_NEXUS_INTRO"
@@ -5363,8 +5353,8 @@
   ],
   "events": [
    {
-    "tick": 406,
-    "t": 20.3,
+    "tick": 400,
+    "t": 20,
     "kind": "R1723_DAMAGE",
     "by": "PLAYER_A",
     "on": "NODE_RB_NEXUS_INTRO",
@@ -5385,8 +5375,8 @@
     "gear_mult": 1.8
    },
    {
-    "tick": 429,
-    "t": 21.45,
+    "tick": 423,
+    "t": 21.15,
     "kind": "R1723_DAMAGE",
     "by": "PLAYER_A",
     "on": "NODE_RB_NEXUS_INTRO",
@@ -5407,19 +5397,19 @@
     "gear_mult": 1.8
    },
    {
-    "tick": 430,
-    "t": 21.5,
+    "tick": 424,
+    "t": 21.2,
     "kind": "RESOURCE_NODE_BROKEN",
     "id": "NODE_RB_NEXUS_INTRO",
     "by": "player",
-    "drops": 3,
-    "requested": 3,
+    "drops": 2,
+    "requested": 2,
     "suppressed": 0,
     "respawn_s": 90
    },
    {
-    "tick": 446,
-    "t": 22.3,
+    "tick": 442,
+    "t": 22.1,
     "kind": "REFILL_PICKED",
     "account": "PLAYER_A",
     "id": "RF_3",
@@ -5427,22 +5417,13 @@
     "inventory": 1
    },
    {
-    "tick": 452,
-    "t": 22.6,
+    "tick": 447,
+    "t": 22.35,
     "kind": "REFILL_PICKED",
     "account": "PLAYER_A",
     "id": "RF_4",
     "to": "INVENTORY",
     "inventory": 2
-   },
-   {
-    "tick": 458,
-    "t": 22.9,
-    "kind": "REFILL_PICKED",
-    "account": "PLAYER_A",
-    "id": "RF_5",
-    "to": "INVENTORY",
-    "inventory": 3
    }
   ],
   "after": {
@@ -5450,18 +5431,18 @@
     "current": 200,
     "max": 200
    },
-   "refills": 3,
+   "refills": 2,
    "collectibles": []
   }
  },
  "equipment": {
   "dumbbell": {
    "manifest": {
-    "command_id": "play-PLAYER_A-5ojtnj-9",
+    "command_id": "play-PLAYER_A-gjr6k1-9",
     "seq": 9,
     "accepted": true,
-    "version": 368,
-    "tick": 351,
+    "version": 361,
+    "tick": 344,
     "duplicate": false,
     "kind": "DUMBBELL",
     "count": 2,
@@ -5474,7 +5455,7 @@
      "kind": "DUMBBELL",
      "state": "MANIFESTED",
      "x": 16.65,
-     "y": 1.446,
+     "y": 1.473,
      "z": 57.05,
      "side": -0.35,
      "idx": 0,
@@ -5486,7 +5467,7 @@
      "kind": "DUMBBELL",
      "state": "MANIFESTED",
      "x": 17.35,
-     "y": 1.411,
+     "y": 1.415,
      "z": 57.05,
      "side": 0.35,
      "idx": 1,
@@ -5496,11 +5477,11 @@
    ],
    "picks": [
     {
-     "command_id": "play-PLAYER_A-5ojtnj-10",
+     "command_id": "play-PLAYER_A-gjr6k1-10",
      "seq": 10,
      "accepted": true,
-     "version": 408,
-     "tick": 391,
+     "version": 400,
+     "tick": 383,
      "duplicate": false,
      "id": "EQ_DUMBBELL_1",
      "kind": "DUMBBELL",
@@ -5508,11 +5489,11 @@
      "multiplier": 1.8
     },
     {
-     "command_id": "play-PLAYER_A-5ojtnj-11",
+     "command_id": "play-PLAYER_A-gjr6k1-11",
      "seq": 11,
      "accepted": true,
-     "version": 410,
-     "tick": 393,
+     "version": 402,
+     "tick": 385,
      "duplicate": false,
      "id": "EQ_DUMBBELL_2",
      "kind": "DUMBBELL",
@@ -5565,11 +5546,11 @@
   },
   "barbell": {
    "manifest": {
-    "command_id": "play-PLAYER_A-5ojtnj-17",
+    "command_id": "play-PLAYER_A-gjr6k1-17",
     "seq": 17,
     "accepted": true,
-    "version": 504,
-    "tick": 479,
+    "version": 492,
+    "tick": 468,
     "duplicate": false,
     "kind": "BARBELL",
     "count": 1,
@@ -5578,12 +5559,12 @@
    },
    "items": [
     {
-     "id": "EQ_BARBELL_6",
+     "id": "EQ_BARBELL_5",
      "kind": "BARBELL",
      "state": "MANIFESTED",
-     "x": 17.18,
+     "x": 16.13,
      "y": 0.34,
-     "z": 54.39,
+     "z": 52.7,
      "side": 0,
      "idx": 0,
      "age_s": 0.7,
@@ -5592,13 +5573,13 @@
    ],
    "picks": [
     {
-     "command_id": "play-PLAYER_A-5ojtnj-18",
+     "command_id": "play-PLAYER_A-gjr6k1-18",
      "seq": 18,
      "accepted": true,
-     "version": 544,
-     "tick": 519,
+     "version": 532,
+     "tick": 508,
      "duplicate": false,
-     "id": "EQ_BARBELL_6",
+     "id": "EQ_BARBELL_5",
      "kind": "BARBELL",
      "held_count": 1,
      "multiplier": null
@@ -5610,7 +5591,7 @@
     ],
     "grips": [
      {
-      "id": "EQ_BARBELL_6",
+      "id": "EQ_BARBELL_5",
       "kind": "BARBELL",
       "state": "HELD",
       "grip": {
@@ -5619,7 +5600,7 @@
         "HAND_R"
        ],
        "palm_mid_error_m": 0,
-       "hand_span_m": 0.68
+       "hand_span_m": 0.675
       }
      }
     ],
@@ -5644,11 +5625,11 @@
  "attacks": {
   "physical_mahgic": {
    "select": {
-    "command_id": "play-PLAYER_A-5ojtnj-20",
+    "command_id": "play-PLAYER_A-gjr6k1-20",
     "seq": 20,
     "accepted": true,
-    "version": 568,
-    "tick": 540,
+    "version": 557,
+    "tick": 530,
     "duplicate": false,
     "category": "PHYSICAL_MAGIC",
     "slot": 0,
@@ -5658,11 +5639,11 @@
    },
    "skill": "PA_PUSH",
    "cast": {
-    "command_id": "play-PLAYER_A-5ojtnj-21",
+    "command_id": "play-PLAYER_A-gjr6k1-21",
     "seq": 21,
     "accepted": true,
-    "version": 570,
-    "tick": 541,
+    "version": 558,
+    "tick": 530,
     "duplicate": false,
     "cast_id": "CAST_PLAYER_A_3",
     "equipment_ids": [],
@@ -5685,7 +5666,7 @@
       "category": "PHYSICAL_MAGIC",
       "attack_mode": "PHYSICAL_MAHGIC",
       "phase": "RECOVERY",
-      "progress": 0.4,
+      "progress": 0.51,
       "stack": {
        "attack_stack_id": "AS_ATHLETE_PHYSICAL_MAHGIC_HORIZONTAL_PUSH_PM_PUSH_F",
        "attack_stack_revision": 1,
@@ -5729,42 +5710,42 @@
         0
        ],
        "PELVIS": [
-        0.05968300223158288,
-        -6.616767466989938e-44,
+        0.05944493549625151,
+        -1.9014669203451614e-43,
         0
        ],
        "SPINE": [
-        0.038704560172162734,
+        0.037903075025641254,
         0,
         0
        ],
        "CHEST": [
-        0.026963293068433276,
-        -5.104363474535095e-44,
+        0.02415513708649075,
+        -1.4668459099805531e-43,
         0
        ],
        "NECK": [
-        -0.0022405357936523076,
+        -0.001564466919146894,
         0,
         0
        ],
        "HEAD": [
-        -0.0334308419416349,
-        -2.943776998329011e-42,
+        -0.03438322205613269,
+        -8.508345659816818e-42,
         0
        ],
        "CLAV_L": [
-        -0.08529166127275803,
-        0.14003939428724632,
-        -0.19984496775693336
+        -0.08326417936057608,
+        0.13957856873102525,
+        -0.19910672279400377
        ],
        "UPPERARM_L": [
-        -1.5316641050121138,
+        -1.532754988881683,
         0.1058383838383838,
-        0.3634603107735941
+        0.36481145203974064
        ],
        "FOREARM_L": [
-        0.049951891685687755,
+        0.04995189105902864,
         0,
         0
        ],
@@ -5774,17 +5755,17 @@
         0
        ],
        "CLAV_R": [
-        -0.08529166127275803,
-        -0.14003939428724632,
-        0.19984496775693336
+        -0.08326417936057608,
+        -0.13957856873102525,
+        0.19910672279400377
        ],
        "UPPERARM_R": [
-        -1.5316641050121138,
+        -1.532754988881683,
         -0.1058383838383838,
-        -0.3634603107735941
+        -0.36481145203974064
        ],
        "FOREARM_R": [
-        0.049951891685687755,
+        0.04995189105902864,
         0,
         0
        ],
@@ -5794,17 +5775,17 @@
         0
        ],
        "TAIL1": [
-        -0.09620196715602189,
-        -3.7810099811371077e-44,
+        -0.0962018221962785,
+        -1.0865525259115208e-43,
         0
        ],
        "TAIL2": [
-        -0.0486379205762026,
+        -0.04863875097858949,
         0,
         0
        ],
        "TAIL3": [
-        -0.0000023474802458078896,
+        -0.000003011802155317449,
         0,
         0
        ],
@@ -5819,48 +5800,48 @@
         0
        ],
        "BROW_L": [
-        0.044074938357153974,
+        0.04397219025019381,
         0,
         0
        ],
        "BROW_R": [
-        0.044074938357153974,
+        0.04397219025019381,
         0,
         0
        ],
        "CHEEK_L": [
-        -0.024755025667628442,
+        -0.024705601642050674,
         0,
         0
        ],
        "CHEEK_R": [
-        -0.024755025667628442,
+        -0.024705601642050674,
         0,
         0
        ],
        "JAW": [
-        0.021353711841610216,
+        0.021313836019660883,
         0,
         0
        ],
        "LUMBAR": [
-        0.025803040114775157,
+        0.02526871668376084,
         0,
         0
        ],
        "SPINE2": [
-        -0.023493394302808366,
-        -3.4029089830233966e-44,
+        -0.02540494594627104,
+        -9.778972733203688e-44,
         0
        ],
        "SCAP_L": [
-        -0.34539753273663926,
-        -0.0866988060046931,
+        -0.3454865497787526,
+        -0.08701617897729713,
         0
        ],
        "ARMTWIST_L": [
         0,
-        -0.27696804341824627,
+        -0.27812606404773765,
         0
        ],
        "FORETWIST_L": [
@@ -5869,13 +5850,13 @@
         0
        ],
        "SCAP_R": [
-        -0.34539753273663926,
-        0.0866988060046931,
+        -0.3454865497787526,
+        0.08701617897729713,
         0
        ],
        "ARMTWIST_R": [
         0,
-        0.27696804341824627,
+        0.27812606404773765,
         0
        ],
        "FORETWIST_R": [
@@ -5916,7 +5897,7 @@
       },
       "live": {
        "PELVIS": [
-        0.0279,
+        0.0285,
         0,
         0,
         0.9996
@@ -5928,46 +5909,46 @@
         0.9998
        ],
        "CHEST": [
-        0.0077,
+        0.0086,
         0,
         0,
         1
        ],
        "UPPERARM_L": [
-        -0.6653,
-        0.1393,
-        0.0194,
-        0.7332
+        -0.6695,
+        0.15,
+        0.0524,
+        0.7256
        ],
        "UPPERARM_R": [
-        -0.6653,
-        -0.1393,
-        -0.0194,
-        0.7332
+        -0.6695,
+        -0.15,
+        -0.0524,
+        0.7256
        ],
        "FOREARM_L": [
-        0.0131,
+        0.0207,
         0,
         0,
-        0.9999
+        0.9998
        ],
        "FOREARM_R": [
-        0.0131,
+        0.0207,
         0,
         0,
-        0.9999
+        0.9998
        ],
        "HAND_L": [
-        -0.3705,
+        -0.3793,
         0,
         0,
-        0.9288
+        0.9253
        ],
        "HAND_R": [
-        -0.3705,
+        -0.3793,
         0,
         0,
-        0.9288
+        0.9253
        ]
       }
      }
@@ -5996,42 +5977,42 @@
         0
        ],
        "PELVIS": [
-        -0.00012819734605234163,
-        -1.6018890780651072e-46,
-        0.0017726244930424816
+        -0.00014859553723913223,
+        -5.130220493522213e-46,
+        -0.0017997194236246585
        ],
        "SPINE": [
-        0.0032151619559404342,
+        0.0031276440564888246,
         0,
         0
        ],
        "CHEST": [
-        0.007525434590821369,
-        -1.2357430030787968e-46,
-        -0.00047269986481132843
+        0.007212657132630322,
+        -3.957598666431421e-46,
+        0.0004799251796332423
        ],
        "NECK": [
-        -0.0031060193187027675,
-        -2.8931609305461343e-11,
+        -0.003029666026374124,
+        -1.0351579592343599e-10,
         0
        ],
        "HEAD": [
-        0.003997281787654069,
-        -6.509612093728803e-11,
+        0.0036701954932547966,
+        -2.32910540827731e-10,
         0
        ],
        "CLAV_L": [
-        -0.009365415268799915,
+        -0.009133940671124215,
         0,
-        -0.005124932206331583
+        -0.004998949330582614
        ],
        "UPPERARM_L": [
-        0.008741078554288781,
+        0.008420182395653505,
         0,
-        -0.056212040228665716
+        -0.05605933429392245
        ],
        "FOREARM_L": [
-        -0.10655605630303154,
+        -0.106556057953616,
         0,
         0
        ],
@@ -6041,17 +6022,17 @@
         0
        ],
        "CLAV_R": [
-        -0.009365415268799915,
+        -0.009133940671124215,
         0,
-        0.005124932206331583
+        0.004998949330582614
        ],
        "UPPERARM_R": [
-        0.008741078554288781,
+        0.008420182395653505,
         0,
-        0.056212040228665716
+        0.05605933429392245
        ],
        "FOREARM_R": [
-        -0.10655605630303154,
+        -0.106556057953616,
         0,
         0
        ],
@@ -6061,17 +6042,17 @@
         0
        ],
        "TAIL1": [
-        2.4027638758479476e-10,
-        -9.153651874657756e-47,
+        3.575838062154717e-10,
+        -2.931554567726979e-46,
         0
        ],
        "TAIL2": [
-        -1.3766822394587196e-9,
+        -2.048804174304283e-9,
         0,
         0
        ],
        "TAIL3": [
-        -1.1013457915669756e-9,
+        -1.6390433394434263e-9,
         0,
         0
        ],
@@ -6086,39 +6067,39 @@
         0
        ],
        "BROW_L": [
-        0.0006207732637205945,
+        0.00014219479042239838,
         0,
         0
        ],
        "BROW_R": [
-        0.0006207732637205945,
+        0.00014219479042239838,
         0,
         0
        ],
        "CHEEK_L": [
-        -0.0029693913499757654,
+        -0.002900476049820825,
         0,
         0
        ],
        "CHEEK_R": [
-        -0.0029693913499757654,
+        -0.002900476049820825,
         0,
         0
        ],
        "JAW": [
-        0.009277186151587607,
+        0.009269558277098421,
         0,
         0
        ],
        "LUMBAR": [
-        0.00214344130396029,
+        0.0020850960376592167,
         0,
-        -0.000984791385023601
+        0.0009998441242359214
        ],
        "SPINE2": [
-        0.004612363136309872,
-        -8.23828668719198e-47,
-        -0.00031513324320755234
+        0.004420660823225036,
+        -2.638399110954281e-46,
+        0.00031995011975549485
        ],
        "SCAP_L": [
         0,
@@ -6127,7 +6108,7 @@
        ],
        "ARMTWIST_L": [
         0,
-        -0.00014744592256455064,
+        -0.00014164687941297014,
         0
        ],
        "FORETWIST_L": [
@@ -6142,7 +6123,7 @@
        ],
        "ARMTWIST_R": [
         0,
-        0.00014744592256455064,
+        0.00014164687941297014,
         0
        ],
        "FORETWIST_R": [
@@ -6185,31 +6166,31 @@
        "PELVIS": [
         -0.0001,
         0,
-        0.0008,
+        -0.0009,
         1
        ],
        "SPINE": [
-        0.0016,
+        0.0015,
         0,
         0,
         1
        ],
        "CHEST": [
-        0.0037,
+        0.0034,
         0,
-        -0.0002,
+        0.0002,
         1
        ],
        "UPPERARM_L": [
-        0.0043,
+        0.004,
         0.0001,
-        -0.0281,
+        -0.0279,
         0.9996
        ],
        "UPPERARM_R": [
-        0.0043,
+        0.004,
         -0.0001,
-        0.0281,
+        0.0279,
         0.9996
        ],
        "FOREARM_L": [
