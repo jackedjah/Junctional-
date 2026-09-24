@@ -10,6 +10,6 @@ Updated 2026-09-24. This pointer is safe to keep on the public recovery branch; 
 - Precedence: this packet replaces only the earlier pasted M7 prompt. It preserves M1-M6Q work, the existing JOB A/B ledger, source-derived runtime assets, protected previews, and production.
 - Ownership boundary: gameplay/world lane only. Character, MAHFITT, S08, native-rig, billing, purchase, password-removal, and production-publish work remain outside this job.
 - Recovery remote: public repository `jackedjah/Junctional-`, branch `backup/mahworld-m6-20260924T190351Z`; incoming verified tip `c01185290e8b6815fd6b4d4908deb3b271674279`.
-- Current execution: S0 continuity checkpoint, then S1 intrusive-backdrop/world layout, S2 NEXUS-ASPECT-HALO round trip, S3 world/creature/action polish, S4 bounded acceptance, S5 one protected unpublished candidate.
+- Current execution: S0-S4 are locally closed. The intrusive backdrop owner is corrected; NEXUS / ASCENT / HALO and its round trip are implemented; the current M6Q world/creature/action baseline is retained and focused checks plus an eight-view runtime route are clean. Exact mapping is in `../../M7_EXECUTION_LEDGER.md`; S5 package/protected-draft release is next.
 
 Do not add the ZIP, extracted packet, owner screenshots, archived master/add-on, secrets, or deploy credentials to the public repository. The authoritative full M7 requirement ledger remains the locally preserved `05_REQUIREMENTS_LEDGER.json`; execution outcomes are merged into `CONTINUE_HERE.md`, `ASTRA_TAKEOVER_STATE.md`, and the eventual M7 release record.

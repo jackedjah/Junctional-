@@ -1,0 +1,25 @@
+# M7 reference-lock execution ledger
+
+Updated 2026-09-24 after the bounded local runtime check. This file maps the packet ledger to actual current-source outcomes; it does not replace the locally preserved source ledger.
+
+## Implemented and runtime-checked
+
+- `M7-CON-01..06`: same dirty M1-M6Q worktree, one lead, unchanged JOB A/B and Character/MAHFITT/S08 boundaries; packet kept local and sanitized pointer pushed to the established recovery branch.
+- `M7-LAY-01..04`, `M7-HOR-01`: the diagnosed owner of the intrusive near blue wall was the legacy 26-cone `cityScene` ridge, not the far-world system. Full-district construction now suppresses it while retaining the layered macro/far-world horizon; compact standalone mode keeps a bounded 12-segment fallback. The five-region table is `M7_REGION_TABLE.md`.
+- `M7-TRE-01..11`, `M7-TRE-13..19`, `M7-TER-08`: NEXUS / ASCENT / HALO is implemented at the measured civic envelope: 6.2 m base radius, 24 m trunk/deck, 8.5 m upper realm, 32.2 m dome apex. The platinum flared trunk, glazed blue core, light veins, spiral, eight curved load branches, joined collar, glass dome, promenade, benches, focus crystal, guide and one cabin form a complete host-owned up/down loop. The 5.4 s smootherstep ride remains upright, preserves manual camera, costs zero MAHGIC and returns safely.
+- `M7-FAU-05..08`: the current source Phoenix remains host-owned at legal high-air cruise; the checked bird was in `PATROL` at 95.468 m terrain clearance with the source geometry and bilateral wing presentation visible.
+- `M7-ACT-01..04`: the existing exercise-specific M6Q cadence and authority are retained. The checked 40,005-triangle L0 barbell remains two-hand socketed with 0 m palm-midpoint error and a 0.676 m hand span. The new three-quarter load/release views show complete geometry without the formerly reported rear neck/head intersection.
+- `M7-QA-01..04`: one compact eight-view NIGHT runtime route covers the world, approach, tree/crown, live ascent, upper realm, Phoenix and barbell load/release. It completed with zero console errors. Local images/report: `26_LOCAL_AUTHORITY/deploy/probe_out/m7_reference_lock/`.
+
+## Retained and revalidated from the current M6Q baseline
+
+- `M7-LAY-05..06`, `M7-TER-01..07`, `M7-HOR-02..03`: one route graph, real macro relief/terraces/passes, shared support, the fixed 128-segment junction, continuous regional mineral masks, readable road hierarchy, finished bridge structures and layered non-traversable horizon remain active. The checked runtime reports eight regions, 31 paths, 1,556 tint cells, 962 foreground shards, 18 monolith clusters and two layered macro ridges.
+- `M7-LIT-01..03`, `M7-SKY-01..05`, `M7-ECO-01..06`: Moon-traced night lighting, connected cloud layers, local pooled fixtures, region identities, 41 dense refill patches × 64 shards, tree wind/aura, ponds/waterfall/shore and day switch are retained.
+- `M7-FAU-01..04`, `M7-NPC-01..02`, `M7-ARC-01..04`, `M7-ACT-05..07`: fish/school LOD, source-color Dogkie, bounded residents, corrected building scales/doors/interiors, black MAH MATCH, blue MAH GYM, slow mist aura, controls/camera/resource contracts and pending owner choices remain unchanged. The upper guide is deliberately noncombat at altitude 24 m and is excluded from ground-resident wandering logic.
+
+## Intentionally bounded / owner review pending
+
+- `M7-TRE-12`: existing controller/flight support around the dome is preserved; no new claim of a bespoke climbing system is made.
+- `M7-QA-03`: desktop headless instrumentation was collected (final sample 336 draw calls, 1,831,701 triangles, 13.5 ms render sample), but this is not a physical-phone performance claim.
+- `M7-QA-05..08`: release/package/deploy status is recorded only after the single authorized release pipeline and protected draft deployment complete.
+- Reference dimensions not present in the supplied image remain authored/measured runtime choices, not claimed source measurements. Physical-phone acceptance remains owner-only.

@@ -1,6 +1,14 @@
 # MAHWORLD Astra takeover state
 
-Updated 2026-09-24 (M7 reference-locked implementation S0; protected M6Q/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+Updated 2026-09-24 (M7 reference-locked implementation S1-S4 locally closed; protected M6Q/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+
+## Active M7 checkpoint — S1-S4 locally closed
+
+- Full-world legacy ridge ownership is corrected: the obsolete 26-cone near wall is suppressed only in district mode, while the layered macro/far-world boundary remains. `M7_REGION_TABLE.md` records the actual five-sanctuary topology without multiplying the world scale.
+- NEXUS / ASCENT / HALO now provides a measured 24 m host-supported ascent and a usable 8.5 m-radius upper realm beneath a 32.2 m glass dome. It includes a visible cabin, joined structural branches, promenade/activity furniture, focus crystal, altitude-aware noncombat guide, return docking and zero resource drain.
+- Focused local checks total `119/119` across five relevant programs. The current eight-view browser route completed with zero console errors and directly checked the world/horizon, tree structure, live ascent, upper realm, Phoenix high cruise and two-hand L0 barbell load/release. The prior neck intersection is not visible in the corrected three-quarter sequence.
+- M6Q terrain, roads, junction, buildings, Moon/clouds, ecology, Dogkie, resident, equipment, cadence, camera/control and balance contracts remain intact. No Character/MAHFITT/S08, billing, production, password or earlier preview state changed.
+- Next exact action: push the reviewed M7 source checkpoint, run the single release gate/package, deploy one protected unpublished draft, verify protection plus unchanged production/older previews, then push the release record and stop for owner phone review.
 
 ## Active M7 reference-lock checkpoint — S0 continuity
 
