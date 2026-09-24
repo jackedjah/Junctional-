@@ -32,8 +32,8 @@ function row(file, role, remotePath, sourceId = null) {
     sha256: sha(file),
     remote_path: remotePath,
     content_storage: 'GIT_BLOB_NOT_LFS',
-    upload_state: 'PENDING_PUSH',
-    retrieval_state: 'PENDING_REMOTE_READBACK',
+    upload_state: 'VERIFIED_GITHUB_COMMIT_a25277ebe6afc378af63ed19735a53f2c400327b',
+    retrieval_state: 'VERIFIED_FRESH_CLONE_SHA256_2026-09-24',
     license_privacy: 'Owner-supplied MAHWORLD game asset; public recovery upload explicitly authorized 2026-09-24. Generator/export provenance is recorded in project manifests; third-party source terms were not independently re-audited in this emergency pass.'
   };
 }
@@ -62,6 +62,7 @@ const manifest = {
   recovery_branch: 'backup/mahworld-m6-20260924T190351Z',
   gameplay_root: 'CLAUDE_GAMEPLAY_RUNTIME',
   source_checkpoint: 'bdc43b60d56c22253aeddf2eac996a5394128407',
+  asset_checkpoint: 'a25277ebe6afc378af63ed19735a53f2c400327b',
   cloud_execution: 'NOT_TESTED',
   summary: {
     files: rows.length,
@@ -71,7 +72,7 @@ const manifest = {
     lfs_pointers: 0
   },
   assets: rows,
-  outside_repository_dependencies: rows.filter(x => x.role.includes('original')).map(x => ({ local_path: x.logical_path, recovery_path: x.remote_path, sha256: x.sha256, state: 'PENDING_PUSH' })),
+  outside_repository_dependencies: rows.filter(x => x.role.includes('original')).map(x => ({ local_path: x.logical_path, recovery_path: x.remote_path, sha256: x.sha256, state: 'VERIFIED_FRESH_CLONE_SHA256_2026-09-24' })),
   excluded_private_or_restricted: [
     { scope: 'MAHWORLD_VIDEO_SOURCE_BUNDLE and reference footage', reason: 'private/restricted review media; not required runtime bytes; intentionally not uploaded' },
     { scope: 'Character/MAHFITT/S08 working assets and reserved Blender jobs', reason: 'separate job boundary; intentionally not uploaded' },
@@ -85,7 +86,16 @@ const manifest = {
     instruction: 'Check out the recovery branch normally. All listed bytes are ordinary Git blobs, not LFS pointers. Compare each recovered file against this manifest SHA-256 before use.',
     originals_mapping: 'Files under 25_HANDOFF/RECOVERY_ASSETS/originals restore to the local source paths recorded in logical_path when a derivative rebuild is required.'
   },
-  notes: ['Upload/readback fields are advanced only after the asset commit is pushed and independently retrieved from GitHub.']
+  verification: {
+    method: 'Fresh sparse clone of the recovery branch at the exact asset checkpoint, followed by SHA-256 and byte-length comparison for every manifest row.',
+    clone_root_used: 'C:/Users/jahsu/Downloads/MAHWORLD_M6_REMOTE_VERIFY_a25277e',
+    verified_files: 98,
+    verified_bytes: 1454701148,
+    missing_files: 0,
+    mismatched_files: 0,
+    verified_utc: '2026-09-24T19:30:00Z'
+  },
+  notes: ['Every upload/readback field was advanced only after the asset commit was pushed and independently retrieved from GitHub.']
 };
 fs.writeFileSync(OUT, JSON.stringify(manifest, null, 2) + '\n');
 console.log(`asset manifest -> ${OUT} (${manifest.summary.files} files, ${manifest.summary.bytes} bytes)`);

@@ -1,5 +1,11 @@
 # Owner addendum (2026-09-17, received during PASS 2) — integration into the convergence queue
 
+## Recovery/M6 status note — 2026-09-24
+
+- All existing master/addendum requirements remain recorded below; no row was discarded or reinterpreted by the emergency backup.
+- Current M1–M6 source/context is remotely backed up on `backup/mahworld-m6-20260924T190351Z`; source commit `bdc43b6`, required-asset commit `a25277e`. Fresh remote readback matched all 98 required files / 1,454,701,148 bytes.
+- The bounded M6 `CW_GYM` / `RP_FOREST_W` junction defect is fixed and locally proven. No package/deploy occurred. Next larger milestone remains a separately authorized protected M6 preview; physical-phone acceptance remains owner-only.
+
 The addendum extends the running convergence job; it does not replace the master brief, the pass order or the approved work.
 Received while PASS 2 (camera) probes were running; the active step was finished first (PASS 2 probes / report / review).
 

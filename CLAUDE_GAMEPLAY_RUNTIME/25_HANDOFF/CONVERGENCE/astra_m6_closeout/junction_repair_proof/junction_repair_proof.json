@@ -1,0 +1,40 @@
+{
+ "generated_at": "2026-09-24T19:42:21.742Z",
+ "source": "fresh local static_dist; not packaged or deployed",
+ "point": [
+  -40,
+  40
+ ],
+ "screenshots": [
+  "01_matched_night_after.png",
+  "02_oblique_after.png",
+  "03_crossing_1.png",
+  "04_crossing_2.png",
+  "05_crossing_3.png",
+  "06_crossing_end.png"
+ ],
+ "crossing": {
+  "start": {
+   "x": -40,
+   "z": 54.65
+  },
+  "sample_1": {
+   "x": -40,
+   "z": 51.435
+  },
+  "sample_2": {
+   "x": -40,
+   "z": 47.144
+  },
+  "sample_3": {
+   "x": -40,
+   "z": 43.21
+  },
+  "end": {
+   "x": -40,
+   "z": 39.812
+  },
+  "min_distance_to_junction": 0.1880000000000024
+ },
+ "console_errors": []
+}

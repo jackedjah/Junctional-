@@ -1,6 +1,14 @@
 # MAHWORLD Astra takeover state
 
-Updated 2026-09-23 (M6 bounded closeout saved for owner review; M5C protected candidate preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+Updated 2026-09-24 (recovery backup verified; M6 junction closed; M5C protected candidate preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+
+## Current recovery checkpoint — remote bytes verified, junction fixed locally
+
+- Verified PUBLIC repository `https://github.com/jackedjah/Junctional-`; recovery branch `backup/mahworld-m6-20260924T190351Z`. Source commit `bdc43b60d56c22253aeddf2eac996a5394128407`; required-asset commit `a25277ebe6afc378af63ed19735a53f2c400327b`. No force push, default-branch merge, production deployment or visibility/access change occurred.
+- Fresh remote readback verified 98/98 required assets and all 1,454,701,148 bytes by manifest SHA-256, with zero missing/mismatched files and no LFS pointers. Runtime derivatives/authoring files and registered originals/building inputs are recoverable; restricted footage, secrets, private machine state and separate job assets are intentionally excluded.
+- `CW_GYM` / `RP_FOREST_W` cause: true-circle ribbon clipping met 20-sided inscribed frame/core junction discs, exposing the dark ground as circular/angular chord gaps. The bounded repair changes only their shared boundary to 128 segments (sub-3.1 mm maximum gap), preserving collision, paths, ground colors, trees, Moon/clouds, Dogkie, aura, resources, equipment and combat cadence.
+- Fresh local static build passed its private-content scan. Matched NIGHT, oblique and 6.25 s ordinary-controller crossing proof is clean; crossing reached `0.188 m` from `(-40,40)` and logged zero unexpected console errors. Evidence is under `astra_m6_closeout/junction_isolation/` and `junction_repair_proof/`.
+- Cloud execution is **NOT TESTED**. The next unfinished milestone is an explicitly authorized protected M6 preview; this run did not package or deploy it.
 
 ## Current checkpoint — M6 bounded closeout, editing only
 
@@ -10,8 +18,8 @@ Updated 2026-09-23 (M6 bounded closeout saved for owner review; M5C protected ca
 - The shared arcane-leakage field now includes seven selected existing tree-canopy anchors and two free accents, remaining one draw call and 321 faint/slow motes across 33 total anchors. No rectangular band or second particle system was added.
 - Physical and physical-MAHGIC presentation now uses profile-specific QUICK/HEAVY/PRECISE/FLOW/BALANCED envelopes; PHYSICAL_MAGIC receives a small additional readability offset. Exercise poses and host phase/damage/cost/cooldown authority remain unchanged. This is presentation polish, not a combat redesign or S08 character-lane change.
 - One bounded local visual session is saved at `astra_m6_closeout/visual_check/`: 11 frames, 0 runtime/console errors, actual `PA_PUSH` PHYSICAL_MAGIC sampling, resource break + three refill pickups, L0 dumbbell/barbell geometry, and zero-error palm/two-hand grip debug. It visually covered ground/junction, Moon/clouds, bushes/refill, source-color Dogkie, blue MAH GYM, selected canopy accents, rest-body integrity, and physical/physical-MAHGIC gear poses. No broad regression or soak ran.
-- Exact unresolved presentation issue: dark circular/angular floor fragments reproduce in the saved tower-approach view and in `visual_check/floor_recheck/01_floor_road_and_rest_integrity.png` at the authored `CW_GYM`/`RP_FOREST_W` junction. One path-height attempt was ineffective and reverted; the second focused view reproduced it, so investigation stopped at the owner limit.
-- Next action is owner visual review. M6 must not be packaged or deployed from this checkpoint without new authorization. No hosted, production, or physical-phone acceptance is claimed.
+- The previously unresolved `CW_GYM`/`RP_FOREST_W` circular/angular fragments are now closed by the cause-based junction-boundary repair above. The former `floor_recheck` frame is retained as baseline evidence rather than overwritten.
+- Next action is owner review, followed only by a separately authorized protected M6 preview. No current M6 package, hosted acceptance, production or physical-phone acceptance is claimed.
 
 ## Current correction checkpoint — checkpoint 03 protected candidate closure
 
