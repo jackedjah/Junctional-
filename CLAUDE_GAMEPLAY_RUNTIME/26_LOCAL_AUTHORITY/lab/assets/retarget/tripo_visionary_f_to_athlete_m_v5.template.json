@@ -1,0 +1,131 @@
+{
+ "_doc": "S10 source\u2192target mapping for the Tripo Visionary_F rigged export \u2192 ATHLETE_M rig v5 (dev_0.12). Fill `source` names from deploy/inspect_rigged_glb.mjs output. Motion only: NO source bone scale, NO stretch translations, NO lower-body / root channels.",
+ "status": "TEMPLATE \u2014 donor export not available on this machine (see deploy/TRIPO_DONOR_MISSING_INPUT.md)",
+ "source": {
+  "file": null,
+  "sha256": null,
+  "units": null,
+  "up_axis": null,
+  "forward_axis": null,
+  "handedness": "right (glTF)",
+  "skeleton_root": null,
+  "rest_pose": "A|T|unknown",
+  "clips": []
+ },
+ "target": {
+  "file": "lab/assets/athlete_m_preview/dev_0.12/Mah_Athlete_M_am08_v5.glb",
+  "rig": "ATHLETE_M_AM08_V5 / dev_0.12",
+  "units": "source units (H=0.9865, \u00d71.8246 = metres)",
+  "up_axis": "+Y",
+  "forward_axis": "+Z (runtime body turned by \u03c0)",
+  "left": "-x",
+  "rest_pose": "A-pose, arms hanging near the trunk"
+ },
+ "reference_space": "pelvis-relative: evaluate the source pose in its own hierarchy, take each upper joint's world rotation relative to the source pelvis world rotation, express as a delta from the source rest, then re-express in the target parent frame and add to the target rest (RigAnimator euler XYZ, rig-space sign per side via rigOutSign)",
+ "chains": [
+  {
+   "target": "SPINE",
+   "source": null,
+   "note": "lower-spine transition: bounded share only (LUMBAR stays MAH; trunk distribution handles the rest)"
+  },
+  {
+   "target": "SPINE2",
+   "source": null
+  },
+  {
+   "target": "CHEST",
+   "source": null
+  },
+  {
+   "target": "NECK",
+   "source": null
+  },
+  {
+   "target": "HEAD",
+   "source": null,
+   "note": "only where it agrees with look/aim"
+  },
+  {
+   "target": "CLAV_L",
+   "source": null,
+   "note": "if the donor has a clavicle the procedural clavicle rhythm fades out (RigAnimator layerHas)"
+  },
+  {
+   "target": "CLAV_R",
+   "source": null
+  },
+  {
+   "target": "SCAP_L",
+   "source": null,
+   "note": "usually absent in Tripo rigs \u2192 leave null, MAH scapular rhythm stays"
+  },
+  {
+   "target": "SCAP_R",
+   "source": null
+  },
+  {
+   "target": "UPPERARM_L",
+   "source": null
+  },
+  {
+   "target": "UPPERARM_R",
+   "source": null
+  },
+  {
+   "target": "ARMTWIST_L",
+   "source": null,
+   "note": "derived: counter-twist from UPPERARM_y unless the donor has its own twist bone"
+  },
+  {
+   "target": "ARMTWIST_R",
+   "source": null
+  },
+  {
+   "target": "FOREARM_L",
+   "source": null
+  },
+  {
+   "target": "FOREARM_R",
+   "source": null
+  },
+  {
+   "target": "FORETWIST_L",
+   "source": null
+  },
+  {
+   "target": "FORETWIST_R",
+   "source": null
+  },
+  {
+   "target": "HAND_L",
+   "source": null
+  },
+  {
+   "target": "HAND_R",
+   "source": null
+  },
+  {
+   "target": "FINGERS_L",
+   "source": null,
+   "note": "one finger-mass bone on the target; average the donor finger chains"
+  },
+  {
+   "target": "FINGERS_R",
+   "source": null
+  }
+ ],
+ "excluded_source_channels": [
+  "hips/pelvis translation+rotation (reference only)",
+  "thigh/leg/knee/foot/toe",
+  "root motion",
+  "showcase turntable / camera node"
+ ],
+ "verification": [
+  "left/right not swapped (raise LEFT arm in the donor \u2192 target UPPERARM_L rises)",
+  "no negative-scale mirroring",
+  "bone lengths invariant (16_TESTS/gameplay_motion_layer.test.mjs L3)",
+  "clavicle DOF not stacked (L4)",
+  "lower-body untouched (L2)",
+  "entry/exit blend (L5)"
+ ]
+}

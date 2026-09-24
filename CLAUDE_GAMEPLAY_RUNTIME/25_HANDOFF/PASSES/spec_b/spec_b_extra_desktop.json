@@ -1,0 +1,18 @@
+{
+ "mode": "desktop",
+ "viewport": [
+  1200,
+  750
+ ],
+ "touch_emulated": false,
+ "checks": [
+  "PASS E4 (owner rule: nothing but a drag moves the view): at run speed the FOV and the boom do NOT change — {\"rest\":{\"fov\":55,\"dist\":4.014373268519102,\"k\":0},\"run\":{\"fov\":55,\"dist\":4.014373268519102,\"k\":0.9980017837789751},\"back\":{\"fov\":55,\"dist\":4.014373268519102,\"k\":0.0016690373397044924}}",
+  "PASS E3 movement frame: a swing under 45° keeps the latch (forward → forward-right = 45°: exactly 45°, kept); a 90° swing re-latches; lifting clears it — {\"L0\":{\"ang\":0,\"yaw\":-3.780256638925179e-43},\"L1\":{\"ang\":0,\"yaw\":-3.780256638925179e-43},\"L2\":{\"ang\":1.5707963267948966,\"yaw\":-0.4577387857617377},\"L3\":null}",
+  "PASS E2 lock-on (owner rule: the camera stays on HIS back; a locked player faces the target): locked, camera on the target → him line (|error| < 5°), both on screen — {\"locked\":true,\"err_line_deg\":0,\"dist\":4.014373268519102,\"applied\":4.014373268515825,\"tdist\":9.919382289235557,\"target_on_screen\":true,\"target_px\":[600,238],\"him_on_screen\":true}",
+  "SUPERSEDED — O4: E1 flight pitch → vertical",
+  "PASS E5 collision: the boom shortened against a wall (min applied < 0.75 × full) and eased back out (no single 100 ms step > 35 % of the full boom) — {\"min_applied\":0.5,\"full\":4.01,\"max_step_out_per_100ms\":0.75,\"end\":4.01}",
+  "PASS Z zero page / console errors — [\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\",\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\",\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\"]"
+ ],
+ "pass": 5,
+ "fail": 0
+}

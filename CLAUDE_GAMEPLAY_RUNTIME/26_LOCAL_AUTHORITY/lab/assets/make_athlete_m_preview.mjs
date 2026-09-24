@@ -1,0 +1,28 @@
+/* MAHWORLD :: ISOLATED DEVELOPMENT PREVIEW COPY of the existing Athlete_M source GLB (owner-authorized 2026-09-15).
+   Reads RAW_10_MODELS/Mah_Athlete_M.glb READ-ONLY and writes a geometry-only copy (positions, normals, uvs, indices; the two
+   11 MB texture images are dropped so a phone loads ~0.6 MB and a graphite / platinum preview material is applied at runtime).
+   The source, WORKING masters, Astra folders and .blend files are never touched. This copy is NOT an approved character.
+       node 26_LOCAL_AUTHORITY/lab/assets/make_athlete_m_preview.mjs   (from CLAUDE_GAMEPLAY_RUNTIME) */
+import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto'; import { fileURLToPath } from 'node:url';
+var HERE = path.dirname(fileURLToPath(import.meta.url)); var ROOT = path.resolve(HERE, '../../..', '..');
+var SRC = path.join(ROOT, 'RAW_10_MODELS', 'Mah_Athlete_M.glb'); var OUT_DIR = path.join(HERE, 'athlete_m_preview', 'dev_0.1'); fs.mkdirSync(OUT_DIR, { recursive: true });
+var buf = fs.readFileSync(SRC); var srcSha = crypto.createHash('sha256').update(buf).digest('hex');
+if (buf.readUInt32LE(0) !== 0x46546C67) throw new Error('not a GLB'); var jsonLen = buf.readUInt32LE(12); var json = JSON.parse(buf.slice(20, 20 + jsonLen).toString('utf8')); var binOff = 20 + jsonLen + 8; var bin = buf.slice(binOff, binOff + buf.readUInt32LE(20 + jsonLen));
+if ((json.skins || []).length || (json.animations || []).length) console.log('note: source has skins/animations', (json.skins || []).length, (json.animations || []).length);
+/* keep only bufferViews referenced by accessors (drops the image views) */
+var keep = {}; json.accessors.forEach(function (a) { if (a.bufferView !== undefined) keep[a.bufferView] = true; });
+var newViews = []; var map = {}; var chunks = []; var offset = 0;
+json.bufferViews.forEach(function (v, i) { if (!keep[i]) return; var data = bin.slice(v.byteOffset || 0, (v.byteOffset || 0) + v.byteLength); var pad = (4 - (data.length % 4)) % 4; map[i] = newViews.length; newViews.push(Object.assign({}, v, { byteOffset: offset, buffer: 0 })); chunks.push(data); if (pad) chunks.push(Buffer.alloc(pad)); offset += data.length + pad; });
+json.accessors.forEach(function (a) { if (a.bufferView !== undefined) a.bufferView = map[a.bufferView]; });
+json.bufferViews = newViews; json.buffers = [{ byteLength: offset }]; delete json.images; delete json.textures; delete json.samplers;
+json.materials = [{ name: 'ATHLETE_M_PREVIEW_GRAPHITE', pbrMetallicRoughness: { baseColorFactor: [0.42, 0.45, 0.5, 1], metallicFactor: 0.75, roughnessFactor: 0.38 }, doubleSided: false }];
+json.meshes.forEach(function (m) { m.name = 'ATHLETE_M_PREVIEW_BODY'; m.primitives.forEach(function (p) { p.material = 0; }); }); json.nodes.forEach(function (n) { n.name = 'ATHLETE_M_PREVIEW_BODY'; });
+json.extensionsUsed = []; json.extensionsRequired = [];
+json.asset = { version: '2.0', generator: 'MAHWORLD make_athlete_m_preview.mjs (geometry-only development preview copy of Tripo source)', extras: { mahworld_preview: 'DEVELOPMENT_PREVIEW_UNAPPROVED', source: 'RAW_10_MODELS/Mah_Athlete_M.glb', source_sha256: srcSha, textures_dropped: true, rig: 'NONE (single rigid mesh, no skin, no morph targets, no animations)' } };
+var js = Buffer.from(JSON.stringify(json), 'utf8'); var jpad = (4 - (js.length % 4)) % 4; if (jpad) js = Buffer.concat([js, Buffer.alloc(jpad, 0x20)]); var binBuf = Buffer.concat(chunks);
+var total = 12 + 8 + js.length + 8 + binBuf.length; var out = Buffer.alloc(total); out.writeUInt32LE(0x46546C67, 0); out.writeUInt32LE(2, 4); out.writeUInt32LE(total, 8); out.writeUInt32LE(js.length, 12); out.writeUInt32LE(0x4E4F534A, 16); js.copy(out, 20); out.writeUInt32LE(binBuf.length, 20 + js.length); out.writeUInt32LE(0x004E4942, 24 + js.length); binBuf.copy(out, 28 + js.length);
+var outFile = path.join(OUT_DIR, 'Mah_Athlete_M_preview.glb'); fs.writeFileSync(outFile, out); var outSha = crypto.createHash('sha256').update(out).digest('hex');
+var pos = json.accessors[json.meshes[0].primitives[0].attributes.POSITION];
+var manifest = { export_id: 'ATHLETE_M_PREVIEW', version: 'dev_0.1', sha256: outSha, owner_review_status: 'CANDIDATE', preview_status: 'DEVELOPMENT_PREVIEW_UNAPPROVED (never promoted; not a retained or production character)', source_release: 'isolated geometry-only copy of RAW_10_MODELS/Mah_Athlete_M.glb (sha256 ' + srcSha + '); textures dropped; NOT an approved or retained production character', units: 'metres', up_axis: '+Y', forward_axis: '-Z', source_forward_axis: '+Z', forward_axis_note: 'measured on the source mesh: the face (932 vs 339 head vertices, nose at z=+0.084) points +Z; the runtime factory rotates the body 180° so yaw 0 faces -Z like every other entity', root: 'ATHLETE_M_PREVIEW_BODY', scale_to_metres: +(1.8 / (pos.max[1] - pos.min[1])).toFixed(5), source_height_units: +(pos.max[1] - pos.min[1]).toFixed(4), forms: ['FUSED'], clips: {}, sockets: { ROOT: 'ATHLETE_M_PREVIEW_BODY' }, materials: { ATHLETE_M_PREVIEW_GRAPHITE: 'graphite / platinum preview (runtime)' }, files: ['Mah_Athlete_M_preview.glb'], limitations: ['single rigid mesh: no skeleton, no morph targets, no authored clips', 'SPLIT form (leg separation) cannot be shown by this asset', 'limb / hand articulation cannot be shown; only whole-body procedural motion', 'used for every class during development testing (class tint only)'], generated: new Date().toISOString() };
+fs.writeFileSync(path.join(OUT_DIR, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
+console.log('wrote', outFile, out.length, 'bytes sha', outSha.slice(0, 16), 'source sha', srcSha.slice(0, 16), 'height', manifest.source_height_units, 'scale', manifest.scale_to_metres);

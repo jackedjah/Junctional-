@@ -1,0 +1,712 @@
+{
+ "world_version": "DISTRICT_V1",
+ "_doc": "S11 four landmark districts north of the existing plaza (the plaza stays the arrival forecourt; spawn, tree elevator, NPC routes untouched). Metres, Y up, source fronts +Z; yaw turns the front toward the central approach axis (x=0, from the plaza at z 56 to the temple). Originals stay in INCOMING_BUILDINGS (never served); runtime = Blender decimated copies (decimate_buildings.py).",
+ "field": {
+  "size_m": 600,
+  "walls": {
+   "x1": -175,
+   "x2": 175,
+   "z1": -56.5,
+   "z2": 292
+  },
+  "note": "walls are finite 3 m barriers; the host clamps to size_m/2 = 300 as a last resort"
+ },
+ "buildings": [
+  {
+   "id": "temple",
+   "label": "Gold Temple",
+   "runtime": "lab/assets/buildings/fidelity_m5c/TEMPLE_M5C_L0.glb",
+   "lod_runtime": "lab/assets/buildings/fidelity_m5c/TEMPLE_M5C_L1.glb",
+   "collider_runtime": "lab/assets/buildings/fidelity_m5c/TEMPLE_M5C_L1.glb",
+   "lod_switch_m": 90,
+   "target_height_m": 32.16,
+   "target_scale": 32.885064,
+   "portals": [
+    {
+     "id": "TEMPLE_DOOR",
+     "local": [
+      0.0001708,
+      0,
+      0.3709264
+     ],
+     "local_normal": [
+      0,
+      0,
+      1
+     ],
+     "world": [
+      0,
+      165.55
+     ],
+     "outward": [
+      0,
+      -1
+     ],
+     "half_width_m": 2.2,
+     "height_m": 5.6,
+     "inside_depth_m": 2.8,
+     "outside_depth_m": 1.2
+    }
+   ],
+   "owner_m5_correction": {
+    "application_id": "M5_OWNER_OP02_SCALE_ONCE_20260923",
+    "baseline_build": "ASTRA_M5_PRIVATE_20260923",
+    "baseline_scale": 54.80844,
+    "baseline_target_height_m": 53.6,
+    "baseline_envelope_m": {
+     "x1": -19.7,
+     "z1": 157.7,
+     "x2": 19.7,
+     "z2": 198.3
+    },
+    "factor": 0.6,
+    "source_status": "FOUND_IN_BOUNDED_KNOWN_FOLDER",
+    "source_front_axis": "+Z",
+    "baseline_runtime_sha256": "c7894cd95cc7507b244cba315703b9e834c81112360d11c3aa24169bacfe0b52",
+    "near_runtime_sha256": "1bbc66c1b54c4a6b612ce7a55ddcbdd4e441e44fac94809ddf8c1b9300e86e8d",
+    "far_runtime_sha256": "bcca14be0d0ec02e7bcb2edaf18544c6097740139d4b71e8c84aa925ed8ef66f"
+   },
+   "yaw_deg": 180,
+   "position": [
+    0,
+    0,
+    178
+   ],
+   "district": "central",
+   "front": "-z toward the plaza approach",
+   "scale": 32.885064,
+   "source_height": 0.97853,
+   "runtime_triangles": 799999,
+   "envelope_m": {
+    "x1": -11.9,
+    "z1": 165.8,
+    "x2": 11.9,
+    "z2": 190.2,
+    "width": 23.7,
+    "depth": 24.4,
+    "height": 32.1792
+   },
+   "silhouette_height_m": 32.1792,
+   "landing_levels": [
+    {
+     "h_m": 32.3,
+     "area_m2": 13
+    },
+    {
+     "h_m": 31.8,
+     "area_m2": 13
+    },
+    {
+     "h_m": 25.3,
+     "area_m2": 25
+    },
+    {
+     "h_m": 23.8,
+     "area_m2": 25
+    },
+    {
+     "h_m": 23.3,
+     "area_m2": 13
+    },
+    {
+     "h_m": 2.8,
+     "area_m2": 6
+    }
+   ],
+   "highest_usable_landing_m": 32.3,
+   "collider_counts": {
+    "solid_boxes": 92,
+    "deck_slabs": 10,
+    "portal_boxes_removed": 7,
+    "portal_deck_slabs_removed": 2
+   },
+   "provenance": {
+    "source_file": "ornate temple 3d model.glb",
+    "source_sha256": "25c4c6e951797ae374e74efc172aeb9c0cb4977bbceca18f62e26e82473054c1",
+    "source_triangles": 1866763,
+    "source_bytes": 76380384,
+    "runtime_file": "lab/assets/buildings/fidelity_m5c/TEMPLE_M5C_L0.glb",
+    "runtime_sha256": "1bbc66c1b54c4a6b612ce7a55ddcbdd4e441e44fac94809ddf8c1b9300e86e8d",
+    "runtime_bytes": 27672088,
+    "collider_runtime_file": "lab/assets/buildings/fidelity_m5c/TEMPLE_M5C_L1.glb",
+    "collider_runtime_sha256": "bcca14be0d0ec02e7bcb2edaf18544c6097740139d4b71e8c84aa925ed8ef66f",
+    "collider_runtime_bytes": 12731844
+   },
+   "transform": "T(0,0,178) · R_y(180°) · S(32.885064) · offset(-0.0000, --0.0000, -0.0000)",
+   "target_height_m_s11": 80,
+   "collider_triangles": 266419,
+   "source_bounds": {
+    "min": [
+     -0.3605914,
+     -0.0000247,
+     -0.3708801
+    ],
+    "max": [
+     0.3606415,
+     0.9785093,
+     0.3708801
+    ],
+    "center_xz": [
+     0.000025,
+     0
+    ],
+    "base_y": -0.0000247
+   },
+   "actual_height_m": 32.1792,
+   "lod_runtime_triangles": 266419
+  },
+  {
+   "id": "gym",
+   "label": "MAH GYM",
+   "runtime": "lab/assets/buildings/_decimated/gym_rt.glb",
+   "target_height_m": 48.24,
+   "yaw_deg": 90,
+   "position": [
+    -112,
+    0,
+    110
+   ],
+   "district": "west",
+   "front": "+x toward the approach axis",
+   "scale": 49.258259,
+   "source_height": 0.97933,
+   "runtime_triangles": 70000,
+   "envelope_m": {
+    "x1": -136,
+    "z1": 85.9,
+    "x2": -88,
+    "z2": 134.1,
+    "width": 47.9,
+    "depth": 48.2,
+    "height": 48.24
+   },
+   "silhouette_height_m": 48.24,
+   "landing_levels": [
+    {
+     "h_m": 48.3,
+     "area_m2": 150
+    },
+    {
+     "h_m": 48,
+     "area_m2": 88
+    },
+    {
+     "h_m": 47.8,
+     "area_m2": 125
+    },
+    {
+     "h_m": 47.5,
+     "area_m2": 88
+    },
+    {
+     "h_m": 47.3,
+     "area_m2": 81
+    },
+    {
+     "h_m": 47,
+     "area_m2": 38
+    },
+    {
+     "h_m": 46.8,
+     "area_m2": 25
+    },
+    {
+     "h_m": 46.5,
+     "area_m2": 13
+    },
+    {
+     "h_m": 45.8,
+     "area_m2": 38
+    },
+    {
+     "h_m": 45.5,
+     "area_m2": 50
+    },
+    {
+     "h_m": 45.3,
+     "area_m2": 38
+    },
+    {
+     "h_m": 45,
+     "area_m2": 100
+    },
+    {
+     "h_m": 44.8,
+     "area_m2": 56
+    },
+    {
+     "h_m": 44.5,
+     "area_m2": 38
+    },
+    {
+     "h_m": 44.3,
+     "area_m2": 81
+    },
+    {
+     "h_m": 44,
+     "area_m2": 56
+    },
+    {
+     "h_m": 43.8,
+     "area_m2": 38
+    },
+    {
+     "h_m": 43.5,
+     "area_m2": 44
+    },
+    {
+     "h_m": 43.3,
+     "area_m2": 38
+    },
+    {
+     "h_m": 43,
+     "area_m2": 38
+    },
+    {
+     "h_m": 42.5,
+     "area_m2": 50
+    },
+    {
+     "h_m": 36.3,
+     "area_m2": 31
+    },
+    {
+     "h_m": 36,
+     "area_m2": 25
+    },
+    {
+     "h_m": 34.5,
+     "area_m2": 13
+    },
+    {
+     "h_m": 34.3,
+     "area_m2": 13
+    },
+    {
+     "h_m": 34,
+     "area_m2": 13
+    },
+    {
+     "h_m": 33.8,
+     "area_m2": 13
+    },
+    {
+     "h_m": 32,
+     "area_m2": 13
+    },
+    {
+     "h_m": 28.3,
+     "area_m2": 13
+    },
+    {
+     "h_m": 28,
+     "area_m2": 38
+    },
+    {
+     "h_m": 27.8,
+     "area_m2": 13
+    },
+    {
+     "h_m": 20,
+     "area_m2": 13
+    },
+    {
+     "h_m": 16,
+     "area_m2": 38
+    },
+    {
+     "h_m": 12,
+     "area_m2": 38
+    },
+    {
+     "h_m": 11.3,
+     "area_m2": 38
+    },
+    {
+     "h_m": 3.8,
+     "area_m2": 25
+    },
+    {
+     "h_m": 3.5,
+     "area_m2": 25
+    },
+    {
+     "h_m": 1.8,
+     "area_m2": 13
+    }
+   ],
+   "highest_usable_landing_m": 48.3,
+   "collider_counts": {
+    "solid_boxes": 424,
+    "deck_slabs": 104,
+    "portal_boxes_removed": 0,
+    "portal_deck_slabs_removed": 0
+   },
+   "provenance": {
+    "source_file": "modern gym building 3d model.glb",
+    "source_sha256": "87027489462602e652e78cc18d8470a74354f3465c03830b47eed66832be2aa3",
+    "source_triangles": 1795490,
+    "source_bytes": 67891184,
+    "runtime_file": "lab/assets/buildings/_decimated/gym_rt.glb",
+    "runtime_sha256": "8dfe3608e9e6f22078b537871c72bfc7e93a44337fb40183e6cd4f7e7e95d176",
+    "runtime_bytes": 3612376,
+    "collider_runtime_file": "lab/assets/buildings/_decimated/gym_rt.glb",
+    "collider_runtime_sha256": "8dfe3608e9e6f22078b537871c72bfc7e93a44337fb40183e6cd4f7e7e95d176",
+    "collider_runtime_bytes": 3612376
+   },
+   "transform": "T(-112,0,110) · R_y(90°) · S(49.258259) · offset(-0.0002, --0.0001, --0.0001)",
+   "target_height_m_s11": 72,
+   "collider_triangles": 70000,
+   "source_bounds": {
+    "min": [
+     -0.4892639,
+     -0.000079,
+     -0.4864297
+    ],
+    "max": [
+     0.4896987,
+     0.9792491,
+     0.486163
+    ],
+    "center_xz": [
+     0.0002174,
+     -0.0001334
+    ],
+    "base_y": -0.000079
+   },
+   "actual_height_m": 48.24,
+   "lod_runtime_triangles": null
+  },
+  {
+   "id": "tower",
+   "label": "Blue Tower",
+   "runtime": "lab/assets/buildings/fidelity_m5c/TOWER_M5C_L0.glb",
+   "lod_runtime": "lab/assets/buildings/fidelity_m5c/TOWER_M5C_L1.glb",
+   "collider_runtime": "lab/assets/buildings/fidelity_m5c/TOWER_M5C_L1.glb",
+   "lod_switch_m": 90,
+   "target_height_m": 28.944,
+   "target_scale": 29.36148,
+   "portals": [
+    {
+     "id": "TOWER_DOOR",
+     "local": [
+      -0.0000377,
+      0,
+      0.3081301
+     ],
+     "local_normal": [
+      0,
+      0,
+      1
+     ],
+     "world": [
+      102.65,
+      110
+     ],
+     "outward": [
+      -1,
+      0
+     ],
+     "half_width_m": 2,
+     "height_m": 5.2,
+     "inside_depth_m": 2.8,
+     "outside_depth_m": 1.2
+    }
+   ],
+   "owner_m5_correction": {
+    "application_id": "M5_OWNER_OP02_SCALE_ONCE_20260923",
+    "baseline_build": "ASTRA_M5_PRIVATE_20260923",
+    "baseline_scale": 48.9358,
+    "baseline_target_height_m": 48.24,
+    "baseline_envelope_m": {
+     "x1": 96.9,
+     "z1": 90.8,
+     "x2": 127.1,
+     "z2": 129.2
+    },
+    "factor": 0.6,
+    "source_status": "FOUND_IN_BOUNDED_KNOWN_FOLDER",
+    "source_front_axis": "+Z",
+    "baseline_runtime_sha256": "3926dcb319c3d4e19a8139060b7708966c221392afb52063fca1efff11b61d6c",
+    "near_runtime_sha256": "3cf45e17d374ff8d958de59df1700b484e26dc26ec904b4e8b75d9604af0c0a5",
+    "far_runtime_sha256": "81423ddbed5ac7a14dcdcafef0df02fd7f102ec9c03a9bc0bdc39c01e445d703"
+   },
+   "yaw_deg": -90,
+   "position": [
+    112,
+    0,
+    110
+   ],
+   "district": "east",
+   "front": "-x toward the approach axis",
+   "scale": 29.36148,
+   "source_height": 0.98541,
+   "runtime_triangles": 800000,
+   "envelope_m": {
+    "x1": 103,
+    "z1": 98.5,
+    "x2": 121,
+    "z2": 121.5,
+    "width": 18.1,
+    "depth": 23,
+    "height": 28.9332
+   },
+   "silhouette_height_m": 28.9332,
+   "landing_levels": [
+    {
+     "h_m": 29,
+     "area_m2": 13
+    },
+    {
+     "h_m": 23.3,
+     "area_m2": 50
+    },
+    {
+     "h_m": 23,
+     "area_m2": 106
+    },
+    {
+     "h_m": 15.8,
+     "area_m2": 163
+    },
+    {
+     "h_m": 12.3,
+     "area_m2": 25
+    },
+    {
+     "h_m": 9,
+     "area_m2": 25
+    },
+    {
+     "h_m": 7.5,
+     "area_m2": 13
+    },
+    {
+     "h_m": 3,
+     "area_m2": 25
+    }
+   ],
+   "highest_usable_landing_m": 29,
+   "collider_counts": {
+    "solid_boxes": 86,
+    "deck_slabs": 30,
+    "portal_boxes_removed": 3,
+    "portal_deck_slabs_removed": 1
+   },
+   "provenance": {
+    "source_file": "futuristic tower 3d model.glb",
+    "source_sha256": "f7a587cc0f253ca11d9fdc5e66e260cd39bf4390b707d3c1d9e1dd7a84d2606e",
+    "source_triangles": 1901950,
+    "source_bytes": 77766980,
+    "runtime_file": "lab/assets/buildings/fidelity_m5c/TOWER_M5C_L0.glb",
+    "runtime_sha256": "3cf45e17d374ff8d958de59df1700b484e26dc26ec904b4e8b75d9604af0c0a5",
+    "runtime_bytes": 27374976,
+    "collider_runtime_file": "lab/assets/buildings/fidelity_m5c/TOWER_M5C_L1.glb",
+    "collider_runtime_sha256": "81423ddbed5ac7a14dcdcafef0df02fd7f102ec9c03a9bc0bdc39c01e445d703",
+    "collider_runtime_bytes": 12090500
+   },
+   "transform": "T(112,0,110) · R_y(-90°) · S(29.361480) · offset(-0.0000, -0.0000, -0.0000)",
+   "target_height_m_s11": 72,
+   "collider_triangles": 254126,
+   "source_bounds": {
+    "min": [
+     -0.3915956,
+     0,
+     -0.3081497
+    ],
+    "max": [
+     0.3916174,
+     0.9854126,
+     0.3081516
+    ],
+    "center_xz": [
+     0.0000109,
+     0.000001
+    ],
+    "base_y": 0
+   },
+   "actual_height_m": 28.9332,
+   "lod_runtime_triangles": 254126
+  },
+  {
+   "id": "market",
+   "label": "MAH MARKET",
+   "runtime": "lab/assets/buildings/fidelity_m5c/MARKET_M5C_L0.glb",
+   "lod_runtime": "lab/assets/buildings/fidelity_m5c/MARKET_M5C_L1.glb",
+   "collider_runtime": "lab/assets/buildings/fidelity_m5c/MARKET_M5C_L1.glb",
+   "lod_switch_m": 90,
+   "target_height_m": 25.728,
+   "target_scale": 26.180346,
+   "portals": [
+    {
+     "id": "CLOTHING_DOOR",
+     "local": [
+      0.0841,
+      0,
+      0.249007
+     ],
+     "local_normal": [
+      0,
+      0,
+      1
+     ],
+     "world": [
+      -2.2,
+      251.25
+     ],
+     "outward": [
+      0,
+      -1
+     ],
+     "half_width_m": 1.65,
+     "height_m": 4.5,
+     "inside_depth_m": 2.6,
+     "outside_depth_m": 1.2
+    },
+    {
+     "id": "WEAPON_DOOR",
+     "local": [
+      -0.084,
+      0,
+      0.249007
+     ],
+     "local_normal": [
+      0,
+      0,
+      1
+     ],
+     "world": [
+      2.2,
+      251.25
+     ],
+     "outward": [
+      0,
+      -1
+     ],
+     "half_width_m": 1.65,
+     "height_m": 4.5,
+     "inside_depth_m": 2.6,
+     "outside_depth_m": 1.2
+    }
+   ],
+   "owner_m5_correction": {
+    "application_id": "M5_OWNER_OP02_SCALE_ONCE_20260923",
+    "baseline_build": "ASTRA_M5_PRIVATE_20260923",
+    "baseline_scale": 43.63391,
+    "baseline_target_height_m": 42.88,
+    "baseline_envelope_m": {
+     "x1": -11.2,
+     "z1": 247.1,
+     "x2": 11.2,
+     "z2": 268.9
+    },
+    "factor": 0.6,
+    "source_status": "FOUND_IN_BOUNDED_KNOWN_FOLDER",
+    "source_front_axis": "+Z",
+    "baseline_runtime_sha256": "aeadcea966dcb48d2409c2d8d307888fa58761137ef3f77d8f3c8e70d2e88753",
+    "near_runtime_sha256": "8d595d544aa950a9d250208ad73decc2b19a4f07d47c47218886e1a31f4e4c99",
+    "far_runtime_sha256": "473081449b91ed29273f8e765778baff56b9879e31d1f3e5f9114e292a09a9a4"
+   },
+   "yaw_deg": 180,
+   "position": [
+    0,
+    0,
+    258
+   ],
+   "district": "north",
+   "front": "-z toward the temple ring",
+   "scale": 26.180346,
+   "source_height": 0.98281,
+   "runtime_triangles": 800000,
+   "envelope_m": {
+    "x1": -6.7,
+    "z1": 251.5,
+    "x2": 6.7,
+    "z2": 264.5,
+    "width": 13.5,
+    "depth": 13,
+    "height": 25.7302
+   },
+   "silhouette_height_m": 25.7302,
+   "landing_levels": [
+    {
+     "h_m": 25.8,
+     "area_m2": 38
+    },
+    {
+     "h_m": 23.8,
+     "area_m2": 13
+    },
+    {
+     "h_m": 22.8,
+     "area_m2": 13
+    },
+    {
+     "h_m": 18.3,
+     "area_m2": 63
+    }
+   ],
+   "highest_usable_landing_m": 25.8,
+   "collider_counts": {
+    "solid_boxes": 39,
+    "deck_slabs": 7,
+    "portal_boxes_removed": 6,
+    "portal_deck_slabs_removed": 0
+   },
+   "provenance": {
+    "source_file": "futuristic market building 3d model.glb",
+    "source_sha256": "f18a1d022764e6f21e76e5d7cbf516f24efdfbd20a7630547e67337781c230c9",
+    "source_triangles": 1871488,
+    "source_bytes": 84168868,
+    "runtime_file": "lab/assets/buildings/fidelity_m5c/MARKET_M5C_L0.glb",
+    "runtime_sha256": "8d595d544aa950a9d250208ad73decc2b19a4f07d47c47218886e1a31f4e4c99",
+    "runtime_bytes": 27040072,
+    "collider_runtime_file": "lab/assets/buildings/fidelity_m5c/MARKET_M5C_L1.glb",
+    "collider_runtime_sha256": "473081449b91ed29273f8e765778baff56b9879e31d1f3e5f9114e292a09a9a4",
+    "collider_runtime_bytes": 10315108
+   },
+   "transform": "T(0,0,258) · R_y(180°) · S(26.180346) · offset(-0.0000, --0.0000, -0.0000)",
+   "target_height_m_s11": 64,
+   "collider_triangles": 202680,
+   "source_bounds": {
+    "min": [
+     -0.2577793,
+     -0.0000233,
+     -0.2490343
+    ],
+    "max": [
+     0.257782,
+     0.9827845,
+     0.2490658
+    ],
+    "center_xz": [
+     0.0000013,
+     0.0000157
+    ],
+    "base_y": -0.0000233
+   },
+   "actual_height_m": 25.7302,
+   "lod_runtime_triangles": 202680
+  },
+  {
+   "id": "training_display",
+   "label": "Training Display",
+   "runtime": "lab/assets/buildings/_decimated/training_display_rt.glb",
+   "target_height_m": 11.31,
+   "yaw_deg": 90,
+   "position": [
+    -150,
+    5,
+    62
+   ],
+   "district": "west",
+   "enabled": false,
+   "hover_base_m": 5,
+   "note": "optional static prop beside the gym forecourt; feature-flagged off until reviewed"
+  }
+ ],
+ "generated": "2026-09-23T18:33:43.844Z",
+ "collider_cell_m": 2.5,
+ "collider_ycell_m": 1.5,
+ "_scale_note": "owner 2026-09-17: mainland landmarks scaled by 0.67x from the S11 heights (target_height_m_s11 keeps the previous value for rollback); colliders + envelopes regenerated by deploy/build_district.mjs"
+}

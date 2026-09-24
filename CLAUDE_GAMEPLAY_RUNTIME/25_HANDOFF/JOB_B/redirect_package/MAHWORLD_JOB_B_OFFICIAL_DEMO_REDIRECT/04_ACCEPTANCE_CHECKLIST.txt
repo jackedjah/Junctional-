@@ -1,0 +1,83 @@
+MAHWORLD OFFICIAL DEMO — WORLD PASS ACCEPTANCE CHECKLIST
+
+SESSION / SAFETY
+[ ] Same existing MAHWORLD Claude session/worktree continued.
+[ ] Current in-progress work was not discarded, restarted, or rolled back.
+[ ] JOB A gameplay/control/combat ownership was not overwritten.
+[ ] Existing good world features were preserved unless replacement was demonstrably better.
+
+MAP / NAVIGATION
+[ ] World has substantially more meaningful land presence or reshaped geography so existing water is justified.
+[ ] Main progression/traversal spine is visually obvious without forcing corridor-only movement.
+[ ] Main, regional, and discovery path hierarchy is readable.
+[ ] Paths look like crystalline MAHWORLD causeways, not ordinary asphalt roads.
+[ ] Major regions have landmark silhouettes visible at useful distances.
+[ ] Geography is structured to support future training/challenge arcs without implementing those quest gates now.
+
+GROUND / COLOR / MATERIALS
+[ ] Ground is no longer a broad flat undetailed plane.
+[ ] Crystal/mineral plates, seams, elevation changes, transitions, and material variation create depth.
+[ ] Red, pink, gold, green, and purple are meaningfully present through MAHWORLD crystal/mineral language.
+[ ] Platinum/chromium identity remains dominant/coherent.
+[ ] Reflections are controlled and do not become a giant mirror.
+
+TREES
+[ ] Structural trunk and primary boughs read as clean finished platinum / heat-grey metal.
+[ ] Crystal/diamond complexity is concentrated in extremities/foliage/growths.
+[ ] Tree silhouettes are clearer than the current all-over diamond treatment.
+[ ] Optional grooves/energy seams remain subtle and do not reintroduce visual noise.
+
+SKY / ATMOSPHERE
+[ ] Sky has layered depth rather than a flat bright background.
+[ ] Huge Sun/Moon direction is preserved.
+[ ] Horizon atmosphere and distant depth work without bleaching the whole scene.
+[ ] Clouds/particles/selected environmental motion create life at acceptable cost.
+
+WATER
+[ ] Calm water has subtle living motion.
+[ ] Local impacts create localized disturbances.
+[ ] Ripples expand, overlap visually, damp, and return toward calm.
+[ ] Fish breaches visibly disturb the water.
+[ ] Shorelines/bridge supports/objects meet water believably.
+[ ] Near/mid/far water quality scales with distance/performance.
+
+GUIDE FAIRIES
+[ ] Mrs. Mah guide reads at about 3x the supplied tiny-companion reference's apparent screen footprint.
+[ ] Scale was tuned from the real gameplay camera, not blindly multiplied.
+[ ] Guide idle/flying uses the same broad MAHWORLD species motion language as the player characters.
+[ ] Hover is alive but controlled: no bug jitter, random bobbing, or stiff translation.
+[ ] Follow behavior does not block camera/player and recovers smoothly.
+[ ] Mr. Mah can reuse the same guide architecture.
+
+CREATURES / GLBS
+[ ] GLB_NEW3 was inspected locally before asking for uploads.
+[ ] fish.glb rig/animations/materials/orientation were actually inspected.
+[ ] horse.glb rig/animations/materials/orientation were actually inspected.
+[ ] golden phoenix 3d model.glb rig/animations/materials/orientation were actually inspected.
+[ ] Dogkie remains forest-weighted.
+[ ] Horse encounters are primarily open-land and comparatively isolated.
+[ ] Phoenix reads huge (~2x player target) and uses high-altitude territory.
+[ ] Fish populations/activity increase away from shore and include breach arcs.
+[ ] Creature spawning/AI is pooled/bounded and not unbounded.
+[ ] Fightable-world identity is distinct from future pet ownership entitlement.
+[ ] Future acquisition metadata can distinguish Dogkie quest/free vs other creatures premium without implementing payment UI unless already authorized elsewhere.
+
+PERFORMANCE / ENGINEERING
+[ ] Phone-first performance was profiled in the real runtime.
+[ ] Stable 60 FPS is prioritized on target phone hardware; higher refresh can be used when available.
+[ ] No unbounded particles, spawn loops, render targets, or per-frame allocations.
+[ ] LOD/culling/instancing/chunking are used where appropriate.
+[ ] Heavy systems degrade gracefully with distance/quality tier.
+[ ] No unnecessary giant new dependency was added without justification.
+
+PROOF
+[ ] Real playable runtime shown, not only isolated tech demos.
+[ ] High-level map/overview proof captured.
+[ ] Ground/path close-up proof captured.
+[ ] Tree material close-up proof captured.
+[ ] Water-impact/fish proof captured.
+[ ] Fairy follow/flight proof captured.
+[ ] Horse habitat proof captured.
+[ ] Phoenix high-altitude proof captured.
+[ ] Mobile/phone-sized gameplay proof captured.
+[ ] Final report states what changed, what was preserved, measured performance, and any genuine remaining blockers.

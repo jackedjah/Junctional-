@@ -1,0 +1,6236 @@
+{
+ "label": "M5C_NIGHT_DESKTOP",
+ "sky": "NIGHT",
+ "profile_id": "desktop",
+ "profile": "desktop headless Chrome GPU",
+ "viewport": {
+  "width": 1280,
+  "height": 800,
+  "dpr": 1
+ },
+ "dist": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "startup": {
+  "load_event_ms": 399.3,
+  "ready_ms": 21354.5,
+  "forest_build_ms": 7145,
+  "forest": {
+   "tree_lock": true,
+   "zone_family": {
+    "FOREST_W": "purple",
+    "FOREST_NW": "red",
+    "FOREST_NE": "blue",
+    "FOREST_N_W": "red",
+    "FOREST_N_E": "gold",
+    "BAGE_GARDEN_W": "pink",
+    "BAGE_GARDEN_E": "pink"
+   },
+   "trees": 121,
+   "lod_counts": {
+    "L0": 0,
+    "L1": 121,
+    "IMPOSTOR": 0
+   },
+   "source_tiers": {
+    "near": "L0",
+    "far": "L1"
+   },
+   "same_material_all_tiers": true,
+   "runtime_impostor": false,
+   "impostor": false,
+   "runtime_bake_ms": 0,
+   "draw_calls": 8,
+   "zone_chunks": [
+    {
+     "zone": "BAGE_GARDEN_E",
+     "trees": 2,
+     "L0": 0,
+     "L1": 2
+    },
+    {
+     "zone": "BAGE_GARDEN_W",
+     "trees": 2,
+     "L0": 0,
+     "L1": 2
+    },
+    {
+     "zone": "FOREST_NE",
+     "trees": 30,
+     "L0": 0,
+     "L1": 30
+    },
+    {
+     "zone": "FOREST_NW",
+     "trees": 30,
+     "L0": 0,
+     "L1": 30
+    },
+    {
+     "zone": "FOREST_N_E",
+     "trees": 15,
+     "L0": 0,
+     "L1": 15
+    },
+    {
+     "zone": "FOREST_N_W",
+     "trees": 15,
+     "L0": 0,
+     "L1": 15
+    },
+    {
+     "zone": "FOREST_W",
+     "trees": 27,
+     "L0": 0,
+     "L1": 27
+    }
+   ],
+   "lod_m": {
+    "near": 26,
+    "mid": null
+   },
+   "hysteresis_m": 4,
+   "triangles_per_tree": {
+    "L0": 14792,
+    "L1": 7392
+   },
+   "rendered_tree_triangles": 894432,
+   "family_samples": [
+    {
+     "index": 0,
+     "id": "FOREST_W_T000",
+     "zone": "FOREST_W",
+     "family": "purple",
+     "x": -89.91,
+     "z": -4.6,
+     "tier": "L1",
+     "color": "#8b67d2"
+    },
+    {
+     "index": 27,
+     "id": "FOREST_NW_T000",
+     "zone": "FOREST_NW",
+     "family": "red",
+     "x": -66.02,
+     "z": 188.7,
+     "tier": "L1",
+     "color": "#c93146"
+    },
+    {
+     "index": 57,
+     "id": "FOREST_NE_T000",
+     "zone": "FOREST_NE",
+     "family": "blue",
+     "x": 148.03,
+     "z": 193.69,
+     "tier": "L1",
+     "color": "#2958da"
+    },
+    {
+     "index": 102,
+     "id": "FOREST_N_E_T000",
+     "zone": "FOREST_N_E",
+     "family": "gold",
+     "x": 105.54,
+     "z": 271.72,
+     "tier": "L1",
+     "color": "#d6b562"
+    },
+    {
+     "index": 117,
+     "id": "BAGE_GARDEN_W_T000",
+     "zone": "BAGE_GARDEN_W",
+     "family": "pink",
+     "x": -51.9,
+     "z": 248,
+     "tier": "L1",
+     "color": "#e986b3"
+    }
+   ],
+   "lifecycle": {
+    "transitions": 121,
+    "rewrites": 1,
+    "timing_ms": {
+     "build_ms": 7144.1,
+     "assemble_ms": 1.9,
+     "first_classify_ms": 0.2,
+     "first_rewrite_ms": 0.1,
+     "last_classify_ms": 0,
+     "max_classify_ms": 0.2,
+     "last_rewrite_ms": 0.1,
+     "max_rewrite_ms": 0.1,
+     "runtime_bake_ms": 0
+    },
+    "resources": {
+     "materials": 1,
+     "geometries": 2,
+     "render_targets": 0
+    }
+   },
+   "height_m": [
+    9.27,
+    14.73
+   ],
+   "underbrush": 121,
+   "night": true,
+   "skipped": null
+  },
+  "render": {
+   "calls": 215,
+   "triangles": 518715,
+   "programs": 172,
+   "textures": 131,
+   "geometries": 342
+  }
+ },
+ "families": [
+  {
+   "family": "gold",
+   "zone": "FOREST_N_E",
+   "index": 102,
+   "tree": {
+    "x": 105.54,
+    "z": 271.72
+   },
+   "passes": [
+    {
+     "phase": "far_in",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 163.8,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 229,
+        "triangles": 742061,
+        "programs": 172,
+        "textures": 143,
+        "geometries": 346
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_01_gold_far_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 184.5,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 264,
+        "triangles": 1046001,
+        "programs": 172,
+        "textures": 149,
+        "geometries": 363
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 850.5,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 223,
+        "triangles": 1859134,
+        "programs": 174,
+        "textures": 184,
+        "geometries": 429
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 1539.6,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 7,
+        "L1": 114,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 246,
+        "triangles": 2038366,
+        "programs": 175,
+        "textures": 189,
+        "geometries": 433
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L1",
+      "color": "#d6b562"
+     },
+     "lod_counts": {
+      "L0": 7,
+      "L1": 114,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 246,
+      "triangles": 2038366,
+      "programs": 175,
+      "textures": 189,
+      "geometries": 433
+     },
+     "settled_tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L1",
+      "color": "#d6b562"
+     },
+     "settled_lod_counts": {
+      "L0": 7,
+      "L1": 114,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 246,
+      "triangles": 2038366,
+      "programs": 175,
+      "textures": 189,
+      "geometries": 433
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 20.9,
+      "p95_ms": 29.4,
+      "p99_ms": 31.2,
+      "max_ms": 31.2
+     }
+    },
+    {
+     "phase": "boundary_in",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5.2,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 7,
+        "L1": 114,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 246,
+        "triangles": 2038366,
+        "programs": 175,
+        "textures": 189,
+        "geometries": 433
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_01_gold_boundary_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 19.1,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 7,
+        "L1": 114,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 249,
+        "triangles": 2038480,
+        "programs": 175,
+        "textures": 189,
+        "geometries": 433
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 70.7,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 7,
+        "L1": 114,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 249,
+        "triangles": 2038480,
+        "programs": 175,
+        "textures": 189,
+        "geometries": 433
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 894.5,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 6,
+        "L1": 115,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 243,
+        "triangles": 1827936,
+        "programs": 175,
+        "textures": 192,
+        "geometries": 433
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L1",
+      "color": "#d6b562"
+     },
+     "lod_counts": {
+      "L0": 6,
+      "L1": 115,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 243,
+      "triangles": 1827936,
+      "programs": 175,
+      "textures": 192,
+      "geometries": 433
+     },
+     "settled_tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L1",
+      "color": "#d6b562"
+     },
+     "settled_lod_counts": {
+      "L0": 6,
+      "L1": 115,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 243,
+      "triangles": 1827936,
+      "programs": 175,
+      "textures": 192,
+      "geometries": 433
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 21.8,
+      "p95_ms": 29.9,
+      "p99_ms": 33.2,
+      "max_ms": 33.2
+     }
+    },
+    {
+     "phase": "near",
+     "requested_camera_distance_m": 18,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5.4,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 6,
+        "L1": 115,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 240,
+        "triangles": 1827824,
+        "programs": 175,
+        "textures": 193,
+        "geometries": 433
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_01_gold_near_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 23.5,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 6,
+        "L1": 115,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 240,
+        "triangles": 1824814,
+        "programs": 175,
+        "textures": 193,
+        "geometries": 433
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 83.5,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 6,
+        "L1": 115,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 242,
+        "triangles": 1824604,
+        "programs": 175,
+        "textures": 193,
+        "geometries": 433
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 852.5,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L0",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 4,
+        "L1": 117,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 240,
+        "triangles": 1787474,
+        "programs": 175,
+        "textures": 195,
+        "geometries": 434
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L0",
+      "color": "#d6b562"
+     },
+     "lod_counts": {
+      "L0": 4,
+      "L1": 117,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 240,
+      "triangles": 1787474,
+      "programs": 175,
+      "textures": 195,
+      "geometries": 434
+     },
+     "settled_tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L0",
+      "color": "#d6b562"
+     },
+     "settled_lod_counts": {
+      "L0": 4,
+      "L1": 117,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 240,
+      "triangles": 1787474,
+      "programs": 175,
+      "textures": 195,
+      "geometries": 434
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 19.8,
+      "p95_ms": 26.7,
+      "p99_ms": 27.5,
+      "max_ms": 27.5
+     }
+    },
+    {
+     "phase": "boundary_out",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 3.3,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L0",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 4,
+        "L1": 117,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 241,
+        "triangles": 1792626,
+        "programs": 175,
+        "textures": 195,
+        "geometries": 434
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_01_gold_boundary_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 19.1,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L0",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 4,
+        "L1": 117,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 241,
+        "triangles": 1792626,
+        "programs": 175,
+        "textures": 195,
+        "geometries": 434
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 63.2,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L0",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 4,
+        "L1": 117,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 132,
+        "triangles": 803848,
+        "programs": 175,
+        "textures": 201,
+        "geometries": 434
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 903.4,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L0",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 248,
+        "triangles": 1829591,
+        "programs": 175,
+        "textures": 201,
+        "geometries": 434
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L0",
+      "color": "#d6b562"
+     },
+     "lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 248,
+      "triangles": 1829591,
+      "programs": 175,
+      "textures": 201,
+      "geometries": 434
+     },
+     "settled_tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L0",
+      "color": "#d6b562"
+     },
+     "settled_lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 248,
+      "triangles": 1829591,
+      "programs": 175,
+      "textures": 201,
+      "geometries": 434
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 23.3,
+      "p95_ms": 31.8,
+      "p99_ms": 86,
+      "max_ms": 86
+     }
+    },
+    {
+     "phase": "far_out",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5.3,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L0",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 256,
+        "triangles": 1867043,
+        "programs": 176,
+        "textures": 203,
+        "geometries": 438
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_01_gold_far_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 21.4,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L0",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 256,
+        "triangles": 1867043,
+        "programs": 176,
+        "textures": 203,
+        "geometries": 438
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 69.8,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L0",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 119,
+        "triangles": 563686,
+        "programs": 176,
+        "textures": 204,
+        "geometries": 438
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 807.6,
+       "tree_state": {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       "lod_counts": {
+        "L0": 8,
+        "L1": 113,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 252,
+        "triangles": 2122755,
+        "programs": 176,
+        "textures": 204,
+        "geometries": 438
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L1",
+      "color": "#d6b562"
+     },
+     "lod_counts": {
+      "L0": 8,
+      "L1": 113,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 252,
+      "triangles": 2122755,
+      "programs": 176,
+      "textures": 204,
+      "geometries": 438
+     },
+     "settled_tree_state": {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L1",
+      "color": "#d6b562"
+     },
+     "settled_lod_counts": {
+      "L0": 8,
+      "L1": 113,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 252,
+      "triangles": 2122755,
+      "programs": 176,
+      "textures": 204,
+      "geometries": 438
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 22.1,
+      "p95_ms": 28.3,
+      "p99_ms": 32.2,
+      "max_ms": 32.2
+     }
+    }
+   ]
+  },
+  {
+   "family": "blue",
+   "zone": "FOREST_NE",
+   "index": 57,
+   "tree": {
+    "x": 148.03,
+    "z": 193.69
+   },
+   "passes": [
+    {
+     "phase": "far_in",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 7.5,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 8,
+        "L1": 113,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 260,
+        "triangles": 2123065,
+        "programs": 176,
+        "textures": 204,
+        "geometries": 438
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_02_blue_far_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 25.4,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 8,
+        "L1": 113,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 188,
+        "triangles": 1130713,
+        "programs": 176,
+        "textures": 208,
+        "geometries": 455
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 80.7,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 8,
+        "L1": 113,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 280,
+        "triangles": 2359016,
+        "programs": 176,
+        "textures": 208,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 937,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 266,
+        "triangles": 2199292,
+        "programs": 176,
+        "textures": 204,
+        "geometries": 457
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L1",
+      "color": "#2958da"
+     },
+     "lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 266,
+      "triangles": 2199292,
+      "programs": 176,
+      "textures": 204,
+      "geometries": 457
+     },
+     "settled_tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L1",
+      "color": "#2958da"
+     },
+     "settled_lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 266,
+      "triangles": 2199292,
+      "programs": 176,
+      "textures": 204,
+      "geometries": 457
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 25.8,
+      "p95_ms": 33.6,
+      "p99_ms": 34.6,
+      "max_ms": 34.6
+     }
+    },
+    {
+     "phase": "boundary_in",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 4.1,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 268,
+        "triangles": 2199406,
+        "programs": 176,
+        "textures": 204,
+        "geometries": 457
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_02_blue_boundary_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 23.9,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 268,
+        "triangles": 2199406,
+        "programs": 176,
+        "textures": 204,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 75.8,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 268,
+        "triangles": 2195276,
+        "programs": 176,
+        "textures": 204,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 898.5,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 2,
+        "L1": 119,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 269,
+        "triangles": 1992700,
+        "programs": 176,
+        "textures": 208,
+        "geometries": 457
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L1",
+      "color": "#2958da"
+     },
+     "lod_counts": {
+      "L0": 2,
+      "L1": 119,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 269,
+      "triangles": 1992700,
+      "programs": 176,
+      "textures": 208,
+      "geometries": 457
+     },
+     "settled_tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L1",
+      "color": "#2958da"
+     },
+     "settled_lod_counts": {
+      "L0": 2,
+      "L1": 119,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 269,
+      "triangles": 1992700,
+      "programs": 176,
+      "textures": 208,
+      "geometries": 457
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 25.2,
+      "p95_ms": 32.2,
+      "p99_ms": 34.3,
+      "max_ms": 34.3
+     }
+    },
+    {
+     "phase": "near",
+     "requested_camera_distance_m": 18,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 2.6,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 2,
+        "L1": 119,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 276,
+        "triangles": 1984808,
+        "programs": 176,
+        "textures": 208,
+        "geometries": 457
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_02_blue_near_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 15.4,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 2,
+        "L1": 119,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 276,
+        "triangles": 1984808,
+        "programs": 176,
+        "textures": 208,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 60.9,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 2,
+        "L1": 119,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 278,
+        "triangles": 1993044,
+        "programs": 176,
+        "textures": 208,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 959.2,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L0",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 274,
+        "triangles": 2046642,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L0",
+      "color": "#2958da"
+     },
+     "lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 274,
+      "triangles": 2046642,
+      "programs": 176,
+      "textures": 210,
+      "geometries": 457
+     },
+     "settled_tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L0",
+      "color": "#2958da"
+     },
+     "settled_lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 274,
+      "triangles": 2046642,
+      "programs": 176,
+      "textures": 210,
+      "geometries": 457
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 23.9,
+      "p95_ms": 31.2,
+      "p99_ms": 36.7,
+      "max_ms": 36.7
+     }
+    },
+    {
+     "phase": "boundary_out",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L0",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 276,
+        "triangles": 2046756,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_02_blue_boundary_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 21.1,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L0",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 276,
+        "triangles": 2046756,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 69.1,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L0",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 237,
+        "triangles": 2018846,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 882.5,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L0",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 3,
+        "L1": 118,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 275,
+        "triangles": 2006888,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L0",
+      "color": "#2958da"
+     },
+     "lod_counts": {
+      "L0": 3,
+      "L1": 118,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 275,
+      "triangles": 2006888,
+      "programs": 176,
+      "textures": 210,
+      "geometries": 457
+     },
+     "settled_tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L0",
+      "color": "#2958da"
+     },
+     "settled_lod_counts": {
+      "L0": 3,
+      "L1": 118,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 275,
+      "triangles": 2006888,
+      "programs": 176,
+      "textures": 210,
+      "geometries": 457
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 23.6,
+      "p95_ms": 30.5,
+      "p99_ms": 32.3,
+      "max_ms": 32.3
+     }
+    },
+    {
+     "phase": "far_out",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 2.9,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L0",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 3,
+        "L1": 118,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 268,
+        "triangles": 2006660,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_02_blue_far_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 23.3,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L0",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 3,
+        "L1": 118,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 268,
+        "triangles": 2006660,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 69.6,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L0",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 3,
+        "L1": 118,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 120,
+        "triangles": 642903,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 899.1,
+       "tree_state": {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 270,
+        "triangles": 2226380,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L1",
+      "color": "#2958da"
+     },
+     "lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 270,
+      "triangles": 2226380,
+      "programs": 176,
+      "textures": 210,
+      "geometries": 457
+     },
+     "settled_tree_state": {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L1",
+      "color": "#2958da"
+     },
+     "settled_lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 270,
+      "triangles": 2226380,
+      "programs": 176,
+      "textures": 210,
+      "geometries": 457
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 23.9,
+      "p95_ms": 30.3,
+      "p99_ms": 32.7,
+      "max_ms": 32.7
+     }
+    }
+   ]
+  },
+  {
+   "family": "red",
+   "zone": "FOREST_NW",
+   "index": 27,
+   "tree": {
+    "x": -66.02,
+    "z": 188.7
+   },
+   "passes": [
+    {
+     "phase": "far_in",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 4.3,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 268,
+        "triangles": 2218146,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_03_red_far_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 16.4,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 271,
+        "triangles": 2218260,
+        "programs": 176,
+        "textures": 210,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 71.2,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 246,
+        "triangles": 1875474,
+        "programs": 175,
+        "textures": 188,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 949.9,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 175,
+        "triangles": 844569,
+        "programs": 176,
+        "textures": 199,
+        "geometries": 457
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L1",
+      "color": "#c93146"
+     },
+     "lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 175,
+      "triangles": 844569,
+      "programs": 176,
+      "textures": 199,
+      "geometries": 457
+     },
+     "settled_tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L1",
+      "color": "#c93146"
+     },
+     "settled_lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 175,
+      "triangles": 844569,
+      "programs": 176,
+      "textures": 199,
+      "geometries": 457
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 18.2,
+      "p95_ms": 24.3,
+      "p99_ms": 27.6,
+      "max_ms": 27.6
+     }
+    },
+    {
+     "phase": "boundary_in",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5.4,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 844341,
+        "programs": 176,
+        "textures": 199,
+        "geometries": 457
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_03_red_boundary_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 18,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 844341,
+        "programs": 176,
+        "textures": 199,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 59.4,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 843647,
+        "programs": 176,
+        "textures": 199,
+        "geometries": 457
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 941.3,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 4,
+        "L1": 117,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 166,
+        "triangles": 946369,
+        "programs": 176,
+        "textures": 199,
+        "geometries": 458
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L1",
+      "color": "#c93146"
+     },
+     "lod_counts": {
+      "L0": 4,
+      "L1": 117,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 166,
+      "triangles": 946369,
+      "programs": 176,
+      "textures": 199,
+      "geometries": 458
+     },
+     "settled_tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L1",
+      "color": "#c93146"
+     },
+     "settled_lod_counts": {
+      "L0": 4,
+      "L1": 117,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 166,
+      "triangles": 946369,
+      "programs": 176,
+      "textures": 199,
+      "geometries": 458
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 18.6,
+      "p95_ms": 23.6,
+      "p99_ms": 28.7,
+      "max_ms": 28.7
+     }
+    },
+    {
+     "phase": "near",
+     "requested_camera_distance_m": 18,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 6.6,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 4,
+        "L1": 117,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 162,
+        "triangles": 947603,
+        "programs": 176,
+        "textures": 199,
+        "geometries": 458
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_03_red_near_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 24,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 4,
+        "L1": 117,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 162,
+        "triangles": 947603,
+        "programs": 176,
+        "textures": 199,
+        "geometries": 458
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 72.2,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 4,
+        "L1": 117,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 162,
+        "triangles": 947245,
+        "programs": 176,
+        "textures": 198,
+        "geometries": 458
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 1015,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L0",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 971573,
+        "programs": 176,
+        "textures": 203,
+        "geometries": 458
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L0",
+      "color": "#c93146"
+     },
+     "lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 168,
+      "triangles": 971573,
+      "programs": 176,
+      "textures": 203,
+      "geometries": 458
+     },
+     "settled_tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L0",
+      "color": "#c93146"
+     },
+     "settled_lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 168,
+      "triangles": 971573,
+      "programs": 176,
+      "textures": 203,
+      "geometries": 458
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 19.7,
+      "p95_ms": 25.4,
+      "p99_ms": 28.6,
+      "max_ms": 28.6
+     }
+    },
+    {
+     "phase": "boundary_out",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 4.2,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L0",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 173,
+        "triangles": 971801,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_03_red_boundary_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 15.6,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L0",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 173,
+        "triangles": 971801,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 51.3,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L0",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 173,
+        "triangles": 971801,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 830.7,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L0",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 169,
+        "triangles": 970031,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L0",
+      "color": "#c93146"
+     },
+     "lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 169,
+      "triangles": 970031,
+      "programs": 176,
+      "textures": 202,
+      "geometries": 458
+     },
+     "settled_tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L0",
+      "color": "#c93146"
+     },
+     "settled_lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 169,
+      "triangles": 970031,
+      "programs": 176,
+      "textures": 202,
+      "geometries": 458
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 19.5,
+      "p95_ms": 27.6,
+      "p99_ms": 29.5,
+      "max_ms": 29.5
+     }
+    },
+    {
+     "phase": "far_out",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 18.2,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L0",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 968683,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_03_red_far_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 34.9,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L0",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 968683,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 72.4,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L0",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 968683,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 806.1,
+       "tree_state": {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       "lod_counts": {
+        "L0": 2,
+        "L1": 119,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 171,
+        "triangles": 896533,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L1",
+      "color": "#c93146"
+     },
+     "lod_counts": {
+      "L0": 2,
+      "L1": 119,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 171,
+      "triangles": 896533,
+      "programs": 176,
+      "textures": 202,
+      "geometries": 458
+     },
+     "settled_tree_state": {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L1",
+      "color": "#c93146"
+     },
+     "settled_lod_counts": {
+      "L0": 2,
+      "L1": 119,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 171,
+      "triangles": 896533,
+      "programs": 176,
+      "textures": 202,
+      "geometries": 458
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 18.9,
+      "p95_ms": 24.5,
+      "p99_ms": 29.5,
+      "max_ms": 29.5
+     }
+    }
+   ]
+  },
+  {
+   "family": "pink",
+   "zone": "BAGE_GARDEN_W",
+   "index": 117,
+   "tree": {
+    "x": -51.9,
+    "z": 248
+   },
+   "passes": [
+    {
+     "phase": "far_in",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 3.3,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 2,
+        "L1": 119,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 170,
+        "triangles": 892633,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_04_pink_far_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 19.7,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 2,
+        "L1": 119,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 170,
+        "triangles": 892633,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 458
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 74.7,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 2,
+        "L1": 119,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 169,
+        "triangles": 1345579,
+        "programs": 176,
+        "textures": 208,
+        "geometries": 458
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 958.1,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 183,
+        "triangles": 1630565,
+        "programs": 176,
+        "textures": 213,
+        "geometries": 459
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L1",
+      "color": "#e986b3"
+     },
+     "lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 183,
+      "triangles": 1630565,
+      "programs": 176,
+      "textures": 213,
+      "geometries": 459
+     },
+     "settled_tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L1",
+      "color": "#e986b3"
+     },
+     "settled_lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 183,
+      "triangles": 1630565,
+      "programs": 176,
+      "textures": 213,
+      "geometries": 459
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 19.2,
+      "p95_ms": 25.1,
+      "p99_ms": 28.3,
+      "max_ms": 28.3
+     }
+    },
+    {
+     "phase": "boundary_in",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 7,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 185,
+        "triangles": 1630679,
+        "programs": 176,
+        "textures": 213,
+        "geometries": 459
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_04_pink_boundary_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 19,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 185,
+        "triangles": 830681,
+        "programs": 176,
+        "textures": 213,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 69.9,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 187,
+        "triangles": 843055,
+        "programs": 176,
+        "textures": 214,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 894.9,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 179,
+        "triangles": 834657,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L1",
+      "color": "#e986b3"
+     },
+     "lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 179,
+      "triangles": 834657,
+      "programs": 176,
+      "textures": 216,
+      "geometries": 459
+     },
+     "settled_tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L1",
+      "color": "#e986b3"
+     },
+     "settled_lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 179,
+      "triangles": 834657,
+      "programs": 176,
+      "textures": 216,
+      "geometries": 459
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 17.4,
+      "p95_ms": 22.4,
+      "p99_ms": 24.6,
+      "max_ms": 24.6
+     }
+    },
+    {
+     "phase": "near",
+     "requested_camera_distance_m": 18,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5.8,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 179,
+        "triangles": 834767,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_04_pink_near_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 16.1,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 179,
+        "triangles": 834767,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 56.8,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 177,
+        "triangles": 815409,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 857,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L0",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 179,
+        "triangles": 836006,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L0",
+      "color": "#e986b3"
+     },
+     "lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 179,
+      "triangles": 836006,
+      "programs": 176,
+      "textures": 216,
+      "geometries": 459
+     },
+     "settled_tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L0",
+      "color": "#e986b3"
+     },
+     "settled_lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 179,
+      "triangles": 836006,
+      "programs": 176,
+      "textures": 216,
+      "geometries": 459
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 18,
+      "p95_ms": 26,
+      "p99_ms": 28.9,
+      "max_ms": 28.9
+     }
+    },
+    {
+     "phase": "boundary_out",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5.5,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L0",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 178,
+        "triangles": 836006,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_04_pink_boundary_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 27.7,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L0",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 835808,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 70.7,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L0",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 176,
+        "triangles": 857530,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 913.3,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L0",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 185,
+        "triangles": 893108,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L0",
+      "color": "#e986b3"
+     },
+     "lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 185,
+      "triangles": 893108,
+      "programs": 176,
+      "textures": 216,
+      "geometries": 459
+     },
+     "settled_tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L0",
+      "color": "#e986b3"
+     },
+     "settled_lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 185,
+      "triangles": 893108,
+      "programs": 176,
+      "textures": 216,
+      "geometries": 459
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 18.3,
+      "p95_ms": 24.8,
+      "p99_ms": 27.5,
+      "max_ms": 27.5
+     }
+    },
+    {
+     "phase": "far_out",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 2.8,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L0",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 182,
+        "triangles": 892996,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_04_pink_far_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 16.6,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L0",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 182,
+        "triangles": 892996,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 62,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L0",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 182,
+        "triangles": 892996,
+        "programs": 176,
+        "textures": 216,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 767.8,
+       "tree_state": {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 185,
+        "triangles": 1665364,
+        "programs": 176,
+        "textures": 217,
+        "geometries": 459
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L1",
+      "color": "#e986b3"
+     },
+     "lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 185,
+      "triangles": 1665364,
+      "programs": 176,
+      "textures": 217,
+      "geometries": 459
+     },
+     "settled_tree_state": {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L1",
+      "color": "#e986b3"
+     },
+     "settled_lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 185,
+      "triangles": 1665364,
+      "programs": 176,
+      "textures": 217,
+      "geometries": 459
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 19.1,
+      "p95_ms": 26.2,
+      "p99_ms": 28.2,
+      "max_ms": 28.2
+     }
+    }
+   ]
+  },
+  {
+   "family": "purple",
+   "zone": "FOREST_W",
+   "index": 0,
+   "tree": {
+    "x": -89.91,
+    "z": -4.6
+   },
+   "passes": [
+    {
+     "phase": "far_in",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 3.1,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 188,
+        "triangles": 1670628,
+        "programs": 176,
+        "textures": 217,
+        "geometries": 459
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_05_purple_far_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 20.8,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 188,
+        "triangles": 1670628,
+        "programs": 176,
+        "textures": 217,
+        "geometries": 459
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 140.9,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 0,
+        "L1": 121,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 424,
+        "triangles": 1039737,
+        "programs": 176,
+        "textures": 202,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 885.9,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 178,
+        "triangles": 684659,
+        "programs": 176,
+        "textures": 209,
+        "geometries": 469
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L1",
+      "color": "#8b67d2"
+     },
+     "lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 178,
+      "triangles": 684659,
+      "programs": 176,
+      "textures": 209,
+      "geometries": 469
+     },
+     "settled_tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L1",
+      "color": "#8b67d2"
+     },
+     "settled_lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 178,
+      "triangles": 684659,
+      "programs": 176,
+      "textures": 209,
+      "geometries": 469
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 17.3,
+      "p95_ms": 22.1,
+      "p99_ms": 23.8,
+      "max_ms": 23.8
+     }
+    },
+    {
+     "phase": "boundary_in",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5.1,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 174,
+        "triangles": 676745,
+        "programs": 176,
+        "textures": 209,
+        "geometries": 469
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_05_purple_boundary_in_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 16.3,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 174,
+        "triangles": 676745,
+        "programs": 176,
+        "textures": 209,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 51.4,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 174,
+        "triangles": 676745,
+        "programs": 176,
+        "textures": 209,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 880.8,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 3,
+        "L1": 118,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 169,
+        "triangles": 706213,
+        "programs": 176,
+        "textures": 215,
+        "geometries": 469
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L1",
+      "color": "#8b67d2"
+     },
+     "lod_counts": {
+      "L0": 3,
+      "L1": 118,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 169,
+      "triangles": 706213,
+      "programs": 176,
+      "textures": 215,
+      "geometries": 469
+     },
+     "settled_tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L1",
+      "color": "#8b67d2"
+     },
+     "settled_lod_counts": {
+      "L0": 3,
+      "L1": 118,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 169,
+      "triangles": 706213,
+      "programs": 176,
+      "textures": 215,
+      "geometries": 469
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 18.2,
+      "p95_ms": 23.1,
+      "p99_ms": 25.5,
+      "max_ms": 25.5
+     }
+    },
+    {
+     "phase": "near",
+     "requested_camera_distance_m": 18,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 3.7,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 3,
+        "L1": 118,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 165,
+        "triangles": 694563,
+        "programs": 176,
+        "textures": 215,
+        "geometries": 469
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_05_purple_near_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 17.7,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 3,
+        "L1": 118,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 165,
+        "triangles": 694563,
+        "programs": 176,
+        "textures": 215,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 62.3,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 3,
+        "L1": 118,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 163,
+        "triangles": 690367,
+        "programs": 176,
+        "textures": 217,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 1059.2,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L0",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 9,
+        "L1": 112,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 159,
+        "triangles": 813961,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L0",
+      "color": "#8b67d2"
+     },
+     "lod_counts": {
+      "L0": 9,
+      "L1": 112,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 159,
+      "triangles": 813961,
+      "programs": 176,
+      "textures": 219,
+      "geometries": 469
+     },
+     "settled_tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L0",
+      "color": "#8b67d2"
+     },
+     "settled_lod_counts": {
+      "L0": 9,
+      "L1": 112,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 159,
+      "triangles": 813961,
+      "programs": 176,
+      "textures": 219,
+      "geometries": 469
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 19.2,
+      "p95_ms": 23.9,
+      "p99_ms": 26.4,
+      "max_ms": 26.4
+     }
+    },
+    {
+     "phase": "boundary_out",
+     "requested_camera_distance_m": 29,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 4.2,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L0",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 9,
+        "L1": 112,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 814305,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_05_purple_boundary_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 20.1,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L0",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 9,
+        "L1": 112,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 168,
+        "triangles": 814305,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 60.4,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L0",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 9,
+        "L1": 112,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 128,
+        "triangles": 762163,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 962.9,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L0",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 167,
+        "triangles": 744153,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L0",
+      "color": "#8b67d2"
+     },
+     "lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 167,
+      "triangles": 744153,
+      "programs": 176,
+      "textures": 219,
+      "geometries": 469
+     },
+     "settled_tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L0",
+      "color": "#8b67d2"
+     },
+     "settled_lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 167,
+      "triangles": 744153,
+      "programs": 176,
+      "textures": 219,
+      "geometries": 469
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 19.2,
+      "p95_ms": 24.8,
+      "p99_ms": 25.6,
+      "max_ms": 25.6
+     }
+    },
+    {
+     "phase": "far_out",
+     "requested_camera_distance_m": 40,
+     "transition": [
+      {
+       "mark": "immediate",
+       "frame_after_place": 0,
+       "elapsed_ms": 5.7,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L0",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 165,
+        "triangles": 737655,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": "M5C_NIGHT_DESKTOP_05_purple_far_out_immediate.png"
+      },
+      {
+       "mark": "raf_1",
+       "frame_after_place": 1,
+       "elapsed_ms": 20.5,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L0",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 165,
+        "triangles": 737655,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "raf_3",
+       "frame_after_place": 3,
+       "elapsed_ms": 61.5,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L0",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 5,
+        "L1": 116,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 153,
+        "triangles": 897585,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": null
+      },
+      {
+       "mark": "settled_550ms",
+       "frame_after_place": null,
+       "elapsed_ms": 849.9,
+       "tree_state": {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       "lod_counts": {
+        "L0": 1,
+        "L1": 120,
+        "IMPOSTOR": 0
+       },
+       "render": {
+        "calls": 172,
+        "triangles": 671595,
+        "programs": 176,
+        "textures": 219,
+        "geometries": 469
+       },
+       "screenshot": null
+      }
+     ],
+     "tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L1",
+      "color": "#8b67d2"
+     },
+     "lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "render": {
+      "calls": 172,
+      "triangles": 671595,
+      "programs": 176,
+      "textures": 219,
+      "geometries": 469
+     },
+     "settled_tree_state": {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L1",
+      "color": "#8b67d2"
+     },
+     "settled_lod_counts": {
+      "L0": 1,
+      "L1": 120,
+      "IMPOSTOR": 0
+     },
+     "settled_render": {
+      "calls": 172,
+      "triangles": 671595,
+      "programs": 176,
+      "textures": 219,
+      "geometries": 469
+     },
+     "frames": {
+      "n": 90,
+      "p50_ms": 17,
+      "p95_ms": 22,
+      "p99_ms": 25.3,
+      "max_ms": 25.3
+     }
+    }
+   ]
+  }
+ ],
+ "lifecycle": {
+  "cycles": [
+   {
+    "cycle": 1,
+    "side": "far",
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 7,
+      "L1": 114,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 9,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 7,
+       "L1": 8
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 946232,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L1",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 196,
+      "rewrites": 27,
+      "timing_ms": {
+       "build_ms": 7144.1,
+       "assemble_ms": 1.9,
+       "first_classify_ms": 0.2,
+       "first_rewrite_ms": 0.1,
+       "last_classify_ms": 0,
+       "max_classify_ms": 0.2,
+       "last_rewrite_ms": 0,
+       "max_rewrite_ms": 0.1,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "render": {
+     "calls": 248,
+     "triangles": 2043516,
+     "programs": 176,
+     "textures": 203,
+     "geometries": 470
+    }
+   },
+   {
+    "cycle": 2,
+    "side": "near",
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 4,
+      "L1": 117,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 9,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 4,
+       "L1": 11
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 924032,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L0",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 203,
+      "rewrites": 29,
+      "timing_ms": {
+       "build_ms": 7144.1,
+       "assemble_ms": 1.9,
+       "first_classify_ms": 0.2,
+       "first_rewrite_ms": 0.1,
+       "last_classify_ms": 0,
+       "max_classify_ms": 0.2,
+       "last_rewrite_ms": 0,
+       "max_rewrite_ms": 0.1,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "render": {
+     "calls": 241,
+     "triangles": 1787476,
+     "programs": 176,
+     "textures": 210,
+     "geometries": 470
+    }
+   },
+   {
+    "cycle": 3,
+    "side": "far",
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 8,
+      "L1": 113,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 9,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 8,
+       "L1": 7
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 953632,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L1",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 209,
+      "rewrites": 30,
+      "timing_ms": {
+       "build_ms": 7144.1,
+       "assemble_ms": 1.9,
+       "first_classify_ms": 0.2,
+       "first_rewrite_ms": 0.1,
+       "last_classify_ms": 0,
+       "max_classify_ms": 0.2,
+       "last_rewrite_ms": 0,
+       "max_rewrite_ms": 0.1,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "render": {
+     "calls": 257,
+     "triangles": 2108256,
+     "programs": 176,
+     "textures": 220,
+     "geometries": 470
+    }
+   },
+   {
+    "cycle": 4,
+    "side": "near",
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 5,
+      "L1": 116,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 9,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 5,
+       "L1": 10
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 931432,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L0",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 214,
+      "rewrites": 31,
+      "timing_ms": {
+       "build_ms": 7144.1,
+       "assemble_ms": 1.9,
+       "first_classify_ms": 0.2,
+       "first_rewrite_ms": 0.1,
+       "last_classify_ms": 0.1,
+       "max_classify_ms": 0.2,
+       "last_rewrite_ms": 0,
+       "max_rewrite_ms": 0.1,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "render": {
+     "calls": 241,
+     "triangles": 1798466,
+     "programs": 176,
+     "textures": 220,
+     "geometries": 470
+    }
+   },
+   {
+    "cycle": 5,
+    "side": "far",
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 8,
+      "L1": 113,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 9,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 8,
+       "L1": 7
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 953632,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L1",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 221,
+      "rewrites": 33,
+      "timing_ms": {
+       "build_ms": 7144.1,
+       "assemble_ms": 1.9,
+       "first_classify_ms": 0.2,
+       "first_rewrite_ms": 0.1,
+       "last_classify_ms": 0,
+       "max_classify_ms": 0.2,
+       "last_rewrite_ms": 0,
+       "max_rewrite_ms": 0.1,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "render": {
+     "calls": 254,
+     "triangles": 2145284,
+     "programs": 176,
+     "textures": 220,
+     "geometries": 470
+    }
+   },
+   {
+    "cycle": 6,
+    "side": "near",
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 4,
+      "L1": 117,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 9,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 4,
+       "L1": 11
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 924032,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L0",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 227,
+      "rewrites": 34,
+      "timing_ms": {
+       "build_ms": 7144.1,
+       "assemble_ms": 1.9,
+       "first_classify_ms": 0.2,
+       "first_rewrite_ms": 0.1,
+       "last_classify_ms": 0,
+       "max_classify_ms": 0.2,
+       "last_rewrite_ms": 0,
+       "max_rewrite_ms": 0.1,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "render": {
+     "calls": 238,
+     "triangles": 1776160,
+     "programs": 176,
+     "textures": 220,
+     "geometries": 470
+    }
+   },
+   {
+    "cycle": 7,
+    "side": "far",
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 6,
+      "L1": 115,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 9,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 6,
+       "L1": 9
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 938832,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L1",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 231,
+      "rewrites": 35,
+      "timing_ms": {
+       "build_ms": 7144.1,
+       "assemble_ms": 1.9,
+       "first_classify_ms": 0.2,
+       "first_rewrite_ms": 0.1,
+       "last_classify_ms": 0,
+       "max_classify_ms": 0.2,
+       "last_rewrite_ms": 0,
+       "max_rewrite_ms": 0.1,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "render": {
+     "calls": 254,
+     "triangles": 2100900,
+     "programs": 176,
+     "textures": 220,
+     "geometries": 470
+    }
+   },
+   {
+    "cycle": 8,
+    "side": "near",
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 4,
+      "L1": 117,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 9,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 4,
+       "L1": 11
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 924032,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L0",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 239,
+      "rewrites": 37,
+      "timing_ms": {
+       "build_ms": 7144.1,
+       "assemble_ms": 1.9,
+       "first_classify_ms": 0.2,
+       "first_rewrite_ms": 0.1,
+       "last_classify_ms": 0,
+       "max_classify_ms": 0.2,
+       "last_rewrite_ms": 0,
+       "max_rewrite_ms": 0.1,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "render": {
+     "calls": 238,
+     "triangles": 1776160,
+     "programs": 176,
+     "textures": 220,
+     "geometries": 470
+    }
+   }
+  ],
+  "before": {
+   "forest": {
+    "tree_lock": true,
+    "zone_family": {
+     "FOREST_W": "purple",
+     "FOREST_NW": "red",
+     "FOREST_NE": "blue",
+     "FOREST_N_W": "red",
+     "FOREST_N_E": "gold",
+     "BAGE_GARDEN_W": "pink",
+     "BAGE_GARDEN_E": "pink"
+    },
+    "trees": 121,
+    "lod_counts": {
+     "L0": 1,
+     "L1": 120,
+     "IMPOSTOR": 0
+    },
+    "source_tiers": {
+     "near": "L0",
+     "far": "L1"
+    },
+    "same_material_all_tiers": true,
+    "runtime_impostor": false,
+    "impostor": false,
+    "runtime_bake_ms": 0,
+    "draw_calls": 9,
+    "zone_chunks": [
+     {
+      "zone": "BAGE_GARDEN_E",
+      "trees": 2,
+      "L0": 0,
+      "L1": 2
+     },
+     {
+      "zone": "BAGE_GARDEN_W",
+      "trees": 2,
+      "L0": 0,
+      "L1": 2
+     },
+     {
+      "zone": "FOREST_NE",
+      "trees": 30,
+      "L0": 0,
+      "L1": 30
+     },
+     {
+      "zone": "FOREST_NW",
+      "trees": 30,
+      "L0": 0,
+      "L1": 30
+     },
+     {
+      "zone": "FOREST_N_E",
+      "trees": 15,
+      "L0": 0,
+      "L1": 15
+     },
+     {
+      "zone": "FOREST_N_W",
+      "trees": 15,
+      "L0": 0,
+      "L1": 15
+     },
+     {
+      "zone": "FOREST_W",
+      "trees": 27,
+      "L0": 1,
+      "L1": 26
+     }
+    ],
+    "lod_m": {
+     "near": 26,
+     "mid": null
+    },
+    "hysteresis_m": 4,
+    "triangles_per_tree": {
+     "L0": 14792,
+     "L1": 7392
+    },
+    "rendered_tree_triangles": 901832,
+    "family_samples": [
+     {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L1",
+      "color": "#8b67d2"
+     },
+     {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L1",
+      "color": "#c93146"
+     },
+     {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L1",
+      "color": "#2958da"
+     },
+     {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L1",
+      "color": "#d6b562"
+     },
+     {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L1",
+      "color": "#e986b3"
+     }
+    ],
+    "lifecycle": {
+     "transitions": 188,
+     "rewrites": 26,
+     "timing_ms": {
+      "build_ms": 7144.1,
+      "assemble_ms": 1.9,
+      "first_classify_ms": 0.2,
+      "first_rewrite_ms": 0.1,
+      "last_classify_ms": 0,
+      "max_classify_ms": 0.2,
+      "last_rewrite_ms": 0.1,
+      "max_rewrite_ms": 0.1,
+      "runtime_bake_ms": 0
+     },
+     "resources": {
+      "materials": 1,
+      "geometries": 2,
+      "render_targets": 0
+     }
+    },
+    "height_m": [
+     9.27,
+     14.73
+    ],
+    "underbrush": 121,
+    "night": true,
+    "skipped": null
+   },
+   "forest_build_ms": 7145,
+   "render": {
+    "calls": 174,
+    "triangles": 675609,
+    "programs": 176,
+    "textures": 219,
+    "geometries": 469
+   },
+   "camera": {
+    "x": -49.967530913199916,
+    "y": 4.957697658311355,
+    "z": -4.599999999999998
+   }
+  },
+  "after": {
+   "forest": {
+    "tree_lock": true,
+    "zone_family": {
+     "FOREST_W": "purple",
+     "FOREST_NW": "red",
+     "FOREST_NE": "blue",
+     "FOREST_N_W": "red",
+     "FOREST_N_E": "gold",
+     "BAGE_GARDEN_W": "pink",
+     "BAGE_GARDEN_E": "pink"
+    },
+    "trees": 121,
+    "lod_counts": {
+     "L0": 4,
+     "L1": 117,
+     "IMPOSTOR": 0
+    },
+    "source_tiers": {
+     "near": "L0",
+     "far": "L1"
+    },
+    "same_material_all_tiers": true,
+    "runtime_impostor": false,
+    "impostor": false,
+    "runtime_bake_ms": 0,
+    "draw_calls": 9,
+    "zone_chunks": [
+     {
+      "zone": "BAGE_GARDEN_E",
+      "trees": 2,
+      "L0": 0,
+      "L1": 2
+     },
+     {
+      "zone": "BAGE_GARDEN_W",
+      "trees": 2,
+      "L0": 0,
+      "L1": 2
+     },
+     {
+      "zone": "FOREST_NE",
+      "trees": 30,
+      "L0": 0,
+      "L1": 30
+     },
+     {
+      "zone": "FOREST_NW",
+      "trees": 30,
+      "L0": 0,
+      "L1": 30
+     },
+     {
+      "zone": "FOREST_N_E",
+      "trees": 15,
+      "L0": 4,
+      "L1": 11
+     },
+     {
+      "zone": "FOREST_N_W",
+      "trees": 15,
+      "L0": 0,
+      "L1": 15
+     },
+     {
+      "zone": "FOREST_W",
+      "trees": 27,
+      "L0": 0,
+      "L1": 27
+     }
+    ],
+    "lod_m": {
+     "near": 26,
+     "mid": null
+    },
+    "hysteresis_m": 4,
+    "triangles_per_tree": {
+     "L0": 14792,
+     "L1": 7392
+    },
+    "rendered_tree_triangles": 924032,
+    "family_samples": [
+     {
+      "index": 0,
+      "id": "FOREST_W_T000",
+      "zone": "FOREST_W",
+      "family": "purple",
+      "x": -89.91,
+      "z": -4.6,
+      "tier": "L1",
+      "color": "#8b67d2"
+     },
+     {
+      "index": 27,
+      "id": "FOREST_NW_T000",
+      "zone": "FOREST_NW",
+      "family": "red",
+      "x": -66.02,
+      "z": 188.7,
+      "tier": "L1",
+      "color": "#c93146"
+     },
+     {
+      "index": 57,
+      "id": "FOREST_NE_T000",
+      "zone": "FOREST_NE",
+      "family": "blue",
+      "x": 148.03,
+      "z": 193.69,
+      "tier": "L1",
+      "color": "#2958da"
+     },
+     {
+      "index": 102,
+      "id": "FOREST_N_E_T000",
+      "zone": "FOREST_N_E",
+      "family": "gold",
+      "x": 105.54,
+      "z": 271.72,
+      "tier": "L0",
+      "color": "#d6b562"
+     },
+     {
+      "index": 117,
+      "id": "BAGE_GARDEN_W_T000",
+      "zone": "BAGE_GARDEN_W",
+      "family": "pink",
+      "x": -51.9,
+      "z": 248,
+      "tier": "L1",
+      "color": "#e986b3"
+     }
+    ],
+    "lifecycle": {
+     "transitions": 239,
+     "rewrites": 37,
+     "timing_ms": {
+      "build_ms": 7144.1,
+      "assemble_ms": 1.9,
+      "first_classify_ms": 0.2,
+      "first_rewrite_ms": 0.1,
+      "last_classify_ms": 0,
+      "max_classify_ms": 0.2,
+      "last_rewrite_ms": 0,
+      "max_rewrite_ms": 0.1,
+      "runtime_bake_ms": 0
+     },
+     "resources": {
+      "materials": 1,
+      "geometries": 2,
+      "render_targets": 0
+     }
+    },
+    "height_m": [
+     9.27,
+     14.73
+    ],
+    "underbrush": 121,
+    "night": true,
+    "skipped": null
+   },
+   "forest_build_ms": 7145,
+   "render": {
+    "calls": 238,
+    "triangles": 1776160,
+    "programs": 176,
+    "textures": 220,
+    "geometries": 470
+   },
+   "camera": {
+    "x": 123.54556851502045,
+    "y": 5.4576976583113535,
+    "z": 271.71999999999997
+   }
+  },
+  "stable_programs": true,
+  "stable_tree_resources": true,
+  "global_textures_note": "changed while travelling (whole-world counter, not attributed to forest)",
+  "global_geometries_note": "changed while travelling (whole-world counter, not attributed to forest)"
+ },
+ "screenshots": [
+  "M5C_NIGHT_DESKTOP_01_gold_far_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_01_gold_boundary_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_01_gold_near_immediate.png",
+  "M5C_NIGHT_DESKTOP_01_gold_boundary_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_01_gold_far_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_02_blue_far_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_02_blue_boundary_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_02_blue_near_immediate.png",
+  "M5C_NIGHT_DESKTOP_02_blue_boundary_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_02_blue_far_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_03_red_far_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_03_red_boundary_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_03_red_near_immediate.png",
+  "M5C_NIGHT_DESKTOP_03_red_boundary_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_03_red_far_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_04_pink_far_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_04_pink_boundary_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_04_pink_near_immediate.png",
+  "M5C_NIGHT_DESKTOP_04_pink_boundary_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_04_pink_far_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_05_purple_far_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_05_purple_boundary_in_immediate.png",
+  "M5C_NIGHT_DESKTOP_05_purple_near_immediate.png",
+  "M5C_NIGHT_DESKTOP_05_purple_boundary_out_immediate.png",
+  "M5C_NIGHT_DESKTOP_05_purple_far_out_immediate.png"
+ ],
+ "errors": [],
+ "expected_fallback_errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/favicon.ico>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.1/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.13/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.12/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.11/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.10/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.9/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.7/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.6/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.5/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.4/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.3/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:54189/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.2/manifest.json>"
+ ],
+ "observed_sky": "NIGHT"
+}

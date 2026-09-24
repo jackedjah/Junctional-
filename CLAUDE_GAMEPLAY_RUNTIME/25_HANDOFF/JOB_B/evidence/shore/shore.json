@@ -1,0 +1,42 @@
+{
+ "coast": {
+  "islands": 5,
+  "draw_calls": 12,
+  "tris": 13644,
+  "sea_y": -0.3,
+  "beach_w": 34,
+  "outline": {
+   "x1": -203,
+   "z1": -86,
+   "x2": 203,
+   "z2": 322,
+   "corner_r": 70
+  },
+  "foam_lines": 6,
+  "night": false
+ },
+ "water": {
+  "supported": true,
+  "enabled": true,
+  "tier": "HIGH",
+  "n": 256,
+  "size_m": 48,
+  "grid": 96,
+  "texel_m": 0.188,
+  "c2": 0.09,
+  "damp": 0.99,
+  "amp_m": 0.07,
+  "ring_speed_mps": 3.94,
+  "impulses": 0,
+  "dropped": 0,
+  "steps": 1622,
+  "active": true,
+  "in_water": false,
+  "pending": 0,
+  "origin": [
+   -39.9375,
+   204.75
+  ],
+  "error": null
+ }
+}

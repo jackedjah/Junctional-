@@ -1,0 +1,56 @@
+{
+ "schema": "mahworld.class_stats.v0",
+ "classification": "EXPERIMENTAL",
+ "_doc": "OWNER INTERJECTION 2026-09-18 §5.3 / §17 (phase F): the canonical five-stat family as a UI + DATA CONTRACT ONLY. Nothing here changes combat: the rules field never reads this file (no live rebalance), no points are awarded in the demo, allocation exists only as a labelled PREVIEW without persistence or rewards. Values are 0–999 integers.",
+ "family": ["FORCE", "POWER", "ENGINE", "CONTROL", "RESILIENCE"],
+ "max": 999,
+ "descriptions": {
+  "FORCE": "raw strength output (canon identity: Titan maximum force)",
+  "POWER": "explosive output (canon identity: Titan power, Athlete explosive all-round athleticism / power)",
+  "ENGINE": "endurance / efficiency (canon identity: Lean speed / endurance / efficient movement)",
+  "CONTROL": "coordination / balance (canon identity: Athlete coordination / control, Bage control / balance)",
+  "RESILIENCE": "toughness / recovery (canon identity: Titan resilience)"
+ },
+ "class_baselines": {
+  "_status": "SOURCE_NOT_FOUND",
+  "_doc": "the canonical numeric baselines live in the 'MAHWORLD Fitness Class Archetypes' source / class registry named by the owner. That source is NOT on this machine (searched 2026-09-19: Downloads/MAHWORLD_CHARACTERS, Downloads/MAHWORLD_CLAUDE_CHARACTER, Documents/Codex/2026-09-12; only the canon's IDENTITY sentences exist — CLAUDE_GAMEPLAY_FOUNDATION/00_CANON/MAHWORLD_GAMEPLAY_CANON.md §2 and 04_CLASS_LOADOUTS/CLASS_MOVEMENT_PATTERN_MATRIX.md §1). Numbers are never invented: every class reads null until the owner points at the file; the panel then shows 'class baseline: source not found'.",
+  "identity_source": "CLAUDE_GAMEPLAY_FOUNDATION/00_CANON/MAHWORLD_GAMEPLAY_CANON.md §2 (text identities, no numbers)",
+  "ATHLETE": null,
+  "TITAN": null,
+  "LEAN": null,
+  "BAGE": null,
+  "VISIONARY": null
+ },
+ "identities": {
+  "ATHLETE": "explosive all-round athleticism / power / coordination / control",
+  "TITAN": "maximum force / strength / resilience / power",
+  "LEAN": "lightweight, low unnecessary mass, speed / endurance / efficient movement",
+  "BAGE": "Balance Mage: magic-oriented, control / balance, buff / support stronger than the physically dominant classes",
+  "VISIONARY": "functional training / CrossFit / fighting-community influence"
+ },
+ "points_per_level": {
+  "value": null,
+  "candidates": [3, 4],
+  "status": "OWNER_DECISION",
+  "_doc": "points earned per level is UNRESOLVED between 3 and 4 (owner interjection §5.3). ONE centralized provisional entry; never hard-coded as canon anywhere else. The preview shows both totals side by side."
+ },
+ "allocation": {
+  "live": false,
+  "preview_only": true,
+  "_doc": "no real points are awarded in the current demo; the panel's PREVIEW mode exercises allocation (+ / −, cap 999) without persistence, rewards or any effect on the host. Live leveling waits for the effect formulas / fairness policy."
+ },
+ "competitive_fairness": {
+  "question": "Q07",
+  "status": "UNRESOLVED",
+  "_doc": "equal-stat vs earned-stat organized PvP is not decided by this UI pass"
+ },
+ "progression": {
+  "_doc": "the branching presentation (owner interjection §5.2): built from the ACTUAL current attack stacks and bands; every node that is not the current FOUNDATION band is FUTURE / LOCKED and never grantable from the panel; no unlock requirement is invented (only the band levels that already exist in the ruleset are shown).",
+  "branches": [
+   { "id": "PHYSICAL", "label": "PHYSICAL-biased development", "status": "FUTURE", "requirement": null },
+   { "id": "MAHGIC", "label": "MAHGIC-biased development", "status": "FUTURE", "requirement": null },
+   { "id": "HYBRID", "label": "HYBRID development", "status": "FUTURE", "requirement": null },
+   { "id": "CLASS", "label": "class-specific branches and skill acquisitions", "status": "FUTURE", "requirement": "class future concepts from the ruleset (attack_stacks.future_concepts) appear here as FUTURE nodes" }
+  ]
+ }
+}

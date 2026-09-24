@@ -1,0 +1,91 @@
+{
+ "export_id": "ATHLETE_M_RIGGED_MOBILE",
+ "version": "dev_0.3",
+ "sha256": "303a7ad3946aed7c28a72d509a399f2f542bfd0f1396d7852020a4c5e3472afd",
+ "owner_review_status": "CANDIDATE",
+ "preview_status": "DEVELOPMENT_PREVIEW_UNAPPROVED (mobile texture variant: textures downscaled from 8192² to 2048² (base colour, JPEG q0.86) / 2048² (normal map, JPEG q0.9) for phone load; derived from dev_0.2 sha 1f3fbc345bee0557… by browser-canvas resampling; geometry, skin weights, skeleton and material unchanged; derivative auto-rig over the Tripo source; not a retained or production character; the Astra head / eye cleanup (AM08 retained base, AM19 in progress) is NOT included because no export exists)",
+ "source_release": "isolated derivative of RAW_10_MODELS/Mah_Athlete_M.glb (sha256 7b023694ea924b86128ff2e1ae3b64157491c1d5b11805b9d4d2b68131592b63) with the authentic base-colour + normal textures embedded and a 17-joint derivative skeleton + skin weights added",
+ "units": "metres",
+ "up_axis": "+Y",
+ "forward_axis": "-Z",
+ "source_forward_axis": "+Z",
+ "root": "ROOT",
+ "scale_to_metres": 1.82461,
+ "source_height_units": 0.9865,
+ "forms": [
+  "FUSED"
+ ],
+ "clips": {},
+ "sockets": {
+  "ROOT": "ROOT",
+  "HEAD": "HEAD",
+  "CHEST": "CHEST",
+  "HAND_L": "HAND_L",
+  "HAND_R": "HAND_R",
+  "FEET": "TAIL3"
+ },
+ "materials": {
+  "ATHLETE_M_SOURCE_PBR": "source base colour + normal map (embedded JPEG)"
+ },
+ "files": [
+  "Mah_Athlete_M_rigged_mobile.glb"
+ ],
+ "joints": [
+  "ROOT",
+  "PELVIS",
+  "SPINE",
+  "CHEST",
+  "NECK",
+  "HEAD",
+  "CLAV_L",
+  "UPPERARM_L",
+  "FOREARM_L",
+  "HAND_L",
+  "CLAV_R",
+  "UPPERARM_R",
+  "FOREARM_R",
+  "HAND_R",
+  "TAIL1",
+  "TAIL2",
+  "TAIL3"
+ ],
+ "weight_stats": [
+  "ROOT:0",
+  "PELVIS:1654",
+  "SPINE:1359",
+  "CHEST:3388",
+  "NECK:511",
+  "HEAD:1054",
+  "CLAV_L:200",
+  "UPPERARM_L:585",
+  "FOREARM_L:503",
+  "HAND_L:1067",
+  "CLAV_R:191",
+  "UPPERARM_R:623",
+  "FOREARM_R:485",
+  "HAND_R:1046",
+  "TAIL1:1447",
+  "TAIL2:166",
+  "TAIL3:101"
+ ],
+ "limitations": [
+  "derivative auto-rig: joint placement measured from cross-sections, smooth distance weights (not hand-painted)",
+  "no separated-leg geometry / PACKED morph in the source: SPLIT anatomy cannot be shown",
+  "no eye or lid geometry: blinks / gaze are not possible",
+  "no authored clips: all motion is procedural on the derivative bones",
+  "textures are the source JPEGs (about 11 MB total)",
+  "textures resampled in the browser canvas (bilinear/high-quality smoothing), not a mip-aware filter; fine crystal micro-detail from the 8192² source is softened at 2048²"
+ ],
+ "generated": "2026-09-15T06:22:33.693Z",
+ "derived_from": {
+  "export_id": "ATHLETE_M_RIGGED_PREVIEW",
+  "version": "dev_0.2",
+  "sha256": "1f3fbc345bee0557cc35354701e3e3d7ba8948e810159be440aaec4ee2346a63",
+  "file": "Mah_Athlete_M_rigged.glb"
+ },
+ "textures": {
+  "base_color": "2048x2048 jpeg q0.86",
+  "normal": "2048x2048 jpeg q0.9",
+  "source": "8192x8192 jpeg (both)"
+ }
+}

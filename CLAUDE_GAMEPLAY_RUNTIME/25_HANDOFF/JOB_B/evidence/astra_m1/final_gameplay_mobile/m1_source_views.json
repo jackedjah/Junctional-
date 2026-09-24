@@ -1,0 +1,65 @@
+{
+ "label": "astra_m1_final_mobile",
+ "mobile": true,
+ "dist": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "shots": [
+  "tree_gameplay_day",
+  "tree_gameplay_night",
+  "dogkie_gameplay_day",
+  "dogkie_gameplay_night",
+  "temple_gameplay_day",
+  "temple_gameplay_night"
+ ],
+ "forest_perf": {
+  "frame_ms_mean": 13.108,
+  "frame_ms_p50": 9.3,
+  "frame_ms_p95": 13.7,
+  "calls": 123,
+  "triangles": 602008,
+  "geometries": 326,
+  "textures": 124,
+  "forest": {
+   "tree_lock": true,
+   "zone_family": {
+    "FOREST_W": "purple",
+    "FOREST_NW": "red",
+    "FOREST_NE": "blue",
+    "FOREST_N_W": "red",
+    "FOREST_N_E": "gold"
+   },
+   "trees": 125,
+   "lod_counts": {
+    "L0": 17,
+    "L1": 7,
+    "IMPOSTOR": 101
+   },
+   "impostor": true,
+   "draw_calls": 4,
+   "lod_m": {
+    "near": 26,
+    "mid": 60
+   },
+   "height_m": [
+    9.27,
+    14.73
+   ],
+   "underbrush": 125,
+   "night": false,
+   "skipped": null
+  }
+ },
+ "dogkie": {
+  "id": "WILD_DOGKIE_05",
+  "x": -141.79,
+  "z": 4.826,
+  "state": "IDLE"
+ },
+ "renderer": {
+  "calls": 162,
+  "triangles": 463608,
+  "programs": 166,
+  "geometries": 358,
+  "textures": 148
+ },
+ "errors": []
+}

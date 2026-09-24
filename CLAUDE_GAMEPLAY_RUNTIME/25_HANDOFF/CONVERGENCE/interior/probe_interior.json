@@ -1,0 +1,660 @@
+{
+ "checks": [
+  "PASS H1 the host refuses the gym interior away from its door (NOT_AT_DOOR) — no teleport into interiors — {\"command_id\":\"play-PLAYER_A-83s6r4-1\",\"seq\":1,\"accepted\":false,\"version\":99,\"tick\":97,\"duplicate\":false,\"reason\":\"NOT_AT_DOOR\",\"detail\":{\"door\":\"GYM_DOOR\",\"distance_m\":136.5}}",
+  "PASS E1 at the MAH GYM door the contextual prompt is ENTER (id GYM_DOOR, eligible) and the field draws the threshold pad — {\"prompt\":{\"intent\":\"ENTER\",\"id\":\"GYM_DOOR\",\"to\":\"GYM_INTERIOR\",\"label\":\"MAH GYM — enter\",\"eligible\":true},\"pos\":{\"x\":-84.2,\"z\":109.711},\"reached\":true}",
+  "PASS E2 CANCEL: the confirm sheet opened (it owns input), CANCEL leaves the player at the door in FIELD with no fade and a CANCEL log entry — {\"during\":true,\"after\":\"FIELD\",\"res\":{\"accepted\":false,\"reason\":\"CANCELLED\"},\"log\":[\"CANCEL\"]}",
+  "PASS E3 ENTER accepted: the curtain was up while the host switched rooms (fade_on during), the transaction log runs START → HOST_ACK:true → END:ok, the player stands in GYM_INTERIOR at its spawn with the curtain cleared (opacity 0) — {\"res\":{\"accepted\":true,\"room\":\"GYM_INTERIOR\",\"total_ms\":580,\"via\":\"ENTER\",\"camera_before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":2.5350000000451263},\"camera_after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":0.8541173752728858},\"camera_change\":{\"mode_before\":\"follow\",\"yaw_before\":2.535000000008543,\"old_behind\":2.5350000000000033,\"new_behind\":0,\"mode_after\":\"follow\",\"yaw_after\":0,\"relative_kept\":null}},\"mid_fade\":true,\"in\":{\"room\":\"GYM_INTERIOR\",\"pos\":{\"x\":0,\"z\":9.5},\"fade\":\"0\"},\"log\":[\"CANCEL\",\"START\",\"FADE_OUT_DONE\",\"HOST_ACK:true\",\"READY\",\"END\"]}",
+  "PASS E4 warm entry adds no loading card: readiness came before the 350 ms stage line (no SLOW_STAGE_SHOWN); the time is the two fixed fades (220 + 220 ms), not waiting: host 1 ms, scene preparation 116 ms, total 580 ms — {\"fade_out_ms\":220,\"host_ms\":1,\"prepare_ms\":116,\"scene_build_ms\":6.1,\"fade_in_ms\":220,\"total_ms\":580}",
+  "PASS E5 the interior is the ONE visible scene: no build error, the wall solids feed the camera probe, the field is hidden (visible mesh count is the hall, not the district) — {\"error\":null,\"boom\":true,\"visible_meshes\":111}",
+  "PASS E6 flight inside is allowed but capped by the hall ceiling (3.2 m): powered after ENTER + ASCEND, height above ground ≤ 3.3 m after 2.5 s; EXIT lands — {\"enter\":true,\"fly\":{\"powered\":true,\"altitude\":3.2,\"height\":3.2},\"after_exit\":{\"powered\":false,\"height\":0}}",
+  "PASS E7 standing at the doorway wall facing into the hall, the rear camera boom shortens against the wall behind (applied < preferred) — {\"dist\":6.474795594385649,\"applied\":1.9833629181104258}",
+  "PASS E8 at the hall doorway the prompt is the labelled EXIT (ENTER_ROOM → FIELD) — {\"intent\":\"ENTER_ROOM\",\"to\":\"FIELD\",\"label\":\"EXIT — MAH GYM doorway\",\"eligible\":true}",
+  "PASS E9 EXIT returns to the SAME doorway outside (within 0.35 m of the door point, facing away from the building = +x), curtain cleared, the district rebuilt — {\"res\":{\"accepted\":true,\"room\":\"FIELD\",\"total_ms\":727,\"via\":\"ENTER_ROOM\",\"camera_before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":6.283089938259231},\"camera_after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":-1.3992341618154907},\"camera_change\":{\"mode_before\":\"follow\",\"yaw_before\":6.283166185155702,\"old_behind\":6.283185224896633,\"new_behind\":-1.571,\"mode_after\":\"follow\",\"yaw_after\":-1.571,\"relative_kept\":null}},\"pos\":{\"x\":-86,\"z\":110},\"facing\":1.571,\"door\":{\"x\":-86,\"z\":110}}",
+  "PASS E10 a second room change issued during the running transaction was refused (TRANSACTION_IN_PROGRESS) — no duplicate scene or double transaction — {\"accepted\":false,\"reason\":\"TRANSACTION_IN_PROGRESS\"}",
+  "PASS E11 REPEAT: enter again from the doorway and exit again — both accepted, the interior mesh count is identical to the first entry, the doorway return is exact again — {\"enter\":true,\"meshes_first\":111,\"meshes_repeat\":111,\"out\":{\"x\":-86,\"z\":110},\"meshes_out\":[295,292]}",
+  "PASS K1 rear-follow entry / exit: the mode was FOLLOW before entry, FOLLOW after the reveal and FOLLOW after the exit (the follow target was re-expressed under the curtain, no reset) — {\"enter\":{\"before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":2.5350000000451263},\"after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":0.8541173752728858}},\"exit_after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":-1.3992341618154907}}",
+  "PASS K2 manual-orbit entry: the mode was ORBIT before entry and is still ORBIT after the reveal — the dragged angle relative to his back is preserved (-72.4 deg before, -72.45 deg inside), no recenter — {\"before\":{\"state\":\"ORBIT\",\"err_deg\":-72.4},\"inside\":{\"state\":\"ORBIT\",\"err_deg\":-72.45},\"change\":{\"mode_before\":\"orbit\",\"yaw_before\":-0.30744332497088633,\"old_behind\":4.7121853523653465,\"new_behind\":0,\"mode_after\":\"orbit\",\"yaw_after\":1.263556629843354,\"relative_kept\":72.4}}",
+  "PASS K3 manual-orbit exit: still ORBIT after the exit, and the angle relative to his back that he had at the doorway (107.58 deg — it differs from the entry value because he turned round inside while the orbit stayed put, O1) is the angle after the exit (107.57 deg); the manual mode was never erased or recentred by a room change — {\"at_exit\":{\"state\":\"ORBIT\",\"err_deg\":107.58},\"out\":{\"state\":\"ORBIT\",\"err_deg\":107.57}}",
+  "PASS Z1 zero page / console errors through the gym transactions — []",
+  "PASS F1 FAILURE path: the interior build failed (injected), the transaction reported SCENE_FAILED and recovered to FIELD at the doorway, the curtain is cleared and the field is rebuilt (no black screen, no stale interior) — {\"res\":{\"accepted\":false,\"reason\":\"SCENE_FAILED\",\"detail\":\"INTERIOR_BUILD_FAILED (GYM_INTERIOR) — fault injection\",\"recovered_to\":\"FIELD\"},\"state\":{\"room\":\"FIELD\",\"pos\":{\"x\":-86,\"z\":110},\"fade\":false,\"build_error\":null},\"log\":[\"START\",\"FADE_OUT_DONE\",\"HOST_ACK:true\",\"READY\",\"SCENE_FAILED\",\"RECOVER_ACK:true\",\"END\"]}",
+  "PASS S1 SLOW path (1.5 s injected): the curtain shows the room name and a real stage line (\"preparing the hall · N s\", no percentage), the entry still completes and the curtain clears — {\"stage\":{\"title\":\"MAH GYM — training hall (interior)\",\"stage\":\"preparing the hall · 0.8 s\",\"on\":true},\"res\":{\"accepted\":true,\"room\":\"GYM_INTERIOR\",\"total_ms\":1974,\"via\":\"ENTER\",\"camera_before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":2.530999999999998},\"camera_after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":0.000486043838179907},\"camera_change\":{\"mode_before\":\"follow\",\"yaw_before\":2.530999999999998,\"old_behind\":2.5309999999999993,\"new_behind\":0,\"mode_after\":\"follow\",\"yaw_after\":0,\"relative_kept\":null}},\"log\":[\"START\",\"FADE_OUT_DONE\",\"HOST_ACK:true\",\"SLOW_STAGE_SHOWN\",\"READY\",\"END\"]}",
+  "PASS C1 CLOTHING SHOP: the door prompt (CLOTHING_DOOR) enters the finished interior (touch-emulated portrait), the counter prompt is BROWSE, the catalog panel is the registry’s empty state — 0 items, \"NO STOCK YET\", status ZERO_STOCK, the only control is CLOSE (no purchase, no price, no item) — {\"prompt\":{\"intent\":\"ENTER\",\"id\":\"CLOTHING_DOOR\",\"to\":\"CLOTHING_SHOP\",\"label\":\"MAH MARKET — clothing\",\"eligible\":true},\"enter\":true,\"browse\":{\"intent\":\"BROWSE\",\"id\":\"CLOTHING_COUNTER\",\"label\":\"BROWSE — apparel catalog\",\"eligible\":true},\"catalog\":{\"open\":true,\"text\":\"MAH MARKET — clothingAPPARELNO STOCK YET · 0 itemscatalog empty by design — apparel art and fit are a later owner decisionstatus ZERO_STOCK · purchase disabled no economyCLOSE\",\"buttons\":[\"CLOSE\"]}}",
+  "PASS C2 the shop EXIT lands on the clothing door outside the market (within 0.35 m), facing away (−z) — {\"res\":{\"accepted\":true,\"room\":\"FIELD\",\"total_ms\":1896,\"via\":\"ENTER_ROOM\",\"camera_before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":-3.1229999994646604},\"camera_after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":-0.3416346796310872},\"camera_change\":{\"mode_before\":\"follow\",\"yaw_before\":-3.1229999999119213,\"old_behind\":3.160185307179592,\"new_behind\":0,\"mode_after\":\"follow\",\"yaw_after\":0,\"relative_kept\":null}},\"pos\":{\"x\":-4,\"z\":243.5},\"facing\":0}",
+  "PASS C3 WEAPON SHOP: entered through WEAPON_DOOR (portrait, touch emulated), gameplay view captured, the counter BROWSE shows the zero-stock weapon catalog (0 items, no purchase), the exit lands on the weapon door — {\"enter\":true,\"browse\":{\"accepted\":true,\"browse\":\"SHOP_WEAPONS\"},\"catalog\":{\"open\":true,\"text\":\"MAH MARKET — weaponsWEAPONSNO STOCK YET · 0 itemscatalog empty by design — weapon gameplay stays dormant until design approvalstatus ZERO_STOCK · purchase disabled no economyCLOSE\"},\"out\":{\"x\":4,\"z\":243.5}}",
+  "PASS Z2 zero page / console errors through the shop transaction (portrait, touch emulated) — []"
+ ],
+ "out": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\probe_out\\interior",
+ "transactions": [
+  {
+   "name": "gym_enter",
+   "res": {
+    "accepted": true,
+    "room": "GYM_INTERIOR",
+    "total_ms": 580,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 2.5350000000451263
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.8541173752728858
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 2.535000000008543,
+     "old_behind": 2.5350000000000033,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "log": [
+    "CANCEL",
+    "START",
+    "FADE_OUT_DONE",
+    "HOST_ACK:true",
+    "READY",
+    "END"
+   ],
+   "wall_ms": 1549
+  },
+  {
+   "name": "gym_exit",
+   "res": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 727,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 6.283089938259231
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": -1.3992341618154907
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 6.283166185155702,
+     "old_behind": 6.283185224896633,
+     "new_behind": -1.571,
+     "mode_after": "follow",
+     "yaw_after": -1.571,
+     "relative_kept": null
+    }
+   },
+   "dup": {
+    "accepted": false,
+    "reason": "TRANSACTION_IN_PROGRESS"
+   },
+   "log": [
+    "READY",
+    "END",
+    "START",
+    "DUPLICATE_REFUSED",
+    "FADE_OUT_DONE",
+    "HOST_ACK:true",
+    "READY",
+    "END"
+   ]
+  },
+  {
+   "name": "gym_enter_orbit",
+   "res": {
+    "accepted": true,
+    "room": "GYM_INTERIOR",
+    "total_ms": 509,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "orbit",
+     "state": "ORBIT",
+     "yaw": -0.30744332497088633
+    },
+    "camera_after": {
+     "mode": "orbit",
+     "state": "ORBIT",
+     "yaw": 1.263556629843354
+    },
+    "camera_change": {
+     "mode_before": "orbit",
+     "yaw_before": -0.30744332497088633,
+     "old_behind": 4.7121853523653465,
+     "new_behind": 0,
+     "mode_after": "orbit",
+     "yaw_after": 1.263556629843354,
+     "relative_kept": 72.4
+    }
+   },
+   "before": {
+    "yaw": -0.30744332497088633,
+    "pitch": 0.25,
+    "behind": 4.712206849650909,
+    "err_deg": -72.4,
+    "back_dot": 0.30319469420796297,
+    "back_err_deg": 72.35,
+    "last_err_deg": -72.4,
+    "yaw_vel": 0,
+    "applied": 6.474795594385649,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0,
+    "obstructed": false,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 269.99,
+    "latch": null,
+    "cfg": {
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": -87.90289272022083,
+     "y": 3.1062483232365223,
+     "z": 115.97179007402971
+    },
+    "inside": null,
+    "below_ground": false
+   },
+   "inside": {
+    "yaw": 1.263556629843354,
+    "pitch": 0.25,
+    "behind": 6.282307317933977,
+    "err_deg": -72.45,
+    "back_dot": 0.3015917571445039,
+    "back_err_deg": 72.45,
+    "last_err_deg": -72.45,
+    "yaw_vel": 0,
+    "applied": 6.474795594385649,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0,
+    "obstructed": false,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 359.95,
+    "latch": null,
+    "cfg": {
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": 5.979705783445625,
+     "y": 3.1066260238476278,
+     "z": 11.397280810857795
+    },
+    "inside": null,
+    "below_ground": false
+   },
+   "at_exit": {
+    "yaw": 1.263556629843354,
+    "pitch": 0.25,
+    "behind": 9.42436875742362,
+    "err_deg": 107.58,
+    "back_dot": -0.302038384382224,
+    "back_err_deg": 107.58,
+    "last_err_deg": 107.58,
+    "yaw_vel": 0,
+    "applied": 6.474795594385649,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0,
+    "obstructed": false,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 539.98,
+    "latch": null,
+    "cfg": {
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": 5.979705783445625,
+     "y": 3.1066260238476278,
+     "z": 13.074278102039438
+    },
+    "inside": null,
+    "below_ground": false
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 771,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "orbit",
+     "state": "ORBIT",
+     "yaw": 1.263556629843354
+    },
+    "camera_after": {
+     "mode": "orbit",
+     "state": "ORBIT",
+     "yaw": -3.448628621344593
+    },
+    "camera_change": {
+     "mode_before": "orbit",
+     "yaw_before": 1.263556629843354,
+     "old_behind": 9.424370558367533,
+     "new_behind": -1.571,
+     "mode_after": "orbit",
+     "yaw_after": -3.448628621344593,
+     "relative_kept": -107.6
+    }
+   },
+   "out": {
+    "yaw": -3.448628621344593,
+    "pitch": 0.25,
+    "behind": 10.995150132505012,
+    "err_deg": 107.57,
+    "back_dot": -0.30305580403175125,
+    "back_err_deg": 107.64,
+    "last_err_deg": 107.57,
+    "yaw_vel": 0,
+    "applied": 6.474795594385649,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0,
+    "obstructed": false,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 629.98,
+    "latch": null,
+    "cfg": {
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": -84.08632860891784,
+     "y": 3.1066260238476278,
+     "z": 103.99967338594689
+    },
+    "inside": null,
+    "below_ground": false
+   }
+  },
+  {
+   "name": "gym_enter_failure",
+   "res": {
+    "accepted": false,
+    "reason": "SCENE_FAILED",
+    "detail": "INTERIOR_BUILD_FAILED (GYM_INTERIOR) — fault injection",
+    "recovered_to": "FIELD"
+   },
+   "log": [
+    "START",
+    "FADE_OUT_DONE",
+    "HOST_ACK:true",
+    "READY",
+    "SCENE_FAILED",
+    "RECOVER_ACK:true",
+    "END"
+   ]
+  },
+  {
+   "name": "gym_enter_slow",
+   "res": {
+    "accepted": true,
+    "room": "GYM_INTERIOR",
+    "total_ms": 1974,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 2.530999999999998
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.000486043838179907
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 2.530999999999998,
+     "old_behind": 2.5309999999999993,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "stage": {
+    "title": "MAH GYM — training hall (interior)",
+    "stage": "preparing the hall · 0.8 s",
+    "on": true
+   },
+   "log": [
+    "START",
+    "FADE_OUT_DONE",
+    "HOST_ACK:true",
+    "SLOW_STAGE_SHOWN",
+    "READY",
+    "END"
+   ]
+  }
+ ],
+ "door_prompt": {
+  "intent": "ENTER",
+  "id": "GYM_DOOR",
+  "to": "GYM_INTERIOR",
+  "label": "MAH GYM — enter",
+  "eligible": true
+ },
+ "enter_phases": {
+  "fade_out_ms": 220,
+  "host_ms": 1,
+  "prepare_ms": 116,
+  "scene_build_ms": 6.1,
+  "fade_in_ms": 220,
+  "total_ms": 580
+ },
+ "shop": {
+  "door_prompt": {
+   "intent": "ENTER",
+   "id": "CLOTHING_DOOR",
+   "to": "CLOTHING_SHOP",
+   "label": "MAH MARKET — clothing",
+   "eligible": true
+  },
+  "enter": {
+   "accepted": true,
+   "room": "CLOTHING_SHOP",
+   "total_ms": 689,
+   "via": "ENTER",
+   "camera_before": {
+    "mode": "follow",
+    "state": "FOLLOW",
+    "yaw": 3.4361853071795863
+   },
+   "camera_after": {
+    "mode": "follow",
+    "state": "FOLLOW",
+    "yaw": -0.8186341838698736
+   },
+   "camera_change": {
+    "mode_before": "follow",
+    "yaw_before": 3.4361853071795863,
+    "old_behind": 3.4361853071795867,
+    "new_behind": 0,
+    "mode_after": "follow",
+    "yaw_after": 0,
+    "relative_kept": null
+   }
+  },
+  "browse_prompt": {
+   "intent": "BROWSE",
+   "id": "CLOTHING_COUNTER",
+   "label": "BROWSE — apparel catalog",
+   "eligible": true
+  },
+  "catalog": {
+   "open": true,
+   "text": "MAH MARKET — clothingAPPARELNO STOCK YET · 0 itemscatalog empty by design — apparel art and fit are a later owner decisionstatus ZERO_STOCK · purchase disabled no economyCLOSE",
+   "buttons": [
+    "CLOSE"
+   ]
+  },
+  "registry": {
+   "version": "SHOPS_V1",
+   "_doc": "master §17 (EXT-26–29, U18): the two market shops are FINISHED, ENTERABLE spaces whose catalogs are EMPTY by design. This registry is the minimal extensible data: a shop's id, kind, room, status and an item list that is intentionally [] — no product, price, purchase, equipped item or silhouette is invented. `states` distinguish APPROVED (owner-approved items), UNDESIGNED (the whole family until the apparel / weapon art and the fit / combat rules exist), TEST_ONLY (fixtures that must never ship) and RUNTIME (what the build actually lists). A validator (16_TESTS/gameplay_interior_entry.test.mjs) checks every listed item's asset reference exists — with zero items that check is vacuous today, and the test proves the validator rejects a synthetic bad reference.",
+   "shops": [
+    {
+     "id": "SHOP_CLOTHING",
+     "kind": "CLOTHING",
+     "room": "CLOTHING_SHOP",
+     "label": "MAH MARKET — clothing",
+     "status": "ZERO_STOCK",
+     "catalog": [],
+     "states": {
+      "approved": [],
+      "undesigned": [
+       "APPAREL_FAMILY (art + fit rules pending — owner)"
+      ],
+      "test_only": [],
+      "runtime": []
+     },
+     "empty_state": {
+      "title": "APPAREL",
+      "line": "NO STOCK YET",
+      "detail": "catalog empty by design — apparel art and fit are a later owner decision"
+     },
+     "purchase": "DISABLED_NO_ECONOMY"
+    },
+    {
+     "id": "SHOP_WEAPONS",
+     "kind": "WEAPONS",
+     "room": "WEAPON_SHOP",
+     "label": "MAH MARKET — weapons",
+     "status": "ZERO_STOCK",
+     "catalog": [],
+     "states": {
+      "approved": [],
+      "undesigned": [
+       "WEAPON_FAMILY (weapon art + combat rules pending — owner; the gym-pattern kit stays the only combat)"
+      ],
+      "test_only": [],
+      "runtime": []
+     },
+     "empty_state": {
+      "title": "WEAPONS",
+      "line": "NO STOCK YET",
+      "detail": "catalog empty by design — weapon gameplay stays dormant until design approval"
+     },
+     "purchase": "DISABLED_NO_ECONOMY"
+    }
+   ]
+  }
+ },
+ "summary": {
+  "pass": 22,
+  "fail": 0
+ }
+}

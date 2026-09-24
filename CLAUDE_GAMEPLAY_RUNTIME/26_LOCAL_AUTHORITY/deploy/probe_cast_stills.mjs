@@ -1,0 +1,14 @@
+/* cast stills A/B: node deploy/probe_cast_stills.mjs <A|B> <front|side> → probe_out/cast_<v>_<view>_<i>.png every 0.25 s + active layer log */
+import path from 'node:path'; import fs from 'node:fs'; import { fileURLToPath } from 'node:url';
+import { serveStatic, launchChrome, waitForGame, sleep, PLAY_PATH } from './probe_lib.mjs';
+var HERE = path.dirname(fileURLToPath(import.meta.url)); var OUT = path.join(HERE, 'probe_out'); fs.mkdirSync(OUT, { recursive: true }); var V = process.argv[2] || 'B', VIEW = process.argv[3] || 'front';
+var srv = await serveStatic(path.join(HERE, 'static_dist')); var pg = await launchChrome({ width: 720, height: 720, gpu: true });
+async function tap(code) { await pg.evaluate("document.dispatchEvent(new KeyboardEvent('keydown',{code:'" + code + "',key:'" + code.slice(3).toLowerCase() + "',bubbles:true})); document.dispatchEvent(new KeyboardEvent('keyup',{code:'" + code + "',key:'" + code.slice(3).toLowerCase() + "',bubbles:true})); 1"); }
+try {
+  await pg.goto(srv.origin + PLAY_PATH + '?field=1&dev=1&avatar=ATHLETE_M_V7' + (V === 'B' ? '&motion=TRIPO_UPPER' : '')); await waitForGame(pg, 90000); await sleep(3500);
+  await pg.evaluate("(function(){ var P=window.MAHWORLD_PLAY; P.hud.showGuide(false); P.camFollow(false); document.querySelectorAll('body > *').forEach(function(e){ if (e.tagName!=='CANVAS') e.style.visibility='hidden'; }); return 1; })()");
+  await pg.evaluate("window.MAHWORLD_PLAY.goTo(-3, -13, -3, -8)"); await sleep(400); var y0 = await pg.evaluate("window.MAHWORLD_PLAY.mePose().root_yaw");
+  await pg.evaluate("window.MAHWORLD_PLAY.cam(" + (VIEW === 'side' ? y0 + Math.PI / 2 : y0 + Math.PI + 0.6) + ", 0.06, 2.4, 1.05)"); await pg.evaluate("window.MAHWORLD_PLAY.send('RULES_SELECT',{category:'SPECIAL_MAGIC', slot:0})"); await sleep(700);
+  await pg.evaluate("window.MAHWORLD_PLAY.rules.castSlot(0)"); var log = []; for (var i = 0; i < 14; i++) { await sleep(100); await pg.screenshot(path.join(OUT, 'cast_' + V + '_' + VIEW + '_' + String(i).padStart(2, '0') + '.png')); log.push(await pg.evaluate("(function(){ var m=window.MAHWORLD_PLAY.motion(); var p=window.MAHWORLD_PLAY.snap().play; var c=p.rules&&p.rules.me.cast; var me=window.MAHWORLD_PLAY.sceneDebug?null:null; var e=window.MAHWORLD_PLAY.__adapterGet?null:null; var acts=(function(){ try { var A=window.MAHWORLD_PLAY.entityAnimators ? window.MAHWORLD_PLAY.entityAnimators('me') : null; return A ? A.map(function(a){return (a.donorActive&&a.donorActive())||'-';}).join('/') : 'n/a'; } catch(err){ return 'err'; } })(); return acts+' '+(m.active||'-')+':'+(c?c.phase+' '+(c.progress||0).toFixed(2):'no-cast'); })()")); }
+  console.log(V, VIEW, log.join(' | ')); console.log('errors', pg.errors.filter(function (x) { return !/404/.test(x); }));
+} finally { await pg.close(); srv.close(); }

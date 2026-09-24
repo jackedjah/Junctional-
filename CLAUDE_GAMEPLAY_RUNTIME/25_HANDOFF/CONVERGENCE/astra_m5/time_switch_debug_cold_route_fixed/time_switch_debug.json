@@ -1,0 +1,304 @@
+{
+ "generated_at": "2026-09-23T09:16:08.305Z",
+ "stages": [
+  {
+   "label": "cold_route_night_noop",
+   "want": "NIGHT",
+   "before_count": 277,
+   "after_count": 277,
+   "measured": {
+    "returned": "NIGHT",
+    "observed": "NIGHT",
+    "sync_ms": 0,
+    "frames": 88,
+    "p50_ms": 13.6,
+    "p95_ms": 20.6,
+    "max_ms": 211.8,
+    "max_frame_index": 19,
+    "first_frames_ms": [
+     -17.7,
+     18.3,
+     12.4,
+     11.6,
+     12,
+     13.6,
+     14.3,
+     11.5
+    ],
+    "slow_frames": [
+     {
+      "i": 19,
+      "ms": 211.8
+     }
+    ]
+   },
+   "added": []
+  },
+  {
+   "label": "cold_route_first_day",
+   "want": "DAY",
+   "before_count": 277,
+   "after_count": 304,
+   "measured": {
+    "returned": "DAY",
+    "observed": "DAY",
+    "sync_ms": 1.2,
+    "frames": 2,
+    "p50_ms": -20.4,
+    "p95_ms": -20.4,
+    "max_ms": 5578.3,
+    "max_frame_index": 1,
+    "first_frames_ms": [
+     -20.4,
+     5578.3
+    ],
+    "slow_frames": [
+     {
+      "i": 1,
+      "ms": 5578.3
+     }
+    ]
+   },
+   "added": [
+    {
+     "i": 277,
+     "name": "",
+     "used": 13,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388624,8519683,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 278,
+     "name": "",
+     "used": 10,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388625,8519683,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 279,
+     "name": "",
+     "used": 3,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388624,8519687,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 280,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388625,8521735,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 281,
+     "name": "",
+     "used": 3,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,uv,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388624,8519683,srgb,onBeforeCompile(){}",
+     "cache_key_length": 256
+    },
+    {
+     "i": 282,
+     "name": "",
+     "used": 4,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389648,8519687,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 283,
+     "name": "",
+     "used": 2,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388625,8519687,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 284,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389649,8519683,srgb,mahgic_tree_branch_v1",
+     "cache_key_length": 261
+    },
+    {
+     "i": 285,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389649,8519687,srgb,mahgic_tree_leaf_v1",
+     "cache_key_length": 259
+    },
+    {
+     "i": 286,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389649,8519687,srgb,mahgic_tree_gem_v1",
+     "cache_key_length": 258
+    },
+    {
+     "i": 287,
+     "name": "",
+     "used": 2,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388627,8519683,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 288,
+     "name": "ATHLETE_M_AM08_V6_PBR",
+     "used": 2,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,uv,false,false,false,false,uv,false,uv,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,22,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388688,8519779,srgb,mahworld_body_hook_v1",
+     "cache_key_length": 253
+    },
+    {
+     "i": 289,
+     "name": "MAHWORLD_FOREST_TREE",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,uv,false,false,false,false,uv,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388691,8521731,srgb,mahworld_forest_lock",
+     "cache_key_length": 254
+    },
+    {
+     "i": 290,
+     "name": "MAHWORLD_FOREST_IMPOSTOR",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,uv,false,false,false,false,false,false,uv,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389139,8521731,srgb,mahworld_forest_impostor_lock",
+     "cache_key_length": 263
+    },
+    {
+     "i": 291,
+     "name": "TITAN_M_V5_PBR",
+     "used": 9,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,uv,false,false,false,false,uv,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,22,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388688,8519779,srgb,mahworld_body_hook_v1",
+     "cache_key_length": 256
+    },
+    {
+     "i": 292,
+     "name": "tripo_mat_836ca6c3-2d9d-4b2e-a39f-a1e88195f2bb",
+     "used": 3,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,uv,false,false,false,false,uv,false,uv,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388688,8521763,srgb,mahworld_wild_FISH",
+     "cache_key_length": 249
+    },
+    {
+     "i": 293,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389648,8519683,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 294,
+     "name": "",
+     "used": 4,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388624,8388611,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 295,
+     "name": "",
+     "used": 2,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388625,8388611,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 296,
+     "name": "",
+     "used": 2,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388627,8388611,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 297,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388627,8388615,srgb,mahworld_arch_entrance",
+     "cache_key_length": 262
+    },
+    {
+     "i": 298,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389648,8388615,srgb,mahworld_arch_crystal",
+     "cache_key_length": 261
+    },
+    {
+     "i": 299,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388627,8388611,srgb,mahworld_shard",
+     "cache_key_length": 254
+    },
+    {
+     "i": 300,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389648,8388611,srgb,onBeforeCompile(){}",
+     "cache_key_length": 259
+    },
+    {
+     "i": 301,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389648,8388615,srgb,mahworld_monolith",
+     "cache_key_length": 257
+    },
+    {
+     "i": 302,
+     "name": "",
+     "used": 2,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,uv,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8388688,8388611,srgb,mahworld_water_far_hole",
+     "cache_key_length": 260
+    },
+    {
+     "i": 303,
+     "name": "",
+     "used": 1,
+     "cache_key": "physical,STANDARD,,highp,srgb,306,128,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,false,0,,3,3,0,0,1,0,0,0,0,0,0,1,0,0,0,0,8389648,8388611,srgb,mahworld_path_core",
+     "cache_key_length": 258
+    }
+   ]
+  },
+  {
+   "label": "cold_route_return_night",
+   "want": "NIGHT",
+   "before_count": 304,
+   "after_count": 304,
+   "measured": {
+    "returned": "NIGHT",
+    "observed": "NIGHT",
+    "sync_ms": 0.9,
+    "frames": 101,
+    "p50_ms": 9.9,
+    "p95_ms": 16.6,
+    "max_ms": 356.6,
+    "max_frame_index": 26,
+    "first_frames_ms": [
+     -21.6,
+     38.9,
+     1.5,
+     13.2,
+     7.8,
+     8.8,
+     9.9,
+     8.5
+    ],
+    "slow_frames": [
+     {
+      "i": 26,
+      "ms": 356.6
+     }
+    ]
+   },
+   "added": []
+  }
+ ],
+ "errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/favicon.ico>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.1/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.13/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.12/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.11/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.10/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.9/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.7/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.6/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.5/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.4/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.3/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:60622/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.2/manifest.json>"
+ ],
+ "finished_at": "2026-09-23T09:17:21.715Z"
+}

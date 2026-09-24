@@ -1,0 +1,349 @@
+{
+ "night": false,
+ "spots": [
+  {
+   "id": "plaza_wide",
+   "base": {
+    "calls": 342,
+    "tris": 616262
+   },
+   "without_world": {
+    "calls": 324,
+    "tris": 583882
+   },
+   "module_cost": {
+    "FIXTURES_CYAN_STREET_LIGHT": {
+     "calls": 6,
+     "tris": 18256
+    },
+    "MAHWORLD_WATER": {
+     "calls": 8,
+     "tris": 3048
+    },
+    "MAHWORLD_WATER_NEAR": {
+     "calls": 2,
+     "tris": 4
+    },
+    "MAHWORLD_FOREST_L0": {
+     "calls": 0,
+     "tris": 0
+    },
+    "MAHWORLD_FOREST_L1": {
+     "calls": 1,
+     "tris": 2
+    },
+    "MAHWORLD_FOREST_IMPOSTOR": {
+     "calls": 2,
+     "tris": 630
+    },
+    "MAHWORLD_FOREST_UNDERBRUSH": {
+     "calls": 3,
+     "tris": 1260
+    },
+    "PROP_PROJECTOR_GYM_BEACON": {
+     "calls": 2,
+     "tris": 9002
+    },
+    "PROP_PAD_PROJECTOR_GYM_BEACON": {
+     "calls": 2,
+     "tris": 194
+    },
+    "MATCH_HALL": {
+     "calls": 1,
+     "tris": 2
+    },
+    "MATCH_COURT": {
+     "calls": 1,
+     "tris": 2
+    }
+   }
+  },
+  {
+   "id": "forest_w_inside",
+   "base": {
+    "calls": 341,
+    "tris": 884967
+   },
+   "without_world": {
+    "calls": 312,
+    "tris": 375023
+   },
+   "module_cost": {
+    "FIXTURES_CYAN_STREET_LIGHT": {
+     "calls": 5,
+     "tris": 18254
+    },
+    "MAHWORLD_WATER": {
+     "calls": 5,
+     "tris": 564
+    },
+    "MAHWORLD_WATER_NEAR": {
+     "calls": 0,
+     "tris": 0
+    },
+    "MAHWORLD_FOREST_L0": {
+     "calls": 1,
+     "tris": 279998
+    },
+    "MAHWORLD_FOREST_L1": {
+     "calls": 0,
+     "tris": 189998
+    },
+    "MAHWORLD_FOREST_IMPOSTOR": {
+     "calls": 0,
+     "tris": 434
+    },
+    "MAHWORLD_FOREST_UNDERBRUSH": {
+     "calls": 0,
+     "tris": 1254
+    },
+    "PROP_PROJECTOR_GYM_BEACON": {
+     "calls": -1,
+     "tris": -2
+    },
+    "PROP_PAD_PROJECTOR_GYM_BEACON": {
+     "calls": 0,
+     "tris": 0
+    },
+    "MATCH_HALL": {
+     "calls": 7,
+     "tris": 1774
+    },
+    "MATCH_COURT": {
+     "calls": 6,
+     "tris": 11160
+    },
+    "DOGKIE_NPC_DOGKIE_08": {
+     "calls": 3,
+     "tris": 6504
+    },
+    "DOGKIE_NPC_DOGKIE_03": {
+     "calls": 3,
+     "tris": 6504
+    },
+    "DOGKIE_NPC_DOGKIE_04": {
+     "calls": 2,
+     "tris": 6502
+    },
+    "DOGKIE_NPC_DOGKIE_07": {
+     "calls": 2,
+     "tris": 6502
+    },
+    "DOGKIE_NPC_DOGKIE_06": {
+     "calls": 2,
+     "tris": 6502
+    },
+    "DOGKIE_NPC_DOGKIE_10": {
+     "calls": 2,
+     "tris": 6502
+    },
+    "DOGKIE_NPC_DOGKIE_02": {
+     "calls": 2,
+     "tris": 6502
+    },
+    "DOGKIE_NPC_DOGKIE_09": {
+     "calls": 2,
+     "tris": 6502
+    },
+    "DOGKIE_NPC_DOGKIE_01": {
+     "calls": 3,
+     "tris": 6504
+    },
+    "DOGKIE_NPC_DOGKIE_05": {
+     "calls": 3,
+     "tris": 6504
+    }
+   }
+  },
+  {
+   "id": "canal_bridge_main",
+   "base": {
+    "calls": 346,
+    "tris": 640651
+   },
+   "without_world": {
+    "calls": 321,
+    "tris": 653415
+   },
+   "module_cost": {
+    "FIXTURES_CYAN_STREET_LIGHT": {
+     "calls": 6,
+     "tris": -51742
+    },
+    "MAHWORLD_WATER": {
+     "calls": 7,
+     "tris": -66952
+    },
+    "MAHWORLD_WATER_NEAR": {
+     "calls": 1,
+     "tris": -51566
+    },
+    "MAHWORLD_FOREST_L0": {
+     "calls": 0,
+     "tris": -69998
+    },
+    "MAHWORLD_FOREST_L1": {
+     "calls": 1,
+     "tris": -69996
+    },
+    "MAHWORLD_FOREST_IMPOSTOR": {
+     "calls": 2,
+     "tris": -69368
+    },
+    "MAHWORLD_FOREST_UNDERBRUSH": {
+     "calls": 2,
+     "tris": -68740
+    },
+    "PROP_PROJECTOR_GYM_BEACON": {
+     "calls": 2,
+     "tris": -60996
+    },
+    "PROP_PAD_PROJECTOR_GYM_BEACON": {
+     "calls": 2,
+     "tris": -69804
+    },
+    "MATCH_HALL": {
+     "calls": 7,
+     "tris": -68224
+    },
+    "MATCH_COURT": {
+     "calls": 3,
+     "tris": -65342
+    },
+    "DOGKIE_NPC_DOGKIE_12": {
+     "calls": 0,
+     "tris": -69998
+    }
+   }
+  },
+  {
+   "id": "match_hall_approach",
+   "base": {
+    "calls": 336,
+    "tris": 412461
+   },
+   "without_world": {
+    "calls": 315,
+    "tris": 378315
+   },
+   "module_cost": {
+    "FIXTURES_CYAN_STREET_LIGHT": {
+     "calls": 4,
+     "tris": 18252
+    },
+    "MAHWORLD_WATER": {
+     "calls": 8,
+     "tris": 3048
+    },
+    "MAHWORLD_WATER_NEAR": {
+     "calls": -1,
+     "tris": -2
+    },
+    "MAHWORLD_FOREST_L0": {
+     "calls": 0,
+     "tris": 0
+    },
+    "MAHWORLD_FOREST_L1": {
+     "calls": 0,
+     "tris": 0
+    },
+    "MAHWORLD_FOREST_IMPOSTOR": {
+     "calls": 1,
+     "tris": 628
+    },
+    "MAHWORLD_FOREST_UNDERBRUSH": {
+     "calls": 1,
+     "tris": 1256
+    },
+    "PROP_PROJECTOR_GYM_BEACON": {
+     "calls": 1,
+     "tris": 9000
+    },
+    "PROP_PAD_PROJECTOR_GYM_BEACON": {
+     "calls": 1,
+     "tris": 192
+    },
+    "MATCH_HALL": {
+     "calls": 5,
+     "tris": 1770
+    },
+    "MATCH_COURT": {
+     "calls": 0,
+     "tris": 0
+    }
+   }
+  }
+ ],
+ "inventory": {
+  "FIXTURES_CYAN_STREET_LIGHT": {
+   "renderables": 4,
+   "tris": 18252,
+   "instances": 312
+  },
+  "MAHWORLD_WATER": {
+   "renderables": 8,
+   "tris": 3048,
+   "instances": 22
+  },
+  "MAHWORLD_WATER_NEAR": {
+   "renderables": 1,
+   "tris": 18432,
+   "instances": 0
+  },
+  "MAHWORLD_FOREST_L0": {
+   "renderables": 1,
+   "tris": 0,
+   "instances": 0
+  },
+  "MAHWORLD_FOREST_L1": {
+   "renderables": 1,
+   "tris": 0,
+   "instances": 0
+  },
+  "MAHWORLD_FOREST_IMPOSTOR": {
+   "renderables": 1,
+   "tris": 628,
+   "instances": 157
+  },
+  "MAHWORLD_FOREST_UNDERBRUSH": {
+   "renderables": 1,
+   "tris": 1256,
+   "instances": 157
+  },
+  "PROP_PROJECTOR_GYM_BEACON": {
+   "renderables": 2,
+   "tris": 39000,
+   "instances": 0
+  },
+  "PROP_PAD_PROJECTOR_GYM_BEACON": {
+   "renderables": 1,
+   "tris": 192,
+   "instances": 0
+  },
+  "MATCH_HALL": {
+   "renderables": 6,
+   "tris": 1772,
+   "instances": 0
+  },
+  "MATCH_COURT": {
+   "renderables": 3,
+   "tris": 4656,
+   "instances": 0
+  }
+ },
+ "errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/favicon.ico>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.1/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.13/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.12/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.11/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.10/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.9/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.7/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.6/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.5/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.4/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.3/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:58846/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.2/manifest.json>"
+ ]
+}

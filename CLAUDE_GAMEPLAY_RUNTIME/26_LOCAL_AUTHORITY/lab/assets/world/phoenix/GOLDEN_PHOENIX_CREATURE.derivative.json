@@ -1,0 +1,66 @@
+{
+ "canonical": "GOLDEN_PHOENIX_CREATURE",
+ "role": "aerial creature (golden phoenix)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_NEW3\\golden phoenix 3d model.glb",
+  "original_name": "golden phoenix 3d model.glb",
+  "sha256": "92241cb70988c03d5c97d22f369987c67172ef3559218bd360879e7aee00619d",
+  "bytes": 90391676,
+  "triangles": 19384,
+  "skinned": true,
+  "joints": 26,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "image": 0,
+   "source_bytes": 12854404,
+   "runtime_bytes": 483269,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": false
+  },
+  {
+   "image": 1,
+   "source_bytes": 75937917,
+   "runtime_bytes": 192532,
+   "runtime_size": [
+    512,
+    512
+   ],
+   "normal": true
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "GOLDEN_PHOENIX_CREATURE_L0.glb",
+   "triangles": 19384,
+   "bytes": 2275472,
+   "sha256": "607b246c89172577e07b65cc5fb85af758cc661ca0088f09579a52143c4db570"
+  },
+  {
+   "lod": "L1",
+   "file": "GOLDEN_PHOENIX_CREATURE_L1.glb",
+   "triangles": 8234,
+   "vertices": 14077,
+   "bytes": 1519060,
+   "sha256": "7e4840a795d393c80819c88776a603b7b0921fa9cdf350a630f97821927dc115",
+   "method": "glTF-Transform 4.5.0 meshoptimizer, requested ratio 0.335279, error 0.01, topological borders locked; stopped at the fidelity ceiling with source normals, UVs, joints and weights preserved"
+  },
+  {
+   "lod": "L2",
+   "file": "GOLDEN_PHOENIX_CREATURE_L2.glb",
+   "triangles": 8234,
+   "vertices": 14077,
+   "bytes": 1519060,
+   "sha256": "7e4840a795d393c80819c88776a603b7b0921fa9cdf350a630f97821927dc115",
+   "method": "same validated attribute-aware derivative as L1; a lower target crossed the 0.01 fidelity ceiling"
+  }
+ ],
+ "method": "L0: images resampled (Pillow LANCZOS, JPEG) with geometry, nodes and skin unchanged. L1/L2: glTF-Transform 4.5.0 meshoptimizer with error 0.01, topological borders locked and source NORMAL/TEXCOORD_0/JOINTS_0/WEIGHTS_0 preserved; L2 reuses the validated L1 plateau.",
+ "generated": "2026-09-23T03:53:24Z"
+}

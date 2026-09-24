@@ -1,0 +1,85 @@
+{
+ "canonical": "TOWER_M5C",
+ "role": "Blue Tower imported landmark",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\futuristic tower 3d model.glb",
+  "original_name": "futuristic tower 3d model.glb",
+  "sha256": "f7a587cc0f253ca11d9fdc5e66e260cd39bf4390b707d3c1d9e1dd7a84d2606e",
+  "bytes": 77766980,
+  "triangles": 1901950,
+  "vertices": 1054152,
+  "bounds_min": [
+   -0.3916015625,
+   0.0,
+   -0.30816650390625
+  ],
+  "bounds_max": [
+   0.3916015625,
+   0.98541259765625,
+   0.30816650390625
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 15468515,
+   "runtime_bytes": 1375444,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 5740289,
+   "runtime_bytes": 295938,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "mime": "image/jpeg"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "TOWER_M5C_L0.glb",
+   "triangles": 800000,
+   "vertices": 503177,
+   "bytes": 27374976,
+   "sha256": "3cf45e17d374ff8d958de59df1700b484e26dc26ec904b4e8b75d9604af0c0a5"
+  },
+  {
+   "lod": "L1",
+   "file": "TOWER_M5C_L1.glb",
+   "triangles": 254126,
+   "vertices": 230240,
+   "bytes": 12090500,
+   "sha256": "81423ddbed5ac7a14dcdcafef0df02fd7f102ec9c03a9bc0bdc39c01e445d703"
+  }
+ ],
+ "method": "fast_simplification quadric edge collapse (agg 3.0, preserve_border True), UVs via nearest collapse-cluster representative, source normals carried by collapse map; textures Pillow LANCZOS",
+ "recipe": {
+  "tool": "26_LOCAL_AUTHORITY/deploy/jobb/derive_glb.py",
+  "mode": "static_geometry",
+  "arguments": {
+   "lods": "L0:800000,L1:200000",
+   "tex": 2048,
+   "normal": 2048,
+   "jpeg": 86,
+   "agg": 3.0,
+   "keep_geometry": false,
+   "preserve_normals": true,
+   "preserve_border": true,
+   "attribute_representative": "nearest"
+  }
+ },
+ "generated": "2026-09-23T18:30:49Z",
+ "timing_s": {
+  "L0": 4.0,
+  "L1": 4.2
+ },
+ "elapsed_s": 9.9
+}

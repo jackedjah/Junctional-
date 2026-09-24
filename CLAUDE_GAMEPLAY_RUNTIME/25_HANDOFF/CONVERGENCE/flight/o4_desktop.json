@@ -1,0 +1,53 @@
+{
+ "mode": "desktop",
+ "viewport": [
+  1200,
+  750
+ ],
+ "touch_emulated": false,
+ "checks": [
+  "PASS A1 Space HOLD takes off and climbs (powered, vz ≈ climb rate); RELEASE captures a hold altitude and the body settles on it (|err| ≤ 0.05 m, overshoot past it ≤ 0.15 m), still powered, intent 0 — {\"at_release\":{\"t\":20.29,\"powered\":true,\"intent\":0,\"alt\":12.52,\"ground\":0,\"h\":12.52,\"vz\":2.5,\"hold_alt\":12.781,\"perch\":null,\"forced\":false,\"res\":94.4,\"landed\":0,\"pos\":[19.75,19.88],\"pitch\":0.2},\"measure\":{\"overshoot_past_hold\":0,\"settled_alt\":12.78,\"err\":-0.001,\"samples\":25},\"after\":{\"t\":23.34,\"powered\":true,\"intent\":0,\"alt\":12.78,\"ground\":0,\"h\":12.78,\"vz\":0,\"hold_alt\":12.781,\"perch\":null,\"forced\":false,\"res\":86.8,\"landed\":0,\"pos\":[19.75,19.88],\"pitch\":0.2}}",
+  "PASS A1b the stop distance beyond the release point is explicit and short (≤ 1.1 m from a full climb) — {\"release_alt\":12.52,\"hold_alt\":12.781,\"stop_m\":0.26}",
+  "PASS A2 flying forward while looking UP (pitch -0.40) and DOWN (pitch 1.20): altitude unchanged (|Δ| ≤ 0.1 m) — the camera pitch never commands height — {\"hold\":12.78,\"alt_looking_up\":12.78,\"alt_looking_down\":12.78,\"pitch_low\":-0.4,\"pitch_high\":1.2}",
+  "PASS A3 C HOLD descends and RELEASE holds the lower altitude (no drift to the ground, no auto-land) — {\"before\":12.78,\"hold_alt\":5.976,\"measure\":{\"overshoot_past_hold\":0.974,\"settled_alt\":5.98,\"err\":0.004,\"samples\":23}}",
+  "PASS A4 F while flying lands (deliberate EXIT → not powered, on a support) — {\"t\":35.08,\"powered\":false,\"intent\":0,\"alt\":0,\"ground\":0,\"h\":0,\"vz\":0,\"hold_alt\":null,\"perch\":null,\"forced\":false,\"res\":57.6,\"landed\":1,\"pos\":[132.45,73.67],\"pitch\":1.2}",
+  "PASS A4b a TAP take-off (F) lifts a little and then HOLDS altitude (powered, intent 0, 1 m < height < 8 m, vz ≈ 0) — {\"t\":38.46,\"powered\":true,\"intent\":0,\"alt\":3.68,\"ground\":0,\"h\":3.68,\"vz\":0,\"hold_alt\":3.681,\"perch\":null,\"forced\":false,\"res\":55.1,\"landed\":1,\"pos\":[132.45,73.67],\"pitch\":1.2}",
+  "PASS Z zero page / console errors — [\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\",\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\",\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\"]"
+ ],
+ "measurements": {
+  "space_release": {
+   "at_release": {
+    "t": 20.29,
+    "powered": true,
+    "intent": 0,
+    "alt": 12.52,
+    "ground": 0,
+    "h": 12.52,
+    "vz": 2.5,
+    "hold_alt": 12.781,
+    "perch": null,
+    "forced": false,
+    "res": 94.4,
+    "landed": 0,
+    "pos": [
+     19.75,
+     19.88
+    ],
+    "pitch": 0.2
+   },
+   "measure": {
+    "overshoot_past_hold": 0,
+    "settled_alt": 12.78,
+    "err": -0.001,
+    "samples": 25
+   }
+  },
+  "pitch_independence": {
+   "hold": 12.78,
+   "up": 12.78,
+   "down": 12.78
+  }
+ },
+ "pass": 7,
+ "fail": 0
+}

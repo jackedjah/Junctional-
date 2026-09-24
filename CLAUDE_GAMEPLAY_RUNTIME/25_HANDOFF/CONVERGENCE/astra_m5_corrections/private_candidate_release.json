@@ -1,0 +1,187 @@
+{
+  "schema": "MAHWORLD_PRIVATE_CANDIDATE_RELEASE_V2",
+  "checkpoint": "M5_OWNER_CORRECTIONS_03_PROTECTED_CANDIDATE",
+  "candidate": "ASTRA_M5C_PRIVATE_20260923",
+  "created_at": "2026-09-23T22:55:19.9572385Z",
+  "source": {
+    "branch": "master",
+    "head": "3185a25f80a23131fbdb2062fca9a1a1ffb7684f",
+    "worktree_clean": false,
+    "dirty_paths_at_package": 110,
+    "staged_paths": 0,
+    "continuity": "Same preserved M1-M5 working state; no reset, clean, stash, commit, or ownership-boundary change."
+  },
+  "immutable_comparison_candidate": {
+    "build": "ASTRA_M5_PRIVATE_20260923",
+    "archive_sha256": "ebcad0ed993899f66c7477a1b3f1cde57740b32047fd0c02b60cf71e85055995",
+    "package_record_sha256": "7161b2eddafee12f895dc0913b189033dc0683ff243d741798aa1408a3be3ef9",
+    "release_record_sha256": "d09790df60b3f8a10f0a403b98e0b618228b85a637b49522b538ec1f6d50c7a2",
+    "deploy_id": "6ab3abd739fc958c75339988",
+    "url": "https://6ab3abd739fc958c75339988--mahworld-test-preview.netlify.app",
+    "state": "ready",
+    "context": "deploy-preview",
+    "published_at": null,
+    "edge_functions_present": true,
+    "verified_unchanged_after": true
+  },
+  "corrections": {
+    "checkpoint_02": "25_HANDOFF/CONVERGENCE/astra_m5_corrections/checkpoint_02_integrated_corrections.json",
+    "checkpoint_02_sha256": "75354af933306daaaabd6cf8dc28ad6106093e8420a2c13b1f16286c847e0390",
+    "status": "OP01-OP10 and OP12 implemented; OP11 optimized/emulated with physical-device acceptance open.",
+    "road_authority": "26_LOCAL_AUTHORITY/lab/world/roadNetwork.js",
+    "collision_shapes": {
+      "base": 28,
+      "district": 792,
+      "world": 9457,
+      "total": 10277
+    },
+    "world_registry_sha256": "825f6943b093d17df65522c1b1cb398b33bf9c2790bde2183ede3376aa757f5f",
+    "buildings": {
+      "scale_correction": 0.6,
+      "source_traced_reduced_derivatives": true,
+      "aligned_portals": ["TEMPLE_DOOR", "TOWER_DOOR", "CLOTHING_DOOR", "WEAPON_DOOR"],
+      "functional_grand_interiors": true,
+      "portal_return_ground_fix": "Entry ground is retained as the FIELD ground-height reference so overlapping roof decks cannot lift an exit return."
+    },
+    "moon": {
+      "source_sha256": "6d5499f9654d00f3533170848dfe18fb991237d1ed87e5eb0a6cfb785701eb8c",
+      "runtime_sha256": "b7ad1e4897ef26961133b09894583c709e27cf6edebfe4a7811ad7bdbfbf415c",
+      "distance_m": 900,
+      "apparent_deg": 6.2
+    },
+    "tree_lod_color_continuity": true,
+    "crystal_bush_refills": "zero, partial, full, and overflow loops verified"
+  },
+  "package": {
+    "archive": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M5C_PRIVATE_20260923.zip",
+    "archive_sha256": "9eb0816871a258a408a7b453e8d4982dc851708a48eccd90e2411494ac9d1571",
+    "archive_bytes": 122970109,
+    "archive_entries": 181,
+    "record": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M5C_PRIVATE_20260923.PACKAGE.json",
+    "record_sha256": "99fdc974b655473b9c2cea8d47353dc813752d9b939161d365f423d3528d7159",
+    "built_at": "2026-09-23T22:32:56.185Z",
+    "package_stamp": "2026-09-23T22:35:23.506Z",
+    "finished_at": "2026-09-23T22:36:18.296Z",
+    "complete": true,
+    "test_programs": 56,
+    "checks_passed": 1518,
+    "checks_failed": 0,
+    "js_syntax_files": 104,
+    "css_blocks": 2,
+    "private_content_scan": "clean",
+    "secret_scan_files": 181,
+    "built_in_extraction_smoke": "7/7",
+    "persistent_extraction": "26_LOCAL_AUTHORITY/deploy/packages/deploy_ASTRA_M5C_PRIVATE_20260923",
+    "persistent_extraction_files": 181,
+    "persistent_extraction_smoke": "7/7",
+    "build_info": {
+      "pass": "ASTRA_M5C_PRIVATE_20260923",
+      "commit": "3185a25",
+      "files": 180,
+      "bytes": 217151884,
+      "worktree_clean": false
+    }
+  },
+  "deployment": {
+    "site_id": "968f80e5-889b-43a8-b2cd-5860c588546a",
+    "site_name": "mahworld-test-preview",
+    "deploy_id": "6ab454bf3a60c4bf88b1334a",
+    "url": "https://6ab454bf3a60c4bf88b1334a--mahworld-test-preview.netlify.app",
+    "state": "ready",
+    "context": "deploy-preview",
+    "published_at": null,
+    "deploy_source": "cli",
+    "edge_functions_present": true,
+    "password_protection": "Netlify Edge password gate",
+    "production_promoted": false,
+    "alias_created": false
+  },
+  "gate": {
+    "root": {
+      "status": 303,
+      "location": "claude_gameplay_runtime/26_local_authority/lab/play?field=1",
+      "cache_control": "no-store",
+      "x_robots_tag": "noindex, nofollow, noarchive, noindex"
+    },
+    "play": {
+      "status": 401,
+      "content_type": "text/html; charset=utf-8",
+      "password_form": true,
+      "cache_control": "no-store",
+      "x_robots_tag": "noindex, nofollow, noarchive, noindex"
+    },
+    "protected_assets": {
+      "play_js": "401 application/json DEMO_LOGIN_REQUIRED no-store",
+      "build_info": "401 application/json DEMO_LOGIN_REQUIRED no-store",
+      "moon_l0": "401 application/json DEMO_LOGIN_REQUIRED no-store"
+    },
+    "netlify_cdn_cache_control": "absent from client-visible responses",
+    "authorized_hosted_load": "not run: MAHDEMO_PW unavailable",
+    "credential_material_stored": false
+  },
+  "production_before": {
+    "deploy_id": "6aac25101f17ce5ed37166e4",
+    "state": "ready",
+    "context": "production",
+    "published_at": "2026-09-17T17:36:28.139Z"
+  },
+  "production_after": {
+    "deploy_id": "6aac25101f17ce5ed37166e4",
+    "state": "ready",
+    "context": "production",
+    "published_at": "2026-09-17T17:36:28.139Z",
+    "unchanged": true
+  },
+  "comparison_candidate_after": {
+    "deploy_id": "6ab3abd739fc958c75339988",
+    "state": "ready",
+    "context": "deploy-preview",
+    "published_at": null,
+    "edge_functions_present": true,
+    "unchanged": true
+  },
+  "acceptance": {
+    "candidate_route": {
+      "report": "25_HANDOFF/CONVERGENCE/astra_m5_corrections/candidate_route_green3/m5_candidate_route.json",
+      "sha256": "55a3137e20e0f82d2e64b04a4b06a4eded7f5a1a21770bf23cebb3a75470270e",
+      "result": "20/20",
+      "duration_ms": 612277,
+      "screenshots": 36,
+      "defeats": "0 to 0"
+    },
+    "stability_soak": {
+      "report": "25_HANDOFF/CONVERGENCE/astra_m5_corrections/soak_phone_emulated_final/stability.json",
+      "sha256": "75e214f5036ec3f69092d05ff325a8370e2f465065646f0157831354a7410a1d",
+      "seconds": 900,
+      "final_world_status": "READY",
+      "context_losses": 0,
+      "authority_errors": 0,
+      "rejections": 0,
+      "console_errors": 0,
+      "page_errors": 0,
+      "fatal": null,
+      "ended_early": null,
+      "note": "Stability completed cleanly. Its supplemental correction-coverage gate recorded 5/7 because of probe routing; the separate integrated route is green, and the owner directed delivery without another investigation pass."
+    },
+    "prior_desktop_owner_corrections": "62/62",
+    "prior_phone_emulated_owner_corrections": "62/62",
+    "visual_gates": "20/20 desktop and 20/20 phone-emulated",
+    "interiors": "26/26 historical green plus focused portal-ground headless regression 14/14",
+    "tree_lod": "100/100 across day/night desktop/phone profiles",
+    "package_regression": "56/56 programs, 1518/1518 checks",
+    "fresh_extraction_smoke": "7/7 twice"
+  },
+  "remaining_acceptance": {
+    "physical_phone": "OWNER_PENDING"
+  },
+  "limitations": [
+    "Building assets are reduced/resampled source-traced derivatives; raw parity or recovery of missing originals is not claimed.",
+    "Grand interiors are authored functional interpretations, not literal imported interiors.",
+    "World/building collision uses generated proxies rather than per-triangle collision.",
+    "Road diagnostics retain 68 core and 84 frame degenerates plus 2 seams, with 0 invalid surfaces.",
+    "Routes and tree checks are representative samples, not exhaustive every-metre/every-tree coverage.",
+    "Throttled phone emulation is not physical-phone GPU, thermal, memory, or touch acceptance.",
+    "Authenticated hosted gameplay was not run because MAHDEMO_PW was unavailable.",
+    "BAND remains manifest/render/dismiss-only because no approved moves were supplied."
+  ]
+}

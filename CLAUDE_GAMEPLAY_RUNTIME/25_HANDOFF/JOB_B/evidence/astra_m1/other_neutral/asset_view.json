@@ -1,0 +1,172 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_NEW3\\fish.glb",
+  "bytes": 17536928,
+  "load_ms": 582,
+  "size_m": [
+   0.838,
+   0.42,
+   0.98
+  ],
+  "triangles": 18870,
+  "meshes": 1,
+  "shots": {
+   "front": "fish_front.png",
+   "q34": "fish_q34.png",
+   "side": "fish_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\fish\\FISH_DEEPWATER_CREATURE_L0.glb",
+  "bytes": 1867740,
+  "load_ms": 38,
+  "size_m": [
+   0.838,
+   0.42,
+   0.98
+  ],
+  "triangles": 18870,
+  "meshes": 1,
+  "shots": {
+   "front": "FISH_DEEPWATER_CREATURE_L0_front.png",
+   "q34": "FISH_DEEPWATER_CREATURE_L0_q34.png",
+   "side": "FISH_DEEPWATER_CREATURE_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_NEW3\\horse.glb",
+  "bytes": 31319444,
+  "load_ms": 582,
+  "size_m": [
+   0.979,
+   0.274,
+   0.734
+  ],
+  "triangles": 19996,
+  "meshes": 1,
+  "shots": {
+   "front": "horse_front.png",
+   "q34": "horse_q34.png",
+   "side": "horse_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\horse\\HORSE_RANGE_CREATURE_L0.glb",
+  "bytes": 3028460,
+  "load_ms": 47,
+  "size_m": [
+   0.979,
+   0.274,
+   0.734
+  ],
+  "triangles": 19996,
+  "meshes": 1,
+  "shots": {
+   "front": "HORSE_RANGE_CREATURE_L0_front.png",
+   "q34": "HORSE_RANGE_CREATURE_L0_q34.png",
+   "side": "HORSE_RANGE_CREATURE_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_NEW3\\golden phoenix 3d model.glb",
+  "bytes": 90391676,
+  "load_ms": 1352,
+  "size_m": [
+   0.909,
+   0.982,
+   0.736
+  ],
+  "triangles": 19384,
+  "meshes": 1,
+  "shots": {
+   "front": "golden phoenix 3d model_front.png",
+   "q34": "golden phoenix 3d model_q34.png",
+   "side": "golden phoenix 3d model_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\phoenix\\GOLDEN_PHOENIX_CREATURE_L0.glb",
+  "bytes": 2275472,
+  "load_ms": 42,
+  "size_m": [
+   0.909,
+   0.982,
+   0.736
+  ],
+  "triangles": 19384,
+  "meshes": 1,
+  "shots": {
+   "front": "GOLDEN_PHOENIX_CREATURE_L0_front.png",
+   "q34": "GOLDEN_PHOENIX_CREATURE_L0_q34.png",
+   "side": "GOLDEN_PHOENIX_CREATURE_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\barbell.glb",
+  "bytes": 78683280,
+  "load_ms": 714,
+  "size_m": [
+   0.983,
+   0.338,
+   0.367
+  ],
+  "triangles": 1926191,
+  "meshes": 1,
+  "shots": {
+   "front": "barbell_front.png",
+   "q34": "barbell_q34.png",
+   "side": "barbell_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\gym_barbell\\MAHWORLD_GYM_BARBELL_L0.glb",
+  "bytes": 2684220,
+  "load_ms": 48,
+  "size_m": [
+   0.983,
+   0.338,
+   0.367
+  ],
+  "triangles": 39999,
+  "meshes": 1,
+  "shots": {
+   "front": "MAHWORLD_GYM_BARBELL_L0_front.png",
+   "q34": "MAHWORLD_GYM_BARBELL_L0_q34.png",
+   "side": "MAHWORLD_GYM_BARBELL_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\dumbell.glb",
+  "bytes": 76498804,
+  "load_ms": 925,
+  "size_m": [
+   0.983,
+   0.354,
+   0.381
+  ],
+  "triangles": 1926482,
+  "meshes": 1,
+  "shots": {
+   "front": "dumbell_front.png",
+   "q34": "dumbell_q34.png",
+   "side": "dumbell_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\gym_dumbbell\\MAHWORLD_GYM_DUMBBELL_L0.glb",
+  "bytes": 2307820,
+  "load_ms": 65,
+  "size_m": [
+   0.982,
+   0.353,
+   0.381
+  ],
+  "triangles": 39999,
+  "meshes": 1,
+  "shots": {
+   "front": "MAHWORLD_GYM_DUMBBELL_L0_front.png",
+   "q34": "MAHWORLD_GYM_DUMBBELL_L0_q34.png",
+   "side": "MAHWORLD_GYM_DUMBBELL_L0_side.png"
+  }
+ }
+]

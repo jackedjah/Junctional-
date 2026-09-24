@@ -1,0 +1,4567 @@
+{
+ "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_TRIPO\\donor_received_2026-09-16\\INPUTS\\purple+armor+3d+model.glb",
+ "bytes": 37522832,
+ "generator": "Tripo",
+ "extensionsUsed": [],
+ "extensionsRequired": [],
+ "compressed": false,
+ "scene_roots": [
+  {
+   "index": 42,
+   "name": "Armature",
+   "translation": [
+    0.00009154528379440308,
+    0.0005188361974433064,
+    0.00019069015979766846
+   ],
+   "rotation": null,
+   "scale": null,
+   "matrix": false,
+   "mesh": null,
+   "skin": null
+  }
+ ],
+ "meshes": [
+  {
+   "index": 0,
+   "name": "tripo_mesh_f83d8187-28f8-43ba-839e-e94c3b4e3e5b",
+   "primitives": [
+    {
+     "vertices": 325191,
+     "triangles": 614668,
+     "attributes": [
+      "POSITION",
+      "NORMAL",
+      "TEXCOORD_0",
+      "JOINTS_0",
+      "WEIGHTS_0"
+     ],
+     "skinned": true,
+     "max_influences": 4,
+     "morph_targets": 0,
+     "morph_attributes": [],
+     "uv_sets": 1,
+     "material": 0,
+     "bounds_min": [
+      -0.2014923095703125,
+      0.0005186210037209094,
+      -0.09249144792556763
+     ],
+     "bounds_max": [
+      0.2016753852367401,
+      0.9819025993347168,
+      0.09287258982658386
+     ],
+     "draco": false
+    }
+   ],
+   "morph_names": null
+  }
+ ],
+ "skins": [
+  {
+   "index": 0,
+   "name": "Armature",
+   "joint_count": 41,
+   "skeleton_root": null,
+   "root_joint": [
+    "Root"
+   ],
+   "joints_with_rest_scale": 0,
+   "joints_with_nonuniform_scale": 0,
+   "joints_with_matrix": 0,
+   "has_inverse_binds": true,
+   "joints": [
+    {
+     "name": "Root",
+     "node": 40,
+     "parent": "Armature",
+     "translation": [
+      0.0075538004748523235,
+      1.3137469068169594e-7,
+      0.03271082788705826
+     ],
+     "rotation": [
+      -0.7071067690849304,
+      -5.9561578780176205e-8,
+      -5.9561578780176205e-8,
+      0.7071067690849304
+     ],
+     "scale": null,
+     "matrix": false,
+     "ibm_translation": [
+      -0.0076,
+      0.0329,
+      -0.0005
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "Hip",
+     "node": 39,
+     "parent": "Root",
+     "translation": [
+      6.008435082804908e-9,
+      1.2879787236741436e-9,
+      0.5251852869987488
+     ],
+     "rotation": [
+      0.35877034068107605,
+      -0.35877108573913574,
+      -0.15233048796653748,
+      0.8481524586677551
+     ],
+     "scale": [
+      1,
+      0.9999999403953552,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.2848,
+      -0.3545,
+      -0.266
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "Pelvis",
+     "node": 16,
+     "parent": "Hip",
+     "translation": [
+      -1.2246891856193542e-7,
+      -9.725408744998276e-8,
+      -8.66129994392395e-8
+     ],
+     "rotation": [
+      -0.12141614407300949,
+      -0.8750759363174438,
+      -0.2864224314689636,
+      0.3707592189311981
+     ],
+     "scale": [
+      1,
+      0.9999997615814209,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.007,
+      -0.5163,
+      0.1046
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_Thigh",
+     "node": 7,
+     "parent": "Pelvis",
+     "translation": [
+      -0.057223401963710785,
+      -0.000002283108187839389,
+      0.0012513201218098402
+     ],
+     "rotation": [
+      0.9947832822799683,
+      0.06471326947212219,
+      -0.005226511508226395,
+      0.07868365943431854
+     ],
+     "scale": [
+      1.0000005960464478,
+      0.9999999403953552,
+      1.0000008344650269
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.0045,
+      0.53,
+      -0.0209
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_Calf",
+     "node": 4,
+     "parent": "L_Thigh",
+     "translation": [
+      -0.00001836167211877182,
+      0.2512618899345398,
+      -0.000036419834941625595
+     ],
+     "rotation": [
+      -0.271238774061203,
+      0.002800598042085767,
+      0.13581691682338715,
+      0.9528774619102478
+     ],
+     "scale": [
+      1,
+      1,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.069,
+      0.2393,
+      0.1268
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_Foot",
+     "node": 1,
+     "parent": "L_Calf",
+     "translation": [
+      0.000017613405361771584,
+      0.07056712359189987,
+      0.00003143025969620794
+     ],
+     "rotation": [
+      0.2839745581150055,
+      0.00372020504437387,
+      -0.15749002993106842,
+      0.9458020925521851
+     ],
+     "scale": [
+      0.9999999403953552,
+      1,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.0034,
+      0.2218,
+      0.0098
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_ToeBase",
+     "node": 0,
+     "parent": "L_Foot",
+     "translation": [
+      6.576556188520044e-9,
+      0.05882346257567406,
+      9.878036166810489e-10
+     ],
+     "rotation": [
+      2.0571299330640613e-8,
+      0.6950339674949646,
+      -6.492419935000271e-9,
+      0.7189769148826599
+     ],
+     "scale": [
+      0.9999999403953552,
+      0.9999999403953552,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.0097,
+      0.163,
+      0.0037
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_CalfTwist01",
+     "node": 3,
+     "parent": "L_Calf",
+     "translation": [
+      2.561137080192566e-9,
+      -0.00004120776429772377,
+      -4.029566014196462e-8
+     ],
+     "rotation": [
+      -4.8095174065565516e-8,
+      -1.3319328218130977e-7,
+      -2.0489096641540527e-8,
+      1
+     ],
+     "scale": [
+      1,
+      1,
+      1.0000001192092896
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.069,
+      0.2394,
+      0.1268
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_CalfTwist02",
+     "node": 2,
+     "parent": "L_CalfTwist01",
+     "translation": [
+      -1.6938429325819016e-8,
+      0.029424868524074554,
+      1.8194398876403284e-8
+     ],
+     "rotation": [
+      2.582639524462138e-8,
+      2.5511707235637004e-7,
+      -1.5739351511001587e-7,
+      1
+     ],
+     "scale": null,
+     "matrix": false,
+     "ibm_translation": [
+      0.069,
+      0.21,
+      0.1268
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_ThighTwist01",
+     "node": 6,
+     "parent": "L_Thigh",
+     "translation": [
+      2.1122104953974485e-8,
+      -0.00012586492812260985,
+      9.515190413367236e-9
+     ],
+     "rotation": [
+      4.778399897986674e-10,
+      4.432013156474568e-8,
+      6.173014099886132e-8,
+      1
+     ],
+     "scale": [
+      0.9999999403953552,
+      0.9999999403953552,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.0045,
+      0.5301,
+      -0.0209
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_ThighTwist02",
+     "node": 5,
+     "parent": "L_ThighTwist01",
+     "translation": [
+      -1.365697244182229e-8,
+      0.12572802603244781,
+      -1.6529497770534363e-9
+     ],
+     "rotation": [
+      -1.3961455325173233e-9,
+      4.422827615258029e-8,
+      -1.0221630475371057e-7,
+      1
+     ],
+     "scale": [
+      0.9999999403953552,
+      0.9999999403953552,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.0045,
+      0.4044,
+      -0.0209
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_Thigh",
+     "node": 15,
+     "parent": "Pelvis",
+     "translation": [
+      0.05722205713391304,
+      -0.000501199858263135,
+      -0.0011716635199263692
+     ],
+     "rotation": [
+      0.9948619604110718,
+      -0.06455210596323013,
+      0.0049537126906216145,
+      0.07783481478691101
+     ],
+     "scale": [
+      1.0000016689300537,
+      1,
+      1.000002384185791
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.0181,
+      0.528,
+      -0.0242
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_ThighTwist01",
+     "node": 9,
+     "parent": "R_Thigh",
+     "translation": [
+      5.820766091346741e-9,
+      -0.0001312129315920174,
+      1.3826820577378385e-8
+     ],
+     "rotation": [
+      -1.1101519703515805e-9,
+      3.003833626280539e-8,
+      -4.440789780346677e-8,
+      1
+     ],
+     "scale": null,
+     "matrix": false,
+     "ibm_translation": [
+      0.0181,
+      0.5281,
+      -0.0242
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_ThighTwist02",
+     "node": 8,
+     "parent": "R_ThighTwist01",
+     "translation": [
+      -1.076841726899147e-9,
+      0.1312849372625351,
+      1.601443955223658e-8
+     ],
+     "rotation": [
+      -1.5642712014596327e-8,
+      -6.459686119342223e-9,
+      2.6027009880635887e-8,
+      1
+     ],
+     "scale": null,
+     "matrix": false,
+     "ibm_translation": [
+      0.0181,
+      0.3969,
+      -0.0242
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_Calf",
+     "node": 14,
+     "parent": "R_Thigh",
+     "translation": [
+      0.000025889967218972743,
+      0.26235365867614746,
+      -0.00005224064443609677
+     ],
+     "rotation": [
+      -0.3961014151573181,
+      -0.027902960777282715,
+      -0.181062251329422,
+      0.8997452855110168
+     ],
+     "scale": [
+      1,
+      1.0000001192092896,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.0685,
+      0.1882,
+      0.1772
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_Foot",
+     "node": 11,
+     "parent": "R_Calf",
+     "translation": [
+      -0.000019568484276533127,
+      0.0742807537317276,
+      0.000047318648284999654
+     ],
+     "rotation": [
+      0.4586961567401886,
+      0.018517151474952698,
+      0.20128031075000763,
+      0.865298330783844
+     ],
+     "scale": null,
+     "matrix": false,
+     "ibm_translation": [
+      0.0057,
+      0.2213,
+      -0.0019
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_ToeBase",
+     "node": 10,
+     "parent": "R_Foot",
+     "translation": [
+      -6.984919309616089e-10,
+      0.0592111200094223,
+      1.462851173528179e-9
+     ],
+     "rotation": [
+      -2.3203861054810204e-9,
+      -0.4813280701637268,
+      3.929040914840698e-8,
+      0.8765405416488647
+     ],
+     "scale": [
+      0.9999999403953552,
+      1,
+      0.9999998807907104
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.0015,
+      0.1621,
+      -0.0059
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_CalfTwist01",
+     "node": 13,
+     "parent": "R_Calf",
+     "translation": [
+      3.259629011154175e-9,
+      -0.0000433456152677536,
+      5.913689449243975e-8
+     ],
+     "rotation": [
+      -2.2113523812095082e-7,
+      8.608139978605323e-9,
+      3.725290076417309e-9,
+      1
+     ],
+     "scale": [
+      1,
+      0.9999999403953552,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.0685,
+      0.1882,
+      0.1772
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_CalfTwist02",
+     "node": 12,
+     "parent": "R_CalfTwist01",
+     "translation": [
+      2.537854015827179e-8,
+      0.030981406569480896,
+      -5.835295269207563e-8
+     ],
+     "rotation": [
+      3.3519216913191485e-7,
+      1.0952590834278908e-8,
+      6.14673041354763e-8,
+      1
+     ],
+     "scale": [
+      0.9999999403953552,
+      0.9999997615814209,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.0685,
+      0.1572,
+      0.1772
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "Waist",
+     "node": 38,
+     "parent": "Hip",
+     "translation": [
+      0.00002147536724805832,
+      0.0000409275853598956,
+      0.000020765233784914017
+     ],
+     "rotation": [
+      -0.12141626328229904,
+      -0.8750758171081543,
+      -0.28642308712005615,
+      0.3707590699195862
+     ],
+     "scale": [
+      1,
+      0.9999998211860657,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.007,
+      -0.5163,
+      0.1046
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "Spine01",
+     "node": 37,
+     "parent": "Waist",
+     "translation": [
+      1.2578311725519598e-9,
+      0.05059678852558136,
+      3.4360187584070445e-8
+     ],
+     "rotation": [
+      8.158067430485971e-7,
+      -1.1778746511481586e-7,
+      -7.699236448388547e-8,
+      1
+     ],
+     "scale": null,
+     "matrix": false,
+     "ibm_translation": [
+      0.007,
+      -0.5669,
+      0.1046
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "Spine02",
+     "node": 36,
+     "parent": "Spine01",
+     "translation": [
+      1.3392309483606368e-10,
+      0.10108062624931335,
+      1.7579900202235876e-8
+     ],
+     "rotation": [
+      1.1217629491966363e-8,
+      -6.257572238155262e-9,
+      7.138169610954037e-9,
+      1
+     ],
+     "scale": [
+      1,
+      0.9999999403953552,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.007,
+      -0.668,
+      0.1046
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "NeckTwist01",
+     "node": 19,
+     "parent": "Spine02",
+     "translation": [
+      1.193861010051478e-9,
+      0.08840087056159973,
+      2.5723014829281965e-8
+     ],
+     "rotation": [
+      -1.3405929166765418e-7,
+      8.04756083994107e-9,
+      -9.105406206799671e-9,
+      1
+     ],
+     "scale": null,
+     "matrix": false,
+     "ibm_translation": [
+      0.007,
+      -0.7564,
+      0.1046
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "NeckTwist02",
+     "node": 18,
+     "parent": "NeckTwist01",
+     "translation": [
+      5.896367838431615e-10,
+      0.03287380933761597,
+      3.716651519880543e-8
+     ],
+     "rotation": [
+      4.475154469218978e-8,
+      3.1675355671723082e-9,
+      -3.6757230592598944e-9,
+      1
+     ],
+     "scale": [
+      1,
+      0.9999999403953552,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.007,
+      -0.7893,
+      0.1046
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "Head",
+     "node": 17,
+     "parent": "NeckTwist02",
+     "translation": [
+      9.966925063054077e-10,
+      0.02029048278927803,
+      2.2222574003194495e-8
+     ],
+     "rotation": [
+      1.3788172736894921e-7,
+      -6.587086431864009e-11,
+      3.637980541815189e-12,
+      1
+     ],
+     "scale": [
+      1,
+      0.9999999403953552,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.007,
+      -0.8096,
+      0.1046
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_Clavicle",
+     "node": 27,
+     "parent": "Spine02",
+     "translation": [
+      -0.01962766982614994,
+      0.08839423209428787,
+      3.488492339442928e-8
+     ],
+     "rotation": [
+      0.645530104637146,
+      -0.760459840297699,
+      0.04124443233013153,
+      0.05736404284834862
+     ],
+     "scale": [
+      1,
+      1.0000001192092896,
+      0.9999998807907104
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.7495,
+      -0.1485,
+      -0.001
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_Upperarm",
+     "node": 26,
+     "parent": "L_Clavicle",
+     "translation": [
+      0.00016632970073260367,
+      0.07185100018978119,
+      -0.000008237228939833585
+     ],
+     "rotation": [
+      -0.10985790193080902,
+      -0.07545635104179382,
+      -0.6837162375450134,
+      0.7174745798110962
+     ],
+     "scale": [
+      0.9999999403953552,
+      1,
+      1.0000001192092896
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.2525,
+      0.7386,
+      -0.027
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_Forearm",
+     "node": 23,
+     "parent": "L_Upperarm",
+     "translation": [
+      -0.000014146091416478157,
+      0.16375289857387543,
+      0.000039198010199470446
+     ],
+     "rotation": [
+      0.09217812120914459,
+      0.31497058272361755,
+      0.07272522151470184,
+      0.9418109059333801
+     ],
+     "scale": [
+      0.9999998807907104,
+      0.9999999403953552,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.3275,
+      0.5331,
+      0.0585
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_ForearmTwist01",
+     "node": 21,
+     "parent": "L_Forearm",
+     "translation": [
+      -3.585591912269592e-8,
+      -0.00008941837586462498,
+      -1.2170531249466876e-8
+     ],
+     "rotation": [
+      2.5012354853970464e-8,
+      -1.4347695298511098e-7,
+      7.264316082000732e-8,
+      1
+     ],
+     "scale": null,
+     "matrix": false,
+     "ibm_translation": [
+      0.3275,
+      0.5332,
+      0.0585
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_ForearmTwist02",
+     "node": 20,
+     "parent": "L_ForearmTwist01",
+     "translation": [
+      -3.012246452271938e-8,
+      0.08922670781612396,
+      -2.938421062026464e-9
+     ],
+     "rotation": [
+      -2.0270441325465072e-8,
+      -3.1597892302670516e-8,
+      -2.300366759300232e-7,
+      1
+     ],
+     "scale": [
+      0.9999998807907104,
+      1.0000001192092896,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.3275,
+      0.444,
+      0.0585
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_Hand",
+     "node": 22,
+     "parent": "L_Forearm",
+     "translation": [
+      0.000015936559066176414,
+      0.17830441892147064,
+      0.00000898870075616287
+     ],
+     "rotation": [
+      0.2730901837348938,
+      0.8045210242271423,
+      -0.01820852980017662,
+      0.5271016359329224
+     ],
+     "scale": [
+      0.9999999403953552,
+      1,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.0022,
+      0.467,
+      0.136
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_UpperarmTwist01",
+     "node": 25,
+     "parent": "L_Upperarm",
+     "translation": [
+      -6.6356733441352844e-9,
+      -0.00008194035035558045,
+      -8.940190809880733e-9
+     ],
+     "rotation": [
+      -7.0200725232894e-9,
+      3.284564087380204e-8,
+      -8.94069742685133e-8,
+      1
+     ],
+     "scale": [
+      0.9999999403953552,
+      1,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.2525,
+      0.7387,
+      -0.027
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "L_UpperarmTwist02",
+     "node": 24,
+     "parent": "L_UpperarmTwist01",
+     "translation": [
+      5.075708031654358e-8,
+      0.08187177777290344,
+      9.562786118522126e-9
+     ],
+     "rotation": [
+      3.221289546218031e-8,
+      9.712922377502764e-8,
+      1.7601996660232544e-7,
+      1
+     ],
+     "scale": [
+      1,
+      1.0000001192092896,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.2525,
+      0.6568,
+      -0.027
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_Clavicle",
+     "node": 35,
+     "parent": "Spine02",
+     "translation": [
+      0.019627638161182404,
+      0.08834189921617508,
+      1.0847640119493462e-8
+     ],
+     "rotation": [
+      0.635415256023407,
+      0.7690795660018921,
+      -0.048173777759075165,
+      0.049430884420871735
+     ],
+     "scale": [
+      0.9999999403953552,
+      1,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.7476,
+      -0.1557,
+      -0.0002
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_Upperarm",
+     "node": 34,
+     "parent": "R_Clavicle",
+     "translation": [
+      -0.00018139333405997604,
+      0.07218164205551147,
+      -0.000016789841538411565
+     ],
+     "rotation": [
+      -0.14292168617248535,
+      0.08634575456380844,
+      0.6600973010063171,
+      0.7323861122131348
+     ],
+     "scale": [
+      1,
+      1,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.2996,
+      0.7211,
+      -0.0274
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_UpperarmTwist01",
+     "node": 29,
+     "parent": "R_Upperarm",
+     "translation": [
+      -2.450542524456978e-8,
+      -0.00008956741658039391,
+      1.234141677741718e-9
+     ],
+     "rotation": [
+      2.3175275032372156e-8,
+      -9.660837463343341e-8,
+      -3.3527616238870905e-8,
+      1
+     ],
+     "scale": [
+      0.9999999403953552,
+      0.9999999403953552,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.2996,
+      0.7212,
+      -0.0274
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_UpperarmTwist02",
+     "node": 28,
+     "parent": "R_UpperarmTwist01",
+     "translation": [
+      -1.4435499906539917e-8,
+      0.08951211720705032,
+      -7.564153747807723e-10
+     ],
+     "rotation": [
+      -8.131640782949034e-8,
+      8.227435444041475e-8,
+      6.51925802230835e-9,
+      1
+     ],
+     "scale": [
+      1,
+      0.9999999403953552,
+      1.0000001192092896
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.2996,
+      0.6317,
+      -0.0274
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_Forearm",
+     "node": 33,
+     "parent": "R_Upperarm",
+     "translation": [
+      -0.000015055295079946518,
+      0.1790054589509964,
+      0.0000562676832487341
+     ],
+     "rotation": [
+      0.16825543344020844,
+      -0.4737580716609955,
+      -0.04100475087761879,
+      0.8634593486785889
+     ],
+     "scale": [
+      0.9999999403953552,
+      1,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.311,
+      0.5271,
+      0.0992
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_ForearmTwist01",
+     "node": 31,
+     "parent": "R_Forearm",
+     "translation": [
+      6.51925802230835e-9,
+      -0.00008532730862498283,
+      -4.930208774567291e-8
+     ],
+     "rotation": [
+      2.705274404490865e-8,
+      -4.816968868226468e-8,
+      -3.8370490074157715e-7,
+      1
+     ],
+     "scale": [
+      1,
+      1,
+      0.9999999403953552
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.311,
+      0.5272,
+      0.0992
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_ForearmTwist02",
+     "node": 30,
+     "parent": "R_ForearmTwist01",
+     "translation": [
+      -7.695052772760391e-8,
+      0.08536899834871292,
+      4.902176442556083e-8
+     ],
+     "rotation": [
+      -1.0159453722735634e-8,
+      -4.985629686871107e-8,
+      4.209578321479057e-7,
+      1
+     ],
+     "scale": [
+      1,
+      0.9999999403953552,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      -0.311,
+      0.4418,
+      0.0992
+     ],
+     "ibm_scale": 1
+    },
+    {
+     "name": "R_Hand",
+     "node": 32,
+     "parent": "R_Forearm",
+     "translation": [
+      -0.00001621432602405548,
+      0.1705968827009201,
+      0.000006720210421917727
+     ],
+     "rotation": [
+      0.26125773787498474,
+      -0.8228131532669067,
+      0.04096672311425209,
+      0.5030354857444763
+     ],
+     "scale": [
+      1,
+      1.0000001192092896,
+      1
+     ],
+     "matrix": false,
+     "ibm_translation": [
+      0.0568,
+      0.4726,
+      0.0843
+     ],
+     "ibm_scale": 1
+    }
+   ]
+  }
+ ],
+ "animations": [
+  {
+   "index": 0,
+   "name": "preset:biped:angry_02",
+   "duration_s": 2.208,
+   "max_samples": 53,
+   "channels": 123,
+   "animated_nodes": 41,
+   "animated_skin_joints": 41,
+   "upper_body_joints_animated": 21,
+   "upper_body_joints_moving_over_3deg": 11,
+   "lower_body_joints_animated": 18,
+   "root_translation_travel_m": 1.121,
+   "top_level_node_max_rotation_deg": null,
+   "morph_only": false,
+   "nodes": {
+    "Root": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 90
+    },
+    "Hip": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "LINEAR",
+     "translation_end_minus_start": 1.121,
+     "translation_span": [
+      0.0293,
+      1.121,
+      0.0536
+     ],
+     "max_rotation_deg": 73.1
+    },
+    "Pelvis": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 136.5
+    },
+    "L_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 179.9
+    },
+    "L_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 91.7
+    },
+    "L_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 58.9
+    },
+    "L_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 88.1
+    },
+    "L_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 178.9
+    },
+    "R_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 85.9
+    },
+    "R_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 85
+    },
+    "R_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 57.5
+    },
+    "R_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Waist": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 138.8
+    },
+    "Spine01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 6.6
+    },
+    "Spine02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 6.6
+    },
+    "NeckTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 22.2
+    },
+    "NeckTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Head": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 173.4
+    },
+    "L_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 91.3
+    },
+    "L_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 71.8
+    },
+    "L_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 116.4
+    },
+    "L_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 174.3
+    },
+    "R_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 97.9
+    },
+    "R_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 53,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 79.2
+    },
+    "R_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 119.6
+    }
+   }
+  },
+  {
+   "index": 1,
+   "name": "preset:biped:agree",
+   "duration_s": 4.042,
+   "max_samples": 97,
+   "channels": 123,
+   "animated_nodes": 41,
+   "animated_skin_joints": 41,
+   "upper_body_joints_animated": 21,
+   "upper_body_joints_moving_over_3deg": 11,
+   "lower_body_joints_animated": 18,
+   "root_translation_travel_m": 0.0006,
+   "top_level_node_max_rotation_deg": null,
+   "morph_only": false,
+   "nodes": {
+    "Root": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 90
+    },
+    "Hip": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "LINEAR",
+     "translation_end_minus_start": 0.0006,
+     "translation_span": [
+      0.0221,
+      0.0146,
+      0.0034
+     ],
+     "max_rotation_deg": 67.3
+    },
+    "Pelvis": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 136.5
+    },
+    "L_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 173.5
+    },
+    "L_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 26.4
+    },
+    "L_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 41.4
+    },
+    "L_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 88.1
+    },
+    "L_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 179
+    },
+    "R_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 4
+    },
+    "R_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 54.4
+    },
+    "R_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 57.5
+    },
+    "R_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Waist": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 141.3
+    },
+    "Spine01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 5.3
+    },
+    "Spine02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 5.3
+    },
+    "NeckTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 30.3
+    },
+    "NeckTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Head": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 173.4
+    },
+    "L_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 92.4
+    },
+    "L_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 113.1
+    },
+    "L_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 116.4
+    },
+    "L_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 174.3
+    },
+    "R_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 105.3
+    },
+    "R_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 97,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 114.4
+    },
+    "R_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 119.6
+    }
+   }
+  },
+  {
+   "index": 2,
+   "name": "preset:biped:hit_to_head",
+   "duration_s": 1.875,
+   "max_samples": 45,
+   "channels": 123,
+   "animated_nodes": 41,
+   "animated_skin_joints": 41,
+   "upper_body_joints_animated": 21,
+   "upper_body_joints_moving_over_3deg": 11,
+   "lower_body_joints_animated": 18,
+   "root_translation_travel_m": 0,
+   "top_level_node_max_rotation_deg": null,
+   "morph_only": false,
+   "nodes": {
+    "Root": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 90
+    },
+    "Hip": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "LINEAR",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0.0415,
+      0.0512,
+      0.0387
+     ],
+     "max_rotation_deg": 70.8
+    },
+    "Pelvis": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 136.5
+    },
+    "L_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 179.8
+    },
+    "L_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 63.9
+    },
+    "L_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 31.7
+    },
+    "L_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 88.1
+    },
+    "L_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 179.7
+    },
+    "R_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 80.6
+    },
+    "R_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 62.5
+    },
+    "R_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 57.5
+    },
+    "R_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Waist": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 142.5
+    },
+    "Spine01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 12
+    },
+    "Spine02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 12
+    },
+    "NeckTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 93.4
+    },
+    "NeckTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Head": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 173.4
+    },
+    "L_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 109
+    },
+    "L_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 129.4
+    },
+    "L_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 116.4
+    },
+    "L_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 174.3
+    },
+    "R_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 90.4
+    },
+    "R_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 45,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 119
+    },
+    "R_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 119.6
+    }
+   }
+  },
+  {
+   "index": 3,
+   "name": "preset:biped:cast_a_spell",
+   "duration_s": 5.417,
+   "max_samples": 130,
+   "channels": 123,
+   "animated_nodes": 41,
+   "animated_skin_joints": 41,
+   "upper_body_joints_animated": 21,
+   "upper_body_joints_moving_over_3deg": 11,
+   "lower_body_joints_animated": 18,
+   "root_translation_travel_m": 0,
+   "top_level_node_max_rotation_deg": null,
+   "morph_only": false,
+   "nodes": {
+    "Root": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 90
+    },
+    "Hip": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "LINEAR",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0.1247,
+      0.2087,
+      0.0535
+     ],
+     "max_rotation_deg": 92.1
+    },
+    "Pelvis": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 136.5
+    },
+    "L_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 179.4
+    },
+    "L_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 75
+    },
+    "L_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 47.7
+    },
+    "L_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 88.1
+    },
+    "L_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 176.3
+    },
+    "R_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 83.1
+    },
+    "R_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 72.4
+    },
+    "R_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 57.5
+    },
+    "R_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Waist": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 142
+    },
+    "Spine01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 12.6
+    },
+    "Spine02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 12.6
+    },
+    "NeckTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 114
+    },
+    "NeckTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Head": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 173.4
+    },
+    "L_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 166.6
+    },
+    "L_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 154.3
+    },
+    "L_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 116.4
+    },
+    "L_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 174.3
+    },
+    "R_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 117.1
+    },
+    "R_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 130,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 130
+    },
+    "R_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 119.6
+    }
+   }
+  },
+  {
+   "index": 4,
+   "name": "preset:biped:afraid",
+   "duration_s": 2.625,
+   "max_samples": 63,
+   "channels": 123,
+   "animated_nodes": 41,
+   "animated_skin_joints": 41,
+   "upper_body_joints_animated": 21,
+   "upper_body_joints_moving_over_3deg": 11,
+   "lower_body_joints_animated": 18,
+   "root_translation_travel_m": 0.0002,
+   "top_level_node_max_rotation_deg": null,
+   "morph_only": false,
+   "nodes": {
+    "Root": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 90
+    },
+    "Hip": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "LINEAR",
+     "translation_end_minus_start": 0.0002,
+     "translation_span": [
+      0.0084,
+      0.096,
+      0.0397
+     ],
+     "max_rotation_deg": 66.6
+    },
+    "Pelvis": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 136.5
+    },
+    "L_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 179.6
+    },
+    "L_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 55.2
+    },
+    "L_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 57.2
+    },
+    "L_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 88.1
+    },
+    "L_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Thigh": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 180
+    },
+    "R_ThighTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ThighTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Calf": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 51.2
+    },
+    "R_Foot": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 85.4
+    },
+    "R_ToeBase": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 57.5
+    },
+    "R_CalfTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_CalfTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Waist": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 138.7
+    },
+    "Spine01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 7.8
+    },
+    "Spine02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 7.8
+    },
+    "NeckTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 30.8
+    },
+    "NeckTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "Head": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 173.4
+    },
+    "L_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 100.2
+    },
+    "L_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 133.8
+    },
+    "L_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 116.4
+    },
+    "L_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "L_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Clavicle": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 174.3
+    },
+    "R_Upperarm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 97.4
+    },
+    "R_UpperarmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_UpperarmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Forearm": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 63,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 123.7
+    },
+    "R_ForearmTwist01": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_ForearmTwist02": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 0
+    },
+    "R_Hand": {
+     "properties": [
+      "translation",
+      "rotation",
+      "scale"
+     ],
+     "samples": 2,
+     "interpolation": "STEP",
+     "translation_end_minus_start": 0,
+     "translation_span": [
+      0,
+      0,
+      0
+     ],
+     "max_rotation_deg": 119.6
+    }
+   }
+  }
+ ],
+ "units_guess": {
+  "tallest_axis": "+Y",
+  "height_in_file_units": 0.9814,
+  "likely_units": "metres"
+ },
+ "verdict": "ANIMATED_SKELETAL_DONOR (5 usable clip(s))"
+}

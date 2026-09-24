@@ -1,0 +1,2494 @@
+{
+ "generated_at": "2026-09-24T02:07:13.570Z",
+ "source": "fresh local static_dist; not packaged or deployed",
+ "scope": "one bounded M6 visual session",
+ "screenshots": [
+  "01_floor_road_and_rest_integrity.png"
+ ],
+ "runtime": {
+  "initial": {
+   "world": {
+    "status": "READY",
+    "registry": "WORLD_REGISTRY_V1",
+    "error": null,
+    "shapes": 9457,
+    "floor_cut": 5,
+    "floor_cut_error": null,
+    "modules": {
+     "build_ms": {
+      "fixtures": 2,
+      "water": 38,
+      "coast": 37,
+      "terrain": 35,
+      "macro": 3,
+      "meadow": 18,
+      "forest": 4995,
+      "architecture": 1384,
+      "celestial": 837,
+      "sky": 6,
+      "atmosphere": 0,
+      "props": 1042,
+      "matchHall": 15,
+      "guides": 0,
+      "creatures": 305,
+      "wildlife": 436,
+      "gear": 17,
+      "signage": 20
+     },
+     "fixtures": 164,
+     "water": {
+      "rivers": 5,
+      "bridges": 3,
+      "kerbSegments": 0,
+      "decks": 3,
+      "ramps": 6,
+      "rails": 6,
+      "posts": 66,
+      "edgeLines": 18,
+      "pads": 6,
+      "drawCalls": 18,
+      "triangles": 2900,
+      "maxY": 1.45,
+      "railTopY": 1.45,
+      "clearanceOk": true,
+      "night": true,
+      "floats": 27,
+      "meshes": [
+       "WATER_SHORE",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_FOAM",
+       "WATER_PLATINUM",
+       "WATER_RAILS",
+       "WATER_EDGE_LINES",
+       "WATER_LANDING_PADS",
+       "WATER_SURFACE",
+       "WATER_FLOAT_PADS",
+       "WATER_FLOAT_CORES"
+      ],
+      "ripples": {
+       "supported": true,
+       "enabled": true,
+       "tier": "HIGH",
+       "n": 256,
+       "size_m": 48,
+       "grid": 96,
+       "texel_m": 0.188,
+       "c2": 0.09,
+       "damp": 0.99,
+       "amp_m": 0.07,
+       "ring_speed_mps": 3.94,
+       "impulses": 38,
+       "dropped": 0,
+       "steps": 0,
+       "active": false,
+       "in_water": false,
+       "pending": 38,
+       "origin": [
+        0,
+        3.9375
+       ],
+       "error": null
+      }
+     },
+     "coast": {
+      "islands": 11,
+      "draw_calls": 18,
+      "tris": 24940,
+      "sea_y": -0.3,
+      "beach_w": 34,
+      "outline": {
+       "x1": -203,
+       "z1": -86,
+       "x2": 203,
+       "z2": 322,
+       "corner_r": 70
+      },
+      "foam_lines": 12,
+      "night": true
+     },
+     "terrain": {
+      "regions": 8,
+      "terraces": 4,
+      "forecourts": 5,
+      "spurs": 6,
+      "tint_sheets": 1,
+      "tint_cells": 1556,
+      "tint_overlaps_prevented": 32,
+      "tint_policy": "SINGLE_SURFACE_SOFT_VERTEX_BLEND",
+      "paths": {
+       "CAUSEWAY": 6,
+       "REGIONAL": 13,
+       "TRAIL": 12
+      },
+      "shards": 962,
+      "dust": 2661,
+      "monoliths": 18,
+      "draw_calls": 10,
+      "tris": 16734,
+      "night": true
+     },
+     "macro": {
+      "ridges": [
+       {
+        "id": "RIDGE_NEAR",
+        "dist_m": 360,
+        "h": [
+         38,
+         150
+        ],
+        "passes": 5,
+        "tris": 960
+       },
+       {
+        "id": "RIDGE_MID",
+        "dist_m": 520,
+        "h": [
+         70,
+         230
+        ],
+        "passes": 5,
+        "tris": 848
+       }
+      ],
+      "waterfalls": [
+       {
+        "id": "TITAN_FALL",
+        "drop_m": 11.8,
+        "source": "TITAN_LEDGE",
+        "receiver": "TITAN_LAKE",
+        "ripple": true,
+        "mist": 3
+       },
+       {
+        "id": "NORTH_FALL",
+        "drop_m": 46,
+        "source": "RIDGE_NEAR",
+        "receiver": "RIVER_N",
+        "ripple": false,
+        "mist": 3
+       }
+      ],
+      "sky_beams": [
+       "BEAM_TEMPLE←LM_TEMPLE crown diamond",
+       "BEAM_TOWER←LM_TOWER crown diamond",
+       "BEAM_NORTH_PASS←north pass sanctuary beacon (ridge notch)"
+      ],
+      "draw_calls": 15
+     },
+     "meadow": {
+      "chunks": 95,
+      "instances": 17553,
+      "visible_chunks": 19,
+      "draw_calls": 19,
+      "tris_visible_max": 140424,
+      "near_m": 70,
+      "mid_m": 130,
+      "night": true,
+      "cfg": {
+       "_doc": "owner next-pass 2026-09-20 §10 CRYSTAL MEADOW = the MAHWORLD grassland: many small multifaceted forms in the region family, varied height, controlled highlights, slight translucency, never a mirror; NEAR = instanced geometry (chunks of 30 m, frustum + distance culled), MID = the same chunks at half density, FAR = the region tint sheet; a subtle shimmer by instance hash, never constant sparkle",
+       "density_per_m2": 0.7,
+       "chunk_m": 30,
+       "near_m": 70,
+       "mid_m": 130,
+       "h_m": [
+        0.07,
+        0.36
+       ],
+       "r_m": [
+        0.045,
+        0.13
+       ],
+       "max_instances": 64000,
+       "opacity": 0.86,
+       "shimmer": 0.05
+      }
+     },
+     "forest": {
+      "tree_lock": true,
+      "zone_family": {
+       "FOREST_W": "purple",
+       "FOREST_NW": "red",
+       "FOREST_NE": "blue",
+       "FOREST_N_W": "red",
+       "FOREST_N_E": "gold",
+       "BAGE_GARDEN_W": "pink",
+       "BAGE_GARDEN_E": "pink"
+      },
+      "trees": 121,
+      "lod_counts": {
+       "L0": 0,
+       "L1": 121,
+       "IMPOSTOR": 0
+      },
+      "source_tiers": {
+       "near": "L0",
+       "far": "L1"
+      },
+      "same_material_all_tiers": true,
+      "runtime_impostor": false,
+      "impostor": false,
+      "runtime_bake_ms": 0,
+      "draw_calls": 8,
+      "zone_chunks": [
+       {
+        "zone": "BAGE_GARDEN_E",
+        "trees": 2,
+        "L0": 0,
+        "L1": 2
+       },
+       {
+        "zone": "BAGE_GARDEN_W",
+        "trees": 2,
+        "L0": 0,
+        "L1": 2
+       },
+       {
+        "zone": "FOREST_NE",
+        "trees": 30,
+        "L0": 0,
+        "L1": 30
+       },
+       {
+        "zone": "FOREST_NW",
+        "trees": 30,
+        "L0": 0,
+        "L1": 30
+       },
+       {
+        "zone": "FOREST_N_E",
+        "trees": 15,
+        "L0": 0,
+        "L1": 15
+       },
+       {
+        "zone": "FOREST_N_W",
+        "trees": 15,
+        "L0": 0,
+        "L1": 15
+       },
+       {
+        "zone": "FOREST_W",
+        "trees": 27,
+        "L0": 0,
+        "L1": 27
+       }
+      ],
+      "lod_m": {
+       "near": 26,
+       "mid": null
+      },
+      "hysteresis_m": 4,
+      "triangles_per_tree": {
+       "L0": 14792,
+       "L1": 7392
+      },
+      "rendered_tree_triangles": 894432,
+      "family_samples": [
+       {
+        "index": 0,
+        "id": "FOREST_W_T000",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -89.91,
+        "z": -4.6,
+        "tier": "L1",
+        "color": "#8b67d2"
+       },
+       {
+        "index": 27,
+        "id": "FOREST_NW_T000",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -66.02,
+        "z": 188.7,
+        "tier": "L1",
+        "color": "#c93146"
+       },
+       {
+        "index": 57,
+        "id": "FOREST_NE_T000",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 148.03,
+        "z": 193.69,
+        "tier": "L1",
+        "color": "#2958da"
+       },
+       {
+        "index": 102,
+        "id": "FOREST_N_E_T000",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 105.54,
+        "z": 271.72,
+        "tier": "L1",
+        "color": "#d6b562"
+       },
+       {
+        "index": 117,
+        "id": "BAGE_GARDEN_W_T000",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -51.9,
+        "z": 248,
+        "tier": "L1",
+        "color": "#e986b3"
+       }
+      ],
+      "lifecycle": {
+       "transitions": 121,
+       "rewrites": 1,
+       "timing_ms": {
+        "build_ms": 4994.8,
+        "assemble_ms": 3.2,
+        "first_classify_ms": 0.165,
+        "first_rewrite_ms": 0.22,
+        "last_classify_ms": 0,
+        "max_classify_ms": 0.165,
+        "last_rewrite_ms": 0.22,
+        "max_rewrite_ms": 0.22,
+        "runtime_bake_ms": 0
+       },
+       "resources": {
+        "materials": 1,
+        "geometries": 2,
+        "render_targets": 0
+       }
+      },
+      "height_m": [
+       9.27,
+       14.73
+      ],
+      "underbrush": 121,
+      "night": true,
+      "skipped": null
+     },
+     "architecture": {
+      "landmarks": 5,
+      "houses": 5,
+      "skirt_shards": 141,
+      "seams": 25,
+      "bands": 0,
+      "insets": 30,
+      "crowns": 9,
+      "aura_particles": 321,
+      "aura_anchors": 33,
+      "canopy_aura_anchors": 7,
+      "free_aura_anchors": 2,
+      "canopy_aura_samples": [
+       {
+        "id": "BAGE_GARDEN_E_T001",
+        "zone": "BAGE_GARDEN_E",
+        "family": "pink",
+        "x": 50.41,
+        "y": 7.23,
+        "z": 246.82
+       },
+       {
+        "id": "BAGE_GARDEN_W_T001",
+        "zone": "BAGE_GARDEN_W",
+        "family": "pink",
+        "x": -68.09,
+        "y": 7.89,
+        "z": 257.66
+       },
+       {
+        "id": "FOREST_NE_T015",
+        "zone": "FOREST_NE",
+        "family": "blue",
+        "x": 76.18,
+        "y": 8.36,
+        "z": 195.73
+       },
+       {
+        "id": "FOREST_NW_T015",
+        "zone": "FOREST_NW",
+        "family": "red",
+        "x": -95.96,
+        "y": 9.65,
+        "z": 191.46
+       },
+       {
+        "id": "FOREST_N_E_T007",
+        "zone": "FOREST_N_E",
+        "family": "gold",
+        "x": 151.48,
+        "y": 7.72,
+        "z": 256.35
+       },
+       {
+        "id": "FOREST_N_W_T007",
+        "zone": "FOREST_N_W",
+        "family": "red",
+        "x": -166.71,
+        "y": 10.93,
+        "z": 279.54
+       },
+       {
+        "id": "FOREST_W_T013",
+        "zone": "FOREST_W",
+        "family": "purple",
+        "x": -90.3,
+        "y": 8.63,
+        "z": -24.68
+       }
+      ],
+      "aura_language": "ARCANE_LEAKAGE_MIST",
+      "entrance_diamonds": 24,
+      "roof_diamonds": 20,
+      "draw_calls": 50,
+      "tris": 6596,
+      "night": true,
+      "motion_far_m": 220
+     },
+     "celestial": {
+      "night": true,
+      "camera_relative_origin": true,
+      "world_direction_stable": true,
+      "effects_face_camera": true,
+      "cloud_cards": "OLD_SOFT_FEATHERED",
+      "draw_calls_visible": 5,
+      "sun": {
+       "apparent_deg": 6.5,
+       "diameter_m": 102.21,
+       "distance_m": 900,
+       "halo_deg": 14,
+       "halo_m": 221.01,
+       "textured": true,
+       "visible": false,
+       "direction": [
+        0.7404,
+        0.5411,
+        0.3987
+       ],
+       "geometry": "PROCEDURAL_SUN",
+       "triangles": 320,
+       "meshes": 1,
+       "provenance": {
+        "mode": "DERIVATIVE_TEXTURE_PROCEDURAL_GEOMETRY",
+        "derivative_id": "MAHWORLD_OVERSIZED_SUN",
+        "lod": "L1",
+        "runtime": "lab/assets/world/sun/MAHWORLD_OVERSIZED_SUN_L1.glb"
+       },
+       "source_bounds": null,
+       "veil_shape": {
+        "kind": "IRREGULAR_RADIAL_FAN",
+        "rectangular": false,
+        "feathered": true,
+        "segments": 42,
+        "radius_min": 0.8004,
+        "radius_max": 1.0076,
+        "seed": 3238878957
+       },
+       "cloud": {
+        "tau": 0.035,
+        "coverage": 0.035,
+        "transmission": 0.965,
+        "disc": 0.98,
+        "halo": 0.953,
+        "rays": 0.932,
+        "key": 0.978
+       }
+      },
+      "moon": {
+       "apparent_deg": 6.2,
+       "diameter_m": 97.48,
+       "distance_m": 900,
+       "halo_deg": 12,
+       "halo_m": 189.19,
+       "textured": true,
+       "visible": true,
+       "direction": [
+        -0.3295,
+        0.2764,
+        -0.9028
+       ],
+       "geometry": "TRACED_DERIVATIVE_GLB",
+       "triangles": 8000,
+       "meshes": 1,
+       "provenance": {
+        "mode": "REGISTRY_TRACED_DERIVATIVE",
+        "derivative_id": "MAHWORLD_OVERSIZED_MOON",
+        "lod": "L0",
+        "runtime": "lab/assets/world/moon/MAHWORLD_OVERSIZED_MOON_L0.glb",
+        "runtime_sha256": "b7ad1e4897ef26961133b09894583c709e27cf6edebfe4a7811ad7bdbfbf415c",
+        "source_id": "MAHWORLD_OVERSIZED_MOON_SOURCE",
+        "source_path": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\moon.glb",
+        "source_sha256": "6d5499f9654d00f3533170848dfe18fb991237d1ed87e5eb0a6cfb785701eb8c"
+       },
+       "source_bounds": {
+        "min": [
+         -0.4753277003765106,
+         0.006969625595957041,
+         -0.4882354736328125
+        ],
+        "max": [
+         0.47760772705078125,
+         0.928564727306366,
+         0.4807717502117157
+        ],
+        "max_dim": 0.96901
+       },
+       "veil_shape": {
+        "kind": "IRREGULAR_RADIAL_FAN",
+        "rectangular": false,
+        "feathered": true,
+        "segments": 42,
+        "radius_min": 0.8004,
+        "radius_max": 1.0076,
+        "seed": 3238878957
+       },
+       "cloud": {
+        "tau": 1.232,
+        "coverage": 0.708,
+        "transmission": 0.292,
+        "disc": 0.589,
+        "halo": 0.189,
+        "rays": 0.085,
+        "key": 0.561
+       }
+      }
+     },
+     "sky": {
+      "wind": {
+       "dir_deg": 28,
+       "speed_mps": 2.4,
+       "now_mps": 3.23,
+       "travel_m": 62.94,
+       "gust": 0.35
+      },
+      "cloud_cards": "OLD_SOFT_FEATHERED",
+      "cloud_key": "MOON",
+      "layers": [
+       {
+        "id": "MIST_LOW",
+        "kind": "MIST",
+        "count": 1,
+        "alt_m": 6,
+        "opacity": 0.22,
+        "occludes": false,
+        "depth_write": false,
+        "silhouette": null,
+        "alpha_test": 0
+       },
+       {
+        "id": "STRATUS_LOW",
+        "kind": "CLOUD",
+        "count": 12,
+        "alt_m": 118,
+        "opacity": 0.28,
+        "occludes": true,
+        "depth_write": true,
+        "silhouette": {
+         "kind": "IRREGULAR_RADIAL_FAN",
+         "rectangular": false,
+         "feathered": true,
+         "segments": 40,
+         "radius_min": 0.8021,
+         "radius_max": 0.97,
+         "seed": 289
+        },
+        "alpha_test": 0.055
+       },
+       {
+        "id": "CUMULUS_MID",
+        "kind": "CLOUD",
+        "count": 26,
+        "alt_m": 190,
+        "opacity": 0.36,
+        "occludes": true,
+        "depth_write": true,
+        "silhouette": {
+         "kind": "IRREGULAR_RADIAL_FAN",
+         "rectangular": false,
+         "feathered": true,
+         "segments": 40,
+         "radius_min": 0.8111,
+         "radius_max": 1.0079,
+         "seed": 420
+        },
+        "alpha_test": 0.055
+       },
+       {
+        "id": "CIRRUS_HIGH",
+        "kind": "CLOUD",
+        "count": 14,
+        "alt_m": 330,
+        "opacity": 0.16,
+        "occludes": false,
+        "depth_write": false,
+        "silhouette": {
+         "kind": "IRREGULAR_RADIAL_FAN",
+         "rectangular": false,
+         "feathered": true,
+         "segments": 40,
+         "radius_min": 0.809,
+         "radius_max": 1.02,
+         "seed": 551
+        },
+        "alpha_test": 0.012
+       }
+      ],
+      "celestial_optics": {
+       "model": "T=exp(-tau)",
+       "sun": {
+        "tau": 0.035,
+        "transmission": 0.965,
+        "coverage": 0.035,
+        "disc": 0.98,
+        "halo": 0.953,
+        "rays": 0.932,
+        "key": 0.978,
+        "phase_u": 0.336,
+        "phase_v": 0.384,
+        "travel_m": 62.94
+       },
+       "moon": {
+        "tau": 1.232,
+        "transmission": 0.292,
+        "coverage": 0.708,
+        "disc": 0.589,
+        "halo": 0.189,
+        "rays": 0.085,
+        "key": 0.561,
+        "phase_u": 0.72,
+        "phase_v": 0.384,
+        "travel_m": 62.94
+       }
+      },
+      "draw_calls": 4,
+      "night": true
+     },
+     "atmosphere": {
+      "on": true,
+      "tier": "HIGH",
+      "night": true,
+      "fog": null,
+      "mie": 0.15,
+      "sun": [
+       -0.342,
+       0.085,
+       -0.936
+      ]
+     },
+     "props": {
+      "placed": [
+       {
+        "id": "PROJECTOR_GYM_BEACON",
+        "derivative": "MAH_GYM_PROJECTOR_BEACON",
+        "scale": 4.9804,
+        "footprint_m": [
+         4.88,
+         2.77
+        ],
+        "height_m": 4.6,
+        "yaw_deg": 40,
+        "levels": [
+         0,
+         60
+        ],
+        "meshes": 1,
+        "bounds": {
+         "min": [
+          -82.76,
+          0.02,
+          95.37
+         ],
+         "max": [
+          -77.24,
+          4.62,
+          100.63
+         ]
+        },
+        "pad_r_m": 2.79
+       }
+      ],
+      "pads": 1,
+      "draw_calls_at_rest": 2,
+      "hologram_materials": 2,
+      "night": true
+     },
+     "matchHall": {
+      "building": {
+       "id": "MATCH_HALL",
+       "at": [
+        122,
+        6
+       ],
+       "door": {
+        "side": "-x",
+        "x": 102,
+        "z": 6,
+        "w": 6,
+        "h": 5
+       },
+       "draw_calls": 6,
+       "tris": 1772,
+       "strips": 60,
+       "height_m": 22
+      },
+      "court": {
+       "id": "MATCH_COURT_OUTDOOR",
+       "at": [
+        128,
+        50
+       ],
+       "r": 16,
+       "spectator_r": [
+        19,
+        24
+       ],
+       "pylons": 4,
+       "aisles": 4,
+       "draw_calls": 3,
+       "tris": 4656
+      },
+      "interior": null,
+      "night": true,
+      "draw_calls_field": 9
+     },
+     "guides": {
+      "current": null,
+      "visible": true,
+      "on_stage": false,
+      "height_m": 0.75,
+      "wanted": null,
+      "loaded": [],
+      "loading": [],
+      "skinned": null,
+      "scale": null,
+      "night": true,
+      "rim": null,
+      "draw_calls": 0,
+      "pos": null,
+      "yaw_deg": null,
+      "follow": {
+       "lateral_m": 0.78,
+       "trail_m": 0.38,
+       "up_m": 1.42,
+       "rate": 7,
+       "lead_s": 0.18,
+       "snap_beyond_m": 12,
+       "cam_clear_m": 1.6,
+       "floor_above_feet_m": 0.35,
+       "dist_m": 1.5,
+       "angle_rad": 1.2
+      },
+      "orient": {
+       "yaw_rate": 6,
+       "look_events_s": 0
+      },
+      "companion_brake": {
+       "min_decel_mps2": 5,
+       "rad": 0.18,
+       "settle_s": 0.35
+      },
+      "hover": {
+       "amp_m": 0.05,
+       "hz": 0.9,
+       "amp2_m": 0.02,
+       "hz2": 0.37
+      },
+      "drift": {
+       "amp_m": 0.28,
+       "period_s": 6.5,
+       "correct_rate": 1.6
+      },
+      "settle": {
+       "after_s": 2.5,
+       "rise_m": 0.12,
+       "look_hz": 0.11,
+       "look_rad": 0.55
+      },
+      "bank": {
+       "rad_per_mps": 0.14,
+       "max_rad": 0.42,
+       "yaw_rate": 8
+      },
+      "formation": null,
+      "accel_bank": 0.05,
+      "settled": 0,
+      "idle_s": 0,
+      "motion_source": "registry.guide_motion",
+      "cast": {
+       "weight": 0,
+       "casts_seen": 0,
+       "tuning": {
+        "rise_m": 0.42,
+        "pitch_rad": 0.22,
+        "bob_hz": 2.6,
+        "glow_m": 0.9,
+        "dispense_s": 0.9
+       }
+      }
+     },
+     "creatures": {
+      "count": 0,
+      "active": 0,
+      "lod_levels": 3,
+      "lod_m": [
+       24,
+       60
+      ],
+      "lod_now": [],
+      "classified_bones": {
+       "method": "names",
+       "total_bones": 55,
+       "root": "Root",
+       "hips": "J_Bip_C_Hips",
+       "head": "J_Bip_C_Head",
+       "neck": "J_Bip_C_Neck",
+       "jaw": null,
+       "spine": [
+        "J_Bip_C_Spine",
+        "J_Bip_C_Chest",
+        "J_Bip_C_UpperChest"
+       ],
+       "tail": [],
+       "legs": {
+        "FL": "J_Bip_L_UpperArm / J_Bip_L_LowerArm / J_Bip_L_Hand",
+        "FR": "J_Bip_R_UpperArm / J_Bip_R_LowerArm / J_Bip_R_Hand",
+        "BL": "J_Bip_L_UpperLeg / J_Bip_L_Foot / J_Bip_L_Foot",
+        "BR": "J_Bip_R_UpperLeg / J_Bip_R_Foot / J_Bip_R_Foot"
+       },
+       "forward_model": "+z",
+       "forward_fix_deg": 180,
+       "rest_height_m": 0.978,
+       "missing": [
+        "jaw",
+        "tail"
+       ],
+       "duplicates": [],
+       "notes": [
+        "BL knee degenerate (-0.004 m) → fold at J_Bip_L_Foot",
+        "BR knee degenerate (-0.000 m) → fold at J_Bip_R_Foot"
+       ]
+      },
+      "loaded": true,
+      "load_error": null,
+      "derivative": "DOGKIE_FOREST_CREATURE",
+      "height_m": 1.4,
+      "scale": 1.4319,
+      "states": {},
+      "draw_calls_visible": 0,
+      "tags": 0,
+      "status_level": 5,
+      "contacts": 0,
+      "territories": {
+       "packs": 11,
+       "shards": 560,
+       "draw_calls": 2
+      },
+      "locomotion": "GLIDE (no stepping cycle; hover 0.07 m, attack lift 0.28 m)",
+      "motion_contract": {
+       "mode": "SURFACE_GLIDE",
+       "step_cycle": false,
+       "surface_hover_m": 0.07,
+       "attack_lift_m": 0.28,
+       "attack_only_lift": true,
+       "fused_units": true
+      },
+      "motion": [],
+      "lag_s": 0.12,
+      "host_clock": false,
+      "night": true
+     },
+     "wildlife": {
+      "authority": "HOST (p.wildlife — play/world/WildlifeManager.js)",
+      "species": {
+       "PHOENIX": {
+        "figures": 5,
+        "visible": 5,
+        "lods": 3,
+        "scale": 3.74,
+        "head": "+z",
+        "rig": "RIGID → shader",
+        "combat": {
+         "hits_to_kill": 18,
+         "hits_to_kill_player": 10,
+         "aggression": "HOSTILE_AERIAL"
+        },
+        "ownership": {
+         "wild": true,
+         "pet_capable": true,
+         "premium": true,
+         "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+         "payment_ui": false
+        },
+        "states": [
+         "PATROL",
+         "PATROL",
+         "PATROL",
+         "PATROL",
+         "PATROL"
+        ],
+        "positions": [
+         [
+          137,
+          94,
+          413
+         ],
+         [
+          -112,
+          94,
+          76
+         ],
+         [
+          194,
+          94,
+          201
+         ],
+         [
+          -108,
+          95.2,
+          374
+         ],
+         [
+          10,
+          94,
+          365
+         ]
+        ]
+       },
+       "FISH": {
+        "figures": 24,
+        "visible": 21,
+        "lods": 3,
+        "scale": 2.448,
+        "head": "+z",
+        "rig": "RIGID → shader",
+        "combat": {
+         "hits_to_kill": 5,
+         "hits_to_kill_player": 4.5,
+         "aggression": "PROVOKED"
+        },
+        "ownership": {
+         "wild": true,
+         "pet_capable": true,
+         "premium": true,
+         "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+         "payment_ui": false
+        },
+        "states": [
+         "SWIM",
+         "SWIM",
+         "RISE",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "RISE",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "BREACH",
+         "SWIM",
+         "RISE",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "SWIM",
+         "BREACH"
+        ],
+        "positions": [
+         [
+          -9,
+          -1.4,
+          -122
+         ],
+         [
+          -7,
+          -2.1,
+          -120
+         ],
+         [
+          -4,
+          -1.7,
+          -118
+         ],
+         [
+          269,
+          -1.4,
+          52
+         ],
+         [
+          272,
+          -1.6,
+          52
+         ],
+         [
+          275,
+          -2.1,
+          52
+         ],
+         [
+          -27,
+          -0.4,
+          226
+         ],
+         [
+          -26,
+          -0.4,
+          229
+         ],
+         [
+          -26,
+          -0.4,
+          232
+         ],
+         [
+          -143,
+          -0.4,
+          224
+         ],
+         [
+          -146,
+          -0.3,
+          223
+         ],
+         [
+          -149,
+          -0.3,
+          221
+         ],
+         [
+          144,
+          -0.4,
+          103
+         ],
+         [
+          142,
+          -0.3,
+          105
+         ],
+         [
+          142,
+          1.5,
+          104
+         ],
+         [
+          -91,
+          -0.4,
+          32
+         ],
+         [
+          -88,
+          -0.4,
+          32
+         ],
+         [
+          -85,
+          -0.4,
+          32
+         ],
+         [
+          -26,
+          -0.3,
+          263
+         ],
+         [
+          -23,
+          -0.4,
+          262
+         ],
+         [
+          -20,
+          -0.4,
+          261
+         ],
+         [
+          32,
+          -0.3,
+          257
+         ],
+         [
+          31,
+          -0.4,
+          254
+         ],
+         [
+          24,
+          1.5,
+          251
+         ]
+        ]
+       },
+       "HORSE": {
+        "figures": 5,
+        "visible": 5,
+        "lods": 3,
+        "scale": 2.384,
+        "head": "+z",
+        "rig": "RIGID → shader",
+        "combat": {
+         "hits_to_kill": 35,
+         "hits_to_kill_player": null,
+         "aggression": "DEFENSIVE"
+        },
+        "ownership": {
+         "wild": true,
+         "pet_capable": true,
+         "premium": true,
+         "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+         "payment_ui": false
+        },
+        "states": [
+         "GRAZE",
+         "GRAZE",
+         "GRAZE",
+         "GRAZE",
+         "GRAZE"
+        ],
+        "positions": [
+         [
+          131,
+          0,
+          141
+         ],
+         [
+          75,
+          0,
+          128
+         ],
+         [
+          -27,
+          0,
+          155
+         ],
+         [
+          -143,
+          2.6,
+          22
+         ],
+         [
+          -84,
+          0,
+          -29
+         ]
+        ]
+       }
+      },
+      "stats": {
+       "fish": 24,
+       "horses": 5,
+       "phoenix": 5,
+       "breaches": 0,
+       "visits": 0,
+       "draw_calls": 31,
+       "tags": 0
+      },
+      "night": true,
+      "payment_ui": false,
+      "figures": 34,
+      "population_lod": {
+       "built": true,
+       "error": null,
+       "mid_schools": 20,
+       "mid_agents": 228,
+       "far_silhouettes": 120,
+       "breaches": 17,
+       "reach_m": 260,
+       "near_schools": 13,
+       "draw_calls": 2
+      }
+     },
+     "gear": {
+      "items": [],
+      "grips": [],
+      "clones": 0,
+      "diamonds": 0,
+      "bushes": 41,
+      "intro_patch": "RB_NEXUS_INTRO",
+      "shards_per_patch": 64,
+      "shards": 2624,
+      "broken": [],
+      "templates": [],
+      "band": "procedural tube 1.3 m × r 0.018 m (no source model in the project database)",
+      "status_tags": 0
+     },
+     "signage": {
+      "wayfinders": 30,
+      "buildings": 14,
+      "labels_visible": 6,
+      "labels_total": 44
+     },
+     "trees": 121
+    }
+   },
+   "debug": {
+    "build_ms": {
+     "fixtures": 2,
+     "water": 38,
+     "coast": 37,
+     "terrain": 35,
+     "macro": 3,
+     "meadow": 18,
+     "forest": 4995,
+     "architecture": 1384,
+     "celestial": 837,
+     "sky": 6,
+     "atmosphere": 0,
+     "props": 1042,
+     "matchHall": 15,
+     "guides": 0,
+     "creatures": 305,
+     "wildlife": 436,
+     "gear": 17,
+     "signage": 20
+    },
+    "fixtures": 164,
+    "water": {
+     "rivers": 5,
+     "bridges": 3,
+     "kerbSegments": 0,
+     "decks": 3,
+     "ramps": 6,
+     "rails": 6,
+     "posts": 66,
+     "edgeLines": 18,
+     "pads": 6,
+     "drawCalls": 18,
+     "triangles": 2900,
+     "maxY": 1.45,
+     "railTopY": 1.45,
+     "clearanceOk": true,
+     "night": true,
+     "floats": 27,
+     "meshes": [
+      "WATER_SHORE",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_PLATINUM",
+      "WATER_RAILS",
+      "WATER_EDGE_LINES",
+      "WATER_LANDING_PADS",
+      "WATER_SURFACE",
+      "WATER_FLOAT_PADS",
+      "WATER_FLOAT_CORES"
+     ],
+     "ripples": {
+      "supported": true,
+      "enabled": true,
+      "tier": "HIGH",
+      "n": 256,
+      "size_m": 48,
+      "grid": 96,
+      "texel_m": 0.188,
+      "c2": 0.09,
+      "damp": 0.99,
+      "amp_m": 0.07,
+      "ring_speed_mps": 3.94,
+      "impulses": 38,
+      "dropped": 0,
+      "steps": 0,
+      "active": false,
+      "in_water": false,
+      "pending": 38,
+      "origin": [
+       0,
+       3.9375
+      ],
+      "error": null
+     }
+    },
+    "coast": {
+     "islands": 11,
+     "draw_calls": 18,
+     "tris": 24940,
+     "sea_y": -0.3,
+     "beach_w": 34,
+     "outline": {
+      "x1": -203,
+      "z1": -86,
+      "x2": 203,
+      "z2": 322,
+      "corner_r": 70
+     },
+     "foam_lines": 12,
+     "night": true
+    },
+    "terrain": {
+     "regions": 8,
+     "terraces": 4,
+     "forecourts": 5,
+     "spurs": 6,
+     "tint_sheets": 1,
+     "tint_cells": 1556,
+     "tint_overlaps_prevented": 32,
+     "tint_policy": "SINGLE_SURFACE_SOFT_VERTEX_BLEND",
+     "paths": {
+      "CAUSEWAY": 6,
+      "REGIONAL": 13,
+      "TRAIL": 12
+     },
+     "shards": 962,
+     "dust": 2661,
+     "monoliths": 18,
+     "draw_calls": 10,
+     "tris": 16734,
+     "night": true
+    },
+    "macro": {
+     "ridges": [
+      {
+       "id": "RIDGE_NEAR",
+       "dist_m": 360,
+       "h": [
+        38,
+        150
+       ],
+       "passes": 5,
+       "tris": 960
+      },
+      {
+       "id": "RIDGE_MID",
+       "dist_m": 520,
+       "h": [
+        70,
+        230
+       ],
+       "passes": 5,
+       "tris": 848
+      }
+     ],
+     "waterfalls": [
+      {
+       "id": "TITAN_FALL",
+       "drop_m": 11.8,
+       "source": "TITAN_LEDGE",
+       "receiver": "TITAN_LAKE",
+       "ripple": true,
+       "mist": 3
+      },
+      {
+       "id": "NORTH_FALL",
+       "drop_m": 46,
+       "source": "RIDGE_NEAR",
+       "receiver": "RIVER_N",
+       "ripple": false,
+       "mist": 3
+      }
+     ],
+     "sky_beams": [
+      "BEAM_TEMPLE←LM_TEMPLE crown diamond",
+      "BEAM_TOWER←LM_TOWER crown diamond",
+      "BEAM_NORTH_PASS←north pass sanctuary beacon (ridge notch)"
+     ],
+     "draw_calls": 15
+    },
+    "meadow": {
+     "chunks": 95,
+     "instances": 17553,
+     "visible_chunks": 19,
+     "draw_calls": 19,
+     "tris_visible_max": 140424,
+     "near_m": 70,
+     "mid_m": 130,
+     "night": true,
+     "cfg": {
+      "_doc": "owner next-pass 2026-09-20 §10 CRYSTAL MEADOW = the MAHWORLD grassland: many small multifaceted forms in the region family, varied height, controlled highlights, slight translucency, never a mirror; NEAR = instanced geometry (chunks of 30 m, frustum + distance culled), MID = the same chunks at half density, FAR = the region tint sheet; a subtle shimmer by instance hash, never constant sparkle",
+      "density_per_m2": 0.7,
+      "chunk_m": 30,
+      "near_m": 70,
+      "mid_m": 130,
+      "h_m": [
+       0.07,
+       0.36
+      ],
+      "r_m": [
+       0.045,
+       0.13
+      ],
+      "max_instances": 64000,
+      "opacity": 0.86,
+      "shimmer": 0.05
+     }
+    },
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold",
+      "BAGE_GARDEN_W": "pink",
+      "BAGE_GARDEN_E": "pink"
+     },
+     "trees": 121,
+     "lod_counts": {
+      "L0": 0,
+      "L1": 121,
+      "IMPOSTOR": 0
+     },
+     "source_tiers": {
+      "near": "L0",
+      "far": "L1"
+     },
+     "same_material_all_tiers": true,
+     "runtime_impostor": false,
+     "impostor": false,
+     "runtime_bake_ms": 0,
+     "draw_calls": 8,
+     "zone_chunks": [
+      {
+       "zone": "BAGE_GARDEN_E",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "BAGE_GARDEN_W",
+       "trees": 2,
+       "L0": 0,
+       "L1": 2
+      },
+      {
+       "zone": "FOREST_NE",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_NW",
+       "trees": 30,
+       "L0": 0,
+       "L1": 30
+      },
+      {
+       "zone": "FOREST_N_E",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_N_W",
+       "trees": 15,
+       "L0": 0,
+       "L1": 15
+      },
+      {
+       "zone": "FOREST_W",
+       "trees": 27,
+       "L0": 0,
+       "L1": 27
+      }
+     ],
+     "lod_m": {
+      "near": 26,
+      "mid": null
+     },
+     "hysteresis_m": 4,
+     "triangles_per_tree": {
+      "L0": 14792,
+      "L1": 7392
+     },
+     "rendered_tree_triangles": 894432,
+     "family_samples": [
+      {
+       "index": 0,
+       "id": "FOREST_W_T000",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -89.91,
+       "z": -4.6,
+       "tier": "L1",
+       "color": "#8b67d2"
+      },
+      {
+       "index": 27,
+       "id": "FOREST_NW_T000",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -66.02,
+       "z": 188.7,
+       "tier": "L1",
+       "color": "#c93146"
+      },
+      {
+       "index": 57,
+       "id": "FOREST_NE_T000",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 148.03,
+       "z": 193.69,
+       "tier": "L1",
+       "color": "#2958da"
+      },
+      {
+       "index": 102,
+       "id": "FOREST_N_E_T000",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 105.54,
+       "z": 271.72,
+       "tier": "L1",
+       "color": "#d6b562"
+      },
+      {
+       "index": 117,
+       "id": "BAGE_GARDEN_W_T000",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -51.9,
+       "z": 248,
+       "tier": "L1",
+       "color": "#e986b3"
+      }
+     ],
+     "lifecycle": {
+      "transitions": 121,
+      "rewrites": 1,
+      "timing_ms": {
+       "build_ms": 4994.8,
+       "assemble_ms": 3.2,
+       "first_classify_ms": 0.165,
+       "first_rewrite_ms": 0.22,
+       "last_classify_ms": 0,
+       "max_classify_ms": 0.165,
+       "last_rewrite_ms": 0.22,
+       "max_rewrite_ms": 0.22,
+       "runtime_bake_ms": 0
+      },
+      "resources": {
+       "materials": 1,
+       "geometries": 2,
+       "render_targets": 0
+      }
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 121,
+     "night": true,
+     "skipped": null
+    },
+    "architecture": {
+     "landmarks": 5,
+     "houses": 5,
+     "skirt_shards": 141,
+     "seams": 25,
+     "bands": 0,
+     "insets": 30,
+     "crowns": 9,
+     "aura_particles": 321,
+     "aura_anchors": 33,
+     "canopy_aura_anchors": 7,
+     "free_aura_anchors": 2,
+     "canopy_aura_samples": [
+      {
+       "id": "BAGE_GARDEN_E_T001",
+       "zone": "BAGE_GARDEN_E",
+       "family": "pink",
+       "x": 50.41,
+       "y": 7.23,
+       "z": 246.82
+      },
+      {
+       "id": "BAGE_GARDEN_W_T001",
+       "zone": "BAGE_GARDEN_W",
+       "family": "pink",
+       "x": -68.09,
+       "y": 7.89,
+       "z": 257.66
+      },
+      {
+       "id": "FOREST_NE_T015",
+       "zone": "FOREST_NE",
+       "family": "blue",
+       "x": 76.18,
+       "y": 8.36,
+       "z": 195.73
+      },
+      {
+       "id": "FOREST_NW_T015",
+       "zone": "FOREST_NW",
+       "family": "red",
+       "x": -95.96,
+       "y": 9.65,
+       "z": 191.46
+      },
+      {
+       "id": "FOREST_N_E_T007",
+       "zone": "FOREST_N_E",
+       "family": "gold",
+       "x": 151.48,
+       "y": 7.72,
+       "z": 256.35
+      },
+      {
+       "id": "FOREST_N_W_T007",
+       "zone": "FOREST_N_W",
+       "family": "red",
+       "x": -166.71,
+       "y": 10.93,
+       "z": 279.54
+      },
+      {
+       "id": "FOREST_W_T013",
+       "zone": "FOREST_W",
+       "family": "purple",
+       "x": -90.3,
+       "y": 8.63,
+       "z": -24.68
+      }
+     ],
+     "aura_language": "ARCANE_LEAKAGE_MIST",
+     "entrance_diamonds": 24,
+     "roof_diamonds": 20,
+     "draw_calls": 50,
+     "tris": 6596,
+     "night": true,
+     "motion_far_m": 220
+    },
+    "celestial": {
+     "night": true,
+     "camera_relative_origin": true,
+     "world_direction_stable": true,
+     "effects_face_camera": true,
+     "cloud_cards": "OLD_SOFT_FEATHERED",
+     "draw_calls_visible": 5,
+     "sun": {
+      "apparent_deg": 6.5,
+      "diameter_m": 102.21,
+      "distance_m": 900,
+      "halo_deg": 14,
+      "halo_m": 221.01,
+      "textured": true,
+      "visible": false,
+      "direction": [
+       0.7404,
+       0.5411,
+       0.3987
+      ],
+      "geometry": "PROCEDURAL_SUN",
+      "triangles": 320,
+      "meshes": 1,
+      "provenance": {
+       "mode": "DERIVATIVE_TEXTURE_PROCEDURAL_GEOMETRY",
+       "derivative_id": "MAHWORLD_OVERSIZED_SUN",
+       "lod": "L1",
+       "runtime": "lab/assets/world/sun/MAHWORLD_OVERSIZED_SUN_L1.glb"
+      },
+      "source_bounds": null,
+      "veil_shape": {
+       "kind": "IRREGULAR_RADIAL_FAN",
+       "rectangular": false,
+       "feathered": true,
+       "segments": 42,
+       "radius_min": 0.8004,
+       "radius_max": 1.0076,
+       "seed": 3238878957
+      },
+      "cloud": {
+       "tau": 0.035,
+       "coverage": 0.035,
+       "transmission": 0.965,
+       "disc": 0.98,
+       "halo": 0.953,
+       "rays": 0.932,
+       "key": 0.978
+      }
+     },
+     "moon": {
+      "apparent_deg": 6.2,
+      "diameter_m": 97.48,
+      "distance_m": 900,
+      "halo_deg": 12,
+      "halo_m": 189.19,
+      "textured": true,
+      "visible": true,
+      "direction": [
+       -0.3295,
+       0.2764,
+       -0.9028
+      ],
+      "geometry": "TRACED_DERIVATIVE_GLB",
+      "triangles": 8000,
+      "meshes": 1,
+      "provenance": {
+       "mode": "REGISTRY_TRACED_DERIVATIVE",
+       "derivative_id": "MAHWORLD_OVERSIZED_MOON",
+       "lod": "L0",
+       "runtime": "lab/assets/world/moon/MAHWORLD_OVERSIZED_MOON_L0.glb",
+       "runtime_sha256": "b7ad1e4897ef26961133b09894583c709e27cf6edebfe4a7811ad7bdbfbf415c",
+       "source_id": "MAHWORLD_OVERSIZED_MOON_SOURCE",
+       "source_path": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\moon.glb",
+       "source_sha256": "6d5499f9654d00f3533170848dfe18fb991237d1ed87e5eb0a6cfb785701eb8c"
+      },
+      "source_bounds": {
+       "min": [
+        -0.4753277003765106,
+        0.006969625595957041,
+        -0.4882354736328125
+       ],
+       "max": [
+        0.47760772705078125,
+        0.928564727306366,
+        0.4807717502117157
+       ],
+       "max_dim": 0.96901
+      },
+      "veil_shape": {
+       "kind": "IRREGULAR_RADIAL_FAN",
+       "rectangular": false,
+       "feathered": true,
+       "segments": 42,
+       "radius_min": 0.8004,
+       "radius_max": 1.0076,
+       "seed": 3238878957
+      },
+      "cloud": {
+       "tau": 1.232,
+       "coverage": 0.708,
+       "transmission": 0.292,
+       "disc": 0.589,
+       "halo": 0.189,
+       "rays": 0.085,
+       "key": 0.561
+      }
+     }
+    },
+    "sky": {
+     "wind": {
+      "dir_deg": 28,
+      "speed_mps": 2.4,
+      "now_mps": 3.23,
+      "travel_m": 62.94,
+      "gust": 0.35
+     },
+     "cloud_cards": "OLD_SOFT_FEATHERED",
+     "cloud_key": "MOON",
+     "layers": [
+      {
+       "id": "MIST_LOW",
+       "kind": "MIST",
+       "count": 1,
+       "alt_m": 6,
+       "opacity": 0.22,
+       "occludes": false,
+       "depth_write": false,
+       "silhouette": null,
+       "alpha_test": 0
+      },
+      {
+       "id": "STRATUS_LOW",
+       "kind": "CLOUD",
+       "count": 12,
+       "alt_m": 118,
+       "opacity": 0.28,
+       "occludes": true,
+       "depth_write": true,
+       "silhouette": {
+        "kind": "IRREGULAR_RADIAL_FAN",
+        "rectangular": false,
+        "feathered": true,
+        "segments": 40,
+        "radius_min": 0.8021,
+        "radius_max": 0.97,
+        "seed": 289
+       },
+       "alpha_test": 0.055
+      },
+      {
+       "id": "CUMULUS_MID",
+       "kind": "CLOUD",
+       "count": 26,
+       "alt_m": 190,
+       "opacity": 0.36,
+       "occludes": true,
+       "depth_write": true,
+       "silhouette": {
+        "kind": "IRREGULAR_RADIAL_FAN",
+        "rectangular": false,
+        "feathered": true,
+        "segments": 40,
+        "radius_min": 0.8111,
+        "radius_max": 1.0079,
+        "seed": 420
+       },
+       "alpha_test": 0.055
+      },
+      {
+       "id": "CIRRUS_HIGH",
+       "kind": "CLOUD",
+       "count": 14,
+       "alt_m": 330,
+       "opacity": 0.16,
+       "occludes": false,
+       "depth_write": false,
+       "silhouette": {
+        "kind": "IRREGULAR_RADIAL_FAN",
+        "rectangular": false,
+        "feathered": true,
+        "segments": 40,
+        "radius_min": 0.809,
+        "radius_max": 1.02,
+        "seed": 551
+       },
+       "alpha_test": 0.012
+      }
+     ],
+     "celestial_optics": {
+      "model": "T=exp(-tau)",
+      "sun": {
+       "tau": 0.035,
+       "transmission": 0.965,
+       "coverage": 0.035,
+       "disc": 0.98,
+       "halo": 0.953,
+       "rays": 0.932,
+       "key": 0.978,
+       "phase_u": 0.336,
+       "phase_v": 0.384,
+       "travel_m": 62.94
+      },
+      "moon": {
+       "tau": 1.232,
+       "transmission": 0.292,
+       "coverage": 0.708,
+       "disc": 0.589,
+       "halo": 0.189,
+       "rays": 0.085,
+       "key": 0.561,
+       "phase_u": 0.72,
+       "phase_v": 0.384,
+       "travel_m": 62.94
+      }
+     },
+     "draw_calls": 4,
+     "night": true
+    },
+    "atmosphere": {
+     "on": true,
+     "tier": "HIGH",
+     "night": true,
+     "fog": null,
+     "mie": 0.15,
+     "sun": [
+      -0.342,
+      0.085,
+      -0.936
+     ]
+    },
+    "props": {
+     "placed": [
+      {
+       "id": "PROJECTOR_GYM_BEACON",
+       "derivative": "MAH_GYM_PROJECTOR_BEACON",
+       "scale": 4.9804,
+       "footprint_m": [
+        4.88,
+        2.77
+       ],
+       "height_m": 4.6,
+       "yaw_deg": 40,
+       "levels": [
+        0,
+        60
+       ],
+       "meshes": 1,
+       "bounds": {
+        "min": [
+         -82.76,
+         0.02,
+         95.37
+        ],
+        "max": [
+         -77.24,
+         4.62,
+         100.63
+        ]
+       },
+       "pad_r_m": 2.79
+      }
+     ],
+     "pads": 1,
+     "draw_calls_at_rest": 2,
+     "hologram_materials": 2,
+     "night": true
+    },
+    "matchHall": {
+     "building": {
+      "id": "MATCH_HALL",
+      "at": [
+       122,
+       6
+      ],
+      "door": {
+       "side": "-x",
+       "x": 102,
+       "z": 6,
+       "w": 6,
+       "h": 5
+      },
+      "draw_calls": 6,
+      "tris": 1772,
+      "strips": 60,
+      "height_m": 22
+     },
+     "court": {
+      "id": "MATCH_COURT_OUTDOOR",
+      "at": [
+       128,
+       50
+      ],
+      "r": 16,
+      "spectator_r": [
+       19,
+       24
+      ],
+      "pylons": 4,
+      "aisles": 4,
+      "draw_calls": 3,
+      "tris": 4656
+     },
+     "interior": null,
+     "night": true,
+     "draw_calls_field": 9
+    },
+    "guides": {
+     "current": null,
+     "visible": true,
+     "on_stage": false,
+     "height_m": 0.75,
+     "wanted": null,
+     "loaded": [],
+     "loading": [],
+     "skinned": null,
+     "scale": null,
+     "night": true,
+     "rim": null,
+     "draw_calls": 0,
+     "pos": null,
+     "yaw_deg": null,
+     "follow": {
+      "lateral_m": 0.78,
+      "trail_m": 0.38,
+      "up_m": 1.42,
+      "rate": 7,
+      "lead_s": 0.18,
+      "snap_beyond_m": 12,
+      "cam_clear_m": 1.6,
+      "floor_above_feet_m": 0.35,
+      "dist_m": 1.5,
+      "angle_rad": 1.2
+     },
+     "orient": {
+      "yaw_rate": 6,
+      "look_events_s": 0
+     },
+     "companion_brake": {
+      "min_decel_mps2": 5,
+      "rad": 0.18,
+      "settle_s": 0.35
+     },
+     "hover": {
+      "amp_m": 0.05,
+      "hz": 0.9,
+      "amp2_m": 0.02,
+      "hz2": 0.37
+     },
+     "drift": {
+      "amp_m": 0.28,
+      "period_s": 6.5,
+      "correct_rate": 1.6
+     },
+     "settle": {
+      "after_s": 2.5,
+      "rise_m": 0.12,
+      "look_hz": 0.11,
+      "look_rad": 0.55
+     },
+     "bank": {
+      "rad_per_mps": 0.14,
+      "max_rad": 0.42,
+      "yaw_rate": 8
+     },
+     "formation": null,
+     "accel_bank": 0.05,
+     "settled": 0,
+     "idle_s": 0,
+     "motion_source": "registry.guide_motion",
+     "cast": {
+      "weight": 0,
+      "casts_seen": 0,
+      "tuning": {
+       "rise_m": 0.42,
+       "pitch_rad": 0.22,
+       "bob_hz": 2.6,
+       "glow_m": 0.9,
+       "dispense_s": 0.9
+      }
+     }
+    },
+    "creatures": {
+     "count": 0,
+     "active": 0,
+     "lod_levels": 3,
+     "lod_m": [
+      24,
+      60
+     ],
+     "lod_now": [],
+     "classified_bones": {
+      "method": "names",
+      "total_bones": 55,
+      "root": "Root",
+      "hips": "J_Bip_C_Hips",
+      "head": "J_Bip_C_Head",
+      "neck": "J_Bip_C_Neck",
+      "jaw": null,
+      "spine": [
+       "J_Bip_C_Spine",
+       "J_Bip_C_Chest",
+       "J_Bip_C_UpperChest"
+      ],
+      "tail": [],
+      "legs": {
+       "FL": "J_Bip_L_UpperArm / J_Bip_L_LowerArm / J_Bip_L_Hand",
+       "FR": "J_Bip_R_UpperArm / J_Bip_R_LowerArm / J_Bip_R_Hand",
+       "BL": "J_Bip_L_UpperLeg / J_Bip_L_Foot / J_Bip_L_Foot",
+       "BR": "J_Bip_R_UpperLeg / J_Bip_R_Foot / J_Bip_R_Foot"
+      },
+      "forward_model": "+z",
+      "forward_fix_deg": 180,
+      "rest_height_m": 0.978,
+      "missing": [
+       "jaw",
+       "tail"
+      ],
+      "duplicates": [],
+      "notes": [
+       "BL knee degenerate (-0.004 m) → fold at J_Bip_L_Foot",
+       "BR knee degenerate (-0.000 m) → fold at J_Bip_R_Foot"
+      ]
+     },
+     "loaded": true,
+     "load_error": null,
+     "derivative": "DOGKIE_FOREST_CREATURE",
+     "height_m": 1.4,
+     "scale": 1.4319,
+     "states": {},
+     "draw_calls_visible": 0,
+     "tags": 0,
+     "status_level": 5,
+     "contacts": 0,
+     "territories": {
+      "packs": 11,
+      "shards": 560,
+      "draw_calls": 2
+     },
+     "locomotion": "GLIDE (no stepping cycle; hover 0.07 m, attack lift 0.28 m)",
+     "motion_contract": {
+      "mode": "SURFACE_GLIDE",
+      "step_cycle": false,
+      "surface_hover_m": 0.07,
+      "attack_lift_m": 0.28,
+      "attack_only_lift": true,
+      "fused_units": true
+     },
+     "motion": [],
+     "lag_s": 0.12,
+     "host_clock": false,
+     "night": true
+    },
+    "wildlife": {
+     "authority": "HOST (p.wildlife — play/world/WildlifeManager.js)",
+     "species": {
+      "PHOENIX": {
+       "figures": 5,
+       "visible": 5,
+       "lods": 3,
+       "scale": 3.74,
+       "head": "+z",
+       "rig": "RIGID → shader",
+       "combat": {
+        "hits_to_kill": 18,
+        "hits_to_kill_player": 10,
+        "aggression": "HOSTILE_AERIAL"
+       },
+       "ownership": {
+        "wild": true,
+        "pet_capable": true,
+        "premium": true,
+        "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+        "payment_ui": false
+       },
+       "states": [
+        "PATROL",
+        "PATROL",
+        "PATROL",
+        "PATROL",
+        "PATROL"
+       ],
+       "positions": [
+        [
+         137,
+         94,
+         413
+        ],
+        [
+         -112,
+         94,
+         76
+        ],
+        [
+         194,
+         94,
+         201
+        ],
+        [
+         -108,
+         95.2,
+         374
+        ],
+        [
+         10,
+         94,
+         365
+        ]
+       ]
+      },
+      "FISH": {
+       "figures": 24,
+       "visible": 21,
+       "lods": 3,
+       "scale": 2.448,
+       "head": "+z",
+       "rig": "RIGID → shader",
+       "combat": {
+        "hits_to_kill": 5,
+        "hits_to_kill_player": 4.5,
+        "aggression": "PROVOKED"
+       },
+       "ownership": {
+        "wild": true,
+        "pet_capable": true,
+        "premium": true,
+        "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+        "payment_ui": false
+       },
+       "states": [
+        "SWIM",
+        "SWIM",
+        "RISE",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "RISE",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "BREACH",
+        "SWIM",
+        "RISE",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "SWIM",
+        "BREACH"
+       ],
+       "positions": [
+        [
+         -9,
+         -1.4,
+         -122
+        ],
+        [
+         -7,
+         -2.1,
+         -120
+        ],
+        [
+         -4,
+         -1.7,
+         -118
+        ],
+        [
+         269,
+         -1.4,
+         52
+        ],
+        [
+         272,
+         -1.6,
+         52
+        ],
+        [
+         275,
+         -2.1,
+         52
+        ],
+        [
+         -27,
+         -0.4,
+         226
+        ],
+        [
+         -26,
+         -0.4,
+         229
+        ],
+        [
+         -26,
+         -0.4,
+         232
+        ],
+        [
+         -143,
+         -0.4,
+         224
+        ],
+        [
+         -146,
+         -0.3,
+         223
+        ],
+        [
+         -149,
+         -0.3,
+         221
+        ],
+        [
+         144,
+         -0.4,
+         103
+        ],
+        [
+         142,
+         -0.3,
+         105
+        ],
+        [
+         142,
+         1.5,
+         104
+        ],
+        [
+         -91,
+         -0.4,
+         32
+        ],
+        [
+         -88,
+         -0.4,
+         32
+        ],
+        [
+         -85,
+         -0.4,
+         32
+        ],
+        [
+         -26,
+         -0.3,
+         263
+        ],
+        [
+         -23,
+         -0.4,
+         262
+        ],
+        [
+         -20,
+         -0.4,
+         261
+        ],
+        [
+         32,
+         -0.3,
+         257
+        ],
+        [
+         31,
+         -0.4,
+         254
+        ],
+        [
+         24,
+         1.5,
+         251
+        ]
+       ]
+      },
+      "HORSE": {
+       "figures": 5,
+       "visible": 5,
+       "lods": 3,
+       "scale": 2.384,
+       "head": "+z",
+       "rig": "RIGID → shader",
+       "combat": {
+        "hits_to_kill": 35,
+        "hits_to_kill_player": null,
+        "aggression": "DEFENSIVE"
+       },
+       "ownership": {
+        "wild": true,
+        "pet_capable": true,
+        "premium": true,
+        "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+        "payment_ui": false
+       },
+       "states": [
+        "GRAZE",
+        "GRAZE",
+        "GRAZE",
+        "GRAZE",
+        "GRAZE"
+       ],
+       "positions": [
+        [
+         131,
+         0,
+         141
+        ],
+        [
+         75,
+         0,
+         128
+        ],
+        [
+         -27,
+         0,
+         155
+        ],
+        [
+         -143,
+         2.6,
+         22
+        ],
+        [
+         -84,
+         0,
+         -29
+        ]
+       ]
+      }
+     },
+     "stats": {
+      "fish": 24,
+      "horses": 5,
+      "phoenix": 5,
+      "breaches": 0,
+      "visits": 0,
+      "draw_calls": 31,
+      "tags": 0
+     },
+     "night": true,
+     "payment_ui": false,
+     "figures": 34,
+     "population_lod": {
+      "built": true,
+      "error": null,
+      "mid_schools": 20,
+      "mid_agents": 228,
+      "far_silhouettes": 120,
+      "breaches": 17,
+      "reach_m": 260,
+      "near_schools": 13,
+      "draw_calls": 2
+     }
+    },
+    "gear": {
+     "items": [],
+     "grips": [],
+     "clones": 0,
+     "diamonds": 0,
+     "bushes": 41,
+     "intro_patch": "RB_NEXUS_INTRO",
+     "shards_per_patch": 64,
+     "shards": 2624,
+     "broken": [],
+     "templates": [],
+     "band": "procedural tube 1.3 m × r 0.018 m (no source model in the project database)",
+     "status_tags": 0
+    },
+    "signage": {
+     "wayfinders": 30,
+     "buildings": 14,
+     "labels_visible": 6,
+     "labels_total": 44
+    },
+    "trees": 121
+   },
+   "character": {
+    "bones": [
+     "ROOT",
+     "PELVIS",
+     "SPINE",
+     "CHEST",
+     "NECK",
+     "HEAD",
+     "CLAV_L",
+     "UPPERARM_L",
+     "FOREARM_L",
+     "HAND_L",
+     "CLAV_R",
+     "UPPERARM_R",
+     "FOREARM_R",
+     "HAND_R",
+     "TAIL1",
+     "TAIL2",
+     "TAIL3",
+     "FINGERS_L",
+     "FINGERS_R",
+     "BROW_L",
+     "BROW_R",
+     "CHEEK_L",
+     "CHEEK_R",
+     "JAW",
+     "LUMBAR",
+     "SPINE2",
+     "SCAP_L",
+     "ARMTWIST_L",
+     "FORETWIST_L",
+     "SCAP_R",
+     "ARMTWIST_R",
+     "FORETWIST_R",
+     "THIGH_L",
+     "SHIN_L",
+     "TIP_L",
+     "THIGH_R",
+     "SHIN_R",
+     "TIP_R"
+    ],
+    "visible_meshes": 3
+   }
+  }
+ },
+ "resource": {},
+ "equipment": {},
+ "attacks": {},
+ "console_errors": [],
+ "unresolved": []
+}

@@ -1,0 +1,66 @@
+{
+ "canonical": "FISH_DEEPWATER_CREATURE",
+ "role": "aquatic creature (fish)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_NEW3\\fish.glb",
+  "original_name": "fish.glb",
+  "sha256": "e43d5ad6959350d542d0f7e6e048ee6f829825fb91596af1434bdb53ee5bc58e",
+  "bytes": 17536928,
+  "triangles": 18870,
+  "skinned": true,
+  "joints": 14,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "image": 0,
+   "source_bytes": 9944843,
+   "runtime_bytes": 185671,
+   "runtime_size": [
+    512,
+    512
+   ],
+   "normal": true
+  },
+  {
+   "image": 1,
+   "source_bytes": 6446257,
+   "runtime_bytes": 535937,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": false
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "FISH_DEEPWATER_CREATURE_L0.glb",
+   "triangles": 18870,
+   "bytes": 1867740,
+   "sha256": "722588f9bb3bac21d2452cd0cc59917c5f78ae635a5619e34dc583ed7e84a384"
+  },
+  {
+   "lod": "L1",
+   "file": "FISH_DEEPWATER_CREATURE_L1.glb",
+   "triangles": 6498,
+   "vertices": 9573,
+   "bytes": 1264076,
+   "sha256": "c48e6acb1d3127d9cc37caa50f2121b78cf73006eacde71b662a4ecac160ae83",
+   "method": "glTF-Transform 4.5.0 meshoptimizer, ratio 0.344409, error 0.01, topological borders locked, source normals, UVs, joints and weights preserved"
+  },
+  {
+   "lod": "L2",
+   "file": "FISH_DEEPWATER_CREATURE_L2.glb",
+   "triangles": 5150,
+   "vertices": 8134,
+   "bytes": 1181164,
+   "sha256": "c3a9549b79e439394d08902d1f68338f55e39f90586621c3bad896984c1e6132",
+   "method": "glTF-Transform 4.5.0 meshoptimizer, requested ratio 0.137784, error 0.01, topological borders locked; stopped at the fidelity ceiling with source normals, UVs, joints and weights preserved"
+  }
+ ],
+ "method": "L0: images resampled (Pillow LANCZOS, JPEG) with geometry, nodes and skin unchanged. L1/L2: glTF-Transform 4.5.0 meshoptimizer with error 0.01, topological borders locked and source NORMAL/TEXCOORD_0/JOINTS_0/WEIGHTS_0 preserved.",
+ "generated": "2026-09-23T03:53:24Z"
+}

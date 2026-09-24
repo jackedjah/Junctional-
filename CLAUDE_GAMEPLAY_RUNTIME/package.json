@@ -1,0 +1,11 @@
+{
+  "name": "mahworld-gameplay-runtime",
+  "version": "0.2.0",
+  "private": true,
+  "description": "MAHWORLD headless gameplay core (Gameplay Foundation Phase 2) - vanilla ES modules, no dependencies, no graphics",
+  "type": "module",
+  "scripts": {
+    "test": "node 16_TESTS/gameplay_runtime.test.mjs",
+    "simulate": "node 15_SIMULATOR/simulate_vertical_slice.mjs"
+  }
+}

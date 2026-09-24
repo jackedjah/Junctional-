@@ -1,0 +1,70 @@
+{
+ "canonical": "MAHWORLD_OVERSIZED_MOON",
+ "role": "stylized enormous moon (sky derivative, ~10x apparent size)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\moon.glb",
+  "original_name": "moon(2).glb",
+  "sha256": "6d5499f9654d00f3533170848dfe18fb991237d1ed87e5eb0a6cfb785701eb8c",
+  "bytes": 93764824,
+  "triangles": 1985082,
+  "vertices": 1030518,
+  "bounds_min": [
+   -0.478118896484375,
+   0.0,
+   -0.490142822265625
+  ],
+  "bounds_max": [
+   0.478118896484375,
+   0.92889404296875,
+   0.490142822265625
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 20435523,
+   "runtime_bytes": 494926,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 16529856,
+   "runtime_bytes": 119751,
+   "runtime_size": [
+    512,
+    512
+   ],
+   "mime": "image/jpeg"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "MAHWORLD_OVERSIZED_MOON_L0.glb",
+   "triangles": 8000,
+   "vertices": 5954,
+   "bytes": 903220,
+   "sha256": "b7ad1e4897ef26961133b09894583c709e27cf6edebfe4a7811ad7bdbfbf415c"
+  },
+  {
+   "lod": "L1",
+   "file": "MAHWORLD_OVERSIZED_MOON_L1.glb",
+   "triangles": 2000,
+   "vertices": 2006,
+   "bytes": 704872,
+   "sha256": "5a10b2a0a780b957018b84bea10ab7355500279fc0ed8b27733f35745c83769b"
+  }
+ ],
+ "method": "fast_simplification quadric edge collapse (agg 7.0), UVs from the collapse map, smooth normals recomputed; textures Pillow LANCZOS",
+ "generated": "2026-09-19T20:45:52Z",
+ "timing_s": {
+  "L0": 8.6,
+  "L1": 0.2
+ },
+ "elapsed_s": 13.3
+}

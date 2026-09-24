@@ -1,0 +1,71 @@
+{
+ "version": "BOTANY_PROTOTYPE_V1",
+ "family": "MAHGIC_TREE",
+ "status": "PROTOTYPE_PENDING_OWNER_VERDICT",
+ "_doc": "master §14.5 — ONE specimen beside the spawn (in the default rear view, off the walking line) and ONE small varied cluster between the west and south plaza pathways. The old laser-plant family is NOT replaced by this file (U11: no mass replacement before Jah's verdict); replacing it happens through a later registry/migration (U12). Positions are plaza metres (spawn 0,4 facing -Z; pathway inlays run from r=11 m to the entrances at (-17,0) (0,-19.5) (18,0) (1,20)); nothing sits on a pathway, threshold, landing pad or the dummy at (0,-2).",
+ "instances": [
+  {
+   "id": "MT_SPEC_01",
+   "role": "specimen",
+   "variant": 0,
+   "x": 3.0,
+   "z": 0.4,
+   "yaw_deg": 20,
+   "scale": 1.0
+  },
+  {
+   "id": "MT_CL_01",
+   "role": "cluster",
+   "variant": 1,
+   "x": -7.4,
+   "z": -6.2,
+   "yaw_deg": 0,
+   "scale": 1.0
+  },
+  {
+   "id": "MT_CL_02",
+   "role": "cluster",
+   "variant": 2,
+   "x": -8.9,
+   "z": -7.6,
+   "yaw_deg": 110,
+   "scale": 0.97
+  },
+  {
+   "id": "MT_CL_03",
+   "role": "cluster",
+   "variant": 0,
+   "x": -6.1,
+   "z": -8.1,
+   "yaw_deg": 205,
+   "scale": 0.98
+  },
+  {
+   "id": "MT_CL_04",
+   "role": "cluster",
+   "variant": 1,
+   "x": -9.6,
+   "z": -5.4,
+   "yaw_deg": 300,
+   "scale": 1.03
+  },
+  {
+   "id": "MT_CL_05",
+   "role": "cluster",
+   "variant": 2,
+   "x": -7.9,
+   "z": -9.3,
+   "yaw_deg": 45,
+   "scale": 0.99
+  },
+  {
+   "id": "MT_CL_06",
+   "role": "cluster",
+   "variant": 0,
+   "x": -10.4,
+   "z": -8.0,
+   "yaw_deg": 160,
+   "scale": 1.02
+  }
+ ]
+}

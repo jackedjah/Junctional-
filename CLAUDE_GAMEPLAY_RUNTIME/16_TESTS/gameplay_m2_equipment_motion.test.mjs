@@ -1,0 +1,49 @@
+/* M2 equipment / special acceptance: true held ids, one ownership chain, explicit lifecycle, swept hit / wall / miss behavior,
+   and the new true overhead press → actual barbell projectile. In-process host, plain node.
+   node 16_TESTS/gameplay_m2_equipment_motion.test.mjs */
+import { loadHeadlessData, composeHeadless } from '../00_CORE/bootstrap.js';
+import { createDuelHost } from '../26_LOCAL_AUTHORITY/DuelHost.js';
+import { makeEnvelope } from '../26_LOCAL_AUTHORITY/Protocol.js';
+import { loadRuleset } from '../26_LOCAL_AUTHORITY/play/rules1723/RulesMath.js';
+
+var pass = 0, fail = 0; function ok(id, cond, detail) { if (cond) { pass++; console.log('PASS ' + id); } else { fail++; console.log('FAIL ' + id + (detail === undefined ? '' : ' — ' + JSON.stringify(detail))); } }
+var data = await loadHeadlessData(); var cfg = data.cfg; var DT = cfg.dev('local_authority.tick_dt_s'); var R = loadRuleset();
+var h = createDuelHost({ data: data, composeHeadless: composeHeadless }); h.dev.createAccount('A', { classId: 'ATHLETE', sex: 'M' });
+var c = h.connect({ client_id: 'm2', account_id: 'A', token: h.dev.tokens().A }); var seq = 0;
+var send = function (action, payload) { return h.submit(makeEnvelope({ session_id: c.session_id, client_id: 'm2' }, ++seq, action, payload || {})); };
+var play = function () { return h.snapshot(c.session_id).play; }; var rules = function () { return play().rules; };
+function tick() { h.tick(DT); } function run(sec) { for (var i = 0; i < Math.round(sec / DT); i++) tick(); }
+function face(p) { var me = play().position; send('MOVE', { forward: 0, strafe: 0, yaw: +Math.atan2(p.x - me.x, -(p.z - me.z)).toFixed(4) }); tick(); }
+function observe(sec, ids) { var out = { states: {}, entities: [] }; ids.forEach(function (id) { out.states[id] = {}; }); for (var i = 0; i < Math.round(sec / DT); i++) { tick(); var p = play(); ids.forEach(function (id) { var it = p.equipment.manifested.filter(function (x) { return x.id === id; })[0]; if (it) out.states[id][it.state] = (out.states[id][it.state] || 0) + 1; }); (p.rules.entities || []).forEach(function (e) { if (!out.entities.some(function (q) { return q.id === e.id; })) out.entities.push(e); }); } return out; }
+function transitions(castId) { return h.dev.log().filter(function (e) { return e.kind === 'EQUIP_SPECIAL_STATE' && e.cast_id === castId; }); }
+function damages(castId) { return h.dev.log().filter(function (e) { return e.kind === 'R1723_DAMAGE' && e.cast_id === castId; }); }
+
+send('ENTER_ROOM', { room: 'FIELD' }); run(1.2); send('FIELD_PRACTICE', { on: true }); var internals = h.dev.play_internals(); var rf = internals.rulesField(); var me = rf.combatant('A'); me.pool.refund(1000);
+var dummy = rf.combatant('FIELD_DUMMY'); h.dev.play('PLACE', { account_id: 'A', x: dummy.pos.x, z: dummy.pos.z + 5 }); run(0.3); face(dummy.pos);
+
+/* Two HELD dumbbells remain the same two gear-special objects. */
+var md = send('EQUIP_MANIFEST', { kind: 'DUMBBELL', count: 2 }); run(cfg.dev('equipment').manifest.DUMBBELL.cast_s + 0.2); var dbIds = play().equipment.manifested.map(function (x) { return x.id; }); dbIds.forEach(function (id) { send('EQUIP_PICKUP', { id: id }); }); tick();
+ok('1. two real dumbbell ids are HELD in the authoritative view (no replacement grip props)', md.accepted && dbIds.length === 2 && play().equipment.held.count === 2 && dbIds.every(function (id) { return play().equipment.held.ids.indexOf(id) >= 0; }) && play().equipment.manifested.length === 2, play().equipment);
+send('LOCK_TARGET', { aim_id: 'FIELD_DUMMY' }); face(dummy.pos); var xw = send('RULES_CAST', { skill_id: 'ATHLETE_X_WAVE' }); var xo = observe(2.4, dbIds); var xfin = play().equipment; var xent = xo.entities.filter(function (e) { return e.cast_id === xw.cast_id && e.type === 'PROJECTILE'; }); var xdmg = damages(xw.cast_id);
+ok('2. X-Wave drives both exact ids HELD → IN_SPECIAL → PROJECTILE → RETURNING → HELD and leaves exactly two equipment objects', xw.accepted && dbIds.every(function (id) { var s = xo.states[id]; return s.IN_SPECIAL && s.PROJECTILE && s.RETURNING && xfin.held.ids.indexOf(id) >= 0; }) && xfin.manifested.length === 2, { states: xo.states, final: xfin.held, transitions: transitions(xw.cast_id) });
+ok('3. cast_id → equipment_ids → projectile_id ownership is published end-to-end; swept collision applies this projectile at most once', xent.length === 1 && xent[0].equipment_ids.slice().sort().join('|') === dbIds.slice().sort().join('|') && xdmg.length === 1 && xdmg[0].projectile_id === xent[0].projectile_id && xdmg[0].cast_id === xw.cast_id, { entity: xent, damage: xdmg });
+
+/* Clamp target leaves its frozen convergence point before commit: honest miss, no phantom damage. */
+me.cooldowns = {}; me.pool.refund(1000); var oldDummy = { x: dummy.pos.x, z: dummy.pos.z }; face(dummy.pos); send('LOCK_TARGET', { aim_id: 'FIELD_DUMMY' }); var cl = send('RULES_CAST', { skill_id: 'ATHLETE_TELEKINETIC_CLAMP' }); dummy.pos.x += 18; dummy.pos.z += 18; observe(2.1, dbIds); var cmiss = h.dev.log().filter(function (e) { return e.kind === 'R1723_MISS' && e.cast_id === cl.cast_id; }); var cdmg = damages(cl.cast_id); dummy.pos.x = oldDummy.x; dummy.pos.z = oldDummy.z;
+ok('4. Telekinetic Clamp rechecks the world at commit: a target that escaped the frozen point records area-empty MISS and takes no damage', cl.accepted && cmiss.some(function (e) { return /area empty/.test(e.why); }) && cdmg.length === 0, { miss: cmiss, damage: cdmg });
+
+/* A plate shot animates the bar in-place; the bar itself is not mislabeled as either plate projectile. */
+send('EQUIP_DISMISS', {}); run(1); me.pool.refund(1000); h.dev.play('PLACE', { account_id: 'A', x: oldDummy.x, z: oldDummy.z + 5 }); run(0.2); face(oldDummy); var mb = send('EQUIP_MANIFEST', { kind: 'BARBELL', count: 1 }); run(cfg.dev('equipment').manifest.BARBELL.cast_s + 0.2); var barId = play().equipment.manifested[0].id; var bp = send('EQUIP_PICKUP', { id: barId }); tick(); send('LOCK_TARGET', { aim_id: 'FIELD_DUMMY' }); face(oldDummy); var ps = send('RULES_CAST', { skill_id: 'BARBELL_PLATE_SHOT' }); var po = observe(3.1, [barId]); var pent = po.entities.filter(function (e) { return e.cast_id === ps.cast_id && e.type === 'PROJECTILE'; });
+ok('5. true barbell grip uses one authoritative id; Plate Shot keeps that bar IN_SPECIAL while two owned plate projectiles leave, then returns it continuously to HELD', mb.accepted && bp.accepted && ps.accepted && po.states[barId].IN_SPECIAL && !po.states[barId].PROJECTILE && po.states[barId].RETURNING && play().equipment.held.ids[0] === barId && pent.length === 2 && pent.every(function (e) { return e.equipment_ids.length === 1 && e.equipment_ids[0] === barId; }), { states: po.states[barId], projectiles: pent, transitions: transitions(ps.cast_id) });
+
+/* New special D: rack / overhead press in presentation, the actual bar id becomes the swept projectile. Put a boundary wall 6 m ahead. */
+me.cooldowns = {}; me.pool.refund(1000); send('LOCK_TARGET', { aim_id: null }); h.dev.play('PLACE', { account_id: 'A', x: 0, z: -50 }); run(0.2); face({ x: 0, z: -65 }); var energy0 = rules().me.combat_energy.current; var pt = send('RULES_CAST', { skill_id: 'ATHLETE_BARBELL_PRESS_THROW' }); var to = observe(2.8, [barId]); var energy1 = rules().me.combat_energy.current; var tent = to.entities.filter(function (e) { return e.cast_id === pt.cast_id && e.type === 'PROJECTILE'; }); var wall = h.dev.log().filter(function (e) { return e.kind === 'R1723_PROJECTILE_WALL' && e.skill === 'ATHLETE_BARBELL_PRESS_THROW'; }); var tdmg = damages(pt.cast_id);
+ok('6. Press Throw is a verified VERTICAL_PUSH gear stack with PRESS_THROW presentation and is selectable only while the bar exists', (function () { var sk = rules().skills.SPECIAL_MAGIC.filter(function (s) { return s.id === 'ATHLETE_BARBELL_PRESS_THROW'; })[0]; return pt.accepted && sk && sk.movement_pattern_id === 'VERTICAL_PUSH' && sk.stack.presentation_profile_id === 'PP_ATHLETE_BARBELL_PRESS_THROW'; })(), rules().skills.SPECIAL_MAGIC.map(function (s) { return [s.id, s.movement_pattern_id, s.stack.presentation_profile_id]; }));
+ok('7. the same held bar id becomes PROJECTILE, hits the wall through swept collision, enters RETURNING, and restores the original HELD grip with no duplicate', to.states[barId].IN_SPECIAL && to.states[barId].PROJECTILE && to.states[barId].RETURNING && play().equipment.held.ids[0] === barId && play().equipment.manifested.length === 1 && wall.length >= 1 && tent.length === 1 && tent[0].equipment_ids[0] === barId, { states: to.states[barId], wall: wall, entity: tent, final: play().equipment });
+ok('8. post-commit wall / miss never refunds the reserved 30 MAHGIC and never fabricates damage', Math.abs(energy0 - energy1 - 30) < 0.01 && tdmg.length === 0, { before: energy0, after: energy1, wall: wall.length, damage: tdmg });
+
+/* Before commit, the canonical fizzle policy returns the unconsumed fraction and the item still comes home. */
+me.cooldowns = {}; me.pool.refund(1000); var pre0 = rules().me.combat_energy.current; var pre = send('RULES_CAST', { skill_id: 'ATHLETE_BARBELL_PRESS_THROW' }); tick(); var interrupted = rf.interrupt(me, 'M2_TEST_PRECOMMIT'); observe(0.8, [barId]); var pre1 = rules().me.combat_energy.current; var consumed = 30 * R.resources.precommit_interrupt_consumed_fraction;
+ok('9. pre-commit interruption applies the existing partial-refund rule and returns the same bar instead of orphaning it', pre.accepted && interrupted && Math.abs(pre0 - pre1 - consumed) < 0.01 && play().equipment.held.ids[0] === barId && play().equipment.manifested.length === 1, { before: pre0, after: pre1, consumed: consumed, final: play().equipment, transitions: transitions(pre.cast_id) });
+
+console.log('RESULT M2 equipment motion: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

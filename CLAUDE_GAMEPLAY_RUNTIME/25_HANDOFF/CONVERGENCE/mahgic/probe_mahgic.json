@@ -1,0 +1,220 @@
+{
+ "checks": [
+  "PASS setup: the practice dummy is a combatant at {\"x\":0,\"z\":-2}, practice on — {\"id\":\"FIELD_DUMMY\",\"kind\":\"SYNTHETIC\",\"class\":\"ATHLETE\",\"team\":\"DUMMY\",\"hp\":1000,\"max\":1000,\"ko\":false,\"last_hit_ago_s\":null,\"last_touch_ago_s\":null,\"last_hit_from\":null,\"lock\":null,\"position\":{\"x\":0,\"z\":-2},\"facing\":3.142,\"guard\":null,\"invisible\":false,\"immune\":false,\"discord\":false,\"cast\":null,\"statuses\":[],\"enemy\":true,\"ally\":false}",
+  "PASS G1 PHYSICAL MAHGIC push (PM_PUSH): during the startup the grains GATHER on the striking hand and follow it (8 samples, centroid ≤ 0.35 m from HAND_R: max 0.151 m, grains 97), at the commit they burst and are gone by the end of the recovery, NO projectile entity, damage landed (hp 1000 → 926.1) — {\"accepted\":true,\"samples\":8,\"worst\":0.15132745950421558,\"gone\":true,\"proj\":false,\"hp\":[1000,926.1]}",
+  "PASS G2 PHYSICAL push (PA_PUSH): the body delivers the contact — no GATHER / WAVE / CURTAIN formation at all, only a restrained contact puff at the hit (max 24 grains ≤ 30), no projectile — {\"formation\":false,\"puff\":24}",
+  "PASS W1 SPECIAL push (ATHLETE_VECTOR): a compact WAVE front rides the authoritative projectile (4 samples: the emitter head is ≤ 0.6 m from the entity, max 0.00 m; the front reaches at most 0.04 m ahead of the head (≤ 1.0) and the filaments trail at most 3.00 m behind (≤ 4.0: ≈ 0.2 s of grain life at a 12 m/s head, measured under the sampling load of the probe itself)), the projectile ends at the first contact (impact at the dummy), the wave grains are gone 233 ms after the entity vanished (≤ 500), damage landed (hp 768.3 → 704.5) — {\"accepted\":true,\"track\":4,\"head\":0,\"front\":0.04,\"back\":3,\"gone_ms\":232.5,\"impact\":true,\"hp\":[768.3,704.5]}",
+  "PASS W2 (no suitable plaza wall within 4–12 m from this spot — skipped, not a failure)",
+  "PASS C1 CASCADE PULL (original candidate; equipped into special slot 1 in place of TRACK: 2/2; lock ok): during the pull a descending CURTAIN column stands over the aimed dummy (18 startup samples, centroid XZ ≤ 0.9 m: max 0.13 m; top ≥ 2 m: 3.3), the impact carries formation CURTAIN at the dummy, damage landed (hp 640.8 → 564.3), the column has broken into dust and gone by 3.4 s — {\"eq\":2,\"cast\":true,\"curt\":18,\"imp\":{\"id\":\"E8\",\"type\":\"IMPACT\",\"owner\":\"PLAYER_A\",\"position\":{\"x\":0,\"z\":-2},\"y\":0,\"formation\":\"CURTAIN\",\"radius_m\":2.5,\"heading\":null,\"remaining_s\":0.55,\"skill\":\"ATHLETE_CASCADE\",\"dissipatable\":false,\"harmless\":false,\"cause\":null,\"category\":\"SPECIAL_MAGIC\"},\"hp\":[640.8,564.3],\"left\":false}",
+  "PASS F1 cast in FLIGHT (8.5 m): the special cast is ACCEPTED (no AIRBORNE refusal), the projectile flies at the caster height (entity y 8.554), the body stays powered at altitude afterwards (8.6 m, no landing) in the same form — {\"accepted\":true,\"projY\":8.554,\"alt\":[8.51,8.56],\"powered\":true}",
+  "PASS P1 eight casts in a row (PM_PUSH / VECTOR alternating): frame interval p95 19.6 ms / p99 21.1 ms (idle p95 19.6 ms), long stalls (> 40 ms) 0 in 858 frames; dust effects pooled and retired (live after: 0, pooled 11 ≤ 12) — render CPU under vsync, not physical-phone smoothness — {\"idle_p95\":19.6,\"cast_p95\":19.6,\"cast_p99\":21.1,\"stalls\":0,\"frames\":858,\"pooled\":[{\"effects\":0,\"grains\":0,\"pooled\":11,\"max_live\":14},{\"effects\":0,\"grains\":0,\"pooled\":11,\"max_live\":14}]}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "out": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\probe_out\\mahgic",
+ "g1": {
+  "samples": 20,
+  "gath": [
+   {
+    "d": 0.11881077392223323,
+    "grains": 10
+   },
+   {
+    "d": 0.13692698784388715,
+    "grains": 22
+   },
+   {
+    "d": 0.15132745950421558,
+    "grains": 32
+   },
+   {
+    "d": 0.1299884610263542,
+    "grains": 48
+   },
+   {
+    "d": 0.12667280686871996,
+    "grains": 57
+   },
+   {
+    "d": 0.12278436382536669,
+    "grains": 70
+   },
+   {
+    "d": 0.12382649151130783,
+    "grains": 87
+   },
+   {
+    "d": 0.1182624200665621,
+    "grains": 97
+   }
+  ],
+  "gone": true,
+  "proj": false
+ },
+ "w1": {
+  "track": [
+   {
+    "d": 0,
+    "front": 0.04,
+    "back": 0.18,
+    "grains": 45
+   },
+   {
+    "d": 0,
+    "front": 0.01,
+    "back": 1.74,
+    "grains": 90
+   },
+   {
+    "d": 0,
+    "front": 0.02,
+    "back": 2.98,
+    "grains": 103
+   },
+   {
+    "d": 0,
+    "front": 0.01,
+    "back": 3,
+    "grains": 38
+   }
+  ],
+  "gone_ms": 232.5
+ },
+ "c1": {
+  "curt": [
+   {
+    "dxz": 0.1284562182223967,
+    "top": 3.23,
+    "grains": 30
+   },
+   {
+    "dxz": 0.042438190347845905,
+    "top": 3.28,
+    "grains": 60
+   },
+   {
+    "dxz": 0.035693136595149416,
+    "top": 3.23,
+    "grains": 89
+   },
+   {
+    "dxz": 0.07102816342831901,
+    "top": 3.22,
+    "grains": 119
+   },
+   {
+    "dxz": 0.046669047558312075,
+    "top": 3.26,
+    "grains": 149
+   },
+   {
+    "dxz": 0.044102154142399826,
+    "top": 3.29,
+    "grains": 179
+   },
+   {
+    "dxz": 0.03580502757993625,
+    "top": 3.22,
+    "grains": 209
+   },
+   {
+    "dxz": 0.017464249196572995,
+    "top": 3.28,
+    "grains": 239
+   },
+   {
+    "dxz": 0.030000000000000027,
+    "top": 3.26,
+    "grains": 260
+   },
+   {
+    "dxz": 0.03140063693621511,
+    "top": 3.24,
+    "grains": 260
+   },
+   {
+    "dxz": 0.03328663395418648,
+    "top": 3.24,
+    "grains": 260
+   },
+   {
+    "dxz": 0.019235384061671298,
+    "top": 3.26,
+    "grains": 260
+   },
+   {
+    "dxz": 0.009433981132056549,
+    "top": 3.21,
+    "grains": 260
+   },
+   {
+    "dxz": 0.024698178070456853,
+    "top": 3.25,
+    "grains": 260
+   },
+   {
+    "dxz": 0.018439088914585792,
+    "top": 3.26,
+    "grains": 260
+   },
+   {
+    "dxz": 0.009219544457292787,
+    "top": 3.27,
+    "grains": 260
+   },
+   {
+    "dxz": 0.005000000000000003,
+    "top": 3.19,
+    "grains": 260
+   },
+   {
+    "dxz": 0.021189620100417108,
+    "top": 3.26,
+    "grains": 260
+   }
+  ],
+  "imp": {
+   "id": "E8",
+   "type": "IMPACT",
+   "owner": "PLAYER_A",
+   "position": {
+    "x": 0,
+    "z": -2
+   },
+   "y": 0,
+   "formation": "CURTAIN",
+   "radius_m": 2.5,
+   "heading": null,
+   "remaining_s": 0.55,
+   "skill": "ATHLETE_CASCADE",
+   "dissipatable": false,
+   "harmless": false,
+   "cause": null,
+   "category": "SPECIAL_MAGIC"
+  }
+ },
+ "p1": {
+  "idle_p95": 19.6,
+  "cast_p95": 19.6,
+  "cast_p99": 21.1,
+  "stalls": 0,
+  "frames": 858,
+  "pooled": [
+   {
+    "effects": 0,
+    "grains": 0,
+    "pooled": 11,
+    "max_live": 14
+   },
+   {
+    "effects": 0,
+    "grains": 0,
+    "pooled": 11,
+    "max_live": 14
+   }
+  ]
+ },
+ "summary": {
+  "pass": 9,
+  "fail": 0
+ }
+}

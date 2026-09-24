@@ -1,0 +1,61 @@
+{
+ "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\phoenix\\GOLDEN_PHOENIX_CREATURE_L0.glb",
+ "kind": "BIRD",
+ "rebase": {
+  "rebased": 1,
+  "skinned_meshes": 1,
+  "untouched": 0
+ },
+ "report": {
+  "kind": "BIRD",
+  "bones": 26,
+  "forward": "+x",
+  "fix_deg": 90,
+  "wingL": [
+   "bone_20",
+   "bone_19",
+   "bone_21"
+  ],
+  "wingR": [
+   "bone_15",
+   "bone_42",
+   "bone_16",
+   "bone_17",
+   "bone_24",
+   "bone_25",
+   "bone_26"
+  ],
+  "tailL": [
+   "bone_36",
+   "bone_35"
+  ],
+  "tailR": [
+   "bone_43"
+  ],
+  "head": "bone_4",
+  "neck": "bone_12",
+  "crest": [
+   "bone_14",
+   "bone_13"
+  ],
+  "span_m": 0.982
+ },
+ "triangles": 21464,
+ "size_m": [
+  0.98199462890625,
+  0.7360228300094604,
+  0.90899658203125
+ ],
+ "shots": {
+  "rest_side": "GOLDEN_PHOENIX_CREATURE_L0_rest_side.png",
+  "rest_front": "GOLDEN_PHOENIX_CREATURE_L0_rest_front.png",
+  "rest_q34": "GOLDEN_PHOENIX_CREATURE_L0_rest_q34.png",
+  "pose_a_side": "GOLDEN_PHOENIX_CREATURE_L0_pose_a_side.png",
+  "pose_b_side": "GOLDEN_PHOENIX_CREATURE_L0_pose_b_side.png",
+  "pose_a_front": "GOLDEN_PHOENIX_CREATURE_L0_pose_a_front.png",
+  "pose_b_q34": "GOLDEN_PHOENIX_CREATURE_L0_pose_b_q34.png"
+ },
+ "console_errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:51617/favicon.ico>"
+ ]
+}

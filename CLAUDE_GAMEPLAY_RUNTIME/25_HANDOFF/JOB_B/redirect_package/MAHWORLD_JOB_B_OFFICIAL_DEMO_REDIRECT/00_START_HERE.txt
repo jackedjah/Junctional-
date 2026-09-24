@@ -1,0 +1,42 @@
+MAHWORLD OFFICIAL DEMO — JOB B REDIRECTION PACK
+
+BABY MODE — WHAT TO DO
+
+1. DO NOT stop Claude's current running job.
+2. At the next safe checkpoint, give Claude the file:
+   01_PASTE_THIS_TO_CLAUDE.txt
+3. Upload this reference pack only if Claude Remote needs the visual/video references.
+4. DO NOT upload the three new monster GLBs through chat.
+   They already live on the user's computer in:
+   GLB_NEW3/
+5. Existing larger GLBs remain in:
+   GLB_PHASE_AB/
+6. Claude must FIRST check those local folders in the SAME existing MAHWORLD session/worktree before asking for any asset again.
+7. This pack is intentionally under 30 MB.
+8. JOB B may continue/run first. It must not rewrite JOB A ownership.
+
+WHAT THE FILES DO
+
+01_PASTE_THIS_TO_CLAUDE.txt
+- The one master prompt to queue into the existing Claude job.
+- It merges the world/map expansion, modern MMORPG quality direction, pets/monsters, fairy motion/scale, water, sky/ground, paths, trees, color system, performance, and acceptance proof.
+
+02_REFERENCE_MAP.txt
+- Tells Claude exactly what each screenshot/video means.
+- Prevents Claude from guessing the intent of the references.
+
+03_DESIGN_20_PERCENT.txt
+- The assistant's added design logic to complete the user's roughly 80% creative direction.
+- These ideas are already reflected in the master prompt; this file is mainly a readable design summary.
+
+04_ACCEPTANCE_CHECKLIST.txt
+- Fast final gate. Claude should not call the world pass complete until these items are proven.
+
+references/
+- Current map screenshots.
+- Current tree crop.
+- Fairy scale reference.
+- Water-motion video and extracted frame sheet.
+
+IMPORTANT
+The reference video/image is for behavior, atmosphere, and water-response study only. Do not copy third-party game assets, textures, geometry, audio, or code.

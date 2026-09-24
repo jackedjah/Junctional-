@@ -1,0 +1,140 @@
+{
+ "version": "BOTANY_PLACEMENT_V1",
+ "status": "DEFINITION_ONLY — nothing is placed from this file until Jah approves the tree family (U11); then it drives the registry/migration that replaces the laser-plant family (U12)",
+ "_doc": "master §14.6: deterministic seeded placement within eligible ground, excluding pathways, thresholds, landing pads, combat clearances, solids and important sightlines. All distances in plaza metres (spawn 0,4). The preview tool deploy/botany_placement_preview.mjs evaluates this mask against the actual FIELD layout (rules _runtime_mapping.field_colliders_district_v1) and reports counts/bounds without touching the scene.",
+ "seed": 4127,
+ "eligible": [
+  {
+   "kind": "annulus",
+   "cx": 0,
+   "cz": 0,
+   "r_min": 13.5,
+   "r_max": 54,
+   "label": "plaza ring outside the arrival forecourt, inside the authored 112 m floor"
+  },
+  {
+   "kind": "annulus",
+   "cx": 0,
+   "cz": 0,
+   "r_min": 62,
+   "r_max": 150,
+   "label": "district ground between the plaza and the landmark approaches"
+  }
+ ],
+ "exclusions": {
+  "layout_solids_margin_m": 2.5,
+  "landmark_envelope_margin_m": 8,
+  "plaza_pathways": {
+   "from_r": 11,
+   "targets": [
+    [
+     -17,
+     0
+    ],
+    [
+     0,
+     -19.5
+    ],
+    [
+     18,
+     0
+    ],
+    [
+     1,
+     20
+    ]
+   ],
+   "half_width_m": 2.9,
+   "label": "the four plaza → entrance inlays (2.6 m) + 1.6 m margin"
+  },
+  "secondary_streets": {
+   "from": [
+    0,
+    0
+   ],
+   "targets": [
+    [
+     30,
+     40
+    ],
+    [
+     -30,
+     30
+    ]
+   ],
+   "half_width_m": 2.9,
+   "label": "plaza → tree elevator, plaza → residential pods"
+  },
+  "district_routes": {
+   "from": [
+    0,
+    56
+   ],
+   "targets_from_manifest": true,
+   "half_width_m": 5.5,
+   "label": "the radial route inlays plaza → each landmark (4.5 m) + 1 m margin"
+  },
+  "clearances": [
+   {
+    "cx": 0,
+    "cz": 4,
+    "r": 4,
+    "label": "spawn"
+   },
+   {
+    "cx": 0,
+    "cz": -2,
+    "r": 3.5,
+    "label": "practice dummy"
+   },
+   {
+    "cx": 30,
+    "cz": 40,
+    "r": 13,
+    "label": "tree elevator platform + landing"
+   },
+   {
+    "cx": -31,
+    "cz": 31,
+    "r": 10,
+    "label": "residential pods"
+   }
+  ],
+  "sightlines": [
+   {
+    "from": [
+     0,
+     4
+    ],
+    "to": [
+     0,
+     178
+    ],
+    "half_width_m": 6,
+    "label": "spawn → temple axis stays open"
+   }
+  ]
+ },
+ "distribution": {
+  "method": "seeded cluster grammar: cluster centres on a jittered 16 m grid inside the eligible mask (60 % of cells kept), nearest the plaza first up to the hard cap; 3–6 specimens per cluster within 2.8 m; min spacing 1.7 m; variant / yaw / scale (0.97–1.03) from the seed",
+  "cluster_cell_m": 16,
+  "cluster_size": [
+   3,
+   6
+  ],
+  "cluster_radius_m": 2.8,
+  "min_spacing_m": 1.7,
+  "density_cap_per_100m2": 1.6,
+  "hard_cap": 140,
+  "scale_range": [
+   0.97,
+   1.03
+  ],
+  "cell_acceptance": 0.6
+ },
+ "lod": {
+  "far_switch_m": 30,
+  "far_variant": "tree_spec.lod_far (no twigs, half the terminal leaves, 5 radial segments)",
+  "note": "LOD is a definition here; the runtime switch is built with the propagation step after approval"
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "_doc": "MAHWORLD motion foundation + retarget mapping (motion master B, section 3A). Written 2026-09-16 with NO captured motion used: the one bounded resource inventory found no FBX/BVH in Downloads or the project, no Auto-Rig Pro or AccuRIG, and iClone 8's bundled Basic Walk / Basic Run / Idle / Boxing presets are proprietary .iMotion files that only the iClone GUI can export (no headless route, and launching the owner's iClone session was not authorised). The four foundations below are therefore AUTHORED on the repaired rig, and this file records exactly what a later retarget needs so the mapping is not guessed twice.",
+ "foundation_clips": {
+  "IDLE": { "status": "AUTHORED_PROCEDURAL", "driver": "RigAnimator layer 1 ALIVE (breath 4-6 s, blink 3-7 s, gaze, posture drift), seeded per character", "provenance": "no external source" },
+  "WALK": { "status": "AUTHORED_PROCEDURAL", "driver": "RigAnimator layer 2 separated hover gait: single phase from travelled distance, support pulses at phase 0 / pi, knee flexion at the measured knee, tips hover (hover_gait)", "provenance": "no external source" },
+  "RUN": { "status": "AUTHORED_PROCEDURAL", "driver": "the same gait at higher cadence/stride plus the fused travel lean (travel_posture) and flight posture", "provenance": "no external source" },
+  "PUNCH": { "status": "AUTHORED_PROCEDURAL", "driver": "RigAnimator layer 5 PUSH pattern (HORIZONTAL_PUSH family) timed by the host's CONCENTRIC / RECOVERY phases", "provenance": "no external source" }
+ },
+ "owner_action_to_add_captured_motion": [
+  "Option A (owned licence): open iClone 8, apply MotionPuppet Base Motion > Move > 01_Basic Walk, 02_Basic Run, Idle > 01_Natural and Idle > 01_Boxing to any standard character, File > Export > FBX (in-place root, 30 fps, no mesh needed) into C:\\Users\\jahsu\\Downloads\\MAHWORLD_MOTION\\iclone\\ .",
+  "Option B (free account): sign in to mixamo.com, download Idle, Walking (in place), Running (in place), Punching as FBX 'Without Skin' into C:\\Users\\jahsu\\Downloads\\MAHWORLD_MOTION\\mixamo\\ .",
+  "Then run the retarget with this mapping; keep the source FBX unchanged and record its filename + licence in this file."
+ ],
+ "target_rig": {
+  "asset": "lab/assets/athlete_m_preview/dev_0.7/Mah_Athlete_M_am08_v4.glb",
+  "units": "metres (glTF node translations x scale_to_metres 1.82461 from the manifest)",
+  "up": "+Y", "face": "+Z in bone space (the runtime turns the body 180 deg about Y; a yaw is unchanged by that turn)",
+  "handedness": "`_L` bones sit at model -x; abduction opens the left limb on -z, the right on +z; a hanging bone swings forward on -x; an upward bone bends forward on +x",
+  "rest_pose": "A-pose with arms hanging (not a T-pose): shoulders at 0.752 H, elbows 0.635 H, wrists 0.520 H; all bone rest rotations are identity",
+  "root": "ROOT at the feet on the ground; host-driven position — locomotion must be retargeted IN PLACE, pelvis translation kept as local bob only"
+ },
+ "bone_map": {
+  "_doc": "source bone -> MAHWORLD bone. Retarget by local orientation of each chain (shoulder->elbow->wrist, hip->knee->ankle), never by name coincidence; the MAHWORLD leg is hip->knee->TIP with no foot, so source foot/toe rotations are NOT copied (they would twist the pointed shin) — map them to virtual support only.",
+  "mixamo": { "mixamorig:Hips": "PELVIS", "mixamorig:Spine": "SPINE", "mixamorig:Spine1": "SPINE", "mixamorig:Spine2": "CHEST", "mixamorig:Neck": "NECK", "mixamorig:Head": "HEAD", "mixamorig:LeftShoulder": "CLAV_L", "mixamorig:LeftArm": "UPPERARM_L", "mixamorig:LeftForeArm": "FOREARM_L", "mixamorig:LeftHand": "HAND_L", "mixamorig:LeftHandMiddle1": "FINGERS_L", "mixamorig:RightShoulder": "CLAV_R", "mixamorig:RightArm": "UPPERARM_R", "mixamorig:RightForeArm": "FOREARM_R", "mixamorig:RightHand": "HAND_R", "mixamorig:RightHandMiddle1": "FINGERS_R", "mixamorig:LeftUpLeg": "THIGH_L", "mixamorig:LeftLeg": "SHIN_L", "mixamorig:LeftFoot": "(virtual support L — not a bone)", "mixamorig:RightUpLeg": "THIGH_R", "mixamorig:RightLeg": "SHIN_R", "mixamorig:RightFoot": "(virtual support R — not a bone)" },
+  "iclone_cc": { "CC_Base_Hip": "PELVIS", "CC_Base_Waist": "SPINE", "CC_Base_Spine01": "SPINE", "CC_Base_Spine02": "CHEST", "CC_Base_NeckTwist01": "NECK", "CC_Base_Head": "HEAD", "CC_Base_L_Clavicle": "CLAV_L", "CC_Base_L_Upperarm": "UPPERARM_L", "CC_Base_L_Forearm": "FOREARM_L", "CC_Base_L_Hand": "HAND_L", "CC_Base_L_Mid1": "FINGERS_L", "CC_Base_R_Clavicle": "CLAV_R", "CC_Base_R_Upperarm": "UPPERARM_R", "CC_Base_R_Forearm": "FOREARM_R", "CC_Base_R_Hand": "HAND_R", "CC_Base_R_Mid1": "FINGERS_R", "CC_Base_L_Thigh": "THIGH_L", "CC_Base_L_Calf": "SHIN_L", "CC_Base_L_Foot": "(virtual support L)", "CC_Base_R_Thigh": "THIGH_R", "CC_Base_R_Calf": "SHIN_R", "CC_Base_R_Foot": "(virtual support R)" },
+  "side_note": "Mixamo/CC 'Left' is the character's anatomical left. On this rig the `_L` bones are the ones at model -x, which after the runtime's 180 deg turn is the character's anatomical RIGHT. Map source Left -> `_R` and source Right -> `_L` unless the runtime turn is removed; record the choice in the retarget log."
+ },
+ "rest_offset_policy": "source A/T-pose is converted to this rig's hanging A-pose by a per-bone rest quaternion offset computed once from both rest poses (q_target_rest^-1 * q_source_rest), never by a mirror scale and never by rewriting the bound skeleton's axes",
+ "hover_adaptation": "human stance/swing rhythm is kept; foot contacts become support PULSES at the tip anchors; ground foot-lock tracks are dropped so nothing pulls the tips into the floor; swing height is remapped to hover_gait.swing_lift_fraction_of_leg",
+ "licence_log": []
+}

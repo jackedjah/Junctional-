@@ -1,0 +1,45 @@
+{
+ "label": "B6_new",
+ "dist": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "mobile": false,
+ "pairs": [
+  {
+   "route": "causeway_north",
+   "flip_pct_per_pair": [
+    0.001,
+    0,
+    0.001,
+    0,
+    0
+   ],
+   "max_flip_pct": 0.001,
+   "mean_flip_pct": 0
+  },
+  {
+   "route": "plaza_edge_east",
+   "flip_pct_per_pair": [
+    0.099,
+    0.106,
+    0.1,
+    0.113,
+    0.116
+   ],
+   "max_flip_pct": 0.116,
+   "mean_flip_pct": 0.107
+  },
+  {
+   "route": "forecourt_gym",
+   "flip_pct_per_pair": [
+    0.062,
+    0.049,
+    0.039,
+    0.031,
+    0.026
+   ],
+   "max_flip_pct": 0.062,
+   "mean_flip_pct": 0.041
+  }
+ ],
+ "depth_bits": 24,
+ "camera_near": null
+}

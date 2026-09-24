@@ -1,0 +1,70 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\treevariaint.glb",
+  "bytes": 76539556,
+  "load_ms": 2561,
+  "size_m": [
+   0.702,
+   0.983,
+   0.632
+  ],
+  "triangles": 1849522,
+  "meshes": 1,
+  "shots": {
+   "front": "treevariaint_front.png",
+   "q34": "treevariaint_q34.png",
+   "side": "treevariaint_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\tree_candidates_hi\\MAHWORLD_FOREST_TREE_PRIMARY_C300.glb",
+  "bytes": 9699220,
+  "load_ms": 159,
+  "size_m": [
+   0.703,
+   0.983,
+   0.632
+  ],
+  "triangles": 300000,
+  "meshes": 1,
+  "shots": {
+   "front": "MAHWORLD_FOREST_TREE_PRIMARY_C300_front.png",
+   "q34": "MAHWORLD_FOREST_TREE_PRIMARY_C300_q34.png",
+   "side": "MAHWORLD_FOREST_TREE_PRIMARY_C300_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\tree_candidates_hi\\MAHWORLD_FOREST_TREE_PRIMARY_C180.glb",
+  "bytes": 6177672,
+  "load_ms": 235,
+  "size_m": [
+   0.702,
+   0.983,
+   0.632
+  ],
+  "triangles": 179999,
+  "meshes": 1,
+  "shots": {
+   "front": "MAHWORLD_FOREST_TREE_PRIMARY_C180_front.png",
+   "q34": "MAHWORLD_FOREST_TREE_PRIMARY_C180_q34.png",
+   "side": "MAHWORLD_FOREST_TREE_PRIMARY_C180_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\tree_primary\\MAHWORLD_FOREST_TREE_PRIMARY_L0.glb",
+  "bytes": 1191128,
+  "load_ms": 81,
+  "size_m": [
+   0.697,
+   0.982,
+   0.631
+  ],
+  "triangles": 14000,
+  "meshes": 1,
+  "shots": {
+   "front": "MAHWORLD_FOREST_TREE_PRIMARY_L0_front.png",
+   "q34": "MAHWORLD_FOREST_TREE_PRIMARY_L0_q34.png",
+   "side": "MAHWORLD_FOREST_TREE_PRIMARY_L0_side.png"
+  }
+ }
+]

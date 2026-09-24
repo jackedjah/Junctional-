@@ -1,0 +1,10 @@
+three@0.185.1
+Build: build/three.module.min.js + build/three.core.min.js (ES modules, sibling relative import)
+Source: https://www.npmjs.com/package/three/v/0.185.1
+License: MIT (see LICENSE)
+Vendored because MAHFITT has no bundler; all client JS is served as plain static assets.
+
+--- addons vendored 2026-09-13 (MAHWORLD runtime, human-approved Phase 3 decision 1) ---
+GLTFLoader.js, BufferGeometryUtils.js, SkeletonUtils.js from three@0.185.1 examples/jsm (same revision as the builds above).
+Only the import specifiers were rewritten ('three' -> './three.module.min.js', '../utils/*' -> './*') so they resolve with no import map.
+Record + rollback: MAHWORLD_CHARACTERS/CLAUDE_RUNTIME_FOUNDATION/15_GLTFLOADER_INTEGRATION/

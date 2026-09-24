@@ -1,0 +1,995 @@
+{
+ "night": false,
+ "errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/favicon.ico>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.1/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.13/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.12/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.11/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.10/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.9/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.7/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.6/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.5/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.4/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.3/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:49339/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.2/manifest.json>"
+ ],
+ "console_errors": [],
+ "world": {
+  "status": "READY",
+  "registry": "WORLD_REGISTRY_V1",
+  "error": null,
+  "shapes": 213,
+  "floor_cut": 5,
+  "floor_cut_error": null,
+  "modules": {
+   "fixtures": 78,
+   "water": {
+    "rivers": 5,
+    "bridges": 3,
+    "kerbSegments": 0,
+    "decks": 3,
+    "ramps": 6,
+    "rails": 6,
+    "posts": 66,
+    "edgeLines": 18,
+    "pads": 6,
+    "drawCalls": 18,
+    "triangles": 2900,
+    "maxY": 1.45,
+    "railTopY": 1.45,
+    "clearanceOk": true,
+    "night": false,
+    "floats": 27,
+    "meshes": [
+     "WATER_SHORE",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_FOAM",
+     "WATER_PLATINUM",
+     "WATER_RAILS",
+     "WATER_EDGE_LINES",
+     "WATER_LANDING_PADS",
+     "WATER_SURFACE",
+     "WATER_FLOAT_PADS",
+     "WATER_FLOAT_CORES"
+    ],
+    "ripples": {
+     "supported": true,
+     "enabled": true,
+     "tier": "HIGH",
+     "n": 256,
+     "size_m": 48,
+     "grid": 96,
+     "texel_m": 0.188,
+     "c2": 0.09,
+     "damp": 0.99,
+     "amp_m": 0.07,
+     "ring_speed_mps": 3.94,
+     "impulses": 0,
+     "dropped": 0,
+     "steps": 0,
+     "active": false,
+     "in_water": false,
+     "pending": 0,
+     "origin": [
+      0,
+      3.9375
+     ],
+     "error": null
+    }
+   },
+   "coast": {
+    "islands": 11,
+    "draw_calls": 18,
+    "tris": 24940,
+    "sea_y": -0.3,
+    "beach_w": 34,
+    "outline": {
+     "x1": -203,
+     "z1": -86,
+     "x2": 203,
+     "z2": 322,
+     "corner_r": 70
+    },
+    "foam_lines": 12,
+    "night": false
+   },
+   "terrain": {
+    "regions": 8,
+    "terraces": 3,
+    "forecourts": 5,
+    "spurs": 4,
+    "tint_sheets": 10,
+    "tint_cells": 908,
+    "paths": {
+     "CAUSEWAY": 6,
+     "REGIONAL": 11,
+     "TRAIL": 11
+    },
+    "shards": 448,
+    "dust": 2589,
+    "monoliths": 14,
+    "draw_calls": 10,
+    "tris": 7322,
+    "night": false
+   },
+   "meadow": {
+    "chunks": 93,
+    "instances": 18800,
+    "visible_chunks": 18,
+    "draw_calls": 18,
+    "tris_visible_max": 150400,
+    "near_m": 70,
+    "mid_m": 130,
+    "night": false,
+    "cfg": {
+     "_doc": "owner next-pass 2026-09-20 §10 CRYSTAL MEADOW = the MAHWORLD grassland: many small multifaceted forms in the region family, varied height, controlled highlights, slight translucency, never a mirror; NEAR = instanced geometry (chunks of 30 m, frustum + distance culled), MID = the same chunks at half density, FAR = the region tint sheet; a subtle shimmer by instance hash, never constant sparkle",
+     "density_per_m2": 0.7,
+     "chunk_m": 30,
+     "near_m": 70,
+     "mid_m": 130,
+     "h_m": [
+      0.07,
+      0.36
+     ],
+     "r_m": [
+      0.045,
+      0.13
+     ],
+     "max_instances": 64000,
+     "opacity": 0.86,
+     "shimmer": 0.05
+    }
+   },
+   "forest": {
+    "tree_lock": true,
+    "zone_family": {
+     "FOREST_W": "purple",
+     "FOREST_NW": "red",
+     "FOREST_NE": "blue",
+     "FOREST_N_W": "red",
+     "FOREST_N_E": "gold"
+    },
+    "trees": 125,
+    "lod_counts": {
+     "L0": 0,
+     "L1": 0,
+     "IMPOSTOR": 125
+    },
+    "impostor": true,
+    "draw_calls": 2,
+    "lod_m": {
+     "near": 26,
+     "mid": 60
+    },
+    "height_m": [
+     9.27,
+     14.73
+    ],
+    "underbrush": 125,
+    "night": false,
+    "skipped": null
+   },
+   "architecture": {
+    "landmarks": 5,
+    "houses": 5,
+    "skirt_shards": 172,
+    "seams": 25,
+    "crowns": 9,
+    "entrance_diamonds": 12,
+    "roof_diamonds": 12,
+    "draw_calls": 24,
+    "tris": 6180,
+    "night": false,
+    "motion_far_m": 220
+   },
+   "celestial": {
+    "night": false,
+    "draw_calls_visible": 3,
+    "sun": {
+     "apparent_deg": 5.3,
+     "diameter_m": 30.55,
+     "distance_m": 330,
+     "halo_deg": 14,
+     "halo_m": 81.04,
+     "textured": true,
+     "visible": true,
+     "direction": [
+      0.577,
+      0.755,
+      0.311
+     ]
+    },
+    "moon": {
+     "apparent_deg": 5.2,
+     "diameter_m": 29.97,
+     "distance_m": 330,
+     "halo_deg": 12,
+     "halo_m": 69.37,
+     "textured": true,
+     "visible": false,
+     "direction": [
+      -0.342,
+      0.085,
+      -0.936
+     ]
+    }
+   },
+   "sky": {
+    "wind": {
+     "dir_deg": 28,
+     "speed_mps": 2.4,
+     "now_mps": 2.46,
+     "gust": 0.35
+    },
+    "layers": [
+     {
+      "id": "MIST_LOW",
+      "kind": "MIST",
+      "count": 1,
+      "alt_m": 6,
+      "opacity": 0.16
+     },
+     {
+      "id": "CUMULUS_MID",
+      "kind": "CLOUD",
+      "count": 30,
+      "alt_m": 150,
+      "opacity": 0.78
+     },
+     {
+      "id": "CIRRUS_HIGH",
+      "kind": "CLOUD",
+      "count": 16,
+      "alt_m": 280,
+      "opacity": 0.34
+     }
+    ],
+    "draw_calls": 3,
+    "night": false
+   },
+   "props": {
+    "placed": [
+     {
+      "id": "PROJECTOR_GYM_BEACON",
+      "derivative": "MAH_GYM_PROJECTOR_BEACON",
+      "scale": 4.9804,
+      "footprint_m": [
+       4.88,
+       2.77
+      ],
+      "height_m": 4.6,
+      "yaw_deg": 40,
+      "levels": [
+       0,
+       60
+      ],
+      "meshes": 1,
+      "bounds": {
+       "min": [
+        -82.76,
+        0.02,
+        95.37
+       ],
+       "max": [
+        -77.24,
+        4.62,
+        100.63
+       ]
+      },
+      "pad_r_m": 2.79
+     }
+    ],
+    "pads": 1,
+    "draw_calls_at_rest": 2,
+    "hologram_materials": 2,
+    "night": false
+   },
+   "matchHall": {
+    "building": {
+     "id": "MATCH_HALL",
+     "at": [
+      122,
+      6
+     ],
+     "door": {
+      "side": "-x",
+      "x": 102,
+      "z": 6,
+      "w": 6,
+      "h": 5
+     },
+     "draw_calls": 6,
+     "tris": 1772,
+     "strips": 60,
+     "height_m": 22
+    },
+    "court": {
+     "id": "MATCH_COURT_OUTDOOR",
+     "at": [
+      128,
+      50
+     ],
+     "r": 16,
+     "spectator_r": [
+      19,
+      24
+     ],
+     "pylons": 4,
+     "aisles": 4,
+     "draw_calls": 3,
+     "tris": 4656
+    },
+    "interior": null,
+    "night": false,
+    "draw_calls_field": 9
+   },
+   "guides": {
+    "current": null,
+    "visible": true,
+    "on_stage": false,
+    "height_m": 0.75,
+    "wanted": null,
+    "loaded": [],
+    "loading": [],
+    "skinned": null,
+    "scale": null,
+    "night": false,
+    "rim": null,
+    "draw_calls": 0,
+    "pos": null,
+    "yaw_deg": null,
+    "follow": {
+     "lateral_m": 0.78,
+     "trail_m": 0.38,
+     "up_m": 1.42,
+     "rate": 7,
+     "lead_s": 0.18,
+     "snap_beyond_m": 12,
+     "cam_clear_m": 1.6,
+     "floor_above_feet_m": 0.35,
+     "dist_m": 1.5,
+     "angle_rad": 1.2
+    },
+    "orient": {
+     "yaw_rate": 6,
+     "look_events_s": 0
+    },
+    "companion_brake": {
+     "min_decel_mps2": 5,
+     "rad": 0.18,
+     "settle_s": 0.35
+    },
+    "hover": {
+     "amp_m": 0.05,
+     "hz": 0.9,
+     "amp2_m": 0.02,
+     "hz2": 0.37
+    },
+    "drift": {
+     "amp_m": 0.28,
+     "period_s": 6.5,
+     "correct_rate": 1.6
+    },
+    "settle": {
+     "after_s": 2.5,
+     "rise_m": 0.12,
+     "look_hz": 0.11,
+     "look_rad": 0.55
+    },
+    "bank": {
+     "rad_per_mps": 0.14,
+     "max_rad": 0.42,
+     "yaw_rate": 8
+    },
+    "formation": null,
+    "accel_bank": 0.05,
+    "settled": 0,
+    "idle_s": 0,
+    "motion_source": "registry.guide_motion"
+   },
+   "creatures": {
+    "count": 0,
+    "active": 0,
+    "lod_levels": 3,
+    "lod_m": [
+     24,
+     60
+    ],
+    "lod_now": [],
+    "classified_bones": {
+     "method": "names",
+     "total_bones": 55,
+     "root": "Root",
+     "hips": "J_Bip_C_Hips",
+     "head": "J_Bip_C_Head",
+     "neck": "J_Bip_C_Neck",
+     "jaw": null,
+     "spine": [
+      "J_Bip_C_Spine",
+      "J_Bip_C_Chest",
+      "J_Bip_C_UpperChest"
+     ],
+     "tail": [],
+     "legs": {
+      "FL": "J_Bip_L_UpperArm / J_Bip_L_LowerArm / J_Bip_L_Hand",
+      "FR": "J_Bip_R_UpperArm / J_Bip_R_LowerArm / J_Bip_R_Hand",
+      "BL": "J_Bip_L_UpperLeg / J_Bip_L_Foot / J_Bip_L_Foot",
+      "BR": "J_Bip_R_UpperLeg / J_Bip_R_Foot / J_Bip_R_Foot"
+     },
+     "forward_model": "+z",
+     "forward_fix_deg": 180,
+     "rest_height_m": 0.978,
+     "missing": [
+      "jaw",
+      "tail"
+     ],
+     "duplicates": [],
+     "notes": [
+      "BL knee degenerate (-0.004 m) → fold at J_Bip_L_Foot",
+      "BR knee degenerate (-0.000 m) → fold at J_Bip_R_Foot"
+     ]
+    },
+    "loaded": true,
+    "load_error": null,
+    "derivative": "DOGKIE_FOREST_CREATURE",
+    "height_m": 1.4,
+    "scale": 1.4319,
+    "states": {},
+    "draw_calls_visible": 0,
+    "tags": true,
+    "lag_s": 0.12,
+    "host_clock": false,
+    "night": false
+   },
+   "wildlife": {
+    "authority": "HOST (p.wildlife — play/world/WildlifeManager.js)",
+    "species": {
+     "FISH": {
+      "figures": 18,
+      "visible": 12,
+      "lods": 3,
+      "scale": 2.448,
+      "head": "+z",
+      "rig": {
+       "kind": "FISH",
+       "bones": 14,
+       "spine": [
+        "bone_0",
+        "bone_1",
+        "bone_2",
+        "bone_3",
+        "bone_4",
+        "bone_5",
+        "bone_6",
+        "bone_7"
+       ],
+       "fins": [
+        "L:bone_8>bone_9",
+        "R:bone_10>bone_11",
+        "L:bone_12"
+       ],
+       "forward": "+z",
+       "fix_deg": 180,
+       "length_m": 0.98
+      },
+      "combat": {
+       "hits_to_kill": 3,
+       "hits_to_kill_player": 4.5,
+       "aggression": "PROVOKED"
+      },
+      "ownership": {
+       "wild": true,
+       "pet_capable": true,
+       "premium": true,
+       "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+       "payment_ui": false
+      },
+      "states": [
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM",
+       "SWIM"
+      ],
+      "positions": [
+       [
+        2,
+        -1.7,
+        -121
+       ],
+       [
+        4,
+        -1.7,
+        -120
+       ],
+       [
+        7,
+        -2.4,
+        -118
+       ],
+       [
+        274,
+        -1.8,
+        48
+       ],
+       [
+        277,
+        -1.2,
+        47
+       ],
+       [
+        280,
+        -1.7,
+        47
+       ],
+       [
+        -25,
+        -0.2,
+        227
+       ],
+       [
+        -23,
+        -0.3,
+        229
+       ],
+       [
+        -21,
+        -0.6,
+        231
+       ],
+       [
+        -149,
+        -0.4,
+        225
+       ],
+       [
+        -152,
+        -0.5,
+        224
+       ],
+       [
+        -155,
+        -0.2,
+        223
+       ],
+       [
+        144,
+        -0.3,
+        105
+       ],
+       [
+        143,
+        -0.6,
+        108
+       ],
+       [
+        141,
+        -0.4,
+        111
+       ],
+       [
+        -91,
+        -0.3,
+        31
+       ],
+       [
+        -88,
+        -0.2,
+        30
+       ],
+       [
+        -85,
+        -0.3,
+        29
+       ]
+      ]
+     },
+     "PHOENIX": {
+      "figures": 5,
+      "visible": 5,
+      "lods": 3,
+      "scale": 3.74,
+      "head": "+z",
+      "rig": "RIGID → shader",
+      "combat": {
+       "hits_to_kill": 18,
+       "hits_to_kill_player": 10,
+       "aggression": "HOSTILE_AERIAL"
+      },
+      "ownership": {
+       "wild": true,
+       "pet_capable": true,
+       "premium": true,
+       "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+       "payment_ui": false
+      },
+      "states": [
+       "PATROL",
+       "PATROL",
+       "PATROL",
+       "PATROL",
+       "PATROL"
+      ],
+      "positions": [
+       [
+        162,
+        94,
+        383
+       ],
+       [
+        -82,
+        94,
+        51
+       ],
+       [
+        227,
+        94,
+        180
+       ],
+       [
+        -82,
+        94,
+        351
+       ],
+       [
+        45,
+        94,
+        349
+       ]
+      ]
+     },
+     "HORSE": {
+      "figures": 5,
+      "visible": 5,
+      "lods": 3,
+      "scale": 2.384,
+      "head": "+z",
+      "rig": "RIGID → shader",
+      "combat": {
+       "hits_to_kill": 35,
+       "hits_to_kill_player": null,
+       "aggression": "DEFENSIVE"
+      },
+      "ownership": {
+       "wild": true,
+       "pet_capable": true,
+       "premium": true,
+       "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+       "payment_ui": false
+      },
+      "states": [
+       "WALK",
+       "GRAZE",
+       "GRAZE",
+       "GRAZE",
+       "GRAZE"
+      ],
+      "positions": [
+       [
+        132,
+        0,
+        139
+       ],
+       [
+        75,
+        0,
+        128
+       ],
+       [
+        -27,
+        0,
+        155
+       ],
+       [
+        -143,
+        0,
+        22
+       ],
+       [
+        -84,
+        0,
+        -29
+       ]
+      ]
+     }
+    },
+    "stats": {
+     "fish": 18,
+     "horses": 5,
+     "phoenix": 5,
+     "breaches": 0,
+     "visits": 0,
+     "draw_calls": 22
+    },
+    "night": false,
+    "payment_ui": false,
+    "figures": 28
+   },
+   "trees": 125
+  }
+ },
+ "places": [
+  {
+   "id": "plaza_wide",
+   "goto": {
+    "reached": false,
+    "passes": 1,
+    "sidesteps": 35
+   },
+   "calls": 600,
+   "tris": 1034342,
+   "pos": {
+    "x": -9.85,
+    "z": -29.99
+   },
+   "creatures": 0,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 125
+   }
+  },
+  {
+   "id": "plaza_north",
+   "goto": {
+    "reached": true,
+    "passes": 1,
+    "sidesteps": 2
+   },
+   "calls": 314,
+   "tris": 817681,
+   "pos": {
+    "x": -0.109,
+    "z": 19.539
+   },
+   "creatures": 1,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 125
+   }
+  },
+  {
+   "id": "forest_w_edge",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 526,
+   "tris": 1204932,
+   "pos": {
+    "x": -65.728,
+    "z": 10.04
+   },
+   "creatures": 6,
+   "spar": null,
+   "forest_lod": {
+    "L0": 9,
+    "L1": 18,
+    "IMPOSTOR": 98
+   }
+  },
+  {
+   "id": "forest_w_inside",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 540,
+   "tris": 1021151,
+   "pos": {
+    "x": -99.526,
+    "z": 5.07
+   },
+   "creatures": 11,
+   "spar": null,
+   "forest_lod": {
+    "L0": 1,
+    "L1": 25,
+    "IMPOSTOR": 99
+   }
+  },
+  {
+   "id": "canal_bridge_main",
+   "goto": {
+    "reached": true,
+    "passes": 1,
+    "sidesteps": 7
+   },
+   "calls": 600,
+   "tris": 1244668,
+   "pos": {
+    "x": -0.282,
+    "z": 200.405
+   },
+   "creatures": 10,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 1,
+    "IMPOSTOR": 124
+   }
+  },
+  {
+   "id": "bridge_deck",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 619,
+   "tris": 1293353,
+   "pos": {
+    "x": -0.003,
+    "z": 225.781
+   },
+   "creatures": 15,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 1,
+    "IMPOSTOR": 124
+   }
+  },
+  {
+   "id": "match_hall_approach",
+   "goto": {
+    "reached": true,
+    "passes": 1,
+    "sidesteps": 2
+   },
+   "calls": 222,
+   "tris": 670935,
+   "pos": {
+    "x": 83.871,
+    "z": 6.372
+   },
+   "creatures": 1,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 125
+   }
+  },
+  {
+   "id": "bridge_side",
+   "goto": {
+    "reached": false,
+    "passes": 1,
+    "sidesteps": 17
+   },
+   "calls": 287,
+   "tris": 978909,
+   "pos": {
+    "x": 10.4,
+    "z": 159.577
+   },
+   "creatures": 7,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 5,
+    "IMPOSTOR": 120
+   }
+  },
+  {
+   "id": "match_court",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 210,
+   "tris": 669221,
+   "pos": {
+    "x": 127.831,
+    "z": 30.187
+   },
+   "creatures": 2,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 125
+   }
+  },
+  {
+   "id": "projector_gym",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 396,
+   "tris": 1037985,
+   "pos": {
+    "x": -71.741,
+    "z": 95.915
+   },
+   "creatures": 4,
+   "spar": {
+    "a": "NPC_LEAN_F",
+    "b": "NPC_BAGE_F",
+    "spot": {
+     "x": 36,
+     "z": -30
+    },
+    "arrived": true,
+    "remaining_s": 11.9,
+    "casts": 1
+   },
+   "forest_lod": {
+    "L0": 0,
+    "L1": 7,
+    "IMPOSTOR": 118
+   }
+  },
+  {
+   "id": "plaza_buildings",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 477,
+   "tris": 992904,
+   "pos": {
+    "x": -30.156,
+    "z": -9.839
+   },
+   "creatures": 4,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 2,
+    "IMPOSTOR": 123
+   }
+  },
+  {
+   "id": "match_hall_interior",
+   "enter": true,
+   "room": "MATCH_HALL",
+   "calls": 23,
+   "tris": 28992,
+   "build": {
+    "key": "MATCH_HALL:MATCH_HALL_colliders_v1:14",
+    "room": "MATCH_HALL",
+    "error": null
+   }
+  },
+  {
+   "id": "gym_interior_props",
+   "enter": true,
+   "room": "GYM_INTERIOR",
+   "calls": 99,
+   "tris": 76863,
+   "build": {
+    "key": "GYM_INTERIOR:GYM_INTERIOR_colliders_v1:15",
+    "room": "GYM_INTERIOR",
+    "error": null
+   }
+  }
+ ]
+}

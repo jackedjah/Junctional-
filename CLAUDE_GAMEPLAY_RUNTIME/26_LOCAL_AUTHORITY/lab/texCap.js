@@ -1,0 +1,28 @@
+/* MAHWORLD :: TEXTURE CAP (owner B8 P0 — the real-iPhone Safari reload at ~126 s, 2026-09-20)
+   Measured on the B7 build at phone DPR 3 near the red region: 160 textures ≈ 533 MB of GPU memory (thirteen 2048² RGBA maps with mipmaps
+   at 21 MB each — the four district buildings, the Athlete base + normal, the Dogkie ×2, the horse, the gym projector beacon ×2 (L0 and L1
+   each carrying their own copy), the two 2048² canvas ground maps) + 70 MB of geometry + a 377 MB JS heap. WebKit kills a tab well before
+   1.5 GB; opening the MAHWORLD panel (a full-screen backdrop blur over the WebGL canvas) was the push over the edge, not the cause.
+   This module caps every loaded image texture to the quality tier's maximum edge (HIGH 2048 = no change on desktop, MED 1024 = the
+   phone default, LOW 512) by resampling once on a canvas BEFORE the first GPU upload, and de-duplicates textures that carry the same image
+   name and size (LOD derivatives embedding the same map) so one GPU copy serves them all. 2048² → 1024² is −75 % per map. */
+export function createTextureCap(THREE, opts) {
+  opts = opts || {}; var limits = opts.limits || { LOW: 512, MED: 1024, HIGH: 2048 }; var tierFn = opts.tier || function () { return 'HIGH'; }; var shared = {}; var stats = { seen: 0, capped: 0, shared: 0, duplicate_textures_disposed: 0, duplicate_bitmaps_closed: 0, bytes_before: 0, bytes_after: 0 };
+  function maxEdge() { var t = String(tierFn() || 'HIGH').toUpperCase(); return limits[t] || limits.HIGH || 2048; }
+  function dims(im) { if (!im) return null; if (Array.isArray(im)) return null; var w = im.width || im.naturalWidth || im.videoWidth || 0, h = im.height || im.naturalHeight || im.videoHeight || 0; return (w > 0 && h > 0) ? { w: w, h: h } : null; }
+  function resample(im, w, h, tw, th) { var c = document.createElement('canvas'); c.width = tw; c.height = th; var g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(im, 0, 0, w, h, 0, 0, tw, th); return c; }
+  /* cap ONE texture in place (returns the texture to use — a shared one when an identical map was already capped) */
+  var edgeOverride = null;
+  function capTexture(tex) { if (!tex || !tex.isTexture || tex.isCompressedTexture || tex.isDataTexture || tex.isCubeTexture || tex.isRenderTargetTexture) return tex; var d = dims(tex.image); if (!d) return tex; stats.seen++; var max = edgeOverride || maxEdge(); var key = (tex.name || '') + '|' + d.w + 'x' + d.h + '|' + (tex.colorSpace || ''); if (tex.name && shared[key] && shared[key] !== tex) { var keep = shared[key], rejectedImage = tex.image; stats.shared++; stats.bytes_before += d.w * d.h * 4; try { tex.dispose(); stats.duplicate_textures_disposed++; } catch (e) { } if (rejectedImage && rejectedImage !== keep.image && typeof rejectedImage.close === 'function') { try { rejectedImage.close(); stats.duplicate_bitmaps_closed++; } catch (e) { } } return keep; }
+    if (d.w > max || d.h > max) { var k = Math.min(max / d.w, max / d.h); var tw = Math.max(1, Math.round(d.w * k)), th = Math.max(1, Math.round(d.h * k)); try { var c = resample(tex.image, d.w, d.h, tw, th); if (tex.image && typeof tex.image.close === 'function') { try { tex.image.close(); } catch (e) { } }   /* an ImageBitmap: release the decoded 2048² copy */ tex.image = c; tex.needsUpdate = true; stats.capped++; stats.bytes_before += d.w * d.h * 4; stats.bytes_after += tw * th * 4; } catch (e) { stats.bytes_before += d.w * d.h * 4; stats.bytes_after += d.w * d.h * 4; } }
+    else { stats.bytes_before += d.w * d.h * 4; stats.bytes_after += d.w * d.h * 4; }
+    if (tex.name) shared[key] = tex; return tex; }
+  var SLOTS = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap', 'alphaMap', 'bumpMap', 'displacementMap', 'specularMap', 'envMap', 'lightMap', 'clearcoatMap', 'clearcoatNormalMap', 'sheenColorMap', 'transmissionMap', 'thicknessMap'];
+  /* cap every texture under a root (a loaded GLTF scene) — call BEFORE the first render of that root */
+  function capRoot(root, edge) { if (!root) return stats; edgeOverride = edge || null; var mats = new Set(); root.traverse(function (o) { var m = o.material; if (!m) return; (Array.isArray(m) ? m : [m]).forEach(function (mm) { mats.add(mm); }); }); mats.forEach(function (m) { SLOTS.forEach(function (s) { if (m[s] && m[s].isTexture) { var t2 = capTexture(m[s]); if (t2 !== m[s]) { m[s] = t2; m.needsUpdate = true; } } }); if (m.uniforms) Object.keys(m.uniforms).forEach(function (u) { var v = m.uniforms[u] && m.uniforms[u].value; if (v && v.isTexture) m.uniforms[u].value = capTexture(v); }); }); edgeOverride = null; return stats; }
+  function releaseTexture(tex) { if (!tex) return false; var removed = false; Object.keys(shared).forEach(function (k) { if (shared[k] === tex) { delete shared[k]; removed = true; } }); return removed; }
+  function report() { return { tier: String(tierFn() || 'HIGH').toUpperCase(), max_edge: maxEdge(), seen: stats.seen, capped: stats.capped, shared: stats.shared, duplicate_textures_disposed: stats.duplicate_textures_disposed, duplicate_bitmaps_closed: stats.duplicate_bitmaps_closed, mb_before: +(stats.bytes_before / 1048576).toFixed(1), mb_after: +(stats.bytes_after / 1048576).toFixed(1) }; }
+  return { capTexture: capTexture, capRoot: capRoot, releaseTexture: releaseTexture, maxEdge: maxEdge, report: report };
+}
+/* one process-wide default so every loader (world modules, the district, the character) caps through the same tier without threading options */
+var DEFAULT = null; export function installTextureCap(cap) { DEFAULT = cap; return cap; } export function defaultTextureCap() { return DEFAULT; }

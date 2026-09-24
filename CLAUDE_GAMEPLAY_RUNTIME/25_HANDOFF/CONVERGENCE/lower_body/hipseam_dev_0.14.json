@@ -1,0 +1,262 @@
+{
+ "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\athlete_m_preview\\dev_0.14\\Mah_Athlete_M_am08_v6.glb",
+ "joints": {
+  "PELVIS": [
+   0,
+   0.4192672729492188,
+   0
+  ],
+  "LUMBAR": [
+   0,
+   0.4714290542602539,
+   0
+  ],
+  "THIGH_L": [
+   -0.045,
+   0.45132888793945314,
+   0.015
+  ],
+  "THIGH_R": [
+   0.045,
+   0.45132888793945314,
+   0.015
+  ],
+  "SHIN_L": [
+   -0.045,
+   0.32164376576741543,
+   0.008179914583772215
+  ],
+  "TAIL1": [
+   0,
+   0.3581241289774577,
+   0
+  ]
+ },
+ "heights": {
+  "hip_pivot_y": 0.4513,
+  "upper_prim_lowest_y": 0.3938,
+  "fused_lower_top_y": 0.3938,
+  "legs_top_y": 0.4454,
+  "legs_bottom_y": 0,
+  "pivot_above_split_m": 0.0575
+ },
+ "upper_bands": [
+  {
+   "tag": "upper bottom ring (split line)",
+   "verts": 234,
+   "y0": 0.3937,
+   "y1": 0.4038,
+   "mean_weight_share": {
+    "PELVIS": 0.464,
+    "TAIL1": 0.408,
+    "LUMBAR": 0.126,
+    "SPINE": 0.002
+   }
+  },
+  {
+   "tag": "between split line and hip pivot",
+   "verts": 1962,
+   "y0": 0.4038,
+   "y1": 0.4513,
+   "mean_weight_share": {
+    "PELVIS": 0.124,
+    "TAIL1": 0.047,
+    "LUMBAR": 0.073,
+    "SPINE": 0.005,
+    "FINGERS_L": 0.334,
+    "HAND_L": 0.042,
+    "FINGERS_R": 0.332,
+    "HAND_R": 0.043,
+    "FOREARM_R": 0,
+    "FOREARM_L": 0
+   }
+  },
+  {
+   "tag": "hip pivot → +0.06 (glute / iliac)",
+   "verts": 1661,
+   "y0": 0.4513,
+   "y1": 0.5113,
+   "mean_weight_share": {
+    "PELVIS": 0.148,
+    "LUMBAR": 0.15,
+    "TAIL1": 0.004,
+    "SPINE": 0.056,
+    "SPINE2": 0.002,
+    "FINGERS_R": 0.084,
+    "HAND_R": 0.191,
+    "FINGERS_L": 0.086,
+    "HAND_L": 0.2,
+    "FOREARM_L": 0.041,
+    "FOREARM_R": 0.039
+   }
+  },
+  {
+   "tag": "pivot +0.06 → +0.12 (lower abdomen / sacrum)",
+   "verts": 1027,
+   "y0": 0.5113,
+   "y1": 0.5713,
+   "mean_weight_share": {
+    "LUMBAR": 0.218,
+    "SPINE": 0.237,
+    "PELVIS": 0.064,
+    "SPINE2": 0.091,
+    "FOREARM_R": 0.132,
+    "HAND_R": 0.042,
+    "CHEST": 0.008,
+    "FOREARM_L": 0.14,
+    "HAND_L": 0.047,
+    "FORETWIST_R": 0.008,
+    "UPPERARM_R": 0.001,
+    "FORETWIST_L": 0.009,
+    "UPPERARM_L": 0.001
+   }
+  }
+ ],
+ "legs_bands": [
+  {
+   "tag": "legs top ring",
+   "verts": 2,
+   "y0": 0.4404,
+   "y1": 0.4455,
+   "mean_weight_share": {
+    "THIGH_L": 0.5,
+    "THIGH_R": 0.5
+   }
+  },
+  {
+   "tag": "legs top 3 cm",
+   "verts": 0,
+   "y0": 0.4154,
+   "y1": 0.4404,
+   "mean_weight_share": {}
+  },
+  {
+   "tag": "upper thigh",
+   "verts": 674,
+   "y0": 0.3654,
+   "y1": 0.4154,
+   "mean_weight_share": {
+    "THIGH_L": 0.503,
+    "SHIN_L": 0.001,
+    "THIGH_R": 0.494,
+    "SHIN_R": 0.001
+   }
+  }
+ ],
+ "joint_coverage": {
+  "upper_prim": {
+   "PELVIS": 1834,
+   "TAIL1": 1049,
+   "LUMBAR": 3658,
+   "SPINE": 4384,
+   "SPINE2": 4386,
+   "FINGERS_L": 1223,
+   "HAND_L": 1324,
+   "FINGERS_R": 1188,
+   "HAND_R": 1292,
+   "FOREARM_L": 1020,
+   "FOREARM_R": 999,
+   "CHEST": 7470,
+   "FORETWIST_R": 491,
+   "UPPERARM_R": 1363,
+   "FORETWIST_L": 468,
+   "UPPERARM_L": 1335,
+   "CLAV_L": 797,
+   "ARMTWIST_L": 884,
+   "CLAV_R": 814,
+   "ARMTWIST_R": 891,
+   "SCAP_L": 484,
+   "SCAP_R": 504,
+   "NECK": 1895,
+   "HEAD": 1293,
+   "JAW": 203,
+   "BROW_R": 101,
+   "CHEEK_R": 181,
+   "CHEEK_L": 81,
+   "BROW_L": 38
+  },
+  "fused_lower_prim": {
+   "TAIL3": 52,
+   "TAIL2": 353,
+   "TAIL1": 2037,
+   "PELVIS": 1727,
+   "LUMBAR": 1293,
+   "SPINE": 166
+  },
+  "split_legs": {
+   "TIP_L": 459,
+   "SHIN_L": 1898,
+   "THIGH_L": 1593,
+   "TIP_R": 561,
+   "SHIN_R": 2152,
+   "THIGH_R": 1707
+  }
+ },
+ "seam": {
+  "upper_ring_verts": 110,
+  "legs_ring_verts": 2,
+  "ring_gap_m": {
+   "median": 0.0768,
+   "p90": 0.0816,
+   "max": 0.0847
+  },
+  "normal_mismatch_deg": {
+   "median": 108.8024,
+   "p90": 118.1019,
+   "max": 180
+  }
+ },
+ "extents": {
+  "upper_bottom_ring": {
+   "x": [
+    -0.0898,
+    0.0898
+   ],
+   "z": [
+    -0.0492,
+    0.0763
+   ]
+  },
+  "legs_top_ring_L": {
+   "x": [
+    -0.0501,
+    -0.0501
+   ],
+   "z": [
+    0.0162,
+    0.0162
+   ]
+  },
+  "legs_top_ring_R": {
+   "x": [
+    0.0473,
+    0.0473
+   ],
+   "z": [
+    0.0159,
+    0.0159
+   ]
+  },
+  "fused_lower_top_band": {
+   "x": [
+    -0.0898,
+    0.0898
+   ],
+   "z": [
+    -0.0492,
+    0.0763
+   ]
+  }
+ },
+ "overlap": {
+  "upper_verts_below_hip_pivot": 2196,
+  "legs_verts_above_hip_pivot": 0,
+  "note": "the pelvis shell continues below the femoral head; a leg that also reaches above the pivot doubles the surface there"
+ },
+ "findings": [
+  "pelvis shell between the split line and the femoral head: THIGH share 0 (a connected hip needs the shell to follow the thigh partially here)",
+  "legs top ring / top 3 cm: PELVIS share 0.000 (a connected junction needs the thigh top to stay with the pelvis partially)",
+  "femoral head sits 0.0575 m above the split line: the thigh swings from the split line, 0.0575 m below its own pivot — the shell above is rigid",
+  "ring gap median 0.0768 m / max 0.0847 m; normal mismatch median 108.8024°"
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "checks": [
+  "PASS E1 OVERHEAD arc (hand WORLD positions): the load carries BOTH hands up to head height (0.08 m vs the head bone — the declared shoulder table softens flexion to ≈ 80°, so head height IS the overhead of this rig) over the chest line, elbows bent; the release extends them forward of the chest (≥ 0.30 m ahead, at chest height, elbows straight) — an overhead extension, never a lunge — {\"cast\":true,\"load\":{\"hy\":1.904,\"hyMax\":1.908,\"head\":1.824,\"chest\":1.334,\"fwdL\":-0.12100000000000044,\"fwdR\":-0.11899999999999977,\"latL\":0.193,\"latR\":-0.194,\"gap\":0.3870258389306843},\"release\":{\"hy\":1.565,\"hyMax\":1.566,\"head\":1.851,\"chest\":1.335,\"fwdL\":0.3729999999999998,\"fwdR\":0.3729999999999998,\"latL\":0.273,\"latR\":-0.272,\"gap\":0.5450009174304205},\"samples\":90}",
+  "PASS E1b the LANCE projectile hit the dummy once (hp 1000 → 931.1) — {\"hp\":[1000,931.1]}",
+  "PASS E2 CHEST FLY arc (hand WORLD positions): the load opens the hands WIDE at shoulder height (1.25 m apart, within 0.55 m of the chest bone = shoulder height), the release ADDUCTS them to the clap in front of the chest (0.10 m apart, ≥ 0.25 m ahead); the second hand carried its own gather — {\"cast\":true,\"load\":{\"hy\":1.541,\"hyMax\":1.543,\"head\":1.853,\"chest\":1.336,\"fwdL\":-0.07900000000000018,\"fwdR\":-0.07799999999999985,\"latL\":0.624,\"latR\":-0.623,\"gap\":1.2470020048099362},\"release\":{\"hy\":1.689,\"hyMax\":1.69,\"head\":1.851,\"chest\":1.336,\"fwdL\":0.375,\"fwdR\":0.375,\"latL\":0.05,\"latR\":-0.049,\"gap\":0.09900505037623081},\"gathers\":{\"g1\":true,\"g2\":true},\"samples\":103}",
+  "PASS E2b the CLAP projectile hit the dummy once (hp 931.1 → 854.6) — {\"hp\":[931.1,854.6]}",
+  "PASS E3 BARRAGE: the approach slid him from 2.3 m to reach (1.26 m, never a teleport), the host counted 8 strikes (view max 8, by damage 8 × 12.9 hp), the dummy lost health eight times (hp 854.6 → 750.7) — {\"cast\":true,\"moved\":1.262,\"strikes\":8,\"strikes_by_damage\":8,\"per_strike_hp\":12.9,\"hp_drops\":[12.9,13,13,13,13,13,13,13],\"hp\":[854.6,750.7]}",
+  "PASS E3b the eight curls ALTERNATE arms on the host schedule (L0 R1 L2 R3 L4 R5 L6 R7), each a real elbow flexion (FOREARM reaches ≤ −0.8 rad = a curl to the shoulder, elbows pinned) — {\"seq\":[\"L0\",\"R1\",\"L2\",\"R3\",\"L4\",\"R5\",\"L6\",\"R7\"],\"depth\":-1.29}",
+  "PASS E3c the combo-lock shows on the dummy (status COMBO_LOCK for 39 samples, ≤ 1.35 s) and on its world tag — {\"lock_samples\":39,\"span_ms\":690.8000000119209,\"tag_seen\":true,\"tags\":[\"LV 1\",\"LV 1 · COMBO\"]}",
+  "PASS E4 performance during the barrage (page timer, desktop GPU Chrome): sampler p95 32.3 ms, long stalls (> 100 ms) 0 of 124 — no freeze, no constant shake; host state delay is the 120 ms presentation lag, unchanged — {\"p95\":32.299999952316284,\"stalls\":0,\"n\":124}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "pass": 9,
+ "fail": 0
+}

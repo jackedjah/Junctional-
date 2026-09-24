@@ -1,0 +1,104 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\TEMPLE_M5C_L0.glb",
+  "bytes": 9118384,
+  "load_ms": 106,
+  "size_m": [
+   0.719,
+   0.979,
+   0.741
+  ],
+  "triangles": 219999,
+  "meshes": 1,
+  "shots": {
+   "front": "TEMPLE_M5C_L0_front.png",
+   "q34": "TEMPLE_M5C_L0_q34.png",
+   "side": "TEMPLE_M5C_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\TEMPLE_M5C_L1.glb",
+  "bytes": 4228512,
+  "load_ms": 66,
+  "size_m": [
+   0.717,
+   0.978,
+   0.74
+  ],
+  "triangles": 59999,
+  "meshes": 1,
+  "shots": {
+   "front": "TEMPLE_M5C_L1_front.png",
+   "q34": "TEMPLE_M5C_L1_q34.png",
+   "side": "TEMPLE_M5C_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\TOWER_M5C_L0.glb",
+  "bytes": 8921660,
+  "load_ms": 87,
+  "size_m": [
+   0.783,
+   0.985,
+   0.616
+  ],
+  "triangles": 220000,
+  "meshes": 1,
+  "shots": {
+   "front": "TOWER_M5C_L0_front.png",
+   "q34": "TOWER_M5C_L0_q34.png",
+   "side": "TOWER_M5C_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\TOWER_M5C_L1.glb",
+  "bytes": 4062088,
+  "load_ms": 67,
+  "size_m": [
+   0.783,
+   0.985,
+   0.616
+  ],
+  "triangles": 60000,
+  "meshes": 1,
+  "shots": {
+   "front": "TOWER_M5C_L1_front.png",
+   "q34": "TOWER_M5C_L1_q34.png",
+   "side": "TOWER_M5C_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\MARKET_M5C_L0.glb",
+  "bytes": 9133064,
+  "load_ms": 91,
+  "size_m": [
+   0.516,
+   0.983,
+   0.498
+  ],
+  "triangles": 220000,
+  "meshes": 1,
+  "shots": {
+   "front": "MARKET_M5C_L0_front.png",
+   "q34": "MARKET_M5C_L0_q34.png",
+   "side": "MARKET_M5C_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\MARKET_M5C_L1.glb",
+  "bytes": 4341248,
+  "load_ms": 75,
+  "size_m": [
+   0.515,
+   0.984,
+   0.499
+  ],
+  "triangles": 60000,
+  "meshes": 1,
+  "shots": {
+   "front": "MARKET_M5C_L1_front.png",
+   "q34": "MARKET_M5C_L1_q34.png",
+   "side": "MARKET_M5C_L1_side.png"
+  }
+ }
+]

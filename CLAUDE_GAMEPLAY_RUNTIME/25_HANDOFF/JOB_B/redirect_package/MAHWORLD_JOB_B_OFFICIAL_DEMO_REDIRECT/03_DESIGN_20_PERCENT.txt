@@ -1,0 +1,48 @@
+MAHWORLD — ASSISTANT'S 20% CREATIVE INPUT
+
+The user's core vision remains authoritative. These are supporting design decisions intended to turn that vision into a coherent world rather than a collection of disconnected features.
+
+1. WORLD SPINE + LOOPS
+Create a readable main traversal spine from the central civic/plaza area into major regions, then use loops and side paths for exploration. The player should understand where the world wants them to go without being trapped in a corridor.
+
+2. THREE PATH HIERARCHIES
+A. Crown Causeways — broad, unmistakable main routes between major regions.
+B. Regional Paths — narrower paths connecting local landmarks and habitats.
+C. Discovery Trails — optional paths leading to rare views, creature pockets, and future challenge locations.
+
+All should feel like MAHWORLD: faceted crystal structure, satin platinum framing, restrained emissive seams, and biome color accents.
+
+3. COLOR WITHOUT RAINBOW NOISE
+Keep platinum/chromium/graphite as the world-wide material family. Red, pink, gold, green, and purple should appear as region-dominant crystal/mineral energy families rather than painted surfaces. Use color in crystal veins, geological growths, canopy extremities, path cores, structural accents, atmospheric particles, and landmark lighting.
+
+4. REGION LOGIC
+Use geography to prepare future progression without implementing quest gates yet:
+- Central Platinum Nexus: social/civic hub and orientation point.
+- Cobalt/Umbral Forest: Dogkie ecology and darker dense traversal.
+- Prismatic Open Range: open land and isolated horse encounters.
+- Crown Spires / Aerial Highlands: cliffs, towers, elevated routes, phoenix territory.
+- Luminous Coast / Deepwater: fish activity, swimming-facing geography, deeper offshore ecology.
+
+These are design roles, not mandatory final names.
+
+5. WATER SHOULD EARN ITS SPACE
+Do not simply delete the water. Increase/reshape land until the water reads as intentional geography: bays, channels, lakes, shoreline basins, deeper outer water, bridges, coves. The high-level view should feel land-rich enough that water is a feature rather than empty filler.
+
+6. TREE MATERIAL SPLIT
+The user's new tree rule is strong: make the structural trunk and main boughs readable metal, then save crystal complexity for extremities. Add only restrained MAHWORLD texture to the metal: shallow longitudinal faceting/grooves, soft heat-grey tonal variation, clean bevels, optional hairline biome-colored energy seams. Avoid natural bark and avoid mirror-chrome noise.
+
+7. SKY DEPTH THROUGH LAYERS
+Use huge Sun/Moon, high cloud layer, lower cloud/mist layer, horizon atmosphere, distant silhouette fade, and restrained crystal/energy particles. Add a shared wind vector that can influence cloud drift, selected vegetation motion, distant particles, and aerial creature feel. This creates a coherent world without expensive full volumetrics.
+
+8. FUTURE-PROOF SURFACES
+Let terrain expose tags/metadata such as ground, crystal path, forest floor, shallow water, deep water, rock, bridge, and special surface. JOB B does not rewrite player locomotion, but these tags allow JOB A to later drive footsteps, attacks, swim behavior, climbing, VFX, and sound correctly.
+
+9. MOBILE-FIRST 'AHEAD OF TIME'
+Ahead-of-time quality should come from coherent systems, not brute-force polygons: chunked loading, instancing, LODs, culling, pooled effects, compressed assets where supported, stable materials, responsive water near the player, cheaper representations at distance, and landmark-driven composition.
+
+10. CREATURES SHOULD TEACH THE WORLD
+Even before quests are implemented, habitat placement can foreshadow gameplay:
+- Dogkie teaches forest navigation/ground combat.
+- Fish makes water feel alive and later supports swimming progression.
+- Horse rewards open-land exploration and future traversal/climbing-adjacent routes.
+- Phoenix gives meaning to vertical world design and high-altitude flight.

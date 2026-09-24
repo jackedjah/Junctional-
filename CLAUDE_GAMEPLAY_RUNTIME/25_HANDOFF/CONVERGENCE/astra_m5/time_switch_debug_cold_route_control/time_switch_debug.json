@@ -1,0 +1,110 @@
+{
+ "generated_at": "2026-09-23T09:14:26.489Z",
+ "stages": [
+  {
+   "label": "cold_route_night_noop",
+   "want": "NIGHT",
+   "before_count": 204,
+   "after_count": 204,
+   "measured": {
+    "returned": "NIGHT",
+    "observed": "NIGHT",
+    "sync_ms": 0,
+    "frames": 91,
+    "p50_ms": 15,
+    "p95_ms": 21.4,
+    "max_ms": 39.8,
+    "max_frame_index": 23,
+    "first_frames_ms": [
+     -3.6,
+     3.3,
+     15.3,
+     15.3,
+     15.2,
+     15.1,
+     19.6,
+     12.9
+    ],
+    "slow_frames": []
+   },
+   "added": []
+  },
+  {
+   "label": "cold_route_first_day",
+   "want": "DAY",
+   "before_count": 204,
+   "after_count": 204,
+   "measured": {
+    "returned": "DAY",
+    "observed": "DAY",
+    "sync_ms": 0.6,
+    "frames": 80,
+    "p50_ms": 9.5,
+    "p95_ms": 14.3,
+    "max_ms": 641,
+    "max_frame_index": 1,
+    "first_frames_ms": [
+     -16.9,
+     641,
+     3.2,
+     39.7,
+     2.5,
+     10.5,
+     15.5,
+     10.3
+    ],
+    "slow_frames": [
+     {
+      "i": 1,
+      "ms": 641
+     }
+    ]
+   },
+   "added": []
+  },
+  {
+   "label": "cold_route_return_night",
+   "want": "NIGHT",
+   "before_count": 204,
+   "after_count": 204,
+   "measured": {
+    "returned": "NIGHT",
+    "observed": "NIGHT",
+    "sync_ms": 2.3,
+    "frames": 114,
+    "p50_ms": 12.6,
+    "p95_ms": 18.8,
+    "max_ms": 44.8,
+    "max_frame_index": 113,
+    "first_frames_ms": [
+     -12.6,
+     13.2,
+     10.8,
+     10.5,
+     7.5,
+     8.6,
+     8.3,
+     10.9
+    ],
+    "slow_frames": []
+   },
+   "added": []
+  }
+ ],
+ "errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/favicon.ico>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.1/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.13/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.12/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.11/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.10/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.9/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.7/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.6/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.5/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.4/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.3/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57451/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.2/manifest.json>"
+ ],
+ "finished_at": "2026-09-23T09:15:26.384Z"
+}

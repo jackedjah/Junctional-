@@ -1,0 +1,58 @@
+{
+ "canonical": "MR_MAH_GUIDE",
+ "role": "tiny optional flying guide (static)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\mr.glb",
+  "original_name": "mr(1).glb",
+  "sha256": "d92e2d0c4b3699f154d3dc47f768f14e108500344606cd91c08fea8ad0c5b536",
+  "bytes": 89499360,
+  "triangles": 18492,
+  "skinned": false,
+  "joints": 0,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "image": 0,
+   "source_bytes": 4667912,
+   "runtime_bytes": 413763,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": false
+  },
+  {
+   "image": 1,
+   "source_bytes": 14870399,
+   "runtime_bytes": 138944,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": false
+  },
+  {
+   "image": 2,
+   "source_bytes": 69112109,
+   "runtime_bytes": 523517,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": true
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "MR_MAH_GUIDE_L0.glb",
+   "triangles": 18492,
+   "bytes": 1925432,
+   "sha256": "51a0fe2a983326b6b851810922de97da0332d62717d44d21951a4873bf4874ab"
+  }
+ ],
+ "method": "images resampled (Pillow LANCZOS, JPEG); every accessor, node, skin and animation byte-identical",
+ "generated": "2026-09-19T20:46:17Z"
+}

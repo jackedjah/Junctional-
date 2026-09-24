@@ -1,0 +1,372 @@
+{
+ "_doc": "MAHWORLD emote catalog (development, 2026-09-15 master prompt §13). ONE canonical list: the host registers every entry on the world emote system (cosmetic — combat_allowed false, social_allowed true, interruptible; never a workout, XP, progression, cast, healing or resource transaction) and publishes it in every play snapshot as `emote_catalog`. `form`: ANY | FUSED | SPLIT (a form requirement is REFUSED with FORM_REQUIRED, never satisfied by a silent transformation). `partner`: needs EMOTE_INVITE / EMOTE_JOIN. `directed`: may carry a social target (`to`). `loop`: the presentation loops entry→loop→exit until EMOTE_STOP or a cancelling action; `duration_s` is the solo default life on the host. `reply_options`: what a nearby NPC may answer with.",
+ "version": "EMOTES_DEV_1",
+ "groups": [
+  "SOCIAL",
+  "DANCE",
+  "EXERCISE",
+  "FLEX",
+  "EXPRESSION",
+  "PARTNER"
+ ],
+ "emotes": [
+  {
+   "id": "WAVE",
+   "name": "Wave",
+   "group": "SOCIAL",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 2.2,
+   "icon": "👋",
+   "reply_options": [
+    "NOD",
+    "WAVE"
+   ]
+  },
+  {
+   "id": "NOD",
+   "name": "Respect Nod",
+   "group": "SOCIAL",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 1.4,
+   "icon": "🙇",
+   "reply_options": [
+    "NOD"
+   ]
+  },
+  {
+   "id": "READY",
+   "name": "Ready",
+   "group": "SOCIAL",
+   "form": "ANY",
+   "partner": false,
+   "directed": false,
+   "loop": false,
+   "duration_s": 1.6,
+   "icon": "🧍",
+   "reply_options": [
+    "NOD",
+    "THUMBS_UP"
+   ]
+  },
+  {
+   "id": "APPLAUD",
+   "name": "Applaud",
+   "group": "SOCIAL",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 2.4,
+   "icon": "👏",
+   "reply_options": [
+    "NOD",
+    "THUMBS_UP",
+    "WAVE"
+   ]
+  },
+  {
+   "id": "THUMBS_UP",
+   "name": "Thumbs Up",
+   "group": "SOCIAL",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 1.8,
+   "icon": "👍",
+   "reply_options": [
+    "THUMBS_UP",
+    "NOD"
+   ]
+  },
+  {
+   "id": "BECKON",
+   "name": "Playful Beckon",
+   "group": "SOCIAL",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 2.0,
+   "icon": "🫴",
+   "reply_options": [
+    "WAVE",
+    "SHRUG",
+    "MAH_GROOVE"
+   ]
+  },
+  {
+   "id": "MAH_GROOVE",
+   "name": "MAH Groove",
+   "group": "DANCE",
+   "form": "ANY",
+   "partner": false,
+   "directed": false,
+   "loop": true,
+   "duration_s": 12.0,
+   "icon": "🕺",
+   "reply_options": [
+    "MAH_GROOVE",
+    "APPLAUD"
+   ]
+  },
+  {
+   "id": "SIDE_GLIDE",
+   "name": "Side Glide",
+   "group": "DANCE",
+   "form": "ANY",
+   "partner": false,
+   "directed": false,
+   "loop": true,
+   "duration_s": 10.0,
+   "icon": "💃",
+   "reply_options": [
+    "APPLAUD",
+    "SIDE_GLIDE"
+   ]
+  },
+  {
+   "id": "UPRIGHT_ROW_DEMO",
+   "name": "Upright Row Demo",
+   "group": "EXERCISE",
+   "form": "ANY",
+   "partner": false,
+   "directed": false,
+   "loop": true,
+   "duration_s": 8.0,
+   "icon": "🏋️",
+   "reply_options": [
+    "APPLAUD",
+    "NOD"
+   ]
+  },
+  {
+   "id": "HORIZONTAL_PUSH_DEMO",
+   "name": "Horizontal Push Demo",
+   "group": "EXERCISE",
+   "form": "ANY",
+   "partner": false,
+   "directed": false,
+   "loop": true,
+   "duration_s": 8.0,
+   "icon": "🤜",
+   "reply_options": [
+    "APPLAUD",
+    "NOD"
+   ]
+  },
+  {
+   "id": "HIP_HINGE_DEMO",
+   "name": "Hip-Hinge Demo",
+   "group": "EXERCISE",
+   "form": "ANY",
+   "partner": false,
+   "directed": false,
+   "loop": true,
+   "duration_s": 8.0,
+   "icon": "🙆",
+   "reply_options": [
+    "APPLAUD",
+    "NOD"
+   ]
+  },
+  {
+   "id": "SQUAT_DEMO",
+   "name": "Squat Demo",
+   "group": "EXERCISE",
+   "form": "SPLIT",
+   "partner": false,
+   "directed": false,
+   "loop": true,
+   "duration_s": 8.0,
+   "icon": "🦵",
+   "reply_options": [
+    "APPLAUD",
+    "NOD"
+   ]
+  },
+  {
+   "id": "DOUBLE_BICEPS",
+   "name": "Double Biceps",
+   "group": "FLEX",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 3.0,
+   "icon": "💪",
+   "reply_options": [
+    "APPLAUD",
+    "DOUBLE_BICEPS",
+    "BECKON"
+   ]
+  },
+  {
+   "id": "FRONT_LAT_SPREAD",
+   "name": "Front Lat Spread",
+   "group": "FLEX",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 3.0,
+   "icon": "🦅",
+   "reply_options": [
+    "APPLAUD",
+    "THUMBS_UP"
+   ]
+  },
+  {
+   "id": "SIDE_CHEST",
+   "name": "Side Chest",
+   "group": "FLEX",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 3.0,
+   "icon": "🫸",
+   "reply_options": [
+    "APPLAUD",
+    "THUMBS_UP"
+   ]
+  },
+  {
+   "id": "BACK_LAT_SPREAD",
+   "name": "Back Lat Spread",
+   "group": "FLEX",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 3.0,
+   "icon": "🔙",
+   "reply_options": [
+    "APPLAUD",
+    "NOD"
+   ]
+  },
+  {
+   "id": "SHRUG",
+   "name": "Shrug",
+   "group": "EXPRESSION",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 1.8,
+   "icon": "🤷",
+   "reply_options": [
+    "SHRUG",
+    "QUIET_LAUGH"
+   ]
+  },
+  {
+   "id": "QUIET_LAUGH",
+   "name": "Quiet Laugh",
+   "group": "EXPRESSION",
+   "form": "ANY",
+   "partner": false,
+   "directed": true,
+   "loop": false,
+   "duration_s": 2.2,
+   "icon": "😄",
+   "reply_options": [
+    "QUIET_LAUGH",
+    "NOD"
+   ]
+  },
+  {
+   "id": "FIST_BUMP",
+   "name": "Fist Bump",
+   "group": "PARTNER",
+   "form": "ANY",
+   "partner": true,
+   "directed": true,
+   "loop": false,
+   "duration_s": 2.6,
+   "icon": "👊",
+   "reply_options": []
+  },
+  {
+   "id": "HIGH_FIVE",
+   "name": "High Five",
+   "group": "PARTNER",
+   "form": "ANY",
+   "partner": true,
+   "directed": true,
+   "loop": false,
+   "duration_s": 2.4,
+   "icon": "🙏",
+   "reply_options": []
+  },
+  {
+   "id": "PAIRED_GROOVE",
+   "name": "Paired Groove",
+   "group": "PARTNER",
+   "form": "ANY",
+   "partner": true,
+   "directed": true,
+   "loop": true,
+   "duration_s": 12.0,
+   "icon": "👯",
+   "reply_options": []
+  },
+  {
+   "id": "PERCH",
+   "name": "Perch",
+   "group": "SOCIAL",
+   "form": "ANY",
+   "partner": false,
+   "directed": false,
+   "loop": true,
+   "duration_s": 60,
+   "icon": "🪑",
+   "reply_options": [],
+   "requires_support": true,
+   "_doc": "S11 sit / perch: a settled hover-perch (knees drawn up, hands resting, tail tucked) that needs ground or a registered roof / deck under the body; refused in flight or transit; cancels on move / dash / fly / attack / guard / transform like every emote. It is a hovering perch, not a seated pose on a chair: the fused body has no feet and keeps its tip clearance."
+  }
+ ],
+ "npc_demeanour": {
+  "_doc": "class demeanour only selects which reply / social emotes an NPC uses (never strength, speed or rules)",
+  "TITAN": [
+   "NOD",
+   "FIST_BUMP",
+   "DOUBLE_BICEPS",
+   "APPLAUD"
+  ],
+  "BAGE": [
+   "WAVE",
+   "NOD",
+   "APPLAUD",
+   "MAH_GROOVE"
+  ],
+  "LEAN": [
+   "WAVE",
+   "THUMBS_UP",
+   "SIDE_GLIDE",
+   "QUIET_LAUGH"
+  ],
+  "ATHLETE": [
+   "WAVE",
+   "NOD",
+   "THUMBS_UP"
+  ],
+  "VISIONARY": [
+   "NOD",
+   "APPLAUD",
+   "SHRUG"
+  ]
+ },
+ "invite_expiry_s": 8.0,
+ "npc_accept_delay_s": [
+  0.6,
+  1.4
+ ]
+}

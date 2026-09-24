@@ -1,0 +1,1087 @@
+QUEUED OWNER MASTER REDIRECTION — MAHWORLD OFFICIAL DEMO WORLD PASS
+JOB B = MAP / WORLD / ENVIRONMENT / EXTERNAL GAMEPLAY
+
+DO NOT INTERRUPT, RESTART, FORK, ROLL BACK, OR ABANDON THE CURRENT JOB.
+
+This is a queued owner delta for the SAME existing MAHWORLD Claude Code Remote session/worktree.
+Finish the operation currently in progress or reach the next technically safe checkpoint, then absorb this entire directive into the SAME worktree and continue automatically.
+
+Do not reset the project from scratch.
+Do not create a new MAHWORLD project.
+Do not discard good completed work.
+Do not ask the owner to repeat requirements already stated here.
+Do not stop after one visual pass, one shader, one imported creature, one screenshot, or one prototype.
+Continue through inspection -> planning -> implementation -> integration -> runtime test -> mobile/performance optimization -> regression test -> proof for all owner-independent work authorized here.
+
+The purpose of this pass is to redirect the OFFICIAL MAHWORLD DEMO WORLD toward a modern, forward-looking MMORPG standard while preserving the existing project's systems and ownership boundaries.
+
+======================================================================
+0. SOURCE OF TRUTH / OWNERSHIP BOUNDARY
+======================================================================
+
+The work remains divided into two lanes:
+
+JOB A — CHARACTER / GAMEPLAY / CONTROLS / COMBAT
+JOB B — MAP / WORLD / ENVIRONMENT / EXTERNAL GAMEPLAY
+
+THIS DIRECTIVE IS PRIMARILY JOB B.
+
+JOB A continues to own authoritative player systems including:
+- player locomotion
+- player rig/animation implementation
+- player-facing logic
+- camera/player-facing independence
+- click/tap-to-move
+- FLY control behavior
+- SEPARATE/FUSE player control
+- numbered attacks 1–4
+- lock-on / combat dispatch
+- exercise attack biomechanics
+- player combat authority
+
+JOB B may consume, observe, expose hooks to, and create environments for those systems.
+JOB B must NOT casually rewrite or replace them.
+
+If a world feature needs a player-side hook, expose clean data/events/surface tags and integrate conservatively instead of seizing ownership of the player controller.
+
+Latest player-side rules that must remain compatible:
+- camera heading is independent of character facing
+- manual camera orbit persists until reset
+- click/tap-to-move is required
+- numbered attacks 1–4 directly execute attacks
+- generic ATTACK hold+swipe button is deleted
+- one FLY button handles ascent / altitude hold / descent
+- Dash is being replaced by direct SEPARATE/FUSE access
+- exercise attacks use accurate biomechanics
+
+Do not regress any of these.
+
+======================================================================
+1. LOCAL ASSET RULE — DO NOT WASTE UPLOADS
+======================================================================
+
+Large GLBs are already stored locally.
+
+Existing project GLBs:
+GLB_PHASE_AB/
+
+New monster/pet GLBs:
+GLB_NEW3/
+
+Expected files in GLB_NEW3/:
+- fish.glb
+- horse.glb
+- golden phoenix 3d model.glb
+
+FIRST inspect those actual local folders/files in the existing worktree/environment.
+Do not ask the owner to upload the large GLBs again unless you have genuinely verified that the current session/worktree cannot access them.
+
+The owner expects rigging and required embedded details to be present when available, but DO NOT ASSUME.
+Inspect each GLB for:
+- scene hierarchy
+- armature/skeleton
+- skinning
+- animation clips
+- material assignments
+- textures
+- scale
+- origin/pivot
+- forward/up axes
+- mesh count
+- triangle/vertex cost
+- duplicate geometry
+- transparency
+- morph targets if any
+- naming
+- bounding box
+- suitability for runtime LOD/collision proxy creation
+
+Preserve original files.
+Create derived optimized runtime assets only when necessary and document what was changed.
+
+======================================================================
+2. OFFICIAL DEMO QUALITY TARGET
+======================================================================
+
+The current world is a foundation, not the final visual bar.
+
+The owner wants the official demo to feel competitive with modern MMORPG world presentation and, where practical, feel ahead of its time through SYSTEM COHERENCE rather than brute-force graphics.
+
+That means:
+- readable world composition
+- strong silhouettes
+- living environment
+- meaningful ecology
+- rich but controlled material identity
+- intentional travel routes
+- responsive water
+- layered atmosphere
+- high-altitude world presence
+- modern mobile/browser performance discipline
+- world systems that can expand later without rebuild
+
+Do NOT interpret "ahead of its time" as permission to destroy mobile performance with extreme polygon counts, giant textures, uncontrolled post-processing, full-scene expensive reflections, or permanent heavy simulations.
+
+The innovation should come from a world that feels ALIVE, CONNECTED, REACTIVE, and BEAUTIFULLY ORGANIZED.
+
+======================================================================
+3. CURRENT WORLD DIAGNOSIS — USE THE SUPPLIED REFERENCES
+======================================================================
+
+The supplied current-map references show useful foundations:
+- a recognizable central civic/plaza area
+- water network
+- bridges/causeways
+- existing forest concept
+- mountain/crystal silhouettes
+- platinum/cyan world language
+- recognizable large structures
+- room to expand
+
+Preserve the useful work.
+
+But the current world has major presentation issues that this pass must correct:
+
+A. TOO MUCH EMPTY NEGATIVE SPACE RELATIVE TO LAND CONTENT
+The owner is not necessarily asking to simply delete the water.
+The real problem is that there is not enough meaningful land mass, terrain, habitat, and destination density to JUSTIFY the amount of water.
+
+B. FLAT / STALE GROUND
+Large areas read as broad flat surfaces with insufficient micro/macro material variation, terrain articulation, geological structure, path hierarchy, or biome identity.
+
+C. FLAT / STALE SKY AND DISTANCE
+The horizon and distant mountains can read like simple paper/low-detail silhouettes rather than a deep living atmosphere.
+
+D. MONOCHROME WORLD READ
+The platinum/blue identity is valuable, but too much of the current frame is white/blue/grey without enough controlled chromatic world identity.
+
+E. WEAK NAVIGATIONAL STORY
+The world needs routes that naturally tell a new player, visually, "this way leads somewhere important" instead of leaving the user to free-run aimlessly across empty space.
+
+F. ENVIRONMENTAL CONTACT
+Water/shore/bridge/terrain/building/tree contact needs to feel physically intentional rather than like separate objects placed on planes.
+
+G. TREE READABILITY
+The current all-over crystalline/diamond treatment makes the tree structure visually noisy and reduces trunk/branch readability.
+
+Correct these without erasing the MAHWORLD identity.
+
+======================================================================
+4. WORLD ORGANIZATION — BUILD A STORY-READY GEOGRAPHY, NOT QUESTS YET
+======================================================================
+
+The world's long-term story/gameplay purpose is training and progression:
+- become stronger
+- improve fitness/strength capability
+- develop class-specific strengths
+- prepare for duels and higher-level play
+- encounter different challenges in different environments
+
+Future examples may include:
+- aquatic/fish regions that indirectly build swimming familiarity/capability
+- terrain/climbing-oriented regions
+- aerial regions
+- monster challenge paths
+- class-relevant training areas
+
+IMPORTANT:
+DO NOT implement the full quest/progression/gating system in this Job B pass.
+This is groundwork.
+
+Build the WORLD GEOGRAPHY so those systems can later fit naturally.
+
+The player should be able to enjoy the world immediately even at the beginning.
+Do not hard-lock the demo behind extensive tutorial corridors.
+
+Instead create a visual progression structure:
+
+CENTRAL ORIENTATION AREA
+    -> beautiful obvious main route
+    -> distinct next region / landmark
+    -> branching regional routes
+    -> optional discovery areas
+    -> progressively more specialized habitats
+
+The world should guide without imprisoning.
+
+======================================================================
+5. PATH SYSTEM — CRYSTAL CAUSEWAYS, NOT BORING ROADS
+======================================================================
+
+The owner specifically wants visually organized PATHS.
+
+A path should read like a road in terms of navigation, but it is not ordinary asphalt or Earth infrastructure.
+It is a MAHWORLD traversal element.
+
+Create a path hierarchy:
+
+A. CROWN CAUSEWAYS / MAIN WORLD SPINE
+- broadest
+- visually unmistakable
+- connects central hub to major world regions
+- strongest landmark sightlines
+- premium crystalline finish
+
+B. REGIONAL PATHS
+- narrower
+- connect habitat landmarks, structures, bridges, and future challenge spaces
+
+C. DISCOVERY TRAILS
+- optional, smaller, less explicit
+- lead to scenic overlooks, unusual creature pockets, future collectibles/challenges, hidden structures, or alternate routes
+
+PATH VISUAL LANGUAGE:
+- crystallized/faceted structure
+- satin-platinum or heat-grey edge framing
+- translucent / semi-translucent crystal sections where appropriate
+- restrained emissive seams or embedded energy lines
+- colored mineral accents matching the region
+- gleam/readability without excessive bloom
+- subtle elevation/curvature
+- clean edge treatment
+- beautiful enough that simply moving along the route feels satisfying
+
+Do not make every path identical.
+Use a shared design system with regional variation.
+
+The path network should make the map readable from:
+- gameplay camera
+- high-level map view
+- phone-sized screen
+
+======================================================================
+6. WORLD SHAPE — MORE LAND PRESENCE, BETTER USE OF EXISTING WATER
+======================================================================
+
+Do not blindly remove the existing water.
+Rebalance the world by ADDING / RESHAPING MEANINGFUL LAND.
+
+Use the existing real estate more intelligently:
+- broaden selected land masses
+- connect some isolated land where beneficial
+- create peninsulas
+- create coves
+- create channels
+- create plateaus
+- create coastal shelves
+- create cliffs
+- create elevated regions
+- create islands only when they have a reason to exist
+- use bridges where they make navigational and visual sense
+
+From a high-level map view, the world should no longer read as "blue field with small disconnected pieces."
+It should read as a coherent mainland/world system with water integrated into it.
+
+A useful creative target is for LAND to visually dominate the navigable demo experience while water remains a major feature.
+Do not obey a blind numerical ratio if the composition works better another way.
+
+Water should become intentional geography:
+- city water / civic canals where useful
+- shorelines
+- bays
+- lakes/basins
+- rivers/channels where useful
+- deep outer water
+- creature-rich aquatic pockets
+
+======================================================================
+7. REGION / BIOME SCAFFOLDING — DESIGN LOGIC
+======================================================================
+
+Use this as design logic, not mandatory final naming.
+
+A. CENTRAL PLATINUM NEXUS
+- existing civic/plaza orientation
+- strongest architectural clarity
+- cleanest main causeway departures
+- social/navigation anchor
+
+B. COBALT / UMBRAL FOREST
+- darker exposure
+- dense blue/black/platinum tree masses
+- Dogkie ecology
+- layered forest paths
+- pockets of colored crystal growth
+- enough visual openness for combat/navigation
+
+C. PRISMATIC OPEN RANGE
+- broad open land
+- rolling faceted terrain / plateaus
+- fewer dense trees
+- isolated horse encounters
+- long views
+- ideal contrast against the forest
+- gold/green/platinum can be strong here without becoming ordinary grassland
+
+D. CROWN SPIRES / AERIAL HIGHLANDS
+- high cliffs
+- towers / crystal spires
+- aerial arches / elevated silhouettes where appropriate
+- dramatic vertical drop
+- Phoenix territory
+- visibility near high flight range
+- gives actual PURPOSE to player flight
+
+E. LUMINOUS COAST / DEEPWATER
+- purposeful shore
+- shallow-to-deep transition
+- fish activity
+- fish density increases farther from land
+- water traversal has visual landmarks
+- avoids featureless endless blue
+
+F. PRISMATIC TRANSITION GARDENS / OUTSKIRTS
+- optional supporting concept
+- use transition zones to introduce richer red/pink/gold/green/purple crystal families between major regions rather than suddenly swapping the entire world palette
+
+Do not turn these into five unrelated theme parks.
+They must share MAHWORLD materials, geometry language, sky, lighting logic, and architectural DNA.
+
+======================================================================
+8. COLOR EXPANSION — RED / PINK / GOLD / GREEN / PURPLE
+======================================================================
+
+The owner explicitly wants substantially more:
+- RED
+- PINK
+- GOLD
+- GREEN
+- PURPLE
+
+across the world.
+
+These colors must feel CRYSTALLIZED / MINERAL / ENERGY-BASED.
+Do not paint ordinary Earth surfaces bright colors.
+
+Keep the core world family:
+- platinum
+- chromium
+- graphite / dark metal
+- diamond/crystal
+- cool blue-white
+- cyan/blue energy
+
+Then bring region color through:
+- crystal seams
+- geological veins
+- rock formations
+- path cores
+- tree extremities
+- canopy crystals
+- building accents
+- embedded lights
+- mineral columns
+- ambient particles
+- distant landmark glow
+- water-adjacent crystal formations
+- occasional regional atmosphere tint
+
+USE COLOR WITH DISCIPLINE.
+Avoid rainbow noise.
+Avoid making every object multi-colored.
+A region may have one dominant accent family plus smaller secondary accents.
+
+A useful compositional principle:
+- neutral platinum/chromium structure remains the visual glue
+- regional color supplies identity
+- emissive energy is the smallest, brightest layer
+
+======================================================================
+9. GROUND / TERRAIN — MAJOR VISUAL UPGRADE
+======================================================================
+
+The ground must stop reading as a giant smooth plane.
+
+Create layered terrain detail at different scales:
+
+MACRO:
+- elevation changes
+- plateaus
+- slopes
+- embankments
+- shallow basins
+- cliffs
+- terraces
+- raised path beds
+
+MESO:
+- faceted crystal plates
+- mineral ridges
+- seams
+- low sculptural formations
+- region transitions
+- embedded path borders
+
+MICRO / MATERIAL:
+- restrained roughness variation
+- subtle normal detail
+- fine crystalline grain
+- micro scratches / heat-finished metal variation where appropriate
+- controlled highlight breakup
+
+The owner wants the floor to feel crystallized, premium, pretty, and visually addictive to traverse.
+
+Do NOT make the entire ground a mirror.
+Use satin/matte-to-polished contrast:
+- broader surfaces can be more satin/matte
+- selected crystal edges/seams can catch brighter reflections
+- limited reflective highlights can move as the camera moves
+
+Preserve the previously requested subtle platinum-ground reflection behavior rather than creating a chrome lake.
+
+Provide stable environment collision surfaces without rewriting JOB A locomotion.
+
+Expose useful surface tags/metadata for future systems, for example:
+- platinum_ground
+- crystal_causeway
+- forest_floor
+- open_range
+- shallow_water
+- deep_water
+- rock
+- bridge
+- special_surface
+
+These tags can later drive footsteps, VFX, swim/climb behavior, attacks, sound, etc. without Job B taking control of the player.
+
+======================================================================
+10. TREE REDESIGN — NEW OWNER LOCK
+======================================================================
+
+The current tree design is conceptually on-brand but visually too noisy.
+The owner wants the structural tree body to become much cleaner.
+
+NEW LOCK:
+
+From the root/trunk upward through the MAIN STRUCTURAL BRANCHES / BOUGHS:
+use a CLEAN FINISHED PLATINUM / HEAT-GREY METALLIC MATERIAL.
+
+The trunk and major bough skeleton should be clearly readable as a coherent form.
+
+Use:
+- platinum / heat-grey tone
+- controlled metallic response
+- modest reflectiveness
+- satin / refined finish rather than perfect mirror
+- clean bevels / silhouette
+- enough roughness that the form remains readable in bright sky conditions
+
+DO NOT cover the full trunk and main boughs in chaotic diamond facets.
+
+Reserve stronger DIAMOND / CRYSTAL treatment primarily for:
+- foliage/extremities
+- branch tips
+- selected crystalline growths
+- leaf-like diamond structures
+- special region-colored accents
+
+OPTIONAL TEXTURE INPUT — use only if it improves the result:
+- shallow longitudinal grooves/facets in the metal
+- subtle heat-finished tonal variation
+- sculpted root flare
+- restrained segmented rhythm
+- one or a few hairline biome-colored energy/mineral seams
+
+Do NOT use ordinary natural bark.
+Do NOT reintroduce heavy visual noise.
+If the optional texture makes the trunk harder to read, remove it.
+
+The intended result:
+PLATINUM STRUCTURAL TREE + CRYSTALLINE EXTREMITIES.
+
+Create material/geometry variants efficiently so forests do not look cloned.
+Use instancing / LOD where appropriate.
+
+======================================================================
+11. SKY / ATMOSPHERE — LIVING DEPTH, NOT FLAT BACKDROP
+======================================================================
+
+Upgrade the sky substantially while respecting phone performance.
+
+Preserve the HUGE SUN / HUGE MOON direction.
+They should feel intentionally enormous and iconic.
+
+Build layered atmospheric depth:
+- sky gradient with real depth
+- horizon haze / atmospheric perspective
+- high cloud layer
+- lower cloud or mist layer where appropriate
+- distant mountain/spire fade
+- restrained star/energy/crystal particles where appropriate
+- subtle color changes with celestial direction
+
+Avoid bleaching the world into white fog.
+Foreground and important gameplay silhouettes must remain readable.
+
+Creative systems suggestion:
+create a lightweight shared WIND VECTOR / WORLD AMBIENCE signal that can influence, where appropriate:
+- cloud drift
+- selected tree extremity movement
+- particles
+- mist
+- water directionality
+- aerial creature presentation
+
+This does NOT require a heavy weather simulation.
+It creates coherence because different environmental systems feel like they occupy the same atmosphere.
+
+If implementing a dynamic celestial cycle is safe and already supported by the architecture, structure it cleanly.
+Do not derail the job into a giant day/night rewrite if that would jeopardize the main world pass.
+
+======================================================================
+12. WATER — RESPONSIVE, BEAUTIFUL, PURPOSEFUL
+======================================================================
+
+The supplied third-party game reference is BEHAVIORAL/TECHNICAL inspiration only.
+Do not copy or redistribute its assets, textures, geometry, code, audio, characters, or level design.
+
+Study the CATEGORY of responsiveness:
+- localized ripples
+- propagating wave rings
+- overlapping disturbances
+- surface highlight changes
+- object/water contact
+- environmental motion that makes the pond/water feel alive
+
+Build an ORIGINAL MAHWORLD solution using the existing Three.js/runtime architecture.
+
+The water must no longer behave like a flat decorative plane.
+
+TARGET BEHAVIOR:
+IMPACT -> EXPANSION -> OVERLAP -> DAMPING -> RETURN TOWARD CALM
+
+Potential architecture, only after inspecting current runtime:
+- procedural base wave normals
+- localized impulse/ripple field
+- render-target height/ripple propagation if justified
+- vertex displacement for larger near waves
+- normal perturbation for smaller waves
+- contact foam/highlight where useful
+- near/mid/far quality tiers
+
+Prefer GPU/shader work over expensive CPU mesh mutation where appropriate.
+Do not cargo-cult a complex fluid solver if a cheaper solution produces the target experience.
+
+EVENT SOURCES should be architected cleanly:
+- player water entry / landing
+- wading/running where relevant
+- fish breach/re-entry
+- Dogkie or other creature water contact where relevant
+- environmental objects
+- future attacks/projectiles through hooks, not a Job B combat rewrite
+
+Impulse parameters may include:
+- position
+- velocity
+- strength
+- radius
+
+Heavy impacts should read differently from gentle ones.
+
+WATER-OBJECT SUPPORT:
+Provide reusable behavior for original floating/surface objects where used:
+- surface alignment
+- modest bob
+- small tilt
+- localized response
+- gameplay-stable collision when needed
+
+SHORELINE / CONTACT:
+Improve:
+- shoreline transitions
+- bridge supports entering water
+- rocks/structures contacting water
+- shallow/deep color/normal response
+- optional restrained contact foam / edge highlight
+
+Do not make every shoreline white with foam.
+
+PERFORMANCE:
+NEAR = highest responsive fidelity
+MID = reduced ripple/shader complexity
+FAR = cheap animated representation
+
+Only simulate meaningful active areas.
+Pool ripple events.
+Cap simultaneous impulses.
+Avoid per-frame allocations.
+
+======================================================================
+13. GUIDE / FAIRY SYSTEM — SIZE + SHARED MAHWORLD MOTION LANGUAGE
+======================================================================
+
+This merges the earlier owner fairy requirements into this master job.
+Do not lose them.
+
+MRS. MAH GUIDE / FAIRY SCALE:
+The supplied reference shows a tiny floating companion behind a larger character.
+Mrs. Mah's guide/fairy presentation should have approximately 3x that reference companion's APPARENT VISUAL SIZE / SCREEN FOOTPRINT at a comparable gameplay camera distance.
+
+This is NOT a blind instruction to make her world-space body 3x normal human size.
+Tune from the REAL rear-follow gameplay camera.
+
+She should be:
+- immediately readable on a phone
+- clearly a character, not a particle/insect/speck
+- still a guide/fairy companion rather than a second full player-sized character
+
+MR. MAH should share the same reusable guide architecture.
+
+MOTION LANGUAGE — NEW LOCK:
+Guide/fairy characters must NOT use random generic floating-NPC motion.
+They should move and idle using the SAME OVERALL ANIMATION LANGUAGE as the MAHWORLD player species / our characters, translated into a smaller floating companion form.
+
+IDLE:
+- subtle levitation
+- controlled vertical hover rhythm
+- slight drift and correction
+- subtle body orientation change
+- poised energy/aliveness
+- no dead-still hovering
+- no bug-like jitter
+- no random meaningless bobbing
+- no cartoon wing-flapping unless a specific future creature design requires it
+
+TRAVEL / FLY:
+- smooth acceleration/deceleration
+- coherent turning
+- intentional glide transitions
+- slight lean/bank/orientation change when changing direction
+- same broad species/fused-body motion logic where relevant
+- no stiff translation through space
+- no constant teleport snapping
+
+FOLLOWING:
+- comfortable offset from player
+- avoid camera obstruction
+- avoid clipping into player
+- recover smoothly if separated
+- remain readable while the player runs/flies
+- use smart teleport/reposition only as a recovery failsafe when truly needed
+
+The guide's movement should feel like:
+"a small MAHWORLD being that knows how our species moves"
+not
+"a drone attached to the player."
+
+Build the motion/follow architecture reusable for future guide variants.
+If JOB A later refines player animation language, the guide system should be easy to retune without rewrite.
+
+======================================================================
+14. CREATURE / MONSTER ECOLOGY — FOUR SPECIES
+======================================================================
+
+MAHWORLD now has four monster/pet species in this phase of world planning:
+
+1. DOGKIE
+2. FISH
+3. HORSE
+4. GOLDEN PHOENIX / BIRD
+
+ALL may exist as wild/fightable creatures in the world.
+Pet OWNERSHIP is a separate state from world ENCOUNTER.
+Do not collapse "wild creature" and "owned pet" into the same logic.
+
+Do NOT implement a full payment/store system here unless that system is already explicitly in scope elsewhere.
+However, structure creature metadata so later acquisition can distinguish:
+- Dogkie = earnable/free through future quest/defeat threshold
+- Fish = premium pet acquisition later
+- Horse = premium pet acquisition later
+- Phoenix/Bird = premium pet acquisition later
+
+This prevents a later economy rewrite without prematurely building monetization UI.
+
+A. DOGKIE
+- primary ecology: forest
+- bounded populations
+- patrol/roam behavior
+- fightable
+- future free/quest pet path
+- keep existing Dogkie direction intact
+
+B. FISH
+- inspect GLB_NEW3/fish.glb
+- aquatic habitat
+- multiple fish visible in water
+- population/activity should generally increase farther from land / in deeper designated regions
+- not every cubic meter filled with fish
+- frequently energetic / jumpy
+- breach surface in readable arcs
+- re-enter water convincingly
+- breach/re-entry should create water impulse/splash/ripple response
+- group variation so breaches do not synchronize unnaturally
+- fightable encounter architecture where appropriate
+- future premium pet flag/metadata
+
+C. HORSE
+- inspect GLB_NEW3/horse.glb
+- primary habitat: non-forest open land
+- comparatively solitary / isolated
+- avoid dense everywhere-herd behavior
+- use long-range roam routes / rest pockets / overlook areas
+- scale/orientation based on actual asset inspection
+- fightable encounter architecture where appropriate
+- future premium pet flag/metadata
+
+The horse should help justify broad beautiful open territory.
+It gives the open mainland a living purpose.
+
+D. GOLDEN PHOENIX / BIRD
+- inspect GLB_NEW3/golden phoenix 3d model.glb
+- visually enormous
+- target approximately 2x player-character size in gameplay read unless asset inspection and collision reality justify a tuned value
+- flies HIGH
+- should use territory near the upper region of the player's allowed flight range
+- wide elegant aerial circuits rather than tiny frantic bird paths
+- readable from the ground as a major moving silhouette
+- can pass above cliffs/spires and aerial-highland landmarks
+- consider large moving shadow / light occlusion cue only if performant and visually useful
+- fightable encounter architecture where appropriate
+- future premium pet flag/metadata
+
+DO NOT spawn many huge Phoenixes in one small area.
+Rarity and scale should make them feel important.
+
+COMMON CREATURE ENGINEERING:
+- bounded spawn managers
+- pooled entities/effects
+- despawn / sleep outside meaningful ranges
+- LOD / animation-distance rules
+- nav/roam volumes per habitat
+- recovery if stuck
+- collision kept sane
+- no uncontrolled population growth
+- no per-frame expensive searches across the whole world
+
+======================================================================
+15. CREATURES AS FUTURE STORY LANGUAGE — DO NOT OVERIMPLEMENT YET
+======================================================================
+
+The owner is laying groundwork for future adjustment/training journeys.
+Do NOT build the full progression system now.
+
+But use world placement to FORESHADOW it:
+
+- Forest / Dogkie = early ground ecology, navigation, combat familiarity
+- Water / Fish = future swimming adaptation/training potential
+- Open Range / Horse = future traversal/endurance/climbing-adjacent geography potential
+- Aerial Highlands / Phoenix = future flight/high-altitude challenge potential
+
+This means the physical world should already contain:
+- logical approach routes
+- challenge-ready pockets
+- clear habitat boundaries/gradients
+- space for future encounter scripting
+- region identifiers / metadata where useful
+
+Do not hard-code unfinished quest rules.
+Do not lock players out unnecessarily.
+
+======================================================================
+16. EXTERNAL WORLD / BUILDINGS / LANDMARKS
+======================================================================
+
+Preserve and improve the existing world direction:
+- clean mainland
+- water / bridges
+- dark-blue forest/tree areas
+- cyan/blue street lighting
+- subtle platinum ground reflection
+- official BLACK MAH MATCH building
+- Dogkie forest ecology
+- huge Sun/Moon
+- Mr./Mrs. Mah guides
+
+LANDMARK RULE:
+Each major region needs at least one strong distant silhouette or visual anchor so the player can navigate by WORLD MEMORY, not only UI.
+
+Examples of categories, not mandatory assets:
+- giant crystal arch
+- elevated spire group
+- monumental mineral formation
+- distinctive bridge profile
+- luminous grove
+- black MAH MATCH structure
+- cliff crown
+- celestial alignment landmark
+
+Avoid copy-pasting identical towers everywhere.
+
+======================================================================
+17. MAP / HIGH-LEVEL READABILITY
+======================================================================
+
+The world should make sense from above.
+
+Update the map/region representation as appropriate so the expanded geography shows:
+- central hub
+- main causeways
+- major land masses
+- water channels/deepwater areas
+- forest region
+- open range
+- aerial/highland region
+- key landmarks
+
+Do NOT clutter the map with every decorative asset.
+Use hierarchy.
+
+Future challenges/quests can later overlay on this base.
+
+======================================================================
+18. MODERN MMORPG / BROWSER-WORLD ENGINEERING STANDARD
+======================================================================
+
+Before adding new heavy systems, inspect the existing Three.js/runtime architecture and current loading/render pipeline.
+
+Use appropriate modern practices when compatible:
+- region/chunk-based loading
+- frustum culling
+- distance culling
+- instancing for repeated environmental assets
+- LODs
+- animation-distance throttling
+- pooled particles/effects/entities
+- texture atlasing or compressed textures where supported
+- GLB optimization / mesh compression where the current pipeline safely supports it
+- cached materials
+- avoid shader/material explosion
+- avoid duplicate geometry/material instances
+- async/progressive loading
+- low-cost far representations
+
+Do not add a giant dependency merely because it is fashionable.
+Do not destabilize the runtime.
+
+PHONE-FIRST PERFORMANCE:
+Prioritize stable 60 FPS on target phone-class hardware/browser.
+Allow higher-refresh responsiveness when the device/browser can sustain it.
+A stable, responsive 60 is better than a visually overloaded 20–30.
+
+Measure rather than guess.
+Record before/after relevant metrics where possible:
+- FPS/frame time
+- draw calls
+- triangle counts in representative views
+- texture memory indicators where available
+- active creature count
+- active ripple/effect count
+- load time for representative region transition
+
+Create graceful quality tiers if necessary.
+
+======================================================================
+19. NO ISOLATED TECH-DEMO TRAP
+======================================================================
+
+You may prototype a shader/system separately only when technically useful.
+
+But this job is NOT complete because:
+- a water test page looks good
+- one tree material looks good in isolation
+- one Phoenix can load in a blank scene
+- one fairy hover test works
+
+Everything must ultimately be integrated into the REAL playable MAHWORLD demo/runtime.
+
+Proof comes from the real world.
+
+======================================================================
+20. IMPLEMENTATION ORDER — USE JUDGMENT, BUT KEEP IT SAFE
+======================================================================
+
+Do not blindly follow this if the codebase demands a safer order, but a sensible sequence is:
+
+PHASE 1 — INSPECT / BACKUP / BASELINE
+- identify exact current branch/worktree/session state
+- inspect current in-progress changes
+- preserve them
+- capture baseline runtime/performance/screenshots
+- inspect current world architecture and loaders
+- inspect GLB_PHASE_AB and GLB_NEW3 availability
+
+PHASE 2 — WORLD PLAN / REGISTRY
+- define region/habitat/path schema
+- define surface tags
+- define creature habitat/spawn metadata
+- define shared performance rules
+- create concise internal masterplan, not endless documentation
+
+PHASE 3 — LAND / PATH / GROUND RECOMPOSITION
+- increase meaningful land presence
+- improve world silhouette
+- establish main causeways/regional paths
+- improve terrain materials and transitions
+
+PHASE 4 — TREE / FOREST MATERIAL REPAIR
+- platinum structural trunks/boughs
+- crystalline extremities
+- preserve forest identity
+- optimize variants/LOD
+
+PHASE 5 — SKY / ATMOSPHERE / DISTANCE
+- layered sky/horizon
+- huge Sun/Moon preservation
+- atmospheric depth
+- low-cost environmental motion
+
+PHASE 6 — WATER INTEGRATION
+- base motion
+- local impulse system
+- shore/contact improvements
+- near/mid/far tiers
+
+PHASE 7 — CREATURE ECOLOGY
+- inspect/derive runtime versions of fish/horse/Phoenix if needed
+- habitat spawners
+- fish breach -> water response
+- horse open-range behavior
+- Phoenix high-altitude behavior
+- preserve Dogkie forest ecology
+
+PHASE 8 — GUIDE FAIRY INTEGRATION
+- 3x apparent reference size target
+- shared MAHWORLD motion language
+- follow/fly/idle/mobile readability
+
+PHASE 9 — MAP / LANDMARK / REGION READABILITY
+- update high-level representation
+- verify player can visually understand routes/regions
+
+PHASE 10 — PERFORMANCE / REGRESSION / PROOF
+- phone-sized runtime test
+- optimize bottlenecks
+- verify JOB A controls/combat/camera remain intact
+- capture required proof
+
+======================================================================
+21. DO NOT OVERBUILD THESE YET
+======================================================================
+
+Unless already authorized elsewhere, do NOT spend this pass building:
+- complete quest campaign
+- final level-gating economy
+- premium payment checkout UI
+- giant inventory/pet-store system
+- full multiplayer backend rewrite
+- final pet progression trees
+- exhaustive creature combat move sets
+- unrelated character appearance repair
+
+Lay the DATA / WORLD FOUNDATION so those can plug in later.
+
+======================================================================
+22. ACCEPTANCE GATES — DO NOT DECLARE COMPLETE EARLY
+======================================================================
+
+SESSION / OWNERSHIP
+[ ] Same existing MAHWORLD session/worktree continued.
+[ ] Current in-progress work survived.
+[ ] No rollback/restart/fork was used as a shortcut.
+[ ] JOB A player controls/combat/camera ownership remains intact.
+
+WORLD COMPOSITION
+[ ] High-level world no longer reads as mostly empty water with tiny land pieces.
+[ ] Meaningful land presence increased / geography reshaped.
+[ ] Main causeway/world spine is obvious.
+[ ] Regional and optional paths are readable.
+[ ] World still allows exploration rather than corridor-only travel.
+[ ] Major regions have recognizable landmark silhouettes.
+
+GROUND
+[ ] Broad flat-plane look is significantly reduced.
+[ ] Terrain has macro/meso/micro depth.
+[ ] Crystal causeways look premium and distinct.
+[ ] Ground reflection is controlled rather than mirror-like.
+[ ] Stable world collision remains.
+
+COLOR
+[ ] Red is meaningfully represented.
+[ ] Pink is meaningfully represented.
+[ ] Gold is meaningfully represented.
+[ ] Green is meaningfully represented.
+[ ] Purple is meaningfully represented.
+[ ] All colors still read as MAHWORLD mineral/crystal/energy materials.
+[ ] Platinum/chromium remains the unifying structure.
+
+TREES
+[ ] Trunk + main boughs read as clean platinum/heat-grey metal.
+[ ] Crystal complexity is concentrated at extremities/growths.
+[ ] Current all-over-diamond visibility problem is improved.
+[ ] Tree variants do not look like obvious clones.
+
+SKY
+[ ] Sky is layered and deep.
+[ ] Huge Sun/Moon direction remains.
+[ ] Distant forms use atmospheric depth without whiteout.
+[ ] Environmental motion adds life without destroying performance.
+
+WATER
+[ ] Calm surface has living motion.
+[ ] Local impulses create localized ripples/waves.
+[ ] Disturbances expand and damp.
+[ ] Multiple disturbances can coexist visually.
+[ ] Fish breaches cause convincing water response.
+[ ] Shore/bridge/object contact is improved.
+[ ] Near/mid/far quality strategy works.
+
+FAIRY / GUIDE
+[ ] Mrs. Mah reads at ~3x the supplied tiny-companion apparent screen size target.
+[ ] Scale is tuned in actual gameplay camera.
+[ ] Guide idle/fly matches MAHWORLD species motion language.
+[ ] No bug-jitter / generic drone motion.
+[ ] Follow system remains camera-safe and phone-readable.
+[ ] Mr. Mah can reuse the system.
+
+CREATURES
+[ ] GLB_NEW3 was actually inspected locally first.
+[ ] Fish asset integrated/validated or a precise blocker documented.
+[ ] Horse asset integrated/validated or a precise blocker documented.
+[ ] Phoenix asset integrated/validated or a precise blocker documented.
+[ ] Dogkie remains forest-focused.
+[ ] Fish ecology becomes richer farther from shore and includes breach arcs.
+[ ] Horse ecology is open-land and comparatively isolated.
+[ ] Phoenix reads huge and high-altitude.
+[ ] Spawning/AI is bounded and performant.
+[ ] Wild fightable creature state is separated from future pet ownership.
+[ ] Future acquisition metadata distinguishes Dogkie quest/free vs premium species without unnecessary payment implementation.
+
+PERFORMANCE
+[ ] Real phone/browser-oriented runtime profiled.
+[ ] Stable 60 FPS is prioritized.
+[ ] LOD/culling/instancing/pooling used where beneficial.
+[ ] No unbounded particle/spawn/render-target systems.
+[ ] No obvious runaway per-frame allocations.
+[ ] World remains responsive during representative creature/water activity.
+
+PROOF
+[ ] High-level map/world overview captured.
+[ ] Ground/causeway close-up captured.
+[ ] Tree close-up captured.
+[ ] Water interaction captured.
+[ ] Fish breach captured.
+[ ] Horse habitat captured.
+[ ] Phoenix high-altitude capture provided.
+[ ] Fairy idle/follow/fly capture provided.
+[ ] Phone-sized gameplay capture provided.
+[ ] Final report states what changed, what was preserved, actual measured performance, remaining blockers, and the exact files/areas modified.
+
+======================================================================
+23. FINAL CONTINUATION RULE
+======================================================================
+
+Do NOT stop merely because one sub-feature is successful.
+Do NOT ask the owner to approve every intermediate aesthetic decision when the direction is already defined here.
+Use professional judgment for owner-independent implementation details.
+
+Only stop for:
+- a genuine destructive conflict between Job A and Job B
+- inaccessible required local assets after you have actually verified access failure
+- a decision that materially changes product identity/business rules
+- a technical blocker that cannot be resolved safely from the current project/context
+
+Otherwise continue the complete authorized world pass automatically.
+
+The owner wants a coherent OFFICIAL DEMO WORLD, not a pile of disconnected prototypes.
+
+END QUEUED OWNER MASTER REDIRECTION

@@ -1,0 +1,27 @@
+{
+ "_doc": "DEVELOPMENT attack fixtures for the headless vertical slice (classification DEVELOPMENT_REFERENCE). Not the final roster; not Athlete's permanent moves; no balancing. Every number is a key into 00_CORE/dev_tuning.dev.json (EXPERIMENTAL) or the canonical defaults. The bilateral upright row is the owner's worked example of the eccentric system (gameplay canon section 8).",
+ "classification": "DEVELOPMENT_REFERENCE",
+ "attacks": [
+  {"attack_id": "ATHLETE_HORIZONTAL_PUSH_BASIC", "class_id": "ATHLETE", "movement_pattern": "HORIZONTAL_PUSH", "exercise": "explosive push-up / press shove", "range_type": "CONTACT", "attack_tier": "BASIC", "required_form": "EITHER", "direction": "UP",
+   "phases": [{"phase": "CONCENTRIC", "duration_key": "attack.athlete_hpush_basic.concentric_s", "damage_key": "attack.athlete_hpush_basic.main", "direction_vector": "FORWARD"}],
+   "targeting": "POLICY", "cooldown_key": "attack.athlete_hpush_basic.cooldown_s", "resource_cost_key": null, "damage_profile": {"main_key": "attack.athlete_hpush_basic.main"}, "manifestation_profile": null, "tags": ["FUSED_OK", "UPPER_BODY", "CONTACT"]},
+  {"attack_id": "ATHLETE_VERTICAL_PULL_BASIC", "class_id": "ATHLETE", "movement_pattern": "VERTICAL_PULL", "exercise": "fast pull-up burst", "range_type": "CONTACT", "attack_tier": "BASIC", "required_form": "EITHER", "direction": "DOWN",
+   "phases": [{"phase": "CONCENTRIC", "duration_key": "attack.athlete_vpull_basic.concentric_s", "damage_key": "attack.athlete_vpull_basic.main", "direction_vector": "UP"}],
+   "targeting": "POLICY", "cooldown_key": "attack.athlete_vpull_basic.cooldown_s", "resource_cost_key": null, "damage_profile": {"main_key": "attack.athlete_vpull_basic.main"}, "manifestation_profile": null, "tags": ["FUSED_OK", "UPPER_BODY", "CONTACT"]},
+  {"attack_id": "ATHLETE_HINGE_BASIC", "class_id": "ATHLETE", "movement_pattern": "HINGE", "exercise": "power-clean style hip snap", "range_type": "CONTACT", "attack_tier": "BASIC", "required_form": "EITHER", "direction": "UP",
+   "phases": [{"phase": "CONCENTRIC", "duration_key": "attack.athlete_hinge_basic.concentric_s", "damage_key": "attack.athlete_hinge_basic.main", "direction_vector": "UP"}],
+   "targeting": "POLICY", "cooldown_key": "attack.athlete_hinge_basic.cooldown_s", "resource_cost_key": null, "damage_profile": {"main_key": "attack.athlete_hinge_basic.main"}, "manifestation_profile": null, "tags": ["FUSED_LIMITED", "LOWER_BODY", "CONTACT"]},
+  {"attack_id": "ATHLETE_LUNGE_BASIC", "class_id": "ATHLETE", "movement_pattern": "LUNGE", "exercise": "split-jump lunge drive", "range_type": "CONTACT", "attack_tier": "BASIC", "required_form": "SPLIT", "direction": "UP",
+   "phases": [{"phase": "CONCENTRIC", "duration_key": "attack.athlete_lunge_basic.concentric_s", "damage_key": "attack.athlete_lunge_basic.main", "direction_vector": "FORWARD"}],
+   "targeting": "POLICY", "cooldown_key": "attack.athlete_lunge_basic.cooldown_s", "resource_cost_key": null, "damage_profile": {"main_key": "attack.athlete_lunge_basic.main"}, "manifestation_profile": null, "tags": ["REQUIRES_SPLIT", "LOWER_BODY", "CONTACT"]},
+  {"attack_id": "ATHLETE_BILATERAL_UPRIGHT_ROW_MANIFESTATION", "class_id": "ATHLETE", "movement_pattern": "VERTICAL_PULL", "exercise": "bilateral upright row", "range_type": "LONG_RANGE", "attack_tier": "SPECIAL", "required_form": "EITHER", "direction": "HOLD", "fixture": "DEVELOPMENT_REFERENCE",
+   "phases": [
+    {"phase": "CONCENTRIC", "duration_key": "attack.upright_row.concentric_s", "damage_key": "attack.upright_row.main", "direction_vector": "UP", "vfx_trajectory": "vertical cylinder beneath / around the target, rays upward"},
+    {"phase": "PEAK_TRANSITION", "duration_key": "attack.upright_row.peak_s", "damage_key": null, "direction_vector": "NONE", "vfx_trajectory": "hold at apex"},
+    {"phase": "ECCENTRIC", "duration_key": "eccentric.default_duration_seconds", "damage_key": "attack.upright_row.eccentric_tick", "direction_vector": "DOWN", "vfx_trajectory": "same cylinder descending, rays reverse downward", "color_shift": "DARKER"}],
+   "targeting": "POLICY", "cooldown_key": "attack.upright_row.cooldown_s", "resource_cost_key": "special_cost",
+   "damage_profile": {"main_key": "attack.upright_row.main", "eccentric_tick_key": "attack.upright_row.eccentric_tick", "eccentric_tick_interval_key": "attack.upright_row.eccentric_tick_interval_s", "eccentric_duration_key": "eccentric.default_duration_seconds"},
+   "manifestation_profile": {"kind": "VERTICAL_CYLINDER", "aoe_radius_key": "attack.upright_row.aoe_radius_m", "eccentric_direction_visual": "REVERSED", "eccentric_color_shift": "DARKER"},
+   "tags": ["FUSED_OK", "UPPER_BODY", "RANGED_MANIFESTATION", "ECCENTRIC_PHASE", "AOE"]}
+ ]
+}

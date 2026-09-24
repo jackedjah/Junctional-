@@ -1,0 +1,8529 @@
+{
+ "poses": {
+  "idle": {
+   "shots": {
+    "A_front": "idle_A_front.png",
+    "A_side": "idle_A_side.png",
+    "A_rear34": "idle_A_rear34.png",
+    "A_rear": "idle_A_rear.png",
+    "A_close_front": "idle_A_close_front.png",
+    "A_close_side": "idle_A_close_side.png",
+    "A_close_rear34": "idle_A_close_rear34.png",
+    "B_front": "idle_B_front.png",
+    "B_side": "idle_B_side.png",
+    "B_rear34": "idle_B_rear34.png",
+    "B_rear": "idle_B_rear.png",
+    "C_front": "idle_C_front.png",
+    "C_side": "idle_C_side.png",
+    "C_rear34": "idle_C_rear34.png",
+    "C_rear": "idle_C_rear.png",
+    "C_close_front": "idle_C_close_front.png",
+    "C_close_side": "idle_C_close_side.png",
+    "C_close_rear34": "idle_C_close_rear34.png",
+    "E_front": "idle_E_front.png",
+    "E_side": "idle_E_side.png",
+    "E_rear34": "idle_E_rear34.png",
+    "E_rear": "idle_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.018,
+      1.608,
+      0.485
+     ],
+     "CLAV_R": [
+      -0.026,
+      1.608,
+      0.485
+     ],
+     "SCAP_L": [
+      0.109,
+      1.511,
+      0.672
+     ],
+     "SCAP_R": [
+      -0.117,
+      1.511,
+      0.672
+     ],
+     "UPPERARM_L": [
+      0.222,
+      1.512,
+      0.576
+     ],
+     "UPPERARM_R": [
+      -0.23,
+      1.512,
+      0.574
+     ],
+     "ARMTWIST_L": [
+      0.224,
+      1.501,
+      0.575
+     ],
+     "ARMTWIST_R": [
+      -0.232,
+      1.501,
+      0.574
+     ],
+     "FOREARM_L": [
+      0.269,
+      1.293,
+      0.566
+     ],
+     "FOREARM_R": [
+      -0.279,
+      1.293,
+      0.569
+     ],
+     "HAND_L": [
+      0.338,
+      1.096,
+      0.496
+     ],
+     "HAND_R": [
+      -0.344,
+      1.096,
+      0.496
+     ],
+     "CHEST": [
+      -0.004,
+      1.336,
+      0.534
+     ],
+     "SPINE": [
+      -0.003,
+      1.125,
+      0.535
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      0.535
+     ],
+     "HEAD": [
+      -0.004,
+      1.854,
+      0.534
+     ]
+    },
+    "elbowL_axis": 0.272,
+    "elbowR_axis": 0.28,
+    "handL_axis": 0.341,
+    "handR_axis": 0.345,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.452,
+    "pose": {
+     "CLAV_L": [
+      -0.01,
+      0,
+      0
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      0,
+      0,
+      -0.05
+     ],
+     "ARMTWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "FOREARM_L": [
+      -0.11,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.01,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      0,
+      0,
+      0.05
+     ],
+     "ARMTWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "FOREARM_R": [
+      -0.11,
+      0,
+      0
+     ],
+     "CHEST": [
+      0,
+      0,
+      0
+     ],
+     "SPINE": [
+      0,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.24,
+       1.14,
+       -0.04
+      ],
+      "hand": [
+       -0.25,
+       0.92,
+       -0.02
+      ],
+      "depthH": 0.42,
+      "depthE": 0.46
+     },
+     "R": {
+      "elbow": [
+       0.24,
+       1.14,
+       -0.04
+      ],
+      "hand": [
+       0.25,
+       0.92,
+       -0.02
+      ],
+      "depthH": 0.42,
+      "depthE": 0.47
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.32,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.48,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.55,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.3,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.46,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "push_release": {
+   "shots": {
+    "A_front": "push_release_A_front.png",
+    "A_side": "push_release_A_side.png",
+    "A_rear34": "push_release_A_rear34.png",
+    "A_rear": "push_release_A_rear.png",
+    "A_close_front": "push_release_A_close_front.png",
+    "A_close_side": "push_release_A_close_side.png",
+    "A_close_rear34": "push_release_A_close_rear34.png",
+    "B_front": "push_release_B_front.png",
+    "B_side": "push_release_B_side.png",
+    "B_rear34": "push_release_B_rear34.png",
+    "B_rear": "push_release_B_rear.png",
+    "C_front": "push_release_C_front.png",
+    "C_side": "push_release_C_side.png",
+    "C_rear34": "push_release_C_rear34.png",
+    "C_rear": "push_release_C_rear.png",
+    "C_close_front": "push_release_C_close_front.png",
+    "C_close_side": "push_release_C_close_side.png",
+    "C_close_rear34": "push_release_C_close_rear34.png",
+    "E_front": "push_release_E_front.png",
+    "E_side": "push_release_E_side.png",
+    "E_rear34": "push_release_E_rear34.png",
+    "E_rear": "push_release_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.606,
+      0.466
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.606,
+      0.466
+     ],
+     "SCAP_L": [
+      0.126,
+      1.514,
+      0.649
+     ],
+     "SCAP_R": [
+      -0.126,
+      1.514,
+      0.649
+     ],
+     "UPPERARM_L": [
+      0.233,
+      1.517,
+      0.546
+     ],
+     "UPPERARM_R": [
+      -0.233,
+      1.517,
+      0.544
+     ],
+     "ARMTWIST_L": [
+      0.234,
+      1.507,
+      0.542
+     ],
+     "ARMTWIST_R": [
+      -0.234,
+      1.507,
+      0.54
+     ],
+     "FOREARM_L": [
+      0.262,
+      1.312,
+      0.462
+     ],
+     "FOREARM_R": [
+      -0.264,
+      1.31,
+      0.465
+     ],
+     "HAND_L": [
+      0.311,
+      1.132,
+      0.344
+     ],
+     "HAND_R": [
+      -0.308,
+      1.132,
+      0.344
+     ],
+     "CHEST": [
+      0,
+      1.336,
+      0.526
+     ],
+     "SPINE": [
+      0,
+      1.125,
+      0.532
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      0.535
+     ],
+     "HEAD": [
+      0,
+      1.853,
+      0.506
+     ]
+    },
+    "elbowL_axis": 0.269,
+    "elbowR_axis": 0.27,
+    "handL_axis": 0.361,
+    "handR_axis": 0.359,
+    "upperarm_len_L": 0.223,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.466,
+    "pose": {
+     "CLAV_L": [
+      -0.01,
+      0.03,
+      -0.01
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      -0.11,
+      0,
+      -0.02
+     ],
+     "ARMTWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "FOREARM_L": [
+      -0.04,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.01,
+      -0.03,
+      0.01
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      -0.11,
+      0,
+      0.02
+     ],
+     "ARMTWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "FOREARM_R": [
+      -0.04,
+      0,
+      0
+     ],
+     "CHEST": [
+      0,
+      0,
+      0
+     ],
+     "SPINE": [
+      0,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.23,
+       1.14,
+       -0.02
+      ],
+      "hand": [
+       -0.23,
+       0.92,
+       0.02
+      ],
+      "depthH": 0.48,
+      "depthE": 0.52
+     },
+     "R": {
+      "elbow": [
+       0.23,
+       1.14,
+       -0.02
+      ],
+      "hand": [
+       0.23,
+       0.92,
+       0.02
+      ],
+      "depthH": 0.48,
+      "depthE": 0.52
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.28,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.3,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.46,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "push_load": {
+   "shots": {
+    "A_front": "push_load_A_front.png",
+    "A_side": "push_load_A_side.png",
+    "A_rear34": "push_load_A_rear34.png",
+    "A_rear": "push_load_A_rear.png",
+    "A_close_front": "push_load_A_close_front.png",
+    "A_close_side": "push_load_A_close_side.png",
+    "A_close_rear34": "push_load_A_close_rear34.png",
+    "B_front": "push_load_B_front.png",
+    "B_side": "push_load_B_side.png",
+    "B_rear34": "push_load_B_rear34.png",
+    "B_rear": "push_load_B_rear.png",
+    "C_front": "push_load_C_front.png",
+    "C_side": "push_load_C_side.png",
+    "C_rear34": "push_load_C_rear34.png",
+    "C_rear": "push_load_C_rear.png",
+    "C_close_front": "push_load_C_close_front.png",
+    "C_close_side": "push_load_C_close_side.png",
+    "C_close_rear34": "push_load_C_close_rear34.png",
+    "E_front": "push_load_E_front.png",
+    "E_side": "push_load_E_side.png",
+    "E_rear34": "push_load_E_rear34.png",
+    "E_rear": "push_load_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.023,
+      1.701,
+      0.128
+     ],
+     "CLAV_R": [
+      -0.021,
+      1.701,
+      0.128
+     ],
+     "SCAP_L": [
+      0.13,
+      1.625,
+      0.316
+     ],
+     "SCAP_R": [
+      -0.129,
+      1.625,
+      0.316
+     ],
+     "UPPERARM_L": [
+      0.241,
+      1.674,
+      0.23
+     ],
+     "UPPERARM_R": [
+      -0.24,
+      1.674,
+      0.229
+     ],
+     "ARMTWIST_L": [
+      0.242,
+      1.675,
+      0.219
+     ],
+     "ARMTWIST_R": [
+      -0.24,
+      1.675,
+      0.218
+     ],
+     "FOREARM_L": [
+      0.252,
+      1.702,
+      0.009
+     ],
+     "FOREARM_R": [
+      -0.255,
+      1.699,
+      0.007
+     ],
+     "HAND_L": [
+      0.258,
+      1.791,
+      -0.193
+     ],
+     "HAND_R": [
+      -0.256,
+      1.789,
+      -0.194
+     ],
+     "CHEST": [
+      0.001,
+      1.435,
+      0.201
+     ],
+     "SPINE": [
+      0,
+      1.224,
+      0.221
+     ],
+     "PELVIS": [
+      0,
+      1.013,
+      0.235
+     ],
+     "HEAD": [
+      0.001,
+      1.95,
+      0.155
+     ]
+    },
+    "elbowL_axis": 0.301,
+    "elbowR_axis": 0.306,
+    "handL_axis": 0.443,
+    "handR_axis": 0.443,
+    "upperarm_len_L": 0.223,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.481,
+    "pose": {
+     "CLAV_L": [
+      -0.08,
+      0.1,
+      -0.19
+     ],
+     "SCAP_L": [
+      -0.34,
+      -0.09,
+      0
+     ],
+     "UPPERARM_L": [
+      -1.53,
+      0.16,
+      0.27
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.25,
+      0
+     ],
+     "FOREARM_L": [
+      0.05,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.08,
+      -0.1,
+      0.19
+     ],
+     "SCAP_R": [
+      -0.34,
+      0.09,
+      0
+     ],
+     "UPPERARM_R": [
+      -1.53,
+      -0.16,
+      -0.27
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.25,
+      0
+     ],
+     "FOREARM_R": [
+      0.05,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.02,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.04,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.17,
+       1.42,
+       0.17
+      ],
+      "hand": [
+       -0.11,
+       1.47,
+       0.37
+      ],
+      "depthH": 0,
+      "depthE": 0.07
+     },
+     "R": {
+      "elbow": [
+       0.17,
+       1.42,
+       0.17
+      ],
+      "hand": [
+       0.11,
+       1.47,
+       0.38
+      ],
+      "depthH": 0,
+      "depthE": 0.06
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.31,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.46,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.27,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.44,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.52,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.56,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "pull_release": {
+   "shots": {
+    "A_front": "pull_release_A_front.png",
+    "A_side": "pull_release_A_side.png",
+    "A_rear34": "pull_release_A_rear34.png",
+    "A_rear": "pull_release_A_rear.png",
+    "A_close_front": "pull_release_A_close_front.png",
+    "A_close_side": "pull_release_A_close_side.png",
+    "A_close_rear34": "pull_release_A_close_rear34.png",
+    "B_front": "pull_release_B_front.png",
+    "B_side": "pull_release_B_side.png",
+    "B_rear34": "pull_release_B_rear34.png",
+    "B_rear": "pull_release_B_rear.png",
+    "C_front": "pull_release_C_front.png",
+    "C_side": "pull_release_C_side.png",
+    "C_rear34": "pull_release_C_rear34.png",
+    "C_rear": "pull_release_C_rear.png",
+    "C_close_front": "pull_release_C_close_front.png",
+    "C_close_side": "pull_release_C_close_side.png",
+    "C_close_rear34": "pull_release_C_close_rear34.png",
+    "E_front": "pull_release_E_front.png",
+    "E_side": "pull_release_E_side.png",
+    "E_rear34": "pull_release_E_rear34.png",
+    "E_rear": "pull_release_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.609,
+      0.602
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.609,
+      0.602
+     ],
+     "SCAP_L": [
+      0.027,
+      1.451,
+      0.77
+     ],
+     "SCAP_R": [
+      -0.027,
+      1.451,
+      0.77
+     ],
+     "UPPERARM_L": [
+      0.16,
+      1.437,
+      0.705
+     ],
+     "UPPERARM_R": [
+      -0.16,
+      1.437,
+      0.703
+     ],
+     "ARMTWIST_L": [
+      0.157,
+      1.426,
+      0.705
+     ],
+     "ARMTWIST_R": [
+      -0.158,
+      1.427,
+      0.704
+     ],
+     "FOREARM_L": [
+      0.111,
+      1.219,
+      0.707
+     ],
+     "FOREARM_R": [
+      -0.112,
+      1.219,
+      0.711
+     ],
+     "HAND_L": [
+      0.179,
+      1.115,
+      0.525
+     ],
+     "HAND_R": [
+      -0.177,
+      1.12,
+      0.525
+     ],
+     "CHEST": [
+      0,
+      1.333,
+      0.58
+     ],
+     "SPINE": [
+      0,
+      1.124,
+      0.549
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      0.535
+     ],
+     "HEAD": [
+      0,
+      1.834,
+      0.713
+     ]
+    },
+    "elbowL_axis": 0.157,
+    "elbowR_axis": 0.16,
+    "handL_axis": 0.185,
+    "handR_axis": 0.184,
+    "upperarm_len_L": 0.223,
+    "upperarm_len_R": 0.223,
+    "shoulder_gap": 0.32,
+    "pose": {
+     "CLAV_L": [
+      0.03,
+      -0.27,
+      0.24
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      0.31,
+      0,
+      0.07
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.03,
+      0
+     ],
+     "FOREARM_L": [
+      -0.99,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      0.03,
+      0.27,
+      -0.24
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      0.31,
+      0,
+      -0.07
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.03,
+      0
+     ],
+     "FOREARM_R": [
+      -0.99,
+      0,
+      0
+     ],
+     "CHEST": [
+      -0.08,
+      0,
+      0
+     ],
+     "SPINE": [
+      -0.04,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 2,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.21,
+       1.15,
+       -0.11
+      ],
+      "hand": [
+       -0.2,
+       0.98,
+       0.03
+      ],
+      "depthH": 0.47,
+      "depthE": 0.45
+     },
+     "R": {
+      "elbow": [
+       0.21,
+       1.15,
+       -0.11
+      ],
+      "hand": [
+       0.2,
+       0.98,
+       0.03
+      ],
+      "depthH": 0.48,
+      "depthE": 0.45
+     },
+     "fixes": 2,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.29,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.29,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "hinge_load": {
+   "shots": {
+    "A_front": "hinge_load_A_front.png",
+    "A_side": "hinge_load_A_side.png",
+    "A_rear34": "hinge_load_A_rear34.png",
+    "A_rear": "hinge_load_A_rear.png",
+    "A_close_front": "hinge_load_A_close_front.png",
+    "A_close_side": "hinge_load_A_close_side.png",
+    "A_close_rear34": "hinge_load_A_close_rear34.png",
+    "B_front": "hinge_load_B_front.png",
+    "B_side": "hinge_load_B_side.png",
+    "B_rear34": "hinge_load_B_rear34.png",
+    "B_rear": "hinge_load_B_rear.png",
+    "C_front": "hinge_load_C_front.png",
+    "C_side": "hinge_load_C_side.png",
+    "C_rear34": "hinge_load_C_rear34.png",
+    "C_rear": "hinge_load_C_rear.png",
+    "C_close_front": "hinge_load_C_close_front.png",
+    "C_close_side": "hinge_load_C_close_side.png",
+    "C_close_rear34": "hinge_load_C_close_rear34.png",
+    "E_front": "hinge_load_E_front.png",
+    "E_side": "hinge_load_E_side.png",
+    "E_rear34": "hinge_load_E_rear34.png",
+    "E_rear": "hinge_load_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.465,
+      0.112
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.465,
+      0.112
+     ],
+     "SCAP_L": [
+      0.11,
+      1.514,
+      0.319
+     ],
+     "SCAP_R": [
+      -0.11,
+      1.514,
+      0.319
+     ],
+     "UPPERARM_L": [
+      0.224,
+      1.457,
+      0.244
+     ],
+     "UPPERARM_R": [
+      -0.224,
+      1.456,
+      0.242
+     ],
+     "ARMTWIST_L": [
+      0.228,
+      1.447,
+      0.244
+     ],
+     "ARMTWIST_R": [
+      -0.228,
+      1.446,
+      0.243
+     ],
+     "FOREARM_L": [
+      0.307,
+      1.25,
+      0.253
+     ],
+     "FOREARM_R": [
+      -0.31,
+      1.25,
+      0.257
+     ],
+     "HAND_L": [
+      0.408,
+      1.064,
+      0.189
+     ],
+     "HAND_R": [
+      -0.406,
+      1.063,
+      0.189
+     ],
+     "CHEST": [
+      0,
+      1.27,
+      0.309
+     ],
+     "SPINE": [
+      0,
+      1.094,
+      0.426
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      0.535
+     ],
+     "HEAD": [
+      0,
+      1.694,
+      0.012
+     ]
+    },
+    "elbowL_axis": 0.311,
+    "elbowR_axis": 0.313,
+    "handL_axis": 0.456,
+    "handR_axis": 0.454,
+    "upperarm_len_L": 0.223,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.448,
+    "pose": {
+     "CLAV_L": [
+      0.09,
+      -0.02,
+      0
+     ],
+     "SCAP_L": [
+      -0.03,
+      0,
+      -0.02
+     ],
+     "UPPERARM_L": [
+      -0.58,
+      0,
+      -0.2
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.04,
+      0
+     ],
+     "FOREARM_L": [
+      -0.16,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      0.09,
+      0.02,
+      0
+     ],
+     "SCAP_R": [
+      -0.03,
+      0,
+      0.02
+     ],
+     "UPPERARM_R": [
+      -0.58,
+      0,
+      0.2
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.04,
+      0
+     ],
+     "FOREARM_R": [
+      -0.16,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.02,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.03,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.27,
+       1.18,
+       0.08
+      ],
+      "hand": [
+       -0.32,
+       1.03,
+       0.23
+      ],
+      "depthH": 0,
+      "depthE": 0.27
+     },
+     "R": {
+      "elbow": [
+       0.27,
+       1.18,
+       0.08
+      ],
+      "hand": [
+       0.32,
+       1.03,
+       0.23
+      ],
+      "depthH": 0,
+      "depthE": 0.27
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.32,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.47,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.55,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.32,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.48,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "rotation_release": {
+   "shots": {
+    "A_front": "rotation_release_A_front.png",
+    "A_side": "rotation_release_A_side.png",
+    "A_rear34": "rotation_release_A_rear34.png",
+    "A_rear": "rotation_release_A_rear.png",
+    "A_close_front": "rotation_release_A_close_front.png",
+    "A_close_side": "rotation_release_A_close_side.png",
+    "A_close_rear34": "rotation_release_A_close_rear34.png",
+    "B_front": "rotation_release_B_front.png",
+    "B_side": "rotation_release_B_side.png",
+    "B_rear34": "rotation_release_B_rear34.png",
+    "B_rear": "rotation_release_B_rear.png",
+    "C_front": "rotation_release_C_front.png",
+    "C_side": "rotation_release_C_side.png",
+    "C_rear34": "rotation_release_C_rear34.png",
+    "C_rear": "rotation_release_C_rear.png",
+    "C_close_front": "rotation_release_C_close_front.png",
+    "C_close_side": "rotation_release_C_close_side.png",
+    "C_close_rear34": "rotation_release_C_close_rear34.png",
+    "E_front": "rotation_release_E_front.png",
+    "E_side": "rotation_release_E_side.png",
+    "E_rear34": "rotation_release_E_rear34.png",
+    "E_rear": "rotation_release_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      -0.043,
+      1.609,
+      0.555
+     ],
+     "CLAV_R": [
+      -0.05,
+      1.605,
+      0.598
+     ],
+     "SCAP_L": [
+      0.159,
+      1.525,
+      0.484
+     ],
+     "SCAP_R": [
+      0.125,
+      1.512,
+      0.713
+     ],
+     "UPPERARM_L": [
+      0.085,
+      1.56,
+      0.361
+     ],
+     "UPPERARM_R": [
+      0.018,
+      1.549,
+      0.811
+     ],
+     "ARMTWIST_L": [
+      0.08,
+      1.558,
+      0.351
+     ],
+     "ARMTWIST_R": [
+      0.01,
+      1.55,
+      0.819
+     ],
+     "FOREARM_L": [
+      -0.004,
+      1.517,
+      0.16
+     ],
+     "FOREARM_R": [
+      -0.138,
+      1.577,
+      0.969
+     ],
+     "HAND_L": [
+      -0.152,
+      1.553,
+      0
+     ],
+     "HAND_R": [
+      -0.319,
+      1.665,
+      1.057
+     ],
+     "CHEST": [
+      0.002,
+      1.335,
+      0.561
+     ],
+     "SPINE": [
+      0,
+      1.124,
+      0.546
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      0.535
+     ],
+     "HEAD": [
+      0.002,
+      1.851,
+      0.605
+     ]
+    },
+    "elbowL_axis": 0.419,
+    "elbowR_axis": 0.408,
+    "handL_axis": 0.601,
+    "handR_axis": 0.565,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.455,
+    "pose": {
+     "CLAV_L": [
+      -0.01,
+      0,
+      -0.05
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      -0.1
+     ],
+     "UPPERARM_L": [
+      -0.5,
+      0.22,
+      -0.63
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.03,
+      0
+     ],
+     "FOREARM_L": [
+      -0.25,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.01,
+      0.03,
+      0.11
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0.19
+     ],
+     "UPPERARM_R": [
+      -0.69,
+      -0.4,
+      0.76
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.08,
+      0
+     ],
+     "FOREARM_R": [
+      -0.17,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.01,
+      0.34,
+      -0.01
+     ],
+     "SPINE": [
+      -0.01,
+      0.24,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.37,
+       1.23,
+       0.07
+      ],
+      "hand": [
+       -0.5,
+       1.13,
+       0.22
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "R": {
+      "elbow": [
+       0.39,
+       1.31,
+       0.1
+      ],
+      "hand": [
+       0.54,
+       1.28,
+       0.26
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.29,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.29,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      0.54
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "overhead_load": {
+   "shots": {
+    "A_front": "overhead_load_A_front.png",
+    "A_side": "overhead_load_A_side.png",
+    "A_rear34": "overhead_load_A_rear34.png",
+    "A_rear": "overhead_load_A_rear.png",
+    "A_close_front": "overhead_load_A_close_front.png",
+    "A_close_side": "overhead_load_A_close_side.png",
+    "A_close_rear34": "overhead_load_A_close_rear34.png",
+    "B_front": "overhead_load_B_front.png",
+    "B_side": "overhead_load_B_side.png",
+    "B_rear34": "overhead_load_B_rear34.png",
+    "B_rear": "overhead_load_B_rear.png",
+    "C_front": "overhead_load_C_front.png",
+    "C_side": "overhead_load_C_side.png",
+    "C_rear34": "overhead_load_C_rear34.png",
+    "C_rear": "overhead_load_C_rear.png",
+    "C_close_front": "overhead_load_C_close_front.png",
+    "C_close_side": "overhead_load_C_close_side.png",
+    "C_close_rear34": "overhead_load_C_close_rear34.png",
+    "E_front": "overhead_load_E_front.png",
+    "E_side": "overhead_load_E_side.png",
+    "E_rear34": "overhead_load_E_rear34.png",
+    "E_rear": "overhead_load_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.602,
+      1.839
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.602,
+      1.839
+     ],
+     "SCAP_L": [
+      0.086,
+      1.451,
+      1.999
+     ],
+     "SCAP_R": [
+      -0.086,
+      1.451,
+      1.999
+     ],
+     "UPPERARM_L": [
+      0.206,
+      1.538,
+      1.998
+     ],
+     "UPPERARM_R": [
+      -0.206,
+      1.54,
+      1.997
+     ],
+     "ARMTWIST_L": [
+      0.205,
+      1.548,
+      1.993
+     ],
+     "ARMTWIST_R": [
+      -0.206,
+      1.549,
+      1.991
+     ],
+     "FOREARM_L": [
+      0.2,
+      1.734,
+      1.89
+     ],
+     "FOREARM_R": [
+      -0.205,
+      1.734,
+      1.886
+     ],
+     "HAND_L": [
+      0.139,
+      1.87,
+      2.053
+     ],
+     "HAND_R": [
+      -0.141,
+      1.866,
+      2.051
+     ],
+     "CHEST": [
+      0,
+      1.332,
+      1.78
+     ],
+     "SPINE": [
+      0,
+      1.125,
+      1.743
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      1.739
+     ],
+     "HEAD": [
+      0,
+      1.81,
+      1.978
+     ]
+    },
+    "elbowL_axis": 0.21,
+    "elbowR_axis": 0.216,
+    "handL_axis": 0.169,
+    "handR_axis": 0.168,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.412,
+    "pose": {
+     "CLAV_L": [
+      -0.13,
+      -0.29,
+      -0.42
+     ],
+     "SCAP_L": [
+      -0.35,
+      -0.13,
+      0
+     ],
+     "UPPERARM_L": [
+      -1.82,
+      0,
+      0.32
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.24,
+      0
+     ],
+     "FOREARM_L": [
+      -1.24,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.13,
+      0.29,
+      0.42
+     ],
+     "SCAP_R": [
+      -0.35,
+      0.13,
+      0
+     ],
+     "UPPERARM_R": [
+      -1.82,
+      0,
+      -0.32
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.24,
+      0
+     ],
+     "FOREARM_R": [
+      -1.24,
+      0,
+      0
+     ],
+     "CHEST": [
+      -0.14,
+      0,
+      0
+     ],
+     "SPINE": [
+      -0.06,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.16,
+       1.48,
+       0.13
+      ],
+      "hand": [
+       -0.13,
+       1.69,
+       0.07
+      ],
+      "depthH": 0,
+      "depthE": 0.01
+     },
+     "R": {
+      "elbow": [
+       0.16,
+       1.48,
+       0.14
+      ],
+      "hand": [
+       0.13,
+       1.69,
+       0.08
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.3,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.46,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.55,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.35,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "overhead_release": {
+   "shots": {
+    "A_front": "overhead_release_A_front.png",
+    "A_side": "overhead_release_A_side.png",
+    "A_rear34": "overhead_release_A_rear34.png",
+    "A_rear": "overhead_release_A_rear.png",
+    "A_close_front": "overhead_release_A_close_front.png",
+    "A_close_side": "overhead_release_A_close_side.png",
+    "A_close_rear34": "overhead_release_A_close_rear34.png",
+    "B_front": "overhead_release_B_front.png",
+    "B_side": "overhead_release_B_side.png",
+    "B_rear34": "overhead_release_B_rear34.png",
+    "B_rear": "overhead_release_B_rear.png",
+    "C_front": "overhead_release_C_front.png",
+    "C_side": "overhead_release_C_side.png",
+    "C_rear34": "overhead_release_C_rear34.png",
+    "C_rear": "overhead_release_C_rear.png",
+    "C_close_front": "overhead_release_C_close_front.png",
+    "C_close_side": "overhead_release_C_close_side.png",
+    "C_close_rear34": "overhead_release_C_close_rear34.png",
+    "E_front": "overhead_release_E_front.png",
+    "E_side": "overhead_release_E_side.png",
+    "E_rear34": "overhead_release_E_rear34.png",
+    "E_rear": "overhead_release_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.606,
+      1.608
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.606,
+      1.608
+     ],
+     "SCAP_L": [
+      0.112,
+      1.516,
+      1.799
+     ],
+     "SCAP_R": [
+      -0.112,
+      1.516,
+      1.799
+     ],
+     "UPPERARM_L": [
+      0.226,
+      1.515,
+      1.704
+     ],
+     "UPPERARM_R": [
+      -0.226,
+      1.515,
+      1.702
+     ],
+     "ARMTWIST_L": [
+      0.228,
+      1.504,
+      1.702
+     ],
+     "ARMTWIST_R": [
+      -0.228,
+      1.504,
+      1.701
+     ],
+     "FOREARM_L": [
+      0.267,
+      1.298,
+      1.671
+     ],
+     "FOREARM_R": [
+      -0.269,
+      1.297,
+      1.675
+     ],
+     "HAND_L": [
+      0.33,
+      1.106,
+      1.582
+     ],
+     "HAND_R": [
+      -0.328,
+      1.106,
+      1.582
+     ],
+     "CHEST": [
+      0,
+      1.336,
+      1.668
+     ],
+     "SPINE": [
+      0,
+      1.125,
+      1.673
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      1.675
+     ],
+     "HEAD": [
+      0,
+      1.853,
+      1.649
+     ]
+    },
+    "elbowL_axis": 0.267,
+    "elbowR_axis": 0.269,
+    "handL_axis": 0.341,
+    "handR_axis": 0.34,
+    "upperarm_len_L": 0.223,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.452,
+    "pose": {
+     "CLAV_L": [
+      -0.01,
+      0,
+      0
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      0,
+      0,
+      -0.05
+     ],
+     "ARMTWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "FOREARM_L": [
+      -0.11,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.01,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      0,
+      0,
+      0.05
+     ],
+     "ARMTWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "FOREARM_R": [
+      -0.11,
+      0,
+      0
+     ],
+     "CHEST": [
+      0,
+      0,
+      0
+     ],
+     "SPINE": [
+      0,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.24,
+       1.14,
+       -0.04
+      ],
+      "hand": [
+       -0.25,
+       0.92,
+       -0.02
+      ],
+      "depthH": 0.42,
+      "depthE": 0.46
+     },
+     "R": {
+      "elbow": [
+       0.24,
+       1.14,
+       -0.04
+      ],
+      "hand": [
+       0.25,
+       0.92,
+       -0.02
+      ],
+      "depthH": 0.42,
+      "depthE": 0.47
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.33,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.48,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.55,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.33,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.48,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.55,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "chestfly_load": {
+   "shots": {
+    "A_front": "chestfly_load_A_front.png",
+    "A_side": "chestfly_load_A_side.png",
+    "A_rear34": "chestfly_load_A_rear34.png",
+    "A_rear": "chestfly_load_A_rear.png",
+    "A_close_front": "chestfly_load_A_close_front.png",
+    "A_close_side": "chestfly_load_A_close_side.png",
+    "A_close_rear34": "chestfly_load_A_close_rear34.png",
+    "B_front": "chestfly_load_B_front.png",
+    "B_side": "chestfly_load_B_side.png",
+    "B_rear34": "chestfly_load_B_rear34.png",
+    "B_rear": "chestfly_load_B_rear.png",
+    "C_front": "chestfly_load_C_front.png",
+    "C_side": "chestfly_load_C_side.png",
+    "C_rear34": "chestfly_load_C_rear34.png",
+    "C_rear": "chestfly_load_C_rear.png",
+    "C_close_front": "chestfly_load_C_close_front.png",
+    "C_close_side": "chestfly_load_C_close_side.png",
+    "C_close_rear34": "chestfly_load_C_close_rear34.png",
+    "E_front": "chestfly_load_E_front.png",
+    "E_side": "chestfly_load_E_side.png",
+    "E_rear34": "chestfly_load_E_rear34.png",
+    "E_rear": "chestfly_load_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.611,
+      1.716
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.611,
+      1.716
+     ],
+     "SCAP_L": [
+      0.064,
+      1.532,
+      1.928
+     ],
+     "SCAP_R": [
+      -0.064,
+      1.532,
+      1.928
+     ],
+     "UPPERARM_L": [
+      0.187,
+      1.591,
+      1.87
+     ],
+     "UPPERARM_R": [
+      -0.188,
+      1.591,
+      1.868
+     ],
+     "ARMTWIST_L": [
+      0.198,
+      1.592,
+      1.872
+     ],
+     "ARMTWIST_R": [
+      -0.199,
+      1.592,
+      1.871
+     ],
+     "FOREARM_L": [
+      0.405,
+      1.602,
+      1.918
+     ],
+     "FOREARM_R": [
+      -0.405,
+      1.604,
+      1.922
+     ],
+     "HAND_L": [
+      0.607,
+      1.659,
+      1.851
+     ],
+     "HAND_R": [
+      -0.606,
+      1.657,
+      1.85
+     ],
+     "CHEST": [
+      0,
+      1.336,
+      1.741
+     ],
+     "SPINE": [
+      0,
+      1.125,
+      1.738
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      1.738
+     ],
+     "HEAD": [
+      0,
+      1.852,
+      1.787
+     ]
+    },
+    "elbowL_axis": 0.43,
+    "elbowR_axis": 0.431,
+    "handL_axis": 0.611,
+    "handR_axis": 0.61,
+    "upperarm_len_L": 0.223,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.375,
+    "pose": {
+     "CLAV_L": [
+      0.06,
+      -0.33,
+      -0.22
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      -0.32
+     ],
+     "UPPERARM_L": [
+      -0.16,
+      0,
+      -0.92
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.05,
+      0
+     ],
+     "FOREARM_L": [
+      -0.39,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      0.06,
+      0.33,
+      0.22
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0.32
+     ],
+     "UPPERARM_R": [
+      -0.16,
+      0,
+      0.92
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.05,
+      0
+     ],
+     "FOREARM_R": [
+      -0.39,
+      0,
+      0
+     ],
+     "CHEST": [
+      -0.05,
+      0,
+      0
+     ],
+     "SPINE": [
+      0,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.44,
+       1.29,
+       -0.03
+      ],
+      "hand": [
+       -0.63,
+       1.24,
+       0.06
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "R": {
+      "elbow": [
+       0.44,
+       1.29,
+       -0.03
+      ],
+      "hand": [
+       0.63,
+       1.24,
+       0.06
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.3,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.29,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "chestfly_clap": {
+   "shots": {
+    "A_front": "chestfly_clap_A_front.png",
+    "A_side": "chestfly_clap_A_side.png",
+    "A_rear34": "chestfly_clap_A_rear34.png",
+    "A_rear": "chestfly_clap_A_rear.png",
+    "A_close_front": "chestfly_clap_A_close_front.png",
+    "A_close_side": "chestfly_clap_A_close_side.png",
+    "A_close_rear34": "chestfly_clap_A_close_rear34.png",
+    "B_front": "chestfly_clap_B_front.png",
+    "B_side": "chestfly_clap_B_side.png",
+    "B_rear34": "chestfly_clap_B_rear34.png",
+    "B_rear": "chestfly_clap_B_rear.png",
+    "C_front": "chestfly_clap_C_front.png",
+    "C_side": "chestfly_clap_C_side.png",
+    "C_rear34": "chestfly_clap_C_rear34.png",
+    "C_rear": "chestfly_clap_C_rear.png",
+    "C_close_front": "chestfly_clap_C_close_front.png",
+    "C_close_side": "chestfly_clap_C_close_side.png",
+    "C_close_rear34": "chestfly_clap_C_close_rear34.png",
+    "E_front": "chestfly_clap_E_front.png",
+    "E_side": "chestfly_clap_E_side.png",
+    "E_rear34": "chestfly_clap_E_rear34.png",
+    "E_rear": "chestfly_clap_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.607,
+      1.615
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.607,
+      1.615
+     ],
+     "SCAP_L": [
+      0.135,
+      1.51,
+      1.79
+     ],
+     "SCAP_R": [
+      -0.135,
+      1.51,
+      1.79
+     ],
+     "UPPERARM_L": [
+      0.236,
+      1.514,
+      1.681
+     ],
+     "UPPERARM_R": [
+      -0.236,
+      1.514,
+      1.679
+     ],
+     "ARMTWIST_L": [
+      0.237,
+      1.505,
+      1.674
+     ],
+     "ARMTWIST_R": [
+      -0.237,
+      1.504,
+      1.673
+     ],
+     "FOREARM_L": [
+      0.257,
+      1.331,
+      1.554
+     ],
+     "FOREARM_R": [
+      -0.258,
+      1.328,
+      1.556
+     ],
+     "HAND_L": [
+      0.293,
+      1.21,
+      1.373
+     ],
+     "HAND_R": [
+      -0.289,
+      1.209,
+      1.373
+     ],
+     "CHEST": [
+      0,
+      1.336,
+      1.671
+     ],
+     "SPINE": [
+      0,
+      1.125,
+      1.674
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      1.675
+     ],
+     "HEAD": [
+      0,
+      1.854,
+      1.658
+     ]
+    },
+    "elbowL_axis": 0.281,
+    "elbowR_axis": 0.281,
+    "handL_axis": 0.417,
+    "handR_axis": 0.414,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.472,
+    "pose": {
+     "CLAV_L": [
+      -0.03,
+      0.11,
+      0
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      -0.47,
+      0,
+      -0.03
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.02,
+      0
+     ],
+     "FOREARM_L": [
+      -0.18,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.03,
+      -0.11,
+      0
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      -0.47,
+      0,
+      0.03
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.02,
+      0
+     ],
+     "FOREARM_R": [
+      -0.18,
+      0,
+      0
+     ],
+     "CHEST": [
+      0,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.01,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 2,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.23,
+       1.16,
+       0.06
+      ],
+      "hand": [
+       -0.24,
+       0.99,
+       0.19
+      ],
+      "depthH": 0,
+      "depthE": 0.48
+     },
+     "R": {
+      "elbow": [
+       0.23,
+       1.16,
+       0.06
+      ],
+      "hand": [
+       0.24,
+       0.99,
+       0.19
+      ],
+      "depthH": 0,
+      "depthE": 0.48
+     },
+     "fixes": 2,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.29,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.32,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.47,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      1.68
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "curl_strike": {
+   "shots": {
+    "A_front": "curl_strike_A_front.png",
+    "A_side": "curl_strike_A_side.png",
+    "A_rear34": "curl_strike_A_rear34.png",
+    "A_rear": "curl_strike_A_rear.png",
+    "A_close_front": "curl_strike_A_close_front.png",
+    "A_close_side": "curl_strike_A_close_side.png",
+    "A_close_rear34": "curl_strike_A_close_rear34.png",
+    "B_front": "curl_strike_B_front.png",
+    "B_side": "curl_strike_B_side.png",
+    "B_rear34": "curl_strike_B_rear34.png",
+    "B_rear": "curl_strike_B_rear.png",
+    "C_front": "curl_strike_C_front.png",
+    "C_side": "curl_strike_C_side.png",
+    "C_rear34": "curl_strike_C_rear34.png",
+    "C_rear": "curl_strike_C_rear.png",
+    "C_close_front": "curl_strike_C_close_front.png",
+    "C_close_side": "curl_strike_C_close_side.png",
+    "C_close_rear34": "curl_strike_C_close_rear34.png",
+    "E_front": "curl_strike_E_front.png",
+    "E_side": "curl_strike_E_side.png",
+    "E_rear34": "curl_strike_E_rear34.png",
+    "E_rear": "curl_strike_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.023,
+      1.589,
+      -0.933
+     ],
+     "CLAV_R": [
+      -0.021,
+      1.588,
+      -0.934
+     ],
+     "SCAP_L": [
+      0.108,
+      1.523,
+      -0.729
+     ],
+     "SCAP_R": [
+      -0.117,
+      1.521,
+      -0.736
+     ],
+     "UPPERARM_L": [
+      0.224,
+      1.515,
+      -0.821
+     ],
+     "UPPERARM_R": [
+      -0.227,
+      1.508,
+      -0.836
+     ],
+     "ARMTWIST_L": [
+      0.229,
+      1.505,
+      -0.825
+     ],
+     "ARMTWIST_R": [
+      -0.231,
+      1.498,
+      -0.84
+     ],
+     "FOREARM_L": [
+      0.31,
+      1.327,
+      -0.906
+     ],
+     "FOREARM_R": [
+      -0.307,
+      1.312,
+      -0.908
+     ],
+     "HAND_L": [
+      0.38,
+      1.376,
+      -1.109
+     ],
+     "HAND_R": [
+      -0.37,
+      1.31,
+      -1.119
+     ],
+     "CHEST": [
+      0,
+      1.33,
+      -0.837
+     ],
+     "SPINE": [
+      0,
+      1.123,
+      -0.791
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      -0.767
+     ],
+     "HEAD": [
+      0,
+      1.839,
+      -0.928
+     ]
+    },
+    "elbowL_axis": 0.317,
+    "elbowR_axis": 0.315,
+    "handL_axis": 0.459,
+    "handR_axis": 0.463,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.451,
+    "pose": {
+     "CLAV_L": [
+      -0.02,
+      -0.02,
+      -0.01
+     ],
+     "SCAP_L": [
+      -0.04,
+      0,
+      -0.02
+     ],
+     "UPPERARM_L": [
+      -0.62,
+      0,
+      -0.17
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.03,
+      0
+     ],
+     "FOREARM_L": [
+      -1.28,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.02,
+      0,
+      0.01
+     ],
+     "SCAP_R": [
+      -0.01,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      -0.52,
+      0,
+      0.19
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.03,
+      0
+     ],
+     "FOREARM_R": [
+      -0.87,
+      0,
+      0
+     ],
+     "CHEST": [
+      -0.04,
+      -0.03,
+      0
+     ],
+     "SPINE": [
+      0.08,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.27,
+       1.19,
+       0.09
+      ],
+      "hand": [
+       -0.28,
+       1.27,
+       0.3
+      ],
+      "depthH": 0,
+      "depthE": 0.27
+     },
+     "R": {
+      "elbow": [
+       0.27,
+       1.17,
+       0.07
+      ],
+      "hand": [
+       0.3,
+       1.14,
+       0.28
+      ],
+      "depthH": 0,
+      "depthE": 0.31
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.42,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.31,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.47,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "guard": {
+   "shots": {
+    "A_front": "guard_A_front.png",
+    "A_side": "guard_A_side.png",
+    "A_rear34": "guard_A_rear34.png",
+    "A_rear": "guard_A_rear.png",
+    "A_close_front": "guard_A_close_front.png",
+    "A_close_side": "guard_A_close_side.png",
+    "A_close_rear34": "guard_A_close_rear34.png",
+    "B_front": "guard_B_front.png",
+    "B_side": "guard_B_side.png",
+    "B_rear34": "guard_B_rear34.png",
+    "B_rear": "guard_B_rear.png",
+    "C_front": "guard_C_front.png",
+    "C_side": "guard_C_side.png",
+    "C_rear34": "guard_C_rear34.png",
+    "C_rear": "guard_C_rear.png",
+    "C_close_front": "guard_C_close_front.png",
+    "C_close_side": "guard_C_close_side.png",
+    "C_close_rear34": "guard_C_close_rear34.png",
+    "E_front": "guard_E_front.png",
+    "E_side": "guard_E_side.png",
+    "E_rear34": "guard_E_rear34.png",
+    "E_rear": "guard_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.598,
+      -0.724
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.598,
+      -0.724
+     ],
+     "SCAP_L": [
+      0.117,
+      1.517,
+      -0.531
+     ],
+     "SCAP_R": [
+      -0.117,
+      1.517,
+      -0.531
+     ],
+     "UPPERARM_L": [
+      0.23,
+      1.55,
+      -0.621
+     ],
+     "UPPERARM_R": [
+      -0.23,
+      1.55,
+      -0.622
+     ],
+     "ARMTWIST_L": [
+      0.238,
+      1.546,
+      -0.627
+     ],
+     "ARMTWIST_R": [
+      -0.239,
+      1.546,
+      -0.629
+     ],
+     "FOREARM_L": [
+      0.39,
+      1.469,
+      -0.755
+     ],
+     "FOREARM_R": [
+      -0.392,
+      1.466,
+      -0.752
+     ],
+     "HAND_L": [
+      0.351,
+      1.604,
+      -0.924
+     ],
+     "HAND_R": [
+      -0.348,
+      1.602,
+      -0.92
+     ],
+     "CHEST": [
+      0,
+      1.335,
+      -0.642
+     ],
+     "SPINE": [
+      0,
+      1.125,
+      -0.617
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      -0.612
+     ],
+     "HEAD": [
+      0,
+      1.848,
+      -0.705
+     ]
+    },
+    "elbowL_axis": 0.4,
+    "elbowR_axis": 0.401,
+    "handL_axis": 0.426,
+    "handR_axis": 0.422,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.46,
+    "pose": {
+     "CLAV_L": [
+      -0.13,
+      -0.05,
+      -0.16
+     ],
+     "SCAP_L": [
+      -0.1,
+      0,
+      -0.06
+     ],
+     "UPPERARM_L": [
+      -0.76,
+      0,
+      -0.47
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.11,
+      0
+     ],
+     "FOREARM_L": [
+      -1.26,
+      0,
+      0.42
+     ],
+     "CLAV_R": [
+      -0.13,
+      0.05,
+      0.16
+     ],
+     "SCAP_R": [
+      -0.1,
+      0,
+      0.06
+     ],
+     "UPPERARM_R": [
+      -0.76,
+      0,
+      0.47
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.11,
+      0
+     ],
+     "FOREARM_R": [
+      -1.26,
+      0,
+      -0.42
+     ],
+     "CHEST": [
+      0.01,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.07,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.34,
+       1.24,
+       0.1
+      ],
+      "hand": [
+       -0.29,
+       1.32,
+       0.3
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "R": {
+      "elbow": [
+       0.34,
+       1.24,
+       0.11
+      ],
+      "hand": [
+       0.29,
+       1.32,
+       0.31
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.26,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.43,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.52,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.56,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.37,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -0.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "dash": {
+   "shots": {
+    "A_front": "dash_A_front.png",
+    "A_side": "dash_A_side.png",
+    "A_rear34": "dash_A_rear34.png",
+    "A_rear": "dash_A_rear.png",
+    "A_close_front": "dash_A_close_front.png",
+    "A_close_side": "dash_A_close_side.png",
+    "A_close_rear34": "dash_A_close_rear34.png",
+    "B_front": "dash_B_front.png",
+    "B_side": "dash_B_side.png",
+    "B_rear34": "dash_B_rear34.png",
+    "B_rear": "dash_B_rear.png",
+    "C_front": "dash_C_front.png",
+    "C_side": "dash_C_side.png",
+    "C_rear34": "dash_C_rear34.png",
+    "C_rear": "dash_C_rear.png",
+    "C_close_front": "dash_C_close_front.png",
+    "C_close_side": "dash_C_close_side.png",
+    "C_close_rear34": "dash_C_close_rear34.png",
+    "E_front": "dash_E_front.png",
+    "E_side": "dash_E_side.png",
+    "E_rear34": "dash_E_rear34.png",
+    "E_rear": "dash_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      1.567,
+      -6.673
+     ],
+     "CLAV_R": [
+      -0.022,
+      1.567,
+      -6.673
+     ],
+     "SCAP_L": [
+      0.115,
+      1.527,
+      -6.466
+     ],
+     "SCAP_R": [
+      -0.112,
+      1.513,
+      -6.469
+     ],
+     "UPPERARM_L": [
+      0.227,
+      1.503,
+      -6.559
+     ],
+     "UPPERARM_R": [
+      -0.228,
+      1.522,
+      -6.563
+     ],
+     "ARMTWIST_L": [
+      0.232,
+      1.493,
+      -6.558
+     ],
+     "ARMTWIST_R": [
+      -0.234,
+      1.514,
+      -6.567
+     ],
+     "FOREARM_L": [
+      0.329,
+      1.306,
+      -6.527
+     ],
+     "FOREARM_R": [
+      -0.359,
+      1.359,
+      -6.643
+     ],
+     "HAND_L": [
+      0.417,
+      1.181,
+      -6.685
+     ],
+     "HAND_R": [
+      -0.452,
+      1.371,
+      -6.843
+     ],
+     "CHEST": [
+      0,
+      1.326,
+      -6.538
+     ],
+     "SPINE": [
+      0,
+      1.123,
+      -6.479
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      -6.451
+     ],
+     "HEAD": [
+      0,
+      1.815,
+      -6.707
+     ]
+    },
+    "elbowL_axis": 0.331,
+    "elbowR_axis": 0.364,
+    "handL_axis": 0.444,
+    "handR_axis": 0.518,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.455,
+    "pose": {
+     "CLAV_L": [
+      -0.07,
+      0,
+      -0.02
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      -0.07,
+      0.01,
+      -0.38
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.01,
+      0
+     ],
+     "FOREARM_L": [
+      -1.01,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.22,
+      0.06,
+      0.14
+     ],
+     "SCAP_R": [
+      -0.1,
+      0,
+      0.06
+     ],
+     "UPPERARM_R": [
+      -0.66,
+      0.02,
+      0.39
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.1,
+      0
+     ],
+     "FOREARM_R": [
+      -1.03,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.04,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.14,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.32,
+       1.16,
+       -0.01
+      ],
+      "hand": [
+       -0.35,
+       1.13,
+       0.2
+      ],
+      "depthH": 0,
+      "depthE": 0.09
+     },
+     "R": {
+      "elbow": [
+       0.34,
+       1.27,
+       0.12
+      ],
+      "hand": [
+       0.37,
+       1.42,
+       0.28
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.31,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.47,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.54,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.3,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.46,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "emote_double_biceps": {
+   "shots": {
+    "A_front": "emote_double_biceps_A_front.png",
+    "A_side": "emote_double_biceps_A_side.png",
+    "A_rear34": "emote_double_biceps_A_rear34.png",
+    "A_rear": "emote_double_biceps_A_rear.png",
+    "A_close_front": "emote_double_biceps_A_close_front.png",
+    "A_close_side": "emote_double_biceps_A_close_side.png",
+    "A_close_rear34": "emote_double_biceps_A_close_rear34.png",
+    "B_front": "emote_double_biceps_B_front.png",
+    "B_side": "emote_double_biceps_B_side.png",
+    "B_rear34": "emote_double_biceps_B_rear34.png",
+    "B_rear": "emote_double_biceps_B_rear.png",
+    "C_front": "emote_double_biceps_C_front.png",
+    "C_side": "emote_double_biceps_C_side.png",
+    "C_rear34": "emote_double_biceps_C_rear34.png",
+    "C_rear": "emote_double_biceps_C_rear.png",
+    "C_close_front": "emote_double_biceps_C_close_front.png",
+    "C_close_side": "emote_double_biceps_C_close_side.png",
+    "C_close_rear34": "emote_double_biceps_C_close_rear34.png",
+    "E_front": "emote_double_biceps_E_front.png",
+    "E_side": "emote_double_biceps_E_side.png",
+    "E_rear34": "emote_double_biceps_E_rear34.png",
+    "E_rear": "emote_double_biceps_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.019,
+      1.612,
+      -6.598
+     ],
+     "CLAV_R": [
+      -0.025,
+      1.612,
+      -6.598
+     ],
+     "SCAP_L": [
+      0.136,
+      1.51,
+      -6.428
+     ],
+     "SCAP_R": [
+      -0.141,
+      1.51,
+      -6.427
+     ],
+     "UPPERARM_L": [
+      0.211,
+      1.622,
+      -6.49
+     ],
+     "UPPERARM_R": [
+      -0.216,
+      1.623,
+      -6.491
+     ],
+     "ARMTWIST_L": [
+      0.221,
+      1.624,
+      -6.493
+     ],
+     "ARMTWIST_R": [
+      -0.227,
+      1.624,
+      -6.495
+     ],
+     "FOREARM_L": [
+      0.421,
+      1.657,
+      -6.558
+     ],
+     "FOREARM_R": [
+      -0.427,
+      1.657,
+      -6.559
+     ],
+     "HAND_L": [
+      0.41,
+      1.844,
+      -6.675
+     ],
+     "HAND_R": [
+      -0.41,
+      1.843,
+      -6.675
+     ],
+     "CHEST": [
+      -0.003,
+      1.336,
+      -6.605
+     ],
+     "SPINE": [
+      -0.002,
+      1.125,
+      -6.618
+     ],
+     "PELVIS": [
+      0,
+      0.913,
+      -6.613
+     ],
+     "HEAD": [
+      -0.003,
+      1.842,
+      -6.496
+     ]
+    },
+    "elbowL_axis": 0.425,
+    "elbowR_axis": 0.426,
+    "handL_axis": 0.45,
+    "handR_axis": 0.444,
+    "upperarm_len_L": 0.223,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.427,
+    "pose": {
+     "CLAV_L": [
+      -0.07,
+      -0.03,
+      -0.42
+     ],
+     "SCAP_L": [
+      0,
+      -0.04,
+      -0.52
+     ],
+     "UPPERARM_L": [
+      -0.73,
+      -0.37,
+      -0.47
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.32,
+      0
+     ],
+     "FOREARM_L": [
+      -1.11,
+      0.03,
+      0.22
+     ],
+     "CLAV_R": [
+      -0.07,
+      0.03,
+      0.42
+     ],
+     "SCAP_R": [
+      0,
+      0.04,
+      0.52
+     ],
+     "UPPERARM_R": [
+      -0.75,
+      0.36,
+      0.46
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.32,
+      0
+     ],
+     "FOREARM_R": [
+      -1.1,
+      -0.04,
+      -0.2
+     ],
+     "CHEST": [
+      -0.11,
+      0,
+      0
+     ],
+     "SPINE": [
+      -0.04,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 2,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.4,
+       1.23,
+       -0.01
+      ],
+      "hand": [
+       -0.52,
+       1.26,
+       0.17
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "R": {
+      "elbow": [
+       0.4,
+       1.23,
+       0
+      ],
+      "hand": [
+       0.52,
+       1.27,
+       0.17
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "fixes": 2,
+     "ik": {
+      "L": {
+       "target": [
+        -0.42,
+        1.69,
+        0.06
+       ],
+       "pivot": [
+        -0.209,
+        1.474,
+        -0.129
+       ],
+       "elbow": [
+        -0.418,
+        1.502,
+        -0.056
+       ],
+       "reach": 0.356,
+       "w": 0.98
+      },
+      "R": {
+       "target": [
+        0.42,
+        1.69,
+        0.06
+       ],
+       "pivot": [
+        0.214,
+        1.475,
+        -0.128
+       ],
+       "elbow": [
+        0.423,
+        1.502,
+        -0.054
+       ],
+       "reach": 0.352,
+       "w": 0.98
+      }
+     },
+     "endpoint": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.29,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.46,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.3,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.45,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      0,
+      -6.61
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "flight_cruise": {
+   "shots": {
+    "A_front": "flight_cruise_A_front.png",
+    "A_side": "flight_cruise_A_side.png",
+    "A_rear34": "flight_cruise_A_rear34.png",
+    "A_rear": "flight_cruise_A_rear.png",
+    "A_close_front": "flight_cruise_A_close_front.png",
+    "A_close_side": "flight_cruise_A_close_side.png",
+    "A_close_rear34": "flight_cruise_A_close_rear34.png",
+    "B_front": "flight_cruise_B_front.png",
+    "B_side": "flight_cruise_B_side.png",
+    "B_rear34": "flight_cruise_B_rear34.png",
+    "B_rear": "flight_cruise_B_rear.png",
+    "C_front": "flight_cruise_C_front.png",
+    "C_side": "flight_cruise_C_side.png",
+    "C_rear34": "flight_cruise_C_rear34.png",
+    "C_rear": "flight_cruise_C_rear.png",
+    "C_close_front": "flight_cruise_C_close_front.png",
+    "C_close_side": "flight_cruise_C_close_side.png",
+    "C_close_rear34": "flight_cruise_C_close_rear34.png",
+    "E_front": "flight_cruise_E_front.png",
+    "E_side": "flight_cruise_E_side.png",
+    "E_rear34": "flight_cruise_E_rear34.png",
+    "E_rear": "flight_cruise_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      13.446,
+      -19.795
+     ],
+     "CLAV_R": [
+      -0.022,
+      13.446,
+      -19.795
+     ],
+     "SCAP_L": [
+      0.116,
+      13.402,
+      -19.59
+     ],
+     "SCAP_R": [
+      -0.116,
+      13.402,
+      -19.59
+     ],
+     "UPPERARM_L": [
+      0.229,
+      13.382,
+      -19.685
+     ],
+     "UPPERARM_R": [
+      -0.229,
+      13.382,
+      -19.687
+     ],
+     "ARMTWIST_L": [
+      0.233,
+      13.374,
+      -19.678
+     ],
+     "ARMTWIST_R": [
+      -0.233,
+      13.374,
+      -19.68
+     ],
+     "FOREARM_L": [
+      0.316,
+      13.221,
+      -19.557
+     ],
+     "FOREARM_R": [
+      -0.318,
+      13.224,
+      -19.556
+     ],
+     "HAND_L": [
+      0.42,
+      13.031,
+      -19.514
+     ],
+     "HAND_R": [
+      -0.418,
+      13.032,
+      -19.514
+     ],
+     "CHEST": [
+      0,
+      13.208,
+      -19.657
+     ],
+     "SPINE": [
+      0,
+      13.006,
+      -19.592
+     ],
+     "PELVIS": [
+      0,
+      12.8,
+      -19.547
+     ],
+     "HEAD": [
+      0,
+      13.694,
+      -19.833
+     ]
+    },
+    "elbowL_axis": 0.338,
+    "elbowR_axis": 0.34,
+    "handL_axis": 0.432,
+    "handR_axis": 0.43,
+    "upperarm_len_L": 0.223,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.458,
+    "pose": {
+     "CLAV_L": [
+      -0.1,
+      0,
+      -0.03
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      0.46,
+      0,
+      -0.21
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.03,
+      0
+     ],
+     "FOREARM_L": [
+      -0.22,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.1,
+      0,
+      0.03
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      0.46,
+      0,
+      0.21
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.03,
+      0
+     ],
+     "FOREARM_R": [
+      -0.22,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.03,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.06,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.27,
+       1.17,
+       -0.14
+      ],
+      "hand": [
+       -0.32,
+       0.96,
+       -0.19
+      ],
+      "depthH": 0,
+      "depthE": 0.1
+     },
+     "R": {
+      "elbow": [
+       0.27,
+       1.17,
+       -0.14
+      ],
+      "hand": [
+       0.32,
+       0.96,
+       -0.19
+      ],
+      "depthH": 0,
+      "depthE": 0.1
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.37,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.5,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.56,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.33,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.5,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.56,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      11.81,
+      -25.64
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "flight_boost": {
+   "shots": {
+    "A_front": "flight_boost_A_front.png",
+    "A_side": "flight_boost_A_side.png",
+    "A_rear34": "flight_boost_A_rear34.png",
+    "A_rear": "flight_boost_A_rear.png",
+    "A_close_front": "flight_boost_A_close_front.png",
+    "A_close_side": "flight_boost_A_close_side.png",
+    "A_close_rear34": "flight_boost_A_close_rear34.png",
+    "B_front": "flight_boost_B_front.png",
+    "B_side": "flight_boost_B_side.png",
+    "B_rear34": "flight_boost_B_rear34.png",
+    "B_rear": "flight_boost_B_rear.png",
+    "C_front": "flight_boost_C_front.png",
+    "C_side": "flight_boost_C_side.png",
+    "C_rear34": "flight_boost_C_rear34.png",
+    "C_rear": "flight_boost_C_rear.png",
+    "C_close_front": "flight_boost_C_close_front.png",
+    "C_close_side": "flight_boost_C_close_side.png",
+    "C_close_rear34": "flight_boost_C_close_rear34.png",
+    "E_front": "flight_boost_E_front.png",
+    "E_side": "flight_boost_E_side.png",
+    "E_rear34": "flight_boost_E_rear34.png",
+    "E_rear": "flight_boost_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      0.022,
+      13.364,
+      -40.965
+     ],
+     "CLAV_R": [
+      -0.022,
+      13.364,
+      -40.965
+     ],
+     "SCAP_L": [
+      0.116,
+      13.313,
+      -40.761
+     ],
+     "SCAP_R": [
+      -0.116,
+      13.313,
+      -40.761
+     ],
+     "UPPERARM_L": [
+      0.228,
+      13.296,
+      -40.856
+     ],
+     "UPPERARM_R": [
+      -0.228,
+      13.296,
+      -40.858
+     ],
+     "ARMTWIST_L": [
+      0.233,
+      13.287,
+      -40.85
+     ],
+     "ARMTWIST_R": [
+      -0.233,
+      13.287,
+      -40.852
+     ],
+     "FOREARM_L": [
+      0.315,
+      13.127,
+      -40.737
+     ],
+     "FOREARM_R": [
+      -0.317,
+      13.131,
+      -40.735
+     ],
+     "HAND_L": [
+      0.417,
+      12.935,
+      -40.703
+     ],
+     "HAND_R": [
+      -0.415,
+      12.936,
+      -40.704
+     ],
+     "CHEST": [
+      0,
+      13.12,
+      -40.836
+     ],
+     "SPINE": [
+      0,
+      12.917,
+      -40.779
+     ],
+     "PELVIS": [
+      0,
+      12.709,
+      -40.738
+     ],
+     "HEAD": [
+      0,
+      13.614,
+      -40.992
+     ]
+    },
+    "elbowL_axis": 0.335,
+    "elbowR_axis": 0.338,
+    "handL_axis": 0.428,
+    "handR_axis": 0.426,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.224,
+    "shoulder_gap": 0.456,
+    "pose": {
+     "CLAV_L": [
+      -0.1,
+      0,
+      -0.03
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      0.45,
+      0,
+      -0.21
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.03,
+      0
+     ],
+     "FOREARM_L": [
+      -0.22,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.1,
+      0,
+      0.03
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      0.45,
+      0,
+      0.21
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.03,
+      0
+     ],
+     "FOREARM_R": [
+      -0.22,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.02,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.06,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.27,
+       1.17,
+       -0.14
+      ],
+      "hand": [
+       -0.32,
+       0.96,
+       -0.19
+      ],
+      "depthH": 0,
+      "depthE": 0.11
+     },
+     "R": {
+      "elbow": [
+       0.27,
+       1.17,
+       -0.14
+      ],
+      "hand": [
+       0.32,
+       0.96,
+       -0.18
+      ],
+      "depthH": 0,
+      "depthE": 0.12
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      11.81,
+      -48.18
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.32,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.48,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.55,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.37,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 3.14,
+     "pitch": 0.06,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.51,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 1.57,
+     "pitch": 0.05,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.57,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0.79,
+     "pitch": 0.12,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": 0,
+     "pitch": 0.08,
+     "root": [
+      0,
+      11.81,
+      -48.35
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "split_mid": {
+   "shots": {
+    "A_front": "split_mid_A_front.png",
+    "A_side": "split_mid_A_side.png",
+    "A_rear34": "split_mid_A_rear34.png",
+    "A_rear": "split_mid_A_rear.png",
+    "A_close_front": "split_mid_A_close_front.png",
+    "A_close_side": "split_mid_A_close_side.png",
+    "A_close_rear34": "split_mid_A_close_rear34.png",
+    "B_front": "split_mid_B_front.png",
+    "B_side": "split_mid_B_side.png",
+    "B_rear34": "split_mid_B_rear34.png",
+    "B_rear": "split_mid_B_rear.png",
+    "C_front": "split_mid_C_front.png",
+    "C_side": "split_mid_C_side.png",
+    "C_rear34": "split_mid_C_rear34.png",
+    "C_rear": "split_mid_C_rear.png",
+    "C_close_front": "split_mid_C_close_front.png",
+    "C_close_side": "split_mid_C_close_side.png",
+    "C_close_rear34": "split_mid_C_close_rear34.png",
+    "E_front": "split_mid_E_front.png",
+    "E_side": "split_mid_E_side.png",
+    "E_rear34": "split_mid_E_rear34.png",
+    "E_rear": "split_mid_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      59.518,
+      1.663,
+      -45.051
+     ],
+     "CLAV_R": [
+      59.518,
+      1.663,
+      -45.007
+     ],
+     "SCAP_L": [
+      59.68,
+      1.54,
+      -45.158
+     ],
+     "SCAP_R": [
+      59.68,
+      1.54,
+      -44.9
+     ],
+     "UPPERARM_L": [
+      59.596,
+      1.6,
+      -45.265
+     ],
+     "UPPERARM_R": [
+      59.594,
+      1.6,
+      -44.793
+     ],
+     "ARMTWIST_L": [
+      59.594,
+      1.596,
+      -45.275
+     ],
+     "ARMTWIST_R": [
+      59.592,
+      1.597,
+      -44.783
+     ],
+     "FOREARM_L": [
+      59.549,
+      1.523,
+      -45.47
+     ],
+     "FOREARM_R": [
+      59.553,
+      1.524,
+      -44.587
+     ],
+     "HAND_L": [
+      59.444,
+      1.504,
+      -45.663
+     ],
+     "HAND_R": [
+      59.444,
+      1.503,
+      -44.397
+     ],
+     "CHEST": [
+      59.521,
+      1.387,
+      -45.029
+     ],
+     "SPINE": [
+      59.495,
+      1.177,
+      -45.029
+     ],
+     "PELVIS": [
+      59.483,
+      0.966,
+      -45.029
+     ],
+     "HEAD": [
+      59.611,
+      1.897,
+      -45.029
+     ]
+    },
+    "elbowL_axis": 0.441,
+    "elbowR_axis": 0.442,
+    "handL_axis": 0.644,
+    "handR_axis": 0.642,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.223,
+    "shoulder_gap": 0.472,
+    "pose": {
+     "CLAV_L": [
+      -0.08,
+      0,
+      -0.15
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      -0.09
+     ],
+     "UPPERARM_L": [
+      -0.09,
+      0,
+      -0.62
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.02,
+      0
+     ],
+     "FOREARM_L": [
+      -0.17,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.08,
+      0,
+      0.15
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0.09
+     ],
+     "UPPERARM_R": [
+      -0.09,
+      0,
+      0.62
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.02,
+      0
+     ],
+     "FOREARM_R": [
+      -0.17,
+      0,
+      0
+     ],
+     "CHEST": [
+      -0.03,
+      0,
+      0
+     ],
+     "SPINE": [
+      -0.04,
+      0,
+      0
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.37,
+       1.19,
+       -0.03
+      ],
+      "hand": [
+       -0.51,
+       1.03,
+       0.03
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "R": {
+      "elbow": [
+       0.37,
+       1.19,
+       -0.02
+      ],
+      "hand": [
+       0.51,
+       1.03,
+       0.03
+      ],
+      "depthH": 0,
+      "depthE": 0
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -1.57,
+     "pitch": 0.06,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.14,
+     "pitch": 0.05,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.93,
+     "pitch": 0.12,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -4.71,
+     "pitch": 0.08,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.36,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -1.57,
+     "pitch": 0.06,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.49,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.14,
+     "pitch": 0.05,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.55,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.93,
+     "pitch": 0.12,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -4.71,
+     "pitch": 0.08,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -1.57,
+     "pitch": 0.06,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.14,
+     "pitch": 0.05,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.93,
+     "pitch": 0.12,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -4.71,
+     "pitch": 0.08,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.33,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -1.57,
+     "pitch": 0.06,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.48,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.14,
+     "pitch": 0.05,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.55,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.93,
+     "pitch": 0.12,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -4.71,
+     "pitch": 0.08,
+     "root": [
+      59.48,
+      0,
+      -45.03
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  },
+  "split_walk": {
+   "shots": {
+    "A_front": "split_walk_A_front.png",
+    "A_side": "split_walk_A_side.png",
+    "A_rear34": "split_walk_A_rear34.png",
+    "A_rear": "split_walk_A_rear.png",
+    "A_close_front": "split_walk_A_close_front.png",
+    "A_close_side": "split_walk_A_close_side.png",
+    "A_close_rear34": "split_walk_A_close_rear34.png",
+    "B_front": "split_walk_B_front.png",
+    "B_side": "split_walk_B_side.png",
+    "B_rear34": "split_walk_B_rear34.png",
+    "B_rear": "split_walk_B_rear.png",
+    "C_front": "split_walk_C_front.png",
+    "C_side": "split_walk_C_side.png",
+    "C_rear34": "split_walk_C_rear34.png",
+    "C_rear": "split_walk_C_rear.png",
+    "C_close_front": "split_walk_C_close_front.png",
+    "C_close_side": "split_walk_C_close_side.png",
+    "C_close_rear34": "split_walk_C_close_rear34.png",
+    "E_front": "split_walk_E_front.png",
+    "E_side": "split_walk_E_side.png",
+    "E_rear34": "split_walk_E_rear34.png",
+    "E_rear": "split_walk_E_rear.png"
+   },
+   "geo": {
+    "W": {
+     "CLAV_L": [
+      59.388,
+      1.664,
+      -50.088
+     ],
+     "CLAV_R": [
+      59.387,
+      1.666,
+      -50.044
+     ],
+     "SCAP_L": [
+      59.585,
+      1.582,
+      -50.173
+     ],
+     "SCAP_R": [
+      59.579,
+      1.588,
+      -49.947
+     ],
+     "UPPERARM_L": [
+      59.492,
+      1.572,
+      -50.288
+     ],
+     "UPPERARM_R": [
+      59.479,
+      1.582,
+      -49.836
+     ],
+     "ARMTWIST_L": [
+      59.496,
+      1.562,
+      -50.29
+     ],
+     "ARMTWIST_R": [
+      59.475,
+      1.572,
+      -49.833
+     ],
+     "FOREARM_L": [
+      59.572,
+      1.371,
+      -50.345
+     ],
+     "FOREARM_R": [
+      59.407,
+      1.382,
+      -49.768
+     ],
+     "HAND_L": [
+      59.501,
+      1.176,
+      -50.42
+     ],
+     "HAND_R": [
+      59.235,
+      1.265,
+      -49.694
+     ],
+     "CHEST": [
+      59.46,
+      1.399,
+      -50.056
+     ],
+     "SPINE": [
+      59.473,
+      1.188,
+      -50.05
+     ],
+     "PELVIS": [
+      59.483,
+      0.977,
+      -50.038
+     ],
+     "HEAD": [
+      59.415,
+      1.914,
+      -50.074
+     ]
+    },
+    "elbowL_axis": 0.315,
+    "elbowR_axis": 0.289,
+    "handL_axis": 0.376,
+    "handR_axis": 0.421,
+    "upperarm_len_L": 0.224,
+    "upperarm_len_R": 0.223,
+    "shoulder_gap": 0.452,
+    "pose": {
+     "CLAV_L": [
+      0,
+      0,
+      -0.01
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_L": [
+      0.31,
+      0,
+      -0.13
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.01,
+      0
+     ],
+     "FOREARM_L": [
+      -0.51,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      0,
+      0,
+      -0.01
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "UPPERARM_R": [
+      -0.39,
+      0,
+      0.13
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.01,
+      0
+     ],
+     "FOREARM_R": [
+      -0.37,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.02,
+      -0.06,
+      0.01
+     ],
+     "SPINE": [
+      0.01,
+      -0.03,
+      -0.02
+     ]
+    },
+    "clearance_fixes": 0,
+    "arm": {
+     "L": {
+      "elbow": [
+       -0.25,
+       1.15,
+       -0.11
+      ],
+      "hand": [
+       -0.28,
+       0.94,
+       -0.07
+      ],
+      "depthH": 0.21,
+      "depthE": 0.27
+     },
+     "R": {
+      "elbow": [
+       0.25,
+       1.16,
+       0.04
+      ],
+      "hand": [
+       0.28,
+       1,
+       0.19
+      ],
+      "depthH": 0,
+      "depthE": 0.41
+     },
+     "fixes": 0,
+     "ik": null,
+     "endpoint": null
+    }
+   },
+   "cam": {
+    "A_front": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -1.57,
+     "pitch": 0.06,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.14,
+     "pitch": 0.05,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.93,
+     "pitch": 0.12,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "A_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -4.71,
+     "pitch": 0.08,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_front": {
+     "applied": 2.35,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -1.57,
+     "pitch": 0.06,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_side": {
+     "applied": 2.52,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.14,
+     "pitch": 0.05,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear34": {
+     "applied": 2.56,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.93,
+     "pitch": 0.12,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "B_rear": {
+     "applied": 2.58,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -4.71,
+     "pitch": 0.08,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_front": {
+     "applied": 2.59,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -1.57,
+     "pitch": 0.06,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_side": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.14,
+     "pitch": 0.05,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear34": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.93,
+     "pitch": 0.12,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "C_rear": {
+     "applied": 2.6,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -4.71,
+     "pitch": 0.08,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_front": {
+     "applied": 2.31,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -1.57,
+     "pitch": 0.06,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_side": {
+     "applied": 2.47,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.14,
+     "pitch": 0.05,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear34": {
+     "applied": 2.53,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -3.93,
+     "pitch": 0.12,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    },
+    "E_rear": {
+     "applied": 2.56,
+     "dist": 2.6,
+     "obstructed": false,
+     "fade": 1,
+     "yaw": -4.71,
+     "pitch": 0.08,
+     "root": [
+      59.48,
+      0,
+      -50.28
+     ],
+     "grp_vis": true,
+     "grp_scale": 1,
+     "hold": true
+    }
+   }
+  }
+ },
+ "errors": [],
+ "blank_frames": [],
+ "webgl": {
+  "lost": false
+ }
+}

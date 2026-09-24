@@ -1,0 +1,442 @@
+{
+ "export_id": "LEAN_F_V5",
+ "version": "dev_0.5",
+ "sha256": "fc28f78c2712d03e5f48b3f675ed8cd54f4acb33e22ba02937b464cf57c07d10",
+ "owner_review_status": "CANDIDATE",
+ "rig_generator": "make_class_rig_v5.mjs",
+ "rig_chain": "PELVIS>LUMBAR>SPINE>SPINE2>CHEST>NECK>HEAD; CLAV>SCAP>UPPERARM>ARMTWIST; FOREARM>FORETWIST",
+ "glenohumeral": {
+  "L": [
+   -0.14234027574142796,
+   0.768,
+   -0.039428696036338806
+  ],
+  "R": [
+   0.14234027574142796,
+   0.768,
+   -0.03942873328924179
+  ],
+  "cap_apex_L": [
+   -0.1317443996667862,
+   0.805,
+   -0.039428696036338806
+  ],
+  "head_radius_L": 0.026
+ },
+ "v5": {
+  "gh_inward_from_threshold": 0.011,
+  "gh_below_top": 0.037,
+  "hip_h": 0.4575,
+  "hip_x": 0.0568,
+  "hip_z": 0.015,
+  "sc_x": 0.012,
+  "sc_h": 0.8109,
+  "sc_z": 0.027,
+  "scap_x": 0.0618,
+  "scap_z": -0.076
+ },
+ "hip_pivot_h": 0.4575,
+ "knee_h": 0.2747916666666667,
+ "muscles": [
+  {
+   "name": "BICEPS_L",
+   "group": 1,
+   "verts": 32
+  },
+  {
+   "name": "TRICEPS_L",
+   "group": 3,
+   "verts": 36
+  },
+  {
+   "name": "DELTOID_L",
+   "group": 5,
+   "verts": 0
+  },
+  {
+   "name": "PEC_L",
+   "group": 7,
+   "verts": 524
+  },
+  {
+   "name": "LAT_L",
+   "group": 9,
+   "verts": 914
+  },
+  {
+   "name": "FOREARM_L",
+   "group": 13,
+   "verts": 67
+  },
+  {
+   "name": "BICEPS_R",
+   "group": 2,
+   "verts": 36
+  },
+  {
+   "name": "TRICEPS_R",
+   "group": 4,
+   "verts": 38
+  },
+  {
+   "name": "DELTOID_R",
+   "group": 6,
+   "verts": 0
+  },
+  {
+   "name": "PEC_R",
+   "group": 8,
+   "verts": 553
+  },
+  {
+   "name": "LAT_R",
+   "group": 10,
+   "verts": 898
+  },
+  {
+   "name": "FOREARM_R",
+   "group": 14,
+   "verts": 74
+  },
+  {
+   "name": "TRAP",
+   "group": 11,
+   "verts": 591
+  },
+  {
+   "name": "ABS",
+   "group": 15,
+   "verts": 683
+  },
+  {
+   "name": "SH45_L",
+   "group": 0,
+   "verts": 143
+  },
+  {
+   "name": "SH90_L",
+   "group": 0,
+   "verts": 252
+  },
+  {
+   "name": "SH120_L",
+   "group": 0,
+   "verts": 190
+  },
+  {
+   "name": "SH150_L",
+   "group": 0,
+   "verts": 241
+  },
+  {
+   "name": "SH45_R",
+   "group": 0,
+   "verts": 153
+  },
+  {
+   "name": "SH90_R",
+   "group": 0,
+   "verts": 267
+  },
+  {
+   "name": "SH120_R",
+   "group": 0,
+   "verts": 206
+  },
+  {
+   "name": "SH150_R",
+   "group": 0,
+   "verts": 258
+  }
+ ],
+ "muscle_attribute": "_MUSCLE",
+ "preview_status": "DEVELOPMENT_PREVIEW_UNAPPROVED (measured derivative auto-rig v4: v3 + cross-section joints + geodesic surface binding, split legs, face and finger bones over the Tripo source; not a retained or production character)",
+ "source": {
+  "file": "Mah_Lean_F.glb",
+  "sha256": "a03e0142c8a7491355b27b3413a6a9b62f69bbc7a514041e49e17639c42e1469"
+ },
+ "source_release": "isolated derivative of Mah_Lean_F.glb (sha256 a03e0142c8a7491355b27b3413a6a9b62f69bbc7a514041e49e17639c42e1469)",
+ "units": "metres",
+ "up_axis": "+Y",
+ "forward_axis": "-Z",
+ "source_forward_axis": "+Z",
+ "root": "ROOT",
+ "scale_to_metres": 1.83152,
+ "source_height_units": 0.9828,
+ "forms": [
+  "FUSED",
+  "SPLIT"
+ ],
+ "clips": {},
+ "sockets": {
+  "ROOT": "ROOT",
+  "HEAD": "HEAD",
+  "CHEST": "CHEST",
+  "HAND_L": "HAND_L",
+  "HAND_R": "HAND_R",
+  "FEET": "TAIL3",
+  "TIP_FUSED": "TAIL3",
+  "TIP_L": "TIP_L",
+  "TIP_R": "TIP_R"
+ },
+ "split": {
+  "legs_mesh": "LEAN_F_V5_SPLIT_LEGS",
+  "packed_morph": "PACKED",
+  "fused_lower_role": "fused_lower",
+  "upper_role": "upper",
+  "leg_bones": [
+   "THIGH_L",
+   "SHIN_L",
+   "TIP_L",
+   "THIGH_R",
+   "SHIN_R",
+   "TIP_R"
+  ],
+  "leg_centres_x": [
+   -0.0568,
+   0.0568
+  ],
+  "crotch_h": 0.4,
+  "method": "each leg = a closed loft of 49 elliptical rings x 24 segments sized from the fused body sections at every height (x 0.5, z 0.82), dense loops around the measured knee with a patella swell, closed tip point and hip dome, UVs from the nearest fused-body vertex; PACKED delta presses the same topology onto its half of the fused silhouette (no seam plane, manifold)"
+ },
+ "face_controls": "DERIVATIVE_BONES (brow/cheek/jaw), no eyelid or iris geometry",
+ "finger_controls": "FINGERS_L / FINGERS_R single finger-mass bones",
+ "materials": {
+  "LEAN_F_V5_PBR": "base colour 1024² + normal 1024², roughness 0.5, metallic 0"
+ },
+ "textures": {
+  "base_color": "1024x1024 jpeg q0.88 (source)",
+  "normal": "1024x1024 jpeg q0.9 (source)"
+ },
+ "files": [
+  "Mah_LEAN_F_v5.glb"
+ ],
+ "joints": [
+  "ROOT",
+  "PELVIS",
+  "SPINE",
+  "CHEST",
+  "NECK",
+  "HEAD",
+  "CLAV_L",
+  "UPPERARM_L",
+  "FOREARM_L",
+  "HAND_L",
+  "CLAV_R",
+  "UPPERARM_R",
+  "FOREARM_R",
+  "HAND_R",
+  "TAIL1",
+  "TAIL2",
+  "TAIL3",
+  "FINGERS_L",
+  "FINGERS_R",
+  "BROW_L",
+  "BROW_R",
+  "CHEEK_L",
+  "CHEEK_R",
+  "JAW",
+  "LUMBAR",
+  "SPINE2",
+  "SCAP_L",
+  "ARMTWIST_L",
+  "FORETWIST_L",
+  "SCAP_R",
+  "ARMTWIST_R",
+  "FORETWIST_R",
+  "THIGH_L",
+  "SHIN_L",
+  "TIP_L",
+  "THIGH_R",
+  "SHIN_R",
+  "TIP_R"
+ ],
+ "weight_stats": [
+  "ROOT:0",
+  "PELVIS:1338",
+  "SPINE:787",
+  "CHEST:2453",
+  "NECK:1215",
+  "HEAD:557",
+  "CLAV_L:31",
+  "UPPERARM_L:726",
+  "FOREARM_L:62",
+  "HAND_L:688",
+  "CLAV_R:30",
+  "UPPERARM_R:718",
+  "FOREARM_R:68",
+  "HAND_R:648",
+  "TAIL1:1860",
+  "TAIL2:328",
+  "TAIL3:132",
+  "FINGERS_L:1131",
+  "FINGERS_R:1127",
+  "BROW_L:98",
+  "BROW_R:91",
+  "CHEEK_L:377",
+  "CHEEK_R:306",
+  "JAW:761",
+  "LUMBAR:725",
+  "SPINE2:679",
+  "SCAP_L:76",
+  "ARMTWIST_L:1",
+  "FORETWIST_L:8",
+  "SCAP_R:83",
+  "ARMTWIST_R:3",
+  "FORETWIST_R:11",
+  "THIGH_L:0",
+  "SHIN_L:0",
+  "TIP_L:0",
+  "THIGH_R:0",
+  "SHIN_R:0",
+  "TIP_R:0"
+ ],
+ "measurements": {
+  "H": 0.9827880859375,
+  "arm_threshold_x": 0.13134027574142795,
+  "arm_threshold_method": "density_minimum_inward_from_arm_mass",
+  "shoulder_y": 0.755,
+  "shoulder_half_width": 0.1317443996667862,
+  "torso_half_width_chest": 0.1278991848230362,
+  "chest_half_width_median": 0.06443024426698685,
+  "neck_y": 0.845,
+  "neck_radius": 0.029815457198238603,
+  "head_half_width": 0.052890799939632416,
+  "head_top": 1,
+  "arm_L": {
+   "shoulder_joint_h": 0.755,
+   "shoulder_source": "shoulder_girdle_band",
+   "deltoid_h": 0.6976843715066452,
+   "elbow_h": 0.6184654949695689,
+   "elbow_source": "proportional_station",
+   "elbow_station_h": 0.6184654949695689,
+   "forearm_bulge_h": null,
+   "wrist_h": 0.5259793659172773,
+   "wrist_source": "measured_narrowing",
+   "hand_bulge_h": 0.4401268631225934,
+   "fingertip_h": 0.3757374860265805
+  },
+  "legs_measured": {
+   "hip_h": 0.4,
+   "hip_source": "crotch parameter (the fused body has no crotch; the split line is authored)",
+   "knee_h": 0.2747916666666667,
+   "knee_source": "measured_narrowing",
+   "knee_radius": 0.036276212678838855,
+   "calf_bulge_h": 0.19645833333333335,
+   "tip_h": 0
+  },
+  "spine_chain_h": {
+   "PELVIS": 0.42500000000000004,
+   "SPINE": 0.5475000000000001,
+   "CHEST": 0.67,
+   "NECK": 0.845,
+   "TAIL1": 0.33739583333333334,
+   "TAIL2": 0.13739583333333336,
+   "TAIL3": 0.019999999999999997
+  },
+  "landmarks_source_units": {
+   "PELVIS": [
+    0,
+    0.4176849365234375,
+    0
+   ],
+   "SPINE": [
+    0,
+    0.5380764770507813,
+    0
+   ],
+   "CHEST": [
+    0,
+    0.658468017578125,
+    0
+   ],
+   "NECK": [
+    0,
+    0.8304559326171874,
+    0
+   ],
+   "HEAD": [
+    0,
+    0.9066220092773437,
+    0
+   ],
+   "UPPERARM_L": [
+    -0.14234027574142796,
+    0.7547812500000001,
+    -0.039428696036338806
+   ],
+   "FOREARM_L": [
+    -0.142850796753001,
+    0.6078205200195311,
+    -0.03191360657616893
+   ],
+   "HAND_L": [
+    -0.16477007184709822,
+    0.516926254272461,
+    -0.008984309428238442
+   ],
+   "FINGERS_L": [
+    -0.16662399354830104,
+    0.4009108810424804,
+    0.01219737929039973
+   ],
+   "BROW_L": [
+    -0.018511779978871344,
+    0.9287347412109375,
+    0.06250761449337006
+   ],
+   "CHEEK_L": [
+    -0.021156319975852968,
+    0.8992510986328125,
+    0.05673598498106003
+   ],
+   "JAW": [
+    0,
+    0.8697674560546875,
+    0.05443022936582565
+   ],
+   "THIGH_L": [
+    -0.0568,
+    0.44962554931640625,
+    0.015
+   ],
+   "TIP_L": [
+    -0.0568,
+    0.029483642578125,
+    -0.0040158583715942464
+   ]
+  },
+  "arm_verts": {
+   "L": 2090,
+   "R": 2047
+  },
+  "tris": {
+   "upper": 11986,
+   "fused_lower": 2228,
+   "legs": 4704
+  },
+  "legs": {
+   "L": {
+    "verts": 1178,
+    "rings": 49,
+    "cx": -0.0568
+   },
+   "R": {
+    "verts": 1178,
+    "rings": 49,
+    "cx": 0.0568
+   },
+   "tris": 4704,
+   "segments": 24
+  }
+ },
+ "limitations": [
+  "derivative auto-rig: joint placement measured from cross-sections, smooth distance weights (not hand-painted); shoulder / elbow / groin can pinch at extreme angles",
+  "split legs are an engineering approximation: each pointed limb = the narrowed outer half of the fused lower body plus its mirror (texture mirrors on the inner face), capped; the pelvis underside is capped flat",
+  "PACKED morph carries positions only (normals are the separated-form normals)",
+  "face bones deform a Tripo head with no eyelid, iris or mouth-interior geometry — expressions are crude and stated as such",
+  "finger mass is one bone per hand (curl only)",
+  "textures resampled in the browser canvas, not mip-aware"
+ ],
+ "generated": "2026-09-16T18:50:01.596Z"
+}

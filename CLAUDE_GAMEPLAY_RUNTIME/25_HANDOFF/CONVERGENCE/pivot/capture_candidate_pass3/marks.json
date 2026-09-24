@@ -1,0 +1,55 @@
+{
+ "marks": [
+  {
+   "t": 0,
+   "label": "1 · IDLE"
+  },
+  {
+   "t": 3.02,
+   "label": "2 · TURN"
+  },
+  {
+   "t": 6.05,
+   "label": "3 · SHORT WALK"
+  },
+  {
+   "t": 8.56,
+   "label": "4 · STOP → SETTLE"
+  },
+  {
+   "t": 11.58,
+   "label": "5 · MANUAL ORBIT (mouse drag)"
+  },
+  {
+   "t": 13.91,
+   "label": "6 · RELEASE"
+  },
+  {
+   "t": 18.49,
+   "label": "7 · EXPLICIT RESET (Backspace)"
+  },
+  {
+   "t": 21.05,
+   "label": "8 · OBSTACLE RECOVERY"
+  },
+  {
+   "t": 59.02,
+   "label": "8b · WALK CLEAR"
+  },
+  {
+   "t": 63.24,
+   "label": "9 · BRIEF FLIGHT (Space held) → HOLD → LAND (F)"
+  },
+  {
+   "t": 74.16,
+   "label": "END"
+  }
+ ],
+ "frames": 2271,
+ "seconds": 75.6,
+ "build": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "viewport": [
+  1120,
+  700
+ ]
+}

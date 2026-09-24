@@ -1,0 +1,236 @@
+{
+ "class_height_m": { "_doc": "owner B8 §7 (2026-09-20): canonical rendered class heights. Every preview body is normalised to 1.800 m by its manifest scale_to_metres; TITAN = ATHLETE + 0.3048 m (one real-world foot) at the character ROOT (the whole physique scales, never a neck / leg stretch). GlbCharacter applies height / 1.8 to the body root; the adapter scales the overhead label / LV-HP / bar heights by the same factor; the target proxy is the body itself. Collision in the field rules is a radius (no height term), so nothing changes there.", "natural_m": 1.8, "ATHLETE": 1.8, "TITAN": 2.1048, "LEAN": 1.8, "VISIONARY": 1.8, "BAGE": 1.8 },
+ "_doc": "MAHWORLD presentation defaults (2026-09-15 master prompt). Artistic, adjustable settings for this fictional anatomy â€” never combat rules, never physics, never costs. ONE canonical file: every presentation module (RigAnimator, BeamFx, fieldSound, animData, gameHud emote radial) reads from here; nothing scatters these numbers in code.",
+ "presentation": {
+  "interp_delay_s": 0.12,
+  "_doc": "PASS 5: every character root renders this far behind the estimated host clock by interpolating between the two bracketing host snapshots (20 Hz ticks, ~60 ms polls) - a constant host speed becomes a constant displayed speed (the exponential filter it replaces left a +/-10 % ripple and ~80 ms of lag). 0 = the old filter."
+ },
+ "alive": {
+  "breath_cycle_s": [
+   4,
+   6
+  ],
+  "blink_interval_s": [
+   3,
+   7
+  ],
+  "blink_close_s": 0.07,
+  "blink_open_s": 0.11,
+  "idle_adjust_interval_s": [
+   14,
+   30
+  ],
+  "gaze_interval_s": [
+   2.5,
+   7
+  ],
+  "gaze_small_rad": 0.1,
+  "gaze_large_rad": 0.24,
+  "blend_short_s": [
+   0.1,
+   0.18
+  ],
+  "calm_rise_per_s": 1.2,
+  "calm_drop_per_s": 3
+ },
+ "gait": {
+  "distance_per_full_cycle_m": 3.6,
+  "stride_speed_ref_mps": 3,
+  "swing_lift_m": 0.1,
+  "pelvis_rot_rad": 0.14,
+  "counter_rot_rad": 0.11,
+  "shoulder_sway_rad": 0.06,
+  "arm_swing_rad": 0.42,
+  "step_settle_s": 0.25,
+  "support_pulse_s": 0.22,
+  "swing_max_rad": 0.82,
+  "knee_swing_rad": 0.95,
+  "pelvis_roll_rad": 0.07,
+  "support_drift": 0.45,
+  "support_hold_behind_m": 0.16,
+  "support_reach_frac": 0.86,
+  "_doc_support": "PASS 5 (Spec E): support_drift = how fast the held support point moves back relative to the pelvis as a fraction of travel (0.45 = the owner's hover thrust, the tip drifts with the body; 1.0 = a world-fixed plant, foot slide → 0); support_hold_behind_m = how far behind the hip the hold releases (a plant needs ~0.5 so it lasts the whole support pulse). These three drive ONLY the rollback path (plant = false).",
+  "plant": true,
+  "plant_reach_frac": 0.995,
+  "plant_hold_behind_m": 0.42,
+  "plant_release_s": 0.08,
+  "plant_engage_s": 0.04,
+  "plant_min_speed_mps": 0.4,
+  "_doc_plant": "G37 repair (declared pointed contact): plant = the support hold is a WORLD-FIXED point — captured at the support event from the tip's pointed end as written that frame, held by a 3D two-bone IK in the pelvis frame written after the rate filter, released (plant_release_s blend) once the point passes plant_hold_behind_m behind the hip or leaves the leg's reach (plant_reach_frac of thigh + shin + tip_ext). The tip still hovers (owner motion master B: no floor strike); the contact interval = the hold; the measured point = the pointed end. false = the PASS 5 pelvis-frame drifting hold (42.8 cm), kept for A/B."
+ },
+ "fused_travel": {
+  "incline_rad": [
+   0.05,
+   0.12
+  ],
+  "stop_counter_rad": 0.08,
+  "settle_s": 0.35
+ },
+ "flight": {
+  "incline_rad": [
+   0.14,
+   0.26
+  ],
+  "bank_rad": 0.18,
+  "brake_settle_s": 0.4,
+  "speed_ref_mps": 8,
+  "lean": {
+   "_doc": "owner interjection 2026-09-18 §7: ONE centralized lean curve driven continuously by the REAL displayed horizontal speed, normalized by the form's CRUISE speed from the host (play.flight.cruise_mps = canonical band top x air_speed_factor: SPLIT 7.71 m/s, FUSED 20.56 m/s): x = speed / cruise -> degrees of whole-body inclination (piecewise linear). Hover x 0 -> 6 deg; normal forward flight x 1 -> 24 deg; BOOST (`+` in flight, x = boost_factor 1.3) -> 40 deg = the Hinge-inspired forward commitment (the pelvis leads the lean, the arms sweep back and out, the legs / taper trail in line). One curve for both forms because the commitment is about the travel state, not absolute m/s. The camera never reads this.",
+   "curve_x_deg": [
+    [
+     0,
+     6
+    ],
+    [
+     1,
+     24
+    ],
+    [
+     1.3,
+     40
+    ]
+   ],
+   "cruise_mps_fallback": {
+    "FUSED": 20.56,
+    "SPLIT": 7.71,
+    "_doc": "used only for figures whose view carries no host cruise_mps (remote players, rules combatants); derived from the canonical bands x 1.15"
+   },
+   "distribution_cruise": {
+    "PELVIS": 0.45,
+    "SPINE": 0.3,
+    "CHEST": 0.15,
+    "TAIL1": 0.1
+   },
+   "distribution_boost": {
+    "PELVIS": 0.58,
+    "SPINE": 0.22,
+    "CHEST": 0.1,
+    "TAIL1": 0.1
+   },
+   "arm_trail_rad": [
+    0.3,
+    0.7
+   ],
+   "arm_open_rad": 0.16,
+   "leg_trail_rad": 0.55,
+   "knee_shape_rad": 0.34,
+   "tail2_rad": [
+    0.06,
+    0.24
+   ],
+   "head_counter": 0.55,
+   "_previous": "before phase D: flight_lean_deg [8, 18] over speed / 8 m/s (rig_profile travel_posture), no flight boost on the host, arm trail 15 deg + 20 deg x fs, leg trail 0.42 x fs with the wrong sign (hip flexion), TAIL2 -0.10 x (0.5 + fs)",
+   "_arm_note": "the sweep-back is capped by the declared shoulder table (rig_profile UPPERARM_x <= 0.70 rad = 40 deg of extension; the soft zone from 0.60 compresses the authored 0.70 to about 0.56 on the bones): the full anatomical sweep, never past it"
+  },
+  "brake": {
+   "_doc": "owner next-pass 2026-09-20 §2 FULL-SPEED FLIGHT BRAKE: when the input releases at ≥ trigger_x of the cruise speed (x = speed / cruise, boost = 1.3) the body absorbs the inertia in one restrained transition — the fused lower body / taper sweeps slightly FORWARD as one connected mass under the torso (pelvis + tail), the torso counter-angles back a little, the head stays level, the arms come forward a touch, shoulders controlled — then settles into the hover pose with no oscillation (critically damped, one envelope: rise → hold → settle ≈ 0.42 s). Low-speed stops (x < trigger_x) never trigger it. Radians / seconds.",
+   "trigger_x": 0.7,
+   "min_decel_mps2": 6,
+   "rise_s": 0.12,
+   "hold_s": 0.08,
+   "settle_s": 0.22,
+   "pelvis_rad": 0.34,
+   "tail1_rad": 0.16,
+   "tail2_rad": 0.1,
+   "thigh_rad": 0.22,
+   "spine_rad": 0.08,
+   "chest_rad": 0.05,
+   "head_rad": 0.06,
+   "arm_rad": 0.16,
+   "retrigger_x": 0.5
+  }
+ },
+ "dash": {
+  "torso_lean_rad": 0.06,
+  "lead_hand_chin": true,
+  "blend_s": 0.06
+ },
+ "beams": {
+  "fused_idle": 1,
+  "fused_travel": 1.25,
+  "fused_brace": 1.5,
+  "split_baseline": 0.3,
+  "split_step_peak": [
+   0.5,
+   0.65
+  ],
+  "split_swing_residual": 0.12,
+  "core_radius_m": 0.012,
+  "halo_radius_m": 0.05,
+  "ground_glint_m": 0.22,
+  "altitude_fade_m": [
+   1.5,
+   6
+  ],
+  "airborne_trail_m": 0.6
+ },
+ "audio": {
+  "fused_hover_gain": 0.1,
+  "split_support_gain": 0.06,
+  "step_pulse_gain": 0.18,
+  "airborne_gain": 0.09,
+  "max_voices": 8,
+  "fade_s": 0.12
+ },
+ "face": {
+  "expression_blend_s": 0.18,
+  "wince_s": 0.45,
+  "smile_max": 0.7,
+  "brow_max_rad": 0.1,
+  "jaw_max_rad": 0.12,
+  "cheek_max": 0.6
+ },
+ "emotes": {
+  "favorites_default": [
+   "WAVE",
+   "NOD",
+   "APPLAUD",
+   "THUMBS_UP",
+   "MAH_GROOVE",
+   "DOUBLE_BICEPS"
+  ],
+  "long_press_ms": 450,
+  "radial_radius_px": 96,
+  "cancel_radius_px": 30,
+  "reply_cooldown_s": [
+   4,
+   9
+  ],
+  "invite_range_m": 3
+ },
+ "npc": {
+  "wander_radius_m": 2.5,
+  "wander_interval_s": [
+   6,
+   14
+  ],
+  "gaze_interval_s": [
+   3,
+   8
+  ],
+  "reply_chance": 0.7,
+  "far_update_hz": 15,
+  "far_distance_m": 18
+ },
+ "hinge": {
+  "_doc": "owner JOB A directive 2026-09-19 (supersedes the 2026-09-18 OWNER DECISION note): the RDL / Hinge loads with the femur angled ~45° (0.785 rad forward-down in the world = the hips pushed BACK behind the knees), hips back, shins vertical (knee flexion = femur), a long neutral spine inclined at the hips (torso_rad), eyes forward, the straight arms hanging plumb so the hands reach BELOW the knees, the MAHGIC hurled from the hip drive. Rig signs (measured 2026-09-19): PELVIS + = forward pitch (carries the legs and the taper back), THIGH + = hip EXTENSION (flexion negative), SHIN + = knee flexion, UPPERARM + = arm back. torso 0.70 + femur 0.785 = 1.485 rad of hip flexion: the hip table is relaxed to 90° trunk-to-thigh for this (rig_profile limits_inside_deg.hip_flexion.min 90, THIGH_x −1.57). RELEASE: the hip drive to a tall lockout, the straight arms swing to CHEST height (never overhead), the MAHGIC leaves from the hip drive. Radians.",
+  "torso_rad": 0.8,
+  "femur_rad": 0.6,
+  "spine_neutral_rad": 0.05,
+  "arm_hang_rad": 0.85,
+  "release_arm_rad": -1.25,
+  "airborne": {
+   "_doc": "in the air there is no floor to load against: a pike (the pelvis pitches, the legs fold forward under the body), then the hip drive snaps the legs back and the torso up - nothing fakes floor support",
+   "pike_pelvis_rad": 0.55,
+   "pike_thigh_flex_rad": 0.95
+  },
+  "torso_fused_rad": 0.66,
+  "_fused_note": "torso_fused_rad: the FUSED form has no legs to hinge over — its trunk-only hinge keeps the 2026-09-18 incline (0.66) so the hip drive / arm swing timing of the fused release is unchanged; the split RDL uses torso_rad + femur_rad",
+  "arm_hang_fused_rad": 0.6
+ },
+ "barrage": {
+  "_doc": "owner interjection 2026-09-18 §12: the eight alternating curls are timed to the HOST strike schedule — strikes start after the approach (0.18 s of the 1.15 s recovery = approach_fraction) and span 8 × 0.11 s (strike_fraction of the recovery); the animator derives the striking arm from the cast progress",
+  "approach_fraction": 0.157,
+  "strike_fraction": 0.765
+ }
+}

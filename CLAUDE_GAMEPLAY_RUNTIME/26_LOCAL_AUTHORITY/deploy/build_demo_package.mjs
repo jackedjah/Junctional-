@@ -1,0 +1,29 @@
+/* MAHWORLD :: HOSTED DEMO PACKAGE BUILDER (development)
+   Assembles a self-contained, secret-free deployment folder for the password-protected demo, mirroring the project layout the runtime
+   resolves at boot (the runtime imports its sibling foundations by relative path):
+     deploy/dist/CLAUDE_GAMEPLAY_RUNTIME/      runtime modules + local authority + lab view + isolated character preview
+     deploy/dist/CLAUDE_RUNTIME_FOUNDATION/    contracts / loader / animation controller (JSON + JS only)
+     deploy/dist/CLAUDE_GAMEPLAY_FOUNDATION/   canonical tunables (JSON only)
+     deploy/dist/CLAUDE_DUAL_LOCOMOTION/       mahloco runtime design (JS + JSON)
+     deploy/dist/vendor/three/                 vendored three.js 0.185.1 + the three human-approved addons (read-only copies)
+   Excluded everywhere: tests, evidence, checkpoints, DEV_DATA_ONLY stores, reports (.md), python, images, zips, logs, sqlite files, .env,
+   anything whose name contains "secret" or "password", and every folder outside these four (Astra, models). The password is NEVER part of
+   the artifact: the host reads MAHWORLD_DEMO_PASSWORD from its environment. Run from CLAUDE_GAMEPLAY_RUNTIME:
+       node 26_LOCAL_AUTHORITY/deploy/build_demo_package.mjs */
+import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto'; import { fileURLToPath } from 'node:url';
+var HERE = path.dirname(fileURLToPath(import.meta.url)); var RUNTIME = path.resolve(HERE, '..', '..'); var PROJECT = path.resolve(RUNTIME, '..'); var OUT = path.join(HERE, 'dist'); var THREE_DIR = process.env.MAHWORLD_THREE_DIR || 'C:/Users/jahsu/Documents/Codex/2026-09-06/mrs-mah/implementation/mrmah3d/vendor/three';
+var EXCLUDE = /(^|[\\/])(evidence|checkpoints|DEV_DATA_ONLY|node_modules|dist|packet|deploy|16_TESTS|14_TESTS|15_SIMULATOR|17_HANDOFF|24_TEST_SCENARIOS|25_HANDOFF|HISTORY|ROLLBACK)([\\/]|$)|\.(md|test\.mjs|py|png|jpg|zip|log|sqlite|sqlite-[a-z]+|env|pem|key|blend|glb|cmd|txt)$|secret|password/i;
+var KEEP_GLB = /athlete_m_preview[\\/](dev_0\.1[\\/]Mah_Athlete_M_preview|dev_0\.3[\\/]Mah_Athlete_M_rigged_mobile|dev_0\.4[\\/]Mah_Athlete_M_am08_rigged|dev_0\.5[\\/]Mah_Athlete_M_am08_v2)\.glb$|(titan_m|bage_f|lean_f)_preview[\\/]dev_0\.1[\\/]Mah_[A-Za-z_]+_rigged\.glb$/;   /* the demo ships the rigid preview, the mobile / AM08 / v2 Athlete builds and the three NPC class bodies; the 12 MB 8K dev_0.2 stays local */
+function copyDir(src, dst, filter) { if (!fs.existsSync(src)) return 0; var n = 0; fs.mkdirSync(dst, { recursive: true }); fs.readdirSync(src, { withFileTypes: true }).forEach(function (d) { var s = path.join(src, d.name), t = path.join(dst, d.name); if (d.isDirectory()) { if (EXCLUDE.test(s)) return; n += copyDir(s, t, filter); } else { if ((EXCLUDE.test(s) && !KEEP_GLB.test(s)) || (filter && !filter(s))) return; fs.copyFileSync(s, t); n++; } }); return n; }
+fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true }); var total = 0;
+total += copyDir(RUNTIME, path.join(OUT, 'CLAUDE_GAMEPLAY_RUNTIME'), function (f) { return !/make_athlete_m_preview\.mjs$|build_demo_package\.mjs$|Dockerfile$/.test(f); });
+total += copyDir(path.join(PROJECT, 'CLAUDE_RUNTIME_FOUNDATION'), path.join(OUT, 'CLAUDE_RUNTIME_FOUNDATION'), function (f) { return /\.(js|mjs|json)$/.test(f); });
+total += copyDir(path.join(PROJECT, 'CLAUDE_GAMEPLAY_FOUNDATION'), path.join(OUT, 'CLAUDE_GAMEPLAY_FOUNDATION'), function (f) { return /\.json$/.test(f); });
+total += copyDir(path.join(PROJECT, 'CLAUDE_DUAL_LOCOMOTION', '15_RUNTIME_DESIGN'), path.join(OUT, 'CLAUDE_DUAL_LOCOMOTION', '15_RUNTIME_DESIGN'), function (f) { return /\.(js|mjs|json)$/.test(f); });   /* only the runtime design (the rest of that folder is renders / blends) */
+var V = path.join(OUT, 'vendor', 'three'); fs.mkdirSync(V, { recursive: true }); ['three.module.min.js', 'three.core.min.js', 'GLTFLoader.js', 'BufferGeometryUtils.js', 'SkeletonUtils.js', 'LICENSE'].forEach(function (f) { var s = path.join(THREE_DIR, f); if (fs.existsSync(s)) { fs.copyFileSync(s, path.join(V, f)); total++; } });
+/* private-content scan of the artifact (paths under the owner's profile, private LAN addresses, inline passwords) */
+var leaks = []; (function scan(dir) { fs.readdirSync(dir, { withFileTypes: true }).forEach(function (d) { var p = path.join(dir, d.name); if (d.isDirectory()) return scan(p); if (/\.(js|mjs|json|html)$/i.test(d.name)) { var txt = fs.readFileSync(p, 'utf8'); if (/MAHWORLD_DEMO_PASSWORD\s*=\s*['"][^'"<]+['"]|192\.168\.\d+\.\d+/i.test(txt)) leaks.push(path.relative(OUT, p)); } }); })(OUT);
+var size = 0; (function sum(dir) { fs.readdirSync(dir, { withFileTypes: true }).forEach(function (d) { var p = path.join(dir, d.name); if (d.isDirectory()) return sum(p); size += fs.statSync(p).size; }); })(OUT);
+var manifest = { built: new Date().toISOString(), files: total, bytes: size, sha256_of_server: crypto.createHash('sha256').update(fs.readFileSync(path.join(OUT, 'CLAUDE_GAMEPLAY_RUNTIME', '26_LOCAL_AUTHORITY', 'lab_host_server.mjs'))).digest('hex'), start: 'cd CLAUDE_GAMEPLAY_RUNTIME && MAHWORLD_DEMO_PASSWORD=<secret> MAHWORLD_THREE_DIR=../vendor/three node 26_LOCAL_AUTHORITY/lab_host_server.mjs 8080 --memory --field --demo --base-path /mahworld', notes: ['password only from the environment', 'memory store: demo progress resets on restart (recovery-held policy untouched; no persistent store in the demo)', 'dev endpoints absent in demo mode', 'serve behind HTTPS (DEMO_SECURE=1 or an x-forwarded-proto: https proxy header)'], private_content_scan: leaks.length ? leaks : 'clean' };
+fs.writeFileSync(path.join(OUT, 'DEMO_PACKAGE_MANIFEST.json'), JSON.stringify(manifest, null, 1) + '\n');
+console.log('demo package: ' + total + ' files, ' + (size / 1048576).toFixed(1) + ' MB → ' + OUT + (leaks.length ? '\nPRIVATE CONTENT FOUND: ' + leaks.join(', ') : '\nprivate-content scan: clean'));

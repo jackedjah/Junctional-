@@ -1,0 +1,306 @@
+{
+ "shots": [
+  {
+   "name": "00_plan_hub_and_spokes",
+   "calls": 552,
+   "tris": 744650
+  },
+  {
+   "name": "01_overview_sw",
+   "calls": 560,
+   "tris": 760326
+  },
+  {
+   "name": "02_nexus_four_truthful_facades",
+   "calls": 458,
+   "tris": 747075
+  },
+  {
+   "name": "10_athlete_temple_crown",
+   "calls": 207,
+   "tris": 627773
+  },
+  {
+   "name": "11_athlete_forecourt_skirt",
+   "calls": 196,
+   "tris": 609353
+  },
+  {
+   "name": "12_athlete_crown_high",
+   "calls": 212,
+   "tris": 609433
+  },
+  {
+   "name": "20_titan_gate",
+   "calls": 182,
+   "tris": 496183
+  },
+  {
+   "name": "21_titan_tower_crown",
+   "calls": 162,
+   "tris": 487183
+  },
+  {
+   "name": "22_titan_lake_meadow",
+   "calls": 160,
+   "tris": 524289
+  },
+  {
+   "name": "23_titan_ledge",
+   "calls": 146,
+   "tris": 505795
+  },
+  {
+   "name": "30_lean_spire_house",
+   "calls": 146,
+   "tris": 531169
+  },
+  {
+   "name": "31_lean_top_platform",
+   "calls": 147,
+   "tris": 513643
+  },
+  {
+   "name": "32_lean_ground_skirt",
+   "calls": 134,
+   "tris": 508911
+  },
+  {
+   "name": "40_visionary_overlook",
+   "calls": 154,
+   "tris": 707229
+  },
+  {
+   "name": "41_visionary_platform_core",
+   "calls": 143,
+   "tris": 589451
+  },
+  {
+   "name": "42_visionary_pool",
+   "calls": 172,
+   "tris": 819313
+  },
+  {
+   "name": "50_bage_market_entrance",
+   "calls": 172,
+   "tris": 495477
+  },
+  {
+   "name": "51_bage_basin_west_ring",
+   "calls": 191,
+   "tris": 548319
+  },
+  {
+   "name": "52_bage_from_north_high",
+   "calls": 215,
+   "tris": 675569
+  },
+  {
+   "name": "53_bage_ordered_garden_pack",
+   "calls": 203,
+   "tris": 740549
+  },
+  {
+   "name": "60_gym_forecourt_spur",
+   "calls": 148,
+   "tris": 497639
+  },
+  {
+   "name": "61_gym_entrance_frame",
+   "calls": 141,
+   "tris": 489741
+  },
+  {
+   "name": "62_main_bridge_link",
+   "calls": 184,
+   "tris": 585681
+  },
+  {
+   "name": "63_west_bridge_link",
+   "calls": 204,
+   "tris": 904017
+  },
+  {
+   "name": "64_east_bridge_link",
+   "calls": 201,
+   "tris": 892599
+  },
+  {
+   "name": "65_civic_training_shell",
+   "calls": 72,
+   "tris": 27650
+  },
+  {
+   "name": "70_match_hall_ring",
+   "calls": 150,
+   "tris": 441135
+  },
+  {
+   "name": "80_meadow_close_gold",
+   "calls": 153,
+   "tris": 620987
+  },
+  {
+   "name": "81_meadow_close_purple",
+   "calls": 148,
+   "tris": 813943
+  },
+  {
+   "name": "90_map",
+   "calls": 322,
+   "tris": 472873
+  }
+ ],
+ "errors": [],
+ "notes": [],
+ "console_errors": [],
+ "world_status": "READY",
+ "build": null,
+ "civic_entry": {
+  "command_id": "play-PLAYER_A-fkyruf-1",
+  "seq": 1,
+  "accepted": true,
+  "version": 1527,
+  "tick": 1497,
+  "duplicate": false,
+  "room": "CIVIC_TRAINING_HALL",
+  "spawn": {
+   "x": 0,
+   "z": 7
+  },
+  "facing": 0,
+  "interior": true,
+  "returned_to_door": null,
+  "prompt": "PLAZA"
+ },
+ "civic_exit": {
+  "command_id": "play-PLAYER_A-fkyruf-2",
+  "seq": 2,
+  "accepted": true,
+  "version": 1569,
+  "tick": 1537,
+  "duplicate": false,
+  "room": "FIELD",
+  "spawn": {
+   "x": -17,
+   "z": 0
+  },
+  "facing": 1.5708,
+  "interior": false,
+  "returned_to_door": "CIVIC_TRAINING_DOOR",
+  "prompt": "PLAZA"
+ },
+ "modules": {
+  "architecture": {
+   "landmarks": 5,
+   "houses": 5,
+   "skirt_shards": 141,
+   "seams": 25,
+   "bands": 336,
+   "insets": 30,
+   "crowns": 9,
+   "entrance_diamonds": 20,
+   "roof_diamonds": 20,
+   "draw_calls": 43,
+   "tris": 12220,
+   "night": true,
+   "motion_far_m": 220
+  },
+  "meadow": {
+   "chunks": 90,
+   "instances": 17133,
+   "visible_chunks": 23,
+   "draw_calls": 23,
+   "tris_visible_max": 137064,
+   "near_m": 70,
+   "mid_m": 130,
+   "night": true,
+   "cfg": {
+    "_doc": "owner next-pass 2026-09-20 §10 CRYSTAL MEADOW = the MAHWORLD grassland: many small multifaceted forms in the region family, varied height, controlled highlights, slight translucency, never a mirror; NEAR = instanced geometry (chunks of 30 m, frustum + distance culled), MID = the same chunks at half density, FAR = the region tint sheet; a subtle shimmer by instance hash, never constant sparkle",
+    "density_per_m2": 0.7,
+    "chunk_m": 30,
+    "near_m": 70,
+    "mid_m": 130,
+    "h_m": [
+     0.07,
+     0.36
+    ],
+    "r_m": [
+     0.045,
+     0.13
+    ],
+    "max_instances": 64000,
+    "opacity": 0.86,
+    "shimmer": 0.05
+   }
+  },
+  "terrain": {
+   "regions": 8,
+   "terraces": 4,
+   "forecourts": 5,
+   "spurs": 5,
+   "tint_sheets": 1,
+   "tint_cells": 1111,
+   "tint_overlaps_prevented": 32,
+   "tint_policy": "SINGLE_OWNER_FIELD_GRID",
+   "paths": {
+    "CAUSEWAY": 6,
+    "REGIONAL": 13,
+    "TRAIL": 12
+   },
+   "shards": 452,
+   "dust": 2661,
+   "monoliths": 18,
+   "draw_calls": 10,
+   "tris": 8606,
+   "night": true
+  },
+  "forest": {
+   "tree_lock": true,
+   "zone_family": {
+    "FOREST_W": "purple",
+    "FOREST_NW": "red",
+    "FOREST_NE": "blue",
+    "FOREST_N_W": "red",
+    "FOREST_N_E": "gold",
+    "BAGE_GARDEN_W": "pink",
+    "BAGE_GARDEN_E": "pink"
+   },
+   "trees": 121,
+   "lod_counts": {
+    "L0": 7,
+    "L1": 16,
+    "IMPOSTOR": 98
+   },
+   "impostor": true,
+   "draw_calls": 4,
+   "lod_m": {
+    "near": 26,
+    "mid": 60
+   },
+   "height_m": [
+    9.27,
+    14.73
+   ],
+   "underbrush": 121,
+   "night": true,
+   "skipped": null
+  },
+  "water": {
+   "rivers": 5,
+   "drawCalls": 18
+  },
+  "creatures": {
+   "count": 10,
+   "active": 10
+  }
+ },
+ "phone_nav": {
+  "reached": true,
+  "passes": 1
+ },
+ "phone": {
+  "calls": 119,
+  "tris": 308278
+ }
+}

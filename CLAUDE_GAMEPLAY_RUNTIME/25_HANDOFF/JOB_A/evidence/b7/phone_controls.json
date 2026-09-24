@@ -1,0 +1,243 @@
+{
+ "touch": "EMULATED (never iPhone acceptance)",
+ "checks": [
+  {
+   "id": "1. elements: ONE FLY control, SEPARATE/FUSE in the corner, MAH GUIDE toggle, category arrows; NO DOWN / LAND / DASH / generic ATTACK",
+   "pass": true,
+   "detail": {
+    "desc": false,
+    "land": false,
+    "flyaux": false,
+    "dash": false,
+    "form": true,
+    "fly": true,
+    "guide": true,
+    "catlbl": true,
+    "prev": true,
+    "next": true,
+    "attack": false
+   }
+  },
+  {
+   "id": "2. FLY hold = take off and climb; release = hold the attained altitude (powered, vz ≈ 0, altitude kept)",
+   "pass": true,
+   "detail": {
+    "hold": {
+     "powered": true,
+     "alt": 6.53,
+     "intent": 1,
+     "exiting": false,
+     "landed": 0,
+     "form": "FUSED",
+     "mode": "PHYSICAL",
+     "cast": 0
+    },
+    "release": {
+     "powered": true,
+     "alt": 8.22,
+     "intent": 0,
+     "exiting": false,
+     "landed": 0,
+     "form": "FUSED",
+     "mode": "PHYSICAL",
+     "cast": 0
+    }
+   }
+  },
+  {
+   "id": "2b. altitude holds after release (no drift)",
+   "pass": true,
+   "detail": {
+    "a": {
+     "powered": true,
+     "alt": 8.22,
+     "intent": 0,
+     "exiting": false,
+     "landed": 0,
+     "form": "FUSED",
+     "mode": "PHYSICAL",
+     "cast": 0
+    },
+    "b": {
+     "powered": true,
+     "alt": 8.23,
+     "intent": 0,
+     "exiting": false,
+     "landed": 0,
+     "form": "FUSED",
+     "mode": "PHYSICAL",
+     "cast": 0
+    }
+   }
+  },
+  {
+   "id": "3. FLY tap while hovering = DESCEND (intent −1, altitude falling)",
+   "pass": true,
+   "detail": {
+    "tap": {
+     "powered": true,
+     "alt": 5.65,
+     "intent": -1,
+     "exiting": false,
+     "landed": 0,
+     "form": "FUSED",
+     "mode": "PHYSICAL",
+     "cast": 0
+    },
+    "before": {
+     "powered": true,
+     "alt": 8.23,
+     "intent": 0,
+     "exiting": false,
+     "landed": 0,
+     "form": "FUSED",
+     "mode": "PHYSICAL",
+     "cast": 0
+    }
+   }
+  },
+  {
+   "id": "4. FLY tap while descending = stop and hold",
+   "pass": true,
+   "detail": {
+    "powered": true,
+    "alt": 1.51,
+    "intent": 0,
+    "exiting": false,
+    "landed": 0,
+    "form": "FUSED",
+    "mode": "PHYSICAL",
+    "cast": 0
+   }
+  },
+  {
+   "id": "5. FLY hold while descending = climb again",
+   "pass": true,
+   "detail": {
+    "powered": true,
+    "alt": 2.3,
+    "intent": 1,
+    "exiting": false,
+    "landed": 1,
+    "form": "FUSED",
+    "mode": "PHYSICAL",
+    "cast": 0
+   }
+  },
+  {
+   "id": "6. descending to the support completes as the LANDING (powered false, landed_count +1) — no LAND button",
+   "pass": true,
+   "detail": {
+    "before": {
+     "powered": false,
+     "alt": 0,
+     "intent": 0,
+     "exiting": false,
+     "landed": 0,
+     "form": "FUSED",
+     "mode": "PHYSICAL",
+     "cast": 0
+    },
+    "after": {
+     "powered": false,
+     "alt": 0,
+     "intent": 0,
+     "exiting": false,
+     "landed": 2,
+     "form": "FUSED",
+     "mode": "PHYSICAL",
+     "cast": 0
+    }
+   }
+  },
+  {
+   "id": "7. FLY tap on the ground = lift into a hover",
+   "pass": true,
+   "detail": {
+    "powered": true,
+    "alt": 3.65,
+    "intent": 0,
+    "exiting": false,
+    "landed": 2,
+    "form": "FUSED",
+    "mode": "PHYSICAL",
+    "cast": 0
+   }
+  },
+  {
+   "id": "8. SEPARATE / FUSE corner button: tap = the H transform (FUSED → SPLIT → FUSED), the label shows the next transition",
+   "pass": true,
+   "detail": {
+    "f0": "FUSED",
+    "f1": "SPLIT",
+    "f2": "FUSED",
+    "lab1": "FUSEtap · H",
+    "lab2": "SEPARATEtap · H"
+   }
+  },
+  {
+   "id": "9. owner B7 §5: the attack-MODE control is a compact PILL directly LEFT of FLY (same row, its right edge within one gap of FLY, ≤ 30 px tall, arrows hidden) — no longer the strip under the quick slots",
+   "pass": true,
+   "detail": {
+    "pill": {
+     "x": 239,
+     "y": 773,
+     "w": 92,
+     "h": 26,
+     "display": "block"
+    },
+    "fly": {
+     "x": 314,
+     "y": 773,
+     "w": 42,
+     "h": 42,
+     "display": "flex"
+    },
+    "arrows_hidden": true
+   }
+  },
+  {
+   "id": "9b. tapping the pill cycles the mode (3 taps = back to the start); a mode change never casts",
+   "pass": true,
+   "detail": {
+    "m0": "PHYSICAL",
+    "m1": "PHYSICAL_MAHGIC",
+    "m2": "PHYSICAL"
+   }
+  },
+  {
+   "id": "10. horizontal swipe on the category strip = next category; no attack fired, the camera yaw untouched",
+   "pass": true,
+   "detail": {
+    "m0": "PHYSICAL",
+    "m3": "PHYSICAL_MAHGIC",
+    "cast": 0,
+    "yaw0": 0,
+    "yaw1": 0
+   }
+  },
+  {
+   "id": "11. the tiny MAH GUIDE toggle under Health shows Mrs. Mah (default) — the JOB B guide layer",
+   "pass": true,
+   "detail": {
+    "vis": true,
+    "cur": "MRS",
+    "on": true,
+    "label": "✧ MRS. MAH"
+   }
+  },
+  {
+   "id": "12. toggle again = hidden",
+   "pass": true,
+   "detail": {
+    "vis": false,
+    "label": "✧ GUIDE"
+   }
+  },
+  {
+   "id": "Z. zero page / console errors",
+   "pass": true,
+   "detail": []
+  }
+ ]
+}

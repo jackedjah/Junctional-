@@ -1,0 +1,50 @@
+{
+ "mode": "landscape",
+ "viewport": [
+  844,
+  390
+ ],
+ "touch_emulated": true,
+ "checks": [
+  "PASS T1 on the ground: FLY visible, the DOWN / LAND affordance hidden — {\"fly\":{\"x\":786,\"y\":278,\"w\":50,\"h\":50,\"cx\":811,\"cy\":303,\"shown\":true},\"aux\":{\"x\":0,\"y\":0,\"w\":0,\"h\":0,\"cx\":0,\"cy\":0,\"shown\":false}}",
+  "PASS T2 HOLD FLY takes off and climbs; RELEASE holds the attained altitude (|err| ≤ 0.05 m, overshoot ≤ 0.15 m), still powered, intent 0 — never a tap-toggle that keeps climbing — {\"at_release\":{\"t\":19.21,\"powered\":true,\"intent\":0,\"alt\":12.07,\"ground\":0,\"h\":12.07,\"vz\":3.5,\"hold_alt\":12.456,\"perch\":null,\"forced\":false,\"res\":94.6,\"landed\":0,\"pos\":[19.79,19.9],\"pitch\":0.2},\"measure\":{\"overshoot_past_hold\":0.004,\"settled_alt\":12.46,\"err\":0.004,\"samples\":28},\"after\":{\"t\":22.29,\"powered\":true,\"intent\":0,\"alt\":12.46,\"ground\":0,\"h\":12.46,\"vz\":0,\"hold_alt\":12.456,\"perch\":null,\"forced\":false,\"res\":86.8,\"landed\":0,\"pos\":[19.79,19.9],\"pitch\":0.2}}",
+  "PASS T3 airborne: DOWN and LAND appear next to FLY (≤ 170 px), FLY itself did not move under the thumb, inside the viewport, ≥ 44 px, not overlapping FLY / GUARD / MORE / menu / ATTACK / DASH / the 1–4 row / the stick zone — {\"desc\":{\"x\":730,\"y\":166,\"w\":50,\"h\":50,\"cx\":755,\"cy\":191,\"shown\":true},\"land\":{\"x\":786,\"y\":166,\"w\":50,\"h\":50,\"cx\":811,\"cy\":191,\"shown\":true},\"clash\":[],\"near_fly_px\":125,\"fly_moved_px\":0,\"viewport\":{\"w\":844,\"h\":390}}",
+  "PASS T4 stick forward + look UP (pitch -0.40) / DOWN (pitch 1.10): altitude unchanged (|Δ| ≤ 0.1 m) — {\"hold\":12.46,\"up\":12.46,\"down\":12.46,\"pitch_low\":-0.4,\"pitch_high\":1.1}",
+  "PASS T5 DOWN hold descends, release holds the lower altitude (still powered) — {\"before\":12.46,\"hold_alt\":6.101,\"measure\":{\"overshoot_past_hold\":0.979,\"settled_alt\":6.1,\"err\":-0.001,\"samples\":23}}",
+  "PASS T6 LAND tap lands (not powered, on a support) and the DOWN / LAND affordance hides again — {\"landed\":{\"t\":34.55,\"powered\":false,\"intent\":0,\"alt\":0,\"ground\":0,\"h\":0,\"vz\":0,\"hold_alt\":null,\"perch\":null,\"forced\":false,\"res\":61.4,\"landed\":1,\"pos\":[122.52,70.69],\"pitch\":1.1},\"aux\":{\"x\":0,\"y\":0,\"w\":0,\"h\":0,\"cx\":0,\"cy\":0,\"shown\":false}}",
+  "PASS T7 blur / hidden while FLY is held: the climb command is released (intent 0, altitude held, no runaway climb) — {\"after_blur\":{\"t\":36.69,\"powered\":true,\"intent\":0,\"alt\":5.3,\"ground\":0,\"h\":5.3,\"vz\":0.03,\"hold_alt\":5.306,\"perch\":null,\"forced\":false,\"res\":57.1,\"landed\":1,\"pos\":[122.52,70.69],\"pitch\":1.1},\"later\":{\"t\":38.21,\"powered\":true,\"intent\":0,\"alt\":5.31,\"ground\":0,\"h\":5.31,\"vz\":0,\"hold_alt\":5.306,\"perch\":null,\"forced\":false,\"res\":53.3,\"landed\":1,\"pos\":[122.52,70.69],\"pitch\":1.1}}",
+  "PASS T8 FLY held while GUARD and power 1 are tapped by other fingers: the climb continues during the hold (intent 1) and the FLY release still holds the altitude (intent 0, no runaway climb) — {\"during\":{\"t\":40.97,\"powered\":true,\"intent\":1,\"alt\":5.88,\"ground\":0,\"h\":5.88,\"vz\":6.5,\"hold_alt\":null,\"perch\":null,\"forced\":false,\"res\":49.5,\"landed\":2,\"pos\":[122.52,70.69],\"pitch\":1.1},\"during2\":{\"t\":41.39,\"powered\":true,\"intent\":1,\"alt\":8.48,\"ground\":0,\"h\":8.48,\"vz\":6.5,\"hold_alt\":null,\"perch\":null,\"forced\":false,\"res\":48.5,\"landed\":2,\"pos\":[122.52,70.69],\"pitch\":1.1},\"released\":{\"t\":41.81,\"powered\":true,\"intent\":0,\"alt\":9.73,\"ground\":0,\"h\":9.73,\"vz\":0.46,\"hold_alt\":9.856,\"perch\":null,\"forced\":false,\"res\":47.5,\"landed\":2,\"pos\":[122.52,70.69],\"pitch\":1.1},\"later\":{\"t\":43.32,\"powered\":true,\"intent\":0,\"alt\":9.86,\"ground\":0,\"h\":9.86,\"vz\":0,\"hold_alt\":9.856,\"perch\":null,\"forced\":false,\"res\":43.6,\"landed\":2,\"pos\":[122.52,70.69],\"pitch\":1.1},\"power_btn\":{\"cx\":139,\"cy\":361,\"id\":null}}",
+  "PASS Z zero page / console errors — [\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\",\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\",\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\"]"
+ ],
+ "measurements": {
+  "fly_hold_release": {
+   "at_release": {
+    "t": 19.21,
+    "powered": true,
+    "intent": 0,
+    "alt": 12.07,
+    "ground": 0,
+    "h": 12.07,
+    "vz": 3.5,
+    "hold_alt": 12.456,
+    "perch": null,
+    "forced": false,
+    "res": 94.6,
+    "landed": 0,
+    "pos": [
+     19.79,
+     19.9
+    ],
+    "pitch": 0.2
+   },
+   "measure": {
+    "overshoot_past_hold": 0.004,
+    "settled_alt": 12.46,
+    "err": 0.004,
+    "samples": 28
+   }
+  }
+ },
+ "pass": 9,
+ "fail": 0
+}

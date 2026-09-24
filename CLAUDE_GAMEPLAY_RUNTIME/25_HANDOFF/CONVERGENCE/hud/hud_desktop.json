@@ -1,0 +1,216 @@
+{
+ "mode": "desktop",
+ "viewport": [
+  1200,
+  750
+ ],
+ "touch_emulated": false,
+ "checks": [
+  "PASS L1 every control exists, ≥ 44 px, inside the viewport, and nothing overlaps (controls · stick zone · 1–4 row · vitals · dock) — {\"missing\":[],\"small\":[],\"outside\":[],\"clashes\":[]}",
+  "PASS L8 desktop keeps its key hints (V · M · B · Q visible)",
+  "PASS L1d the dock with its drawer open (PHYSICAL) stays out of the cluster: no control covered — {\"dock\":{\"id\":\"g-dock\",\"x\":838,\"y\":6,\"w\":356,\"h\":282.03125,\"cx\":1016,\"cy\":147.015625,\"shown\":true},\"drawer_h\":186.03125,\"clashes\":[]}",
+  "PASS L8b no truncated ability names: the 1–4 / E R T Y labels equal the authored short forms and none overflows its button — {\"labels\":{\"labels\":[\"H-PUSH\",\"V-PULL\",\"HINGE\",\"ROTATE\",\"H-PUSH\",\"V-PULL\",\"HINGE\",\"ROTATE\"],\"overflow\":[],\"chips\":[\"E\",\"R\",\"T\",\"Y\"],\"authored\":[\"H-PUSH\",\"V-PULL\",\"HINGE\",\"ROTATE\"]},\"chips_with_drawer_open\":[\"E\",\"R\",\"T\",\"Y\"]}",
+  "PASS L2 no permanent USE: the contextual prompt is hidden at an ordinary spot (the practice-reset / incoming fixtures never make a button) — {\"id\":\"g-ctx\",\"x\":0,\"y\":0,\"w\":0,\"h\":0,\"cx\":0,\"cy\":0,\"shown\":false}",
+  "PASS L2b at the tree elevator the contextual prompt appears with its verb (LIFT), inside the viewport, ≥ 44 px — {\"ctx\":{\"id\":\"g-ctx\",\"x\":1128,\"y\":698,\"w\":64,\"h\":44,\"cx\":1160,\"cy\":720,\"shown\":true},\"text\":\"LIFT✦\"}",
+  "PASS L2c the contextual prompt never sits on the framed character (his screen box vs the prompt rect) — {\"prompt\":{\"id\":\"g-ctx\",\"x\":1128,\"y\":698,\"w\":64,\"h\":44,\"cx\":1160,\"cy\":720,\"shown\":true},\"him\":{\"x\":509.5,\"y\":258.6,\"w\":175.70000000000005,\"h\":266.69999999999993,\"shown\":true}}",
+  "PASS L3 the HUD theme follows the LOCAL player’s class (ATHLETE) and the five class families resolve to distinct token sets — {\"body_class\":\"ATHLETE\",\"me\":\"ATHLETE\",\"families\":{\"ATHLETE\":{\"rim\":\"#d9a93e\",\"accent\":\"#ffd15e\",\"face\":\"#1a1408\"},\"TITAN\":{\"rim\":\"#4f8fe0\",\"accent\":\"#5ea8ff\",\"face\":\"#081328\"},\"LEAN\":{\"rim\":\"#d94a5a\",\"accent\":\"#ff5e72\",\"face\":\"#200a0e\"},\"VISIONARY\":{\"rim\":\"#9a6be0\",\"accent\":\"#b58cff\",\"face\":\"#150c26\"},\"BAGE\":{\"rim\":\"#e070a8\",\"accent\":\"#ff8fc8\",\"face\":\"#230b19\"}}}",
+  "PASS L9 state matrix: ready · selected · disabled · unavailable · cooldown · pressed render distinctly — {\"ready\":[\"rgb(217, 169, 62)\",\"solid\",\"1\",\"rgb(255, 232, 166) 0px 1.5px 0px 0px inset, rgb(90, 61, 12) \",\"none\",\"none\"],\"selected\":[\"rgb(255, 209, 94)\",\"solid\",\"1\",\"rgb(255, 232, 166) 0px 1.5px 0px 0px inset, rgb(90, 61, 12) \",\"none\",\"none\"],\"disabled\":[\"rgb(90, 61, 12)\",\"solid\",\"0.45\",\"rgba(0, 0, 0, 0.3) 0px 0px 0px 1px inset\",\"saturate(0.4)\",\"none\"],\"unavailable\":[\"rgb(255, 107, 107)\",\"dashed\",\"0.55\",\"rgb(255, 232, 166) 0px 1.5px 0px 0px inset, rgb(90, 61, 12) \",\"saturate(0.3)\",\"none\"],\"cooldown\":[\"rgb(217, 169, 62)\",\"dashed\",\"0.6\",\"rgb(255, 232, 166) 0px 1.5px 0px 0px inset, rgb(90, 61, 12) \",\"none\",\"none\"],\"pressed\":[\"rgb(217, 169, 62)\",\"solid\",\"1\",\"rgba(0, 0, 0, 0.55) 0px 2px 4px 0px inset, rgb(90, 61, 12) 0\",\"none\",\"matrix(1, 0, 0, 1, 0, 1)\"]}",
+  "PASS L4 `+` faster travel: a tap toggles a clear selected state and sustained travel is faster (6.19 vs 3.52 m/s ≥ 1.25×); a second tap turns it off — {\"slow_mps\":3.52,\"fast_mps\":6.19,\"selected_on\":true,\"selected_off\":false}",
+  "PASS L5 MAP is one tap away: the menu opens directly on its MAP tab — {\"open\":true,\"tab\":\"MAP\",\"local_dev\":true}",
+  "PASS L6 one utility sheet: the ≡ menu carries EMOTES / LOADOUT / SETTINGS (+ STATS · SKILLS · INVENTORY · MAP · FRIENDS · DMs); EMOTES lists the catalogue (open sheet + one tap), SETTINGS holds practice / help / guide; no MORE button exists — {\"tabs\":[\"STATS\",\"SKILLS\",\"LOADOUT\",\"EMOTES\",\"ACTIONS\",\"INVENTORY\",\"MAP\",\"FRIENDS\",\"DMS\"],\"emotes\":22,\"loadout\":true,\"no_more_button\":true}",
+  "PASS L6c an emote tapped INSIDE the mounted EMOTES tab actually plays (the menu-hosted bodies are live, not dead) — {\"tapped\":\"WAVE\",\"before\":null,\"after\":\"WAVE\"}",
+  "PASS L6d PRACTICE tapped INSIDE the mounted SETTINGS tab toggles the host practice flag — {\"before\":false,\"after\":true}",
+  "PASS L6b closing the sheet returns the tab bodies to their home (nothing left mounted, no leaked panel) — {\"restored\":true}",
+  "PASS L7 MAHGIC (tap / M) casts the first READY magic skill: a magic slot leaves READY (cooldown / casting) after the tap — {\"before\":[[\"READY\",\"READY\"],[\"READY\",\"READY\"]],\"after\":[[\"COOLDOWN\",\"READY\"],[\"READY\",\"READY\"]],\"last\":null}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "rects": {
+  "ground": {
+   "g-menubt": {
+    "id": "g-menubt",
+    "x": 1134,
+    "y": 604.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1163,
+    "cy": 633.546875,
+    "shown": true
+   },
+   "g-mapbt": {
+    "id": "g-mapbt",
+    "x": 1002,
+    "y": 538.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1031,
+    "cy": 567.546875,
+    "shown": true
+   },
+   "g-speed": {
+    "id": "g-speed",
+    "x": 1068,
+    "y": 538.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1097,
+    "cy": 567.546875,
+    "shown": true
+   },
+   "g-camreset": {
+    "id": "g-camreset",
+    "x": 1134,
+    "y": 538.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1163,
+    "cy": 567.546875,
+    "shown": true
+   },
+   "g-fly": {
+    "id": "g-fly",
+    "x": 1018,
+    "y": 676,
+    "w": 58,
+    "h": 58,
+    "cx": 1047,
+    "cy": 705,
+    "shown": true
+   },
+   "g-guard": {
+    "id": "g-guard",
+    "x": 1076,
+    "y": 670.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1105,
+    "cy": 699.546875,
+    "shown": true
+   },
+   "g-mahgic": {
+    "id": "g-mahgic",
+    "x": 1134,
+    "y": 670.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1163,
+    "cy": 699.546875,
+    "shown": true
+   },
+   "g-land": {
+    "id": "g-land",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "g-desc": {
+    "id": "g-desc",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "g-ctx": {
+    "id": "g-ctx",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "tc-attack": {
+    "id": "tc-attack",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "tc-dash": {
+    "id": "tc-dash",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "tc-stickzone": {
+    "id": "tc-stickzone",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "g-erty-t": {
+    "id": "g-erty-t",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "g-vitals": {
+    "id": "g-vitals",
+    "x": 6,
+    "y": 6,
+    "w": 224,
+    "h": 87.421875,
+    "cx": 118,
+    "cy": 49.7109375,
+    "shown": true
+   },
+   "g-dock": {
+    "id": "g-dock",
+    "x": 838,
+    "y": 6,
+    "w": 356,
+    "h": 92,
+    "cx": 1016,
+    "cy": 52,
+    "shown": true
+   }
+  },
+  "dock_open": {
+   "dock": {
+    "id": "g-dock",
+    "x": 838,
+    "y": 6,
+    "w": 356,
+    "h": 282.03125,
+    "cx": 1016,
+    "cy": 147.015625,
+    "shown": true
+   },
+   "drawer": {
+    "id": "g-drawer",
+    "x": 868,
+    "y": 96,
+    "w": 320,
+    "h": 186.03125,
+    "cx": 1028,
+    "cy": 189.015625,
+    "shown": true
+   },
+   "mode": "PHYSICAL"
+  }
+ },
+ "pass": 17,
+ "fail": 0
+}

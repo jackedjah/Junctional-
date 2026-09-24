@@ -1,0 +1,837 @@
+{
+ "shots": [
+  "01_overview_high",
+  "02_overview_south_coast",
+  "03_ground_causeway_gym",
+  "04_ground_forest_path_shards",
+  "05_monolith_umbral",
+  "05b_terrace_west_from_bridge",
+  "05c_terrace_west_high",
+  "06_tree_lock_L0",
+  "07_tree_lock_band",
+  "08_fish_breach_0",
+  "08_fish_breach_1",
+  "08_fish_breach_2",
+  "08_fish_breach_3",
+  "08_fish_breach_4",
+  "09_fish_school_surface",
+  "10_horse_range",
+  "11_horse_range_move",
+  "12_phoenix_flight",
+  "13_phoenix_arrive",
+  "14_phoenix_from_ground",
+  "15_fairy_rear_camera",
+  "16_fairy_close",
+  "17_fairy_travel",
+  "18_sky_layers",
+  "19_map"
+ ],
+ "errors": [],
+ "notes": [
+  "breacher {\"i\":2,\"x\":-24.71612224911987,\"z\":-130.32254787112345,\"hx\":-0.32960641341329944,\"hz\":-0.9441184312557515,\"y0\":-1.8341495400165555}",
+  "breach frame 0 fish at [-26.9,-0.4,-136.6,\"IN\"]",
+  "breach frame 1 fish at [-25.6,-1.58,-137.6,\"SWIM\"]",
+  "breach frame 2 fish at [-24.5,-1.45,-139.6,\"SWIM\"]",
+  "breach frame 3 fish at [-23.1,-1.49,-141.8,\"SWIM\"]",
+  "breach frame 4 fish at [-20.8,-1.73,-144.4,\"SWIM\"]"
+ ],
+ "console_errors": [],
+ "world_status": "READY",
+ "build": null,
+ "tree": {
+  "id": "FOREST_W_T000",
+  "x": -82.53,
+  "z": -5.52,
+  "yaw": 3.791,
+  "scale": 0.967,
+  "tint": "#7d93b8",
+  "zone": "FOREST_W"
+ },
+ "schools": [
+  {
+   "id": "S",
+   "x": 0,
+   "z": -136
+  },
+  {
+   "id": "E",
+   "x": 253,
+   "z": 40
+  },
+  {
+   "id": "W",
+   "x": -253,
+   "z": 170
+  }
+ ],
+ "horse": {
+  "p": [
+   64,
+   0,
+   116
+  ],
+  "st": "MOVE",
+  "all": [
+   [
+    64,
+    0,
+    116
+   ],
+   [
+    -35,
+    0,
+    93
+   ]
+  ]
+ },
+ "phoenix": {
+  "p": [
+   124,
+   94,
+   149
+  ],
+  "st": "ARRIVE"
+ },
+ "modules_part1": {
+  "wildlife": {
+   "species": {
+    "PHOENIX": {
+     "figures": 1,
+     "active": 1,
+     "visible": 1,
+     "lods": 3,
+     "scale": 3.74,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "ARRIVE"
+     ],
+     "positions": [
+      [
+       113,
+       94,
+       181
+      ]
+     ],
+     "next_appear_s": 149.7
+    },
+    "FISH": {
+     "figures": 12,
+     "active": 12,
+     "visible": 5,
+     "lods": 3,
+     "scale": 2.448,
+     "head": "+z",
+     "rig": {
+      "kind": "FISH",
+      "bones": 14,
+      "spine": [
+       "bone_0",
+       "bone_1",
+       "bone_2",
+       "bone_3",
+       "bone_4",
+       "bone_5",
+       "bone_6",
+       "bone_7"
+      ],
+      "fins": [
+       "L:bone_8>bone_9",
+       "R:bone_10>bone_11",
+       "L:bone_12"
+      ],
+      "forward": "+z",
+      "fix_deg": 180,
+      "length_m": 0.98
+     },
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE/BREACH",
+      "IDLE",
+      "IDLE"
+     ],
+     "positions": [
+      [
+       13,
+       -2,
+       -124
+      ],
+      [
+       18,
+       -1.2,
+       -123
+      ],
+      [
+       19,
+       -1.6,
+       -124
+      ],
+      [
+       20,
+       -1.1,
+       -129
+      ],
+      [
+       248,
+       -1.5,
+       51
+      ],
+      [
+       250,
+       -1.3,
+       55
+      ],
+      [
+       253,
+       -1.3,
+       55
+      ],
+      [
+       257,
+       -1.8,
+       53
+      ],
+      [
+       -277,
+       -1.8,
+       169
+      ],
+      [
+       -282,
+       -0.4,
+       169
+      ],
+      [
+       -281,
+       -1.5,
+       174
+      ],
+      [
+       -277,
+       -1.2,
+       177
+      ]
+     ]
+    },
+    "HORSE": {
+     "figures": 2,
+     "active": 2,
+     "visible": 2,
+     "lods": 3,
+     "scale": 2.384,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "MOVE",
+      "MOVE"
+     ],
+     "positions": [
+      [
+       86,
+       0.1,
+       110
+      ],
+      [
+       -52,
+       0.1,
+       69
+      ]
+     ]
+    }
+   },
+   "stats": {
+    "fish": 12,
+    "horses": 2,
+    "phoenix": 0,
+    "breaches": 16,
+    "visits": 1,
+    "draw_calls": 8
+   },
+   "night": false,
+   "payment_ui": false
+  },
+  "terrain": {
+   "regions": 6,
+   "terraces": 2,
+   "tint_sheets": 9,
+   "paths": {
+    "CAUSEWAY": 6,
+    "REGIONAL": 9,
+    "TRAIL": 9
+   },
+   "shards": 403,
+   "dust": 2352,
+   "monoliths": 6,
+   "draw_calls": 10,
+   "tris": 4332,
+   "night": false
+  },
+  "sky": {
+   "wind": {
+    "dir_deg": 28,
+    "speed_mps": 2.4,
+    "now_mps": 2.9,
+    "gust": 0.35
+   },
+   "layers": [
+    {
+     "id": "MIST_LOW",
+     "kind": "MIST",
+     "count": 1,
+     "alt_m": 6,
+     "opacity": 0.16
+    },
+    {
+     "id": "CUMULUS_MID",
+     "kind": "CLOUD",
+     "count": 30,
+     "alt_m": 150,
+     "opacity": 0.78
+    },
+    {
+     "id": "CIRRUS_HIGH",
+     "kind": "CLOUD",
+     "count": 16,
+     "alt_m": 280,
+     "opacity": 0.34
+    }
+   ],
+   "draw_calls": 3,
+   "night": false
+  },
+  "forest": {
+   "tree_lock": true,
+   "zone_family": {
+    "FOREST_W": "purple",
+    "FOREST_NW": "purple",
+    "FOREST_NE": "green",
+    "FOREST_N_W": "red",
+    "FOREST_N_E": "red"
+   },
+   "trees": 147,
+   "lod_counts": {
+    "L0": 9,
+    "L1": 20,
+    "IMPOSTOR": 118
+   },
+   "impostor": true,
+   "draw_calls": 4,
+   "lod_m": {
+    "near": 26,
+    "mid": 60
+   },
+   "height_m": [
+    9.27,
+    14.73
+   ],
+   "underbrush": 147,
+   "night": false,
+   "skipped": null
+  },
+  "coast": {
+   "islands": 11,
+   "draw_calls": 18,
+   "tris": 24940,
+   "sea_y": -0.3,
+   "beach_w": 34,
+   "outline": {
+    "x1": -203,
+    "z1": -86,
+    "x2": 203,
+    "z2": 322,
+    "corner_r": 70
+   },
+   "foam_lines": 12,
+   "night": false
+  }
+ },
+ "guide": {
+  "current": "MRS",
+  "visible": true,
+  "on_stage": true,
+  "height_m": 0.75,
+  "wanted": "MRS",
+  "loaded": [
+   "MRS"
+  ],
+  "loading": [],
+  "skinned": true,
+  "scale": 0.76,
+  "night": false,
+  "rim": true,
+  "draw_calls": 1,
+  "pos": [
+   0.99,
+   1.32,
+   58.82
+  ],
+  "yaw_deg": -40,
+  "follow": {
+   "dist_m": 1.5,
+   "angle_rad": 1.2,
+   "up_m": 1.3,
+   "rate": 6.5,
+   "lead_s": 0.22,
+   "snap_beyond_m": 12,
+   "cam_clear_m": 1.6,
+   "floor_above_feet_m": 0.35
+  },
+  "hover": {
+   "amp_m": 0.05,
+   "hz": 0.9,
+   "amp2_m": 0.02,
+   "hz2": 0.37
+  },
+  "drift": {
+   "amp_m": 0.28,
+   "period_s": 6.5,
+   "correct_rate": 1.6
+  },
+  "settle": {
+   "after_s": 2.5,
+   "rise_m": 0.12,
+   "look_hz": 0.11,
+   "look_rad": 0.55
+  },
+  "bank": {
+   "rad_per_mps": 0.14,
+   "max_rad": 0.42,
+   "yaw_rate": 8
+  },
+  "accel_bank": 0.05,
+  "settled": 0.38,
+  "idle_s": 2.88,
+  "motion_source": "registry.guide_motion"
+ },
+ "guide_moving": {
+  "current": "MRS",
+  "visible": true,
+  "on_stage": true,
+  "height_m": 0.75,
+  "wanted": "MRS",
+  "loaded": [
+   "MRS"
+  ],
+  "loading": [],
+  "skinned": true,
+  "scale": 0.76,
+  "night": false,
+  "rim": true,
+  "draw_calls": 1,
+  "pos": [
+   -1.5,
+   1.3,
+   40.74
+  ],
+  "yaw_deg": -250,
+  "follow": {
+   "dist_m": 1.5,
+   "angle_rad": 1.2,
+   "up_m": 1.3,
+   "rate": 6.5,
+   "lead_s": 0.22,
+   "snap_beyond_m": 12,
+   "cam_clear_m": 1.6,
+   "floor_above_feet_m": 0.35
+  },
+  "hover": {
+   "amp_m": 0.05,
+   "hz": 0.9,
+   "amp2_m": 0.02,
+   "hz2": 0.37
+  },
+  "drift": {
+   "amp_m": 0.28,
+   "period_s": 6.5,
+   "correct_rate": 1.6
+  },
+  "settle": {
+   "after_s": 2.5,
+   "rise_m": 0.12,
+   "look_hz": 0.11,
+   "look_rad": 0.55
+  },
+  "bank": {
+   "rad_per_mps": 0.14,
+   "max_rad": 0.42,
+   "yaw_rate": 8
+  },
+  "accel_bank": 0.05,
+  "settled": 0,
+  "idle_s": 1.58,
+  "motion_source": "registry.guide_motion"
+ },
+ "modules": {
+  "wildlife": {
+   "species": {
+    "FISH": {
+     "figures": 12,
+     "active": 12,
+     "visible": 4,
+     "lods": 3,
+     "scale": 2.448,
+     "head": "+z",
+     "rig": {
+      "kind": "FISH",
+      "bones": 14,
+      "spine": [
+       "bone_0",
+       "bone_1",
+       "bone_2",
+       "bone_3",
+       "bone_4",
+       "bone_5",
+       "bone_6",
+       "bone_7"
+      ],
+      "fins": [
+       "L:bone_8>bone_9",
+       "R:bone_10>bone_11",
+       "L:bone_12"
+      ],
+      "forward": "+z",
+      "fix_deg": 180,
+      "length_m": 0.98
+     },
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE",
+      "IDLE"
+     ],
+     "positions": [
+      [
+       -17,
+       -1.1,
+       -119
+      ],
+      [
+       -18,
+       -2.2,
+       -116
+      ],
+      [
+       -16,
+       -0.9,
+       -113
+      ],
+      [
+       -12,
+       -2,
+       -113
+      ],
+      [
+       283,
+       -1.4,
+       37
+      ],
+      [
+       285,
+       -1.2,
+       33
+      ],
+      [
+       285,
+       -1.2,
+       30
+      ],
+      [
+       281,
+       -2.1,
+       29
+      ],
+      [
+       -270,
+       -1.5,
+       179
+      ],
+      [
+       -270,
+       -1.5,
+       183
+      ],
+      [
+       -268,
+       -1.8,
+       185
+      ],
+      [
+       -264,
+       -1.5,
+       184
+      ]
+     ]
+    },
+    "PHOENIX": {
+     "figures": 1,
+     "active": 1,
+     "visible": 1,
+     "lods": 3,
+     "scale": 3.74,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "ARRIVE"
+     ],
+     "positions": [
+      [
+       -129,
+       94,
+       665
+      ]
+     ],
+     "next_appear_s": 106.4
+    },
+    "HORSE": {
+     "figures": 2,
+     "active": 2,
+     "visible": 2,
+     "lods": 3,
+     "scale": 2.384,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "MOVE",
+      "MOVE"
+     ],
+     "positions": [
+      [
+       73,
+       0,
+       107
+      ],
+      [
+       -61,
+       0,
+       90
+      ]
+     ]
+    }
+   },
+   "stats": {
+    "fish": 12,
+    "horses": 2,
+    "phoenix": 0,
+    "breaches": 9,
+    "visits": 1,
+    "draw_calls": 7
+   },
+   "night": false,
+   "payment_ui": false
+  },
+  "terrain": {
+   "regions": 6,
+   "terraces": 2,
+   "tint_sheets": 9,
+   "paths": {
+    "CAUSEWAY": 6,
+    "REGIONAL": 9,
+    "TRAIL": 9
+   },
+   "shards": 403,
+   "dust": 2352,
+   "monoliths": 6,
+   "draw_calls": 10,
+   "tris": 4332,
+   "night": false
+  },
+  "sky": {
+   "wind": {
+    "dir_deg": 28,
+    "speed_mps": 2.4,
+    "now_mps": 2.81,
+    "gust": 0.35
+   },
+   "layers": [
+    {
+     "id": "MIST_LOW",
+     "kind": "MIST",
+     "count": 1,
+     "alt_m": 6,
+     "opacity": 0.16
+    },
+    {
+     "id": "CUMULUS_MID",
+     "kind": "CLOUD",
+     "count": 30,
+     "alt_m": 150,
+     "opacity": 0.78
+    },
+    {
+     "id": "CIRRUS_HIGH",
+     "kind": "CLOUD",
+     "count": 16,
+     "alt_m": 280,
+     "opacity": 0.34
+    }
+   ],
+   "draw_calls": 3,
+   "night": false
+  },
+  "forest": {
+   "tree_lock": true,
+   "zone_family": {
+    "FOREST_W": "purple",
+    "FOREST_NW": "purple",
+    "FOREST_NE": "green",
+    "FOREST_N_W": "red",
+    "FOREST_N_E": "red"
+   },
+   "trees": 147,
+   "lod_counts": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 147
+   },
+   "impostor": true,
+   "draw_calls": 2,
+   "lod_m": {
+    "near": 26,
+    "mid": 60
+   },
+   "height_m": [
+    9.27,
+    14.73
+   ],
+   "underbrush": 147,
+   "night": false,
+   "skipped": null
+  },
+  "coast": {
+   "islands": 11,
+   "draw_calls": 18,
+   "tris": 24940,
+   "sea_y": -0.3,
+   "beach_w": 34,
+   "outline": {
+    "x1": -203,
+    "z1": -86,
+    "x2": 203,
+    "z2": 322,
+    "corner_r": 70
+   },
+   "foam_lines": 12,
+   "night": false
+  },
+  "guides": {
+   "current": "MRS",
+   "visible": true,
+   "on_stage": true,
+   "height_m": 0.75,
+   "wanted": "MRS",
+   "loaded": [
+    "MRS"
+   ],
+   "loading": [],
+   "skinned": true,
+   "scale": 0.76,
+   "night": false,
+   "rim": true,
+   "draw_calls": 1,
+   "pos": [
+    -1.25,
+    1.42,
+    40.73
+   ],
+   "yaw_deg": -239,
+   "follow": {
+    "dist_m": 1.5,
+    "angle_rad": 1.2,
+    "up_m": 1.3,
+    "rate": 6.5,
+    "lead_s": 0.22,
+    "snap_beyond_m": 12,
+    "cam_clear_m": 1.6,
+    "floor_above_feet_m": 0.35
+   },
+   "hover": {
+    "amp_m": 0.05,
+    "hz": 0.9,
+    "amp2_m": 0.02,
+    "hz2": 0.37
+   },
+   "drift": {
+    "amp_m": 0.28,
+    "period_s": 6.5,
+    "correct_rate": 1.6
+   },
+   "settle": {
+    "after_s": 2.5,
+    "rise_m": 0.12,
+    "look_hz": 0.11,
+    "look_rad": 0.55
+   },
+   "bank": {
+    "rad_per_mps": 0.14,
+    "max_rad": 0.42,
+    "yaw_rate": 8
+   },
+   "accel_bank": 0.05,
+   "settled": 1,
+   "idle_s": 11.41,
+   "motion_source": "registry.guide_motion"
+  }
+ },
+ "phone": {
+  "frame": "393x852@2 EMULATED (Chrome mobile emulation) — not iPhone acceptance",
+  "errors": []
+ }
+}

@@ -1,0 +1,230 @@
+{
+ "tag": "current_owner_round",
+ "build": "C:\\mw_base\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "viewport": [
+  1120,
+  700
+ ],
+ "summary": {
+  "start": {
+   "frames": 382,
+   "box_height_frac": {
+    "p50": 0.501,
+    "min": 0.476,
+    "max": 0.644
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.6,
+    "p95": 16.8,
+    "p99": 17
+   }
+  },
+  "idle": {
+   "frames": 181,
+   "box_height_frac": {
+    "p50": 0.545,
+    "min": 0.545,
+    "max": 0.546
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 17
+   }
+  },
+  "turn": {
+   "frames": 183,
+   "box_height_frac": {
+    "p50": 0.544,
+    "min": 0.502,
+    "max": 0.613
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8
+   }
+  },
+  "walk": {
+   "frames": 151,
+   "box_height_frac": {
+    "p50": 0.462,
+    "min": 0.452,
+    "max": 0.545
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "stop": {
+   "frames": 180,
+   "box_height_frac": {
+    "p50": 0.545,
+    "min": 0.461,
+    "max": 0.545
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "orbit": {
+   "frames": 139,
+   "box_height_frac": {
+    "p50": 0.578,
+    "min": 0.545,
+    "max": 0.594
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8
+   }
+  },
+  "release": {
+   "frames": 271,
+   "box_height_frac": {
+    "p50": 0.545,
+    "min": 0.529,
+    "max": 0.63
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "reset": {
+   "frames": 155,
+   "box_height_frac": {
+    "p50": 0.545,
+    "min": 0.545,
+    "max": 0.545
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "obstacle": {
+   "frames": 1769,
+   "box_height_frac": {
+    "p50": 0.535,
+    "min": 0.452,
+    "max": 1.09
+   },
+   "applied_m": {
+    "min": 2.3,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "flight": {
+   "frames": 657,
+   "box_height_frac": {
+    "p50": 0.545,
+    "min": 0.379,
+    "max": 0.575
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.6,
+    "p95": 16.8,
+    "p99": 17
+   }
+  },
+  "end": {
+   "frames": 91,
+   "box_height_frac": {
+    "p50": 0.545,
+    "min": 0.545,
+    "max": 0.545
+   },
+   "applied_m": {
+    "min": 4.01,
+    "p50": 4.01
+   },
+   "preferred_m": 4.01,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8
+   }
+  }
+ }
+}

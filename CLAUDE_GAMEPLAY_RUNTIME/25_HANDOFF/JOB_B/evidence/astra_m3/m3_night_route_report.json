@@ -1,0 +1,1848 @@
+{
+ "generated_at": "2026-09-23T04:53:40.035Z",
+ "source": "local static_dist (not packaged / not published)",
+ "capture_method": "dev placement for distant composition; P.goTo real-controller traversal for pass and building approach",
+ "checks": [
+  {
+   "id": "M3.1 world reaches READY with its warm gate complete",
+   "pass": true,
+   "detail": {
+    "world": "READY",
+    "warm": true,
+    "restore": true
+   }
+  },
+  {
+   "id": "M3.2 a fresh page is NIGHT and the boot gate prewarmed DAY then NIGHT before restoring NIGHT",
+   "pass": true,
+   "detail": {
+    "world_done": true,
+    "states": {
+     "started": true,
+     "done": true,
+     "states": [
+      "DAY",
+      "NIGHT"
+     ],
+     "restored": "NIGHT",
+     "ms": 8070.8,
+     "error": null
+    },
+    "tod": "NIGHT",
+    "programs": 211
+   }
+  },
+  {
+   "id": "M3.3 route registry carries all seven standards and every referenced road exists in the rendered registry",
+   "pass": true,
+   "detail": {
+    "stages": [
+     {
+      "id": "CIVIC_FORECOURT",
+      "standard": "FLOOR",
+      "label": "PLATINUM NEXUS civic forecourt",
+      "at": [
+       0,
+       0
+      ]
+     },
+     {
+      "id": "CLASS_ROAD",
+      "standard": "ROAD",
+      "label": "TOWER CAUSEWAY through TITAN GATE",
+      "at": [
+       70,
+       70
+      ],
+      "path": "CW_TOWER"
+     },
+     {
+      "id": "FOREST_RESOURCE",
+      "standard": "FOREST_RESOURCE",
+      "label": "Titan forest and attackable blue crystal bush",
+      "at": [
+       116,
+       168
+      ],
+      "zone": "FOREST_NE",
+      "resource": "RB_NE_PATH"
+     },
+     {
+      "id": "POND",
+      "standard": "POND",
+      "label": "TITAN LAKE north shore with fish",
+      "at": [
+       150,
+       124
+      ],
+      "water": "TITAN_LAKE"
+     },
+     {
+      "id": "MOUNTAIN_PASS",
+      "standard": "MOUNTAIN",
+      "label": "TITAN MOON PASS",
+      "at": [
+       150,
+       62
+      ],
+      "terrace": "TITAN_MOON_PASS",
+      "path": "RP_EAST_LINK"
+     },
+     {
+      "id": "NAMED_BUILDING",
+      "standard": "BUILDING",
+      "label": "MAH MATCH real entrance",
+      "at": [
+       98,
+       6
+      ],
+      "building": "MATCH_HALL",
+      "door": "MATCH_DOOR",
+      "interior": "MATCH_HALL"
+     },
+     {
+      "id": "NIGHT_SKY",
+      "standard": "SKY",
+      "label": "moon, stars, scattering atmosphere and class emissives",
+      "at": [
+       150,
+       62
+      ],
+      "time": "NIGHT"
+     }
+    ],
+    "paths": 30,
+    "wayfinders": 23
+   }
+  },
+  {
+   "id": "M3.4 full world standard is live: terrain/roads, forest, water, mountain macro, atmosphere, signage and named building modules",
+   "pass": true,
+   "detail": {
+    "terrain": {
+     "regions": 8,
+     "terraces": 4,
+     "forecourts": 5,
+     "spurs": 4,
+     "tint_sheets": 10,
+     "tint_cells": 866,
+     "paths": {
+      "CAUSEWAY": 6,
+      "REGIONAL": 13,
+      "TRAIL": 11
+     },
+     "shards": 452,
+     "dust": 2589,
+     "monoliths": 18,
+     "draw_calls": 10,
+     "tris": 7940,
+     "night": true
+    },
+    "forest": {
+     "tree_lock": true,
+     "zone_family": {
+      "FOREST_W": "purple",
+      "FOREST_NW": "red",
+      "FOREST_NE": "blue",
+      "FOREST_N_W": "red",
+      "FOREST_N_E": "gold"
+     },
+     "trees": 125,
+     "lod_counts": {
+      "L0": 0,
+      "L1": 0,
+      "IMPOSTOR": 125
+     },
+     "impostor": true,
+     "draw_calls": 2,
+     "lod_m": {
+      "near": 26,
+      "mid": 60
+     },
+     "height_m": [
+      9.27,
+      14.73
+     ],
+     "underbrush": 125,
+     "night": true,
+     "skipped": null
+    },
+    "water": {
+     "rivers": 5,
+     "bridges": 3,
+     "kerbSegments": 0,
+     "decks": 3,
+     "ramps": 6,
+     "rails": 6,
+     "posts": 66,
+     "edgeLines": 18,
+     "pads": 6,
+     "drawCalls": 18,
+     "triangles": 2900,
+     "maxY": 1.45,
+     "railTopY": 1.45,
+     "clearanceOk": true,
+     "night": true,
+     "floats": 27,
+     "meshes": [
+      "WATER_SHORE",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_PLATINUM",
+      "WATER_RAILS",
+      "WATER_EDGE_LINES",
+      "WATER_LANDING_PADS",
+      "WATER_SURFACE",
+      "WATER_FLOAT_PADS",
+      "WATER_FLOAT_CORES"
+     ],
+     "ripples": {
+      "supported": true,
+      "enabled": true,
+      "tier": "HIGH",
+      "n": 256,
+      "size_m": 48,
+      "grid": 96,
+      "texel_m": 0.188,
+      "c2": 0.09,
+      "damp": 0.99,
+      "amp_m": 0.07,
+      "ring_speed_mps": 3.94,
+      "impulses": 59,
+      "dropped": 0,
+      "steps": 0,
+      "active": false,
+      "in_water": false,
+      "pending": 59,
+      "origin": [
+       0,
+       3.9375
+      ],
+      "error": null
+     }
+    },
+    "macro": {
+     "ridges": [
+      {
+       "id": "RIDGE_NEAR",
+       "dist_m": 360,
+       "h": [
+        38,
+        150
+       ],
+       "passes": 5,
+       "tris": 480
+      },
+      {
+       "id": "RIDGE_MID",
+       "dist_m": 520,
+       "h": [
+        70,
+        230
+       ],
+       "passes": 5,
+       "tris": 424
+      }
+     ],
+     "waterfalls": [
+      {
+       "id": "TITAN_FALL",
+       "drop_m": 11.8,
+       "source": "TITAN_LEDGE",
+       "receiver": "TITAN_LAKE",
+       "ripple": true,
+       "mist": 3
+      },
+      {
+       "id": "NORTH_FALL",
+       "drop_m": 46,
+       "source": "RIDGE_NEAR",
+       "receiver": "RIVER_N",
+       "ripple": false,
+       "mist": 3
+      }
+     ],
+     "sky_beams": [
+      "BEAM_TEMPLE←LM_TEMPLE crown diamond",
+      "BEAM_TOWER←LM_TOWER crown diamond",
+      "BEAM_NORTH_PASS←north pass sanctuary beacon (ridge notch)"
+     ],
+     "draw_calls": 15
+    },
+    "atmosphere": {
+     "on": true,
+     "tier": "HIGH",
+     "night": true,
+     "fog": null,
+     "mie": 0.15,
+     "sun": [
+      -0.342,
+      0.085,
+      -0.936
+     ]
+    },
+    "signage": {
+     "wayfinders": 23,
+     "buildings": 10,
+     "labels_visible": 1,
+     "labels_total": 33
+    },
+    "match": {
+     "building": {
+      "id": "MATCH_HALL",
+      "at": [
+       122,
+       6
+      ],
+      "door": {
+       "side": "-x",
+       "x": 102,
+       "z": 6,
+       "w": 6,
+       "h": 5
+      },
+      "draw_calls": 6,
+      "tris": 1772,
+      "strips": 60,
+      "height_m": 22
+     },
+     "court": {
+      "id": "MATCH_COURT_OUTDOOR",
+      "at": [
+       128,
+       50
+      ],
+      "r": 16,
+      "spectator_r": [
+       19,
+       24
+      ],
+      "pylons": 4,
+      "aisles": 4,
+      "draw_calls": 3,
+      "tris": 4656
+     },
+     "interior": null,
+     "night": true,
+     "draw_calls_field": 9
+    }
+   }
+  },
+  {
+   "id": "M3.5 forest stage has the live host-owned RB_NE_PATH node and the rendered tree population",
+   "pass": true,
+   "detail": {
+    "node": {
+     "id": "NODE_RB_NE_PATH",
+     "patch": "RB_NE_PATH",
+     "x": 124,
+     "z": 165,
+     "y": 0,
+     "family": "blue",
+     "r": 2.4,
+     "hp": 168,
+     "max": 168,
+     "broken": false,
+     "respawn_in_s": null
+    },
+    "trees": 125,
+    "region": 8
+   }
+  },
+  {
+   "id": "M3.6 TITAN LAKE renders as real water with four walkable shores/wade metadata and live fish ecology",
+   "pass": true,
+   "detail": {
+    "water": {
+     "rivers": 5,
+     "bridges": 3,
+     "kerbSegments": 0,
+     "decks": 3,
+     "ramps": 6,
+     "rails": 6,
+     "posts": 66,
+     "edgeLines": 18,
+     "pads": 6,
+     "drawCalls": 18,
+     "triangles": 2900,
+     "maxY": 1.45,
+     "railTopY": 1.45,
+     "clearanceOk": true,
+     "night": true,
+     "floats": 27,
+     "meshes": [
+      "WATER_SHORE",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_FOAM",
+      "WATER_PLATINUM",
+      "WATER_RAILS",
+      "WATER_EDGE_LINES",
+      "WATER_LANDING_PADS",
+      "WATER_SURFACE",
+      "WATER_FLOAT_PADS",
+      "WATER_FLOAT_CORES"
+     ],
+     "ripples": {
+      "supported": true,
+      "enabled": true,
+      "tier": "HIGH",
+      "n": 256,
+      "size_m": 48,
+      "grid": 96,
+      "texel_m": 0.188,
+      "c2": 0.09,
+      "damp": 0.99,
+      "amp_m": 0.07,
+      "ring_speed_mps": 3.94,
+      "impulses": 82,
+      "dropped": 78,
+      "steps": 116,
+      "active": true,
+      "in_water": false,
+      "pending": 0,
+      "origin": [
+       150,
+       126
+      ],
+      "error": null
+     }
+    },
+    "meta": {
+     "id": "TITAN_LAKE",
+     "pond": true,
+     "sanctuary": "TITAN_SANCTUARY",
+     "x1": 137,
+     "z1": 90,
+     "x2": 161,
+     "z2": 118,
+     "surface_y": -0.16,
+     "bed_y": -0.45,
+     "wade_y": -0.45,
+     "shore_w": 5,
+     "note": "the Titan lake under the east mountain ledge"
+    },
+    "fish": 24,
+    "surface_mesh": true,
+    "shore_ground": 0
+   }
+  },
+  {
+   "id": "M3.7 the controller walks the collision-backed Moon Pass from approach to descent; support rises to 2.8 m and returns to ground",
+   "pass": true,
+   "detail": {
+    "ground": {
+     "north": 1.4,
+     "top": 2.8,
+     "south": 1.4,
+     "off": 0
+    },
+    "walk": {
+     "reached": true,
+     "passes": 1
+    },
+    "final": {
+     "x": 150,
+     "z": 40.993
+    }
+   }
+  },
+  {
+   "id": "M3.8 final regional road reaches the MAH MATCH forecourt and the real MATCH_DOOR enters its named bespoke hall",
+   "pass": true,
+   "detail": {
+    "approach": {
+     "reached": true,
+     "passes": 1
+    },
+    "door_walk": {
+     "reached": true,
+     "passes": 1
+    },
+    "enter": {
+     "command_id": "play-PLAYER_A-1uang7-80",
+     "seq": 80,
+     "accepted": true,
+     "version": 1537,
+     "tick": 1447,
+     "duplicate": false,
+     "room": "MATCH_HALL",
+     "spawn": {
+      "x": 0,
+      "z": 17
+     },
+     "facing": 0,
+     "interior": true,
+     "returned_to_door": null,
+     "prompt": "PLAZA"
+    },
+    "room": {
+     "room": "MATCH_HALL",
+     "trx": {
+      "state": {
+       "phase": null,
+       "to": null,
+       "from": null,
+       "t0": 0
+      },
+      "log": [],
+      "room_build": {
+       "key": "MATCH_HALL:MATCH_HALL_colliders_v1:14",
+       "room": "MATCH_HALL",
+       "error": null
+      },
+      "boom_shapes": true
+     }
+    }
+   }
+  },
+  {
+   "id": "M3.9 the hall EXIT returns to the same warm playable field",
+   "pass": true,
+   "detail": {
+    "exit": {
+     "command_id": "play-PLAYER_A-1uang7-81",
+     "seq": 81,
+     "accepted": true,
+     "version": 1602,
+     "tick": 1510,
+     "duplicate": false,
+     "room": "FIELD",
+     "spawn": {
+      "x": 98,
+      "z": 6
+     },
+     "facing": 0,
+     "interior": false,
+     "returned_to_door": "MATCH_DOOR",
+     "prompt": "PLAZA"
+    },
+    "room": "FIELD"
+   }
+  },
+  {
+   "id": "M3.10 DAY and NIGHT switch live after prewarm and the route finishes restored to NIGHT without a second shader-program surge",
+   "pass": true,
+   "detail": {
+    "before": 211,
+    "day": 213,
+    "night": 213,
+    "day_state": "DAY",
+    "final_state": "NIGHT"
+   }
+  },
+  {
+   "id": "M3.11 rendered route has no unexpected runtime/console errors",
+   "pass": true,
+   "detail": []
+  }
+ ],
+ "screenshots": [
+  "01_night_civic_forecourt.png",
+  "02_route_map_overlay.png",
+  "03_tower_class_road.png",
+  "04_titan_forest_resource.png",
+  "05_titan_lake_pond.png",
+  "06_moon_pass_approach.png",
+  "07_moon_pass_top.png",
+  "08_match_forecourt.png",
+  "09_match_hall_interior.png",
+  "10_day_state_prewarmsafe.png",
+  "11_night_route_final.png"
+ ],
+ "console_errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/favicon.ico>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.1/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.13/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.12/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.11/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.10/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.9/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.7/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.6/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.5/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.4/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.3/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:50978/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.2/manifest.json>"
+ ],
+ "registry": {
+  "tod": {
+   "_doc": "Astra M3 night-first route: two STABLE states (no calendar / simulation). NIGHT is the first-visit default and route preview; an explicit ?sky=day or the player saved choice still wins. Both states are prewarmed before play and remain live-switchable through fieldScene.setNight.",
+   "default": "NIGHT",
+   "preview": "NIGHT",
+   "states": [
+    "DAY",
+    "NIGHT"
+   ],
+   "storage_key": "mahworld-time",
+   "prewarm": [
+    "DAY",
+    "NIGHT"
+   ]
+  },
+  "route": {
+   "id": "QR_MOONLIT_TITAN_CIRCUIT",
+   "name": "MOONLIT TITAN CIRCUIT",
+   "default_time": "NIGHT",
+   "preview_time": "NIGHT",
+   "start": {
+    "id": "CIVIC_FORECOURT",
+    "label": "PLATINUM NEXUS CIVIC FORECOURT",
+    "x": 0,
+    "z": 0
+   },
+   "finish": {
+    "id": "MATCH_ENTRY",
+    "label": "MAH MATCH — NAMED ENTERABLE HALL",
+    "x": 98,
+    "z": 6,
+    "building": "MATCH_HALL",
+    "door": "MATCH_DOOR",
+    "interior": "MATCH_HALL"
+   },
+   "path_ids": [
+    "CW_TOWER",
+    "RP_RANGE_LOOP",
+    "RP_FOREST_NE",
+    "RP_TITAN_WILDWAY",
+    "RP_RANGE_TO_PASS",
+    "RP_EAST_LINK",
+    "CW_MATCH"
+   ],
+   "stages": [
+    {
+     "id": "CIVIC_FORECOURT",
+     "standard": "FLOOR",
+     "label": "PLATINUM NEXUS civic forecourt",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "CLASS_ROAD",
+     "standard": "ROAD",
+     "label": "TOWER CAUSEWAY through TITAN GATE",
+     "at": [
+      70,
+      70
+     ],
+     "path": "CW_TOWER"
+    },
+    {
+     "id": "FOREST_RESOURCE",
+     "standard": "FOREST_RESOURCE",
+     "label": "Titan forest and attackable blue crystal bush",
+     "at": [
+      116,
+      168
+     ],
+     "zone": "FOREST_NE",
+     "resource": "RB_NE_PATH"
+    },
+    {
+     "id": "POND",
+     "standard": "POND",
+     "label": "TITAN LAKE north shore with fish",
+     "at": [
+      150,
+      124
+     ],
+     "water": "TITAN_LAKE"
+    },
+    {
+     "id": "MOUNTAIN_PASS",
+     "standard": "MOUNTAIN",
+     "label": "TITAN MOON PASS",
+     "at": [
+      150,
+      62
+     ],
+     "terrace": "TITAN_MOON_PASS",
+     "path": "RP_EAST_LINK"
+    },
+    {
+     "id": "NAMED_BUILDING",
+     "standard": "BUILDING",
+     "label": "MAH MATCH real entrance",
+     "at": [
+      98,
+      6
+     ],
+     "building": "MATCH_HALL",
+     "door": "MATCH_DOOR",
+     "interior": "MATCH_HALL"
+    },
+    {
+     "id": "NIGHT_SKY",
+     "standard": "SKY",
+     "label": "moon, stars, scattering atmosphere and class emissives",
+     "at": [
+      150,
+      62
+     ],
+     "time": "NIGHT"
+    }
+   ],
+   "standards": {
+    "floor": "continuous platinum/region ground stack with host support",
+    "road": "causeway → regional forest/range paths → forecourt/spur",
+    "forest": "FOREST_NE tree family and Dogkie habitat, road-excluded trunks",
+    "resource": "RB_NE_PATH host-owned attackable/refill node on the verge",
+    "pond": "TITAN_LAKE with four walkable shores, wade bed and fish",
+    "mountain": "2.8 m collision-backed pass with north/south ramps and four flanking mountain monolith colliders",
+    "building": "MAH MATCH named exterior → MATCH_DOOR → bespoke MATCH_HALL → EXIT",
+    "sky": "NIGHT default/preview; DAY and NIGHT prewarmed and live-switchable"
+   },
+   "map_polyline": [
+    [
+     0,
+     0
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     84,
+     84
+    ],
+    [
+     112,
+     130
+    ],
+    [
+     112,
+     178
+    ],
+    [
+     132,
+     178
+    ],
+    [
+     148,
+     162
+    ],
+    [
+     150,
+     140
+    ],
+    [
+     150,
+     124
+    ],
+    [
+     131,
+     121
+    ],
+    [
+     131,
+     88
+    ],
+    [
+     126,
+     78
+    ],
+    [
+     150,
+     80
+    ],
+    [
+     150,
+     40
+    ],
+    [
+     128,
+     34
+    ],
+    [
+     96,
+     34
+    ],
+    [
+     84,
+     20
+    ],
+    [
+     84,
+     6
+    ],
+    [
+     98,
+     6
+    ]
+   ]
+  },
+  "paths": 30,
+  "wayfinders": 23
+ },
+ "warm": {
+  "world_done": true,
+  "states": {
+   "started": true,
+   "done": true,
+   "states": [
+    "DAY",
+    "NIGHT"
+   ],
+   "restored": "NIGHT",
+   "ms": 8070.8,
+   "error": null
+  },
+  "tod": "NIGHT",
+  "programs": 211
+ },
+ "world_debug": {
+  "build_ms": {
+   "fixtures": 11,
+   "water": 71,
+   "coast": 59,
+   "terrain": 52,
+   "macro": 8,
+   "meadow": 64,
+   "forest": 11842,
+   "architecture": 7486,
+   "celestial": 1931,
+   "sky": 6,
+   "atmosphere": 1,
+   "props": 2114,
+   "matchHall": 43,
+   "guides": 2,
+   "creatures": 897,
+   "wildlife": 1342,
+   "gear": 20,
+   "signage": 41
+  },
+  "fixtures": 78,
+  "water": {
+   "rivers": 5,
+   "bridges": 3,
+   "kerbSegments": 0,
+   "decks": 3,
+   "ramps": 6,
+   "rails": 6,
+   "posts": 66,
+   "edgeLines": 18,
+   "pads": 6,
+   "drawCalls": 18,
+   "triangles": 2900,
+   "maxY": 1.45,
+   "railTopY": 1.45,
+   "clearanceOk": true,
+   "night": true,
+   "floats": 27,
+   "meshes": [
+    "WATER_SHORE",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_PLATINUM",
+    "WATER_RAILS",
+    "WATER_EDGE_LINES",
+    "WATER_LANDING_PADS",
+    "WATER_SURFACE",
+    "WATER_FLOAT_PADS",
+    "WATER_FLOAT_CORES"
+   ],
+   "ripples": {
+    "supported": true,
+    "enabled": true,
+    "tier": "HIGH",
+    "n": 256,
+    "size_m": 48,
+    "grid": 96,
+    "texel_m": 0.188,
+    "c2": 0.09,
+    "damp": 0.99,
+    "amp_m": 0.07,
+    "ring_speed_mps": 3.94,
+    "impulses": 59,
+    "dropped": 0,
+    "steps": 0,
+    "active": false,
+    "in_water": false,
+    "pending": 59,
+    "origin": [
+     0,
+     3.9375
+    ],
+    "error": null
+   }
+  },
+  "coast": {
+   "islands": 11,
+   "draw_calls": 18,
+   "tris": 24940,
+   "sea_y": -0.3,
+   "beach_w": 34,
+   "outline": {
+    "x1": -203,
+    "z1": -86,
+    "x2": 203,
+    "z2": 322,
+    "corner_r": 70
+   },
+   "foam_lines": 12,
+   "night": true
+  },
+  "terrain": {
+   "regions": 8,
+   "terraces": 4,
+   "forecourts": 5,
+   "spurs": 4,
+   "tint_sheets": 10,
+   "tint_cells": 866,
+   "paths": {
+    "CAUSEWAY": 6,
+    "REGIONAL": 13,
+    "TRAIL": 11
+   },
+   "shards": 452,
+   "dust": 2589,
+   "monoliths": 18,
+   "draw_calls": 10,
+   "tris": 7940,
+   "night": true
+  },
+  "macro": {
+   "ridges": [
+    {
+     "id": "RIDGE_NEAR",
+     "dist_m": 360,
+     "h": [
+      38,
+      150
+     ],
+     "passes": 5,
+     "tris": 480
+    },
+    {
+     "id": "RIDGE_MID",
+     "dist_m": 520,
+     "h": [
+      70,
+      230
+     ],
+     "passes": 5,
+     "tris": 424
+    }
+   ],
+   "waterfalls": [
+    {
+     "id": "TITAN_FALL",
+     "drop_m": 11.8,
+     "source": "TITAN_LEDGE",
+     "receiver": "TITAN_LAKE",
+     "ripple": true,
+     "mist": 3
+    },
+    {
+     "id": "NORTH_FALL",
+     "drop_m": 46,
+     "source": "RIDGE_NEAR",
+     "receiver": "RIVER_N",
+     "ripple": false,
+     "mist": 3
+    }
+   ],
+   "sky_beams": [
+    "BEAM_TEMPLE←LM_TEMPLE crown diamond",
+    "BEAM_TOWER←LM_TOWER crown diamond",
+    "BEAM_NORTH_PASS←north pass sanctuary beacon (ridge notch)"
+   ],
+   "draw_calls": 15
+  },
+  "meadow": {
+   "chunks": 89,
+   "instances": 16895,
+   "visible_chunks": 17,
+   "draw_calls": 17,
+   "tris_visible_max": 135160,
+   "near_m": 70,
+   "mid_m": 130,
+   "night": true,
+   "cfg": {
+    "_doc": "owner next-pass 2026-09-20 §10 CRYSTAL MEADOW = the MAHWORLD grassland: many small multifaceted forms in the region family, varied height, controlled highlights, slight translucency, never a mirror; NEAR = instanced geometry (chunks of 30 m, frustum + distance culled), MID = the same chunks at half density, FAR = the region tint sheet; a subtle shimmer by instance hash, never constant sparkle",
+    "density_per_m2": 0.7,
+    "chunk_m": 30,
+    "near_m": 70,
+    "mid_m": 130,
+    "h_m": [
+     0.07,
+     0.36
+    ],
+    "r_m": [
+     0.045,
+     0.13
+    ],
+    "max_instances": 64000,
+    "opacity": 0.86,
+    "shimmer": 0.05
+   }
+  },
+  "forest": {
+   "tree_lock": true,
+   "zone_family": {
+    "FOREST_W": "purple",
+    "FOREST_NW": "red",
+    "FOREST_NE": "blue",
+    "FOREST_N_W": "red",
+    "FOREST_N_E": "gold"
+   },
+   "trees": 125,
+   "lod_counts": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 125
+   },
+   "impostor": true,
+   "draw_calls": 2,
+   "lod_m": {
+    "near": 26,
+    "mid": 60
+   },
+   "height_m": [
+    9.27,
+    14.73
+   ],
+   "underbrush": 125,
+   "night": true,
+   "skipped": null
+  },
+  "architecture": {
+   "landmarks": 5,
+   "houses": 5,
+   "skirt_shards": 137,
+   "seams": 25,
+   "bands": 336,
+   "insets": 30,
+   "crowns": 9,
+   "entrance_diamonds": 20,
+   "roof_diamonds": 20,
+   "draw_calls": 43,
+   "tris": 12140,
+   "night": true,
+   "motion_far_m": 220
+  },
+  "celestial": {
+   "night": true,
+   "draw_calls_visible": 3,
+   "sun": {
+    "apparent_deg": 6.5,
+    "diameter_m": 37.48,
+    "distance_m": 330,
+    "halo_deg": 14,
+    "halo_m": 81.04,
+    "textured": true,
+    "visible": false,
+    "direction": [
+     0.74,
+     0.541,
+     0.399
+    ]
+   },
+   "moon": {
+    "apparent_deg": 6.2,
+    "diameter_m": 35.74,
+    "distance_m": 330,
+    "halo_deg": 12,
+    "halo_m": 69.37,
+    "textured": true,
+    "visible": true,
+    "direction": [
+     -0.342,
+     0.085,
+     -0.936
+    ]
+   }
+  },
+  "sky": {
+   "wind": {
+    "dir_deg": 28,
+    "speed_mps": 2.4,
+    "now_mps": 3.04,
+    "gust": 0.35
+   },
+   "layers": [
+    {
+     "id": "MIST_LOW",
+     "kind": "MIST",
+     "count": 1,
+     "alt_m": 6,
+     "opacity": 0.22
+    },
+    {
+     "id": "STRATUS_LOW",
+     "kind": "CLOUD",
+     "count": 12,
+     "alt_m": 96,
+     "opacity": 0.3
+    },
+    {
+     "id": "CUMULUS_MID",
+     "kind": "CLOUD",
+     "count": 30,
+     "alt_m": 150,
+     "opacity": 0.42
+    },
+    {
+     "id": "CIRRUS_HIGH",
+     "kind": "CLOUD",
+     "count": 16,
+     "alt_m": 280,
+     "opacity": 0.2
+    }
+   ],
+   "draw_calls": 4,
+   "night": true
+  },
+  "atmosphere": {
+   "on": true,
+   "tier": "HIGH",
+   "night": true,
+   "fog": null,
+   "mie": 0.15,
+   "sun": [
+    -0.342,
+    0.085,
+    -0.936
+   ]
+  },
+  "props": {
+   "placed": [
+    {
+     "id": "PROJECTOR_GYM_BEACON",
+     "derivative": "MAH_GYM_PROJECTOR_BEACON",
+     "scale": 4.9804,
+     "footprint_m": [
+      4.88,
+      2.77
+     ],
+     "height_m": 4.6,
+     "yaw_deg": 40,
+     "levels": [
+      0,
+      60
+     ],
+     "meshes": 1,
+     "bounds": {
+      "min": [
+       -82.76,
+       0.02,
+       95.37
+      ],
+      "max": [
+       -77.24,
+       4.62,
+       100.63
+      ]
+     },
+     "pad_r_m": 2.79
+    }
+   ],
+   "pads": 1,
+   "draw_calls_at_rest": 2,
+   "hologram_materials": 2,
+   "night": true
+  },
+  "matchHall": {
+   "building": {
+    "id": "MATCH_HALL",
+    "at": [
+     122,
+     6
+    ],
+    "door": {
+     "side": "-x",
+     "x": 102,
+     "z": 6,
+     "w": 6,
+     "h": 5
+    },
+    "draw_calls": 6,
+    "tris": 1772,
+    "strips": 60,
+    "height_m": 22
+   },
+   "court": {
+    "id": "MATCH_COURT_OUTDOOR",
+    "at": [
+     128,
+     50
+    ],
+    "r": 16,
+    "spectator_r": [
+     19,
+     24
+    ],
+    "pylons": 4,
+    "aisles": 4,
+    "draw_calls": 3,
+    "tris": 4656
+   },
+   "interior": null,
+   "night": true,
+   "draw_calls_field": 9
+  },
+  "guides": {
+   "current": null,
+   "visible": true,
+   "on_stage": false,
+   "height_m": 0.75,
+   "wanted": null,
+   "loaded": [],
+   "loading": [],
+   "skinned": null,
+   "scale": null,
+   "night": true,
+   "rim": null,
+   "draw_calls": 0,
+   "pos": null,
+   "yaw_deg": null,
+   "follow": {
+    "lateral_m": 0.78,
+    "trail_m": 0.38,
+    "up_m": 1.42,
+    "rate": 7,
+    "lead_s": 0.18,
+    "snap_beyond_m": 12,
+    "cam_clear_m": 1.6,
+    "floor_above_feet_m": 0.35,
+    "dist_m": 1.5,
+    "angle_rad": 1.2
+   },
+   "orient": {
+    "yaw_rate": 6,
+    "look_events_s": 0
+   },
+   "companion_brake": {
+    "min_decel_mps2": 5,
+    "rad": 0.18,
+    "settle_s": 0.35
+   },
+   "hover": {
+    "amp_m": 0.05,
+    "hz": 0.9,
+    "amp2_m": 0.02,
+    "hz2": 0.37
+   },
+   "drift": {
+    "amp_m": 0.28,
+    "period_s": 6.5,
+    "correct_rate": 1.6
+   },
+   "settle": {
+    "after_s": 2.5,
+    "rise_m": 0.12,
+    "look_hz": 0.11,
+    "look_rad": 0.55
+   },
+   "bank": {
+    "rad_per_mps": 0.14,
+    "max_rad": 0.42,
+    "yaw_rate": 8
+   },
+   "formation": null,
+   "accel_bank": 0.05,
+   "settled": 0,
+   "idle_s": 0,
+   "motion_source": "registry.guide_motion",
+   "cast": {
+    "weight": 0,
+    "casts_seen": 0,
+    "tuning": {
+     "rise_m": 0.42,
+     "pitch_rad": 0.22,
+     "bob_hz": 2.6,
+     "glow_m": 0.9,
+     "dispense_s": 0.9
+    }
+   }
+  },
+  "creatures": {
+   "count": 0,
+   "active": 0,
+   "lod_levels": 3,
+   "lod_m": [
+    24,
+    60
+   ],
+   "lod_now": [],
+   "classified_bones": {
+    "method": "names",
+    "total_bones": 55,
+    "root": "Root",
+    "hips": "J_Bip_C_Hips",
+    "head": "J_Bip_C_Head",
+    "neck": "J_Bip_C_Neck",
+    "jaw": null,
+    "spine": [
+     "J_Bip_C_Spine",
+     "J_Bip_C_Chest",
+     "J_Bip_C_UpperChest"
+    ],
+    "tail": [],
+    "legs": {
+     "FL": "J_Bip_L_UpperArm / J_Bip_L_LowerArm / J_Bip_L_Hand",
+     "FR": "J_Bip_R_UpperArm / J_Bip_R_LowerArm / J_Bip_R_Hand",
+     "BL": "J_Bip_L_UpperLeg / J_Bip_L_Foot / J_Bip_L_Foot",
+     "BR": "J_Bip_R_UpperLeg / J_Bip_R_Foot / J_Bip_R_Foot"
+    },
+    "forward_model": "+z",
+    "forward_fix_deg": 180,
+    "rest_height_m": 0.978,
+    "missing": [
+     "jaw",
+     "tail"
+    ],
+    "duplicates": [],
+    "notes": [
+     "BL knee degenerate (-0.004 m) → fold at J_Bip_L_Foot",
+     "BR knee degenerate (-0.000 m) → fold at J_Bip_R_Foot"
+    ]
+   },
+   "loaded": true,
+   "load_error": null,
+   "derivative": "DOGKIE_FOREST_CREATURE",
+   "height_m": 1.4,
+   "scale": 1.4319,
+   "states": {},
+   "draw_calls_visible": 0,
+   "tags": 0,
+   "status_level": 5,
+   "contacts": 0,
+   "territories": {
+    "packs": 9,
+    "shards": 452,
+    "draw_calls": 2
+   },
+   "locomotion": "GLIDE (no stepping cycle; hover 0.07 m, attack lift 0.28 m)",
+   "motion_contract": {
+    "mode": "SURFACE_GLIDE",
+    "step_cycle": false,
+    "surface_hover_m": 0.07,
+    "attack_lift_m": 0.28,
+    "attack_only_lift": true,
+    "fused_units": true
+   },
+   "motion": [],
+   "lag_s": 0.12,
+   "host_clock": false,
+   "night": true
+  },
+  "wildlife": {
+   "authority": "HOST (p.wildlife — play/world/WildlifeManager.js)",
+   "species": {
+    "FISH": {
+     "figures": 24,
+     "visible": 21,
+     "lods": 3,
+     "scale": 2.448,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "combat": {
+      "hits_to_kill": 5,
+      "hits_to_kill_player": 4.5,
+      "aggression": "PROVOKED"
+     },
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "SWIM",
+      "SWIM",
+      "RISE",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "RISE",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "DIVE",
+      "SWIM",
+      "RISE",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "DIVE"
+     ],
+     "positions": [
+      [
+       -11,
+       -1.4,
+       -122
+      ],
+      [
+       -9,
+       -2.1,
+       -120
+      ],
+      [
+       -3,
+       -0.4,
+       -118
+      ],
+      [
+       268,
+       -1.4,
+       52
+      ],
+      [
+       271,
+       -1.6,
+       52
+      ],
+      [
+       274,
+       -2,
+       53
+      ],
+      [
+       -27,
+       -0.4,
+       226
+      ],
+      [
+       -27,
+       -0.4,
+       229
+      ],
+      [
+       -27,
+       -0.3,
+       232
+      ],
+      [
+       -144,
+       -0.3,
+       224
+      ],
+      [
+       -145,
+       -0.3,
+       222
+      ],
+      [
+       -148,
+       -0.3,
+       221
+      ],
+      [
+       144,
+       -0.4,
+       103
+      ],
+      [
+       142,
+       -0.3,
+       105
+      ],
+      [
+       143,
+       -0.2,
+       102
+      ],
+      [
+       -92,
+       -0.4,
+       32
+      ],
+      [
+       -88,
+       -0.2,
+       33
+      ],
+      [
+       -85,
+       -0.4,
+       32
+      ],
+      [
+       -26,
+       -0.3,
+       263
+      ],
+      [
+       -23,
+       -0.3,
+       262
+      ],
+      [
+       -20,
+       -0.4,
+       261
+      ],
+      [
+       32,
+       -0.3,
+       258
+      ],
+      [
+       32,
+       -0.4,
+       255
+      ],
+      [
+       23,
+       -0.2,
+       251
+      ]
+     ]
+    },
+    "PHOENIX": {
+     "figures": 5,
+     "visible": 5,
+     "lods": 3,
+     "scale": 3.74,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "combat": {
+      "hits_to_kill": 18,
+      "hits_to_kill_player": 10,
+      "aggression": "HOSTILE_AERIAL"
+     },
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "PATROL",
+      "PATROL",
+      "PATROL",
+      "PATROL",
+      "PATROL"
+     ],
+     "positions": [
+      [
+       134,
+       94,
+       416
+      ],
+      [
+       -116,
+       94,
+       78
+      ],
+      [
+       190,
+       94,
+       203
+      ],
+      [
+       -116,
+       94,
+       378
+      ],
+      [
+       5,
+       94,
+       366
+      ]
+     ]
+    },
+    "HORSE": {
+     "figures": 5,
+     "visible": 5,
+     "lods": 3,
+     "scale": 2.384,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "combat": {
+      "hits_to_kill": 35,
+      "hits_to_kill_player": null,
+      "aggression": "DEFENSIVE"
+     },
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "GRAZE",
+      "GRAZE",
+      "GRAZE",
+      "GRAZE",
+      "GRAZE"
+     ],
+     "positions": [
+      [
+       131,
+       0,
+       141
+      ],
+      [
+       75,
+       0,
+       128
+      ],
+      [
+       -27,
+       0,
+       155
+      ],
+      [
+       -143,
+       2.6,
+       22
+      ],
+      [
+       -84,
+       0,
+       -29
+      ]
+     ]
+    }
+   },
+   "stats": {
+    "fish": 24,
+    "horses": 5,
+    "phoenix": 5,
+    "breaches": 0,
+    "visits": 0,
+    "draw_calls": 31,
+    "tags": 0
+   },
+   "night": true,
+   "payment_ui": false,
+   "figures": 34,
+   "population_lod": {
+    "built": true,
+    "error": null,
+    "mid_schools": 20,
+    "mid_agents": 228,
+    "far_silhouettes": 120,
+    "breaches": 26,
+    "reach_m": 260,
+    "near_schools": 13,
+    "draw_calls": 2
+   }
+  },
+  "gear": {
+   "items": [],
+   "grips": [],
+   "clones": 0,
+   "diamonds": 0,
+   "bushes": 16,
+   "shards": 480,
+   "broken": [],
+   "templates": [],
+   "band": "procedural tube 1.3 m × r 0.018 m (no source model in the project database)",
+   "status_tags": 0
+  },
+  "signage": {
+   "wayfinders": 23,
+   "buildings": 10,
+   "labels_visible": 1,
+   "labels_total": 33
+  },
+  "trees": 125
+ },
+ "forest_resource": {
+  "node": {
+   "id": "NODE_RB_NE_PATH",
+   "patch": "RB_NE_PATH",
+   "x": 124,
+   "z": 165,
+   "y": 0,
+   "family": "blue",
+   "r": 2.4,
+   "hp": 168,
+   "max": 168,
+   "broken": false,
+   "respawn_in_s": null
+  },
+  "trees": 125,
+  "region": 8
+ },
+ "pond": {
+  "water": {
+   "rivers": 5,
+   "bridges": 3,
+   "kerbSegments": 0,
+   "decks": 3,
+   "ramps": 6,
+   "rails": 6,
+   "posts": 66,
+   "edgeLines": 18,
+   "pads": 6,
+   "drawCalls": 18,
+   "triangles": 2900,
+   "maxY": 1.45,
+   "railTopY": 1.45,
+   "clearanceOk": true,
+   "night": true,
+   "floats": 27,
+   "meshes": [
+    "WATER_SHORE",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_FOAM",
+    "WATER_PLATINUM",
+    "WATER_RAILS",
+    "WATER_EDGE_LINES",
+    "WATER_LANDING_PADS",
+    "WATER_SURFACE",
+    "WATER_FLOAT_PADS",
+    "WATER_FLOAT_CORES"
+   ],
+   "ripples": {
+    "supported": true,
+    "enabled": true,
+    "tier": "HIGH",
+    "n": 256,
+    "size_m": 48,
+    "grid": 96,
+    "texel_m": 0.188,
+    "c2": 0.09,
+    "damp": 0.99,
+    "amp_m": 0.07,
+    "ring_speed_mps": 3.94,
+    "impulses": 82,
+    "dropped": 78,
+    "steps": 116,
+    "active": true,
+    "in_water": false,
+    "pending": 0,
+    "origin": [
+     150,
+     126
+    ],
+    "error": null
+   }
+  },
+  "meta": {
+   "id": "TITAN_LAKE",
+   "pond": true,
+   "sanctuary": "TITAN_SANCTUARY",
+   "x1": 137,
+   "z1": 90,
+   "x2": 161,
+   "z2": 118,
+   "surface_y": -0.16,
+   "bed_y": -0.45,
+   "wade_y": -0.45,
+   "shore_w": 5,
+   "note": "the Titan lake under the east mountain ledge"
+  },
+  "fish": 24,
+  "surface_mesh": true,
+  "shore_ground": 0
+ },
+ "pass_traversal": {
+  "ground": {
+   "north": 1.4,
+   "top": 2.8,
+   "south": 1.4,
+   "off": 0
+  },
+  "walk": {
+   "reached": true,
+   "passes": 1
+  },
+  "final": {
+   "x": 150,
+   "z": 40.993
+  }
+ },
+ "building": {
+  "approach": {
+   "reached": true,
+   "passes": 1
+  },
+  "door_walk": {
+   "reached": true,
+   "passes": 1
+  },
+  "enter": {
+   "command_id": "play-PLAYER_A-1uang7-80",
+   "seq": 80,
+   "accepted": true,
+   "version": 1537,
+   "tick": 1447,
+   "duplicate": false,
+   "room": "MATCH_HALL",
+   "spawn": {
+    "x": 0,
+    "z": 17
+   },
+   "facing": 0,
+   "interior": true,
+   "returned_to_door": null,
+   "prompt": "PLAZA"
+  },
+  "room": {
+   "room": "MATCH_HALL",
+   "trx": {
+    "state": {
+     "phase": null,
+     "to": null,
+     "from": null,
+     "t0": 0
+    },
+    "log": [],
+    "room_build": {
+     "key": "MATCH_HALL:MATCH_HALL_colliders_v1:14",
+     "room": "MATCH_HALL",
+     "error": null
+    },
+    "boom_shapes": true
+   }
+  }
+ },
+ "day_night": {
+  "before": 211,
+  "day": 213,
+  "night": 213,
+  "day_state": "DAY",
+  "final_state": "NIGHT"
+ },
+ "expected_probe_404s": 13,
+ "pass": 11,
+ "fail": 0
+}

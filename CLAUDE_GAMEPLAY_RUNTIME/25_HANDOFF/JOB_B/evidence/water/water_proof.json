@@ -1,0 +1,183 @@
+{
+ "night": false,
+ "mobile": false,
+ "steps": [
+  {
+   "id": "wade",
+   "pos": {
+    "pos": {
+     "x": -39.998,
+     "z": 220.198
+    },
+    "alt": -0.35,
+    "ground": -0.35
+   },
+   "water": {
+    "supported": true,
+    "enabled": true,
+    "tier": "HIGH",
+    "n": 256,
+    "size_m": 48,
+    "grid": 96,
+    "texel_m": 0.188,
+    "c2": 0.09,
+    "damp": 0.992,
+    "amp_m": 0.11,
+    "ring_speed_mps": 3.94,
+    "impulses": 17,
+    "dropped": 0,
+    "steps": 1474,
+    "active": true,
+    "in_water": true,
+    "pending": 0,
+    "origin": [
+     -39.9375,
+     220.125
+    ],
+    "error": null
+   }
+  },
+  {
+   "id": "landing",
+   "water": {
+    "supported": true,
+    "enabled": true,
+    "tier": "HIGH",
+    "n": 256,
+    "size_m": 48,
+    "grid": 96,
+    "texel_m": 0.188,
+    "c2": 0.09,
+    "damp": 0.992,
+    "amp_m": 0.11,
+    "ring_speed_mps": 3.94,
+    "impulses": 89,
+    "dropped": 0,
+    "steps": 2883,
+    "active": true,
+    "in_water": true,
+    "pending": 0,
+    "origin": [
+     -8.8125,
+     220.125
+    ],
+    "error": null
+   }
+  },
+  {
+   "id": "guide_rest",
+   "m": {
+    "guide_px": 71.80000000000001,
+    "head_px": 33.80000000000001,
+    "guide_on": true,
+    "height_m": 0.75,
+    "pos": [
+     -40,
+     1.35,
+     206.53
+    ],
+    "follow": {
+     "dist_m": 1.45,
+     "angle_rad": 1.25,
+     "up_m": 1.35,
+     "rate": 6.5,
+     "lead_s": 0.22,
+     "snap_beyond_m": 12,
+     "cam_clear_m": 1.6,
+     "floor_above_feet_m": 0.35
+    },
+    "view_h": 800,
+    "ratio_guide_over_head": 2.12,
+    "reference_ratio": 0.66,
+    "target_ratio": 2,
+    "x_over_reference": 3.21
+   }
+  },
+  {
+   "id": "guide_running",
+   "m": {
+    "guide_px": 99.60000000000002,
+    "head_px": 29.400000000000006,
+    "guide_on": true,
+    "height_m": 0.75,
+    "pos": [
+     -38.43,
+     1.01,
+     220.81
+    ],
+    "follow": {
+     "dist_m": 1.45,
+     "angle_rad": 1.25,
+     "up_m": 1.35,
+     "rate": 6.5,
+     "lead_s": 0.22,
+     "snap_beyond_m": 12,
+     "cam_clear_m": 1.6,
+     "floor_above_feet_m": 0.35
+    },
+    "view_h": 800,
+    "ratio_guide_over_head": 3.39,
+    "reference_ratio": 0.66,
+    "target_ratio": 2,
+    "x_over_reference": 5.14
+   }
+  }
+ ],
+ "errors": [],
+ "console": [
+  "warning: THREE.WebGLProgram: Program Info Log: (210,81-129): warning X4122: sum of 0.996094 and -2.98545e-017 cannot be represented accurately in double precision\n(209,37-61): warning X4122: sum of 1 and -1.49272e-017 cannot be represented accurately in double precision\n(210,82-106): warning X4122: sum of 1 "
+ ],
+ "water": {
+  "rivers": 1,
+  "bridges": 3,
+  "kerbSegments": 8,
+  "decks": 3,
+  "ramps": 6,
+  "rails": 6,
+  "posts": 66,
+  "edgeLines": 18,
+  "pads": 6,
+  "drawCalls": 8,
+  "triangles": 2696,
+  "maxY": 1.45,
+  "railTopY": 1.45,
+  "clearanceOk": true,
+  "night": false,
+  "floats": 11,
+  "meshes": [
+   "WATER_TRENCH",
+   "WATER_PLATINUM",
+   "WATER_RAILS",
+   "WATER_EDGE_LINES",
+   "WATER_LANDING_PADS",
+   "WATER_SURFACE",
+   "WATER_FLOAT_PADS",
+   "WATER_FLOAT_CORES"
+  ],
+  "ripples": {
+   "supported": true,
+   "enabled": true,
+   "tier": "HIGH",
+   "n": 256,
+   "size_m": 48,
+   "grid": 96,
+   "texel_m": 0.188,
+   "c2": 0.09,
+   "damp": 0.992,
+   "amp_m": 0.11,
+   "ring_speed_mps": 3.94,
+   "impulses": 0,
+   "dropped": 0,
+   "steps": 0,
+   "active": false,
+   "in_water": false,
+   "pending": 0,
+   "origin": [
+    0,
+    3.9375
+   ],
+   "error": null
+  }
+ },
+ "stage": "07_mr_rest"
+}

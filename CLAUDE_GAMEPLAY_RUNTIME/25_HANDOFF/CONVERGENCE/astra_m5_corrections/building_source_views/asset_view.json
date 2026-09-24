@@ -1,0 +1,53 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\ornate temple 3d model.glb",
+  "bytes": 76380384,
+  "load_ms": 1643,
+  "size_m": [
+   0.721,
+   0.979,
+   0.742
+  ],
+  "triangles": 1866763,
+  "meshes": 1,
+  "shots": {
+   "front": "ornate temple 3d model_front.png",
+   "q34": "ornate temple 3d model_q34.png",
+   "side": "ornate temple 3d model_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\futuristic tower 3d model.glb",
+  "bytes": 77766980,
+  "load_ms": 2265,
+  "size_m": [
+   0.783,
+   0.985,
+   0.616
+  ],
+  "triangles": 1901950,
+  "meshes": 1,
+  "shots": {
+   "front": "futuristic tower 3d model_front.png",
+   "q34": "futuristic tower 3d model_q34.png",
+   "side": "futuristic tower 3d model_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\futuristic market building 3d model.glb",
+  "bytes": 84168868,
+  "load_ms": 2617,
+  "size_m": [
+   0.516,
+   0.983,
+   0.498
+  ],
+  "triangles": 1871488,
+  "meshes": 1,
+  "shots": {
+   "front": "futuristic market building 3d model_front.png",
+   "q34": "futuristic market building 3d model_q34.png",
+   "side": "futuristic market building 3d model_side.png"
+  }
+ }
+]

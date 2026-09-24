@@ -1,0 +1,40 @@
+/* SHORT REPLACEMENT CLIP — the three closure defects only: packed → gather → split, hover gait (side + close rear leg), shoulder
+   elevation ladder 15/45/90/135 + front lat spread / double biceps. node deploy/record_closure.mjs [tag] → deploy/review/<tag>/ */
+import path from 'node:path'; import fs from 'node:fs'; import { fileURLToPath } from 'node:url';
+import { serveStatic, launchChrome, waitForGame, sleep, PLAY_PATH } from './probe_lib.mjs';
+var HERE = path.dirname(fileURLToPath(import.meta.url)); var DIST = path.join(HERE, 'static_dist'); var tag = process.argv[2] || 'closure'; var OUT = path.join(HERE, 'review', tag); fs.mkdirSync(OUT, { recursive: true });
+var srv = await serveStatic(DIST); var pg = await launchChrome({ width: 960, height: 720, gpu: true }); var frames = [], marks = [], t0 = 0;
+function mark(l) { marks.push({ t: +((performance.now() - t0) / 1000).toFixed(2), label: l }); console.log(((performance.now() - t0) / 1000).toFixed(1) + 's  ' + l); }
+async function key(code, down) { await pg.evaluate("document.dispatchEvent(new KeyboardEvent('" + (down ? 'keydown' : 'keyup') + "',{code:'" + code + "',key:'" + code.slice(3).toLowerCase() + "',bubbles:true})); 1"); }
+async function cam(y, p, d, pv) { await pg.evaluate("window.MAHWORLD_PLAY.cam(" + y + "," + p + "," + d + "," + (pv === undefined ? 'null' : pv) + ")"); }
+async function yawOf() { return await pg.evaluate("window.MAHWORLD_PLAY.mePose().root_yaw"); }
+try {
+  await pg.goto(srv.origin + PLAY_PATH + '?field=1'); await waitForGame(pg, 90000); await sleep(4000);
+  await pg.evaluate("(function(){ var P=window.MAHWORLD_PLAY; P.hud.showGuide(false); if (P.camFollow) P.camFollow(false); return 1; })()");
+  pg.on('Page.screencastFrame', function (p) { frames.push({ t: performance.now() - t0, data: p.data }); pg.cmd('Page.screencastFrameAck', { sessionId: p.sessionId }).catch(function () { }); });
+  await pg.evaluate("window.MAHWORLD_PLAY.goTo(-3, -13, -3, -8)"); await sleep(400);
+  t0 = performance.now(); await pg.cmd('Page.startScreencast', { format: 'jpeg', quality: 72, maxWidth: 960, maxHeight: 720, everyNthFrame: 1 });
+  /* 3. packed → gather → split (front-3/4) */
+  var y0 = await yawOf(); await cam(y0 + Math.PI + 0.55, 0.06, 3.6, 0.95); await sleep(400); mark('PACKED -> GATHER -> SPLIT: two rounded legs throughout, seam accent only');
+  await pg.evaluate('window.MAHWORLD_PLAY.send("TRANSFORM",{to:"SPLIT"})'); await sleep(3400);
+  /* 1. hover gait: side, then close rear leg */
+  await pg.evaluate("window.MAHWORLD_PLAY.goTo(-18, -10)"); await sleep(400); await cam(-Math.PI / 2, 0.42, 6.5); await sleep(200); await key('KeyW', true); await sleep(1200); var y1 = await yawOf();
+  await cam(y1 + Math.PI + Math.PI / 2, 0.02, 3.4, 0.8); mark('HOVER GAIT (side): rear leg long behind, trailing tip idles, knee lifts only under the body'); await sleep(3600);
+  await cam(y1 + Math.PI + Math.PI / 2 + 0.3, 0.0, 1.6, 0.5); mark('CLOSE: rear leg / knee / shin through the swing'); await sleep(2800); await key('KeyW', false); await sleep(500);
+  /* 2. shoulder elevation: held pose ladder + flex emotes */
+  await pg.evaluate("window.MAHWORLD_PLAY.goTo(-3, -13)"); await sleep(300); await pg.evaluate('window.MAHWORLD_PLAY.send("TRANSFORM",{to:"FUSED"})'); await sleep(2800); var y2 = await yawOf();
+  await cam(y2 + Math.PI - 0.55, 0.05, 1.5, 1.35); await pg.evaluate("window.MAHWORLD_PLAY.holdPose('me', true)"); await sleep(200); mark('SHOULDER: 45 -> 90 -> 120 -> 135 -> 150 deg (SHOULDER + AXILLA correctives on elevation)');
+  var ladder = [45, 90, 120, 135, 150, 135, 120];
+  for (var li = 0; li < ladder.length; li++) { var deg = ladder[li]; var z = -deg * Math.PI / 180, clav = Math.max(0, (deg - 30) / 2) * Math.PI / 180; await pg.evaluate("(function(){ var P=window.MAHWORLD_PLAY; P.setBone('me','UPPERARM_L',-0.05,0," + z + "); P.setBone('me','CLAV_L',0,0," + (-clav) + "); P.setBone('me','FOREARM_L',-0.1,0,0); return 1; })()"); await sleep(650); }
+  await cam(y2 - 0.7, 0.05, 1.5, 1.35); await sleep(1400); await pg.evaluate("window.MAHWORLD_PLAY.holdPose('me', false)"); await sleep(400);
+  await pg.cmd('Page.stopScreencast'); var dur = frames.length ? (frames[frames.length - 1].t - frames[0].t) / 1000 : 0; console.log('frames', frames.length, 'seconds', dur.toFixed(1));
+  fs.writeFileSync(path.join(OUT, 'marks.json'), JSON.stringify({ marks: marks, frames: frames.length, seconds: +dur.toFixed(1) }, null, 1));
+  marks.forEach(function (mk, i) { var fi = frames.findIndex(function (f) { return f.t / 1000 >= mk.t + 0.9; }); if (fi >= 0) fs.writeFileSync(path.join(OUT, 'still_' + String(i).padStart(2, '0') + '_' + mk.label.replace(/[^a-z0-9]+/gi, '_').slice(0, 40) + '.png'), Buffer.from(frames[fi].data, 'base64')); });
+  var t2 = await pg.cmd('Target.createTarget', { url: 'about:blank' }); var list = await (await fetch('http://127.0.0.1:' + pg.port + '/json/list')).json(); var helper = list.filter(function (x) { return x.id === t2.targetId; })[0]; var ws = new WebSocket(helper.webSocketDebuggerUrl); await new Promise(function (r, j) { ws.onopen = r; ws.onerror = j; });
+  var mid = 0, pend = {}; ws.onmessage = function (m) { var d = JSON.parse(typeof m.data === 'string' ? m.data : String(m.data)); if (d.id && pend[d.id]) { pend[d.id](d); delete pend[d.id]; } }; function c2(method, params) { return new Promise(function (r, j) { var id = ++mid; pend[id] = function (d) { d.error ? j(new Error(JSON.stringify(d.error))) : r(d.result); }; ws.send(JSON.stringify({ id: id, method: method, params: params || {} })); }); }
+  await c2('Runtime.enable'); var ev2 = async function (expr) { var r = await c2('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true }); if (r.exceptionDetails) throw new Error('eval2: ' + JSON.stringify(r.exceptionDetails).slice(0, 300)); return r.result.value; };
+  await ev2('window.__F = []; window.__T = []; 1'); for (var c0 = 0; c0 < frames.length; c0 += 40) { var chunk = frames.slice(c0, c0 + 40); await ev2('(function(){var d=' + JSON.stringify(chunk.map(function (f) { return f.data; })) + ';var t=' + JSON.stringify(chunk.map(function (f) { return Math.round(f.t - frames[0].t); })) + ';for(var i=0;i<d.length;i++){window.__F.push(d[i]);window.__T.push(t[i]);} return window.__F.length;})()'); }
+  var webm = await ev2('(async function(){ var F=window.__F, T=window.__T; var imgs=[]; for (var i=0;i<F.length;i++){ imgs.push(await new Promise(function(res){ var im=new Image(); im.onload=function(){res(im)}; im.onerror=function(){res(null)}; im.src="data:image/jpeg;base64,"+F[i]; })); } var w=imgs[0].width, h=imgs[0].height; var cv=document.createElement("canvas"); cv.width=w; cv.height=h; document.body.appendChild(cv); var ctx=cv.getContext("2d"); ctx.drawImage(imgs[0],0,0); var stream=cv.captureStream(30); var mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].filter(function(m){return MediaRecorder.isTypeSupported(m)})[0]; var rec=new MediaRecorder(stream,{mimeType:mime, videoBitsPerSecond: 3000000}); var chunks=[]; rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); }; var done=new Promise(function(res){ rec.onstop=res; }); rec.start(250); var start=performance.now(); var i=0; await new Promise(function(res){ function tick(){ var el=performance.now()-start; while(i<F.length && T[i]<=el){ if (imgs[i]) ctx.drawImage(imgs[i],0,0); i++; } if(i>=F.length){ setTimeout(res,300); return; } requestAnimationFrame(tick);} tick(); }); rec.stop(); await done; var blob=new Blob(chunks,{type:mime}); var b64=await new Promise(function(res){ var fr=new FileReader(); fr.onload=function(){res(fr.result.split(",")[1])}; fr.readAsDataURL(blob); }); return {mime:mime, bytes:blob.size, b64:b64}; })()');
+  var vpath = path.join(OUT, 'mahworld_closure_review.webm'); fs.writeFileSync(vpath, Buffer.from(webm.b64, 'base64')); console.log('VIDEO FILE ' + vpath + ' ' + webm.bytes + ' bytes ' + dur.toFixed(1) + 's'); ws.close();
+  console.log('errors', pg.errors.filter(function (x) { return !/404/.test(x); }));
+} finally { await pg.close(); srv.close(); }

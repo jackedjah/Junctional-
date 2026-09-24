@@ -1,0 +1,740 @@
+{
+ "checks": [
+  {
+   "id": "Dogkie (west forest): a real tap at its projected body locks THE TAPPED creature through LOCK_TARGET (entityAt → other:WILD_DOGKIE_09)",
+   "ok": true,
+   "detail": {
+    "r": {
+     "screen": {
+      "x": 196.50632516750306,
+      "y": 314.513651765429,
+      "cx": -95.5,
+      "cy": 0.71,
+      "cz": -26.8,
+      "size": [
+       1.3,
+       1.4,
+       1.32
+      ],
+      "safe": true
+     },
+     "steps": 0,
+     "entityAt": {
+      "id": "other:WILD_DOGKIE_09",
+      "distance": 12.141620699155123
+     },
+     "under": {
+      "tag": "DIV",
+      "id": "tc-world",
+      "cls": "",
+      "zone": "world"
+     },
+     "touch": {
+      "last_gesture": null,
+      "last_command": "LOCK_TARGET {\"aim_id\":\"WILD_DOGKIE_10\"}",
+      "last_response": "accepted",
+      "fingers": []
+     },
+     "journal": [
+      [
+       "DEV_PLACE",
+       null,
+       null,
+       null,
+       243
+      ],
+      [
+       "DEV_PLACE",
+       null,
+       null,
+       null,
+       293
+      ],
+      [
+       "R1723_LOCK",
+       "PLAYER_A",
+       "WILD_DOGKIE_09",
+       null,
+       358
+      ],
+      [
+       "R1723_LOCK",
+       "PLAYER_A",
+       "WILD_DOGKIE_10",
+       null,
+       372
+      ]
+     ],
+     "trace": [
+      [
+       17.95,
+       "WILD_DOGKIE_09",
+       false,
+       "FIELD"
+      ],
+      [
+       18.1,
+       "WILD_DOGKIE_09",
+       false,
+       "FIELD"
+      ],
+      [
+       18.2,
+       "WILD_DOGKIE_09",
+       false,
+       "FIELD"
+      ],
+      [
+       18.35,
+       "WILD_DOGKIE_09",
+       false,
+       "FIELD"
+      ],
+      [
+       18.45,
+       "WILD_DOGKIE_09",
+       false,
+       "FIELD"
+      ],
+      [
+       18.55,
+       "WILD_DOGKIE_09",
+       false,
+       "FIELD"
+      ]
+     ],
+     "lock": "WILD_DOGKIE_09",
+     "lockmark": {
+      "target": "other:WILD_DOGKIE_09",
+      "visible": true
+     },
+     "log": [
+      "LOCK_TARGET ✓ WILD_DOGKIE_09"
+     ],
+     "direct": {
+      "accepted": true
+     }
+    },
+    "d": 6,
+    "y": 0,
+    "level": 5
+   }
+  },
+  {
+   "id": "Dogkie (west forest): the lock marker follows the locked creature figure",
+   "ok": true,
+   "detail": {
+    "lockmark": {
+     "target": "other:WILD_DOGKIE_09",
+     "visible": true
+    }
+   }
+  },
+  {
+   "id": "Dogkie (west forest): the entity status (name / LV 5 / HP) is present and visible on its figure",
+   "ok": true,
+   "detail": {
+    "tag": {
+     "id": "WILD_DOGKIE_09",
+     "name": "DOGKIE",
+     "level": 5,
+     "hp": 336,
+     "max": 336,
+     "locked": true,
+     "ko": false,
+     "visible": true,
+     "opacity": 1,
+     "position": {
+      "x": -92.47,
+      "y": 0,
+      "z": -23.484
+     },
+     "head_y": 1.4
+    },
+    "host_level": 5
+   }
+  },
+  {
+   "id": "Dogkie (west forest): attack slot 1 (PA_PUSH) damages THE LOCKED creature through the one combat authority (2 hits)",
+   "ok": true,
+   "detail": {
+    "hits": 2,
+    "misses": []
+   }
+  },
+  {
+   "id": "Dogkie (west forest): the status HP bar reflects the damage (hp < max; LOCKED while the lock holds)",
+   "ok": true,
+   "detail": {
+    "tag": {
+     "id": "WILD_DOGKIE_09",
+     "name": "DOGKIE",
+     "level": 5,
+     "hp": 168,
+     "max": 336,
+     "locked": false,
+     "ko": false,
+     "visible": true,
+     "opacity": 1,
+     "position": {
+      "x": -88.308,
+      "y": 0,
+      "z": -19.135
+     },
+     "head_y": 1.4
+    },
+    "dissolved": false
+   }
+  },
+  {
+   "id": "fish (the Visionary pool, from its south shore): a real tap at its projected body locks THE TAPPED creature through LOCK_TARGET (entityAt → other:WILD_FISH_VISIONARY_POOL_1)",
+   "ok": true,
+   "detail": {
+    "r": {
+     "screen": {
+      "x": 252.81698454197942,
+      "y": 408.9609208947666,
+      "cx": -92.28,
+      "cy": 1.14,
+      "cz": 24,
+      "safe": true,
+      "in_page": true
+     },
+     "steps": 0,
+     "entityAt": {
+      "id": "other:WILD_FISH_VISIONARY_POOL_1"
+     },
+     "lock": "WILD_FISH_VISIONARY_POOL_1",
+     "lockmark": {
+      "target": "other:WILD_FISH_VISIONARY_POOL_1",
+      "visible": true
+     },
+     "touch": {
+      "last_command": "LOCK_TARGET {\"aim_id\":\"WILD_FISH_VISIONARY_POOL_1\"}",
+      "last_response": "accepted",
+      "events": [
+       "DOWN_CAMERA",
+       "WORLD_TAP",
+       "DOWN_CAMERA",
+       "WORLD_TAP"
+      ]
+     },
+     "in_page": true
+    },
+    "d": 2.3,
+    "y": 1.272,
+    "level": 35
+   }
+  },
+  {
+   "id": "fish (the Visionary pool, from its south shore): the lock marker follows the locked creature figure",
+   "ok": true,
+   "detail": {
+    "lockmark": {
+     "target": "other:WILD_FISH_VISIONARY_POOL_1",
+     "visible": true
+    }
+   }
+  },
+  {
+   "id": "fish (the Visionary pool, from its south shore): the entity status (name / LV 35 / HP) is present and visible on its figure",
+   "ok": true,
+   "detail": {
+    "tag": {
+     "id": "WILD_FISH_VISIONARY_POOL_1",
+     "species": "FISH",
+     "name": "FISH",
+     "level": 35,
+     "hp": 420,
+     "max": 420,
+     "locked": false,
+     "ko": false,
+     "visible": true,
+     "opacity": 1,
+     "position": {
+      "x": -88.23415601360979,
+      "y": 1.3264032605615537,
+      "z": 21.826315671958252
+     },
+     "head_y": 2.2264032605615536
+    },
+    "host_level": 35
+   }
+  },
+  {
+   "id": "fish (the Visionary pool, from its south shore): attack slot 1 (PA_PUSH) damages THE LOCKED creature through the one combat authority (5 hits)",
+   "ok": true,
+   "detail": {
+    "hits": 5,
+    "misses": [
+     "no enemy in range / cone"
+    ],
+    "casts": 12,
+    "min_d": 1.88,
+    "states": {
+     "SWIRL": 9,
+     "LAUNCH": 3,
+     "RECOVER": 3
+    }
+   }
+  },
+  {
+   "id": "fish (the Visionary pool, from its south shore): the status HP bar reflects the damage (hp < max; LOCKED while the lock holds)",
+   "ok": true,
+   "detail": {
+    "tag": {
+     "id": "WILD_FISH_VISIONARY_POOL_1",
+     "species": "FISH",
+     "name": "FISH",
+     "level": 35,
+     "hp": 0,
+     "max": 420,
+     "locked": false,
+     "ko": true,
+     "visible": true,
+     "opacity": 1,
+     "position": {
+      "x": -81.057,
+      "y": 1.1316666666666666,
+      "z": 23.574
+     },
+     "head_y": 2.0316666666666667
+    },
+    "dissolved": false
+   }
+  },
+  {
+   "id": "horse (Titan meadow, passive): a real tap at its projected body locks THE TAPPED creature through LOCK_TARGET (entityAt → other:WILD_HORSE_1)",
+   "ok": true,
+   "detail": {
+    "r": {
+     "screen": {
+      "x": 250.4320268161381,
+      "y": 318.7673677047465,
+      "cx": 133.4,
+      "cy": 0.91,
+      "cz": 136.5,
+      "size": [
+       2.31,
+       1.82,
+       2.12
+      ],
+      "safe": true
+     },
+     "steps": 0,
+     "entityAt": {
+      "id": "other:WILD_HORSE_1",
+      "distance": 11.826712319558064
+     },
+     "under": {
+      "tag": "DIV",
+      "id": "tc-world",
+      "cls": "",
+      "zone": "world"
+     },
+     "touch": {
+      "last_gesture": null,
+      "last_command": "LOCK_TARGET {\"aim_id\":\"WILD_HORSE_1\"}",
+      "last_response": "accepted",
+      "fingers": []
+     },
+     "journal": [
+      [
+       "R1723_LOCK",
+       "PLAYER_A",
+       "WILD_FISH_VISIONARY_POOL_1",
+       null,
+       1006
+      ],
+      [
+       "R1723_KO",
+       "WILD_FISH_VISIONARY_POOL_1",
+       null,
+       null,
+       1295
+      ],
+      [
+       "R1723_LOCK",
+       "PLAYER_A",
+       null,
+       "TARGET_DOWN",
+       1296
+      ],
+      [
+       "DEV_PLACE",
+       null,
+       null,
+       null,
+       1323
+      ],
+      [
+       "R1723_LOCK",
+       "PLAYER_A",
+       "WILD_HORSE_1",
+       null,
+       1480
+      ]
+     ],
+     "trace": [
+      [
+       74.05,
+       "WILD_HORSE_1",
+       false,
+       "FIELD"
+      ],
+      [
+       74.2,
+       "WILD_HORSE_1",
+       false,
+       "FIELD"
+      ],
+      [
+       74.3,
+       "WILD_HORSE_1",
+       false,
+       "FIELD"
+      ],
+      [
+       74.35,
+       "WILD_HORSE_1",
+       false,
+       "FIELD"
+      ],
+      [
+       74.5,
+       "WILD_HORSE_1",
+       false,
+       "FIELD"
+      ],
+      [
+       74.6,
+       "WILD_HORSE_1",
+       false,
+       "FIELD"
+      ]
+     ],
+     "lock": "WILD_HORSE_1",
+     "lockmark": {
+      "target": "other:WILD_HORSE_1",
+      "visible": true
+     },
+     "log": [
+      "LOCK_TARGET ✓ cleared",
+      "LOCK_TARGET ✓ WILD_HORSE_1"
+     ],
+     "direct": null
+    },
+    "d": 6.4,
+    "y": 0,
+    "level": 35
+   }
+  },
+  {
+   "id": "horse (Titan meadow, passive): the lock marker follows the locked creature figure",
+   "ok": true,
+   "detail": {
+    "lockmark": {
+     "target": "other:WILD_HORSE_1",
+     "visible": true
+    }
+   }
+  },
+  {
+   "id": "horse (Titan meadow, passive): the entity status (name / LV 35 / HP) is present and visible on its figure",
+   "ok": true,
+   "detail": {
+    "tag": {
+     "id": "WILD_HORSE_1",
+     "species": "HORSE",
+     "name": "HORSE",
+     "level": 35,
+     "hp": 2940,
+     "max": 2940,
+     "locked": false,
+     "ko": false,
+     "visible": true,
+     "opacity": 1,
+     "position": {
+      "x": 135.066,
+      "y": 9.898189900361748e-11,
+      "z": 137.704
+     },
+     "head_y": 2.100000000098982
+    },
+    "host_level": 35
+   }
+  },
+  {
+   "id": "horse (Titan meadow, passive): attack slot 1 (PA_PUSH) damages THE LOCKED creature through the one combat authority (7 hits)",
+   "ok": true,
+   "detail": {
+    "hits": 7,
+    "misses": [],
+    "casts": 12,
+    "min_d": 1.88,
+    "states": {
+     "SWIRL": 9,
+     "LAUNCH": 3,
+     "RECOVER": 3
+    }
+   }
+  },
+  {
+   "id": "horse (Titan meadow, passive): the status HP bar reflects the damage (hp < max; LOCKED while the lock holds)",
+   "ok": true,
+   "detail": {
+    "tag": {
+     "id": "WILD_HORSE_1",
+     "species": "HORSE",
+     "name": "HORSE",
+     "level": 35,
+     "hp": 2352,
+     "max": 2940,
+     "locked": true,
+     "ko": false,
+     "visible": true,
+     "opacity": 1,
+     "position": {
+      "x": 123.572,
+      "y": 3.6515830038745635e-11,
+      "z": 130.045
+     },
+     "head_y": 2.1000000000365158
+    },
+    "dissolved": false
+   }
+  },
+  {
+   "id": "phoenix (aerial, provoked → dives within lock range): the player is airborne at ≥ 30 m for the aerial encounter (alt 37.4 m)",
+   "ok": true,
+   "detail": {
+    "alt": 37.4
+   }
+  },
+  {
+   "id": "phoenix (aerial, provoked → dives within lock range): the provoked phoenix comes within the 30 m lock rule",
+   "ok": true,
+   "detail": {
+    "last": {
+     "d": 2.2590949515237226,
+     "rec": {
+      "id": "WILD_PHOENIX_2",
+      "species": "PHOENIX",
+      "wild": true,
+      "position": {
+       "x": -169.145,
+       "z": 24.433
+      },
+      "y": 39.294,
+      "facing": -1.502,
+      "state": "SWEEP",
+      "speed_mps": 3.08,
+      "hp": 1512,
+      "max": 1512,
+      "ko": false,
+      "ko_ago_s": null,
+      "attack_t": null,
+      "level": 75,
+      "name": "PHOENIX",
+      "hit_ago_s": null,
+      "fight": true,
+      "aura": "#ffd27a",
+      "aura_attack": "#fff0b0",
+      "active": true
+     },
+     "my_y": 38.78
+    }
+   }
+  },
+  {
+   "id": "phoenix (aerial, provoked → dives within lock range): a real tap at its projected body locks THE TAPPED creature through LOCK_TARGET (entityAt → other:WILD_PHOENIX_2)",
+   "ok": true,
+   "detail": {
+    "r": {
+     "screen": {
+      "x": 279.1661950816526,
+      "y": 395.51622457060813,
+      "cx": -170.37,
+      "cy": 39.19,
+      "cz": 24.89,
+      "safe": true,
+      "in_page": true
+     },
+     "steps": 0,
+     "entityAt": {
+      "id": "other:WILD_PHOENIX_2"
+     },
+     "lock": "WILD_PHOENIX_2",
+     "lockmark": {
+      "target": "other:WILD_PHOENIX_2",
+      "visible": true
+     },
+     "touch": {
+      "last_command": "LOCK_TARGET {\"aim_id\":\"WILD_PHOENIX_2\"}",
+      "last_response": "accepted",
+      "events": [
+       "DOWN_CAMERA",
+       "WORLD_TAP",
+       "DOWN_CAMERA",
+       "WORLD_TAP",
+       "DOWN_CAMERA",
+       "WORLD_TAP"
+      ]
+     },
+     "in_page": true
+    },
+    "d": 20.7,
+    "y": 49.366,
+    "level": 75
+   }
+  },
+  {
+   "id": "phoenix (aerial, provoked → dives within lock range): the lock marker follows the locked creature figure",
+   "ok": true,
+   "detail": {
+    "lockmark": {
+     "target": "other:WILD_PHOENIX_2",
+     "visible": true
+    }
+   }
+  },
+  {
+   "id": "phoenix (aerial, provoked → dives within lock range): the entity status (name / LV 75 / HP) is present and visible on its figure",
+   "ok": true,
+   "detail": {
+    "tag": {
+     "id": "WILD_PHOENIX_2",
+     "species": "PHOENIX",
+     "name": "PHOENIX",
+     "level": 75,
+     "hp": 1512,
+     "max": 1512,
+     "locked": false,
+     "ko": false,
+     "visible": true,
+     "opacity": 1,
+     "position": {
+      "x": -168.9400721693361,
+      "y": 39.37450608130798,
+      "z": 24.250204703774457
+     },
+     "head_y": 40.97450608130798
+    },
+    "host_level": 75
+   }
+  },
+  {
+   "id": "phoenix (aerial, provoked → dives within lock range): attack slot 1 (PA_PUSH) damages THE LOCKED creature through the one combat authority (8 hits)",
+   "ok": true,
+   "detail": {
+    "hits": 8,
+    "misses": [],
+    "casts": 12,
+    "min_d": 2.24,
+    "states": {
+     "CLIMB": 72,
+     "WINDUP": 73,
+     "DIVE": 23,
+     "SWEEP": 16
+    },
+    "note": "aerial target: answered in its SWEEP pass at the player height (dive → level pass inside melee reach)"
+   }
+  },
+  {
+   "id": "phoenix (aerial, provoked → dives within lock range): the status HP bar reflects the damage (hp < max; LOCKED while the lock holds)",
+   "ok": true,
+   "detail": {
+    "tag": {
+     "id": "WILD_PHOENIX_2",
+     "species": "PHOENIX",
+     "name": "PHOENIX",
+     "level": 75,
+     "hp": 840,
+     "max": 1512,
+     "locked": true,
+     "ko": false,
+     "visible": true,
+     "opacity": 1,
+     "position": {
+      "x": -167.73538326146397,
+      "y": 39.98620550992561,
+      "z": 22.727441829471868
+     },
+     "head_y": 41.58620550992561
+    },
+    "dissolved": false
+   }
+  },
+  {
+   "id": "lock cleanup: the locked Dogkie was killed with slot 1 (KO) and the lock cleared",
+   "ok": true,
+   "detail": {
+    "lock_after": null,
+    "locked_before": "WILD_DOGKIE_10",
+    "kill": {
+     "dmg_on": 4,
+     "dmg_me": 24,
+     "miss": [
+      "no enemy in range / cone",
+      "no enemy in range / cone",
+      "no enemy in range / cone",
+      "no enemy in range / cone"
+     ],
+     "ko": [
+      "PLAYER_A",
+      "PLAYER_A",
+      "WILD_DOGKIE_10",
+      "PLAYER_A"
+     ],
+     "defeat": 0,
+     "respawn": 0,
+     "me_hp": 0
+    }
+   }
+  },
+  {
+   "id": "lock cleanup: leaving lock range (teleport 110 m away) clears the lock within the range grace",
+   "ok": true,
+   "detail": {
+    "locked": "WILD_DOGKIE_09",
+    "after": null
+   }
+  },
+  {
+   "id": "no console errors",
+   "ok": true,
+   "detail": []
+  }
+ ],
+ "console_errors": [],
+ "levels": [
+  {
+   "species": "FISH",
+   "size_m": 2.4,
+   "level": 35,
+   "override": null
+  },
+  {
+   "species": "HORSE",
+   "size_m": 2.335,
+   "level": 35,
+   "override": null
+  },
+  {
+   "species": "PHOENIX",
+   "size_m": 3.673,
+   "level": 75,
+   "override": null
+  },
+  {
+   "species": "DOGKIE",
+   "size_m": 1.4,
+   "level": 5,
+   "override": null
+  }
+ ],
+ "errors": [],
+ "mobile": true,
+ "pass": 25,
+ "fail": 0
+}

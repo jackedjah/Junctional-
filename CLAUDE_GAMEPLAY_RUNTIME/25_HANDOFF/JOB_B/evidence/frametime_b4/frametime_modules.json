@@ -1,0 +1,196 @@
+{
+ "runs": [
+  {
+   "nomod": "full",
+   "spots": {
+    "canal_rest": {
+     "p50": 25.5,
+     "p95": 30.9,
+     "max": 39.2,
+     "calls": 555,
+     "tris": 1131238,
+     "creatures": 9,
+     "wildlife": 33
+    },
+    "forest_rest": {
+     "p50": 19.8,
+     "p95": 24.4,
+     "max": 29.7,
+     "calls": 221,
+     "tris": 1102429,
+     "creatures": 11,
+     "wildlife": 28
+    },
+    "athlete_rest": {
+     "p50": 24,
+     "p95": 29.9,
+     "max": 33.9,
+     "calls": 529,
+     "tris": 1001311,
+     "creatures": 4,
+     "wildlife": 36
+    }
+   }
+  },
+  {
+   "nomod": "meadow",
+   "spots": {
+    "canal_rest": {
+     "p50": 34.4,
+     "p95": 46.2,
+     "max": 112.8,
+     "calls": 532,
+     "tris": 1109892,
+     "creatures": 9,
+     "wildlife": 33
+    },
+    "forest_rest": {
+     "p50": 26.9,
+     "p95": 36.9,
+     "max": 49.8,
+     "calls": 212,
+     "tris": 1086539,
+     "creatures": 11,
+     "wildlife": 28
+    },
+    "athlete_rest": {
+     "p50": 31.3,
+     "p95": 40,
+     "max": 49.4,
+     "calls": 518,
+     "tris": 995947,
+     "creatures": 4,
+     "wildlife": 36
+    }
+   }
+  },
+  {
+   "nomod": "architecture",
+   "spots": {
+    "canal_rest": {
+     "p50": 31.3,
+     "p95": 50.3,
+     "max": 200.4,
+     "calls": 529,
+     "tris": 1125158,
+     "creatures": 9,
+     "wildlife": 33
+    },
+    "forest_rest": {
+     "p50": 23.9,
+     "p95": 31.5,
+     "max": 42.9,
+     "calls": 215,
+     "tris": 1097827,
+     "creatures": 11,
+     "wildlife": 28
+    },
+    "athlete_rest": {
+     "p50": 31.5,
+     "p95": 41.4,
+     "max": 48.1,
+     "calls": 516,
+     "tris": 993379,
+     "creatures": 4,
+     "wildlife": 36
+    }
+   }
+  },
+  {
+   "nomod": "creatures",
+   "spots": {
+    "canal_rest": {
+     "p50": 38,
+     "p95": 46.5,
+     "max": 76,
+     "calls": 555,
+     "tris": 1134508,
+     "creatures": 9,
+     "wildlife": 33
+    },
+    "forest_rest": {
+     "p50": 28,
+     "p95": 32.3,
+     "max": 50,
+     "calls": 219,
+     "tris": 1089427,
+     "creatures": 11,
+     "wildlife": 28
+    },
+    "athlete_rest": {
+     "p50": 36,
+     "p95": 42.1,
+     "max": 49.5,
+     "calls": 533,
+     "tris": 998849,
+     "creatures": 4,
+     "wildlife": 36
+    }
+   }
+  },
+  {
+   "nomod": "wildlife",
+   "spots": {
+    "canal_rest": {
+     "p50": 35.5,
+     "p95": 40.4,
+     "max": 94,
+     "calls": 543,
+     "tris": 1118096,
+     "creatures": 9,
+     "wildlife": 33
+    },
+    "forest_rest": {
+     "p50": 20.2,
+     "p95": 30.4,
+     "max": 39.5,
+     "calls": 216,
+     "tris": 1088127,
+     "creatures": 11,
+     "wildlife": 28
+    },
+    "athlete_rest": {
+     "p50": 29.4,
+     "p95": 41.3,
+     "max": 61.8,
+     "calls": 517,
+     "tris": 990815,
+     "creatures": 4,
+     "wildlife": 36
+    }
+   }
+  },
+  {
+   "nomod": "terrain",
+   "spots": {
+    "canal_rest": {
+     "p50": 25.5,
+     "p95": 32.6,
+     "max": 48.2,
+     "calls": 546,
+     "tris": 1123916,
+     "creatures": 9,
+     "wildlife": 33
+    },
+    "forest_rest": {
+     "p50": 19.7,
+     "p95": 26,
+     "max": 35.8,
+     "calls": 211,
+     "tris": 1095107,
+     "creatures": 11,
+     "wildlife": 28
+    },
+    "athlete_rest": {
+     "p50": 19.8,
+     "p95": 23.5,
+     "max": 26.4,
+     "calls": 522,
+     "tris": 994015,
+     "creatures": 4,
+     "wildlife": 36
+    }
+   }
+  }
+ ]
+}

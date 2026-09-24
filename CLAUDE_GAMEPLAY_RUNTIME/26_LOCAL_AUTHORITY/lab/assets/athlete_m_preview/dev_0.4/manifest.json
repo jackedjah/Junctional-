@@ -1,0 +1,113 @@
+{
+ "export_id": "ATHLETE_M_AM08_RIGGED",
+ "version": "dev_0.4",
+ "sha256": "4e3926eec4a789e865f59ec544780516f6dbdae018a5595b9bd5da46564f6850",
+ "owner_review_status": "CANDIDATE",
+ "preview_status": "DEVELOPMENT_PREVIEW_UNAPPROVED (derivative rig dev_0.2 re-textured with Astra's latest RETAINED Athlete_M candidate AM08_BASE_CLOSED_RETAINED.blend: GOLD_B gold decision + AM08 finger fix base colour, AM02 K3 eye treatment (emissive mask, LEGACY_EYE_SYSTEM under the 2026-09-13 species canon: no human-like eye geometry / lids exist yet), AM06 material response roughness 0.5 / metallic 0, source normal map; AM09–AM19 (facets, trap silver, premium head, eye seating / quality / socket / lid work) are NOT retained by Astra and are not included; the .blend was not opened — geometry equality with the source is per Astra's AM03 / AM08 reports)",
+ "source_release": "isolated derivative of RAW_10_MODELS/Mah_Athlete_M.glb (sha256 7b023694ea924b86128ff2e1ae3b64157491c1d5b11805b9d4d2b68131592b63) with the authentic base-colour + normal textures embedded and a 17-joint derivative skeleton + skin weights added",
+ "units": "metres",
+ "up_axis": "+Y",
+ "forward_axis": "-Z",
+ "source_forward_axis": "+Z",
+ "root": "ROOT",
+ "scale_to_metres": 1.82461,
+ "source_height_units": 0.9865,
+ "forms": [
+  "FUSED"
+ ],
+ "clips": {},
+ "sockets": {
+  "ROOT": "ROOT",
+  "HEAD": "HEAD",
+  "CHEST": "CHEST",
+  "HAND_L": "HAND_L",
+  "HAND_R": "HAND_R",
+  "FEET": "TAIL3"
+ },
+ "materials": {
+  "ATHLETE_M_AM08_RETAINED_PBR": "AM08 base colour (2048² jpeg) + source normal (2048² jpeg) + K3 eye emissive mask (1024² jpeg), roughness 0.5, metallic 0, emissive strength 3"
+ },
+ "files": [
+  "Mah_Athlete_M_am08_rigged.glb"
+ ],
+ "joints": [
+  "ROOT",
+  "PELVIS",
+  "SPINE",
+  "CHEST",
+  "NECK",
+  "HEAD",
+  "CLAV_L",
+  "UPPERARM_L",
+  "FOREARM_L",
+  "HAND_L",
+  "CLAV_R",
+  "UPPERARM_R",
+  "FOREARM_R",
+  "HAND_R",
+  "TAIL1",
+  "TAIL2",
+  "TAIL3"
+ ],
+ "weight_stats": [
+  "ROOT:0",
+  "PELVIS:1654",
+  "SPINE:1359",
+  "CHEST:3388",
+  "NECK:511",
+  "HEAD:1054",
+  "CLAV_L:200",
+  "UPPERARM_L:585",
+  "FOREARM_L:503",
+  "HAND_L:1067",
+  "CLAV_R:191",
+  "UPPERARM_R:623",
+  "FOREARM_R:485",
+  "HAND_R:1046",
+  "TAIL1:1447",
+  "TAIL2:166",
+  "TAIL3:101"
+ ],
+ "limitations": [
+  "derivative auto-rig: joint placement measured from cross-sections, smooth distance weights (not hand-painted)",
+  "no separated-leg geometry / PACKED morph in the source: SPLIT anatomy cannot be shown",
+  "no eye or lid geometry: blinks / gaze are not possible",
+  "no authored clips: all motion is procedural on the derivative bones",
+  "textures are the source JPEGs (about 11 MB total)",
+  "eyes are the retained K3 emissive accents (legacy glow canon) — no eye geometry, iris or lids, so blinks and eye gaze remain impossible",
+  "textures resampled in the browser canvas, not mip-aware"
+ ],
+ "generated": "2026-09-15T06:22:33.693Z",
+ "derived_from": {
+  "export_id": "ATHLETE_M_RIGGED_PREVIEW",
+  "version": "dev_0.2",
+  "sha256": "1f3fbc345bee0557cc35354701e3e3d7ba8948e810159be440aaec4ee2346a63",
+  "file": "Mah_Athlete_M_rigged.glb"
+ },
+ "astra_candidate": {
+  "retained_blend": "C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/ASTRA_VISUAL_CLEANUP/ATHLETE_M/02_CHECKPOINTS/AM08_BASE_CLOSED_RETAINED.blend",
+  "retained_blend_sha256": "6a6404c99722df70fdd5bfd07cd9b655c5cb4e114a227987be4fdfbdc6139cc5",
+  "base_color_source": "C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/ASTRA_VISUAL_CLEANUP/ATHLETE_M/04_TEXTURE_WORK/AM08_RIGHT_FINGER_COLOR_FIX/Mah_Athlete_M_AM08_FINGER_COLOR_TEST_8K.png",
+  "base_color_sha256": "8c118ed02e00464d07c36cbe665fa7de76a8c41d75c6b75620066158794e6661",
+  "eye_mask_source": "C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/ASTRA_VISUAL_CLEANUP/ATHLETE_M/04_TEXTURE_WORK/AM02B_EYE_SHAPE/Mah_Athlete_M_EYE_MASK_AM02B_GUARDED_8K.png",
+  "eye_mask_sha256": "3366d380f6c6bb6f870fc817f32fc9adc6e3fc5fb2b58da2442827d430624012",
+  "eye_treatment": "AM02 K3: emission strength 3, linear (1, 0.3, 0.02), dark-gold diffuse (0.22, 0.09, 0.006) under the mask; normal-strength-0.25-inside-mask NOT reproduced",
+  "includes": [
+   "AM00 incoming source geometry (unchanged)",
+   "AM02 K3 eyes (mask emission)",
+   "AM03 GOLD_B",
+   "AM06 roughness/metallic",
+   "AM08 finger colour fix"
+  ],
+  "excludes": [
+   "AM05 chest darkening (not retained)",
+   "AM09/AM10 facets + trap silver (not retained)",
+   "AM12–AM19 premium head / human eyes / lids (not retained, no export)"
+  ]
+ },
+ "textures": {
+  "base_color": "2048x2048 jpeg q0.88 (from AM08 8192² png)",
+  "normal": "2048x2048 jpeg q0.9",
+  "emissive_eye_mask": "1024x1024 jpeg (from AM02B guarded 8192² mask)"
+ }
+}

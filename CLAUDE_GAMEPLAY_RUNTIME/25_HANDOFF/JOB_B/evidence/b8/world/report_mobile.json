@@ -1,0 +1,381 @@
+{
+ "checks": [
+  {
+   "id": "world_ready",
+   "ok": true,
+   "detail": {
+    "done": true,
+    "veil": "none",
+    "world": "READY"
+   }
+  },
+  {
+   "id": "registry_routes_buildings",
+   "ok": true,
+   "detail": {
+    "wayfinders": 19,
+    "buildings": 10,
+    "routes_named": 28,
+    "routes": 28,
+    "sun_deg": 6.5,
+    "tod": {
+     "_doc": "owner B8 §20: a data-driven time-of-day parameter with two STABLE states (no calendar / no simulation): DAY is the default; NIGHT is selected by the player (≡ SETTINGS → TIME, kept in localStorage) or ?sky=night; the switch is LIVE (fieldScene.setNight: lights, sky dome, stars, ground policy, environment, fog + every world module setNight)",
+     "default": "DAY",
+     "states": [
+      "DAY",
+      "NIGHT"
+     ],
+     "storage_key": "mahworld-time"
+    },
+    "rooms_added": [
+     "MATCH_HALL",
+     "TEMPLE_HALL",
+     "TOWER_HALL"
+    ]
+   }
+  },
+  {
+   "id": "signage_module_built",
+   "ok": true,
+   "detail": {
+    "wayfinders": 19,
+    "buildings": 10,
+    "labels_visible": 1,
+    "labels_total": 29
+   }
+  },
+  {
+   "id": "wayfinder_labels_near_nexus",
+   "ok": true,
+   "detail": {
+    "wayfinders": 19,
+    "buildings": 10,
+    "labels_visible": 1,
+    "labels_total": 29
+   }
+  },
+  {
+   "id": "nexus_wayfinder_legs",
+   "ok": true,
+   "detail": {
+    "id": "WF_1",
+    "x": -12.2,
+    "z": 0,
+    "junction": {
+     "x": 0,
+     "z": 0
+    },
+    "family": "gold",
+    "legs": [
+     {
+      "route": "CW_TEMPLE",
+      "name": "GOLD TEMPLE",
+      "tier": "CAUSEWAY",
+      "family": "gold",
+      "dir_rad": 3.142,
+      "dist_m": 148
+     },
+     {
+      "route": "CW_GYM",
+      "name": "MAH GYM",
+      "tier": "CAUSEWAY",
+      "family": "gold",
+      "dir_rad": -2.356,
+      "dist_m": 126
+     },
+     {
+      "route": "CW_TOWER",
+      "name": "BLUE TOWER",
+      "tier": "CAUSEWAY",
+      "family": "blue",
+      "dir_rad": 2.356,
+      "dist_m": 119
+     }
+    ]
+   }
+  },
+  {
+   "id": "temple_refused_away_from_door",
+   "ok": true,
+   "detail": {
+    "command_id": "play-PLAYER_A-8iw4ti-2",
+    "seq": 2,
+    "accepted": false,
+    "version": 310,
+    "tick": 304,
+    "duplicate": false,
+    "reason": "NOT_AT_DOOR",
+    "detail": {
+     "door": "TEMPLE_DOOR",
+     "distance_m": 27.5
+    }
+   }
+  },
+  {
+   "id": "temple_hall_entered",
+   "ok": true,
+   "detail": {
+    "enter": {
+     "command_id": "play-PLAYER_A-8iw4ti-4",
+     "seq": 4,
+     "accepted": true,
+     "version": 403,
+     "tick": 394,
+     "duplicate": false,
+     "room": "TEMPLE_HALL",
+     "spawn": {
+      "x": 0,
+      "z": 11
+     },
+     "facing": 0,
+     "interior": true,
+     "returned_to_door": null,
+     "prompt": "PLAZA"
+    },
+    "room": "TEMPLE_HALL"
+   }
+  },
+  {
+   "id": "temple_exit_back_to_field",
+   "ok": true,
+   "detail": {
+    "back": {
+     "command_id": "play-PLAYER_A-8iw4ti-5",
+     "seq": 5,
+     "accepted": true,
+     "version": 497,
+     "tick": 486,
+     "duplicate": false,
+     "room": "FIELD",
+     "spawn": {
+      "x": 0,
+      "z": 157.5
+     },
+     "facing": 0,
+     "interior": false,
+     "returned_to_door": "TEMPLE_DOOR",
+     "prompt": "PLAZA"
+    },
+    "room": "FIELD",
+    "exit": null
+   }
+  },
+  {
+   "id": "tower_hall_entered",
+   "ok": true,
+   "detail": {
+    "e2": {
+     "command_id": "play-PLAYER_A-8iw4ti-7",
+     "seq": 7,
+     "accepted": true,
+     "version": 640,
+     "tick": 626,
+     "duplicate": false,
+     "room": "TOWER_HALL",
+     "spawn": {
+      "x": 0,
+      "z": 7
+     },
+     "facing": 0,
+     "interior": true,
+     "returned_to_door": null,
+     "prompt": "PLAZA"
+    },
+    "room": "TOWER_HALL"
+   }
+  },
+  {
+   "id": "tower_exit",
+   "ok": true,
+   "detail": "FIELD"
+  },
+  {
+   "id": "night_switch_live",
+   "ok": true,
+   "detail": {
+    "before": "DAY",
+    "after": "NIGHT",
+    "atmosphere_night": true
+   }
+  },
+  {
+   "id": "day_switch_back",
+   "ok": true,
+   "detail": "DAY"
+  },
+  {
+   "id": "no_console_errors",
+   "ok": true,
+   "detail": []
+  }
+ ],
+ "console_errors": [],
+ "shots": [
+  "01_nexus_wayfinder",
+  "02_temple_entrance_name",
+  "03_temple_hall_shell",
+  "04_tower_hall_shell",
+  "05_day_sky",
+  "05b_sun_view",
+  "06_night_sky",
+  "06b_moon_view",
+  "07_day_again"
+ ],
+ "temple_prompt": null,
+ "temple_interior": {},
+ "celestial": {
+  "night": false,
+  "draw_calls_visible": 3,
+  "sun": {
+   "apparent_deg": 6.5,
+   "diameter_m": 37.48,
+   "distance_m": 330,
+   "halo_deg": 14,
+   "halo_m": 81.04,
+   "textured": true,
+   "visible": true,
+   "direction": [
+    0.74,
+    0.541,
+    0.399
+   ]
+  },
+  "moon": {
+   "apparent_deg": 6.2,
+   "diameter_m": 35.74,
+   "distance_m": 330,
+   "halo_deg": 12,
+   "halo_m": 69.37,
+   "textured": true,
+   "visible": false,
+   "direction": [
+    -0.342,
+    0.085,
+    -0.936
+   ]
+  }
+ },
+ "sun_view": {
+  "diam_m": 37.47751598422402,
+  "apparent_deg": 6.5,
+  "debug": {
+   "night": false,
+   "draw_calls_visible": 3,
+   "sun": {
+    "apparent_deg": 6.5,
+    "diameter_m": 37.48,
+    "distance_m": 330,
+    "halo_deg": 14,
+    "halo_m": 81.04,
+    "textured": true,
+    "visible": true,
+    "direction": [
+     0.74,
+     0.541,
+     0.399
+    ]
+   },
+   "moon": {
+    "apparent_deg": 6.2,
+    "diameter_m": 35.74,
+    "distance_m": 330,
+    "halo_deg": 12,
+    "halo_m": 69.37,
+    "textured": true,
+    "visible": false,
+    "direction": [
+     -0.342,
+     0.085,
+     -0.936
+    ]
+   }
+  }
+ },
+ "sun_proj": {
+  "cam": {
+   "yaw": -2.065,
+   "pitch": -0.78,
+   "behind": -1.938,
+   "err_deg": 7.28,
+   "back_dot": 0.9919463335341184,
+   "back_err_deg": 7.28,
+   "last_err_deg": 7.28,
+   "yaw_vel": 0,
+   "applied": 4.500000000000002,
+   "dist": 7.911741903257634,
+   "dragging": false,
+   "state": "FREE",
+   "speedK": 0,
+   "fov": 55,
+   "fade": 1,
+   "mode": "free",
+   "resetting": false,
+   "pitch_bias": 0,
+   "obstructed": false,
+   "readable": 2.69,
+   "zoom": 1,
+   "flightV": 0,
+   "hold_alt": null,
+   "fly_hold": false,
+   "desc_hold": false,
+   "flightMine": false,
+   "move_f": 0,
+   "in_fwd": 0,
+   "keys_space": false,
+   "keys_c": false,
+   "preset": "portrait",
+   "facing_deg": -111.04,
+   "latch": null,
+   "cfg": {
+    "heading_follow": false,
+    "height_frac": 0.72,
+    "look_height_frac": 0.28,
+    "shoulder_m": 0,
+    "look_ahead_m": 2,
+    "stiffness_idle_hz": 1.2,
+    "stiffness_move_hz": 2,
+    "reset_time_s": 0.5,
+    "obstruct_pitch_up": true,
+    "min_readable_m": 2.2,
+    "readable_frac": 0.34,
+    "latch_manual_drag": false,
+    "pitch_up_step": 0.12,
+    "pitch_up_max_steps": 8,
+    "pitch_up_limit": 0.9,
+    "relatch_deg": 45,
+    "pitch_min": -0.4,
+    "pitch_min_flight": -1.05,
+    "pitch_max": 1.2,
+    "probe_radius_m": 0.35,
+    "pull_in_speed": 24,
+    "ease_out_speed": 2.5,
+    "speed_fov_deg": 0,
+    "speed_pullback": 0,
+    "fade_below_m": 1.3,
+    "lock_extend": 0,
+    "lock_frame": false,
+    "strike_kick": 0,
+    "presets": {
+     "portrait": {
+      "frame_frac": 0.55,
+      "pitch_home": 0.2,
+      "look_height_frac": 0
+     },
+     "landscape": {
+      "frame_frac": 0.31,
+      "pitch_home": 0.2
+     }
+    }
+   },
+   "position": {
+    "x": -3.6488385760593336,
+    "y": 0.45,
+    "z": 2.0340059822061107
+   },
+   "inside": null,
+   "below_ground": false
+  }
+ },
+ "pass": 13,
+ "fail": 0
+}

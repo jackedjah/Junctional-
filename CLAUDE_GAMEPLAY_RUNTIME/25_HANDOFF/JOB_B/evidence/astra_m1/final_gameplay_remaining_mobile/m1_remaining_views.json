@@ -1,0 +1,205 @@
+{
+ "label": "astra_m1_final_mobile_v2",
+ "mobile": true,
+ "dist": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "shots": [
+  "fish_gameplay_day",
+  "fish_gameplay_night",
+  "fish_swim_gameplay_day",
+  "fish_swim_gameplay_night",
+  "horse_gameplay_day",
+  "horse_gameplay_night",
+  "phoenix_gameplay_day",
+  "phoenix_gameplay_night",
+  "barbell_gameplay_day",
+  "barbell_gameplay_night",
+  "dumbbell_gameplay_day",
+  "dumbbell_gameplay_night"
+ ],
+ "subjects": {
+  "fish_snapshot": {
+   "id": "WILD_FISH_S_3",
+   "species": "FISH",
+   "wild": true,
+   "school": "S",
+   "surface_y": -0.3,
+   "position": {
+    "x": -3.776,
+    "z": -118.016
+   },
+   "y": -1.271,
+   "facing": 1.524,
+   "state": "RISE",
+   "speed_mps": 3.58,
+   "hp": 420,
+   "max": 420,
+   "ko": false,
+   "ko_ago_s": null,
+   "attack_t": null,
+   "level": 35,
+   "name": "FISH",
+   "hit_ago_s": null,
+   "fight": false,
+   "aura": "#5fc8ff",
+   "aura_attack": "#b8f0ff",
+   "active": true
+  },
+  "fish_figure": {
+   "id": "WILD_FISH_S_3",
+   "visible": true,
+   "state": "RISE",
+   "position": [
+    -3.9565164988277743,
+    -1.5605061331982473,
+    -118.00788689892909
+   ]
+  },
+  "fish_swim_snapshot": {
+   "id": "WILD_FISH_S_1",
+   "species": "FISH",
+   "wild": true,
+   "school": "S",
+   "surface_y": -0.3,
+   "position": {
+    "x": -14.18,
+    "z": -122.946
+   },
+   "y": -1.559,
+   "facing": 4.932,
+   "state": "SWIM",
+   "speed_mps": 2.32,
+   "hp": 420,
+   "max": 420,
+   "ko": false,
+   "ko_ago_s": null,
+   "attack_t": null,
+   "level": 35,
+   "name": "FISH",
+   "hit_ago_s": null,
+   "fight": false,
+   "aura": "#5fc8ff",
+   "aura_attack": "#b8f0ff",
+   "active": true
+  },
+  "fish_swim_figure": {
+   "id": "WILD_FISH_S_1",
+   "visible": true,
+   "state": "SWIM",
+   "position": [
+    -14.18,
+    -1.559,
+    -122.946
+   ]
+  },
+  "horse_snapshot": {
+   "id": "WILD_HORSE_1",
+   "species": "HORSE",
+   "wild": true,
+   "position": {
+    "x": 131.053,
+    "z": 140.881
+   },
+   "y": 0,
+   "facing": 2.157,
+   "state": "WALK",
+   "speed_mps": 1.3,
+   "hp": 2940,
+   "max": 2940,
+   "ko": false,
+   "ko_ago_s": null,
+   "attack_t": null,
+   "level": 35,
+   "name": "HORSE",
+   "hit_ago_s": null,
+   "fight": false,
+   "aura": "#ff6a7a",
+   "aura_attack": "#ffb0b8",
+   "active": true
+  },
+  "horse_figure": {
+   "id": "WILD_HORSE_1",
+   "visible": true,
+   "state": "WALK",
+   "position": [
+    130.9525457331758,
+    0.022666237256208397,
+    140.8700979865462
+   ]
+  },
+  "phoenix_summon": {
+   "ok": true,
+   "summoned": true
+  },
+  "phoenix_snapshot": {
+   "id": "WILD_PHOENIX_3",
+   "species": "PHOENIX",
+   "wild": true,
+   "position": {
+    "x": 132.952,
+    "z": 228.38
+   },
+   "y": 0.92,
+   "facing": 2.726,
+   "state": "SWEEP",
+   "speed_mps": 6.75,
+   "hp": 1512,
+   "max": 1512,
+   "ko": false,
+   "ko_ago_s": null,
+   "attack_t": null,
+   "level": 75,
+   "name": "PHOENIX",
+   "hit_ago_s": 4.55,
+   "fight": true,
+   "aura": "#ffd27a",
+   "aura_attack": "#fff0b0",
+   "active": true
+  },
+  "phoenix_figure": {
+   "id": "WILD_PHOENIX_3",
+   "visible": true,
+   "state": "SWEEP",
+   "position": [
+    132.60515715138953,
+    0.9346996511517296,
+    227.81607536378
+   ]
+  },
+  "gym_enter": {
+   "command_id": "play-PLAYER_A-bvsdaw-1",
+   "seq": 1,
+   "accepted": true,
+   "version": 610,
+   "tick": 593,
+   "duplicate": false,
+   "room": "GYM_INTERIOR",
+   "spawn": {
+    "x": 0,
+    "z": 9.5
+   },
+   "facing": 0,
+   "interior": true,
+   "returned_to_door": null,
+   "prompt": "PLAZA"
+  },
+  "gym_room": "GYM_INTERIOR",
+  "barbell": {
+   "name": "PROP_GYM_BARBELL_PLATFORM",
+   "levels": 2,
+   "visible": true
+  },
+  "dumbbell": {
+   "name": "PROP_GYM_DUMBBELL_BENCH_W",
+   "levels": 2,
+   "visible": true
+  }
+ },
+ "renderer": {
+  "calls": 23,
+  "triangles": 66618,
+  "programs": 162,
+  "geometries": 367,
+  "textures": 80
+ },
+ "errors": []
+}

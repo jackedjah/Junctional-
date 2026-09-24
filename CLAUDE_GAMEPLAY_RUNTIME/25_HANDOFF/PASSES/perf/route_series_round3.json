@@ -1,0 +1,1229 @@
+{
+ "label": "round3",
+ "started": "2026-09-17T17:20:18.023Z",
+ "builds": {
+  "A": "C:\\Users\\jahsu\\AppData\\Local\\Temp\\claude\\C--Users-jahsu-Downloads-MAHWORLD-CLAUDE-CHARACTER\\baf013cd-83d3-4042-a19e-79a13006cb14\\scratchpad\\pass1_dist",
+  "B": "C:\\Users\\jahsu\\AppData\\Local\\Temp\\claude\\C--Users-jahsu-Downloads-MAHWORLD-CLAUDE-CHARACTER\\baf013cd-83d3-4042-a19e-79a13006cb14\\scratchpad\\round3_dist"
+ },
+ "runs": 3,
+ "viewports": [
+  "1120x700"
+ ],
+ "harness": {
+  "pacing": "unlocked",
+  "gpu": true
+ },
+ "results": {
+  "1120x700": {
+   "A": [
+    {
+     "run": 0,
+     "file": "route_round3_1120x700_A0.json",
+     "seconds": 59,
+     "route_valid": true,
+     "end_position": {
+      "x": 127.61,
+      "z": -60.395
+     },
+     "phases": {
+      "walk": {
+       "frames": 1349,
+       "seconds": 10.3,
+       "p50_ms": 7.5,
+       "p95_ms": 11.3,
+       "p99_ms": 14.2,
+       "max_ms": 25.5,
+       "over_25ms_pct": 0.1,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "route": {
+       "frames": 7443,
+       "seconds": 48.2,
+       "p50_ms": 6.3,
+       "p95_ms": 9.9,
+       "p99_ms": 12.2,
+       "max_ms": 25.5,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "fly": {
+       "frames": 3276,
+       "seconds": 20.1,
+       "p50_ms": 6,
+       "p95_ms": 8.7,
+       "p99_ms": 10.2,
+       "max_ms": 13.7,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "land": {
+       "frames": 1050,
+       "seconds": 6.1,
+       "p50_ms": 5.6,
+       "p95_ms": 8.5,
+       "p99_ms": 10.1,
+       "max_ms": 12.6,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "combo": {
+       "frames": 1768,
+       "seconds": 11.7,
+       "p50_ms": 6.4,
+       "p95_ms": 10.4,
+       "p99_ms": 13.5,
+       "max_ms": 19.3,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      }
+     },
+     "tris": 322178,
+     "calls": 53,
+     "pixel_ratio": 1,
+     "tier": "HIGH",
+     "lab": {
+      "frames": 600,
+      "interval_ms": {
+       "p50": 6.3,
+       "p95": 10.1,
+       "p99": 11.9
+      },
+      "work_ms": {
+       "p50": 5.2,
+       "p95": 8,
+       "p99": 8.9
+      },
+      "dropped_pct": 7.8,
+      "dropped_def": "interval > 1.5 x rolling median (PROPOSED)",
+      "over_50ms_pct": 0
+     }
+    },
+    {
+     "run": 1,
+     "file": "route_round3_1120x700_A1.json",
+     "seconds": 59,
+     "route_valid": true,
+     "end_position": {
+      "x": 129.231,
+      "z": -58.673
+     },
+     "phases": {
+      "walk": {
+       "frames": 1381,
+       "seconds": 10.3,
+       "p50_ms": 7.4,
+       "p95_ms": 10.6,
+       "p99_ms": 13.8,
+       "max_ms": 30.7,
+       "over_25ms_pct": 0.1,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "route": {
+       "frames": 7381,
+       "seconds": 48.3,
+       "p50_ms": 6.4,
+       "p95_ms": 9.9,
+       "p99_ms": 12.4,
+       "max_ms": 30.7,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "fly": {
+       "frames": 3330,
+       "seconds": 20.1,
+       "p50_ms": 5.9,
+       "p95_ms": 8.7,
+       "p99_ms": 10.2,
+       "max_ms": 12.5,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "land": {
+       "frames": 1036,
+       "seconds": 6.1,
+       "p50_ms": 5.7,
+       "p95_ms": 8.3,
+       "p99_ms": 9.9,
+       "max_ms": 14.5,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "combo": {
+       "frames": 1634,
+       "seconds": 11.7,
+       "p50_ms": 7,
+       "p95_ms": 11.2,
+       "p99_ms": 13.9,
+       "max_ms": 18,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      }
+     },
+     "tris": 322178,
+     "calls": 53,
+     "pixel_ratio": 1,
+     "tier": "HIGH",
+     "lab": {
+      "frames": 600,
+      "interval_ms": {
+       "p50": 6.6,
+       "p95": 10.5,
+       "p99": 12.7
+      },
+      "work_ms": {
+       "p50": 5.6,
+       "p95": 8.2,
+       "p99": 9.4
+      },
+      "dropped_pct": 7.3,
+      "dropped_def": "interval > 1.5 x rolling median (PROPOSED)",
+      "over_50ms_pct": 0
+     }
+    },
+    {
+     "run": 2,
+     "file": "route_round3_1120x700_A2.json",
+     "seconds": 59,
+     "route_valid": true,
+     "end_position": {
+      "x": 127.635,
+      "z": -63.549
+     },
+     "phases": {
+      "walk": {
+       "frames": 1406,
+       "seconds": 10.3,
+       "p50_ms": 7.3,
+       "p95_ms": 10.6,
+       "p99_ms": 13.4,
+       "max_ms": 16.2,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "route": {
+       "frames": 7531,
+       "seconds": 48.2,
+       "p50_ms": 6.2,
+       "p95_ms": 9.7,
+       "p99_ms": 12,
+       "max_ms": 17.2,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "fly": {
+       "frames": 3278,
+       "seconds": 20.1,
+       "p50_ms": 6,
+       "p95_ms": 8.7,
+       "p99_ms": 10.3,
+       "max_ms": 13.2,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "land": {
+       "frames": 1050,
+       "seconds": 6.1,
+       "p50_ms": 5.6,
+       "p95_ms": 8.3,
+       "p99_ms": 9.8,
+       "max_ms": 12.4,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "combo": {
+       "frames": 1797,
+       "seconds": 11.7,
+       "p50_ms": 6.3,
+       "p95_ms": 10.4,
+       "p99_ms": 13.8,
+       "max_ms": 17.2,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      }
+     },
+     "tris": 322178,
+     "calls": 53,
+     "pixel_ratio": 1,
+     "tier": "HIGH",
+     "lab": {
+      "frames": 600,
+      "interval_ms": {
+       "p50": 6.2,
+       "p95": 10.1,
+       "p99": 12.5
+      },
+      "work_ms": {
+       "p50": 5.2,
+       "p95": 8,
+       "p99": 8.7
+      },
+      "dropped_pct": 9.3,
+      "dropped_def": "interval > 1.5 x rolling median (PROPOSED)",
+      "over_50ms_pct": 0
+     }
+    }
+   ],
+   "B": [
+    {
+     "run": 0,
+     "file": "route_round3_1120x700_B0.json",
+     "seconds": 60,
+     "route_valid": true,
+     "end_position": {
+      "x": 134.813,
+      "z": -28.802
+     },
+     "phases": {
+      "walk": {
+       "frames": 1209,
+       "seconds": 10.3,
+       "p50_ms": 8.6,
+       "p95_ms": 12.2,
+       "p99_ms": 14,
+       "max_ms": 29.4,
+       "over_25ms_pct": 0.1,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "route": {
+       "frames": 6280,
+       "seconds": 48.3,
+       "p50_ms": 7.4,
+       "p95_ms": 11.7,
+       "p99_ms": 14.6,
+       "max_ms": 31.3,
+       "over_25ms_pct": 0.1,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "fly": {
+       "frames": 2811,
+       "seconds": 20.1,
+       "p50_ms": 7.1,
+       "p95_ms": 9.9,
+       "p99_ms": 11.7,
+       "max_ms": 31.3,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "land": {
+       "frames": 900,
+       "seconds": 6.1,
+       "p50_ms": 6.7,
+       "p95_ms": 9.5,
+       "p99_ms": 10.8,
+       "max_ms": 23.1,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "combo": {
+       "frames": 1360,
+       "seconds": 11.7,
+       "p50_ms": 8.3,
+       "p95_ms": 14,
+       "p99_ms": 16.9,
+       "max_ms": 31.2,
+       "over_25ms_pct": 0.4,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      }
+     },
+     "tris": 319628,
+     "calls": 54,
+     "pixel_ratio": 1,
+     "tier": "HIGH",
+     "lab": {
+      "frames": 600,
+      "interval_ms": {
+       "p50": 8.6,
+       "p95": 14.2,
+       "p99": 17.1
+      },
+      "work_ms": {
+       "p50": 7.2,
+       "p95": 11.8,
+       "p99": 13.6
+      },
+      "dropped_pct": 8.7,
+      "dropped_def": "interval > 1.5 x rolling median (PROPOSED)",
+      "over_50ms_pct": 0
+     }
+    },
+    {
+     "run": 1,
+     "file": "route_round3_1120x700_B1.json",
+     "seconds": 60,
+     "route_valid": true,
+     "end_position": {
+      "x": 133.768,
+      "z": -28.994
+     },
+     "phases": {
+      "walk": {
+       "frames": 1232,
+       "seconds": 10.3,
+       "p50_ms": 8.3,
+       "p95_ms": 11.9,
+       "p99_ms": 14.4,
+       "max_ms": 30,
+       "over_25ms_pct": 0.2,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "route": {
+       "frames": 6363,
+       "seconds": 48.3,
+       "p50_ms": 7.3,
+       "p95_ms": 11.5,
+       "p99_ms": 14.8,
+       "max_ms": 35,
+       "over_25ms_pct": 0.2,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "fly": {
+       "frames": 2847,
+       "seconds": 20.1,
+       "p50_ms": 7,
+       "p95_ms": 9.8,
+       "p99_ms": 11,
+       "max_ms": 15,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "land": {
+       "frames": 935,
+       "seconds": 6.1,
+       "p50_ms": 6.5,
+       "p95_ms": 9.3,
+       "p99_ms": 10.8,
+       "max_ms": 15.4,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "combo": {
+       "frames": 1349,
+       "seconds": 11.8,
+       "p50_ms": 8.4,
+       "p95_ms": 14.2,
+       "p99_ms": 18,
+       "max_ms": 35,
+       "over_25ms_pct": 0.6,
+       "over_33ms_pct": 0.1,
+       "over_50ms_pct": 0
+      }
+     },
+     "tris": 319628,
+     "calls": 54,
+     "pixel_ratio": 1,
+     "tier": "HIGH",
+     "lab": {
+      "frames": 600,
+      "interval_ms": {
+       "p50": 8.9,
+       "p95": 14.5,
+       "p99": 18
+      },
+      "work_ms": {
+       "p50": 7.5,
+       "p95": 11.7,
+       "p99": 14
+      },
+      "dropped_pct": 9,
+      "dropped_def": "interval > 1.5 x rolling median (PROPOSED)",
+      "over_50ms_pct": 0
+     }
+    },
+    {
+     "run": 2,
+     "file": "route_round3_1120x700_B2.json",
+     "seconds": 60,
+     "route_valid": true,
+     "end_position": {
+      "x": 134.823,
+      "z": -28.667
+     },
+     "phases": {
+      "walk": {
+       "frames": 1212,
+       "seconds": 10.3,
+       "p50_ms": 8.5,
+       "p95_ms": 12.4,
+       "p99_ms": 14.9,
+       "max_ms": 30.6,
+       "over_25ms_pct": 0.2,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "route": {
+       "frames": 6112,
+       "seconds": 48.3,
+       "p50_ms": 7.7,
+       "p95_ms": 11.9,
+       "p99_ms": 15.4,
+       "max_ms": 32.8,
+       "over_25ms_pct": 0.2,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "fly": {
+       "frames": 2663,
+       "seconds": 20.1,
+       "p50_ms": 7.5,
+       "p95_ms": 10.3,
+       "p99_ms": 11.9,
+       "max_ms": 14.1,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "land": {
+       "frames": 898,
+       "seconds": 6.1,
+       "p50_ms": 6.8,
+       "p95_ms": 9.6,
+       "p99_ms": 11.2,
+       "max_ms": 13.1,
+       "over_25ms_pct": 0,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      },
+      "combo": {
+       "frames": 1339,
+       "seconds": 11.8,
+       "p50_ms": 8.4,
+       "p95_ms": 14.8,
+       "p99_ms": 18.9,
+       "max_ms": 32.8,
+       "over_25ms_pct": 0.8,
+       "over_33ms_pct": 0,
+       "over_50ms_pct": 0
+      }
+     },
+     "tris": 319628,
+     "calls": 54,
+     "pixel_ratio": 1,
+     "tier": "HIGH",
+     "lab": {
+      "frames": 600,
+      "interval_ms": {
+       "p50": 8.3,
+       "p95": 13.7,
+       "p99": 17.8
+      },
+      "work_ms": {
+       "p50": 6.9,
+       "p95": 11,
+       "p99": 12.6
+      },
+      "dropped_pct": 8.3,
+      "dropped_def": "interval > 1.5 x rolling median (PROPOSED)",
+      "over_50ms_pct": 0
+     }
+    }
+   ]
+  }
+ },
+ "summary": {
+  "1120x700": {
+   "A": {
+    "valid_runs": 3,
+    "phases": {
+     "route": {
+      "p50_ms": {
+       "median": 6.3,
+       "spread": 0.2,
+       "runs": [
+        6.3,
+        6.4,
+        6.2
+       ]
+      },
+      "p95_ms": {
+       "median": 9.9,
+       "spread": 0.2,
+       "runs": [
+        9.9,
+        9.9,
+        9.7
+       ]
+      },
+      "p99_ms": {
+       "median": 12.2,
+       "spread": 0.4,
+       "runs": [
+        12.2,
+        12.4,
+        12
+       ]
+      },
+      "max_ms": {
+       "median": 25.5,
+       "spread": 13.5,
+       "runs": [
+        25.5,
+        30.7,
+        17.2
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     "walk": {
+      "p50_ms": {
+       "median": 7.4,
+       "spread": 0.2,
+       "runs": [
+        7.5,
+        7.4,
+        7.3
+       ]
+      },
+      "p95_ms": {
+       "median": 10.6,
+       "spread": 0.7,
+       "runs": [
+        11.3,
+        10.6,
+        10.6
+       ]
+      },
+      "p99_ms": {
+       "median": 13.8,
+       "spread": 0.8,
+       "runs": [
+        14.2,
+        13.8,
+        13.4
+       ]
+      },
+      "max_ms": {
+       "median": 25.5,
+       "spread": 14.5,
+       "runs": [
+        25.5,
+        30.7,
+        16.2
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0.1,
+       "spread": 0.1,
+       "runs": [
+        0.1,
+        0.1,
+        0
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     "fly": {
+      "p50_ms": {
+       "median": 6,
+       "spread": 0.1,
+       "runs": [
+        6,
+        5.9,
+        6
+       ]
+      },
+      "p95_ms": {
+       "median": 8.7,
+       "spread": 0,
+       "runs": [
+        8.7,
+        8.7,
+        8.7
+       ]
+      },
+      "p99_ms": {
+       "median": 10.2,
+       "spread": 0.1,
+       "runs": [
+        10.2,
+        10.2,
+        10.3
+       ]
+      },
+      "max_ms": {
+       "median": 13.2,
+       "spread": 1.2,
+       "runs": [
+        13.7,
+        12.5,
+        13.2
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     "land": {
+      "p50_ms": {
+       "median": 5.6,
+       "spread": 0.1,
+       "runs": [
+        5.6,
+        5.7,
+        5.6
+       ]
+      },
+      "p95_ms": {
+       "median": 8.3,
+       "spread": 0.2,
+       "runs": [
+        8.5,
+        8.3,
+        8.3
+       ]
+      },
+      "p99_ms": {
+       "median": 9.9,
+       "spread": 0.3,
+       "runs": [
+        10.1,
+        9.9,
+        9.8
+       ]
+      },
+      "max_ms": {
+       "median": 12.6,
+       "spread": 2.1,
+       "runs": [
+        12.6,
+        14.5,
+        12.4
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     "combo": {
+      "p50_ms": {
+       "median": 6.4,
+       "spread": 0.7,
+       "runs": [
+        6.4,
+        7,
+        6.3
+       ]
+      },
+      "p95_ms": {
+       "median": 10.4,
+       "spread": 0.8,
+       "runs": [
+        10.4,
+        11.2,
+        10.4
+       ]
+      },
+      "p99_ms": {
+       "median": 13.8,
+       "spread": 0.4,
+       "runs": [
+        13.5,
+        13.9,
+        13.8
+       ]
+      },
+      "max_ms": {
+       "median": 18,
+       "spread": 2.1,
+       "runs": [
+        19.3,
+        18,
+        17.2
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    "tris_median": 322178,
+    "dropped_pct_proposed_median": 7.8
+   },
+   "B": {
+    "valid_runs": 3,
+    "phases": {
+     "route": {
+      "p50_ms": {
+       "median": 7.4,
+       "spread": 0.4,
+       "runs": [
+        7.4,
+        7.3,
+        7.7
+       ]
+      },
+      "p95_ms": {
+       "median": 11.7,
+       "spread": 0.4,
+       "runs": [
+        11.7,
+        11.5,
+        11.9
+       ]
+      },
+      "p99_ms": {
+       "median": 14.8,
+       "spread": 0.8,
+       "runs": [
+        14.6,
+        14.8,
+        15.4
+       ]
+      },
+      "max_ms": {
+       "median": 32.8,
+       "spread": 3.7,
+       "runs": [
+        31.3,
+        35,
+        32.8
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0.2,
+       "spread": 0.1,
+       "runs": [
+        0.1,
+        0.2,
+        0.2
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     "walk": {
+      "p50_ms": {
+       "median": 8.5,
+       "spread": 0.3,
+       "runs": [
+        8.6,
+        8.3,
+        8.5
+       ]
+      },
+      "p95_ms": {
+       "median": 12.2,
+       "spread": 0.5,
+       "runs": [
+        12.2,
+        11.9,
+        12.4
+       ]
+      },
+      "p99_ms": {
+       "median": 14.4,
+       "spread": 0.9,
+       "runs": [
+        14,
+        14.4,
+        14.9
+       ]
+      },
+      "max_ms": {
+       "median": 30,
+       "spread": 1.2,
+       "runs": [
+        29.4,
+        30,
+        30.6
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0.2,
+       "spread": 0.1,
+       "runs": [
+        0.1,
+        0.2,
+        0.2
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     "fly": {
+      "p50_ms": {
+       "median": 7.1,
+       "spread": 0.5,
+       "runs": [
+        7.1,
+        7,
+        7.5
+       ]
+      },
+      "p95_ms": {
+       "median": 9.9,
+       "spread": 0.5,
+       "runs": [
+        9.9,
+        9.8,
+        10.3
+       ]
+      },
+      "p99_ms": {
+       "median": 11.7,
+       "spread": 0.9,
+       "runs": [
+        11.7,
+        11,
+        11.9
+       ]
+      },
+      "max_ms": {
+       "median": 15,
+       "spread": 17.2,
+       "runs": [
+        31.3,
+        15,
+        14.1
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     "land": {
+      "p50_ms": {
+       "median": 6.7,
+       "spread": 0.3,
+       "runs": [
+        6.7,
+        6.5,
+        6.8
+       ]
+      },
+      "p95_ms": {
+       "median": 9.5,
+       "spread": 0.3,
+       "runs": [
+        9.5,
+        9.3,
+        9.6
+       ]
+      },
+      "p99_ms": {
+       "median": 10.8,
+       "spread": 0.4,
+       "runs": [
+        10.8,
+        10.8,
+        11.2
+       ]
+      },
+      "max_ms": {
+       "median": 15.4,
+       "spread": 10,
+       "runs": [
+        23.1,
+        15.4,
+        13.1
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     "combo": {
+      "p50_ms": {
+       "median": 8.4,
+       "spread": 0.1,
+       "runs": [
+        8.3,
+        8.4,
+        8.4
+       ]
+      },
+      "p95_ms": {
+       "median": 14.2,
+       "spread": 0.8,
+       "runs": [
+        14,
+        14.2,
+        14.8
+       ]
+      },
+      "p99_ms": {
+       "median": 18,
+       "spread": 2,
+       "runs": [
+        16.9,
+        18,
+        18.9
+       ]
+      },
+      "max_ms": {
+       "median": 32.8,
+       "spread": 3.8,
+       "runs": [
+        31.2,
+        35,
+        32.8
+       ]
+      },
+      "over_25ms_pct": {
+       "median": 0.6,
+       "spread": 0.4,
+       "runs": [
+        0.4,
+        0.6,
+        0.8
+       ]
+      },
+      "over_33ms_pct": {
+       "median": 0,
+       "spread": 0.1,
+       "runs": [
+        0,
+        0.1,
+        0
+       ]
+      },
+      "over_50ms_pct": {
+       "median": 0,
+       "spread": 0,
+       "runs": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    "tris_median": 319628,
+    "dropped_pct_proposed_median": 8.7
+   },
+   "delta_route": {
+    "p95_ms": 1.8,
+    "p99_ms": 2.6,
+    "max_ms": 7.3,
+    "over_25ms_pct": 0.2,
+    "tolerance_ms": 0.5,
+    "regressed": true
+   }
+  }
+ },
+ "finished": "2026-09-17T17:26:15.060Z",
+ "owner_exception": {
+  "tier": "HIGH (desktop, fine pointer)",
+  "what": "the sun casts the player shadow (PCF 1024, reach 24 m) — owner request 2026-09-17: daytime, sun out, appropriate lighting",
+  "measured": "route p95 9.9 -> 11.7 ms (+1.8) on the desktop tier; the phone tier (MED, route_series_round3_med.json) is unchanged 7.8 -> 7.9",
+  "decision": "shipped ON for HIGH; the owner can turn it off in the Control Lab (QUALITY tier MED/LOW) or by asking"
+ }
+}

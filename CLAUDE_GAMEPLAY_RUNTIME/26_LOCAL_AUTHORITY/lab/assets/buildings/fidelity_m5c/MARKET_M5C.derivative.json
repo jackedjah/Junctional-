@@ -1,0 +1,85 @@
+{
+ "canonical": "MARKET_M5C",
+ "role": "MAH Market imported landmark",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\futuristic market building 3d model.glb",
+  "original_name": "futuristic market building 3d model.glb",
+  "sha256": "f18a1d022764e6f21e76e5d7cbf516f24efdfbd20a7630547e67337781c230c9",
+  "bytes": 84168868,
+  "triangles": 1871488,
+  "vertices": 1016449,
+  "bounds_min": [
+   -0.257781982421875,
+   0.0,
+   -0.24903106689453125
+  ],
+  "bounds_max": [
+   0.257781982421875,
+   0.9827880859375,
+   0.24903106689453125
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 15705775,
+   "runtime_bytes": 1298630,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 13476921,
+   "runtime_bytes": 756916,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "mime": "image/jpeg"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "MARKET_M5C_L0.glb",
+   "triangles": 800000,
+   "vertices": 480705,
+   "bytes": 27040072,
+   "sha256": "8d595d544aa950a9d250208ad73decc2b19a4f07d47c47218886e1a31f4e4c99"
+  },
+  {
+   "lod": "L1",
+   "file": "MARKET_M5C_L1.glb",
+   "triangles": 202680,
+   "vertices": 182045,
+   "bytes": 10315108,
+   "sha256": "473081449b91ed29273f8e765778baff56b9879e31d1f3e5f9114e292a09a9a4"
+  }
+ ],
+ "method": "fast_simplification quadric edge collapse (agg 3.0, preserve_border True), UVs via nearest collapse-cluster representative, source normals carried by collapse map; textures Pillow LANCZOS",
+ "recipe": {
+  "tool": "26_LOCAL_AUTHORITY/deploy/jobb/derive_glb.py",
+  "mode": "static_geometry",
+  "arguments": {
+   "lods": "L0:800000,L1:200000",
+   "tex": 2048,
+   "normal": 2048,
+   "jpeg": 86,
+   "agg": 3.0,
+   "keep_geometry": false,
+   "preserve_normals": true,
+   "preserve_border": true,
+   "attribute_representative": "nearest"
+  }
+ },
+ "generated": "2026-09-23T18:31:04Z",
+ "timing_s": {
+  "L0": 3.2,
+  "L1": 3.8
+ },
+ "elapsed_s": 8.7
+}

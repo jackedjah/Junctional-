@@ -1,0 +1,36 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\equipment_meshopt\\barbell_meshopt_40k_1k.glb",
+  "bytes": 2742220,
+  "load_ms": 51,
+  "size_m": [
+   0.983,
+   0.337,
+   0.367
+  ],
+  "triangles": 40005,
+  "meshes": 1,
+  "shots": {
+   "front": "barbell_meshopt_40k_1k_front.png",
+   "q34": "barbell_meshopt_40k_1k_q34.png",
+   "side": "barbell_meshopt_40k_1k_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\equipment_meshopt\\dumbbell_meshopt_40k_1k.glb",
+  "bytes": 2715524,
+  "load_ms": 40,
+  "size_m": [
+   0.983,
+   0.354,
+   0.381
+  ],
+  "triangles": 39992,
+  "meshes": 1,
+  "shots": {
+   "front": "dumbbell_meshopt_40k_1k_front.png",
+   "q34": "dumbbell_meshopt_40k_1k_q34.png",
+   "side": "dumbbell_meshopt_40k_1k_side.png"
+  }
+ }
+]

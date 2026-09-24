@@ -1,0 +1,162 @@
+{
+ "tag": "dpr1",
+ "dpr": 1,
+ "tier": "(default)",
+ "viewport": [
+  390,
+  844
+ ],
+ "checks": [
+  "PASS B1 the buffer chain is reported: device px, drawing buffer, render scale, tier, antialias, tone mapping, exposure — {\"renderer\":{\"drawing_buffer\":[390,844],\"css\":[390,844],\"device_pixel_ratio\":1,\"pixel_ratio\":1,\"render_scale_pct\":100,\"tier\":\"MED\",\"tier_dpr_cap\":2,\"tier_dpr_floor\":1,\"antialias\":true,\"tone_mapping\":4,\"exposure\":1.35,\"output_color_space\":\"srgb\",\"shadows\":\"off\",\"max_anisotropy\":16,\"webgl2\":true},\"dpr\":1,\"css\":[390,844]}",
+  "PASS T1 texture facts are reported for the player, the gym (Tripo runtime derivative) and the training hall (native) — {\"me\":3,\"gym\":2,\"native\":0}",
+  "PASS C1 matched captures saved for 4 views × production / neutral / wireframe (C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\probe_out\\fidelity) — production",
+  "PASS N1 a native 1:1 crop of him at gameplay distance was read from the drawing buffer (his box is 322 buffer px tall at DPR 1) — {\"buffer\":[390,844],\"box_px\":[181,322]}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "buffer_chain": {
+  "renderer": {
+   "drawing_buffer": [
+    390,
+    844
+   ],
+   "css": [
+    390,
+    844
+   ],
+   "device_pixel_ratio": 1,
+   "pixel_ratio": 1,
+   "render_scale_pct": 100,
+   "tier": "MED",
+   "tier_dpr_cap": 2,
+   "tier_dpr_floor": 1,
+   "antialias": true,
+   "tone_mapping": 4,
+   "exposure": 1.35,
+   "output_color_space": "srgb",
+   "shadows": "off",
+   "max_anisotropy": 16,
+   "webgl2": true
+  },
+  "dpr": 1,
+  "css": [
+   390,
+   844
+  ]
+ },
+ "textures": {
+  "me": {
+   "count": 3,
+   "textures": [
+    {
+     "slot": "map",
+     "size": [
+      2048,
+      2048
+     ],
+     "anisotropy": 8,
+     "mipmaps": true,
+     "minFilter": 1008,
+     "magFilter": 1006,
+     "colorSpace": "srgb",
+     "material": "MeshStandardMaterial",
+     "roughness": 0.34,
+     "metalness": 0.72,
+     "envMapIntensity": 1
+    },
+    {
+     "slot": "normalMap",
+     "size": [
+      2048,
+      2048
+     ],
+     "anisotropy": 8,
+     "mipmaps": true,
+     "minFilter": 1008,
+     "magFilter": 1006,
+     "colorSpace": "",
+     "material": "MeshStandardMaterial",
+     "roughness": 0.34,
+     "metalness": 0.72,
+     "envMapIntensity": 1
+    },
+    {
+     "slot": "emissiveMap",
+     "size": [
+      1024,
+      1024
+     ],
+     "anisotropy": 8,
+     "mipmaps": true,
+     "minFilter": 1008,
+     "magFilter": 1006,
+     "colorSpace": "srgb",
+     "material": "MeshStandardMaterial",
+     "roughness": 0.34,
+     "metalness": 0.72,
+     "envMapIntensity": 1
+    }
+   ],
+   "materials": 6,
+   "triangles": 17991
+  },
+  "gym": {
+   "count": 2,
+   "textures": [
+    {
+     "slot": "map",
+     "size": [
+      2048,
+      2048
+     ],
+     "anisotropy": 8,
+     "mipmaps": true,
+     "minFilter": 1008,
+     "magFilter": 1006,
+     "colorSpace": "srgb",
+     "material": "MeshStandardMaterial",
+     "roughness": 0.5,
+     "metalness": 0,
+     "envMapIntensity": 0.35
+    },
+    {
+     "slot": "normalMap",
+     "size": [
+      1024,
+      1024
+     ],
+     "anisotropy": 8,
+     "mipmaps": true,
+     "minFilter": 1008,
+     "magFilter": 1006,
+     "colorSpace": "",
+     "material": "MeshStandardMaterial",
+     "roughness": 0.5,
+     "metalness": 0,
+     "envMapIntensity": 0.35
+    }
+   ],
+   "materials": 2,
+   "triangles": 85026
+  },
+  "native": {
+   "count": 0,
+   "textures": [],
+   "materials": 11,
+   "triangles": 1798
+  }
+ },
+ "native_crop": {
+  "w": 197,
+  "h": 338,
+  "buffer": [
+   390,
+   844
+  ],
+  "box_px": [
+   181,
+   322
+  ]
+ },
+ "pass": 5,
+ "fail": 0
+}

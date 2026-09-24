@@ -1,0 +1,17 @@
+{
+  "schema": "MAHWORLD_ASSET_BACKUP_MANIFEST_V1",
+  "updated_utc": "2026-09-24T19:03:51Z",
+  "repository": "https://github.com/jackedjah/Junctional-",
+  "visibility": "PUBLIC",
+  "recovery_branch": "backup/mahworld-m6-20260924T190351Z",
+  "gameplay_root": "CLAUDE_GAMEPLAY_RUNTIME",
+  "source_checkpoint": "PENDING_FIRST_PUSH",
+  "cloud_execution": "NOT_TESTED",
+  "assets": [],
+  "outside_repository_dependencies": [],
+  "excluded_private_or_restricted": [],
+  "notes": [
+    "This initial manifest is committed with the source checkpoint and is populated with per-file hashes and remote-readback state in the asset checkpoint.",
+    "No entry may be marked retrieval_verified solely from a local Git object, local LFS cache, pointer file, manifest, or upload response."
+  ]
+}

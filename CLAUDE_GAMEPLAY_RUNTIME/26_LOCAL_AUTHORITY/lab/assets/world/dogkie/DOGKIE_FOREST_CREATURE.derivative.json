@@ -1,0 +1,78 @@
+{
+ "canonical": "DOGKIE_FOREST_CREATURE",
+ "role": "fightable forest creature species (skinned, no clips)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\dogkie.glb",
+  "original_name": "dogkie(1).glb",
+  "sha256": "867ea26feb2335d5666d0c6447bdedfea248d3c9d8dd690b42570279e22086a9",
+  "bytes": 14566196,
+  "triangles": 18627,
+  "skinned": true,
+  "joints": 55,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "image": 0,
+   "source_bytes": 1520308,
+   "runtime_bytes": 190448,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": true
+  },
+  {
+   "image": 1,
+   "source_bytes": 4421468,
+   "runtime_bytes": 1086144,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "normal": false
+  },
+  {
+   "image": 2,
+   "source_bytes": 7650363,
+   "runtime_bytes": 243489,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "normal": false
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "DOGKIE_FOREST_CREATURE_L0.glb",
+   "triangles": 18627,
+   "bytes": 2494392,
+   "sha256": "fae377fbcc5fee9e04af60081be1ca5b1876d9c44779fc7524abe140ad8113d1"
+  },
+  {
+   "lod": "L1",
+   "triangles": 6500,
+   "vertices": 6375,
+   "bytes": 973344,
+   "sha256": "33c8ec29ba0d1f212b205f33a686291d892be7aba5a20886e12ada264c8890cd",
+   "method": "fast_simplification quadric (agg 7) + joints/weights via representative vertex, skin verbatim",
+   "seconds": 1.2,
+   "file": "DOGKIE_FOREST_CREATURE_L1.glb"
+  },
+  {
+   "lod": "L2",
+   "triangles": 2600,
+   "vertices": 3034,
+   "bytes": 752808,
+   "sha256": "8e6d52797442b85e06d93b6fced19007d2ab1ffdb811e841e6d846fd14e57b7e",
+   "method": "fast_simplification quadric (agg 7) + joints/weights via representative vertex, skin verbatim",
+   "seconds": 1.2,
+   "file": "DOGKIE_FOREST_CREATURE_L2.glb"
+  }
+ ],
+ "method": "images resampled (Pillow LANCZOS, JPEG); every accessor, node, skin and animation byte-identical",
+ "generated": "2026-09-19T20:46:05Z"
+}

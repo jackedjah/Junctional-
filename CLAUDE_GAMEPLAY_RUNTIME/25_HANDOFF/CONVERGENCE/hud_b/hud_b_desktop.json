@@ -1,0 +1,248 @@
+{
+ "mode": "desktop",
+ "viewport": [
+  1200,
+  750
+ ],
+ "touch_emulated": false,
+ "checks": [
+  "PASS B1 island layout: no top-right category card, no LOCKED panel in the DOM, HEALTH upper-left with LV, COMBAT + FLIGHT MAHGIC upper-right (three bare bars: transparent, no blur, no border), the state a small line (9 px, no pill): \"FREE ROAM · HARMLESS\" — {\"layout\":\"island\",\"dock\":{\"id\":\"g-dock\",\"x\":0,\"y\":0,\"w\":0,\"h\":0,\"cx\":0,\"cy\":0,\"shown\":false,\"text\":\"⟩—?\"},\"target\":null,\"mahgic\":{\"id\":\"g-mahgic\",\"x\":1134,\"y\":670.546875,\"w\":58,\"h\":58,\"cx\":1163,\"cy\":699.546875,\"shown\":true,\"text\":\"MAHGIC\"},\"vitals\":{\"bg\":\"rgba(0, 0, 0, 0)\",\"bf\":\"none\",\"border\":\"0px\",\"state_font\":9,\"state_bg\":\"rgba(0, 0, 0, 0)\",\"state_text\":\"FREE ROAM · HARMLESS\",\"lv\":\"LV 1\",\"bars\":3,\"right\":{\"x\":1024,\"w\":168,\"right\":1192}}}",
+  "PASS B2 desktop keeps its bottom bar (E R T Y · MAHGIC · DASH · LOCK, keyboard / mouse bindings) and the right column gains ⚔ beside ≡; the category label sits above the bar — {\"desk\":{\"id\":\"g-desk\",\"x\":341.2265625,\"y\":686,\"w\":517.546875,\"h\":56,\"cx\":600,\"cy\":714,\"shown\":true,\"text\":\"ATTACKVEH-PUSHRV-PULLTHINGEYROTATEMAHGIC\"},\"sword\":{\"id\":\"g-swordbt\",\"x\":1068,\"y\":604.546875,\"w\":58,\"h\":58,\"cx\":1097,\"cy\":633.546875,\"shown\":true,\"text\":\"⚔\"},\"cat\":{\"id\":\"g-catlbl\",\"x\":566.3203125,\"y\":672,\"w\":67.359375,\"h\":12,\"cx\":600,\"cy\":678,\"shown\":true,\"text\":\"PHYSICAL ▸\"}}",
+  "PASS B7d ⚔ opens the menu on COMBAT with the three categories and ARM buttons (desktop) — {\"menu\":{\"open\":true,\"tab\":\"COMBAT\",\"local_dev\":true},\"combat\":{\"modes\":3,\"arm\":7}}",
+  "PASS B8 world-space tag on the dummy: free roam = \"LV 1\" without a bar; PRACTICE + lock = \"LV 1 · LOCKED\" in gold WITH the health bar and the state line \"PRACTICE BATTLE\"; no LOCKED panel anywhere; unlock + practice off = \"LV 1\" without a bar — {\"free\":{\"lvl\":true,\"text\":\"LV 1\",\"bar\":false,\"name\":true},\"lock\":{\"lvl\":true,\"text\":\"LV 1 · LOCKED\",\"bar\":true,\"gold\":\"#ffd15e\"},\"after\":{\"lvl\":true,\"text\":\"LV 1\",\"bar\":false},\"panel\":null,\"state\":\"PRACTICE BATTLE\"}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "rects": {
+  "ground": {
+   "g-mapbt": {
+    "id": "g-mapbt",
+    "x": 1002,
+    "y": 538.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1031,
+    "cy": 567.546875,
+    "shown": true,
+    "text": "MAP"
+   },
+   "g-speed": {
+    "id": "g-speed",
+    "x": 1068,
+    "y": 538.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1097,
+    "cy": 567.546875,
+    "shown": true,
+    "text": "+SPEED"
+   },
+   "g-camreset": {
+    "id": "g-camreset",
+    "x": 1134,
+    "y": 538.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1163,
+    "cy": 567.546875,
+    "shown": true,
+    "text": "⟲CAM"
+   },
+   "g-fly": {
+    "id": "g-fly",
+    "x": 1018,
+    "y": 676,
+    "w": 58,
+    "h": 58,
+    "cx": 1047,
+    "cy": 705,
+    "shown": true,
+    "text": "FLYhold"
+   },
+   "g-guard": {
+    "id": "g-guard",
+    "x": 1076,
+    "y": 670.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1105,
+    "cy": 699.546875,
+    "shown": true,
+    "text": "GUARD"
+   },
+   "g-menubt": {
+    "id": "g-menubt",
+    "x": 1134,
+    "y": 604.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1163,
+    "cy": 633.546875,
+    "shown": true,
+    "text": "≡Q"
+   },
+   "g-swordbt": {
+    "id": "g-swordbt",
+    "x": 1068,
+    "y": 604.546875,
+    "w": 58,
+    "h": 58,
+    "cx": 1097,
+    "cy": 633.546875,
+    "shown": true,
+    "text": "⚔"
+   },
+   "g-catlbl": {
+    "id": "g-catlbl",
+    "x": 566.3203125,
+    "y": 672,
+    "w": 67.359375,
+    "h": 12,
+    "cx": 600,
+    "cy": 678,
+    "shown": true,
+    "text": "PHYSICAL ▸"
+   },
+   "tc-dash": {
+    "id": "tc-dash",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "DASHhold + swipe"
+   },
+   "tc-stickzone": {
+    "id": "tc-stickzone",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": ""
+   },
+   "tc-stick": {
+    "id": "tc-stick",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": ""
+   },
+   "g-erty-t": {
+    "id": "g-erty-t",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "1H-PUSH2V-PULL3HINGE4ROTATE"
+   },
+   "g-vitals": {
+    "id": "g-vitals",
+    "x": 8,
+    "y": 6,
+    "w": 168,
+    "h": 21.796875,
+    "cx": 92,
+    "cy": 16.8984375,
+    "shown": true,
+    "text": "HEALTHLV 11000 / 1000"
+   },
+   "g-state": {
+    "id": "g-state",
+    "x": 531.046875,
+    "y": 8,
+    "w": 137.90625,
+    "h": 12.140625,
+    "cx": 600,
+    "cy": 14.0703125,
+    "shown": true,
+    "text": "FREE ROAM · HARMLESS"
+   },
+   "g-ctx": {
+    "id": "g-ctx",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "✦"
+   },
+   "g-desk": {
+    "id": "g-desk",
+    "x": 341.2265625,
+    "y": 686,
+    "w": 517.546875,
+    "h": 56,
+    "cx": 600,
+    "cy": 714,
+    "shown": true,
+    "text": "ATTACKVEH-PUSHRV-PULLTHINGEYROTATEMAHGIC"
+   }
+  },
+  "slots": [
+   {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "1H-PUSH",
+    "small": "H-PUSH",
+    "overflow": false
+   },
+   {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "2V-PULL",
+    "small": "V-PULL",
+    "overflow": false
+   },
+   {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "3HINGE",
+    "small": "HINGE",
+    "overflow": false
+   },
+   {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "4ROTATE",
+    "small": "ROTATE",
+    "overflow": false
+   }
+  ]
+ },
+ "halos": {},
+ "pass": 5,
+ "fail": 0
+}

@@ -1,0 +1,371 @@
+{
+ "checks": [
+  "PASS P1 the prototype registry is placed: 7 instances (1 specimen + 6 cluster), 9 instanced draw calls, 3 variants — {\"status\":\"PLACED\",\"instances\":7,\"draws\":9,\"tris\":50216}",
+  "PASS P2 every placed crown top is within the hip band of the reference body (pelvis 0.765 m … femoral head 0.835 m, ±3 cm for the authored scale variation) — [0.829,0.826,0.748,0.813,0.851,0.763,0.846]",
+  "PASS P3 each variant is a rooted 4-level hierarchy with attached leaves and a few gem nodes (authored bounds: 4–5 primaries, ≤ 15 secondaries, ≤ 20 twigs, 60–150 leaves, ≤ 9000 tris) — [{\"seed\":1201,\"top\":0.8294,\"pri\":4,\"sec\":10,\"twigs\":12,\"leaves\":103,\"gems\":4,\"tris\":6216},{\"seed\":2207,\"top\":0.8264,\"pri\":5,\"sec\":12,\"twigs\":15,\"leaves\":124,\"gems\":5,\"tris\":7424},{\"seed\":3301,\"top\":0.771,\"pri\":5,\"sec\":14,\"twigs\":17,\"leaves\":145,\"gems\":8,\"tris\":8360}]",
+  "PASS S1 the solid silhouette (front, the specimen own screen region) is a crown on a trunk, not a rod: width/height between 0.55 and 1.6, and the widest sampled row lies in the upper 70 % of the box — {\"region\":[449,216,831,613],\"pixels\":14775,\"box\":[214,286],\"fill\":0.241,\"aspect\":0.75,\"width_by_row_top_to_bottom\":[3,30,26,40,53,73,97,95,4]}",
+  "PASS S2 in the paired view the specimen crown projects between the pelvis and femoral-head screen heights of the body beside it (±12 px) — {\"crown\":{\"sx\":759.5,\"sy\":404.5,\"on_screen\":true},\"pelvis\":{\"sx\":509.9,\"sy\":418.3,\"on_screen\":true},\"femoral\":{\"sx\":509.6,\"sy\":403.2,\"on_screen\":true}}",
+  "PASS L1 gentle life: some pixels change over 1.5 s with a fixed camera and a held body (crown sway + pulse), the change is small (< 6 % of the frame) and biased toward the crown (upper half ≥ 0.8 × lower half: the trunk stays grounded) — {\"changed_pct\":0.77,\"upper_half\":7601,\"lower_half\":283}",
+  "PASS W1 standing inside the cluster the rear camera keeps its preferred boom (foliage is decorative: no collider, no camera shove) — {\"approach\":{\"dist\":3,\"applied\":2.999995660767313,\"yaw\":-0.7526999516967913},\"inside\":{\"dist\":3,\"applied\":2.9999999999977174,\"yaw\":-0.8997944957099191}}",
+  "PASS C0 matched workload (same load, same camera, A B A B): the family adds 13 draw calls and 100084 renderer triangles per frame (placed 50216 + shadow-casting 49912 = 100128 expected when every instanced draw is in view in both passes) and -0.03 ms of mean frame interval (desktop, uncapped) — {\"off\":[{\"calls\":96,\"triangles\":285485,\"frame_ms_mean\":16.637,\"render_ms_p50\":4.5,\"render_ms_p95\":8},{\"calls\":95,\"triangles\":285463,\"frame_ms_mean\":16.658,\"render_ms_p50\":3.8,\"render_ms_p95\":6.6}],\"on\":[{\"calls\":112,\"triangles\":385615,\"frame_ms_mean\":16.635,\"render_ms_p50\":4.4,\"render_ms_p95\":8.5},{\"calls\":105,\"triangles\":385501,\"frame_ms_mean\":16.602,\"render_ms_p50\":3.4,\"render_ms_p95\":5.2}],\"placed\":{\"tris\":50216,\"by_part\":{\"branches\":32972,\"leaves\":16940,\"gems\":304},\"shadow_casting\":49912,\"draws\":9,\"instances\":7},\"delta\":{\"triangles\":100084,\"calls\":13,\"frame_ms_mean\":-0.029,\"expected_triangles_main_plus_shadow\":100128}}",
+  "PASS C1 cost of the whole prototype (7 instances, ~44 k placed tris, drawn again in the sun-shadow pass) at the same spot: +draw calls ≤ 12 and +triangles ≤ 100 000 versus ?botany=0 (the call count also moves with LOD / culling between two page loads: read the delta as indicative) — {\"with\":{\"calls\":105,\"triangles\":385501,\"render_ms\":3.4},\"without\":{\"calls\":118,\"triangles\":292251,\"render_ms\":5.0999999940395355,\"botany\":\"OFF\"},\"delta_calls\":-13,\"delta_tris\":93250}",
+  "PASS M2 phone-portrait matched workload (EMULATED 390x844 @ DPR 2, same load, A B A B): +2.5 calls, +18647 triangles, 0.008 ms mean frame interval — {\"off\":[{\"calls\":88,\"triangles\":274106,\"frame_ms_mean\":16.569,\"render_ms_p50\":2.8,\"render_ms_p95\":4.3},{\"calls\":89,\"triangles\":274108,\"frame_ms_mean\":16.648,\"render_ms_p50\":3.1,\"render_ms_p95\":5.5}],\"on\":[{\"calls\":91,\"triangles\":292754,\"frame_ms_mean\":16.637,\"render_ms_p50\":3.3,\"render_ms_p95\":6},{\"calls\":91,\"triangles\":292754,\"frame_ms_mean\":16.596,\"render_ms_p50\":3.3,\"render_ms_p95\":5.9}],\"delta\":{\"triangles\":18647,\"calls\":2.5,\"frame_ms_mean\":0.008}}",
+  "PASS M1 phone-portrait framing captured (EMULATED DEVICE: 390×844 @ DPR 2) with the family placed — {\"calls\":91,\"triangles\":292754,\"render_ms\":3.3}",
+  "PASS Z zero page / console errors with the family placed (the shader hooks compiled) — []"
+ ],
+ "out": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\probe_out\\botany",
+ "botany": {
+  "status": "PLACED",
+  "registry": "BOTANY_PROTOTYPE_V1",
+  "registry_status": "PROTOTYPE_PENDING_OWNER_VERDICT",
+  "error": null,
+  "family": "MAHGIC_TREE",
+  "spec_version": "MAHGIC_TREE_SPEC_V1",
+  "instances": 7,
+  "list": [
+   {
+    "id": "MT_SPEC_01",
+    "variant": 0,
+    "role": "specimen",
+    "x": 3,
+    "y": 0,
+    "z": 0.4,
+    "yaw_deg": 20,
+    "scale": 1,
+    "crown_top_m": 0.829,
+    "radius_m": 0.372
+   },
+   {
+    "id": "MT_CL_01",
+    "variant": 1,
+    "role": "cluster",
+    "x": -7.4,
+    "y": 0,
+    "z": -6.2,
+    "yaw_deg": 0,
+    "scale": 1,
+    "crown_top_m": 0.826,
+    "radius_m": 0.392
+   },
+   {
+    "id": "MT_CL_02",
+    "variant": 2,
+    "role": "cluster",
+    "x": -8.9,
+    "y": 0,
+    "z": -7.6,
+    "yaw_deg": 110,
+    "scale": 0.97,
+    "crown_top_m": 0.748,
+    "radius_m": 0.339
+   },
+   {
+    "id": "MT_CL_03",
+    "variant": 0,
+    "role": "cluster",
+    "x": -6.1,
+    "y": 0,
+    "z": -8.1,
+    "yaw_deg": 205,
+    "scale": 0.98,
+    "crown_top_m": 0.813,
+    "radius_m": 0.364
+   },
+   {
+    "id": "MT_CL_04",
+    "variant": 1,
+    "role": "cluster",
+    "x": -9.6,
+    "y": 0,
+    "z": -5.4,
+    "yaw_deg": 300,
+    "scale": 1.03,
+    "crown_top_m": 0.851,
+    "radius_m": 0.404
+   },
+   {
+    "id": "MT_CL_05",
+    "variant": 2,
+    "role": "cluster",
+    "x": -7.9,
+    "y": 0,
+    "z": -9.3,
+    "yaw_deg": 45,
+    "scale": 0.99,
+    "crown_top_m": 0.763,
+    "radius_m": 0.346
+   },
+   {
+    "id": "MT_CL_06",
+    "variant": 0,
+    "role": "cluster",
+    "x": -10.4,
+    "y": 0,
+    "z": -8,
+    "yaw_deg": 160,
+    "scale": 1.02,
+    "crown_top_m": 0.846,
+    "radius_m": 0.379
+   }
+  ],
+  "draw_calls": 9,
+  "tris_placed": 50216,
+  "tris_placed_by_part": {
+   "branches": 32972,
+   "leaves": 16940,
+   "gems": 304
+  },
+  "shadow_casting_tris": 49912,
+  "visible": true,
+  "energy": true,
+  "variants": [
+   {
+    "seed": 1201,
+    "crown_top_m": 0.8294,
+    "primaries": 4,
+    "secondaries": 10,
+    "twigs": 12,
+    "leaves": 103,
+    "gems": 4,
+    "roots": 5,
+    "junctions": 12,
+    "levels": 4,
+    "fit_scale": 0.93,
+    "authored_crown_m": 0.8294,
+    "width_m": 0.696,
+    "base_min_y": -0.0008,
+    "tris": {
+     "branches": 4124,
+     "leaves": 2060,
+     "gems": 32,
+     "total": 6216
+    },
+    "lod": "near"
+   },
+   {
+    "seed": 2207,
+    "crown_top_m": 0.8264,
+    "primaries": 5,
+    "secondaries": 12,
+    "twigs": 15,
+    "leaves": 124,
+    "gems": 5,
+    "roots": 5,
+    "junctions": 15,
+    "levels": 4,
+    "fit_scale": 0.9439,
+    "authored_crown_m": 0.8264,
+    "width_m": 0.75,
+    "base_min_y": 0.0009,
+    "tris": {
+     "branches": 4904,
+     "leaves": 2480,
+     "gems": 40,
+     "total": 7424
+    },
+    "lod": "near"
+   },
+   {
+    "seed": 3301,
+    "crown_top_m": 0.771,
+    "primaries": 5,
+    "secondaries": 14,
+    "twigs": 17,
+    "leaves": 145,
+    "gems": 8,
+    "roots": 5,
+    "junctions": 17,
+    "levels": 4,
+    "fit_scale": 0.8943,
+    "authored_crown_m": 0.771,
+    "width_m": 0.671,
+    "base_min_y": -0.0005,
+    "tris": {
+     "branches": 5396,
+     "leaves": 2900,
+     "gems": 64,
+     "total": 8360
+    },
+    "lod": "near"
+   }
+  ],
+  "scale_reference": {
+   "body": "dev_0.14 ATHLETE_M_V9 (Mah_Athlete_M_am08_v6.glb sha256 7d217d0f…)",
+   "pose": "neutral grounded rest pose, fused, hoverLift 0 (no hover bob, no trails)",
+   "pelvis_joint_m": 0.765,
+   "femoral_head_joint_m": 0.835,
+   "crotch_m": 0.73,
+   "head_top_m": 1.8,
+   "method": "restSkeleton FK of the shipped GLB (scale_to_metres 1.82461), lowest mesh point = 0"
+  }
+ },
+ "me_root": {},
+ "silhouette": {
+  "region": [
+   449,
+   216,
+   831,
+   613
+  ],
+  "pixels": 14775,
+  "box": [
+   214,
+   286
+  ],
+  "fill": 0.241,
+  "aspect": 0.75,
+  "width_by_row_top_to_bottom": [
+   3,
+   30,
+   26,
+   40,
+   53,
+   73,
+   97,
+   95,
+   4
+  ]
+ },
+ "hip_projection": {
+  "crown": {
+   "sx": 759.5,
+   "sy": 404.5,
+   "on_screen": true
+  },
+  "pelvis": {
+   "sx": 509.9,
+   "sy": 418.3,
+   "on_screen": true
+  },
+  "femoral": {
+   "sx": 509.6,
+   "sy": 403.2,
+   "on_screen": true
+  }
+ },
+ "sway": {
+  "changed_pct": 0.77,
+  "upper_half": 7601,
+  "lower_half": 283
+ },
+ "cam_approach": {
+  "dist": 3,
+  "applied": 2.999995660767313,
+  "yaw": -0.7526999516967913
+ },
+ "cam_inside": {
+  "dist": 3,
+  "applied": 2.9999999999977174,
+  "yaw": -0.8997944957099191
+ },
+ "matched_workload": {
+  "off": [
+   {
+    "calls": 96,
+    "triangles": 285485,
+    "frame_ms_mean": 16.637,
+    "render_ms_p50": 4.5,
+    "render_ms_p95": 8
+   },
+   {
+    "calls": 95,
+    "triangles": 285463,
+    "frame_ms_mean": 16.658,
+    "render_ms_p50": 3.8,
+    "render_ms_p95": 6.6
+   }
+  ],
+  "on": [
+   {
+    "calls": 112,
+    "triangles": 385615,
+    "frame_ms_mean": 16.635,
+    "render_ms_p50": 4.4,
+    "render_ms_p95": 8.5
+   },
+   {
+    "calls": 105,
+    "triangles": 385501,
+    "frame_ms_mean": 16.602,
+    "render_ms_p50": 3.4,
+    "render_ms_p95": 5.2
+   }
+  ],
+  "placed": {
+   "tris": 50216,
+   "by_part": {
+    "branches": 32972,
+    "leaves": 16940,
+    "gems": 304
+   },
+   "shadow_casting": 49912,
+   "draws": 9,
+   "instances": 7
+  },
+  "delta": {
+   "triangles": 100084,
+   "calls": 13,
+   "frame_ms_mean": -0.029,
+   "expected_triangles_main_plus_shadow": 100128
+  }
+ },
+ "render_with": {
+  "calls": 105,
+  "triangles": 385501,
+  "render_ms": 3.4
+ },
+ "render_without": {
+  "calls": 118,
+  "triangles": 292251,
+  "render_ms": 5.0999999940395355,
+  "botany": "OFF"
+ },
+ "phone_matched_workload": {
+  "off": [
+   {
+    "calls": 88,
+    "triangles": 274106,
+    "frame_ms_mean": 16.569,
+    "render_ms_p50": 2.8,
+    "render_ms_p95": 4.3
+   },
+   {
+    "calls": 89,
+    "triangles": 274108,
+    "frame_ms_mean": 16.648,
+    "render_ms_p50": 3.1,
+    "render_ms_p95": 5.5
+   }
+  ],
+  "on": [
+   {
+    "calls": 91,
+    "triangles": 292754,
+    "frame_ms_mean": 16.637,
+    "render_ms_p50": 3.3,
+    "render_ms_p95": 6
+   },
+   {
+    "calls": 91,
+    "triangles": 292754,
+    "frame_ms_mean": 16.596,
+    "render_ms_p50": 3.3,
+    "render_ms_p95": 5.9
+   }
+  ],
+  "delta": {
+   "triangles": 18647,
+   "calls": 2.5,
+   "frame_ms_mean": 0.008
+  }
+ },
+ "phone_render": {
+  "calls": 91,
+  "triangles": 292754,
+  "render_ms": 3.3
+ },
+ "summary": {
+  "pass": 12,
+  "fail": 0
+ }
+}

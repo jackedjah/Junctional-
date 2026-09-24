@@ -1,0 +1,142 @@
+{
+ "contract": "MAHWORLD_IMPORT_CONTRACT_V1",
+ "character": "MRS_MAH_GUIDE",
+ "source": "MRS_MAH_GUIDE_L0.glb",
+ "status": "DRAFT_AUTO_GUESS — every role below must be confirmed by a human against the source skeleton",
+ "units": "metres",
+ "up_axis": "+Y",
+ "forward_axis": "-Z",
+ "height_m": 0.984,
+ "bind": "oriented",
+ "roles": {
+  "ROOT": "BoneRoot",
+  "PELVIS": "Pelvis",
+  "LUMBAR": "Waist",
+  "SPINE": "Spine01",
+  "CHEST": "Spine02",
+  "NECK": "NeckTwist02",
+  "HEAD": "Head",
+  "CLAV_L": "L_Clavicle",
+  "CLAV_R": "R_Clavicle",
+  "UPPERARM_L": "L_Upperarm",
+  "UPPERARM_R": "R_Upperarm",
+  "FOREARM_L": "L_Forearm",
+  "FOREARM_R": "R_Forearm",
+  "HAND_L": "L_Hand",
+  "HAND_R": "R_Hand",
+  "FINGERS_L": "L_Mid1",
+  "FINGERS_R": "R_Mid1",
+  "THIGH_L": "L_Thigh",
+  "THIGH_R": "R_Thigh",
+  "SHIN_L": "L_Calf",
+  "SHIN_R": "R_Calf",
+  "TIP_L": "L_ToeBase",
+  "TIP_R": "R_ToeBase"
+ },
+ "emitter_anchors": {
+  "HAND_L": {
+   "role": "HAND_L",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "HAND_R": {
+   "role": "HAND_R",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "TIP_L": {
+   "role": "TIP_L",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "TIP_R": {
+   "role": "TIP_R",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "FUSED_TIP": {
+   "role": "TAIL3",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "CHEST": {
+   "role": "CHEST",
+   "offset_m": [
+    0,
+    0.05,
+    0.12
+   ]
+  }
+ },
+ "morphs": {},
+ "face": {
+  "channels": [
+   "brow_l",
+   "brow_r",
+   "cheek_l",
+   "cheek_r",
+   "jaw",
+   "smile",
+   "blink"
+  ],
+  "bones_or_morphs": "bones"
+ },
+ "forms": {
+  "fused": false,
+  "split": true
+ },
+ "canonical_names_present": 0,
+ "notes": [],
+ "validation_at_draft": {
+  "ok": false,
+  "errors": [
+   "chain spine: LUMBAR (Waist) does not descend from PELVIS (Pelvis)"
+  ],
+  "warnings": [
+   "no complete FUSED chain (TAIL1..3): the fused lower body and its tip anchor are unavailable",
+   "oriented bind on 20 role(s) (ROOT, PELVIS, SPINE, CHEST, HEAD, CLAV_L…): the canonical Euler channels need per-role re-basing (contract.bind = \"oriented\") before authored clips apply",
+   "height 0.984 m is outside the humanoid band 1.2–2.6",
+   "emitter anchor FUSED_TIP refers to unmapped role TAIL3"
+  ],
+  "bind": {
+   "ROOT": "oriented(141.0°)",
+   "PELVIS": "oriented(139.1°)",
+   "SPINE": "oriented(11.0°)",
+   "CHEST": "oriented(11.8°)",
+   "NECK": "identity",
+   "HEAD": "oriented(31.8°)",
+   "CLAV_L": "oriented(100.5°)",
+   "CLAV_R": "oriented(128.4°)",
+   "UPPERARM_L": "oriented(66.0°)",
+   "UPPERARM_R": "oriented(75.0°)",
+   "FOREARM_L": "oriented(12.8°)",
+   "FOREARM_R": "oriented(14.0°)",
+   "HAND_L": "oriented(5.1°)",
+   "HAND_R": "oriented(13.1°)",
+   "LUMBAR": "oriented(7.0°)",
+   "FINGERS_L": "oriented(26.6°)",
+   "FINGERS_R": "oriented(14.4°)",
+   "THIGH_L": "oriented(55.4°)",
+   "THIGH_R": "oriented(30.1°)",
+   "SHIN_L": "oriented(14.8°)",
+   "SHIN_R": "oriented(17.4°)",
+   "TIP_L": "identity",
+   "TIP_R": "identity"
+  }
+ }
+}

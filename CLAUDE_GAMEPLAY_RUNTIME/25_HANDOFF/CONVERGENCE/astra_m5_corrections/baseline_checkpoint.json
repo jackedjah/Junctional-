@@ -1,0 +1,49 @@
+{
+  "checkpoint": "ASTRA_M5_OWNER_CORRECTIONS_BASELINE",
+  "recorded_at": "2026-09-23T11:57:56.0563501-04:00",
+  "workspace": "C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/CLAUDE_GAMEPLAY_RUNTIME",
+  "source": {
+    "branch": "master",
+    "head": "3185a25f80a23131fbdb2062fca9a1a1ffb7684f",
+    "worktree_clean": false,
+    "porcelain_records": 901,
+    "provenance": "same intentionally uncommitted M1-M5 worktree; no reset, clean, stash, checkout, staging, or commit performed"
+  },
+  "disk": {
+    "drive": "C:",
+    "free_bytes": 37247516672
+  },
+  "immutable_comparison": {
+    "build": "ASTRA_M5_PRIVATE_20260923",
+    "package": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M5_PRIVATE_20260923.zip",
+    "package_sha256": "ebcad0ed993899f66c7477a1b3f1cde57740b32047fd0c02b60cf71e85055995",
+    "deploy_id": "6ab3abd739fc958c75339988",
+    "release_record": "25_HANDOFF/CONVERGENCE/astra_m5/private_candidate_release.json"
+  },
+  "baseline_file_sha256": {
+    "26_LOCAL_AUTHORITY/lab/world/terrain.js": "f02aa2404130113bae293b221047f071fe971ace58e9e7339241b6a003cc734a",
+    "26_LOCAL_AUTHORITY/lab/world/worldLayout.js": "7e2e606f90a7a8fea508981a6a8c34e7bc665e9e713f0f388c657326d2ca483f",
+    "26_LOCAL_AUTHORITY/deploy/jobb/build_registry.mjs": "826ea53fbe443159ffda40bbb975ffb4e846bf0ea36b03cee23a909c42dca9e6",
+    "26_LOCAL_AUTHORITY/lab/assets/world/world_registry_v1.json": "2b3a3f2f34b1c9d1ab59be3fc0726f5a1bec69e0ce577fd228ab03951c24ba6c",
+    "26_LOCAL_AUTHORITY/play/PlayMode.js": "7fe7b2f5e5c8a3117b7bcc619baa220c1d26b0acbf09f1c33773e43d50838a31",
+    "26_LOCAL_AUTHORITY/play/rules1723/Colliders.js": "b55f48609a7ea984fa5e9619695b3e924df714c0b69d9f0f511392a9fb528b74",
+    "26_LOCAL_AUTHORITY/play/EquipmentManager.js": "57c0451f4d8a9981aa7d5b0bfec9fcba77e34ff8cf4dc2d8d651266817f58ee6",
+    "26_LOCAL_AUTHORITY/lab/world/gear.js": "1f83e09175e8e3051d521062a15b3c085489e068256256a4f8bfbea213edafe9",
+    "26_LOCAL_AUTHORITY/lab/gameMenu.js": "f4d8aefc67cfe745aef1115e3d53f94015e53825babda5482c5b7ed7f2c2253d",
+    "26_LOCAL_AUTHORITY/lab/world/celestial.js": "fa76aeb8c7bb8c41538d67197ca05ac9303af33f7964217e28ab53e5c487dc9d",
+    "26_LOCAL_AUTHORITY/lab/world/sky.js": "51036a0218b78c96eca54d275904e2fe98921b9c46ff73bfc11b2206386d956f",
+    "26_LOCAL_AUTHORITY/lab/world/forest.js": "6839218b712194437cc69d7e6b5e1153f91e5d74d9d37de5a81a5763105a7e6b",
+    "26_LOCAL_AUTHORITY/lab/world/architecture.js": "7a3008e49d8510fe69eb6e6248c3f497996f7cdb4dada61cdd6a44f70d6632ef",
+    "26_LOCAL_AUTHORITY/lab/interiorScene.js": "42061c5fc3384f8f50680e3472823220d832d03c9782ba644082234648ada1de",
+    "26_LOCAL_AUTHORITY/lab/fieldScene.js": "4cfa44e7d25e0c5edc26297ae25bdeb63447c23fb1f47325003768fae6c18cad"
+  },
+  "ownership": {
+    "lead_writer": "/root",
+    "read_only_audits": [
+      "op_road_collision_refill_audit",
+      "op_building_asset_audit",
+      "op_moon_tree_perf_audit"
+    ],
+    "protected_lanes": ["MAHFITT", "Character appearance masters", "S08", "reserved Blender tasks"]
+  }
+}

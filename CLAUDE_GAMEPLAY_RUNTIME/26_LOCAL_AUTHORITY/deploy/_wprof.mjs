@@ -1,0 +1,23 @@
+import { readGlb } from './glb_read.mjs';
+var g = readGlb('C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/assets/athlete_m_preview/' + (process.argv[2] || 'dev_0.7') + '/' + (process.argv[3] || 'Mah_Athlete_M_am08_v4.glb'));
+var j = g.json; var body = j.meshes.find(function (m) { return /BODY/.test(m.name) && !/SPLIT/.test(m.name); }); var pr = body.primitives[0];
+var P = g.acc(pr.attributes.POSITION).data, W = g.acc(pr.attributes.WEIGHTS_0).data, J = g.acc(pr.attributes.JOINTS_0).data, N = P.length / 3; var H = 0.9865;
+var names = j.skins[0].joints.map(function (ni) { return j.nodes[ni].name; });
+function region(label, pred) { var acc = {}, n = 0; for (var v = 0; v < N; v++) { var h = P[v * 3 + 1] / H, x = P[v * 3], z = P[v * 3 + 2]; if (!pred(h, x, z)) continue; n++; for (var k = 0; k < 4; k++) { var nm = names[J[v * 4 + k]]; acc[nm] = (acc[nm] || 0) + W[v * 4 + k]; } } var out = Object.keys(acc).sort(function (a, b) { return acc[b] - acc[a]; }).slice(0, 4).map(function (k) { return k + ':' + (acc[k] / n).toFixed(2); }); console.log(label.padEnd(34), 'n', String(n).padStart(4), out.join('  ')); }
+region('deltoid cap R (h.76-.82,x>.12)', function (h, x) { return h > 0.76 && h < 0.82 && x > 0.12; });
+region('deltoid cap R outer (x>.15)', function (h, x) { return h > 0.76 && h < 0.82 && x > 0.15; });
+region('shoulder shelf R (h.78-.84,x .09-.13)', function (h, x) { return h > 0.78 && h < 0.84 && x > 0.09 && x < 0.13; });
+region('upper arm R (h.66-.74,x>.12)', function (h, x) { return h > 0.66 && h < 0.74 && x > 0.12; });
+region('elbow R (h.62-.65,x>.113)', function (h, x) { return h > 0.62 && h < 0.65 && x > 0.113; });
+region('forearm R (h.55-.61,x>.113)', function (h, x) { return h > 0.55 && h < 0.61 && x > 0.113; });
+region('wrist R (h.51-.54,x>.113)', function (h, x) { return h > 0.51 && h < 0.54 && x > 0.113; });
+region('hand R (h.43-.50,x>.113)', function (h, x) { return h > 0.43 && h < 0.50 && x > 0.113; });
+region('pec R (h.70-.78,x .03-.10,z>.05)', function (h, x, z) { return h > 0.70 && h < 0.78 && x > 0.03 && x < 0.10 && z > 0.05; });
+region('lat R (h.60-.70,x .07-.11,z<0)', function (h, x, z) { return h > 0.60 && h < 0.70 && x > 0.07 && x < 0.11 && z < 0; });
+region('trap R (h.80-.86, x .04-.10)', function (h, x, z) { return h > 0.80 && h < 0.86 && x > 0.04 && x < 0.10; });
+region('pelvis (h.40-.46)', function (h, x) { return h > 0.40 && h < 0.46 && Math.abs(x) < 0.113; });
+region('fused lower (h.30-.40)', function (h, x) { return h > 0.30 && h < 0.40 && Math.abs(x) < 0.113; });
+region('neck (h.86-.89)', function (h, x) { return h > 0.86 && h < 0.89 && Math.abs(x) < 0.113; });
+region('SCAP zone (h.645-.815, x .035-.123, z<-.01)', function (h, x, z) { return h > 0.645 && h < 0.815 && Math.abs(x) > 0.035 && Math.abs(x) < 0.1226 && z < -0.01 && x > 0; });
+region('upper back (h.70-.80, x .04-.10, z<-.05)', function (h, x, z) { return h > 0.70 && h < 0.80 && x > 0.04 && x < 0.10 && z < -0.05; });
+region('distal upper arm R (h.64-.69,x>.113)', function (h, x) { return h > 0.64 && h < 0.69 && x > 0.113; });

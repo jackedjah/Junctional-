@@ -1,0 +1,85 @@
+{
+ "canonical": "TEMPLE_M5C",
+ "role": "Gold Temple imported landmark",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\ornate temple 3d model.glb",
+  "original_name": "ornate temple 3d model.glb",
+  "sha256": "25c4c6e951797ae374e74efc172aeb9c0cb4977bbceca18f62e26e82473054c1",
+  "bytes": 76380384,
+  "triangles": 1866763,
+  "vertices": 1043714,
+  "bounds_min": [
+   -0.3606414794921875,
+   0.0,
+   -0.370880126953125
+  ],
+  "bounds_max": [
+   0.3606414794921875,
+   0.978515625,
+   0.370880126953125
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 14609401,
+   "runtime_bytes": 1419483,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 5969063,
+   "runtime_bytes": 320037,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "mime": "image/jpeg"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "TEMPLE_M5C_L0.glb",
+   "triangles": 799999,
+   "vertices": 510332,
+   "bytes": 27672088,
+   "sha256": "1bbc66c1b54c4a6b612ce7a55ddcbdd4e441e44fac94809ddf8c1b9300e86e8d"
+  },
+  {
+   "lod": "L1",
+   "file": "TEMPLE_M5C_L1.glb",
+   "triangles": 266419,
+   "vertices": 243542,
+   "bytes": 12731844,
+   "sha256": "bcca14be0d0ec02e7bcb2edaf18544c6097740139d4b71e8c84aa925ed8ef66f"
+  }
+ ],
+ "method": "fast_simplification quadric edge collapse (agg 3.0, preserve_border True), UVs via nearest collapse-cluster representative, source normals carried by collapse map; textures Pillow LANCZOS",
+ "recipe": {
+  "tool": "26_LOCAL_AUTHORITY/deploy/jobb/derive_glb.py",
+  "mode": "static_geometry",
+  "arguments": {
+   "lods": "L0:800000,L1:200000",
+   "tex": 2048,
+   "normal": 2048,
+   "jpeg": 86,
+   "agg": 3.0,
+   "keep_geometry": false,
+   "preserve_normals": true,
+   "preserve_border": true,
+   "attribute_representative": "nearest"
+  }
+ },
+ "generated": "2026-09-23T18:30:35Z",
+ "timing_s": {
+  "L0": 3.3,
+  "L1": 4.3
+ },
+ "elapsed_s": 9.3
+}

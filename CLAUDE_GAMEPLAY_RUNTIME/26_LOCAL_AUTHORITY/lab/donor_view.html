@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>MAHWORLD — donor source viewer (isolated, read-only)</title>
+<style>html,body{margin:0;height:100%;background:#0b1220;color:#cfe;font:12px/1.4 system-ui}#hud{position:fixed;left:8px;top:8px;background:rgba(0,0,0,.55);padding:6px 10px;border-radius:8px;white-space:pre}canvas{display:block}</style></head>
+<body><div id="hud">loading…</div>
+<script type="module">
+/* S10 §5 SOURCE PLAYBACK PROOF: the unmodified Tripo donor GLB played through the vendored GLTFLoader + AnimationMixer. Nothing here is the game;
+   the camera orbit is ours (the showcase turntable is not an animation). ?clip=cast_a_spell&file=<url>&t=<seconds> */
+import * as THREE from '../vendor/three/three.module.min.js'; import { GLTFLoader } from '../vendor/three/GLTFLoader.js';
+var P = new URLSearchParams(location.search); var FILE = P.get('file') || '../../../INCOMING_TRIPO/donor_received_2026-09-16/INPUTS/purple+armor+3d+model.glb'; var CLIP = P.get('clip') || 'cast_a_spell';
+var renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(1); document.body.appendChild(renderer.domElement);
+var scene = new THREE.Scene(); scene.background = new THREE.Color(0x101a2a); var camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.05, 100);
+scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x203040, 1.1)); var key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(2, 4, 3); scene.add(key); var fill = new THREE.DirectionalLight(0x88aaff, 0.5); fill.position.set(-3, 2, -2); scene.add(fill);
+var grid = new THREE.GridHelper(4, 16, 0x335, 0x223); scene.add(grid);
+var mixer = null, action = null, clock = new THREE.Clock(), root = null, skel = null, cam = { yaw: 0.6, pitch: 0.12, dist: 2.6, pivot: 0.95 }, hud = document.getElementById('hud');
+window.DONOR = { ready: false, cam: function (y, p, d, pv) { if (y !== undefined && y !== null) cam.yaw = y; if (p !== undefined && p !== null) cam.pitch = p; if (d !== undefined && d !== null) cam.dist = d; if (pv !== undefined && pv !== null) cam.pivot = pv; }, seek: function (t) { if (action) { action.paused = true; action.time = t; mixer.update(0); } }, play: function (rate) { if (action) { action.paused = false; action.timeScale = rate || 1; } }, clips: [], time: function () { return action ? action.time : 0; }, bone: function (n) { var b = skel && skel.bones.filter(function (x) { return x.name === n; })[0]; if (!b) return null; var v = new THREE.Vector3(); b.getWorldPosition(v); return [v.x, v.y, v.z]; } };
+new GLTFLoader().load(FILE, function (g) {
+  root = g.scene; scene.add(root); root.traverse(function (o) { if (o.isSkinnedMesh) { skel = o.skeleton; o.frustumCulled = false; } });
+  var box = new THREE.Box3().setFromObject(root); var h = box.max.y - box.min.y; cam.pivot = box.min.y + h * 0.55; cam.dist = h * 2.4;
+  mixer = new THREE.AnimationMixer(root); window.DONOR.clips = g.animations.map(function (a) { return a.name; }); var clip = g.animations.filter(function (a) { return a.name.indexOf(CLIP) >= 0; })[0] || g.animations[0]; action = mixer.clipAction(clip); action.setLoop(THREE.LoopRepeat); action.play(); if (P.get('t')) window.DONOR.seek(parseFloat(P.get('t')));
+  window.DONOR.ready = true; window.DONOR.clip = clip.name; window.DONOR.duration = clip.duration; window.DONOR.joints = skel ? skel.bones.length : 0;
+}, undefined, function (e) { hud.textContent = 'load failed: ' + e; });
+function frame() { requestAnimationFrame(frame); var dt = clock.getDelta(); if (mixer) mixer.update(dt); var cx = Math.sin(cam.yaw) * Math.cos(cam.pitch) * cam.dist, cz = Math.cos(cam.yaw) * Math.cos(cam.pitch) * cam.dist, cy = cam.pivot + Math.sin(cam.pitch) * cam.dist; camera.position.set(cx, cy, cz); camera.lookAt(0, cam.pivot, 0); renderer.render(scene, camera); if (action) hud.textContent = 'DONOR SOURCE (unmodified) · ' + window.DONOR.clip + ' · t ' + action.time.toFixed(2) + ' / ' + window.DONOR.duration.toFixed(2) + ' s · joints ' + window.DONOR.joints + ' · camera orbit is ours'; }
+frame(); addEventListener('resize', function () { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
+</script></body></html>

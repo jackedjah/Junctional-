@@ -1,0 +1,96 @@
+{
+ "shots": [
+  "01_sheet_physical_rear_camera",
+  "02_sheet_physical_side",
+  "03_sheet_physical_front_quarter",
+  "04_sheet_magical_side",
+  "05_sheet_after_guarded_bites_rear",
+  "06_sheet_break_burst"
+ ],
+ "notes": [
+  "nearest at arrival {\"c\":{\"id\":\"WILD_DOGKIE_03\",\"x\":-105,\"z\":-20,\"state\":\"IDLE\"},\"d\":40.311288741492746,\"yaw\":-1.0516502125483738}"
+ ],
+ "console_errors": [],
+ "checks": [
+  {
+   "id": "1. PHYSICAL guard accepted; the SHEET is built on the body meshes (≥ 1 SkinnedMesh child) and visible; guard_sheet frac 1",
+   "ok": true,
+   "detail": {
+    "g": true,
+    "m": {
+     "hp": 225,
+     "max": 225,
+     "frac": 1,
+     "broken": false
+    },
+    "si": {
+     "built": true,
+     "meshes": 3,
+     "visible": 3,
+     "prevFrac": 1,
+     "burstT": -1
+    }
+   }
+  },
+  {
+   "id": "2. the old guard RING (torus r 0.8) is gone from the scene",
+   "ok": true,
+   "detail": {
+    "torus_rings_visible": 0
+   }
+  },
+  {
+   "id": "3. MAGICAL guard accepted — the sheet takes the class energy colour",
+   "ok": true,
+   "detail": "MAGICAL"
+  },
+  {
+   "id": "4. guarded Dogkie bites DRAIN the sheet (frac steps down) and the host BREAKS it (guard null + broken) within 2–3 meaningful hits; the client shows the burst",
+   "ok": true,
+   "detail": {
+    "fracs": [
+     1,
+     0.471,
+     0
+    ],
+    "broke": {
+     "hp": 0,
+     "max": 225,
+     "frac": 0,
+     "broken": true
+    },
+    "si": {
+     "built": true,
+     "meshes": 3,
+     "visible": 0,
+     "prevFrac": 0.471,
+     "burstT": 23.04400000000006
+    },
+    "notes": [
+     "nearest at arrival {\"c\":{\"id\":\"WILD_DOGKIE_03\",\"x\":-105,\"z\":-20,\"state\":\"IDLE\"},\"d\":40.311288741492746,\"yaw\":-1.0516502125483738}"
+    ]
+   }
+  },
+  {
+   "id": "5. after the break: no sheet drawn while the guard is down; a re-guard inside the lock window is refused (GUARD_BROKEN) or, once it re-forms, accepted",
+   "ok": true,
+   "detail": {
+    "re2": "GUARD_BROKEN",
+    "after": {
+     "hp": 39.4,
+     "max": 225,
+     "frac": 0.175,
+     "broken": true
+    }
+   }
+  },
+  {
+   "id": "6. no shader / console errors (the sheet material compiled on the skinned + morphed body)",
+   "ok": true,
+   "detail": []
+  }
+ ],
+ "errors": [],
+ "pass": 6,
+ "fail": 0
+}

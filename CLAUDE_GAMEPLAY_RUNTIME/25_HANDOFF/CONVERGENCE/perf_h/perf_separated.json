@@ -1,0 +1,44 @@
+{
+ "checks": [
+  "PASS INPUT DELAY: MOVE sent → the host position moves in 85 ms (host reaction, 20 Hz tick + poll) → the displayed root moves in 176 ms (what the eye sees; includes the 120 ms presentation delay) — {\"host_ms\":85.19999998807907,\"displayed_ms\":175.60000002384186,\"interp_delay_ms\":120}",
+  "PASS ANIMATION STEPPING: over 101 steady frames the displayed root never held still while travelling (0 zero-advance frames) and the displayed speed is smooth (mean 3.69 m/s, coefficient of variation 0.27 ≤ 0.35) — {\"frames\":101,\"zero_advance_frames\":0,\"mean_mps\":3.691404351272809,\"cv\":0.270808379943574}",
+  "PASS FRAME STALLS: p95 29.3 ms · p99 33.2 ms · 0 frames > 100 ms of 241 (desktop GPU headless Chrome; a phone is Jah's measurement) — {\"p95\":29.299999952316284,\"p99\":33.19999998807907,\"stalls\":0,\"frames\":241}",
+  "FAIL CAMERA JITTER: the projected fixed world point moves smoothly across the screen during travel — second difference RMS 2.71 px/frame² (p95 5.21), no shake spikes — {\"rms\":2.7128692196123767,\"p95\":5.214570791423972,\"n\":99}",
+  "PASS STATE DELAY: the displayed root trails the authoritative position by 0.35 m = 94 ms at 3.69 m/s — the constant presentation delay (120 ms) plus the 20 Hz sampling, nothing accumulating — {\"lag_m\":0.3456503646601723,\"lag_ms\":93.6365490659377,\"interp_ms\":120}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "build": {
+  "built": "2026-09-19T15:40:21.600Z",
+  "athlete": "dev_0.16 (ATHLETE_M_V11: dev_0.15 + graded shoulder skin weights — owner hotfix 2026-09-19 intactness: the 0.4 UPPERARM weight step across one deltoid / armpit edge is smoothed over ~2–3 cm, weights only, rollback ?avatar=ATHLETE_M_V10; V10 = dev_0.14 + hip connection — the pelvis shell follows the thighs, the leg tops stay with the pelvis (weights only; rollback ?avatar=ATHLETE_M_V9); V9 = faithful separated legs (O6) — the fused lower body’s own triangles + inferred medial walls; V8 dev_0.13 (surgical loft) kept for rollback via ?avatar=ATHLETE_M_V8)"
+ },
+ "metrics": {
+  "input_delay_ms": {
+   "host": 85.19999998807907,
+   "displayed": 175.60000002384186
+  },
+  "animation": {
+   "steady_frames": 101,
+   "zero_advance_frames": 0,
+   "mean_mps": 3.691404351272809,
+   "cv": 0.270808379943574
+  },
+  "stalls": {
+   "p95": 29.299999952316284,
+   "p99": 33.19999998807907,
+   "over_100ms": 0,
+   "frames": 241
+  },
+  "camera_jitter": {
+   "rms_px": 2.7128692196123767,
+   "p95_px": 5.214570791423972
+  },
+  "state_delay": {
+   "lag_m": 0.3456503646601723,
+   "lag_ms": 93.6365490659377,
+   "interp_delay_ms": 120
+  },
+  "environment": "desktop GPU headless Chrome 1200×750, normal speed, straight walking leg on the plaza strip; physical phone NOT measured (Jah only)"
+ },
+ "pass": 5,
+ "fail": 1
+}

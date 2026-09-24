@@ -1,0 +1,542 @@
+{
+ "night": false,
+ "errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/favicon.ico>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.1/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.13/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.12/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.11/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.10/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.9/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.7/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.6/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.5/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.4/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.3/manifest.json>",
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:57778/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.2/manifest.json>"
+ ],
+ "world": {
+  "status": "READY",
+  "registry": "WORLD_REGISTRY_V1",
+  "error": null,
+  "shapes": 191,
+  "floor_cut": 1,
+  "floor_cut_error": null,
+  "modules": {
+   "fixtures": 78,
+   "water": {
+    "rivers": 1,
+    "bridges": 3,
+    "kerbSegments": 8,
+    "decks": 3,
+    "ramps": 6,
+    "rails": 6,
+    "posts": 66,
+    "edgeLines": 18,
+    "pads": 6,
+    "drawCalls": 6,
+    "triangles": 2696,
+    "maxY": 1.45,
+    "railTopY": 1.45,
+    "clearanceOk": true,
+    "night": false,
+    "meshes": [
+     "WATER_TRENCH",
+     "WATER_PLATINUM",
+     "WATER_RAILS",
+     "WATER_EDGE_LINES",
+     "WATER_LANDING_PADS",
+     "WATER_SURFACE"
+    ]
+   },
+   "forest": {
+    "trees": 157,
+    "lod_counts": {
+     "L0": 0,
+     "L1": 0,
+     "IMPOSTOR": 157
+    },
+    "impostor": true,
+    "draw_calls": 2,
+    "lod_m": {
+     "near": 26,
+     "mid": 60
+    },
+    "height_m": [
+     9.27,
+     14.73
+    ],
+    "underbrush": 157,
+    "night": false,
+    "skipped": null
+   },
+   "celestial": {
+    "night": false,
+    "draw_calls_visible": 3,
+    "sun": {
+     "apparent_deg": 5.3,
+     "diameter_m": 30.55,
+     "distance_m": 330,
+     "halo_deg": 14,
+     "halo_m": 81.04,
+     "textured": true,
+     "visible": true,
+     "direction": [
+      0.577,
+      0.755,
+      0.311
+     ]
+    },
+    "moon": {
+     "apparent_deg": 5.2,
+     "diameter_m": 29.97,
+     "distance_m": 330,
+     "halo_deg": 12,
+     "halo_m": 69.37,
+     "textured": true,
+     "visible": false,
+     "direction": [
+      -0.342,
+      0.085,
+      -0.936
+     ]
+    }
+   },
+   "props": {
+    "placed": [
+     {
+      "id": "PROJECTOR_GYM_BEACON",
+      "derivative": "MAH_GYM_PROJECTOR_BEACON",
+      "scale": 4.9804,
+      "footprint_m": [
+       4.88,
+       2.77
+      ],
+      "height_m": 4.6,
+      "yaw_deg": 40,
+      "levels": [
+       0,
+       60
+      ],
+      "meshes": 1,
+      "bounds": {
+       "min": [
+        -82.76,
+        0.02,
+        95.37
+       ],
+       "max": [
+        -77.24,
+        4.62,
+        100.63
+       ]
+      },
+      "pad_r_m": 2.79
+     }
+    ],
+    "pads": 1,
+    "draw_calls_at_rest": 2,
+    "hologram_materials": 2,
+    "night": false
+   },
+   "matchHall": {
+    "building": {
+     "id": "MATCH_HALL",
+     "at": [
+      122,
+      6
+     ],
+     "door": {
+      "side": "-x",
+      "x": 102,
+      "z": 6,
+      "w": 6,
+      "h": 5
+     },
+     "draw_calls": 6,
+     "tris": 1772,
+     "strips": 60,
+     "height_m": 22
+    },
+    "court": {
+     "id": "MATCH_COURT_OUTDOOR",
+     "at": [
+      128,
+      50
+     ],
+     "r": 16,
+     "spectator_r": [
+      19,
+      24
+     ],
+     "pylons": 4,
+     "aisles": 4,
+     "draw_calls": 3,
+     "tris": 4656
+    },
+    "interior": null,
+    "night": false,
+    "draw_calls_field": 9
+   },
+   "guides": {
+    "current": null,
+    "visible": true,
+    "on_stage": false,
+    "height_m": 0.45,
+    "wanted": null,
+    "loaded": [],
+    "loading": [],
+    "skinned": null,
+    "scale": null,
+    "night": false,
+    "rim": null,
+    "draw_calls": 0,
+    "pos": null,
+    "yaw_deg": null,
+    "follow": {
+     "dist_m": 1.4,
+     "angle_rad": 0.7,
+     "up_m": 1.55,
+     "rate": 4,
+     "snap_beyond_m": 12,
+     "cam_clear_m": 1.2,
+     "floor_above_feet_m": 0.35
+    },
+    "hover": {
+     "amp_m": 0.06,
+     "hz": 1.1
+    },
+    "bank": {
+     "rad_per_mps": 0.12,
+     "max_rad": 0.3,
+     "yaw_rate": 8
+    }
+   },
+   "creatures": {
+    "count": 0,
+    "active": 0,
+    "lod_levels": 3,
+    "lod_m": [
+     24,
+     60
+    ],
+    "lod_now": [],
+    "classified_bones": {
+     "method": "names",
+     "total_bones": 55,
+     "root": "Root",
+     "hips": "J_Bip_C_Hips",
+     "head": "J_Bip_C_Head",
+     "neck": "J_Bip_C_Neck",
+     "jaw": null,
+     "spine": [
+      "J_Bip_C_Spine",
+      "J_Bip_C_Chest",
+      "J_Bip_C_UpperChest"
+     ],
+     "tail": [],
+     "legs": {
+      "FL": "J_Bip_L_UpperArm / J_Bip_L_LowerArm / J_Bip_L_Hand",
+      "FR": "J_Bip_R_UpperArm / J_Bip_R_LowerArm / J_Bip_R_Hand",
+      "BL": "J_Bip_L_UpperLeg / J_Bip_L_Foot / J_Bip_L_Foot",
+      "BR": "J_Bip_R_UpperLeg / J_Bip_R_Foot / J_Bip_R_Foot"
+     },
+     "forward_model": "+z",
+     "forward_fix_deg": 180,
+     "rest_height_m": 0.978,
+     "missing": [
+      "jaw",
+      "tail"
+     ],
+     "duplicates": [],
+     "notes": [
+      "BL knee degenerate (-0.004 m) → fold at J_Bip_L_Foot",
+      "BR knee degenerate (-0.000 m) → fold at J_Bip_R_Foot"
+     ]
+    },
+    "loaded": true,
+    "load_error": null,
+    "derivative": "DOGKIE_FOREST_CREATURE",
+    "height_m": 1.25,
+    "scale": 1.2785,
+    "states": {},
+    "draw_calls_visible": 0,
+    "tags": true,
+    "lag_s": 0.12,
+    "host_clock": false,
+    "night": false
+   },
+   "trees": 157
+  }
+ },
+ "places": [
+  {
+   "id": "plaza_wide",
+   "goto": {
+    "reached": false,
+    "passes": 1,
+    "sidesteps": 36
+   },
+   "calls": 340,
+   "tris": 615910,
+   "pos": {
+    "x": -9.85,
+    "z": -29.996
+   },
+   "creatures": 0,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 157
+   }
+  },
+  {
+   "id": "plaza_north",
+   "goto": {
+    "reached": true,
+    "passes": 1,
+    "sidesteps": 2
+   },
+   "calls": 184,
+   "tris": 401283,
+   "pos": {
+    "x": -0.11,
+    "z": 19.536
+   },
+   "creatures": 1,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 157
+   }
+  },
+  {
+   "id": "forest_w_edge",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 337,
+   "tris": 888399,
+   "pos": {
+    "x": -65.552,
+    "z": 10.065
+   },
+   "creatures": 6,
+   "spar": null,
+   "forest_lod": {
+    "L0": 13,
+    "L1": 24,
+    "IMPOSTOR": 120
+   }
+  },
+  {
+   "id": "forest_w_inside",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 339,
+   "tris": 907615,
+   "pos": {
+    "x": -99.616,
+    "z": 5.057
+   },
+   "creatures": 10,
+   "spar": null,
+   "forest_lod": {
+    "L0": 11,
+    "L1": 37,
+    "IMPOSTOR": 109
+   }
+  },
+  {
+   "id": "canal_bridge_main",
+   "goto": {
+    "reached": true,
+    "passes": 1,
+    "sidesteps": 3
+   },
+   "calls": 341,
+   "tris": 691861,
+   "pos": {
+    "x": -0.317,
+    "z": 200.424
+   },
+   "creatures": 1,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 157
+   }
+  },
+  {
+   "id": "bridge_deck",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 340,
+   "tris": 691821,
+   "pos": {
+    "x": -0.004,
+    "z": 225.642
+   },
+   "creatures": 1,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 157
+   }
+  },
+  {
+   "id": "match_hall_approach",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 72,
+   "tris": 251555,
+   "pos": {
+    "x": 83.882,
+    "z": 6.338
+   },
+   "creatures": 0,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 157
+   }
+  },
+  {
+   "id": "bridge_side",
+   "goto": {
+    "reached": false,
+    "passes": 1,
+    "sidesteps": 18
+   },
+   "calls": 74,
+   "tris": 413261,
+   "pos": {
+    "x": 10.403,
+    "z": 158.778
+   },
+   "creatures": 1,
+   "spar": {
+    "a": "NPC_ATHLETE_F",
+    "b": "NPC_VISIONARY_M",
+    "spot": {
+     "x": -20,
+     "z": 36
+    },
+    "arrived": true,
+    "remaining_s": 3.6,
+    "casts": 5
+   },
+   "forest_lod": {
+    "L0": 0,
+    "L1": 5,
+    "IMPOSTOR": 152
+   }
+  },
+  {
+   "id": "match_court",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 74,
+   "tris": 251597,
+   "pos": {
+    "x": 127.671,
+    "z": 30.36
+   },
+   "creatures": 0,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 0,
+    "IMPOSTOR": 157
+   }
+  },
+  {
+   "id": "projector_gym",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 148,
+   "tris": 535393,
+   "pos": {
+    "x": -71.617,
+    "z": 95.874
+   },
+   "creatures": 2,
+   "spar": null,
+   "forest_lod": {
+    "L0": 0,
+    "L1": 5,
+    "IMPOSTOR": 152
+   }
+  },
+  {
+   "id": "plaza_buildings",
+   "goto": {
+    "reached": true,
+    "passes": 1
+   },
+   "calls": 180,
+   "tris": 533191,
+   "pos": {
+    "x": -30.311,
+    "z": -9.667
+   },
+   "creatures": 4,
+   "spar": {
+    "a": "NPC_LEAN_F",
+    "b": "NPC_BAGE_F",
+    "spot": {
+     "x": 36,
+     "z": -30
+    },
+    "arrived": false,
+    "remaining_s": 5.7,
+    "casts": 0
+   },
+   "forest_lod": {
+    "L0": 0,
+    "L1": 1,
+    "IMPOSTOR": 156
+   }
+  },
+  {
+   "id": "match_hall_interior",
+   "enter": true,
+   "room": "MATCH_HALL",
+   "calls": 23,
+   "tris": 28992,
+   "build": {
+    "key": "MATCH_HALL:MATCH_HALL_colliders_v1:14",
+    "room": "MATCH_HALL",
+    "error": null
+   }
+  },
+  {
+   "id": "gym_interior_props",
+   "enter": true,
+   "room": "GYM_INTERIOR",
+   "calls": 99,
+   "tris": 76863,
+   "build": {
+    "key": "GYM_INTERIOR:GYM_INTERIOR_colliders_v1:15",
+    "room": "GYM_INTERIOR",
+    "error": null
+   }
+  }
+ ]
+}

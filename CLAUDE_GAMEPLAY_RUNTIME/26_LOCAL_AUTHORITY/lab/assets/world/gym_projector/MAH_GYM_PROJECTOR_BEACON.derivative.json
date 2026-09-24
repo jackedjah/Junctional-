@@ -1,0 +1,79 @@
+{
+ "canonical": "MAH_GYM_PROJECTOR_BEACON",
+ "role": "projector / holographic information artifact outside the Gym",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\mahgymadvertsemet.glb",
+  "original_name": "mahgymadvertsemet(1).glb",
+  "sha256": "4fe29962c1d55898e6d817d0042c479b8b08b3795cabddd37f98a35cf5c3417b",
+  "bytes": 77246456,
+  "triangles": 1955221,
+  "vertices": 1021697,
+  "bounds_min": [
+   -0.4899139702320099,
+   0.0,
+   -0.2783660590648651
+  ],
+  "bounds_max": [
+   0.4899139702320099,
+   0.923553466796875,
+   0.2783660590648651
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 12197121,
+   "runtime_bytes": 1146343,
+   "runtime_size": [
+    2048,
+    2048
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 8890467,
+   "runtime_bytes": 205036,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/jpeg"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "MAH_GYM_PROJECTOR_BEACON_L0.glb",
+   "triangles": 30000,
+   "vertices": 18688,
+   "bytes": 2311440,
+   "sha256": "fd4844800cb22a944cfed51830e44c96b98fd07c297b8ca12f81df7a56acac70"
+  },
+  {
+   "lod": "L1",
+   "file": "MAH_GYM_PROJECTOR_BEACON_L1.glb",
+   "triangles": 9000,
+   "vertices": 6751,
+   "bytes": 1677448,
+   "sha256": "9c689fa9dc6c7abf0f88b9ec850d7362f03e38d980116151c45149714ff529e0"
+  },
+  {
+   "lod": "L2",
+   "file": "MAH_GYM_PROJECTOR_BEACON_L2.glb",
+   "triangles": 2543,
+   "vertices": 2388,
+   "bytes": 1460344,
+   "sha256": "59422769294f9f23e91faffe1e4f9d8ea3134b79346837cb669c9a83667008fb"
+  }
+ ],
+ "method": "fast_simplification quadric edge collapse (agg 7.0), UVs from the collapse map, smooth normals recomputed; textures Pillow LANCZOS",
+ "generated": "2026-09-19T20:45:09Z",
+ "timing_s": {
+  "L0": 14.1,
+  "L1": 0.6,
+  "L2": 0.5
+ },
+ "elapsed_s": 19.0
+}

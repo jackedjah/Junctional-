@@ -1,0 +1,76 @@
+{
+  "checkpoint": "M5_OWNER_CORRECTIONS_02_INTEGRATED_LOCAL",
+  "timestamp": "2026-09-23T17:47:57.9484360-04:00",
+  "source_head": "3185a25f80a23131fbdb2062fca9a1a1ffb7684f",
+  "branch": "master",
+  "continuity": "same intentionally dirty M1-M5 worktree; no reset, clean, stash, stage, commit, or ownership-boundary change",
+  "state": "LOCAL_CORRECTIONS_STABLE_SOAK_PACKAGE_DEPLOY_OPEN",
+  "immutable_comparison_candidate": {
+    "build": "ASTRA_M5_PRIVATE_20260923",
+    "package_sha256": "ebcad0ed993899f66c7477a1b3f1cde57740b32047fd0c02b60cf71e85055995",
+    "deploy_id": "6ab3abd739fc958c75339988",
+    "release_record_sha256": "d09790df60b3f8a10f0a403b98e0b618228b85a637b49522b538ec1f6d50c7a2"
+  },
+  "next_candidate_label": "ASTRA_M5C_PRIVATE_20260923",
+  "operations": {
+    "OP01": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: source-traced seam/border-preserving building derivatives; no raw-parity or recovered-original claim",
+    "OP02": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: once-only 0.6 scale (Temple 54.80844 -> 32.885064; Tower 48.9358 -> 29.36148; Market 43.63391 -> 26.180346)",
+    "OP03": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: source-aligned front portals face real approaches",
+    "OP04": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: grand functional interiors (Temple 11.5 m, Tower 13 m, Market wings 8.2 m) and 0.55 m safe returns",
+    "OP05": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: one cached owned road topology with deterministic junctions and no overlapping coplanar road sheets",
+    "OP06": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: same- and mixed-family junctions share one opaque surface owner",
+    "OP07": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: owner Moon source 6d5499f9654d00f3533170848dfe18fb991237d1ed87e5eb0a6cfb785701eb8c -> runtime L0 b7ad1e4897ef26961133b09894583c709e27cf6edebfe4a7811ad7bdbfbf415c at 900 m / 6.2 degrees",
+    "OP08": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: irregular feathered moving clouds and shared celestial/key-light transmission",
+    "OP09": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: normal-play zero, partial, full, and full+999 bush loops plus funded special",
+    "OP10": "REPORTED_REPRODUCED_FIXED_VERIFIED_LOCAL: reachable ridge, monolith, and building proxies block both forms and flight while real passes, bridges, doors, and landings remain traversable",
+    "OP11": "REPORTED_NOT_PHYSICALLY_REPRODUCED_OPTIMIZED_MEASURED_LOCAL: redundant surface work removed and defined desktop/emulated-phone profiles measured; physical phone remains owner-pending",
+    "OP12": "REPORTED_REPRODUCED_FIXED_VERIFIED_EMULATION: all five family colors remain identical across L0/L1, DAY/NIGHT, desktop/phone with 26/30 m hysteresis"
+  },
+  "generated_authority": {
+    "district_manifest_sha256": "6dcb118b132fe1244d12d0c42aca4e265d3cf92de37ec76991a7ae8ae3f01e6e",
+    "district_shape_sha256": "fbc808af1c4134c50b66cfa3ec59a29da102ca94eee7771c07902bc426a9c814",
+    "world_registry_sha256": "825f6943b093d17df65522c1b1cb398b33bf9c2790bde2183ede3376aa757f5f",
+    "base_shapes": 28,
+    "district_shapes": 792,
+    "world_shapes": 9457,
+    "mapping_shapes": 10277
+  },
+  "accepted_evidence": {
+    "visual_desktop": { "result": "20/20", "screenshots": 95, "sha256": "b03a8981f0ce3ff559a1d37ccdb400c859b4e347e2cc9c781571e24f4c08b1fc" },
+    "visual_phone_emulation": { "result": "20/20", "screenshots": 95, "sha256": "0e9ae4f7374be4f2cdf3f2859f1239251f0fad8bcb6a9d350a965915e0fde541" },
+    "owner_corrections_desktop": { "result": "62/62", "screenshots": 199, "input_events": 324, "console_errors": 0, "sha256": "f586b35415ef0f1939e1dacf53042c3913a96b6d09af0661a88f34b6a91663cd" },
+    "owner_corrections_phone_emulation": { "result": "62/62", "screenshots": 199, "input_events": 219, "console_errors": 0, "sha256": "9382801a31f9d5ee25cb673da18d43f51835bbb805e27dc96d5068987e9b52c2" },
+    "interiors": { "result": "26/26", "screenshots": 27, "sha256": "34d8778e2159bff1d2959f933151b3a2aaca312eb0f326fb5604523b25d9fc84" },
+    "tree_lod": {
+      "result": "100/100 settled checks",
+      "screenshots": 100,
+      "families": ["gold", "blue", "red", "pink", "purple"],
+      "day_desktop_sha256": "7a73c187103c56dbf6c2c29e2cf0b62d60b8096505309792aaa9ec499b961191",
+      "day_phone_sha256": "33e503d6bcdc6ff6ec46aed1177f81efe630e57d9b0688def32c9cd50377f3c3",
+      "night_desktop_sha256": "59fd2ab91a085a8d10b3cf619bfa46af4f2ff902d0b3a1ca3808ad4386639acc",
+      "night_phone_sha256": "9999f16a80528a0b186ca65de469ae6c37c5f7dc85d8a5d4a49f63f84f243df9"
+    },
+    "candidate_route": {
+      "result": "20/20",
+      "sha256": "55a3137e20e0f82d2e64b04a4b06a4eded7f5a1a21770bf23cebb3a75470270e",
+      "titan_counter": "ordinary low flight at 11.46 m, above the Titan Lake fish envelope and below the 30 m Phoenix threshold; normal landing beyond the leash; zero defeat and no Titan-stage reset/heal/placement shortcut (the report's sole reset is the earlier resource-drain fixture)"
+    },
+    "non_browser_regression": { "programs": "15/15", "checks": "385/385", "npm_test": "125/125" }
+  },
+  "release_gates": {
+    "candidate_route": "PASS_20_OF_20",
+    "soak_900s": "PENDING_NOT_RUN",
+    "package": "PENDING_NOT_RUN",
+    "fresh_extraction": "PENDING_NOT_RUN",
+    "protected_nonproduction_deploy": "PENDING_NOT_RUN",
+    "physical_phone_acceptance": "OWNER_PENDING"
+  },
+  "limitations": [
+    "building derivatives are reduced and border-preserving, with resampled textures and unsupported extensions removed; they are not exact raw parity and no missing original is claimed recovered",
+    "grand interiors are authored functional volumes, not literal imported interiors",
+    "structural collision uses generated bounded proxies rather than per-triangle collision",
+    "road diagnostics retain 68 core, 84 frame, and 2 seam degenerates, with zero invalid indices",
+    "runtime coverage samples representative routes and trees rather than every metre or tree",
+    "desktop and phone-sized emulation do not constitute physical-phone acceptance"
+  ]
+}

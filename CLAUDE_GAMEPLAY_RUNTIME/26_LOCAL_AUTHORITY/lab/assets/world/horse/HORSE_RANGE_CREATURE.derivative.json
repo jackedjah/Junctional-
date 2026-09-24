@@ -1,0 +1,76 @@
+{
+ "canonical": "HORSE_RANGE_CREATURE",
+ "role": "open-range creature (horse)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_NEW3\\horse.glb",
+  "original_name": "horse.glb",
+  "sha256": "42c2ae471d7c8f731a6e977b6c92808f501e17494c20d22cf71fb8e60bc1cb90",
+  "bytes": 31319444,
+  "triangles": 19996,
+  "skinned": true,
+  "joints": 18,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "image": 0,
+   "source_bytes": 6061785,
+   "runtime_bytes": 537695,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": false
+  },
+  {
+   "image": 1,
+   "source_bytes": 18949868,
+   "runtime_bytes": 620974,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": false
+  },
+  {
+   "image": 2,
+   "source_bytes": 4635389,
+   "runtime_bytes": 197059,
+   "runtime_size": [
+    512,
+    512
+   ],
+   "normal": true
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "HORSE_RANGE_CREATURE_L0.glb",
+   "triangles": 19996,
+   "bytes": 3028460,
+   "sha256": "4158d2a80e711df31880e2fc5febaace6709c0eb9fd13e30f584baec9ac97476"
+  },
+  {
+   "lod": "L1",
+   "file": "HORSE_RANGE_CREATURE_L1.glb",
+   "triangles": 8794,
+   "vertices": 15231,
+   "bytes": 2265928,
+   "sha256": "399f73eeefcbe607838aa11a2eb4aecd2ac37c09caac52b5827de0c1e45c3411",
+   "method": "glTF-Transform 4.5.0 meshoptimizer, requested ratio 0.325065, error 0.01, topological borders locked; stopped at the fidelity ceiling with source normals, UVs, joints and weights preserved"
+  },
+  {
+   "lod": "L2",
+   "file": "HORSE_RANGE_CREATURE_L2.glb",
+   "triangles": 8794,
+   "vertices": 15231,
+   "bytes": 2265928,
+   "sha256": "399f73eeefcbe607838aa11a2eb4aecd2ac37c09caac52b5827de0c1e45c3411",
+   "method": "same validated attribute-aware derivative as L1; a lower target crossed the 0.01 fidelity ceiling"
+  }
+ ],
+ "method": "L0: images resampled (Pillow LANCZOS, JPEG) with geometry, nodes and skin unchanged. L1/L2: glTF-Transform 4.5.0 meshoptimizer with error 0.01, topological borders locked and source NORMAL/TEXCOORD_0/JOINTS_0/WEIGHTS_0 preserved; L2 reuses the validated L1 plateau.",
+ "generated": "2026-09-23T03:53:24Z"
+}

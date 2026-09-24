@@ -1,0 +1,691 @@
+{
+ "checks": [
+  {
+   "id": "world_ready_gate_cleared",
+   "ok": true,
+   "detail": {
+    "done": true,
+    "veil": "none",
+    "gear": true
+   }
+  },
+  {
+   "id": "field_room",
+   "ok": true,
+   "detail": "FIELD"
+  },
+  {
+   "id": "equipment_view_present",
+   "ok": true,
+   "detail": {
+    "costs": {
+     "DUMBBELL": [
+      20,
+      30,
+      42
+     ],
+     "BARBELL": 36,
+     "BAND": 15
+    },
+    "affinity": 1,
+    "cm": {
+     "current": 200,
+     "max": 200
+    }
+   }
+  },
+  {
+   "id": "gear_module_built",
+   "ok": true,
+   "detail": {
+    "items": [],
+    "clones": 0,
+    "diamonds": 0,
+    "bushes": 16,
+    "shards": 480,
+    "broken": [],
+    "templates": [],
+    "band": "procedural tube 1.3 m × r 0.018 m (no source model in the project database)",
+    "status_tags": 0
+   }
+  },
+  {
+   "id": "guide_visible",
+   "ok": true,
+   "detail": {
+    "current": "MRS",
+    "visible": true,
+    "on_stage": true
+   }
+  },
+  {
+   "id": "hud_gear_row_visible",
+   "ok": true,
+   "detail": {
+    "display": "block",
+    "buttons": 7
+   }
+  },
+  {
+   "id": "manifest_db2_accepted",
+   "ok": true,
+   "detail": {
+    "btn": {
+     "x": 47,
+     "y": 68.796875,
+     "w": 26,
+     "h": 24,
+     "vis": true
+    },
+    "journal": [
+     {
+      "tick": 319,
+      "t": 15.95,
+      "kind": "EQUIP_MANIFEST",
+      "account": "PLAYER_A",
+      "equipment": "DUMBBELL",
+      "count": 2,
+      "cost": 50,
+      "cast_s": 1.1
+     }
+    ]
+   }
+  },
+  {
+   "id": "casting_state",
+   "ok": true,
+   "detail": {
+    "kind": "DUMBBELL",
+    "count": 2,
+    "progress": 0.455
+   }
+  },
+  {
+   "id": "guide_cast_weight",
+   "ok": true,
+   "detail": {
+    "weight": 0.97,
+    "casts_seen": 1,
+    "tuning": {
+     "rise_m": 0.42,
+     "pitch_rad": 0.22,
+     "bob_hz": 2.6,
+     "glow_m": 0.9,
+     "dispense_s": 0.9
+    }
+   }
+  },
+  {
+   "id": "two_dumbbells_manifested",
+   "ok": true,
+   "detail": [
+    {
+     "id": "EQ_DUMBBELL_1",
+     "kind": "DUMBBELL",
+     "state": "MANIFESTED",
+     "x": -13.935,
+     "y": 1.487,
+     "z": 100.586,
+     "side": -0.35,
+     "idx": 0,
+     "age_s": 1.45
+    },
+    {
+     "id": "EQ_DUMBBELL_2",
+     "kind": "DUMBBELL",
+     "state": "MANIFESTED",
+     "x": -13.238,
+     "y": 1.461,
+     "z": 100.522,
+     "side": 0.35,
+     "idx": 1,
+     "age_s": 1.45
+    }
+   ]
+  },
+  {
+   "id": "manifest_cost_charged",
+   "ok": true,
+   "detail": {
+    "before": {
+     "current": 200,
+     "max": 200
+    },
+    "after": {
+     "current": 150,
+     "max": 200
+    }
+   }
+  },
+  {
+   "id": "gear_models_cloned",
+   "ok": true,
+   "detail": {
+    "items": [
+     "DUMBBELL:MANIFESTED",
+     "DUMBBELL:MANIFESTED"
+    ],
+    "clones": 2,
+    "diamonds": 0,
+    "bushes": 16,
+    "shards": 480,
+    "broken": [],
+    "templates": [
+     "DUMBBELL←MAHWORLD_GYM_DUMBBELL_L0.glb 39999 tris"
+    ],
+    "band": "procedural tube 1.3 m × r 0.018 m (no source model in the project database)",
+    "status_tags": 0
+   }
+  },
+  {
+   "id": "node_in_snapshot",
+   "ok": true,
+   "detail": {
+    "id": "NODE_RB_TEMPLE_W",
+    "patch": "RB_TEMPLE_W",
+    "x": -14,
+    "z": 96,
+    "y": 0,
+    "family": "gold",
+    "r": 2.4,
+    "hp": 168,
+    "max": 168,
+    "broken": false,
+    "respawn_in_s": null
+   }
+  },
+  {
+   "id": "bush_locked_by_tap",
+   "ok": true,
+   "detail": {
+    "tap": {
+     "s": {
+      "x": 640.1109460800747,
+      "y": 351.02216421098035,
+      "depth": 0.9342867736722472
+     },
+     "hit": {
+      "id": "other:NODE_RB_TEMPLE_W",
+      "distance": 10.307663464706954
+     }
+    },
+    "lock": "NODE_RB_TEMPLE_W"
+   }
+  },
+  {
+   "id": "xwave_cast_accepted",
+   "ok": true,
+   "detail": {
+    "armed": {
+     "skill": "ATHLETE_X_WAVE",
+     "category": "SPECIAL_MAGIC",
+     "sel": {
+      "PHYSICAL": 0,
+      "PHYSICAL_MAGIC": 0,
+      "SPECIAL_MAGIC": 0
+     }
+    },
+    "res": {
+     "command_id": "play-PLAYER_A-0oom8g-5",
+     "seq": 5,
+     "accepted": true,
+     "version": 447,
+     "tick": 439,
+     "duplicate": false,
+     "skill": "ATHLETE_X_WAVE",
+     "category": "SPECIAL_MAGIC",
+     "startup_s": 0.945,
+     "recovery_s": 0.45,
+     "reserved": 24,
+     "aim": null,
+     "point": null,
+     "facing": -0.091,
+     "aim_source": "LOCK"
+    }
+   }
+  },
+  {
+   "id": "xwave_gear_damage_on_node",
+   "ok": true,
+   "detail": {
+    "damage": [
+     {
+      "tick": 460,
+      "t": 23,
+      "kind": "R1723_DAMAGE",
+      "by": "PLAYER_A",
+      "on": "NODE_RB_TEMPLE_W",
+      "skill": "ATHLETE_X_WAVE",
+      "raw": 240,
+      "applied": 122.4,
+      "guard": null,
+      "components": {
+       "physical": 0,
+       "magical": 144
+      },
+      "periodic": false,
+      "family": null,
+      "discord": false,
+      "curse_source": null,
+      "hp": 45.6,
+      "context": "RESOURCE",
+      "gear_special": true
+     }
+    ],
+    "armed": {
+     "skill": "ATHLETE_X_WAVE",
+     "category": "SPECIAL_MAGIC",
+     "sel": {
+      "PHYSICAL": 0,
+      "PHYSICAL_MAGIC": 0,
+      "SPECIAL_MAGIC": 0
+     }
+    }
+   }
+  },
+  {
+   "id": "guide_charge_rises",
+   "ok": true,
+   "detail": {
+    "charge": 0.082,
+    "hits": 1
+   }
+  },
+  {
+   "id": "bush_fractures",
+   "ok": true,
+   "detail": {
+    "broken": true,
+    "journal": [
+     {
+      "tick": 601,
+      "t": 30.05,
+      "kind": "RESOURCE_NODE_BROKEN",
+      "id": "NODE_RB_TEMPLE_W",
+      "by": "player",
+      "drops": 3,
+      "respawn_s": 90
+     }
+    ]
+   }
+  },
+  {
+   "id": "refill_drops_spawned",
+   "ok": true,
+   "detail": [
+    {
+     "id": "RF_3",
+     "kind": "MAHGIC_REFILL",
+     "x": -13.03,
+     "y": 0.45,
+     "z": 96.45,
+     "age_s": 1.6
+    },
+    {
+     "id": "RF_4",
+     "kind": "MAHGIC_REFILL",
+     "x": -15.16,
+     "y": 0.45,
+     "z": 96.65,
+     "age_s": 1.6
+    },
+    {
+     "id": "RF_5",
+     "kind": "MAHGIC_REFILL",
+     "x": -14.87,
+     "y": 0.45,
+     "z": 95.1,
+     "age_s": 1.6
+    }
+   ]
+  },
+  {
+   "id": "gear_draws_drops_and_fracture",
+   "ok": true,
+   "detail": {
+    "items": [
+     "DUMBBELL:MANIFESTED",
+     "DUMBBELL:MANIFESTED"
+    ],
+    "clones": 2,
+    "diamonds": 3,
+    "bushes": 16,
+    "shards": 480,
+    "broken": [
+     "RB_TEMPLE_W"
+    ],
+    "templates": [
+     "DUMBBELL←MAHWORLD_GYM_DUMBBELL_L0.glb 39999 tris"
+    ],
+    "band": "procedural tube 1.3 m × r 0.018 m (no source model in the project database)",
+    "status_tags": 0
+   }
+  },
+  {
+   "id": "refills_picked_by_walking",
+   "ok": true,
+   "detail": [
+    {
+     "tick": 656,
+     "t": 32.8,
+     "kind": "REFILL_PICKED",
+     "account": "PLAYER_A",
+     "id": "RF_3",
+     "to": "MAHGIC",
+     "amount": 60,
+     "before": 102,
+     "after": 162
+    },
+    {
+     "tick": 698,
+     "t": 34.9,
+     "kind": "REFILL_PICKED",
+     "account": "PLAYER_A",
+     "id": "RF_4",
+     "to": "MAHGIC",
+     "amount": 60,
+     "before": 162,
+     "after": 200
+    },
+    {
+     "tick": 736,
+     "t": 36.8,
+     "kind": "REFILL_PICKED",
+     "account": "PLAYER_A",
+     "id": "RF_5",
+     "to": "INVENTORY",
+     "inventory": 1
+    }
+   ]
+  },
+  {
+   "id": "dumbbells_followed_player",
+   "ok": true,
+   "detail": [
+    {
+     "id": "EQ_DUMBBELL_1",
+     "kind": "DUMBBELL",
+     "state": "MANIFESTED",
+     "x": 14.835,
+     "y": 1.488,
+     "z": 121.5,
+     "side": -0.35,
+     "idx": 0,
+     "age_s": 25.45
+    },
+    {
+     "id": "EQ_DUMBBELL_2",
+     "kind": "DUMBBELL",
+     "state": "MANIFESTED",
+     "x": 15.53,
+     "y": 1.456,
+     "z": 121.414,
+     "side": 0.35,
+     "idx": 1,
+     "age_s": 25.45
+    }
+   ]
+  },
+  {
+   "id": "tap_dumbbell_equips",
+   "ok": true,
+   "detail": {
+    "tap": {
+     "s": {
+      "x": 603.5724875248899,
+      "y": 337.09611606986346,
+      "depth": 0.8922425413207976
+     },
+     "hit": {
+      "id": "equip:EQ_DUMBBELL_1",
+      "distance": 7.26494459761861
+     }
+    },
+    "held": {
+     "kind": "DUMBBELL",
+     "count": 1,
+     "multiplier": 1.8
+    },
+    "journal": [
+     {
+      "tick": 858,
+      "t": 42.9,
+      "kind": "EQUIP_PICKUP",
+      "account": "PLAYER_A",
+      "id": "EQ_DUMBBELL_1",
+      "equipment": "DUMBBELL",
+      "held_count": 1,
+      "cost": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "held_dumbbell_multiplies_physical",
+   "ok": true,
+   "detail": {
+    "cast": {
+     "command_id": "play-PLAYER_A-0oom8g-45",
+     "seq": 45,
+     "accepted": true,
+     "version": 953,
+     "tick": 906,
+     "duplicate": false,
+     "skill": "PA_PUSH",
+     "category": "PHYSICAL",
+     "startup_s": 0.198,
+     "recovery_s": 0.342,
+     "reserved": 0,
+     "aim": null,
+     "point": null,
+     "facing": -0.124,
+     "aim_source": "LOCK"
+    },
+    "damage": [
+     {
+      "tick": 910,
+      "t": 45.5,
+      "kind": "R1723_DAMAGE",
+      "by": "PLAYER_A",
+      "on": "NODE_RB_TEMPLE_E",
+      "skill": "PA_PUSH",
+      "raw": 100,
+      "applied": 151.2,
+      "guard": null,
+      "components": {
+       "physical": 180,
+       "magical": 0
+      },
+      "periodic": false,
+      "family": null,
+      "discord": false,
+      "curse_source": null,
+      "hp": 16.8,
+      "context": "RESOURCE",
+      "gear_mult": 1.8
+     }
+    ],
+    "node": {
+     "id": "NODE_RB_TEMPLE_E",
+     "patch": "RB_TEMPLE_E",
+     "x": 15,
+     "z": 120,
+     "y": 0,
+     "family": "gold",
+     "r": 2.2,
+     "hp": 168,
+     "max": 168,
+     "broken": false,
+     "respawn_in_s": null
+    }
+   }
+  },
+  {
+   "id": "dismiss_reclaims_all",
+   "ok": true,
+   "detail": {
+    "manifested": [],
+    "held": null,
+    "casting": null,
+    "guide_charge": 0.163,
+    "guide_charge_hits": 2,
+    "dispensed_at": null,
+    "refills": 1,
+    "refill_amount": 60,
+    "inventory_cap": 999,
+    "affinity": 1,
+    "combat_mahgic": {
+     "current": 200,
+     "max": 200
+    },
+    "costs": {
+     "DUMBBELL": [
+      20,
+      30,
+      42
+     ],
+     "BARBELL": 36,
+     "BAND": 15
+    }
+   }
+  },
+  {
+   "id": "barbell_manifested_on_ground",
+   "ok": true,
+   "detail": [
+    {
+     "id": "EQ_BARBELL_6",
+     "kind": "BARBELL",
+     "state": "MANIFESTED",
+     "x": 52.09,
+     "y": 0.34,
+     "z": 30.713,
+     "side": 0,
+     "idx": 0,
+     "age_s": 0.85
+    }
+   ]
+  },
+  {
+   "id": "plate_shot_two_shots",
+   "ok": true,
+   "detail": {
+    "cast": {
+     "armed": {
+      "skill": "BARBELL_PLATE_SHOT",
+      "category": "SPECIAL_MAGIC",
+      "sel": {
+       "PHYSICAL": 0,
+       "PHYSICAL_MAGIC": 0,
+       "SPECIAL_MAGIC": 0
+      }
+     },
+     "res": {
+      "command_id": "play-PLAYER_A-0oom8g-51",
+      "seq": 51,
+      "accepted": true,
+      "version": 1181,
+      "tick": 1128,
+      "duplicate": false,
+      "skill": "BARBELL_PLATE_SHOT",
+      "category": "SPECIAL_MAGIC",
+      "startup_s": 0.81,
+      "recovery_s": 1.44,
+      "reserved": 30,
+      "aim": null,
+      "point": null,
+      "facing": -0.124,
+      "aim_source": "LOCK"
+     }
+    },
+    "armed": [
+     {
+      "tick": 1145,
+      "t": 57.25,
+      "kind": "R1723_SECOND_SHOT_ARMED",
+      "id": "PLAYER_A",
+      "skill": "BARBELL_PLATE_SHOT",
+      "launch_in_s": 1.1,
+      "telegraph_s": 0.6
+     }
+    ],
+    "damage": 2
+   }
+  },
+  {
+   "id": "use_refill_control",
+   "ok": true,
+   "detail": {
+    "btn": {
+     "x": 31.2890625,
+     "y": 91.796875,
+     "w": 46.578125,
+     "h": 16,
+     "vis": true
+    },
+    "used": [
+     {
+      "tick": 1203,
+      "t": 60.15,
+      "kind": "REFILL_USED",
+      "account": "PLAYER_A",
+      "amount": 60,
+      "inventory": 0,
+      "current": 194
+     }
+    ],
+    "refills_before": 1,
+    "after": 0,
+    "cm": {
+     "current": 194,
+     "max": 200
+    }
+   }
+  },
+  {
+   "id": "no_console_errors",
+   "ok": true,
+   "detail": []
+  }
+ ],
+ "console_errors": [],
+ "shots": [
+  "01_bush_and_guide",
+  "02_guide_casting",
+  "03_dumbbells_floating",
+  "04_xwave_flight",
+  "05_bush_broken_drops",
+  "06_dumbbell_held",
+  "07_barbell_ground",
+  "08_plate_shot"
+ ],
+ "skills_view": null,
+ "after_pickup": {
+  "refills": 1,
+  "cm": {
+   "current": 200,
+   "max": 200
+  }
+ },
+ "held_debug": {
+  "items": [
+   "DUMBBELL:HELD",
+   "DUMBBELL:MANIFESTED"
+  ],
+  "clones": 2,
+  "diamonds": 0,
+  "bushes": 16,
+  "shards": 480,
+  "broken": [
+   "RB_TEMPLE_W"
+  ],
+  "templates": [
+   "DUMBBELL←MAHWORLD_GYM_DUMBBELL_L0.glb 39999 tris"
+  ],
+  "band": "procedural tube 1.3 m × r 0.018 m (no source model in the project database)",
+  "status_tags": 0
+ },
+ "host_summary": null,
+ "pass": 29,
+ "fail": 0
+}

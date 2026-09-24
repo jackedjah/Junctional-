@@ -1,0 +1,25 @@
+{
+ "_doc": "Data-driven class movement-pattern loadouts. Classification PROVISIONAL (human review required, OD-03 / OD-04). Pattern ids are ONLY those present in CLAUDE_GAMEPLAY_FOUNDATION/04_CLASS_LOADOUTS/CLASS_MOVEMENT_PATTERN_MATRIX.md (the runtime test checks this). Only the ATHLETE development prototype preset is populated (4 patterns, the first combat prototype); the other classes stay PENDING_HUMAN_REVIEW so no class decision is duplicated in code.",
+ "classification": "PROVISIONAL",
+ "pattern_catalog": [
+  {"pattern_id": "HORIZONTAL_PUSH", "kinematic_family": "PUSH", "primary_region": "UPPER", "fused_availability": "FUSED_OK"},
+  {"pattern_id": "HORIZONTAL_PULL", "kinematic_family": "PULL", "primary_region": "UPPER", "fused_availability": "FUSED_OK"},
+  {"pattern_id": "VERTICAL_PUSH", "kinematic_family": "PUSH", "primary_region": "UPPER", "fused_availability": "FUSED_OK"},
+  {"pattern_id": "VERTICAL_PULL", "kinematic_family": "PULL", "primary_region": "UPPER", "fused_availability": "FUSED_OK"},
+  {"pattern_id": "SQUAT", "kinematic_family": "SQUAT", "primary_region": "LOWER", "fused_availability": "REQUIRES_SPLIT"},
+  {"pattern_id": "HINGE", "kinematic_family": "HINGE", "primary_region": "LOWER", "fused_availability": "FUSED_LIMITED"},
+  {"pattern_id": "LUNGE", "kinematic_family": "LUNGE", "primary_region": "LOWER", "fused_availability": "REQUIRES_SPLIT"},
+  {"pattern_id": "ROTATION", "kinematic_family": "ROTATION", "primary_region": "CORE", "fused_availability": "FUSED_OK"},
+  {"pattern_id": "BRACING_CORE", "kinematic_family": "BRACE", "primary_region": "CORE", "fused_availability": "FUSED_OK", "alias": "CORE_BRACE"},
+  {"pattern_id": "CARRY_LOCOMOTION", "kinematic_family": "CARRY", "primary_region": "FULL", "fused_availability": "REQUIRES_SPLIT"},
+  {"pattern_id": "JUMP_PLYO", "kinematic_family": "JUMP", "primary_region": "LOWER", "fused_availability": "REQUIRES_SPLIT", "classification": "PROVISIONAL"},
+  {"pattern_id": "ISOMETRIC_HOLD", "kinematic_family": "ISOMETRIC", "primary_region": "FULL", "fused_availability": "FUSED_OK", "classification": "PROVISIONAL"}
+ ],
+ "loadouts": {
+  "ATHLETE": {"status": "DEVELOPMENT_PROTOTYPE", "note": "first combat prototype preset - a development choice, NOT the permanent first-playable class (owner approval pending, OD-19)", "patterns": ["HORIZONTAL_PUSH", "VERTICAL_PULL", "HINGE", "LUNGE"], "idle_flourish_id": "IDLE_ATHLETE_SIDE_CHEST"},
+  "TITAN": {"status": "PENDING_HUMAN_REVIEW", "patterns": [], "idle_flourish_id": "IDLE_TITAN_MOST_MUSCULAR"},
+  "LEAN": {"status": "PENDING_HUMAN_REVIEW", "patterns": [], "idle_flourish_id": "IDLE_LEAN_SIDE_TRICEPS"},
+  "BAGE": {"status": "PENDING_HUMAN_REVIEW", "patterns": [], "idle_flourish_id": "IDLE_BAGE_QUAD_FLEX"},
+  "VISIONARY": {"status": "PENDING_HUMAN_REVIEW", "patterns": [], "idle_flourish_id": "IDLE_VISIONARY_LAT_SPREAD"}
+ }
+}

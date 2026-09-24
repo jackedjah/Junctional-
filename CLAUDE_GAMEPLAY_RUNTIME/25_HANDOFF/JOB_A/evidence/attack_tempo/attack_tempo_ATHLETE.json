@@ -1,0 +1,377 @@
+{
+ "summary": {
+  "class": "ATHLETE",
+  "phase_multipliers": null,
+  "startup_floor_s": 0.12,
+  "recovery_floor_s": 0.1,
+  "read_min_s": 0.2,
+  "skills": 15,
+  "flagged": [
+   "PA_PUSH: STARTUP_UNDER_0.2s"
+  ]
+ },
+ "rows": [
+  {
+   "id": "PA_PUSH",
+   "name": "Drive",
+   "category": "PHYSICAL",
+   "pattern": "PUSH",
+   "base_startup_s": 0.22,
+   "base_recovery_s": 0.38,
+   "startup_s": 0.198,
+   "recovery_s": 0.342,
+   "total_s": 0.54,
+   "cooldown_s": 0.1,
+   "animator": {
+    "preparation_load_s": 0.109,
+    "loaded_hold_s": 0.089,
+    "commit_whip_s": 0.086,
+    "contact_finish_s": 0.068,
+    "recovery_s": 0.188
+   },
+   "frames_60hz": {
+    "startup": 12,
+    "recovery": 21
+   },
+   "flags": [
+    "STARTUP_UNDER_0.2s"
+   ]
+  },
+  {
+   "id": "PM_PUSH",
+   "name": "Infused Drive",
+   "category": "PHYSICAL_MAGIC",
+   "pattern": "PUSH",
+   "base_startup_s": 0.45,
+   "base_recovery_s": 0.55,
+   "startup_s": 0.405,
+   "recovery_s": 0.495,
+   "total_s": 0.9,
+   "cooldown_s": 1.2,
+   "animator": {
+    "preparation_load_s": 0.223,
+    "loaded_hold_s": 0.182,
+    "commit_whip_s": 0.124,
+    "contact_finish_s": 0.099,
+    "recovery_s": 0.272
+   },
+   "frames_60hz": {
+    "startup": 24,
+    "recovery": 30
+   },
+   "flags": []
+  },
+  {
+   "id": "PA_PULL",
+   "name": "Row Hook",
+   "category": "PHYSICAL",
+   "pattern": "PULL",
+   "base_startup_s": 0.3,
+   "base_recovery_s": 0.45,
+   "startup_s": 0.27,
+   "recovery_s": 0.405,
+   "total_s": 0.675,
+   "cooldown_s": 0.1,
+   "animator": {
+    "preparation_load_s": 0.149,
+    "loaded_hold_s": 0.121,
+    "commit_whip_s": 0.101,
+    "contact_finish_s": 0.081,
+    "recovery_s": 0.223
+   },
+   "frames_60hz": {
+    "startup": 16,
+    "recovery": 24
+   },
+   "flags": []
+  },
+  {
+   "id": "PM_PULL",
+   "name": "Infused Row Hook",
+   "category": "PHYSICAL_MAGIC",
+   "pattern": "PULL",
+   "base_startup_s": 0.55,
+   "base_recovery_s": 0.6,
+   "startup_s": 0.495,
+   "recovery_s": 0.54,
+   "total_s": 1.035,
+   "cooldown_s": 1.6,
+   "animator": {
+    "preparation_load_s": 0.272,
+    "loaded_hold_s": 0.223,
+    "commit_whip_s": 0.135,
+    "contact_finish_s": 0.108,
+    "recovery_s": 0.297
+   },
+   "frames_60hz": {
+    "startup": 30,
+    "recovery": 32
+   },
+   "flags": []
+  },
+  {
+   "id": "PA_HINGE",
+   "name": "Hinge Rise",
+   "category": "PHYSICAL",
+   "pattern": "HINGE",
+   "base_startup_s": 0.4,
+   "base_recovery_s": 0.5,
+   "startup_s": 0.36,
+   "recovery_s": 0.45,
+   "total_s": 0.81,
+   "cooldown_s": 0.1,
+   "animator": {
+    "preparation_load_s": 0.198,
+    "loaded_hold_s": 0.162,
+    "commit_whip_s": 0.113,
+    "contact_finish_s": 0.09,
+    "recovery_s": 0.247
+   },
+   "frames_60hz": {
+    "startup": 22,
+    "recovery": 27
+   },
+   "flags": []
+  },
+  {
+   "id": "PM_HINGE",
+   "name": "Infused Hinge Rise",
+   "category": "PHYSICAL_MAGIC",
+   "pattern": "HINGE",
+   "base_startup_s": 0.7,
+   "base_recovery_s": 0.7,
+   "startup_s": 0.63,
+   "recovery_s": 0.63,
+   "total_s": 1.26,
+   "cooldown_s": 2.5,
+   "animator": {
+    "preparation_load_s": 0.347,
+    "loaded_hold_s": 0.283,
+    "commit_whip_s": 0.158,
+    "contact_finish_s": 0.126,
+    "recovery_s": 0.346
+   },
+   "frames_60hz": {
+    "startup": 38,
+    "recovery": 38
+   },
+   "flags": []
+  },
+  {
+   "id": "PA_ROTATION",
+   "name": "Pivot Strike",
+   "category": "PHYSICAL",
+   "pattern": "ROTATION",
+   "base_startup_s": 0.32,
+   "base_recovery_s": 0.42,
+   "startup_s": 0.288,
+   "recovery_s": 0.378,
+   "total_s": 0.666,
+   "cooldown_s": 0.1,
+   "animator": {
+    "preparation_load_s": 0.158,
+    "loaded_hold_s": 0.13,
+    "commit_whip_s": 0.095,
+    "contact_finish_s": 0.076,
+    "recovery_s": 0.208
+   },
+   "frames_60hz": {
+    "startup": 17,
+    "recovery": 23
+   },
+   "flags": []
+  },
+  {
+   "id": "PM_ROTATION",
+   "name": "Infused Pivot Strike",
+   "category": "PHYSICAL_MAGIC",
+   "pattern": "ROTATION",
+   "base_startup_s": 0.55,
+   "base_recovery_s": 0.6,
+   "startup_s": 0.495,
+   "recovery_s": 0.54,
+   "total_s": 1.035,
+   "cooldown_s": 1.8,
+   "animator": {
+    "preparation_load_s": 0.272,
+    "loaded_hold_s": 0.223,
+    "commit_whip_s": 0.135,
+    "contact_finish_s": 0.108,
+    "recovery_s": 0.297
+   },
+   "frames_60hz": {
+    "startup": 30,
+    "recovery": 32
+   },
+   "flags": []
+  },
+  {
+   "id": "ATHLETE_VECTOR",
+   "name": "Vector Shot",
+   "category": "SPECIAL_MAGIC",
+   "pattern": "PROJECTILE",
+   "base_startup_s": 0.9,
+   "base_recovery_s": 0.4,
+   "startup_s": 0.81,
+   "recovery_s": 0.36,
+   "total_s": 1.17,
+   "cooldown_s": 3,
+   "animator": {
+    "preparation_load_s": 0.446,
+    "loaded_hold_s": 0.364,
+    "commit_whip_s": 0.09,
+    "contact_finish_s": 0.072,
+    "recovery_s": 0.198
+   },
+   "frames_60hz": {
+    "startup": 49,
+    "recovery": 22
+   },
+   "flags": []
+  },
+  {
+   "id": "ATHLETE_TRACK",
+   "name": "Trackburst",
+   "category": "SPECIAL_MAGIC",
+   "pattern": "PROJECTILE",
+   "base_startup_s": 1.2,
+   "base_recovery_s": 0.5,
+   "startup_s": 1.08,
+   "recovery_s": 0.45,
+   "total_s": 1.53,
+   "cooldown_s": 8,
+   "animator": {
+    "preparation_load_s": 0.594,
+    "loaded_hold_s": 0.486,
+    "commit_whip_s": 0.113,
+    "contact_finish_s": 0.09,
+    "recovery_s": 0.247
+   },
+   "frames_60hz": {
+    "startup": 65,
+    "recovery": 27
+   },
+   "flags": []
+  },
+  {
+   "id": "ATHLETE_SET",
+   "name": "Set Position",
+   "category": "SPECIAL_MAGIC",
+   "pattern": "SELF_BUFF",
+   "base_startup_s": 0.8,
+   "base_recovery_s": 0.35,
+   "startup_s": 0.72,
+   "recovery_s": 0.315,
+   "total_s": 1.035,
+   "cooldown_s": 12,
+   "animator": {
+    "preparation_load_s": 0.396,
+    "loaded_hold_s": 0.324,
+    "commit_whip_s": 0.079,
+    "contact_finish_s": 0.063,
+    "recovery_s": 0.173
+   },
+   "frames_60hz": {
+    "startup": 43,
+    "recovery": 19
+   },
+   "flags": []
+  },
+  {
+   "id": "ATHLETE_CASCADE",
+   "name": "Cascade Pull",
+   "category": "SPECIAL_MAGIC",
+   "pattern": "PULL",
+   "base_startup_s": 1,
+   "base_recovery_s": 0.5,
+   "startup_s": 0.9,
+   "recovery_s": 0.45,
+   "total_s": 1.35,
+   "cooldown_s": 8,
+   "animator": {
+    "preparation_load_s": 0.495,
+    "loaded_hold_s": 0.405,
+    "commit_whip_s": 0.113,
+    "contact_finish_s": 0.09,
+    "recovery_s": 0.247
+   },
+   "frames_60hz": {
+    "startup": 54,
+    "recovery": 27
+   },
+   "flags": []
+  },
+  {
+   "id": "ATHLETE_OVERHEAD_RELEASE",
+   "name": "Overhead Extension Release",
+   "category": "SPECIAL_MAGIC",
+   "pattern": "OVERHEAD",
+   "base_startup_s": 0.85,
+   "base_recovery_s": 0.4,
+   "startup_s": 0.765,
+   "recovery_s": 0.36,
+   "total_s": 1.125,
+   "cooldown_s": 4,
+   "animator": {
+    "preparation_load_s": 0.421,
+    "loaded_hold_s": 0.344,
+    "commit_whip_s": 0.09,
+    "contact_finish_s": 0.072,
+    "recovery_s": 0.198
+   },
+   "frames_60hz": {
+    "startup": 46,
+    "recovery": 22
+   },
+   "flags": []
+  },
+  {
+   "id": "ATHLETE_CHEST_FLY_CLAP",
+   "name": "Chest Fly Clap Release",
+   "category": "SPECIAL_MAGIC",
+   "pattern": "CHEST_FLY",
+   "base_startup_s": 0.95,
+   "base_recovery_s": 0.45,
+   "startup_s": 0.855,
+   "recovery_s": 0.405,
+   "total_s": 1.26,
+   "cooldown_s": 5,
+   "animator": {
+    "preparation_load_s": 0.47,
+    "loaded_hold_s": 0.385,
+    "commit_whip_s": 0.101,
+    "contact_finish_s": 0.081,
+    "recovery_s": 0.223
+   },
+   "frames_60hz": {
+    "startup": 51,
+    "recovery": 24
+   },
+   "flags": []
+  },
+  {
+   "id": "PM_CURL_BARRAGE",
+   "name": "Eight-Strike Curl Barrage",
+   "category": "PHYSICAL_MAGIC",
+   "pattern": "CURL",
+   "base_startup_s": 0.35,
+   "base_recovery_s": 1.15,
+   "startup_s": 0.315,
+   "recovery_s": 1.035,
+   "total_s": 1.35,
+   "cooldown_s": 6,
+   "animator": {
+    "preparation_load_s": 0.173,
+    "loaded_hold_s": 0.142,
+    "commit_whip_s": 0.259,
+    "contact_finish_s": 0.207,
+    "recovery_s": 0.569
+   },
+   "frames_60hz": {
+    "startup": 19,
+    "recovery": 62
+   },
+   "flags": []
+  }
+ ]
+}

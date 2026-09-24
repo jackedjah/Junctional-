@@ -1,0 +1,3027 @@
+{
+ "checks": [
+  "PASS D0 the ONE flight-lean curve is live: x = speed / cruise → hover 6°, normal (x 1) 24°, boost (x 1.3) 40°; the host publishes the form's cruise speed (20.56 m/s FUSED) and the boost factor 1.3 (old: 8°–18° over speed / 8 m/s, no boost) — {\"curve\":[{\"deg\":6,\"l\":0,\"curve\":[[0,6],[1,24],[1.3,40]]},{\"deg\":24,\"l\":0.529,\"curve\":[[0,6],[1,24],[1.3,40]]},{\"deg\":40,\"l\":1,\"curve\":[[0,6],[1,24],[1.3,40]]}],\"cruise\":20.56,\"boost_factor\":1.3}",
+  "PASS D1 fused HINGE load: the trunk inclines at the HIPS (PELVIS ≥ 0.45 rad) with a long neutral spine (LUMBAR+SPINE+SPINE2+CHEST ≤ 0.22), eyes forward (HEAD ≤ −0.15), arms hanging under the torso (UPPERARM ≤ −0.30), the taper counters the pitch so the tip stays the base (TAIL1 ≤ −0.25) — {\"ms\":341.69999998807907,\"samples\":80,\"pelvis\":0.5332484693758746,\"spine\":0.078,\"head\":-0.3756735709759087,\"ua\":-0.5968382111258917,\"tail1\":-0.4141259111158489}",
+  "FAIL D2 fused HINGE release: the hip drive stands tall (PELVIS ≤ 0.08 at the whip peak — the load collapses with the drive), the straight arms swing to CHEST height — hands below the head, within 0.35 m of chest height (never overhead; UPPERARM between −1.6 and −0.85) — {\"ms\":682.8000000119209,\"pelvis\":-0.07240825143051238,\"ua\":-0.7943050012238769,\"hand_y\":1.284,\"head_y\":1.892,\"chest_y\":1.41}",
+  "PASS D3 controlled tempo: the loaded position is reached ≥ 150 ms after the cast (the 120 ms presentation delay + the ease) and HELD ≥ 90 ms before the drive (startup 0.4 s), then the release peaks — {\"first_load_ms\":235.30000001192093,\"held_ms\":214.5,\"release_ms\":682.8000000119209,\"samples\":80}",
+  "PASS D4 split HINGE load (surface-supported): the femur points forward-down 49° in the world (38°–52° — the owner JOB A 2026-09-19 decision: ~45°, the hip table relaxed to 90°), the shin ~vertical (7°, |shin| ≤ 12°), a neutral spine (≤ 0.22) inclined at the hips (PELVIS ≥ 0.45 ≈ 31°), eyes forward — {\"ms\":294.80000001192093,\"femur_world_deg\":48.596743696558626,\"shin_world_deg\":6.5772511638443465,\"thigh\":-1.3925676242676608,\"shin\":0.7333784947130353,\"pelvis\":0.5443944410149126,\"spine\":0.08,\"head\":-0.3769297904534256,\"form\":\"SPLIT\"}",
+  "FAIL D4b RDL hands BELOW the knees at the load (HAND_R world y − SHIN_L (the knee joint) world y ≤ 0.05 m) — {\"hand_minus_knee_m\":0.3330000000000001,\"hand\":[19.335,1.05,29.582],\"knee\":[19.846,0.717,29.806]}",
+  "PASS D5 planted feet + hips back: through the load the foot END stays where it was (|Δy| ≤ 0.08 m, Δhorizontal ≤ 0.12 m) while the pelvis moves back ≥ 0.12 m and down ≥ 0.04 m — the root offset, not a floating leg — {\"tip_dy\":-0.07600000000000001,\"tip_dh\":0.03624913792078509,\"hips_back_m\":0.33699999999999974,\"hips_down_m\":0.10699999999999998,\"root_offset\":{\"y\":-0.1076591037950053,\"z\":0.33654620255732093},\"rest_tip\":[19.885,0.263,29.726],\"load_tip\":[19.87,0.187,29.759]}",
+  "PASS D6 split HINGE release: tall lockout (PELVIS ≤ 0.08, the femur back to ≤ 12° of vertical, the root offset back to ≤ 0.06 m within 0.7 s of the peak), arms to chest height (UPPERARM ≤ −0.85, hands below the head) — {\"ms\":553.9000000357628,\"pelvis\":-0.09963265306122449,\"femur_world_deg\":0,\"ro_at_peak\":{\"y\":-0.05160587920961493,\"z\":0.11888711836302138},\"ro_back_m\":0.000001985957326833804,\"ua\":-1.0426771291416657}",
+  "PASS D12 airborne HINGE adapts without faking floor support: a pike at the load (PELVIS ≥ 0.30, the legs fold FORWARD under the body: femur world ≥ 15° forward) while still flying, then the hip drive — {\"fly\":true,\"pelvis\":0.5220738136319711,\"femur_world_deg\":18.379080583054954,\"thigh\":-0.8428492832956392}",
+  "PASS D7 flight lean follows the REAL displayed speed through the ONE curve [[0,6],[1,24],[1.3,40]] (x = speed / cruise 7.71 m/s, split): hover 6.1° (curve 6.0°), normal forward 23.2° at 7.2 m/s (curve 22.9°), BOOST 40.1° at 10.2 m/s (curve 40.0°; the full boost = 40° at 1.3 × cruise) — every sample within 3° of the curve, boost faster than cruise; old ordinary flight was 8°–18° with no boost — {\"hover_deg\":6.053657125794838,\"cruise_deg\":23.175324468649915,\"boost_deg\":40.13432032990003,\"curve_deg\":[6,22.87522131174537,40],\"speeds\":[6.958772348483044e-32,7.228219795197601,10.173203919689069],\"cruise_mps\":7.71,\"fly\":[true,true,true]}",
+  "PASS D8 boost = the Hinge-inspired commitment: the pelvis leads (its share of the lean grows from cruise to boost, ≥ 0.53 at boost), the legs trail BEHIND in line with the lean (femur world ≤ −35° = behind vertical), the arms sweep back to the edge of the shoulder table (UPPERARM ≥ 0.50 on the bones: the 0.70 table limit, softened) — pelvis and legs trail with the torso — {\"pelvis_share_boost\":0.578,\"pelvis_share_cruise\":0.508,\"femur_world_deg_boost\":-54.71267859350758,\"femur_world_deg_cruise\":-32.02666093487469,\"thigh\":0.55,\"ua\":0.5661810543573972}",
+  "PASS D9 no arms inside the torso at boost: both hands ≥ 0.12 m from the pelvis → chest axis — {\"hand_clearance_m\":0.4405560403135318}",
+  "PASS D10 camera never coupled: heading and pitch are identical before and after the boost lean (no drag happened) — [{\"yaw\":3.1387963267948966,\"pitch\":0.04},{\"yaw\":3.1387963267948966,\"pitch\":0.04}]",
+  "PASS D11 fused flight (cruise 20.56 m/s): the same curve — normal ≈ 24° (22.1° at 19.2 m/s), boost ≈ 40° (39.4° at 26.5 m/s) and the fused lower body participates — TAIL2 curves back with the lean (≤ −0.18 rad at boost, more than at cruise) — {\"form\":\"FUSED\",\"cruise_deg\":22.141252285702944,\"boost_deg\":39.42156363125454,\"tail2\":[-0.1490867009840628,-0.2363430901570068],\"speeds\":[19.2207306962652,26.461716014932712]}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "hinge": {
+  "fused": {
+   "accepted": true,
+   "samples": 80,
+   "brief": [
+    {
+     "ms": 30,
+     "h": null,
+     "L": null,
+     "R": null,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 42,
+     "h": null,
+     "L": null,
+     "R": null,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 51,
+     "h": "STARTUP",
+     "L": null,
+     "R": null,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 74,
+     "h": "STARTUP",
+     "L": 0.14,
+     "R": 0,
+     "pelvis": 0.04,
+     "thigh": 0.1
+    },
+    {
+     "ms": 86,
+     "h": "STARTUP",
+     "L": 0.14,
+     "R": 0,
+     "pelvis": 0.06,
+     "thigh": 0.07
+    },
+    {
+     "ms": 98,
+     "h": "STARTUP",
+     "L": 0.14,
+     "R": 0,
+     "pelvis": 0.07,
+     "thigh": 0.05
+    },
+    {
+     "ms": 116,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.35,
+     "thigh": 0.01
+    },
+    {
+     "ms": 144,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.35,
+     "thigh": 0
+    },
+    {
+     "ms": 163,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.35,
+     "thigh": 0
+    },
+    {
+     "ms": 181,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.35,
+     "thigh": 0
+    },
+    {
+     "ms": 201,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.35,
+     "thigh": 0
+    },
+    {
+     "ms": 220,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.35,
+     "thigh": 0
+    },
+    {
+     "ms": 235,
+     "h": "STARTUP",
+     "L": 0.94,
+     "R": 0,
+     "pelvis": 0.52,
+     "thigh": 0
+    },
+    {
+     "ms": 254,
+     "h": "STARTUP",
+     "L": 0.94,
+     "R": 0,
+     "pelvis": 0.52,
+     "thigh": 0
+    },
+    {
+     "ms": 275,
+     "h": "STARTUP",
+     "L": 0.94,
+     "R": 0,
+     "pelvis": 0.52,
+     "thigh": 0
+    },
+    {
+     "ms": 295,
+     "h": "STARTUP",
+     "L": 1,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 314,
+     "h": "STARTUP",
+     "L": 1,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 325,
+     "h": "STARTUP",
+     "L": 1,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 342,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 361,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 372,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 393,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 415,
+     "h": "STARTUP",
+     "L": 1.04,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 428,
+     "h": "STARTUP",
+     "L": 1.04,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 438,
+     "h": "STARTUP",
+     "L": 1.04,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 450,
+     "h": "RECOVERY",
+     "L": 1.04,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 653,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 666,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": 0
+    },
+    {
+     "ms": 683,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0
+    },
+    {
+     "ms": 696,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0
+    },
+    {
+     "ms": 717,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0
+    },
+    {
+     "ms": 727,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0
+    },
+    {
+     "ms": 744,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0
+    },
+    {
+     "ms": 755,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0
+    },
+    {
+     "ms": 772,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.44,
+     "pelvis": -0.04,
+     "thigh": 0
+    },
+    {
+     "ms": 790,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.44,
+     "pelvis": -0.04,
+     "thigh": 0
+    },
+    {
+     "ms": 808,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.44,
+     "pelvis": -0.04,
+     "thigh": 0
+    },
+    {
+     "ms": 820,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.44,
+     "pelvis": -0.04,
+     "thigh": 0
+    },
+    {
+     "ms": 839,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 864,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 882,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 899,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 921,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 931,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 950,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 971,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 987,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 998,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1012,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1030,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1048,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1057,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1082,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1090,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1108,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1128,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1137,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1167,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1176,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1198,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1204,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1226,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1234,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1249,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1279,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1288,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1301,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1318,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1333,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1345,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1364,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1388,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1401,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1414,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1431,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1453,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1465,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1479,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1491,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1516,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    }
+   ],
+   "load": {
+    "ms": 341.69999998807907,
+    "pose": {
+     "ROOT": [
+      0,
+      0,
+      0
+     ],
+     "PELVIS": [
+      0.5332484693758746,
+      2.0096351919308548e-8,
+      0.002090453404783161
+     ],
+     "SPINE": [
+      0.03192254355086685,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.01564854304421903,
+      1.5502900052038023e-8,
+      -0.0005574542412755096
+     ],
+     "NECK": [
+      -0.0000466721519348082,
+      -0.000009191329341298628,
+      0
+     ],
+     "HEAD": [
+      -0.3756735709759087,
+      -0.00002021082041465529,
+      0
+     ],
+     "CLAV_L": [
+      0.09692685080507102,
+      -0.019261518158191073,
+      -0.004278165670925951
+     ],
+     "UPPERARM_L": [
+      -0.5968382111258917,
+      0,
+      -0.1925748869968847
+     ],
+     "FOREARM_L": [
+      -0.165449111120347,
+      0,
+      0
+     ],
+     "HAND_L": [
+      0.16999999999999998,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      0.09692685080507102,
+      0.019261518158191073,
+      0.004278165670925951
+     ],
+     "UPPERARM_R": [
+      -0.5968382111258917,
+      0,
+      0.1925748869968847
+     ],
+     "FOREARM_R": [
+      -0.165449111120347,
+      0,
+      0
+     ],
+     "HAND_R": [
+      0.16999999999999998,
+      0,
+      0
+     ],
+     "TAIL1": [
+      -0.4141259111158489,
+      1.1483629668176314e-8,
+      0
+     ],
+     "TAIL2": [
+      -0.17417908604608473,
+      0,
+      0
+     ],
+     "TAIL3": [
+      0,
+      0,
+      0
+     ],
+     "FINGERS_L": [
+      1.4098531621809227,
+      0,
+      0
+     ],
+     "FINGERS_R": [
+      1.4098531621809227,
+      0,
+      0
+     ],
+     "BROW_L": [
+      0.02404798815936533,
+      0,
+      0
+     ],
+     "BROW_R": [
+      0.02404798815936533,
+      0,
+      0
+     ],
+     "CHEEK_L": [
+      -0.006342910294948607,
+      0,
+      0
+     ],
+     "CHEEK_R": [
+      -0.006342910294948607,
+      0,
+      0
+     ],
+     "JAW": [
+      0.009658359502035235,
+      0,
+      0
+     ],
+     "LUMBAR": [
+      0.0212816957005779,
+      0,
+      -0.001161363002657312
+     ],
+     "SPINE2": [
+      0.009591042510972952,
+      1.0335266701358682e-8,
+      -0.00037163616085033983
+     ],
+     "SCAP_L": [
+      -0.03581687260820654,
+      0,
+      -0.02089317568812048
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.03564195501611264,
+      0
+     ],
+     "FORETWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      -0.03581687260820654,
+      0,
+      0.02089317568812048
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.03564195501611264,
+      0
+     ],
+     "FORETWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_L": [
+      0,
+      0,
+      0
+     ],
+     "SHIN_L": [
+      0.6333784947130353,
+      0,
+      0
+     ],
+     "TIP_L": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_R": [
+      0,
+      0,
+      0
+     ],
+     "SHIN_R": [
+      0.6333784947130353,
+      0,
+      0
+     ],
+     "TIP_R": [
+      0,
+      0,
+      0
+     ]
+    },
+    "ro": {
+     "y": 0,
+     "z": 0
+    },
+    "W": {
+     "PELVIS": [
+      19.752,
+      0.829,
+      29.847
+     ],
+     "CHEST": [
+      19.753,
+      1.188,
+      29.624
+     ],
+     "HEAD": [
+      19.753,
+      1.616,
+      29.333
+     ],
+     "HAND_R": [
+      19.348,
+      0.981,
+      29.507
+     ],
+     "TIP_L": [
+      19.832,
+      0.436,
+      30.404
+     ],
+     "THIGH_L": [
+      19.834,
+      0.866,
+      29.794
+     ],
+     "SHIN_L": [
+      19.833,
+      0.667,
+      29.923
+     ]
+    }
+   },
+   "rel": {
+    "ms": 682.8000000119209,
+    "pose": {
+     "ROOT": [
+      0,
+      0,
+      0
+     ],
+     "PELVIS": [
+      -0.07240825143051238,
+      1.080223597710624e-9,
+      0
+     ],
+     "SPINE": [
+      -0.03407523453399879,
+      0,
+      0
+     ],
+     "CHEST": [
+      -0.029283207401118123,
+      8.333153468053385e-10,
+      0
+     ],
+     "NECK": [
+      -0.0006483005455451364,
+      0,
+      0
+     ],
+     "HEAD": [
+      0.11639748712194624,
+      2.7619927404965028e-8,
+      0
+     ],
+     "CLAV_L": [
+      -0.11417755469785987,
+      -0.0585384742160369,
+      -0.1259730723923058
+     ],
+     "UPPERARM_L": [
+      -0.7943050012238769,
+      0,
+      -0.403782170476163
+     ],
+     "FOREARM_L": [
+      -0.1673395918367347,
+      0,
+      0
+     ],
+     "HAND_L": [
+      0.061387755102040836,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.11417755469785987,
+      0.0585384742160369,
+      0.1259730723923058
+     ],
+     "UPPERARM_R": [
+      -0.7943050012238769,
+      0,
+      0.403782170476163
+     ],
+     "FOREARM_R": [
+      -0.1673395918367347,
+      0,
+      0
+     ],
+     "HAND_R": [
+      0.061387755102040836,
+      0,
+      0
+     ],
+     "TAIL1": [
+      0.04344489795918365,
+      6.172706272632137e-10,
+      0
+     ],
+     "TAIL2": [
+      0,
+      0,
+      0
+     ],
+     "TAIL3": [
+      0,
+      0,
+      0
+     ],
+     "FINGERS_L": [
+      1.4124391810072772,
+      0,
+      0
+     ],
+     "FINGERS_R": [
+      1.4124391810072772,
+      0,
+      0
+     ],
+     "BROW_L": [
+      0.04376426265987009,
+      0,
+      0
+     ],
+     "BROW_R": [
+      0.04376426265987009,
+      0,
+      0
+     ],
+     "CHEEK_L": [
+      -0.024605584047113677,
+      0,
+      0
+     ],
+     "CHEEK_R": [
+      -0.024605584047113677,
+      0,
+      0
+     ],
+     "JAW": [
+      0.021233368448223194,
+      0,
+      0
+     ],
+     "LUMBAR": [
+      -0.022716823022665866,
+      0,
+      0
+     ],
+     "SPINE2": [
+      -0.017947772278104658,
+      5.555435645368924e-10,
+      0
+     ],
+     "SCAP_L": [
+      -0.10885253469924216,
+      0,
+      -0.06349731190789126
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.10276916062199964,
+      0
+     ],
+     "FORETWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      -0.10885253469924216,
+      0,
+      0.06349731190789126
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.10276916062199964,
+      0
+     ],
+     "FORETWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_L": [
+      0,
+      0,
+      0
+     ],
+     "SHIN_L": [
+      0.06512532912042407,
+      0,
+      0
+     ],
+     "TIP_L": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_R": [
+      0,
+      0,
+      0
+     ],
+     "SHIN_R": [
+      0.06512532912042407,
+      0,
+      0
+     ],
+     "TIP_R": [
+      0,
+      0,
+      0
+     ]
+    },
+    "W": {
+     "PELVIS": [
+      19.752,
+      1.015,
+      29.461
+     ],
+     "CHEST": [
+      19.752,
+      1.41,
+      29.311
+     ],
+     "HEAD": [
+      19.752,
+      1.892,
+      29.121
+     ],
+     "HAND_R": [
+      19.306,
+      1.284,
+      29.097
+     ],
+     "TIP_L": [
+      19.834,
+      0.468,
+      29.888
+     ],
+     "THIGH_L": [
+      19.834,
+      1.06,
+      29.415
+     ],
+     "SHIN_L": [
+      19.834,
+      0.842,
+      29.508
+     ]
+    }
+   }
+  },
+  "split": {
+   "form": "SPLIT",
+   "accepted": true,
+   "samples": 86,
+   "brief": [
+    {
+     "ms": 24,
+     "h": null,
+     "L": 0,
+     "R": 0.2,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 36,
+     "h": null,
+     "L": 0,
+     "R": 0.2,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 68,
+     "h": null,
+     "L": 0,
+     "R": 0.2,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 89,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.11,
+     "thigh": -0.18
+    },
+    {
+     "ms": 99,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.19,
+     "thigh": -0.33
+    },
+    {
+     "ms": 119,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.31,
+     "thigh": -0.55
+    },
+    {
+     "ms": 132,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.36,
+     "thigh": -0.62
+    },
+    {
+     "ms": 146,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.38,
+     "thigh": -0.67
+    },
+    {
+     "ms": 167,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.42,
+     "thigh": -0.74
+    },
+    {
+     "ms": 178,
+     "h": "STARTUP",
+     "L": 0.54,
+     "R": 0,
+     "pelvis": 0.43,
+     "thigh": -0.75
+    },
+    {
+     "ms": 199,
+     "h": "STARTUP",
+     "L": 0.86,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": -1.2
+    },
+    {
+     "ms": 209,
+     "h": "STARTUP",
+     "L": 0.86,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": -1.2
+    },
+    {
+     "ms": 230,
+     "h": "STARTUP",
+     "L": 0.86,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": -1.2
+    },
+    {
+     "ms": 244,
+     "h": "STARTUP",
+     "L": 0.86,
+     "R": 0,
+     "pelvis": 0.53,
+     "thigh": -1.2
+    },
+    {
+     "ms": 263,
+     "h": "STARTUP",
+     "L": 1,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.35
+    },
+    {
+     "ms": 275,
+     "h": "STARTUP",
+     "L": 1,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.35
+    },
+    {
+     "ms": 295,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.39
+    },
+    {
+     "ms": 306,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.39
+    },
+    {
+     "ms": 328,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.39
+    },
+    {
+     "ms": 340,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.39
+    },
+    {
+     "ms": 363,
+     "h": "STARTUP",
+     "L": 1.06,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.39
+    },
+    {
+     "ms": 375,
+     "h": "STARTUP",
+     "L": 1.04,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.38
+    },
+    {
+     "ms": 400,
+     "h": "STARTUP",
+     "L": 1.04,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.38
+    },
+    {
+     "ms": 423,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.38
+    },
+    {
+     "ms": 436,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.37
+    },
+    {
+     "ms": 457,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.36
+    },
+    {
+     "ms": 468,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0,
+     "pelvis": 0.54,
+     "thigh": -1.36
+    },
+    {
+     "ms": 489,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.57,
+     "pelvis": 0.26,
+     "thigh": -0.51
+    },
+    {
+     "ms": 504,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.57,
+     "pelvis": 0.26,
+     "thigh": -0.5
+    },
+    {
+     "ms": 516,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.57,
+     "pelvis": 0.26,
+     "thigh": -0.5
+    },
+    {
+     "ms": 539,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.57,
+     "pelvis": 0.26,
+     "thigh": -0.5
+    },
+    {
+     "ms": 554,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 1,
+     "pelvis": -0.1,
+     "thigh": 0.1
+    },
+    {
+     "ms": 564,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 1,
+     "pelvis": -0.1,
+     "thigh": 0.1
+    },
+    {
+     "ms": 585,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 1,
+     "pelvis": -0.1,
+     "thigh": 0.1
+    },
+    {
+     "ms": 596,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 1,
+     "pelvis": -0.1,
+     "thigh": 0.1
+    },
+    {
+     "ms": 620,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.92,
+     "pelvis": -0.09,
+     "thigh": 0.09
+    },
+    {
+     "ms": 632,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.92,
+     "pelvis": -0.09,
+     "thigh": 0.09
+    },
+    {
+     "ms": 648,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.92,
+     "pelvis": -0.09,
+     "thigh": 0.09
+    },
+    {
+     "ms": 658,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.92,
+     "pelvis": -0.09,
+     "thigh": 0.09
+    },
+    {
+     "ms": 686,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0.07
+    },
+    {
+     "ms": 697,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0.07
+    },
+    {
+     "ms": 710,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.72,
+     "pelvis": -0.07,
+     "thigh": 0.07
+    },
+    {
+     "ms": 722,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.44,
+     "pelvis": -0.04,
+     "thigh": 0.04
+    },
+    {
+     "ms": 745,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.44,
+     "pelvis": -0.04,
+     "thigh": 0.04
+    },
+    {
+     "ms": 758,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.44,
+     "pelvis": -0.04,
+     "thigh": 0.04
+    },
+    {
+     "ms": 781,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 793,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 838,
+     "h": "RECOVERY",
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 850,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 869,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 893,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 923,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 933,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 956,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 969,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 982,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 994,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1021,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1035,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1048,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1070,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1082,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1095,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1107,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1132,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1145,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1157,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1170,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1199,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1214,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1228,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1240,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1254,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1265,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1290,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1304,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1315,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1340,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1354,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1369,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1380,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1393,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1449,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1462,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1473,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    },
+    {
+     "ms": 1500,
+     "h": null,
+     "L": 0,
+     "R": 0.05,
+     "pelvis": 0,
+     "thigh": 0
+    }
+   ],
+   "rest": {
+    "pose": {
+     "ROOT": [
+      0,
+      0,
+      0
+     ],
+     "PELVIS": [
+      0,
+      3.468153126081719e-59,
+      -0.017902145942388103
+     ],
+     "SPINE": [
+      0.00016306512898370075,
+      0,
+      0
+     ],
+     "CHEST": [
+      -0.004334140504948273,
+      2.6754324115487553e-59,
+      0.004773905584636828
+     ],
+     "NECK": [
+      -0.0001553123805539244,
+      -1.1673600872021864e-8,
+      0
+     ],
+     "HEAD": [
+      -0.0005135591494533315,
+      -2.6265601962049196e-8,
+      0
+     ],
+     "CLAV_L": [
+      -0.0049452488700857,
+      0,
+      -0.00025624520268867265
+     ],
+     "UPPERARM_L": [
+      0.0004659003685248593,
+      0,
+      -0.05031060024568324
+     ],
+     "FOREARM_L": [
+      -0.1065560529222011,
+      0,
+      0
+     ],
+     "HAND_L": [
+      0.05,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.0049452488700857,
+      0,
+      0.00025624520268867265
+     ],
+     "UPPERARM_R": [
+      0.0004659003685248593,
+      0,
+      0.05031060024568324
+     ],
+     "FOREARM_R": [
+      -0.1065560529222011,
+      0,
+      0
+     ],
+     "HAND_R": [
+      0.05,
+      0,
+      0
+     ],
+     "TAIL1": [
+      0,
+      0,
+      0
+     ],
+     "TAIL2": [
+      0,
+      0,
+      0
+     ],
+     "TAIL3": [
+      0,
+      0,
+      0
+     ],
+     "FINGERS_L": [
+      0.25,
+      0,
+      0
+     ],
+     "FINGERS_R": [
+      0.25,
+      0,
+      0
+     ],
+     "BROW_L": [
+      -0.002,
+      0,
+      0
+     ],
+     "BROW_R": [
+      -0.002,
+      0,
+      0
+     ],
+     "CHEEK_L": [
+      -0.0025919999999999997,
+      0,
+      0
+     ],
+     "CHEEK_R": [
+      -0.0025919999999999997,
+      0,
+      0
+     ],
+     "JAW": [
+      0.009235491469271488,
+      0,
+      0
+     ],
+     "LUMBAR": [
+      0.00010871008598913384,
+      0,
+      0.009945636634660058
+     ],
+     "SPINE2": [
+      -0.0026564086965811993,
+      1.7836216076991703e-59,
+      0.003182603723091219
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.000007033401901667085,
+      0
+     ],
+     "FORETWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.000007033401901667085,
+      0
+     ],
+     "FORETWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_L": [
+      0,
+      0,
+      -0.05
+     ],
+     "SHIN_L": [
+      0.1179236673850196,
+      0,
+      0
+     ],
+     "TIP_L": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_R": [
+      0,
+      0,
+      0.05
+     ],
+     "SHIN_R": [
+      0.1179236673850196,
+      0,
+      0
+     ],
+     "TIP_R": [
+      0,
+      0,
+      0
+     ]
+    },
+    "W": {
+     "PELVIS": [
+      19.752,
+      0.967,
+      29.678
+     ],
+     "CHEST": [
+      19.748,
+      1.39,
+      29.678
+     ],
+     "HEAD": [
+      19.748,
+      1.908,
+      29.682
+     ],
+     "HAND_L": [
+      20.088,
+      1.149,
+      29.638
+     ],
+     "HAND_R": [
+      19.41,
+      1.15,
+      29.638
+     ],
+     "TIP_L": [
+      19.885,
+      0.263,
+      29.726
+     ],
+     "TIP_R": [
+      19.644,
+      0.259,
+      29.726
+     ],
+     "SHIN_L": [
+      19.849,
+      0.791,
+      29.663
+     ],
+     "THIGH_L": [
+      19.833,
+      1.027,
+      29.651
+     ],
+     "TAIL3": [
+      19.765,
+      0.238,
+      29.678
+     ]
+    }
+   },
+   "load": {
+    "ms": 294.80000001192093,
+    "pose": {
+     "ROOT": [
+      0,
+      0,
+      0
+     ],
+     "PELVIS": [
+      0.5443944410149126,
+      2.638200028254355e-60,
+      -0.005883310083160362
+     ],
+     "SPINE": [
+      0.03215370635290876,
+      0,
+      0
+     ],
+     "CHEST": [
+      0.01653537135281429,
+      2.0351828789390744e-60,
+      0.0015688826888427632
+     ],
+     "NECK": [
+      -0.0004616989060996525,
+      -2.026366448024712e-9,
+      0
+     ],
+     "HEAD": [
+      -0.3769297904534256,
+      -4.559324508055602e-9,
+      0
+     ],
+     "CLAV_L": [
+      0.09560707498574238,
+      -0.05748484124582646,
+      -0.035914851612664465
+     ],
+     "UPPERARM_L": [
+      -0.7890078106711661,
+      0,
+      -0.1574767436380397
+     ],
+     "FOREARM_L": [
+      -0.165449111120347,
+      0,
+      0
+     ],
+     "HAND_L": [
+      0.16999999999999998,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      0.09560707498574238,
+      0.05748484124582646,
+      0.035914851612664465
+     ],
+     "UPPERARM_R": [
+      -0.7890078106711661,
+      0,
+      0.1574767436380397
+     ],
+     "FOREARM_R": [
+      -0.165449111120347,
+      0,
+      0
+     ],
+     "HAND_R": [
+      0.16999999999999998,
+      0,
+      0
+     ],
+     "TAIL1": [
+      -0.44439847523479403,
+      0,
+      0
+     ],
+     "TAIL2": [
+      -0.2111261649043451,
+      0,
+      0
+     ],
+     "TAIL3": [
+      0,
+      0,
+      0
+     ],
+     "FINGERS_L": [
+      1.4098531621809227,
+      0,
+      0
+     ],
+     "FINGERS_R": [
+      1.4098531621809227,
+      0,
+      0
+     ],
+     "BROW_L": [
+      0.020869205850599162,
+      0,
+      0
+     ],
+     "BROW_R": [
+      0.020869205850599162,
+      0,
+      0
+     ],
+     "CHEEK_L": [
+      -0.005885165642486279,
+      0,
+      0
+     ],
+     "CHEEK_R": [
+      -0.005885165642486279,
+      0,
+      0
+     ],
+     "JAW": [
+      0.009605734634659278,
+      0,
+      0
+     ],
+     "LUMBAR": [
+      0.021435804235272513,
+      0,
+      0.0032685056017557573
+     ],
+     "SPINE2": [
+      0.010134582442047468,
+      1.356788585959383e-60,
+      0.0010459217925618423
+     ],
+     "SCAP_L": [
+      -0.1068932998372806,
+      0,
+      -0.06235442490508035
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.03940466706619853,
+      0
+     ],
+     "FORETWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      -0.1068932998372806,
+      0,
+      0.06235442490508035
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.03940466706619853,
+      0
+     ],
+     "FORETWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_L": [
+      -1.3925676242676608,
+      0,
+      -0.05
+     ],
+     "SHIN_L": [
+      0.7333784947130353,
+      0,
+      0
+     ],
+     "TIP_L": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_R": [
+      -1.3925676242676608,
+      0,
+      0.05
+     ],
+     "SHIN_R": [
+      0.7333784947130353,
+      0,
+      0
+     ],
+     "TIP_R": [
+      0,
+      0,
+      0
+     ]
+    },
+    "ro": {
+     "y": -0.1076591037950053,
+     "z": 0.33654620255732093
+    },
+    "W": {
+     "PELVIS": [
+      19.752,
+      0.86,
+      30.015
+     ],
+     "CHEST": [
+      19.75,
+      1.217,
+      29.788
+     ],
+     "HEAD": [
+      19.75,
+      1.642,
+      29.493
+     ],
+     "HAND_R": [
+      19.335,
+      1.05,
+      29.582
+     ],
+     "TIP_L": [
+      19.87,
+      0.187,
+      29.759
+     ],
+     "THIGH_L": [
+      19.834,
+      0.896,
+      29.961
+     ],
+     "SHIN_L": [
+      19.846,
+      0.717,
+      29.806
+     ]
+    }
+   },
+   "rel": {
+    "ms": 553.9000000357628,
+    "pose": {
+     "ROOT": [
+      0,
+      0,
+      0
+     ],
+     "PELVIS": [
+      -0.09963265306122449,
+      3.114136804696032e-61,
+      0
+     ],
+     "SPINE": [
+      -0.04711848098349357,
+      0,
+      0
+     ],
+     "CHEST": [
+      -0.03931675101672449,
+      2.402334106479797e-61,
+      0
+     ],
+     "NECK": [
+      -0.0006716118913277962,
+      0,
+      0
+     ],
+     "HEAD": [
+      0.16044992567255525,
+      0,
+      0
+     ],
+     "CLAV_L": [
+      -0.15644544791888135,
+      -0.10794071116626006,
+      -0.21097985813962689
+     ],
+     "UPPERARM_L": [
+      -1.0426771291416657,
+      0,
+      -0.4507324714966025
+     ],
+     "FOREARM_L": [
+      -0.19265836734693878,
+      0,
+      0
+     ],
+     "HAND_L": [
+      0.020551020408163256,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.15644544791888135,
+      0.10794071116626006,
+      0.21097985813962689
+     ],
+     "UPPERARM_R": [
+      -1.0426771291416657,
+      0,
+      0.4507324714966025
+     ],
+     "FOREARM_R": [
+      -0.19265836734693878,
+      0,
+      0
+     ],
+     "HAND_R": [
+      0.020551020408163256,
+      0,
+      0
+     ],
+     "TAIL1": [
+      0.05977959183673469,
+      0,
+      0
+     ],
+     "TAIL2": [
+      0,
+      0,
+      0
+     ],
+     "TAIL3": [
+      0,
+      0,
+      0
+     ],
+     "FINGERS_L": [
+      1.4133678069466469,
+      0,
+      0
+     ],
+     "FINGERS_R": [
+      1.4133678069466469,
+      0,
+      0
+     ],
+     "BROW_L": [
+      0.04187124840198822,
+      0,
+      0
+     ],
+     "BROW_R": [
+      0.04187124840198822,
+      0,
+      0
+     ],
+     "CHEEK_L": [
+      -0.023695003912173395,
+      0,
+      0
+     ],
+     "CHEEK_R": [
+      -0.023695003912173395,
+      0,
+      0
+     ],
+     "JAW": [
+      0.02051460720394079,
+      0,
+      0
+     ],
+     "LUMBAR": [
+      -0.03141232065566238,
+      0,
+      0
+     ],
+     "SPINE2": [
+      -0.024097363526379527,
+      1.6015560709865314e-61,
+      0
+     ],
+     "SCAP_L": [
+      -0.20071619844965713,
+      -0.004339332759132275,
+      -0.11708444909563331
+     ],
+     "ARMTWIST_L": [
+      0,
+      0.15710475221396317,
+      0
+     ],
+     "FORETWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      -0.20071619844965713,
+      0.004339332759132275,
+      0.11708444909563331
+     ],
+     "ARMTWIST_R": [
+      0,
+      -0.15710475221396317,
+      0
+     ],
+     "FORETWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_L": [
+      0.09963265306122449,
+      0,
+      -0.05
+     ],
+     "SHIN_L": [
+      0.1179236673850196,
+      0,
+      0
+     ],
+     "TIP_L": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_R": [
+      0.09963265306122449,
+      0,
+      0.05
+     ],
+     "SHIN_R": [
+      0.1179236673850196,
+      0,
+      0
+     ],
+     "TIP_R": [
+      0,
+      0,
+      0
+     ]
+    },
+    "ro": {
+     "y": -0.05160587920961493,
+     "z": 0.11888711836302138
+    },
+    "W": {
+     "PELVIS": [
+      19.752,
+      1.055,
+      29.498
+     ],
+     "CHEST": [
+      19.752,
+      1.471,
+      29.423
+     ],
+     "HEAD": [
+      19.752,
+      1.984,
+      29.351
+     ],
+     "HAND_R": [
+      19.252,
+      1.637,
+      29.119
+     ],
+     "TIP_L": [
+      19.871,
+      0.344,
+      29.461
+     ],
+     "THIGH_L": [
+      19.834,
+      1.107,
+      29.46
+     ],
+     "SHIN_L": [
+      19.846,
+      0.874,
+      29.416
+     ]
+    }
+   }
+  }
+ },
+ "flight": {
+  "split": {
+   "hover": {
+    "lean": 0.10565624863193647,
+    "speed": 6.958772348483044e-32,
+    "cruise": 7.71
+   },
+   "cruise": {
+    "lean": 0.4044857171959464,
+    "speed": 7.228219795197601,
+    "pose": {
+     "ROOT": [
+      0,
+      0,
+      0
+     ],
+     "PELVIS": [
+      0.20540196668691746,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.06403498384713828,
+      0,
+      3.2136795877959486e-33
+     ],
+     "CHEST": [
+      0.03250907040812376,
+      0,
+      5.356132646326581e-33
+     ],
+     "NECK": [
+      -0.0016099770712069447,
+      0,
+      0
+     ],
+     "HEAD": [
+      -0.2230363583047051,
+      0,
+      -7.141510195102109e-33
+     ],
+     "CLAV_L": [
+      -0.10453633430008051,
+      0,
+      -0.03555957518602315
+     ],
+     "UPPERARM_L": [
+      0.4691442973260054,
+      0,
+      -0.21321995414241388
+     ],
+     "FOREARM_L": [
+      -0.21999999999999997,
+      0,
+      0
+     ],
+     "HAND_L": [
+      0.05,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.10453633430008051,
+      0,
+      0.03555957518602315
+     ],
+     "UPPERARM_R": [
+      0.4691442973260054,
+      0,
+      0.21321995414241388
+     ],
+     "FOREARM_R": [
+      -0.21999999999999997,
+      0,
+      0
+     ],
+     "HAND_R": [
+      0.05,
+      0,
+      0
+     ],
+     "TAIL1": [
+      0.0399247929012333,
+      0,
+      0
+     ],
+     "TAIL2": [
+      -0.1493394069445343,
+      0,
+      0
+     ],
+     "TAIL3": [
+      0,
+      0,
+      0
+     ],
+     "FINGERS_L": [
+      0.25,
+      0,
+      0
+     ],
+     "FINGERS_R": [
+      0.25,
+      0,
+      0
+     ],
+     "BROW_L": [
+      -0.002,
+      0,
+      0
+     ],
+     "BROW_R": [
+      -0.002,
+      0,
+      0
+     ],
+     "CHEEK_L": [
+      -0.0025919999999999997,
+      0,
+      0
+     ],
+     "CHEEK_R": [
+      -0.0025919999999999997,
+      0,
+      0
+     ],
+     "JAW": [
+      0.009235491469271488,
+      0,
+      0
+     ],
+     "LUMBAR": [
+      0.04268998923142553,
+      0,
+      2.1424530585306324e-33
+     ],
+     "SPINE2": [
+      0.019924914121108108,
+      0,
+      3.5707550975510544e-33
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.03301243105420639,
+      0
+     ],
+     "FORETWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.03301243105420639,
+      0
+     ],
+     "FORETWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_L": [
+      0.35356871504649107,
+      0,
+      -0.019853201543229847
+     ],
+     "SHIN_L": [
+      0.23926600771614925,
+      0,
+      0
+     ],
+     "TIP_L": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_R": [
+      0.35356871504649107,
+      0,
+      0.019853201543229847
+     ],
+     "SHIN_R": [
+      0.23926600771614925,
+      0,
+      0
+     ],
+     "TIP_R": [
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   "boost": {
+    "lean": 0.7004760328068523,
+    "speed": 10.173203919689069,
+    "pose": {
+     "ROOT": [
+      0,
+      0,
+      0
+     ],
+     "PELVIS": [
+      0.4049163840421275,
+      0,
+      0
+     ],
+     "SPINE": [
+      0.09346993551303796,
+      0,
+      5.048383884231658e-41
+     ],
+     "CHEST": [
+      0.04337721675453078,
+      0,
+      8.413973140386097e-41
+     ],
+     "NECK": [
+      -0.0012538590708297903,
+      0,
+      0
+     ],
+     "HEAD": [
+      -0.38210568370838294,
+      0,
+      -1.121863085384813e-40
+     ],
+     "CLAV_L": [
+      -0.14376157721248936,
+      0,
+      -0.04826886746686915
+     ],
+     "UPPERARM_L": [
+      0.5661810543573972,
+      0,
+      -0.21250771814165956
+     ],
+     "FOREARM_L": [
+      -0.21999999999999997,
+      0,
+      0
+     ],
+     "HAND_L": [
+      0.05,
+      0,
+      0
+     ],
+     "CLAV_R": [
+      -0.14376157721248936,
+      0,
+      0.04826886746686915
+     ],
+     "UPPERARM_R": [
+      0.5661810543573972,
+      0,
+      0.21250771814165956
+     ],
+     "FOREARM_R": [
+      -0.21999999999999997,
+      0,
+      0
+     ],
+     "HAND_R": [
+      0.05,
+      0,
+      0
+     ],
+     "TAIL1": [
+      0.06981317007977318,
+      0,
+      0
+     ],
+     "TAIL2": [
+      -0.24,
+      0,
+      0
+     ],
+     "TAIL3": [
+      0,
+      0,
+      0
+     ],
+     "FINGERS_L": [
+      0.25,
+      0,
+      0
+     ],
+     "FINGERS_R": [
+      0.25,
+      0,
+      0
+     ],
+     "BROW_L": [
+      -0.002,
+      0,
+      0
+     ],
+     "BROW_R": [
+      -0.002,
+      0,
+      0
+     ],
+     "CHEEK_L": [
+      -0.0025919999999999997,
+      0,
+      0
+     ],
+     "CHEEK_R": [
+      -0.0025919999999999997,
+      0,
+      0
+     ],
+     "JAW": [
+      0.009235491469271488,
+      0,
+      0
+     ],
+     "LUMBAR": [
+      0.06231329034202531,
+      0,
+      3.365589256154439e-41
+     ],
+     "SPINE2": [
+      0.026586036075357575,
+      0,
+      5.609315426924065e-41
+     ],
+     "SCAP_L": [
+      0,
+      0,
+      0
+     ],
+     "ARMTWIST_L": [
+      0,
+      -0.046967752010582016,
+      0
+     ],
+     "FORETWIST_L": [
+      0,
+      0,
+      0
+     ],
+     "SCAP_R": [
+      0,
+      0,
+      0
+     ],
+     "ARMTWIST_R": [
+      0,
+      0.046967752010582016,
+      0
+     ],
+     "FORETWIST_R": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_L": [
+      0.55,
+      0,
+      -0.04
+     ],
+     "SHIN_L": [
+      0.34,
+      0,
+      0
+     ],
+     "TIP_L": [
+      0,
+      0,
+      0
+     ],
+     "THIGH_R": [
+      0.55,
+      0,
+      0.04
+     ],
+     "SHIN_R": [
+      0.34,
+      0,
+      0
+     ],
+     "TIP_R": [
+      0,
+      0,
+      0
+     ]
+    },
+    "W": {
+     "PELVIS": [
+      59.788,
+      19.953,
+      -77.772
+     ],
+     "CHEST": [
+      59.586,
+      20.323,
+      -77.772
+     ],
+     "HEAD": [
+      59.283,
+      20.744,
+      -77.772
+     ],
+     "HAND_L": [
+      59.785,
+      20.209,
+      -78.198
+     ],
+     "HAND_R": [
+      59.784,
+      20.21,
+      -77.348
+     ],
+     "TIP_L": [
+      60.449,
+      19.716,
+      -77.884
+     ],
+     "TIP_R": [
+      60.449,
+      19.716,
+      -77.661
+     ],
+     "SHIN_L": [
+      59.939,
+      19.868,
+      -77.864
+     ],
+     "THIGH_L": [
+      59.74,
+      19.997,
+      -77.854
+     ],
+     "TAIL3": [
+      60.053,
+      19.279,
+      -77.772
+     ]
+    }
+   },
+   "cam": [
+    {
+     "yaw": 3.1387963267948966,
+     "pitch": 0.04
+    },
+    {
+     "yaw": 3.1387963267948966,
+     "pitch": 0.04
+    }
+   ]
+  },
+  "fused": {
+   "form": "FUSED",
+   "cruise": {
+    "lean": 0.3864377529002366,
+    "tail2": -0.1490867009840628,
+    "speed": 19.2207306962652
+   },
+   "boost": {
+    "lean": 0.6880360816498435,
+    "tail2": -0.2363430901570068,
+    "speed": 26.461716014932712,
+    "cruise": 20.56
+   }
+  }
+ },
+ "pass": 13,
+ "fail": 2
+}

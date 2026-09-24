@@ -1,0 +1,296 @@
+{
+ "generated_at": "2026-09-23T18:52:51.107Z",
+ "candidate_root": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "proof_sources": {
+  "registry": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\world_registry_v1.json",
+  "colliders": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\play\\rules1723\\world_v1_colliders.json",
+  "district_colliders": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\play\\rules1723\\district_v1_colliders.json"
+ },
+ "capture_policy": "fixture actor placement/economy seeding is labelled; solid-face stops/slides, flight, forms, speeds, door/pass/ramp/bridge traversal, locks, bush breaks, casts, manifestation, movement and pickup use normal browser keyboard/touch input; no accepted traversal uses P.goTo, and no refill or geometry is fixture-spawned",
+ "phone_acceptance": "CHROMIUM TOUCH EMULATION ONLY — physical-phone acceptance remains owner-pending",
+ "fixtures": {
+  "junction": [
+   -40,
+   40
+  ],
+  "ridge": {
+   "id": "RIDGE_NEAR_FACE_S015_T0_B000_P00",
+   "type": "BOX",
+   "x1": 150.314,
+   "z1": 225.185,
+   "x2": 153.568,
+   "z2": 228.196,
+   "y0": 0,
+   "h": 4.59,
+   "ridge": true,
+   "mountain": true,
+   "ridge_id": "RIDGE_NEAR",
+   "ridge_segment": 15,
+   "ridge_triangle": 0,
+   "ridge_band": 0,
+   "ridge_piece": 0,
+   "ridge_pieces": 1,
+   "face_y0_m": 0,
+   "face_y1_m": 4.339849196,
+   "face_sweep_m": 2.467021,
+   "surface_y_m": 2.17,
+   "collision_proxy": "VISIBLE_RIDGE_INNER_FACE",
+   "world": "JOBB",
+   "zone": "RIDGE_NEAR_FACE_01"
+  },
+  "monolith": {
+   "id": "VISIONARY_SANCTUARY_MONOLITH0",
+   "type": "CYLINDER",
+   "x": -120,
+   "z": 0,
+   "r": 1.26,
+   "h": 6.65,
+   "monolith": true,
+   "mountain": false,
+   "collision_proxy": "MAIN_VISIBLE_CRYSTAL",
+   "world": "JOBB",
+   "zone": "VISIONARY_SANCTUARY"
+  },
+  "building_wall": {
+   "id": "TEMPLE_S67",
+   "type": "BOX",
+   "district": "temple",
+   "x1": 5,
+   "z1": 167.5,
+   "x2": 7.5,
+   "z2": 170,
+   "y0": 0,
+   "h": 11
+  },
+  "pass": {
+   "terrace": {
+    "id": "TITAN_MOON_PASS",
+    "x1": 141,
+    "z1": 48,
+    "x2": 159,
+    "z2": 74,
+    "h": 2.8,
+    "ramps": [
+     {
+      "side": "S",
+      "w": 10
+     },
+     {
+      "side": "N",
+      "w": 10
+     }
+    ],
+    "region": "TITAN_SANCTUARY",
+    "surface": "BLUE_GRANITE_PASS",
+    "note": "M3: the walkable east-range pass; the RP_EAST_LINK road climbs between four collision-backed mountain monoliths and descends toward MAH MATCH"
+   },
+   "top": {
+    "id": "TITAN_MOON_PASS_TOP",
+    "type": "BOX",
+    "x1": 141,
+    "z1": 48,
+    "x2": 159,
+    "z2": 74,
+    "h": 2.8,
+    "walkable": true,
+    "low": true,
+    "terrace": true,
+    "world": "JOBB",
+    "zone": "TITAN_MOON_PASS"
+   },
+   "ramps": [
+    {
+     "id": "TITAN_MOON_PASS_RAMP_S",
+     "type": "RAMP",
+     "x1": 141,
+     "z1": 38,
+     "x2": 159,
+     "z2": 48,
+     "axis": "z",
+     "h0": 0,
+     "h1": 2.8,
+     "terrace": true,
+     "world": "JOBB",
+     "zone": "TITAN_MOON_PASS"
+    },
+    {
+     "id": "TITAN_MOON_PASS_RAMP_N",
+     "type": "RAMP",
+     "x1": 141,
+     "z1": 74,
+     "x2": 159,
+     "z2": 84,
+     "axis": "z",
+     "h0": 2.8,
+     "h1": 0,
+     "terrace": true,
+     "world": "JOBB",
+     "zone": "TITAN_MOON_PASS"
+    }
+   ],
+   "traversal": {
+    "start": [
+     150,
+     36
+    ],
+    "end": [
+     150,
+     86
+    ],
+    "axis": "z",
+    "bounds": {
+     "x1": 141,
+     "z1": 38,
+     "x2": 159,
+     "z2": 84
+    },
+    "source_ids": [
+     "TITAN_MOON_PASS_RAMP_S",
+     "TITAN_MOON_PASS_RAMP_N",
+     "TITAN_MOON_PASS_TOP"
+    ]
+   }
+  },
+  "bridge": {
+   "link": {
+    "id": "LINK_BRIDGE_MAIN",
+    "kind": "BRIDGE",
+    "physical": "BRIDGE_MAIN",
+    "from_path": "CW_MARKET",
+    "to_path": "CW_MARKET_N",
+    "from": [
+     0,
+     214
+    ],
+    "to": [
+     0,
+     230
+    ],
+    "deck": {
+     "x1": -7,
+     "z1": 212,
+     "x2": 7,
+     "z2": 240
+    },
+    "family": "pink",
+    "note": "the main deck is the continuous road surface between the south and north market causeways"
+   },
+   "deck": {
+    "id": "BRIDGE_MAIN_DECK",
+    "type": "BOX",
+    "x1": -7,
+    "z1": 215,
+    "x2": 7,
+    "z2": 237,
+    "h": 0.35,
+    "walkable": true,
+    "deck": true,
+    "bridge": true,
+    "world": "JOBB",
+    "zone": "BRIDGE_MAIN"
+   },
+   "ramps": [
+    {
+     "id": "BRIDGE_MAIN_RAMP_S",
+     "type": "RAMP",
+     "x1": -7,
+     "z1": 212,
+     "x2": 7,
+     "z2": 215,
+     "axis": "z",
+     "h0": 0,
+     "h1": 0.35,
+     "world": "JOBB",
+     "zone": "BRIDGE_MAIN"
+    },
+    {
+     "id": "BRIDGE_MAIN_RAMP_N",
+     "type": "RAMP",
+     "x1": -7,
+     "z1": 237,
+     "x2": 7,
+     "z2": 240,
+     "axis": "z",
+     "h0": 0.35,
+     "h1": 0,
+     "world": "JOBB",
+     "zone": "BRIDGE_MAIN"
+    }
+   ],
+   "traversal": {
+    "start": [
+     0,
+     210
+    ],
+    "end": [
+     0,
+     242
+    ],
+    "axis": "z",
+    "bounds": {
+     "x1": -7,
+     "z1": 212,
+     "x2": 7,
+     "z2": 240
+    },
+    "source_ids": [
+     "BRIDGE_MAIN_RAMP_S",
+     "BRIDGE_MAIN_RAMP_N",
+     "BRIDGE_MAIN_DECK"
+    ]
+   }
+  },
+  "door": {
+   "interactable": {
+    "kind": "ENTER",
+    "label": "GOLD TEMPLE — enter the vaulted rotunda",
+    "range_m": 3.5,
+    "to": {
+     "room": "TEMPLE_HALL"
+    },
+    "id": "TEMPLE_DOOR",
+    "x": 0,
+    "z": 165.55
+   },
+   "building": "LM_TEMPLE",
+   "portal": {
+    "id": "TEMPLE_DOOR",
+    "local": [
+     0.0001708,
+     0,
+     0.3709264
+    ],
+    "local_normal": [
+     0,
+     0,
+     1
+    ],
+    "world": [
+     0,
+     165.55
+    ],
+    "outward": [
+     0,
+     -1
+    ],
+    "half_width_m": 2.2,
+    "height_m": 5.6,
+    "inside_depth_m": 2.8,
+    "outside_depth_m": 1.2
+   },
+   "room": "TEMPLE_HALL",
+   "room_exit": {
+    "x": 0,
+    "z": 9.2
+   }
+  }
+ },
+ "checks": [],
+ "profiles": {},
+ "screenshots": [],
+ "pass": 0,
+ "fail": 1,
+ "fatal": "TypeError: Cannot read properties of undefined (reading 'mkdirSync')\n    at runProfile (file:///C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/deploy/jobb/probe_m5_owner_corrections.mjs:187:72)\n    at file:///C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/deploy/jobb/probe_m5_owner_corrections.mjs:644:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)",
+ "finished_at": "2026-09-23T18:52:51.129Z",
+ "result": "FAIL"
+}

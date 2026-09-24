@@ -1,0 +1,145 @@
+{
+ "contract": "MAHWORLD_IMPORT_CONTRACT_V1",
+ "character": "ATHLETE_M_V11",
+ "source": "Mah_Athlete_M_am08_v8.glb",
+ "status": "CONFIRMED — the derivative rig carries the canonical role names (identity mapping); the record exists so every future character follows the same contract",
+ "units": "source units × scale_to_metres (manifest)",
+ "up_axis": "+Y",
+ "forward_axis": "-Z",
+ "height_m": 1.801,
+ "bind": "identity",
+ "roles": {
+  "ROOT": "ROOT",
+  "PELVIS": "PELVIS",
+  "LUMBAR": "LUMBAR",
+  "SPINE": "SPINE",
+  "CHEST": "CHEST",
+  "SPINE2": "SPINE2",
+  "NECK": "NECK",
+  "HEAD": "HEAD",
+  "CLAV_L": "CLAV_L",
+  "CLAV_R": "CLAV_R",
+  "UPPERARM_L": "UPPERARM_L",
+  "UPPERARM_R": "UPPERARM_R",
+  "FOREARM_L": "FOREARM_L",
+  "FOREARM_R": "FOREARM_R",
+  "HAND_L": "HAND_L",
+  "HAND_R": "HAND_R",
+  "FINGERS_L": "FINGERS_L",
+  "FINGERS_R": "FINGERS_R",
+  "THIGH_L": "THIGH_L",
+  "THIGH_R": "THIGH_R",
+  "SHIN_L": "SHIN_L",
+  "SHIN_R": "SHIN_R",
+  "TIP_L": "TIP_L",
+  "TIP_R": "TIP_R",
+  "JAW": "JAW",
+  "BROW_L": "BROW_L",
+  "BROW_R": "BROW_R",
+  "CHEEK_L": "CHEEK_L",
+  "CHEEK_R": "CHEEK_R",
+  "TAIL1": "TAIL1",
+  "TAIL2": "TAIL2",
+  "TAIL3": "TAIL3"
+ },
+ "emitter_anchors": {
+  "HAND_L": {
+   "role": "HAND_L",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "HAND_R": {
+   "role": "HAND_R",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "TIP_L": {
+   "role": "TIP_L",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "TIP_R": {
+   "role": "TIP_R",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "FUSED_TIP": {
+   "role": "TAIL3",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "CHEST": {
+   "role": "CHEST",
+   "offset_m": [
+    0,
+    0.05,
+    0.12
+   ]
+  }
+ },
+ "morphs": {
+  "PACKED": "PACKED",
+  "muscles": [
+   "BICEPS_L",
+   "TRICEPS_L",
+   "DELTOID_L",
+   "PEC_L",
+   "LAT_L",
+   "FOREARM_L",
+   "BICEPS_R",
+   "TRICEPS_R",
+   "DELTOID_R",
+   "PEC_R",
+   "LAT_R",
+   "FOREARM_R",
+   "TRAP",
+   "ABS",
+   "SH45_L",
+   "SH90_L",
+   "SH120_L",
+   "SH150_L",
+   "SH45_R",
+   "SH90_R",
+   "SH120_R",
+   "SH150_R"
+  ]
+ },
+ "face": {
+  "channels": [
+   "brow_l",
+   "brow_r",
+   "cheek_l",
+   "cheek_r",
+   "jaw",
+   "smile",
+   "blink"
+  ],
+  "bones_or_morphs": "bones"
+ },
+ "forms": {
+  "fused": true,
+  "split": true
+ },
+ "canonical_names_present": 38,
+ "notes": [
+  "This record is the reference example for lab/import_contract.TEMPLATE.json.",
+  "Bone rotation convention: Euler XYZ radians on local axes = rest-pose object axes (identity bind) — lab/ANIMATION_CHANNELS.md.",
+  "Emitter anchors: hands, the two pointed tips (separated), the fused tip TAIL3, the chest (offset)."
+ ],
+ "scale_to_metres": 1.82461
+}

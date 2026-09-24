@@ -1,0 +1,87 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\treevariaint.glb",
+  "bytes": 76539556,
+  "load_ms": 2260,
+  "size_m": [
+   0.702,
+   0.983,
+   0.632
+  ],
+  "triangles": 1849522,
+  "meshes": 1,
+  "shots": {
+   "front": "treevariaint_front.png",
+   "q34": "treevariaint_q34.png",
+   "side": "treevariaint_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\tree_primary\\MAHWORLD_FOREST_TREE_PRIMARY_L0.glb",
+  "bytes": 1191128,
+  "load_ms": 88,
+  "size_m": [
+   0.697,
+   0.982,
+   0.631
+  ],
+  "triangles": 14000,
+  "meshes": 1,
+  "shots": {
+   "front": "MAHWORLD_FOREST_TREE_PRIMARY_L0_front.png",
+   "q34": "MAHWORLD_FOREST_TREE_PRIMARY_L0_q34.png",
+   "side": "MAHWORLD_FOREST_TREE_PRIMARY_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\dogkie.glb",
+  "bytes": 14566196,
+  "load_ms": 1425,
+  "size_m": [
+   0.406,
+   0.978,
+   0.886
+  ],
+  "triangles": 18627,
+  "meshes": 1,
+  "shots": {
+   "front": "dogkie_front.png",
+   "q34": "dogkie_q34.png",
+   "side": "dogkie_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\dogkie\\DOGKIE_FOREST_CREATURE_L0.glb",
+  "bytes": 2494392,
+  "load_ms": 223,
+  "size_m": [
+   0.406,
+   0.978,
+   0.886
+  ],
+  "triangles": 18627,
+  "meshes": 1,
+  "shots": {
+   "front": "DOGKIE_FOREST_CREATURE_L0_front.png",
+   "q34": "DOGKIE_FOREST_CREATURE_L0_q34.png",
+   "side": "DOGKIE_FOREST_CREATURE_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\_decimated\\temple_rt.glb",
+  "bytes": 4000616,
+  "load_ms": 233,
+  "size_m": [
+   0.719,
+   0.978,
+   0.74
+  ],
+  "triangles": 70000,
+  "meshes": 1,
+  "shots": {
+   "front": "temple_rt_front.png",
+   "q34": "temple_rt_q34.png",
+   "side": "temple_rt_side.png"
+  }
+ }
+]

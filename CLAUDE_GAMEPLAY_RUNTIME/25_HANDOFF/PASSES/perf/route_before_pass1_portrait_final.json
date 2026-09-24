@@ -1,0 +1,188 @@
+{
+ "label": "pass1_390x844_A2",
+ "build": "C:\\Users\\jahsu\\AppData\\Local\\Temp\\claude\\C--Users-jahsu-Downloads-MAHWORLD-CLAUDE-CHARACTER\\baf013cd-83d3-4042-a19e-79a13006cb14\\scratchpad\\baseline_dist",
+ "viewport": [
+  390,
+  844
+ ],
+ "quality": {
+  "tier": null,
+  "pixelRatio": 1,
+  "dpr": 1,
+  "fx": null,
+  "w": 390,
+  "h": 844,
+  "sky": "DAY",
+  "avatar": "ATHLETE_M_V8"
+ },
+ "control_lab_last600": null,
+ "lod": [
+  null,
+  null,
+  null,
+  null
+ ],
+ "breakdown_ms": {
+  "walk": {
+   "samples": 41,
+   "ents_ms": 0,
+   "render_ms": 0,
+   "host_tick_ms": 0,
+   "poll_wall_ms": 0,
+   "snapshot_ms": 0,
+   "hud_ms_per_100ms": 0,
+   "rigs_per_frame": 0
+  },
+  "fly": {
+   "samples": 80,
+   "ents_ms": 0,
+   "render_ms": 0,
+   "host_tick_ms": 0,
+   "poll_wall_ms": 0,
+   "snapshot_ms": 0,
+   "hud_ms_per_100ms": 0,
+   "rigs_per_frame": 0
+  },
+  "land": {
+   "samples": 24,
+   "ents_ms": 0,
+   "render_ms": 0,
+   "host_tick_ms": 0,
+   "poll_wall_ms": 0,
+   "snapshot_ms": 0,
+   "hud_ms_per_100ms": 0,
+   "rigs_per_frame": 0
+  },
+  "combo": {
+   "samples": 47,
+   "ents_ms": 0,
+   "render_ms": 0,
+   "host_tick_ms": 0,
+   "poll_wall_ms": 0,
+   "snapshot_ms": 0,
+   "hud_ms_per_100ms": 0,
+   "rigs_per_frame": 0
+  }
+ },
+ "render": {
+  "calls": 45,
+  "triangles": 285440
+ },
+ "runtime_perf_counter": {
+  "frames": 8722,
+  "over_50ms": 1,
+  "max_ms": 189.3
+ },
+ "end_position": {
+  "x": 128.457,
+  "z": -57.683
+ },
+ "slow_frames": [
+  {
+   "frame_ms": 41.3,
+   "prev_update_ms": 45.8,
+   "prev_render_ms": 1.5,
+   "at_s": 2.08
+  },
+  {
+   "frame_ms": 266,
+   "prev_update_ms": 38.9,
+   "prev_render_ms": 234,
+   "at_s": 2.47
+  },
+  {
+   "frame_ms": 114.7,
+   "prev_update_ms": 44.2,
+   "prev_render_ms": 80.2,
+   "at_s": 2.5
+  },
+  {
+   "frame_ms": 160,
+   "prev_update_ms": 53.9,
+   "prev_render_ms": 106.9,
+   "at_s": 3.07
+  },
+  {
+   "frame_ms": 403.5,
+   "prev_update_ms": 129.3,
+   "prev_render_ms": 283.8,
+   "at_s": 3.46
+  },
+  {
+   "frame_ms": 391.9,
+   "prev_update_ms": 153.7,
+   "prev_render_ms": 239.8,
+   "at_s": 3.5
+  },
+  {
+   "frame_ms": 189.3,
+   "prev_update_ms": 10.3,
+   "prev_render_ms": 200.9,
+   "at_s": 37.31
+  },
+  {
+   "frame_ms": 46.9,
+   "prev_update_ms": 39.9,
+   "prev_render_ms": 7.7,
+   "at_s": 37.32
+  }
+ ],
+ "worst_frame": null,
+ "phases": {
+  "walk": {
+   "frames": 1733,
+   "seconds": 10.3,
+   "p50_ms": 5.9,
+   "p95_ms": 8.4,
+   "p99_ms": 10.3,
+   "max_ms": 12.3,
+   "over_25ms_pct": 0,
+   "over_33ms_pct": 0,
+   "over_50ms_pct": 0
+  },
+  "route": {
+   "frames": 8714,
+   "seconds": 48.2,
+   "p50_ms": 5.5,
+   "p95_ms": 7.6,
+   "p99_ms": 9.2,
+   "max_ms": 189.3,
+   "over_25ms_pct": 0,
+   "over_33ms_pct": 0,
+   "over_50ms_pct": 0
+  },
+  "fly": {
+   "frames": 3835,
+   "seconds": 20,
+   "p50_ms": 5.3,
+   "p95_ms": 6.9,
+   "p99_ms": 7.9,
+   "max_ms": 11.5,
+   "over_25ms_pct": 0,
+   "over_33ms_pct": 0,
+   "over_50ms_pct": 0
+  },
+  "land": {
+   "frames": 1206,
+   "seconds": 6.1,
+   "p50_ms": 5.1,
+   "p95_ms": 6.7,
+   "p99_ms": 7.4,
+   "max_ms": 8.6,
+   "over_25ms_pct": 0,
+   "over_33ms_pct": 0,
+   "over_50ms_pct": 0
+  },
+  "combo": {
+   "frames": 1940,
+   "seconds": 11.7,
+   "p50_ms": 5.9,
+   "p95_ms": 8.4,
+   "p99_ms": 10.2,
+   "max_ms": 189.3,
+   "over_25ms_pct": 0.1,
+   "over_33ms_pct": 0.1,
+   "over_50ms_pct": 0.1
+  }
+ }
+}

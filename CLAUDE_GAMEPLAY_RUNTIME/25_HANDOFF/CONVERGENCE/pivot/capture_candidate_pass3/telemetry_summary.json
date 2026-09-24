@@ -1,0 +1,230 @@
+{
+ "tag": "candidate_pass3",
+ "build": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "viewport": [
+  1120,
+  700
+ ],
+ "summary": {
+  "start": {
+   "frames": 384,
+   "box_height_frac": {
+    "p50": 0.327,
+    "min": 0.314,
+    "max": 0.383
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 17
+   }
+  },
+  "idle": {
+   "frames": 180,
+   "box_height_frac": {
+    "p50": 0.338,
+    "min": 0.338,
+    "max": 0.34
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8
+   }
+  },
+  "turn": {
+   "frames": 183,
+   "box_height_frac": {
+    "p50": 0.34,
+    "min": 0.338,
+    "max": 0.365
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 17
+   }
+  },
+  "walk": {
+   "frames": 151,
+   "box_height_frac": {
+    "p50": 0.304,
+    "min": 0.3,
+    "max": 0.338
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "stop": {
+   "frames": 181,
+   "box_height_frac": {
+    "p50": 0.338,
+    "min": 0.301,
+    "max": 0.338
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.6,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "orbit": {
+   "frames": 140,
+   "box_height_frac": {
+    "p50": 0.357,
+    "min": 0.338,
+    "max": 0.367
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8
+   }
+  },
+  "release": {
+   "frames": 274,
+   "box_height_frac": {
+    "p50": 0.35,
+    "min": 0.311,
+    "max": 0.35
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "reset": {
+   "frames": 154,
+   "box_height_frac": {
+    "p50": 0.343,
+    "min": 0.343,
+    "max": 0.35
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "obstacle": {
+   "frames": 2534,
+   "box_height_frac": {
+    "p50": 0.34,
+    "min": 0.302,
+    "max": 5.739
+   },
+   "applied_m": {
+    "min": 0.5,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 1,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 17
+   }
+  },
+  "flight": {
+   "frames": 656,
+   "box_height_frac": {
+    "p50": 0.338,
+    "min": 0.269,
+    "max": 0.339
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.9
+   }
+  },
+  "end": {
+   "frames": 91,
+   "box_height_frac": {
+    "p50": 0.338,
+    "min": 0.338,
+    "max": 0.338
+   },
+   "applied_m": {
+    "min": 6.47,
+    "p50": 6.47
+   },
+   "preferred_m": 6.47,
+   "pitch_bias_max": 0,
+   "inside_frames": 0,
+   "interval_ms": {
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8
+   }
+  }
+ }
+}

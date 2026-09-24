@@ -1,0 +1,76 @@
+{
+ "canonical": "MAHWORLD_GYM_DUMBBELL",
+ "role": "premium MAH dumbbell inside the enterable Gym (training prop)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\dumbell.glb",
+  "original_name": "dumbell.glb",
+  "sha256": "f9be985d869d3f9197d1debcd8f5b1672ca61c2f4afadd6e6f67a80ca7687560",
+  "bytes": 76498804,
+  "triangles": 1926482,
+  "vertices": 992316,
+  "bounds_min": [
+   -0.4915008544921875,
+   0.0,
+   -0.19065098464488983
+  ],
+  "bounds_max": [
+   0.4915008544921875,
+   0.3542328178882599,
+   0.19065098464488983
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 9780420,
+   "runtime_bytes": 207492,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 11844595,
+   "runtime_bytes": 1379410,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/png"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "MAHWORLD_GYM_DUMBBELL_L0.glb",
+   "triangles": 39992,
+   "vertices": 27718,
+   "bytes": 2715524,
+   "sha256": "e40a4487e567aa91b8bab770cb1fcc2a784eb46e3d2773f325ccb4cd84226f33",
+   "method": "glTF-Transform 4.5.0 meshoptimizer, ratio 0.02076, error 0.01, topological borders locked, source normals and UVs preserved"
+  },
+  {
+   "lod": "L1",
+   "file": "MAHWORLD_GYM_DUMBBELL_L1.glb",
+   "triangles": 12000,
+   "vertices": 9543,
+   "bytes": 1965964,
+   "sha256": "7bfc855a36c7a645228555521316fbd2ac5075c13b2113b9c65372a6b3c02fee",
+   "method": "glTF-Transform 4.5.0 meshoptimizer, ratio 0.00623, error 0.01, topological borders locked, source normals and UVs preserved"
+  },
+  {
+   "lod": "L2",
+   "file": "MAHWORLD_GYM_DUMBBELL_L2.glb",
+   "triangles": 3000,
+   "vertices": 2443,
+   "bytes": 1218028,
+   "sha256": "4e8af18e4f599f7c06f0b8ba0032e74175194bb34bc45447931d58f325235483",
+   "method": "legacy fast_simplification derivative retained for provenance; not shipped by the registry"
+  }
+ ],
+ "method": "L0/L1: glTF-Transform 4.5.0 meshoptimizer with topological borders locked and source NORMAL/TEXCOORD_0 preserved; error 0.01; textures Lanczos3 to 1024. L2 is a retained, unshipped legacy derivative.",
+ "generated": "2026-09-23T03:41:52Z"
+}

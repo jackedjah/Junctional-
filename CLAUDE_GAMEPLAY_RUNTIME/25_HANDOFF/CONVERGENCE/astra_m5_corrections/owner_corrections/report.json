@@ -1,0 +1,3690 @@
+{
+ "generated_at": "2026-09-23T17:25:20.473Z",
+ "candidate_root": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "proof_sources": {
+  "registry": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\world_registry_v1.json",
+  "colliders": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\play\\rules1723\\world_v1_colliders.json"
+ },
+ "capture_policy": "fixture placement/economy seeding is labelled; movement, locks, casts, manifestation and pickups use normal browser input",
+ "phone_acceptance": "CHROMIUM TOUCH EMULATION ONLY — physical-phone acceptance remains owner-pending",
+ "fixtures": {
+  "junction": [
+   -40,
+   40
+  ],
+  "ridge": {
+   "id": "RIDGE_NEAR_FACE_S019_T0_B000_P00",
+   "type": "BOX",
+   "x1": 205.714,
+   "z1": 222.577,
+   "x2": 209.658,
+   "z2": 225.099,
+   "y0": 0,
+   "h": 2.958,
+   "ridge": true,
+   "mountain": true,
+   "ridge_id": "RIDGE_NEAR",
+   "ridge_segment": 19,
+   "ridge_triangle": 0,
+   "ridge_band": 0,
+   "ridge_piece": 0,
+   "ridge_pieces": 1,
+   "face_y0_m": 0,
+   "face_y1_m": 2.708195748,
+   "face_sweep_m": 2.427072,
+   "surface_y_m": 1.354,
+   "collision_proxy": "VISIBLE_RIDGE_INNER_FACE",
+   "world": "JOBB",
+   "zone": "RIDGE_NEAR_FACE_02"
+  },
+  "monolith": {
+   "id": "VISIONARY_SANCTUARY_MONOLITH0",
+   "type": "CYLINDER",
+   "x": -120,
+   "z": 0,
+   "r": 1.26,
+   "h": 6.65,
+   "monolith": true,
+   "mountain": false,
+   "collision_proxy": "MAIN_VISIBLE_CRYSTAL",
+   "world": "JOBB",
+   "zone": "VISIONARY_SANCTUARY"
+  }
+ },
+ "checks": [
+  {
+   "profile": "desktop",
+   "gate": "BOOT",
+   "id": "world_ready",
+   "pass": true,
+   "detail": {
+    "world": "READY",
+    "restore": true,
+    "veil": true,
+    "gear": true,
+    "room": "FIELD"
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G01",
+   "id": "day_junction_still_and_motion",
+   "pass": true,
+   "detail": {
+    "render": {
+     "time": "DAY",
+     "cores": true,
+     "frames": true,
+     "seams": true,
+     "core_material": {
+      "transparent": false,
+      "opacity": 1,
+      "depthWrite": true,
+      "program": "mahworld_path_core_owned"
+     },
+     "ground": 0
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyW"
+     },
+     "before": {
+      "x": -40,
+      "z": 46.2
+     },
+     "after": {
+      "x": -40,
+      "z": 24.675
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": -40,
+        "z": 46.2
+       }
+      },
+      {
+       "t_ms": 500,
+       "position": {
+        "x": -40,
+        "z": 44.602
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      },
+      {
+       "t_ms": 1000,
+       "position": {
+        "x": -40,
+        "z": 40.311
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      },
+      {
+       "t_ms": 1500,
+       "position": {
+        "x": -40,
+        "z": 34.588
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      }
+     ],
+     "displacement_m": 21.525,
+     "defeat": false
+    }
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G01",
+   "id": "night_junction_still_and_motion",
+   "pass": true,
+   "detail": {
+    "render": {
+     "time": "NIGHT",
+     "cores": true,
+     "frames": true,
+     "seams": true,
+     "core_material": {
+      "transparent": false,
+      "opacity": 1,
+      "depthWrite": true,
+      "program": "mahworld_path_core_owned"
+     },
+     "ground": 0
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyW"
+     },
+     "before": {
+      "x": -40,
+      "z": 46.2
+     },
+     "after": {
+      "x": -40,
+      "z": 22.529
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": -40,
+        "z": 46.2
+       }
+      },
+      {
+       "t_ms": 500,
+       "position": {
+        "x": -40,
+        "z": 44.781
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      },
+      {
+       "t_ms": 1000,
+       "position": {
+        "x": -40,
+        "z": 38.165
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      },
+      {
+       "t_ms": 1500,
+       "position": {
+        "x": -40,
+        "z": 30.476
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      }
+     ],
+     "displacement_m": 23.671,
+     "defeat": false
+    }
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G02",
+   "id": "controller_sweep_stops_at_visible_ridge",
+   "pass": false,
+   "detail": {
+    "shape": {
+     "id": "RIDGE_NEAR_FACE_S019_T0_B000_P00",
+     "type": "BOX",
+     "x1": 205.714,
+     "z1": 222.577,
+     "x2": 209.658,
+     "z2": 225.099,
+     "y0": 0,
+     "h": 2.958,
+     "ridge": true,
+     "mountain": true,
+     "ridge_id": "RIDGE_NEAR",
+     "ridge_segment": 19,
+     "ridge_triangle": 0,
+     "ridge_band": 0,
+     "ridge_piece": 0,
+     "ridge_pieces": 1,
+     "face_y0_m": 0,
+     "face_y1_m": 2.708195748,
+     "face_sweep_m": 2.427072,
+     "surface_y_m": 1.354,
+     "collision_proxy": "VISIBLE_RIDGE_INNER_FACE",
+     "world": "JOBB",
+     "zone": "RIDGE_NEAR_FACE_02"
+    },
+    "ray_half_m": 1.7201853330606007,
+    "final_signed_m": -6.2108107851905885,
+    "blocker": {
+     "id": "RIDGE_NEAR_FACE_S018_T1_B000_P00",
+     "type": "BOX",
+     "h": 3.792,
+     "y0": 0,
+     "x1": 195.454,
+     "x2": 203.265,
+     "z1": 225.305,
+     "z2": 230.452
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyW"
+     },
+     "before": {
+      "x": 204.748,
+      "z": 220.671
+     },
+     "after": {
+      "x": 197.437,
+      "z": 224.875
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": 204.748,
+        "z": 220.671
+       }
+      },
+      {
+       "t_ms": 1100,
+       "position": {
+        "x": 202.445,
+        "z": 222.175
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      },
+      {
+       "t_ms": 2200,
+       "position": {
+        "x": 198.553,
+        "z": 224.089
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      }
+     ],
+     "displacement_m": 8.434,
+     "defeat": false
+    }
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G02",
+   "id": "controller_sweep_stops_at_visible_monolith",
+   "pass": false,
+   "detail": {
+    "shape": {
+     "id": "VISIONARY_SANCTUARY_MONOLITH0",
+     "type": "CYLINDER",
+     "x": -120,
+     "z": 0,
+     "r": 1.26,
+     "h": 6.65,
+     "monolith": true,
+     "mountain": false,
+     "collision_proxy": "MAIN_VISIBLE_CRYSTAL",
+     "world": "JOBB",
+     "zone": "VISIONARY_SANCTUARY"
+    },
+    "final_distance_m": 1.677,
+    "blocker": {
+     "id": "VISIONARY_SANCTUARY_MONOLITH0",
+     "type": "CYLINDER",
+     "h": 6.65,
+     "x": -120,
+     "z": 0,
+     "r": 1.26
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyW"
+     },
+     "before": {
+      "x": -120,
+      "z": 4.06
+     },
+     "after": {
+      "x": -120,
+      "z": 1.677
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": -120,
+        "z": 4.06
+       }
+      },
+      {
+       "t_ms": 1050,
+       "position": {
+        "x": -120,
+        "z": 1.677
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      },
+      {
+       "t_ms": 2100,
+       "position": {
+        "x": -120,
+        "z": 1.677
+       },
+       "mahloco": "FUSED_GLIDE",
+       "touch": null
+      }
+     ],
+     "displacement_m": 2.383,
+     "defeat": false
+    }
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G02",
+   "id": "ordinary_controller_crosses_open_titan_moon_pass",
+   "pass": true,
+   "detail": {
+    "samples": [
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 39.575
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 42.593
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 46.616
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 50.304
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 76.456
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 80.144
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 83.497
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 85.74
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 87.885
+      },
+      "defeat": false
+     },
+     {
+      "done": false,
+      "result": null,
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 88.143
+      },
+      "defeat": false
+     },
+     {
+      "done": true,
+      "result": {
+       "reached": true,
+       "passes": 1
+      },
+      "error": null,
+      "position": {
+       "x": 150,
+       "z": 88.143
+      },
+      "defeat": false
+     }
+    ],
+    "centre_blocker": null
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G09",
+   "id": "zero_normal_input_bush_hit_and_refill",
+   "pass": false,
+   "detail": {
+    "patch": {
+     "id": "RB_NEXUS_INTRO",
+     "x": 17,
+     "z": 55,
+     "family": "gold",
+     "r": 2.6,
+     "intro": true,
+     "map_label": "MAHGIC CRYSTALS",
+     "note": "owner correction OP09: obvious safe newcomer patch beside the north/temple route, outside the road surface"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 0,
+      "max": 200,
+      "regen": 0,
+      "lockout": true,
+      "depleted": true,
+      "lockout_until": 60.1999999999988
+     },
+     "refills": 0,
+     "actor": {
+      "x": 17,
+      "z": 58.4
+     },
+     "fixture_only": true
+    },
+    "mode": {
+     "ok": true,
+     "mode": "PHYSICAL",
+     "steps": [
+      {
+       "before": "PHYSICAL"
+      }
+     ]
+    },
+    "lock": {
+     "ok": true,
+     "node": "NODE_RB_NEXUS_INTRO",
+     "attempts": [
+      {
+       "node": {
+        "id": "NODE_RB_NEXUS_INTRO",
+        "patch": "RB_NEXUS_INTRO",
+        "x": 17,
+        "z": 55,
+        "y": 0,
+        "family": "gold",
+        "r": 2.6,
+        "hp": 168,
+        "max": 168,
+        "broken": false,
+        "respawn_in_s": null
+       },
+       "screen": {
+        "x": 640,
+        "y": 441.29520751994056,
+        "depth": 0.8764828320607415
+       },
+       "hit": {
+        "id": "other:NODE_RB_NEXUS_INTRO",
+        "distance": 4.470987952187225
+       },
+       "safe": true,
+       "element": "view"
+      }
+     ],
+     "lock": "NODE_RB_NEXUS_INTRO"
+    },
+    "input": {
+     "source": "CDP_KEYBOARD",
+     "control": "KeyE"
+    },
+    "cast_events": [
+     {
+      "tick": 1229,
+      "t": 61.45,
+      "kind": "ATTACK_FACING",
+      "account": "PLAYER_A",
+      "from": 0,
+      "to": 0,
+      "source": "LOCK"
+     }
+    ],
+    "spawned": {
+     "id": "RF_1",
+     "x": 17,
+     "z": 56.15,
+     "source": "NODE_RB_NEXUS_INTRO::M5C_desktop_zero",
+     "fixture_only": true
+    },
+    "pickup_motion": {
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyW"
+     },
+     "before": {
+      "x": 17,
+      "z": 58.4
+     },
+     "after": {
+      "x": 17,
+      "z": 54.756
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": 17,
+        "z": 58.4
+       }
+      }
+     ],
+     "displacement_m": 3.644,
+     "defeat": false
+    },
+    "pickup_events": [
+     {
+      "tick": 1273,
+      "t": 63.65,
+      "kind": "REFILL_PICKED",
+      "account": "PLAYER_A",
+      "id": "RF_1",
+      "to": "MAHGIC",
+      "amount": 60,
+      "before": 0,
+      "after": 60
+     }
+    ],
+    "after_cast": {
+     "combat": {
+      "current": 0,
+      "max": 200
+     }
+    },
+    "after_pickup": {
+     "combat": {
+      "current": 60,
+      "max": 200
+     },
+     "refills": 0
+    }
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G09",
+   "id": "partial_normal_input_mahgic",
+   "pass": true,
+   "detail": {
+    "patch": {
+     "id": "RB_TEMPLE_E",
+     "x": 15,
+     "z": 120,
+     "family": "gold",
+     "r": 2.2,
+     "note": "temple causeway, east verge"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 70,
+      "max": 200,
+      "regen": 0,
+      "lockout": false,
+      "depleted": false,
+      "lockout_until": 60.1999999999988
+     },
+     "refills": 0,
+     "actor": {
+      "x": 15,
+      "z": 124.2
+     },
+     "fixture_only": true
+    },
+    "spawned": {
+     "id": "RF_2",
+     "x": 15,
+     "z": 121.95,
+     "source": "NODE_RB_TEMPLE_E::M5C_desktop_partial",
+     "fixture_only": true
+    },
+    "before": {
+     "combat": {
+      "current": 70,
+      "max": 200
+     },
+     "refills": 0
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyW"
+     },
+     "before": {
+      "x": 15,
+      "z": 124.2
+     },
+     "after": {
+      "x": 15,
+      "z": 120.735
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": 15,
+        "z": 124.2
+       }
+      }
+     ],
+     "displacement_m": 3.465,
+     "defeat": false
+    },
+    "after": {
+     "combat": {
+      "current": 130,
+      "max": 200
+     },
+     "refills": 0,
+     "collectible": []
+    },
+    "journal": [
+     {
+      "tick": 1384,
+      "t": 69.2,
+      "kind": "REFILL_PICKED",
+      "account": "PLAYER_A",
+      "id": "RF_2",
+      "to": "MAHGIC",
+      "amount": 60,
+      "before": 70,
+      "after": 130
+     }
+    ],
+    "expected": "MAHGIC"
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G09",
+   "id": "full_normal_input_inventory",
+   "pass": true,
+   "detail": {
+    "patch": {
+     "id": "RB_GYM_BEND",
+     "x": -62,
+     "z": 52,
+     "family": "gold",
+     "r": 2.4,
+     "note": "the gym causeway bend, outer verge (≥ 5 m off the lane)"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 200,
+      "max": 200,
+      "regen": 0,
+      "lockout": false,
+      "depleted": false,
+      "lockout_until": 60.1999999999988
+     },
+     "refills": 0,
+     "actor": {
+      "x": -62,
+      "z": 56.2
+     },
+     "fixture_only": true
+    },
+    "spawned": {
+     "id": "RF_3",
+     "x": -62,
+     "z": 53.95,
+     "source": "NODE_RB_GYM_BEND::M5C_desktop_full",
+     "fixture_only": true
+    },
+    "before": {
+     "combat": {
+      "current": 200,
+      "max": 200
+     },
+     "refills": 0
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyW"
+     },
+     "before": {
+      "x": -62,
+      "z": 56.2
+     },
+     "after": {
+      "x": -62,
+      "z": 52.914
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": -62,
+        "z": 56.2
+       }
+      }
+     ],
+     "displacement_m": 3.286,
+     "defeat": false
+    },
+    "after": {
+     "combat": {
+      "current": 200,
+      "max": 200
+     },
+     "refills": 1,
+     "collectible": []
+    },
+    "journal": [
+     {
+      "tick": 1553,
+      "t": 77.65,
+      "kind": "REFILL_PICKED",
+      "account": "PLAYER_A",
+      "id": "RF_3",
+      "to": "INVENTORY",
+      "inventory": 1
+     }
+    ],
+    "expected": "INVENTORY"
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G09",
+   "id": "full_999_normal_input_overflow",
+   "pass": true,
+   "detail": {
+    "patch": {
+     "id": "RB_TOWER_BEND",
+     "x": 52,
+     "z": 30,
+     "family": "blue",
+     "r": 2.2,
+     "note": "the tower causeway bend, outer side"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 200,
+      "max": 200,
+      "regen": 0,
+      "lockout": false,
+      "depleted": false,
+      "lockout_until": 60.1999999999988
+     },
+     "refills": 999,
+     "actor": {
+      "x": 52,
+      "z": 34.2
+     },
+     "fixture_only": true
+    },
+    "spawned": {
+     "id": "RF_4",
+     "x": 52,
+     "z": 31.950000000000003,
+     "source": "NODE_RB_TOWER_BEND::M5C_desktop_full_999",
+     "fixture_only": true
+    },
+    "before": {
+     "combat": {
+      "current": 200,
+      "max": 200
+     },
+     "refills": 999
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyW"
+     },
+     "before": {
+      "x": 52,
+      "z": 34.2
+     },
+     "after": {
+      "x": 52,
+      "z": 30.993
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": 52,
+        "z": 34.2
+       }
+      }
+     ],
+     "displacement_m": 3.207,
+     "defeat": false
+    },
+    "after": {
+     "combat": {
+      "current": 200,
+      "max": 200
+     },
+     "refills": 999,
+     "collectible": [
+      {
+       "id": "RF_4",
+       "kind": "MAHGIC_REFILL",
+       "x": 52,
+       "y": 0.45,
+       "z": 31.95,
+       "age_s": 7.3,
+       "overflow_held": true,
+       "source": "NODE_RB_TOWER_BEND::M5C_desktop_full_999"
+      }
+     ]
+    },
+    "journal": [
+     {
+      "tick": 2099,
+      "t": 104.95,
+      "kind": "REFILL_OVERFLOW_HELD",
+      "account": "PLAYER_A",
+      "id": "RF_4",
+      "drop_kind": "BUSH",
+      "source": "NODE_RB_TOWER_BEND::M5C_desktop_full_999",
+      "inventory": 999,
+      "cap": 999
+     }
+    ],
+    "expected": "OVERFLOW"
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "G09",
+   "id": "funded_equipment_special_via_normal_controls",
+   "pass": false,
+   "detail": {
+    "patch": {
+     "id": "RB_TEMPLE_W",
+     "x": -14,
+     "z": 96,
+     "family": "gold",
+     "r": 2.4,
+     "note": "beside the temple causeway, west verge"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 200,
+      "max": 200,
+      "regen": 0,
+      "lockout": false,
+      "depleted": false,
+      "lockout_until": 60.1999999999988
+     },
+     "refills": 0,
+     "actor": {
+      "x": -14,
+      "z": 100.2
+     },
+     "fixture_only": true
+    },
+    "gear_button": {
+     "x": 47,
+     "y": 68.796875,
+     "w": 26,
+     "h": 24,
+     "visible": true
+    },
+    "manifest_events": [
+     {
+      "tick": 2267,
+      "t": 113.35,
+      "kind": "EQUIP_MANIFEST",
+      "account": "PLAYER_A",
+      "equipment": "DUMBBELL",
+      "count": 2,
+      "cost": 50,
+      "cast_s": 1.1
+     }
+    ],
+    "combat_before": {
+     "current": 200,
+     "max": 200
+    },
+    "combat_after_manifest": {
+     "current": 150,
+     "max": 200
+    },
+    "manifested": [
+     {
+      "id": "EQ_DUMBBELL_5",
+      "kind": "DUMBBELL",
+      "state": "MANIFESTED",
+      "x": -14.35,
+      "y": 1.429,
+      "z": 99.25,
+      "side": -0.35,
+      "idx": 0,
+      "age_s": 0.95,
+      "special": null
+     },
+     {
+      "id": "EQ_DUMBBELL_6",
+      "kind": "DUMBBELL",
+      "state": "MANIFESTED",
+      "x": -13.65,
+      "y": 1.419,
+      "z": 99.25,
+      "side": 0.35,
+      "idx": 1,
+      "age_s": 0.95,
+      "special": null
+     }
+    ],
+    "lock": {
+     "ok": true,
+     "node": "NODE_RB_TEMPLE_W",
+     "attempts": [
+      {
+       "node": {
+        "id": "NODE_RB_TEMPLE_W",
+        "patch": "RB_TEMPLE_W",
+        "x": -14,
+        "z": 96,
+        "y": 0,
+        "family": "gold",
+        "r": 2.4,
+        "hp": 168,
+        "max": 168,
+        "broken": false,
+        "respawn_in_s": null
+       },
+       "screen": {
+        "x": 639.9999999999998,
+        "y": 441.29521100808955,
+        "depth": 0.8764828215665942
+       },
+       "hit": {
+        "id": "other:NODE_RB_TEMPLE_W",
+        "distance": 4.623845872643655
+       },
+       "safe": true,
+       "element": "view"
+      }
+     ],
+     "lock": "NODE_RB_TEMPLE_W"
+    },
+    "mode": {
+     "ok": true,
+     "mode": "SPECIAL_MAGIC",
+     "steps": [
+      {
+       "before": "PHYSICAL",
+       "control": "KeyZ"
+      },
+      {
+       "before": "PHYSICAL_MAGIC",
+       "control": "KeyZ"
+      },
+      {
+       "before": "SPECIAL_MAGIC"
+      }
+     ]
+    },
+    "input": {
+     "source": "CDP_KEYBOARD",
+     "control": "KeyE"
+    },
+    "events": [
+     {
+      "tick": 2359,
+      "t": 117.95,
+      "kind": "ATTACK_FACING",
+      "account": "PLAYER_A",
+      "from": 0,
+      "to": 0,
+      "source": "LOCK"
+     },
+     {
+      "tick": 2379,
+      "t": 118.95,
+      "kind": "R1723_DAMAGE",
+      "by": "PLAYER_A",
+      "on": "NODE_RB_TEMPLE_W",
+      "cast_id": "CAST_PLAYER_A_5",
+      "projectile_id": "E3",
+      "skill": "ATHLETE_X_WAVE",
+      "raw": 240,
+      "applied": 122.4,
+      "guard": null,
+      "components": {
+       "physical": 0,
+       "magical": 144
+      },
+      "periodic": false,
+      "family": null,
+      "discord": false,
+      "curse_source": null,
+      "hp": 45.6,
+      "context": "RESOURCE",
+      "gear_special": true
+     }
+    ],
+    "combat_after": {
+     "current": 126,
+     "max": 200
+    },
+    "damage": [
+     {
+      "tick": 2379,
+      "t": 118.95,
+      "kind": "R1723_DAMAGE",
+      "by": "PLAYER_A",
+      "on": "NODE_RB_TEMPLE_W",
+      "cast_id": "CAST_PLAYER_A_5",
+      "projectile_id": "E3",
+      "skill": "ATHLETE_X_WAVE",
+      "raw": 240,
+      "applied": 122.4,
+      "guard": null,
+      "components": {
+       "physical": 0,
+       "magical": 144
+      },
+      "periodic": false,
+      "family": null,
+      "discord": false,
+      "curse_source": null,
+      "hp": 45.6,
+      "context": "RESOURCE",
+      "gear_special": true
+     }
+    ]
+   }
+  },
+  {
+   "profile": "desktop",
+   "gate": "RUNTIME",
+   "id": "no_unexpected_console_errors",
+   "pass": true,
+   "detail": []
+  },
+  {
+   "profile": "phone",
+   "gate": "BOOT",
+   "id": "world_ready",
+   "pass": true,
+   "detail": {
+    "world": "READY",
+    "restore": true,
+    "veil": true,
+    "gear": true,
+    "room": "FIELD"
+   }
+  },
+  {
+   "profile": "phone",
+   "gate": "G09",
+   "id": "zero_normal_input_bush_hit_and_refill",
+   "pass": false,
+   "detail": {
+    "patch": {
+     "id": "RB_NEXUS_INTRO",
+     "x": 17,
+     "z": 55,
+     "family": "gold",
+     "r": 2.6,
+     "intro": true,
+     "map_label": "MAHGIC CRYSTALS",
+     "note": "owner correction OP09: obvious safe newcomer patch beside the north/temple route, outside the road surface"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 0,
+      "max": 200,
+      "regen": 0,
+      "lockout": true,
+      "depleted": true,
+      "lockout_until": 12.050000000000015
+     },
+     "refills": 0,
+     "actor": {
+      "x": 17,
+      "z": 58.4
+     },
+     "fixture_only": true
+    },
+    "mode": {
+     "ok": true,
+     "mode": "PHYSICAL",
+     "steps": [
+      {
+       "before": "PHYSICAL"
+      }
+     ]
+    },
+    "lock": {
+     "ok": true,
+     "node": "NODE_RB_NEXUS_INTRO",
+     "attempts": [
+      {
+       "node": {
+        "id": "NODE_RB_NEXUS_INTRO",
+        "patch": "RB_NEXUS_INTRO",
+        "x": 17,
+        "z": 55,
+        "y": 0,
+        "family": "gold",
+        "r": 2.6,
+        "hp": 168,
+        "max": 168,
+        "broken": false,
+        "respawn_in_s": null
+       },
+       "screen": {
+        "x": 196.49999999999955,
+        "y": 469.9784634242886,
+        "depth": 0.8764854665148962
+       },
+       "hit": {
+        "id": "other:NODE_RB_NEXUS_INTRO",
+        "distance": 4.471125182840878
+       },
+       "safe": true,
+       "element": "tc-world"
+      }
+     ],
+     "lock": "NODE_RB_NEXUS_INTRO"
+    },
+    "input": {
+     "source": "CDP_TOUCH",
+     "control": "#g-chips .gchip[data-slot=0]",
+     "rect": null
+    },
+    "cast_events": [],
+    "spawned": {
+     "id": "RF_1",
+     "x": 17,
+     "z": 56.15,
+     "source": "NODE_RB_NEXUS_INTRO::M5C_phone_zero",
+     "fixture_only": true
+    },
+    "pickup_motion": {
+     "input": {
+      "source": "CDP_TOUCH",
+      "control": "tc-stickzone",
+      "rect": {
+       "left": 0,
+       "top": 528.234375,
+       "right": 117.890625,
+       "bottom": 852,
+       "w": 117.890625,
+       "h": 323.765625
+      },
+      "vector_px": [
+       0,
+       -72
+      ]
+     },
+     "before": {
+      "x": 17,
+      "z": 58.4
+     },
+     "after": {
+      "x": 16.727,
+      "z": 54.767
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": 17,
+        "z": 58.4
+       }
+      }
+     ],
+     "displacement_m": 3.643,
+     "defeat": false
+    },
+    "pickup_events": [
+     {
+      "tick": 306,
+      "t": 15.3,
+      "kind": "REFILL_PICKED",
+      "account": "PLAYER_A",
+      "id": "RF_1",
+      "to": "MAHGIC",
+      "amount": 60,
+      "before": 0,
+      "after": 60
+     }
+    ],
+    "after_cast": {
+     "combat": {
+      "current": 0,
+      "max": 200
+     }
+    },
+    "after_pickup": {
+     "combat": {
+      "current": 60,
+      "max": 200
+     },
+     "refills": 0
+    }
+   }
+  },
+  {
+   "profile": "phone",
+   "gate": "G09",
+   "id": "partial_normal_input_mahgic",
+   "pass": true,
+   "detail": {
+    "patch": {
+     "id": "RB_TEMPLE_E",
+     "x": 15,
+     "z": 120,
+     "family": "gold",
+     "r": 2.2,
+     "note": "temple causeway, east verge"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 70,
+      "max": 200,
+      "regen": 0,
+      "lockout": false,
+      "depleted": false,
+      "lockout_until": 12.050000000000015
+     },
+     "refills": 0,
+     "actor": {
+      "x": 15,
+      "z": 124.2
+     },
+     "fixture_only": true
+    },
+    "spawned": {
+     "id": "RF_2",
+     "x": 15,
+     "z": 121.95,
+     "source": "NODE_RB_TEMPLE_E::M5C_phone_partial",
+     "fixture_only": true
+    },
+    "before": {
+     "combat": {
+      "current": 70,
+      "max": 200
+     },
+     "refills": 0
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_TOUCH",
+      "control": "tc-stickzone",
+      "rect": {
+       "left": 0,
+       "top": 528.234375,
+       "right": 117.890625,
+       "bottom": 852,
+       "w": 117.890625,
+       "h": 323.765625
+      },
+      "vector_px": [
+       0,
+       -72
+      ]
+     },
+     "before": {
+      "x": 15,
+      "z": 124.2
+     },
+     "after": {
+      "x": 14.727,
+      "z": 120.567
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": 15,
+        "z": 124.2
+       }
+      }
+     ],
+     "displacement_m": 3.643,
+     "defeat": false
+    },
+    "after": {
+     "combat": {
+      "current": 130,
+      "max": 200
+     },
+     "refills": 0,
+     "collectible": []
+    },
+    "journal": [
+     {
+      "tick": 425,
+      "t": 21.25,
+      "kind": "REFILL_PICKED",
+      "account": "PLAYER_A",
+      "id": "RF_2",
+      "to": "MAHGIC",
+      "amount": 60,
+      "before": 70,
+      "after": 130
+     }
+    ],
+    "expected": "MAHGIC"
+   }
+  },
+  {
+   "profile": "phone",
+   "gate": "G09",
+   "id": "full_normal_input_inventory",
+   "pass": true,
+   "detail": {
+    "patch": {
+     "id": "RB_GYM_BEND",
+     "x": -62,
+     "z": 52,
+     "family": "gold",
+     "r": 2.4,
+     "note": "the gym causeway bend, outer verge (≥ 5 m off the lane)"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 200,
+      "max": 200,
+      "regen": 0,
+      "lockout": false,
+      "depleted": false,
+      "lockout_until": 12.050000000000015
+     },
+     "refills": 0,
+     "actor": {
+      "x": -62,
+      "z": 56.2
+     },
+     "fixture_only": true
+    },
+    "spawned": {
+     "id": "RF_3",
+     "x": -62,
+     "z": 53.95,
+     "source": "NODE_RB_GYM_BEND::M5C_phone_full",
+     "fixture_only": true
+    },
+    "before": {
+     "combat": {
+      "current": 200,
+      "max": 200
+     },
+     "refills": 0
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_TOUCH",
+      "control": "tc-stickzone",
+      "rect": {
+       "left": 0,
+       "top": 528.234375,
+       "right": 117.890625,
+       "bottom": 852,
+       "w": 117.890625,
+       "h": 323.765625
+      },
+      "vector_px": [
+       0,
+       -72
+      ]
+     },
+     "before": {
+      "x": -62,
+      "z": 56.2
+     },
+     "after": {
+      "x": -62.287,
+      "z": 52.388
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": -62,
+        "z": 56.2
+       }
+      }
+     ],
+     "displacement_m": 3.823,
+     "defeat": false
+    },
+    "after": {
+     "combat": {
+      "current": 200,
+      "max": 200
+     },
+     "refills": 1,
+     "collectible": []
+    },
+    "journal": [
+     {
+      "tick": 541,
+      "t": 27.05,
+      "kind": "REFILL_PICKED",
+      "account": "PLAYER_A",
+      "id": "RF_3",
+      "to": "INVENTORY",
+      "inventory": 1
+     }
+    ],
+    "expected": "INVENTORY"
+   }
+  },
+  {
+   "profile": "phone",
+   "gate": "G09",
+   "id": "full_999_normal_input_overflow",
+   "pass": true,
+   "detail": {
+    "patch": {
+     "id": "RB_TOWER_BEND",
+     "x": 52,
+     "z": 30,
+     "family": "blue",
+     "r": 2.2,
+     "note": "the tower causeway bend, outer side"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 200,
+      "max": 200,
+      "regen": 0,
+      "lockout": false,
+      "depleted": false,
+      "lockout_until": 12.050000000000015
+     },
+     "refills": 999,
+     "actor": {
+      "x": 52,
+      "z": 34.2
+     },
+     "fixture_only": true
+    },
+    "spawned": {
+     "id": "RF_4",
+     "x": 52,
+     "z": 31.950000000000003,
+     "source": "NODE_RB_TOWER_BEND::M5C_phone_full_999",
+     "fixture_only": true
+    },
+    "before": {
+     "combat": {
+      "current": 200,
+      "max": 200
+     },
+     "refills": 999
+    },
+    "motion": {
+     "input": {
+      "source": "CDP_TOUCH",
+      "control": "tc-stickzone",
+      "rect": {
+       "left": 0,
+       "top": 528.234375,
+       "right": 117.890625,
+       "bottom": 852,
+       "w": 117.890625,
+       "h": 323.765625
+      },
+      "vector_px": [
+       0,
+       -72
+      ]
+     },
+     "before": {
+      "x": 52,
+      "z": 34.2
+     },
+     "after": {
+      "x": 51.727,
+      "z": 30.567
+     },
+     "samples": [
+      {
+       "t_ms": 0,
+       "position": {
+        "x": 52,
+        "z": 34.2
+       }
+      }
+     ],
+     "displacement_m": 3.643,
+     "defeat": false
+    },
+    "after": {
+     "combat": {
+      "current": 200,
+      "max": 200
+     },
+     "refills": 999,
+     "collectible": [
+      {
+       "id": "RF_4",
+       "kind": "MAHGIC_REFILL",
+       "x": 52,
+       "y": 0.45,
+       "z": 31.95,
+       "age_s": 3.4,
+       "overflow_held": true,
+       "source": "NODE_RB_TOWER_BEND::M5C_phone_full_999"
+      }
+     ]
+    },
+    "journal": [
+     {
+      "tick": 656,
+      "t": 32.8,
+      "kind": "REFILL_OVERFLOW_HELD",
+      "account": "PLAYER_A",
+      "id": "RF_4",
+      "drop_kind": "BUSH",
+      "source": "NODE_RB_TOWER_BEND::M5C_phone_full_999",
+      "inventory": 999,
+      "cap": 999
+     }
+    ],
+    "expected": "OVERFLOW"
+   }
+  },
+  {
+   "profile": "phone",
+   "gate": "G09",
+   "id": "funded_equipment_special_via_normal_controls",
+   "pass": false,
+   "detail": {
+    "patch": {
+     "id": "RB_TEMPLE_W",
+     "x": -14,
+     "z": 96,
+     "family": "gold",
+     "r": 2.4,
+     "note": "beside the temple causeway, west verge"
+    },
+    "fixture": {
+     "combat": {
+      "id": "COMBAT_R1723",
+      "current": 200,
+      "max": 200,
+      "regen": 0,
+      "lockout": false,
+      "depleted": false,
+      "lockout_until": 12.050000000000015
+     },
+     "refills": 0,
+     "actor": {
+      "x": -14,
+      "z": 100.2
+     },
+     "fixture_only": true
+    },
+    "gear_button": {
+     "x": 29,
+     "y": 66.796875,
+     "w": 26,
+     "h": 24,
+     "visible": true
+    },
+    "manifest_events": [
+     {
+      "tick": 739,
+      "t": 36.95,
+      "kind": "EQUIP_MANIFEST",
+      "account": "PLAYER_A",
+      "equipment": "DUMBBELL",
+      "count": 2,
+      "cost": 50,
+      "cast_s": 1.1
+     }
+    ],
+    "combat_before": {
+     "current": 200,
+     "max": 200
+    },
+    "combat_after_manifest": {
+     "current": 150,
+     "max": 200
+    },
+    "manifested": [
+     {
+      "id": "EQ_DUMBBELL_5",
+      "kind": "DUMBBELL",
+      "state": "MANIFESTED",
+      "x": -14.35,
+      "y": 1.474,
+      "z": 99.25,
+      "side": -0.35,
+      "idx": 0,
+      "age_s": 1.1,
+      "special": null
+     },
+     {
+      "id": "EQ_DUMBBELL_6",
+      "kind": "DUMBBELL",
+      "state": "MANIFESTED",
+      "x": -13.65,
+      "y": 1.479,
+      "z": 99.25,
+      "side": 0.35,
+      "idx": 1,
+      "age_s": 1.1,
+      "special": null
+     }
+    ],
+    "lock": {
+     "ok": true,
+     "node": "NODE_RB_TEMPLE_W",
+     "attempts": [
+      {
+       "node": {
+        "id": "NODE_RB_TEMPLE_W",
+        "patch": "RB_TEMPLE_W",
+        "x": -14,
+        "z": 96,
+        "y": 0,
+        "family": "gold",
+        "r": 2.4,
+        "hp": 168,
+        "max": 168,
+        "broken": false,
+        "respawn_in_s": null
+       },
+       "screen": {
+        "x": 196.49999999999977,
+        "y": 469.97939972361536,
+        "depth": 0.8764828215665942
+       },
+       "hit": {
+        "id": "other:NODE_RB_TEMPLE_W",
+        "distance": 4.623845872643655
+       },
+       "safe": true,
+       "element": "tc-world"
+      }
+     ],
+     "lock": "NODE_RB_TEMPLE_W"
+    },
+    "mode": {
+     "ok": true,
+     "mode": "SPECIAL_MAGIC",
+     "steps": [
+      {
+       "before": "PHYSICAL",
+       "control": {
+        "x": 239,
+        "y": 773,
+        "w": 92,
+        "h": 26,
+        "visible": true
+       }
+      },
+      {
+       "before": "PHYSICAL_MAGIC",
+       "control": {
+        "x": 239,
+        "y": 773,
+        "w": 92,
+        "h": 26,
+        "visible": true
+       }
+      },
+      {
+       "before": "SPECIAL_MAGIC"
+      }
+     ]
+    },
+    "input": {
+     "source": "CDP_TOUCH",
+     "control": "#g-chips .gchip[data-slot=0]",
+     "rect": null
+    },
+    "events": [],
+    "combat_after": {
+     "current": 150,
+     "max": 200
+    },
+    "damage": []
+   }
+  },
+  {
+   "profile": "phone",
+   "gate": "RUNTIME",
+   "id": "no_unexpected_console_errors",
+   "pass": true,
+   "detail": []
+  }
+ ],
+ "profiles": {
+  "desktop": {
+   "emulation": "1280x800 desktop",
+   "full_gates": true,
+   "input_events": [
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyW",
+     "at": "2026-09-23T17:26:18.004Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyW",
+     "at": "2026-09-23T17:26:24.054Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyW",
+     "at": "2026-09-23T17:26:27.583Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyW",
+     "at": "2026-09-23T17:26:34.237Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyW",
+     "at": "2026-09-23T17:26:36.341Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyW",
+     "at": "2026-09-23T17:26:39.499Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyW",
+     "at": "2026-09-23T17:26:42.224Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyW",
+     "at": "2026-09-23T17:26:47.175Z"
+    },
+    {
+     "type": "MOUSE_CLICK",
+     "x": 640,
+     "y": 441.3
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyE",
+     "at": "2026-09-23T17:27:06.279Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyE",
+     "at": "2026-09-23T17:27:06.365Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyW",
+     "at": "2026-09-23T17:27:08.120Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyW",
+     "at": "2026-09-23T17:27:09.187Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyW",
+     "at": "2026-09-23T17:27:13.610Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyW",
+     "at": "2026-09-23T17:27:14.700Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyW",
+     "at": "2026-09-23T17:27:22.096Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyW",
+     "at": "2026-09-23T17:27:23.328Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyW",
+     "at": "2026-09-23T17:27:50.180Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyW",
+     "at": "2026-09-23T17:27:51.245Z"
+    },
+    {
+     "type": "MOUSE_CLICK",
+     "x": 47,
+     "y": 68.8
+    },
+    {
+     "type": "MOUSE_CLICK",
+     "x": 640,
+     "y": 441.3
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyZ",
+     "at": "2026-09-23T17:28:02.574Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyZ",
+     "at": "2026-09-23T17:28:02.679Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyZ",
+     "at": "2026-09-23T17:28:03.142Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyZ",
+     "at": "2026-09-23T17:28:03.273Z"
+    },
+    {
+     "type": "KEY_DOWN",
+     "code": "KeyE",
+     "at": "2026-09-23T17:28:03.738Z"
+    },
+    {
+     "type": "KEY_UP",
+     "code": "KeyE",
+     "at": "2026-09-23T17:28:03.829Z"
+    }
+   ],
+   "g01": {
+    "point": [
+     -40,
+     40
+    ],
+    "routes": [
+     "CW_GYM",
+     "RP_FOREST_W"
+    ],
+    "states": {
+     "DAY": {
+      "render": {
+       "time": "DAY",
+       "cores": true,
+       "frames": true,
+       "seams": true,
+       "core_material": {
+        "transparent": false,
+        "opacity": 1,
+        "depthWrite": true,
+        "program": "mahworld_path_core_owned"
+       },
+       "ground": 0
+      },
+      "motion": {
+       "input": {
+        "source": "CDP_KEYBOARD",
+        "control": "KeyW"
+       },
+       "before": {
+        "x": -40,
+        "z": 46.2
+       },
+       "after": {
+        "x": -40,
+        "z": 24.675
+       },
+       "samples": [
+        {
+         "t_ms": 0,
+         "position": {
+          "x": -40,
+          "z": 46.2
+         }
+        },
+        {
+         "t_ms": 500,
+         "position": {
+          "x": -40,
+          "z": 44.602
+         },
+         "mahloco": "FUSED_GLIDE",
+         "touch": null
+        },
+        {
+         "t_ms": 1000,
+         "position": {
+          "x": -40,
+          "z": 40.311
+         },
+         "mahloco": "FUSED_GLIDE",
+         "touch": null
+        },
+        {
+         "t_ms": 1500,
+         "position": {
+          "x": -40,
+          "z": 34.588
+         },
+         "mahloco": "FUSED_GLIDE",
+         "touch": null
+        }
+       ],
+       "displacement_m": 21.525,
+       "defeat": false
+      }
+     },
+     "NIGHT": {
+      "render": {
+       "time": "NIGHT",
+       "cores": true,
+       "frames": true,
+       "seams": true,
+       "core_material": {
+        "transparent": false,
+        "opacity": 1,
+        "depthWrite": true,
+        "program": "mahworld_path_core_owned"
+       },
+       "ground": 0
+      },
+      "motion": {
+       "input": {
+        "source": "CDP_KEYBOARD",
+        "control": "KeyW"
+       },
+       "before": {
+        "x": -40,
+        "z": 46.2
+       },
+       "after": {
+        "x": -40,
+        "z": 22.529
+       },
+       "samples": [
+        {
+         "t_ms": 0,
+         "position": {
+          "x": -40,
+          "z": 46.2
+         }
+        },
+        {
+         "t_ms": 500,
+         "position": {
+          "x": -40,
+          "z": 44.781
+         },
+         "mahloco": "FUSED_GLIDE",
+         "touch": null
+        },
+        {
+         "t_ms": 1000,
+         "position": {
+          "x": -40,
+          "z": 38.165
+         },
+         "mahloco": "FUSED_GLIDE",
+         "touch": null
+        },
+        {
+         "t_ms": 1500,
+         "position": {
+          "x": -40,
+          "z": 30.476
+         },
+         "mahloco": "FUSED_GLIDE",
+         "touch": null
+        }
+       ],
+       "displacement_m": 23.671,
+       "defeat": false
+      }
+     }
+    },
+    "render_truth": {
+     "time": "DAY",
+     "cores": true,
+     "frames": true,
+     "seams": true,
+     "core_material": {
+      "transparent": false,
+      "opacity": 1,
+      "depthWrite": true,
+      "program": "mahworld_path_core_owned"
+     },
+     "ground": 0
+    }
+   },
+   "g02": {
+    "ridge": {
+     "shape": "RIDGE_NEAR_FACE_S019_T0_B000_P00",
+     "motion": {
+      "input": {
+       "source": "CDP_KEYBOARD",
+       "control": "KeyW"
+      },
+      "before": {
+       "x": 204.748,
+       "z": 220.671
+      },
+      "after": {
+       "x": 197.437,
+       "z": 224.875
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": 204.748,
+         "z": 220.671
+        }
+       },
+       {
+        "t_ms": 1100,
+        "position": {
+         "x": 202.445,
+         "z": 222.175
+        },
+        "mahloco": "FUSED_GLIDE",
+        "touch": null
+       },
+       {
+        "t_ms": 2200,
+        "position": {
+         "x": 198.553,
+         "z": 224.089
+        },
+        "mahloco": "FUSED_GLIDE",
+        "touch": null
+       }
+      ],
+      "displacement_m": 8.434,
+      "defeat": false
+     },
+     "blocker": {
+      "id": "RIDGE_NEAR_FACE_S018_T1_B000_P00",
+      "type": "BOX",
+      "h": 3.792,
+      "y0": 0,
+      "x1": 195.454,
+      "x2": 203.265,
+      "z1": 225.305,
+      "z2": 230.452
+     }
+    },
+    "monolith": {
+     "shape": "VISIONARY_SANCTUARY_MONOLITH0",
+     "motion": {
+      "input": {
+       "source": "CDP_KEYBOARD",
+       "control": "KeyW"
+      },
+      "before": {
+       "x": -120,
+       "z": 4.06
+      },
+      "after": {
+       "x": -120,
+       "z": 1.677
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": -120,
+         "z": 4.06
+        }
+       },
+       {
+        "t_ms": 1050,
+        "position": {
+         "x": -120,
+         "z": 1.677
+        },
+        "mahloco": "FUSED_GLIDE",
+        "touch": null
+       },
+       {
+        "t_ms": 2100,
+        "position": {
+         "x": -120,
+         "z": 1.677
+        },
+        "mahloco": "FUSED_GLIDE",
+        "touch": null
+       }
+      ],
+      "displacement_m": 2.383,
+      "defeat": false
+     },
+     "blocker": {
+      "id": "VISIONARY_SANCTUARY_MONOLITH0",
+      "type": "CYLINDER",
+      "h": 6.65,
+      "x": -120,
+      "z": 0,
+      "r": 1.26
+     }
+    },
+    "titan_pass": {
+     "samples": [
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 39.575
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 42.593
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 46.616
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 50.304
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 76.456
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 80.144
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 83.497
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 85.74
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 87.885
+       },
+       "defeat": false
+      },
+      {
+       "done": false,
+       "result": null,
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 88.143
+       },
+       "defeat": false
+      },
+      {
+       "done": true,
+       "result": {
+        "reached": true,
+        "passes": 1
+       },
+       "error": null,
+       "position": {
+        "x": 150,
+        "z": 88.143
+       },
+       "defeat": false
+      }
+     ],
+     "centre_blocker": null
+    }
+   },
+   "g09": {
+    "zero": {
+     "patch": {
+      "id": "RB_NEXUS_INTRO",
+      "x": 17,
+      "z": 55,
+      "family": "gold",
+      "r": 2.6,
+      "intro": true,
+      "map_label": "MAHGIC CRYSTALS",
+      "note": "owner correction OP09: obvious safe newcomer patch beside the north/temple route, outside the road surface"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 0,
+       "max": 200,
+       "regen": 0,
+       "lockout": true,
+       "depleted": true,
+       "lockout_until": 60.1999999999988
+      },
+      "refills": 0,
+      "actor": {
+       "x": 17,
+       "z": 58.4
+      },
+      "fixture_only": true
+     },
+     "mode": {
+      "ok": true,
+      "mode": "PHYSICAL",
+      "steps": [
+       {
+        "before": "PHYSICAL"
+       }
+      ]
+     },
+     "lock": {
+      "ok": true,
+      "node": "NODE_RB_NEXUS_INTRO",
+      "attempts": [
+       {
+        "node": {
+         "id": "NODE_RB_NEXUS_INTRO",
+         "patch": "RB_NEXUS_INTRO",
+         "x": 17,
+         "z": 55,
+         "y": 0,
+         "family": "gold",
+         "r": 2.6,
+         "hp": 168,
+         "max": 168,
+         "broken": false,
+         "respawn_in_s": null
+        },
+        "screen": {
+         "x": 640,
+         "y": 441.29520751994056,
+         "depth": 0.8764828320607415
+        },
+        "hit": {
+         "id": "other:NODE_RB_NEXUS_INTRO",
+         "distance": 4.470987952187225
+        },
+        "safe": true,
+        "element": "view"
+       }
+      ],
+      "lock": "NODE_RB_NEXUS_INTRO"
+     },
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyE"
+     },
+     "cast_events": [
+      {
+       "tick": 1229,
+       "t": 61.45,
+       "kind": "ATTACK_FACING",
+       "account": "PLAYER_A",
+       "from": 0,
+       "to": 0,
+       "source": "LOCK"
+      }
+     ],
+     "spawned": {
+      "id": "RF_1",
+      "x": 17,
+      "z": 56.15,
+      "source": "NODE_RB_NEXUS_INTRO::M5C_desktop_zero",
+      "fixture_only": true
+     },
+     "pickup_motion": {
+      "input": {
+       "source": "CDP_KEYBOARD",
+       "control": "KeyW"
+      },
+      "before": {
+       "x": 17,
+       "z": 58.4
+      },
+      "after": {
+       "x": 17,
+       "z": 54.756
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": 17,
+         "z": 58.4
+        }
+       }
+      ],
+      "displacement_m": 3.644,
+      "defeat": false
+     },
+     "pickup_events": [
+      {
+       "tick": 1273,
+       "t": 63.65,
+       "kind": "REFILL_PICKED",
+       "account": "PLAYER_A",
+       "id": "RF_1",
+       "to": "MAHGIC",
+       "amount": 60,
+       "before": 0,
+       "after": 60
+      }
+     ],
+     "after_cast": {
+      "combat": {
+       "current": 0,
+       "max": 200
+      }
+     },
+     "after_pickup": {
+      "combat": {
+       "current": 60,
+       "max": 200
+      },
+      "refills": 0
+     }
+    },
+    "partial": {
+     "patch": {
+      "id": "RB_TEMPLE_E",
+      "x": 15,
+      "z": 120,
+      "family": "gold",
+      "r": 2.2,
+      "note": "temple causeway, east verge"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 70,
+       "max": 200,
+       "regen": 0,
+       "lockout": false,
+       "depleted": false,
+       "lockout_until": 60.1999999999988
+      },
+      "refills": 0,
+      "actor": {
+       "x": 15,
+       "z": 124.2
+      },
+      "fixture_only": true
+     },
+     "spawned": {
+      "id": "RF_2",
+      "x": 15,
+      "z": 121.95,
+      "source": "NODE_RB_TEMPLE_E::M5C_desktop_partial",
+      "fixture_only": true
+     },
+     "before": {
+      "combat": {
+       "current": 70,
+       "max": 200
+      },
+      "refills": 0
+     },
+     "motion": {
+      "input": {
+       "source": "CDP_KEYBOARD",
+       "control": "KeyW"
+      },
+      "before": {
+       "x": 15,
+       "z": 124.2
+      },
+      "after": {
+       "x": 15,
+       "z": 120.735
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": 15,
+         "z": 124.2
+        }
+       }
+      ],
+      "displacement_m": 3.465,
+      "defeat": false
+     },
+     "after": {
+      "combat": {
+       "current": 130,
+       "max": 200
+      },
+      "refills": 0,
+      "collectible": []
+     },
+     "journal": [
+      {
+       "tick": 1384,
+       "t": 69.2,
+       "kind": "REFILL_PICKED",
+       "account": "PLAYER_A",
+       "id": "RF_2",
+       "to": "MAHGIC",
+       "amount": 60,
+       "before": 70,
+       "after": 130
+      }
+     ],
+     "expected": "MAHGIC"
+    },
+    "full": {
+     "patch": {
+      "id": "RB_GYM_BEND",
+      "x": -62,
+      "z": 52,
+      "family": "gold",
+      "r": 2.4,
+      "note": "the gym causeway bend, outer verge (≥ 5 m off the lane)"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 200,
+       "max": 200,
+       "regen": 0,
+       "lockout": false,
+       "depleted": false,
+       "lockout_until": 60.1999999999988
+      },
+      "refills": 0,
+      "actor": {
+       "x": -62,
+       "z": 56.2
+      },
+      "fixture_only": true
+     },
+     "spawned": {
+      "id": "RF_3",
+      "x": -62,
+      "z": 53.95,
+      "source": "NODE_RB_GYM_BEND::M5C_desktop_full",
+      "fixture_only": true
+     },
+     "before": {
+      "combat": {
+       "current": 200,
+       "max": 200
+      },
+      "refills": 0
+     },
+     "motion": {
+      "input": {
+       "source": "CDP_KEYBOARD",
+       "control": "KeyW"
+      },
+      "before": {
+       "x": -62,
+       "z": 56.2
+      },
+      "after": {
+       "x": -62,
+       "z": 52.914
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": -62,
+         "z": 56.2
+        }
+       }
+      ],
+      "displacement_m": 3.286,
+      "defeat": false
+     },
+     "after": {
+      "combat": {
+       "current": 200,
+       "max": 200
+      },
+      "refills": 1,
+      "collectible": []
+     },
+     "journal": [
+      {
+       "tick": 1553,
+       "t": 77.65,
+       "kind": "REFILL_PICKED",
+       "account": "PLAYER_A",
+       "id": "RF_3",
+       "to": "INVENTORY",
+       "inventory": 1
+      }
+     ],
+     "expected": "INVENTORY"
+    },
+    "full_999": {
+     "patch": {
+      "id": "RB_TOWER_BEND",
+      "x": 52,
+      "z": 30,
+      "family": "blue",
+      "r": 2.2,
+      "note": "the tower causeway bend, outer side"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 200,
+       "max": 200,
+       "regen": 0,
+       "lockout": false,
+       "depleted": false,
+       "lockout_until": 60.1999999999988
+      },
+      "refills": 999,
+      "actor": {
+       "x": 52,
+       "z": 34.2
+      },
+      "fixture_only": true
+     },
+     "spawned": {
+      "id": "RF_4",
+      "x": 52,
+      "z": 31.950000000000003,
+      "source": "NODE_RB_TOWER_BEND::M5C_desktop_full_999",
+      "fixture_only": true
+     },
+     "before": {
+      "combat": {
+       "current": 200,
+       "max": 200
+      },
+      "refills": 999
+     },
+     "motion": {
+      "input": {
+       "source": "CDP_KEYBOARD",
+       "control": "KeyW"
+      },
+      "before": {
+       "x": 52,
+       "z": 34.2
+      },
+      "after": {
+       "x": 52,
+       "z": 30.993
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": 52,
+         "z": 34.2
+        }
+       }
+      ],
+      "displacement_m": 3.207,
+      "defeat": false
+     },
+     "after": {
+      "combat": {
+       "current": 200,
+       "max": 200
+      },
+      "refills": 999,
+      "collectible": [
+       {
+        "id": "RF_4",
+        "kind": "MAHGIC_REFILL",
+        "x": 52,
+        "y": 0.45,
+        "z": 31.95,
+        "age_s": 7.3,
+        "overflow_held": true,
+        "source": "NODE_RB_TOWER_BEND::M5C_desktop_full_999"
+       }
+      ]
+     },
+     "journal": [
+      {
+       "tick": 2099,
+       "t": 104.95,
+       "kind": "REFILL_OVERFLOW_HELD",
+       "account": "PLAYER_A",
+       "id": "RF_4",
+       "drop_kind": "BUSH",
+       "source": "NODE_RB_TOWER_BEND::M5C_desktop_full_999",
+       "inventory": 999,
+       "cap": 999
+      }
+     ],
+     "expected": "OVERFLOW"
+    },
+    "funded_equipment_special": {
+     "patch": {
+      "id": "RB_TEMPLE_W",
+      "x": -14,
+      "z": 96,
+      "family": "gold",
+      "r": 2.4,
+      "note": "beside the temple causeway, west verge"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 200,
+       "max": 200,
+       "regen": 0,
+       "lockout": false,
+       "depleted": false,
+       "lockout_until": 60.1999999999988
+      },
+      "refills": 0,
+      "actor": {
+       "x": -14,
+       "z": 100.2
+      },
+      "fixture_only": true
+     },
+     "gear_button": {
+      "x": 47,
+      "y": 68.796875,
+      "w": 26,
+      "h": 24,
+      "visible": true
+     },
+     "manifest_events": [
+      {
+       "tick": 2267,
+       "t": 113.35,
+       "kind": "EQUIP_MANIFEST",
+       "account": "PLAYER_A",
+       "equipment": "DUMBBELL",
+       "count": 2,
+       "cost": 50,
+       "cast_s": 1.1
+      }
+     ],
+     "combat_before": {
+      "current": 200,
+      "max": 200
+     },
+     "combat_after_manifest": {
+      "current": 150,
+      "max": 200
+     },
+     "manifested": [
+      {
+       "id": "EQ_DUMBBELL_5",
+       "kind": "DUMBBELL",
+       "state": "MANIFESTED",
+       "x": -14.35,
+       "y": 1.429,
+       "z": 99.25,
+       "side": -0.35,
+       "idx": 0,
+       "age_s": 0.95,
+       "special": null
+      },
+      {
+       "id": "EQ_DUMBBELL_6",
+       "kind": "DUMBBELL",
+       "state": "MANIFESTED",
+       "x": -13.65,
+       "y": 1.419,
+       "z": 99.25,
+       "side": 0.35,
+       "idx": 1,
+       "age_s": 0.95,
+       "special": null
+      }
+     ],
+     "lock": {
+      "ok": true,
+      "node": "NODE_RB_TEMPLE_W",
+      "attempts": [
+       {
+        "node": {
+         "id": "NODE_RB_TEMPLE_W",
+         "patch": "RB_TEMPLE_W",
+         "x": -14,
+         "z": 96,
+         "y": 0,
+         "family": "gold",
+         "r": 2.4,
+         "hp": 168,
+         "max": 168,
+         "broken": false,
+         "respawn_in_s": null
+        },
+        "screen": {
+         "x": 639.9999999999998,
+         "y": 441.29521100808955,
+         "depth": 0.8764828215665942
+        },
+        "hit": {
+         "id": "other:NODE_RB_TEMPLE_W",
+         "distance": 4.623845872643655
+        },
+        "safe": true,
+        "element": "view"
+       }
+      ],
+      "lock": "NODE_RB_TEMPLE_W"
+     },
+     "mode": {
+      "ok": true,
+      "mode": "SPECIAL_MAGIC",
+      "steps": [
+       {
+        "before": "PHYSICAL",
+        "control": "KeyZ"
+       },
+       {
+        "before": "PHYSICAL_MAGIC",
+        "control": "KeyZ"
+       },
+       {
+        "before": "SPECIAL_MAGIC"
+       }
+      ]
+     },
+     "input": {
+      "source": "CDP_KEYBOARD",
+      "control": "KeyE"
+     },
+     "events": [
+      {
+       "tick": 2359,
+       "t": 117.95,
+       "kind": "ATTACK_FACING",
+       "account": "PLAYER_A",
+       "from": 0,
+       "to": 0,
+       "source": "LOCK"
+      },
+      {
+       "tick": 2379,
+       "t": 118.95,
+       "kind": "R1723_DAMAGE",
+       "by": "PLAYER_A",
+       "on": "NODE_RB_TEMPLE_W",
+       "cast_id": "CAST_PLAYER_A_5",
+       "projectile_id": "E3",
+       "skill": "ATHLETE_X_WAVE",
+       "raw": 240,
+       "applied": 122.4,
+       "guard": null,
+       "components": {
+        "physical": 0,
+        "magical": 144
+       },
+       "periodic": false,
+       "family": null,
+       "discord": false,
+       "curse_source": null,
+       "hp": 45.6,
+       "context": "RESOURCE",
+       "gear_special": true
+      }
+     ],
+     "combat_after": {
+      "current": 126,
+      "max": 200
+     },
+     "damage": [
+      {
+       "tick": 2379,
+       "t": 118.95,
+       "kind": "R1723_DAMAGE",
+       "by": "PLAYER_A",
+       "on": "NODE_RB_TEMPLE_W",
+       "cast_id": "CAST_PLAYER_A_5",
+       "projectile_id": "E3",
+       "skill": "ATHLETE_X_WAVE",
+       "raw": 240,
+       "applied": 122.4,
+       "guard": null,
+       "components": {
+        "physical": 0,
+        "magical": 144
+       },
+       "periodic": false,
+       "family": null,
+       "discord": false,
+       "curse_source": null,
+       "hp": 45.6,
+       "context": "RESOURCE",
+       "gear_special": true
+      }
+     ]
+    }
+   },
+   "console_errors": []
+  },
+  "phone": {
+   "emulation": "393x852 @2x touch emulation",
+   "full_gates": false,
+   "input_events": [
+    {
+     "type": "TOUCH_TAP",
+     "x": 196.5,
+     "y": 470
+    },
+    {
+     "type": "TOUCH_STICK_FORWARD_START",
+     "x": 56.6,
+     "y0": 760,
+     "y1": 688
+    },
+    {
+     "type": "TOUCH_STICK_END"
+    },
+    {
+     "type": "TOUCH_STICK_FORWARD_START",
+     "x": 56.6,
+     "y0": 760,
+     "y1": 688
+    },
+    {
+     "type": "TOUCH_STICK_END"
+    },
+    {
+     "type": "TOUCH_STICK_FORWARD_START",
+     "x": 56.6,
+     "y0": 760,
+     "y1": 688
+    },
+    {
+     "type": "TOUCH_STICK_END"
+    },
+    {
+     "type": "TOUCH_STICK_FORWARD_START",
+     "x": 56.6,
+     "y0": 760,
+     "y1": 688
+    },
+    {
+     "type": "TOUCH_STICK_END"
+    },
+    {
+     "type": "TOUCH_TAP",
+     "x": 29,
+     "y": 66.8
+    },
+    {
+     "type": "TOUCH_TAP",
+     "x": 196.5,
+     "y": 470
+    },
+    {
+     "type": "TOUCH_TAP",
+     "x": 239,
+     "y": 773
+    },
+    {
+     "type": "TOUCH_TAP",
+     "x": 239,
+     "y": 773
+    }
+   ],
+   "g01": null,
+   "g02": null,
+   "g09": {
+    "zero": {
+     "patch": {
+      "id": "RB_NEXUS_INTRO",
+      "x": 17,
+      "z": 55,
+      "family": "gold",
+      "r": 2.6,
+      "intro": true,
+      "map_label": "MAHGIC CRYSTALS",
+      "note": "owner correction OP09: obvious safe newcomer patch beside the north/temple route, outside the road surface"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 0,
+       "max": 200,
+       "regen": 0,
+       "lockout": true,
+       "depleted": true,
+       "lockout_until": 12.050000000000015
+      },
+      "refills": 0,
+      "actor": {
+       "x": 17,
+       "z": 58.4
+      },
+      "fixture_only": true
+     },
+     "mode": {
+      "ok": true,
+      "mode": "PHYSICAL",
+      "steps": [
+       {
+        "before": "PHYSICAL"
+       }
+      ]
+     },
+     "lock": {
+      "ok": true,
+      "node": "NODE_RB_NEXUS_INTRO",
+      "attempts": [
+       {
+        "node": {
+         "id": "NODE_RB_NEXUS_INTRO",
+         "patch": "RB_NEXUS_INTRO",
+         "x": 17,
+         "z": 55,
+         "y": 0,
+         "family": "gold",
+         "r": 2.6,
+         "hp": 168,
+         "max": 168,
+         "broken": false,
+         "respawn_in_s": null
+        },
+        "screen": {
+         "x": 196.49999999999955,
+         "y": 469.9784634242886,
+         "depth": 0.8764854665148962
+        },
+        "hit": {
+         "id": "other:NODE_RB_NEXUS_INTRO",
+         "distance": 4.471125182840878
+        },
+        "safe": true,
+        "element": "tc-world"
+       }
+      ],
+      "lock": "NODE_RB_NEXUS_INTRO"
+     },
+     "input": {
+      "source": "CDP_TOUCH",
+      "control": "#g-chips .gchip[data-slot=0]",
+      "rect": null
+     },
+     "cast_events": [],
+     "spawned": {
+      "id": "RF_1",
+      "x": 17,
+      "z": 56.15,
+      "source": "NODE_RB_NEXUS_INTRO::M5C_phone_zero",
+      "fixture_only": true
+     },
+     "pickup_motion": {
+      "input": {
+       "source": "CDP_TOUCH",
+       "control": "tc-stickzone",
+       "rect": {
+        "left": 0,
+        "top": 528.234375,
+        "right": 117.890625,
+        "bottom": 852,
+        "w": 117.890625,
+        "h": 323.765625
+       },
+       "vector_px": [
+        0,
+        -72
+       ]
+      },
+      "before": {
+       "x": 17,
+       "z": 58.4
+      },
+      "after": {
+       "x": 16.727,
+       "z": 54.767
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": 17,
+         "z": 58.4
+        }
+       }
+      ],
+      "displacement_m": 3.643,
+      "defeat": false
+     },
+     "pickup_events": [
+      {
+       "tick": 306,
+       "t": 15.3,
+       "kind": "REFILL_PICKED",
+       "account": "PLAYER_A",
+       "id": "RF_1",
+       "to": "MAHGIC",
+       "amount": 60,
+       "before": 0,
+       "after": 60
+      }
+     ],
+     "after_cast": {
+      "combat": {
+       "current": 0,
+       "max": 200
+      }
+     },
+     "after_pickup": {
+      "combat": {
+       "current": 60,
+       "max": 200
+      },
+      "refills": 0
+     }
+    },
+    "partial": {
+     "patch": {
+      "id": "RB_TEMPLE_E",
+      "x": 15,
+      "z": 120,
+      "family": "gold",
+      "r": 2.2,
+      "note": "temple causeway, east verge"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 70,
+       "max": 200,
+       "regen": 0,
+       "lockout": false,
+       "depleted": false,
+       "lockout_until": 12.050000000000015
+      },
+      "refills": 0,
+      "actor": {
+       "x": 15,
+       "z": 124.2
+      },
+      "fixture_only": true
+     },
+     "spawned": {
+      "id": "RF_2",
+      "x": 15,
+      "z": 121.95,
+      "source": "NODE_RB_TEMPLE_E::M5C_phone_partial",
+      "fixture_only": true
+     },
+     "before": {
+      "combat": {
+       "current": 70,
+       "max": 200
+      },
+      "refills": 0
+     },
+     "motion": {
+      "input": {
+       "source": "CDP_TOUCH",
+       "control": "tc-stickzone",
+       "rect": {
+        "left": 0,
+        "top": 528.234375,
+        "right": 117.890625,
+        "bottom": 852,
+        "w": 117.890625,
+        "h": 323.765625
+       },
+       "vector_px": [
+        0,
+        -72
+       ]
+      },
+      "before": {
+       "x": 15,
+       "z": 124.2
+      },
+      "after": {
+       "x": 14.727,
+       "z": 120.567
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": 15,
+         "z": 124.2
+        }
+       }
+      ],
+      "displacement_m": 3.643,
+      "defeat": false
+     },
+     "after": {
+      "combat": {
+       "current": 130,
+       "max": 200
+      },
+      "refills": 0,
+      "collectible": []
+     },
+     "journal": [
+      {
+       "tick": 425,
+       "t": 21.25,
+       "kind": "REFILL_PICKED",
+       "account": "PLAYER_A",
+       "id": "RF_2",
+       "to": "MAHGIC",
+       "amount": 60,
+       "before": 70,
+       "after": 130
+      }
+     ],
+     "expected": "MAHGIC"
+    },
+    "full": {
+     "patch": {
+      "id": "RB_GYM_BEND",
+      "x": -62,
+      "z": 52,
+      "family": "gold",
+      "r": 2.4,
+      "note": "the gym causeway bend, outer verge (≥ 5 m off the lane)"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 200,
+       "max": 200,
+       "regen": 0,
+       "lockout": false,
+       "depleted": false,
+       "lockout_until": 12.050000000000015
+      },
+      "refills": 0,
+      "actor": {
+       "x": -62,
+       "z": 56.2
+      },
+      "fixture_only": true
+     },
+     "spawned": {
+      "id": "RF_3",
+      "x": -62,
+      "z": 53.95,
+      "source": "NODE_RB_GYM_BEND::M5C_phone_full",
+      "fixture_only": true
+     },
+     "before": {
+      "combat": {
+       "current": 200,
+       "max": 200
+      },
+      "refills": 0
+     },
+     "motion": {
+      "input": {
+       "source": "CDP_TOUCH",
+       "control": "tc-stickzone",
+       "rect": {
+        "left": 0,
+        "top": 528.234375,
+        "right": 117.890625,
+        "bottom": 852,
+        "w": 117.890625,
+        "h": 323.765625
+       },
+       "vector_px": [
+        0,
+        -72
+       ]
+      },
+      "before": {
+       "x": -62,
+       "z": 56.2
+      },
+      "after": {
+       "x": -62.287,
+       "z": 52.388
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": -62,
+         "z": 56.2
+        }
+       }
+      ],
+      "displacement_m": 3.823,
+      "defeat": false
+     },
+     "after": {
+      "combat": {
+       "current": 200,
+       "max": 200
+      },
+      "refills": 1,
+      "collectible": []
+     },
+     "journal": [
+      {
+       "tick": 541,
+       "t": 27.05,
+       "kind": "REFILL_PICKED",
+       "account": "PLAYER_A",
+       "id": "RF_3",
+       "to": "INVENTORY",
+       "inventory": 1
+      }
+     ],
+     "expected": "INVENTORY"
+    },
+    "full_999": {
+     "patch": {
+      "id": "RB_TOWER_BEND",
+      "x": 52,
+      "z": 30,
+      "family": "blue",
+      "r": 2.2,
+      "note": "the tower causeway bend, outer side"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 200,
+       "max": 200,
+       "regen": 0,
+       "lockout": false,
+       "depleted": false,
+       "lockout_until": 12.050000000000015
+      },
+      "refills": 999,
+      "actor": {
+       "x": 52,
+       "z": 34.2
+      },
+      "fixture_only": true
+     },
+     "spawned": {
+      "id": "RF_4",
+      "x": 52,
+      "z": 31.950000000000003,
+      "source": "NODE_RB_TOWER_BEND::M5C_phone_full_999",
+      "fixture_only": true
+     },
+     "before": {
+      "combat": {
+       "current": 200,
+       "max": 200
+      },
+      "refills": 999
+     },
+     "motion": {
+      "input": {
+       "source": "CDP_TOUCH",
+       "control": "tc-stickzone",
+       "rect": {
+        "left": 0,
+        "top": 528.234375,
+        "right": 117.890625,
+        "bottom": 852,
+        "w": 117.890625,
+        "h": 323.765625
+       },
+       "vector_px": [
+        0,
+        -72
+       ]
+      },
+      "before": {
+       "x": 52,
+       "z": 34.2
+      },
+      "after": {
+       "x": 51.727,
+       "z": 30.567
+      },
+      "samples": [
+       {
+        "t_ms": 0,
+        "position": {
+         "x": 52,
+         "z": 34.2
+        }
+       }
+      ],
+      "displacement_m": 3.643,
+      "defeat": false
+     },
+     "after": {
+      "combat": {
+       "current": 200,
+       "max": 200
+      },
+      "refills": 999,
+      "collectible": [
+       {
+        "id": "RF_4",
+        "kind": "MAHGIC_REFILL",
+        "x": 52,
+        "y": 0.45,
+        "z": 31.95,
+        "age_s": 3.4,
+        "overflow_held": true,
+        "source": "NODE_RB_TOWER_BEND::M5C_phone_full_999"
+       }
+      ]
+     },
+     "journal": [
+      {
+       "tick": 656,
+       "t": 32.8,
+       "kind": "REFILL_OVERFLOW_HELD",
+       "account": "PLAYER_A",
+       "id": "RF_4",
+       "drop_kind": "BUSH",
+       "source": "NODE_RB_TOWER_BEND::M5C_phone_full_999",
+       "inventory": 999,
+       "cap": 999
+      }
+     ],
+     "expected": "OVERFLOW"
+    },
+    "funded_equipment_special": {
+     "patch": {
+      "id": "RB_TEMPLE_W",
+      "x": -14,
+      "z": 96,
+      "family": "gold",
+      "r": 2.4,
+      "note": "beside the temple causeway, west verge"
+     },
+     "fixture": {
+      "combat": {
+       "id": "COMBAT_R1723",
+       "current": 200,
+       "max": 200,
+       "regen": 0,
+       "lockout": false,
+       "depleted": false,
+       "lockout_until": 12.050000000000015
+      },
+      "refills": 0,
+      "actor": {
+       "x": -14,
+       "z": 100.2
+      },
+      "fixture_only": true
+     },
+     "gear_button": {
+      "x": 29,
+      "y": 66.796875,
+      "w": 26,
+      "h": 24,
+      "visible": true
+     },
+     "manifest_events": [
+      {
+       "tick": 739,
+       "t": 36.95,
+       "kind": "EQUIP_MANIFEST",
+       "account": "PLAYER_A",
+       "equipment": "DUMBBELL",
+       "count": 2,
+       "cost": 50,
+       "cast_s": 1.1
+      }
+     ],
+     "combat_before": {
+      "current": 200,
+      "max": 200
+     },
+     "combat_after_manifest": {
+      "current": 150,
+      "max": 200
+     },
+     "manifested": [
+      {
+       "id": "EQ_DUMBBELL_5",
+       "kind": "DUMBBELL",
+       "state": "MANIFESTED",
+       "x": -14.35,
+       "y": 1.474,
+       "z": 99.25,
+       "side": -0.35,
+       "idx": 0,
+       "age_s": 1.1,
+       "special": null
+      },
+      {
+       "id": "EQ_DUMBBELL_6",
+       "kind": "DUMBBELL",
+       "state": "MANIFESTED",
+       "x": -13.65,
+       "y": 1.479,
+       "z": 99.25,
+       "side": 0.35,
+       "idx": 1,
+       "age_s": 1.1,
+       "special": null
+      }
+     ],
+     "lock": {
+      "ok": true,
+      "node": "NODE_RB_TEMPLE_W",
+      "attempts": [
+       {
+        "node": {
+         "id": "NODE_RB_TEMPLE_W",
+         "patch": "RB_TEMPLE_W",
+         "x": -14,
+         "z": 96,
+         "y": 0,
+         "family": "gold",
+         "r": 2.4,
+         "hp": 168,
+         "max": 168,
+         "broken": false,
+         "respawn_in_s": null
+        },
+        "screen": {
+         "x": 196.49999999999977,
+         "y": 469.97939972361536,
+         "depth": 0.8764828215665942
+        },
+        "hit": {
+         "id": "other:NODE_RB_TEMPLE_W",
+         "distance": 4.623845872643655
+        },
+        "safe": true,
+        "element": "tc-world"
+       }
+      ],
+      "lock": "NODE_RB_TEMPLE_W"
+     },
+     "mode": {
+      "ok": true,
+      "mode": "SPECIAL_MAGIC",
+      "steps": [
+       {
+        "before": "PHYSICAL",
+        "control": {
+         "x": 239,
+         "y": 773,
+         "w": 92,
+         "h": 26,
+         "visible": true
+        }
+       },
+       {
+        "before": "PHYSICAL_MAGIC",
+        "control": {
+         "x": 239,
+         "y": 773,
+         "w": 92,
+         "h": 26,
+         "visible": true
+        }
+       },
+       {
+        "before": "SPECIAL_MAGIC"
+       }
+      ]
+     },
+     "input": {
+      "source": "CDP_TOUCH",
+      "control": "#g-chips .gchip[data-slot=0]",
+      "rect": null
+     },
+     "events": [],
+     "combat_after": {
+      "current": 150,
+      "max": 200
+     },
+     "damage": []
+    }
+   },
+   "console_errors": []
+  }
+ },
+ "screenshots": [
+  "desktop/g01_day_still.png",
+  "desktop/g01_day_motion_01.png",
+  "desktop/g01_day_motion_02.png",
+  "desktop/g01_day_motion_03.png",
+  "desktop/g01_night_still.png",
+  "desktop/g01_night_motion_01.png",
+  "desktop/g01_night_motion_02.png",
+  "desktop/g01_night_motion_03.png",
+  "desktop/g02_ridge_before.png",
+  "desktop/g02_ridge_motion_01.png",
+  "desktop/g02_ridge_motion_02.png",
+  "desktop/g02_ridge_after.png",
+  "desktop/g02_monolith_before.png",
+  "desktop/g02_monolith_motion_01.png",
+  "desktop/g02_monolith_motion_02.png",
+  "desktop/g02_monolith_after.png",
+  "desktop/g02_titan_pass_start.png",
+  "desktop/g02_titan_pass_motion.png",
+  "desktop/g02_titan_pass_end.png",
+  "desktop/g09_zero_locked_bush.png",
+  "desktop/g09_zero_after_refill.png",
+  "desktop/g09_partial_before.png",
+  "desktop/g09_partial_after.png",
+  "desktop/g09_full_before.png",
+  "desktop/g09_full_after.png",
+  "desktop/g09_full_999_before.png",
+  "desktop/g09_full_999_after.png",
+  "desktop/g09_funded_equipment_special_motion.png",
+  "desktop/g09_funded_equipment_special_after.png",
+  "phone/g09_zero_locked_bush.png",
+  "phone/g09_zero_after_refill.png",
+  "phone/g09_partial_before.png",
+  "phone/g09_partial_after.png",
+  "phone/g09_full_before.png",
+  "phone/g09_full_after.png",
+  "phone/g09_full_999_before.png",
+  "phone/g09_full_999_after.png",
+  "phone/g09_funded_equipment_special_motion.png",
+  "phone/g09_funded_equipment_special_after.png"
+ ],
+ "pass": 13,
+ "fail": 6,
+ "fatal": null,
+ "finished_at": "2026-09-23T17:29:26.126Z",
+ "result": "FAIL"
+}

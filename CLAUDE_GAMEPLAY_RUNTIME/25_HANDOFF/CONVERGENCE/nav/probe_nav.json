@@ -1,0 +1,130 @@
+{
+ "checks": [
+  "PASS N1 spawn: the first view is ONE rear view of his spawn facing (err 0°) and the mode is FREE — not a re-armed rear follow — {\"state\":\"FREE\",\"err\":0,\"mode\":\"free\"}",
+  "PASS N2 heading independence: through forward / right / backward / left / diagonal travel (his facing turned through 5.50 rad) the camera yaw moved 0.00° (≤ 0.5°) — side and front views during ordinary travel are the intended result — {\"maxDev\":0,\"facings\":[0,1.57,3.14,-1.57,0.79,-2.36]}",
+  "PASS N3 drag → ORBIT: the dragged heading (yaw 0.900) is kept on release and through the next travel (yaw 0.900), no return — {\"s3\":\"ORBIT\",\"s3b\":\"ORBIT\"}",
+  "PASS N4 RESET: a smooth one-time reframe (RESET during the glide, then FREE with err 0°) and the heading is independent again — sideways travel afterwards moved the yaw 0.00° — {\"during\":\"RESET\",\"after\":\"FREE\",\"err\":0}",
+  "PASS N5 click-to-move (real mouse click on the canvas): ONE destination accepted (LEVITATE, 1 wp), the class-styled marker shown at the ACCEPTED point, the walker travelled and arrived within 0.5 m in 1203 ms, marker removed; the camera heading did not move (0.00°) — {\"nav\":{\"target\":{\"x\":10.625,\"z\":-0.017,\"y\":0.422},\"mode\":\"LEVITATE\",\"via\":\"CLICK\",\"waypoint\":{\"x\":10.625,\"z\":-0.017},\"waypoints_left\":1,\"remaining_m\":5.41,\"settling\":false,\"snapped\":false},\"arrived\":{\"done\":true,\"moved\":true,\"ms\":1203,\"pos\":{\"x\":10.474,\"z\":-0.017},\"mark\":false},\"diag\":{\"el\":\"view\",\"actor\":null,\"pick\":{\"x\":10.619,\"y\":0.42,\"z\":-0.005,\"distance\":12.5,\"object\":\"Mesh\"},\"suppressed\":false,\"panel\":false,\"guide\":false},\"px\":{\"x\":599.8551062370788,\"y\":326.18529734722875,\"wx\":12.684993628570272,\"wz\":-0.010096674454594215,\"el\":\"view\",\"actor\":null,\"pick\":{\"x\":10.618,\"y\":0.419,\"z\":-0.007,\"distance\":12.5,\"object\":\"Mesh\"}}}",
+  "PASS N6 pointer-down alone does not move (450 ms held: no destination); once the gesture became a LOOK (drag > threshold) the release emitted no move — the camera orbited instead — {\"down\":null,\"afterDrag\":{\"nav\":null,\"cam\":\"ORBIT\"}}",
+  "PASS N7 a click 45 m away is refused OUT_OF_RANGE (range 30 m from the player) with a concise toast and no marker — {\"n7\":{\"nav\":null,\"refused\":{\"reason\":\"OUT_OF_RANGE\",\"detail\":{\"distance_m\":45,\"range_m\":30,\"mode\":\"LEVITATE\"},\"t\":23625.600000023842},\"mark\":false,\"range\":30},\"diag\":null,\"px\":null}",
+  "PASS N8 a click on the sky (camera pitched up, no world geometry under the pointer) has no destination (refused NO_PICK, never guessed at a distance), no marker — {\"nav\":null,\"refused\":{\"reason\":\"NO_PICK\",\"t\":24343.100000023842},\"mark\":false,\"diag\":{\"el\":\"view\",\"actor\":null,\"pick\":null,\"suppressed\":false,\"panel\":false,\"guide\":false},\"px\":{\"x\":300,\"y\":6}}",
+  "PASS N8b a click on a building facade / storey (picked height 2.98 m) is refused TARGET_BLOCKED (ELEVATED) — not snapped to the ground beside the wall, no marker — {\"fac\":{\"x\":18.052,\"y\":2.98,\"z\":-4.553,\"distance\":14.65,\"object\":\"Mesh\"},\"n8b\":{\"nav\":null,\"refused\":{\"reason\":\"TARGET_BLOCKED\",\"detail\":{\"detail\":\"ELEVATED\",\"picked_y\":2.99,\"ground_y\":0,\"mode\":\"LEVITATE\"},\"t\":25701.30000001192},\"mark\":false},\"skipped\":false}",
+  "PASS N9 takeover: direct input (MOVE with a stick vector) cleared the destination at once and removed the marker; lifting the stick did not resume it — {\"before\":true,\"after\":{\"nav\":null,\"mark\":false},\"lifted\":false}",
+  "PASS N10 a camera drag alone preserves an otherwise valid path: the destination stayed the same world point (20.921, -9.679) and was reached — {\"t10\":{\"x\":20.921,\"z\":-9.679,\"y\":0},\"w10\":{\"done\":true,\"moved\":true,\"ms\":3632,\"pos\":{\"x\":20.723,\"z\":-9.52},\"mark\":false}}",
+  "PASS N11 flight: a ground click while flying became an AIR waypoint at the held altitude (marker at y 8.87 with the plumb line), reached horizontally with the altitude held (Δ 0.00 m ≤ 0.6), still powered — never a silent landing — {\"nav\":{\"target\":{\"x\":28.551,\"z\":-15.809,\"y\":8.865},\"mode\":\"AIR\",\"via\":\"CLICK\",\"waypoint\":{\"x\":28.551,\"z\":-15.809},\"waypoints_left\":1,\"remaining_m\":9.31,\"settling\":false,\"snapped\":false},\"altMin\":8.88,\"altMax\":8.88,\"w11\":{\"nav\":null,\"alt\":8.88,\"powered\":true,\"pos\":{\"x\":28.827,\"z\":-16.031}}}",
+  "PASS N11b holding FLY (ASCEND = direct altitude control) cancels the aerial destination — {\"before\":true,\"after\":false}",
+  "PASS N12 MAP: a tap on the map canvas becomes the same NAV command through the map's world transform (via MAP, target within 1.5 m of the tapped world point: 40.0, -21.9); a tap outside the range ring is refused OUT_OF_RANGE; the accepted one was walked — {\"n12\":{\"target\":{\"x\":40.013,\"z\":-21.891,\"y\":0},\"mode\":\"LEVITATE\",\"via\":\"MAP\",\"waypoint\":{\"x\":40.013,\"z\":-21.891},\"waypoints_left\":1,\"remaining_m\":10.6,\"settling\":false,\"snapped\":false},\"n12b\":{\"nav\":{\"target\":{\"x\":40.013,\"z\":-21.891,\"y\":0},\"mode\":\"LEVITATE\",\"via\":\"MAP\",\"waypoint\":{\"x\":40.013,\"z\":-21.891},\"waypoints_left\":1,\"remaining_m\":8.1,\"settling\":false,\"snapped\":false},\"refused\":{\"reason\":\"OUT_OF_RANGE\",\"detail\":{\"distance_m\":78.18,\"range_m\":30,\"mode\":\"LEVITATE\"},\"t\":45021.40000000596}},\"w12\":{\"done\":true,\"moved\":true,\"ms\":1703,\"pos\":{\"x\":39.884,\"z\":-21.814},\"mark\":true}}",
+  "PASS N13 room: inside GYM_INTERIOR a click walks him across the hall (arrived: true); a point outside the room is OUT_OF_ROOM; a destination pending at the doorway is cancelled by the room change (no stale path outside, no marker) — {\"n13\":true,\"g13\":{\"wx\":-1.21204560742405,\"wz\":15.376303723049386,\"pick\":{\"x\":-0.928,\"y\":0.335,\"z\":14,\"distance\":11.21,\"object\":\"Mesh\"}},\"w13\":{\"done\":true,\"moved\":true,\"ms\":1110,\"pos\":{\"x\":-0.88,\"z\":13.769},\"mark\":false},\"far13\":\"OUT_OF_ROOM\",\"n13c\":true,\"after\":{\"nav\":null,\"room\":\"FIELD\",\"mark\":false}}",
+  "PASS Z1 zero page / console errors (desktop) — []",
+  "PASS M1 portrait (touch emulated): a real touch tap on empty ground submits ONE destination (LEVITATE), the marker shows the accepted point, he walked there and stopped — {\"m1\":{\"nav\":{\"target\":{\"x\":2.507,\"z\":-3.039,\"y\":0},\"mode\":\"LEVITATE\",\"via\":\"TAP\",\"waypoint\":{\"x\":2.507,\"z\":-3.039},\"waypoints_left\":1,\"remaining_m\":6.77,\"settling\":false,\"snapped\":false},\"mark\":true},\"wm1\":{\"done\":true,\"moved\":true,\"ms\":1605,\"pos\":{\"x\":2.422,\"z\":-2.802},\"mark\":false},\"diag\":{\"el\":\"tc-world\",\"actor\":null,\"pick\":{\"x\":2.507,\"y\":0.012,\"z\":-3.039,\"distance\":15.3,\"object\":\"Mesh\"},\"suppressed\":false,\"panel\":false,\"guide\":false},\"px\":{\"x\":330.32581121090806,\"y\":339.5195903910415,\"wx\":2.5,\"wz\":-3,\"el\":\"tc-world\",\"actor\":null,\"pick\":{\"x\":2.507,\"y\":0.012,\"z\":-3.039,\"distance\":15.3,\"object\":\"Mesh\"}}}",
+  "PASS M2 portrait: a touch drag on the world is a LOOK (camera ORBIT, yaw moved 41.3°) and its release emitted no destination — {\"nav\":null,\"cam\":\"ORBIT\"}",
+  "PASS M3 portrait: with the stick finger steering (STICK role, mag 0.77), a second finger's tap is its own gesture (independent pointer ids: [{\"id\":4,\"role\":\"STICK\"}]) and is REFUSED while direct input is active (DIRECT_INPUT_ACTIVE) — the stick keeps steering (speed 3.576), no destination hijacks it — {\"refused\":{\"reason\":\"DIRECT_INPUT_ACTIVE\",\"t\":12826.800000011921},\"speed\":3.576,\"touch\":{\"stick\":{\"active\":true,\"x\":0,\"y\":-0.77,\"mag\":0.77,\"run\":false},\"fingers\":[{\"id\":4,\"role\":\"STICK\"}]}}",
+  "PASS M4 landscape (touch emulated): the same tap works after rotation and is walked — {\"m4\":true,\"wm4\":{\"done\":true,\"moved\":true,\"ms\":1609,\"pos\":{\"x\":5.735,\"z\":-12.376},\"mark\":false}}",
+  "PASS Z2 zero page / console errors (portrait) — []"
+ ],
+ "out": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\probe_out\\nav",
+ "desktop": {
+  "d5": {
+   "el": "view",
+   "actor": null,
+   "pick": {
+    "x": 10.619,
+    "y": 0.42,
+    "z": -0.005,
+    "distance": 12.5,
+    "object": "Mesh"
+   },
+   "suppressed": false,
+   "panel": false,
+   "guide": false
+  },
+  "n5": {
+   "nav": {
+    "nav": {
+     "target": {
+      "x": 10.625,
+      "z": -0.017,
+      "y": 0.422
+     },
+     "mode": "LEVITATE",
+     "via": "CLICK",
+     "waypoint": {
+      "x": 10.625,
+      "z": -0.017
+     },
+     "waypoints_left": 1,
+     "remaining_m": 5.41,
+     "settling": false,
+     "snapped": false
+    },
+    "last": {
+     "target": {
+      "x": 10.625,
+      "z": -0.017,
+      "y": 0.422
+     },
+     "mode": "LEVITATE",
+     "via": "CLICK",
+     "t": 19832,
+     "snapped": false,
+     "waypoints": 1
+    },
+    "mark": true
+   },
+   "arrived": {
+    "done": true,
+    "moved": true,
+    "ms": 1203,
+    "pos": {
+     "x": 10.474,
+     "z": -0.017
+    },
+    "mark": false
+   }
+  },
+  "n9_first_refused": {
+   "reason": "NO_ROUTE",
+   "detail": {
+    "distance_m": 8.84,
+    "range_m": 30,
+    "mode": "LEVITATE"
+   },
+   "t": 26354.20000001788
+  },
+  "g13": {
+   "x": 600,
+   "y": 347.8943229160685,
+   "wx": -1.21204560742405,
+   "wz": 15.376303723049386,
+   "el": "view",
+   "actor": null,
+   "pick": {
+    "x": -0.928,
+    "y": 0.335,
+    "z": 14,
+    "distance": 11.21,
+    "object": "Mesh"
+   }
+  }
+ },
+ "portrait": {
+  "dm1": {
+   "el": "tc-world",
+   "actor": null,
+   "pick": {
+    "x": 2.507,
+    "y": 0.012,
+    "z": -3.039,
+    "distance": 15.3,
+    "object": "Mesh"
+   },
+   "suppressed": false,
+   "panel": false,
+   "guide": false
+  }
+ },
+ "summary": {
+  "pass": 21,
+  "fail": 0
+ }
+}

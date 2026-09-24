@@ -1,0 +1,52 @@
+{
+ "viewport": [
+  1000,
+  700
+ ],
+ "checks": [
+  "PASS T0 SEPARATE reached SPLIT before the second run — SPLIT",
+  "PASS W1 pace: fused and separated ground travel run at the same steady speed (displayed 3.578 vs 3.59 m/s; host 3.543 vs 3.531 m/s; ratio within ±5 %) — {\"fused\":3.578,\"split\":3.59,\"ratio\":1.0033538289547232}",
+  "PASS W2 the harmonized pace is the separated WALK band (3.58 m/s = 8 mph; canonical FUSED was 8.94 m/s): both forms within ±8 % of 3.58 — {\"fused_host\":3.543,\"split_host\":3.531}",
+  "PASS W3 transition timing: start (input → 95 %) and stop (release → still) match between the forms within 150 ms (fused 383 / 288 ms, separated 456 / 290 ms) — {\"fused\":[383,288],\"split\":[456,290]}",
+  "PASS W4 calmness / identity of the start: the host integrator never overshoots in either form (peak = steady) and the displayed start profiles match between the forms (|Δ peak-over-steady| ≤ 0.05; both ≈ 1.02 / 1.02 — the ~10 % ripple over 300 ms windows is the 60 ms snapshot cadence reaching the presentation, identical in both forms, logged for PASS 5) — {\"fused\":[1.02,1],\"split\":[1.02,1]}",
+  "PASS W5 separated cadence is measured from the support phase: 1.995 steps/s, step period 508 ms, stride 1.822 m at 3.59 m/s (the owner’s distance-tied cadence: 3.6 m per full cycle → 2 steps per 3.6 m) — {\"steps\":5,\"cadence\":1.995,\"period_ms\":508,\"stride_m\":1.822}",
+  "PASS W6 STATED DIFFERENCE (not a pass / fail of the code): the fused form is a GLIDE by the owner’s earlier rule (no support phase, phase frozen: advances = false; beam level reversals 43.07/s), so it has no step cadence to match — pace and transitions are shared, the step rhythm exists only in the separated form; whether the fused glide should carry the separated walk’s rhythm is the gate question — {\"fused_phase_advances\":false,\"fused_cadence\":0}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "fused": {
+  "frames": 1499,
+  "form": "FUSED",
+  "speed_displayed_mps": 3.578,
+  "speed_host_mps": 3.543,
+  "start_to_95pct_ms": 383,
+  "release_to_stop_ms": 288,
+  "peak_over_steady": 1.02,
+  "host_speed_steady_mps": 3.576,
+  "host_peak_over_steady": 1,
+  "steps_in_window": 0,
+  "cadence_steps_per_s": 0,
+  "step_period_ms": null,
+  "stride_length_m": null,
+  "phase_advances": false,
+  "beam_level_reversals_per_s": 43.07
+ },
+ "split": {
+  "frames": 1123,
+  "form": "SPLIT",
+  "speed_displayed_mps": 3.59,
+  "speed_host_mps": 3.531,
+  "start_to_95pct_ms": 456,
+  "release_to_stop_ms": 290,
+  "peak_over_steady": 1.02,
+  "host_speed_steady_mps": 3.576,
+  "host_peak_over_steady": 1,
+  "steps_in_window": 5,
+  "cadence_steps_per_s": 1.995,
+  "step_period_ms": 508,
+  "stride_length_m": 1.822,
+  "phase_advances": true,
+  "beam_level_reversals_per_s": 0
+ },
+ "pass": 8,
+ "fail": 0
+}

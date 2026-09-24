@@ -1,0 +1,45 @@
+{
+ "label": "astra_m1_final_mobile",
+ "dist": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist",
+ "mobile": true,
+ "pairs": [
+  {
+   "route": "causeway_north",
+   "flip_pct_per_pair": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "max_flip_pct": 0,
+   "mean_flip_pct": 0
+  },
+  {
+   "route": "plaza_edge_east",
+   "flip_pct_per_pair": [
+    0.065,
+    0.065,
+    0.067,
+    0.067,
+    0.07
+   ],
+   "max_flip_pct": 0.07,
+   "mean_flip_pct": 0.067
+  },
+  {
+   "route": "forecourt_gym",
+   "flip_pct_per_pair": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "max_flip_pct": 0,
+   "mean_flip_pct": 0
+  }
+ ],
+ "depth_bits": 24,
+ "camera_near": null
+}

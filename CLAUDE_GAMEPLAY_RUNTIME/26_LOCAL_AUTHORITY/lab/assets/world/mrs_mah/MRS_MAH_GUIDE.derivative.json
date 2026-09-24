@@ -1,0 +1,58 @@
+{
+ "canonical": "MRS_MAH_GUIDE",
+ "role": "tiny optional flying guide (skinned, no clips)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\mrs.glb",
+  "original_name": "mrs(1).glb",
+  "sha256": "9ca358074b9244df8401e6189ed24f4f21f75527bb5a3e14233b3208b40295c6",
+  "bytes": 39547052,
+  "triangles": 18419,
+  "skinned": true,
+  "joints": 78,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "image": 0,
+   "source_bytes": 12672966,
+   "runtime_bytes": 290724,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": true
+  },
+  {
+   "image": 1,
+   "source_bytes": 11459965,
+   "runtime_bytes": 444686,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": false
+  },
+  {
+   "image": 2,
+   "source_bytes": 14234169,
+   "runtime_bytes": 223448,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "normal": false
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "MRS_MAH_GUIDE_L0.glb",
+   "triangles": 18419,
+   "bytes": 2138996,
+   "sha256": "dde05e83f63948ada5fc3dfcf1e1d895ab1d45b2e5f589774cd1e8f7f0946122"
+  }
+ ],
+ "method": "images resampled (Pillow LANCZOS, JPEG); every accessor, node, skin and animation byte-identical",
+ "generated": "2026-09-19T20:46:09Z"
+}

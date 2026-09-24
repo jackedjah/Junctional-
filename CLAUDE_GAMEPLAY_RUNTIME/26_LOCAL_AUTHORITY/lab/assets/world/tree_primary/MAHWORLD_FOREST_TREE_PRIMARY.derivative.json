@@ -1,0 +1,76 @@
+{
+ "canonical": "MAHWORLD_FOREST_TREE_PRIMARY",
+ "role": "primary forest tree family",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\treevariaint.glb",
+  "original_name": "treevariaint.glb",
+  "sha256": "d2a7db55096c6a531453efd32e98a478e13f5fc20266afe1ef2eea5599adbde0",
+  "bytes": 76539556,
+  "triangles": 1849522,
+  "vertices": 993472,
+  "bounds_min": [
+   -0.351043701171875,
+   0.0,
+   -0.316070556640625
+  ],
+  "bounds_max": [
+   0.351043701171875,
+   0.983062744140625,
+   0.316070556640625
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 14988891,
+   "runtime_bytes": 305633,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 7563404,
+   "runtime_bytes": 792220,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/png"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "MAHWORLD_FOREST_TREE_PRIMARY_L0.glb",
+   "triangles": 14792,
+   "vertices": 15516,
+   "bytes": 1684804,
+   "sha256": "0bfb4ee53359ef61c8eeea415fff38a83132c48d6ae2e27bd24300e679f5608b",
+   "method": "glTF-Transform 4.5.0 meshoptimizer, ratio 0.008, error 0.01, topological borders locked, source normals and UVs preserved"
+  },
+  {
+   "lod": "L1",
+   "file": "MAHWORLD_FOREST_TREE_PRIMARY_L1.glb",
+   "triangles": 7392,
+   "vertices": 9623,
+   "bytes": 1451824,
+   "sha256": "2bbecdcdaa03cdbbf2ce5e09cf1c1948323465c456cb93f915c35b809c2723d8",
+   "method": "glTF-Transform 4.5.0 meshoptimizer, ratio 0.004, error 0.01, topological borders locked, source normals and UVs preserved"
+  },
+  {
+   "lod": "L2",
+   "file": "MAHWORLD_FOREST_TREE_PRIMARY_L2.glb",
+   "triangles": 2436,
+   "vertices": 2501,
+   "bytes": 763992,
+   "sha256": "7bfa6623df6d46c815ba4ad248a1ad5abeb64a101440b699d91a8933a03b5c0c",
+   "method": "legacy fast_simplification derivative retained for provenance; not shipped by the registry"
+  }
+ ],
+ "method": "L0/L1: glTF-Transform 4.5.0 meshoptimizer with topological borders locked and source NORMAL/TEXCOORD_0 preserved; error 0.01; textures Lanczos3 to 1024. L2 is a retained, unshipped legacy derivative.",
+ "generated": "2026-09-23T03:33:01Z"
+}

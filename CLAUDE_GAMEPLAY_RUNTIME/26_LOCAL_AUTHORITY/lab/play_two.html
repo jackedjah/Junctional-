@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAHWORLD — TWO PLAY CLIENTS + SPECTATOR (development evidence page)</title>
+<style>
+  body { margin: 0; background: #05070c; color: #e8f2ff; font: 12px system-ui, sans-serif; }
+  #wrap { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr auto; height: 100vh; gap: 4px; padding: 4px; box-sizing: border-box; }
+  h1 { grid-column: 1 / 3; margin: 0; font-size: 13px; letter-spacing: 0.06em; color: #8fa6c2; }
+  iframe { width: 100%; height: 100%; border: 1px solid rgba(120,190,255,0.35); border-radius: 6px; background: #000; }
+  #spec { grid-column: 1 / 3; border: 1px solid rgba(120,190,255,0.35); border-radius: 6px; padding: 6px 8px; min-height: 64px; white-space: pre-wrap; color: #b9d0ea; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>TWO PLAY CLIENTS ON ONE LOCAL AUTHORITY (left PLAYER_A · right PLAYER_B) + state-only SPECTATOR_1 below — development, loopback</h1>
+  <iframe id="a" title="PLAYER_A"></iframe>
+  <iframe id="b" title="PLAYER_B"></iframe>
+  <div id="spec">spectator: connecting…</div>
+</div>
+<script type="module">
+  import { createLabClient, createHttpTransport } from './LabClient.js';
+  var base = location.origin; var params = new URLSearchParams(location.search || ''); var hold = params.get('hold') || '40000'; var auto = params.get('auto') !== '0';
+  if (params.get('hold')) { var img = new Image(); img.src = base + '/api/hold?ms=' + hold; }
+  document.getElementById('a').src = './play.html?account=PLAYER_A' + (auto ? '&auto=pvp_host' : '') + (params.get('touch') ? '&touch=1' : '') + (params.get('fx') ? '&fx=' + params.get('fx') : '');
+  document.getElementById('b').src = './play.html?account=PLAYER_B' + (auto ? '&auto=pvp_join' : '') + (params.get('touch') ? '&touch=1' : '') + (params.get('fx') ? '&fx=' + params.get('fx') : '');
+  var out = document.getElementById('spec'); var T = createHttpTransport(base); var tokens = (await fetch(base + '/api/tokens').then(function (r) { return r.json(); })).tokens;
+  var S = createLabClient({ client_id: 'spec-page', account_id: 'SPECTATOR_1', token: tokens.SPECTATOR_1, transport: T }); var c = await S.connect(); var joined = false; var lines = ['spectator SPECTATOR_1 connected: ' + c.ok];
+  async function tick() { try { var s = await S.refresh(); if (s && s.duel && s.duel.state === 'ACTIVE' && !joined) { var j = await S.send('SPECTATE'); joined = j.accepted; lines.push('SPECTATE → ' + (j.accepted ? 'accepted (movement authority NONE_WHILE_SPECTATING)' : j.reason)); } out.textContent = lines.join('\n') + '\n' + (s && s.duel ? 'duel ' + s.duel.id + ' ' + s.duel.state + ' health ' + JSON.stringify(s.duel.health) + ' forms ' + JSON.stringify(s.forms) + ' spectators ' + s.spectators + (s.spectator ? ' · camera ' + s.spectator.camera.mode : '') : 'no duel yet · lifecycle ' + (s ? s.lifecycle : '?')); if (s && s.duel && s.duel.state === 'ACTIVE' && joined && !window.__reported) { window.__reported = true; console.log('MAHWORLD_PLAY_TWO ' + JSON.stringify({ duel: s.duel, spectators: s.spectators, forms: s.forms })); } } catch (e) { out.textContent = 'host unreachable: ' + e.message; } }
+  setInterval(tick, 300);
+</script>
+</body>
+</html>

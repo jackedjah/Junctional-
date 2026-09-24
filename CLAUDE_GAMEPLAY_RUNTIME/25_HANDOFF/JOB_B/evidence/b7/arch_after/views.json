@@ -1,0 +1,416 @@
+{
+ "label": "after7",
+ "mobile": false,
+ "shots": [
+  "tower_titan_3q",
+  "tower_titan_ground",
+  "temple_gold_causeway",
+  "gym_athlete_forecourt",
+  "market_bage",
+  "match_hall",
+  "skyline_mainland",
+  "horizon_east_range",
+  "horizon_sea_west",
+  "canal_fish",
+  "pond_visionary",
+  "pond_bage_east",
+  "route_forest_water"
+ ],
+ "architecture": null,
+ "sky": {
+  "wind": {
+   "dir_deg": 28,
+   "speed_mps": 2.4,
+   "now_mps": 2.7,
+   "gust": 0.35
+  },
+  "layers": [
+   {
+    "id": "MIST_LOW",
+    "kind": "MIST",
+    "count": 1,
+    "alt_m": 6,
+    "opacity": 0.16
+   },
+   {
+    "id": "STRATUS_LOW",
+    "kind": "CLOUD",
+    "count": 12,
+    "alt_m": 96,
+    "opacity": 0.5
+   },
+   {
+    "id": "CUMULUS_MID",
+    "kind": "CLOUD",
+    "count": 30,
+    "alt_m": 150,
+    "opacity": 0.78
+   },
+   {
+    "id": "CIRRUS_HIGH",
+    "kind": "CLOUD",
+    "count": 16,
+    "alt_m": 280,
+    "opacity": 0.34
+   }
+  ],
+  "draw_calls": 4,
+  "night": false
+ },
+ "wildlife": {
+  "authority": "HOST (p.wildlife — play/world/WildlifeManager.js)",
+  "species": {
+   "FISH": {
+    "figures": 24,
+    "visible": 18,
+    "lods": 3,
+    "scale": 2.448,
+    "head": "+z",
+    "rig": {
+     "kind": "FISH",
+     "bones": 14,
+     "spine": [
+      "bone_0",
+      "bone_1",
+      "bone_2",
+      "bone_3",
+      "bone_4",
+      "bone_5",
+      "bone_6",
+      "bone_7"
+     ],
+     "fins": [
+      "L:bone_8>bone_9",
+      "R:bone_10>bone_11",
+      "L:bone_12"
+     ],
+     "forward": "+z",
+     "fix_deg": 180,
+     "length_m": 0.98
+    },
+    "combat": {
+     "hits_to_kill": 3,
+     "hits_to_kill_player": 4.5,
+     "aggression": "PROVOKED"
+    },
+    "ownership": {
+     "wild": true,
+     "pet_capable": true,
+     "premium": true,
+     "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+     "payment_ui": false
+    },
+    "states": [
+     "BREACH",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "BREACH",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM",
+     "SWIM"
+    ],
+    "positions": [
+     [
+      -12,
+      1.5,
+      227
+     ],
+     [
+      -18,
+      -0.4,
+      230
+     ],
+     [
+      -16,
+      -0.3,
+      232
+     ],
+     [
+      -152,
+      -0.4,
+      226
+     ],
+     [
+      -155,
+      -0.3,
+      225
+     ],
+     [
+      -158,
+      -0.3,
+      224
+     ],
+     [
+      -92,
+      -0.4,
+      33
+     ],
+     [
+      -89,
+      -0.4,
+      33
+     ],
+     [
+      -86,
+      -0.4,
+      34
+     ],
+     [
+      -26,
+      -0.3,
+      260
+     ],
+     [
+      -25,
+      -0.3,
+      257
+     ],
+     [
+      -23,
+      -0.4,
+      254
+     ],
+     [
+      34,
+      -0.3,
+      260
+     ],
+     [
+      28,
+      2.1,
+      259
+     ],
+     [
+      36,
+      -0.3,
+      255
+     ],
+     [
+      -227,
+      -1.5,
+      184
+     ],
+     [
+      -229,
+      -1.7,
+      181
+     ],
+     [
+      -226,
+      -1.1,
+      180
+     ],
+     [
+      146,
+      -0.4,
+      99
+     ],
+     [
+      143,
+      -0.3,
+      99
+     ],
+     [
+      140,
+      -0.3,
+      99
+     ],
+     [
+      91,
+      -1.6,
+      379
+     ],
+     [
+      94,
+      -1.8,
+      378
+     ],
+     [
+      96,
+      -1.3,
+      376
+     ]
+    ]
+   },
+   "PHOENIX": {
+    "figures": 5,
+    "visible": 5,
+    "lods": 3,
+    "scale": 3.74,
+    "head": "+z",
+    "rig": "RIGID → shader",
+    "combat": {
+     "hits_to_kill": 18,
+     "hits_to_kill_player": 10,
+     "aggression": "HOSTILE_AERIAL"
+    },
+    "ownership": {
+     "wild": true,
+     "pet_capable": true,
+     "premium": true,
+     "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+     "payment_ui": false
+    },
+    "states": [
+     "PATROL",
+     "TRAVEL",
+     "PATROL",
+     "TRAVEL",
+     "PATROL"
+    ],
+    "positions": [
+     [
+      96,
+      94,
+      437
+     ],
+     [
+      -189,
+      85,
+      23
+     ],
+     [
+      -12,
+      84,
+      204
+     ],
+     [
+      -194,
+      85,
+      268
+     ],
+     [
+      -78,
+      84,
+      88
+     ]
+    ]
+   },
+   "HORSE": {
+    "figures": 9,
+    "visible": 8,
+    "lods": 3,
+    "scale": 2.384,
+    "head": "+z",
+    "rig": "RIGID → shader",
+    "combat": {
+     "hits_to_kill": 35,
+     "hits_to_kill_player": null,
+     "aggression": "DEFENSIVE"
+    },
+    "ownership": {
+     "wild": true,
+     "pet_capable": true,
+     "premium": true,
+     "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+     "payment_ui": false
+    },
+    "states": [
+     "GRAZE",
+     "GRAZE",
+     "GRAZE",
+     "GRAZE",
+     "GRAZE",
+     "GRAZE",
+     "GRAZE",
+     "GRAZE",
+     "WALK"
+    ],
+    "positions": [
+     [
+      -33,
+      0,
+      156
+     ],
+     [
+      -148,
+      0,
+      175
+     ],
+     [
+      127,
+      0,
+      135
+     ],
+     [
+      88,
+      0,
+      123
+     ],
+     [
+      -86,
+      0.5,
+      258
+     ],
+     [
+      -39,
+      0,
+      281
+     ],
+     [
+      95,
+      0.5,
+      269
+     ],
+     [
+      33,
+      0,
+      276
+     ],
+     [
+      -145,
+      2.6,
+      24
+     ]
+    ]
+   }
+  },
+  "stats": {
+   "fish": 24,
+   "horses": 9,
+   "phoenix": 5,
+   "breaches": 0,
+   "visits": 0,
+   "draw_calls": 31,
+   "tags": 0
+  },
+  "night": false,
+  "payment_ui": false,
+  "figures": 38,
+  "population_lod": {
+   "built": true,
+   "error": null,
+   "mid_schools": 20,
+   "mid_agents": 208,
+   "far_silhouettes": 120,
+   "breaches": 119,
+   "reach_m": 260,
+   "near_schools": 11,
+   "draw_calls": 2
+  }
+ },
+ "renderer": {
+  "calls": 130,
+  "tris": 600875,
+  "programs": 112,
+  "geometries": 409,
+  "textures": 197
+ }
+}

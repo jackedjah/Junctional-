@@ -1,0 +1,1156 @@
+{
+  "schema": "mahworld.design_handoff.rules_17_23.v0_1",
+  "ruleset_id": "MW_DEV_2026_09_14_R17_23_V0_1",
+  "status": "DESIGN_CONFIGURATION_NOT_RUNTIME_INTEGRATED",
+  "authority": {
+    "owner_rules": "Latest answers 17\u201323, preserving compatible answers 1\u201316 and the later bare-field milestone.",
+    "numerical_values": "Assistant-proposed editable development tuning unless explicitly identified as an owner rule.",
+    "shipping_balance_validated": false,
+    "gender_stat_differences": false,
+    "class_aliases_for_input_only": {
+      "Mage": "BAGE",
+      "Bage": "BAGE",
+      "Balance Mage": "BAGE",
+      "balance": "BAGE",
+      "lien": "LEAN",
+      "Lean": "LEAN"
+    },
+    "alias_migration": "Resolve against actual project IDs; do not rename persisted classes or create a sixth class.",
+    "interpretations": {
+      "visionary_not_allowed_to_field": "Treated as no healing; owner may correct this transcription.",
+      "lean_percentage_reference": "75\u201385% of Athlete corresponding magic potency, choosing 80%; physical chosen at 55%. Not 80% of each specialist.",
+      "percentages": "Comparable per-hit/category potency before skill budgets and defenses; not attack frequency, DPS, XP, or energy capacity.",
+      "released_effects": "Interruption stops unfinished/body-bound/channel work. Already released autonomous effects follow their explicit lifetime policy."
+    }
+  },
+  "attack_categories": [
+    "PHYSICAL",
+    "PHYSICAL_MAGIC",
+    "SPECIAL_MAGIC"
+  ],
+  "energy_pools": [
+    "COMBAT",
+    "FLIGHT"
+  ],
+  "class_profiles": {
+    "ATHLETE": {
+      "display_name": "Athlete",
+      "potency_index": {
+        "PHYSICAL": 100,
+        "PHYSICAL_MAGIC": 70,
+        "SPECIAL_MAGIC": 60
+      },
+      "max_health": 1000,
+      "physical_damage_reduction": 0.16,
+      "magical_damage_reduction": 0.15,
+      "movement_speed_multiplier": 1.0,
+      "startup_duration_multiplier": 0.9,
+      "recovery_duration_multiplier": 0.9,
+      "combat_energy_capacity": 100,
+      "combat_energy_regen_per_second": 5.0,
+      "flight_capacity_multiplier": 1.1,
+      "combat_dash": {
+        "distance_multiplier": 1.0,
+        "duration_seconds": 0.15,
+        "cooldown_seconds": 1.8,
+        "combat_energy_cost": 8
+      },
+      "periodic_damage_multiplier": 1.0,
+      "max_persistent_offensive_entities": 1,
+      "design_ratings_not_automatic_damage_multipliers": {
+        "explosive_force": 90,
+        "agility": 88,
+        "poise": 75
+      }
+    },
+    "TITAN": {
+      "display_name": "Titan",
+      "potency_index": {
+        "PHYSICAL": 90,
+        "PHYSICAL_MAGIC": 100,
+        "SPECIAL_MAGIC": 40
+      },
+      "max_health": 1100,
+      "physical_damage_reduction": 0.25,
+      "magical_damage_reduction": 0.14,
+      "movement_speed_multiplier": 0.82,
+      "startup_duration_multiplier": 1.1,
+      "recovery_duration_multiplier": 1.1,
+      "combat_energy_capacity": 95,
+      "combat_energy_regen_per_second": 4.0,
+      "flight_capacity_multiplier": 0.85,
+      "combat_dash": {
+        "distance_multiplier": 0.8,
+        "duration_seconds": 0.19,
+        "cooldown_seconds": 2.4,
+        "combat_energy_cost": 10
+      },
+      "periodic_damage_multiplier": 1.0,
+      "max_persistent_offensive_entities": 1,
+      "design_ratings_not_automatic_damage_multipliers": {
+        "explosive_force": 100,
+        "agility": 60,
+        "poise": 100
+      }
+    },
+    "BAGE": {
+      "display_name": "BAGE",
+      "potency_index": {
+        "PHYSICAL": 35,
+        "PHYSICAL_MAGIC": 40,
+        "SPECIAL_MAGIC": 100
+      },
+      "max_health": 1150,
+      "physical_damage_reduction": 0.24,
+      "magical_damage_reduction": 0.28,
+      "movement_speed_multiplier": 0.9,
+      "startup_duration_multiplier": 1.05,
+      "recovery_duration_multiplier": 1.05,
+      "combat_energy_capacity": 120,
+      "combat_energy_regen_per_second": 6.0,
+      "flight_capacity_multiplier": 1.0,
+      "combat_dash": {
+        "distance_multiplier": 0.85,
+        "duration_seconds": 0.18,
+        "cooldown_seconds": 2.2,
+        "combat_energy_cost": 9
+      },
+      "periodic_damage_multiplier": 1.0,
+      "max_persistent_offensive_entities": 2,
+      "design_ratings_not_automatic_damage_multipliers": {
+        "explosive_force": 40,
+        "agility": 65,
+        "poise": 65
+      }
+    },
+    "VISIONARY": {
+      "display_name": "Visionary",
+      "potency_index": {
+        "PHYSICAL": 65,
+        "PHYSICAL_MAGIC": 45.5,
+        "SPECIAL_MAGIC": 90
+      },
+      "max_health": 1020,
+      "physical_damage_reduction": 0.18,
+      "magical_damage_reduction": 0.2,
+      "movement_speed_multiplier": 0.96,
+      "startup_duration_multiplier": 1.0,
+      "recovery_duration_multiplier": 1.0,
+      "combat_energy_capacity": 110,
+      "combat_energy_regen_per_second": 5.5,
+      "flight_capacity_multiplier": 1.05,
+      "combat_dash": {
+        "distance_multiplier": 0.95,
+        "duration_seconds": 0.16,
+        "cooldown_seconds": 2.0,
+        "combat_energy_cost": 8.5
+      },
+      "periodic_damage_multiplier": 1.25,
+      "max_persistent_offensive_entities": 3,
+      "design_ratings_not_automatic_damage_multipliers": {
+        "explosive_force": 70,
+        "agility": 78,
+        "poise": 70
+      }
+    },
+    "LEAN": {
+      "display_name": "Lean",
+      "potency_index": {
+        "PHYSICAL": 55,
+        "PHYSICAL_MAGIC": 56,
+        "SPECIAL_MAGIC": 48
+      },
+      "max_health": 900,
+      "physical_damage_reduction": 0.1,
+      "magical_damage_reduction": 0.15,
+      "movement_speed_multiplier": 1.3,
+      "startup_duration_multiplier": 0.75,
+      "recovery_duration_multiplier": 0.75,
+      "combat_energy_capacity": 100,
+      "combat_energy_regen_per_second": 5.5,
+      "flight_capacity_multiplier": 1.0,
+      "combat_dash": {
+        "distance_multiplier": 1.2,
+        "duration_seconds": 0.12,
+        "cooldown_seconds": 1.4,
+        "combat_energy_cost": 7
+      },
+      "periodic_damage_multiplier": 1.0,
+      "max_persistent_offensive_entities": 1,
+      "design_ratings_not_automatic_damage_multipliers": {
+        "explosive_force": 65,
+        "agility": 100,
+        "poise": 50
+      }
+    }
+  },
+  "damage": {
+    "formula": "raw_budget * potency_index[category] / 100 * periodic_multiplier_if_periodic * existing_applicable_form_and_skill_modifiers, then split into physical/magical components, then guard and resistance per component",
+    "apply_each_factor_once": true,
+    "periodic_budget_is_total_per_target_over_full_duration": true,
+    "periodic_damage_has_no_extra_duration_multiplier": true,
+    "rounding": "Keep authoritative existing precision; do not round each intermediate factor.",
+    "default_component_weights": {
+      "PHYSICAL": {
+        "physical": 1,
+        "magical": 0
+      },
+      "PHYSICAL_MAGIC": {
+        "physical": 0.6,
+        "magical": 0.4
+      },
+      "SPECIAL_MAGIC": {
+        "physical": 0,
+        "magical": 1
+      }
+    },
+    "healing": "base_heal * SPECIAL_MAGIC potency / 100, capped at missing HP; never passed through damage resistance",
+    "utility": "Use explicit duration/magnitude fields. Do not multiply slows, invisibility, immunity, or movement buffs by damage potency.",
+    "long_range_magic": "Skill-specific range/close-effectiveness only. Do not infer universal distance amplification or automatic melee/ranged conversion."
+  },
+  "resources": {
+    "PHYSICAL_cost_pool": null,
+    "PHYSICAL_MAGIC_cost_pool": "COMBAT",
+    "SPECIAL_MAGIC_cost_pool": "COMBAT",
+    "dash_cost_pool": "COMBAT",
+    "flight_cost_pool": "FLIGHT",
+    "combat_regen_delay_after_spend_seconds": 2,
+    "combat_regen_conditions": "Alive, simulated time advancing, not casting/channeling or holding either guard; delay measured from the latest committed spend.",
+    "flight_regen_and_drain": "Preserve existing implementation; capacity multiplier only.",
+    "form_cost": "Preserve existing development pool/cost and MIN_DWELL. This packet does not settle the earlier 5\u201310% reference-attack ambiguity.",
+    "startup_reservation": "Reserve full cost at accepted start; reservation is unavailable for other actions.",
+    "precommit_interrupt_consumed_fraction": 0.25,
+    "commit_cost_fraction": 1,
+    "precommit_interrupt_cooldown": "max(0.5 seconds, 0.25 * skill cooldown)",
+    "normal_cooldown_starts_at": "COMMIT",
+    "invalid_command_cost": 0,
+    "duplicate_command_additional_cost": 0,
+    "user_cancel_to_refund": false
+  },
+  "guard": {
+    "frontal_cone_degrees": 120,
+    "PHYSICAL": {
+      "physical_reduction": 0.9,
+      "magical_reduction": 0
+    },
+    "MAGICAL": {
+      "physical_reduction": 0,
+      "magical_reduction": 0.9
+    },
+    "dissipation": "A successful frontal magical guard destroys an explicitly dissipatable pure-magic projectile before damage/status application. No automatic dissipation of mixed body strikes, zones, or existing DoTs.",
+    "already_applied_periodic_damage_blockable": false,
+    "both_guards_simultaneously": false,
+    "switch_during_committed_attack": "No; request is refused without changing the active attack.",
+    "holding_guard_blocks_new_attack_start": true,
+    "dash_releases_guard": true,
+    "perfect_parry": "Preserve existing behavior; no new perfect-parry mechanic in this packet."
+  },
+  "input": {
+    "category_selection": "Explicit PHYSICAL / PHYSICAL_MAGIC / SPECIAL_MAGIC tabs; never proximity-switched.",
+    "initial_movement_pattern_slots": 4,
+    "movement_pattern_slots_shared_between_PHYSICAL_and_PHYSICAL_MAGIC": true,
+    "special_magic_quick_slots_dev": 4,
+    "magic_quick_slots_are_not_extra_movement_pattern_slots": true,
+    "selection_tap_fires_attack": false,
+    "selection_during_action": "Changes selection for the next action only; no implicit queued attack or cancellation.",
+    "long_press_details_ms": 350,
+    "detail_panel_max_fraction_of_viewport": 0.3,
+    "detail_panel_pauses_pvp": false,
+    "gesture": "Hold left Attack + swipe right action area; Hold left Dash + direction swipe. Preserve pointer ownership and cancellation handling.",
+    "simultaneous_modifiers": "First held modifier owns that gesture until release/cancel; another press cannot reinterpret it.",
+    "facing_and_targeting": "Camera orbit never silently rotates attack-facing. Initial target must satisfy server facing/range/team/context checks; no target snap.",
+    "targeted_skill_choice": "Use existing explicit valid-target selection if present; otherwise highlight the eligible entity nearest the body-facing ray within the permitted cone, stable entity-ID tie break. Release does not retarget automatically.",
+    "friendly_target_confirmation": "A deliberate ally selection plus a normal attack gesture is required for an ally-targeted Discord Mark; do not choose an ally as a fallback.",
+    "new_equipment_policy_dev": "Changing the equipped set occurs at practice reset or outside active rounds; selecting among equipped moves is always available subject to action state. Final live-loadout policy stays open.",
+    "accessibility": "Keep keyboard and visible on-screen equivalents. Camera must have an alternative to right-click."
+  },
+  "timing_and_effects": {
+    "clock": "Authoritative simulation time for all gameplay effects; OD-29 deadline clock remains separate.",
+    "startup_cap_seconds": 3,
+    "startup_floor_seconds": 0.12,
+    "recovery_floor_seconds": 0.1,
+    "phase_multipliers_affect": [
+      "STARTUP",
+      "RECOVERY"
+    ],
+    "phase_multipliers_do_not_affect": [
+      "COOLDOWN",
+      "DOT_INTERVAL",
+      "EFFECT_LIFETIME",
+      "FLIGHT_DRAIN",
+      "OD29_DEADLINE"
+    ],
+    "lowering_control": "Automatic; preserve existing eccentric effects. Uncommitted future effects stop on a valid interrupt; committed effects are not undone.",
+    "ordinary_damage_always_interrupts": false,
+    "valid_interrupts": "Existing authoritative stagger/stun/knockout/cancel-by-rules events, respecting current poise checks.",
+    "channel_on_interrupt": "Stop future ticks; retain committed ticks and spent energy.",
+    "autonomous_on_interrupt": "Continue only if the skill explicitly has autonomous_after_commit=true.",
+    "committed_status_on_caster_interrupt": "Already applied buffs/debuffs keep their stated lifetime. autonomous_after_commit governs released projectiles/zones/traps, not undoing a completed status application.",
+    "owner_ko": "Remove owner persistent entities and unfinished effects after the current atomic resolution batch; finish already committed events in that batch.",
+    "match_terminal_or_practice_reset": "Clear all pending effects, reserved costs, temporary statuses, projectiles and synthetic-owned entities exactly once.",
+    "pause": "Freeze gameplay timers and preserve state. A disconnect notification itself does not grant a refund or cancel/restart a cast.",
+    "historical_replay": "No fresh real clock, unseeded randomness, current mutable tuning, or browser animation callbacks."
+  },
+  "status_rules": {
+    "same_named_buff": "Strongest magnitude wins; an accepted reapplication refreshes duration. No additive stacking.",
+    "same_dot_family_on_target": "Strongest instance wins across sources. A weaker/equal reapplication may refresh duration but cannot increase tick damage or cause an immediate extra tick; keep the next scheduled tick. Retain winning damage attribution.",
+    "dot_family_relationship": "BAGE_DECAY and VISIONARY_LOAD are distinct families and may coexist.",
+    "slow": {
+      "strongest_only": true,
+      "minimum_remaining_movement_fraction": 0.4,
+      "slows_affect_dash_distance": false
+    },
+    "healing": "Living self/allies only, same combat context; no resurrection, no overheal, no outsider assistance into an active duel.",
+    "visionary_healing_allowed": false,
+    "invisibility": "Breaks on taking damage or on the next non-movement ability commit; its own activation does not immediately break it. Manual/AoE hits still work; do not render an enemy target marker or keep automatic tracking after target loss.",
+    "immunity": "Blocks incoming damage and new harmful statuses during its lifetime. Existing status timers continue; it does not cleanse. Movement/dash allowed, new offensive/support casts and guards blocked while active. Existing released effects may finish.",
+    "discord": {
+      "duration_seconds": 4,
+      "friendly_damage_fraction": 0.5,
+      "changes_team_identity": false,
+      "forces_actions": false,
+      "allows_self_damage": false,
+      "changes_healing_targets": false,
+      "out_of_match_allowed": false,
+      "snapshot": "At each voluntary damage-action commit, record whether curse was active. It enables that action to hit original teammates, including its released effects. Preexisting effects are not retroactively converted.",
+      "attribution": "Keep actual attacking actor and curse instigator separately; simultaneous marks do not stack."
+    },
+    "manifestations": {
+      "modes": [
+        "WORLD_FIXED",
+        "FOLLOW_TARGET",
+        "FOLLOW_CASTER",
+        "PROJECTILE"
+      ],
+      "automatic_retarget": false,
+      "target_lost": "End a following manifestation; a projectile continues its recorded heading until hit/expiry without acquiring another target.",
+      "line_of_sight": "Validate initial targeting and use existing collisions/visibility; never bypass walls or become an instant hit through tracking.",
+      "entity_cap": "At cap, reject a new persistent-offense placement without charge. Do not silently replace the oldest.",
+      "visuals": "Visible cast/body/object/projectile motion and applied-status icons only; no added preattack warning banners, countdowns, danger outlines or aim-snapping prompts."
+    }
+  },
+  "teams": {
+    "owner_max_team_size": 3,
+    "dev_equal_team_sizes": [
+      1,
+      2,
+      3
+    ],
+    "spectators_are_combatants": false,
+    "normal_friendly_fire": false,
+    "healing_inside_matches": true,
+    "healing_outside_matches": true,
+    "outside_match_heal_targets_dev": "Self or explicit same-party/practice-team living ally who is also outside a match.",
+    "win_policy_dev": "All opposing team members knocked out; no in-round respawn or resurrection in this packet.",
+    "simultaneous_team_elimination": "Use an existing draw policy. If absent, implement an explicit no-winner/no-reward DRAW_DEV for this new ruleset only, distinct from disconnect NO_CONTEST.",
+    "resolution": "Resolve same-timestamp committed damage/heal/self-KO events as an atomic authoritative batch, then evaluate victory.",
+    "self_ko_resolution": "Self-KO is a committed cost, not ordinary mitigatable damage. It cannot be canceled by armor, immunity or healing in the same batch. Preserve existing deterministic event ordering for other effects; evaluate terminal outcome only after the batch.",
+    "disconnect_extension_dev": "Any active combatant disconnect pauses the whole round. Track the original 10-elapsed-second deadline per disconnected combatant; duplicate notices never reset it. Earliest expiry ends the whole round NO_CONTEST. Resume only after every missing combatant returns before their deadline. Spectator loss does not pause.",
+    "host_failure": "Preserve RECOVERY_HELD_DEV; no new host-failure outcome.",
+    "pvp_flight": false
+  },
+  "scope": {
+    "current": "Local empty mechanics field, five data-driven class fixtures, starter skills/effect families, same-context allied practice and up-to-3v3 development fixtures.",
+    "no_rewards_or_real_profiles": true,
+    "new_shipping_topology_decided": false,
+    "new_map_or_matchmaking": false,
+    "art_dependency": "Use stand-ins until an explicitly released export and manifest are available. Do not open/edit Astra work files.",
+    "workouts": "No new MAHFITT sync; 3\u20135x proposal is skill XP only, not damage or character-level XP.",
+    "existing_progression": "Preserve existing modifiers exactly once; neither class changes/resets nor slot milestones are settled here.",
+    "movement_multiplier_scope": "Normal ground locomotion and free-flight cruise against their existing base speeds. Forced descent/landing keeps its existing safety controller. No PvP flight is enabled."
+  },
+  "skills": [
+    {
+      "id": "PA_PUSH",
+      "draft_name": "Drive",
+      "category": "PHYSICAL",
+      "classes": [
+        "ATHLETE",
+        "TITAN",
+        "BAGE",
+        "VISIONARY",
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.22,
+      "base_recovery_seconds": 0.38,
+      "cooldown_seconds": 0.1,
+      "combat_energy_cost": 0,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 100,
+        "range_melee_units": 1.0
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "PUSH",
+      "gesture": "UP",
+      "strike_family": true
+    },
+    {
+      "id": "PM_PUSH",
+      "draft_name": "Infused Drive",
+      "category": "PHYSICAL_MAGIC",
+      "classes": [
+        "ATHLETE",
+        "TITAN",
+        "BAGE",
+        "VISIONARY",
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.45,
+      "base_recovery_seconds": 0.55,
+      "cooldown_seconds": 1.2,
+      "combat_energy_cost": 8,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 125,
+        "range_melee_units": 1.0
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "PUSH",
+      "gesture": "UP",
+      "strike_family": true
+    },
+    {
+      "id": "PA_PULL",
+      "draft_name": "Row Hook",
+      "category": "PHYSICAL",
+      "classes": [
+        "ATHLETE",
+        "TITAN",
+        "BAGE",
+        "VISIONARY",
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.3,
+      "base_recovery_seconds": 0.45,
+      "cooldown_seconds": 0.1,
+      "combat_energy_cost": 0,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 105,
+        "range_melee_units": 1.0
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "PULL",
+      "gesture": "LEFT",
+      "strike_family": true
+    },
+    {
+      "id": "PM_PULL",
+      "draft_name": "Infused Row Hook",
+      "category": "PHYSICAL_MAGIC",
+      "classes": [
+        "ATHLETE",
+        "TITAN",
+        "BAGE",
+        "VISIONARY",
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.55,
+      "base_recovery_seconds": 0.6,
+      "cooldown_seconds": 1.6,
+      "combat_energy_cost": 10,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 135,
+        "range_melee_units": 1.0
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "PULL",
+      "gesture": "LEFT",
+      "strike_family": true
+    },
+    {
+      "id": "PA_HINGE",
+      "draft_name": "Hinge Rise",
+      "category": "PHYSICAL",
+      "classes": [
+        "ATHLETE",
+        "TITAN",
+        "BAGE",
+        "VISIONARY",
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.4,
+      "base_recovery_seconds": 0.5,
+      "cooldown_seconds": 0.1,
+      "combat_energy_cost": 0,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 125,
+        "range_melee_units": 0.9
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "HINGE",
+      "gesture": "UP",
+      "strike_family": true
+    },
+    {
+      "id": "PM_HINGE",
+      "draft_name": "Infused Hinge Rise",
+      "category": "PHYSICAL_MAGIC",
+      "classes": [
+        "ATHLETE",
+        "TITAN",
+        "BAGE",
+        "VISIONARY",
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.7,
+      "base_recovery_seconds": 0.7,
+      "cooldown_seconds": 2.5,
+      "combat_energy_cost": 14,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 160,
+        "range_melee_units": 0.9
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "HINGE",
+      "gesture": "UP",
+      "strike_family": true
+    },
+    {
+      "id": "PA_ROTATION",
+      "draft_name": "Pivot Strike",
+      "category": "PHYSICAL",
+      "classes": [
+        "ATHLETE",
+        "TITAN",
+        "BAGE",
+        "VISIONARY",
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.32,
+      "base_recovery_seconds": 0.42,
+      "cooldown_seconds": 0.1,
+      "combat_energy_cost": 0,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 110,
+        "range_melee_units": 1.1
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "ROTATION",
+      "gesture": "RIGHT",
+      "strike_family": true
+    },
+    {
+      "id": "PM_ROTATION",
+      "draft_name": "Infused Pivot Strike",
+      "category": "PHYSICAL_MAGIC",
+      "classes": [
+        "ATHLETE",
+        "TITAN",
+        "BAGE",
+        "VISIONARY",
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.55,
+      "base_recovery_seconds": 0.6,
+      "cooldown_seconds": 1.8,
+      "combat_energy_cost": 11,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 140,
+        "range_melee_units": 1.1
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "ROTATION",
+      "gesture": "RIGHT",
+      "strike_family": true
+    },
+    {
+      "id": "TITAN_SHOULDER",
+      "draft_name": "Shoulder Drive",
+      "category": "PHYSICAL_MAGIC",
+      "classes": [
+        "TITAN"
+      ],
+      "base_startup_seconds": 0.65,
+      "base_recovery_seconds": 0.7,
+      "cooldown_seconds": 3,
+      "combat_energy_cost": 16,
+      "effect": {
+        "type": "BODY_STRIKE",
+        "raw_damage": 170,
+        "range_melee_units": 1.15
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "PUSH",
+      "gesture": "RIGHT",
+      "strike_family": true
+    },
+    {
+      "id": "TITAN_GROUND_PULSE",
+      "draft_name": "Ground Pulse",
+      "category": "PHYSICAL_MAGIC",
+      "classes": [
+        "TITAN"
+      ],
+      "base_startup_seconds": 0.9,
+      "base_recovery_seconds": 0.8,
+      "cooldown_seconds": 4,
+      "combat_energy_cost": 18,
+      "effect": {
+        "type": "BODY_AREA",
+        "raw_damage": 190,
+        "radius_melee_units": 1.2,
+        "requires_grounded": true
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "movement_pattern": "HINGE",
+      "gesture": "DOWN",
+      "strike_family": true
+    },
+    {
+      "id": "ATHLETE_VECTOR",
+      "draft_name": "Vector Shot",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "ATHLETE"
+      ],
+      "base_startup_seconds": 0.9,
+      "base_recovery_seconds": 0.4,
+      "cooldown_seconds": 3,
+      "combat_energy_cost": 12,
+      "effect": {
+        "type": "PROJECTILE",
+        "raw_damage": 125,
+        "range_melee_units": 12,
+        "speed_melee_units_per_second": 12,
+        "lifetime_seconds": 1.2,
+        "dissipatable": true
+      },
+      "autonomous_after_commit": true,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "ATHLETE_TRACK",
+      "draft_name": "Trackburst",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "ATHLETE"
+      ],
+      "base_startup_seconds": 1.2,
+      "base_recovery_seconds": 0.5,
+      "cooldown_seconds": 8,
+      "combat_energy_cost": 20,
+      "effect": {
+        "type": "PROJECTILE",
+        "raw_damage": 180,
+        "range_melee_units": 10,
+        "speed_melee_units_per_second": 10,
+        "lifetime_seconds": 1.2,
+        "dissipatable": true
+      },
+      "autonomous_after_commit": true,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "ATHLETE_SET",
+      "draft_name": "Set Position",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "ATHLETE"
+      ],
+      "base_startup_seconds": 0.8,
+      "base_recovery_seconds": 0.35,
+      "cooldown_seconds": 12,
+      "combat_energy_cost": 18,
+      "effect": {
+        "type": "SELF_BUFF",
+        "knockback_reduction": 0.3,
+        "duration_seconds": 3
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "TITAN_IRON",
+      "draft_name": "Iron Pulse",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "TITAN"
+      ],
+      "base_startup_seconds": 1,
+      "base_recovery_seconds": 0.65,
+      "cooldown_seconds": 7,
+      "combat_energy_cost": 22,
+      "effect": {
+        "type": "AREA_DAMAGE",
+        "raw_damage": 170,
+        "radius_melee_units": 1.5,
+        "placement": "CASTER_AT_COMMIT"
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "TITAN_BRACE",
+      "draft_name": "Anchor Brace",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "TITAN"
+      ],
+      "base_startup_seconds": 0.8,
+      "base_recovery_seconds": 0.4,
+      "cooldown_seconds": 12,
+      "combat_energy_cost": 18,
+      "effect": {
+        "type": "SELF_BUFF",
+        "knockback_reduction": 0.5,
+        "movement_multiplier": 0.85,
+        "duration_seconds": 3
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "BAGE_MEND",
+      "draft_name": "Mend",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "BAGE"
+      ],
+      "base_startup_seconds": 1,
+      "base_recovery_seconds": 0.45,
+      "cooldown_seconds": 5,
+      "combat_energy_cost": 18,
+      "effect": {
+        "type": "HEAL",
+        "base_heal": 200,
+        "targets": [
+          "SELF",
+          "ALLY"
+        ],
+        "range_melee_units": 8
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "BAGE_RALLY",
+      "draft_name": "Rally",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "BAGE"
+      ],
+      "base_startup_seconds": 1.1,
+      "base_recovery_seconds": 0.5,
+      "cooldown_seconds": 12,
+      "combat_energy_cost": 20,
+      "effect": {
+        "type": "ALLY_BUFF",
+        "targets": [
+          "SELF",
+          "ALLY"
+        ],
+        "damage_dealt_multiplier": 1.15,
+        "duration_seconds": 5,
+        "range_melee_units": 8
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "BAGE_VANISH",
+      "draft_name": "Vanish",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "BAGE"
+      ],
+      "base_startup_seconds": 1,
+      "base_recovery_seconds": 0.4,
+      "cooldown_seconds": 16,
+      "combat_energy_cost": 20,
+      "effect": {
+        "type": "INVISIBILITY",
+        "duration_seconds": 4,
+        "target": "SELF",
+        "manifestation_mode": "FOLLOW_CASTER"
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "BAGE_SHELL",
+      "draft_name": "Phase Shell",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "BAGE"
+      ],
+      "base_startup_seconds": 0.8,
+      "base_recovery_seconds": 0.2,
+      "cooldown_seconds": 24,
+      "combat_energy_cost": 30,
+      "effect": {
+        "type": "IMMUNITY",
+        "duration_seconds": 1.25,
+        "target": "SELF",
+        "manifestation_mode": "FOLLOW_CASTER"
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "BAGE_DISCORD",
+      "draft_name": "Discord Mark",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "BAGE"
+      ],
+      "base_startup_seconds": 1.3,
+      "base_recovery_seconds": 0.5,
+      "cooldown_seconds": 16,
+      "combat_energy_cost": 24,
+      "effect": {
+        "type": "DISCORD",
+        "targets": [
+          "ENEMY",
+          "EXPLICIT_ALLY"
+        ],
+        "range_melee_units": 8,
+        "duration_seconds": 4
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "BAGE_LAST_PULSE",
+      "draft_name": "Last Pulse",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "BAGE"
+      ],
+      "base_startup_seconds": 2.5,
+      "base_recovery_seconds": 0,
+      "cooldown_seconds": 60,
+      "combat_energy_cost": 40,
+      "effect": {
+        "type": "SELF_KO_AND_AREA_DAMAGE",
+        "raw_damage": 300,
+        "radius_melee_units": 2.5,
+        "requires_atomic_resolution": true
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true,
+      "draft_unlock_level": 12
+    },
+    {
+      "id": "BAGE_MIST",
+      "draft_name": "Sapping Mist",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "BAGE"
+      ],
+      "base_startup_seconds": 1.2,
+      "base_recovery_seconds": 0.5,
+      "cooldown_seconds": 10,
+      "combat_energy_cost": 20,
+      "effect": {
+        "type": "PERIODIC_ZONE",
+        "mode": "WORLD_FIXED",
+        "raw_periodic_total": 120,
+        "duration_seconds": 6,
+        "tick_interval_seconds": 1,
+        "first_tick_after_seconds": 1,
+        "range_melee_units": 6,
+        "radius_melee_units": 2,
+        "dot_family": "BAGE_DECAY"
+      },
+      "autonomous_after_commit": true,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "BAGE_SEAL",
+      "draft_name": "Delayed Seal",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "BAGE"
+      ],
+      "base_startup_seconds": 1.2,
+      "base_recovery_seconds": 0.5,
+      "cooldown_seconds": 12,
+      "combat_energy_cost": 22,
+      "effect": {
+        "type": "TRIGGER_TRAP",
+        "mode": "WORLD_FIXED",
+        "placement_range_melee_units": 6,
+        "trigger_radius_melee_units": 0.7,
+        "untriggered_lifetime_seconds": 8,
+        "on_trigger": {
+          "type": "ATTACHED_DOT",
+          "mode": "FOLLOW_TARGET",
+          "raw_periodic_total": 120,
+          "duration_seconds": 5,
+          "tick_interval_seconds": 1,
+          "first_tick_after_seconds": 1,
+          "dot_family": "BAGE_DECAY"
+        }
+      },
+      "autonomous_after_commit": true,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "VISIONARY_ANKLE",
+      "draft_name": "Ankle Load",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "VISIONARY"
+      ],
+      "base_startup_seconds": 0.9,
+      "base_recovery_seconds": 0.4,
+      "cooldown_seconds": 8,
+      "combat_energy_cost": 16,
+      "effect": {
+        "type": "SLOW",
+        "mode": "FOLLOW_TARGET",
+        "slow_fraction": 0.4,
+        "duration_seconds": 4,
+        "range_melee_units": 8,
+        "targets": [
+          "ENEMY"
+        ]
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "VISIONARY_CHAIN",
+      "draft_name": "Chain Circuit",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "VISIONARY"
+      ],
+      "base_startup_seconds": 1.2,
+      "base_recovery_seconds": 0.5,
+      "cooldown_seconds": 10,
+      "combat_energy_cost": 22,
+      "effect": {
+        "type": "PERIODIC_ZONE",
+        "mode": "WORLD_FIXED",
+        "raw_periodic_total": 120,
+        "duration_seconds": 6,
+        "tick_interval_seconds": 1,
+        "first_tick_after_seconds": 1,
+        "range_melee_units": 6,
+        "radius_melee_units": 2.5,
+        "slow_fraction_while_inside": 0.25,
+        "dot_family": "VISIONARY_LOAD"
+      },
+      "autonomous_after_commit": true,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "VISIONARY_BARBELL",
+      "draft_name": "Barbell Drop",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "VISIONARY"
+      ],
+      "base_startup_seconds": 1.3,
+      "base_recovery_seconds": 0.6,
+      "cooldown_seconds": 12,
+      "combat_energy_cost": 24,
+      "effect": {
+        "type": "AREA_DAMAGE",
+        "raw_damage": 180,
+        "range_melee_units": 6,
+        "radius_melee_units": 1,
+        "placement": "AIMED_GROUND_POINT_AT_START",
+        "manifestation_mode": "WORLD_FIXED"
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "VISIONARY_CABLE",
+      "draft_name": "Cable Snare",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "VISIONARY"
+      ],
+      "base_startup_seconds": 1.1,
+      "base_recovery_seconds": 0.5,
+      "cooldown_seconds": 12,
+      "combat_energy_cost": 22,
+      "effect": {
+        "type": "TRIGGER_TRAP",
+        "mode": "WORLD_FIXED",
+        "placement_range_melee_units": 6,
+        "trigger_radius_melee_units": 0.8,
+        "untriggered_lifetime_seconds": 8,
+        "on_trigger": {
+          "type": "ATTACHED_DOT",
+          "mode": "FOLLOW_TARGET",
+          "raw_periodic_total": 100,
+          "duration_seconds": 5,
+          "tick_interval_seconds": 1,
+          "first_tick_after_seconds": 1,
+          "dot_family": "VISIONARY_LOAD",
+          "slow_fraction": 0.35,
+          "slow_duration_seconds": 4
+        }
+      },
+      "autonomous_after_commit": true,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "LEAN_BOLT",
+      "draft_name": "Slip Bolt",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.8,
+      "base_recovery_seconds": 0.3,
+      "cooldown_seconds": 2.5,
+      "combat_energy_cost": 9,
+      "effect": {
+        "type": "PROJECTILE",
+        "raw_damage": 125,
+        "range_melee_units": 10,
+        "speed_melee_units_per_second": 14,
+        "lifetime_seconds": 1,
+        "dissipatable": true
+      },
+      "autonomous_after_commit": true,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "LEAN_ECHO",
+      "draft_name": "Quickstep Echo",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.65,
+      "base_recovery_seconds": 0.2,
+      "cooldown_seconds": 9,
+      "combat_energy_cost": 15,
+      "effect": {
+        "type": "SELF_BUFF",
+        "movement_multiplier": 1.1,
+        "duration_seconds": 2
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    },
+    {
+      "id": "LEAN_TETHER",
+      "draft_name": "Tether Flick",
+      "category": "SPECIAL_MAGIC",
+      "classes": [
+        "LEAN"
+      ],
+      "base_startup_seconds": 0.8,
+      "base_recovery_seconds": 0.3,
+      "cooldown_seconds": 7,
+      "combat_energy_cost": 12,
+      "effect": {
+        "type": "SLOW",
+        "mode": "FOLLOW_TARGET",
+        "slow_fraction": 0.2,
+        "duration_seconds": 2,
+        "range_melee_units": 6,
+        "targets": [
+          "ENEMY"
+        ]
+      },
+      "autonomous_after_commit": false,
+      "final_unlock": "UNDECIDED",
+      "dev_fixture_available": true
+    }
+  ],
+  "catalog_policy": {
+    "names_and_gestures": "Draft fallback examples; map to existing approved movement-pattern and skill IDs first. Do not overwrite canon names or unlocks.",
+    "range_units": "One melee unit = the existing runtime standard melee reach. Resolve it once; never assume Blender scale or a new meter conversion.",
+    "phase_mapping": "These startup/recovery budgets map into existing concentric/eccentric phases. They do not remove eccentric damage or create a second clock.",
+    "body_strike_inventory": "Four pure + four infused shared exemplars; Titan adds two infused variants, giving it the only majority-infused strike catalog in this development fixture.",
+    "magic_quick_loadouts": {
+      "ATHLETE": [
+        "ATHLETE_VECTOR",
+        "ATHLETE_TRACK",
+        "ATHLETE_SET"
+      ],
+      "TITAN": [
+        "TITAN_IRON",
+        "TITAN_BRACE"
+      ],
+      "BAGE": [
+        "BAGE_MEND",
+        "BAGE_RALLY",
+        "BAGE_MIST",
+        "BAGE_SEAL"
+      ],
+      "VISIONARY": [
+        "VISIONARY_ANKLE",
+        "VISIONARY_CHAIN",
+        "VISIONARY_BARBELL",
+        "VISIONARY_CABLE"
+      ],
+      "LEAN": [
+        "LEAN_BOLT",
+        "LEAN_ECHO",
+        "LEAN_TETHER"
+      ]
+    },
+    "bage_niche_fixture": [
+      "BAGE_VANISH",
+      "BAGE_SHELL",
+      "BAGE_DISCORD",
+      "BAGE_LAST_PULSE"
+    ],
+    "bage_offensive_duration_trap_inventory": {
+      "current_examples": 2,
+      "planned_total_dev": 6,
+      "owner_range": [
+        5,
+        10
+      ],
+      "remaining_slots": "Reserved; no additional skills or level unlocks invented."
+    },
+    "empty_magic_quick_slots": "Leave empty; never duplicate an ability to imply a larger kit.",
+    "support_scope": "BAGE has healing/support in this starter catalog; Visionary has no healing. Other classes gain no implied BAGE-exclusive skills from hybrid percentages."
+  }
+}

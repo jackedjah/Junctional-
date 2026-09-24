@@ -1,0 +1,603 @@
+{
+ "_doc": "MAHWORLD REUSABLE RIG PROFILE (2026-09-15 rig-motion repair). The METHOD and the art-direction limits only — per-character fitting values (measured landmarks, segment lengths) live in each asset manifest under `measurements`, so a new body reuses the method without inheriting another body's identity. Angles are ART DIRECTION and body clearance, never medical claims and never gameplay rules.",
+ "angle_convention": {
+  "mode": "FLEXION_FROM_STRAIGHT",
+  "_doc": "Motion master B: numbers are degrees of BEND FROM STRAIGHT (0 = fully extended) with an explicit axis and sign per joint. The earlier INSIDE-angle table is retained below under limits_inside_deg as source data only and is converted at this boundary: flexion_deg = 180 - inside_deg. Runtime limits_rad are radians on the named local axis in the asset convention (`_L` bones at model -x, face at +z): a bone that hangs down swings FORWARD on negative x, a bone that points up bends forward on positive x; abduction opens the LEFT limb on negative z and the right on positive z.",
+  "straight_deg": 0,
+  "joints": {
+   "elbow": {
+    "bone": "FOREARM",
+    "axis": "x",
+    "sign": -1,
+    "flexion_deg": [
+     0,
+     75
+    ],
+    "_note": "75 deg = the shared art limit for combat / emotes / travel; the transformation X uses pose_overrides.transformation"
+   },
+   "knee": {
+    "bone": "SHIN",
+    "axis": "x",
+    "sign": 1,
+    "flexion_deg": [
+     0,
+     85
+    ]
+   },
+   "hip_flexion": {
+    "bone": "THIGH",
+    "axis": "x",
+    "sign": -1,
+    "flexion_deg": [
+     0,
+     75
+    ],
+    "extension_deg": [
+     0,
+     54
+    ]
+   },
+   "hip_abduction": {
+    "bone": "THIGH",
+    "axis": "z",
+    "sign": "outward",
+    "deg": [
+     0,
+     40
+    ]
+   },
+   "shoulder_flexion": {
+    "bone": "UPPERARM",
+    "axis": "x",
+    "sign": -1,
+    "flexion_deg": [
+     0,
+     100
+    ],
+    "extension_deg": [
+     0,
+     40
+    ]
+   },
+   "shoulder_abduction": {
+    "bone": "UPPERARM",
+    "axis": "z",
+    "sign": "outward",
+    "deg": [
+     0,
+     100
+    ]
+   },
+   "shoulder_rotation": {
+    "bone": "UPPERARM",
+    "axis": "y",
+    "deg": [
+     -34,
+     34
+    ]
+   },
+   "clavicle": {
+    "bone": "CLAV",
+    "elevation_axis": "z",
+    "protraction_axis": "y",
+    "deg": [
+     -26,
+     26
+    ]
+   },
+   "wrist": {
+    "bone": "HAND",
+    "axis": "x",
+    "deg": [
+     -52,
+     52
+    ]
+   },
+   "fingers": {
+    "bone": "FINGERS",
+    "axis": "x",
+    "sign": 1,
+    "curl_deg": [
+     0,
+     83
+    ]
+   }
+  }
+ },
+ "limits_inside_deg": {
+  "elbow": {
+   "min": 105,
+   "rest": 172,
+   "_note": "deepest Athlete bend ≈105° inside (≈75° flexion); resting arms much straighter; no hyperextension past 180"
+  },
+  "knee": {
+   "min": 95,
+   "rest": 176
+  },
+  "hip_flexion": {
+   "min": 90,
+   "rest": 178,
+   "_note": "trunk-to-thigh: 90° at the deepest hinge (owner JOB A 2026-09-19: the RDL femur ~45° with the torso inclined ~40°); fused travel stays near straight 170–180"
+  },
+  "trunk_to_thigh_travel": {
+   "min": 170,
+   "max": 180
+  },
+  "neck": {
+   "min": 150,
+   "max": 200
+  },
+  "_retained": "source data for the flexion table above; not read by the runtime"
+ },
+ "limits_rad": {
+  "_doc": "derived from limits_inside_deg for the runtime (flexion from rest, local x unless stated); the animator clamps every layer against these after composition",
+  "FOREARM_x": [
+   -1.31,
+   0.05
+  ],
+  "SHIN_x": [
+   -0.03,
+   1.48
+  ],
+  "THIGH_x": [
+   -1.57,
+   0.95
+  ],
+  "UPPERARM_x": [
+   -1.75,
+   0.7
+  ],
+  "UPPERARM_z": [
+   -2.1,
+   2.1
+  ],
+  "UPPERARM_y": [
+   -0.6,
+   0.6
+  ],
+  "CLAV_z": [
+   -0.45,
+   0.45
+  ],
+  "CLAV_y": [
+   -0.45,
+   0.45
+  ],
+  "_CLAV_y_note": "protraction / retraction of the shoulder girdle. The clavicle runs along x, so this is the only channel that actually draws the shoulder back; CLAV_z elevates it and CLAV_x rotates it about its own length.",
+  "CLAV_x": [
+   -0.35,
+   0.35
+  ],
+  "HAND_x": [
+   -0.9,
+   0.9
+  ],
+  "FINGERS_x": [
+   0,
+   1.45
+  ],
+  "SPINE_x": [
+   -0.45,
+   0.7
+  ],
+  "SPINE_y": [
+   -0.5,
+   0.5
+  ],
+  "SPINE_z": [
+   -0.35,
+   0.35
+  ],
+  "CHEST_x": [
+   -0.35,
+   0.6
+  ],
+  "CHEST_y": [
+   -0.7,
+   0.7
+  ],
+  "CHEST_z": [
+   -0.35,
+   0.35
+  ],
+  "PELVIS_x": [
+   -0.35,
+   0.55
+  ],
+  "PELVIS_y": [
+   -0.6,
+   0.6
+  ],
+  "PELVIS_z": [
+   -0.3,
+   0.3
+  ],
+  "NECK_x": [
+   -0.45,
+   0.45
+  ],
+  "NECK_y": [
+   -0.6,
+   0.6
+  ],
+  "NECK_z": [
+   -0.3,
+   0.3
+  ],
+  "HEAD_x": [
+   -0.5,
+   0.5
+  ],
+  "HEAD_y": [
+   -0.8,
+   0.8
+  ],
+  "HEAD_z": [
+   -0.35,
+   0.35
+  ],
+  "TAIL1_x": [
+   -0.5,
+   1.2
+  ],
+  "TAIL2_x": [
+   -0.5,
+   1
+  ],
+  "TAIL3_x": [
+   -0.4,
+   0.8
+  ],
+  "TIP_x": [
+   -0.5,
+   0.6
+  ],
+  "BROW_x": [
+   -0.12,
+   0.12
+  ],
+  "CHEEK_x": [
+   -0.12,
+   0.12
+  ],
+  "JAW_x": [
+   0,
+   0.16
+  ],
+  "LUMBAR_x": [
+   -0.3,
+   0.5
+  ],
+  "LUMBAR_y": [
+   -0.35,
+   0.35
+  ],
+  "LUMBAR_z": [
+   -0.3,
+   0.3
+  ],
+  "SPINE2_x": [
+   -0.35,
+   0.55
+  ],
+  "SPINE2_y": [
+   -0.5,
+   0.5
+  ],
+  "SPINE2_z": [
+   -0.3,
+   0.3
+  ],
+  "SCAP_x": [
+   -0.35,
+   0.3
+  ],
+  "SCAP_y": [
+   -0.4,
+   0.4
+  ],
+  "SCAP_z": [
+   -1.05,
+   1.05
+  ],
+  "ARMTWIST_x": [
+   -0.05,
+   0.05
+  ],
+  "ARMTWIST_y": [
+   -1.7,
+   1.7
+  ],
+  "ARMTWIST_z": [
+   -0.05,
+   0.05
+  ],
+  "FORETWIST_x": [
+   -0.05,
+   0.05
+  ],
+  "FORETWIST_y": [
+   -1.7,
+   1.7
+  ],
+  "FORETWIST_z": [
+   -0.05,
+   0.05
+  ],
+  "_v5_note": "rig v5 chain: LUMBAR/SPINE2 trunk segments, SCAP scapula (z = upward rotation, x = posterior tilt, y = axial), ARMTWIST/FORETWIST carry axial rotation only",
+  "_v5_overhead": "v5: glenohumeral abduction to 120° (2.1) + scapular upward rotation to 60° (1.05) = a true 180° overhead; the animator gives the scapula its share",
+  "_rdl_note": "THIGH_x −1.57 = 90° of hip flexion for the owner-decided RDL (2026-09-19); every other channel unchanged"
+ },
+ "pose_overrides": {
+  "_doc": "joint allowances that apply to ONE named pose only. Owner decision 1 (motion master B): the crossed-forearm X of the transformation is fitted to this body with a deep elbow and knees drawn to the navel; the 75 deg cap does not govern it. No other pose may use these ranges, and they never authorise scaling or intersections.",
+  "transformation": {
+   "limits_rad": {
+    "FOREARM_x": [
+     -1.6,
+     0.05
+    ],
+    "THIGH_x": [
+     -2.05,
+     0.95
+    ],
+    "SHIN_x": [
+     -0.03,
+     2.25
+    ],
+    "UPPERARM_x": [
+     -1.75,
+     0.7
+    ],
+    "UPPERARM_y": [
+     -1.75,
+     1.75
+    ],
+    "UPPERARM_z": [
+     -1.75,
+     1.75
+    ],
+    "PELVIS_x": [
+     -0.35,
+     0.6
+    ],
+    "TAIL1_x": [
+     -1,
+     1.2
+    ],
+    "TAIL2_x": [
+     -0.8,
+     1
+    ],
+    "TAIL3_x": [
+     -0.5,
+     0.8
+    ]
+   },
+   "x_pose": {
+    "_doc": "fitted by FK on the delivered Athlete skeleton: forearms lie on the chest, hands meet at the sternum and just past it (a full reach to the opposite shoulder is not available on this chest depth with these limb lengths), elbows beside the lower pectorals, the left forearm a touch ahead; knees toward the belly button with a pelvic tuck",
+    "shoulder_flexion_deg": 52,
+    "shoulder_internal_rotation_deg": 95,
+    "shoulder_adduction_deg": -6,
+    "elbow_flexion_deg": [
+     64,
+     69
+    ],
+    "hip_flexion_deg": 106,
+    "knee_flexion_deg": 117,
+    "lead_forearm": "L",
+    "what_the_override_actually_unlocks": "UPPERARM_y (humeral rotation) to ±100 deg and the hip/knee ranges; the elbow stays inside the shared 75 deg",
+    "elbow_clearance_from_torso_side_m": 0.03
+   }
+  },
+  "emote_endpoint": {
+   "_doc": "S13: arms driven by an explicit wrist ENDPOINT (animData ik channel) are solved by 2-bone IK on the live shoulder; a real elbow flexes past 75 deg and the humerus turns further than the procedural table allows, so these ranges apply to THAT arm for THOSE frames only. Never to the lower body, never to a procedural pose.",
+   "limits_rad": {
+    "UPPERARM_x": [
+     -2.6,
+     0.9
+    ],
+    "UPPERARM_y": [
+     -2.2,
+     2.2
+    ],
+    "UPPERARM_z": [
+     -2.4,
+     2.4
+    ],
+    "FOREARM_x": [
+     -2.45,
+     0.05
+    ],
+    "FOREARM_y": [
+     -1.6,
+     1.6
+    ],
+    "FOREARM_z": [
+     -0.6,
+     0.6
+    ]
+   }
+  },
+  "perch": {
+   "_doc": "S11 PERCH (settled hover-perch on a ledge): knees drawn up past the travel table; applies to the PERCH emote only.",
+   "limits_rad": {
+    "THIGH_x": [
+     -1.31,
+     1.3
+    ],
+    "SHIN_x": [
+     -1.5,
+     1.48
+    ]
+   }
+  },
+  "overhead_release": {
+   "_doc": "owner Special #1 OVERHEAD EXTENSION RELEASE (2026-09-18 §10): the humerus flexes to ~149° so the load is genuinely overhead (elbows bent behind the head) — applied to BOTH arms for the OVERHEAD attack's own frames only (RigAnimator st.atkAllow); the general shoulder table (100°) stays for every other pose. Verified on ATHLETE_M_V11 (dev_0.16 graded shoulder weights) with deploy/probe_mesh_stretch.mjs — never a cover for torn geometry.",
+   "limits_rad": {
+    "UPPERARM_x": [
+     -2.6,
+     0.7
+    ]
+   }
+  }
+ },
+ "travel_posture": {
+  "_doc": "whole-body lean: torso, pelvis and fused lower body incline together; the waist never hinges alone",
+  "fused_lean_deg": [
+   5,
+   12
+  ],
+  "flight_lean_deg": [
+   8,
+   18
+  ],
+  "trailing_shoulder_deg": [
+   10,
+   15
+  ],
+  "lean_distribution": {
+   "PELVIS": 0.45,
+   "SPINE": 0.3,
+   "CHEST": 0.15,
+   "TAIL1": 0.1
+  },
+  "turn": {
+   "gaze_lead_s": 0.12,
+   "chest_yaw_share": 0.45,
+   "pelvis_yaw_share": 0.35,
+   "lower_yaw_share": 0.2
+  }
+ },
+ "clearance": {
+  "_doc": "coarse posing volumes (metres, character space) — separate from combat hitboxes, used only to keep elbows outside the ribcage and hands off the chest",
+  "ribcage": {
+   "cx": 0,
+   "cy": 1.2,
+   "cz": 0,
+   "rx": 0.26,
+   "ry": 0.3,
+   "rz": 0.2
+  },
+  "pelvis": {
+   "cx": 0,
+   "cy": 0.86,
+   "cz": 0,
+   "rx": 0.22,
+   "ry": 0.18,
+   "rz": 0.18
+  },
+  "head": {
+   "cx": 0,
+   "cy": 1.62,
+   "cz": 0.02,
+   "r": 0.15
+  },
+  "min_hand_to_chest_m": 0.12,
+  "min_elbow_to_ribs_m": 0.08,
+  "min_leg_gap_m": 0.04,
+  "head_fit": {
+   "cx": 0,
+   "cy": 1.765,
+   "cz": 0,
+   "r": 0.115,
+   "_doc": "S13: the head sphere the endpoint solver keeps hands out of (crown 1.825, half-width 0.100)"
+  },
+  "ribcage_fit": {
+   "cx": 0,
+   "cy": 1.2,
+   "cz": 0,
+   "rx": 0.2,
+   "ry": 0.3,
+   "rz": 0.16,
+   "_doc": "S13: character-fitted torso for endpoint targets (the coarse ribcage keeps its 0.26 for the procedural heuristic)"
+  },
+  "pelvis_fit": {
+   "cx": 0,
+   "cy": 0.86,
+   "cz": 0,
+   "rx": 0.19,
+   "ry": 0.16,
+   "rz": 0.15
+  }
+ },
+ "transformation_beats": {
+  "gather": 0.38,
+  "release": 0.22,
+  "settle": 0.4,
+  "_doc": "proportions of the EXISTING authoritative transition duration (host phases UNFUSE_ENTER/CURL/CHARGE = gather, BURST = release, STAR/RECOVER = settle); the host clock is never lengthened. The release is the quickest beat by owner decision."
+ },
+ "class_palette": {
+  "_doc": "authoritative class energy colour for every emitter, trail, magic build-up and contact effect; attack CATEGORY never recolours the character's magic",
+  "ATHLETE": "#ffc34d",
+  "TITAN": "#4da3ff",
+  "BAGE": "#ff8fd6",
+  "VISIONARY": "#8cff9c",
+  "LEAN": "#ff5e5e"
+ },
+ "scale": {
+  "world_units_per_metre": 1,
+  "_doc": "the runtime scene is authored in metres (character height 1.8 world units = 1.8 m); the 25 m fingertip-trail visibility limit is 25 world units here"
+ },
+ "emitter_anchors": {
+  "fused": "TAIL3",
+  "split_L": "TIP_L",
+  "split_R": "TIP_R",
+  "seam": "PELVIS",
+  "fingertips": [
+   "FINGERS_L",
+   "FINGERS_R"
+  ],
+  "shin_gradient_bones": [
+   "SHIN_L",
+   "SHIN_R",
+   "TAIL2"
+  ]
+ },
+ "shin_light": {
+  "fade_fraction_of_shin": [
+   0.4,
+   0.5
+  ],
+  "_doc": "class-coloured emissive gradient rooted at the tip, fading upward over the lower 40–50 % of the metallic shin segment; no hard cutoff, metal detail preserved"
+ },
+ "fingertip_trail": {
+  "visible_max_m": 25,
+  "fade_start_m": 18,
+  "length_s": 0.18,
+  "min_speed_mps": 1.2
+ },
+ "method": [
+  "1 measure landmarks per body from mesh cross-sections (never a fixed percentage of height): shoulder band = widest |x| slice 0.74–0.86 H; torso half-width = median |x| of the widest slice 0.62–0.72 H; arm region = |x| > 1.05 x torso half-width between 0.30 H and the shoulder; elbow = narrowest arm cross-section between the upper-arm and forearm bulges; wrist = next narrowest below it; knee = narrowest leg cross-section immediately above the shin segment (femur/shin junction, inside the joint volume, NOT the front surface); hip = inside the pelvis at the femur origin, offset from the spine pivot by half the measured hip spacing; neck = narrowest slice 0.82–0.90 H.",
+  "2 place every joint at the CENTRE of its local cross-section (average of the section's extremes in x and z), never on the surface.",
+  "3 bind with geodesic/heat weighting so influence follows the surface, not straight-line proximity (an arm must not pull the ribs; one thigh must not pull the other); normalise to the loader's 4-influence limit.",
+  "4 keep rest silhouette, bone lengths and inverse-bind matrices consistent; fix axis/parent-space errors at the source instead of compensating with extreme rotations.",
+  "5 add corrective morphs or helper joints only where a visible bend still collapses.",
+  "6 record the measured values in the asset manifest; keep this profile free of per-character numbers."
+ ],
+ "lateral_glide": {
+  "_doc": "Owner decision 2: sideways input is a continuous CONTROLLED lateral glide while held (never DASH, its cooldown or invulnerability). The chest turns slightly toward travel with pelvis follow and a small whole-body bank; the leading arm opens gently toward travel, the trailing arm settles back; shoulders low, hands loose. Mirrored through the rig's real handedness; diagonals and reversals blend.",
+  "chest_turn_deg": [
+   10,
+   16
+  ],
+  "pelvis_turn_deg": [
+   5,
+   8
+  ],
+  "bank_deg": [
+   3,
+   6
+  ],
+  "lead_arm_open_deg": 18,
+  "trail_arm_settle_deg": 10,
+  "prep_s": 0.18,
+  "brake_s": 0.28
+ },
+ "hover_gait": {
+  "_doc": "Owner decision 3: separated walking keeps both pointed tips JUST ABOVE the ground with alternating propulsion pulses — no planted feet, no tip strikes, no footstep impacts. Hover lift is a presentation offset proportional to the measured leg; the authoritative height and collision capsule are untouched. The beam may meet the ground while the mesh tip does not.",
+  "hover_clearance_fraction_of_leg": 0.07,
+  "min_clearance_m": 0.035,
+  "support_transfer_smooth_s": 0.16,
+  "swing_lift_fraction_of_leg": 0.09
+ }
+}

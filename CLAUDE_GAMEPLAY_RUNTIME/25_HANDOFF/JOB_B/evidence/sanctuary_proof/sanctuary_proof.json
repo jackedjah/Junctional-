@@ -1,0 +1,232 @@
+{
+ "shots": [
+  {
+   "name": "00_plan_hub_and_spokes",
+   "calls": 826,
+   "tris": 968823
+  },
+  {
+   "name": "01_overview_sw",
+   "calls": 861,
+   "tris": 979369
+  },
+  {
+   "name": "10_athlete_temple_crown",
+   "calls": 363,
+   "tris": 1033697
+  },
+  {
+   "name": "11_athlete_forecourt_skirt",
+   "calls": 327,
+   "tris": 1021082
+  },
+  {
+   "name": "12_athlete_crown_high",
+   "calls": 373,
+   "tris": 1018940
+  },
+  {
+   "name": "20_titan_gate",
+   "calls": 290,
+   "tris": 865871
+  },
+  {
+   "name": "21_titan_tower_crown",
+   "calls": 243,
+   "tris": 840200
+  },
+  {
+   "name": "22_titan_lake_meadow",
+   "calls": 259,
+   "tris": 870089
+  },
+  {
+   "name": "23_titan_ledge",
+   "calls": 219,
+   "tris": 764825
+  },
+  {
+   "name": "30_lean_spire_house",
+   "calls": 190,
+   "tris": 955577
+  },
+  {
+   "name": "31_lean_top_platform",
+   "calls": 230,
+   "tris": 940566
+  },
+  {
+   "name": "32_lean_ground_skirt",
+   "calls": 169,
+   "tris": 932543
+  },
+  {
+   "name": "40_visionary_overlook",
+   "calls": 227,
+   "tris": 967265
+  },
+  {
+   "name": "41_visionary_platform_core",
+   "calls": 183,
+   "tris": 851610
+  },
+  {
+   "name": "42_visionary_pool",
+   "calls": 283,
+   "tris": 1112748
+  },
+  {
+   "name": "50_bage_market_entrance",
+   "calls": 265,
+   "tris": 849580
+  },
+  {
+   "name": "51_bage_basin_west_ring",
+   "calls": 297,
+   "tris": 881206
+  },
+  {
+   "name": "52_bage_from_north_high",
+   "calls": 308,
+   "tris": 1050168
+  },
+  {
+   "name": "60_gym_forecourt_spur",
+   "calls": 236,
+   "tris": 878944
+  },
+  {
+   "name": "61_gym_entrance_frame",
+   "calls": 231,
+   "tris": 863050
+  },
+  {
+   "name": "70_match_hall_ring",
+   "calls": 258,
+   "tris": 761645
+  },
+  {
+   "name": "80_meadow_close_gold",
+   "calls": 230,
+   "tris": 1020198
+  },
+  {
+   "name": "81_meadow_close_purple",
+   "calls": 239,
+   "tris": 1073803
+  },
+  {
+   "name": "90_map",
+   "calls": 399,
+   "tris": 861882
+  }
+ ],
+ "errors": [],
+ "notes": [],
+ "console_errors": [],
+ "world_status": "READY",
+ "build": null,
+ "modules": {
+  "architecture": {
+   "landmarks": 5,
+   "houses": 5,
+   "skirt_shards": 172,
+   "seams": 25,
+   "crowns": 9,
+   "entrance_diamonds": 12,
+   "roof_diamonds": 12,
+   "draw_calls": 24,
+   "tris": 6180,
+   "night": false,
+   "motion_far_m": 220
+  },
+  "meadow": {
+   "chunks": 93,
+   "instances": 18800,
+   "visible_chunks": 23,
+   "draw_calls": 23,
+   "tris_visible_max": 150400,
+   "near_m": 70,
+   "mid_m": 130,
+   "night": false,
+   "cfg": {
+    "_doc": "owner next-pass 2026-09-20 §10 CRYSTAL MEADOW = the MAHWORLD grassland: many small multifaceted forms in the region family, varied height, controlled highlights, slight translucency, never a mirror; NEAR = instanced geometry (chunks of 30 m, frustum + distance culled), MID = the same chunks at half density, FAR = the region tint sheet; a subtle shimmer by instance hash, never constant sparkle",
+    "density_per_m2": 0.7,
+    "chunk_m": 30,
+    "near_m": 70,
+    "mid_m": 130,
+    "h_m": [
+     0.07,
+     0.36
+    ],
+    "r_m": [
+     0.045,
+     0.13
+    ],
+    "max_instances": 64000,
+    "opacity": 0.86,
+    "shimmer": 0.05
+   }
+  },
+  "terrain": {
+   "regions": 8,
+   "terraces": 3,
+   "forecourts": 5,
+   "spurs": 4,
+   "tint_sheets": 10,
+   "tint_cells": 908,
+   "paths": {
+    "CAUSEWAY": 6,
+    "REGIONAL": 11,
+    "TRAIL": 11
+   },
+   "shards": 448,
+   "dust": 2589,
+   "monoliths": 14,
+   "draw_calls": 10,
+   "tris": 7322,
+   "night": false
+  },
+  "forest": {
+   "tree_lock": true,
+   "zone_family": {
+    "FOREST_W": "purple",
+    "FOREST_NW": "red",
+    "FOREST_NE": "blue",
+    "FOREST_N_W": "red",
+    "FOREST_N_E": "gold"
+   },
+   "trees": 125,
+   "lod_counts": {
+    "L0": 7,
+    "L1": 13,
+    "IMPOSTOR": 105
+   },
+   "impostor": true,
+   "draw_calls": 4,
+   "lod_m": {
+    "near": 26,
+    "mid": 60
+   },
+   "height_m": [
+    9.27,
+    14.73
+   ],
+   "underbrush": 125,
+   "night": false,
+   "skipped": null
+  },
+  "water": {
+   "rivers": 5,
+   "drawCalls": 18
+  },
+  "creatures": {
+   "count": 9,
+   "active": 9
+  }
+ },
+ "phone": {
+  "calls": 159,
+  "tris": 640904
+ }
+}

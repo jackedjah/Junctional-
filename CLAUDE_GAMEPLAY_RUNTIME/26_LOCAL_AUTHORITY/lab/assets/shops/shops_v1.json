@@ -1,0 +1,28 @@
+{
+ "version": "SHOPS_V1",
+ "_doc": "master §17 (EXT-26–29, U18): the two market shops are FINISHED, ENTERABLE spaces whose catalogs are EMPTY by design. This registry is the minimal extensible data: a shop's id, kind, room, status and an item list that is intentionally [] — no product, price, purchase, equipped item or silhouette is invented. `states` distinguish APPROVED (owner-approved items), UNDESIGNED (the whole family until the apparel / weapon art and the fit / combat rules exist), TEST_ONLY (fixtures that must never ship) and RUNTIME (what the build actually lists). A validator (16_TESTS/gameplay_interior_entry.test.mjs) checks every listed item's asset reference exists — with zero items that check is vacuous today, and the test proves the validator rejects a synthetic bad reference.",
+ "shops": [
+  {
+   "id": "SHOP_CLOTHING",
+   "kind": "CLOTHING",
+   "room": "CLOTHING_SHOP",
+   "label": "MAH MARKET — clothing",
+   "status": "ZERO_STOCK",
+   "catalog": [],
+   "states": { "approved": [], "undesigned": ["APPAREL_FAMILY (art + fit rules pending — owner)"], "test_only": [], "runtime": [] },
+   "empty_state": { "title": "APPAREL", "line": "NO STOCK YET", "detail": "catalog empty by design — apparel art and fit are a later owner decision" },
+   "purchase": "DISABLED_NO_ECONOMY"
+  },
+  {
+   "id": "SHOP_WEAPONS",
+   "kind": "WEAPONS",
+   "room": "WEAPON_SHOP",
+   "label": "MAH MARKET — weapons",
+   "status": "ZERO_STOCK",
+   "catalog": [],
+   "states": { "approved": [], "undesigned": ["WEAPON_FAMILY (weapon art + combat rules pending — owner; the gym-pattern kit stays the only combat)"], "test_only": [], "runtime": [] },
+   "empty_state": { "title": "WEAPONS", "line": "NO STOCK YET", "detail": "catalog empty by design — weapon gameplay stays dormant until design approval" },
+   "purchase": "DISABLED_NO_ECONOMY"
+  }
+ ]
+}

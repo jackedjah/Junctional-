@@ -1,0 +1,304 @@
+{
+ "shots": [
+  "01_dogkie_attacks_aura",
+  "02_hud_health_after_bites",
+  "03_dogkie_defeated_dissolving",
+  "04_dogkie_dissolved",
+  "05_defeated_state_hud",
+  "06_respawned_at_safe_point"
+ ],
+ "notes": [
+  "nearest at arrival {\"id\":\"WILD_DOGKIE_04\",\"x\":-83.176,\"z\":35.741,\"state\":\"ROAM\",\"d\":38.3874596841208,\"hp\":420,\"max\":420,\"ko\":false}",
+  "bitten {\"me\":{\"pos\":{\"x\":-80.652,\"z\":37.126},\"hp\":888.9,\"max\":1000,\"ko\":false,\"defeat\":null,\"lock\":null},\"n\":{\"id\":\"WILD_DOGKIE_04\",\"x\":-80.276,\"z\":35.591,\"state\":\"BITE\",\"d\":1.5803800175907037,\"hp\":420,\"max\":420,\"ko\":false}}",
+  "kill {\"target\":\"WILD_DOGKIE_04\",\"casts\":7,\"kod\":true,\"final\":{\"hp\":0,\"ko\":true,\"ko_ago\":null,\"x\":-80.276,\"z\":35.591}}",
+  "defeated {\"pos\":{\"x\":-100.152,\"z\":31.314},\"hp\":0,\"max\":1000,\"ko\":true,\"defeat\":{\"since_s\":0.35,\"respawn_in_s\":2.45,\"at\":{\"x\":-100.15,\"z\":31.31},\"safe\":{\"x\":-72.84,\"z\":10.3}},\"lock\":null}",
+  "respawned {\"pos\":{\"x\":-72.84,\"z\":10.3},\"hp\":1000,\"max\":1000,\"ko\":false,\"defeat\":null,\"lock\":null}"
+ ],
+ "errors": [],
+ "console_errors": [],
+ "respawn": {
+  "defeated_at": {
+   "x": -100.15,
+   "z": 31.31
+  },
+  "safe": {
+   "x": -72.84,
+   "z": 10.3
+  },
+  "now": {
+   "x": -72.84,
+   "z": 10.3
+  },
+  "hp": 1000,
+  "max": 1000,
+  "ko": false
+ },
+ "host": {
+  "creatures": [
+   "WILD_DOGKIE_02:ROAM:420",
+   "WILD_DOGKIE_03:ROAM:420",
+   "WILD_DOGKIE_05:IDLE:420",
+   "WILD_DOGKIE_06:IDLE:420",
+   "WILD_DOGKIE_07:IDLE:420",
+   "WILD_DOGKIE_08:ROAM:420",
+   "WILD_DOGKIE_09:ROAM:420",
+   "WILD_DOGKIE_10:IDLE:420"
+  ],
+  "wildlife": [
+   "FISH:SWIM:252/252",
+   "FISH:SWIM:252/252",
+   "FISH:SWIM:252/252",
+   "FISH:SWIM:252/252",
+   "FISH:SWIM:252/252",
+   "FISH:BREACH:252/252",
+   "FISH:SWIM:252/252",
+   "FISH:SWIM:252/252",
+   "HORSE:WALK:2940/2940",
+   "HORSE:GRAZE:2940/2940",
+   "PHOENIX:PATROL:1512/1512"
+  ]
+ },
+ "modules": {
+  "wildlife": {
+   "authority": "HOST (p.wildlife — play/world/WildlifeManager.js)",
+   "species": {
+    "FISH": {
+     "figures": 8,
+     "visible": 8,
+     "lods": 3,
+     "scale": 2.448,
+     "head": "+z",
+     "rig": {
+      "kind": "FISH",
+      "bones": 14,
+      "spine": [
+       "bone_0",
+       "bone_1",
+       "bone_2",
+       "bone_3",
+       "bone_4",
+       "bone_5",
+       "bone_6",
+       "bone_7"
+      ],
+      "fins": [
+       "L:bone_8>bone_9",
+       "R:bone_10>bone_11",
+       "L:bone_12"
+      ],
+      "forward": "+z",
+      "fix_deg": 180,
+      "length_m": 0.98
+     },
+     "combat": {
+      "hits_to_kill": 3,
+      "hits_to_kill_player": 4.5,
+      "aggression": "PROVOKED"
+     },
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "SWIM",
+      "BREACH",
+      "SWIM",
+      "SWIM"
+     ],
+     "positions": [
+      [
+       25,
+       -1.7,
+       -144
+      ],
+      [
+       25,
+       -1.7,
+       -148
+      ],
+      [
+       22,
+       -2.4,
+       -150
+      ],
+      [
+       18,
+       -2.4,
+       -148
+      ],
+      [
+       -257,
+       -1.4,
+       152
+      ],
+      [
+       -267,
+       1.8,
+       149
+      ],
+      [
+       -262,
+       -1.5,
+       149
+      ],
+      [
+       -264,
+       -1.9,
+       153
+      ]
+     ]
+    },
+    "PHOENIX": {
+     "figures": 1,
+     "visible": 1,
+     "lods": 3,
+     "scale": 3.74,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "combat": {
+      "hits_to_kill": 18,
+      "hits_to_kill_player": 10,
+      "aggression": "HOSTILE_AERIAL"
+     },
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "PATROL"
+     ],
+     "positions": [
+      [
+       56,
+       94,
+       217
+      ]
+     ]
+    },
+    "HORSE": {
+     "figures": 2,
+     "visible": 2,
+     "lods": 3,
+     "scale": 2.384,
+     "head": "+z",
+     "rig": "RIGID → shader",
+     "combat": {
+      "hits_to_kill": 35,
+      "hits_to_kill_player": null,
+      "aggression": "DEFENSIVE"
+     },
+     "ownership": {
+      "wild": true,
+      "pet_capable": true,
+      "premium": true,
+      "acquisition": "FUTURE_OWNER_DECISION — no purchase flow, no price, no payment UI in the demo",
+      "payment_ui": false
+     },
+     "states": [
+      "WALK",
+      "GRAZE"
+     ],
+     "positions": [
+      [
+       126,
+       0.1,
+       99
+      ],
+      [
+       -48,
+       0,
+       109
+      ]
+     ]
+    }
+   },
+   "stats": {
+    "fish": 8,
+    "horses": 2,
+    "phoenix": 1,
+    "breaches": 0,
+    "visits": 0,
+    "draw_calls": 11
+   },
+   "night": false,
+   "payment_ui": false,
+   "figures": 11
+  },
+  "creatures": {
+   "count": 8,
+   "active": 8,
+   "lod_levels": 3,
+   "lod_m": [
+    24,
+    60
+   ],
+   "lod_now": [
+    2,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2
+   ],
+   "classified_bones": {
+    "method": "names",
+    "total_bones": 55,
+    "root": "Root",
+    "hips": "J_Bip_C_Hips",
+    "head": "J_Bip_C_Head",
+    "neck": "J_Bip_C_Neck",
+    "jaw": null,
+    "spine": [
+     "J_Bip_C_Spine",
+     "J_Bip_C_Chest",
+     "J_Bip_C_UpperChest"
+    ],
+    "tail": [],
+    "legs": {
+     "FL": "J_Bip_L_UpperArm / J_Bip_L_LowerArm / J_Bip_L_Hand",
+     "FR": "J_Bip_R_UpperArm / J_Bip_R_LowerArm / J_Bip_R_Hand",
+     "BL": "J_Bip_L_UpperLeg / J_Bip_L_Foot / J_Bip_L_Foot",
+     "BR": "J_Bip_R_UpperLeg / J_Bip_R_Foot / J_Bip_R_Foot"
+    },
+    "forward_model": "+z",
+    "forward_fix_deg": 180,
+    "rest_height_m": 0.978,
+    "missing": [
+     "jaw",
+     "tail"
+    ],
+    "duplicates": [],
+    "notes": [
+     "BL knee degenerate (-0.004 m) → fold at J_Bip_L_Foot",
+     "BR knee degenerate (-0.000 m) → fold at J_Bip_R_Foot"
+    ]
+   },
+   "loaded": true,
+   "load_error": null,
+   "derivative": "DOGKIE_FOREST_CREATURE",
+   "height_m": 1.4,
+   "scale": 1.4319,
+   "states": {
+    "ROAM": 4,
+    "IDLE": 4
+   },
+   "draw_calls_visible": 8,
+   "tags": true,
+   "lag_s": 0.12,
+   "host_clock": true,
+   "night": false
+  }
+ }
+}

@@ -1,0 +1,11 @@
+{
+ "calls": 58,
+ "tris": 307669,
+ "district": [
+  "temple:70000",
+  "gym:70000",
+  "market:70000",
+  "tower:80000"
+ ],
+ "failed": []
+}

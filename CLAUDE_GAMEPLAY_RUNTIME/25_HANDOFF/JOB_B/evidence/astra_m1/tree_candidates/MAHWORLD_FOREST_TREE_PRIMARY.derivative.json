@@ -1,0 +1,79 @@
+{
+ "canonical": "MAHWORLD_FOREST_TREE_PRIMARY",
+ "role": "forest tree fidelity candidate",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\treevariaint.glb",
+  "original_name": "treevariaint.glb",
+  "sha256": "d2a7db55096c6a531453efd32e98a478e13f5fc20266afe1ef2eea5599adbde0",
+  "bytes": 76539556,
+  "triangles": 1849522,
+  "vertices": 993472,
+  "bounds_min": [
+   -0.351043701171875,
+   0.0,
+   -0.316070556640625
+  ],
+  "bounds_max": [
+   0.351043701171875,
+   0.983062744140625,
+   0.316070556640625
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 14988891,
+   "runtime_bytes": 443785,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 7563404,
+   "runtime_bytes": 208925,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/jpeg"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "C120",
+   "file": "MAHWORLD_FOREST_TREE_PRIMARY_C120.glb",
+   "triangles": 120000,
+   "vertices": 72185,
+   "bytes": 4404676,
+   "sha256": "f1efad62aa52456c5cad3bc753b8a868d0180b6e71947a010c73006da176cbb8"
+  },
+  {
+   "lod": "C60",
+   "file": "MAHWORLD_FOREST_TREE_PRIMARY_C60.glb",
+   "triangles": 60000,
+   "vertices": 38799,
+   "bytes": 2616320,
+   "sha256": "ce8c4bc2ef8ee090c7346e74908b75eb7698040c16b714bf93025efd87aeeda8"
+  },
+  {
+   "lod": "C30",
+   "file": "MAHWORLD_FOREST_TREE_PRIMARY_C30.glb",
+   "triangles": 30000,
+   "vertices": 21424,
+   "bytes": 1700316,
+   "sha256": "87ec81b5d9cde3d70769496fb3cca44c2ab2b71136db08ea5941777cda5532fb"
+  }
+ ],
+ "method": "fast_simplification quadric edge collapse (agg 7.0), UVs from the collapse map, smooth normals recomputed; textures Pillow LANCZOS",
+ "generated": "2026-09-23T03:20:35Z",
+ "timing_s": {
+  "C120": 14.8,
+  "C60": 0.8,
+  "C30": 0.3
+ },
+ "elapsed_s": 25.1
+}

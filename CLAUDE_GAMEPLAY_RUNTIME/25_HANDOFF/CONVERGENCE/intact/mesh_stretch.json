@@ -1,0 +1,4377 @@
+{
+ "poses": {
+  "idle": {
+   "meshes": [
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 14590,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 14965,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 6847,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "push_load": {
+   "meshes": [
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 877,
+     "flipped_hand_face_triangles": 539,
+     "flip_by_bone": {
+      "FOREARM_R": 67,
+      "FOREARM_L": 71,
+      "UPPERARM_R": 316,
+      "UPPERARM_L": 318,
+      "SPINE2": 8,
+      "ARMTWIST_R": 31,
+      "CLAV_R": 1,
+      "ARMTWIST_L": 39,
+      "SCAP_R": 2,
+      "CHEST": 23,
+      "CLAV_L": 1
+     },
+     "flip_samples": [
+      {
+       "dot": 0.45,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.147,
+        0.852,
+        0.238
+       ]
+      },
+      {
+       "dot": -0.3,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.86,
+        "sum": 1
+       },
+       "at": [
+        0.145,
+        0.806,
+        0.233
+       ]
+      },
+      {
+       "dot": -0.23,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.86,
+        "sum": 1
+       },
+       "at": [
+        0.145,
+        0.806,
+        0.233
+       ]
+      },
+      {
+       "dot": 0.31,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.82,
+        "sum": 1
+       },
+       "at": [
+        0.148,
+        0.778,
+        0.208
+       ]
+      },
+      {
+       "dot": 0.46,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.61,
+        "sum": 1
+       },
+       "at": [
+        0.15,
+        0.769,
+        0.193
+       ]
+      },
+      {
+       "dot": 0.45,
+       "a": {
+        "bone": "FOREARM_L",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        -0.147,
+        0.853,
+        0.238
+       ]
+      },
+      {
+       "dot": -0.41,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.62,
+        "sum": 1
+       },
+       "at": [
+        0.136,
+        0.815,
+        0.243
+       ]
+      },
+      {
+       "dot": -0.59,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.59,
+        "sum": 1
+       },
+       "at": [
+        0.128,
+        0.818,
+        0.24
+       ]
+      }
+     ],
+     "shell_pairs": 14590,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.001,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 48,
+     "pairs": {
+      "SCAP_L ↔ SCAP_L": {
+       "n": 6,
+       "max": 2.9,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8021,
+        "b": 8025,
+        "bind": 0.007,
+        "posed": 0.0202,
+        "ratio": 2.9,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         -0.12,
+         0.734,
+         -0.016
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ SCAP_R": {
+       "n": 4,
+       "max": 2.87,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11287,
+        "b": 11277,
+        "bind": 0.0104,
+        "posed": 0.0299,
+        "ratio": 2.87,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         0.138,
+         0.741,
+         -0.003
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ SCAP_L": {
+       "n": 4,
+       "max": 2.8,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11859,
+        "b": 11863,
+        "bind": 0.0104,
+        "posed": 0.0292,
+        "ratio": 2.8,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.29,
+         "sum": 1
+        },
+        "pa": [
+         -0.138,
+         0.742,
+         -0.004
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ ARMTWIST_R": {
+       "n": 9,
+       "max": 2.74,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11278,
+        "b": 11289,
+        "bind": 0.008,
+        "posed": 0.0218,
+        "ratio": 2.74,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.28,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         0.128,
+         0.756,
+         -0.032
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ ARMTWIST_L": {
+       "n": 12,
+       "max": 2.7,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11245,
+        "b": 11246,
+        "bind": 0.008,
+        "posed": 0.0215,
+        "ratio": 2.7,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.28,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_L",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         -0.128,
+         0.756,
+         -0.032
+        ]
+       }
+      },
+      "CHEST ↔ CHEST": {
+       "n": 5,
+       "max": 2.68,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8385,
+        "b": 8381,
+        "bind": 0.0055,
+        "posed": 0.0146,
+        "ratio": 2.68,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.38,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.46,
+         "sum": 1
+        },
+        "pa": [
+         0.05,
+         0.667,
+         -0.031
+        ]
+       }
+      },
+      "CHEST ↔ UPPERARM_L": {
+       "n": 1,
+       "max": 2.29,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11696,
+        "b": 11697,
+        "bind": 0.0098,
+        "posed": 0.0226,
+        "ratio": 2.29,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.59,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         -0.096,
+         0.798,
+         0.03
+        ]
+       }
+      },
+      "SCAP_R ↔ SCAP_R": {
+       "n": 4,
+       "max": 2.21,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11274,
+        "b": 11275,
+        "bind": 0.0104,
+        "posed": 0.023,
+        "ratio": 2.21,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.35,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         0.118,
+         0.748,
+         -0.035
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ CHEST": {
+       "n": 1,
+       "max": 2.05,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12191,
+        "b": 12187,
+        "bind": 0.0119,
+        "posed": 0.0244,
+        "ratio": 2.05,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         0.128,
+         0.792,
+         -0.032
+        ]
+       }
+      },
+      "SCAP_R ↔ UPPERARM_R": {
+       "n": 1,
+       "max": 2.04,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11873,
+        "b": 11872,
+        "bind": 0.0113,
+        "posed": 0.023,
+        "ratio": 2.04,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         0.135,
+         0.74,
+         0.006
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ CHEST": {
+       "n": 1,
+       "max": 2.03,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12496,
+        "b": 12493,
+        "bind": 0.0119,
+        "posed": 0.0242,
+        "ratio": 2.03,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         -0.128,
+         0.792,
+         -0.032
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 8021,
+       "b": 8025,
+       "bind": 0.007,
+       "posed": 0.0202,
+       "ratio": 2.9,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.33,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.36,
+        "sum": 1
+       },
+       "pa": [
+        -0.12,
+        0.734,
+        -0.016
+       ]
+      },
+      {
+       "a": 11287,
+       "b": 11277,
+       "bind": 0.0104,
+       "posed": 0.0299,
+       "ratio": 2.87,
+       "A": {
+        "bone": "ARMTWIST_R",
+        "w": 0.34,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_R",
+        "w": 0.3,
+        "sum": 1
+       },
+       "pa": [
+        0.138,
+        0.741,
+        -0.003
+       ]
+      },
+      {
+       "a": 11877,
+       "b": 11874,
+       "bind": 0.0104,
+       "posed": 0.0299,
+       "ratio": 2.87,
+       "A": {
+        "bone": "SCAP_R",
+        "w": 0.3,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_R",
+        "w": 0.34,
+        "sum": 1
+       },
+       "pa": [
+        0.126,
+        0.75,
+        -0.029
+       ]
+      },
+      {
+       "a": 11859,
+       "b": 11863,
+       "bind": 0.0104,
+       "posed": 0.0292,
+       "ratio": 2.8,
+       "A": {
+        "bone": "ARMTWIST_L",
+        "w": 0.34,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.29,
+        "sum": 1
+       },
+       "pa": [
+        -0.138,
+        0.742,
+        -0.004
+       ]
+      },
+      {
+       "a": 12090,
+       "b": 12088,
+       "bind": 0.0104,
+       "posed": 0.0292,
+       "ratio": 2.8,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.29,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_L",
+        "w": 0.34,
+        "sum": 1
+       },
+       "pa": [
+        -0.126,
+        0.75,
+        -0.03
+       ]
+      },
+      {
+       "a": 11286,
+       "b": 11277,
+       "bind": 0.0086,
+       "posed": 0.0241,
+       "ratio": 2.79,
+       "A": {
+        "bone": "ARMTWIST_R",
+        "w": 0.35,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_R",
+        "w": 0.3,
+        "sum": 1
+       },
+       "pa": [
+        0.141,
+        0.745,
+        -0.011
+       ]
+      },
+      {
+       "a": 11278,
+       "b": 11289,
+       "bind": 0.008,
+       "posed": 0.0218,
+       "ratio": 2.74,
+       "A": {
+        "bone": "ARMTWIST_R",
+        "w": 0.28,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_R",
+        "w": 0.36,
+        "sum": 1
+       },
+       "pa": [
+        0.128,
+        0.756,
+        -0.032
+       ]
+      },
+      {
+       "a": 11247,
+       "b": 11248,
+       "bind": 0.0086,
+       "posed": 0.0236,
+       "ratio": 2.73,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.29,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_L",
+        "w": 0.35,
+        "sum": 1
+       },
+       "pa": [
+        -0.126,
+        0.75,
+        -0.03
+       ]
+      },
+      {
+       "a": 12089,
+       "b": 12090,
+       "bind": 0.0086,
+       "posed": 0.0236,
+       "ratio": 2.73,
+       "A": {
+        "bone": "ARMTWIST_L",
+        "w": 0.35,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.29,
+        "sum": 1
+       },
+       "pa": [
+        -0.141,
+        0.746,
+        -0.012
+       ]
+      },
+      {
+       "a": 11245,
+       "b": 11246,
+       "bind": 0.008,
+       "posed": 0.0215,
+       "ratio": 2.7,
+       "A": {
+        "bone": "ARMTWIST_L",
+        "w": 0.28,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_L",
+        "w": 0.36,
+        "sum": 1
+       },
+       "pa": [
+        -0.128,
+        0.756,
+        -0.032
+       ]
+      },
+      {
+       "a": 11866,
+       "b": 11867,
+       "bind": 0.008,
+       "posed": 0.0215,
+       "ratio": 2.7,
+       "A": {
+        "bone": "ARMTWIST_L",
+        "w": 0.36,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_L",
+        "w": 0.28,
+        "sum": 1
+       },
+       "pa": [
+        -0.141,
+        0.747,
+        -0.018
+       ]
+      },
+      {
+       "a": 8385,
+       "b": 8381,
+       "bind": 0.0055,
+       "posed": 0.0146,
+       "ratio": 2.68,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.38,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.46,
+        "sum": 1
+       },
+       "pa": [
+        0.05,
+        0.667,
+        -0.031
+       ]
+      }
+     ]
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 14965,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.001,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 6847,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "rotation_release": {
+   "meshes": [
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 959,
+     "flipped_hand_face_triangles": 654,
+     "flip_by_bone": {
+      "PELVIS": 1,
+      "FOREARM_R": 72,
+      "FOREARM_L": 105,
+      "UPPERARM_R": 299,
+      "UPPERARM_L": 358,
+      "SPINE2": 5,
+      "CHEST": 30,
+      "ARMTWIST_R": 39,
+      "CLAV_R": 1,
+      "ARMTWIST_L": 43,
+      "NECK": 5,
+      "HEAD": 1
+     },
+     "flip_samples": [
+      {
+       "dot": 0.22,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.46,
+        "sum": 1
+       },
+       "at": [
+        0.023,
+        0.406,
+        0.048
+       ]
+      },
+      {
+       "dot": 0.97,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.108,
+        0.902,
+        -0.3
+       ]
+      },
+      {
+       "dot": 0.85,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.108,
+        0.902,
+        -0.3
+       ]
+      },
+      {
+       "dot": 0.38,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.102,
+        0.895,
+        -0.315
+       ]
+      },
+      {
+       "dot": 0.54,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.102,
+        0.895,
+        -0.315
+       ]
+      },
+      {
+       "dot": 0.2,
+       "a": {
+        "bone": "FOREARM_L",
+        "w": 0.63,
+        "sum": 1
+       },
+       "at": [
+        0.115,
+        0.828,
+        0.279
+       ]
+      },
+      {
+       "dot": 0.84,
+       "a": {
+        "bone": "FOREARM_L",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.128,
+        0.837,
+        0.268
+       ]
+      },
+      {
+       "dot": 0.37,
+       "a": {
+        "bone": "FOREARM_L",
+        "w": 0.55,
+        "sum": 1
+       },
+       "at": [
+        0.126,
+        0.836,
+        0.256
+       ]
+      }
+     ],
+     "shell_pairs": 14590,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.001,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 8,
+     "pairs": {
+      "CHEST ↔ CHEST": {
+       "n": 1,
+       "max": 2.59,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 9376,
+        "b": 9377,
+        "bind": 0.0055,
+        "posed": 0.0141,
+        "ratio": 2.59,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.37,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.46,
+         "sum": 1
+        },
+        "pa": [
+         -0.068,
+         0.664,
+         0.02
+        ]
+       }
+      },
+      "SCAP_L ↔ SCAP_L": {
+       "n": 1,
+       "max": 2.31,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8021,
+        "b": 8025,
+        "bind": 0.007,
+        "posed": 0.0161,
+        "ratio": 2.31,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         -0.07,
+         0.745,
+         0.1
+        ]
+       }
+      },
+      "SPINE2 ↔ SPINE2": {
+       "n": 2,
+       "max": 2.27,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8417,
+        "b": 8354,
+        "bind": 0.0091,
+        "posed": 0.0206,
+        "ratio": 2.27,
+        "A": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         -0.017,
+         0.622,
+         -0.064
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ SCAP_R": {
+       "n": 2,
+       "max": 2.14,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11287,
+        "b": 11277,
+        "bind": 0.0104,
+        "posed": 0.0222,
+        "ratio": 2.14,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         -0.065,
+         0.75,
+         -0.172
+        ]
+       }
+      },
+      "UPPERARM_R ↔ UPPERARM_R": {
+       "n": 1,
+       "max": 2.13,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10856,
+        "b": 10857,
+        "bind": 0.008,
+        "posed": 0.0169,
+        "ratio": 2.13,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.38,
+         "sum": 1
+        },
+        "pa": [
+         -0.006,
+         0.793,
+         -0.143
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ ARMTWIST_R": {
+       "n": 1,
+       "max": 2.03,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11278,
+        "b": 11289,
+        "bind": 0.008,
+        "posed": 0.0161,
+        "ratio": 2.03,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.28,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         -0.079,
+         0.755,
+         -0.152
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 9376,
+       "b": 9377,
+       "bind": 0.0055,
+       "posed": 0.0141,
+       "ratio": 2.59,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.37,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.46,
+        "sum": 1
+       },
+       "pa": [
+        -0.068,
+        0.664,
+        0.02
+       ]
+      },
+      {
+       "a": 8021,
+       "b": 8025,
+       "bind": 0.007,
+       "posed": 0.0161,
+       "ratio": 2.31,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.33,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.36,
+        "sum": 1
+       },
+       "pa": [
+        -0.07,
+        0.745,
+        0.1
+       ]
+      },
+      {
+       "a": 8417,
+       "b": 8354,
+       "bind": 0.0091,
+       "posed": 0.0206,
+       "ratio": 2.27,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "pa": [
+        -0.017,
+        0.622,
+        -0.064
+       ]
+      },
+      {
+       "a": 11287,
+       "b": 11277,
+       "bind": 0.0104,
+       "posed": 0.0222,
+       "ratio": 2.14,
+       "A": {
+        "bone": "ARMTWIST_R",
+        "w": 0.34,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_R",
+        "w": 0.3,
+        "sum": 1
+       },
+       "pa": [
+        -0.065,
+        0.75,
+        -0.172
+       ]
+      },
+      {
+       "a": 11877,
+       "b": 11874,
+       "bind": 0.0104,
+       "posed": 0.0222,
+       "ratio": 2.14,
+       "A": {
+        "bone": "SCAP_R",
+        "w": 0.3,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_R",
+        "w": 0.34,
+        "sum": 1
+       },
+       "pa": [
+        -0.077,
+        0.749,
+        -0.153
+       ]
+      },
+      {
+       "a": 10856,
+       "b": 10857,
+       "bind": 0.008,
+       "posed": 0.0169,
+       "ratio": 2.13,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.38,
+        "sum": 1
+       },
+       "pa": [
+        -0.006,
+        0.793,
+        -0.143
+       ]
+      },
+      {
+       "a": 7839,
+       "b": 7836,
+       "bind": 0.0091,
+       "posed": 0.0185,
+       "ratio": 2.04,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.36,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "pa": [
+        -0.006,
+        0.629,
+        -0.092
+       ]
+      },
+      {
+       "a": 11278,
+       "b": 11289,
+       "bind": 0.008,
+       "posed": 0.0161,
+       "ratio": 2.03,
+       "A": {
+        "bone": "ARMTWIST_R",
+        "w": 0.28,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_R",
+        "w": 0.36,
+        "sum": 1
+       },
+       "pa": [
+        -0.079,
+        0.755,
+        -0.152
+       ]
+      }
+     ]
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 14965,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.001,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 6847,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "hinge_load": {
+   "meshes": [
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 1010,
+     "flipped_hand_face_triangles": 383,
+     "flip_by_bone": {
+      "PELVIS": 35,
+      "LUMBAR": 27,
+      "SPINE": 90,
+      "SPINE2": 65,
+      "FOREARM_R": 3,
+      "FOREARM_L": 3,
+      "UPPERARM_R": 11,
+      "UPPERARM_L": 12,
+      "CHEST": 669,
+      "SCAP_L": 16,
+      "SCAP_R": 14,
+      "ARMTWIST_R": 11,
+      "ARMTWIST_L": 13,
+      "NECK": 23,
+      "HEAD": 18
+     },
+     "flip_samples": [
+      {
+       "dot": -0.26,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        -0.036,
+        0.469,
+        -0.023
+       ]
+      },
+      {
+       "dot": -0.41,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.52,
+        "sum": 1
+       },
+       "at": [
+        -0.026,
+        0.473,
+        -0.027
+       ]
+      },
+      {
+       "dot": -0.27,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        -0.026,
+        0.468,
+        -0.02
+       ]
+      },
+      {
+       "dot": -0.21,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.52,
+        "sum": 1
+       },
+       "at": [
+        -0.016,
+        0.467,
+        -0.016
+       ]
+      },
+      {
+       "dot": -0.23,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.56,
+        "sum": 1
+       },
+       "at": [
+        -0.005,
+        0.46,
+        0.005
+       ]
+      },
+      {
+       "dot": -0.63,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        -0.036,
+        0.469,
+        -0.023
+       ]
+      },
+      {
+       "dot": -0.74,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.5,
+        "sum": 1
+       },
+       "at": [
+        -0.047,
+        0.478,
+        -0.028
+       ]
+      },
+      {
+       "dot": -0.68,
+       "a": {
+        "bone": "PELVIS",
+        "w": 0.5,
+        "sum": 1
+       },
+       "at": [
+        -0.047,
+        0.478,
+        -0.028
+       ]
+      }
+     ],
+     "shell_pairs": 14590,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.001,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 10,
+     "pairs": {
+      "CHEST ↔ CHEST": {
+       "n": 5,
+       "max": 2.38,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 13328,
+        "b": 13329,
+        "bind": 0.008,
+        "posed": 0.0189,
+        "ratio": 2.38,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.72,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.43,
+         "sum": 1
+        },
+        "pa": [
+         0.009,
+         0.748,
+         0.277
+        ]
+       }
+      },
+      "CHEEK_R ↔ NECK": {
+       "n": 3,
+       "max": 2.34,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 13680,
+        "b": 13681,
+        "bind": 0.0084,
+        "posed": 0.0197,
+        "ratio": 2.34,
+        "A": {
+         "bone": "NECK",
+         "w": 0.47,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEEK_R",
+         "w": 0.37,
+         "sum": 1
+        },
+        "pa": [
+         0.022,
+         0.771,
+         0.319
+        ]
+       }
+      },
+      "JAW ↔ JAW": {
+       "n": 2,
+       "max": 2.3,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 13673,
+        "b": 13674,
+        "bind": 0.0061,
+        "posed": 0.014,
+        "ratio": 2.3,
+        "A": {
+         "bone": "JAW",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "JAW",
+         "w": 0.39,
+         "sum": 1
+        },
+        "pa": [
+         0.015,
+         0.771,
+         0.326
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 13328,
+       "b": 13329,
+       "bind": 0.008,
+       "posed": 0.0189,
+       "ratio": 2.38,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.72,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.43,
+        "sum": 1
+       },
+       "pa": [
+        0.009,
+        0.748,
+        0.277
+       ]
+      },
+      {
+       "a": 13329,
+       "b": 13327,
+       "bind": 0.0089,
+       "posed": 0.0211,
+       "ratio": 2.38,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.43,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.73,
+        "sum": 1
+       },
+       "pa": [
+        0.003,
+        0.751,
+        0.295
+       ]
+      },
+      {
+       "a": 13350,
+       "b": 13346,
+       "bind": 0.008,
+       "posed": 0.0189,
+       "ratio": 2.38,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.43,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.72,
+        "sum": 1
+       },
+       "pa": [
+        0.003,
+        0.751,
+        0.295
+       ]
+      },
+      {
+       "a": 13680,
+       "b": 13681,
+       "bind": 0.0084,
+       "posed": 0.0197,
+       "ratio": 2.34,
+       "A": {
+        "bone": "NECK",
+        "w": 0.47,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEEK_R",
+        "w": 0.37,
+        "sum": 1
+       },
+       "pa": [
+        0.022,
+        0.771,
+        0.319
+       ]
+      },
+      {
+       "a": 13686,
+       "b": 13683,
+       "bind": 0.0084,
+       "posed": 0.0197,
+       "ratio": 2.34,
+       "A": {
+        "bone": "CHEEK_R",
+        "w": 0.37,
+        "sum": 1
+       },
+       "B": {
+        "bone": "NECK",
+        "w": 0.47,
+        "sum": 1
+       },
+       "pa": [
+        0.02,
+        0.78,
+        0.337
+       ]
+      },
+      {
+       "a": 13349,
+       "b": 13346,
+       "bind": 0.008,
+       "posed": 0.0183,
+       "ratio": 2.3,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.48,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.72,
+        "sum": 1
+       },
+       "pa": [
+        0.013,
+        0.75,
+        0.295
+       ]
+      },
+      {
+       "a": 13673,
+       "b": 13674,
+       "bind": 0.0061,
+       "posed": 0.014,
+       "ratio": 2.3,
+       "A": {
+        "bone": "JAW",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "JAW",
+        "w": 0.39,
+        "sum": 1
+       },
+       "pa": [
+        0.015,
+        0.771,
+        0.326
+       ]
+      },
+      {
+       "a": 13682,
+       "b": 13679,
+       "bind": 0.0061,
+       "posed": 0.014,
+       "ratio": 2.3,
+       "A": {
+        "bone": "JAW",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "JAW",
+        "w": 0.39,
+        "sum": 1
+       },
+       "pa": [
+        0.015,
+        0.78,
+        0.337
+       ]
+      },
+      {
+       "a": 13685,
+       "b": 13683,
+       "bind": 0.0098,
+       "posed": 0.0203,
+       "ratio": 2.06,
+       "A": {
+        "bone": "CHEEK_R",
+        "w": 0.46,
+        "sum": 1
+       },
+       "B": {
+        "bone": "NECK",
+        "w": 0.47,
+        "sum": 1
+       },
+       "pa": [
+        0.024,
+        0.786,
+        0.333
+       ]
+      },
+      {
+       "a": 13334,
+       "b": 13333,
+       "bind": 0.0097,
+       "posed": 0.0196,
+       "ratio": 2.03,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.4,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.66,
+        "sum": 1
+       },
+       "pa": [
+        -0.009,
+        0.764,
+        0.29
+       ]
+      }
+     ]
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 32,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {
+      "TAIL1": 32
+     },
+     "flip_samples": [
+      {
+       "dot": 0.28,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.52,
+        "sum": 1
+       },
+       "at": [
+        0.028,
+        0.354,
+        0.028
+       ]
+      },
+      {
+       "dot": 0.25,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.04,
+        0.355,
+        0.028
+       ]
+      },
+      {
+       "dot": 0.37,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.55,
+        "sum": 1
+       },
+       "at": [
+        0.047,
+        0.357,
+        0.02
+       ]
+      },
+      {
+       "dot": 0.35,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.61,
+        "sum": 1
+       },
+       "at": [
+        0.051,
+        0.352,
+        0.009
+       ]
+      },
+      {
+       "dot": 0.57,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.55,
+        "sum": 1
+       },
+       "at": [
+        0.047,
+        0.357,
+        0.02
+       ]
+      },
+      {
+       "dot": 0.22,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.49,
+        "sum": 1
+       },
+       "at": [
+        0.036,
+        0.36,
+        0.038
+       ]
+      },
+      {
+       "dot": 0.3,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.5,
+        "sum": 1
+       },
+       "at": [
+        0.045,
+        0.363,
+        0.03
+       ]
+      },
+      {
+       "dot": 0.3,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.5,
+        "sum": 1
+       },
+       "at": [
+        0.053,
+        0.363,
+        0.029
+       ]
+      }
+     ],
+     "shell_pairs": 14965,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.001,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 6847,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "pull_release": {
+   "meshes": [
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 564,
+     "flipped_hand_face_triangles": 253,
+     "flip_by_bone": {
+      "FOREARM_L": 84,
+      "FOREARM_R": 86,
+      "UPPERARM_R": 42,
+      "FORETWIST_R": 3,
+      "FORETWIST_L": 3,
+      "UPPERARM_L": 40,
+      "SCAP_L": 4,
+      "CHEST": 254,
+      "SPINE2": 12,
+      "SCAP_R": 3,
+      "ARMTWIST_L": 11,
+      "ARMTWIST_R": 13,
+      "NECK": 6,
+      "HEAD": 3
+     },
+     "flip_samples": [
+      {
+       "dot": 0.44,
+       "a": {
+        "bone": "FOREARM_L",
+        "w": 0.51,
+        "sum": 1
+       },
+       "at": [
+        -0.092,
+        0.514,
+        0.002
+       ]
+      },
+      {
+       "dot": 0.26,
+       "a": {
+        "bone": "FOREARM_L",
+        "w": 0.51,
+        "sum": 1
+       },
+       "at": [
+        -0.092,
+        0.514,
+        0.002
+       ]
+      },
+      {
+       "dot": 0.41,
+       "a": {
+        "bone": "FOREARM_L",
+        "w": 0.56,
+        "sum": 1
+       },
+       "at": [
+        -0.089,
+        0.516,
+        -0.003
+       ]
+      },
+      {
+       "dot": 0.3,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.53,
+        "sum": 1
+       },
+       "at": [
+        0.099,
+        0.511,
+        -0.002
+       ]
+      },
+      {
+       "dot": 0.43,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.53,
+        "sum": 1
+       },
+       "at": [
+        0.099,
+        0.511,
+        -0.002
+       ]
+      },
+      {
+       "dot": 0.25,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "at": [
+        0.097,
+        0.513,
+        -0.007
+       ]
+      },
+      {
+       "dot": 0.4,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "at": [
+        0.097,
+        0.513,
+        -0.007
+       ]
+      },
+      {
+       "dot": 0.25,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.65,
+        "sum": 1
+       },
+       "at": [
+        0.093,
+        0.517,
+        -0.013
+       ]
+      }
+     ],
+     "shell_pairs": 14590,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.001,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 3,
+     "pairs": {
+      "ARMTWIST_L ↔ ARMTWIST_L": {
+       "n": 1,
+       "max": 2.16,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11866,
+        "b": 11861,
+        "bind": 0.0082,
+        "posed": 0.0177,
+        "ratio": 2.16,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.36,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_L",
+         "w": 0.35,
+         "sum": 1
+        },
+        "pa": [
+         -0.086,
+         0.711,
+         -0.145
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ ARMTWIST_R": {
+       "n": 1,
+       "max": 2.15,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11289,
+        "b": 11286,
+        "bind": 0.0082,
+        "posed": 0.0176,
+        "ratio": 2.15,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.36,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.35,
+         "sum": 1
+        },
+        "pa": [
+         0.086,
+         0.711,
+         -0.145
+        ]
+       }
+      },
+      "CHEST ↔ UPPERARM_L": {
+       "n": 1,
+       "max": 2.01,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11696,
+        "b": 11697,
+        "bind": 0.0098,
+        "posed": 0.0198,
+        "ratio": 2.01,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.59,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         -0.077,
+         0.701,
+         -0.036
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 11866,
+       "b": 11861,
+       "bind": 0.0082,
+       "posed": 0.0177,
+       "ratio": 2.16,
+       "A": {
+        "bone": "ARMTWIST_L",
+        "w": 0.36,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_L",
+        "w": 0.35,
+        "sum": 1
+       },
+       "pa": [
+        -0.086,
+        0.711,
+        -0.145
+       ]
+      },
+      {
+       "a": 11289,
+       "b": 11286,
+       "bind": 0.0082,
+       "posed": 0.0176,
+       "ratio": 2.15,
+       "A": {
+        "bone": "ARMTWIST_R",
+        "w": 0.36,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_R",
+        "w": 0.35,
+        "sum": 1
+       },
+       "pa": [
+        0.086,
+        0.711,
+        -0.145
+       ]
+      },
+      {
+       "a": 11696,
+       "b": 11697,
+       "bind": 0.0098,
+       "posed": 0.0198,
+       "ratio": 2.01,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.59,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.3,
+        "sum": 1
+       },
+       "pa": [
+        -0.077,
+        0.701,
+        -0.036
+       ]
+      }
+     ]
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 6,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {
+      "TAIL1": 6
+     },
+     "flip_samples": [
+      {
+       "dot": -0.26,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.97,
+        "sum": 1
+       },
+       "at": [
+        -0.042,
+        0.281,
+        -0.027
+       ]
+      },
+      {
+       "dot": -0.2,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.97,
+        "sum": 1
+       },
+       "at": [
+        -0.053,
+        0.281,
+        -0.025
+       ]
+      },
+      {
+       "dot": -0.2,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.94,
+        "sum": 1
+       },
+       "at": [
+        0.047,
+        0.292,
+        -0.017
+       ]
+      },
+      {
+       "dot": -0.26,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.94,
+        "sum": 1
+       },
+       "at": [
+        0.047,
+        0.292,
+        -0.017
+       ]
+      },
+      {
+       "dot": -0.24,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.97,
+        "sum": 1
+       },
+       "at": [
+        -0.042,
+        0.281,
+        -0.027
+       ]
+      },
+      {
+       "dot": -0.24,
+       "a": {
+        "bone": "TAIL1",
+        "w": 0.96,
+        "sum": 1
+       },
+       "at": [
+        0.034,
+        0.281,
+        -0.027
+       ]
+      }
+     ],
+     "shell_pairs": 14965,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.001,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 6847,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "overhead_load": {
+   "meshes": [
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 948,
+     "flipped_hand_face_triangles": 288,
+     "flip_by_bone": {
+      "FOREARM_R": 63,
+      "FOREARM_L": 62,
+      "UPPERARM_R": 85,
+      "FORETWIST_R": 2,
+      "UPPERARM_L": 83,
+      "FORETWIST_L": 3,
+      "SCAP_L": 11,
+      "SPINE2": 20,
+      "CHEST": 537,
+      "SCAP_R": 15,
+      "ARMTWIST_R": 15,
+      "CLAV_R": 2,
+      "ARMTWIST_L": 19,
+      "CLAV_L": 4,
+      "NECK": 20,
+      "HEAD": 7
+     },
+     "flip_samples": [
+      {
+       "dot": 0.21,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.092,
+        0.955,
+        -0.178
+       ]
+      },
+      {
+       "dot": 0.23,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.53,
+        "sum": 1
+       },
+       "at": [
+        0.087,
+        0.96,
+        -0.172
+       ]
+      },
+      {
+       "dot": 0.21,
+       "a": {
+        "bone": "FOREARM_L",
+        "w": 0.53,
+        "sum": 1
+       },
+       "at": [
+        -0.086,
+        0.962,
+        -0.174
+       ]
+      },
+      {
+       "dot": 0.51,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.65,
+        "sum": 1
+       },
+       "at": [
+        0.083,
+        0.95,
+        -0.155
+       ]
+      },
+      {
+       "dot": 0.26,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.82,
+        "sum": 1
+       },
+       "at": [
+        0.089,
+        0.94,
+        -0.108
+       ]
+      },
+      {
+       "dot": -0.6,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.59,
+        "sum": 1
+       },
+       "at": [
+        0.071,
+        0.94,
+        -0.157
+       ]
+      },
+      {
+       "dot": -0.33,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.59,
+        "sum": 1
+       },
+       "at": [
+        0.071,
+        0.94,
+        -0.157
+       ]
+      },
+      {
+       "dot": -0.23,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.83,
+        "sum": 1
+       },
+       "at": [
+        0.075,
+        0.944,
+        -0.142
+       ]
+      }
+     ],
+     "shell_pairs": 14590,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.002,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 94,
+     "pairs": {
+      "CHEST ↔ UPPERARM_L": {
+       "n": 2,
+       "max": 3.64,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11696,
+        "b": 11697,
+        "bind": 0.0098,
+        "posed": 0.0358,
+        "ratio": 3.64,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.59,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         -0.077,
+         0.777,
+         -0.138
+        ]
+       }
+      },
+      "CHEST ↔ CHEST": {
+       "n": 39,
+       "max": 3.38,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11705,
+        "b": 11703,
+        "bind": 0.008,
+        "posed": 0.0269,
+        "ratio": 3.38,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.6,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.68,
+         "sum": 1
+        },
+        "pa": [
+         -0.099,
+         0.758,
+         -0.046
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ ARMTWIST_R": {
+       "n": 10,
+       "max": 3.11,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11278,
+        "b": 11289,
+        "bind": 0.008,
+        "posed": 0.0247,
+        "ratio": 3.11,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.28,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         0.106,
+         0.723,
+         -0.146
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ ARMTWIST_L": {
+       "n": 13,
+       "max": 3.06,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11245,
+        "b": 11246,
+        "bind": 0.008,
+        "posed": 0.0243,
+        "ratio": 3.06,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.28,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_L",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         -0.105,
+         0.723,
+         -0.147
+        ]
+       }
+      },
+      "SCAP_L ↔ SCAP_L": {
+       "n": 6,
+       "max": 2.94,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8021,
+        "b": 8025,
+        "bind": 0.007,
+        "posed": 0.0205,
+        "ratio": 2.94,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         -0.104,
+         0.718,
+         -0.121
+        ]
+       }
+      },
+      "UPPERARM_L ↔ UPPERARM_L": {
+       "n": 3,
+       "max": 2.5,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11586,
+        "b": 11587,
+        "bind": 0.008,
+        "posed": 0.0199,
+        "ratio": 2.5,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.38,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.57,
+         "sum": 1
+        },
+        "pa": [
+         -0.11,
+         0.776,
+         -0.139
+        ]
+       }
+      },
+      "UPPERARM_R ↔ UPPERARM_R": {
+       "n": 3,
+       "max": 2.49,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10856,
+        "b": 10857,
+        "bind": 0.008,
+        "posed": 0.0198,
+        "ratio": 2.49,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.38,
+         "sum": 1
+        },
+        "pa": [
+         0.111,
+         0.784,
+         -0.156
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ SCAP_R": {
+       "n": 3,
+       "max": 2.32,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11287,
+        "b": 11277,
+        "bind": 0.0104,
+        "posed": 0.0241,
+        "ratio": 2.32,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         0.117,
+         0.734,
+         -0.125
+        ]
+       }
+      },
+      "CHEST ↔ UPPERARM_R": {
+       "n": 1,
+       "max": 2.31,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11844,
+        "b": 11846,
+        "bind": 0.0088,
+        "posed": 0.0204,
+        "ratio": 2.31,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         0.106,
+         0.766,
+         -0.105
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ SCAP_L": {
+       "n": 4,
+       "max": 2.25,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11859,
+        "b": 11863,
+        "bind": 0.0104,
+        "posed": 0.0234,
+        "ratio": 2.25,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.29,
+         "sum": 1
+        },
+        "pa": [
+         -0.116,
+         0.733,
+         -0.126
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ CHEST": {
+       "n": 1,
+       "max": 2.24,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12191,
+        "b": 12187,
+        "bind": 0.0119,
+        "posed": 0.0266,
+        "ratio": 2.24,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         0.105,
+         0.748,
+         -0.159
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ CHEST": {
+       "n": 1,
+       "max": 2.22,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12496,
+        "b": 12493,
+        "bind": 0.0119,
+        "posed": 0.0264,
+        "ratio": 2.22,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         -0.105,
+         0.748,
+         -0.16
+        ]
+       }
+      },
+      "SCAP_R ↔ SCAP_R": {
+       "n": 4,
+       "max": 2.2,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11274,
+        "b": 11275,
+        "bind": 0.0104,
+        "posed": 0.0228,
+        "ratio": 2.2,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.35,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         0.098,
+         0.714,
+         -0.142
+        ]
+       }
+      },
+      "CHEST ↔ CLAV_R": {
+       "n": 1,
+       "max": 2.16,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11054,
+        "b": 11055,
+        "bind": 0.0043,
+        "posed": 0.0093,
+        "ratio": 2.16,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_R",
+         "w": 0.29,
+         "sum": 1
+        },
+        "pa": [
+         0.106,
+         0.771,
+         -0.107
+        ]
+       }
+      },
+      "FOREARM_L ↔ FOREARM_L": {
+       "n": 2,
+       "max": 2.04,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 6440,
+        "b": 6442,
+        "bind": 0.0183,
+        "posed": 0.0374,
+        "ratio": 2.04,
+        "A": {
+         "bone": "FOREARM_L",
+         "w": 0.59,
+         "sum": 1
+        },
+        "B": {
+         "bone": "FOREARM_L",
+         "w": 0.37,
+         "sum": 1
+        },
+        "pa": [
+         -0.072,
+         0.9,
+         -0.093
+        ]
+       }
+      },
+      "FOREARM_R ↔ FOREARM_R": {
+       "n": 1,
+       "max": 2.02,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 6401,
+        "b": 6404,
+        "bind": 0.0183,
+        "posed": 0.037,
+        "ratio": 2.02,
+        "A": {
+         "bone": "FOREARM_R",
+         "w": 0.59,
+         "sum": 1
+        },
+        "B": {
+         "bone": "FOREARM_R",
+         "w": 0.37,
+         "sum": 1
+        },
+        "pa": [
+         0.073,
+         0.898,
+         -0.092
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 11696,
+       "b": 11697,
+       "bind": 0.0098,
+       "posed": 0.0358,
+       "ratio": 3.64,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.59,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.3,
+        "sum": 1
+       },
+       "pa": [
+        -0.077,
+        0.777,
+        -0.138
+       ]
+      },
+      {
+       "a": 11705,
+       "b": 11703,
+       "bind": 0.008,
+       "posed": 0.0269,
+       "ratio": 3.38,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.6,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.68,
+        "sum": 1
+       },
+       "pa": [
+        -0.099,
+        0.758,
+        -0.046
+       ]
+      },
+      {
+       "a": 10687,
+       "b": 10688,
+       "bind": 0.008,
+       "posed": 0.0265,
+       "ratio": 3.33,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.68,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.6,
+        "sum": 1
+       },
+       "pa": [
+        0.102,
+        0.745,
+        -0.023
+       ]
+      },
+      {
+       "a": 11797,
+       "b": 11802,
+       "bind": 0.0104,
+       "posed": 0.0341,
+       "ratio": 3.28,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.3,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.46,
+        "sum": 1
+       },
+       "pa": [
+        -0.095,
+        0.769,
+        -0.108
+       ]
+      },
+      {
+       "a": 11278,
+       "b": 11289,
+       "bind": 0.008,
+       "posed": 0.0247,
+       "ratio": 3.11,
+       "A": {
+        "bone": "ARMTWIST_R",
+        "w": 0.28,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_R",
+        "w": 0.36,
+        "sum": 1
+       },
+       "pa": [
+        0.106,
+        0.723,
+        -0.146
+       ]
+      },
+      {
+       "a": 11245,
+       "b": 11246,
+       "bind": 0.008,
+       "posed": 0.0243,
+       "ratio": 3.06,
+       "A": {
+        "bone": "ARMTWIST_L",
+        "w": 0.28,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_L",
+        "w": 0.36,
+        "sum": 1
+       },
+       "pa": [
+        -0.105,
+        0.723,
+        -0.147
+       ]
+      },
+      {
+       "a": 11866,
+       "b": 11867,
+       "bind": 0.008,
+       "posed": 0.0243,
+       "ratio": 3.06,
+       "A": {
+        "bone": "ARMTWIST_L",
+        "w": 0.36,
+        "sum": 1
+       },
+       "B": {
+        "bone": "ARMTWIST_L",
+        "w": 0.28,
+        "sum": 1
+       },
+       "pa": [
+        -0.123,
+        0.727,
+        -0.131
+       ]
+      },
+      {
+       "a": 8021,
+       "b": 8025,
+       "bind": 0.007,
+       "posed": 0.0205,
+       "ratio": 2.94,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.33,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.36,
+        "sum": 1
+       },
+       "pa": [
+        -0.104,
+        0.718,
+        -0.121
+       ]
+      },
+      {
+       "a": 11697,
+       "b": 11695,
+       "bind": 0.0109,
+       "posed": 0.0305,
+       "ratio": 2.79,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.3,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.56,
+        "sum": 1
+       },
+       "pa": [
+        -0.095,
+        0.769,
+        -0.108
+       ]
+      },
+      {
+       "a": 11641,
+       "b": 11647,
+       "bind": 0.0106,
+       "posed": 0.0291,
+       "ratio": 2.76,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.6,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.7,
+        "sum": 1
+       },
+       "pa": [
+        -0.099,
+        0.758,
+        -0.046
+       ]
+      },
+      {
+       "a": 11704,
+       "b": 11705,
+       "bind": 0.0106,
+       "posed": 0.0291,
+       "ratio": 2.76,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.7,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.6,
+        "sum": 1
+       },
+       "pa": [
+        -0.1,
+        0.754,
+        -0.017
+       ]
+      },
+      {
+       "a": 10688,
+       "b": 10686,
+       "bind": 0.0106,
+       "posed": 0.0288,
+       "ratio": 2.73,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.6,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.7,
+        "sum": 1
+       },
+       "pa": [
+        0.1,
+        0.758,
+        -0.046
+       ]
+      }
+     ]
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 14965,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.002,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 6847,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "chestfly_load": {
+   "meshes": [
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 961,
+     "flipped_hand_face_triangles": 795,
+     "flip_by_bone": {
+      "FOREARM_R": 107,
+      "FOREARM_L": 111,
+      "UPPERARM_R": 318,
+      "UPPERARM_L": 321,
+      "FORETWIST_L": 1,
+      "FORETWIST_R": 3,
+      "SPINE2": 3,
+      "ARMTWIST_R": 44,
+      "ARMTWIST_L": 46,
+      "CHEST": 7
+     },
+     "flip_samples": [
+      {
+       "dot": 0.58,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.331,
+        0.852,
+        -0.057
+       ]
+      },
+      {
+       "dot": 0.74,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.331,
+        0.852,
+        -0.057
+       ]
+      },
+      {
+       "dot": 0.61,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.64,
+        "sum": 1
+       },
+       "at": [
+        0.332,
+        0.849,
+        -0.076
+       ]
+      },
+      {
+       "dot": 0.62,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.64,
+        "sum": 1
+       },
+       "at": [
+        0.332,
+        0.849,
+        -0.076
+       ]
+      },
+      {
+       "dot": 0.46,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.338,
+        0.849,
+        -0.073
+       ]
+      },
+      {
+       "dot": 0.24,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.64,
+        "sum": 1
+       },
+       "at": [
+        0.332,
+        0.849,
+        -0.076
+       ]
+      },
+      {
+       "dot": 0.68,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.338,
+        0.849,
+        -0.073
+       ]
+      },
+      {
+       "dot": 0.33,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.338,
+        0.849,
+        -0.073
+       ]
+      }
+     ],
+     "shell_pairs": 14590,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.002,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 2,
+     "pairs": {
+      "SPINE2 ↔ SPINE2": {
+       "n": 2,
+       "max": 2.24,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8417,
+        "b": 8354,
+        "bind": 0.0091,
+        "posed": 0.0203,
+        "ratio": 2.24,
+        "A": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         0.042,
+         0.626,
+         -0.036
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 8417,
+       "b": 8354,
+       "bind": 0.0091,
+       "posed": 0.0203,
+       "ratio": 2.24,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "pa": [
+        0.042,
+        0.626,
+        -0.036
+       ]
+      },
+      {
+       "a": 8060,
+       "b": 8058,
+       "bind": 0.0091,
+       "posed": 0.0202,
+       "ratio": 2.23,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "pa": [
+        -0.042,
+        0.626,
+        -0.036
+       ]
+      }
+     ]
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 14965,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.002,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 6847,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "emote_double_biceps": {
+   "meshes": [
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 1075,
+     "flipped_hand_face_triangles": 564,
+     "flip_by_bone": {
+      "FOREARM_R": 33,
+      "FOREARM_L": 34,
+      "UPPERARM_R": 321,
+      "UPPERARM_L": 322,
+      "SPINE2": 8,
+      "CHEST": 253,
+      "ARMTWIST_R": 36,
+      "CLAV_R": 2,
+      "CLAV_L": 2,
+      "ARMTWIST_L": 42,
+      "SCAP_L": 1,
+      "SCAP_R": 1,
+      "NECK": 13,
+      "HEAD": 7
+     },
+     "flip_samples": [
+      {
+       "dot": 0.83,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.228,
+        0.946,
+        0.021
+       ]
+      },
+      {
+       "dot": 0.77,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.228,
+        0.946,
+        0.021
+       ]
+      },
+      {
+       "dot": 0.49,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.244,
+        0.94,
+        0.023
+       ]
+      },
+      {
+       "dot": 0.5,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.54,
+        "sum": 1
+       },
+       "at": [
+        0.244,
+        0.94,
+        0.023
+       ]
+      },
+      {
+       "dot": -0.89,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.86,
+        "sum": 1
+       },
+       "at": [
+        0.254,
+        0.906,
+        0.024
+       ]
+      },
+      {
+       "dot": -0.86,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.86,
+        "sum": 1
+       },
+       "at": [
+        0.254,
+        0.906,
+        0.024
+       ]
+      },
+      {
+       "dot": -0.91,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "at": [
+        0.261,
+        0.892,
+        0.021
+       ]
+      },
+      {
+       "dot": -0.92,
+       "a": {
+        "bone": "FOREARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "at": [
+        0.261,
+        0.892,
+        0.021
+       ]
+      }
+     ],
+     "shell_pairs": 14590,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.002,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 39,
+     "pairs": {
+      "CHEST ↔ CHEST": {
+       "n": 17,
+       "max": 4.33,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8385,
+        "b": 8381,
+        "bind": 0.0055,
+        "posed": 0.0236,
+        "ratio": 4.33,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.38,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.46,
+         "sum": 1
+        },
+        "pa": [
+         0.065,
+         0.658,
+         -0.068
+        ]
+       }
+      },
+      "SPINE2 ↔ SPINE2": {
+       "n": 16,
+       "max": 3.21,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8417,
+        "b": 8354,
+        "bind": 0.0091,
+        "posed": 0.0291,
+        "ratio": 3.21,
+        "A": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         0.039,
+         0.623,
+         -0.036
+        ]
+       }
+      },
+      "UPPERARM_R ↔ UPPERARM_R": {
+       "n": 1,
+       "max": 2.51,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10856,
+        "b": 10857,
+        "bind": 0.008,
+        "posed": 0.02,
+        "ratio": 2.51,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.38,
+         "sum": 1
+        },
+        "pa": [
+         0.119,
+         0.831,
+         -0.05
+        ]
+       }
+      },
+      "UPPERARM_L ↔ UPPERARM_L": {
+       "n": 2,
+       "max": 2.51,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11586,
+        "b": 11587,
+        "bind": 0.008,
+        "posed": 0.02,
+        "ratio": 2.51,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.38,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.57,
+         "sum": 1
+        },
+        "pa": [
+         -0.123,
+         0.816,
+         -0.039
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ SCAP_R": {
+       "n": 1,
+       "max": 2.02,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11872,
+        "b": 11874,
+        "bind": 0.008,
+        "posed": 0.0161,
+        "ratio": 2.02,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.34,
+         "sum": 1
+        },
+        "pa": [
+         0.122,
+         0.757,
+         -0.1
+        ]
+       }
+      },
+      "CHEST ↔ SPINE2": {
+       "n": 2,
+       "max": 2.01,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8756,
+        "b": 8758,
+        "bind": 0.0084,
+        "posed": 0.0169,
+        "ratio": 2.01,
+        "A": {
+         "bone": "SPINE2",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.42,
+         "sum": 1
+        },
+        "pa": [
+         -0.078,
+         0.639,
+         0
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 8385,
+       "b": 8381,
+       "bind": 0.0055,
+       "posed": 0.0236,
+       "ratio": 4.33,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.38,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.46,
+        "sum": 1
+       },
+       "pa": [
+        0.065,
+        0.658,
+        -0.068
+       ]
+      },
+      {
+       "a": 9376,
+       "b": 9377,
+       "bind": 0.0055,
+       "posed": 0.0234,
+       "ratio": 4.3,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.37,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.46,
+        "sum": 1
+       },
+       "pa": [
+        -0.069,
+        0.658,
+        -0.069
+       ]
+      },
+      {
+       "a": 8417,
+       "b": 8354,
+       "bind": 0.0091,
+       "posed": 0.0291,
+       "ratio": 3.21,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "pa": [
+        0.039,
+        0.623,
+        -0.036
+       ]
+      },
+      {
+       "a": 8060,
+       "b": 8058,
+       "bind": 0.0091,
+       "posed": 0.029,
+       "ratio": 3.2,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "pa": [
+        -0.044,
+        0.623,
+        -0.036
+       ]
+      },
+      {
+       "a": 9130,
+       "b": 9129,
+       "bind": 0.0086,
+       "posed": 0.0256,
+       "ratio": 2.97,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.42,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.54,
+        "sum": 1
+       },
+       "pa": [
+        -0.075,
+        0.671,
+        -0.086
+       ]
+      },
+      {
+       "a": 8354,
+       "b": 8353,
+       "bind": 0.0122,
+       "posed": 0.0336,
+       "ratio": 2.75,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "pa": [
+        0.064,
+        0.636,
+        -0.045
+       ]
+      },
+      {
+       "a": 8057,
+       "b": 8058,
+       "bind": 0.0122,
+       "posed": 0.0335,
+       "ratio": 2.74,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "pa": [
+        -0.036,
+        0.627,
+        -0.047
+       ]
+      },
+      {
+       "a": 8354,
+       "b": 8355,
+       "bind": 0.013,
+       "posed": 0.0352,
+       "ratio": 2.72,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "pa": [
+        0.064,
+        0.636,
+        -0.045
+       ]
+      },
+      {
+       "a": 8059,
+       "b": 8058,
+       "bind": 0.013,
+       "posed": 0.0351,
+       "ratio": 2.71,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.33,
+        "sum": 1
+       },
+       "pa": [
+        -0.036,
+        0.622,
+        -0.042
+       ]
+      },
+      {
+       "a": 11705,
+       "b": 11703,
+       "bind": 0.008,
+       "posed": 0.0206,
+       "ratio": 2.59,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.6,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.68,
+        "sum": 1
+       },
+       "pa": [
+        -0.107,
+        0.766,
+        0.017
+       ]
+      },
+      {
+       "a": 8385,
+       "b": 8387,
+       "bind": 0.0104,
+       "posed": 0.0267,
+       "ratio": 2.56,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.38,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.41,
+        "sum": 1
+       },
+       "pa": [
+        0.065,
+        0.658,
+        -0.068
+       ]
+      },
+      {
+       "a": 10687,
+       "b": 10688,
+       "bind": 0.008,
+       "posed": 0.0204,
+       "ratio": 2.56,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.68,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.6,
+        "sum": 1
+       },
+       "pa": [
+        0.101,
+        0.747,
+        0.024
+       ]
+      }
+     ]
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 14965,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0.002,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "_flip_metric_note": "EXPERIMENTAL, NOT A RESULT: the face-normal vs skinned-normal sign test flags a plain trunk tilt (hinge load: 667 CHEST triangles) — the skinned normal path does not match applyBoneTransform; do not read these numbers",
+     "flipped_triangles": 0,
+     "flipped_hand_face_triangles": 0,
+     "flip_by_bone": {},
+     "flip_samples": [],
+     "shell_pairs": 6847,
+     "shell_pairs_open_gt_12mm": 0,
+     "shell_max_separation_m": 0,
+     "shell_open_samples": [],
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  }
+ },
+ "errors": []
+}

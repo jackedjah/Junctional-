@@ -1,0 +1,12 @@
+{
+ "mode": "portrait",
+ "touch_emulated": true,
+ "checks": [
+  "PASS F1 STATS tab: the five canonical stats in order (FORCE · POWER · ENGINE · CONTROL · RESILIENCE), every baseline reads \"class baseline: source not found\" (5×, nothing invented), points per level = OWNER_DECISION (3 or 4), PREVIEW-only allocation, Q07 fairness UNRESOLVED, the class identity from the canon — {\"stats\":[\"FORCE\",\"POWER\",\"ENGINE\",\"CONTROL\",\"RESILIENCE\"],\"source_not_found\":5,\"owner_decision\":true,\"preview_only\":true,\"q07\":true,\"plus\":5,\"identity\":true}",
+  "PASS F2 PREVIEW allocation works in the panel (POWER +3, CONTROL +1, 8 of the labelled test budget left, reset enabled) and touches NOTHING on the host: the rules profile is byte-identical and no stat reaches the snapshot — {\"preview\":{\"power_preview\":true,\"control_preview\":true,\"left\":8,\"reset\":true},\"profile_same\":true,\"snapshot_has_stats\":false}",
+  "PASS F3 SKILLS tab: the branching PROGRESSION — FOUNDATION PROTOCOL current (levels 1–12), CLASS DEVELOPMENT locked from level 13 (the ruleset band, no invented requirement), the PHYSICAL / MAHGIC / HYBRID / CLASS branches as FUTURE nodes, the class concepts from the ruleset (Athlete: none recorded) — every non-current node says it is not grantable — {\"n\":7,\"now\":1,\"locked\":1,\"future\":5,\"texts\":[\"FOUNDATION PROTOCOL | levels 1–12 · CURRENT (level 1) · the equipped stacks below\",\"CLASS DEVELOPMENT | from level 13 (ruleset band) · LOCKED · stack selection / branching: O\",\"PHYSICAL-biased development | FUTURE · requirement: not designed yet (none invented) · not grantable\",\"MAHGIC-biased development | FUTURE · requirement: not designed yet (none invented) · not grantable\",\"HYBRID development | FUTURE · requirement: not designed yet (none invented) · not grantable\",\"class-specific branches and skill acquisitions | FUTURE · class future concepts from the ruleset (attack_stacks.future_\",\"ATHLETE class concepts | none recorded in the ruleset yet · FUTURE\"]}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "pass": 4,
+ "fail": 0
+}

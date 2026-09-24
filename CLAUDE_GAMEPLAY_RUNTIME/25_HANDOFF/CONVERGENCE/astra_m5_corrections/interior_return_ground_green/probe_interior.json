@@ -1,0 +1,5272 @@
+{
+ "checks": [
+  "PASS H1 the host refuses the gym interior away from its door (NOT_AT_DOOR) — no teleport into interiors — {\"command_id\":\"play-PLAYER_A-aktiu8-1\",\"seq\":1,\"accepted\":false,\"version\":249,\"tick\":247,\"duplicate\":false,\"reason\":\"NOT_AT_DOOR\",\"detail\":{\"door\":\"GYM_DOOR\",\"distance_m\":136.5}}",
+  "PASS E1 at the MAH GYM door the contextual prompt is ENTER (id GYM_DOOR, eligible) and the field draws the threshold pad — {\"prompt\":{\"intent\":\"ENTER\",\"id\":\"GYM_DOOR\",\"to\":\"GYM_INTERIOR\",\"label\":\"TRAINING ROOM — enter (MAH GYM)\",\"eligible\":true},\"pos\":{\"x\":-84.104,\"z\":109.693},\"reached\":true}",
+  "PASS E2 CANCEL: the confirm sheet opened (it owns input), CANCEL leaves the player at the door in FIELD with no fade and a CANCEL log entry — {\"during\":true,\"after\":\"FIELD\",\"res\":{\"accepted\":false,\"reason\":\"CANCELLED\"},\"log\":[\"CANCEL\"]}",
+  "PASS E3 ENTER accepted: the curtain was up while the host switched rooms (fade_on during), the transaction log runs START → HOST_ACK:true → END:ok, the player stands in GYM_INTERIOR at its spawn with the curtain cleared (opacity 0) — {\"res\":{\"accepted\":true,\"room\":\"GYM_INTERIOR\",\"total_ms\":857,\"via\":\"ENTER\",\"camera_before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":2.375000000002379},\"camera_after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":0.24455852798411973},\"camera_change\":{\"mode_before\":\"follow\",\"yaw_before\":2.3750000000002776,\"old_behind\":2.375000000000001,\"new_behind\":0,\"mode_after\":\"follow\",\"yaw_after\":0,\"relative_kept\":null}},\"mid_fade\":true,\"in\":{\"room\":\"GYM_INTERIOR\",\"pos\":{\"x\":0,\"z\":9.5},\"fade\":\"0\"},\"log\":[\"CANCEL\",\"START\",\"FADE_OUT_DONE\",\"HOST_ACK:true\",\"READY\",\"END\"]}",
+  "PASS E4 warm entry adds no loading card: the complete transaction is START → FADE_OUT_DONE → HOST_ACK → READY → END with no SLOW_STAGE_SHOWN/timeout; the two 220 ms fades remain fixed and preparation/total stay below bounded warm-path budgets (1200/2000 ms) — {\"events\":[\"START\",\"FADE_OUT_DONE\",\"HOST_ACK\",\"READY\",\"END\"],\"slow_stage_shown\":false,\"ready_timeout\":false,\"fade_out_ms\":220,\"host_ms\":46,\"prepare_ms\":317,\"scene_build_ms\":13.8,\"room_seen_after_ms\":26,\"polls\":1,\"fade_in_ms\":220,\"total_ms\":857}",
+  "PASS E5 the interior is the ONE visible scene: no build error, the wall solids feed the camera probe, the field is hidden (visible mesh count is the hall, not the district) — {\"error\":null,\"boom\":true,\"visible_meshes\":128}",
+  "PASS E6 flight inside is allowed but capped by the hall ceiling (3.2 m): powered after ENTER + ASCEND, height above ground ≤ 3.3 m after 2.5 s; EXIT lands — {\"enter\":true,\"fly\":{\"powered\":true,\"altitude\":3.2,\"height\":3.2},\"after_exit\":{\"powered\":false,\"height\":0}}",
+  "PASS E7 at the doorway wall, a deterministic rear manual view (yaw 0, ORBIT disables automatic pitch escape) is shortened by the interior wall; the camera remains outside the solid, then explicit reset restores FOLLOW before the exit transaction — {\"setup\":{\"orbit\":{\"mode\":\"orbit\",\"yaw\":0},\"camera\":{\"yaw\":0,\"pitch\":0.2,\"behind\":6.186811988617253,\"err_deg\":-5.52,\"back_dot\":0.7080657774383146,\"back_err_deg\":44.92,\"last_err_deg\":48.55,\"yaw_vel\":0,\"applied\":2.1,\"dist\":6.474795594385649,\"dragging\":false,\"state\":\"ORBIT\",\"speedK\":0,\"fov\":55,\"fade\":1,\"mode\":\"orbit\",\"resetting\":false,\"pitch_bias\":0.024,\"obstructed\":true,\"readable\":2.2,\"zoom\":1,\"flightV\":0,\"hold_alt\":null,\"fly_hold\":false,\"desc_hold\":false,\"flightMine\":false,\"move_f\":0,\"in_fwd\":0,\"keys_space\":false,\"keys_c\":false,\"preset\":\"landscape\",\"facing_deg\":354.48,\"latch\":null,\"cfg\":{\"heading_follow\":true,\"height_frac\":0.72,\"look_height_frac\":0.28,\"shoulder_m\":0,\"look_ahead_m\":2,\"stiffness_idle_hz\":1.2,\"stiffness_move_hz\":2,\"reset_time_s\":0.5,\"obstruct_pitch_up\":true,\"min_readable_m\":2.2,\"readable_frac\":0.34,\"latch_manual_drag\":false,\"pitch_up_step\":0.12,\"pitch_up_max_steps\":8,\"pitch_up_limit\":0.9,\"relatch_deg\":45,\"pitch_min\":-0.4,\"pitch_min_flight\":-1.05,\"pitch_max\":1.2,\"probe_radius_m\":0.35,\"pull_in_speed\":24,\"ease_out_speed\":2.5,\"speed_fov_deg\":0,\"speed_pullback\":0,\"fade_below_m\":1.3,\"lock_extend\":0,\"lock_frame\":false,\"strike_kick\":0,\"presets\":{\"portrait\":{\"frame_frac\":0.55,\"pitch_home\":0.2,\"look_height_frac\":0},\"landscape\":{\"frame_frac\":0.31,\"pitch_home\":0.2}}},\"position\":{\"x\":-1.8374825121928131,\"y\":1.9720791476042305,\"z\":13.606792624776455},\"inside\":null,\"below_ground\":false},\"play\":{\"play_config_version\":\"PLAY_DEV_0.1.0\",\"room\":\"GYM_INTERIOR\",\"room_label\":\"TRAINING ROOM — MAH GYM (interior)\",\"room_direct\":false,\"room_interior\":true,\"room_shop\":null,\"return_to\":{\"room\":\"FIELD\",\"x\":-85.45000000000371,\"z\":110.00000202026281,\"facing\":1.5708,\"door\":\"GYM_DOOR\",\"threshold\":{\"x\":-86,\"z\":110},\"clearance_m\":0.55},\"rules\":{\"ruleset\":\"MW_DEV_2026_09_14_R17_23_V0_1 (live)\",\"me\":{\"id\":\"PLAYER_A\",\"kind\":\"PLAYER\",\"class\":\"ATHLETE\",\"level\":1,\"team\":\"PRACTICE\",\"hp\":2000,\"max\":2000,\"ko\":false,\"last_hit_ago_s\":null,\"last_touch_ago_s\":null,\"last_hit_from\":null,\"lock\":null,\"position\":{\"x\":-0.259,\"z\":12.303},\"facing\":0,\"guard\":null,\"guard_sheet\":{\"frac\":1,\"broken\":false},\"invisible\":false,\"immune\":false,\"discord\":false,\"cast\":null,\"statuses\":[],\"enemy\":false,\"ally\":true,\"combat_energy\":{\"current\":200,\"max\":200,\"regen\":0},\"category\":\"PHYSICAL\",\"attack_mode\":\"PHYSICAL\",\"attack_modes\":[{\"id\":\"PHYSICAL\",\"label\":\"PHYSICAL\",\"category\":\"PHYSICAL\"},{\"id\":\"PHYSICAL_MAHGIC\",\"label\":\"PHYS MAHGIC\",\"category\":\"PHYSICAL_MAGIC\"},{\"id\":\"SPECIAL_MAHGIC\",\"label\":\"SPECIAL MAHGIC\",\"category\":\"SPECIAL_MAGIC\"}],\"band\":\"FOUNDATION_PROTOCOL\",\"foundation_max_level\":12,\"stacks_revision\":1,\"equipped_stacks\":{},\"loadout\":{\"PHYSICAL\":{\"attack_mode\":\"PHYSICAL\",\"capacity\":4,\"equipped\":[\"PA_PUSH\",\"PA_PULL\",\"PA_HINGE\",\"PA_ROTATION\"],\"equipped_count\":4,\"pool\":[{\"skill_id\":\"PA_PUSH\",\"name\":\"Drive\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":0,\"movement_pattern_id\":\"HORIZONTAL_PUSH\",\"pattern_name\":\"Horizontal Push\",\"pattern_label\":\"H-PUSH\",\"cost\":0,\"effect\":\"BODY_STRIKE\"},{\"skill_id\":\"PA_PULL\",\"name\":\"Row Hook\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":1,\"movement_pattern_id\":\"VERTICAL_PULL\",\"pattern_name\":\"Vertical Pull\",\"pattern_label\":\"V-PULL\",\"cost\":0,\"effect\":\"BODY_STRIKE\"},{\"skill_id\":\"PA_HINGE\",\"name\":\"Hinge Rise\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":2,\"movement_pattern_id\":\"HINGE\",\"pattern_name\":\"Hinge\",\"pattern_label\":\"HINGE\",\"cost\":0,\"effect\":\"BODY_STRIKE\"},{\"skill_id\":\"PA_ROTATION\",\"name\":\"Pivot Strike\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":3,\"movement_pattern_id\":\"ROTATION\",\"pattern_name\":\"Rotation\",\"pattern_label\":\"ROTATE\",\"cost\":0,\"effect\":\"BODY_STRIKE\"}]},\"PHYSICAL_MAGIC\":{\"attack_mode\":\"PHYSICAL_MAHGIC\",\"capacity\":2,\"equipped\":[\"PM_PUSH\",\"PM_PULL\"],\"equipped_count\":2,\"pool\":[{\"skill_id\":\"PM_PUSH\",\"name\":\"Infused Drive\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":0,\"movement_pattern_id\":\"HORIZONTAL_PUSH\",\"pattern_name\":\"Horizontal Push\",\"pattern_label\":\"H-PUSH\",\"cost\":8,\"effect\":\"BODY_STRIKE\"},{\"skill_id\":\"PM_PULL\",\"name\":\"Infused Row Hook\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":1,\"movement_pattern_id\":\"VERTICAL_PULL\",\"pattern_name\":\"Vertical Pull\",\"pattern_label\":\"V-PULL\",\"cost\":10,\"effect\":\"BODY_STRIKE\"},{\"skill_id\":\"PM_HINGE\",\"name\":\"Infused Hinge Rise\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":null,\"movement_pattern_id\":\"HINGE\",\"pattern_name\":\"Hinge\",\"pattern_label\":\"HINGE\",\"cost\":14,\"effect\":\"BODY_STRIKE\"},{\"skill_id\":\"PM_ROTATION\",\"name\":\"Infused Pivot Strike\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":null,\"movement_pattern_id\":\"ROTATION\",\"pattern_name\":\"Rotation\",\"pattern_label\":\"ROTATE\",\"cost\":11,\"effect\":\"BODY_STRIKE\"},{\"skill_id\":\"PM_CURL_BARRAGE\",\"name\":\"Eight-Strike Curl Barrage\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":null,\"movement_pattern_id\":\"CURL\",\"pattern_name\":\"Alternating Curl\",\"pattern_label\":\"CURL\",\"cost\":18,\"effect\":\"MULTI_STRIKE\"}]},\"SPECIAL_MAGIC\":{\"attack_mode\":\"SPECIAL_MAHGIC\",\"capacity\":2,\"equipped\":[\"ATHLETE_OVERHEAD_RELEASE\",\"ATHLETE_CHEST_FLY_CLAP\"],\"equipped_count\":2,\"pool\":[{\"skill_id\":\"ATHLETE_VECTOR\",\"name\":\"Vector Shot\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":null,\"movement_pattern_id\":\"UNASSIGNED_PATTERN_DEV\",\"pattern_name\":\"No verified exercise mapping\",\"pattern_label\":\"—\",\"cost\":12,\"effect\":\"PROJECTILE\"},{\"skill_id\":\"ATHLETE_TRACK\",\"name\":\"Trackburst\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":null,\"movement_pattern_id\":\"UNASSIGNED_PATTERN_DEV\",\"pattern_name\":\"No verified exercise mapping\",\"pattern_label\":\"—\",\"cost\":20,\"effect\":\"PROJECTILE\"},{\"skill_id\":\"ATHLETE_SET\",\"name\":\"Set Position\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":null,\"movement_pattern_id\":\"UNASSIGNED_PATTERN_DEV\",\"pattern_name\":\"No verified exercise mapping\",\"pattern_label\":\"—\",\"cost\":18,\"effect\":\"SELF_BUFF\"},{\"skill_id\":\"ATHLETE_CASCADE\",\"name\":\"Cascade Pull\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":null,\"movement_pattern_id\":\"VERTICAL_PULL\",\"pattern_name\":\"Vertical Pull\",\"pattern_label\":\"V-PULL\",\"cost\":18,\"effect\":\"AREA_DAMAGE\"},{\"skill_id\":\"ATHLETE_OVERHEAD_RELEASE\",\"name\":\"Overhead Extension Release\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":0,\"movement_pattern_id\":\"VERTICAL_PUSH\",\"pattern_name\":\"Vertical Push\",\"pattern_label\":\"V-PUSH\",\"cost\":14,\"effect\":\"PROJECTILE\"},{\"skill_id\":\"ATHLETE_CHEST_FLY_CLAP\",\"name\":\"Chest Fly Clap Release\",\"eligible\":true,\"reason\":\"OK\",\"detail\":null,\"equipped_slot\":1,\"movement_pattern_id\":\"HORIZONTAL_ADDUCTION\",\"pattern_name\":\"Chest Fly\",\"pattern_label\":\"FLY\",\"cost\":16,\"effect\":\"PROJECTILE\"}]}},\"selection\":{\"PHYSICAL\":0,\"PHYSICAL_MAGIC\":0,\"SPECIAL_MAGIC\":0},\"selected_skill\":\"PA_PUSH\",\"niche\":false,\"profile\":{\"potency\":{\"PHYSICAL\":100,\"PHYSICAL_MAGIC\":70,\"SPECIAL_MAGIC\":60},\"hp\":2000,\"physical_reduction\":0.16,\"magical_reduction\":0.15,\"movement\":1,\"startup\":0.9,\"dash\":{\"distance_multiplier\":1,\"duration_seconds\":0.15,\"cooldown_seconds\":1.8,\"combat_energy_cost\":8},\"constructs_cap\":1,\"periodic\":1},\"movement_multiplier\":1,\"dash_cooldown_remaining_s\":0,\"constructs\":0,\"stats\":{\"casts\":0,\"hits\":0,\"heals\":0,\"fizzles\":0,\"kos\":0}},\"skills\":{\"PHYSICAL\":[{\"id\":\"PA_PUSH\",\"name\":\"Drive\",\"category\":\"PHYSICAL\",\"cost\":0,\"cooldown_s\":0.1,\"cooldown_remaining_s\":0,\"startup_s\":0.2,\"recovery_s\":0.34,\"range_m\":2.5,\"gesture\":\"UP\",\"effect\":\"BODY_STRIKE\",\"pattern\":\"HORIZONTAL_PUSH\",\"autonomous\":false,\"targets\":null,\"mode\":null,\"attack_mode\":\"PHYSICAL\",\"attack_mode_label\":\"PHYSICAL\",\"movement_pattern_id\":\"HORIZONTAL_PUSH\",\"pattern_name\":\"Horizontal Push\",\"pattern_label\":\"H-PUSH\",\"stack\":{\"attack_stack_id\":\"AS_ATHLETE_PHYSICAL_HORIZONTAL_PUSH_PA_PUSH_F\",\"attack_stack_revision\":1,\"presentation_profile_id\":\"PP_ATHLETE_PA_PUSH\",\"progression_band\":\"FOUNDATION_PROTOCOL\",\"resolved_name\":\"Athlete Drive\"},\"selected\":true,\"loadout_slot\":0,\"availability\":\"READY\",\"availability_why\":null},{\"id\":\"PA_PULL\",\"name\":\"Row Hook\",\"category\":\"PHYSICAL\",\"cost\":0,\"cooldown_s\":0.1,\"cooldown_remaining_s\":0,\"startup_s\":0.27,\"recovery_s\":0.41,\"range_m\":2.5,\"gesture\":\"LEFT\",\"effect\":\"BODY_STRIKE\",\"pattern\":\"VERTICAL_PULL\",\"autonomous\":false,\"targets\":null,\"mode\":null,\"attack_mode\":\"PHYSICAL\",\"attack_mode_label\":\"PHYSICAL\",\"movement_pattern_id\":\"VERTICAL_PULL\",\"pattern_name\":\"Vertical Pull\",\"pattern_label\":\"V-PULL\",\"stack\":{\"attack_stack_id\":\"AS_ATHLETE_PHYSICAL_VERTICAL_PULL_PA_PULL_F\",\"attack_stack_revision\":1,\"presentation_profile_id\":\"PP_ATHLETE_PA_PULL\",\"progression_band\":\"FOUNDATION_PROTOCOL\",\"resolved_name\":\"Athlete Row Hook\"},\"selected\":false,\"loadout_slot\":1,\"availability\":\"READY\",\"availability_why\":null},{\"id\":\"PA_HINGE\",\"name\":\"Hinge Rise\",\"category\":\"PHYSICAL\",\"cost\":0,\"cooldown_s\":0.1,\"cooldown_remaining_s\":0,\"startup_s\":0.36,\"recovery_s\":0.45,\"range_m\":2.3,\"gesture\":\"UP\",\"effect\":\"BODY_STRIKE\",\"pattern\":\"HINGE\",\"autonomous\":false,\"targets\":null,\"mode\":null,\"attack_mode\":\"PHYSICAL\",\"attack_mode_label\":\"PHYSICAL\",\"movement_pattern_id\":\"HINGE\",\"pattern_name\":\"Hinge\",\"pattern_label\":\"HINGE\",\"stack\":{\"attack_stack_id\":\"AS_ATHLETE_PHYSICAL_HINGE_PA_HINGE_F\",\"attack_stack_revision\":1,\"presentation_profile_id\":\"PP_ATHLETE_PA_HINGE\",\"progression_band\":\"FOUNDATION_PROTOCOL\",\"resolved_name\":\"Athlete Hinge Rise\"},\"selected\":false,\"loadout_slot\":2,\"availability\":\"READY\",\"availability_why\":null},{\"id\":\"PA_ROTATION\",\"name\":\"Pivot Strike\",\"category\":\"PHYSICAL\",\"cost\":0,\"cooldown_s\":0.1,\"cooldown_remaining_s\":0,\"startup_s\":0.29,\"recovery_s\":0.38,\"range_m\":2.8,\"gesture\":\"RIGHT\",\"effect\":\"BODY_STRIKE\",\"pattern\":\"ROTATION\",\"autonomous\":false,\"targets\":null,\"mode\":null,\"attack_mode\":\"PHYSICAL\",\"attack_mode_label\":\"PHYSICAL\",\"movement_pattern_id\":\"ROTATION\",\"pattern_name\":\"Rotation\",\"pattern_label\":\"ROTATE\",\"stack\":{\"attack_stack_id\":\"AS_ATHLETE_PHYSICAL_ROTATION_PA_ROTATION_F\",\"attack_stack_revision\":1,\"presentation_profile_id\":\"PP_ATHLETE_PA_ROTATION\",\"progression_band\":\"FOUNDATION_PROTOCOL\",\"resolved_name\":\"Athlete Pivot Strike\"},\"selected\":false,\"loadout_slot\":3,\"availability\":\"READY\",\"availability_why\":null}],\"PHYSICAL_MAGIC\":[{\"id\":\"PM_PUSH\",\"name\":\"Infused Drive\",\"category\":\"PHYSICAL_MAGIC\",\"cost\":8,\"cooldown_s\":1.2,\"cooldown_remaining_s\":0,\"startup_s\":0.41,\"recovery_s\":0.5,\"range_m\":2.5,\"gesture\":\"UP\",\"effect\":\"BODY_STRIKE\",\"pattern\":\"HORIZONTAL_PUSH\",\"autonomous\":false,\"targets\":null,\"mode\":null,\"attack_mode\":\"PHYSICAL_MAHGIC\",\"attack_mode_label\":\"PHYS MAHGIC\",\"movement_pattern_id\":\"HORIZONTAL_PUSH\",\"pattern_name\":\"Horizontal Push\",\"pattern_label\":\"H-PUSH\",\"stack\":{\"attack_stack_id\":\"AS_ATHLETE_PHYSICAL_MAHGIC_HORIZONTAL_PUSH_PM_PUSH_F\",\"attack_stack_revision\":1,\"presentation_profile_id\":\"PP_ATHLETE_PM_PUSH\",\"progression_band\":\"FOUNDATION_PROTOCOL\",\"resolved_name\":\"Athlete Infused Drive\"},\"selected\":false,\"loadout_slot\":0,\"availability\":\"READY\",\"availability_why\":null},{\"id\":\"PM_PULL\",\"name\":\"Infused Row Hook\",\"category\":\"PHYSICAL_MAGIC\",\"cost\":10,\"cooldown_s\":1.6,\"cooldown_remaining_s\":0,\"startup_s\":0.5,\"recovery_s\":0.54,\"range_m\":2.5,\"gesture\":\"LEFT\",\"effect\":\"BODY_STRIKE\",\"pattern\":\"VERTICAL_PULL\",\"autonomous\":false,\"targets\":null,\"mode\":null,\"attack_mode\":\"PHYSICAL_MAHGIC\",\"attack_mode_label\":\"PHYS MAHGIC\",\"movement_pattern_id\":\"VERTICAL_PULL\",\"pattern_name\":\"Vertical Pull\",\"pattern_label\":\"V-PULL\",\"stack\":{\"attack_stack_id\":\"AS_ATHLETE_PHYSICAL_MAHGIC_VERTICAL_PULL_PM_PULL_F\",\"attack_stack_revision\":1,\"presentation_profile_id\":\"PP_ATHLETE_PM_PULL\",\"progression_band\":\"FOUNDATION_PROTOCOL\",\"resolved_name\":\"Athlete Infused Row Hook\"},\"selected\":false,\"loadout_slot\":1,\"availability\":\"READY\",\"availability_why\":null}],\"SPECIAL_MAGIC\":[{\"id\":\"ATHLETE_OVERHEAD_RELEASE\",\"name\":\"Overhead Extension Release\",\"category\":\"SPECIAL_MAGIC\",\"cost\":14,\"cooldown_s\":4,\"cooldown_remaining_s\":0,\"startup_s\":0.77,\"recovery_s\":0.36,\"range_m\":30,\"gesture\":\"UP\",\"effect\":\"PROJECTILE\",\"pattern\":\"VERTICAL_PUSH\",\"autonomous\":true,\"targets\":null,\"mode\":null,\"attack_mode\":\"SPECIAL_MAHGIC\",\"attack_mode_label\":\"SPECIAL MAHGIC\",\"movement_pattern_id\":\"VERTICAL_PUSH\",\"pattern_name\":\"Vertical Push\",\"pattern_label\":\"V-PUSH\",\"stack\":{\"attack_stack_id\":\"AS_ATHLETE_SPECIAL_MAHGIC_VERTICAL_PUSH_ATHLETE_OVERHEAD_RELEASE_F\",\"attack_stack_revision\":1,\"presentation_profile_id\":\"PP_ATHLETE_OVERHEAD_RELEASE\",\"progression_band\":\"FOUNDATION_PROTOCOL\",\"resolved_name\":\"Overhead Extension Release\"},\"selected\":false,\"loadout_slot\":0,\"availability\":\"READY\",\"availability_why\":null},{\"id\":\"ATHLETE_CHEST_FLY_CLAP\",\"name\":\"Chest Fly Clap Release\",\"category\":\"SPECIAL_MAGIC\",\"cost\":16,\"cooldown_s\":5,\"cooldown_remaining_s\":0,\"startup_s\":0.85,\"recovery_s\":0.41,\"range_m\":22.5,\"gesture\":\"LEFT\",\"effect\":\"PROJECTILE\",\"pattern\":\"HORIZONTAL_ADDUCTION\",\"autonomous\":true,\"targets\":null,\"mode\":null,\"attack_mode\":\"SPECIAL_MAHGIC\",\"attack_mode_label\":\"SPECIAL MAHGIC\",\"movement_pattern_id\":\"HORIZONTAL_ADDUCTION\",\"pattern_name\":\"Chest Fly\",\"pattern_label\":\"FLY\",\"stack\":{\"attack_stack_id\":\"AS_ATHLETE_SPECIAL_MAHGIC_HORIZONTAL_ADDUCTION_ATHLETE_CHEST_FLY_CLAP_F\",\"attack_stack_revision\":1,\"presentation_profile_id\":\"PP_ATHLETE_CHEST_FLY_CLAP\",\"progression_band\":\"FOUNDATION_PROTOCOL\",\"resolved_name\":\"Chest Fly Clap Release\"},\"selected\":false,\"loadout_slot\":1,\"availability\":\"READY\",\"availability_why\":null}]},\"patterns\":[\"HORIZONTAL_PUSH\",\"VERTICAL_PULL\",\"HINGE\",\"ROTATION\"],\"others\":[{\"id\":\"FIELD_DUMMY\",\"kind\":\"SYNTHETIC\",\"class\":\"ATHLETE\",\"level\":1,\"team\":\"DUMMY\",\"hp\":2000,\"max\":2000,\"ko\":false,\"last_hit_ago_s\":null,\"last_touch_ago_s\":null,\"last_hit_from\":null,\"lock\":null,\"position\":{\"x\":0,\"z\":-2},\"facing\":3.142,\"guard\":null,\"guard_sheet\":{\"frac\":1,\"broken\":false},\"invisible\":false,\"immune\":false,\"discord\":false,\"cast\":null,\"statuses\":[],\"enemy\":true,\"ally\":false}],\"entities\":[],\"context\":\"PRACTICE\",\"practice\":true,\"colliders\":{\"version\":\"GYM_INTERIOR_colliders_v1\",\"shapes\":[{\"id\":\"GYM_INTERIOR_WALL_0\",\"type\":\"BOX\",\"x1\":-14.6,\"x2\":14.6,\"z1\":-14.600000000000001,\"z2\":-14,\"h\":3.2},{\"id\":\"GYM_INTERIOR_WALL_1\",\"type\":\"BOX\",\"x1\":-14.6,\"x2\":14.6,\"z1\":14,\"z2\":14.600000000000001,\"h\":3.2},{\"id\":\"GYM_INTERIOR_WALL_2\",\"type\":\"BOX\",\"x1\":-14.600000000000001,\"x2\":-14,\"z1\":-14,\"z2\":14,\"h\":3.2},{\"id\":\"GYM_INTERIOR_WALL_3\",\"type\":\"BOX\",\"x1\":14,\"x2\":14.600000000000001,\"z1\":-14,\"z2\":14,\"h\":3.2},{\"id\":\"GYM_PLATFORM\",\"type\":\"BOX\",\"x1\":-3,\"z1\":-9,\"x2\":3,\"z2\":-5,\"h\":0.25,\"walkable\":true,\"low\":true},{\"id\":\"GYM_BENCH_W\",\"type\":\"BOX\",\"x1\":-11.5,\"z1\":-2,\"x2\":-9.5,\"z2\":2,\"h\":0.5,\"walkable\":true,\"low\":true},{\"id\":\"GYM_BENCH_E\",\"type\":\"BOX\",\"x1\":9.5,\"z1\":-2,\"x2\":11.5,\"z2\":2,\"h\":0.5,\"walkable\":true,\"low\":true},{\"type\":\"BOX\",\"id\":\"RACK_W0\",\"x1\":-12.72,\"x2\":-12.48,\"z1\":-9.05,\"z2\":-6.95,\"h\":1.9,\"label\":\"rack\"},{\"type\":\"BOX\",\"id\":\"RACK_W1\",\"x1\":-12.72,\"x2\":-12.48,\"z1\":-3.05,\"z2\":-0.95,\"h\":1.9,\"label\":\"rack\"},{\"type\":\"BOX\",\"id\":\"RACK_W2\",\"x1\":-12.72,\"x2\":-12.48,\"z1\":2.95,\"z2\":5.05,\"h\":1.9,\"label\":\"rack\"},{\"type\":\"BOX\",\"id\":\"RACK_E0\",\"x1\":12.48,\"x2\":12.72,\"z1\":-9.05,\"z2\":-6.95,\"h\":1.9,\"label\":\"rack\"},{\"type\":\"BOX\",\"id\":\"RACK_E1\",\"x1\":12.48,\"x2\":12.72,\"z1\":-3.05,\"z2\":-0.95,\"h\":1.9,\"label\":\"rack\"},{\"type\":\"BOX\",\"id\":\"RACK_E2\",\"x1\":12.48,\"x2\":12.72,\"z1\":2.95,\"z2\":5.05,\"h\":1.9,\"label\":\"rack\"},{\"type\":\"BOX\",\"id\":\"CAGE\",\"x1\":-1.5,\"x2\":1.5,\"z1\":-11.95,\"z2\":-10.25,\"h\":2.6,\"label\":\"squat cage\"},{\"type\":\"BOX\",\"id\":\"GYM_BARBELL_PLATFORM\",\"x1\":-1.1,\"x2\":1.1,\"z1\":-7.3,\"z2\":-6.7,\"h\":0.87,\"y0\":0.25,\"label\":\"training prop — premium MAH barbell on the lifting platform (JOB B prop)\",\"world\":\"JOBB\"}],\"district_shapes\":0,\"world_shapes\":0,\"body_radius_m\":0.4,\"interactables\":[],\"landmarks\":[],\"groups\":[]},\"match\":null,\"classes\":[\"ATHLETE\",\"TITAN\",\"BAGE\",\"VISIONARY\",\"LEAN\"],\"resets\":0},\"field\":null,\"room_size_m\":28,\"ceiling_m\":3.2,\"flight_ceiling_m\":3.2,\"interior_plan\":null,\"room_style_id\":null,\"material_family\":null,\"feature_ids\":[],\"floor_levels\":[],\"room_solids\":[{\"id\":\"RACK_W0\",\"x1\":-12.72,\"x2\":-12.48,\"z1\":-9.05,\"z2\":-6.95,\"h\":1.9,\"label\":\"rack\"},{\"id\":\"RACK_W1\",\"x1\":-12.72,\"x2\":-12.48,\"z1\":-3.05,\"z2\":-0.95,\"h\":1.9,\"label\":\"rack\"},{\"id\":\"RACK_W2\",\"x1\":-12.72,\"x2\":-12.48,\"z1\":2.95,\"z2\":5.05,\"h\":1.9,\"label\":\"rack\"},{\"id\":\"RACK_E0\",\"x1\":12.48,\"x2\":12.72,\"z1\":-9.05,\"z2\":-6.95,\"h\":1.9,\"label\":\"rack\"},{\"id\":\"RACK_E1\",\"x1\":12.48,\"x2\":12.72,\"z1\":-3.05,\"z2\":-0.95,\"h\":1.9,\"label\":\"rack\"},{\"id\":\"RACK_E2\",\"x1\":12.48,\"x2\":12.72,\"z1\":2.95,\"z2\":5.05,\"h\":1.9,\"label\":\"rack\"},{\"id\":\"CAGE\",\"x1\":-1.5,\"x2\":1.5,\"z1\":-11.95,\"z2\":-10.25,\"h\":2.6,\"label\":\"squat cage\"},{\"id\":\"GYM_BARBELL_PLATFORM\",\"x1\":-1.1,\"x2\":1.1,\"z1\":-7.3,\"z2\":-6.7,\"h\":0.87,\"y0\":0.25,\"label\":\"training prop — premium MAH barbell on the lifting platform (JOB B prop)\",\"world\":\"JOBB\"}],\"platforms\":[{\"id\":\"GYM_PLATFORM\",\"x1\":-3,\"z1\":-9,\"x2\":3,\"z2\":-5,\"height\":0.25,\"label\":\"lifting platform\"},{\"id\":\"GYM_BENCH_W\",\"x1\":-11.5,\"z1\":-2,\"x2\":-9.5,\"z2\":2,\"height\":0.5,\"label\":\"bench\"},{\"id\":\"GYM_BENCH_E\",\"x1\":9.5,\"z1\":-2,\"x2\":11.5,\"z2\":2,\"height\":0.5,\"label\":\"bench\"}],\"markers\":[],\"exit\":{\"to\":\"FIELD\",\"position\":{\"x\":0,\"z\":11.6},\"range_m\":2.6,\"requires\":null,\"label\":\"EXIT — TRAINING ROOM doorway\"},\"position\":{\"x\":-0.259,\"z\":12.303},\"speed_mps\":0,\"transit\":null,\"facing\":0,\"form\":\"FUSED\",\"mahloco\":\"FUSED_IDLE\",\"transforming\":false,\"guard\":null,\"guard_sheet\":{\"hp\":450,\"max\":450,\"frac\":1,\"broken\":false},\"dash\":null,\"emote\":null,\"emote_at\":null,\"emote_target\":null,\"emote_duration_s\":null,\"paired\":null,\"invite\":null,\"invite_out\":null,\"emote_catalog\":[{\"id\":\"WAVE\",\"name\":\"Wave\",\"group\":\"SOCIAL\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":2.2,\"icon\":\"👋\",\"reply_options\":[\"NOD\",\"WAVE\"]},{\"id\":\"NOD\",\"name\":\"Respect Nod\",\"group\":\"SOCIAL\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":1.4,\"icon\":\"🙇\",\"reply_options\":[\"NOD\"]},{\"id\":\"READY\",\"name\":\"Ready\",\"group\":\"SOCIAL\",\"form\":\"ANY\",\"partner\":false,\"directed\":false,\"loop\":false,\"duration_s\":1.6,\"icon\":\"🧍\",\"reply_options\":[\"NOD\",\"THUMBS_UP\"]},{\"id\":\"APPLAUD\",\"name\":\"Applaud\",\"group\":\"SOCIAL\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":2.4,\"icon\":\"👏\",\"reply_options\":[\"NOD\",\"THUMBS_UP\",\"WAVE\"]},{\"id\":\"THUMBS_UP\",\"name\":\"Thumbs Up\",\"group\":\"SOCIAL\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":1.8,\"icon\":\"👍\",\"reply_options\":[\"THUMBS_UP\",\"NOD\"]},{\"id\":\"BECKON\",\"name\":\"Playful Beckon\",\"group\":\"SOCIAL\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":2,\"icon\":\"🫴\",\"reply_options\":[\"WAVE\",\"SHRUG\",\"MAH_GROOVE\"]},{\"id\":\"MAH_GROOVE\",\"name\":\"MAH Groove\",\"group\":\"DANCE\",\"form\":\"ANY\",\"partner\":false,\"directed\":false,\"loop\":true,\"duration_s\":12,\"icon\":\"🕺\",\"reply_options\":[\"MAH_GROOVE\",\"APPLAUD\"]},{\"id\":\"SIDE_GLIDE\",\"name\":\"Side Glide\",\"group\":\"DANCE\",\"form\":\"ANY\",\"partner\":false,\"directed\":false,\"loop\":true,\"duration_s\":10,\"icon\":\"💃\",\"reply_options\":[\"APPLAUD\",\"SIDE_GLIDE\"]},{\"id\":\"UPRIGHT_ROW_DEMO\",\"name\":\"Upright Row Demo\",\"group\":\"EXERCISE\",\"form\":\"ANY\",\"partner\":false,\"directed\":false,\"loop\":true,\"duration_s\":8,\"icon\":\"🏋️\",\"reply_options\":[\"APPLAUD\",\"NOD\"]},{\"id\":\"HORIZONTAL_PUSH_DEMO\",\"name\":\"Horizontal Push Demo\",\"group\":\"EXERCISE\",\"form\":\"ANY\",\"partner\":false,\"directed\":false,\"loop\":true,\"duration_s\":8,\"icon\":\"🤜\",\"reply_options\":[\"APPLAUD\",\"NOD\"]},{\"id\":\"HIP_HINGE_DEMO\",\"name\":\"Hip-Hinge Demo\",\"group\":\"EXERCISE\",\"form\":\"ANY\",\"partner\":false,\"directed\":false,\"loop\":true,\"duration_s\":8,\"icon\":\"🙆\",\"reply_options\":[\"APPLAUD\",\"NOD\"]},{\"id\":\"SQUAT_DEMO\",\"name\":\"Squat Demo\",\"group\":\"EXERCISE\",\"form\":\"SPLIT\",\"partner\":false,\"directed\":false,\"loop\":true,\"duration_s\":8,\"icon\":\"🦵\",\"reply_options\":[\"APPLAUD\",\"NOD\"]},{\"id\":\"DOUBLE_BICEPS\",\"name\":\"Double Biceps\",\"group\":\"FLEX\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":3,\"icon\":\"💪\",\"reply_options\":[\"APPLAUD\",\"DOUBLE_BICEPS\",\"BECKON\"]},{\"id\":\"FRONT_LAT_SPREAD\",\"name\":\"Front Lat Spread\",\"group\":\"FLEX\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":3,\"icon\":\"🦅\",\"reply_options\":[\"APPLAUD\",\"THUMBS_UP\"]},{\"id\":\"SIDE_CHEST\",\"name\":\"Side Chest\",\"group\":\"FLEX\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":3,\"icon\":\"🫸\",\"reply_options\":[\"APPLAUD\",\"THUMBS_UP\"]},{\"id\":\"BACK_LAT_SPREAD\",\"name\":\"Back Lat Spread\",\"group\":\"FLEX\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":3,\"icon\":\"🔙\",\"reply_options\":[\"APPLAUD\",\"NOD\"]},{\"id\":\"SHRUG\",\"name\":\"Shrug\",\"group\":\"EXPRESSION\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":1.8,\"icon\":\"🤷\",\"reply_options\":[\"SHRUG\",\"QUIET_LAUGH\"]},{\"id\":\"QUIET_LAUGH\",\"name\":\"Quiet Laugh\",\"group\":\"EXPRESSION\",\"form\":\"ANY\",\"partner\":false,\"directed\":true,\"loop\":false,\"duration_s\":2.2,\"icon\":\"😄\",\"reply_options\":[\"QUIET_LAUGH\",\"NOD\"]},{\"id\":\"FIST_BUMP\",\"name\":\"Fist Bump\",\"group\":\"PARTNER\",\"form\":\"ANY\",\"partner\":true,\"directed\":true,\"loop\":false,\"duration_s\":2.6,\"icon\":\"👊\",\"reply_options\":[]},{\"id\":\"HIGH_FIVE\",\"name\":\"High Five\",\"group\":\"PARTNER\",\"form\":\"ANY\",\"partner\":true,\"directed\":true,\"loop\":false,\"duration_s\":2.4,\"icon\":\"🙏\",\"reply_options\":[]},{\"id\":\"PAIRED_GROOVE\",\"name\":\"Paired Groove\",\"group\":\"PARTNER\",\"form\":\"ANY\",\"partner\":true,\"directed\":true,\"loop\":true,\"duration_s\":12,\"icon\":\"👯\",\"reply_options\":[]},{\"id\":\"PERCH\",\"name\":\"Perch\",\"group\":\"SOCIAL\",\"form\":\"ANY\",\"partner\":false,\"directed\":false,\"loop\":true,\"duration_s\":60,\"icon\":\"🪑\",\"reply_options\":[],\"requires_support\":true,\"_doc\":\"S11 sit / perch: a settled hover-perch (knees drawn up, hands resting, tail tucked) that needs ground or a registered roof / deck under the body; refused in flight or transit; cancels on move / dash / fly / attack / guard / transform like every emote. It is a hovering perch, not a seated pose on a chair: the fused body has no feet and keeps its tip clearance.\"}],\"emote_groups\":[\"SOCIAL\",\"DANCE\",\"EXERCISE\",\"FLEX\",\"EXPRESSION\",\"PARTNER\"],\"social_range_m\":3,\"npcs\":[],\"creatures\":[],\"equipment\":null,\"collectibles\":[],\"nodes\":[],\"wildlife\":[],\"defeat\":null,\"ai_spar\":null,\"host_t\":61.15,\"in_duel\":false,\"host_fighter\":false,\"nav_end\":null,\"nav\":null,\"flight\":{\"powered\":false,\"braking\":false,\"brake_seq\":0,\"brake_x\":0,\"brake_age_s\":null,\"altitude\":0,\"height_above_ground\":0,\"ground\":0,\"vz\":0,\"warning\":false,\"forced_landing\":false,\"exiting\":false,\"intent\":0,\"remaining_s\":null,\"landed_count\":1,\"hold\":null,\"perch\":null,\"falling\":false,\"hold_alt\":null,\"took_off\":false,\"warning_fraction\":0.25,\"cruise_mps\":20.56,\"boost_factor\":1.3,\"allowed_in_pvp\":false},\"flight_mahgic\":{\"current\":200,\"max\":200,\"lockout\":false,\"label\":\"Flight MAHGIC (temporary label — final name OPEN)\"},\"combat_mahgic\":{\"current\":200,\"max\":200,\"lockout\":false,\"label\":\"Combat MAHGIC (temporary label — final name OPEN)\"},\"pattern\":\"HORIZONTAL_PUSH\",\"pattern_hints\":{\"HORIZONTAL_PUSH\":{\"basic\":\"UP\",\"basic_id\":\"ATHLETE_HORIZONTAL_PUSH_BASIC\"},\"VERTICAL_PULL\":{\"basic\":\"DOWN\",\"basic_id\":\"ATHLETE_VERTICAL_PULL_BASIC\",\"special\":\"HOLD\",\"special_id\":\"ATHLETE_BILATERAL_UPRIGHT_ROW_MANIFESTATION\"},\"HINGE\":{\"basic\":\"UP\",\"basic_id\":\"ATHLETE_HINGE_BASIC\"},\"LUNGE\":{\"basic\":\"UP\",\"basic_id\":\"ATHLETE_LUNGE_BASIC\"}},\"room_attack\":null,\"targets\":[],\"tutorial\":{\"steps\":[\"MOVE\",\"FLY_AND_LAND\",\"BASIC_ATTACK\"],\"done\":{\"MOVE\":true,\"FLY_AND_LAND\":true},\"complete\":false},\"quest\":null,\"quests_done\":[],\"skills\":{},\"workouts\":0,\"character\":{\"xp\":0,\"level\":1},\"loadout\":[\"HORIZONTAL_PUSH\",\"VERTICAL_PULL\",\"HINGE\",\"LUNGE\"],\"ui_slots\":4,\"slot_cap\":8,\"equipped_max\":4,\"patterns_catalog\":[\"HORIZONTAL_PUSH\",\"VERTICAL_PULL\",\"HINGE\",\"LUNGE\"],\"magic_catalog\":[{\"id\":\"CLASS_MAGIC_PLACEHOLDER\",\"note\":\"separate progression family — OPEN\"}],\"dash_profile\":{\"distance_m\":6,\"duration_s\":0.34},\"presence\":[],\"prompts\":[{\"intent\":\"ENTER_ROOM\",\"to\":\"FIELD\",\"label\":\"EXIT — TRAINING ROOM doorway\",\"eligible\":true,\"blocked_by\":[]}],\"stats\":{\"room_hits\":0,\"dashes\":0,\"guards\":0,\"target_downs\":0}}},\"blocked\":{\"state\":\"ORBIT\",\"yaw\":0,\"dist\":6.474795594385649,\"applied\":2.1,\"obstructed\":true,\"inside\":null,\"pos\":{\"x\":-0.259,\"z\":12.303},\"facing\":0},\"restored\":{\"state\":\"FOLLOW\",\"dist\":6.474795594385649,\"applied\":1.6205530358864026}}",
+  "PASS E8 at the hall doorway the prompt is the labelled EXIT (ENTER_ROOM → FIELD) — {\"intent\":\"ENTER_ROOM\",\"to\":\"FIELD\",\"label\":\"EXIT — TRAINING ROOM doorway\",\"eligible\":true}",
+  "PASS E9 EXIT returns to the SAME doorway at its authored 0.55 m exterior clearance and entry ground level, facing away from the building (+x), curtain cleared, district rebuilt — {\"res\":{\"accepted\":true,\"room\":\"FIELD\",\"total_ms\":864,\"via\":\"ENTER_ROOM\",\"camera_before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":6.283119134475264},\"camera_after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":-1.3995070056753793},\"camera_change\":{\"mode_before\":\"follow\",\"yaw_before\":6.283164145145501,\"old_behind\":6.283180225113137,\"new_behind\":-1.571,\"mode_after\":\"follow\",\"yaw_after\":-1.571,\"relative_kept\":null}},\"pos\":{\"x\":-85.45,\"z\":110},\"expected_return\":[-85.45000000000371,110.00000202026281],\"error_m\":0.0000020202628121558004,\"ground_return\":{\"entry_ground_m\":0,\"exit_ground_m\":0,\"exit_altitude_m\":0,\"exit_height_above_ground_m\":0,\"exit_powered\":false,\"ground_error_m\":0,\"altitude_error_m\":0,\"pass\":true},\"facing\":1.571,\"door\":{\"x\":-86,\"z\":110,\"exit\":[0,11.6],\"returnAt\":[-85.45000000000371,110.00000202026281]}}",
+  "PASS E10 a second room change issued during the running transaction was refused (TRANSACTION_IN_PROGRESS) — no duplicate scene or double transaction — {\"accepted\":false,\"reason\":\"TRANSACTION_IN_PROGRESS\"}",
+  "FAIL E11 REPEAT: enter and exit again — both accepted, the repeated interior has the same owned-resource census/visible count, its room group is empty after exit, and the authored 0.55 m doorway/entry-ground return is exact again — {\"enter\":true,\"meshes_first\":128,\"meshes_repeat\":131,\"owned_first\":{\"children\":116,\"objects\":116,\"meshes\":111,\"skinned\":0,\"geometries\":111,\"materials\":10,\"textures\":2,\"skeletons\":0},\"owned_repeat\":{\"children\":119,\"objects\":131,\"meshes\":117,\"skinned\":0,\"geometries\":115,\"materials\":14,\"textures\":6,\"skeletons\":0},\"out\":{\"x\":-85.45,\"z\":110},\"expected_return\":[-85.45000000000371,110.00000202026281],\"ground_return\":{\"entry_ground_m\":0,\"exit_ground_m\":0,\"exit_altitude_m\":0,\"exit_height_above_ground_m\":0,\"exit_powered\":false,\"ground_error_m\":0,\"altitude_error_m\":0,\"pass\":true},\"field_owned\":{\"children\":0,\"objects\":0,\"meshes\":0,\"skinned\":0,\"geometries\":0,\"materials\":0,\"textures\":0,\"skeletons\":0},\"visible_field_meshes_diagnostic\":[544,491]}",
+  "PASS K1 rollback rear-follow entry / exit: ?cam_follow=1 was observed as FOLLOW before the first transaction, restored after the isolated boom setup, and remained FOLLOW before entry, after reveal and after exit — {\"setup\":{\"state\":\"FOLLOW\",\"mode\":\"follow\"},\"enter\":{\"before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":2.375000000002379},\"after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":0.24455852798411973}},\"boom_restore\":{\"state\":\"FOLLOW\",\"mode\":\"follow\"},\"exit\":{\"before\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":6.283119134475264},\"after\":{\"mode\":\"follow\",\"state\":\"FOLLOW\",\"yaw\":-1.3995070056753793}}}",
+  "PASS K2 manual-orbit entry: the mode was ORBIT before entry and is still ORBIT after the reveal — the dragged angle relative to his back is preserved (-71.86 deg before, -71.9 deg inside), no recenter — {\"before\":{\"state\":\"ORBIT\",\"err_deg\":-71.86},\"inside\":{\"state\":\"ORBIT\",\"err_deg\":-71.9},\"change\":{\"mode_before\":\"orbit\",\"yaw_before\":-0.31684545137894315,\"old_behind\":4.71218534575481,\"new_behind\":0,\"mode_after\":\"orbit\",\"yaw_after\":1.2541545100458331,\"relative_kept\":71.9}}",
+  "PASS K3 manual-orbit exit: still ORBIT after the exit, and the angle relative to his back that he had at the doorway (108.12 deg — it differs from the entry value because he turned round inside while the orbit stayed put, O1) is the angle after the exit (108.1 deg); the manual mode was never erased or recentred by a room change — {\"at_exit\":{\"state\":\"ORBIT\",\"err_deg\":108.12},\"out\":{\"state\":\"ORBIT\",\"err_deg\":108.1}}",
+  "PASS G1 TEMPLE_HALL uses its district_v1 portal and exposes the authored grand-room plan, ceiling, material/features, prompt transaction and exact exterior position/entry-ground return — {\"door\":{\"world\":[0,165.55],\"outward\":[0,-1]},\"prompt\":{\"intent\":\"ENTER\",\"id\":\"TEMPLE_DOOR\",\"to\":\"TEMPLE_HALL\",\"label\":\"GOLD TEMPLE — enter the vaulted rotunda\",\"eligible\":true},\"room\":\"TEMPLE_HALL\",\"plan\":\"TEMPLE_GOLD_ROTUNDA_V1\",\"style\":\"ATHLETE_GOLD_VAULT\",\"ceiling_m\":11.5,\"features\":[\"GOLD_VAULT_COLUMNS\",\"TEMPLE_ROTUNDA_DAIS\",\"TEMPLE_HALO_RINGS\"],\"return_m\":0.55,\"ground_return\":{\"entry_ground_m\":0,\"exit_ground_m\":0,\"exit_altitude_m\":0,\"exit_height_above_ground_m\":0,\"exit_powered\":false,\"ground_error_m\":0,\"altitude_error_m\":0,\"pass\":true},\"facing\":0}",
+  "PASS G2 TOWER_HALL uses its district_v1 portal and exposes the authored grand-room plan, ceiling, material/features, prompt transaction and exact exterior position/entry-ground return — {\"door\":{\"world\":[102.65,110],\"outward\":[-1,0]},\"prompt\":{\"intent\":\"ENTER\",\"id\":\"TOWER_DOOR\",\"to\":\"TOWER_HALL\",\"label\":\"BLUE TOWER — enter the vertical atrium\",\"eligible\":true},\"room\":\"TOWER_HALL\",\"plan\":\"TOWER_BLUE_ATRIUM_V1\",\"style\":\"TITAN_BLUE_VERTICAL\",\"ceiling_m\":13,\"features\":[\"TOWER_ATRIUM_COLUMNS\",\"TOWER_LUMEN_SPINE\",\"TOWER_SUSPENDED_RINGS\"],\"return_m\":0.55,\"ground_return\":{\"entry_ground_m\":0,\"exit_ground_m\":0,\"exit_altitude_m\":0,\"exit_height_above_ground_m\":0,\"exit_powered\":false,\"ground_error_m\":0,\"altitude_error_m\":0,\"pass\":true},\"facing\":-1.571}",
+  "PASS G3 CLOTHING_SHOP uses its district_v1 portal and exposes the authored grand-room plan, ceiling, material/features, prompt transaction and exact exterior position/entry-ground return — {\"door\":{\"world\":[-2.2,251.25],\"outward\":[0,-1]},\"prompt\":{\"intent\":\"ENTER\",\"id\":\"CLOTHING_DOOR\",\"to\":\"CLOTHING_SHOP\",\"label\":\"MAH MARKET — enter clothing wing\",\"eligible\":true},\"room\":\"CLOTHING_SHOP\",\"plan\":\"MARKET_CLOTHING_WING_V1\",\"style\":\"BAGE_ROSE_GRAND_MARKET\",\"ceiling_m\":8.2,\"features\":[\"MARKET_VAULT_RIBS\",\"CLOTHING_EMPTY_GALLERY\",\"CLOTHING_COUNTER\"],\"return_m\":0.55,\"ground_return\":{\"entry_ground_m\":0,\"exit_ground_m\":0,\"exit_altitude_m\":0,\"exit_height_above_ground_m\":0,\"exit_powered\":false,\"ground_error_m\":0,\"altitude_error_m\":0,\"pass\":true},\"facing\":0}",
+  "PASS G4 WEAPON_SHOP uses its district_v1 portal and exposes the authored grand-room plan, ceiling, material/features, prompt transaction and exact exterior position/entry-ground return — {\"door\":{\"world\":[2.2,251.25],\"outward\":[0,-1]},\"prompt\":{\"intent\":\"ENTER\",\"id\":\"WEAPON_DOOR\",\"to\":\"WEAPON_SHOP\",\"label\":\"MAH MARKET — enter weapon wing\",\"eligible\":true},\"room\":\"WEAPON_SHOP\",\"plan\":\"MARKET_WEAPON_WING_V1\",\"style\":\"BAGE_ROSE_GRAND_MARKET\",\"ceiling_m\":8.2,\"features\":[\"MARKET_VAULT_RIBS\",\"WEAPON_EMPTY_GALLERY\",\"WEAPON_COUNTER\"],\"return_m\":0.55,\"ground_return\":{\"entry_ground_m\":0,\"exit_ground_m\":0,\"exit_altitude_m\":0,\"exit_height_above_ground_m\":0,\"exit_powered\":false,\"ground_error_m\":0,\"altitude_error_m\":0,\"pass\":true},\"facing\":0}",
+  "PASS Z1 zero page / console errors through the gym and grand-room transactions — []",
+  "PASS F1 FAILURE path: the interior build failed (injected), reported SCENE_FAILED and recovered to FIELD at the authored 0.55 m exterior return, with curtain cleared and field rebuilt — {\"res\":{\"accepted\":false,\"reason\":\"SCENE_FAILED\",\"detail\":\"INTERIOR_BUILD_FAILED (GYM_INTERIOR) — fault injection\",\"recovered_to\":\"FIELD\"},\"state\":{\"room\":\"FIELD\",\"pos\":{\"x\":-85.45,\"z\":110},\"expected_return\":[-85.45000000000371,110.00000202026281],\"error_m\":0.0000020202628121558004,\"fade\":false,\"build_error\":null},\"log\":[\"START\",\"FADE_OUT_DONE\",\"HOST_ACK:true\",\"READY\",\"SCENE_FAILED\",\"RECOVER_ACK:true\",\"END\"]}",
+  "PASS S1 SLOW path (1.5 s injected): the curtain shows the room name and a real stage line (\"preparing the hall · N s\", no percentage), the entry still completes and the curtain clears — {\"stage\":{\"title\":\"TRAINING ROOM — MAH GYM (interior)\",\"stage\":\"preparing the hall · 0.7 s\",\"on\":true},\"res\":{\"accepted\":true,\"room\":\"GYM_INTERIOR\",\"total_ms\":2088,\"via\":\"ENTER\",\"camera_before\":{\"mode\":\"free\",\"state\":\"FREE\",\"yaw\":0},\"camera_after\":{\"mode\":\"free\",\"state\":\"FREE\",\"yaw\":-2.375000000000001},\"camera_change\":{\"mode_before\":\"free\",\"yaw_before\":0,\"old_behind\":2.375000000000001,\"new_behind\":0,\"mode_after\":\"free\",\"yaw_after\":-2.375000000000001,\"relative_kept\":null}},\"log\":[\"START\",\"FADE_OUT_DONE\",\"HOST_ACK:true\",\"SLOW_STAGE_SHOWN\",\"READY\",\"END\"]}",
+  "PASS C1 CLOTHING SHOP: the door prompt (CLOTHING_DOOR) enters the finished interior (touch-emulated portrait), the counter prompt is BROWSE, the catalog panel is the registry’s empty state — 0 items, \"NO STOCK YET\", status ZERO_STOCK, the only control is CLOSE (no purchase, no price, no item) — {\"prompt\":{\"intent\":\"ENTER\",\"id\":\"CLOTHING_DOOR\",\"to\":\"CLOTHING_SHOP\",\"label\":\"MAH MARKET — enter clothing wing\",\"eligible\":true},\"enter\":true,\"browse\":{\"intent\":\"BROWSE\",\"id\":\"CLOTHING_COUNTER\",\"label\":\"BROWSE — apparel catalog\",\"eligible\":true},\"catalog\":{\"open\":true,\"text\":\"MAH MARKET — clothingAPPARELNO STOCK YET · 0 itemscatalog empty by design — apparel art and fit are a later owner decisionstatus ZERO_STOCK · purchase disabled no economyCLOSE\",\"buttons\":[\"CLOSE\"]}}",
+  "PASS C2 the shop EXIT lands at the manifest clothing door’s authored 0.55 m exterior return and entry ground level, facing away — {\"res\":{\"accepted\":true,\"room\":\"FIELD\",\"total_ms\":1015,\"via\":\"ENTER_ROOM\",\"camera_before\":{\"mode\":\"free\",\"state\":\"FREE\",\"yaw\":2.6489999999667},\"camera_after\":{\"mode\":\"free\",\"state\":\"FREE\",\"yaw\":-0.5231853052066322},\"camera_change\":{\"mode_before\":\"free\",\"yaw_before\":2.6489999999667,\"old_behind\":3.172185305173332,\"new_behind\":0,\"mode_after\":\"free\",\"yaw_after\":-0.5231853052066322,\"relative_kept\":null}},\"pos\":{\"x\":-2.2,\"z\":250.7},\"expected_return\":[-2.2,250.7],\"error_m\":0,\"ground_return\":{\"entry_ground_m\":0,\"exit_ground_m\":0,\"exit_altitude_m\":0,\"exit_height_above_ground_m\":0,\"exit_powered\":false,\"ground_error_m\":0,\"altitude_error_m\":0,\"pass\":true},\"facing\":0,\"manifest_door\":[-2.2,251.25]}",
+  "FAIL C3 WEAPON SHOP: entered through the manifest WEAPON_DOOR (portrait, touch emulated), gameplay view captured, the counter BROWSE shows zero stock (no purchase), and exit lands at its authored 0.55 m exterior return and entry ground level — {\"prompt\":{\"intent\":\"ENTER\",\"id\":\"WEAPON_DOOR\",\"to\":\"WEAPON_SHOP\",\"label\":\"MAH MARKET — enter weapon wing\",\"eligible\":true},\"enter\":true,\"browse\":{\"accepted\":true,\"browse\":\"SHOP_CLOTHING\"},\"catalog\":{\"open\":true,\"text\":\"MAH MARKET — clothingAPPARELNO STOCK YET · 0 itemscatalog empty by design — apparel art and fit are a later owner decisionstatus ZERO_STOCK · purchase disabled no economyCLOSE\"},\"out\":{\"x\":-2.2,\"z\":250.7},\"expected_return\":[2.2,250.7],\"error_m\":4.4,\"ground_return\":{\"entry_ground_m\":0,\"exit_ground_m\":0,\"exit_altitude_m\":0,\"exit_height_above_ground_m\":0,\"exit_powered\":false,\"ground_error_m\":0,\"altitude_error_m\":0,\"pass\":true},\"manifest_door\":[2.2,251.25]}",
+  "PASS Z2 zero page / console errors through the shop transaction (portrait, touch emulated) — []"
+ ],
+ "out": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\CONVERGENCE\\astra_m5_corrections\\interior_return_ground_green",
+ "transactions": [
+  {
+   "name": "gym_enter",
+   "res": {
+    "accepted": true,
+    "room": "GYM_INTERIOR",
+    "total_ms": 857,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 2.375000000002379
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.24455852798411973
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 2.3750000000002776,
+     "old_behind": 2.375000000000001,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "log": [
+    "CANCEL",
+    "START",
+    "FADE_OUT_DONE",
+    "HOST_ACK:true",
+    "READY",
+    "END"
+   ],
+   "wall_ms": 1830
+  },
+  {
+   "name": "gym_exit",
+   "res": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 864,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 6.283119134475264
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": -1.3995070056753793
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 6.283164145145501,
+     "old_behind": 6.283180225113137,
+     "new_behind": -1.571,
+     "mode_after": "follow",
+     "yaw_after": -1.571,
+     "relative_kept": null
+    }
+   },
+   "dup": {
+    "accepted": false,
+    "reason": "TRANSACTION_IN_PROGRESS"
+   },
+   "log": [
+    "READY",
+    "END",
+    "START",
+    "DUPLICATE_REFUSED",
+    "FADE_OUT_DONE",
+    "HOST_ACK:true",
+    "READY",
+    "END"
+   ]
+  },
+  {
+   "name": "gym_enter_orbit",
+   "res": {
+    "accepted": true,
+    "room": "GYM_INTERIOR",
+    "total_ms": 526,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "orbit",
+     "state": "ORBIT",
+     "yaw": -0.31684545137894315
+    },
+    "camera_after": {
+     "mode": "orbit",
+     "state": "ORBIT",
+     "yaw": 1.2541545100458331
+    },
+    "camera_change": {
+     "mode_before": "orbit",
+     "yaw_before": -0.31684545137894315,
+     "old_behind": 4.71218534575481,
+     "new_behind": 0,
+     "mode_after": "orbit",
+     "yaw_after": 1.2541545100458331,
+     "relative_kept": 71.9
+    }
+   },
+   "before": {
+    "yaw": -0.31684545137894315,
+    "pitch": 0.25,
+    "behind": 4.712210476740392,
+    "err_deg": -71.86,
+    "back_dot": 0.3121562953535464,
+    "back_err_deg": 71.81,
+    "last_err_deg": -71.86,
+    "yaw_vel": 0,
+    "applied": 6.474795594385649,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0,
+    "obstructed": false,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 269.99,
+    "latch": null,
+    "cfg": {
+     "heading_follow": true,
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_min_flight": -1.05,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": -87.40951331859695,
+     "y": 3.1062927236094375,
+     "z": 115.95499432766094
+    },
+    "inside": null,
+    "below_ground": false
+   },
+   "inside": {
+    "yaw": 1.2541545100458331,
+    "pitch": 0.25,
+    "behind": 6.2824308638280035,
+    "err_deg": -71.9,
+    "back_dot": 0.31066006055032047,
+    "back_err_deg": 71.9,
+    "last_err_deg": -71.9,
+    "yaw_vel": 0,
+    "applied": 6.474795594385649,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0,
+    "obstructed": false,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 359.96,
+    "latch": null,
+    "cfg": {
+     "heading_follow": true,
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_min_flight": -1.05,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": 5.961598778500459,
+     "y": 3.1066445910588087,
+     "z": 11.453416557240956
+    },
+    "inside": null,
+    "below_ground": false
+   },
+   "at_exit": {
+    "yaw": 1.2541545100458331,
+    "pitch": 0.25,
+    "behind": 9.42436902241814,
+    "err_deg": 108.12,
+    "back_dot": -0.3109882220040283,
+    "back_err_deg": 108.12,
+    "last_err_deg": 108.12,
+    "yaw_vel": 0,
+    "applied": 6.474795594385649,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0,
+    "obstructed": false,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 539.98,
+    "latch": null,
+    "cfg": {
+     "heading_follow": true,
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_min_flight": -1.05,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": 5.961598778500459,
+     "y": 3.1066445910588087,
+     "z": 13.1304144522962
+    },
+    "inside": null,
+    "below_ground": false
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 735,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "orbit",
+     "state": "ORBIT",
+     "yaw": 1.2541545100458331
+    },
+    "camera_after": {
+     "mode": "orbit",
+     "state": "ORBIT",
+     "yaw": -3.4580307408188524
+    },
+    "camera_change": {
+     "mode_before": "orbit",
+     "yaw_before": 1.2541545100458331,
+     "old_behind": 9.424370558044272,
+     "new_behind": -1.571,
+     "mode_after": "orbit",
+     "yaw_after": -3.4580307408188524,
+     "relative_kept": -108.1
+    }
+   },
+   "out": {
+    "yaw": -3.4580307408188524,
+    "pitch": 0.25,
+    "behind": 10.995114310162977,
+    "err_deg": 108.1,
+    "back_dot": -0.3107463061612154,
+    "back_err_deg": 108.1,
+    "last_err_deg": 108.1,
+    "yaw_vel": 0,
+    "applied": 6.474795594385649,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0,
+    "obstructed": false,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 629.97,
+    "latch": null,
+    "cfg": {
+     "heading_follow": true,
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_min_flight": -1.05,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": -83.49779803694722,
+     "y": 3.1066445910588087,
+     "z": 104.03800337660493
+    },
+    "inside": null,
+    "below_ground": false
+   }
+  },
+  {
+   "name": "gold_temple_grand",
+   "enter": {
+    "accepted": true,
+    "room": "TEMPLE_HALL",
+    "total_ms": 580,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 9.424404410801621
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.7907655080655632
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 9.42437536702195,
+     "old_behind": 9.424370638261383,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 857,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141185297244848
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.34380524569877896
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141185305523571,
+     "old_behind": 9.424370614358908,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "room_build": {
+    "key": "TEMPLE_HALL:TEMPLE_HALL_colliders_v1:9",
+    "room": "TEMPLE_HALL",
+    "error": null
+   }
+  },
+  {
+   "name": "blue_tower_grand",
+   "enter": {
+    "accepted": true,
+    "room": "TOWER_HALL",
+    "total_ms": 673,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": -1.5709315787678346
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": -0.4568348591367788
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": -1.570993853358103,
+     "old_behind": 4.712185369527019,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 749,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141184812088949
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 1.7426767638135552
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141185212522956,
+     "old_behind": 9.424370614303324,
+     "new_behind": 1.571,
+     "mode_after": "follow",
+     "yaw_after": 1.571,
+     "relative_kept": null
+    }
+   },
+   "room_build": {
+    "key": "TOWER_HALL:TOWER_HALL_colliders_v1:8",
+    "room": "TOWER_HALL",
+    "error": null
+   }
+  },
+  {
+   "name": "clothing_shop_grand",
+   "enter": {
+    "accepted": true,
+    "room": "CLOTHING_SHOP",
+    "total_ms": 711,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141150841314379
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.5157384836598136
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141178438145576,
+     "old_behind": 9.42437059042361,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 823,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141164524181748
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.3438052456636124
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141181655369402,
+     "old_behind": 9.42437060469946,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "room_build": {
+    "key": "CLOTHING_SHOP",
+    "room": "CLOTHING_SHOP",
+    "error": null
+   }
+  },
+  {
+   "name": "weapon_shop_grand",
+   "enter": {
+    "accepted": true,
+    "room": "WEAPON_SHOP",
+    "total_ms": 713,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.1411181342173427
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.5297588239060488
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.1411718938359323,
+     "old_behind": 9.424370566383429,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 802,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141159120787073
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.34380524564173803
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141180129762188,
+     "old_behind": 9.424370601035937,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "room_build": {
+    "key": "WEAPON_SHOP",
+    "room": "WEAPON_SHOP",
+    "error": null
+   }
+  },
+  {
+   "name": "gym_enter_failure",
+   "res": {
+    "accepted": false,
+    "reason": "SCENE_FAILED",
+    "detail": "INTERIOR_BUILD_FAILED (GYM_INTERIOR) — fault injection",
+    "recovered_to": "FIELD"
+   },
+   "log": [
+    "START",
+    "FADE_OUT_DONE",
+    "HOST_ACK:true",
+    "READY",
+    "SCENE_FAILED",
+    "RECOVER_ACK:true",
+    "END"
+   ]
+  },
+  {
+   "name": "gym_enter_slow",
+   "res": {
+    "accepted": true,
+    "room": "GYM_INTERIOR",
+    "total_ms": 2088,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "free",
+     "state": "FREE",
+     "yaw": 0
+    },
+    "camera_after": {
+     "mode": "free",
+     "state": "FREE",
+     "yaw": -2.375000000000001
+    },
+    "camera_change": {
+     "mode_before": "free",
+     "yaw_before": 0,
+     "old_behind": 2.375000000000001,
+     "new_behind": 0,
+     "mode_after": "free",
+     "yaw_after": -2.375000000000001,
+     "relative_kept": null
+    }
+   },
+   "stage": {
+    "title": "TRAINING ROOM — MAH GYM (interior)",
+    "stage": "preparing the hall · 0.7 s",
+    "on": true
+   },
+   "log": [
+    "START",
+    "FADE_OUT_DONE",
+    "HOST_ACK:true",
+    "SLOW_STAGE_SHOWN",
+    "READY",
+    "END"
+   ]
+  }
+ ],
+ "grand_rooms": [
+  {
+   "name": "gold_temple",
+   "building": "temple",
+   "door": "TEMPLE_DOOR",
+   "room": "TEMPLE_HALL",
+   "manifest_portal": {
+    "world": [
+     0,
+     165.55
+    ],
+    "outward": [
+     0,
+     -1
+    ]
+   },
+   "approach": [
+    0,
+    164.75
+   ],
+   "expected_return": [
+    0,
+    165
+   ],
+   "walked": {
+    "reached": true,
+    "passes": 1
+   },
+   "before": {
+    "room": "FIELD",
+    "interior": false,
+    "pos": {
+     "x": 0,
+     "z": 164.442
+    },
+    "facing": 3.142,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER",
+      "id": "TEMPLE_DOOR",
+      "to": "TEMPLE_HALL",
+      "label": "GOLD TEMPLE — enter the vaulted rotunda",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING PHYSICAL (I)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MIXED 60/40 (U)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MAGIC (O)",
+      "eligible": true
+     },
+     {
+      "intent": "PRACTICE_RESET",
+      "label": "RESET PRACTICE (R)",
+      "eligible": true
+     }
+    ],
+    "return_to": null,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "ceiling_m": 100,
+    "floor_levels": [],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "FIELD:FIELD_COLLIDERS_DISTRICT_V1:28",
+     "room": "FIELD",
+     "error": null
+    },
+    "room_resources": {
+     "children": 0,
+     "objects": 0,
+     "meshes": 0,
+     "skinned": 0,
+     "geometries": 0,
+     "materials": 0,
+     "textures": 0,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 7,
+     "disposed": {
+      "children": 119,
+      "objects": 131,
+      "meshes": 117,
+      "skinned": 0,
+      "geometries": 115,
+      "materials": 14,
+      "textures": 6,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": false,
+    "memory": {
+     "geometries": 445,
+     "textures": 196,
+     "programs": 187
+    },
+    "meshes": 567
+   },
+   "prompt": {
+    "intent": "ENTER",
+    "id": "TEMPLE_DOOR",
+    "to": "TEMPLE_HALL",
+    "label": "GOLD TEMPLE — enter the vaulted rotunda",
+    "eligible": true
+   },
+   "confirm_in": {
+    "open": true,
+    "answered": true
+   },
+   "enter": {
+    "accepted": true,
+    "room": "TEMPLE_HALL",
+    "total_ms": 580,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 9.424404410801621
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.7907655080655632
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 9.42437536702195,
+     "old_behind": 9.424370638261383,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "inside": {
+    "room": "TEMPLE_HALL",
+    "interior": true,
+    "pos": {
+     "x": 0,
+     "z": 7.6
+    },
+    "facing": 0,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — GOLD TEMPLE threshold",
+      "eligible": true
+     }
+    ],
+    "return_to": {
+     "room": "FIELD",
+     "x": 0,
+     "z": 165,
+     "facing": 0,
+     "door": "TEMPLE_DOOR",
+     "threshold": {
+      "x": 0,
+      "z": 165.55
+     },
+     "clearance_m": 0.55
+    },
+    "interior_plan": {
+     "plan_id": "TEMPLE_GOLD_ROTUNDA_V1",
+     "style_id": "ATHLETE_GOLD_VAULT",
+     "material_family": "gold_platinum",
+     "ceiling_m": 11.5,
+     "portal": {
+      "half_width_m": 2.2,
+      "height_m": 5.6
+     },
+     "room_envelope_m": {
+      "width": 20,
+      "depth": 20,
+      "ceiling": 11.5
+     },
+     "feature_ids": [
+      "GOLD_VAULT_COLUMNS",
+      "TEMPLE_ROTUNDA_DAIS",
+      "TEMPLE_HALO_RINGS"
+     ],
+     "description": "a tall gold-platinum rotunda with a central dais, vaulted halo rings and a clear threshold aisle"
+    },
+    "room_style_id": "ATHLETE_GOLD_VAULT",
+    "material_family": "gold_platinum",
+    "feature_ids": [
+     "GOLD_VAULT_COLUMNS",
+     "TEMPLE_ROTUNDA_DAIS",
+     "TEMPLE_HALO_RINGS"
+    ],
+    "ceiling_m": 11.5,
+    "floor_levels": [
+     {
+      "id": "MAIN",
+      "y_m": 0,
+      "clear_height_m": 11.5,
+      "role": "ROTUNDA"
+     }
+    ],
+    "room_solids": [
+     {
+      "id": "TEMPLE_COLUMN_NW",
+      "type": "BOX",
+      "x1": -7.1,
+      "x2": -6.3,
+      "z1": -3.4,
+      "z2": -2.6,
+      "y0": 0,
+      "h": 10.8,
+      "feature_id": "GOLD_VAULT_COLUMNS"
+     },
+     {
+      "id": "TEMPLE_COLUMN_NE",
+      "type": "BOX",
+      "x1": 6.3,
+      "x2": 7.1,
+      "z1": -3.4,
+      "z2": -2.6,
+      "y0": 0,
+      "h": 10.8,
+      "feature_id": "GOLD_VAULT_COLUMNS"
+     },
+     {
+      "id": "TEMPLE_COLUMN_SW",
+      "type": "BOX",
+      "x1": -7.1,
+      "x2": -6.3,
+      "z1": 3,
+      "z2": 3.8,
+      "y0": 0,
+      "h": 10.8,
+      "feature_id": "GOLD_VAULT_COLUMNS"
+     },
+     {
+      "id": "TEMPLE_COLUMN_SE",
+      "type": "BOX",
+      "x1": 6.3,
+      "x2": 7.1,
+      "z1": 3,
+      "z2": 3.8,
+      "y0": 0,
+      "h": 10.8,
+      "feature_id": "GOLD_VAULT_COLUMNS"
+     }
+    ],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "TEMPLE_HALL:TEMPLE_HALL_colliders_v1:9",
+     "room": "TEMPLE_HALL",
+     "error": null
+    },
+    "room_resources": {
+     "children": 70,
+     "objects": 70,
+     "meshes": 65,
+     "skinned": 0,
+     "geometries": 65,
+     "materials": 11,
+     "textures": 2,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 8,
+     "disposed": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": true,
+    "memory": {
+     "geometries": 488,
+     "textures": 108,
+     "programs": 184
+    },
+    "meshes": 74
+   },
+   "exit_walk": {
+    "reached": true,
+    "passes": 1
+   },
+   "before_exit": {
+    "room": "TEMPLE_HALL",
+    "interior": true,
+    "pos": {
+     "x": 0,
+     "z": 8.785
+    },
+    "facing": 3.142,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — GOLD TEMPLE threshold",
+      "eligible": true
+     }
+    ],
+    "return_to": {
+     "room": "FIELD",
+     "x": 0,
+     "z": 165,
+     "facing": 0,
+     "door": "TEMPLE_DOOR",
+     "threshold": {
+      "x": 0,
+      "z": 165.55
+     },
+     "clearance_m": 0.55
+    },
+    "interior_plan": {
+     "plan_id": "TEMPLE_GOLD_ROTUNDA_V1",
+     "style_id": "ATHLETE_GOLD_VAULT",
+     "material_family": "gold_platinum",
+     "ceiling_m": 11.5,
+     "portal": {
+      "half_width_m": 2.2,
+      "height_m": 5.6
+     },
+     "room_envelope_m": {
+      "width": 20,
+      "depth": 20,
+      "ceiling": 11.5
+     },
+     "feature_ids": [
+      "GOLD_VAULT_COLUMNS",
+      "TEMPLE_ROTUNDA_DAIS",
+      "TEMPLE_HALO_RINGS"
+     ],
+     "description": "a tall gold-platinum rotunda with a central dais, vaulted halo rings and a clear threshold aisle"
+    },
+    "room_style_id": "ATHLETE_GOLD_VAULT",
+    "material_family": "gold_platinum",
+    "feature_ids": [
+     "GOLD_VAULT_COLUMNS",
+     "TEMPLE_ROTUNDA_DAIS",
+     "TEMPLE_HALO_RINGS"
+    ],
+    "ceiling_m": 11.5,
+    "floor_levels": [
+     {
+      "id": "MAIN",
+      "y_m": 0,
+      "clear_height_m": 11.5,
+      "role": "ROTUNDA"
+     }
+    ],
+    "room_solids": [
+     {
+      "id": "TEMPLE_COLUMN_NW",
+      "type": "BOX",
+      "x1": -7.1,
+      "x2": -6.3,
+      "z1": -3.4,
+      "z2": -2.6,
+      "y0": 0,
+      "h": 10.8,
+      "feature_id": "GOLD_VAULT_COLUMNS"
+     },
+     {
+      "id": "TEMPLE_COLUMN_NE",
+      "type": "BOX",
+      "x1": 6.3,
+      "x2": 7.1,
+      "z1": -3.4,
+      "z2": -2.6,
+      "y0": 0,
+      "h": 10.8,
+      "feature_id": "GOLD_VAULT_COLUMNS"
+     },
+     {
+      "id": "TEMPLE_COLUMN_SW",
+      "type": "BOX",
+      "x1": -7.1,
+      "x2": -6.3,
+      "z1": 3,
+      "z2": 3.8,
+      "y0": 0,
+      "h": 10.8,
+      "feature_id": "GOLD_VAULT_COLUMNS"
+     },
+     {
+      "id": "TEMPLE_COLUMN_SE",
+      "type": "BOX",
+      "x1": 6.3,
+      "x2": 7.1,
+      "z1": 3,
+      "z2": 3.8,
+      "y0": 0,
+      "h": 10.8,
+      "feature_id": "GOLD_VAULT_COLUMNS"
+     }
+    ],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "TEMPLE_HALL:TEMPLE_HALL_colliders_v1:9",
+     "room": "TEMPLE_HALL",
+     "error": null
+    },
+    "room_resources": {
+     "children": 70,
+     "objects": 70,
+     "meshes": 65,
+     "skinned": 0,
+     "geometries": 65,
+     "materials": 11,
+     "textures": 2,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 8,
+     "disposed": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": true,
+    "memory": {
+     "geometries": 488,
+     "textures": 108,
+     "programs": 184
+    },
+    "meshes": 73
+   },
+   "exit_prompt": {
+    "intent": "ENTER_ROOM",
+    "to": "FIELD",
+    "label": "EXIT — GOLD TEMPLE threshold",
+    "eligible": true
+   },
+   "confirm_out": {
+    "open": true,
+    "answered": true
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 857,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141185297244848
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.34380524569877896
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141185305523571,
+     "old_behind": 9.424370614358908,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "outside": {
+    "room": "FIELD",
+    "interior": false,
+    "pos": {
+     "x": 0,
+     "z": 165
+    },
+    "facing": 0,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER",
+      "id": "TEMPLE_DOOR",
+      "to": "TEMPLE_HALL",
+      "label": "GOLD TEMPLE — enter the vaulted rotunda",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING PHYSICAL (I)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MIXED 60/40 (U)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MAGIC (O)",
+      "eligible": true
+     },
+     {
+      "intent": "PRACTICE_RESET",
+      "label": "RESET PRACTICE (R)",
+      "eligible": true
+     }
+    ],
+    "return_to": null,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "ceiling_m": 100,
+    "floor_levels": [],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "FIELD:FIELD_COLLIDERS_DISTRICT_V1:28",
+     "room": "FIELD",
+     "error": null
+    },
+    "room_resources": {
+     "children": 0,
+     "objects": 0,
+     "meshes": 0,
+     "skinned": 0,
+     "geometries": 0,
+     "materials": 0,
+     "textures": 0,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 9,
+     "disposed": {
+      "children": 70,
+      "objects": 70,
+      "meshes": 65,
+      "skinned": 0,
+      "geometries": 65,
+      "materials": 11,
+      "textures": 2,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": false,
+    "memory": {
+     "geometries": 462,
+     "textures": 177,
+     "programs": 183
+    },
+    "meshes": 560
+   },
+   "return_distance_m": 0.55,
+   "return_error_m": 0,
+   "ground_return": {
+    "entry_ground_m": 0,
+    "exit_ground_m": 0,
+    "exit_altitude_m": 0,
+    "exit_height_above_ground_m": 0,
+    "exit_powered": false,
+    "ground_error_m": 0,
+    "altitude_error_m": 0,
+    "pass": true
+   },
+   "plan_ok": true,
+   "pass": true
+  },
+  {
+   "name": "blue_tower",
+   "building": "tower",
+   "door": "TOWER_DOOR",
+   "room": "TOWER_HALL",
+   "manifest_portal": {
+    "world": [
+     102.65,
+     110
+    ],
+    "outward": [
+     -1,
+     0
+    ]
+   },
+   "approach": [
+    101.85000000000001,
+    110
+   ],
+   "expected_return": [
+    102.10000000000001,
+    110
+   ],
+   "walked": {
+    "reached": true,
+    "passes": 1
+   },
+   "before": {
+    "room": "FIELD",
+    "interior": false,
+    "pos": {
+     "x": 101.363,
+     "z": 110
+    },
+    "facing": 1.571,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER",
+      "id": "TOWER_DOOR",
+      "to": "TOWER_HALL",
+      "label": "BLUE TOWER — enter the vertical atrium",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING PHYSICAL (I)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MIXED 60/40 (U)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MAGIC (O)",
+      "eligible": true
+     },
+     {
+      "intent": "PRACTICE_RESET",
+      "label": "RESET PRACTICE (R)",
+      "eligible": true
+     }
+    ],
+    "return_to": null,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "ceiling_m": 100,
+    "floor_levels": [],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "FIELD:FIELD_COLLIDERS_DISTRICT_V1:28",
+     "room": "FIELD",
+     "error": null
+    },
+    "room_resources": {
+     "children": 0,
+     "objects": 0,
+     "meshes": 0,
+     "skinned": 0,
+     "geometries": 0,
+     "materials": 0,
+     "textures": 0,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 9,
+     "disposed": {
+      "children": 70,
+      "objects": 70,
+      "meshes": 65,
+      "skinned": 0,
+      "geometries": 65,
+      "materials": 11,
+      "textures": 2,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": false,
+    "memory": {
+     "geometries": 463,
+     "textures": 192,
+     "programs": 185
+    },
+    "meshes": 532
+   },
+   "prompt": {
+    "intent": "ENTER",
+    "id": "TOWER_DOOR",
+    "to": "TOWER_HALL",
+    "label": "BLUE TOWER — enter the vertical atrium",
+    "eligible": true
+   },
+   "confirm_in": {
+    "open": true,
+    "answered": true
+   },
+   "enter": {
+    "accepted": true,
+    "room": "TOWER_HALL",
+    "total_ms": 673,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": -1.5709315787678346
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": -0.4568348591367788
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": -1.570993853358103,
+     "old_behind": 4.712185369527019,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "inside": {
+    "room": "TOWER_HALL",
+    "interior": true,
+    "pos": {
+     "x": 0,
+     "z": 4.6
+    },
+    "facing": 0,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — BLUE TOWER threshold",
+      "eligible": true
+     }
+    ],
+    "return_to": {
+     "room": "FIELD",
+     "x": 102.10000000000372,
+     "z": 110.00000202026281,
+     "facing": -1.5708,
+     "door": "TOWER_DOOR",
+     "threshold": {
+      "x": 102.65,
+      "z": 110
+     },
+     "clearance_m": 0.55
+    },
+    "interior_plan": {
+     "plan_id": "TOWER_BLUE_ATRIUM_V1",
+     "style_id": "TITAN_BLUE_VERTICAL",
+     "material_family": "blue_platinum",
+     "ceiling_m": 13,
+     "portal": {
+      "half_width_m": 2,
+      "height_m": 5.2
+     },
+     "room_envelope_m": {
+      "width": 14,
+      "depth": 14,
+      "ceiling": 13
+     },
+     "feature_ids": [
+      "TOWER_ATRIUM_COLUMNS",
+      "TOWER_LUMEN_SPINE",
+      "TOWER_SUSPENDED_RINGS"
+     ],
+     "description": "a tall blue-platinum atrium with a luminous spine, suspended rings and a clear threshold aisle"
+    },
+    "room_style_id": "TITAN_BLUE_VERTICAL",
+    "material_family": "blue_platinum",
+    "feature_ids": [
+     "TOWER_ATRIUM_COLUMNS",
+     "TOWER_LUMEN_SPINE",
+     "TOWER_SUSPENDED_RINGS"
+    ],
+    "ceiling_m": 13,
+    "floor_levels": [
+     {
+      "id": "MAIN",
+      "y_m": 0,
+      "clear_height_m": 13,
+      "role": "ATRIUM"
+     }
+    ],
+    "room_solids": [
+     {
+      "id": "TOWER_COLUMN_NW",
+      "type": "BOX",
+      "x1": -5,
+      "x2": -4.35,
+      "z1": -4.2,
+      "z2": -3.55,
+      "y0": 0,
+      "h": 12.2,
+      "feature_id": "TOWER_ATRIUM_COLUMNS"
+     },
+     {
+      "id": "TOWER_COLUMN_NE",
+      "type": "BOX",
+      "x1": 4.35,
+      "x2": 5,
+      "z1": -4.2,
+      "z2": -3.55,
+      "y0": 0,
+      "h": 12.2,
+      "feature_id": "TOWER_ATRIUM_COLUMNS"
+     },
+     {
+      "id": "TOWER_COLUMN_SW",
+      "type": "BOX",
+      "x1": -5,
+      "x2": -4.35,
+      "z1": 2.6,
+      "z2": 3.25,
+      "y0": 0,
+      "h": 12.2,
+      "feature_id": "TOWER_ATRIUM_COLUMNS"
+     },
+     {
+      "id": "TOWER_COLUMN_SE",
+      "type": "BOX",
+      "x1": 4.35,
+      "x2": 5,
+      "z1": 2.6,
+      "z2": 3.25,
+      "y0": 0,
+      "h": 12.2,
+      "feature_id": "TOWER_ATRIUM_COLUMNS"
+     }
+    ],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "TOWER_HALL:TOWER_HALL_colliders_v1:8",
+     "room": "TOWER_HALL",
+     "error": null
+    },
+    "room_resources": {
+     "children": 61,
+     "objects": 61,
+     "meshes": 56,
+     "skinned": 0,
+     "geometries": 56,
+     "materials": 10,
+     "textures": 2,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 10,
+     "disposed": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": true,
+    "memory": {
+     "geometries": 466,
+     "textures": 113,
+     "programs": 182
+    },
+    "meshes": 64
+   },
+   "exit_walk": {
+    "reached": true,
+    "passes": 1
+   },
+   "before_exit": {
+    "room": "TOWER_HALL",
+    "interior": true,
+    "pos": {
+     "x": 0,
+     "z": 5.494
+    },
+    "facing": 3.142,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — BLUE TOWER threshold",
+      "eligible": true
+     }
+    ],
+    "return_to": {
+     "room": "FIELD",
+     "x": 102.10000000000372,
+     "z": 110.00000202026281,
+     "facing": -1.5708,
+     "door": "TOWER_DOOR",
+     "threshold": {
+      "x": 102.65,
+      "z": 110
+     },
+     "clearance_m": 0.55
+    },
+    "interior_plan": {
+     "plan_id": "TOWER_BLUE_ATRIUM_V1",
+     "style_id": "TITAN_BLUE_VERTICAL",
+     "material_family": "blue_platinum",
+     "ceiling_m": 13,
+     "portal": {
+      "half_width_m": 2,
+      "height_m": 5.2
+     },
+     "room_envelope_m": {
+      "width": 14,
+      "depth": 14,
+      "ceiling": 13
+     },
+     "feature_ids": [
+      "TOWER_ATRIUM_COLUMNS",
+      "TOWER_LUMEN_SPINE",
+      "TOWER_SUSPENDED_RINGS"
+     ],
+     "description": "a tall blue-platinum atrium with a luminous spine, suspended rings and a clear threshold aisle"
+    },
+    "room_style_id": "TITAN_BLUE_VERTICAL",
+    "material_family": "blue_platinum",
+    "feature_ids": [
+     "TOWER_ATRIUM_COLUMNS",
+     "TOWER_LUMEN_SPINE",
+     "TOWER_SUSPENDED_RINGS"
+    ],
+    "ceiling_m": 13,
+    "floor_levels": [
+     {
+      "id": "MAIN",
+      "y_m": 0,
+      "clear_height_m": 13,
+      "role": "ATRIUM"
+     }
+    ],
+    "room_solids": [
+     {
+      "id": "TOWER_COLUMN_NW",
+      "type": "BOX",
+      "x1": -5,
+      "x2": -4.35,
+      "z1": -4.2,
+      "z2": -3.55,
+      "y0": 0,
+      "h": 12.2,
+      "feature_id": "TOWER_ATRIUM_COLUMNS"
+     },
+     {
+      "id": "TOWER_COLUMN_NE",
+      "type": "BOX",
+      "x1": 4.35,
+      "x2": 5,
+      "z1": -4.2,
+      "z2": -3.55,
+      "y0": 0,
+      "h": 12.2,
+      "feature_id": "TOWER_ATRIUM_COLUMNS"
+     },
+     {
+      "id": "TOWER_COLUMN_SW",
+      "type": "BOX",
+      "x1": -5,
+      "x2": -4.35,
+      "z1": 2.6,
+      "z2": 3.25,
+      "y0": 0,
+      "h": 12.2,
+      "feature_id": "TOWER_ATRIUM_COLUMNS"
+     },
+     {
+      "id": "TOWER_COLUMN_SE",
+      "type": "BOX",
+      "x1": 4.35,
+      "x2": 5,
+      "z1": 2.6,
+      "z2": 3.25,
+      "y0": 0,
+      "h": 12.2,
+      "feature_id": "TOWER_ATRIUM_COLUMNS"
+     }
+    ],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "TOWER_HALL:TOWER_HALL_colliders_v1:8",
+     "room": "TOWER_HALL",
+     "error": null
+    },
+    "room_resources": {
+     "children": 61,
+     "objects": 61,
+     "meshes": 56,
+     "skinned": 0,
+     "geometries": 56,
+     "materials": 10,
+     "textures": 2,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 10,
+     "disposed": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": true,
+    "memory": {
+     "geometries": 475,
+     "textures": 114,
+     "programs": 183
+    },
+    "meshes": 64
+   },
+   "exit_prompt": {
+    "intent": "ENTER_ROOM",
+    "to": "FIELD",
+    "label": "EXIT — BLUE TOWER threshold",
+    "eligible": true
+   },
+   "confirm_out": {
+    "open": true,
+    "answered": true
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 749,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141184812088949
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 1.7426767638135552
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141185212522956,
+     "old_behind": 9.424370614303324,
+     "new_behind": 1.571,
+     "mode_after": "follow",
+     "yaw_after": 1.571,
+     "relative_kept": null
+    }
+   },
+   "outside": {
+    "room": "FIELD",
+    "interior": false,
+    "pos": {
+     "x": 102.1,
+     "z": 110
+    },
+    "facing": -1.571,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER",
+      "id": "TOWER_DOOR",
+      "to": "TOWER_HALL",
+      "label": "BLUE TOWER — enter the vertical atrium",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING PHYSICAL (I)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MIXED 60/40 (U)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MAGIC (O)",
+      "eligible": true
+     },
+     {
+      "intent": "PRACTICE_RESET",
+      "label": "RESET PRACTICE (R)",
+      "eligible": true
+     }
+    ],
+    "return_to": null,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "ceiling_m": 100,
+    "floor_levels": [],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "FIELD:FIELD_COLLIDERS_DISTRICT_V1:28",
+     "room": "FIELD",
+     "error": null
+    },
+    "room_resources": {
+     "children": 0,
+     "objects": 0,
+     "meshes": 0,
+     "skinned": 0,
+     "geometries": 0,
+     "materials": 0,
+     "textures": 0,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 11,
+     "disposed": {
+      "children": 61,
+      "objects": 61,
+      "meshes": 56,
+      "skinned": 0,
+      "geometries": 56,
+      "materials": 10,
+      "textures": 2,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": false,
+    "memory": {
+     "geometries": 444,
+     "textures": 180,
+     "programs": 184
+    },
+    "meshes": 530
+   },
+   "return_distance_m": 0.55,
+   "return_error_m": 0,
+   "ground_return": {
+    "entry_ground_m": 0,
+    "exit_ground_m": 0,
+    "exit_altitude_m": 0,
+    "exit_height_above_ground_m": 0,
+    "exit_powered": false,
+    "ground_error_m": 0,
+    "altitude_error_m": 0,
+    "pass": true
+   },
+   "plan_ok": true,
+   "pass": true
+  },
+  {
+   "name": "clothing_shop",
+   "building": "market",
+   "door": "CLOTHING_DOOR",
+   "room": "CLOTHING_SHOP",
+   "manifest_portal": {
+    "world": [
+     -2.2,
+     251.25
+    ],
+    "outward": [
+     0,
+     -1
+    ]
+   },
+   "approach": [
+    -2.2,
+    250.45
+   ],
+   "expected_return": [
+    -2.2,
+    250.7
+   ],
+   "walked": {
+    "reached": true,
+    "passes": 1
+   },
+   "before": {
+    "room": "FIELD",
+    "interior": false,
+    "pos": {
+     "x": -2.2,
+     "z": 249.963
+    },
+    "facing": 3.142,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER",
+      "id": "CLOTHING_DOOR",
+      "to": "CLOTHING_SHOP",
+      "label": "MAH MARKET — enter clothing wing",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING PHYSICAL (I)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MIXED 60/40 (U)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MAGIC (O)",
+      "eligible": true
+     },
+     {
+      "intent": "PRACTICE_RESET",
+      "label": "RESET PRACTICE (R)",
+      "eligible": true
+     }
+    ],
+    "return_to": null,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "ceiling_m": 100,
+    "floor_levels": [],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "FIELD:FIELD_COLLIDERS_DISTRICT_V1:28",
+     "room": "FIELD",
+     "error": null
+    },
+    "room_resources": {
+     "children": 0,
+     "objects": 0,
+     "meshes": 0,
+     "skinned": 0,
+     "geometries": 0,
+     "materials": 0,
+     "textures": 0,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 11,
+     "disposed": {
+      "children": 61,
+      "objects": 61,
+      "meshes": 56,
+      "skinned": 0,
+      "geometries": 56,
+      "materials": 10,
+      "textures": 2,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": false,
+    "memory": {
+     "geometries": 445,
+     "textures": 215,
+     "programs": 186
+    },
+    "meshes": 565
+   },
+   "prompt": {
+    "intent": "ENTER",
+    "id": "CLOTHING_DOOR",
+    "to": "CLOTHING_SHOP",
+    "label": "MAH MARKET — enter clothing wing",
+    "eligible": true
+   },
+   "confirm_in": {
+    "open": true,
+    "answered": true
+   },
+   "enter": {
+    "accepted": true,
+    "room": "CLOTHING_SHOP",
+    "total_ms": 711,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141150841314379
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.5157384836598136
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141178438145576,
+     "old_behind": 9.42437059042361,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "inside": {
+    "room": "CLOTHING_SHOP",
+    "interior": true,
+    "pos": {
+     "x": 0,
+     "z": 3.2
+    },
+    "facing": 0,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — to the MARKET forecourt",
+      "eligible": true
+     }
+    ],
+    "return_to": {
+     "room": "FIELD",
+     "x": -2.2,
+     "z": 250.7,
+     "facing": 0,
+     "door": "CLOTHING_DOOR",
+     "threshold": {
+      "x": -2.2,
+      "z": 251.25
+     },
+     "clearance_m": 0.55
+    },
+    "interior_plan": {
+     "plan_id": "MARKET_CLOTHING_WING_V1",
+     "style_id": "BAGE_ROSE_GRAND_MARKET",
+     "material_family": "rose_platinum_textile",
+     "ceiling_m": 8.2,
+     "portal": {
+      "half_width_m": 1.65,
+      "height_m": 4.5
+     },
+     "room_envelope_m": {
+      "width": 10,
+      "depth": 10,
+      "ceiling": 8.2
+     },
+     "feature_ids": [
+      "MARKET_VAULT_RIBS",
+      "CLOTHING_EMPTY_GALLERY",
+      "CLOTHING_COUNTER"
+     ],
+     "description": "a contained rose-platinum market wing with tall vault ribs and a finished zero-stock apparel gallery"
+    },
+    "room_style_id": "BAGE_ROSE_GRAND_MARKET",
+    "material_family": "rose_platinum_textile",
+    "feature_ids": [
+     "MARKET_VAULT_RIBS",
+     "CLOTHING_EMPTY_GALLERY",
+     "CLOTHING_COUNTER"
+    ],
+    "ceiling_m": 8.2,
+    "floor_levels": [
+     {
+      "id": "MAIN",
+      "y_m": 0,
+      "clear_height_m": 8.2,
+      "role": "MARKET_WING"
+     }
+    ],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "CLOTHING_SHOP",
+     "room": "CLOTHING_SHOP",
+     "error": null
+    },
+    "room_resources": {
+     "children": 62,
+     "objects": 62,
+     "meshes": 57,
+     "skinned": 0,
+     "geometries": 57,
+     "materials": 13,
+     "textures": 3,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 12,
+     "disposed": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": true,
+    "memory": {
+     "geometries": 483,
+     "textures": 120,
+     "programs": 184
+    },
+    "meshes": 66
+   },
+   "exit_walk": {
+    "reached": true,
+    "passes": 1
+   },
+   "before_exit": {
+    "room": "CLOTHING_SHOP",
+    "interior": true,
+    "pos": {
+     "x": 0,
+     "z": 3.736
+    },
+    "facing": 3.142,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — to the MARKET forecourt",
+      "eligible": true
+     }
+    ],
+    "return_to": {
+     "room": "FIELD",
+     "x": -2.2,
+     "z": 250.7,
+     "facing": 0,
+     "door": "CLOTHING_DOOR",
+     "threshold": {
+      "x": -2.2,
+      "z": 251.25
+     },
+     "clearance_m": 0.55
+    },
+    "interior_plan": {
+     "plan_id": "MARKET_CLOTHING_WING_V1",
+     "style_id": "BAGE_ROSE_GRAND_MARKET",
+     "material_family": "rose_platinum_textile",
+     "ceiling_m": 8.2,
+     "portal": {
+      "half_width_m": 1.65,
+      "height_m": 4.5
+     },
+     "room_envelope_m": {
+      "width": 10,
+      "depth": 10,
+      "ceiling": 8.2
+     },
+     "feature_ids": [
+      "MARKET_VAULT_RIBS",
+      "CLOTHING_EMPTY_GALLERY",
+      "CLOTHING_COUNTER"
+     ],
+     "description": "a contained rose-platinum market wing with tall vault ribs and a finished zero-stock apparel gallery"
+    },
+    "room_style_id": "BAGE_ROSE_GRAND_MARKET",
+    "material_family": "rose_platinum_textile",
+    "feature_ids": [
+     "MARKET_VAULT_RIBS",
+     "CLOTHING_EMPTY_GALLERY",
+     "CLOTHING_COUNTER"
+    ],
+    "ceiling_m": 8.2,
+    "floor_levels": [
+     {
+      "id": "MAIN",
+      "y_m": 0,
+      "clear_height_m": 8.2,
+      "role": "MARKET_WING"
+     }
+    ],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "CLOTHING_SHOP",
+     "room": "CLOTHING_SHOP",
+     "error": null
+    },
+    "room_resources": {
+     "children": 62,
+     "objects": 62,
+     "meshes": 57,
+     "skinned": 0,
+     "geometries": 57,
+     "materials": 13,
+     "textures": 3,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 12,
+     "disposed": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": true,
+    "memory": {
+     "geometries": 483,
+     "textures": 120,
+     "programs": 184
+    },
+    "meshes": 65
+   },
+   "exit_prompt": {
+    "intent": "ENTER_ROOM",
+    "to": "FIELD",
+    "label": "EXIT — to the MARKET forecourt",
+    "eligible": true
+   },
+   "confirm_out": {
+    "open": true,
+    "answered": true
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 823,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141164524181748
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.3438052456636124
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141181655369402,
+     "old_behind": 9.42437060469946,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "outside": {
+    "room": "FIELD",
+    "interior": false,
+    "pos": {
+     "x": -2.2,
+     "z": 250.7
+    },
+    "facing": 0,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER",
+      "id": "CLOTHING_DOOR",
+      "to": "CLOTHING_SHOP",
+      "label": "MAH MARKET — enter clothing wing",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING PHYSICAL (I)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MIXED 60/40 (U)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MAGIC (O)",
+      "eligible": true
+     },
+     {
+      "intent": "PRACTICE_RESET",
+      "label": "RESET PRACTICE (R)",
+      "eligible": true
+     }
+    ],
+    "return_to": null,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "ceiling_m": 100,
+    "floor_levels": [],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "FIELD:FIELD_COLLIDERS_DISTRICT_V1:28",
+     "room": "FIELD",
+     "error": null
+    },
+    "room_resources": {
+     "children": 0,
+     "objects": 0,
+     "meshes": 0,
+     "skinned": 0,
+     "geometries": 0,
+     "materials": 0,
+     "textures": 0,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 13,
+     "disposed": {
+      "children": 62,
+      "objects": 62,
+      "meshes": 57,
+      "skinned": 0,
+      "geometries": 57,
+      "materials": 13,
+      "textures": 3,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": false,
+    "memory": {
+     "geometries": 465,
+     "textures": 199,
+     "programs": 184
+    },
+    "meshes": 565
+   },
+   "return_distance_m": 0.55,
+   "return_error_m": 0,
+   "ground_return": {
+    "entry_ground_m": 0,
+    "exit_ground_m": 0,
+    "exit_altitude_m": 0,
+    "exit_height_above_ground_m": 0,
+    "exit_powered": false,
+    "ground_error_m": 0,
+    "altitude_error_m": 0,
+    "pass": true
+   },
+   "plan_ok": true,
+   "pass": true
+  },
+  {
+   "name": "weapon_shop",
+   "building": "market",
+   "door": "WEAPON_DOOR",
+   "room": "WEAPON_SHOP",
+   "manifest_portal": {
+    "world": [
+     2.2,
+     251.25
+    ],
+    "outward": [
+     0,
+     -1
+    ]
+   },
+   "approach": [
+    2.2,
+    250.45
+   ],
+   "expected_return": [
+    2.2,
+    250.7
+   ],
+   "walked": {
+    "reached": true,
+    "passes": 1
+   },
+   "before": {
+    "room": "FIELD",
+    "interior": false,
+    "pos": {
+     "x": 2.2,
+     "z": 250.142
+    },
+    "facing": 3.142,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER",
+      "id": "WEAPON_DOOR",
+      "to": "WEAPON_SHOP",
+      "label": "MAH MARKET — enter weapon wing",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING PHYSICAL (I)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MIXED 60/40 (U)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MAGIC (O)",
+      "eligible": true
+     },
+     {
+      "intent": "PRACTICE_RESET",
+      "label": "RESET PRACTICE (R)",
+      "eligible": true
+     }
+    ],
+    "return_to": null,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "ceiling_m": 100,
+    "floor_levels": [],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "FIELD:FIELD_COLLIDERS_DISTRICT_V1:28",
+     "room": "FIELD",
+     "error": null
+    },
+    "room_resources": {
+     "children": 0,
+     "objects": 0,
+     "meshes": 0,
+     "skinned": 0,
+     "geometries": 0,
+     "materials": 0,
+     "textures": 0,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 13,
+     "disposed": {
+      "children": 62,
+      "objects": 62,
+      "meshes": 57,
+      "skinned": 0,
+      "geometries": 57,
+      "materials": 13,
+      "textures": 3,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": false,
+    "memory": {
+     "geometries": 465,
+     "textures": 221,
+     "programs": 185
+    },
+    "meshes": 564
+   },
+   "prompt": {
+    "intent": "ENTER",
+    "id": "WEAPON_DOOR",
+    "to": "WEAPON_SHOP",
+    "label": "MAH MARKET — enter weapon wing",
+    "eligible": true
+   },
+   "confirm_in": {
+    "open": true,
+    "answered": true
+   },
+   "enter": {
+    "accepted": true,
+    "room": "WEAPON_SHOP",
+    "total_ms": 713,
+    "via": "ENTER",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.1411181342173427
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.5297588239060488
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.1411718938359323,
+     "old_behind": 9.424370566383429,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "inside": {
+    "room": "WEAPON_SHOP",
+    "interior": true,
+    "pos": {
+     "x": 0,
+     "z": 3.2
+    },
+    "facing": 0,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — to the MARKET forecourt",
+      "eligible": true
+     }
+    ],
+    "return_to": {
+     "room": "FIELD",
+     "x": 2.2,
+     "z": 250.7,
+     "facing": 0,
+     "door": "WEAPON_DOOR",
+     "threshold": {
+      "x": 2.2,
+      "z": 251.25
+     },
+     "clearance_m": 0.55
+    },
+    "interior_plan": {
+     "plan_id": "MARKET_WEAPON_WING_V1",
+     "style_id": "BAGE_ROSE_GRAND_MARKET",
+     "material_family": "rose_platinum_armory",
+     "ceiling_m": 8.2,
+     "portal": {
+      "half_width_m": 1.65,
+      "height_m": 4.5
+     },
+     "room_envelope_m": {
+      "width": 10,
+      "depth": 10,
+      "ceiling": 8.2
+     },
+     "feature_ids": [
+      "MARKET_VAULT_RIBS",
+      "WEAPON_EMPTY_GALLERY",
+      "WEAPON_COUNTER"
+     ],
+     "description": "a contained rose-platinum market wing with tall vault ribs and a finished zero-stock weapon gallery"
+    },
+    "room_style_id": "BAGE_ROSE_GRAND_MARKET",
+    "material_family": "rose_platinum_armory",
+    "feature_ids": [
+     "MARKET_VAULT_RIBS",
+     "WEAPON_EMPTY_GALLERY",
+     "WEAPON_COUNTER"
+    ],
+    "ceiling_m": 8.2,
+    "floor_levels": [
+     {
+      "id": "MAIN",
+      "y_m": 0,
+      "clear_height_m": 8.2,
+      "role": "MARKET_WING"
+     }
+    ],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "WEAPON_SHOP",
+     "room": "WEAPON_SHOP",
+     "error": null
+    },
+    "room_resources": {
+     "children": 62,
+     "objects": 62,
+     "meshes": 57,
+     "skinned": 0,
+     "geometries": 57,
+     "materials": 13,
+     "textures": 3,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 14,
+     "disposed": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": true,
+    "memory": {
+     "geometries": 473,
+     "textures": 123,
+     "programs": 183
+    },
+    "meshes": 65
+   },
+   "exit_walk": {
+    "reached": true,
+    "passes": 1
+   },
+   "before_exit": {
+    "room": "WEAPON_SHOP",
+    "interior": true,
+    "pos": {
+     "x": 0,
+     "z": 3.736
+    },
+    "facing": 3.142,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — to the MARKET forecourt",
+      "eligible": true
+     }
+    ],
+    "return_to": {
+     "room": "FIELD",
+     "x": 2.2,
+     "z": 250.7,
+     "facing": 0,
+     "door": "WEAPON_DOOR",
+     "threshold": {
+      "x": 2.2,
+      "z": 251.25
+     },
+     "clearance_m": 0.55
+    },
+    "interior_plan": {
+     "plan_id": "MARKET_WEAPON_WING_V1",
+     "style_id": "BAGE_ROSE_GRAND_MARKET",
+     "material_family": "rose_platinum_armory",
+     "ceiling_m": 8.2,
+     "portal": {
+      "half_width_m": 1.65,
+      "height_m": 4.5
+     },
+     "room_envelope_m": {
+      "width": 10,
+      "depth": 10,
+      "ceiling": 8.2
+     },
+     "feature_ids": [
+      "MARKET_VAULT_RIBS",
+      "WEAPON_EMPTY_GALLERY",
+      "WEAPON_COUNTER"
+     ],
+     "description": "a contained rose-platinum market wing with tall vault ribs and a finished zero-stock weapon gallery"
+    },
+    "room_style_id": "BAGE_ROSE_GRAND_MARKET",
+    "material_family": "rose_platinum_armory",
+    "feature_ids": [
+     "MARKET_VAULT_RIBS",
+     "WEAPON_EMPTY_GALLERY",
+     "WEAPON_COUNTER"
+    ],
+    "ceiling_m": 8.2,
+    "floor_levels": [
+     {
+      "id": "MAIN",
+      "y_m": 0,
+      "clear_height_m": 8.2,
+      "role": "MARKET_WING"
+     }
+    ],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "WEAPON_SHOP",
+     "room": "WEAPON_SHOP",
+     "error": null
+    },
+    "room_resources": {
+     "children": 62,
+     "objects": 62,
+     "meshes": 57,
+     "skinned": 0,
+     "geometries": 57,
+     "materials": 13,
+     "textures": 3,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 14,
+     "disposed": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": true,
+    "memory": {
+     "geometries": 483,
+     "textures": 125,
+     "programs": 184
+    },
+    "meshes": 65
+   },
+   "exit_prompt": {
+    "intent": "ENTER_ROOM",
+    "to": "FIELD",
+    "label": "EXIT — to the MARKET forecourt",
+    "eligible": true
+   },
+   "confirm_out": {
+    "open": true,
+    "answered": true
+   },
+   "exit": {
+    "accepted": true,
+    "room": "FIELD",
+    "total_ms": 802,
+    "via": "ENTER_ROOM",
+    "camera_before": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 3.141159120787073
+    },
+    "camera_after": {
+     "mode": "follow",
+     "state": "FOLLOW",
+     "yaw": 0.34380524564173803
+    },
+    "camera_change": {
+     "mode_before": "follow",
+     "yaw_before": 3.141180129762188,
+     "old_behind": 9.424370601035937,
+     "new_behind": 0,
+     "mode_after": "follow",
+     "yaw_after": 0,
+     "relative_kept": null
+    }
+   },
+   "outside": {
+    "room": "FIELD",
+    "interior": false,
+    "pos": {
+     "x": 2.2,
+     "z": 250.7
+    },
+    "facing": 0,
+    "flight": {
+     "ground": 0,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "powered": false
+    },
+    "prompts": [
+     {
+      "intent": "ENTER",
+      "id": "WEAPON_DOOR",
+      "to": "WEAPON_SHOP",
+      "label": "MAH MARKET — enter weapon wing",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING PHYSICAL (I)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MIXED 60/40 (U)",
+      "eligible": true
+     },
+     {
+      "intent": "FIELD_INCOMING",
+      "label": "INCOMING MAGIC (O)",
+      "eligible": true
+     },
+     {
+      "intent": "PRACTICE_RESET",
+      "label": "RESET PRACTICE (R)",
+      "eligible": true
+     }
+    ],
+    "return_to": null,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "ceiling_m": 100,
+    "floor_levels": [],
+    "room_solids": [],
+    "trx": null,
+    "log_tail": [
+     "HOST_ACK:true",
+     "READY",
+     "END",
+     "START",
+     "FADE_OUT_DONE",
+     "HOST_ACK:true",
+     "READY",
+     "END"
+    ],
+    "build_error": null,
+    "room_build": {
+     "key": "FIELD:FIELD_COLLIDERS_DISTRICT_V1:28",
+     "room": "FIELD",
+     "error": null
+    },
+    "room_resources": {
+     "children": 0,
+     "objects": 0,
+     "meshes": 0,
+     "skinned": 0,
+     "geometries": 0,
+     "materials": 0,
+     "textures": 0,
+     "skeletons": 0
+    },
+    "last_room_clear": {
+     "seq": 15,
+     "disposed": {
+      "children": 62,
+      "objects": 62,
+      "meshes": 57,
+      "skinned": 0,
+      "geometries": 57,
+      "materials": 13,
+      "textures": 3,
+      "skeletons": 0
+     },
+     "remaining": {
+      "children": 0,
+      "objects": 0,
+      "meshes": 0,
+      "skinned": 0,
+      "geometries": 0,
+      "materials": 0,
+      "textures": 0,
+      "skeletons": 0
+     }
+    },
+    "fade_on": false,
+    "fade_opacity": "0",
+    "confirm_open": false,
+    "catalog_open": false,
+    "boom": false,
+    "memory": {
+     "geometries": 465,
+     "textures": 200,
+     "programs": 184
+    },
+    "meshes": 567
+   },
+   "return_distance_m": 0.55,
+   "return_error_m": 0,
+   "ground_return": {
+    "entry_ground_m": 0,
+    "exit_ground_m": 0,
+    "exit_altitude_m": 0,
+    "exit_height_above_ground_m": 0,
+    "exit_powered": false,
+    "ground_error_m": 0,
+    "altitude_error_m": 0,
+    "pass": true
+   },
+   "plan_ok": true,
+   "pass": true
+  }
+ ],
+ "proof_sources": {
+  "district_manifest": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\district_v1.json",
+  "room_tuning": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\00_CORE\\dev_tuning.dev.json"
+ },
+ "camera_setup": {
+  "query": "cam_follow=1",
+  "initial": {
+   "yaw": 7.951607761645219e-35,
+   "pitch": 0.2,
+   "behind": 0,
+   "err_deg": 0,
+   "back_dot": 1,
+   "back_err_deg": 0,
+   "last_err_deg": 0,
+   "yaw_vel": -5.923037166759852e-34,
+   "applied": 6.474795594385649,
+   "dist": 6.474795594385649,
+   "dragging": false,
+   "state": "FOLLOW",
+   "speedK": 0,
+   "fov": 55,
+   "fade": 1,
+   "mode": "follow",
+   "resetting": false,
+   "pitch_bias": 0,
+   "obstructed": false,
+   "readable": 2.2,
+   "zoom": 1,
+   "flightV": 0,
+   "hold_alt": null,
+   "fly_hold": false,
+   "desc_hold": false,
+   "flightMine": false,
+   "move_f": 0,
+   "in_fwd": 0,
+   "keys_space": false,
+   "keys_c": false,
+   "preset": "landscape",
+   "facing_deg": 0,
+   "latch": null,
+   "cfg": {
+    "heading_follow": true,
+    "height_frac": 0.72,
+    "look_height_frac": 0.28,
+    "shoulder_m": 0,
+    "look_ahead_m": 2,
+    "stiffness_idle_hz": 1.2,
+    "stiffness_move_hz": 2,
+    "reset_time_s": 0.5,
+    "obstruct_pitch_up": true,
+    "min_readable_m": 2.2,
+    "readable_frac": 0.34,
+    "latch_manual_drag": false,
+    "pitch_up_step": 0.12,
+    "pitch_up_max_steps": 8,
+    "pitch_up_limit": 0.9,
+    "relatch_deg": 45,
+    "pitch_min": -0.4,
+    "pitch_min_flight": -1.05,
+    "pitch_max": 1.2,
+    "probe_radius_m": 0.35,
+    "pull_in_speed": 24,
+    "ease_out_speed": 2.5,
+    "speed_fov_deg": 0,
+    "speed_pullback": 0,
+    "fade_below_m": 1.3,
+    "lock_extend": 0,
+    "lock_frame": false,
+    "strike_kick": 0,
+    "presets": {
+     "portrait": {
+      "frame_frac": 0.55,
+      "pitch_home": 0.2,
+      "look_height_frac": 0
+     },
+     "landscape": {
+      "frame_frac": 0.31,
+      "pitch_home": 0.2
+     }
+    }
+   },
+   "position": {
+    "x": 1.4870725410919583e-33,
+    "y": 2.7909636333602763,
+    "z": 10.34573076041109
+   },
+   "inside": null,
+   "below_ground": false
+  }
+ },
+ "door_prompt": {
+  "intent": "ENTER",
+  "id": "GYM_DOOR",
+  "to": "GYM_INTERIOR",
+  "label": "TRAINING ROOM — enter (MAH GYM)",
+  "eligible": true
+ },
+ "enter_phases": {
+  "events": [
+   "START",
+   "FADE_OUT_DONE",
+   "HOST_ACK",
+   "READY",
+   "END"
+  ],
+  "slow_stage_shown": false,
+  "ready_timeout": false,
+  "fade_out_ms": 220,
+  "host_ms": 46,
+  "prepare_ms": 317,
+  "scene_build_ms": 13.8,
+  "room_seen_after_ms": 26,
+  "polls": 1,
+  "fade_in_ms": 220,
+  "total_ms": 857
+ },
+ "boom_probe": {
+  "setup": {
+   "orbit": {
+    "mode": "orbit",
+    "yaw": 0
+   },
+   "camera": {
+    "yaw": 0,
+    "pitch": 0.2,
+    "behind": 6.186811988617253,
+    "err_deg": -5.52,
+    "back_dot": 0.7080657774383146,
+    "back_err_deg": 44.92,
+    "last_err_deg": 48.55,
+    "yaw_vel": 0,
+    "applied": 2.1,
+    "dist": 6.474795594385649,
+    "dragging": false,
+    "state": "ORBIT",
+    "speedK": 0,
+    "fov": 55,
+    "fade": 1,
+    "mode": "orbit",
+    "resetting": false,
+    "pitch_bias": 0.024,
+    "obstructed": true,
+    "readable": 2.2,
+    "zoom": 1,
+    "flightV": 0,
+    "hold_alt": null,
+    "fly_hold": false,
+    "desc_hold": false,
+    "flightMine": false,
+    "move_f": 0,
+    "in_fwd": 0,
+    "keys_space": false,
+    "keys_c": false,
+    "preset": "landscape",
+    "facing_deg": 354.48,
+    "latch": null,
+    "cfg": {
+     "heading_follow": true,
+     "height_frac": 0.72,
+     "look_height_frac": 0.28,
+     "shoulder_m": 0,
+     "look_ahead_m": 2,
+     "stiffness_idle_hz": 1.2,
+     "stiffness_move_hz": 2,
+     "reset_time_s": 0.5,
+     "obstruct_pitch_up": true,
+     "min_readable_m": 2.2,
+     "readable_frac": 0.34,
+     "latch_manual_drag": false,
+     "pitch_up_step": 0.12,
+     "pitch_up_max_steps": 8,
+     "pitch_up_limit": 0.9,
+     "relatch_deg": 45,
+     "pitch_min": -0.4,
+     "pitch_min_flight": -1.05,
+     "pitch_max": 1.2,
+     "probe_radius_m": 0.35,
+     "pull_in_speed": 24,
+     "ease_out_speed": 2.5,
+     "speed_fov_deg": 0,
+     "speed_pullback": 0,
+     "fade_below_m": 1.3,
+     "lock_extend": 0,
+     "lock_frame": false,
+     "strike_kick": 0,
+     "presets": {
+      "portrait": {
+       "frame_frac": 0.55,
+       "pitch_home": 0.2,
+       "look_height_frac": 0
+      },
+      "landscape": {
+       "frame_frac": 0.31,
+       "pitch_home": 0.2
+      }
+     }
+    },
+    "position": {
+     "x": -1.8374825121928131,
+     "y": 1.9720791476042305,
+     "z": 13.606792624776455
+    },
+    "inside": null,
+    "below_ground": false
+   },
+   "play": {
+    "play_config_version": "PLAY_DEV_0.1.0",
+    "room": "GYM_INTERIOR",
+    "room_label": "TRAINING ROOM — MAH GYM (interior)",
+    "room_direct": false,
+    "room_interior": true,
+    "room_shop": null,
+    "return_to": {
+     "room": "FIELD",
+     "x": -85.45000000000371,
+     "z": 110.00000202026281,
+     "facing": 1.5708,
+     "door": "GYM_DOOR",
+     "threshold": {
+      "x": -86,
+      "z": 110
+     },
+     "clearance_m": 0.55
+    },
+    "rules": {
+     "ruleset": "MW_DEV_2026_09_14_R17_23_V0_1 (live)",
+     "me": {
+      "id": "PLAYER_A",
+      "kind": "PLAYER",
+      "class": "ATHLETE",
+      "level": 1,
+      "team": "PRACTICE",
+      "hp": 2000,
+      "max": 2000,
+      "ko": false,
+      "last_hit_ago_s": null,
+      "last_touch_ago_s": null,
+      "last_hit_from": null,
+      "lock": null,
+      "position": {
+       "x": -0.259,
+       "z": 12.303
+      },
+      "facing": 0,
+      "guard": null,
+      "guard_sheet": {
+       "frac": 1,
+       "broken": false
+      },
+      "invisible": false,
+      "immune": false,
+      "discord": false,
+      "cast": null,
+      "statuses": [],
+      "enemy": false,
+      "ally": true,
+      "combat_energy": {
+       "current": 200,
+       "max": 200,
+       "regen": 0
+      },
+      "category": "PHYSICAL",
+      "attack_mode": "PHYSICAL",
+      "attack_modes": [
+       {
+        "id": "PHYSICAL",
+        "label": "PHYSICAL",
+        "category": "PHYSICAL"
+       },
+       {
+        "id": "PHYSICAL_MAHGIC",
+        "label": "PHYS MAHGIC",
+        "category": "PHYSICAL_MAGIC"
+       },
+       {
+        "id": "SPECIAL_MAHGIC",
+        "label": "SPECIAL MAHGIC",
+        "category": "SPECIAL_MAGIC"
+       }
+      ],
+      "band": "FOUNDATION_PROTOCOL",
+      "foundation_max_level": 12,
+      "stacks_revision": 1,
+      "equipped_stacks": {},
+      "loadout": {
+       "PHYSICAL": {
+        "attack_mode": "PHYSICAL",
+        "capacity": 4,
+        "equipped": [
+         "PA_PUSH",
+         "PA_PULL",
+         "PA_HINGE",
+         "PA_ROTATION"
+        ],
+        "equipped_count": 4,
+        "pool": [
+         {
+          "skill_id": "PA_PUSH",
+          "name": "Drive",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": 0,
+          "movement_pattern_id": "HORIZONTAL_PUSH",
+          "pattern_name": "Horizontal Push",
+          "pattern_label": "H-PUSH",
+          "cost": 0,
+          "effect": "BODY_STRIKE"
+         },
+         {
+          "skill_id": "PA_PULL",
+          "name": "Row Hook",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": 1,
+          "movement_pattern_id": "VERTICAL_PULL",
+          "pattern_name": "Vertical Pull",
+          "pattern_label": "V-PULL",
+          "cost": 0,
+          "effect": "BODY_STRIKE"
+         },
+         {
+          "skill_id": "PA_HINGE",
+          "name": "Hinge Rise",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": 2,
+          "movement_pattern_id": "HINGE",
+          "pattern_name": "Hinge",
+          "pattern_label": "HINGE",
+          "cost": 0,
+          "effect": "BODY_STRIKE"
+         },
+         {
+          "skill_id": "PA_ROTATION",
+          "name": "Pivot Strike",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": 3,
+          "movement_pattern_id": "ROTATION",
+          "pattern_name": "Rotation",
+          "pattern_label": "ROTATE",
+          "cost": 0,
+          "effect": "BODY_STRIKE"
+         }
+        ]
+       },
+       "PHYSICAL_MAGIC": {
+        "attack_mode": "PHYSICAL_MAHGIC",
+        "capacity": 2,
+        "equipped": [
+         "PM_PUSH",
+         "PM_PULL"
+        ],
+        "equipped_count": 2,
+        "pool": [
+         {
+          "skill_id": "PM_PUSH",
+          "name": "Infused Drive",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": 0,
+          "movement_pattern_id": "HORIZONTAL_PUSH",
+          "pattern_name": "Horizontal Push",
+          "pattern_label": "H-PUSH",
+          "cost": 8,
+          "effect": "BODY_STRIKE"
+         },
+         {
+          "skill_id": "PM_PULL",
+          "name": "Infused Row Hook",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": 1,
+          "movement_pattern_id": "VERTICAL_PULL",
+          "pattern_name": "Vertical Pull",
+          "pattern_label": "V-PULL",
+          "cost": 10,
+          "effect": "BODY_STRIKE"
+         },
+         {
+          "skill_id": "PM_HINGE",
+          "name": "Infused Hinge Rise",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": null,
+          "movement_pattern_id": "HINGE",
+          "pattern_name": "Hinge",
+          "pattern_label": "HINGE",
+          "cost": 14,
+          "effect": "BODY_STRIKE"
+         },
+         {
+          "skill_id": "PM_ROTATION",
+          "name": "Infused Pivot Strike",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": null,
+          "movement_pattern_id": "ROTATION",
+          "pattern_name": "Rotation",
+          "pattern_label": "ROTATE",
+          "cost": 11,
+          "effect": "BODY_STRIKE"
+         },
+         {
+          "skill_id": "PM_CURL_BARRAGE",
+          "name": "Eight-Strike Curl Barrage",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": null,
+          "movement_pattern_id": "CURL",
+          "pattern_name": "Alternating Curl",
+          "pattern_label": "CURL",
+          "cost": 18,
+          "effect": "MULTI_STRIKE"
+         }
+        ]
+       },
+       "SPECIAL_MAGIC": {
+        "attack_mode": "SPECIAL_MAHGIC",
+        "capacity": 2,
+        "equipped": [
+         "ATHLETE_OVERHEAD_RELEASE",
+         "ATHLETE_CHEST_FLY_CLAP"
+        ],
+        "equipped_count": 2,
+        "pool": [
+         {
+          "skill_id": "ATHLETE_VECTOR",
+          "name": "Vector Shot",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": null,
+          "movement_pattern_id": "UNASSIGNED_PATTERN_DEV",
+          "pattern_name": "No verified exercise mapping",
+          "pattern_label": "—",
+          "cost": 12,
+          "effect": "PROJECTILE"
+         },
+         {
+          "skill_id": "ATHLETE_TRACK",
+          "name": "Trackburst",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": null,
+          "movement_pattern_id": "UNASSIGNED_PATTERN_DEV",
+          "pattern_name": "No verified exercise mapping",
+          "pattern_label": "—",
+          "cost": 20,
+          "effect": "PROJECTILE"
+         },
+         {
+          "skill_id": "ATHLETE_SET",
+          "name": "Set Position",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": null,
+          "movement_pattern_id": "UNASSIGNED_PATTERN_DEV",
+          "pattern_name": "No verified exercise mapping",
+          "pattern_label": "—",
+          "cost": 18,
+          "effect": "SELF_BUFF"
+         },
+         {
+          "skill_id": "ATHLETE_CASCADE",
+          "name": "Cascade Pull",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": null,
+          "movement_pattern_id": "VERTICAL_PULL",
+          "pattern_name": "Vertical Pull",
+          "pattern_label": "V-PULL",
+          "cost": 18,
+          "effect": "AREA_DAMAGE"
+         },
+         {
+          "skill_id": "ATHLETE_OVERHEAD_RELEASE",
+          "name": "Overhead Extension Release",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": 0,
+          "movement_pattern_id": "VERTICAL_PUSH",
+          "pattern_name": "Vertical Push",
+          "pattern_label": "V-PUSH",
+          "cost": 14,
+          "effect": "PROJECTILE"
+         },
+         {
+          "skill_id": "ATHLETE_CHEST_FLY_CLAP",
+          "name": "Chest Fly Clap Release",
+          "eligible": true,
+          "reason": "OK",
+          "detail": null,
+          "equipped_slot": 1,
+          "movement_pattern_id": "HORIZONTAL_ADDUCTION",
+          "pattern_name": "Chest Fly",
+          "pattern_label": "FLY",
+          "cost": 16,
+          "effect": "PROJECTILE"
+         }
+        ]
+       }
+      },
+      "selection": {
+       "PHYSICAL": 0,
+       "PHYSICAL_MAGIC": 0,
+       "SPECIAL_MAGIC": 0
+      },
+      "selected_skill": "PA_PUSH",
+      "niche": false,
+      "profile": {
+       "potency": {
+        "PHYSICAL": 100,
+        "PHYSICAL_MAGIC": 70,
+        "SPECIAL_MAGIC": 60
+       },
+       "hp": 2000,
+       "physical_reduction": 0.16,
+       "magical_reduction": 0.15,
+       "movement": 1,
+       "startup": 0.9,
+       "dash": {
+        "distance_multiplier": 1,
+        "duration_seconds": 0.15,
+        "cooldown_seconds": 1.8,
+        "combat_energy_cost": 8
+       },
+       "constructs_cap": 1,
+       "periodic": 1
+      },
+      "movement_multiplier": 1,
+      "dash_cooldown_remaining_s": 0,
+      "constructs": 0,
+      "stats": {
+       "casts": 0,
+       "hits": 0,
+       "heals": 0,
+       "fizzles": 0,
+       "kos": 0
+      }
+     },
+     "skills": {
+      "PHYSICAL": [
+       {
+        "id": "PA_PUSH",
+        "name": "Drive",
+        "category": "PHYSICAL",
+        "cost": 0,
+        "cooldown_s": 0.1,
+        "cooldown_remaining_s": 0,
+        "startup_s": 0.2,
+        "recovery_s": 0.34,
+        "range_m": 2.5,
+        "gesture": "UP",
+        "effect": "BODY_STRIKE",
+        "pattern": "HORIZONTAL_PUSH",
+        "autonomous": false,
+        "targets": null,
+        "mode": null,
+        "attack_mode": "PHYSICAL",
+        "attack_mode_label": "PHYSICAL",
+        "movement_pattern_id": "HORIZONTAL_PUSH",
+        "pattern_name": "Horizontal Push",
+        "pattern_label": "H-PUSH",
+        "stack": {
+         "attack_stack_id": "AS_ATHLETE_PHYSICAL_HORIZONTAL_PUSH_PA_PUSH_F",
+         "attack_stack_revision": 1,
+         "presentation_profile_id": "PP_ATHLETE_PA_PUSH",
+         "progression_band": "FOUNDATION_PROTOCOL",
+         "resolved_name": "Athlete Drive"
+        },
+        "selected": true,
+        "loadout_slot": 0,
+        "availability": "READY",
+        "availability_why": null
+       },
+       {
+        "id": "PA_PULL",
+        "name": "Row Hook",
+        "category": "PHYSICAL",
+        "cost": 0,
+        "cooldown_s": 0.1,
+        "cooldown_remaining_s": 0,
+        "startup_s": 0.27,
+        "recovery_s": 0.41,
+        "range_m": 2.5,
+        "gesture": "LEFT",
+        "effect": "BODY_STRIKE",
+        "pattern": "VERTICAL_PULL",
+        "autonomous": false,
+        "targets": null,
+        "mode": null,
+        "attack_mode": "PHYSICAL",
+        "attack_mode_label": "PHYSICAL",
+        "movement_pattern_id": "VERTICAL_PULL",
+        "pattern_name": "Vertical Pull",
+        "pattern_label": "V-PULL",
+        "stack": {
+         "attack_stack_id": "AS_ATHLETE_PHYSICAL_VERTICAL_PULL_PA_PULL_F",
+         "attack_stack_revision": 1,
+         "presentation_profile_id": "PP_ATHLETE_PA_PULL",
+         "progression_band": "FOUNDATION_PROTOCOL",
+         "resolved_name": "Athlete Row Hook"
+        },
+        "selected": false,
+        "loadout_slot": 1,
+        "availability": "READY",
+        "availability_why": null
+       },
+       {
+        "id": "PA_HINGE",
+        "name": "Hinge Rise",
+        "category": "PHYSICAL",
+        "cost": 0,
+        "cooldown_s": 0.1,
+        "cooldown_remaining_s": 0,
+        "startup_s": 0.36,
+        "recovery_s": 0.45,
+        "range_m": 2.3,
+        "gesture": "UP",
+        "effect": "BODY_STRIKE",
+        "pattern": "HINGE",
+        "autonomous": false,
+        "targets": null,
+        "mode": null,
+        "attack_mode": "PHYSICAL",
+        "attack_mode_label": "PHYSICAL",
+        "movement_pattern_id": "HINGE",
+        "pattern_name": "Hinge",
+        "pattern_label": "HINGE",
+        "stack": {
+         "attack_stack_id": "AS_ATHLETE_PHYSICAL_HINGE_PA_HINGE_F",
+         "attack_stack_revision": 1,
+         "presentation_profile_id": "PP_ATHLETE_PA_HINGE",
+         "progression_band": "FOUNDATION_PROTOCOL",
+         "resolved_name": "Athlete Hinge Rise"
+        },
+        "selected": false,
+        "loadout_slot": 2,
+        "availability": "READY",
+        "availability_why": null
+       },
+       {
+        "id": "PA_ROTATION",
+        "name": "Pivot Strike",
+        "category": "PHYSICAL",
+        "cost": 0,
+        "cooldown_s": 0.1,
+        "cooldown_remaining_s": 0,
+        "startup_s": 0.29,
+        "recovery_s": 0.38,
+        "range_m": 2.8,
+        "gesture": "RIGHT",
+        "effect": "BODY_STRIKE",
+        "pattern": "ROTATION",
+        "autonomous": false,
+        "targets": null,
+        "mode": null,
+        "attack_mode": "PHYSICAL",
+        "attack_mode_label": "PHYSICAL",
+        "movement_pattern_id": "ROTATION",
+        "pattern_name": "Rotation",
+        "pattern_label": "ROTATE",
+        "stack": {
+         "attack_stack_id": "AS_ATHLETE_PHYSICAL_ROTATION_PA_ROTATION_F",
+         "attack_stack_revision": 1,
+         "presentation_profile_id": "PP_ATHLETE_PA_ROTATION",
+         "progression_band": "FOUNDATION_PROTOCOL",
+         "resolved_name": "Athlete Pivot Strike"
+        },
+        "selected": false,
+        "loadout_slot": 3,
+        "availability": "READY",
+        "availability_why": null
+       }
+      ],
+      "PHYSICAL_MAGIC": [
+       {
+        "id": "PM_PUSH",
+        "name": "Infused Drive",
+        "category": "PHYSICAL_MAGIC",
+        "cost": 8,
+        "cooldown_s": 1.2,
+        "cooldown_remaining_s": 0,
+        "startup_s": 0.41,
+        "recovery_s": 0.5,
+        "range_m": 2.5,
+        "gesture": "UP",
+        "effect": "BODY_STRIKE",
+        "pattern": "HORIZONTAL_PUSH",
+        "autonomous": false,
+        "targets": null,
+        "mode": null,
+        "attack_mode": "PHYSICAL_MAHGIC",
+        "attack_mode_label": "PHYS MAHGIC",
+        "movement_pattern_id": "HORIZONTAL_PUSH",
+        "pattern_name": "Horizontal Push",
+        "pattern_label": "H-PUSH",
+        "stack": {
+         "attack_stack_id": "AS_ATHLETE_PHYSICAL_MAHGIC_HORIZONTAL_PUSH_PM_PUSH_F",
+         "attack_stack_revision": 1,
+         "presentation_profile_id": "PP_ATHLETE_PM_PUSH",
+         "progression_band": "FOUNDATION_PROTOCOL",
+         "resolved_name": "Athlete Infused Drive"
+        },
+        "selected": false,
+        "loadout_slot": 0,
+        "availability": "READY",
+        "availability_why": null
+       },
+       {
+        "id": "PM_PULL",
+        "name": "Infused Row Hook",
+        "category": "PHYSICAL_MAGIC",
+        "cost": 10,
+        "cooldown_s": 1.6,
+        "cooldown_remaining_s": 0,
+        "startup_s": 0.5,
+        "recovery_s": 0.54,
+        "range_m": 2.5,
+        "gesture": "LEFT",
+        "effect": "BODY_STRIKE",
+        "pattern": "VERTICAL_PULL",
+        "autonomous": false,
+        "targets": null,
+        "mode": null,
+        "attack_mode": "PHYSICAL_MAHGIC",
+        "attack_mode_label": "PHYS MAHGIC",
+        "movement_pattern_id": "VERTICAL_PULL",
+        "pattern_name": "Vertical Pull",
+        "pattern_label": "V-PULL",
+        "stack": {
+         "attack_stack_id": "AS_ATHLETE_PHYSICAL_MAHGIC_VERTICAL_PULL_PM_PULL_F",
+         "attack_stack_revision": 1,
+         "presentation_profile_id": "PP_ATHLETE_PM_PULL",
+         "progression_band": "FOUNDATION_PROTOCOL",
+         "resolved_name": "Athlete Infused Row Hook"
+        },
+        "selected": false,
+        "loadout_slot": 1,
+        "availability": "READY",
+        "availability_why": null
+       }
+      ],
+      "SPECIAL_MAGIC": [
+       {
+        "id": "ATHLETE_OVERHEAD_RELEASE",
+        "name": "Overhead Extension Release",
+        "category": "SPECIAL_MAGIC",
+        "cost": 14,
+        "cooldown_s": 4,
+        "cooldown_remaining_s": 0,
+        "startup_s": 0.77,
+        "recovery_s": 0.36,
+        "range_m": 30,
+        "gesture": "UP",
+        "effect": "PROJECTILE",
+        "pattern": "VERTICAL_PUSH",
+        "autonomous": true,
+        "targets": null,
+        "mode": null,
+        "attack_mode": "SPECIAL_MAHGIC",
+        "attack_mode_label": "SPECIAL MAHGIC",
+        "movement_pattern_id": "VERTICAL_PUSH",
+        "pattern_name": "Vertical Push",
+        "pattern_label": "V-PUSH",
+        "stack": {
+         "attack_stack_id": "AS_ATHLETE_SPECIAL_MAHGIC_VERTICAL_PUSH_ATHLETE_OVERHEAD_RELEASE_F",
+         "attack_stack_revision": 1,
+         "presentation_profile_id": "PP_ATHLETE_OVERHEAD_RELEASE",
+         "progression_band": "FOUNDATION_PROTOCOL",
+         "resolved_name": "Overhead Extension Release"
+        },
+        "selected": false,
+        "loadout_slot": 0,
+        "availability": "READY",
+        "availability_why": null
+       },
+       {
+        "id": "ATHLETE_CHEST_FLY_CLAP",
+        "name": "Chest Fly Clap Release",
+        "category": "SPECIAL_MAGIC",
+        "cost": 16,
+        "cooldown_s": 5,
+        "cooldown_remaining_s": 0,
+        "startup_s": 0.85,
+        "recovery_s": 0.41,
+        "range_m": 22.5,
+        "gesture": "LEFT",
+        "effect": "PROJECTILE",
+        "pattern": "HORIZONTAL_ADDUCTION",
+        "autonomous": true,
+        "targets": null,
+        "mode": null,
+        "attack_mode": "SPECIAL_MAHGIC",
+        "attack_mode_label": "SPECIAL MAHGIC",
+        "movement_pattern_id": "HORIZONTAL_ADDUCTION",
+        "pattern_name": "Chest Fly",
+        "pattern_label": "FLY",
+        "stack": {
+         "attack_stack_id": "AS_ATHLETE_SPECIAL_MAHGIC_HORIZONTAL_ADDUCTION_ATHLETE_CHEST_FLY_CLAP_F",
+         "attack_stack_revision": 1,
+         "presentation_profile_id": "PP_ATHLETE_CHEST_FLY_CLAP",
+         "progression_band": "FOUNDATION_PROTOCOL",
+         "resolved_name": "Chest Fly Clap Release"
+        },
+        "selected": false,
+        "loadout_slot": 1,
+        "availability": "READY",
+        "availability_why": null
+       }
+      ]
+     },
+     "patterns": [
+      "HORIZONTAL_PUSH",
+      "VERTICAL_PULL",
+      "HINGE",
+      "ROTATION"
+     ],
+     "others": [
+      {
+       "id": "FIELD_DUMMY",
+       "kind": "SYNTHETIC",
+       "class": "ATHLETE",
+       "level": 1,
+       "team": "DUMMY",
+       "hp": 2000,
+       "max": 2000,
+       "ko": false,
+       "last_hit_ago_s": null,
+       "last_touch_ago_s": null,
+       "last_hit_from": null,
+       "lock": null,
+       "position": {
+        "x": 0,
+        "z": -2
+       },
+       "facing": 3.142,
+       "guard": null,
+       "guard_sheet": {
+        "frac": 1,
+        "broken": false
+       },
+       "invisible": false,
+       "immune": false,
+       "discord": false,
+       "cast": null,
+       "statuses": [],
+       "enemy": true,
+       "ally": false
+      }
+     ],
+     "entities": [],
+     "context": "PRACTICE",
+     "practice": true,
+     "colliders": {
+      "version": "GYM_INTERIOR_colliders_v1",
+      "shapes": [
+       {
+        "id": "GYM_INTERIOR_WALL_0",
+        "type": "BOX",
+        "x1": -14.6,
+        "x2": 14.6,
+        "z1": -14.600000000000001,
+        "z2": -14,
+        "h": 3.2
+       },
+       {
+        "id": "GYM_INTERIOR_WALL_1",
+        "type": "BOX",
+        "x1": -14.6,
+        "x2": 14.6,
+        "z1": 14,
+        "z2": 14.600000000000001,
+        "h": 3.2
+       },
+       {
+        "id": "GYM_INTERIOR_WALL_2",
+        "type": "BOX",
+        "x1": -14.600000000000001,
+        "x2": -14,
+        "z1": -14,
+        "z2": 14,
+        "h": 3.2
+       },
+       {
+        "id": "GYM_INTERIOR_WALL_3",
+        "type": "BOX",
+        "x1": 14,
+        "x2": 14.600000000000001,
+        "z1": -14,
+        "z2": 14,
+        "h": 3.2
+       },
+       {
+        "id": "GYM_PLATFORM",
+        "type": "BOX",
+        "x1": -3,
+        "z1": -9,
+        "x2": 3,
+        "z2": -5,
+        "h": 0.25,
+        "walkable": true,
+        "low": true
+       },
+       {
+        "id": "GYM_BENCH_W",
+        "type": "BOX",
+        "x1": -11.5,
+        "z1": -2,
+        "x2": -9.5,
+        "z2": 2,
+        "h": 0.5,
+        "walkable": true,
+        "low": true
+       },
+       {
+        "id": "GYM_BENCH_E",
+        "type": "BOX",
+        "x1": 9.5,
+        "z1": -2,
+        "x2": 11.5,
+        "z2": 2,
+        "h": 0.5,
+        "walkable": true,
+        "low": true
+       },
+       {
+        "type": "BOX",
+        "id": "RACK_W0",
+        "x1": -12.72,
+        "x2": -12.48,
+        "z1": -9.05,
+        "z2": -6.95,
+        "h": 1.9,
+        "label": "rack"
+       },
+       {
+        "type": "BOX",
+        "id": "RACK_W1",
+        "x1": -12.72,
+        "x2": -12.48,
+        "z1": -3.05,
+        "z2": -0.95,
+        "h": 1.9,
+        "label": "rack"
+       },
+       {
+        "type": "BOX",
+        "id": "RACK_W2",
+        "x1": -12.72,
+        "x2": -12.48,
+        "z1": 2.95,
+        "z2": 5.05,
+        "h": 1.9,
+        "label": "rack"
+       },
+       {
+        "type": "BOX",
+        "id": "RACK_E0",
+        "x1": 12.48,
+        "x2": 12.72,
+        "z1": -9.05,
+        "z2": -6.95,
+        "h": 1.9,
+        "label": "rack"
+       },
+       {
+        "type": "BOX",
+        "id": "RACK_E1",
+        "x1": 12.48,
+        "x2": 12.72,
+        "z1": -3.05,
+        "z2": -0.95,
+        "h": 1.9,
+        "label": "rack"
+       },
+       {
+        "type": "BOX",
+        "id": "RACK_E2",
+        "x1": 12.48,
+        "x2": 12.72,
+        "z1": 2.95,
+        "z2": 5.05,
+        "h": 1.9,
+        "label": "rack"
+       },
+       {
+        "type": "BOX",
+        "id": "CAGE",
+        "x1": -1.5,
+        "x2": 1.5,
+        "z1": -11.95,
+        "z2": -10.25,
+        "h": 2.6,
+        "label": "squat cage"
+       },
+       {
+        "type": "BOX",
+        "id": "GYM_BARBELL_PLATFORM",
+        "x1": -1.1,
+        "x2": 1.1,
+        "z1": -7.3,
+        "z2": -6.7,
+        "h": 0.87,
+        "y0": 0.25,
+        "label": "training prop — premium MAH barbell on the lifting platform (JOB B prop)",
+        "world": "JOBB"
+       }
+      ],
+      "district_shapes": 0,
+      "world_shapes": 0,
+      "body_radius_m": 0.4,
+      "interactables": [],
+      "landmarks": [],
+      "groups": []
+     },
+     "match": null,
+     "classes": [
+      "ATHLETE",
+      "TITAN",
+      "BAGE",
+      "VISIONARY",
+      "LEAN"
+     ],
+     "resets": 0
+    },
+    "field": null,
+    "room_size_m": 28,
+    "ceiling_m": 3.2,
+    "flight_ceiling_m": 3.2,
+    "interior_plan": null,
+    "room_style_id": null,
+    "material_family": null,
+    "feature_ids": [],
+    "floor_levels": [],
+    "room_solids": [
+     {
+      "id": "RACK_W0",
+      "x1": -12.72,
+      "x2": -12.48,
+      "z1": -9.05,
+      "z2": -6.95,
+      "h": 1.9,
+      "label": "rack"
+     },
+     {
+      "id": "RACK_W1",
+      "x1": -12.72,
+      "x2": -12.48,
+      "z1": -3.05,
+      "z2": -0.95,
+      "h": 1.9,
+      "label": "rack"
+     },
+     {
+      "id": "RACK_W2",
+      "x1": -12.72,
+      "x2": -12.48,
+      "z1": 2.95,
+      "z2": 5.05,
+      "h": 1.9,
+      "label": "rack"
+     },
+     {
+      "id": "RACK_E0",
+      "x1": 12.48,
+      "x2": 12.72,
+      "z1": -9.05,
+      "z2": -6.95,
+      "h": 1.9,
+      "label": "rack"
+     },
+     {
+      "id": "RACK_E1",
+      "x1": 12.48,
+      "x2": 12.72,
+      "z1": -3.05,
+      "z2": -0.95,
+      "h": 1.9,
+      "label": "rack"
+     },
+     {
+      "id": "RACK_E2",
+      "x1": 12.48,
+      "x2": 12.72,
+      "z1": 2.95,
+      "z2": 5.05,
+      "h": 1.9,
+      "label": "rack"
+     },
+     {
+      "id": "CAGE",
+      "x1": -1.5,
+      "x2": 1.5,
+      "z1": -11.95,
+      "z2": -10.25,
+      "h": 2.6,
+      "label": "squat cage"
+     },
+     {
+      "id": "GYM_BARBELL_PLATFORM",
+      "x1": -1.1,
+      "x2": 1.1,
+      "z1": -7.3,
+      "z2": -6.7,
+      "h": 0.87,
+      "y0": 0.25,
+      "label": "training prop — premium MAH barbell on the lifting platform (JOB B prop)",
+      "world": "JOBB"
+     }
+    ],
+    "platforms": [
+     {
+      "id": "GYM_PLATFORM",
+      "x1": -3,
+      "z1": -9,
+      "x2": 3,
+      "z2": -5,
+      "height": 0.25,
+      "label": "lifting platform"
+     },
+     {
+      "id": "GYM_BENCH_W",
+      "x1": -11.5,
+      "z1": -2,
+      "x2": -9.5,
+      "z2": 2,
+      "height": 0.5,
+      "label": "bench"
+     },
+     {
+      "id": "GYM_BENCH_E",
+      "x1": 9.5,
+      "z1": -2,
+      "x2": 11.5,
+      "z2": 2,
+      "height": 0.5,
+      "label": "bench"
+     }
+    ],
+    "markers": [],
+    "exit": {
+     "to": "FIELD",
+     "position": {
+      "x": 0,
+      "z": 11.6
+     },
+     "range_m": 2.6,
+     "requires": null,
+     "label": "EXIT — TRAINING ROOM doorway"
+    },
+    "position": {
+     "x": -0.259,
+     "z": 12.303
+    },
+    "speed_mps": 0,
+    "transit": null,
+    "facing": 0,
+    "form": "FUSED",
+    "mahloco": "FUSED_IDLE",
+    "transforming": false,
+    "guard": null,
+    "guard_sheet": {
+     "hp": 450,
+     "max": 450,
+     "frac": 1,
+     "broken": false
+    },
+    "dash": null,
+    "emote": null,
+    "emote_at": null,
+    "emote_target": null,
+    "emote_duration_s": null,
+    "paired": null,
+    "invite": null,
+    "invite_out": null,
+    "emote_catalog": [
+     {
+      "id": "WAVE",
+      "name": "Wave",
+      "group": "SOCIAL",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 2.2,
+      "icon": "👋",
+      "reply_options": [
+       "NOD",
+       "WAVE"
+      ]
+     },
+     {
+      "id": "NOD",
+      "name": "Respect Nod",
+      "group": "SOCIAL",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 1.4,
+      "icon": "🙇",
+      "reply_options": [
+       "NOD"
+      ]
+     },
+     {
+      "id": "READY",
+      "name": "Ready",
+      "group": "SOCIAL",
+      "form": "ANY",
+      "partner": false,
+      "directed": false,
+      "loop": false,
+      "duration_s": 1.6,
+      "icon": "🧍",
+      "reply_options": [
+       "NOD",
+       "THUMBS_UP"
+      ]
+     },
+     {
+      "id": "APPLAUD",
+      "name": "Applaud",
+      "group": "SOCIAL",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 2.4,
+      "icon": "👏",
+      "reply_options": [
+       "NOD",
+       "THUMBS_UP",
+       "WAVE"
+      ]
+     },
+     {
+      "id": "THUMBS_UP",
+      "name": "Thumbs Up",
+      "group": "SOCIAL",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 1.8,
+      "icon": "👍",
+      "reply_options": [
+       "THUMBS_UP",
+       "NOD"
+      ]
+     },
+     {
+      "id": "BECKON",
+      "name": "Playful Beckon",
+      "group": "SOCIAL",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 2,
+      "icon": "🫴",
+      "reply_options": [
+       "WAVE",
+       "SHRUG",
+       "MAH_GROOVE"
+      ]
+     },
+     {
+      "id": "MAH_GROOVE",
+      "name": "MAH Groove",
+      "group": "DANCE",
+      "form": "ANY",
+      "partner": false,
+      "directed": false,
+      "loop": true,
+      "duration_s": 12,
+      "icon": "🕺",
+      "reply_options": [
+       "MAH_GROOVE",
+       "APPLAUD"
+      ]
+     },
+     {
+      "id": "SIDE_GLIDE",
+      "name": "Side Glide",
+      "group": "DANCE",
+      "form": "ANY",
+      "partner": false,
+      "directed": false,
+      "loop": true,
+      "duration_s": 10,
+      "icon": "💃",
+      "reply_options": [
+       "APPLAUD",
+       "SIDE_GLIDE"
+      ]
+     },
+     {
+      "id": "UPRIGHT_ROW_DEMO",
+      "name": "Upright Row Demo",
+      "group": "EXERCISE",
+      "form": "ANY",
+      "partner": false,
+      "directed": false,
+      "loop": true,
+      "duration_s": 8,
+      "icon": "🏋️",
+      "reply_options": [
+       "APPLAUD",
+       "NOD"
+      ]
+     },
+     {
+      "id": "HORIZONTAL_PUSH_DEMO",
+      "name": "Horizontal Push Demo",
+      "group": "EXERCISE",
+      "form": "ANY",
+      "partner": false,
+      "directed": false,
+      "loop": true,
+      "duration_s": 8,
+      "icon": "🤜",
+      "reply_options": [
+       "APPLAUD",
+       "NOD"
+      ]
+     },
+     {
+      "id": "HIP_HINGE_DEMO",
+      "name": "Hip-Hinge Demo",
+      "group": "EXERCISE",
+      "form": "ANY",
+      "partner": false,
+      "directed": false,
+      "loop": true,
+      "duration_s": 8,
+      "icon": "🙆",
+      "reply_options": [
+       "APPLAUD",
+       "NOD"
+      ]
+     },
+     {
+      "id": "SQUAT_DEMO",
+      "name": "Squat Demo",
+      "group": "EXERCISE",
+      "form": "SPLIT",
+      "partner": false,
+      "directed": false,
+      "loop": true,
+      "duration_s": 8,
+      "icon": "🦵",
+      "reply_options": [
+       "APPLAUD",
+       "NOD"
+      ]
+     },
+     {
+      "id": "DOUBLE_BICEPS",
+      "name": "Double Biceps",
+      "group": "FLEX",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 3,
+      "icon": "💪",
+      "reply_options": [
+       "APPLAUD",
+       "DOUBLE_BICEPS",
+       "BECKON"
+      ]
+     },
+     {
+      "id": "FRONT_LAT_SPREAD",
+      "name": "Front Lat Spread",
+      "group": "FLEX",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 3,
+      "icon": "🦅",
+      "reply_options": [
+       "APPLAUD",
+       "THUMBS_UP"
+      ]
+     },
+     {
+      "id": "SIDE_CHEST",
+      "name": "Side Chest",
+      "group": "FLEX",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 3,
+      "icon": "🫸",
+      "reply_options": [
+       "APPLAUD",
+       "THUMBS_UP"
+      ]
+     },
+     {
+      "id": "BACK_LAT_SPREAD",
+      "name": "Back Lat Spread",
+      "group": "FLEX",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 3,
+      "icon": "🔙",
+      "reply_options": [
+       "APPLAUD",
+       "NOD"
+      ]
+     },
+     {
+      "id": "SHRUG",
+      "name": "Shrug",
+      "group": "EXPRESSION",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 1.8,
+      "icon": "🤷",
+      "reply_options": [
+       "SHRUG",
+       "QUIET_LAUGH"
+      ]
+     },
+     {
+      "id": "QUIET_LAUGH",
+      "name": "Quiet Laugh",
+      "group": "EXPRESSION",
+      "form": "ANY",
+      "partner": false,
+      "directed": true,
+      "loop": false,
+      "duration_s": 2.2,
+      "icon": "😄",
+      "reply_options": [
+       "QUIET_LAUGH",
+       "NOD"
+      ]
+     },
+     {
+      "id": "FIST_BUMP",
+      "name": "Fist Bump",
+      "group": "PARTNER",
+      "form": "ANY",
+      "partner": true,
+      "directed": true,
+      "loop": false,
+      "duration_s": 2.6,
+      "icon": "👊",
+      "reply_options": []
+     },
+     {
+      "id": "HIGH_FIVE",
+      "name": "High Five",
+      "group": "PARTNER",
+      "form": "ANY",
+      "partner": true,
+      "directed": true,
+      "loop": false,
+      "duration_s": 2.4,
+      "icon": "🙏",
+      "reply_options": []
+     },
+     {
+      "id": "PAIRED_GROOVE",
+      "name": "Paired Groove",
+      "group": "PARTNER",
+      "form": "ANY",
+      "partner": true,
+      "directed": true,
+      "loop": true,
+      "duration_s": 12,
+      "icon": "👯",
+      "reply_options": []
+     },
+     {
+      "id": "PERCH",
+      "name": "Perch",
+      "group": "SOCIAL",
+      "form": "ANY",
+      "partner": false,
+      "directed": false,
+      "loop": true,
+      "duration_s": 60,
+      "icon": "🪑",
+      "reply_options": [],
+      "requires_support": true,
+      "_doc": "S11 sit / perch: a settled hover-perch (knees drawn up, hands resting, tail tucked) that needs ground or a registered roof / deck under the body; refused in flight or transit; cancels on move / dash / fly / attack / guard / transform like every emote. It is a hovering perch, not a seated pose on a chair: the fused body has no feet and keeps its tip clearance."
+     }
+    ],
+    "emote_groups": [
+     "SOCIAL",
+     "DANCE",
+     "EXERCISE",
+     "FLEX",
+     "EXPRESSION",
+     "PARTNER"
+    ],
+    "social_range_m": 3,
+    "npcs": [],
+    "creatures": [],
+    "equipment": null,
+    "collectibles": [],
+    "nodes": [],
+    "wildlife": [],
+    "defeat": null,
+    "ai_spar": null,
+    "host_t": 61.15,
+    "in_duel": false,
+    "host_fighter": false,
+    "nav_end": null,
+    "nav": null,
+    "flight": {
+     "powered": false,
+     "braking": false,
+     "brake_seq": 0,
+     "brake_x": 0,
+     "brake_age_s": null,
+     "altitude": 0,
+     "height_above_ground": 0,
+     "ground": 0,
+     "vz": 0,
+     "warning": false,
+     "forced_landing": false,
+     "exiting": false,
+     "intent": 0,
+     "remaining_s": null,
+     "landed_count": 1,
+     "hold": null,
+     "perch": null,
+     "falling": false,
+     "hold_alt": null,
+     "took_off": false,
+     "warning_fraction": 0.25,
+     "cruise_mps": 20.56,
+     "boost_factor": 1.3,
+     "allowed_in_pvp": false
+    },
+    "flight_mahgic": {
+     "current": 200,
+     "max": 200,
+     "lockout": false,
+     "label": "Flight MAHGIC (temporary label — final name OPEN)"
+    },
+    "combat_mahgic": {
+     "current": 200,
+     "max": 200,
+     "lockout": false,
+     "label": "Combat MAHGIC (temporary label — final name OPEN)"
+    },
+    "pattern": "HORIZONTAL_PUSH",
+    "pattern_hints": {
+     "HORIZONTAL_PUSH": {
+      "basic": "UP",
+      "basic_id": "ATHLETE_HORIZONTAL_PUSH_BASIC"
+     },
+     "VERTICAL_PULL": {
+      "basic": "DOWN",
+      "basic_id": "ATHLETE_VERTICAL_PULL_BASIC",
+      "special": "HOLD",
+      "special_id": "ATHLETE_BILATERAL_UPRIGHT_ROW_MANIFESTATION"
+     },
+     "HINGE": {
+      "basic": "UP",
+      "basic_id": "ATHLETE_HINGE_BASIC"
+     },
+     "LUNGE": {
+      "basic": "UP",
+      "basic_id": "ATHLETE_LUNGE_BASIC"
+     }
+    },
+    "room_attack": null,
+    "targets": [],
+    "tutorial": {
+     "steps": [
+      "MOVE",
+      "FLY_AND_LAND",
+      "BASIC_ATTACK"
+     ],
+     "done": {
+      "MOVE": true,
+      "FLY_AND_LAND": true
+     },
+     "complete": false
+    },
+    "quest": null,
+    "quests_done": [],
+    "skills": {},
+    "workouts": 0,
+    "character": {
+     "xp": 0,
+     "level": 1
+    },
+    "loadout": [
+     "HORIZONTAL_PUSH",
+     "VERTICAL_PULL",
+     "HINGE",
+     "LUNGE"
+    ],
+    "ui_slots": 4,
+    "slot_cap": 8,
+    "equipped_max": 4,
+    "patterns_catalog": [
+     "HORIZONTAL_PUSH",
+     "VERTICAL_PULL",
+     "HINGE",
+     "LUNGE"
+    ],
+    "magic_catalog": [
+     {
+      "id": "CLASS_MAGIC_PLACEHOLDER",
+      "note": "separate progression family — OPEN"
+     }
+    ],
+    "dash_profile": {
+     "distance_m": 6,
+     "duration_s": 0.34
+    },
+    "presence": [],
+    "prompts": [
+     {
+      "intent": "ENTER_ROOM",
+      "to": "FIELD",
+      "label": "EXIT — TRAINING ROOM doorway",
+      "eligible": true,
+      "blocked_by": []
+     }
+    ],
+    "stats": {
+     "room_hits": 0,
+     "dashes": 0,
+     "guards": 0,
+     "target_downs": 0
+    }
+   }
+  },
+  "blocked": {
+   "state": "ORBIT",
+   "yaw": 0,
+   "dist": 6.474795594385649,
+   "applied": 2.1,
+   "obstructed": true,
+   "inside": null,
+   "pos": {
+    "x": -0.259,
+    "z": 12.303
+   },
+   "facing": 0
+  },
+  "restored": {
+   "yaw": 6.283027180845375,
+   "pitch": 0.2,
+   "behind": 6.283027180845375,
+   "err_deg": 0,
+   "back_dot": 1.0000000000000002,
+   "back_err_deg": 0,
+   "last_err_deg": 0,
+   "yaw_vel": 0,
+   "applied": 1.6205530358864026,
+   "dist": 6.474795594385649,
+   "dragging": false,
+   "state": "FOLLOW",
+   "speedK": 0,
+   "fov": 55,
+   "fade": 1,
+   "mode": "follow",
+   "resetting": false,
+   "pitch_bias": 0.654,
+   "obstructed": true,
+   "readable": 2.2,
+   "zoom": 1,
+   "flightV": 0,
+   "hold_alt": null,
+   "fly_hold": false,
+   "desc_hold": false,
+   "flightMine": false,
+   "move_f": 0,
+   "in_fwd": 0,
+   "keys_space": false,
+   "keys_c": false,
+   "preset": "landscape",
+   "facing_deg": 359.99,
+   "latch": null,
+   "cfg": {
+    "heading_follow": true,
+    "height_frac": 0.72,
+    "look_height_frac": 0.28,
+    "shoulder_m": 0,
+    "look_ahead_m": 2,
+    "stiffness_idle_hz": 1.2,
+    "stiffness_move_hz": 2,
+    "reset_time_s": 0.5,
+    "obstruct_pitch_up": true,
+    "min_readable_m": 2.2,
+    "readable_frac": 0.34,
+    "latch_manual_drag": false,
+    "pitch_up_step": 0.12,
+    "pitch_up_max_steps": 8,
+    "pitch_up_limit": 0.9,
+    "relatch_deg": 45,
+    "pitch_min": -0.4,
+    "pitch_min_flight": -1.05,
+    "pitch_max": 1.2,
+    "probe_radius_m": 0.35,
+    "pull_in_speed": 24,
+    "ease_out_speed": 2.5,
+    "speed_fov_deg": 0,
+    "speed_pullback": 0,
+    "fade_below_m": 1.3,
+    "lock_extend": 0,
+    "lock_frame": false,
+    "strike_kick": 0,
+    "presets": {
+     "portrait": {
+      "frame_frac": 0.55,
+      "pitch_home": 0.2,
+      "look_height_frac": 0
+     },
+     "landscape": {
+      "frame_frac": 0.31,
+      "pitch_home": 0.2
+     }
+    }
+   },
+   "position": {
+    "x": -0.2591683127738235,
+    "y": 2.7265871780069917,
+    "z": 13.367419619033205
+   },
+   "inside": null,
+   "below_ground": false
+  }
+ },
+ "shop": {
+  "door_prompt": {
+   "intent": "ENTER",
+   "id": "CLOTHING_DOOR",
+   "to": "CLOTHING_SHOP",
+   "label": "MAH MARKET — enter clothing wing",
+   "eligible": true
+  },
+  "enter": {
+   "accepted": true,
+   "room": "CLOTHING_SHOP",
+   "total_ms": 867,
+   "via": "ENTER",
+   "camera_before": {
+    "mode": "free",
+    "state": "FREE",
+    "yaw": 0
+   },
+   "camera_after": {
+    "mode": "free",
+    "state": "FREE",
+    "yaw": 2.6489999999667
+   },
+   "camera_change": {
+    "mode_before": "free",
+    "yaw_before": 0,
+    "old_behind": 3.6341853072128867,
+    "new_behind": 0,
+    "mode_after": "free",
+    "yaw_after": 2.6489999999667,
+    "relative_kept": null
+   }
+  },
+  "browse_prompt": {
+   "intent": "BROWSE",
+   "id": "CLOTHING_COUNTER",
+   "label": "BROWSE — apparel catalog",
+   "eligible": true
+  },
+  "catalog": {
+   "open": true,
+   "text": "MAH MARKET — clothingAPPARELNO STOCK YET · 0 itemscatalog empty by design — apparel art and fit are a later owner decisionstatus ZERO_STOCK · purchase disabled no economyCLOSE",
+   "buttons": [
+    "CLOSE"
+   ]
+  },
+  "registry": {
+   "version": "SHOPS_V1",
+   "_doc": "master §17 (EXT-26–29, U18): the two market shops are FINISHED, ENTERABLE spaces whose catalogs are EMPTY by design. This registry is the minimal extensible data: a shop's id, kind, room, status and an item list that is intentionally [] — no product, price, purchase, equipped item or silhouette is invented. `states` distinguish APPROVED (owner-approved items), UNDESIGNED (the whole family until the apparel / weapon art and the fit / combat rules exist), TEST_ONLY (fixtures that must never ship) and RUNTIME (what the build actually lists). A validator (16_TESTS/gameplay_interior_entry.test.mjs) checks every listed item's asset reference exists — with zero items that check is vacuous today, and the test proves the validator rejects a synthetic bad reference.",
+   "shops": [
+    {
+     "id": "SHOP_CLOTHING",
+     "kind": "CLOTHING",
+     "room": "CLOTHING_SHOP",
+     "label": "MAH MARKET — clothing",
+     "status": "ZERO_STOCK",
+     "catalog": [],
+     "states": {
+      "approved": [],
+      "undesigned": [
+       "APPAREL_FAMILY (art + fit rules pending — owner)"
+      ],
+      "test_only": [],
+      "runtime": []
+     },
+     "empty_state": {
+      "title": "APPAREL",
+      "line": "NO STOCK YET",
+      "detail": "catalog empty by design — apparel art and fit are a later owner decision"
+     },
+     "purchase": "DISABLED_NO_ECONOMY"
+    },
+    {
+     "id": "SHOP_WEAPONS",
+     "kind": "WEAPONS",
+     "room": "WEAPON_SHOP",
+     "label": "MAH MARKET — weapons",
+     "status": "ZERO_STOCK",
+     "catalog": [],
+     "states": {
+      "approved": [],
+      "undesigned": [
+       "WEAPON_FAMILY (weapon art + combat rules pending — owner; the gym-pattern kit stays the only combat)"
+      ],
+      "test_only": [],
+      "runtime": []
+     },
+     "empty_state": {
+      "title": "WEAPONS",
+      "line": "NO STOCK YET",
+      "detail": "catalog empty by design — weapon gameplay stays dormant until design approval"
+     },
+     "purchase": "DISABLED_NO_ECONOMY"
+    }
+   ]
+  }
+ },
+ "summary": {
+  "pass": 24,
+  "fail": 2
+ }
+}

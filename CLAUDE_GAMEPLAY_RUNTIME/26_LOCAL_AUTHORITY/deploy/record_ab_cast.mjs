@@ -1,0 +1,47 @@
+/* S10 A/B + SOURCE PROOF CLIP (~60 s): 1) donor source cast_a_spell + hit_to_head in the isolated viewer (our camera), 2) A = ATHLETE_M_V7 current motion,
+   3) B = same mesh/rig + retargeted donor upper layer (?motion=TRIPO_UPPER); SPECIAL cast (E in SPECIAL MAHGIC) front-3/4 and side (closest arm/chest pass),
+   hit reaction A/B. UI hidden, effects as in game. node deploy/record_ab_cast.mjs [tag] → deploy/review/<tag>/mahworld_ab_cast.webm */
+import path from 'node:path'; import fs from 'node:fs'; import { fileURLToPath } from 'node:url';
+import { serveStatic, launchChrome, waitForGame, sleep, PLAY_PATH } from './probe_lib.mjs';
+var HERE = path.dirname(fileURLToPath(import.meta.url)); var DIST = path.join(HERE, 'static_dist'); var ROOT = path.resolve(HERE, '..', '..', '..'); var tag = process.argv[2] || 'ab_cast'; var OUT = path.join(HERE, 'review', tag); fs.mkdirSync(OUT, { recursive: true });
+var srvDist = await serveStatic(DIST); var srvRoot = await serveStatic(ROOT); var pg = await launchChrome({ width: 960, height: 720, gpu: true }); var frames = [], marks = [], t0 = 0; var srv = { close: function () { srvDist.close(); srvRoot.close(); } };
+function mark(l) { marks.push({ t: +((performance.now() - t0) / 1000).toFixed(2), label: l }); console.log(((performance.now() - t0) / 1000).toFixed(1) + 's  ' + l); }
+async function key(code, down) { await pg.evaluate("document.dispatchEvent(new KeyboardEvent('" + (down ? 'keydown' : 'keyup') + "',{code:'" + code + "',key:'" + (code.startsWith('Key') ? code.slice(3).toLowerCase() : code) + "',bubbles:true})); 1"); }
+async function tap(code) { await key(code, true); await sleep(40); await key(code, false); }
+async function cam(y, p, d, pv) { await pg.evaluate("window.MAHWORLD_PLAY.cam(" + y + "," + p + "," + d + "," + (pv === undefined ? 'null' : pv) + ")"); }
+async function yawOf() { return await pg.evaluate("window.MAHWORLD_PLAY.mePose().root_yaw"); }
+async function P(expr) { return await pg.evaluate("(function(){ var P=window.MAHWORLD_PLAY; " + expr + " })()"); }
+var onFrame = function (p) { frames.push({ t: performance.now() - t0, data: p.data }); pg.cmd('Page.screencastFrameAck', { sessionId: p.sessionId }).catch(function () { }); };
+try {
+  /* ---- 1. SOURCE ---- */
+  await pg.goto(srvRoot.origin + '/CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/donor_view.html?clip=cast_a_spell'); for (var w = 0; w < 120; w++) { if (await pg.evaluate("!!(window.DONOR && window.DONOR.ready)")) break; await sleep(500); } await sleep(800);
+  var info = await pg.evaluate("JSON.stringify({clip: DONOR.clip, dur: DONOR.duration, joints: DONOR.joints, clips: DONOR.clips})"); console.log('source', info);
+  pg.on('Page.screencastFrame', onFrame); t0 = performance.now(); await pg.cmd('Page.startScreencast', { format: 'jpeg', quality: 72, maxWidth: 960, maxHeight: 720, everyNthFrame: 2 });
+  await pg.evaluate("DONOR.cam(0.55, 0.10, null, null); DONOR.seek(0); DONOR.play(1); 1"); mark('SOURCE preset:biped:cast_a_spell — unmodified donor, front 3/4 (5.4 s clip, real time)'); await sleep(5600);
+  await pg.evaluate("DONOR.cam(Math.PI/2, 0.05, null, null); DONOR.seek(0); DONOR.play(1); 1"); mark('SOURCE cast — side: the arm-to-torso pass and the folded lower taper (defect, not copied)'); await sleep(5600);
+  await pg.goto(srvRoot.origin + '/CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/donor_view.html?clip=hit_to_head'); for (var w2 = 0; w2 < 120; w2++) { if (await pg.evaluate("!!(window.DONOR && window.DONOR.ready)")) break; await sleep(500); } await sleep(600);
+  await pg.evaluate("DONOR.cam(0.55, 0.10, null, null); DONOR.seek(0); DONOR.play(1); 1"); mark('SOURCE preset:biped:hit_to_head — unmodified donor (1.9 s)'); await sleep(2400);
+  await pg.cmd('Page.stopScreencast');
+  /* ---- 2/3. TARGET A then B ---- */
+  for (var variant of [{ id: 'A', q: '', label: 'A = ATHLETE_M_V7 dev_0.12, current MAH motion' }, { id: 'B', q: '&motion=TRIPO_UPPER', label: 'B = SAME mesh/rig + retargeted Tripo upper layer, MAH lower body' }]) {
+    await pg.goto(srvDist.origin + PLAY_PATH + '?field=1&dev=1&avatar=ATHLETE_M_V7' + variant.q); await waitForGame(pg, 90000); await sleep(3500);
+    await P("P.hud.showGuide(false); if (P.camFollow) P.camFollow(false); document.querySelectorAll('body > *').forEach(function(e){ if (e.tagName!=='CANVAS') e.style.visibility='hidden'; }); return 1;");
+    await P("return P.goTo(-3, -13, -3, -8)"); await sleep(400); var y0 = await yawOf(); var mm = await P("return JSON.stringify(P.motion())"); console.log(variant.id, 'motion', mm);
+    await P("return P.send('RULES_SELECT',{category:'SPECIAL_MAGIC', slot:0})"); await sleep(600);   /* SPECIAL MAHGIC category */
+    await pg.cmd('Page.startScreencast', { format: 'jpeg', quality: 72, maxWidth: 960, maxHeight: 720, everyNthFrame: 2 });
+    await cam(y0 + Math.PI + 0.6, 0.06, 2.6, 1.05); mark(variant.label + ' — SPECIAL cast E, front 3/4'); await sleep(400); await P("P.rules.castSlot(0); return 1;"); await sleep(3200);
+    await cam(y0 + Math.PI / 2, 0.04, 2.4, 1.05); mark(variant.id + ' — second cast, SIDE (closest arm / chest pass)'); await sleep(600); await P("P.rules.castSlot(0); return 1;"); await sleep(3200);
+    await cam(y0 + Math.PI + 0.6, 0.06, 2.6, 1.05); mark(variant.id + ' — hit reaction (dev incoming physical, harmless)'); await sleep(300); await P("return P.send('FIELD_INCOMING',{kind:'PHYSICAL'})"); await sleep(1600);
+    await pg.cmd('Page.stopScreencast');
+  }
+  var dur = frames.length ? (frames[frames.length - 1].t - frames[0].t) / 1000 : 0; console.log('frames', frames.length, 'seconds', dur.toFixed(1));
+  fs.writeFileSync(path.join(OUT, 'marks.json'), JSON.stringify({ marks: marks, frames: frames.length, seconds: +dur.toFixed(1) }, null, 1));
+  marks.forEach(function (mk, i) { var fi = frames.findIndex(function (f) { return f.t / 1000 >= mk.t + 0.9; }); if (fi >= 0) fs.writeFileSync(path.join(OUT, 'still_' + String(i).padStart(2, '0') + '_' + mk.label.replace(/[^a-z0-9]+/gi, '_').slice(0, 40) + '.png'), Buffer.from(frames[fi].data, 'base64')); });
+  var t2 = await pg.cmd('Target.createTarget', { url: 'about:blank' }); var list = await (await fetch('http://127.0.0.1:' + pg.port + '/json/list')).json(); var helper = list.filter(function (x) { return x.id === t2.targetId; })[0]; var ws = new WebSocket(helper.webSocketDebuggerUrl); await new Promise(function (r, j) { ws.onopen = r; ws.onerror = j; });
+  var mid = 0, pend = {}; ws.onmessage = function (m) { var d = JSON.parse(typeof m.data === 'string' ? m.data : String(m.data)); if (d.id && pend[d.id]) { pend[d.id](d); delete pend[d.id]; } }; function c2(method, params) { return new Promise(function (r, j) { var id = ++mid; pend[id] = function (d) { d.error ? j(new Error(JSON.stringify(d.error))) : r(d.result); }; ws.send(JSON.stringify({ id: id, method: method, params: params || {} })); }); }
+  await c2('Runtime.enable'); var ev2 = async function (expr) { var r = await c2('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true }); if (r.exceptionDetails) throw new Error('eval2: ' + JSON.stringify(r.exceptionDetails).slice(0, 300)); return r.result.value; };
+  await ev2('window.__F = []; window.__T = []; 1'); for (var c0 = 0; c0 < frames.length; c0 += 40) { var chunk = frames.slice(c0, c0 + 40); await ev2('(function(){var d=' + JSON.stringify(chunk.map(function (f) { return f.data; })) + ';var t=' + JSON.stringify(chunk.map(function (f) { return Math.round(f.t - frames[0].t); })) + ';for(var i=0;i<d.length;i++){window.__F.push(d[i]);window.__T.push(t[i]);} return window.__F.length;})()'); }
+  var webm = await ev2('(async function(){ var F=window.__F, T=window.__T; var load=function(i){ return new Promise(function(res){ var im=new Image(); im.onload=function(){res(im)}; im.onerror=function(){res(null)}; im.src="data:image/jpeg;base64,"+F[i]; }); }; var first=await load(0); var w=first.width, h=first.height; var cv=document.createElement("canvas"); cv.width=w; cv.height=h; document.body.appendChild(cv); var ctx=cv.getContext("2d"); ctx.drawImage(first,0,0); var stream=cv.captureStream(30); var mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].filter(function(m){return MediaRecorder.isTypeSupported(m)})[0]; var rec=new MediaRecorder(stream,{mimeType:mime, videoBitsPerSecond: 3000000}); var chunks=[]; rec.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); }; var done=new Promise(function(res){ rec.onstop=res; }); rec.start(250); var start=performance.now(); for (var i=1;i<F.length;i++){ var im=await load(i); F[i]=null; while(performance.now()-start<T[i]) await new Promise(function(r){ requestAnimationFrame(r); }); if (im) ctx.drawImage(im,0,0); } await new Promise(function(r){ setTimeout(r,300); }); rec.stop(); await done; var blob=new Blob(chunks,{type:mime}); var b64=await new Promise(function(res){ var fr=new FileReader(); fr.onload=function(){res(fr.result.split(",")[1])}; fr.readAsDataURL(blob); }); return {mime:mime, bytes:blob.size, b64:b64}; })()');   /* frames decoded one at a time and released (no 7k-bitmap pile-up) */
+  var vpath = path.join(OUT, 'mahworld_ab_cast.webm'); fs.writeFileSync(vpath, Buffer.from(webm.b64, 'base64')); console.log('VIDEO FILE ' + vpath + ' ' + webm.bytes + ' bytes ' + dur.toFixed(1) + 's'); ws.close();
+  console.log('errors', pg.errors.filter(function (x) { return !/404/.test(x); }));
+} finally { await pg.close(); srv.close(); }

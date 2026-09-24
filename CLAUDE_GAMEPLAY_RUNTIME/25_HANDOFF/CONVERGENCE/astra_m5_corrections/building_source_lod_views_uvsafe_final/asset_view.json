@@ -1,0 +1,155 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\ornate temple 3d model.glb",
+  "bytes": 76380384,
+  "load_ms": 640,
+  "size_m": [
+   0.721,
+   0.979,
+   0.742
+  ],
+  "triangles": 1866763,
+  "meshes": 1,
+  "shots": {
+   "front": "ornate temple 3d model_front.png",
+   "q34": "ornate temple 3d model_q34.png",
+   "side": "ornate temple 3d model_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\TEMPLE_M5C_L0.glb",
+  "bytes": 27672088,
+  "load_ms": 137,
+  "size_m": [
+   0.721,
+   0.979,
+   0.742
+  ],
+  "triangles": 799999,
+  "meshes": 1,
+  "shots": {
+   "front": "TEMPLE_M5C_L0_front.png",
+   "q34": "TEMPLE_M5C_L0_q34.png",
+   "side": "TEMPLE_M5C_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\TEMPLE_M5C_L1.glb",
+  "bytes": 12731844,
+  "load_ms": 80,
+  "size_m": [
+   0.721,
+   0.978,
+   0.741
+  ],
+  "triangles": 266419,
+  "meshes": 1,
+  "shots": {
+   "front": "TEMPLE_M5C_L1_front.png",
+   "q34": "TEMPLE_M5C_L1_q34.png",
+   "side": "TEMPLE_M5C_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\futuristic tower 3d model.glb",
+  "bytes": 77766980,
+  "load_ms": 690,
+  "size_m": [
+   0.783,
+   0.985,
+   0.616
+  ],
+  "triangles": 1901950,
+  "meshes": 1,
+  "shots": {
+   "front": "futuristic tower 3d model_front.png",
+   "q34": "futuristic tower 3d model_q34.png",
+   "side": "futuristic tower 3d model_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\TOWER_M5C_L0.glb",
+  "bytes": 27374976,
+  "load_ms": 142,
+  "size_m": [
+   0.783,
+   0.985,
+   0.616
+  ],
+  "triangles": 800000,
+  "meshes": 1,
+  "shots": {
+   "front": "TOWER_M5C_L0_front.png",
+   "q34": "TOWER_M5C_L0_q34.png",
+   "side": "TOWER_M5C_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\TOWER_M5C_L1.glb",
+  "bytes": 12090500,
+  "load_ms": 139,
+  "size_m": [
+   0.783,
+   0.985,
+   0.615
+  ],
+  "triangles": 254126,
+  "meshes": 1,
+  "shots": {
+   "front": "TOWER_M5C_L1_front.png",
+   "q34": "TOWER_M5C_L1_q34.png",
+   "side": "TOWER_M5C_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\INCOMING_BUILDINGS\\MAHWORLD_BUILDING_EXPANSION\\INPUTS\\futuristic market building 3d model.glb",
+  "bytes": 84168868,
+  "load_ms": 778,
+  "size_m": [
+   0.516,
+   0.983,
+   0.498
+  ],
+  "triangles": 1871488,
+  "meshes": 1,
+  "shots": {
+   "front": "futuristic market building 3d model_front.png",
+   "q34": "futuristic market building 3d model_q34.png",
+   "side": "futuristic market building 3d model_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\MARKET_M5C_L0.glb",
+  "bytes": 27040072,
+  "load_ms": 168,
+  "size_m": [
+   0.516,
+   0.983,
+   0.498
+  ],
+  "triangles": 800000,
+  "meshes": 1,
+  "shots": {
+   "front": "MARKET_M5C_L0_front.png",
+   "q34": "MARKET_M5C_L0_q34.png",
+   "side": "MARKET_M5C_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\buildings\\fidelity_m5c\\MARKET_M5C_L1.glb",
+  "bytes": 10315108,
+  "load_ms": 96,
+  "size_m": [
+   0.515,
+   0.983,
+   0.498
+  ],
+  "triangles": 202680,
+  "meshes": 1,
+  "shots": {
+   "front": "MARKET_M5C_L1_front.png",
+   "q34": "MARKET_M5C_L1_q34.png",
+   "side": "MARKET_M5C_L1_side.png"
+  }
+ }
+]

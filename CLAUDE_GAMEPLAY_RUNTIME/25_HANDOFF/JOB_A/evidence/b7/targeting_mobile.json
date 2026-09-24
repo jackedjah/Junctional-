@@ -1,0 +1,147 @@
+{
+ "checks": [
+  {
+   "id": "Dogkie (west forest): a real tap at its projected body locks it through LOCK_TARGET (entityAt → other:WILD_DOGKIE_03)",
+   "ok": false,
+   "detail": {
+    "r": {
+     "screen": {
+      "x": 327.5616460024736,
+      "y": 392.187971985464,
+      "cx": -100.13,
+      "cy": 0.83,
+      "cz": -14.89,
+      "size": [
+       1.55,
+       1.73,
+       1.16
+      ]
+     },
+     "entityAt": {
+      "id": "other:WILD_DOGKIE_03",
+      "distance": 8.187564279624258
+     },
+     "lock": null
+    },
+    "d": 3.6,
+    "y": 0,
+    "level": 1
+   }
+  },
+  {
+   "id": "Dogkie (west forest): the entity status (name / LV / HP) is present on its figure",
+   "ok": false,
+   "detail": {
+    "tag": null
+   }
+  },
+  {
+   "id": "fish (the canal, from the south bank): a real tap at its projected body locks it through LOCK_TARGET (entityAt → other:WILD_FISH_CANAL_C_3)",
+   "ok": false,
+   "detail": {
+    "r": {
+     "screen": {
+      "x": 744.2561713548907,
+      "y": 326.5259275105335,
+      "cx": -4.9,
+      "cy": 1.46,
+      "cz": 216.17,
+      "size": [
+       3.22,
+       1.99,
+       3.14
+      ]
+     },
+     "entityAt": null,
+     "lock": "WILD_FISH_CANAL_C_2"
+    },
+    "d": 3.5,
+    "y": 1.472,
+    "level": 1
+   }
+  },
+  {
+   "id": "fish (the canal, from the south bank): the entity status (name / LV / HP) is present on its figure",
+   "ok": false,
+   "detail": {
+    "tag": null
+   }
+  },
+  {
+   "id": "horse (Titan meadow, passive): a real tap at its projected body locks it through LOCK_TARGET (entityAt → other:WILD_HORSE_1)",
+   "ok": false,
+   "detail": {
+    "r": {
+     "err": "offscreen"
+    },
+    "d": 8.5,
+    "y": 0,
+    "level": 1
+   }
+  },
+  {
+   "id": "horse (Titan meadow, passive): the entity status (name / LV / HP) is present on its figure",
+   "ok": false,
+   "detail": {
+    "tag": null
+   }
+  },
+  {
+   "id": "phoenix (aerial, from the highland): a real tap at its projected body locks it through LOCK_TARGET (entityAt → other:WILD_PHOENIX_2)",
+   "ok": false,
+   "detail": {
+    "r": {
+     "screen": {
+      "x": 1989.6560796114895,
+      "y": -1470.910344475141,
+      "cx": -75.83,
+      "cy": 94,
+      "cz": -40.75,
+      "size": [
+       5.67,
+       4.28,
+       5.24
+      ]
+     },
+     "entityAt": null,
+     "lock": null
+    },
+    "d": 97.2,
+    "y": 94,
+    "level": 1
+   }
+  },
+  {
+   "id": "phoenix (aerial, from the highland): the entity status (name / LV / HP) is present on its figure",
+   "ok": false,
+   "detail": {
+    "tag": null
+   }
+  },
+  {
+   "id": "lock cleanup: the locked Dogkie was killed with slot 1 (KO) and the lock cleared",
+   "ok": true,
+   "detail": {
+    "lock_after": null,
+    "locked_before": "WILD_DOGKIE_03"
+   }
+  },
+  {
+   "id": "lock cleanup: leaving lock range (teleport 110 m away) clears the lock within the range grace",
+   "ok": false,
+   "detail": {
+    "locked": null,
+    "after": null
+   }
+  },
+  {
+   "id": "no console errors",
+   "ok": true,
+   "detail": []
+  }
+ ],
+ "console_errors": [],
+ "errors": [],
+ "pass": 2,
+ "fail": 9
+}

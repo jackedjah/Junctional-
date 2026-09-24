@@ -1,0 +1,273 @@
+{
+ "export_id": "ATHLETE_M_AM08_V2",
+ "version": "dev_0.5",
+ "sha256": "a17b70a757b1175b026ed3d4371415fe62460e3382eea339528366b0ba84ab93",
+ "owner_review_status": "CANDIDATE",
+ "preview_status": "DEVELOPMENT_PREVIEW_UNAPPROVED (measured derivative auto-rig v2 with split legs, face and finger bones over the Tripo source; not a retained or production character)",
+ "source": {
+  "file": "Mah_Athlete_M.glb",
+  "sha256": "7b023694ea924b86128ff2e1ae3b64157491c1d5b11805b9d4d2b68131592b63"
+ },
+ "source_release": "isolated derivative of Mah_Athlete_M.glb (sha256 7b023694ea924b86128ff2e1ae3b64157491c1d5b11805b9d4d2b68131592b63)",
+ "units": "metres",
+ "up_axis": "+Y",
+ "forward_axis": "-Z",
+ "source_forward_axis": "+Z",
+ "root": "ROOT",
+ "scale_to_metres": 1.82461,
+ "source_height_units": 0.9865,
+ "forms": [
+  "FUSED",
+  "SPLIT"
+ ],
+ "clips": {},
+ "sockets": {
+  "ROOT": "ROOT",
+  "HEAD": "HEAD",
+  "CHEST": "CHEST",
+  "HAND_L": "HAND_L",
+  "HAND_R": "HAND_R",
+  "FEET": "TAIL3",
+  "TIP_FUSED": "TAIL3",
+  "TIP_L": "TIP_L",
+  "TIP_R": "TIP_R"
+ },
+ "split": {
+  "legs_mesh": "ATHLETE_M_AM08_V2_SPLIT_LEGS",
+  "packed_morph": "PACKED",
+  "fused_lower_role": "fused_lower",
+  "upper_role": "upper",
+  "leg_bones": [
+   "THIGH_L",
+   "SHIN_L",
+   "TIP_L",
+   "THIGH_R",
+   "SHIN_R",
+   "TIP_R"
+  ],
+  "leg_centres_x": [
+   -0.05565582737326622,
+   0.05565582737326622
+  ],
+  "crotch_h": 0.4,
+  "method": "each leg = narrowed (0.5 x, 0.82 z) outer half of the fused lower body + its mirror across the leg centre, capped top ring; PACKED delta returns the outer half to the fused silhouette and hides the mirror inside (inset 0.965)"
+ },
+ "face_controls": "DERIVATIVE_BONES (brow/cheek/jaw), no eyelid or iris geometry",
+ "finger_controls": "FINGERS_L / FINGERS_R single finger-mass bones",
+ "materials": {
+  "ATHLETE_M_AM08_V2_PBR": "base colour 2048² + normal 2048² + K3 eye emissive mask 1024² (strength 3, (1, 0.3, 0.02)), roughness 0.5, metallic 0"
+ },
+ "textures": {
+  "base_color": "2048x2048 jpeg q0.88 (from Mah_Athlete_M_AM08_FINGER_COLOR_TEST_8K.png)",
+  "normal": "2048x2048 jpeg q0.9 (source)",
+  "emissive_eye_mask": "1024x1024 jpeg (from Mah_Athlete_M_EYE_MASK_AM02B_GUARDED_8K.png)"
+ },
+ "files": [
+  "Mah_Athlete_M_am08_v2.glb"
+ ],
+ "joints": [
+  "ROOT",
+  "PELVIS",
+  "SPINE",
+  "CHEST",
+  "NECK",
+  "HEAD",
+  "CLAV_L",
+  "UPPERARM_L",
+  "FOREARM_L",
+  "HAND_L",
+  "CLAV_R",
+  "UPPERARM_R",
+  "FOREARM_R",
+  "HAND_R",
+  "TAIL1",
+  "TAIL2",
+  "TAIL3",
+  "FINGERS_L",
+  "FINGERS_R",
+  "BROW_L",
+  "BROW_R",
+  "CHEEK_L",
+  "CHEEK_R",
+  "JAW",
+  "THIGH_L",
+  "SHIN_L",
+  "TIP_L",
+  "THIGH_R",
+  "SHIN_R",
+  "TIP_R"
+ ],
+ "weight_stats": [
+  "ROOT:0",
+  "PELVIS:2183",
+  "SPINE:1676",
+  "CHEST:2790",
+  "NECK:234",
+  "HEAD:498",
+  "CLAV_L:375",
+  "UPPERARM_L:690",
+  "FOREARM_L:605",
+  "HAND_L:522",
+  "CLAV_R:360",
+  "UPPERARM_R:751",
+  "FOREARM_R:564",
+  "HAND_R:534",
+  "TAIL1:1301",
+  "TAIL2:155",
+  "TAIL3:52",
+  "FINGERS_L:906",
+  "FINGERS_R:876",
+  "BROW_L:47",
+  "BROW_R:175",
+  "CHEEK_L:131",
+  "CHEEK_R:321",
+  "JAW:327",
+  "THIGH_L:0",
+  "SHIN_L:0",
+  "TIP_L:0",
+  "THIGH_R:0",
+  "SHIN_R:0",
+  "TIP_R:0"
+ ],
+ "measurements": {
+  "H": 0.98651123046875,
+  "shoulder_y": 0.755,
+  "shoulder_half_width": 0.1631317287683487,
+  "arm_threshold_x": 0.11125,
+  "torso_half_width_chest": 0.1071472093462944,
+  "neck_y": 0.875,
+  "neck_half_width": 0.03957746922969818,
+  "head_half_width": 0.05501936003565788,
+  "head_top": 1,
+  "landmarks_source_units": {
+   "PELVIS": [
+    0,
+    0.414334716796875,
+    0
+   ],
+   "SPINE": [
+    0,
+    0.5425811767578126,
+    0
+   ],
+   "CHEST": [
+    0,
+    0.67082763671875,
+    0
+   ],
+   "NECK": [
+    0,
+    0.8631973266601562,
+    0
+   ],
+   "HEAD": [
+    0,
+    0.9248542785644531,
+    0
+   ],
+   "UPPERARM_L": [
+    -0.1379052922129631,
+    0.7250857543945313,
+    -0.022151248861997166
+   ],
+   "FOREARM_L": [
+    -0.1567603181116283,
+    0.57803876953125,
+    -0.017954013905546164
+   ],
+   "HAND_L": [
+    -0.1705491236296662,
+    0.4629585205078125,
+    0.02282823969864311
+   ],
+   "FINGERS_L": [
+    -0.15961895975673082,
+    0.40927886962890625,
+    0.01835900727880992
+   ],
+   "BROW_L": [
+    -0.019256776012480256,
+    0.9322531127929687,
+    0.08398054540157318
+   ],
+   "CHEEK_L": [
+    -0.022007744014263156,
+    0.9026577758789063,
+    0.07239913195371628
+   ],
+   "JAW": [
+    0,
+    0.8730624389648438,
+    0.062399131953716276
+   ],
+   "THIGH_L": [
+    -0.05565582737326622,
+    0.39460449218750004,
+    0.008179914583772215
+   ],
+   "TIP_L": [
+    -0.05565582737326622,
+    0.0295953369140625,
+    0.008179914583772215
+   ]
+  },
+  "arm_verts": {
+   "L": 2152,
+   "R": 2152
+  },
+  "tris": {
+   "upper": 10889,
+   "fused_lower": 1974,
+   "legs": 5940
+  },
+  "legs": {
+   "L": {
+    "tris": 988,
+    "verts": 2151,
+    "cap_edges": 259,
+    "cx": -0.0557
+   },
+   "R": {
+    "tris": 986,
+    "verts": 2139,
+    "cap_edges": 239,
+    "cx": 0.0557
+   }
+  }
+ },
+ "limitations": [
+  "derivative auto-rig: joint placement measured from cross-sections, smooth distance weights (not hand-painted); shoulder / elbow / groin can pinch at extreme angles",
+  "split legs are an engineering approximation: each pointed limb = the narrowed outer half of the fused lower body plus its mirror (texture mirrors on the inner face), capped; the pelvis underside is capped flat",
+  "PACKED morph carries positions only (normals are the separated-form normals)",
+  "face bones deform a Tripo head with no eyelid, iris or mouth-interior geometry — expressions are crude and stated as such",
+  "finger mass is one bone per hand (curl only)",
+  "textures resampled in the browser canvas, not mip-aware"
+ ],
+ "generated": "2026-09-15T09:45:01.988Z",
+ "astra_candidate": {
+  "retained_blend": "C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/ASTRA_VISUAL_CLEANUP/ATHLETE_M/02_CHECKPOINTS/AM08_BASE_CLOSED_RETAINED.blend",
+  "retained_blend_sha256": "6a6404c99722df70fdd5bfd07cd9b655c5cb4e114a227987be4fdfbdc6139cc5",
+  "base_color_source": "C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/ASTRA_VISUAL_CLEANUP/ATHLETE_M/04_TEXTURE_WORK/AM08_RIGHT_FINGER_COLOR_FIX/Mah_Athlete_M_AM08_FINGER_COLOR_TEST_8K.png",
+  "base_color_sha256": "8c118ed02e00464d07c36cbe665fa7de76a8c41d75c6b75620066158794e6661",
+  "eye_mask_source": "C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/ASTRA_VISUAL_CLEANUP/ATHLETE_M/04_TEXTURE_WORK/AM02B_EYE_SHAPE/Mah_Athlete_M_EYE_MASK_AM02B_GUARDED_8K.png",
+  "eye_mask_sha256": "3366d380f6c6bb6f870fc817f32fc9adc6e3fc5fb2b58da2442827d430624012",
+  "eye_treatment": "AM02 K3: emission strength 3, linear (1, 0.3, 0.02), dark-gold diffuse (0.22, 0.09, 0.006) under the mask; normal-strength-0.25-inside-mask NOT reproduced",
+  "includes": [
+   "AM00 incoming source geometry (unchanged)",
+   "AM02 K3 eyes (mask emission)",
+   "AM03 GOLD_B",
+   "AM06 roughness/metallic",
+   "AM08 finger colour fix"
+  ],
+  "excludes": [
+   "AM05 chest darkening (not retained)",
+   "AM09/AM10 facets + trap silver (not retained)",
+   "AM12–AM19 premium head / human eyes / lids (not retained, no export)"
+  ]
+ },
+ "derived_from": {
+  "export_id": "ATHLETE_M_AM08_RIGGED",
+  "version": "dev_0.4",
+  "sha256": "4e3926eec4a789e865f59ec544780516f6dbdae018a5595b9bd5da46564f6850"
+ }
+}

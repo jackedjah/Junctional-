@@ -1,0 +1,70 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\horse\\HORSE_RANGE_CREATURE_L1.glb",
+  "bytes": 1997988,
+  "load_ms": 72,
+  "size_m": [
+   0.979,
+   0.274,
+   0.734
+  ],
+  "triangles": 6500,
+  "meshes": 1,
+  "shots": {
+   "front": "HORSE_RANGE_CREATURE_L1_front.png",
+   "q34": "HORSE_RANGE_CREATURE_L1_q34.png",
+   "side": "HORSE_RANGE_CREATURE_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\horse\\HORSE_RANGE_CREATURE_L2.glb",
+  "bytes": 1629464,
+  "load_ms": 42,
+  "size_m": [
+   0.979,
+   0.274,
+   0.734
+  ],
+  "triangles": 2600,
+  "meshes": 1,
+  "shots": {
+   "front": "HORSE_RANGE_CREATURE_L2_front.png",
+   "q34": "HORSE_RANGE_CREATURE_L2_q34.png",
+   "side": "HORSE_RANGE_CREATURE_L2_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\phoenix\\GOLDEN_PHOENIX_CREATURE_L1.glb",
+  "bytes": 1313948,
+  "load_ms": 42,
+  "size_m": [
+   0.909,
+   0.982,
+   0.736
+  ],
+  "triangles": 6499,
+  "meshes": 1,
+  "shots": {
+   "front": "GOLDEN_PHOENIX_CREATURE_L1_front.png",
+   "q34": "GOLDEN_PHOENIX_CREATURE_L1_q34.png",
+   "side": "GOLDEN_PHOENIX_CREATURE_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\phoenix\\GOLDEN_PHOENIX_CREATURE_L2.glb",
+  "bytes": 947392,
+  "load_ms": 25,
+  "size_m": [
+   0.909,
+   0.98,
+   0.736
+  ],
+  "triangles": 2600,
+  "meshes": 1,
+  "shots": {
+   "front": "GOLDEN_PHOENIX_CREATURE_L2_front.png",
+   "q34": "GOLDEN_PHOENIX_CREATURE_L2_q34.png",
+   "side": "GOLDEN_PHOENIX_CREATURE_L2_side.png"
+  }
+ }
+]

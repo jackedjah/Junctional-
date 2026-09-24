@@ -1,0 +1,262 @@
+{
+ "shots": [
+  {
+   "id": "guide_mrs_close",
+   "guide": {
+    "current": "MRS",
+    "visible": true,
+    "on_stage": true,
+    "height_m": 0.45,
+    "wanted": "MRS",
+    "loaded": [
+     "MRS"
+    ],
+    "loading": [],
+    "skinned": true,
+    "scale": 0.46,
+    "night": false,
+    "rim": true,
+    "draw_calls": 1,
+    "pos": [
+     7.3,
+     1.55,
+     -6.09
+    ],
+    "yaw_deg": 50,
+    "follow": {
+     "dist_m": 1.4,
+     "angle_rad": 0.7,
+     "up_m": 1.55,
+     "rate": 4,
+     "snap_beyond_m": 12,
+     "cam_clear_m": 1.2,
+     "floor_above_feet_m": 0.35
+    },
+    "hover": {
+     "amp_m": 0.06,
+     "hz": 1.1
+    },
+    "bank": {
+     "rad_per_mps": 0.12,
+     "max_rad": 0.3,
+     "yaw_rate": 8
+    }
+   }
+  },
+  {
+   "id": "guide_mr_close",
+   "guide": {
+    "current": "MR",
+    "visible": true,
+    "on_stage": true,
+    "height_m": 0.45,
+    "wanted": "MR",
+    "loaded": [
+     "MRS",
+     "MR"
+    ],
+    "loading": [],
+    "skinned": false,
+    "scale": 0.46,
+    "night": false,
+    "rim": true,
+    "draw_calls": 1,
+    "pos": [
+     7.3,
+     1.55,
+     -6.09
+    ],
+    "yaw_deg": 49,
+    "follow": {
+     "dist_m": 1.4,
+     "angle_rad": 0.7,
+     "up_m": 1.55,
+     "rate": 4,
+     "snap_beyond_m": 12,
+     "cam_clear_m": 1.2,
+     "floor_above_feet_m": 0.35
+    },
+    "hover": {
+     "amp_m": 0.06,
+     "hz": 1.1
+    },
+    "bank": {
+     "rad_per_mps": 0.12,
+     "max_rad": 0.3,
+     "yaw_rate": 8
+    }
+   }
+  },
+  {
+   "id": "dogkie_0",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -104.93,
+    "z": -19.017,
+    "state": "ALERT",
+    "d": 7.202586271611052,
+    "hp": 450
+   }
+  },
+  {
+   "id": "dogkie_1",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -104.93,
+    "z": -19.017,
+    "state": "ALERT",
+    "d": 7.202586271611052,
+    "hp": 450
+   }
+  },
+  {
+   "id": "dogkie_2",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -104.93,
+    "z": -19.017,
+    "state": "ALERT",
+    "d": 7.202586271611052,
+    "hp": 450
+   }
+  },
+  {
+   "id": "dogkie_practice_0",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -102.018,
+    "z": -15.076,
+    "state": "CHASE",
+    "d": 2.30246129174846,
+    "hp": 450
+   }
+  },
+  {
+   "id": "dogkie_practice_1",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -101.439,
+    "z": -14.292,
+    "state": "IDLE",
+    "d": 1.3278347035681735,
+    "hp": 450
+   }
+  },
+  {
+   "id": "dogkie_practice_2",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -101.439,
+    "z": -14.292,
+    "state": "IDLE",
+    "d": 1.3278347035681735,
+    "hp": 450
+   }
+  },
+  {
+   "id": "dogkie_practice_3",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -101.439,
+    "z": -14.292,
+    "state": "ATTACK",
+    "d": 1.3278347035681735,
+    "hp": 450
+   }
+  },
+  {
+   "id": "dogkie_practice_4",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -101.439,
+    "z": -14.292,
+    "state": "IDLE",
+    "d": 1.3278347035681735,
+    "hp": 450
+   }
+  },
+  {
+   "id": "dogkie_practice_5",
+   "c": {
+    "id": "NPC_DOGKIE_03",
+    "x": -101.439,
+    "z": -14.292,
+    "state": "IDLE",
+    "d": 1.3278347035681735,
+    "hp": 450
+   }
+  }
+ ],
+ "errors": [],
+ "me_after_practice": {
+  "hp": 0,
+  "max": 1000
+ },
+ "creatures": {
+  "count": 9,
+  "active": 9,
+  "lod_levels": 3,
+  "lod_m": [
+   24,
+   60
+  ],
+  "lod_now": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   1,
+   1
+  ],
+  "classified_bones": {
+   "method": "names",
+   "total_bones": 55,
+   "root": "Root",
+   "hips": "J_Bip_C_Hips",
+   "head": "J_Bip_C_Head",
+   "neck": "J_Bip_C_Neck",
+   "jaw": null,
+   "spine": [
+    "J_Bip_C_Spine",
+    "J_Bip_C_Chest",
+    "J_Bip_C_UpperChest"
+   ],
+   "tail": [],
+   "legs": {
+    "FL": "J_Bip_L_UpperArm / J_Bip_L_LowerArm / J_Bip_L_Hand",
+    "FR": "J_Bip_R_UpperArm / J_Bip_R_LowerArm / J_Bip_R_Hand",
+    "BL": "J_Bip_L_UpperLeg / J_Bip_L_Foot / J_Bip_L_Foot",
+    "BR": "J_Bip_R_UpperLeg / J_Bip_R_Foot / J_Bip_R_Foot"
+   },
+   "forward_model": "+z",
+   "forward_fix_deg": 180,
+   "rest_height_m": 0.978,
+   "missing": [
+    "jaw",
+    "tail"
+   ],
+   "duplicates": [],
+   "notes": [
+    "BL knee degenerate (-0.004 m) → fold at J_Bip_L_Foot",
+    "BR knee degenerate (-0.000 m) → fold at J_Bip_R_Foot"
+   ]
+  },
+  "loaded": true,
+  "load_error": null,
+  "derivative": "DOGKIE_FOREST_CREATURE",
+  "height_m": 1.25,
+  "scale": 1.2785,
+  "states": {
+   "IDLE": 5,
+   "ROAM": 4
+  },
+  "draw_calls_visible": 27,
+  "tags": true,
+  "lag_s": 0.12,
+  "host_clock": true,
+  "night": false
+ }
+}

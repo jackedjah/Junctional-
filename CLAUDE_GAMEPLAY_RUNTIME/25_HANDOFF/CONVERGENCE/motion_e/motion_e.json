@@ -1,0 +1,226 @@
+{
+ "viewport": [
+  1000,
+  700
+ ],
+ "checks": [
+  "PASS E4 fused idle 20 s: breathing (head forward excursion 26.3 mm, period 4.71 s; the defaults author a 4-6 s breath) and weight shift (head lateral excursion 8 mm, period 9 s; the active idle authors a 9 s roll - the pelvis ROLLS over fixed hips, it does not translate: pelvis dx 0 mm) — {\"head_forward_excursion_mm\":26.3,\"breath_period_s\":4.71,\"head_lateral_excursion_mm\":8,\"weight_shift_period_s\":9,\"pelvis_lateral_mm\":0,\"pelvis_vertical_mm\":0,\"frames\":3253}",
+  "PASS E2 no bind / T-pose frame in the fused idle — 0 of 3253",
+  "PASS E3 fused start / stop / turn: no bone angular-velocity spike above the logged threshold (steady-walk p99 × 2.5 = 4.98 rad/s; transitions max 3.47 rad/s) — {\"threshold_rad_s\":4.98,\"steady_p99\":1.99,\"transition_max\":3.47,\"spikes\":[]}",
+  "PASS E2 no bind / T-pose frame through the fused walk / stop / turn — 0 of 1249",
+  "NOTE E1 fused foot slide — N/A by design — the fused form glides on its propulsion beam (support L = R = 1 throughout, no contacts); the metric applies to the separated form below",
+  "NOTE E3 SEPARATE transformation — max bone angular velocity 20.71 rad/s (33 frames above the walk threshold 4.98 — the transformation is an authored burst (the animator’s UNFUSE_BURST / STAR beats), so the walk threshold is logged against it, not enforced)",
+  "PASS E2 no bind / T-pose frame through SEPARATE — 0 of 495",
+  "PASS E1 separated WALK foot slide per declared contact (the tip’s POINTED END, world XZ drift over the support hold; hold = the world-space anchor engaged, weight ≥ 0.9): 7 contacts, median 0.24 cm, max 0.95 cm (≤ 2 cm; the TIP JOINT over the same holds — PASS 5’s measured point — median 15.18 cm; the whole support pulse ≥ 0.9 incl. the forward reach: median 44.64 cm) — {\"pulse_window_median_cm\":44.64,\"L\":[{\"t0\":67100,\"dur_ms\":223,\"slide_cm\":0.13},{\"t0\":68116,\"dur_ms\":221,\"slide_cm\":0.65},{\"t0\":69112,\"dur_ms\":218,\"slide_cm\":0.95},{\"t0\":70119,\"dur_ms\":222,\"slide_cm\":0.65}],\"R\":[{\"t0\":67604,\"dur_ms\":224,\"slide_cm\":0.24},{\"t0\":68616,\"dur_ms\":214,\"slide_cm\":0.24},{\"t0\":69618,\"dur_ms\":216,\"slide_cm\":0}],\"max_cm\":0.95,\"median_cm\":0.24}",
+  "PASS E3 separated start / stop: no bone angular-velocity spike above the logged threshold (steady-walk p99 × 2.5 = 62.4 rad/s; transitions max 27.97 rad/s) — {\"threshold_rad_s\":62.4,\"steady_p99\":24.96,\"transition_max\":27.97,\"spikes\":[]}",
+  "PASS E2 no bind / T-pose frame through the separated walk / stop — 0 of 836",
+  "PASS E1 separated RUN foot slide per declared contact (pointed end) at 6.706 m/s: 11 contacts, median 0.3 cm, max 1.93 cm (≤ 2 cm; TIP joint median 8.02 cm) — {\"L\":[{\"t0\":79960,\"dur_ms\":78,\"slide_cm\":0.3},{\"t0\":80498,\"dur_ms\":85,\"slide_cm\":0.21},{\"t0\":81037,\"dur_ms\":79,\"slide_cm\":0.89},{\"t0\":81584,\"dur_ms\":75,\"slide_cm\":0.11},{\"t0\":82116,\"dur_ms\":83,\"slide_cm\":0.1}],\"R\":[{\"t0\":79698,\"dur_ms\":78,\"slide_cm\":0.35},{\"t0\":80226,\"dur_ms\":88,\"slide_cm\":0.24},{\"t0\":80766,\"dur_ms\":86,\"slide_cm\":0.88},{\"t0\":81305,\"dur_ms\":82,\"slide_cm\":1.93},{\"t0\":81851,\"dur_ms\":84,\"slide_cm\":0.03},{\"t0\":82373,\"dur_ms\":83,\"slide_cm\":0.58}],\"max_cm\":1.93,\"median_cm\":0.3,\"speed_mps\":6.706}",
+  "NOTE E1 ROLLBACK path gait.plant = false (PASS 5’s pelvis-frame drifting hold, measured on the tip END the same way — the old 42.8 cm class of number, preserved for comparison) — walk: 6 contacts, median 41.31 cm, max 42.96 cm at 3.576 m/s (steady p99 bone rate 22.53 rad/s) / run: 11 contacts, median 21.87 cm, max 24.5 cm at 6.706 m/s (p99 23.68 rad/s)",
+  "PASS E4 separated idle 20 s: breathing (head forward excursion 20.2 mm, period 4.64 s) and weight shift (head lateral excursion 8 mm, period 9 s) — {\"head_forward_excursion_mm\":20.2,\"breath_period_s\":4.64,\"head_lateral_excursion_mm\":8,\"weight_shift_period_s\":9,\"pelvis_lateral_mm\":0,\"pelvis_vertical_mm\":0,\"frames\":3122}",
+  "PASS E2 no bind / T-pose frame through FUSE and the separated idle — {\"fuse\":0,\"idle\":0}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "bones": [
+  "PELVIS",
+  "SPINE",
+  "CHEST",
+  "HEAD",
+  "UPPERARM_L",
+  "FOREARM_L",
+  "UPPERARM_R",
+  "FOREARM_R",
+  "THIGH_L",
+  "SHIN_L",
+  "THIGH_R",
+  "SHIN_R",
+  "TAIL1",
+  "TAIL2"
+ ],
+ "idle_fused": {
+  "head_forward_excursion_mm": 26.3,
+  "breath_period_s": 4.71,
+  "head_lateral_excursion_mm": 8,
+  "weight_shift_period_s": 9,
+  "pelvis_lateral_mm": 0,
+  "pelvis_vertical_mm": 0,
+  "frames": 3253
+ },
+ "fused_walk": {
+  "threshold_rad_s": 4.98,
+  "steady_p99": 1.99,
+  "transition_max": 3.47,
+  "spikes": []
+ },
+ "separate": {
+  "max": 20.71,
+  "spikes": 33,
+  "top": [
+   {
+    "t": 56663.2,
+    "w": 20.705418326872756,
+    "bone": "SHIN_L"
+   },
+   {
+    "t": 56644.7,
+    "w": 20.568145173264853,
+    "bone": "SHIN_L"
+   },
+   {
+    "t": 56635,
+    "w": 19.547846682254892,
+    "bone": "SHIN_L"
+   }
+  ]
+ },
+ "walk_split_joint_legacy": {
+  "contacts": 7,
+  "median_cm": 15.18,
+  "max_cm": 15.75
+ },
+ "walk_split_slides": {
+  "pulse_window_median_cm": 44.64,
+  "L": [
+   {
+    "t0": 67100,
+    "dur_ms": 223,
+    "slide_cm": 0.13
+   },
+   {
+    "t0": 68116,
+    "dur_ms": 221,
+    "slide_cm": 0.65
+   },
+   {
+    "t0": 69112,
+    "dur_ms": 218,
+    "slide_cm": 0.95
+   },
+   {
+    "t0": 70119,
+    "dur_ms": 222,
+    "slide_cm": 0.65
+   }
+  ],
+  "R": [
+   {
+    "t0": 67604,
+    "dur_ms": 224,
+    "slide_cm": 0.24
+   },
+   {
+    "t0": 68616,
+    "dur_ms": 214,
+    "slide_cm": 0.24
+   },
+   {
+    "t0": 69618,
+    "dur_ms": 216,
+    "slide_cm": 0
+   }
+  ],
+  "max_cm": 0.95,
+  "median_cm": 0.24
+ },
+ "split_walk": {
+  "threshold_rad_s": 62.4,
+  "steady_p99": 24.96,
+  "transition_max": 27.97,
+  "spikes": []
+ },
+ "run_split_joint_legacy": {
+  "contacts": 11,
+  "median_cm": 8.02,
+  "max_cm": 9.34
+ },
+ "run_split_slides": {
+  "L": [
+   {
+    "t0": 79960,
+    "dur_ms": 78,
+    "slide_cm": 0.3
+   },
+   {
+    "t0": 80498,
+    "dur_ms": 85,
+    "slide_cm": 0.21
+   },
+   {
+    "t0": 81037,
+    "dur_ms": 79,
+    "slide_cm": 0.89
+   },
+   {
+    "t0": 81584,
+    "dur_ms": 75,
+    "slide_cm": 0.11
+   },
+   {
+    "t0": 82116,
+    "dur_ms": 83,
+    "slide_cm": 0.1
+   }
+  ],
+  "R": [
+   {
+    "t0": 79698,
+    "dur_ms": 78,
+    "slide_cm": 0.35
+   },
+   {
+    "t0": 80226,
+    "dur_ms": 88,
+    "slide_cm": 0.24
+   },
+   {
+    "t0": 80766,
+    "dur_ms": 86,
+    "slide_cm": 0.88
+   },
+   {
+    "t0": 81305,
+    "dur_ms": 82,
+    "slide_cm": 1.93
+   },
+   {
+    "t0": 81851,
+    "dur_ms": 84,
+    "slide_cm": 0.03
+   },
+   {
+    "t0": 82373,
+    "dur_ms": 83,
+    "slide_cm": 0.58
+   }
+  ],
+  "max_cm": 1.93,
+  "median_cm": 0.3,
+  "speed_mps": 6.706
+ },
+ "rollback_hover_hold": {
+  "walk": {
+   "contacts": 6,
+   "median_cm": 41.31,
+   "max_cm": 42.96,
+   "speed_mps": 3.576,
+   "steady_p99_rad_s": 22.53
+  },
+  "run": {
+   "contacts": 11,
+   "median_cm": 21.87,
+   "max_cm": 24.5,
+   "speed_mps": 6.706,
+   "steady_p99_rad_s": 23.68
+  }
+ },
+ "idle_split": {
+  "head_forward_excursion_mm": 20.2,
+  "breath_period_s": 4.64,
+  "head_lateral_excursion_mm": 8,
+  "weight_shift_period_s": 9,
+  "pelvis_lateral_mm": 0,
+  "pelvis_vertical_mm": 0,
+  "frames": 3122
+ },
+ "pass": 12,
+ "fail": 0
+}

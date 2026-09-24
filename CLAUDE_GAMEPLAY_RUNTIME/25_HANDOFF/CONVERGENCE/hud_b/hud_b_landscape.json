@@ -1,0 +1,387 @@
+{
+ "mode": "landscape",
+ "viewport": [
+  844,
+  390
+ ],
+ "touch_emulated": true,
+ "checks": [
+  "PASS B1 island layout: no top-right category card, no LOCKED panel in the DOM, no separate MAHGIC touch button, HEALTH upper-left with LV, COMBAT + FLIGHT MAHGIC upper-right (three bare bars: transparent, no blur, no border), the state a small line (8.5 px, no pill): \"FREE ROAM · HARMLESS\" — {\"layout\":\"island\",\"dock\":{\"id\":\"g-dock\",\"x\":0,\"y\":0,\"w\":0,\"h\":0,\"cx\":0,\"cy\":0,\"shown\":false,\"text\":\"⟩—?\"},\"target\":null,\"mahgic\":{\"id\":\"g-mahgic\",\"x\":0,\"y\":0,\"w\":0,\"h\":0,\"cx\":0,\"cy\":0,\"shown\":false,\"text\":\"MAHGIC\"},\"vitals\":{\"bg\":\"rgba(0, 0, 0, 0)\",\"bf\":\"none\",\"border\":\"0px\",\"state_font\":8.5,\"state_bg\":\"rgba(0, 0, 0, 0)\",\"state_text\":\"FREE ROAM · HARMLESS\",\"lv\":\"LV 1\",\"bars\":3,\"right\":{\"x\":686,\"w\":150,\"right\":836}}}",
+  "PASS B2 island (owner hotfix 2026-09-19 §5 / §6): NO generic ATTACK control in the DOM; DASH in the bottom-right corner, GUARD directly left of it; FLY directly above GUARD; ≡ above DASH; the two cells left of FLY are EMPTY (the point there hits tc-world = open world); the category label under the slots spans the 4-slot arc; the four quick slots as an arc (2 · 3 higher than 1 · 4) are the attack controls; ⚔ above slot 4 — {\"no_generic_attack\":true,\"dash\":{\"id\":\"tc-dash\",\"x\":794,\"y\":340,\"w\":42,\"h\":42,\"cx\":815,\"cy\":361,\"shown\":true,\"text\":\"DASHhold + swipe\"},\"guard\":{\"id\":\"g-guard\",\"x\":744,\"y\":340,\"w\":42,\"h\":42,\"cx\":765,\"cy\":361,\"shown\":true,\"text\":\"GUARD\"},\"fly\":{\"id\":\"g-fly\",\"x\":744,\"y\":290,\"w\":42,\"h\":42,\"cx\":765,\"cy\":311,\"shown\":true,\"text\":\"FLYhold\"},\"menu\":{\"id\":\"g-menubt\",\"x\":797,\"y\":293,\"w\":36,\"h\":36,\"cx\":815,\"cy\":311,\"shown\":true,\"text\":\"≡Q\"},\"free_cells\":{\"x\":644,\"y\":290,\"w\":92,\"h\":42,\"cx\":690,\"cy\":311},\"free_hit\":\"tc-world\",\"cat\":{\"id\":\"g-catlbl\",\"x\":644,\"y\":272,\"w\":192,\"h\":12,\"cx\":740,\"cy\":278,\"shown\":true,\"text\":\"PHYSICAL ▸\"},\"slots\":[[644,224,42,42],[694,218,42,42],[744,218,42,42],[794,224,42,42]],\"sword\":{\"id\":\"g-swordbt\",\"x\":797,\"y\":172,\"w\":36,\"h\":36,\"cx\":815,\"cy\":190,\"shown\":true,\"text\":\"⚔\"}}",
+  "PASS B3 visible faces 42 px (cells), 36 px (≡ · ⚔); HIT bounds = face + a 4 px halo on every side (measured: every control answers 4 px outside its face, never more) → cells 50 × 50, ≡ / ⚔ 44 × 44 — {\"g-mapbt\":{\"id\":\"g-mapbt\",\"vis\":[42,42],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true},\"g-speed\":{\"id\":\"g-speed\",\"vis\":[42,42],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true},\"g-camreset\":{\"id\":\"g-camreset\",\"vis\":[42,42],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true},\"g-fly\":{\"id\":\"g-fly\",\"vis\":[42,42],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true},\"g-guard\":{\"id\":\"g-guard\",\"vis\":[42,42],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true},\"g-menubt\":{\"id\":\"g-menubt\",\"vis\":[36,36],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true},\"g-swordbt\":{\"id\":\"g-swordbt\",\"vis\":[36,36],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true},\"tc-dash\":{\"id\":\"tc-dash\",\"vis\":[42,42],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true},\"slot1\":{\"id\":\"slot1\",\"vis\":[42,42],\"halo\":{\"l\":4,\"r\":4,\"t\":4,\"b\":4},\"centre\":true}}",
+  "PASS B4 no control face overlaps another and no two hit halos overlap (8 px gaps: halos touch at most) — {\"faces\":[],\"halos\":[]}",
+  "PASS B5 left arc: MAP · SPEED · CAM sit above the joystick ring (SPEED 6 px higher = the shallow arc, mirrored), all left of the island, MAP answers its own tap inside the stick zone; the ring is 108 px (108 expected, was 112 / 96) — {\"map\":{\"id\":\"g-mapbt\",\"x\":14,\"y\":214,\"w\":42,\"h\":42,\"cx\":35,\"cy\":235,\"shown\":true,\"text\":\"MAP\"},\"spd\":{\"id\":\"g-speed\",\"x\":64,\"y\":208,\"w\":42,\"h\":42,\"cx\":85,\"cy\":229,\"shown\":true,\"text\":\"+SPEED\"},\"cam\":{\"id\":\"g-camreset\",\"x\":114,\"y\":214,\"w\":42,\"h\":42,\"cx\":135,\"cy\":235,\"shown\":true,\"text\":\"⟲CAM\"},\"stick\":{\"id\":\"tc-stick\",\"x\":20,\"y\":266,\"w\":108,\"h\":108,\"cx\":74,\"cy\":320,\"shown\":true,\"text\":\"\"},\"map_hit\":\"g-mapbt\"}",
+  "PASS B6 the four quick-slot labels are the authored short forms and none overflows a 42 px face — [[\"H-PUSH\",false],[\"V-PULL\",false],[\"HINGE\",false],[\"ROTATE\",false]]",
+  "PASS B7a a TAP on quick slot 1 executes it (the cast is observed: PA_PUSH:STARTUP) — {\"before\":[\"READY\",\"READY\",\"READY\",\"READY\"],\"after\":[\"UNAVAILABLE_IN_CURRENT_STATE\",\"UNAVAILABLE_IN_CURRENT_STATE\",\"UNAVAILABLE_IN_CURRENT_STATE\",\"UNAVAILABLE_IN_CURRENT_STATE\"],\"cast\":\"PA_PUSH:STARTUP\"}",
+  "PASS B7b a SWIPE from quick slot 2 (LEFT = its own arrow) executes slot 2 through the one dispatcher (cast observed: PA_PULL:STARTUP, gesture matched); a WRONG swipe (DOWN) was refused without a cast — {\"slot2\":{\"id\":\"PA_PULL\",\"gesture\":\"LEFT\",\"av\":\"READY\"},\"expected\":\"LEFT\",\"wrong\":{\"cast\":null,\"av\":\"READY\",\"g\":{\"dir\":\"DOWN\",\"matched\":false,\"t\":24137.399999976158}},\"cast\":{\"cast\":\"PA_PULL:STARTUP\",\"av\":\"UNAVAILABLE_IN_CURRENT_STATE\",\"g\":{\"dir\":\"LEFT\",\"matched\":true,\"t\":24765.099999964237}}}",
+  "PASS B7c a tap on the category label cycles the armed category (PHYSICAL → PHYSICAL_MAHGIC), the label and the four slot identities follow (PHYS MAHGIC ▸); three taps return to PHYSICAL — {\"modes\":[\"PHYSICAL\",\"PHYSICAL_MAHGIC\",\"PHYSICAL\"],\"label\":\"PHYS MAHGIC ▸\",\"slots\":\"1H-PUSH2V-PULL3—4—\"}",
+  "PASS B7d ⚔ opens the menu on COMBAT: the three categories (3), the 8 equipped rows (9 rows incl. PRACTICE), ARM buttons, one ARMED row; ARM on a PHYSICAL slot arms it through the one selection function — {\"menu\":{\"open\":true,\"tab\":\"COMBAT\",\"local_dev\":true},\"combat\":{\"modes\":3,\"rows\":9,\"arm\":7,\"armed\":1,\"practice\":true},\"arm\":\"1\",\"sel\":[\"PHYSICAL\",1]}",
+  "PASS B8 world-space tag on the dummy: free roam = \"LV 1\" without a bar; PRACTICE + lock = \"LV 1 · LOCKED\" in gold WITH the health bar and the state line \"PRACTICE BATTLE\"; no LOCKED panel anywhere; unlock + practice off = \"LV 1\" without a bar — {\"free\":{\"lvl\":true,\"text\":\"LV 1\",\"bar\":false,\"name\":true},\"lock\":{\"lvl\":true,\"text\":\"LV 1 · LOCKED\",\"bar\":true,\"gold\":\"#ffd15e\"},\"after\":{\"lvl\":true,\"text\":\"LV 1\",\"bar\":false},\"panel\":null,\"state\":\"PRACTICE BATTLE\"}",
+  "PASS B9 DASH tap from the corner moves him (6.00 m); hold FLY climbs and the release holds (> 2 m); airborne, DOWN · LAND fill row D's free cells left of GUARD (same row, 42 px), FLY never moves — {\"dash_m\":6,\"f1\":{\"powered\":true,\"altitude\":9.53,\"height_above_ground\":0.53,\"ground\":9,\"vz\":0.01,\"warning\":false,\"forced_landing\":false,\"exiting\":false,\"intent\":0,\"remaining_s\":36.85,\"landed_count\":0,\"hold\":null,\"perch\":null,\"falling\":false,\"hold_alt\":9.531,\"took_off\":true,\"warning_fraction\":0.25,\"cruise_mps\":20.56,\"boost_factor\":1.3,\"allowed_in_pvp\":false},\"land\":{\"id\":\"g-land\",\"x\":694,\"y\":340,\"w\":42,\"h\":42,\"cx\":715,\"cy\":361,\"shown\":true,\"text\":\"LANDF\"},\"desc\":{\"id\":\"g-desc\",\"x\":644,\"y\":340,\"w\":42,\"h\":42,\"cx\":665,\"cy\":361,\"shown\":true,\"text\":\"DOWNhold\"},\"guard\":{\"id\":\"g-guard\",\"x\":744,\"y\":340,\"w\":42,\"h\":42,\"cx\":765,\"cy\":361,\"shown\":true,\"text\":\"GUARD\"}}",
+  "PASS B9b LAND lands; DOWN · LAND hide again — {\"f2\":{\"powered\":false,\"altitude\":9,\"height_above_ground\":0,\"ground\":9,\"vz\":0,\"warning\":false,\"forced_landing\":false,\"exiting\":false,\"intent\":0,\"remaining_s\":null,\"landed_count\":1,\"hold\":null,\"perch\":null,\"falling\":false,\"hold_alt\":null,\"took_off\":false,\"warning_fraction\":0.25,\"cruise_mps\":20.56,\"boost_factor\":1.3,\"allowed_in_pvp\":false}}",
+  "PASS B10 the framed character (rear view, standing) is not under the island or the left arc — reported, not forced: overlaps [] — {\"him\":{\"x\":374.6,\"y\":134.4,\"w\":92.79999999999995,\"h\":139.1,\"shown\":true},\"overlaps\":[]}",
+  "PASS B11 at the tree elevator the contextual prompt (LIFT✦) appears inside the viewport, ≥ 44 px, over neither thumb group nor the framed character — {\"ctx\":{\"id\":\"g-ctx\",\"x\":374,\"y\":280,\"w\":96,\"h\":44,\"cx\":422,\"cy\":302,\"shown\":true,\"text\":\"LIFT✦\"},\"over\":[],\"him\":{\"x\":374.6,\"y\":134.4,\"w\":92.79999999999995,\"h\":139.1,\"shown\":true}}",
+  "PASS B12 rollback ?hud=dock: the PASS 3 layout returns (dock shown, cluster grid, 112 px stick, no category label) on the same build — {\"layout\":\"dock\",\"dock\":{\"id\":\"g-dock\",\"x\":488,\"y\":6,\"w\":180,\"h\":142,\"cx\":578,\"cy\":77,\"shown\":true,\"text\":\"⟩PHYSICAL 4/4PHYSMAHGIC2/2SPECIALMAHGIC2\"},\"cluster\":\"grid\",\"stick\":{\"id\":\"tc-stick\",\"x\":20,\"y\":278,\"w\":96,\"h\":96,\"cx\":68,\"cy\":326,\"shown\":true,\"text\":\"\"}}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "rects": {
+  "ground": {
+   "g-mapbt": {
+    "id": "g-mapbt",
+    "x": 14,
+    "y": 214,
+    "w": 42,
+    "h": 42,
+    "cx": 35,
+    "cy": 235,
+    "shown": true,
+    "text": "MAP"
+   },
+   "g-speed": {
+    "id": "g-speed",
+    "x": 64,
+    "y": 208,
+    "w": 42,
+    "h": 42,
+    "cx": 85,
+    "cy": 229,
+    "shown": true,
+    "text": "+SPEED"
+   },
+   "g-camreset": {
+    "id": "g-camreset",
+    "x": 114,
+    "y": 214,
+    "w": 42,
+    "h": 42,
+    "cx": 135,
+    "cy": 235,
+    "shown": true,
+    "text": "⟲CAM"
+   },
+   "g-fly": {
+    "id": "g-fly",
+    "x": 744,
+    "y": 290,
+    "w": 42,
+    "h": 42,
+    "cx": 765,
+    "cy": 311,
+    "shown": true,
+    "text": "FLYhold"
+   },
+   "g-guard": {
+    "id": "g-guard",
+    "x": 744,
+    "y": 340,
+    "w": 42,
+    "h": 42,
+    "cx": 765,
+    "cy": 361,
+    "shown": true,
+    "text": "GUARD"
+   },
+   "g-menubt": {
+    "id": "g-menubt",
+    "x": 797,
+    "y": 293,
+    "w": 36,
+    "h": 36,
+    "cx": 815,
+    "cy": 311,
+    "shown": true,
+    "text": "≡Q"
+   },
+   "g-swordbt": {
+    "id": "g-swordbt",
+    "x": 797,
+    "y": 172,
+    "w": 36,
+    "h": 36,
+    "cx": 815,
+    "cy": 190,
+    "shown": true,
+    "text": "⚔"
+   },
+   "g-catlbl": {
+    "id": "g-catlbl",
+    "x": 644,
+    "y": 272,
+    "w": 192,
+    "h": 12,
+    "cx": 740,
+    "cy": 278,
+    "shown": true,
+    "text": "PHYSICAL ▸"
+   },
+   "tc-dash": {
+    "id": "tc-dash",
+    "x": 794,
+    "y": 340,
+    "w": 42,
+    "h": 42,
+    "cx": 815,
+    "cy": 361,
+    "shown": true,
+    "text": "DASHhold + swipe"
+   },
+   "tc-stickzone": {
+    "id": "tc-stickzone",
+    "x": 0,
+    "y": 117,
+    "w": 253.1875,
+    "h": 273,
+    "cx": 126.59375,
+    "cy": 253.5,
+    "shown": true,
+    "text": ""
+   },
+   "tc-stick": {
+    "id": "tc-stick",
+    "x": 20,
+    "y": 266,
+    "w": 108,
+    "h": 108,
+    "cx": 74,
+    "cy": 320,
+    "shown": true,
+    "text": ""
+   },
+   "g-erty-t": {
+    "id": "g-erty-t",
+    "x": 644,
+    "y": 218,
+    "w": 192,
+    "h": 48,
+    "cx": 740,
+    "cy": 242,
+    "shown": true,
+    "text": "1H-PUSH2V-PULL3HINGE4ROTATE"
+   },
+   "g-vitals": {
+    "id": "g-vitals",
+    "x": 8,
+    "y": 6,
+    "w": 150,
+    "h": 19.796875,
+    "cx": 83,
+    "cy": 15.8984375,
+    "shown": true,
+    "text": "HEALTHLV 11000 / 1000"
+   },
+   "g-state": {
+    "id": "g-state",
+    "x": 356.875,
+    "y": 8,
+    "w": 130.234375,
+    "h": 11.46875,
+    "cx": 421.9921875,
+    "cy": 13.734375,
+    "shown": true,
+    "text": "FREE ROAM · HARMLESS"
+   },
+   "g-ctx": {
+    "id": "g-ctx",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "✦"
+   },
+   "g-desk": {
+    "id": "g-desk",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false,
+    "text": "ATTACKVEH-PUSHRV-PULLTHINGEYROTATEMAHGIC"
+   }
+  },
+  "slots": [
+   {
+    "x": 644,
+    "y": 224,
+    "w": 42,
+    "h": 42,
+    "cx": 665,
+    "cy": 245,
+    "shown": true,
+    "text": "1H-PUSH",
+    "small": "H-PUSH",
+    "overflow": false
+   },
+   {
+    "x": 694,
+    "y": 218,
+    "w": 42,
+    "h": 42,
+    "cx": 715,
+    "cy": 239,
+    "shown": true,
+    "text": "2V-PULL",
+    "small": "V-PULL",
+    "overflow": false
+   },
+   {
+    "x": 744,
+    "y": 218,
+    "w": 42,
+    "h": 42,
+    "cx": 765,
+    "cy": 239,
+    "shown": true,
+    "text": "3HINGE",
+    "small": "HINGE",
+    "overflow": false
+   },
+   {
+    "x": 794,
+    "y": 224,
+    "w": 42,
+    "h": 42,
+    "cx": 815,
+    "cy": 245,
+    "shown": true,
+    "text": "4ROTATE",
+    "small": "ROTATE",
+    "overflow": false
+   }
+  ]
+ },
+ "halos": {
+  "g-mapbt": {
+   "id": "g-mapbt",
+   "vis": [
+    42,
+    42
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  },
+  "g-speed": {
+   "id": "g-speed",
+   "vis": [
+    42,
+    42
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  },
+  "g-camreset": {
+   "id": "g-camreset",
+   "vis": [
+    42,
+    42
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  },
+  "g-fly": {
+   "id": "g-fly",
+   "vis": [
+    42,
+    42
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  },
+  "g-guard": {
+   "id": "g-guard",
+   "vis": [
+    42,
+    42
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  },
+  "g-menubt": {
+   "id": "g-menubt",
+   "vis": [
+    36,
+    36
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  },
+  "g-swordbt": {
+   "id": "g-swordbt",
+   "vis": [
+    36,
+    36
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  },
+  "tc-dash": {
+   "id": "tc-dash",
+   "vis": [
+    42,
+    42
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  },
+  "slot1": {
+   "id": "slot1",
+   "vis": [
+    42,
+    42
+   ],
+   "halo": {
+    "l": 4,
+    "r": 4,
+    "t": 4,
+    "b": 4
+   },
+   "centre": true
+  }
+ },
+ "pass": 17,
+ "fail": 0
+}

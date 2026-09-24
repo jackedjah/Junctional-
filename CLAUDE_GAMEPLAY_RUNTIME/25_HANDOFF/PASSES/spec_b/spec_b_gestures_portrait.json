@@ -1,0 +1,29 @@
+{
+ "mode": "portrait",
+ "viewport": [
+  390,
+  844
+ ],
+ "touch_emulated": true,
+ "lines": [
+  "PASS tap/swipe conflict: a tap (3 px) in the look area never orbits the camera and never leaves DRAG state — {\"before\":{\"state\":\"FOLLOW\",\"err\":0,\"yaw\":0,\"dragging\":false},\"after\":{\"state\":\"FOLLOW\",\"err\":0,\"yaw\":0,\"dragging\":false}}",
+  "PASS double fire: one swipe → one DRAG session → the orbit PERSISTS after release (ORBIT, not dragging, yaw unchanged: no second orbit, no return) — SUPERSEDED — O1: the old one-return expectation — {\"during\":{\"state\":\"DRAG\",\"err\":-41.25,\"yaw\":0.72,\"dragging\":true},\"after_release\":{\"state\":\"ORBIT\",\"err\":-41.25,\"yaw\":0.72,\"dragging\":false},\"settled\":{\"state\":\"ORBIT\",\"err\":-41.25,\"yaw\":0.72,\"dragging\":false}}",
+  "PASS interrupted drag (pointercancel mid-swipe): no stuck DRAG (orbit persists per O1; the explicit reset then returns behind him) — {\"state\":\"ORBIT\",\"err\":-34.38,\"yaw\":0.6,\"dragging\":false}",
+  "PASS interrupted drag → explicit reset returns behind him (|err| < 5°) — {\"state\":\"FOLLOW\",\"err\":0,\"yaw\":0,\"dragging\":false}",
+  "PASS background → foreground: hidden mid-drag + mid-move releases the drag and the keys (no stuck pressed state); back in front the view is where the finger left it (ORBIT, not dragging) — SUPERSEDED — O1: the old return-behind expectation — {\"hidden\":{\"state\":\"ORBIT\",\"err\":-7.53,\"yaw\":0.54,\"dragging\":false},\"move\":{\"f\":0,\"in_fwd\":0},\"back\":{\"state\":\"ORBIT\",\"err\":-6.53,\"yaw\":0.54,\"dragging\":false}}",
+  "PASS rapid release/re-drag: the second swipe takes over at once (DRAG, nothing fights the finger), then the orbit persists (ORBIT) — SUPERSEDED — O1: the old single-return expectation — {\"re_drag\":{\"state\":\"DRAG\",\"err\":-24.06,\"yaw\":0.846,\"dragging\":true},\"held\":{\"state\":\"DRAG\",\"err\":-24.06,\"yaw\":0.846,\"dragging\":true},\"settled\":{\"state\":\"ORBIT\",\"err\":-24.06,\"yaw\":0.846,\"dragging\":false}}",
+  "PASS modal race: the menu opened mid-drag owns input (no orbit from further movement), release + close leaves no DRAG and the menu closed — SUPERSEDED — O1: the old FOLLOW-behind expectation — {\"menu_open\":true,\"yaw_before\":0.906,\"yaw_after_move\":0.906,\"settled\":{\"state\":\"ORBIT\",\"err\":-27.5,\"yaw\":0.906,\"dragging\":false}}",
+  "PASS click-through: a drag that starts on the FLY button never moves the camera — {\"yaw0\":0.426,\"yaw1\":0.426,\"flight_started\":true}",
+  "PASS lock → unlock: lock-on engaged and released cleanly; after unlock the camera (in FOLLOW after the reset) is behind his facing again — {\"locked\":true,\"after\":{\"state\":\"FOLLOW\",\"err\":0,\"yaw\":0.426,\"dragging\":false}}",
+  "PASS stuck pressed state: pointerup outside the look zone (finger slid off) still ends the drag (no DRAG, orbit persists per O1) — {\"state\":\"ORBIT\",\"err\":-34.38,\"yaw\":1.026,\"dragging\":false}",
+  "PASS duplicate / stale listeners: 3 swipes → exactly 3 DRAG sessions — {\"drag_sessions\":3}",
+  "NOT EXERCISED swipe/slider conflict — no slider lives on the look path (the Control Lab overlay stops pointer propagation at its root — inspected, not exercised here)",
+  "NOT EXERCISED duplicated audio — the camera path plays no audio",
+  "NOT EXERCISED network loss — the demo authority is in-page; no network on the camera path",
+  "NOT EXERCISED async results landing after UI ownership changed — no async result feeds the camera (the follow reads the live root yaw each frame)",
+  "PASS Z zero page / console errors — [\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\",\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\",\"[log] Failed to load resource: the server responded with a status of 404 (Not Found)\"]"
+ ],
+ "pass": 12,
+ "fail": 0,
+ "not_exercised": 4
+}

@@ -1,0 +1,56 @@
+{
+ "runs": [
+  {
+   "world": true,
+   "spots": {
+    "plaza_rest": {
+     "p50": 16.4,
+     "p95": 22.8,
+     "max": 30.4,
+     "calls": 155,
+     "tris": 415921
+    },
+    "canal_wading_run": {
+     "p50": 20.5,
+     "p95": 32,
+     "max": 53.7,
+     "calls": 467,
+     "tris": 955871
+    },
+    "forest_rest": {
+     "p50": 16.8,
+     "p95": 24.6,
+     "max": 33.7,
+     "calls": 151,
+     "tris": 916379
+    }
+   }
+  },
+  {
+   "world": false,
+   "spots": {
+    "plaza_rest": {
+     "p50": 16.8,
+     "p95": 20.3,
+     "max": 26.1,
+     "calls": 95,
+     "tris": 366780
+    },
+    "canal_wading_run": {
+     "p50": 16.5,
+     "p95": 20.7,
+     "max": 25.2,
+     "calls": 339,
+     "tris": 648326
+    },
+    "forest_rest": {
+     "p50": 16.5,
+     "p95": 20.7,
+     "max": 23.2,
+     "calls": 66,
+     "tris": 288206
+    }
+   }
+  }
+ ]
+}

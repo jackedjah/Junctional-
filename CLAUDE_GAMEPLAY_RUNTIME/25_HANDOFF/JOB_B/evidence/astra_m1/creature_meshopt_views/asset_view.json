@@ -1,0 +1,104 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\creature_meshopt\\fish_L1.glb",
+  "bytes": 1264076,
+  "load_ms": 49,
+  "size_m": [
+   0.838,
+   0.42,
+   0.98
+  ],
+  "triangles": 6498,
+  "meshes": 1,
+  "shots": {
+   "front": "fish_L1_front.png",
+   "q34": "fish_L1_q34.png",
+   "side": "fish_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\creature_meshopt\\fish_L2.glb",
+  "bytes": 1181164,
+  "load_ms": 33,
+  "size_m": [
+   0.838,
+   0.42,
+   0.98
+  ],
+  "triangles": 5150,
+  "meshes": 1,
+  "shots": {
+   "front": "fish_L2_front.png",
+   "q34": "fish_L2_q34.png",
+   "side": "fish_L2_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\creature_meshopt\\horse_L1.glb",
+  "bytes": 2265928,
+  "load_ms": 51,
+  "size_m": [
+   0.977,
+   0.274,
+   0.734
+  ],
+  "triangles": 8794,
+  "meshes": 1,
+  "shots": {
+   "front": "horse_L1_front.png",
+   "q34": "horse_L1_q34.png",
+   "side": "horse_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\creature_meshopt\\horse_L2.glb",
+  "bytes": 2266400,
+  "load_ms": 42,
+  "size_m": [
+   0.977,
+   0.274,
+   0.734
+  ],
+  "triangles": 8798,
+  "meshes": 1,
+  "shots": {
+   "front": "horse_L2_front.png",
+   "q34": "horse_L2_q34.png",
+   "side": "horse_L2_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\creature_meshopt\\phoenix_L1.glb",
+  "bytes": 1519060,
+  "load_ms": 32,
+  "size_m": [
+   0.909,
+   0.982,
+   0.736
+  ],
+  "triangles": 8234,
+  "meshes": 1,
+  "shots": {
+   "front": "phoenix_L1_front.png",
+   "q34": "phoenix_L1_q34.png",
+   "side": "phoenix_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\creature_meshopt\\phoenix_L2.glb",
+  "bytes": 1519236,
+  "load_ms": 32,
+  "size_m": [
+   0.909,
+   0.982,
+   0.736
+  ],
+  "triangles": 8236,
+  "meshes": 1,
+  "shots": {
+   "front": "phoenix_L2_front.png",
+   "q34": "phoenix_L2_q34.png",
+   "side": "phoenix_L2_side.png"
+  }
+ }
+]

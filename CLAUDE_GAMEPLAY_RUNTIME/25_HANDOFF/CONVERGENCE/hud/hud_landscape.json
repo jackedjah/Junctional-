@@ -1,0 +1,221 @@
+{
+ "mode": "landscape",
+ "viewport": [
+  844,
+  390
+ ],
+ "touch_emulated": true,
+ "checks": [
+  "PASS L1a the four power buttons never overlap the ≡ menu (the row pads its left end) — {\"row_buttons\":4,\"clashes_with_menu\":0}",
+  "PASS L1 every control exists, ≥ 44 px, inside the viewport, and nothing overlaps (controls · stick zone · 1–4 row · vitals · dock) — {\"missing\":[],\"small\":[],\"outside\":[],\"clashes\":[]}",
+  "PASS L1b touch geometry: FLY is the lower-right cell (former USE spot) above the 1–4 row; GUARD · DASH · FLY share the bottom cluster row; ATTACK sits directly above GUARD, MAHGIC above DASH; MAP · + · CAM are one row at the right edge above them; the cluster is right of the stick zone — {\"fly\":{\"id\":\"g-fly\",\"x\":786,\"y\":278,\"w\":50,\"h\":50,\"cx\":811,\"cy\":303,\"shown\":true},\"guard\":{\"id\":\"g-guard\",\"x\":674,\"y\":278,\"w\":50,\"h\":50,\"cx\":699,\"cy\":303,\"shown\":true},\"dash\":{\"id\":\"tc-dash\",\"x\":730,\"y\":278,\"w\":50,\"h\":50,\"cx\":755,\"cy\":303,\"shown\":true},\"attack\":{\"id\":\"tc-attack\",\"x\":674,\"y\":222,\"w\":50,\"h\":50,\"cx\":699,\"cy\":247,\"shown\":true},\"mahgic\":{\"id\":\"g-mahgic\",\"x\":730,\"y\":222,\"w\":50,\"h\":50,\"cx\":755,\"cy\":247,\"shown\":true},\"map\":{\"id\":\"g-mapbt\",\"x\":674,\"y\":110,\"w\":50,\"h\":50,\"cx\":699,\"cy\":135,\"shown\":true},\"speed\":{\"id\":\"g-speed\",\"x\":730,\"y\":110,\"w\":50,\"h\":50,\"cx\":755,\"cy\":135,\"shown\":true},\"cam\":{\"id\":\"g-camreset\",\"x\":786,\"y\":110,\"w\":50,\"h\":50,\"cx\":811,\"cy\":135,\"shown\":true},\"row\":{\"id\":\"g-erty-t\",\"x\":66,\"y\":338,\"w\":602,\"h\":46,\"cx\":367,\"cy\":361,\"shown\":true}}",
+  "PASS L1c compact visible faces: cluster cells are 50 px (≥ 44 px logical targets, not oversized plates), the 1–4 row ≥ 44 px tall — {\"sizes\":[50,50,50,50,50,50,50,50],\"row_h\":46}",
+  "PASS L8 no keyboard hints on touch (every .gbtn small.key hidden)",
+  "PASS L1d the dock with its drawer open (PHYSICAL) stays out of the cluster: no control covered — {\"dock\":{\"id\":\"g-dock\",\"x\":488,\"y\":6,\"w\":180,\"h\":330,\"cx\":578,\"cy\":171,\"shown\":true},\"drawer_h\":184,\"clashes\":[]}",
+  "PASS L8b no truncated ability names: the 1–4 / E R T Y labels equal the authored short forms and none overflows its button; drawer chips are slot numbers on touch — {\"labels\":{\"labels\":[\"H-PUSH\",\"V-PULL\",\"HINGE\",\"ROTATE\",\"H-PUSH\",\"V-PULL\",\"HINGE\",\"ROTATE\"],\"overflow\":[],\"chips\":[\"1\",\"2\",\"3\",\"4\"],\"authored\":[\"H-PUSH\",\"V-PULL\",\"HINGE\",\"ROTATE\"]},\"chips_with_drawer_open\":[\"1\",\"2\",\"3\",\"4\"]}",
+  "PASS L2 no permanent USE: the contextual prompt is hidden at an ordinary spot (the practice-reset / incoming fixtures never make a button) — {\"id\":\"g-ctx\",\"x\":0,\"y\":0,\"w\":0,\"h\":0,\"cx\":0,\"cy\":0,\"shown\":false}",
+  "PASS L2b at the tree elevator the contextual prompt appears with its verb (LIFT), inside the viewport, ≥ 44 px — {\"ctx\":{\"id\":\"g-ctx\",\"x\":374,\"y\":280,\"w\":96,\"h\":44,\"cx\":422,\"cy\":302,\"shown\":true},\"text\":\"LIFT✦\"}",
+  "PASS L2c the contextual prompt never sits on the framed character (his screen box vs the prompt rect) — {\"prompt\":{\"id\":\"g-ctx\",\"x\":374,\"y\":280,\"w\":96,\"h\":44,\"cx\":422,\"cy\":302,\"shown\":true},\"him\":{\"x\":374.9,\"y\":134.5,\"w\":91.40000000000003,\"h\":138.60000000000002,\"shown\":true}}",
+  "PASS L3 the HUD theme follows the LOCAL player’s class (ATHLETE) and the five class families resolve to distinct token sets — {\"body_class\":\"ATHLETE\",\"me\":\"ATHLETE\",\"families\":{\"ATHLETE\":{\"rim\":\"#d9a93e\",\"accent\":\"#ffd15e\",\"face\":\"#1a1408\"},\"TITAN\":{\"rim\":\"#4f8fe0\",\"accent\":\"#5ea8ff\",\"face\":\"#081328\"},\"LEAN\":{\"rim\":\"#d94a5a\",\"accent\":\"#ff5e72\",\"face\":\"#200a0e\"},\"VISIONARY\":{\"rim\":\"#9a6be0\",\"accent\":\"#b58cff\",\"face\":\"#150c26\"},\"BAGE\":{\"rim\":\"#e070a8\",\"accent\":\"#ff8fc8\",\"face\":\"#230b19\"}}}",
+  "PASS L9 state matrix: ready · selected · disabled · unavailable · cooldown · pressed render distinctly — {\"ready\":[\"rgb(217, 169, 62)\",\"solid\",\"1\",\"rgb(255, 232, 166) 0px 1.5px 0px 0px inset, rgb(90, 61, 12) \",\"none\",\"none\"],\"selected\":[\"rgb(255, 209, 94)\",\"solid\",\"1\",\"rgb(255, 232, 166) 0px 1.5px 0px 0px inset, rgb(90, 61, 12) \",\"none\",\"none\"],\"disabled\":[\"rgb(90, 61, 12)\",\"solid\",\"0.45\",\"rgba(0, 0, 0, 0.3) 0px 0px 0px 1px inset\",\"saturate(0.4)\",\"none\"],\"unavailable\":[\"rgb(255, 107, 107)\",\"dashed\",\"0.55\",\"rgb(255, 232, 166) 0px 1.5px 0px 0px inset, rgb(90, 61, 12) \",\"saturate(0.3)\",\"none\"],\"cooldown\":[\"rgb(217, 169, 62)\",\"dashed\",\"0.6\",\"rgb(255, 232, 166) 0px 1.5px 0px 0px inset, rgb(90, 61, 12) \",\"none\",\"none\"],\"pressed\":[\"rgb(217, 169, 62)\",\"solid\",\"1\",\"rgba(0, 0, 0, 0.55) 0px 2px 4px 0px inset, rgb(90, 61, 12) 0\",\"none\",\"matrix(1, 0, 0, 1, 0, 1)\"]}",
+  "PASS L4 `+` faster travel: a tap toggles a clear selected state and sustained travel is faster (6.86 vs 3.79 m/s ≥ 1.25×); a second tap turns it off — {\"slow_mps\":3.79,\"fast_mps\":6.86,\"selected_on\":true,\"selected_off\":false}",
+  "PASS L5 MAP is one tap away: the menu opens directly on its MAP tab — {\"open\":true,\"tab\":\"MAP\",\"local_dev\":true}",
+  "PASS L6 one utility sheet: the ≡ menu carries EMOTES / LOADOUT / SETTINGS (+ STATS · SKILLS · INVENTORY · MAP · FRIENDS · DMs); EMOTES lists the catalogue (open sheet + one tap), SETTINGS holds practice / help / guide; no MORE button exists — {\"tabs\":[\"STATS\",\"SKILLS\",\"LOADOUT\",\"EMOTES\",\"ACTIONS\",\"INVENTORY\",\"MAP\",\"FRIENDS\",\"DMS\"],\"emotes\":22,\"loadout\":true,\"no_more_button\":true}",
+  "PASS L6c an emote tapped INSIDE the mounted EMOTES tab actually plays (the menu-hosted bodies are live, not dead) — {\"tapped\":\"WAVE\",\"before\":null,\"after\":\"WAVE\"}",
+  "PASS L6d PRACTICE tapped INSIDE the mounted SETTINGS tab toggles the host practice flag — {\"before\":false,\"after\":true}",
+  "PASS L6b closing the sheet returns the tab bodies to their home (nothing left mounted, no leaked panel) — {\"restored\":true}",
+  "PASS L7 MAHGIC (tap / M) casts the first READY magic skill: a magic slot leaves READY (cooldown / casting) after the tap — {\"before\":[[\"READY\",\"READY\"],[\"READY\",\"READY\"]],\"after\":[[\"COOLDOWN\",\"READY\"],[\"READY\",\"READY\"]],\"last\":null}",
+  "PASS L10 hold FLY from its cell: take-off + climb, release holds (powered, intent 0, > 2 m); airborne row shows DOWN · LAND above FLY’s column (LAND in FLY’s column, both ≥ 44 px), FLY did not move — {\"f1\":{\"powered\":true,\"altitude\":9.2,\"height_above_ground\":9.2,\"ground\":0,\"vz\":0.01,\"warning\":false,\"forced_landing\":false,\"exiting\":false,\"intent\":0,\"remaining_s\":36.95,\"landed_count\":0,\"hold\":null,\"perch\":null,\"falling\":false,\"hold_alt\":9.206,\"took_off\":true,\"warning_fraction\":0.25,\"allowed_in_pvp\":false},\"land\":{\"id\":\"g-land\",\"x\":786,\"y\":166,\"w\":50,\"h\":50,\"cx\":811,\"cy\":191,\"shown\":true},\"desc\":{\"id\":\"g-desc\",\"x\":730,\"y\":166,\"w\":50,\"h\":50,\"cx\":755,\"cy\":191,\"shown\":true}}",
+  "PASS L10b LAND lands and the airborne row hides again — {\"f2\":{\"powered\":false,\"altitude\":0,\"height_above_ground\":0,\"ground\":0,\"vz\":0,\"warning\":false,\"forced_landing\":false,\"exiting\":false,\"intent\":0,\"remaining_s\":null,\"landed_count\":1,\"hold\":null,\"perch\":null,\"falling\":false,\"hold_alt\":null,\"took_off\":false,\"warning_fraction\":0.25,\"allowed_in_pvp\":false}}",
+  "PASS Z zero page / console errors — []"
+ ],
+ "rects": {
+  "ground": {
+   "g-menubt": {
+    "id": "g-menubt",
+    "x": 8,
+    "y": 338,
+    "w": 52,
+    "h": 46,
+    "cx": 34,
+    "cy": 361,
+    "shown": true
+   },
+   "g-mapbt": {
+    "id": "g-mapbt",
+    "x": 674,
+    "y": 110,
+    "w": 50,
+    "h": 50,
+    "cx": 699,
+    "cy": 135,
+    "shown": true
+   },
+   "g-speed": {
+    "id": "g-speed",
+    "x": 730,
+    "y": 110,
+    "w": 50,
+    "h": 50,
+    "cx": 755,
+    "cy": 135,
+    "shown": true
+   },
+   "g-camreset": {
+    "id": "g-camreset",
+    "x": 786,
+    "y": 110,
+    "w": 50,
+    "h": 50,
+    "cx": 811,
+    "cy": 135,
+    "shown": true
+   },
+   "g-fly": {
+    "id": "g-fly",
+    "x": 786,
+    "y": 278,
+    "w": 50,
+    "h": 50,
+    "cx": 811,
+    "cy": 303,
+    "shown": true
+   },
+   "g-guard": {
+    "id": "g-guard",
+    "x": 674,
+    "y": 278,
+    "w": 50,
+    "h": 50,
+    "cx": 699,
+    "cy": 303,
+    "shown": true
+   },
+   "g-mahgic": {
+    "id": "g-mahgic",
+    "x": 730,
+    "y": 222,
+    "w": 50,
+    "h": 50,
+    "cx": 755,
+    "cy": 247,
+    "shown": true
+   },
+   "g-land": {
+    "id": "g-land",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "g-desc": {
+    "id": "g-desc",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "g-ctx": {
+    "id": "g-ctx",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "cx": 0,
+    "cy": 0,
+    "shown": false
+   },
+   "tc-attack": {
+    "id": "tc-attack",
+    "x": 674,
+    "y": 222,
+    "w": 50,
+    "h": 50,
+    "cx": 699,
+    "cy": 247,
+    "shown": true
+   },
+   "tc-dash": {
+    "id": "tc-dash",
+    "x": 730,
+    "y": 278,
+    "w": 50,
+    "h": 50,
+    "cx": 755,
+    "cy": 303,
+    "shown": true
+   },
+   "tc-stickzone": {
+    "id": "tc-stickzone",
+    "x": 0,
+    "y": 117,
+    "w": 253.1875,
+    "h": 273,
+    "cx": 126.59375,
+    "cy": 253.5,
+    "shown": true
+   },
+   "g-erty-t": {
+    "id": "g-erty-t",
+    "x": 66,
+    "y": 338,
+    "w": 602,
+    "h": 46,
+    "cx": 367,
+    "cy": 361,
+    "shown": true
+   },
+   "g-vitals": {
+    "id": "g-vitals",
+    "x": 6,
+    "y": 6,
+    "w": 176,
+    "h": 68.390625,
+    "cx": 94,
+    "cy": 40.1953125,
+    "shown": true
+   },
+   "g-dock": {
+    "id": "g-dock",
+    "x": 488,
+    "y": 6,
+    "w": 180,
+    "h": 142,
+    "cx": 578,
+    "cy": 77,
+    "shown": true
+   }
+  },
+  "dock_open": {
+   "dock": {
+    "id": "g-dock",
+    "x": 488,
+    "y": 6,
+    "w": 180,
+    "h": 330,
+    "cx": 578,
+    "cy": 171,
+    "shown": true
+   },
+   "drawer": {
+    "id": "g-drawer",
+    "x": 525,
+    "y": 142,
+    "w": 133,
+    "h": 184,
+    "cx": 591.5,
+    "cy": 234,
+    "shown": true
+   },
+   "mode": "PHYSICAL"
+  }
+ },
+ "pass": 22,
+ "fail": 0
+}

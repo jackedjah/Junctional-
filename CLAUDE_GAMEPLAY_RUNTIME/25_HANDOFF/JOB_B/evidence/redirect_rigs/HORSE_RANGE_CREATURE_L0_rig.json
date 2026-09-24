@@ -1,0 +1,63 @@
+{
+ "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\horse\\HORSE_RANGE_CREATURE_L0.glb",
+ "kind": "QUADRUPED",
+ "rebase": {
+  "rebased": 1,
+  "skinned_meshes": 1,
+  "untouched": 0
+ },
+ "report": {
+  "kind": "QUADRUPED",
+  "bones": 18,
+  "forward": "+x",
+  "fix_deg": 90,
+  "spine": [
+   "bone_0",
+   "bone_1",
+   "bone_18",
+   "bone_19",
+   "bone_20",
+   "bone_21"
+  ],
+  "head": "bone_3",
+  "neck": "bone_2",
+  "tail": [
+   "bone_22"
+  ],
+  "legs": {},
+  "missing": [
+   "leg FL",
+   "leg FR",
+   "leg BL",
+   "leg BR"
+  ],
+  "dup": [],
+  "bone_extent": {
+   "x": 1.025,
+   "z": 0.304
+  },
+  "mesh_size": [
+   0.274,
+   0.734,
+   0.979
+  ]
+ },
+ "triangles": 21436,
+ "size_m": [
+  0.2740478515625,
+  0.7340089082717896,
+  0.97930908203125
+ ],
+ "shots": {
+  "rest_side": "HORSE_RANGE_CREATURE_L0_rest_side.png",
+  "rest_front": "HORSE_RANGE_CREATURE_L0_rest_front.png",
+  "rest_q34": "HORSE_RANGE_CREATURE_L0_rest_q34.png",
+  "pose_a_side": "HORSE_RANGE_CREATURE_L0_pose_a_side.png",
+  "pose_b_side": "HORSE_RANGE_CREATURE_L0_pose_b_side.png",
+  "pose_a_front": "HORSE_RANGE_CREATURE_L0_pose_a_front.png",
+  "pose_b_q34": "HORSE_RANGE_CREATURE_L0_pose_b_q34.png"
+ },
+ "console_errors": [
+  "[log] Failed to load resource: the server responded with a status of 404 (Not Found) <http://127.0.0.1:61671/favicon.ico>"
+ ]
+}

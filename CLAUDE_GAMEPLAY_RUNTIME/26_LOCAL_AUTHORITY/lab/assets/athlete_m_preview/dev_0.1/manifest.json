@@ -1,0 +1,36 @@
+{
+ "export_id": "ATHLETE_M_PREVIEW",
+ "version": "dev_0.1",
+ "sha256": "48033bae7ba749a8e4aaf8d67d2c2292d883e75056057c2b2750becd7c012a1d",
+ "owner_review_status": "CANDIDATE",
+ "preview_status": "DEVELOPMENT_PREVIEW_UNAPPROVED (never promoted; not a retained or production character)",
+ "source_release": "isolated geometry-only copy of RAW_10_MODELS/Mah_Athlete_M.glb (sha256 7b023694ea924b86128ff2e1ae3b64157491c1d5b11805b9d4d2b68131592b63); textures dropped; NOT an approved or retained production character",
+ "units": "metres",
+ "up_axis": "+Y",
+ "forward_axis": "-Z",
+ "source_forward_axis": "+Z",
+ "forward_axis_note": "measured on the source mesh: the face (932 vs 339 head vertices, nose at z=+0.084) points +Z; the runtime factory rotates the body 180° so yaw 0 faces -Z like every other entity",
+ "root": "ATHLETE_M_PREVIEW_BODY",
+ "scale_to_metres": 1.82461,
+ "source_height_units": 0.9865,
+ "forms": [
+  "FUSED"
+ ],
+ "clips": {},
+ "sockets": {
+  "ROOT": "ATHLETE_M_PREVIEW_BODY"
+ },
+ "materials": {
+  "ATHLETE_M_PREVIEW_GRAPHITE": "graphite / platinum preview (runtime)"
+ },
+ "files": [
+  "Mah_Athlete_M_preview.glb"
+ ],
+ "limitations": [
+  "single rigid mesh: no skeleton, no morph targets, no authored clips",
+  "SPLIT form (leg separation) cannot be shown by this asset",
+  "limb / hand articulation cannot be shown; only whole-body procedural motion",
+  "used for every class during development testing (class tint only)"
+ ],
+ "generated": "2026-09-15T04:50:09.872Z"
+}

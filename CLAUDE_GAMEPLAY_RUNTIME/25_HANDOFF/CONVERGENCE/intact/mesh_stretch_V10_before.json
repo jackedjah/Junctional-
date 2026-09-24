@@ -1,0 +1,4042 @@
+{
+ "poses": {
+  "idle": {
+   "meshes": [
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "push_load": {
+   "meshes": [
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 9,
+     "pairs": {
+      "UPPERARM_L ↔ UPPERARM_L": {
+       "n": 2,
+       "max": 2.55,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 9091,
+        "b": 9092,
+        "bind": 0.0117,
+        "posed": 0.03,
+        "ratio": 2.55,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.92,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.55,
+         "sum": 1
+        },
+        "pa": [
+         -0.163,
+         0.691,
+         -0.094
+        ]
+       }
+      },
+      "UPPERARM_R ↔ UPPERARM_R": {
+       "n": 2,
+       "max": 2.55,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 9177,
+        "b": 9176,
+        "bind": 0.0117,
+        "posed": 0.03,
+        "ratio": 2.55,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.92,
+         "sum": 1
+        },
+        "pa": [
+         0.134,
+         0.68,
+         -0.09
+        ]
+       }
+      },
+      "CHEST ↔ CHEST": {
+       "n": 5,
+       "max": 2.06,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12046,
+        "b": 12047,
+        "bind": 0.0082,
+        "posed": 0.0169,
+        "ratio": 2.06,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.55,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 1,
+         "sum": 1
+        },
+        "pa": [
+         -0.063,
+         0.799,
+         -0.072
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 9091,
+       "b": 9092,
+       "bind": 0.0117,
+       "posed": 0.03,
+       "ratio": 2.55,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.92,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.55,
+        "sum": 1
+       },
+       "pa": [
+        -0.163,
+        0.691,
+        -0.094
+       ]
+      },
+      {
+       "a": 9177,
+       "b": 9176,
+       "bind": 0.0117,
+       "posed": 0.03,
+       "ratio": 2.55,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.92,
+        "sum": 1
+       },
+       "pa": [
+        0.134,
+        0.68,
+        -0.09
+       ]
+      },
+      {
+       "a": 9174,
+       "b": 9177,
+       "bind": 0.0111,
+       "posed": 0.027,
+       "ratio": 2.44,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "pa": [
+        0.161,
+        0.68,
+        -0.086
+       ]
+      },
+      {
+       "a": 9092,
+       "b": 9089,
+       "bind": 0.0111,
+       "posed": 0.027,
+       "ratio": 2.43,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.55,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.95,
+        "sum": 1
+       },
+       "pa": [
+        -0.135,
+        0.68,
+        -0.09
+       ]
+      },
+      {
+       "a": 12046,
+       "b": 12047,
+       "bind": 0.0082,
+       "posed": 0.0169,
+       "ratio": 2.06,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.55,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 1,
+        "sum": 1
+       },
+       "pa": [
+        -0.063,
+        0.799,
+        -0.072
+       ]
+      },
+      {
+       "a": 12617,
+       "b": 12614,
+       "bind": 0.0082,
+       "posed": 0.0169,
+       "ratio": 2.06,
+       "A": {
+        "bone": "CHEST",
+        "w": 1,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.55,
+        "sum": 1
+       },
+       "pa": [
+        0.076,
+        0.806,
+        -0.065
+       ]
+      },
+      {
+       "a": 12707,
+       "b": 12709,
+       "bind": 0.0082,
+       "posed": 0.0169,
+       "ratio": 2.06,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.55,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 1,
+        "sum": 1
+       },
+       "pa": [
+        0.062,
+        0.799,
+        -0.072
+       ]
+      },
+      {
+       "a": 12055,
+       "b": 12051,
+       "bind": 0.0084,
+       "posed": 0.0172,
+       "ratio": 2.04,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.54,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.94,
+        "sum": 1
+       },
+       "pa": [
+        -0.072,
+        0.799,
+        -0.073
+       ]
+      },
+      {
+       "a": 12748,
+       "b": 12750,
+       "bind": 0.0084,
+       "posed": 0.0172,
+       "ratio": 2.04,
+       "A": {
+        "bone": "CHEST",
+        "w": 0.54,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.94,
+        "sum": 1
+       },
+       "pa": [
+        0.071,
+        0.799,
+        -0.073
+       ]
+      }
+     ]
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "rotation_release": {
+   "meshes": [
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 359,
+     "pairs": {
+      "UPPERARM_R ↔ UPPERARM_R": {
+       "n": 56,
+       "max": 8.58,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14586,
+        "b": 14594,
+        "bind": 0.0086,
+        "posed": 0.0739,
+        "ratio": 8.58,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.57,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.95,
+         "sum": 1
+        },
+        "pa": [
+         -0.117,
+         0.808,
+         -0.119
+        ]
+       }
+      },
+      "SCAP_R ↔ SPINE2": {
+       "n": 14,
+       "max": 7.8,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 7842,
+        "b": 7839,
+        "bind": 0.008,
+        "posed": 0.062,
+        "ratio": 7.8,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "pa": [
+         -0.08,
+         0.66,
+         -0.1
+        ]
+       }
+      },
+      "UPPERARM_L ↔ UPPERARM_L": {
+       "n": 45,
+       "max": 7.17,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14430,
+        "b": 14438,
+        "bind": 0.0087,
+        "posed": 0.0623,
+        "ratio": 7.17,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.56,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.95,
+         "sum": 1
+        },
+        "pa": [
+         0.05,
+         0.804,
+         0.104
+        ]
+       }
+      },
+      "SCAP_R ↔ UPPERARM_R": {
+       "n": 4,
+       "max": 6.03,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10457,
+        "b": 10455,
+        "bind": 0.0082,
+        "posed": 0.0494,
+        "ratio": 6.03,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.29,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.38,
+         "sum": 1
+        },
+        "pa": [
+         -0.128,
+         0.794,
+         -0.105
+        ]
+       }
+      },
+      "SCAP_L ↔ SCAP_L": {
+       "n": 16,
+       "max": 5.83,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8004,
+        "b": 8003,
+        "bind": 0.0109,
+        "posed": 0.0638,
+        "ratio": 5.83,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.43,
+         "sum": 1
+        },
+        "pa": [
+         0.032,
+         0.785,
+         0.101
+        ]
+       }
+      },
+      "CLAV_R ↔ UPPERARM_R": {
+       "n": 5,
+       "max": 5.45,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10863,
+        "b": 10857,
+        "bind": 0.0104,
+        "posed": 0.0567,
+        "ratio": 5.45,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.68,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         -0.071,
+         0.828,
+         -0.082
+        ]
+       }
+      },
+      "SCAP_L ↔ SPINE2": {
+       "n": 8,
+       "max": 5.27,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 7959,
+        "b": 7964,
+        "bind": 0.008,
+        "posed": 0.0419,
+        "ratio": 5.27,
+        "A": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.34,
+         "sum": 1
+        },
+        "pa": [
+         -0.02,
+         0.641,
+         0.044
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ UPPERARM_R": {
+       "n": 13,
+       "max": 4.65,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10489,
+        "b": 10486,
+        "bind": 0.0091,
+        "posed": 0.0421,
+        "ratio": 4.65,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "pa": [
+         -0.141,
+         0.794,
+         -0.099
+        ]
+       }
+      },
+      "SCAP_R ↔ SCAP_R": {
+       "n": 19,
+       "max": 4.65,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11261,
+        "b": 11258,
+        "bind": 0.0104,
+        "posed": 0.0484,
+        "ratio": 4.65,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.41,
+         "sum": 1
+        },
+        "pa": [
+         -0.145,
+         0.796,
+         -0.09
+        ]
+       }
+      },
+      "SPINE2 ↔ SPINE2": {
+       "n": 14,
+       "max": 4.35,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 7835,
+        "b": 7841,
+        "bind": 0.008,
+        "posed": 0.0346,
+        "ratio": 4.35,
+        "A": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.34,
+         "sum": 1
+        },
+        "pa": [
+         -0.023,
+         0.623,
+         -0.083
+        ]
+       }
+      },
+      "CHEST ↔ SCAP_R": {
+       "n": 29,
+       "max": 4.08,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12719,
+        "b": 12724,
+        "bind": 0.008,
+        "posed": 0.0325,
+        "ratio": 4.08,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.53,
+         "sum": 1
+        },
+        "pa": [
+         -0.096,
+         0.808,
+         -0.081
+        ]
+       }
+      },
+      "CLAV_L ↔ UPPERARM_L": {
+       "n": 4,
+       "max": 4.07,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11584,
+        "b": 11586,
+        "bind": 0.0104,
+        "posed": 0.0424,
+        "ratio": 4.07,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.7,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_L",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         0.03,
+         0.841,
+         0.035
+        ]
+       }
+      },
+      "CHEST ↔ UPPERARM_R": {
+       "n": 1,
+       "max": 3.96,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14631,
+        "b": 14638,
+        "bind": 0.0175,
+        "posed": 0.0692,
+        "ratio": 3.96,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.28,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.65,
+         "sum": 1
+        },
+        "pa": [
+         -0.069,
+         0.778,
+         -0.115
+        ]
+       }
+      },
+      "CHEST ↔ CHEST": {
+       "n": 37,
+       "max": 3.86,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12748,
+        "b": 12750,
+        "bind": 0.0084,
+        "posed": 0.0325,
+        "ratio": 3.86,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.54,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.94,
+         "sum": 1
+        },
+        "pa": [
+         -0.092,
+         0.799,
+         -0.056
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ UPPERARM_L": {
+       "n": 12,
+       "max": 3.77,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14388,
+        "b": 14396,
+        "bind": 0.0084,
+        "posed": 0.0318,
+        "ratio": 3.77,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.7,
+         "sum": 1
+        },
+        "pa": [
+         0.038,
+         0.822,
+         0.042
+        ]
+       }
+      },
+      "CHEST ↔ CLAV_R": {
+       "n": 6,
+       "max": 3.64,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14632,
+        "b": 14639,
+        "bind": 0.0146,
+        "posed": 0.0531,
+        "ratio": 3.64,
+        "A": {
+         "bone": "CLAV_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.6,
+         "sum": 1
+        },
+        "pa": [
+         -0.047,
+         0.77,
+         -0.121
+        ]
+       }
+      },
+      "CHEST ↔ SCAP_L": {
+       "n": 19,
+       "max": 3.36,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8014,
+        "b": 8013,
+        "bind": 0.0111,
+        "posed": 0.0373,
+        "ratio": 3.36,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.42,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.48,
+         "sum": 1
+        },
+        "pa": [
+         -0.012,
+         0.767,
+         0.1
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ CLAV_R": {
+       "n": 1,
+       "max": 3.23,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11289,
+        "b": 11286,
+        "bind": 0.0082,
+        "posed": 0.0265,
+        "ratio": 3.23,
+        "A": {
+         "bone": "CLAV_R",
+         "w": 0.32,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         -0.149,
+         0.79,
+         -0.094
+        ]
+       }
+      },
+      "CHEST ↔ SPINE2": {
+       "n": 4,
+       "max": 3.18,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 7854,
+        "b": 7848,
+        "bind": 0.0141,
+        "posed": 0.0447,
+        "ratio": 3.18,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.32,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.41,
+         "sum": 1
+        },
+        "pa": [
+         -0.068,
+         0.664,
+         -0.106
+        ]
+       }
+      },
+      "SCAP_L ↔ UPPERARM_L": {
+       "n": 9,
+       "max": 3.12,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 9466,
+        "b": 9467,
+        "bind": 0.0072,
+        "posed": 0.0226,
+        "ratio": 3.12,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.46,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         0.034,
+         0.811,
+         0.107
+        ]
+       }
+      },
+      "CLAV_R ↔ SCAP_R": {
+       "n": 11,
+       "max": 3.02,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12189,
+        "b": 12187,
+        "bind": 0.0104,
+        "posed": 0.0314,
+        "ratio": 3.02,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.33,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         -0.128,
+         0.808,
+         -0.072
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ SCAP_R": {
+       "n": 6,
+       "max": 2.93,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12195,
+        "b": 12194,
+        "bind": 0.0124,
+        "posed": 0.0363,
+        "ratio": 2.93,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.36,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.29,
+         "sum": 1
+        },
+        "pa": [
+         -0.103,
+         0.808,
+         -0.084
+        ]
+       }
+      },
+      "CHEST ↔ CLAV_L": {
+       "n": 4,
+       "max": 2.68,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14487,
+        "b": 14480,
+        "bind": 0.0175,
+        "posed": 0.0469,
+        "ratio": 2.68,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.65,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         0.04,
+         0.738,
+         0.038
+        ]
+       }
+      },
+      "CLAV_R ↔ CLAV_R": {
+       "n": 1,
+       "max": 2.49,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11853,
+        "b": 11851,
+        "bind": 0.0088,
+        "posed": 0.022,
+        "ratio": 2.49,
+        "A": {
+         "bone": "CLAV_R",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         -0.047,
+         0.754,
+         -0.134
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ SCAP_L": {
+       "n": 3,
+       "max": 2.41,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12494,
+        "b": 12500,
+        "bind": 0.0124,
+        "posed": 0.0298,
+        "ratio": 2.41,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.29,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         0.004,
+         0.808,
+         0.084
+        ]
+       }
+      },
+      "CLAV_L ↔ SCAP_L": {
+       "n": 9,
+       "max": 2.25,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12496,
+        "b": 12493,
+        "bind": 0.0119,
+        "posed": 0.0268,
+        "ratio": 2.25,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_L",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         -0.01,
+         0.823,
+         0.075
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ CHEST": {
+       "n": 1,
+       "max": 2.15,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12202,
+        "b": 12199,
+        "bind": 0.0146,
+        "posed": 0.0314,
+        "ratio": 2.15,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.49,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.47,
+         "sum": 1
+        },
+        "pa": [
+         -0.107,
+         0.779,
+         -0.114
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ ARMTWIST_R": {
+       "n": 3,
+       "max": 2.07,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11286,
+        "b": 11288,
+        "bind": 0.0113,
+        "posed": 0.0233,
+        "ratio": 2.07,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         -0.144,
+         0.815,
+         -0.086
+        ]
+       }
+      },
+      "BROW_R ↔ CHEEK_R": {
+       "n": 2,
+       "max": 2.05,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 13987,
+        "b": 13985,
+        "bind": 0.0058,
+        "posed": 0.0119,
+        "ratio": 2.05,
+        "A": {
+         "bone": "CHEEK_R",
+         "w": 0.48,
+         "sum": 1
+        },
+        "B": {
+         "bone": "BROW_R",
+         "w": 0.44,
+         "sum": 1
+        },
+        "pa": [
+         -0.003,
+         0.906,
+         -0.135
+        ]
+       }
+      },
+      "FOREARM_R ↔ FOREARM_R": {
+       "n": 1,
+       "max": 2.04,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 6401,
+        "b": 6404,
+        "bind": 0.0183,
+        "posed": 0.0374,
+        "ratio": 2.04,
+        "A": {
+         "bone": "FOREARM_R",
+         "w": 0.59,
+         "sum": 1
+        },
+        "B": {
+         "bone": "FOREARM_R",
+         "w": 0.37,
+         "sum": 1
+        },
+        "pa": [
+         -0.059,
+         0.976,
+         -0.107
+        ]
+       }
+      },
+      "FOREARM_L ↔ FOREARM_L": {
+       "n": 2,
+       "max": 2.01,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 6440,
+        "b": 6442,
+        "bind": 0.0183,
+        "posed": 0.0369,
+        "ratio": 2.01,
+        "A": {
+         "bone": "FOREARM_L",
+         "w": 0.59,
+         "sum": 1
+        },
+        "B": {
+         "bone": "FOREARM_L",
+         "w": 0.37,
+         "sum": 1
+        },
+        "pa": [
+         0.13,
+         0.948,
+         0.058
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 14586,
+       "b": 14594,
+       "bind": 0.0086,
+       "posed": 0.0739,
+       "ratio": 8.58,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "pa": [
+        -0.117,
+        0.808,
+        -0.119
+       ]
+      },
+      {
+       "a": 7842,
+       "b": 7839,
+       "bind": 0.008,
+       "posed": 0.062,
+       "ratio": 7.8,
+       "A": {
+        "bone": "SCAP_R",
+        "w": 0.34,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "pa": [
+        -0.08,
+        0.66,
+        -0.1
+       ]
+      },
+      {
+       "a": 7840,
+       "b": 7843,
+       "bind": 0.009,
+       "posed": 0.0653,
+       "ratio": 7.21,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.4,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_R",
+        "w": 0.37,
+        "sum": 1
+       },
+       "pa": [
+        -0.043,
+        0.623,
+        -0.075
+       ]
+      },
+      {
+       "a": 8400,
+       "b": 8402,
+       "bind": 0.009,
+       "posed": 0.0653,
+       "ratio": 7.21,
+       "A": {
+        "bone": "SCAP_R",
+        "w": 0.37,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.4,
+        "sum": 1
+       },
+       "pa": [
+        -0.092,
+        0.661,
+        -0.095
+       ]
+      },
+      {
+       "a": 9174,
+       "b": 9177,
+       "bind": 0.0111,
+       "posed": 0.0796,
+       "ratio": 7.17,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "pa": [
+        -0.12,
+        0.89,
+        -0.134
+       ]
+      },
+      {
+       "a": 14430,
+       "b": 14438,
+       "bind": 0.0087,
+       "posed": 0.0623,
+       "ratio": 7.17,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.56,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.95,
+        "sum": 1
+       },
+       "pa": [
+        0.05,
+        0.804,
+        0.104
+       ]
+      },
+      {
+       "a": 9625,
+       "b": 9624,
+       "bind": 0.0098,
+       "posed": 0.0689,
+       "ratio": 7,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.87,
+        "sum": 1
+       },
+       "pa": [
+        -0.131,
+        0.809,
+        -0.121
+       ]
+      },
+      {
+       "a": 9628,
+       "b": 9627,
+       "bind": 0.0098,
+       "posed": 0.0672,
+       "ratio": 6.82,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.49,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.8,
+        "sum": 1
+       },
+       "pa": [
+        -0.134,
+        0.804,
+        -0.117
+       ]
+      },
+      {
+       "a": 9179,
+       "b": 9176,
+       "bind": 0.0114,
+       "posed": 0.0759,
+       "ratio": 6.64,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.92,
+        "sum": 1
+       },
+       "pa": [
+        -0.131,
+        0.809,
+        -0.121
+       ]
+      },
+      {
+       "a": 9622,
+       "b": 9625,
+       "bind": 0.0114,
+       "posed": 0.0759,
+       "ratio": 6.64,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.92,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "pa": [
+        -0.131,
+        0.885,
+        -0.13
+       ]
+      },
+      {
+       "a": 9092,
+       "b": 9089,
+       "bind": 0.0111,
+       "posed": 0.0715,
+       "ratio": 6.44,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.55,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.95,
+        "sum": 1
+       },
+       "pa": [
+        0.045,
+        0.802,
+        0.119
+       ]
+      },
+      {
+       "a": 9177,
+       "b": 9176,
+       "bind": 0.0117,
+       "posed": 0.072,
+       "ratio": 6.13,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.92,
+        "sum": 1
+       },
+       "pa": [
+        -0.135,
+        0.813,
+        -0.12
+       ]
+      }
+     ]
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "overhead_load": {
+   "meshes": [
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 109,
+     "pairs": {
+      "UPPERARM_L ↔ UPPERARM_L": {
+       "n": 30,
+       "max": 5.92,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11638,
+        "b": 11637,
+        "bind": 0.008,
+        "posed": 0.0472,
+        "ratio": 5.92,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.84,
+         "sum": 1
+        },
+        "pa": [
+         -0.086,
+         0.72,
+         0.067
+        ]
+       }
+      },
+      "SCAP_L ↔ SCAP_L": {
+       "n": 19,
+       "max": 3.63,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11208,
+        "b": 11210,
+        "bind": 0.0104,
+        "posed": 0.0378,
+        "ratio": 3.63,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.42,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.32,
+         "sum": 1
+        },
+        "pa": [
+         -0.124,
+         0.745,
+         0.004
+        ]
+       }
+      },
+      "SCAP_L ↔ UPPERARM_L": {
+       "n": 9,
+       "max": 3.34,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 9466,
+        "b": 9467,
+        "bind": 0.0072,
+        "posed": 0.0241,
+        "ratio": 3.34,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.46,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         -0.151,
+         0.743,
+         0.071
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ UPPERARM_L": {
+       "n": 9,
+       "max": 3.34,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14388,
+        "b": 14396,
+        "bind": 0.0084,
+        "posed": 0.0282,
+        "ratio": 3.34,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.7,
+         "sum": 1
+        },
+        "pa": [
+         -0.096,
+         0.718,
+         0.09
+        ]
+       }
+      },
+      "CLAV_L ↔ UPPERARM_L": {
+       "n": 3,
+       "max": 3.25,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11584,
+        "b": 11586,
+        "bind": 0.0104,
+        "posed": 0.0338,
+        "ratio": 3.25,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.7,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_L",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         -0.1,
+         0.718,
+         0.059
+        ]
+       }
+      },
+      "CHEST ↔ UPPERARM_L": {
+       "n": 2,
+       "max": 2.92,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11696,
+        "b": 11697,
+        "bind": 0.0098,
+        "posed": 0.0287,
+        "ratio": 2.92,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         -0.086,
+         0.72,
+         0.067
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ SCAP_L": {
+       "n": 4,
+       "max": 2.81,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11247,
+        "b": 11248,
+        "bind": 0.0086,
+        "posed": 0.0242,
+        "ratio": 2.81,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_L",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         -0.138,
+         0.762,
+         0.036
+        ]
+       }
+      },
+      "UPPERARM_R ↔ UPPERARM_R": {
+       "n": 9,
+       "max": 2.75,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10472,
+        "b": 10475,
+        "bind": 0.0119,
+        "posed": 0.0327,
+        "ratio": 2.75,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.37,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.76,
+         "sum": 1
+        },
+        "pa": [
+         0.055,
+         0.737,
+         -0.06
+        ]
+       }
+      },
+      "CLAV_L ↔ SCAP_L": {
+       "n": 7,
+       "max": 2.72,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11245,
+        "b": 11246,
+        "bind": 0.008,
+        "posed": 0.0217,
+        "ratio": 2.72,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_L",
+         "w": 0.32,
+         "sum": 1
+        },
+        "pa": [
+         -0.138,
+         0.769,
+         0.039
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ UPPERARM_R": {
+       "n": 4,
+       "max": 2.58,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10489,
+        "b": 10486,
+        "bind": 0.0091,
+        "posed": 0.0234,
+        "ratio": 2.58,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "pa": [
+         0.072,
+         0.767,
+         -0.06
+        ]
+       }
+      },
+      "SCAP_R ↔ UPPERARM_R": {
+       "n": 2,
+       "max": 2.47,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10483,
+        "b": 10487,
+        "bind": 0.0072,
+        "posed": 0.0178,
+        "ratio": 2.47,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.52,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         0.058,
+         0.763,
+         -0.039
+        ]
+       }
+      },
+      "CHEST ↔ SCAP_L": {
+       "n": 3,
+       "max": 2.44,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8014,
+        "b": 8013,
+        "bind": 0.0111,
+        "posed": 0.0271,
+        "ratio": 2.44,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.42,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.48,
+         "sum": 1
+        },
+        "pa": [
+         -0.129,
+         0.736,
+         0.012
+        ]
+       }
+      },
+      "CLAV_R ↔ UPPERARM_R": {
+       "n": 3,
+       "max": 2.37,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10862,
+        "b": 10863,
+        "bind": 0.0137,
+        "posed": 0.0323,
+        "ratio": 2.37,
+        "A": {
+         "bone": "CLAV_R",
+         "w": 0.32,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.68,
+         "sum": 1
+        },
+        "pa": [
+         0.129,
+         0.745,
+         -0.013
+        ]
+       }
+      },
+      "SCAP_R ↔ SCAP_R": {
+       "n": 5,
+       "max": 2.24,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11261,
+        "b": 11258,
+        "bind": 0.0104,
+        "posed": 0.0233,
+        "ratio": 2.24,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.41,
+         "sum": 1
+        },
+        "pa": [
+         0.044,
+         0.767,
+         -0.056
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 11638,
+       "b": 11637,
+       "bind": 0.008,
+       "posed": 0.0472,
+       "ratio": 5.92,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.4,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.84,
+        "sum": 1
+       },
+       "pa": [
+        -0.086,
+        0.72,
+        0.067
+       ]
+      },
+      {
+       "a": 11693,
+       "b": 11695,
+       "bind": 0.009,
+       "posed": 0.0356,
+       "ratio": 3.93,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.76,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.4,
+        "sum": 1
+       },
+       "pa": [
+        -0.107,
+        0.726,
+        0.036
+       ]
+      },
+      {
+       "a": 9459,
+       "b": 9455,
+       "bind": 0.0104,
+       "posed": 0.0389,
+       "ratio": 3.74,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.73,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.37,
+        "sum": 1
+       },
+       "pa": [
+        -0.167,
+        0.729,
+        0.093
+       ]
+      },
+      {
+       "a": 11208,
+       "b": 11210,
+       "bind": 0.0104,
+       "posed": 0.0378,
+       "ratio": 3.63,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.42,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.32,
+        "sum": 1
+       },
+       "pa": [
+        -0.124,
+        0.745,
+        0.004
+       ]
+      },
+      {
+       "a": 9091,
+       "b": 9092,
+       "bind": 0.0117,
+       "posed": 0.0417,
+       "ratio": 3.55,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.92,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.55,
+        "sum": 1
+       },
+       "pa": [
+        -0.177,
+        0.688,
+        0.102
+       ]
+      },
+      {
+       "a": 9760,
+       "b": 9761,
+       "bind": 0.0098,
+       "posed": 0.0344,
+       "ratio": 3.5,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.8,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.48,
+        "sum": 1
+       },
+       "pa": [
+        -0.17,
+        0.707,
+        0.103
+       ]
+      },
+      {
+       "a": 8027,
+       "b": 8020,
+       "bind": 0.0104,
+       "posed": 0.036,
+       "ratio": 3.46,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.41,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.32,
+        "sum": 1
+       },
+       "pa": [
+        -0.123,
+        0.753,
+        0.005
+       ]
+      },
+      {
+       "a": 11210,
+       "b": 11209,
+       "bind": 0.0104,
+       "posed": 0.036,
+       "ratio": 3.46,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.32,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.41,
+        "sum": 1
+       },
+       "pa": [
+        -0.144,
+        0.753,
+        0.035
+       ]
+      },
+      {
+       "a": 8004,
+       "b": 8003,
+       "bind": 0.0109,
+       "posed": 0.0376,
+       "ratio": 3.44,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.3,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.43,
+        "sum": 1
+       },
+       "pa": [
+        -0.143,
+        0.718,
+        0.04
+       ]
+      },
+      {
+       "a": 11636,
+       "b": 11638,
+       "bind": 0.0106,
+       "posed": 0.0355,
+       "ratio": 3.36,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.72,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.4,
+        "sum": 1
+       },
+       "pa": [
+        -0.094,
+        0.723,
+        0.032
+       ]
+      },
+      {
+       "a": 9466,
+       "b": 9467,
+       "bind": 0.0072,
+       "posed": 0.0241,
+       "ratio": 3.34,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.46,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.33,
+        "sum": 1
+       },
+       "pa": [
+        -0.151,
+        0.743,
+        0.071
+       ]
+      },
+      {
+       "a": 11813,
+       "b": 11811,
+       "bind": 0.0072,
+       "posed": 0.0241,
+       "ratio": 3.34,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.33,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.46,
+        "sum": 1
+       },
+       "pa": [
+        -0.139,
+        0.747,
+        0.051
+       ]
+      }
+     ]
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "chestfly_load": {
+   "meshes": [
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 115,
+     "pairs": {
+      "UPPERARM_R ↔ UPPERARM_R": {
+       "n": 32,
+       "max": 5.11,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 9174,
+        "b": 9177,
+        "bind": 0.0111,
+        "posed": 0.0567,
+        "ratio": 5.11,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.95,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "pa": [
+         0.102,
+         0.733,
+         0.083
+        ]
+       }
+      },
+      "CHEST ↔ CLAV_R": {
+       "n": 15,
+       "max": 4.17,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14632,
+        "b": 14639,
+        "bind": 0.0146,
+        "posed": 0.0609,
+        "ratio": 4.17,
+        "A": {
+         "bone": "CLAV_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.6,
+         "sum": 1
+        },
+        "pa": [
+         0.1,
+         0.782,
+         0.06
+        ]
+       }
+      },
+      "SCAP_R ↔ UPPERARM_R": {
+       "n": 4,
+       "max": 3.87,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10454,
+        "b": 10457,
+        "bind": 0.0109,
+        "posed": 0.0423,
+        "ratio": 3.87,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.42,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.29,
+         "sum": 1
+        },
+        "pa": [
+         0.071,
+         0.736,
+         -0.026
+        ]
+       }
+      },
+      "CHEST ↔ UPPERARM_R": {
+       "n": 1,
+       "max": 3.37,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14631,
+        "b": 14638,
+        "bind": 0.0175,
+        "posed": 0.059,
+        "ratio": 3.37,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.28,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.65,
+         "sum": 1
+        },
+        "pa": [
+         0.092,
+         0.783,
+         0.044
+        ]
+       }
+      },
+      "SCAP_R ↔ SCAP_R": {
+       "n": 12,
+       "max": 3.17,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11272,
+        "b": 11270,
+        "bind": 0.008,
+        "posed": 0.0253,
+        "ratio": 3.17,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.38,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.32,
+         "sum": 1
+        },
+        "pa": [
+         0.068,
+         0.78,
+         -0.03
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ UPPERARM_R": {
+       "n": 5,
+       "max": 2.85,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10489,
+        "b": 10486,
+        "bind": 0.0091,
+        "posed": 0.0258,
+        "ratio": 2.85,
+        "A": {
+         "bone": "ARMTWIST_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "pa": [
+         0.099,
+         0.761,
+         0
+        ]
+       }
+      },
+      "UPPERARM_L ↔ UPPERARM_L": {
+       "n": 4,
+       "max": 2.76,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11638,
+        "b": 11637,
+        "bind": 0.008,
+        "posed": 0.0219,
+        "ratio": 2.76,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.84,
+         "sum": 1
+        },
+        "pa": [
+         -0.101,
+         0.697,
+         0.072
+        ]
+       }
+      },
+      "CLAV_R ↔ UPPERARM_R": {
+       "n": 3,
+       "max": 2.74,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10863,
+        "b": 10857,
+        "bind": 0.0104,
+        "posed": 0.0285,
+        "ratio": 2.74,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.68,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         0.128,
+         0.814,
+         0.035
+        ]
+       }
+      },
+      "CHEST ↔ CHEST": {
+       "n": 26,
+       "max": 2.73,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11047,
+        "b": 11045,
+        "bind": 0.0095,
+        "posed": 0.0258,
+        "ratio": 2.73,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.55,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.84,
+         "sum": 1
+        },
+        "pa": [
+         0.088,
+         0.778,
+         0.074
+        ]
+       }
+      },
+      "CLAV_R ↔ CLAV_R": {
+       "n": 1,
+       "max": 2.7,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11853,
+        "b": 11851,
+        "bind": 0.0088,
+        "posed": 0.0239,
+        "ratio": 2.7,
+        "A": {
+         "bone": "CLAV_R",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         0.098,
+         0.759,
+         0.069
+        ]
+       }
+      },
+      "SCAP_R ↔ SPINE2": {
+       "n": 4,
+       "max": 2.38,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 7842,
+        "b": 7839,
+        "bind": 0.008,
+        "posed": 0.0189,
+        "ratio": 2.38,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "pa": [
+         0.07,
+         0.658,
+         -0.009
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ CHEST": {
+       "n": 3,
+       "max": 2.25,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12202,
+        "b": 12199,
+        "bind": 0.0146,
+        "posed": 0.0328,
+        "ratio": 2.25,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.49,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.47,
+         "sum": 1
+        },
+        "pa": [
+         0.11,
+         0.809,
+         0.014
+        ]
+       }
+      },
+      "CHEST ↔ SCAP_R": {
+       "n": 3,
+       "max": 2.17,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12719,
+        "b": 12725,
+        "bind": 0.008,
+        "posed": 0.0173,
+        "ratio": 2.17,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.59,
+         "sum": 1
+        },
+        "pa": [
+         0.077,
+         0.824,
+         0.012
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ SCAP_R": {
+       "n": 1,
+       "max": 2.04,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 12195,
+        "b": 12194,
+        "bind": 0.0124,
+        "posed": 0.0252,
+        "ratio": 2.04,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.36,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.29,
+         "sum": 1
+        },
+        "pa": [
+         0.085,
+         0.823,
+         0.006
+        ]
+       }
+      },
+      "SCAP_L ↔ SCAP_L": {
+       "n": 1,
+       "max": 2,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8002,
+        "b": 8004,
+        "bind": 0.0082,
+        "posed": 0.0164,
+        "ratio": 2,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.3,
+         "sum": 1
+        },
+        "pa": [
+         -0.113,
+         0.709,
+         -0.022
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 9174,
+       "b": 9177,
+       "bind": 0.0111,
+       "posed": 0.0567,
+       "ratio": 5.11,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "pa": [
+        0.102,
+        0.733,
+        0.083
+       ]
+      },
+      {
+       "a": 14586,
+       "b": 14594,
+       "bind": 0.0086,
+       "posed": 0.0408,
+       "ratio": 4.74,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "pa": [
+        0.105,
+        0.732,
+        0.036
+       ]
+      },
+      {
+       "a": 14632,
+       "b": 14639,
+       "bind": 0.0146,
+       "posed": 0.0609,
+       "ratio": 4.17,
+       "A": {
+        "bone": "CLAV_R",
+        "w": 0.3,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.6,
+        "sum": 1
+       },
+       "pa": [
+        0.1,
+        0.782,
+        0.06
+       ]
+      },
+      {
+       "a": 10693,
+       "b": 10689,
+       "bind": 0.0077,
+       "posed": 0.0303,
+       "ratio": 3.92,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.61,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.87,
+        "sum": 1
+       },
+       "pa": [
+        0.115,
+        0.817,
+        0.055
+       ]
+      },
+      {
+       "a": 10454,
+       "b": 10457,
+       "bind": 0.0109,
+       "posed": 0.0423,
+       "ratio": 3.87,
+       "A": {
+        "bone": "SCAP_R",
+        "w": 0.42,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.29,
+        "sum": 1
+       },
+       "pa": [
+        0.071,
+        0.736,
+        -0.026
+       ]
+      },
+      {
+       "a": 9177,
+       "b": 9176,
+       "bind": 0.0117,
+       "posed": 0.0447,
+       "ratio": 3.8,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.92,
+        "sum": 1
+       },
+       "pa": [
+        0.099,
+        0.726,
+        0.027
+       ]
+      },
+      {
+       "a": 9179,
+       "b": 9176,
+       "bind": 0.0114,
+       "posed": 0.0423,
+       "ratio": 3.71,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.92,
+        "sum": 1
+       },
+       "pa": [
+        0.101,
+        0.726,
+        0.029
+       ]
+      },
+      {
+       "a": 9622,
+       "b": 9625,
+       "bind": 0.0114,
+       "posed": 0.0423,
+       "ratio": 3.71,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.92,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "pa": [
+        0.102,
+        0.727,
+        0.071
+       ]
+      },
+      {
+       "a": 10457,
+       "b": 10455,
+       "bind": 0.0082,
+       "posed": 0.0301,
+       "ratio": 3.67,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.29,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_R",
+        "w": 0.38,
+        "sum": 1
+       },
+       "pa": [
+        0.078,
+        0.744,
+        0.015
+       ]
+      },
+      {
+       "a": 14631,
+       "b": 14638,
+       "bind": 0.0175,
+       "posed": 0.059,
+       "ratio": 3.37,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.28,
+        "sum": 1
+       },
+       "B": {
+        "bone": "CHEST",
+        "w": 0.65,
+        "sum": 1
+       },
+       "pa": [
+        0.092,
+        0.783,
+        0.044
+       ]
+      },
+      {
+       "a": 9625,
+       "b": 9624,
+       "bind": 0.0098,
+       "posed": 0.0325,
+       "ratio": 3.3,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.87,
+        "sum": 1
+       },
+       "pa": [
+        0.101,
+        0.726,
+        0.029
+       ]
+      },
+      {
+       "a": 9629,
+       "b": 9627,
+       "bind": 0.0109,
+       "posed": 0.0351,
+       "ratio": 3.21,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.45,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.8,
+        "sum": 1
+       },
+       "pa": [
+        0.099,
+        0.736,
+        0.018
+       ]
+      }
+     ]
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  },
+  "emote_double_biceps": {
+   "meshes": [
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_1",
+     "verts": 14683,
+     "tris": 11241,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 160,
+     "pairs": {
+      "UPPERARM_L ↔ UPPERARM_L": {
+       "n": 29,
+       "max": 5.42,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14430,
+        "b": 14438,
+        "bind": 0.0087,
+        "posed": 0.0471,
+        "ratio": 5.42,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.56,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.95,
+         "sum": 1
+        },
+        "pa": [
+         -0.17,
+         0.743,
+         -0.056
+        ]
+       }
+      },
+      "UPPERARM_R ↔ UPPERARM_R": {
+       "n": 26,
+       "max": 5.39,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14586,
+        "b": 14594,
+        "bind": 0.0086,
+        "posed": 0.0464,
+        "ratio": 5.39,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.57,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.95,
+         "sum": 1
+        },
+        "pa": [
+         0.174,
+         0.744,
+         -0.058
+        ]
+       }
+      },
+      "SCAP_R ↔ SPINE2": {
+       "n": 8,
+       "max": 4.83,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 7842,
+        "b": 7839,
+        "bind": 0.008,
+        "posed": 0.0384,
+        "ratio": 4.83,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.34,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "pa": [
+         0.102,
+         0.653,
+         -0.033
+        ]
+       }
+      },
+      "SCAP_L ↔ SPINE2": {
+       "n": 8,
+       "max": 4.81,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 7959,
+        "b": 7964,
+        "bind": 0.008,
+        "posed": 0.0383,
+        "ratio": 4.81,
+        "A": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.34,
+         "sum": 1
+        },
+        "pa": [
+         -0.067,
+         0.631,
+         -0.027
+        ]
+       }
+      },
+      "SCAP_R ↔ UPPERARM_R": {
+       "n": 2,
+       "max": 3.98,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10454,
+        "b": 10457,
+        "bind": 0.0109,
+        "posed": 0.0435,
+        "ratio": 3.98,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.42,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_R",
+         "w": 0.29,
+         "sum": 1
+        },
+        "pa": [
+         0.114,
+         0.714,
+         -0.083
+        ]
+       }
+      },
+      "SCAP_L ↔ SCAP_L": {
+       "n": 10,
+       "max": 3.93,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8004,
+        "b": 8003,
+        "bind": 0.0109,
+        "posed": 0.043,
+        "ratio": 3.93,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.43,
+         "sum": 1
+        },
+        "pa": [
+         -0.143,
+         0.736,
+         -0.066
+        ]
+       }
+      },
+      "CHEST ↔ UPPERARM_R": {
+       "n": 1,
+       "max": 3,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14631,
+        "b": 14638,
+        "bind": 0.0175,
+        "posed": 0.0525,
+        "ratio": 3,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.28,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.65,
+         "sum": 1
+        },
+        "pa": [
+         0.116,
+         0.774,
+         -0.009
+        ]
+       }
+      },
+      "CHEST ↔ CLAV_R": {
+       "n": 3,
+       "max": 2.95,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14632,
+        "b": 14639,
+        "bind": 0.0146,
+        "posed": 0.043,
+        "ratio": 2.95,
+        "A": {
+         "bone": "CLAV_R",
+         "w": 0.3,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.6,
+         "sum": 1
+        },
+        "pa": [
+         0.111,
+         0.781,
+         0.016
+        ]
+       }
+      },
+      "CLAV_L ↔ UPPERARM_L": {
+       "n": 4,
+       "max": 2.91,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11584,
+        "b": 11586,
+        "bind": 0.0104,
+        "posed": 0.0303,
+        "ratio": 2.91,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.7,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_L",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         -0.129,
+         0.824,
+         -0.017
+        ]
+       }
+      },
+      "CLAV_R ↔ UPPERARM_R": {
+       "n": 5,
+       "max": 2.78,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10863,
+        "b": 10857,
+        "bind": 0.0104,
+        "posed": 0.029,
+        "ratio": 2.78,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.68,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         0.133,
+         0.823,
+         -0.017
+        ]
+       }
+      },
+      "CHEST ↔ CLAV_L": {
+       "n": 4,
+       "max": 2.73,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14487,
+        "b": 14480,
+        "bind": 0.0175,
+        "posed": 0.0478,
+        "ratio": 2.73,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.65,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CLAV_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         -0.09,
+         0.727,
+         -0.004
+        ]
+       }
+      },
+      "SCAP_R ↔ SCAP_R": {
+       "n": 10,
+       "max": 2.72,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 11264,
+        "b": 11261,
+        "bind": 0.0104,
+        "posed": 0.0283,
+        "ratio": 2.72,
+        "A": {
+         "bone": "SCAP_R",
+         "w": 0.41,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.31,
+         "sum": 1
+        },
+        "pa": [
+         0.107,
+         0.742,
+         -0.106
+        ]
+       }
+      },
+      "SPINE2 ↔ SPINE2": {
+       "n": 10,
+       "max": 2.68,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 7835,
+        "b": 7841,
+        "bind": 0.008,
+        "posed": 0.0213,
+        "ratio": 2.68,
+        "A": {
+         "bone": "SPINE2",
+         "w": 0.39,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.34,
+         "sum": 1
+        },
+        "pa": [
+         0.072,
+         0.632,
+         -0.015
+        ]
+       }
+      },
+      "ARMTWIST_L ↔ UPPERARM_L": {
+       "n": 5,
+       "max": 2.66,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14388,
+        "b": 14396,
+        "bind": 0.0084,
+        "posed": 0.0225,
+        "ratio": 2.66,
+        "A": {
+         "bone": "ARMTWIST_L",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "UPPERARM_L",
+         "w": 0.7,
+         "sum": 1
+        },
+        "pa": [
+         -0.128,
+         0.813,
+         -0.013
+        ]
+       }
+      },
+      "CHEST ↔ CHEST": {
+       "n": 16,
+       "max": 2.43,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8874,
+        "b": 8876,
+        "bind": 0.0086,
+        "posed": 0.021,
+        "ratio": 2.43,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.38,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.4,
+         "sum": 1
+        },
+        "pa": [
+         0.137,
+         0.758,
+         0.015
+        ]
+       }
+      },
+      "CHEST ↔ SCAP_L": {
+       "n": 6,
+       "max": 2.23,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8079,
+        "b": 8077,
+        "bind": 0.0117,
+        "posed": 0.0262,
+        "ratio": 2.23,
+        "A": {
+         "bone": "SCAP_L",
+         "w": 0.35,
+         "sum": 1
+        },
+        "B": {
+         "bone": "CHEST",
+         "w": 0.4,
+         "sum": 1
+        },
+        "pa": [
+         -0.083,
+         0.666,
+         -0.069
+        ]
+       }
+      },
+      "CHEST ↔ SCAP_R": {
+       "n": 6,
+       "max": 2.23,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 8391,
+        "b": 8396,
+        "bind": 0.0117,
+        "posed": 0.0262,
+        "ratio": 2.23,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.4,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_R",
+         "w": 0.35,
+         "sum": 1
+        },
+        "pa": [
+         0.062,
+         0.658,
+         -0.066
+        ]
+       }
+      },
+      "ARMTWIST_R ↔ UPPERARM_R": {
+       "n": 3,
+       "max": 2.23,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 10517,
+        "b": 10518,
+        "bind": 0.0072,
+        "posed": 0.0162,
+        "ratio": 2.23,
+        "A": {
+         "bone": "UPPERARM_R",
+         "w": 0.56,
+         "sum": 1
+        },
+        "B": {
+         "bone": "ARMTWIST_R",
+         "w": 0.36,
+         "sum": 1
+        },
+        "pa": [
+         0.158,
+         0.793,
+         -0.077
+        ]
+       }
+      },
+      "SCAP_L ↔ UPPERARM_L": {
+       "n": 2,
+       "max": 2.12,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 9466,
+        "b": 9467,
+        "bind": 0.0072,
+        "posed": 0.0153,
+        "ratio": 2.12,
+        "A": {
+         "bone": "UPPERARM_L",
+         "w": 0.46,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SCAP_L",
+         "w": 0.33,
+         "sum": 1
+        },
+        "pa": [
+         -0.145,
+         0.764,
+         -0.075
+        ]
+       }
+      },
+      "CHEST ↔ SPINE2": {
+       "n": 2,
+       "max": 2.02,
+       "hard": 0,
+       "zero": 0,
+       "coincident": 0,
+       "sample": {
+        "a": 14672,
+        "b": 14679,
+        "bind": 0.0175,
+        "posed": 0.0353,
+        "ratio": 2.02,
+        "A": {
+         "bone": "CHEST",
+         "w": 0.32,
+         "sum": 1
+        },
+        "B": {
+         "bone": "SPINE2",
+         "w": 0.41,
+         "sum": 1
+        },
+        "pa": [
+         0.099,
+         0.658,
+         -0.024
+        ]
+       }
+      }
+     },
+     "top": [
+      {
+       "a": 14430,
+       "b": 14438,
+       "bind": 0.0087,
+       "posed": 0.0471,
+       "ratio": 5.42,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.56,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.95,
+        "sum": 1
+       },
+       "pa": [
+        -0.17,
+        0.743,
+        -0.056
+       ]
+      },
+      {
+       "a": 14586,
+       "b": 14594,
+       "bind": 0.0086,
+       "posed": 0.0464,
+       "ratio": 5.39,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "pa": [
+        0.174,
+        0.744,
+        -0.058
+       ]
+      },
+      {
+       "a": 7842,
+       "b": 7839,
+       "bind": 0.008,
+       "posed": 0.0384,
+       "ratio": 4.83,
+       "A": {
+        "bone": "SCAP_R",
+        "w": 0.34,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "pa": [
+        0.102,
+        0.653,
+        -0.033
+       ]
+      },
+      {
+       "a": 7959,
+       "b": 7964,
+       "bind": 0.008,
+       "posed": 0.0383,
+       "ratio": 4.81,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.39,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.34,
+        "sum": 1
+       },
+       "pa": [
+        -0.067,
+        0.631,
+        -0.027
+       ]
+      },
+      {
+       "a": 9625,
+       "b": 9624,
+       "bind": 0.0098,
+       "posed": 0.0456,
+       "ratio": 4.63,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.57,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.87,
+        "sum": 1
+       },
+       "pa": [
+        0.177,
+        0.739,
+        -0.072
+       ]
+      },
+      {
+       "a": 9757,
+       "b": 9758,
+       "bind": 0.0098,
+       "posed": 0.0455,
+       "ratio": 4.62,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.86,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.56,
+        "sum": 1
+       },
+       "pa": [
+        -0.197,
+        0.778,
+        -0.072
+       ]
+      },
+      {
+       "a": 7840,
+       "b": 7843,
+       "bind": 0.009,
+       "posed": 0.0409,
+       "ratio": 4.52,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.4,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_R",
+        "w": 0.37,
+        "sum": 1
+       },
+       "pa": [
+        0.067,
+        0.63,
+        -0.036
+       ]
+      },
+      {
+       "a": 8400,
+       "b": 8402,
+       "bind": 0.009,
+       "posed": 0.0409,
+       "ratio": 4.52,
+       "A": {
+        "bone": "SCAP_R",
+        "w": 0.37,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.4,
+        "sum": 1
+       },
+       "pa": [
+        0.1,
+        0.652,
+        -0.044
+       ]
+      },
+      {
+       "a": 7965,
+       "b": 7960,
+       "bind": 0.009,
+       "posed": 0.0408,
+       "ratio": 4.51,
+       "A": {
+        "bone": "SCAP_L",
+        "w": 0.37,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SPINE2",
+        "w": 0.4,
+        "sum": 1
+       },
+       "pa": [
+        -0.096,
+        0.652,
+        -0.044
+       ]
+      },
+      {
+       "a": 8066,
+       "b": 8069,
+       "bind": 0.009,
+       "posed": 0.0408,
+       "ratio": 4.51,
+       "A": {
+        "bone": "SPINE2",
+        "w": 0.4,
+        "sum": 1
+       },
+       "B": {
+        "bone": "SCAP_L",
+        "w": 0.37,
+        "sum": 1
+       },
+       "pa": [
+        -0.063,
+        0.631,
+        -0.036
+       ]
+      },
+      {
+       "a": 9174,
+       "b": 9177,
+       "bind": 0.0111,
+       "posed": 0.0498,
+       "ratio": 4.49,
+       "A": {
+        "bone": "UPPERARM_R",
+        "w": 0.95,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_R",
+        "w": 0.56,
+        "sum": 1
+       },
+       "pa": [
+        0.214,
+        0.773,
+        -0.053
+       ]
+      },
+      {
+       "a": 9092,
+       "b": 9089,
+       "bind": 0.0111,
+       "posed": 0.0496,
+       "ratio": 4.47,
+       "A": {
+        "bone": "UPPERARM_L",
+        "w": 0.55,
+        "sum": 1
+       },
+       "B": {
+        "bone": "UPPERARM_L",
+        "w": 0.95,
+        "sum": 1
+       },
+       "pa": [
+        -0.177,
+        0.738,
+        -0.068
+       ]
+      }
+     ]
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_BODY_2",
+     "verts": 14683,
+     "tris": 1974,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    },
+    {
+     "name": "ATHLETE_M_AM08_V6_SPLIT_LEGS",
+     "verts": 4522,
+     "tris": 4476,
+     "groups": [],
+     "materials": [
+      {
+       "name": "ATHLETE_M_AM08_V6_PBR",
+       "side": 0,
+       "transparent": false,
+       "opacity": 1,
+       "visible": true
+      }
+     ],
+     "no_influence_verts": 0,
+     "stretched_edges": 0,
+     "pairs": {},
+     "top": []
+    }
+   ]
+  }
+ },
+ "errors": []
+}

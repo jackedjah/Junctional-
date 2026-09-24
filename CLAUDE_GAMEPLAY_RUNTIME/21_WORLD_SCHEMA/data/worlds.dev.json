@@ -1,0 +1,31 @@
+{
+ "_doc": "DEVELOPMENT world definitions (data-driven; Phase 4). No maps, no art: profiles are identity descriptors and POIs are positions + types. Shared infrastructure ids recur across worlds while each world's identity stays independently configurable. Classification: DEVELOPMENT_REFERENCE.",
+ "classification": "DEVELOPMENT_REFERENCE",
+ "shared_infrastructure_catalog": {
+  "GYM": {"poi_type": "GYM", "recurs": true}, "MAH_MATCH": {"poi_type": "DUEL_ARENA", "recurs": true}, "MENTOR_HALL": {"poi_type": "MENTOR", "recurs": true}, "TRANSPORT_HUB": {"poi_type": "TRANSPORT", "recurs": true}, "SOCIAL_SPACE": {"poi_type": "SOCIAL_SPACE", "recurs": true}, "SHOP_FUTURE": {"poi_type": "SHOP_FUTURE", "recurs": true, "future": true}
+ },
+ "worlds": [
+  {"world_id": "WORLD_DEV_01", "name": "Dev Proving Ground", "environment_profile": {"id": "ENV_DEV_NEUTRAL", "note": "placeholder; non-Earth identity to be defined"}, "architecture_profile": {"id": "ARCH_DEV_PLACEHOLDER"}, "nature_profile": {"id": "NATURE_DEV_PLACEHOLDER"}, "transport_profile": {"id": "TRANSPORT_DEV_PLACEHOLDER", "modes": ["FUSED_TRAVEL", "TRANSPORT_NODE"]},
+   "shared_infrastructure": ["GYM", "MAH_MATCH", "MENTOR_HALL", "TRANSPORT_HUB", "SOCIAL_SPACE"],
+   "spawn_points": [{"spawn_id": "SPAWN_MAIN", "position": {"x": 0, "y": 0, "z": 0}, "default": true}],
+   "activity_locations": [{"location_id": "WALL_01", "activity_type": "CLIMBING", "position": {"x": -6, "y": 0, "z": 4}}, {"location_id": "GYM_01", "activity_type": "GYM_WORKOUT", "position": {"x": 10, "y": 0, "z": -6}}],
+   "mentor_locations": [{"mentor_id": "MENTOR_01", "position": {"x": 6, "y": 0, "z": 0}}],
+   "wild_monster_set": {"set_id": "MONSTERS_DEV_PLACEHOLDER", "monsters": [], "note": "no monsters created (Phase 4 boundary)"},
+   "ultimate_boss": {"boss_id": "BOSS_DEV_PLACEHOLDER", "defined": false},
+   "raid_zones": [{"zone_id": "RAID_ZONE_DEV", "position": {"x": 0, "y": 0, "z": 30}, "radius_m": 20}],
+   "pois": [
+    {"poi_id": "POI_GYM_01", "type": "GYM", "position": {"x": 10, "y": 0, "z": -6}, "infrastructure": "GYM"},
+    {"poi_id": "POI_ARENA_01", "type": "DUEL_ARENA", "position": {"x": 0, "y": 0, "z": -8}, "infrastructure": "MAH_MATCH"},
+    {"poi_id": "POI_MENTOR_01", "type": "MENTOR", "position": {"x": 6, "y": 0, "z": 0}, "infrastructure": "MENTOR_HALL", "mentor_id": "MENTOR_01"},
+    {"poi_id": "POI_WALL_01", "type": "ACTIVITY", "position": {"x": -6, "y": 0, "z": 4}, "activity_type": "CLIMBING"},
+    {"poi_id": "POI_HUB_01", "type": "TRANSPORT", "position": {"x": -10, "y": 0, "z": -10}, "infrastructure": "TRANSPORT_HUB"},
+    {"poi_id": "POI_RAID_01", "type": "RAID", "position": {"x": 0, "y": 0, "z": 30}},
+    {"poi_id": "POI_SOCIAL_01", "type": "SOCIAL_SPACE", "position": {"x": 12, "y": 0, "z": 8}, "infrastructure": "SOCIAL_SPACE"},
+    {"poi_id": "POI_DOOR_GYM_01", "type": "BUILDING_INTERIOR", "position": {"x": 9, "y": 0, "z": -4}, "interior_id": "INTERIOR_GYM_01_PLACEHOLDER"},
+    {"poi_id": "POI_EXIT_01", "type": "WORLD_EXIT", "position": {"x": -14, "y": 0, "z": -14}, "destination_world": "WORLD_DEV_02"}
+   ]},
+  {"world_id": "WORLD_DEV_02", "name": "Dev Second Region", "environment_profile": {"id": "ENV_DEV_ALT"}, "architecture_profile": {"id": "ARCH_DEV_ALT"}, "nature_profile": {"id": "NATURE_DEV_ALT"}, "transport_profile": {"id": "TRANSPORT_DEV_ALT", "modes": ["FUSED_TRAVEL"]},
+   "shared_infrastructure": ["GYM", "MAH_MATCH", "TRANSPORT_HUB"], "spawn_points": [{"spawn_id": "SPAWN_MAIN", "position": {"x": 0, "y": 0, "z": 0}, "default": true}], "activity_locations": [], "mentor_locations": [], "wild_monster_set": {"set_id": "MONSTERS_DEV_PLACEHOLDER_2", "monsters": []}, "ultimate_boss": {"boss_id": "BOSS_DEV_PLACEHOLDER_2", "defined": false}, "raid_zones": [],
+   "pois": [{"poi_id": "POI_GYM_02", "type": "GYM", "position": {"x": 4, "y": 0, "z": 4}, "infrastructure": "GYM"}, {"poi_id": "POI_HUB_02", "type": "TRANSPORT", "position": {"x": -4, "y": 0, "z": -4}, "infrastructure": "TRANSPORT_HUB"}, {"poi_id": "POI_EXIT_02", "type": "WORLD_EXIT", "position": {"x": -8, "y": 0, "z": -8}, "destination_world": "WORLD_DEV_01"}]}
+ ]
+}

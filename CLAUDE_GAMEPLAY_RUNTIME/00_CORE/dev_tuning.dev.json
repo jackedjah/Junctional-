@@ -1,0 +1,1554 @@
+{
+ "_doc": "DEVELOPMENT tuning placeholders for the headless vertical slice. Classification: EXPERIMENTAL / DEVELOPMENT_REFERENCE - NOT canon, NOT balanced. Every canonical gameplay number lives ONLY in CLAUDE_GAMEPLAY_FOUNDATION/02_MOVEMENT/PLAYER_MOVEMENT_DEFAULTS.json; this file holds the values the canon leaves OPEN (OD-06 resource economy, OD-14 flight drain, OD-18 eccentric ratio, attack damage/cost/cooldown) so that code never hard-codes them. Replace through config, never through code.",
+ "tuning_version": "0.2.0-dev",
+ "classification": "EXPERIMENTAL",
+ "resource": {
+  "id": "MAHGIC",
+  "display_name": "MAHGIC (placeholder name, OD-06)",
+  "max": 100,
+  "capacity_scale": 2,
+  "capacity_scale_doc": "owner B8 §9 (2026-09-20): the FLIGHT MAHGIC capacity = max × capacity_scale (200) — long flight traversal matters; recharge / drain rules unchanged",
+  "regen_rate_per_s": 10,
+  "regen_delay_s": 0.6,
+  "lockout_s_on_depletion": 1.5,
+  "flight_drain_per_s": 2.5,
+  "special_cost": 30,
+  "transform_cost_key": "mahloco:unfuse_mahgic_cost / refuse_mahgic_cost (mahloco owns transformation costs)",
+  "utility_cost": 10
+ },
+ "health": {
+  "max": 100
+ },
+ "attack": {
+  "athlete_hpush_basic": {
+   "concentric_s": 0.35,
+   "main": 8,
+   "cooldown_s": 0.6
+  },
+  "athlete_vpull_basic": {
+   "concentric_s": 0.4,
+   "main": 8,
+   "cooldown_s": 0.6
+  },
+  "athlete_hinge_basic": {
+   "concentric_s": 0.45,
+   "main": 9,
+   "cooldown_s": 0.7
+  },
+  "athlete_lunge_basic": {
+   "concentric_s": 0.4,
+   "main": 9,
+   "cooldown_s": 0.7
+  },
+  "upright_row": {
+   "concentric_s": 0.6,
+   "peak_s": 0.15,
+   "main": 24,
+   "eccentric_tick": 2,
+   "eccentric_tick_interval_s": 0.5,
+   "aoe_radius_m": 2.5,
+   "cooldown_s": 6
+  }
+ },
+ "eccentric": {
+  "tick_interval_s": 0.5,
+  "tail_total_must_be_below_main": true
+ },
+ "duel": {
+  "boundary_radius_m": 12,
+  "round_end_grace_s": 2.0,
+  "challenge_timeout_s": 30
+ },
+ "buff": {
+  "bage_placeholder_duration_s": 20
+ },
+ "mentor": {
+  "intro_xp_bonus": 50
+ },
+ "progression": {
+  "xp_per_level_placeholder": 100,
+  "duel_win_xp": 40,
+  "duel_loss_xp": 15,
+  "workout_sync_xp_per_unit": 25
+ },
+ "idle": {
+  "flourish_max_duration_s": 4
+ },
+ "activity": {
+  "default_capacity": 8
+ },
+ "policies": {
+  "CALL_NEXT_POLICY": "A",
+  "TARGETING_POLICY": "SOFT_LOCK_IN_DUEL",
+  "HERO_ARENA_CAMERA_MODE": "UNDECIDED_OD-01",
+  "RAID_SCALING_POLICY": "LINEAR_DEV",
+  "RESOURCE_TUNING": "DEV"
+ },
+ "bot": {
+  "_doc": "deterministic development duel bot (Phase 4) - EXPERIMENTAL placeholders, not production AI",
+  "decision_interval_s": 0.6,
+  "attack_range_m": 2.2,
+  "ranged_range_m": 9.0,
+  "defend_reduction": 0.5,
+  "defend_duration_s": 0.8,
+  "ranged_cooldown_s": 6.0,
+  "approach_stop_m": 1.8
+ },
+ "interaction": {
+  "_doc": "interaction framework dev placeholders",
+  "default_range_m": 2.5,
+  "door_transition_s": 0.6
+ },
+ "persistence": {
+  "_doc": "local development persistence only",
+  "schema_version": "1.0.0",
+  "storage_key_prefix": "mahworld.dev.profile."
+ },
+ "local_authority": {
+  "_doc": "Phase 5A local authoritative duel host - DEVELOPMENT LAB ONLY (loopback, synthetic accounts, dev tokens). Not production networking, security or policy. Disconnect handling is a named dev strategy (OD-29). Change through config, never in code.",
+  "environment": "DEVELOPMENT",
+  "protocol_version": "MAHWORLD_LAB_1",
+  "tick_dt_s": 0.05,
+  "session_ttl_s": 300,
+  "max_envelope_bytes": 4096,
+  "max_payload_keys": 12,
+  "disconnect_strategy": "PAUSE_AND_WAIT_DEV",
+  "reconnect_window_s": 10,
+  "voluntary_exit_in_duel": "CONCEDE_DEV",
+  "reward_rule_version": "DEV_0.2.0",
+  "movement_integrator": "BAND_MIN_SPEED_DEV",
+  "targeting_strategy": "SOFT_LOCK_IN_DUEL",
+  "durable": {
+   "_doc": "Phase 5B durable host store (DEVELOPMENT ONLY): node:sqlite journal of every state change; recovery replays it and HOLDS the match (RECOVERY_HELD_DEV) until an explicit developer resume / close. Not production storage.",
+   "engine": "node:sqlite",
+   "store_schema_version": "5B.1",
+   "data_dir_name": "DEV_DATA_ONLY",
+   "fingerprint_every_ticks": 10,
+   "recovery_hold_state": "RECOVERY_HELD_DEV"
+  },
+  "disconnect_expiry_outcome": "NO_CONTEST",
+  "od29_status": {
+   "approved_2026_09_14": [
+    "a disconnected fighter gets reconnect_window_s = 10 s to reconnect (host clock keeps running while gameplay is paused)",
+    "if the window expires the duel ends WITHOUT A WINNER (NO_CONTEST); the connected opponent is not the winner; no winner-based Call Next"
+   ],
+   "still_open": [
+    "deliberate quitting / conceding",
+    "repeated-disconnect abuse",
+    "host / server failure (host restart stays RECOVERY_HELD_DEV)",
+    "ranked penalties",
+    "participation rewards",
+    "post-no-contest queue behaviour"
+   ],
+   "interim_development_setting": "no rewards on NO_CONTEST (not owner canon)"
+  },
+  "play": {
+   "_doc": "PLAYABLE LOCAL SAMPLE (owner continuation 2026-09-14) — DEVELOPMENT tuning for the play view / play mode of the local authority host. Owner-confirmed RULES live in od29_status and the ledger; everything here is implementation scaffolding and stays replaceable. Labels 'Combat MAHGIC' / 'Flight MAHGIC' are temporary (final names OPEN).",
+   "play_config_version": "PLAY_DEV_0.1.0",
+   "rooms": {
+    "TRAINING": {
+     "label": "CLASS TRAINING ROOM (retro-futuristic grid, schematic furnishings) — development placeholder",
+     "size_m": 24,
+     "spawn": {
+      "x": 0,
+      "z": 6
+     },
+     "platforms": [
+      {
+       "id": "PODIUM",
+       "x1": 6,
+       "z1": -2,
+       "x2": 10,
+       "z2": 2,
+       "height": 2.0
+      }
+     ],
+     "targets": [
+      {
+       "id": "SAMPLE_MONSTER",
+       "kind": "MONSTER_DUMMY",
+       "position": {
+        "x": 0,
+        "z": -4
+       },
+       "health": 60,
+       "respawn_s": 4,
+       "fights_back": false
+      }
+     ],
+     "exit": {
+      "to": "PLAZA",
+      "position": {
+       "x": 0,
+       "z": 10
+      },
+      "range_m": 2.5,
+      "requires": "TUTORIAL_COMPLETE"
+     }
+    },
+    "PLAZA": {
+     "label": "CITY PLAZA (compact placeholder) — development",
+     "size_m": 40,
+     "spawn": {
+      "x": 0,
+      "z": 0
+     },
+     "platforms": [],
+     "targets": [
+      {
+       "id": "PLAZA_PRACTICE_TARGET",
+       "kind": "MONSTER_DUMMY",
+       "position": {
+        "x": 6,
+        "z": -6
+       },
+       "health": 40,
+       "respawn_s": 3,
+       "fights_back": false
+      }
+     ],
+     "markers": [
+      {
+       "id": "FAR_MARKER",
+       "position": {
+        "x": 0,
+        "z": -12
+       },
+       "range_m": 2.0
+      }
+     ],
+     "exit": {
+      "to": "TRAINING",
+      "position": {
+       "x": 0,
+       "z": 14
+      },
+      "range_m": 2.5,
+      "requires": null
+     }
+    },
+    "FIELD": {
+     "label": "MAHWORLD SAMPLE CITY — plaza (arrival forecourt), TREE ELEVATOR, and the four landmark districts: Gold Temple, MAH GYM, Blue Tower, MAH MARKET (S11)",
+     "size_m": 600,
+     "direct": true,
+     "spawn": {
+      "x": 0,
+      "z": 4
+     },
+     "platforms": [],
+     "targets": [],
+     "exit": null,
+     "rules_17_23": true,
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "world_layout": "DISTRICT_V1",
+     "flight_ceiling_m": 100,
+     "_world_layout_doc": "DISTRICT_V1 = plaza + district colliders (rules _runtime_mapping.field_colliders_district_v1); CITY_2 = the previous 112 m plaza only (rollback). flight_ceiling_m: ground-relative travel ceiling for this room (canon 50 m is not enough to reach the authorised 60-80 m landmarks)."
+    },
+    "GYM_INTERIOR": {
+     "label": "TRAINING ROOM — MAH GYM (interior)",
+     "interior": true,
+     "size_m": 28,
+     "spawn": {
+      "x": 0,
+      "z": 9.5
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "GYM_DOOR",
+      "x": -86,
+      "z": 110,
+      "facing": 1.5708
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 11.6
+      },
+      "range_m": 2.6,
+      "requires": null,
+      "label": "EXIT — TRAINING ROOM doorway"
+     },
+     "platforms": [
+      {
+       "id": "GYM_PLATFORM",
+       "x1": -3,
+       "z1": -9,
+       "x2": 3,
+       "z2": -5,
+       "height": 0.25,
+       "label": "lifting platform"
+      },
+      {
+       "id": "GYM_BENCH_W",
+       "x1": -11.5,
+       "z1": -2,
+       "x2": -9.5,
+       "z2": 2,
+       "height": 0.5,
+       "label": "bench"
+      },
+      {
+       "id": "GYM_BENCH_E",
+       "x1": 9.5,
+       "z1": -2,
+       "x2": 11.5,
+       "z2": 2,
+       "height": 0.5,
+       "label": "bench"
+      }
+     ],
+     "targets": [],
+     "markers": [],
+     "interactables": [],
+     "flight_ceiling_m": 3.2,
+     "rules_17_23": true,
+     "_doc": "P8 first entrance transaction (master §16): entered ONLY through the FIELD door interactable GYM_DOOR (host refuses NOT_AT_DOOR otherwise); EXIT returns the actor to the door point facing away from the building (return_to). Flight is capped at the hall ceiling. Equipment blocks are walkable platforms along the walls; the floor is clear (MAH clearance).",
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "solids": [
+      {
+       "id": "RACK_W0",
+       "x1": -12.72,
+       "x2": -12.48,
+       "z1": -9.05,
+       "z2": -6.95,
+       "h": 1.9,
+       "label": "rack"
+      },
+      {
+       "id": "RACK_W1",
+       "x1": -12.72,
+       "x2": -12.48,
+       "z1": -3.05,
+       "z2": -0.95,
+       "h": 1.9,
+       "label": "rack"
+      },
+      {
+       "id": "RACK_W2",
+       "x1": -12.72,
+       "x2": -12.48,
+       "z1": 2.95,
+       "z2": 5.05,
+       "h": 1.9,
+       "label": "rack"
+      },
+      {
+       "id": "RACK_E0",
+       "x1": 12.48,
+       "x2": 12.72,
+       "z1": -9.05,
+       "z2": -6.95,
+       "h": 1.9,
+       "label": "rack"
+      },
+      {
+       "id": "RACK_E1",
+       "x1": 12.48,
+       "x2": 12.72,
+       "z1": -3.05,
+       "z2": -0.95,
+       "h": 1.9,
+       "label": "rack"
+      },
+      {
+       "id": "RACK_E2",
+       "x1": 12.48,
+       "x2": 12.72,
+       "z1": 2.95,
+       "z2": 5.05,
+       "h": 1.9,
+       "label": "rack"
+      },
+      {
+       "id": "CAGE",
+       "x1": -1.5,
+       "x2": 1.5,
+       "z1": -11.95,
+       "z2": -10.25,
+       "h": 2.6,
+       "label": "squat cage"
+      },
+      {
+       "id": "GYM_BARBELL_PLATFORM",
+       "x1": -1.1,
+       "x2": 1.1,
+       "z1": -7.3,
+       "z2": -6.7,
+       "h": 0.87,
+       "y0": 0.25,
+       "label": "training prop — premium MAH barbell on the lifting platform (JOB B prop)",
+       "world": "JOBB"
+      }
+     ],
+     "training": {
+      "_doc": "owner 2026-09-18 section 10: the enterable TRAINING ROOM — the practice dummy runs on the real eligible-target pipeline in an isolated rules field (own combatants / entities / practice state; no XP, loot, fitness credit or ranked result); the tutorial steps are event-driven and replayable on the client; slow-motion inspection is a presentation-only replay of the last cast, confined to this room",
+      "steps": [
+       "MOVE",
+       "LOOK",
+       "NAV",
+       "FLY_AND_RELEASE",
+       "CAST_PHYSICAL",
+       "CAST_PHYSICAL_MAHGIC",
+       "CAST_SPECIAL_MAHGIC",
+       "TIMING"
+      ]
+     }
+    },
+    "CLOTHING_SHOP": {
+     "label": "MAH MARKET — clothing (interior)",
+     "interior": true,
+     "size_m": 10,
+     "spawn": {
+      "x": 0,
+      "z": 3.2
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "CLOTHING_DOOR",
+      "x": -2.2,
+      "z": 251.25,
+      "facing": 0
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 4.2
+      },
+      "range_m": 2.4,
+      "requires": null,
+      "label": "EXIT — to the MARKET forecourt"
+     },
+     "platforms": [
+      {
+       "id": "CLOTHING_COUNTER",
+       "x1": -3,
+       "z1": -3.7,
+       "x2": 3,
+       "z2": -2.7,
+       "height": 1.05,
+       "label": "counter"
+      }
+     ],
+     "targets": [],
+     "markers": [],
+     "interactables": [
+      {
+       "id": "CLOTHING_COUNTER",
+       "kind": "BROWSE",
+       "label": "BROWSE — apparel catalog",
+       "x": 0,
+       "z": -2.2,
+       "range_m": 2.6,
+       "shop": "SHOP_CLOTHING"
+      }
+     ],
+     "shop": "SHOP_CLOTHING",
+     "ceiling_m": 8.2,
+     "flight_ceiling_m": 7.2,
+     "floor_levels": [
+      {
+       "id": "MAIN",
+       "y_m": 0,
+       "clear_height_m": 8.2,
+       "role": "MARKET_WING"
+      }
+     ],
+     "interior_plan": {
+      "plan_id": "MARKET_CLOTHING_WING_V1",
+      "style_id": "BAGE_ROSE_GRAND_MARKET",
+      "material_family": "rose_platinum_textile",
+      "ceiling_m": 8.2,
+      "portal": {
+       "half_width_m": 1.65,
+       "height_m": 4.5
+      },
+      "room_envelope_m": {
+       "width": 10,
+       "depth": 10,
+       "ceiling": 8.2
+      },
+      "feature_ids": [
+       "MARKET_VAULT_RIBS",
+       "CLOTHING_EMPTY_GALLERY",
+       "CLOTHING_COUNTER"
+      ],
+      "description": "a contained rose-platinum market wing with tall vault ribs and a finished zero-stock apparel gallery"
+     },
+     "rules_17_23": false,
+     "_doc": "P8 zero-stock clothing shop (master §17): the space is finished and enterable, the catalog is EMPTY by design (lab/assets/shops/shops_v1.json SHOP_CLOTHING, status ZERO_STOCK); no product, price, purchase or equipped item is invented."
+    },
+    "WEAPON_SHOP": {
+     "label": "MAH MARKET — weapons (interior)",
+     "interior": true,
+     "size_m": 10,
+     "spawn": {
+      "x": 0,
+      "z": 3.2
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "WEAPON_DOOR",
+      "x": 2.2,
+      "z": 251.25,
+      "facing": 0
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 4.2
+      },
+      "range_m": 2.4,
+      "requires": null,
+      "label": "EXIT — to the MARKET forecourt"
+     },
+     "platforms": [
+      {
+       "id": "WEAPON_COUNTER",
+       "x1": -3,
+       "z1": -3.7,
+       "x2": 3,
+       "z2": -2.7,
+       "height": 1.05,
+       "label": "counter"
+      }
+     ],
+     "targets": [],
+     "markers": [],
+     "interactables": [
+      {
+       "id": "WEAPON_COUNTER",
+       "kind": "BROWSE",
+       "label": "BROWSE — weapon catalog",
+       "x": 0,
+       "z": -2.2,
+       "range_m": 2.6,
+       "shop": "SHOP_WEAPONS"
+      }
+     ],
+     "shop": "SHOP_WEAPONS",
+     "ceiling_m": 8.2,
+     "flight_ceiling_m": 7.2,
+     "floor_levels": [
+      {
+       "id": "MAIN",
+       "y_m": 0,
+       "clear_height_m": 8.2,
+       "role": "MARKET_WING"
+      }
+     ],
+     "interior_plan": {
+      "plan_id": "MARKET_WEAPON_WING_V1",
+      "style_id": "BAGE_ROSE_GRAND_MARKET",
+      "material_family": "rose_platinum_armory",
+      "ceiling_m": 8.2,
+      "portal": {
+       "half_width_m": 1.65,
+       "height_m": 4.5
+      },
+      "room_envelope_m": {
+       "width": 10,
+       "depth": 10,
+       "ceiling": 8.2
+      },
+      "feature_ids": [
+       "MARKET_VAULT_RIBS",
+       "WEAPON_EMPTY_GALLERY",
+       "WEAPON_COUNTER"
+      ],
+      "description": "a contained rose-platinum market wing with tall vault ribs and a finished zero-stock weapon gallery"
+     },
+     "rules_17_23": false,
+     "_doc": "P8 zero-stock weapon shop (master §17): finished space, EMPTY catalog (SHOP_WEAPONS, ZERO_STOCK); weapon gameplay stays dormant until design approval."
+    },
+    "MATCH_HALL": {
+     "label": "MAH MATCH — official match hall (interior)",
+     "interior": true,
+     "size_m": 44,
+     "spawn": {
+      "x": 0,
+      "z": 17
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "MATCH_DOOR",
+      "x": 98,
+      "z": 6,
+      "facing": 0
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 19.6
+      },
+      "range_m": 2.8,
+      "requires": null,
+      "label": "EXIT — MATCH HALL doorway"
+     },
+     "platforms": [
+      {
+       "id": "MATCH_TIER_1_S",
+       "x1": -17,
+       "z1": -19,
+       "x2": 17,
+       "z2": -16,
+       "height": 0.8,
+       "label": "spectator tier 1"
+      },
+      {
+       "id": "MATCH_TIER_1_W",
+       "x1": -17,
+       "z1": -16,
+       "x2": -14,
+       "z2": 15,
+       "height": 0.8,
+       "label": "spectator tier 1"
+      },
+      {
+       "id": "MATCH_TIER_1_E",
+       "x1": 14,
+       "z1": -16,
+       "x2": 17,
+       "z2": 15,
+       "height": 0.8,
+       "label": "spectator tier 1"
+      },
+      {
+       "id": "MATCH_TIER_1_NW",
+       "x1": -17,
+       "z1": 12,
+       "x2": -1.6,
+       "z2": 15,
+       "height": 0.8,
+       "label": "spectator tier 1"
+      },
+      {
+       "id": "MATCH_TIER_1_NE",
+       "x1": 1.6,
+       "z1": 12,
+       "x2": 17,
+       "z2": 15,
+       "height": 0.8,
+       "label": "spectator tier 1"
+      },
+      {
+       "id": "MATCH_TIER_2_S",
+       "x1": -20,
+       "z1": -22,
+       "x2": 20,
+       "z2": -19,
+       "height": 1.6,
+       "label": "spectator tier 2"
+      },
+      {
+       "id": "MATCH_TIER_2_W",
+       "x1": -20,
+       "z1": -19,
+       "x2": -17,
+       "z2": 18,
+       "height": 1.6,
+       "label": "spectator tier 2"
+      },
+      {
+       "id": "MATCH_TIER_2_E",
+       "x1": 17,
+       "z1": -19,
+       "x2": 20,
+       "z2": 18,
+       "height": 1.6,
+       "label": "spectator tier 2"
+      },
+      {
+       "id": "MATCH_TIER_2_NW",
+       "x1": -20,
+       "z1": 15,
+       "x2": -1.6,
+       "z2": 18,
+       "height": 1.6,
+       "label": "spectator tier 2"
+      },
+      {
+       "id": "MATCH_TIER_2_NE",
+       "x1": 1.6,
+       "z1": 15,
+       "x2": 20,
+       "z2": 18,
+       "height": 1.6,
+       "label": "spectator tier 2"
+      }
+     ],
+     "targets": [],
+     "markers": [],
+     "interactables": [],
+     "ceiling_m": 8.5,
+     "flight_ceiling_m": 8.5,
+     "floor_levels": [],
+     "interior_plan": null,
+     "style_id": null,
+     "material_family": null,
+     "feature_ids": [],
+     "rules_17_23": true,
+     "no_dummy": true,
+     "practice_default": false,
+     "_doc": "JOB B (2026-09-19) + M5 owner correction: official matches / spectating; interior visuals = lab/world/matchHall.js; combat flows = existing PRACTICE_DUEL / TEAM_MATCH / SPECTATE (JOB A owns the match UI + forfeit) — GENERATED from lab/assets/world/world_registry_v1.json rooms_added by deploy/jobb/build_world_colliders.mjs",
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "solids": []
+    },
+    "TEMPLE_HALL": {
+     "label": "GOLD TEMPLE — vaulted rotunda",
+     "interior": true,
+     "size_m": 20,
+     "spawn": {
+      "x": 0,
+      "z": 7.6
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "TEMPLE_DOOR",
+      "x": 0,
+      "z": 165.55,
+      "facing": 0
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 9.2
+      },
+      "range_m": 2.2,
+      "requires": null,
+      "label": "EXIT — GOLD TEMPLE threshold"
+     },
+     "platforms": [
+      {
+       "id": "TEMPLE_ROTUNDA_DAIS",
+       "x1": -3,
+       "z1": -3.2,
+       "x2": 3,
+       "z2": 2.8,
+       "height": 0.35,
+       "label": "central gold rotunda dais"
+      }
+     ],
+     "targets": [],
+     "markers": [],
+     "interactables": [],
+     "ceiling_m": 11.5,
+     "flight_ceiling_m": 10.4,
+     "floor_levels": [
+      {
+       "id": "MAIN",
+       "y_m": 0,
+       "clear_height_m": 11.5,
+       "role": "ROTUNDA"
+      }
+     ],
+     "interior_plan": {
+      "plan_id": "TEMPLE_GOLD_ROTUNDA_V1",
+      "style_id": "ATHLETE_GOLD_VAULT",
+      "material_family": "gold_platinum",
+      "ceiling_m": 11.5,
+      "portal": {
+       "half_width_m": 2.2,
+       "height_m": 5.6
+      },
+      "room_envelope_m": {
+       "width": 20,
+       "depth": 20,
+       "ceiling": 11.5
+      },
+      "feature_ids": [
+       "GOLD_VAULT_COLUMNS",
+       "TEMPLE_ROTUNDA_DAIS",
+       "TEMPLE_HALO_RINGS"
+      ],
+      "description": "a tall gold-platinum rotunda with a central dais, vaulted halo rings and a clear threshold aisle"
+     },
+     "style_id": "ATHLETE_GOLD_VAULT",
+     "material_family": "gold_platinum",
+     "feature_ids": [
+      "GOLD_VAULT_COLUMNS",
+      "TEMPLE_ROTUNDA_DAIS",
+      "TEMPLE_HALO_RINGS"
+     ],
+     "rules_17_23": true,
+     "no_dummy": true,
+     "practice_default": false,
+     "_doc": "JOB B (2026-09-19) + M5 owner correction: M5 owner correction: contained 20 m rotunda, distinctive gold vault, 11.5 m visual ceiling and 10.4 m physical flight ceiling — GENERATED from lab/assets/world/world_registry_v1.json rooms_added by deploy/jobb/build_world_colliders.mjs",
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "solids": [
+      {
+       "id": "TEMPLE_COLUMN_NW",
+       "type": "BOX",
+       "x1": -7.1,
+       "x2": -6.3,
+       "z1": -3.4,
+       "z2": -2.6,
+       "y0": 0,
+       "h": 10.8,
+       "feature_id": "GOLD_VAULT_COLUMNS"
+      },
+      {
+       "id": "TEMPLE_COLUMN_NE",
+       "type": "BOX",
+       "x1": 6.3,
+       "x2": 7.1,
+       "z1": -3.4,
+       "z2": -2.6,
+       "y0": 0,
+       "h": 10.8,
+       "feature_id": "GOLD_VAULT_COLUMNS"
+      },
+      {
+       "id": "TEMPLE_COLUMN_SW",
+       "type": "BOX",
+       "x1": -7.1,
+       "x2": -6.3,
+       "z1": 3,
+       "z2": 3.8,
+       "y0": 0,
+       "h": 10.8,
+       "feature_id": "GOLD_VAULT_COLUMNS"
+      },
+      {
+       "id": "TEMPLE_COLUMN_SE",
+       "type": "BOX",
+       "x1": 6.3,
+       "x2": 7.1,
+       "z1": 3,
+       "z2": 3.8,
+       "y0": 0,
+       "h": 10.8,
+       "feature_id": "GOLD_VAULT_COLUMNS"
+      }
+     ]
+    },
+    "TOWER_HALL": {
+     "label": "BLUE TOWER — vertical atrium",
+     "interior": true,
+     "size_m": 14,
+     "spawn": {
+      "x": 0,
+      "z": 4.6
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "TOWER_DOOR",
+      "x": 102.65,
+      "z": 110,
+      "facing": -1.5708
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 6
+      },
+      "range_m": 2.2,
+      "requires": null,
+      "label": "EXIT — BLUE TOWER threshold"
+     },
+     "platforms": [],
+     "targets": [],
+     "markers": [],
+     "interactables": [],
+     "ceiling_m": 13,
+     "flight_ceiling_m": 11.7,
+     "floor_levels": [
+      {
+       "id": "MAIN",
+       "y_m": 0,
+       "clear_height_m": 13,
+       "role": "ATRIUM"
+      }
+     ],
+     "interior_plan": {
+      "plan_id": "TOWER_BLUE_ATRIUM_V1",
+      "style_id": "TITAN_BLUE_VERTICAL",
+      "material_family": "blue_platinum",
+      "ceiling_m": 13,
+      "portal": {
+       "half_width_m": 2,
+       "height_m": 5.2
+      },
+      "room_envelope_m": {
+       "width": 14,
+       "depth": 14,
+       "ceiling": 13
+      },
+      "feature_ids": [
+       "TOWER_ATRIUM_COLUMNS",
+       "TOWER_LUMEN_SPINE",
+       "TOWER_SUSPENDED_RINGS"
+      ],
+      "description": "a tall blue-platinum atrium with a luminous spine, suspended rings and a clear threshold aisle"
+     },
+     "style_id": "TITAN_BLUE_VERTICAL",
+     "material_family": "blue_platinum",
+     "feature_ids": [
+      "TOWER_ATRIUM_COLUMNS",
+      "TOWER_LUMEN_SPINE",
+      "TOWER_SUSPENDED_RINGS"
+     ],
+     "rules_17_23": true,
+     "no_dummy": true,
+     "practice_default": false,
+     "_doc": "JOB B (2026-09-19) + M5 owner correction: M5 owner correction: contained 14 m vertical atrium, distinctive Titan identity, 13 m visual ceiling and 11.7 m physical flight ceiling — GENERATED from lab/assets/world/world_registry_v1.json rooms_added by deploy/jobb/build_world_colliders.mjs",
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "solids": [
+      {
+       "id": "TOWER_COLUMN_NW",
+       "type": "BOX",
+       "x1": -5,
+       "x2": -4.35,
+       "z1": -4.2,
+       "z2": -3.55,
+       "y0": 0,
+       "h": 12.2,
+       "feature_id": "TOWER_ATRIUM_COLUMNS"
+      },
+      {
+       "id": "TOWER_COLUMN_NE",
+       "type": "BOX",
+       "x1": 4.35,
+       "x2": 5,
+       "z1": -4.2,
+       "z2": -3.55,
+       "y0": 0,
+       "h": 12.2,
+       "feature_id": "TOWER_ATRIUM_COLUMNS"
+      },
+      {
+       "id": "TOWER_COLUMN_SW",
+       "type": "BOX",
+       "x1": -5,
+       "x2": -4.35,
+       "z1": 2.6,
+       "z2": 3.25,
+       "y0": 0,
+       "h": 12.2,
+       "feature_id": "TOWER_ATRIUM_COLUMNS"
+      },
+      {
+       "id": "TOWER_COLUMN_SE",
+       "type": "BOX",
+       "x1": 4.35,
+       "x2": 5,
+       "z1": 2.6,
+       "z2": 3.25,
+       "y0": 0,
+       "h": 12.2,
+       "feature_id": "TOWER_ATRIUM_COLUMNS"
+      }
+     ]
+    },
+    "CIVIC_TRAINING_HALL": {
+     "label": "TRAINING HALL — civic orientation shell",
+     "interior": true,
+     "size_m": 20,
+     "spawn": {
+      "x": 0,
+      "z": 7
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "CIVIC_TRAINING_DOOR",
+      "x": -17,
+      "z": 0,
+      "facing": 1.5708
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 8.4
+      },
+      "range_m": 2.6,
+      "requires": null,
+      "label": "EXIT — TRAINING HALL doorway"
+     },
+     "platforms": [],
+     "targets": [],
+     "markers": [],
+     "interactables": [],
+     "ceiling_m": 7.5,
+     "flight_ceiling_m": 7.5,
+     "floor_levels": [],
+     "interior_plan": null,
+     "style_id": null,
+     "material_family": null,
+     "feature_ids": [],
+     "rules_17_23": true,
+     "no_dummy": true,
+     "practice_default": false,
+     "_doc": "JOB B (2026-09-19) + M5 owner correction: M4 honest safe shell behind the original plaza façade; the bespoke GYM remains the equipment/training destination — GENERATED from lab/assets/world/world_registry_v1.json rooms_added by deploy/jobb/build_world_colliders.mjs",
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "solids": []
+    },
+    "CIVIC_ARENA_HALL": {
+     "label": "ARENA DOME — civic orientation shell",
+     "interior": true,
+     "size_m": 22,
+     "spawn": {
+      "x": 0,
+      "z": 8
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "CIVIC_ARENA_DOOR",
+      "x": 0,
+      "z": -19.5,
+      "facing": 0
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 9.4
+      },
+      "range_m": 2.6,
+      "requires": null,
+      "label": "EXIT — ARENA DOME doorway"
+     },
+     "platforms": [],
+     "targets": [],
+     "markers": [],
+     "interactables": [],
+     "ceiling_m": 8.5,
+     "flight_ceiling_m": 8.5,
+     "floor_levels": [],
+     "interior_plan": null,
+     "style_id": null,
+     "material_family": null,
+     "feature_ids": [],
+     "rules_17_23": true,
+     "no_dummy": true,
+     "practice_default": false,
+     "_doc": "JOB B (2026-09-19) + M5 owner correction: M4 honest safe shell; MAH MATCH remains the only functional match building — GENERATED from lab/assets/world/world_registry_v1.json rooms_added by deploy/jobb/build_world_colliders.mjs",
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "solids": []
+    },
+    "CIVIC_MENTOR_HALL": {
+     "label": "MENTOR SPIRE — civic orientation shell",
+     "interior": true,
+     "size_m": 16,
+     "spawn": {
+      "x": 0,
+      "z": 5
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "CIVIC_MENTOR_DOOR",
+      "x": 18,
+      "z": 0,
+      "facing": -1.5708
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 6.4
+      },
+      "range_m": 2.6,
+      "requires": null,
+      "label": "EXIT — MENTOR SPIRE doorway"
+     },
+     "platforms": [],
+     "targets": [],
+     "markers": [],
+     "interactables": [],
+     "ceiling_m": 7,
+     "flight_ceiling_m": 7,
+     "floor_levels": [],
+     "interior_plan": null,
+     "style_id": null,
+     "material_family": null,
+     "feature_ids": [],
+     "rules_17_23": true,
+     "no_dummy": true,
+     "practice_default": false,
+     "_doc": "JOB B (2026-09-19) + M5 owner correction: M4 honest safe shell; no fabricated mentor quest system — GENERATED from lab/assets/world/world_registry_v1.json rooms_added by deploy/jobb/build_world_colliders.mjs",
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "solids": []
+    },
+    "CIVIC_EXCHANGE_HALL": {
+     "label": "MAHGIC EXCHANGE — information shell",
+     "interior": true,
+     "size_m": 18,
+     "spawn": {
+      "x": 0,
+      "z": 6
+     },
+     "facing_in": 0,
+     "door": {
+      "room": "FIELD",
+      "interactable": "CIVIC_EXCHANGE_DOOR",
+      "x": 1,
+      "z": 20,
+      "facing": 3.1416
+     },
+     "exit": {
+      "to": "FIELD",
+      "position": {
+       "x": 0,
+       "z": 7.4
+      },
+      "range_m": 2.6,
+      "requires": null,
+      "label": "EXIT — MAHGIC EXCHANGE doorway"
+     },
+     "platforms": [],
+     "targets": [],
+     "markers": [],
+     "interactables": [],
+     "ceiling_m": 7,
+     "flight_ceiling_m": 7,
+     "floor_levels": [],
+     "interior_plan": null,
+     "style_id": null,
+     "material_family": null,
+     "feature_ids": [],
+     "rules_17_23": true,
+     "no_dummy": true,
+     "practice_default": false,
+     "_doc": "JOB B (2026-09-19) + M5 owner correction: M4 honest information shell; explicitly no economy, sale, trade, price or payment UI — GENERATED from lab/assets/world/world_registry_v1.json rooms_added by deploy/jobb/build_world_colliders.mjs",
+     "dummy_position": {
+      "x": 0,
+      "z": -2
+     },
+     "solids": []
+    }
+   },
+   "tutorial": {
+    "steps": [
+     "MOVE",
+     "FLY_AND_LAND",
+     "BASIC_ATTACK"
+    ],
+    "move_distance_m": 1.5,
+    "_doc": "event-driven: MOVE observes an accepted MOVE plus ≥ move_distance_m travelled; FLY_AND_LAND observes a powered takeoff followed by a landing; BASIC_ATTACK observes ATTACK_MAIN_IMPACT on the room target; then the exit unlocks"
+   },
+   "quests": {
+    "first_guided": {
+     "quest_id": "Q_FIRST_GUIDED_PLAZA",
+     "guided": true,
+     "families": [
+      "SPORT_ACTIVITY",
+      "ABILITY_JOURNEY"
+     ],
+     "objectives": [
+      {
+       "id": "PRACTICE_3_PATTERN_HITS",
+       "family": "SPORT_ACTIVITY",
+       "count": 3
+      },
+      {
+       "id": "UNFUSE_AND_REACH_FAR_MARKER",
+       "family": "ABILITY_JOURNEY"
+      }
+     ],
+     "character_xp": 20,
+     "_doc": "development sample: one guided quest offered on entering the plaza; character XP through an isolated idempotent QUEST receipt"
+    },
+    "next_unguided": {
+     "quest_id": "Q_NEXT_UNGUIDED_SAMPLE",
+     "guided": false,
+     "families": [
+      "SPORT_ACTIVITY"
+     ],
+     "objectives": [
+      {
+       "id": "PRACTICE_5_PATTERN_HITS",
+       "family": "SPORT_ACTIVITY",
+       "count": 5
+      }
+     ],
+     "character_xp": 10
+    }
+   },
+   "aim": {
+    "cone_deg": 60,
+    "contact_range_m": 3.5,
+    "ranged_range_m": 12,
+    "_doc": "development tolerances (no snap-to-target); the authoritative attack query uses the fighter's facing + range; camera orbit never changes facing"
+   },
+   "duel_start_positions": {
+    "a": {
+     "x": 0,
+     "z": 1.5
+    },
+    "b": {
+     "x": 0,
+     "z": -1.5
+    }
+   },
+   "guards": {
+    "physical_vs_physical_multiplier": 0.5,
+    "physical_vs_magic_multiplier": 1.0,
+    "magical_vs_physical_multiplier": 1.0,
+    "magical_vs_eligible_magic": "DISSIPATE",
+    "magic_close_range_m": 3.0,
+    "magic_close_range_multiplier": 0.75,
+    "attack_classes": {
+     "CONTACT": "PHYSICAL",
+     "LONG_RANGE": "MAGIC"
+    },
+    "dissipates_on_magic_guard": [
+     "ATHLETE_BILATERAL_UPRIGHT_ROW_MANIFESTATION"
+    ],
+    "_doc": "development matrix: correct magical guard dissipates eligible magic; physical guard halves physical; physical guard has NO magic immunity; close-range magic weaker than long-range. Exact parry windows / coefficients OPEN"
+   },
+   "dash": {
+    "cost_combat_mahgic": 8,
+    "profiles": {
+     "TITAN": {
+      "distance_m": 3.6,
+      "duration_s": 0.5
+     },
+     "BAGE": {
+      "distance_m": 4.6,
+      "duration_s": 0.42
+     },
+     "VISIONARY": {
+      "distance_m": 5.3,
+      "duration_s": 0.36
+     },
+     "ATHLETE": {
+      "distance_m": 6.0,
+      "duration_s": 0.34
+     },
+     "LEAN": {
+      "distance_m": 7.4,
+      "duration_s": 0.26
+     }
+    },
+    "_doc": "owner 2026-09-17: a more dramatic dash (~1.75x the S07 distances, slightly longer bursts). Short combat burst per class (Titan weakest/slowest, Lean strongest/fastest, others distinct); outside combat + grounded the broader traversal dash is mahloco DASH; airborne dash spends Combat MAHGIC, no floor impact"
+   },
+   "flight": {
+    "pool_id": "FLIGHT_MAHGIC",
+    "climb_rate_mps": 6.5,
+    "air_speed_factor": 1.15,
+    "boost_factor": 1.3,
+    "_doc_boost": "owner interjection 2026-09-18 phase D (flight boost): the `+` SPEED toggle (MOVE fast / run) in POWERED flight = BOOST = cruise x boost_factor, where cruise = the canonical band top x air_speed_factor exactly as before. PROVISIONAL: one centralized adjustable number, not a measured reference value. Ground travel is unchanged.",
+    "warning_fraction": 0.25,
+    "descent_max_mps": 9.0,
+    "descent_accel_mps2": 12.0,
+    "vertical_brake_mps2": 20.0,
+    "hold_gain_per_s": 3.0,
+    "forced_unpowered_descent_mps": 3.0,
+    "epsilon_s": 0.05,
+    "_doc": "separate flight pool (same numbers as the resource block until named/tuned, OD-06); at ≤ warning_fraction the low-energy controller derives a descent speed from remaining height / remaining powered seconds; at zero energy a visibly forced controlled unpowered landing (DEVELOPMENT FALLBACK pending owner policy); no flight during active PvP; taking flight in PvE interrupts the active attack sequence; landing_margin_s = the controller aims to touch down that many powered seconds BEFORE the pool is empty so a low-altitude flyer lands under power",
+    "landing_margin_s": 0.75,
+    "_doc_o4": "O4 (convergence 2026-09-17): HOLD the ascent control = take off + climb; RELEASE = intent 0 → the host captures hold_alt = altitude + vz·|vz| / (2·vertical_brake_mps2) (the explicit stop distance: 1.06 m from a full 6.5 m/s climb) and settles on it with hold_gain_per_s; residual tolerance is measured by deploy/probe_flight_o4.mjs, not declared zero. Looking up/down never changes altitude (the Spec B camera-pitch rule is removed).",
+    "brake_decel_mps2": 55,
+    "brake": {
+     "_doc": "owner B7 2026-09-20 §1: the flight brake is a ONE-SHOT event on the joystick active→neutral edge at ≥ trigger_x of the cruise speed (flight.brake_seq / brake_x in the snapshot); cooldown_s blocks a second event, and the edge rule means no re-trigger until movement input resumed; the animator plays its envelope once per seq",
+     "trigger_x": 0.7,
+     "cooldown_s": 0.6
+    },
+    "_doc_brake": "owner next-pass 2026-09-20 §2: releasing the stick in POWERED flight decelerates at brake_decel_mps2 (cruise 20.6 m/s → 0 in ~0.37 s, boost 26.8 → ~0.49 s) instead of the ground decel — the presentation runs its braking transition over the same window; altitude is untouched (the one-button FLY logic stays authoritative)"
+   },
+   "skills": {
+    "train_xp_per_hit": 5,
+    "workout_xp_per_unit": 5,
+    "workout_multiplier_example": 3,
+    "_doc": "movement-pattern SKILL XP is separate from character XP; in-game training awards train_xp_per_hit per room hit; the synthetic MAHFITT adapter awards units × workout_xp_per_unit × multiplier (3 = labelled development example inside the owner's 3–5 range). Skill → stat conversion OPEN; character XP never comes from workouts"
+   },
+   "loadout": {
+    "initial_slots": 4,
+    "ui_slot_cap": 8,
+    "fixture_slots_allowed": [
+     4,
+     6,
+     8
+    ],
+    "_doc": "four equipped patterns initially; UI capable of eight; milestone unlocks OPEN — fixture slot counts are display-only and grant nothing; loadout changes only outside a duel (pre-fight) for the demonstration"
+   },
+   "transform": {
+    "_doc": "form change costs come from mahloco's runtime config (unfuse_mahgic_cost 35 / refuse_mahgic_cost 5, Combat MAHGIC) — existing compatible tuning reused; the owner's 5–10 % of a major attack reference is NOT applied yet (OPEN)"
+   },
+   "emotes": {
+    "WAVE": {
+     "cooldown_s": 1.0
+    },
+    "NOD": {
+     "cooldown_s": 1.0
+    },
+    "READY": {
+     "cooldown_s": 1.0
+    },
+    "APPLAUD": {
+     "cooldown_s": 1.0
+    },
+    "THUMBS_UP": {
+     "cooldown_s": 1.0
+    },
+    "BECKON": {
+     "cooldown_s": 1.0
+    },
+    "MAH_GROOVE": {
+     "cooldown_s": 1.0
+    },
+    "SIDE_GLIDE": {
+     "cooldown_s": 1.0
+    },
+    "UPRIGHT_ROW_DEMO": {
+     "cooldown_s": 1.0
+    },
+    "HORIZONTAL_PUSH_DEMO": {
+     "cooldown_s": 1.0
+    },
+    "HIP_HINGE_DEMO": {
+     "cooldown_s": 1.0
+    },
+    "SQUAT_DEMO": {
+     "cooldown_s": 1.0
+    },
+    "DOUBLE_BICEPS": {
+     "cooldown_s": 1.0
+    },
+    "FRONT_LAT_SPREAD": {
+     "cooldown_s": 1.0
+    },
+    "SIDE_CHEST": {
+     "cooldown_s": 1.0
+    },
+    "BACK_LAT_SPREAD": {
+     "cooldown_s": 1.0
+    },
+    "SHRUG": {
+     "cooldown_s": 1.0
+    },
+    "QUIET_LAUGH": {
+     "cooldown_s": 1.0
+    },
+    "FIST_BUMP": {
+     "cooldown_s": 1.0
+    },
+    "HIGH_FIVE": {
+     "cooldown_s": 1.0
+    },
+    "PAIRED_GROOVE": {
+     "cooldown_s": 1.0
+    },
+    "PERCH": {
+     "cooldown_s": 0.5
+    }
+   },
+   "presence": {
+    "broadcast_positions": true
+   },
+   "movement": {
+    "accel_mps2": 14,
+    "decel_mps2": 40,
+    "harmonize_fused_ground_to_split": true,
+    "_doc_identity": "CONVERGENCE addendum (2026-09-17, WALK IDENTITY ACROSS LEG STATES): fused and separated share one locomotion identity — the separated walk is the target and the fused GROUND travel harmonizes to it, so the fused glide uses the SPLIT band (walk 3.58 m/s, `+` = run 6.71 m/s) instead of the canonical FUSED 8.94–17.88 m/s band; powered flight keeps the canonical FUSED band top (20.6 m/s with the air factor). false = the canonical bands (rollback in one line).",
+    "_doc": "room-play integrator only: velocity ramps toward the canonical band speed (smooth accel/decel, owner rule 14) — the duel host integrator is untouched; the view also eases presentation"
+   },
+   "navigation": {
+    "range_m": 30,
+    "range_status": "PROVISIONAL",
+    "arrive_radius_m": 0.35,
+    "waypoint_radius_m": 0.7,
+    "grid_m": 1.0,
+    "sample_m": 0.4,
+    "max_expansions": 4000,
+    "step_max_m": 0.6,
+    "snap_m": 1.5,
+    "body_height_m": 1.7,
+    "stuck_s": 1.2,
+    "stuck_progress_m": 0.12,
+    "max_replans": 1,
+    "_doc": "owner 2026-09-18 section 4: nearby click / tap-to-move. range_m is measured from the PLAYER (never from the camera ray origin) and is an explicitly PROVISIONAL starting value inside the owner's requested 20-35 m band (no approved value existed in the register; 30 is NOT a measured reference-game number). Range validation is separate from path length and from the bounded search budget (max_expansions). The plan runs over the same colliders / ground the integrator uses; the walker uses the ordinary moveVec, speed band, accel / decel and sliding - never a teleport or a position tween. step_max_m = the largest support-height change between adjacent route samples (a step or ramp is fine, a drop or a rise onto a deck is not). snap_m bounds the search for nearby free ground when the tapped point itself is blocked (the accepted, snapped point is what the marker shows). One re-plan when stuck, then a clear stop."
+   },
+   "field": {
+    "health": 100,
+    "incoming": {
+     "PHYSICAL": "ATHLETE_HORIZONTAL_PUSH_BASIC",
+     "MAGIC": "ATHLETE_BILATERAL_UPRIGHT_ROW_MANIFESTATION"
+    },
+    "dummy_pool_id": "FIELD_DUMMY_MAHGIC",
+    "_doc": "stage-1 mechanics field (owner AFK prompts 2026-09-14): synthetic, isolated practice. FIELD_INCOMING makes the practice dummy launch ONE deterministic existing attack at the player through the real attack execution + guard modifier path into a synthetic field health pool; PRACTICE_RESET restores field health, room targets, both pools and position — never saves, rewards, progression, receipts or duel sessions; with rules_17_23 the field's combat (health, energy, attacks, guards, effects, teams) runs through play/rules1723 (ruleset MW_DEV_2026_09_14_R17_23_V0_1); FIELD_INCOMING kinds PHYSICAL / MIXED / MAGIC use PA_PUSH / PM_PUSH / ATHLETE_VECTOR from the practice dummy"
+   },
+   "defeat": {
+    "respawn_s": 2.8,
+    "safe_sample_s": 4,
+    "safe_clear_m": 22,
+    "_doc": "owner next-pass 2026-09-20 §20: the demo defeat loop — HP 0 outside a match round shows a defeat state for respawn_s, then the player respawns at the last validated safe point (sampled every safe_sample_s while grounded, out of water, no wild creature within safe_clear_m, not hit for 8 s; room spawn fallback) with HP / energy restored; no penalties"
+   }
+  }
+ },
+ "equipment": {
+  "_doc": "owner B8 §10–§15 (2026-09-20): the guide EQUIPMENT MANIFESTATION system + the MAHGIC economy — every number here is data (PROVISIONAL balance), never a literal in behaviour code. Manifest = Mrs. Mah casts (cast_s) and the equipment materialises in front of the player; floating dumbbells populate the gear SPECIAL layer; a tapped dumbbell is HELD (physical attacks x held_damage_multiplier where applicable); the barbell materialises on the ground; the band manifests only (no move set yet — owner decision). Guide charge fills ONLY from verified damage dealt through the gear specials; full = a dispense of refill collectibles. Combat / Special MAHGIC never regenerates passively — the refill collectibles (bush patches, the guide charge, inventory) are the economy.",
+  "manifest": {
+   "DUMBBELL": {
+    "cost_by_count": [
+     20,
+     30,
+     42
+    ],
+    "count_max": 3,
+    "third_requires_magic_affinity": 2,
+    "cast_s": 1.1,
+    "forward_m": 0.95,
+    "height_m": 1.45,
+    "spacing_m": 0.5,
+    "hover_amp_m": 0.04,
+    "follow_mps": 3.0
+   },
+   "BARBELL": {
+    "cost": 36,
+    "cast_s": 1.3,
+    "forward_m": 1.7,
+    "height_m": 0.34,
+    "ground": true
+   },
+   "BAND": {
+    "cost": 15,
+    "cast_s": 0.9,
+    "forward_m": 1.15,
+    "height_m": 1.05,
+    "tube_radius_m": 0.018,
+    "length_m": 1.3
+   }
+  },
+  "class_magic_affinity": {
+   "ATHLETE": 1,
+   "TITAN": 1,
+   "LEAN": 1,
+   "VISIONARY": 2,
+   "BAGE": 3
+  },
+  "telekinesis": {
+   "ATHLETE": true,
+   "TITAN": true,
+   "LEAN": true,
+   "VISIONARY": true,
+   "BAGE": true
+  },
+  "held_damage_multiplier": 1.8,
+  "held_applicable": {
+   "categories": [
+    "PHYSICAL"
+   ],
+   "patterns": [
+    "HORIZONTAL_PUSH",
+    "VERTICAL_PULL",
+    "ROTATION",
+    "CURL",
+    "VERTICAL_PUSH"
+   ],
+   "_doc": "where applicable: only the physical exercises a held dumbbell actually loads (the hinge stays a bodyweight / barbell pattern); MAHGIC categories and unrelated sources are never multiplied"
+  },
+  "dismiss": {
+   "walk_away_m": 14,
+   "idle_s": 120,
+   "incompatible_manifest": "reclaim"
+  },
+  "pickup": {
+   "tap_radius_m": 2.4,
+   "cost": 0
+  },
+  "guide_charge": {
+   "full_at_damage": 1500,
+   "reward_refills": 3,
+   "dispense_radius_m": 1.6,
+   "_doc": "NOT a level, NOT XP: fills only from verified damage dealt through the manifested equipment specials (misses and casts add nothing); full → Mrs. Mah dispenses reward_refills collectibles and the charge rolls over"
+  },
+  "refill": {
+   "amount": 60,
+   "inventory_cap": 999,
+   "pickup_radius_m": 1.4,
+   "lifetime_s": 150,
+   "_doc": "restores COMBAT / SPECIAL MAHGIC; at full MAHGIC the item goes to inventory (cap 999, an overflow stays on the ground); USE_REFILL consumes one stored item"
+  },
+  "bush": {
+   "hits_to_break": 2,
+   "drops": [
+    2,
+    3
+   ],
+   "respawn_s": 90,
+   "lock_acquire_m": 30,
+   "_doc": "the crystal-bush resource patches (registry resource_patches) are lockable destructible NODES (team NODE, passive, never aggro) — hp = hits_to_break × the baseline player hit"
+  },
+  "specials": {
+   "ATHLETE_X_WAVE": {
+    "requires": {
+     "floating": "DUMBBELL",
+     "count": 2
+    },
+    "classes": [
+     "ATHLETE"
+    ]
+   },
+   "ATHLETE_TELEKINETIC_CLAMP": {
+    "requires": {
+     "floating": "DUMBBELL",
+     "count": 2
+    },
+    "classes": [
+     "ATHLETE"
+    ]
+   },
+   "BARBELL_PLATE_SHOT": {
+    "requires": {
+     "floating": "BARBELL",
+     "count": 1
+    },
+    "classes": [
+     "ATHLETE",
+     "TITAN",
+     "LEAN",
+     "VISIONARY",
+     "BAGE"
+    ]
+   },
+   "ATHLETE_BARBELL_PRESS_THROW": {
+    "requires": {
+     "floating": "BARBELL",
+     "count": 1
+    },
+    "classes": [
+     "ATHLETE"
+    ]
+   }
+  }
+ }
+}

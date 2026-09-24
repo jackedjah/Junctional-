@@ -1,0 +1,26 @@
+{
+  "schema": "MAHWORLD_CHECKPOINT_V1",
+  "checkpoint": "M5_OWNER_CORRECTIONS_03_PROTECTED_CANDIDATE",
+  "created_at": "2026-09-23T22:55:19.9572385Z",
+  "build": "ASTRA_M5C_PRIVATE_20260923",
+  "deploy_id": "6ab454bf3a60c4bf88b1334a",
+  "private_url": "https://6ab454bf3a60c4bf88b1334a--mahworld-test-preview.netlify.app",
+  "release_record": "25_HANDOFF/CONVERGENCE/astra_m5_corrections/private_candidate_release.json",
+  "release_record_sha256": "d33bc948b51e2b4dd89bff61654c20b4ec3ed6ab95587b9351bcada460d9a850",
+  "package": {
+    "archive_sha256": "9eb0816871a258a408a7b453e8d4982dc851708a48eccd90e2411494ac9d1571",
+    "record_sha256": "99fdc974b655473b9c2cea8d47353dc813752d9b939161d365f423d3528d7159",
+    "test_programs": 56,
+    "checks_passed": 1518,
+    "fresh_extraction_smoke": "7/7"
+  },
+  "deployment": {
+    "state": "ready",
+    "context": "deploy-preview",
+    "published_at": null,
+    "password_gate": true,
+    "production_unchanged": "6aac25101f17ce5ed37166e4",
+    "comparison_candidate_unchanged": "6ab3abd739fc958c75339988"
+  },
+  "remaining_acceptance": "Physical-phone owner acceptance pending."
+}

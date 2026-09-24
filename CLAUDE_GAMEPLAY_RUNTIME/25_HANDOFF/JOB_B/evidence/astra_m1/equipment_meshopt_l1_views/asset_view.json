@@ -1,0 +1,70 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\equipment_meshopt\\barbell_meshopt_12k_1k.glb",
+  "bytes": 2003436,
+  "load_ms": 51,
+  "size_m": [
+   0.982,
+   0.337,
+   0.367
+  ],
+  "triangles": 11995,
+  "meshes": 1,
+  "shots": {
+   "front": "barbell_meshopt_12k_1k_front.png",
+   "q34": "barbell_meshopt_12k_1k_q34.png",
+   "side": "barbell_meshopt_12k_1k_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\25_HANDOFF\\JOB_B\\evidence\\astra_m1\\equipment_meshopt\\dumbbell_meshopt_12k_1k.glb",
+  "bytes": 1965964,
+  "load_ms": 32,
+  "size_m": [
+   0.983,
+   0.354,
+   0.381
+  ],
+  "triangles": 12000,
+  "meshes": 1,
+  "shots": {
+   "front": "dumbbell_meshopt_12k_1k_front.png",
+   "q34": "dumbbell_meshopt_12k_1k_q34.png",
+   "side": "dumbbell_meshopt_12k_1k_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\gym_barbell\\MAHWORLD_GYM_BARBELL_L1.glb",
+  "bytes": 1855484,
+  "load_ms": 48,
+  "size_m": [
+   0.982,
+   0.338,
+   0.368
+  ],
+  "triangles": 12000,
+  "meshes": 1,
+  "shots": {
+   "front": "MAHWORLD_GYM_BARBELL_L1_front.png",
+   "q34": "MAHWORLD_GYM_BARBELL_L1_q34.png",
+   "side": "MAHWORLD_GYM_BARBELL_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\gym_dumbbell\\MAHWORLD_GYM_DUMBBELL_L1.glb",
+  "bytes": 1490964,
+  "load_ms": 53,
+  "size_m": [
+   0.982,
+   0.353,
+   0.382
+  ],
+  "triangles": 12000,
+  "meshes": 1,
+  "shots": {
+   "front": "MAHWORLD_GYM_DUMBBELL_L1_front.png",
+   "q34": "MAHWORLD_GYM_DUMBBELL_L1_q34.png",
+   "side": "MAHWORLD_GYM_DUMBBELL_L1_side.png"
+  }
+ }
+]

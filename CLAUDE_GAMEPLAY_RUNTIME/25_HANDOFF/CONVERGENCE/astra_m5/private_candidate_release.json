@@ -1,0 +1,140 @@
+{
+  "candidate": "ASTRA_M5_PRIVATE_20260923",
+  "source": {
+    "branch": "master",
+    "head": "3185a25f80a23131fbdb2062fca9a1a1ffb7684f",
+    "worktree_clean": false,
+    "provenance": "same preserved, intentionally uncommitted M1-M5 gameplay worktree"
+  },
+  "package": {
+    "archive": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M5_PRIVATE_20260923.zip",
+    "record": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M5_PRIVATE_20260923.PACKAGE.json",
+    "built": "2026-09-23T10:29:58.573Z",
+    "package_stamp": "2026-09-23T10:32:03.979Z",
+    "entries": 175,
+    "bytes": 65008929,
+    "sha256": "ebcad0ed993899f66c7477a1b3f1cde57740b32047fd0c02b60cf71e85055995",
+    "test_programs": 51,
+    "test_checks_passed": 1461,
+    "test_failures": 0,
+    "built_in_fresh_extraction_smoke": "7/7",
+    "second_extraction_smoke": "7/7",
+    "js_files_checked": 102,
+    "private_content_scan": "clean",
+    "secret_scan": "clean"
+  },
+  "deployment": {
+    "site_id": "968f80e5-889b-43a8-b2cd-5860c588546a",
+    "site_name": "mahworld-test-preview",
+    "deploy_id": "6ab3abd739fc958c75339988",
+    "url": "https://6ab3abd739fc958c75339988--mahworld-test-preview.netlify.app",
+    "state": "ready",
+    "context": "deploy-preview",
+    "published_at": null,
+    "edge_functions_present": true,
+    "production_promoted": false,
+    "alias_created": false
+  },
+  "gate": {
+    "root": {
+      "status": 303,
+      "location": "claude_gameplay_runtime/26_local_authority/lab/play?field=1",
+      "cache_control": "no-store"
+    },
+    "play": {
+      "status": 401,
+      "content_type": "text/html; charset=utf-8",
+      "password_form": true,
+      "cache_control": "no-store"
+    },
+    "protected_assets": [
+      "/claude_gameplay_runtime/26_local_authority/lab/play.js",
+      "/BUILD_INFO.json",
+      "/claude_gameplay_runtime/26_local_authority/lab/assets/athlete_m_preview/dev_0.16/Mah_Athlete_M_am08_v8.glb"
+    ],
+    "protected_asset_result": "401 application/json DEMO_LOGIN_REQUIRED no-store",
+    "authorized_hosted_load": "not run: MAHDEMO_PW unavailable in this environment"
+  },
+  "production_after": {
+    "deploy_id": "6aac25101f17ce5ed37166e4",
+    "state": "ready",
+    "context": "production",
+    "published_at": "2026-09-17T17:36:28.139Z",
+    "edge_functions_present": true,
+    "unchanged": true
+  },
+  "acceptance": {
+    "candidate_route": {
+      "report": "25_HANDOFF/CONVERGENCE/astra_m5/candidate_route_release_final_green/m5_candidate_route.json",
+      "passed": 20,
+      "failed": 0,
+      "route_records": 65,
+      "required_waypoints": 54,
+      "screenshots": 35,
+      "duration_ms": 563182
+    },
+    "targeting_desktop": {
+      "report": "25_HANDOFF/CONVERGENCE/astra_m5/targeting_current/targeting.json",
+      "passed": 25,
+      "failed": 0
+    },
+    "targeting_mobile": {
+      "report": "25_HANDOFF/CONVERGENCE/astra_m5/targeting_release_mobile/targeting.json",
+      "passed": 25,
+      "failed": 0,
+      "direct_lock_fallback": false
+    },
+    "phone_emulated_soak": {
+      "report": "25_HANDOFF/CONVERGENCE/astra_m5/soak_phone_emulated_final/stability.json",
+      "requested_seconds": 900,
+      "observed_seconds": 899.6,
+      "samples": 828,
+      "cpu_throttle": 4,
+      "tier": "MED",
+      "viewport": "393x852",
+      "phase_tags": 35,
+      "context_lost": 0,
+      "context_restored": 0,
+      "authority_errors": 0,
+      "authority_rejections": 0,
+      "page_errors": 0,
+      "console_errors": 0,
+      "console_warnings": 4,
+      "ended_early": false,
+      "frame_ms": {
+        "p50": 66.6,
+        "p95": 100,
+        "p99": 149.4,
+        "max": 5179
+      }
+    },
+    "floor_flicker": {
+      "depth_bits": 24,
+      "desktop_max_percent": {
+        "causeway_north": 0.005,
+        "plaza_edge_east": 0.286,
+        "forecourt_gym": 0.201
+      },
+      "mobile_max_percent": {
+        "causeway_north": 0,
+        "plaza_edge_east": 0.311,
+        "forecourt_gym": 0
+      }
+    }
+  },
+  "discarded_draft": {
+    "deploy_id": "6ab3ab7278d1a76f04a20009",
+    "reason": "first no-build upload omitted the edge gate",
+    "published_at": null,
+    "deleted": true
+  },
+  "limitations": [
+    "Physical-phone acceptance remains pending the owner's actual device test.",
+    "The 4x CPU emulation is not a physical GPU, thermal, memory, or 30 fps claim.",
+    "Authorized hosted loading could not be run without MAHDEMO_PW; only the unauthenticated protection boundary is proven remotely.",
+    "Renderer-wide resource counts compare different streamed world states and do not establish zero retained growth; repeat-room owned teardown is asserted exactly.",
+    "The controller route proves its exact waypoints and collision path, not every metre of every road footprint.",
+    "Resistance-band behavior remains manifest/render/dismiss-only pending owner-approved moves.",
+    "Raw ornate-temple source parity remains unavailable because its source GLB is absent."
+  ]
+}

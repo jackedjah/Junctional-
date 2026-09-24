@@ -1,0 +1,76 @@
+MAHWORLD REFERENCE MAP
+
+CURRENT MAP / WORLD
+
+references/current_map_overview.jpeg
+- Shows the current high-level world/map arrangement, central hub, isolated land/island shapes, current tree masses, bridges/paths, mountain silhouettes, and the amount of blue/water/empty space.
+- Use this to PRESERVE what already works while correcting the empty/flat/monochrome feel.
+- Key owner criticism: the water amount can work, but there is not enough meaningful land mass/content to justify it.
+
+references/current_water_views_01.jpeg
+references/current_water_views_02.jpeg
+- Show the current near-water look, horizon, mountain shapes, bridge silhouettes, and current water/shore contact.
+- Key owner criticism: sky, water, ground, and distant terrain currently feel too flat/stale/repetitive.
+
+references/current_tree_crop.jpeg
+- Close crop of the current tree family from the supplied map screenshots.
+- Key owner change: trunk + major structural boughs should become a clean finished platinum / heat-grey metallic structure with controlled reflectiveness.
+- Keep diamond/crystal treatment mainly for branch extremities, foliage, crystal growths, and selected tips.
+- Do NOT leave the whole trunk/branch skeleton covered in visually noisy diamond facets.
+
+FAIRY / GUIDE
+
+references/fairy_scale_reference.jpeg
+- The tiny floating companion in the background is the APPARENT-SIZE reference.
+- Mrs. Mah guide/fairy should read at roughly 3x that companion's apparent visual footprint from a comparable gameplay camera distance.
+- This is a SCREEN-PRESENCE target, not a blind 3x world-scale multiplier.
+- Mr. Mah should use the same reusable guide framework.
+
+WATER MOTION
+
+references/water_motion_reference.mp4
+references/water_motion_frames.png
+- Study the CATEGORY of responsive water: localized disturbances, traveling ripples/wave rings, surface highlight changes, environmental liveliness, and object/water contact.
+- Build an ORIGINAL MAHWORLD solution using the project's Three.js/runtime architecture.
+- Do not copy third-party assets/code/materials/audio/level geometry.
+
+LOCAL GLB FOLDERS — DO NOT ASK THE OWNER TO RE-UPLOAD WITHOUT CHECKING
+
+GLB_PHASE_AB/
+- Existing project GLBs already stored locally from earlier phases.
+
+GLB_NEW3/
+- fish.glb
+- horse.glb
+- golden phoenix 3d model.glb
+
+Claude must inspect the actual files before assuming rig, animation, scale, orientation, material, or topology details.
+The owner expects rigging/required details to be embedded when available, but the files themselves are authoritative.
+
+CREATURE INTENT
+
+DOGKIE
+- Existing forest creature.
+- Fightable in the world.
+- Later: earnable free pet after a quest/defeat threshold.
+
+FISH
+- Aquatic monster/pet.
+- Multiple fish in water, with density/activity increasing farther from shore.
+- Jumpy: frequently breach out of water in arcs and re-enter with visible water response.
+- Fightable wild creature.
+- Later: premium pet acquisition.
+
+HORSE
+- Open-land monster/pet.
+- Primarily outside forest.
+- More solitary / isolated encounters, not dense herds everywhere.
+- Fightable wild creature.
+- Later: premium pet acquisition.
+
+GOLDEN PHOENIX / BIRD
+- Huge aerial monster/pet.
+- Approximately 2x character size in intended gameplay read unless inspection reveals a better scale baseline.
+- Flies very high, including near the upper region of the player's allowed flight range.
+- Fightable wild creature.
+- Later: premium pet acquisition.

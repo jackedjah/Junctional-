@@ -1,0 +1,53 @@
+[
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\fish\\FISH_DEEPWATER_CREATURE_L0.glb",
+  "bytes": 1867740,
+  "load_ms": 58,
+  "size_m": [
+   0.838,
+   0.42,
+   0.98
+  ],
+  "triangles": 18870,
+  "meshes": 1,
+  "shots": {
+   "front": "FISH_DEEPWATER_CREATURE_L0_front.png",
+   "q34": "FISH_DEEPWATER_CREATURE_L0_q34.png",
+   "side": "FISH_DEEPWATER_CREATURE_L0_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\fish\\FISH_DEEPWATER_CREATURE_L1.glb",
+  "bytes": 1218436,
+  "load_ms": 29,
+  "size_m": [
+   0.838,
+   0.418,
+   0.98
+  ],
+  "triangles": 6499,
+  "meshes": 1,
+  "shots": {
+   "front": "FISH_DEEPWATER_CREATURE_L1_front.png",
+   "q34": "FISH_DEEPWATER_CREATURE_L1_q34.png",
+   "side": "FISH_DEEPWATER_CREATURE_L1_side.png"
+  }
+ },
+ {
+  "file": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\lab\\assets\\world\\fish\\FISH_DEEPWATER_CREATURE_L2.glb",
+  "bytes": 966500,
+  "load_ms": 30,
+  "size_m": [
+   0.838,
+   0.412,
+   0.975
+  ],
+  "triangles": 2600,
+  "meshes": 1,
+  "shots": {
+   "front": "FISH_DEEPWATER_CREATURE_L2_front.png",
+   "q34": "FISH_DEEPWATER_CREATURE_L2_q34.png",
+   "side": "FISH_DEEPWATER_CREATURE_L2_side.png"
+  }
+ }
+]

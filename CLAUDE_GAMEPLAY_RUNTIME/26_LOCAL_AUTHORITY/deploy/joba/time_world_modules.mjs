@@ -1,0 +1,12 @@
+/* CPU cost of the pure-JS world module builds (node, the vendored three): the part that blocks the phone's main thread */
+import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
+import * as THREE from '../../vendor/three/three.module.min.js';
+import { createMeadow } from '../../lab/world/meadow.js'; import { createArchitecture } from '../../lab/world/architecture.js'; import { createTerrain } from '../../lab/world/terrain.js';
+import { forestLayout, fixtureLayout } from '../../lab/world/worldLayout.js';
+var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.resolve(HERE, '..', '..');
+var reg = JSON.parse(fs.readFileSync(path.join(LA, 'lab/assets/world/world_registry_v1.json'), 'utf8')); var R = JSON.parse(fs.readFileSync(path.join(LA, 'play/rules1723/rules_17_23.dev.json'), 'utf8'));
+var layout = { landmarks: R._runtime_mapping.field_colliders_district_v1.landmarks, interactables: R._runtime_mapping.field_colliders_district_v1.interactables };
+global.document = { createElement: function () { return { width: 0, height: 0, getContext: function () { return { createImageData: function (w, h) { return { data: new Uint8ClampedArray(w * h * 4) }; }, putImageData: function () { }, createLinearGradient: function () { return { addColorStop: function () { } }; }, createRadialGradient: function () { return { addColorStop: function () { } }; }, fill: function () { }, beginPath: function () { }, arc: function () { }, closePath: function () { }, stroke: function () { }, fillRect: function () { }, clearRect: function () { }, fillStyle: null }; } }; } };
+global.fetch = function (u) { return Promise.resolve({ ok: true, json: function () { return Promise.resolve(JSON.parse(fs.readFileSync(path.join(LA, 'play/rules1723/district_v1_colliders.json'), 'utf8'))); } }); };
+var lms = layout.landmarks.map(function (l) { return l.envelope; }); var ctx = { THREE: THREE, group: new THREE.Group(), registry: reg, layout: layout, night: false, cameraPos: function () { return { x: 0, y: 5, z: 10 }; }, log: function () { }, forestPlacement: forestLayout(reg, lms), fixturePlacement: fixtureLayout(reg), url: function (u) { return u; }, M: {} };
+for (const [name, make] of [['terrain', createTerrain], ['meadow', createMeadow], ['architecture', createArchitecture]]) { var t0 = performance.now(); var m = make(ctx); await Promise.resolve(m.build()); console.log(name, 'build CPU', (performance.now() - t0).toFixed(0), 'ms', JSON.stringify(m.debug()).slice(0, 160)); }

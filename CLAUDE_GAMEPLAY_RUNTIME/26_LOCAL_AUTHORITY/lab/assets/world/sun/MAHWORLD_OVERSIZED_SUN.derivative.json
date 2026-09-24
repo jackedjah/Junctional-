@@ -1,0 +1,70 @@
+{
+ "canonical": "MAHWORLD_OVERSIZED_SUN",
+ "role": "stylized enormous sun (sky derivative, ~10x apparent size)",
+ "source": {
+  "file": "C:\\Users\\jahsu\\Downloads\\GLB_PHASE_AB\\sun.glb",
+  "original_name": "sun(2).glb",
+  "sha256": "7f5e402e5954db4bcab14920917f6ae08ee6ba93d8956bac3512fa01fa4638fc",
+  "bytes": 89111272,
+  "triangles": 1989518,
+  "vertices": 1044672,
+  "bounds_min": [
+   -0.488555908203125,
+   0.0,
+   -0.461334228515625
+  ],
+  "bounds_max": [
+   0.488555908203125,
+   0.978057861328125,
+   0.461334228515625
+  ],
+  "skinned": false,
+  "animations": 0,
+  "generator": "Tripo"
+ },
+ "textures": [
+  {
+   "source_bytes": 18030915,
+   "runtime_bytes": 568407,
+   "runtime_size": [
+    1024,
+    1024
+   ],
+   "mime": "image/jpeg"
+  },
+  {
+   "source_bytes": 13774759,
+   "runtime_bytes": 85901,
+   "runtime_size": [
+    512,
+    512
+   ],
+   "mime": "image/jpeg"
+  }
+ ],
+ "lods": [
+  {
+   "lod": "L0",
+   "file": "MAHWORLD_OVERSIZED_SUN_L0.glb",
+   "triangles": 8000,
+   "vertices": 6483,
+   "bytes": 959768,
+   "sha256": "8a8ee3e79a96e2fb8bd279367d5ad541cf627e798d1e61b6633c86fbea6f5a1e"
+  },
+  {
+   "lod": "L1",
+   "file": "MAHWORLD_OVERSIZED_SUN_L1.glb",
+   "triangles": 2243,
+   "vertices": 2419,
+   "bytes": 760632,
+   "sha256": "fc231fc1cfcb3154a873be299a841c0c29a945d6008bcfeb7d8266e9f73a5370"
+  }
+ ],
+ "method": "fast_simplification quadric edge collapse (agg 7.0), UVs from the collapse map, smooth normals recomputed; textures Pillow LANCZOS",
+ "generated": "2026-09-19T20:45:32Z",
+ "timing_s": {
+  "L0": 14.8,
+  "L1": 0.3
+ },
+ "elapsed_s": 20.9
+}

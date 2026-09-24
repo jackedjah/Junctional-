@@ -1,0 +1,32 @@
+{
+  "checkpoint": "M5_OWNER_CORRECTIONS_01_SURFACE_COLLISION_REFILL",
+  "timestamp": "2026-09-23T12:09:57.1120711-04:00",
+  "source_head": "3185a25f80a23131fbdb2062fca9a1a1ffb7684f",
+  "continuity": "same intentionally dirty M1-M5 worktree; no reset/stash/clean/commit",
+  "immutable_comparison_candidate": {
+    "build": "ASTRA_M5_PRIVATE_20260923",
+    "package_sha256": "ebcad0ed993899f66c7477a1b3f1cde57740b32047fd0c02b60cf71e85055995",
+    "deploy_id": "6ab3abd739fc958c75339988"
+  },
+  "operations": {
+    "OP05": { "state": "FIXED_HEADLESS_VISUAL_GATE_OPEN", "cause": "independently extended road/forecourt ribbons overlapped coplanarly at bends and crossings", "fix": "single cached road graph; crossings split; duplicate pieces removed; one owner/junction; ribbons clipped to sampled circular boundaries; opaque core" },
+    "OP06": { "state": "FIXED_HEADLESS_VISUAL_GATE_OPEN", "cause": "same as OP05; family colour was carried by separate transparent geometry at the same depth", "fix": "one dominant owned junction core/ring for same- and different-family intersections" },
+    "OP09": { "state": "FIXED_HEADLESS_RUNTIME_VISUAL_GATE_OPEN", "cause": "existing loop worked but patches were distant/sparse and had no map/newcomer cue", "fix": "one safe RB_NEXUS_INTRO patch, five sanctuary lists preserved, 48-facet compact bushes, near hint, map icon/legend; existing host inventory/economy reused" },
+    "OP10": { "state": "FIXED_HEADLESS_ROUTE_VISUAL_GATE_OPEN", "cause": "terrain rendered two solid satellite crystals per monolith but the host only collided the main crystal", "fix": "two bounded satellite cylinder proxies per reachable monolith; real pass/ramps remain open" }
+  },
+  "generated_authority": { "registry_sha256": "5512b124a8e19f5dd92247c3c6934a3979bb4f96c17667db8716490178419ab9", "world_shapes": 251, "mapping_shapes": 1526 },
+  "focused_tests": [
+    { "program": "gameplay_m5_owner_corrections.test.mjs", "result": "9/9" },
+    { "program": "gameplay_b8_equipment.test.mjs", "result": "25/25" },
+    { "program": "gameplay_world_jobb.test.mjs", "result": "34/34" },
+    { "program": "gameplay_m3_night_route.test.mjs", "result": "13/13" }
+  ],
+  "hashes": {
+    "roadNetwork.js": "5400100d203301e5162a43bdad0cbe8f0d1a38e15c3786c9332b68c946886088",
+    "terrain.js": "2587fc056e04fb850adf92ed08fac67f3c9b15a719153815ad56443dbd9ed4c1",
+    "worldLayout.js": "8a05e3c928c214fb7f0b8553f370014c49d6540244a3c1e185259f1394a19185",
+    "gear.js": "6751d407a3c5cf3ac1d405155014fd1577d719b665fbeec61a44ce8096cbad27",
+    "gameMenu.js": "97517457ab02973af07f119e90eb579b4f98d1dc6dd5a540c1fa6657dbf0816b"
+  },
+  "open": ["runtime visual road orbit/day/night/flight gate", "real pointer/touch harvest capture", "building/Moon/cloud/tree/performance correction tranches", "full regression/soak/package/protected deploy", "physical phone owner acceptance"]
+}

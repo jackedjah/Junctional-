@@ -1,0 +1,346 @@
+MAHWORLD — BACK UP CURRENT M6 TO GITHUB, THEN CONTINUE THE JUNCTION REPAIR
+EXPLICIT IMPLEMENTATION REQUEST · SAME EXISTING SOL HIGH GAMEPLAY JOB
+Prepared 24 September 2026
+
+EXECUTE THIS REQUEST. Do not merely review or summarize the attachment.
+The laptop may fail. Protect the actual current work BEFORE further graphics edits.
+
+REQUIRED SEQUENCE
+1. Preserve any currently running operation at its next safe checkpoint.
+2. Push a small, reviewed current-source/context checkpoint immediately.
+3. Back up required assets and remaining recovery material; verify remote retrieval.
+4. Complete the existing focused CW_GYM / RP_FOREST_W junction repair.
+5. Save and push the outcome again; verify the remote checkpoint.
+6. Return the exact recovery branch/commit and honest remaining status.
+
+Do not wait for a perfect floor before saving the work off the laptop.
+A local commit, Netlify preview, or uploaded prompt is not a verified backup of
+the current source plus its required asset bytes.
+
+0. AUTHORIZATION AND PROTECTED BOUNDARIES
+
+The owner NOW authorizes scoped Git commits and pushes of this MAHWORLD work.
+This overrides older temporary "no commit/no push" instructions FOR BACKUP ONLY.
+A dedicated recovery branch/ref in the EXISTING verified GitHub repository is
+authorized where necessary to avoid modifying a production/other-job branch.
+This is not permission for a new game, replacement repo, clone/worktree, engine
+migration, default-branch merge, or unrelated infrastructure project.
+
+Keep Sol High, one lead, and the existing source/worktree. No agent swarm, model
+changes, session-history search, authentication reset, paid top-ups, or purchases.
+Leave separate MAHFITT and Character work, assets and reserved Blender jobs alone.
+
+No Netlify deployment, production promotion, domain change, password-gate removal,
+or new CI service. A GitHub push can trigger automation: inspect that first and
+choose the existing safe backup path. Git backup is not website publication.
+
+1. SAVE THE ACTUAL M6 STATE, NOT AN OLD B8 CHECKOUT
+
+Expected gameplay directory:
+C:/Users/jahsu/Downloads/MAHWORLD_CHARACTERS/CLAUDE_GAMEPLAY_RUNTIME
+
+Resolve the actual Git root/branch/worktree and nested repositories from this
+location and the handoff. 26_LOCAL_AUTHORITY contains the established runtime.
+Do not assume HEAD includes the currently uncommitted M6 implementation.
+
+Read the relevant current heads only:
+25_HANDOFF/CONVERGENCE/CONTINUE_HERE.md
+25_HANDOFF/CONVERGENCE/ASTRA_TAKEOVER_STATE.md
+25_HANDOFF/CONVERGENCE/astra_m6_closeout/visual_check/m6_visual_check.json
+
+Then inspect only the current Git/asset/build configuration needed for backup.
+Do not repeat the full historical source audit or rewatch the old videos.
+
+Latest OWNER-SUPPLIED M6 report:
+- M1 through M5C preserved; M6 edits exist locally, with no new M6 deployment.
+- Seven canopy anchors and two floating accents added to the shared mist system.
+- QUICK/HEAVY/PRECISE/FLOW/BALANCED attack envelopes and a physical-MAHGIC
+  readability offset; damage/costs/cooldowns/authority/grip sockets unchanged.
+- Bounded NIGHT check: 11 frames, reported zero runtime/console errors.
+- Sampled actual Moon/clouds, source Dogkie colors, blue MAH GYM, body/grips
+  and PA_PUSH cadence; 41 patches x 64 shards and three drops/pickups reported.
+- STILL UNRESOLVED: dark circular/angular fragments at CW_GYM / RP_FOREST_W.
+  The previous path-layer adjustment failed and was reverted.
+- No broad regression/soak, package, deployment or phone acceptance from M6.
+
+Preserve any newer valid local progress. Report claims are not permission to
+overwrite real files or declare a missing fix complete.
+
+Hosted comparison, historically:
+ASTRA_M5C_PRIVATE_20260923 / deploy 6ab454bf3a60c4bf88b1334a.
+Last reported production: 6aac25101f17ce5ed37166e4.
+Do not assume a historical deploy ID is current without checking when relevant.
+
+2. CONFIRM THE REMOTE, ITS VISIBILITY AND THE DESTINATION BRANCH
+
+Read-only GitHub connection observations made for this handoff on 24 September:
+- Repository: jackedjah/Junctional-
+- Visibility: PUBLIC.
+- Default branch: claude/mrmah-3d-renderer-poc-1nyunz.
+- Repository metadata last-push timestamp: 2026-09-09T02:28:40Z.
+- Listed branches included claude-mahworld-phase0-control-deck and
+  claude/mahworld-r2-world-craftsman; this does not verify a remote M6 backup.
+
+Use these as a lead, not authority to rewrite the actual local origin.
+Verify the local remote, owner, repository visibility and intended gameplay
+destination once. If a different existing remote is clearly documented as the
+current gameplay destination, use that verified destination and record it.
+Never choose a Character branch merely because it is the default branch.
+Do not print credential-bearing remote URLs or tokens.
+
+PUBLIC REPOSITORY WARNING:
+A backup branch in a public repository is still public. LFS and release assets
+must not be treated as privacy workarounds. The request to back up the game is
+not permission to publish credentials, personal client data, confidential
+reference footage or source assets whose redistribution is restricted.
+
+Push owner-authorized game code/assets to the verified destination. Before
+uploading previously private/restricted material to a public repository, exclude
+it and flag the precise private-destination/disclosure decision needed.
+Save the safe subset promptly; label the overall backup PARTIAL if essential
+assets remain excluded. Never silently omit them or declare everything safe.
+Do not change repository visibility or create another repository without approval.
+
+3. BACK UP A RECOVERABLE PROJECT, NOT JUST FILES THAT HAPPEN TO BE TRACKED
+
+Inventory from the existing manifests and known asset locations:
+- Modified and new source, shaders, generators, registries and configuration.
+- Rig/animation/equipment/resource data and relevant build/serve helper code.
+- Package manifests/lockfiles, dependency versions, tests/probes and license notices.
+- Current master, GitHub-reuse add-on, M6 requirements and final-junction request.
+- CONTINUE_HERE, ASTRA_TAKEOVER_STATE, requirements ledger, A/B queue, compact
+  evidence and remaining source/owner restrictions.
+- Runtime GLBs/textures plus the approved original GLBs/authoring files needed
+  to reproduce and refine them.
+- Actual Moon, Dogkie, trees, imported buildings, fish, horse, Phoenix,
+  dumbbells, barbell, relevant band source or honest procedural fallback.
+- GLB_PHASE_AB/, GLB_NEW3/, and any necessary external asset paths identified
+  by the existing source manifests.
+
+Keep originals immutable. Preserve maps, names, animation/skin data, references
+and raw-source-to-runtime-derivative relationships. Do not degrade art to back it up.
+
+Identify ignored/untracked required files, outside-repo dependencies, symlinks,
+nested Git repos and submodules. A Windows path, symlink or submodule pointer is
+not a backup of the target bytes. Each required dependency needs a retrievable
+remote location and restore instructions.
+
+For approved assets outside the repo, use an existing authorized remote or a
+clearly organized immutable recovery copy with relative restore mapping. Do not
+move another job's working source or create unnecessary duplicate giant archives.
+
+UPLOAD PRIORITY:
+A. Current source, context and dependency/build metadata FIRST.
+B. Required runtime and approved original/authoring assets NEXT.
+C. Unique relevant evidence/non-reproducible artifacts after A/B.
+Large old videos and redundant build ZIPs must not block the first source push.
+Clearly record any recovery-critical artifact not yet secured.
+
+EXCLUDE FROM UPLOAD:
+API keys, .env values, OAuth tokens, cookies, passwords, browser profiles,
+credential stores, private client data, unrelated databases, full agent transcripts,
+node_modules, OS/temp caches, .git as an archive blob, and unrelated job files.
+Record required environment-variable NAMES in a sanitized example, not values.
+Do not delete the local excluded material or any sole review-video copies.
+
+4. REVIEWED COMMITS AND PUSHES WITHOUT DISTURBING THE ACTIVE WORKTREE
+
+Use explicit reviewed paths. Inspect the staged snapshot and outgoing history.
+Preserve unrelated staged changes and unfinished valid edits.
+
+No blind git add . / git add -A over a mixed workspace; no push --all/--mirror,
+force push, git clean/reset, destructive checkout, broad stash, rebase, or default
+branch merge. Do not push all of a mixed local history without checking it.
+
+Prefer an existing verified safe gameplay backup ref. Otherwise use a dedicated
+backup/mahworld-m6-<actual-UTC-timestamp> ref in the same repository.
+Do not overwrite divergent remote work. No pull request or production merge is
+needed for a recovery checkpoint. Do not switch the working tree to an old branch.
+
+A push may expose older unpublished commits, not only the current staged diff.
+Check newly outgoing history for secrets and unrelated/private content.
+If that history is unsafe, use the established scoped snapshot method instead.
+A reviewed temporary-index/commit-tree snapshot parented to the verified remote
+gameplay state is an available advanced fallback that need not alter the active
+index/branch/worktree. Use it only with an exact verified path mapping; record
+that it backs up current files, not the entire local history. Never rewrite
+existing local/remote history to make a backup look cleaner.
+
+Inspect relevant .github/workflows, Git hooks and hosting triggers. A candidate
+backup message may include [skip ci] [skip netlify], but these do not disable every
+possible trigger. GitHub's skip behavior is limited; Netlify's skip markers apply
+to documented Git-triggered flows. Do not rely on them to suppress unrelated
+create-triggered workflows or custom hooks. Do not globally disable another job's
+automation. If a safe push needs an unapproved configuration change, report it.
+
+Check free disk before packing. Do not create multiple full clones or huge
+duplicate ZIPs on a nearly full disk. Only confirmed inactive, reproducible,
+already-authorized job temp may be cleaned if necessary. Never bypass secret-
+protection hooks or remove user/project source files to force upload.
+
+5. LARGE ASSETS: CONTENT MUST BE UPLOADED, NOT JUST POINTERS
+
+GitHub blocks normal Git files over 100 MiB. Git LFS uses Git pointers and a
+separate store for actual file contents. Inventory size before committing
+new large binaries. Prefer the existing compatible LFS/asset-store policy.
+
+Check LFS availability, storage/bandwidth constraints, existing attributes and
+permissions. Do not buy quota or enable auto top-ups. Do not run history-wide
+LFS migration as part of this emergency backup; tracking a pattern alone does
+not transform already-existing history.
+
+Preserve legitimate external asset-store/release arrangements where already
+approved, with stable recovery IDs and SHA-256. An expiring signed download URL
+is not a durable backup location. A public release is not a private asset vault.
+
+Never return “all assets pushed” from pointer files alone. Verify required LFS
+objects were uploaded and independently retrievable.
+If quota/auth/size blocks assets, preserve the successful source checkpoint,
+list the exact files and byte sizes still at risk, and mark backup PARTIAL.
+Do not hide missing originals behind the existence of runtime derivatives.
+
+6. WRITE SMALL, DURABLE RECOVERY NOTES
+
+Use the established convergence/handoff location, not a new competing directive.
+
+RECOVERY_START_HERE.md:
+- Verified repository, branch, gameplay-relative root and source-state basis.
+- Current M6 status, unresolved junction, and last usable hosted comparison.
+- Actual pinned prerequisites and existing build/serve commands from the repo.
+- Locations of the master, add-on, M6 request, final-junction file and A/B ledger.
+- Asset restore/LFS instructions and the exact missing/excluded dependencies.
+- No S08/MAHFITT changes; one gameplay writer; no production deploy.
+- The next executable task; do not transfer the entire old chat history.
+
+ASSET_BACKUP_MANIFEST.json:
+- Each required unique asset's relative logical path and source/derivative role.
+- Byte length and SHA-256; remote path/store ID or LFS object ID.
+- Upload/readback state; relevant license/privacy constraints.
+- Required ignored/outside-repo files not yet secured.
+Keep manifests credential-free; do not pretend missing values are verified.
+
+CLOUD_CONTINUE.md:
+“Continue this exact recovery branch of the existing MAHWORLD project.
+Read current handoffs and the asset manifest. Restore required asset bytes.
+Preserve all M1–M6 and newer work. Resume the recorded junction task, not a new
+world, character appearance pass or session hunt. Use existing tools/tests,
+one lead, and no production deployment or unapproved asset regeneration.”
+
+Document OS-specific commands and real tool requirements. Do not claim a cloud
+GPU, Blender installation, working Linux build or inherited credentials exists.
+No new cloud environment/subscription is needed just to create this backup.
+Cloud execution remains NOT TESTED unless it was actually run.
+
+7. VERIFY OFF-LAPTOP RECOVERY BEFORE MORE POLISH
+
+After the source push, give a short checkpoint immediately:
+SOURCE CHECKPOINT: actual repository / branch / full commit / verified yes-or-no.
+ASSETS: in progress, verified, partial or blocked; exact outstanding material.
+CLOUD EXECUTION: tested or NOT TESTED.
+Then finish the authorized asset backup without another permission loop.
+
+For every reported verified checkpoint:
+- Read the remote ref independently and compare its full commit ID.
+- Inspect the remote tree and retrieve representative current M6 source/handoff
+  content. Match the committed snapshot, not folder names or timestamps.
+- Reconcile required assets and source against the manifest. Check ignored/new
+  files, external dependencies, submodules and actual binary objects.
+- For LFS, independently retrieve required new objects using isolated empty
+  storage when disk/quota allows; compare hashes. A previously cached local
+  object or lfs ls-files output is not remote-readback proof.
+- If full retrieval cannot be performed, distinguish UPLOADED from RETRIEVAL
+  VERIFIED and say exactly what remains unverified.
+- Check that backup activity did not modify unrelated branches or deploy the game.
+
+These are BACKUP INTEGRITY checks, not a full graphics regression.
+Do not spend the emergency window on a broad test battery.
+If essential source/assets remain unsecured, report the exact blocker before
+doing more risky local polish; don't hide a sole copy on the failing laptop.
+
+8. THEN FINISH THE EXISTING M6 JUNCTION TASK
+
+Use MAHWORLD_M6_FINAL_JUNCTION_FIX.txt where available; scope is restated here.
+No new graphics scope, feature expansion, creature redesign or another M6 recap.
+
+At CW_GYM / RP_FOREST_W:
+- Recover original location/camera from the current visual-check records/registry.
+- Capture baseline once.
+- Isolate ground/roads, decals/contact cards/resource bases, shadow/AO contributions
+  if present, material masks and duplicate/LOD instances by group, restoring each.
+- Identify the exact producing object/registry ID, material/pass and source function.
+  A raycast alone cannot establish which shader/shadow pass produced a pixel.
+- Fix only the identified cause in the owning source/generator and regenerate
+  only the necessary outputs.
+
+Do not repeat guessed path Y offsets. No cover slab, global depth-test disable,
+fog/blur concealment, removal of all shadows, or unrelated art changes.
+Preserve physical navigation, gradients, resource targeting, trees, Moon, gear,
+canopy mist, original Dogkie colors, blue MAH GYM and existing combat authority.
+
+Small proof only:
+matched NIGHT before/after and one oblique view; a 5–10-second moving-camera
+crossing; quick DAY view if relevant; nearby roads/bushes intact.
+Changed-file syntax and a directly affected existing test if needed.
+No full regression, long soak, exhaustive attack sweep or new test framework.
+
+If the producer cannot be isolated in this bounded session, or two focused
+cause-based fixes fail, preserve successful work, revert only the unsuccessful
+experiment, and record STILL UNRESOLVED with eliminated causes/evidence.
+Do not fabricate a fix or reopen an endless guess-and-offset loop.
+
+9. PUSH THE RESULT AGAIN AND KEEP THE REST OF THE JOB IN ORDER
+
+Update CONTINUE_HERE, ASTRA_TAKEOVER_STATE and the recovery note with exact outcome.
+Commit/push the scoped result and verify the remote again.
+Save useful intermediate source checkpoints before long operations; do not wait
+for the last credit. No always-running background backup service or per-keystroke
+commits—use meaningful checkpoints during active work.
+
+Keep all accumulated master/add-on/M6 instructions and unfinished A/B tasks.
+Do not interpret “perfect world” as another unbounded redesign.
+After this bounded closeout, the next larger milestone is an owner-authorized
+protected M6 preview. No packaging/deployment is authorized in this backup pass.
+M5C stays the existing hosted comparison; a GitHub M6 push does not update its URL.
+
+10. FINISH WITH A BRIEF, VERIFIABLE REPORT
+
+BACKUP: VERIFIED / PARTIAL / BLOCKED
+REPOSITORY + VISIBILITY:
+RECOVERY BRANCH + EXACT COMMIT URL:
+SOURCE + ASSETS: remotely retrievable contents and exact exclusions.
+CLOUD RESTORE NOTE: path; cloud execution TESTED or NOT TESTED.
+JUNCTION: FIXED WITH LOCAL PROOF / STILL UNRESOLVED, exact cause/blocker.
+POST-REPAIR REMOTE COMMIT:
+DEPLOYMENTS: unchanged, or accurately report an unexpected side effect.
+NEXT TASK:
+
+Say “all required project files backed up” only when the source, required
+originals/derivatives, instructions and dependency bytes can actually be recovered.
+A local commit, queued upload, stale remote branch or pointer without its object
+does not meet that requirement.
+
+No guaranteed usage percentage or completion promise. Remaining balance is
+UNKNOWN unless genuinely exposed. Backup first; preserve useful work.
+
+BEGIN NOW: SAVE THE CURRENT M6 BEFORE MAKING ANOTHER GRAPHICS EDIT.
+
+REFERENCE NOTES — NOT A NEW RESEARCH TASK
+Read-only repository/branch observations for this handoff:
+https://api.github.com/repos/jackedjah/Junctional-
+https://api.github.com/repos/jackedjah/Junctional-/branches?per_page=100
+GitHub visibility:
+https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories
+GitHub large-file limits:
+https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github
+Git LFS:
+https://github.com/git-lfs/git-lfs
+GitHub backup documentation:
+https://docs.github.com/en/repositories/archiving-a-github-repository/backing-up-a-repository
+Netlify skip-deploy behavior:
+https://docs.netlify.com/deploy/manage-deploys/manage-deploys-overview/
+GitHub Actions skip scope:
+https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs
+
+This is an instruction for the existing local agent with access to Windows files.
+ChatGPT checked remote metadata, not the current local worktree. This handoff does
+not claim that the laptop files were pushed or the floor was repaired from chat.

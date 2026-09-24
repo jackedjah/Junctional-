@@ -1,0 +1,122 @@
+{
+ "contract": "MAHWORLD_IMPORT_CONTRACT_V1",
+ "character": "<CHARACTER_ID>",
+ "source": "<source file name>",
+ "status": "DRAFT — run: node deploy/joba/validate_import_contract.mjs <glb> --draft <this file> --character <ID>, then confirm every role by hand and validate: node deploy/joba/validate_import_contract.mjs <glb> <this file>",
+ "units": "source units × scale_to_metres (manifest)",
+ "up_axis": "+Y",
+ "forward_axis": "-Z",
+ "height_m": null,
+ "bind": "identity | oriented",
+ "roles": {
+  "ROOT": "<source bone name for ROOT>",
+  "PELVIS": "<source bone name for PELVIS>",
+  "LUMBAR": "<source bone name for LUMBAR>",
+  "SPINE": "<source bone name for SPINE>",
+  "CHEST": "<source bone name for CHEST>",
+  "SPINE2": "<source bone name for SPINE2>",
+  "NECK": "<source bone name for NECK>",
+  "HEAD": "<source bone name for HEAD>",
+  "CLAV_L": "<source bone name for CLAV_L>",
+  "CLAV_R": "<source bone name for CLAV_R>",
+  "UPPERARM_L": "<source bone name for UPPERARM_L>",
+  "UPPERARM_R": "<source bone name for UPPERARM_R>",
+  "FOREARM_L": "<source bone name for FOREARM_L>",
+  "FOREARM_R": "<source bone name for FOREARM_R>",
+  "HAND_L": "<source bone name for HAND_L>",
+  "HAND_R": "<source bone name for HAND_R>",
+  "FINGERS_L": "<source bone name for FINGERS_L>",
+  "FINGERS_R": "<source bone name for FINGERS_R>",
+  "THIGH_L": "<source bone name for THIGH_L>",
+  "THIGH_R": "<source bone name for THIGH_R>",
+  "SHIN_L": "<source bone name for SHIN_L>",
+  "SHIN_R": "<source bone name for SHIN_R>",
+  "TIP_L": "<source bone name for TIP_L>",
+  "TIP_R": "<source bone name for TIP_R>",
+  "JAW": "<source bone name for JAW>",
+  "BROW_L": "<source bone name for BROW_L>",
+  "BROW_R": "<source bone name for BROW_R>",
+  "CHEEK_L": "<source bone name for CHEEK_L>",
+  "CHEEK_R": "<source bone name for CHEEK_R>",
+  "TAIL1": "<source bone name for TAIL1>",
+  "TAIL2": "<source bone name for TAIL2>",
+  "TAIL3": "<source bone name for TAIL3>"
+ },
+ "emitter_anchors": {
+  "HAND_L": {
+   "role": "HAND_L",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "HAND_R": {
+   "role": "HAND_R",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "TIP_L": {
+   "role": "TIP_L",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "TIP_R": {
+   "role": "TIP_R",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "FUSED_TIP": {
+   "role": "TAIL3",
+   "offset_m": [
+    0,
+    0,
+    0
+   ]
+  },
+  "CHEST": {
+   "role": "CHEST",
+   "offset_m": [
+    0,
+    0.05,
+    0.12
+   ]
+  }
+ },
+ "morphs": {
+  "PACKED": "PACKED (the split-legs morph on the SPLIT_LEGS mesh)",
+  "muscles": "22 muscle morphs (manifest.muscles)"
+ },
+ "face": {
+  "channels": [
+   "brow_l",
+   "brow_r",
+   "cheek_l",
+   "cheek_r",
+   "jaw",
+   "smile",
+   "blink"
+  ],
+  "bones_or_morphs": "bones"
+ },
+ "forms": {
+  "fused": true,
+  "split": true
+ },
+ "canonical_names_present": 38,
+ "notes": [
+  "Required roles: ROOT PELVIS SPINE CHEST NECK HEAD CLAV_L/R UPPERARM_L/R FOREARM_L/R HAND_L/R. Optional: LUMBAR SPINE2 SCAP ARMTWIST FORETWIST FINGERS BROW CHEEK JAW. SPLIT form: THIGH SHIN TIP (both sides). FUSED form: TAIL1 TAIL2 TAIL3.",
+  "bind = identity means every mapped bone's rest rotation is the identity in object space (the animator's Euler channels apply directly); oriented rigs (Mixamo, Reallusion, Tripo) need per-role re-basing before authored clips apply — the validator reports it.",
+  "Emitter anchors may be bones or bone + offset_m; morphs list the source morph target names per canonical morph role."
+ ],
+ "scale_to_metres": null
+}
