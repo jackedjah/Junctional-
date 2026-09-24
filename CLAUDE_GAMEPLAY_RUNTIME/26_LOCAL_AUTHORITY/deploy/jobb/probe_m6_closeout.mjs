@@ -13,7 +13,7 @@ var FLOOR_ONLY = process.argv.includes('--floor-only');
 var OUT = path.join(ROOT, '25_HANDOFF', 'CONVERGENCE', 'astra_m6_closeout', 'visual_check', ...(FLOOR_ONLY ? ['floor_recheck'] : []));
 fs.mkdirSync(OUT, { recursive: true });
 var REG = JSON.parse(fs.readFileSync(path.join(ROOT, '26_LOCAL_AUTHORITY', 'lab', 'assets', 'world', 'world_registry_v1.json'), 'utf8'));
-var report = { generated_at: new Date().toISOString(), source: 'fresh local static_dist; not packaged or deployed', scope: 'one bounded M6 visual session', screenshots: [], runtime: {}, resource: {}, equipment: {}, attacks: {}, console_errors: [], unresolved: [] };
+var report = { generated_at: new Date().toISOString(), source: DIST, scope: 'one bounded M6 visual session', screenshots: [], runtime: {}, resource: {}, equipment: {}, attacks: {}, console_errors: [], unresolved: [] };
 var srv = await serveStatic(DIST), pg = await launchChrome({ width: 1280, height: 800, dpr: 1, gpu: true, timeScale: 0.55, cmdTimeoutMs: 120000 });
 async function ev(src) { return await pg.evaluate("(async function(){ var P=window.MAHWORLD_PLAY,H=window.MAHWORLD_STATIC_HOST; " + src + " })()"); }
 async function shot(name) { var f = path.join(OUT, name + '.png'); await pg.screenshot(f); report.screenshots.push(name + '.png'); console.log('SHOT ' + name); return f; }

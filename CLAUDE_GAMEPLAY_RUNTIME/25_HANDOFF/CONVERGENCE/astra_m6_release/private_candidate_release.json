@@ -1,0 +1,110 @@
+{
+  "schema": "MAHWORLD_PROTECTED_PRIVATE_CANDIDATE_V1",
+  "released_at": "2026-09-24T20:24:36.859Z",
+  "build_id": "ASTRA_M6_PRIVATE_20260924",
+  "source": {
+    "working_branch": "master",
+    "working_head": "3185a25f80a23131fbdb2062fca9a1a1ffb7684f",
+    "worktree_clean": false,
+    "verified_backup_branch": "backup/mahworld-m6-20260924T190351Z",
+    "verified_pre_release_checkpoint": "6fa4e33e9ee4d35171bf3eaa4cff5606c559999e",
+    "release_source_commit": null,
+    "final_release_record_commit": null,
+    "note": "Built from the preserved current M1-M6 dirty gameplay worktree; no checkout or reset to an older source state."
+  },
+  "package": {
+    "record": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M6_PRIVATE_20260924.PACKAGE.json",
+    "record_sha256": "07ccfd25534e11c8726449dc73fb61fafbdae1a6a465917550dbdcc7a80ea5b3",
+    "zip": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M6_PRIVATE_20260924.zip",
+    "zip_bytes": 122974744,
+    "zip_entries": 181,
+    "zip_sha256": "82d5433350d9785e665fe9b5b74b88e07ddbf2c40a1c9e36c3a1a4fea87ab02c",
+    "zip_committed": false,
+    "visible_build_id": "ASTRA_M6_PRIVATE_20260924",
+    "embedded_working_head": "3185a25",
+    "mandatory_pipeline": {
+      "test_programs": 56,
+      "checks_passed": 1518,
+      "checks_failed": 0,
+      "javascript_files": 104,
+      "secret_scan_files": 181,
+      "fresh_extraction_files": 181,
+      "fresh_extraction_smoke": "7/7",
+      "fresh_extraction_javascript": "clean"
+    }
+  },
+  "local_extracted_runtime": {
+    "root": "26_LOCAL_AUTHORITY/deploy/packages/deploy_ASTRA_M6_PRIVATE_20260924",
+    "visual_report": "25_HANDOFF/CONVERGENCE/astra_m6_closeout/visual_check/m6_visual_check.json",
+    "visual_report_sha256": "37fde3345c35281dd180c30050b3699d7d22b364585d9fdf27720cd849e067c3",
+    "visual_screenshots": 11,
+    "console_errors": 0,
+    "unresolved": 0,
+    "resource_bush": {
+      "broken": true,
+      "drops": 3,
+      "refills_picked": 3
+    },
+    "equipment": {
+      "dumbbells_held": 2,
+      "dumbbell_palm_error_m": 0,
+      "barbell_held": true,
+      "barbell_midpoint_error_m": 0,
+      "barbell_hand_span_m": 0.68
+    },
+    "junction_report": "25_HANDOFF/CONVERGENCE/astra_m6_closeout/junction_repair_proof/junction_repair_proof.json",
+    "junction_report_sha256": "850a8f57ab1edd8be460af1aae3f2331fc63b801b3bf0e20ed15a02afd1f0983",
+    "junction_console_errors": 0,
+    "junction_min_distance_m": 0.009
+  },
+  "deployment": {
+    "provider": "Netlify",
+    "site_id": "968f80e5-889b-43a8-b2cd-5860c588546a",
+    "site_name": "mahworld-test-preview",
+    "deploy_id": "6ab586ec9ad382fa1b83f1be",
+    "url": "https://6ab586ec9ad382fa1b83f1be--mahworld-test-preview.netlify.app",
+    "state": "ready",
+    "context": "deploy-preview",
+    "published_at": null,
+    "created_at": "2026-09-24T20:24:12.635Z",
+    "ready_at": "2026-09-24T20:24:36.859Z",
+    "production_promoted": false
+  },
+  "protection": {
+    "play_unauthenticated": "401 password page",
+    "asset_unauthenticated": "401 application/json",
+    "wrong_password": "rejected with attempts-remaining message",
+    "served_password_string": "absent",
+    "authenticated_hosted_load": "NOT RUN: MAHDEMO_PW was not available to the release probe",
+    "password_removed": false
+  },
+  "preservation": {
+    "production": {
+      "url": "https://mahdemo.fob.systems",
+      "deploy_id_before": "6aac25101f17ce5ed37166e4",
+      "deploy_id_after": "6aac25101f17ce5ed37166e4",
+      "unchanged": true
+    },
+    "m5c": {
+      "deploy_id": "6ab454bf3a60c4bf88b1334a",
+      "url": "https://6ab454bf3a60c4bf88b1334a--mahworld-test-preview.netlify.app",
+      "state": "ready",
+      "context": "deploy-preview",
+      "published_at": null,
+      "unchanged": true
+    }
+  },
+  "limitations": [
+    "Physical-phone acceptance remains owner-only and has not been claimed.",
+    "Authenticated hosted gameplay was not automated because MAHDEMO_PW was unavailable; unauthenticated and wrong-password protection were verified.",
+    "The release used the bounded M6 checks and mandatory package pipeline, not a new long soak or broad feature audit.",
+    "Raw ornate-temple source parity and an owner-approved resistance-band move set remain open from earlier milestones."
+  ],
+  "owner_route": [
+    "At NIGHT, cross the repaired CW_GYM / RP_FOREST_W junction and look for a smooth, fragment-free blended floor join.",
+    "Approach MAH GYM and confirm its blue, slow mist aura and the nearby canopy accents.",
+    "Lock and physically attack a crystal bush, then walk through the drops and confirm the refill pickup.",
+    "Manifest two dumbbells and one barbell; check the true hand grips, then try a physical and physical-MAHGIC attack.",
+    "Look toward the high actual Moon, elongated clouds, distant shell, and source-color Dogkie."
+  ]
+}

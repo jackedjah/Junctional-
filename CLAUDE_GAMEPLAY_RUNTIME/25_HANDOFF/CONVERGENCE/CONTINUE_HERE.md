@@ -1,4 +1,12 @@
-# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (M6 recovery backup + junction closure)
+# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (protected M6 preview delivered)
+
+## M6 protected private preview — owner phone review next
+- New visible build `ASTRA_M6_PRIVATE_20260924`; immutable Netlify draft `6ab586ec9ad382fa1b83f1be`: `https://6ab586ec9ad382fa1b83f1be--mahworld-test-preview.netlify.app`. API state is `ready`, context `deploy-preview`, `published_at = null`.
+- Exact package: 181 entries / 122,974,744 bytes / SHA-256 `82d5433350d9785e665fe9b5b74b88e07ddbf2c40a1c9e36c3a1a4fea87ab02c`. The mandatory pipeline passed 56 programs / 1,518 checks, 104-file JavaScript syntax, secret/private-boundary scans, ZIP integrity, exact fresh extraction, 7/7 extraction smoke, and extracted JavaScript syntax.
+- The extracted package also passed the existing bounded M6 runtime proof with 0 console errors / 0 unresolved items: resource bush broken, three drops and three refills collected; two dumbbell palm errors `0`; barbell midpoint error `0` at `0.68 m` hand span. The ordinary-controller junction proof reached within `0.009 m` of `CW_GYM / RP_FOREST_W` with no console errors.
+- Protection verified independently: play is `401` with the password form, a representative asset is `401 application/json`, a wrong password is refused, and no password string is served. `MAHDEMO_PW` was unavailable, so authenticated hosted READY/gameplay is explicitly **NOT RUN**.
+- Production remains deploy `6aac25101f17ce5ed37166e4`; M5C remains ready at deploy `6ab454bf3a60c4bf88b1334a`. Neither was promoted, replaced, or altered. The M6 ZIP remains local and is not committed; its reproducible record is `astra_m6_release/private_candidate_release.json`.
+- **Next exact action:** owner physical-phone review only. Suggested path: repaired junction → blue-aura MAH GYM → attack/collect one crystal bush → dumbbell/barbell grip plus physical/physical-MAHGIC action → Moon/cloud/Dogkie view. Do not promote to production without a new explicit instruction.
 
 ## Emergency recovery checkpoint — verified remote backup + bounded M6 junction closure
 - GitHub recovery destination is the verified **PUBLIC** repository `https://github.com/jackedjah/Junctional-`, branch `backup/mahworld-m6-20260924T190351Z`. It is a scoped recovery branch; default/production branches were not rewritten or merged.

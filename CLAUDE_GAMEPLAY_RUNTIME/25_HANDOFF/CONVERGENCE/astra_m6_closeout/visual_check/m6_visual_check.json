@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-24T02:04:04.330Z",
- "source": "fresh local static_dist; not packaged or deployed",
+ "generated_at": "2026-09-24T20:20:56.958Z",
+ "source": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\packages\\deploy_ASTRA_M6_PRIVATE_20260924",
  "scope": "one bounded M6 visual session",
  "screenshots": [
   "01_floor_road_and_rest_integrity.png",
@@ -26,24 +26,24 @@
     "floor_cut_error": null,
     "modules": {
      "build_ms": {
-      "fixtures": 4,
-      "water": 23,
-      "coast": 21,
-      "terrain": 33,
-      "macro": 2,
-      "meadow": 24,
-      "forest": 4591,
-      "architecture": 1157,
-      "celestial": 668,
+      "fixtures": 2,
+      "water": 17,
+      "coast": 17,
+      "terrain": 32,
+      "macro": 3,
+      "meadow": 17,
+      "forest": 2747,
+      "architecture": 757,
+      "celestial": 473,
       "sky": 8,
       "atmosphere": 0,
-      "props": 904,
-      "matchHall": 16,
+      "props": 715,
+      "matchHall": 10,
       "guides": 0,
-      "creatures": 260,
-      "wildlife": 418,
-      "gear": 16,
-      "signage": 21
+      "creatures": 273,
+      "wildlife": 346,
+      "gear": 11,
+      "signage": 9
      },
      "fixtures": 164,
      "water": {
@@ -95,12 +95,12 @@
        "damp": 0.99,
        "amp_m": 0.07,
        "ring_speed_mps": 3.94,
-       "impulses": 35,
+       "impulses": 32,
        "dropped": 0,
        "steps": 0,
        "active": false,
        "in_water": false,
-       "pending": 35,
+       "pending": 32,
        "origin": [
         0,
         3.9375
@@ -142,7 +142,7 @@
       "dust": 2661,
       "monoliths": 18,
       "draw_calls": 10,
-      "tris": 16734,
+      "tris": 29478,
       "night": true
      },
      "macro": {
@@ -357,8 +357,8 @@
        "transitions": 121,
        "rewrites": 1,
        "timing_ms": {
-        "build_ms": 4590.4,
-        "assemble_ms": 0.9,
+        "build_ms": 2747.1,
+        "assemble_ms": 1.4,
         "first_classify_ms": 0.11,
         "first_rewrite_ms": 0.055,
         "last_classify_ms": 0,
@@ -499,13 +499,13 @@
         "seed": 3238878957
        },
        "cloud": {
-        "tau": 0.008,
-        "coverage": 0.008,
-        "transmission": 0.992,
-        "disc": 0.995,
-        "halo": 0.989,
-        "rays": 0.984,
-        "key": 0.995
+        "tau": 0.012,
+        "coverage": 0.012,
+        "transmission": 0.988,
+        "disc": 0.993,
+        "halo": 0.984,
+        "rays": 0.977,
+        "key": 0.993
        }
       },
       "moon": {
@@ -557,13 +557,13 @@
         "seed": 3238878957
        },
        "cloud": {
-        "tau": 0.647,
-        "coverage": 0.476,
-        "transmission": 0.524,
-        "disc": 0.724,
-        "halo": 0.418,
-        "rays": 0.274,
-        "key": 0.705
+        "tau": 0.075,
+        "coverage": 0.072,
+        "transmission": 0.928,
+        "disc": 0.958,
+        "halo": 0.904,
+        "rays": 0.861,
+        "key": 0.955
        }
       }
      },
@@ -571,8 +571,8 @@
       "wind": {
        "dir_deg": 28,
        "speed_mps": 2.4,
-       "now_mps": 3.02,
-       "travel_m": 51.87,
+       "now_mps": 2.51,
+       "travel_m": 41.95,
        "gust": 0.35
       },
       "cloud_cards": "OLD_SOFT_FEATHERED",
@@ -650,28 +650,28 @@
       "celestial_optics": {
        "model": "T=exp(-tau)",
        "sun": {
-        "tau": 0.008,
-        "transmission": 0.992,
-        "coverage": 0.008,
-        "disc": 0.995,
-        "halo": 0.989,
-        "rays": 0.984,
-        "key": 0.995,
-        "phase_u": 0.307,
-        "phase_v": 0.346,
-        "travel_m": 51.87
+        "tau": 0.012,
+        "transmission": 0.988,
+        "coverage": 0.012,
+        "disc": 0.993,
+        "halo": 0.984,
+        "rays": 0.977,
+        "key": 0.993,
+        "phase_u": 0.281,
+        "phase_v": 0.312,
+        "travel_m": 41.95
        },
        "moon": {
-        "tau": 0.647,
-        "transmission": 0.524,
-        "coverage": 0.476,
-        "disc": 0.724,
-        "halo": 0.418,
-        "rays": 0.274,
-        "key": 0.705,
-        "phase_u": 0.691,
-        "phase_v": 0.346,
-        "travel_m": 51.87
+        "tau": 0.075,
+        "transmission": 0.928,
+        "coverage": 0.072,
+        "disc": 0.958,
+        "halo": 0.904,
+        "rays": 0.861,
+        "key": 0.955,
+        "phase_u": 0.665,
+        "phase_v": 0.312,
+        "travel_m": 41.95
        }
       },
       "draw_calls": 4,
@@ -936,7 +936,7 @@
         "states": [
          "SWIM",
          "SWIM",
-         "RISE",
+         "SWIM",
          "SWIM",
          "SWIM",
          "SWIM",
@@ -950,7 +950,7 @@
          "SWIM",
          "BREACH",
          "SWIM",
-         "RISE",
+         "SWIM",
          "SWIM",
          "SWIM",
          "SWIM",
@@ -961,34 +961,34 @@
         ],
         "positions": [
          [
-          -9,
+          -7,
           -1.4,
           -122
          ],
          [
-          -6,
-          -2.1,
+          -4,
+          -2,
           -120
          ],
          [
-          -4,
-          -1.9,
+          -2,
+          -2,
           -118
          ],
          [
-          269,
+          270,
           -1.4,
           51
          ],
          [
-          272,
-          -1.6,
-          52
+          273,
+          -1.5,
+          51
          ],
          [
-          275,
-          -2.1,
-          52
+          277,
+          -2,
+          51
          ],
          [
           -27,
@@ -1001,39 +1001,39 @@
           229
          ],
          [
-          -26,
+          -24,
           -0.4,
           232
          ],
          [
-          -144,
+          -145,
           -0.4,
           224
          ],
          [
-          -146,
+          -148,
           -0.3,
           223
          ],
          [
-          -149,
+          -150,
           -0.3,
           221
          ],
          [
           144,
           -0.4,
-          103
+          104
          ],
          [
           142,
           -0.3,
-          105
+          106
          ],
          [
-          142,
-          1.9,
-          104
+          141,
+          0.2,
+          107
          ],
          [
           -91,
@@ -1043,27 +1043,27 @@
          [
           -88,
           -0.4,
-          32
+          31
          ],
          [
           -85,
           -0.4,
-          32
+          31
          ],
          [
           -26,
           -0.3,
-          263
+          262
          ],
          [
           -23,
           -0.4,
-          262
+          261
          ],
          [
           -20,
           -0.4,
-          261
+          260
          ],
          [
           32,
@@ -1072,12 +1072,12 @@
          ],
          [
           31,
-          -0.4,
+          -0.3,
           254
          ],
          [
-          24,
-          1.9,
+          28,
+          0.2,
           251
          ]
         ]
@@ -1110,29 +1110,29 @@
         ],
         "positions": [
          [
-          138,
+          144,
           94,
-          412
+          407
          ],
          [
-          -111,
+          -104,
           94,
-          75
+          71
          ],
          [
-          195,
+          203,
           94,
-          201
+          198
          ],
          [
-          -107,
-          95.3,
-          374
+          -100,
+          95.7,
+          370
          ],
          [
-          11,
+          19,
           94,
-          365
+          363
          ]
         ]
        },
@@ -1209,7 +1209,7 @@
        "mid_schools": 20,
        "mid_agents": 228,
        "far_silhouettes": 120,
-       "breaches": 17,
+       "breaches": 15,
        "reach_m": 260,
        "near_schools": 13,
        "draw_calls": 2
@@ -1240,24 +1240,24 @@
    },
    "debug": {
     "build_ms": {
-     "fixtures": 4,
-     "water": 23,
-     "coast": 21,
-     "terrain": 33,
-     "macro": 2,
-     "meadow": 24,
-     "forest": 4591,
-     "architecture": 1157,
-     "celestial": 668,
+     "fixtures": 2,
+     "water": 17,
+     "coast": 17,
+     "terrain": 32,
+     "macro": 3,
+     "meadow": 17,
+     "forest": 2747,
+     "architecture": 757,
+     "celestial": 473,
      "sky": 8,
      "atmosphere": 0,
-     "props": 904,
-     "matchHall": 16,
+     "props": 715,
+     "matchHall": 10,
      "guides": 0,
-     "creatures": 260,
-     "wildlife": 418,
-     "gear": 16,
-     "signage": 21
+     "creatures": 273,
+     "wildlife": 346,
+     "gear": 11,
+     "signage": 9
     },
     "fixtures": 164,
     "water": {
@@ -1309,12 +1309,12 @@
       "damp": 0.99,
       "amp_m": 0.07,
       "ring_speed_mps": 3.94,
-      "impulses": 35,
+      "impulses": 32,
       "dropped": 0,
       "steps": 0,
       "active": false,
       "in_water": false,
-      "pending": 35,
+      "pending": 32,
       "origin": [
        0,
        3.9375
@@ -1356,7 +1356,7 @@
      "dust": 2661,
      "monoliths": 18,
      "draw_calls": 10,
-     "tris": 16734,
+     "tris": 29478,
      "night": true
     },
     "macro": {
@@ -1571,8 +1571,8 @@
       "transitions": 121,
       "rewrites": 1,
       "timing_ms": {
-       "build_ms": 4590.4,
-       "assemble_ms": 0.9,
+       "build_ms": 2747.1,
+       "assemble_ms": 1.4,
        "first_classify_ms": 0.11,
        "first_rewrite_ms": 0.055,
        "last_classify_ms": 0,
@@ -1713,13 +1713,13 @@
        "seed": 3238878957
       },
       "cloud": {
-       "tau": 0.008,
-       "coverage": 0.008,
-       "transmission": 0.992,
-       "disc": 0.995,
-       "halo": 0.989,
-       "rays": 0.984,
-       "key": 0.995
+       "tau": 0.012,
+       "coverage": 0.012,
+       "transmission": 0.988,
+       "disc": 0.993,
+       "halo": 0.984,
+       "rays": 0.977,
+       "key": 0.993
       }
      },
      "moon": {
@@ -1771,13 +1771,13 @@
        "seed": 3238878957
       },
       "cloud": {
-       "tau": 0.647,
-       "coverage": 0.476,
-       "transmission": 0.524,
-       "disc": 0.724,
-       "halo": 0.418,
-       "rays": 0.274,
-       "key": 0.705
+       "tau": 0.075,
+       "coverage": 0.072,
+       "transmission": 0.928,
+       "disc": 0.958,
+       "halo": 0.904,
+       "rays": 0.861,
+       "key": 0.955
       }
      }
     },
@@ -1785,8 +1785,8 @@
      "wind": {
       "dir_deg": 28,
       "speed_mps": 2.4,
-      "now_mps": 3.02,
-      "travel_m": 51.87,
+      "now_mps": 2.51,
+      "travel_m": 41.95,
       "gust": 0.35
      },
      "cloud_cards": "OLD_SOFT_FEATHERED",
@@ -1864,28 +1864,28 @@
      "celestial_optics": {
       "model": "T=exp(-tau)",
       "sun": {
-       "tau": 0.008,
-       "transmission": 0.992,
-       "coverage": 0.008,
-       "disc": 0.995,
-       "halo": 0.989,
-       "rays": 0.984,
-       "key": 0.995,
-       "phase_u": 0.307,
-       "phase_v": 0.346,
-       "travel_m": 51.87
+       "tau": 0.012,
+       "transmission": 0.988,
+       "coverage": 0.012,
+       "disc": 0.993,
+       "halo": 0.984,
+       "rays": 0.977,
+       "key": 0.993,
+       "phase_u": 0.281,
+       "phase_v": 0.312,
+       "travel_m": 41.95
       },
       "moon": {
-       "tau": 0.647,
-       "transmission": 0.524,
-       "coverage": 0.476,
-       "disc": 0.724,
-       "halo": 0.418,
-       "rays": 0.274,
-       "key": 0.705,
-       "phase_u": 0.691,
-       "phase_v": 0.346,
-       "travel_m": 51.87
+       "tau": 0.075,
+       "transmission": 0.928,
+       "coverage": 0.072,
+       "disc": 0.958,
+       "halo": 0.904,
+       "rays": 0.861,
+       "key": 0.955,
+       "phase_u": 0.665,
+       "phase_v": 0.312,
+       "travel_m": 41.95
       }
      },
      "draw_calls": 4,
@@ -2150,7 +2150,7 @@
        "states": [
         "SWIM",
         "SWIM",
-        "RISE",
+        "SWIM",
         "SWIM",
         "SWIM",
         "SWIM",
@@ -2164,7 +2164,7 @@
         "SWIM",
         "BREACH",
         "SWIM",
-        "RISE",
+        "SWIM",
         "SWIM",
         "SWIM",
         "SWIM",
@@ -2175,34 +2175,34 @@
        ],
        "positions": [
         [
-         -9,
+         -7,
          -1.4,
          -122
         ],
         [
-         -6,
-         -2.1,
+         -4,
+         -2,
          -120
         ],
         [
-         -4,
-         -1.9,
+         -2,
+         -2,
          -118
         ],
         [
-         269,
+         270,
          -1.4,
          51
         ],
         [
-         272,
-         -1.6,
-         52
+         273,
+         -1.5,
+         51
         ],
         [
-         275,
-         -2.1,
-         52
+         277,
+         -2,
+         51
         ],
         [
          -27,
@@ -2215,39 +2215,39 @@
          229
         ],
         [
-         -26,
+         -24,
          -0.4,
          232
         ],
         [
-         -144,
+         -145,
          -0.4,
          224
         ],
         [
-         -146,
+         -148,
          -0.3,
          223
         ],
         [
-         -149,
+         -150,
          -0.3,
          221
         ],
         [
          144,
          -0.4,
-         103
+         104
         ],
         [
          142,
          -0.3,
-         105
+         106
         ],
         [
-         142,
-         1.9,
-         104
+         141,
+         0.2,
+         107
         ],
         [
          -91,
@@ -2257,27 +2257,27 @@
         [
          -88,
          -0.4,
-         32
+         31
         ],
         [
          -85,
          -0.4,
-         32
+         31
         ],
         [
          -26,
          -0.3,
-         263
+         262
         ],
         [
          -23,
          -0.4,
-         262
+         261
         ],
         [
          -20,
          -0.4,
-         261
+         260
         ],
         [
          32,
@@ -2286,12 +2286,12 @@
         ],
         [
          31,
-         -0.4,
+         -0.3,
          254
         ],
         [
-         24,
-         1.9,
+         28,
+         0.2,
          251
         ]
        ]
@@ -2324,29 +2324,29 @@
        ],
        "positions": [
         [
-         138,
+         144,
          94,
-         412
+         407
         ],
         [
-         -111,
+         -104,
          94,
-         75
+         71
         ],
         [
-         195,
+         203,
          94,
-         201
+         198
         ],
         [
-         -107,
-         95.3,
-         374
+         -100,
+         95.7,
+         370
         ],
         [
-         11,
+         19,
          94,
-         365
+         363
         ]
        ]
       },
@@ -2423,7 +2423,7 @@
       "mid_schools": 20,
       "mid_agents": 228,
       "far_silhouettes": 120,
-      "breaches": 17,
+      "breaches": 15,
       "reach_m": 260,
       "near_schools": 13,
       "draw_calls": 2
@@ -2592,8 +2592,8 @@
     "aura_attack": "#a9c4ff",
     "ko_ago_s": null,
     "position": {
-     "x": -140.082,
-     "z": 17.124
+     "x": -139.892,
+     "z": 17.119
     },
     "y": 2.6,
     "facing": 1.546,
@@ -2665,10 +2665,9 @@
     "height_m": 1.4,
     "scale": 1.4319,
     "states": {
-     "BITE": 1,
-     "CHASE": 2,
-     "IDLE": 2,
-     "ROAM": 3
+     "CHASE": 3,
+     "IDLE": 3,
+     "ROAM": 2
     },
     "draw_calls_visible": 12,
     "tags": 8,
@@ -2691,7 +2690,7 @@
     "motion": [
      {
       "id": "WILD_DOGKIE_03",
-      "state": "BITE",
+      "state": "CHASE",
       "hover_m": 0.07,
       "gait_weight": 1,
       "attack_weight": 0
@@ -2713,22 +2712,22 @@
      {
       "id": "WILD_DOGKIE_06",
       "state": "IDLE",
-      "hover_m": 0,
-      "gait_weight": 0,
+      "hover_m": 0.001,
+      "gait_weight": 0.018,
       "attack_weight": 0
      },
      {
       "id": "WILD_DOGKIE_07",
       "state": "IDLE",
-      "hover_m": 0,
-      "gait_weight": 0,
+      "hover_m": 0.015,
+      "gait_weight": 0.219,
       "attack_weight": 0
      },
      {
       "id": "WILD_DOGKIE_08",
-      "state": "ROAM",
-      "hover_m": 0.068,
-      "gait_weight": 0.964,
+      "state": "IDLE",
+      "hover_m": 0,
+      "gait_weight": 0,
       "attack_weight": 0
      },
      {
@@ -2741,8 +2740,8 @@
      {
       "id": "WILD_DOGKIE_10",
       "state": "ROAM",
-      "hover_m": 0.07,
-      "gait_weight": 1,
+      "hover_m": 0.069,
+      "gait_weight": 0.979,
       "attack_weight": 0
      }
     ],
@@ -2761,24 +2760,24 @@
     "floor_cut_error": null,
     "modules": {
      "build_ms": {
-      "fixtures": 4,
-      "water": 23,
-      "coast": 21,
-      "terrain": 33,
-      "macro": 2,
-      "meadow": 24,
-      "forest": 4591,
-      "architecture": 1157,
-      "celestial": 668,
+      "fixtures": 2,
+      "water": 17,
+      "coast": 17,
+      "terrain": 32,
+      "macro": 3,
+      "meadow": 17,
+      "forest": 2747,
+      "architecture": 757,
+      "celestial": 473,
       "sky": 8,
       "atmosphere": 0,
-      "props": 904,
-      "matchHall": 16,
+      "props": 715,
+      "matchHall": 10,
       "guides": 0,
-      "creatures": 260,
-      "wildlife": 418,
-      "gear": 16,
-      "signage": 21
+      "creatures": 273,
+      "wildlife": 346,
+      "gear": 11,
+      "signage": 9
      },
      "fixtures": 164,
      "water": {
@@ -2830,12 +2829,12 @@
        "damp": 0.99,
        "amp_m": 0.07,
        "ring_speed_mps": 3.94,
-       "impulses": 137,
-       "dropped": 5,
-       "steps": 233,
+       "impulses": 126,
+       "dropped": 0,
+       "steps": 251,
        "active": false,
        "in_water": false,
-       "pending": 64,
+       "pending": 61,
        "origin": [
         -135,
         17.0625
@@ -2877,7 +2876,7 @@
       "dust": 2661,
       "monoliths": 18,
       "draw_calls": 10,
-      "tris": 16734,
+      "tris": 29478,
       "night": true
      },
      "macro": {
@@ -3089,11 +3088,11 @@
        }
       ],
       "lifecycle": {
-       "transitions": 145,
-       "rewrites": 6,
+       "transitions": 171,
+       "rewrites": 7,
        "timing_ms": {
-        "build_ms": 4590.4,
-        "assemble_ms": 0.9,
+        "build_ms": 2747.1,
+        "assemble_ms": 1.4,
         "first_classify_ms": 0.11,
         "first_rewrite_ms": 0.055,
         "last_classify_ms": 0,
@@ -3234,13 +3233,13 @@
         "seed": 3238878957
        },
        "cloud": {
-        "tau": 1.329,
-        "coverage": 0.735,
-        "transmission": 0.265,
-        "disc": 0.574,
-        "halo": 0.166,
-        "rays": 0.07,
-        "key": 0.544
+        "tau": 1.238,
+        "coverage": 0.71,
+        "transmission": 0.29,
+        "disc": 0.588,
+        "halo": 0.188,
+        "rays": 0.084,
+        "key": 0.56
        }
       },
       "moon": {
@@ -3292,13 +3291,13 @@
         "seed": 3238878957
        },
        "cloud": {
-        "tau": 0.808,
-        "coverage": 0.554,
-        "transmission": 0.446,
-        "disc": 0.679,
-        "halo": 0.336,
-        "rays": 0.199,
-        "key": 0.656
+        "tau": 1.259,
+        "coverage": 0.716,
+        "transmission": 0.284,
+        "disc": 0.585,
+        "halo": 0.183,
+        "rays": 0.081,
+        "key": 0.556
        }
       }
      },
@@ -3306,8 +3305,8 @@
       "wind": {
        "dir_deg": 28,
        "speed_mps": 2.4,
-       "now_mps": 3.23,
-       "travel_m": 110.8,
+       "now_mps": 2.75,
+       "travel_m": 94.62,
        "gust": 0.35
       },
       "cloud_cards": "OLD_SOFT_FEATHERED",
@@ -3385,28 +3384,28 @@
       "celestial_optics": {
        "model": "T=exp(-tau)",
        "sun": {
-        "tau": 1.329,
-        "transmission": 0.265,
-        "coverage": 0.735,
-        "disc": 0.574,
-        "halo": 0.166,
-        "rays": 0.07,
-        "key": 0.544,
-        "phase_u": 0.46,
-        "phase_v": 0.546,
-        "travel_m": 110.8
+        "tau": 1.238,
+        "transmission": 0.29,
+        "coverage": 0.71,
+        "disc": 0.588,
+        "halo": 0.188,
+        "rays": 0.084,
+        "key": 0.56,
+        "phase_u": 0.418,
+        "phase_v": 0.491,
+        "travel_m": 94.62
        },
        "moon": {
-        "tau": 0.808,
-        "transmission": 0.446,
-        "coverage": 0.554,
-        "disc": 0.679,
-        "halo": 0.336,
-        "rays": 0.199,
-        "key": 0.656,
-        "phase_u": 0.845,
-        "phase_v": 0.546,
-        "travel_m": 110.8
+        "tau": 1.259,
+        "transmission": 0.284,
+        "coverage": 0.716,
+        "disc": 0.585,
+        "halo": 0.183,
+        "rays": 0.081,
+        "key": 0.556,
+        "phase_u": 0.802,
+        "phase_v": 0.491,
+        "travel_m": 94.62
        }
       },
       "draw_calls": 4,
@@ -3671,8 +3670,8 @@
         "states": [
          "SWIM",
          "SWIM",
+         "RISE",
          "SWIM",
-         "DIVE",
          "SWIM",
          "SWIM",
          "SWIM",
@@ -3696,124 +3695,124 @@
         ],
         "positions": [
          [
-          -31,
-          -1.4,
-          -139
+          -32,
+          -1.6,
+          -137
          ],
          [
           -34,
-          -2.1,
-          -138
+          -1.8,
+          -134
          ],
          [
-          -33,
-          -2.1,
-          -139
-         ],
-         [
-          -22,
-          0.1,
-          223
-         ],
-         [
-          -15,
-          -0.4,
-          222
+          -36,
+          -1.1,
+          -132
          ],
          [
           -17,
+          -0.3,
+          224
+         ],
+         [
+          -19,
+          -0.4,
+          223
+         ],
+         [
+          -22,
           -0.4,
           221
          ],
          [
-          -111,
+          -114,
           -0.4,
-          225
+          224
          ],
          [
-          -114,
+          -117,
           -0.3,
           222
          ],
          [
-          -116,
+          -120,
           -0.3,
           220
          ],
          [
-          150,
+          149,
           -0.4,
           98
          ],
          [
-          149,
-          -0.3,
-          95
+          147,
+          -0.4,
+          96
          ],
          [
-          147,
+          145,
           -0.3,
           93
          ],
          [
-          -96,
+          -95,
           -0.4,
           33
          ],
          [
-          -96,
+          -95,
           -0.4,
           36
          ],
          [
-          -96,
+          -94,
           -0.4,
           39
          ],
          [
-          -31,
+          -30,
           -0.3,
           265
          ],
          [
-          -29,
+          -28,
           -0.4,
-          268
+          267
          ],
          [
-          -28,
+          -26,
           -0.4,
           270
          ],
          [
-          33,
-          -0.3,
-          263
-         ],
-         [
-          36,
-          -0.3,
-          263
-         ],
-         [
-          39,
+          34,
           -0.4,
           263
          ],
          [
-          238,
-          -1.4,
-          52
+          37,
+          -0.3,
+          262
          ],
          [
-          239,
-          -1.6,
-          55
+          40,
+          -0.4,
+          261
          ],
          [
           241,
-          -2.1,
-          58
+          -1.6,
+          54
+         ],
+         [
+          243,
+          -1.3,
+          56
+         ],
+         [
+          245,
+          -1.8,
+          59
          ]
         ]
        },
@@ -3845,29 +3844,29 @@
         ],
         "positions": [
          [
-          -26,
+          -10,
           94,
-          403
+          419
          ],
          [
           -234,
           94,
-          -10
+          13
          ],
          [
-          105,
+          97,
           94,
-          92
+          113
          ],
          [
           -237,
-          98.4,
-          298
+          99.8,
+          321
          ],
          [
-          -47,
-          94.7,
-          253
+          -61,
+          95.7,
+          272
          ]
         ]
        },
@@ -3891,43 +3890,43 @@
          "payment_ui": false
         },
         "states": [
+         "GRAZE",
          "WALK",
          "GRAZE",
-         "TROT",
-         "WALK",
          "GRAZE",
-         "WALK"
+         "GRAZE",
+         "GRAZE"
         ],
         "positions": [
          [
-          -33,
+          -36,
           0,
-          156
+          155
          ],
          [
-          -156,
+          -155,
           2.6,
           17
          ],
          [
-          -96,
+          -99,
           0,
-          -28
+          -31
          ],
          [
-          74,
-          0,
-          119
-         ],
-         [
-          -145,
+          -144,
           0,
           180
          ],
          [
-          138,
-          0.1,
-          141
+          73,
+          0,
+          118
+         ],
+         [
+          140,
+          0,
+          142
          ]
         ]
        }
@@ -3950,7 +3949,7 @@
        "mid_schools": 20,
        "mid_agents": 228,
        "far_silhouettes": 120,
-       "breaches": 55,
+       "breaches": 51,
        "reach_m": 260,
        "near_schools": 13,
        "draw_calls": 2
@@ -3971,7 +3970,7 @@
           "HAND_R"
          ],
          "palm_mid_error_m": 0,
-         "hand_span_m": 0.681
+         "hand_span_m": 0.689
         }
        }
       ],
@@ -4002,24 +4001,24 @@
    },
    "debug": {
     "build_ms": {
-     "fixtures": 4,
-     "water": 23,
-     "coast": 21,
-     "terrain": 33,
-     "macro": 2,
-     "meadow": 24,
-     "forest": 4591,
-     "architecture": 1157,
-     "celestial": 668,
+     "fixtures": 2,
+     "water": 17,
+     "coast": 17,
+     "terrain": 32,
+     "macro": 3,
+     "meadow": 17,
+     "forest": 2747,
+     "architecture": 757,
+     "celestial": 473,
      "sky": 8,
      "atmosphere": 0,
-     "props": 904,
-     "matchHall": 16,
+     "props": 715,
+     "matchHall": 10,
      "guides": 0,
-     "creatures": 260,
-     "wildlife": 418,
-     "gear": 16,
-     "signage": 21
+     "creatures": 273,
+     "wildlife": 346,
+     "gear": 11,
+     "signage": 9
     },
     "fixtures": 164,
     "water": {
@@ -4071,12 +4070,12 @@
       "damp": 0.99,
       "amp_m": 0.07,
       "ring_speed_mps": 3.94,
-      "impulses": 137,
-      "dropped": 5,
-      "steps": 233,
+      "impulses": 126,
+      "dropped": 0,
+      "steps": 251,
       "active": false,
       "in_water": false,
-      "pending": 64,
+      "pending": 61,
       "origin": [
        -135,
        17.0625
@@ -4118,7 +4117,7 @@
      "dust": 2661,
      "monoliths": 18,
      "draw_calls": 10,
-     "tris": 16734,
+     "tris": 29478,
      "night": true
     },
     "macro": {
@@ -4330,11 +4329,11 @@
       }
      ],
      "lifecycle": {
-      "transitions": 145,
-      "rewrites": 6,
+      "transitions": 171,
+      "rewrites": 7,
       "timing_ms": {
-       "build_ms": 4590.4,
-       "assemble_ms": 0.9,
+       "build_ms": 2747.1,
+       "assemble_ms": 1.4,
        "first_classify_ms": 0.11,
        "first_rewrite_ms": 0.055,
        "last_classify_ms": 0,
@@ -4475,13 +4474,13 @@
        "seed": 3238878957
       },
       "cloud": {
-       "tau": 1.329,
-       "coverage": 0.735,
-       "transmission": 0.265,
-       "disc": 0.574,
-       "halo": 0.166,
-       "rays": 0.07,
-       "key": 0.544
+       "tau": 1.238,
+       "coverage": 0.71,
+       "transmission": 0.29,
+       "disc": 0.588,
+       "halo": 0.188,
+       "rays": 0.084,
+       "key": 0.56
       }
      },
      "moon": {
@@ -4533,13 +4532,13 @@
        "seed": 3238878957
       },
       "cloud": {
-       "tau": 0.808,
-       "coverage": 0.554,
-       "transmission": 0.446,
-       "disc": 0.679,
-       "halo": 0.336,
-       "rays": 0.199,
-       "key": 0.656
+       "tau": 1.259,
+       "coverage": 0.716,
+       "transmission": 0.284,
+       "disc": 0.585,
+       "halo": 0.183,
+       "rays": 0.081,
+       "key": 0.556
       }
      }
     },
@@ -4547,8 +4546,8 @@
      "wind": {
       "dir_deg": 28,
       "speed_mps": 2.4,
-      "now_mps": 3.23,
-      "travel_m": 110.8,
+      "now_mps": 2.75,
+      "travel_m": 94.62,
       "gust": 0.35
      },
      "cloud_cards": "OLD_SOFT_FEATHERED",
@@ -4626,28 +4625,28 @@
      "celestial_optics": {
       "model": "T=exp(-tau)",
       "sun": {
-       "tau": 1.329,
-       "transmission": 0.265,
-       "coverage": 0.735,
-       "disc": 0.574,
-       "halo": 0.166,
-       "rays": 0.07,
-       "key": 0.544,
-       "phase_u": 0.46,
-       "phase_v": 0.546,
-       "travel_m": 110.8
+       "tau": 1.238,
+       "transmission": 0.29,
+       "coverage": 0.71,
+       "disc": 0.588,
+       "halo": 0.188,
+       "rays": 0.084,
+       "key": 0.56,
+       "phase_u": 0.418,
+       "phase_v": 0.491,
+       "travel_m": 94.62
       },
       "moon": {
-       "tau": 0.808,
-       "transmission": 0.446,
-       "coverage": 0.554,
-       "disc": 0.679,
-       "halo": 0.336,
-       "rays": 0.199,
-       "key": 0.656,
-       "phase_u": 0.845,
-       "phase_v": 0.546,
-       "travel_m": 110.8
+       "tau": 1.259,
+       "transmission": 0.284,
+       "coverage": 0.716,
+       "disc": 0.585,
+       "halo": 0.183,
+       "rays": 0.081,
+       "key": 0.556,
+       "phase_u": 0.802,
+       "phase_v": 0.491,
+       "travel_m": 94.62
       }
      },
      "draw_calls": 4,
@@ -4912,8 +4911,8 @@
        "states": [
         "SWIM",
         "SWIM",
+        "RISE",
         "SWIM",
-        "DIVE",
         "SWIM",
         "SWIM",
         "SWIM",
@@ -4937,124 +4936,124 @@
        ],
        "positions": [
         [
-         -31,
-         -1.4,
-         -139
+         -32,
+         -1.6,
+         -137
         ],
         [
          -34,
-         -2.1,
-         -138
+         -1.8,
+         -134
         ],
         [
-         -33,
-         -2.1,
-         -139
-        ],
-        [
-         -22,
-         0.1,
-         223
-        ],
-        [
-         -15,
-         -0.4,
-         222
+         -36,
+         -1.1,
+         -132
         ],
         [
          -17,
+         -0.3,
+         224
+        ],
+        [
+         -19,
+         -0.4,
+         223
+        ],
+        [
+         -22,
          -0.4,
          221
         ],
         [
-         -111,
+         -114,
          -0.4,
-         225
+         224
         ],
         [
-         -114,
+         -117,
          -0.3,
          222
         ],
         [
-         -116,
+         -120,
          -0.3,
          220
         ],
         [
-         150,
+         149,
          -0.4,
          98
         ],
         [
-         149,
-         -0.3,
-         95
+         147,
+         -0.4,
+         96
         ],
         [
-         147,
+         145,
          -0.3,
          93
         ],
         [
-         -96,
+         -95,
          -0.4,
          33
         ],
         [
-         -96,
+         -95,
          -0.4,
          36
         ],
         [
-         -96,
+         -94,
          -0.4,
          39
         ],
         [
-         -31,
+         -30,
          -0.3,
          265
         ],
         [
-         -29,
+         -28,
          -0.4,
-         268
+         267
         ],
         [
-         -28,
+         -26,
          -0.4,
          270
         ],
         [
-         33,
-         -0.3,
-         263
-        ],
-        [
-         36,
-         -0.3,
-         263
-        ],
-        [
-         39,
+         34,
          -0.4,
          263
         ],
         [
-         238,
-         -1.4,
-         52
+         37,
+         -0.3,
+         262
         ],
         [
-         239,
-         -1.6,
-         55
+         40,
+         -0.4,
+         261
         ],
         [
          241,
-         -2.1,
-         58
+         -1.6,
+         54
+        ],
+        [
+         243,
+         -1.3,
+         56
+        ],
+        [
+         245,
+         -1.8,
+         59
         ]
        ]
       },
@@ -5086,29 +5085,29 @@
        ],
        "positions": [
         [
-         -26,
+         -10,
          94,
-         403
+         419
         ],
         [
          -234,
          94,
-         -10
+         13
         ],
         [
-         105,
+         97,
          94,
-         92
+         113
         ],
         [
          -237,
-         98.4,
-         298
+         99.8,
+         321
         ],
         [
-         -47,
-         94.7,
-         253
+         -61,
+         95.7,
+         272
         ]
        ]
       },
@@ -5132,43 +5131,43 @@
         "payment_ui": false
        },
        "states": [
+        "GRAZE",
         "WALK",
         "GRAZE",
-        "TROT",
-        "WALK",
         "GRAZE",
-        "WALK"
+        "GRAZE",
+        "GRAZE"
        ],
        "positions": [
         [
-         -33,
+         -36,
          0,
-         156
+         155
         ],
         [
-         -156,
+         -155,
          2.6,
          17
         ],
         [
-         -96,
+         -99,
          0,
-         -28
+         -31
         ],
         [
-         74,
-         0,
-         119
-        ],
-        [
-         -145,
+         -144,
          0,
          180
         ],
         [
-         138,
-         0.1,
-         141
+         73,
+         0,
+         118
+        ],
+        [
+         140,
+         0,
+         142
         ]
        ]
       }
@@ -5191,7 +5190,7 @@
       "mid_schools": 20,
       "mid_agents": 228,
       "far_silhouettes": 120,
-      "breaches": 55,
+      "breaches": 51,
       "reach_m": 260,
       "near_schools": 13,
       "draw_calls": 2
@@ -5212,7 +5211,7 @@
          "HAND_R"
         ],
         "palm_mid_error_m": 0,
-        "hand_span_m": 0.681
+        "hand_span_m": 0.689
        }
       }
      ],
@@ -5255,7 +5254,7 @@
         "HAND_R"
        ],
        "palm_mid_error_m": 0,
-       "hand_span_m": 0.681
+       "hand_span_m": 0.689
       }
      }
     ],
@@ -5291,13 +5290,13 @@
   },
   "casts": [
    {
-    "command_id": "play-PLAYER_A-2eh8wl-14",
+    "command_id": "play-PLAYER_A-5ojtnj-14",
     "seq": 14,
     "accepted": true,
-    "version": 455,
-    "tick": 434,
+    "version": 422,
+    "tick": 402,
     "duplicate": false,
-    "cast_id": "CAST_PLAYER_A_2",
+    "cast_id": "CAST_PLAYER_A_1",
     "equipment_ids": [],
     "skill": "PA_PUSH",
     "category": "PHYSICAL",
@@ -5310,13 +5309,13 @@
     "aim_source": "LOCK"
    },
    {
-    "command_id": "play-PLAYER_A-2eh8wl-15",
+    "command_id": "play-PLAYER_A-5ojtnj-15",
     "seq": 15,
     "accepted": true,
-    "version": 482,
-    "tick": 460,
+    "version": 446,
+    "tick": 425,
     "duplicate": false,
-    "cast_id": "CAST_PLAYER_A_3",
+    "cast_id": "CAST_PLAYER_A_2",
     "equipment_ids": [],
     "skill": "PA_PUSH",
     "category": "PHYSICAL",
@@ -5334,9 +5333,9 @@
    {
     "id": "RF_3",
     "kind": "MAHGIC_REFILL",
-    "x": 16.4,
+    "x": 15.99,
     "y": 0.45,
-    "z": 54.11,
+    "z": 54.62,
     "age_s": 0.6,
     "overflow_held": false,
     "source": "NODE_RB_NEXUS_INTRO"
@@ -5344,9 +5343,9 @@
    {
     "id": "RF_4",
     "kind": "MAHGIC_REFILL",
-    "x": 18.05,
+    "x": 17.82,
     "y": 0.45,
-    "z": 54.92,
+    "z": 54.33,
     "age_s": 0.6,
     "overflow_held": false,
     "source": "NODE_RB_NEXUS_INTRO"
@@ -5354,9 +5353,9 @@
    {
     "id": "RF_5",
     "kind": "MAHGIC_REFILL",
-    "x": 16.52,
+    "x": 17.18,
     "y": 0.45,
-    "z": 56,
+    "z": 56.09,
     "age_s": 0.6,
     "overflow_held": false,
     "source": "NODE_RB_NEXUS_INTRO"
@@ -5364,8 +5363,8 @@
   ],
   "events": [
    {
-    "tick": 438,
-    "t": 21.9,
+    "tick": 406,
+    "t": 20.3,
     "kind": "R1723_DAMAGE",
     "by": "PLAYER_A",
     "on": "NODE_RB_NEXUS_INTRO",
@@ -5386,8 +5385,8 @@
     "gear_mult": 1.8
    },
    {
-    "tick": 464,
-    "t": 23.2,
+    "tick": 429,
+    "t": 21.45,
     "kind": "R1723_DAMAGE",
     "by": "PLAYER_A",
     "on": "NODE_RB_NEXUS_INTRO",
@@ -5408,8 +5407,8 @@
     "gear_mult": 1.8
    },
    {
-    "tick": 465,
-    "t": 23.25,
+    "tick": 430,
+    "t": 21.5,
     "kind": "RESOURCE_NODE_BROKEN",
     "id": "NODE_RB_NEXUS_INTRO",
     "by": "player",
@@ -5419,8 +5418,8 @@
     "respawn_s": 90
    },
    {
-    "tick": 484,
-    "t": 24.2,
+    "tick": 446,
+    "t": 22.3,
     "kind": "REFILL_PICKED",
     "account": "PLAYER_A",
     "id": "RF_3",
@@ -5428,8 +5427,8 @@
     "inventory": 1
    },
    {
-    "tick": 490,
-    "t": 24.5,
+    "tick": 452,
+    "t": 22.6,
     "kind": "REFILL_PICKED",
     "account": "PLAYER_A",
     "id": "RF_4",
@@ -5437,8 +5436,8 @@
     "inventory": 2
    },
    {
-    "tick": 495,
-    "t": 24.75,
+    "tick": 458,
+    "t": 22.9,
     "kind": "REFILL_PICKED",
     "account": "PLAYER_A",
     "id": "RF_5",
@@ -5458,11 +5457,11 @@
  "equipment": {
   "dumbbell": {
    "manifest": {
-    "command_id": "play-PLAYER_A-2eh8wl-9",
+    "command_id": "play-PLAYER_A-5ojtnj-9",
     "seq": 9,
     "accepted": true,
-    "version": 399,
-    "tick": 381,
+    "version": 368,
+    "tick": 351,
     "duplicate": false,
     "kind": "DUMBBELL",
     "count": 2,
@@ -5475,11 +5474,11 @@
      "kind": "DUMBBELL",
      "state": "MANIFESTED",
      "x": 16.65,
-     "y": 1.459,
+     "y": 1.446,
      "z": 57.05,
      "side": -0.35,
      "idx": 0,
-     "age_s": 0.9,
+     "age_s": 0.85,
      "special": null
     },
     {
@@ -5487,21 +5486,21 @@
      "kind": "DUMBBELL",
      "state": "MANIFESTED",
      "x": 17.35,
-     "y": 1.488,
+     "y": 1.411,
      "z": 57.05,
      "side": 0.35,
      "idx": 1,
-     "age_s": 0.9,
+     "age_s": 0.85,
      "special": null
     }
    ],
    "picks": [
     {
-     "command_id": "play-PLAYER_A-2eh8wl-10",
+     "command_id": "play-PLAYER_A-5ojtnj-10",
      "seq": 10,
      "accepted": true,
-     "version": 439,
-     "tick": 421,
+     "version": 408,
+     "tick": 391,
      "duplicate": false,
      "id": "EQ_DUMBBELL_1",
      "kind": "DUMBBELL",
@@ -5509,11 +5508,11 @@
      "multiplier": 1.8
     },
     {
-     "command_id": "play-PLAYER_A-2eh8wl-11",
+     "command_id": "play-PLAYER_A-5ojtnj-11",
      "seq": 11,
      "accepted": true,
-     "version": 441,
-     "tick": 423,
+     "version": 410,
+     "tick": 393,
      "duplicate": false,
      "id": "EQ_DUMBBELL_2",
      "kind": "DUMBBELL",
@@ -5566,11 +5565,11 @@
   },
   "barbell": {
    "manifest": {
-    "command_id": "play-PLAYER_A-2eh8wl-17",
+    "command_id": "play-PLAYER_A-5ojtnj-17",
     "seq": 17,
     "accepted": true,
-    "version": 543,
-    "tick": 517,
+    "version": 504,
+    "tick": 479,
     "duplicate": false,
     "kind": "BARBELL",
     "count": 1,
@@ -5582,22 +5581,22 @@
      "id": "EQ_BARBELL_6",
      "kind": "BARBELL",
      "state": "MANIFESTED",
-     "x": 16.52,
+     "x": 17.18,
      "y": 0.34,
-     "z": 54.3,
+     "z": 54.39,
      "side": 0,
      "idx": 0,
-     "age_s": 0.65,
+     "age_s": 0.7,
      "special": null
     }
    ],
    "picks": [
     {
-     "command_id": "play-PLAYER_A-2eh8wl-18",
+     "command_id": "play-PLAYER_A-5ojtnj-18",
      "seq": 18,
      "accepted": true,
-     "version": 582,
-     "tick": 556,
+     "version": 544,
+     "tick": 519,
      "duplicate": false,
      "id": "EQ_BARBELL_6",
      "kind": "BARBELL",
@@ -5620,7 +5619,7 @@
         "HAND_R"
        ],
        "palm_mid_error_m": 0,
-       "hand_span_m": 0.689
+       "hand_span_m": 0.68
       }
      }
     ],
@@ -5645,11 +5644,11 @@
  "attacks": {
   "physical_mahgic": {
    "select": {
-    "command_id": "play-PLAYER_A-2eh8wl-20",
+    "command_id": "play-PLAYER_A-5ojtnj-20",
     "seq": 20,
     "accepted": true,
-    "version": 612,
-    "tick": 583,
+    "version": 568,
+    "tick": 540,
     "duplicate": false,
     "category": "PHYSICAL_MAGIC",
     "slot": 0,
@@ -5659,13 +5658,13 @@
    },
    "skill": "PA_PUSH",
    "cast": {
-    "command_id": "play-PLAYER_A-2eh8wl-21",
+    "command_id": "play-PLAYER_A-5ojtnj-21",
     "seq": 21,
     "accepted": true,
-    "version": 613,
-    "tick": 583,
+    "version": 570,
+    "tick": 541,
     "duplicate": false,
-    "cast_id": "CAST_PLAYER_A_4",
+    "cast_id": "CAST_PLAYER_A_3",
     "equipment_ids": [],
     "skill": "PM_PUSH",
     "category": "PHYSICAL_MAGIC",
@@ -5680,13 +5679,13 @@
    "samples": [
     {
      "cast": {
-      "cast_id": "CAST_PLAYER_A_4",
+      "cast_id": "CAST_PLAYER_A_3",
       "equipment_ids": [],
       "skill": "PM_PUSH",
       "category": "PHYSICAL_MAGIC",
       "attack_mode": "PHYSICAL_MAHGIC",
       "phase": "RECOVERY",
-      "progress": 0.51,
+      "progress": 0.4,
       "stack": {
        "attack_stack_id": "AS_ATHLETE_PHYSICAL_MAHGIC_HORIZONTAL_PUSH_PM_PUSH_F",
        "attack_stack_revision": 1,
@@ -5730,42 +5729,42 @@
         0
        ],
        "PELVIS": [
-        0.06190583133291992,
-        -1.226791353426121e-49,
+        0.05968300223158288,
+        -6.616767466989938e-44,
         0
        ],
        "SPINE": [
-        0.03904256355836302,
+        0.038704560172162734,
         0,
         0
        ],
        "CHEST": [
-        0.025745104332422202,
-        -9.463819012144362e-50,
+        0.026963293068433276,
+        -5.104363474535095e-44,
         0
        ],
        "NECK": [
-        -0.0017871088366779504,
+        -0.0022405357936523076,
         0,
         0
        ],
        "HEAD": [
-        -0.03340105263558116,
-        -4.920103486619323e-48,
+        -0.0334308419416349,
+        -2.943776998329011e-42,
         0
        ],
        "CLAV_L": [
-        -0.08392881962298152,
-        0.1413196620749141,
-        -0.19804851019691122
+        -0.08529166127275803,
+        0.14003939428724632,
+        -0.19984496775693336
        ],
        "UPPERARM_L": [
-        -1.5286045712389815,
+        -1.5316641050121138,
         0.1058383838383838,
-        0.3643706859079115
+        0.3634603107735941
        ],
        "FOREARM_L": [
-        0.04995189390001559,
+        0.049951891685687755,
         0,
         0
        ],
@@ -5775,17 +5774,17 @@
         0
        ],
        "CLAV_R": [
-        -0.08392881962298152,
-        -0.1413196620749141,
-        0.19804851019691122
+        -0.08529166127275803,
+        -0.14003939428724632,
+        0.19984496775693336
        ],
        "UPPERARM_R": [
-        -1.5286045712389815,
+        -1.5316641050121138,
         -0.1058383838383838,
-        -0.3643706859079115
+        -0.3634603107735941
        ],
        "FOREARM_R": [
-        0.04995189390001559,
+        0.049951891685687755,
         0,
         0
        ],
@@ -5795,17 +5794,17 @@
         0
        ],
        "TAIL1": [
-        -0.09620247933884299,
-        -7.010236305292121e-50,
+        -0.09620196715602189,
+        -3.7810099811371077e-44,
         0
        ],
        "TAIL2": [
-        -0.04863498622589534,
+        -0.0486379205762026,
         0,
         0
        ],
        "TAIL3": [
-        0,
+        -0.0000023474802458078896,
         0,
         0
        ],
@@ -5820,48 +5819,48 @@
         0
        ],
        "BROW_L": [
-        0.04427509463709229,
+        0.044074938357153974,
         0,
         0
        ],
        "BROW_R": [
-        0.04427509463709229,
+        0.044074938357153974,
         0,
         0
        ],
        "CHEEK_L": [
-        -0.024851305096923026,
+        -0.024755025667628442,
         0,
         0
        ],
        "CHEEK_R": [
-        -0.024851305096923026,
+        -0.024755025667628442,
         0,
         0
        ],
        "JAW": [
-        0.021431605438541543,
+        0.021353711841610216,
         0,
         0
        ],
        "LUMBAR": [
-        0.026028375705575348,
+        0.025803040114775157,
         0,
         0
        ],
        "SPINE2": [
-        -0.023710989832854853,
-        -6.309212674762908e-50,
+        -0.023493394302808366,
+        -3.4029089830233966e-44,
         0
        ],
        "SCAP_L": [
-        -0.3451409028348587,
-        -0.08581707887820011,
+        -0.34539753273663926,
+        -0.0866988060046931,
         0
        ],
        "ARMTWIST_L": [
         0,
-        -0.27644460250436137,
+        -0.27696804341824627,
         0
        ],
        "FORETWIST_L": [
@@ -5870,13 +5869,13 @@
         0
        ],
        "SCAP_R": [
-        -0.3451409028348587,
-        0.08581707887820011,
+        -0.34539753273663926,
+        0.0866988060046931,
         0
        ],
        "ARMTWIST_R": [
         0,
-        0.27644460250436137,
+        0.27696804341824627,
         0
        ],
        "FORETWIST_R": [
@@ -5917,58 +5916,58 @@
       },
       "live": {
        "PELVIS": [
-        0.0304,
+        0.0279,
         0,
         0,
-        0.9995
+        0.9996
        ],
        "SPINE": [
-        0.0192,
+        0.0182,
         0,
         0,
         0.9998
        ],
        "CHEST": [
-        0.0104,
+        0.0077,
+        0,
+        0,
+        1
+       ],
+       "UPPERARM_L": [
+        -0.6653,
+        0.1393,
+        0.0194,
+        0.7332
+       ],
+       "UPPERARM_R": [
+        -0.6653,
+        -0.1393,
+        -0.0194,
+        0.7332
+       ],
+       "FOREARM_L": [
+        0.0131,
         0,
         0,
         0.9999
        ],
-       "UPPERARM_L": [
-        -0.6724,
-        0.1513,
-        0.0595,
-        0.7221
-       ],
-       "UPPERARM_R": [
-        -0.6724,
-        -0.1513,
-        -0.0595,
-        0.7221
-       ],
-       "FOREARM_L": [
-        0.023,
-        0,
-        0,
-        0.9997
-       ],
        "FOREARM_R": [
-        0.023,
+        0.0131,
         0,
         0,
-        0.9997
+        0.9999
        ],
        "HAND_L": [
-        -0.3855,
+        -0.3705,
         0,
         0,
-        0.9227
+        0.9288
        ],
        "HAND_R": [
-        -0.3855,
+        -0.3705,
         0,
         0,
-        0.9227
+        0.9288
        ]
       }
      }
@@ -5979,7 +5978,7 @@
       "pat": "PUSH",
       "startup": false,
       "load": 0,
-      "release": 0.6107266435986157,
+      "release": 0.1401384083044982,
       "whip": 1,
       "cadence": "BALANCED:PHYSICAL_MAGIC",
       "envelope": {
@@ -5997,42 +5996,42 @@
         0
        ],
        "PELVIS": [
-        -0.0000015530308362418112,
-        -1.973948852249194e-53,
-        0.016437597583959213
+        -0.00012819734605234163,
+        -1.6018890780651072e-46,
+        0.0017726244930424816
        ],
        "SPINE": [
-        0.0006209426780589928,
+        0.0032151619559404342,
         0,
         0
        ],
        "CHEST": [
-        -0.0025081911425224777,
-        -1.522760543163664e-53,
-        -0.0043833593557224566
+        0.007525434590821369,
+        -1.2357430030787968e-46,
+        -0.00047269986481132843
        ],
        "NECK": [
-        0.0019785030376597386,
-        -0.006527316765575232,
+        -0.0031060193187027675,
+        -2.8931609305461343e-11,
         0
        ],
        "HEAD": [
-        0.00724532433726254,
-        -0.014686462722544272,
+        0.003997281787654069,
+        -6.509612093728803e-11,
         0
        ],
        "CLAV_L": [
-        -0.006022493094022385,
+        -0.009365415268799915,
         0,
-        -0.0011011081176592564
+        -0.005124932206331583
        ],
        "UPPERARM_L": [
-        0.001768730701694169,
+        0.008741078554288781,
         0,
-        -0.05118381289363817
+        -0.056212040228665716
        ],
        "FOREARM_L": [
-        -0.1065560529222011,
+        -0.10655605630303154,
         0,
         0
        ],
@@ -6042,17 +6041,17 @@
         0
        ],
        "CLAV_R": [
-        -0.006022493094022385,
+        -0.009365415268799915,
         0,
-        0.0011011081176592564
+        0.005124932206331583
        ],
        "UPPERARM_R": [
-        0.001768730701694169,
+        0.008741078554288781,
         0,
-        0.05118381289363817
+        0.056212040228665716
        ],
        "FOREARM_R": [
-        -0.1065560529222011,
+        -0.10655605630303154,
         0,
         0
        ],
@@ -6062,17 +6061,17 @@
         0
        ],
        "TAIL1": [
-        0,
-        -1.1279707727138253e-53,
+        2.4027638758479476e-10,
+        -9.153651874657756e-47,
         0
        ],
        "TAIL2": [
-        0,
+        -1.3766822394587196e-9,
         0,
         0
        ],
        "TAIL3": [
-        0,
+        -1.1013457915669756e-9,
         0,
         0
        ],
@@ -6087,39 +6086,39 @@
         0
        ],
        "BROW_L": [
-        -0.001540627081359131,
+        0.0006207732637205945,
         0,
         0
        ],
        "BROW_R": [
-        -0.001540627081359131,
+        0.0006207732637205945,
         0,
         0
        ],
        "CHEEK_L": [
-        -0.0028129681477581437,
+        -0.0029693913499757654,
         0,
         0
        ],
        "CHEEK_R": [
-        -0.0028129681477581437,
+        -0.0029693913499757654,
         0,
         0
        ],
        "JAW": [
-        0.009312992869699239,
+        0.009277186151587607,
         0,
         0
        ],
        "LUMBAR": [
-        0.0004139617853726619,
+        0.00214344130396029,
         0,
-        -0.00913199865775512
+        -0.000984791385023601
        ],
        "SPINE2": [
-        -0.001537278442191196,
-        -1.0151736954424427e-53,
-        -0.002922239570481638
+        0.004612363136309872,
+        -8.23828668719198e-47,
+        -0.00031513324320755234
        ],
        "SCAP_L": [
         0,
@@ -6128,7 +6127,7 @@
        ],
        "ARMTWIST_L": [
         0,
-        -0.000027165052267652126,
+        -0.00014744592256455064,
         0
        ],
        "FORETWIST_L": [
@@ -6143,7 +6142,7 @@
        ],
        "ARMTWIST_R": [
         0,
-        0.000027165052267652126,
+        0.00014744592256455064,
         0
        ],
        "FORETWIST_R": [
@@ -6184,34 +6183,34 @@
       },
       "live": {
        "PELVIS": [
+        -0.0001,
         0,
-        0,
-        0.008,
+        0.0008,
         1
        ],
        "SPINE": [
-        0.0003,
+        0.0016,
         0,
         0,
         1
        ],
        "CHEST": [
-        -0.0012,
+        0.0037,
         0,
-        -0.0021,
+        -0.0002,
         1
        ],
        "UPPERARM_L": [
-        0.0009,
-        0,
-        -0.0256,
-        0.9997
+        0.0043,
+        0.0001,
+        -0.0281,
+        0.9996
        ],
        "UPPERARM_R": [
-        0.0009,
-        0,
-        0.0256,
-        0.9997
+        0.0043,
+        -0.0001,
+        0.0281,
+        0.9996
        ],
        "FOREARM_L": [
         -0.0533,

@@ -45,7 +45,7 @@ ok('8. street fixtures follow every lighting-authorized real polyline and retain
 
 var menuSrc = fs.readFileSync(path.join(LA, 'lab', 'gameMenu.js'), 'utf8'), terrainSrc = fs.readFileSync(path.join(LA, 'lab', 'world', 'terrain.js'), 'utf8'), skySrc = fs.readFileSync(path.join(LA, 'lab', 'world', 'sky.js'), 'utf8');
 var walls = R.field.walls, area = (walls.x2 - walls.x1) * (walls.z2 - walls.z1);
-ok('9. the complete 121,975 m² mainland remains the real field; map bounds come from field.walls and region tint rendering uses one owner per field cell', area === 121975 && /WR\.field && WR\.field\.walls/.test(menuSrc) && /SINGLE_OWNER_FIELD_GRID/.test(terrainSrc) && /overlapping translucent region planes/.test(terrainSrc), { walls: walls, area_m2: area });
+ok('9. the complete 121,975 m² mainland remains the real field; map bounds come from field.walls and region tint rendering uses one softly blended surface', area === 121975 && /WR\.field && WR\.field\.walls/.test(menuSrc) && /SINGLE_SURFACE_SOFT_VERTEX_BLEND/.test(terrainSrc) && /overlapping registry regions never stack translucent planes/.test(terrainSrc), { walls: walls, area_m2: area });
 
 var cloud = R.sky.layers.filter(function (l) { return l.kind === 'CLOUD'; });
 ok('10. the layered sky uses gray-blue low/mid cloud bodies with depth-writing occlusion while high cirrus remains a non-occluding veil', cloud.filter(function (l) { return l.occludes; }).length === 2 && cloud.some(function (l) { return l.id === 'CIRRUS_HIGH' && !l.occludes; }) && cloud.every(function (l) { return !/^#f{6}$/i.test(l.color); }) && /depthWrite: !!L\.occludes/.test(skySrc) && /alphaTest: L\.occludes/.test(skySrc), cloud);

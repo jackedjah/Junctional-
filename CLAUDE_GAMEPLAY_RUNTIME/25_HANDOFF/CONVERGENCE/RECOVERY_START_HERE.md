@@ -1,6 +1,12 @@
 # MAHWORLD recovery start here
 
-Updated 2026-09-24 for the emergency M6 backup.
+Updated 2026-09-24 for the emergency M6 backup and protected M6 preview release.
+
+## Latest protected candidate
+
+- Build `ASTRA_M6_PRIVATE_20260924`; immutable draft `6ab586ec9ad382fa1b83f1be`: `https://6ab586ec9ad382fa1b83f1be--mahworld-test-preview.netlify.app`.
+- Package SHA-256 `82d5433350d9785e665fe9b5b74b88e07ddbf2c40a1c9e36c3a1a4fea87ab02c`; release record `astra_m6_release/private_candidate_release.json`.
+- Production remains `6aac25101f17ce5ed37166e4`; M5C remains `6ab454bf3a60c4bf88b1334a`. Physical-phone acceptance and authenticated hosted gameplay remain open.
 
 ## Recovery identity
 
@@ -8,7 +14,7 @@ Updated 2026-09-24 for the emergency M6 backup.
 - Recovery branch: `backup/mahworld-m6-20260924T190351Z`.
 - Gameplay root on that branch: `CLAUDE_GAMEPLAY_RUNTIME/`.
 - Snapshot basis: the current intentionally dirty M1–M6 gameplay worktree, not the old B8 checkout. The recovery commits are scoped snapshots parented to the verified remote gameplay ref; they do not rewrite or merge the default branch.
-- Existing hosted comparison remains `ASTRA_M5C_PRIVATE_20260923`, deploy `6ab454bf3a60c4bf88b1334a`. No deployment is created by this recovery job.
+- Existing hosted comparison remains `ASTRA_M5C_PRIVATE_20260923`, deploy `6ab454bf3a60c4bf88b1334a`. The later authorized M6 release created only the protected draft recorded above.
 - Verified source checkpoint: `bdc43b60d56c22253aeddf2eac996a5394128407`.
 - Verified required-asset checkpoint: `a25277ebe6afc378af63ed19735a53f2c400327b`.
 

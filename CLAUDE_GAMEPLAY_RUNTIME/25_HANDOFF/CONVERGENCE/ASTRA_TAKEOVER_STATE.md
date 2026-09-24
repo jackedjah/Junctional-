@@ -1,6 +1,14 @@
 # MAHWORLD Astra takeover state
 
-Updated 2026-09-24 (recovery backup verified; M6 junction closed; M5C protected candidate preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+Updated 2026-09-24 (protected M6 preview delivered; production and M5C preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+
+## Current release checkpoint — protected M6 candidate
+
+- `ASTRA_M6_PRIVATE_20260924` is ready at immutable draft `6ab586ec9ad382fa1b83f1be`: `https://6ab586ec9ad382fa1b83f1be--mahworld-test-preview.netlify.app`. It is a `deploy-preview` with `published_at = null`, not production.
+- Package SHA-256 `82d5433350d9785e665fe9b5b74b88e07ddbf2c40a1c9e36c3a1a4fea87ab02c`; 181 entries / 122,974,744 bytes. Existing package gates passed 56 programs / 1,518 checks and 7/7 exact fresh-extraction smoke.
+- The exact persistent extraction passed the bounded M6 visual/action probe and ordinary-controller junction crossing: 0 console errors, 0 unresolved items, real bush break / three drops / three pickups, zero-error dumbbell and barbell grip reports, and `0.009 m` minimum junction distance.
+- Gate is present: unauthenticated play and assets return `401`; wrong-password rejection works; served password string is absent. Authenticated hosted gameplay is not claimed because `MAHDEMO_PW` was unavailable.
+- Production is still `6aac25101f17ce5ed37166e4`; M5C is still ready at `6ab454bf3a60c4bf88b1334a`. Next step is Jah's physical-phone review. No production promotion is authorized.
 
 ## Current recovery checkpoint — remote bytes verified, junction fixed locally
 

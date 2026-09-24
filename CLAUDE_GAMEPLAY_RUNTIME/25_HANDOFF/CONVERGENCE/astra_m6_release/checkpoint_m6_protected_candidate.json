@@ -1,0 +1,17 @@
+{
+  "checkpoint": "M6_PROTECTED_PRIVATE_CANDIDATE",
+  "build_id": "ASTRA_M6_PRIVATE_20260924",
+  "deploy_id": "6ab586ec9ad382fa1b83f1be",
+  "url": "https://6ab586ec9ad382fa1b83f1be--mahworld-test-preview.netlify.app",
+  "state": "ready",
+  "context": "deploy-preview",
+  "published_at": null,
+  "protected": true,
+  "production_deploy_id": "6aac25101f17ce5ed37166e4",
+  "m5c_deploy_id": "6ab454bf3a60c4bf88b1334a",
+  "package_sha256": "82d5433350d9785e665fe9b5b74b88e07ddbf2c40a1c9e36c3a1a4fea87ab02c",
+  "verified_pre_release_checkpoint": "6fa4e33e9ee4d35171bf3eaa4cff5606c559999e",
+  "release_source_commit": null,
+  "final_release_record_commit": null,
+  "physical_phone_acceptance": "PENDING_OWNER"
+}

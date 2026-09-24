@@ -9,7 +9,7 @@ const ROOT = path.resolve(HERE, '..', '..', '..');
 const DIST = path.resolve(process.argv[2] || path.join(ROOT, '26_LOCAL_AUTHORITY', 'deploy', 'static_dist'));
 const OUT = path.join(ROOT, '25_HANDOFF', 'CONVERGENCE', 'astra_m6_closeout', 'junction_repair_proof');
 fs.mkdirSync(OUT, { recursive: true });
-const report = { generated_at: new Date().toISOString(), source: 'fresh local static_dist; not packaged or deployed', point: [-40, 40], screenshots: [], crossing: {}, console_errors: [] };
+const report = { generated_at: new Date().toISOString(), source: DIST, point: [-40, 40], screenshots: [], crossing: {}, console_errors: [] };
 const srv = await serveStatic(DIST);
 const pg = await launchChrome({ width: 1280, height: 800, dpr: 1, gpu: true, timeScale: 0.55, cmdTimeoutMs: 120000 });
 async function ev(src) { return await pg.evaluate(`(async function(){var P=window.MAHWORLD_PLAY,H=window.MAHWORLD_STATIC_HOST;${src}})()`); }

@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-09-24T19:42:21.742Z",
- "source": "fresh local static_dist; not packaged or deployed",
+ "generated_at": "2026-09-24T20:22:02.760Z",
+ "source": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\packages\\deploy_ASTRA_M6_PRIVATE_20260924",
  "point": [
   -40,
   40
@@ -20,11 +20,11 @@
   },
   "sample_1": {
    "x": -40,
-   "z": 51.435
+   "z": 51.256
   },
   "sample_2": {
    "x": -40,
-   "z": 47.144
+   "z": 47.322
   },
   "sample_3": {
    "x": -40,
@@ -32,9 +32,9 @@
   },
   "end": {
    "x": -40,
-   "z": 39.812
+   "z": 39.991
   },
-  "min_distance_to_junction": 0.1880000000000024
+  "min_distance_to_junction": 0.009000000000000341
  },
  "console_errors": []
 }
