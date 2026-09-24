@@ -29,3 +29,12 @@ Updated 2026-09-24 after the bounded local runtime check. This file maps the pac
 - `M7-QA-03`: desktop headless instrumentation was collected (final sample 336 draw calls, 1,831,701 triangles, 13.5 ms render sample), but this is not a physical-phone performance claim.
 - Authenticated hosted gameplay was not run because `MAHDEMO_PW` was unavailable; protection was instead checked unauthenticated and with an intentionally wrong password. The Netlify CLI ignored the existing defensive `/.netlify/images` redirect because that reserved path is no longer accepted in redirect syntax; this package contains no raster image files for that service, and the all-path edge gate is deployed.
 - Reference dimensions not present in the supplied image remain authored/measured runtime choices, not claimed source measurements. Physical-phone acceptance remains owner-only.
+
+## M7 HALO scale/access addendum — active requirements
+
+- `HALO-SCALE` — ACTIVE: one-time 10× arrival and 18× linear dome result is versioned in `HALO_SCALE_CONTRACT.json`; no city/actor/furniture/equipment scaling.
+- `HALO-ACCESS` — PENDING IMPLEMENTATION: elevator must be the only normal gameplay entrance/exit and all other boundary crossings must be rejected.
+- `HALO-TRANSIT` — PENDING IMPLEMENTATION: one host-owned 20 s smootherstep timeline, zero resource drain, no destination teleport before docking, camera independent.
+- `HALO-QUALITY` — PENDING IMPLEMENTATION: re-authored load-bearing tree/deck/dome, human-scale interior programme and stable two-sided shell rendering.
+- `ROAD-GRADIENT` — PENDING IMPLEMENTATION: extend the accepted smooth shared-endpoint class gradients without breaking the 128-segment junction.
+- `HALO-RELEASE` — PENDING: focused dimensions/access/transit/visual checks, one release gate and one new protected unpublished candidate; preserve M7 and production.

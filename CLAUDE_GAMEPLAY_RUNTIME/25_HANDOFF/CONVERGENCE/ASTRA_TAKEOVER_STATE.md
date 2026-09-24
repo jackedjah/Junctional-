@@ -1,5 +1,12 @@
 # MAHWORLD Astra takeover state
 
+## Active M7 HALO scale/access addendum
+
+- Exact owner addendum: `25_HANDOFF/M7/MAHWORLD_M7_HALO_SCALE_AND_ELEVATOR_ONLY.md`.
+- Canonical one-time result: `25_HANDOFF/M7/HALO_SCALE_CONTRACT.json`, runtime authority `26_LOCAL_AUTHORITY/play/haloLayout.js`.
+- Work proceeds from the completed M7 checkpoint with a 240 m arrival, 295.2 m dome diameter, elevator-only normal access and contained interior flight. No whole-city/actor/furniture/equipment scaling is authorized.
+- M7 preview and production are preserved. Release may create exactly one new protected non-production preview only after the addendum gates pass.
+
 Updated 2026-09-24 (M7 reference-locked implementation S1-S4 locally closed; protected M6Q/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
 
 ## M7 protected private candidate — owner review pending

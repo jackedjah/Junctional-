@@ -1,0 +1,19 @@
+{
+  "schema": "M7_HALO_SCALE_ACCESS_V1",
+  "status": "AUTHORIZED_IMPLEMENTATION",
+  "application_rule": "Apply once to the accepted M7 baseline; never multiply already-enlarged dimensions.",
+  "baseline": { "arrival_height_m": 24, "dome_radius_m": 8.2, "dome_diameter_m": 16.4 },
+  "authorized_factors": { "arrival_height": 10, "dome_linear": 18 },
+  "result": {
+    "arrival_height_m": 240,
+    "shell_radius_m": 147.6,
+    "shell_diameter_m": 295.2,
+    "structural_deck_radius_m": 153,
+    "playable_radius_m": 144.8,
+    "apex_height_m": 387.6,
+    "elevator_travel_s": 20
+  },
+  "not_scaled": ["world city", "characters", "furniture", "equipment", "tree base footprint"],
+  "runtime_authority": "26_LOCAL_AUTHORITY/play/haloLayout.js"
+}
+

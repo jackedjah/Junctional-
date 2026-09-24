@@ -1,5 +1,10 @@
 # CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (M7 reference-locked implementation active)
 
+## Active M7 HALO scale/access addendum — implementation started
+- Owner addendum is preserved at `25_HANDOFF/M7/MAHWORLD_M7_HALO_SCALE_AND_ELEVATOR_ONLY.md`; its one-time scale result is recorded at `25_HANDOFF/M7/HALO_SCALE_CONTRACT.json` and enforced by `26_LOCAL_AUTHORITY/play/haloLayout.js`.
+- Authorized target: 240 m upper arrival, 147.6 m shell radius / 295.2 m diameter, 153 m structural deck radius and 387.6 m apex. City, actors, furniture, equipment and the local tree-base footprint remain human/world scale.
+- Elevator-only access, contained interior flight, support/collision, 20 s host transit, upper-realm architecture and road-gradient implementation are in progress. M7 draft and production remain unchanged.
+
 ## M7 reference-locked private candidate — delivered for owner review
 - Playable protected draft: `https://6ab5acc1077641dc53f2b30b--mahworld-test-preview.netlify.app`; deploy/build ID `6ab5acc1077641dc53f2b30b`; visible build label `ASTRA_M7_REFERENCE_LOCK_PRIVATE_20260924`. API state is `ready`, context `deploy-preview`, `published_at = null`, with one edge gate present.
 - Package is 181 entries / 122,978,858 bytes / SHA-256 `3613f88fc484073181da6b59096404510d82769e55047c98d117645417de2e56`. The one authorized pipeline passed 56 programs / 1,518 checks, 104-file JavaScript syntax, CSS/boundary/secret scans, ZIP integrity, exact fresh extraction and 7/7 extracted browser smoke.
