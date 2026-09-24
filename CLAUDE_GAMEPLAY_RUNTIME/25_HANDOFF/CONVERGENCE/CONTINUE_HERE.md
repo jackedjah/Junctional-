@@ -1,4 +1,11 @@
-# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (post-M6 quality continuation active)
+# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (M7 reference-locked implementation active)
+
+## M7 reference-locked continuation — S0 preserved
+- The authorized packet is locally preserved at `m7_reference_lock/packet/MAHWORLD_M7_REFERENCE_LOCK/`; its source ZIP SHA-256 is `AE60AA5CB3CB02F0424B18FCAFAF189409C234D96A7AA60C04125EA54DB3BACF`. The compact safe pointer is `m7_reference_lock/CONTINUATION_POINTER.md`.
+- `00_START_HERE`, both execution specifications, code/resource map, acceptance/release rules, and all M7 ledger entries were read; the four supplied reference images were inspected at original detail. The ZIP, images, archived master/add-on, and other packet payloads remain local-only because public redistribution was not authorized.
+- Continuity baseline is the same intentionally dirty M1-M6Q gameplay worktree. M6Q draft `6ab594d507b647b41d599401`, earlier previews, production `6aac25101f17ce5ed37166e4`, current assets, and unfinished JOB A/B requirements are preserved. Character/MAHFITT/S08/native-rig lanes remain out of scope.
+- Recovery destination reverified: public GitHub repository `jackedjah/Junctional-`, branch `backup/mahworld-m6-20260924T190351Z`, incoming tip `c01185290e8b6815fd6b4d4908deb3b271674279`. This S0 record is the first sanitized M7 checkpoint; runtime implementation follows without a reset or duplicate backup pass.
+- **Next exact action:** identify and remove the actual owner of the intrusive blue backdrop, then implement the full NEXUS-ASPECT-HALO ascent/upper-realm loop and the remaining bounded M7 world/action quality pass. Release only one new protected unpublished draft after the packet's compact gates.
 
 ## Post-M6 quality continuation — protected private candidate released
 - New visible build `ASTRA_M6Q_PRIVATE_20260924`; immutable Netlify draft `6ab594d507b647b41d599401`: `https://6ab594d507b647b41d599401--mahworld-test-preview.netlify.app`. API state is `ready`, context `deploy-preview`, `published_at = null`; one edge gate is present.

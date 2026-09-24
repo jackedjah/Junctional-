@@ -1,6 +1,13 @@
 # MAHWORLD Astra takeover state
 
-Updated 2026-09-24 (post-M6 quality continuation checkpoint 02; protected M6/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+Updated 2026-09-24 (M7 reference-locked implementation S0; protected M6Q/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
+
+## Active M7 reference-lock checkpoint — S0 continuity
+
+- The owner-authorized M7 packet is preserved locally under `25_HANDOFF/CONVERGENCE/m7_reference_lock/`; ZIP SHA-256 `AE60AA5CB3CB02F0424B18FCAFAF189409C234D96A7AA60C04125EA54DB3BACF`. `CONTINUATION_POINTER.md` records the read order, precedence, ownership boundaries and recovery destination without publishing the private packet payload.
+- All packet execution/reference/acceptance documents and the complete M7 ledger were read, and all four supplied images were inspected at original detail. The packet replaces only the previous pasted M7 prompt; current M1-M6Q work and unfinished JOB A/B requirements remain authoritative.
+- GitHub repository `jackedjah/Junctional-` is reverified public. Safe branch `backup/mahworld-m6-20260924T190351Z` was read back at incoming tip `c01185290e8b6815fd6b4d4908deb3b271674279`. No force push, default-branch merge, production change, password removal, or Character/MAHFITT/S08 edit is authorized.
+- Next implementation phases are the cause-owned intrusive-backdrop/layout correction; full tree NEXUS-ASPECT-HALO round trip; bounded lighting/sky/ecology/fauna/resident/building/action work; compact visual/motion validation; then one protected unpublished candidate.
 
 ## Current post-M6 release — protected private candidate
 
