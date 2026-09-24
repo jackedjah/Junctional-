@@ -1,0 +1,1315 @@
+MAHWORLD — COMPLETE GAMEPLAY / WORLD QUALITY CONTINUATION
+Saved B8 or newer · owner review received · same existing Claude job
+Prepared 2026-09-21
+
+THIS IS THE ONE AUTHORITATIVE CONSOLIDATED NEXT-PASS DIRECTIVE.
+It replaces the overlapping NEXT-PASS summaries covered here, not the project,
+current implementation, existing ownership rules, or unrelated authorized tasks.
+
+Read this once. Keep a small requirements ledger. Then work, test, and finish.
+Do not start another conversation, search old transcripts, change authentication,
+or ask the owner to reconstruct the history again.
+
+==========================================================================
+00 — MISSION, EVIDENCE AND AUTHORITY
+==========================================================================
+
+Continue MAHWORLD into a coherent, high-quality, responsive mobile/PC demo.
+The goal is not "add more polygons and effects." It is faithful source assets,
+convincing animation, usable combat/equipment, purposeful geography, rich material
+response and a stable frame budget, expressed as one finished world.
+
+The owner wants a serious, long-running implementation pass. Do not underestimate
+it, but do not substitute a huge agent swarm, repeated reports, or blind rebuilding
+for careful execution. A feature's existence in a report is not its acceptance.
+
+EVIDENCE RECEIVED:
+- Actual new upload: 69b039f7-0bac-42f9-bef0-c9572cd24ed1.mp4.
+- Measured duration 400.507521 s: 6 minutes 40.5 seconds, NOT 16 minutes.
+- Original 1180x2556, nominal 30 fps video. That is recording cadence, not game FPS.
+- Review coverage: the complete timeline sampled at one-second intervals; selected
+  flight, creature, pose, separated-leg and floor intervals examined at 6-8 fps.
+  No audio transcription, frame-perfect all-frame inspection, GPU measurement or
+  independent access to the Windows source was performed by this reviewer.
+- The supplied compressed evidence copy preserves duration but reduces resolution
+  and cadence. Device sharing/home-screen material is obscured for privacy.
+- Written owner requirements remain valid when a behavior is not shown in this clip.
+- A B8-named URL is visible during sharing; this does not verify an immutable build
+  hash for the entire recording. Check current source before calling a defect new.
+
+Use 02_VIDEO_REVIEW.md for exact observations and coverage. Do not transfer the
+old five-minute video's crash at ~126 s into this new recording. Here ~00:26 onward
+includes an intentional iOS Share / Add to Home Screen / relaunch sequence. No
+explicit automatic-reload crash banner was observed in this upload. That is not a
+physical-phone stability sign-off.
+
+AUTHORITY ORDER:
+1. Latest explicit owner requirement determines intended behavior.
+2. Verified current source/handoff determines what exists and active ownership.
+3. Older instructions remain where not superseded.
+4. Engineering/design defaults below are labeled proposals where interpretation
+   is needed. Use them for a reversible candidate, not as invented past approval.
+
+New feedback supersedes "wait for the forthcoming video" for this delivered
+source and these written requirements. A separate longer recording, if supplied
+later, is another additive review; it does not invalidate this work or restart it.
+
+==========================================================================
+01 — SAME JOB, SAME FILES, SAFE CHECKPOINT
+==========================================================================
+
+Gameplay directory:
+C:\Users\jahsu\Downloads\MAHWORLD_CHARACTERS\CLAUDE_GAMEPLAY_RUNTIME
+
+Read first:
+25_HANDOFF/CONVERGENCE/CONTINUE_HERE.md
+25_HANDOFF/CONVERGENCE/B8_KILLER_DIRECTION_DELTA_REPORT.md
+Then the currently linked A/B queue and only the relevant subsystem files.
+Resolve the actual Git root from the current handoff, including 26_LOCAL_AUTHORITY
+if appropriate. Do not assume a new root or create a replacement repository.
+
+The current valid operation takes priority until its technically safe checkpoint.
+Save its state and preserve unfinished edits. Then merge this directive once.
+If idle, begin the reconciliation now. If another writer owns relevant files,
+coordinate through the existing handoff and work on an independent task meanwhile.
+Do not manufacture a lock-release, overwrite someone else's changes, or kill jobs.
+
+Verify once: working directory, applicable instructions, Git root/branch/HEAD,
+working-tree status, current task ownership, local asset locations and free disk.
+Do not keep rereading every report or scanning the whole drive at each subpass.
+
+No reset/clean/blind checkout, unnecessary fork/clone/worktree, fresh demo, duplicate
+runtime, parallel player controller, or second combat authority. Preserve progress
+newer than B8. Do not rename the project B9 simply because this is a later prompt.
+Use the next canonical checkpoint name already established locally.
+
+Separate appearance workspace:
+C:\Users\jahsu\Downloads\MAHWORLD_CLAUDE_CHARACTER
+Do not resume S08 chin/jaw/eye/crown work, overwrite appearance masters, or consume
+unreleased replacement characters. Temporary Athlete facial polish is not this job.
+Read applicable gameplay CLAUDE.md. A real instruction conflict must be reported,
+not silently bypassed or rewritten. No session hunt or billing/key work.
+
+JOB A: player rig/movement/flight/camera, fusion, exercise animation, grips,
+equipment state, authoritative combat/resources and gameplay HUD.
+JOB B: terrain/routes/architecture/interiors, materials/sky/water, environment,
+habitats/spawns, creature world behavior and companion formation.
+Shared work uses existing host/event/target/asset interfaces with explicit owners.
+
+==========================================================================
+02 — B8 IS A PROTECTED BASELINE, NOT A CLAIM OF FINISHED QUALITY
+==========================================================================
+
+Historical anchors, to verify only where relevant:
+- B8 source f7b487a; documentation HEAD 3185a25.
+- CONSOLIDATED_B8.zip under 26_LOCAL_AUTHORITY/deploy/packages/.
+- Draft deploy 6ab084e0cea9648ad9644896.
+- Review alias https://b8-killer-delta--mahworld-test-preview.netlify.app
+- Last reported published deploy 6aac25101f17ce5ed37166e4.
+- Reported 47 suites / 1423 checks, 330-second emulated soak.
+These are not this reviewer's current deployment inspection or iPhone approval.
+
+Preserve the working implementations of:
+- Removal of hidden full Athlete rigs from wildlife combat entities.
+- Shader warm-up, depth/ground corrections, bounded wildlife activity.
+- Tier texture policy, removal of full-screen menu blur, reduced rendering behind
+  panels, crash breadcrumbs, restoration veil and remount skeleton-texture cleanup.
+- Host input-edge flight brake, shared targeting, entity level/health plates.
+- Dogkie territories/glide/contact language, fish behavior, Titan height correction.
+- Resource maxima already reported as 2000 HP / 200 combat MAHGIC / 200 flight MAHGIC.
+  NEVER apply the previous x2 request again merely because it appears in history.
+- No passive combat/special MAHGIC refill; flight is a separate resource policy.
+- Guide manifestation, pickup, applicable held dumbbell x1.8, gear specials,
+  guide-charge rewards, refill inventory cap 999 and resource-node infrastructure.
+- Route/building registries, existing wayfinders, names, shell interiors, day/night,
+  water, ridges, waterfalls and architecture features where they are valid.
+
+Repair reported-but-unusable systems rather than replacing them wholesale.
+Do not reapply Titan +1 foot, fairy x3, Dogkie +15%, road x3, or resource x2 on every
+pass. Every NEW scale adjustment gets one recorded reference baseline and factor.
+
+Unfinished queue to carry through closure:
+A: movement-quality audit, separated-form performance route, RDL residuals,
+   equipment/animation integration and JOB A verification/package.
+B: sanctuary polish, HUD minimal-mode coordination, architectural/creature motion,
+   authorized expansion, interior/band-source/ridge-quality leftovers.
+Keep additional uncontradicted local queue items; do not silently erase them.
+
+==========================================================================
+03 — EXECUTION PLAN: REPAIR -> PROVE -> EXPAND -> FINISH
+==========================================================================
+
+PHASE 0: reconcile current task and missing requirements once; protect progress.
+PHASE 1: reproduce floor/action/loading blockers; stabilize the rendering/input
+         foundation and establish an asset-fidelity comparison.
+PHASE 2: repair player/creature animation, hand grips, targeting, equipment loadouts
+         and zero-MAHGIC resource recovery as complete player workflows.
+PHASE 3: build one representative QUALITY ROUTE in the actual world: civic
+         forecourt -> connected class road -> forest/resource patch/pond ->
+         mountain pass -> named, enterable building. Include night lighting.
+PHASE 4: propagate that standard across the larger interconnected town and five
+         sanctuaries; complete requested geography, buildings, sky and interiors.
+PHASE 5: optimize changed systems, run the established integrated suite and
+         sustained route, package from a fresh extraction, make a private draft,
+         record genuine remaining gates, and continue other unblocked A/B work.
+
+A quality route is a calibration gate, NOT permission to deliver an isolated
+showcase or stop with one good corner while the rest is abandoned.
+Do not start large-scale replication before its asset/material/collision costs
+are known. Do not let one blocked asset stop independent authorized corrections.
+
+Use one lead. No broad 20-30-agent adversarial review. A specialist is justified
+only by a named blocker with a bounded question and no overlapping write scope.
+Reuse existing harnesses; targeted tests while iterating, the full suite at a
+meaningful candidate checkpoint. Do not re-pin assertions merely to hide failure.
+
+==========================================================================
+04 — P0: FLOOR FAILURE AND ONE COHERENT SURFACE STACK
+==========================================================================
+
+VISIBLE evidence V16: ~06:20-06:26 near the gold temple, blue/gold ground forms
+large changing jagged patches as the camera moves. Historical green flicker
+numbers do not invalidate this. Reproduce this exact approach and camera arc.
+
+Potential causes to discriminate, not assume:
+- overlapping coplanar region tint, floor, plaza, forecourt or road meshes;
+- nearly coincident depth with insufficient precision;
+- duplicate loaded region surfaces or simultaneous LODs;
+- incorrect transparent depth-write/order, polygon offsets, shadow acne;
+- vertex displacement or streamed chunk boundaries inconsistent with colliders.
+
+Capture draw/object identity at the location, actual projection near/far and
+actual framebuffer/depth characteristics. Do not label every phone a 16-bit
+buffer. Do not globally disable depth tests, add blur or cover failures with fog.
+
+Give each patch of ground one authoritative solid surface. Prefer region tint,
+mineral variation and broad road inlays in a shared ground material/mesh system,
+or deliberately nonoverlapping road geometry, rather than multiple full-area
+planes stacked on top of each other. Keep decals for actual decals.
+
+Where real layered geometry is required, specify a documented surface hierarchy,
+consistent physical offsets, transition geometry and matching collision heights.
+Do not keep raising floors blindly until sidewalks float or toes clip.
+
+For a conventional perspective depth buffer, the approximate depth increment at
+distance z is z^2*(f-n)/(f*n*(2^b-1)), with near n, far f and bit count b. This is a
+diagnostic approximation, not a proof of the device format. Sensible near/far
+values and eliminating duplicate surfaces matter more than arbitrary offsets.
+Use capability-gated alternative depth modes only if supported by the installed
+renderer and justified by measurements; no wholesale engine upgrade. [R02]
+
+Ground visuals: darker graphite/platinum with soft directional reflections,
+subtle macro mineral variation and restrained micro normals. Keep roads readable.
+Not a shiny black mirror, not a flat blue paint plane, not gold/blue patchwork.
+
+Acceptance: repeat the exact recorded area at ground height, grazing camera
+angles and flight overview in both day and night; no changing floor fragments,
+road fighting, terrace double draw, shadow acne or depth clipping in normal play.
+Also verify actual physical navigation and no hidden holes after cleanup.
+
+==========================================================================
+05 — P0: ACTION READINESS, TARGET IDENTITY AND RESOURCE RECOVERY
+==========================================================================
+
+VISIBLE V08-V12: repeated unavailable-state/mapping messages, "NO ATTACK 3 IN THIS
+PATTERN," low energy, insufficient combat MAHGIC and "NOT REACHABLE THERE."
+Some restrictions may be correct. The defect to resolve is an unclear or broken
+usable action chain, NOT a mandate to bypass costs, cooldowns or biomechanics.
+
+Build one eligibility result from the existing authoritative rules:
+{available, reason, cost, cooldownRemaining, requiredForm, requiredGear,
+ targetRequirement, exerciseMappingId}. HUD, input and host agree on that result.
+A disabled/unmapped slot must never advertise READY; a usable slot must dispatch
+its actual valid move. Preserve approved shared/basic options where available.
+Do not invent exercise mappings just to light up four buttons.
+
+Every normal active loadout should expose its useful actions and a clear route
+out of restrictions. Debounce repeated banners and show short actionable reasons:
+"Need 7 combat MAHGIC — collect a refill" instead of endless indistinct rejection.
+A long informational banner must not obscure flight/combat visibility.
+
+At zero combat MAHGIC the game must not soft-lock the refill loop. Preserve or
+implement at least one verified zero-MAHGIC PHYSICAL resource-harvest attack and
+normal pickup/inventory use. Refilling cannot require the very resource that is
+empty. This is a proposed economy-completeness safeguard, not free regeneration.
+
+At ~00:00 the clip reports "TOO FAR — 381 m (limit 30 m)" while birds are visible
+nearby. We cannot tell whether the lock targets another bird or whether positions
+are inconsistent. Log selected entity ID, displayed figure ID, host position,
+render world position, proxy and range. Correct stale IDs/transform disagreement
+if found. Do NOT raise every attack range to hundreds of meters to hide it.
+
+Use one host authority for hit/miss, targetability, costs, HP, cooldowns and rewards.
+Respect existing battle/free-roam rules: animations can play outside combat while
+damage follows the valid encounter rules. Start eligible wildlife encounters
+cleanly through the existing system, not global damage permission. Preserve
+NO_CONTEST / disconnect handling and existing duel rules where present. Preserve
+the established 10-second reconnect/no-contest rule when it is current canon.
+Keep the current progression/class architecture (including approved early shared
+protocols, later class-specific moves and duel unlocks); do not reset progression
+or invent a full new MMO backend as part of this pass.
+
+==========================================================================
+06 — INPUT, HUD AND ENTITY STATUS: PHONE AND PC
+==========================================================================
+
+Preserve direct numbered attacks 1-4, MAP, camera reset, speed control, GUARD,
+SEPARATE/FUSE and one FLY control. No giant generic ATTACK hold+swipe button.
+Keep click/tap-to-move, persistent camera orbit and camera-heading independence.
+
+Resolve event ownership explicitly:
+HUD tap -> HUD action only;
+equipment tap -> equipment pickup only;
+creature tap -> lock candidate;
+resource-node tap -> resource target;
+empty-ground short tap -> permitted navigation;
+world drag beyond threshold -> camera orbit.
+Preserve B7 finger-down candidate selection for moving creatures, but cancel a
+candidate when that gesture becomes a drag. Handle pointer cancellation, rotation,
+focus loss and joystick release so stuck input cannot run forever.
+
+One target ID links figure, status plate, collision/LOS proxy, lock reticle and
+attack execution. Use current world transforms and altitude-aware LOS. Test fish,
+Dogkie, airborne Phoenix, passive horse, NPC/player as eligible, and resource node.
+Clear lock on defeat/despawn/range loss. Do not make decorative school silhouettes
+look like invulnerable nearby combat fish without a defined promotion policy.
+
+Mode control remains directly LEFT OF FLY with an accessible touch region.
+Visible clip terminology: PHYSICAL, PHYS MAHGIC, SPECIAL MAHGIC. Read the actual
+current enum; do not invent a fourth category from ambiguous earlier wording.
+Equipment replaces specific SPECIAL MAHGIC attacks ONLY. Physical repertoires
+remain their established moves, with appropriate gear handling and modifiers.
+
+When relevant equipment is active, PHYS MAHGIC and SPECIAL MAHGIC numbered slots
+get a restrained class-colored edge/light cue for genuine ready actions. Ordinary
+physical/other actual categories stay ordinary. A disabled, cooling or unaffordable
+slot must not glow as ready. Category selection never fires an attack.
+
+MINIMAL HUD: preserve the requested reversible X toggle. Remove colored outer
+containers, fill, bevels and large shadows while leaving icons/text black at about
+0.8 opacity and retaining invisible usable hit areas. Because this pass opens at
+night, black-only marks may lose contrast. Proposed minimal remedy: a very thin
+pale outline/halo on dark backgrounds, not restoration of opaque panels. Keep full
+HUD available, make state reversible and test both modes. Do not silently hide
+health/resources/target feedback or discard labels essential for learning.
+
+Compact NAME / LV / HP on nearby entities remains. V11 shows very large plates
+when fish pass close: cap projected label width/height, separate label scale from
+creature scale, use occlusion/distance and modest label density, and prioritize the
+locked target. Do not rebuild DOM or upload text textures every frame. Avoid giant
+plates covering attacks or the head. Use real names rather than duplicated debug
+class strings. Always make a nearby target's level/health accessible.
+
+Portrait, landscape, desktop mouse/keyboard and current gamepad mappings must
+remain functional. Recompute viewport and touch regions on orientation, browser
+chrome or safe-area changes without remounting the world. Test simultaneous
+movement, camera and attack touches. Touch targets may be larger than visual marks.
+
+==========================================================================
+07 — PLAYER MOTION AND FUSED / SEPARATED BODY INTEGRITY
+==========================================================================
+
+The desired smoothness is continuous pose/velocity and readable anatomy, not a
+rubberized body. Preserve the established silhouette and intentional crystal
+planes. One renderer loop and existing fixed host tick; interpolate visual state
+without making physics or damage depend on display FPS.
+
+Useful starting interpolation, where appropriate:
+a = 1 - exp(-lambda*dt)
+position = lerp(position, target, a)
+rotation = quaternion slerp(current, target, a)
+Do not repeatedly lerp Euler angles through wrap-around. Tune acceleration,
+braking and bank independently. Preserve immediate control response: smoothing
+must not become delayed input or artificial input buffering.
+
+FLIGHT BRAKE:
+Only a qualifying horizontal movement-input active -> neutral edge at meaningful
+speed triggers one brief brake. Preserve the existing host brake sequence/event.
+One envelope, roughly 0.20-0.45 s; no retrigger while neutral, no periodic rocking,
+no trigger from camera release or simple descent. A smooth candidate pose weight
+is 64*u^3*(1-u)^3 for u clamped 0..1; it peaks once and returns to zero. Apply as a
+small additive pose, not another vertical-position oscillator. The fused lower
+body counter-sweeps as one unit; altitude follows the separate FLY authority.
+Re-engaged input blends safely back to cruise. Low-speed stops remain subtle.
+
+V10 shows an extended raised/outstretched pose; without input telemetry this
+could be guard, attack recovery or a stuck blend. Reproduce and inspect state
+ownership rather than blaming the brake automatically. Every action has an exit,
+blend cancellation policy and explicit return to the current locomotion pose.
+
+SEPARATED KNEE / THIGH COMPRESSION:
+Owner reports shrinking/compressing upper legs. Inspect rest/bind scale, parent
+nonuniform scale, IK reach, bone lengths, corrective shapes, weights and animation
+blend order. Sample pelvis/hip/knee/ankle transforms through starts, stops, turns,
+run/flight/landing and both-form transitions. Compare deformed surface volume.
+
+Bone-length invariant: for each intended rigid segment, posed joint distance must
+remain its canonical length within an explicit small tolerance unless an authored
+nonrigid effect is deliberately intended. Never animate thigh scale to solve foot
+placement. Clamp unreachable IK targets rather than shortening the leg. Preserve
+knee pole orientation and bend plane; correct pelvis/root motion before adding
+correctives. Validate weights sum and no wrong-leg influence. Volume-preserving
+skin/corrective methods may help after hierarchy and weights are correct.
+
+Do not break fused form to repair separated form. Preserve the fused default,
+separated alternate rig and intended visible transformation/emote/attack sequence.
+No knee popping, inverted bends, thigh collapse or detached shoulders in front,
+side, 3/4 and rear views. Test current gameplay derivatives; do not modify the
+separate Character master's face or finish materials during this correction.
+
+==========================================================================
+08 — EXERCISE CHOREOGRAPHY AND IMPACT TIMING
+==========================================================================
+
+Movement must demonstrate its named exercise. Catalog current verified mappings,
+phase timing, pose limits and hand/equipment requirements. Use existing approved
+motions first. General mocap is a donor, not proof of correct exercise mechanics.
+
+RDL / HINGE owner choreography: soft knees, hips back, femur angled back roughly
+45 degrees, shins approximately vertical, neutral spine, hands below knees toward
+shins; hip extension drives the release/attack. This is an authored stylized
+character target, not a universal human technique or anthropometric prescription.
+No spine-folding, deep-squat substitution, forward shins or generic punch.
+
+Chest fly: controlled arm opening, modest elbow bend, horizontal shoulder
+adduction; no shoulder shrug or elbow-driven punch replacing the pattern.
+Katana/cross-cable extension: suitable arm abduction, elbow extension doing the
+work, coherent cable-crossing-inspired path, stable shoulder/torso.
+Press: hands/implement move overhead with appropriate shoulder rotation and elbow
+extension, no head/shoulder intersection or bar teleport. Bake contact/release
+markers from the actual pose timeline and align the host action stages to them.
+
+Keep anticipation -> active contact/release -> brief readable impact pose ->
+recovery. Preserve B8's successful impact-frame/guard-sheet work. Do not change
+host timing silently to make a render look slow-motion or permit duplicate hits.
+Test at varying render rates; the active frame/hit count must remain authoritative.
+
+==========================================================================
+09 — CREATURE ANIMATION: USE THE ACTUAL SOURCE FACTS
+==========================================================================
+
+03_SOURCE_ASSET_AUDIT.md records the three original uploaded GLBs. Each has one
+skin but ZERO embedded animation clips. Each mesh is about 19-20k triangles.
+These facts refer to the supplied originals, not current Windows derivatives.
+
+Therefore: inspect current runtime procedural/baked/retargeted animation before
+claiming it is absent, and do not keep looking for nonexistent original clips.
+Visible early Phoenix frames DO change pose; the concern is cadence/orientation,
+not a proven total lack of animation. Rig presence and clip presence are different.
+
+Use one creature state machine per entity, not multiple competing root updates.
+Separate travel path, bank/pitch, skeletal action and visual aura channels. Smooth
+transitions with normalized clocks, stable root orientation, bounded turn rate
+and anticipation. Distant animation LOD must interpolate back without pose snaps.
+Independent instances require appropriate independent skeleton state; shared
+geometry/material resources must not accidentally share pose ownership. [R05]
+
+Validate all species in normal, turning, attack and recovery clips in a small
+local test harness, then prove in the actual world. No separate polished zoo that
+never integrates into the official demo. Reuse successful derivatives and rigs.
+
+==========================================================================
+10 — DOGKIE: SIGNATURE MATERIAL, GLIDE, CONTACT AND TERRITORY
+==========================================================================
+
+Keep Dogkie's dog/monkey identity, fused front limb unit + fused hind limb unit,
+continuous torso connection, pointed bottoms, simple readable face and forehead
+square-diamond. No ordinary four paws, hooves or conventional walking cycle.
+
+Normal travel: surface-adjacent controlled glide, slight body compression/lean,
+coherent pointed units; the same movement family as the player in creature form.
+Short laser contact/energy pointers extend below the actual lowest tips to the
+valid nearby ground, not through cliffs, water or the whole map. A contact beam
+is visual, not a new collision body or global permanent streak.
+
+Slight levitation only when an attack/dodge/pounce needs it. Wind-up -> small lift
+-> physical-MAHGIC action -> recover -> surface glide. No perpetual airborne bobbing
+or frantic regular animal footsteps. Keep hitboxes aligned to the visible body.
+
+Material: deep sapphire/Titan-blue base, midnight/navy separations, lighter cobalt
+planes where light strikes, selected platinum/near-black support. Preserve normal
+and facet detail, depth and controlled reflections. Do not wash everything in a
+single saturated blue factor or zero roughness. Tune source maps in a neutral
+comparison before in-game light. Regional illumination may vary; species identity
+must not become five different recolored pets.
+
+Latest size request is slightly larger than CURRENT Dogkie. Proposed one-time
+candidate: 1.10 times current canonical scale, with a recorded baseline and visual
+comparison. Reuse it if a comparable newer owner change already landed; never
+compound the old 8-15% requests. Update proxies, contact, labels and spawn clearance.
+Visual size tuning must not silently recalculate combat levels/damage.
+
+Group Dogkies into predictable, readable forest pack territories, not uniform
+random map scatter. Keep forest clearings/path margins/signs/crystal traces that
+let a player anticipate them. Typical occupied sanctuary target 8-12 active animals,
+distributed into small territories; bounded concurrent aggro, not all 12 at once.
+Proposed normal aggro start is 2, within the earlier 1-3 range; expose it as data
+and do not silently change a newer approved cap. Leave sanctuary hearts usable.
+
+Durability remains about 3-4 baseline noncritical hits (B8 reported 4). Do not make
+them stronger merely because the model gets larger. Preserve intended outgoing
+threat and already-retuned 2000-HP balance unless a measured tuning pass identifies
+a genuine defect. This clip does not independently prove close-up Dogkie quality;
+retain the owner's requirement and capture new species-labeled proof.
+
+==========================================================================
+11 — FISH, PHOENIX, HORSE, TITAN AND POPULATION LOGIC
+==========================================================================
+
+FISH:
+Latest request: a little smaller. Proposed once-only candidate 0.90 times CURRENT
+canonical fish size; record baseline and align proxies/labels. Keep source shape.
+Retain swim/breach arcs, low hover/swirl/body-launch when provoked, timed recovery,
+return-water leash and strong readable threat. No indefinite high-speed orbit
+through the player/camera or repeated undodgeable body hits.
+About 5-6 baseline noncritical hits to defeat remains (B8 reported 5); outgoing
+high-threat profile remains near 4-5 successful hits against its defined baseline.
+Do not auto-rescale damage from the new visual size.
+
+There should be visibly abundant fish in sanctuary ponds and offshore waters,
+not merely a large invisible instance count. Use readable clustered schools and
+occasional breaches. Full nearby combat entities are bounded; mid/far agents may
+be cheap instances. Define consistent promotion/demotion and interaction identity
+at proximity so tapping a convincing nearby fish is meaningful. No hidden full
+Athlete rigs, duplicated health, or exploit from cycling population tiers.
+
+PHOENIX:
+Large (~2x established player character scale), naturally high in the permitted
+flight space, long graceful circuits. The newest owner direction OVERRIDES the
+old ground-height SWEEP workaround: birds do not dive or park on the ground.
+Use minimum terrain-relative flight clearance plus wing/body envelope avoidance.
+They engage through aerial/ranged/player-flight opportunities instead of forcing
+melee reach at ground height. Terrain growth must not make their patrol intersect
+new mountains or put them beyond the unchanged legal flight ceiling.
+
+Full readable upstroke/downstroke, recovery, glide and limited bank. Upright means
+coherent anatomy, not a rigid vertical lock that forbids natural bank. Turn through
+arcs, not instant yaw/pitch flips; downstroke/recovery timing may differ. Tail and
+body follow with restrained lag. Avoid pure whole-model rotation as a substitute
+for wing articulation. No wing/building penetration. Durable 15-20 baseline hits;
+its outgoing target remains about 10 successful hits against defined baseline.
+
+HORSE:
+Two near each sanctuary house in open clearings as previously requested, more
+solitary than Dogkie, passive/non-aggressive. Do not label the red HORSE LV35 visible
+in this recording as Dogkie. Preserve 30-40-hit durability; slow defensive snort/
+feint/lunge when provoked, not new ordinary damage or unavoidable harassment.
+Inspect head/neck bind, animation range, skin influences and inherited transforms
+for the reported face-into-neck defect. Fix deformation, not camera distance.
+No global humanoid donor animation on a quadruped/fused creature skeleton.
+
+TITAN:
+Verify B8's Athlete canonical height +0.3048 m world-equivalent; do not add another
+foot. Compare at same camera/distance/ground. Preserve upper-body mass and narrow
+lower-body class proportions. Update collider/target/status/camera offsets without
+stretching only the neck or legs. This clip is not a clean Titan height comparison.
+
+ALL:
+Canonical levels remain size-derived in the 5-75 range, with documented overrides.
+Use stable design bounds, not animated wing span or current LOD. Previous species
+levels Dogkie5 / Horse35 / Fish35 / Phoenix75 are historical; verify current data.
+Cosmetic scale changes do not silently renormalize every species. Aggression is
+separate from level. Player crit probability remains the canonical 3% unless a
+newer explicit rule exists. Preserve normal target/HP UI and defeat/respawn flow.
+Far sanctuaries sleep/virtualize; loading all five is not simulating all five fully.
+
+==========================================================================
+12 — GUIDE FORMATION AND EQUIPMENT DISCOVERY
+==========================================================================
+
+Mrs. Mah's accepted size stays. No new x3 enlargement. Close shoulder-level
+formation, small trailing offset, same player-facing/travel heading, smooth follow
+and banking, controlled idle levitation. Normal movement does not lookAt(player)
+from the side. Casting/dialogue may intentionally turn for a short defined action.
+The same guide architecture remains reusable for Mr. Mah.
+
+Recover approved local dumbbell and barbell sources/derivatives from the existing
+asset database first. GLB_PHASE_AB and GLB_NEW3 stay local; do not request reupload.
+A procedural thin tubular resistance band is a reported B8 fallback, not an
+approved imported asset. Verify whether a real source now exists. No purchase,
+new subscription, unapproved cloud upload or regenerated unrelated equipment.
+
+Make the complete gear path accessible from the normal phone HUD:
+GUIDE -> choose gear/count with readable cost -> cast animation -> visible manifest
+-> accurate tap or deliberate hover -> clear equipped state -> valid attacks ->
+visible hit/miss -> return/cleanup -> charge/refill.
+
+The tiny gear row existing in the video is not proof that this chain works. Make
+its labels/icons/state understandable at phone scale without another huge overlay.
+Reuse the current GUIDE entry and equipment logic, not a parallel menu/controller.
+A short first-use hint is sufficient; do not force repeated tutorials.
+
+Dumbbell preview: floating just above the clavicle line, forward in view, separated
+from player/camera/guide and easy to tap. Up to three with cost/count/class gating.
+Athlete's authored two-dumbbell specials must remain reachable. Third-dumbbell
+class affinity remains an explicit data/owner decision, not silently granted.
+Barbell preview: horizontal on valid floor ahead, charged, not floating in torso.
+Band: thin round tube with plausible bends/tension and glossy polymer/crystal
+response; not a rigid rod, flat ribbon or thin chrome wire by default.
+Pickup adds NO extra magic cost beyond manifestation. Reject an invalid placement
+cleanly without charging twice or littering orphaned equipment.
+
+==========================================================================
+13 — HELD GRIPS, TELEKINETIC RELEASE AND SINGLE EQUIPMENT OWNERSHIP
+==========================================================================
+
+Separate possession/loadout from attachment state. An active gear set may be
+HELD, HOVERING, IN_SPECIAL, PROJECTILE, RETURNING or DISMISSED. These are states of
+one authoritative set, not simultaneous copies with multiple damage sources.
+
+Latest owner intent: gear-specific SPECIAL MAHGIC options are usable when the
+gear is selected/equipped, while normal held attacks visibly use hands. Proposed
+reconciliation: a telekinetic special temporarily releases held gear, runs its
+visible airborne choreography, then restores its previous held/hover state. Earlier
+"leave it floating" remains a valid presentation; do not demand an unexplained
+extra button or replace normal physical moves.
+
+DUMBBELL HELD:
+Align the handle with palm/finger grip; plausible wrist, no body overlap, floating
+inside chest, wrong orientation or attachment to the root. One/two held tools
+must follow the correct hand bones through locomotion and attacks. Unheld extra
+tools, where authorized, occupy a bounded safe hovering formation.
+
+BARBELL HELD:
+Two hands, horizontal bar in front of thighs at the top of a deadlift. Both hands
+remain on the shaft at valid spacing, plates outside the body, no abdomen/leg
+penetration. Keep clearances through turns, arm raise, transformation and camera
+views. Use stance-compatible equipment handling rather than squashing limbs.
+
+Socket relationship: if G is the grip transform in equipment-local space and H
+is desired world grip, equipmentWorld = H * inverse(G). For a two-hand bar, solve
+bar pose plus both hand targets; do not parent the bar independently to two hands.
+Use a dominant grip and constrained off-hand IK, or a shared authored bar track
+with both hands following. Compute matrices in one consistent coordinate space.
+Author handle sockets once per asset; do not fight offsets separately in every move.
+
+On release detach while preserving world transform, hand over to the existing
+projectile/special authority, animate the actual equipment, then return/reattach
+with continuous transforms. No snap-to-origin, double scale, duplicate render,
+invisible projectile while the tool stays inside the player, or late ghost grip.
+Collision during held motion may use appropriate proxies; avoid applying full
+rigid-body dynamics to every gripped weapon. A physics library is not permission
+for a second locomotion/combat controller.
+
+Held dumbbell damage remains approximately x1.8 on applicable approved damage
+sources only. Do not apply twice, stack per rendering instance or buff unrelated
+projectiles simply because equipment is in inventory.
+
+==========================================================================
+14 — COMPLETE THE EQUIPMENT SPECIALS AND ADD PRESS-THROW
+==========================================================================
+
+Only SPECIAL MAHGIC's gear-specific repertoire is replaced. The existing numbered
+slots and host action infrastructure execute these moves. Gear-compatible normal
+physical/physical-MAHGIC motions remain their original exercise patterns.
+
+A. X-WAVE / KATANA EXTENSION (reported B8; repair and prove)
+- Athlete uses empty-hand cross-cable-inspired triceps extension: suitable arm
+  abduction, controlled elbows, stable torso/shoulder, not a generic punch.
+- Two floating dumbbells cross on clean X-shaped trajectories timed to extension.
+- At release, a precise X-shaped luminous blade/wave travels through free air to
+  the selected target direction. Clearly visible world-space path and orientation.
+- Strong, costed and telegraphed. Use a finite X-shaped/swept collision proxy, not
+  an invisible sphere covering the whole area. Hit or miss honestly, then cleanup.
+
+B. CHEST-FLY TELEKINETIC CLAMP (reported B8; repair and prove)
+- Arms open to the sides with modest elbow bend, then controlled horizontal
+  adduction as in a chest fly/pec deck.
+- Two dumbbells move in free air around the target, closing with arm motion.
+- Each develops a growing protection film following the dumbbell's outer shape.
+  Reuse the existing skinned/shape-following shield visual language, not a generic
+  unrelated ring or spherical dome.
+- Converge/collapse with a readable dodge window and restrained magical shatter.
+  Don't home through terrain or guarantee damage after the target has escaped.
+
+C. BARBELL DOUBLE-END PLATE SHOT (reported B8; repair and prove)
+- Lift the bar telekinetically, rotate about 90 degrees to aim its shaft/end at
+  the opponent, telegraph and fire one actual end plate as a charged projectile.
+- Rotate the remaining bar 180 degrees and fire the other plate. Second telegraph
+  is clearer/longer, making the repeat easier to anticipate and dodge.
+- Reconstitute/return plates or cleanly finish the manifestation. No permanent
+  debris, duplicate host hits or empty bar accidentally doing full damage.
+- If source geometry is fused, make a non-destructive runtime derivative with
+  separated plate assets and proper pivots; don't mutilate the approved original.
+
+D. OVERHEAD PRESS -> BARBELL THROW (new owner request)
+- Start from a physically plausible two-hand grip and transition through a verified
+  press path with head/shoulder clearance. The bar remains in both hands until the
+  release marker; no throw implied while it is visibly stuck to the body.
+- At overhead release, the real bar travels toward the target through free air.
+  Choose a readable, stable bar orientation and defined forward trajectory.
+- Host-owned swept collision, clear anticipation, meaningful miss and recovery,
+  appropriate special cost/cooldown. Return/reconstitute and restore safe grip.
+- Use the existing gear-special slot configuration. Do not overwrite normal
+  PHYSICAL overhead-press repertoire or invent a separate attack system.
+
+BAND:
+Complete believable manifestation, equip/tension/material and already-approved
+handling now. The final band special repertoire was not owner-defined. Optional
+creative proposal for later approval: a controlled row/stretch builds a visible
+band-shaped MAHGIC tension arc released forward. Document this separately as a
+proposal; do not claim it is already approved, ship four fabricated mappings, or
+block all other gear on this decision.
+
+All specials: attackId/castId/equipmentId/projectileId identify ownership. Damage
+is awarded once per authorized collision, not once per frame of overlap. Use
+swept previous->current collision for fast motion. Cost on the agreed commit phase,
+no double charge on retries, cancel/refund policy explicit. Check obstacle hits,
+target defeat, switch mode, unequip, death, respawn and region transition mid-cast.
+Visual authority can interpolate, but it cannot change damage or generate rewards.
+
+==========================================================================
+15 — CRYSTAL BUSHES, REFILL DIAMONDS AND GUIDE CHARGE
+==========================================================================
+
+Visible gold fields contain widely spaced specks; the owner wants SHORT, DENSE,
+BUSH-LIKE DIAMOND CLUSTERS, not sparse hair across the whole floor.
+
+Reuse resource-node IDs and data. Form several coherent small shard clusters per
+patch: dense center, tapering edge, varied height/orientation within a designed
+silhouette, selected brighter tips, darker reflective interior. Triangle/facet
+identity remains; random high needles and carpet-wide glitter do not. Keep roads,
+doors, combat and pack routes open. Region color helps placement but refill items
+keep Mrs. Mah's recognizable blue/cyan-white identity.
+
+One logical node target and simple proxy per bush patch, not physics bodies for
+every blade. Resource harvesting is allowed in normal free roam through its
+resource-node interaction, without enabling unrestricted actor/PvP damage.
+Nearby LOD must still read as a bush; distant patches can simplify
+without becoming isolated hairs. Instancing reduces submissions, not all triangle
+or fragment work; cull by chunk and bound effects. [R10]
+
+Prove: tap/lock node -> zero-cost valid physical attack available at zero combat
+MAHGIC -> fracture/hit feedback -> real collectible spawn -> collect -> HUD pool or
+inventory changes -> depletion/cooldown -> bounded respawn. Resource nodes do not
+aggro or grant free creature XP. Do not spawn unlimited drops on repeated overlap.
+
+Refill: small detailed square-diamond, fairy-blue fluorescent core/cyan-white light,
+reflective crystal shell and restrained hover. Distinguish collectible from waypoint
+or atmosphere diamond. Normal pickup remains usable by touch/approach as designed.
+Below max combat/special MAHGIC, restore configured amount. At full, store up to
+999. Preserve current validated partial/overflow policy and expose it; no silent
+item destruction. Proposed safe default where no policy exists: one item fills up
+to max without fractional inventory, shows actual restored amount; at full+999,
+leave the item uncollected/briefly explain capacity. Test cap and repeated pickup.
+Stored use consumes only when a meaningful refill occurs, never while full.
+
+Combat/special MAHGIC has NO passive refill. Do not reintroduce it to mask a broken
+resource loop. Flight pool's recharge remains its separate established rule.
+HP/combat/flight maxima remain the already-reported 2000/200/200 unless source has
+newer approved values. Preserve resource HUD and correct save/load/respawn behavior.
+
+Mrs. Mah GUIDE CHARGE is NOT a level and not ordinary character XP. Only verified
+qualifying dumbbell/barbell extension damage adds charge, bounded against duplicate
+events/overkill and inappropriate dummy farming under current rules. Misses/casting
+alone do not count. Full meter -> brief guide dispense animation -> configured few
+refill items -> reset/rollover. Keep current validated reward amount; older "3" was
+provisional, not a new requirement to overwrite it. Meter and inventory are saved
+through the current authoritative persistence path, not a new browser-only economy.
+
+==========================================================================
+16 — ORIGINAL-ASSET FIDELITY BEFORE BLIND GRAPHICS UPGRADES
+==========================================================================
+
+Use 03_SOURCE_ASSET_AUDIT.md to skip rediscovery of the supplied originals.
+Current local files/derivatives may differ; compare hashes and identify variants.
+Audit one representative tree, Dogkie, the three new creature species, equipment
+and each imported temple family before broad conversion.
+
+Comparison chain:
+approved export/reference -> raw GLB in neutral inspection -> runtime derivative
+in same neutral setup -> actual game with matched camera/light/exposure.
+
+Record per asset: source path/hash, primitive/triangle count, skins/clips, textures
+and their roles/dimensions, material assignments, extensions, UV/tangent/normal state,
+LOD/decimation/compression operations, runtime tier, final draw/material counts.
+This distinguishes lost source data from a bad material override or scene lighting.
+
+The three inspected raw creatures have 18,870 / 19,996 / 19,384 triangles, but
+multiple 8K textures. "It looks polygonal" is not proof of excessive triangle count
+or proof that another subdivision pass fixes it. Preserve silhouette and important
+facets; put triangles where curvature/deformation needs them, not uniform subdivision.
+
+Check normal direction/handedness, hard-vs-smooth boundaries, UV seams, tangent basis
+and baked normal compression. Preserve intentional crystal face breaks. Smooth
+structural curves and skin where needed without melting crystal crowns. An sRGB
+normal map, missing map or destroyed roughness variation can make a detailed asset
+look crude without changing its triangle count. [R01, R03, R04]
+
+Use bounded per-asset texture tiers. Never restore every source 8K image globally
+on phone. Prefer a faithful high-detail near variant with managed residency and
+measured compressed texture support; lower tiers preserve silhouette, normal form
+and color hierarchy. KTX2/Basis texture and mesh compression solve different costs.
+File download compression alone is not GPU-memory optimization. [R06]
+
+A raw 8192^2 RGBA8 image with a full mip chain is approximately 341 MiB before
+other resources; two are approximately 683 MiB. These are theoretical uncompressed
+estimates, NOT measurements of the current game. B8's reported resident cap must
+not be undone while improving detail. Keep raw sources immutable.
+
+Both fish and Phoenix originals have metallicFactor 0 and roughnessFactor 0.5.
+That is not automatically wrong: crystal is a dielectric and colorized metal is a
+separate material choice. Do not set every creature's metallic to 1 to make it
+"premium." Use source/owner intent to partition metal, crystal and dark support.
+
+==========================================================================
+17 — MATERIAL, COLOR-GRADING AND REFLECTION LANGUAGE
+==========================================================================
+
+Owner target: platinum/chromium structure + mineral/crystal color + depth and
+controlled shine. No important asset should read like a uniform solid paint bucket.
+This does not require noise on every surface. Use coherent large values, medium
+material variation and restrained small detail. Avoid "everything is glossy ice."
+
+One linear-light rendering pipeline: authored base/emissive colors use their proper
+color interpretation; normal/roughness/metalness data remain data, not color. Do
+not apply another conversion over the loader's correct assignments. Final display
+conversion/tone mapping happens once, including after postprocessing. [R01, R03]
+Compare the existing tone mapper against a neutral target before changing it. Any
+new mapper is a controlled matched-image decision, not a way to conceal bad assets.
+
+Proposed sRGB PALETTE STARTS (tint families, not replace-all base textures):
+Civic support: charcoal #151E29 -> steel #52606D -> platinum #C7CFD5.
+Athlete: bronze #604014 -> gold #C5902D -> champagne #FFE1A1.
+Titan/Dogkie: midnight #08152F -> sapphire #144CB8 -> cobalt-light #77B3FF.
+Lean: oxblood #340D1E -> crimson #B51D46 -> rose-light #FF8BA8.
+Visionary: deep violet #241139 -> purple #7242BB -> lilac-light #CAB0FF.
+BAGE: dark plum #38132E -> hot pink #DC3F9A -> blush #FFC0E3.
+Water/fairy/civic energy: deep teal/blue support -> cyan #64DCEF -> blue-white.
+Green/emerald may diversify gardens/crystal pockets without inventing a sixth class.
+
+Apply tint via authored masks/material zones, luminance-aware adjustment and
+source-preserving contrast. Do not multiply already dark saturated blue by another
+dark blue until all detail disappears. Shadows and highlights arise from lighting,
+roughness and normals, with art-directed material variation, not painted light blobs.
+
+Proposed roughness exploration ranges, not universal laws:
+satin platinum structure ~0.28-0.48; polished details ~0.12-0.25; darker mineral
+terrain ~0.30-0.50; selected crystal facets lower with rougher interior/support.
+Tune under neutral light and the game, and control aliasing at grazing angles.
+Metal/platinum uses metal-appropriate response; crystal/polymers use dielectric
+specular/IOR where supported. Small normal/roughness variation reveals form.
+
+Reflection policy: shared prefiltered environment and carefully located reflection
+zones; real-time mirrors only for explicitly justified hero surfaces and measured
+budgets. Do not assign every tree/building its own dynamic cube camera. Preserve
+dark ground's subtle reflection, not a mirror lake. [R07]
+
+Specular sparkles need valid mipmaps/filtering and bounded sharpening. Improve
+silhouette and shading before indiscriminate bloom. Preserve readable colored
+facets without clipping whites, muddying shadows or bathing the whole world blue.
+
+==========================================================================
+18 — LIGHTING, SHADOWS, CONTACT AND A LESS GLACIAL WORLD
+==========================================================================
+
+Night is not simply exposure lowered on an unlit daytime scene. Establish a
+coherent moon/key direction, low ambient fill, restrained warm/cool accents,
+class-colored architectural light and clear navigation/actor separation.
+
+Use light to communicate surface curvature and crystal planes. Keep the player,
+target, resource patch and doorway readable against dark ground. A soft contact
+shadow or species laser connection gives hovering entities a grounded position.
+Do not use oversized opaque disc shadows as a substitute for all contact quality.
+
+Trees: structural roots/trunks/main branches clean satin platinum/heat-grey,
+subtle grooves/beveled transitions, darker structural creases. Crystalline root
+skirts/crown/extremities carry class color. The successful red root motif becomes
+an intentional repeated grammar, not a full noisy diamond trunk at every scale.
+Trees should read trunk -> branches -> crown from normal gameplay distance.
+
+One principal nearby shadow solution with tuned bias/normal bias and bounded
+caster/receiver lists. Most energy windows, beams, particles and tiny crystals do
+not need independent shadow maps. Additional shadow lights cost extra passes;
+point-light shadows are especially expensive. [R08]
+Use baked/static occlusion/contact cues where appropriate, while avoiding baked
+lighting that contradicts moving day/night. Freeze static shadow updates only
+when scene/light changes permit. No blanket real-time shadows on every meadow blade.
+
+Use distance haze, value contrast and atmospheric layers for depth. Default phone
+DOF/motion blur should not hide enemies, flicker or low detail. Strong camera
+blur is not a substitute for geometry or texture quality. Favor stable antialiasing
+and clear UI; scale optional post effects by measured GPU cost.
+
+Buildings and forests may have warm gold, crimson, pink, violet and green accents
+within the shared platinum palette. Water remains a positive visual baseline.
+A winter-glacier world is not the target; avoid overexposed white terrain and
+uniform blue-white fog swallowing all region identity.
+
+==========================================================================
+19 — CITY EXPANSION WITH A DECLARED SCALE INTERPRETATION
+==========================================================================
+
+Owner asks mainland city roughly 3-4x its current size. "Size" is ambiguous.
+Do NOT scale both horizontal axes 4x and call the resulting 16x area a 4x city.
+
+Proposed reversible planning default: target ~3.5x USABLE CITY FOOTPRINT AREA.
+A_new = 3.5*A_reference; an isotropic linear equivalent would be sqrt(3.5) ~= 1.87,
+but actual expansion should follow shore/terrain and district needs, not multiply
+one root node. Record current usable area, boundary and measurement convention.
+Show the before/after metric and state this interpretation in the first plan.
+If newer owner/source notes clearly specify linear expansion, use that instead.
+
+No scaling of player, travel speed, attack ranges, flight ceiling, source props or
+all temple sizes as a shortcut. No compounded multiplication on later reloads.
+Expand world extent through connected geography while keeping the active render/
+simulation region bounded. Place enough purposeful land to justify the water.
+
+Town organization proposal:
+- Civic heart: plaza/market/guide/clearly named services.
+- Training edge: practice grounds and routes into class sanctuaries.
+- Waterfront: short quays, bridge connections, visible fish, source-to-basin water.
+- Elevated belt: connected terraces/lookouts/mountain pass entrances.
+- Small roadside structures: actual information/rest/training/service role using
+  already approved functions, not unimplemented economies or random model spam.
+
+Do not create every possible system mentioned above. Reuse existing building
+functions and give added structures a purposeful destination/interaction.
+Connect a primary ring or partial ring with spoke routes and cross-region loops.
+Allow exploration off-road, but a newcomer can follow a route without guessing.
+
+Make the first useful destination close and visible. Larger area does not require
+minutes of nothing. Use medium-scale landmarks, changes of elevation, clearings,
+water/vegetation and optional nodes as journey beats, not unbounded prop density.
+Measure travel-time distribution at ordinary speed; preserve flight usefulness.
+
+==========================================================================
+20 — CONNECTED ROAD GRAPH, GRADIENTS AND MEANINGFUL ARRIVALS
+==========================================================================
+
+Extend the current route registry; do not paint a second set of unrelated lines.
+Nodes: civic spaces, regional gates, junctions, bridges, sanctuary forecourts,
+building approaches, resource/pond/training points where relevant.
+Edges: actual traversable centerlines with width, elevation, surface, region
+transition and destination. One graph drives world route geometry, MAP and signs.
+
+Tests: all intended public destinations reachable from spawn; no isolated edge,
+unknown endpoint, route through a wall/pond, duplicate road surface or collision
+gap. Every end belongs to a named arrival/forecourt/door/purposeful overlook.
+A valid connected terminal destination is allowed; an unexplained rectangular
+paint cutoff is not. Joining every endpoint into arbitrary loops is not the goal.
+
+Primary causeway -> regional approach -> forecourt -> short FRONT-door spur.
+Secondary paths connect habitats/ponds/side buildings. Discovery trails are quieter.
+Preserve already widened primary routes; inspect actual width before applying any
+old x3 request again. Give joins proper corner fillets/bevels/caps, slope continuity
+and gradient transition zones, not intersecting rectangles drawn over each other.
+
+At class boundaries, interpolate region accents over a designed distance using a
+smooth parameter, e.g. smoothstep(0,1,d/L), in the chosen color workflow. Keep a
+stable dark/platinum structural lane while accents fade red->blue/gold/purple.
+No muddy multi-hue paint everywhere or huge hard square region plaques.
+
+Existing named wayfinders ARE visible at ~06:13. Preserve and improve them, don't
+claim there are none. Place signs at actual forks before the decision, oriented
+toward approach, readable at normal view, with matching destinations/distances.
+Physical geometry and map must agree after city/temple rescaling.
+
+Road physics follows the designed surface: no bump from tiny decorative shards,
+no invisible trip edges, no cliff navigation through solid side faces. Nav paths
+use actual supported elevations/ramps, not old flat-plane assumptions. Flight
+routes can cross above terrain but cannot let ground movement fall through it.
+
+==========================================================================
+21 — MOUNTAINS, WATERFALLS, WATER AND VERTICAL DESTINATIONS
+==========================================================================
+
+Owner priority: mountains should be among the BEST-composed map features, not
+unfinished giant squares/triangles. V07 shows huge planar ridge forms close to
+traversal. Keep crystal geology but replace crude blockout appearance and joins.
+
+Design large ridge arcs, saddle/pass connections and coherent base-to-crest mass.
+Use several silhouette scales, selected fractured crystal outcrops, darker rock/
+platinum body, colored mineral seams and atmosphere. Not uniform white spikes.
+Maintain world-space texel density, coherent normals, boundary stitching and LOD
+transitions. No floating slabs, camera-visible hollow undersides or square cuts
+through water. Avoid high-frequency noise pasted uniformly on a low-quality shape.
+
+Near terrain is traversable where indicated; distant massifs can be efficient
+background geometry but must transition convincingly and obey reachable bounds.
+Camera near/far/terrain LOD must support city expansion without reopening depth
+problems. Add high/low paths, ramps, lookout terraces and purposeful aerial spaces.
+No new locomotion mechanics without an existing owner-approved interface.
+
+Water is a PRESERVE target. Build on current responsive water: contact/breach
+impulses -> expansion -> damping -> calm, shared disturbance events from fish,
+objects and appropriate player actions. Maintain overlap/contact, ripple normals,
+reflection/light response and shoreline integration. Do not copy Kung Fu Panda
+assets/code/audio; the earlier reference was for interaction quality only.
+
+Waterfalls must have a visible elevated channel/reservoir, coherent fall volume,
+receiving basin, impact disturbance and restrained mist. Use bounded surfaces and
+pooled particles/foam, not a giant blue rectangle or full-fluid physics everywhere.
+Keep ponds small/distinct within class forests and meaningful larger waters near
+coasts. Don't blindly delete ocean area; increase purposeful land/shore context.
+
+Sky beams/FOBeams: occasional energy phenomena tied to a sanctuary/roof/crystal
+source, designed direction/pulse and visual scale. No purposeless tall editor rods.
+Vertical architecture/bridges should reach actual routes, rooftops, guide/training
+points or aerial vistas. Long bridges need intermediate nodes/views/branches;
+never create a two-minute empty walkway just to say the map is larger.
+
+==========================================================================
+22 — FIVE SANCTUARIES AND TREE / HABITAT COMPOSITION
+==========================================================================
+
+Retain all five identities; not the same forest recolored five times:
+ATHLETE/GOLD: kinetic terraces, balanced broad training spaces, upward diagonals.
+TITAN/BLUE: mountain integration, monumental broad masses, thick supports.
+LEAN/CRIMSON: slimmer structures, precise cut-throughs, canyon/switchback rhythm.
+VISIONARY/PURPLE: elevated airy platforms, negative space, suspended crystal core.
+BAGE/HOT PINK: ordered symmetric terraces, restorative gardens/pools, softer joins.
+
+Each region: clear route/arrival, recognizable temple/training heart, modest water
+body with visible fish, Dogkie pack territories, two passive horses near the house
+in open clearings, and appropriate high-altitude Phoenix territory. Active counts
+are bounded by proximity; distant sanctuaries aren't all full-rate simulations.
+
+Use platinum structural trees with class-colored root growth and crowns. Density
+in deliberate groves, quieter route corridors, framed entrances and clear combat
+spaces. Do not replicate trees over paths or force the camera through reflective
+foliage. Height/spacing/understory vary by region within a coherent ecology.
+
+These places form the early adjustment/learning journey: class identity, exercise
+moves, traversal, preparation for duels. Swimming/fish, climbing/highlands or other
+short challenges can later fit the geography. Do NOT build a sprawling quest
+campaign, payment system or brand-new MMO server in this graphics/gameplay pass.
+Keep existing levels/progression and future free Dogkie/premium pet distinction.
+
+==========================================================================
+23 — THREE IMPORTED TEMPLES: 0.6x, FRONT DOORS, TRUE INTERIORS
+==========================================================================
+
+Identify the THREE imported temple-like building instances by source/registry and
+owner reference. Apply 0.6 times their recorded current individual scale ONCE.
+Do not shrink all five sanctuary temples, all buildings or the entire town.
+If source identity is genuinely ambiguous, isolate that decision, show exact
+candidate names/thumbnails and continue other unblocked work without guessing.
+
+Rescaling includes collider/proxy, front-door/forecourt/interior transfer anchors,
+name offset, stairs/ramp clearances, attached VFX and path spurs. Position/rotate
+the actual FRONT toward the approach; not side/back/corner. Rebuild attachments
+in building-local coordinates so repeated placement is stable.
+
+The exterior GLB's visible baked interior may not match the intended actual room.
+Cover that misleading opening with a designed door/screen/threshold that properly
+opens/transitions into the real interior. Do not brick up the only entrance or
+leave an invisible teleport while rendering a contradictory room behind it.
+
+Every public demo building has registry ID, display name, function, district,
+map entry, front entrance, arrival anchor, collision/entry state and interior.
+Names must be clear at entrances and on MAP, with sensible proximity sizing.
+Use existing contextual interaction philosophy; no permanent giant USE button.
+
+Enter -> load/activate correct room -> safe spawn -> obvious exit -> return at the
+correct outdoor door with no loop, fall, camera trap or duplicate exterior.
+Basic functional named shells are better than fake locked facades. Keep them
+honestly labeled as shells until their purposeful fittings/materials are complete.
+Use current approved functions to furnish Temple Hall and Tower Hall; don't invent
+an entire shop economy. Repeated entry/exit must not leak skeleton/texture resources.
+
+All mainland buildings need finished integrated color/material hierarchy, not
+plain white cylinders with detached neon poles. Use insets, recesses, roof crowns,
+façade energy channels, foundation growth and coherent local reflections.
+The official black/windowless MAH MATCH canon remains an exception to colored
+window panels: add nuanced black/platinum detail and restrained energy, not glass
+windows or a blanket bright repaint.
+
+==========================================================================
+24 — ARCHITECTURE MOTION AND PURPOSEFUL DIAMONDS
+==========================================================================
+
+Use the established MAH/MAHFITT motion language in world architecture:
+horizontal beams slowly oscillate along a defined façade rail, square-diamond
+markers hover/travel between receivers, energy grooves pulse, selected crown
+rings/apertures move with a functional rhythm. This is not an app pasted onto a wall.
+
+Hero building: one primary identity motion plus one or two restrained secondary
+motions. Ordinary buildings quieter. Source/receiver/anchor/meaning clear. Animate
+with shared clocks/uniforms or cheap transforms, not hundreds of individual RAFs,
+physics bodies or always-running distant skeletons.
+
+Audit large colored/floating objects: STRUCTURE / ENERGY / NAVIGATION / ENTRANCE /
+CLASS IDENTITY / RESOURCE. Objects with no readable purpose are removed or
+repurposed. Removing an asset instance is not permission to delete its source file.
+
+A retained square-diamond must read as designed crystal/platinum: bevel/rim or
+crafted facet geometry, meaningful material contrast, controlled light, stable
+silhouette. Do not blindly subdivide away its square-diamond identity. Scale by
+function; giant blue solids over civic rings should not obscure the entire building.
+Keep resource diamonds small/distinct and navigation markers recognizable.
+
+Foundation -> crystal root skirt -> region inlay creates contact with the world,
+not random extrusions beside buildings. Visible energy should communicate activity
+or function: entrance response, class temple pulse, active training field. Preserve
+building collision and overhead clearance when moving decorative assemblies.
+
+==========================================================================
+25 — NIGHT-FIRST, HUGE SUN / MOON AND LIGHT-RESPONSIVE CLOUDS
+==========================================================================
+
+Next review candidate opens in NIGHT with the intended lights visibly operating.
+Keep DAY selectable. Don't require the owner to discover a hidden setting to see
+this pass. Respect persistence deliberately; expose/reset preview time explicitly
+rather than confusing an old saved daytime setting with a failed implementation.
+
+Latest owner visual target: Sun around 5-7 times current apparent disc size;
+Moon comparably immense with the same cloud/light composition. Use k=6 as a
+provisional visual starting point, measured once against the recorded/current
+baseline. Document both bodies' measured before/after apparent size; don't compound
+older huge-celestial requests or blindly enlarge all world meshes.
+
+For a centered disc with angular diameter theta and camera FOV along the same axis,
+its approximate viewport diameter fraction q = tan(theta/2)/tan(FOV/2).
+To multiply apparent diameter by k at the same FOV:
+theta_new = 2*atan(k*tan(theta_old/2)).
+Use this for art-direction consistency across cameras; don't confuse degrees,
+radius, linear model size and viewport area. A portrait/landscape view can show
+different crops. The Sun's historical 6.5-degree report is not a fresh measurement.
+
+Keep celestial direction world-consistent. Center sky geometry on camera position
+where appropriate, not its viewing direction; do not glue a moon permanently in
+front of the player. Provide many outdoor vistas where the active disc is easy to
+find, while allowing real mountain/cloud occlusion. Its visual size is independent
+of lighting energy so enlarging it does not bleach the scene.
+
+Moon: huge textured blue-white/icy-crystal surface, subtle variation and halo,
+readable not solidflatcircle. Sun: huge luminous layered plasma/crystal treatment,
+not tiny icon; source/intensity/grade tuned to preserve world readability.
+Use the supplied night reference for composition only, not copyrighted characters
+or architecture.
+
+Clouds: lower moving banks cross IN FRONT of Sun/Moon; multiple shaped layers,
+gray/blue internal bodies, silver/rimlit edges, thickness variation, wind/parallax.
+"Glamorous/glossy" here means luminous scattering/edges, not metallic mirror clouds.
+Avoid white flat polygons, identical blobs, giant hard sorting edges or cloud
+layers that visibly slice buildings.
+
+A useful physically-inspired relation is transmittance T=exp(-tau), where optical
+depth tau comes from bounded cloud density. Use the SAME occlusion field to dim the
+disc and attenuate its visible shafts/rays, so rays don't inexplicably shine through
+opaque cloud. This is a design method, not a mandate for a full volumetric simulator.
+Low/mobile: layered 2.5D density/noise surfaces and cheap bounded shafts. Higher
+quality may add better scattering only after frame/memory proof. [R15]
+
+Atmosphere: coherent scattering gradient, horizon haze, far ridge falloff, night
+stars where appropriate, reflected sky state in water/metal. A time/wind parameter
+can drive cloud/selected vegetation motion, not global random bobbing. No huge
+calendar system. Prewarm required DAY/NIGHT material variants outside active play;
+prefer shared shader structure/uniform changes instead of dozens of recompiles on
+every toggle. Validate the reported first-night-switch hitch specifically.
+
+==========================================================================
+26 — PHYSICS, CONTACT, CAMERA AND SPATIAL CONSISTENCY
+==========================================================================
+
+Quality includes absence of invisible walls, false range, clipping and inconsistent
+contact. Keep simple intentional colliders separate from decorative high-detail
+mesh. The actual renderer, host movement, navigation, projectiles and input raycasts
+must use consistent world transforms and registry IDs after every scale change.
+
+Do not derive level, collision size or nav clearance from momentary deformed bounds
+unless the mechanic explicitly needs that. Use designed body envelopes and dynamic
+parts only where necessary, such as Phoenix wing avoidance or projectile sweeps.
+
+Preserve camera/facing independence while adding collision-aware camera clearance
+around trees and walls. V02 shows heavy tree obstruction. Solve via camera boom
+collision/appropriate occluder treatment in JOB A, not automatically recentering
+to facing or deleting all tree detail. Do not make the locked target invisible
+behind an opaque object while permitting damage through that object.
+
+Existing physics backend first. Rapier/other resources are references, not an
+instruction to install a second controller or replace the game engine. [R14]
+Bound world/event impulses and resimulation. New sky/material effects don't need
+rigid-body simulation. Held gear doesn't need unconstrained world physics. Water
+requires convincing contact and damping, not expensive full fluid dynamics on phone.
+
+==========================================================================
+27 — LOADING, RESUME, LIFECYCLE AND MOBILE MEMORY
+==========================================================================
+
+VISIBLE launch sequence: after intentional Home Screen launch, there is black/
+partial UI before the loading veil and eventual world. Improve first paint and
+staged readiness. Do not call this sequence a proven crash. [V04]
+
+Display a lightweight truthful loading/restoring screen immediately; progress by
+actual phase, not fake instant 100%. Preserve controls only when their world/input
+is ready. World build, asset decode/upload and shader preparation must not create
+an extended unresponsive black view with isolated Tutorial/Skills/joystick bits.
+Promise-based loading does not automatically move heavy parse work off the main
+thread. Profile phases and defer/chunk or use appropriate workers only where the
+actual work/library supports it.
+
+Maintain one renderer/animation loop. Verify event/timer/mixer lifetimes when
+entering halls, rotating, opening panels, toggling time, equipping and respawning.
+Resources shared across instances need reference-aware disposal; do not dispose a
+shared texture still in use or leak independent skeleton bone textures on remount.
+Stop mixers/actions before releasing their owner. Release owned render targets,
+materials, geometries, decoded images and listeners appropriately. [R02, R04, R09]
+
+Keep compact crash breadcrumbs at a low rate, bounded storage, no secrets. Log
+last region/state/action and counts; don't flush huge synchronous logs each frame.
+Context-loss events help, but OS process kills may leave no event. On unexpected
+reload recover the last small snapshot and show a complete READY restoration gate.
+
+Disk: historical ~610 MB free is not current truth. Recheck before packaging or
+large conversions. Only confirmed inactive disposable job temp may be cleaned
+without further owner permission. Never delete raw GLBs, user files, source,
+checkpoint archives or probe_out/video. Use bounded temporary output and avoid
+simultaneous giant conversions. Report exact blocked needs, not "delete stuff."
+
+==========================================================================
+28 — PERFORMANCE BUDGETS: HIGH QUALITY WITHOUT A FALSE PROMISE
+==========================================================================
+
+Do not promise identical offline-render quality on every phone or claim current
+FPS from the recording. Establish actual device/browser/GPU/canvas/tier and input
+scenario for measurements. Keep source resolution, runtime resolution and display
+resolution distinct. [R09, R11]
+
+Proposed candidate targets, NOT measured results:
+- Supported representative PC: stable 60 fps goal with measured frame tails.
+- Supported representative phone: 60 fps ambition; a stable 30 fps quality tier
+  is the minimum planning floor for supported low hardware, not approval at 19fps.
+- No multi-second active-play main-thread block, runaway memory, tab reload,
+  repeated shader compilation storm or visible floor failure.
+If the actual device cannot meet the selected tier, simplify costs before adding
+more replicated detail and record the supported profile honestly.
+
+A 60 fps frame is 16.67 ms; 30 fps is 33.33 ms. Measure median plus p95/p99 frame
+intervals, long stalls and interactions, not only an average. CPU emulation does
+not emulate phone GPU limits/thermal behavior. Separate JS heap, estimated texture
+residency and other GPU costs. Renderer texture counts are not byte-accurate VRAM.
+
+Pixel budget matters: multiplying device pixel ratio by 3 yields ~9x pixels for
+a fixed CSS canvas. A proposed cap uses scale=min(deviceDPR,sqrt(Pmax/(Wcss*Hcss))).
+Choose Pmax/tier from measured sharpness/performance, not blindly force DPR3. Keep
+text/UI crisp separately. A first low/mid experiment around 0.8-1.2 megapixel render
+area is a tuning proposal, not universal quality law. Only resize on actual changes.
+
+Measure cost per subsystem: creature animation/AI, draw submissions, visible
+triangles, materials/program variants, shadows, transparency/transmission, water,
+clouds, UI, texture residency, loading and region activation. Instancing doesn't
+remove fragment/vertex work. Frozen offscreen geometry isn't freed memory.
+
+Maintain/strengthen B8's bounded texture tier (reported ~190 MB) with comparable
+measurement; don't blindly call this a universal Safari limit. Near hero textures,
+shared compressed maps, per-region residency and animation LOD are preferable to
+a uniform drastic blur. Far geometry/meadows/cloud layers/creatures simplify by
+visibility and significance with hysteresis to avoid popping or repeated respawn.
+
+Use pooled bounded particles, few shadow casters, shared clocks and infrequent
+distant AI. High settings add measured refinement, not different gameplay rules.
+No optional quality setting may break targeting, hide necessary enemies, change
+combat cost, shrink resource-node hitboxes or make controls unusable.
+
+==========================================================================
+29 — AVAILABLE RESOURCES: PURPOSEFUL, NOT ANOTHER TOOL CHAIN SPIRAL
+==========================================================================
+
+04_PRIMARY_RESOURCES.md contains checked primary documentation and why each is
+relevant. Match all APIs to the repository's pinned version; do not upgrade the
+engine simply to copy a current example. Keep Three.js as the existing runtime.
+
+Three.js/glTF: loaders, material/color handling, animation mixers, skeleton-safe
+clones/retargeting, texture compression, renderer diagnostics and instancing.
+Blender: inspect raw/derived geometry, normals, weights, grip sockets and animation;
+bake/export supported game data rather than expecting arbitrary Blender shaders,
+constraints or procedural nodes to transfer automatically.
+Reallusion CC/iClone/ActorCore/Blender Auto Setup: use available licensed tools and
+already-owned donor motions for appropriate rigs. Re-target to the actual custom
+MAH skeleton and bake. Do not replace the custom fused body with a generic human.
+Mixamo: optional humanoid motion donor; it is not a universal bird/fish/quadruped
+auto-rigger. Validate license/use and suitability before using assets.
+Tripo: already-generated sources and rig assistance; the supplied creatures have
+skins but no clips. Verify available features/credits before any operation; no
+new generation, paid job or cloud upload is authorized merely by this resource list.
+Physics/atmosphere references: use the idea in the existing architecture, not a
+second engine or mandatory expensive volumetric system.
+
+No purchasing plugins, consuming paid external generation credits, uploading
+private source assets elsewhere, or asserting installed tools/version/license
+without checking. If a tool is unavailable, implement the same bounded task with
+existing local capabilities or document the exact missing dependency. Do not stall
+all work because one optional vendor tool isn't accessible.
+
+==========================================================================
+30 — ACCEPTANCE: PROVE COMPLETE PLAYER CHAINS, NOT ONLY TEST COUNTS
+==========================================================================
+
+Use 05_REQUIREMENTS_LEDGER.json as the initial requirement index. All statuses
+start as NEEDS_CURRENT_SOURCE_CHECK or OWNER_REVIEW_PENDING, not "done." Update
+compactly with actual changed file/commit and evidence. Preserve historical queue.
+
+Required focused tests/proofs:
+1. Exact floor arc ~06:20-06:26, multiple heights/time/tier; no patch breakup.
+2. Portrait/landscape/desktop input; HUD/camera/equipment/target taps don't conflict.
+3. Ground/fused/separated/flight start-turn-release-land; one brake, intact knees,
+   stable segment lengths and no persistent unauthorized pose.
+4. Every creature: target/LOS/proxy/HP, species motion, correct range, exit cleanup;
+   Phoenix remains airborne and horse passive; labels stay readable at close range.
+5. Guide -> DB/BB/band -> manifest -> tap -> true grip -> normal moves -> special
+   release -> world-space projectile hit/miss -> return -> correct cost/reward.
+6. Zero combat MAHGIC -> valid physical bush harvest -> real blue refill -> pool /
+   inventory <=999 -> stored use. Guide charge only on qualifying real damage.
+7. Route graph connectivity, no wall/pond endpoints, named sign/map agreement.
+8. Three identified temples 0.6x once, correct front doors, entry/exit safe and no
+   remount leaks. Same physical scaling in collision, labels and interactions.
+9. Night default; giant moon/cloud occlusion/lighting, day switch giant Sun,
+   no repeated program explosion. Color/readability preserved on mobile and PC.
+10. Source/derivative/game comparison for representative raw assets, preserving
+    silhouette, detail and bounded runtime residency; no unverified parity claim.
+11. Expanded city footprint documented, purposeful regions, completed mountains/
+    water connections, coherent class forests and restrained architecture motion.
+
+At candidate closure run the existing full suite once and a representative
+sustained route materially longer than the old failure window. Proposed internal
+soak ~15 minutes with menu/time switches, repeated building visits, both forms,
+creature combat, gear changes and resource refill. Use shorter targeted probes
+while iterating. Label unrun or blocked device/auth tests honestly. A physical-phone
+owner test remains required; no desktop-emulation substitution for that sign-off.
+
+One strong finished route is the calibration, then all authorized region/system
+requirements need explicit status. A screenshot, registered animation name,
+compiler success or green unit count alone cannot close a visual/gameplay requirement.
+
+==========================================================================
+31 — RELEASE, CONTINUITY AND COMPACT REPORT
+==========================================================================
+
+Keep B8 and other forensic evidence. Package a new canonical candidate only after
+meaningful verified improvements. Use current package tooling, fresh extraction,
+source/package hashes and actual files, not guessed full hashes.
+
+Draft/private only; NO production promotion or --prod. Verify current published
+deploy before/after, using actual current state rather than assuming the historical
+ID forever. Preserve the gate. Test unauthorized protection and authorized shell/
+assets when local credentials are available, never print secrets. If login proof
+is blocked, say so; do not remove protection or declare user access passed from a
+401/"ready" response alone. No deployment/account changes by this ChatGPT handoff.
+
+This handoff itself must stay below 30,000,000 bytes. The actual game build can be
+larger; do not destroy game assets to make the Claude instruction ZIP tiny. Large
+original GLBs stay local. Reference an existing package/source rather than upload
+it again. The compressed evidence is for orientation; original source remains.
+
+First report: <=8 lines of verified current state, active lane, first repair,
+important dependency and chosen area/scale interpretation. Then implement, not
+another session-recovery plan. Respect normal tool approvals and real write gates.
+At meaningful checkpoints, report:
+- Current HEAD/changed files, phase and requirement IDs completed/partial/blocked.
+- Actual test and visual evidence, device/emulation distinction, measured resource
+  changes, runtime defects still present and any provisional design choices used.
+- New private candidate facts only when deployed; published site unchanged.
+- Next unblocked task and owner-only decisions, without repeatedly requesting "go."
+
+Update CONTINUE_HERE with the real state and retain history. Do not stop after one
+material, one creature, one temple, one shader or a one-route prototype. Continue
+all authorized owner-independent work through integration, optimization and proof.
+Genuine blockers: unavailable required asset, concurrent ownership conflict,
+destructive ambiguity, missing paid permission, physical-device acceptance or a
+specific undefined owner choice. Name the exact blocker and continue independent
+work. No promises of a fixed dollar cost or guaranteed "generation-breaking" result.
+
+BEGIN AT THE CURRENT SAFE CHECKPOINT.
+SAME MAHWORLD. B8 OR NEWER PRESERVED. ONE COHERENT QUALITY PASS.
