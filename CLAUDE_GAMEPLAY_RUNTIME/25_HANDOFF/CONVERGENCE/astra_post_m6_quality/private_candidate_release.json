@@ -1,0 +1,78 @@
+{
+  "schema": "MAHWORLD_PROTECTED_PRIVATE_CANDIDATE_V1",
+  "released_at": "2026-09-24T21:25:35.9792715Z",
+  "build_id": "ASTRA_M6Q_PRIVATE_20260924",
+  "source": {
+    "working_branch": "master",
+    "working_head": "3185a25f80a23131fbdb2062fca9a1a1ffb7684f",
+    "worktree_clean": false,
+    "verified_backup_branch": "backup/mahworld-m6-20260924T190351Z",
+    "foreground_checkpoint": "80b96391c29e275cdac1c3b238b713b90c5e15d3",
+    "world_gameplay_checkpoint": "abae621c0c40c4b14cb3985377dcd6e434aa7c52",
+    "note": "Built from the preserved current gameplay worktree after two remotely verified post-M6 source checkpoints; no checkout, reset, or substitution with an older source state."
+  },
+  "package": {
+    "record": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M6Q_PRIVATE_20260924.PACKAGE.json",
+    "record_sha256": "b416ed085ccde107a906256a7a52f3ddcdf086e17bd28151cf085a6e3272f98a",
+    "zip": "26_LOCAL_AUTHORITY/deploy/packages/ASTRA_M6Q_PRIVATE_20260924.zip",
+    "zip_bytes": 122976086,
+    "zip_entries": 181,
+    "zip_sha256": "72e754ac8e6a9587531e8e3bac4a6b67ff154533dd79b2a799b44a8e0eff5c06",
+    "zip_committed": false,
+    "visible_build_id": "ASTRA_M6Q_PRIVATE_20260924",
+    "mandatory_pipeline": {
+      "test_programs": 56,
+      "checks_passed": 1518,
+      "checks_failed": 0,
+      "javascript_files": 104,
+      "secret_scan_files": 181,
+      "fresh_extraction_files": 181,
+      "fresh_extraction_smoke": "7/7",
+      "fresh_extraction_javascript": "clean"
+    }
+  },
+  "bounded_runtime_evidence": {
+    "report": "25_HANDOFF/CONVERGENCE/astra_m6_closeout/visual_check/m6_visual_check.json",
+    "report_sha256": "40cc35366c3f468e487b0e0e97e884e13f2354af3f4f55ccd5a0791b54777d4a",
+    "screenshots": 11,
+    "console_errors": 0,
+    "runtime_unresolved": 0,
+    "resource_bush": { "broken": true, "drops": 2, "refills_picked": 2 },
+    "equipment": { "dumbbells_held": 2, "dumbbell_palm_error_m": 0, "barbell_held": true, "barbell_midpoint_error_m": 0, "barbell_hand_span_m": 0.675 },
+    "representative_attack": "PA_PUSH accepted as PM_PUSH / PHYSICAL_MAGIC with BALANCED profile; host authority preserved"
+  },
+  "deployment": {
+    "provider": "Netlify",
+    "site_id": "968f80e5-889b-43a8-b2cd-5860c588546a",
+    "site_name": "mahworld-test-preview",
+    "deploy_id": "6ab594d507b647b41d599401",
+    "url": "https://6ab594d507b647b41d599401--mahworld-test-preview.netlify.app",
+    "state": "ready",
+    "context": "deploy-preview",
+    "published_at": null,
+    "created_at": "2026-09-24T21:23:33.472Z",
+    "production_promoted": false,
+    "edge_functions_present": true
+  },
+  "protection": {
+    "play_unauthenticated": "401 password page",
+    "asset_unauthenticated": "401 application/json",
+    "wrong_password": "rejected with attempts-remaining message",
+    "served_password_string": "absent",
+    "authenticated_hosted_load": "NOT RUN: MAHDEMO_PW was unavailable",
+    "password_removed": false
+  },
+  "preservation": {
+    "production": { "url": "https://mahdemo.fob.systems", "deploy_id_before": "6aac25101f17ce5ed37166e4", "deploy_id_after": "6aac25101f17ce5ed37166e4", "unchanged": true },
+    "m6": { "deploy_id": "6ab586ec9ad382fa1b83f1be", "state": "ready", "context": "deploy-preview", "published_at": null, "unchanged": true },
+    "m5c": { "deploy_id": "6ab454bf3a60c4bf88b1334a", "state": "ready", "context": "deploy-preview", "published_at": null, "unchanged": true }
+  },
+  "limitations": [
+    "Physical-phone acceptance remains owner-only and has not been claimed.",
+    "Authenticated hosted gameplay was not automated because MAHDEMO_PW was unavailable; unauthenticated, asset, and wrong-password protection were verified.",
+    "After two bounded pose attempts, the representative PA_PUSH load still places the bar shaft through the rear neck/head silhouette despite passing grip midpoint authority.",
+    "The close resource prompt remains more prominent than ideal, though it is readable, unclipped, and near-only.",
+    "Raw ornate-temple source parity remains unavailable because the missing original was not recovered.",
+    "The reserved /.netlify/images denial redirect is rejected by current Netlify syntax, but the deployed edge password gate is present and direct play/private-asset checks return 401."
+  ]
+}

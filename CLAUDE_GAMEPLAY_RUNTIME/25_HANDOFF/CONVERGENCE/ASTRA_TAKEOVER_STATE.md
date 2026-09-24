@@ -2,11 +2,19 @@
 
 Updated 2026-09-24 (post-M6 quality continuation checkpoint 02; protected M6/production preserved). This is a compact live state record, not a replacement for `CONTINUE_HERE.md`, the B8 report, or the complete transfer master.
 
+## Current post-M6 release — protected private candidate
+
+- `ASTRA_M6Q_PRIVATE_20260924` is ready at immutable draft `6ab594d507b647b41d599401`: `https://6ab594d507b647b41d599401--mahworld-test-preview.netlify.app`. It is `deploy-preview`, `published_at = null`, with the edge gate present.
+- Package SHA-256 is `72e754ac8e6a9587531e8e3bac4a6b67ff154533dd79b2a799b44a8e0eff5c06`; 181 entries / 122,976,086 bytes. Required gates passed 56 programs / 1,518 checks, 104 syntax files, clean scans, exact extraction and 7/7 extracted smoke.
+- Unauthenticated play and a private asset return `401`; wrong password is refused; no password value is served. Authenticated hosted gameplay is not claimed because `MAHDEMO_PW` was unavailable.
+- Production remains `6aac25101f17ce5ed37166e4`; M6 remains ready at `6ab586ec9ad382fa1b83f1be`; M5C remains ready at `6ab454bf3a60c4bf88b1334a`. No promotion, alias change or password removal occurred.
+- Source checkpoint is `abae621c0c40c4b14cb3985377dcd6e434aa7c52`; final release-record checkpoint follows on the same recovery branch. Owner physical-phone review is next.
+
 ## Active post-M6 checkpoint 02 — world/gameplay presentation
 
 - Checkpoint 01 is remotely verified at `80b96391c29e275cdac1c3b238b713b90c5e15d3` on `backup/mahworld-m6-20260924T190351Z`. The current source adds lower/longer Moon-keyed cloud carriers, connected subdued distant banks, layered far massifs/towers/arches and macro-ridge strata without replacing the actual Moon or route authority.
 - Visible equipment sockets now use the source HAND→FINGERS palm span; authoritative equipment ownership, projectile/special behavior, damage, costs and exercise selection are unchanged. The crystal prompt/material pass remains near-only and preserves the existing break/drop/refill system.
-- Bounded proof is current: 180-file clean static build; 11 NIGHT views; zero console/runtime errors; break + three drops/refills; complete L0 equipment; zero-error debug palm/midpoint grips; representative `PA_PUSH` accepted under its existing PHYSICAL_MAGIC profile. Existing focused checks remain 98/98.
+- Bounded proof is current: 180-file clean static build; 11 NIGHT views; zero console/runtime errors; break + two drops/refills in the final run; complete L0 equipment; zero-error debug palm/midpoint grips; representative `PA_PUSH` accepted under its existing PHYSICAL_MAGIC profile. Existing focused checks remain 98/98.
 - Exact visual remainder: after two focused presentation attempts, the bar shaft still intersects the rear neck/head silhouette during the inspected `PA_PUSH` load. The close bush prompt remains more prominent than ideal. Both are recorded rather than extended into an open-ended investigation.
 - Next action is the single authorized release gate/package and one new protected unpublished draft. Preserve M6/M5C/production and do not claim physical-phone acceptance.
 

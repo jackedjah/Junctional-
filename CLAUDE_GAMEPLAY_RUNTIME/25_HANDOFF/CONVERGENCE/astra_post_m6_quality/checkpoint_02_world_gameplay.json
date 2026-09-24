@@ -26,7 +26,7 @@
     "private_content_scan": "PASS",
     "bounded_visual_action_probe": "PASS: 11 views / 0 console errors / 0 runtime unresolved",
     "preserved_focused_tests": "PASS: 98/98",
-    "resource_interaction": "PASS: break plus three drops and three refills",
+    "resource_interaction": "PASS: break plus two drops and two refills in the final bounded run",
     "equipment_debug": "PASS: complete L0 geometry, two zero-error dumbbell palm grips, zero-error two-hand barbell midpoint",
     "representative_attack_authority": "PASS: PA_PUSH accepted in PHYSICAL_MAGIC with preserved BALANCED profile"
   },

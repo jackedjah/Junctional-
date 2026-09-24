@@ -1,10 +1,18 @@
 # CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (post-M6 quality continuation active)
 
+## Post-M6 quality continuation — protected private candidate released
+- New visible build `ASTRA_M6Q_PRIVATE_20260924`; immutable Netlify draft `6ab594d507b647b41d599401`: `https://6ab594d507b647b41d599401--mahworld-test-preview.netlify.app`. API state is `ready`, context `deploy-preview`, `published_at = null`; one edge gate is present.
+- Exact package: 181 entries / 122,976,086 bytes / SHA-256 `72e754ac8e6a9587531e8e3bac4a6b67ff154533dd79b2a799b44a8e0eff5c06`. The single authorized pipeline passed 56 programs / 1,518 checks, 104-file syntax, boundary/secret scans, ZIP integrity, exact fresh extraction, 7/7 extracted smoke and extracted syntax.
+- Hosted protection is verified: play `401` password page, private asset `401 application/json`, wrong password refused with attempts remaining, and the served page contains no password value. `MAHDEMO_PW` was unavailable, so authenticated hosted gameplay is explicitly **NOT RUN**.
+- Production remains deploy `6aac25101f17ce5ed37166e4`; M6 remains ready/unpublished at `6ab586ec9ad382fa1b83f1be`; M5C remains ready/unpublished at `6ab454bf3a60c4bf88b1334a`. None was promoted, replaced or altered.
+- Release source checkpoint before packaging is `abae621c0c40c4b14cb3985377dcd6e434aa7c52`. Durable release record: `astra_post_m6_quality/private_candidate_release.json`. Physical-phone acceptance and the two recorded presentation limitations remain owner/open.
+- **Next exact action:** owner phone review of this private candidate. Do not promote production without a new explicit instruction.
+
 ## Post-M6 quality continuation — checkpoint 02 world/gameplay presentation
 - GitHub continuity: checkpoint 01 is verified at `80b96391c29e275cdac1c3b238b713b90c5e15d3` on `backup/mahworld-m6-20260924T190351Z`. M6, M5C, production, assets, JOB A/B and Character/MAHFITT/S08 boundaries remain preserved.
 - The foreground pass is now joined by lower/longer atmospheric cloud carriers, a subdued connected distant cloud bank in place of the bright circular skyland strip, shouldered far massifs/towers, continuous bridge arches, and added macro-ridge strata. The registered actual Moon remains authoritative.
 - Equipment presentation now samples the source-rig HAND→FINGERS span for the visible palm center while retaining the host grip/ownership/projectile authority. A representative physical-MAHGIC barbell pose received bounded presentation tuning; damage, costs, cooldowns, cadence profiles and exercise selection are unchanged.
-- One bounded NIGHT visual/action run completed 11 views with zero console/runtime errors. It rechecked the floor/junction, Moon/cloud/horizon, source Dogkie, blue MAH GYM/canopy aura, resource break + three refills, complete L0 equipment and representative physical/physical-MAHGIC actions. Static build remains clean at 180 files / 207.1 MB; the preserved focused checks are 98/98.
+- One bounded NIGHT visual/action run completed 11 views with zero console/runtime errors. It rechecked the floor/junction, Moon/cloud/horizon, source Dogkie, blue MAH GYM/canopy aura, resource break + two drops/refills, complete L0 equipment and representative physical/physical-MAHGIC actions. Static build remains clean at 180 files / 207.1 MB; the preserved focused checks are 98/98.
 - Honest visual remainder: after two focused pose attempts, the accepted `PA_PUSH` load still places the bar shaft through the rear neck/head silhouette even though two-hand midpoint/grip metrics are zero-error. The close resource prompt is readable and no longer clipped but remains visually prominent. These are recorded, not hidden or called complete.
 - Next: push this checkpoint, then run the authorized release gate/package exactly once from the preserved source and deploy one new protected unpublished candidate. No production promotion or physical-phone claim.
 
