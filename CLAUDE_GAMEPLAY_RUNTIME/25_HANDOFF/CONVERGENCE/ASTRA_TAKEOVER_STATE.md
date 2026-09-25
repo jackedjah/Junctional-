@@ -239,3 +239,12 @@ Usage/billing balance: UNKNOWN. No local tool exposes a spend ceiling; work proc
 - The one selected non-HALO item is fish readability at existing ponds/lake/basins: the prior octahedral school agent is now a low-poly spindle/forked-tail/dorsal/pectoral silhouette without changing host wildlife, habitat or population authority.
 - Current phase is the packet-required compact actual-runtime visual/motion demonstration. Do not add features or broaden the map tranche.
 - Exact implementation ledger: `halo_repair_and_play/EXECUTION_LEDGER.md`.
+
+## HALO repair/play visual closure checkpoint
+
+- Implementation and focused authority checks are complete: repair/play `11/11`, preserved M7 scale/access `13/13`.
+- Two current-runtime rides prove exact occupied containment in both directions at zero Flight MAHGIC admission: `0 m` carrier/rider and rendered passenger drift, `1.27 m` minimum side clearance, `1.45 m` head clearance, barbell ownership retained, safe WORLD return at ground `0`.
+- Current-runtime deck inspection proves one opaque full-area top and zero transparent full-area overlays across NIGHT/DAY moving views.
+- Current-runtime sport motion proves real keyboard input, a complete first-to-seven bot match, a player return contact, out/court resolution, replay, five target serves, and safe activity exit without combat/resource/progression mutation.
+- The selected map tranche is fish readability at existing water habitats; the lower-map link smoke separately proves an actual resource-node fracture/refill and equipment retention.
+- Next and only active step: the established package/fresh-extraction/security gate and one protected non-production preview. Do not add features, alter production, replace the prior HALO preview, or claim physical-phone acceptance.

@@ -32,6 +32,8 @@ export const HALO_PLAY_LAYOUT = Object.freeze({
   half_width_m: 4.3,
   net_height_m: 2.15,
   ball_radius_m: 0.22,
+  first_to: 7,
+  practice_serves: 5,
   entry: Object.freeze({ x: 42.2, z: 40, altitude_m: 240, range_m: 3.2 }),
   player_start: Object.freeze({ x: 45.6, z: 40, altitude_m: 240 }),
   bot_start: Object.freeze({ x: 56.4, z: 40, altitude_m: 240 }),

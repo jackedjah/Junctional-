@@ -11,14 +11,16 @@
 
 ## Focused checks
 
-- `16_TESTS/gameplay_halo_repair_play.test.mjs`: 10/10.
+- `16_TESTS/gameplay_halo_repair_play.test.mjs`: 11/11, including the post-return mainland equipment/resource link: held barbell retained, two accepted physical contacts fracture `NODE_RB_NEXUS_INTRO`, three real drops spawn, and the combat pool refills.
 - `16_TESTS/gameplay_m7_halo_scale.test.mjs`: 13/13.
-- Changed-file JavaScript syntax and `git diff --check`: clean.
+- Actual-runtime ascent: 42 sampled frames across boarding/travel, host carrier/rider drift `0 m`, rendered passenger/cabin vertical drift `0 m`, held barbell visible inside the cabin.
+- Actual-runtime follow-up roundtrip: ground and upper prompts each admitted an ordinary input ride at `0` Flight MAHGIC; 50 ascent and 49 descent samples held host/rendered drift at `0 m`; minimum side/head clearance `1.27/1.45 m`; return docked in `WORLD` at ground `0` with the same held barbell.
+- Floor motion: one opaque full-area top, zero transparent full-area overlays, inspected at NIGHT and DAY plus orbit/walk views without the previous breakup.
+- Sports motion: one 29.03-second current-runtime clip driven by real keyboard events; seven rally results include a deliberate sideline `OUT` and a real player return contact, then `BOT_WON 0–7`; replay reset to `0–0`; target practice completed `5/5`; safe exit left `sport=null` in `HALO`; zero unexpected console errors.
+- Mainland presentation: the Titan Lake view shows the new finned fish school; the linked host gate above proves the resource interaction at the authored newcomer patch rather than treating a decorative screenshot as proof.
 
 ## Pending gates
 
-- Actual-runtime moving ride/floor/court/input inspection and short clips/stills.
-- One affected mainland water/ecology view plus existing equipment/resource smoke.
 - Established candidate release/security/package/fresh-extraction gates once, then one new protected unpublished preview.
 - Hosted authenticated gameplay only if permitted credentials are available. Physical-phone acceptance remains owner-only.
 
@@ -26,4 +28,3 @@
 
 - This closes one named non-HALO presentation defect, not the five-sanctuary/master queue.
 - No bespoke dome climbing, missing-original recovery, production publication, previous-preview replacement or phone acceptance.
-
