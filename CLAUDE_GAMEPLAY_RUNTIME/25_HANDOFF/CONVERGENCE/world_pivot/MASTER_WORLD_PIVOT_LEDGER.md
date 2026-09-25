@@ -185,3 +185,15 @@ showed individual puff outlines (V09); ridge faces were large flat slabs; at nig
 | guard | new `16_TESTS/gameplay_world_pivot_host_safety.test.mjs` (4 checks: ridge inner rows never displaced, HALO colonnade beyond the playable radius and inside the shell with the rings ≥ 60 m above the deck, low / mid cloud layers capped under the deck, class-house suspended pieces above head height). Verified to FAIL on `aefbebb` and PASS on `32aac74`. |
 | tests | 23 runnable programs green, 422 checks (was 22 / 418) |
 | assumption to verify with the host | the celestial rings (95 m above the deck) are above any player flight ceiling found in the data (7–13 m); `capabilities.getFlightCeiling` lives in the missing runtime modules |
+
+## PASS 6 (grounding) + night far world — checkpoint 6 (`929770d`)
+
+| field | value |
+|---|---|
+| files | `lab/world/contactAO.js` (new), `lab/world/worldB.js` (mount after architecture), `lab/farWorld.js` (both palettes baked, live swap), `lab/fieldScene.js` (setNight calls it), `16_TESTS/gameplay_world_pivot_host_safety.test.mjs` (check 5) |
+| goal | objects sit IN the world (the key shadow reaches only 24 m on HIGH and is off on MED / LOW, so trees, landmarks and plaza pieces looked pasted onto a bright floor); no daylight far massifs glowing in a night sky |
+| what changed | CONTACT AO: one InstancedMesh of flat decals whose falloff is a rounded-box signed distance computed in metres — every forest tree (broad soft canopy occlusion), the plaza civic shapes (tight contact bands), the landmark envelopes (inset, wide base darkening), class-house supports / spires / gate pillars and the match hall; 5.5 cm above the local ground, distance fade 110 → 300 m, night 70 %, no collider, 1 draw call. NIGHT: the in-game time toggle never rebuilds the field, so the unlit, fog-free far massifs / mid walkways / haze plain kept their build-time daylight colours — the cp2 / cp4 night evidence shows white caps glowing; farWorld now bakes BOTH palettes and swaps the colour attribute live (Node smoke: a day-built world toggled to night equals a night build exactly, and back) |
+| before / after | `evidence/cp4_after/…` → `evidence/cp6_after/{desktop_day (V02 V03 V04 V05 V12 V13 V16 V17), desktop_night (V02 V12 V17), phone_med_day (V03 V13)}`, pinned at `929770d`; sheets `evidence/cp6_vs_cp4_day.jpg`, `cp6_vs_cp4_night.jpg`. The day frames also show checkpoint 5: the ridge inner faces are planar again (collision parity) and keep the shader rock grain |
+| perf (same 8 day views) | draw calls 1483 → 1488 (the decals), triangles +0.02 %, programs unchanged (144) |
+| tests | 23 runnable programs green, 423 checks; host safety 5 / 5; colour law 0 |
+| unresolved | the plaza floor still reads near-white at street level (V13); other build-time day/night choices (floor canvases, HALO deck texture) also do not swap on a live toggle — they are lit, so they darken with the night rig, but a live-swap pass for them is a candidate follow-up; owner visual review |
