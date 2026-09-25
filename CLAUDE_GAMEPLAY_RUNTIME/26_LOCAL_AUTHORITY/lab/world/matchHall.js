@@ -58,7 +58,7 @@ export function createMatchHall(ctx) {
     if (typeof document === 'undefined') return null;
     var c = document.createElement('canvas'); c.width = 1024; c.height = 192; var g = c.getContext('2d'); if (!g) return null;
     g.clearRect(0, 0, 1024, 192); g.font = '600 96px "Segoe UI", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; try { g.letterSpacing = '16px'; } catch (e) { }
-    g.shadowColor = '#4fd8ff'; g.shadowBlur = 10; g.fillStyle = '#e9f8ff'; g.fillText(text, 512, 92); g.shadowBlur = 0; g.fillStyle = '#4fd8ff'; g.fillRect(232, 160, 560, 4);
+    g.shadowColor = '#dfe8ff'; g.shadowBlur = 10; g.fillStyle = '#e9f8ff'; g.fillText(text, 512, 92); g.shadowBlur = 0; g.fillStyle = '#dfe8ff'; g.fillRect(232, 160, 560, 4);
     var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
   }
   /* local frame of a building whose door face is local -x: theta = group yaw, hw = half extent along the door axis, hd = half extent along the
@@ -185,8 +185,8 @@ export function createMatchHall(ctx) {
   }
   var api = {
     build: function () {
-      var base = mat('cyanLine', { color: 0x6fd3ff, emissive: 0x39c5ff, emissiveIntensity: 1.6, roughness: 0.3, metalness: 0.2 }); lineMat = base.clone(); lineMat.name = 'matchHall_line';
-      gateMat = new THREE.MeshStandardMaterial({ color: 0x05080c, roughness: 0.06, metalness: 0.7, transparent: true, opacity: 0.74, emissive: 0x0b3446, emissiveIntensity: GATE_DAY, depthWrite: false }); gateMat.name = 'matchHall_gate';
+      var base = mat('cyanLine', { color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: 1.6, roughness: 0.3, metalness: 0.2 }); lineMat = base.clone(); lineMat.name = 'matchHall_line';
+      gateMat = new THREE.MeshStandardMaterial({ color: 0x05080c, roughness: 0.06, metalness: 0.7, transparent: true, opacity: 0.74, emissive: 0x10131c, emissiveIntensity: GATE_DAY, depthWrite: false }); gateMat.name = 'matchHall_gate';
       try { buildBuilding(); } catch (e) { log('matchHall: exterior failed: ' + (e && e.message || e)); }
       try { buildCourt(); } catch (e) { log('matchHall: court failed: ' + (e && e.message || e)); }
       applyNight(ctx.night);

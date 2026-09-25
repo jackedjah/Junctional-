@@ -14,7 +14,7 @@ export function buildInterior(THREE, group, play, helpers) {
     wall: new THREE.MeshStandardMaterial({ color: 0xc6ced8, roughness: 0.42, metalness: 0.82 }),
     panel: new THREE.MeshStandardMaterial({ color: 0xaeb8c6, roughness: 0.5, metalness: 0.75 }),
     dark: new THREE.MeshStandardMaterial({ color: 0x2a3140, roughness: 0.45, metalness: 0.7 }),
-    trim: new THREE.MeshStandardMaterial({ color: 0x7fd7ff, emissive: 0x2a8fff, emissiveIntensity: 0.9, roughness: 0.4, metalness: 0.2 }),
+    trim: new THREE.MeshStandardMaterial({ color: 0xe6ecf6, emissive: 0xd6e0ff, emissiveIntensity: 0.9, roughness: 0.4, metalness: 0.2 }),
     strip: new THREE.MeshBasicMaterial({ color: 0xdff3ff }),
     gold: new THREE.MeshStandardMaterial({ color: 0xd4a83a, roughness: 0.32, metalness: 0.9 }),
     chrome: new THREE.MeshStandardMaterial({ color: 0xb4bec9, roughness: 0.3, metalness: 0.97 }),

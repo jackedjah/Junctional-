@@ -13,12 +13,12 @@ export function createCityScene(THREE, group, helpers) {
     chrome: new THREE.MeshStandardMaterial({ color: 0xa4aeb9, roughness: 0.24, metalness: 0.98, envMapIntensity: 0.7 }),
     dark: new THREE.MeshStandardMaterial({ color: 0x1d2229, roughness: 0.5, metalness: 0.75 }),
     glass: new THREE.MeshStandardMaterial({ color: 0x7fd2ff, roughness: 0.08, metalness: 0.25, transparent: true, opacity: 0.6, emissive: 0x0f5f8a, emissiveIntensity: (DAY ? 0.42 : 0.8) }),   /* owner B7 §7: the civic glass band carries the district's CYAN energy (material-integrated, not a rod) */
-    trim: new THREE.MeshStandardMaterial({ color: 0xaee8ff, emissive: 0x3fc8ff, emissiveIntensity: (DAY ? 0.95 : 1.7), roughness: 0.3, metalness: 0.2 }),   /* B7 §7: the tier ledges / portholes read as recessed cyan energy seams */
+    trim: new THREE.MeshStandardMaterial({ color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: (DAY ? 0.95 : 1.7), roughness: 0.3, metalness: 0.2 }),   /* B7 §7: the tier ledges / portholes read as recessed cyan energy seams */
     trimWarm: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xdfeeff, emissiveIntensity: (DAY ? 0.54 : 1.2), roughness: 0.3, metalness: 0.1 }),
-    diamond: new THREE.MeshStandardMaterial({ color: 0xcff4ff, roughness: 0.05, metalness: 0.6, emissive: 0x4fd0ff, emissiveIntensity: (DAY ? 0.5 : 0.9), flatShading: true }),   /* B7 §7: the roof diamond is a cyan crystal, not a white cap */
+    diamond: new THREE.MeshStandardMaterial({ color: 0xe2e9f4, roughness: 0.05, metalness: 0.6, emissive: 0xd6e0ff, emissiveIntensity: (DAY ? 0.5 : 0.9), flatShading: true }),   /* B7 §7: the roof diamond is a cyan crystal, not a white cap */
     doorway: new THREE.MeshStandardMaterial({ color: 0x0b1220, roughness: 0.9, metalness: 0.1, emissive: 0x0e4a7a, emissiveIntensity: (DAY ? 0.6 : 1.0) }),   /* B7 §7: entrance illumination — the doorway recess glows cyan */
-    leaf: new THREE.MeshStandardMaterial({ color: 0x9ff2ff, emissive: 0x3fd8ff, emissiveIntensity: (DAY ? 0.495 : 1.1), roughness: 0.3, metalness: 0.3, flatShading: true, side: THREE.DoubleSide }),
-    stalk: new THREE.MeshStandardMaterial({ color: 0xdff6ff, emissive: 0x8fe8ff, emissiveIntensity: (DAY ? 0.405 : 0.9), roughness: 0.4, metalness: 0.2 }),
+    leaf: new THREE.MeshStandardMaterial({ color: 0xe4e9f2, emissive: 0xffc862, emissiveIntensity: (DAY ? 0.495 : 1.1), roughness: 0.3, metalness: 0.3, flatShading: true, side: THREE.DoubleSide }),
+    stalk: new THREE.MeshStandardMaterial({ color: 0xe8edf5, emissive: 0xdfe8ff, emissiveIntensity: (DAY ? 0.405 : 0.9), roughness: 0.4, metalness: 0.2 }),
     puddle: new THREE.MeshStandardMaterial({ color: 0x1a2432, roughness: 0.02, metalness: 1.0, transparent: true, opacity: 0.85 })
   };
   function nameSprite(text) { var tex = canvasTex(512, 96, function (g, w, h) { g.clearRect(0, 0, w, h); g.font = '600 46px "Segoe UI", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#6fc3ff'; g.shadowBlur = 18; g.fillStyle = '#dff3ff'; g.fillText(text.toUpperCase(), w / 2, h / 2); }); var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false })); sp.scale.set(7.5, 1.4, 1); return sp; }
@@ -108,7 +108,7 @@ export function createCityScene(THREE, group, helpers) {
     /* M7 HALO SCALE/ACCESS — re-authored at the single canonical 10× arrival / 18× dome result.  The city, base, actors and furniture stay
        human scale; only the vertical civic trunk, structural deck and enclosed upper realm use the authorised dimensions. */
     treeElevator: function (s, shapes) { var g = new THREE.Group(); g.name = 'TREE_ELEVATOR'; g.userData.noMerge = true; var PH = HALO_LAYOUT.arrival_height_m, PR = HALO_LAYOUT.structural_deck_radius_m, DR = HALO_LAYOUT.shell_radius_m;
-      var glassCore = M.glass.clone(); glassCore.color.setHex(0x8adfff); glassCore.opacity = DAY ? 0.16 : 0.24; glassCore.depthWrite = false; glassCore.side = THREE.DoubleSide; glassCore.emissiveIntensity = DAY ? 0.24 : 0.48;
+      var glassCore = M.glass.clone(); glassCore.color.setHex(0xd4def0); glassCore.opacity = DAY ? 0.16 : 0.24; glassCore.depthWrite = false; glassCore.side = THREE.DoubleSide; glassCore.emissiveIntensity = DAY ? 0.24 : 0.48;
       var darkGlass = M.doorway.clone(); darkGlass.transparent = true; darkGlass.opacity = 0.82;
       var floorMat = M.platinum.clone(); floorMat.roughness = 0.32; floorMat.metalness = 0.92; floorMat.envMapIntensity = 0.72;
       function tube(points, radius, mat, tubular, radial) { var curve = new THREE.CatmullRomCurve3(points); var mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, tubular || 40, radius, radial || 10, false), mat); g.add(mesh); return mesh; }

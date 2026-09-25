@@ -5,8 +5,8 @@
    skyline-wide sign. Phone budget: 2 InstancedMeshes (posts, blades) + 1 for crowns, ≤ 10 label sprites visible (nearest first, fade 30–48 m),
    canvases drawn once. */
 import { groundYAt } from './worldLayout.js';
-var FAMILY = { gold: '#e6c36a', blue: '#4f8cff', red: '#ff5a6a', purple: '#b08cff', pink: '#ff7fc4', platinum: '#dfe6ee', cyan: '#7fe4ff' };
-var FAMILY_HEX = { gold: 0xe6c36a, blue: 0x2c62d8, red: 0xd8404a, purple: 0x8a5fd6, pink: 0xff5fb0, platinum: 0xdfe6ee, cyan: 0x39c5ff };
+var FAMILY = { gold: '#e6c36a', blue: '#4f8cff', red: '#ff5a6a', purple: '#b08cff', pink: '#ff7fc4', platinum: '#dfe6ee', cyan: '#e6ecf6' };   /* colour law 2026-09-25: civic accents are neutral white light */
+var FAMILY_HEX = { gold: 0xe6c36a, blue: 0x2c62d8, red: 0xd8404a, purple: 0x8a5fd6, pink: 0xff5fb0, platinum: 0xdfe6ee, cyan: 0xdfe8ff };
 var POST_H = 2.7, BLADE_L = 1.05, BLADE_STEP = 0.2, LABEL_FADE = 30, LABEL_GONE = 48, LABEL_MAX = 10;
 export function createSignage(ctx) {
   var THREE = ctx.THREE; var group = null; var reg = null; var labels = []; var stats = { wayfinders: 0, buildings: 0 };

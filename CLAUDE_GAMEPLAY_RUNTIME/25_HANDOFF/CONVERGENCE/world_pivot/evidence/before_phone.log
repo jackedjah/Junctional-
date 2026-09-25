@@ -1,0 +1,6 @@
+state {"built":true,"error":null,"frames":10,"layout":{"version":"FIELD_COLLIDERS_DISTRICT_V1","base":28,"district":792,"world":9457},"world":{"status":"READY","error":null},"tod":"DAY","tier":"MED","log":["wildlife: population LOD — 17 mid schools / 154 agents (6 bodies + 11 sea schools), 90 far silhouettes (tier ×0.75)","creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures creat
+V01 DAY {"calls":202,"triangles":1498467,"geometries":201,"textures":45,"programs":138}
+V03 DAY {"calls":139,"triangles":1246399,"geometries":203,"textures":48,"programs":138}
+V08 DAY {"calls":189,"triangles":548404,"geometries":297,"textures":52,"programs":138}
+V10 DAY {"calls":181,"triangles":850712,"geometries":332,"textures":55,"programs":139}
+console errors 1

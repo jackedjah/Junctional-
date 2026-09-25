@@ -1,6 +1,6 @@
 {
  "version": "WORLD_REGISTRY_V1",
- "generated": "2026-09-25T16:24:08.756Z",
+ "generated": "2026-09-25T17:08:18.765Z",
  "_doc": "JOB B world registry (owner directive 2026-09-19 §19): sources (provenance) → derivatives (what ships) → artifacts / zones / fixtures / creatures / celestial (placement + policy). Coordinates are FIELD metres (x east, z north, y up), yaw in degrees around +y. Collision shapes for the host are GENERATED from this file by deploy/jobb/build_world_colliders.mjs (never hand-edited twice). states: PLACED = built and in the world · WAITING_FOR_JOB_A = the hook exists, the gameplay side is JOB A's · PROVISIONAL = owner tuning pending.",
  "field": {
   "walls": {
@@ -888,8 +888,8 @@
   "civic": {
    "name": "CIVIC",
    "tint": "#d9e2ea",
-   "accent": "#6fd3ff",
-   "note": "platinum + cyan / blue"
+   "accent": "#dfe8ff",
+   "note": "colour law 2026-09-25: civic accents are neutral white light (was cyan); platinum + cyan / blue"
   },
   "gym": {
    "name": "GYM_TRAINING",
@@ -900,8 +900,8 @@
   "match": {
    "name": "MATCH",
    "tint": "#151a21",
-   "accent": "#4fd8ff",
-   "note": "black / graphite + cyan-blue luminous lines"
+   "accent": "#dfe8ff",
+   "note": "colour law 2026-09-25: MAH MATCH is black / graphite + neutral white light (was cyan); black / graphite + cyan-blue luminous lines"
   },
   "forest": {
    "name": "FOREST_EDGE",
@@ -1336,7 +1336,7 @@
     "spires": 3,
     "trees": 40,
     "seed": 12,
-    "family": "green"
+    "family": "blue"
    },
    {
     "id": "ISLE_N",
@@ -1422,7 +1422,7 @@
     "spires": 5,
     "trees": 70,
     "seed": 19,
-    "family": "green"
+    "family": "blue"
    },
    {
     "id": "ISLET_LUMEN",
@@ -1447,7 +1447,7 @@
     "spires": 1,
     "trees": 10,
     "seed": 21,
-    "family": "green",
+    "family": "red",
     "reachable": true
    }
   ]
@@ -1496,26 +1496,33 @@
     14
    ],
    "distance_m": 900,
-   "halo_deg": 14,
+   "halo_deg": 20,
    "runtime": "textured procedural Sun sphere; camera-relative sky origin, stable registry direction",
    "state": "PLACED",
    "elevation_note": "B8 §20: elevation ≈ 33° (was 49°): findable from the ground camera (pitch limit 0.4 rad up + the 55° FOV) from most outdoor areas, not only in flight; the fieldScene key light and shadow direction follow the registry direction",
-   "note_b8": "B8 §20: 6.5° ≈ 20 % of the portrait phone width (≈ 32° horizontal FOV) and ≈ 9 % in landscape — the huge MAHWORLD sun, findable from most outdoor areas"
+   "note_b8": "B8 §20: 6.5° ≈ 20 % of the portrait phone width (≈ 32° horizontal FOV) and ≈ 9 % in landscape — the huge MAHWORLD sun, findable from most outdoor areas",
+   "note_pivot": "owner pivot: a luminous Sun with a wide warm glow; the derivative texture remains the surface"
   },
   "moon": {
    "id": "CELESTIAL_MOON",
    "derivative": "MAHWORLD_OVERSIZED_MOON",
    "lod": "L0",
-   "apparent_deg": 6.2,
+   "apparent_deg": 11,
    "earth_apparent_deg": 0.52,
-   "ratio": 11.9,
+   "ratio": 21.2,
    "yaw_rad": 0.35,
-   "elevation_rad": 0.28,
+   "elevation_rad": 0.34,
    "distance_m": 900,
-   "halo_deg": 12,
+   "halo_deg": 22,
    "runtime": "existing L0 derivative GLB geometry/material identity traced to MAHWORLD_OVERSIZED_MOON_SOURCE; camera-relative high-sky origin, stable world direction; cloud optical veil/halo/rays/key share one transmission",
    "state": "PLACED",
-   "note_b8": "B8 §20: the huge moon (night state), low over the horizon so it is in frame at the default camera pitch"
+   "note_b8": "B8 §20: the huge moon (night state), low over the horizon so it is in frame at the default camera pitch",
+   "day_visible": true,
+   "tint": "#d8c8ff",
+   "emissive": "#9b82f0",
+   "emissive_day": 0.95,
+   "emissive_night": 0.72,
+   "note_pivot": "owner pivot: very large lavender Moon, visible by day and night (night key only)"
   }
  },
  "artifacts": [
@@ -2573,12 +2580,6 @@
    "color": "#e6c36a",
    "deep": "#6b4d14",
    "glow": "#ffd77a"
-  },
-  "green": {
-   "name": "VERDANT",
-   "color": "#5fd39a",
-   "deep": "#14503a",
-   "glow": "#8affc4"
   },
   "purple": {
    "name": "AMETHYST",
@@ -5914,24 +5915,31 @@
   "atmosphere": {
    "_doc": "owner B7 §8 (2026-09-20): the phone-safe physically-inspired sky (lab/world/atmosphere.js) — a Rayleigh-style zenith → horizon mix by the optical depth of the view ray, a horizon haze band warmed toward the sun, a Henyey-Greenstein Mie lobe (the sun glare + halo), a graphite ground haze, a faint cool-violet MAHWORLD zenith cast; the scene fog takes the haze colour (one truth for sky + distance falloff). Tiers: HIGH / MED full, LOW = Mie lobe off. The oversized sun / moon canon (registry.celestial) and the water stay.",
    "day": {
-    "zenith": "#2159b4",
-    "horizon": "#a4c3e3",
-    "haze": "#cfdde9",
-    "sunTint": "#fff0c8",
-    "ground": "#5a6470",
-    "mie": 1,
-    "fog": "#9cb8d4",
-    "fog_near_m": 120
+    "zenith": "#2e6fd6",
+    "horizon": "#c3dcf6",
+    "haze": "#e6eefa",
+    "sunTint": "#ffe0a8",
+    "ground": "#5d6373",
+    "mie": 1.3,
+    "fog": "#bccfe8",
+    "fog_near_m": 150,
+    "lavender": "#d9c7f4",
+    "lavender_k": 0.42,
+    "haze_k": 0.72
    },
    "night": {
-    "zenith": "#040915",
-    "horizon": "#1c3352",
-    "haze": "#2a4363",
-    "sunTint": "#9fb4d8",
-    "ground": "#0d1420",
-    "mie": 0.15,
-    "fog": "#0b1424"
-   }
+    "zenith": "#07091c",
+    "horizon": "#252a55",
+    "haze": "#34366a",
+    "sunTint": "#c7b6f2",
+    "ground": "#0d1020",
+    "mie": 0.22,
+    "fog": "#161a36",
+    "lavender": "#5a4a8e",
+    "lavender_k": 0.35,
+    "haze_k": 0.62
+   },
+   "pivot_note": "World pivot PASS 1 (owner sky direction 2026-09-25): bright fantasy DAYLIGHT is the hero: a luminous horizon, a warm gold glow toward the Sun, and a lavender band on the anti-solar horizon that ties the sky to the lavender Moon; NIGHT keeps the same language in a deep indigo register."
   },
   "time_of_day": {
    "_doc": "Owner sky direction 2026-09-25 (supersedes the Astra M3 night-first default): bright fantasy DAYLIGHT is the primary presentation. Two STABLE states (no calendar / simulation). DAY is the first-visit default and route preview; an explicit ?sky=night or the player saved choice still wins. Both states keep the actual Sun and Moon, are prewarmed before play and remain live-switchable through fieldScene.setNight.",
@@ -6000,8 +6008,8 @@
      "hover_y_m": 1.3,
      "swirl_radius_m": 2.3,
      "swirl_radius_note": "B7 §2: the wind-up orbit sits INSIDE the baseline melee reach (2.5 m) so a player on the bank / in the water can answer it between launches — the fish stays a movement test (breach → swirl → launch → recover), never a stationary target; was 4.2 m = unreachable for every physical attack",
-     "aura": "#5fc8ff",
-     "aura_attack": "#b8f0ff",
+     "aura": "#6e9dff",
+     "aura_attack": "#c4d4ff",
      "crit": "PLAYER_RULES",
      "respawn_s": 40,
      "respawn_jitter_s": 20,
@@ -6750,7 +6758,7 @@
      "count": 4,
      "h_frac": 0.6,
      "w_m": 0.3,
-     "color": "#4fd8ff"
+     "color": "#dfe8ff"
     },
     "entrance": {
      "door": "MATCH_DOOR",

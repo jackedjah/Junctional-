@@ -1,0 +1,188 @@
+{
+ "started": "2026-09-25T16:46:06.508Z",
+ "size": [
+  1280,
+  720
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V02",
+   "label": "world overview from the south",
+   "tod": "NIGHT",
+   "file": "V02_NIGHT.jpg",
+   "pos": [
+    0,
+    170,
+    -270
+   ],
+   "look": [
+    0,
+    0,
+    70
+   ],
+   "stats": {
+    "calls": 374,
+    "triangles": 2119289,
+    "geometries": 385,
+    "textures": 65,
+    "programs": 117
+   },
+   "frames_in_600ms": 2,
+   "ms": 33779
+  },
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "NIGHT",
+   "file": "V08_NIGHT.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 229,
+    "triangles": 914272,
+    "geometries": 454,
+    "textures": 67,
+    "programs": 117
+   },
+   "frames_in_600ms": 0,
+   "ms": 17234
+  },
+  {
+   "id": "V10",
+   "label": "sky toward the Sun",
+   "tod": "NIGHT",
+   "file": "V10_NIGHT.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    260,
+    150,
+    140
+   ],
+   "stats": {
+    "calls": 238,
+    "triangles": 1009138,
+    "geometries": 461,
+    "textures": 67,
+    "programs": 118
+   },
+   "frames_in_600ms": 2,
+   "ms": 16804
+  },
+  {
+   "id": "V12",
+   "label": "view back over MAHWORLD from the HALO rim",
+   "tod": "NIGHT",
+   "file": "V12_NIGHT.jpg",
+   "pos": [
+    30,
+    247,
+    184
+   ],
+   "look": [
+    20,
+    40,
+    520
+   ],
+   "stats": {
+    "calls": 105,
+    "triangles": 494748,
+    "geometries": 195,
+    "textures": 53,
+    "programs": 118
+   },
+   "frames_in_600ms": 2,
+   "ms": 8770
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 9,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD \u2014 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier \u00d71)",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) \u2014 applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready \u2014 rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84\u00d70.42\u00d70.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) \u2192 shader deformation",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) \u2014 applies to figures created from now on",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27\u00d70.73\u00d70.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98\u00d70.74\u00d70.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife ready: FISH, HORSE, PHOENIX \u2014 figures follow p.wildlife (host authority; payment UI: none \u2014 wild / pet metadata only)",
+   "worldB wildlife ready (732 ms)",
+   "gear ready (bushes 41 \u00d7 64 shards, diamonds \u2264 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (25 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels \u2264 10 visible, fade 30\u201348 m)",
+   "worldB signage ready (35 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 6099,
+  "error": null
+ },
+ "finished": "2026-09-25T16:47:55.257Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 34,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD \u2014 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier \u00d71)",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) \u2014 applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready \u2014 rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84\u00d70.42\u00d70.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) \u2192 shader deformation",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) \u2014 applies to figures created from now on",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27\u00d70.73\u00d70.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98\u00d70.74\u00d70.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife ready: FISH, HORSE, PHOENIX \u2014 figures follow p.wildlife (host authority; payment UI: none \u2014 wild / pet metadata only)",
+   "worldB wildlife ready (732 ms)",
+   "gear ready (bushes 41 \u00d7 64 shards, diamonds \u2264 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (25 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels \u2264 10 visible, fade 30\u201348 m)",
+   "worldB signage ready (35 ms)"
+  ]
+ }
+}

@@ -73,7 +73,7 @@ export function createFixtures(ctx) {
     headMat = ctx.M.cyan.clone(); headMat.color.copy(col(F.head_color, '#bfe6ff')); headMat.emissive.copy(col(F.emissive, '#6fc3ff'));
     headMat.emissiveIntensity = night ? HEAD_EMISSIVE_NIGHT : HEAD_EMISSIVE_DAY; headMat.roughness = 0.22; headMat.metalness = 0.3; headMat.name = 'FIXTURE_HEAD';
     poolTex = makePoolTexture();
-    if (poolTex) { poolMat = new THREE.MeshBasicMaterial({ map: poolTex, color: 0x6fd3ff, transparent: true, opacity: night ? nightAlpha : dayAlpha, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }); poolMat.name = 'FIXTURE_POOL'; }
+    if (poolTex) { poolMat = new THREE.MeshBasicMaterial({ map: poolTex, color: 0x8fb4ea, transparent: true, opacity: night ? nightAlpha : dayAlpha, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }); poolMat.name = 'FIXTURE_POOL'; }
     else log('no canvas available — light pools skipped');
 
     poles = new THREE.InstancedMesh(poleGeo, ctx.M.chrome, n); arms = new THREE.InstancedMesh(armGeo, ctx.M.graphite, n); heads = new THREE.InstancedMesh(headGeo, headMat, n);
@@ -99,7 +99,7 @@ export function createFixtures(ctx) {
     drawCalls = 3 + (pools ? 1 : 0);
 
     /* the few real lights: never shadow-casting, always present (a constant light count keeps one shader variant — intensity 0 is "off") */
-    for (var k = 0; k < nLights; k++) { var L = new THREE.PointLight(0x8fdcff, 0, reach, 2); L.castShadow = false; L.name = 'FIXTURE_LIGHT_' + k; L.position.set(0, headY, 0); group.add(L); lights.push(L); lightFix.push(-1); lightTarget.push(0); }
+    for (var k = 0; k < nLights; k++) { var L = new THREE.PointLight(0xe3eaff, 0, reach, 2); L.castShadow = false; L.name = 'FIXTURE_LIGHT_' + k; L.position.set(0, headY, 0); group.add(L); lights.push(L); lightFix.push(-1); lightTarget.push(0); }
     bestN = Math.min(nLights, n); bestIdx = new Int32Array(Math.max(1, bestN)); bestD2 = new Float32Array(Math.max(1, bestN));
     built = true; acc = HOP_INTERVAL_S;
     log(n + ' fixtures (' + (F.kind || 'STREET_LIGHT') + ', pole ' + poleH + ' m), ' + nLights + ' dynamic lights (reach ' + reach + ' m), ' + drawCalls + ' draw calls, ' + (night ? 'night' : 'day'));

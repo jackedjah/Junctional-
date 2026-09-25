@@ -1,0 +1,14 @@
+state {"built":true,"error":null,"frames":11,"layout":{"version":"FIELD_COLLIDERS_DISTRICT_V1","base":28,"district":792,"world":9457},"world":{"status":"READY","error":null},"tod":"DAY","tier":"HIGH","log":["wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)","creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures create
+V01 DAY {"calls":293,"triangles":2093337,"geometries":298,"textures":59,"programs":140}
+V02 DAY {"calls":372,"triangles":2111609,"geometries":383,"textures":60,"programs":140}
+V03 DAY {"calls":170,"triangles":1983005,"geometries":386,"textures":64,"programs":141}
+V04 DAY {"calls":137,"triangles":1316782,"geometries":387,"textures":67,"programs":141}
+V05 DAY {"calls":130,"triangles":726090,"geometries":388,"textures":67,"programs":141}
+V06 DAY {"calls":103,"triangles":789344,"geometries":388,"textures":68,"programs":142}
+V07 DAY {"calls":135,"triangles":1299310,"geometries":389,"textures":74,"programs":142}
+V08 DAY {"calls":227,"triangles":906592,"geometries":458,"textures":76,"programs":142}
+V09 DAY {"calls":276,"triangles":599648,"geometries":509,"textures":76,"programs":143}
+V10 DAY {"calls":236,"triangles":1001458,"geometries":509,"textures":76,"programs":143}
+V11 DAY {"calls":67,"triangles":212622,"geometries":509,"textures":76,"programs":143}
+V12 DAY {"calls":316,"triangles":722730,"geometries":509,"textures":76,"programs":143}
+console errors 1

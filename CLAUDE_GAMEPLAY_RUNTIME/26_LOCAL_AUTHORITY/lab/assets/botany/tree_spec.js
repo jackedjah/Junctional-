@@ -12,7 +12,7 @@ export var TREE_SPEC = {
   primaries_min: 4, primaries_max: 5, primary_elevation_rad: [0.5, 0.9], primary_length_fraction: [0.5, 0.62], secondary_length_fraction: [0.5, 0.65], twig_length_fraction: [0.4, 0.55],
   leaf_length_m: 0.08, leaf_width_m: 0.04, gem_tip_fraction: 0.35, gem_radius_m: 0.0085,
   sway_amplitude_m: 0.011, leaf_flutter_m: 0.0016,
-  branch_color: 0xaeb8c4, leaf_color: 0x8fd0e0, gem_color: 0xeaf9ff, energy_color: 0x3fd0ff, energy_day: 0.22, energy_night: 0.8,
+  branch_color: 0xaeb8c4, leaf_color: 0xd4dce8, gem_color: 0xeaf9ff, energy_color: 0xffc862, energy_day: 0.22, energy_night: 0.8,
   variant_seeds: [1201, 2207, 3301],
   lod_far: { switch_m: 30, twigs: false, mid_leaves: false, terminal_leaf_fraction: 0.5, radial_scale: 0.6, gems: false, note: 'DEFINITION for the propagation step (U15): the far variant of each seed keeps the trunk / primaries / secondaries and half the terminal leaf fans; no twigs, no mid-branch leaves, no gems; the crown top and the seed-driven silhouette are the same' },
   collision: 'NONE — decorative hip-height foliage: walk-through, the camera boom ignores it (master §14.6: no camera shove, no trapped players)',

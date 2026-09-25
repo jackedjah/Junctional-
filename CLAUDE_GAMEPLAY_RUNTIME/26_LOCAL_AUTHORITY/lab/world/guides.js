@@ -25,7 +25,7 @@ var HOVER = { amp_m: 0.05, hz: 0.9, amp2_m: 0.02, hz2: 0.37 };
 var CAST = { rise_m: 0.42, pitch_rad: 0.22, bob_hz: 2.6, glow_m: 0.9, dispense_s: 0.9 };   /* owner B8 §10: the GUIDE CAST — root-level only (the asset has no clips): she rises, faces the manifest point, dips into a rhythmic cast bob, a fairy-blue square-diamond glow blooms at her front; a short lift pulse when she dispenses refills */
 var DRIFT = { amp_m: 0.28, period_s: 6.5, correct_rate: 1.6 }; var SETTLE = { after_s: 2.5, rise_m: 0.12, look_hz: 0.11, look_rad: 0.55 }; var ACCEL_BANK = 0.05;
 var BANK = { rad_per_mps: 0.12, max_rad: 0.3, yaw_rate: 8 };                      /* lean into travel; the facing yaw eases at yaw_rate/s */
-var RIM = { color: 0x4fd8ff, day: 0.15, night: 0.4, power: 2.5 };                 /* cyan Fresnel rim (civic accent) — a rim, not a glow ball */
+var RIM = { color: 0xd9e2ff, day: 0.15, night: 0.4, power: 2.5 };                 /* cyan Fresnel rim (civic accent) — a rim, not a glow ball */
 var MODEL_FRONT_YAW = 0;                                                          /* both derivatives face +z in model space (foot / face vertex distribution) → yaw = atan2(dx, dz) + this */
 var ENV_INTENSITY = 0.5;                                                          /* same taming as the props: the derivative PBR stays as exported */
 var MAX_DT = 0.1;

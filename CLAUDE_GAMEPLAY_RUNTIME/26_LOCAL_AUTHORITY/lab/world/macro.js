@@ -11,7 +11,7 @@ import { ridgeStations, ridgeFaceSegment } from './ridgeLayout.js';
    SKY ENERGY: three sparse vertical conduits, each from a real source — the Gold Temple crown, the Blue Tower crown and the north pass
    sanctuary beacon — additive gradient columns that pulse slowly (one InstancedMesh). Phone budget: 2 ridge meshes + 2 sheets + 2 foam +
    1 mist + 1 beam instanced mesh ≈ 8 draw calls, no per-frame allocation, LOW tier drops the mist. */
-var FAM = { gold: 0xe6c36a, blue: 0x2c62d8, red: 0xd8404a, purple: 0x8a5fd6, pink: 0xff5fb0, platinum: 0xdfe6ee, cyan: 0x39c5ff };
+var FAM = { gold: 0xe6c36a, blue: 0x2c62d8, red: 0xd8404a, purple: 0x8a5fd6, pink: 0xff5fb0, platinum: 0xdfe6ee, cyan: 0xdfe8ff };   /* colour law 2026-09-25: the civic 'cyan' key is neutral white light */
 export function createMacro(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var group = null; var reg = null; var M = null; var own = []; var ridges = []; var falls = []; var beams = null; var clock = 0; var night = !!ctx.night; var beamMat = null, sheetMats = [], foamMats = [], mistSprites = [];
   function tier() { try { return ctx.quality && ctx.quality.tier ? ctx.quality.tier() : 'MED'; } catch (e) { return 'MED'; } }

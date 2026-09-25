@@ -1,0 +1,388 @@
+{
+ "started": "2026-09-25T17:03:22.537Z",
+ "size": [
+  1280,
+  720
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V01",
+   "label": "plaza hub toward the temple causeway",
+   "tod": "DAY",
+   "file": "V01_DAY.jpg",
+   "pos": [
+    0,
+    7,
+    -30
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 301,
+    "triangles": 2103409,
+    "geometries": 300,
+    "textures": 62,
+    "programs": 135
+   },
+   "frames_in_600ms": 2,
+   "ms": 37839
+  },
+  {
+   "id": "V02",
+   "label": "world overview from the south",
+   "tod": "DAY",
+   "file": "V02_DAY.jpg",
+   "pos": [
+    0,
+    170,
+    -270
+   ],
+   "look": [
+    0,
+    0,
+    70
+   ],
+   "stats": {
+    "calls": 380,
+    "triangles": 2121681,
+    "geometries": 385,
+    "textures": 63,
+    "programs": 135
+   },
+   "frames_in_600ms": 0,
+   "ms": 22969
+  },
+  {
+   "id": "V03",
+   "label": "ATHLETE gold temple forecourt",
+   "tod": "DAY",
+   "file": "V03_DAY.jpg",
+   "pos": [
+    0,
+    8,
+    122
+   ],
+   "look": [
+    0,
+    14,
+    178
+   ],
+   "stats": {
+    "calls": 178,
+    "triangles": 1993077,
+    "geometries": 388,
+    "textures": 67,
+    "programs": 136
+   },
+   "frames_in_600ms": 0,
+   "ms": 21409
+  },
+  {
+   "id": "V04",
+   "label": "TITAN blue tower and gate",
+   "tod": "DAY",
+   "file": "V04_DAY.jpg",
+   "pos": [
+    58,
+    10,
+    104
+   ],
+   "look": [
+    112,
+    20,
+    110
+   ],
+   "stats": {
+    "calls": 145,
+    "triangles": 1326854,
+    "geometries": 389,
+    "textures": 70,
+    "programs": 136
+   },
+   "frames_in_600ms": 0,
+   "ms": 21752
+  },
+  {
+   "id": "V05",
+   "label": "LEAN crimson canyon corridor",
+   "tod": "DAY",
+   "file": "V05_DAY.jpg",
+   "pos": [
+    -86,
+    11,
+    138
+   ],
+   "look": [
+    -112,
+    12,
+    210
+   ],
+   "stats": {
+    "calls": 138,
+    "triangles": 736162,
+    "geometries": 390,
+    "textures": 70,
+    "programs": 136
+   },
+   "frames_in_600ms": 0,
+   "ms": 15076
+  },
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "DAY",
+   "file": "V06_DAY.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 111,
+    "triangles": 799416,
+    "geometries": 390,
+    "textures": 71,
+    "programs": 137
+   },
+   "frames_in_600ms": 1,
+   "ms": 14892
+  },
+  {
+   "id": "V07",
+   "label": "BAGE pink market and basins",
+   "tod": "DAY",
+   "file": "V07_DAY.jpg",
+   "pos": [
+    0,
+    9,
+    212
+   ],
+   "look": [
+    0,
+    8,
+    258
+   ],
+   "stats": {
+    "calls": 143,
+    "triangles": 1309382,
+    "geometries": 391,
+    "textures": 77,
+    "programs": 137
+   },
+   "frames_in_600ms": 2,
+   "ms": 22153
+  },
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "DAY",
+   "file": "V08_DAY.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 235,
+    "triangles": 916664,
+    "geometries": 460,
+    "textures": 79,
+    "programs": 137
+   },
+   "frames_in_600ms": 0,
+   "ms": 14314
+  },
+  {
+   "id": "V09",
+   "label": "HALO dome from the ground",
+   "tod": "DAY",
+   "file": "V09_DAY.jpg",
+   "pos": [
+    -130,
+    22,
+    -150
+   ],
+   "look": [
+    30,
+    230,
+    40
+   ],
+   "stats": {
+    "calls": 284,
+    "triangles": 609720,
+    "geometries": 511,
+    "textures": 79,
+    "programs": 138
+   },
+   "frames_in_600ms": 2,
+   "ms": 10581
+  },
+  {
+   "id": "V10",
+   "label": "sky toward the Sun",
+   "tod": "DAY",
+   "file": "V10_DAY.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    260,
+    150,
+    140
+   ],
+   "stats": {
+    "calls": 244,
+    "triangles": 1011530,
+    "geometries": 511,
+    "textures": 79,
+    "programs": 138
+   },
+   "frames_in_600ms": 0,
+   "ms": 12301
+  },
+  {
+   "id": "V11",
+   "label": "south coast horizon",
+   "tod": "DAY",
+   "file": "V11_DAY.jpg",
+   "pos": [
+    0,
+    7,
+    -140
+   ],
+   "look": [
+    0,
+    4,
+    -300
+   ],
+   "stats": {
+    "calls": 75,
+    "triangles": 222694,
+    "geometries": 511,
+    "textures": 79,
+    "programs": 138
+   },
+   "frames_in_600ms": 0,
+   "ms": 9601
+  },
+  {
+   "id": "V12",
+   "label": "view back over MAHWORLD from the HALO rim",
+   "tod": "DAY",
+   "file": "V12_DAY.jpg",
+   "pos": [
+    30,
+    247,
+    184
+   ],
+   "look": [
+    20,
+    40,
+    520
+   ],
+   "stats": {
+    "calls": 111,
+    "triangles": 497140,
+    "geometries": 511,
+    "textures": 79,
+    "programs": 138
+   },
+   "frames_in_600ms": 0,
+   "ms": 10558
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 10,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: PHOENIX, FISH, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (602 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (22 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (25 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 5699.9,
+  "error": null
+ },
+ "finished": "2026-09-25T17:07:25.980Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 79,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: PHOENIX, FISH, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (602 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (22 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (25 ms)"
+  ]
+ }
+}

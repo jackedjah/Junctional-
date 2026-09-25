@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAHWORLD world preview (dev only)</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #view { display: block; width: 100vw; height: 100vh; }
+  #tag { position: fixed; left: 8px; bottom: 6px; font: 11px/1.2 ui-monospace, monospace; color: rgba(255, 255, 255, 0.72); text-shadow: 0 1px 2px #000; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="tag"></div>
+<!-- WORLD PREVIEW (dev only, never shipped): renders lab/fieldScene.js + the registry world layer WITHOUT the gameplay host, from the
+     same generated collider authority, so world-art passes can be inspected at fixed viewpoints while the host runtime is unavailable.
+     Served at lab/world_preview.html by deploy/world_preview/capture.mjs so every relative asset fetch resolves exactly as in play.html. -->
+<script type="module" src="./world_preview.js"></script>
+</body>
+</html>

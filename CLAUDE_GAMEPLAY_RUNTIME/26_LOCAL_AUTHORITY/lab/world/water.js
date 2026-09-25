@@ -74,7 +74,7 @@ export function createWater(ctx) {
 
     normalTex = makeNormalTexture(256); ctx.waterNormalTex = normalTex;   /* shared with the coast's sea */
     waterMat = new THREE.MeshStandardMaterial({ color: DAY.color, roughness: DAY.rough, metalness: 0.55, transparent: true, opacity: DAY.opacity, envMapIntensity: DAY.env, side: THREE.FrontSide, normalMap: normalTex, normalScale: new THREE.Vector2(NORMAL_BASE, NORMAL_BASE) }); ownMats.push(waterMat);
-    var cyanSrc = M.cyanLine || null; lineMat = cyanSrc ? cyanSrc.clone() : new THREE.MeshStandardMaterial({ color: 0x6fd3ff, emissive: 0x39c5ff, emissiveIntensity: DAY.line, roughness: 0.3, metalness: 0.2 }); ownMats.push(lineMat);   /* cloned: its emissive pulses */
+    var cyanSrc = M.cyanLine || null; lineMat = cyanSrc ? cyanSrc.clone() : new THREE.MeshStandardMaterial({ color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: DAY.line, roughness: 0.3, metalness: 0.2 }); ownMats.push(lineMat);   /* cloned: its emissive pulses */
     padMat = new THREE.MeshStandardMaterial({ color: 0xeef3f8, roughness: 0.3, metalness: 0.84, envMapIntensity: 0.6 }); ownMats.push(padMat);   /* slightly lighter than ctx.M.platinum */
     var platinum = shared('platinum', { color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), chromeM = shared('chrome', { color: 0xc9d3dc, roughness: 0.2, metalness: 0.95 }), sapphire = shared('sapphire', { color: 0x1c2a46, roughness: 0.4, metalness: 0.7 });
 

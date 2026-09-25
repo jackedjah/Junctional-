@@ -31,7 +31,7 @@ export function createWorldB(THREE, scene, opts) {
   var std = function (o) { return new THREE.MeshStandardMaterial(o); };
   var M = {   /* the MAHWORLD material families (platinum · chromium · graphite recesses · diamond / crystal · cyan energy) shared by every module */
     platinum: std({ color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), chrome: std({ color: 0xc9d3dc, roughness: 0.2, metalness: 0.95 }), graphite: std({ color: 0x1d2229, roughness: 0.55, metalness: 0.75 }), black: std({ color: 0x0b0d11, roughness: 0.42, metalness: 0.8 }),
-    cyan: std({ color: 0x9fdcff, emissive: 0x4fd8ff, emissiveIntensity: 1.2, roughness: 0.25, metalness: 0.4 }), cyanLine: std({ color: 0x6fd3ff, emissive: 0x39c5ff, emissiveIntensity: 1.6, roughness: 0.3, metalness: 0.2 }), gold: std({ color: 0xe6c36a, emissive: 0xffc34d, emissiveIntensity: 0.35, roughness: 0.3, metalness: 0.85 }),
+    cyan: std({ color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: 1.2, roughness: 0.25, metalness: 0.4 }), cyanLine: std({ color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: 1.6, roughness: 0.3, metalness: 0.2 }), gold: std({ color: 0xe6c36a, emissive: 0xffc34d, emissiveIntensity: 0.35, roughness: 0.3, metalness: 0.85 }),
     crystal: std({ color: 0xe8f4ff, roughness: 0.08, metalness: 0.6, transparent: true, opacity: 0.85 }), sapphire: std({ color: 0x1c2a46, roughness: 0.4, metalness: 0.7 }), amethyst: std({ color: 0x6b4a9a, roughness: 0.35, metalness: 0.7 }),
     sand: std({ color: 0xcfc9bd, roughness: 0.88, metalness: 0.12 }), shore: shoreMaterial()   /* BEACH: platinum sand; the shore gradient (v: 0 = dry sand at the floor edge → wet band at the waterline → sapphire deep) is shared by the canal banks and the coast */
   };
