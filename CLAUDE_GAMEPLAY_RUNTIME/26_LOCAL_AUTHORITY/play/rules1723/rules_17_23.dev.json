@@ -1793,69 +1793,75 @@
      "type": "CYLINDER",
      "x": 30.0,
      "z": 40.0,
-     "r": 2.6,
-     "h": 24.0,
+     "r": 6.2,
+     "h": 240.0,
      "landmark": {
       "kind": "TREE_ELEVATOR",
       "name": "MAH NEXUS / ASCENT / HALO",
-      "platform_h": 24.0,
-      "platform_r": 8.5,
-      "branches": 8
+      "platform_h": 240.0,
+      "platform_r": 153.0,
+      "dome_radius": 147.6,
+      "playable_radius": 144.8,
+      "apex_h": 387.6,
+      "scale_contract": "M7_HALO_SCALE_ACCESS_V1",
+      "branches": 12
      }
     },
     {
      "id": "TREE_PLATFORM",
      "type": "BOX",
      "walkable": true,
-     "x1": 21.5,
-     "z1": 31.5,
-     "x2": 38.5,
-     "z2": 48.5,
-     "h": 24.0
+     "x1": -123.0,
+     "z1": -113.0,
+     "x2": 183.0,
+     "z2": 193.0,
+     "y0": 238.8,
+     "h": 240.0,
+     "halo_deck": true
     },
     {
      "id": "TREE_RIM_N",
      "type": "BOX",
-     "x1": 21.1,
-     "z1": 31.1,
-     "x2": 38.9,
-     "z2": 31.5,
-     "h": 25.15,
+     "x1": -123.5,
+     "z1": -113.5,
+     "x2": 183.5,
+     "z2": -112.7,
+     "h": 241.2,
      "rim": true,
-     "y0": 23.6
+     "y0": 239.2
     },
     {
      "id": "TREE_RIM_S",
      "type": "BOX",
-     "x1": 21.1,
-     "z1": 48.5,
-     "x2": 38.9,
-     "z2": 48.9,
-     "h": 25.15,
+     "x1": -123.5,
+     "z1": 192.7,
+     "x2": 183.5,
+     "z2": 193.5,
+     "h": 241.2,
      "rim": true,
-     "y0": 23.6
+     "y0": 239.2
     },
     {
      "id": "TREE_RIM_W",
      "type": "BOX",
-     "x1": 21.1,
-     "z1": 31.1,
-     "x2": 21.5,
-     "z2": 48.9,
-     "h": 25.15,
+     "x1": -123.5,
+     "z1": -113.5,
+     "x2": -122.7,
+     "z2": 193.5,
+     "h": 241.2,
      "rim": true,
-     "y0": 23.6
+     "y0": 239.2
     },
     {
      "id": "TREE_RIM_E",
      "type": "BOX",
-     "x1": 38.5,
-     "z1": 31.1,
-     "x2": 38.9,
-     "z2": 48.9,
-     "h": 25.15,
+     "x1": 182.7,
+     "z1": -113.5,
+     "x2": 183.5,
+     "z2": 193.5,
+     "h": 241.2,
      "rim": true,
-     "y0": 23.6
+     "y0": 239.2
     },
     {
      "id": "POD_1",
@@ -1890,15 +1896,16 @@
      "id": "ELEVATOR_UP",
      "kind": "TRANSIT",
      "label": "MAH ASCENT — ride to the HALO realm",
-     "x": 26.5,
+     "x": 22.7,
      "z": 40.0,
      "range_m": 3.0,
-     "to": {
-      "x": 22.7,
-      "z": 40.0,
-      "ground": 24.0
-     },
-     "travel_s": 5.4
+      "to": {
+       "x": 22.7,
+       "z": 40.0,
+       "ground": 240.0
+      },
+      "travel_s": 20.0,
+      "to_domain": "HALO"
     },
     {
      "id": "ELEVATOR_DOWN",
@@ -1907,13 +1914,14 @@
      "x": 22.7,
      "z": 40.0,
      "range_m": 3.0,
-     "on_ground": 24.0,
+     "on_ground": 240.0,
      "to": {
-      "x": 26.5,
+      "x": 22.7,
       "z": 40.0,
       "ground": 0.0
      },
-     "travel_s": 5.4
+     "travel_s": 20.0,
+     "to_domain": "WORLD"
     }
    ],
    "_interactables_doc": "SYSTEMIC INTERACTABLE rule (brief §34-35): proximity -> prompt -> action -> state. TRANSIT: enter (prompt) / travel (host moves the actor, travel_s presentation) / exit (arrives on the destination ground). The same envelope will drive doors, shops, MAH MATCH entry and NPC talk. P8: ENTER (a door) — proximity → contextual confirm on the client → ENTER_ROOM {room: to.room}; the host refuses NOT_AT_DOOR unless the actor stands at that door, remembers the door as return_to, and EXIT from the interior lands the actor back on it facing away from the building."
@@ -4733,15 +4741,16 @@
      "id": "ELEVATOR_UP",
      "kind": "TRANSIT",
      "label": "MAH ASCENT — ride to the HALO realm",
-     "x": 26.5,
+     "x": 22.7,
      "z": 40,
      "range_m": 3,
      "to": {
       "x": 22.7,
       "z": 40,
-      "ground": 24
+      "ground": 240
      },
-     "travel_s": 5.4
+     "travel_s": 20,
+     "to_domain": "HALO"
     },
     {
      "id": "ELEVATOR_DOWN",
@@ -4750,13 +4759,14 @@
      "x": 22.7,
      "z": 40,
      "range_m": 3,
-     "on_ground": 24,
+     "on_ground": 240,
      "to": {
-      "x": 26.5,
+      "x": 22.7,
       "z": 40,
       "ground": 0
      },
-     "travel_s": 5.4
+     "travel_s": 20,
+     "to_domain": "WORLD"
     },
     {
      "id": "GYM_DOOR",
@@ -5103,69 +5113,75 @@
     "type": "CYLINDER",
     "x": 30,
     "z": 40,
-    "r": 2.6,
-     "h": 24,
+     "r": 6.2,
+      "h": 240,
     "landmark": {
      "kind": "TREE_ELEVATOR",
       "name": "MAH NEXUS / ASCENT / HALO",
-      "platform_h": 24,
-      "platform_r": 8.5,
-      "branches": 8
+       "platform_h": 240,
+       "platform_r": 153,
+       "dome_radius": 147.6,
+       "playable_radius": 144.8,
+       "apex_h": 387.6,
+       "scale_contract": "M7_HALO_SCALE_ACCESS_V1",
+       "branches": 12
      }
     },
     {
      "id": "TREE_PLATFORM",
      "type": "BOX",
      "walkable": true,
-     "x1": 21.5,
-     "z1": 31.5,
-     "x2": 38.5,
-     "z2": 48.5,
-     "h": 24
+      "x1": -123,
+      "z1": -113,
+      "x2": 183,
+      "z2": 193,
+      "y0": 238.8,
+      "h": 240,
+      "halo_deck": true
     },
     {
      "id": "TREE_RIM_N",
      "type": "BOX",
-     "x1": 21.1,
-     "z1": 31.1,
-     "x2": 38.9,
-     "z2": 31.5,
-     "h": 25.15,
+     "x1": -123.5,
+     "z1": -113.5,
+     "x2": 183.5,
+     "z2": -112.7,
+     "h": 241.2,
      "rim": true,
-     "y0": 23.6
+     "y0": 239.2
     },
     {
      "id": "TREE_RIM_S",
      "type": "BOX",
-     "x1": 21.1,
-     "z1": 48.5,
-     "x2": 38.9,
-     "z2": 48.9,
-     "h": 25.15,
+     "x1": -123.5,
+     "z1": 192.7,
+     "x2": 183.5,
+     "z2": 193.5,
+     "h": 241.2,
      "rim": true,
-     "y0": 23.6
+     "y0": 239.2
     },
     {
      "id": "TREE_RIM_W",
      "type": "BOX",
-     "x1": 21.1,
-     "z1": 31.1,
-     "x2": 21.5,
-     "z2": 48.9,
-     "h": 25.15,
+     "x1": -123.5,
+     "z1": -113.5,
+     "x2": -122.7,
+     "z2": 193.5,
+     "h": 241.2,
      "rim": true,
-     "y0": 23.6
+     "y0": 239.2
     },
     {
      "id": "TREE_RIM_E",
      "type": "BOX",
-     "x1": 38.5,
-     "z1": 31.1,
-     "x2": 38.9,
-     "z2": 48.9,
-     "h": 25.15,
+     "x1": 182.7,
+     "z1": -113.5,
+     "x2": 183.5,
+     "z2": 193.5,
+     "h": 241.2,
      "rim": true,
-     "y0": 23.6
+     "y0": 239.2
     },
     {
      "id": "POD_1",

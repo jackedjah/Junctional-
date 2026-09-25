@@ -13,8 +13,8 @@ export const HALO_LAYOUT = Object.freeze({
   playable_radius_m: 144.8,
   apex_height_m: 387.6,
   travel_s: 20,
-  ground_dock: Object.freeze({ x: 26.5, z: 40, altitude_m: 0 }),
-  upper_dock: Object.freeze({ x: 26.5, z: 40, altitude_m: 240 }),
+  ground_dock: Object.freeze({ x: 22.7, z: 40, altitude_m: 0 }),
+  upper_dock: Object.freeze({ x: 22.7, z: 40, altitude_m: 240 }),
   guide: Object.freeze({ x: 34, z: 49, altitude_m: 240 }),
   body_radius_m: 0.45,
   body_height_m: 1.7,
@@ -42,4 +42,3 @@ export function haloContainsActor(x, z, altitudeM) {
   if (y < HALO_LAYOUT.arrival_height_m - 0.001) return false;
   return haloRadialDistance(x, z) <= haloInteriorRadiusAt(y) + 0.001;
 }
-
