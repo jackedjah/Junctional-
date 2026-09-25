@@ -247,3 +247,32 @@ shells, blown-out street level, no scale cues.
    fracture lines, value zoning between lit rock and shadowed clefts). Must stay on the collision plane (owner OP10) — shader-side only.
 2. Civic curtain-wall glass bands still read as uniform smoked strips (mullion rhythm, spandrel panels).
 3. Crystal ecology / tree materials (GLB-textured) were not touched; water-facing edges took the shared platinum change only.
+
+## M8B — SKY REALISM + SURFACE LANGUAGE + TRANSITIONS (`8aa33fe`)
+
+Diagnosis (pinned `fc68cd3` frames): the day sky was one flat saturated "screen blue" from the zenith to ~10° above the horizon (the dome
+blend only moved in the last few degrees), with no brighter Sun side or deeper opposite side; the Sun wore a doodled corona (a lobed
+cloud-veil card + 18 hard cartoon rays); clouds were all mid-size puffs at two altitudes over the playable world — nothing gave scale at
+the horizon; the day Moon was an opaque lilac sticker and the night Moon a flat disc in a flat navy-purple sky. The ground spoke one
+paving language everywhere, and district / surface changes were hard stops (floor → shore, plaza → districts, landmark → ground).
+
+| field | value |
+|---|---|
+| files | `lab/world/atmosphere.js`, `lab/world/sky.js`, `lab/world/cloudBodies.js`, `lab/world/celestial.js`, `lab/world/surfaceDetail.js` (zoned paving, GLAZING, SAND), `lab/fieldScene.js`, `lab/cityScene.js`, `lab/world/worldB.js` (shore transition), `lab/world/contactAO.js`, `deploy/jobb/build_registry.mjs` → registry (+ collider hash), `deploy/world_preview/capture.mjs` (V21–V25), `16_TESTS/gameplay_world_material_realism.test.mjs` (checks 6–7) |
+| sky (changed first) | dome: long zenith → horizon falloff (deep blue high, milky over ~30°), Sun-side multiple-scattering brightening and a deeper opposite side, a wide haze skirt under the horizon line, a tight aureole, dither against banding; palettes: day zenith `#1a52bd` / horizon `#cfe1f6` / whiter Sun glow, night indigo zenith / purple-blue horizon / lavender lunar aureole (mie 0.22 → 0.55); a ring of 22 large, flatter HORIZON cloud banks at 820–1100 m behind the far massifs (lit bodies; the registry layer stays non-occluding and is excluded from the Sun / Moon optics — the two occluding layers and every pinned sky marker are unchanged); the Sun's lobed veil → a soft diffuse veil, rays 0.15 → 0.05; the day Moon is seen through the lit atmosphere (74 % opacity, paler albedo, softer limb) and the night Moon is opaque with a stronger limb glow (emissive 0.72 → 0.9); clouds get a stronger silver lining by day |
+| floor language | one zoned paving shader for the plaza + district ground, family per registry zone: civic running bond · plaza hub RINGS (concentric courses, radial joints) · fine rings around the HALO trunk base · TITAN hexagons · ATHLETE diamonds · VISIONARY triangles · LEAN planks (+ the coast boardwalk) · MATCH squares · BAGE mosaic |
+| transitions | 0.7 m THRESHOLD courses wherever two families meet (plaza rim, HALO base, every sanctuary edge); SOFT ECOLOGY PATCHES — seams fade and value drops under world noise in forest / garden zones (feathered 10 m) and ecology-leaning districts, so tiling gives way to weathered ground; the SHORE gradient becomes a material transition (glossy wet band / grained dry sand, derived from the gradient colour itself); contact bands under every street light and sanctuary monolith |
+| structure | curtain-wall GLAZING: mullions every 1.5 m, transoms every 1.2 m, a dark spandrel per 3.6 m storey, per-pane reflection variation (value / roughness only) |
+| before / after | pinned `fc68cd3` → pinned `8aa33fe`: `evidence/m8b_before/…` → `evidence/m8b_after/{desktop_day, desktop_night, phone_med_day}`; sheets `evidence/m8b_sky_day.jpg`, `m8b_sky_night.jpg`, `m8b_floors.jpg` |
+| perf (12 matched day views) | draw calls 2690 → 2713 (≈ +2 per view: the horizon-bank layer), triangles 13.89 M → 14.01 M (+0.9 %: bank puffs), shader programs 111 → 113, textures 73 → 73; phone-sized MED V21 / V23: calls 149 / 175 → 151 / 177, programs 108 → 113 (desktop emulation, not a device test) |
+| evidence notes | V24 / V25 were re-aimed onto open district paving and their BEFORE frames recaptured from the same pinned `fc68cd3`; V24 has a close rail in the foreground and V25 still frames much of a causeway (the ATHLETE diamonds show on its right) — kept as-is rather than re-aimed a third time; V15's BEFORE is `evidence/m8_after` (identical world code) |
+| tests (focused) | material realism 7 / 7 (new 6: nine paving families in one shader, threshold courses, soft patches, LOW keeps pattern + tone, zones bound live from the registry; new 7: sky falloff + dither, lunar aureole, horizon banks outside the optics with two occluding layers kept, soft Sun veil), host safety 6 / 6, colour law 4 / 4 (one new night haze nudged from hue 245.6° into the purple window), Moon / cloud 19 / 19, ridge collision 8 / 8, night route 13 / 13 |
+| host safety | presentation only: no collider or walkable change; the horizon banks sit far outside every host limit and below the HALO deck cap (max_top 236 m) |
+
+### M8B next — the highest-value remaining realism issue
+
+1. **Ridge mountains at street level** (carried from M8, still first): they fill 30–50 % of every street-level frame as large flat grey
+   faces; macro structure (ledges, fracture lines, value zoning between lit rock and shadowed clefts) must come from the shader because
+   the visible inner face IS the collision surface (owner OP10).
+2. Crystal ecology / trees (GLB-textured) keep their original materials; ground-level meadow shards could use a contact tint.
+3. The sky is still an analytic dome: a volumetric-looking cloud deck near the Sun (god-ray shafts through gaps) would be the next sky step.
