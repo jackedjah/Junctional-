@@ -1,0 +1,638 @@
+{
+ "label": "ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924",
+ "started": "2026-09-25T02:18:48.314Z",
+ "stages": [
+  {
+   "stage": "0 static build",
+   "ok": true,
+   "detail": "static demo → C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_dist 182 files 207.2 MB private-content scan clean"
+  },
+  {
+   "stage": "1 all tests",
+   "ok": true,
+   "detail": "58 files, 1542 checks passed, 0 files failing"
+  },
+  {
+   "stage": "2 JS syntax sweep",
+   "ok": true,
+   "detail": "106 files"
+  },
+  {
+   "stage": "3 CSS parse sweep",
+   "ok": true,
+   "detail": "2 stylesheets / blocks"
+  },
+  {
+   "stage": "4 runtime / cache stamps",
+   "ok": true,
+   "detail": "built 2026-09-25T02:18:49.045Z · commit 3710e4588a7f853c84a1a376eee7d08fdabc0454 (WORKTREE DIRTY: 152 paths) · netlify.toml cache + gate rules present"
+  },
+  {
+   "stage": "5 protected backend boundaries",
+   "ok": true,
+   "detail": "top-level CLAUDE_GAMEPLAY_RUNTIME, CLAUDE_RUNTIME_FOUNDATION, netlify · functions: netlify/edge-functions/gate.js"
+  },
+  {
+   "stage": "6 secret scan",
+   "ok": true,
+   "detail": "183 files scanned"
+  },
+  {
+   "stage": "7a ZIP written",
+   "ok": true,
+   "detail": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\packages\\ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924.zip 117.3 MB"
+  },
+  {
+   "stage": "7b ZIP integrity (listing)",
+   "ok": true,
+   "detail": "183 entries = 183 files"
+  },
+  {
+   "stage": "7c fresh extraction",
+   "ok": true,
+   "detail": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\packages\\fresh_ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924_JmVdeO · 183 files, byte sizes match"
+  },
+  {
+   "stage": "7d smoke test from the extraction",
+   "ok": true,
+   "detail": "  PASS SEPARATE goes through the host — form SPLIT |   PASS zero page errors / console errors — [] | 7 passed, 0 failed · screenshot C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\static_test\\static_phone.png"
+  },
+  {
+   "stage": "7e JS syntax sweep from the extraction",
+   "ok": true,
+   "detail": "clean"
+  }
+ ],
+ "tests": [
+  {
+   "test": "gameplay_anim_data.test.mjs",
+   "code": 0,
+   "passed": 46,
+   "failed": 0,
+   "last": "RESULT anim data: 46 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_asset_slot.test.mjs",
+   "code": 0,
+   "passed": 11,
+   "failed": 0,
+   "last": "11 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_attack_stack.test.mjs",
+   "code": 0,
+   "passed": 22,
+   "failed": 0,
+   "last": "disposable test dir: C:\\Users\\jahsu\\AppData\\Local\\Temp\\mahworld-5b-test-stack-ghtNiZ"
+  },
+  {
+   "test": "gameplay_attacks_phase_e.test.mjs",
+   "code": 0,
+   "passed": 16,
+   "failed": 0,
+   "last": "RESULT ATTACKS PHASE E: 16 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_b7_targeting.test.mjs",
+   "code": 0,
+   "passed": 12,
+   "failed": 0,
+   "last": "RESULT b7 targeting: 12 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_b8_equipment.test.mjs",
+   "code": 0,
+   "passed": 25,
+   "failed": 0,
+   "last": "RESULT b8 equipment: 25 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_beam_audio.test.mjs",
+   "code": 0,
+   "passed": 12,
+   "failed": 0,
+   "last": "RESULT beam audio voices: 12 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_camera_pass2.test.mjs",
+   "code": 0,
+   "passed": 30,
+   "failed": 0,
+   "last": "RESULT camera PASS 2: 30 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_creature_combat.test.mjs",
+   "code": 0,
+   "passed": 22,
+   "failed": 0,
+   "last": "RESULT creature combat: 22 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_demo_gate.test.mjs",
+   "code": 0,
+   "passed": 24,
+   "failed": 0,
+   "last": "RESULT demo gate: 24 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_direct_ui.test.mjs",
+   "code": 0,
+   "passed": 52,
+   "failed": 0,
+   "last": "RESULT direct-execution / colour authority / UI ownership: 52 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_district.test.mjs",
+   "code": 0,
+   "passed": 31,
+   "failed": 0,
+   "last": "RESULT district: 31 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_emote_endpoints.test.mjs",
+   "code": 0,
+   "passed": 22,
+   "failed": 0,
+   "last": "RESULT emote endpoints: 22 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_emotes_npc.test.mjs",
+   "code": 0,
+   "passed": 23,
+   "failed": 0,
+   "last": "RESULT emotes + NPCs: 23 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_flight_f01.test.mjs",
+   "code": 0,
+   "passed": 29,
+   "failed": 0,
+   "last": "RESULT flight F01/O4: 29 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_g37_contact.test.mjs",
+   "code": 0,
+   "passed": 10,
+   "failed": 0,
+   "last": "RESULT G37 contact: 10 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_guard_sheet.test.mjs",
+   "code": 0,
+   "passed": 11,
+   "failed": 0,
+   "last": "RESULT guard sheet: 11 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_halo_repair_play.test.mjs",
+   "code": 0,
+   "passed": 11,
+   "failed": 0,
+   "last": "RESULT HALO repair/play: 11 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_hip_connect.test.mjs",
+   "code": 0,
+   "passed": 12,
+   "failed": 0,
+   "last": "RESULT hip connect: 12 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_hud_pass3.test.mjs",
+   "code": 0,
+   "passed": 22,
+   "failed": 0,
+   "last": "RESULT HUD PASS 3: 22 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_hud_phase_b.test.mjs",
+   "code": 0,
+   "passed": 18,
+   "failed": 0,
+   "last": "RESULT HUD PHASE B: 18 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_interior_entry.test.mjs",
+   "code": 0,
+   "passed": 24,
+   "failed": 0,
+   "last": "RESULT interior entry: 24 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_leg_surface.test.mjs",
+   "code": 0,
+   "passed": 8,
+   "failed": 0,
+   "last": "8 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_legs_faithful.test.mjs",
+   "code": 0,
+   "passed": 10,
+   "failed": 0,
+   "last": "RESULT legs faithful: 10 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_loadout_422.test.mjs",
+   "code": 0,
+   "passed": 16,
+   "failed": 0,
+   "last": "RESULT 4/2/2 loadout: 16 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m2_equipment_motion.test.mjs",
+   "code": 0,
+   "passed": 9,
+   "failed": 0,
+   "last": "RESULT M2 equipment motion: 9 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m3_night_route.test.mjs",
+   "code": 0,
+   "passed": 13,
+   "failed": 0,
+   "last": "RESULT M3 night route: 13 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m4_world_expansion.test.mjs",
+   "code": 0,
+   "passed": 12,
+   "failed": 0,
+   "last": "RESULT M4 world expansion: 12 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m5_minimal_hud.test.mjs",
+   "code": 0,
+   "passed": 4,
+   "failed": 0,
+   "last": "RESULT M5 minimal HUD: 4 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m5_moon_cloud.test.mjs",
+   "code": 0,
+   "passed": 18,
+   "failed": 0,
+   "last": "RESULT M5 Moon/cloud correction: 18 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m5_owner_buildings.test.mjs",
+   "code": 0,
+   "passed": 14,
+   "failed": 0,
+   "last": "RESULT M5 owner buildings: 14 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m5_owner_corrections.test.mjs",
+   "code": 0,
+   "passed": 9,
+   "failed": 0,
+   "last": "RESULT M5 owner corrections tranche 1: 9 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m5_ridge_collision.test.mjs",
+   "code": 0,
+   "passed": 8,
+   "failed": 0,
+   "last": "RESULT M5 ridge structural collision: 8 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m5_tree_lod.test.mjs",
+   "code": 0,
+   "passed": 8,
+   "failed": 0,
+   "last": "RESULT M5 tree colour / LOD correction: 8 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_m7_halo_scale.test.mjs",
+   "code": 0,
+   "passed": 13,
+   "failed": 0,
+   "last": "RESULT M7 HALO scale/access: 13 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_mahgic_anywhere.test.mjs",
+   "code": 0,
+   "passed": 16,
+   "failed": 0,
+   "last": "RESULT mahgic anywhere: 16 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_mahgic_tree.test.mjs",
+   "code": 0,
+   "passed": 30,
+   "failed": 0,
+   "last": "RESULT mahgic tree: 30 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_mocap_pipeline.test.mjs",
+   "code": 0,
+   "passed": 18,
+   "failed": 0,
+   "last": "RESULT mocap pipeline: 18 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_motion_layer.test.mjs",
+   "code": 0,
+   "passed": 12,
+   "failed": 0,
+   "last": "RESULT motion layer: 12 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_motion_phase_d.test.mjs",
+   "code": 0,
+   "passed": 11,
+   "failed": 0,
+   "last": "RESULT MOTION PHASE D: 11 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_navigation.test.mjs",
+   "code": 0,
+   "passed": 28,
+   "failed": 0,
+   "last": "RESULT navigation: 28 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_od29_disconnect.test.mjs",
+   "code": 0,
+   "passed": 26,
+   "failed": 0,
+   "last": "(Use `node --trace-warnings ...` to show where the warning was created)"
+  },
+  {
+   "test": "gameplay_phase4.test.mjs",
+   "code": 0,
+   "passed": 85,
+   "failed": 0,
+   "last": "85 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_phase4_1.test.mjs",
+   "code": 0,
+   "passed": 33,
+   "failed": 0,
+   "last": "33 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_phase5a.test.mjs",
+   "code": 0,
+   "passed": 46,
+   "failed": 0,
+   "last": "46 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_phase5b.test.mjs",
+   "code": 0,
+   "passed": 46,
+   "failed": 0,
+   "last": "(Use `node --trace-warnings ...` to show where the warning was created)"
+  },
+  {
+   "test": "gameplay_play_sample.test.mjs",
+   "code": 0,
+   "passed": 97,
+   "failed": 0,
+   "last": "(Use `node --trace-warnings ...` to show where the warning was created)"
+  },
+  {
+   "test": "gameplay_rig_bind.test.mjs",
+   "code": 0,
+   "passed": 26,
+   "failed": 0,
+   "last": "26 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_rig_limits.test.mjs",
+   "code": 0,
+   "passed": 64,
+   "failed": 0,
+   "last": "RESULT rig limits: 64 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_rig_pose_fk.test.mjs",
+   "code": 0,
+   "passed": 33,
+   "failed": 0,
+   "last": "RESULT pose anatomy: 33 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_rig_v5_gates.test.mjs",
+   "code": 0,
+   "passed": 8,
+   "failed": 0,
+   "last": "RESULT rig v5 gates: 8 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_rules_17_23.test.mjs",
+   "code": 0,
+   "passed": 60,
+   "failed": 0,
+   "last": "disposable test dir: C:\\Users\\jahsu\\AppData\\Local\\Temp\\mahworld-5b-test-r1723-BywYVr"
+  },
+  {
+   "test": "gameplay_runtime.test.mjs",
+   "code": 0,
+   "passed": 125,
+   "failed": 0,
+   "last": "125 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_spec_a_perf.test.mjs",
+   "code": 0,
+   "passed": 64,
+   "failed": 0,
+   "last": "64 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_spec_b_camera.test.mjs",
+   "code": 0,
+   "passed": 31,
+   "failed": 0,
+   "last": "31 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_stats_phase_f.test.mjs",
+   "code": 0,
+   "passed": 10,
+   "failed": 0,
+   "last": "RESULT STATS PHASE F: 10 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_training_room.test.mjs",
+   "code": 0,
+   "passed": 12,
+   "failed": 0,
+   "last": "RESULT training room: 12 passed, 0 failed"
+  },
+  {
+   "test": "gameplay_world_jobb.test.mjs",
+   "code": 0,
+   "passed": 34,
+   "failed": 0,
+   "last": "RESULT world jobb: 34 passed, 0 failed"
+  }
+ ],
+ "stamp": {
+  "built": "2026-09-25T02:18:49.045Z",
+  "athlete": "dev_0.16 (ATHLETE_M_V11: dev_0.15 + graded shoulder skin weights — owner hotfix 2026-09-19 intactness: the 0.4 UPPERARM weight step across one deltoid / armpit edge is smoothed over ~2–3 cm, weights only, rollback ?avatar=ATHLETE_M_V10; V10 = dev_0.14 + hip connection — the pelvis shell follows the thighs, the leg tops stay with the pelvis (weights only; rollback ?avatar=ATHLETE_M_V9); V9 = faithful separated legs (O6) — the fused lower body’s own triangles + inferred medial walls; V8 dev_0.13 (surgical loft) kept for rollback via ?avatar=ATHLETE_M_V8)",
+  "npcs": "ten residents (v5; nine ground residents + one non-combat HALO guide)",
+  "world": "M7 HALO REPAIR/PLAY WORLD — preserved M1–M7 mainland/gameplay; occupied passenger cabin to the 240 m deck; one opaque stable 295.2 m-diameter HALO floor; elevator-only access; playable one-bot arcade volleyball and five-serve target practice; M6Q terrain, ecology, source-driven buildings, owner Moon/cloud light, Dogkie identity and equipment/combat polish retained",
+  "owner_corrections": {
+   "schema": "M7_HALO_REPAIR_PLAY_V1",
+   "buildings": [
+    {
+     "id": "temple",
+     "scale": 32.885064,
+     "baseline_scale": 54.80844,
+     "correction_factor": 0.6,
+     "runtime": "lab/assets/buildings/fidelity_m5c/TEMPLE_M5C_L0.glb",
+     "runtime_triangles": 799999,
+     "lod_runtime": "lab/assets/buildings/fidelity_m5c/TEMPLE_M5C_L1.glb",
+     "lod_runtime_triangles": 266419,
+     "lod_switch_m": 90,
+     "portals": [
+      {
+       "id": "TEMPLE_DOOR",
+       "world": [
+        0,
+        165.55
+       ],
+       "outward": [
+        0,
+        -1
+       ]
+      }
+     ]
+    },
+    {
+     "id": "tower",
+     "scale": 29.36148,
+     "baseline_scale": 48.9358,
+     "correction_factor": 0.6,
+     "runtime": "lab/assets/buildings/fidelity_m5c/TOWER_M5C_L0.glb",
+     "runtime_triangles": 800000,
+     "lod_runtime": "lab/assets/buildings/fidelity_m5c/TOWER_M5C_L1.glb",
+     "lod_runtime_triangles": 254126,
+     "lod_switch_m": 90,
+     "portals": [
+      {
+       "id": "TOWER_DOOR",
+       "world": [
+        102.65,
+        110
+       ],
+       "outward": [
+        -1,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "id": "market",
+     "scale": 26.180346,
+     "baseline_scale": 43.63391,
+     "correction_factor": 0.6,
+     "runtime": "lab/assets/buildings/fidelity_m5c/MARKET_M5C_L0.glb",
+     "runtime_triangles": 800000,
+     "lod_runtime": "lab/assets/buildings/fidelity_m5c/MARKET_M5C_L1.glb",
+     "lod_runtime_triangles": 202680,
+     "lod_switch_m": 90,
+     "portals": [
+      {
+       "id": "CLOTHING_DOOR",
+       "world": [
+        -2.2,
+        251.25
+       ],
+       "outward": [
+        0,
+        -1
+       ]
+      },
+      {
+       "id": "WEAPON_DOOR",
+       "world": [
+        2.2,
+        251.25
+       ],
+       "outward": [
+        0,
+        -1
+       ]
+      }
+     ]
+    }
+   ],
+   "moon": {
+    "derivative": "MAHWORLD_OVERSIZED_MOON",
+    "source": "MAHWORLD_OVERSIZED_MOON_SOURCE",
+    "runtime": "lab/assets/world/moon/MAHWORLD_OVERSIZED_MOON_L0.glb",
+    "runtime_sha256": "b7ad1e4897ef26961133b09894583c709e27cf6edebfe4a7811ad7bdbfbf415c",
+    "source_sha256": "6d5499f9654d00f3533170848dfe18fb991237d1ed87e5eb0a6cfb785701eb8c",
+    "distance_m": 900,
+    "apparent_deg": 6.2
+   },
+   "tree_lod_color_continuity": true,
+   "road_topology_owner": "lab/world/roadNetwork.js",
+   "horizon_owner": "lab/world/macro.js + lab/farWorld.js (legacy district ridge suppressed)",
+   "tree_ascent": {
+    "name": "MAH NEXUS / ASCENT / HALO",
+    "contract": "M7_HALO_SCALE_ACCESS_V1",
+    "baseline_arrival_m": 24,
+    "arrival_scale": 10,
+    "platform_m": 240,
+    "shell_radius_m": 147.6,
+    "shell_diameter_m": 295.2,
+    "structural_deck_radius_m": 153,
+    "playable_radius_m": 144.8,
+    "dome_apex_m": 387.6,
+    "lift_duration_s": 20,
+    "boarding_s": 1,
+    "elevator_only": true,
+    "carrier_owner": "PlayMode TRANSIT single carrier/rider pose",
+    "visible_floor_owner": "HALO_DECK_SINGLE_TOP",
+    "flight_mahgic_drain": 0
+   },
+   "halo_sports": {
+    "modes": [
+     "VOLLEY",
+     "PRACTICE"
+    ],
+    "first_to": 7,
+    "practice_serves": 5,
+    "host_owner": "play/HaloSport.js",
+    "replay": true,
+    "safe_exit": true,
+    "rewards": false
+   },
+   "collision_shapes": {
+    "district": 792,
+    "world": 9457
+   }
+  },
+  "world_registry_sha256": "34f44e108a910a5ba358d1360387b3550189302b0c50be96b115408578b2f1b2",
+  "world_counts": {
+   "sanctuaries": 5,
+   "paths": 31,
+   "bridge_links": 3,
+   "buildings": 14,
+   "dogkie_pool": 54
+  },
+  "files": 182,
+  "bytes": 217232752,
+  "mode": "static site, in-page authority, memory store",
+  "commit": "3710e4588a7f853c84a1a376eee7d08fdabc0454",
+  "pass": "ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924",
+  "package_stamp": "2026-09-25T02:21:40.189Z",
+  "worktree_clean": false
+ },
+ "zip": {
+  "path": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\packages\\ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924.zip",
+  "bytes": 122993039,
+  "sha256": "a63114487c19a053dfb74c18cd4fc6f453424f7f805d73b895f1a887a90ed1aa",
+  "entries": 183,
+  "fresh_folder": "C:\\Users\\jahsu\\Downloads\\MAHWORLD_CHARACTERS\\CLAUDE_GAMEPLAY_RUNTIME\\26_LOCAL_AUTHORITY\\deploy\\packages\\fresh_ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924_JmVdeO"
+ },
+ "finished": "2026-09-25T02:22:46.606Z",
+ "complete": true
+}

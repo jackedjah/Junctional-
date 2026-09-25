@@ -1,4 +1,12 @@
-# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-25 (HALO repair/play active)
+# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-25 (HALO repair/play delivered)
+
+## HALO repair-and-play — protected candidate delivered
+- New protected, unpublished draft: `https://6ab5db39db052ab31c510699--mahworld-test-preview.netlify.app`; deploy ID `6ab5db39db052ab31c510699`; visible build `ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924`. Netlify reports `ready`, `deploy-preview`, `published_at = null`.
+- Release source is the remotely verified recovery-branch commit `3710e4588a7f853c84a1a376eee7d08fdabc0454`. The established branch remains `backup/mahworld-m6-20260924T190351Z`; no default/production branch was rewritten.
+- Release gate passed 58 programs / 1,542 checks / 0 failures, 106-file JavaScript syntax, CSS/protected-boundary/183-file secret scans, exact 183-file fresh extraction, extracted syntax and smoke `7/7`. Package: 122,993,039 bytes, SHA-256 `a63114487c19a053dfb74c18cd4fc6f453424f7f805d73b895f1a887a90ed1aa`.
+- Protection is verified without exposing credentials: the play route and a private script return `401` behind the edge gate. Authenticated hosted gameplay was not run because `MAHDEMO_PW` is unavailable; local current-runtime motion/visual evidence is the acceptance basis for this desktop release gate.
+- Production remains deploy `6aac25101f17ce5ed37166e4`; previous HALO preview `6ab5c2451611040beb1093d8` remains `ready`, unpublished and unchanged. Exact release record: `halo_repair_and_play/private_candidate_release.json`.
+- **Next exact action:** owner physical-phone review of this candidate. Do not promote production or expand the job without a new explicit instruction.
 
 ## HALO repair-and-play continuation — source-preservation checkpoint
 - The owner-authorized continuation is active from verified recovery tip `3eee0bfc3a08398d56f4658cd5dc0179e2bb0487`; the M7 enlarged-dome contract and elevator-only access remain fixed.

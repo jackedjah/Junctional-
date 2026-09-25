@@ -1,5 +1,14 @@
 # MAHWORLD Astra takeover state
 
+## Current HALO repair-and-play candidate — owner review pending
+
+- Protected immutable draft `6ab5db39db052ab31c510699`: `https://6ab5db39db052ab31c510699--mahworld-test-preview.netlify.app`; visible build `ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924`; state `ready`, context `deploy-preview`, `published_at = null`.
+- Exact recovery-branch source checkpoint: `3710e4588a7f853c84a1a376eee7d08fdabc0454`. Package SHA-256 `a63114487c19a053dfb74c18cd4fc6f453424f7f805d73b895f1a887a90ed1aa`; 183 entries / 122,993,039 bytes.
+- Required release gates passed: 58 programs / 1,542 checks, 106 JavaScript files, CSS/security/boundary scans, exact fresh extraction and extracted smoke `7/7`.
+- The repaired cabin carried the rendered player and held barbell at zero host/rendered relative drift; the one-owner HALO floor stayed stable in NIGHT/DAY motion; a real-input first-to-seven bot match, replay, five-serve target practice and safe exit completed; the bounded mainland fish silhouette repair is visible and post-return barbell/resource authority passed.
+- Production remains `6aac25101f17ce5ed37166e4`; prior HALO preview `6ab5c2451611040beb1093d8` remains ready/unpublished. Protection returns `401` for play and private assets. Authenticated hosted gameplay was not run because `MAHDEMO_PW` is unavailable.
+- Remaining acceptance: owner physical-phone review. Stop here; no production promotion, password removal, feature expansion or unrelated lane work.
+
 ## Active M7 HALO scale/access addendum
 
 - Exact owner addendum: `25_HANDOFF/M7/MAHWORLD_M7_HALO_SCALE_AND_ELEVATOR_ONLY.md`.

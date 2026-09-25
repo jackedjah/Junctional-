@@ -19,10 +19,13 @@
 - Sports motion: one 29.03-second current-runtime clip driven by real keyboard events; seven rally results include a deliberate sideline `OUT` and a real player return contact, then `BOT_WON 0–7`; replay reset to `0–0`; target practice completed `5/5`; safe exit left `sport=null` in `HALO`; zero unexpected console errors.
 - Mainland presentation: the Titan Lake view shows the new finned fish school; the linked host gate above proves the resource interaction at the authored newcomer patch rather than treating a decorative screenshot as proof.
 
-## Pending gates
+## Release outcome
 
-- Established candidate release/security/package/fresh-extraction gates once, then one new protected unpublished preview.
-- Hosted authenticated gameplay only if permitted credentials are available. Physical-phone acceptance remains owner-only.
+- Source checkpoint `3710e4588a7f853c84a1a376eee7d08fdabc0454` is verified on `backup/mahworld-m6-20260924T190351Z`.
+- The established candidate pipeline passed 58 programs / 1,542 checks / 0 failures, 106-file JavaScript syntax, CSS/protected-boundary/183-file secret scans, exact 183-file fresh extraction, extracted syntax and smoke `7/7`.
+- Package `ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924.zip`: 122,993,039 bytes; SHA-256 `a63114487c19a053dfb74c18cd4fc6f453424f7f805d73b895f1a887a90ed1aa`.
+- New protected unpublished preview: deploy `6ab5db39db052ab31c510699`, `https://6ab5db39db052ab31c510699--mahworld-test-preview.netlify.app`, state `ready`, context `deploy-preview`, `published_at = null`.
+- Production `6aac25101f17ce5ed37166e4` and previous HALO preview `6ab5c2451611040beb1093d8` remain unchanged. Play and a private JavaScript route return `401`; authenticated hosted gameplay was not run because `MAHDEMO_PW` is unavailable. Physical-phone acceptance remains owner-only.
 
 ## Deliberately not claimed
 
