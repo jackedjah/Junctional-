@@ -6,7 +6,7 @@
    one hemisphere, an environment map for specular, emissive trims for local light (no per-lamp point lights). */
 import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { defaultTextureCap } from './texCap.js'; import { applySurface } from './world/surfaceDetail.js';
+import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal } from './world/surfaceDetail.js';
 export function createCityScene(THREE, group, helpers) {
   var roundedBox = helpers.roundedBox, canvasTex = helpers.canvasTex; var DAY = helpers.night === false;
   var M = {
@@ -26,7 +26,7 @@ export function createCityScene(THREE, group, helpers) {
   };
   /* M8 MATERIAL REALISM: the civic families get world-space structural surface logic (lab/world/surfaceDetail.js) — facade panel grid with
      inset seams and a trim band per 3.6 m storey, brushed chrome, panelled graphite structure, stone grain. Value / roughness only (no hue). */
-  var SDT = helpers.surfaceTier || 'HIGH'; applySurface(THREE, M.platinum, 'FACADE', SDT); applySurface(THREE, M.chrome, 'BRUSHED', SDT); applySurface(THREE, M.dark, 'STRUCTURE', SDT); applySurface(THREE, M.stone, 'STONE', SDT); applySurface(THREE, M.glass, 'GLAZING', SDT);
+  var SDT = helpers.surfaceTier || 'HIGH'; applySurface(THREE, M.platinum, 'FACADE', SDT); applySurface(THREE, M.chrome, 'BRUSHED', SDT); applySurface(THREE, M.dark, 'STRUCTURE', SDT); applySurface(THREE, M.stone, 'STONE', SDT); applySurface(THREE, M.glass, 'GLAZING', SDT); applyCrystal(THREE, M.diamond, { tier: SDT });   /* M8C: roof / entrance diamonds are cut crystal (facets, depth, grazing rim) */
   function nameSprite(text) { var tex = canvasTex(512, 96, function (g, w, h) { g.clearRect(0, 0, w, h); g.font = '600 46px "Segoe UI", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#f3e6c8'; g.shadowBlur = 18; g.fillStyle = '#f7f9ff'; g.fillText(text.toUpperCase(), w / 2, h / 2); }); var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false })); sp.scale.set(7.5, 1.4, 1); return sp; }
   function tier(cx, cz, w, d, y0, h, r, mat) { var m = new THREE.Mesh(roundedBox(w, h, d, r), mat); m.position.set(cx, y0, cz); return m; }   /* roundedBox is extruded from y0 upward (see fieldScene.roundedBox) */
   function band(cx, cz, w, d, y, h, r) { var b = new THREE.Mesh(roundedBox(w + 0.12, h, d + 0.12, r), M.glass); b.position.set(cx, y, cz); return b; }
@@ -42,13 +42,37 @@ export function createCityScene(THREE, group, helpers) {
     if (B.entrance) { var e = B.entrance, horiz = e.side === '+z' || e.side === '-z', sx = e.side === '+x' ? 1 : e.side === '-x' ? -1 : 0, sz = e.side === '+z' ? 1 : e.side === '-z' ? -1 : 0, cy = e.height + 0.35, ow = e.width * 1.9, od = 2.3;
       stoneParts.push(rb(horiz ? ow : od, 0.22, horiz ? od : ow, 0.08, e.x + sx * (od / 2 - 0.2), cy, e.z + sz * (od / 2 - 0.2)));
       trimParts.push(rb(horiz ? ow - 0.3 : 0.1, 0.04, horiz ? 0.1 : ow - 0.3, 0.02, e.x + sx * (od - 0.35), cy - 0.03, e.z + sz * (od - 0.35))); }
+    /* M8C CONSTRUCTION LANGUAGE (base / shaft / crown): graphite structural PIERS close every straight wall run (where the rounded corner
+       begins), standing on the first-floor cornice (≥ 3.6 m) on the ground tier and on the tier ledge above it; a deep EAVE FASCIA under
+       each tier's light reveal (the roofline has thickness); a louvred SERVICE BAY on the top storey's rear face (the plant needs air); a
+       glazed TRANSOM over the entrance canopy with tension rods carrying the canopy back to the wall. Everything is ≥ 3.4 m above the
+       ground (the host collider keeps the wall face), merged per material: +2 draws per building. */
+    var frameParts = [], glazeParts = []; function bx(W, H, D, x, y, z) { var q = new THREE.BoxGeometry(W, H, D); q.translate(x, y + H / 2, z); return q; }   /* exact (unbevelled) box, base at y */
+    for (var t3 = 0; t3 < tiers; t3++) { var k3 = 1 - t3 * 0.09, w3 = w * k3, d3 = d * k3, r3 = Math.min(w3, d3) * 0.24, y3 = t3 * hEach, pb = t3 ? y3 + 0.08 : 3.6, pt = y3 + hEach - 0.42;
+      if (pt - pb > 1.2) [-1, 1].forEach(function (a) { [-1, 1].forEach(function (b) {
+        frameParts.push(rb(0.16, pt - pb, 0.2, 0.04, cx + a * (w3 / 2 - r3), pb, cz + b * (d3 / 2 + 0.05)));
+        frameParts.push(rb(0.2, pt - pb, 0.16, 0.04, cx + b * (w3 / 2 + 0.05), pb, cz + a * (d3 / 2 - r3))); }); });
+      if (y3 + hEach - 0.4 >= 3.4) chromeParts.push(rb(w3 + 0.44, 0.24, d3 + 0.44, r3 + 0.22, cx, y3 + hEach - 0.4, cz)); }
+    var kT = 1 - (tiers - 1) * 0.09, wT = w * kT, dT = d * kT, rT = Math.min(wT, dT) * 0.24, yT = (tiers - 1) * hEach, es = B.entrance ? B.entrance.side : '+z';
+    var rear = { '+x': '-x', '-x': '+x', '+z': '-z', '-z': '+z' }[es] || '-z', rx = rear === '+x' ? 1 : rear === '-x' ? -1 : 0, rz = rear === '+z' ? 1 : rear === '-z' ? -1 : 0;
+    var run = (rz ? wT : dT) - 2 * rT, LW = Math.min(4.2, run * 0.5), LH = 1.5, ly = yT + hEach * 0.74 - LH / 2, fx = cx + rx * (wT / 2), fz = cz + rz * (dT / 2);
+    if (run > 2.4 && ly >= 3.4 && ly + LH < yT + hEach - 0.5) {
+      frameParts.push(bx(rz ? LW + 0.24 : 0.12, LH + 0.24, rz ? 0.12 : LW + 0.24, fx + rx * 0.04, ly - 0.12, fz + rz * 0.04));   /* the louvre frame */
+      for (var sl = 0; sl < 7; sl++) { var slat = new THREE.BoxGeometry(rz ? LW : 0.2, 0.04, rz ? 0.2 : LW); if (rz) slat.rotateX(-rz * 0.55); else slat.rotateZ(rx * 0.55); slat.translate(fx + rx * 0.14, ly + 0.14 + sl * (LH - 0.2) / 6, fz + rz * 0.14); chromeParts.push(slat); } }
+    if (B.entrance) { var en = B.entrance, hz = en.side === '+z' || en.side === '-z', ex = en.side === '+x' ? 1 : en.side === '-x' ? -1 : 0, ez = en.side === '+z' ? 1 : en.side === '-z' ? -1 : 0, cY = en.height + 0.35, oW = en.width * 1.9, oD = 2.3;
+      if (cY + 1.9 < hEach - 0.5) { var TW = en.width * 1.25, TH = 1.3, ty = cY + 0.42;
+        glazeParts.push(bx(hz ? TW : 0.04, TH, hz ? 0.04 : TW, en.x + ex * 0.06, ty, en.z + ez * 0.06));
+        [[0, -0.07, TW + 0.14], [TH, 0, TW + 0.14]].forEach(function (m) { frameParts.push(bx(hz ? m[2] : 0.12, 0.07, hz ? 0.12 : m[2], en.x + ex * 0.08, ty + m[0] + m[1], en.z + ez * 0.08)); });
+        [-0.5, -1 / 6, 1 / 6, 0.5].forEach(function (u) { frameParts.push(bx(hz ? 0.07 : 0.12, TH, hz ? 0.12 : 0.07, en.x + (hz ? u * TW : ex * 0.08), ty, en.z + (hz ? ez * 0.08 : u * TW))); }); }
+      var aY = Math.min(cY + 2.4, hEach - 0.5); if (aY > cY + 0.9) [-1, 1].forEach(function (sg) { var lat = sg * oW * 0.42, p0 = new THREE.Vector3(en.x + ex * (oD - 0.3) + (hz ? lat : 0), cY + 0.2, en.z + ez * (oD - 0.3) + (hz ? 0 : lat)), p1 = new THREE.Vector3(en.x + ex * 0.08 + (hz ? lat : 0), aY, en.z + ez * 0.08 + (hz ? 0 : lat));
+        var dir = p1.clone().sub(p0), rod = new THREE.CylinderGeometry(0.035, 0.035, dir.length(), 6); rod.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize())); rod.translate((p0.x + p1.x) / 2, (p0.y + p1.y) / 2, (p0.z + p1.z) / 2); chromeParts.push(rod); }); }
     var k2 = 1 - tiers * 0.09, rw = w * k2 * 0.62, rd = d * k2 * 0.62, ry = topY + 0.5;   /* roof plant on the cap */
     for (var u = 0; u < 3; u++) stoneParts.push(rb(rw * 0.22, 0.9, rd * 0.18, 0.1, cx - rw * 0.3 + u * rw * 0.3, ry, cz - rd * 0.28));
     var tank = new THREE.CylinderGeometry(Math.min(rw, rd) * 0.12, Math.min(rw, rd) * 0.12, 1.6, 20); tank.translate(cx + rw * 0.28, ry + 0.8, cz + rd * 0.22); chromeParts.push(tank);
     var mast = new THREE.CylinderGeometry(0.05, 0.08, 4.2, 6); mast.translate(cx - rw * 0.32, ry + 2.1, cz + rd * 0.26); chromeParts.push(mast);
     var tip = new THREE.OctahedronGeometry(0.2, 0); tip.translate(cx - rw * 0.32, ry + 4.3, cz + rd * 0.26); trimParts.push(tip);
     for (var pnl = 0; pnl < 2; pnl++) { var pg = roundedBox(rw * 0.28, 0.06, rd * 0.34, 0.02); pg.rotateX(-0.35); pg.translate(cx - rw * 0.02 + pnl * rw * 0.3, ry + 0.55, cz + rd * 0.18); stoneParts.push(pg); }
-    [[stoneParts, M.stone, 'PREMIUM_STONE'], [chromeParts, M.chrome, 'PREMIUM_CHROME'], [trimParts, M.trim, 'PREMIUM_LIGHT']].forEach(function (P) { if (!P[0].length) return; var mg = mergeGeometries(P[0].map(function (q) { return q.index ? q.toNonIndexed() : q; }), false); P[0].forEach(function (q) { q.dispose(); }); if (!mg) return; var mesh = new THREE.Mesh(mg, P[1]); mesh.name = (g.name || 'BUILDING') + '_' + P[2]; g.add(mesh); });
+    [[stoneParts, M.stone, 'PREMIUM_STONE'], [chromeParts, M.chrome, 'PREMIUM_CHROME'], [trimParts, M.trim, 'PREMIUM_LIGHT'], [frameParts, M.dark, 'PREMIUM_FRAME'], [glazeParts, M.glass, 'PREMIUM_GLAZE']].forEach(function (P) { if (!P[0].length) return; var mg = mergeGeometries(P[0].map(function (q) { return q.index ? q.toNonIndexed() : q; }), false); P[0].forEach(function (q) { q.dispose(); }); if (!mg) return; var mesh = new THREE.Mesh(mg, P[1]); mesh.name = (g.name || 'BUILDING') + '_' + P[2]; g.add(mesh); });
   }
   function diamond(x, y, z, s) { var o = new THREE.Mesh(new THREE.OctahedronGeometry(s, 0), M.diamond); o.position.set(x, y, z); o.scale.set(1, 1.6, 1); return o; }
   function entrance(bx, bz, e) {   /* e: {side:'+x'|'-x'|'+z'|'-z', x, z, width, height}: a curved recessed opening on that face, a light arch, a landing strip */
@@ -83,10 +107,13 @@ export function createCityScene(THREE, group, helpers) {
       /* MOTION PRECISION PASS I — façade depth: vertical chrome fins along each tier's long faces (instanced), a recessed dark window strip
          behind the glass band, a light ledge at every tier base, round portholes on the upper tiers — authored, restrained, coherent */
       if (!B.dome) { var finCount = 0; var faces = []; var yy = 0; for (var t2 = 0; t2 < tiers; t2++) { var kk = 1 - t2 * 0.09; faces.push({ y: yy, h: hEach, w: w * kk, d: d * kk }); yy += hEach; }
-        var finsPer = faces.reduce(function (a, f) { return a + 2 * (Math.floor(f.w / 1.6) + Math.floor(f.d / 1.6)); }, 0); var fins = new THREE.InstancedMesh(new THREE.BoxGeometry(0.16, 1, 0.34), M.chrome, Math.max(1, finsPer)); var fm = new THREE.Matrix4(), fq = new THREE.Quaternion(), fv = new THREE.Vector3(), fs = new THREE.Vector3();
-        faces.forEach(function (f) { var fh = f.h * 0.78; var nx = Math.floor(f.w / 1.6), nz = Math.floor(f.d / 1.6);
-          for (var i2 = 0; i2 < nx; i2++) { var px = cx - f.w / 2 + (i2 + 0.5) * (f.w / nx); [-1, 1].forEach(function (sg) { fq.identity(); fm.compose(fv.set(px, f.y + f.h * 0.5, cz + sg * (f.d / 2 + 0.08)), fq, fs.set(1, fh, 1)); if (finCount < fins.count) fins.setMatrixAt(finCount++, fm); }); }
-          for (var j2 = 0; j2 < nz; j2++) { var pz = cz - f.d / 2 + (j2 + 0.5) * (f.d / nz); [-1, 1].forEach(function (sg) { fq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2); fm.compose(fv.set(cx + sg * (f.w / 2 + 0.08), f.y + f.h * 0.5, pz), fq, fs.set(1, fh, 1)); if (finCount < fins.count) fins.setMatrixAt(finCount++, fm); }); }
+        /* M8C CONSTRUCTION: fins stand on the STRAIGHT runs only (they used to continue into the rounded corners and float up to 0.7 m off the
+           curved wall); each run ends in a structural pier (premiumDress) */
+        function runOf(L, f) { return Math.max(0, L - 2 * Math.min(f.w, f.d) * 0.24); }
+        var finsPer = faces.reduce(function (a, f) { return a + 2 * (Math.floor(runOf(f.w, f) / 1.6) + Math.floor(runOf(f.d, f) / 1.6)); }, 0); var fins = new THREE.InstancedMesh(new THREE.BoxGeometry(0.16, 1, 0.34), M.chrome, Math.max(1, finsPer)); var fm = new THREE.Matrix4(), fq = new THREE.Quaternion(), fv = new THREE.Vector3(), fs = new THREE.Vector3();
+        faces.forEach(function (f) { var fh = f.h * 0.78; var Lx = runOf(f.w, f), Lz = runOf(f.d, f); var nx = Math.floor(Lx / 1.6), nz = Math.floor(Lz / 1.6);
+          for (var i2 = 0; i2 < nx; i2++) { var px = cx - Lx / 2 + (i2 + 0.5) * (Lx / nx); [-1, 1].forEach(function (sg) { fq.identity(); fm.compose(fv.set(px, f.y + f.h * 0.5, cz + sg * (f.d / 2 + 0.08)), fq, fs.set(1, fh, 1)); if (finCount < fins.count) fins.setMatrixAt(finCount++, fm); }); }
+          for (var j2 = 0; j2 < nz; j2++) { var pz = cz - Lz / 2 + (j2 + 0.5) * (Lz / nz); [-1, 1].forEach(function (sg) { fq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2); fm.compose(fv.set(cx + sg * (f.w / 2 + 0.08), f.y + f.h * 0.5, pz), fq, fs.set(1, fh, 1)); if (finCount < fins.count) fins.setMatrixAt(finCount++, fm); }); }
           var ledge = new THREE.Mesh(roundedBox(f.w + 0.5, 0.06, f.d + 0.5, Math.min(f.w, f.d) * 0.24), M.trimWarm); ledge.position.set(cx, f.y + 0.02, cz); g.add(ledge);
           var inset = new THREE.Mesh(roundedBox(f.w + 0.02, 0.9, f.d + 0.02, Math.min(f.w, f.d) * 0.24), M.dark); inset.position.set(cx, f.y + f.h * (B.glass_band || 0.45) - 0.45, cz); g.add(inset); });
         fins.instanceMatrix.needsUpdate = true; if (helpers.fins !== false) g.add(fins);

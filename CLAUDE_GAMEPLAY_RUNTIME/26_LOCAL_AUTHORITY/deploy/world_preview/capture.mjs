@@ -36,7 +36,10 @@ export var VIEWS = [
   ['V22', 'Moon from the plaza', [0, 4, 20], [-32, 40, -80]],
   ['V23', 'plaza hub paving from above', [14, 9, -20], [0, 0, 0]],
   ['V24', 'TITAN district paving close', [150, 1.8, 80], [160, 0, 95]],
-  ['V25', 'ATHLETE district paving close', [-30, 1.8, 146], [-30, 0, 162]]
+  ['V25', 'ATHLETE district paving close', [-30, 1.8, 146], [-30, 0, 162]],
+  ['V26', 'canal bank and water edge close', [20, 2.2, 204], [40, 0, 226]],
+  ['V27', 'ridge face close from the TITAN ledge', [166, 14, 130], [230, 40, 150]],
+  ['V28', 'civic roofline, piers and service bay (Mentor Spire rear)', [46, 11, -12], [29, 16, 0]]
 ];
 
 function mime(p) { return ({ '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css', '.bin': 'application/octet-stream', '.ktx2': 'image/ktx2' })[path.extname(p).toLowerCase()] || 'application/octet-stream'; }

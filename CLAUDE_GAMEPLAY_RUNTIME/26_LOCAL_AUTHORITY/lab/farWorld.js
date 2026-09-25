@@ -1,3 +1,4 @@
+import { applyGeology } from './world/surfaceDetail.js';
 /* MAHWORLD :: FAR WORLD (convergence PASS 2b — sky / far-background scale illusion, owner addendum 2026-09-17)
    Three readable depth layers around the playable district, in the MAHWORLD language (platinum, crystal, diamond-family prisms, cool sky):
      · MID  (230–330 m from the plaza, the empty southern / lateral sectors only): a few elevated crystal walkway arcs between low platforms and
@@ -53,7 +54,7 @@ export function createFarWorld(THREE, opts) {
     for (var j = 0; j < pieces; j++) { var h = j === 0 ? main : main * (0.35 + rnd() * 0.45); var r = h * (0.42 + rnd() * 0.22); var ox = (rnd() - 0.5) * 120, oz = (rnd() - 0.5) * 120; rockPeak(cx + ox, cz + oz, r, h, rnd() * 3, 0.78 + rnd() * 0.5, mix, k * 13 + j * 3.7); }
     if (k % 7 === 3) { var sh = 190 + rnd() * 70; pushGeo(far, new THREE.ConeGeometry(14 + rnd() * 8, sh, 6), place(cx, sh / 2 - 6, cz, rnd() * 3, 1, 1, 1), pmap(capCol, function (c, i) { return c.lerp(pHaze[i], 0.35 + mix * 0.5); }), true);   /* a world-scale spire: a platinum monument on the horizon */ pushGeo(far, new THREE.OctahedronGeometry(18, 0), place(cx, sh - 2, cz, rnd() * 3, 1, 1.9, 1), pmap(capCol, function (c, i) { return c.lerp(pHaze[i], mix * 0.6); }), true); }
   }
-  var farMat = new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, toneMapped: false }); var farMesh = finish(far, farMat); farMesh.name = 'FAR_MASSIFS'; farMesh.renderOrder = -5; group.add(farMesh);
+  var farMat = new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, toneMapped: false }); applyGeology(THREE, farMat, { lit: false, strata: 11, joint: 16, ledge: 0.2, fracture: 0.35, cleft: 0.9, macro: 0.1, grain: 0, bump: 0, lod: [500, 2500] });   /* M8C: the same geology as value only — the baked facets gain strata, joints and clefts */ var farMesh = finish(far, farMat); farMesh.name = 'FAR_MASSIFS'; farMesh.renderOrder = -5; group.add(farMesh);
   /* ---------- MID: elevated crystal walkway arcs + prism towers in the empty sectors (lit, fogged naturally) ---------- */
   var mid = { pos: [], colD: [], colN: [], nrm: [] }; var sectors = [Math.PI * 0.62, Math.PI * 0.85, Math.PI * 1.05, Math.PI * 1.28, Math.PI * 1.5, Math.PI * 1.72];   /* bearings (atan2 x,z): the north half holds the temple / market / gym / tower — mid forms stay south, east and west */
   var midPlat = pair('midPlat'), midCrystal = pair('midCrystal');   /* B7 §10 F: the mid forms a step darker than the far ring — three readable depth steps */

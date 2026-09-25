@@ -151,21 +151,119 @@ export function zonedPaving(THREE, mat, Z, spec) {
     'float zSoftRect = 0.0; for (int i = 0; i < 8; i++) { vec4 Sr = uZS[i]; if (Sr.z > Sr.x) { float se = min(min(zp.x - Sr.x, Sr.z - zp.x), min(zp.y - Sr.y, Sr.w - zp.y)); zSoftRect = max(zSoftRect, smoothstep(0.0, 10.0, se)); } }',
     'float zSoft = max(zSoftBase, zSoftRect * 0.85); float zN = sdNoise(zp * 0.07) * 0.7 + sdNoise(zp * 0.23) * 0.3; zPatch = zSoft * smoothstep(0.42, 0.7, zN) * (1.0 - zBand);',
     'sdSeam *= 1.0 - 0.9 * zPatch; sdTone *= 1.0 - 0.08 * zPatch; sdRough *= 1.0 + 0.25 * zPatch;',
+    /* M8C NATURAL GROUND: inside forest / garden zones and the ecology-leaning districts the paving DISSOLVES — tiles drop out one by one
+       along a noisy boundary (a sunken gap edge where each one is missing) until the ground is grown: dark loam with clods, pebbles and a
+       sparse crystal grit (the region tint colours it), fully matte, lit through its own bump. Hardscape stays constructed; nature stays grown. */
+    'float zNat0 = zSoftRect * 1.05 + (zSoftBase - 0.2) * 0.6 * step(0.3, zSoftBase); float zNat = clamp(zNat0 + (geoFbm(zp * 0.045) - 0.5) * 0.9 * smoothstep(0.03, 0.3, zNat0), 0.0, 1.0) * (1.0 - zBand);',   /* the noise only shapes the edge of a natural zone: plain hardscape never loses slabs */
+    'float zGone = step(sdH2, zNat * 1.2 - 0.12); float zNatK = max(zGone, smoothstep(0.82, 0.97, zNat));',
+    'float zGH = geoFbm(zp * 0.42) * 0.6 + geoN(zp * 2.6) * 0.3 + step(0.93, sdHash(floor(zp * 2.2))) * 0.35; float zGrit = step(0.994, sdHash(floor(zp * 7.0) + 3.3)) * zNatK;',
+    'float zGap = zGone * (1.0 - smoothstep(0.0, 0.12, sdD)) * (1.0 - smoothstep(0.82, 0.97, zNat));',   /* the broken edge of the paving around a missing tile */
+    'sdSeam = mix(sdSeam, 0.0, zNatK); sdTone = mix(sdTone, (0.46 + 0.2 * zGH) * (1.0 + zGrit * 1.4), zNatK) * (1.0 - zGap * 0.45); sdRough = mix(sdRough, 1.35 * (1.0 - zGrit * 0.6), zNatK);',
     'float sdMacro = sdNoise(zp * 0.045) - 0.5; sdTone *= 1.0 + sdMacro * ' + f(S.macro * 2) + '; sdRough *= 1.0 + sdMacro * ' + f(S.macro * 3) + ';',
     'float sdGrain = sdNoise(zp * 7.3) * 0.6 + sdNoise(zp * 23.0) * 0.4 - 0.5; sdTone *= 1.0 + sdGrain * ' + f(S.grain) + ' * sdNear; sdRough *= 1.0 + sdGrain * ' + f(S.grain * 2.2) + ' * sdNear;');
   body.push('diffuseColor.rgb *= sdTone * mix(1.0, ' + f(S.seamDark) + ', sdSeam);');
   var rough = ['#include <roughnessmap_fragment>', 'roughnessFactor = clamp(mix(roughnessFactor * sdRough, max(roughnessFactor, 0.86), sdSeam), 0.04, 1.0);'];
-  var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor *= 1.0 - 0.6 * sdSeam;'];
+  var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor *= 1.0 - 0.6 * sdSeam;' + (LOW ? '' : ' metalnessFactor = mix(metalnessFactor, 0.02, zNatK);')];
   var nrm = ['#include <normal_fragment_maps>'];
-  if (!LOW && S.bevel > 0) nrm.push('{ vec2 bd = zp - sdCC; float bl = length(bd); if (bl > 1e-4) { float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, ' + f(Math.max(S.seam * 2.5, 0.06)) + ', sdD)) * sdNear * (1.0 - zPatch) * (1.0 - 0.6 * zBand); normal = normalize(normal + sdK * normalize((viewMatrix * vec4(bd.x / bl, 0.0, bd.y / bl, 0.0)).xyz)); } }');
-  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-zoned-' + [S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.lod.join('x'), S.band, LOW ? 'L' : 'H'].join('_');
+  if (!LOW) nrm.push('if (zNatK > 0.01) normal = normalize(mix(normal, geoBump(-vViewPosition, normal, (zGH * 0.5 - zGap * 0.2) * sdNear), zNatK));');
+  if (!LOW && S.bevel > 0) nrm.push('{ vec2 bd = zp - sdCC; float bl = length(bd); if (bl > 1e-4) { float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, ' + f(Math.max(S.seam * 2.5, 0.06)) + ', sdD)) * sdNear * (1.0 - zPatch) * (1.0 - 0.6 * zBand) * (1.0 - zNatK); normal = normalize(normal + sdK * normalize((viewMatrix * vec4(bd.x / bl, 0.0, bd.y / bl, 0.0)).xyz)); } }');
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-zoned-m8c-' + [S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.lod.join('x'), S.band, LOW ? 'L' : 'H'].join('_');
   mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
     sh.uniforms.uZR = { value: Z.rects }; sh.uniforms.uZRT = { value: Z.rtype }; sh.uniforms.uZRS = { value: Z.rsoft }; sh.uniforms.uZC = { value: Z.circles }; sh.uniforms.uZCS = { value: Z.csoft }; sh.uniforms.uZS = { value: Z.soft }; sh.uniforms.uZDefSoft = Z.defSoft;
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW; varying vec3 vSdN;').replace('#include <project_vertex>', ['#include <project_vertex>',
       '{ vec4 sdP = vec4(transformed, 1.0); vec3 sdN0 = objectNormal;', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP; sdN0 = mat3(instanceMatrix) * sdN0;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; vSdN = normalize(mat3(modelMatrix) * sdN0); }'].join('\n'));
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + ZONED_FUNCS).replace('#include <color_fragment>', body.join('\n'))
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + GEO_FUNCS + '\n' + ZONED_FUNCS).replace('#include <color_fragment>', body.join('\n'))
       .replace('#include <roughnessmap_fragment>', rough.join('\n')).replace('#include <metalnessmap_fragment>', metal.join('\n')).replace('#include <normal_fragment_maps>', nrm.join('\n')); };
   mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|' + key; };
   mat.userData.surfaceDetail = { kind: 'ZONED', key: key }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
+  return mat;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------
+   M8C GEOLOGY — the reusable rock material pipeline (ridges, cliffs, far massifs, rocky terrain). World-space, shader-only, so the
+   collision surface never moves (the ridge inner face IS the owner OP10 collision plane). One height field drives both value and light:
+     STRATA    irregular sedimentary bands (warped, variable thickness) with thin dark bedding lines and per-band tone / roughness;
+     LEDGES    some band boundaries become ledges: a lit lip above, a shadowed undercut below;
+     FRACTURES vertical joint network (Voronoi on the face plane, stretched vertically) — dark, rough, pinched into the surface;
+     CLEFTS    deep vertical gullies at the 30–60 m scale — the shadowed recesses that break a big face into buttresses;
+     MACRO / MICRO tonal variation at ~250 m and grain at 0.3–1 m;
+   lighting: the combined height is turned into a bumped normal through screen-space derivatives (no tangents, no textures), so every
+   ledge, joint and cleft catches the Sun; unlit variants (the far massifs) take the same field as value only. Value / roughness only. */
+var GEO_FUNCS = [
+  'float geoN(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(sdHash(i), sdHash(i + vec2(1.0, 0.0)), f.x), mix(sdHash(i + vec2(0.0, 1.0)), sdHash(i + vec2(1.0, 1.0)), f.x), f.y); }',
+  'float geoFbm(vec2 p) { return geoN(p) * 0.55 + geoN(p * 2.07 + 13.1) * 0.3 + geoN(p * 4.3 - 7.7) * 0.15; }',
+  'vec2 geoVor(vec2 p) { vec2 i = floor(p), f = fract(p); float d1 = 8.0, d2 = 8.0; for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 g = vec2(float(x), float(y)); vec2 o = vec2(sdHash(i + g), sdHash(i + g + 31.7)); float d = length(g + o - f); if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d; } return vec2(d1, d2); }',
+  'vec3 geoBump(vec3 sp, vec3 sn, float h) { vec3 sx = dFdx(sp), sy = dFdy(sp); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1); vec3 grad = sign(det) * (dFdx(h) * r1 + dFdy(h) * r2); return normalize(abs(det) * sn - grad); }'
+].join('\n');
+
+export function applyGeology(THREE, mat, spec) {
+  if (!mat || (PATCHED ? PATCHED.has(mat) : (mat.userData && mat.userData.surfaceDetail))) return mat;
+  var S = Object.assign({ snowY: 1e5, strata: 2.6, major: 0, ledge: 0.32, joint: 4.5, fracture: 1, cleft: 1, macro: 0.16, grain: 0.07, bump: 1, lit: true, tier: 'HIGH', lod: [60, 900], bumpLod: [40, 260] }, spec || {});
+  var LOW = S.tier === 'LOW', lit = S.lit && !!mat.isMeshStandardMaterial, MAJ = S.major || S.strata * 3.2;
+  /* v2 (M8C iteration 2): the first cut read as a crazed-glaze web (an isotropic Voronoi everywhere) with dotted "stitching" where thin ledge
+     lips went through the derivative bump. Rock now reads in three orders, each only where it can resolve: MAJOR BEDS (≈ 8 m: value zoning
+     and ledges — a lit lip above a ledge boundary, a shadowed undercut below it), MINOR BEDS (the bedding lines) with JOINTS that stop at the
+     bedding planes and step from bed to bed (blocky jointing), and sparse long near-vertical MASTER FRACTURES. Only smooth fields (ledges,
+     clefts, grain) enter the bump; the thin lines are value / roughness. */
+  var body = ['#include <color_fragment>',
+    'vec3 gAn = abs(normalize(cross(dFdx(vSdW), dFdy(vSdW)))); vec2 gUV = gAn.x > gAn.z ? vec2(vSdW.z, vSdW.y) : vec2(vSdW.x, vSdW.y);',   /* the face plane (from derivatives: works on flat-shaded and normal-less geometry): along-face horizontal × height */
+    'float gDist = length(cameraPosition - vSdW); float gNear = 1.0 - smoothstep(' + f(S.lod[0]) + ', ' + f(S.lod[1]) + ', gDist);',
+    'float gWarp = geoFbm(vSdW.xz * 0.012) * 7.0 + geoFbm(vec2(gUV.x * 0.03, vSdW.y * 0.01)) * 2.0;',
+    'float gYM = (vSdW.y + gWarp) / ' + f(MAJ) + '; float gBM = floor(gYM), gFM = fract(gYM); float gHM = sdHash(vec2(gBM, 7.3)); float gPx = max(fwidth(gYM) * ' + f(MAJ) + ', 1e-3);',   /* metres per pixel up the face */
+    'float gTop = (1.0 - gFM) * ' + f(MAJ) + ', gBot = gFM * ' + f(MAJ) + '; float gLk = clamp(0.9 / gPx, 0.0, 1.0);',
+    'float gLip = step(' + f(1 - S.ledge) + ', gHM) * (1.0 - smoothstep(0.0, 0.9, gBot)) * gLk;',   /* this bed juts out over a ledge boundary at its base: a rounded, lit lip */
+    'float gUnder = step(' + f(1 - S.ledge) + ', sdHash(vec2(gBM + 1.0, 7.3))) * (1.0 - smoothstep(0.0, 1.8, gTop)) * gLk;',   /* ... and the bed below it sits in the undercut shadow */
+    'float gYm = (vSdW.y + gWarp) / ' + f(S.strata) + '; float gBm = floor(gYm), gFm = fract(gYm); float gHm = sdHash(vec2(gBm, 2.9));',
+    'float gFw = fwidth(gYm); float gBedW = max(0.035, gFw * 1.5); float gBed = (1.0 - smoothstep(0.0, gBedW, min(gFm, 1.0 - gFm))) * clamp(0.035 / gBedW, 0.0, 1.0);',   /* footprint AA: a bedding line thinner than a pixel fades instead of aliasing */
+    'float gRw = max(0.15, gPx * 1.5); float gH = gLip * smoothstep(0.0, gRw, gBot) * 0.55 - gUnder * smoothstep(0.0, gRw, gTop) * 0.7;',   /* the height meets 0 at the ledge boundary (a hard step there made the derivative bump sparkle in dotted lines) */
+    'float gTone = 1.0 + (gHM - 0.5) * 0.26 + (gHm - 0.5) * 0.08 - gBed * 0.2 + gLip * 0.12 - gUnder * 0.36;',
+    'float gRough = 1.0 + (sdHash(vec2(gBm, 2.1)) - 0.5) * 0.2 - gLip * 0.08;'];
+  if (!LOW) body.push(
+    'float gJx = (gUV.x + (geoN(vec2(gUV.x * 0.15, gBm * 1.7)) - 0.5) * 2.2) / ' + f(S.joint) + ' + sdHash(vec2(gBm, 1.3)) * 7.0; float gJd = min(fract(gJx), 1.0 - fract(gJx)) * ' + f(S.joint) + ';',
+    'float gJw = max(0.05, fwidth(gJd) * 1.5); float gJoint = (1.0 - smoothstep(0.0, gJw, gJd)) * clamp(0.05 / gJw, 0.0, 1.0) * step(0.35, sdHash(vec2(floor(gJx), gBm + 0.5)));',   /* joints end at the bedding planes and step bed to bed */
+    'vec2 gV = geoVor(vec2(gUV.x * 0.05, vSdW.y * 0.009) + gWarp * 0.01); float gCd = gV.y - gV.x; float gCw = max(0.05, fwidth(gCd) * 1.5); float gCrack = (1.0 - smoothstep(0.0, gCw, gCd)) * clamp(0.05 / gCw, 0.0, 1.0) * smoothstep(0.42, 0.62, geoN(vec2(gUV.x * 0.021, vSdW.y * 0.006) + 5.3)) * ' + f(S.fracture) + ';',   /* sparse master fractures: long, near-vertical */
+    'float gCl = geoN(vec2(gUV.x * 0.028, 3.7)) * 0.7 + geoN(vec2(gUV.x * 0.07, vSdW.y * 0.004)) * 0.3; float gCleft = pow(smoothstep(0.55, 0.95, gCl), 2.0) * ' + f(S.cleft) + ';',
+    'float gGrain = (geoN(gUV * 1.1) * 0.6 + geoN(gUV * 3.3) * 0.4 - 0.5) * gNear;',
+    'gH += -gCleft * 1.6 + gGrain * 0.35; gTone *= (1.0 - gJoint * 0.34) * (1.0 - gCrack * 0.38) * (1.0 - gCleft * 0.42) * (1.0 + gGrain * ' + f(S.grain * 2) + '); gRough *= 1.0 + gJoint * 0.12 + gCrack * 0.12 + gCleft * 0.08 + gGrain * 0.1;');
+  body.push('float gMacro = geoFbm(vSdW.xz * 0.004 + vec2(vSdW.y * 0.002)) - 0.5; gTone *= 1.0 + gMacro * ' + f(S.macro * 2) + ';');
+  if (S.snowY < 1e4) body.push('float gUp = gAn.y; float gSnow = smoothstep(0.55, 0.8, gUp + gLip * 0.25) * smoothstep(' + f(S.snowY - 18) + ', ' + f(S.snowY + 14) + ', vSdW.y + (geoFbm(vSdW.xz * 0.02) - 0.5) * 36.0);');
+  else body.push('float gSnow = 0.0;');
+  body.push('diffuseColor.rgb *= mix(gTone, 1.0, gSnow * 0.9);', 'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.9, 0.93, 0.97) * diffuse, gSnow * 0.88);');
+  var frag = function (fs) {
+    fs = fs.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + GEO_FUNCS).replace('#include <color_fragment>', body.join('\n'));
+    if (lit) { fs = fs.replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(mix(roughnessFactor * gRough, 0.55, gSnow), 0.3, 1.0);');
+      if (!LOW && S.bump > 0) fs = fs.replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nnormal = geoBump(-vViewPosition, normal, gH * ' + f(S.bump) + ' * (1.0 - smoothstep(' + f(S.bumpLod[0]) + ', ' + f(S.bumpLod[1]) + ', gDist)));'); }
+    return fs; };
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-geo-' + [S.snowY < 1e4 ? Math.round(S.snowY) : 'x', S.strata, S.ledge, S.fracture, S.cleft, S.macro, S.grain, S.bump, lit ? 'L' : 'U', LOW ? 'lo' : 'hi', S.lod.join('x'), S.bumpLod.join('x'), MAJ, S.joint, 'v2b'].join('_');
+  mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW; varying vec3 vSdN;').replace('#include <project_vertex>', ['#include <project_vertex>',
+      '{ vec4 sdP = vec4(transformed, 1.0);', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; vSdN = vec3(0.0, 1.0, 0.0); }'].join('\n'));
+    sh.fragmentShader = frag(sh.fragmentShader); };
+  mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|' + key; };
+  mat.userData.surfaceDetail = { kind: 'GEOLOGY', key: key }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
+  return mat;
+}
+
+/* M8C · CRYSTAL — the MAHWORLD crystal family (class shards, crowns, roof diamonds). A cut stone is not one flat value: each facet sits at
+   its own angle to the light and the eye, the body looks deep face-on and bright at grazing (Fresnel), and faint internal fracture planes
+   catch light inside it. Per-facet tone / roughness from the facet's world orientation (derivatives: flat-shaded and merged geometry work),
+   a face-on depth darkening with a bright grazing rim, and sparse inclusion planes. Value / roughness only — the class hue is untouched. */
+export function applyCrystal(THREE, mat, spec) {
+  if (!mat || !mat.isMeshStandardMaterial || (PATCHED ? PATCHED.has(mat) : (mat.userData && mat.userData.surfaceDetail))) return mat;
+  var S = Object.assign({ facet: 0.34, depth: 0.3, rim: 0.4, veins: 0.12, tier: 'HIGH' }, spec || {}); var LOW = S.tier === 'LOW';
+  var body = ['#include <color_fragment>',
+    'vec3 cN = normalize(cross(dFdx(vSdW), dFdy(vSdW))); vec3 cV = normalize(cameraPosition - vSdW); float cFr = pow(1.0 - clamp(abs(dot(cN, cV)), 0.0, 1.0), 3.0);',
+    'float cF = sdHash(floor(cN.xz * 5.0 + cN.y * 3.0) + 0.37);',   /* facet id from its orientation: every cut plane keeps its own value */
+    'float cTone = (1.0 + (cF - 0.5) * ' + f(S.facet) + ') * (1.0 - ' + f(S.depth) + ' * (1.0 - cFr)) + cFr * ' + f(S.rim) + ';'];
+  if (!LOW && S.veins > 0) body.push('float cVp = dot(vSdW, normalize(vec3(0.62, 1.0, 0.41))) * 1.7; float cVw = max(fwidth(cVp), 1e-3) * 1.5; float cVd = 0.5 - abs(fract(cVp) - 0.5); float cVein = (1.0 - smoothstep(0.0, cVw + 0.02, cVd)) * clamp(0.05 / (cVw + 0.03), 0.0, 1.0) * step(0.62, sdHash(vec2(floor(cVp + 0.5), 4.1))); cTone *= 1.0 + cVein * ' + f(S.veins) + ';');
+  body.push('diffuseColor.rgb *= cTone;');
+  var rough = '#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor * (0.55 + 0.9 * cF), 0.03, 0.45);';
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-crystal-' + [S.facet, S.depth, S.rim, S.veins, LOW ? 'lo' : 'hi'].join('_');
+  mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW;').replace('#include <project_vertex>', ['#include <project_vertex>',
+      '{ vec4 sdP = vec4(transformed, 1.0);', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; }'].join('\n'));
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW;\n' + HELPERS.split('\n').slice(1).join('\n')).replace('#include <color_fragment>', body.join('\n')).replace('#include <roughnessmap_fragment>', rough); };
+  mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|' + key; };
+  mat.userData.surfaceDetail = { kind: 'CRYSTAL', key: key }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
   return mat;
 }

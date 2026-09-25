@@ -125,6 +125,20 @@ export function createWater(ctx) {
     var surface = addMerged(surf, waterMat, 'WATER_SURFACE'); if (surface) { surface.receiveShadow = false; surface.renderOrder = 1; }
     /* responsive water: the near-window ripple field (impulses from the player / creatures / hooks) — the far surface keeps the drifting normal map */
     try { ripples = createRipples(ctx, { rivers: rivers, farMaterial: waterMat, tileM: TILE_M }); ripples.build(); ctx.ripples = ripples; } catch (e) { ripples = null; log('water: ripples failed (' + (e && e.message || e) + ')'); }   /* ctx.ripples: the coast registers the SEA body, the wildlife layer splashes into it */
+    /* M8C WATER / LAND TRANSITION: shallow-water cue — from each waterline (1.7 m inside the rect, where the foam laps) the water stays
+       lighter and more transparent over the rising bank and deepens to full colour ~6.5 m out, so the canals and ponds flow into their banks
+       instead of ending as a flat blue sheet at a hard line. Chained AFTER the ripple system's own patch; value / alpha only. */
+    (function () { var R = rivers.slice(0, 8).map(function (r) { return new THREE.Vector4(r.x1, r.z1, r.x2, r.z2); }); while (R.length < 8) R.push(new THREE.Vector4(1, 1, 0, 0));
+      function shallow(wm) { if (!wm || wm.userData.shallowCue) return; wm.userData.shallowCue = true; var prevW = wm.onBeforeCompile, prevWK = wm.customProgramCacheKey;
+      wm.onBeforeCompile = function (sh, rr) { if (prevW) prevW.call(this, sh, rr); sh.uniforms.uWR = { value: R };
+        sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vShW;').replace('#include <project_vertex>', '#include <project_vertex>\nvShW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vShW; uniform vec4 uWR[8];').replace('#include <color_fragment>', ['#include <color_fragment>',
+          'float wEd = 1e5; for (int i = 0; i < 8; i++) { vec4 Rw = uWR[i]; if (vShW.x > Rw.x && vShW.x < Rw.z && vShW.z > Rw.y && vShW.z < Rw.w) wEd = min(wEd, min(min(vShW.x - Rw.x, Rw.z - vShW.x), min(vShW.z - Rw.y, Rw.w - vShW.z))); }',
+          'float wShallow = 1.0 - smoothstep(1.4, 6.5, wEd);',
+          'diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 1.45 + vec3(0.05), wShallow * 0.55); diffuseColor.a *= mix(1.0, 0.42, wShallow);'].join('\n'))
+          .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor *= 1.0 - 0.6 * wShallow;'); };   /* over the shallows the sky mirror gives way to the submerged bank (it was invisible at eye level: grazing reflection swamped the tint) */
+      wm.customProgramCacheKey = function () { return (prevWK ? prevWK.call(this) : '') + '|mahworld-water-shallow2'; }; wm.needsUpdate = true; }
+      shallow(waterMat); var nearW = ctx.group && ctx.group.getObjectByName('WATER_NEAR'); if (nearW) shallow(nearW.material); })();   /* the ripple NEAR window is a clone taken before this patch with its own hook: it carries the cue too (it is what the eye sees at a bank) */
     /* ORIGINAL floating surface objects: MAHWORLD crystal float pads (hexagonal platinum discs with a crystal core) that ride the waves — buoyant, tilting with the local slope, decorative (no collider) */
     try { buildFloats(rivers, bridges); } catch (e) { log('water: float pads failed (' + (e && e.message || e) + ')'); }
     counts.clearanceOk = counts.maxY <= counts.railTopY + 1.1 + 1e-6;

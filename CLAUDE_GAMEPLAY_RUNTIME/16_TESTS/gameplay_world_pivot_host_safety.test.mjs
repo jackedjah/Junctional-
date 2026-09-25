@@ -46,4 +46,14 @@ var b0 = FS.indexOf('function buildLights('), b1 = FS.indexOf('function setNight
 var rigIn = (inside.match(/new THREE\.(Directional|Hemisphere)Light\(/g) || []).length, rigOut = (outside.replace(/es\.add\(new THREE\.HemisphereLight\([^)]*\)\)/g, '').match(/new THREE\.(Directional|Hemisphere)Light\(/g) || []).length;   /* the offscreen room-environment PMREM scene (es) keeps its own light */
 ok('6. the field builds exactly one light rig: every directional / hemisphere light lives in buildLights() (none outside it)', rigIn >= 4 && rigOut === 0 && /lights\.length = 0/.test(inside), { in_buildLights: rigIn, outside: rigOut });
 
+/* 7. M8C construction language (cityScene premiumDress): every piece that stands proud of the collider face is ≥ 3.4 m above the ground —
+      ground-tier piers start on the first-floor cornice (3.6 m), upper-tier piers on a tier ledge ≥ 3.4 m, the eave fascias, the louvred
+      service bay and the entrance transom / canopy rods are gated on ≥ 3.4 m; facade fins stand on the straight runs only (never floating
+      off the rounded corners). Checked against every authored building. */
+var RULES = JSON.parse(src('play/rules1723/rules_17_23.dev.json')), blds = []; (function walk(o) { if (!o || typeof o !== 'object') return; if (o.building && !o.building.dome) blds.push(o); for (var k in o) walk(o[k]); })(RULES);
+var minUpper = Math.min.apply(null, blds.map(function (b) { var t = Math.max(1, b.building.tiers || 1); return t > 1 ? b.h / t : 99; })), minDoor = Math.min.apply(null, blds.filter(function (b) { return b.building.entrance; }).map(function (b) { return b.building.entrance.height; }));
+var cons = { piers: /pb = t3 \? y3 \+ 0\.08 : 3\.6/.test(CITY), eave: /if \(y3 \+ hEach - 0\.4 >= 3\.4\) chromeParts\.push/.test(CITY), louvre: /ly >= 3\.4 && ly \+ LH < yT \+ hEach - 0\.5/.test(CITY),
+  transom: /cY = en\.height \+ 0\.35/.test(CITY) && /ty = cY \+ 0\.42/.test(CITY) && /cY \+ 0\.2, en\.z/.test(CITY) && minDoor + 0.35 + 0.2 >= 3.4, upperTiers: minUpper >= 3.4, fins: /var Lx = runOf\(f\.w, f\), Lz = runOf\(f\.d, f\)/.test(CITY) };
+ok('7. M8C construction pieces (piers, eave fascias, service louvres, entrance transom and canopy rods) stay ≥ 3.4 m above the ground; fins stand on the straight wall runs', Object.keys(cons).every(function (k) { return cons[k]; }), Object.assign({ buildings: blds.length, min_upper_tier_base_m: minUpper, min_door_h_m: minDoor }, cons));
+
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

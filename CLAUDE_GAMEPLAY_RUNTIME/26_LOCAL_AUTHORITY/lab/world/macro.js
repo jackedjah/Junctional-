@@ -1,4 +1,5 @@
 import { ridgeStations, ridgeFaceSegment } from './ridgeLayout.js';
+import { applyGeology } from './surfaceDetail.js';
 
 /* JOB B world module — MACRO GEOGRAPHY (owner B8 §16–§18 "floor down, world up"). Data: registry.macro.
    MOUNTAINS: two ridge bands between the sanctuaries and the far massifs (NEAR 300–420 m, MID 470–560 m) — each ONE merged ribbon mesh
@@ -43,23 +44,10 @@ export function createMacro(ctx) {
       push(uoA.x, uoA.y, uoA.z, cuoA, nOut); push(crestA.x, crestA.y, crestA.z, cA, nOut); push(crestB.x, crestB.y, crestB.z, cB, nOut); push(uoA.x, uoA.y, uoA.z, cuoA, nOut); push(crestB.x, crestB.y, crestB.z, cB, nOut); push(uoB.x, uoB.y, uoB.z, cuoB, nOut); }
     var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3)); own.push(g);
     var mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.08, flatShading: true, envMapIntensity: 0.28 });   /* pivot: faceted rock that answers the Sun */ own.push(mat);
-    if (tier() !== 'LOW') rockShader(mat, R.h_max * 0.6); var mesh = new THREE.Mesh(g, mat); mesh.name = 'MACRO_RIDGE_' + R.id; mesh.frustumCulled = false; mesh.receiveShadow = false; mesh.userData.noMerge = true; group.add(mesh); ridges.push({ R: R, mesh: mesh, tris: pos.length / 9 }); return mesh; }
-  /* WORLD PIVOT PASS 2b — procedural ROCK on the ridge faces (no texture, no extra draw): world-space value noise breaks every big facet
-     into grain + sedimentary strata, and shallow faces above the snow line (with a noisy edge) take a cool white snow/crystal cover.
-     Neutral stone / white only (colour law). Two noise lookups per fragment; the LOW tier keeps the plain faceted vertex colours. */
-  function rockShader(mat, snowY) { mat.onBeforeCompile = function (sh) { sh.uniforms.uSnowY = { value: snowY };
-      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vRkW;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvRkW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
-      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', ['#include <common>', 'varying vec3 vRkW; uniform float uSnowY;',
-        'float rkHash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }',
-        'float rkNoise(vec3 x) { vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(mix(mix(rkHash(i), rkHash(i + vec3(1.0, 0.0, 0.0)), f.x), mix(rkHash(i + vec3(0.0, 1.0, 0.0)), rkHash(i + vec3(1.0, 1.0, 0.0)), f.x), f.y), mix(mix(rkHash(i + vec3(0.0, 0.0, 1.0)), rkHash(i + vec3(1.0, 0.0, 1.0)), f.x), mix(rkHash(i + vec3(0.0, 1.0, 1.0)), rkHash(i + vec3(1.0, 1.0, 1.0)), f.x), f.y), f.z); }'].join('\n'))
-        .replace('#include <color_fragment>', ['#include <color_fragment>',
-        'vec3 rkN = normalize(cross(dFdx(vRkW), dFdy(vRkW))); float rkUp = abs(rkN.y);',
-        'float rkA = rkNoise(vRkW * 0.045), rkB = rkNoise(vRkW * vec3(0.21, 0.6, 0.21));',
-        'float rkStrata = 0.5 + 0.5 * sin(vRkW.y * 0.62 + rkA * 6.0);',
-        'diffuseColor.rgb *= 0.78 + 0.26 * rkB + 0.12 * rkStrata * (1.0 - rkUp);',
-        'float rkSnow = smoothstep(0.52, 0.8, rkUp) * smoothstep(uSnowY - 18.0, uSnowY + 14.0, vRkW.y + (rkA - 0.5) * 36.0);',
-        'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.9, 0.93, 0.97) * diffuse, rkSnow * 0.88);'].join('\n')); };
-    mat.customProgramCacheKey = function () { return 'mahworld-ridge-rock'; }; }
+    applyGeology(THREE, mat, { snowY: R.h_max * 0.6, strata: 2.6, tier: tier() }); var mesh = new THREE.Mesh(g, mat); mesh.name = 'MACRO_RIDGE_' + R.id; mesh.frustumCulled = false; mesh.receiveShadow = false; mesh.userData.noMerge = true; group.add(mesh); ridges.push({ R: R, mesh: mesh, tris: pos.length / 9 }); return mesh; }
+  /* M8C: the ridge faces use the shared GEOLOGY pipeline (lab/world/surfaceDetail.js applyGeology — strata, ledges, fracture joints, clefts,
+     macro / micro tone, a derivative bump so every feature catches the Sun, snow on shallow high faces). Shader-only: the inner face stays
+     exactly on the owner OP10 collision plane. */
   /* ---- waterfalls ---- */
   function streakTexture() { var c = document.createElement('canvas'); c.width = 64; c.height = 256; var g = c.getContext('2d'); g.clearRect(0, 0, 64, 256); var r = rnd(0x77A); for (var i = 0; i < 26; i++) { var x = r() * 64, w = 2 + r() * 5, y0 = r() * 256, len = 40 + r() * 120; var gr = g.createLinearGradient(0, y0, 0, y0 + len); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.3, 'rgba(255,255,255,' + (0.35 + r() * 0.5) + ')'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(x - w / 2, y0, w, len); } var t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; own.push(t); return t; }
   function softTexture() { var c = document.createElement('canvas'); c.width = c.height = 64; var g = c.getContext('2d'); var gr = g.createRadialGradient(32, 32, 2, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,0.9)'); gr.addColorStop(0.5, 'rgba(255,255,255,0.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; own.push(t); return t; }

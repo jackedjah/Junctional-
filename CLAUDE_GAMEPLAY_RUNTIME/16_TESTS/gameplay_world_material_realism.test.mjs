@@ -4,7 +4,7 @@
    Runs the real patch against the vendored three.js standard shader source.  node 16_TESTS/gameplay_world_material_realism.test.mjs */
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
-import { surfaceDetail, applySurface, SURFACE, zonedPaving, createPavingZones, PAVING_TYPES } from '../26_LOCAL_AUTHORITY/lab/world/surfaceDetail.js';
+import { surfaceDetail, applySurface, SURFACE, zonedPaving, createPavingZones, PAVING_TYPES, applyGeology, applyCrystal } from '../26_LOCAL_AUTHORITY/lab/world/surfaceDetail.js';
 import { celestialCloudOptics } from '../26_LOCAL_AUTHORITY/lab/world/sky.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
@@ -34,7 +34,8 @@ ok('4. every major hard-surface family carries its surface logic (floors, facade
 /* 5. daylight value policy + colour law: trims ≤ 0.5 emissive by day, no sky-mirror metals by day, the pattern never changes hue */
 var trimDay = /trim: new THREE\.MeshStandardMaterial\(\{ color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: \(DAY \? ([0-9.]+)/.exec(CS), fsTrim = /trim\.emissiveIntensity = ([0-9.]+); \}/.exec(FS);
 var chromeDay = /chrome: new THREE\.MeshStandardMaterial\(\{ color: 0xa4aeb9, roughness: \(DAY \? ([0-9.]+)/.exec(CS), wPlat = /platinum: std\(\{ color: 0x([0-9a-f]{6}), roughness: ([0-9.]+)/.exec(WB), wChrome = /chrome: std\(\{ color: 0x[0-9a-f]{6}, roughness: ([0-9.]+)/.exec(WB);
-var SD = src('lab/world/surfaceDetail.js'), hueFree = !/vec3\(\s*0?\.\d+\s*,\s*0?\.\d+\s*,\s*0?\.\d+\s*\)\s*\*\s*diffuse|diffuseColor\.rgb\s*=\s*vec3|mix\(diffuseColor\.rgb/.test(SD) && (SD.match(/diffuseColor\.rgb \*=/g) || []).length >= 1 && (SD.match(/diffuseColor\.rgb \*=/g) || []).length === (SD.match(/diffuseColor\.rgb \*= sdTone \* mix\(1\.0, ' \+ f\(S\.seamDark\) \+ ', sdSeam\);/g) || []).length;   /* every value change is the scalar tone × seam form (panels + zoned) */
+var SD = src('lab/world/surfaceDetail.js'); var mulAll = (SD.match(/diffuseColor\.rgb \*=/g) || []).length, mulOk = (SD.match(/diffuseColor\.rgb \*= sdTone \* mix\(1\.0, ' \+ f\(S\.seamDark\) \+ ', sdSeam\);/g) || []).length + (SD.match(/diffuseColor\.rgb \*= mix\(gTone, 1\.0, gSnow \* 0\.9\);/g) || []).length + ((/'float cTone = /.test(SD) && SD.match(/diffuseColor\.rgb \*= cTone;/g)) || []).length;   /* M8C crystal: cTone is a float */
+var mixes = SD.match(/diffuseColor\.rgb = mix\(diffuseColor\.rgb, [^;]*;/g) || [], hueFree = mulAll >= 1 && mulAll === mulOk && mixes.length === 1 && /vec3\(0\.9, 0\.93, 0\.97\) \* diffuse, gSnow/.test(mixes[0]) && !/diffuseColor\.rgb\s*=\s*vec3/.test(SD);   /* every value change is a scalar (tone × seam, geology tone, crystal facet tone); the one blend is neutral-white snow */
 ok('5. daylight trims glow ≤ 0.5, civic and world metals are satin / brushed (roughness ≥ 0.3, platinum no longer near-white), and the pattern only scales value', trimDay && +trimDay[1] <= 0.5 && fsTrim && +fsTrim[1] <= 0.5 && chromeDay && +chromeDay[1] >= 0.3 && wPlat && parseInt(wPlat[1], 16) < 0xd0d0d0 && +wPlat[2] >= 0.3 && wChrome && +wChrome[1] >= 0.3 && hueFree, { trimDay: trimDay && trimDay[1], fsTrim: fsTrim && fsTrim[1], chromeDay: chromeDay && chromeDay[1], worldPlatinum: wPlat && wPlat.slice(1), worldChrome: wChrome && wChrome[1], hueFree: hueFree });
 
 /* 6. M8B zoned paving: one shader, nine families, threshold courses, soft ecology patches; zones come from the registry (class → family) */
@@ -50,5 +51,22 @@ var ATM = src('lab/world/atmosphere.js'), SKYS = src('lab/world/sky.js'), CELS =
 var noBank = JSON.parse(JSON.stringify(REG.sky)); noBank.layers = noBank.layers.filter(function (L) { return !L.bank; }); var o1 = celestialCloudOptics(REG.sky, [0.6, 0.6, 0.5], 42, false, {}), o2 = celestialCloudOptics(noBank, [0.6, 0.6, 0.5], 42, false, {});
 var sky = { falloff: /pow\(1\.0 - hp, 2\.2\)/.test(ATM), dither: /gl_FragCoord\.xy, vec2\(12\.9898, 78\.233\)/.test(ATM), hg: /1\.0 - g \* g\) \/ pow\(1\.0 \+ g \* g - 2\.0 \* g \* mu, 1\.5\)/.test(ATM), aureole: A.night.mie >= 0.5 && A.day.haze_k >= 0.75, bank: !!bank && !bank.occludes && bank.ring_m[0] > 700 && bank.max_top_m < 240, ring: /if \(Ly\.L\.ring_m\)/.test(SKYS) && /L\.bank\) continue;/.test(SKYS), opticsExcluded: Math.abs(o1.tau - o2.tau) < 1e-9, sunVeil: /cloudTex: softVeilTex\(512\), cloudOpacity: 0\.55/.test(CELS) && /rayOpacity: 0\.05/.test(CELS), occluders: REG.sky.layers.filter(function (L) { return L.occludes; }).length === 2 };
 ok('7. sky realism: long zenith-to-horizon falloff with dither, a strong lavender lunar aureole at night, a far horizon cloud-bank ring that never enters the Sun / Moon optics (two occluding layers kept), a soft Sun veil and barely-there rays', Object.keys(sky).every(function (k) { return sky[k]; }), sky);
+
+/* 8. M8C physical world: ONE geology pipeline (ridge inner face = collision plane, so shader only) on the ridges, the far massifs (unlit
+      value) and the coast islands — beds + ledges, joints that stop at bedding planes, sparse master fractures, clefts; only SMOOTH fields
+      reach the derivative bump (thin lines in the bump sparkled). Crystal family on the roof diamonds + class crystals; natural ground only
+      where a zone is soft (plain hardscape never loses slabs); the shallow-water cue on the canal / pond surface. */
+var geoM = new THREE.MeshStandardMaterial(), geoS = compiled(applyGeology(THREE, geoM, { snowY: 40 })), geoF = geoS.fragmentShader;
+var cryS = compiled(applyCrystal(THREE, new THREE.MeshStandardMaterial({ flatShading: true }), {})).fragmentShader, ZP = src('lab/world/surfaceDetail.js');
+var MAC = src('lab/world/macro.js'), FARW = src('lab/farWorld.js'), CST = src('lab/world/coast.js'), WAT = src('lab/world/water.js'), CTY = src('lab/cityScene.js'), ARC = src('lab/world/architecture.js');
+var hLine = (/gH \+= ([^;]*);/.exec(geoF) || [])[1] || '', hBase = (/float gH = ([^;]*);/.exec(geoF) || [])[1] || '';
+var m8c = { applied: /applyGeology\(THREE, mat, \{ snowY: R\.h_max \* 0\.6/.test(MAC) && /applyGeology\(THREE, farMat, \{ lit: false/.test(FARW) && /applyGeology\(THREE, landMat/.test(CST),
+  beds: /float gLip = /.test(geoF) && /float gUnder = /.test(geoF) && /float gBed = /.test(geoF) && /float gJoint = /.test(geoF) && /float gCrack = /.test(geoF) && /float gCleft = /.test(geoF),
+  aa: /clamp\(0\.035 \/ gBedW, 0\.0, 1\.0\)/.test(geoF) && /clamp\(0\.05 \/ gJw, 0\.0, 1\.0\)/.test(geoF) && /clamp\(0\.05 \/ gCw, 0\.0, 1\.0\)/.test(geoF),
+  smoothBump: !!hLine && !/gJoint|gCrack|gBed/.test(hLine + hBase) && /smoothstep\(0\.0, gRw, gBot\)/.test(hBase) && /normal = geoBump\(-vViewPosition, normal, gH/.test(geoF),
+  crystal: /diffuseColor\.rgb \*= cTone;/.test(cryS) && /float cFr = pow\(1\.0 - /.test(cryS) && /applyCrystal\(THREE, M\.diamond/.test(CTY) && /applyCrystal\(THREE, crystalMat/.test(ARC),
+  naturalGated: /smoothstep\(0\.03, 0\.3, zNat0\)/.test(ZP),
+  water: /float wShallow = 1\.0 - smoothstep\(1\.4, 6\.5, wEd\);/.test(WAT) && /metalnessFactor \*= 1\.0 - 0\.6 \* wShallow;/.test(WAT) && /\|mahworld-water-shallow2/.test(WAT) };
+ok('8. M8C physical world: one geology pipeline on ridges / far massifs / islands (beds, ledges, joints, master fractures, clefts; footprint AA; only smooth fields in the bump), the crystal family, natural ground gated to soft zones, the shallow-water cue', Object.keys(m8c).every(function (k) { return m8c[k]; }), m8c);
 
 console.log('RESULT world material realism: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
