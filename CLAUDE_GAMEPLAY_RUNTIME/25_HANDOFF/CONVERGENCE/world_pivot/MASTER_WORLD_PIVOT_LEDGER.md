@@ -19,6 +19,7 @@ untouched; no deploy is part of this ledger.
 | class houses | VISIONARY overlook, LEAN spire house | `evidence/before/desktop_day/V16_DAY.jpg`, `V17_DAY.jpg` → `evidence/cp6_after/desktop_day/` |
 | map | five-territory map, phone + desktop | `evidence/cp4_after/desktop_day/MAP_phone.png`, `MAP_desktop.png` |
 | phone-sized frames (desktop emulation, NOT a phone test) | MED tier 393×852 | `evidence/cp4_after/phone_med_day/` |
+| M8C rock / construction / water (latest) | stratified jointed rock with ledges, crystal facets, natural forest ground, shallows at the banks, civic piers / fascias / service bay / entrance transom | `evidence/m8c_rock.jpg`, `m8c_world.jpg`, `m8c_construction.jpg`, `m8c_night.jpg` |
 
 ## How evidence is produced
 
@@ -276,3 +277,56 @@ paving language everywhere, and district / surface changes were hard stops (floo
    the visible inner face IS the collision surface (owner OP10).
 2. Crystal ecology / trees (GLB-textured) keep their original materials; ground-level meadow shards could use a contact tint.
 3. The sky is still an analytic dome: a volumetric-looking cloud deck near the Sun (god-ray shafts through gaps) would be the next sky step.
+
+## M8C — FULL MATERIAL REALIZATION / PHYSICAL WORLD PASS (`67bc9b0`)
+
+M8B was accepted as a foundation checkpoint, not a visual approval. Diagnosis (pinned `7eb0f5e` frames): the ridge mountains filled 30–50 %
+of every street-level frame as large flat grey facets with only a faint grain — no strata, fractures, ledges or shadowed recesses; the far
+massifs and coast islands were single-value silhouettes; floors were tiled everywhere, including under the forests; the canals ended as a
+flat blue sheet at a hard line; civic buildings read as smooth shells, and their facade fins continued into the rounded corners, floating
+up to 0.7 m off the curved wall (a real construction defect).
+
+| field | value |
+|---|---|
+| new views | V26 canal bank and water edge close · V27 ridge face close from the TITAN ledge · V28 civic roofline, piers and service bay (Mentor Spire rear) |
+| files | `lab/world/surfaceDetail.js` (`applyGeology`, `applyCrystal`, natural ground in `zonedPaving`), `lab/world/macro.js`, `lab/farWorld.js`, `lab/world/coast.js`, `lab/world/water.js`, `lab/cityScene.js`, `lab/world/architecture.js`, `deploy/world_preview/capture.mjs` (V26–V28), `16_TESTS/gameplay_world_material_realism.test.mjs` (check 8), `16_TESTS/gameplay_world_pivot_host_safety.test.mjs` (check 7) |
+| geology (changed first) | ONE reusable GEOLOGY pipeline, shader only (the ridge inner face is the owner OP10 collision plane, so no geometry moved): MAJOR BEDS (≈ 8 m on the ridges) give value zoning, and a share of their boundaries become LEDGES — a lit rounded lip above, a shadowed undercut below; MINOR BEDS draw the bedding lines; JOINTS stop at the bedding planes and step bed to bed (blocky jointing); sparse long near-vertical MASTER FRACTURES; CLEFTS (30–60 m gullies) as shadowed recesses; macro + grain; snow above the snow line. Only smooth fields (ledges, clefts, grain) drive the derivative-bump normal; thin lines are value / roughness with footprint AA (a line thinner than a pixel fades instead of aliasing). Applied to the ridges (lit + bump), the far massifs (unlit value, 35 m beds) and the coast islands. Iterated three times against the frames: v1 read as a crazed-glaze web with speckled strata → footprint AA; v2 replaced the isotropic Voronoi web with beds / joints / master fractures; v2b removed dotted sparkle where the ledge height stepped |
+| material families | see the family table below; new: GEOLOGY (rock) and CRYSTAL (roof diamonds + class crystals: per-facet value from the facet's orientation, face-on depth, bright grazing rim, sparse inclusion planes; the class hue stays the vertex colour) |
+| natural ground | inside the soft ecology zones (forests, gardens) the paving dissolves slab by slab into grown ground — no seams, darker matte value, grit, a low-amplitude bump, near-zero metalness, a darker gap where a slab is missing; the dissolution follows world noise at the zone edge. Plain hardscape never loses slabs (an iteration-2 defect where the noise reached every district was caught in V02 and gated) |
+| water / land | shallow-water cue on the canals and ponds: from the waterline the water is lighter, more transparent (α × 0.42) and less mirror-like (metalness × 0.4), deepening to full colour ~6.5 m out, so the submerged bank shows. Applied to the far surface AND the ripple near window (the near window is a clone taken before the patch — iteration 3 showed no change until it was patched too). Subtle at eye level, as it physically should be |
+| construction | fins stand on the straight wall runs only; graphite structural PIERS close every run (ground tier: standing on the first-floor cornice at 3.6 m — base / shaft / crown; upper tiers: on the tier ledge); a deep EAVE FASCIA under each tier's light reveal (the roofline has thickness); a louvred SERVICE BAY on the top storey's rear face (away from the entrance); a glazed TRANSOM with mullions over the entrance canopy and two TENSION RODS carrying the canopy back to the wall. Merged per material (+2 draws per building) |
+| human livability | ridge corridors: shading only — the walkable floor and collision are unchanged, and the ledges are painted relief (< 1 m), not false climbable shelves. Civic buildings: nothing new below 3.4 m, so the pedestrian zone is unchanged; the entrance reads as a sheltered, daylit threshold (canopy visibly supported, transom light); plant air exhausts on the rear face, not over the door. Forests: natural ground under the trees while the paths / causeways stay constructed. Canal banks: the bank stays walkable hardscape; no railings added (host-owned). No benches, props or NPC clutter added |
+| before / after | pinned `7eb0f5e` → pinned `67bc9b0`: `evidence/m8c_before/…` → `evidence/m8c_after/{desktop_day, desktop_night}`; sheets `evidence/m8c_rock.jpg` (V27 V16 V05 V07), `m8c_world.jpg` (V02 V03 V04 V06 V11 V26), `m8c_construction.jpg` (V15 V18 V28), `m8c_night.jpg` (V05 V16 V26); V28's BEFORE is rendered from the same pinned `7eb0f5e` tree with the V28 view added to its harness only |
+| perf | 12 matched day views: draw calls 1964 → 1990 — of the +26, +21 is V26, where the crystal meadow's camera-ticked chunk visibility happened to show 21 blade chunks in the AFTER run (harness timing; no M8C change touches the meadow); without V26 1855 → 1860, i.e. the +2 merged draws per civic building where one is in frame. Triangles 12.48 M → 12.62 M (+1.1 %, mostly those V26 blades; the construction pieces are a few hundred triangles per building). Shader programs 115 → 117 (the geology and crystal variants), textures 83 → 84; NO texture maps added (all detail is procedural, world space). Night (3 views): calls 365 → 365, programs 114 → 119. Shader cost: the geology adds one 3 × 3 Voronoi (9 cells) plus a few value noises per rock pixel, on the ridges / far massifs / islands only; LOW keeps beds, ledges and tone and drops joints / fractures / clefts / grain / bump. Software WebGL: counters are relative evidence, not phone performance |
+| tests (focused) | material realism 8 / 8 (new 8: geology on ridges / far / islands with beds, ledges, joints, master fractures, clefts, footprint AA and only smooth fields in the bump; crystal family; natural ground gated to soft zones; the shallow-water cue), host safety 7 / 7 (new 7: every construction piece ≥ 3.4 m, checked against the authored buildings; fins on the straight runs), colour law 4 / 4, Moon / cloud 19 / 19, ridge collision 8 / 8, night route 13 / 13; colour-law audit 0 violations; colliders `--check` nothing to do; full runnable set 24 files green (433 checks); `gameplay_mahgic_tree` keeps its one pre-existing failure (the static build it checks is blocked on the bridge upload) and 36 programs stay blocked on the missing sibling roots |
+| host safety | presentation only: no collider, walkable or registry change; construction pieces ≥ 3.4 m or on the wall face; ridge art stays shader-only on the collision plane |
+| Scenario | re-checked (free calls only, nothing generated, 0 CU): PATINA Material / Image-to-Maps / retexture need Pro; Scenario Texture runs on the free plan (33 CU per 1024² high with seam erase, 12 CU at medium, colour only); scenario-3d meshes are not the right tool for this pass. Grouped request + integration plan: `SCENARIO_GATE.md` — waiting on the owner |
+| evidence notes | the crystal meadow's chunk visibility is ticked from the camera, so blade counts differ between runs whose view ORDER differs (iteration frames show more gold / red blades); the pinned BEFORE / AFTER runs use the same order. The blue slab across the top of V27 is the HALO underside seen from the ledge — present before and after |
+
+### M8C material families (value / roughness / metalness only — hue stays owned by the colour law)
+
+| family | where | base roughness · metalness | detail / normal | seams / edges | wet / dry, contact |
+|---|---|---|---|---|---|
+| rock (GEOLOGY) | ridges, far massifs, coast islands | 0.82 · 0.08 (ridges), per-bed ± 10 %, joints / fractures + 12 %, lips − 8 %, clamped 0.3–1.0 | beds, ledges, joints, master fractures, clefts, grain; bump from ledges / clefts / grain | ledge lip (lit) / undercut (shadow) | dry; snow 0.55 above the snow line |
+| architectural platinum (FACADE / STRUCTURE) | civic facades, class-house structure, world platinum | 0.42 · 0.62 | panel grid, storey band, macro + grain | inset seams (matte, metalness × 0.5), chamfer normal | contact AO at the footprint |
+| brushed chrome (BRUSHED) | fins, rails, trims, domes | 0.32 · 0.92 by day | directional streak roughness | — | — |
+| structural dark metal (STRUCTURE on graphite) | piers, insets, louvre frames | 0.5 · 0.75 | 1.2 × 2.4 m plates | inset seams | — |
+| glass (GLAZING) | curtain walls, bands, transoms | 0.06 · 0.55, α 0.78 | per-pane reflection variation | mullions 1.5 m, transoms 1.2 m, spandrel per storey | — |
+| stone / hardscape (PLAZA / DISTRICT / zoned) | plaza + districts | floor 0.5 · 0.88 by day | nine paving families, grain, macro | recessed grout, bevel, 0.7 m threshold courses | contact AO under fixtures, monoliths, civic shapes |
+| road (PAVER / KERB) | causeways, regional roads, trails | cores 0.58 · 0.3, kerbs 0.52 · 0.78 | 4 × 2 m staggered pavers, grain | segmented kerb stones | — |
+| natural ground (zoned NATURAL) | soft ecology zones | roughness × 1.35, metalness → 0.02 | grit, low bump | slabs dissolve, darker gaps | matte, dry |
+| shoreline / wet (SAND + shore gradient) | beaches, canal banks | dry 0.88 · 0.12 → wet band 0.16 · 0.32 | drift grain | the gradient itself is the transition | glossy wet band at the waterline |
+| water-adjacent (shallow cue) | canal / pond surfaces | 0.55 metalness → × 0.4 at the bank, α × 0.42 | ripple normals (unchanged) | foam line (unchanged) | lighter, clearer shallows |
+| MAHWORLD crystal (CRYSTAL) | roof / entrance diamonds, class crystals | roughness × 0.55–1.45, clamped 0.03–0.45 | per-facet value ± 17 %, inclusion planes | grazing rim + 40 %, face-on depth − 30 % | — |
+
+### M8C next — open issues (nothing here is approved)
+
+1. **Clouds (active, carried):** still reads as cotton / blob puffs; needs scale, depth, density variation inside the body, better
+   integration with the horizon banks and illumination (a darker, denser base; brighter, thinner rims). The sky remains open in every view.
+2. **Ridge faceting:** the flat-shaded ridge facets are geometry, and they are still the dominant low-poly read at street level; the shader
+   now carries the rock, but a smoothed-normal field (or a finer OUTER-row mesh, never the inner collision rows) is the next step.
+3. **Scenario detail maps:** owner decision on the grouped request (6 × 33 CU) or a Pro upgrade for PATINA — would add photographic micro
+   detail at 0–15 m, where procedural grain is weakest.
+4. Construction language beyond the three civic buildings: class-house platforms (thickness, soffits), HALO supports, bridges, the imported
+   landmark facades (texture-level, Scenario-dependent).
+5. Coast islands meet the sea without a wet band or shore shaping; the canal banks carry the transition, the islands do not yet.
