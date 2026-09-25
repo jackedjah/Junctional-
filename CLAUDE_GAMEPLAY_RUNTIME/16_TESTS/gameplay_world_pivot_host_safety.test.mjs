@@ -40,4 +40,10 @@ var CAO = src('lab/world/contactAO.js'), WB = src('lab/world/worldB.js'), FAR = 
 var lift = /y: groundYAt\(reg, x, z\) \+ ([0-9.]+)/.exec(CAO);
 ok('5. contact AO decals sit ≤ 6 cm above the local ground with no collider output and one draw; the far world swaps day/night palettes live', lift && +lift[1] > 0 && +lift[1] <= 0.06 && !/collider|walkable\s*:/i.test(CAO.replace(/\/\*[\s\S]*?\*\//g, '')) && /info\.draw_calls = 1/.test(CAO) && /\['contactAO', createContactAO\]/.test(WB) && /group\.userData\.setNight = function/.test(FAR) && /fw\.userData\.setNight\(NIGHT\)/.test(FS), { lift_m: lift && +lift[1] });
 
+/* 6. presentation integrity: the field owns ONE light rig. Every Directional / Hemisphere light is constructed inside buildLights() (which
+      clears the previous rig first); a legacy `if (false) {…} else {…}` block used to stack a second daylight rig after it on every build. */
+var b0 = FS.indexOf('function buildLights('), b1 = FS.indexOf('function setNight(', b0), inside = b0 >= 0 && b1 > b0 ? FS.slice(b0, b1) : '', outside = b0 >= 0 && b1 > b0 ? FS.slice(0, b0) + FS.slice(b1) : FS;
+var rigIn = (inside.match(/new THREE\.(Directional|Hemisphere)Light\(/g) || []).length, rigOut = (outside.replace(/es\.add\(new THREE\.HemisphereLight\([^)]*\)\)/g, '').match(/new THREE\.(Directional|Hemisphere)Light\(/g) || []).length;   /* the offscreen room-environment PMREM scene (es) keeps its own light */
+ok('6. the field builds exactly one light rig: every directional / hemisphere light lives in buildLights() (none outside it)', rigIn >= 4 && rigOut === 0 && /lights\.length = 0/.test(inside), { in_buildLights: rigIn, outside: rigOut });
+
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

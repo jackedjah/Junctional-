@@ -1,6 +1,6 @@
 {
  "version": "WORLD_REGISTRY_V1",
- "generated": "2026-09-25T17:38:55.369Z",
+ "generated": "2026-09-25T18:13:51.190Z",
  "_doc": "JOB B world registry (owner directive 2026-09-19 §19): sources (provenance) → derivatives (what ships) → artifacts / zones / fixtures / creatures / celestial (placement + policy). Coordinates are FIELD metres (x east, z north, y up), yaw in degrees around +y. Collision shapes for the host are GENERATED from this file by deploy/jobb/build_world_colliders.mjs (never hand-edited twice). states: PLACED = built and in the world · WAITING_FOR_JOB_A = the hook exists, the gameplay side is JOB A's · PROVISIONAL = owner tuning pending.",
  "field": {
   "walls": {
@@ -1472,16 +1472,16 @@
   "policy": "OPAQUE_PLATINUM",
   "reflected_light_prominence": 0.15,
   "day": {
-   "roughness": 0.58,
-   "metalness": 0.25,
-   "envMapIntensity": 0.5
+   "roughness": 0.7,
+   "metalness": 0.12,
+   "envMapIntensity": 0.32
   },
   "night": {
    "roughness": 0.3,
    "metalness": 0.9,
    "envMapIntensity": 0.55
   },
-  "pivot_note": "World pivot PASS 2 (2026-09-25): by DAY the floor is a satin platinum STONE (metalness 0.25) so it answers the Sun with light and shade instead of mirroring the bright sky as flat white glare; the night blackened-platinum sheen is unchanged.",
+  "pivot_note": "World pivot PASS 2 (2026-09-25): by DAY the floor is a platinum STONE so it answers the Sun with light and shade instead of mirroring the bright sky as flat white glare (PASS 2b: honed, roughness 0.7 / metalness 0.12 / env 0.32 — at street-level grazing angles the satin 0.58 / 0.25 / 0.5 still reflected the bright horizon as a white wash); the night blackened-platinum sheen is unchanged.",
   "note": "0.15 is a visual prominence target (roughness / metalness / env intensity), NOT opacity"
  },
  "celestial": {
