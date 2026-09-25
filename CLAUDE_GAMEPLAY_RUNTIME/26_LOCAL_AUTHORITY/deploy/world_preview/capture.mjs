@@ -66,7 +66,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
         var v = views[vi]; var t0 = Date.now();
         await page.evaluate(function (a) { window.WP.view(a[0], a[1]); window.WP.tag(''); return 1; }, [v[2], v[3]]); await sleep(SETTLE);
         var f0 = await page.evaluate(function () { return window.WP.state().frames; }); await sleep(600); var f1 = await page.evaluate(function () { return window.WP.state().frames; });
-        var file = v[0] + '_' + tods[ti] + '.jpg'; await page.screenshot({ path: path.join(OUT, file), type: 'jpeg', quality: 84 });
+        var file = v[0] + '_' + tods[ti] + '.jpg'; await page.screenshot({ path: path.join(OUT, file), type: 'jpeg', quality: 84, timeout: 180000 });   /* software GL can need > 30 s for the first frame after new shader programs compile */
         var stats = await page.evaluate(function () { return window.WP.stats(); });
         report.views.push({ id: v[0], label: v[1], tod: tods[ti], file: file, pos: v[2], look: v[3], stats: stats, frames_in_600ms: f1 - f0, ms: Date.now() - t0 });
         console.log(v[0], tods[ti], JSON.stringify(stats));
