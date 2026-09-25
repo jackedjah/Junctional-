@@ -1,0 +1,8 @@
+{
+  "defaultCharacter": "female",
+  "defaultTheme": "blue",
+  "characters": {
+    "female": "female.json",
+    "male": "male.json"
+  }
+}
