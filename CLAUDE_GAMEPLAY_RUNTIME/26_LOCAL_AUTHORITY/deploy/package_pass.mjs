@@ -44,7 +44,7 @@ js.forEach(function (f) { var s = fs.readFileSync(f, 'utf8'); var re = /textCont
 stage('3 CSS parse sweep', cssProblems.length === 0, cssCount + ' stylesheets / blocks' + (cssProblems.length ? '; ' + cssProblems.join(' | ') : ''));
 
 /* 4. runtime / cache stamps */
-var infoP = path.join(DIST, 'BUILD_INFO.json'); var info = fs.existsSync(infoP) ? JSON.parse(fs.readFileSync(infoP, 'utf8')) : null; var commit = git(['rev-parse', '--short', 'HEAD']); var dirty = git(['status', '--porcelain', '--', 'CLAUDE_GAMEPLAY_RUNTIME']);
+var infoP = path.join(DIST, 'BUILD_INFO.json'); var info = fs.existsSync(infoP) ? JSON.parse(fs.readFileSync(infoP, 'utf8')) : null; var declaredCommit = process.env.MAHWORLD_RELEASE_COMMIT; if (declaredCommit && !/^[0-9a-f]{40}$/i.test(declaredCommit)) { console.error('MAHWORLD_RELEASE_COMMIT must be an exact 40-character Git commit'); process.exit(2); } var commit = declaredCommit || git(['rev-parse', '--short', 'HEAD']); var dirty = git(['status', '--porcelain', '--', 'CLAUDE_GAMEPLAY_RUNTIME']);
 if (info) { info.commit = commit; info.pass = label; info.package_stamp = new Date().toISOString(); info.worktree_clean = dirty === ''; fs.writeFileSync(infoP, JSON.stringify(info, null, 1)); }
 var toml = fs.existsSync(path.join(DIST, 'netlify.toml')) ? fs.readFileSync(path.join(DIST, 'netlify.toml'), 'utf8') : '';
 stage('4 runtime / cache stamps', !!info && !!info.built && /Cache-Control/.test(toml) && /function = "gate"/.test(toml), info ? 'built ' + info.built + ' · commit ' + commit + (dirty === '' ? ' (clean)' : ' (WORKTREE DIRTY: ' + (dirty || '').split('\n').length + ' paths)') + ' · netlify.toml cache + gate rules present' : 'BUILD_INFO.json missing'); R.stamp = info;
