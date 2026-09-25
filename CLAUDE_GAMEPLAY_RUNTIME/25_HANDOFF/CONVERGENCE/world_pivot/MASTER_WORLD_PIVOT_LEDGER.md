@@ -8,6 +8,18 @@ here claims subjective approval, physical-phone performance or authenticated hos
 Branch `backup/mahworld-m6-20260924T190351Z`; pivot starts from `b94e611` (DAY-first default). Production and every protected preview are
 untouched; no deploy is part of this ledger.
 
+## Owner review index (nothing below is marked approved)
+
+| look at | what changed | where |
+|---|---|---|
+| sky / Sun / Moon / clouds | lit billowing cloud bodies, lavender Moon by day, white-gold Sun | `evidence/pass1_before_after_day.jpg` |
+| whole world, day | ground, mountains (rock grain, snow), coast, civic façades, HALO, fog reach | `evidence/cp2_before_after_day.jpg`, `cp4_vs_cp2_day.jpg`, `cp6_vs_cp4_day.jpg` |
+| night | far massifs no longer glow; caps dimmed | `evidence/cp4_vs_cp2_night.jpg`, `cp6_vs_cp4_night.jpg` |
+| HALO | deck pattern, glass sky-walk, iridescent dome, rim colonnade, celestial rings | `evidence/cp3_vs_cp2_day.jpg` (V08 V09 V12 V14) |
+| class houses | VISIONARY overlook, LEAN spire house | `evidence/before/desktop_day/V16_DAY.jpg`, `V17_DAY.jpg` → `evidence/cp6_after/desktop_day/` |
+| map | five-territory map, phone + desktop | `evidence/cp4_after/desktop_day/MAP_phone.png`, `MAP_desktop.png` |
+| phone-sized frames (desktop emulation, NOT a phone test) | MED tier 393×852 | `evidence/cp4_after/phone_med_day/` |
+
 ## How evidence is produced
 
 - `26_LOCAL_AUTHORITY/deploy/world_preview/` renders the REAL client world (`lab/fieldScene.js` + the registry world layer, HALO included)
@@ -197,3 +209,14 @@ showed individual puff outlines (V09); ridge faces were large flat slabs; at nig
 | perf (same 8 day views) | draw calls 1483 → 1488 (the decals), triangles +0.02 %, programs unchanged (144) |
 | tests | 23 runnable programs green, 423 checks; host safety 5 / 5; colour law 0 |
 | unresolved | the plaza floor still reads near-white at street level (V13); other build-time day/night choices (floor canvases, HALO deck texture) also do not swap on a live toggle — they are lit, so they darken with the night rig, but a live-swap pass for them is a candidate follow-up; owner visual review |
+
+## CHECKPOINT 7 — one light rig, honed ground (`3186200`)
+
+| field | value |
+|---|---|
+| defect found | investigating why the plaza read near-white, the scene was found carrying TWO daylight rigs: a legacy inline rig written as `if (false) { NIGHT } else { DAY }` always ran its DAY branch right after `buildLights()` — key 2.35 + hemisphere 1.15 + rim + fill on top of the owner rig, and it re-pointed `sun` (the shadow caster) — until the first time-state prewarm / toggle rebuilt the lights. Present since the M6 backup; live in the game during load and whenever `?warm=0`. The preview harness always prewarms, so no evidence frame was affected. |
+| fix | the dead block and its always-running `else` are removed; `buildLights()` alone owns background, fog, shadows and the rig. Guard: host-safety check 6 (every directional / hemisphere light is built inside `buildLights()`; it fails on the previous head with 8 outside) |
+| ground | the day ground policy is honed stone (roughness 0.7, metalness 0.12, env 0.32; was 0.58 / 0.25 / 0.5) to trim grazing-angle sky glare. Measured V13 floor pixels are a mid-light grey-blue (~150 / 160 / 180): the plaza's "white" read is the high-key platinum palette around it, not a clipped floor |
+| evidence | `evidence/cp7_after/desktop_day/` (V01 V02 V13, pinned at `3186200`) |
+| perf (V01 V02 V13) | live shader programs 141–144 → **94** (−34 %): the stacked rig's larger light count compiled a second full set of shader variants at load, which the prewarm then orphaned; time-state prewarm 8.8 s → 4.3 s (software GL — relative only, not a device timing); draw calls / triangles unchanged. Fewer compiles means less load-time hitching, which matters most on phones (to be confirmed by the owner's device test) |
+| tests | 23 runnable programs green, 424 checks; host safety 6 / 6 |
