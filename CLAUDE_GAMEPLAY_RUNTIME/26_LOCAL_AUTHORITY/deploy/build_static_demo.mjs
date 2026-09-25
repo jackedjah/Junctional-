@@ -3,7 +3,7 @@
    JSON files the host reads into shims/host_files.js, patches ONE page (play.html: import map + the in-page host), and writes
    netlify.toml. Nothing in the source tree is modified.  node 26_LOCAL_AUTHORITY/deploy/build_static_demo.mjs [--out <dir>] */
 import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto'; import { fileURLToPath } from 'node:url';
-import { HALO_LAYOUT } from '../play/haloLayout.js';
+import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.resolve(HERE, '..'); var RUNTIME = path.resolve(LA, '..'); var ROOT = path.resolve(RUNTIME, '..');
 var argv = process.argv.slice(2); function arg(k, d) { var i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; }
 var OUT = path.resolve(arg('--out', path.join(HERE, 'static_dist')));
