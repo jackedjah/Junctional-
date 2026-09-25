@@ -28,11 +28,11 @@ export function createMacro(ctx) {
       var soA = { x: outA.x * 0.58 + crestA.x * 0.42, y: outA.y * 0.58 + crestA.y * 0.42, z: outA.z * 0.58 + crestA.z * 0.42 }, soB = { x: outB.x * 0.58 + crestB.x * 0.42, y: outB.y * 0.58 + crestB.y * 0.42, z: outB.z * 0.58 + crestB.z * 0.42 };
       var uiA = { x: inA.x * 0.24 + crestA.x * 0.76, y: inA.y * 0.24 + crestA.y * 0.76, z: inA.z * 0.24 + crestA.z * 0.76 }, uiB = { x: inB.x * 0.24 + crestB.x * 0.76, y: inB.y * 0.24 + crestB.y * 0.76, z: inB.z * 0.24 + crestB.z * 0.76 };
       var uoA = { x: outA.x * 0.28 + crestA.x * 0.72, y: outA.y * 0.28 + crestA.y * 0.72, z: outA.z * 0.28 + crestA.z * 0.72 }, uoB = { x: outB.x * 0.28 + crestB.x * 0.72, y: outB.y * 0.28 + crestB.y * 0.72, z: outB.z * 0.28 + crestB.z * 0.72 };
-      /* WORLD PIVOT PASS 2: break the planar faces into rock — the intermediate rows are pushed INTO the mountain body (never over the
-         playable side) by a seeded value noise, and the material shades by true facet orientation (flatShading) instead of one normal per side */
+      /* WORLD PIVOT PASS 2 (corrected at checkpoint 5): only the OUTER face rows take the seeded rock displacement. The INNER face is the
+         owner OP10 shared visible/collision surface (ridgeLayout → VISIBLE_RIDGE_INNER_FACE proxies), so its rows stay exactly on the proxy
+         plane — pushing them into the body left invisible walls in front of the rock. The inner face gets its rock read from rockShader(). */
       var dsp = function (P, sx, sz, amp, sd) { var n = Math.sin(P.x * 0.061 + sd * 1.7) * 0.5 + Math.sin(P.z * 0.053 - sd * 0.9) * 0.35 + Math.sin((P.x + P.z) * 0.137 + sd) * 0.15; var m = Math.max(0, n * 0.5 + 0.5) * amp; return { x: P.x + sx * m, y: P.y + (n * 0.5) * amp * 0.35, z: P.z + sz * m }; };
       var hA = Math.max(2, a.h), hB = Math.max(2, b2.h);
-      siA = dsp(siA, ox, oz, hA * 0.14, idx + 1); siB = dsp(siB, ox, oz, hB * 0.14, idx + 1); uiA = dsp(uiA, ox, oz, hA * 0.1, idx + 2); uiB = dsp(uiB, ox, oz, hB * 0.1, idx + 2);
       soA = dsp(soA, -ox, -oz, hA * 0.12, idx + 3); soB = dsp(soB, -ox, -oz, hB * 0.12, idx + 3); uoA = dsp(uoA, -ox, -oz, hA * 0.09, idx + 4); uoB = dsp(uoB, -ox, -oz, hB * 0.09, idx + 4);
       var ciA = cBase.clone().lerp(cA, 0.46), ciB = cBase.clone().lerp(cB, 0.46), coA = cBase.clone().lerp(cA, 0.38), coB = cBase.clone().lerp(cB, 0.38), cuiA = cBase.clone().lerp(cA, 0.76), cuiB = cBase.clone().lerp(cB, 0.76), cuoA = cBase.clone().lerp(cA, 0.7), cuoB = cBase.clone().lerp(cB, 0.7);
       push(inA.x, inA.y, inA.z, cBase, nIn); push(siB.x, siB.y, siB.z, ciB, nIn); push(siA.x, siA.y, siA.z, ciA, nIn); push(inA.x, inA.y, inA.z, cBase, nIn); push(inB.x, inB.y, inB.z, cBase, nIn); push(siB.x, siB.y, siB.z, ciB, nIn);
