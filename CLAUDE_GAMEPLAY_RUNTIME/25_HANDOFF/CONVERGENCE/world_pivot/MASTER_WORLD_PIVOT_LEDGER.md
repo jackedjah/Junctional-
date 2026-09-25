@@ -150,3 +150,38 @@ walls, and the coastline beyond the walls.
 | tests | runnable programs unchanged (22 green, 418 checks) |
 | edge case | if the ripple system re-installs its sea patch at runtime after this chain (toggle), the dual-scale normal drops back to the single map — visual only |
 | unresolved | the rings sit above the V08 frame (visible from the deck looking up and through the dome from the ground); owner review of the colonnade density |
+
+## PASS 2b — value, contrast and air (checkpoint 4)
+
+Audit of the checkpoint 2 evidence: from altitude (V02, V12, V14) the world washed to white — the linear day fog ran 150 → 640 m, so the
+far half of a 350 m field sat at 40–90 % haze over a pale stone ground; the HALO deck read near-white under the 3.0 key; cloud bodies
+showed individual puff outlines (V09); ridge faces were large flat slabs; at night the pale peak caps glowed like lit paper.
+
+| field | value |
+|---|---|
+| files | `lab/fieldScene.js` (day fog far, ground stone value), `deploy/jobb/build_registry.mjs` → registry (day fog near / colour), `lab/cityScene.js` (HALO deck value), `lab/world/cloudBodies.js`, `lab/world/macro.js` (rock shader, night dimming), `lab/farWorld.js` (night caps), `lab/world/coast.js` (sea relief distance fade) |
+| what changed | day fog 150 → 640 m becomes 190 → 1050 m (colour `#b4cbe9`, a touch deeper): aerial perspective stays, geometry is no longer hidden; district / plaza stone one value step darker; HALO deck base `#c8ccd4…#a6adb9` → `#aab0ba…#858d9a` with stronger stone bands and class sectors; cloud puffs: the per-puff volume term fades out toward the puff edge (overlaps meet on the shared cloud shading), the silver lining only where the camera faces the light and only on the upper cloud, wider alpha feather; ridges: world-space value-noise grain + sedimentary strata on steep faces and a noisy snow/crystal cover on shallow faces above 60 % of the ridge height (neutral white; LOW tier keeps plain facets); night: ridge albedo ×0.58, far-massif caps and lit rock one step darker; sea: the ripple relief calms between 90 and 650 m so the far sea reads as reflected sky |
+| rule kept | "do not hide bad world geometry behind fog": the fog now starts beyond the playable field's crisp zone and the geometry itself was improved |
+| before / after | `evidence/cp2_after/desktop_day` → `evidence/cp4_after/desktop_day` (all 17 views, pinned at `aefbebb`); night `cp4_after/desktop_night`, phone `cp4_after/phone_med_day`; sheets `evidence/cp4_vs_cp2_day.jpg`, `cp4_vs_cp2_night.jpg` |
+| perf (V01–V12 desktop, checkpoint 4 = PASS 2b + PASS 3 class houses together) | draw calls 2322 → 2353 (+31: the architecture stone bucket and the lower fog letting more far chunks through), triangles 13.98 M → 14.09 M (+0.8 %), programs max 140 → 144 (ridge rock shader, stone), textures max unchanged (81) |
+| tests | runnable programs unchanged (22 green, 418 checks); colour law 0 |
+
+## PASS 3 (continued) — class houses and plaza metals (checkpoint 4)
+
+| field | value |
+|---|---|
+| files | `lab/world/architecture.js` (`premiumHouse`, `fascia`, satin platinum, graphite stone bucket), `lab/fieldScene.js` (plaza proxy metals by day) |
+| goal | the procedural class houses read as designed buildings, not kit primitives (V16 / V17 BEFORE: three bare cylinders under a slab; a canopy on four posts) |
+| what changed | VISIONARY overlook: support collars at 3.6 m, capitals flaring into the soffit, a halo ring tying the four supports at 14 m with a violet light line, graphite fascia + white light line around the platform, a square-diamond light inlay on the soffit, a suspended amethyst core with four satellite shards (lowest point 3.65 m above the terrace); LEAN spire house: platinum collars alternating with crimson light rings every 4 m, needle tips, struts from the 22 m platform to the lower spires, fascia; architecture platinum is satin anodised (`0xc4cbd5`, metalness 0.7) instead of a near-white mirror; plaza pillars / barriers / planters by day are satin platinum and brushed chrome (env 0.62–0.7) on graphite plinths |
+| host safety | every free-standing piece is ≥ 3.4 m above its ground or inside an existing footprint; no collider changes — pinned by `16_TESTS/gameplay_world_pivot_host_safety.test.mjs` check 4 |
+| before / after | `evidence/before/desktop_day/V16_DAY.jpg`, `V17_DAY.jpg` (pinned `b94e611`) → `evidence/cp4_after/desktop_day/` |
+
+## CHECKPOINT 5 — ridge visible/collision parity restored (`32aac74`)
+
+| field | value |
+|---|---|
+| defect found | checkpoint 2's rock displacement also moved the ridge INNER face rows into the mountain body. That face is the owner OP10 shared visible/collision surface (`VISIBLE_RIDGE_INNER_FACE` proxies from `ridgeLayout`), so from `a46bed0` to `aefbebb` the visible rock sat up to ~0.14 × ridge height behind its collision — invisible walls in front of the rock for a flying player. The existing ridge test reconstructs the triangles from `ridgeLayout`, not from the mesh, so it could not see it. Found while profiling the world colliders for PASS 6. |
+| fix | inner rows are exact again (linear between the inner base and the crest); only the unreachable OUTER rows are displaced, into the body; the inner face keeps its rock read from the shader-only grain / strata / snow |
+| guard | new `16_TESTS/gameplay_world_pivot_host_safety.test.mjs` (4 checks: ridge inner rows never displaced, HALO colonnade beyond the playable radius and inside the shell with the rings ≥ 60 m above the deck, low / mid cloud layers capped under the deck, class-house suspended pieces above head height). Verified to FAIL on `aefbebb` and PASS on `32aac74`. |
+| tests | 23 runnable programs green, 422 checks (was 22 / 418) |
+| assumption to verify with the host | the celestial rings (95 m above the deck) are above any player flight ceiling found in the data (7–13 m); `capabilities.getFlightCeiling` lives in the missing runtime modules |

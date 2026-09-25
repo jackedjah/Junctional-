@@ -384,6 +384,58 @@
    "frames_in_600ms": 0,
    "ms": 17967,
    "captured_later": "2026-09-25T17:29:13.161Z"
+  },
+  {
+   "id": "V16",
+   "label": "LEAN spire house on the north-west terrace",
+   "tod": "DAY",
+   "file": "V16_DAY.jpg",
+   "pos": [
+    -82,
+    7,
+    238
+   ],
+   "look": [
+    -110,
+    15,
+    272
+   ],
+   "stats": {
+    "calls": 107,
+    "triangles": 610032,
+    "geometries": 189,
+    "textures": 49,
+    "programs": 118
+   },
+   "frames_in_600ms": 2,
+   "ms": 24518,
+   "captured_later": "2026-09-25T17:42:17.997Z"
+  },
+  {
+   "id": "V17",
+   "label": "VISIONARY overlook close",
+   "tod": "DAY",
+   "file": "V17_DAY.jpg",
+   "pos": [
+    -127,
+    5,
+    16
+   ],
+   "look": [
+    -152,
+    9,
+    0
+   ],
+   "stats": {
+    "calls": 97,
+    "triangles": 453410,
+    "geometries": 196,
+    "textures": 51,
+    "programs": 118
+   },
+   "frames_in_600ms": 1,
+   "ms": 8108,
+   "captured_later": "2026-09-25T17:42:17.997Z"
   }
  ],
  "console_errors": [
@@ -463,5 +515,6 @@
    "worldB signage ready (14 ms)"
   ]
  },
- "note_v13_v15": "V13-V15 added later from the same pinned commit (b94e611) with the same harness settings"
+ "note_v13_v15": "V13-V15 added later from the same pinned commit (b94e611) with the same harness settings",
+ "note_v16_v17": "V16-V17 added later from the same pinned commit (b94e611) with the same harness settings"
 }
