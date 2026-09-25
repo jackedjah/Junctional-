@@ -23,7 +23,7 @@ export function createFarWorld(THREE, opts) {
      haze by distance and by height (thicker air low). Neutral rock only (colour law); still unlit, fog-free and ONE merged draw call. */
   var far = { pos: [], col: [] }; var N = 40;
   var pSun = new THREE.Vector3(26, 19, 14).normalize(); var pHaze = new THREE.Color(NIGHT ? 0x252a55 : 0xc3d8f2);
-  var rockLit = new THREE.Color(NIGHT ? 0x6d6aa0 : 0xd8cfc2), rockShade = new THREE.Color(NIGHT ? 0x1b1d3a : 0x5c6380), capCol = new THREE.Color(NIGHT ? 0xb9b2e6 : 0xf4f6fb), baseCol = new THREE.Color(NIGHT ? 0x141629 : 0x4a5068);
+  var rockLit = new THREE.Color(NIGHT ? 0x4f4c7c : 0xd8cfc2), rockShade = new THREE.Color(NIGHT ? 0x1b1d3a : 0x5c6380), capCol = new THREE.Color(NIGHT ? 0x77739f : 0xf4f6fb), baseCol = new THREE.Color(NIGHT ? 0x141629 : 0x4a5068);
   function hsh(n) { var v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); }
   function vnoise(x, y, z) { var ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z), fx = x - ix, fy = y - iy, fz = z - iz; fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); fz = fz * fz * (3 - 2 * fz);
     function h(a, b, c) { return hsh(a * 1.0 + b * 57.0 + c * 113.0); } function lx(a, b, t) { return a + (b - a) * t; }

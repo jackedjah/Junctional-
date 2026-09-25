@@ -39,10 +39,11 @@ var FRAG = [
   '  vec3 L = normalize(vLightView); float forward = pow(max(-L.z, 0.0), 3.0);',
   '  float lam = dot(n, L) * 0.5 + 0.5; lam = lam * lam * (3.0 - 2.0 * lam);',
   '  float h = smoothstep(0.0, 0.85, vH);',                                                      /* underside → crown of the whole cloud */
-  '  float lit = clamp(h * 0.78 + (lam - 0.5) * 0.42 + 0.14, 0.0, 1.0);',
-  '  vec3 col = mix(uShade, uTop, lit) * (0.92 + 0.16 * tex.r);',                             /* the texture carries the cauliflower relief */
+  '  float core = smoothstep(0.2, 0.9, tex.a);',                                               /* the per-puff volume term fades out toward the puff edge, so overlapping puffs meet on the SHARED cloud shading (no ball outlines) */
+  '  float lit = clamp(h * 0.8 + (lam - 0.5) * 0.3 * core + 0.14, 0.0, 1.0);',
+  '  vec3 col = mix(uShade, uTop, lit) * (0.95 + 0.1 * mix(0.85, tex.r, core));',                             /* the texture carries the cauliflower relief */
   '  float edge = 1.0 - smoothstep(0.08, 0.62, tex.a);',                                      /* thin edges scatter light */
-  '  col += uRim * uRimK * edge * (0.35 + forward) * clamp(dot(normalize(vec3(q, 0.35)), L) * 0.5 + 0.55, 0.0, 1.0);',
+  '  col += uRim * uRimK * edge * (0.08 + forward) * h * clamp(dot(normalize(vec3(q, 0.35)), L) * 0.5 + 0.55, 0.0, 1.0);',
   '  float fogK = smoothstep(uHazeNear, uHazeFar, vDist); col = mix(col, uHaze, fogK * 0.78); a *= 1.0 - fogK * 0.35;',
   '  gl_FragColor = vec4(col, a);',
   '  #include <colorspace_fragment>',
@@ -56,7 +57,7 @@ function puffTexture(THREE, size) {
   var C = size / 2; lobe(C, C * 1.04, C * 0.66, 0.95, 225);
   for (var i = 0; i < 26; i++) { var ang = Math.PI * (1.04 + r() * 0.92), d = C * (0.34 + r() * 0.24); lobe(C + Math.cos(ang) * d, C * 1.02 + Math.sin(ang) * d * 0.9, C * (0.16 + r() * 0.16), 0.72 + r() * 0.2, 205 + Math.round(r() * 50)); }
   for (i = 0; i < 12; i++) { ang = Math.PI * (0.08 + r() * 0.84); d = C * (0.22 + r() * 0.26); lobe(C + Math.cos(ang) * d, C * 1.0 + Math.sin(ang) * d * 0.55, C * (0.18 + r() * 0.12), 0.6 + r() * 0.2, 170 + Math.round(r() * 40)); }
-  var im = g.getImageData(0, 0, size, size), px = im.data; for (var y = 0; y < size; y++) for (var x = 0; x < size; x++) { var o = (y * size + x) * 4, dx = (x - C) / C, dy = (y - C) / C, rr = Math.sqrt(dx * dx + dy * dy); var fall = Math.max(0, Math.min(1, (1.0 - rr) / 0.32)); fall = fall * fall * (3 - 2 * fall); px[o + 3] = Math.round(px[o + 3] * fall); }
+  var im = g.getImageData(0, 0, size, size), px = im.data; for (var y = 0; y < size; y++) for (var x = 0; x < size; x++) { var o = (y * size + x) * 4, dx = (x - C) / C, dy = (y - C) / C, rr = Math.sqrt(dx * dx + dy * dy); var fall = Math.max(0, Math.min(1, (1.0 - rr) / 0.5)); fall = fall * fall * (3 - 2 * fall); px[o + 3] = Math.round(px[o + 3] * fall); }
   g.putImageData(im, 0, 0); var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; return t;
 }
 
