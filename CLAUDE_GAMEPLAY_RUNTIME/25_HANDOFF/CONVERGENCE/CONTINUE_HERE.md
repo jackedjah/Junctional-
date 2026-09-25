@@ -1,9 +1,19 @@
-# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-24 (M7 reference-locked implementation active)
+# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-25 (M7 HALO scale/access candidate released)
 
-## Active M7 HALO scale/access addendum — implementation started
+## M7 HALO scale/access addendum — protected candidate delivered
+- New protected, unpublished draft: `https://6ab5c2451611040beb1093d8--mahworld-test-preview.netlify.app`; deploy ID `6ab5c2451611040beb1093d8`; visible build `ASTRA_M7_HALO_SCALE_PRIVATE_20260924`. Netlify reports `ready`, `deploy-preview`, `published_at = null`.
+- The one-time scale contract is exact: baseline arrival `24 m` → upper arrival/deck `240 m` (`10×`); baseline dome diameter `16.4 m` → shell radius `147.6 m`, diameter `295.2 m` (`18×`); playable radius `144.8 m`; structural deck radius `153 m`; apex `387.6 m`. City, characters, furniture, equipment and local architectural modules remain unscaled.
+- The elevator is the sole normal WORLD↔HALO crossing. Both directions use one host-owned `20 s` quintic TRANSIT timeline with no early destination teleport and zero MAHGIC drain. Walking, clicking, flying and recovery cannot cross the sealed shell; HALO flight is constrained to the dome and mid-ride recovery retains held equipment.
+- The enlarged platinum/crystal tree, load paths, deck, shell, human-scale arrival court/promenades and connected class-road gradients are implemented. Nine focused NIGHT views completed with zero console errors and prove ground, ascent, upper arrival, interior shell and phone-sized framing.
+- Release gate passed: 57 programs / 1,531 checks / 0 failures; 105-file JavaScript syntax; CSS, boundary and 182-file secret scans; 182-entry exact extraction; extracted smoke `7/7`. Package: 122,983,657 bytes, SHA-256 `a1b8f4585aa2770a7c3a884a911e4bd585ad5335fe2be7334149298cf1671c56`.
+- Protection is verified without revealing credentials: play returns the MAHWORLD password form (`401`), a private JS asset is blocked (`401`), a wrong password is refused (`303`, no session cookie), and no password value is served. Authenticated hosted gameplay was not run because `MAHDEMO_PW` is unavailable.
+- Production remains deploy `6aac25101f17ce5ed37166e4`; the earlier M7 draft `6ab5acc1077641dc53f2b30b` also remains ready/unpublished. Exact release record: `m7_halo_scale/private_candidate_release.json`. Physical-phone acceptance remains owner-only.
+- **Next exact action:** owner phone review of the new protected draft. Do not promote production or expand the job without a new explicit instruction.
+
+## M7 HALO scale/access addendum — preserved implementation contract
 - Owner addendum is preserved at `25_HANDOFF/M7/MAHWORLD_M7_HALO_SCALE_AND_ELEVATOR_ONLY.md`; its one-time scale result is recorded at `25_HANDOFF/M7/HALO_SCALE_CONTRACT.json` and enforced by `26_LOCAL_AUTHORITY/play/haloLayout.js`.
 - Authorized target: 240 m upper arrival, 147.6 m shell radius / 295.2 m diameter, 153 m structural deck radius and 387.6 m apex. City, actors, furniture, equipment and the local tree-base footprint remain human/world scale.
-- Elevator-only access, contained interior flight, support/collision, 20 s host transit, upper-realm architecture and road-gradient implementation are in progress. M7 draft and production remain unchanged.
+- Elevator-only access, contained interior flight, support/collision, 20 s host transit, upper-realm architecture and road-gradient work are complete in the new candidate above. The earlier M7 draft and production remain unchanged.
 
 ## M7 reference-locked private candidate — delivered for owner review
 - Playable protected draft: `https://6ab5acc1077641dc53f2b30b--mahworld-test-preview.netlify.app`; deploy/build ID `6ab5acc1077641dc53f2b30b`; visible build label `ASTRA_M7_REFERENCE_LOCK_PRIVATE_20260924`. API state is `ready`, context `deploy-preview`, `published_at = null`, with one edge gate present.

@@ -1,0 +1,64 @@
+{
+  "released_at": "2026-09-25T00:37:25.199Z",
+  "build_label": "ASTRA_M7_HALO_SCALE_PRIVATE_20260924",
+  "deploy_id": "6ab5c2451611040beb1093d8",
+  "url": "https://6ab5c2451611040beb1093d8--mahworld-test-preview.netlify.app",
+  "state": "ready",
+  "context": "deploy-preview",
+  "published_at": null,
+  "password_protected": true,
+  "dimensions_m": {
+    "baseline_arrival": 24,
+    "arrival_scale": 10,
+    "arrival_and_trunk": 240,
+    "baseline_dome_diameter": 16.4,
+    "dome_scale": 18,
+    "shell_radius": 147.6,
+    "shell_diameter": 295.2,
+    "playable_radius": 144.8,
+    "structural_deck_radius": 153,
+    "dome_apex": 387.6
+  },
+  "access": {
+    "normal_entrance_exit": "ELEVATOR_ONLY",
+    "transit_seconds_each_way": 20,
+    "authority_domains": ["WORLD", "TRANSIT", "HALO"],
+    "flight_contained": true,
+    "mahgic_drain": 0,
+    "early_destination_teleport": false
+  },
+  "package": {
+    "entries": 182,
+    "bytes": 122983657,
+    "sha256": "a1b8f4585aa2770a7c3a884a911e4bd585ad5335fe2be7334149298cf1671c56",
+    "record_sha256": "8aa35b623fc1d7b3f36d27195e7ed140f28fdc7a649a0a89277e47a50b42267b"
+  },
+  "release_checks": {
+    "test_programs": 57,
+    "checks_passed": 1531,
+    "checks_failed": 0,
+    "javascript_files": 105,
+    "secret_scan_files": 182,
+    "fresh_extraction_files": 182,
+    "fresh_extraction_smoke": "7/7",
+    "focused_views": 9,
+    "focused_console_errors": 0,
+    "visual_report_sha256": "cc1d8fed0fc2e5e082aaf3e44c30799e63a0b497e86df2424eb02175315a360e"
+  },
+  "gate_check": {
+    "play_status": 401,
+    "password_form": true,
+    "private_asset_status": 401,
+    "wrong_password_status": 303,
+    "wrong_password_refused": true,
+    "wrong_password_session_cookie_issued": false,
+    "password_value_served": false,
+    "authenticated_hosted_gameplay": "NOT RUN - MAHDEMO_PW unavailable"
+  },
+  "preserved": {
+    "production_deploy": "6aac25101f17ce5ed37166e4",
+    "previous_m7_deploy": "6ab5acc1077641dc53f2b30b"
+  },
+  "reviewed_source_checkpoint": "01c61d22c0108001db0cd8ca73b3b5a60fcf405b",
+  "physical_phone_acceptance": "OWNER_PENDING"
+}

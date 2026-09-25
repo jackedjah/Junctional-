@@ -116,6 +116,16 @@ Updated 2026-09-24 (M7 reference-locked implementation S1-S4 locally closed; pro
 - Character masters, S08 appearance work, and the Blender slot remain outside this scope. `BLENDER RELEASED` has not been established.
 - No reset, clean, stash, clone, replacement world, new worktree, model/billing/auth change, purchase, external asset upload, deployment, or production publish was performed.
 
+## M7 HALO scale/access release — current state
+
+- Build `ASTRA_M7_HALO_SCALE_PRIVATE_20260924` is packaged and deployed as protected draft `6ab5c2451611040beb1093d8`: `https://6ab5c2451611040beb1093d8--mahworld-test-preview.netlify.app`. It is `ready`, `deploy-preview`, and unpublished.
+- Contract dimensions are enforced by `play/haloLayout.js`: arrival/deck `240 m` (`10×` baseline), shell radius `147.6 m`, diameter `295.2 m` (`18×` baseline), playable radius `144.8 m`, structural radius `153 m`, apex `387.6 m`. The city, actors, furniture and equipment are not scaled.
+- WORLD, TRANSIT and HALO spatial authority seals every non-elevator crossing. Up and down rides each take `20 s`, retain camera/equipment state, consume no MAHGIC, and dock before the destination domain becomes active. HALO flight remains bounded inside the shell.
+- Focused proof is 9 views / 0 console errors. Full release proof is 57 programs / 1,531 checks / 0 failures, 105 syntax files, clean protected-boundary and 182-file secret scans, exact 182-file extraction, and `7/7` extracted smoke.
+- Package is 122,983,657 bytes, SHA-256 `a1b8f4585aa2770a7c3a884a911e4bd585ad5335fe2be7334149298cf1671c56`. Durable record: `25_HANDOFF/CONVERGENCE/m7_halo_scale/private_candidate_release.json`.
+- Password boundary is verified: gated play `401`, private asset `401`, wrong password refused with no session cookie, no password value served. Authenticated hosted gameplay and physical-phone acceptance remain owner-pending.
+- Production remains `6aac25101f17ce5ed37166e4`; prior M7 remains `6ab5acc1077641dc53f2b30b`, ready and unpublished. No previous preview was replaced.
+
 ## Transfer ingestion
 
 - Read completely: `MAHWORLD_ASTRA_TRANSFER/02_PASTE_IN_ASTRA.txt`, `03_MASTER_REVIEW/01_MASTER_CONTINUATION.txt`, and `04_GITHUB_REUSE_ADDON.md`.

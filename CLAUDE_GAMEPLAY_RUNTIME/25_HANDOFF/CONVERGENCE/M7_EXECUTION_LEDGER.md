@@ -30,11 +30,18 @@ Updated 2026-09-24 after the bounded local runtime check. This file maps the pac
 - Authenticated hosted gameplay was not run because `MAHDEMO_PW` was unavailable; protection was instead checked unauthenticated and with an intentionally wrong password. The Netlify CLI ignored the existing defensive `/.netlify/images` redirect because that reserved path is no longer accepted in redirect syntax; this package contains no raster image files for that service, and the all-path edge gate is deployed.
 - Reference dimensions not present in the supplied image remain authored/measured runtime choices, not claimed source measurements. Physical-phone acceptance remains owner-only.
 
-## M7 HALO scale/access addendum — active requirements
+## M7 HALO scale/access addendum — closed for owner review
 
-- `HALO-SCALE` — ACTIVE: one-time 10× arrival and 18× linear dome result is versioned in `HALO_SCALE_CONTRACT.json`; no city/actor/furniture/equipment scaling.
-- `HALO-ACCESS` — PENDING IMPLEMENTATION: elevator must be the only normal gameplay entrance/exit and all other boundary crossings must be rejected.
-- `HALO-TRANSIT` — PENDING IMPLEMENTATION: one host-owned 20 s smootherstep timeline, zero resource drain, no destination teleport before docking, camera independent.
-- `HALO-QUALITY` — PENDING IMPLEMENTATION: re-authored load-bearing tree/deck/dome, human-scale interior programme and stable two-sided shell rendering.
-- `ROAD-GRADIENT` — PENDING IMPLEMENTATION: extend the accepted smooth shared-endpoint class gradients without breaking the 128-segment junction.
-- `HALO-RELEASE` — PENDING: focused dimensions/access/transit/visual checks, one release gate and one new protected unpublished candidate; preserve M7 and production.
+- `HALO-SCALE` — IMPLEMENTED / VERIFIED: arrival `240 m` (`10×`); shell radius `147.6 m`, diameter `295.2 m` (`18×`); playable `144.8 m`; structural deck `153 m`; apex `387.6 m`. City/actor/furniture/equipment scale is unchanged.
+- `HALO-ACCESS` — IMPLEMENTED / VERIFIED: the elevator is the only normal entrance/exit; walking, click navigation, free flight, shell recovery and domain-leaking AI/items are rejected or contained.
+- `HALO-TRANSIT` — IMPLEMENTED / VERIFIED: one host-owned `20 s` quintic up/down timeline, zero drain, no early destination teleport, independent camera, equipment retained through midpoint recovery.
+- `HALO-QUALITY` — IMPLEMENTED / VISUALLY CHECKED: load-bearing 240 m trunk/bough/core, structural deck, stable two-sided shell, human-scale arrival/promenade programme and improved dock architecture.
+- `ROAD-GRADIENT` — IMPLEMENTED / VISUALLY CHECKED: shared-endpoint linear-space class gradients continue through the ground approach and upper spokes/courts while the repaired 128-segment mainland junction stays intact.
+- `HALO-RELEASE` — COMPLETE FOR OWNER REVIEW: 57 programs / 1,531 checks / 0 failures; 182-entry exact extraction; smoke `7/7`; protected unpublished draft `6ab5c2451611040beb1093d8`. Production and prior M7 are unchanged.
+
+### Addendum evidence and honest limitations
+
+- Focused report: `26_LOCAL_AUTHORITY/deploy/probe_out/m7_halo_scale/report.json` (`9` views, `0` console errors). It records WORLD ground `0 m`, live TRANSIT midpoint `121.124981 m`, HALO dock `240 m`, successful guide interaction, successful down ride, final WORLD ground `0 m`, and unchanged pool `200` throughout.
+- Phone-sized headless view is framing evidence only. Its render sample is not a physical-phone GPU, thermal, memory or touch-performance claim.
+- The 18× shell deliberately surrounds human-scale city modules; the resulting upper realm is spacious. No forbidden whole-city scaling was used to fill it.
+- Authenticated hosted gameplay is not claimed because `MAHDEMO_PW` was unavailable. Physical-phone acceptance remains the owner's test.
