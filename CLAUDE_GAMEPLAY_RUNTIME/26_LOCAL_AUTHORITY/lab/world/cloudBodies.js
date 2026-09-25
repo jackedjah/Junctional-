@@ -78,6 +78,7 @@ export function createCloudBodies(ctx, L, opts) {
     var cl = { x: x0, z: z0, x0: x0, z0: z0, y: (L.alt_m || 150) + (rnd() - 0.5) * 24, yaw: rnd() * Math.PI, drift: 0.7 + rnd() * 0.6, len: len, puffs: [] };
     var raw = cloudCluster(len, rnd, L.crown === undefined ? 1 : L.crown); var keep = Math.max(4, Math.round(raw.length * tierScale));
     cl.extent = Math.max.apply(Math, raw.map(function (P) { return P.y + P.h * 0.5; })) + len * 0.02;
+    if (L.max_top_m && cl.y + cl.extent > L.max_top_m) cl.y = L.max_top_m - cl.extent;   /* keeps every body below the HALO deck (240 m): no cloud ever pokes up through the upper-realm floor */
     for (var p = 0; p < raw.length; p++) { if (p % Math.max(1, Math.round(raw.length / keep)) !== 0 && raw.length > keep) continue; var P = raw[p]; P.cloud = cl; P.seed = rnd(); cl.puffs.push(P); puffs.push(P); }
     clouds.push(cl); }
   var geo = new THREE.PlaneGeometry(1, 1); own.push(geo); var aPuff = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aPuff.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aPuff', aPuff); var aCloud = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 2), 2); aCloud.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aCloud', aCloud);

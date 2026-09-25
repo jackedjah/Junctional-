@@ -8,7 +8,7 @@ var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.resolve(H
 var LAB_URL = '/CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/';
 var argv = process.argv.slice(2); function arg(k, d) { var i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; }
 var OUT = path.resolve(argv[0] && argv[0].indexOf('--') !== 0 ? argv[0] : path.join(HERE, 'out')); fs.mkdirSync(OUT, { recursive: true });
-var SIZE = arg('--size', '1280x720').split('x').map(Number); var QUALITY = arg('--quality', 'HIGH'); var TOD = arg('--tod', 'DAY'); var SETTLE = +arg('--settle', '2500');
+var SIZE = arg('--size', '1280x720').split('x').map(Number); var MAPS = argv.indexOf('--map') >= 0; var QUALITY = arg('--quality', 'HIGH'); var TOD = arg('--tod', 'DAY'); var SETTLE = +arg('--settle', '2500');
 
 /* FIXED viewpoints: [id, label, camera position, look-at]. World axes: +z north (temple / market), +x east (tower), HALO tree at (30, 40). */
 export var VIEWS = [
@@ -23,7 +23,10 @@ export var VIEWS = [
   ['V09', 'HALO dome from the ground', [-130, 22, -150], [30, 230, 40]],
   ['V10', 'sky toward the Sun', [0, 3, 0], [260, 150, 140]],
   ['V11', 'south coast horizon', [0, 7, -140], [0, 4, -300]],
-  ['V12', 'view back over MAHWORLD from the HALO rim', [30, 247, 184], [20, 40, 520]]
+  ['V12', 'view back over MAHWORLD from the HALO rim', [30, 247, 184], [20, 40, 520]],
+  ['V13', 'plaza street level toward the tree elevator', [-10, 3.2, -14], [30, 10, 40]],
+  ['V14', 'HALO glass sky-walk looking down', [30, 243, 172], [30, 0, 262]],
+  ['V15', 'civic facade close (Mentor Spire)', [6, 2.6, -9], [24, 7, 0]]
 ];
 
 function mime(p) { return ({ '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css', '.bin': 'application/octet-stream', '.ktx2': 'image/ktx2' })[path.extname(p).toLowerCase()] || 'application/octet-stream'; }
@@ -65,6 +68,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       }
     }
   } catch (e) { report.error = String(e && e.stack || e); console.log('ERROR', report.error); }
+  if (MAPS) { try { for (var ms of [[390, 430, 'MAP_phone.png'], [720, 640, 'MAP_desktop.png']]) { var du = await page.evaluate(function (a) { return window.WP.map(a[0], a[1], { x: 0, z: -20, heading: 0.3 }); }, ms); if (du) { fs.writeFileSync(path.join(OUT, ms[2]), Buffer.from(du.split(',')[1], 'base64')); report.maps = (report.maps || []).concat(ms[2]); } } } catch (e) { report.map_error = String(e && e.stack || e); } }
   report.finished = new Date().toISOString(); report.final_state = await page.evaluate(function () { return window.WP ? window.WP.state() : null; }).catch(function () { return null; });
   fs.writeFileSync(path.join(OUT, 'capture_report.json'), JSON.stringify(report, null, 1));
   console.log('console errors', consoleErrors.length); await browser.close(); srv.close();

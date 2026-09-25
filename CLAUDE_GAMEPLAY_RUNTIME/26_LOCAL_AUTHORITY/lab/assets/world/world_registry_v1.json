@@ -1,6 +1,6 @@
 {
  "version": "WORLD_REGISTRY_V1",
- "generated": "2026-09-25T17:08:18.765Z",
+ "generated": "2026-09-25T17:28:09.154Z",
  "_doc": "JOB B world registry (owner directive 2026-09-19 §19): sources (provenance) → derivatives (what ships) → artifacts / zones / fixtures / creatures / celestial (placement + policy). Coordinates are FIELD metres (x east, z north, y up), yaw in degrees around +y. Collision shapes for the host are GENERATED from this file by deploy/jobb/build_world_colliders.mjs (never hand-edited twice). states: PLACED = built and in the world · WAITING_FOR_JOB_A = the hook exists, the gameplay side is JOB A's · PROVISIONAL = owner tuning pending.",
  "field": {
   "walls": {
@@ -1304,7 +1304,8 @@
    "z1": -86,
    "x2": 203,
    "z2": 322,
-   "corner_r": 70
+   "corner_r": 70,
+   "organic_m": 16
   },
   "beach_w": 34,
   "beach_drop_m": 1.6,
@@ -1471,15 +1472,16 @@
   "policy": "OPAQUE_PLATINUM",
   "reflected_light_prominence": 0.15,
   "day": {
-   "roughness": 0.42,
-   "metalness": 0.9,
-   "envMapIntensity": 0.22
+   "roughness": 0.58,
+   "metalness": 0.25,
+   "envMapIntensity": 0.5
   },
   "night": {
    "roughness": 0.3,
    "metalness": 0.9,
    "envMapIntensity": 0.55
   },
+  "pivot_note": "World pivot PASS 2 (2026-09-25): by DAY the floor is a satin platinum STONE (metalness 0.25) so it answers the Sun with light and shade instead of mirroring the bright sky as flat white glare; the night blackened-platinum sheen is unchanged.",
   "note": "0.15 is a visual prominence target (roughness / metalness / env intensity), NOT opacity"
  },
  "celestial": {
@@ -5863,6 +5865,7 @@
     "id": "STRATUS_LOW",
     "kind": "CLOUD",
     "alt_m": 118,
+    "max_top_m": 200,
     "count": 12,
     "size_m": [
      70,
@@ -5880,7 +5883,8 @@
    {
     "id": "CUMULUS_MID",
     "kind": "CLOUD",
-    "alt_m": 190,
+    "alt_m": 180,
+    "max_top_m": 226,
     "count": 26,
     "size_m": [
      105,
@@ -8621,9 +8625,9 @@
     "h_min": 38,
     "h_max": 150,
     "base_w_m": 70,
-    "color_base": "#26313f",
-    "color_peak": "#6f8298",
-    "color_crystal": "#9fd0ff",
+    "color_base": "#3b4154",
+    "color_peak": "#aaa5a2",
+    "color_crystal": "#eef1f8",
     "passes": [
      {
       "id": "PASS_NORTH_BAGE",
@@ -8671,9 +8675,9 @@
     "h_min": 70,
     "h_max": 230,
     "base_w_m": 110,
-    "color_base": "#3a4a5e",
-    "color_peak": "#8ea3ba",
-    "color_crystal": "#bfe0ff",
+    "color_base": "#4a5064",
+    "color_peak": "#b9b4ae",
+    "color_crystal": "#f2f4f9",
     "passes": [
      {
       "id": "PASS_NORTH_BAGE",

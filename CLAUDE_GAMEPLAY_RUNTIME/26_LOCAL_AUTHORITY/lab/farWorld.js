@@ -17,12 +17,34 @@ export function createFarWorld(THREE, opts) {
   function finish(acc, material) { var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(acc.pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(acc.col, 3)); if (acc.nrm) g.setAttribute('normal', new THREE.Float32BufferAttribute(acc.nrm, 3)); g.computeBoundingSphere(); var m = new THREE.Mesh(g, material); m.frustumCulled = false; m.matrixAutoUpdate = false; return m; }
   var M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), S = new THREE.Vector3(), T = new THREE.Vector3(); var Y = new THREE.Vector3(0, 1, 0);
   function place(x, y, z, ry, sx, sy, sz) { Q.setFromAxisAngle(Y, ry); S.set(sx, sy, sz); T.set(x, y, z); return M4.compose(T, Q, S); }
-  /* ---------- FAR: crystalline massifs + world-scale spires (unlit silhouettes, colours mixed toward the haze by distance) ---------- */
+  /* ---------- FAR: rocky massifs + world-scale spires. WORLD PIVOT PASS 2 (owner 2026-09-25: premium world, no flat paper mountains):
+     every peak is a noise-displaced cone (12 × 6) with BAKED facet light from the registry Sun direction — warm light-stone on lit faces,
+     cool lavender-grey in shadow, pale crystal-white caps on the high upward faces — then aerial perspective toward the daylight horizon
+     haze by distance and by height (thicker air low). Neutral rock only (colour law); still unlit, fog-free and ONE merged draw call. */
   var far = { pos: [], col: [] }; var N = 40;
-  for (var k = 0; k < N; k++) { var ang = k / N * Math.PI * 2 + (rnd() - 0.5) * 0.12; var dist = 620 + rnd() * 240; var mix = 0.3 + 0.4 * (dist - 620) / 240;   /* farther = closer to the haze colour (authored atmospheric perspective; the forms stay readable, never fogged out) */
-    var base = plat.clone().lerp(crystal, rnd() * 0.5).lerp(haze, mix); var cx = Math.cos(ang) * dist, cz = Math.sin(ang) * dist; var pieces = 2 + Math.floor(rnd() * 4);
-    for (var j = 0; j < pieces; j++) { var h = 60 + rnd() * 140; var r = 28 + rnd() * 40; var ox = (rnd() - 0.5) * 90, oz = (rnd() - 0.5) * 90; var sides = 8 + Math.floor(rnd() * 3), squash = 0.82 + rnd() * 0.48, ry = rnd() * 3; var pc = base.clone().multiplyScalar(0.94 + rnd() * 0.07); pushGeo(far, new THREE.CylinderGeometry(r * 0.68, r, h * 0.64, sides, 2), place(cx + ox, h * 0.32 - 8, cz + oz, ry, 1, 1, squash), pc, true, h * 0.9); pushGeo(far, new THREE.ConeGeometry(r * 0.68, h * 0.36, sides), place(cx + ox, h * 0.82 - 8, cz + oz, ry, 1, 1, squash), pc.clone().lerp(crystal, 0.1), true, h * 0.9); }
-    if (k % 7 === 3) { var sh = 190 + rnd() * 70; pushGeo(far, new THREE.ConeGeometry(14 + rnd() * 8, sh, 6), place(cx, sh / 2 - 6, cz, rnd() * 3, 1, 1, 1), base.clone().lerp(crystal, 0.35), true);   /* a world-scale spire: a diamond monument on the horizon */ pushGeo(far, new THREE.OctahedronGeometry(18, 0), place(cx, sh - 2, cz, rnd() * 3, 1, 1.9, 1), crystal.clone().lerp(haze, mix * 0.8), true); }
+  var pSun = new THREE.Vector3(26, 19, 14).normalize(); var pHaze = new THREE.Color(NIGHT ? 0x252a55 : 0xc3d8f2);
+  var rockLit = new THREE.Color(NIGHT ? 0x6d6aa0 : 0xd8cfc2), rockShade = new THREE.Color(NIGHT ? 0x1b1d3a : 0x5c6380), capCol = new THREE.Color(NIGHT ? 0xb9b2e6 : 0xf4f6fb), baseCol = new THREE.Color(NIGHT ? 0x141629 : 0x4a5068);
+  function hsh(n) { var v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); }
+  function vnoise(x, y, z) { var ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z), fx = x - ix, fy = y - iy, fz = z - iz; fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); fz = fz * fz * (3 - 2 * fz);
+    function h(a, b, c) { return hsh(a * 1.0 + b * 57.0 + c * 113.0); } function lx(a, b, t) { return a + (b - a) * t; }
+    return lx(lx(lx(h(ix, iy, iz), h(ix + 1, iy, iz), fx), lx(h(ix, iy + 1, iz), h(ix + 1, iy + 1, iz), fx), fy), lx(lx(h(ix, iy, iz + 1), h(ix + 1, iy, iz + 1), fx), lx(h(ix, iy + 1, iz + 1), h(ix + 1, iy + 1, iz + 1), fx), fy), fz); }
+  function fbm(x, y, z) { return vnoise(x, y, z) * 0.55 + vnoise(x * 2.07, y * 2.07, z * 2.07) * 0.3 + vnoise(x * 4.3, y * 4.3, z * 4.3) * 0.15; }
+  function smooth01(v) { v = Math.max(0, Math.min(1, v)); return v * v * (3 - 2 * v); }
+  function rockPeak(cx, cz, r, h, ry, squash, mix, sd) {
+    var g = new THREE.ConeGeometry(r, h, 12, 6, true); g.translate(0, h / 2, 0); var P = g.attributes.position, apexShift = (hsh(sd) - 0.5) * r * 0.5;
+    for (var i = 0; i < P.count; i++) { var x = P.getX(i), y = P.getY(i), z = P.getZ(i), t = y / h, rad = Math.hypot(x, z);
+      if (rad > 1e-4) { var n = fbm(x * 0.045 + sd, y * 0.05, z * 0.045 - sd); var k = 1 + (n - 0.5) * 0.9 * (1 - t * 0.5); x *= k; z *= k; y += (fbm(x * 0.03, y * 0.03 + sd, z * 0.03) - 0.5) * h * 0.08 * (1 - t); }
+      x += apexShift * t * t; P.setXYZ(i, x, Math.max(0, y), z); }
+    g = g.toNonIndexed(); g.applyMatrix4(place(cx, -6, cz, ry, 1, 1, squash)); g.computeVertexNormals(); var p = g.attributes.position, nm = g.attributes.normal, c = new THREE.Color();
+    for (var v = 0; v < p.count; v++) { var lam = nm.getX(v) * pSun.x + nm.getY(v) * pSun.y + nm.getZ(v) * pSun.z; var yy = p.getY(v) + 6, tt = yy / h;
+      c.copy(rockShade).lerp(rockLit, smooth01(lam * 0.9 + 0.35)); c.lerp(baseCol, (1 - smooth01(tt * 2.2)) * 0.35);
+      if (tt > 0.62 && nm.getY(v) > 0.28) c.lerp(capCol, smooth01((tt - 0.62) / 0.2) * smooth01((nm.getY(v) - 0.28) / 0.3) * (0.55 + 0.45 * Math.max(0, lam)));
+      c.lerp(pHaze, Math.min(0.86, mix + (1 - smooth01(tt)) * 0.18)); far.pos.push(p.getX(v), p.getY(v), p.getZ(v)); far.col.push(c.r, c.g, c.b); }
+    g.dispose(); }
+  for (var k = 0; k < N; k++) { var ang = k / N * Math.PI * 2 + (rnd() - 0.5) * 0.12; var dist = 620 + rnd() * 240; var mix = 0.18 + 0.36 * (dist - 620) / 240;   /* farther = closer to the haze colour; forms stay readable, never fogged out */
+    var cx = Math.cos(ang) * dist, cz = Math.sin(ang) * dist; var pieces = 3 + Math.floor(rnd() * 4); var main = 110 + rnd() * 150;
+    for (var j = 0; j < pieces; j++) { var h = j === 0 ? main : main * (0.35 + rnd() * 0.45); var r = h * (0.42 + rnd() * 0.22); var ox = (rnd() - 0.5) * 120, oz = (rnd() - 0.5) * 120; rockPeak(cx + ox, cz + oz, r, h, rnd() * 3, 0.78 + rnd() * 0.5, mix, k * 13 + j * 3.7); }
+    if (k % 7 === 3) { var sh = 190 + rnd() * 70; pushGeo(far, new THREE.ConeGeometry(14 + rnd() * 8, sh, 6), place(cx, sh / 2 - 6, cz, rnd() * 3, 1, 1, 1), capCol.clone().lerp(pHaze, 0.35 + mix * 0.5), true);   /* a world-scale spire: a platinum monument on the horizon */ pushGeo(far, new THREE.OctahedronGeometry(18, 0), place(cx, sh - 2, cz, rnd() * 3, 1, 1.9, 1), capCol.clone().lerp(pHaze, mix * 0.6), true); }
   }
   var farMat = new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, toneMapped: false }); var farMesh = finish(far, farMat); farMesh.name = 'FAR_MASSIFS'; farMesh.renderOrder = -5; group.add(farMesh);
   /* ---------- MID: elevated crystal walkway arcs + prism towers in the empty sectors (lit, fogged naturally) ---------- */

@@ -84,3 +84,44 @@ Evidence: `evidence/before/desktop_day/`, `desktop_night/`, `phone_med_day/`.
 | after | 0. Civic accents (trims, fixtures, signage, architecture lines, MAH MATCH, interiors, guide/fairy glow) → neutral white light; Dogkie aura, fish tint and status plates → TITAN blue; pools → natural water blue; plaza botanicals → platinum leaves with NEXUS gold energy; the VERDANT green family is retired (ISLE_E / ISLE_FAR_E → blue, ISLET_VERDANT → red); MAH MATCH is black / graphite + white light (was canon cyan — the owner law supersedes it) |
 | tests | new colour-law program 4/4: classifier, zero literals across 35 world-art files + registry, crystal families exactly the five + platinum, every referenced colour family in the registry is lawful |
 | unresolved | literal scan only: colours computed at runtime (HSL maths) and GLB-embedded textures are not scanned; status-plate semantics (hostile blue / friendly white / low red) await owner review |
+
+## PASS 2 — terrain / ground / mountains / coast (checkpoint 2, host-safe scope)
+
+Walkable elevation inside the field walls is shared with the host (worldLayout.groundYAt + generated colliders) and its tests cannot run
+until the runtime bridge lands, so this checkpoint changes ONLY what the host never reads: materials, the ridges and massifs beyond the
+walls, and the coastline beyond the walls.
+
+| field | value |
+|---|---|
+| files | `lab/fieldScene.js` (daytime floor stone palette), `lab/farWorld.js` (FAR massifs), `lab/world/macro.js` (ridge faceting + inward rock displacement), `lab/world/coast.js` (organic coastline), `deploy/jobb/build_registry.mjs` (ground policy, ridge colours, `coast.outline.organic_m`) |
+| visual goal | remove the white-mirror floor and the flat-paper mountains; replace the machined rounded-rectangle coast with headlands and bays |
+| what changed | DAY ground policy metalness 0.9 → 0.25, roughness 0.42 → 0.58 (satin stone that answers the Sun) with a warm mid-grey stone base under the existing seams / inlays; macro ridges shade by true facet orientation with rock pushed INTO the mountain body (never over the playable side) and neutral slate → warm stone → white crystal-cap colours; FAR massifs are noise-displaced rocky peaks with baked warm-lit / cool-shadow facets from the Sun direction, pale caps and aerial perspective toward the daylight haze; the coast breathes outward 0–16 m (sea hole, foam and seaTest share the same offset; host sea schools stay ≥ 50 m out) |
+| unresolved | terrain folds / berms / valleys INSIDE the walls wait for host verification; roads and region-tint transitions; water material |
+
+## PASS 3 — civic architecture (checkpoint 2)
+
+| field | value |
+|---|---|
+| files | `lab/cityScene.js` |
+| goal | premium, believable civic buildings: structure first, light second, collision parity kept |
+| what changed | satin anodised platinum panels (metalness 0.9 → 0.62), smoked neutral curtain-wall glass (was the civic cyan band), warm-white doorway light; per building a graphite plinth, thin floor cornices every 3.6 m above head height, a cantilevered entrance canopy with a white-light underside and a merged roof-plant cluster (condensers, tank, mast + beacon, tilted solar array) — +2 draws per building, everything inside the collider footprint or above 3.4 m |
+| unresolved | the five sanctuaries' landmark buildings (imported temple / tower / market and the procedural LEAN / VISIONARY houses) are audited but not yet re-dressed; texture-level material families wait on the Scenario decision |
+
+## PASS 4 — HALO hero realm (checkpoint 2)
+
+| field | value |
+|---|---|
+| files | `lab/cityScene.js` (treeElevator) |
+| goal | a signature landmark — premium circular construction, luminous rings, views back over MAHWORLD — while the host contract (240 m deck, 144.8 m playable radius, elevator-only access, court, flight) is untouched |
+| what changed | the deck is one opaque plan-drawn top to 128 m (satin platinum stone, paving bands and seams, luminous white inlay rings at 24/48/72/96/120 m, five class spokes and sectors, a segmented light-ring medallion at the elevator arrival; texture follows the tier cap); a GLASS SKY-WALK annulus 128–153 m (16.8 m walkable) with a merged platinum mullion grid and a glass balustrade + rail at the playable edge lets the rim look straight down 240 m over MAHWORLD (the underside disc stops at 126.8 m); iridescent fresnel dome glass (clear face-on, lavender / blue / rose at grazing angles); a fine merged lattice (24 meridians + 6 parallels + crown ring, one draw) replaces 16 heavy ribs + 4 rings; low / mid cloud bodies are capped below the deck so no cloud crosses the upper-realm floor |
+| host contract | HALO_DECK_SINGLE_TOP, `full_area_opaque_owners: 1`, `transparent_full_area_overlays: 0` and the open side skirt are kept: the glass is a separate annulus owner, never an overlay |
+| unresolved | the HALO still needs social / activity dressing beyond the court (only floor-level or rim-zone detail is host-safe); owner review of the glass sky-walk |
+
+## PASS 5 — world map (checkpoint 2)
+
+| field | value |
+|---|---|
+| files | `lab/worldMap.js` (new), `lab/gameMenu.js` (MAP tab routes through it when the world registry is present; the district-only drawing stays the fallback) |
+| goal | the five class territories readable at a glance; territory ↔ sanctuary ↔ landmarks ↔ roads ↔ water ↔ HALO ↔ player relationships; phone-readable technical overlay |
+| what changed | a cached territory field rasterised from the registry regions (soft union, nearest class wins, glowing class borders, faint hatching), water, the causeway / regional / trail hierarchy, MAHGIC patches, landmark glyphs in their territory colour, the HALO access ring with its height, the player heading arrow, a five-class legend; no `ctx.filter` (iPhone Safari) |
+| evidence | `MAP_phone.png` / `MAP_desktop.png` rendered by the world preview from the live registry |

@@ -6,6 +6,7 @@ import * as THREE from '../vendor/three/three.module.min.js';
 import { createFieldScene } from './fieldScene.js';
 import { createQuality } from './quality.js';
 import { createColliders } from '../play/rules1723/Colliders.js';
+import { drawWorldMap } from './worldMap.js';
 
 var params = new URLSearchParams(location.search);
 var quality = createQuality({ params: params });
@@ -51,5 +52,8 @@ window.WP = {
   time: function (tod) { if (fieldScene.setNight) fieldScene.setNight(tod === 'NIGHT', { persist: false }); return fieldScene.timeOfDay ? fieldScene.timeOfDay() : null; },
   prewarm: function () { STATE.prewarm = fieldScene.prewarmTimeStates ? fieldScene.prewarmTimeStates(renderer, camera) : null; return STATE.prewarm; },
   stats: function () { var i = renderer.info; return { calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, programs: i.programs ? i.programs.length : null }; },
-  tag: function (s) { document.getElementById('tag').textContent = s || ''; return true; }
+  tag: function (s) { document.getElementById('tag').textContent = s || ''; return true; },
+  map: function (w, h, player) { var reg = fieldScene.worldRegistry ? fieldScene.worldRegistry() : null; if (!reg) return null; var c = document.createElement('canvas'); c.width = w; c.height = h; var g = c.getContext('2d'); var boxes = [];
+    function mapLabel(txt, x, y, o) { o = o || {}; g.save(); g.font = o.font || '700 9px system-ui'; var tw = Math.ceil(g.measureText(txt).width) + 8, th = o.height || 13, bx = Math.max(2, Math.min(w - tw - 2, x - tw / 2)), by = Math.max(2, Math.min(h - th - 2, y - th / 2)), box = { x1: bx, y1: by, x2: bx + tw, y2: by + th }; if (!o.force && boxes.some(function (b) { return !(box.x2 + 2 < b.x1 || box.x1 - 2 > b.x2 || box.y2 + 2 < b.y1 || box.y1 - 2 > b.y2); })) { g.restore(); return false; } boxes.push(box); g.fillStyle = 'rgba(5,7,13,0.7)'; g.fillRect(bx, by, tw, th); g.fillStyle = o.color || '#eef1f8'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, bx + tw / 2, by + th / 2 + 0.5); g.restore(); return true; }
+    drawWorldMap(g, w, h, reg, { player: player || { x: 0, z: -20, heading: 0 }, t: 0.6, mapLabel: mapLabel }); return c.toDataURL('image/png'); }
 };

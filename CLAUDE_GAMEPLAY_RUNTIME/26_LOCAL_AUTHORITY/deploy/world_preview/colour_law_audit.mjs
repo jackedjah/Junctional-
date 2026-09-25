@@ -23,7 +23,7 @@ export function classify(hex) {
 export function auditColourLaw() {
 var FILES = [];
 function add(dir, re) { fs.readdirSync(dir).forEach(function (f) { if (re.test(f)) FILES.push(path.join(dir, f)); }); }
-add(path.join(LA, 'lab', 'world'), /\.js$/); ['fieldScene.js', 'cityScene.js', 'farWorld.js', 'mahgicTree.js', 'interiorScene.js', 'dustFx.js', 'BeamFx.js'].forEach(function (f) { FILES.push(path.join(LA, 'lab', f)); });
+add(path.join(LA, 'lab', 'world'), /\.js$/); ['fieldScene.js', 'cityScene.js', 'farWorld.js', 'mahgicTree.js', 'interiorScene.js', 'dustFx.js', 'BeamFx.js', 'worldMap.js'].forEach(function (f) { FILES.push(path.join(LA, 'lab', f)); });
 FILES.push(path.join(LA, 'lab', 'assets', 'world', 'world_registry_v1.json')); FILES.push(path.join(LA, 'lab', 'assets', 'botany', 'tree_spec.js'));
 var rows = [];
 FILES.filter(function (f) { return fs.existsSync(f); }).forEach(function (f) {
