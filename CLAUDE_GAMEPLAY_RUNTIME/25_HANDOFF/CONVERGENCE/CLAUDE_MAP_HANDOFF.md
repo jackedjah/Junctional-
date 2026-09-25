@@ -1,6 +1,8 @@
 # MAHWORLD map takeover handoff
 
-Status: **MAP EDITING PAUSED** at the 2026-09-25 HALO repair/play release checkpoint. This document is for a separate Claude Code map session. It does not authorize Character, MAHFITT, S08, deployment, or new graphics work.
+**2026-09-25 takeover update:** the official Claude map takeover is active on this branch. The first cloud baseline found that the branch is not self-sufficient: the runtime and static build import `CLAUDE_RUNTIME_FOUNDATION/`, `CLAUDE_DUAL_LOCOMOTION/` and `CLAUDE_GAMEPLAY_FOUNDATION/`, which were never backed up, so 34 of 58 test programs and the release gate cannot run from GitHub alone. The owner's new DAY-first sky direction is recorded and its default switch implemented. See `CONTINUE_HERE.md` (top section) and `claude_takeover/baseline_20260925.json`.
+
+Original status at handoff: **MAP EDITING PAUSED** at the 2026-09-25 HALO repair/play release checkpoint. This document is for a separate Claude Code map session. It does not authorize Character, MAHFITT, S08, deployment, or new graphics work.
 
 ## Current playable build
 

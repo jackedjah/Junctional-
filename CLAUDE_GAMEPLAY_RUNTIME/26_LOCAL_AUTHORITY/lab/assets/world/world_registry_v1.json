@@ -1,6 +1,6 @@
 {
  "version": "WORLD_REGISTRY_V1",
- "generated": "2026-09-23T23:56:58.748Z",
+ "generated": "2026-09-25T16:24:08.756Z",
  "_doc": "JOB B world registry (owner directive 2026-09-19 §19): sources (provenance) → derivatives (what ships) → artifacts / zones / fixtures / creatures / celestial (placement + policy). Coordinates are FIELD metres (x east, z north, y up), yaw in degrees around +y. Collision shapes for the host are GENERATED from this file by deploy/jobb/build_world_colliders.mjs (never hand-edited twice). states: PLACED = built and in the world · WAITING_FOR_JOB_A = the hook exists, the gameplay side is JOB A's · PROVISIONAL = owner tuning pending.",
  "field": {
   "walls": {
@@ -5934,9 +5934,9 @@
    }
   },
   "time_of_day": {
-   "_doc": "Astra M3 night-first route: two STABLE states (no calendar / simulation). NIGHT is the first-visit default and route preview; an explicit ?sky=day or the player saved choice still wins. Both states are prewarmed before play and remain live-switchable through fieldScene.setNight.",
-   "default": "NIGHT",
-   "preview": "NIGHT",
+   "_doc": "Owner sky direction 2026-09-25 (supersedes the Astra M3 night-first default): bright fantasy DAYLIGHT is the primary presentation. Two STABLE states (no calendar / simulation). DAY is the first-visit default and route preview; an explicit ?sky=night or the player saved choice still wins. Both states keep the actual Sun and Moon, are prewarmed before play and remain live-switchable through fieldScene.setNight.",
+   "default": "DAY",
+   "preview": "DAY",
    "states": [
     "DAY",
     "NIGHT"

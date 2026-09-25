@@ -1,0 +1,445 @@
+{
+ "record": "Claude map takeover baseline / reproducibility check",
+ "date": "2026-09-25",
+ "branch": "backup/mahworld-m6-20260924T190351Z",
+ "tip_at_takeover": "30d1effaea24026e8823f5efe7fa6f2104d609db",
+ "environment": "Claude Code cloud container, Linux, Node v22.22.2, fresh clone, no GPU, no credentials",
+ "method": "every 16_TESTS/*.test.mjs in its own node process from CLAUDE_GAMEPLAY_RUNTIME (the package_pass.mjs stage-1 recipe); static build attempted with --out outside the repository; no package, ZIP, deploy or Scenario call",
+ "summary": {
+  "programs": 58,
+  "passing_programs": 24,
+  "passing_checks": 503,
+  "blocked_programs": 34,
+  "note": "passing counts include gameplay_rig_limits 64/0, gameplay_rig_pose_fk 33/0 and gameplay_emote_endpoints 22/0 re-run from / to bypass their Windows-only path strip"
+ },
+ "static_build": {
+  "result": "STOPPED before output: missing required host modules/JSON",
+  "missing": [
+   "CLAUDE_RUNTIME_FOUNDATION/10_RUNTIME_LOADER/ClassIdentityConfig.js",
+   "CLAUDE_RUNTIME_FOUNDATION/10_RUNTIME_LOADER/characterRegistry.js",
+   "CLAUDE_RUNTIME_FOUNDATION/10_RUNTIME_LOADER/jsonSource.js",
+   "CLAUDE_RUNTIME_FOUNDATION/12_ANIMATION_RUNTIME/AnimationStateController.js",
+   "CLAUDE_RUNTIME_FOUNDATION/01_CHARACTER_MANIFEST/CHARACTER_MASTER_MANIFEST.json",
+   "CLAUDE_RUNTIME_FOUNDATION/02_MATERIAL_CONTRACT/material_zones.json",
+   "CLAUDE_RUNTIME_FOUNDATION/03_CHARACTER_CREATOR/CHARACTER_VARIANT_SCHEMA.json",
+   "CLAUDE_RUNTIME_FOUNDATION/05_ANIMATION_CONTRACT/animation_set.json",
+   "CLAUDE_DUAL_LOCOMOTION/15_RUNTIME_DESIGN/config/runtime_config.default.json",
+   "CLAUDE_GAMEPLAY_FOUNDATION/02_MOVEMENT/PLAYER_MOVEMENT_DEFAULTS.json"
+  ],
+  "transitive_imports": "unknown until the three roots are present"
+ },
+ "present_and_verified_by_this_run": [
+  "vendored Three.js 0.185.1 (26_LOCAL_AUTHORITY/vendor/three)",
+  "all ten ASSET_VERSIONS avatar folders",
+  "world registry regenerates byte-identically apart from its timestamp",
+  "build_world_colliders --check IN SYNC"
+ ],
+ "programs": [
+  {
+   "test": "gameplay_anim_data.test.mjs",
+   "passed": 46,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_asset_slot.test.mjs",
+   "passed": 11,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_attack_stack.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_attacks_phase_e.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_b7_targeting.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_b8_equipment.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_beam_audio.test.mjs",
+   "passed": 12,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_camera_pass2.test.mjs",
+   "passed": 30,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_creature_combat.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_demo_gate.test.mjs",
+   "passed": 24,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_direct_ui.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_district.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_emote_endpoints.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "WINDOWS_ONLY_PATH_STRIP (passes when run from /)"
+  },
+  {
+   "test": "gameplay_emotes_npc.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_flight_f01.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_g37_contact.test.mjs",
+   "passed": 10,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_guard_sheet.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_halo_repair_play.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_hip_connect.test.mjs",
+   "passed": 12,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_hud_pass3.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_hud_phase_b.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_interior_entry.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_leg_surface.test.mjs",
+   "passed": 8,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_legs_faithful.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "CHARACTER_RAW_SOURCE_NOT_BACKED_UP RAW_10_MODELS/Mah_Athlete_M.glb"
+  },
+  {
+   "test": "gameplay_loadout_422.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_m2_equipment_motion.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_m3_night_route.test.mjs",
+   "passed": 13,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_m4_world_expansion.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_m5_minimal_hud.test.mjs",
+   "passed": 4,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_m5_moon_cloud.test.mjs",
+   "passed": 18,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_m5_owner_buildings.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_m5_owner_corrections.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_m5_ridge_collision.test.mjs",
+   "passed": 8,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_m5_tree_lod.test.mjs",
+   "passed": 8,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_m7_halo_scale.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_mahgic_anywhere.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_mahgic_tree.test.mjs",
+   "passed": 29,
+   "failed": 1,
+   "exit": 1,
+   "cause": "NEEDS_STATIC_BUILD (blocked by the missing sibling roots)"
+  },
+  {
+   "test": "gameplay_mocap_pipeline.test.mjs",
+   "passed": 18,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_motion_layer.test.mjs",
+   "passed": 12,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_motion_phase_d.test.mjs",
+   "passed": 11,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_navigation.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_od29_disconnect.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_phase4.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_phase4_1.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_phase5a.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_phase5b.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_play_sample.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_rig_bind.test.mjs",
+   "passed": 26,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_rig_limits.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "WINDOWS_ONLY_PATH_STRIP (passes when run from /)"
+  },
+  {
+   "test": "gameplay_rig_pose_fk.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "WINDOWS_ONLY_PATH_STRIP (passes when run from /)"
+  },
+  {
+   "test": "gameplay_rig_v5_gates.test.mjs",
+   "passed": 8,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_rules_17_23.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_runtime.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_spec_a_perf.test.mjs",
+   "passed": 64,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_spec_b_camera.test.mjs",
+   "passed": 31,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_stats_phase_f.test.mjs",
+   "passed": 10,
+   "failed": 0,
+   "exit": 0,
+   "cause": null
+  },
+  {
+   "test": "gameplay_training_room.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  },
+  {
+   "test": "gameplay_world_jobb.test.mjs",
+   "passed": null,
+   "failed": null,
+   "exit": 1,
+   "cause": "MISSING_SIBLING_ROOT CLAUDE_RUNTIME_FOUNDATION (00_CORE/bootstrap.js import)"
+  }
+ ]
+}
