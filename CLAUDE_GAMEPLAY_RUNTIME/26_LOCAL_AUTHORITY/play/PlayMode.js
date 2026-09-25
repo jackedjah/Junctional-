@@ -10,7 +10,7 @@ import { createResource } from '../../03_RESOURCES/Resource.js';
 import { createAttackExecution } from '../../05_ECCENTRIC/EccentricRuntime.js';
 import { createRulesField } from './rules1723/RulesField.js';
 import { createNavigator } from './Navigation.js';
-import { HALO_LAYOUT, haloRadialDistance, haloInteriorRadiusAt, haloInteriorCeilingAt } from './haloLayout.js';
+import { HALO_LAYOUT, haloRadialDistance, haloInteriorRadiusAt, haloInteriorCeilingAt, haloBoundaryConstraint } from './haloLayout.js';
 import { createDogkieManager, loadWorldRegistry } from './world/DogkieManager.js'; import { createSparScheduler } from './world/SparScheduler.js'; import { createWildlifeManager } from './world/WildlifeManager.js'; import { createEquipmentManager } from './EquipmentManager.js';   /* owner B8 §10–§15: guide equipment manifestation + the MAHGIC economy */   /* owner next-pass 2026-09-20: fish / horse / phoenix on the host + the demo's defeat / respawn loop */   /* JOB B (2026-09-19): forest creature habitat + occasional NPC-vs-NPC spars — both run through the existing FIELD rules field, no second combat / movement system */
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 var HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -22,7 +22,7 @@ function hash01(a, b, c) { var h = 2166136261; [a, b, c].forEach(function (v) { 
 /* TOWN RESIDENTS (motion precision pass J): one representative of every class / gender except the player's own ATHLETE_M. body_key selects
    the class body; tier = AMBIENT (idle, gaze, restrained motion) · ROAMER (glides between a few safe points) · QUEST (stationary demo quest
    NPC: approachable, contextual prompt, placeholder dialog) · SPAR (the practice partner, unchanged). Spots ≥ 3 m from colliders, ≥ 11 m from the dummy. */
-var WORLD_REG = loadWorldRegistry(); var DOGKIE = null, SPAR = null, WILDLIFE = null, EQUIPM = null;   /* JOB B world AI (created with the FIELD rules field; ?world data missing → disabled) */
+var WORLD_REG = loadWorldRegistry();
 var NPC_DEFS = [
   { id: 'NPC_TITAN_M', classId: 'TITAN', sex: 'M', tier: 'SPAR', x: -13.5, z: 3.5, facing: 1.4, building: 'BLD_TRAINING_HALL' },
   { id: 'NPC_BAGE_F', classId: 'BAGE', sex: 'F', tier: 'ROAMER', x: 3.8, z: -16, facing: 3.0, pending_owner_name: 'Warlock (owner name pending; class stays BAGE)', building: 'BLD_ARENA_DOME' },
@@ -42,16 +42,13 @@ export var PLAY_SHARED_ACTIONS = ['MOVE', 'TRANSFORM', 'SELECT_PATTERN', 'ATTACK
 var FINISHED = /COMPLETE|REFUSED|INTERRUPTED/;
 
 export function createPlayMode(ctx) {
-  var cfg = ctx.cfg, H = ctx.H, LA = ctx.LA, T = LA.play, rec = ctx.rec, bump = ctx.bump; var actors = {}, targets = {}, TARGET_BY_ROOM = {}; var ROOMS = T.rooms, Q = T.quests; var NAVIG = createNavigator(T.navigation || {});   /* destination navigation (owner 2026-09-18 §4): the range is the centralized provisional value in play.navigation */
+  var cfg = ctx.cfg, H = ctx.H, LA = ctx.LA, T = LA.play, rec = ctx.rec, bump = ctx.bump; var actors = {}, targets = {}, TARGET_BY_ROOM = {}; var ROOMS = T.rooms, Q = T.quests; var NAVIG = createNavigator(T.navigation || {}); var DOGKIE = null, SPAR = null, WILDLIFE = null, EQUIPM = null;   /* every authority host owns its own AI/equipment managers; reconstruction must never reuse process-global managers bound to the previous host */
   Object.keys(ROOMS).forEach(function (r) { TARGET_BY_ROOM[r] = (ROOMS[r].targets || []).map(function (t) { var o = { id: t.id, kind: t.kind, room: r, pos: { x: t.position.x, z: t.position.z }, hp: t.health, max: t.health, respawn_s: t.respawn_s, fights_back: !!t.fights_back, respawn_t: null }; targets[t.id] = o; return o; }); });
   function forward(yaw) { return { x: Math.sin(yaw), z: -Math.cos(yaw) }; }
   function dist(a, b) { var dx = a.x - b.x, dz = a.z - b.z; return Math.sqrt(dx * dx + dz * dz); }
   function groundAt(room, p, refY, domain) { if (room === 'FIELD' && domain === 'HALO') return HALO_LAYOUT.arrival_height_m; var g = 0, onPlatform = false; ((ROOMS[room] && ROOMS[room].platforms) || []).forEach(function (pl) { if (p.x >= pl.x1 && p.x <= pl.x2 && p.z >= pl.z1 && p.z <= pl.z2 && pl.height > g) { g = pl.height; onPlatform = true; } }); if (ROOMS[room] && ROOMS[room].rules_17_23 && RFS[room]) { var gh = RFS[room].colliders(null).groundHeight(p.x, p.z, refY); if (gh > g || (!onPlatform && gh < 0)) g = gh; }   /* JOB B: the canal's wade floor is ground BELOW zero (Colliders water:true) — honoured when no room platform carries the body */ return g; }
   function smootherstep01(t) { t = Math.max(0, Math.min(1, t)); return t * t * t * (t * (t * 6 - 15) + 10); }
-  function haloMoveBoundary(a, from) { if (!a || a.room !== 'FIELD' || a.domain === 'TRANSIT') return false; var y = a.fl ? a.fl.altitude : 0, dx = a.pos.x - HALO_LAYOUT.center.x, dz = a.pos.z - HALO_LAYOUT.center.z, d = Math.hypot(dx, dz), limit = null, keepOutside = false;
-    if (a.domain === 'HALO') limit = Math.min(HALO_LAYOUT.playable_radius_m, haloInteriorRadiusAt(y));
-    else if (a.domain === 'WORLD' && y >= HALO_LAYOUT.arrival_height_m && y <= HALO_LAYOUT.apex_height_m) { var sy = y - HALO_LAYOUT.arrival_height_m, shell = Math.sqrt(Math.max(0, HALO_LAYOUT.shell_radius_m * HALO_LAYOUT.shell_radius_m - sy * sy)) + HALO_LAYOUT.body_radius_m, fd = Math.hypot(from.x - HALO_LAYOUT.center.x, from.z - HALO_LAYOUT.center.z); if (fd >= shell - 0.001 && d < shell) { limit = shell; keepOutside = true; } }
-    if (limit === null || (!keepOutside && d <= limit) || (keepOutside && d >= limit)) return false; var ux = d > 1e-6 ? dx / d : 1, uz = d > 1e-6 ? dz / d : 0; a.pos.x = HALO_LAYOUT.center.x + ux * limit; a.pos.z = HALO_LAYOUT.center.z + uz * limit; if (a.vel) { var radial = a.vel.x * ux + a.vel.z * uz; if ((!keepOutside && radial > 0) || (keepOutside && radial < 0)) { a.vel.x -= radial * ux; a.vel.z -= radial * uz; } } a.haloContact = { kind: keepOutside ? 'OUTSIDE_SHELL' : 'INSIDE_SHELL', at_t: H.t, radius_m: +limit.toFixed(3) }; return true; }
+  function haloMoveBoundary(a, from) { if (!a || a.room !== 'FIELD' || a.domain === 'TRANSIT') return false; var hit = haloBoundaryConstraint(a.domain, a.fl ? a.fl.altitude : 0, from, a.pos); if (!hit) return false; a.pos.x = hit.x; a.pos.z = hit.z; if (a.vel) { var radial = a.vel.x * hit.ux + a.vel.z * hit.uz, keepOutside = hit.kind === 'OUTSIDE_SHELL'; if ((!keepOutside && radial > 0) || (keepOutside && radial < 0)) { a.vel.x -= radial * hit.ux; a.vel.z -= radial * hit.uz; } } a.haloContact = { kind: hit.kind, at_t: H.t, radius_m: +hit.radius_m.toFixed(3) }; return true; }
   function actor(id) { return actors[id] || null; }
   function attackClass(def) { return (def && T.guards.attack_classes[def.range_type]) || 'PHYSICAL'; }
   function inPvp(id) { return !!(H.duel && H.duel.inCombat() && ctx.isFighter(id)); }
@@ -301,7 +298,7 @@ export function createPlayMode(ctx) {
       if (op === 'LEVEL_FIXTURE') { if (!Number.isInteger(x.level) || x.level < 1 || x.level > 99) return { ok: false, reason: 'BAD_FIXTURE' }; a.world.profile.level = x.level; rec('LEVEL_FIXTURE', { account: a.account_id, level: x.level, grants: 'NONE' }); if (a.rc && rulesRoom(a)) rulesField(a.room).revalidateLoadout(a.rc, 'LEVEL_FIXTURE');   /* 4/2/2 loadout: a band change may close an equipped slot (journaled) */ bump(); return { ok: true, level: x.level, note: 'development fixture - sets the progression band only; no unlock, reward or stat granted (unlock schedule OPEN)', record: { op: op, account_id: x.account_id, level: x.level } }; }
       return { ok: false, reason: 'UNKNOWN_PLAY_DEV_OP' }; },
     replayRecord: function (r) { var res = api.devOp(r.op, r); return !!(res && res.ok); },
-    reset: function () { actors = {}; RFS = {}; NPCS = null; Object.keys(targets).forEach(function (id) { var t = targets[id]; t.hp = t.max; t.respawn_t = null; }); },
+    reset: function () { actors = {}; RFS = {}; NPCS = null; DOGKIE = null; SPAR = null; WILDLIFE = null; EQUIPM = null; Object.keys(targets).forEach(function (id) { var t = targets[id]; t.hp = t.max; t.respawn_t = null; }); },
     /* ---- owner next-pass 2026-09-20 §20: the demo's DEFEAT / RESPAWN loop — HP 0 in a rules room (outside a match round: matches keep their own KO
        semantics) → a readable defeat state for T.defeat.respawn_s → respawn at the last validated SAFE POINT (sampled every few seconds while
        grounded, out of water, not in a fight and not under wild aggro; the room spawn is the fallback) with HP / energy restored by the rules

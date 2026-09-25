@@ -42,3 +42,22 @@ export function haloContainsActor(x, z, altitudeM) {
   if (y < HALO_LAYOUT.arrival_height_m - 0.001) return false;
   return haloRadialDistance(x, z) <= haloInteriorRadiusAt(y) + 0.001;
 }
+
+/* Shared swept radial constraint used by the authority and its isolated boundary fixture.
+   WORLD is constrained only when a segment actually crosses from outside the closed shell;
+   HALO is always constrained to the capsule-safe interior. */
+export function haloBoundaryConstraint(domain, altitudeM, from, to) {
+  const y = Number(altitudeM || 0), tx = Number(to && to.x || 0), tz = Number(to && to.z || 0);
+  const dx = tx - HALO_LAYOUT.center.x, dz = tz - HALO_LAYOUT.center.z, d = Math.hypot(dx, dz);
+  let limit = null, keepOutside = false;
+  if (domain === 'HALO') limit = Math.min(HALO_LAYOUT.playable_radius_m, haloInteriorRadiusAt(y));
+  else if (domain === 'WORLD' && y >= HALO_LAYOUT.arrival_height_m && y <= HALO_LAYOUT.apex_height_m) {
+    const sy = y - HALO_LAYOUT.arrival_height_m;
+    const shell = Math.sqrt(Math.max(0, HALO_LAYOUT.shell_radius_m * HALO_LAYOUT.shell_radius_m - sy * sy)) + HALO_LAYOUT.body_radius_m;
+    const fd = haloRadialDistance(from && from.x, from && from.z);
+    if (fd >= shell - 0.001 && d < shell) { limit = shell; keepOutside = true; }
+  }
+  if (limit === null || (!keepOutside && d <= limit) || (keepOutside && d >= limit)) return null;
+  const ux = d > 1e-6 ? dx / d : 1, uz = d > 1e-6 ? dz / d : 0;
+  return { x: HALO_LAYOUT.center.x + ux * limit, z: HALO_LAYOUT.center.z + uz * limit, ux: ux, uz: uz, radius_m: limit, kind: keepOutside ? 'OUTSIDE_SHELL' : 'INSIDE_SHELL' };
+}
