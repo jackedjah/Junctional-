@@ -26,7 +26,9 @@ export var VIEWS = [
   ['V12', 'view back over MAHWORLD from the HALO rim', [30, 247, 184], [20, 40, 520]],
   ['V13', 'plaza street level toward the tree elevator', [-10, 3.2, -14], [30, 10, 40]],
   ['V14', 'HALO glass sky-walk looking down', [30, 243, 172], [30, 0, 262]],
-  ['V15', 'civic facade close (Mentor Spire)', [6, 2.6, -9], [24, 7, 0]]
+  ['V15', 'civic facade close (Mentor Spire)', [6, 2.6, -9], [24, 7, 0]],
+  ['V16', 'LEAN spire house on the north-west terrace', [-82, 7, 238], [-110, 15, 272]],
+  ['V17', 'VISIONARY overlook close', [-127, 5, 16], [-152, 9, 0]]
 ];
 
 function mime(p) { return ({ '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css', '.bin': 'application/octet-stream', '.ktx2': 'image/ktx2' })[path.extname(p).toLowerCase()] || 'application/octet-stream'; }

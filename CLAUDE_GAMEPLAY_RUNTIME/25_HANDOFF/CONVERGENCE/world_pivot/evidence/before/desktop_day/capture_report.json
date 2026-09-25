@@ -306,6 +306,84 @@
    },
    "frames_in_600ms": 0,
    "ms": 15042
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "DAY",
+   "file": "V13_DAY.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 278,
+    "triangles": 1486265,
+    "geometries": 288,
+    "textures": 55,
+    "programs": 117
+   },
+   "frames_in_600ms": 0,
+   "ms": 28745,
+   "captured_later": "2026-09-25T17:29:13.161Z"
+  },
+  {
+   "id": "V14",
+   "label": "HALO glass sky-walk looking down",
+   "tod": "DAY",
+   "file": "V14_DAY.jpg",
+   "pos": [
+    30,
+    243,
+    172
+   ],
+   "look": [
+    30,
+    0,
+    262
+   ],
+   "stats": {
+    "calls": 232,
+    "triangles": 1542267,
+    "geometries": 324,
+    "textures": 59,
+    "programs": 118
+   },
+   "frames_in_600ms": 0,
+   "ms": 17809,
+   "captured_later": "2026-09-25T17:29:13.161Z"
+  },
+  {
+   "id": "V15",
+   "label": "civic facade close (Mentor Spire)",
+   "tod": "DAY",
+   "file": "V15_DAY.jpg",
+   "pos": [
+    6,
+    2.6,
+    -9
+   ],
+   "look": [
+    24,
+    7,
+    0
+   ],
+   "stats": {
+    "calls": 189,
+    "triangles": 954962,
+    "geometries": 326,
+    "textures": 59,
+    "programs": 118
+   },
+   "frames_in_600ms": 0,
+   "ms": 17967,
+   "captured_later": "2026-09-25T17:29:13.161Z"
   }
  ],
  "console_errors": [
@@ -384,5 +462,6 @@
    "signage ready (30 wayfinders / 75 blades, 14 building names; labels \u2264 10 visible, fade 30\u201348 m)",
    "worldB signage ready (14 ms)"
   ]
- }
+ },
+ "note_v13_v15": "V13-V15 added later from the same pinned commit (b94e611) with the same harness settings"
 }

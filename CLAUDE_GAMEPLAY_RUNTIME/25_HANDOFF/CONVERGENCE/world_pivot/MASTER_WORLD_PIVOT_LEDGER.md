@@ -11,10 +11,11 @@ untouched; no deploy is part of this ledger.
 ## How evidence is produced
 
 - `26_LOCAL_AUTHORITY/deploy/world_preview/` renders the REAL client world (`lab/fieldScene.js` + the registry world layer, HALO included)
-  WITHOUT the gameplay host, from the same generated collider authority, at twelve FIXED viewpoints (`capture.mjs` → `VIEWS`). Headless
+  WITHOUT the gameplay host, from the same generated collider authority, at FIXED viewpoints (`capture.mjs` → `VIEWS`; twelve at the start, V13–V17 added later and captured BEFORE from the same pinned commit). Headless
   Chromium with software WebGL (SwiftShader): stills are faithful, frame times are NOT performance evidence.
 - `contact_sheet.py` pairs BEFORE | AFTER per viewpoint. Evidence lives under `world_pivot/evidence/` (JPEG q84, 1280×720 desktop HIGH and
   393×852 phone-sized MED).
+- Every capture runs from a git worktree PINNED to the commit it documents (never the live tree, which may be mid-edit).
 - Renderer counters (draw calls, triangles, programs, textures) come from `renderer.info` at each viewpoint and are recorded per pass as the
   relative performance effect.
 
@@ -34,6 +35,14 @@ untouched; no deploy is part of this ledger.
 | V10 | sky toward the Sun |
 | V11 | south coast horizon |
 | V12 | view back over MAHWORLD from the HALO rim |
+| V13 | plaza street level toward the tree elevator |
+| V14 | HALO glass sky-walk looking down |
+| V15 | civic façade close (Mentor Spire) |
+| V16 | LEAN spire house on the north-west terrace |
+| V17 | VISIONARY overlook close |
+
+V01 note: its camera sits just behind the Arena Dome, so the chrome roof fills the lower half of the frame; it is kept unchanged for
+like-for-like comparison and V13 was added for the true street-level plaza read.
 
 ## BEFORE audit (b94e611, DAY, desktop HIGH)
 
@@ -96,6 +105,9 @@ walls, and the coastline beyond the walls.
 | files | `lab/fieldScene.js` (daytime floor stone palette), `lab/farWorld.js` (FAR massifs), `lab/world/macro.js` (ridge faceting + inward rock displacement), `lab/world/coast.js` (organic coastline), `deploy/jobb/build_registry.mjs` (ground policy, ridge colours, `coast.outline.organic_m`) |
 | visual goal | remove the white-mirror floor and the flat-paper mountains; replace the machined rounded-rectangle coast with headlands and bays |
 | what changed | DAY ground policy metalness 0.9 → 0.25, roughness 0.42 → 0.58 (satin stone that answers the Sun) with a warm mid-grey stone base under the existing seams / inlays; macro ridges shade by true facet orientation with rock pushed INTO the mountain body (never over the playable side) and neutral slate → warm stone → white crystal-cap colours; FAR massifs are noise-displaced rocky peaks with baked warm-lit / cool-shadow facets from the Sun direction, pale caps and aerial perspective toward the daylight haze; the coast breathes outward 0–16 m (sea hole, foam and seaTest share the same offset; host sea schools stay ≥ 50 m out) |
+| evidence | `evidence/cp2_after/{desktop_day (15 views + MAP_phone / MAP_desktop), desktop_night (V02 V08 V10 V12 V14), phone_med_day (V01 V03 V08 V10 + maps)}`, captured from a worktree pinned at `a46bed0`; sheets `evidence/cp2_before_after_day.jpg`, `cp2_before_after_night.jpg` |
+| perf (renderer.info, V01–V12 desktop, checkpoint 2 = PASSES 2–5 together) | draw calls 2345 → 2322, triangles 13.65 M → 13.98 M (+2.4 %: rocky FAR massifs, HALO lattice / sky-walk frame), programs max 138 → 140, textures max 79 → 81 |
+| tests | runnable programs unchanged vs baseline (22 green, 418 checks) |
 | unresolved | terrain folds / berms / valleys INSIDE the walls wait for host verification; roads and region-tint transitions; water material |
 
 ## PASS 3 — civic architecture (checkpoint 2)
@@ -125,3 +137,16 @@ walls, and the coastline beyond the walls.
 | goal | the five class territories readable at a glance; territory ↔ sanctuary ↔ landmarks ↔ roads ↔ water ↔ HALO ↔ player relationships; phone-readable technical overlay |
 | what changed | a cached territory field rasterised from the registry regions (soft union, nearest class wins, glowing class borders, faint hatching), water, the causeway / regional / trail hierarchy, MAHGIC patches, landmark glyphs in their territory colour, the HALO access ring with its height, the player heading arrow, a five-class legend; no `ctx.filter` (iPhone Safari) |
 | evidence | `MAP_phone.png` / `MAP_desktop.png` rendered by the world preview from the live registry |
+
+## CHECKPOINT 3 — HALO rim colonnade, celestial rings, azure sea (`e3e223f`)
+
+| field | value |
+|---|---|
+| files | `lab/cityScene.js` (treeElevator), `lab/fieldScene.js` (ring spin in tick, cache reset on clear), `lab/world/coast.js` |
+| goal | human-scale rhythm at the HALO rim; luminous rings in the dome (reference: elegant circular platform); a daylight sea that reads azure and not as a tiled grid |
+| what changed | 40 slender platinum columns just beyond the playable radius (144.8 m → 146.2 m, under the shell) with inner white-light strips, capitals and a chrome cornice ring — 3 merged draws; three counter-rotating celestial rings (26 / 34 / 42 m, white light with a lavender core) 95 m above the deck, decorative only; DAY sea `#16406c` → `#1f5fb0`, roughness 0.34 → 0.2, env 0.38 → 0.85; the drifting normal map is sampled at 1× and 0.37× (offset) and blended — chained AFTER the ripple system's own shader patch and guarded on the three.js chunk text |
+| before / after | `evidence/cp2_after/desktop_day` / `evidence/cp3_after/desktop_day` (V08 V09 V11 V12 V14, pinned at `e3e223f`); sheet `evidence/cp3_vs_cp2_day.jpg` |
+| perf (same five views) | draw calls 922 → 928, triangles 3.92 M → 3.96 M (+1.0 %), programs unchanged (140) |
+| tests | runnable programs unchanged (22 green, 418 checks) |
+| edge case | if the ripple system re-installs its sea patch at runtime after this chain (toggle), the dual-scale normal drops back to the single map — visual only |
+| unresolved | the rings sit above the V08 frame (visible from the deck looking up and through the dome from the ground); owner review of the colonnade density |
