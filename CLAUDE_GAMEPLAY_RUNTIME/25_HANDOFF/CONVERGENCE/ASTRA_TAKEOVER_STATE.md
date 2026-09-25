@@ -1,5 +1,13 @@
 # MAHWORLD Astra takeover state
 
+## Map lane handed off — paused 2026-09-25
+
+- Canonical takeover record: `25_HANDOFF/CONVERGENCE/CLAUDE_MAP_HANDOFF.md`.
+- Recovery authority: public repository `jackedjah/Junctional-`, branch `backup/mahworld-m6-20260924T190351Z`; released source `3710e4588a7f853c84a1a376eee7d08fdabc0454`, release record `cb06dc03b93a89c601b6be9d765a9b55652a1094`.
+- Protected candidate `6ab5db39db052ab31c510699` remains ready/unpublished. Production `6aac25101f17ce5ed37166e4` and prior HALO preview `6ab5c2451611040beb1093d8` remain unchanged.
+- No newer runtime/map source was found at handoff. The two registry-referenced `_decimated` assets missing from the recovery branch are added with `CLAUDE_MAP_ASSET_SUPPLEMENT.json`; superseded candidates remain excluded. Private reference packets, consolidated master/video bundle, generated ZIP and local probe media remain local-only; no secrets or private references were added to the public branch.
+- Map editing is paused. Character, MAHFITT and S08 remain separate and untouched.
+
 ## Current HALO repair-and-play candidate — owner review pending
 
 - Protected immutable draft `6ab5db39db052ab31c510699`: `https://6ab5db39db052ab31c510699--mahworld-test-preview.netlify.app`; visible build `ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924`; state `ready`, context `deploy-preview`, `published_at = null`.

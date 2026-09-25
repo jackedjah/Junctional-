@@ -1,5 +1,13 @@
 # MAHWORLD recovery start here
 
+## 2026-09-25 map takeover pointer
+
+- Read `CLAUDE_MAP_HANDOFF.md` first. Map editing is paused for takeover by a separate Claude Code session.
+- Current protected build is `ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924`, deploy `6ab5db39db052ab31c510699`; packaged source `3710e4588a7f853c84a1a376eee7d08fdabc0454`; release record parent `cb06dc03b93a89c601b6be9d765a9b55652a1094`.
+- Fetch the newest tip of `backup/mahworld-m6-20260924T190351Z` into a dedicated map worktree. Do not reset or clean the shared dirty `master` checkout and do not touch Character, MAHFITT or S08.
+- Asset restore uses the original `ASSET_BACKUP_MANIFEST.json` plus `CLAUDE_MAP_ASSET_SUPPLEMENT.json`; the supplement closes the current registry's gym/training-display runtime-asset gap.
+- Production and all prior previews remain unchanged. No deployment or graphics work occurred during this handoff.
+
 Updated 2026-09-24 for the emergency M6 backup and protected M6 preview release.
 
 ## Latest protected candidate

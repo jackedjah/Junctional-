@@ -1,5 +1,12 @@
 # CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-25 (HALO repair/play delivered)
 
+## Map takeover checkpoint — editing paused
+- Map authority is now summarized in `CLAUDE_MAP_HANDOFF.md`. A separate Claude Code session must start from the verified remote recovery branch `backup/mahworld-m6-20260924T190351Z`, not the intentionally dirty shared `master` index.
+- Current playable build remains `ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924`, deploy `6ab5db39db052ab31c510699`, packaged source `3710e4588a7f853c84a1a376eee7d08fdabc0454`. Production and prior previews remain unchanged.
+- Checkpoint inventory found no newer runtime/map source after release record `cb06dc03b93a89c601b6be9d765a9b55652a1094`. It found and closes one recovery gap by adding the two current registry-referenced `_decimated` assets (`gym_rt.glb` and the feature-flagged `training_display_rt.glb`) with `CLAUDE_MAP_ASSET_SUPPLEMENT.json`. Two regenerated M6 floor-recheck evidence files remain local-only and are not treated as implementation.
+- Character cleanup, MAHFITT and S08 were not touched. No deployment, restart or graphics pass was performed for this handoff.
+- **Next exact action:** new map session reads `CLAUDE_MAP_HANDOFF.md`, this file and `ASTRA_TAKEOVER_STATE.md`, then waits for owner phone feedback or the next explicitly authorized map tranche.
+
 ## HALO repair-and-play — protected candidate delivered
 - New protected, unpublished draft: `https://6ab5db39db052ab31c510699--mahworld-test-preview.netlify.app`; deploy ID `6ab5db39db052ab31c510699`; visible build `ASTRA_M7_HALO_REPAIR_PLAY_PRIVATE_20260924`. Netlify reports `ready`, `deploy-preview`, `published_at = null`.
 - Release source is the remotely verified recovery-branch commit `3710e4588a7f853c84a1a376eee7d08fdabc0454`. The established branch remains `backup/mahworld-m6-20260924T190351Z`; no default/production branch was rewritten.

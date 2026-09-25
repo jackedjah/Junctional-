@@ -1,0 +1,33 @@
+{
+  "schema": "MAHWORLD_CLAUDE_MAP_ASSET_SUPPLEMENT_V1",
+  "created_utc": "2026-09-25",
+  "repository": "https://github.com/jackedjah/Junctional-",
+  "recovery_branch": "backup/mahworld-m6-20260924T190351Z",
+  "parent_checkpoint": "cb06dc03b93a89c601b6be9d765a9b55652a1094",
+  "asset_checkpoint": null,
+  "reason": "Takeover inventory found two current district_v1.json runtime references that were excluded from the earlier 98-row recovery manifest.",
+  "assets": [
+    {
+      "remote_path": "CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/assets/buildings/_decimated/gym_rt.glb",
+      "role": "current_runtime_building",
+      "bytes": 3612376,
+      "sha256": "8dfe3608e9e6f22078b537871c72bfc7e93a44337fb40183e6cd4f7e7e95d176",
+      "registry_reference": "district_v1.json gym runtime/runtime_file/collider_runtime_file",
+      "upload_state": "PENDING_HANDOFF_COMMIT"
+    },
+    {
+      "remote_path": "CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/assets/buildings/_decimated/training_display_rt.glb",
+      "role": "feature_flagged_runtime_building",
+      "bytes": 1760892,
+      "sha256": "9b25047535555a5000dce381f00aa66065265355185df4ee01aa3d25d0b034fd",
+      "registry_reference": "district_v1.json training display runtime",
+      "upload_state": "PENDING_HANDOFF_COMMIT"
+    }
+  ],
+  "excluded_nonrequired_local_candidates": [
+    "market_rt.glb (superseded by fidelity_m5c/MARKET_M5C_L0/L1)",
+    "temple_rt.glb (superseded by fidelity_m5c/TEMPLE_M5C_L0/L1)",
+    "tower_rt.glb (superseded by fidelity_m5c/TOWER_M5C_L0/L1)"
+  ],
+  "verification": "Pending GitHub commit and remote blob readback."
+}
