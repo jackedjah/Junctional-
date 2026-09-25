@@ -1,0 +1,20 @@
+{
+  "female": {
+    "states": 19,
+    "frames": 488,
+    "face_pixels_locked": true,
+    "arm_segment_max_relative_error": 8.881784197001252e-16,
+    "atlas_paths_verified": true,
+    "final_visual_master_pixel_identical": true,
+    "theme_neutrals_unchanged": true
+  },
+  "male": {
+    "states": 19,
+    "frames": 488,
+    "face_pixels_locked": true,
+    "arm_segment_max_relative_error": 1.1102230246251565e-15,
+    "atlas_paths_verified": true,
+    "final_visual_master_pixel_identical": true,
+    "theme_neutrals_unchanged": true
+  }
+}

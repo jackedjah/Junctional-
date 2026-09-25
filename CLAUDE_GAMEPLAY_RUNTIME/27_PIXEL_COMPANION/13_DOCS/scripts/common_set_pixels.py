@@ -1,13 +1,13 @@
 """Essential common-set continuation. Existing art, rig, indexed atlas contract."""
 from pathlib import Path
-import argparse, json, shutil, hashlib
+import argparse, json, shutil, hashlib, os
 import numpy as np
 from PIL import Image, ImageDraw
 import final_production_pipeline as fp
 from root_correction_pixels import consolidate
 
 P=Path(__file__).resolve().parents[2]
-TAG='FINAL_POLISH'
+TAG=os.environ.get('MAHFITT_RELEASE_TAG','FINAL_POLISH')
 MASTERS=P/'05_PIXEL_MASTERS'/TAG
 RAW=P/'07_ANIMATION_SOURCE'/TAG
 REVIEW=P/'12_REVIEW_PROOFS'/TAG
@@ -130,6 +130,10 @@ def finish():
         manifest['themeArchitecture']['binding']='Active MAHFITT app secondary/theme color; explicit indexed material IDs'
         manifest['themeArchitecture']['lockedNeutralMaterials']=['black','graphite','silver','white']
         manifest['armLengthAudit']=render['audit']
+        if TAG=='SMOOTH_APP':
+            manifest['playback']={'updatePath':'requestAnimationFrame','targetHz':60,'authoredMotion':'selective breakdown frames; duration-based timing; no image interpolation'}
+            for name,spec in manifest['animations'].items():
+                spec['holdFrame']=int(np.argmax(spec['durationsMs'])) if max(spec['durationsMs'])>min(spec['durationsMs']) else len(spec['frames'])//2
         manifest_path.write_text(json.dumps(manifest,indent=2))
         package[char]=library
         checks[char]=check(char,library,manifest)
@@ -167,6 +171,9 @@ def finish():
     gif_frames[0].save(REVIEW/'COMMON_MOTION.gif',save_all=True,append_images=gif_frames[1:],duration=durations,loop=0,disposal=2)
     theme_proof(package,checks)
     (RAW/'checks.json').write_text(json.dumps(checks,indent=2))
+    if TAG=='SMOOTH_APP':
+        print(json.dumps({'review':str(REVIEW),'checks':checks},indent=2))
+        return  # The app module is maintained directly; never overwrite it with the legacy timer template.
     runtime=P/'11_PROTOTYPE'/TAG; runtime.mkdir(exist_ok=True)
     old=P/'11_PROTOTYPE/FINAL_APPROVED'
     for name in ['index.html','styles.css']:
@@ -226,11 +233,16 @@ def check(char,library,manifest):
                     assert np.array_equal(a[dy*2:(dy+h)*2,dx*2:(dx+w)*2],expected),f'Feature changed: {char}/{state}/{i}'
             count+=1
     assert render['audit']['max_segment_relative_error']<2e-5
+    if TAG=='SMOOTH_APP':
+        for name in ['front_master','front_3q_master']:
+            previous=np.array(Image.open(P/f'05_PIXEL_MASTERS/FINAL_POLISH/{char}_{name}.png').convert('RGBA'))
+            assert np.array_equal(np.array(fp.compose(library[name]['frames_data'][0])),previous),f'Visual master drift: {char}/{name}'
     for page in manifest['atlases']['pages']:
         for key in ['neutral','themeIndex','bluePreview']:
             assert (fp.MANIFESTS/page[key]).resolve().is_file()
     return {'states':len(library),'frames':count,'face_pixels_locked':True,
-            'arm_segment_max_relative_error':render['audit']['max_segment_relative_error'],'atlas_paths_verified':True}
+            'arm_segment_max_relative_error':render['audit']['max_segment_relative_error'],'atlas_paths_verified':True,
+            'final_visual_master_pixel_identical':TAG=='SMOOTH_APP'}
 
 def theme_proof(package,checks):
     proof=Image.new('RGB',(1216,660),(7,13,22)); d=ImageDraw.Draw(proof)

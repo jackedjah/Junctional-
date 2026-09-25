@@ -170,6 +170,17 @@ for direction in ['up','down','left','up_left','up_right','down_left','down_righ
     SPECS['point_'+direction]=([100,90,90,100,650,100,90,90,180],False)
 SPECS['dance_a']=([110]*16,False)
 SPECS['dance_b']=([110]*16,False)
+if export.TAG=='SMOOTH_APP':
+    SPECS.update({
+        'idle_neutral':([140]*24,True), 'idle_long':([150]*32,True),
+        'think_loop':([80]*36,True),
+        'look_left':([45]*9+[600]+[45]*8+[140],False),
+        'look_right':([45]*9+[600]+[45]*8+[140],False),
+        'wave_greet':([40]*33,False),
+        'celebrate_small':([40]*12+[300]+[40]*11+[120],False),
+        'dance_a':([40]*49,False), 'dance_b':([40]*49,False)})
+    for key in [k for k in SPECS if k.startswith('point_')]:
+        SPECS[key]=([40]*12+[650]+[40]*11+[120],False)
 
 POINTS={'right':('R',68,7,0),'left':('L',-68,-7,0),
         'up':('R',80,80,20),'down':('R',35,-45,10),
@@ -192,11 +203,13 @@ def draw(char,base,pieces,features,state,i,count):
         side,aa,fa,ha=POINTS[state[6:]]
         angle[side]=[aa*e,fa*e,ha*e]; head_angle=(-1 if side=='R' else 1)*e
     elif state=='wave_greet':
-        angle['R']=[50*e*e,95*math.sqrt(e),14*math.sin(phase*2)*e]; head_angle=-1.2*e
+        fore_ease=e**.75 if export.TAG=='SMOOTH_APP' else math.sqrt(e)
+        angle['R']=[50*e*e,95*fore_ease,14*math.sin(phase*2)*e]; head_angle=-1.2*e
     elif state=='celebrate_small':
         # Bend the elbows before lifting the upper arms: a compact, human-like
         # path which never sweeps long straight arms out of the app canvas.
-        aa=58*e*e; fa=90*min(1,2*e)
+        aa=58*e*e; blend=min(1,2*e)
+        fa=90*(blend*blend*(3-2*blend) if export.TAG=='SMOOTH_APP' else blend)
         angle['R']=[aa,fa,-6*e]; angle['L']=[-aa,-fa,6*e]; drift[1]=-1.3*e
     elif state in ['dance_a','dance_b']:
         beat=math.sin(phase*2); body_angle=2.2*beat*e; head_angle=-3*beat*e
@@ -205,8 +218,9 @@ def draw(char,base,pieces,features,state,i,count):
             angle['R']=[(18+12*beat)*e,(24-14*beat)*e,-8*beat*e]
             angle['L']=[-(18-12*beat)*e,-(24+14*beat)*e,-8*beat*e]
         else:
-            angle['R']=[(22+7*beat)*e*e,(100-8*beat)*math.sqrt(e),8*beat*e]
-            angle['L']=[-(22-7*beat)*e*e,-(100+8*beat)*math.sqrt(e),8*beat*e]
+            fore_ease=e**.75 if export.TAG=='SMOOTH_APP' else math.sqrt(e)
+            angle['R']=[(22+7*beat)*e*e,(100-8*beat)*fore_ease,8*beat*e]
+            angle['L']=[-(22-7*beat)*e*e,-(100+8*beat)*fore_ease,8*beat*e]
     # Fit a pointing gesture by translation only. Segment lengths, body size,
     # and the authored grid stay invariant, including diagonal directions.
     if state.startswith('point_'):
