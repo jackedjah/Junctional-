@@ -225,3 +225,10 @@ M5 owner corrections are delivered as protected build `ASTRA_M5C_PRIVATE_2026092
 - No package, draft deploy, or live publish was produced.
 
 Usage/billing balance: UNKNOWN. No local tool exposes a spend ceiling; work proceeds by bounded milestones with testing/save reserve.
+# HALO repair-and-play active checkpoint — 2026-09-25
+
+- Continuity base: public recovery branch `backup/mahworld-m6-20260924T190351Z`, verified incoming tip `3eee0bfc3a08398d56f4658cd5dc0179e2bb0487`.
+- Owner packet is locally preserved and fully read; source ZIP SHA-256 `f5ba25ada0643fcfec599630d50c1641e0204844a6a67cee3782e6b28a36d349`. Do not publish its private payload.
+- Active phase: repair the actual carrier/rider transform contract and the coincident HALO floor owners before sports or map work. Preserve the 240 m arrival, 295.2 m dome, elevator-only crossing, M1-M7 improvements, JOB A/B queue, existing preview, and production.
+- Next safe checkpoint: focused two-roundtrip proof with moving views and floor stability, followed by playable one-bot volleyball and five-serve target practice.
+- Reference pointer: `halo_repair_and_play/CONTINUATION_POINTER.md`.

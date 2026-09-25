@@ -1,4 +1,11 @@
-# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-25 (M7 HALO scale/access candidate released)
+# CONTINUE HERE — MAHWORLD convergence (gameplay lane) · updated 2026-09-25 (HALO repair/play active)
+
+## HALO repair-and-play continuation — source-preservation checkpoint
+- The owner-authorized continuation is active from verified recovery tip `3eee0bfc3a08398d56f4658cd5dc0179e2bb0487`; the M7 enlarged-dome contract and elevator-only access remain fixed.
+- The supplied packet is preserved locally under `halo_repair_and_play/packet/`; its ZIP SHA-256 is `f5ba25ada0643fcfec599630d50c1641e0204844a6a67cee3782e6b28a36d349`. Private packet contents remain excluded from the public recovery branch; the safe pointer is `halo_repair_and_play/CONTINUATION_POINTER.md`.
+- Ordered work is now: cause-based occupied-cabin/floor repair and real round-trip proof; playable one-bot volleyball plus five-serve practice; no more than three bounded mainland repairs; then one required release gate and one new protected unpublished preview.
+- Current HALO preview `6ab5c2451611040beb1093d8` and production `6aac25101f17ce5ed37166e4` remain unchanged. Physical-phone acceptance remains owner-only.
+
 
 ## M7 HALO scale/access addendum — protected candidate delivered
 - New protected, unpublished draft: `https://6ab5c2451611040beb1093d8--mahworld-test-preview.netlify.app`; deploy ID `6ab5c2451611040beb1093d8`; visible build `ASTRA_M7_HALO_SCALE_PRIVATE_20260924`. Netlify reports `ready`, `deploy-preview`, `published_at = null`.
