@@ -27,3 +27,38 @@ credit balance.
    presented as one grouped request with the exact prompts and cost before anything runs.
 
 Nothing here is authorised to run until the owner approves the specific grouped request.
+
+## M8C re-check (2026-09-25): texture, retexture and 3D for the physical-world pass
+
+Investigated again with free calls only (model search, schema, `dry_run` pricing — no job was created, nothing was charged; project usage
+still 0 CU).
+
+| skill / route | model | outputs | plan | cost (dry run) | fit for M8C |
+|---|---|---|---|---|---|
+| scenario-textures (PBR from a prompt) | `model_patina-material` (PATINA Material) | seamless basecolor + normal + roughness + metalness + height, 512–2048, tiling / upscale options | **Pro** (the free team gets 403) | — | best fit, blocked by plan |
+| scenario-textures (maps from an image) | `model_patina` (PATINA Image to Maps) | the same five maps from an uploaded flat texture | **Pro** | — | would turn free colour maps into full PBR; blocked by plan |
+| scenario-textures (seamless colour) | `model_scenario-texture` (Scenario Texture) | ONE seamless colour image; `eraseSeam` inpaints both seam axes | free | **33 CU** at 1024² quality high + eraseSeam · **12 CU** at quality medium | usable: we only need a luminance detail signal |
+| scenario-patina-retexture | PATINA retexture | re-materialled existing mesh | **Pro** | — | not needed: M8C materials are world-space shaders, not per-mesh textures |
+| scenario-3d | Meshy 7.1 / Hunyuan 3D / Pixal3D (image-to-3D) | textured meshes, 2K–8K PBR | varies | not priced | **not recommended** for this pass: the brief is materials + construction on existing host-safe geometry; generated meshes are heavy and would need retopology / LOD before a phone budget |
+
+**How a Scenario Texture batch would integrate (no runtime texture exists today):** each colour map is converted OFFLINE (Node, no
+Scenario call) to luminance only — so the five-colour law holds by construction — plus a height-derived normal, packed as one RGBA detail
+texture per family (R detail value, GB normal xy, A roughness variation). `surfaceDetail.js` samples it TRIPLANAR in world space and only
+modulates the existing procedural families at close range (inside each family's LOD fade), so nothing else in the pipeline changes and
+LOW keeps the procedural path. Budget: 1024² on HIGH, 512² on MED, off on LOW; six families ≈ 24 MB uncompressed with mips at 1024 —
+the main phone risk, which is why MED halves it.
+
+**Grouped request prepared for the owner (NOT run):** six seamless textures, `model_scenario-texture`, 1024 × 1024, `eraseSeam: true`,
+fixed seeds, one pass, no re-rolls:
+
+| # | family | prompt |
+|---|---|---|
+| 1 | rock | stratified grey granite-gneiss cliff rock surface, horizontal bedding layers, fine vertical joint fractures, mineral grain, neutral cool grey, orthographic photographic surface scan, even diffuse lighting, no shadows, no colour cast |
+| 2 | architectural platinum | anodised platinum architectural metal cladding, fine directional brushing, faint handling marks and satin oxidation, neutral silver-grey, orthographic surface scan, flat even lighting, no panel joints, no colour cast |
+| 3 | stone / hardscape | honed graphite granite paving stone surface, fine speckled aggregate, subtle foot-traffic wear, neutral grey, top-down orthographic surface scan, flat even lighting, no joints, no colour cast |
+| 4 | road | fine exposed-aggregate concrete road surface, small embedded stones, light weathering and hairline cracks, neutral grey, top-down orthographic surface scan, flat even lighting, no markings, no colour cast |
+| 5 | natural ground | compacted natural ground, fine grey gravel, small stones and dry packed soil, no plants, neutral cool grey, top-down orthographic surface scan, flat even lighting, no colour cast |
+| 6 | structural dark metal | dark graphite powder-coated structural steel, fine pebbled powder-coat micro texture, subtle edge scuffs, neutral near-black, orthographic surface scan, flat even lighting, no colour cast |
+
+Cost: **6 × 33 = 198 CU** at quality high (or 6 × 12 = 72 CU at medium). Alternative owner decision: upgrade to **Pro** for PATINA
+Material (true five-map PBR sets from the same prompts). Nothing runs until the owner approves one of these as a whole.
