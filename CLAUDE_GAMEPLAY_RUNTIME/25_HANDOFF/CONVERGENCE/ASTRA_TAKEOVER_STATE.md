@@ -232,3 +232,10 @@ Usage/billing balance: UNKNOWN. No local tool exposes a spend ceiling; work proc
 - Active phase: repair the actual carrier/rider transform contract and the coincident HALO floor owners before sports or map work. Preserve the 240 m arrival, 295.2 m dome, elevator-only crossing, M1-M7 improvements, JOB A/B queue, existing preview, and production.
 - Next safe checkpoint: focused two-roundtrip proof with moving views and floor stability, followed by playable one-bot volleyball and five-serve target practice.
 - Reference pointer: `halo_repair_and_play/CONTINUATION_POINTER.md`.
+
+## HALO repair/play implementation checkpoint
+
+- Source closure is green at 23/23 focused checks: exact occupied carrier poses and single-owner deck; full one-bot volleyball and five-serve practice lifecycles; safe replay/exit; unchanged M7 scale/access.
+- The one selected non-HALO item is fish readability at existing ponds/lake/basins: the prior octahedral school agent is now a low-poly spindle/forked-tail/dorsal/pectoral silhouette without changing host wildlife, habitat or population authority.
+- Current phase is the packet-required compact actual-runtime visual/motion demonstration. Do not add features or broaden the map tranche.
+- Exact implementation ledger: `halo_repair_and_play/EXECUTION_LEDGER.md`.

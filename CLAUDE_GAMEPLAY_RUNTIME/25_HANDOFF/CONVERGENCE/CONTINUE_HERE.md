@@ -6,6 +6,15 @@
 - Ordered work is now: cause-based occupied-cabin/floor repair and real round-trip proof; playable one-bot volleyball plus five-serve practice; no more than three bounded mainland repairs; then one required release gate and one new protected unpublished preview.
 - Current HALO preview `6ab5c2451611040beb1093d8` and production `6aac25101f17ce5ed37166e4` remain unchanged. Physical-phone acceptance remains owner-only.
 
+## HALO repair-and-play — focused source closure
+- The passenger/cabin mismatch is closed in source: 1 s explicit boarding precedes occupied motion inside the retained 20 s trip, and the host publishes the exact carrier/rider poses consumed by both presentation layers. The finished 3.15 m-clear walk-in cabin has animated doors; equipment ownership and zero transit drain are retained.
+- The flashing deck cause is removed: two coincident cylinder caps and transparent full-area overlays became one opaque vertex-gradient top, open structural skirt and separate underside.
+- The upper court is playable: one bounded bot, one gravity/substep ball, real contact/reach, net/court/out outcomes, first-to-seven score/result/replay/leave, and five-serve LEFT/CENTER/RIGHT practice. Inputs are available through keyboard and touch HUD; combat/resources/progression are isolated.
+- Bounded mainland item `NON-HALO-01`: existing instanced fish schools now have a recognizable spindle body, forked tail, dorsal fin and paired pectoral fins at the existing water habitats; counts/authority/habitats are unchanged.
+- Direct checks are 10/10 repair/play plus 13/13 preserved M7 scale/access; changed-file syntax/diff checks are clean. Detailed mapping: `halo_repair_and_play/EXECUTION_LEDGER.md`.
+- Next: one focused actual-runtime ride/floor/sport/mainland motion route, then the established release gate and exactly one new protected unpublished candidate.
+
+
 
 ## M7 HALO scale/access addendum — protected candidate delivered
 - New protected, unpublished draft: `https://6ab5c2451611040beb1093d8--mahworld-test-preview.netlify.app`; deploy ID `6ab5c2451611040beb1093d8`; visible build `ASTRA_M7_HALO_SCALE_PRIVATE_20260924`. Netlify reports `ready`, `deploy-preview`, `published_at = null`.

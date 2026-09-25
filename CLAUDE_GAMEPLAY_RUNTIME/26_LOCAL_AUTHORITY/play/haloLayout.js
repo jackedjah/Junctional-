@@ -13,12 +13,33 @@ export const HALO_LAYOUT = Object.freeze({
   playable_radius_m: 144.8,
   apex_height_m: 387.6,
   travel_s: 20,
+  boarding_s: 1,
   ground_dock: Object.freeze({ x: 22.7, z: 40, altitude_m: 0 }),
   upper_dock: Object.freeze({ x: 22.7, z: 40, altitude_m: 240 }),
+  carrier: Object.freeze({ id: 'MAH_ASCENT_CABIN', half_width_m: 1.72, half_depth_m: 1.62, clear_height_m: 3.15, rider_anchor: Object.freeze({ x: 0, y: 0, z: 0 }), door_width_m: 1.55 }),
   guide: Object.freeze({ x: 34, z: 49, altitude_m: 240 }),
   body_radius_m: 0.45,
   body_height_m: 1.7,
   shell_margin_m: 1.1
+});
+
+/* One human-scale activity court near the upper arrival. The dome/city is not
+   scaled again: these are ordinary metre dimensions inside the fixed M7 shell. */
+export const HALO_PLAY_LAYOUT = Object.freeze({
+  contract: 'HALO_PLAY_V1',
+  center: Object.freeze({ x: 51, z: 40, altitude_m: 240 }),
+  half_length_m: 8,
+  half_width_m: 4.3,
+  net_height_m: 2.15,
+  ball_radius_m: 0.22,
+  entry: Object.freeze({ x: 42.2, z: 40, altitude_m: 240, range_m: 3.2 }),
+  player_start: Object.freeze({ x: 45.6, z: 40, altitude_m: 240 }),
+  bot_start: Object.freeze({ x: 56.4, z: 40, altitude_m: 240 }),
+  targets: Object.freeze([
+    Object.freeze({ id: 'LEFT', x: 56.7, z: 37.8, radius_m: 1.15 }),
+    Object.freeze({ id: 'CENTER', x: 57.4, z: 40, radius_m: 1.15 }),
+    Object.freeze({ id: 'RIGHT', x: 56.7, z: 42.2, radius_m: 1.15 })
+  ])
 });
 
 export function haloRadialDistance(x, z) {

@@ -7,6 +7,7 @@
 - Preserved contract: arrival/deck `240 m`; shell radius `147.6 m`; shell diameter `295.2 m`; playable radius `144.8 m`; structural radius `153 m`; apex `387.6 m`; elevator-only WORLD/HALO access; zero transit MAHGIC cost.
 - Ordered work: repair occupied carrier and single-owner HALO floor; prove two real round trips; add playable one-bot volleyball and five-serve target practice; complete at most three bounded mainland fixes; run the required single release gate; publish one new protected, unpublished preview.
 - Preserved deployments: current HALO preview `6ab5c2451611040beb1093d8`; production `6aac25101f17ce5ed37166e4`.
-- Current phase: S1 — carrier/floor implementation.
+- Current phase: S4 — focused actual-runtime visual/motion route, followed by the single release gate.
+- Source result: one finished walk-in cabin and one host carrier/rider pose; single opaque HALO deck top; playable one-bot first-to-seven volleyball; five-serve target practice; safe replay/exit and visual-only gear stow; recognizable spindle/forked-tail/dorsal/pectoral fish school silhouettes at existing water habitats.
+- Focused authority status: `gameplay_halo_repair_play.test.mjs` 10/10 and preserved `gameplay_m7_halo_scale.test.mjs` 13/13.
 - Physical-phone acceptance: owner-pending; never inferred from desktop or emulated checks.
-

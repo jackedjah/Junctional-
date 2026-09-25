@@ -19,6 +19,8 @@ export var PLAYER_ACTIONS = ['JOIN_DUEL', 'SPECTATE', 'MOVE', 'TRANSFORM', 'SELE
   'NAV',
   /* owner B8 §10–§15 (2026-09-20): guide equipment manifestation + the MAHGIC economy — intents only; the host (EquipmentManager) owns costs, positions, pickup, reclaim and refills */
   'EQUIP_MANIFEST', 'EQUIP_PICKUP', 'EQUIP_DISMISS', 'USE_REFILL',
+  /* HALO repair/play: host-owned arcade volleyball and serve practice; contacts, ball state, scores and exits remain authoritative */
+  'HALO_SPORT_START', 'HALO_SPORT_HIT', 'HALO_SPORT_REPLAY', 'HALO_SPORT_LEAVE',
   /* living character pass (2026-09-15): social emotes — directed (`to`), stop, partner invitation / join; still intents, the host owns every outcome */
   'EMOTE_STOP', 'EMOTE_INVITE', 'EMOTE_JOIN'];
 export var FLIGHT_OPS = ['ENTER', 'EXIT', 'ASCEND', 'DESCEND', 'HOVER']; export var GUARD_KINDS = ['PHYSICAL', 'MAGICAL', 'NONE']; export var DASH_DIRS = ['FORWARD', 'BACK', 'LEFT', 'RIGHT'];
