@@ -34,4 +34,10 @@ var coreClear = vis ? vis.platform.h - 1.05 - 2 * 1.9 : -1;   /* soffit − gap 
 var collarClear = /col\.translate\(sx, base \+ ([0-9.]+), sz\)/.exec(ARCH);
 ok('4. the suspended amethyst core and the support collars clear 3.4 m above the class-house ground; the dressing is one guarded function', !!vis && coreClear >= 3.4 && collarClear && +collarClear[1] >= 3.4 && /function premiumHouse\(H, base, famId, glow\)/.test(ARCH), { house: vis && vis.id, core_lowest_above_ground_m: +coreClear.toFixed(2), collar_y: collarClear && +collarClear[1] });
 
+/* 5. contact AO (PASS 6) is presentation only: flat decals a few cm above the local ground, no collider / walkable output, one draw call;
+      the far silhouettes swap their baked night palette live (the in-game time toggle never rebuilds the field) */
+var CAO = src('lab/world/contactAO.js'), WB = src('lab/world/worldB.js'), FAR = src('lab/farWorld.js'), FS = src('lab/fieldScene.js');
+var lift = /y: groundYAt\(reg, x, z\) \+ ([0-9.]+)/.exec(CAO);
+ok('5. contact AO decals sit ≤ 6 cm above the local ground with no collider output and one draw; the far world swaps day/night palettes live', lift && +lift[1] > 0 && +lift[1] <= 0.06 && !/collider|walkable\s*:/i.test(CAO.replace(/\/\*[\s\S]*?\*\//g, '')) && /info\.draw_calls = 1/.test(CAO) && /\['contactAO', createContactAO\]/.test(WB) && /group\.userData\.setNight = function/.test(FAR) && /fw\.userData\.setNight\(NIGHT\)/.test(FS), { lift_m: lift && +lift[1] });
+
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
