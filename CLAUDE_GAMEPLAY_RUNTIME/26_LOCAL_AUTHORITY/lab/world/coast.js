@@ -9,7 +9,7 @@
 export function createCoast(ctx) {
   var THREE = ctx.THREE, M = ctx.M || {}, log = ctx.log || function () { };
   var group = null, meshes = [], own = [], sea = null, seaMat = null, foam = [], clock = 0, night = !!ctx.night, C = null, info = { islands: 0, draw_calls: 0, tris: 0 };
-  var DAY = { color: 0x16406c, rough: 0.34, env: 0.38, opacity: 0.94 }, NIGHT = { color: 0x0e2a48, rough: 0.28, env: 0.7, opacity: 0.95 };   /* a sea that reads BLUE at grazing angles (less mirror than the canal) */
+  var DAY = { color: 0x1f5fb0, rough: 0.2, env: 0.85, opacity: 0.94 }, NIGHT = { color: 0x0e2a48, rough: 0.28, env: 0.7, opacity: 0.95 };   /* a sea that reads BLUE at grazing angles; WORLD PIVOT PASS 2: brighter azure by day, more sky reflection and sun glitter */
   function rnd(seed) { var s = (seed >>> 0) || 1; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
   /* rounded-rectangle outline sampled as N points with outward normals (perimeter order) */
   function outlinePoints(o, n) { var w = o.x2 - o.x1, d = o.z2 - o.z1, r = Math.min(o.corner_r || 0, w / 2, d / 2); var cx = (o.x1 + o.x2) / 2, cz = (o.z1 + o.z2) / 2; var pts = [];
@@ -49,12 +49,19 @@ export function createCoast(ctx) {
     var holePts = outlinePoints(C.outline, 120).map(function (p) { var dd = WL - 1.5 + (p.off || 0); return { x: p.x + p.nx * dd, z: p.z + p.nz * dd }; }); var hole = new THREE.Path(); holePts.forEach(function (p, i) { if (i === 0) hole.moveTo(p.x, -p.z); else hole.lineTo(p.x, -p.z); }); hole.closePath(); seaShape.holes.push(hole);
     var seaG = new THREE.ShapeGeometry(seaShape, 1); var sp = seaG.attributes.position, su = seaG.attributes.uv; for (var i = 0; i < sp.count; i++) su.setXY(i, sp.getX(i) / 13, sp.getY(i) / 13); su.needsUpdate = true; seaG.rotateX(-Math.PI / 2); seaG.translate(0, SEA, 0);
     seaMat = new THREE.MeshStandardMaterial({ color: DAY.color, roughness: DAY.rough, metalness: 0.3, transparent: true, opacity: DAY.opacity, envMapIntensity: DAY.env, side: THREE.FrontSide }); own.push(seaMat);
-    if (ctx.waterNormalTex) { seaMat.normalMap = ctx.waterNormalTex; seaMat.normalScale = new THREE.Vector2(0.13, 0.13); }   /* the canal's drifting normal map (the same texture object: its offset animates both surfaces) */
+    if (ctx.waterNormalTex) { seaMat.normalMap = ctx.waterNormalTex; seaMat.normalScale = new THREE.Vector2(0.16, 0.16); }   /* the canal's drifting normal map (the same texture object: its offset animates both surfaces) */
     sea = add(seaG, seaMat, 'COAST_SEA', 1);
     /* the SEA as a ripple body: outside the mainland's rounded outline (+ waterline) and outside every island's ellipse (+ its waterline) */
     var O = C.outline, R = Math.min(O.corner_r || 0, (O.x2 - O.x1) / 2, (O.z2 - O.z1) / 2); var isl0 = C.islands || [];
     var seaTest = function (x, z) { var dx = Math.max(O.x1 + R - x, 0, x - (O.x2 - R)), dz = Math.max(O.z1 + R - z, 0, z - (O.z2 - R)); var d = Math.hypot(dx, dz) - R; if (d < WL - 1.5 + coastOffset(O, x, z)) return false; for (var i = 0; i < isl0.length; i++) { var I = isl0[i]; var bw = Math.max(16, Math.min(40, I.rx * 0.32)); var wl = bw * 0.28; var ex = (x - I.x) / (I.rx + wl), ez = (z - I.z) / (I.rz + wl); if (ex * ex + ez * ez < 1) return false; } return true; };
     ctx.seaTest = seaTest; ctx.seaY = SEA; if (ctx.ripples && ctx.ripples.setSea) { ctx.ripples.setSea(seaTest, SEA, seaMat); log('coast: sea registered as a ripple body (surface ' + SEA + ')'); }
+    /* WORLD PIVOT PASS 2: break the visible prototype tiling — the drifting normal map is sampled twice (1× and 0.37× with an offset) and
+       blended, so the 13 m repeat no longer reads as a regular diamond grid. CHAINED after the ripple system's hole patch (which owns
+       onBeforeCompile when enabled); guarded: if the chunk text ever changes, the plain map stays. */
+    if (seaMat.normalMap) { var chunk = THREE.ShaderChunk && THREE.ShaderChunk.normal_fragment_maps, from = 'vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;';
+      if (chunk && chunk.indexOf(from) >= 0) { var prevOBC = seaMat.onBeforeCompile, prevKey = seaMat.customProgramCacheKey;
+        seaMat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r); sh.fragmentShader = sh.fragmentShader.replace('#include <normal_fragment_maps>', chunk.replace(from, 'vec3 mapN = normalize( ( texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0 ) + ( texture2D( normalMap, vNormalMapUv * 0.37 + vec2( 0.31, 0.17 ) ).xyz * 2.0 - 1.0 ) * 0.85 );')); };
+        seaMat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|mahworld-sea-dual-normal'; }; seaMat.needsUpdate = true; } }
     /* 3. islands: beach ring (sea_y − DROP → 0) + a rising plateau + crystal spires + tree silhouettes (instanced) */
     var landMat = new THREE.MeshStandardMaterial({ color: 0x223048, roughness: 0.7, metalness: 0.35, flatShading: true }); own.push(landMat); var spireMat = (M.crystal || new THREE.MeshStandardMaterial({ color: 0xe8f4ff, roughness: 0.1, metalness: 0.6 })).clone(); spireMat.vertexColors = true; own.push(spireMat); var FAMS = ctx.registry && ctx.registry.crystal_families || {};   /* island spires carry their island's crystal family (owner redirect 2026-09-19: regions read from afar) */ var treeMat = M.sapphire || new THREE.MeshStandardMaterial({ color: 0x1c2a46 });
     var landGeos = [], spireGeos = [], treeMats = []; var treeCount = 0; var isl = C.islands || []; var foamPts = [];

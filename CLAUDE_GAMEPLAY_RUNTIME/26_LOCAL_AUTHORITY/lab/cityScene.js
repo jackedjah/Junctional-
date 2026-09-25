@@ -194,6 +194,23 @@ export function createCityScene(THREE, group, helpers) {
         [0.16, 0.32, 0.48, 0.63, 0.77, 0.89].forEach(function (f) { var th = Math.asin(f), rr = DR * Math.cos(th) - 0.12, t2 = new THREE.TorusGeometry(rr, 0.15, 5, 160); t2.rotateX(Math.PI / 2); t2.translate(s.x, PH + DR * f, s.z); parts.push(t2); });
         var crown = new THREE.TorusGeometry(DR * 0.2, 0.34, 6, 96); crown.rotateX(Math.PI / 2); crown.translate(s.x, PH + DR * Math.sin(Math.acos(0.2)), s.z); parts.push(crown);
         var lat = new THREE.Mesh(mergeGeometries(parts.map(function (q) { return q.index ? q.toNonIndexed() : q; }), false), M.chrome); parts.forEach(function (q) { q.dispose(); }); lat.name = 'HALO_DOME_LATTICE'; lat.userData.noMerge = true; g.add(lat); })();
+      (function () {   /* WORLD PIVOT PASS 4: the RIM COLONNADE — 40 slender platinum columns between the playable edge (144.8 m) and the shell, meeting the
+        glass at ~20 m, each with an inner white-light strip and a capital, a chrome cornice ring on top: the circular promenade gets a
+        human-scale rhythm. Beyond the host limit, so nothing here can be walked or flown into. Merged: 3 draws. */
+        var RC = HALO_LAYOUT.playable_radius_m + 1.4, H2 = Math.sqrt(Math.max(1, DR * DR - RC * RC)) - 0.6, colP = [], litP = [], corP = [];
+        for (var cI = 0; cI < 40; cI++) { var ca2 = cI / 40 * Math.PI * 2 + 0.04, cx2 = s.x + Math.cos(ca2) * RC, cz2 = s.z + Math.sin(ca2) * RC;
+          var col = new THREE.CylinderGeometry(0.36, 0.52, H2, 10); col.translate(cx2, PH + H2 / 2, cz2); colP.push(col); var pl = new THREE.CylinderGeometry(0.8, 0.9, 0.5, 10); pl.translate(cx2, PH + 0.25, cz2); colP.push(pl);
+          var strip2 = new THREE.BoxGeometry(0.07, H2 * 0.82, 0.07); strip2.translate(s.x + Math.cos(ca2) * (RC - 0.42), PH + H2 * 0.5, s.z + Math.sin(ca2) * (RC - 0.42)); litP.push(strip2);
+          var capG = new THREE.CylinderGeometry(0.75, 0.4, 0.55, 10); capG.translate(cx2, PH + H2 - 0.2, cz2); litP.push(capG); }
+        var cor = new THREE.TorusGeometry(RC, 0.34, 6, 200); cor.rotateX(Math.PI / 2); cor.translate(s.x, PH + H2, s.z); corP.push(cor);
+        [[colP, M.platinum, 'HALO_RIM_COLONNADE'], [litP, M.trim, 'HALO_RIM_LIGHTS'], [corP, M.chrome, 'HALO_RIM_CORNICE']].forEach(function (P) { var mg = mergeGeometries(P[0].map(function (q) { return q.index ? q.toNonIndexed() : q; }), false); P[0].forEach(function (q) { q.dispose(); }); var mm = new THREE.Mesh(mg, P[1]); mm.name = P[2]; mm.userData.noMerge = true; g.add(mm); }); })();
+      (function () {   /* WORLD PIVOT PASS 4: three suspended CELESTIAL RINGS high above the centre (reference: elegant luminous rings) — white light with a
+        lavender core, slowly counter-rotating (fieldScene.tick), visible from the deck and from the ground through the dome glass. Decorative,
+        never solid. */
+        var rg = new THREE.Group(); rg.name = 'HALO_CELESTIAL_RINGS'; rg.userData.noMerge = true; rg.position.set(s.x, PH + 95, s.z);
+        var rm = new THREE.MeshStandardMaterial({ color: 0xf2f0ff, emissive: 0xe4d8ff, emissiveIntensity: DAY ? 0.85 : 1.6, roughness: 0.25, metalness: 0.4 });
+        [[26, 0.42, 0.18], [34, 0.3, -0.26], [42, 0.52, 0.34]].forEach(function (R3, i) { var t3 = new THREE.Mesh(new THREE.TorusGeometry(R3[0], R3[1], 8, 220), rm); t3.rotation.x = Math.PI / 2 + R3[2]; t3.rotation.y = i * 0.7; t3.userData.spin = (i % 2 ? -1 : 1) * (0.025 + i * 0.01); rg.add(t3); });
+        g.add(rg); })();
       var zenith = new THREE.Mesh(new THREE.OctahedronGeometry(1.3, 1), M.diamond); zenith.scale.y = 1.45; zenith.position.set(s.x, HALO_LAYOUT.apex_height_m + 0.4, s.z); g.add(zenith);
       /* civic programme at human scale: arrival court, overlooks, rest bays, guide focus */
       for (var bn = 0; bn < 12; bn++) { var ba = bn / 12 * Math.PI * 2 + 0.12, br = bn % 2 ? 104 : 57; var bench = new THREE.Mesh(roundedBox(2.0, 0.42, 0.62, 0.2), M.platinum); bench.position.set(s.x + Math.cos(ba) * br, PH + 0.22, s.z + Math.sin(ba) * br); bench.rotation.y = -ba + Math.PI / 2; g.add(bench); var lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 1.3, 8), M.chrome); lamp.position.set(s.x + Math.cos(ba + 0.035) * (br + 2.1), PH + 0.65, s.z + Math.sin(ba + 0.035) * (br + 2.1)); g.add(lamp); }
