@@ -220,3 +220,30 @@ showed individual puff outlines (V09); ridge faces were large flat slabs; at nig
 | evidence | `evidence/cp7_after/desktop_day/` (V01 V02 V13, pinned at `3186200`) |
 | perf (V01 V02 V13) | live shader programs 141–144 → **94** (−34 %): the stacked rig's larger light count compiled a second full set of shader variants at load, which the prewarm then orphaned; time-state prewarm 8.8 s → 4.3 s (software GL — relative only, not a device timing); draw calls / triangles unchanged. Fewer compiles means less load-time hitching, which matters most on phones (to be confirmed by the owner's device test) |
 | tests | 23 runnable programs green, 424 checks; host safety 6 / 6 |
+
+## M8 — MATERIAL REALISM / STRUCTURAL SURFACE PASS, first pass (`e7b12a9`; harness `cd381e1`)
+
+Diagnosis (live material audit of the rendered world, `WP.scene` traversal): every hard surface was ONE flat value — no normal /
+roughness / detail maps on civic platinum, HALO chrome (metalness 0.98), plaza proxies, poles and water edges (a near-white `#dfe6ee`
+mirror at roughness 0.2–0.34 with full environment reflection), the plaza + district ground (a smooth canvas) and the causeway cores (a
+sky mirror at grazing angles); white trims glowed at 0.9–0.95 emissive by day across 19+ merged meshes. Result: smooth white-plastic
+shells, blown-out street level, no scale cues.
+
+| field | value |
+|---|---|
+| files | `lab/world/surfaceDetail.js` (new), `lab/fieldScene.js`, `lab/cityScene.js`, `lab/world/worldB.js`, `lab/world/architecture.js`, `lab/world/terrain.js`, `deploy/world_preview/capture.mjs` (V18–V20, screenshot timeout), `16_TESTS/gameplay_world_material_realism.test.mjs` (new) |
+| technique | a WORLD-SPACE procedural layer patched onto the existing MeshStandardMaterials (no textures; survives the static merge and instancing): HARDSCAPE (staggered slabs, recessed matte grout, per-slab tone / roughness, aggregate grain, wear breakup), PANELS (box-projected panel grid, inset seams with a chamfer normal, storey trim bands), BRUSHED (streak roughness), seamless poured option. Seams are fwidth-antialiased and fade with distance; the LOW tier keeps tone / roughness only. It scales value / roughness / metalness only — never hue (five-class colour law untouched; colour audit 0) |
+| surfaces changed first | plaza floor (PLAZA 2.4 × 1.2 m running bond) · district ground (DISTRICT 3.2 × 1.6 m) · plaza pillars / barriers / ramps (STRUCTURE, BRUSHED) and graphite plinths (STONE) · civic facades incl. the Mentor Spire (FACADE 1.8 × 1.2 m panels + a band per 3.6 m storey) · civic chrome (BRUSHED, roughness 0.24 → 0.32 by day) / graphite / stone · HALO deck (DECK 3 m slabs, honed 0.36 → 0.5) · HALO trunk (TOWER 3.2 × 7.2 m panels, storey band) · shared world platinum (`#dfe6ee` → `#c2c9d2`, satin) / chrome (roughness 0.3) / graphite / black — poles, rails, water edges, match hall · class-house structure + stone · road kerbs (KERB 1 m) · causeway cores (PAVER 4 × 2 m, roughness 0.42 → 0.58, metalness 0.48 → 0.3) |
+| daylight value | civic trims 0.95 → 0.45 emissive, plaza trims 0.9 → 0.4, warm trims 0.54 → 0.3 (light lines read by contrast, not a white glow) |
+| before / after | pinned `2ef4c87` → pinned `e7b12a9` / `cd381e1` (identical world code): `evidence/m8_before/…` → `evidence/m8_after/{desktop_day (V01 V03 V04 V08 V09 V13 V15 V16 V18 V19 V20), desktop_night (V13 V18 V19), phone_med_day (V18 V19)}`; sheets `evidence/m8_close_day.jpg`, `m8_wide_day.jpg`, `m8_night.jpg`, `m8_phone_med.jpg` |
+| perf (11 day views, same frames) | draw calls 2378 → 2378, triangles 14.36 M → 14.36 M, textures 77 → 77 (no texture memory), shader programs 95 → 111 (+16: the surface families); phone-sized MED: calls unchanged, programs 95 → 108. Frame cost is a handful of hash / value-noise lookups per lit fragment — to be confirmed on the owner's device |
+| tests (focused) | material realism 5 / 5 (patch lands on every anchor of the vendored three.js standard shader, LOW tier drops chamfer / grain, chaining after existing patches, the application map, the daylight value policy + no hue change), host safety 6 / 6, colour law 4 / 4, Moon / cloud 19 / 19, ridge collision 8 / 8, night route 13 / 13 |
+| unresolved / next | see "M8 next" below; owner visual review |
+
+### M8 next — the most important open material issue after this pass
+
+1. **Ridge mountains / cliffs at street level** — they fill 30–50 % of every street-level frame (V03 V04 V05 V16) and still read as large
+   flat grey slab faces: the rock grain / strata shader is too subtle at that distance and the faces carry no macro structure (ledges,
+   fracture lines, value zoning between lit rock and shadowed clefts). Must stay on the collision plane (owner OP10) — shader-side only.
+2. Civic curtain-wall glass bands still read as uniform smoked strips (mullion rhythm, spandrel panels).
+3. Crystal ecology / tree materials (GLB-textured) were not touched; water-facing edges took the shared platinum change only.
