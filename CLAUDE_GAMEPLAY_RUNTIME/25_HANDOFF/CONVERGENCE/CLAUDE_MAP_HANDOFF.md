@@ -11,6 +11,7 @@ Status: **MAP EDITING PAUSED** at the 2026-09-25 HALO repair/play release checkp
 | Netlify deploy | `6ab5db39db052ab31c510699` (`ready`, `deploy-preview`, unpublished) |
 | Packaged source | `3710e4588a7f853c84a1a376eee7d08fdabc0454` |
 | Release-record parent | `cb06dc03b93a89c601b6be9d765a9b55652a1094` |
+| Takeover asset checkpoint | `2d41d494853017add0865de4dfc645d06e66e7f8` |
 | Package | 183 entries, 122,993,039 bytes, SHA-256 `a63114487c19a053dfb74c18cd4fc6f453424f7f805d73b895f1a887a90ed1aa` |
 | Preserved production | `6aac25101f17ce5ed37166e4` |
 | Preserved prior HALO preview | `6ab5c2451611040beb1093d8` |
@@ -26,7 +27,7 @@ The release gate passed 58 programs / 1,542 checks / 0 failures, 106-file JavaSc
 - The shared local checkout is intentionally dirty on `master` at `3185a25f80a23131fbdb2062fca9a1a1ffb7684f` and includes unrelated lanes. Do not reset, clean, blanket-stage, or treat that `master` index as the map authority.
 - A checkpoint comparison against `cb06dc0` found no newer runtime/map source. It did find two registry-referenced runtime assets absent from the recovery branch: `_decimated/gym_rt.glb` and the feature-flagged `_decimated/training_display_rt.glb`. This handoff adds exactly those two assets with a supplemental manifest.
 - Only two regenerated M6 floor-recheck evidence files otherwise differ locally; they are not source changes and are intentionally not substituted for the reviewed release evidence.
-- All current executable map work through HALO repair/play is on the recovery branch after this handoff. The current handoff adds takeover records and the two required runtime GLBs; it does not import unrelated or superseded decimation candidates.
+- All current executable map work through HALO repair/play is on the recovery branch after this handoff. Asset checkpoint `2d41d494853017add0865de4dfc645d06e66e7f8` adds the takeover records and two required runtime GLBs; a fresh sparse clone reproduced both byte lengths and SHA-256 values exactly. It does not import unrelated or superseded decimation candidates.
 
 ## Completed map state to preserve
 
