@@ -28,7 +28,10 @@ export var VIEWS = [
   ['V14', 'HALO glass sky-walk looking down', [30, 243, 172], [30, 0, 262]],
   ['V15', 'civic facade close (Mentor Spire)', [6, 2.6, -9], [24, 7, 0]],
   ['V16', 'LEAN spire house on the north-west terrace', [-82, 7, 238], [-110, 15, 272]],
-  ['V17', 'VISIONARY overlook close', [-127, 5, 16], [-152, 9, 0]]
+  ['V17', 'VISIONARY overlook close', [-127, 5, 16], [-152, 9, 0]],
+  ['V18', 'plaza hardscape close (Mentor Spire base)', [-2, 1.6, -16], [10, 0.2, -6]],
+  ['V19', 'HALO trunk base and elevator close', [16, 2.2, 22], [30, 7, 40]],
+  ['V20', 'causeway road edge close', [7, 1.7, 70], [0, 0.3, 92]]
 ];
 
 function mime(p) { return ({ '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css', '.bin': 'application/octet-stream', '.ktx2': 'image/ktx2' })[path.extname(p).toLowerCase()] || 'application/octet-stream'; }

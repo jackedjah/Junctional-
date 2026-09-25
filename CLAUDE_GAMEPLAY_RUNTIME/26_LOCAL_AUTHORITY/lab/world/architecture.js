@@ -11,7 +11,7 @@
                       a suspended amethyst core), TITAN gate (caps + a beam between the pillars) and ledge (slab on struts around the
                       mountain spire), BAGE basin rings (platinum frames + rose rim growth) — their colliders = worldLayout.architectureColliders
    Phone-first: transform / uniform animation only, ~20 draw calls total, motion frozen beyond MOTION_FAR_M, night = emissive up. */
-import { groundYAt } from './worldLayout.js';
+import { groundYAt } from './worldLayout.js'; import { applySurface } from './surfaceDetail.js';
 
 var MOTION_FAR_M = 240;
 
@@ -103,6 +103,7 @@ export function createArchitecture(ctx) {
     group = new THREE.Group(); group.name = 'MAHWORLD_ARCHITECTURE'; group.userData.noMerge = true; ctx.group.add(group);
     platMat = new THREE.MeshStandardMaterial({ color: 0xc4cbd5, roughness: 0.38, metalness: 0.7, envMapIntensity: 0.6 }); own.push(platMat);   /* WORLD PIVOT PASS 3: satin anodised platinum (was a near-white mirror under the daylight key), matching the civic buildings */
     var stoneMat = new THREE.MeshStandardMaterial({ color: 0x3a3f4a, roughness: 0.62, metalness: 0.3, envMapIntensity: 0.4 }); own.push(stoneMat);
+    (function () { var tier = 'HIGH'; try { tier = ctx.quality && ctx.quality.tier ? ctx.quality.tier() : 'HIGH'; } catch (e) { } applySurface(THREE, platMat, 'STRUCTURE', tier); applySurface(THREE, stoneMat, 'STONE', tier); })();   /* M8: panelled structure + stone grain on the class houses / crowns / plinths */
     crystalMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.12, metalness: 0.5, envMapIntensity: 0.7, transparent: true, opacity: 0.9, emissive: 0xffffff, emissiveIntensity: 0.08, flatShading: true }); crystalMat.onBeforeCompile = function (sh) { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance = emissive * vColor.rgb;'); }; crystalMat.customProgramCacheKey = function () { return 'mahworld_arch_crystal'; }; own.push(crystalMat);
     seamMat = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xffffff }); seamMat.onBeforeCompile = function (sh) { sh.uniforms.uT = { value: 0 }; sh.uniforms.uHi = { value: night ? 1.0 : 0.6 }; seamMat.userData.shader = sh;
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying float vWy;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWy = position.y;');
