@@ -31,21 +31,25 @@ export function createAtmosphere(ctx) {
       fragmentShader: [
         'precision mediump float; varying vec3 vDir; uniform vec3 uSun, uZenith, uHorizon, uHaze, uSunTint, uGround, uLav; uniform float uMie, uT, uWind, uLavK, uHazeK;',
         'void main() {',
-        '  vec3 d = normalize(vDir); float h = clamp(d.y, -1.0, 1.0); float mu = dot(d, uSun);',
-        '  float od = 1.0 / (max(h, 0.0) * 4.0 + 0.22);',                                  /* optical depth of the view ray: ~4.5 at the horizon, ~0.24 at the zenith */
-        '  vec3 sky = mix(uZenith, uHorizon, clamp(1.0 - exp(-od * 0.55), 0.0, 1.0));',      /* Rayleigh-style: the thicker the ray, the paler the blue */
+        '  vec3 d = normalize(vDir); float h = clamp(d.y, -1.0, 1.0); float hp = max(h, 0.0); float mu = dot(d, uSun);',
+        /* M8B SKY REALISM: a long zenith → horizon falloff (deep blue high, milky toward the horizon over ~30°) instead of one flat band */
+        '  float od = 1.0 / (hp * 4.0 + 0.22);',                                               /* optical depth of the view ray: ~4.5 at the horizon, ~0.24 at the zenith */
+        '  float t = clamp(0.62 * pow(1.0 - hp, 2.2) + 0.38 * (1.0 - exp(-od * 0.55)), 0.0, 1.0);',
+        '  vec3 sky = mix(uZenith, uHorizon, t);',
+        '  sky *= mix(0.9, 1.1, (0.5 + 0.5 * mu) * (0.35 + 0.65 * t));',                        /* multiple scattering: brighter and paler on the Sun side, deeper blue opposite */
         '  float breathe = 1.0 + 0.04 * sin(uT * 0.05 + uWind);',
-        '  float hazeK = exp(-max(h, 0.0) * 13.0) * breathe;',                                /* the horizon haze band (distance scattering) */
-        '  vec3 haze = mix(uHaze, uSunTint, 0.55 * pow(max(mu, 0.0), 4.0));',                /* warmer toward the sun */
+        '  float hazeK = (exp(-hp * 16.0) + 0.38 * exp(-hp * 3.6)) * breathe;',                 /* a tight bright horizon line + a wide soft haze skirt */
+        '  vec3 haze = mix(uHaze, uSunTint, 0.55 * pow(max(mu, 0.0), 4.0));',                   /* warmer toward the sun */
         '  vec3 c = mix(sky, haze, clamp(hazeK * uHazeK, 0.0, 1.0));',
-        '  float anti = pow(max(-mu, 0.0), 1.4) * exp(-max(h, 0.0) * 7.0);',                   /* pivot: lavender band on the anti-solar horizon */
+        '  float anti = pow(max(-mu, 0.0), 1.4) * exp(-hp * 7.0);',                              /* lavender band on the anti-solar horizon (ties the sky to the Moon) */
         '  c = mix(c, uLav, clamp(anti * uLavK, 0.0, 1.0));',
-        '  c += uSunTint * pow(max(mu, 0.0), 3.0) * exp(-max(h, 0.0) * 3.0) * 0.16 * uMie;',    /* pivot: the wide warm glow that fills the sky around the Sun */
-        '  float g = 0.82; float hg = (1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * mu, 1.5);', /* Henyey-Greenstein forward lobe = the glare around the sun */
+        '  c += uSunTint * pow(max(mu, 0.0), 3.0) * exp(-hp * 3.0) * 0.16 * uMie;',               /* the wide warm glow that fills the sky around the key body */
+        '  float g = 0.82; float hg = (1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * mu, 1.5);',   /* Henyey-Greenstein forward lobe = the glare around the sun / moon */
         '  c += uSunTint * hg * 0.012 * uMie;',
-        '  c += uSunTint * pow(max(mu, 0.0), 10.0) * 0.1 * max(uMie, 0.25);',                 /* the wide soft halo */
-        '  c = mix(c, c * vec3(0.95, 0.975, 1.07), smoothstep(0.35, 0.95, h));',              /* MAHWORLD: a cool violet-cyan cast at the zenith, never a photoreal Earth sky */
-        '  if (h < 0.0) c = mix(c, uGround, clamp(-h * 3.0, 0.0, 1.0));',                     /* ground haze → graphite below the horizon */
+        '  c += uSunTint * (pow(max(mu, 0.0), 10.0) * 0.1 * max(uMie, 0.25) + pow(max(mu, 0.0), 56.0) * 0.28 * uMie);',   /* the soft halo + a tight aureole */
+        '  c = mix(c, c * vec3(0.95, 0.975, 1.07), smoothstep(0.35, 0.95, h));',               /* MAHWORLD: a cool violet cast at the zenith, never a photoreal Earth sky */
+        '  if (h < 0.0) c = mix(c, uGround, clamp(-h * 3.0, 0.0, 1.0));',                      /* ground haze → graphite below the horizon */
+        '  c += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * (1.5 / 255.0);',   /* dither: no 8-bit banding across the long gradient */
         '  gl_FragColor = vec4(c, 1.0);',
         '  #include <colorspace_fragment>',   /* the uniforms are linear (THREE.Color) → the renderer output space, like every built-in material */
         '}'].join('\n') });

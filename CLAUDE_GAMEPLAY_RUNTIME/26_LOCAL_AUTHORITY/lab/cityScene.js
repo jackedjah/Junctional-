@@ -26,7 +26,7 @@ export function createCityScene(THREE, group, helpers) {
   };
   /* M8 MATERIAL REALISM: the civic families get world-space structural surface logic (lab/world/surfaceDetail.js) — facade panel grid with
      inset seams and a trim band per 3.6 m storey, brushed chrome, panelled graphite structure, stone grain. Value / roughness only (no hue). */
-  var SDT = helpers.surfaceTier || 'HIGH'; applySurface(THREE, M.platinum, 'FACADE', SDT); applySurface(THREE, M.chrome, 'BRUSHED', SDT); applySurface(THREE, M.dark, 'STRUCTURE', SDT); applySurface(THREE, M.stone, 'STONE', SDT);
+  var SDT = helpers.surfaceTier || 'HIGH'; applySurface(THREE, M.platinum, 'FACADE', SDT); applySurface(THREE, M.chrome, 'BRUSHED', SDT); applySurface(THREE, M.dark, 'STRUCTURE', SDT); applySurface(THREE, M.stone, 'STONE', SDT); applySurface(THREE, M.glass, 'GLAZING', SDT);
   function nameSprite(text) { var tex = canvasTex(512, 96, function (g, w, h) { g.clearRect(0, 0, w, h); g.font = '600 46px "Segoe UI", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#f3e6c8'; g.shadowBlur = 18; g.fillStyle = '#f7f9ff'; g.fillText(text.toUpperCase(), w / 2, h / 2); }); var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false })); sp.scale.set(7.5, 1.4, 1); return sp; }
   function tier(cx, cz, w, d, y0, h, r, mat) { var m = new THREE.Mesh(roundedBox(w, h, d, r), mat); m.position.set(cx, y0, cz); return m; }   /* roundedBox is extruded from y0 upward (see fieldScene.roundedBox) */
   function band(cx, cz, w, d, y, h, r) { var b = new THREE.Mesh(roundedBox(w + 0.12, h, d + 0.12, r), M.glass); b.position.set(cx, y, cz); return b; }

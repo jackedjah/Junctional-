@@ -57,6 +57,9 @@ export function createContactAO(ctx) {
       (H.spires || []).forEach(function (sp) { push(H.x + sp.dx, H.z + sp.dz, sp.r, sp.r, 2.2, 0.42, sp.r); info.houses++; });
       (H.pillars || []).forEach(function (q) { push(q.x, q.z, 3.6, 3.6, 2.4, 0.36, 3.6); info.houses++; }); });
     (reg.artifacts || []).forEach(function (a) { if (a.id === 'MATCH_HALL' && a.position && a.footprint && a.footprint.w) { var fw = a.footprint.w / 2, fd = (a.footprint.d || a.footprint.w) / 2; push(a.position[0], a.position[2], fw, fd, 3, 0.42, 0.5); info.landmarks++; } });
+    /* M8B TRANSITIONS: every street light and wayfinder foot, and the sanctuary monoliths, sit in a small contact band too */
+    (ctx.fixturePlacement || []).forEach(function (F) { if (F && isFinite(F.x) && isFinite(F.z)) { push(F.x, F.z, 0.3, 0.3, 1.3, 0.36, 0.3); info.fixtures = (info.fixtures || 0) + 1; } });
+    ((reg.regions && reg.regions.list) || []).forEach(function (R) { (R.monoliths || []).forEach(function (m) { var r0 = 0.9 + (m.h || 6) * 0.08; push(m.x, m.z, r0, r0, 1.9, 0.4, r0); info.monoliths = (info.monoliths || 0) + 1; }); });
     items = items.filter(function (it) { return !(it.hx === it.hz && it.hx < 1 && nearTree(it.x, it.z) && it.k > 0.3); });
     if (!items.length) { log('contactAO: nothing to ground'); return; }
     group = new THREE.Group(); group.name = 'WORLD_CONTACT_AO'; group.userData.noMerge = true; ctx.group.add(group);

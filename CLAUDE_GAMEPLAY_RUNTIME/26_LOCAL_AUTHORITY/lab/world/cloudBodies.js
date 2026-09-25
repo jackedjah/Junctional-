@@ -75,8 +75,8 @@ export function createCloudBodies(ctx, L, opts) {
   var THREE = ctx.THREE; var tierScale = opts.tierScale || 1; var rnd = opts.rnd || Math.random; var own = [];
   var clouds = [], puffs = [];
   var count = Math.max(4, Math.round((L.count || 20) * (opts.countScale || 1)));
-  for (var k = 0; k < count; k++) { var len = (L.size_m ? L.size_m[0] : 60) + rnd() * ((L.size_m ? L.size_m[1] : 140) - (L.size_m ? L.size_m[0] : 60)); var x0 = (rnd() - 0.5) * opts.spread, z0 = opts.originZ + (rnd() - 0.5) * opts.spread;
-    var cl = { x: x0, z: z0, x0: x0, z0: z0, y: (L.alt_m || 150) + (rnd() - 0.5) * 24, yaw: rnd() * Math.PI, drift: 0.7 + rnd() * 0.6, len: len, puffs: [] };
+  for (var k = 0; k < count; k++) { var len = (L.size_m ? L.size_m[0] : 60) + rnd() * ((L.size_m ? L.size_m[1] : 140) - (L.size_m ? L.size_m[0] : 60)); var x0 = (rnd() - 0.5) * opts.spread, z0 = opts.originZ + (rnd() - 0.5) * opts.spread, ang0 = 0, rr = 0; if (L.ring_m) { ang0 = rnd() * Math.PI * 2; rr = L.ring_m[0] + rnd() * (L.ring_m[1] - L.ring_m[0]); x0 = Math.cos(ang0) * rr; z0 = opts.originZ + Math.sin(ang0) * rr; }   /* M8B: horizon banks sit on a ring around the world */
+    var cl = { x: x0, z: z0, x0: x0, z0: z0, ang0: ang0, rr: rr, y: (L.alt_m || 150) + (rnd() - 0.5) * 24, yaw: rnd() * Math.PI, drift: 0.7 + rnd() * 0.6, len: len, puffs: [] };
     var raw = cloudCluster(len, rnd, L.crown === undefined ? 1 : L.crown); var keep = Math.max(4, Math.round(raw.length * tierScale));
     cl.extent = Math.max.apply(Math, raw.map(function (P) { return P.y + P.h * 0.5; })) + len * 0.02;
     if (L.max_top_m && cl.y + cl.extent > L.max_top_m) cl.y = L.max_top_m - cl.extent;   /* keeps every body below the HALO deck (240 m): no cloud ever pokes up through the upper-realm floor */

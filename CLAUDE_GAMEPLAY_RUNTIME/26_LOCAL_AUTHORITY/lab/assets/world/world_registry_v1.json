@@ -1,6 +1,6 @@
 {
  "version": "WORLD_REGISTRY_V1",
- "generated": "2026-09-25T18:13:51.190Z",
+ "generated": "2026-09-25T19:19:32.191Z",
  "_doc": "JOB B world registry (owner directive 2026-09-19 §19): sources (provenance) → derivatives (what ships) → artifacts / zones / fixtures / creatures / celestial (placement + policy). Coordinates are FIELD metres (x east, z north, y up), yaw in degrees around +y. Collision shapes for the host are GENERATED from this file by deploy/jobb/build_world_colliders.mjs (never hand-edited twice). states: PLACED = built and in the world · WAITING_FOR_JOB_A = the hook exists, the gameplay side is JOB A's · PROVISIONAL = owner tuning pending.",
  "field": {
   "walls": {
@@ -1522,8 +1522,8 @@
    "day_visible": true,
    "tint": "#d8c8ff",
    "emissive": "#9b82f0",
-   "emissive_day": 0.95,
-   "emissive_night": 0.72,
+   "emissive_day": 0.78,
+   "emissive_night": 0.9,
    "note_pivot": "owner pivot: very large lavender Moon, visible by day and night (night key only)"
   }
  },
@@ -5914,35 +5914,60 @@
     "rim_color": "#d5e2ef",
     "occludes": false,
     "drift_scale": 1.6
+   },
+   {
+    "id": "CUMULUS_HORIZON",
+    "kind": "CLOUD",
+    "bank": true,
+    "alt_m": 96,
+    "max_top_m": 236,
+    "ring_m": [
+     820,
+     1100
+    ],
+    "count": 22,
+    "size_m": [
+     300,
+     560
+    ],
+    "crown": 0.55,
+    "opacity_day": 0.8,
+    "opacity_night": 0.42,
+    "color": "#c2cedb",
+    "rim_color": "#eef4fb",
+    "occludes": false,
+    "drift_scale": 0.25,
+    "note": "M8B sky realism: a ring of large, flatter cumulus banks behind the far massifs (820-1100 m) — scale and depth at the horizon; lit bodies like the low / mid layers but outside the Sun / Moon optics (they never cross the high celestial bodies)"
    }
   ],
   "atmosphere": {
    "_doc": "owner B7 §8 (2026-09-20): the phone-safe physically-inspired sky (lab/world/atmosphere.js) — a Rayleigh-style zenith → horizon mix by the optical depth of the view ray, a horizon haze band warmed toward the sun, a Henyey-Greenstein Mie lobe (the sun glare + halo), a graphite ground haze, a faint cool-violet MAHWORLD zenith cast; the scene fog takes the haze colour (one truth for sky + distance falloff). Tiers: HIGH / MED full, LOW = Mie lobe off. The oversized sun / moon canon (registry.celestial) and the water stay.",
    "day": {
-    "zenith": "#2e6fd6",
-    "horizon": "#c3dcf6",
-    "haze": "#e6eefa",
-    "sunTint": "#ffe0a8",
+    "zenith": "#1a52bd",
+    "horizon": "#cfe1f6",
+    "haze": "#eef3fb",
+    "sunTint": "#fff1d6",
     "ground": "#5d6373",
     "mie": 1.3,
     "fog": "#b4cbe9",
     "fog_near_m": 190,
     "lavender": "#d9c7f4",
     "lavender_k": 0.42,
-    "haze_k": 0.72
+    "haze_k": 0.8
    },
    "night": {
-    "zenith": "#07091c",
-    "horizon": "#252a55",
-    "haze": "#34366a",
-    "sunTint": "#c7b6f2",
+    "zenith": "#050716",
+    "horizon": "#2a2c5e",
+    "haze": "#3d3574",
+    "sunTint": "#c9b4ff",
     "ground": "#0d1020",
-    "mie": 0.22,
-    "fog": "#161a36",
-    "lavender": "#5a4a8e",
-    "lavender_k": 0.35,
-    "haze_k": 0.62
+    "mie": 0.55,
+    "fog": "#171a38",
+    "lavender": "#6a55a8",
+    "lavender_k": 0.3,
+    "haze_k": 0.6
    },
+   "m8b_note": "M8B sky realism (2026-09-25): deeper zenith, milky horizon over ~30 deg, whiter sun glow; night indigo zenith, purple-blue horizon and a strong lavender lunar aureole (mie 0.22 -> 0.55)",
    "pivot_note": "World pivot PASS 1 (owner sky direction 2026-09-25): bright fantasy DAYLIGHT is the hero: a luminous horizon, a warm gold glow toward the Sun, and a lavender band on the anti-solar horizon that ties the sky to the lavender Moon; NIGHT keeps the same language in a deep indigo register."
   },
   "time_of_day": {

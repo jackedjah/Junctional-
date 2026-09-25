@@ -31,7 +31,12 @@ export var VIEWS = [
   ['V17', 'VISIONARY overlook close', [-127, 5, 16], [-152, 9, 0]],
   ['V18', 'plaza hardscape close (Mentor Spire base)', [-2, 1.6, -16], [10, 0.2, -6]],
   ['V19', 'HALO trunk base and elevator close', [16, 2.2, 22], [30, 7, 40]],
-  ['V20', 'causeway road edge close', [7, 1.7, 70], [0, 0.3, 92]]
+  ['V20', 'causeway road edge close', [7, 1.7, 70], [0, 0.3, 92]],
+  ['V21', 'sky away from the Sun (zenith depth, anti-solar band)', [0, 3, 0], [-120, 40, -70]],
+  ['V22', 'Moon from the plaza', [0, 4, 20], [-32, 40, -80]],
+  ['V23', 'plaza hub paving from above', [14, 9, -20], [0, 0, 0]],
+  ['V24', 'TITAN district paving close', [150, 1.8, 80], [160, 0, 95]],
+  ['V25', 'ATHLETE district paving close', [-30, 1.8, 146], [-30, 0, 162]]
 ];
 
 function mime(p) { return ({ '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css', '.bin': 'application/octet-stream', '.ktx2': 'image/ktx2' })[path.extname(p).toLowerCase()] || 'application/octet-stream'; }
