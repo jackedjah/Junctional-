@@ -103,7 +103,8 @@ export function createCityScene(THREE, group, helpers) {
     var mat = new THREE.Mesh(new THREE.PlaneGeometry(horiz ? e.width * 1.1 : 4.5, horiz ? 4.5 : e.width * 1.1), M.trimWarm); mat.rotation.x = -Math.PI / 2; mat.position.set(e.x + sx * 2.4, 0.02, e.z + sz * 2.4); mat.material = M.trimWarm.clone(); mat.material.transparent = true; mat.material.opacity = 0.22; g.add(mat);
     return g;
   }
-  var THRESH = { stone: [], drain: [], edge: [] };   /* M10: entrance aprons / slot drains, merged once in dress() */
+  var THRESH = { stone: [], drain: [], edge: [] };
+  var haloTicks = [];   /* M11: HALO pieces animated from the city tick (garden motes) */   /* M10: entrance aprons / slot drains, merged once in dress() */
   var api = {
     /* one authored building from its collider (BOX or CYLINDER) + `building` block */
     building: function (s) {
@@ -378,6 +379,35 @@ export function createCityScene(THREE, group, helpers) {
           pools2.setMatrixAt(gI, m5.compose(v5.set(gx, PH + 0.012, gz), q5, s5.set(8, 1, 8))); pools2.setColorAt(gI, c5); }
         [[beams2, 'HALO_GARDEN_LIGHT_BEAMS', function (n) { bM.opacity = n ? 0.32 : 0.14; }], [rings2, 'HALO_GARDEN_EMITTERS', function (n) { eM.emissiveIntensity = n ? 1.8 : 0.5; }], [pools2, 'HALO_GARDEN_LIGHT_POOLS', function (n) { pM.opacity = n ? 0.42 : 0.08; }]].filter(function (B, bi) { if (SDT === 'LOW' && bi > 0) { B[0].geometry.dispose(); B[0].material.dispose(); return false; } return true; }).forEach(function (B) { B[0].instanceMatrix.needsUpdate = true; if (B[0].instanceColor) B[0].instanceColor.needsUpdate = true; B[0].computeBoundingSphere(); B[0].name = B[1]; B[0].userData.noMerge = true; B[0].userData.dayNight = B[2]; B[0].renderOrder = 5; g.add(B[0]); });
         rings2.renderOrder = 0; })();   /* M10 LOW: the beams only (no emitter rings / pools) */
+      (function () {   /* M11 PROMENADE + VIEWING EDGE LIGHT (owner: promenade identity, architectural lighting, integrated class-colour accents). Flush
+        recessed floor lights (2 cm) run along both promenade curbs every 5 m — neutral white, except where a class spoke crosses the promenade,
+        which takes the sector's colour — each with a soft light pool on the granite at night; a lit strip runs under the viewing-edge handrail.
+        Light and flush only (nothing to walk into). 3 draws; the pools are hidden by day. */
+        var lamps = [], FAM5 = FAMS_RIM.map(function (h) { return new THREE.Color(h); }), white = new THREE.Color(0xf4f1ea);
+        [109.2, 124.8].forEach(function (lr) { var n = Math.round(Math.PI * 2 * lr / 5); for (var li = 0; li < n; li++) { var la = li / n * Math.PI * 2, spoke = -1;
+          for (var sp = 0; sp < 5; sp++) { var sa2 = sp / 5 * Math.PI * 2 + 0.22, d = Math.abs(Math.atan2(Math.sin(la - sa2), Math.cos(la - sa2))); if (d * lr < 2.6) spoke = sp; }
+          lamps.push({ x: s.x + Math.cos(la) * lr, z: s.z + Math.sin(la) * lr, c: spoke >= 0 ? FAM5[spoke] : white }); } });
+        var lG = new THREE.CylinderGeometry(0.1, 0.1, 0.02, 12), lM = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: DAY ? 0.35 : 1.6, roughness: 0.2, metalness: 0.3 });
+        var pc2 = document.createElement('canvas'); pc2.width = pc2.height = 64; var px3 = pc2.getContext('2d'), pg3 = px3.createRadialGradient(32, 32, 1, 32, 32, 32); pg3.addColorStop(0, 'rgba(255,255,255,0.85)'); pg3.addColorStop(0.4, 'rgba(255,255,255,0.28)'); pg3.addColorStop(1, 'rgba(255,255,255,0)'); px3.fillStyle = pg3; px3.fillRect(0, 0, 64, 64);
+        var pT2 = new THREE.CanvasTexture(pc2); pT2.colorSpace = THREE.SRGBColorSpace; var pG2 = new THREE.CircleGeometry(1, 24); pG2.rotateX(-Math.PI / 2);
+        var poolM = new THREE.MeshBasicMaterial({ map: pT2, transparent: true, opacity: 0.4, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, polygonOffset: true, polygonOffsetFactor: -2 });
+        var lampI = new THREE.InstancedMesh(lG, lM, lamps.length), poolI = new THREE.InstancedMesh(pG2, poolM, lamps.length), m6 = new THREE.Matrix4(), q6 = new THREE.Quaternion(), v6 = new THREE.Vector3(), s6 = new THREE.Vector3();
+        lamps.forEach(function (L, i) { lampI.setMatrixAt(i, m6.compose(v6.set(L.x, PH + 0.01, L.z), q6, s6.set(1, 1, 1))); lampI.setColorAt(i, L.c); poolI.setMatrixAt(i, m6.compose(v6.set(L.x, PH + 0.014, L.z), q6, s6.set(1.5, 1, 1.5))); poolI.setColorAt(i, L.c.clone().multiplyScalar(0.8)); });
+        var rail = new THREE.TorusGeometry(HALO_LAYOUT.playable_radius_m + 0.15, 0.022, 4, 240); rail.rotateX(Math.PI / 2); rail.translate(s.x, PH + 1.03, s.z); var railM = M.trim.clone(); railM.emissiveIntensity = DAY ? 0.3 : 1.9;
+        var railL = new THREE.Mesh(rail, railM); railL.name = 'HALO_HANDRAIL_LIGHT'; railL.userData.noMerge = true; railL.userData.dayNight = function (n) { railM.emissiveIntensity = n ? 1.9 : 0.3; }; g.add(railL);
+        [[lampI, 'HALO_PROMENADE_LAMPS', function (n) { lM.emissiveIntensity = n ? 1.6 : 0.35; }], [poolI, 'HALO_PROMENADE_POOLS', function (n) { poolI.visible = !!n; }]].forEach(function (B) { B[0].instanceMatrix.needsUpdate = true; if (B[0].instanceColor) B[0].instanceColor.needsUpdate = true; B[0].computeBoundingSphere(); B[0].name = B[1]; B[0].userData.noMerge = true; B[0].userData.dayNight = B[2]; g.add(B[0]); });
+        poolI.visible = !DAY; poolI.renderOrder = 5; })();
+      (function () {   /* M11 GARDEN MOTES (owner: ambience): a slow drift of light motes rising through each class garden's light column in its class
+        colour and fading as they climb — the column reads as alive at eye level. Light only (points, no depth write), 1 draw, animated in tick. */
+        if (SDT === 'LOW') return; var NM = 18, pos = new Float32Array(5 * NM * 3), col = new Float32Array(5 * NM * 3), seeds = [];
+        for (var gI2 = 0; gI2 < 5; gI2++) { var ga = gI2 / 5 * Math.PI * 2 + 0.22 + Math.PI / 5, gx2 = s.x + Math.cos(ga) * 84, gz2 = s.z + Math.sin(ga) * 84, cc = new THREE.Color(FAMS_RIM[gI2]).lerp(new THREE.Color(0xffffff), 0.35);
+          for (var k3 = 0; k3 < NM; k3++) { var i3 = gI2 * NM + k3; seeds.push({ x: gx2, z: gz2, ph: (k3 * 0.618) % 1, r: 0.6 + (k3 * 0.37 % 1) * 2.2, a: k3 * 2.4, sp: 0.045 + (k3 * 0.29 % 1) * 0.04 }); col[i3 * 3] = cc.r; col[i3 * 3 + 1] = cc.g; col[i3 * 3 + 2] = cc.b; } }
+        var mg2 = new THREE.BufferGeometry(); mg2.setAttribute('position', new THREE.BufferAttribute(pos, 3)); mg2.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        var mc = document.createElement('canvas'); mc.width = mc.height = 32; var mx = mc.getContext('2d'), mgr = mx.createRadialGradient(16, 16, 0, 16, 16, 16); mgr.addColorStop(0, 'rgba(255,255,255,1)'); mgr.addColorStop(0.35, 'rgba(255,255,255,0.5)'); mgr.addColorStop(1, 'rgba(255,255,255,0)'); mx.fillStyle = mgr; mx.fillRect(0, 0, 32, 32);
+        var mT = new THREE.CanvasTexture(mc); mT.colorSpace = THREE.SRGBColorSpace; var mM = new THREE.PointsMaterial({ size: 0.85, map: mT, vertexColors: true, transparent: true, opacity: DAY ? 0.45 : 0.95, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, fog: false });
+        var motes = new THREE.Points(mg2, mM); motes.name = 'HALO_GARDEN_MOTES'; motes.userData.noMerge = true; motes.frustumCulled = false; motes.userData.dayNight = function (n) { mM.opacity = n ? 0.95 : 0.45; };
+        motes.userData.tick = function (t) { for (var i = 0; i < seeds.length; i++) { var S2 = seeds[i], u = (S2.ph + t * S2.sp) % 1, ang = S2.a + t * 0.25 + u * 3.0, rr = S2.r * (1 - 0.4 * u); pos[i * 3] = S2.x + Math.cos(ang) * rr; pos[i * 3 + 1] = PH + 0.4 + u * 26; pos[i * 3 + 2] = S2.z + Math.sin(ang) * rr; } mg2.attributes.position.needsUpdate = true; };
+        motes.userData.tick(0); g.add(motes); haloTicks.push(motes); })();
       (function () {   /* WORLD PIVOT PASS 4: three suspended CELESTIAL RINGS high above the centre (reference: elegant luminous rings) — white light with a
         lavender core, slowly counter-rotating (fieldScene.tick), visible from the deck and from the ground through the dome glass. Decorative,
         never solid. */
@@ -403,7 +433,7 @@ export function createCityScene(THREE, group, helpers) {
     pod: function (s) { var g = new THREE.Group(); var body = new THREE.Mesh(new THREE.SphereGeometry(s.r, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), M.platinum); body.scale.y = s.h / s.r * 0.75; body.position.set(s.x, 0, s.z); g.add(body); var seam = new THREE.Mesh(new THREE.TorusGeometry(s.r * 0.98, 0.05, 8, 40), M.trim); seam.rotation.x = Math.PI / 2; seam.position.set(s.x, s.h * 0.45, s.z); g.add(seam); var door = new THREE.Mesh(roundedBox(1.1, 2.0, 0.3, 0.4), M.doorway); door.position.set(s.x, 0, s.z + s.r - 0.1); g.add(door); var dm = new THREE.Mesh(new THREE.CircleGeometry(1.2, 24), M.trimWarm.clone()); dm.material.transparent = true; dm.material.opacity = 0.16; dm.rotation.x = -Math.PI / 2; dm.position.set(s.x, 0.02, s.z + s.r + 1.0); g.add(dm); group.add(g); return g; },
     materials: M,
     /* M8E: the live time-of-day toggle and the frame clock reach the facades (windows light up at night; the plaza light show) */
-    setNight: function (n) { kit.setNight(n); group.traverse(function (o) { if (o.name === 'TREE_UPLIGHT_WASH') o.visible = !!n; if (o.userData.dayNight) o.userData.dayNight(!!n); }); },   /* M9: the trunk's practical light wash follows the live time of day */ tick: function (dt, t) { kit.tick(dt, t); }, facadeInfo: function () { return Object.assign({ audit: kit.audit() }, kit.info()); }
+    setNight: function (n) { kit.setNight(n); group.traverse(function (o) { if (o.name === 'TREE_UPLIGHT_WASH') o.visible = !!n; if (o.userData.dayNight) o.userData.dayNight(!!n); }); },   /* M9: the trunk's practical light wash follows the live time of day */ tick: function (dt, t) { kit.tick(dt, t); for (var hi = 0; hi < haloTicks.length; hi++) haloTicks[hi].userData.tick(t || 0); }, facadeInfo: function () { return Object.assign({ audit: kit.audit() }, kit.info()); }
   };
   return api;
 }
