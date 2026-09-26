@@ -6,6 +6,7 @@
    one hemisphere, an environment map for specular, emissive trims for local light (no per-lamp point lights). */
 import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
+import { createAuraField } from './world/aura.js';   /* M12 owner pivot: the spectral aura language */
 import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal, applyRadialDeck } from './world/surfaceDetail.js'; import { createFacadeKit, profileFor, addCivicBuilding } from './world/facadeKit.js';
 export function createCityScene(THREE, group, helpers) {
   var roundedBox = helpers.roundedBox, canvasTex = helpers.canvasTex; var DAY = helpers.night === false;
@@ -193,7 +194,8 @@ export function createCityScene(THREE, group, helpers) {
         var pools = new THREE.InstancedMesh(bG, bM, Math.max(1, np)); for (var pi = 0; pi < np; pi++) { caps.getMatrixAt(pi, tm); tm.decompose(tp, tq, ts); tp.y = 0.018; pools.setMatrixAt(pi, tm.compose(tp, noRot, one)); }
         pools.count = np; pools.instanceMatrix.needsUpdate = true; pools.name = 'CITY_BOLLARD_POOLS'; pools.userData.noMerge = true; pools.visible = !DAY; pools.userData.dayNight = function (n) { pools.visible = !!n; }; group.add(pools); })();
       pylons.count = np; rings.count = np; pylons.instanceMatrix.needsUpdate = true; rings.instanceMatrix.needsUpdate = true; group.add(pylons); group.add(rings);
-      var emblem = new THREE.Group(); var oct = new THREE.Mesh(new THREE.OctahedronGeometry(1.1, 0), M.diamond); oct.scale.set(1, 1.7, 1); emblem.add(oct); var halo = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.05, 8, 48), M.trim); halo.rotation.x = Math.PI / 2; emblem.add(halo); emblem.position.set(0, 9.5, 0); emblem.name = 'MAH_EMBLEM'; group.add(emblem); var lbl = nameSprite('MAHWORLD PLAZA'); lbl.position.set(0, 12.2, 0); group.add(lbl); api.emblem = emblem;
+      var emblem = new THREE.Group(); var oct = new THREE.Mesh(new THREE.OctahedronGeometry(1.1, 0), M.diamond); oct.scale.set(1, 1.7, 1); emblem.add(oct); var halo = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.05, 8, 48), M.trim); halo.rotation.x = Math.PI / 2; emblem.add(halo); emblem.position.set(0, 9.5, 0); emblem.name = 'MAH_EMBLEM'; group.add(emblem);
+      (function () { var EA = createAuraField(THREE, [{ x: 0, y: 9.5, z: 0, size: 5.6, ring: 0.66, ringW: 0.07, breakup: 0.55, tint: 0xf4f6ff, spectral: 1.0, intensity: 0.5, nightK: 1.3, pull: 1.5, phase: 0.9 }], { isNight: !DAY, tier: SDT, name: 'PLAZA_EMBLEM_AURA' }); if (!EA) return; EA.mesh.userData.tick = function (t) { EA.tick(t); }; EA.mesh.userData.dayNight = function (n) { EA.setNight(n); }; group.add(EA.mesh); haloTicks.push(EA.mesh); })();   /* M12 AURA: the MAHWORLD emblem — the union of the five classes — carries the full prismatic halo */ var lbl = nameSprite('MAHWORLD PLAZA'); lbl.position.set(0, 12.2, 0); group.add(lbl); api.emblem = emblem;
       /* The old 26-cone ridge was the actual owner of the enormous blue planar shard in the M7 owner view: on the district build its
          34–94 m seven-sided cones were merged before the registry macro/far-world layers loaded.  Keep the bounded fallback for the small
          standalone field, but do not stack it behind the full world where macro.js + farWorld.js already own the unreachable horizon. */
@@ -467,6 +469,12 @@ export function createCityScene(THREE, group, helpers) {
         var beacG = mergeGeometries(beacP.map(function (q, qi) { var nq = q.index ? q.toNonIndexed() : q, n = nq.attributes.position.count, cc = new Float32Array(n * 3); for (var ci = 0; ci < n; ci++) { cc[ci * 3] = bcol[qi].r; cc[ci * 3 + 1] = bcol[qi].g; cc[ci * 3 + 2] = bcol[qi].b; } nq.setAttribute('color', new THREE.BufferAttribute(cc, 3)); return nq; }), false);
         var beacM = new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: true }); beacM.color.setScalar(DAY ? 1.0 : 1.7); var beac = new THREE.Mesh(beacG, beacM); beac.name = 'HALO_BEACONS'; beac.userData.noMerge = true; beac.userData.dayNight = function (n) { beacM.color.setScalar(n ? 1.7 : 1.0); }; g.add(beac);
         g.userData.beaconMasts = { r: RM, h: HM, count: 5 }; })();
+      (function () {   /* M12 AURA (owner pivot: aura / magic energy language): the HALO's energy architecture gets the spectral field — a class-colour
+        glint on each beacon mast outside the glass.
+        One draw; restrained by day, stronger at night. */
+        var items = [];   /* (a halo round the trunk-to-canopy junction was tried and dropped: against the bright deck underside an additive glow does not read) */
+        for (var ak = 0; ak < 5; ak++) { var aa = ak / 5 * Math.PI * 2 + 0.22, ar2 = PR - 2.2; items.push({ x: s.x + Math.cos(aa) * ar2, y: PH + 1.2 + 30 + 2.1, z: s.z + Math.sin(aa) * ar2, size: 4.5, ring: 0.6, ringW: 0.1, breakup: 0.4, tint: parseInt(FAMS_RIM[ak].slice(1), 16), spectral: 0.7, intensity: 0.5, nightK: 1.6, pull: 1, phase: ak * 1.1 }); }
+        var AF = createAuraField(THREE, items, { isNight: !DAY, tier: SDT, name: 'HALO_SPECTRAL_AURA' }); if (!AF) return; AF.mesh.userData.tick = function (t) { AF.tick(t); }; AF.mesh.userData.dayNight = function (n) { AF.setNight(n); }; g.add(AF.mesh); haloTicks.push(AF.mesh); })();
       (function () {   /* M11 GARDEN MOTES (owner: ambience): a slow drift of light motes rising through each class garden's light column in its class
         colour and fading as they climb — the column reads as alive at eye level. Light only (points, no depth write), 1 draw, animated in tick. */
         if (SDT === 'LOW') return; var NM = 18, pos = new Float32Array(5 * NM * 3), col = new Float32Array(5 * NM * 3), seeds = [];

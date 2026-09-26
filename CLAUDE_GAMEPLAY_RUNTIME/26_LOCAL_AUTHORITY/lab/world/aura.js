@@ -8,6 +8,8 @@
    hides the part of its own aura behind its silhouette — the light reads as emanating from around it). Day is restrained, night stronger.
    LOW tier keeps the bloom and drops the fringes. */
 
+import { celestialDirection } from './celestial.js';
+
 export var SPECTRAL = { violet: 0xb48cff, ice: 0x7fd0ff, white: 0xf4f6ff, gold: 0xffd88a, pink: 0xff9ad2 };
 export var CLASS_TINT = { gold: 0xe6c36a, blue: 0x5a8cf0, purple: 0x9a78e0, pink: 0xf08ab8, red: 0xd4344a, white: 0xf4f6ff };
 
@@ -74,12 +76,24 @@ export function createAuraField(THREE, items, opts) {
 export function createAura(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var field = null, night = !!ctx.night, followers = [];
   function tier() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
-  function build() { var req = ctx.auraRequests || []; if (!req.length) { log('aura: no requests'); return; }
+  /* SELECTED SKY MOMENTS: a 22° halo that forms round the Sun for about a minute every five minutes by day, and a faint corona round the
+     lavender Moon at night. Both ride camera-relative at 870 m along the celestial directions (in front of the 900 m bodies), so they stay
+     locked to the Sun / Moon wherever the viewer is. Additive and depth-tested: terrain and cloud bodies occlude them; the Moon disc itself
+     is untouched. */
+  function skyMoments(req) { var reg = ctx.registry || {}, C = reg.celestial; if (!C || !ctx.cameraPos) return; var D = 870;
+    var sd = celestialDirection(C.sun, 'sun'), sl = Math.hypot(sd[0], sd[1], sd[2]) || 1, md = celestialDirection(C.moon, 'moon'), ml = Math.hypot(md[0], md[1], md[2]) || 1;
+    function at(d, l) { return function () { var c = ctx.cameraPos(); return [c.x + d[0] / l * D, c.y + d[1] / l * D, c.z + d[2] / l * D]; }; }
+    var haloR = D * Math.tan(22 * Math.PI / 180), coronaR = D * Math.tan(7 * Math.PI / 180);
+    req.push({ x: 0, y: 0, z: 0, size: haloR / 0.8, ring: 0.8, ringW: 0.03, breakup: 0.45, tint: 0x000000, spectral: 1.0, intensity: 0.75, nightK: 0, phase: 0.7, follow: at(sd, sl),
+      fade: function (t, n) { if (n) return 0; var u = ((t % 300) + 300) % 300; return Math.min(1, Math.max(0, u / 12)) * Math.min(1, Math.max(0, (75 - u) / 12)); } });
+    req.push({ x: 0, y: 0, z: 0, size: coronaR / 0.6, ring: 0.6, ringW: 0.08, breakup: 0.25, tint: 0x241c36, spectral: 0.9, intensity: 0.6, phase: 1.9, follow: at(md, ml),
+      fade: function (t, n) { return n ? 1 : 0; } }); }
+  function build() { var req = ctx.auraRequests || []; skyMoments(req); if (!req.length) { log('aura: no requests'); return; }
     field = createAuraField(THREE, req, { isNight: night, tier: tier(), name: 'WORLD_SPECTRAL_AURA' }); if (!field) return; ctx.group.add(field.mesh);
     req.forEach(function (r, i) { if (typeof r.follow === 'function') followers.push({ i: i, fn: r.follow, fade: r.fade || null, base: r.intensity === undefined ? 0.5 : r.intensity }); });
     log('aura: ' + req.length + ' spectral auras in one draw (' + followers.length + ' following)'); }
   function tick(dt, t) { if (!field) return; field.tick(t); if (!followers.length) return; var P = field.positions, K = field.mesh.geometry.attributes.aK;
-    for (var i = 0; i < followers.length; i++) { var F = followers[i], p = F.fn(t); if (p) { P.setXYZ(F.i, p[0], p[1], p[2]); } if (F.fade) K.setX(F.i, F.base * F.fade(t)); }
+    for (var i = 0; i < followers.length; i++) { var F = followers[i], p = F.fn(t); if (p) { P.setXYZ(F.i, p[0], p[1], p[2]); } if (F.fade) K.setX(F.i, F.base * F.fade(t, night)); }
     P.needsUpdate = true; K.needsUpdate = true; }
   function setNight(n) { night = !!n; if (field) field.setNight(night); }
   function dispose() { if (field) { if (field.mesh.parent) field.mesh.parent.remove(field.mesh); field.dispose(); field = null; } }
