@@ -32,7 +32,7 @@ export function surfaceDetail(THREE, mat, spec) {
     'vec2 sdCell = vec2(' + f(S.cell[0]) + ', ' + f(S.cell[1]) + '); if (sdFloor && ' + (K === 'PANELS' ? 'true' : 'false') + ') sdCell = vec2(sdCell.x);',
     'vec2 sdG = sdUV / sdCell; float sdRow = floor(sdG.y); sdG.x += ' + f(S.stagger) + ' * mod(sdRow, 2.0);',
     'vec2 sdId = floor(sdG), sdF = fract(sdG); vec2 sdE = min(sdF, 1.0 - sdF) * sdCell; float sdD = min(sdE.x, sdE.y);',
-    'float sdAA = max(fwidth(sdD), 1e-4) * 1.25; float sdSeam = (1.0 - smoothstep(' + f(S.seam * 0.5) + ', ' + f(S.seam * 0.5) + ' + sdAA, sdD)) * sdNear;',
+    'float sdAA = max(fwidth(sdD), 1e-4) * 1.25; float sdSeam = (1.0 - smoothstep(' + f(S.seam * 0.5) + ', ' + f(S.seam * 0.5) + ' + sdAA, sdD)) * sdNear * clamp(' + f(S.seam) + ' / sdAA, 0.0, 1.0);',   /* M11: a seam finer than the pixel footprint fades to its coverage instead of aliasing at grazing view */
     'float sdH1 = sdHash(sdId + 17.0), sdH2 = sdHash(sdId * 1.7 + 3.1);',
     'float sdTone = 1.0 + (sdH1 - 0.5) * ' + f(S.toneVar) + ';',
     'float sdRough = 1.0 + (sdH2 - 0.5) * ' + f(S.roughVar) + ';'
@@ -50,7 +50,7 @@ export function surfaceDetail(THREE, mat, spec) {
   var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor *= 1.0 - ' + f(S.metalSeam) + ' * sdSeam;'];
   var nrm = ['#include <normal_fragment_maps>'];
   if (!LOW && S.bevel > 0 && K !== 'BRUSHED' && !S.seamless) nrm.push(   /* chamfer: inside the bevel width the normal tilts toward the nearest seam, so each panel / slab reads as a separate, slightly inset piece */
-    '{ float sdBW = ' + f(Math.max(S.seam * 2.5, 0.05)) + '; float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, sdBW, sdD)) * sdNear; vec3 sdDir = sdE.x < sdE.y ? sdTU * (sdF.x < 0.5 ? -1.0 : 1.0) : sdTV * (sdF.y < 0.5 ? -1.0 : 1.0);',
+    '{ float sdBW = ' + f(Math.max(S.seam * 2.5, 0.05)) + '; float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, sdBW, sdD)) * sdNear * clamp(sdBW / sdAA, 0.0, 1.0); vec3 sdDir = sdE.x < sdE.y ? sdTU * (sdF.x < 0.5 ? -1.0 : 1.0) : sdTV * (sdF.y < 0.5 ? -1.0 : 1.0);',
     '  normal = normalize(normal + sdK * normalize((viewMatrix * vec4(sdDir, 0.0)).xyz)); }');
   var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey;
   var key = 'mahworld-sd-' + K + '-' + [S.cell[0], S.cell[1], S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.band ? S.band.join('x') : 0, S.bandTone, S.stagger, S.lod.join('x'), LOW ? 'L' : 'H', S.metalSeam, S.seamless ? 'S' : 'G'].join('_');
@@ -147,7 +147,7 @@ export function zonedPaving(THREE, mat, Z, spec) {
     'else if (zType < 7.5) pBond(zp, vec2(0.9, 0.9), 0.5, sdD, sdId, sdCC);',
     'else { pRings(zp - zC, 1.2, 1.8, sdD, sdId, sdCC); sdCC += zC; }',
     'float zBand = 0.0; if (zEdge < ' + f(S.band) + ') { zBand = 1.0; sdD = min(zEdge, ' + f(S.band) + ' - zEdge); sdId = vec2(-7.0, zType); sdCC = zp; }',   /* the threshold course where two families meet */
-    'float sdAA = max(fwidth(sdD), 1e-4) * 1.25; float sdSeam = (1.0 - smoothstep(' + f(S.seam * 0.5) + ', ' + f(S.seam * 0.5) + ' + sdAA, sdD)) * sdNear;',
+    'float sdAA = max(fwidth(sdD), 1e-4) * 1.25; float sdSeam = (1.0 - smoothstep(' + f(S.seam * 0.5) + ', ' + f(S.seam * 0.5) + ' + sdAA, sdD)) * sdNear * clamp(' + f(S.seam) + ' / sdAA, 0.0, 1.0);',   /* M11: a seam finer than the pixel footprint fades to its coverage instead of aliasing at grazing view */
     'float sdH1 = sdHash(sdId + 17.0 + zType * 3.1), sdH2 = sdHash(sdId * 1.7 + 3.1 + zType);',
     'float sdTone = (1.0 + (sdH1 - 0.5) * ' + f(S.toneVar) + ') * mix(1.0, 0.9, zBand); float sdRough = (1.0 + (sdH2 - 0.5) * ' + f(S.roughVar) + ') * mix(1.0, 1.15, zBand);',
     'float zPatch = 0.0;'];
@@ -170,7 +170,7 @@ export function zonedPaving(THREE, mat, Z, spec) {
   var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor *= 1.0 - 0.6 * sdSeam;' + (LOW ? '' : ' metalnessFactor = mix(metalnessFactor, 0.02, zNatK);')];
   var nrm = ['#include <normal_fragment_maps>'];
   if (!LOW) nrm.push('if (zNatK > 0.01) normal = normalize(mix(normal, geoBump(-vViewPosition, normal, (zGH * 0.5 - zGap * 0.2) * sdNear), zNatK));');
-  if (!LOW && S.bevel > 0) nrm.push('{ vec2 bd = zp - sdCC; float bl = length(bd); if (bl > 1e-4) { float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, ' + f(Math.max(S.seam * 2.5, 0.06)) + ', sdD)) * sdNear * (1.0 - zPatch) * (1.0 - 0.6 * zBand) * (1.0 - zNatK); normal = normalize(normal + sdK * normalize((viewMatrix * vec4(bd.x / bl, 0.0, bd.y / bl, 0.0)).xyz)); } }');
+  if (!LOW && S.bevel > 0) nrm.push('{ vec2 bd = zp - sdCC; float bl = length(bd); if (bl > 1e-4) { float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, ' + f(Math.max(S.seam * 2.5, 0.06)) + ', sdD)) * sdNear * clamp(' + f(Math.max(S.seam * 2.5, 0.06)) + ' / sdAA, 0.0, 1.0) * (1.0 - zPatch) * (1.0 - 0.6 * zBand) * (1.0 - zNatK); normal = normalize(normal + sdK * normalize((viewMatrix * vec4(bd.x / bl, 0.0, bd.y / bl, 0.0)).xyz)); } }');
   var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-zoned-m8c-' + [S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.lod.join('x'), S.band, LOW ? 'L' : 'H'].join('_');
   mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
     sh.uniforms.uZR = { value: Z.rects }; sh.uniforms.uZRT = { value: Z.rtype }; sh.uniforms.uZRS = { value: Z.rsoft }; sh.uniforms.uZC = { value: Z.circles }; sh.uniforms.uZCS = { value: Z.csoft }; sh.uniforms.uZS = { value: Z.soft }; sh.uniforms.uZDefSoft = Z.defSoft;
