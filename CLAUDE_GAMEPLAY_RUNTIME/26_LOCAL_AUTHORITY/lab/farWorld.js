@@ -99,7 +99,20 @@ export function createFarWorld(THREE, opts) {
       pushGeo(mid, sweep(curve, 36, 4.2, 1.8, -0.45), new THREE.Matrix4(), pmap(midPlat, function (c) { return c.multiplyScalar(0.6); }), true);   /* the girder under it */
       [-1, 1].forEach(function (sg) { pushGeo(mid, sweep(curve, 36, 0.35, 1.1, 1.55, sg * 3.3), new THREE.Matrix4(), pmap(midPlat, function (c) { return c.multiplyScalar(1.05); }), true);   /* parapets */
         pushGeo(mid, sweep(curve, 36, 0.3, 0.22, -0.3, sg * 3.62), new THREE.Matrix4(), midLit, true); });   /* the deck-edge light line */
-      [0.18, 0.82].forEach(function (u) { var pp = curve.getPoint(u), ph = Math.max(8, pp.y - 2.25); pushGeo(mid, new THREE.CylinderGeometry(1.9, 3.2, ph, 8), place(pp.x, ph * 0.5, pp.z, 0, 1, 1, 1), pmap(midPlat, function (c) { return c.multiplyScalar(0.82); }), true); pushGeo(mid, new THREE.BoxGeometry(6, 1.2, 6), place(pp.x, ph + 0.6, pp.z, 0, 1, 1, 1), pmap(midPlat, function (c) { return c.multiplyScalar(0.7); }), true); }); }   /* piers with caps */
+      [0.18, 0.82].forEach(function (u) { var pp = curve.getPoint(u), ph = Math.max(8, pp.y - 2.25); pushGeo(mid, new THREE.CylinderGeometry(1.9, 3.2, ph, 8), place(pp.x, ph * 0.5, pp.z, 0, 1, 1, 1), pmap(midPlat, function (c) { return c.multiplyScalar(0.82); }), true); pushGeo(mid, new THREE.BoxGeometry(6, 1.2, 6), place(pp.x, ph + 0.6, pp.z, 0, 1, 1, 1), pmap(midPlat, function (c) { return c.multiplyScalar(0.7); }), true); });   /* piers with caps */
+      /* M11 CABLE-STAYED (owner: visual support logic — a 150+ m deck on two thin piers did not read as carried): each pier gets a hammerhead
+         crossbeam, twin pylons beside the deck joined by a crossbeam at the top, and a fan of stays to both deck edges — forestays toward
+         mid-span, backstays toward the tower. Everything new starts on the pier cap (≥ 8 m up) or above the deck; same merged mesh. */
+      var pylC = pmap(midPlat, function (c) { return c.multiplyScalar(0.86); }), stayC = pmap(midPlat, function (c) { return c.multiplyScalar(1.12); });
+      var strut = function (A, B, r, col) { var d = new THREE.Vector3().subVectors(B, A), L = d.length(); if (L < 0.01) return; var q = new THREE.Quaternion().setFromUnitVectors(UPV, d.multiplyScalar(1 / L)); pushGeo(mid, new THREE.CylinderGeometry(r, r, L, 4, 1), new THREE.Matrix4().compose(new THREE.Vector3().addVectors(A, B).multiplyScalar(0.5), q, new THREE.Vector3(1, 1, 1)), col, true); };
+      [0.18, 0.82].forEach(function (u, ui) { var pp = curve.getPoint(u), T = curve.getTangent(u); T.y = 0; T.normalize(); var S = new THREE.Vector3().crossVectors(T, UPV).normalize(), capY = Math.max(8, pp.y - 2.25) + 1.2, top = pp.y + 24, dirIn = ui === 0 ? 1 : -1;
+        var yawS = Math.atan2(S.x, S.z);
+        pushGeo(mid, new THREE.BoxGeometry(11, 1.4, 3.2), place(pp.x, capY - 0.7, pp.z, yawS - Math.PI / 2, 1, 1, 1), pylC, true);   /* hammerhead under the deck */
+        pushGeo(mid, new THREE.BoxGeometry(9.6, 1.2, 2.2), place(pp.x, top - 0.9, pp.z, yawS - Math.PI / 2, 1, 1, 1), pylC, true);   /* the top crossbeam */
+        [-1, 1].forEach(function (sg) { var mx = pp.x + S.x * sg * 4.6, mz = pp.z + S.z * sg * 4.6; pushGeo(mid, new THREE.CylinderGeometry(0.7, 1.15, top - capY, 6, 1), place(mx, (capY + top) / 2, mz, 0, 1, 1, 1), pylC, true);
+          pushGeo(mid, new THREE.OctahedronGeometry(0.6, 0), place(mx, top + 0.6, mz, 0, 1, 1.6, 1), midLit, true);   /* an aircraft-warning light on each pylon (lit at night) */
+          for (var k = 1; k <= 6; k++) [u + dirIn * k * 0.045, u - dirIn * k * 0.03].forEach(function (uu) { if (uu <= 0.02 || uu >= 0.98) return; var dp = curve.getPoint(uu), Td = curve.getTangent(uu); Td.y = 0; Td.normalize(); var Sd = new THREE.Vector3().crossVectors(Td, UPV).normalize();
+            strut(new THREE.Vector3(mx, top - 2 - k * 0.7, mz), new THREE.Vector3(dp.x + Sd.x * sg * 3.45, dp.y + 0.5, dp.z + Sd.z * sg * 3.45), 0.16, stayC); }); }); }); }
   });
   var midMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.5, metalness: 0.55 }); var midMesh = finish(mid, midMat); midMesh.name = 'MID_WALKWAYS'; group.add(midMesh);
   /* ---------- HAZE plain: the ground fades into a platinum haze beyond the district instead of ending at an edge ---------- */
