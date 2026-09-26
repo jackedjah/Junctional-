@@ -16,6 +16,18 @@
 export var CLASS_GLOW = ['#ffd77a', '#5c8cff', '#ff5a6a', '#b99cff', '#ffa6d4'];   /* = registry crystal_families gold / blue / red / purple / pink .glow */
 export var CLASS_COLOR = ['#e6c36a', '#2a5be0', '#d4344a', '#8f6ad8', '#f08ab8'];   /* = registry .color: the saturated body the show runs on (the pale .glow tone-maps to white on a thin strip) */
 export var LOW_Y = 3.4, LOW_PROUD = 0.05;
+/* THE SHOW — one clock for every expressive light in the world (plaza facades, sanctuary seams, HALO rim): at night, for 24 s every 150 s, the
+   plaza runs the five classes IN TURN (gold · blue · red · purple · pink, 4.8 s each, dimming between steps so hues never mix) under a travelling
+   brightness wave; sanctuaries pulse in their own colour on the same beat. Outside the show everything is calm neutral / own-colour light.
+   ?show=1 forces it on (evidence), cycling continuously. */
+export var SHOW_PERIOD = 150, SHOW_LEN = 24, SHOW_STEP = 4.8;
+export function showForced() { try { return typeof location !== 'undefined' && /[?&]show=1/.test(location.search); } catch (e) { return false; } }
+export function showLevel(t, night, force) { if (force) return 1; var ph = ((t || 0) % SHOW_PERIOD) / SHOW_LEN, on = night && ph < 1 ? Math.min(1, ph * 6, (1 - ph) * 6) : 0; return on; }
+export function showPhase(t, force) { return force ? (t || 0) % SHOW_LEN : (t || 0) % SHOW_PERIOD; }
+export var SHOW_GLSL = 'uniform float uShow; uniform float uPhase; uniform vec3 uC0; uniform vec3 uC1; uniform vec3 uC2; uniform vec3 uC3; uniform vec3 uC4;\n' +
+  'vec3 fkClass(float i) { return i < 0.5 ? uC0 : (i < 1.5 ? uC1 : (i < 2.5 ? uC2 : (i < 3.5 ? uC3 : uC4))); }\n' +
+  'vec3 fkShowColour() { return fkClass(mod(floor(uPhase / ' + SHOW_STEP.toFixed(1) + '), 5.0)); }\n' +
+  'float fkShowDim() { float f = fract(uPhase / ' + SHOW_STEP.toFixed(1) + '); return min(smoothstep(0.0, 0.12, f), 1.0 - smoothstep(0.88, 1.0, f)); }';
 /* which construction profile a civic building takes, from its id (the city and the host-safety test use the same rule) */
 export function profileFor(id, tiers) { id = String(id || ''); return /SPIRE|TOWER/.test(id) ? 'TOWER' : (/HALL|TRAINING|ARENA/.test(id) ? 'HALL' : (/EXCHANGE|MARKET/.test(id) ? 'EXCHANGE' : (tiers >= 3 ? 'TOWER' : 'EXCHANGE'))); }
 
@@ -31,7 +43,7 @@ var PANE_VERT_BODY = [
   'vWin = aWin; vWinUv = clamp(position.xy + 0.5, 0.0, 1.0);'].join('\n');
 var PANE_FRAG_HEAD = 'uniform float uNight; uniform vec3 uLightA; uniform vec3 uLightB; uniform float uDayRoom; uniform vec3 uSkyH; uniform vec3 uSkyZ; uniform vec3 uGround;\nvarying vec4 vWin; varying vec3 vTanV; varying vec2 vWinUv; varying vec2 vWinSize;\nfloat fkH(float n) { return fract(sin(n * 91.345) * 47453.5453); }';
 var PANE_FRAG_BODY = [
-  '{ vec2 wsz = max(vWinSize, vec2(0.05)); vec3 d = normalize(vTanV); float depth = vWin.w; float seed = vWin.x;',
+  '{ vec2 wsz = max(vWinSize, vec2(0.05)); vec3 d = normalize(vTanV); float depth = vWin.w; float seed = floor(vWin.x * 997.0 + 0.5);',   /* integer seed: the sine hash would amplify varying interpolation error into per-pixel static */
   '  float lobby = step(1.5, vWin.y), lit = clamp(vWin.y, 0.0, 1.0) * uNight; vec3 lightC = mix(uLightA, uLightB, fkH(seed * 3.1)) * mix(0.45 + 0.75 * fkH(seed * 5.7), 1.0, lobby);',
   '  vec3 amb = mix(vec3(uDayRoom) + lightC * 0.3 * lobby, lightC * (lit * 0.62 + lobby * 0.5 * uNight) + vec3(0.004), uNight);',   /* entrance lobbies are lit by day too */   /* by day the rooms are dim against the sky; at night lit rooms glow, dark rooms stay dark */
   '  vec3 room = amb * 0.25;',
@@ -54,24 +66,24 @@ var PANE_FRAG_BODY = [
   '  totalEmissiveRadiance += room * (1.0 - F) + sky * F; }'].join('\n');
 
 var STRIP_HEAD = 'attribute vec4 aLight;\nvarying vec4 vLight;';
-var STRIP_FRAG_HEAD = 'uniform float uShow; uniform float uTime; uniform float uNight; uniform vec3 uWhite; uniform vec3 uC0; uniform vec3 uC1; uniform vec3 uC2; uniform vec3 uC3; uniform vec3 uC4;\nvarying vec4 vLight;\nvec3 fkClass(float i) { return i < 0.5 ? uC0 : (i < 1.5 ? uC1 : (i < 2.5 ? uC2 : (i < 3.5 ? uC3 : uC4))); }';
+var STRIP_FRAG_HEAD = 'uniform float uTime; uniform float uNight; uniform vec3 uWhite;\nvarying vec4 vLight;\n' + SHOW_GLSL;
 var STRIP_FRAG_BODY = [
   '{ float k = vLight.z * mix(0.32, 1.0, uNight); vec3 c = uWhite;',
-  '  if (uShow > 0.001 && vLight.w > 0.5) { float s = uTime * 0.3 + vLight.x * 0.7 + vLight.y * 0.19; float i = mod(floor(s), 5.0); vec3 ca = mix(fkClass(i), fkClass(mod(i + 1.0, 5.0)), smoothstep(0.75, 1.0, fract(s)));',
-  '    float wave = 0.5 + 0.5 * sin(6.2832 * (uTime * 0.45 - vLight.x)); c = mix(c, ca, uShow * 0.92); k = mix(k, 0.7 + 0.55 * wave, uShow); }',   /* class colours ONLY in a show: a slow synchronised sweep */
+  '  if (uShow > 0.001 && vLight.w > 0.5) { float wave = 0.5 + 0.5 * sin(6.2832 * (uTime * 0.45 - vLight.x - vLight.y * 0.13));',
+  '    c = mix(c, fkShowColour(), uShow * 0.92); k = mix(k, (0.7 + 0.55 * wave) * (0.2 + 0.8 * fkShowDim()), uShow); }',   /* class colours ONLY in a show: all facades on the same class at once, one class after another, a travelling wave */
   '  diffuseColor.rgb = c * k; }'].join('\n');
 
 export function createFacadeKit(THREE, opts) {
   opts = opts || {}; var tierQ = opts.tier || 'HIGH', night = !!opts.night, showForce = opts.show === true;
-  var panes = [], corners = [], bars = [], strips = [], pieces = [], info = { buildings: 0, windows: 0, corner_panes: 0, bars: 0, strips: 0, draw_calls: 0 };
+  var panes = [], corners = [], bars = [], strips = [], pieces = [], extras = [], info = { buildings: 0, windows: 0, corner_panes: 0, bars: 0, strips: 0, draw_calls: 0 };
   var UP = new THREE.Vector3(0, 1, 0), _m = new THREE.Matrix4(), _b = new THREE.Matrix4(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _q = new THREE.Quaternion();
   var COL = { frame: new THREE.Color(0x2c323a), sill: new THREE.Color(0xc2c8d0), pier: new THREE.Color(0x8d96a2), slab: new THREE.Color(0xaab2bc), grille: new THREE.Color(0x3a414a), door: new THREE.Color(0x4a525c), rail: new THREE.Color(0xb8c0ca), parapet: new THREE.Color(0x9ba3ad), house: new THREE.Color(0x767e89) };
   /* one oriented box in a face frame: F = { o: face origin (Vector3), t: tangent, n: normal }; a = along, y = base height, depth measured from the face outward */
-  function fbox(F, a, y, lenT, lenY, proud, col, rec) { var n0 = rec && rec.n0 !== undefined ? rec.n0 : 0; _p.copy(F.o).addScaledVector(F.t, a).addScaledVector(F.n, n0 + proud / 2); _p.y = y + lenY / 2; _b.makeBasis(F.t, UP, F.n); _q.setFromRotationMatrix(_b); _s.set(lenT, lenY, Math.max(0.01, proud)); _m.compose(_p, _q, _s); bars.push({ m: _m.clone(), c: col }); pieces.push({ y0: y, y1: y + lenY, proud: n0 + proud, id: F.id }); }
-  function pane(F, a, y, w, h, win, rec) { var n0 = rec && rec.n0 !== undefined ? rec.n0 : 0; _p.copy(F.o).addScaledVector(F.t, a).addScaledVector(F.n, n0 + 0.012); _p.y = y + h / 2; _b.makeBasis(F.t, UP, F.n); _q.setFromRotationMatrix(_b); _s.set(w, h, 1); _m.compose(_p, _q, _s); panes.push({ m: _m.clone(), w: win }); pieces.push({ y0: y, y1: y + h, proud: n0 + 0.012, id: F.id }); info.windows++; }
-  function strip(F, a, y, lenT, lenY, rec, light) { var n0 = rec && rec.n0 !== undefined ? rec.n0 : 0; _p.copy(F.o).addScaledVector(F.t, a).addScaledVector(F.n, n0 + 0.03); _p.y = y + lenY / 2; _b.makeBasis(F.t, UP, F.n); _q.setFromRotationMatrix(_b); _s.set(lenT, lenY, 0.04); _m.compose(_p, _q, _s); strips.push({ m: _m.clone(), l: light }); pieces.push({ y0: y, y1: y + lenY, proud: n0 + 0.05, id: F.id }); }
+  function fbox(F, a, y, lenT, lenY, proud, col, rec) { var n0 = rec && rec.n0 !== undefined ? rec.n0 : 0; _p.copy(F.o).addScaledVector(F.t, a).addScaledVector(F.n, n0 + proud / 2); _p.y = y + lenY / 2; _b.makeBasis(F.t, UP, F.n); _q.setFromRotationMatrix(_b); _s.set(lenT, lenY, Math.max(0.01, proud)); _m.compose(_p, _q, _s); bars.push({ m: _m.clone(), c: col }); pieces.push({ y0: y - (F.g || 0), y1: y - (F.g || 0) + lenY, proud: n0 + proud, id: F.id }); }
+  function pane(F, a, y, w, h, win, rec) { var n0 = rec && rec.n0 !== undefined ? rec.n0 : 0; _p.copy(F.o).addScaledVector(F.t, a).addScaledVector(F.n, n0 + 0.012); _p.y = y + h / 2; _b.makeBasis(F.t, UP, F.n); _q.setFromRotationMatrix(_b); _s.set(w, h, 1); _m.compose(_p, _q, _s); panes.push({ m: _m.clone(), w: win }); pieces.push({ y0: y - (F.g || 0), y1: y - (F.g || 0) + h, proud: n0 + 0.012, id: F.id }); info.windows++; }
+  function strip(F, a, y, lenT, lenY, rec, light) { var n0 = rec && rec.n0 !== undefined ? rec.n0 : 0; _p.copy(F.o).addScaledVector(F.t, a).addScaledVector(F.n, n0 + 0.03); _p.y = y + lenY / 2; _b.makeBasis(F.t, UP, F.n); _q.setFromRotationMatrix(_b); _s.set(lenT, lenY, 0.04); _m.compose(_p, _q, _s); strips.push({ m: _m.clone(), l: light }); pieces.push({ y0: y - (F.g || 0), y1: y - (F.g || 0) + lenY, proud: n0 + 0.05, id: F.id }); }
   /* a framed window: pane + head, sill, jambs, mullions every ~1.3 m, an optional transom; frames project 4 cm below 3.4 m (the host rule), 10 cm above */
-  function framedWindow(F, a, y, w, h, win, style, rec) { var low = y - 0.12 < LOW_Y, fd = low ? 0.04 : 0.1, fw = 0.075, n0 = rec && rec.n0 || 0;
+  function framedWindow(F, a, y, w, h, win, style, rec) { var low = y - (F.g || 0) - 0.12 < LOW_Y, fd = low ? 0.04 : 0.1, fw = 0.075, n0 = rec && rec.n0 || 0;
     pane(F, a, y, w, h, win, rec);
     fbox(F, a, y + h, w + 2 * fw, fw, fd, COL.frame, rec); fbox(F, a - w / 2 - fw / 2, y, fw, h, fd, COL.frame, rec); fbox(F, a + w / 2 + fw / 2, y, fw, h, fd, COL.frame, rec);
     fbox(F, a, y - fw * 1.3, w + 2 * fw + (low ? 0 : 0.12), fw * 1.3, low ? fd : fd + 0.08, COL.sill, rec);   /* the sill projects a little more (drip edge) */
@@ -136,6 +148,18 @@ export function createFacadeKit(THREE, opts) {
       strip(F1, 0, yb - 0.26, BW * 0.9, 0.04, { n0: BD - 0.05 }, [0.5, info.buildings, 0.8, 1]);   /* the slab-edge downlight */
       info.balconies = (info.balconies || 0) + 1; }
   }
+  /* a class-house SPIRE (an n-sided tapered prism, CylinderGeometry(rTop, r, h, sides) standing on a local ground `base`): narrow framed slots on
+     its flat faces, two per level on opposite faces, the pair turning with height like a stair core inside; a flush service door with a
+     practical light on the face nearest `door` (an angle). Slots stay above 4 m and below 3/4 of the height (the faces narrow upward). */
+  function addSpire(spec) { var rnd = lcg(spec.seed || 5), N = spec.sides || 8, h = spec.h, r = spec.r, rT = spec.rTop, base = spec.base || 0; info.buildings++;
+    function rAt(y) { return r - (r - rT) * (y / h); }
+    function face(k, y) { var th = (k + 0.5) / N * Math.PI * 2, n = new THREE.Vector3(Math.sin(th), 0, Math.cos(th)), ap = rAt(y) * Math.cos(Math.PI / N); return { o: new THREE.Vector3(spec.x, 0, spec.z).addScaledVector(n, ap), t: new THREE.Vector3().crossVectors(UP, n), n: n, id: spec.id + 'f' + k, g: base, fw: 2 * rAt(y) * Math.sin(Math.PI / N) }; }
+    for (var L = 0, y = 4.2; y + 1.6 < h * 0.75; y += spec.step || 3.8, L++) { var k0 = (L * 3) % N;
+      [k0, (k0 + N / 2) % N].forEach(function (k) { var F = face(k, y + 0.8), sw = Math.min(0.42, F.fw * 0.55); if (sw < 0.22) return; framedWindow(F, 0, base + y, sw, 1.6, [rnd(), rnd() < 0.5 ? 0.45 + 0.5 * rnd() : 0, rnd() < 0.3 ? 0.2 : 0, 1.4], 'UTIL', { n0: 0.0 }); }); }
+    if (spec.door !== undefined) { var best = 0, bd = 9; for (var k = 0; k < N; k++) { var th = (k + 0.5) / N * Math.PI * 2, dd = Math.abs(Math.atan2(Math.sin(th - spec.door), Math.cos(th - spec.door))); if (dd < bd) { bd = dd; best = k; } }
+      var F = face(best, 1.1), dw = Math.min(1.0, F.fw * 0.78); fbox(F, 0, base + 0.02, dw, 2.2, 0.03, COL.door); fbox(F, 0, base + 2.22, dw + 0.16, 0.08, 0.04, COL.frame); [-1, 1].forEach(function (sg) { fbox(F, sg * (dw / 2 + 0.04), base + 0.02, 0.06, 2.2, 0.04, COL.frame); });
+      strip(F, 0, base + 2.38, Math.min(0.5, dw * 0.6), 0.04, null, [0, info.buildings, 0.6, 0]); }   /* a flush door, its frame and a practical light: the house is entered */
+  }
   /* a cylinder base (the arena): a ring of tall clerestory windows above head height with piers between them */
   function addCylinder(spec) { var rnd = lcg(spec.seed || 3), n = spec.count || 14; info.buildings++;
     function frameAt(ang, id) { var nrm = new THREE.Vector3(Math.sin(ang), 0, Math.cos(ang)); return { o: new THREE.Vector3(spec.x, 0, spec.z).addScaledVector(nrm, spec.r), t: new THREE.Vector3().crossVectors(UP, nrm), n: nrm, id: spec.id + id }; }
@@ -159,7 +183,7 @@ export function createFacadeKit(THREE, opts) {
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + PANE_FRAG_HEAD).replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(0.04 + 0.12 * fkH(vWin.x * 7.3), 0.03, 0.2);').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + PANE_FRAG_BODY); };
     m.customProgramCacheKey = function () { return 'mahworld-facade-pane-v1'; }; return m; }
   function stripMaterial() { var cols = (opts.classColor || CLASS_COLOR).map(function (h) { return new THREE.Color(h); }); var m = new THREE.MeshBasicMaterial({ color: 0xffffff, fog: true, toneMapped: true });
-    m.onBeforeCompile = function (sh) { sh.uniforms.uShow = { value: showForce ? 1 : 0 }; sh.uniforms.uTime = { value: 0 }; sh.uniforms.uNight = { value: night ? 1 : 0 }; sh.uniforms.uWhite = { value: new THREE.Color(0xf4f6fb) }; cols.forEach(function (c, i) { sh.uniforms['uC' + i] = { value: c }; }); m.userData.shader = sh;
+    m.onBeforeCompile = function (sh) { sh.uniforms.uShow = { value: showForce ? 1 : 0 }; sh.uniforms.uPhase = { value: 0 }; sh.uniforms.uTime = { value: 0 }; sh.uniforms.uNight = { value: night ? 1 : 0 }; sh.uniforms.uWhite = { value: new THREE.Color(0xf4f6fb) }; cols.forEach(function (c, i) { sh.uniforms['uC' + i] = { value: c }; }); m.userData.shader = sh;
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + STRIP_HEAD).replace('#include <begin_vertex>', '#include <begin_vertex>\nvLight = aLight;');
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + STRIP_FRAG_HEAD).replace('#include <color_fragment>', '#include <color_fragment>\n' + STRIP_FRAG_BODY); };
     m.customProgramCacheKey = function () { return 'mahworld-facade-strip-v1'; }; return m; }
@@ -176,12 +200,19 @@ export function createFacadeKit(THREE, opts) {
     info.bars = bars.length; info.strips = strips.length; group.add(root); return root; }
   function setNight(n) { night = !!n; [paneMat, stripMat].forEach(function (m) { var sh = m && m.userData.shader; if (sh) sh.uniforms.uNight.value = night ? 1 : 0; }); var ps = paneMat && paneMat.userData.shader; if (ps) { ps.uniforms.uSkyH.value.set(night ? 0x252848 : 0xc9d5e4); ps.uniforms.uSkyZ.value.set(night ? 0x0a0d1f : 0x6c8ec4); ps.uniforms.uGround.value.set(night ? 0x101219 : 0x5c626b); } }
   /* the show: central-plaza facades run a slow class-colour sequence for 24 s every 150 s, at night only (calm by day); forced on for evidence */
-  function tick(dt, t) { var sh = stripMat && stripMat.userData.shader; if (!sh) return; sh.uniforms.uTime.value = t || 0; if (showForce) { sh.uniforms.uShow.value = 1; return; }
-    var ph = ((t || 0) % 150) / 24, on = night && ph < 1 ? Math.min(1, ph * 6, (1 - ph) * 6) : 0; sh.uniforms.uShow.value = on; }
+  function tick(dt, t) { var lv = showLevel(t, night, showForce), ph = showPhase(t, showForce), sh = stripMat && stripMat.userData.shader;
+    if (sh) { sh.uniforms.uTime.value = t || 0; sh.uniforms.uShow.value = lv; sh.uniforms.uPhase.value = ph; }
+    extras.forEach(function (m) { var s2 = m.userData.shader; if (s2) { s2.uniforms.uShow.value = lv; s2.uniforms.uPhase.value = ph; s2.uniforms.uTime.value = t || 0; } }); }
+  /* a light material elsewhere (the HALO rim) joins the show: its emission takes the current class under a wave travelling around (cx, cz) */
+  function showMaterial(base, o) { o = o || {}; var m = base.clone(), cols = (opts.classColor || CLASS_COLOR).map(function (h) { return new THREE.Color(h); });
+    m.onBeforeCompile = function (sh) { sh.uniforms.uShow = { value: showForce ? 1 : 0 }; sh.uniforms.uPhase = { value: 0 }; sh.uniforms.uTime = { value: 0 }; sh.uniforms.uCtr = { value: new THREE.Vector2(o.cx || 0, o.cz || 0) }; cols.forEach(function (c, i) { sh.uniforms['uC' + i] = { value: c }; }); m.userData.shader = sh;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vFkW;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvFkW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime; uniform vec2 uCtr; varying vec3 vFkW;\n' + SHOW_GLSL).replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\nif (uShow > 0.001) { float ang = atan(vFkW.z - uCtr.y, vFkW.x - uCtr.x) / 6.2832; float wave = 0.5 + 0.5 * sin(6.2832 * (uTime * 0.3 - ang * 3.0)); totalEmissiveRadiance = mix(totalEmissiveRadiance, fkShowColour() * (0.6 + 1.1 * wave) * (0.2 + 0.8 * fkShowDim()) * 1.6, uShow * 0.9); }'); };
+    m.customProgramCacheKey = function () { return 'mahworld-facade-showlight-v1'; }; extras.push(m); return m; }
   /* host rule proof: every placed piece below 3.4 m stays within 5 cm of the face (piers, frames, sills, doors, panes, lights) */
   function audit() { var worst = 0; pieces.forEach(function (p) { if (p.y0 < LOW_Y - 1e-6) worst = Math.max(worst, p.proud); }); return { pieces: pieces.length, max_proud_below_3_4_m: +worst.toFixed(3), ok: worst <= LOW_PROUD + 1e-6 }; }
-  function dispose() { meshes.forEach(function (m) { if (m.parent) m.parent.remove(m); }); geos.forEach(function (g) { g.dispose(); }); mats.forEach(function (m) { m.dispose(); }); meshes = []; geos = []; mats = []; }
-  return { addBoxBuilding: addBoxBuilding, addCylinder: addCylinder, addEntrance: addEntrance, build: build, setNight: setNight, tick: tick, audit: audit, dispose: dispose, info: function () { return Object.assign({}, info); } };
+  function dispose() { meshes.forEach(function (m) { if (m.parent) m.parent.remove(m); }); geos.forEach(function (g) { g.dispose(); }); mats.forEach(function (m) { m.dispose(); }); extras.forEach(function (m) { m.dispose(); }); meshes = []; geos = []; mats = []; extras = []; }
+  return { addBoxBuilding: addBoxBuilding, addCylinder: addCylinder, addEntrance: addEntrance, build: build, setNight: setNight, tick: tick, showMaterial: showMaterial, addSpire: addSpire, audit: audit, dispose: dispose, info: function () { return Object.assign({}, info); } };
 }
 
 export function idSeed(id) { var h = 2166136261; id = String(id || ''); for (var i = 0; i < id.length; i++) { h ^= id.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }

@@ -237,7 +237,7 @@ export function createCityScene(THREE, group, helpers) {
           var strip2 = new THREE.BoxGeometry(0.07, H2 * 0.82, 0.07); strip2.translate(s.x + Math.cos(ca2) * (RC - 0.42), PH + H2 * 0.5, s.z + Math.sin(ca2) * (RC - 0.42)); litP.push(strip2);
           var capG = new THREE.CylinderGeometry(0.75, 0.4, 0.55, 10); capG.translate(cx2, PH + H2 - 0.2, cz2); litP.push(capG); }
         var cor = new THREE.TorusGeometry(RC, 0.34, 6, 200); cor.rotateX(Math.PI / 2); cor.translate(s.x, PH + H2, s.z); corP.push(cor);
-        [[colP, M.platinum, 'HALO_RIM_COLONNADE'], [litP, M.trim, 'HALO_RIM_LIGHTS'], [corP, M.chrome, 'HALO_RIM_CORNICE']].forEach(function (P) { var mg = mergeGeometries(P[0].map(function (q) { return q.index ? q.toNonIndexed() : q; }), false); P[0].forEach(function (q) { q.dispose(); }); var mm = new THREE.Mesh(mg, P[1]); mm.name = P[2]; mm.userData.noMerge = true; g.add(mm); }); })();
+        [[colP, M.platinum, 'HALO_RIM_COLONNADE'], [litP, kit.showMaterial(M.trim, { cx: s.x, cz: s.z }), 'HALO_RIM_LIGHTS'], [corP, M.chrome, 'HALO_RIM_CORNICE']].forEach(function (P) { var mg = mergeGeometries(P[0].map(function (q) { return q.index ? q.toNonIndexed() : q; }), false); P[0].forEach(function (q) { q.dispose(); }); var mm = new THREE.Mesh(mg, P[1]); mm.name = P[2]; mm.userData.noMerge = true; g.add(mm); }); })();
       (function () {   /* WORLD PIVOT PASS 4: three suspended CELESTIAL RINGS high above the centre (reference: elegant luminous rings) — white light with a
         lavender core, slowly counter-rotating (fieldScene.tick), visible from the deck and from the ground through the dome glass. Decorative,
         never solid. */
