@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 /* MAHWORLD :: rig joint limits, body clearance, posture and gait continuity — plain-node checks (development, 2026-09-15).
    Drives lab/RigAnimator.js through EVERY state it can be in (idle, fused travel at several speeds, backward, turning, flight, all four
    dashes, every attack pattern at startup and at release, both guards, hit, KO, every authored emote, and every UNFUSE_ / REFUSE_ phase)
@@ -28,7 +29,7 @@ var THREE = { Euler: Euler, Quaternion: Quat };
    Reading the rest pose from the GLB means the convention can only be wrong in the asset, where the bind test would catch it. */
 import { restFromGlb, convention } from './lib/rest_from_glb.mjs';
 var ASSET = new URL('../26_LOCAL_AUTHORITY/lab/assets/athlete_m_preview/dev_0.11/Mah_Athlete_M_am08_v5.glb', import.meta.url);
-var RESTRIG = restFromGlb(ASSET.pathname.replace(/^\//, '').replace(/%20/g, ' '));
+var RESTRIG = restFromGlb(fileURLToPath(ASSET));   /* portable (the old pathname.replace(/^\//) only worked on Windows) */
 var CONV = convention(RESTRIG); var REST = RESTRIG.bones;
 /* Side-dependent expectations are derived from the asset, never assumed. OUT is the sign that ABDUCTS the left arm (moves it
    away from the body): a bone below its joint swings toward +x on a positive z rotation, so a left arm sitting at −x opens on

@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 /* MAHWORLD :: POSE ANATOMY (forward kinematics on the delivered skeleton).
    The limits suite proves no channel leaves its range; this one proves the pose MEANS what it says once the numbers reach the
    real bones. It drives lab/RigAnimator.js, then runs the composed pose through the rest skeleton read out of the shipped GLB
@@ -14,7 +15,7 @@ function ok(id, cond, detail) { if (cond) { pass++; console.log('PASS ' + id); }
 var PROFILE = JSON.parse(fs.readFileSync(new URL('../26_LOCAL_AUTHORITY/lab/rig_profile.json', import.meta.url), 'utf8'));
 var DEFAULTS = JSON.parse(fs.readFileSync(new URL('../26_LOCAL_AUTHORITY/lab/presentation_defaults.json', import.meta.url), 'utf8'));
 var argv = process.argv.slice(2); function arg(k, d) { var i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; }
-var ASSET = arg('--asset', decodeURIComponent(new URL('../26_LOCAL_AUTHORITY/lab/assets/athlete_m_preview/dev_0.11/Mah_Athlete_M_am08_v5.glb', import.meta.url).pathname.replace(/^\//, '')));
+var ASSET = arg('--asset', fileURLToPath(new URL('../26_LOCAL_AUTHORITY/lab/assets/athlete_m_preview/dev_0.11/Mah_Athlete_M_am08_v5.glb', import.meta.url)));   /* portable (the old pathname.replace(/^\//) only worked on Windows) */
 var RIGREST = restFromGlb(ASSET);
 var CONV = convention(RIGREST), OUT = CONV.left_x_sign;
 

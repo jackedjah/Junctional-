@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 /* MAHWORLD :: EMOTE ENDPOINT PRECISION (S13). An emote key that names a wrist target must END there: the animator is driven through the
    emote on the delivered skeleton, the composed pose is run through exact FK over the asset hierarchy, and the wrist is measured against the
    authored target (metres). Also: no hand inside the head, hands ON the hips for the lat spread, the wave hand beside (not over) the head,
@@ -11,7 +12,7 @@ var pass = 0, fail = 0;
 function ok(id, cond, detail) { if (cond) { pass++; console.log('PASS ' + id); } else { fail++; console.log('FAIL ' + id + (detail !== undefined ? ' — ' + (typeof detail === 'string' ? detail : JSON.stringify(detail)) : '')); } }
 var PROFILE = JSON.parse(fs.readFileSync(new URL('../26_LOCAL_AUTHORITY/lab/rig_profile.json', import.meta.url), 'utf8'));
 var DEFAULTS = JSON.parse(fs.readFileSync(new URL('../26_LOCAL_AUTHORITY/lab/presentation_defaults.json', import.meta.url), 'utf8'));
-var ASSET = decodeURIComponent(new URL('../26_LOCAL_AUTHORITY/lab/assets/athlete_m_preview/dev_0.11/Mah_Athlete_M_am08_v5.glb', import.meta.url).pathname.replace(/^\//, ''));
+var ASSET = fileURLToPath(new URL('../26_LOCAL_AUTHORITY/lab/assets/athlete_m_preview/dev_0.11/Mah_Athlete_M_am08_v5.glb', import.meta.url));   /* portable (the old pathname.replace(/^\//) only worked on Windows) */
 var RIGREST = restFromGlb(ASSET);
 /* three.js stand-ins (exact quaternion maths; slerp is a normalised nlerp, close enough for w in {0,1} and monotone in between) */
 function Euler() { this.x = 0; this.y = 0; this.z = 0; this.order = 'XYZ'; }
