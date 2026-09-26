@@ -86,7 +86,13 @@ export function createFarWorld(THREE, opts) {
     var hT = 55 + rnd() * 55, towerR = 10 + rnd() * 6, yaw = rnd() * 3, y0 = 0, frac = [0.46, 0.33, 0.21];
     frac.forEach(function (f, k) { var th = hT * f, rB = towerR * (1 - k * 0.24), rT = rB * 0.9; pushGeo(mid, new THREE.CylinderGeometry(rT, rB, th - 2.4, 9, 1), place(cx, y0 + (th - 2.4) / 2, cz, yaw, 1, 1, 1), midPlat, true);   /* a tier */
       pushGeo(mid, new THREE.CylinderGeometry(rT * 0.97, rT * 0.97, 1.8, 9, 1), place(cx, y0 + th - 2.4 + 0.9, cz, yaw, 1, 1, 1), midGlass, true);   /* its glazing band (lit at night) */
-      pushGeo(mid, new THREE.CylinderGeometry(rT * 1.04, rT * 1.04, 0.6, 9, 1), place(cx, y0 + th - 0.3, cz, yaw, 1, 1, 1), midLit, true); y0 += th; });   /* the cap ring / setback edge */
+      pushGeo(mid, new THREE.CylinderGeometry(rT * 1.04, rT * 1.04, 0.6, 9, 1), place(cx, y0 + th - 0.3, cz, yaw, 1, 1, 1), midLit, true);   /* the cap ring / setback edge */
+      /* M11 (owner: structures that still read as plain white obelisks): FLOORS — a thin dark glazing ring every 4.2 m up each tier; FINS — a
+         slender vertical fin on each of the nine edges; so the tower reads as an occupied building from 150–300 m. Same merged mesh. */
+      for (var fy = y0 + 3.2; fy < y0 + th - 3.4; fy += 4.2) { var ft = (fy - y0) / (th - 2.4), rf = rB + (rT - rB) * ft; pushGeo(mid, new THREE.CylinderGeometry(rf * 1.008, rf * 1.008, 1.05, 9, 1), place(cx, fy, cz, yaw, 1, 1, 1), midGlass, true); }
+      for (var fe = 0; fe < 9; fe++) { var fa = yaw + fe / 9 * Math.PI * 2 + Math.PI / 2, rm = (rB + rT) / 2 * 1.02, fin = new THREE.BoxGeometry(0.55, th - 2.6, 0.9); pushGeo(mid, fin, place(cx + Math.sin(fa) * rm, y0 + (th - 2.4) / 2, cz + Math.cos(fa) * rm, fa, 1, 1, 1), midPlat, true); }
+      y0 += th; });
+    pushGeo(mid, new THREE.CylinderGeometry(0.35, 0.9, 14, 6, 1), place(cx, y0 + 7, cz, yaw, 1, 1, 1), midPlat, true); pushGeo(mid, new THREE.OctahedronGeometry(1.1, 0), place(cx, y0 + 14.6, cz, yaw, 1, 1.6, 1), midLit, true);   /* M11: a crown mast with a beacon — the skyline reads a built tower, not a cone */
     pushGeo(mid, new THREE.OctahedronGeometry(7, 0), place(cx, hT + 4, cz, yaw, 1, 1.8, 1), midCrystal, true);   /* its crystal crown */
     if (i % 2 === 0) { var b2 = sectors[(i + 1) % sectors.length]; var d2 = 230 + rnd() * 100; var ex = Math.sin(b2) * d2, ez = Math.cos(b2) * d2; var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(cx, 22, cz), new THREE.Vector3((cx + ex) * 0.5, 50, (cz + ez) * 0.5), new THREE.Vector3(ex, 22, ez));
       pushGeo(mid, sweep(curve, 36, 7, 0.9, 0.45), new THREE.Matrix4(), midPlat, true);   /* the deck slab */
