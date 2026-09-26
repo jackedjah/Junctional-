@@ -51,6 +51,7 @@ var FRAG = [
    no ring), ringW (ring half-width as a fraction), tint (hex, the bloom colour), spectral (0..1 ring / fringe strength), intensity (day
    brightness, ~0.2–1), pull (m toward the camera), phase }]. Returns { mesh, uniforms, setNight(n), tick(t), count }. */
 /* extra per item: arc (1 = upper arc only), breakup (0..1, the ring dissolves into soft arcs; default 0.75), nightK (night brightness factor; default 1) */
+/* opts: isNight, tier, name, renderOrder, day / night (global levels), cull (true for a fixed field: frustum-cull it as one sphere) */
 export function createAuraField(THREE, items, opts) {
   opts = opts || {}; var n = items.length; if (!n) return null;
   var base = new THREE.PlaneGeometry(2, 2); var g = new THREE.InstancedBufferGeometry(); g.index = base.index; g.setAttribute('position', base.attributes.position); g.instanceCount = n;
@@ -63,7 +64,10 @@ export function createAuraField(THREE, items, opts) {
   var day = opts.day === undefined ? 0.55 : opts.day, nightK = opts.night === undefined ? 1.0 : opts.night;
   var uniforms = { uTime: { value: 0 }, uGlobal: { value: opts.isNight ? nightK : day }, uFringe: { value: opts.tier === 'LOW' ? 0 : 1 }, uNight: { value: opts.isNight ? 1 : 0 } };
   var mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uniforms, transparent: true, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending, toneMapped: false });
-  var mesh = new THREE.Mesh(g, mat); mesh.frustumCulled = false; mesh.renderOrder = opts.renderOrder === undefined ? 12 : opts.renderOrder; mesh.name = opts.name || 'SPECTRAL_AURA'; mesh.userData.noMerge = true;
+  var mesh = new THREE.Mesh(g, mat); mesh.frustumCulled = false;
+  if (opts.cull) { var cx = 0, cy = 0, cz = 0, R = 0; items.forEach(function (it) { cx += it.x / n; cy += it.y / n; cz += it.z / n; });   /* a fixed local field (no followers) can be frustum-culled: one sphere round every quad at its full reach */
+    items.forEach(function (it) { R = Math.max(R, Math.hypot(it.x - cx, it.y - cy, it.z - cz) + (it.size || 10) * Math.max(1, it.aspect || 1) + (it.pull || 0)); });
+    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(cx, cy, cz), R); mesh.frustumCulled = true; } mesh.renderOrder = opts.renderOrder === undefined ? 12 : opts.renderOrder; mesh.name = opts.name || 'SPECTRAL_AURA'; mesh.userData.noMerge = true;
   base.dispose();
   return { mesh: mesh, uniforms: uniforms, count: n, positions: g.attributes.aP,
     setNight: function (nn) { uniforms.uGlobal.value = nn ? nightK : day; uniforms.uNight.value = nn ? 1 : 0; },
