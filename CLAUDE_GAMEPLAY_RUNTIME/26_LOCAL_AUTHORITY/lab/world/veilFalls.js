@@ -60,7 +60,7 @@ export function createVeilFalls(ctx) {
         '  float n1 = vfN(vec2(x * 20.0, y * 5.5 - t * 1.7)), n2 = vfN(vec2(x * 57.0 + 3.1, y * 11.0 - t * 2.6)), n3 = vfN(vec2(x * 7.0 - 1.3, y * 2.2 - t * 0.9));',
         '  float streak = smoothstep(0.32, 0.92, n1 * 0.55 + n2 * 0.3 + n3 * 0.15);',
         '  float rag = vfN(vec2(x * 9.0, y * 16.0 - t * 1.3)); float side = min(x, 1.0 - x); float edge = smoothstep(0.0, 0.2 + 0.12 * rag, side);',
-        '  float aer = smoothstep(0.1, 0.0, y) + smoothstep(0.72, 1.0, y) * 0.9;',
+        '  float aer = (1.0 - smoothstep(0.0, 0.1, y)) + smoothstep(0.72, 1.0, y) * 0.9;',
         '  float strand = smoothstep(0.22, 0.72, vfN(vec2(x * 6.5 + 11.0, y * 0.8 - t * 0.04)) * 0.75 + vfN(vec2(x * 15.0 - 4.0, y * 1.6)) * 0.25);',   /* a horsetail veil: uneven strands, not one flat sheet */
         '  vec3 body = mix(vec3(0.74, 0.84, 0.96), vec3(0.985, 0.99, 1.0), clamp(streak * 0.8 + aer * 0.6 + strand * 0.2, 0.0, 1.0));',
         '  vec3 sp = vfSpec(y * 1.5 + x * 0.7 - t * 0.02); body += sp * (0.06 + 0.1 * aer + 0.08 * (1.0 - edge));',   /* light interference in the veil */
@@ -81,7 +81,7 @@ export function createVeilFalls(ctx) {
       vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vP;\nvoid main() { vP = position.xz; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
       fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; varying vec2 vP;', NOISE,
         'void main() { float r = length(vP); float n = vfN(vP * 9.0 + vec2(uTime * 0.4, -uTime * 0.7)) * 0.6 + vfN(vP * 23.0 - vec2(uTime * 0.9, uTime * 0.3)) * 0.4;',
-        '  float fo = smoothstep(1.0, 0.25, r) * smoothstep(0.35, 0.75, n + (1.0 - r) * 0.35);', 'vec3 c = vec3(0.95, 0.97, 1.0) * mix(1.0, 0.45, uNight);',
+        '  float fo = (1.0 - smoothstep(0.25, 1.0, r)) * smoothstep(0.35, 0.75, n + (1.0 - r) * 0.35);', 'vec3 c = vec3(0.95, 0.97, 1.0) * mix(1.0, 0.45, uNight);',
         '  gl_FragColor = vec4(c, fo * 0.85);', '#include <fog_fragment>', '}'].join('\n') }));
     var foam = new THREE.Mesh(foamG, foamMat); foam.scale.set(BASEW * 0.95, 1, BASEW * 0.6); foam.rotation.y = Math.atan2(ox, oz); foam.position.set(baseX, SEA + 0.03, baseZ); foam.name = 'VEIL_FALLS_FOAM'; foam.renderOrder = 5; group.add(foam);
     info.foam_y_above_sea = 0.03;

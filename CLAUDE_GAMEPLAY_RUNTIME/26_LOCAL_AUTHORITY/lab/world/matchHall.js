@@ -18,7 +18,8 @@ export function createMatchHall(ctx) {
   var THREE = ctx.THREE; var M = ctx.M || {}; var log = ctx.log || function () { }; var reg = ctx.registry || {};
   var LINE_DAY = 1.6, LINE_NIGHT = 2.9, GATE_DAY = 0.45, GATE_NIGHT = 1.05;
   var night = !!ctx.night; var groups = []; var stats = { building: null, court: null, interior: null };
-  var lineMat = null, gateMat = null, plateMat = null, plateTex = null;   /* exterior + court materials (this module's own clones; never mutate ctx.M) */
+  var lineMat = null, gateMat = null, plateMat = null, plateTex = null;
+  var facadeMat = null, facadeU = null, tickerMat = null, tickerTex = null, bladeMat = null, bladeTex = null, clock = 0;   /* M12 neo-Tokyo facade (owner pivot): animated lines, ticker, signage blade */   /* exterior + court materials (this module's own clones; never mutate ctx.M) */
   var interiorMats = null;                                                /* the current interior's clones (host-disposed on room exit) */
   function mat(k, fallback) { return M[k] || new THREE.MeshStandardMaterial(fallback); }
 
@@ -32,7 +33,8 @@ export function createMatchHall(ctx) {
     if (!g) { log('matchHall: merge failed for ' + name + ' (' + list.length + ' parts)'); return null; }
     g.computeBoundingSphere(); var m = new THREE.Mesh(g, material); m.name = name; m.castShadow = false; m.receiveShadow = !!receive; m.userData.noMerge = true; m.userData.tris = Math.round(g.attributes.position.count / 3); return m;
   }
-  function box(w, h, d, x, y, z) { var g = new THREE.BoxGeometry(w, h, d); g.translate(x, y + h / 2, z); return g; }                       /* y = bottom */
+  function box(w, h, d, x, y, z) { var g = new THREE.BoxGeometry(w, h, d); g.translate(x, y + h / 2, z); return g; }
+  function tag(g, k) { var n = g.attributes.position.count, a = new Float32Array(n); a.fill(k); g.setAttribute('aLine', new THREE.BufferAttribute(a, 1)); return g; }   /* M12: line kind for the facade animation — 0 vertical strip, 1 horizontal band, 2 portal / sign edge */                       /* y = bottom */
   function cyl(rt, rb, h, x, y, z, seg) { var g = new THREE.CylinderGeometry(rt, rb, h, seg || 16); g.translate(x, y + h / 2, z); return g; }
   function disc(r, y, cx, cz, seg) { var g = new THREE.CircleGeometry(r, seg || 64); g.rotateX(-Math.PI / 2); g.translate(cx, y, cz); return g; }
   function flatRing(r1, r2, y, cx, cz, seg) { var g = new THREE.RingGeometry(r1, r2, seg || 96, 1); g.rotateX(-Math.PI / 2); g.translate(cx, y, cz); return g; }
@@ -72,6 +74,62 @@ export function createMatchHall(ctx) {
     return { theta: 0, hw: w / 2, hd: d / 2, d0: door.z - cz };
   }
 
+  /* ---------- M12 NEO-TOKYO FACADE (owner pivot 2026-09-26: the black building was stale; a premium, animated city-tech life) ----------
+     Restrained and intentional, not cyberpunk clutter: the existing light strips carry slow rising PACKETS (most in one of the five class
+     colours — the hall is where every class competes), a SCAN sweeps once round the building, the crown band CHASES, and the portal lines
+     run a quick gold-white chase; a scrolling TICKER band wraps all four facades under the crown; a vertical SIGNAGE BLADE stands off the
+     door-side corner. Day is quiet (base lines dim, packets faint); night is alive. All new pieces are above 3.4 m (ticker ≈ bodyTop − 2 m,
+     blade 7–17 m); the strips keep their geometry. Cost: the lines stay one draw (own material clone, the court is untouched), +1 ticker,
+     +2 blade (edge + sign faces). */
+  var tickerGeo = null, bladeGeo = null, graphiteM2 = null;
+  var CLASS_HEX = ['#e6c36a', '#3f78e8', '#d4344a', '#8f6ad8', '#f08ab8'], CLASS_NAMES = ['ATHLETE', 'TITAN', 'LEAN', 'VISIONARY', 'BAGE'];
+  function tickerTexture() { var c = document.createElement('canvas'); c.width = 2048; c.height = 96; var g = c.getContext('2d'); g.fillStyle = '#05070b'; g.fillRect(0, 0, 2048, 96);
+    g.font = '600 50px "Segoe UI", Arial, sans-serif'; g.textBaseline = 'middle'; try { g.letterSpacing = '6px'; } catch (e) { } var x = 30;
+    function word(t, col) { g.fillStyle = col; g.fillText(t, x, 50); x += g.measureText(t).width + 34; } function dot(col) { g.fillStyle = col; g.fillRect(x, 42, 16, 16); x += 50; }
+    word('MAH MATCH', '#f4f6ff'); dot('#f4f6ff'); word('OFFICIAL', '#aab3c4'); for (var i = 0; i < 5; i++) { dot(CLASS_HEX[i]); word(CLASS_NAMES[i], CLASS_HEX[i]); } dot('#f4f6ff'); word('LIVE', '#f4f6ff');
+    g.fillStyle = 'rgba(255,255,255,0.08)'; for (var y = 0; y < 96; y += 4) g.fillRect(0, y, 2048, 1);   /* a faint LED raster */
+    var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.anisotropy = 4; return t; }
+  function bladeTexture() { var c = document.createElement('canvas'); c.width = 192; c.height = 1024; var g = c.getContext('2d'); g.fillStyle = '#06080c'; g.fillRect(0, 0, 192, 1024);
+    g.font = '700 104px "Segoe UI", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; var letters = 'MAHMATCH'.split(''); letters.forEach(function (L, i) { g.fillStyle = i < 3 ? '#f4f6ff' : '#dfe6ee'; g.fillText(L, 96, 70 + i * 112 + (i >= 3 ? 30 : 0)); });
+    for (var k = 0; k < 5; k++) { g.fillStyle = CLASS_HEX[k]; g.fillRect(20 + k * 32, 348, 24, 8); }   /* the five class bars between MAH and MATCH */
+    g.fillStyle = '#f4f6ff'; g.fillRect(8, 0, 4, 1024); g.fillRect(180, 0, 4, 1024);
+    var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
+  function neoTokyo(hw, hd, d0, dw, dh, bodyTop, cyan, graphite) { if (typeof document === 'undefined') return;
+    /* ticker: four planes round the body, one continuous u along the perimeter so the text flows round the corners */
+    var TH = 0.9, TY = bodyTop - 2.3, OUT = 0.08, REP = 36, u0 = 0, pos = [], uv = [], nor = [], idx = [];
+    var sides = [[-hw - OUT, -hd, -hw - OUT, hd, -1, 0], [-hw, hd + OUT, hw, hd + OUT, 0, 1], [hw + OUT, hd, hw + OUT, -hd, 1, 0], [hw, -hd - OUT, -hw, -hd - OUT, 0, -1]];
+    sides.forEach(function (S) { var L = Math.hypot(S[2] - S[0], S[3] - S[1]), b = pos.length / 3, u1 = u0 + L / REP;
+      pos.push(S[0], TY, S[1], S[2], TY, S[3], S[2], TY + TH, S[3], S[0], TY + TH, S[1]); uv.push(u0, 0, u1, 0, u1, 1, u0, 1); for (var k = 0; k < 4; k++) nor.push(S[4], 0, S[5]); idx.push(b, b + 1, b + 2, b, b + 2, b + 3); u0 = u1; });
+    tickerGeo = new THREE.BufferGeometry(); tickerGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); tickerGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); tickerGeo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); tickerGeo.setIndex(idx); tickerGeo.computeBoundingSphere();
+    tickerTex = tickerTexture(); tickerMat = new THREE.MeshBasicMaterial({ map: tickerTex, side: THREE.DoubleSide }); tickerMat.name = 'matchHall_ticker';
+    sides.forEach(function (S) { var L = Math.hypot(S[2] - S[0], S[3] - S[1]), mx = (S[0] + S[2]) / 2, mz = (S[1] + S[3]) / 2, ax = S[4] !== 0; [TY - 0.08, TY + TH + 0.02].forEach(function (yy) { cyan.push(tag(box(ax ? 0.05 : L, 0.06, ax ? L : 0.05, mx + S[4] * 0.03, yy, mz + S[5] * 0.03), 1)); }); });   /* the ticker's frame lines (they chase) */
+    /* the signage blade off the door-side corner away from the door, perpendicular to the facade, 7–17 m up */
+    var cz = d0 > 0 ? -hd + 1.4 : hd - 1.4, BW = 2.2, BH = 10, BY = 7;
+    bladeGeo = new THREE.BoxGeometry(BW, BH, 0.36); bladeGeo.translate(-hw - 0.35 - BW / 2, BY + BH / 2, cz);
+    bladeGeo.clearGroups(); bladeGeo.addGroup(0, 24, 0); bladeGeo.addGroup(24, 12, 1);   /* sides / top / bottom: graphite; the two broad faces: the sign */
+    bladeTex = bladeTexture(); bladeMat = new THREE.MeshBasicMaterial({ map: bladeTex }); bladeMat.name = 'matchHall_blade'; graphiteM2 = mat('graphite', { color: 0x1d2229, roughness: 0.55, metalness: 0.75 });
+    [BY + 1.2, BY + BH - 1.2].forEach(function (yy) { graphite.push(box(0.4, 0.3, 0.3, -hw - 0.2, yy, cz)); });   /* mounting brackets */
+    cyan.push(tag(box(0.08, BH, 0.42, -hw - 0.35 - BW - 0.04, BY, cz), 2)); cyan.push(tag(box(BW + 0.1, 0.08, 0.42, -hw - 0.35 - BW / 2, BY + BH, cz), 2)); cyan.push(tag(box(BW + 0.1, 0.08, 0.42, -hw - 0.35 - BW / 2, BY - 0.08, cz), 2));   /* the blade's lit edges */
+    /* the animated facade line material (own clone; the court keeps lineMat) */
+    facadeMat = lineMat.clone(); facadeMat.name = 'matchHall_facade_lines'; facadeU = { uTime: { value: 0 }, uNight: { value: night ? 1 : 0 }, uH: { value: bodyTop } };
+    facadeMat.onBeforeCompile = function (sh) { sh.uniforms.uTime = facadeU.uTime; sh.uniforms.uNight = facadeU.uNight; sh.uniforms.uH = facadeU.uH;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float aLine; varying float vLine; varying vec3 vLP;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvLine = aLine; vLP = position;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', ['#include <common>', 'uniform float uTime; uniform float uNight; uniform float uH; varying float vLine; varying vec3 vLP;',
+        'float nkH(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }',
+        'vec3 nkClass(float h) { if (h < 0.2) return vec3(0.791, 0.546, 0.141); if (h < 0.4) return vec3(0.05, 0.188, 0.807); if (h < 0.6) return vec3(0.658, 0.034, 0.069); if (h < 0.8) return vec3(0.275, 0.144, 0.686); return vec3(0.871, 0.254, 0.479); }'].join('\n'))
+        .replace('#include <emissivemap_fragment>', ['#include <emissivemap_fragment>',
+        '{ float k = vLine, t = uTime; vec3 Eb = totalEmissiveRadiance / max(length(totalEmissiveRadiance), 1e-3); vec3 add = vec3(0.0);',
+        '  float ang = atan(vLP.z, vLP.x) / 6.2831853 + 0.5; float sweep = smoothstep(0.9, 1.0, fract(ang - t * 0.028));',
+        '  if (k < 0.5) { float id = nkH(floor(vLP.xz * 0.4 + 0.5)); float yN = clamp(vLP.y / uH, 0.0, 1.0); float ph = fract(t * (0.07 + id * 0.05) + id * 7.0);',
+        '    float on = step(0.3, fract(id * 13.7)); vec3 cc = nkClass(fract(id * 5.3)); for (int j = 0; j < 2; j++) { float d = fract(ph + float(j) * 0.47) - yN; float tail = step(0.0, d) * exp(-d * 14.0) * (1.0 - smoothstep(0.2, 0.26, d)); float head = 1.0 - smoothstep(0.0, 0.012, abs(d));',
+        '    add += (cc * (tail * 1.6 + head * 1.2) + vec3(head * 0.3)) * on; } }',
+        '  else if (k < 1.5) { float f = fract(ang * 28.0 - t * 0.9); add += Eb * smoothstep(0.7, 1.0, f) * 1.2; }',
+        '  else { float f = fract((vLP.y + abs(vLP.z) + abs(vLP.x) * 0.3) * 0.55 - t * 1.6); add += vec3(0.9, 0.78, 0.5) * smoothstep(0.72, 1.0, f) * 1.1; }',
+        '  totalEmissiveRadiance = Eb * mix(0.1, 0.13, uNight) * (k > 1.5 ? 2.6 : 1.0) + add * mix(0.75, 1.0, uNight) + Eb * sweep * mix(0.35, 0.6, uNight); }'].join('\n')); };   /* absolute levels: a dim ice base line; class-coloured packets with a white head and a fading tail climb the strips, kept below the tone-map shoulder so the class colour survives (a hot packet read as flat white) */
+    facadeMat.customProgramCacheKey = function () { return 'matchHall_neoTokyo'; }; facadeMat.color.setHex(0x1c2028); facadeMat.metalness = 0.6; facadeMat.roughness = 0.4;   /* dark diffuse: the lines are light, not white paint lit by the sky */
+    stats.neoTokyo = { ticker_perimeter_m: +(u0 * REP).toFixed(1), blade: [BW, BH, BY] };
+  }
+
   /* ---------- EXTERIOR: the official match building (black body, graphite crown + portal, platinum plinth, cyan lines) ---------- */
   function buildBuilding() {
     var A = artifact('MATCH_HALL'); if (!A || !A.position || !A.footprint) { log('matchHall: MATCH_HALL artifact (position / footprint) missing → exterior skipped'); return; }
@@ -98,23 +156,25 @@ export function createMatchHall(ctx) {
     graphite.push(box(0.35, 0.6, 2 * dw + 1.0, -hw - 0.175, dh + 0.3, d0));
     graphite.push(box(RECESS + 0.5, 0.03, 2 * dw, -hw + RECESS / 2 - 0.25, 0, d0));
     graphite.push(box(0.16, 2.0, 9.0, -hw - 0.08, dh + 1.6, d0));
-    cyan.push(box(0.08, 0.12, 2 * dw + 0.5, -hw - 0.39, dh + 0.54, d0));
-    cyan.push(box(0.05, 0.06, 9.0, -hw - 0.19, dh + 1.42, d0));
+    cyan.push(tag(box(0.08, 0.12, 2 * dw + 0.5, -hw - 0.39, dh + 0.54, d0), 2));
+    cyan.push(tag(box(0.05, 0.06, 9.0, -hw - 0.19, dh + 1.42, d0), 2));
     /* recess: vertical lines on both jamb faces + a floor line at the gate threshold (reads as an open, lit gate) */
-    [-1, 1].forEach(function (s) { cyan.push(box(0.14, dh - 0.7, 0.06, -hw + RECESS / 2, 0.35, d0 + s * (dw - 0.03))); });
-    cyan.push(box(0.1, 0.03, 2 * dw - 0.4, -hw + RECESS - 0.15, 0.03, d0));
+    [-1, 1].forEach(function (s) { cyan.push(tag(box(0.14, dh - 0.7, 0.06, -hw + RECESS / 2, 0.35, d0 + s * (dw - 0.03)), 2)); });
+    cyan.push(tag(box(0.1, 0.03, 2 * dw - 0.4, -hw + RECESS - 0.15, 0.03, d0), 2));
     /* approach lines on the ground either side of the door path (the MATCH_DOOR interactable sits ~4 m out on this axis) */
-    [-1, 1].forEach(function (s) { cyan.push(box(6.0, 0.03, 0.12, -hw - 3.2, 0.005, d0 + s * (dw + 0.4))); });
+    [-1, 1].forEach(function (s) { cyan.push(tag(box(6.0, 0.03, 0.12, -hw - 3.2, 0.005, d0 + s * (dw + 0.4)), 2)); });
     /* vertical light lines: evenly spaced on all four facades, ending under one horizontal band below the crown; none in the door zone */
     var S = 2.5, y0 = PLINTH + 0.6, y1 = bodyTop - 1.1, L = y1 - y0, strips = 0;
-    function alongZ(x, proudSign, skipDoor) { for (var z = -hd + S / 2; z < hd - S / 4; z += S) { if (skipDoor && Math.abs(z - d0) < dw + 1.2) continue; cyan.push(box(0.06, L, 0.14, x + proudSign * 0.03, y0, z)); strips++; } }
-    function alongX(z, proudSign) { for (var x = -hw + S / 2; x < hw - S / 4; x += S) { cyan.push(box(0.14, L, 0.06, x, y0, z + proudSign * 0.03)); strips++; } }
+    function alongZ(x, proudSign, skipDoor) { for (var z = -hd + S / 2; z < hd - S / 4; z += S) { if (skipDoor && Math.abs(z - d0) < dw + 1.2) continue; cyan.push(tag(box(0.06, L, 0.14, x + proudSign * 0.03, y0, z), 0)); strips++; } }
+    function alongX(z, proudSign) { for (var x = -hw + S / 2; x < hw - S / 4; x += S) { cyan.push(tag(box(0.14, L, 0.06, x, y0, z + proudSign * 0.03), 0)); strips++; } }
     alongZ(-hw, -1, true); alongZ(hw, 1, false); alongX(-hd, -1); alongX(hd, 1);
-    [-1, 1].forEach(function (s) { cyan.push(box(0.05, 0.07, 2 * hd + 0.1, s * (hw + 0.025), bodyTop - 0.78, 0)); cyan.push(box(2 * hw + 0.1, 0.07, 0.05, 0, bodyTop - 0.78, s * (hd + 0.025))); });
+    [-1, 1].forEach(function (s) { cyan.push(tag(box(0.05, 0.07, 2 * hd + 0.1, s * (hw + 0.025), bodyTop - 0.78, 0), 1)); cyan.push(tag(box(2 * hw + 0.1, 0.07, 0.05, 0, bodyTop - 0.78, s * (hd + 0.025)), 1)); });
+    neoTokyo(hw, hd, d0, dw, dh, bodyTop, cyan, graphite);   /* M12: the ticker band, the signage blade and its lit edges */
     /* assemble */
     var g = new THREE.Group(); g.name = 'MATCH_HALL'; g.position.set(A.position[0], 0, A.position[2]); g.rotation.y = F.theta; g.userData.noMerge = true;
-    var meshes = [merged(black, mat('black', { color: 0x0b0d11, roughness: 0.42, metalness: 0.8 }), 'MATCH_HALL_BODY', true), merged(graphite, mat('graphite', { color: 0x1d2229, roughness: 0.55, metalness: 0.75 }), 'MATCH_HALL_CROWN', true), merged(platinum, mat('platinum', { color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), 'MATCH_HALL_PLINTH', true), merged(cyan, lineMat, 'MATCH_HALL_LINES', false)];
-    var tris = 0; meshes.forEach(function (m) { if (m) { g.add(m); tris += m.userData.tris; } });
+    var meshes = [merged(black, mat('black', { color: 0x0b0d11, roughness: 0.42, metalness: 0.8 }), 'MATCH_HALL_BODY', true), merged(graphite, mat('graphite', { color: 0x1d2229, roughness: 0.55, metalness: 0.75 }), 'MATCH_HALL_CROWN', true), merged(platinum, mat('platinum', { color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), 'MATCH_HALL_PLINTH', true), merged(cyan, facadeMat || lineMat, 'MATCH_HALL_LINES', false)];
+    if (tickerGeo) { var tk = new THREE.Mesh(tickerGeo, tickerMat); tk.name = 'MATCH_HALL_TICKER'; tk.renderOrder = 3; meshes.push(tk); } if (bladeGeo) { var bl = new THREE.Mesh(bladeGeo, [graphiteM2, bladeMat]); bl.name = 'MATCH_HALL_SIGN_BLADE'; meshes.push(bl); }
+    var tris = 0; meshes.forEach(function (m) { if (m) { g.add(m); tris += m.userData.tris || 0; } });
     /* the gate: a dark glass plane at the back of the recess (reads as open; the interior is a room transition) */
     var gate = new THREE.Mesh(new THREE.PlaneGeometry(2 * dw - 0.1, dh - 0.1), gateMat); gate.rotation.y = -Math.PI / 2; gate.position.set(-hw + RECESS - 0.08, dh / 2, d0); gate.name = 'MATCH_HALL_GATE'; gate.renderOrder = 2; g.add(gate); tris += 2;
     /* the name plate 'MAH MATCH' (registry map label) as a canvas plane on the door facade above the portal */
@@ -183,18 +243,21 @@ export function createMatchHall(ctx) {
     night = !!n; if (lineMat) lineMat.emissiveIntensity = night ? LINE_NIGHT : LINE_DAY; if (gateMat) gateMat.emissiveIntensity = night ? GATE_NIGHT : GATE_DAY;
     if (interiorMats) { interiorMats.line.emissiveIntensity = night ? LINE_NIGHT : LINE_DAY; interiorMats.gate.emissiveIntensity = night ? GATE_NIGHT : GATE_DAY; }
   }
+  function neoNight(n) { if (facadeU) facadeU.uNight.value = n ? 1 : 0; if (facadeMat) facadeMat.emissiveIntensity = n ? LINE_NIGHT : LINE_DAY; if (tickerMat) tickerMat.color.setScalar(n ? 1.15 : 0.62); if (bladeMat) bladeMat.color.setScalar(n ? 1.1 : 0.6); }
   var api = {
+    tick: function (dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (facadeU) facadeU.uTime.value = clock; if (tickerTex) tickerTex.offset.x = (clock * 0.018) % 1; },
     build: function () {
       var base = mat('cyanLine', { color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: 1.6, roughness: 0.3, metalness: 0.2 }); lineMat = base.clone(); lineMat.name = 'matchHall_line';
       gateMat = new THREE.MeshStandardMaterial({ color: 0x05080c, roughness: 0.06, metalness: 0.7, transparent: true, opacity: 0.74, emissive: 0x10131c, emissiveIntensity: GATE_DAY, depthWrite: false }); gateMat.name = 'matchHall_gate';
       try { buildBuilding(); } catch (e) { log('matchHall: exterior failed: ' + (e && e.message || e)); }
       try { buildCourt(); } catch (e) { log('matchHall: court failed: ' + (e && e.message || e)); }
-      applyNight(ctx.night);
+      applyNight(ctx.night); neoNight(ctx.night);
     },
-    setNight: applyNight,
+    setNight: function (n) { applyNight(n); neoNight(n); },
     buildInterior: buildInterior,
     dispose: function () {
       groups.forEach(function (g) { if (g.parent) g.parent.remove(g); g.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); }); groups = [];
+      [facadeMat, tickerMat, tickerTex, bladeMat, bladeTex].forEach(function (o) { if (o) o.dispose(); }); facadeMat = tickerMat = tickerTex = bladeMat = bladeTex = null; if (tickerGeo) tickerGeo.dispose(); if (bladeGeo) bladeGeo.dispose(); tickerGeo = bladeGeo = null;
       if (lineMat) lineMat.dispose(); if (gateMat) gateMat.dispose(); if (plateMat) plateMat.dispose(); if (plateTex) plateTex.dispose(); lineMat = gateMat = plateMat = plateTex = null; stats.building = stats.court = null; if (_instance === api) _instance = null;
     },
     debug: function () { return { building: stats.building, court: stats.court, interior: stats.interior, night: night, draw_calls_field: (stats.building ? stats.building.draw_calls : 0) + (stats.court ? stats.court.draw_calls : 0) }; }
