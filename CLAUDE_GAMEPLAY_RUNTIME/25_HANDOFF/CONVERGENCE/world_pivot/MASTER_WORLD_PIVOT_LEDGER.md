@@ -499,7 +499,7 @@ Owner directive 2026-09-26 ("M10 WORLD COHESION + RUNTIME BRIDGE CLOSURE"):
    Then collider-backed HALO seating and pavilions, and creature presentation (fish, horse motion, Phoenix high flight, Dogkie).
 2. **Owner review** of M10 (sheets above). Most subjective: the far-massif crowns, the garden light columns, and the cloud cells.
 3. **Next refinement candidates:**
-   - the plaza floor value by day and the plaza ramp / furniture materials;
+   - the plaza floor value by day and the plaza ramp / furniture materials. **Checked at the 09:12 check-in and not changed.** Checkpoint 7 measured the floor at mid-light grey (~150 / 160 / 180, not clipped); its high-key read is the owner's daylight palette, so changing it is a design decision. The white plaza pieces seen in V13 / V32 are anonymous field-merge chunks from several earlier accepted passes, and V32's camera sits 2 m from one. **Owner direction needed** before re-materialising them;
    - the MID ridge seen from the plaza (more sculpt amplitude beyond 360 m);
    - the far-massif spires;
    - HALO deck inlays at eye level.
