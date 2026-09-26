@@ -84,6 +84,7 @@ export var SURFACE = {
   FACADE_PLAIN: { kind: 'PANELS', cell: [1.8, 1.2], seam: 0.024, seamDark: 0.66, bevel: 0.3, toneVar: 0.08, roughVar: 0.3, macro: 0.05, grain: 0.035, lod: [30, 140], metalSeam: 0.5 },   /* M8E: platinum skin between real windows (the storey band now comes from the slab edges) */
   COMPOSITE: { kind: 'PANELS', cell: [3.0, 1.2], seam: 0.018, seamDark: 0.7, bevel: 0.22, toneVar: 0.06, roughVar: 0.18, macro: 0.04, grain: 0.025, stagger: 0.5, lod: [30, 140], metalSeam: 0.3 },   /* M8E: neutral architectural composite rainscreen, staggered long panels */
   CLADDING: { kind: 'PANELS', cell: [2.4, 1.2], seam: 0.02, seamDark: 0.6, bevel: 0.25, toneVar: 0.1, roughVar: 0.22, macro: 0.06, grain: 0.08, stagger: 0.5, lod: [30, 140], metalSeam: 0.3 },   /* M8E: honed stone cladding for heavy bases */
+  MONOLITH: { kind: 'PANELS', cell: [2.5, 3.6], seam: 0.016, seamDark: 0.35, bevel: 0.14, toneVar: 0.3, roughVar: 0.95, macro: 0.05, grain: 0.02, lod: [30, 160], metalSeam: 0.2 },   /* M9: large-format satin black cladding (MAH MATCH): 2.5 m panels on its light-line rhythm, 3.6 m courses */
   STONE: { kind: 'PANELS', cell: [0.9, 0.45], seam: 0.012, seamDark: 0.8, bevel: 0.12, toneVar: 0.08, roughVar: 0.2, macro: 0.06, grain: 0.1, stagger: 0.5, lod: [16, 70], metalSeam: 0.3 }
 };
 

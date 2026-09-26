@@ -16,7 +16,7 @@ export function createFixtures(ctx) {
   var HEAD_EMISSIVE_DAY = 0.35, HEAD_EMISSIVE_NIGHT = 1.6;      /* luminaire emissiveIntensity (owner spec) */
   var LIGHT_NIGHT = 42, LIGHT_DAY_NEAR = 14;                     /* candela (three r155+ physical units, decay 2): ~1.1 irradiance right under the head at night; a subtle cool fill by day */
   var NEAR_POLE_M = 6, HOP_INTERVAL_S = 0.25, FADE_RATE = 8;     /* by day a light only wakes while the player is within 6 m of its pole; intensities ease toward their targets */
-  var POOL_SIZE_M = 7, POOL_Y = 0.045, ARM_LEN_M = 1.4;          /* pool quad ~7 m, just above the plaza floor (0.012) with a polygon offset against z-fighting */
+  var POOL_SIZE_M = 9, POOL_Y = 0.045, ARM_LEN_M = 1.4;          /* M9: pool quad ~9 m (7 m at alpha 0.45 vanished on the night paving), just above the plaza floor (0.012) with a polygon offset against z-fighting */
   var group = null, poles = null, arms = null, heads = null, pools = null, headMat = null, poolMat = null, poolTex = null, geos = [];
   var lights = [], lightFix = [], lightTarget = [];
   var n = 0, hx = null, hy = null, hz = null, px = null, pz = null;   /* head positions (light anchors) and pole feet (the near-pole test) */
