@@ -28,7 +28,9 @@ export function createRipples(ctx, o) {
   var TMP = new THREE.Vector3(); var lastPlayer = { x: 0, z: 0, y: 0, t: -1, landed: -1, wade: 0 }; var creatureLast = {};
   var sea = null;   /* JOB B redirect 2026-09-19: the SEA as a second ripple body — { test(x, z), surface_y } registered by coast.js (fish breaches, flight landings and wading on the beach ring all ripple the sea too) */
   function inWater(x, z) { for (var i = 0; i < rivers.length; i++) { var r = rivers[i]; if (x >= r.x1 && x <= r.x2 && z >= r.z1 && z <= r.z2) return r; } if (sea && sea.test(x, z)) return sea; return null; }
-  function setSea(test, surface_y, mat) { sea = { test: test, surface_y: surface_y, sea: true, x1: -1e9, x2: 1e9, z1: -1e9, z2: 1e9 }; if (mat && enabled) holeMaterial(mat); }
+  function setSea(test, surface_y, mat) { sea = { test: test, surface_y: surface_y, sea: true, mat: mat || null, x1: -1e9, x2: 1e9, z1: -1e9, z2: 1e9 }; if (mat && enabled) holeMaterial(mat); }
+  /* M11: the window wears the look of the body it floats on — over the sea it was still the darker canal water, a hard-edged dark square of sea around the player */
+  function wearLook(src) { if (!src || !nearMat) return; nearMat.color.copy(src.color); nearMat.roughness = src.roughness; nearMat.metalness = src.metalness; nearMat.envMapIntensity = src.envMapIntensity; nearMat.opacity = src.opacity; if (src.normalScale && nearMat.normalScale) nearMat.normalScale.copy(src.normalScale); }
   var holeMaterial = function () { };
   function snap(v) { return Math.round(v / TEXEL) * TEXEL; }
 
@@ -108,7 +110,7 @@ export function createRipples(ctx, o) {
     var dd = Math.min(0.1, Math.max(0, dt || 0)); sources(dd);
     /* budget: simulate only when the player is within reach of the water (the field keeps its state when paused) */
     var pp = ctx.playerPos(); var nearWater = false; var bodyY = surfaceY; for (var i = 0; i < rivers.length; i++) { var r = rivers[i]; if (pp.x > r.x1 - SIZE && pp.x < r.x2 + SIZE && pp.z > r.z1 - SIZE && pp.z < r.z2 + SIZE) nearWater = true; }
-    if (!nearWater && sea && sea.test(pp.x, pp.z)) { nearWater = true; bodyY = sea.surface_y; } near.position.y = bodyY + 0.004;
+    var onSea = false; if (!nearWater && sea && sea.test(pp.x, pp.z)) { nearWater = true; onSea = true; bodyY = sea.surface_y; } near.position.y = bodyY + 0.004; if (nearWater) wearLook(onSea ? sea.mat : far);
     near.visible = nearWater; if (!nearWater) { acc = 0; stats.active = false; return; } stats.active = true;
     acc += dd; steps = 0; while (acc >= STEP && steps < MAX_STEPS) { acc -= STEP; step(); } if (acc > STEP * 4) acc = 0; stats.steps = stepsTotal;
   }
