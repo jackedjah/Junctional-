@@ -8880,6 +8880,10 @@
     "source_id": "RIDGE_NEAR",
     "receiver_id": "SEA",
     "station": 110,
+    "curtain": {
+     "from": 106,
+     "to": 114
+    },
     "source": {
      "x": -350.7,
      "y": 146.7,
@@ -8930,7 +8934,7 @@
       14
      ]
     ],
-    "note": "M12 owner pivot: the Veil Falls - the recessed west cove of RIDGE_NEAR at station 110 (buttresses 109 / 111 frame it), ~150 m down the face into the sea; drawn by lab/world/veilFalls.js (macro.js skips style VEIL); keep_line holds the ridge sculpt still under the water"
+    "note": "M12 owner pivot + reference pass: the Veil Falls - a broad multi-strand curtain over the NEAR ridge crest from station 106 to 114 (the notch at 110 carries the tallest strand, the buttress noses at 109 / 111 / 113 are the rock ribs between strands), ~110-150 m down into the sea; drawn by lab/world/veilFalls.js (macro.js skips style VEIL); keep_line + the curtain keep circles (veilCurtainKeep) hold the ridge sculpt still under the water"
    }
   ],
   "sky_beams": [

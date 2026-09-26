@@ -32,6 +32,8 @@ var FRAG = [
   '  vec3 v = vec3(0.706, 0.549, 1.0), i = vec3(0.498, 0.816, 1.0), w = vec3(0.957, 0.965, 1.0), g = vec3(1.0, 0.847, 0.541), p = vec3(1.0, 0.604, 0.824);',
   '  if (t < 0.2) return mix(v, i, t / 0.2); if (t < 0.4) return mix(i, w, (t - 0.2) / 0.2); if (t < 0.6) return mix(w, g, (t - 0.4) / 0.2);',
   '  if (t < 0.8) return mix(g, p, (t - 0.6) / 0.2); return mix(p, v, (t - 0.8) / 0.2); }',
+  'vec3 vivid(float t) { t = clamp(t, 0.0, 1.0); vec3 i = vec3(0.498, 0.816, 1.0), v = vec3(0.706, 0.549, 1.0), p = vec3(1.0, 0.604, 0.824), g = vec3(1.0, 0.847, 0.541);',   /* a vivid prismatic band, ice → violet → pink → gold: it turns through magenta, never green */
+  '  if (t < 0.33) return mix(i, v, t / 0.33); if (t < 0.66) return mix(v, p, (t - 0.33) / 0.33); return mix(p, g, (t - 0.66) / 0.34); }',
   'void main() { float r = length(vUv); if (r > 1.0) discard;',
   '  float ang = atan(vUv.y, vUv.x), ph = vK.z, t = uTime;',
   '  float bloom = pow(1.0 - r, 2.4) * (0.85 + 0.15 * sin(t * 0.7 + ph));',   /* soft core, a slow breath */
@@ -40,15 +42,16 @@ var FRAG = [
   '  float arc = vX.x > 0.5 ? smoothstep(-0.05, 0.45, vUv.y / max(r, 1e-3)) : 1.0;',   /* 1 = an upper arc only (a mist-bow), never a full UI circle */
   '  float brk = mix(1.0, smoothstep(0.25, 0.85, auN(ang * 2.6 + ph * 3.0 + t * 0.04) * 0.7 + auN(ang * 7.0 - t * 0.07) * 0.3), vX.y);',   /* the ring breaks into soft arcs */
   '  float shimmer = 0.78 + 0.22 * sin(ang * 5.0 + t * 0.45 + ph) * sin(ang * 3.0 - t * 0.31 + ph * 1.7);',
-  '  vec3 sp = mix(spectral(rr * 0.22 + 0.5 + 0.04 * sin(t * 0.2 + ph)), vec3(1.0), 0.3);',   /* spectral, but pearl-soft */
-  '  vec3 col = vC * bloom + sp * band * vK.y * shimmer * arc * brk;',
-  '  col += spectral(r * 2.6 - t * 0.035 + ph) * bloom * 0.22 * vK.y * uFringe;',   /* faint interference fringes inside the bloom */
+  '  float viv = clamp(vK.y - 1.0, 0.0, 1.0), spk = min(vK.y, 1.0);',   /* spectral > 1: the vivid band (the Veil glory); ≤ 1: pearl-soft, unchanged */
+  '  vec3 sp = mix(mix(spectral(rr * 0.22 + 0.5 + 0.04 * sin(t * 0.2 + ph)), vec3(1.0), 0.3), vivid(rr * 0.3 + 0.5), viv);',
+  '  vec3 col = vC * bloom + sp * band * spk * shimmer * arc * brk;',
+  '  col += spectral(r * 2.6 - t * 0.035 + ph) * bloom * 0.22 * spk * uFringe;',   /* faint interference fringes inside the bloom */
   '  float edge = 1.0 - smoothstep(0.86, 1.0, r);',
   '  gl_FragColor = vec4(col * vK.x * uGlobal * mix(1.0, vX.z, uNight) * edge, 1.0); }'
 ].join('\n');
 
 /* items: [{ x, y, z, size (m, quad half-extent), aspect (vertical stretch, 1 = round), ring (0..1 ring radius as a fraction of the quad; 0 =
-   no ring), ringW (ring half-width as a fraction), tint (hex, the bloom colour), spectral (0..1 ring / fringe strength), intensity (day
+   no ring), ringW (ring half-width as a fraction), tint (hex, the bloom colour), spectral (0..1 ring / fringe strength; 1..2 blends the ring toward the vivid prismatic band), intensity (day
    brightness, ~0.2–1), pull (m toward the camera), phase }]. Returns { mesh, uniforms, setNight(n), tick(t), count }. */
 /* extra per item: arc (1 = upper arc only), breakup (0..1, the ring dissolves into soft arcs; default 0.75), nightK (night brightness factor; default 1) */
 /* opts: isNight, tier, name, renderOrder, day / night (global levels), cull (true for a fixed field: frustum-cull it as one sphere) */

@@ -1,6 +1,6 @@
 import { ridgeStations, ridgeFaceSegment } from './ridgeLayout.js';
 import { applyGeology } from './surfaceDetail.js';
-import { ridgeWarpField, sculptRidge } from './ridgeSculpt.js'; import { veilWaterMaterial } from './veilFalls.js';
+import { ridgeWarpField, sculptRidge } from './ridgeSculpt.js'; import { veilWaterMaterial, veilCurtainKeep } from './veilFalls.js';
 
 /* JOB B world module — MACRO GEOGRAPHY (owner B8 §16–§18 "floor down, world up"). Data: registry.macro.
    MOUNTAINS: two ridge bands between the sanctuaries and the far massifs (NEAR 300–420 m, MID 470–560 m) — each ONE merged ribbon mesh
@@ -47,7 +47,7 @@ export function createMacro(ctx) {
        and saddles, rock shelves stepping the faces, fall-line gullies notching the crest. Inside 312 m every triangle is untouched, so the
        collision face and its proxies are exactly as authored. Waterfall lips on this ridge are held still. */
     var sculptOn = true; try { sculptOn = !/[?&]ridgeSculpt=0/.test(location.search); } catch (e) { }
-    var sc = null; if (sculptOn) { var keep = ((M && M.waterfalls) || []).filter(function (W) { return W.source_id === R.id; }).reduce(function (acc, W) { acc.push({ x: W.source.x, z: W.source.z, r: 28 }); (W.keep_line || []).forEach(function (K) { acc.push({ x: K[0], z: K[1], r: K[2] }); }); return acc; }, []);   /* M12: a keep_line holds the whole face under a long fall still */
+    var sc = null; if (sculptOn) { var keep = ((M && M.waterfalls) || []).filter(function (W) { return W.source_id === R.id; }).reduce(function (acc, W) { acc.push({ x: W.source.x, z: W.source.z, r: 28 }); (W.keep_line || []).forEach(function (K) { acc.push({ x: K[0], z: K[1], r: K[2] }); }); veilCurtainKeep(stations, W).forEach(function (K) { acc.push(K); }); return acc; }, []);   /* M12: a keep_line holds the whole face under a long fall still */
       sc = sculptRidge(pos, col, ridgeWarpField(R, stations, idx, keep), tier() === 'HIGH' ? 4 : tier() === 'LOW' ? 1 : 3); pos = sc.pos; col = sc.col; nrm = sc.nrm; }
     var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3)); own.push(g);
     var mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.86, metalness: 0.04, flatShading: true, envMapIntensity: 0.14 });   /* faceted rock that answers the Sun; M9: less sky ambient (the faces keep their dark mass) — an A/B showed smoothed normals wash the rock out pale */ own.push(mat);

@@ -6,7 +6,8 @@ import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath }
 import { HALO_LAYOUT } from '../26_LOCAL_AUTHORITY/play/haloLayout.js';
 import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
 import { createFacadeKit, addCivicBuilding } from '../26_LOCAL_AUTHORITY/lab/world/facadeKit.js';
-import { ridgeStations, ridgeFaceSegment, ridgeReachBounds } from '../26_LOCAL_AUTHORITY/lab/world/ridgeLayout.js';
+import { ridgeStations, ridgeFaceSegment, ridgeFacePoint, ridgeReachBounds } from '../26_LOCAL_AUTHORITY/lab/world/ridgeLayout.js';
+import { veilCurtainKeep } from '../26_LOCAL_AUTHORITY/lab/world/veilFalls.js';
 import { ridgeWarpField, sculptRidge, REACH_IN, REACH_FLOOR } from '../26_LOCAL_AUTHORITY/lab/world/ridgeSculpt.js';
 import { buildRoadNetwork } from '../26_LOCAL_AUTHORITY/lab/world/roadNetwork.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
@@ -163,5 +164,19 @@ if (HL16) { var er16 = [Math.sin(HL16.center_bearing), Math.cos(HL16.center_bear
     var lx16 = Math.cos(th16) * r16, lz16 = Math.sin(th16) * r16, px16 = cx16 + er16[0] * lx16 + et16[0] * lz16, pz16 = cz16 + er16[1] * lx16 + et16[1] * lz16; sc16.minCheb = Math.min(sc16.minCheb, Math.max(Math.abs(px16), Math.abs(pz16))); } }
 var WL16 = src('lab/world/worldLayout.js'), noCollider = !/VEIL|highland/i.test(WL16);
 ok('16. M12 Veil Falls + highland stay host-safe (ribbon bottom ' + yBot16 + ' m, foam flush, highland min reach distance ' + sc16.minCheb.toFixed(0) + ' m, unreachable, no collider)', !!VW && !!HL16 && yBot16 >= 3.4 && foamOk && sc16.minCheb > 304 && HL16.reachable === false && VW.reachable === false && noCollider && (VW.keep_line || []).length >= 4, { yBot: yBot16, foamOk: foamOk, sc16: sc16, noCollider: noCollider });
+
+/* 17. M12 reference pass (the owner's waterfall image): the broad Veil curtain rides authored rock. Under the full keep list macro.js builds
+       (the source, keep_line and veilCurtainKeep), the ridge-sculpt warp weight is 0 at every sampled curtain footprint — on the face and
+       2 m in front of it — so water and rock match at HIGH / MED / LOW alike; the curtain spans at least six stations; the cliff crystals
+       keep their feet ≥ 3.4 m up (centre ≥ 4 + 0.7·size, foot ≈ centre − 0.35·size). */
+var CU17 = VW && VW.curtain, RN17 = VW && (R.macro.mountains || []).filter(function (m) { return m.id === VW.source_id; })[0], ri17 = (R.macro.mountains || []).indexOf(RN17), res17 = { maxW: -1, n: 0 };
+if (CU17 && RN17) { var st17 = ridgeStations(RN17, ri17), keep17 = [{ x: VW.source.x, z: VW.source.z, r: 28 }].concat((VW.keep_line || []).map(function (K) { return { x: K[0], z: K[1], r: K[2] }; }), veilCurtainKeep(st17, VW)), fld17 = ridgeWarpField(RN17, st17, ri17, keep17);
+  res17.keep = keep17.length;
+  for (var k17 = CU17.from; k17 < CU17.to; k17++) { var A17 = ridgeFaceSegment(st17, k17), B17 = ridgeFaceSegment(st17, k17 + 1);
+    for (var f17 = 0; f17 <= 6; f17++) for (var h17 = 0; h17 <= 12; h17++) { var t17 = f17 / 6, top17 = A17.crestA.y + (B17.crestA.y - A17.crestA.y) * t17, y17 = 3.6 + (top17 - 3.6) * h17 / 12;
+      var pa17 = ridgeFacePoint(A17.innerA, A17.crestA, Math.min(y17, A17.crestA.y)), pb17 = ridgeFacePoint(B17.innerA, B17.crestA, Math.min(y17, B17.crestA.y)), x17 = pa17.x + (pb17.x - pa17.x) * t17, z17 = pa17.z + (pb17.z - pa17.z) * t17, rl17 = Math.hypot(x17, z17);
+      [0, 2].forEach(function (d) { res17.maxW = Math.max(res17.maxW, fld17.weight(x17 - x17 / rl17 * d, z17 - z17 / rl17 * d)); res17.n++; }); } } }
+var crysOk17 = /Math\.max\(4 \+ s2 \* 0\.7,/.test(VF) && !/Math\.max\(4 \+ s2 \* 0\.[0-6],/.test(VF);
+ok('17. M12 Veil curtain rides authored rock (' + res17.n + ' footprints, max sculpt weight ' + res17.maxW + ', ' + (CU17 ? CU17.to - CU17.from : 0) + ' station spans) and the cliff crystals stay ≥ 3.4 m', !!CU17 && res17.n > 0 && res17.maxW === 0 && CU17.to - CU17.from >= 6 && crysOk17, { res17: res17, crysOk17: crysOk17 });
 
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

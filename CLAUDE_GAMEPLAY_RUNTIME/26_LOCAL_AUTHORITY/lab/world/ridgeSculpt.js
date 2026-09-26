@@ -35,10 +35,11 @@ export function ridgeWarpField(R, stations, idx, keepOut) {
   var perCrest = Math.max(8, Math.round(TAU * arc / 170)), perShelf = Math.max(8, Math.round(TAU * arc / 120)), perGully = Math.round(TAU * arc / (arc < 450 ? 34 : 52));
   var gullyW = 0.2, passes = R.passes || [];
   function at(b) { var f = (((b % TAU) + TAU) % TAU) / TAU * N, i = Math.min(N - 1, Math.floor(f)), t = f - i; return { r: rad[i] + (rad[i + 1] - rad[i]) * t, rs: rs[i] + (rs[i + 1] - rs[i]) * t, h: stations[i].h + (stations[i + 1].h - stations[i].h) * t, w: stations[i].w + (stations[i + 1].w - stations[i].w) * t }; }
+  var kb = (keepOut || []).reduce(function (b, K) { var m = K.r * 2.2; return [Math.min(b[0], K.x - m), Math.max(b[1], K.x + m), Math.min(b[2], K.z - m), Math.max(b[3], K.z + m)]; }, [1e9, -1e9, 1e9, -1e9]);   /* the keep circles' reach box: most vertices skip the loop */
   function weight(x, z) {
     var w = sstep(REACH_IN, REACH_OUT, maxNorm(x, z)); if (w <= 0) return 0;
     var b = Math.atan2(x, z); for (var p = 0; p < passes.length; p++) { var d = Math.abs(angleDelta(b, passes[p].bearing_rad)); w *= sstep(passes[p].half_width_rad * 1.1, passes[p].half_width_rad * 1.6 + 0.02, d); }
-    for (var k = 0; k < (keepOut || []).length; k++) { var K = keepOut[k]; w *= sstep(K.r, K.r * 2.2, Math.hypot(x - K.x, z - K.z)); }
+    if (x >= kb[0] && x <= kb[1] && z >= kb[2] && z <= kb[3]) for (var k = 0; k < keepOut.length; k++) { var K = keepOut[k]; w *= sstep(K.r, K.r * 2.2, Math.hypot(x - K.x, z - K.z)); if (w <= 0) return 0; }
     return w; }
   function warp(x, y, z) {
     var w = weight(x, z); if (w <= 0) return [x, y, z, 1];
