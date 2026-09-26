@@ -6,7 +6,7 @@
    one hemisphere, an environment map for specular, emissive trims for local light (no per-lamp point lights). */
 import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal } from './world/surfaceDetail.js'; import { createFacadeKit, profileFor, addCivicBuilding } from './world/facadeKit.js';
+import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal, applyRadialDeck } from './world/surfaceDetail.js'; import { createFacadeKit, profileFor, addCivicBuilding } from './world/facadeKit.js';
 export function createCityScene(THREE, group, helpers) {
   var roundedBox = helpers.roundedBox, canvasTex = helpers.canvasTex; var DAY = helpers.night === false;
   var M = {
@@ -216,7 +216,18 @@ export function createCityScene(THREE, group, helpers) {
         [g2, ge].forEach(function (ctx2) { ctx2.strokeStyle = 'rgba(255,255,255,0.9)'; ctx2.lineWidth = 0.22 * k; [5.5, 12].forEach(function (mr) { ctx2.beginPath(); ctx2.arc(ax, az, mr * k, 0, Math.PI * 2); ctx2.stroke(); }); });
         var tMap = new THREE.CanvasTexture(cc), tGlow = new THREE.CanvasTexture(ce); [tMap, tGlow].forEach(function (t) { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; }); return { map: tMap, glow: tGlow }; }
       function deckSurface(radius, y) { var T = deckTextures(radius); var geo = new THREE.CircleGeometry(radius, 192); geo.rotateX(-Math.PI / 2); geo.translate(s.x, y, s.z);
-        var mat = new THREE.MeshStandardMaterial({ map: T.map, emissiveMap: T.glow, emissive: 0xffffff, emissiveIntensity: DAY ? 0.42 : 0.95, roughness: DAY ? 0.6 : 0.36, metalness: DAY ? 0.18 : 0.45, envMapIntensity: DAY ? 0.42 : 0.6 });   /* M10: honed, less metallic by day — the Sun no longer washes the eye-level deck white */ applySurface(THREE, mat, 'DECK', SDT);   /* M8: honed deck stone with a 3 m slab grid under the plan-drawn rings */ var mesh = new THREE.Mesh(geo, mat); mesh.name = 'HALO_DECK_SINGLE_TOP'; mesh.userData.noMerge = true; g.add(mesh); return mesh; }
+        var mat = new THREE.MeshStandardMaterial({ map: T.map, emissiveMap: T.glow, emissive: 0xffffff, emissiveIntensity: DAY ? 0.42 : 0.95, roughness: DAY ? 0.6 : 0.36, metalness: DAY ? 0.18 : 0.45, envMapIntensity: DAY ? 0.42 : 0.6 });   /* M10: honed, less metallic by day — the Sun no longer washes the eye-level deck white */ applyRadialDeck(THREE, mat, { cx: s.x, cz: s.z, tier: SDT, baseMetal: mat.metalness, lod: [45, 190],   /* M11: RADIAL DECK replaces the cartesian 3 m slab grid — the floor is laid out as the circle it is (lab/world/surfaceDetail.js) */
+          zones: [
+            { r0: 0, r1: 12, ring: 1.5, arc: 1.8, tone: 0.64, rough: 0.32, metal: 0.3, grain: 0.02, joint: 0.012 },                 /* the crown hub: a polished dark-stone dais in a fine radial fan */
+            { r0: 12, r1: 24, ring: 3.0, arc: 3.6, stagger: 0.5, tone: 1.0, rough: 0.62, metal: 0.12, grain: 0.05, joint: 0.025 }, /* arrival court: large light honed slabs */
+            { r0: 24, r1: 48, ring: 2.4, arc: 4.8, stagger: 0.5, tone: 0.9, rough: 0.56, metal: 0.16, grain: 0.04, joint: 0.022 },
+            { r0: 48, r1: 72, ring: 3.0, arc: 6.0, stagger: 0.5, tone: 1.0, rough: 0.64, metal: 0.12, grain: 0.05, joint: 0.025 },
+            { r0: 72, r1: 96, ring: 1.5, arc: 1.5, stagger: 0.5, tone: 0.82, rough: 0.72, metal: 0.08, grain: 0.07, joint: 0.03 },   /* the garden ring: small setts */
+            { r0: 96, r1: 108, ring: 1.2, arc: 8.0, tone: 0.93, rough: 0.5, metal: 0.2, grain: 0.03, joint: 0.02 },                  /* long bands leading to the promenade */
+            { r0: 108, r1: 126, ring: 1.5, arc: 3.0, stagger: 0.5, tone: 0.74, rough: 0.46, metal: 0.2, grain: 0.04, joint: 0.02 },  /* the promenade: dark honed granite, running bond */
+            { r0: 126, r1: 999, ring: 2.2, arc: 1.2, tone: 0.9, rough: 0.34, metal: 0.55, grain: 0.0, joint: 0.015 }                /* the metal curb band at the glass */
+          ],
+          seams: [{ r: 12, kind: 'STEP', w: 0.1 }, { r: 24, kind: 'INLAY', w: 0.14 }, { r: 47.4, kind: 'DRAIN', w: 0.1 }, { r: 72, kind: 'INLAY', w: 0.14 }, { r: 95.4, kind: 'DRAIN', w: 0.1 }, { r: 108, kind: 'STEP', w: 0.1 }, { r: 126, kind: 'STEP', w: 0.1 }] }); var mesh = new THREE.Mesh(geo, mat); mesh.name = 'HALO_DECK_SINGLE_TOP'; mesh.userData.noMerge = true; g.add(mesh); return mesh; }
       /* the glass SKY-WALK: the deck annulus GLASS_IN..PR is glass (a separate area owner, never an overlay), so the rim — 16.8 m of it inside
          the playable radius — looks straight down 240 m over MAHWORLD; a merged platinum mullion grid carries it, a glass balustrade marks
          the playable edge. The underside disc stops at GLASS_IN, and the boughs below stay visible through the glass. */
@@ -275,19 +286,50 @@ export function createCityScene(THREE, group, helpers) {
         vertexShader: 'varying vec3 vN; varying vec3 vV; varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal); vV = normalize(cameraPosition - w.xyz); gl_Position = projectionMatrix * viewMatrix * w; }',
         fragmentShader: 'uniform float uDay; varying vec3 vN; varying vec3 vV; varying vec3 vW; void main() { float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.6); float ph = 0.5 + 0.5 * sin(vW.y * 0.035 + atan(vN.z, vN.x) * 3.0); vec3 iri = mix(mix(vec3(0.74, 0.84, 1.0), vec3(0.84, 0.74, 1.0), ph), vec3(1.0, 0.8, 0.93), f * 0.6); float a = mix(uDay > 0.5 ? 0.035 : 0.06, uDay > 0.5 ? 0.46 : 0.58, f); vec3 c = iri * mix(uDay > 0.5 ? 1.05 : 0.55, uDay > 0.5 ? 1.25 : 0.9, f); gl_FragColor = vec4(c, a);\n#include <colorspace_fragment>\n}' });
       var dome = new THREE.Mesh(new THREE.SphereGeometry(DR, 96, 40, 0, Math.PI * 2, 0, Math.PI / 2), domeGlass); dome.position.set(s.x, PH, s.z); dome.renderOrder = 4; g.add(dome);
-      (function () { var parts = [], MER = 24;   /* WORLD PIVOT PASS 4: a fine merged lattice (24 meridians + 6 parallels + a crown ring, ONE draw) replaces 16 heavy ribs + 4 rings */
-        for (var rb = 0; rb < MER; rb++) { var ra = rb / MER * Math.PI * 2, pts = []; for (var q = 0; q <= 16; q++) { var th = q / 16 * (Math.PI / 2 - 0.03), rr = DR * Math.cos(th) - 0.12; pts.push(new THREE.Vector3(s.x + Math.cos(ra) * rr, PH + DR * Math.sin(th), s.z + Math.sin(ra) * rr)); } parts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, rb % 3 === 0 ? 0.3 : 0.17, 5, false)); }
-        [0.16, 0.32, 0.48, 0.63, 0.77, 0.89].forEach(function (f) { var th = Math.asin(f), rr = DR * Math.cos(th) - 0.12, t2 = new THREE.TorusGeometry(rr, 0.15, 5, 160); t2.rotateX(Math.PI / 2); t2.translate(s.x, PH + DR * f, s.z); parts.push(t2); });
-        [4.6, 9.8].forEach(function (hT) { var t4 = new THREE.TorusGeometry(Math.sqrt(DR * DR - hT * hT) - 0.12, 0.09, 5, 200); t4.rotateX(Math.PI / 2); t4.translate(s.x, PH + hT, s.z); parts.push(t4); });   /* M10: two transoms low on the shell — the bare 23 m of glass above the deck gets a human-scale rhythm (on the shell: beyond reach) */
-        var crown = new THREE.TorusGeometry(DR * 0.2, 0.34, 6, 96); crown.rotateX(Math.PI / 2); crown.translate(s.x, PH + DR * Math.sin(Math.acos(0.2)), s.z); parts.push(crown);
-        var lat = new THREE.Mesh(mergeGeometries(parts.map(function (q) { return q.index ? q.toNonIndexed() : q; }), false), M.chrome); parts.forEach(function (q) { q.dispose(); }); lat.name = 'HALO_DOME_LATTICE'; lat.userData.noMerge = true; g.add(lat);
-        /* M9 LATTICE NODES: a cast joint at every meridian × parallel crossing (and on the crown ring) — structure by day; at night a quiet
-           architectural node light that joins the plaza's class sequence during the show (kit.showMaterial). On the shell (the flight
-           boundary): nothing inside the playable volume. One instanced draw. */
-        var nodeM = [], nm4 = new THREE.Matrix4(), nq = new THREE.Quaternion(), nv = new THREE.Vector3(), ns = new THREE.Vector3(0.75, 0.75, 0.75);
-        [0.16, 0.32, 0.48, 0.63, 0.77, 0.89].forEach(function (f) { var th = Math.asin(f), rr = DR * Math.cos(th) - 0.12; for (var mi = 0; mi < MER; mi++) { var ma = mi / MER * Math.PI * 2; nv.set(s.x + Math.cos(ma) * rr, PH + DR * f, s.z + Math.sin(ma) * rr); nodeM.push(nm4.compose(nv, nq, ns).clone()); } });
-        var cr2 = DR * 0.2; for (var ci2 = 0; ci2 < 12; ci2++) { var ca3 = ci2 / 12 * Math.PI * 2; nv.set(s.x + Math.cos(ca3) * cr2, PH + DR * Math.sin(Math.acos(0.2)), s.z + Math.sin(ca3) * cr2); nodeM.push(nm4.compose(nv, nq, ns).clone()); }
-        var nodes = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), kit.showMaterial(M.trim, { cx: s.x, cz: s.z }), nodeM.length); nodeM.forEach(function (m, i) { nodes.setMatrixAt(i, m); }); nodes.instanceMatrix.needsUpdate = true; nodes.computeBoundingSphere(); nodes.name = 'HALO_LATTICE_NODES'; nodes.userData.noMerge = true; g.add(nodes); })();
+      (function () {   /* M11 ENGINEERED SHELL (owner: the shell must read ENGINEERED, not thin lines round a sphere). It replaces the M8 fine tube lattice:
+        • 8 MAIN RIBS (the whole frame phased a quarter step off the axes, so no member stands dead-centre in the rim / dock sight lines) — box-section girders (2.4 m wide, 0.8 m deep) in anodised graphite, split platinum flanges with a light channel between them;
+        • 16 secondary meridians — lighter box ribs; 6 RING BEAMS and 2 low TRANSOMS as box sections; the crown ring;
+        • a COMPRESSION RING on the rim plinth, steel SHOES where the main ribs land, cast COLLARS at every rib × ring crossing;
+        • secondary MULLIONS (HIGH / MED) that break the 38 m panes into glazing panels;
+        • the M9 node lights become flush plates on the collar faces (still the plaza's class sequence at night).
+        Flight reach: a flying player's body stays inside 146.5 m of the dome centre (shell − margin); every piece here lies outside
+        SH_RMIN = 146.6 m (SH_MAXIN 1.0 m of depth inside the 147.6 m glass). Box segments merged per material: 4 draws + 1 instanced plates. */
+        var SH_MAXIN = DR - (HALO_LAYOUT.shell_radius_m - HALO_LAYOUT.shell_margin_m + 0.1), MER = 24, PHZ = 0.25, C3 = new THREE.Vector3(s.x, PH, s.z), qS2 = SDT === 'LOW' ? 0.5 : 1;
+        var dark = [], plat = [], chr = [], lite = [], _b = new THREE.Vector3(), _t = new THREE.Vector3(), _n = new THREE.Vector3(), _m = new THREE.Vector3(), _M = new THREE.Matrix4(), maxIn = 0;
+        function P(az, el, inset) { var r = DR - inset; return new THREE.Vector3(s.x + Math.cos(az) * Math.cos(el) * r, PH + Math.sin(el) * r, s.z + Math.sin(az) * Math.cos(el) * r); }
+        function beam(list, p0, p1, w, i0, i1) {   /* a box from p0 to p1 (points on the shell), lateral width w, from inset i0 to i1 (toward the centre) */
+          maxIn = Math.max(maxIn, i1); if (i1 > SH_MAXIN) i1 = SH_MAXIN;
+          _t.subVectors(p1, p0); var len = _t.length(); _t.normalize(); _m.addVectors(p0, p1).multiplyScalar(0.5); _n.subVectors(_m, C3).normalize(); _b.crossVectors(_t, _n).normalize(); _n.crossVectors(_b, _t).normalize();
+          var mid = C3.clone().add(_m.clone().sub(C3).normalize().multiplyScalar(DR - (i0 + i1) / 2));
+          _M.makeBasis(_b, _t, _n).scale(new THREE.Vector3(w, len * 1.02, i1 - i0)).setPosition(mid); var g5 = new THREE.BoxGeometry(1, 1, 1); g5.applyMatrix4(_M); list.push(g5.toNonIndexed()); g5.dispose(); }
+        function meridian(list, az, w, i0, i1, n, elTop) { for (var q = 0; q < n; q++) { var e0 = 0.004 + q / n * (elTop - 0.004), e1 = 0.004 + (q + 1) / n * (elTop - 0.004); beam(list, P(az, e0, 0), P(az, e1, 0), w, i0, i1); } }
+        function ring(list, el, w, i0, i1, n) { for (var q = 0; q < n; q++) { var a0 = q / n * Math.PI * 2, a1 = (q + 1) / n * Math.PI * 2; beam(list, P(a0, el, 0), P(a1, el, 0), w, i0, i1); } }
+        var ELT = Math.acos(0.2), RINGS = [0.16, 0.32, 0.48, 0.63, 0.77, 0.89], NS = Math.round(44 * qS2);
+        for (var rb = 0; rb < MER; rb++) { var ra = (rb + PHZ) / MER * Math.PI * 2;
+          if (rb % 3 === 1) { meridian(dark, ra, 2.4, 0.1, 0.78, NS, ELT);   /* the main girder web: wide, not deep (depth is capped by flight reach; width reads from 150 m) */
+            [-1, 1].forEach(function (sg) { for (var q = 0; q < NS; q++) { var e0 = 0.004 + q / NS * (ELT - 0.004), e1 = 0.004 + (q + 1) / NS * (ELT - 0.004), off = sg * 0.95 / DR; beam(plat, P(ra + off / Math.cos((e0 + e1) / 2), e0, 0), P(ra + off / Math.cos((e0 + e1) / 2), e1, 0), 1.4, 0.78, 0.88); } });   /* split flanges */
+            meridian(lite, ra, 0.2, 0.8, 0.86, NS, ELT); }   /* the light channel between the flanges */
+          else meridian(dark, ra, 0.9, 0.1, 0.55, Math.round(NS * 0.8), ELT); }
+        RINGS.forEach(function (fv) { ring(chr, Math.asin(fv), 1.3, 0.1, 0.62, Math.round(120 * qS2)); });
+        [4.6, 9.8].forEach(function (hT) { ring(chr, Math.asin(hT / DR), 0.36, 0.1, 0.36, Math.round(160 * qS2)); });
+        ring(dark, Math.asin(1.75 / DR), 2.6, 0.1, 0.9, Math.round(160 * qS2));   /* the compression ring on the rim plinth */
+        ring(chr, ELT, 1.6, 0.05, 0.7, 48);   /* the crown ring */
+        for (var sI = 0; sI < 8; sI++) { var sa = (sI * 3 + 1 + PHZ) / MER * Math.PI * 2; beam(plat, P(sa, 0.004, 0), P(sa, 4.2 / DR, 0), 3.6, 0.05, 0.9); }   /* rib shoes on the compression ring */
+        if (SDT !== 'LOW') for (var mm2 = 0; mm2 < MER; mm2++) { var mza = (mm2 + 0.5 + PHZ) / MER * Math.PI * 2; meridian(chr, mza, 0.22, 0.1, 0.28, 16, Math.asin(0.48)); }   /* secondary mullions up to the third ring */
+        var PLATES = [], cq = new THREE.Quaternion(), zAx = new THREE.Vector3(0, 0, 1), cM = new THREE.Matrix4();
+        RINGS.forEach(function (fv) { var el = Math.asin(fv); for (var mi = 0; mi < MER; mi++) { var az = (mi + PHZ) / MER * Math.PI * 2, main = mi % 3 === 1, w = main ? 3.2 : 1.7;
+          beam(plat, P(az, el - w / 2 / DR, 0), P(az, el + w / 2 / DR, 0), w, 0.05, 0.86);   /* the cast collar */
+          PLATES.push({ p: P(az, el, 0.88), main: main }); } });
+        for (var ci2 = 0; ci2 < 12; ci2++) PLATES.push({ p: P(ci2 / 12 * Math.PI * 2, ELT, 0.72), main: true });
+        var plateG = new THREE.CylinderGeometry(0.42, 0.42, 0.04, 8); plateG.rotateX(Math.PI / 2);
+        var nodes = new THREE.InstancedMesh(plateG, kit.showMaterial(M.trim, { cx: s.x, cz: s.z }), PLATES.length);
+        PLATES.forEach(function (N, i) { var nIn = C3.clone().sub(N.p).normalize(); cq.setFromUnitVectors(zAx, nIn); var sc = N.main ? 2.0 : 1.2; nodes.setMatrixAt(i, cM.compose(N.p, cq, new THREE.Vector3(sc, sc, 1))); });
+        nodes.instanceMatrix.needsUpdate = true; nodes.computeBoundingSphere(); nodes.name = 'HALO_LATTICE_NODES'; nodes.userData.noMerge = true; g.add(nodes);
+        var shellMat = new THREE.MeshStandardMaterial({ color: 0x4b5361, roughness: 0.42, metalness: 0.82, envMapIntensity: 0.7 }); applySurface(THREE, shellMat, 'BRUSHED', SDT);   /* anodised graphite structural metal */
+        [[dark, shellMat, 'HALO_SHELL_GIRDERS'], [plat, M.platinum, 'HALO_SHELL_COLLARS_FLANGES'], [chr, M.chrome, 'HALO_SHELL_RINGS_MULLIONS'], [lite, kit.showMaterial(M.trim, { cx: s.x, cz: s.z }), 'HALO_SHELL_RIB_LIGHTS']].forEach(function (T) {
+          if (!T[0].length) return; var mg = mergeGeometries(T[0], false); T[0].forEach(function (q) { q.dispose(); }); var mm = new THREE.Mesh(mg, T[1]); mm.name = T[2]; mm.userData.noMerge = true; g.add(mm); });
+        g.userData.shellStructure = { max_inset_m: +Math.min(maxIn, SH_MAXIN).toFixed(3), limit_inset_m: +SH_MAXIN.toFixed(3), plates: PLATES.length };
+      })();
       (function () {   /* WORLD PIVOT PASS 4: the RIM COLONNADE — 40 slender platinum columns between the playable edge (144.8 m) and the shell, meeting the
         glass at ~20 m, each with an inner white-light strip and a capital, a chrome cornice ring on top: the circular promenade gets a
         human-scale rhythm. Beyond the host limit, so nothing here can be walked or flown into. Merged: 3 draws. */

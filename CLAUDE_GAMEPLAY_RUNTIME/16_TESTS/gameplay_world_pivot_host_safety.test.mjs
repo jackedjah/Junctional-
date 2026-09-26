@@ -34,6 +34,13 @@ var em = /rings2\.setMatrixAt\(gI, m5\.compose\(v5\.set\(gx, PH \+ ([0-9.]+), gz
 var lightOnly = /var bM = new THREE\.MeshBasicMaterial\(\{ map: bt, transparent: true, opacity: DAY \? [0-9.]+ : [0-9.]+, depthWrite: false, blending: THREE\.AdditiveBlending/.test(CITY) && /var pM = new THREE\.MeshBasicMaterial\(\{ map: pt, transparent: true, opacity: DAY \? [0-9.]+ : [0-9.]+, depthWrite: false, blending: THREE\.AdditiveBlending/.test(CITY);
 ok('2b. M10 HALO rim garden lies beyond the host reach and inside the shell; garden emitters flush (≤ 5 cm); garden beams / pools are additive light', !!rg && RIm > HALO_LAYOUT.playable_radius_m + HALO_LAYOUT.body_radius_m && ROm < HALO_LAYOUT.shell_radius_m && ROm > RIm && emTop <= 0.05 && lightOnly, { rim: [RIm, ROm], reach: HALO_LAYOUT.playable_radius_m + HALO_LAYOUT.body_radius_m, shell: HALO_LAYOUT.shell_radius_m, emitter_top_m: emTop, light_only: lightOnly });
 
+/* 2c. M11 engineered shell: every girder, ring beam, collar, shoe, mullion, light channel and node plate lies outside the sphere a flying
+       player's body can reach (shell radius − margin, plus 0.1 m): the builder clamps every box to SH_MAXIN of depth inside the glass. */
+var shIn = /var SH_MAXIN = DR - \(HALO_LAYOUT\.shell_radius_m - HALO_LAYOUT\.shell_margin_m \+ ([0-9.]+)\)/.exec(CITY), clampIn = /if \(i1 > SH_MAXIN\) i1 = SH_MAXIN;/.test(CITY);
+var plateIn = /PLATES\.push\(\{ p: P\(az, el, ([0-9.]+)\)/.exec(CITY), plateMax = plateIn ? +plateIn[1] + 0.02 : 9;
+var SHR = HALO_LAYOUT.shell_radius_m, reachR = SHR - HALO_LAYOUT.shell_margin_m, depthLimit = shIn ? SHR - (reachR + +shIn[1]) : 0;
+ok('2c. M11 HALO shell structure stays outside the flight-reach sphere (every box clamped to the depth limit; node plates within it)', !!shIn && +shIn[1] >= 0.05 && clampIn && depthLimit > 0 && plateMax <= depthLimit, { depth_limit_m: +depthLimit.toFixed(3), reach_sphere_m: reachR, innermost_surface_m: +(SHR - depthLimit).toFixed(3), node_plate_inset_m: plateMax });
+
 /* 3. no low / mid cloud body can rise through the HALO deck (the upper realm floor at the arrival height) */
 var deckY = HALO_LAYOUT.arrival_height_m; var bodies = (R.sky.layers || []).filter(function (L) { return L.kind === 'CLOUD' && L.alt_m < deckY; });
 ok('3. every cloud layer based below the HALO deck is capped under it (max_top_m) and the cluster builder enforces the cap', bodies.length > 0 && bodies.every(function (L) { return L.max_top_m > L.alt_m && L.max_top_m < deckY; }) && /if \(L\.max_top_m && cl\.y \+ cl\.extent > L\.max_top_m\) cl\.y = L\.max_top_m - cl\.extent;/.test(BODIES), bodies.map(function (L) { return [L.id, L.alt_m, L.max_top_m]; }));

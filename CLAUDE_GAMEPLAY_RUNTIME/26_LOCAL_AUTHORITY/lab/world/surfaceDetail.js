@@ -278,3 +278,54 @@ export function applyCrystal(THREE, mat, spec) {
   mat.userData.surfaceDetail = { kind: 'CRYSTAL', key: key }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
   return mat;
 }
+
+/* M11 RADIAL DECK (owner: the HALO floor must stop reading as one giant smooth disc — radial planning, ring construction, multiple surface
+   families, inset panels, ring seams, structural joints, drainage seams). A circular floor is laid out in polar coordinates about its
+   centre: concentric ZONES, each its own surface FAMILY (tone, roughness, metalness, grain) and its own paving — rings of a set width cut
+   into panels of a set arc length (odd rings staggered). Every panel carries a hashed tone / roughness offset (reflections vary panel to
+   panel); joints are recessed (darker, rougher, a chamfer that tilts the normal toward the joint). Zone boundaries get a brushed-metal
+   INLAY seam; chosen boundaries a SLOT DRAIN (dark slot, grating bars); chosen boundaries a fake STEP (a lit arris on the inner edge and a
+   shadow line on the outer) so the plan reads as layered platforms while the walkable surface stays exactly flat. Shader only: no
+   geometry, no draw, no texture. zones: [{ r0, r1, ring, arc, stagger, tone, rough, metal, grain, joint }], seams: [{ r, kind:
+   'INLAY'|'DRAIN'|'STEP', w }]. Tier LOW keeps the panels and seams but drops the chamfer normals and grain. */
+export function applyRadialDeck(THREE, mat, o) {
+  if (!mat || !mat.isMeshStandardMaterial || mat.userData.radialDeck) return mat;
+  var LOW = o.tier === 'LOW', Z = o.zones || [], SE = o.seams || [], lod = o.lod || [40, 170];
+  var zoneCode = Z.map(function (z, i) { return (i ? 'else ' : '') + 'if (rdR < ' + f(z.r1) + ') { rdZ0 = ' + f(z.r0) + '; rdZ1 = ' + f(z.r1) + '; rdRW = ' + f(z.ring) + '; rdArc = ' + f(z.arc) + '; rdSt = ' + f(z.stagger || 0) + '; rdFam = vec4(' + f(z.tone) + ', ' + f(z.rough) + ', ' + f(z.metal) + ', ' + f(z.grain || 0) + '); rdJW = ' + f(z.joint || 0.02) + '; rdZi = ' + f(i) + '; }'; }).join('\n');
+  var seamCode = SE.map(function (s) { var d = 'abs(rdR - ' + f(s.r) + ')', w = f((s.w || 0.1) * 0.5);
+    if (s.kind === 'DRAIN') return '{ float d = ' + d + '; float k = 1.0 - smoothstep(' + w + ', ' + w + ' + rdAAr, d); float bar = step(0.5, fract(rdTh * ' + f(s.r) + ' * 9.0)); rdDrain = max(rdDrain, k); rdBar = max(rdBar, k * bar); }';
+    if (s.kind === 'STEP') return '{ float d = rdR - ' + f(s.r) + '; float lit = (1.0 - smoothstep(0.0, ' + w + ' + rdAAr, -d)) * step(d, 0.0); float sh = (1.0 - smoothstep(0.0, ' + w + ' * 2.0 + rdAAr, d)) * step(0.0, d); rdStepLit = max(rdStepLit, lit); rdStepSh = max(rdStepSh, sh); }';
+    return '{ float d = ' + d + '; rdInlay = max(rdInlay, 1.0 - smoothstep(' + w + ', ' + w + ' + rdAAr, d)); }'; }).join('\n');
+  var body = [
+    '#include <color_fragment>',
+    'vec2 rdP = vSdW.xz - vec2(' + f(o.cx) + ', ' + f(o.cz) + '); float rdR = length(rdP); float rdTh = atan(rdP.y, rdP.x) / 6.2831853 + 0.5;',
+    'float rdNear = 1.0 - smoothstep(' + f(lod[0]) + ', ' + f(lod[1]) + ', length(cameraPosition - vSdW)); float rdAAr = max(fwidth(rdR), 1e-4) * 1.25;',
+    'float rdZ0 = 0.0, rdZ1 = 1e6, rdRW = 3.0, rdArc = 3.0, rdSt = 0.0, rdJW = 0.02, rdZi = 99.0; vec4 rdFam = vec4(1.0, 1.0, 1.0, 0.0);',
+    zoneCode,
+    'float rdRR = (rdR - rdZ0) / rdRW; float rdRing = floor(rdRR); float rdFr = fract(rdRR); float rdRc = rdZ0 + (rdRing + 0.5) * rdRW;',
+    'float rdN = max(6.0, floor(6.2831853 * rdRc / rdArc + 0.5)); float rdA = rdTh * rdN + rdSt * mod(rdRing, 2.0); float rdSeg = floor(rdA); float rdFa = fract(rdA);',
+    'float rdDR = min(rdFr, 1.0 - rdFr) * rdRW; float rdDA = min(rdFa, 1.0 - rdFa) * 6.2831853 * rdRc / rdN; float rdD = min(rdDR, rdDA);',
+    'float rdAA = max(fwidth(rdD), 1e-4) * 1.25; float rdJ = (1.0 - smoothstep(rdJW * 0.5, rdJW * 0.5 + rdAA, rdD)) * rdNear;',
+    'vec2 rdId = vec2(rdRing + rdZi * 37.0, rdSeg); float rdH1 = sdHash(rdId + 11.0), rdH2 = sdHash(rdId * 1.37 + 5.3);',
+    'float rdTone = rdFam.x * (1.0 + (rdH1 - 0.5) * 0.11) * (mod(rdRing, 4.0) > 2.5 ? 0.92 : 1.0), rdRough = rdFam.y * (1.0 + (rdH2 - 0.5) * 0.32);',   /* every fourth ring a darker accent course */
+    LOW ? '' : 'float rdGr = (sdNoise(vSdW.xz * 6.1) * 0.6 + sdNoise(vSdW.xz * 19.0) * 0.4 - 0.5) * rdFam.w * rdNear; rdTone *= 1.0 + rdGr; rdRough *= 1.0 + rdGr * 1.8;',
+    'float rdInlay = 0.0, rdDrain = 0.0, rdBar = 0.0, rdStepLit = 0.0, rdStepSh = 0.0;',
+    seamCode,
+    'rdInlay *= rdNear * 0.85 + 0.15; rdDrain *= rdNear * 0.8 + 0.2; rdBar *= rdNear;',
+    'diffuseColor.rgb *= rdTone * mix(1.0, 0.62, rdJ) * mix(1.0, 0.72, rdStepSh) * (1.0 + 0.16 * rdStepLit);',
+    'diffuseColor.rgb *= (1.0 + 0.22 * rdInlay) * mix(1.0, mix(0.1, 0.55, rdBar), rdDrain);'   /* value only (colour law): the inlay reads as metal through its metalness, the drain as a dark slot with lit grating bars */
+  ];
+  var rough = ['#include <roughnessmap_fragment>', 'roughnessFactor = clamp(mix(mix(roughnessFactor * rdRough, 0.9, rdJ), 0.3, rdInlay), 0.05, 1.0); roughnessFactor = mix(roughnessFactor, 0.85, rdDrain * (1.0 - rdBar));'];
+  var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor = mix(mix(metalnessFactor * (rdFam.z / max(' + f(o.baseMetal || 0.2) + ', 0.01)), 0.0, rdJ * 0.6), 0.85, max(rdInlay, rdBar));'];
+  var nrm = ['#include <normal_fragment_maps>'];
+  if (!LOW) nrm.push('{ float bw = max(rdJW * 2.5, 0.05); float k = 0.22 * (1.0 - smoothstep(0.0, bw, rdD)) * rdNear; vec2 rad = rdP / max(rdR, 1e-3); vec2 tan2 = vec2(-rad.y, rad.x);',
+    '  vec2 dir2 = rdDR < rdDA ? rad * (rdFr < 0.5 ? -1.0 : 1.0) : tan2 * (rdFa < 0.5 ? -1.0 : 1.0); normal = normalize(normal + k * normalize((viewMatrix * vec4(dir2.x, 0.0, dir2.y, 0.0)).xyz));',
+    '  float sk = 0.5 * (rdStepLit - rdStepSh) * rdNear; normal = normalize(normal + sk * normalize((viewMatrix * vec4(-rad.x, 0.0, -rad.y, 0.0)).xyz)); }');
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey, key = 'mahworld-radial-deck-' + (LOW ? 'L' : 'H') + '-' + JSON.stringify([o.cx, o.cz, Z, SE, lod]).length;
+  mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW; varying vec3 vSdN;').replace('#include <project_vertex>', '#include <project_vertex>\n{ vec4 sdP = vec4(transformed, 1.0); vSdW = (modelMatrix * sdP).xyz; vSdN = normalize(mat3(modelMatrix) * objectNormal); }');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + HELPERS).replace('#include <color_fragment>', body.join('\n'))
+      .replace('#include <roughnessmap_fragment>', rough.join('\n')).replace('#include <metalnessmap_fragment>', metal.join('\n')).replace('#include <normal_fragment_maps>', nrm.join('\n')); };
+  mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|' + key; };
+  mat.userData.radialDeck = { zones: Z.length, seams: SE.length, tier: LOW ? 'LOW' : 'HIGH' }; mat.needsUpdate = true; return mat;
+}
