@@ -49,10 +49,20 @@ var FRAG = [
   'uniform sampler2D uMap; uniform vec3 uTop, uShade, uRim, uHaze, uLightWorld; uniform float uOpacity, uRimK, uHazeNear, uHazeFar, uHazeMax, uBaseDark, uShadowK, uTime; uniform vec2 uHor;',
   'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow; varying float vShell; varying float vFade;',
   'vec4 cellTex(vec2 u) { return texture2D(uMap, vCell + clamp(u, 0.006, 0.994) * 0.5); }',
+  'float cH(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }',
+  'float cN(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(cH(i), cH(i + vec2(1.0, 0.0)), f.x), mix(cH(i + vec2(0.0, 1.0)), cH(i + vec2(1.0, 1.0)), f.x), f.y); }',
   'void main() {',
   '  vec2 u = vUv; u.x += 0.01 * sin(vPuff.y * 40.0 + uTime * 0.04);',   /* a slow boil */
   '  float shell = smoothstep(0.3, 0.85, vShell);',   /* M9 (owner: clouds still read as stacked pancakes): a puff INSIDE the body must not draw its own outline */
-  '  vec4 tex = cellTex(u); float dens = tex.a; float a = dens * vPuff.z * uOpacity * mix(1.0, smoothstep(0.0, 0.85, dens), vBelow) * mix(smoothstep(0.0, 0.6, dens), 1.0, shell * (1.0 - vBelow * 0.7)) * vFade; if (a < 0.004) discard;',   /* interior puffs fade in softly and merge; shell puffs keep the crisp cauliflower silhouette */
+  '  vec4 tex = cellTex(u); float dens = tex.a;',
+  '#if CLOUD_TAPS > 0',
+  '  { vec2 eu = vUv * 7.0 + vec2(vPuff.y * 17.0, uTime * 0.012); float en = cN(eu);',   /* M11: the thin rim of every lobe erodes into wisps (fractal, slowly drifting) — no more clean circular lobe edges; the dense core is untouched */
+  '#if CLOUD_TAPS > 1',
+  '    en = en * 0.62 + cN(eu * 2.4 + 7.1) * 0.38;',
+  '#endif',
+  '    dens = clamp(dens + (en - 0.5) * 0.8 * (1.0 - smoothstep(0.4, 0.95, dens)), 0.0, 1.0); }',
+  '#endif',
+  '  float a = dens * vPuff.z * uOpacity * mix(1.0, smoothstep(0.0, 0.85, dens), vBelow) * mix(smoothstep(0.0, 0.6, dens), 1.0, shell * (1.0 - vBelow * 0.7)) * vFade; if (a < 0.004) discard;',   /* interior puffs fade in softly and merge; shell puffs keep the crisp cauliflower silhouette */
   '  float occl = 0.0;',
   '#if CLOUD_TAPS > 0',
   '  occl = cellTex(u + vLs * 0.06).r * 0.55;',   /* thickness between this point and the key, inside the puff */
