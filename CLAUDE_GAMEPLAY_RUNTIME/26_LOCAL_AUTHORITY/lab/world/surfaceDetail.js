@@ -293,9 +293,9 @@ export function applyRadialDeck(THREE, mat, o) {
   var LOW = o.tier === 'LOW', Z = o.zones || [], SE = o.seams || [], lod = o.lod || [40, 170];
   var zoneCode = Z.map(function (z, i) { return (i ? 'else ' : '') + 'if (rdR < ' + f(z.r1) + ') { rdZ0 = ' + f(z.r0) + '; rdZ1 = ' + f(z.r1) + '; rdRW = ' + f(z.ring) + '; rdArc = ' + f(z.arc) + '; rdSt = ' + f(z.stagger || 0) + '; rdFam = vec4(' + f(z.tone) + ', ' + f(z.rough) + ', ' + f(z.metal) + ', ' + f(z.grain || 0) + '); rdJW = ' + f(z.joint || 0.02) + '; rdZi = ' + f(i) + '; }'; }).join('\n');
   var seamCode = SE.map(function (s) { var d = 'abs(rdR - ' + f(s.r) + ')', w = f((s.w || 0.1) * 0.5);
-    if (s.kind === 'DRAIN') return '{ float d = ' + d + '; float k = 1.0 - smoothstep(' + w + ', ' + w + ' + rdAAr, d); float bar = step(0.5, fract(rdTh * ' + f(s.r) + ' * 9.0)); rdDrain = max(rdDrain, k); rdBar = max(rdBar, k * bar); }';
-    if (s.kind === 'STEP') return '{ float d = rdR - ' + f(s.r) + '; float lit = (1.0 - smoothstep(0.0, ' + w + ' + rdAAr, -d)) * step(d, 0.0); float sh = (1.0 - smoothstep(0.0, ' + w + ' * 2.0 + rdAAr, d)) * step(0.0, d); rdStepLit = max(rdStepLit, lit); rdStepSh = max(rdStepSh, sh); }';
-    return '{ float d = ' + d + '; rdInlay = max(rdInlay, 1.0 - smoothstep(' + w + ', ' + w + ' + rdAAr, d)); }'; }).join('\n');
+    if (s.kind === 'DRAIN') return '{ float d = ' + d + '; float k = (1.0 - smoothstep(' + w + ', ' + w + ' + rdAAr, d)) * clamp(2.0 * ' + w + ' / rdAAr, 0.0, 1.0); float bq = rdTh * ' + f(s.r) + ' * 9.0; float bar = mix(step(0.5, fract(bq)), 0.5, clamp(fwidth(bq) * 2.0 - 0.5, 0.0, 1.0)); rdDrain = max(rdDrain, k); rdBar = max(rdBar, k * bar); }';
+    if (s.kind === 'STEP') return '{ float d = rdR - ' + f(s.r) + '; float lit = (1.0 - smoothstep(0.0, ' + w + ' + rdAAr, -d)) * step(d, 0.0) * clamp(' + w + ' / rdAAr, 0.0, 1.0); float sh = (1.0 - smoothstep(0.0, ' + w + ' * 2.0 + rdAAr, d)) * step(0.0, d) * clamp(2.0 * ' + w + ' / rdAAr, 0.0, 1.0); rdStepLit = max(rdStepLit, lit); rdStepSh = max(rdStepSh, sh); }';
+    return '{ float d = ' + d + '; rdInlay = max(rdInlay, (1.0 - smoothstep(' + w + ', ' + w + ' + rdAAr, d)) * clamp(2.0 * ' + w + ' / rdAAr, 0.0, 1.0)); }'; }).join('\n');   /* M11: every seam keeps its average value once it is finer than a pixel (coverage = width / footprint) instead of aliasing into streaks at grazing view */
   var body = [
     '#include <color_fragment>',
     'vec2 rdP = vSdW.xz - vec2(' + f(o.cx) + ', ' + f(o.cz) + '); float rdR = length(rdP); float rdTh = atan(rdP.y, rdP.x) / 6.2831853 + 0.5;',
@@ -305,7 +305,7 @@ export function applyRadialDeck(THREE, mat, o) {
     'float rdRR = (rdR - rdZ0) / rdRW; float rdRing = floor(rdRR); float rdFr = fract(rdRR); float rdRc = rdZ0 + (rdRing + 0.5) * rdRW;',
     'float rdN = max(6.0, floor(6.2831853 * rdRc / rdArc + 0.5)); float rdA = rdTh * rdN + rdSt * mod(rdRing, 2.0); float rdSeg = floor(rdA); float rdFa = fract(rdA);',
     'float rdDR = min(rdFr, 1.0 - rdFr) * rdRW; float rdDA = min(rdFa, 1.0 - rdFa) * 6.2831853 * rdRc / rdN; float rdD = min(rdDR, rdDA);',
-    'float rdAA = max(fwidth(rdD), 1e-4) * 1.25; float rdJ = (1.0 - smoothstep(rdJW * 0.5, rdJW * 0.5 + rdAA, rdD)) * rdNear;',
+    'float rdAA = max(fwidth(rdD), 1e-4) * 1.25; float rdJ = (1.0 - smoothstep(rdJW * 0.5, rdJW * 0.5 + rdAA, rdD)) * rdNear * clamp(rdJW / rdAA, 0.0, 1.0);',   /* M11: a joint finer than the pixel footprint fades to its coverage — the far deck no longer aliases into white / dark streaks */
     'vec2 rdId = vec2(rdRing + rdZi * 37.0, rdSeg); float rdH1 = sdHash(rdId + 11.0), rdH2 = sdHash(rdId * 1.37 + 5.3);',
     'float rdTone = rdFam.x * (1.0 + (rdH1 - 0.5) * 0.11) * (mod(rdRing, 4.0) > 2.5 ? 0.92 : 1.0), rdRough = rdFam.y * (1.0 + (rdH2 - 0.5) * 0.32);',   /* every fourth ring a darker accent course */
     LOW ? '' : 'float rdGr = (sdNoise(vSdW.xz * 6.1) * 0.6 + sdNoise(vSdW.xz * 19.0) * 0.4 - 0.5) * rdFam.w * rdNear; rdTone *= 1.0 + rdGr; rdRough *= 1.0 + rdGr * 1.8;',
@@ -318,7 +318,7 @@ export function applyRadialDeck(THREE, mat, o) {
   var rough = ['#include <roughnessmap_fragment>', 'roughnessFactor = clamp(mix(mix(roughnessFactor * rdRough, 0.9, rdJ), 0.3, rdInlay), 0.05, 1.0); roughnessFactor = mix(roughnessFactor, 0.85, rdDrain * (1.0 - rdBar));'];
   var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor = mix(mix(metalnessFactor * (rdFam.z / max(' + f(o.baseMetal || 0.2) + ', 0.01)), 0.0, rdJ * 0.6), 0.85, max(rdInlay, rdBar));'];
   var nrm = ['#include <normal_fragment_maps>'];
-  if (!LOW) nrm.push('{ float bw = max(rdJW * 2.5, 0.05); float k = 0.22 * (1.0 - smoothstep(0.0, bw, rdD)) * rdNear; vec2 rad = rdP / max(rdR, 1e-3); vec2 tan2 = vec2(-rad.y, rad.x);',
+  if (!LOW) nrm.push('{ float bw = max(rdJW * 2.5, 0.05); float k = 0.22 * (1.0 - smoothstep(0.0, bw, rdD)) * rdNear * clamp(bw / rdAA, 0.0, 1.0); vec2 rad = rdP / max(rdR, 1e-3); vec2 tan2 = vec2(-rad.y, rad.x);',
     '  vec2 dir2 = rdDR < rdDA ? rad * (rdFr < 0.5 ? -1.0 : 1.0) : tan2 * (rdFa < 0.5 ? -1.0 : 1.0); normal = normalize(normal + k * normalize((viewMatrix * vec4(dir2.x, 0.0, dir2.y, 0.0)).xyz));',
     '  float sk = 0.5 * (rdStepLit - rdStepSh) * rdNear; normal = normalize(normal + sk * normalize((viewMatrix * vec4(-rad.x, 0.0, -rad.y, 0.0)).xyz)); }');
   var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey, key = 'mahworld-radial-deck-' + (LOW ? 'L' : 'H') + '-' + JSON.stringify([o.cx, o.cz, Z, SE, lod]).length;

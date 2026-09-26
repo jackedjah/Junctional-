@@ -251,14 +251,16 @@ export function createCityScene(THREE, group, helpers) {
         var mat = new THREE.MeshStandardMaterial({ map: T.map, emissiveMap: T.glow, emissive: 0xffffff, emissiveIntensity: DAY ? 0.42 : 0.95, roughness: DAY ? 0.6 : 0.36, metalness: DAY ? 0.18 : 0.45, envMapIntensity: DAY ? 0.42 : 0.6 });   /* M10: honed, less metallic by day — the Sun no longer washes the eye-level deck white */ applyRadialDeck(THREE, mat, { cx: s.x, cz: s.z, tier: SDT, baseMetal: mat.metalness, lod: [45, 190],   /* M11: RADIAL DECK replaces the cartesian 3 m slab grid — the floor is laid out as the circle it is (lab/world/surfaceDetail.js) */
           zones: [
             { r0: 0, r1: 12, ring: 1.5, arc: 1.8, tone: 0.64, rough: 0.32, metal: 0.3, grain: 0.02, joint: 0.012 },                 /* the crown hub: a polished dark-stone dais in a fine radial fan */
-            { r0: 12, r1: 24, ring: 3.0, arc: 3.6, stagger: 0.5, tone: 1.0, rough: 0.62, metal: 0.12, grain: 0.05, joint: 0.025 }, /* arrival court: large light honed slabs */
-            { r0: 24, r1: 48, ring: 2.4, arc: 4.8, stagger: 0.5, tone: 0.9, rough: 0.56, metal: 0.16, grain: 0.04, joint: 0.022 },
-            { r0: 48, r1: 72, ring: 3.0, arc: 6.0, stagger: 0.5, tone: 1.0, rough: 0.64, metal: 0.12, grain: 0.05, joint: 0.025 },
-            { r0: 72, r1: 96, ring: 1.5, arc: 1.5, stagger: 0.5, tone: 0.82, rough: 0.72, metal: 0.08, grain: 0.07, joint: 0.03 },   /* the garden ring: small setts */
-            { r0: 96, r1: 108, ring: 1.2, arc: 8.0, tone: 0.93, rough: 0.5, metal: 0.2, grain: 0.03, joint: 0.02 },                  /* long bands leading to the promenade */
-            { r0: 108, r1: 126, ring: 1.5, arc: 3.0, stagger: 0.5, tone: 0.74, rough: 0.46, metal: 0.2, grain: 0.04, joint: 0.02 },  /* the promenade: dark honed granite, running bond */
+            { r0: 12, r1: 24, ring: 3.0, arc: 3.6, stagger: 0.5, tone: 0.95, rough: 0.62, metal: 0.12, grain: 0.05, joint: 0.025 }, /* arrival court: large light honed slabs */
+            { r0: 24, r1: 48, ring: 2.4, arc: 4.8, stagger: 0.5, tone: 0.82, rough: 0.56, metal: 0.16, grain: 0.04, joint: 0.022 },
+            { r0: 48, r1: 72, ring: 3.0, arc: 6.0, stagger: 0.5, tone: 0.96, rough: 0.64, metal: 0.12, grain: 0.05, joint: 0.025 },
+            { r0: 72, r1: 96, ring: 1.5, arc: 1.5, stagger: 0.5, tone: 0.72, rough: 0.72, metal: 0.08, grain: 0.07, joint: 0.03 },   /* the garden ring: small setts */
+            { r0: 96, r1: 108, ring: 1.2, arc: 8.0, tone: 0.87, rough: 0.5, metal: 0.2, grain: 0.03, joint: 0.02 },                  /* long bands leading to the promenade */
+            { r0: 108, r1: 126, ring: 1.5, arc: 3.0, stagger: 0.5, tone: 0.64, rough: 0.46, metal: 0.2, grain: 0.04, joint: 0.02 },  /* the promenade: dark honed granite, running bond */
             { r0: 126, r1: 999, ring: 2.2, arc: 1.2, tone: 0.9, rough: 0.34, metal: 0.55, grain: 0.0, joint: 0.015 }                /* the metal curb band at the glass */
           ],
+          /* M11: the zone values step harder (light court · mid bands · dark setts · light bands · dark promenade) so the rings read as layered
+             platforms from eye level once the far joints stop aliasing into grey noise */
           seams: [{ r: 12, kind: 'STEP', w: 0.1 }, { r: 24, kind: 'INLAY', w: 0.14 }, { r: 47.4, kind: 'DRAIN', w: 0.1 }, { r: 72, kind: 'INLAY', w: 0.14 }, { r: 95.4, kind: 'DRAIN', w: 0.1 }, { r: 108, kind: 'STEP', w: 0.1 }, { r: 126, kind: 'STEP', w: 0.1 }] }); var mesh = new THREE.Mesh(geo, mat); mesh.name = 'HALO_DECK_SINGLE_TOP'; mesh.userData.noMerge = true; g.add(mesh); return mesh; }
       /* the glass SKY-WALK: the deck annulus GLASS_IN..PR is glass (a separate area owner, never an overlay), so the rim — 16.8 m of it inside
          the playable radius — looks straight down 240 m over MAHWORLD; a merged platinum mullion grid carries it, a glass balustrade marks
