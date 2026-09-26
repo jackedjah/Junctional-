@@ -105,6 +105,11 @@ var bandHalf = /new THREE\.CylinderGeometry\(s\.r \+ 0\.14, s\.r \+ 0\.14, ([0-9
 var furn = { lanternFrom: lh && +lh[1], bandBottom: lh && bandHalf ? +lh[1] - +bandHalf[3] - +bandHalf[1] / 2 : 0, drumProud: drumR && +drumR[1], shaftInside: /CylinderGeometry\(s\.r \* 0\.94, s\.r, lh0 - dh, 8\)/.test(FSX), coping: /var cop = new THREE\.Mesh\(roundedBox\(w, 0\.08, d, rr0\)/.test(FSX), reveal: /roundedBox\(w - 0\.1, 0\.08, d - 0\.1/.test(FSX) };
 ok('11. M11 civic furniture stays in its collider envelope below 3.4 m (drum ≤ +5 cm, shaft inside, lantern / bands above 3.4 m; coping = footprint, reveal inset)', furn.lanternFrom >= 3.4 && furn.bandBottom >= 3.4 && furn.drumProud <= 0.05 && furn.shaftInside && furn.coping && furn.reveal, furn);
 
+/* 12. M11 trunk collars / service rings stay inside the trunk's collider (TREE_ELEVATOR_TRUNK, radius = HALO base radius): the builder clamps
+       every collar to TR_MAX = base radius − 5 cm and the bolt blocks to its depth; collars start at 20 m (nothing new near the plaza). */
+var trm = /TR_MAX = HALO_LAYOUT\.base_radius_m - ([0-9.]+)/.exec(CITY), trOut = /out = Math\.min\(TR_MAX, r0 \+ /.test(CITY), trFrom = /for \(var cy = ([0-9.]+); cy <= 200; cy \+= 20\)/.exec(CITY), trBolt = /Math\.min\(0\.3, TR_MAX - out \+ 0\.1\)\); bx\.rotateY\(-ba\); bx\.translate\(s\.x \+ Math\.cos\(ba\) \* \(out - 0\.1\)/.test(CITY);
+ok('12. M11 trunk collars stay inside the 6.2 m trunk collider (clamped to base radius − 5 cm, from 20 m up)', !!trm && +trm[1] >= 0.02 && trOut && trBolt && trFrom && +trFrom[1] >= 3.4, { clamp_m: trm && HALO_LAYOUT.base_radius_m - +trm[1], from_m: trFrom && +trFrom[1] });
+
 /* 9. M10 ridge sculpt: the silhouette / shelf / gully warp lives beyond the reach square only. Sampled over the real ribbon triangles (all
       level-4 subdivision points) and 150 k random points: nothing whose original position is inside REACH_IN moves, nothing warped lands
       inside REACH_FLOOR, and REACH_FLOOR clears the FIELD reach square; triangles wholly inside REACH_IN come out bit-identical. */
