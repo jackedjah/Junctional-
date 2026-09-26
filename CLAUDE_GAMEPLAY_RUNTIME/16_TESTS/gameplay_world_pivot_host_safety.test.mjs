@@ -138,4 +138,12 @@ var net13 = buildRoadNetwork(roads13, []), sc13 = { bends: 0, missing: [], radiu
 var TER13 = src('lab/world/terrain.js'), corner13 = /if \(N\.bendOnly\) \{/.test(TER13) && /joint\(frames, N\.x, N\.z, N\.frameRadius \* 2, PATH_Y, N\.frameBlend, nSeg\)/.test(TER13) && /arc\(seams, N\.x, N\.z, so, st\.seamW, PATH_Y \+ 0\.008/.test(TER13);
 ok('13. M11 every real road bend (' + sc13.bends + ') keeps a flush corner node the road\'s width with both legs ending on it', sc13.bends > 20 && !sc13.missing.length && !sc13.radius.length && !sc13.legs.length && corner13, { sc13: sc13, corner13: corner13 });
 
+/* 14. M11 plaza bollards: the restyled pathway pylons keep their places and count and shrink their footprint (every part within 0.12 m of
+       the post axis, was a 0.26 m ring), and their night pools are flush (1.8 cm) and additive. */
+var BOL = (CITY.match(/\/\* M11 BOLLARDS:[\s\S]*?group\.add\(pools\); \}\)\(\);/) || [''])[0], bolR = [];
+BOL.replace(/cyl\(([0-9.]+), ([0-9.]+), [0-9.]+, [0-9.]+/g, function (m, r0, r1) { bolR.push(+r0, +r1); return m; });
+var mull = BOL.match(/BoxGeometry\(([0-9.]+), [0-9.]+, ([0-9.]+)\); mb\.translate\(0, [0-9.]+, ([0-9.]+)\)/), mullR = mull ? Math.hypot(+mull[1] / 2, +mull[3] + +mull[2] / 2) : 99;
+var bolOk = !!BOL && bolR.length >= 8 && Math.max.apply(null, bolR) <= 0.12 && mullR <= 0.12 && /tp\.y = 0\.018; pools\.setMatrixAt/.test(BOL) && /AdditiveBlending/.test(BOL) && /pools\.visible = !DAY/.test(BOL) && /pylons\.getMatrixAt\(bi, tm\)/.test(BOL) && /new THREE\.InstancedMesh\(new THREE\.CylinderGeometry\(0\.07, 0\.1, 1, 8\), M\.chrome, 56\)/.test(CITY);
+ok('14. M11 plaza bollards stay in place with a smaller footprint (max ' + Math.max.apply(null, bolR.concat([mullR])).toFixed(3) + ' m) and flush additive night pools', bolOk, { radii: bolR, mullR: mullR, found: !!BOL });
+
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
