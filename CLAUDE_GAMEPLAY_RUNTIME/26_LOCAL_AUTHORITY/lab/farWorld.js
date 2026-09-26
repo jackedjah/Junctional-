@@ -28,7 +28,7 @@ export function createFarWorld(THREE, opts) {
      every peak is a noise-displaced cone (12 × 6) with BAKED facet light from the registry Sun direction — warm light-stone on lit faces,
      cool lavender-grey in shadow, pale crystal-white caps on the high upward faces — then aerial perspective toward the daylight horizon
      haze by distance and by height (thicker air low). Neutral rock only (colour law); still unlit, fog-free and ONE merged draw call. */
-  var far = { pos: [], colD: [], colN: [] }; var N = 40; var FAR_SEG = o.tier === 'LOW' ? 12 : 22, FAR_ROWS = o.tier === 'LOW' ? 6 : 11;   /* M9: tiered massif resolution */
+  var far = { pos: [], colD: [], colN: [] }; var N = 40; var FAR_SEG = o.tier === 'LOW' ? 12 : (o.tier === 'MED' ? 16 : 22), FAR_ROWS = o.tier === 'LOW' ? 6 : (o.tier === 'MED' ? 8 : 11);   /* M9: tiered massif resolution (HIGH ≈ 97 k tris for the ring, MED ≈ half) */
   var pSun = new THREE.Vector3(26, 19, 14).normalize(); var pHaze = pair('pHaze');
   var rockLit = pair('rockLit'), rockShade = pair('rockShade'), capCol = pair('cap'), baseCol = pair('base');
   function hsh(n) { var v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); }
