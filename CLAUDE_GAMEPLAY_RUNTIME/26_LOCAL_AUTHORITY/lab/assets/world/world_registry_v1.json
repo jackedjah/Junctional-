@@ -8873,6 +8873,64 @@
      }
     },
     "note": "SCENIC ONLY beyond the north field wall: the ridge notch visually pours toward the RIVER_N backdrop, but it is not a reachable receiver or interaction target in this candidate"
+   },
+   {
+    "id": "VEIL_FALLS",
+    "style": "VEIL",
+    "source_id": "RIDGE_NEAR",
+    "receiver_id": "SEA",
+    "station": 110,
+    "source": {
+     "x": -350.7,
+     "y": 146.7,
+     "z": -145.3
+    },
+    "receiver": {
+     "x": -293.2,
+     "y": -0.3,
+     "z": -121.4
+    },
+    "width_m": 58,
+    "lip_w_m": 24,
+    "base_w_m": 58,
+    "speed": 1.2,
+    "ripple": false,
+    "scenic_only": true,
+    "reachable": false,
+    "interaction": false,
+    "keep_line": [
+     [
+      -293.2,
+      -121.4,
+      14
+     ],
+     [
+      -304.7,
+      -126.2,
+      14
+     ],
+     [
+      -316.2,
+      -131,
+      14
+     ],
+     [
+      -327.7,
+      -135.7,
+      14
+     ],
+     [
+      -339.2,
+      -140.5,
+      14
+     ],
+     [
+      -350.7,
+      -145.3,
+      14
+     ]
+    ],
+    "note": "M12 owner pivot: the Veil Falls - the recessed west cove of RIDGE_NEAR at station 110 (buttresses 109 / 111 frame it), ~150 m down the face into the sea; drawn by lab/world/veilFalls.js (macro.js skips style VEIL); keep_line holds the ridge sculpt still under the water"
    }
   ],
   "sky_beams": [
@@ -8906,7 +8964,21 @@
     "height_m": 220,
     "family": "pink"
    }
-  ]
+  ],
+  "highland": {
+   "id": "VEIL_HIGHLAND",
+   "center_bearing": 4.33,
+   "center_dist_m": 430,
+   "radial_m": 50,
+   "tangential_m": 88,
+   "top_y_m": 146.2,
+   "villas": 5,
+   "spire_bearing": 4.4,
+   "spire_dist_m": 415,
+   "spire_h_m": 72,
+   "reachable": false,
+   "note": "M12 owner pivot: the hanging highland behind the Veil Falls lip - meadow, source lake, crystal groves, villas, lantern paths, a flight landing pad and the Veil spire. Visual only: 370-500 m out, beyond the host reach; ENTERING it needs new colliders + host validation (runtime bridge)"
+  }
  },
  "buildings": {
   "_doc": "owner B8 §19 + M5 owner correction: every demo building names its REAL entrance and map point; imported landmark scale/envelope/provenance and portal truth are hydrated from district_v1.json. ENTER uses the same portal coordinates as the causeway spur, architecture frame, prompt and room return. Open-air class structures remain open_air.",

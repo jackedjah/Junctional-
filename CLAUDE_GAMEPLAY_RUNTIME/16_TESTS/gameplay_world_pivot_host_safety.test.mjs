@@ -152,4 +152,16 @@ var mRM = CITY.match(/var RM = PR - ([0-9.]+), HM = ([0-9.]+)/), mShoe = CITY.ma
 var mastR = mRM ? HALO_LAYOUT.structural_deck_radius_m - +mRM[1] : 0, mastIn = mShoe ? mastR - +mShoe[3] / 2 : 0, REACH = 146.5;
 ok('15. M11 HALO beacon masts stand outside the shell and beyond reach (inner face ' + mastIn.toFixed(1) + ' m vs shell ' + HALO_LAYOUT.shell_radius_m + ' m / reach ' + REACH + ' m)', !!mRM && !!mShoe && mastIn > HALO_LAYOUT.shell_radius_m + 0.5 && mastIn > REACH && mastR + +mShoe[3] / 2 <= HALO_LAYOUT.structural_deck_radius_m + 1e-6 && /HALO_BEACON_MASTS/.test(CITY), { mastR: mastR, mastIn: mastIn });
 
+/* 16. M12 Veil Falls + highland: the water ribbon stops above 3.4 m (no solid below head height), the plunge foam is a 3 cm decal on the sea,
+       the highland (mesa + its skirt flare) lies wholly beyond the reach square, the registry marks it unreachable, and no collider source
+       mentions it. The ridge sculpt keeps the face under the water (keep_line) — check 9 above still proves in-reach triangles bit-identical. */
+var VF = src('lab/world/veilFalls.js'), VW = (R.macro.waterfalls || []).filter(function (w) { return w.id === 'VEIL_FALLS'; })[0], HL16 = R.macro.highland;
+var yBot16 = +((VF.match(/yBot = ([0-9.]+);/) || [])[1]), foamOk = /foam\.position\.set\(baseX, SEA \+ 0\.03, baseZ\)/.test(VF), sc16 = { minCheb: 1e9 };
+if (HL16) { var er16 = [Math.sin(HL16.center_bearing), Math.cos(HL16.center_bearing)], et16 = [Math.cos(HL16.center_bearing), -Math.sin(HL16.center_bearing)], cx16 = er16[0] * HL16.center_dist_m, cz16 = er16[1] * HL16.center_dist_m;
+  for (var a16 = 0; a16 < 360; a16++) { var th16 = a16 / 180 * Math.PI, e16 = Math.hypot(Math.cos(th16) / HL16.radial_m, Math.sin(th16) / HL16.tangential_m), rim16 = (1 / e16) * 1.14;   /* rim noise ≤ 14 % */
+    var toField16 = Math.max(0, -Math.cos(th16)), r16 = rim16 + Math.max(0, 30 * (1 - toField16 * 1.6)) + 3.7 * (1 - toField16);   /* veilFalls.js skirt: the widest flare (30 m) + jag, tucked on the field-facing side */
+    var lx16 = Math.cos(th16) * r16, lz16 = Math.sin(th16) * r16, px16 = cx16 + er16[0] * lx16 + et16[0] * lz16, pz16 = cz16 + er16[1] * lx16 + et16[1] * lz16; sc16.minCheb = Math.min(sc16.minCheb, Math.max(Math.abs(px16), Math.abs(pz16))); } }
+var WL16 = src('lab/world/worldLayout.js'), noCollider = !/VEIL|highland/i.test(WL16);
+ok('16. M12 Veil Falls + highland stay host-safe (ribbon bottom ' + yBot16 + ' m, foam flush, highland min reach distance ' + sc16.minCheb.toFixed(0) + ' m, unreachable, no collider)', !!VW && !!HL16 && yBot16 >= 3.4 && foamOk && sc16.minCheb > 304 && HL16.reachable === false && VW.reachable === false && noCollider && (VW.keep_line || []).length >= 4, { yBot: yBot16, foamOk: foamOk, sc16: sc16, noCollider: noCollider });
+
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
