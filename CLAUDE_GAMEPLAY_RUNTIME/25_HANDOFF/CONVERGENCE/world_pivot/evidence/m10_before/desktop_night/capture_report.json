@@ -1,0 +1,582 @@
+{
+ "started": "2026-09-26T07:48:28.040Z",
+ "size": [
+  1280,
+  720
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V01",
+   "label": "plaza hub toward the temple causeway",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V01_NIGHT.jpg",
+   "pos": [
+    0,
+    7,
+    -30
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 293,
+    "triangles": 2272523,
+    "geometries": 300,
+    "textures": 62,
+    "programs": 130
+   },
+   "frames_in_600ms": 2,
+   "ms": 60398
+  },
+  {
+   "id": "V02",
+   "label": "world overview from the south",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V02_NIGHT.jpg",
+   "pos": [
+    0,
+    170,
+    -270
+   ],
+   "look": [
+    0,
+    0,
+    70
+   ],
+   "stats": {
+    "calls": 375,
+    "triangles": 2303671,
+    "geometries": 388,
+    "textures": 65,
+    "programs": 130
+   },
+   "frames_in_600ms": 0,
+   "ms": 44515
+  },
+  {
+   "id": "V03",
+   "label": "ATHLETE gold temple forecourt",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V03_NIGHT.jpg",
+   "pos": [
+    0,
+    8,
+    122
+   ],
+   "look": [
+    0,
+    14,
+    178
+   ],
+   "stats": {
+    "calls": 162,
+    "triangles": 2099243,
+    "geometries": 391,
+    "textures": 69,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 38069
+  },
+  {
+   "id": "V04",
+   "label": "TITAN blue tower and gate",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V04_NIGHT.jpg",
+   "pos": [
+    58,
+    10,
+    104
+   ],
+   "look": [
+    112,
+    20,
+    110
+   ],
+   "stats": {
+    "calls": 133,
+    "triangles": 1438544,
+    "geometries": 392,
+    "textures": 72,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 39771
+  },
+  {
+   "id": "V05",
+   "label": "LEAN crimson canyon corridor",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V05_NIGHT.jpg",
+   "pos": [
+    -86,
+    11,
+    138
+   ],
+   "look": [
+    -112,
+    12,
+    210
+   ],
+   "stats": {
+    "calls": 132,
+    "triangles": 846200,
+    "geometries": 392,
+    "textures": 72,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 29478
+  },
+  {
+   "id": "V07",
+   "label": "BAGE pink market and basins",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V07_NIGHT.jpg",
+   "pos": [
+    0,
+    9,
+    212
+   ],
+   "look": [
+    0,
+    8,
+    258
+   ],
+   "stats": {
+    "calls": 128,
+    "triangles": 1415364,
+    "geometries": 393,
+    "textures": 78,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 25335
+  },
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V08_NIGHT.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 222,
+    "triangles": 1046678,
+    "geometries": 445,
+    "textures": 80,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 26481
+  },
+  {
+   "id": "V09",
+   "label": "HALO dome from the ground",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V09_NIGHT.jpg",
+   "pos": [
+    -130,
+    22,
+    -150
+   ],
+   "look": [
+    30,
+    230,
+    40
+   ],
+   "stats": {
+    "calls": 276,
+    "triangles": 765954,
+    "geometries": 498,
+    "textures": 80,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 15839
+  },
+  {
+   "id": "V12",
+   "label": "view back over MAHWORLD from the HALO rim",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V12_NIGHT.jpg",
+   "pos": [
+    30,
+    247,
+    184
+   ],
+   "look": [
+    20,
+    40,
+    520
+   ],
+   "stats": {
+    "calls": 111,
+    "triangles": 644338,
+    "geometries": 498,
+    "textures": 80,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 12278
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V13_NIGHT.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 281,
+    "triangles": 1662045,
+    "geometries": 498,
+    "textures": 81,
+    "programs": 131
+   },
+   "frames_in_600ms": 1,
+   "ms": 25913
+  },
+  {
+   "id": "V16",
+   "label": "LEAN spire house on the north-west terrace",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V16_NIGHT.jpg",
+   "pos": [
+    -82,
+    7,
+    238
+   ],
+   "look": [
+    -110,
+    15,
+    272
+   ],
+   "stats": {
+    "calls": 115,
+    "triangles": 738526,
+    "geometries": 498,
+    "textures": 84,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 29696
+  },
+  {
+   "id": "V19",
+   "label": "HALO trunk base and elevator close",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V19_NIGHT.jpg",
+   "pos": [
+    16,
+    2.2,
+    22
+   ],
+   "look": [
+    30,
+    7,
+    40
+   ],
+   "stats": {
+    "calls": 214,
+    "triangles": 1594531,
+    "geometries": 498,
+    "textures": 84,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 28538
+  },
+  {
+   "id": "V22",
+   "label": "Moon from the plaza",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V22_NIGHT.jpg",
+   "pos": [
+    0,
+    4,
+    20
+   ],
+   "look": [
+    -32,
+    40,
+    -80
+   ],
+   "stats": {
+    "calls": 172,
+    "triangles": 762530,
+    "geometries": 498,
+    "textures": 84,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 24121
+  },
+  {
+   "id": "V26",
+   "label": "canal bank and water edge close",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V26_NIGHT.jpg",
+   "pos": [
+    20,
+    2.2,
+    204
+   ],
+   "look": [
+    40,
+    0,
+    226
+   ],
+   "stats": {
+    "calls": 114,
+    "triangles": 750904,
+    "geometries": 499,
+    "textures": 85,
+    "programs": 131
+   },
+   "frames_in_600ms": 1,
+   "ms": 17829
+  },
+  {
+   "id": "V31",
+   "label": "HALO arrival: out from the upper dock across the deck",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V31_NIGHT.jpg",
+   "pos": [
+    24.5,
+    241.7,
+    40
+   ],
+   "look": [
+    80,
+    241,
+    60
+   ],
+   "stats": {
+    "calls": 164,
+    "triangles": 440560,
+    "geometries": 499,
+    "textures": 85,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 16751
+  },
+  {
+   "id": "V32",
+   "label": "plaza hub toward the temple causeway (clear of the arena: V01 now sits on its roof)",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V32_NIGHT.jpg",
+   "pos": [
+    12,
+    1.7,
+    -4
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 243,
+    "triangles": 1756813,
+    "geometries": 499,
+    "textures": 85,
+    "programs": 131
+   },
+   "frames_in_600ms": 1,
+   "ms": 26122
+  },
+  {
+   "id": "V33",
+   "label": "Moon from the plaza (clear of the exchange: V22 now sits inside it)",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V33_NIGHT.jpg",
+   "pos": [
+    14,
+    1.7,
+    8
+   ],
+   "look": [
+    -32,
+    40,
+    -80
+   ],
+   "stats": {
+    "calls": 174,
+    "triangles": 760694,
+    "geometries": 499,
+    "textures": 85,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 29621
+  },
+  {
+   "id": "V34",
+   "label": "MAH MATCH hall exterior from its approach",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V34_NIGHT.jpg",
+   "pos": [
+    84,
+    2.2,
+    -14
+   ],
+   "look": [
+    122,
+    9,
+    6
+   ],
+   "stats": {
+    "calls": 129,
+    "triangles": 865388,
+    "geometries": 499,
+    "textures": 87,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 15313
+  },
+  {
+   "id": "V35",
+   "label": "HALO deck from high inside the dome (a flying view)",
+   "tod": "NIGHT",
+   "clock": null,
+   "file": "V35_NIGHT.jpg",
+   "pos": [
+    30,
+    330,
+    -70
+   ],
+   "look": [
+    30,
+    240,
+    60
+   ],
+   "stats": {
+    "calls": 321,
+    "triangles": 1960141,
+    "geometries": 499,
+    "textures": 87,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 20023
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 9,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (769 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (21 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (14 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 9494,
+  "error": null
+ },
+ "finished": "2026-09-26T07:57:57.711Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 96,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (769 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (21 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (14 ms)"
+  ]
+ }
+}
