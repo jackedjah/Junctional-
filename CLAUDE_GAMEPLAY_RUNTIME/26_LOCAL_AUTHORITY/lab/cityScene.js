@@ -6,7 +6,7 @@
    one hemisphere, an environment map for specular, emissive trims for local light (no per-lamp point lights). */
 import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal } from './world/surfaceDetail.js';
+import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal } from './world/surfaceDetail.js'; import { createFacadeKit, profileFor, addCivicBuilding } from './world/facadeKit.js';
 export function createCityScene(THREE, group, helpers) {
   var roundedBox = helpers.roundedBox, canvasTex = helpers.canvasTex; var DAY = helpers.night === false;
   var M = {
@@ -22,11 +22,20 @@ export function createCityScene(THREE, group, helpers) {
     stone: new THREE.MeshStandardMaterial({ color: 0x3a3f4a, roughness: 0.62, metalness: 0.28, envMapIntensity: 0.35 }),   /* WORLD PIVOT PASS 3: graphite stone plinths / roof plant */
     leaf: new THREE.MeshStandardMaterial({ color: 0xe4e9f2, emissive: 0xffc862, emissiveIntensity: (DAY ? 0.495 : 1.1), roughness: 0.3, metalness: 0.3, flatShading: true, side: THREE.DoubleSide }),
     stalk: new THREE.MeshStandardMaterial({ color: 0xe8edf5, emissive: 0xdfe8ff, emissiveIntensity: (DAY ? 0.405 : 0.9), roughness: 0.4, metalness: 0.2 }),
-    puddle: new THREE.MeshStandardMaterial({ color: 0x1a2432, roughness: 0.02, metalness: 1.0, transparent: true, opacity: 0.85 })
+    puddle: new THREE.MeshStandardMaterial({ color: 0x1a2432, roughness: 0.02, metalness: 1.0, transparent: true, opacity: 0.85 }),
+    /* M8E: wall families — a satin platinum skin, a neutral architectural composite, a honed stone cladding for heavy bases */
+    skin: new THREE.MeshStandardMaterial({ color: 0xa3abb5, roughness: 0.46, metalness: 0.58, envMapIntensity: 0.55 }),
+    composite: new THREE.MeshStandardMaterial({ color: 0xa7abb1, roughness: 0.6, metalness: 0.1, envMapIntensity: 0.4 }),
+    cladding: new THREE.MeshStandardMaterial({ color: 0x5f6671, roughness: 0.68, metalness: 0.1, envMapIntensity: 0.35 })
   };
   /* M8 MATERIAL REALISM: the civic families get world-space structural surface logic (lab/world/surfaceDetail.js) — facade panel grid with
      inset seams and a trim band per 3.6 m storey, brushed chrome, panelled graphite structure, stone grain. Value / roughness only (no hue). */
-  var SDT = helpers.surfaceTier || 'HIGH'; applySurface(THREE, M.platinum, 'FACADE', SDT); applySurface(THREE, M.chrome, 'BRUSHED', SDT); applySurface(THREE, M.dark, 'STRUCTURE', SDT); applySurface(THREE, M.stone, 'STONE', SDT); applySurface(THREE, M.glass, 'GLAZING', SDT); applyCrystal(THREE, M.diamond, { tier: SDT });   /* M8C: roof / entrance diamonds are cut crystal (facets, depth, grazing rim) */
+  var SDT = helpers.surfaceTier || 'HIGH'; applySurface(THREE, M.platinum, 'FACADE', SDT); applySurface(THREE, M.chrome, 'BRUSHED', SDT); applySurface(THREE, M.dark, 'STRUCTURE', SDT); applySurface(THREE, M.stone, 'STONE', SDT); applySurface(THREE, M.glass, 'GLAZING', SDT); applyCrystal(THREE, M.diamond, { tier: SDT }); applySurface(THREE, M.skin, 'FACADE_PLAIN', SDT); applySurface(THREE, M.composite, 'COMPOSITE', SDT); applySurface(THREE, M.cladding, 'CLADDING', SDT);   /* M8C: roof / entrance diamonds are cut crystal (facets, depth, grazing rim) */
+  /* M8E ARCHITECTURAL REALISM: one facade kit for every civic building (windows with rooms behind them, frames, bay piers, interrupted slab
+     edges, service bays, corner glazing, a balcony, integrated light) — built once after the last building (dress), 4 draws in total */
+  var SHOW = false; try { SHOW = typeof location !== 'undefined' && /[?&]show=1/.test(location.search); } catch (e) { }
+  var kit = createFacadeKit(THREE, { tier: SDT, night: !DAY, show: SHOW }), kitBuilt = false;
+  function skinsFor(prof, tiers) { var out = []; for (var i = 0; i < tiers; i++) out.push(prof === 'TOWER' ? (i === 0 ? M.cladding : (i === tiers - 1 ? M.composite : M.skin)) : (prof === 'HALL' ? (i === 0 ? M.composite : M.skin) : M.composite)); return out; }   /* heavy base · platinum body · composite crown */
   function nameSprite(text) { var tex = canvasTex(512, 96, function (g, w, h) { g.clearRect(0, 0, w, h); g.font = '600 46px "Segoe UI", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#f3e6c8'; g.shadowBlur = 18; g.fillStyle = '#f7f9ff'; g.fillText(text.toUpperCase(), w / 2, h / 2); }); var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false })); sp.scale.set(7.5, 1.4, 1); return sp; }
   function tier(cx, cz, w, d, y0, h, r, mat) { var m = new THREE.Mesh(roundedBox(w, h, d, r), mat); m.position.set(cx, y0, cz); return m; }   /* roundedBox is extruded from y0 upward (see fieldScene.roundedBox) */
   function band(cx, cz, w, d, y, h, r) { var b = new THREE.Mesh(roundedBox(w + 0.12, h, d + 0.12, r), M.glass); b.position.set(cx, y, cz); return b; }
@@ -38,7 +47,7 @@ export function createCityScene(THREE, group, helpers) {
   function premiumDress(g, cx, cz, w, d, tiers, hEach, topY, B) {
     var stoneParts = [], trimParts = [], chromeParts = []; function rb(W, H, D, R, x, y, z) { var q = roundedBox(W, H, D, R); q.translate(x, y, z); return q; }
     stoneParts.push(rb(w + 0.1, 0.85, d + 0.1, Math.min(w, d) * 0.24, cx, 0, cz));   /* plinth */
-    for (var t = 0; t < tiers; t++) { var k = 1 - t * 0.09, tw = w * k, td = d * k, y0 = t * hEach; for (var fy = y0 + 3.6; fy < y0 + hEach - 0.8; fy += 3.6) { if (fy < 3.4) continue; chromeParts.push(rb(tw + 0.34, 0.12, td + 0.34, Math.min(tw, td) * 0.24, cx, fy, cz)); } }
+    /* M8E: the all-around 3.6 m cornice rings are gone — the facade kit draws slab edges per bay, interrupted at every pier */
     if (B.entrance) { var e = B.entrance, horiz = e.side === '+z' || e.side === '-z', sx = e.side === '+x' ? 1 : e.side === '-x' ? -1 : 0, sz = e.side === '+z' ? 1 : e.side === '-z' ? -1 : 0, cy = e.height + 0.35, ow = e.width * 1.9, od = 2.3;
       stoneParts.push(rb(horiz ? ow : od, 0.22, horiz ? od : ow, 0.08, e.x + sx * (od / 2 - 0.2), cy, e.z + sz * (od / 2 - 0.2)));
       trimParts.push(rb(horiz ? ow - 0.3 : 0.1, 0.04, horiz ? 0.1 : ow - 0.3, 0.02, e.x + sx * (od - 0.35), cy - 0.03, e.z + sz * (od - 0.35))); }
@@ -77,6 +86,10 @@ export function createCityScene(THREE, group, helpers) {
   function diamond(x, y, z, s) { var o = new THREE.Mesh(new THREE.OctahedronGeometry(s, 0), M.diamond); o.position.set(x, y, z); o.scale.set(1, 1.6, 1); return o; }
   function entrance(bx, bz, e) {   /* e: {side:'+x'|'-x'|'+z'|'-z', x, z, width, height}: a curved recessed opening on that face, a light arch, a landing strip */
     var g = new THREE.Group(); var horiz = e.side === '+z' || e.side === '-z'; var sx = e.side === '+x' ? 1 : e.side === '-x' ? -1 : 0; var sz = e.side === '+z' ? 1 : e.side === '-z' ? -1 : 0;
+    if (e.glazed) {   /* M8E: the flat door slab, leaves and light arch give way to the kit's storefront entrance; the lit lintel and the landing stay */
+      var lint = new THREE.Mesh(roundedBox(horiz ? e.width * 1.15 : 0.3, 0.16, horiz ? 0.3 : e.width * 1.15, 0.05), M.trimWarm); lint.position.set(e.x + sx * 0.45, e.height * 0.98 + 0.34, e.z + sz * 0.45); if (e.height * 0.98 + 0.34 >= 3.4) g.add(lint);
+      [1.2, 2.1].forEach(function (rr, i) { var ring = new THREE.Mesh(new THREE.RingGeometry(rr - 0.05, rr, 40), i ? M.trim : M.trimWarm); ring.rotation.x = -Math.PI / 2; ring.position.set(e.x + sx * 2.4, 0.03, e.z + sz * 2.4); g.add(ring); });
+      return g; }
     var depth = 0.9; var door = new THREE.Mesh(roundedBox(horiz ? e.width : depth, e.height, horiz ? depth : e.width, Math.min(e.width, e.height) * 0.42), M.doorway); door.position.set(e.x + sx * (depth / 2 - 0.35), 0, e.z + sz * (depth / 2 - 0.35)); g.add(door);
     var arch = new THREE.Mesh(new THREE.TorusGeometry(e.width * 0.52, 0.09, 8, 32, Math.PI), M.trim); arch.position.set(e.x + sx * 0.3, e.height * 0.62, e.z + sz * 0.3); if (!horiz) arch.rotation.y = Math.PI / 2; g.add(arch);
     /* door: two platinum leaves set into the recess with a vertical light seam, a lit lintel above, concentric landing rings on the ground */
@@ -97,34 +110,25 @@ export function createCityScene(THREE, group, helpers) {
         var base = new THREE.Mesh(new THREE.CylinderGeometry(s.r, s.r * 1.04, s.h * 0.55, 48), M.platinum); base.position.set(cx, s.h * 0.275, cz); g.add(base);
         var dome = new THREE.Mesh(new THREE.SphereGeometry(s.r * 0.98, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), M.chrome); dome.scale.y = (s.h * 0.45) / (s.r * 0.98); dome.position.set(cx, s.h * 0.55, cz); g.add(dome);
         var ring1 = new THREE.Mesh(new THREE.TorusGeometry(s.r * 1.0, 0.1, 8, 64), M.trim); ring1.rotation.x = Math.PI / 2; ring1.position.set(cx, s.h * 0.55, cz); g.add(ring1);
-        var gband = new THREE.Mesh(new THREE.CylinderGeometry(s.r * 1.02, s.r * 1.02, s.h * 0.12, 48, 1, true), M.glass); gband.position.set(cx, s.h * 0.30, cz); g.add(gband);
         g.add(diamond(cx, s.h + 1.1, cz, 0.9));
       } else {
-        for (var i = 0; i < tiers; i++) { var k = 1 - i * 0.09; var tw = w * k, td = d * k; var r = Math.min(tw, td) * 0.24; g.add(tier(cx, cz, tw, td, y, hEach, r, i % 2 ? M.chrome : M.platinum)); g.add(band(cx, cz, tw, td, y + hEach * (B.glass_band || 0.45) - 0.35, 0.7, r)); g.add(strip(cx, cz, tw, td, y + hEach - 0.12, r)); y += hEach; }
+        var PROF = profileFor(s.id, tiers), skins = skinsFor(PROF, tiers);
+        for (var i = 0; i < tiers; i++) { var k = 1 - i * 0.09; var tw = w * k, td = d * k; var r = Math.min(tw, td) * 0.24; g.add(tier(cx, cz, tw, td, y, hEach, r, skins[i])); y += hEach; }   /* M8E: base / body / crown wall families; the continuous glass band + light ring are gone (real windows + interrupted strips instead) */
         var cap = new THREE.Mesh(roundedBox(w * (1 - tiers * 0.09) * 0.7, 0.5, d * (1 - tiers * 0.09) * 0.7, Math.min(w, d) * 0.2), M.chrome); cap.position.set(cx, y, cz); g.add(cap);
         g.add(diamond(cx, y + 1.4, cz, 0.7));
       }
-      /* MOTION PRECISION PASS I — façade depth: vertical chrome fins along each tier's long faces (instanced), a recessed dark window strip
-         behind the glass band, a light ledge at every tier base, round portholes on the upper tiers — authored, restrained, coherent */
-      if (!B.dome) { var finCount = 0; var faces = []; var yy = 0; for (var t2 = 0; t2 < tiers; t2++) { var kk = 1 - t2 * 0.09; faces.push({ y: yy, h: hEach, w: w * kk, d: d * kk }); yy += hEach; }
-        /* M8C CONSTRUCTION: fins stand on the STRAIGHT runs only (they used to continue into the rounded corners and float up to 0.7 m off the
-           curved wall); each run ends in a structural pier (premiumDress) */
-        function runOf(L, f) { return Math.max(0, L - 2 * Math.min(f.w, f.d) * 0.24); }
-        var finsPer = faces.reduce(function (a, f) { return a + 2 * (Math.floor(runOf(f.w, f) / 1.6) + Math.floor(runOf(f.d, f) / 1.6)); }, 0); var fins = new THREE.InstancedMesh(new THREE.BoxGeometry(0.16, 1, 0.34), M.chrome, Math.max(1, finsPer)); var fm = new THREE.Matrix4(), fq = new THREE.Quaternion(), fv = new THREE.Vector3(), fs = new THREE.Vector3();
-        faces.forEach(function (f) { var fh = f.h * 0.78; var Lx = runOf(f.w, f), Lz = runOf(f.d, f); var nx = Math.floor(Lx / 1.6), nz = Math.floor(Lz / 1.6);
-          for (var i2 = 0; i2 < nx; i2++) { var px = cx - Lx / 2 + (i2 + 0.5) * (Lx / nx); [-1, 1].forEach(function (sg) { fq.identity(); fm.compose(fv.set(px, f.y + f.h * 0.5, cz + sg * (f.d / 2 + 0.08)), fq, fs.set(1, fh, 1)); if (finCount < fins.count) fins.setMatrixAt(finCount++, fm); }); }
-          for (var j2 = 0; j2 < nz; j2++) { var pz = cz - Lz / 2 + (j2 + 0.5) * (Lz / nz); [-1, 1].forEach(function (sg) { fq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2); fm.compose(fv.set(cx + sg * (f.w / 2 + 0.08), f.y + f.h * 0.5, pz), fq, fs.set(1, fh, 1)); if (finCount < fins.count) fins.setMatrixAt(finCount++, fm); }); }
-          var ledge = new THREE.Mesh(roundedBox(f.w + 0.5, 0.06, f.d + 0.5, Math.min(f.w, f.d) * 0.24), M.trimWarm); ledge.position.set(cx, f.y + 0.02, cz); g.add(ledge);
-          var inset = new THREE.Mesh(roundedBox(f.w + 0.02, 0.9, f.d + 0.02, Math.min(f.w, f.d) * 0.24), M.dark); inset.position.set(cx, f.y + f.h * (B.glass_band || 0.45) - 0.45, cz); g.add(inset); });
-        fins.instanceMatrix.needsUpdate = true; if (helpers.fins !== false) g.add(fins);
-        if (tiers >= 2) { var top = faces[faces.length - 1]; for (var pi2 = 0; pi2 < 3; pi2++) { [-1, 1].forEach(function (sg) { var ring = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.06, 8, 24), M.trim); ring.position.set(cx - top.w * 0.3 + pi2 * top.w * 0.3, top.y + top.h * 0.62, cz + sg * (top.d / 2 + 0.1)); g.add(ring); var disc = new THREE.Mesh(new THREE.CircleGeometry(0.4, 20), M.glass); disc.position.copy(ring.position); if (sg < 0) disc.rotation.y = Math.PI; g.add(disc); }); } } }
-      if (B.entrance) g.add(entrance(cx, cz, B.entrance));
+      /* M8E: the uniform chrome fins, the dark inset strips, the glowing tier-base rings and the portholes are replaced by the facade kit:
+         bays of varied width between piers, framed windows per floor (rooms behind the glass), interrupted slab edges, service bays, corner
+         glazing and a balcony on towers, integrated light strips */
+      addCivicBuilding(kit, THREE, s);   /* M8E: windows, frames, piers, slab edges, service bays, corner glazing, balcony, storefront entrance, light (lab/world/facadeKit.js) */
+      if (B.entrance) g.add(entrance(cx, cz, Object.assign({}, B.entrance, { glazed: true })));   /* M8E: lintel + landing; the kit draws the storefront */
       if (!B.dome) premiumDress(g, cx, cz, w, d, tiers, hEach, y, B);
       var label = nameSprite(B.name || s.id); label.position.set(B.entrance ? B.entrance.x : cx, (B.entrance ? B.entrance.height : 4) + 1.6, B.entrance ? B.entrance.z : cz); g.add(label);
       group.add(g); return g;
     },
     /* ground and dressing: chrome floor with diamond inlays, puddle accents, laser plants; nothing blocks movement */
     dress: function (size) {
+      if (!kitBuilt) { kitBuilt = true; try { kit.build(group); } catch (e) { if (helpers.log) helpers.log('facade kit failed: ' + (e && e.message || e)); } }
       var seed = 9; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
       /* diamond inlays: thin flat octahedra in a ring around the plaza */
       var inlay = new THREE.InstancedMesh(new THREE.OctahedronGeometry(0.55, 0), new THREE.MeshStandardMaterial({ color: 0xe8f4ff, roughness: 0.1, metalness: 0.9, emissive: 0x3a86c8, emissiveIntensity: 0.35, flatShading: true }), 24); var mtx = new THREE.Matrix4(); var q = new THREE.Quaternion(); var sc = new THREE.Vector3(1, 0.06, 1);
@@ -257,7 +261,9 @@ export function createCityScene(THREE, group, helpers) {
       group.add(g); return g; },
     /* residential pod: a rounded platinum shell with a luminous seam and a soft door light */
     pod: function (s) { var g = new THREE.Group(); var body = new THREE.Mesh(new THREE.SphereGeometry(s.r, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), M.platinum); body.scale.y = s.h / s.r * 0.75; body.position.set(s.x, 0, s.z); g.add(body); var seam = new THREE.Mesh(new THREE.TorusGeometry(s.r * 0.98, 0.05, 8, 40), M.trim); seam.rotation.x = Math.PI / 2; seam.position.set(s.x, s.h * 0.45, s.z); g.add(seam); var door = new THREE.Mesh(roundedBox(1.1, 2.0, 0.3, 0.4), M.doorway); door.position.set(s.x, 0, s.z + s.r - 0.1); g.add(door); var dm = new THREE.Mesh(new THREE.CircleGeometry(1.2, 24), M.trimWarm.clone()); dm.material.transparent = true; dm.material.opacity = 0.16; dm.rotation.x = -Math.PI / 2; dm.position.set(s.x, 0.02, s.z + s.r + 1.0); g.add(dm); group.add(g); return g; },
-    materials: M
+    materials: M,
+    /* M8E: the live time-of-day toggle and the frame clock reach the facades (windows light up at night; the plaza light show) */
+    setNight: function (n) { kit.setNight(n); }, tick: function (dt, t) { kit.tick(dt, t); }, facadeInfo: function () { return Object.assign({ audit: kit.audit() }, kit.info()); }
   };
   return api;
 }

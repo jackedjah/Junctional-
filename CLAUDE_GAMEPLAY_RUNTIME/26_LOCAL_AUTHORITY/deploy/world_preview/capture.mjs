@@ -8,7 +8,7 @@ var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.resolve(H
 var LAB_URL = '/CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/';
 var argv = process.argv.slice(2); function arg(k, d) { var i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; }
 var OUT = path.resolve(argv[0] && argv[0].indexOf('--') !== 0 ? argv[0] : path.join(HERE, 'out')); fs.mkdirSync(OUT, { recursive: true });
-var SIZE = arg('--size', '1280x720').split('x').map(Number); var MAPS = argv.indexOf('--map') >= 0; var QUALITY = arg('--quality', 'HIGH'); var TOD = arg('--tod', 'DAY'); var SETTLE = +arg('--settle', '2500');
+var SIZE = arg('--size', '1280x720').split('x').map(Number); var MAPS = argv.indexOf('--map') >= 0; var QUALITY = arg('--quality', 'HIGH'); var TOD = arg('--tod', 'DAY'); var SHOW = argv.indexOf('--show') >= 0;   /* M8E: force the facade light show on (evidence) */ var SETTLE = +arg('--settle', '2500');
 
 /* FIXED viewpoints: [id, label, camera position, look-at]. World axes: +z north (temple / market), +x east (tower), HALO tree at (30, 40). */
 export var VIEWS = [
@@ -39,7 +39,9 @@ export var VIEWS = [
   ['V25', 'ATHLETE district paving close', [-30, 1.8, 146], [-30, 0, 162]],
   ['V26', 'canal bank and water edge close', [20, 2.2, 204], [40, 0, 226]],
   ['V27', 'ridge face close from the TITAN ledge', [166, 14, 130], [230, 40, 150]],
-  ['V28', 'civic roofline, piers and service bay (Mentor Spire rear)', [46, 11, -12], [29, 16, 0]]
+  ['V28', 'civic roofline, piers and service bay (Mentor Spire rear)', [46, 11, -12], [29, 16, 0]],
+  ['V29', 'Training Hall entrance facade', [-3, 2.4, 9], [-22, 5.5, -1]],
+  ['V30', 'Mahgic Exchange entrance facade', [-6, 2.4, 6], [3, 4.5, 24]]
 ];
 
 function mime(p) { return ({ '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css', '.bin': 'application/octet-stream', '.ktx2': 'image/ktx2' })[path.extname(p).toLowerCase()] || 'application/octet-stream'; }
@@ -64,7 +66,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   var consoleErrors = []; page.on('console', function (m) { if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 300)); }); page.on('pageerror', function (e) { consoleErrors.push('pageerror: ' + String(e).slice(0, 300)); }); page.on('response', function (r) { if (r.status() >= 400) consoleErrors.push('HTTP ' + r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '')); });
   var report = { started: new Date().toISOString(), size: SIZE, quality: QUALITY, settle_ms: SETTLE, views: [], console_errors: consoleErrors };
   try {
-    await page.goto(origin + LAB_URL + 'world_preview.html?quality=' + QUALITY + '&sky=day', { waitUntil: 'load', timeout: 120000 });
+    await page.goto(origin + LAB_URL + 'world_preview.html?quality=' + QUALITY + '&sky=day' + (SHOW ? '&show=1' : ''), { waitUntil: 'load', timeout: 120000 });
     var st = null; for (var i = 0; i < 240; i++) { st = await page.evaluate(function () { return window.WP ? window.WP.state() : null; }); if (st && (st.error || (st.world && (st.world.status === 'READY' || st.world.status === 'FAILED')))) break; await sleep(1000); }
     report.ready = st; console.log('state', JSON.stringify(st).slice(0, 400));
     report.prewarm = await page.evaluate(function () { return window.WP.prewarm(); });

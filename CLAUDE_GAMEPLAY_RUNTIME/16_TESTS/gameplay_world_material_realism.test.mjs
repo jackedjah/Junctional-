@@ -7,6 +7,7 @@ import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
 import { surfaceDetail, applySurface, SURFACE, zonedPaving, createPavingZones, PAVING_TYPES, applyGeology, applyCrystal } from '../26_LOCAL_AUTHORITY/lab/world/surfaceDetail.js';
 import { celestialCloudOptics } from '../26_LOCAL_AUTHORITY/lab/world/sky.js';
 import { towerCluster, cloudCluster } from '../26_LOCAL_AUTHORITY/lab/world/cloudBodies.js';
+import { CLASS_GLOW, CLASS_COLOR } from '../26_LOCAL_AUTHORITY/lab/world/facadeKit.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
@@ -86,5 +87,17 @@ var clouds = { atlas: /var SHAPES = \[/.test(CB) && /Math\.exp\(-\(dx \* dx \+ d
   sizes: REG.sky.layers.filter(function (L) { return L.id === 'CUMULUS_MID' || L.id === 'STRATUS_LOW'; }).every(function (L) { return L.size_pow > 1; }) && /Math\.pow\(rnd\(\), L\.size_pow \|\| 1\)/.test(CB),
   pinned: cloudCluster(160, seededR(7)).length === cloudCluster(160, seededR(7)).length };
 ok('9. M8D cloud realism: noise-eroded shape atlas, whole-body key lighting with thickness self-shadow (tiered), flat darker bases, aerial perspective + horizon fade, skewed sizes, a camera-relative towering-cumulus ring (bank, outside the optics, clear of the Sun / Moon, far layers first)', Object.keys(clouds).every(function (k) { return clouds[k]; }), clouds);
+
+/* 10. M8E architectural realism: real windows per floor with rooms behind them (interior mapping, coated glass mirroring the sky, blinds, a
+       reveal shadow, seeded night occupancy with varied brightness), frames / mullions / transoms / sills / piers / slab edges from one
+       instanced box, storefront entrances with lit lobbies, three wall families (stone base · platinum body · composite crown), and light
+       strips whose expressive colours are exactly the five class glows, used only in the night plaza show */
+var FK = src('lab/world/facadeKit.js'), CT = src('lab/cityScene.js'), CF = REG.crystal_families || {};
+var arch = { windows: /float tb = depth \/ -d\.z/.test(FK) && /float F = 0\.16 \+ 0\.84 \* pow\(/.test(FK) && /vec3 sky = rf\.y > 0\.0/.test(FK) && /float bl = vWin\.z;/.test(FK) && /smoothstep\(0\.0, 0\.14, e\)/.test(FK) && /lit = clamp\(vWin\.y, 0\.0, 1\.0\) \* uNight/.test(FK),
+  frames: /function framedWindow\(F, a, y, w, h, win, style, rec\)/.test(FK) && /the slab edge, interrupted at every pier/.test(FK) && /bay piers of varied width/.test(FK) && /function addEntrance\(spec\)/.test(FK),
+  walls: /applySurface\(THREE, M\.skin, 'FACADE_PLAIN', SDT\); applySurface\(THREE, M\.composite, 'COMPOSITE', SDT\); applySurface\(THREE, M\.cladding, 'CLADDING', SDT\)/.test(CT) && !/g\.add\(band\(cx, cz, tw, td/.test(CT) && !/g\.add\(strip\(cx, cz, tw, td/.test(CT),
+  classLight: JSON.stringify(CLASS_GLOW) === JSON.stringify(['gold', 'blue', 'red', 'purple', 'pink'].map(function (k) { return CF[k] && CF[k].glow; })) && JSON.stringify(CLASS_COLOR) === JSON.stringify(['gold', 'blue', 'red', 'purple', 'pink'].map(function (k) { return CF[k] && CF[k].color; })) && /class colours ONLY in a show/.test(FK) && /on = night && ph < 1/.test(FK),
+  live: /setNight: function \(n\) \{ kit\.setNight\(n\); \}/.test(CT) && /cityApi\.setNight\(NIGHT\)/.test(src('lab/fieldScene.js')) && /cityApi\.tick\(dt, t\)/.test(src('lab/fieldScene.js')) };
+ok('10. M8E architecture: interior-mapped windows per floor (coated glass, blinds, reveal, seeded night occupancy), instanced frames / piers / interrupted slab edges, storefront entrances, three wall families, class colours only in the night plaza show, live day / night', Object.keys(arch).every(function (k) { return arch[k]; }), arch);
 
 console.log('RESULT world material realism: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

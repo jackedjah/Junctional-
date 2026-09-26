@@ -4,6 +4,8 @@
    node 16_TESTS/gameplay_world_pivot_host_safety.test.mjs */
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 import { HALO_LAYOUT } from '../26_LOCAL_AUTHORITY/play/haloLayout.js';
+import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
+import { createFacadeKit, addCivicBuilding } from '../26_LOCAL_AUTHORITY/lab/world/facadeKit.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
@@ -53,8 +55,13 @@ ok('6. the field builds exactly one light rig: every directional / hemisphere li
 var RULES = JSON.parse(src('play/rules1723/rules_17_23.dev.json')), blds = []; (function walk(o) { if (!o || typeof o !== 'object') return; if (o.building && !o.building.dome) blds.push(o); for (var k in o) walk(o[k]); })(RULES);
 var minUpper = Math.min.apply(null, blds.map(function (b) { var t = Math.max(1, b.building.tiers || 1); return t > 1 ? b.h / t : 99; })), minDoor = Math.min.apply(null, blds.filter(function (b) { return b.building.entrance; }).map(function (b) { return b.building.entrance.height; }));
 var cons = { piers: /pb = t3 \? y3 \+ 0\.08 : 3\.6/.test(CITY), eave: /if \(y3 \+ hEach - 0\.4 >= 3\.4\) chromeParts\.push/.test(CITY), louvre: /ly >= 3\.4 && ly \+ LH < yT \+ hEach - 0\.5/.test(CITY),
-  transom: /cY = en\.height \+ 0\.35/.test(CITY) && /ty = cY \+ 0\.42/.test(CITY) && /cY \+ 0\.2, en\.z/.test(CITY) && minDoor + 0.35 + 0.2 >= 3.4, upperTiers: minUpper >= 3.4, fins: /var Lx = runOf\(f\.w, f\), Lz = runOf\(f\.d, f\)/.test(CITY) };
-ok('7. M8C construction pieces (piers, eave fascias, service louvres, entrance transom and canopy rods) stay ≥ 3.4 m above the ground; fins stand on the straight wall runs', Object.keys(cons).every(function (k) { return cons[k]; }), Object.assign({ buildings: blds.length, min_upper_tier_base_m: minUpper, min_door_h_m: minDoor }, cons));
+  transom: /cY = en\.height \+ 0\.35/.test(CITY) && /ty = cY \+ 0\.42/.test(CITY) && /cY \+ 0\.2, en\.z/.test(CITY) && minDoor + 0.35 + 0.2 >= 3.4, upperTiers: minUpper >= 3.4,
+  noUniformFins: !/new THREE\.InstancedMesh\(new THREE\.BoxGeometry\(0\.16, 1, 0\.34\)/.test(CITY), noCorniceRings: !/chromeParts\.push\(rb\(tw \+ 0\.34, 0\.12/.test(CITY), cityUsesRule: /addCivicBuilding\(kit, THREE, s\)/.test(CITY) };
+/* M8E facade kit: build exactly what the city builds for every authored civic building and audit every placed piece */
+var seenB = {}, civ = []; (function walk(o) { if (!o || typeof o !== 'object') return; if (o.building && o.id && !seenB[o.id]) { seenB[o.id] = 1; civ.push(o); } for (var k in o) walk(o[k]); })(RULES);
+var KIT = createFacadeKit(THREE, {}); civ.forEach(function (b) { addCivicBuilding(KIT, THREE, b); }); KIT.build(new THREE.Group()); var KA = KIT.audit(), KI = KIT.info();
+cons.kitBelowHead = KA.ok && KA.pieces > 400; cons.kitDraws = KI.draw_calls === 4;
+ok('7. M8C / M8E construction (piers, eave fascias, louvres, transom, canopy rods, and every facade-kit window, frame, pier, slab edge, service door, storefront and light) stays ≥ 3.4 m above the ground or within 5 cm of the existing wall; the uniform fins and all-around cornice rings are gone', Object.keys(cons).every(function (k) { return cons[k]; }), Object.assign({ buildings: blds.length, civic: civ.length, min_upper_tier_base_m: minUpper, min_door_h_m: minDoor, kit_audit: KA, kit: KI }, cons));
 
 /* 8. M8D towering cumulus: the camera-relative tower ring is based above the HALO deck height and, from ANY camera position inside the
       field walls (+120 m margin), its nearest possible body stays farther from the HALO centre than the HALO shell — no tower can ever
