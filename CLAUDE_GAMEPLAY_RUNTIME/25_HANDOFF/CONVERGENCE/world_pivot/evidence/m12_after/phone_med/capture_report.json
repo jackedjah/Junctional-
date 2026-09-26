@@ -1,0 +1,400 @@
+{
+ "started": "2026-09-26T22:35:48.082Z",
+ "size": [
+  393,
+  852
+ ],
+ "quality": "MED",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V03",
+   "label": "ATHLETE gold temple forecourt",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V03_DAY_t40.jpg",
+   "pos": [
+    0,
+    8,
+    122
+   ],
+   "look": [
+    0,
+    14,
+    178
+   ],
+   "stats": {
+    "calls": 162,
+    "triangles": 1383199,
+    "geometries": 216,
+    "textures": 48,
+    "programs": 151
+   },
+   "frames_in_600ms": 0,
+   "ms": 43170
+  },
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V06_DAY_t40.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 116,
+    "triangles": 666868,
+    "geometries": 227,
+    "textures": 51,
+    "programs": 151
+   },
+   "frames_in_600ms": 0,
+   "ms": 30572
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V13_DAY_t40.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 222,
+    "triangles": 1158916,
+    "geometries": 275,
+    "textures": 53,
+    "programs": 151
+   },
+   "frames_in_600ms": 1,
+   "ms": 36486
+  },
+  {
+   "id": "V17",
+   "label": "VISIONARY overlook close",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V17_DAY_t40.jpg",
+   "pos": [
+    -127,
+    5,
+    16
+   ],
+   "look": [
+    -152,
+    9,
+    0
+   ],
+   "stats": {
+    "calls": 121,
+    "triangles": 563670,
+    "geometries": 285,
+    "textures": 55,
+    "programs": 151
+   },
+   "frames_in_600ms": 0,
+   "ms": 17756
+  },
+  {
+   "id": "F3",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "F3_DAY_t40.jpg",
+   "pos": [
+    0,
+    1.7,
+    0
+   ],
+   "look": [
+    -320,
+    60,
+    -130
+   ],
+   "stats": {
+    "calls": 164,
+    "triangles": 712568,
+    "geometries": 295,
+    "textures": 58,
+    "programs": 152
+   },
+   "frames_in_600ms": 1,
+   "ms": 22068
+  },
+  {
+   "id": "MM",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "MM_DAY_t40.jpg",
+   "pos": [
+    60,
+    6,
+    -40
+   ],
+   "look": [
+    122,
+    10,
+    6
+   ],
+   "stats": {
+    "calls": 129,
+    "triangles": 401158,
+    "geometries": 309,
+    "textures": 60,
+    "programs": 152
+   },
+   "frames_in_600ms": 1,
+   "ms": 21049
+  },
+  {
+   "id": "V03",
+   "label": "ATHLETE gold temple forecourt",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V03_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    8,
+    122
+   ],
+   "look": [
+    0,
+    14,
+    178
+   ],
+   "stats": {
+    "calls": 148,
+    "triangles": 1374555,
+    "geometries": 311,
+    "textures": 61,
+    "programs": 152
+   },
+   "frames_in_600ms": 0,
+   "ms": 68368
+  },
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V06_NIGHT_t40.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 108,
+    "triangles": 658452,
+    "geometries": 311,
+    "textures": 61,
+    "programs": 152
+   },
+   "frames_in_600ms": 0,
+   "ms": 31996
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V13_NIGHT_t40.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 217,
+    "triangles": 1159348,
+    "geometries": 314,
+    "textures": 63,
+    "programs": 152
+   },
+   "frames_in_600ms": 2,
+   "ms": 47971
+  },
+  {
+   "id": "V17",
+   "label": "VISIONARY overlook close",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V17_NIGHT_t40.jpg",
+   "pos": [
+    -127,
+    5,
+    16
+   ],
+   "look": [
+    -152,
+    9,
+    0
+   ],
+   "stats": {
+    "calls": 113,
+    "triangles": 555254,
+    "geometries": 314,
+    "textures": 63,
+    "programs": 152
+   },
+   "frames_in_600ms": 0,
+   "ms": 30585
+  },
+  {
+   "id": "F3",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "F3_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    1.7,
+    0
+   ],
+   "look": [
+    -320,
+    60,
+    -130
+   ],
+   "stats": {
+    "calls": 157,
+    "triangles": 704920,
+    "geometries": 314,
+    "textures": 63,
+    "programs": 152
+   },
+   "frames_in_600ms": 0,
+   "ms": 15826
+  },
+  {
+   "id": "MM",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "MM_NIGHT_t40.jpg",
+   "pos": [
+    60,
+    6,
+    -40
+   ],
+   "look": [
+    122,
+    10,
+    6
+   ],
+   "stats": {
+    "calls": 121,
+    "triangles": 392742,
+    "geometries": 314,
+    "textures": 63,
+    "programs": 152
+   },
+   "frames_in_600ms": 0,
+   "ms": 13926
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 13,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "MED",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife ready: PHOENIX, FISH, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (763 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (22 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (16 ms)",
+   "aura: 20 spectral auras in one draw (2 following)",
+   "worldB aura ready (1 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 6606.7,
+  "error": null
+ },
+ "finished": "2026-09-26T22:42:53.526Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 82,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "MED",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife ready: PHOENIX, FISH, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (763 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (22 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (16 ms)",
+   "aura: 20 spectral auras in one draw (2 following)",
+   "worldB aura ready (1 ms)"
+  ]
+ }
+}

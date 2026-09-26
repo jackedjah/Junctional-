@@ -1,0 +1,296 @@
+{
+ "started": "2026-09-26T22:29:41.932Z",
+ "size": [
+  1280,
+  720
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V02",
+   "label": "world overview from the south",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V02_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    170,
+    -270
+   ],
+   "look": [
+    0,
+    0,
+    70
+   ],
+   "stats": {
+    "calls": 439,
+    "triangles": 2474784,
+    "geometries": 437,
+    "textures": 73,
+    "programs": 154
+   },
+   "frames_in_600ms": 0,
+   "ms": 77950
+  },
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V06_NIGHT_t40.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 124,
+    "triangles": 752191,
+    "geometries": 451,
+    "textures": 74,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 44548
+  },
+  {
+   "id": "V10",
+   "label": "sky toward the Sun",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V10_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    260,
+    150,
+    140
+   ],
+   "stats": {
+    "calls": 277,
+    "triangles": 1350125,
+    "geometries": 456,
+    "textures": 74,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 36852
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V13_NIGHT_t40.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 324,
+    "triangles": 1786488,
+    "geometries": 456,
+    "textures": 74,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 44534
+  },
+  {
+   "id": "V17",
+   "label": "VISIONARY overlook close",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V17_NIGHT_t40.jpg",
+   "pos": [
+    -127,
+    5,
+    16
+   ],
+   "look": [
+    -152,
+    9,
+    0
+   ],
+   "stats": {
+    "calls": 116,
+    "triangles": 622071,
+    "geometries": 456,
+    "textures": 76,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 44393
+  },
+  {
+   "id": "V21",
+   "label": "sky away from the Sun (zenith depth, anti-solar band)",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V21_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    -120,
+    40,
+    -70
+   ],
+   "stats": {
+    "calls": 198,
+    "triangles": 804771,
+    "geometries": 456,
+    "textures": 76,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 15801
+  },
+  {
+   "id": "V33",
+   "label": "Moon from the plaza (clear of the exchange: V22 now sits inside it)",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V33_NIGHT_t40.jpg",
+   "pos": [
+    14,
+    1.7,
+    8
+   ],
+   "look": [
+    -32,
+    40,
+    -80
+   ],
+   "stats": {
+    "calls": 214,
+    "triangles": 840315,
+    "geometries": 456,
+    "textures": 76,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 20990
+  },
+  {
+   "id": "V34",
+   "label": "MAH MATCH hall exterior from its approach",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V34_NIGHT_t40.jpg",
+   "pos": [
+    84,
+    2.2,
+    -14
+   ],
+   "look": [
+    122,
+    9,
+    6
+   ],
+   "stats": {
+    "calls": 147,
+    "triangles": 943221,
+    "geometries": 456,
+    "textures": 78,
+    "programs": 155
+   },
+   "frames_in_600ms": 1,
+   "ms": 21593
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 9,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (496 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (17 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (14 ms)",
+   "aura: 20 spectral auras in one draw (2 following)",
+   "worldB aura ready (1 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 12806.2,
+  "error": null
+ },
+ "finished": "2026-09-26T22:35:35.779Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 50,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (496 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (17 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (14 ms)",
+   "aura: 20 spectral auras in one draw (2 following)",
+   "worldB aura ready (1 ms)"
+  ]
+ }
+}

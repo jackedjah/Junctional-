@@ -24,7 +24,8 @@ untouched; no deploy is part of this ledger.
 | M8E lived-in buildings | real windows per floor with rooms behind the glass, lit / dark rooms at night, storefront entrances, balcony, service bays, parapets + roof access; one synchronised class-colour light show (plaza, sanctuaries, HALO rim); LEAN spire house windows + door | `evidence/m8e_facades_day.jpg`, `m8e_facades_night.jpg`, `m8e_plaza_day.jpg`, `m8e_show_steps.jpg`, `m8e_houses_halo.jpg`, `m8e_phone_med.jpg` |
 | M9 world refinement round 1 | mountains as rock mass, far massifs, clouds without pancakes, meadow only on natural ground, coast beach (flip fix) + islands, tree-elevator grounding, mid-distance bridges / towers, HALO garden terraces + promenade + lit lattice nodes, night light pools, terrace risers, MAH MATCH cladding | `evidence/m9_mountains.jpg`, `m9_clouds.jpg`, `m9_ground_coast.jpg`, `m9_structures.jpg`, `m9_halo.jpg`, `m9_night.jpg`, `m9_phone_med.jpg` |
 | M10 world cohesion + runtime bridge | the ten-file runtime bridge (one owner command); ridges sculpted beyond reach, far massifs with shoulders and broad summits; cumulus cells in depth; HALO rim garden, shell transoms, class garden light; entrance aprons + slot drains, canal-bank coping | `RUNTIME_BRIDGE_MANIFEST.md`; sheets `evidence/m10_mountains.jpg`, `m10_clouds.jpg`, `m10_halo.jpg`, `m10_public.jpg`, `m10_night.jpg`, `m10_phone_med.jpg` |
-| M11 unblocked world realization (latest) | HALO: radial deck with eight ring zones, seams, drains and steps; an engineered shell (girder ribs, ring beams, collars, shoes, frit); promenade lamps and handrail light; the trunk built in lifts. World: road bends fixed (39 open outer corners); the dark sea square around the player fixed; far seams stop aliasing; civic furniture built; bollard lights; arena structure; cable-stayed bridges; eroded cloud rims and fibrous cirrus | sheets `evidence/m11_halo_day.jpg`, `m11_halo_shell.jpg`, `m11_halo_night.jpg`, `m11_structures.jpg`, `m11_public.jpg`, `m11_sky_water.jpg`, `m11_night.jpg`, `m11_phone_med.jpg`, `m11_phone_low.jpg`, `m11_cirrus_postpin.jpg` |
+| M11 unblocked world realization | HALO: radial deck with eight ring zones, seams, drains and steps; an engineered shell (girder ribs, ring beams, collars, shoes, frit); promenade lamps and handrail light; the trunk built in lifts. World: road bends fixed (39 open outer corners); the dark sea square around the player fixed; far seams stop aliasing; civic furniture built; bollard lights; arena structure; cable-stayed bridges; eroded cloud rims and fibrous cirrus | sheets `evidence/m11_halo_day.jpg`, `m11_halo_shell.jpg`, `m11_halo_night.jpg`, `m11_structures.jpg`, `m11_public.jpg`, `m11_sky_water.jpg`, `m11_night.jpg`, `m11_phone_med.jpg`, `m11_phone_low.jpg`, `m11_cirrus_postpin.jpg` |
+| M12 hard pivot: magical scenic world (latest) | the Veil Falls (~150 m down the west cove into the sea) and the hanging Veil highland beyond reach (villas, crystal groves, source lake, belvedere, landing pad, 72 m spire; entering it waits on the bridge); one spectral aura field (class crowns, hero landmarks, HALO beacons, the plaza emblem, a Sun halo / Moon corona, the class crystals, the older falls); MAH MATCH neo-Tokyo facade (class-coloured light packets, crown ticker, signage blade); the older falls pour the Veil water; HALO class beacon masts | sheets `evidence/m12_falls_day.jpg`, `m12_falls_night.jpg`, `m12_highland.jpg`, `m12_aura.jpg`, `m12_matchhall.jpg`, `m12_phone_med.jpg`, `m12_phone_low.jpg`, `m12_postpin_crystals_falls.jpg`, `m12_postpin_veil_day.jpg`, `m12_halo_masts.jpg` |
 
 ## How evidence is produced
 
@@ -563,3 +564,103 @@ No collider, walkable surface or host limit changed. Every new solid is inside a
    - the VISIONARY overlook canopy fascia and soffit;
    - HALO night reflection strength (if the owner wants it calmer);
    - a replacement camera for V24 / V27.
+
+## M12 — HARD PIVOT: MAGICAL SCENIC WORLD (`6be6203` … `bb7f5d3`)
+
+Owner directive 2026-09-26 ("HARD PIVOT AUTHORIZED. ULTRA CODE MODE"), in priority order:
+1. **A waterfall and elevated land.** It should be grand, magical and scenic, and lead the eye up to higher terrain that feels like land
+   you could enter: a serene, suburban-style magical plain / highland. Not random, not theme-park cheesy.
+2. **An aura / spectral energy language.** Soft, majestic and prismatic, with violet / pink / cyan / gold blending, soft bloom and light
+   interference. It goes around major buildings, energy architecture, magical landmarks, selected sky moments, and diamonds / crystals.
+   "Beautiful and expensive, not gaudy", not rainbow spam, and it must support the class system, not replace it.
+3. **The black building (MAH MATCH).** A neo-Tokyo animated treatment: linework, luminous accents, scrolling / pulsing light and premium
+   signage. Restrained, not cheap cyberpunk, and aware of performance.
+4. **Broader uplift** around those ideas.
+
+Rules: keep the five class identities, the district logic, the class colours and the crystal / diamond identity; stay phone-aware for
+LOW / MED; and never fake work that needs the runtime bridge. The owner's written brief referenced a waterfall screenshot, but no image
+reached this session, so the work follows the written description.
+
+**How the brief's "cyan" is handled.** The colour law allows no teal or cyan family. The brief's "cyan" is rendered as the ice end of the
+BLUE class family (hue about 202–206°, inside the 200–245° BLUE window). The spectral ramp is violet `#b48cff` → ice `#7fd0ff` → white
+`#f4f6ff` → gold `#ffd88a` → pink `#ff9ad2`. White sits between ice and gold, so no blend passes through green. Colour law: 4 / 4.
+
+No collider, walkable surface or host limit changed. The host-safety test grows to 18 checks.
+
+### Before the pivot
+
+| field | value |
+|---|---|
+| HALO beacon masts (`6be6203`) | One mast stands at the end of each class spoke, on the structural deck ring outside the shell (r 150.8 m). The plinth's inner face sits at 149.2 m, which clears the 147.6 m shell and the 146.5 m flight reach.<br>Each mast has a graphite shaft on a shoe, platinum collars, a crossarm with guy stays, and a beacon in the spoke's class colour (brighter at night). The view out over the rim gets five built class markers.<br>Host safety 15 pins the envelope. Cost: +3 draws and about 2 k triangles on HALO views. |
+
+### P1 — the Veil Falls and the Veil highland (`c69a6f8`)
+
+| field | value |
+|---|---|
+| site | The recessed west cove of the NEAR ridge at station 110 (crest −350.7, 146.7, −145.3). The station 109 / 111 buttresses stand about 45 m forward and frame it like a stage.<br>• It is on the VISIONARY highland's sight line (V17, within about 5°), and seen from the overlook (V06) and the plaza (F3, V21).<br>• It clears both mid-layer towers.<br>Registry: `macro.waterfalls` entry `VEIL_FALLS` (style `VEIL`, `reachable: false`) and `macro.highland` `VEIL_HIGHLAND`. `macro.js` skips the VEIL style, and `lab/world/veilFalls.js` draws it. |
+| the falls | • A horsetail ribbon about 150 m high that widens from a 24 m lip to a 58 m base (46 × 12 grid, following the real face lines of stations 109–111).<br>• A water shader with flowing aerated streaks, horsetail strands, lip aeration and a faint spectral sheen.<br>• A dark wet-rock band behind it, for contrast.<br>• At the plunge: a 3 cm foam decal on the sea, a rising mist plume (HIGH 370 points in two tiers, MED 210, none on LOW) and a mid-height spray tier.<br>• A registry `keep_line` holds the ridge sculpt still under the water, so the ribbon lies on the rock. |
+| the highland | A hanging mesa at lip height behind the falls, beyond host reach:<br>• an elliptical meadow top on a stratified geology-rock skirt, with the field-facing flare tucked so it never hides the falls;<br>• a source lake and channel that feed the lip;<br>• violet / silver / ice crystal groves;<br>• five villas facing the view;<br>• a cantilevered belvedere at the lip;<br>• lantern paths and a flight landing pad;<br>• the 72 m Veil spire (violet crystal, three shards), which shows above the lower crests from the field.<br>Everything is merged by material: +10 to +14 draws on west-facing views, +1 to +2 elsewhere, about 6 k triangles. |
+| aura field (`lab/world/aura.js`) | One instanced, camera-facing field draws every aura in the world in **one draw**. Each aura has:<br>• a soft class-tinted bloom;<br>• an optional pearl-soft prismatic ring that breaks into arcs, or shows only its upper arc (the mist-bow);<br>• faint drifting fringes along the spectral ramp;<br>• a per-item night factor.<br>It is additive and depth-tested (terrain and buildings occlude it), with no tone mapping. It is restrained by day (global 0.55) and fuller at night (1.0). LOW drops the fringe interference. |
+| Veil auras | A violet glow hugging the sheet, the base mist bloom, a mist-bow arc in the spray, the mid spray, a gold lip glow, a purple spire column and a broken ice crown ring on the spire. |
+| blocked — the bridge | **Entering the highland is not built.** It lies ≥ 328 m out (host reach ±300 m) and is marked `reachable: false`. Walking or flying onto it needs new colliders, a raised walkable surface and host validation, which all wait on the runtime bridge. Nothing here pretends otherwise. |
+| host safety | Check 16:<br>• the ribbon stops 3.6 m above the sea;<br>• the foam is flush (+3 cm);<br>• the highland's nearest point is 328 m out (the rim noise and tucked skirt flare are modelled);<br>• both entries are unreachable;<br>• `worldLayout.js` knows nothing about them, so no collider exists.<br>Check 9: the ridge is still bit-identical inside reach. |
+
+### P2 — the spectral aura language (`d216bc5`)
+
+| field | value |
+|---|---|
+| crowns | Every class crown diamond (temple, tower, gym, market, class houses) carries a broken prismatic halo in its class glow, stronger at night. Platinum crowns get none. |
+| landmarks | Hero landmarks get a faint class bloom with a thin spectral rim. It is depth-tested, so the building hides its own centre and the light reads round its silhouette. |
+| HALO | The five beacon masts glint in their class colours. The MAHWORLD plaza emblem (the union of the five classes) carries the full prismatic halo. |
+| sky moments | • **The Sun:** a 22° halo forms for about a minute every five minutes by day (75 s visible out of every 300 s, with 12 s ramps).<br>• **The Moon:** a pearly 7° corona hugs the lavender Moon at night.<br>Both ride camera-relative at 870 m, in front of the 900 m bodies, so they stay locked to the Sun / Moon. The Moon disc is untouched. |
+| tried and dropped | A halo round the HALO trunk-to-canopy junction: an additive glow does not read against the bright deck underside. |
+| cost | Everything stays in the two existing aura draws (world and HALO), plus one for the emblem. |
+
+### P3 — MAH MATCH neo-Tokyo facade (`e0ce63a`)
+
+| field | value |
+|---|---|
+| animated linework | The facade line material is the building's own clone; the court keeps its lines.<br>• **Vertical strips:** class-coloured light packets (a white head and a fading tail, two per strip) climb at seeded speeds.<br>• **Crown bands:** run a chase.<br>• **Portal and sign edges:** run a warm scan.<br>• **One slow sweep** circles the building.<br>The base line is a dim ice glow, so the black body stays black. Levels sit below the tone-map shoulder so the class colours survive (the first pass clipped every packet to flat white). |
+| ticker | One continuous perimeter band under the crown scrolls: MAH MATCH · OFFICIAL · the five class names in their class colours · LIVE. |
+| signage blade | A vertical blade off the door-side corner with MAHMATCH lettering, class bars, a graphite frame and lit edges. |
+| cost | +1 ticker draw and +2 blade draws; the lines stay one draw. One uniform clock drives it all, and day / night follows the live switch. |
+| fixes that came with it | • `veilFalls.js`: two reversed `smoothstep(hi, lo, x)` calls (undefined in GLSL; SwiftShader drops them) are now `1 − smoothstep(lo, hi, x)`, for the lip aeration and the foam edge.<br>• **A P1 regression:** the new registry entries changed the registry hash, so `world_v1_colliders.json` no longer matched and M3 night-route check 10 failed. It was regenerated with `build_world_colliders.mjs`. Only the hash changed: all 9 457 shapes, the host mapping, the interactables and the rooms are identical. |
+
+### After the pin — broader uplift and fixes (`e11184c` … `bb7f5d3`)
+
+| field | value |
+|---|---|
+| class crystals (`e11184c`) | The 18 class crystal monoliths carry the aura in their class glow: sanctuary gates, the TITAN moon-pass wall, the LEAN spires, and the ATHLETE / VISIONARY / BAGE markers.<br>• Each region's tallest crystal gets one broken ringed halo; the rest get a soft bloom.<br>• It is faint by day and the rings show at night.<br>• It rides the world aura draw: 0 new draws. |
+| the older falls (`e11184c`, `b84e1fd`) | TITAN_FALL and NORTH_FALL now speak the Veil's language at their own scale.<br>• **Water:** the Veil water shader is exported as `veilWaterMaterial`, with a width scale and a V flip; the Veil itself uses the identity settings, so it renders as before. Both older sheets pour the same aerated, strand-broken water with soft edges.<br>• **Removed:** the additive streak texture and the flat tinted back plane. The plane drew a hard-edged grey rectangle, most visible on NORTH_FALL and at night. This saves one draw per fall.<br>• **Auras:** a violet glow on the sheet and a base mist bloom; NORTH_FALL also gets a mist-bow. |
+| Veil mist fix (`fa2763e`) | **A P1 bug.** The mist's point size was fixed in pixels, tuned at a 720 px frame. At 960×540 the plume blew out to white (on `e0ce63a` too); on a DPR-3 phone buffer the points would shrink to specks. The size now follows the renderer's drawing-buffer height. |
+| aura culling (`a768651`) | `createAuraField` takes `cull`: a fixed field gets one bounding sphere round every quad and is frustum-culled. The HALO beacon field and the plaza emblem field use it; the world field cannot, because its sky halo follows the camera.<br>Result: −1 to −2 draws on views that do not see them; frames are identical where they are in view. |
+| the Veil by day (`bb7f5d3`) | The checkpoint sheets showed the Veil reading by day as a blown-out white plume (F3, V06, V17, F5) instead of water with mist. The 370 additive mist points (0.2 each) saturated where they overlap, and two white auras stacked on top.<br>• The day mist drops to 0.085 per point.<br>• The base mist bloom and mid spray drop 40 % and 50 % by day.<br>• Night levels are unchanged.<br>The ribbon's streaks, strands and mist-bow now read by day. |
+| evidence | • `m12_postpin_crystals_falls.jpg` (`e0ce63a` → `fa2763e`: G1 TITAN gate, L1 LEAN spire, N2 NORTH_FALL, T2 TITAN_FALL, by night and day).<br>• `m12_postpin_veil_day.jpg` (`e0ce63a` → `bb7f5d3`). |
+
+### Evidence, perf, tests
+
+| field | value |
+|---|---|
+| before / after | Pinned `6be6203` (the HALO masts, just before the pivot) → pinned `e0ce63a` (P1–P3): `evidence/m12_before/…` → `evidence/m12_after/…`. Every frame uses a pinned clock of 40 s, inside the Sun-halo window.<br>• `desktop_day`: 35 views.<br>• `desktop_night`: 8 views (V02 V06 V10 V13 V17 V21 V33 V34).<br>• `audit_cams`: F1–F6 (falls and highland) and MM / MC (MAH MATCH), by day and night.<br>• `phone_med` / `phone_low`: 393×852, V03 V13 V17 V06 F3 MM, by day and night.<br>Sheets: `m12_falls_day.jpg`, `m12_falls_night.jpg`, `m12_highland.jpg`, `m12_aura.jpg`, `m12_matchhall.jpg`, `m12_phone_med.jpg`, `m12_phone_low.jpg`.<br>Masts: `m12_halo_masts.jpg` (the end of M11 → `6be6203`).<br>After the pin: `m12_postpin_crystals_falls.jpg`, `m12_postpin_veil_day.jpg`.<br>**Note:** the `e0ce63a` frames show the Veil too hot by day; `bb7f5d3` fixes that (see the post-pin sheet). |
+| perf | Pinned `6be6203` → `e0ce63a`, software WebGL. These are relative counters, not phone performance; no physical-phone claim is made.<br>• **35 day views (HIGH):** draw calls 7467 → 7692 (+225, +6.4 per view), triangles 46.40 M → 46.45 M (+0.1 %).<br>&nbsp;&nbsp;– Views that see the Veil (V06 V08 V17 V21 V22 V29 V33): +16 each and +6.8 k triangles. That is 13 for the falls and highland (ribbon, wet rock, foam, mist, mesa ×2, lake, canopies, villas ×3, spire, lanterns) plus the three aura fields.<br>&nbsp;&nbsp;– Views that see MAH MATCH: +6 (ticker 1, blade 2, aura fields 3).<br>&nbsp;&nbsp;– Every other view: +3 (the three aura fields, never culled at the pin).<br>• **Audit cameras:** F1–F6 +13 to +16; MM / MC +6.<br>• **8 night views:** 1747 → 1839 (+92), triangles +0.3 %.<br>• **MED 393×852 (12 frames):** 1681 → 1778 (+8.1 per frame), triangles +0.3 %. F3 / V17 +16, the rest +3 to +6.<br>• **LOW 393×852 (12 frames):** 1638 → 1728 (+7.5 per frame). F3 / V17 +15 (LOW drops only the mist), the rest +3 to +5.<br>• **Shader programs:** max 143 → 157 by day (+14: the Veil water, wet rock, foam, mist, lake and meadow, the aura field, the facade, ticker and blade). **Textures:** max 94 → 95. The first-frame compile cost on a phone is unmeasured.<br>• **After the pin:** `a768651` culls the HALO and emblem fields (−1 to −2 where they are out of view); `b84e1fd` drops the two older-fall back planes (−1 each where visible). The crystal and older-fall auras add no draws. |
+| tests | Focused suites on HEAD `bb7f5d3`:<br>• host safety **18 / 18** (new: 15 beacon masts, 16 Veil Falls and highland).<br>• material realism 10 / 10.<br>• colour law 4 / 4.<br>• Moon / cloud 19 / 19.<br>• ridge collision 8 / 8.<br>• M3 night route 13 / 13 (check 10 restored by the collider-hash regeneration in `e0ce63a`).<br>Full suite on `bb7f5d3`: 61 files, **565 checks passing, 34 files failing** (M11: 563 / 34; +2 from the two new host-safety checks). The 34 failing files are the same as in M11, all bridge-blocked:<br>• 32 stop at the missing `jsonSource.js`;<br>• `gameplay_legs_faithful` needs the private raw character master (category B, by design);<br>• `gameplay_mahgic_tree` fails only its static-build check. |
+| not done — blocked | • **Entering the Veil highland** (colliders, a walkable top, flight landing): this is new.<br>• Unchanged from M11: creature motion, collider-backed HALO seating / pavilions / activity zones, and gameplay presentation.<br>All of these wait on the ten-file bridge (`RUNTIME_BRIDGE_MANIFEST.md`). Claude is not polling for it. |
+| residual | • **The Veil by day:** after `bb7f5d3` it reads as water with mist, but it is still the brightest thing in its frame when the Sun is behind it (F5, V06). This is subjective.<br>• **The highland:** it is only seen from far away and from above. At that range the villas read as plain white blocks. Close-range architecture only matters once the highland can be entered, which waits on the bridge.<br>• **MAH MATCH:** the packets read clearly within about 40 m (MC, V34). From the plaza (MM) they are a faint shimmer, which is restrained on purpose. The ticker text is placeholder copy (MAH MATCH · OFFICIAL · the class names · LIVE).<br>• **NORTH_FALL:** it now reads as water, not a grey slab, but it is still a thin 9 m sheet at the back of a notch.<br>• **Crystal and crown auras:** faint by day by design; the rings carry at night.<br>• **No reference image:** the owner's waterfall screenshot never reached this session, so the look follows the written brief. |
+
+### M12 next — open issues (nothing here is approved)
+
+1. **Owner action — the bridge (deferred while the owner is away; Claude is not polling for it).** After it lands, run everything in
+   the M11 list, plus the Veil highland:
+   - colliders for the mesa top, paths and belvedere;
+   - a walkable / flight-landing surface;
+   - a way up (for example a flight corridor or a lift from the VISIONARY highland);
+   - host validation of all of it.
+2. **Owner review of M12** (sheets above). Most subjective:
+   - the Veil's day brightness;
+   - aura strength: crowns, landmarks, crystals, and the Sun-halo cadence (about a minute in every five);
+   - MAH MATCH packet density and speed, and the ticker copy;
+   - the highland villas and spire.
+3. **Next refinement candidates:**
+   - highland villa architecture (terraces, roof gardens, lit rooms at night), worth doing once the highland is reachable;
+   - a grander NORTH_FALL (width is registry data) if the owner wants a second hero fall;
+   - a physical-phone check of shader-program compile time (+14 programs).
