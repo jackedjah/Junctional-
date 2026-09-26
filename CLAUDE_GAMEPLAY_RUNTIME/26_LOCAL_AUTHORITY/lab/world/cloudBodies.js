@@ -19,7 +19,7 @@ var VERT = [
   'attribute vec2 aCloud;',             /* x: cloud base world y · y: cloud vertical extent (m) */
   'attribute vec4 aCentre;',            /* xyz: the cloud body's centre (world) · w: its radius (m) — the whole body is lit from the key's side */
   'uniform vec3 uLightWorld;',
-  'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow;',
+  'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow; varying float vShell; varying float vFade;',
   'void main() {',
   '  float seed = fract(aPuff.y), shape = floor(aPuff.y + 0.001); bool flip = seed > 0.5;',
   '  vUv = vec2(flip ? 1.0 - uv.x : uv.x, uv.y); vPuff = vec4(aPuff.x, seed, aPuff.z, aPuff.w);',
@@ -27,26 +27,30 @@ var VERT = [
   '  vec3 centre = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;',
   '  float sx = length(instanceMatrix[0].xyz), sy = length(instanceMatrix[1].xyz);',
   '  vec3 toCam = normalize(cameraPosition - centre);',
-  '  float below = smoothstep(0.2, 0.7, -toCam.y); vBelow = below; sy *= 1.0 + below * (0.6 + 0.9 * aPuff.w);',   /* seen from below, puffs spread vertically so the underside closes into one flat grey surface (thin stacked puffs read as slices) */
+  '  float below = smoothstep(0.2, 0.7, -toCam.y); vBelow = below; float isPlate = step(1.5, aPuff.w), isBase = step(0.5, aPuff.w) * (1.0 - isPlate); sy *= 1.0 + below * (0.6 + 0.9 * min(aPuff.w, 1.0));',
+  '  float under = smoothstep(0.03, 0.35, -toCam.y); vFade = mix(mix(1.0, 1.0 - 0.85 * under, isBase), under, isPlate);',   /* M9: the plate appears as the base puffs fade, once the body is overhead */   /* seen from below, puffs spread vertically so the underside closes into one flat grey surface (thin stacked puffs read as slices) */
   '  vec3 viewUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);',
   '  vec3 camUp = normalize(mix(vec3(0.0, 1.0, 0.0), viewUp, smoothstep(0.35, 0.85, abs(toCam.y))));',   /* upright near the horizon (flat base, crown up); camera-facing when looked at steeply from below/above so puffs never foreshorten into stacked discs */
   '  vec3 camRight = normalize(cross(camUp, toCam)); camUp = normalize(cross(toCam, camRight));',
   '  vec3 world = centre + camRight * position.x * sx + camUp * position.y * sy;',
+  '  if (isPlate > 0.5) { world = centre + mat3(instanceMatrix) * vec3(position.x, 0.0, position.y); vBelow = 1.0; }',   /* the base plate lies flat in the body's own frame */
   '  vH = clamp((world.y - aCloud.x) / max(aCloud.y, 1.0), 0.0, 1.0);',   /* shade by height inside the WHOLE cloud: no per-puff banding */
   '  vRel = ((centre - aCentre.xyz) + (world - centre) * 0.35 * (1.0 - below)) / max(aCentre.w, 1.0);',   /* body-side light is taken at the PUFF centre (plus a little in-puff gradient seen side-on): per-fragment it painted the same gradient on every puff, which stacked into plates seen from below */
   '  vec3 Lw = normalize(uLightWorld); vLs = vec2(dot(Lw, camRight) * (flip ? -1.0 : 1.0), dot(Lw, camUp)) * (1.0 - 0.85 * below);',   /* the key projected into this puff's texture plane: the self-shadow march direction */
   '  vec3 vd = world - cameraPosition; float vl = max(length(vd), 1.0); vElev = vd.y / vl; vFwd = max(dot(vd / vl, Lw), 0.0);',
   '  vDist = length(cameraPosition - centre);',
+  '  vec3 dO = (centre - aCentre.xyz) / vec3(max(aCentre.w, 1.0), max(aCloud.y * 0.5, 1.0), max(aCentre.w, 1.0)); vShell = length(dO - toCam * dot(dO, toCam));',   /* M9: the puff's place in the body's SILHOUETTE (ellipsoid-normalised, projected across the view): 0 = covered core, ~1 = the visible outline */
   '  gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);',
   '}'].join('\n');
 
 var FRAG = [
   'uniform sampler2D uMap; uniform vec3 uTop, uShade, uRim, uHaze, uLightWorld; uniform float uOpacity, uRimK, uHazeNear, uHazeFar, uHazeMax, uBaseDark, uShadowK, uTime; uniform vec2 uHor;',
-  'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow;',
+  'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow; varying float vShell; varying float vFade;',
   'vec4 cellTex(vec2 u) { return texture2D(uMap, vCell + clamp(u, 0.006, 0.994) * 0.5); }',
   'void main() {',
   '  vec2 u = vUv; u.x += 0.01 * sin(vPuff.y * 40.0 + uTime * 0.04);',   /* a slow boil */
-  '  vec4 tex = cellTex(u); float dens = tex.a; float a = dens * vPuff.z * uOpacity * mix(1.0, smoothstep(0.0, 0.8, dens), vBelow * 0.6); if (a < 0.004) discard;',
+  '  float shell = smoothstep(0.3, 0.85, vShell);',   /* M9 (owner: clouds still read as stacked pancakes): a puff INSIDE the body must not draw its own outline */
+  '  vec4 tex = cellTex(u); float dens = tex.a; float a = dens * vPuff.z * uOpacity * mix(1.0, smoothstep(0.0, 0.85, dens), vBelow) * mix(smoothstep(0.0, 0.6, dens), 1.0, shell * (1.0 - vBelow * 0.7)) * vFade; if (a < 0.004) discard;',   /* interior puffs fade in softly and merge; shell puffs keep the crisp cauliflower silhouette */
   '  float occl = 0.0;',
   '#if CLOUD_TAPS > 0',
   '  occl = cellTex(u + vLs * 0.06).r * 0.55;',   /* thickness between this point and the key, inside the puff */
@@ -58,12 +62,12 @@ var FRAG = [
   '#endif',
   '  vec3 Lw = normalize(uLightWorld); float side = dot(normalize(vRel + vec3(0.0, 0.2, 0.0)), Lw);',   /* which side of the whole BODY faces the key */
   '  float sunK = clamp(0.5 + 0.5 * side, 0.0, 1.0); sunK = sunK * sunK * (3.0 - 2.0 * sunK); float h = smoothstep(0.0, 0.9, vH);',
-  '  float lit = sunK * (1.0 - uShadowK * clamp(occl, 0.0, 1.0)) * (0.6 + 0.4 * h) + 0.2 * h;',
+  '  float lit = sunK * (1.0 - uShadowK * clamp(occl * mix(0.3, 1.0, shell), 0.0, 1.0)) * (0.6 + 0.4 * h) + 0.2 * h;',   /* the in-puff self-shadow belongs to the body surface; inside the body it painted one gradient per puff */
   '  float baseK = 1.0 - smoothstep(0.0, 0.3, vH);',   /* flat, darker bases */
   '  lit = mix(lit, 0.22 + 0.18 * (1.0 - clamp(tex.r, 0.0, 1.0)) + 0.12 * sunK, vBelow); baseK = mix(baseK, 0.7, vBelow);',   /* seen from below, the whole underside shares one tone (lighter where thin): stacked puffs at different heights otherwise outline each other as discs */
-  '  vec3 col = mix(uShade, uTop, clamp(lit, 0.0, 1.0)) * (1.0 - uBaseDark * baseK * (1.0 - 0.5 * sunK)) * (0.95 + 0.1 * tex.r);',
+  '  vec3 col = mix(uShade, uTop, clamp(lit, 0.0, 1.0)) * (1.0 - uBaseDark * baseK * (1.0 - 0.5 * sunK)) * (0.95 + 0.1 * tex.r * shell);',
   '  float edge = 1.0 - smoothstep(0.06, 0.55, dens);',   /* thin parts scatter the key forward: a silver lining, strongest toward the light */
-  '  col += uRim * uRimK * edge * (0.1 + 1.6 * pow(vFwd, 5.0)) * (0.35 + 0.65 * sunK) * (1.0 - 0.7 * vBelow);',
+  '  col += uRim * uRimK * edge * shell * (0.1 + 1.6 * pow(vFwd, 5.0)) * (0.35 + 0.65 * sunK) * (1.0 - 0.7 * vBelow);',   /* the silver lining rims the BODY silhouette, not every puff */
   '  float fogK = smoothstep(uHazeNear, uHazeFar, vDist) * uHazeMax; float horK = 1.0 - smoothstep(uHor.x, uHor.y, vElev);',   /* aerial perspective + the horizon haze swallowing distant bases */
   '  col = mix(col, uHaze, clamp(fogK + horK * 0.55, 0.0, 0.92)); a *= (1.0 - horK * 0.6) * (1.0 - fogK * 0.3);',
   '  gl_FragColor = vec4(col, a);',
@@ -148,6 +152,11 @@ export function createCloudBodies(ctx, L, opts) {
     for (var p = 0; p < raw.length; p++) { if (p % Math.max(1, Math.round(raw.length / keep)) !== 0 && raw.length > keep) continue; var P = raw[p]; P.cloud = cl; P.seed = rnd();
       if (P.v === undefined) P.v = P.flat ? (style === 'STRATUS' && rnd() < 0.15 ? 3 : 2) : (P.height >= 1 ? 0 : (style === 'STRATUS' ? (rnd() < 0.7 ? 1 : 3) : (rnd() < 0.55 ? 0 : 1)));   /* atlas shape per puff */
       cl.puffs.push(P); puffs.push(P); }
+    /* M9 BASE PLATE (owner: clouds read as stacked pancakes / cards from below): ONE horizontal soft card per body at its base, the body's
+       footprint, aligned with its yaw. Seen from below it takes over from the base puffs (a row of upright base puffs seen end-on stacked
+       into a tower of ellipses), so the underside reads as one flat, darker surface; from the side it is edge-on and invisible. */
+    var bx0 = 1e9, bx1 = -1e9, bz = 0, by = 1e9; cl.puffs.forEach(function (Q) { bx0 = Math.min(bx0, Q.x - Q.w * 0.42); bx1 = Math.max(bx1, Q.x + Q.w * 0.42); bz = Math.max(bz, Math.abs(Q.z) + Q.w * 0.3); if (Q.flat) by = Math.min(by, Q.y - Q.h * 0.3); });
+    if (by < 1e8) { var PL = { x: (bx0 + bx1) / 2, y: by, z: 0, w: (bx1 - bx0), h: bz * 2, height: 0, flat: 2, v: 1, plate: true, cloud: cl, seed: Math.abs(Math.sin(cl.x0 * 12.9898 + cl.z0 * 78.233) * 43758.5453) % 1 };   /* a positional hash: the plate never draws from the shared sky stream (the composition stays put) */ cl.puffs.push(PL); puffs.push(PL); }
     clouds.push(cl); }
   var geo = new THREE.PlaneGeometry(1, 1); own.push(geo); var aPuff = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aPuff.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aPuff', aPuff); var aCloud = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 2), 2); aCloud.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aCloud', aCloud);
   var aCentre = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aCentre.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aCentre', aCentre);
@@ -158,11 +167,11 @@ export function createCloudBodies(ctx, L, opts) {
   own.push(mat);
   var mesh = new THREE.InstancedMesh(geo, mat, puffs.length); mesh.name = 'SKY_' + L.id; mesh.frustumCulled = false; mesh.userData.noMerge = true; mesh.renderOrder = opts.renderOrder || 4; mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.userData.cloudSilhouette = { kind: tower ? 'LIT_TOWER_CLUSTER' : 'LIT_PUFF_CLUSTER', rectangular: false, feathered: true, clouds: clouds.length, puffs: puffs.length, tier_scale: tierScale, shapes: 'ATLAS_4_NOISE_ERODED', self_shadow_taps: taps, style: style };
-  var _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(); var order = puffs.map(function (p, i) { return i; }); var sortClock = 1e9;
+  var _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _qp = new THREE.Quaternion(), _up = new THREE.Vector3(0, 1, 0); var order = puffs.map(function (p, i) { return i; }); var sortClock = 1e9;
   function write(camPos) {  /* recompute world puff positions from the drifting cloud origins; with camPos also re-sort back-to-front */
     for (var i = 0; i < puffs.length; i++) { var P = puffs[i], c = P.cloud, cs = Math.cos(c.yaw), sn = Math.sin(c.yaw); P.wx = c.x + P.x * cs - P.z * sn; P.wy = c.y + P.y; P.wz = c.z + P.x * sn + P.z * cs; P.d2 = camPos ? (P.wx - camPos.x) * (P.wx - camPos.x) + (P.wy - camPos.y) * (P.wy - camPos.y) + (P.wz - camPos.z) * (P.wz - camPos.z) : 0; }
     if (camPos) order.sort(function (a, b) { return puffs[b].d2 - puffs[a].d2; });   /* back-to-front */
-    for (var j = 0; j < order.length; j++) { var Q = puffs[order[j]]; _p.set(Q.wx, Q.wy, Q.wz); _s.set(Q.w, Q.h, 1); _m.compose(_p, _q, _s); mesh.setMatrixAt(j, _m); aPuff.setXYZW(j, Q.height, Q.v + Q.seed * 0.998, 0.5 + 0.34 * (1 - Q.flat * 0.25), Q.flat); aCloud.setXY(j, Q.cloud.y - Q.cloud.len * 0.02, Q.cloud.extent); aCentre.setXYZW(j, Q.cloud.x, Q.cloud.y + Q.cloud.extent * 0.45, Q.cloud.z, Q.cloud.rad); }
+    for (var j = 0; j < order.length; j++) { var Q = puffs[order[j]]; _p.set(Q.wx, Q.wy, Q.wz); if (Q.plate) { _qp.setFromAxisAngle(_up, -Q.cloud.yaw); _s.set(Q.w, 1, Q.h); _m.compose(_p, _qp, _s); } else { _s.set(Q.w, Q.h, 1); _m.compose(_p, _q, _s); } mesh.setMatrixAt(j, _m); aPuff.setXYZW(j, Q.height, Q.v + Q.seed * 0.998, 0.5 + 0.34 * (1 - Q.flat * 0.25), Q.flat); aCloud.setXY(j, Q.cloud.y - Q.cloud.len * 0.02, Q.cloud.extent); aCentre.setXYZW(j, Q.cloud.x, Q.cloud.y + Q.cloud.extent * 0.45, Q.cloud.z, Q.cloud.rad); }
     mesh.instanceMatrix.needsUpdate = true; aPuff.needsUpdate = true; aCloud.needsUpdate = true; aCentre.needsUpdate = true; }
   write(null);
   function setLook(look) { var U = mat.uniforms; U.uTop.value.set(look.top); U.uShade.value.set(look.shade); U.uRim.value.set(look.rim); U.uHaze.value.set(look.haze); U.uOpacity.value = look.opacity; U.uRimK.value = look.rimK;
