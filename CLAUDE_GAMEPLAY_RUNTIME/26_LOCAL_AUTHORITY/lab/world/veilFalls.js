@@ -24,6 +24,26 @@ var NOISE = [
   '  if (t < 0.2) return mix(v, i, t / 0.2); if (t < 0.4) return mix(i, w, (t - 0.2) / 0.2); if (t < 0.6) return mix(w, g, (t - 0.4) / 0.2); if (t < 0.8) return mix(g, p, (t - 0.6) / 0.2); return mix(p, v, (t - 0.8) / 0.2); }'
 ].join('\n');
 
+/* THE VEIL WATER (M12), shared with the older falls (macro.js): aerated streak water flowing down the sheet, horsetail strands, lip / base
+   aeration and a faint spectral sheen; darker at night. uv.x runs across the sheet, uv.y from the lip (0) to the base (1) — flipV for a
+   PlaneGeometry (1 at the top); sx scales the across-sheet frequencies to the sheet's width (1 = the 24–58 m Veil ribbon). */
+export function veilWaterMaterial(THREE, opts) { opts = opts || {};
+  var U = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uNight: { value: opts.night ? 1 : 0 }, uSX: { value: opts.sx || 1 }, uFlip: { value: opts.flipV ? 1 : 0 } }]);
+  return new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
+    vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\nvoid main() { vUv = uv; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
+    fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uSX; uniform float uFlip; varying vec2 vUv;', NOISE,
+        'void main() { float x = vUv.x, y = mix(vUv.y, 1.0 - vUv.y, uFlip), t = uTime, xs = x * uSX;',
+        '  float n1 = vfN(vec2(xs * 20.0, y * 5.5 - t * 1.7)), n2 = vfN(vec2(xs * 57.0 + 3.1, y * 11.0 - t * 2.6)), n3 = vfN(vec2(xs * 7.0 - 1.3, y * 2.2 - t * 0.9));',
+        '  float streak = smoothstep(0.32, 0.92, n1 * 0.55 + n2 * 0.3 + n3 * 0.15);',
+        '  float rag = vfN(vec2(xs * 9.0, y * 16.0 - t * 1.3)); float side = min(x, 1.0 - x); float edge = smoothstep(0.0, 0.2 + 0.12 * rag, side);',
+        '  float aer = (1.0 - smoothstep(0.0, 0.1, y)) + smoothstep(0.72, 1.0, y) * 0.9;',
+        '  float strand = smoothstep(0.22, 0.72, vfN(vec2(xs * 6.5 + 11.0, y * 0.8 - t * 0.04)) * 0.75 + vfN(vec2(xs * 15.0 - 4.0, y * 1.6)) * 0.25);',   /* a horsetail veil: uneven strands, not one flat sheet */
+        '  vec3 body = mix(vec3(0.74, 0.84, 0.96), vec3(0.985, 0.99, 1.0), clamp(streak * 0.8 + aer * 0.6 + strand * 0.2, 0.0, 1.0));',
+        '  vec3 sp = vfSpec(y * 1.5 + x * 0.7 - t * 0.02); body += sp * (0.06 + 0.1 * aer + 0.08 * (1.0 - edge));',   /* light interference in the veil */
+        '  body *= mix(1.0, 0.4, uNight); body += sp * 0.07 * uNight;',
+        '  float a = edge * mix(0.35, 1.0, strand) * (0.58 + 0.4 * streak + 0.25 * aer);',
+        '  gl_FragColor = vec4(body, clamp(a, 0.0, 0.96));', '#include <fog_fragment>', '}'].join('\n') }); }
+
 export function createVeilFalls(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var group = null, own = [], night = !!ctx.night, clock = 0, info = {};
   var waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null;
@@ -52,21 +72,7 @@ export function createVeilFalls(ctx) {
     for (j = 0; j < NR; j++) for (i = 0; i < NC; i++) { var a = j * (NC + 1) + i, b = a + NC + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
     var rg = keep(new THREE.BufferGeometry()); rg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); rg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); rg.setIndex(idx); rg.computeBoundingSphere(); return rg; }
     var fg = ribbon(1, OFF);
-    waterU = fogUniforms({ uTime: { value: 0 }, uNight: { value: night ? 1 : 0 } });
-    var fallMat = keep(new THREE.ShaderMaterial({ uniforms: waterU, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
-      vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\nvoid main() { vUv = uv; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
-      fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; varying vec2 vUv;', NOISE,
-        'void main() { float x = vUv.x, y = vUv.y, t = uTime;',
-        '  float n1 = vfN(vec2(x * 20.0, y * 5.5 - t * 1.7)), n2 = vfN(vec2(x * 57.0 + 3.1, y * 11.0 - t * 2.6)), n3 = vfN(vec2(x * 7.0 - 1.3, y * 2.2 - t * 0.9));',
-        '  float streak = smoothstep(0.32, 0.92, n1 * 0.55 + n2 * 0.3 + n3 * 0.15);',
-        '  float rag = vfN(vec2(x * 9.0, y * 16.0 - t * 1.3)); float side = min(x, 1.0 - x); float edge = smoothstep(0.0, 0.2 + 0.12 * rag, side);',
-        '  float aer = (1.0 - smoothstep(0.0, 0.1, y)) + smoothstep(0.72, 1.0, y) * 0.9;',
-        '  float strand = smoothstep(0.22, 0.72, vfN(vec2(x * 6.5 + 11.0, y * 0.8 - t * 0.04)) * 0.75 + vfN(vec2(x * 15.0 - 4.0, y * 1.6)) * 0.25);',   /* a horsetail veil: uneven strands, not one flat sheet */
-        '  vec3 body = mix(vec3(0.74, 0.84, 0.96), vec3(0.985, 0.99, 1.0), clamp(streak * 0.8 + aer * 0.6 + strand * 0.2, 0.0, 1.0));',
-        '  vec3 sp = vfSpec(y * 1.5 + x * 0.7 - t * 0.02); body += sp * (0.06 + 0.1 * aer + 0.08 * (1.0 - edge));',   /* light interference in the veil */
-        '  body *= mix(1.0, 0.4, uNight); body += sp * 0.07 * uNight;',
-        '  float a = edge * mix(0.35, 1.0, strand) * (0.58 + 0.4 * streak + 0.25 * aer);',
-        '  gl_FragColor = vec4(body, clamp(a, 0.0, 0.96));', '#include <fog_fragment>', '}'].join('\n') }));
+    var fallMat = keep(veilWaterMaterial(THREE, { night: night })); waterU = fallMat.uniforms;
     var fall = new THREE.Mesh(fg, fallMat); fall.name = 'VEIL_FALLS_RIBBON'; fall.renderOrder = 6; group.add(fall);
     /* the wet rock band behind the water: a darker, glistening stripe on the face so the white water reads against the pale rock */
     var wetU = fogUniforms({ uNight: { value: night ? 1 : 0 } }); var wetMat = keep(new THREE.ShaderMaterial({ uniforms: wetU, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
