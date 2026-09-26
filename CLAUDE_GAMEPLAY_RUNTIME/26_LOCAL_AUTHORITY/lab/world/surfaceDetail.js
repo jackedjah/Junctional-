@@ -201,7 +201,7 @@ var GEO_FUNCS = [
 
 export function applyGeology(THREE, mat, spec) {
   if (!mat || (PATCHED ? PATCHED.has(mat) : (mat.userData && mat.userData.surfaceDetail))) return mat;
-  var S = Object.assign({ snowY: 1e5, strata: 2.6, major: 0, ledge: 0.32, joint: 4.5, fracture: 1, cleft: 1, macro: 0.16, grain: 0.07, bump: 1, lit: true, tier: 'HIGH', lod: [60, 900], bumpLod: [40, 260] }, spec || {});
+  var S = Object.assign({ snowY: 1e5, strata: 2.6, major: 0, ledge: 0.32, joint: 4.5, fracture: 1, cleft: 1, macro: 0.16, grain: 0.07, bump: 1, lit: true, tier: 'HIGH', lod: [60, 900], bumpLod: [40, 260], relief: null }, spec || {});
   var LOW = S.tier === 'LOW', lit = S.lit && !!mat.isMeshStandardMaterial, MAJ = S.major || S.strata * 3.2;
   /* v2 (M8C iteration 2): the first cut read as a crazed-glaze web (an isotropic Voronoi everywhere) with dotted "stitching" where thin ledge
      lips went through the derivative bump. Rock now reads in three orders, each only where it can resolve: MAJOR BEDS (≈ 8 m: value zoning
@@ -229,15 +229,22 @@ export function applyGeology(THREE, mat, spec) {
     'float gGrain = (geoN(gUV * 1.1) * 0.6 + geoN(gUV * 3.3) * 0.4 - 0.5) * gNear;',
     'gH += -gCleft * 1.6 + gGrain * 0.35; gTone *= (1.0 - gJoint * 0.34) * (1.0 - gCrack * 0.38) * (1.0 - gCleft * 0.42) * (1.0 + gGrain * ' + f(S.grain * 2) + '); gRough *= 1.0 + gJoint * 0.12 + gCrack * 0.12 + gCleft * 0.08 + gGrain * 0.1;');
   body.push('float gMacro = geoFbm(vSdW.xz * 0.004 + vec2(vSdW.y * 0.002)) - 0.5; gTone *= 1.0 + gMacro * ' + f(S.macro * 2) + ';');
+  /* M9 MACRO RELIEF (spec.relief = [amplitude m, width m]): the rock MASS — fall-line gullies and buttress ribs 10–40 m across, stretched down
+     the slope and ridged, entering the bump at mountain distances (they are what a large face shows from the plaza). With smooth-shaded
+     geometry this replaces the hard low-poly facet edges with continuous, believable relief; the gullies also carry a darker value. */
+  var RU = S.reliefPolar ? 'atan(vSdW.x - ' + f(S.reliefPolar[0]) + ', vSdW.z - ' + f(S.reliefPolar[1]) + ') * ' + f(S.reliefPolar[2]) : 'gUV.x';   /* polar bearing (ring features): continuous across faces — the per-face projection jumps at every edge; the ±π wrap sits due south (the open sea, no ridge) */
+  if (S.relief) body.push('vec2 gRp = vec2((' + RU + ') / ' + f(S.relief[1]) + ', vSdW.y / ' + f(S.relief[1] * 2.6) + ') + vec2(gWarp * 0.02, 0.0); float gRn = geoFbm(gRp); float gRr = 1.0 - abs(2.0 * geoFbm(gRp * vec2(1.7, 0.8) + 3.1) - 1.0);',
+    'float gRelief = (gRn * 0.55 + gRr * 0.45 - 0.5) * ' + f(S.relief[0]) + '; gTone *= 1.0 + (gRn - 0.5) * 0.34 + (gRr - 0.5) * 0.12;');
+  else body.push('float gRelief = 0.0;');
   if (S.snowY < 1e4) body.push('float gUp = gAn.y; float gSnow = smoothstep(0.55, 0.8, gUp + gLip * 0.25) * smoothstep(' + f(S.snowY - 18) + ', ' + f(S.snowY + 14) + ', vSdW.y + (geoFbm(vSdW.xz * 0.02) - 0.5) * 36.0);');
   else body.push('float gSnow = 0.0;');
   body.push('diffuseColor.rgb *= mix(gTone, 1.0, gSnow * 0.9);', 'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.9, 0.93, 0.97) * diffuse, gSnow * 0.88);');
   var frag = function (fs) {
     fs = fs.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + GEO_FUNCS).replace('#include <color_fragment>', body.join('\n'));
     if (lit) { fs = fs.replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(mix(roughnessFactor * gRough, 0.55, gSnow), 0.3, 1.0);');
-      if (!LOW && S.bump > 0) fs = fs.replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nnormal = geoBump(-vViewPosition, normal, gH * ' + f(S.bump) + ' * (1.0 - smoothstep(' + f(S.bumpLod[0]) + ', ' + f(S.bumpLod[1]) + ', gDist)));'); }
+      if (!LOW && S.bump > 0) fs = fs.replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nnormal = geoBump(-vViewPosition, normal, gH * ' + f(S.bump) + ' * (1.0 - smoothstep(' + f(S.bumpLod[0]) + ', ' + f(S.bumpLod[1]) + ', gDist)) + gRelief * (1.0 - smoothstep(700.0, 1500.0, gDist)));'); }
     return fs; };
-  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-geo-' + [S.snowY < 1e4 ? Math.round(S.snowY) : 'x', S.strata, S.ledge, S.fracture, S.cleft, S.macro, S.grain, S.bump, lit ? 'L' : 'U', LOW ? 'lo' : 'hi', S.lod.join('x'), S.bumpLod.join('x'), MAJ, S.joint, 'v2b'].join('_');
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-geo-' + [S.snowY < 1e4 ? Math.round(S.snowY) : 'x', S.strata, S.ledge, S.fracture, S.cleft, S.macro, S.grain, S.bump, lit ? 'L' : 'U', LOW ? 'lo' : 'hi', S.lod.join('x'), S.bumpLod.join('x'), MAJ, S.joint, S.relief ? 'r' + S.relief.join('x') + (S.reliefPolar ? 'p' + S.reliefPolar.join('x') : '') : 'r0', 'v2b'].join('_');
   mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW; varying vec3 vSdN;').replace('#include <project_vertex>', ['#include <project_vertex>',
       '{ vec4 sdP = vec4(transformed, 1.0);', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; vSdN = vec3(0.0, 1.0, 0.0); }'].join('\n'));

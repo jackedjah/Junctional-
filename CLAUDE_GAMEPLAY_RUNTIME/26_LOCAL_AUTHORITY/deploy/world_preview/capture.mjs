@@ -66,7 +66,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   var consoleErrors = []; page.on('console', function (m) { if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 300)); }); page.on('pageerror', function (e) { consoleErrors.push('pageerror: ' + String(e).slice(0, 300)); }); page.on('response', function (r) { if (r.status() >= 400) consoleErrors.push('HTTP ' + r.status() + ' ' + r.url().replace(/^https?:\/\/[^/]+/, '')); });
   var report = { started: new Date().toISOString(), size: SIZE, quality: QUALITY, settle_ms: SETTLE, views: [], console_errors: consoleErrors };
   try {
-    await page.goto(origin + LAB_URL + 'world_preview.html?quality=' + QUALITY + '&sky=day' + (SHOW ? '&show=1' : ''), { waitUntil: 'load', timeout: 120000 });
+    await page.goto(origin + LAB_URL + 'world_preview.html?quality=' + QUALITY + '&sky=day' + (SHOW ? '&show=1' : '') + (arg('--qs', '') ? '&' + arg('--qs', '') : ''), { waitUntil: 'load', timeout: 120000 });   /* --qs k=v&k2=v2: dev switches for A/B renders */
     var st = null; for (var i = 0; i < 240; i++) { st = await page.evaluate(function () { return window.WP ? window.WP.state() : null; }); if (st && (st.error || (st.world && (st.world.status === 'READY' || st.world.status === 'FAILED')))) break; await sleep(1000); }
     report.ready = st; console.log('state', JSON.stringify(st).slice(0, 400));
     report.prewarm = await page.evaluate(function () { return window.WP.prewarm(); });
