@@ -1,0 +1,348 @@
+{
+ "started": "2026-09-26T03:19:29.226Z",
+ "size": [
+  1280,
+  720
+ ],
+ "quality": "HIGH",
+ "settle_ms": 3000,
+ "views": [
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "NIGHT",
+   "clock": 2.4,
+   "file": "V08_NIGHT_t2.4.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 228,
+    "triangles": 964146,
+    "geometries": 295,
+    "textures": 55,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 19251
+  },
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "NIGHT",
+   "clock": 7.2,
+   "file": "V08_NIGHT_t7.2.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 228,
+    "triangles": 964146,
+    "geometries": 295,
+    "textures": 55,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 10738
+  },
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "NIGHT",
+   "clock": 12,
+   "file": "V08_NIGHT_t12.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 228,
+    "triangles": 964146,
+    "geometries": 295,
+    "textures": 55,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 10769
+  },
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "NIGHT",
+   "clock": 16.8,
+   "file": "V08_NIGHT_t16.8.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 228,
+    "triangles": 964146,
+    "geometries": 295,
+    "textures": 55,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 10720
+  },
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "NIGHT",
+   "clock": 21.6,
+   "file": "V08_NIGHT_t21.6.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 228,
+    "triangles": 964146,
+    "geometries": 295,
+    "textures": 55,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 10670
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 2.4,
+   "file": "V13_NIGHT_t2.4.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 284,
+    "triangles": 1564809,
+    "geometries": 394,
+    "textures": 64,
+    "programs": 126
+   },
+   "frames_in_600ms": 1,
+   "ms": 26060
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 7.2,
+   "file": "V13_NIGHT_t7.2.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 284,
+    "triangles": 1564809,
+    "geometries": 394,
+    "textures": 64,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 21556
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 12,
+   "file": "V13_NIGHT_t12.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 284,
+    "triangles": 1564809,
+    "geometries": 394,
+    "textures": 64,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 21543
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 16.8,
+   "file": "V13_NIGHT_t16.8.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 280,
+    "triangles": 1564585,
+    "geometries": 394,
+    "textures": 64,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 17154
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 21.6,
+   "file": "V13_NIGHT_t21.6.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 280,
+    "triangles": 1564585,
+    "geometries": 394,
+    "textures": 64,
+    "programs": 126
+   },
+   "frames_in_600ms": 0,
+   "ms": 17198
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 8,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (333 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (23 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (15 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 3517.5,
+  "error": null
+ },
+ "finished": "2026-09-26T03:22:40.159Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 62,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (333 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (23 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (15 ms)"
+  ]
+ }
+}

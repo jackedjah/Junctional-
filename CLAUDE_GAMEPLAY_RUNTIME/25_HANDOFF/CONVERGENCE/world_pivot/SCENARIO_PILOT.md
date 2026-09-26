@@ -63,3 +63,11 @@ stays. It does not change the sky, the buildings or anything outside the ridges.
 - **Platinum: not tested** — blocked by the free plan's 50 CU generation allowance (17 CU left). It needs either a plan upgrade, the allowance
   to reset, or an owner decision to allow a medium-quality (12 CU) generation instead.
 - Nothing here is canonical: no texture, loader or shader path from the pilot is in the branch runtime.
+
+## M8E note (2026-09-26): platinum not requested
+
+The M8E architecture pass re-asked whether the 12 CU medium platinum map would materially improve the facades. It would not: the three
+wall families (`FACADE_PLAIN`, `COMPOSITE`, `CLADDING`) already carry per-panel tone, roughness, macro value, grain, seams and bevels, and a
+1024 px panel map is micro detail (2–3 mm per pixel on a 2 m panel) that mips away at the 5–40 m the facades are seen from — the same case
+as rock variants A / B, which gave no material gain. The facade gain came from geometry and light (windows, frames, rooflines, occupancy).
+0 CU spent; 17 CU of the free allowance remain.
