@@ -98,7 +98,7 @@ export function createVeilFalls(ctx) {
       mistU = { uTime: { value: 0 }, uNight: { value: night ? 1 : 0 }, uScale: { value: 700 }, uOut: { value: new THREE.Vector2(-ox, -oz) } };
       var mistMat = keep(new THREE.ShaderMaterial({ uniforms: mistU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
         vertexShader: 'attribute float aSeed; attribute float aRise; uniform float uTime; uniform float uScale; uniform vec2 uOut; varying float vA;\nvoid main() { float ph = fract(aSeed + uTime * (0.03 + aSeed * 0.02)); vec3 p = position; p.y += ph * aRise; p.xz += uOut * ph * aRise * 0.35; p.x += sin(uTime * 0.3 + aSeed * 40.0) * 4.0 * ph; p.z += cos(uTime * 0.23 + aSeed * 31.0) * 3.0 * ph;\n  vA = sin(ph * 3.14159) * (0.55 + 0.45 * aSeed); vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_PointSize = uScale * (8.0 + 18.0 * ph) / max(1.0, -mv.z); gl_Position = projectionMatrix * mv; }',
-        fragmentShader: 'uniform float uNight; varying float vA;\nvoid main() { float r = length(gl_PointCoord - 0.5) * 2.0; if (r > 1.0) discard; float s = pow(1.0 - r, 1.8); gl_FragColor = vec4(vec3(0.93, 0.96, 1.0) * s * vA * mix(0.2, 0.1, uNight), 1.0); }' }));
+        fragmentShader: 'uniform float uNight; varying float vA;\nvoid main() { float r = length(gl_PointCoord - 0.5) * 2.0; if (r > 1.0) discard; float s = pow(1.0 - r, 1.8); gl_FragColor = vec4(vec3(0.93, 0.96, 1.0) * s * vA * mix(0.085, 0.1, uNight), 1.0); }' }));
       var mist = new THREE.Points(mg, mistMat); mist.name = 'VEIL_FALLS_MIST'; mist.renderOrder = 7; group.add(mist); info.mist = NM; }
 
     /* ---------- 3. the highland mesa ---------- */
@@ -192,9 +192,9 @@ export function createVeilFalls(ctx) {
     /* ---------- 4. the aura language (one shared field, built by aura.js) ---------- */
     var A = ctx.auraRequests; if (A) { var mid = onLine(inC, crC, (yTop + yBot) / 2), midC2 = onLine(inC, crC, yTop + (yBot - yTop) * 0.46);
       A.push({ x: mid.x - ox * 8, y: mid.y, z: mid.z - oz * 8, size: 40, aspect: 2.1, ring: 0, tint: 0x8c84c8, spectral: 0.55, intensity: 0.3, pull: 16, phase: 0.3 });   /* the veil glow hugging the fall (fringes, no circle) */
-      A.push({ x: baseX - ox * 6, y: 12, z: baseZ - oz * 6, size: 72, aspect: 0.5, ring: 0, tint: 0xeef4ff, spectral: 0.35, intensity: 0.5, pull: 14, nightK: 0.55 });                /* the base mist bloom */
+      A.push({ x: baseX - ox * 6, y: 12, z: baseZ - oz * 6, size: 72, aspect: 0.5, ring: 0, tint: 0xeef4ff, spectral: 0.35, intensity: 0.3, pull: 14, nightK: 0.92 });                /* the base mist bloom */
       A.push({ x: baseX - ox * 22, y: 6, z: baseZ - oz * 22, size: 48, aspect: 1, ring: 0.8, ringW: 0.07, arc: 1, breakup: 0.35, tint: 0x0c0c14, spectral: 1.0, intensity: 0.95, pull: 6, phase: 1.1, nightK: 0.3 });   /* the mist-bow: an upper arc in the spray */
-      A.push({ x: midC2.x - ox * 6, y: midC2.y, z: midC2.z - oz * 6, size: 26, aspect: 0.8, ring: 0, tint: 0xf4f6ff, spectral: 0.3, intensity: 0.3, pull: 8 });   /* the spray tier half way down */
+      A.push({ x: midC2.x - ox * 6, y: midC2.y, z: midC2.z - oz * 6, size: 26, aspect: 0.8, ring: 0, tint: 0xf4f6ff, spectral: 0.3, intensity: 0.15, pull: 8, nightK: 2.0 });   /* the spray tier half way down */
       A.push({ x: lip.x - ox * 3, y: yTop + 2, z: lip.z - oz * 3, size: 18, aspect: 0.8, ring: 0, tint: SPECTRAL.gold, spectral: 0.45, intensity: 0.28, pull: 6 });          /* the lip glow */
       A.push({ x: sx, y: sy + 2.2 + SH * 0.55, z: sz, size: 18, aspect: 3.2, ring: 0, tint: CLASS_TINT.purple, spectral: 0.6, intensity: 0.34, pull: 6 });               /* the Veil spire column */
       A.push({ x: sx, y: sy + 2.2 + SH, z: sz, size: 12, aspect: 1, ring: 0.65, ringW: 0.08, breakup: 0.85, tint: SPECTRAL.ice, spectral: 0.6, intensity: 0.45, pull: 4, phase: 2.2 }); }
