@@ -1,5 +1,6 @@
 import { ridgeStations, ridgeFaceSegment } from './ridgeLayout.js';
 import { applyGeology } from './surfaceDetail.js';
+import { ridgeWarpField, sculptRidge } from './ridgeSculpt.js';
 
 /* JOB B world module — MACRO GEOGRAPHY (owner B8 §16–§18 "floor down, world up"). Data: registry.macro.
    MOUNTAINS: two ridge bands between the sanctuaries and the far massifs (NEAR 300–420 m, MID 470–560 m) — each ONE merged ribbon mesh
@@ -33,8 +34,8 @@ export function createMacro(ctx) {
          owner OP10 shared visible/collision surface (ridgeLayout → VISIBLE_RIDGE_INNER_FACE proxies), so its rows stay exactly on the proxy
          plane — pushing them into the body left invisible walls in front of the rock. The inner face gets its rock read from rockShader(). */
       var dsp = function (P, sx, sz, amp, sd) { var n = Math.sin(P.x * 0.061 + sd * 1.7) * 0.5 + Math.sin(P.z * 0.053 - sd * 0.9) * 0.35 + Math.sin((P.x + P.z) * 0.137 + sd) * 0.15; var m = Math.max(0, n * 0.5 + 0.5) * amp; return { x: P.x + sx * m, y: P.y + (n * 0.5) * amp * 0.35, z: P.z + sz * m }; };
-      var hA = Math.max(2, a.h), hB = Math.max(2, b2.h);
-      soA = dsp(soA, -ox, -oz, hA * 0.12, idx + 3); soB = dsp(soB, -ox, -oz, hB * 0.12, idx + 3); uoA = dsp(uoA, -ox, -oz, hA * 0.09, idx + 4); uoB = dsp(uoB, -ox, -oz, hB * 0.09, idx + 4);
+      var hA = Math.max(2, a.h), hB = Math.max(2, b2.h), rA = Math.hypot(a.x, a.z) || 1, rB = Math.hypot(b2.x, b2.z) || 1;   /* M10: each station's own radial (not the segment average), so neighbouring segments share their outer-face rows exactly — no slivers */
+      soA = dsp(soA, -a.x / rA, -a.z / rA, hA * 0.12, idx + 3); soB = dsp(soB, -b2.x / rB, -b2.z / rB, hB * 0.12, idx + 3); uoA = dsp(uoA, -a.x / rA, -a.z / rA, hA * 0.09, idx + 4); uoB = dsp(uoB, -b2.x / rB, -b2.z / rB, hB * 0.09, idx + 4);
       var ciA = cBase.clone().lerp(cA, 0.46), ciB = cBase.clone().lerp(cB, 0.46), coA = cBase.clone().lerp(cA, 0.38), coB = cBase.clone().lerp(cB, 0.38), cuiA = cBase.clone().lerp(cA, 0.76), cuiB = cBase.clone().lerp(cB, 0.76), cuoA = cBase.clone().lerp(cA, 0.7), cuoB = cBase.clone().lerp(cB, 0.7);
       push(inA.x, inA.y, inA.z, cBase, nIn); push(siB.x, siB.y, siB.z, ciB, nIn); push(siA.x, siA.y, siA.z, ciA, nIn); push(inA.x, inA.y, inA.z, cBase, nIn); push(inB.x, inB.y, inB.z, cBase, nIn); push(siB.x, siB.y, siB.z, ciB, nIn);
       push(siA.x, siA.y, siA.z, ciA, nIn); push(uiB.x, uiB.y, uiB.z, cuiB, nIn); push(uiA.x, uiA.y, uiA.z, cuiA, nIn); push(siA.x, siA.y, siA.z, ciA, nIn); push(siB.x, siB.y, siB.z, ciB, nIn); push(uiB.x, uiB.y, uiB.z, cuiB, nIn);
@@ -42,9 +43,15 @@ export function createMacro(ctx) {
       push(outA.x, outA.y, outA.z, cBase, nOut); push(soA.x, soA.y, soA.z, coA, nOut); push(soB.x, soB.y, soB.z, coB, nOut); push(outA.x, outA.y, outA.z, cBase, nOut); push(soB.x, soB.y, soB.z, coB, nOut); push(outB.x, outB.y, outB.z, cBase, nOut);
       push(soA.x, soA.y, soA.z, coA, nOut); push(uoA.x, uoA.y, uoA.z, cuoA, nOut); push(uoB.x, uoB.y, uoB.z, cuoB, nOut); push(soA.x, soA.y, soA.z, coA, nOut); push(uoB.x, uoB.y, uoB.z, cuoB, nOut); push(soB.x, soB.y, soB.z, coB, nOut);
       push(uoA.x, uoA.y, uoA.z, cuoA, nOut); push(crestA.x, crestA.y, crestA.z, cA, nOut); push(crestB.x, crestB.y, crestB.z, cB, nOut); push(uoA.x, uoA.y, uoA.z, cuoA, nOut); push(crestB.x, crestB.y, crestB.z, cB, nOut); push(uoB.x, uoB.y, uoB.z, cuoB, nOut); }
+    /* M10 RIDGE SCULPT (lab/world/ridgeSculpt.js): beyond the reach square only — the fins eased into a continuous crest with secondary summits
+       and saddles, rock shelves stepping the faces, fall-line gullies notching the crest. Inside 312 m every triangle is untouched, so the
+       collision face and its proxies are exactly as authored. Waterfall lips on this ridge are held still. */
+    var sculptOn = true; try { sculptOn = !/[?&]ridgeSculpt=0/.test(location.search); } catch (e) { }
+    var sc = null; if (sculptOn) { var keep = ((M && M.waterfalls) || []).filter(function (W) { return W.source_id === R.id; }).map(function (W) { return { x: W.source.x, z: W.source.z, r: 28 }; });
+      sc = sculptRidge(pos, col, ridgeWarpField(R, stations, idx, keep), tier() === 'HIGH' ? 4 : tier() === 'LOW' ? 1 : 3); pos = sc.pos; col = sc.col; nrm = sc.nrm; }
     var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3)); own.push(g);
     var mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.86, metalness: 0.04, flatShading: true, envMapIntensity: 0.14 });   /* faceted rock that answers the Sun; M9: less sky ambient (the faces keep their dark mass) — an A/B showed smoothed normals wash the rock out pale */ own.push(mat);
-    applyGeology(THREE, mat, { snowY: R.h_max * 0.6, strata: 2.6, tier: tier(), relief: [7, 16], reliefPolar: [0, 0, R.dist_m || 400] });   /* M9: MACRO RELIEF — fall-line gullies and buttress ribs cut across the facet planes, so the big faces read as rock mass instead of low-poly triangles (polar coordinates: the ridge is a ring, continuous across faces) */ var mesh = new THREE.Mesh(g, mat); mesh.name = 'MACRO_RIDGE_' + R.id; mesh.frustumCulled = false; mesh.receiveShadow = false; mesh.userData.noMerge = true; group.add(mesh); ridges.push({ R: R, mesh: mesh, tris: pos.length / 9 }); return mesh; }
+    applyGeology(THREE, mat, { snowY: R.h_max * 0.6, strata: 2.6, tier: tier(), relief: [7, 16], reliefPolar: [0, 0, R.dist_m || 400] });   /* M9: MACRO RELIEF — fall-line gullies and buttress ribs cut across the facet planes, so the big faces read as rock mass instead of low-poly triangles (polar coordinates: the ridge is a ring, continuous across faces) */ var mesh = new THREE.Mesh(g, mat); mesh.name = 'MACRO_RIDGE_' + R.id; mesh.frustumCulled = false; mesh.receiveShadow = false; mesh.userData.noMerge = true; group.add(mesh); ridges.push({ R: R, mesh: mesh, tris: pos.length / 9, sculpted: sc ? sc.sculpted : 0 }); return mesh; }
   /* M8C: the ridge faces use the shared GEOLOGY pipeline (lab/world/surfaceDetail.js applyGeology — strata, ledges, fracture joints, clefts,
      macro / micro tone, a derivative bump so every feature catches the Sun, snow on shallow high faces). Shader-only: the inner face stays
      exactly on the owner OP10 collision plane. */
@@ -68,7 +75,7 @@ export function createMacro(ctx) {
     if (beamMat) beamMat.opacity = (night ? 0.7 : 0.42) + 0.14 * Math.sin(clock * 0.8);
     /* contact disturbance: a ripple impulse where the fall meets a live water body (water.js), a few times a second per fall */ for (var q = 0; q < falls.length; q++) { var F = falls[q]; if (!F.W.ripple) continue; F.nextImpulse -= dt || 0; if (F.nextImpulse <= 0) { F.nextImpulse = 0.35 + Math.random() * 0.4; try { var wm = ctx.water; if (wm && wm.impulse) wm.impulse(F.W.receiver.x + (Math.random() - 0.5) * F.W.width_m * 0.6, F.W.receiver.z + (Math.random() - 0.5) * 1.2, 0.35, 1.6); } catch (e) { } } } }
   function setNight(n) { night = !!n; applyNight(night); }
-  function debug() { return { ridges: ridges.map(function (r) { return { id: r.R.id, dist_m: r.R.dist_m, h: [r.R.h_min, r.R.h_max], passes: (r.R.passes || []).length, tris: r.tris }; }), waterfalls: falls.map(function (f) { return { id: f.W.id, drop_m: +(f.W.source.y - f.W.receiver.y).toFixed(1), source: f.W.source_id, receiver: f.W.receiver_id, ripple: !!f.W.ripple, mist: f.mists.length }; }), sky_beams: M && M.sky_beams ? M.sky_beams.map(function (b) { return b.id + '←' + b.source; }) : [], draw_calls: ridges.length + falls.length * 3 + mistSprites.length + (beams ? 1 : 0) }; }
+  function debug() { return { ridges: ridges.map(function (r) { return { id: r.R.id, dist_m: r.R.dist_m, h: [r.R.h_min, r.R.h_max], passes: (r.R.passes || []).length, tris: r.tris, sculpted: r.sculpted }; }), waterfalls: falls.map(function (f) { return { id: f.W.id, drop_m: +(f.W.source.y - f.W.receiver.y).toFixed(1), source: f.W.source_id, receiver: f.W.receiver_id, ripple: !!f.W.ripple, mist: f.mists.length }; }), sky_beams: M && M.sky_beams ? M.sky_beams.map(function (b) { return b.id + '←' + b.source; }) : [], draw_calls: ridges.length + falls.length * 3 + mistSprites.length + (beams ? 1 : 0) }; }
   function dispose() { own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; if (group && group.parent) group.parent.remove(group); }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
 }

@@ -6,6 +6,8 @@ import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath }
 import { HALO_LAYOUT } from '../26_LOCAL_AUTHORITY/play/haloLayout.js';
 import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
 import { createFacadeKit, addCivicBuilding } from '../26_LOCAL_AUTHORITY/lab/world/facadeKit.js';
+import { ridgeStations, ridgeFaceSegment, ridgeReachBounds } from '../26_LOCAL_AUTHORITY/lab/world/ridgeLayout.js';
+import { ridgeWarpField, sculptRidge, REACH_IN, REACH_FLOOR } from '../26_LOCAL_AUTHORITY/lab/world/ridgeSculpt.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
@@ -16,7 +18,7 @@ var R = JSON.parse(src('lab/assets/world/world_registry_v1.json'));
       are linear between the inner base and the crest and are never displaced; the rock displacement may only push OUTER rows into the body. */
 var innerLerp = /var siA = \{ x: inA\.x \* 0\.54 \+ crestA\.x \* 0\.46/.test(MACRO) && /var uiA = \{ x: inA\.x \* 0\.24 \+ crestA\.x \* 0\.76/.test(MACRO);
 var innerDisplaced = /\b(si|ui)[AB]\s*=\s*dsp\(/.test(MACRO);
-var outerInward = (MACRO.match(/\b(so|uo)[AB]\s*=\s*dsp\(\s*(so|uo)[AB]\s*,\s*-ox\s*,\s*-oz/g) || []).length === 4;
+var outerInward = (MACRO.match(/\b(so|uo)[AB]\s*=\s*dsp\(\s*(so|uo)[AB]\s*,\s*-(ox|a\.x \/ rA|b2\.x \/ rB)\s*,\s*-(oz|a\.z \/ rA|b2\.z \/ rB)/g) || []).length === 4;   /* M10: each station's own radial (still into the body) */
 ok('1. the ridge inner (collision) face rows stay on the proxy plane; only the outer rows are displaced, and only into the body', innerLerp && !innerDisplaced && outerInward, { innerLerp: innerLerp, innerDisplaced: innerDisplaced, outerInward: outerInward });
 
 /* 2. HALO: the rim colonnade stands beyond the host playable radius and under the dome shell; the celestial rings are decorative, high above
@@ -74,5 +76,20 @@ var TWR = (R.sky.layers || []).filter(function (L) { return L.follow; }), FW = R
 var farCam = FW ? Math.max.apply(null, [[FW.x1, FW.z1], [FW.x1, FW.z2], [FW.x2, FW.z1], [FW.x2, FW.z2]].map(function (c) { return Math.hypot(c[0] - HALO_LAYOUT.center.x, c[1] - HALO_LAYOUT.center.z); })) + 120 : Infinity;
 var towerSafe = TWR.length > 0 && TWR.every(function (L) { return L.bank && !L.occludes && L.alt_m >= HALO_LAYOUT.arrival_height_m && L.ring_m[0] - L.size_m[1] / 2 - farCam > HALO_LAYOUT.shell_radius_m; });
 ok('8. the camera-relative towering-cumulus ring stays above the deck height and always farther from the HALO than its shell, from anywhere in the field', towerSafe, TWR.map(function (L) { return { id: L.id, alt_m: L.alt_m, nearest_to_halo_m: L.ring_m[0] - L.size_m[1] / 2 - farCam, shell_m: HALO_LAYOUT.shell_radius_m }; }));
+
+/* 9. M10 ridge sculpt: the silhouette / shelf / gully warp lives beyond the reach square only. Sampled over the real ribbon triangles (all
+      level-4 subdivision points) and 150 k random points: nothing whose original position is inside REACH_IN moves, nothing warped lands
+      inside REACH_FLOOR, and REACH_FLOOR clears the FIELD reach square; triangles wholly inside REACH_IN come out bit-identical. */
+var RB = ridgeReachBounds(R), sc9 = { moved_inside: 0, landed_inside: 0, min_landed: 1e9, identical: true, tris: 0 };
+(R.macro.mountains || []).forEach(function (Rg, ri) { var st = ridgeStations(Rg, ri), pos = [], col = [], keep = []; (R.macro.waterfalls || []).forEach(function (W) { if (W.source_id === Rg.id) keep.push({ x: W.source.x, z: W.source.z, r: 28 }); });
+  for (var k = 0; k < (Rg.segments || 160); k++) { var F = ridgeFaceSegment(st, k); if (F.a.h < 2 && F.b.h < 2) continue; [[F.innerA, F.crestB, F.crestA], [F.innerA, F.innerB, F.crestB], [F.outerA, F.crestA, F.crestB], [F.outerA, F.crestB, F.outerB]].forEach(function (T) { T.forEach(function (p) { pos.push(p.x, p.y, p.z); col.push(1, 1, 1); }); }); }
+  var fld = ridgeWarpField(Rg, st, ri, keep), out = sculptRidge(pos, col, fld, 4), mn = function (x, z) { return Math.max(Math.abs(x), Math.abs(z)); }; sc9.tris += out.tris;
+  for (var t = 0; t < pos.length; t += 9) { var ins = [0, 3, 6].every(function (o) { return mn(pos[t + o], pos[t + o + 2]) < REACH_IN; }); if (!ins) continue;
+    var hit = false; for (var q = 0; q + 8 < out.pos.length && !hit; q += 9) if (out.pos[q] === pos[t] && out.pos[q + 1] === pos[t + 1] && out.pos[q + 2] === pos[t + 2] && out.pos[q + 3] === pos[t + 3] && out.pos[q + 6] === pos[t + 6]) hit = true; if (!hit) sc9.identical = false; }
+  var seed = 7 + ri; function rr() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  for (var i = 0; i < 75000; i++) { var x = (rr() - 0.5) * 1500, z = (rr() - 0.5) * 1500, y = rr() * 260 - 4, w = fld.warp(x, y, z), d = Math.abs(w[0] - x) + Math.abs(w[1] - y) + Math.abs(w[2] - z);
+    if (d > 1e-9) { if (mn(x, z) < REACH_IN) sc9.moved_inside++; var m = mn(w[0], w[2]); sc9.min_landed = Math.min(sc9.min_landed, m); if (m < REACH_FLOOR) sc9.landed_inside++; } } });
+var sculptWired = /import \{ ridgeWarpField, sculptRidge \} from '\.\/ridgeSculpt\.js'/.test(MACRO) && /sculptRidge\(pos, col, ridgeWarpField\(R, stations, idx, keep\)/.test(MACRO);
+ok('9. M10 ridge sculpt stays beyond reach: nothing inside ' + REACH_IN + ' m moves, nothing warped lands inside ' + REACH_FLOOR + ' m (reach square ±' + RB.half + ' m), in-reach triangles are bit-identical', sculptWired && RB.half < REACH_FLOOR && sc9.moved_inside === 0 && sc9.landed_inside === 0 && sc9.identical, sc9);
 
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

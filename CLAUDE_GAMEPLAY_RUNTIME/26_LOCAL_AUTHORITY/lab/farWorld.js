@@ -43,15 +43,25 @@ export function createFarWorld(THREE, opts) {
        light / shadow structure instead of a regular pyramid. */
     var g = new THREE.ConeGeometry(r, h, FAR_SEG, FAR_ROWS, true); g.translate(0, h / 2, 0); var P = g.attributes.position, apexShift = (hsh(sd) - 0.5) * r * 0.55;
     var nA = 3 + Math.floor(hsh(sd * 1.7) * 3), aPh = hsh(sd * 2.3) * 6.283;
+    /* M10 (owner: less giant-triangle silhouette): a cone's outline is a triangle whatever its radial noise, so the PROFILE changes —
+       a foot that spreads, full shoulders and a broad crown, stepped SHOULDERS (rock shelves that show in the outline), and a
+       broken summit: the top rows rise and fall round the peak, so the apex becomes one or two broad, uneven summits with a saddle, not one point. */
+    var nT = 2.2 + hsh(sd * 3.1) * 1.8, tPh = hsh(sd * 4.7), sPk = 0.65 + hsh(sd * 5.3) * 0.8, apexY = h * (0.86 + 0.06 * hsh(sd * 6.1));
+    function prof(tt) { tt = Math.max(0, Math.min(1, tt)); return Math.pow(1 - tt, 0.6) * (1 - 0.2 * smooth01(tt / 0.25)); }   /* a spreading foot, full shoulders, a broad crown (a cone is 1 − t) */
     for (var i = 0; i < P.count; i++) { var x = P.getX(i), y = P.getY(i), z = P.getZ(i), t = y / h, rad = Math.hypot(x, z);
       if (rad > 1e-4) { var th = Math.atan2(z, x), n = fbm(x * 0.045 + sd, y * 0.05, z * 0.045 - sd), rn = 1 - Math.abs(2 * fbm(x * 0.022 - sd, y * 0.03, z * 0.022 + sd) - 1);
         var arete = Math.pow(Math.abs(Math.cos((th * nA + aPh + (n - 0.5) * 1.6) * 0.5)), 3.0);   /* spurs: ridgelines from the top down the flanks */
-        var k = 1 + ((n - 0.5) * 0.7 + (rn - 0.55) * 0.45 + (arete - 0.35) * 0.5) * (1 - t * 0.45); x *= k; z *= k; y += (fbm(x * 0.03, y * 0.03 + sd, z * 0.03) - 0.5) * h * 0.1 * (1 - t) + (rn - 0.5) * h * 0.05 * t; }
+        var tf = t * nT + tPh, fr = tf - Math.floor(tf), tStep = t + ((fr * 0.3 + 0.7 * smooth01((fr - 0.6) / 0.34)) - fr) / nT * 0.85;   /* shelves: steep band, then a setback */
+        var kp = prof(tStep) / Math.max(1e-3, 1 - t);
+        var k = (1 + ((n - 0.5) * 0.7 + (rn - 0.55) * 0.45 + (arete - 0.35) * 0.5) * (1 - t * 0.45)) * kp; x *= k; z *= k;
+        var pk = 1 - Math.abs(2 * vnoise(Math.cos(th) * sPk + sd, Math.sin(th) * sPk - sd, sd * 0.37) - 1);   /* summits round the top (wraps: circle coordinates) */
+        y += (fbm(x * 0.03, y * 0.03 + sd, z * 0.03) - 0.5) * h * 0.1 * (1 - t) + (rn - 0.5) * h * 0.05 * t + (pk * 0.7 + pk * pk * 0.3 - 0.45) * h * 0.26 * smooth01((t - 0.45) / 0.5); }
+      else y = apexY;   /* the cone apex drops below the risen top rows: the summits are theirs */
       x += apexShift * t * t; P.setXYZ(i, x, Math.max(0, y), z); }
     g = g.toNonIndexed(); g.applyMatrix4(place(cx, -6, cz, ry, 1, 1, squash)); g.computeVertexNormals(); var p = g.attributes.position, nm = g.attributes.normal, c = new THREE.Color();
     for (var v = 0; v < p.count; v++) { var lam = nm.getX(v) * pSun.x + nm.getY(v) * pSun.y + nm.getZ(v) * pSun.z; var yy = p.getY(v) + 6, tt = yy / h;
       for (var s2 = 0; s2 < 2; s2++) { c.copy(rockShade[s2]).lerp(rockLit[s2], smooth01(lam * 1.25 + 0.18)); c.lerp(baseCol[s2], (1 - smooth01(tt * 2.2)) * 0.4);   /* M9: a firmer lit / shadow split — the massif has a sunlit side and a shadow side */
-        if (tt > 0.62 && nm.getY(v) > 0.28) c.lerp(capCol[s2], smooth01((tt - 0.62) / 0.2) * smooth01((nm.getY(v) - 0.28) / 0.3) * (0.55 + 0.45 * Math.max(0, lam)));
+        if (tt > 0.66 && nm.getY(v) > 0.38) c.lerp(capCol[s2], smooth01((tt - 0.66) / 0.2) * smooth01((nm.getY(v) - 0.38) / 0.3) * (0.55 + 0.45 * Math.max(0, lam)));   /* M10: the broad crowns and shelf tops would wash white — snow only on the high, flatter faces */
         c.lerp(pHaze[s2], Math.min(0.8, mix * 0.8 + (1 - smooth01(tt)) * 0.2)); (s2 ? far.colN : far.colD).push(c.r, c.g, c.b); }   /* M9: less haze wash (the forms were dissolving into near-white) */
       far.pos.push(p.getX(v), p.getY(v), p.getZ(v)); }
     g.dispose(); }
