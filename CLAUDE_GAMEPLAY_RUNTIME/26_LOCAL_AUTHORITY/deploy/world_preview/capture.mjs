@@ -1,14 +1,14 @@
 /* MAHWORLD :: WORLD PREVIEW CAPTURE (dev only). Serves the repository root on 127.0.0.1 with the preview page mounted at
    lab/world_preview.html, opens it in headless Chromium (software WebGL is fine for stills) and writes one JPEG per fixed viewpoint plus a
    JSON report (world status, renderer counters, per-view timing). The viewpoints are FIXED so every world-pivot pass compares like with like.
-   node deploy/world_preview/capture.mjs <outDir> [--views V01,V08] [--tod DAY|NIGHT|BOTH] [--quality HIGH|MED|LOW] [--size 1280x720] [--settle 2500]
+   node deploy/world_preview/capture.mjs <outDir> [--views V01,V08] [--tod DAY|NIGHT|BOTH] [--quality HIGH|MED|LOW] [--size 1280x720] [--settle 2500] [--show] [--clock 2.4,7.2]
    Needs Playwright (global) and a Chromium: PLAYWRIGHT_CHROMIUM or /opt/pw-browsers/chromium. Never used by the game or the package. */
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url'; import { createRequire } from 'node:module'; import { execSync } from 'node:child_process';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.resolve(HERE, '..', '..'); var ROOT = path.resolve(LA, '..', '..');
 var LAB_URL = '/CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/lab/';
 var argv = process.argv.slice(2); function arg(k, d) { var i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; }
 var OUT = path.resolve(argv[0] && argv[0].indexOf('--') !== 0 ? argv[0] : path.join(HERE, 'out')); fs.mkdirSync(OUT, { recursive: true });
-var SIZE = arg('--size', '1280x720').split('x').map(Number); var MAPS = argv.indexOf('--map') >= 0; var QUALITY = arg('--quality', 'HIGH'); var TOD = arg('--tod', 'DAY'); var SHOW = argv.indexOf('--show') >= 0;   /* M8E: force the facade light show on (evidence) */ var SETTLE = +arg('--settle', '2500');
+var SIZE = arg('--size', '1280x720').split('x').map(Number); var MAPS = argv.indexOf('--map') >= 0; var QUALITY = arg('--quality', 'HIGH'); var TOD = arg('--tod', 'DAY'); var SHOW = argv.indexOf('--show') >= 0; var CLOCKS = arg('--clock', null) ? arg('--clock', null).split(',').map(Number) : [null];   /* M8E: pin the simulation clock per frame (s), e.g. one frame per show step */   /* M8E: force the facade light show on (evidence) */ var SETTLE = +arg('--settle', '2500');
 
 /* FIXED viewpoints: [id, label, camera position, look-at]. World axes: +z north (temple / market), +x east (tower), HALO tree at (30, 40). */
 export var VIEWS = [
@@ -74,12 +74,14 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       await page.evaluate(function (t) { return window.WP.time(t); }, tods[ti]); await sleep(800);
       for (var vi = 0; vi < views.length; vi++) {
         var v = views[vi]; var t0 = Date.now();
-        await page.evaluate(function (a) { window.WP.view(a[0], a[1]); window.WP.tag(''); return 1; }, [v[2], v[3]]); await sleep(SETTLE);
+        for (var ci = 0; ci < CLOCKS.length; ci++) { var clk = CLOCKS[ci]; t0 = Date.now();
+        await page.evaluate(function (a) { window.WP.view(a[0], a[1]); window.WP.tag(''); return 1; }, [v[2], v[3]]); if (clk !== null) await page.evaluate(function (c) { return window.WP.clock(c); }, clk); await sleep(SETTLE);
+        if (clk !== null) await page.evaluate(function (c) { return window.WP.clock(c); }, clk);   /* re-pin just before the frame (the clock runs on while settling) */
         var f0 = await page.evaluate(function () { return window.WP.state().frames; }); await sleep(600); var f1 = await page.evaluate(function () { return window.WP.state().frames; });
-        var file = v[0] + '_' + tods[ti] + '.jpg'; await page.screenshot({ path: path.join(OUT, file), type: 'jpeg', quality: 84, timeout: 180000 });   /* software GL can need > 30 s for the first frame after new shader programs compile */
+        var file = v[0] + '_' + tods[ti] + (clk !== null ? '_t' + clk : '') + '.jpg'; await page.screenshot({ path: path.join(OUT, file), type: 'jpeg', quality: 84, timeout: 180000 });   /* software GL can need > 30 s for the first frame after new shader programs compile */
         var stats = await page.evaluate(function () { return window.WP.stats(); });
-        report.views.push({ id: v[0], label: v[1], tod: tods[ti], file: file, pos: v[2], look: v[3], stats: stats, frames_in_600ms: f1 - f0, ms: Date.now() - t0 });
-        console.log(v[0], tods[ti], JSON.stringify(stats));
+        report.views.push({ id: v[0], label: v[1], tod: tods[ti], clock: clk, file: file, pos: v[2], look: v[3], stats: stats, frames_in_600ms: f1 - f0, ms: Date.now() - t0 });
+        console.log(v[0], tods[ti], clk, JSON.stringify(stats)); }
       }
     }
   } catch (e) { report.error = String(e && e.stack || e); console.log('ERROR', report.error); }

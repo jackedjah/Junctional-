@@ -48,6 +48,7 @@ requestAnimationFrame(frame);
 window.WP = {
   THREE: THREE, scene: scene, camera: camera, renderer: renderer, fieldScene: fieldScene, quality: quality,
   state: function () { var w = fieldScene.worldInfo ? fieldScene.worldInfo() : null; return { built: STATE.built, error: STATE.error, frames: STATE.frames, layout: STATE.layout, world: w && { status: w.status, error: w.error }, tod: fieldScene.timeOfDay ? fieldScene.timeOfDay() : null, tier: quality.tier(), log: STATE.log.slice(-12) }; },
+  clock: function (s) { if (typeof s === 'number' && isFinite(s)) t = s; return t; },   /* pin the simulation clock (evidence of timed effects: the facade show) */
   view: function (pos, look) { VIEW.pos.set(pos[0], pos[1], pos[2]); VIEW.look.set(look[0], look[1], look[2]); return true; },
   time: function (tod) { if (fieldScene.setNight) fieldScene.setNight(tod === 'NIGHT', { persist: false }); return fieldScene.timeOfDay ? fieldScene.timeOfDay() : null; },
   prewarm: function () { STATE.prewarm = fieldScene.prewarmTimeStates ? fieldScene.prewarmTimeStates(renderer, camera) : null; return STATE.prewarm; },
