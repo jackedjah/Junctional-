@@ -656,7 +656,7 @@ The image itself is not committed: this repository is public, and the image may 
 | not built — needs the bridge | The reference's pool, low weir cascade and viewing platform. At the curtain's base these would be solid, walkable ground inside the host's reach, so they need colliders and host validation (the runtime bridge). Today the falls are viewed from the plaza, the overlook and the VISIONARY terrace. |
 | cost | Against `bb7f5d3`, measured on the same frames:<br>• HIGH: +1 draw (the crystals), about +10 k triangles on views of the falls.<br>• LOW 393×852: +0 draws, about +7 k triangles. |
 | tests | host safety **19 / 19** (new 17), material realism 10 / 10, colour law 4 / 4, Moon / cloud 19 / 19, ridge collision 8 / 8, M3 night route 13 / 13. The collider file was regenerated: only the registry hash changed.<br>Full suite on `615fdbf`: 61 files, **566 checks passing** (+1: check 17), and the same 34 bridge-blocked files as M11. |
-| evidence | Pinned `bb7f5d3` → pinned `615fdbf`, rendering at the time of this commit; the sheets `m12_reference_pass.jpg` (S2 from the sea, F3 plaza, V17, V06, F5 base, F4 aerial; S2 / F3 at night) and `m12_reference_pass_low.jpg` (LOW 393×852) follow in the next commit. |
+| evidence | Pinned `bb7f5d3` → pinned `615fdbf`:<br>• `m12_reference_pass.jpg`: S2 from the sea, F3 plaza, V17, V06, F5 base, F4 aerial, and S2 / F3 at night.<br>• `m12_reference_pass_low.jpg`: LOW 393×852, S2 / F3. |
 
 ### Evidence, perf, tests
 
