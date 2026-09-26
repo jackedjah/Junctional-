@@ -15,8 +15,8 @@ export function createFarWorld(THREE, opts) {
   var sunDir = new THREE.Vector3(26, 34, 14).normalize();
   /* WORLD PIVOT PASS 2b: BOTH palettes are baked (index 0 = day, 1 = night) and the vertex colours are swapped live by group.userData.setNight —
      the in-game time toggle never rebuilds the field, and these unlit, fog-free silhouettes kept their daylight caps glowing in a night sky. */
-  var PAL = [{ haze: 0x8fb0d0, pHaze: 0xa9c0de, rockLit: 0xaeb6c6, rockShade: 0x4c5674, cap: 0xecf1f9, base: 0x3f4862,   /* M9: cool blue-grey aerial perspective, clearly darker than the horizon sky (the warm near-white read as paper / glass) */ midPlat: 0x9fb0c2, midCrystal: 0xb4cde6, ringIn: 0x2a3341, ringOut: 0xb9c8d6 },
-             { haze: 0x2a4363, pHaze: 0x252a55, rockLit: 0x4f4c7c, rockShade: 0x1b1d3a, cap: 0x77739f, base: 0x141629, midPlat: 0x55657e, midCrystal: 0x5d7aa6, ringIn: 0x141a24, ringOut: 0x1e2c42 }];
+  var PAL = [{ haze: 0x8fb0d0, pHaze: 0xa9c0de, rockLit: 0xaeb6c6, rockShade: 0x4c5674, cap: 0xecf1f9, base: 0x3f4862,   /* M9: cool blue-grey aerial perspective, clearly darker than the horizon sky (the warm near-white read as paper / glass) */ midPlat: 0x9fb0c2, midCrystal: 0xb4cde6, ringIn: 0x2a3341, ringOut: 0xb9c8d6, midGlass: 0x3b4558, midLit: 0xdfe5ee },
+             { haze: 0x2a4363, pHaze: 0x252a55, rockLit: 0x4f4c7c, rockShade: 0x1b1d3a, cap: 0x77739f, base: 0x141629, midPlat: 0x55657e, midCrystal: 0x5d7aa6, ringIn: 0x141a24, ringOut: 0x1e2c42, midGlass: 0x8e97ab, midLit: 0xe8e4d8 }];   /* M9: night — the glazing bands and deck-edge lines are lit (neutral practical light) */
   function pair(k) { return [new THREE.Color(PAL[0][k]), new THREE.Color(PAL[1][k])]; } function pmap(p2, fn) { return [fn(p2[0].clone(), 0), fn(p2[1].clone(), 1)]; }
   var hazeP = pair('haze');
   /* ---------- helpers: merge cone / prism pieces into one geometry with vertex colours ---------- */
@@ -64,10 +64,26 @@ export function createFarWorld(THREE, opts) {
   /* ---------- MID: elevated crystal walkway arcs + prism towers in the empty sectors (lit, fogged naturally) ---------- */
   var mid = { pos: [], colD: [], colN: [], nrm: [] }; var sectors = [Math.PI * 0.62, Math.PI * 0.85, Math.PI * 1.05, Math.PI * 1.28, Math.PI * 1.5, Math.PI * 1.72];   /* bearings (atan2 x,z): the north half holds the temple / market / gym / tower — mid forms stay south, east and west */
   var midPlat = pair('midPlat'), midCrystal = pair('midCrystal');   /* B7 §10 F: the mid forms a step darker than the far ring — three readable depth steps */
+  /* M9 (audit: the mid layer read as white pipes and plain obelisks): towers become three stepped tiers with setbacks, dark glazing bands
+     between them (lit at night) and a pale cap ring per tier; the walkway arcs become real BRIDGES — a deck slab, a darker girder under it,
+     parapets, a thin practical light line along each deck edge by night, piers with caps. Same six sectors, same seeded layout. */
+  var midGlass = pair('midGlass'), midLit = pair('midLit'), UPV = new THREE.Vector3(0, 1, 0);
+  function sweep(curve, n, w, h, yOff, lat) { var pos = [], idx = []; for (var q = 0; q <= n; q++) { var t = q / n, P = curve.getPoint(t), T = curve.getTangent(t), S = new THREE.Vector3().crossVectors(T, UPV).normalize();
+      [[-w / 2, 0], [w / 2, 0], [w / 2, -h], [-w / 2, -h]].forEach(function (c) { pos.push(P.x + S.x * (c[0] + (lat || 0)), P.y + yOff + c[1], P.z + S.z * (c[0] + (lat || 0))); }); }
+    for (q = 0; q < n; q++) { var a = q * 4, b2 = a + 4; [[0, 1], [1, 2], [2, 3], [3, 0]].forEach(function (e) { idx.push(a + e[0], b2 + e[0], b2 + e[1], a + e[0], b2 + e[1], a + e[1]); }); }
+    var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); return g; }
   sectors.forEach(function (b, i) { var dist = 230 + rnd() * 100; var cx = Math.sin(b) * dist, cz = Math.cos(b) * dist;
-    var hT = 55 + rnd() * 55, towerR = 10 + rnd() * 6; pushGeo(mid, new THREE.CylinderGeometry(towerR * 0.34, towerR, hT, 9, 2), place(cx, hT / 2, cz, rnd() * 3, 1, 1, 1), midPlat, true);   /* a shouldered prism tower, not a single cheap spike */
-    pushGeo(mid, new THREE.OctahedronGeometry(7, 0), place(cx, hT + 4, cz, rnd() * 3, 1, 1.8, 1), midCrystal, true);   /* its crystal crown */
-    if (i % 2 === 0) { /* one continuous distant arch with two grounded piers; the old chain of boxes read as a broken half-bridge */ var b2 = sectors[(i + 1) % sectors.length]; var d2 = 230 + rnd() * 100; var ex = Math.sin(b2) * d2, ez = Math.cos(b2) * d2; var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(cx, 22, cz), new THREE.Vector3((cx + ex) * 0.5, 50, (cz + ez) * 0.5), new THREE.Vector3(ex, 22, ez)); pushGeo(mid, new THREE.TubeGeometry(curve, 28, 2.5, 7, false), new THREE.Matrix4(), pmap(midPlat, function (c) { return c.multiplyScalar(0.9); }), true); [0.18, 0.82].forEach(function (u) { var pp = curve.getPoint(u), ph = Math.max(8, pp.y); pushGeo(mid, new THREE.CylinderGeometry(1.7, 3.0, ph, 8), place(pp.x, ph * 0.5, pp.z, 0, 1, 1, 1), pmap(midPlat, function (c) { return c.multiplyScalar(0.82); }), true); }); }
+    var hT = 55 + rnd() * 55, towerR = 10 + rnd() * 6, yaw = rnd() * 3, y0 = 0, frac = [0.46, 0.33, 0.21];
+    frac.forEach(function (f, k) { var th = hT * f, rB = towerR * (1 - k * 0.24), rT = rB * 0.9; pushGeo(mid, new THREE.CylinderGeometry(rT, rB, th - 2.4, 9, 1), place(cx, y0 + (th - 2.4) / 2, cz, yaw, 1, 1, 1), midPlat, true);   /* a tier */
+      pushGeo(mid, new THREE.CylinderGeometry(rT * 0.97, rT * 0.97, 1.8, 9, 1), place(cx, y0 + th - 2.4 + 0.9, cz, yaw, 1, 1, 1), midGlass, true);   /* its glazing band (lit at night) */
+      pushGeo(mid, new THREE.CylinderGeometry(rT * 1.04, rT * 1.04, 0.6, 9, 1), place(cx, y0 + th - 0.3, cz, yaw, 1, 1, 1), midLit, true); y0 += th; });   /* the cap ring / setback edge */
+    pushGeo(mid, new THREE.OctahedronGeometry(7, 0), place(cx, hT + 4, cz, yaw, 1, 1.8, 1), midCrystal, true);   /* its crystal crown */
+    if (i % 2 === 0) { var b2 = sectors[(i + 1) % sectors.length]; var d2 = 230 + rnd() * 100; var ex = Math.sin(b2) * d2, ez = Math.cos(b2) * d2; var curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(cx, 22, cz), new THREE.Vector3((cx + ex) * 0.5, 50, (cz + ez) * 0.5), new THREE.Vector3(ex, 22, ez));
+      pushGeo(mid, sweep(curve, 36, 7, 0.9, 0.45), new THREE.Matrix4(), midPlat, true);   /* the deck slab */
+      pushGeo(mid, sweep(curve, 36, 4.2, 1.8, -0.45), new THREE.Matrix4(), pmap(midPlat, function (c) { return c.multiplyScalar(0.6); }), true);   /* the girder under it */
+      [-1, 1].forEach(function (sg) { pushGeo(mid, sweep(curve, 36, 0.35, 1.1, 1.55, sg * 3.3), new THREE.Matrix4(), pmap(midPlat, function (c) { return c.multiplyScalar(1.05); }), true);   /* parapets */
+        pushGeo(mid, sweep(curve, 36, 0.3, 0.22, -0.3, sg * 3.62), new THREE.Matrix4(), midLit, true); });   /* the deck-edge light line */
+      [0.18, 0.82].forEach(function (u) { var pp = curve.getPoint(u), ph = Math.max(8, pp.y - 2.25); pushGeo(mid, new THREE.CylinderGeometry(1.9, 3.2, ph, 8), place(pp.x, ph * 0.5, pp.z, 0, 1, 1, 1), pmap(midPlat, function (c) { return c.multiplyScalar(0.82); }), true); pushGeo(mid, new THREE.BoxGeometry(6, 1.2, 6), place(pp.x, ph + 0.6, pp.z, 0, 1, 1, 1), pmap(midPlat, function (c) { return c.multiplyScalar(0.7); }), true); }); }   /* piers with caps */
   });
   var midMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.5, metalness: 0.55 }); var midMesh = finish(mid, midMat); midMesh.name = 'MID_WALKWAYS'; group.add(midMesh);
   /* ---------- HAZE plain: the ground fades into a platinum haze beyond the district instead of ending at an edge ---------- */
