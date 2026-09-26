@@ -41,7 +41,12 @@ export var VIEWS = [
   ['V27', 'ridge face close from the TITAN ledge', [166, 14, 130], [230, 40, 150]],
   ['V28', 'civic roofline, piers and service bay (Mentor Spire rear)', [46, 11, -12], [29, 16, 0]],
   ['V29', 'Training Hall entrance facade', [-3, 2.4, 9], [-22, 5.5, -1]],
-  ['V30', 'Mahgic Exchange entrance facade', [-6, 2.4, 6], [3, 4.5, 24]]
+  ['V30', 'Mahgic Exchange entrance facade', [-6, 2.4, 6], [3, 4.5, 24]],
+  ['V31', 'HALO arrival: out from the upper dock across the deck', [24.5, 241.7, 40], [80, 241, 60]],
+  ['V32', 'plaza hub toward the temple causeway (clear of the arena: V01 now sits on its roof)', [12, 1.7, -4], [0, 6, 60]],
+  ['V33', 'Moon from the plaza (clear of the exchange: V22 now sits inside it)', [14, 1.7, 8], [-32, 40, -80]],
+  ['V34', 'MAH MATCH hall exterior from its approach', [84, 2.2, -14], [122, 9, 6]],
+  ['V35', 'HALO deck from high inside the dome (a flying view)', [30, 330, -70], [30, 240, 60]]
 ];
 
 function mime(p) { return ({ '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css', '.bin': 'application/octet-stream', '.ktx2': 'image/ktx2' })[path.extname(p).toLowerCase()] || 'application/octet-stream'; }
