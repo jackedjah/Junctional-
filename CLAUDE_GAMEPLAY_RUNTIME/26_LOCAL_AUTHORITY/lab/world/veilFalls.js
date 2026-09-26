@@ -46,7 +46,7 @@ export function veilWaterMaterial(THREE, opts) { opts = opts || {};
 
 export function createVeilFalls(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var group = null, own = [], night = !!ctx.night, clock = 0, info = {};
-  var waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null;
+  var bufV = new THREE.Vector2(); var waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null;
   function tier() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   function rnd(seed) { return ctx.rnd ? ctx.rnd(seed) : (function (s) { return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; })(seed >>> 0); }
   function keep(o) { own.push(o); return o; }
@@ -201,7 +201,7 @@ export function createVeilFalls(ctx) {
     ctx.veilFalls = { lip: { x: lip.x, y: yTop, z: lip.z }, base: { x: baseX, z: baseZ }, highland: { x: CX, z: CZ, top_y: TOP }, reachable: false };
     log('veilFalls: ribbon ' + NR + '×' + NC + ', lip ' + yTop.toFixed(1) + ' m → ' + yBot + ' m, highland top ' + TOP + ' m, villas ' + info.villas + ', trees ' + info.trees + ', lanterns ' + info.lanterns + ' (not reachable until the runtime bridge)');
   }
-  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) mistU.uTime.value = clock; }
+  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
   function setNight(n) { night = !!n; if (waterU) waterU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
     if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.35 : 0.08; if (spireMat) spireMat.emissiveIntensity = night ? 0.9 : 0.22; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; }
   function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; group = null; }
