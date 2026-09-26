@@ -8,6 +8,7 @@ import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
 import { createFacadeKit, addCivicBuilding } from '../26_LOCAL_AUTHORITY/lab/world/facadeKit.js';
 import { ridgeStations, ridgeFaceSegment, ridgeReachBounds } from '../26_LOCAL_AUTHORITY/lab/world/ridgeLayout.js';
 import { ridgeWarpField, sculptRidge, REACH_IN, REACH_FLOOR } from '../26_LOCAL_AUTHORITY/lab/world/ridgeSculpt.js';
+import { buildRoadNetwork } from '../26_LOCAL_AUTHORITY/lab/world/roadNetwork.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
@@ -124,5 +125,17 @@ var RB = ridgeReachBounds(R), sc9 = { moved_inside: 0, landed_inside: 0, min_lan
     if (d > 1e-9) { if (mn(x, z) < REACH_IN) sc9.moved_inside++; var m = mn(w[0], w[2]); sc9.min_landed = Math.min(sc9.min_landed, m); if (m < REACH_FLOOR) sc9.landed_inside++; } } });
 var sculptWired = /import \{ ridgeWarpField, sculptRidge \} from '\.\/ridgeSculpt\.js'/.test(MACRO) && /sculptRidge\(pos, col, ridgeWarpField\(R, stations, idx, keep\)/.test(MACRO);
 ok('9. M10 ridge sculpt stays beyond reach: nothing inside ' + REACH_IN + ' m moves, nothing warped lands inside ' + REACH_FLOOR + ' m (reach square ±' + RB.half + ' m), in-reach triangles are bit-identical', sculptWired && RB.half < REACH_FLOOR && sc9.moved_inside === 0 && sc9.landed_inside === 0 && sc9.identical, sc9);
+
+/* 13. M11 road corners: every real turn inside an authored road keeps a corner node exactly the road's width, both legs end on it, and the
+       corner is drawn flush with the rest of the path graph (the joint disc, the seam arc and the mitred inner seams). Until M11 the crossing
+       pass relabelled these bends JOIN and dropped them, leaving the outer corner of every bend open to the ground. */
+var PW13 = R.paths || {}, W13 = { CAUSEWAY: PW13.causeway_w || 8, REGIONAL: PW13.regional_w || 3.6, TRAIL: PW13.trail_w || 1.8 }, roads13 = (PW13.list || []).map(function (P) { return { id: P.id, tier: P.tier, points: P.pts, frameW: W13[P.tier] || 3, coreW: (W13[P.tier] || 3) - 1 }; });
+var net13 = buildRoadNetwork(roads13, []), sc13 = { bends: 0, missing: [], radius: [], legs: [] };
+(PW13.list || []).forEach(function (P) { var pts = P.pts || []; for (var i = 1; i + 1 < pts.length; i++) { var a = pts[i - 1], b = pts[i], c = pts[i + 1], t = Math.atan2(c[1] - b[1], c[0] - b[0]) - Math.atan2(b[1] - a[1], b[0] - a[0]); t = Math.abs(Math.atan2(Math.sin(t), Math.cos(t))); if (t <= 0.009) continue; sc13.bends++;
+  var N = net13.nodes.filter(function (n) { return Math.abs(n.x - b[0]) < 1e-3 && Math.abs(n.z - b[1]) < 1e-3; })[0]; if (!N) { sc13.missing.push(P.id + '@' + b.join(',')); continue; }
+  if (N.frameRadius < (W13[P.tier] || 3) / 2 - 1e-6) sc13.radius.push(P.id + '@' + b.join(','));
+  var legs = net13.pieces.filter(function (Q) { return Q.aKey === N.key || Q.bKey === N.key; }).length; if (legs < 2) sc13.legs.push(P.id + '@' + b.join(',') + ':' + legs); } });
+var TER13 = src('lab/world/terrain.js'), corner13 = /if \(N\.bendOnly\) \{/.test(TER13) && /joint\(frames, N\.x, N\.z, N\.frameRadius \* 2, PATH_Y, N\.frameBlend, nSeg\)/.test(TER13) && /arc\(seams, N\.x, N\.z, so, st\.seamW, PATH_Y \+ 0\.008/.test(TER13);
+ok('13. M11 every real road bend (' + sc13.bends + ') keeps a flush corner node the road\'s width with both legs ending on it', sc13.bends > 20 && !sc13.missing.length && !sc13.radius.length && !sc13.legs.length && corner13, { sc13: sc13, corner13: corner13 });
 
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

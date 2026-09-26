@@ -52,7 +52,8 @@ export function buildRoadNetwork(roads, explicitNodes) {
       var a = [+pts[i][0], +pts[i][1]], b = [+pts[i + 1][0], +pts[i + 1][1]];
       if (Math.hypot(b[0] - a[0], b[1] - a[1]) <= EPS) continue;
       raw.push({ id: r.id, piece: i, a: a, b: b, style: r, splits: [{ t: 0, x: a[0], z: a[1] }, { t: 1, x: b[0], z: b[1] }] });
-      if (i > 0) ensureNode(a[0], a[1], { kind: 'BEND', id: r.id + ':B' + i });
+      if (i > 0) { var bn = ensureNode(a[0], a[1], { kind: 'BEND', id: r.id + ':B' + i }), pv = pts[i - 1], turn = Math.atan2(b[1] - a[1], b[0] - a[0]) - Math.atan2(a[1] - pv[1], a[0] - pv[0]);
+        turn = Math.abs(Math.atan2(Math.sin(turn), Math.cos(turn))); if (turn > 0.009) bn.bend = true; }   /* a real turn (> 0.5°) is flagged, not just labelled: the crossing pass below relabels a road's own consecutive segments as a JOIN */
     }
   });
   for (var i = 0; i < raw.length; i++) for (var j = i + 1; j < raw.length; j++) {
@@ -86,10 +87,15 @@ export function buildRoadNetwork(roads, explicitNodes) {
   var nodes = Object.keys(nodeMap).map(function (k) {
     var n = nodeMap[k], d = null; n.styles.forEach(function (s) { d = dominant(d, s); }); n.owner = d;
     var maxFrame = 0, maxCore = 0; n.styles.forEach(function (s) { maxFrame = Math.max(maxFrame, s.frameW || 0); maxCore = Math.max(maxCore, s.coreW || 0); });
-    n.frameRadius = Math.max(n.radius, maxFrame * 0.5 + (n.explicit ? 0 : 0.35));
-    n.coreRadius = Math.max(0.1, n.explicit ? n.frameRadius - 0.8 : maxCore * 0.5 + 0.22);
-    n.degree = Object.keys(n.touch).length; return n;
-  }).filter(function (n) { return n.explicit || n.styles.length > 1 || n.degree > 1 || n.kind === 'BEND'; });
+    n.degree = Object.keys(n.touch).length;
+    /* M11: a BEND inside one road (no other road, no explicit junction) is a corner, not a junction: its joint is exactly the road's
+       width, so the kerb and core edges run tangent into the corner disc and the outer corner is closed. Until M11 these bends were
+       relabelled JOIN by the crossing pass and filtered out, which left the outer corner of every bend open to the ground. */
+    n.bendOnly = !!n.bend && !n.explicit && n.styles.length === 1 && n.degree <= 1;
+    n.frameRadius = n.bendOnly ? maxFrame * 0.5 : Math.max(n.radius, maxFrame * 0.5 + (n.explicit ? 0 : 0.35));
+    n.coreRadius = n.bendOnly ? maxCore * 0.5 : Math.max(0.1, n.explicit ? n.frameRadius - 0.8 : maxCore * 0.5 + 0.22);
+    return n;
+  }).filter(function (n) { return n.explicit || n.styles.length > 1 || n.degree > 1 || n.kind === 'BEND' || n.bend; });
   var keep = {}; nodes.forEach(function (n) { keep[n.key] = true; });
   pieces.forEach(function (p) { if (p.aKey && !keep[p.aKey]) p.aKey = null; if (p.bKey && !keep[p.bKey]) p.bKey = null; });
   var seenRaw = {}; raw.forEach(function (s) { var a = key(s.a[0], s.a[1]), b = key(s.b[0], s.b[1]), k = a < b ? a + '|' + b : b + '|' + a; if (seenRaw[k]) duplicateRaw++; seenRaw[k] = true; });
