@@ -85,6 +85,8 @@ export function createArchitecture(ctx) {
     if (H.supports) { var R = H.ring_r || 7, SH = H.support_h || 14, sr = H.support_r || 0.55;
       for (var k = 0; k < H.supports; k++) { var a = Math.PI / 4 + k * Math.PI / 2, sx = H.x + Math.cos(a) * R, sz = H.z + Math.sin(a) * R;
         var col = new THREE.TorusGeometry(sr * 1.55, 0.12, 6, 20); col.rotateX(Math.PI / 2); col.translate(sx, base + 3.6, sz); plat.push(col);
+        var drum = new THREE.CylinderGeometry(sr + 0.03, sr + 0.05, 1.0, 16); drum.translate(sx, base + 0.5, sz); stone.push(drum);   /* M11: a stone drum at the foot (≤ 5 cm proud) */
+        for (var rvI = 0; rvI < 6; rvI++) { var rva = rvI / 6 * Math.PI * 2 + a, rvH = (P ? top - 2.3 : base + SH - 0.6) - (base + 1.1), rvg = new THREE.BoxGeometry(0.04, rvH, 0.03); rvg.rotateY(-rva); rvg.translate(sx + Math.cos(rva) * sr * 0.975, base + 1.1 + rvH / 2, sz + Math.sin(rva) * sr * 0.975); stone.push(rvg); }   /* M11: six graphite reveals up the shaft (inside its radius) */
         if (P) { var cap = new THREE.CylinderGeometry(1.3, sr * 1.05, 1.2, 10); cap.translate(sx, top - 1.6, sz); plat.push(cap); }   /* the capital flares into the soffit */
         var tipC = new THREE.ConeGeometry(sr * 0.9, 1.6, 8); tipC.translate(sx, base + SH + 0.8, sz); plat.push(tipC); }
       var halo = new THREE.TorusGeometry(R, 0.24, 8, 72); halo.rotateX(Math.PI / 2); halo.translate(H.x, base + SH - 0.3, H.z); plat.push(halo);
