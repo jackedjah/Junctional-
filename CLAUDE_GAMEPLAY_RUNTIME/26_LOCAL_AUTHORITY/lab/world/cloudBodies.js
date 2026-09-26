@@ -32,11 +32,13 @@ var VERT = [
   '  vec3 viewUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);',
   '  vec3 camUp = normalize(mix(vec3(0.0, 1.0, 0.0), viewUp, smoothstep(0.35, 0.85, abs(toCam.y))));',   /* upright near the horizon (flat base, crown up); camera-facing when looked at steeply from below/above so puffs never foreshorten into stacked discs */
   '  vec3 camRight = normalize(cross(camUp, toCam)); camUp = normalize(cross(toCam, camRight));',
-  '  vec3 world = centre + camRight * position.x * sx + camUp * position.y * sy;',
+  '  float rot = (1.0 - step(0.25, aPuff.w)) * (fract(seed * 7.13) - 0.5) * 0.9, cr = cos(rot), sr = sin(rot); vec2 q = vec2(position.x * sx, position.y * sy);',
+  '  vec3 tX = camRight * cr + camUp * sr, tY = camUp * cr - camRight * sr;',   /* M10: crown puffs turn up to ±26° in their own plane, so the four atlas shapes never stand in the same pose */
+  '  vec3 world = centre + tX * q.x + tY * q.y;',
   '  if (isPlate > 0.5) { world = centre + mat3(instanceMatrix) * vec3(position.x, 0.0, position.y); vBelow = 1.0; }',   /* the base plate lies flat in the body's own frame */
   '  vH = clamp((world.y - aCloud.x) / max(aCloud.y, 1.0), 0.0, 1.0);',   /* shade by height inside the WHOLE cloud: no per-puff banding */
   '  vRel = ((centre - aCentre.xyz) + (world - centre) * 0.35 * (1.0 - below)) / max(aCentre.w, 1.0);',   /* body-side light is taken at the PUFF centre (plus a little in-puff gradient seen side-on): per-fragment it painted the same gradient on every puff, which stacked into plates seen from below */
-  '  vec3 Lw = normalize(uLightWorld); vLs = vec2(dot(Lw, camRight) * (flip ? -1.0 : 1.0), dot(Lw, camUp)) * (1.0 - 0.85 * below);',   /* the key projected into this puff's texture plane: the self-shadow march direction */
+  '  vec3 Lw = normalize(uLightWorld); vLs = vec2(dot(Lw, tX) * (flip ? -1.0 : 1.0), dot(Lw, tY)) * (1.0 - 0.85 * below);',   /* the key projected into this puff's texture plane: the self-shadow march direction */
   '  vec3 vd = world - cameraPosition; float vl = max(length(vd), 1.0); vElev = vd.y / vl; vFwd = max(dot(vd / vl, Lw), 0.0);',
   '  vDist = length(cameraPosition - centre);',
   '  vec3 dO = (centre - aCentre.xyz) / vec3(max(aCentre.w, 1.0), max(aCloud.y * 0.5, 1.0), max(aCentre.w, 1.0)); vShell = length(dO - toCam * dot(dO, toCam));',   /* M9: the puff's place in the body's SILHOUETTE (ellipsoid-normalised, projected across the view): 0 = covered core, ~1 = the visible outline */
@@ -66,6 +68,8 @@ var FRAG = [
   '  float baseK = 1.0 - smoothstep(0.0, 0.3, vH);',   /* flat, darker bases */
   '  lit = mix(lit, 0.22 + 0.18 * (1.0 - clamp(tex.r, 0.0, 1.0)) + 0.12 * sunK, vBelow); baseK = mix(baseK, 0.7, vBelow);',   /* seen from below, the whole underside shares one tone (lighter where thin): stacked puffs at different heights otherwise outline each other as discs */
   '  vec3 col = mix(uShade, uTop, clamp(lit, 0.0, 1.0)) * (1.0 - uBaseDark * baseK * (1.0 - 0.5 * sunK)) * (0.95 + 0.1 * tex.r * shell);',
+  '  vec3 bodyCol = mix(uShade, uTop, clamp(0.35 + 0.35 * sunK + 0.2 * h, 0.0, 1.0)) * (1.0 - uBaseDark * baseK * 0.6);',
+  '  col = mix(col, bodyCol, (1.0 - smoothstep(0.1, 0.65, dens)) * 0.65 * (1.0 - 0.6 * shell));',   /* M10: a lobe's thin rim takes the body's mean tone, so a shaded lobe in front of a lit one no longer draws a crisp disc (the outer silhouette keeps its edge) */
   '  float edge = 1.0 - smoothstep(0.06, 0.55, dens);',   /* thin parts scatter the key forward: a silver lining, strongest toward the light */
   '  col += uRim * uRimK * edge * shell * (0.1 + 1.6 * pow(vFwd, 5.0)) * (0.35 + 0.65 * sunK) * (1.0 - 0.7 * vBelow);',   /* the silver lining rims the BODY silhouette, not every puff */
   '  float fogK = smoothstep(uHazeNear, uHazeFar, vDist) * uHazeMax; float horK = 1.0 - smoothstep(uHor.x, uHor.y, vElev);',   /* aerial perspective + the horizon haze swallowing distant bases */
@@ -108,8 +112,28 @@ function puffAtlas(THREE, cell) {
 }
 function releaseAtlas(tex) { for (var k in ATLAS) if (ATLAS[k].tex === tex && --ATLAS[k].refs <= 0) { tex.dispose(); delete ATLAS[k]; } }
 
-/* Deterministic cluster layout for one cloud of footprint length L (metres). Returns puffs relative to the cloud origin. */
+/* Deterministic cluster layout for one cloud of footprint length L (metres). Returns puffs relative to the cloud origin.
+   M10 (owner: close-range clouds still read as a chain of equal round balls): a real cumulus is a flat base shelf with a few CONVECTIVE
+   CELLS rising out of it — one dominant, the others lower, each a mound of billows that shrink as they climb, set in DEPTH (not one row),
+   with small ragged FRINGE puffs on the flanks. Sizes now vary inside a body (core billows three to four times the fringe), so the outline
+   breaks into turrets, shoulders and gaps instead of a string of beads. Puff count stays about the same (tier-scaled as before). */
 export function cloudCluster(L, rnd, crown) {
+  var k = crown === undefined ? 1 : crown, puffs = [], nb = Math.max(5, Math.min(13, Math.round(L / 15))), baseTop = -1e9;
+  for (var i = 0; i < nb; i++) { var u = nb === 1 ? 0.5 : i / (nb - 1), prof = Math.pow(Math.sin(Math.PI * (0.08 + u * 0.84)), 0.75), rad = L * (0.075 + 0.06 * prof) * (0.8 + rnd() * 0.4);
+    var B = { x: (u - 0.5) * L * 0.88 + (rnd() - 0.5) * L * 0.04, y: rad * 0.28, z: (rnd() - 0.5) * L * 0.26, w: rad * 2.4, h: rad * 1.15, height: 0.1, flat: 1 }; puffs.push(B); baseTop = Math.max(baseTop, B.y); }   /* base shelf, in depth */
+  var nc = L < 90 ? 1 + Math.floor(rnd() * 2) : 2 + Math.floor(rnd() * 2.2), cx = [], dom = Math.floor(rnd() * nc);
+  for (var c = 0; c < nc; c++) cx.push(((c + 0.5) / nc - 0.5) * L * 0.72 + (rnd() - 0.5) * L * 0.16);
+  for (var c2 = 0; c2 < nc; c2++) { var st = c2 === dom ? 1 : 0.4 + rnd() * 0.45, cw = L * (0.12 + 0.1 * st), ch = L * (0.16 + 0.34 * st) * k, cz = (rnd() - 0.5) * L * 0.14, lean = (rnd() - 0.5) * cw * 0.5, lv = st > 0.8 ? 3 : 2;
+    for (var j = 0; j < lv; j++) { var t = (j + 0.5) / lv, per = j === 0 ? 2 : 1 + (rnd() < 0.5 * (1 - t) ? 1 : 0);
+      for (var q = 0; q < per; q++) { var r = cw * (1.0 - 0.45 * t) * (0.75 + rnd() * 0.45), off = per === 1 ? (rnd() - 0.5) * cw * 0.4 : (q - 0.5) * cw * (0.9 + rnd() * 0.3);
+        puffs.push({ x: cx[c2] + off + lean * t, y: baseTop + r * 0.35 + ch * t * 0.8, z: cz + (rnd() - 0.5) * cw * 0.9, w: r * 2.1, h: r * 2.0, height: 0.4 + 0.55 * t * st, flat: 0 }); } }
+    var cr = cw * (0.42 + rnd() * 0.2); puffs.push({ x: cx[c2] + lean + (rnd() - 0.5) * cw * 0.3, y: baseTop + ch * 0.86 + cr * 0.3, z: cz + (rnd() - 0.5) * cw * 0.4, w: cr * 2.1, h: cr * 2.0, height: st > 0.8 ? 1 : 0.75, flat: 0 }); }   /* the cell's cauliflower cap */
+  var nf = 1 + Math.floor(rnd() * 2.5);
+  for (var f = 0; f < nf; f++) { var sg = f % 2 ? 1 : -1, fr = L * (0.035 + rnd() * 0.03); puffs.push({ x: sg * L * (0.3 + rnd() * 0.16), y: baseTop + fr * (0.6 + rnd() * 1.4), z: (rnd() - 0.5) * L * 0.22, w: fr * 2.2, h: fr * 1.8, height: 0.4, flat: 0 }); }   /* ragged fringe on the flanks */
+  return puffs;
+}
+
+function legacyCluster(L, rnd, crown) {   /* the M9 layout, kept ONLY to draw from the shared sky stream exactly as before (see createCloudBodies) */
   var n = Math.max(5, Math.min(16, Math.round(L / 13))), puffs = [], k = crown === undefined ? 1 : crown;
   for (var i = 0; i < n; i++) { var u = n === 1 ? 0.5 : i / (n - 1), prof = Math.pow(Math.sin(Math.PI * (0.08 + u * 0.84)), 0.75); var rad = L * (0.09 + 0.07 * prof) * (0.85 + rnd() * 0.3);
     puffs.push({ x: (u - 0.5) * L * 0.86 + (rnd() - 0.5) * L * 0.04, y: rad * 0.28, z: (rnd() - 0.5) * L * 0.16, w: rad * 2.3, h: rad * 1.25, height: 0.1, flat: 1 });   /* base shelf */
@@ -134,6 +158,8 @@ export function towerCluster(W, H, rnd) {
   return puffs;
 }
 
+function pickShape(P, style, r) { return P.flat ? (style === 'STRATUS' && r() < 0.15 ? 3 : 2) : (P.height >= 1 ? 0 : (style === 'STRATUS' ? (r() < 0.7 ? 1 : 3) : (r() < 0.55 ? 0 : 1))); }   /* atlas shape per puff */
+function privateRnd(x, z, k) { var s = (Math.imul(Math.round(x * 64) | 0, 73856093) ^ Math.imul(Math.round(z * 64) | 0, 19349663) ^ Math.imul(k | 0, 83492791)) >>> 0 || 1; return function () { s = (s + 0x6D2B79F5) >>> 0; var t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function angleGap(a, b) { var d = Math.abs(a - b) % (Math.PI * 2); return d > Math.PI ? Math.PI * 2 - d : d; }
 
 export function createCloudBodies(ctx, L, opts) {
@@ -145,12 +171,17 @@ export function createCloudBodies(ctx, L, opts) {
     if (L.ring_m) { ang0 = rnd() * Math.PI * 2; for (var tries = 0; tries < 24 && avoid.some(function (az) { return angleGap(ang0, az) < avoidR; }); tries++) ang0 = rnd() * Math.PI * 2;   /* M8D: towers keep clear of the Sun / Moon sectors */
       rr = L.ring_m[0] + rnd() * (L.ring_m[1] - L.ring_m[0]); x0 = Math.cos(ang0) * rr; z0 = opts.originZ + Math.sin(ang0) * rr; }   /* M8B: horizon banks sit on a ring around the world */
     var cl = { x: x0, z: z0, x0: x0, z0: z0, ang0: ang0, rr: rr, y: (L.alt_m || 150) + (rnd() - 0.5) * 24, yaw: rnd() * Math.PI, drift: 0.7 + rnd() * 0.6, len: len, puffs: [] };
-    var raw = tower ? towerCluster(len, L.tower_h_m ? L.tower_h_m[0] + rnd() * (L.tower_h_m[1] - L.tower_h_m[0]) : len * 0.8, rnd) : cloudCluster(len, rnd, L.crown === undefined ? 1 : L.crown); var keep = Math.max(4, Math.round(raw.length * tierScale));
+    /* M10: the cell layout draws from a PRIVATE positional stream; the shared sky stream is advanced exactly as the M9 layout drew from it
+       (legacyCluster + its per-puff seed / shape draws), so every body keeps its accepted place, size, height, yaw and drift and the other
+       layers are untouched — only each body's inner form changes. */
+    var pr = tower ? rnd : privateRnd(x0, z0, k + 1), crownK = L.crown === undefined ? 1 : L.crown;
+    if (!tower) { var legacy = legacyCluster(len, rnd, crownK), keepL = Math.max(4, Math.round(legacy.length * tierScale)); for (var lp = 0; lp < legacy.length; lp++) { if (lp % Math.max(1, Math.round(legacy.length / keepL)) !== 0 && legacy.length > keepL) continue; rnd(); pickShape(legacy[lp], style, rnd); } }
+    var raw = tower ? towerCluster(len, L.tower_h_m ? L.tower_h_m[0] + rnd() * (L.tower_h_m[1] - L.tower_h_m[0]) : len * 0.8, rnd) : cloudCluster(len, pr, crownK); var keep = Math.max(4, Math.round(raw.length * tierScale));
     if (tower) cl.yaw = ang0 + Math.PI / 2;   /* a tower's long axis runs along the ring: seen broadside from the world */
     cl.extent = Math.max.apply(Math, raw.map(function (P) { return P.y + P.h * 0.5; })) + len * 0.02; cl.rad = Math.max(len * 0.5, cl.extent * 0.55);
     if (L.max_top_m && cl.y + cl.extent > L.max_top_m) cl.y = L.max_top_m - cl.extent;   /* keeps every body below the HALO deck (240 m): no cloud ever pokes up through the upper-realm floor */
-    for (var p = 0; p < raw.length; p++) { if (p % Math.max(1, Math.round(raw.length / keep)) !== 0 && raw.length > keep) continue; var P = raw[p]; P.cloud = cl; P.seed = rnd();
-      if (P.v === undefined) P.v = P.flat ? (style === 'STRATUS' && rnd() < 0.15 ? 3 : 2) : (P.height >= 1 ? 0 : (style === 'STRATUS' ? (rnd() < 0.7 ? 1 : 3) : (rnd() < 0.55 ? 0 : 1)));   /* atlas shape per puff */
+    for (var p = 0; p < raw.length; p++) { if (p % Math.max(1, Math.round(raw.length / keep)) !== 0 && raw.length > keep) continue; var P = raw[p]; P.cloud = cl; P.seed = pr();
+      if (P.v === undefined) P.v = pickShape(P, style, pr);
       cl.puffs.push(P); puffs.push(P); }
     /* M9 BASE PLATE (owner: clouds read as stacked pancakes / cards from below): ONE horizontal soft card per body at its base, the body's
        footprint, aligned with its yaw. Seen from below it takes over from the base puffs (a row of upright base puffs seen end-on stacked

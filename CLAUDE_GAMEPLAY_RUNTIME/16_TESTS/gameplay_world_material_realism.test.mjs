@@ -85,7 +85,8 @@ var clouds = { atlas: /var SHAPES = \[/.test(CB) && /Math\.exp\(-\(dx \* dx \+ d
   towerShape: JSON.stringify(tA) === JSON.stringify(tB) && tBase.length >= 4 && tCaps.length >= 2 && tCaps.every(function (c) { return tBase.every(function (b) { return c.y > b.y; }); }) && tA.every(function (p) { return Math.abs(p.x) < 420 * 0.75; }),
   order: /renderOrder: L\.follow \? 1 : \(L\.bank \? 2 : 4 \+ li\)/.test(SK) && /im\.renderOrder = L\.occludes \? 4 \+ li : 2/.test(SK) && /var rcx = Ly\.L\.follow && camPos \? camPos\.x : 0/.test(SK),
   sizes: REG.sky.layers.filter(function (L) { return L.id === 'CUMULUS_MID' || L.id === 'STRATUS_LOW'; }).every(function (L) { return L.size_pow > 1; }) && /Math\.pow\(rnd\(\), L\.size_pow \|\| 1\)/.test(CB),
-  pinned: cloudCluster(160, seededR(7)).length === cloudCluster(160, seededR(7)).length };
+  pinned: cloudCluster(160, seededR(7)).length === cloudCluster(160, seededR(7)).length,
+  stream: /var legacy = legacyCluster\(len, rnd, crownK\)/.test(CB) && /privateRnd\(x0, z0, k \+ 1\)/.test(CB) && /P\.seed = pr\(\)/.test(CB) };   /* M10: the cell layout draws privately; the shared sky stream advances exactly as before, so the accepted composition stays put */
 ok('9. M8D cloud realism: noise-eroded shape atlas, whole-body key lighting with thickness self-shadow (tiered), flat darker bases, aerial perspective + horizon fade, skewed sizes, a camera-relative towering-cumulus ring (bank, outside the optics, clear of the Sun / Moon, far layers first)', Object.keys(clouds).every(function (k) { return clouds[k]; }), clouds);
 
 /* 10. M8E architectural realism: real windows per floor with rooms behind them (interior mapping, coated glass mirroring the sky, blinds, a
