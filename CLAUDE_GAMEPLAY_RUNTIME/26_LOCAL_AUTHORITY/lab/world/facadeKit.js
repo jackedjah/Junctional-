@@ -187,7 +187,7 @@ export function createFacadeKit(THREE, opts) {
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + STRIP_HEAD).replace('#include <begin_vertex>', '#include <begin_vertex>\nvLight = aLight;');
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + STRIP_FRAG_HEAD).replace('#include <color_fragment>', '#include <color_fragment>\n' + STRIP_FRAG_BODY); };
     m.customProgramCacheKey = function () { return 'mahworld-facade-strip-v1'; }; return m; }
-  function instanced(geo, mat, list, name, attr, attrOf) { if (!list.length) return null; var im = new THREE.InstancedMesh(geo, mat, list.length); im.name = name; im.userData.noMerge = true; im.frustumCulled = false;
+  function instanced(geo, mat, list, name, attr, attrOf) { if (!list.length) return null; var im = new THREE.InstancedMesh(geo, mat, list.length); im.name = name; im.userData.noMerge = true; im.frustumCulled = true;   /* the bounding sphere below spans every instance: off-screen facades cost no draw */
     var a = attr ? new Float32Array(list.length * 4) : null; list.forEach(function (it, i) { im.setMatrixAt(i, it.m); if (it.c) im.setColorAt(i, it.c); if (a) { var v = attrOf(it); a[i * 4] = v[0]; a[i * 4 + 1] = v[1]; a[i * 4 + 2] = v[2]; a[i * 4 + 3] = v[3]; } });
     if (a) geo.setAttribute(attr, new THREE.InstancedBufferAttribute(a, 4)); im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; im.computeBoundingSphere(); meshes.push(im); geos.push(geo); info.draw_calls++; return im; }
   function build(group) {
