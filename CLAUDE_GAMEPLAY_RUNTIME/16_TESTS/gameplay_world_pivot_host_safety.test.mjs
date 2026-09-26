@@ -84,6 +84,12 @@ var farCam = FW ? Math.max.apply(null, [[FW.x1, FW.z1], [FW.x1, FW.z2], [FW.x2, 
 var towerSafe = TWR.length > 0 && TWR.every(function (L) { return L.bank && !L.occludes && L.alt_m >= HALO_LAYOUT.arrival_height_m && L.ring_m[0] - L.size_m[1] / 2 - farCam > HALO_LAYOUT.shell_radius_m; });
 ok('8. the camera-relative towering-cumulus ring stays above the deck height and always farther from the HALO than its shell, from anywhere in the field', towerSafe, TWR.map(function (L) { return { id: L.id, alt_m: L.alt_m, nearest_to_halo_m: L.ring_m[0] - L.size_m[1] / 2 - farCam, shell_m: HALO_LAYOUT.shell_radius_m }; }));
 
+/* 10. M10 public-space edge logic is flush: the entrance aprons, slot drains and grating bars stand ≤ 2 cm, the canal-bank coping 1.2 cm —
+       nothing a player steps over or onto (host rule: ≤ 5 cm proud below 3.4 m). */
+var WATER = src('lab/world/water.js'), hs = []; var reSlab = /slab\([^;]*?, ([0-9.]+), THRESH\.(stone|drain|edge)\)/g, mm2; while ((mm2 = reSlab.exec(CITY))) hs.push(+mm2[1]);
+var copes = (WATER.match(/coping\.push\(flat\([^;]*?GROUND_Y \+ ([0-9.]+)\)\)/g) || []).map(function (t) { return +/GROUND_Y \+ ([0-9.]+)/.exec(t)[1]; });
+ok('10. M10 entrance aprons / slot drains / grating and the canal-bank coping are flush (≤ 5 cm)', hs.length >= 4 && hs.every(function (h) { return h <= 0.05; }) && copes.length >= 2 && copes.every(function (h) { return h <= 0.05; }), { thresholds: hs, coping: copes });
+
 /* 9. M10 ridge sculpt: the silhouette / shelf / gully warp lives beyond the reach square only. Sampled over the real ribbon triangles (all
       level-4 subdivision points) and 150 k random points: nothing whose original position is inside REACH_IN moves, nothing warped lands
       inside REACH_FLOOR, and REACH_FLOOR clears the FIELD reach square; triangles wholly inside REACH_IN come out bit-identical. */

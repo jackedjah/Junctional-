@@ -87,6 +87,11 @@ export function createCityScene(THREE, group, helpers) {
     if (e.glazed) {   /* M8E: the flat door slab, leaves and light arch give way to the kit's storefront entrance; the lit lintel and the landing stay */
       var lint = new THREE.Mesh(roundedBox(horiz ? e.width * 1.15 : 0.3, 0.16, horiz ? 0.3 : e.width * 1.15, 0.05), M.trimWarm); lint.position.set(e.x + sx * 0.45, e.height * 0.98 + 0.34, e.z + sz * 0.45); if (e.height * 0.98 + 0.34 >= 3.4) g.add(lint);
       [1.2, 2.1].forEach(function (rr, i) { var ring = new THREE.Mesh(new THREE.RingGeometry(rr - 0.05, rr, 40), i ? M.trim : M.trimWarm); ring.rotation.x = -Math.PI / 2; ring.position.set(e.x + sx * 2.4, 0.03, e.z + sz * 2.4); g.add(ring); });
+      /* M10 THRESHOLD (owner: entrances / thresholds / drainage-edge logic): a darker honed-stone APRON before the doors, a SLOT DRAIN across it
+         just outside the threshold with brushed-metal edges — how a real entrance meets a plaza. Flush (≤ 2 cm), merged city-wide in dress(). */
+      (function () { var W = e.width + 2.4, D = 3.2, tx = horiz ? 1 : 0, tz = horiz ? 0 : 1; function slab(along, out, lenA, lenO, h, list) { var bg = new THREE.BoxGeometry(tx ? lenA : lenO, h, tx ? lenO : lenA); bg.translate(e.x + sx * out + tx * along, h / 2, e.z + sz * out + tz * along); list.push(bg); }
+        slab(0, 0.08 + D / 2, W, D, 0.012, THRESH.stone); slab(0, 0.72, W - 0.4, 0.16, 0.016, THRESH.drain); [-1, 1].forEach(function (sg) { slab(0, 0.72 + sg * 0.1, W - 0.4, 0.035, 0.018, THRESH.edge); });
+        for (var gi = 0; gi < Math.floor((W - 0.6) / 0.09); gi++) slab(-(W - 0.6) / 2 + gi * 0.09 + 0.045, 0.72, 0.022, 0.15, 0.018, THRESH.edge); })();   /* the drain's grating bars */
       return g; }
     var depth = 0.9; var door = new THREE.Mesh(roundedBox(horiz ? e.width : depth, e.height, horiz ? depth : e.width, Math.min(e.width, e.height) * 0.42), M.doorway); door.position.set(e.x + sx * (depth / 2 - 0.35), 0, e.z + sz * (depth / 2 - 0.35)); g.add(door);
     var arch = new THREE.Mesh(new THREE.TorusGeometry(e.width * 0.52, 0.09, 8, 32, Math.PI), M.trim); arch.position.set(e.x + sx * 0.3, e.height * 0.62, e.z + sz * 0.3); if (!horiz) arch.rotation.y = Math.PI / 2; g.add(arch);
@@ -98,6 +103,7 @@ export function createCityScene(THREE, group, helpers) {
     var mat = new THREE.Mesh(new THREE.PlaneGeometry(horiz ? e.width * 1.1 : 4.5, horiz ? 4.5 : e.width * 1.1), M.trimWarm); mat.rotation.x = -Math.PI / 2; mat.position.set(e.x + sx * 2.4, 0.02, e.z + sz * 2.4); mat.material = M.trimWarm.clone(); mat.material.transparent = true; mat.material.opacity = 0.22; g.add(mat);
     return g;
   }
+  var THRESH = { stone: [], drain: [], edge: [] };   /* M10: entrance aprons / slot drains, merged once in dress() */
   var api = {
     /* one authored building from its collider (BOX or CYLINDER) + `building` block */
     building: function (s) {
@@ -127,6 +133,8 @@ export function createCityScene(THREE, group, helpers) {
     /* ground and dressing: chrome floor with diamond inlays, puddle accents, laser plants; nothing blocks movement */
     dress: function (size) {
       if (!kitBuilt) { kitBuilt = true; try { kit.build(group); } catch (e) { if (helpers.log) helpers.log('facade kit failed: ' + (e && e.message || e)); } }
+      if (THRESH.stone.length) { var tStone = M.cladding.clone(); tStone.color.setHex(0x4c525c); tStone.roughness = 0.58; tStone.polygonOffset = true; tStone.polygonOffsetFactor = -1; var tDrain = new THREE.MeshStandardMaterial({ color: 0x101318, roughness: 0.85, metalness: 0.2 });
+        [[THRESH.stone, tStone, 'CITY_ENTRANCE_APRONS'], [THRESH.drain, tDrain, 'CITY_SLOT_DRAINS'], [THRESH.edge, M.chrome, 'CITY_DRAIN_EDGES']].forEach(function (T) { var mg = mergeGeometries(T[0].map(function (q) { return q.toNonIndexed(); }), false); T[0].forEach(function (q) { q.dispose(); }); var mm = new THREE.Mesh(mg, T[1]); mm.name = T[2]; mm.userData.noMerge = true; mm.receiveShadow = true; group.add(mm); }); THRESH.stone = []; THRESH.drain = []; THRESH.edge = []; }
       var seed = 9; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
       /* diamond inlays: thin flat octahedra in a ring around the plaza */
       var inlay = new THREE.InstancedMesh(new THREE.OctahedronGeometry(0.55, 0), new THREE.MeshStandardMaterial({ color: 0xe8f4ff, roughness: 0.1, metalness: 0.9, emissive: 0x3a86c8, emissiveIntensity: 0.35, flatShading: true }), 24); var mtx = new THREE.Matrix4(); var q = new THREE.Quaternion(); var sc = new THREE.Vector3(1, 0.06, 1);
