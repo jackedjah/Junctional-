@@ -447,6 +447,26 @@ export function createCityScene(THREE, group, helpers) {
         var railL = new THREE.Mesh(rail, railM); railL.name = 'HALO_HANDRAIL_LIGHT'; railL.userData.noMerge = true; railL.userData.dayNight = function (n) { railM.emissiveIntensity = n ? 1.9 : 0.3; }; g.add(railL);
         [[lampI, 'HALO_PROMENADE_LAMPS', function (n) { lM.emissiveIntensity = n ? 1.6 : 0.35; }], [poolI, 'HALO_PROMENADE_POOLS', function (n) { poolI.visible = !!n; }]].forEach(function (B) { B[0].instanceMatrix.needsUpdate = true; if (B[0].instanceColor) B[0].instanceColor.needsUpdate = true; B[0].computeBoundingSphere(); B[0].name = B[1]; B[0].userData.noMerge = true; B[0].userData.dayNight = B[2]; g.add(B[0]); });
         poolI.visible = !DAY; poolI.renderOrder = 5; })();
+      (function () {   /* M11 CLASS BEACON MASTS (owner: perimeter architecture, non-colliding detail outside player reach, integrated class colour): one
+        mast at the end of each class spoke, standing on the structural deck ring OUTSIDE the glass (r = PR − 2.2 m; the shell curves inward as it
+        rises, the flight reach is 146.5 m, so every part is beyond reach). A graphite shaft on a plinth shoe, platinum collars, a crossarm with
+        guy stays, and a beacon in the spoke's class colour (brighter at night). The view out over the rim gets five built class markers. 3 draws. */
+        var RM = PR - 2.2, HM = 30, mastP = [], platP = [], beacP = [], bcol = [], UP = new THREE.Vector3(0, 1, 0);
+        function stay(A, B, r) { var d = new THREE.Vector3().subVectors(B, A), L = d.length(), gg = new THREE.CylinderGeometry(r, r, L, 4, 1); gg.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3().addVectors(A, B).multiplyScalar(0.5), new THREE.Quaternion().setFromUnitVectors(UP, d.multiplyScalar(1 / L)), new THREE.Vector3(1, 1, 1))); mastP.push(gg); }
+        for (var mk = 0; mk < 5; mk++) { var ma = mk / 5 * Math.PI * 2 + 0.22, cx = Math.cos(ma), cz = Math.sin(ma), mx = s.x + cx * RM, mz = s.z + cz * RM, tx = -cz, tz = cx, yaw = Math.atan2(cx, cz), y0 = PH + 1.2;
+          var shoe = new THREE.BoxGeometry(2.4, 1.2, 3.2); shoe.rotateY(yaw); shoe.translate(mx, PH + 0.6, mz); mastP.push(shoe);
+          var shaft = new THREE.CylinderGeometry(0.3, 0.58, HM, 8); shaft.translate(mx, y0 + HM / 2, mz); mastP.push(shaft);
+          [0.25, 0.5, 0.75].forEach(function (f) { var rr = 0.58 + (0.3 - 0.58) * f + 0.12, cg = new THREE.CylinderGeometry(rr, rr, 0.5, 12); cg.translate(mx, y0 + HM * f, mz); platP.push(cg); });
+          var yA = y0 + HM * 0.82, arm = new THREE.BoxGeometry(0.28, 0.28, 6); arm.rotateY(yaw + Math.PI / 2); arm.translate(mx, yA, mz); platP.push(arm);
+          [-1, 1].forEach(function (sg) { var px = mx + tx * sg * 2.9, pz = mz + tz * sg * 2.9, pod = new THREE.CylinderGeometry(0.2, 0.26, 0.5, 8); pod.translate(px, yA - 0.35, pz); platP.push(pod);
+            stay(new THREE.Vector3(mx, yA - 0.3, mz), new THREE.Vector3(mx + tx * sg * 3.4, PH + 1.1, mz + tz * sg * 3.4), 0.05); });
+          var cap = new THREE.CylinderGeometry(0.42, 0.34, 0.5, 8); cap.translate(mx, y0 + HM + 0.25, mz); platP.push(cap);
+          var bc = new THREE.OctahedronGeometry(0.9, 0); bc.scale(1, 1.7, 1); bc.translate(mx, y0 + HM + 2.1, mz); beacP.push(bc); bcol.push(new THREE.Color(FAMS_RIM[mk])); }
+        var mastM = new THREE.MeshStandardMaterial({ color: 0x4b5361, roughness: 0.46, metalness: 0.7, envMapIntensity: 0.5 }), mastMesh = new THREE.Mesh(mergeGeometries(mastP.map(function (q) { return q.index ? q.toNonIndexed() : q; }), false), mastM); mastMesh.name = 'HALO_BEACON_MASTS'; mastMesh.userData.noMerge = true; g.add(mastMesh);
+        var mastPlat = new THREE.Mesh(mergeGeometries(platP.map(function (q) { return q.index ? q.toNonIndexed() : q; }), false), M.platinum); mastPlat.name = 'HALO_BEACON_MAST_COLLARS'; mastPlat.userData.noMerge = true; g.add(mastPlat);
+        var beacG = mergeGeometries(beacP.map(function (q, qi) { var nq = q.index ? q.toNonIndexed() : q, n = nq.attributes.position.count, cc = new Float32Array(n * 3); for (var ci = 0; ci < n; ci++) { cc[ci * 3] = bcol[qi].r; cc[ci * 3 + 1] = bcol[qi].g; cc[ci * 3 + 2] = bcol[qi].b; } nq.setAttribute('color', new THREE.BufferAttribute(cc, 3)); return nq; }), false);
+        var beacM = new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: true }); beacM.color.setScalar(DAY ? 1.0 : 1.7); var beac = new THREE.Mesh(beacG, beacM); beac.name = 'HALO_BEACONS'; beac.userData.noMerge = true; beac.userData.dayNight = function (n) { beacM.color.setScalar(n ? 1.7 : 1.0); }; g.add(beac);
+        g.userData.beaconMasts = { r: RM, h: HM, count: 5 }; })();
       (function () {   /* M11 GARDEN MOTES (owner: ambience): a slow drift of light motes rising through each class garden's light column in its class
         colour and fading as they climb — the column reads as alive at eye level. Light only (points, no depth write), 1 draw, animated in tick. */
         if (SDT === 'LOW') return; var NM = 18, pos = new Float32Array(5 * NM * 3), col = new Float32Array(5 * NM * 3), seeds = [];

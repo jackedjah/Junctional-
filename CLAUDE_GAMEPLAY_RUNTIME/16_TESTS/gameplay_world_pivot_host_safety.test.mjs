@@ -146,4 +146,10 @@ var mull = BOL.match(/BoxGeometry\(([0-9.]+), [0-9.]+, ([0-9.]+)\); mb\.translat
 var bolOk = !!BOL && bolR.length >= 8 && Math.max.apply(null, bolR) <= 0.12 && mullR <= 0.12 && /tp\.y = 0\.018; pools\.setMatrixAt/.test(BOL) && /AdditiveBlending/.test(BOL) && /pools\.visible = !DAY/.test(BOL) && /pylons\.getMatrixAt\(bi, tm\)/.test(BOL) && /new THREE\.InstancedMesh\(new THREE\.CylinderGeometry\(0\.07, 0\.1, 1, 8\), M\.chrome, 56\)/.test(CITY);
 ok('14. M11 plaza bollards stay in place with a smaller footprint (max ' + Math.max.apply(null, bolR.concat([mullR])).toFixed(3) + ' m) and flush additive night pools', bolOk, { radii: bolR, mullR: mullR, found: !!BOL });
 
+/* 15. M11 HALO class beacon masts stand OUTSIDE the glass and beyond the flight reach: the innermost point (the plinth shoe's inner face,
+       RM − depth/2) clears the shell radius and the 146.5 m reach sphere, and the mast ring lies on the structural deck (≤ PR). */
+var mRM = CITY.match(/var RM = PR - ([0-9.]+), HM = ([0-9.]+)/), mShoe = CITY.match(/var shoe = new THREE\.BoxGeometry\(([0-9.]+), ([0-9.]+), ([0-9.]+)\); shoe\.rotateY\(yaw\)/);
+var mastR = mRM ? HALO_LAYOUT.structural_deck_radius_m - +mRM[1] : 0, mastIn = mShoe ? mastR - +mShoe[3] / 2 : 0, REACH = 146.5;
+ok('15. M11 HALO beacon masts stand outside the shell and beyond reach (inner face ' + mastIn.toFixed(1) + ' m vs shell ' + HALO_LAYOUT.shell_radius_m + ' m / reach ' + REACH + ' m)', !!mRM && !!mShoe && mastIn > HALO_LAYOUT.shell_radius_m + 0.5 && mastIn > REACH && mastR + +mShoe[3] / 2 <= HALO_LAYOUT.structural_deck_radius_m + 1e-6 && /HALO_BEACON_MASTS/.test(CITY), { mastR: mastR, mastIn: mastIn });
+
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
