@@ -116,6 +116,20 @@ export function createCityScene(THREE, group, helpers) {
         var dome = new THREE.Mesh(new THREE.SphereGeometry(s.r * 0.98, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), M.chrome); dome.scale.y = (s.h * 0.45) / (s.r * 0.98); dome.position.set(cx, s.h * 0.55, cz); g.add(dome);
         var ring1 = new THREE.Mesh(new THREE.TorusGeometry(s.r * 1.0, 0.1, 8, 64), M.trim); ring1.rotation.x = Math.PI / 2; ring1.position.set(cx, s.h * 0.55, cz); g.add(ring1);
         g.add(diamond(cx, s.h + 1.1, cz, 0.9));
+        (function () {   /* M11 ARENA STRUCTURE (owner: architectural depth — the drum read as a plain white cylinder under a chrome cap). A stone PLINTH
+          band flush with the drum's foot, stone PILASTERS on the kit's pier radials (3 cm proud below 3.4 m), a projecting CORNICE with a dark
+          gutter reveal where the dome sits (6.6 m), 16 platinum meridian RIBS on the dome and an OCULUS ring at its crown. Merged per material. */
+          var H1 = s.h * 0.55, rAt = function (y) { return s.r * 1.04 - s.r * 0.04 * (y / H1); }, stoneP = [], platP = [], darkP = [], n16 = 16;
+          var pl = new THREE.CylinderGeometry(rAt(1.1) + 0.015, rAt(0) + 0.015, 1.1, 64, 1, true); pl.translate(cx, 0.55, cz); stoneP.push(pl);
+          for (var pi2 = 0; pi2 < n16; pi2++) { var pa2 = (pi2 + 1) / n16 * Math.PI * 2, nx = Math.sin(pa2), nz = Math.cos(pa2), pb = new THREE.BoxGeometry(0.55, 3.4 - 1.1, 0.06); pb.rotateY(pa2); pb.translate(cx + nx * (rAt(2.2) + 0.0), 1.1 + (3.4 - 1.1) / 2, cz + nz * (rAt(2.2) + 0.0)); stoneP.push(pb); }
+          var cor = new THREE.LatheGeometry([[rAt(H1) - 0.05, H1 - 0.45], [rAt(H1) + 0.55, H1 - 0.45], [rAt(H1) + 0.7, H1 - 0.3], [rAt(H1) + 0.7, H1 + 0.05], [rAt(H1) - 0.05, H1 + 0.05]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }), 96); cor.translate(cx, 0, cz); platP.push(cor);
+          var gut = new THREE.CylinderGeometry(rAt(H1) + 0.52, rAt(H1) + 0.52, 0.08, 96, 1, true); gut.translate(cx, H1 - 0.5, cz); darkP.push(gut);
+          var DRr = s.r * 0.98, SY = (s.h * 0.45) / DRr;
+          for (var ri = 0; ri < n16; ri++) { var ra3 = (ri + 1) / n16 * Math.PI * 2, pts2 = []; for (var q2 = 0; q2 <= 18; q2++) { var th2 = q2 / 18 * (Math.PI / 2 - 0.2), rr2 = DRr * Math.cos(th2) + 0.06; pts2.push(new THREE.Vector3(cx + Math.sin(ra3) * rr2, H1 + DRr * Math.sin(th2) * SY + 0.04, cz + Math.cos(ra3) * rr2)); }
+            platP.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts2), 24, 0.12, 5, false)); }
+          var ocR = DRr * Math.cos(Math.PI / 2 - 0.2), ocY = H1 + DRr * Math.sin(Math.PI / 2 - 0.2) * SY; var oc = new THREE.TorusGeometry(ocR, 0.2, 8, 48); oc.rotateX(Math.PI / 2); oc.translate(cx, ocY + 0.05, cz); platP.push(oc);
+          var cladA = M.cladding.clone(); cladA.color.setHex(0x737a85);
+          [[stoneP, cladA, 'ARENA_PLINTH_PILASTERS'], [platP, M.platinum, 'ARENA_CORNICE_RIBS'], [darkP, M.stone, 'ARENA_GUTTER']].forEach(function (T) { var mg = mergeGeometries(T[0].map(function (q) { var nq = q.index ? q.toNonIndexed() : q; if (!nq.attributes.uv) nq.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(nq.attributes.position.count * 2), 2)); return nq; }), false); var mm = new THREE.Mesh(mg, T[1]); mm.name = T[2]; g.add(mm); }); })();
       } else {
         var PROF = profileFor(s.id, tiers), skins = skinsFor(PROF, tiers);
         for (var i = 0; i < tiers; i++) { var k = 1 - i * 0.09; var tw = w * k, td = d * k; var r = Math.min(tw, td) * 0.24; g.add(tier(cx, cz, tw, td, y, hEach, r, skins[i])); y += hEach; }   /* M8E: base / body / crown wall families; the continuous glass band + light ring are gone (real windows + interrupted strips instead) */
