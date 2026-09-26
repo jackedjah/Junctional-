@@ -22,7 +22,8 @@ untouched; no deploy is part of this ledger.
 | M8C rock / construction / water | stratified jointed rock with ledges, crystal facets, natural forest ground, shallows at the banks, civic piers / fascias / service bay / entrance transom | `evidence/m8c_rock.jpg`, `m8c_world.jpg`, `m8c_construction.jpg`, `m8c_night.jpg` |
 | M8D clouds + Scenario pilot | noise-eroded cloud shapes, body lighting, flat shaded bases, towering horizon cumulus, lavender Moon kept clear; the rock texture pilot (isolated) | `evidence/m8d_clouds_day.jpg`, `m8d_clouds_halo.jpg`, `m8d_clouds_night.jpg`, `m8d_clouds_phone.jpg`, `evidence/scenario_pilot/` + `SCENARIO_PILOT.md` |
 | M8E lived-in buildings | real windows per floor with rooms behind the glass, lit / dark rooms at night, storefront entrances, balcony, service bays, parapets + roof access; one synchronised class-colour light show (plaza, sanctuaries, HALO rim); LEAN spire house windows + door | `evidence/m8e_facades_day.jpg`, `m8e_facades_night.jpg`, `m8e_plaza_day.jpg`, `m8e_show_steps.jpg`, `m8e_houses_halo.jpg`, `m8e_phone_med.jpg` |
-| M9 world refinement round 1 (latest) | mountains as rock mass, far massifs, clouds without pancakes, meadow only on natural ground, coast beach (flip fix) + islands, tree-elevator grounding, mid-distance bridges / towers, HALO garden terraces + promenade + lit lattice nodes, night light pools, terrace risers, MAH MATCH cladding | `evidence/m9_mountains.jpg`, `m9_clouds.jpg`, `m9_ground_coast.jpg`, `m9_structures.jpg`, `m9_halo.jpg`, `m9_night.jpg`, `m9_phone_med.jpg` |
+| M9 world refinement round 1 | mountains as rock mass, far massifs, clouds without pancakes, meadow only on natural ground, coast beach (flip fix) + islands, tree-elevator grounding, mid-distance bridges / towers, HALO garden terraces + promenade + lit lattice nodes, night light pools, terrace risers, MAH MATCH cladding | `evidence/m9_mountains.jpg`, `m9_clouds.jpg`, `m9_ground_coast.jpg`, `m9_structures.jpg`, `m9_halo.jpg`, `m9_night.jpg`, `m9_phone_med.jpg` |
+| M10 world cohesion + runtime bridge (latest) | the ten-file runtime bridge (one owner command); ridges sculpted beyond reach, far massifs with shoulders and broad summits; cumulus cells in depth; HALO rim garden, shell transoms, class garden light; entrance aprons + slot drains, canal-bank coping | `RUNTIME_BRIDGE_MANIFEST.md`; sheets `evidence/m10_*.jpg` (rendering) |
 
 ## How evidence is produced
 
@@ -450,3 +451,55 @@ viewpoint drift: V01 now sits on the arena roof, V22 inside the exchange, V27 0.
 2. Blocked on the runtime bridge: creature presentation, HALO activity zones / seating (need colliders), gameplay presentation.
 3. Next refinement candidates: ridge / massif silhouettes (geometry is still the authored low-poly ring), cloud bodies at close range,
    HALO eye-level composition, the plaza ramp / furniture material pass, night value hierarchy (the moonlit ground is still bright).
+
+## M10 — WORLD COHESION + RUNTIME BRIDGE CLOSURE (`c15f1c4` … `d6e1e7d`)
+
+Owner directive 2026-09-26 ("M10 WORLD COHESION + RUNTIME BRIDGE CLOSURE"):
+- Close the runtime bridge with ONE minimal, classified copy.
+- Keep refining the unblocked visuals: mountain silhouettes, close-range clouds, HALO eye level, public space, night, shoreline and
+  transitions.
+- Keep collision authority intact; add no walk-through solids.
+- Performance: AAA perceived quality at a sane cost, with HIGH / MED / LOW tracked.
+
+### Runtime bridge (`c15f1c4`)
+
+| field | value |
+|---|---|
+| manifest | `RUNTIME_BRIDGE_MANIFEST.md`. The static build traces 56 host files (`build_static_demo.mjs` HOST_MODULES / HOST_JSON); 46 are already on the branch and **exactly ten are missing**: 4 JS modules and 6 JSON configs from `CLAUDE_RUNTIME_FOUNDATION` / `CLAUDE_DUAL_LOCOMOTION` / `CLAUDE_GAMEPLAY_FOUNDATION`. Every file is classified A (public-safe required runtime: the ten) · B (private character source, never uploaded: `RAW_*` masters, `.blend` / 8K texture work, building intake sources) · C (not needed: docs, canon markdown, reports, `node_modules`, the archive's older runtime copy) · D (secrets, never). |
+| owner command | from a clone root, after `git pull`: `node CLAUDE_GAMEPLAY_RUNTIME/26_LOCAL_AUTHORITY/deploy/bridge/apply_minimal_bridge.mjs --from "<folder containing CLAUDE_RUNTIME_FOUNDATION>" --push`. It copies only the ten files, then commits and pushes them. Checks per file: present, ≤ 1 MB, text, JSON parses, no secret values (key / token / password assignments, private keys, GitHub / AWS / OpenAI tokens, JWTs), no private absolute paths. Any relative import outside the ten files stops the run and is named. `--dry-run` runs the checks only. Verified end to end against a mock archive and a local bare remote: exactly 10 files in one commit; a planted secret, private path and unknown import each stop it; comment words like "secret" or "password" do not. |
+| tests freed | `gameplay_rig_limits`, `gameplay_rig_pose_fk`, `gameplay_emote_endpoints` resolved their own path with a Windows-only `pathname.replace(/^\//, '')`; now `fileURLToPath`. Path resolution only; the test logic, `lab/RigAnimator.js` and the Character assets are untouched. They pass 64 / 0, 33 / 0 and 22 / 0 on Linux. |
+| blocked until the push | 32 test files stop at `jsonSource.js`; the static build and release gate need the same ten files; `gameplay_mahgic_tree` fails only its static-build check; `gameplay_legs_faithful` needs the raw character master (category B), so it stays blocked by design |
+
+### World cohesion
+
+| field | value |
+|---|---|
+| mountains (`59c8109`) | **ridge sculpt** (`lab/world/ridgeSculpt.js`, pure):<br>• The NEAR / MID ribbon is subdivided and warped only where the rock lies beyond the FIELD reach square (±300 m).<br>• The sawtooth fins ease into a continuous crest, with secondary summits and saddles.<br>• Rock shelves step the faces, and fall-line gullies notch the crest; gully floors and cliff bands are a step darker.<br>• Reach safety: weight is zero inside 312 m, a guard keeps every warped vertex outside 304 m, and waterfall lips and passes are held still. Triangles wholly inside 312 m pass through **bit-identical**, so the collision face and its proxies are exactly as authored (ridge collision 8 / 8; host-safety check 9 samples the real ribbon and 150 k points).<br>• Subdivision level 4 HIGH / 3 MED / 1 LOW.<br>• The outer-face rock displacement now uses each station's own radial, so neighbouring segments share rows (no slivers).<br><br>**far massifs** were cones, whose outline is a triangle whatever the noise. They now have a spreading foot, full shoulders and a broad crown, with stepped shelves in the outline and one or two broad, uneven summits. Snow sits only on the high, flatter faces. `?ridgeSculpt=0` gives an A/B. |
+| clouds (`a66a604`) | **Cumulus bodies:** each is a base shelf (now in depth) with one dominant and one to three lower CONVECTIVE CELLS: mounds of billows that shrink as they climb, plus ragged fringe puffs. Lobe sizes vary 3–4× inside a body, so the chain-of-equal-balls read is gone.<br>**Crown puffs** turn up to ±26° in their own plane, and the self-shadow march turns with them.<br>**Lobe rims:** a lobe's thin rim takes the body's mean tone, so a shaded lobe in front of a lit one no longer draws a crisp disc.<br>**Accepted composition preserved exactly:** the cell layout draws from a private positional stream, while the shared sky stream advances as the M9 layout drew from it. Verified: every body's position, yaw, drift and size, and the final stream state, are identical at all three tiers (material-realism check 9 pins it).<br>**Cost:** fewer puffs than before (mid 616 vs 685, horizon 610 vs 810 on HIGH), one draw per layer. |
+| HALO eye level (`2d5281d`, `f665ccc`) | The audit used ad-hoc eye-level cameras (`capture --cam`) and one straight down. At eye level the rim read as a thin fence against sky, with 23 m of bare glass above the deck, and the deck glared white.<br>• **RIM GARDEN:** in the band between the host's reach (144.8 m + 0.45 m body) and the shell. It is a honed-stone plinth with coping, a planter bed with crystal planting in each sector's class colour (restrained toward silver, faint at night), and a neutral light cove under the coping.<br>• **Two shell TRANSOMS** at 4.6 m and 9.8 m.<br>• **GARDEN LIGHT:** a soft additive column over each of the five class garden terraces from a flush emitter ring, with a flush light pool. Light, not solids. It is placed on the bed centres, verified from above.<br>• **Deck:** honed and less metallic by day.<br>• Every piece follows live day / night. Host safety 2b: the rim starts beyond reach and ends inside the shell; the emitters are flush; the beams and pools are additive. |
+| public space (`d6e1e7d`) | • Every glazed civic entrance gets a darker honed-stone APRON with a SLOT DRAIN just outside the threshold (brushed-metal edges, grating), all flush ≤ 2 cm and merged city-wide (3 draws).<br>• Canals and ponds get a flush cut-stone COPING band where the paving meets each beach bank (1.2 cm, 1 draw); the owner's beach-bank profile is unchanged.<br>• Host safety check 10 pins the flush heights. |
+| night balance | Measured on 8 night views; mean luma is 35–86 on a 0–255 scale.<br>• Near-black pixels are 4–12 % of each frame, except MAH MATCH at 47 % (the owner's deliberately black brief).<br>• Clipped pixels are ≤ 0.4 %.<br>• The landmarks, lit windows and light pools carry the hierarchy.<br>No night change was made beyond the new practical lights (rim cove, garden light, entrance aprons). |
+| tried and dropped | Honed-stone coping on the canal KERB colliders: the current registry has no rim kerbs, so the change was a no-op and it was reverted. |
+| harness | `capture --cam "ID=x,y,z:lx,ly,lz;…"` adds ad-hoc audit cameras. The M10 evidence adds H1 / H3 / H6 (HALO eye level), T (HALO from straight above) and W1 (canal bank). |
+| before / after | Pinned `c15f1c4` (bridge only; the same visuals as the end of M9) → pinned `d6e1e7d`: `evidence/m10_before/…` → `evidence/m10_after/…`; sheets `evidence/m10_*.jpg` |
+| perf | pending — the pinned before / after render (`c15f1c4` → `d6e1e7d`: 35 day views, 19 night, 10 HALO / canal audit cameras, 4 phone-sized MED) is in progress; filled in at the evidence commit. Measured on the way (HIGH, software WebGL): ridge sculpt +35 k triangles per view, 0 draws; clouds −0.5 k triangles, fewer puffs, 0 draws; HALO views +8 draws, +43 k triangles after the planting trim; entrance aprons +3 draws, bank coping +1 draw |
+| tests | host safety 11 / 11 (new: 9 ridge sculpt beyond reach, 2b HALO rim garden / garden light, 10 flush edge logic), material realism 10 / 10 (clouds keep the sky stream), colour law 4 / 4, Moon / cloud 19 / 19, ridge collision 8 / 8. Full suite on `d6e1e7d`: 61 files, **558 checks passing, 34 files failing** (M9: 436 / 37). The three path-fixed rig / emote tests now run; all 34 failures are bridge-blocked — 32 stop at the missing `jsonSource.js`, `gameplay_legs_faithful` needs the raw character master (category B), `gameplay_mahgic_tree` fails only its static-build check (29 / 1) |
+| not done — blocked | **creatures** (fish / horse / Phoenix / Dogkie motion) are host-driven. **HALO seating / pavilions / activity zones** need colliders. **Gameplay presentation** (movement, camera, flight, elevator ride, combat) needs the running host. All three wait on the ten-file bridge push. |
+| residual | • **HALO:** by day at eye level it is still mostly an open deck. Its real fix is collider-backed seating and pavilions (queued behind the bridge). The rim planting reads only within ~40 m of the edge.<br>• **Ridges:** the NEAR segments inside reach keep their authored fins, as collision authority requires. The sculpt shows beyond the square and on the MID ridge.<br>• **Clouds:** still billboard impostors; at close range the lobes are rounder than real cumulus.<br>• **Plaza:** the floor value is still pale by day (the honed ground policy). |
+
+### M10 next — open issues (nothing here is approved)
+
+1. **Owner action — the bridge:** run the one command above. After the push, Claude will rerun:
+   - all 61 test files;
+   - the static build and release gate;
+   - the wildlife host and creature runtime;
+   - movement / camera / flight / elevator / combat;
+   - HALO collider validation.
+
+   Then collider-backed HALO seating and pavilions, and creature presentation (fish, horse motion, Phoenix high flight, Dogkie).
+2. **Owner review** of M10 (sheets above). Most subjective: the far-massif crowns, the garden light columns, and the cloud cells.
+3. **Next refinement candidates:**
+   - the plaza floor value by day and the plaza ramp / furniture materials;
+   - the MID ridge seen from the plaza (more sculpt amplitude beyond 360 m);
+   - the far-massif spires;
+   - HALO deck inlays at eye level.
