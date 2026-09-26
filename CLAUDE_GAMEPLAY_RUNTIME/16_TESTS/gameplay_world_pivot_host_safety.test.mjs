@@ -97,6 +97,14 @@ var WATER = src('lab/world/water.js'), hs = []; var reSlab = /slab\([^;]*?, ([0-
 var copes = (WATER.match(/coping\.push\(flat\([^;]*?GROUND_Y \+ ([0-9.]+)\)\)/g) || []).map(function (t) { return +/GROUND_Y \+ ([0-9.]+)/.exec(t)[1]; });
 ok('10. M10 entrance aprons / slot drains / grating and the canal-bank coping are flush (≤ 5 cm)', hs.length >= 4 && hs.every(function (h) { return h <= 0.05; }) && copes.length >= 2 && copes.every(function (h) { return h <= 0.05; }), { thresholds: hs, coping: copes });
 
+/* 11. M11 civic furniture (the base collider proxies re-dressed): below 3.4 m the light column stays within its collider radius + 5 cm (the
+       stone drum), the shaft and reveals inside it, and everything wider (bands, lantern, capital) starts above 3.4 m; barriers / planters
+       keep their exact rounded footprint (coping = footprint, reveal and soil inset). */
+var FSX = src('lab/fieldScene.js'), lh = /lh0 = Math\.max\(([0-9.]+), s\.h - ([0-9.]+)\)/.exec(FSX), drumR = /new THREE\.CylinderGeometry\(s\.r \+ 0\.03, s\.r \+ ([0-9.]+), dh, 24\), furnStone/.exec(FSX);
+var bandHalf = /new THREE\.CylinderGeometry\(s\.r \+ 0\.14, s\.r \+ 0\.14, ([0-9.]+), 24\), chrome\); band\.position\.set\(s\.x, yy \+ \(ki \? ([0-9.]+) : -([0-9.]+)\)/.exec(FSX);
+var furn = { lanternFrom: lh && +lh[1], bandBottom: lh && bandHalf ? +lh[1] - +bandHalf[3] - +bandHalf[1] / 2 : 0, drumProud: drumR && +drumR[1], shaftInside: /CylinderGeometry\(s\.r \* 0\.94, s\.r, lh0 - dh, 8\)/.test(FSX), coping: /var cop = new THREE\.Mesh\(roundedBox\(w, 0\.08, d, rr0\)/.test(FSX), reveal: /roundedBox\(w - 0\.1, 0\.08, d - 0\.1/.test(FSX) };
+ok('11. M11 civic furniture stays in its collider envelope below 3.4 m (drum ≤ +5 cm, shaft inside, lantern / bands above 3.4 m; coping = footprint, reveal inset)', furn.lanternFrom >= 3.4 && furn.bandBottom >= 3.4 && furn.drumProud <= 0.05 && furn.shaftInside && furn.coping && furn.reveal, furn);
+
 /* 9. M10 ridge sculpt: the silhouette / shelf / gully warp lives beyond the reach square only. Sampled over the real ribbon triangles (all
       level-4 subdivision points) and 150 k random points: nothing whose original position is inside REACH_IN moves, nothing warped lands
       inside REACH_FLOOR, and REACH_FLOOR clears the FIELD reach square; triangles wholly inside REACH_IN come out bit-identical. */
