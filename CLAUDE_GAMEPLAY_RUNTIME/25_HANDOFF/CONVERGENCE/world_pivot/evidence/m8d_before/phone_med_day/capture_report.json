@@ -1,0 +1,139 @@
+{
+ "started": "2026-09-26T01:58:32.131Z",
+ "size": [
+  393,
+  852
+ ],
+ "quality": "MED",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V11",
+   "label": "south coast horizon",
+   "tod": "DAY",
+   "file": "V11_DAY.jpg",
+   "pos": [
+    0,
+    7,
+    -140
+   ],
+   "look": [
+    0,
+    4,
+    -300
+   ],
+   "stats": {
+    "calls": 78,
+    "triangles": 225276,
+    "geometries": 149,
+    "textures": 40,
+    "programs": 116
+   },
+   "frames_in_600ms": 1,
+   "ms": 8487
+  },
+  {
+   "id": "V22",
+   "label": "Moon from the plaza",
+   "tod": "DAY",
+   "file": "V22_DAY.jpg",
+   "pos": [
+    0,
+    4,
+    20
+   ],
+   "look": [
+    -32,
+    40,
+    -80
+   ],
+   "stats": {
+    "calls": 165,
+    "triangles": 466676,
+    "geometries": 158,
+    "textures": 42,
+    "programs": 116
+   },
+   "frames_in_600ms": 1,
+   "ms": 5397
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 12,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "MED",
+  "log": [
+   "wildlife: population LOD \u2014 17 mid schools / 154 agents (6 bodies + 11 sea schools), 90 far silhouettes (tier \u00d70.75)",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) \u2014 applies to figures created from now on",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27\u00d70.73\u00d70.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98\u00d70.74\u00d70.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready \u2014 rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84\u00d70.42\u00d70.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) \u2192 shader deformation",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) \u2014 applies to figures created from now on",
+   "wildlife ready: PHOENIX, FISH, HORSE \u2014 figures follow p.wildlife (host authority; payment UI: none \u2014 wild / pet metadata only)",
+   "worldB wildlife ready (741 ms)",
+   "gear ready (bushes 41 \u00d7 64 shards, diamonds \u2264 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (16 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels \u2264 10 visible, fade 30\u201348 m)",
+   "worldB signage ready (17 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 3229.4,
+  "error": null
+ },
+ "finished": "2026-09-26T01:59:15.860Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 34,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "MED",
+  "log": [
+   "wildlife: population LOD \u2014 17 mid schools / 154 agents (6 bodies + 11 sea schools), 90 far silhouettes (tier \u00d70.75)",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) \u2014 applies to figures created from now on",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27\u00d70.73\u00d70.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98\u00d70.74\u00d70.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready \u2014 rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84\u00d70.42\u00d70.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) \u2192 shader deformation",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) \u2014 applies to figures created from now on",
+   "wildlife ready: PHOENIX, FISH, HORSE \u2014 figures follow p.wildlife (host authority; payment UI: none \u2014 wild / pet metadata only)",
+   "worldB wildlife ready (741 ms)",
+   "gear ready (bushes 41 \u00d7 64 shards, diamonds \u2264 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (16 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels \u2264 10 visible, fade 30\u201348 m)",
+   "worldB signage ready (17 ms)"
+  ]
+ },
+ "note": "merged from: cl_before_phone"
+}

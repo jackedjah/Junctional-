@@ -19,7 +19,8 @@ untouched; no deploy is part of this ledger.
 | class houses | VISIONARY overlook, LEAN spire house | `evidence/before/desktop_day/V16_DAY.jpg`, `V17_DAY.jpg` → `evidence/cp6_after/desktop_day/` |
 | map | five-territory map, phone + desktop | `evidence/cp4_after/desktop_day/MAP_phone.png`, `MAP_desktop.png` |
 | phone-sized frames (desktop emulation, NOT a phone test) | MED tier 393×852 | `evidence/cp4_after/phone_med_day/` |
-| M8C rock / construction / water (latest) | stratified jointed rock with ledges, crystal facets, natural forest ground, shallows at the banks, civic piers / fascias / service bay / entrance transom | `evidence/m8c_rock.jpg`, `m8c_world.jpg`, `m8c_construction.jpg`, `m8c_night.jpg` |
+| M8C rock / construction / water | stratified jointed rock with ledges, crystal facets, natural forest ground, shallows at the banks, civic piers / fascias / service bay / entrance transom | `evidence/m8c_rock.jpg`, `m8c_world.jpg`, `m8c_construction.jpg`, `m8c_night.jpg` |
+| M8D clouds + Scenario pilot (latest) | noise-eroded cloud shapes, body lighting, flat shaded bases, towering horizon cumulus, lavender Moon kept clear; the rock texture pilot (isolated) | `evidence/m8d_clouds_day.jpg`, `m8d_clouds_halo.jpg`, `m8d_clouds_night.jpg`, `m8d_clouds_phone.jpg`, `evidence/scenario_pilot/` + `SCENARIO_PILOT.md` |
 
 ## How evidence is produced
 
@@ -330,3 +331,48 @@ up to 0.7 m off the curved wall (a real construction defect).
 4. Construction language beyond the three civic buildings: class-house platforms (thickness, soffits), HALO supports, bridges, the imported
    landmark facades (texture-level, Scenario-dependent).
 5. Coast islands meet the sea without a wet band or shore shaping; the canal banks carry the transition, the islands do not yet.
+
+## M8D — CLOUD REALISM + SCENARIO PILOT (owner option E, 2026-09-26)
+
+### Scenario pilot (isolated, not canonical) — full report `SCENARIO_PILOT.md`
+
+Owner approved two high-quality textures (rock, platinum), ≤ 66 CU. Rock ran (33 CU, one job, no re-roll); platinum was refused before any job
+existed by the free plan's 50 CU custom-generation allowance (`429 PlanLimitReachedError`, 0 CU). The rock map is seamless and neutral and
+converts cleanly to a luminance detail map; three integrations were compared in a scratch worktree only (patches + matched renders under
+`evidence/scenario_pilot/`). Verdict: as 36 m meso detail (variant C) it materially improves the ridge rock at 30–300 m; as close micro
+detail it does not (A aliases into speckle, B is invisible). Cost: +1 texture (5.6 MB at 1024), +1 fetch per ridge fragment, no draw calls.
+Nothing from the pilot is in the runtime; adoption and any further credits wait on the owner.
+
+### Clouds
+
+Diagnosis (pinned `bf80c74` frames): every cloud was a cluster of near-identical round, crisp-edged lobes 70–210 m wide, just above the
+rooftops — cotton balls; shading was mostly by height (no sunlit side against a shadowed side, no self-shadowing); near and far clouds had the
+same contrast; the horizon was empty (V11) because the M8B horizon banks were painted in the horizon's own haze colours.
+
+| field | value |
+|---|---|
+| files | `lab/world/cloudBodies.js` (atlas, shader, `towerCluster`), `lab/world/sky.js` (tiered taps, Sun / Moon avoidance, camera-relative ring, draw order, per-layer looks), `deploy/jobb/build_registry.mjs` → registry (+ collider hash only), `16_TESTS/gameplay_world_material_realism.test.mjs` (check 9), `16_TESTS/gameplay_world_pivot_host_safety.test.mjs` (check 8), `16_TESTS/gameplay_world_jobb.test.mjs` (check 26 fixed, see below) |
+| silhouettes | one shared procedural ATLAS (2 × 2) of noise-eroded shapes — cauliflower cumulus · soft billow · flat base · wisp: a smooth gaussian sum of lobes (they merge into one mass instead of reading as separate balls), domain-warped, fBm-eroded, billow noise raising cauliflower bumps on the upper rim; alpha = coverage with a soft rim, red = thickness with internal relief. Built once and reference-counted across layers |
+| light | the whole BODY is lit from the key's side (Sun by day, Moon by night); each puff self-shadows by marching its thickness toward the light (2 taps HIGH · 1 MED · 0 LOW); flat, darker bases; a silver lining on thin edges that strengthens toward the light; seen from below, every puff shares one underside tone (lighter where thin) — iterations 2–4 showed stacked puffs outlining each other as plates when looked up at |
+| depth | aerial perspective by distance (per layer) and a horizon fade by view elevation, so distant bases dissolve into the horizon haze; far layers draw before near ones (towers → banks / high veil → near bodies) so a far body never paints over a nearer one |
+| scale | skewed size distributions (STRATUS pow 1.4, CUMULUS pow 1.8: many small, a few large) + a new camera-relative ring of TOWERING cumulus (`CUMULUS_TOWERS`: 12 congestus 280–540 m wide, 170–400 m tall, based at 262 m, 1060–1200 m out) rising behind the far massifs; the M8B horizon banks were painted in the horizon's own haze and are now tuned visible |
+| Moon / Sun | the towers keep 26° clear of the Sun and Moon azimuths — the large lavender Moon stays unobstructed; towers and banks are outside the celestial optics (the Sun / Moon transmission is unchanged: two occluding layers kept); nearer bodies still veil the Moon as they drift, as before |
+| host safety | presentation only; the towers are based above the HALO deck height and, from any camera position inside the field walls (+120 m), their nearest possible body stays ≥ 345 m from the HALO centre, whose shell radius is 148 m (host safety check 8) |
+| latent test fix | `gameplay_world_jobb` check 26 asserted exactly 4 sky layers; M8B's horizon bank had already made it 5 — invisible because that program is blocked on the missing runtime roots. It now counts the four base sheets (bank layers are extra scenery) |
+| before / after | pinned `bf80c74` → pinned `fd9cc4d`: `evidence/m8d_before/…` → `evidence/m8d_after/{desktop_day, desktop_night, phone_med_day}`; sheets `evidence/m8d_clouds_day.jpg`, `m8d_clouds_halo.jpg`, `m8d_clouds_night.jpg`, `m8d_clouds_phone.jpg` |
+| perf | 8 matched day views: draw calls 1884 → 1892 (+1 per view: the tower ring), triangles 10.809 M → 10.812 M (≈ +340 per view: the visible tower puffs), shader programs 115 → 115, textures 70 → 68 (one shared atlas replaces three per-layer puff canvases). Per cloud fragment: 3 texture reads on HIGH (was 1), 2 on MED, 1 on LOW, plus a few dozen ALU; puff counts stay tiered (HIGH 1 · MED 0.7 · LOW 0.45; tower count × 0.75 MED, × 0.5 LOW). Cloud overdraw is the phone risk to watch — software WebGL here, so these are relative counters, not phone performance |
+| tests (focused) | material realism 9 / 9, host safety 8 / 8, colour law 4 / 4, Moon / cloud 19 / 19, ridge collision 8 / 8, night route 13 / 13; colour-law audit 0 violations; colliders `--check` nothing to do; full runnable set 24 files green (435 checks), `gameplay_mahgic_tree` keeps its one pre-existing failure (the static build), 36 programs blocked on the missing sibling roots |
+| side effect | the per-puff shape pick draws from the shared sky random stream, so the clouds sit in different places than before (a new composition, not a fixed one); the Sun / Moon transmission is analytic and unaffected |
+| residual | looked at from directly below at steep angles (V09 under the HALO) some stacked-plate layering remains in the flat stratus; cloud bodies are still billboard impostors, not volumetric |
+
+
+### M8D next — open issues (nothing here is approved)
+
+1. **Owner review** of the Scenario pilot (`SCENARIO_PILOT.md`: adopt the rock as meso detail — variant C plus a two-axis blend, 512 on MED,
+   off on LOW — or not; how to obtain the platinum texture) and of the clouds. No credits until then.
+2. **Ridge facet read**: the flat-shaded ridge facets are geometry and remain the dominant low-poly read at street level; next is a
+   smoothed-normal field on the OUTER rows only (the inner rows are the collision plane).
+3. **Clouds, residual**: flat stratus seen straight up (V09) still layers a little; the bodies are billboard impostors — the next step would
+   be a few larger hero puffs per body or a raymarched deck on HIGH only.
+4. Construction language beyond the three civic buildings (class-house platforms, HALO supports, bridges); coast islands still meet the sea
+   without a wet band.

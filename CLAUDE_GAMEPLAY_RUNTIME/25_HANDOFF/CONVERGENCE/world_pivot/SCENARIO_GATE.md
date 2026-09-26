@@ -62,3 +62,9 @@ fixed seeds, one pass, no re-rolls:
 
 Cost: **6 × 33 = 198 CU** at quality high (or 6 × 12 = 72 CU at medium). Alternative owner decision: upgrade to **Pro** for PATINA
 Material (true five-map PBR sets from the same prompts). Nothing runs until the owner approves one of these as a whole.
+
+## Pilot outcome (2026-09-26)
+
+The owner approved option E (rock + platinum, high, ≤ 66 CU). Rock ran (33 CU); platinum was refused by the free plan's 50 CU
+custom-generation allowance before any job existed. Results, evidence and the recommendation: `SCENARIO_PILOT.md`. No further credits
+without a new owner decision.
