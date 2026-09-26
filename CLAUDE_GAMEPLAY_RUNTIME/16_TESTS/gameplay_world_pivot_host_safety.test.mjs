@@ -56,4 +56,12 @@ var cons = { piers: /pb = t3 \? y3 \+ 0\.08 : 3\.6/.test(CITY), eave: /if \(y3 \
   transom: /cY = en\.height \+ 0\.35/.test(CITY) && /ty = cY \+ 0\.42/.test(CITY) && /cY \+ 0\.2, en\.z/.test(CITY) && minDoor + 0.35 + 0.2 >= 3.4, upperTiers: minUpper >= 3.4, fins: /var Lx = runOf\(f\.w, f\), Lz = runOf\(f\.d, f\)/.test(CITY) };
 ok('7. M8C construction pieces (piers, eave fascias, service louvres, entrance transom and canopy rods) stay ≥ 3.4 m above the ground; fins stand on the straight wall runs', Object.keys(cons).every(function (k) { return cons[k]; }), Object.assign({ buildings: blds.length, min_upper_tier_base_m: minUpper, min_door_h_m: minDoor }, cons));
 
+/* 8. M8D towering cumulus: the camera-relative tower ring is based above the HALO deck height and, from ANY camera position inside the
+      field walls (+120 m margin), its nearest possible body stays farther from the HALO centre than the HALO shell — no tower can ever
+      reach the upper realm; the layer is a non-occluding bank outside the celestial optics. */
+var TWR = (R.sky.layers || []).filter(function (L) { return L.follow; }), FW = R.field && R.field.walls;
+var farCam = FW ? Math.max.apply(null, [[FW.x1, FW.z1], [FW.x1, FW.z2], [FW.x2, FW.z1], [FW.x2, FW.z2]].map(function (c) { return Math.hypot(c[0] - HALO_LAYOUT.center.x, c[1] - HALO_LAYOUT.center.z); })) + 120 : Infinity;
+var towerSafe = TWR.length > 0 && TWR.every(function (L) { return L.bank && !L.occludes && L.alt_m >= HALO_LAYOUT.arrival_height_m && L.ring_m[0] - L.size_m[1] / 2 - farCam > HALO_LAYOUT.shell_radius_m; });
+ok('8. the camera-relative towering-cumulus ring stays above the deck height and always farther from the HALO than its shell, from anywhere in the field', towerSafe, TWR.map(function (L) { return { id: L.id, alt_m: L.alt_m, nearest_to_halo_m: L.ring_m[0] - L.size_m[1] / 2 - farCam, shell_m: HALO_LAYOUT.shell_radius_m }; }));
+
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

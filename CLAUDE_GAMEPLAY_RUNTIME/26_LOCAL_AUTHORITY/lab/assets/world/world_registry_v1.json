@@ -1,6 +1,6 @@
 {
  "version": "WORLD_REGISTRY_V1",
- "generated": "2026-09-25T19:19:32.191Z",
+ "generated": "2026-09-26T01:21:20.293Z",
  "_doc": "JOB B world registry (owner directive 2026-09-19 §19): sources (provenance) → derivatives (what ships) → artifacts / zones / fixtures / creatures / celestial (placement + policy). Coordinates are FIELD metres (x east, z north, y up), yaw in degrees around +y. Collision shapes for the host are GENERATED from this file by deploy/jobb/build_world_colliders.mjs (never hand-edited twice). states: PLACED = built and in the world · WAITING_FOR_JOB_A = the hook exists, the gameplay side is JOB A's · PROVISIONAL = owner tuning pending.",
  "field": {
   "walls": {
@@ -5864,6 +5864,8 @@
    {
     "id": "STRATUS_LOW",
     "kind": "CLOUD",
+    "style": "STRATUS",
+    "size_pow": 1.4,
     "alt_m": 118,
     "max_top_m": 200,
     "count": 12,
@@ -5883,6 +5885,8 @@
    {
     "id": "CUMULUS_MID",
     "kind": "CLOUD",
+    "style": "CUMULUS",
+    "size_pow": 1.8,
     "alt_m": 180,
     "max_top_m": 226,
     "count": 26,
@@ -5919,6 +5923,7 @@
     "id": "CUMULUS_HORIZON",
     "kind": "CLOUD",
     "bank": true,
+    "style": "CUMULUS",
     "alt_m": 96,
     "max_top_m": 236,
     "ring_m": [
@@ -5931,6 +5936,24 @@
      560
     ],
     "crown": 0.55,
+    "look_day": {
+     "hazeNear": 420,
+     "hazeFar": 1400,
+     "hazeMax": 0.42,
+     "hor": [
+      0,
+      0.1
+     ]
+    },
+    "look_night": {
+     "hazeNear": 420,
+     "hazeFar": 1400,
+     "hazeMax": 0.5,
+     "hor": [
+      0,
+      0.1
+     ]
+    },
     "opacity_day": 0.8,
     "opacity_night": 0.42,
     "color": "#c2cedb",
@@ -5938,6 +5961,57 @@
     "occludes": false,
     "drift_scale": 0.25,
     "note": "M8B sky realism: a ring of large, flatter cumulus banks behind the far massifs (820-1100 m) — scale and depth at the horizon; lit bodies like the low / mid layers but outside the Sun / Moon optics (they never cross the high celestial bodies)"
+   },
+   {
+    "id": "CUMULUS_TOWERS",
+    "kind": "CLOUD",
+    "bank": true,
+    "follow": true,
+    "style": "TOWER",
+    "alt_m": 262,
+    "ring_m": [
+     1060,
+     1200
+    ],
+    "count": 12,
+    "size_m": [
+     280,
+     540
+    ],
+    "tower_h_m": [
+     170,
+     400
+    ],
+    "avoid_deg": 26,
+    "opacity_day": 0.92,
+    "opacity_night": 0.46,
+    "color": "#c7d2de",
+    "rim_color": "#f1f5fb",
+    "occludes": false,
+    "drift_scale": 0.001,
+    "look_day": {
+     "hazeNear": 500,
+     "hazeFar": 1500,
+     "hazeMax": 0.4,
+     "hor": [
+      0.1,
+      0.3
+     ],
+     "baseDark": 0.26,
+     "shadowK": 0.62
+    },
+    "look_night": {
+     "hazeNear": 500,
+     "hazeFar": 1500,
+     "hazeMax": 0.55,
+     "hor": [
+      0.1,
+      0.3
+     ],
+     "baseDark": 0.14,
+     "shadowK": 0.45
+    },
+    "note": "M8D cloud realism: towering cumulus (congestus) on a CAMERA-RELATIVE ring 1060-1200 m out, rising behind the far massifs (620-860 m) — the scale the sky lacked. Bank: outside the Sun / Moon optics; based above the HALO deck height and always > 1 km from the viewer, so no body can reach the upper realm; the ring keeps 26 deg clear of the Sun and Moon azimuths (the lavender Moon stays unobstructed); effectively static (distant towers barely move)"
    }
   ],
   "atmosphere": {

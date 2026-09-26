@@ -6,6 +6,7 @@ import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath }
 import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
 import { surfaceDetail, applySurface, SURFACE, zonedPaving, createPavingZones, PAVING_TYPES, applyGeology, applyCrystal } from '../26_LOCAL_AUTHORITY/lab/world/surfaceDetail.js';
 import { celestialCloudOptics } from '../26_LOCAL_AUTHORITY/lab/world/sky.js';
+import { towerCluster, cloudCluster } from '../26_LOCAL_AUTHORITY/lab/world/cloudBodies.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
@@ -68,5 +69,22 @@ var m8c = { applied: /applyGeology\(THREE, mat, \{ snowY: R\.h_max \* 0\.6/.test
   naturalGated: /smoothstep\(0\.03, 0\.3, zNat0\)/.test(ZP),
   water: /float wShallow = 1\.0 - smoothstep\(1\.4, 6\.5, wEd\);/.test(WAT) && /metalnessFactor \*= 1\.0 - 0\.6 \* wShallow;/.test(WAT) && /\|mahworld-water-shallow2/.test(WAT) };
 ok('8. M8C physical world: one geology pipeline on ridges / far massifs / islands (beds, ledges, joints, master fractures, clefts; footprint AA; only smooth fields in the bump), the crystal family, natural ground gated to soft zones, the shallow-water cue', Object.keys(m8c).every(function (k) { return m8c[k]; }), m8c);
+
+/* 9. M8D cloud realism: the cotton-ball puffs are replaced by a shared procedural ATLAS of four noise-eroded shapes (gaussian-sum masses,
+      domain warp, billow cauliflower rims, a thickness channel); every body is lit from the key's side as a whole, self-shadows through its
+      thickness (tiered taps), has a flat darker base, aerial perspective and a horizon fade; a camera-relative ring of TOWERING cumulus adds
+      the missing scale behind the far massifs, outside the celestial optics, clear of the Sun / Moon sectors, drawn before nearer layers. */
+var CB = src('lab/world/cloudBodies.js'), SK = src('lab/world/sky.js'), TW = REG.sky.layers.filter(function (L) { return L.style === 'TOWER'; })[0];
+function seededR(n) { var st = n >>> 0; return function () { st = (st * 1664525 + 1013904223) >>> 0; return st / 4294967296; }; }
+var tA = towerCluster(420, 300, seededR(11)), tB = towerCluster(420, 300, seededR(11)), tBase = tA.filter(function (p) { return p.flat === 1; }), tCaps = tA.filter(function (p) { return p.height === 1; });
+var noTower = JSON.parse(JSON.stringify(REG.sky)); noTower.layers = noTower.layers.filter(function (L) { return L.style !== 'TOWER'; }); var oT1 = celestialCloudOptics(REG.sky, [0.4, 0.5, -0.6], 77, false, {}), oT2 = celestialCloudOptics(noTower, [0.4, 0.5, -0.6], 77, false, {});
+var clouds = { atlas: /var SHAPES = \[/.test(CB) && /Math\.exp\(-\(dx \* dx \+ dy \* dy\) \* 1\.7\)/.test(CB) && /nb = 1 - Math\.abs\(2 \* fbm\(/.test(CB) && /ATLAS\[key\] = \{ tex: t, refs: 1 \}/.test(CB) && /function releaseAtlas\(tex\)/.test(CB),
+  light: /float side = dot\(normalize\(vRel \+ vec3\(0\.0, 0\.2, 0\.0\)\), Lw\)/.test(CB) && /occl = cellTex\(u \+ vLs \* 0\.06\)\.r/.test(CB) && /#if CLOUD_TAPS > 1/.test(CB) && /float baseK = 1\.0 - smoothstep\(0\.0, 0\.3, vH\)/.test(CB) && /float horK = 1\.0 - smoothstep\(uHor\.x, uHor\.y, vElev\)/.test(CB) && /taps: qt === 'LOW' \? 0 : \(qt === 'MED' \? 1 : 2\)/.test(SK),
+  towers: !!TW && TW.bank === true && TW.follow === true && TW.occludes === false && TW.alt_m >= 240 && TW.ring_m[0] - TW.size_m[1] / 2 > 700 && TW.avoid_deg >= 20 && Math.abs(oT1.tau - oT2.tau) < 1e-9,
+  towerShape: JSON.stringify(tA) === JSON.stringify(tB) && tBase.length >= 4 && tCaps.length >= 2 && tCaps.every(function (c) { return tBase.every(function (b) { return c.y > b.y; }); }) && tA.every(function (p) { return Math.abs(p.x) < 420 * 0.75; }),
+  order: /renderOrder: L\.follow \? 1 : \(L\.bank \? 2 : 4 \+ li\)/.test(SK) && /im\.renderOrder = L\.occludes \? 4 \+ li : 2/.test(SK) && /var rcx = Ly\.L\.follow && camPos \? camPos\.x : 0/.test(SK),
+  sizes: REG.sky.layers.filter(function (L) { return L.id === 'CUMULUS_MID' || L.id === 'STRATUS_LOW'; }).every(function (L) { return L.size_pow > 1; }) && /Math\.pow\(rnd\(\), L\.size_pow \|\| 1\)/.test(CB),
+  pinned: cloudCluster(160, seededR(7)).length === cloudCluster(160, seededR(7)).length };
+ok('9. M8D cloud realism: noise-eroded shape atlas, whole-body key lighting with thickness self-shadow (tiered), flat darker bases, aerial perspective + horizon fade, skewed sizes, a camera-relative towering-cumulus ring (bank, outside the optics, clear of the Sun / Moon, far layers first)', Object.keys(clouds).every(function (k) { return clouds[k]; }), clouds);
 
 console.log('RESULT world material realism: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
