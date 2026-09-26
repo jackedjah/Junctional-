@@ -1,7 +1,7 @@
 /* MAHWORLD :: WORLD PREVIEW CAPTURE (dev only). Serves the repository root on 127.0.0.1 with the preview page mounted at
    lab/world_preview.html, opens it in headless Chromium (software WebGL is fine for stills) and writes one JPEG per fixed viewpoint plus a
    JSON report (world status, renderer counters, per-view timing). The viewpoints are FIXED so every world-pivot pass compares like with like.
-   node deploy/world_preview/capture.mjs <outDir> [--views V01,V08] [--tod DAY|NIGHT|BOTH] [--quality HIGH|MED|LOW] [--size 1280x720] [--settle 2500] [--show] [--clock 2.4,7.2]
+   node deploy/world_preview/capture.mjs <outDir> [--views V01,V08] [--tod DAY|NIGHT|BOTH] [--quality HIGH|MED|LOW] [--size 1280x720] [--settle 2500] [--show] [--clock 2.4,7.2] [--cam "C1=x,y,z:lx,ly,lz;…"]
    Needs Playwright (global) and a Chromium: PLAYWRIGHT_CHROMIUM or /opt/pw-browsers/chromium. Never used by the game or the package. */
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url'; import { createRequire } from 'node:module'; import { execSync } from 'node:child_process';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.resolve(HERE, '..', '..'); var ROOT = path.resolve(LA, '..', '..');
@@ -64,6 +64,8 @@ function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   var want = arg('--views', null); var views = VIEWS.filter(function (v) { return !want || want.split(',').indexOf(v[0]) >= 0; });
+  /* M10: ad-hoc audit cameras (not part of the fixed set): --cam "C1=x,y,z:lx,ly,lz;C2=…" */
+  if (arg('--cam', null)) { var cams = arg('--cam', null).split(';').filter(Boolean).map(function (c) { var kv = c.split('='), pl = kv[1].split(':'); return [kv[0], 'ad-hoc audit camera', pl[0].split(',').map(Number), pl[1].split(',').map(Number)]; }); views = want ? views.concat(cams) : cams; }
   var tods = TOD === 'BOTH' ? ['DAY', 'NIGHT'] : [TOD];
   var srv = await serve(); var origin = 'http://127.0.0.1:' + srv.address().port;
   var browser = await chromium().launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM || '/opt/pw-browsers/chromium', args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
