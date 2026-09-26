@@ -21,7 +21,8 @@ untouched; no deploy is part of this ledger.
 | phone-sized frames (desktop emulation, NOT a phone test) | MED tier 393×852 | `evidence/cp4_after/phone_med_day/` |
 | M8C rock / construction / water | stratified jointed rock with ledges, crystal facets, natural forest ground, shallows at the banks, civic piers / fascias / service bay / entrance transom | `evidence/m8c_rock.jpg`, `m8c_world.jpg`, `m8c_construction.jpg`, `m8c_night.jpg` |
 | M8D clouds + Scenario pilot | noise-eroded cloud shapes, body lighting, flat shaded bases, towering horizon cumulus, lavender Moon kept clear; the rock texture pilot (isolated) | `evidence/m8d_clouds_day.jpg`, `m8d_clouds_halo.jpg`, `m8d_clouds_night.jpg`, `m8d_clouds_phone.jpg`, `evidence/scenario_pilot/` + `SCENARIO_PILOT.md` |
-| M8E lived-in buildings (latest) | real windows per floor with rooms behind the glass, lit / dark rooms at night, storefront entrances, balcony, service bays, parapets + roof access; one synchronised class-colour light show (plaza, sanctuaries, HALO rim); LEAN spire house windows + door | `evidence/m8e_facades_day.jpg`, `m8e_facades_night.jpg`, `m8e_plaza_day.jpg`, `m8e_show_steps.jpg`, `m8e_houses_halo.jpg`, `m8e_phone_med.jpg` |
+| M8E lived-in buildings | real windows per floor with rooms behind the glass, lit / dark rooms at night, storefront entrances, balcony, service bays, parapets + roof access; one synchronised class-colour light show (plaza, sanctuaries, HALO rim); LEAN spire house windows + door | `evidence/m8e_facades_day.jpg`, `m8e_facades_night.jpg`, `m8e_plaza_day.jpg`, `m8e_show_steps.jpg`, `m8e_houses_halo.jpg`, `m8e_phone_med.jpg` |
+| M9 world refinement round 1 (latest) | mountains as rock mass, far massifs, clouds without pancakes, meadow only on natural ground, coast beach (flip fix) + islands, tree-elevator grounding, mid-distance bridges / towers, HALO garden terraces + promenade + lit lattice nodes, night light pools, terrace risers, MAH MATCH cladding | `evidence/m9_mountains.jpg`, `m9_clouds.jpg`, `m9_ground_coast.jpg`, `m9_structures.jpg`, `m9_halo.jpg`, `m9_night.jpg`, `m9_phone_med.jpg` |
 
 ## How evidence is produced
 
@@ -411,3 +412,41 @@ building), and at night every window band equally dark.
 2. Human-scale ground details on the landmark GLBs (steps, doors) need owner direction: their meshes are shipped derivatives.
 3. Carried over from M8D: the Scenario pilot decision (rock as meso detail), ridge facet smoothing on the outer rows, stratus layering seen
    straight up, coast islands without a wet band.
+
+## M9 — CONTINUOUS WORLD REFINEMENT, round 1 (`e1b413c` … `20ab52c`)
+
+Owner directive 2026-09-26 ("refine the entire existing world"): raise the weakest visual, structural, material and environmental areas
+continuously, preserving every accepted system; no random features; no prop spam; owner-test candidate when substantial.
+
+**Audit** (pinned `126f3fe`, all 30 fixed views by day, 14 by night, 6 phone-sized): ranked by screen share and severity —
+(1) mountains everywhere read as low-poly grey facets and the far ring as translucent glass pyramids; (2) clouds stacked into towers of
+grey pancakes seen from below; (3) crystal blades scattered like confetti over paved squares; (4) the mainland coast read as a dark moat
+from above; (5) plain structures — white pipe bridges, plain obelisks, the flat black MAH MATCH box, grey terrace risers; (6) the tree
+elevator meeting the plaza as a plain cylinder; (7) the HALO deck an empty plate. Raycast forensics resolved three apparent bugs as
+viewpoint drift: V01 now sits on the arena roof, V22 inside the exchange, V27 0.7 m from a crystal monolith (corrected companions added).
+
+| field | value |
+|---|---|
+| mountains (`e1b413c`) | geology MACRO RELIEF (fall-line gullies and buttress ribs 10–40 m, ridged, in POLAR coordinates so it is continuous across faces; the ±π wrap sits due south over the open sea) on the ridges; less sky ambient. An A/B showed smoothed normals wash the rock out pale, so the faces stay flat-shaded and the relief breaks up the facet planes. Far massifs: denser cones (22 × 11; LOW 12 × 6) with ridged noise and arêtes, a firmer lit / shadow split, a cool blue-grey aerial-perspective palette clearly darker than the horizon sky, calmer strata. Shading only on the ridges: the inner face stays the OP10 collision plane (ridge collision 8 / 8) |
+| clouds (`19d6d20`) | diagnosis by isolation render: a body is a row of flattened base puffs; seen end-on from 15–60° below it projected into a tower of ellipses, and every puff drew its own rim / lining / self-shadow. Now ONE horizontal soft BASE PLATE per body (yaw-aligned, the body's footprint) fades in as the body goes overhead while the base puffs fade out — one flat, darker underside; SHELL shading — core puffs merge softly, only silhouette puffs keep the crisp cauliflower edge, self-shadow and silver lining. +1 instance per body, no draws, no texture reads |
+| ecology (`1020d1f`) | crystal meadow blades grow only on NATURAL ground (inside the forest / garden zones, noise-feathered edge), ×1.5 density there; none on paving |
+| tree elevator (`15d329e`) | twelve structural RIBS up the trunk into the twelve boughs, tapered branching ROOT inlays flush in the fine-ring paving, flush UPLIGHTS and a night light-wash on the lower trunk (live day / night). Host-safe: ribs ≤ 5 cm beyond the r 6.2 m collider below 3.4 m, roots 12 mm inlays, the dock side clear |
+| mid layer (`15d329e`) | the 230–330 m walkway arcs become bridges (deck, girder, parapets, piers with caps, a neutral deck-edge light line at night); the obelisks become three stepped tiers with setbacks, glazing bands lit at night, cap rings |
+| HALO (`f93f3a7`) | deck zones drawn flush into its plan texture (nothing may stand on the walkable deck without a collider): a PROMENADE of darker honed slabs with curbs inside the glass sky-walk, five class GARDEN TERRACES (arc beds between the 72 m and 96 m rings, stepping paths, class-colour crystal glints that glow faintly at night, platinum curbs). Read from above / in flight (V35); flush art compresses at eye level (V31) |
+| coast (`38df9e5`) | FIX (pre-existing): the shared shore gradient ran upside down (CanvasTexture flipY — uv v = 0, the dry end, sampled the deep tone), so the beach read as a dark moat from above and the canal banks were inverted too. Profile remap (wide pale dry sand, damp, a narrow wet band). Islands: 9-ring plateau with a sandy shelf into a rocky crown, headlands / coves and a cliff side, macro relief; the octahedron "trees" become rounded crowns tinted in the island's class family |
+| night + MAH MATCH (`3dfd161`) | street-light pools 9 m, night alpha 0.7 (registry → colliders hash only, `--check` clean); MAH MATCH's black body takes a MONOLITH cladding family (large panels on the light-line rhythm), owner brief kept |
+| HALO nodes (`d4a72b6`, after the pinned set) | a cast joint at every dome-lattice crossing and on its crown ring (156, one instanced draw): structure by day, a quiet node light at night, the class sequence in the show; on the shell, outside the playable volume |
+| terrain (`7d6cd8d`) | crown-terrace slabs take CLADDING (stone courses on the risers); monoliths take the shared cut-crystal treatment |
+| harness | `--qs` dev switches (A/B), `--clock` (M8E), new fixed views V31 HALO arrival · V32 / V33 corrected plaza views · V34 MAH MATCH · V35 HALO from high in the dome |
+| before / after | pinned `126f3fe` → pinned `7d6cd8d`: `evidence/m9_before/…` → `evidence/m9_after/…`; sheets `evidence/m9_*.jpg` |
+| perf | 35 matched day views (pinned `126f3fe` → `7d6cd8d`): draw calls 6909 → 6795 (−1.7 %: the meadow builds fewer chunks), triangles 39.98 M → 43.16 M (+8 %: almost all the denser far massifs, ≈ 97 k per view), shader programs 129 → 132, textures 89 → 91; 19 night views: calls −0.9 %, triangles +7.6 %; phone-sized MED frames: calls −0.2 %, triangles +9 % — after the evidence MED builds the massifs at 16 × 8 (`20ab52c`, about half of HIGH). New per-fragment cost: the ridge / island relief (2 fBm evaluations), the cloud shell term (a few ALU); the HALO zones are texture-only. Software WebGL: relative counters, not phone performance |
+| tests | material realism 10 / 10, host safety 8 / 8, colour law 4 / 4, Moon / cloud 19 / 19, ridge collision 8 / 8 at every commit; colliders `--check` clean after the registry change; full suite 61 files / 436 checks passing, the same 37 files failing as before this round (all blocked on the missing sibling runtime roots, plus `gameplay_mahgic_tree`'s pre-existing static-build check). One commit (`15d329e`) went out with check 10's live-hook regex failing (it matched the old one-statement city setNight exactly); fixed in `e34deac` |
+| not done — blocked | **creatures** (fish / horse / Phoenix) are host-driven (`p.wildlife`, play/world/WildlifeManager.js): the host-free preview cannot show or judge them — waits on the runtime bridge. **HALO activity zones / seating / pavilions** and any standing prop on walkable ground need NEW COLLIDERS, which the host-safe rule forbids while the runtime is blocked (anything visual without a collider would be walked or flown through). **Gameplay presentation** (movement, camera, landing, flight, elevator ride, combat feedback) needs the running game — blocked on the bridge |
+| residual | ridge / massif silhouettes are still the authored low-poly geometry (the relief is shading); cloud bodies are billboard impostors (the pancake read is gone, the per-puff read at close range remains); the HALO at eye level is still a very large flat deck; the Moon is the owner's stylised lavender body (unchanged); MAH MATCH stays deliberately black |
+
+### M9 next — open issues (nothing here is approved)
+
+1. **Owner review** of round 1 (sheets above); the tree grounding and the HALO zones are the most subjective.
+2. Blocked on the runtime bridge: creature presentation, HALO activity zones / seating (need colliders), gameplay presentation.
+3. Next refinement candidates: ridge / massif silhouettes (geometry is still the authored low-poly ring), cloud bodies at close range,
+   HALO eye-level composition, the plaza ramp / furniture material pass, night value hierarchy (the moonlit ground is still bright).

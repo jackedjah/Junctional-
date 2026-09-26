@@ -1,0 +1,998 @@
+{
+ "started": "2026-09-26T05:14:49.154Z",
+ "size": [
+  1280,
+  720
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V01",
+   "label": "plaza hub toward the temple causeway",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V01_DAY.jpg",
+   "pos": [
+    0,
+    7,
+    -30
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 297,
+    "triangles": 2258243,
+    "geometries": 296,
+    "textures": 61,
+    "programs": 129
+   },
+   "frames_in_600ms": 0,
+   "ms": 38345
+  },
+  {
+   "id": "V02",
+   "label": "world overview from the south",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V02_DAY.jpg",
+   "pos": [
+    0,
+    170,
+    -270
+   ],
+   "look": [
+    0,
+    0,
+    70
+   ],
+   "stats": {
+    "calls": 381,
+    "triangles": 2307943,
+    "geometries": 384,
+    "textures": 64,
+    "programs": 129
+   },
+   "frames_in_600ms": 0,
+   "ms": 25881
+  },
+  {
+   "id": "V03",
+   "label": "ATHLETE gold temple forecourt",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V03_DAY.jpg",
+   "pos": [
+    0,
+    8,
+    122
+   ],
+   "look": [
+    0,
+    14,
+    178
+   ],
+   "stats": {
+    "calls": 170,
+    "triangles": 2107659,
+    "geometries": 387,
+    "textures": 68,
+    "programs": 130
+   },
+   "frames_in_600ms": 0,
+   "ms": 35004
+  },
+  {
+   "id": "V04",
+   "label": "TITAN blue tower and gate",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V04_DAY.jpg",
+   "pos": [
+    58,
+    10,
+    104
+   ],
+   "look": [
+    112,
+    20,
+    110
+   ],
+   "stats": {
+    "calls": 141,
+    "triangles": 1446960,
+    "geometries": 388,
+    "textures": 71,
+    "programs": 130
+   },
+   "frames_in_600ms": 0,
+   "ms": 35571
+  },
+  {
+   "id": "V05",
+   "label": "LEAN crimson canyon corridor",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V05_DAY.jpg",
+   "pos": [
+    -86,
+    11,
+    138
+   ],
+   "look": [
+    -112,
+    12,
+    210
+   ],
+   "stats": {
+    "calls": 141,
+    "triangles": 869416,
+    "geometries": 389,
+    "textures": 71,
+    "programs": 130
+   },
+   "frames_in_600ms": 0,
+   "ms": 34760
+  },
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V06_DAY.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 109,
+    "triangles": 912406,
+    "geometries": 389,
+    "textures": 72,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 23839
+  },
+  {
+   "id": "V07",
+   "label": "BAGE pink market and basins",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V07_DAY.jpg",
+   "pos": [
+    0,
+    9,
+    212
+   ],
+   "look": [
+    0,
+    8,
+    258
+   ],
+   "stats": {
+    "calls": 136,
+    "triangles": 1423780,
+    "geometries": 390,
+    "textures": 78,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 18072
+  },
+  {
+   "id": "V08",
+   "label": "HALO deck arrival court",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V08_DAY.jpg",
+   "pos": [
+    80,
+    251,
+    40
+   ],
+   "look": [
+    51,
+    240.5,
+    40
+   ],
+   "stats": {
+    "calls": 229,
+    "triangles": 1051974,
+    "geometries": 442,
+    "textures": 80,
+    "programs": 131
+   },
+   "frames_in_600ms": 0,
+   "ms": 24318
+  },
+  {
+   "id": "V09",
+   "label": "HALO dome from the ground",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V09_DAY.jpg",
+   "pos": [
+    -130,
+    22,
+    -150
+   ],
+   "look": [
+    30,
+    230,
+    40
+   ],
+   "stats": {
+    "calls": 281,
+    "triangles": 756482,
+    "geometries": 495,
+    "textures": 80,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 14384
+  },
+  {
+   "id": "V10",
+   "label": "sky toward the Sun",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V10_DAY.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    260,
+    150,
+    140
+   ],
+   "stats": {
+    "calls": 241,
+    "triangles": 1195108,
+    "geometries": 495,
+    "textures": 80,
+    "programs": 132
+   },
+   "frames_in_600ms": 1,
+   "ms": 23226
+  },
+  {
+   "id": "V11",
+   "label": "south coast horizon",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V11_DAY.jpg",
+   "pos": [
+    0,
+    7,
+    -140
+   ],
+   "look": [
+    0,
+    4,
+    -300
+   ],
+   "stats": {
+    "calls": 79,
+    "triangles": 340360,
+    "geometries": 495,
+    "textures": 80,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 19352
+  },
+  {
+   "id": "V12",
+   "label": "view back over MAHWORLD from the HALO rim",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V12_DAY.jpg",
+   "pos": [
+    30,
+    247,
+    184
+   ],
+   "look": [
+    20,
+    40,
+    520
+   ],
+   "stats": {
+    "calls": 118,
+    "triangles": 649634,
+    "geometries": 495,
+    "textures": 80,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 8460
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V13_DAY.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 285,
+    "triangles": 1651549,
+    "geometries": 495,
+    "textures": 81,
+    "programs": 132
+   },
+   "frames_in_600ms": 1,
+   "ms": 17970
+  },
+  {
+   "id": "V14",
+   "label": "HALO glass sky-walk looking down",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V14_DAY.jpg",
+   "pos": [
+    30,
+    243,
+    172
+   ],
+   "look": [
+    30,
+    0,
+    262
+   ],
+   "stats": {
+    "calls": 231,
+    "triangles": 1699717,
+    "geometries": 496,
+    "textures": 82,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 17418
+  },
+  {
+   "id": "V15",
+   "label": "civic facade close (Mentor Spire)",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V15_DAY.jpg",
+   "pos": [
+    6,
+    2.6,
+    -9
+   ],
+   "look": [
+    24,
+    7,
+    0
+   ],
+   "stats": {
+    "calls": 201,
+    "triangles": 1134252,
+    "geometries": 496,
+    "textures": 82,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 15791
+  },
+  {
+   "id": "V16",
+   "label": "LEAN spire house on the north-west terrace",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V16_DAY.jpg",
+   "pos": [
+    -82,
+    7,
+    238
+   ],
+   "look": [
+    -110,
+    15,
+    272
+   ],
+   "stats": {
+    "calls": 123,
+    "triangles": 746942,
+    "geometries": 496,
+    "textures": 85,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 11924
+  },
+  {
+   "id": "V17",
+   "label": "VISIONARY overlook close",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V17_DAY.jpg",
+   "pos": [
+    -127,
+    5,
+    16
+   ],
+   "look": [
+    -152,
+    9,
+    0
+   ],
+   "stats": {
+    "calls": 103,
+    "triangles": 575312,
+    "geometries": 496,
+    "textures": 87,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 11624
+  },
+  {
+   "id": "V18",
+   "label": "plaza hardscape close (Mentor Spire base)",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V18_DAY.jpg",
+   "pos": [
+    -2,
+    1.6,
+    -16
+   ],
+   "look": [
+    10,
+    0.2,
+    -6
+   ],
+   "stats": {
+    "calls": 235,
+    "triangles": 1172354,
+    "geometries": 496,
+    "textures": 87,
+    "programs": 132
+   },
+   "frames_in_600ms": 1,
+   "ms": 14190
+  },
+  {
+   "id": "V19",
+   "label": "HALO trunk base and elevator close",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V19_DAY.jpg",
+   "pos": [
+    16,
+    2.2,
+    22
+   ],
+   "look": [
+    30,
+    7,
+    40
+   ],
+   "stats": {
+    "calls": 222,
+    "triangles": 1584157,
+    "geometries": 496,
+    "textures": 87,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 13490
+  },
+  {
+   "id": "V20",
+   "label": "causeway road edge close",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V20_DAY.jpg",
+   "pos": [
+    7,
+    1.7,
+    70
+   ],
+   "look": [
+    0,
+    0.3,
+    92
+   ],
+   "stats": {
+    "calls": 173,
+    "triangles": 1629409,
+    "geometries": 496,
+    "textures": 87,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 18486
+  },
+  {
+   "id": "V21",
+   "label": "sky away from the Sun (zenith depth, anti-solar band)",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V21_DAY.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    -120,
+    40,
+    -70
+   ],
+   "stats": {
+    "calls": 173,
+    "triangles": 739222,
+    "geometries": 496,
+    "textures": 87,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 13606
+  },
+  {
+   "id": "V22",
+   "label": "Moon from the plaza",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V22_DAY.jpg",
+   "pos": [
+    0,
+    4,
+    20
+   ],
+   "look": [
+    -32,
+    40,
+    -80
+   ],
+   "stats": {
+    "calls": 180,
+    "triangles": 741716,
+    "geometries": 496,
+    "textures": 87,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 9458
+  },
+  {
+   "id": "V23",
+   "label": "plaza hub paving from above",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V23_DAY.jpg",
+   "pos": [
+    14,
+    9,
+    -20
+   ],
+   "look": [
+    0,
+    0,
+    0
+   ],
+   "stats": {
+    "calls": 278,
+    "triangles": 1926475,
+    "geometries": 496,
+    "textures": 87,
+    "programs": 132
+   },
+   "frames_in_600ms": 1,
+   "ms": 18020
+  },
+  {
+   "id": "V24",
+   "label": "TITAN district paving close",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V24_DAY.jpg",
+   "pos": [
+    150,
+    1.8,
+    80
+   ],
+   "look": [
+    160,
+    0,
+    95
+   ],
+   "stats": {
+    "calls": 127,
+    "triangles": 738904,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 17772
+  },
+  {
+   "id": "V25",
+   "label": "ATHLETE district paving close",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V25_DAY.jpg",
+   "pos": [
+    -30,
+    1.8,
+    146
+   ],
+   "look": [
+    -30,
+    0,
+    162
+   ],
+   "stats": {
+    "calls": 165,
+    "triangles": 2096445,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 14952
+  },
+  {
+   "id": "V26",
+   "label": "canal bank and water edge close",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V26_DAY.jpg",
+   "pos": [
+    20,
+    2.2,
+    204
+   ],
+   "look": [
+    40,
+    0,
+    226
+   ],
+   "stats": {
+    "calls": 128,
+    "triangles": 759548,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 16418
+  },
+  {
+   "id": "V27",
+   "label": "ridge face close from the TITAN ledge",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V27_DAY.jpg",
+   "pos": [
+    166,
+    14,
+    130
+   ],
+   "look": [
+    230,
+    40,
+    150
+   ],
+   "stats": {
+    "calls": 92,
+    "triangles": 393060,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 9231
+  },
+  {
+   "id": "V28",
+   "label": "civic roofline, piers and service bay (Mentor Spire rear)",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V28_DAY.jpg",
+   "pos": [
+    46,
+    11,
+    -12
+   ],
+   "look": [
+    29,
+    16,
+    0
+   ],
+   "stats": {
+    "calls": 281,
+    "triangles": 1735111,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 16756
+  },
+  {
+   "id": "V29",
+   "label": "Training Hall entrance facade",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V29_DAY.jpg",
+   "pos": [
+    -3,
+    2.4,
+    9
+   ],
+   "look": [
+    -22,
+    5.5,
+    -1
+   ],
+   "stats": {
+    "calls": 171,
+    "triangles": 783240,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 17682
+  },
+  {
+   "id": "V30",
+   "label": "Mahgic Exchange entrance facade",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V30_DAY.jpg",
+   "pos": [
+    -6,
+    2.4,
+    6
+   ],
+   "look": [
+    3,
+    4.5,
+    24
+   ],
+   "stats": {
+    "calls": 249,
+    "triangles": 1965103,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 15721
+  },
+  {
+   "id": "V31",
+   "label": "HALO arrival: out from the upper dock across the deck",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V31_DAY.jpg",
+   "pos": [
+    24.5,
+    241.7,
+    40
+   ],
+   "look": [
+    80,
+    241,
+    60
+   ],
+   "stats": {
+    "calls": 171,
+    "triangles": 445856,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 14687
+  },
+  {
+   "id": "V32",
+   "label": "plaza hub toward the temple causeway (clear of the arena: V01 now sits on its roof)",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V32_DAY.jpg",
+   "pos": [
+    12,
+    1.7,
+    -4
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 244,
+    "triangles": 1742419,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 1,
+   "ms": 18037
+  },
+  {
+   "id": "V33",
+   "label": "Moon from the plaza (clear of the exchange: V22 now sits inside it)",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V33_DAY.jpg",
+   "pos": [
+    14,
+    1.7,
+    8
+   ],
+   "look": [
+    -32,
+    40,
+    -80
+   ],
+   "stats": {
+    "calls": 179,
+    "triangles": 739766,
+    "geometries": 496,
+    "textures": 89,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 16617
+  },
+  {
+   "id": "V34",
+   "label": "MAH MATCH hall exterior from its approach",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V34_DAY.jpg",
+   "pos": [
+    84,
+    2.2,
+    -14
+   ],
+   "look": [
+    122,
+    9,
+    6
+   ],
+   "stats": {
+    "calls": 136,
+    "triangles": 870684,
+    "geometries": 496,
+    "textures": 91,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 7746
+  },
+  {
+   "id": "V35",
+   "label": "HALO deck from high inside the dome (a flying view)",
+   "tod": "DAY",
+   "clock": null,
+   "file": "V35_DAY.jpg",
+   "pos": [
+    30,
+    330,
+    -70
+   ],
+   "look": [
+    30,
+    240,
+    60
+   ],
+   "stats": {
+    "calls": 325,
+    "triangles": 1965323,
+    "geometries": 496,
+    "textures": 91,
+    "programs": 132
+   },
+   "frames_in_600ms": 0,
+   "ms": 14384
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 8,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (520 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (19 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (16 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 5681.8,
+  "error": null
+ },
+ "finished": "2026-09-26T05:26:00.887Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 183,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife: population LOD — 20 mid schools / 228 agents (6 bodies + 14 sea schools), 120 far silhouettes (tier ×1)",
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (520 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (19 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (16 ms)"
+  ]
+ }
+}
