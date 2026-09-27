@@ -112,32 +112,6 @@
    "ms": 7357
   },
   {
-   "id": "HS",
-   "label": "ad-hoc audit camera",
-   "tod": "DAY",
-   "clock": 40,
-   "file": "HS_DAY_t40.jpg",
-   "pos": [
-    -372,
-    150.5,
-    -122
-   ],
-   "look": [
-    -420,
-    151,
-    -178
-   ],
-   "stats": {
-    "calls": 75,
-    "triangles": 458093,
-    "geometries": 240,
-    "textures": 43,
-    "programs": 165
-   },
-   "frames_in_600ms": 1,
-   "ms": 6790
-  },
-  {
    "id": "F4",
    "label": "ad-hoc audit camera",
    "tod": "NIGHT",
@@ -244,28 +218,54 @@
   {
    "id": "HS",
    "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HS_DAY_t40.jpg",
+   "pos": [
+    -419,
+    150.5,
+    -190
+   ],
+   "look": [
+    -393,
+    149,
+    -147
+   ],
+   "stats": {
+    "calls": 525,
+    "triangles": 2741642,
+    "geometries": 539,
+    "textures": 66,
+    "programs": 165
+   },
+   "frames_in_600ms": 0,
+   "ms": 64435
+  },
+  {
+   "id": "HS",
+   "label": "ad-hoc audit camera",
    "tod": "NIGHT",
    "clock": 40,
    "file": "HS_NIGHT_t40.jpg",
    "pos": [
-    -372,
+    -419,
     150.5,
-    -122
+    -190
    ],
    "look": [
-    -420,
-    151,
-    -178
+    -393,
+    149,
+    -147
    ],
    "stats": {
-    "calls": 79,
-    "triangles": 471373,
-    "geometries": 246,
-    "textures": 49,
+    "calls": 532,
+    "triangles": 2763770,
+    "geometries": 547,
+    "textures": 73,
     "programs": 165
    },
    "frames_in_600ms": 0,
-   "ms": 6216
+   "ms": 42625
   }
  ],
  "console_errors": [
@@ -288,13 +288,13 @@
   "tod": "DAY",
   "tier": "HIGH",
   "log": [
-   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
-   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
-   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98\u00d70.74\u00d70.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27\u00d70.73\u00d70.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE \u2014 figures follow p.wildlife (host authority; payment UI: none \u2014 wild / pet metadata only)",
    "worldB wildlife ready (467 ms)",
-   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "gear ready (bushes 41 \u00d7 64 shards, diamonds \u2264 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
    "worldB gear ready (18 ms)",
-   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels \u2264 10 visible, fade 30\u201348 m)",
    "worldB signage ready (12 ms)",
    "combatZones: 1 courts (CZ_ELEVATOR_GROVE 26 m) in 1 draw",
    "worldB combatZones ready (1 ms)",
@@ -331,18 +331,19 @@
   "tod": "NIGHT",
   "tier": "HIGH",
   "log": [
-   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
-   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
-   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98\u00d70.74\u00d70.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready \u2014 rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27\u00d70.73\u00d70.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) \u2192 shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE \u2014 figures follow p.wildlife (host authority; payment UI: none \u2014 wild / pet metadata only)",
    "worldB wildlife ready (467 ms)",
-   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "gear ready (bushes 41 \u00d7 64 shards, diamonds \u2264 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
    "worldB gear ready (18 ms)",
-   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels \u2264 10 visible, fade 30\u201348 m)",
    "worldB signage ready (12 ms)",
    "combatZones: 1 courts (CZ_ELEVATOR_GROVE 26 m) in 1 draw",
    "worldB combatZones ready (1 ms)",
    "aura: 56 spectral auras in one draw, 2 sky moments in the backdrop, 25 dimensional forms in one draw (2 following)",
    "worldB aura ready (3 ms)"
   ]
- }
+ },
+ "note": "HS frames re-captured at 961d484 with the new eye-level camera (the first HS camera was blocked by a floating crystal)"
 }
