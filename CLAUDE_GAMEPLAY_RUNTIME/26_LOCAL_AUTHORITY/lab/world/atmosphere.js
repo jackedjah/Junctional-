@@ -54,12 +54,13 @@ export function createAtmosphere(ctx) {
         '  #include <colorspace_fragment>',   /* the uniforms are linear (THREE.Color) → the renderer output space, like every built-in material */
         '}'].join('\n') });
     prev = dome.material; dome.material = mat; own.push(mat);
+    var sk = ctx.mods && ctx.mods.sky; if (sk && sk.shareSky) sk.shareSky(mat.uniforms);   /* M19 horizon merging (owner 2026-09-27): the cloud bodies fade into THIS dome's own colour along each view ray — one truth for the sky and the aerial perspective of the clouds */
     if (scene.fog) { scene.fog.color.set(P('fog')); if (scene.fog.isFog && P('fog_near_m')) scene.fog.near = P('fog_near_m'); }   /* the near forms keep their contrast; the falloff runs to the same far as before */ if (scene.background && scene.background.isColor) scene.background.set(P('horizon'));
     log('atmosphere: scattering dome on (' + tier() + (low ? ', Mie off' : '') + '), fog → ' + P('fog') + ', sun ' + sunDir().toArray().map(function (v) { return v.toFixed(2); }).join(','));
   }
   function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (!mat) return; mat.uniforms.uT.value = clock; var w = ctx.wind; mat.uniforms.uWind.value = w && typeof w.t === 'number' ? w.t * 0.1 : 0; }
   function setNight(n) { night = !!n; if (!mat) return; mat.uniforms.uZenith.value.set(P('zenith')); mat.uniforms.uHorizon.value.set(P('horizon')); mat.uniforms.uHaze.value.set(P('haze')); mat.uniforms.uSunTint.value.set(P('sunTint')); mat.uniforms.uGround.value.set(P('ground')); mat.uniforms.uMie.value = tier() === 'LOW' ? 0 : P('mie'); mat.uniforms.uSun.value.copy(sunDir()); mat.uniforms.uLav.value.set(P('lavender')); mat.uniforms.uLavK.value = P('lavender_k'); mat.uniforms.uHazeK.value = P('haze_k'); if (scene.fog) scene.fog.color.set(P('fog')); }
-  function dispose() { if (dome && prev) { dome.material = prev; } own.forEach(function (m) { m.dispose(); }); own = []; mat = null; }
+  function dispose() { var sk = ctx.mods && ctx.mods.sky; if (mat && sk && sk.shareSky) sk.shareSky(null); if (dome && prev) { dome.material = prev; } own.forEach(function (m) { m.dispose(); }); own = []; mat = null; }
   function debug() { return { on: !!mat, tier: tier(), night: night, fog: scene.fog ? '#' + scene.fog.color.getHexString() : null, mie: mat ? mat.uniforms.uMie.value : null, sun: sunDir().toArray().map(function (v) { return +v.toFixed(3); }) }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
 }
