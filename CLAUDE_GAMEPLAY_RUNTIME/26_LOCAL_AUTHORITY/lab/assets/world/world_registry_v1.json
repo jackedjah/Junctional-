@@ -2693,6 +2693,20 @@
       "x": 62,
       "z": 262,
       "h": 6
+     },
+     {
+      "x": 104,
+      "z": 312,
+      "h": 26,
+      "spire": true,
+      "m19": "WARM_CROWN_BEYOND_WALL"
+     },
+     {
+      "x": 146,
+      "z": 300,
+      "h": 20,
+      "spire": true,
+      "m19": "WARM_CROWN_BEYOND_WALL"
      }
     ]
    },
@@ -2852,6 +2866,20 @@
       "x": -150,
       "z": 262,
       "h": 7
+     },
+     {
+      "x": -196,
+      "z": 236,
+      "h": 26,
+      "spire": true,
+      "m19": "WARM_CROWN_BEYOND_WALL"
+     },
+     {
+      "x": -188,
+      "z": 290,
+      "h": 28,
+      "spire": true,
+      "m19": "WARM_CROWN_BEYOND_WALL"
      }
     ]
    },
@@ -2945,6 +2973,20 @@
       "x": 46,
       "z": 289,
       "h": 6
+     },
+     {
+      "x": -30,
+      "z": 318,
+      "h": 18,
+      "spire": true,
+      "m19": "WARM_CROWN_BEYOND_WALL"
+     },
+     {
+      "x": 30,
+      "z": 318,
+      "h": 18,
+      "spire": true,
+      "m19": "WARM_CROWN_BEYOND_WALL"
      }
     ]
    },

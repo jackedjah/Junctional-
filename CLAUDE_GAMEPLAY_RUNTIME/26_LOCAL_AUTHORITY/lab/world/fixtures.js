@@ -28,6 +28,23 @@ export function createFixtures(ctx) {
   function num(v, d) { return typeof v === 'number' && isFinite(v) ? v : d; }
   function col(v, d) { try { return new THREE.Color(typeof v === 'string' && v ? v : d); } catch (e) { return new THREE.Color(d); } }
   function log(m) { if (ctx.log) ctx.log('fixtures: ' + m); }
+  /* M19 (owner 2026-09-27: "the five-class civilization must visibly include ATHLETE gold, LEAN crimson and BAGE pink at eye level … light
+     fixtures, not whole regions bathed in colour"). Every luminaire used to burn the registry's one cyan-blue, so at night every district
+     and the shared plaza read TITAN. Now each lamp carries the class of the sanctuary it stands in (a 6 m margin): ATHLETE gilded gold,
+     LEAN crimson, BAGE rose; TITAN keeps the registry blue (unchanged); outside the sanctuaries a lamp on a road toward a warm sanctuary
+     carries that warm light (its road seam and inlays already do), and VISIONARY, the plaza ring, MAH MATCH and every other shared lamp
+     burn clean equal-channel white (colour law: civic light is neutral; purple is VISIONARY's, never the generic lamp; the registry's
+     pale-blue head_color is superseded). The warm class LIGHT tones are deeper than the pastel crystal .color
+     (#e6c36a / #f08ab8 tone-map to champagne / blush and never read as class light): each keeps its family hue through ACES at the head's
+     day (0.35) and night (1.6) emissive. Per-instance colour on the heads (albedo + emissive), the pools (the lamp's hue, no brighter than the
+     old blue pool: a warm cast, never a coloured floor) and the wet-floor streaks; the near-player lights take a warm lamp's tint when they
+     anchor to it. No new draw call, no new program per lamp. */
+  var LAMP_LIGHT = { gold: 0xf7ba3c, red: 0xe8304a, pink: 0xff4aa8 }, LAMP_STREAK = { gold: 0xffe57c, red: 0xf35670, pink: 0xff95d6 }, LAMP_WHITE = 0xe2e2e2, POOL_WHITE = 0xb0b0b0, LAMP_BLUE = null, lampFam = null, lampTint = null;
+  function lampFamily(p, reg) { var RG = reg.regions && reg.regions.list || [], i, j;
+    for (i = 0; i < RG.length; i++) { var R = RG[i], s = R.shape || {}; if (!R.class) continue; var m = 6, inside = s.kind === 'CIRCLE' ? Math.hypot(p.x - s.x, p.z - s.z) <= s.r + m : (s.rects || []).some(function (r) { return p.x >= r.x1 - m && p.x <= r.x2 + m && p.z >= r.z1 - m && p.z <= r.z2 + m; }); if (inside) return R.family; }   /* a lamp at a sanctuary's edge (≤ 6 m) is that sanctuary's */
+    var road = null, PL = reg.paths && reg.paths.list || []; for (j = 0; j < PL.length && !road; j++) if (PL[j].id === p.route) road = PL[j].family;
+    var LK = reg.paths && reg.paths.links || []; for (j = 0; j < LK.length && !road; j++) if (LK[j].physical === p.route) road = LK[j].family;
+    return LAMP_LIGHT[road] ? road : 'platinum'; }   /* outside the sanctuaries a road toward a warm sanctuary carries its warm light (the shared world acknowledges the warm classes); every other shared lamp is neutral white — TITAN's blue stays in TITAN */
 
   /* the arm / head direction: toward the lane the fixture serves (route centreline, plaza centre, bridge centreline); yaw is the fallback */
   function laneDir(p, reg, out) {
@@ -76,10 +93,12 @@ export function createFixtures(ctx) {
     var poolGeo = new THREE.PlaneGeometry(POOL_SIZE_M, POOL_SIZE_M); poolGeo.rotateX(-Math.PI / 2);
     geos.push(poleGeo, armGeo, headGeo, poolGeo);
 
-    headMat = ctx.M.cyan.clone(); headMat.color.copy(col(F.head_color, '#bfe6ff')); headMat.emissive.copy(col(F.emissive, '#6fc3ff'));
+    headMat = ctx.M.cyan.clone(); headMat.color.setHex(0xededed); headMat.emissive.setHex(0xffffff);   /* M19: the lamp's own colour rides in the instance colour (albedo × tint, emissive × tint) */
+    headMat.onBeforeCompile = function (sh) { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_COLOR\n\ttotalEmissiveRadiance *= vColor.rgb;\n#endif'); }; headMat.customProgramCacheKey = function () { return 'mahworld_fixture_head_class'; };
     headMat.emissiveIntensity = night ? HEAD_EMISSIVE_NIGHT : HEAD_EMISSIVE_DAY; headMat.roughness = 0.22; headMat.metalness = 0.3; headMat.name = 'FIXTURE_HEAD';
+    LAMP_BLUE = col(F.emissive, '#6fc3ff'); lampFam = []; lampTint = [];
     poolTex = makePoolTexture();
-    if (poolTex) { poolMat = new THREE.MeshBasicMaterial({ map: poolTex, color: 0x8fb4ea, transparent: true, opacity: night ? nightAlpha : dayAlpha, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }); poolMat.name = 'FIXTURE_POOL'; }
+    if (poolTex) { poolMat = new THREE.MeshBasicMaterial({ map: poolTex, color: 0xffffff, transparent: true, opacity: night ? nightAlpha : dayAlpha, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -10 }); poolMat.name = 'FIXTURE_POOL'; }   /* M19: the pools sat at 4.5 cm, UNDER the 4.9 cm path cores (registry path_y 0.045), so no pool showed on a road — a stronger depth offset, same height */   /* M19: per-instance pool colour (TITAN keeps the old 0x8fb4ea) */
     else log('no canvas available — light pools skipped');
 
     poles = new THREE.InstancedMesh(poleGeo, ctx.M.chrome, n); arms = new THREE.InstancedMesh(armGeo, ctx.M.graphite, n); heads = new THREE.InstancedMesh(headGeo, headMat, n);
@@ -99,9 +118,12 @@ export function createFixtures(ctx) {
       tmpV.set(ex, gy + headY, ez); tmpM.compose(tmpV, tmpQ, tmpS); heads.setMatrixAt(i, tmpM);
       hx[i] = ex; hy[i] = gy + headY; hz[i] = ez;
       if (pools) { tmpQ.identity(); tmpV.set(ex, gy + POOL_Y, ez); tmpM.compose(tmpV, tmpQ, tmpS); pools.setMatrixAt(i, tmpM); }
-      lampList.push({ x: ex, y: gy, z: ez, h: headY, color: 0xd6e4ff });
+      var fam = lampFamily({ x: x, z: z, route: p.route }, reg), warm = LAMP_LIGHT[fam], hc = warm ? new THREE.Color(warm) : (fam === 'blue' ? LAMP_BLUE.clone() : new THREE.Color(LAMP_WHITE));
+      var pc = warm ? new THREE.Color(warm).multiplyScalar(0.8) : (fam === 'blue' ? new THREE.Color(0x8fb4ea).multiplyScalar(0.7) : new THREE.Color(POOL_WHITE));   /* warm pools: the lamp's own hue, no brighter than the old blue pool (gold at 0.8 ≈ its luminance; crimson / rose darker) — a warm cast under the lamp, not a coloured floor; never mixed toward white (in linear light that drifts gold to amber). TITAN's pools at 0.7: now that pools show on the roads too, TITAN's blue is not increased */
+      heads.setColorAt(i, hc); if (pools) pools.setColorAt(i, pc); lampFam.push(fam); lampTint.push(warm ? new THREE.Color(warm).lerp(new THREE.Color(0xffffff), 0.5) : null);
+      lampList.push({ x: ex, y: gy, z: ez, h: headY, color: warm ? LAMP_STREAK[fam] : (fam === 'blue' ? 0xd6e4ff : LAMP_WHITE) });   /* the streak shader writes the colour's linear value raw: the streak tones are chosen so that value is the class hue (gold 47°, crimson 355°, rose 326°) */
     }
-    poles.instanceMatrix.needsUpdate = true; arms.instanceMatrix.needsUpdate = true; heads.instanceMatrix.needsUpdate = true; if (pools) pools.instanceMatrix.needsUpdate = true;
+    poles.instanceMatrix.needsUpdate = true; arms.instanceMatrix.needsUpdate = true; heads.instanceMatrix.needsUpdate = true; if (pools) pools.instanceMatrix.needsUpdate = true; if (heads.instanceColor) heads.instanceColor.needsUpdate = true; if (pools && pools.instanceColor) pools.instanceColor.needsUpdate = true;
     [poles, arms, heads, pools].forEach(function (m) { if (m) { if (m.computeBoundingSphere) m.computeBoundingSphere(); m.frustumCulled = true; group.add(m); } });
     drawCalls = 3 + (pools ? 1 : 0);
     streaks = createReflectionStreaks(THREE, lampList, { tier: FT, night: night, name: 'FIXTURE_WET_REFLECTIONS' }); if (streaks) { group.add(streaks.mesh); drawCalls++; }   /* M15: the polished night floor mirrors every luminaire as a streak toward the viewer */
@@ -122,7 +144,7 @@ export function createFixtures(ctx) {
       while (j > 0 && bestD2[j - 1] > d2) { bestD2[j] = bestD2[j - 1]; bestIdx[j] = bestIdx[j - 1]; j--; } bestD2[j] = d2; bestIdx[j] = i; }
     for (k = 0; k < lights.length; k++) { f = lightFix[k]; var keep = false; if (f >= 0) for (q = 0; q < m; q++) if (bestIdx[q] === f) { keep = true; break; } if (!keep) lightFix[k] = -1; }
     for (q = 0; q < m; q++) { var idx = bestIdx[q]; var claimed = false; for (k = 0; k < lights.length; k++) if (lightFix[k] === idx) { claimed = true; break; } if (claimed) continue;
-      for (k = 0; k < lights.length; k++) if (lightFix[k] < 0) { lightFix[k] = idx; lights[k].position.set(hx[idx], hy[idx], hz[idx]); lights[k].intensity = 0; break; } }
+      for (k = 0; k < lights.length; k++) if (lightFix[k] < 0) { lightFix[k] = idx; lights[k].position.set(hx[idx], hy[idx], hz[idx]); lights[k].intensity = 0; if (lampTint && lampTint[idx]) lights[k].color.copy(lampTint[idx]); else lights[k].color.setHex(0xe3eaff); break; } }   /* M19: a warm lamp lights the player warm */
     var near2 = NEAR_POLE_M * NEAR_POLE_M;
     for (k = 0; k < lights.length; k++) { f = lightFix[k]; if (f < 0) { lightTarget[k] = 0; continue; }
       if (night) lightTarget[k] = LIGHT_NIGHT; else { var ddx = px[f] - pxp, ddz = pz[f] - pzp; lightTarget[k] = (ddx * ddx + ddz * ddz <= near2) ? LIGHT_DAY_NEAR : 0; } }
@@ -148,8 +170,9 @@ export function createFixtures(ctx) {
     poles = arms = heads = pools = headMat = poolMat = poolTex = group = null; built = false; n = 0; drawCalls = 0;
   }
   function debug() {
+    var fams = {}; (lampFam || []).forEach(function (f) { fams[f] = (fams[f] || 0) + 1; });
     var ls = []; for (var k = 0; k < lights.length; k++) ls.push({ fixture: lightFix[k] >= 0 ? lightFix[k] : null, intensity: +lights[k].intensity.toFixed(2), target: lightTarget[k] });
-    return { fixtures: n, dynamic_lights: lights.length, draw_calls: drawCalls, night: night, head_emissive: headMat ? headMat.emissiveIntensity : null, pool_alpha: poolMat ? poolMat.opacity : null, lights: ls };
+    return { fixtures: n, lamp_families: fams, dynamic_lights: lights.length, draw_calls: drawCalls, night: night, head_emissive: headMat ? headMat.emissiveIntensity : null, pool_alpha: poolMat ? poolMat.opacity : null, lights: ls };
   }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
 }
