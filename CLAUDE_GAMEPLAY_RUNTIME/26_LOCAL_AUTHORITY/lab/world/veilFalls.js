@@ -56,7 +56,7 @@ export function veilWaterMaterial(THREE, opts) { opts = opts || {};
         '  float br = vfN(vec2(xs * 1.7 + 5.0, y * 0.45 - t * 0.012)), merge = 1.0 - smoothstep(0.48, 0.8, y);',
         '  float thin = clamp(vRib * 0.95 + (1.0 - smoothstep(0.22, 0.55, br)) * 0.7, 0.0, 1.0) * merge;',
         '  a *= 1.0 - 0.9 * thin; a = max(a, smoothstep(0.62, 0.95, y) * 0.9 * edge);',
-        '  a *= 1.0 - smoothstep(0.9, 1.0, y + 0.05 * (rag - 0.5));',   /* M20: the curtain dissolves completely into the spray skirt with a ragged edge — no hard hem hanging 3.6 m over the sea */   /* the last rows dissolve into the spray: no hard hem above the sea (LOW has no mist) */
+        '  a *= 1.0 - smoothstep(0.83, 1.0, y + 0.07 * (rag - 0.5));',   /* M20: the curtain dissolves completely into the spray skirt with a ragged edge — no hard hem hanging 3.6 m over the sea */   /* the last rows dissolve into the spray: no hard hem above the sea (LOW has no mist) */
         '#endif',
         '#ifdef VEIL_FRONT',   /* M19 the front veil: separate flow bands of varying thickness with ragged edges, bowing out from the main sheet, gone before the spray */
         '  float fb = vfN(vec2(xs * 2.1 + 17.0, y * 0.35 - t * 0.02)) + 0.14 * vfN(vec2(xs * 23.0, y * 7.0 - t * 2.2));',
@@ -151,7 +151,7 @@ export function createVeilFalls(ctx) {
         NM = NB + NT2, mp = new Float32Array(NM * 3), ms = new Float32Array(NM), mr = new Float32Array(NM), r0 = rnd(0x7E11), midY = yTop * 0.46 + yBot * 0.54;
       for (var m = 0; m < NM; m++) { var tier2 = m >= NB, uu = r0() * NS, bq = BP[Math.min(BP.length - 1, Math.round(uu * 4))];
         if (!tier2) { var d0 = OFF + 3 + r0() * 16; mp[m * 3] = bq.x + bq.nx * d0 + (r0() - 0.5) * 8; mp[m * 3 + 1] = 0.5; mp[m * 3 + 2] = bq.z + bq.nz * d0 + (r0() - 0.5) * 8; mr[m] = 34 + r0() * 40; }
-        else { var sy = 0.3 + r0() * 2.2, sf = faceOn(LINES, uu, sy), sn = normalOn(LINES, uu, sy), d1 = 2.5 + r0() * 9; mp[m * 3] = sf.x + sn.x * d1 + (r0() - 0.5) * 3; mp[m * 3 + 1] = sy; mp[m * 3 + 2] = sf.z + sn.z * d1 + (r0() - 0.5) * 3; mr[m] = -(5 + r0() * 10); } ms[m] = r0(); }   /* off the rock AT its own height (the face leans out toward the sea: spawned off the 3.6 m line, most puffs sat inside the rock) */   /* skirt: born at the water line under the whole curtain, rising only 5–15 m (aRise < 0 flags it) */
+        else { var d1 = OFF + r0() * 7.5; mp[m * 3] = bq.x + bq.nx * d1 + (r0() - 0.5) * 5; mp[m * 3 + 1] = 0.3 + r0() * 2.2; mp[m * 3 + 2] = bq.z + bq.nz * d1 + (r0() - 0.5) * 5; mr[m] = -(5 + r0() * 10); } ms[m] = r0(); }   /* skirt: born at the water line under the whole curtain, rising only 5–15 m (aRise < 0 flags it) */
       var mg = keep(new THREE.BufferGeometry()); mg.setAttribute('position', new THREE.BufferAttribute(mp, 3)); mg.setAttribute('aSeed', new THREE.BufferAttribute(ms, 1)); mg.setAttribute('aRise', new THREE.BufferAttribute(mr, 1)); mg.boundingSphere = new THREE.Sphere(new THREE.Vector3(baseX, 60, baseZ), CH * 0.6 + 140);
       mistU = { uTime: { value: 0 }, uNight: { value: night ? 1 : 0 }, uScale: { value: 700 }, uOut: { value: new THREE.Vector2(-ox, -oz) } };
       var mistMat = keep(new THREE.ShaderMaterial({ uniforms: mistU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
