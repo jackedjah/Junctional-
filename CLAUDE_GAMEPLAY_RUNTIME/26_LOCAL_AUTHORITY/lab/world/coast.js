@@ -1,4 +1,4 @@
-import { applyGeology } from './surfaceDetail.js';
+import { applyGeology } from './surfaceDetail.js'; import { skyWater } from './water.js';
 /* MAHWORLD JOB B :: COAST, SEA AND ISLANDS (owner note 2026-09-19: "we need multiple bodies of land — it's a vast world; where the water
    meets the land it must be very gradual, like a beach with waves").
    The mainland is ONE island: its floor ends at a rounded coast beyond the field walls (registry.coast.outline), a BEACH RING slopes from the
@@ -64,6 +64,9 @@ export function createCoast(ctx) {
       if (chunk && chunk.indexOf(from) >= 0) { var prevOBC = seaMat.onBeforeCompile, prevKey = seaMat.customProgramCacheKey;
         seaMat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r); sh.fragmentShader = sh.fragmentShader.replace('#include <normal_fragment_maps>', chunk.replace(from, 'vec3 mapN = normalize( ( texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0 ) + ( texture2D( normalMap, vNormalMapUv * 0.37 + vec2( 0.31, 0.17 ) ).xyz * 2.0 - 1.0 ) * 0.85 ); mapN.xy *= 1.0 - 0.8 * smoothstep( 90.0, 650.0, length( vViewPosition ) );')); };
         seaMat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|mahworld-sea-dual-normal'; }; seaMat.needsUpdate = true; } }
+    /* M20: the sea as water — the sky it mirrors (Fresnel), a dark dielectric body, calm and wind-roughened patches, and translucent shallows
+       clearing toward the mainland's waterline and every island's (water.js skyWater) */
+    (function () { var O2 = C.outline, off = WL - 1.5, R2 = Math.min(O2.corner_r || 0, (O2.x2 - O2.x1) / 2, (O2.z2 - O2.z1) / 2); skyWater(THREE, seaMat, ctx, { shore: { rect: [O2.x1 - off, O2.z1 - off, O2.x2 + off, O2.z2 + off], r: R2 + off, islands: (C.islands || []).map(function (I) { var bw2 = Math.max(16, Math.min(40, I.rx * 0.32)), wl2 = bw2 * 0.28; return [I.x, I.z, I.rx + wl2, I.rz + wl2]; }) } }); })();
     /* 3. islands: beach ring (sea_y − DROP → 0) + a rising plateau + crystal spires + tree silhouettes (instanced) */
     var landMat = new THREE.MeshStandardMaterial({ color: 0x4b5366, roughness: 0.88, metalness: 0.04, flatShading: true, envMapIntensity: 0.2 }); own.push(landMat); applyGeology(THREE, landMat, { strata: 1.6, ledge: 0.3, macro: 0.14, relief: [3.5, 12], tier: ctx.quality && ctx.quality.tier ? ctx.quality.tier() : 'HIGH' });   /* M9: a step lighter (aerial perspective), macro relief like the ridges */   /* M8C: island rock (was a glossy dark-sapphire metal at metalness 0.35) */ var spireMat = (M.crystal || new THREE.MeshStandardMaterial({ color: 0xe8f4ff, roughness: 0.1, metalness: 0.6 })).clone(); spireMat.vertexColors = true; own.push(spireMat); var FAMS = ctx.registry && ctx.registry.crystal_families || {};   /* island spires carry their island's crystal family (owner redirect 2026-09-19: regions read from afar) */ var treeMat = M.sapphire || new THREE.MeshStandardMaterial({ color: 0x1c2a46 });
     var landGeos = [], spireGeos = [], treeMats = []; var treeCount = 0; var isl = C.islands || []; var foamPts = [];

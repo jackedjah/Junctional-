@@ -19,7 +19,7 @@
    lake 1, trunks 1, canopies 1, villas 3, spire 1, lanterns 1, pad 1 — all behind the west ridge, frustum-culled as a group. M19 adds the front
    veil (not LOW), the paving and the crystal grass (not LOW): +3 on HIGH / MED, +1 on LOW (16_TESTS/gameplay_world_veil_district). */
 import { ridgeStations, ridgeFaceSegment, ridgeFacePoint } from './ridgeLayout.js';
-import { SPECTRAL, CLASS_TINT, CRYSTAL_TINT } from './aura.js'; import { applyGeology } from './surfaceDetail.js'; import { softBox } from './formKit.js';
+import { SPECTRAL, CLASS_TINT, CRYSTAL_TINT } from './aura.js'; import { applyGeology } from './surfaceDetail.js'; import { softBox } from './formKit.js'; import { skyWater } from './water.js';
 
 var NOISE = [
   'float vfH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
@@ -39,9 +39,10 @@ export function veilWaterMaterial(THREE, opts) { opts = opts || {};
     vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\n#ifdef VEIL_RIBS\nattribute float aRib; varying float vRib;\n#endif\nvoid main() { vUv = uv;\n#ifdef VEIL_RIBS\n vRib = aRib;\n#endif\n vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
     fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uSX; uniform float uFlip; uniform float uSeed; varying vec2 vUv;', '#ifdef VEIL_RIBS', 'varying float vRib;', '#endif', NOISE,
         'void main() { float x = vUv.x, y = mix(vUv.y, 1.0 - vUv.y, uFlip), t = uTime, xs = x * uSX + uSeed;',
-        '  float n1 = vfN(vec2(xs * 20.0, y * 5.5 - t * 1.7)), n2 = vfN(vec2(xs * 57.0 + 3.1, y * 11.0 - t * 2.6)), n3 = vfN(vec2(xs * 7.0 - 1.3, y * 2.2 - t * 0.9));',
+        '  float ya = sqrt(max(y, 0.0) + 0.015) * 2.0;',   /* M20 FREE FALL: the water accelerates (v ∝ √drop), so the streak field runs in √y — short clumps at the lip stretching into long streaks below, not one constant-speed texture scroll */
+        '  float n1 = vfN(vec2(xs * 20.0, ya * 3.1 - t * 1.7)), n2 = vfN(vec2(xs * 57.0 + 3.1, ya * 6.2 - t * 2.6)), n3 = vfN(vec2(xs * 7.0 - 1.3, ya * 1.25 - t * 0.9));',
         '  float streak = smoothstep(0.32, 0.92, n1 * 0.55 + n2 * 0.3 + n3 * 0.15);',
-        '  float rag = vfN(vec2(xs * 9.0, y * 16.0 - t * 1.3)); float side = min(x, 1.0 - x); float edge = smoothstep(0.0, 0.2 + 0.12 * rag, side);',
+        '  float rag = vfN(vec2(xs * 9.0, ya * 9.0 - t * 1.3)); float side = min(x, 1.0 - x); float edge = smoothstep(0.0, 0.2 + 0.12 * rag, side);',
         '  float aer = (1.0 - smoothstep(0.0, 0.1, y)) * smoothstep(-0.02, -0.001, y) + smoothstep(0.72, 1.0, y) * 0.9;',   /* M19: up the flume (y < 0; 0.1 ≈ 20 m) the water runs clear and streaked, whitening only in the last ~4 m before the brink */
         '#ifdef VEIL_RIBS', '  aer += vRib * 0.35 * smoothstep(0.04, 0.3, y);', '#endif',   /* M19: white water where the fall breaks over a rock rib */
         '  float strand = smoothstep(0.22, 0.72, vfN(vec2(xs * 6.5 + 11.0, y * 0.8 - t * 0.04)) * 0.75 + vfN(vec2(xs * 15.0 - 4.0, y * 1.6)) * 0.25);',   /* a horsetail veil: uneven strands, not one flat sheet */
@@ -280,7 +281,7 @@ export function createVeilFalls(ctx) {
         '{ vec2 q = vLkW.xz; float e = 0.35, t = uTime; float h0 = vfN(q * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN(q * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4;',
         '  float hx = vfN((q + vec2(e, 0.0)) * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN((q + vec2(e, 0.0)) * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4, hz = vfN((q + vec2(0.0, e)) * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN((q + vec2(0.0, e)) * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4;',
         '  float fade = 1.0 - smoothstep(40.0, 160.0, length(cameraPosition - vLkW)); vec3 wn = normalize(vec3(-(hx - h0) / e * 0.15 * fade, 1.0, -(hz - h0) / e * 0.15 * fade)); normal = normalize(mix(normal, (viewMatrix * vec4(wn, 0.0)).xyz, 0.85)); }'].join('\n')); };
-    lakeM.customProgramCacheKey = function () { return 'veil_lake_m19'; };
+    lakeM.customProgramCacheKey = function () { return 'veil_lake_m19'; }; skyWater(THREE, lakeM, ctx, { refl: 0.9, body: 0.6, land: 0.3 });   /* M20: the basin mirrors the sky like the sea and the canals */
     lakeG.scale(12, 1, 8); lakeG.rotateY(Math.atan2(ox, oz)); lakeG.translate(lakeC.x + ox * 6, TOP + 0.25, lakeC.z + oz * 6);
     /* M19: the channel to the lip is no longer a still mirror plane — its bed is wet dark stone (the paving draw, M19 block) and the water running
        down it is the curtain's own flowing sheet (the curtain's brink rows): shallow fast water over stone, whitening at the brink */

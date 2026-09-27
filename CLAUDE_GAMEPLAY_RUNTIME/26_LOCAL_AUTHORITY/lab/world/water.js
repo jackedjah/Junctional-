@@ -14,6 +14,43 @@ import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js'; imp
 import { waterColliders } from './worldLayout.js';
 import { createRipples } from './waterRipples.js';   /* owner interjection 2026-09-19: responsive water (near-window GPU ripples) + floating objects */
 
+/* M20 WATER AS WATER (owner 2026-09-27: "water … transparent depth, foam, reflections … the waterfall should become one of the world's
+   highest-quality natural assets"): real water is a dark DIELECTRIC whose look is the sky it reflects — about 2 % looking straight down, most
+   of it at a grazing view (Fresnel) — not a blue metal. skyWater() chains onto a water material: the sky it mirrors is the scattering dome's
+   own colour along the reflected ray (atmosphere.js uniforms, shared by reference, so night follows), the body darkens and loses its metal,
+   calm and wind-roughened patches (world space, ~60 m) break the tiled ripple, and for the SEA (opt.shore) the water clears to translucent
+   shallows toward every shore, so the beach reads under it. Value / alpha / normal only: no geometry, no new draw. */
+export function skyWater(THREE, mat, ctx, opt) {
+  if (!mat || mat.userData.skyWater) return mat; opt = opt || {}; mat.userData.skyWater = true;
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey, sh0 = opt.shore || null;
+  mat.userData.swU = { uReflK: { value: opt.refl || 0.92 }, uBodyK: { value: opt.body || 0.55 }, uGlintK: { value: opt.glint || 1.0 }, uCalmK: { value: opt.calm === undefined ? 1.0 : opt.calm }, uLandH: { value: opt.land === undefined ? 0.0 : opt.land }, uLandK: { value: opt.landK || 0.42 } };   /* live-tunable (evidence A/B) */
+  var own = { uSkyZ: { value: new THREE.Color(0x2159b4) }, uSkyH: { value: new THREE.Color(0xa4c3e3) }, uSkyHz: { value: new THREE.Color(0xcfdde9) }, uSun: { value: new THREE.Vector3(0.55, 0.72, 0.3) }, uSunTint: { value: new THREE.Color(0xfff0c8) } };
+  mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
+    var A = null; try { A = ctx && ctx.mods && ctx.mods.atmosphere && ctx.mods.atmosphere.uniforms ? ctx.mods.atmosphere.uniforms() : null; } catch (e) { A = null; }
+    sh.uniforms.uSkyZ = A ? A.uZenith : own.uSkyZ; sh.uniforms.uSkyH = A ? A.uHorizon : own.uSkyH; sh.uniforms.uSkyHz = A ? A.uHaze : own.uSkyHz; sh.uniforms.uSkySun = A ? A.uSun : own.uSun; sh.uniforms.uSkyTint = A ? A.uSunTint : own.uSunTint;
+    sh.uniforms.uReflK = mat.userData.swU.uReflK; sh.uniforms.uBodyK = mat.userData.swU.uBodyK; sh.uniforms.uGlintK = mat.userData.swU.uGlintK; sh.uniforms.uCalmK = mat.userData.swU.uCalmK; sh.uniforms.uLandH = mat.userData.swU.uLandH; sh.uniforms.uLandK = mat.userData.swU.uLandK;
+    if (sh0) { sh.uniforms.uShR = { value: new THREE.Vector4(sh0.rect[0], sh0.rect[1], sh0.rect[2], sh0.rect[3]) }; sh.uniforms.uShC = { value: sh0.r || 0 }; var IS = (sh0.islands || []).slice(0, 6).map(function (I) { return new THREE.Vector4(I[0], I[1], I[2], I[3]); }); while (IS.length < 6) IS.push(new THREE.Vector4(0, 0, 0, 0)); sh.uniforms.uShI = { value: IS }; }
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSwW;').replace('#include <project_vertex>', '#include <project_vertex>\nvSwW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    var FS = ['#include <common>', 'varying vec3 vSwW; uniform vec3 uSkyZ; uniform vec3 uSkyH; uniform vec3 uSkyHz; uniform vec3 uSkySun; uniform vec3 uSkyTint; uniform float uReflK; uniform float uBodyK; uniform float uGlintK; uniform float uCalmK; uniform float uLandH; uniform float uLandK;',
+      'float swH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float swN(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(swH(i), swH(i + vec2(1.0, 0.0)), f.x), mix(swH(i + vec2(0.0, 1.0)), swH(i + vec2(1.0, 1.0)), f.x), f.y); }'];
+    if (sh0) FS.push('uniform vec4 uShR; uniform float uShC; uniform vec4 uShI[6];',
+      'float swShore(vec2 p) { vec2 c = (uShR.xy + uShR.zw) * 0.5, hb = (uShR.zw - uShR.xy) * 0.5 - vec2(uShC); vec2 q = abs(p - c) - hb; float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - uShC;',
+      '  for (int i = 0; i < 6; i++) { vec4 I = uShI[i]; if (I.z > 0.0) d = min(d, (length((p - I.xy) / I.zw) - 1.0) * min(I.z, I.w)); } return d; }');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', FS.join('\n'))
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor *= 0.08;')
+      .replace('#include <normal_fragment_maps>', ['#include <normal_fragment_maps>',
+        '{ vec3 swUp = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz); float swW = swN(vSwW.xz * 0.017 + vec2(3.1, 7.7)) * 0.7 + swN(vSwW.xz * 0.05 - vec2(1.3, 2.9)) * 0.3; normal = normalize(mix(swUp, normal, mix(1.0, 0.35 + 0.95 * smoothstep(0.25, 0.8, swW), uCalmK))); }'].join('\n'))   /* calm slicks and wind-roughened patches */
+      .replace('#include <opaque_fragment>', ['{ vec3 swV = normalize(vViewPosition); vec3 swR = normalize((vec4(reflect(-swV, normal), 0.0) * viewMatrix).xyz); float swHp = max(swR.y, 0.0);',
+        '  vec3 swSky = mix(uSkyH, uSkyZ, pow(swHp, 0.55)); swSky = mix(swSky, uSkyHz, exp(-swHp * 10.0) * 0.55); swSky += uSkyTint * pow(max(dot(swR, normalize(uSkySun)), 0.0), 24.0) * 0.22; if (swR.y < 0.0) swSky = mix(uSkyH, uSkyHz, 0.5) * 0.7;',
+        '  if (uLandH > 0.0) { float swAz = atan(swR.z, swR.x); float swRl = uLandH * (0.55 + 0.3 * swN(vec2(swAz * 5.0, 1.7)) + 0.15 * swN(vec2(swAz * 17.0, 4.1))); swSky = mix(swSky, uSkyH * uLandK, 1.0 - smoothstep(swRl - 0.09, swRl + 0.05, swR.y)); } swSky.r = min(swSky.r, swSky.g);',   /* the ridges round the basin: low reflected rays meet a jagged dark skyline, not open sky */   /* the mirrored sky stays BLUE: the night dome's violet haze and the lavender Moon tint never turn the water purple (colour law) */
+        '  float swF = 0.02 + 0.98 * pow(1.0 - clamp(dot(normal, swV), 0.0, 1.0), 5.0); float swSh = 0.0;',
+        sh0 ? '  swSh = 1.0 - smoothstep(3.0, 55.0, swShore(vSwW.xz));' : '',
+        '  outgoingLight = mix(totalDiffuse * mix(uBodyK, 1.0, swSh * 0.8), swSky * uReflK, clamp(swF, 0.0, 1.0)) + reflectedLight.directSpecular * uGlintK + totalEmissiveRadiance;',   /* the body (diffuse, darkened) under the mirrored sky; the environment-map specular gives way to the dome, the Sun's own glints stay */
+        '  diffuseColor.a = mix(diffuseColor.a * mix(1.0, 0.55, swSh), 1.0, swF * 0.6); }',
+        '#include <opaque_fragment>'].join('\n')); };
+  mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|mahworld-skywater' + (sh0 ? '-shore' : ''); }; mat.needsUpdate = true; return mat;
+}
+
 export function createWater(ctx) {
   var THREE = ctx.THREE, M = ctx.M || {}, log = ctx.log || function () { };
   var group = null, meshes = [], ownMats = [], normalTex = null, waterMat = null, lineMat = null, padMat = null, foamMat = null, foamMeshes = []; var ripples = null; var floats = null, floatN = 0, floatData = [], floatM4 = null, floatQ = null, floatV = null, floatS = null, floatE = null, floatRivers = [];
@@ -144,7 +181,8 @@ export function createWater(ctx) {
           'diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 1.45 + vec3(0.05), wShallow * 0.55); diffuseColor.a *= mix(1.0, 0.42, wShallow);'].join('\n'))
           .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor *= 1.0 - 0.6 * wShallow;'); };   /* over the shallows the sky mirror gives way to the submerged bank (it was invisible at eye level: grazing reflection swamped the tint) */
       wm.customProgramCacheKey = function () { return (prevWK ? prevWK.call(this) : '') + '|mahworld-water-shallow2'; }; wm.needsUpdate = true; }
-      shallow(waterMat); var nearW = ctx.group && ctx.group.getObjectByName('WATER_NEAR'); if (nearW) shallow(nearW.material); })();   /* the ripple NEAR window is a clone taken before this patch with its own hook: it carries the cue too (it is what the eye sees at a bank) */
+      shallow(waterMat); var nearW = ctx.group && ctx.group.getObjectByName('WATER_NEAR'); if (nearW) shallow(nearW.material); })();
+    skyWater(THREE, waterMat, ctx, { land: 0.34 }); var nearW2 = ctx.group && ctx.group.getObjectByName('WATER_NEAR'); if (nearW2) skyWater(THREE, nearW2.material, ctx, { land: 0.34 });   /* M20: the canals and the ripple window near the eye mirror the sky */   /* the ripple NEAR window is a clone taken before this patch with its own hook: it carries the cue too (it is what the eye sees at a bank) */
     /* ORIGINAL floating surface objects: MAHWORLD crystal float pads (hexagonal platinum discs with a crystal core) that ride the waves — buoyant, tilting with the local slope, decorative (no collider) */
     try { buildFloats(rivers, bridges); } catch (e) { log('water: float pads failed (' + (e && e.message || e) + ')'); }
     counts.clearanceOk = counts.maxY <= counts.railTopY + 1.1 + 1e-6;
