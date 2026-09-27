@@ -1,0 +1,712 @@
+{
+ "started": "2026-09-27T11:10:43.289Z",
+ "size": [
+  960,
+  540
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V16",
+   "label": "LEAN spire house on the north-west terrace",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V16_DAY_t40.jpg",
+   "pos": [
+    -82,
+    7,
+    238
+   ],
+   "look": [
+    -110,
+    15,
+    272
+   ],
+   "stats": {
+    "calls": 124,
+    "triangles": 972885,
+    "geometries": 226,
+    "textures": 50,
+    "programs": 174
+   },
+   "frames_in_600ms": 1,
+   "ms": 34323
+  },
+  {
+   "id": "V21",
+   "label": "sky away from the Sun (zenith depth, anti-solar band)",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V21_DAY_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    -120,
+    40,
+    -70
+   ],
+   "stats": {
+    "calls": 205,
+    "triangles": 1119827,
+    "geometries": 254,
+    "textures": 51,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 18822
+  },
+  {
+   "id": "V25",
+   "label": "ATHLETE district paving close",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V25_DAY_t40.jpg",
+   "pos": [
+    -30,
+    1.8,
+    146
+   ],
+   "look": [
+    -30,
+    0,
+    162
+   ],
+   "stats": {
+    "calls": 154,
+    "triangles": 2323114,
+    "geometries": 285,
+    "textures": 56,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 23039
+  },
+  {
+   "id": "V27",
+   "label": "ridge face close from the TITAN ledge",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V27_DAY_t40.jpg",
+   "pos": [
+    166,
+    14,
+    130
+   ],
+   "look": [
+    230,
+    40,
+    150
+   ],
+   "stats": {
+    "calls": 86,
+    "triangles": 606283,
+    "geometries": 285,
+    "textures": 56,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 24064
+  },
+  {
+   "id": "V32",
+   "label": "plaza hub toward the temple causeway (clear of the arena: V01 now sits on its roof)",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V32_DAY_t40.jpg",
+   "pos": [
+    12,
+    1.7,
+    -4
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 251,
+    "triangles": 2053648,
+    "geometries": 346,
+    "textures": 62,
+    "programs": 174
+   },
+   "frames_in_600ms": 2,
+   "ms": 44246
+  },
+  {
+   "id": "V33",
+   "label": "Moon from the plaza (clear of the exchange: V22 now sits inside it)",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V33_DAY_t40.jpg",
+   "pos": [
+    14,
+    1.7,
+    8
+   ],
+   "look": [
+    -32,
+    40,
+    -80
+   ],
+   "stats": {
+    "calls": 215,
+    "triangles": 1127849,
+    "geometries": 346,
+    "textures": 62,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 30278
+  },
+  {
+   "id": "V34",
+   "label": "MAH MATCH hall exterior from its approach",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V34_DAY_t40.jpg",
+   "pos": [
+    84,
+    2.2,
+    -14
+   ],
+   "look": [
+    122,
+    9,
+    6
+   ],
+   "stats": {
+    "calls": 143,
+    "triangles": 1131213,
+    "geometries": 369,
+    "textures": 70,
+    "programs": 174
+   },
+   "frames_in_600ms": 1,
+   "ms": 26631
+  },
+  {
+   "id": "TS1",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "TS1_DAY_t40.jpg",
+   "pos": [
+    20,
+    2.2,
+    -70
+   ],
+   "look": [
+    40,
+    8,
+    -420
+   ],
+   "stats": {
+    "calls": 82,
+    "triangles": 500441,
+    "geometries": 369,
+    "textures": 70,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 15203
+  },
+  {
+   "id": "F3",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "F3_DAY_t40.jpg",
+   "pos": [
+    0,
+    1.7,
+    0
+   ],
+   "look": [
+    -320,
+    60,
+    -130
+   ],
+   "stats": {
+    "calls": 197,
+    "triangles": 1126685,
+    "geometries": 372,
+    "textures": 70,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 17873
+  },
+  {
+   "id": "F4",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "F4_DAY_t40.jpg",
+   "pos": [
+    -250,
+    230,
+    -40
+   ],
+   "look": [
+    -398,
+    146,
+    -160
+   ],
+   "stats": {
+    "calls": 83,
+    "triangles": 604489,
+    "geometries": 372,
+    "textures": 70,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 19107
+  },
+  {
+   "id": "MA",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "MA_DAY_t40.jpg",
+   "pos": [
+    60,
+    12,
+    -60
+   ],
+   "look": [
+    122,
+    26,
+    6
+   ],
+   "stats": {
+    "calls": 177,
+    "triangles": 1299001,
+    "geometries": 401,
+    "textures": 70,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 17087
+  },
+  {
+   "id": "MX",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "MX_DAY_t40.jpg",
+   "pos": [
+    0,
+    10,
+    0
+   ],
+   "look": [
+    200,
+    60,
+    250
+   ],
+   "stats": {
+    "calls": 264,
+    "triangles": 1923756,
+    "geometries": 402,
+    "textures": 70,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 30863
+  },
+  {
+   "id": "V16",
+   "label": "LEAN spire house on the north-west terrace",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V16_NIGHT_t40.jpg",
+   "pos": [
+    -82,
+    7,
+    238
+   ],
+   "look": [
+    -110,
+    15,
+    272
+   ],
+   "stats": {
+    "calls": 122,
+    "triangles": 985937,
+    "geometries": 407,
+    "textures": 75,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 28644
+  },
+  {
+   "id": "V21",
+   "label": "sky away from the Sun (zenith depth, anti-solar band)",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V21_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    -120,
+    40,
+    -70
+   ],
+   "stats": {
+    "calls": 207,
+    "triangles": 1133761,
+    "geometries": 408,
+    "textures": 76,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 17751
+  },
+  {
+   "id": "V25",
+   "label": "ATHLETE district paving close",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V25_NIGHT_t40.jpg",
+   "pos": [
+    -30,
+    1.8,
+    146
+   ],
+   "look": [
+    -30,
+    0,
+    162
+   ],
+   "stats": {
+    "calls": 158,
+    "triangles": 2336394,
+    "geometries": 408,
+    "textures": 76,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 36134
+  },
+  {
+   "id": "V27",
+   "label": "ridge face close from the TITAN ledge",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V27_NIGHT_t40.jpg",
+   "pos": [
+    166,
+    14,
+    130
+   ],
+   "look": [
+    230,
+    40,
+    150
+   ],
+   "stats": {
+    "calls": 90,
+    "triangles": 619563,
+    "geometries": 408,
+    "textures": 76,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 25583
+  },
+  {
+   "id": "V32",
+   "label": "plaza hub toward the temple causeway (clear of the arena: V01 now sits on its roof)",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V32_NIGHT_t40.jpg",
+   "pos": [
+    12,
+    1.7,
+    -4
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 260,
+    "triangles": 2094328,
+    "geometries": 410,
+    "textures": 77,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 24903
+  },
+  {
+   "id": "V33",
+   "label": "Moon from the plaza (clear of the exchange: V22 now sits inside it)",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V33_NIGHT_t40.jpg",
+   "pos": [
+    14,
+    1.7,
+    8
+   ],
+   "look": [
+    -32,
+    40,
+    -80
+   ],
+   "stats": {
+    "calls": 223,
+    "triangles": 1171241,
+    "geometries": 410,
+    "textures": 77,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 33242
+  },
+  {
+   "id": "V34",
+   "label": "MAH MATCH hall exterior from its approach",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V34_NIGHT_t40.jpg",
+   "pos": [
+    84,
+    2.2,
+    -14
+   ],
+   "look": [
+    122,
+    9,
+    6
+   ],
+   "stats": {
+    "calls": 147,
+    "triangles": 1144493,
+    "geometries": 410,
+    "textures": 77,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 19244
+  },
+  {
+   "id": "TS1",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "TS1_NIGHT_t40.jpg",
+   "pos": [
+    20,
+    2.2,
+    -70
+   ],
+   "look": [
+    40,
+    8,
+    -420
+   ],
+   "stats": {
+    "calls": 86,
+    "triangles": 513721,
+    "geometries": 410,
+    "textures": 77,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 13543
+  },
+  {
+   "id": "F3",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "F3_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    1.7,
+    0
+   ],
+   "look": [
+    -320,
+    60,
+    -130
+   ],
+   "stats": {
+    "calls": 202,
+    "triangles": 1140733,
+    "geometries": 410,
+    "textures": 77,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 15207
+  },
+  {
+   "id": "F4",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "F4_NIGHT_t40.jpg",
+   "pos": [
+    -250,
+    230,
+    -40
+   ],
+   "look": [
+    -398,
+    146,
+    -160
+   ],
+   "stats": {
+    "calls": 87,
+    "triangles": 617769,
+    "geometries": 410,
+    "textures": 77,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 19856
+  },
+  {
+   "id": "MA",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "MA_NIGHT_t40.jpg",
+   "pos": [
+    60,
+    12,
+    -60
+   ],
+   "look": [
+    122,
+    26,
+    6
+   ],
+   "stats": {
+    "calls": 182,
+    "triangles": 1319337,
+    "geometries": 410,
+    "textures": 77,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 17613
+  },
+  {
+   "id": "MX",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "MX_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    10,
+    0
+   ],
+   "look": [
+    200,
+    60,
+    250
+   ],
+   "stats": {
+    "calls": 271,
+    "triangles": 1945884,
+    "geometries": 410,
+    "textures": 77,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 31238
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 12,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (459 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (20 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (20 ms)",
+   "combatZones: 2 courts (CZ_ELEVATOR_GROVE 24 m, CZ_GYM_LAWN 24 m) in 1 draw; roster authority HOST",
+   "worldB combatZones ready (3 ms)",
+   "aura: 106 spectral auras in one draw, 2 sky moments in the backdrop, 27 dimensional forms in one draw (2 following)",
+   "worldB aura ready (9 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 11462.3,
+  "error": null
+ },
+ "finished": "2026-09-27T11:21:15.918Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 131,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (459 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (20 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (20 ms)",
+   "combatZones: 2 courts (CZ_ELEVATOR_GROVE 24 m, CZ_GYM_LAWN 24 m) in 1 draw; roster authority HOST",
+   "worldB combatZones ready (3 ms)",
+   "aura: 106 spectral auras in one draw, 2 sky moments in the backdrop, 27 dimensional forms in one draw (2 following)",
+   "worldB aura ready (9 ms)"
+  ]
+ }
+}

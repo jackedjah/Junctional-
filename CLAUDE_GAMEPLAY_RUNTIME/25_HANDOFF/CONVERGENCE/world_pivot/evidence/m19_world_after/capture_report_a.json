@@ -1,0 +1,660 @@
+{
+ "started": "2026-09-27T11:10:43.267Z",
+ "size": [
+  960,
+  540
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V02",
+   "label": "world overview from the south",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V02_DAY_t40.jpg",
+   "pos": [
+    0,
+    170,
+    -270
+   ],
+   "look": [
+    0,
+    0,
+    70
+   ],
+   "stats": {
+    "calls": 428,
+    "triangles": 2709746,
+    "geometries": 443,
+    "textures": 66,
+    "programs": 173
+   },
+   "frames_in_600ms": 0,
+   "ms": 53774
+  },
+  {
+   "id": "V03",
+   "label": "ATHLETE gold temple forecourt",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V03_DAY_t40.jpg",
+   "pos": [
+    0,
+    8,
+    122
+   ],
+   "look": [
+    0,
+    14,
+    178
+   ],
+   "stats": {
+    "calls": 172,
+    "triangles": 2361176,
+    "geometries": 446,
+    "textures": 70,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 37172
+  },
+  {
+   "id": "V04",
+   "label": "TITAN blue tower and gate",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V04_DAY_t40.jpg",
+   "pos": [
+    58,
+    10,
+    104
+   ],
+   "look": [
+    112,
+    20,
+    110
+   ],
+   "stats": {
+    "calls": 142,
+    "triangles": 1686949,
+    "geometries": 447,
+    "textures": 73,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 35303
+  },
+  {
+   "id": "V05",
+   "label": "LEAN crimson canyon corridor",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V05_DAY_t40.jpg",
+   "pos": [
+    -86,
+    11,
+    138
+   ],
+   "look": [
+    -112,
+    12,
+    210
+   ],
+   "stats": {
+    "calls": 142,
+    "triangles": 1095617,
+    "geometries": 449,
+    "textures": 73,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 32299
+  },
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V06_DAY_t40.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 121,
+    "triangles": 941543,
+    "geometries": 462,
+    "textures": 75,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 20908
+  },
+  {
+   "id": "V07",
+   "label": "BAGE pink market and basins",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V07_DAY_t40.jpg",
+   "pos": [
+    0,
+    9,
+    212
+   ],
+   "look": [
+    0,
+    8,
+    258
+   ],
+   "stats": {
+    "calls": 131,
+    "triangles": 1649641,
+    "geometries": 463,
+    "textures": 81,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 19072
+  },
+  {
+   "id": "V09",
+   "label": "HALO dome from the ground",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V09_DAY_t40.jpg",
+   "pos": [
+    -130,
+    22,
+    -150
+   ],
+   "look": [
+    30,
+    230,
+    40
+   ],
+   "stats": {
+    "calls": 297,
+    "triangles": 1090457,
+    "geometries": 568,
+    "textures": 83,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 23039
+  },
+  {
+   "id": "V10",
+   "label": "sky toward the Sun",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V10_DAY_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    260,
+    150,
+    140
+   ],
+   "stats": {
+    "calls": 275,
+    "triangles": 1568415,
+    "geometries": 568,
+    "textures": 83,
+    "programs": 174
+   },
+   "frames_in_600ms": 1,
+   "ms": 23344
+  },
+  {
+   "id": "V11",
+   "label": "south coast horizon",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V11_DAY_t40.jpg",
+   "pos": [
+    0,
+    7,
+    -140
+   ],
+   "look": [
+    0,
+    4,
+    -300
+   ],
+   "stats": {
+    "calls": 72,
+    "triangles": 482347,
+    "geometries": 568,
+    "textures": 83,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 24706
+  },
+  {
+   "id": "V12",
+   "label": "view back over MAHWORLD from the HALO rim",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V12_DAY_t40.jpg",
+   "pos": [
+    30,
+    247,
+    184
+   ],
+   "look": [
+    20,
+    40,
+    520
+   ],
+   "stats": {
+    "calls": 135,
+    "triangles": 957065,
+    "geometries": 568,
+    "textures": 83,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 14715
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V13_DAY_t40.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 311,
+    "triangles": 1985108,
+    "geometries": 568,
+    "textures": 83,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 23624
+  },
+  {
+   "id": "V02",
+   "label": "world overview from the south",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V02_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    170,
+    -270
+   ],
+   "look": [
+    0,
+    0,
+    70
+   ],
+   "stats": {
+    "calls": 450,
+    "triangles": 2732444,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 34142
+  },
+  {
+   "id": "V03",
+   "label": "ATHLETE gold temple forecourt",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V03_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    8,
+    122
+   ],
+   "look": [
+    0,
+    14,
+    178
+   ],
+   "stats": {
+    "calls": 173,
+    "triangles": 2374342,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 35893
+  },
+  {
+   "id": "V04",
+   "label": "TITAN blue tower and gate",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V04_NIGHT_t40.jpg",
+   "pos": [
+    58,
+    10,
+    104
+   ],
+   "look": [
+    112,
+    20,
+    110
+   ],
+   "stats": {
+    "calls": 140,
+    "triangles": 1700001,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 174
+   },
+   "frames_in_600ms": 0,
+   "ms": 42558
+  },
+  {
+   "id": "V05",
+   "label": "LEAN crimson canyon corridor",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V05_NIGHT_t40.jpg",
+   "pos": [
+    -86,
+    11,
+    138
+   ],
+   "look": [
+    -112,
+    12,
+    210
+   ],
+   "stats": {
+    "calls": 147,
+    "triangles": 1138481,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 175
+   },
+   "frames_in_600ms": 0,
+   "ms": 26937
+  },
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V06_NIGHT_t40.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 126,
+    "triangles": 1058423,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 175
+   },
+   "frames_in_600ms": 0,
+   "ms": 24109
+  },
+  {
+   "id": "V07",
+   "label": "BAGE pink market and basins",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V07_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    9,
+    212
+   ],
+   "look": [
+    0,
+    8,
+    258
+   ],
+   "stats": {
+    "calls": 135,
+    "triangles": 1662921,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 175
+   },
+   "frames_in_600ms": 0,
+   "ms": 19804
+  },
+  {
+   "id": "V09",
+   "label": "HALO dome from the ground",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V09_NIGHT_t40.jpg",
+   "pos": [
+    -130,
+    22,
+    -150
+   ],
+   "look": [
+    30,
+    230,
+    40
+   ],
+   "stats": {
+    "calls": 304,
+    "triangles": 1125561,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 176
+   },
+   "frames_in_600ms": 0,
+   "ms": 23433
+  },
+  {
+   "id": "V10",
+   "label": "sky toward the Sun",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V10_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    260,
+    150,
+    140
+   ],
+   "stats": {
+    "calls": 282,
+    "triangles": 1590543,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 176
+   },
+   "frames_in_600ms": 1,
+   "ms": 22576
+  },
+  {
+   "id": "V11",
+   "label": "south coast horizon",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V11_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    7,
+    -140
+   ],
+   "look": [
+    0,
+    4,
+    -300
+   ],
+   "stats": {
+    "calls": 76,
+    "triangles": 495627,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 176
+   },
+   "frames_in_600ms": 0,
+   "ms": 21055
+  },
+  {
+   "id": "V12",
+   "label": "view back over MAHWORLD from the HALO rim",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V12_NIGHT_t40.jpg",
+   "pos": [
+    30,
+    247,
+    184
+   ],
+   "look": [
+    20,
+    40,
+    520
+   ],
+   "stats": {
+    "calls": 140,
+    "triangles": 977401,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 176
+   },
+   "frames_in_600ms": 0,
+   "ms": 16988
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V13_NIGHT_t40.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 320,
+    "triangles": 2022004,
+    "geometries": 576,
+    "textures": 90,
+    "programs": 176
+   },
+   "frames_in_600ms": 0,
+   "ms": 24476
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 9,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (697 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (33 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (15 ms)",
+   "combatZones: 2 courts (CZ_ELEVATOR_GROVE 24 m, CZ_GYM_LAWN 24 m) in 1 draw; roster authority HOST",
+   "worldB combatZones ready (2 ms)",
+   "aura: 106 spectral auras in one draw, 2 sky moments in the backdrop, 27 dimensional forms in one draw (2 following)",
+   "worldB aura ready (11 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 12109.2,
+  "error": null
+ },
+ "finished": "2026-09-27T11:21:31.400Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 112,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (697 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (33 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (15 ms)",
+   "combatZones: 2 courts (CZ_ELEVATOR_GROVE 24 m, CZ_GYM_LAWN 24 m) in 1 draw; roster authority HOST",
+   "worldB combatZones ready (2 ms)",
+   "aura: 106 spectral auras in one draw, 2 sky moments in the backdrop, 27 dimensional forms in one draw (2 following)",
+   "worldB aura ready (11 ms)"
+  ]
+ }
+}
