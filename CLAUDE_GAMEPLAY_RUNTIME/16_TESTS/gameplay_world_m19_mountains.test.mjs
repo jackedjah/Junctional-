@@ -139,6 +139,20 @@ var { createCoast } = await import('../26_LOCAL_AUTHORITY/lab/world/coast.js'); 
   s9[T] = { islet_trees: n, min_canopy_clearance_m: +minC.toFixed(2), land: g.getObjectByName('ISLAND_LAND').material }; });
 ok('9. reachable-islet trees clear 3.4 m + 1 m on every tier (' + ['HIGH', 'MED', 'LOW'].map(function (T) { return T + ' ' + s9[T].islet_trees + ' trees, min ' + s9[T].min_canopy_clearance_m + ' m'; }).join('; ') + ')', ['HIGH', 'MED', 'LOW'].every(function (T) { return s9[T].islet_trees >= isl9.length && s9[T].min_canopy_clearance_m >= 4.4; }), ['HIGH', 'MED', 'LOW'].map(function (T) { return [T, s9[T].islet_trees, s9[T].min_canopy_clearance_m]; }));
 
+/* 11. M20 lead fix — HOST SAFETY (hard rule 4, wave-2 re-review): the rock-island profile / groves / clusters only on islands whose ellipse lies
+      wholly OUTSIDE the ±300 m reach square (a flight landing inside the square stands on the host's y 0): ISLE_SW, whose corner crosses into the
+      square, keeps its M9 heights — on every tier the island land inside the square stays under 3.6 m (the M9 mound's own 3.5 m) and its
+      village does not rise (houses under 10 m, as at dcaed60). */
+var { ridgeReachBounds } = await import('../26_LOCAL_AUTHORITY/lab/world/ridgeLayout.js'); var RB11 = ridgeReachBounds(R), s11 = {};
+var cross11 = (R.coast.islands || []).filter(function (I) { return !I.reachable && !(I.x - I.rx > RB11.x2 || I.x + I.rx < RB11.x1 || I.z - I.rz > RB11.z2 || I.z + I.rz < RB11.z1); });
+['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(), C = createCoast({ THREE: THREE, group: g, scene: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }); C.build(); g.updateMatrixWorld(true);
+  var land = g.getObjectByName('ISLAND_LAND'), towns = g.getObjectByName('ISLAND_TOWNS'), rc = new THREE.Raycaster(), dn = new THREE.Vector3(0, -1, 0), maxL = -1e9, maxT = -1e9, n = 0, D = C.debug();
+  cross11.forEach(function (I) { for (var x = Math.max(I.x - I.rx, RB11.x1); x <= Math.min(I.x + I.rx, RB11.x2); x += 2) for (var z = Math.max(I.z - I.rz, RB11.z1); z <= Math.min(I.z + I.rz, RB11.z2); z += 2) {
+    rc.set(new THREE.Vector3(x, 400, z), dn); var h = rc.intersectObject(land, false)[0]; if (h) { n++; maxL = Math.max(maxL, h.point.y); } if (towns) { var t = rc.intersectObject(towns, false)[0]; if (t) maxT = Math.max(maxT, t.point.y); } } });
+  s11[T] = { m20: cross11.map(function (I) { return I.id + ':' + D.m20_islands[I.id]; }), samples: n, max_land_m: +maxL.toFixed(2), max_town_m: +maxT.toFixed(2) }; });
+ok('11. islands crossing the reach square keep the M9 profile (' + cross11.map(function (I) { return I.id; }).join(', ') + '): max land inside the square ' + ['HIGH', 'MED', 'LOW'].map(function (T) { return T + ' ' + s11[T].max_land_m + ' m'; }).join(' / ') + ', village ' + s11.HIGH.max_town_m + ' m',
+  cross11.length >= 1 && ['HIGH', 'MED', 'LOW'].every(function (T) { return s11[T].m20.every(function (e) { return /:false$/.test(e); }) && s11[T].samples > 50 && s11[T].max_land_m <= 3.6 && s11[T].max_town_m < 10; }), s11);
+
 /* 10. M20 review fix — continuous rock coordinates and the tier law with the REAL M20 specs: the islands (HIGH / MED) map their rock on the
       ground plane (the along-face axis switched x ↔ z per triangle on their gentle crowns: a quilt of light / dark triangles), the far ring
       (MED / HIGH) on the ring bearing, the facet tilt rides Frisvad's frame (no cross(up, n), which flipped on level rock); LOW compiles no

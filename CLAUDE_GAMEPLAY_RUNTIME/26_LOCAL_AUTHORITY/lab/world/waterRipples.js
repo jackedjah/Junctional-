@@ -30,7 +30,8 @@ export function createRipples(ctx, o) {
   function inWater(x, z) { for (var i = 0; i < rivers.length; i++) { var r = rivers[i]; if (x >= r.x1 && x <= r.x2 && z >= r.z1 && z <= r.z2) return r; } if (sea && sea.test(x, z)) return sea; return null; }
   function setSea(test, surface_y, mat) { sea = { test: test, surface_y: surface_y, sea: true, mat: mat || null, x1: -1e9, x2: 1e9, z1: -1e9, z2: 1e9 }; if (mat && enabled) holeMaterial(mat); }
   /* M11: the window wears the look of the body it floats on — over the sea it was still the darker canal water, a hard-edged dark square of sea around the player */
-  function wearLook(src) { if (!src || !nearMat) return; nearMat.color.copy(src.color); nearMat.roughness = src.roughness; nearMat.metalness = src.metalness; nearMat.envMapIntensity = src.envMapIntensity; nearMat.opacity = src.opacity; if (src.normalScale && nearMat.normalScale) nearMat.normalScale.copy(src.normalScale); }
+  function wearLook(src) { if (!src || !nearMat) return; nearMat.color.copy(src.color); nearMat.roughness = src.roughness; nearMat.metalness = src.metalness; nearMat.envMapIntensity = src.envMapIntensity; nearMat.opacity = src.opacity; if (src.normalScale && nearMat.normalScale) nearMat.normalScale.copy(src.normalScale);
+    var sU = src.userData && src.userData.swU, nU = nearMat.userData && nearMat.userData.swU; if (sU && nU) ['uReflK', 'uBodyK', 'uGlintK', 'uCalmK', 'uLandH', 'uLandK'].forEach(function (k) { if (sU[k] && nU[k]) nU[k].value = sU[k].value; }); }   /* M20: the window also wears the body's sky-mirror settings (skyWater) — on the sea it kept the canals' ridge-skyline band and showed as a darker 48 m square round the player */
   var holeMaterial = function () { };
   function snap(v) { return Math.round(v / TEXEL) * TEXEL; }
 
