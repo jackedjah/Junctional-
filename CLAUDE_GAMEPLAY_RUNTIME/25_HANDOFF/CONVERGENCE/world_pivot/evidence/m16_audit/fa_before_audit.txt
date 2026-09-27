@@ -1,0 +1,48 @@
+MAHWORLD five-class colour audit (artistic diagnostic, not a quota) — /tmp/claude-0/-home-user-Junctional-/b7a5b257-4154-5b93-907d-17a5c195618b/scratchpad/fa_before
+shares = chroma-weighted share of the ACCENT light (sky / sea / tinted shading kept apart as ambient)
+
+DAY  map mean: GOLD 0.00  BLUE 0.95  RED 0.01  PURPLE 0.03  PINK 0.01
+DAY  shared mean: GOLD 0.00  BLUE 1.00  RED 0.00  PURPLE 0.00  PINK 0.00
+   represented: BLUE | shared dominated: V02,V09,V11,V12,V13,V32,V34,V35,F3,F4 | shared purple-led: - | district weak: V07 | busy: - | mean neutral 0.69 | mean accent 0.032
+NIGHT  map mean: GOLD 0.03  BLUE 0.62  RED 0.02  PURPLE 0.29  PINK 0.03
+NIGHT  shared mean: GOLD 0.01  BLUE 0.84  RED 0.00  PURPLE 0.14  PINK 0.00
+   represented: BLUE,PURPLE | shared dominated: V02,V08,V11,V13,V32,V34,V35,F4,TS1 | shared purple-led: V11,TS1 | district weak: - | busy: - | mean neutral 0.37 | mean accent 0.006
+
+V02  DAY   SHARED          neutral 0.61 accent 0.223  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; LOW neutral room
+V03  DAY   DISTRICT/GOLD   neutral 0.77 accent 0.004  GOL 0.45 BLU 0.34 RED 0.03 PUR 0.00 PIN 0.02 OFF 0.16  | READS as GOLD; OFF-LAW light 0.158
+V04  DAY   DISTRICT/BLUE   neutral 0.64 accent 0.053  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | READS as BLUE
+V05  DAY   DISTRICT/RED    neutral 0.82 accent 0.005  GOL 0.00 BLU 0.01 RED 0.63 PUR 0.00 PIN 0.29 OFF 0.07  | READS as RED
+V06  DAY   DISTRICT/PURPLE neutral 0.69 accent 0.020  GOL 0.00 BLU 0.29 RED 0.00 PUR 0.62 PIN 0.00 OFF 0.09  | READS as PURPLE
+V07  DAY   DISTRICT/PINK   neutral 0.84 accent 0.015  GOL 0.00 BLU 0.89 RED 0.00 PUR 0.00 PIN 0.11 OFF 0.00  | WEAK read (PINK 0.107, top BLUE)
+V08  DAY   SHARED          neutral 0.52 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | almost no accent light
+V09  DAY   SHARED          neutral 0.66 accent 0.045  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V11  DAY   SHARED          neutral 0.39 accent 0.165  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V12  DAY   SHARED          neutral 0.68 accent 0.030  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V13  DAY   SHARED          neutral 0.87 accent 0.002  GOL 0.01 BLU 0.99 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V17  DAY   DISTRICT/PURPLE neutral 0.58 accent 0.015  GOL 0.00 BLU 0.42 RED 0.00 PUR 0.47 PIN 0.00 OFF 0.10  | READS as PURPLE
+V31  DAY   SHARED          neutral 0.69 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | almost no accent light
+V32  DAY   SHARED          neutral 0.90 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; almost no accent light
+V34  DAY   SHARED          neutral 0.66 accent 0.004  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V35  DAY   SHARED          neutral 0.67 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; almost no accent light
+F3   DAY   SHARED          neutral 0.78 accent 0.001  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; almost no accent light
+F4   DAY   SHARED          neutral 0.65 accent 0.034  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+TS1  DAY   SHARED          neutral 0.73 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | almost no accent light
+V02  NIGHT SHARED          neutral 0.31 accent 0.001  GOL 0.00 BLU 0.78 RED 0.00 PUR 0.18 PIN 0.00 OFF 0.03  | DOMINATED by BLUE; almost no accent light
+V03  NIGHT DISTRICT/GOLD   neutral 0.30 accent 0.004  GOL 0.79 BLU 0.00 RED 0.09 PUR 0.00 PIN 0.03 OFF 0.08  | READS as GOLD
+V04  NIGHT DISTRICT/BLUE   neutral 0.12 accent 0.053  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | READS as BLUE
+V05  NIGHT DISTRICT/RED    neutral 0.27 accent 0.002  GOL 0.00 BLU 0.00 RED 0.88 PUR 0.00 PIN 0.08 OFF 0.04  | READS as RED; almost no accent light
+V06  NIGHT DISTRICT/PURPLE neutral 0.27 accent 0.016  GOL 0.00 BLU 0.10 RED 0.00 PUR 0.89 PIN 0.00 OFF 0.01  | READS as PURPLE
+V07  NIGHT DISTRICT/PINK   neutral 0.29 accent 0.004  GOL 0.00 BLU 0.03 RED 0.00 PUR 0.00 PIN 0.96 OFF 0.00  | READS as PINK
+V08  NIGHT SHARED          neutral 0.15 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; almost no accent light
+V09  NIGHT SHARED          neutral 0.57 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | almost no accent light
+V11  NIGHT SHARED          neutral 0.41 accent 0.001  GOL 0.00 BLU 0.34 RED 0.00 PUR 0.66 PIN 0.00 OFF 0.00  | DOMINATED by PURPLE; almost no accent light
+V12  NIGHT SHARED          neutral 0.66 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | almost no accent light
+V13  NIGHT SHARED          neutral 0.47 accent 0.005  GOL 0.02 BLU 0.92 RED 0.00 PUR 0.05 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V17  NIGHT DISTRICT/PURPLE neutral 0.31 accent 0.021  GOL 0.00 BLU 0.11 RED 0.00 PUR 0.86 PIN 0.00 OFF 0.02  | READS as PURPLE
+V31  NIGHT SHARED          neutral 0.20 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | almost no accent light
+V32  NIGHT SHARED          neutral 0.47 accent 0.001  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; almost no accent light
+V34  NIGHT SHARED          neutral 0.51 accent 0.007  GOL 0.00 BLU 0.99 RED 0.01 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V35  NIGHT SHARED          neutral 0.34 accent 0.001  GOL 0.00 BLU 0.98 RED 0.00 PUR 0.02 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; almost no accent light
+F3   NIGHT SHARED          neutral 0.37 accent 0.001  GOL 0.00 BLU 0.56 RED 0.00 PUR 0.44 PIN 0.00 OFF 0.00  | almost no accent light
+F4   NIGHT SHARED          neutral 0.44 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; almost no accent light
+TS1  NIGHT SHARED          neutral 0.50 accent 0.001  GOL 0.00 BLU 0.00 RED 0.00 PUR 1.00 PIN 0.00 OFF 0.00  | DOMINATED by PURPLE; almost no accent light

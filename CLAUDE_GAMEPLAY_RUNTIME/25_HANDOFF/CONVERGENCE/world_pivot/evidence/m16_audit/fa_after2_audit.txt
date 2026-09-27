@@ -1,0 +1,30 @@
+MAHWORLD five-class colour audit (artistic diagnostic, not a quota) — /tmp/claude-0/-home-user-Junctional-/b7a5b257-4154-5b93-907d-17a5c195618b/scratchpad/fa_after2
+shares = chroma-weighted share of the ACCENT light (sky / sea / tinted shading kept apart as ambient)
+
+DAY  map mean: GOLD 0.01  BLUE 0.91  RED 0.01  PURPLE 0.06  PINK 0.01
+DAY  shared mean: GOLD 0.00  BLUE 1.00  RED 0.00  PURPLE 0.00  PINK 0.00
+DAY  shared AMBIENT (sky / sea / shading / night grade): GOLD 0.00  BLUE 0.98  RED 0.00  PURPLE 0.01  PINK 0.01
+   represented: BLUE,PURPLE | shared dominated: V02 | shared purple-led: - | district weak: V07 | busy: - | mean neutral 0.75 | mean accent 0.037
+NIGHT  map mean: GOLD 0.03  BLUE 0.60  RED 0.02  PURPLE 0.30  PINK 0.04
+NIGHT  shared mean: GOLD 0.02  BLUE 0.90  RED 0.00  PURPLE 0.07  PINK 0.00
+NIGHT  shared AMBIENT (sky / sea / shading / night grade): GOLD 0.00  BLUE 0.98  RED 0.00  PURPLE 0.02  PINK 0.00
+   represented: BLUE,PURPLE | shared dominated: V13 | shared purple-led: - | district weak: - | busy: - | mean neutral 0.32 | mean accent 0.011
+
+V02  DAY   SHARED          neutral 0.61 accent 0.223  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE; LOW neutral room
+V03  DAY   DISTRICT/GOLD   neutral 0.77 accent 0.004  GOL 0.44 BLU 0.34 RED 0.03 PUR 0.00 PIN 0.02 OFF 0.17  | READS as GOLD; OFF-LAW light 0.166
+V04  DAY   DISTRICT/BLUE   neutral 0.64 accent 0.053  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | READS as BLUE
+V05  DAY   DISTRICT/RED    neutral 0.82 accent 0.005  GOL 0.00 BLU 0.01 RED 0.63 PUR 0.00 PIN 0.28 OFF 0.08  | READS as RED
+V06  DAY   DISTRICT/PURPLE neutral 0.69 accent 0.019  GOL 0.00 BLU 0.28 RED 0.00 PUR 0.61 PIN 0.00 OFF 0.11  | READS as PURPLE
+V07  DAY   DISTRICT/PINK   neutral 0.84 accent 0.014  GOL 0.00 BLU 0.89 RED 0.00 PUR 0.00 PIN 0.11 OFF 0.00  | WEAK read (PINK 0.11, top BLUE)
+V13  DAY   SHARED          neutral 0.87 accent 0.002  GOL 0.01 BLU 0.99 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.23%)
+V17  DAY   DISTRICT/PURPLE neutral 0.59 accent 0.013  GOL 0.00 BLU 0.34 RED 0.00 PUR 0.53 PIN 0.00 OFF 0.12  | READS as PURPLE
+V32  DAY   SHARED          neutral 0.90 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.03%)
+V02  NIGHT SHARED          neutral 0.31 accent 0.001  GOL 0.00 BLU 0.84 RED 0.00 PUR 0.13 PIN 0.00 OFF 0.03  | too little accent light to judge (0.06%)
+V03  NIGHT DISTRICT/GOLD   neutral 0.32 accent 0.004  GOL 0.78 BLU 0.03 RED 0.09 PUR 0.00 PIN 0.04 OFF 0.07  | READS as GOLD
+V04  NIGHT DISTRICT/BLUE   neutral 0.12 accent 0.053  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | READS as BLUE
+V05  NIGHT DISTRICT/RED    neutral 0.27 accent 0.002  GOL 0.00 BLU 0.01 RED 0.88 PUR 0.00 PIN 0.09 OFF 0.02  | too little accent light to judge (0.18%)
+V06  NIGHT DISTRICT/PURPLE neutral 0.27 accent 0.016  GOL 0.00 BLU 0.09 RED 0.00 PUR 0.89 PIN 0.00 OFF 0.01  | READS as PURPLE
+V07  NIGHT DISTRICT/PINK   neutral 0.29 accent 0.004  GOL 0.00 BLU 0.13 RED 0.00 PUR 0.00 PIN 0.85 OFF 0.02  | READS as PINK
+V13  NIGHT SHARED          neutral 0.48 accent 0.003  GOL 0.03 BLU 0.90 RED 0.00 PUR 0.07 PIN 0.00 OFF 0.01  | DOMINATED by BLUE
+V17  NIGHT DISTRICT/PURPLE neutral 0.32 accent 0.019  GOL 0.00 BLU 0.11 RED 0.00 PUR 0.86 PIN 0.00 OFF 0.03  | READS as PURPLE
+V32  NIGHT SHARED          neutral 0.47 accent 0.001  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.07%)

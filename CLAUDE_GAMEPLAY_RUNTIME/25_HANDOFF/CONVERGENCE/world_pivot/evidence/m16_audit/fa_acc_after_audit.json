@@ -1,0 +1,1323 @@
+{
+ "capture": "/tmp/claude-0/-home-user-Junctional-/b7a5b257-4154-5b93-907d-17a5c195618b/scratchpad/fa_acc_after",
+ "views": [
+  {
+   "view": "V02",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V02_DAY_t40.jpg",
+   "neutral_frac": 0.965,
+   "expressive_frac": 0.0004,
+   "ambient_frac": 0.035,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.804,
+    "RED": 0.001,
+    "PURPLE": 0.075,
+    "PINK": 0.113,
+    "OFF": 0.006
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.04%)"
+   ]
+  },
+  {
+   "view": "V03",
+   "tod": "DAY",
+   "tag": "DISTRICT",
+   "expect": "GOLD",
+   "file": "V03_DAY_t40.jpg",
+   "neutral_frac": 0.808,
+   "expressive_frac": 0.0037,
+   "ambient_frac": 0.188,
+   "shares": {
+    "GOLD": 0.437,
+    "BLUE": 0.336,
+    "RED": 0.013,
+    "PURPLE": 0.0,
+    "PINK": 0.013,
+    "OFF": 0.202
+   },
+   "ambient_shares": {
+    "GOLD": 0.032,
+    "BLUE": 0.852,
+    "RED": 0.002,
+    "PURPLE": 0.0,
+    "PINK": 0.013,
+    "OFF": 0.101
+   },
+   "top": "GOLD",
+   "present": [
+    "GOLD",
+    "BLUE"
+   ],
+   "notes": [
+    "READS as GOLD",
+    "OFF-LAW light 0.202"
+   ]
+  },
+  {
+   "view": "V04",
+   "tod": "DAY",
+   "tag": "DISTRICT",
+   "expect": "BLUE",
+   "file": "V04_DAY_t40.jpg",
+   "neutral_frac": 0.803,
+   "expressive_frac": 0.0526,
+   "ambient_frac": 0.144,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.007,
+    "BLUE": 0.969,
+    "RED": 0.0,
+    "PURPLE": 0.008,
+    "PINK": 0.004,
+    "OFF": 0.012
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "READS as BLUE"
+   ]
+  },
+  {
+   "view": "V05",
+   "tod": "DAY",
+   "tag": "DISTRICT",
+   "expect": "RED",
+   "file": "V05_DAY_t40.jpg",
+   "neutral_frac": 0.88,
+   "expressive_frac": 0.0045,
+   "ambient_frac": 0.116,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.012,
+    "RED": 0.677,
+    "PURPLE": 0.0,
+    "PINK": 0.213,
+    "OFF": 0.098
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.331,
+    "RED": 0.08,
+    "PURPLE": 0.006,
+    "PINK": 0.557,
+    "OFF": 0.027
+   },
+   "top": "RED",
+   "present": [
+    "RED",
+    "PINK"
+   ],
+   "notes": [
+    "READS as RED"
+   ]
+  },
+  {
+   "view": "V06",
+   "tod": "DAY",
+   "tag": "DISTRICT",
+   "expect": "PURPLE",
+   "file": "V06_DAY_t40.jpg",
+   "neutral_frac": 0.75,
+   "expressive_frac": 0.0211,
+   "ambient_frac": 0.229,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.207,
+    "RED": 0.0,
+    "PURPLE": 0.704,
+    "PINK": 0.0,
+    "OFF": 0.089
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.786,
+    "RED": 0.0,
+    "PURPLE": 0.193,
+    "PINK": 0.0,
+    "OFF": 0.022
+   },
+   "top": "PURPLE",
+   "present": [
+    "BLUE",
+    "PURPLE"
+   ],
+   "notes": [
+    "READS as PURPLE"
+   ]
+  },
+  {
+   "view": "V07",
+   "tod": "DAY",
+   "tag": "DISTRICT",
+   "expect": "PINK",
+   "file": "V07_DAY_t40.jpg",
+   "neutral_frac": 0.929,
+   "expressive_frac": 0.0021,
+   "ambient_frac": 0.069,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.241,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.759,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.718,
+    "RED": 0.0,
+    "PURPLE": 0.007,
+    "PINK": 0.273,
+    "OFF": 0.002
+   },
+   "top": "PINK",
+   "present": [
+    "BLUE",
+    "PINK"
+   ],
+   "notes": [
+    "too little accent light to judge (0.21%)"
+   ]
+  },
+  {
+   "view": "V08",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V08_DAY_t40.jpg",
+   "neutral_frac": 0.682,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.318,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.009,
+    "BLUE": 0.99,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V09",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V09_DAY_t40.jpg",
+   "neutral_frac": 0.993,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.007,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.345,
+    "BLUE": 0.295,
+    "RED": 0.0,
+    "PURPLE": 0.002,
+    "PINK": 0.0,
+    "OFF": 0.358
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V11",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V11_DAY_t40.jpg",
+   "neutral_frac": 0.97,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.03,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.759,
+    "RED": 0.0,
+    "PURPLE": 0.004,
+    "PINK": 0.237,
+    "OFF": 0.0
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V12",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V12_DAY_t40.jpg",
+   "neutral_frac": 0.913,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.087,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.999,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.001,
+    "OFF": 0.0
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V13",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V13_DAY_t40.jpg",
+   "neutral_frac": 0.921,
+   "expressive_frac": 0.0021,
+   "ambient_frac": 0.077,
+   "shares": {
+    "GOLD": 0.014,
+    "BLUE": 0.986,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.005,
+    "BLUE": 0.982,
+    "RED": 0.0,
+    "PURPLE": 0.003,
+    "PINK": 0.0,
+    "OFF": 0.009
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.21%)"
+   ]
+  },
+  {
+   "view": "V17",
+   "tod": "DAY",
+   "tag": "DISTRICT",
+   "expect": "PURPLE",
+   "file": "V17_DAY_t40.jpg",
+   "neutral_frac": 0.769,
+   "expressive_frac": 0.0121,
+   "ambient_frac": 0.219,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.287,
+    "RED": 0.0,
+    "PURPLE": 0.593,
+    "PINK": 0.0,
+    "OFF": 0.12
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.898,
+    "RED": 0.0,
+    "PURPLE": 0.084,
+    "PINK": 0.002,
+    "OFF": 0.016
+   },
+   "top": "PURPLE",
+   "present": [
+    "BLUE",
+    "PURPLE"
+   ],
+   "notes": [
+    "READS as PURPLE"
+   ]
+  },
+  {
+   "view": "V31",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V31_DAY_t40.jpg",
+   "neutral_frac": 0.989,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.011,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.145,
+    "BLUE": 0.422,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.169,
+    "OFF": 0.265
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V32",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V32_DAY_t40.jpg",
+   "neutral_frac": 0.916,
+   "expressive_frac": 0.0003,
+   "ambient_frac": 0.083,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.001,
+    "BLUE": 0.998,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.001
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.03%)"
+   ]
+  },
+  {
+   "view": "V34",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V34_DAY_t40.jpg",
+   "neutral_frac": 0.752,
+   "expressive_frac": 0.004,
+   "ambient_frac": 0.244,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.001,
+    "BLUE": 0.974,
+    "RED": 0.002,
+    "PURPLE": 0.011,
+    "PINK": 0.011,
+    "OFF": 0.001
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "DOMINATED by BLUE"
+   ]
+  },
+  {
+   "view": "V35",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V35_DAY_t40.jpg",
+   "neutral_frac": 0.738,
+   "expressive_frac": 0.0001,
+   "ambient_frac": 0.262,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.01%)"
+   ]
+  },
+  {
+   "view": "F3",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "F3_DAY_t40.jpg",
+   "neutral_frac": 0.973,
+   "expressive_frac": 0.0005,
+   "ambient_frac": 0.027,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.054,
+    "BLUE": 0.815,
+    "RED": 0.0,
+    "PURPLE": 0.114,
+    "PINK": 0.009,
+    "OFF": 0.008
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.05%)"
+   ]
+  },
+  {
+   "view": "F4",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "F4_DAY_t40.jpg",
+   "neutral_frac": 0.881,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.119,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.001,
+    "BLUE": 0.822,
+    "RED": 0.0,
+    "PURPLE": 0.149,
+    "PINK": 0.023,
+    "OFF": 0.005
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "TS1",
+   "tod": "DAY",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "TS1_DAY_t40.jpg",
+   "neutral_frac": 0.983,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.017,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.943,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.057,
+    "OFF": 0.0
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V02",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V02_NIGHT_t40.jpg",
+   "neutral_frac": 0.967,
+   "expressive_frac": 0.0002,
+   "ambient_frac": 0.033,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.676,
+    "RED": 0.0,
+    "PURPLE": 0.324,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.002,
+    "BLUE": 0.933,
+    "RED": 0.008,
+    "PURPLE": 0.05,
+    "PINK": 0.003,
+    "OFF": 0.004
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE",
+    "PURPLE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.02%)"
+   ]
+  },
+  {
+   "view": "V03",
+   "tod": "NIGHT",
+   "tag": "DISTRICT",
+   "expect": "GOLD",
+   "file": "V03_NIGHT_t40.jpg",
+   "neutral_frac": 0.549,
+   "expressive_frac": 0.0041,
+   "ambient_frac": 0.447,
+   "shares": {
+    "GOLD": 0.791,
+    "BLUE": 0.018,
+    "RED": 0.091,
+    "PURPLE": 0.0,
+    "PINK": 0.03,
+    "OFF": 0.069
+   },
+   "ambient_shares": {
+    "GOLD": 0.023,
+    "BLUE": 0.906,
+    "RED": 0.001,
+    "PURPLE": 0.003,
+    "PINK": 0.015,
+    "OFF": 0.052
+   },
+   "top": "GOLD",
+   "present": [
+    "GOLD",
+    "RED"
+   ],
+   "notes": [
+    "READS as GOLD"
+   ]
+  },
+  {
+   "view": "V04",
+   "tod": "NIGHT",
+   "tag": "DISTRICT",
+   "expect": "BLUE",
+   "file": "V04_NIGHT_t40.jpg",
+   "neutral_frac": 0.534,
+   "expressive_frac": 0.0464,
+   "ambient_frac": 0.42,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.993,
+    "RED": 0.0,
+    "PURPLE": 0.006,
+    "PINK": 0.0,
+    "OFF": 0.001
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "READS as BLUE"
+   ]
+  },
+  {
+   "view": "V05",
+   "tod": "NIGHT",
+   "tag": "DISTRICT",
+   "expect": "RED",
+   "file": "V05_NIGHT_t40.jpg",
+   "neutral_frac": 0.482,
+   "expressive_frac": 0.0018,
+   "ambient_frac": 0.516,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.935,
+    "PURPLE": 0.0,
+    "PINK": 0.044,
+    "OFF": 0.021
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.727,
+    "RED": 0.042,
+    "PURPLE": 0.02,
+    "PINK": 0.2,
+    "OFF": 0.011
+   },
+   "top": "RED",
+   "present": [
+    "RED"
+   ],
+   "notes": [
+    "too little accent light to judge (0.18%)"
+   ]
+  },
+  {
+   "view": "V06",
+   "tod": "NIGHT",
+   "tag": "DISTRICT",
+   "expect": "PURPLE",
+   "file": "V06_NIGHT_t40.jpg",
+   "neutral_frac": 0.477,
+   "expressive_frac": 0.0165,
+   "ambient_frac": 0.506,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.072,
+    "RED": 0.0,
+    "PURPLE": 0.922,
+    "PINK": 0.0,
+    "OFF": 0.006
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.825,
+    "RED": 0.0,
+    "PURPLE": 0.147,
+    "PINK": 0.0,
+    "OFF": 0.028
+   },
+   "top": "PURPLE",
+   "present": [
+    "BLUE",
+    "PURPLE"
+   ],
+   "notes": [
+    "READS as PURPLE"
+   ]
+  },
+  {
+   "view": "V07",
+   "tod": "NIGHT",
+   "tag": "DISTRICT",
+   "expect": "PINK",
+   "file": "V07_NIGHT_t40.jpg",
+   "neutral_frac": 0.415,
+   "expressive_frac": 0.0038,
+   "ambient_frac": 0.581,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.117,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.834,
+    "OFF": 0.048
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.93,
+    "RED": 0.0,
+    "PURPLE": 0.017,
+    "PINK": 0.051,
+    "OFF": 0.002
+   },
+   "top": "PINK",
+   "present": [
+    "BLUE",
+    "PINK"
+   ],
+   "notes": [
+    "READS as PINK"
+   ]
+  },
+  {
+   "view": "V08",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V08_NIGHT_t40.jpg",
+   "neutral_frac": 0.261,
+   "expressive_frac": 0.0001,
+   "ambient_frac": 0.739,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.004,
+    "BLUE": 0.995,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.01%)"
+   ]
+  },
+  {
+   "view": "V09",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V09_NIGHT_t40.jpg",
+   "neutral_frac": 0.995,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.005,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.512,
+    "RED": 0.0,
+    "PURPLE": 0.457,
+    "PINK": 0.0,
+    "OFF": 0.03
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V11",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V11_NIGHT_t40.jpg",
+   "neutral_frac": 0.84,
+   "expressive_frac": 0.0005,
+   "ambient_frac": 0.159,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.964,
+    "RED": 0.0,
+    "PURPLE": 0.036,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.001,
+    "BLUE": 0.584,
+    "RED": 0.0,
+    "PURPLE": 0.409,
+    "PINK": 0.001,
+    "OFF": 0.005
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.05%)"
+   ]
+  },
+  {
+   "view": "V12",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V12_NIGHT_t40.jpg",
+   "neutral_frac": 0.873,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.127,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.997,
+    "RED": 0.0,
+    "PURPLE": 0.003,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V13",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V13_NIGHT_t40.jpg",
+   "neutral_frac": 0.587,
+   "expressive_frac": 0.0028,
+   "ambient_frac": 0.41,
+   "shares": {
+    "GOLD": 0.034,
+    "BLUE": 0.868,
+    "RED": 0.0,
+    "PURPLE": 0.092,
+    "PINK": 0.0,
+    "OFF": 0.006
+   },
+   "ambient_shares": {
+    "GOLD": 0.001,
+    "BLUE": 0.987,
+    "RED": 0.0,
+    "PURPLE": 0.01,
+    "PINK": 0.0,
+    "OFF": 0.002
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE",
+    "PURPLE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.28%)"
+   ]
+  },
+  {
+   "view": "V17",
+   "tod": "NIGHT",
+   "tag": "DISTRICT",
+   "expect": "PURPLE",
+   "file": "V17_NIGHT_t40.jpg",
+   "neutral_frac": 0.425,
+   "expressive_frac": 0.0127,
+   "ambient_frac": 0.562,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.154,
+    "RED": 0.0,
+    "PURPLE": 0.814,
+    "PINK": 0.0,
+    "OFF": 0.032
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.695,
+    "RED": 0.0,
+    "PURPLE": 0.299,
+    "PINK": 0.001,
+    "OFF": 0.006
+   },
+   "top": "PURPLE",
+   "present": [
+    "BLUE",
+    "PURPLE"
+   ],
+   "notes": [
+    "READS as PURPLE"
+   ]
+  },
+  {
+   "view": "V31",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V31_NIGHT_t40.jpg",
+   "neutral_frac": 0.603,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.397,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.005,
+    "BLUE": 0.989,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.006,
+    "OFF": 0.0
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "V32",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V32_NIGHT_t40.jpg",
+   "neutral_frac": 0.535,
+   "expressive_frac": 0.0007,
+   "ambient_frac": 0.464,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.999,
+    "RED": 0.0,
+    "PURPLE": 0.001,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.07%)"
+   ]
+  },
+  {
+   "view": "V34",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V34_NIGHT_t40.jpg",
+   "neutral_frac": 0.653,
+   "expressive_frac": 0.0069,
+   "ambient_frac": 0.34,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.993,
+    "RED": 0.007,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.982,
+    "RED": 0.001,
+    "PURPLE": 0.015,
+    "PINK": 0.0,
+    "OFF": 0.001
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "DOMINATED by BLUE"
+   ]
+  },
+  {
+   "view": "V35",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "V35_NIGHT_t40.jpg",
+   "neutral_frac": 0.531,
+   "expressive_frac": 0.0008,
+   "ambient_frac": 0.468,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.998,
+    "RED": 0.0,
+    "PURPLE": 0.001,
+    "PINK": 0.001,
+    "OFF": 0.0
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.08%)"
+   ]
+  },
+  {
+   "view": "F3",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "F3_NIGHT_t40.jpg",
+   "neutral_frac": 0.476,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.524,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 1.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.803,
+    "RED": 0.0,
+    "PURPLE": 0.196,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "top": "PURPLE",
+   "present": [
+    "PURPLE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  },
+  {
+   "view": "F4",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "F4_NIGHT_t40.jpg",
+   "neutral_frac": 0.797,
+   "expressive_frac": 0.0002,
+   "ambient_frac": 0.202,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 1.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.852,
+    "RED": 0.0,
+    "PURPLE": 0.144,
+    "PINK": 0.0,
+    "OFF": 0.004
+   },
+   "top": "BLUE",
+   "present": [
+    "BLUE"
+   ],
+   "notes": [
+    "too little accent light to judge (0.02%)"
+   ]
+  },
+  {
+   "view": "TS1",
+   "tod": "NIGHT",
+   "tag": "SHARED",
+   "expect": null,
+   "file": "TS1_NIGHT_t40.jpg",
+   "neutral_frac": 0.612,
+   "expressive_frac": 0.0,
+   "ambient_frac": 0.388,
+   "shares": {
+    "GOLD": 0.0,
+    "BLUE": 0.0,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0,
+    "OFF": 0.0
+   },
+   "ambient_shares": {
+    "GOLD": 0.001,
+    "BLUE": 0.62,
+    "RED": 0.0,
+    "PURPLE": 0.375,
+    "PINK": 0.001,
+    "OFF": 0.004
+   },
+   "top": "GOLD",
+   "present": [],
+   "notes": [
+    "too little accent light to judge (0.00%)"
+   ]
+  }
+ ],
+ "summary": {
+  "DAY": {
+   "map_mean_shares": {
+    "GOLD": 0.016,
+    "BLUE": 0.673,
+    "RED": 0.03,
+    "PURPLE": 0.213,
+    "PINK": 0.025
+   },
+   "shared_mean_shares": {
+    "GOLD": 0.004,
+    "BLUE": 0.996,
+    "RED": 0.0,
+    "PURPLE": 0.0,
+    "PINK": 0.0
+   },
+   "classes_represented": [
+    "BLUE",
+    "PURPLE"
+   ],
+   "shared_dominated": [
+    "V34"
+   ],
+   "shared_purple_led": [],
+   "district_weak": [],
+   "busy": [],
+   "mean_neutral_frac": 0.874,
+   "mean_accent_frac": 0.0054,
+   "shared_ambient_shares": {
+    "GOLD": 0.007,
+    "BLUE": 0.952,
+    "RED": 0.0,
+    "PURPLE": 0.02,
+    "PINK": 0.015
+   }
+  },
+  "NIGHT": {
+   "map_mean_shares": {
+    "GOLD": 0.034,
+    "BLUE": 0.633,
+    "RED": 0.022,
+    "PURPLE": 0.266,
+    "PINK": 0.035
+   },
+   "shared_mean_shares": {
+    "GOLD": 0.008,
+    "BLUE": 0.959,
+    "RED": 0.004,
+    "PURPLE": 0.028,
+    "PINK": 0.0
+   },
+   "classes_represented": [
+    "BLUE",
+    "PURPLE"
+   ],
+   "shared_dominated": [
+    "V34"
+   ],
+   "shared_purple_led": [
+    "F3"
+   ],
+   "district_weak": [],
+   "busy": [],
+   "mean_neutral_frac": 0.611,
+   "mean_accent_frac": 0.0051,
+   "shared_ambient_shares": {
+    "GOLD": 0.001,
+    "BLUE": 0.912,
+    "RED": 0.0,
+    "PURPLE": 0.084,
+    "PINK": 0.001
+   }
+  }
+ }
+}

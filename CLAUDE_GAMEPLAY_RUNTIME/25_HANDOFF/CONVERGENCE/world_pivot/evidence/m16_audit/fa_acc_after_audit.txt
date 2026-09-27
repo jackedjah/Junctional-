@@ -1,0 +1,50 @@
+MAHWORLD five-class colour audit (artistic diagnostic, not a quota) — /tmp/claude-0/-home-user-Junctional-/b7a5b257-4154-5b93-907d-17a5c195618b/scratchpad/fa_acc_after
+shares = chroma-weighted share of the ACCENT light (sky / sea / tinted shading kept apart as ambient)
+
+DAY  map mean: GOLD 0.02  BLUE 0.67  RED 0.03  PURPLE 0.21  PINK 0.03
+DAY  shared mean: GOLD 0.00  BLUE 1.00  RED 0.00  PURPLE 0.00  PINK 0.00
+DAY  shared AMBIENT (sky / sea / shading / night grade): GOLD 0.01  BLUE 0.95  RED 0.00  PURPLE 0.02  PINK 0.01
+   represented: BLUE,PURPLE | shared dominated: V34 | shared purple-led: - | district weak: - | busy: - | mean neutral 0.87 | mean accent 0.005
+NIGHT  map mean: GOLD 0.03  BLUE 0.63  RED 0.02  PURPLE 0.27  PINK 0.04
+NIGHT  shared mean: GOLD 0.01  BLUE 0.96  RED 0.00  PURPLE 0.03  PINK 0.00
+NIGHT  shared AMBIENT (sky / sea / shading / night grade): GOLD 0.00  BLUE 0.91  RED 0.00  PURPLE 0.08  PINK 0.00
+   represented: BLUE,PURPLE | shared dominated: V34 | shared purple-led: F3 | district weak: - | busy: - | mean neutral 0.61 | mean accent 0.005
+
+V02  DAY   SHARED          neutral 0.96 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.04%)
+V03  DAY   DISTRICT/GOLD   neutral 0.81 accent 0.004  GOL 0.44 BLU 0.34 RED 0.01 PUR 0.00 PIN 0.01 OFF 0.20  | READS as GOLD; OFF-LAW light 0.202
+V04  DAY   DISTRICT/BLUE   neutral 0.80 accent 0.053  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | READS as BLUE
+V05  DAY   DISTRICT/RED    neutral 0.88 accent 0.004  GOL 0.00 BLU 0.01 RED 0.68 PUR 0.00 PIN 0.21 OFF 0.10  | READS as RED
+V06  DAY   DISTRICT/PURPLE neutral 0.75 accent 0.021  GOL 0.00 BLU 0.21 RED 0.00 PUR 0.70 PIN 0.00 OFF 0.09  | READS as PURPLE
+V07  DAY   DISTRICT/PINK   neutral 0.93 accent 0.002  GOL 0.00 BLU 0.24 RED 0.00 PUR 0.00 PIN 0.76 OFF 0.00  | too little accent light to judge (0.21%)
+V08  DAY   SHARED          neutral 0.68 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V09  DAY   SHARED          neutral 0.99 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V11  DAY   SHARED          neutral 0.97 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V12  DAY   SHARED          neutral 0.91 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V13  DAY   SHARED          neutral 0.92 accent 0.002  GOL 0.01 BLU 0.99 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.21%)
+V17  DAY   DISTRICT/PURPLE neutral 0.77 accent 0.012  GOL 0.00 BLU 0.29 RED 0.00 PUR 0.59 PIN 0.00 OFF 0.12  | READS as PURPLE
+V31  DAY   SHARED          neutral 0.99 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V32  DAY   SHARED          neutral 0.92 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.03%)
+V34  DAY   SHARED          neutral 0.75 accent 0.004  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V35  DAY   SHARED          neutral 0.74 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.01%)
+F3   DAY   SHARED          neutral 0.97 accent 0.001  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.05%)
+F4   DAY   SHARED          neutral 0.88 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+TS1  DAY   SHARED          neutral 0.98 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V02  NIGHT SHARED          neutral 0.97 accent 0.000  GOL 0.00 BLU 0.68 RED 0.00 PUR 0.32 PIN 0.00 OFF 0.00  | too little accent light to judge (0.02%)
+V03  NIGHT DISTRICT/GOLD   neutral 0.55 accent 0.004  GOL 0.79 BLU 0.02 RED 0.09 PUR 0.00 PIN 0.03 OFF 0.07  | READS as GOLD
+V04  NIGHT DISTRICT/BLUE   neutral 0.53 accent 0.046  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | READS as BLUE
+V05  NIGHT DISTRICT/RED    neutral 0.48 accent 0.002  GOL 0.00 BLU 0.00 RED 0.94 PUR 0.00 PIN 0.04 OFF 0.02  | too little accent light to judge (0.18%)
+V06  NIGHT DISTRICT/PURPLE neutral 0.48 accent 0.017  GOL 0.00 BLU 0.07 RED 0.00 PUR 0.92 PIN 0.00 OFF 0.01  | READS as PURPLE
+V07  NIGHT DISTRICT/PINK   neutral 0.41 accent 0.004  GOL 0.00 BLU 0.12 RED 0.00 PUR 0.00 PIN 0.83 OFF 0.05  | READS as PINK
+V08  NIGHT SHARED          neutral 0.26 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.01%)
+V09  NIGHT SHARED          neutral 0.99 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V11  NIGHT SHARED          neutral 0.84 accent 0.001  GOL 0.00 BLU 0.96 RED 0.00 PUR 0.04 PIN 0.00 OFF 0.00  | too little accent light to judge (0.05%)
+V12  NIGHT SHARED          neutral 0.87 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V13  NIGHT SHARED          neutral 0.59 accent 0.003  GOL 0.03 BLU 0.87 RED 0.00 PUR 0.09 PIN 0.00 OFF 0.01  | too little accent light to judge (0.28%)
+V17  NIGHT DISTRICT/PURPLE neutral 0.42 accent 0.013  GOL 0.00 BLU 0.15 RED 0.00 PUR 0.81 PIN 0.00 OFF 0.03  | READS as PURPLE
+V31  NIGHT SHARED          neutral 0.60 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+V32  NIGHT SHARED          neutral 0.54 accent 0.001  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.07%)
+V34  NIGHT SHARED          neutral 0.65 accent 0.007  GOL 0.00 BLU 0.99 RED 0.01 PUR 0.00 PIN 0.00 OFF 0.00  | DOMINATED by BLUE
+V35  NIGHT SHARED          neutral 0.53 accent 0.001  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.08%)
+F3   NIGHT SHARED          neutral 0.48 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 1.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
+F4   NIGHT SHARED          neutral 0.80 accent 0.000  GOL 0.00 BLU 1.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.02%)
+TS1  NIGHT SHARED          neutral 0.61 accent 0.000  GOL 0.00 BLU 0.00 RED 0.00 PUR 0.00 PIN 0.00 OFF 0.00  | too little accent light to judge (0.00%)
