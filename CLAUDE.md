@@ -1,0 +1,12 @@
+# MAHWORLD — Claude working instructions (repo root)
+
+Start here, then load only what the task needs:
+- Current state / next action: `CLAUDE_GAMEPLAY_RUNTIME/25_HANDOFF/CONVERGENCE/CONTINUE_HERE.md` (top "World pivot" section).
+- World-pivot history, per-milestone decisions and evidence: `…/CONVERGENCE/world_pivot/MASTER_WORLD_PIVOT_LEDGER.md` (read the relevant milestone only).
+- M20 quality pivot: `…/world_pivot/M20_WORKING_NOTES.md` (merged work, open defects); load `…/world_pivot/M20_AGENT_BRIEF.md` in full when briefing a worktree / review agent.
+
+## Owner law (always active)
+Branch `backup/mahworld-m6-20260924T190351Z`; no production deploy; do not touch Character, MAHFITT or S08; no paid Scenario generation without owner approval; no blind dependency upgrades; the runtime bridge stays deferred (do not poll or ask). Colour law: gold, blue, red / crimson, purple, pink + neutrals only (no green / orange / teal / cyan); purple is VISIONARY's, never generic magic. Host safety: art only on collision surfaces, inside collider footprints, ≥ 3.4 m up, or beyond the ±300 m reach square; nothing below 3.4 m within reach more than 5 cm proud; no collider / walkable change. Never claim gameplay, physical-phone performance or subjective approval that was not verified. Keep each line's CRLF / LF as it is (read / write raw bytes); `git diff --stat` must equal `--ignore-cr-at-eol --stat`. Commit trailers as the session reminder says; push with `git push -u origin <branch>`.
+
+## Quality-first efficiency policy
+Correctness, visual fidelity and verified results come first; usage savings never justify weaker models, lower reasoning effort or skipped verification. Establish the intended result, dependencies and acceptance criteria before a consequential edit; reuse settled decisions unless new evidence contradicts them. Use specialist / worktree agents where independent judgment or parallel work helps, each with clear file ownership, the essential constraints and a completion condition; follow every implementation with an adversarial review (verify → fix → re-verify) and merge only what passes. Visual changes need fixed-camera before / after renders that you actually look at (zoomed where it matters); tests alone do not prove visual quality. Machine limit: 4 CPUs — at most ~3 agents rendering at once, one render process each. Read targeted sections, not whole histories; preserve full logs and real exit codes; keep reports short and honest. Update CONTINUE_HERE at milestones before any context compaction.
