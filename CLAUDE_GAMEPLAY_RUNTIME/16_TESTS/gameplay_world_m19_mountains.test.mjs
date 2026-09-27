@@ -40,7 +40,10 @@ var s1 = { calls: 0, movedInside: 0, landedInside: 0, identical: true, tris: 0, 
 ok('1. strip-mode sculpt: nothing inside ' + REACH_IN + ' m moves, nothing lands inside ' + REACH_FLOOR + ' m, in-reach triangles bit-identical, watertight (' + s1.tris + ' tris, ' + s1.calls + ' warps)', s1.calls > 10000 && s1.movedInside === 0 && s1.landedInside === 0 && s1.identical && s1.openBad === 0, s1);
 
 /* 2. the REAL build (macro.js in Node, every tier): watertight the same way, and the tier budgets — LOW ridges no heavier than M18 (2 712
-      tris), MED within 15 % of M18 (21 456), the far massif ring cheaper on LOW than M18 (24 408) and unchanged on MED / HIGH. */
+      tris), MED within 15 % of M18 (21 456), the far massif ring cheaper on LOW than M18 (24 408) and unchanged on MED / HIGH.
+      M20 (owner 2026-09-27, distant world: "fewer crude shapes"): the six world-scale spires (a 6-sided cone under an octahedron) are rock horns
+      built like the massif peaks, so the far ring grows on MED (44 280 → 45 600, +3 %) and HIGH (85 128 → 87 780, +3 %) and gets CHEAPER on
+      LOW (16 680 → 16 668: 6 × 2 horns) — pinned exactly again, LOW against its M19 count. */
 var { createMacro } = await import('../26_LOCAL_AUTHORITY/lab/world/macro.js'); var { createFarWorld } = await import('../26_LOCAL_AUTHORITY/lab/farWorld.js');
 var s2 = {}, watertight = true;
 ['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(); var M = createMacro({ THREE: THREE, group: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }); M.build(); var ridge = 0;
@@ -53,7 +56,7 @@ var s2 = {}, watertight = true;
       if (!fine) watertight = false; }); });
   var fw = createFarWorld(THREE, { tier: T }), far = 0; fw.traverse(function (o) { if (o.name === 'FAR_MASSIFS') far = o.geometry.attributes.position.count / 3; });
   s2[T] = { ridge: ridge, far: far, draws: fw.userData.info.draw_calls, macro_draws: M.debug().draw_calls }; });
-ok('2. real ridges watertight on every tier; LOW ridges ' + s2.LOW.ridge + ' ≤ 2712 and far ring ' + s2.LOW.far + ' < 24408; MED ridges ' + s2.MED.ridge + ' ≤ 24674; far ring MED / HIGH unchanged; draw calls unchanged', watertight && s2.LOW.ridge <= 2712 && s2.LOW.far < 24408 && s2.MED.ridge <= 24674 && s2.MED.far === 44280 && s2.HIGH.far === 85128 && s2.HIGH.draws === 3 && s2.HIGH.macro_draws === 15 && s2.MED.macro_draws === 15 && s2.LOW.macro_draws === 9, s2);   /* M18 macro draws: 2 ridges + 2 falls × 3 + 6 mist (not LOW) + 1 beam set */
+ok('2. real ridges watertight on every tier; LOW ridges ' + s2.LOW.ridge + ' ≤ 2712 and far ring ' + s2.LOW.far + ' < 24408; MED ridges ' + s2.MED.ridge + ' ≤ 24674; far ring MED / HIGH unchanged; draw calls unchanged', watertight && s2.LOW.ridge <= 2712 && s2.LOW.far < 24408 && s2.MED.ridge <= 24674 && s2.LOW.far <= 16680 && s2.MED.far === 45600 && s2.HIGH.far === 87780 && s2.HIGH.draws === 3 && s2.HIGH.macro_draws === 15 && s2.MED.macro_draws === 15 && s2.LOW.macro_draws === 9, s2);   /* M18 macro draws: 2 ridges + 2 falls × 3 + 6 mist (not LOW) + 1 beam set */
 
 /* 3. the geology options are OPT-IN: the Veil mesa cliffs ({ strata: 2.2 }) and the coast islands compile no M19 token; the ridge spec that
       macro.js passes carries every one of them (dip + faults, lithology, couloir streaks, alpine snow, scree, varnish, height-thinned haze, the moonlit-snow uniform the time switch drives). */
