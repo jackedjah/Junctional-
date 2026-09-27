@@ -78,7 +78,7 @@ export function veilCurtainKeep(stations, W) { var CU = W && W.curtain; if (!CU)
 
 export function createVeilFalls(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var group = null, own = [], night = !!ctx.night, clock = 0, info = {};
-  var bufV = new THREE.Vector2(); var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null, lakeU = null;
+  var bufV = new THREE.Vector2(); var ANCH = null; var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null, lakeU = null;
   function tier() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   function rnd(seed) { return ctx.rnd ? ctx.rnd(seed) : (function (s) { return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; })(seed >>> 0); }
   function keep(o) { own.push(o); return o; }
@@ -592,6 +592,15 @@ export function createVeilFalls(ctx) {
     var pvGeo = keep(new THREE.BufferGeometry()); pvGeo.setAttribute('position', new THREE.Float32BufferAttribute(PV.p, 3)); pvGeo.setAttribute('uv', new THREE.Float32BufferAttribute(PV.uv, 2)); pvGeo.setAttribute('color', new THREE.Float32BufferAttribute(PV.c, 3)); pvGeo.setAttribute('aPav', new THREE.Float32BufferAttribute(PV.a, 4)); pvGeo.setIndex(PV.i); pvGeo.computeVertexNormals(); pvGeo.computeBoundingSphere();
     var paving = new THREE.Mesh(pvGeo, pvM); paving.name = 'VEIL_PAVING'; paving.receiveShadow = true; group.add(paving);
     h19.paths_m = Math.round(h19.paths_m); h19.walls_m = Math.round(h19.walls_m); h19.paving_tris = PV.i.length / 3; h19.paths = PATHS.map(function (Pa) { return Pa.name; }); info.m19 = h19;
+    /* M20: the district's lived-in ANCHORS for the resident population (residents.js): where people walk (the paved paths as drawn), whose
+       door they stand at, where they sit, where they stop to watch the falls. World metres, y on the meadow as drawn; data only. */
+    ANCH = { paths: PATHS.map(function (Pa) { var pts = []; for (var q = 0; q < Pa.S.length; q++) { var nq = nrm(Pa.S, q), qx = Pa.S[q].x, qz = Pa.S[q].z; pts.push({ x: qx, y: (gY(qx - nq.x * Pa.hw, qz - nq.z * Pa.hw) + gY(qx + nq.x * Pa.hw, qz + nq.z * Pa.hw)) / 2 + 0.05, z: qz }); } return { name: Pa.name, hw: Pa.hw, lane: Pa.lane, pts: pts }; }),   /* y: the paving as drawn — its flat cross-section between the two edges, ~5 cm on the meadow */
+      doors: sidePaths.map(function (Sp) { return { x: Sp.b.x, y: gY(Sp.b.x, Sp.b.z) + 0.05, z: Sp.b.z, lx: Sp.a.x, lz: Sp.a.z, yaw: Sp.H.yaw }; }),
+      benches: benchAt.map(function (B) { var c = laneC(B.lz); return { x: B.x, y: gY(B.x, B.z), z: B.z, yaw: Math.atan2(c.x - B.x, c.z - B.z) }; }),
+      civic: { x: civ.x, y: gY(civ.x, civ.z), z: civ.z, r: 16, disc: 15, top: civ.y + 0.27, hall: 7.0, cols: 10.5, benchR: 12.9, a0: 0.2 },   /* the raised plaza disc, the glass hall, the column ring and the bench ring (x = cos a, z = sin a) */ belvedere: info.belvedere ? { x: info.belvedere.x, y: gY(info.belvedere.x, info.belvedere.z), z: info.belvedere.z } : null,
+      bridge: (function () { var c = LP(BRA, 0); return { x: c.x, y: deckY, z: c.z, tx: tgx, tz: tgz, look: Math.atan2(-ox, -oz), half: BRH }; })(),
+      homes: RES.homes.map(function (H) { return { x: H.x, z: H.z, yaw: H.yaw, hw: (H.W + 2.6) / 2, hd: (7.2 + 3.2) / 2, top: TOP + roll(H.x, H.z) + 0.65 }; }),   /* each home's graphite plinth (side axis cos / -sin, forward sin / cos): its door stands on it */
+      looks: RES.looks.map(function (O) { return { x: O.x, y: TOP + roll(O.x, O.z) + 0.345, z: O.z, yaw: O.yaw }; }),   /* y: the crescent deck's top */ lake: { x: LK.x, z: LK.z }, lip: { x: lip.x, z: lip.z } };
     function merged(list, mat, name) { if (!list.length) return null; var parts = list.map(function (q) { return q.index ? q.toNonIndexed() : q; }), n = 0; parts.forEach(function (q) { n += q.attributes.position.count; });
       var P = new Float32Array(n * 3), Nn = new Float32Array(n * 3), o = 0; parts.forEach(function (q) { P.set(q.attributes.position.array, o * 3); Nn.set(q.attributes.normal.array, o * 3); o += q.attributes.position.count; q.dispose(); });
       var g2 = keep(new THREE.BufferGeometry()); g2.setAttribute('position', new THREE.BufferAttribute(P, 3)); g2.setAttribute('normal', new THREE.BufferAttribute(Nn, 3)); var me = new THREE.Mesh(g2, mat); me.name = name; group.add(me); return me; }
@@ -662,5 +671,5 @@ export function createVeilFalls(ctx) {
     if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.35 : 0.08; if (bladeMat) bladeMat.emissiveIntensity = night ? 0.1 : 0.04; if (spireMat) spireMat.emissiveIntensity = night ? 0.9 : 0.22; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; if (flMat) flMat.emissiveIntensity = night ? 1.0 : 0.2; }
   function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; group = null; }
   function debug() { return info; }
-  return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
+  return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug, anchors: function () { return ANCH; } };
 }
