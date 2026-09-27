@@ -10,7 +10,7 @@
    setNight() only changes emissive intensities (no rebuild). Nothing animates, so there is no tick. The interior uses its OWN material
    clones because the host's clearGroup() disposes every material in a room group when the player leaves. */
 import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js';
-import { taperShaft, energyTip, tipMaterial } from './formKit.js';
+import { taperShaft, energyTip, tipMaterial } from './formKit.js'; import { applySurface } from './surfaceDetail.js';
 
 var TWO_PI = Math.PI * 2;
 var _instance = null;   /* the latest createMatchHall() instance, so the module-level buildInterior export can serve a host that imports it directly */
@@ -22,6 +22,7 @@ export function createMatchHall(ctx) {
   var lineMat = null, gateMat = null, plateMat = null, plateTex = null;
   var facadeMat = null, facadeU = null, tickerMat = null, tickerTex = null, bladeMat = null, bladeTex = null, clock = 0;   /* M12 neo-Tokyo facade (owner pivot): animated lines, ticker, signage blade */   /* exterior + court materials (this module's own clones; never mutate ctx.M) */
   var interiorMats = null;                                                /* the current interior's clones (host-disposed on room exit) */
+  var ownMats = [];                                                       /* M20: exterior materials this module creates (disposed with it) */
   function mat(k, fallback) { return M[k] || new THREE.MeshStandardMaterial(fallback); }
 
   /* ---------- geometry helpers: every part is baked in place, then merged per material ---------- */
@@ -135,7 +136,7 @@ export function createMatchHall(ctx) {
         '    add += cc * (0.14 + 0.6 * pow(0.5 - 0.5 * cos(f * 6.2831853), 6.0)); }',
         '  float bk = k > 2.5 ? 0.25 : (k > 1.5 ? 2.6 : (k > 0.5 ? 1.0 : 0.45));   /* M15c restraint: the body strips keep only a faint base line — the black body leads */',
         '  totalEmissiveRadiance = Eb * mix(0.1, 0.13, uNight) * bk + add * mix(0.75, 1.0, uNight) + Eb * sweep * mix(0.35, 0.6, uNight) * (k > 2.5 ? 0.3 : 1.0); }'].join('\n')); };   /* absolute levels: a dim ice base line; class-coloured packets with a white head and a fading tail climb the strips, kept below the tone-map shoulder so the class colour survives (a hot packet read as flat white) */
-    facadeMat.customProgramCacheKey = function () { return 'matchHall_neoTokyo'; }; facadeMat.color.setHex(0x1c2028); facadeMat.metalness = 0.6; facadeMat.roughness = 0.4;   /* dark diffuse: the lines are light, not white paint lit by the sky */
+    facadeMat.customProgramCacheKey = function () { return 'matchHall_neoTokyo'; }; facadeMat.color.setHex(0x14171d); facadeMat.metalness = 0.25; facadeMat.roughness = 0.55;   /* M20: a dark slot by day (at 0.6 metal the lines mirrored the pale sky as white stripes) */   /* dark diffuse: the lines are light, not white paint lit by the sky */
     stats.neoTokyo = { ticker_perimeter_m: +(u0 * REP).toFixed(1), blade: [BW, BH, BY] };
   }
 
@@ -204,15 +205,16 @@ export function createMatchHall(ctx) {
         '  float sW = 3.2 / cn, sY = V.y > 0.0 ? (ce - vGW.y) / max(V.y, 1e-3) : (fl - vGW.y) / min(V.y, -1e-3), s = min(sW, max(sY, 0.0)); vec3 Q = vGW + V * s;',   /* interior mapping: the room's back wall, ceiling or floor */
         '  float wall = step(sW, sY), up = step(0.0, V.y), yIn = clamp((Q.y - fl) / max(vGl.y, 0.5), 0.0, 1.0);',
         '  vec3 B = vec3(0.05, 0.28, 1.0), P = vec3(0.254, 0.074, 1.0); vec3 wash = mix(B, P, 0.8 * smoothstep(0.3, 1.0, 0.5 + 0.5 * sin((Q.x * 0.07 + Q.z * 0.05) * 2.0 + t * 0.21 + fl * 0.4)));',   /* M19: bright TITAN blue leads, VISIONARY violet drifts through as the accent (the rooms read mostly violet before) */
-        '  float beams = pow(0.5 + 0.5 * sin((Q.x - Q.z) * 0.42 - t * 0.8 + fl), 10.0) + 0.7 * pow(0.5 + 0.5 * sin((Q.x + Q.z) * 0.29 + t * 0.55 - fl * 0.7), 14.0);',   /* light beams sweeping the room */
-        '  float lines = pow(0.5 + 0.5 * cos((Q.x + Q.z) * 1.9), 24.0);',
-        '  vec3 room = wall * wash * (0.2 + 0.9 * exp(-yIn * 4.0) + 0.85 * beams * (0.3 + 0.7 * yIn))',   /* back wall: the wash, light pooled low, beams */
-        '    + (1.0 - wall) * up * (wash * (0.12 + 0.35 * beams) + vec3(0.75, 0.8, 1.0) * lines * 0.35)',   /* ceiling: light lines */
-        '    + (1.0 - wall) * (1.0 - up) * wash * (0.55 + 0.8 * beams);',   /* floor: glossy, catching the beams */
-        '  float alW = abs(vGN.z) > abs(vGN.x) ? Q.x : Q.z, hY = Q.y - fl, wd = mix(0.23, 0.11, step(1.42, hY));',
-        '  float w1 = (fract(alW / 11.0 + t * 0.021 + fl * 0.37) - 0.5) * 11.0, w2 = (fract(alW / 7.3 - t * 0.016 + fl * 0.61) - 0.5) * 7.3;',
-        '  float fig = max(1.0 - smoothstep(wd - 0.03, wd + 0.03, abs(w1)), (1.0 - smoothstep(wd - 0.03, wd + 0.03, abs(w2))) * step(0.5, fract(fl * 3.1))) * (1.0 - smoothstep(1.66, 1.74, hY)) * step(0.0, hY) * wall;',   /* M15c internal activity: people crossing the lit rooms, silhouettes against the wash */
-        '  room *= 1.0 - 0.82 * fig;',
+        '  float beams = 0.45 * pow(0.5 + 0.5 * sin((Q.x - Q.z) * 0.42 - t * 0.35 + fl), 10.0);',   /* M20: one slow soft sweep across the room (two fast beams read as a club, not a hall) */
+        '  float lines = pow(0.5 + 0.5 * cos((Q.x + Q.z) * 1.9), 24.0) * (1.0 - smoothstep(0.35, 1.1, fwidth((Q.x + Q.z) * 1.9))), cove = exp(-(1.0 - yIn) * 7.0);',   /* M20: the ceiling lines fade where they would alias (grazing views from the street read as speckle) */   /* ceiling light lines; a COVE wash grazing the top of the back wall — the blue / violet is architectural light */
+        '  vec3 room = wall * wash * (0.16 + 0.55 * exp(-yIn * 4.0) + 0.9 * cove + 0.6 * beams)',   /* back wall: the wash, light pooled low, the cove */
+        '    + (1.0 - wall) * up * (wash * (0.12 + 0.25 * beams) + vec3(0.75, 0.8, 1.0) * lines * 0.35)',   /* ceiling: light lines */
+        '    + (1.0 - wall) * (1.0 - up) * wash * (0.45 + 0.5 * beams);',   /* floor: glossy, catching the sweep */
+        '  float alW = abs(vGN.z) > abs(vGN.x) ? Q.x : Q.z, hY = Q.y - fl;',
+        '  float fk = floor(fl * 2.0 + 0.5), bc = floor(alW / 3.6 + fk * 0.19), bx = fract(alW / 3.6 + fk * 0.19) * 3.6, bh = fract(sin(bc * 12.9898 + fk * 7.233) * 43758.5453);',   /* integer seeds: the sine hash amplified the varying floor height's interpolation error into per-pixel static */   /* M20 ROOMS, NOT PEOPLE (lead: room cards show furnished rooms): per 3.6 m of wall a lounge banquette, a bar counter or a lit display */
+        '  float seat = step(0.35, bx) * step(bx, 2.9) * max(step(hY, 0.46), step(hY, 0.95) * step(abs(bx - 1.62), 1.12)) * step(0.4, bh), bar = step(0.25, bx) * step(bx, 3.25) * step(hY, 1.1) * step(bh, 0.4);',
+        '  float disp = step(0.7, bx) * step(bx, 2.9) * step(1.5, hY) * step(hY, 2.55) * step(0.6, fract(bh * 7.31)), fig = min(seat + bar, 1.0) * step(0.0, hY) * wall;',
+        '  room *= 1.0 - 0.78 * fig; room += wall * disp * vec3(0.55, 0.62, 0.85) * (0.45 + 0.55 * cove);',
         '  float occ = 0.55 + 0.45 * sin(fl * 1.9 + floor(vGU / 7.0) * 2.7 + 0.3 * sin(t * 0.13 + vGU * 0.2)), mull = 1.0 - smoothstep(0.44, 0.48, abs(fract(vGU / 1.6) - 0.5));',
         '  totalEmissiveRadiance += room * occ * mull * smoothstep(0.08, 0.45, cn) * mix(0.22, 1.0, uNight); }'].join('\n')); };
     glassMat.customProgramCacheKey = function () { return 'matchHall_skyGlass'; };
@@ -255,7 +257,8 @@ export function createMatchHall(ctx) {
       cyan.push(tag(ribbon(2 * hw + 2 * NO, 2 * hd + 2 * NO, NR, 0, 0, y - 0.05, y + 0.01, 0.0, LOWQ ? 40 : 72), 5)); });   /* the lit reveal tucked under the nose (kind 5: dim blue, one slow travelling light) */
     var sigZ = d0 > 0 ? d0 - 9.5 : d0 + 9.5, bladeZ = d0 > 0 ? -hd + 1.4 : hd - 1.4, SIG_HALF = 3.2;   /* == sigils(): the door-facade panel beside the portal, the south panel at x = 4 (W 5.5 + 0.8 backing) */
     var ROWS = [{ y0: 9.95, y1: 12.55, fl: NOSE[0] + NH, h: NOSE[1] - NOSE[0] - NH, dep: 0.26 }, { y0: 14.45, y1: 16.75, fl: NOSE[1] + NH, h: 17.35 - NOSE[1] - NH, dep: 0.26 }], LOBBY = { y0: 1.0, y1: 6.2, fl: PLINTH, h: NOSE[0] - PLINTH, dep: 0.045 };
-    var WW = 3.2, FW = 0.22, cs = 2, ui = 0, n = { upper: 0, lobby: 0 };   /* LOW: glass only, no rounded reveals */
+    var WW = 3.2, FW = 0.22, cs = 2, ui = 0, n = { upper: 0, lobby: 0, clerestory: 0, louvres: 0, lobby_spans: [] };   /* LOW: glass only, no rounded reveals */
+    var CLER = { y0: 4.5, y1: 7.7, fl: PLINTH, h: NOSE[0] - PLINTH, dep: 0.26 };   /* M20: the double-height lobby level shows on every face (a clerestory row) */
     function pane(nx, nz, a, a0, a1, R) {   /* one window: glass 3 cm off the face + a rounded reveal; a = the bay centre along the face, a0..a1 = the glazed span */
       var tx = nz, tz = -nx, fx = nx * hw, fz = nz * hd, w = a1 - a0, h = R.y1 - R.y0, cA = (a0 + a1) / 2, cx = fx + tx * cA, cz = fz + tz * cA, o = 0.03, u0 = ui++ * 7 + (WW - w);
       var P = [], U = [], I = [0, 1, 2, 0, 2, 3]; [[a0, R.y0, 0], [a1, R.y0, 1], [a1, R.y1, 1], [a0, R.y1, 0]].forEach(function (q) { P.push(fx + tx * q[0] + nx * o, q[1], fz + tz * q[0] + nz * o); U.push(u0 + (q[0] - a0), q[2]); });
@@ -266,10 +269,48 @@ export function createMatchHall(ctx) {
       for (var a = -half + S; a <= half - S + 1e-6; a += S) { var lz = nx ? -nx * a : 0, lx = nz ? nz * a : 0, a0 = a - WW / 2, a1 = a + WW / 2;   /* the bay centre in local x / z */
         var clear = !(doorFace && (Math.abs(lz - sigZ) < SIG_HALF + WW / 2 || Math.abs(lz - bladeZ) < WW / 2 + 0.6)) && !(nz < 0 && Math.abs(lx - 4) < SIG_HALF + WW / 2);
         if (clear) ROWS.forEach(function (R) { pane(nx, nz, a, a0, a1, R); n.upper++; });
+        var bi = Math.round((a + half) / S), nb = Math.round(2 * half / S);   /* M20 LOWER LEVEL (owner: "empty surfaces … service zones, vents"): on the three faces without the lobby, the */
+        if (!doorFace && (bi === 1 || bi === nb - 1) && !LOWQ) { var fxL = nx * hw, fzL = nz * hd, lt = nz, lz2 = -nx; graphite.push(box(nx ? 0.1 : WW, 3.3, nx ? WW : 0.1, fxL + lt * a + nx * 0.05, 4.4, fzL + lz2 * a + nz * 0.05));   /* the corner bays: a plant-room louvre (frame + 9 blades, 4.4–7.7 m) */
+          for (var lb = 0; lb < 9; lb++) { var lg = new THREE.BoxGeometry(nx ? 0.16 : WW - 0.3, 0.07, nx ? WW - 0.3 : 0.16); lg.rotateX(nz ? -nz * 0.5 : 0); lg.rotateZ(nx ? nx * 0.5 : 0); lg.translate(fxL + lt * a + nx * 0.16, 4.62 + lb * 0.34, fzL + lz2 * a + nz * 0.16); graphite.push(lg); } n.louvres++; }
+        else if (!doorFace && clear && bi % 2 === 0) { pane(nx, nz, a, a0, a1, CLER); n.clerestory++; }   /* double-height hall glazes every other bay above the stone base (≥ 4.3 m) */
         if (doorFace && Math.abs(lz - d0) <= 2 * S + 1e-6 && Math.abs(lz - d0) > 1e-6) { var gap = dw + 0.75, s0 = a0, s1 = a1; if (lz > d0) s0 = Math.max(a0, d0 + gap); else s1 = Math.min(a1, d0 - gap);   /* trim clear of the portal frame */
-          if (s1 - s0 >= 2.2) { pane(nx, nz, a, s0, s1, LOBBY); n.lobby++; } } } });
-    return { noses: NOSE.length, windows_upper: n.upper, windows_lobby: n.lobby };
+          if (s1 - s0 >= 2.2) { pane(nx, nz, a, s0, s1, LOBBY); n.lobby++; n.lobby_spans.push([s0 - FW, s1 + FW]); } } } });
+    return { noses: NOSE.length, windows_upper: n.upper, windows_lobby: n.lobby, windows_clerestory: n.clerestory, louvres: n.louvres, lobby_spans: n.lobby_spans };
   }
+
+  /* ---------- M20 BASE · FINS · ENTRANCE (owner 2026-09-27, MAH MATCH: "glazing, interior depth, floor rhythm, blue / purple as
+     ARCHITECTURAL light, entrance, signage, roof, human scale — Do not solve weak architecture with neon"; lead: it read as a black box with a
+     window grid and thin white lines, a white goalpost frame standing 4 m in front of its door) ----------
+     · STONE BASE — a honed dark-granite course (0.3–3.6 m, staggered 2.4 × 1.2 m slabs, 3 cm proud) wraps the body under a brushed coping:
+       the black metal mass now stands on a base at human scale (stone · black metal · glass · graphite structure, four materials, not one);
+     · FINS — the evenly spaced light strips become 30 cm granite FINS (the base rising as piers) from the coping to under the ticker, each
+       carrying its line as a slot in its face: the facade gets depth and shadow, the light follows the structure (the strips no longer start at 0.9 m: below 3.4 m
+       nothing stands more than 3 cm proud — the old strips and corner rivers stood 6–12 cm out there);
+     · ENTRANCE — a cantilevered graphite CANOPY over the portal (from 5.24 m, 2.6 m deep) with a blue light cove inside its fascia (the hall's
+       architectural light, one slow travelling light), a flush granite threshold apron; the two glowing approach lines on the paving are gone;
+     · SERVICE — a flush staff door with its frame and a small canopy (3.6 m) on the rear face; plant-room louvres at the lower corner bays.
+     Host safety: below 3.4 m everything new is ≤ 3 cm proud (the apron 1.5 cm); canopy, coping, fins and louvres are ≥ 3.4 m. Cost: +1 draw
+     (the stone); fins, canopy, louvres and the door join the crown draw, the soffit the line draw. */
+  function bodyBase(hw, hd, d0, dw, dh, S, PLINTH, lobbySpans, stone, graphite, platinum, cyan) {
+    var LOWQ = tierQ() === 'LOW', BT = 3.6, P = 0.03, out = { base_pieces: 0, service_door: 0, canopy: 0 };
+    function cut(ivs, a, b) { var r = []; ivs.forEach(function (iv) { if (b <= iv[0] || a >= iv[1]) { r.push(iv); return; } if (a > iv[0]) r.push([iv[0], a]); if (b < iv[1]) r.push([b, iv[1]]); }); return r; }
+    [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(function (f) { var nx = f[0], nz = f[1], half = nx ? hd : hw, doorFace = nx < 0, rearFace = nx > 0, tx = nz, tz = -nx, fx = nx * hw, fz = nz * hd;
+      function seg(a0, a1, y0, y1, dep, list) { var w = a1 - a0, cA = (a0 + a1) / 2; if (w < 0.05 || y1 - y0 < 0.02) return; list.push(box(nx ? dep : w, y1 - y0, nx ? w : dep, fx + tx * cA + nx * dep / 2, y0, fz + tz * cA + nz * dep / 2)); out.base_pieces++; }
+      var full = [[-half, half]], lowBand = full, highBand = full;
+      if (doorFace) { lowBand = cut(full, d0 - dw - 0.55, d0 + dw + 0.55); highBand = lowBand; lobbySpans.forEach(function (sp) { highBand = cut(highBand, sp[0], sp[1]); }); }
+      var sd = rearFace ? -half + S * 3 : null; if (sd !== null) { lowBand = cut(lowBand, sd - 0.95, sd + 0.95); highBand = cut(highBand, sd - 0.95, sd + 0.95); }   /* the staff door's bay */
+      var yS = doorFace ? 0.78 : BT; lowBand.forEach(function (iv) { seg(iv[0], iv[1], PLINTH, doorFace ? 0.78 : BT, P, stone); }); if (doorFace) highBand.forEach(function (iv) { seg(iv[0], iv[1], yS, BT, P, stone); });
+      if (sd !== null) { highBand.forEach(function (iv) { if (iv[0] < sd && iv[1] > sd) seg(iv[0], iv[1], 2.85, BT, P, stone); }); seg(sd - 0.95, sd + 0.95, 2.85, BT, P, stone);   /* the stone lintel over the staff door */
+        seg(sd - 0.62, sd + 0.62, PLINTH, 2.7, 0.025, graphite); seg(sd - 0.75, sd - 0.62, PLINTH, 2.78, 0.04, graphite); seg(sd + 0.62, sd + 0.75, PLINTH, 2.78, 0.04, graphite); seg(sd - 0.75, sd + 0.75, 2.7, 2.8, 0.04, graphite);   /* the door leaf and its frame */
+        seg(sd + 0.38, sd + 0.42, 1.0, 1.3, 0.045, platinum); seg(sd - 0.9, sd + 0.9, 3.62, 3.74, 1.1, graphite); out.service_door = 1; }   /* its pull handle; a small canopy at 3.6 m */
+      /* the coping over the base: a granite cap, ≥ 3.4 m so it may project a little */
+      (doorFace ? highBand : full).forEach(function (iv) { seg(iv[0], iv[1], BT, BT + 0.14, 0.07, stone); }); });   /* a granite cap */
+    /* the entrance canopy: graphite slab + fascia, cantilevered from the door face over the portal, its soffit lit (line kind 5) */
+    var CW = 2 * dw + 1.0, CD = 2.6, CY = dh + 0.5;   /* over the portal frame (it absorbs the portal lintel), clear of the lobby windows beside it and low enough that the name plate reads above it */
+    graphite.push(box(CD + 0.1, 0.3, CW, -hw - CD / 2 + 0.05, CY, d0)); graphite.push(box(0.12, 0.62, CW + 0.12, -hw - CD - 0.02, CY - 0.26, d0)); [-1, 1].forEach(function (sg) { graphite.push(box(CD, 0.62, 0.1, -hw - CD / 2, CY - 0.26, d0 + sg * (CW / 2 + 0.05))); });
+    cyan.push(tag(box(0.1, 0.03, CW - 0.5, -hw - CD + 0.2, CY - 0.05, d0), 5)); [-1, 1].forEach(function (sg) { cyan.push(tag(box(CD - 0.4, 0.03, 0.1, -hw - CD / 2 + 0.1, CY - 0.05, d0 + sg * (CW / 2 - 0.2)), 5)); });   /* a cove of light inside the fascia (U) — not a lit panel */
+    stone.push(box(4.2, 0.015, 2 * dw + 3.4, -hw - 2.1, 0, d0)); out.canopy = 1;   /* a flush granite threshold apron */
+    return out; }
 
   /* ---------- EXTERIOR: the official match building (black body, graphite crown + portal, platinum plinth, cyan lines) ---------- */
   function buildBuilding() {
@@ -302,24 +343,27 @@ export function createMatchHall(ctx) {
     /* recess: vertical lines on both jamb faces + a floor line at the gate threshold (reads as an open, lit gate) */
     [-1, 1].forEach(function (s) { cyan.push(tag(box(0.14, dh - 0.7, 0.06, -hw + RECESS / 2, 0.35, d0 + s * (dw - 0.03)), 2)); });
     cyan.push(tag(box(0.1, 0.03, 2 * dw - 0.4, -hw + RECESS - 0.15, 0.03, d0), 2));
-    /* approach lines on the ground either side of the door path (the MATCH_DOOR interactable sits ~4 m out on this axis) */
-    [-1, 1].forEach(function (s) { cyan.push(tag(box(6.0, 0.03, 0.12, -hw - 3.2, 0.005, d0 + s * (dw + 0.4)), 2)); });
+    /* M20: the two glowing approach lines on the paving are gone (the entrance canopy's lit soffit and the threshold apron mark the door) */
     /* vertical light lines: evenly spaced on all four facades, ending under one horizontal band below the crown; none in the door zone */
-    var S = 5.0, y0 = PLINTH + 0.6, y1 = bodyTop - 1.1, L = y1 - y0, strips = 0;   /* M15c restraint (owner 2026-09-27: black identity, selected violet / blue light): half as many strips as M12's 2.5 m rhythm */
-    function alongZ(x, proudSign, skipDoor) { for (var z = -hd + S / 2; z < hd - S / 4; z += S) { if (skipDoor && Math.abs(z - d0) < dw + 1.2) continue; cyan.push(tag(box(0.06, L, 0.14, x + proudSign * 0.03, y0, z), 0)); strips++; } }
-    function alongX(z, proudSign) { for (var x = -hw + S / 2; x < hw - S / 4; x += S) { cyan.push(tag(box(0.14, L, 0.06, x, y0, z + proudSign * 0.03), 0)); strips++; } }
+    var S = 5.0, y0 = 3.72, y1 = bodyTop - 1.1, L = y1 - y0, strips = 0;   /* M15c restraint (owner 2026-09-27: black identity, selected violet / blue light): half as many strips as M12's 2.5 m rhythm. M20: they start over the stone base */
+    var stone = [], FIN = 0.3, finTop = bodyTop - 2.55, sigZ0 = d0 > 0 ? d0 - 9.5 : d0 + 9.5, fins = 0;   /* M20 FINS: graphite, 30 cm, the line a slot in the fin face; none across a sigil panel (door face / south face) */
+    function finAt(isX, x, z, sgn) { if (isX && sgn < 0 && Math.abs(z - sigZ0) < 3.4) return false; if (!isX && sgn < 0 && Math.abs(x - 4) < 3.4) return false; stone.push(isX ? box(FIN, finTop - y0, 0.46, x + sgn * FIN / 2, y0, z) : box(0.46, finTop - y0, FIN, x, y0, z + sgn * FIN / 2)); fins++; return true; }   /* the base's granite rises as the fins (graphite on the black body did not read) */
+    function alongZ(x, proudSign, skipDoor) { for (var z = -hd + S / 2; z < hd - S / 4; z += S) { if (skipDoor && Math.abs(z - d0) < dw + 1.2) continue; var fin = finAt(true, x, z, proudSign); cyan.push(tag(box(0.06, fin ? finTop - y0 - 0.3 : L, 0.1, x + proudSign * (fin ? FIN + 0.02 : 0.03), y0 + (fin ? 0.15 : 0), z), 0)); strips++; } }
+    function alongX(z, proudSign) { for (var x = -hw + S / 2; x < hw - S / 4; x += S) { var fin = finAt(false, x, z, proudSign); cyan.push(tag(box(0.1, fin ? finTop - y0 - 0.3 : L, 0.06, x, y0 + (fin ? 0.15 : 0), z + proudSign * (fin ? FIN + 0.02 : 0.03)), 0)); strips++; } }
     alongZ(-hw, -1, true); alongZ(hw, 1, false); alongX(-hd, -1); alongX(hd, 1);
     [-1, 1].forEach(function (s) { cyan.push(tag(box(0.05, 0.07, 2 * hd + 0.1, s * (hw + 0.025), bodyTop - 0.78, 0), 1)); cyan.push(tag(box(2 * hw + 0.1, 0.07, 0.05, 0, bodyTop - 0.78, s * (hd + 0.025)), 1)); });
     neoTokyo(hw, hd, d0, dw, dh, bodyTop, cyan, graphite);   /* M12: the ticker band, the signage blade and its lit edges */
-    var RIV = [[PLINTH + 0.6, BODY_NOSE[0] - 0.06], [BODY_NOSE[0] + BODY_NH, BODY_NOSE[1] - 0.06], [BODY_NOSE[1] + BODY_NH, bodyTop - 0.3]];   /* M19 review: the 0.2 m river (out to hw + 0.12) cut through each rounded slab-nose corner (≈ hw + 0.03 on the diagonal) — it now runs up to each nose and on above it, as if behind the slab */
+    var RIV = [[3.72, BODY_NOSE[0] - 0.06], [BODY_NOSE[0] + BODY_NH, BODY_NOSE[1] - 0.06], [BODY_NOSE[1] + BODY_NH, bodyTop - 0.3]];   /* M20: from the coping up (a 0.2 m river stood 12 cm proud at 0.9 m) */   /* M19 review: the 0.2 m river (out to hw + 0.12) cut through each rounded slab-nose corner (≈ hw + 0.03 on the diagonal) — it now runs up to each nose and on above it, as if behind the slab */
     [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (c) { RIV.forEach(function (r) { cyan.push(tag(box(0.2, r[1] - r[0], 0.2, c[0] * (hw + 0.02), r[0], c[1] * (hd + 0.02)), 4)); }); });   /* M14: light rivers up the body's corners */
     var glass = []; skyGlass(); var sky = skyTiers(hw, hd, H, black, graphite, platinum, cyan, glass);   /* M14: the stacked sky tiers */
     var levels = bodyLevels(hw, hd, d0, dw, S, PLINTH, graphite, cyan, glass);   /* M19: readable floors, punched windows into lit rooms, the lobby glass */
+    var base = bodyBase(hw, hd, d0, dw, dh, S, PLINTH, levels.lobby_spans, stone, graphite, platinum, cyan); levels.fins = fins; levels.base = base;   /* M20: base course, service door, entrance canopy */
     sigils(hw, hd, d0, graphite);   /* M15: the diamond sigil panels */
     /* assemble */
     var g = new THREE.Group(); g.name = 'MATCH_HALL'; g.position.set(A.position[0], 0, A.position[2]); g.rotation.y = F.theta; g.userData.noMerge = true;
     var gem = new THREE.OctahedronGeometry(0.8, 0); gem.scale(1, 1.6, 1); gem.translate(sky.tx, sky.gemY, 0); platinum.push(gem);   /* M14: the roof diamond is now the crest on the crown mast (was on the flat roof, y 21.6 – 24.2) */
-    var meshes = [merged(black, mat('black', { color: 0x0b0d11, roughness: 0.42, metalness: 0.8 }), 'MATCH_HALL_BODY', true), merged(graphite, mat('graphite', { color: 0x1d2229, roughness: 0.55, metalness: 0.75 }), 'MATCH_HALL_CROWN', true), merged(platinum, mat('platinum', { color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), 'MATCH_HALL_PLINTH', true), merged(cyan, facadeMat || lineMat, 'MATCH_HALL_LINES', false)];
+    var stoneM = new THREE.MeshStandardMaterial({ color: 0x4a4e56, roughness: 0.62, metalness: 0.12, envMapIntensity: 0.4 }); stoneM.name = 'matchHall_granite'; applySurface(THREE, stoneM, 'CLADDING', tierQ()); ownMats.push(stoneM);   /* M20: honed dark granite (matte against the lacquered black body) */
+    var meshes = [merged(stone, stoneM, 'MATCH_HALL_BASE', true), merged(black, mat('black', { color: 0x0b0d11, roughness: 0.42, metalness: 0.8 }), 'MATCH_HALL_BODY', true), merged(graphite, mat('graphite', { color: 0x1d2229, roughness: 0.55, metalness: 0.75 }), 'MATCH_HALL_CROWN', true), merged(platinum, mat('platinum', { color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), 'MATCH_HALL_PLINTH', true), merged(cyan, facadeMat || lineMat, 'MATCH_HALL_LINES', false)];
     var gm = merged(glass, glassMat, 'MATCH_HALL_SKY_GLASS', false); if (gm) { gm.renderOrder = 1; meshes.push(gm); }
     if (sigilGeo && sigilMat) { var sg = new THREE.Mesh(sigilGeo, sigilMat); sg.name = 'MATCH_HALL_SIGIL'; sg.renderOrder = 4; meshes.push(sg); }
     if (tipGeo) { tipM = tipMaterial(THREE); var tp = new THREE.Mesh(tipGeo, tipM); tp.name = 'MATCH_HALL_CROWN_TIP'; tp.userData.tris = Math.round(tipGeo.index ? tipGeo.index.count / 3 : tipGeo.attributes.position.count / 3); meshes.push(tp); }
@@ -413,7 +457,7 @@ export function createMatchHall(ctx) {
     dispose: function () {
       groups.forEach(function (g) { if (g.parent) g.parent.remove(g); g.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); }); groups = [];
       [facadeMat, tickerMat, tickerTex, bladeMat, bladeTex, glassMat, tipM, sigilMat, sigilTex, sigilGeo].forEach(function (o) { if (o) o.dispose(); }); facadeMat = tickerMat = tickerTex = bladeMat = bladeTex = glassMat = tipM = sigilMat = sigilTex = sigilGeo = null; glassU = null; if (tipGeo) tipGeo.dispose(); tipGeo = null; if (tickerGeo) tickerGeo.dispose(); if (bladeGeo) bladeGeo.dispose(); tickerGeo = bladeGeo = null;
-      if (lineMat) lineMat.dispose(); if (gateMat) gateMat.dispose(); if (plateMat) plateMat.dispose(); if (plateTex) plateTex.dispose(); lineMat = gateMat = plateMat = plateTex = null; stats.building = stats.court = null; if (_instance === api) _instance = null;
+      ownMats.forEach(function (m2) { m2.dispose(); }); ownMats = []; if (lineMat) lineMat.dispose(); if (gateMat) gateMat.dispose(); if (plateMat) plateMat.dispose(); if (plateTex) plateTex.dispose(); lineMat = gateMat = plateMat = plateTex = null; stats.building = stats.court = null; if (_instance === api) _instance = null;
     },
     debug: function () { return { building: stats.building, court: stats.court, interior: stats.interior, night: night, draw_calls_field: (stats.building ? stats.building.draw_calls : 0) + (stats.court ? stats.court.draw_calls : 0) }; }
   };

@@ -49,9 +49,7 @@ export function createCityScene(THREE, group, helpers) {
     var stoneParts = [], trimParts = [], chromeParts = []; function rb(W, H, D, R, x, y, z) { var q = roundedBox(W, H, D, R); q.translate(x, y, z); return q; }
     stoneParts.push(rb(w + 0.1, 0.85, d + 0.1, Math.min(w, d) * 0.24, cx, 0, cz));   /* plinth */
     /* M8E: the all-around 3.6 m cornice rings are gone — the facade kit draws slab edges per bay, interrupted at every pier */
-    if (B.entrance) { var e = B.entrance, horiz = e.side === '+z' || e.side === '-z', sx = e.side === '+x' ? 1 : e.side === '-x' ? -1 : 0, sz = e.side === '+z' ? 1 : e.side === '-z' ? -1 : 0, cy = e.height + 0.35, ow = e.width * 1.9, od = 2.3;
-      stoneParts.push(rb(horiz ? ow : od, 0.22, horiz ? od : ow, 0.08, e.x + sx * (od / 2 - 0.2), cy, e.z + sz * (od / 2 - 0.2)));
-      trimParts.push(rb(horiz ? ow - 0.3 : 0.1, 0.04, horiz ? 0.1 : ow - 0.3, 0.02, e.x + sx * (od - 0.35), cy - 0.03, e.z + sz * (od - 0.35))); }
+    /* M20: the entrance canopy (slab, fascia, downlights, the name sign) is built by entranceCanopy() for every civic entrance, the arena's too */
     /* M8C CONSTRUCTION LANGUAGE (base / shaft / crown): graphite structural PIERS close every straight wall run (where the rounded corner
        begins), standing on the first-floor cornice (≥ 3.6 m) on the ground tier and on the tier ledge above it; a deep EAVE FASCIA under
        each tier's light reveal (the roofline has thickness); a louvred SERVICE BAY on the top storey's rear face (the plant needs air); a
@@ -87,14 +85,15 @@ export function createCityScene(THREE, group, helpers) {
   function diamond(x, y, z, s) { var o = new THREE.Mesh(new THREE.OctahedronGeometry(s, 0), M.diamond); o.position.set(x, y, z); o.scale.set(1, 1.6, 1); return o; }
   function entrance(bx, bz, e) {   /* e: {side:'+x'|'-x'|'+z'|'-z', x, z, width, height}: a curved recessed opening on that face, a light arch, a landing strip */
     var g = new THREE.Group(); var horiz = e.side === '+z' || e.side === '-z'; var sx = e.side === '+x' ? 1 : e.side === '-x' ? -1 : 0; var sz = e.side === '+z' ? 1 : e.side === '-z' ? -1 : 0;
-    if (e.glazed) {   /* M8E: the flat door slab, leaves and light arch give way to the kit's storefront entrance; the lit lintel and the landing stay */
-      var lint = new THREE.Mesh(roundedBox(horiz ? e.width * 1.15 : 0.3, 0.16, horiz ? 0.3 : e.width * 1.15, 0.05), M.trimWarm); lint.position.set(e.x + sx * 0.45, e.height * 0.98 + 0.34, e.z + sz * 0.45); if (e.height * 0.98 + 0.34 >= 3.4) g.add(lint);
-      [1.2, 2.1].forEach(function (rr, i) { var ring = new THREE.Mesh(new THREE.RingGeometry(rr - 0.05, rr, 40), i ? M.trim : M.trimWarm); ring.rotation.x = -Math.PI / 2; ring.position.set(e.x + sx * 2.4, 0.03, e.z + sz * 2.4); g.add(ring); });
+    if (e.glazed) {   /* M8E: the flat door slab, leaves and light arch give way to the kit's storefront entrance. M20: the glowing lintel bar and the two
+         light rings on the floor are gone (a neon coat on the paving); the entrance CANOPY carries the entrance light now (entranceCanopy) */
+      entranceCanopy(g, e);
       /* M10 THRESHOLD (owner: entrances / thresholds / drainage-edge logic): a darker honed-stone APRON before the doors, a SLOT DRAIN across it
          just outside the threshold with brushed-metal edges — how a real entrance meets a plaza. Flush (≤ 2 cm), merged city-wide in dress(). */
       (function () { var W = e.width + 2.4, D = 3.2, tx = horiz ? 1 : 0, tz = horiz ? 0 : 1; function slab(along, out, lenA, lenO, h, list) { var bg = new THREE.BoxGeometry(tx ? lenA : lenO, h, tx ? lenO : lenA); bg.translate(e.x + sx * out + tx * along, h / 2, e.z + sz * out + tz * along); list.push(bg); }
         slab(0, 0.08 + D / 2, W, D, 0.012, THRESH.stone); slab(0, 0.72, W - 0.4, 0.16, 0.016, THRESH.drain); [-1, 1].forEach(function (sg) { slab(0, 0.72 + sg * 0.1, W - 0.4, 0.035, 0.018, THRESH.edge); });
-        for (var gi = 0; gi < Math.floor((W - 0.6) / 0.09); gi++) slab(-(W - 0.6) / 2 + gi * 0.09 + 0.045, 0.72, 0.022, 0.15, 0.018, THRESH.edge); })();   /* the drain's grating bars */
+        for (var gi = 0; gi < Math.floor((W - 0.6) / 0.09); gi++) slab(-(W - 0.6) / 2 + gi * 0.09 + 0.045, 0.72, 0.022, 0.15, 0.018, THRESH.edge);   /* the drain's grating bars */
+        slab(0, 1.75, Math.min(2.6, e.width * 0.62), 1.5, 0.014, THRESH.drain); })();   /* M20: a dark entrance mat set in the apron on the door axis (flush, 1.4 cm) — where people wipe their feet */
       return g; }
     var depth = 0.9; var door = new THREE.Mesh(roundedBox(horiz ? e.width : depth, e.height, horiz ? depth : e.width, Math.min(e.width, e.height) * 0.42), M.doorway); door.position.set(e.x + sx * (depth / 2 - 0.35), 0, e.z + sz * (depth / 2 - 0.35)); g.add(door);
     var arch = new THREE.Mesh(new THREE.TorusGeometry(e.width * 0.52, 0.09, 8, 32, Math.PI), M.trim); arch.position.set(e.x + sx * 0.3, e.height * 0.62, e.z + sz * 0.3); if (!horiz) arch.rotation.y = Math.PI / 2; g.add(arch);
@@ -106,6 +105,27 @@ export function createCityScene(THREE, group, helpers) {
     var mat = new THREE.Mesh(new THREE.PlaneGeometry(horiz ? e.width * 1.1 : 4.5, horiz ? 4.5 : e.width * 1.1), M.trimWarm); mat.rotation.x = -Math.PI / 2; mat.position.set(e.x + sx * 2.4, 0.02, e.z + sz * 2.4); mat.material = M.trimWarm.clone(); mat.material.transparent = true; mat.material.opacity = 0.22; g.add(mat);
     return g;
   }
+  /* M20 ENTRANCE CANOPY (owner 2026-09-27: "practical entrances and thresholds", "entrances that feel like real entries", material separation;
+     lead: the canopy was a thin black slab with a glowing white bar, the name a floating billboard, glowing rings on the floor). Every civic
+     entrance — the arena's too — gets one built canopy: a honed stone slab cantilevered from the wall, a deep graphite metal FASCIA wrapping
+     its front and ends, a row of recessed DOWNLIGHTS in the soffit (their soft pool on the threshold at night joins the bollard pools), and the
+     building's NAME in brushed-metal letters on the fascia, backlit at night. Its underside is ≥ 4.1 m (host-safe anywhere). The canopies
+     merge city-wide into 3 draws in dress(); each sign is 1 draw and replaces the billboard sprite. */
+  var CANOPY = { stone: [], dark: [], light: [] }, ENT_POOLS = [];
+  function signTexture(text) { var c = document.createElement('canvas'); c.width = 1024; c.height = 128; var g2 = c.getContext('2d'); g2.clearRect(0, 0, 1024, 128); var fs = 78; function font() { g2.font = '600 ' + fs + 'px "Segoe UI", Arial, sans-serif'; } font(); try { g2.letterSpacing = '12px'; } catch (e) { }
+    text = String(text).toUpperCase(); while (g2.measureText(text).width > 940 && fs > 34) { fs -= 4; font(); } g2.textAlign = 'center'; g2.textBaseline = 'middle'; g2.fillStyle = '#ffffff'; g2.fillText(text, 512, 66);
+    var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
+  function entranceCanopy(g, e) { var horiz = e.side === '+z' || e.side === '-z', sx = e.side === '+x' ? 1 : e.side === '-x' ? -1 : 0, sz = e.side === '+z' ? 1 : e.side === '-z' ? -1 : 0;
+    var cy = e.height + 0.35, ow = e.width * (e.dome ? 1.35 : 1.9), back = e.dome ? 0.9 : 0.2, front = 2.1, L = front + back, mid = (front - back) / 2;   /* the arena's canopy runs 0.9 m back into its curved wall */
+    function at(along, out) { return [e.x + sx * out + (horiz ? along : 0), e.z + sz * out + (horiz ? 0 : along)]; }
+    function piece(lenA, lenO, h, r, along, out, y, list) { var p = at(along, out), q = softBox(THREE, horiz ? lenA : lenO, h, horiz ? lenO : lenA, r, SDT); q.translate(p[0], y + h / 2, p[1]); list.push(q); }   /* exact filleted boxes (roundedBox adds an 8 cm bevel all round — it buried the downlights and the sign) */
+    piece(ow, L, 0.22, 0.06, 0, mid, cy, CANOPY.stone);   /* the slab */
+    piece(ow + 0.1, 0.09, 0.52, 0.03, 0, front + 0.045, cy - 0.26, CANOPY.dark); [-1, 1].forEach(function (sg) { piece(0.09, L, 0.52, 0.03, sg * (ow / 2 + 0.045), mid, cy - 0.26, CANOPY.dark); });   /* the fascia: front and ends */
+    var nD = Math.max(2, Math.round(ow / 1.3)); for (var i = 0; i < nD; i++) { var p = at(-ow / 2 + (i + 0.5) * ow / nD, front * 0.55), dl = new THREE.CylinderGeometry(0.1, 0.1, 0.025, 16); dl.translate(p[0], cy - 0.0125, p[1]); CANOPY.light.push(dl); }   /* recessed downlights */
+    var pp = at(0, front * 0.62); ENT_POOLS.push({ x: pp[0], z: pp[1], s: Math.min(2.2, ow / 2.8) });
+    if (typeof document !== 'undefined' && e.name) { var tex = signTexture(e.name), sm = new THREE.MeshBasicMaterial({ map: tex, color: DAY ? 0xaeb4bd : 0xf2f3f6, transparent: true, depthWrite: false });   /* the letters: brushed metal grey by day, backlit white at night (the MAH MATCH plate's proven path) */
+      var sw = Math.min(ow - 0.4, 0.3 * String(e.name).length + 0.6), sp = at(0, front + 0.11), sign = new THREE.Mesh(new THREE.PlaneGeometry(sw, sw / 8), sm); sign.position.set(sp[0], cy - 0.02, sp[1]); sign.rotation.y = Math.atan2(sx, sz); sign.name = 'CIVIC_ENTRANCE_SIGN'; sign.userData.noMerge = true;   /* never folded into the static merge (it would lose its letters) */
+      sign.renderOrder = 3; sign.userData.dayNight = function (n) { sm.color.setHex(n ? 0xf2f3f6 : 0xaeb4bd); }; g.add(sign); } }
   var THRESH = { stone: [], drain: [], edge: [] };
   var haloTicks = [];   /* M11: HALO pieces animated from the city tick (garden motes) */   /* M10: entrance aprons / slot drains, merged once in dress() */
   var api = {
@@ -124,7 +144,7 @@ export function createCityScene(THREE, group, helpers) {
           gutter reveal where the dome sits (6.6 m), 16 platinum meridian RIBS on the dome and an OCULUS ring at its crown. Merged per material. */
           var H1 = s.h * 0.55, rAt = function (y) { return s.r * 1.04 - s.r * 0.04 * (y / H1); }, stoneP = [], platP = [], darkP = [], n16 = 16;
           var pl = new THREE.CylinderGeometry(rAt(1.1) + 0.015, rAt(0) + 0.015, 1.1, 64, 1, true); pl.translate(cx, 0.55, cz); stoneP.push(pl);
-          for (var pi2 = 0; pi2 < n16; pi2++) { var pa2 = (pi2 + 1) / n16 * Math.PI * 2, nx = Math.sin(pa2), nz = Math.cos(pa2), pb = new THREE.BoxGeometry(0.55, 3.4 - 1.1, 0.06); pb.rotateY(pa2); pb.translate(cx + nx * (rAt(2.2) + 0.0), 1.1 + (3.4 - 1.1) / 2, cz + nz * (rAt(2.2) + 0.0)); stoneP.push(pb); }
+          for (var pi2 = 0; pi2 < n16; pi2++) { var pa2 = (pi2 + 1) / n16 * Math.PI * 2, nx = Math.sin(pa2), nz = Math.cos(pa2), pb = new THREE.BoxGeometry(0.55, 3.4 - 1.1, 0.06); pb.rotateX(-Math.atan(s.r * 0.04 / H1)); pb.rotateY(pa2); pb.translate(cx + nx * (rAt(2.25) + 0.015), 1.1 + (3.4 - 1.1) / 2, cz + nz * (rAt(2.25) + 0.015)); stoneP.push(pb); }   /* M20: each pilaster leans with the drum's taper (it stood out of the wall like a hanging pennant, buried at its foot) — 4.5 cm proud all the way up */
           var cor = new THREE.LatheGeometry([[rAt(H1) - 0.05, H1 - 0.45], [rAt(H1) + 0.55, H1 - 0.45], [rAt(H1) + 0.7, H1 - 0.3], [rAt(H1) + 0.7, H1 + 0.05], [rAt(H1) - 0.05, H1 + 0.05]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }), 96); cor.translate(cx, 0, cz); platP.push(cor);
           var gut = new THREE.CylinderGeometry(rAt(H1) + 0.52, rAt(H1) + 0.52, 0.08, 96, 1, true); gut.translate(cx, H1 - 0.5, cz); darkP.push(gut);
           var DRr = s.r * 0.98, SY = (s.h * 0.45) / DRr;
@@ -144,13 +164,15 @@ export function createCityScene(THREE, group, helpers) {
            overhead into the crest orb, the way the roster's armour lines flow over the form and meet at the crest. Each rib hugs the 45°
            point of its tier's rounded corner (outside the eave fascia); below 3.4 m it stays inside the collider box (the rounded corner
            leaves 0.41·r of it free), so its radius is capped by that room and small buildings get none. Merged with the crest: no new draw. */
-        var ribs = [], r0c = Math.min(w, d) * 0.24, ribR = Math.min(0.3, (0.414 * r0c - 0.3) / 2);
+        var ribs = [], r0c = Math.min(w, d) * 0.24, ribR = Math.min(0.17, (0.414 * r0c - 0.3) / 2);   /* M20: slimmer (was up to 0.3 m) */
         if (s.type !== 'CYLINDER' && ribR >= 0.12) [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (sg) { var P3 = [], dgx = sg[0] / Math.SQRT2, dgz = sg[1] / Math.SQRT2;
           function cornerAt(tw, td, off, yy) { var rr = Math.min(tw, td) * 0.24; return new THREE.Vector3(sg[0] * (tw / 2 - 0.293 * rr) + dgx * off, yy, sg[1] * (td / 2 - 0.293 * rr) + dgz * off); }
           for (var ti = 0; ti < tiers; ti++) { var kk = 1 - ti * 0.09, off = 0.27 + ribR; P3.push(cornerAt(w * kk, d * kk, off, ti * hEach + (ti ? 0.6 : 0.02))); P3.push(cornerAt(w * kk, d * kk, off, (ti + 1) * hEach - 0.7)); }
           var kT = 1 - (tiers - 1) * 0.09, cT = cornerAt(w * kT, d * kT, 0.27 + ribR, y + 1.2); cT.x *= 0.72; cT.z *= 0.72; P3.push(cT);
           P3.push(new THREE.Vector3(sg[0] * rF * 1.5, y + 0.45 + hF * 0.3, sg[1] * rF * 1.5)); P3.push(new THREE.Vector3(sg[0] * rF * 0.55, y + 0.45 + hF - rF * 0.2, sg[1] * rF * 0.55));
           var rg = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(P3, false, 'centripetal'), 10 * tiers + 20, ribR, SDT === 'HIGH' ? 7 : (SDT === 'MED' ? 5 : 4), false); rg.translate(0, -y, 0); ribs.push(rg); });
+        /* M20: the ribs were 0.3 m chrome tubes that read as giant plumbing arched over the building; they stay the roster's lacquered lines
+           but at 0.17 m (a graphite version read as a black outline drawn round every building — tried, rejected) */
         var crest = mergeGeometries([capG, finG, orbG].concat(ribs).map(function (q) { var nq = q.index ? q.toNonIndexed() : q; if (!nq.attributes.uv) nq.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(nq.attributes.position.count * 2), 2)); return nq; }), false);
         var cap = new THREE.Mesh(crest || capG, M.chrome); cap.position.set(cx, y, cz); g.add(cap);
         g.add(diamond(cx, y + 0.45 + hF + rF * 0.62 + 1.2, cz, 0.7));
@@ -159,9 +181,9 @@ export function createCityScene(THREE, group, helpers) {
          bays of varied width between piers, framed windows per floor (rooms behind the glass), interrupted slab edges, service bays, corner
          glazing and a balcony on towers, integrated light strips */
       addCivicBuilding(kit, THREE, s);   /* M8E: windows, frames, piers, slab edges, service bays, corner glazing, balcony, storefront entrance, light (lab/world/facadeKit.js) */
-      if (B.entrance) g.add(entrance(cx, cz, Object.assign({}, B.entrance, { glazed: true })));   /* M8E: lintel + landing; the kit draws the storefront */
+      if (B.entrance) g.add(entrance(cx, cz, Object.assign({}, B.entrance, { glazed: true, dome: !!B.dome, name: B.name || s.id })));   /* M8E: lintel + landing; the kit draws the storefront */
       if (!B.dome) premiumDress(g, cx, cz, w, d, tiers, hEach, y, B);
-      var label = nameSprite(B.name || s.id); label.position.set(B.entrance ? B.entrance.x : cx, (B.entrance ? B.entrance.height : 4) + 1.6, B.entrance ? B.entrance.z : cz); g.add(label);
+      if (!B.entrance) { var label = nameSprite(B.name || s.id); label.position.set(cx, 5.6, cz); g.add(label); }   /* M20: a civic building with an entrance carries its name on the canopy fascia (entranceCanopy), not a floating billboard */
       group.add(g); return g;
     },
     /* ground and dressing: chrome floor with diamond inlays, puddle accents, laser plants; nothing blocks movement */
@@ -169,6 +191,7 @@ export function createCityScene(THREE, group, helpers) {
       if (!kitBuilt) { kitBuilt = true; try { kit.build(group); } catch (e) { if (helpers.log) helpers.log('facade kit failed: ' + (e && e.message || e)); } }
       if (THRESH.stone.length) { var tStone = M.cladding.clone(); tStone.color.setHex(0x4c525c); tStone.roughness = 0.58; tStone.polygonOffset = true; tStone.polygonOffsetFactor = -1; var tDrain = new THREE.MeshStandardMaterial({ color: 0x101318, roughness: 0.85, metalness: 0.2 });
         [[THRESH.stone, tStone, 'CITY_ENTRANCE_APRONS'], [THRESH.drain, tDrain, 'CITY_SLOT_DRAINS'], [THRESH.edge, M.chrome, 'CITY_DRAIN_EDGES']].filter(function (T) { if (SDT === 'LOW' && T[2] === 'CITY_DRAIN_EDGES') { T[0].forEach(function (q) { q.dispose(); }); return false; } return true; }).forEach(function (T) { var mg = mergeGeometries(T[0].map(function (q) { return q.toNonIndexed(); }), false); T[0].forEach(function (q) { q.dispose(); }); var mm = new THREE.Mesh(mg, T[1]); mm.name = T[2]; mm.userData.noMerge = true; mm.receiveShadow = true; group.add(mm); }); THRESH.stone = []; THRESH.drain = []; THRESH.edge = []; }
+      if (CANOPY.stone.length) { [[CANOPY.stone, M.stone, 'CITY_ENTRANCE_CANOPIES'], [CANOPY.dark, M.dark, 'CITY_ENTRANCE_CANOPY_FASCIAS'], [CANOPY.light, M.trim, 'CITY_ENTRANCE_DOWNLIGHTS']].forEach(function (T) { if (!T[0].length) return; var mg = mergeGeometries(T[0].map(function (q) { var nq = q.index ? q.toNonIndexed() : q; if (!nq.attributes.uv) nq.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(nq.attributes.position.count * 2), 2)); return nq; }), false); T[0].forEach(function (q) { q.dispose(); }); if (!mg) return; var mm = new THREE.Mesh(mg, T[1]); mm.name = T[2]; mm.userData.noMerge = true; group.add(mm); }); CANOPY.stone = []; CANOPY.dark = []; CANOPY.light = []; }   /* M20: every entrance canopy in 3 draws */
       var seed = 9; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
       /* diamond inlays: thin flat octahedra in a ring around the plaza. M16 (owner 2026-09-27: the shared world should visibly belong to a
          FIVE-class civilization, not default to one colour): the NEXUS ring carries the five classes in turn — gold, blue, crimson, violet,
@@ -192,12 +215,17 @@ export function createCityScene(THREE, group, helpers) {
          intervals (instanced), and the MAHWORLD emblem over the plaza centre. Presentation only: nothing here blocks movement. */
       var entrances = [[-17, 0, -1, 0], [0, -19.5, 0, -1], [18, 0, 1, 0], [1, 20, 0, 1]];   /* x, z, dir x, dir z */
       var pylons = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.07, 0.1, 1, 8), M.chrome, 56); var rings = new THREE.InstancedMesh(new THREE.TorusGeometry(0.22, 0.035, 6, 20), M.trim, 56); var np = 0; var pm = new THREE.Matrix4(), pq = new THREE.Quaternion(), pv = new THREE.Vector3(), ps = new THREE.Vector3();
+      /* M20 (owner: "Do NOT carpet the world with glowing lines"): the pathway kerbs were eight glowing white lines on the paving and every path
+         tint its own mesh (14 draws); the kerbs are now flush brushed-metal inlays and the path tints and inlays merge into 2 draws */
+      var PATHG = [], KERBG = [];
       entrances.forEach(function (en) { var ex = en[0], ez = en[1], dx = en[2], dz = en[3]; var start = 12.5, len = Math.hypot(ex, ez) - start - 2.6; if (len < 2) return; var cxp = ex - dx * (start + len / 2 + 2.6) * 0 + (-dx) * (len / 2 + 2.6) , czp = ez + (-dz) * (len / 2 + 2.6);
-        var path = new THREE.Mesh(new THREE.PlaneGeometry(dx ? len : 2.4, dx ? 2.4 : len), M.trimWarm.clone()); path.material.transparent = true; path.material.opacity = 0.10; path.rotation.x = -Math.PI / 2; path.position.set(cxp, 0.012, czp); group.add(path);
-        [-1, 1].forEach(function (sg) { var kerb = new THREE.Mesh(new THREE.PlaneGeometry(dx ? len : 0.08, dx ? 0.08 : len), M.trim); kerb.rotation.x = -Math.PI / 2; kerb.position.set(cxp + (dx ? 0 : sg * 1.3), 0.02, czp + (dx ? sg * 1.3 : 0)); group.add(kerb); });
+        var pg = new THREE.PlaneGeometry(dx ? len : 2.4, dx ? 2.4 : len); pg.rotateX(-Math.PI / 2); pg.translate(cxp, 0.012, czp); PATHG.push(pg);
+        [-1, 1].forEach(function (sg) { var kg = new THREE.PlaneGeometry(dx ? len : 0.08, dx ? 0.08 : len); kg.rotateX(-Math.PI / 2); kg.translate(cxp + (dx ? 0 : sg * 1.3), 0.02, czp + (dx ? sg * 1.3 : 0)); KERBG.push(kg); });
         for (var k2 = 0; k2 < 4; k2++) { var t3 = (k2 + 0.5) / 4; var px = cxp + (dx ? (t3 - 0.5) * len : 0), pz = czp + (dx ? 0 : (t3 - 0.5) * len); [-1, 1].forEach(function (sg) { if (np >= 56) return; var qx = px + (dx ? 0 : sg * 2.7), qz = pz + (dx ? sg * 2.7 : 0); pq.identity(); pm.compose(pv.set(qx, 0.55, qz), pq, ps.set(1, 1.1, 1)); pylons.setMatrixAt(np, pm); pq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2); pm.compose(pv.set(qx, 1.15, qz), pq, ps.set(1, 1, 1)); rings.setMatrixAt(np, pm); np++;   /* bollard lights at the kerb edge: short, off the walking line */ }); } });
       /* secondary streets (S09 §32): plaza -> tree elevator (NE) and plaza -> residential pods (NW): lit kerbs + bollards on the diagonal */
-      [[30, 40, 21], [-30, 30, 19]].forEach(function (dst) { var ang = Math.atan2(dst[1], dst[0]); var L2 = Math.hypot(dst[0], dst[1]) - dst[2] - 4; var mid = 13 + L2 / 2; var cxp = Math.cos(ang) * mid, czp = Math.sin(ang) * mid; var path = new THREE.Mesh(new THREE.PlaneGeometry(L2, 2.6), M.trimWarm.clone()); path.material.transparent = true; path.material.opacity = 0.09; path.rotation.x = -Math.PI / 2; path.rotation.z = -ang; path.position.set(cxp, 0.012, czp); group.add(path); for (var k3 = 0; k3 < 5; k3++) { var t4 = 13 + (k3 + 0.5) / 5 * L2; [-1, 1].forEach(function (sg) { if (np >= 32) return; var qx = Math.cos(ang) * t4 - Math.sin(ang) * sg * 2.4, qz = Math.sin(ang) * t4 + Math.cos(ang) * sg * 2.4; pq.identity(); pm.compose(pv.set(qx, 0.55, qz), pq, ps.set(1, 1.1, 1)); pylons.setMatrixAt(np, pm); pq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2); pm.compose(pv.set(qx, 1.15, qz), pq, ps.set(1, 1, 1)); rings.setMatrixAt(np, pm); np++; }); } });
+      [[30, 40, 21], [-30, 30, 19]].forEach(function (dst) { var ang = Math.atan2(dst[1], dst[0]); var L2 = Math.hypot(dst[0], dst[1]) - dst[2] - 4; var mid = 13 + L2 / 2; var cxp = Math.cos(ang) * mid, czp = Math.sin(ang) * mid; var pg2 = new THREE.PlaneGeometry(L2, 2.6); pg2.rotateZ(-ang); pg2.rotateX(-Math.PI / 2); pg2.translate(cxp, 0.012, czp); PATHG.push(pg2); for (var k3 = 0; k3 < 5; k3++) { var t4 = 13 + (k3 + 0.5) / 5 * L2; [-1, 1].forEach(function (sg) { if (np >= 32) return; var qx = Math.cos(ang) * t4 - Math.sin(ang) * sg * 2.4, qz = Math.sin(ang) * t4 + Math.cos(ang) * sg * 2.4; pq.identity(); pm.compose(pv.set(qx, 0.55, qz), pq, ps.set(1, 1.1, 1)); pylons.setMatrixAt(np, pm); pq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2); pm.compose(pv.set(qx, 1.15, qz), pq, ps.set(1, 1, 1)); rings.setMatrixAt(np, pm); np++; }); } });
+      (function () { var pm2 = M.trimWarm.clone(); pm2.transparent = true; pm2.opacity = 0.095; var pgm = mergeGeometries(PATHG, false), kgm = mergeGeometries(KERBG, false); PATHG.concat(KERBG).forEach(function (q) { q.dispose(); });
+        if (pgm) { var pmm = new THREE.Mesh(pgm, pm2); pmm.name = 'CITY_PATH_TINTS'; group.add(pmm); } if (kgm) { var kmm = new THREE.Mesh(kgm, M.chrome); kmm.name = 'CITY_PATH_KERB_INLAYS'; kmm.receiveShadow = true; group.add(kmm); } })();
       /* M11 BOLLARDS: the pathway pylons read as bar stools (a thin post under a flat glowing ring at 1.15 m). Same places and count, now civic
          bollard lights inside a smaller footprint (radius 0.12 m, was 0.26 m; height 0.96 m, was 1.19 m): a graphite-stone body on a chrome
          plinth ring, a neutral light band behind four chrome mullions, and a chamfered chrome cap. Three instanced draws. */
@@ -213,8 +241,9 @@ export function createCityScene(THREE, group, helpers) {
         var bc = document.createElement('canvas'); bc.width = bc.height = 64; var bx = bc.getContext('2d'), bgr = bx.createRadialGradient(32, 32, 1, 32, 32, 32); bgr.addColorStop(0, 'rgba(255,255,255,0.7)'); bgr.addColorStop(0.35, 'rgba(255,255,255,0.3)'); bgr.addColorStop(1, 'rgba(255,255,255,0)'); bx.fillStyle = bgr; bx.fillRect(0, 0, 64, 64);
         var bT = new THREE.CanvasTexture(bc); bT.colorSpace = THREE.SRGBColorSpace; var bG = new THREE.CircleGeometry(1.3, 24); bG.rotateX(-Math.PI / 2);
         var bM = new THREE.MeshBasicMaterial({ map: bT, color: 0xdfe6f2, transparent: true, opacity: 0.34, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, polygonOffset: true, polygonOffsetFactor: -2 });
-        var pools = new THREE.InstancedMesh(bG, bM, Math.max(1, np)); for (var pi = 0; pi < np; pi++) { caps.getMatrixAt(pi, tm); tm.decompose(tp, tq, ts); tp.y = 0.018; pools.setMatrixAt(pi, tm.compose(tp, noRot, one)); }
-        pools.count = np; pools.instanceMatrix.needsUpdate = true; pools.name = 'CITY_BOLLARD_POOLS'; pools.userData.noMerge = true; pools.visible = !DAY; pools.userData.dayNight = function (n) { pools.visible = !!n; }; group.add(pools); })();
+        var pools = new THREE.InstancedMesh(bG, bM, Math.max(1, np + ENT_POOLS.length)); for (var pi = 0; pi < np; pi++) { caps.getMatrixAt(pi, tm); tm.decompose(tp, tq, ts); tp.y = 0.018; pools.setMatrixAt(pi, tm.compose(tp, noRot, one)); }
+        ENT_POOLS.forEach(function (P, k) { pools.setMatrixAt(np + k, tm.compose(tp.set(P.x, 0.019, P.z), noRot, ts.set(P.s, 1, P.s))); });   /* M20: each entrance canopy's downlight pool on its threshold (same draw) */
+        pools.count = np + ENT_POOLS.length; pools.instanceMatrix.needsUpdate = true; pools.name = 'CITY_BOLLARD_POOLS'; pools.userData.noMerge = true; pools.visible = !DAY; pools.userData.dayNight = function (n) { pools.visible = !!n; }; group.add(pools); })();
       pylons.count = np; rings.count = np; pylons.instanceMatrix.needsUpdate = true; rings.instanceMatrix.needsUpdate = true; group.add(pylons); group.add(rings);
       var emblem = new THREE.Group(); var oct = new THREE.Mesh(new THREE.OctahedronGeometry(1.1, 0), M.diamond); oct.scale.set(1, 1.7, 1); emblem.add(oct); var halo = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.05, 8, 48), M.trim); halo.rotation.x = Math.PI / 2; emblem.add(halo); emblem.position.set(0, 9.5, 0); emblem.name = 'MAH_EMBLEM'; group.add(emblem);
       (function () { var EA = createAuraField(THREE, [{ x: 0, y: 9.5, z: 0, size: 5.6, ring: 0.66, ringW: 0.07, breakup: 0.55, tint: 0xf4f6ff, spectral: 1.0, intensity: 0.5, nightK: 1.3, pull: 1.5, phase: 0.9 }], { isNight: !DAY, tier: SDT, name: 'PLAZA_EMBLEM_AURA', cull: true }); if (!EA) return; EA.mesh.userData.tick = function (t) { EA.tick(t); }; EA.mesh.userData.dayNight = function (n) { EA.setNight(n); }; group.add(EA.mesh); haloTicks.push(EA.mesh); })();   /* M12 AURA: the MAHWORLD emblem — the union of the five classes — carries the full prismatic halo */ var lbl = nameSprite('MAHWORLD PLAZA'); lbl.position.set(0, 12.2, 0); group.add(lbl); api.emblem = emblem;

@@ -41,30 +41,65 @@ var PANE_VERT_BODY = [
   '  vec3 wV = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz - cameraPosition; vTanV = vec3(dot(wV, wT), dot(wV, wB), dot(wV, wN)); }',
   '#endif',
   'vWin = aWin; vWinUv = clamp(position.xy + 0.5, 0.0, 1.0);'].join('\n');
-var PANE_FRAG_HEAD = 'uniform float uNight; uniform vec3 uLightA; uniform vec3 uLightB; uniform float uDayRoom; uniform vec3 uSkyH; uniform vec3 uSkyZ; uniform vec3 uGround;\nvarying vec4 vWin; varying vec3 vTanV; varying vec2 vWinUv; varying vec2 vWinSize;\nfloat fkH(float n) { return fract(sin(n * 91.345) * 47453.5453); }';
+/* M20 ROOM CARD (owner 2026-09-27: "glass depth, interiors … people actually exist here"; lead: the civic windows read as flat grids and the
+   storefronts as pale opaque panels). The interior-mapped room keeps its box (back wall, side walls, floor, ceiling) and gains what a real room
+   shows through glass: a FURNITURE CARD at mid depth (a silhouette plane — desk + monitor + chair, sofa + floor lamp, shelving with books,
+   meeting table + plant + pendant, a lobby reception counter — never people), a doorway and a picture on the back wall, a shelving unit on a
+   side wall, linear ceiling fittings every 1.8 m (lit at night; a lobby's by day too), floor light falling off from the window. The room
+   stands on its real floor: a door / storefront pane (vWin.z < 0) carries the floor depth under its bottom edge, so a lobby is seen at the
+   threshold, not 0.9 m below it. By day the rooms are dim and the glass mirrors the storm-light sky with a band of street silhouettes at the
+   horizon (the glass reflects a city, not a flat sky); at night the lit rooms glow, their furniture reading dark against the lit walls. */
+var PANE_FRAG_HEAD = 'uniform float uNight; uniform vec3 uLightA; uniform vec3 uLightB; uniform float uDayRoom; uniform vec3 uSkyH; uniform vec3 uSkyZ; uniform vec3 uGround;\nvarying vec4 vWin; varying vec3 vTanV; varying vec2 vWinUv; varying vec2 vWinSize;\nfloat fkH(float n) { return fract(sin(n * 91.345) * 47453.5453); }\n' +
+  'float fkBox(vec2 q, vec4 r, float e) { vec2 a = smoothstep(r.xy - e, r.xy + e, q) * (1.0 - smoothstep(r.zw - e, r.zw + e, q)); return a.x * a.y; }\n' +
+  'float fkFurn(vec2 q, float kind, float x1, float s, float ceilY, out float glow) { float m = 0.0; glow = 0.0;\n' +
+  '  if (kind < 0.5) { m = max(fkBox(q, vec4(x1, 0.7, x1 + 1.6, 0.76), 0.012), max(fkBox(q, vec4(x1 + 0.05, 0.0, x1 + 0.1, 0.7), 0.01), fkBox(q, vec4(x1 + 1.5, 0.0, x1 + 1.55, 0.7), 0.01)));\n' +   /* desk */
+  '    float mon = fkBox(q, vec4(x1 + 0.5, 0.84, x1 + 1.08, 1.2), 0.01); m = max(max(m, mon), fkBox(q, vec4(x1 + 0.78, 0.76, x1 + 0.8, 0.84), 0.005)); glow = mon; m = max(m, fkBox(q, vec4(x1 + 0.62, 0.42, x1 + 1.0, 1.02), 0.03)); }\n' +   /* monitor on its stem, a task-chair back */
+  '  else if (kind < 1.5) { m = max(fkBox(q, vec4(x1, 0.1, x1 + 2.0, 0.46), 0.02), fkBox(q, vec4(x1 + 0.12, 0.46, x1 + 1.88, 0.86), 0.035)); m = max(m, max(fkBox(q, vec4(x1 - 0.06, 0.1, x1 + 0.16, 0.62), 0.02), fkBox(q, vec4(x1 + 1.84, 0.1, x1 + 2.06, 0.62), 0.02)));\n' +   /* sofa */
+  '    float lx = x1 + 2.45; m = max(m, fkBox(q, vec4(lx - 0.015, 0.0, lx + 0.015, 1.42), 0.006)); float sh = fkBox(q, vec4(lx - 0.19, 1.38, lx + 0.19, 1.66), 0.02); m = max(m, sh); glow = sh; }\n' +   /* a floor lamp */
+  '  else if (kind < 2.5) { float u = fkBox(q, vec4(x1, 0.0, x1 + 1.5, 2.05), 0.012), row = fract(q.y / 0.42), bh = 0.35 + 0.5 * fkH(floor(q.x * 13.0) + floor(q.y / 0.42) * 7.0 + s);\n' +   /* shelving: boards, uprights and books of seeded heights */
+  '    m = u * max(max(1.0 - step(0.07, row), step(0.47, abs(fract((q.x - x1) / 0.75) - 0.5))), step(row, bh) * step(0.3, fkH(floor(q.x * 13.0) * 3.1 + s))); }\n' +
+  '  else if (kind < 3.5) { m = max(fkBox(q, vec4(x1, 0.72, x1 + 1.8, 0.77), 0.012), fkBox(q, vec4(x1 + 0.8, 0.0, x1 + 1.0, 0.72), 0.01)); m = max(m, max(fkBox(q, vec4(x1 + 0.1, 0.42, x1 + 0.5, 0.96), 0.03), fkBox(q, vec4(x1 + 1.3, 0.42, x1 + 1.7, 0.96), 0.03)));\n' +   /* meeting table + two chairs */
+  '    float pd = fkBox(q, vec4(x1 + 0.7, 1.86, x1 + 1.1, 2.02), 0.015); m = max(max(m, pd), fkBox(q, vec4(x1 + 0.895, 2.02, x1 + 0.905, ceilY), 0.004)); glow = pd;\n' +   /* a pendant over the table */
+  '    float px = x1 + 2.4; m = max(m, fkBox(q, vec4(px - 0.2, 0.0, px + 0.2, 0.42), 0.015)); vec2 fo = (q - vec2(px, 1.02)) / vec2(0.46, 0.6); m = max(m, 1.0 - smoothstep(0.9, 1.0, length(fo) - 0.12 * sin(atan(fo.y, fo.x) * 7.0 + s))); }\n' +   /* a tall plant */
+  '  else { m = max(fkBox(q, vec4(x1, 0.0, x1 + 2.6, 1.05), 0.015), fkBox(q, vec4(x1 - 0.06, 1.05, x1 + 2.66, 1.12), 0.01)); glow = fkBox(q, vec4(x1 + 0.1, 0.9, x1 + 2.5, 0.98), 0.01); }\n' +   /* a lobby reception counter with its lit front edge */
+  '  return m; }';
 var PANE_FRAG_BODY = [
   '{ vec2 wsz = max(vWinSize, vec2(0.05)); vec3 d = normalize(vTanV); float depth = vWin.w; float seed = floor(vWin.x * 997.0 + 0.5);',   /* integer seed: the sine hash would amplify varying interpolation error into per-pixel static */
   '  float lobby = step(1.5, vWin.y), lit = clamp(vWin.y, 0.0, 1.0) * uNight; vec3 lightC = mix(uLightA, uLightB, fkH(seed * 3.1)) * mix(0.45 + 0.75 * fkH(seed * 5.7), 1.0, lobby);',
-  '  vec3 amb = mix(vec3(uDayRoom) + lightC * 0.3 * lobby, lightC * (lit * 0.62 + lobby * 0.5 * uNight) + vec3(0.004), uNight);',   /* entrance lobbies are lit by day too */   /* by day the rooms are dim against the sky; at night lit rooms glow, dark rooms stay dark */
-  '  vec3 room = amb * 0.25;',
+  '  float fl = vWin.z < -0.001 ? -vWin.z : 0.9, sx = mix(0.6, 1.8, lobby), kind = lobby > 0.5 ? 4.0 : floor(fkH(seed * 7.7) * 3.999);',   /* M20: the floor under the pane, the room's side reach, the room type */
+  '  vec3 amb = mix(vec3(uDayRoom) + lightC * 0.07 * lobby, lightC * (lit * 0.62 + lobby * 0.42 * uNight) + vec3(0.004, 0.005, 0.009), uNight);',   /* by day the rooms are dim against the sky (a lobby a little lit); at night lit rooms glow, dark rooms stay dark */
+  '  vec3 room = amb * 0.25; float fitE = 0.0;',
   '  if (depth > 0.01 && d.z < -0.001) {',   /* interior mapping: the ray through the pane into a box room */
   '    vec2 p = vWinUv * wsz; float tb = depth / -d.z;',
-  '    float tx = d.x > 0.0 ? (wsz.x + 0.6 - p.x) / d.x : (-0.6 - p.x) / min(d.x, -1e-4);',
-  '    float ty = d.y > 0.0 ? (wsz.y + 0.35 - p.y) / d.y : (-0.9 - p.y) / min(d.y, -1e-4);',
-  '    float t = min(tb, min(tx, ty)); vec3 hp = vec3(p, 0.0) + d * t; float dep = clamp(t * -d.z / depth, 0.0, 1.0);',
+  '    float tx = d.x > 0.0 ? (wsz.x + sx - p.x) / d.x : (-sx - p.x) / min(d.x, -1e-4);',
+  '    float ty = d.y > 0.0 ? (wsz.y + 0.35 - p.y) / d.y : (-fl - p.y) / min(d.y, -1e-4);',
+  '    float t = min(tb, min(tx, ty)); vec3 hp = vec3(p, 0.0) + d * t; float dep = clamp(t * -d.z / depth, 0.0, 1.0), hy = hp.y + fl, ax = hp.x + sx, RW = wsz.x + 2.0 * sx, CH = wsz.y + 0.35 + fl;',
   '    vec3 wall;',
-  '    if (tb <= min(tx, ty)) { wall = vec3(0.62, 0.63, 0.66) * (0.8 + 0.4 * fkH(seed * 11.0)); if (hp.y < 0.35) wall *= 0.45 + 0.3 * step(0.5, fract(hp.x * 0.9 + seed * 7.0)); }',   /* back wall + a furniture / partition line */
-  '    else if (ty < tx) { wall = d.y > 0.0 ? vec3(0.8) * (1.0 + 2.2 * lit * smoothstep(0.9, 0.2, abs(hp.x - wsz.x * 0.5) / max(wsz.x, 0.5))) : vec3(0.3, 0.31, 0.33); }',   /* ceiling (a light fitting glows at night) / floor */
-  '    else { wall = vec3(0.45, 0.46, 0.5); }',   /* side walls */
-  '    room = wall * amb * (1.0 - 0.5 * dep); }',
+  '    if (tb <= min(tx, ty)) { wall = vec3(0.6, 0.61, 0.63) * (0.78 + 0.34 * fkH(seed * 11.0));',   /* back wall: a doorway out of the room, a picture / panel */
+  '      float dx0 = 0.2 + fkH(seed * 13.3) * max(RW - 1.4, 0.1), door = fkBox(vec2(ax, hy), vec4(dx0, -1.0, dx0 + 0.95, 2.1), 0.01), art = (1.0 - door) * fkBox(vec2(ax, hy), vec4(RW - dx0 - 1.1, 1.22, RW - dx0 - 0.1, 1.88), 0.01) * step(0.4, fkH(seed * 19.0));',
+  '      wall *= 1.0 - 0.62 * door; wall = mix(wall, vec3(0.3, 0.31, 0.33) * (0.7 + 0.7 * fkH(seed * 23.0)), art * 0.85); wall *= mix(1.0, 0.72 + 0.5 * smoothstep(0.6, CH, hy), uNight); }',   /* washed from the ceiling fittings at night */
+  '    else if (ty < tx) { if (d.y > 0.0) { float fz = abs(fract(-hp.z / 1.8) - 0.5) * 1.8, fit = (1.0 - smoothstep(0.05, 0.08, fz)) * step(0.35, ax) * step(ax, RW - 0.35);',   /* ceiling: a panel grid and linear light fittings every 1.8 m */
+  '        wall = vec3(0.78) * (0.93 + 0.07 * step(0.03, abs(fract(hp.x * 0.83) - 0.5))); fitE = fit * (1.5 * (lit + lobby * uNight) + 0.45 * lobby * (1.0 - uNight)); }',   /* the fittings are light sources, not lit by the room */
+  '      else wall = vec3(0.26, 0.265, 0.28) * (0.8 + 0.4 * (1.0 - dep)); }',   /* floor: brightest near the window */
+  '    else { wall = vec3(0.45, 0.46, 0.49); wall *= 1.0 - 0.42 * step(0.5, fkH(seed * 31.0)) * fkBox(vec2(-hp.z, hy), vec4(0.3, 0.0, 1.9, 2.0), 0.02) * (0.65 + 0.35 * step(0.5, fract(hy * 2.4))); }',   /* side walls: a shelving unit */
+  '    room = wall * amb * (1.0 - 0.62 * dep) + lightC * fitE;',
+  '    float tc = depth * (0.34 + 0.22 * fkH(seed * 29.0)) / -d.z;',   /* the furniture card at mid depth: parallax against the back wall */
+  '    if (tc < t) { vec2 hc = p + d.xy * tc; float fg = 0.0; float fm = fkFurn(vec2(hc.x + sx, hc.y + fl), kind, 0.25 + fkH(seed * 37.0) * max(RW - 3.0, 0.05), seed, CH, fg) * step(-sx, hc.x) * step(hc.x, wsz.x + sx);',
+  '      vec3 fc = vec3(0.15, 0.152, 0.16) * (0.75 + 0.5 * fkH(seed * 41.0)) * amb * (1.0 - 0.3 * dep);',
+  '      fc += fg * (vec3(0.03) * (1.0 - uNight) + lightC * (0.9 * lit + 0.5 * lobby * uNight));',   /* monitors, lamp shades, the pendant and the lobby counter give light */
+  '      room = mix(room, fc, fm); } }',
   '  float bl = vWin.z; if (bl > 0.01 && vWinUv.y > 1.0 - bl) room = vec3(0.72, 0.73, 0.76) * (amb * 0.9 + vec3(0.02)) * (0.9 + 0.1 * step(0.5, fract(vWinUv.y * wsz.y * 9.0)));',   /* blinds */
   '  float e = min(min(vWinUv.x, 1.0 - vWinUv.x) * wsz.x, min(vWinUv.y, 1.0 - vWinUv.y) * wsz.y); room *= 0.55 + 0.45 * smoothstep(0.0, 0.14, e);',   /* the reveal shadows the recess */
   '  float F = 0.16 + 0.84 * pow(1.0 - clamp(abs(d.z), 0.0, 1.0), 5.0);',   /* coated facade glass: it mirrors the sky by day, you see into a room when you face it */
   '  vec3 rf = vec3(d.x, d.y, -d.z) + vec3(fkH(seed * 17.0) - 0.5, fkH(seed * 23.0) - 0.5, 0.0) * 0.06;',   /* each pane is set a hair off-plane: reflections break from pane to pane */
   '  vec3 sky = rf.y > 0.0 ? mix(uSkyH, uSkyZ, pow(clamp(rf.y, 0.0, 1.0), 0.6)) : mix(uSkyH * 0.85, uGround, clamp(-rf.y * 3.0, 0.0, 1.0));',
+  '  float sku = atan(rf.x, max(rf.z, 1e-3)) * 7.0, skl = 0.06 + 0.3 * fkH(floor(sku) + 40.0), skw = step(0.55, fract(sku * 3.0)) * step(0.4, fract(rf.y * 26.0)); sky = mix(sky, uGround * (1.1 + 0.5 * skw) + uSkyH * 0.08, 0.66 * (1.0 - smoothstep(skl - 0.01, skl + 0.01, rf.y)) * step(-0.03, rf.y));',   /* M20: the reflected street — building silhouettes along the horizon */
   '  sky *= 0.85 + 0.3 * fkH(seed * 13.1);',
   '  totalEmissiveRadiance += room * (1.0 - F) + sky * F; }'].join('\n');
 
+/* M20 (wave 2 sky: storm-light, low-saturation grey-violet): the day sky the glass mirrors — horizon pearl-grey, zenith grey-violet, street
+   grey (was a clear-blue sky #c9d5e4 / #6c8ec4 the world no longer has). Saturation stays under 10 % (support neutral, not VISIONARY). */
+var SKY_DAY = [0xc9c8d0, 0x85869a, 0x55575d];
 var STRIP_HEAD = 'attribute vec4 aLight;\nvarying vec4 vLight;';
 var STRIP_FRAG_HEAD = 'uniform float uTime; uniform float uNight; uniform vec3 uWhite;\nvarying vec4 vLight;\n' + SHOW_GLSL;
 var STRIP_FRAG_BODY = [
@@ -77,7 +112,7 @@ export function createFacadeKit(THREE, opts) {
   opts = opts || {}; var tierQ = opts.tier || 'HIGH', night = !!opts.night, showForce = opts.show === true;
   var panes = [], corners = [], bars = [], strips = [], pieces = [], extras = [], info = { buildings: 0, windows: 0, corner_panes: 0, bars: 0, strips: 0, draw_calls: 0 };
   var UP = new THREE.Vector3(0, 1, 0), _m = new THREE.Matrix4(), _b = new THREE.Matrix4(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _q = new THREE.Quaternion();
-  var COL = { frame: new THREE.Color(0x2c323a), sill: new THREE.Color(0xc2c8d0), pier: new THREE.Color(0x8d96a2), slab: new THREE.Color(0xaab2bc), grille: new THREE.Color(0x3a414a), door: new THREE.Color(0x4a525c), rail: new THREE.Color(0xb8c0ca), parapet: new THREE.Color(0x9ba3ad), house: new THREE.Color(0x767e89) };
+  var COL = { frame: new THREE.Color(0x2c323a), sill: new THREE.Color(0xc2c8d0), pier: new THREE.Color(0x8d96a2), slab: new THREE.Color(0xaab2bc), grille: new THREE.Color(0x3a414a), door: new THREE.Color(0x4a525c), rail: new THREE.Color(0xb8c0ca), parapet: new THREE.Color(0x9ba3ad), house: new THREE.Color(0x767e89), reveal: new THREE.Color(0xb6bbc2), spandrel: new THREE.Color(0x3b4149) };   /* M20: a light metal reveal surround, a dark metal spandrel */
   /* one oriented box in a face frame: F = { o: face origin (Vector3), t: tangent, n: normal }; a = along, y = base height, depth measured from the face outward */
   function fbox(F, a, y, lenT, lenY, proud, col, rec) { var n0 = rec && rec.n0 !== undefined ? rec.n0 : 0; _p.copy(F.o).addScaledVector(F.t, a).addScaledVector(F.n, n0 + proud / 2); _p.y = y + lenY / 2; _b.makeBasis(F.t, UP, F.n); _q.setFromRotationMatrix(_b); _s.set(lenT, lenY, Math.max(0.01, proud)); _m.compose(_p, _q, _s); bars.push({ m: _m.clone(), c: col }); pieces.push({ y0: y - (F.g || 0), y1: y - (F.g || 0) + lenY, proud: n0 + proud, id: F.id }); }
   function pane(F, a, y, w, h, win, rec) { var n0 = rec && rec.n0 !== undefined ? rec.n0 : 0; _p.copy(F.o).addScaledVector(F.t, a).addScaledVector(F.n, n0 + 0.012); _p.y = y + h / 2; _b.makeBasis(F.t, UP, F.n); _q.setFromRotationMatrix(_b); _s.set(w, h, 1); _m.compose(_p, _q, _s); panes.push({ m: _m.clone(), w: win }); pieces.push({ y0: y - (F.g || 0), y1: y - (F.g || 0) + h, proud: n0 + 0.012, id: F.id }); info.windows++; }
@@ -87,8 +122,10 @@ export function createFacadeKit(THREE, opts) {
     pane(F, a, y, w, h, win, rec);
     fbox(F, a, y + h, w + 2 * fw, fw, fd, COL.frame, rec); fbox(F, a - w / 2 - fw / 2, y, fw, h, fd, COL.frame, rec); fbox(F, a + w / 2 + fw / 2, y, fw, h, fd, COL.frame, rec);
     fbox(F, a, y - fw * 1.3, w + 2 * fw + (low ? 0 : 0.12), fw * 1.3, low ? fd : fd + 0.08, COL.sill, rec);   /* the sill projects a little more (drip edge) */
-    var nm = Math.max(0, Math.round(w / (style === 'CIVIC' ? 1.3 : 0.9)) - 1); for (var i = 1; i <= nm; i++) fbox(F, a - w / 2 + i * w / (nm + 1), y, fw * 0.6, h, fd * 0.7, COL.frame, rec);
-    if (style === 'CIVIC' && h > 2.4) fbox(F, a, y + h - 0.75, w, fw * 0.6, fd * 0.7, COL.frame, rec);   /* transom: a fixed upper light */ }
+    var deep = !low && style === 'CIVIC' && tierQ !== 'LOW', md = deep ? 0.13 : fd * 0.7;
+    var nm = Math.max(0, Math.round(w / (style === 'CIVIC' ? 1.3 : 0.9)) - 1); for (var i = 1; i <= nm; i++) fbox(F, a - w / 2 + i * w / (nm + 1), y, fw * 0.6, h, md, COL.frame, rec);
+    if (style === 'CIVIC' && h > 2.4) fbox(F, a, y + h - 0.75, w, fw * 0.6, md, COL.frame, rec);   /* transom: a fixed upper light */
+    if (deep) { var rw = 0.14, rd = 0.24; fbox(F, a, y + h + fw, w + 2 * fw + 2 * rw, rw, rd, COL.reveal, rec); [-1, 1].forEach(function (sg) { fbox(F, a + sg * (w / 2 + fw + rw / 2), y - fw * 1.3, rw, h + fw * 2.3 + rw, rd, COL.reveal, rec); }); info.reveals = (info.reveals || 0) + 1; } }   /* M20 GLASS DEPTH (owner: "glass depth, facade depth"): above 3.4 m a civic window sits in a deep reveal surround — head and jambs 24 cm proud, the mullions 13 cm fins — so the glass reads set back in the wall with a shadow line, not a flat grid on the skin (MED / HIGH; LOW keeps the thin frame) */
   function bayWidths(L, pattern, rnd) { var out = [], acc = 0, i = 0; while (acc < L - 0.5 && i < 64) { var wv = pattern[i % pattern.length] * (0.9 + rnd() * 0.2); out.push(wv); acc += wv; i++; } var k = L / Math.max(acc, 1e-3); return out.map(function (v) { return v * k; }); }
   var PROFILES = {
     TOWER: { bays: [2.9, 1.9, 2.9, 3.6], lit: 0.62, blinds: 0.45, depth: [3.2, 5.0] },
@@ -122,8 +159,8 @@ export function createFacadeKit(THREE, opts) {
             if (kind === 'VERTICAL') { if (f % 2 === 1) continue; var vh = Math.min(FH * 2, H) - 1.3; framedWindow(F, a - w * 0.18, fy + 0.8, 0.62, vh, win(), 'UTIL'); framedWindow(F, a + w * 0.18, fy + 0.8, 0.62, vh, win(), 'UTIL'); continue; }   /* double-height slots in pairs */
             if (kind === 'UTILITY') { var uw = 0.95, nU = w > 3.2 ? 2 : 1; for (var u = 0; u < nU; u++) framedWindow(F, a + (nU === 1 ? 0 : (u - 0.5) * w * 0.45), fy + 1.1, uw, 1.25, win(), 'UTIL'); continue; }
             if (kind === 'CLERESTORY') { var ch = Math.min(1.6, FH * 0.32); framedWindow(F, a, fy + FH - ch - 0.45, w - 0.6, ch, win(), 'CIVIC'); if (floors === 1 && FH > 4) framedWindow(F, a, fy + 1.0, Math.min(1.1, w * 0.3), 1.3, win(), 'UTIL'); continue; }   /* a hall: high light, solid lower walls */
-            if (kind === 'STOREFRONT') { framedWindow(F, a, fy + 0.35, w - 0.55, Math.min(FH - 0.9, 3.0), win(), 'CIVIC'); continue; }
-            var ww = w - 0.62 - rnd() * 0.3, wh = FH - 1.15; framedWindow(F, a, fy + 0.85, ww, wh, win(), 'CIVIC'); }
+            if (kind === 'STOREFRONT') { var sw0 = win(); sw0[2] = -0.35; framedWindow(F, a, fy + 0.35, w - 0.55, Math.min(FH - 0.9, 3.0), sw0, 'CIVIC'); continue; }   /* M20: the shop floor is 35 cm under the glass */
+            var ww = w - 0.62 - rnd() * 0.3, wh = FH - 1.15; if (f > 0 && tierQ !== 'LOW') fbox(F, a, fy + 0.12, ww + 0.43, 0.63, 0.03, COL.spandrel); framedWindow(F, a, fy + 0.85, ww, wh, win(), 'CIVIC'); }   /* M20 SPANDREL (owner: material separation, panels, joints): a dark metal panel from the slab edge to the sill under every upper window — window over spandrel reads as a built bay (glass · metal · skin), not a hole in one surface */
         });
         if (top && spec.profile !== 'HALL') { var sy0 = Math.max(y0 + 0.3, LOW_Y + 0.3); [-1, 1].forEach(function (sg) { strip(F, sg * L / 2, sy0, 0.09, y0 + H - 0.6 - sy0, { n0: 0.15 }, [sg * 0.25 + t * 0.4, info.buildings, 0.9, 1]); }); }   /* on the face of the corner piers */   /* integrated vertical light at the corner piers of the crown */
         strip(F, 0, y0 + H - 0.32, L * 0.92, 0.08, { n0: 0.22 }, [t * 0.33, info.buildings, 0.8, 1]);   /* the roofline / setback light on the eave fascia, interrupted at the corners */
@@ -144,7 +181,7 @@ export function createFacadeKit(THREE, opts) {
       fbox(F1, 0, yb - 0.24, BW, 0.24, BD, COL.slab); fbox(F1, 0, yb + 1.02, BW, 0.06, 0.06, COL.rail, { n0: BD - 0.08 });
       [-1, 1].forEach(function (sg) { fbox(F1, sg * (BW / 2 - 0.03), yb, 0.06, 1.08, BD, COL.rail); fbox(F1, sg * (BW / 2 - 0.4), yb - 0.9, 0.1, 0.66, 0.1, COL.frame, { n0: BD * 0.45 }); });
       for (var pn = 0; pn < 4; pn++) fbox(F1, -BW / 2 + 0.3 + pn * (BW - 0.6) / 3, yb, 0.04, 1.02, 0.04, COL.rail, { n0: BD - 0.06 });
-      pane(F1, -BW * 0.18, yb + 0.05, 1.1, 2.35, [rnd(), rnd() < 0.7 ? 0.8 : 0, 0, 3.4], null); fbox(F1, -BW * 0.18, yb + 2.4, 1.26, 0.08, 0.1, COL.frame);   /* the balcony door */
+      pane(F1, -BW * 0.18, yb + 0.05, 1.1, 2.35, [rnd(), rnd() < 0.7 ? 0.8 : 0, -0.05, 3.4], null); fbox(F1, -BW * 0.18, yb + 2.4, 1.26, 0.08, 0.1, COL.frame);   /* the balcony door */
       strip(F1, 0, yb - 0.26, BW * 0.9, 0.04, { n0: BD - 0.05 }, [0.5, info.buildings, 0.8, 1]);   /* the slab-edge downlight */
       info.balconies = (info.balconies || 0) + 1; }
   }
@@ -170,18 +207,23 @@ export function createFacadeKit(THREE, opts) {
      light and a flush threshold, a lit lobby behind the glass. spec: { id, o: point on the visible wall at the door centre (y 0), n: outward normal, width, height } */
   function addEntrance(spec) { var n = spec.n.clone().normalize(), F = { o: spec.o.clone(), t: new THREE.Vector3().crossVectors(UP, n), n: n, id: spec.id + 'entrance' }, W = spec.width, Ht = spec.height, rnd = lcg((spec.seed || 5) + 99);
     var dh = Math.min(2.6, Ht - 0.2), th = Ht - dh - 0.25;
-    pane(F, 0, 0.03, W, dh, [rnd(), 2, 0, 7.5], null);   /* the doors: a deep lit lobby */
-    if (th > 0.4) pane(F, 0, dh + 0.18, W, th, [rnd(), 2, 0, 7.5], null);   /* the transom light over the doors */
+    pane(F, 0, 0.03, W, dh, [rnd(), 2, -0.03, 7.5], null);   /* the doors: a deep lit lobby (M20: its floor at the threshold) */
+    if (th > 0.4) pane(F, 0, dh + 0.18, W, th, [rnd(), 2, -(dh + 0.18), 7.5], null);   /* the transom light over the doors */
     fbox(F, 0, dh + 0.03, W, 0.15, 0.04, COL.frame);   /* transom bar */ fbox(F, 0, 0.03, 0.09, dh, 0.04, COL.frame);   /* centre stile */
-    [-1, 1].forEach(function (sg) { fbox(F, sg * (W / 2 + 0.16), 0, 0.32, Ht + 0.2, 0.045, COL.pier); fbox(F, sg * W * 0.25, 1.0, W * 0.3, 0.05, 0.05, COL.rail); fbox(F, sg * W * 0.5, 0.03, 0.08, dh, 0.04, COL.frame); });   /* portal jambs, push bars, door frames */
+    /* M20 A REAL ENTRY (owner: "entrances that feel like real entries … human scale"): the opening was one glass pair as wide as the portal
+       (4–5.5 m doors). Now a door PAIR of human size (≤ 2 m) in the middle with fixed glazed SIDELIGHTS either side, each leaf with a vertical
+       pull and a brushed kick plate, and a LIT REVEAL down the inside of each portal jamb (neutral practical light). All ≤ 5 cm proud. */
+    var DW = Math.min(2.0, W * 0.46); [-1, 1].forEach(function (sg) { fbox(F, sg * (DW / 2 + 0.04), 0.03, 0.08, dh, 0.045, COL.frame); fbox(F, sg * 0.13, 0.9, 0.035, 1.15, 0.045, COL.rail); fbox(F, sg * DW / 4, 0.03, DW / 2 - 0.14, 0.24, 0.025, COL.rail);   /* door frame, pull, kick plate */
+      var SW = W / 2 - DW / 2 - 0.08; if (SW > 1.3) fbox(F, sg * (DW / 2 + 0.08 + SW / 2), 0.03, 0.06, dh, 0.035, COL.frame);   /* a mullion splits a wide sidelight */
+      fbox(F, sg * (W / 2 + 0.16), 0, 0.32, Ht + 0.2, 0.045, COL.pier); fbox(F, sg * W * 0.5, 0.03, 0.08, dh, 0.04, COL.frame); strip(F, sg * (W / 2 + 0.02), 0.2, 0.025, Ht - 0.45, null, [0.2, 0, 0.7, 0]); });   /* portal jambs, door frames, the lit reveals */
     fbox(F, 0, Ht, W + 0.64, 0.3, 0.045, COL.pier);   /* portal head */ strip(F, 0, Ht - 0.07, W, 0.04, null, [0.1, 0, 1.0, 0]);   /* a practical downlight under the head: always neutral white */ fbox(F, 0, 0.0, W + 0.3, 0.012, 0.045, COL.sill);   /* flush threshold */
     info.entrances = (info.entrances || 0) + 1; }
   var meshes = [], mats = [], geos = [], paneMat = null, stripMat = null;
   function paneMaterial() { var m = new THREE.MeshStandardMaterial({ color: 0x0b0e13, roughness: 0.08, metalness: 0.0, envMapIntensity: 1.1 });
-    m.onBeforeCompile = function (sh) { sh.uniforms.uNight = { value: night ? 1 : 0 }; sh.uniforms.uLightA = { value: new THREE.Color(0xf6f4ee) }; sh.uniforms.uLightB = { value: new THREE.Color(0xe8eefc) }; sh.uniforms.uDayRoom = { value: 0.11 }; sh.uniforms.uSkyH = { value: new THREE.Color(night ? 0x252848 : 0xc9d5e4) }; sh.uniforms.uSkyZ = { value: new THREE.Color(night ? 0x0a0d1f : 0x6c8ec4) }; sh.uniforms.uGround = { value: new THREE.Color(night ? 0x101219 : 0x5c626b) }; m.userData.shader = sh;
+    m.onBeforeCompile = function (sh) { sh.uniforms.uNight = { value: night ? 1 : 0 }; sh.uniforms.uLightA = { value: new THREE.Color(0xf6f4ee) }; sh.uniforms.uLightB = { value: new THREE.Color(0xe8eefc) }; sh.uniforms.uDayRoom = { value: 0.08 }; sh.uniforms.uSkyH = { value: new THREE.Color(night ? 0x252848 : SKY_DAY[0]) }; sh.uniforms.uSkyZ = { value: new THREE.Color(night ? 0x0a0d1f : SKY_DAY[1]) }; sh.uniforms.uGround = { value: new THREE.Color(night ? 0x101219 : SKY_DAY[2]) }; m.userData.shader = sh;
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + PANE_VERT_HEAD).replace('#include <project_vertex>', '#include <project_vertex>\n' + PANE_VERT_BODY);
-      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + PANE_FRAG_HEAD).replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(0.04 + 0.12 * fkH(vWin.x * 7.3), 0.03, 0.2);').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + PANE_FRAG_BODY); };
-    m.customProgramCacheKey = function () { return 'mahworld-facade-pane-v1'; }; return m; }
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + PANE_FRAG_HEAD).replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(0.04 + 0.12 * fkH(vWin.x * 7.3), 0.03, 0.2);').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + PANE_FRAG_BODY).replace('#include <lights_fragment_end>', '#include <lights_fragment_end>\nreflectedLight.indirectSpecular *= 0.25;'); };   /* M20: the pane's own sky term (with the street skyline) carries the reflection; the neutral room IBL on a mirror-smooth pane washed every storefront to a flat pale sheet */
+    m.customProgramCacheKey = function () { return 'mahworld-facade-pane-v2'; }; return m; }
   function stripMaterial() { var cols = (opts.classColor || CLASS_COLOR).map(function (h) { return new THREE.Color(h); }); var m = new THREE.MeshBasicMaterial({ color: 0xffffff, fog: true, toneMapped: true });
     m.onBeforeCompile = function (sh) { sh.uniforms.uShow = { value: showForce ? 1 : 0 }; sh.uniforms.uPhase = { value: 0 }; sh.uniforms.uTime = { value: 0 }; sh.uniforms.uNight = { value: night ? 1 : 0 }; sh.uniforms.uWhite = { value: new THREE.Color(0xf4f6fb) }; cols.forEach(function (c, i) { sh.uniforms['uC' + i] = { value: c }; }); m.userData.shader = sh;
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + STRIP_HEAD).replace('#include <begin_vertex>', '#include <begin_vertex>\nvLight = aLight;');
@@ -198,7 +240,7 @@ export function createFacadeKit(THREE, opts) {
     var b = instanced(new THREE.BoxGeometry(1, 1, 1), barMat, bars, 'FACADE_FRAMES'); if (b) root.add(b);
     var s = instanced(new THREE.BoxGeometry(1, 1, 1), stripMat, strips, 'FACADE_LIGHTS', 'aLight', function (it) { return it.l; }); if (s) root.add(s);
     info.bars = bars.length; info.strips = strips.length; group.add(root); return root; }
-  function setNight(n) { night = !!n; [paneMat, stripMat].forEach(function (m) { var sh = m && m.userData.shader; if (sh) sh.uniforms.uNight.value = night ? 1 : 0; }); var ps = paneMat && paneMat.userData.shader; if (ps) { ps.uniforms.uSkyH.value.set(night ? 0x252848 : 0xc9d5e4); ps.uniforms.uSkyZ.value.set(night ? 0x0a0d1f : 0x6c8ec4); ps.uniforms.uGround.value.set(night ? 0x101219 : 0x5c626b); } }
+  function setNight(n) { night = !!n; [paneMat, stripMat].forEach(function (m) { var sh = m && m.userData.shader; if (sh) sh.uniforms.uNight.value = night ? 1 : 0; }); var ps = paneMat && paneMat.userData.shader; if (ps) { ps.uniforms.uSkyH.value.set(night ? 0x252848 : SKY_DAY[0]); ps.uniforms.uSkyZ.value.set(night ? 0x0a0d1f : SKY_DAY[1]); ps.uniforms.uGround.value.set(night ? 0x101219 : SKY_DAY[2]); } }
   /* the show: central-plaza facades run a slow class-colour sequence for 24 s every 150 s, at night only (calm by day); forced on for evidence */
   function tick(dt, t) { var lv = showLevel(t, night, showForce), ph = showPhase(t, showForce), sh = stripMat && stripMat.userData.shader;
     if (sh) { sh.uniforms.uTime.value = t || 0; sh.uniforms.uShow.value = lv; sh.uniforms.uPhase.value = ph; }

@@ -105,11 +105,16 @@ export function createFixtures(ctx) {
     var armCurve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(-0.04, 0, 0), new THREE.Vector3(ARM_LEN_M * 0.45, 0.34, 0), new THREE.Vector3(ARM_LEN_M - 0.06, 0.02, 0));
     var armGeo = new THREE.TubeGeometry(armCurve, FT === 'LOW' ? 6 : 8, 0.045, FT === 'HIGH' ? 6 : 4, false);   /* starts at the arm-root orb, arcs up and out along +x (rotated per instance) */
     var headGeo = new THREE.CapsuleGeometry(0.15, 0.5, 3, 10); headGeo.rotateZ(Math.PI / 2);                   /* lies along the arm */
+    /* M20 (owner 2026-09-27: "practical lighting", "reduce smooth primitive shells … excessive neon"): the luminaire was a pill glowing all over.
+       Now it is a luminaire: the upper shell is a dark satin housing, only the lower half — the diffuser facing the street — burns in the lamp's
+       class light (aGlow per vertex; one draw as before, the instance colour still carries the class) */
+    (function () { var hp = headGeo.attributes.position, ag = new Float32Array(hp.count); for (var gi = 0; gi < hp.count; gi++) ag[gi] = hp.getY(gi) < 0.035 ? 1 : 0; headGeo.setAttribute('aGlow', new THREE.BufferAttribute(ag, 1)); })();
     var poolGeo = new THREE.PlaneGeometry(POOL_SIZE_M, POOL_SIZE_M); poolGeo.rotateX(-Math.PI / 2);
     geos.push(poleGeo, armGeo, headGeo, poolGeo);
 
     headMat = ctx.M.cyan.clone(); headMat.color.setHex(0xededed); headMat.emissive.setHex(0xffffff);   /* M19: the lamp's own colour rides in the instance colour (albedo × tint, emissive × tint) */
-    headMat.onBeforeCompile = function (sh) { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_COLOR\n\ttotalEmissiveRadiance *= vColor.rgb;\n#endif'); }; headMat.customProgramCacheKey = function () { return 'mahworld_fixture_head_class'; };
+    headMat.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float aGlow; varying float vGlow;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlow = aGlow;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vGlow;').replace('#include <color_fragment>', '#include <color_fragment>\n\tdiffuseColor.rgb = mix(vec3(0.13, 0.135, 0.145), diffuseColor.rgb, vGlow);').replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\n\tmetalnessFactor = mix(0.8, metalnessFactor, vGlow); roughnessFactor = mix(0.38, roughnessFactor, vGlow);').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_COLOR\n\ttotalEmissiveRadiance *= vColor.rgb;\n#endif\n\ttotalEmissiveRadiance *= vGlow;'); }; headMat.customProgramCacheKey = function () { return 'mahworld_fixture_head_class_v2'; };   /* M20: a dark housing over the lit diffuser */
     headMat.emissiveIntensity = night ? HEAD_EMISSIVE_NIGHT : HEAD_EMISSIVE_DAY; headMat.roughness = 0.22; headMat.metalness = 0.3; headMat.name = 'FIXTURE_HEAD';
     LAMP_BLUE = col(F.emissive, '#6fc3ff'); lampFam = []; lampTint = [];
     poolTex = makePoolTexture();
