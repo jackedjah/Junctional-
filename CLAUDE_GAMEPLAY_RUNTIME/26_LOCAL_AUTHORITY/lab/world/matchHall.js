@@ -119,12 +119,12 @@ export function createMatchHall(ctx) {
         'vec3 nkClass(float h) { if (h < 0.2) return vec3(0.791, 0.546, 0.141); if (h < 0.4) return vec3(0.05, 0.188, 0.807); if (h < 0.6) return vec3(0.658, 0.034, 0.069); if (h < 0.8) return vec3(0.275, 0.144, 0.686); return vec3(0.871, 0.254, 0.479); }'].join('\n'))
         .replace('#include <emissivemap_fragment>', ['#include <emissivemap_fragment>',
         '{ float k = vLine, t = uTime; vec3 Eb = totalEmissiveRadiance / max(length(totalEmissiveRadiance), 1e-3); vec3 add = vec3(0.0);',
-        '  float ang = atan(vLP.z, vLP.x) / 6.2831853 + 0.5; float sweep = smoothstep(0.9, 1.0, fract(ang - t * 0.028));',
-        '  if (k < 0.5) { float id = nkH(floor(vLP.xz * 0.4 + 0.5)); float yN = clamp(vLP.y / uH, 0.0, 1.0); float ph = fract(t * (0.07 + id * 0.05) + id * 7.0);',
-        '    float on = step(0.3, fract(id * 13.7)); vec3 cc = nkClass(fract(id * 5.3)); for (int j = 0; j < 2; j++) { float d = fract(ph + float(j) * 0.47) - yN; float tail = step(0.0, d) * exp(-d * 14.0) * (1.0 - smoothstep(0.2, 0.26, d)); float head = 1.0 - smoothstep(0.0, 0.012, abs(d));',
-        '    add += (cc * (tail * 1.6 + head * 1.2) + vec3(head * 0.3)) * on; } }',
-        '  else if (k < 1.5) { float f = fract(ang * 28.0 - t * 0.9); add += Eb * smoothstep(0.7, 1.0, f) * 1.2; }',
-        '  else { float f = fract((vLP.y + abs(vLP.z) + abs(vLP.x) * 0.3) * 0.55 - t * 1.6); add += vec3(0.9, 0.78, 0.5) * smoothstep(0.72, 1.0, f) * 1.1; }',
+        '  float ang = atan(vLP.z, vLP.x) / 6.2831853 + 0.5; float sweep = pow(0.5 - 0.5 * cos(fract(ang - t * 0.018) * 6.2831853), 6.0) * (0.9 + 0.1 * sin(t * 0.4));',
+        '  if (k < 0.5) { float id = nkH(floor(vLP.xz * 0.4 + 0.5)); float yN = clamp(vLP.y / uH, 0.0, 1.0); float ph = fract(t * (0.035 + id * 0.03) + id * 7.0);',
+        '    float on = step(0.3, fract(id * 13.7)); vec3 cc = nkClass(fract(id * 5.3)); for (int j = 0; j < 2; j++) { float d = fract(ph + float(j) * 0.47) - yN; float tail = exp(-d * d * 55.0) * (0.8 + 0.2 * sin(t * 0.9 + id * 11.0)); float head = exp(-d * d * 1400.0) * 0.5;',
+        '    add += cc * (tail * 2.1 + head * 0.8) * on; } }   /* DESIGN DNA: soft eased light bulbs that breathe (no hard white head) */',
+        '  else if (k < 1.5) { float f = fract(ang * 14.0 - t * 0.35); add += Eb * (0.5 - 0.5 * cos(f * 6.2831853)) * 0.55; }',
+        '  else { float f = fract((vLP.y + abs(vLP.z) + abs(vLP.x) * 0.3) * 0.3 - t * 0.5); add += vec3(0.9, 0.78, 0.5) * pow(0.5 - 0.5 * cos(f * 6.2831853), 3.0) * 0.9; }',
         '  totalEmissiveRadiance = Eb * mix(0.1, 0.13, uNight) * (k > 1.5 ? 2.6 : 1.0) + add * mix(0.75, 1.0, uNight) + Eb * sweep * mix(0.35, 0.6, uNight); }'].join('\n')); };   /* absolute levels: a dim ice base line; class-coloured packets with a white head and a fading tail climb the strips, kept below the tone-map shoulder so the class colour survives (a hot packet read as flat white) */
     facadeMat.customProgramCacheKey = function () { return 'matchHall_neoTokyo'; }; facadeMat.color.setHex(0x1c2028); facadeMat.metalness = 0.6; facadeMat.roughness = 0.4;   /* dark diffuse: the lines are light, not white paint lit by the sky */
     stats.neoTokyo = { ticker_perimeter_m: +(u0 * REP).toFixed(1), blade: [BW, BH, BY] };

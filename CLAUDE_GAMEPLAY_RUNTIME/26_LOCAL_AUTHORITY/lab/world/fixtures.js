@@ -8,7 +8,7 @@
    character receives local light when moving near / under a fixture without dozens of lights. Day is the default; setNight(n) switches the
    head emissive (0.35 / 1.6), the pool alpha (day_pool_alpha / night_pool_alpha) and the light intensity without rebuilding anything.
    No per-frame allocation in tick(): the nearest-fixture search runs on flat Float32Arrays into two preallocated small arrays. */
-import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js';
+import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js'; import { taperShaft, orb } from './formKit.js';
 
 import { groundYAt } from './worldLayout.js';
 export function createFixtures(ctx) {
@@ -61,11 +61,17 @@ export function createFixtures(ctx) {
     group = new THREE.Group(); group.name = 'FIXTURES_' + (F.kind || 'STREET_LIGHT'); group.userData.noMerge = true; ctx.group.add(group);
 
     /* geometry: slim tapered pole with a merged plinth (one draw call), short arm, capsule luminaire, ground pool quad */
-    var poleGeo = new THREE.CylinderGeometry(0.055, 0.115, poleH, 10, 1); poleGeo.translate(0, poleH / 2, 0);
-    var plinth = new THREE.CylinderGeometry(0.2, 0.27, 0.32, 10, 1); plinth.translate(0, 0.16, 0);
-    var merged = null; try { merged = mergeGeometries([poleGeo, plinth], false); } catch (e) { merged = null; }
-    if (merged) { poleGeo.dispose(); plinth.dispose(); poleGeo = merged; } else { plinth.dispose(); log('plinth merge unavailable — plain pole'); }
-    var armGeo = new THREE.BoxGeometry(ARM_LEN_M, 0.09, 0.13); armGeo.translate(ARM_LEN_M / 2 - 0.06, 0, 0);   /* starts inside the pole, extends along +x (rotated per instance) */
+    /* DESIGN DNA (the character roster): a rolled dome foot inside the old plinth, a tapered pole with a polished orb collar and an orb at the
+       arm root, and a swan-neck arm arcing up and out to the luminaire (was a straight bar) — the same footprint, height and head position */
+    var FT = 'HIGH'; try { FT = ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { }
+    var poleGeo = taperShaft(THREE, 0.1, 0.05, poleH - 0.3, FT, { belly: 0.02, radial: FT === 'LOW' ? 5 : (FT === 'MED' ? 6 : 8), rows: FT === 'LOW' ? 3 : 4 });   /* instanced everywhere: a tight triangle budget (~0.4 k per light) */ poleGeo.translate(0, 0.3, 0);
+    var plinth = new THREE.LatheGeometry([new THREE.Vector2(0.0001, 0), new THREE.Vector2(0.27, 0), new THREE.Vector2(0.26, 0.08), new THREE.Vector2(0.2, 0.22), new THREE.Vector2(0.12, 0.34), new THREE.Vector2(0.0001, 0.36)], FT === 'LOW' ? 6 : 8);
+    var collar = orb(THREE, 0.13, FT, FT === 'HIGH' ? 8 : 6); collar.scale(1, 0.75, 1); collar.translate(0, 2.6, 0); var crown = orb(THREE, 0.1, FT, 6); crown.translate(0, poleH - 0.12, 0);
+    var parts = (FT === 'LOW' ? [poleGeo, plinth, collar] : [poleGeo, plinth, collar, crown]).map(function (g) { return g.index ? g.toNonIndexed() : g; }); parts.forEach(function (g) { g.deleteAttribute('uv'); g.deleteAttribute('uv1'); });
+    var merged = null; try { merged = mergeGeometries(parts, false); } catch (e) { merged = null; }
+    if (merged) { merged.computeVertexNormals(); parts.forEach(function (g) { g.dispose(); }); poleGeo = merged; } else { log('plinth merge unavailable — plain pole'); poleGeo = parts[0]; }
+    var armCurve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(-0.04, 0, 0), new THREE.Vector3(ARM_LEN_M * 0.45, 0.34, 0), new THREE.Vector3(ARM_LEN_M - 0.06, 0.02, 0));
+    var armGeo = new THREE.TubeGeometry(armCurve, FT === 'LOW' ? 6 : 8, 0.045, FT === 'HIGH' ? 6 : 4, false);   /* starts at the arm-root orb, arcs up and out along +x (rotated per instance) */
     var headGeo = new THREE.CapsuleGeometry(0.15, 0.5, 3, 10); headGeo.rotateZ(Math.PI / 2);                   /* lies along the arm */
     var poolGeo = new THREE.PlaneGeometry(POOL_SIZE_M, POOL_SIZE_M); poolGeo.rotateX(-Math.PI / 2);
     geos.push(poleGeo, armGeo, headGeo, poolGeo);

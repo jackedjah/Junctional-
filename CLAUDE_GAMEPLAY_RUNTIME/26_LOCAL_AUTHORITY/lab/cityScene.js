@@ -6,31 +6,33 @@
    one hemisphere, an environment map for specular, emissive trims for local light (no per-lamp point lights). */
 import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { createAuraField } from './world/aura.js';   /* M12 owner pivot: the spectral aura language */
+import { createAuraField } from './world/aura.js'; import { toLacquer, taperShaft, orb, energyTip, tipMaterial, softBox } from './world/formKit.js';   /* M12 owner pivot: the spectral aura language */
 import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal, applyRadialDeck } from './world/surfaceDetail.js'; import { createFacadeKit, profileFor, addCivicBuilding } from './world/facadeKit.js';
 export function createCityScene(THREE, group, helpers) {
   var roundedBox = helpers.roundedBox, canvasTex = helpers.canvasTex; var DAY = helpers.night === false;
   var M = {
+    /* DESIGN DNA (owner 2026-09-26): the civic neutrals are PEARL — the same values without the blue cast that read as cold machine */
     /* JOB B palette (owner 2026-09-19 §4): PLATINUM facades (a mid-light cool grey with a restrained sky sheen — never white), CHROMIUM domes / trims, GRAPHITE recesses */
-    platinum: new THREE.MeshStandardMaterial({ color: 0xb4bcc7, roughness: 0.42, metalness: 0.62, envMapIntensity: 0.6 }),   /* WORLD PIVOT PASS 3: satin anodised platinum panels (the mirror-metal facades read as flat sky reflections in daylight) */
-    chrome: new THREE.MeshStandardMaterial({ color: 0xa4aeb9, roughness: (DAY ? 0.32 : 0.24), metalness: (DAY ? 0.92 : 0.98), envMapIntensity: (DAY ? 0.55 : 0.7) }),   /* M8: brushed, not a sky mirror, by day */
-    dark: new THREE.MeshStandardMaterial({ color: 0x1d2229, roughness: 0.5, metalness: 0.75 }),
+    platinum: new THREE.MeshStandardMaterial({ color: 0xbbbcbf, roughness: 0.42, metalness: 0.62, envMapIntensity: 0.6 }),   /* WORLD PIVOT PASS 3: satin anodised platinum panels (the mirror-metal facades read as flat sky reflections in daylight) */
+    chrome: new THREE.MeshStandardMaterial({ color: 0xabadb2, roughness: (DAY ? 0.32 : 0.24), metalness: (DAY ? 0.92 : 0.98), envMapIntensity: (DAY ? 0.55 : 0.7) }),   /* M8: brushed, not a sky mirror, by day */
+    dark: new THREE.MeshStandardMaterial({ color: 0x202226, roughness: 0.5, metalness: 0.75 }),
     glass: new THREE.MeshStandardMaterial({ color: 0x9aa6b8, roughness: 0.06, metalness: 0.55, transparent: true, opacity: 0.78, emissive: 0x1c2233, emissiveIntensity: (DAY ? 0.3 : 0.9), envMapIntensity: 1.0 }),   /* WORLD PIVOT PASS 3 + colour law: smoked neutral curtain-wall glass (was the civic cyan band) */
     trim: new THREE.MeshStandardMaterial({ color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: (DAY ? 0.45 : 1.7), roughness: 0.3, metalness: 0.2 }),   /* M8: daylight trims read by contrast, not by a white glow (was 0.95) */   /* B7 §7: the tier ledges / portholes read as recessed cyan energy seams */
     trimWarm: new THREE.MeshStandardMaterial({ color: 0xe9edf3, emissive: 0xdfeeff, emissiveIntensity: (DAY ? 0.3 : 1.2), roughness: 0.3, metalness: 0.1 }),
     diamond: new THREE.MeshStandardMaterial({ color: 0xe2e9f4, roughness: 0.05, metalness: 0.6, emissive: 0xd6e0ff, emissiveIntensity: (DAY ? 0.5 : 0.9), flatShading: true }),   /* B7 §7: the roof diamond is a cyan crystal, not a white cap */
     doorway: new THREE.MeshStandardMaterial({ color: 0x10141c, roughness: 0.9, metalness: 0.1, emissive: 0xd7dce8, emissiveIntensity: (DAY ? 0.32 : 0.7) }),   /* colour law: the doorway recess glows clean white light (was cyan) */
-    stone: new THREE.MeshStandardMaterial({ color: 0x3a3f4a, roughness: 0.62, metalness: 0.28, envMapIntensity: 0.35 }),   /* WORLD PIVOT PASS 3: graphite stone plinths / roof plant */
+    stone: new THREE.MeshStandardMaterial({ color: 0x3f4146, roughness: 0.62, metalness: 0.28, envMapIntensity: 0.35 }),   /* WORLD PIVOT PASS 3: graphite stone plinths / roof plant */
     leaf: new THREE.MeshStandardMaterial({ color: 0xe4e9f2, emissive: 0xffc862, emissiveIntensity: (DAY ? 0.495 : 1.1), roughness: 0.3, metalness: 0.3, flatShading: true, side: THREE.DoubleSide }),
     stalk: new THREE.MeshStandardMaterial({ color: 0xe8edf5, emissive: 0xdfe8ff, emissiveIntensity: (DAY ? 0.405 : 0.9), roughness: 0.4, metalness: 0.2 }),
     puddle: new THREE.MeshStandardMaterial({ color: 0x1a2432, roughness: 0.02, metalness: 1.0, transparent: true, opacity: 0.85 }),
     /* M8E: wall families — a satin platinum skin, a neutral architectural composite, a honed stone cladding for heavy bases */
-    skin: new THREE.MeshStandardMaterial({ color: 0xa3abb5, roughness: 0.46, metalness: 0.58, envMapIntensity: 0.55 }),
-    composite: new THREE.MeshStandardMaterial({ color: 0xa7abb1, roughness: 0.6, metalness: 0.1, envMapIntensity: 0.4 }),
-    cladding: new THREE.MeshStandardMaterial({ color: 0x5f6671, roughness: 0.68, metalness: 0.1, envMapIntensity: 0.35 })
+    skin: new THREE.MeshStandardMaterial({ color: 0xabacae, roughness: 0.46, metalness: 0.58, envMapIntensity: 0.55 }),
+    composite: new THREE.MeshStandardMaterial({ color: 0xaaabad, roughness: 0.6, metalness: 0.1, envMapIntensity: 0.4 }),
+    cladding: new THREE.MeshStandardMaterial({ color: 0x66686b, roughness: 0.68, metalness: 0.1, envMapIntensity: 0.35 })
   };
   /* M8 MATERIAL REALISM: the civic families get world-space structural surface logic (lab/world/surfaceDetail.js) — facade panel grid with
      inset seams and a trim band per 3.6 m storey, brushed chrome, panelled graphite structure, stone grain. Value / roughness only (no hue). */
+  (function (T) { M.chrome = toLacquer(THREE, M.chrome, 0.8, 0.06, T); if (T === 'HIGH') { M.platinum = toLacquer(THREE, M.platinum, 0.45, 0.14, T); M.skin = toLacquer(THREE, M.skin, 0.35, 0.2, T); M.dark = toLacquer(THREE, M.dark, 0.3, 0.25, T); M.stone = toLacquer(THREE, M.stone, 0.18, 0.32, T); } })(helpers.surfaceTier || 'HIGH');   /* DESIGN DNA: the roster's lacquer — a clear coat over the civic metals (HIGH: every family, satin-honed on stone; MED: chrome only; LOW: none) */
   var SDT = helpers.surfaceTier || 'HIGH'; applySurface(THREE, M.platinum, 'FACADE', SDT); applySurface(THREE, M.chrome, 'BRUSHED', SDT); applySurface(THREE, M.dark, 'STRUCTURE', SDT); applySurface(THREE, M.stone, 'STONE', SDT); applySurface(THREE, M.glass, 'GLAZING', SDT); applyCrystal(THREE, M.diamond, { tier: SDT }); applySurface(THREE, M.skin, 'FACADE_PLAIN', SDT); applySurface(THREE, M.composite, 'COMPOSITE', SDT); applySurface(THREE, M.cladding, 'CLADDING', SDT);   /* M8C: roof / entrance diamonds are cut crystal (facets, depth, grazing rim) */
   /* M8E ARCHITECTURAL REALISM: one facade kit for every civic building (windows with rooms behind them, frames, bay piers, interrupted slab
      edges, service bays, corner glazing, a balcony, integrated light) — built once after the last building (dress), 4 draws in total */
@@ -134,8 +136,24 @@ export function createCityScene(THREE, group, helpers) {
       } else {
         var PROF = profileFor(s.id, tiers), skins = skinsFor(PROF, tiers);
         for (var i = 0; i < tiers; i++) { var k = 1 - i * 0.09; var tw = w * k, td = d * k; var r = Math.min(tw, td) * 0.24; g.add(tier(cx, cz, tw, td, y, hEach, r, skins[i])); y += hEach; }   /* M8E: base / body / crown wall families; the continuous glass band + light ring are gone (real windows + interrupted strips instead) */
-        var cap = new THREE.Mesh(roundedBox(w * (1 - tiers * 0.09) * 0.7, 0.5, d * (1 - tiers * 0.09) * 0.7, Math.min(w, d) * 0.2), M.chrome); cap.position.set(cx, y, cz); g.add(cap);
-        g.add(diamond(cx, y + 1.4, cz, 0.7));
+        /* DESIGN DNA: the roof ends in a CREST, like the roster's heads — the chrome cap rises through a rolled, tapered finial into a polished
+           orb that carries the crown diamond (was a flat cap with the diamond hovering over it). Merged with the cap: no new draw. */
+        var capG = roundedBox(w * (1 - tiers * 0.09) * 0.7, 0.5, d * (1 - tiers * 0.09) * 0.7, Math.min(w, d) * 0.2), hF = Math.min(16, Math.max(5, y * 0.3)), rF = Math.min(1.6, Math.max(0.5, Math.min(w, d) * 0.07));
+        var finG = taperShaft(THREE, rF, rF * 0.22, hF, SDT, { flare: 1.35, belly: 0.05 }); finG.translate(0, 0.45, 0); var orbG = orb(THREE, rF * 0.62, SDT); orbG.translate(0, 0.45 + hF, 0);
+        /* DESIGN DNA: RIBS — four lacquered ribs rise from the rounded corners, sweep through every setback in one S-curve and converge
+           overhead into the crest orb, the way the roster's armour lines flow over the form and meet at the crest. Each rib hugs the 45°
+           point of its tier's rounded corner (outside the eave fascia); below 3.4 m it stays inside the collider box (the rounded corner
+           leaves 0.41·r of it free), so its radius is capped by that room and small buildings get none. Merged with the crest: no new draw. */
+        var ribs = [], r0c = Math.min(w, d) * 0.24, ribR = Math.min(0.3, (0.414 * r0c - 0.3) / 2);
+        if (s.type !== 'CYLINDER' && ribR >= 0.12) [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (sg) { var P3 = [], dgx = sg[0] / Math.SQRT2, dgz = sg[1] / Math.SQRT2;
+          function cornerAt(tw, td, off, yy) { var rr = Math.min(tw, td) * 0.24; return new THREE.Vector3(sg[0] * (tw / 2 - 0.293 * rr) + dgx * off, yy, sg[1] * (td / 2 - 0.293 * rr) + dgz * off); }
+          for (var ti = 0; ti < tiers; ti++) { var kk = 1 - ti * 0.09, off = 0.27 + ribR; P3.push(cornerAt(w * kk, d * kk, off, ti * hEach + (ti ? 0.6 : 0.02))); P3.push(cornerAt(w * kk, d * kk, off, (ti + 1) * hEach - 0.7)); }
+          var kT = 1 - (tiers - 1) * 0.09, cT = cornerAt(w * kT, d * kT, 0.27 + ribR, y + 1.2); cT.x *= 0.72; cT.z *= 0.72; P3.push(cT);
+          P3.push(new THREE.Vector3(sg[0] * rF * 1.5, y + 0.45 + hF * 0.3, sg[1] * rF * 1.5)); P3.push(new THREE.Vector3(sg[0] * rF * 0.55, y + 0.45 + hF - rF * 0.2, sg[1] * rF * 0.55));
+          var rg = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(P3, false, 'centripetal'), 10 * tiers + 20, ribR, SDT === 'HIGH' ? 7 : (SDT === 'MED' ? 5 : 4), false); rg.translate(0, -y, 0); ribs.push(rg); });
+        var crest = mergeGeometries([capG, finG, orbG].concat(ribs).map(function (q) { var nq = q.index ? q.toNonIndexed() : q; if (!nq.attributes.uv) nq.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(nq.attributes.position.count * 2), 2)); return nq; }), false);
+        var cap = new THREE.Mesh(crest || capG, M.chrome); cap.position.set(cx, y, cz); g.add(cap);
+        g.add(diamond(cx, y + 0.45 + hF + rF * 0.62 + 1.2, cz, 0.7));
       }
       /* M8E: the uniform chrome fins, the dark inset strips, the glowing tier-base rings and the portholes are replaced by the facade kit:
          bays of varied width between piers, framed windows per floor (rooms behind the glass), interrupted slab edges, service bays, corner
@@ -180,9 +198,9 @@ export function createCityScene(THREE, group, helpers) {
          bollard lights inside a smaller footprint (radius 0.12 m, was 0.26 m; height 0.96 m, was 1.19 m): a graphite-stone body on a chrome
          plinth ring, a neutral light band behind four chrome mullions, and a chamfered chrome cap. Three instanced draws. */
       (function () { function cyl(r0, r1, y0, y1, seg) { var g = new THREE.CylinderGeometry(r1, r0, y1 - y0, seg || 20); g.translate(0, (y0 + y1) / 2, 0); return g; }
-        var chromeParts = [cyl(0.12, 0.12, 0, 0.03), cyl(0.1, 0.106, 0.9, 0.935), cyl(0.106, 0.085, 0.935, 0.96)];
+        var capOrb = orb(THREE, 0.1, SDT); capOrb.scale(1, 0.55, 1); capOrb.translate(0, 0.935, 0); var chromeParts = [cyl(0.12, 0.12, 0, 0.03), cyl(0.1, 0.106, 0.9, 0.935), capOrb];   /* DESIGN DNA: a polished orb dome caps the bollard (was a chamfered disc) */
         for (var mi = 0; mi < 4; mi++) { var mb = new THREE.BoxGeometry(0.018, 0.14, 0.024); mb.translate(0, 0.83, 0.09); mb.rotateY(mi * Math.PI / 2 + Math.PI / 4); chromeParts.push(mb); }
-        var chromeGeo = mergeGeometries(chromeParts.map(function (g) { return g.index ? g.toNonIndexed() : g; }), false), bodyGeo = cyl(0.1, 0.095, 0.03, 0.76), bandGeo = cyl(0.09, 0.09, 0.76, 0.9, 16);
+        var chromeGeo = mergeGeometries(chromeParts.map(function (g) { return g.index ? g.toNonIndexed() : g; }), false), bodyGeo = cyl(0.1, 0.086, 0.03, 0.76), bandGeo = cyl(0.09, 0.09, 0.76, 0.9, 16);
         var caps = new THREE.InstancedMesh(chromeGeo, M.chrome, Math.max(1, np)); caps.name = 'CITY_BOLLARD_CHROME'; var tm = new THREE.Matrix4(), tp = new THREE.Vector3(), tq = new THREE.Quaternion(), ts = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), noRot = new THREE.Quaternion();
         for (var bi = 0; bi < np; bi++) { pylons.getMatrixAt(bi, tm); tm.decompose(tp, tq, ts); tp.y = 0; tm.compose(tp, noRot, one); pylons.setMatrixAt(bi, tm); rings.setMatrixAt(bi, tm); caps.setMatrixAt(bi, tm); }
         pylons.geometry.dispose(); pylons.geometry = bodyGeo; pylons.material = M.stone; pylons.name = 'CITY_BOLLARD_BODY'; rings.geometry.dispose(); rings.geometry = bandGeo; rings.name = 'CITY_BOLLARD_LIGHT';
@@ -456,18 +474,18 @@ export function createCityScene(THREE, group, helpers) {
         var RM = PR - 2.2, HM = 30, mastP = [], platP = [], beacP = [], bcol = [], UP = new THREE.Vector3(0, 1, 0);
         function stay(A, B, r) { var d = new THREE.Vector3().subVectors(B, A), L = d.length(), gg = new THREE.CylinderGeometry(r, r, L, 4, 1); gg.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3().addVectors(A, B).multiplyScalar(0.5), new THREE.Quaternion().setFromUnitVectors(UP, d.multiplyScalar(1 / L)), new THREE.Vector3(1, 1, 1))); mastP.push(gg); }
         for (var mk = 0; mk < 5; mk++) { var ma = mk / 5 * Math.PI * 2 + 0.22, cx = Math.cos(ma), cz = Math.sin(ma), mx = s.x + cx * RM, mz = s.z + cz * RM, tx = -cz, tz = cx, yaw = Math.atan2(cx, cz), y0 = PH + 1.2;
-          var shoe = new THREE.BoxGeometry(2.4, 1.2, 3.2); shoe.rotateY(yaw); shoe.translate(mx, PH + 0.6, mz); mastP.push(shoe);
-          var shaft = new THREE.CylinderGeometry(0.3, 0.58, HM, 8); shaft.translate(mx, y0 + HM / 2, mz); mastP.push(shaft);
-          [0.25, 0.5, 0.75].forEach(function (f) { var rr = 0.58 + (0.3 - 0.58) * f + 0.12, cg = new THREE.CylinderGeometry(rr, rr, 0.5, 12); cg.translate(mx, y0 + HM * f, mz); platP.push(cg); });
-          var yA = y0 + HM * 0.82, arm = new THREE.BoxGeometry(0.28, 0.28, 6); arm.rotateY(yaw + Math.PI / 2); arm.translate(mx, yA, mz); platP.push(arm);
+          var shoe = softBox(THREE, 2.4, 1.2, 3.2, 0.45, SDT); shoe.rotateY(yaw); shoe.translate(mx, PH + 0.6, mz); mastP.push(shoe);
+          var shaft = taperShaft(THREE, 0.58, 0.3, HM, SDT, { belly: 0.04 }); shaft.translate(mx, y0, mz); mastP.push(shaft);   /* DESIGN DNA: a tapered shaft on a rolled foot (was an 8-sided cylinder) */
+          [0.25, 0.5, 0.75].forEach(function (f) { var rr = 0.58 + (0.3 - 0.58) * f + 0.14, cg = orb(THREE, rr, SDT); cg.scale(1, 0.6, 1); cg.translate(mx, y0 + HM * f, mz); platP.push(cg); });   /* polished orb collars (the roster's joints) */
+          var yA = y0 + HM * 0.82, arm = softBox(THREE, 0.28, 0.28, 6, 0.12, SDT); arm.rotateY(yaw + Math.PI / 2); arm.translate(mx, yA, mz); platP.push(arm);
           [-1, 1].forEach(function (sg) { var px = mx + tx * sg * 2.9, pz = mz + tz * sg * 2.9, pod = new THREE.CylinderGeometry(0.2, 0.26, 0.5, 8); pod.translate(px, yA - 0.35, pz); platP.push(pod);
             stay(new THREE.Vector3(mx, yA - 0.3, mz), new THREE.Vector3(mx + tx * sg * 3.4, PH + 1.1, mz + tz * sg * 3.4), 0.05); });
-          var cap = new THREE.CylinderGeometry(0.42, 0.34, 0.5, 8); cap.translate(mx, y0 + HM + 0.25, mz); platP.push(cap);
-          var bc = new THREE.OctahedronGeometry(0.9, 0); bc.scale(1, 1.7, 1); bc.translate(mx, y0 + HM + 2.1, mz); beacP.push(bc); bcol.push(new THREE.Color(FAMS_RIM[mk])); }
+          var cap = orb(THREE, 0.46, SDT); cap.scale(1, 0.8, 1); cap.translate(mx, y0 + HM + 0.2, mz); platP.push(cap);
+          var bc = energyTip(THREE, 0.62, 4.2, FAMS_RIM[mk], SDT); bc.translate(mx, y0 + HM + 0.45, mz); beacP.push(bc); bcol.push(new THREE.Color(FAMS_RIM[mk])); }   /* the beacon is the roster's energy tip: the class colour at the root burning white at the point (was an octahedron) */
         var mastM = new THREE.MeshStandardMaterial({ color: 0x4b5361, roughness: 0.46, metalness: 0.7, envMapIntensity: 0.5 }), mastMesh = new THREE.Mesh(mergeGeometries(mastP.map(function (q) { return q.index ? q.toNonIndexed() : q; }), false), mastM); mastMesh.name = 'HALO_BEACON_MASTS'; mastMesh.userData.noMerge = true; g.add(mastMesh);
         var mastPlat = new THREE.Mesh(mergeGeometries(platP.map(function (q) { return q.index ? q.toNonIndexed() : q; }), false), M.platinum); mastPlat.name = 'HALO_BEACON_MAST_COLLARS'; mastPlat.userData.noMerge = true; g.add(mastPlat);
-        var beacG = mergeGeometries(beacP.map(function (q, qi) { var nq = q.index ? q.toNonIndexed() : q, n = nq.attributes.position.count, cc = new Float32Array(n * 3); for (var ci = 0; ci < n; ci++) { cc[ci * 3] = bcol[qi].r; cc[ci * 3 + 1] = bcol[qi].g; cc[ci * 3 + 2] = bcol[qi].b; } nq.setAttribute('color', new THREE.BufferAttribute(cc, 3)); return nq; }), false);
-        var beacM = new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: true }); beacM.color.setScalar(DAY ? 1.0 : 1.7); var beac = new THREE.Mesh(beacG, beacM); beac.name = 'HALO_BEACONS'; beac.userData.noMerge = true; beac.userData.dayNight = function (n) { beacM.color.setScalar(n ? 1.7 : 1.0); }; g.add(beac);
+        var beacG = mergeGeometries(beacP.map(function (q) { var nq = q.index ? q.toNonIndexed() : q; nq.deleteAttribute('uv'); return nq; }), false);   /* the tips carry their own root-to-point colour ramp */
+        var beacM = tipMaterial(THREE); beacM.color.setScalar(DAY ? 0.85 : 1.25); var beac = new THREE.Mesh(beacG, beacM); beac.name = 'HALO_BEACONS'; beac.userData.noMerge = true; beac.userData.dayNight = function (n) { beacM.color.setScalar(n ? 1.25 : 0.85); }; g.add(beac);
         g.userData.beaconMasts = { r: RM, h: HM, count: 5 }; })();
       (function () {   /* M12 AURA (owner pivot: aura / magic energy language): the HALO's energy architecture gets the spectral field — a class-colour
         glint on each beacon mast outside the glass.
