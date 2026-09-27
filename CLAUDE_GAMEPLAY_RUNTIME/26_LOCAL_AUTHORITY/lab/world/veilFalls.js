@@ -200,7 +200,7 @@ export function createVeilFalls(ctx) {
        with contact darkening; the class tint in the body and the glow (USE_COLOR — the old USE_INSTANCING_COLOR tint never ran in the
        fragment, so every Veil crystal glowed plain white); fewer cliff clumps. */
     var SQ = LOW ? 'LOW' : T; crysGlow = { value: night ? 0.5 : 0.35 };
-    function softMat(o) { var m = keep(new THREE.MeshStandardMaterial(Object.assign({ color: 0x909090, roughness: 0.14, metalness: 0.22, emissive: 0xffffff, emissiveIntensity: night ? 0.3 : 0.12, transparent: true, opacity: 0.96, envMapIntensity: 0.9 }, o || {})));
+    function softMat(o) { var m = keep(new THREE.MeshStandardMaterial(Object.assign({ color: 0xbababa, roughness: 0.12, metalness: 0.18, emissive: 0xffffff, emissiveIntensity: night ? 0.3 : 0.08, transparent: true, opacity: 0.92, envMapIntensity: 0.9 }, o || {})));   /* a lighter equal-channel body (review: 0x909090 read as saturated candy at garden range) */
       m.onBeforeCompile = function (sh) { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_COLOR\n totalEmissiveRadiance *= vColor.rgb;\n#endif'); };
       m.customProgramCacheKey = function () { return 'veil_soft_crystal_m20'; };
       applyCrystal(THREE, m, { tier: SQ, soft: true, glow: crysGlow, facet: 0.45, depth: 0.32, rim: 0.3, tipFade: 0.35, rimFade: 0.2, fadeNear: [10, 26], facetGlow: 0.6, facetLight: 0.5 }); return m; }
@@ -654,7 +654,7 @@ export function createVeilFalls(ctx) {
     shrubs.forEach(function (S) { canopy.push(S); }); info.garden_shrubs = shrubs.length;   /* M15c: the garden shrubs share the grove's instanced canopy draw */
     trunks.forEach(function (T2) { var tg = new THREE.CylinderGeometry(0.28, 0.55, T2.h, 6); tg.translate(T2.x, T2.y + T2.h / 2, T2.z); bodyP.push(tg); });   /* trunks join the villa platinum draw */
     var m4 = new THREE.Matrix4(), q4 = new THREE.Quaternion(), v4 = new THREE.Vector3(), s4 = new THREE.Vector3(), e4 = new THREE.Euler();
-    var cnG = keep(gemG()); cnG.scale(2.5, 2.7, 2.5); canopyMat = softMat({ emissiveIntensity: night ? 0.3 : 0.1 });   /* M20: soft gems (same bounds as the old octahedra: radius 1, height 2.7) */
+    var cnG = keep(gemG()); cnG.scale(2.5, 2.7, 2.5); canopyMat = softMat({ emissiveIntensity: night ? 0.3 : 0.07 });   /* M20: soft gems (same bounds as the old octahedra: radius 1, height 2.7) */
     var cnI = new THREE.InstancedMesh(cnG, canopyMat, Math.max(1, canopy.length)), cc = new THREE.Color();
     canopy.forEach(function (Cn, ci) { e4.set(0, Cn.yaw, 0); cnI.setMatrixAt(ci, m4.compose(v4.set(Cn.x, Cn.y, Cn.z), q4.setFromEuler(e4), s4.set(Cn.s, Cn.s, Cn.s))); cnI.setColorAt(ci, cc.set(Cn.c)); }); cnI.count = canopy.length; cnI.name = 'VEIL_GROVE_CANOPY'; group.add(cnI); info.trees = trunks.length;
     if (BLADES.length) { var blG = keep(colG({ sides: 5, samples: 1, bevel: 0, squash: 0.55, contact: 0.15 })); blG.scale(1, 2.0, 1); bladeMat = softMat({ emissiveIntensity: night ? 0.1 : 0.04 });   /* M20: small rooted soft columns (were octahedra); the canopy's soft program, a dimmer glow (a field of glowing blades read as stars on the ground) */
@@ -663,9 +663,9 @@ export function createVeilFalls(ctx) {
 
     /* the Veil spire: a tall VISIONARY crystal on a platinum plinth, placed on the north part of the mesa so it shows above the lower crests */
     var SB = HL.spire_bearing, SD = HL.spire_dist_m, sx = Math.sin(SB) * SD, sz = Math.cos(SB) * SD, sy = TOP + roll(sx, sz), SH = HL.spire_h_m || 48; taken.push({ x: sx, z: sz, r: 10 });
-    spireMat = softMat({ color: 0xb4a2ea, roughness: 0.1, metalness: 0.3, emissive: 0x9a78e0, emissiveIntensity: night ? 0.9 : 0.22, opacity: 0.94 });   /* M20: the soft crystal language (VISIONARY lavender body, class-coloured glow) */
+    spireMat = softMat({ color: 0xd2c8f2, roughness: 0.08, metalness: 0.3, emissive: 0x9a78e0, emissiveIntensity: night ? 0.8 : 0.16, opacity: 0.9 });   /* M20: the soft crystal language (VISIONARY lavender body, class-coloured glow) */
     var plinth = new THREE.CylinderGeometry(5.5, 6.5, 2.2, 8); plinth.translate(sx, sy + 1.1, sz); bodyP.push(plinth);   /* the plinth joins the platinum draw */
-    var spParts = spireParts, spG = colG({ samples: SQ === 'HIGH' ? 3 : 2, profile: [[0, 0.9], [0.05, 1.0], [0.78, 0.82], [0.95, 0.2], [1.0, 0]] }); spG.scale(3.2, SH, 3.2); spG.rotateY(0.4); spG.translate(sx, sy + 2.2, sz); spParts.push(spG);   /* M20: a rooted crystal column with a blunted point (was a 48 m octahedron) */
+    var spParts = spireParts, spG = colG({ samples: SQ === 'HIGH' ? 3 : 2, profile: [[0, 0.62], [0.05, 0.7], [0.45, 1.0], [0.8, 0.62], [0.95, 0.16], [1.0, 0]] }); spG.scale(2.3, SH, 2.3);   /* a slender spindle (review: the 3.2 m-wide column read as a heavy purple pillar) */ spG.rotateY(0.4); spG.translate(sx, sy + 2.2, sz); spParts.push(spG);   /* M20: a rooted crystal column with a blunted point (was a 48 m octahedron) */
     [[7, 0.45, 1.3], [-6, 0.32, 2.4], [2, 0.62, 3.9]].forEach(function (S2) { var sg = gemG(); sg.scale(2.75, 2 * (5 * S2[1] + 3), 2.75); sg.rotateZ(S2[0] * 0.02); sg.translate(sx + Math.cos(S2[2]) * S2[0], sy + 2.2 + SH * S2[1], sz + Math.sin(S2[2]) * S2[0]); spParts.push(sg); });
     var spM = merged(spParts, spireMat, 'VEIL_SPIRE');   /* the spire and its three satellite shards: one draw */
     info.spire = { x: +sx.toFixed(1), z: +sz.toFixed(1), top_y: +(sy + 2.2 + SH).toFixed(1) };
@@ -708,7 +708,7 @@ export function createVeilFalls(ctx) {
   }
   function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (frontU) frontU.uTime.value = clock; if (wetTU) wetTU.uTime.value = clock; if (lakeU) lakeU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
   function setNight(n) { night = !!n; if (litNightU) litNightU.value = night ? 1 : 0; if (waterU) waterU.uNight.value = night ? 1 : 0; if (frontU) frontU.uNight.value = night ? 1 : 0; if (wetTU) wetTU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
-    if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.3 : 0.1; if (bladeMat) bladeMat.emissiveIntensity = night ? 0.1 : 0.04; if (spireMat) spireMat.emissiveIntensity = night ? 0.9 : 0.22; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; if (flMat) flMat.emissiveIntensity = night ? 0.45 : 0.14; if (crysGlow) crysGlow.value = night ? 0.5 : 0.35; }
+    if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.3 : 0.07; if (bladeMat) bladeMat.emissiveIntensity = night ? 0.1 : 0.04; if (spireMat) spireMat.emissiveIntensity = night ? 0.8 : 0.16; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; if (flMat) flMat.emissiveIntensity = night ? 0.45 : 0.14; if (crysGlow) crysGlow.value = night ? 0.5 : 0.35; }
   function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; group = null; }
   function debug() { return info; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug, anchors: function () { return ANCH; } };
