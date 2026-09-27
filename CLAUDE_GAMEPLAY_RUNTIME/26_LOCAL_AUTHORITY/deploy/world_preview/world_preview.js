@@ -14,7 +14,7 @@ var canvas = document.getElementById('view');
 var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: quality.get().antialias, powerPreference: 'low-power', preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(quality.get().dpr_cap, devicePixelRatio || 1));
 var Tq = quality.get(); if (Tq.shadows && Tq.shadows !== 'off') { renderer.shadowMap.enabled = true; renderer.shadowMap.type = Tq.shadows === 'soft' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap; }
-if (params.get('sky') !== 'night') { renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15; }
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;   /* M20: mirrors play.js — ACES 1.15 in both times of day */
 var scene = new THREE.Scene(); var camera = new THREE.PerspectiveCamera(55, 1, 0.4, 1400);
 function resize() { var w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize); resize();

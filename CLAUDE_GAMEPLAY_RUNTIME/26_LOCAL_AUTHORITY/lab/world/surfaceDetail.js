@@ -16,13 +16,19 @@ var HELPERS = [
   'float sdNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(sdHash(i), sdHash(i + vec2(1.0, 0.0)), f.x), mix(sdHash(i + vec2(0.0, 1.0)), sdHash(i + vec2(1.0, 1.0)), f.x), f.y); }'
 ].join('\n');
 
+/* M20 (owner 2026-09-27, materials: "normal / detail information … micro surface breakup … edge response"): a derivative bump for the
+   families' micro relief (orange-peel on lacquered panels, a honed grain on stone / cladding / kerbs, a fine aggregate on pavers). Screen
+   derivatives of a SMOOTH world-space field only (no per-pixel hash: that sparkles), faded out by 22 m, never on LOW. */
+var SD_MICRO = 'vec3 sdMicroBump(vec3 sp, vec3 sn, float h) { vec3 sx = dFdx(sp), sy = dFdy(sp); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1); vec3 grad = sign(det) * (dFdx(h) * r1 + dFdy(h) * r2); return normalize(abs(det) * sn - grad); }';
+
 var PATCHED = typeof WeakSet !== 'undefined' ? new WeakSet() : null;   /* patched materials (a clone copies userData but not the patch, so it may be patched on its own) */
 function f(v) { v = +v; return (Math.round(v * 10000) / 10000).toFixed(4); }
 
-/* spec: { kind, cell: [u, v] m, seam: m, seamDark, bevel, toneVar, roughVar, macro, grain, band: [every m, height m], bandTone, stagger, lod: [near, far] m, tier } */
+/* spec: { kind, cell: [u, v] m, seam: m, seamDark, bevel, toneVar, roughVar, macro, grain, band: [every m, height m], bandTone, stagger, lod: [near, far] m, tier,
+   foot: [height m, depth] (M20: contact darkening at the foot of vertical faces), micro: [frequency /m, relief m] (M20: micro normal relief) } */
 export function surfaceDetail(THREE, mat, spec) {
   if (!mat || !mat.isMeshStandardMaterial || (PATCHED ? PATCHED.has(mat) : mat.userData.surfaceDetail)) return mat;
-  var S = Object.assign({ kind: 'PANELS', cell: [1.8, 1.2], seam: 0.03, seamDark: 0.6, bevel: 0.35, toneVar: 0.06, roughVar: 0.22, macro: 0.05, grain: 0.05, band: null, bandTone: 0.82, stagger: 0, lod: [30, 140], tier: 'HIGH', metalSeam: 0.5, seamless: false }, spec || {});
+  var S = Object.assign({ kind: 'PANELS', cell: [1.8, 1.2], seam: 0.03, seamDark: 0.6, bevel: 0.35, toneVar: 0.06, roughVar: 0.22, macro: 0.05, grain: 0.05, band: null, bandTone: 0.82, stagger: 0, lod: [30, 140], tier: 'HIGH', metalSeam: 0.5, seamless: false, foot: null, micro: null, glass: 0 }, spec || {});
   var LOW = S.tier === 'LOW'; var K = S.kind;
   var body = [
     '#include <color_fragment>',
@@ -44,48 +50,54 @@ export function surfaceDetail(THREE, mat, spec) {
   ]);
   if (!LOW && S.macro > 0) body.push('float sdMacro = sdNoise(vSdW.xz * 0.045 + vSdW.y * 0.03) - 0.5; sdTone *= 1.0 + sdMacro * ' + f(S.macro * 2) + '; sdRough *= 1.0 + sdMacro * ' + f(S.macro * 3) + ';');
   if (!LOW && S.grain > 0) body.push('float sdGrain = sdNoise(sdUV * 7.3) * 0.6 + sdNoise(sdUV * 23.0) * 0.4 - 0.5; sdTone *= 1.0 + sdGrain * ' + f(S.grain) + ' * sdNear; sdRough *= 1.0 + sdGrain * ' + f(S.grain * 2.2) + ' * sdNear;');
+  if (!LOW && S.foot) body.push('if (!sdFloor) { float sdFt = (1.0 - smoothstep(0.0, ' + f(S.foot[0]) + ', vSdW.y)) * step(-0.35, vSdW.y); sdTone *= 1.0 - ' + f(S.foot[1]) + ' * sdFt * sdFt; }');   /* M20: the lowest metre or two of a wall sees less sky and more floor — a soft contact darkening at the foot (ground level, world y ≈ 0: the plaza and district floor) */
+  if (!LOW && S.glass > 0) body.push('float sdFr = pow(1.0 - clamp(abs(dot(normalize(vSdN), normalize(cameraPosition - vSdW))), 0.0, 1.0), 3.0); sdTone *= mix(' + f(1 - S.glass * 0.25) + ', 1.0, sdFr);');   /* M20 glass depth: head-on the pane reads into the (darker) interior, at a grazing angle it turns to sky reflection */
   if (S.band) body.push('if (!sdFloor) { float sdBy = mod(vSdW.y, ' + f(S.band[0]) + '); float sdBand = smoothstep(' + f(S.band[0] - S.band[1]) + ' - sdAA, ' + f(S.band[0] - S.band[1]) + ', sdBy); sdTone *= mix(1.0, ' + f(S.bandTone) + ', sdBand); sdRough *= mix(1.0, 0.72, sdBand); }');
   body.push('diffuseColor.rgb *= sdTone * mix(1.0, ' + f(S.seamDark) + ', sdSeam);');
   var rough = ['#include <roughnessmap_fragment>', 'roughnessFactor = clamp(mix(roughnessFactor * sdRough, max(roughnessFactor, 0.86), sdSeam), 0.04, 1.0);'];
   var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor *= 1.0 - ' + f(S.metalSeam) + ' * sdSeam;'];
+  if (!LOW && S.glass > 0) metal.push('metalnessFactor *= mix(' + f(1 - S.glass) + ', 1.0, sdFr);');   /* a metal-tinted pane mirrors the sky equally at every angle (a flat pale sheet): its reflection now follows the Fresnel of real glass */
+  var coat = ['#include <lights_physical_fragment>', '#ifdef USE_CLEARCOAT', 'material.clearcoat *= 1.0 - 0.9 * sdSeam; material.clearcoatRoughness = clamp(material.clearcoatRoughness * mix(1.0, sdRough, 0.85) + 0.3 * sdSeam, 0.0525, 1.0);', '#endif'];   /* M20: the lacquer layer follows the piece: no clear coat down in the seams (they read as real grooves, not painted lines), the coat's gloss varies with each panel's roughness */
   var nrm = ['#include <normal_fragment_maps>'];
+  if (!LOW && S.micro) nrm.push('{ float sdMk = 1.0 - smoothstep(6.0, 22.0, sdDist); if (sdMk > 0.01) { float sdMh = (sdNoise(sdUV * ' + f(S.micro[0]) + ') + 0.5 * sdNoise(sdUV * ' + f(S.micro[0] * 2.13) + ' + 7.1)) * ' + f(S.micro[1]) + ' * sdMk; normal = sdMicroBump(-vViewPosition, normal, sdMh); } }');
   if (!LOW && S.bevel > 0 && K !== 'BRUSHED' && !S.seamless) nrm.push(   /* chamfer: inside the bevel width the normal tilts toward the nearest seam, so each panel / slab reads as a separate, slightly inset piece */
     '{ float sdBW = ' + f(Math.max(S.seam * 2.5, 0.05)) + '; float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, sdBW, sdD)) * sdNear * clamp(sdBW / sdAA, 0.0, 1.0); vec3 sdDir = sdE.x < sdE.y ? sdTU * (sdF.x < 0.5 ? -1.0 : 1.0) : sdTV * (sdF.y < 0.5 ? -1.0 : 1.0);',
     '  normal = normalize(normal + sdK * normalize((viewMatrix * vec4(sdDir, 0.0)).xyz)); }');
   var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey;
-  var key = 'mahworld-sd-' + K + '-' + [S.cell[0], S.cell[1], S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.band ? S.band.join('x') : 0, S.bandTone, S.stagger, S.lod.join('x'), LOW ? 'L' : 'H', S.metalSeam, S.seamless ? 'S' : 'G'].join('_');
+  var key = 'mahworld-sd-' + K + '-' + [S.cell[0], S.cell[1], S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.band ? S.band.join('x') : 0, S.bandTone, S.stagger, S.lod.join('x'), LOW ? 'L' : 'H', S.metalSeam, S.seamless ? 'S' : 'G', S.foot ? S.foot.join('x') : 0, S.micro ? S.micro.join('x') : 0, S.glass, 'c1'].join('_');
   mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW; varying vec3 vSdN;').replace('#include <project_vertex>', ['#include <project_vertex>',
       '{ vec4 sdP = vec4(transformed, 1.0); vec3 sdN0 = objectNormal;',
       '#ifdef USE_BATCHING', '  sdP = batchingMatrix * sdP; sdN0 = mat3(batchingMatrix) * sdN0;', '#endif',
       '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP; sdN0 = mat3(instanceMatrix) * sdN0;', '#endif',
       '  vSdW = (modelMatrix * sdP).xyz; vSdN = normalize(mat3(modelMatrix) * sdN0); }'].join('\n'));
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + HELPERS).replace('#include <color_fragment>', body.join('\n'))
-      .replace('#include <roughnessmap_fragment>', rough.join('\n')).replace('#include <metalnessmap_fragment>', metal.join('\n')).replace('#include <normal_fragment_maps>', nrm.join('\n')); };
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + SD_MICRO).replace('#include <color_fragment>', body.join('\n'))
+      .replace('#include <roughnessmap_fragment>', rough.join('\n')).replace('#include <metalnessmap_fragment>', metal.join('\n')).replace('#include <normal_fragment_maps>', nrm.join('\n')).replace('#include <lights_physical_fragment>', coat.join('\n')); };
   mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|' + key; };
   mat.userData.surfaceDetail = { kind: K, key: key }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
   return mat;
 }
 
-/* the material families of the world, tuned once here so every module speaks the same surface language */
+/* the material families of the world, tuned once here so every module speaks the same surface language. M20: walls / supports / stone gain a
+   foot (contact darkening where they meet the floor) and cladding, stone, panels and paving a micro relief (normal detail near the camera) */
 export var SURFACE = {
-  PLAZA: { kind: 'HARDSCAPE', cell: [2.4, 1.2], seam: 0.035, seamDark: 0.7, bevel: 0.28, toneVar: 0.09, roughVar: 0.26, macro: 0.05, grain: 0.07, stagger: 0.5, lod: [26, 110], metalSeam: 0.6 },
-  DISTRICT: { kind: 'HARDSCAPE', cell: [3.2, 1.6], seam: 0.045, seamDark: 0.66, bevel: 0.22, toneVar: 0.08, roughVar: 0.24, macro: 0.06, grain: 0.06, stagger: 0.5, lod: [30, 130], metalSeam: 0.6 },
+  PLAZA: { kind: 'HARDSCAPE', cell: [2.4, 1.2], seam: 0.035, seamDark: 0.7, bevel: 0.28, toneVar: 0.09, roughVar: 0.26, macro: 0.05, grain: 0.07, stagger: 0.5, lod: [26, 110], metalSeam: 0.6, micro: [2.4, 0.008] },
+  DISTRICT: { kind: 'HARDSCAPE', cell: [3.2, 1.6], seam: 0.045, seamDark: 0.66, bevel: 0.22, toneVar: 0.08, roughVar: 0.24, macro: 0.06, grain: 0.06, stagger: 0.5, lod: [30, 130], metalSeam: 0.6, micro: [2.4, 0.008] },
   DECK: { kind: 'HARDSCAPE', cell: [3.0, 3.0], seam: 0.03, seamDark: 0.72, bevel: 0.18, toneVar: 0.05, roughVar: 0.2, macro: 0.035, grain: 0.05, stagger: 0, lod: [24, 100], metalSeam: 0.5 },
-  FACADE: { kind: 'PANELS', cell: [1.8, 1.2], seam: 0.028, seamDark: 0.62, bevel: 0.32, toneVar: 0.07, roughVar: 0.3, macro: 0.04, grain: 0.035, band: [3.6, 0.22], bandTone: 0.78, lod: [30, 140], metalSeam: 0.5 },
-  STRUCTURE: { kind: 'PANELS', cell: [1.2, 2.4], seam: 0.022, seamDark: 0.66, bevel: 0.26, toneVar: 0.05, roughVar: 0.24, macro: 0.035, grain: 0.03, lod: [24, 120], metalSeam: 0.45 },
-  BRUSHED: { kind: 'BRUSHED', toneVar: 0.05, roughVar: 0.55, macro: 0.03, grain: 0, lod: [12, 60] },
-  TOWER: { kind: 'PANELS', cell: [3.2, 7.2], seam: 0.04, seamDark: 0.6, bevel: 0.3, toneVar: 0.05, roughVar: 0.26, macro: 0.04, grain: 0.03, band: [3.6, 0.16], bandTone: 0.84, lod: [40, 220], metalSeam: 0.5 },
-  CONCRETE: { kind: 'HARDSCAPE', cell: [4, 4], seamless: true, toneVar: 0, roughVar: 0, macro: 0.07, grain: 0.08, lod: [30, 120] },
-  PAVER: { kind: 'HARDSCAPE', cell: [4.0, 2.0], seam: 0.03, seamDark: 0.76, bevel: 0.2, toneVar: 0.06, roughVar: 0.2, macro: 0.06, grain: 0.08, stagger: 0.5, lod: [30, 120], metalSeam: 0.5 },
-  KERB: { kind: 'PANELS', cell: [1.0, 1.0], seam: 0.02, seamDark: 0.62, bevel: 0.3, toneVar: 0.06, roughVar: 0.22, macro: 0.03, grain: 0.04, lod: [24, 100], metalSeam: 0.5 },
-  GLAZING: { kind: 'PANELS', cell: [1.5, 1.2], seam: 0.07, seamDark: 0.32, bevel: 0, toneVar: 0.05, roughVar: 0.35, macro: 0.03, grain: 0, band: [3.6, 0.34], bandTone: 0.5, lod: [40, 180], metalSeam: 0 },   /* M8B: curtain wall — mullions / transoms, a spandrel per storey, per-pane reflection variation */
+  FACADE: { kind: 'PANELS', cell: [1.8, 1.2], seam: 0.028, seamDark: 0.62, bevel: 0.32, toneVar: 0.07, roughVar: 0.3, macro: 0.04, grain: 0.035, band: [3.6, 0.22], bandTone: 0.78, lod: [30, 140], metalSeam: 0.5, foot: [2.2, 0.2], micro: [1.6, 0.006] },
+  STRUCTURE: { kind: 'PANELS', cell: [1.2, 2.4], seam: 0.022, seamDark: 0.66, bevel: 0.26, toneVar: 0.05, roughVar: 0.24, macro: 0.035, grain: 0.03, lod: [24, 120], metalSeam: 0.45, foot: [1.8, 0.2], micro: [1.6, 0.006] },
+  BRUSHED: { kind: 'BRUSHED', toneVar: 0.05, roughVar: 0.55, macro: 0.03, grain: 0, lod: [12, 60], foot: [1.4, 0.16] },
+  TOWER: { kind: 'PANELS', cell: [3.2, 7.2], seam: 0.04, seamDark: 0.6, bevel: 0.3, toneVar: 0.05, roughVar: 0.26, macro: 0.04, grain: 0.03, band: [3.6, 0.16], bandTone: 0.84, lod: [40, 220], metalSeam: 0.5, foot: [3.0, 0.2], micro: [1.2, 0.007] },
+  CONCRETE: { kind: 'HARDSCAPE', cell: [4, 4], seamless: true, toneVar: 0, roughVar: 0, macro: 0.07, grain: 0.08, lod: [30, 120], foot: [1.6, 0.18], micro: [3.0, 0.01] },
+  PAVER: { kind: 'HARDSCAPE', cell: [4.0, 2.0], seam: 0.03, seamDark: 0.76, bevel: 0.2, toneVar: 0.06, roughVar: 0.2, macro: 0.06, grain: 0.08, stagger: 0.5, lod: [30, 120], metalSeam: 0.5, micro: [2.6, 0.008] },
+  KERB: { kind: 'PANELS', cell: [1.0, 1.0], seam: 0.02, seamDark: 0.62, bevel: 0.3, toneVar: 0.06, roughVar: 0.22, macro: 0.03, grain: 0.04, lod: [24, 100], metalSeam: 0.5, foot: [0.5, 0.15], micro: [3.5, 0.008] },
+  GLAZING: { kind: 'PANELS', cell: [1.5, 1.2], seam: 0.07, seamDark: 0.32, bevel: 0, toneVar: 0.05, roughVar: 0.35, macro: 0.03, grain: 0, band: [3.6, 0.34], bandTone: 0.5, lod: [40, 180], metalSeam: 0, foot: [1.2, 0.12], glass: 0.6 },   /* M8B: curtain wall — mullions / transoms, a spandrel per storey, per-pane reflection variation */
   SAND: { kind: 'HARDSCAPE', cell: [4, 4], seamless: true, toneVar: 0, roughVar: 0, macro: 0.08, grain: 0.1, lod: [20, 90] },   /* M8B: dry-sand grain + drift breakup on the shore band */
-  FACADE_PLAIN: { kind: 'PANELS', cell: [1.8, 1.2], seam: 0.024, seamDark: 0.66, bevel: 0.3, toneVar: 0.08, roughVar: 0.3, macro: 0.05, grain: 0.035, lod: [30, 140], metalSeam: 0.5 },   /* M8E: platinum skin between real windows (the storey band now comes from the slab edges) */
-  COMPOSITE: { kind: 'PANELS', cell: [3.0, 1.2], seam: 0.018, seamDark: 0.7, bevel: 0.22, toneVar: 0.06, roughVar: 0.18, macro: 0.04, grain: 0.025, stagger: 0.5, lod: [30, 140], metalSeam: 0.3 },   /* M8E: neutral architectural composite rainscreen, staggered long panels */
-  CLADDING: { kind: 'PANELS', cell: [2.4, 1.2], seam: 0.02, seamDark: 0.6, bevel: 0.25, toneVar: 0.1, roughVar: 0.22, macro: 0.06, grain: 0.08, stagger: 0.5, lod: [30, 140], metalSeam: 0.3 },   /* M8E: honed stone cladding for heavy bases */
-  MONOLITH: { kind: 'PANELS', cell: [2.5, 3.6], seam: 0.016, seamDark: 0.35, bevel: 0.14, toneVar: 0.3, roughVar: 0.95, macro: 0.05, grain: 0.02, lod: [30, 160], metalSeam: 0.2 },   /* M9: large-format satin black cladding (MAH MATCH): 2.5 m panels on its light-line rhythm, 3.6 m courses */
-  STONE: { kind: 'PANELS', cell: [0.9, 0.45], seam: 0.012, seamDark: 0.8, bevel: 0.12, toneVar: 0.08, roughVar: 0.2, macro: 0.06, grain: 0.1, stagger: 0.5, lod: [16, 70], metalSeam: 0.3 }
+  FACADE_PLAIN: { kind: 'PANELS', cell: [1.8, 1.2], seam: 0.024, seamDark: 0.66, bevel: 0.3, toneVar: 0.08, roughVar: 0.3, macro: 0.05, grain: 0.035, lod: [30, 140], metalSeam: 0.5, foot: [2.2, 0.2], micro: [1.6, 0.006] },   /* M8E: platinum skin between real windows (the storey band now comes from the slab edges) */
+  COMPOSITE: { kind: 'PANELS', cell: [3.0, 1.2], seam: 0.018, seamDark: 0.7, bevel: 0.22, toneVar: 0.06, roughVar: 0.18, macro: 0.04, grain: 0.025, stagger: 0.5, lod: [30, 140], metalSeam: 0.3, foot: [2.2, 0.2], micro: [1.4, 0.007] },   /* M8E: neutral architectural composite rainscreen, staggered long panels */
+  CLADDING: { kind: 'PANELS', cell: [2.4, 1.2], seam: 0.02, seamDark: 0.6, bevel: 0.25, toneVar: 0.1, roughVar: 0.22, macro: 0.06, grain: 0.08, stagger: 0.5, lod: [30, 140], metalSeam: 0.3, foot: [1.8, 0.22], micro: [3.2, 0.012] },   /* M8E: honed stone cladding for heavy bases */
+  MONOLITH: { kind: 'PANELS', cell: [2.5, 3.6], seam: 0.016, seamDark: 0.35, bevel: 0.14, toneVar: 0.3, roughVar: 0.95, macro: 0.05, grain: 0.02, lod: [30, 160], metalSeam: 0.2, foot: [2.4, 0.18], micro: [1.2, 0.007] },   /* M9: large-format satin black cladding (MAH MATCH): 2.5 m panels on its light-line rhythm, 3.6 m courses */
+  STONE: { kind: 'PANELS', cell: [0.9, 0.45], seam: 0.012, seamDark: 0.8, bevel: 0.12, toneVar: 0.08, roughVar: 0.2, macro: 0.06, grain: 0.1, stagger: 0.5, lod: [16, 70], metalSeam: 0.3, foot: [1.2, 0.2], micro: [4.0, 0.012] }
 };
 
 /* apply a named family with the current tier (a missing / failing tier probe means HIGH) */

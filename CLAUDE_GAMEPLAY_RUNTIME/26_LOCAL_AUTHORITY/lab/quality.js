@@ -11,6 +11,9 @@ export var TIERS = {
   HIGH: { dpr_cap: 3.0, dpr_floor: 1.0, particles: 1.0, clouds: 22, city_fins: true, fog_far_scale: 1.0, lod_far_m: 220, antialias: true, shadows: 'pcf', shadow_map: 1024, shadow_reach_m: 24 }
   /* shadows: the sun casts a shadow map that follows the player (reach = half-size of the orthographic shadow box, metres). Measured 2026-09-17: a PCF 1024 map on the phone tier cost +1.9 ms p95 on the Spec A route (the 70k-triangle player drawn again + PCF in every receiving fragment), so MED / LOW use the blob contact shadow only; HIGH (desktop) has the real sun shadow — the player casts (PCF 1024, reach 24 m); soft 2048 with every rig casting cost +4.9 ms p95 on the desktop route */
   /* PASS 4 (G28, measured 2026-09-18 with probe_fidelity at emulated DPR 2 / 3): the phone tier's old cap of 1.0 rendered 331×717 buffer px behind a 1170×2532 screen (28 % of the device pixels; his gameplay box 193 buffer px tall, upscaled ~5×) — that was the primary 'pixelated / low-res' cause, not the assets. MED renders up to 2× device pixels (a 3× phone gets 780×1688), HIGH (desktop / opt-in) up to the full device ratio, floors 1.0; the adaptive ratio still drops 0.25 per step above 21 ms average, so a slow phone settles at 1.0 instead of 0.6. */
+  /* M20 (light / post / materials): no post pass on any tier — MSAA (antialias) stays the only screen-space cost; the grade lives in the light rig
+     and the ACES stage. The new presentation costs are tiered in their modules (the budget table keeps its eleven keys): contact-AO directional
+     casts (world/contactAO.js) and the surface micro relief / wall-foot darkening / glass Fresnel (world/surfaceDetail.js) are MED + HIGH only. */
   /* antialias is read once at renderer creation (a WebGL context attribute) — a tier change applies it on the next load */
 };
 export function createQuality(opts) {
