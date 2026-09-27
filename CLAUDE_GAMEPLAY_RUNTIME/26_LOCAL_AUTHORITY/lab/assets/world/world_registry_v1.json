@@ -2682,7 +2682,7 @@
     "tint_alpha": 0.2,
     "shard_density_per_100m2": 0.35,
     "dust": 0.7,
-    "meadow": 0.6,
+    "meadow": 0.7,
     "monoliths": [
      {
       "x": 150,
@@ -2731,7 +2731,7 @@
     "tint_alpha": 0.2,
     "shard_density_per_100m2": 0.35,
     "dust": 0.6,
-    "meadow": 0.7,
+    "meadow": 0.6,
     "monoliths": [
      {
       "x": 84,
@@ -2934,7 +2934,7 @@
     "tint_alpha": 0.18,
     "shard_density_per_100m2": 0.35,
     "dust": 0.8,
-    "meadow": 0.45,
+    "meadow": 0.6,
     "monoliths": [
      {
       "x": -46,
@@ -2975,7 +2975,7 @@
     "tint_alpha": 0.16,
     "shard_density_per_100m2": 0.35,
     "dust": 0.7,
-    "meadow": 0.3,
+    "meadow": 0.4,
     "coast_ring": true,
     "monoliths": []
    },
@@ -10263,7 +10263,7 @@
   "review": "QR_FIVE_SANCTUARY_NIGHT_CIRCUIT"
  },
  "combat_zones": {
-  "_doc": "M15b owner 2026-09-27 correction (supersedes the M15 12 m ring): DUEL COURTS are dormant world infrastructure drawn into the ground — a large square-diamond court (crystalline inlay, faint faceted seams, diamond anchors, low ground-bound energy); no cage, walls, raised arena or spectator structure; no collider. States: DORMANT (white / cool white-blue / pale ice only — ZERO class colour), READY (someone on it: a neutral response, white presence, still zero class colour), ACTIVATION (~2.8 s: the court splits into equal class territories by its own symmetry — five fighters, one of each class, take four corner territories and a central diamond, each one fifth; seams through white; then it lets go), ACTIVE_DUEL (neutral court; each fighter carries a local class-colour presence field that moves with them), RESOLUTION (~1.4 s drain), RESET (~1.2 s neutral sweep) → DORMANT. ONE court is placed until the owner verifies the footprint and the dormant look; the M15 sites wait in pending_sites for a re-survey at the new footprint. Runtime: lab/world/combatZones.js (world module 'combatZones'; worldB.combatZones() is the host API).",
+  "_doc": "M15b owner 2026-09-27 correction (supersedes the M15 12 m ring): DUEL COURTS are dormant world infrastructure drawn into the ground — a large square-diamond court (crystalline inlay, faint faceted seams, diamond anchors, low ground-bound energy); no cage, walls, raised arena or spectator structure; no collider. States: DORMANT (white / cool white-blue / pale ice — no class OWNERSHIP colour; M16: five tiny permanent class gems in a centre rosette, gold / blue / crimson / violet / pink, say all five classes may duel here — world identity, kept apart from the combat state, never colouring the surface), READY (someone on it: a neutral response, white presence, still no ownership colour), ACTIVATION (~2.8 s: the court splits into equal class territories by its own symmetry — five fighters, one of each class, take four corner territories and a central diamond, each one fifth; seams through white; then it lets go), ACTIVE_DUEL (neutral court; each fighter carries a local class-colour presence field and square-diamond footprint that move with them; the other classes do not light the court), RESOLUTION (~1.4 s drain), RESET (~1.2 s neutral sweep) → DORMANT. ONE court is placed until the owner verifies the footprint and the dormant look; the M15 sites wait in pending_sites for a re-survey at the new footprint. Runtime: lab/world/combatZones.js (world module 'combatZones'; worldB.combatZones() is the host API).",
   "playable_m": 31,
   "border_m": 1.2,
   "shape": "SQUARE_DIAMOND",
@@ -10364,6 +10364,17 @@
   ],
   "territories": {
    "rule": "the court's own symmetry, equal shares: 5 = four corner territories + a central diamond |x|+|z| <= h*sqrt(0.4) (each one fifth); 4 = corner quadrants; 3 = 120-degree sectors, mirror-symmetric; 2 = halves on the court symmetry line nearest the fighters; fighters take the territory nearest them (least total travel)"
+  },
+  "identity_markers": {
+   "classes": [
+    "ATHLETE",
+    "TITAN",
+    "LEAN",
+    "VISIONARY",
+    "BAGE"
+   ],
+   "layout": "centre rosette, radius 2.1 m, one gem (about 0.27 m) per class, 72 degrees apart",
+   "rule": "permanent world identity in every state; combat colour comes only from the actual participants"
   }
  }
 }

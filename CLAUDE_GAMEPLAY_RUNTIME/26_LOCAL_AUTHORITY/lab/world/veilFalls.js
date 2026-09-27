@@ -18,7 +18,7 @@
    The ridge sculpt keeps the face under the curtain as authored (keep_line + veilCurtainKeep; host-safety 17). Draws: curtain 1, wet rock 1, foam 1, mist 1 (not LOW), cliff crystals 1 (not LOW), highland ground 1,
    lake 1, trunks 1, canopies 1, villas 3, spire 1, lanterns 1, pad 1 — all behind the west ridge, frustum-culled as a group. */
 import { ridgeStations, ridgeFaceSegment, ridgeFacePoint } from './ridgeLayout.js';
-import { SPECTRAL, CLASS_TINT } from './aura.js'; import { applyGeology } from './surfaceDetail.js'; import { softBox } from './formKit.js';
+import { SPECTRAL, CLASS_TINT, CRYSTAL_TINT } from './aura.js'; import { applyGeology } from './surfaceDetail.js'; import { softBox } from './formKit.js';
 
 var NOISE = [
   'float vfH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
@@ -234,7 +234,7 @@ export function createVeilFalls(ctx) {
       for (var i = 0; i <= n; i++) { var f = i / n, x = a.x + dx * f, z = a.z + dz * f; P.push(x - px, TOP + roll(x - px, z - pz) + lift, z - pz, x + px, TOP + roll(x + px, z + pz) + lift, z + pz); if (i) { var k = i * 2 - 2; I.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); } }
       var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); g.computeVertexNormals(); if (g.attributes.normal.getY(0) < 0) { I.reverse(); g.setIndex(I); g.computeVertexNormals(); } list.push(g); }   /* a flush ribbon that follows the meadow */
     function fwd(yaw, k) { return [Math.sin(yaw) * k, Math.cos(yaw) * k]; } function side(yaw, k) { return [Math.cos(yaw) * k, -Math.sin(yaw) * k]; }
-    var SHRUB = [CLASS_TINT.purple, SPECTRAL.violet, SPECTRAL.pink, CLASS_TINT.pink, SPECTRAL.gold, SPECTRAL.ice, 0xd9dcef];   /* class families + pearl white only (colour law) */
+    var SHRUB = [CLASS_TINT.purple, CRYSTAL_TINT.gold, CRYSTAL_TINT.pink, CRYSTAL_TINT.red, CRYSTAL_TINT.blue, 0xd9dcef];   /* M16: gardens of all five classes + pearl white (was purple / violet / pink-led) */
     /* the lane: a pale 3.4 m ribbon on the meadow, lanterns along both edges */
     for (var li = 0, lz = -62; lz < 62; lz += 4, li++) { var A0 = W3(laneX(lz), lz), B0 = W3(laneX(lz + 4), lz + 4); strip(bodyP, A0, B0, 3.4, 0.07);
       if (li % 2 === 0) { var dl = (laneX(lz + 0.5) - laneX(lz - 0.5)), nl = Math.hypot(1, dl); [-1, 1].forEach(function (sd) { var P = W3(laneX(lz) + sd * 2.4 / nl, lz - sd * 2.4 * dl / nl); laneLamps.push(P.x, P.y + 1.2, P.z); }); } }
@@ -246,7 +246,7 @@ export function createVeilFalls(ctx) {
       for (var cI = 0; cI < 8; cI++) { var a = cI / 8 * Math.PI * 2 + 0.2; colAt(bodyP, 6.3, civ.x + Math.cos(a) * 10.5, civ.y + 0.25, civ.z + Math.sin(a) * 10.5); }
       lensAt(bodyP, 13, 13, 1.6, 0.55, civ.x, civ.y + 6.8, civ.z, face);
       var fin = new THREE.OctahedronGeometry(1, 0); fin.scale(0.9, 2.6, 0.9); fin.translate(civ.x, civ.y + 6.8 + 1.6 + 2.2, civ.z); spireParts.push(fin);   /* a small VISIONARY crystal crowns it (the spire's draw) */
-      [-1, 1].forEach(function (sd) { var s2 = side(face, 16.5 * sd); shrubs.push({ x: civ.x + s2[0], y: civ.y + 1.0, z: civ.z + s2[1], s: 0.95, yaw: sd, c: CLASS_TINT.purple }); }); })();
+      [-1, 1].forEach(function (sd) { var s2 = side(face, 16.5 * sd); shrubs.push({ x: civ.x + s2[0], y: civ.y + 1.0, z: civ.z + s2[1], s: 0.95, yaw: sd, c: sd < 0 ? CRYSTAL_TINT.gold : CRYSTAL_TINT.blue }); }); })();   /* M16: the civic pavilion is shared — gold and blue either side, its crown crystal keeps the district's VISIONARY violet */
     /* the homes */
     RES.homes.forEach(function (H) { var yaw = H.yaw, f1 = fwd(yaw, 1), W0 = H.W, D0 = 7.2, cant = 1.8, y0 = TOP + roll(H.x, H.z);
       pillAt(darkP, W0 + 2.6, 0.9, D0 + 3.2, H.x, y0 + 0.2, H.z, yaw);                                                   /* the graphite plinth */
@@ -288,7 +288,7 @@ export function createVeilFalls(ctx) {
     info.villas = info.homes;   /* the M15c homes replace the M12 villas */
 
     /* crystal groves: a platinum trunk and three crystal canopy facets per tree, VISIONARY-led with the other spectral stops */
-    var NT = LOW ? 20 : 48, rt = rnd(0x7EE5), trunks = [], canopy = [], pal = [CLASS_TINT.purple, CLASS_TINT.purple, SPECTRAL.violet, SPECTRAL.violet, 0xd9dcef, 0xd9dcef, SPECTRAL.ice];
+    var NT = LOW ? 20 : 48, rt = rnd(0x7EE5), trunks = [], canopy = [], pal = [CLASS_TINT.purple, SPECTRAL.violet, CRYSTAL_TINT.gold, CRYSTAL_TINT.pink, CRYSTAL_TINT.red, CRYSTAL_TINT.blue, 0xd9dcef, 0xd9dcef];   /* M16: VISIONARY-led, but the highland is a shared civilization — every class in the groves (was purple ×4 + ice) */
     for (var tI = 0; tI < NT; tI++) { var ts = spot(365, 4.5, rt); if (!ts) continue; var th3 = 5 + rt() * 4; trunks.push({ x: ts.x, y: ts.y, z: ts.z, h: th3 }); var ck = pal[Math.floor(rt() * pal.length)];
       for (var cI = 0; cI < 3; cI++) canopy.push({ x: ts.x + (rt() - 0.5) * 2.0, y: ts.y + th3 + cI * 1.2 - 0.6, z: ts.z + (rt() - 0.5) * 2.0, s: 2.1 - cI * 0.45 + rt() * 0.5, yaw: rt() * 3, c: ck }); }
     shrubs.forEach(function (S) { canopy.push(S); }); info.garden_shrubs = shrubs.length;   /* M15c: the garden shrubs share the grove's instanced canopy draw */
@@ -324,10 +324,10 @@ export function createVeilFalls(ctx) {
     /* ---------- 4. the aura language (one shared field, built by aura.js) ---------- */
     var A = ctx.auraRequests; if (A) { var HT = yTop - yBot, cMid = faceOn(LINES, NS / 2, yBot + HT * 0.5), gy = yBot + HT * 0.5, GR = Math.max(CH * 0.66, HT * 0.64);
       if (ctx.auraForms) { var F = ctx.auraForms;   /* M14 DIMENSIONAL AURA: over the falls' crest, high above the highland, a pair of tilted soft rings turning against each other and a hexagonal frame above them — magic in the air, far from anyone's reach */
-        F.push({ x: cMid.x - ox * 16, y: yTop + CH * 0.75, z: cMid.z - oz * 16, size: CH * 1.1, shape: 'RING', scale: [1, 14, 1], tint: 0xb48cff, intensity: 0.55, ground: yTop, axis: [ox, 0.5, oz], spin: 0.03, phase: 0.2 });
+        F.push({ x: cMid.x - ox * 16, y: yTop + CH * 0.75, z: cMid.z - oz * 16, size: CH * 1.1, shape: 'RING', scale: [1, 14, 1], tint: CRYSTAL_TINT.gold, intensity: 0.55, ground: yTop, axis: [ox, 0.5, oz], spin: 0.03, phase: 0.2 });
         F.push({ x: cMid.x - ox * 16, y: yTop + CH * 0.75, z: cMid.z - oz * 16, size: CH * 0.86, shape: 'RING', scale: [1, 12, 1], tint: 0xff9ad2, intensity: 0.45, ground: yTop, axis: [-oz, 0.4, ox], spin: -0.024, phase: 0.55 });
-        [[-26, 0.95, -18, 5.5, 0xb99cff], [-8, 1.6, 22, 4.2, 0xffa6d4], [14, 1.15, -30, 3.6, 0xb99cff]].forEach(function (k) { var tx = -oz, tz = ox; F.push({ x: cMid.x + ox * k[0] + tx * k[2], y: yTop + CH * k[1], z: cMid.z + oz * k[0] + tz * k[2], size: k[3], tint: k[4], ground: yTop, shape: 'CRYSTAL' }); });   /* M15: great violet diamonds hanging in the air over the falls (the owner's reference) */
-        F.push({ x: cMid.x - ox * 10, y: yTop + CH * 1.35, z: cMid.z - oz * 10, size: CH * 0.42, shape: 'HEX', scale: [1, 0.4, 1], tint: 0x7fd0ff, intensity: 0.5, ground: yTop, axis: [0.2, 1, 0.3], spin: 0.04, phase: 0.8 }); }
+        [[-26, 0.95, -18, 5.5, 0xb99cff], [-8, 1.6, 22, 4.2, 0xff6f82], [14, 1.15, -30, 3.6, 0xffa6d4]].forEach(function (k) { var tx = -oz, tz = ox; F.push({ x: cMid.x + ox * k[0] + tx * k[2], y: yTop + CH * k[1], z: cMid.z + oz * k[0] + tz * k[2], size: k[3], tint: k[4], ground: yTop, shape: 'CRYSTAL' }); });   /* M15: great diamonds hanging in the air over the falls (the owner's reference); M16: VISIONARY purple, LEAN crimson, BAGE pink (was violet, pink, violet) */
+        F.push({ x: cMid.x - ox * 10, y: yTop + CH * 1.35, z: cMid.z - oz * 10, size: CH * 0.42, shape: 'HEX', scale: [1, 0.4, 1], tint: CRYSTAL_TINT.blue, intensity: 0.5, ground: yTop, axis: [0.2, 1, 0.3], spin: 0.04, phase: 0.8 }); }
       A.push({ x: cMid.x - ox * 8, y: gy, z: cMid.z - oz * 8, size: CH * 0.55, aspect: Math.max(1, HT / (CH * 0.95)), ring: 0, tint: 0x8c84c8, spectral: 0.55, intensity: 0.18, pull: 20, phase: 0.3 });   /* the veil glow hugging the curtain (fringes, no circle) */
       A.push({ x: baseX - ox * 6, y: 14, z: baseZ - oz * 6, size: CH * 0.8, aspect: 0.42, ring: 0, tint: 0xeef4ff, spectral: 0.35, intensity: 0.22, pull: 14, nightK: 1.25 });   /* the base spray bloom */
       /* THE GLORY (the owner's reference): a full prismatic ring framing the whole falls, and a faint second ring outside it. The colour

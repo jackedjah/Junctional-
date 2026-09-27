@@ -36,7 +36,12 @@ var STATE = { built: false, error: null, log: [], frames: 0, t0: performance.now
 })();
 
 var last = performance.now(), t = 0;
-function frame(now) {
+/* dev only (the five-class colour audit's accent pass): ?physical=0 hides the physical blues — sea, water surfaces and the sky dome — behind a
+   neutral grey, so only the authored expressive colour is left to measure. Never used for evidence of the look itself. */
+var PHYS_OFF = params.get('physical') === '0';
+function hidePhysical() { var hidden = []; scene.traverse(function (o) { if (/^(COAST_SEA|COAST_BEACH|ISLAND_SHORES|MAHWORLD_SKY_DOME|WATER_SURFACE|WATER_NEAR|WATER_TRENCH|WATER_SHORE|WATER_FOAM|COAST_FOAM|VEIL_HIGHLAND_LAKE|ATMOSPHERE_SKY|SKY_DOME)$/.test(o.name || '') && !o.layers.isEnabled(31)) { o.layers.set(31); hidden.push(o.name); } });   /* an unused render layer: nothing in the world resets it (visibility toggles would) */
+  scene.background = new THREE.Color(0x7f7f82); if (scene.fog) scene.fog.color.setHex(0x7f7f82); if (hidden.length) STATE.log.push('physical=0 hid ' + hidden.join(',')); return hidden.length; }
+function frame(now) { if (PHYS_OFF) hidePhysical();   /* every frame: software GL renders only a handful of frames per view */
   var dt = Math.min(0.1, (now - last) / 1000); last = now; t += dt;
   camera.position.copy(VIEW.pos); camera.lookAt(VIEW.look);
   if (STATE.built) { try { fieldScene.follow(VIEW.look.x, VIEW.look.z); fieldScene.skyFollow(camera.position.x, camera.position.z); fieldScene.tick(dt, t, null); } catch (e) { STATE.error = STATE.error || String(e && e.stack || e); } }

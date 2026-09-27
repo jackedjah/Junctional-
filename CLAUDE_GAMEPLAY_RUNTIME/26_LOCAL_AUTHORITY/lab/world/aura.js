@@ -1,6 +1,7 @@
 /* MAHWORLD M12 :: SPECTRAL AURA (owner pivot 2026-09-26: "aura / magic energy language").
    One restrained, prismatic energy language for the whole world: a soft bloom in the owner's class tint, crossed by a thin spectral
-   interference ring and faint concentric fringes that drift slowly — violet → ice blue → white → gold → pink. It sits AROUND powerful
+   interference ring and faint concentric fringes that drift slowly — violet → ice blue → white → gold → pink (M16: → crimson, all five classes in equal
+   measure). It sits AROUND powerful
    things (landmarks, energy architecture, crystal crowns, the Veil Falls mist, selected sky moments), never as a colour wash over the map.
    Colour law: every stop is a class-family colour (violet = VISIONARY purple, ice blue = the TITAN blue family's light end, gold = ATHLETE,
    pink = BAGE) or neutral white; the gradient passes through white between ice blue and gold, so no blend reaches green or teal.
@@ -14,6 +15,9 @@ import { HALO_LAYOUT } from '../../play/haloLayout.js';
 
 export var SPECTRAL = { violet: 0xb48cff, ice: 0x7fd0ff, white: 0xf4f6ff, gold: 0xffd88a, pink: 0xff9ad2 };
 export var CLASS_TINT = { gold: 0xe6c36a, blue: 0x5a8cf0, purple: 0x9a78e0, pink: 0xf08ab8, red: 0xd4344a, white: 0xf4f6ff };
+/* M16 (owner 2026-09-27: the world was drifting PURPLE — purple is VISIONARY, not the generic colour of magic): the light-end crystal tints of
+   all FIVE classes, for shared magic that should acknowledge the whole civilization rather than default to violet. */
+export var CRYSTAL_TINT = { gold: 0xffd88a, blue: 0x8fb4ff, red: 0xff6f82, purple: 0xb99cff, pink: 0xffa6d4, white: 0xf4f6ff };
 
 var VERT = [
   'attribute vec3 aP; attribute vec4 aS; attribute vec3 aC; attribute vec4 aK; attribute vec3 aX;',
@@ -31,10 +35,10 @@ var FRAG = [
   'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec3 vX; varying float vNear;',
   'float auH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
   'float auN(float x) { float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(auH(vec2(i, 1.7)), auH(vec2(i + 1.0, 1.7)), f); }',
-  'vec3 spectral(float t) { t = fract(t);',   /* violet → ice → white → gold → pink → violet */
-  '  vec3 v = vec3(0.706, 0.549, 1.0), i = vec3(0.498, 0.816, 1.0), w = vec3(0.957, 0.965, 1.0), g = vec3(1.0, 0.847, 0.541), p = vec3(1.0, 0.604, 0.824);',
-  '  if (t < 0.2) return mix(v, i, t / 0.2); if (t < 0.4) return mix(i, w, (t - 0.2) / 0.2); if (t < 0.6) return mix(w, g, (t - 0.4) / 0.2);',
-  '  if (t < 0.8) return mix(g, p, (t - 0.6) / 0.2); return mix(p, v, (t - 0.8) / 0.2); }',
+  'vec3 spectral(float t) { t = fract(t) * 7.0;',   /* M16 five-class prism, seven equal steps: violet → ice blue → white → gold → white → pink → crimson → violet (violet held ~40 % of the old cycle and crimson none) */
+  '  vec3 v = vec3(0.706, 0.549, 1.0), i = vec3(0.498, 0.816, 1.0), w = vec3(0.957, 0.965, 1.0), g = vec3(1.0, 0.847, 0.541), p = vec3(1.0, 0.604, 0.824), c = vec3(1.0, 0.44, 0.51);',
+  '  if (t < 1.0) return mix(v, i, t); if (t < 2.0) return mix(i, w, t - 1.0); if (t < 3.0) return mix(w, g, t - 2.0); if (t < 4.0) return mix(g, w, t - 3.0);',
+  '  if (t < 5.0) return mix(w, p, t - 4.0); if (t < 6.0) return mix(p, c, t - 5.0); return mix(c, v, t - 6.0); }',   /* gold sits between two whites (gold straight into pink or crimson would pass orange); pink → crimson → violet stay pink / red */
   'vec3 vivid(float t) { t = clamp(t, 0.0, 1.0); vec3 i = vec3(0.498, 0.816, 1.0), v = vec3(0.706, 0.549, 1.0), p = vec3(1.0, 0.604, 0.824), g = vec3(1.0, 0.847, 0.541);',   /* a vivid prismatic band, ice → violet → pink → gold: it turns through magenta, never green */
   '  if (t < 0.33) return mix(i, v, t / 0.33); if (t < 0.66) return mix(v, p, (t - 0.33) / 0.33); return mix(p, g, (t - 0.66) / 0.34); }',
   'void main() { float r = length(vUv); if (r > 1.0) discard;',
@@ -103,12 +107,19 @@ export function createAura(ctx) {
      its shell (the rings' inner band edge clears the shell radius), and two great light frames far out over the sea. */
   function skyForms(F) { var H = HALO_LAYOUT, cy = H.arrival_height_m + 22, R = H.shell_radius_m + 32;
     F.push({ x: H.center.x, y: cy, z: H.center.z, size: R * 2, shape: 'RING', scale: [1, 40, 1], tint: 0xffd88a, intensity: 0.34, ground: 0, axis: [0.22, 1, 0.1], spin: 0.012, phase: 0.1 });
-    F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: 0xb48cff, intensity: 0.3, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });
-    F.push({ x: -60, y: 205, z: -560, size: 110, shape: 'HEX', scale: [1, 0.35, 1], tint: 0x7fd0ff, intensity: 0.24, ground: 0, axis: [0.3, 1, 0.2], spin: 0.02, phase: 0.35 });
+    F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: CRYSTAL_TINT.blue, intensity: 0.3, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });   /* M16: the HALO gyroscope is gold + TITAN blue (was gold + violet) — the shared hub is not VISIONARY's */
+    F.push({ x: -60, y: 205, z: -560, size: 110, shape: 'HEX', scale: [1, 0.35, 1], tint: CRYSTAL_TINT.red, intensity: 0.22, ground: 0, axis: [0.3, 1, 0.2], spin: 0.02, phase: 0.35 });   /* M16: LEAN crimson far out over the southern sea (was ice) */
     F.push({ x: 540, y: 250, z: 320, size: 80, shape: 'DIAMOND', tint: 0xff9ad2, intensity: 0.18, ground: 0, axis: [0.1, 1, 0.25], spin: 0.03, phase: 0.72 }); }
-  /* M15 FLOATING CRYSTALS (owner reference renders): great violet diamonds hanging high over the plaza, the highland, the river, TITAN and the
-     north-west terrace, and two far out in the sky — all 40 m+ above the ground; modules may add more (shape 'CRYSTAL' in ctx.auraForms) */
-  function skyCrystals(C) { [[-30, 42, -8, 4.2, 0xb99cff], [58, 58, -40, 3.2, 0xffa6d4], [-120, 64, 20, 5.5, 0xb99cff], [0, 70, 215, 4.8, 0xb99cff], [140, 62, 150, 4.0, 0x7fd0ff], [-150, 72, 240, 5.0, 0xb99cff], [-300, 150, -120, 14, 0xb99cff], [300, 180, 60, 12, 0xffa6d4]].forEach(function (a) { C.push({ x: a[0], y: a[1], z: a[2], size: a[3], tint: a[4], ground: 0, shape: 'CRYSTAL' }); }); }
+  /* M15 FLOATING CRYSTALS (owner reference renders): great diamonds hanging high over the plaza, the highland, the river, TITAN and the
+     north-west terrace, and two far out in the sky — all 40 m+ above the ground; modules may add more (shape 'CRYSTAL' in ctx.auraForms).
+     M16 (five-class world): each takes the colour of the district it hangs over — pearl over the shared plaza, VISIONARY purple over the
+     highland, ATHLETE gold over the temple, TITAN blue over the tower, LEAN crimson over the north-west terrace, TITAN blue by MAH MATCH, BAGE
+     pink far out over the south-west coast, ATHLETE gold far out east (was five violet, two pink, one ice). */
+  /* M16 step 2 (the five-colour audit): TITAN's ground monoliths and VISIONARY's amethyst clusters carried most of the map's expressive light
+     (≈ 5 % and 2 % of their district frames) while ATHLETE, LEAN and BAGE sat near 0.2–0.5 %. The warm sanctuaries get their own skyborne
+     crowns — three crystals each over the gold temple, the crimson terraces and the rose market (34–52 m up, never a ground feature: no
+     collider moves) — so every class has a luminous signature of its own. */
+  function skyCrystals(C) { var T = CRYSTAL_TINT; [[-30, 42, -8, 4.2, T.white], [58, 58, -40, 3.2, T.blue], [-120, 64, 20, 5.5, T.purple], [0, 70, 215, 4.8, T.gold], [140, 62, 150, 4.0, T.blue], [-150, 72, 240, 5.0, T.red], [-300, 150, -120, 14, T.pink], [300, 180, 60, 12, T.gold], [-26, 34, 196, 3.6, T.gold], [26, 36, 200, 3.2, T.gold], [0, 52, 222, 4.4, T.gold], [-132, 34, 196, 3.6, T.red], [-96, 38, 232, 3.2, T.red], [-116, 50, 218, 4.4, T.red], [-20, 34, 262, 3.4, T.pink], [20, 36, 266, 3.2, T.pink], [0, 48, 282, 4.4, T.pink]].forEach(function (a) { C.push({ x: a[0], y: a[1], z: a[2], size: a[3], tint: a[4], ground: 0, shape: 'CRYSTAL' }); }); }
   var skyField = null, forms = null, skyFollowers = [], crystals = null;
   function build() { var req = ctx.auraRequests || [], sky = []; skyMoments(sky);
     var cl = (ctx.auraForms || []).filter(function (f) { return f.shape === 'CRYSTAL'; }); skyCrystals(cl);

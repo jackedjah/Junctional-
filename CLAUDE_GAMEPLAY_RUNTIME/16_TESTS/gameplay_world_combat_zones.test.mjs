@@ -5,7 +5,7 @@
    ONE court is placed until the owner verifies the footprint and the dormant look.  node 16_TESTS/gameplay_world_combat_zones.test.mjs */
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 import * as THREE from '../26_LOCAL_AUTHORITY/vendor/three/three.module.min.js';
-import { createCombatZones, combatZoneList, combatZoneCircles, duelPhase, insideZone, CLASS_FAMILY, TIMING, SIZING, PALETTE, PHASES, CLASS_PHASES, MAX_FIGHTERS, territorySlots, assignSlots, splitAngle, FIVE_DIAMOND } from '../26_LOCAL_AUTHORITY/lab/world/combatZones.js';
+import { createCombatZones, combatZoneList, combatZoneCircles, duelPhase, insideZone, CLASS_FAMILY, TIMING, SIZING, PALETTE, PHASES, CLASS_PHASES, MAX_FIGHTERS, territorySlots, assignSlots, splitAngle, FIVE_DIAMOND, IDENTITY_ORDER } from '../26_LOCAL_AUTHORITY/lab/world/combatZones.js';
 import { groundYAt } from '../26_LOCAL_AUTHORITY/lab/world/worldLayout.js';
 import { classify } from '../26_LOCAL_AUTHORITY/deploy/world_preview/colour_law_audit.mjs';
 var HERE = path.dirname(fileURLToPath(import.meta.url)), LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
@@ -108,5 +108,22 @@ ok('6. hooks: the fighter contract and the M15 { id, cls, x, z } shape both work
   ['setOccupants', 'begin', 'update', 'resolve', 'phase', 'onPhase', 'zoneAt'].every(function (k) { return typeof cz[k] === 'function'; }) && /combatZones: function \(\) \{ return mods\.combatZones && mods\.combatZones\.begin/.test(WB) && /\['combatZones', createCombatZones\], \['aura', createAura\]/.test(WB) &&
   /s\.duel && s\.duel\.state\) \|\| \(R\.match && R\.match\.state\)/.test(CS) && /R\.me && R\.me\.class/.test(CS) && cz.classColor('NEWCLASS') === '#8f6ad8' && /duelDemo=/.test(CS) && /scaleRefs=/.test(CS) && cz.zoneAt(zA.x, zA.z) === zA.id && cz.zoneAt(zA.x + 40, zA.z) === null && cz.debug().draw_calls === 1, null);
 cz.dispose();
+
+/* 7. M16 (owner 2026-09-27): the court carries the WORLD identity of all five classes — five tiny permanent gems in a centre rosette (gold,
+      blue, crimson, violet, pink), fed from their own uniforms, never from a fighter slot, so they cannot become ownership colour — while
+      the COMBAT colour comes only from the actual participants: a two-fighter duel (ATHLETE vs LEAN) splits the court into gold and crimson
+      halves on a symmetry line, lights only those two fighters' fields and footprints, and every unused slot stays white */
+var p2 = new THREE.Group(), c2 = createCombatZones({ THREE: THREE, registry: REG, group: p2, night: true, quality: { tier: function () { return 'HIGH'; } } }); c2.build();
+var U = p2.getObjectByName('COMBAT_ZONE_FLOORS').material.uniforms, G2 = p2.getObjectByName('COMBAT_ZONE_FLOORS').geometry.attributes;
+var famOf = { ATHLETE: 'gold', TITAN: 'blue', LEAN: 'red', VISIONARY: 'purple', BAGE: 'pink' };
+var gemsOk = IDENTITY_ORDER.join() === 'ATHLETE,TITAN,LEAN,VISIONARY,BAGE' && U.uMk && U.uMk.value.length === 5 && IDENTITY_ORDER.every(function (c, k) { return U.uMk.value[k].getHexString() === new THREE.Color(REG.crystal_families[famOf[c]].glow).getHexString(); }) && U.uMarkK.value > 0 && U.uMarkK.value <= 1;
+var gemSize = /czLine\(gd - ([0-9.]+), 0\.016\)/.exec(CS), rosR = /vec2\(cos\(a\), sin\(a\)\) \* ([0-9.]+);/.exec(CS), gemR = gemSize ? +gemSize[1] / 0.70710678 : 1, gemArea = 5 * 2 * gemR * gemR, courtArea = CZ.playable_m * CZ.playable_m;
+c2.tick(0.016, 50); var dormWhite = [0, 1, 2, 3, 4].every(function (k) { var a = G2['iC' + k]; return a.getX(0) === 1 && a.getY(0) === 1 && a.getZ(0) === 1; });
+c2.begin(zA.id, [{ fighterId: 'ath', classId: 'ATHLETE', worldPosition: W(-7.5, -7.5) }, { fighterId: 'lea', classId: 'LEAN', worldPosition: W(7.5, 7.5) }], { t: 50 }); c2.tick(0.016, 50.4); var p2p = c2.phase(zA.id);
+var gold2 = new THREE.Color(REG.crystal_families.gold.glow), red2 = new THREE.Color(REG.crystal_families.red.glow), s0 = [G2.iC0.getX(0), G2.iC0.getY(0), G2.iC0.getZ(0)], s1 = [G2.iC1.getX(0), G2.iC1.getY(0), G2.iC1.getZ(0)];
+var twoOk = p2p.territories === 2 && G2.iK2.getW(0) === 2 + 10 * 1 && Math.abs(s0[0] - gold2.r) < 1e-6 && Math.abs(s1[1] - red2.g) < 1e-6 && [2, 3, 4].every(function (k) { var a = G2['iC' + k]; return a.getX(0) === 1 && a.getY(0) === 1 && a.getZ(0) === 1; }) && p2p.fighters.map(function (f) { return f.classId; }).join() === 'ATHLETE,LEAN';
+ok('7. two layers: five permanent class gems (' + IDENTITY_ORDER.join(' / ') + ') ring the centre at ' + (rosR ? rosR[1] : '?') + ' m from their own uniforms — tiny (' + (100 * gemArea / courtArea).toFixed(3) + ' % of the court) — while combat colour is only the participants\': ATHLETE vs LEAN = gold / crimson halves on the diagonal symmetry line, the other three slots white; dormant slots white',
+  gemsOk && gemR <= 0.35 && gemArea / courtArea < 0.002 && rosR && +rosR[1] < 3 && dormWhite && twoOk && /footC \* live \* \(1\.0 - split\)/.test(CS), { gemsOk: gemsOk, gemR: gemR, twoOk: twoOk, iK2w: G2.iK2.getW(0), s0: s0, s1: s1, p2p: p2p.fighters.map(function (f) { return f.classId + '@' + f.territory; }) });
+c2.dispose();
 
 console.log('RESULT world combat zones: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

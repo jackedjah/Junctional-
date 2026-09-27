@@ -6,7 +6,7 @@
    one hemisphere, an environment map for specular, emissive trims for local light (no per-lamp point lights). */
 import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { createAuraField } from './world/aura.js'; import { toLacquer, taperShaft, orb, energyTip, tipMaterial, softBox, plumeMaterial } from './world/formKit.js';   /* M12 owner pivot: the spectral aura language */
+import { createAuraField, CRYSTAL_TINT } from './world/aura.js'; import { toLacquer, taperShaft, orb, energyTip, tipMaterial, softBox, plumeMaterial } from './world/formKit.js';   /* M12 owner pivot: the spectral aura language */
 import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal, applyRadialDeck } from './world/surfaceDetail.js'; import { createFacadeKit, profileFor, addCivicBuilding } from './world/facadeKit.js';
 export function createCityScene(THREE, group, helpers) {
   var roundedBox = helpers.roundedBox, canvasTex = helpers.canvasTex; var DAY = helpers.night === false;
@@ -170,9 +170,13 @@ export function createCityScene(THREE, group, helpers) {
       if (THRESH.stone.length) { var tStone = M.cladding.clone(); tStone.color.setHex(0x4c525c); tStone.roughness = 0.58; tStone.polygonOffset = true; tStone.polygonOffsetFactor = -1; var tDrain = new THREE.MeshStandardMaterial({ color: 0x101318, roughness: 0.85, metalness: 0.2 });
         [[THRESH.stone, tStone, 'CITY_ENTRANCE_APRONS'], [THRESH.drain, tDrain, 'CITY_SLOT_DRAINS'], [THRESH.edge, M.chrome, 'CITY_DRAIN_EDGES']].filter(function (T) { if (SDT === 'LOW' && T[2] === 'CITY_DRAIN_EDGES') { T[0].forEach(function (q) { q.dispose(); }); return false; } return true; }).forEach(function (T) { var mg = mergeGeometries(T[0].map(function (q) { return q.toNonIndexed(); }), false); T[0].forEach(function (q) { q.dispose(); }); var mm = new THREE.Mesh(mg, T[1]); mm.name = T[2]; mm.userData.noMerge = true; mm.receiveShadow = true; group.add(mm); }); THRESH.stone = []; THRESH.drain = []; THRESH.edge = []; }
       var seed = 9; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
-      /* diamond inlays: thin flat octahedra in a ring around the plaza */
-      var inlay = new THREE.InstancedMesh(new THREE.OctahedronGeometry(0.55, 0), new THREE.MeshStandardMaterial({ color: 0xe8f4ff, roughness: 0.1, metalness: 0.9, emissive: 0x3a86c8, emissiveIntensity: 0.35, flatShading: true }), 24); var mtx = new THREE.Matrix4(); var q = new THREE.Quaternion(); var sc = new THREE.Vector3(1, 0.06, 1);
-      for (var i = 0; i < 24; i++) { var a = i / 24 * Math.PI * 2; var rr = 11.5 + (i % 2) * 1.2; q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), a); mtx.compose(new THREE.Vector3(Math.cos(a) * rr, 0.03, Math.sin(a) * rr), q, sc); inlay.setMatrixAt(i, mtx); } inlay.instanceMatrix.needsUpdate = true; group.add(inlay);
+      /* diamond inlays: thin flat octahedra in a ring around the plaza. M16 (owner 2026-09-27: the shared world should visibly belong to a
+         FIVE-class civilization, not default to one colour): the NEXUS ring carries the five classes in turn — gold, blue, crimson, violet,
+         pink, five times round (25 inlays, was 24 all glowing blue) — each inlay's glow tinted by its instance colour. */
+      var inlayMat = new THREE.MeshStandardMaterial({ color: 0xe8f4ff, roughness: 0.1, metalness: 0.9, emissive: 0xffffff, emissiveIntensity: 0.35, flatShading: true });
+      inlayMat.onBeforeCompile = function (sh) { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_INSTANCING_COLOR\n totalEmissiveRadiance *= vColor.rgb;\n#endif'); }; inlayMat.customProgramCacheKey = function () { return 'nexus_inlay_five'; };
+      var inlay = new THREE.InstancedMesh(new THREE.OctahedronGeometry(0.55, 0), inlayMat, 25), FIVE = [CRYSTAL_TINT.gold, CRYSTAL_TINT.blue, CRYSTAL_TINT.red, CRYSTAL_TINT.purple, CRYSTAL_TINT.pink], ic = new THREE.Color(); var mtx = new THREE.Matrix4(); var q = new THREE.Quaternion(); var sc = new THREE.Vector3(1, 0.06, 1);
+      for (var i = 0; i < 25; i++) { var a = i / 25 * Math.PI * 2; var rr = 11.5 + ((i % 5) % 2) * 1.2; inlay.setColorAt(i, ic.set(FIVE[i % 5])); q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), a); mtx.compose(new THREE.Vector3(Math.cos(a) * rr, 0.03, Math.sin(a) * rr), q, sc); inlay.setMatrixAt(i, mtx); } inlay.instanceMatrix.needsUpdate = true; if (inlay.instanceColor) inlay.instanceColor.needsUpdate = true; inlay.name = 'NEXUS_FIVE_CLASS_INLAYS'; group.add(inlay);
       /* JOB B PLAZA CLEANUP (owner directive 2026-09-19 §5 — registry zone PLAZA_CLEAR): the central plaza keeps its lanes, forecourts and landing
          clearance; the decorative puddles and laser-plant clusters move out of the axis lanes / forecourts to the plaza's south perimeter beds (r ≈ 44–50 m,
          away from the tree elevator (30, 40) and the pods (−30, 26)). Landmarks, pathways, pylons and the emblem stay. Nothing here blocks movement. */

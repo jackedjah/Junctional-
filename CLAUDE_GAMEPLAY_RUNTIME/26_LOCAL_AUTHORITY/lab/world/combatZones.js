@@ -6,8 +6,11 @@
    the tightest square that holds five such areas is the dice-five pattern, R·(2 + 2√2) = 30.2 m (four fighters would need 2 × 2 = 25 m).
    So the court is 31 m of clear playable width (≈ 102 ft) plus a 1.2 m inlaid border — 33.4 m across in all.
    STATES (the host drives them; the dev preview can stage each):
-     · DORMANT      nobody on it — white / cool white-blue / pale ice only, soft glass, a faint neutral shimmer, subtly world-reflective.
-                    ZERO class colour: no gold, red, pink, purple or blue class ownership.
+     · DORMANT      nobody on it — white / cool white-blue / pale ice, soft glass, a faint neutral shimmer, subtly world-reflective.
+                    No class OWNERSHIP colour. Two layers are kept apart (owner 2026-09-27, M16): the WORLD / INFRASTRUCTURE identity is
+                    five tiny permanent class gems — gold, blue, crimson, violet, pink — set in a small rosette at the centre ("all five
+                    MAHWORLD classes may duel here"), in every state, never colouring the court surface; the COMBAT STATE colour comes only
+                    from the actual participants.
      · READY        someone stands on it — a neutral response: the inlay wakes a little and a soft WHITE presence forms under each occupant.
                     Still zero class colour.
      · ACTIVATION   a duel begins — the dramatic moment: the court splits into equal CLASS territories by its own symmetry (territorySlots:
@@ -15,8 +18,9 @@
                     two = halves on a symmetry line), each fighter taking the territory nearest them; seams run through white, a surge
                     crosses the court; after ~1.3 s the split lets go. The dormant inlay faintly carries the same dice-five structure.
      · ACTIVE_DUEL  the split is gone; the court is neutral again, and each fighter carries a LOCAL PRESENCE FIELD in their class colour
-                    that moves with them (eased, never flickering), fades at its perimeter (never a box or a UI ring) and blends with
-                    restraint where two fields overlap (the overlap leans to white). Airborne fighters' fields shrink and fade.
+                    that moves with them (eased, never flickering): a soft occupancy aura fading at its perimeter, with a faint
+                    square-diamond footprint inlaid under the fighter; two fields blend with restraint where they overlap (the overlap leans
+                    to white). Airborne fighters' fields shrink and fade. The other classes do not light the court.
      · RESOLUTION   the duel ends — colour drains back out over ~1.4 s.
      · RESET        a neutral sweep runs in from the border (~1.2 s); then DORMANT (or READY if someone is still standing on it).
    Contract (future-ready): fighters are { fighterId, classId, classColor?, worldPosition {x,y,z} | [x,y,z], isParticipant, teamId,
@@ -29,7 +33,8 @@
 export var CLASS_FAMILY = { ATHLETE: 'gold', TITAN: 'blue', LEAN: 'red', VISIONARY: 'purple', BAGE: 'pink' };
 export var TIMING = { activation_s: 2.8, split_hold_s: 1.3, resolution_s: 1.4, reset_s: 1.2, presence_s: 0.35, follow_s: 0.08 };
 export var SIZING = { melee_unit_m: 2.5, max_aoe_radius_m: 6.25, max_fighters: 5, four_fighter_packing_m: 25, five_fighter_packing_m: 30.18, playable_m: 31, border_m: 1.2 };
-export var MAX_FIGHTERS = 5;   /* one of each class: ATHLETE gold, TITAN blue, LEAN red, VISIONARY purple, BAGE pink */
+export var MAX_FIGHTERS = 5;
+export var IDENTITY_ORDER = ['ATHLETE', 'TITAN', 'LEAN', 'VISIONARY', 'BAGE'];   /* the five permanent class gems round the centre: gold, blue, crimson, violet, pink */   /* one of each class: ATHLETE gold, TITAN blue, LEAN red, VISIONARY purple, BAGE pink */
 export var PHASES = ['DORMANT', 'READY', 'ACTIVATION', 'ACTIVE_DUEL', 'RESOLUTION', 'RESET'];
 export var CLASS_PHASES = ['ACTIVATION', 'ACTIVE_DUEL', 'RESOLUTION'];   /* the only phases in which any class colour may show */
 /* the neutral palette (display values): every dormant / ready colour is white or pale ice (colour law: NEUTRAL or the BLUE window, never
@@ -97,7 +102,7 @@ var FLOOR_V = [
 ].join('\n');
 
 var FLOOR_F = [
-  'uniform float uTime; uniform float uGlobal; uniform float uFacets; uniform float uFill; uniform float uSheen; uniform float uPres; uniform vec3 uIce; uniform vec3 uCore; uniform vec3 uReady; uniform vec3 uFillC; uniform vec3 uSky;',
+  'uniform float uTime; uniform float uGlobal; uniform float uFacets; uniform float uFill; uniform float uSheen; uniform float uPres; uniform vec3 uIce; uniform vec3 uCore; uniform vec3 uReady; uniform vec3 uFillC; uniform vec3 uSky; uniform vec3 uMk[5]; uniform float uMarkK;',   /* uMk: the five permanent class identity gems (never a fighter slot) */
   'varying vec4 vLD; flat varying vec4 vK; flat varying vec4 vK2; flat varying vec4 vF0; flat varying vec4 vF1; flat varying vec4 vF2; flat varying vec4 vF3; flat varying vec4 vC0; flat varying vec4 vC1; flat varying vec4 vC2; flat varying vec4 vC3; flat varying vec4 vC4;',
   'float czLine(float d, float w) { float a = fwidth(d) * 1.2 + 1e-4; return 1.0 - smoothstep(w, w + a, abs(d)); }',
   'float czGlow(float d, float s) { return exp(-d * d / s); }',
@@ -110,6 +115,7 @@ var FLOOR_F = [
   '  if (n > 3.5) { if (k > 3.5) return vec2(0.0); return vec2((k > 0.5 && k < 2.5) ? q : -q, k > 1.5 ? q : -q); }',
   '  if (n > 2.5) { float a = 1.5707963 + k * 2.0943951; return vec2(cos(a), sin(a)) * h * 0.5; }',
   '  if (n > 1.5) return vec2(cos(th), sin(th)) * h * 0.5 * (k > 0.5 ? 1.0 : -1.0); return vec2(0.0); }',
+  'float czFoot(vec2 L, vec4 P, float R) { vec2 r = L - P.xy; float lift = 1.0 / (1.0 + max(P.z, 0.0) * 0.45), b = max(R, 0.5) * 0.5 * mix(0.75, 1.0, lift); return P.w * lift * czLine((abs(r.x) + abs(r.y)) * 0.70710678 - b * 0.70710678, 0.035); }',   /* a fighter's square-diamond footprint, inlaid under them */
   'vec4 czFP(float x, float z, float lp) { return vec4(x, z, floor(lp) * 0.01, fract(lp)); }',   /* unpack a fighter: (x, z, lift, presence) */
   'float czTerr(vec2 L, float k, vec4 S, float h, vec4 P) { return (k < S.x - 0.5 && P.w > 0.01) ? length(L - czSlot(k, S.x, S.y, h)) : 1e4; }',
   'void main() { vec2 L = vLD.xy; float h = vK.x, B = vK2.z, hb = h + B, t = uTime, split = vK.y, surge = vK.z, live = vK.w, ready = vK2.x, reset = vK2.y, seed = vF3.w;',
@@ -139,6 +145,7 @@ var FLOOR_F = [
   '  float f0 = czField(L, P0, vC0.w), f1 = czField(L, P1, vC1.w), f2 = czField(L, P2, vC2.w), f3 = czField(L, P3, vC3.w), f4 = czField(L, P4, vC4.w);',
   '  float fs = f0 + f1 + f2 + f3 + f4, fm = max(max(max(f0, f1), max(f2, f3)), f4);',
   '  vec3 pc = fs > 1e-4 ? (vC0.rgb * f0 + vC1.rgb * f1 + vC2.rgb * f2 + vC3.rgb * f3 + vC4.rgb * f4) / fs : uReady;',
+  '  vec3 footC = vC0.rgb * czFoot(L, P0, vC0.w) + vC1.rgb * czFoot(L, P1, vC1.w) + vC2.rgb * czFoot(L, P2, vC2.w) + vC3.rgb * czFoot(L, P3, vC3.w) + vC4.rgb * czFoot(L, P4, vC4.w);',
   '  pc = mix(pc, vec3(1.0), clamp((fs - fm) * 1.2, 0.0, 0.6));',   /* restrained overlap: where two presences meet they lean to white */
   '  vec3 presC = mix(uReady, pc, live); float pres = min(fs, 1.1) * mix(0.5 * ready, 0.95 * uPres, live);   /* uPres: bright day paving needs a stronger presence than night */',
   /* activation territories: the court's symmetric template cells (slot k holds the fighter assigned to territory k), seams through white */
@@ -151,7 +158,10 @@ var FLOOR_F = [
   '  float lvl = (breath * 0.78 + ready * 0.36 + terr * 0.8) * mix(1.0, 1.3, live);   /* dormant is quiet infrastructure; someone stepping on wakes it */',
   '  float lines = edges + seams + dia + facets;',
   '  vec3 col = lineC * lines * lvl + mix(uCore, lineC, 0.6) * (anch + sig) * lvl + uIce * run * 0.7 + uCore * glint * 0.5;',
-  '  col += presC * pres * (0.3 * court + lines * 1.5);',   /* a presence warms the floor under the fighter and lights the inlay it stands on */
+  '  col += presC * pres * (0.3 * court + lines * 1.5) + footC * live * (1.0 - split) * 0.9 * uPres;',   /* the class footprints show only in a live duel (never READY) */
+  '  float rim5 = czLine(length(L) - 2.1, 0.01) * 0.1; vec3 mkC = vec3(0.0);',   /* the five-class rosette: a faint pearl hairline set with five tiny gems (identity, not ownership) */
+  '  for (int k = 0; k < 5; k++) { float a = 1.5707963 + float(k) * 1.2566371; vec2 q = L - vec2(cos(a), sin(a)) * 2.1; float gd = (abs(q.x) + abs(q.y)) * 0.70710678; mkC += uMk[k] * (czLine(gd - 0.19, 0.016) * 0.8 + czGlow(gd, 0.01) * 1.0); }',
+  '  col += uCore * rim5 * lvl + mkC * uMarkK * (1.0 - 0.4 * terr);',   /* a presence warms the floor under the fighter and lights the inlay it stands on */
   '  col += terrC * terr * (0.14 * field + 0.4 * band);',
   '  float dmC = c5 * 0.70710678 - dm, band5 = smoothstep(-0.05, 0.1, dmC) * (1.0 - smoothstep(0.9, 1.3, dmC));',   /* the central territory's own lit band, just inside its diamond — the corners have the border band: the fifth share carries equal weight */
   '  col += vC4.rgb * band5 * step(4.5, TS.x) * step(0.01, P4.w) * split * live * 0.45;',
@@ -182,7 +192,7 @@ export function createCombatZones(ctx) {
     zones.forEach(function (z, i) { z.index = i; z.duel = null; z.occ = []; z.readyV = 0; z.lastPhase = 'DORMANT'; byId[z.id] = z; A.iZ.set([z.x, z.y || 0, z.z, (z.yaw_deg || 0) * Math.PI / 180], i * 4); A.iK.set([z.playable_m / 2, 0, 1, 0], i * 4); A.iK2.set([0, 0, z.border_m, 0], i * 4); A.iF3[i * 4 + 3] = (i * 0.618) % 1; for (var s = 0; s < MAX_FIGHTERS; s++) A['iC' + s].set([1, 1, 1, 3.2], i * 4); });
     var attrs = {}; keys.forEach(function (k) { attrs[k] = new THREE.InstancedBufferAttribute(A[k], 4); attrs[k].setUsage(THREE.DynamicDrawUsage); });
     var fg = new THREE.InstancedBufferGeometry(), pl = new THREE.PlaneGeometry(1, 1); fg.index = pl.index; fg.setAttribute('position', pl.attributes.position); fg.instanceCount = n; keys.forEach(function (k) { fg.setAttribute(k, attrs[k]); }); own.push(fg, pl);
-    uF = { uTime: { value: 0 }, uGlobal: { value: 0 }, uFacets: { value: lowQ ? 0 : 1 }, uFill: { value: 0 }, uSheen: { value: 0 }, uPres: { value: 1 }, uMargin: { value: 2.5 },
+    uF = { uTime: { value: 0 }, uGlobal: { value: 0 }, uFacets: { value: lowQ ? 0 : 1 }, uFill: { value: 0 }, uSheen: { value: 0 }, uPres: { value: 1 }, uMargin: { value: 2.5 }, uMarkK: { value: 0.6 }, uMk: { value: IDENTITY_ORDER.map(function (c) { return colorOf(c).clone(); }) },
       uIce: { value: rawRGB(THREE, PALETTE.ice) }, uCore: { value: rawRGB(THREE, PALETTE.core) }, uReady: { value: rawRGB(THREE, PALETTE.ready) }, uFillC: { value: rawRGB(THREE, PALETTE.fill_day) }, uSky: { value: rawRGB(THREE, PALETTE.sky_day) } };
     setNight(night);
     var fm = new THREE.ShaderMaterial({ vertexShader: FLOOR_V, fragmentShader: FLOOR_F, uniforms: uF, transparent: true, depthWrite: false, depthTest: true, blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -8, toneMapped: false }); own.push(fm);
@@ -199,7 +209,7 @@ export function createCombatZones(ctx) {
   var REF_AT = [[-0.572, -0.572], [0.572, -0.572], [0.572, 0.572], [-0.572, 0.572], [0, 0], [0.8, 0], [-0.8, 0], [0, 0.8]];
   function buildRefs(N) { var body = new THREE.CapsuleGeometry(0.2, 1.2, 4, 10), head = new THREE.SphereGeometry(0.13, 12, 8), mat = new THREE.MeshStandardMaterial({ color: 0x9aa3ae, roughness: 0.7, metalness: 0 }); own.push(body, head, mat);
     var cnt = zones.length * N, bI = new THREE.InstancedMesh(body, mat, cnt), hI = new THREE.InstancedMesh(head, mat, cnt), M = new THREE.Matrix4(), k = 0;
-    zones.forEach(function (z) { var c = Math.cos((z.yaw_deg || 0) * Math.PI / 180), s = Math.sin((z.yaw_deg || 0) * Math.PI / 180); for (var i = 0; i < N; i++) { var hh = z.playable_m / 2, l = [REF_AT[i][0] * hh, REF_AT[i][1] * hh], x = z.x + l[0] * c - l[1] * s, wz = z.z + l[0] * s + l[1] * c; M.makeTranslation(x, (z.y || 0) + 0.8, wz); bI.setMatrixAt(k, M); M.makeTranslation(x, (z.y || 0) + 1.75, wz); hI.setMatrixAt(k, M); k++; } });
+    zones.forEach(function (z) { var c = Math.cos((z.yaw_deg || 0) * Math.PI / 180), s = Math.sin((z.yaw_deg || 0) * Math.PI / 180); var at = demo && DEMO_AT[demo.classes.length] && N === demo.classes.length ? DEMO_AT[N] : REF_AT; for (var i = 0; i < N; i++) { var hh = z.playable_m / 2, l = [at[i][0] * hh, at[i][1] * hh], x = z.x + l[0] * c - l[1] * s, wz = z.z + l[0] * s + l[1] * c; M.makeTranslation(x, (z.y || 0) + 0.8, wz); bI.setMatrixAt(k, M); M.makeTranslation(x, (z.y || 0) + 1.75, wz); hI.setMatrixAt(k, M); k++; } });
     [bI, hI].forEach(function (o, j) { o.name = j ? 'COMBAT_ZONE_SCALE_REF_HEADS' : 'COMBAT_ZONE_SCALE_REFS'; o.userData.noMerge = true; o.userData.nonInteractable = true; o.userData.devOnly = true; o.castShadow = true; group.add(o); });
     refs = { n: N, height_m: 1.88 }; }
   /* a fighter from the contract (or the M15 shape) → its slot on a court: local position, lift, colour, influence */
@@ -252,8 +262,9 @@ export function createCombatZones(ctx) {
   function zoneAt(x, z) { for (var i = 0; i < zones.length; i++) if (insideZone(zones[i], x, z)) return zones[i].id; return null; }
   /* DEV PREVIEW: stage a phase on a court, anchored to the current clock (the preview pins the clock after load); with scale references
      the fighters stand at the mannequins */
+  var DEMO_AT = { 1: [[0, 0]], 2: [[-0.5, -0.5], [0.5, 0.5]], 3: [[0, 0.5], [-0.433, -0.25], [0.433, -0.25]], 4: REF_AT.slice(0, 4), 5: REF_AT.slice(0, 5) };   /* where the staged fighters stand, by count (their territories' centres) */
   function demoFighters(z, t) { var c = Math.cos((z.yaw_deg || 0) * Math.PI / 180), s = Math.sin((z.yaw_deg || 0) * Math.PI / 180), N = demo.classes.length;
-    return demo.classes.map(function (cls, i) { var l; if (refs) { var r = REF_AT[i], hh = z.playable_m / 2; l = [r[0] * hh + 0.4 * Math.sin(t * 0.7 + i), r[1] * hh + 0.4 * Math.cos(t * 0.6 + i * 2)]; } else { var a = t * 0.25 + i * Math.PI * 2 / N, rr = z.playable_m * 0.5 * (0.42 + 0.06 * Math.sin(t * 0.9 + i * 2)); l = [Math.cos(a) * rr, Math.sin(a) * rr]; }
+    return demo.classes.map(function (cls, i) { var l; if (refs) { var r = DEMO_AT[N][i], hh = z.playable_m / 2; l = [r[0] * hh + 0.4 * Math.sin(t * 0.7 + i), r[1] * hh + 0.4 * Math.cos(t * 0.6 + i * 2)]; } else { var a = t * 0.25 + i * Math.PI * 2 / N, rr = z.playable_m * 0.5 * (0.42 + 0.06 * Math.sin(t * 0.9 + i * 2)); l = [Math.cos(a) * rr, Math.sin(a) * rr]; }
       return { fighterId: 'demo_' + i, classId: cls, teamId: i, worldPosition: { x: z.x + l[0] * c - l[1] * s, y: (z.y || 0) + (i === 0 && !refs ? Math.max(0, Math.sin(t * 1.3) * 1.2) : 0), z: z.z + l[0] * s + l[1] * c }, isParticipant: true, localInfluenceRadius: 3.2 }; }); }
   function runDemo(t, dt) { var list = demo.id === 'ALL' ? zones : zones.filter(function (z) { return z.id === demo.id; });
     list.forEach(function (z) { var fs = demoFighters(z, t), P = demo.phase;
@@ -276,10 +287,10 @@ export function createCombatZones(ctx) {
     var any = false; zones.forEach(function (z) { var tgt = stateOf(z).ready, busy = z.duel || z.occ.length || Math.abs(z.readyV - tgt) > 1e-3 || z.lastPhase !== 'DORMANT';
       if (!busy) return; z.readyV += (tgt - z.readyV) * Math.min(1, d / TIMING.presence_s); if (Math.abs(z.readyV - tgt) < 1e-3) z.readyV = tgt; if (!demo) ease(z.duel ? z.duel.f : z.occ, d); if (!z.duel) z.occ = z.occ.filter(function (s) { return s.target > 0 || s.pres > 0.01; }); write(z); any = true; });
     if (any) flag(); }
-  function setNight(n) { night = !!n; if (!uF) return; uF.uGlobal.value = night ? 1.0 : 0.72; uF.uFill.value = night ? 0.16 : 0.13; uF.uSheen.value = night ? 0.22 : 0.16; uF.uPres.value = night ? 1 : 1.7;
+  function setNight(n) { night = !!n; if (!uF) return; uF.uGlobal.value = night ? 1.0 : 0.72; uF.uFill.value = night ? 0.16 : 0.13; uF.uSheen.value = night ? 0.22 : 0.16; uF.uPres.value = night ? 1 : 1.7; uF.uMarkK.value = night ? 0.55 : 0.8;
     uF.uFillC.value.copy(rawRGB(THREE, night ? PALETTE.fill_night : PALETTE.fill_day)); uF.uSky.value.copy(rawRGB(THREE, night ? PALETTE.sky_night : PALETTE.sky_day)); }
   function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; zones = []; byId = {}; group = floor = null; refs = null; }
-  function debug() { return { courts: zones.map(function (z) { return { id: z.id, at: [z.x, z.z], y: z.y, playable_m: z.playable_m, border_m: z.border_m, size_m: z.size_m, yaw_deg: z.yaw_deg, phase: phaseOf(z.id).phase }; }), draw_calls: zones.length ? 1 + (refs ? 2 : 0) : 0, demo: demo ? demo.id + ':' + demo.classes.join(',') + ':' + demo.phase : null, scale_refs: refs }; }
+  function debug() { return { identity_markers: IDENTITY_ORDER.slice(), courts: zones.map(function (z) { return { id: z.id, at: [z.x, z.z], y: z.y, playable_m: z.playable_m, border_m: z.border_m, size_m: z.size_m, yaw_deg: z.yaw_deg, phase: phaseOf(z.id).phase }; }), draw_calls: zones.length ? 1 + (refs ? 2 : 0) : 0, demo: demo ? demo.id + ':' + demo.classes.join(',') + ':' + demo.phase : null, scale_refs: refs }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug,
     zones: function () { return zones.map(function (z) { return { id: z.id, x: z.x, z: z.z, y: z.y, playable_m: z.playable_m, border_m: z.border_m, size_m: z.size_m, yaw_deg: z.yaw_deg }; }); },
     zoneAt: zoneAt, setOccupants: setOccupants, begin: begin, update: update, resolve: resolve, end: resolve, phase: phaseOf, onPhase: function (fn) { listeners.push(fn); },
