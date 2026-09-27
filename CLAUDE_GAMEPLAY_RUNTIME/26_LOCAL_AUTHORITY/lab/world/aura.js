@@ -140,11 +140,18 @@ export function createAura(ctx) {
      … scale variety"): 17 → 9 sky crystals. ONE hero gem per district (pearl over the shared plaza, VISIONARY purple, TITAN blue, and the
      warm heroes a size up at 5–5.6 m) and, for the three warm classes that carry the least ground crystal, one small 2 m companion hanging
      lower beside the hero — a deliberate pair, not a scattered trio. Removed: the three-crystal crowns (their tallest becomes the hero), the
-     second TITAN gem by MAH MATCH and the two 12–14 m gems far out over the coast (more of the same diamond at every horizon). */
+     second TITAN gem by MAH MATCH and the two 12–14 m gems far out over the coast (more of the same diamond at every horizon).
+     M20 review fix (2026-09-27): the LEAN gems (T.red here, and the Veil's crimson gem) read dusty rose by day and pastel pink by night once
+     the dark gem body went neutral — the pale crystal red (0xff6f82) on a grey stone is pink, the M19 crimson-hex trap again, and it sat
+     beside the BAGE pink heroes. build() gives every LEAN gem, and its bloom, the deep class crimson — CLASS_TINT.red with its blue eased
+     (0xd4344a → 0xd42c3a, hue 352° → 355°, still the RED window): lit by the blue sky / hemisphere a gem renders 4–6° toward magenta, and
+     with the plain class hex its rim pixels crossed into the PINK window (measured on the GR / GML gem cameras: rendered hue 346–349° and
+     7–20 % PINK pixels → 349–351° and 0–6 %). */
   function skyCrystals(C) { var T = CRYSTAL_TINT; [[-30, 42, -8, 4.2, T.white], [-120, 64, 20, 5.5, T.purple], [140, 62, 150, 5.0, T.blue], [0, 56, 220, 5.6, T.gold], [-24, 38, 200, 2.2, T.gold], [-116, 52, 218, 5.4, T.red], [-96, 38, 234, 2.0, T.red], [0, 50, 282, 5.0, T.pink], [22, 37, 266, 2.0, T.pink]].forEach(function (a) { C.push({ x: a[0], y: a[1], z: a[2], size: a[3], tint: a[4], ground: 0, shape: 'CRYSTAL' }); }); }
   var skyField = null, forms = null, skyFollowers = [], crystals = null, formsDropped = 0;
   function build() { var req = ctx.auraRequests || [], sky = []; skyMoments(sky);
     var cl = (ctx.auraForms || []).filter(function (f) { return f.shape === 'CRYSTAL'; }); skyCrystals(cl);
+    cl = cl.map(function (c) { return c.tint === CRYSTAL_TINT.red ? Object.assign({}, c, { tint: 0xd42c3a }) : c; });   /* M20 review: a LEAN gem is the deep class crimson (hue-held for the sky light, see above), never the pale crystal red (it read pink) */
     cl.forEach(function (c) { req.push({ x: c.x, y: c.y, z: c.z, size: c.size * 2.3, aspect: 1.25, ring: 0, tint: c.tint, spectral: 0.6, intensity: 0.2, pull: c.size, nightK: 1.9, phase: (c.x * 0.01) % 6 }); });   /* each crystal's soft bloom */
     crystals = createFloatingCrystals(THREE, cl, { isNight: night, tier: tier(), name: 'WORLD_FLOATING_CRYSTALS' }); if (crystals) ctx.group.add(crystals.mesh);
     if (req.length) { field = createAuraField(THREE, req, { isNight: night, tier: tier(), name: 'WORLD_SPECTRAL_AURA' }); if (field) ctx.group.add(field.mesh); }

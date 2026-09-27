@@ -346,10 +346,16 @@ export function applyGeology(THREE, mat, spec) {
    body), a class-coloured FRESNEL EDGE HIGHLIGHT easing to white only at the grazing rim, glowing rounded edges, TIPS that thin into the
    class glow (alpha falls, emission rises — no razor point) and a silhouette that softens at grazing, plus CONTACT DARKENING where a ground
    crystal enters the ground (aCrys.base). The class colour is scaled by its brightest channel (never clipped, never averaged with another
-   hue); spec.glow = { value } scales the light (callers raise it at night). */
+   hue); spec.glow = { value } scales the light (callers raise it at night).
+   M20 review fix (2026-09-27: the floating gems' points and grazing outline faded so far that at 50–110 m a gem read as a pale pebble —
+   "Not MUSHY"): the fade is tunable per crystal — spec.tipFade (how far a point thins, default 0.72), spec.rimFade (the grazing outline,
+   default 0.5) and spec.fadeNear = [d0, d1] (m: the fade acts in full within d0 of the eye and not at all beyond d1, so a crystal keeps its
+   whole outline at mid / far range and only dissolves into light close up); spec.facetGlow (0..1, default 0) lets the facet tone carry the
+   emission as well, so a glowing crystal keeps its cut at night instead of a flat bright shape; spec.facetLight (0..1, default 0) does the same
+   for the sky reflection (the face-on facets look into the dark body, the turned ones catch the sky). Defaults leave every other crystal as it was. */
 export function applyCrystal(THREE, mat, spec) {
   if (!mat || !mat.isMeshStandardMaterial || (PATCHED ? PATCHED.has(mat) : (mat.userData && mat.userData.surfaceDetail))) return mat;
-  var S = Object.assign({ facet: 0.34, depth: 0.3, rim: 0.4, veins: 0.12, refract: 0.18, tier: 'HIGH', soft: false }, spec || {}); var LOW = S.tier === 'LOW', SOFT = !!S.soft, GLOW = S.glow || { value: 1 };
+  var S = Object.assign({ facet: 0.34, depth: 0.3, rim: 0.4, veins: 0.12, refract: 0.18, tier: 'HIGH', soft: false, tipFade: 0.72, rimFade: 0.5, fadeNear: null, facetGlow: 0, facetLight: 0 }, spec || {}); var LOW = S.tier === 'LOW', SOFT = !!S.soft, GLOW = S.glow || { value: 1 };
   var body = ['#include <color_fragment>',
     'vec3 cN = normalize(cross(dFdx(vSdW), dFdy(vSdW))); vec3 cV = normalize(cameraPosition - vSdW); float cFr = pow(1.0 - clamp(abs(dot(cN, cV)), 0.0, 1.0), 3.0);',
     'float cF = sdHash(floor(cN.xz * 5.0 + cN.y * 3.0) + 0.37);',   /* facet id from its orientation: every cut plane keeps its own value */
@@ -365,8 +371,11 @@ export function applyCrystal(THREE, mat, spec) {
   var soft = ['#include <aomap_fragment>',
     '{ vec3 cE = cSoftFam * (cSoftCore * 0.25 + cSoftTip * 0.9 + cSoftEdge * 0.35) + mix(cSoftFam, vec3(1.0), 0.05 + 0.2 * cSoftFr) * cSoftFr * 0.4;',   /* embedded core light · tips burning into glow · lit edges · the class rim easing to white only at grazing */
     '  totalEmissiveRadiance += cE * uCrysGlow * (1.0 - 0.85 * cSoftBase);',
-    '  diffuseColor.a *= (1.0 - cSoftTip * 0.72) * (1.0 - smoothstep(0.6, 1.0, sqrt(cSoftFr)) * 0.5); }'].join('\n');   /* the point thins to light, the silhouette softens at grazing */
-  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-crystal-' + [S.facet, S.depth, S.rim, S.veins, LOW ? 'lo' : 'hi', 'r' + S.refract, SOFT ? 'soft' : 'cut'].join('_');
+    S.facetGlow > 0 ? '  totalEmissiveRadiance *= mix(1.0, clamp(cTone, 0.35, 1.6), ' + f(S.facetGlow) + ');' : '',   /* M20 review: the facets carry the glow (a cut stone at night, not a flat bright shape) */
+    S.facetLight > 0 ? '  reflectedLight.indirectSpecular *= mix(1.0, clamp(cTone, 0.35, 1.6), ' + f(S.facetLight) + ');' : '',   /* M20 review: … and the sky reflection (a smooth metal-glass prism mirrored one even horizon on every face) */
+    '  float cNearK = ' + (S.fadeNear ? '1.0 - smoothstep(' + f(S.fadeNear[0]) + ', ' + f(S.fadeNear[1]) + ', length(vViewPosition))' : '1.0') + ';',   /* M20 review: the fade may act only close to the eye */
+    '  diffuseColor.a *= (1.0 - cSoftTip * ' + f(S.tipFade) + ' * cNearK) * (1.0 - smoothstep(0.6, 1.0, sqrt(cSoftFr)) * ' + f(S.rimFade) + ' * cNearK); }'].join('\n');   /* the point thins to light, the silhouette softens at grazing */
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-crystal-' + [S.facet, S.depth, S.rim, S.veins, LOW ? 'lo' : 'hi', 'r' + S.refract, SOFT ? 'soft' : 'cut', 'f' + S.tipFade + '-' + S.rimFade + '-' + (S.fadeNear ? S.fadeNear.join('-') : 'all') + '-' + S.facetGlow + '-' + S.facetLight].join('_');
   mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r); if (SOFT) sh.uniforms.uCrysGlow = GLOW;
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW;' + (SOFT ? ' attribute vec3 aCrys; varying vec3 vCrys;' : '')).replace('#include <project_vertex>', ['#include <project_vertex>',
       '{ vec4 sdP = vec4(transformed, 1.0);', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; }' + (SOFT ? ' vCrys = aCrys;' : '')].join('\n'));

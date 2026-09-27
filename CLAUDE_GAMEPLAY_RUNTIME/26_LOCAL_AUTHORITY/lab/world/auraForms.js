@@ -150,22 +150,30 @@ export function formsSafe(items) { return items.map(function (it) { var s = it.s
 export function createFloatingCrystals(THREE, items, opts) {
   opts = opts || {}; var n = items.length; if (!n) return null; var LOWQ = opts.tier === 'LOW';
   /* M20 SOFT CRYSTAL (was a flat-shaded razor octahedron on a dark violet body — every class crystal read purple-grey): a six-sided gem with
-     chamfered vertical edges, bevelled shoulders and a blunted lower point (long below like a cut gem), the class colour as its body, and the
-     soft crystal shader (facet tone, inner light, class rim, tips thinning into glow). MED / LOW: the same silhouette with plain corners (LOW also smooth shoulders). */
-  var geo = softCrystalGeometry(THREE, { sides: 6, samples: LOWQ || opts.tier === 'MED' ? 1 : 2, round: 0.22, bevel: LOWQ ? 0 : 0.05, profile: [[-0.5, 0], [-0.43, 0.055], [-0.07, 0.29], [0.03, 0.31], [0.13, 0.3], [0.37, 0.1], [0.44, 0.045], [0.5, 0]] });
-  var glow = { value: opts.isNight ? 0.7 : 0.35 };
-  var mat = new THREE.MeshStandardMaterial({ color: 0x8e9096, roughness: 0.14, metalness: 0.22, emissive: 0xffffff, emissiveIntensity: opts.isNight ? 0.34 : 0.14, transparent: true, opacity: 0.9, envMapIntensity: 0.9 });
+     rounded vertical edges, bevelled shoulders and blunted points (long below like a cut gem), the class colour as its body, and the soft
+     crystal shader (facet tone, inner light, class rim, tips burning into the class glow).
+     M20 review fix (2026-09-27: the first soft gem — a near-round section (corner radius 0.22) on a squat lozenge whose points faded out —
+     read as a pale pebble / egg at the 50–110 m these gems are seen from; "Not MUSHY"): a TALL, SLENDER bipyramid again (height 1, section
+     circumradius 0.26 — the old razor octahedron was 0.31 wide on the same height), a narrow corner radius (0.08: the edges catch a line of
+     light instead of turning the section round) and a short girdle, so the outline stays a crisp pointed gem at any range; the points keep
+     their full body at mid / far range and only thin into light within ~30 m (applyCrystal fadeNear), and the facets carry the glow too
+     (facetGlow), so a night gem is a cut stone, not a flat white shape. The body is an EQUAL-CHANNEL grey (0x909090: the old 0x8e9096 was
+     blue-biased, B / R ≈ 1.13 in linear — it pushed every class hue toward violet). HIGH: rounded edges (three samples a corner), MED / LOW:
+     chamfers (two) — every tier keeps flat facets (one sample a corner shaded the section as a cone). */
+  var geo = softCrystalGeometry(THREE, { sides: 6, samples: LOWQ || opts.tier === 'MED' ? 2 : 3, round: 0.08, bevel: LOWQ ? 0 : 0.025, profile: [[-0.5, 0], [-0.465, 0.02], [0.05, 0.26], [0.12, 0.26], [0.465, 0.02], [0.5, 0]] });
+  var glow = { value: opts.isNight ? 0.5 : 0.35 };
+  var mat = new THREE.MeshStandardMaterial({ color: 0x909090, roughness: 0.14, metalness: 0.22, emissive: 0xffffff, emissiveIntensity: opts.isNight ? 0.3 : 0.16, transparent: true, opacity: 0.96, envMapIntensity: 0.9 });
   var U = { uTime: { value: 0 } };
   mat.onBeforeCompile = function (sh) { sh.uniforms.uTime = U.uTime; var turn = '{ float ph = float(gl_InstanceID) * 1.618; float a = uTime * (0.16 + 0.05 * fract(ph)) + ph * 6.0; float c = cos(a), s = sin(a); ';
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uTime;').replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\n' + turn + 'objectNormal.xz = mat2(c, -s, s, c) * objectNormal.xz; }')   /* M20: the normal turns with the gem (it was rotated after the normal was already transformed — invisible while flat shaded) */
       .replace('#include <begin_vertex>', '#include <begin_vertex>\n' + turn + 'transformed.xz = mat2(c, -s, s, c) * transformed.xz; transformed.y += sin(uTime * 0.45 + ph * 3.0) * 0.08; }');
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime;').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_INSTANCING_COLOR\n totalEmissiveRadiance *= vColor.rgb;\n#endif\n totalEmissiveRadiance *= 0.85 + 0.15 * sin(uTime * 0.8);');   /* a slow breath; the soft crystal shader adds the core, rim and tip light */ };
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime;').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_COLOR\n totalEmissiveRadiance *= vColor.rgb;\n#endif\n totalEmissiveRadiance *= 0.85 + 0.15 * sin(uTime * 0.8);');   /* a slow breath; the soft crystal shader adds the core, rim and tip light. M20 review fix: USE_INSTANCING_COLOR is a VERTEX-only define in three r185 (the fragment sees USE_COLOR), so this tint never ran — every gem glowed plain WHITE since M15 (the grey / pink / salmon cast on the class gems); the glow now takes the gem's class tint */ };
   mat.customProgramCacheKey = function () { return 'mahworld_floating_crystal_m20'; };
-  applyCrystal(THREE, mat, { tier: opts.tier || 'HIGH', soft: true, glow: glow, facet: 0.4, depth: 0.34, rim: 0.3 });
+  applyCrystal(THREE, mat, { tier: opts.tier || 'HIGH', soft: true, glow: glow, facet: 0.45, depth: 0.34, rim: 0.3, tipFade: 0.35, rimFade: 0.2, fadeNear: [14, 32], facetGlow: 0.6 });
   var mesh = new THREE.InstancedMesh(geo, mat, n), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), s = new THREE.Vector3(), col = new THREE.Color();
   items.forEach(function (it, i) { v.set(it.x, it.y, it.z); s.setScalar(it.size || 4); q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), ((i * 0.37) % 1 - 0.5) * 0.25); m4.compose(v, q, s); mesh.setMatrixAt(i, m4); col.set(it.tint === undefined ? 0xb99cff : it.tint); mesh.setColorAt(i, col); });
   mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true; mesh.computeBoundingSphere(); mesh.frustumCulled = true; mesh.name = opts.name || 'FLOATING_CRYSTALS'; mesh.userData.noMerge = true; mesh.userData.nonInteractable = true; mesh.castShadow = false; mesh.receiveShadow = false;
-  return { mesh: mesh, count: n, uniforms: U, tris: (geo.index ? geo.index.count / 3 : 0) * n, setNight: function (nt) { mat.emissiveIntensity = nt ? 0.34 : 0.14; glow.value = nt ? 0.7 : 0.35; }, tick: function (t) { U.uTime.value = t || 0; }, dispose: function () { geo.dispose(); mat.dispose(); } };
+  return { mesh: mesh, count: n, uniforms: U, tris: (geo.index ? geo.index.count / 3 : 0) * n, setNight: function (nt) { mat.emissiveIntensity = nt ? 0.3 : 0.16; glow.value = nt ? 0.5 : 0.35; }, tick: function (t) { U.uTime.value = t || 0; }, dispose: function () { geo.dispose(); mat.dispose(); } };
 }
 
 /* M20 SOFT CRYSTAL GEOMETRY — the one crystal silhouette shared by the floating gems, the region monoliths, the ground shards and the meadow
