@@ -101,7 +101,7 @@ export function createAura(ctx) {
     var haloR = D * Math.tan(Math.max(22, sunHalf * 1.38) * Math.PI / 180), coronaR = D * Math.tan(Math.max(7, moonHalf * 1.3) * Math.PI / 180);
     req.push({ x: 0, y: 0, z: 0, size: haloR / 0.8, ring: 0.8, ringW: 0.03, breakup: 0.45, tint: 0x000000, spectral: 1.0, intensity: 0.75, nightK: 0, phase: 0.7, follow: at(sd, sl),
       fade: function (t, n) { if (n) return 0; var u = ((t % 300) + 300) % 300; return Math.min(1, Math.max(0, u / 12)) * Math.min(1, Math.max(0, (75 - u) / 12)); } });
-    req.push({ x: 0, y: 0, z: 0, size: coronaR / 0.6, ring: 0.6, ringW: 0.08, breakup: 0.25, tint: 0x1c1d21, spectral: 0.9, intensity: 0.6, phase: 1.9, follow: at(md, ml),   /* M19: a neutral silver bloom (was 0x241c36, a violet wash ~75° wide round the Moon); the five-class ring stays */
+    req.push({ x: 0, y: 0, z: 0, size: coronaR / 0.6, ring: 0.6, ringW: 0.08, breakup: 0.25, tint: 0x1e1e1e, spectral: 0.9, intensity: 0.6, phase: 1.9, follow: at(md, ml),   /* M19: a neutral equal-channel silver bloom (was 0x241c36, a violet wash ~75° wide round the Moon); the five-class ring stays */
       fade: function (t, n) { return n ? 1 : 0; } }); }
   /* M14 SKY FORMS: dimensional aura in the sky, far beyond anyone's reach — a gyroscope of two slow soft rings round the HALO dome, outside
      its shell (the rings' inner band edge clears the shell radius), and two great light frames far out over the sea. */
@@ -141,7 +141,7 @@ export function createAura(ctx) {
     if (req.length) { field = createAuraField(THREE, req, { isNight: night, tier: tier(), name: 'WORLD_SPECTRAL_AURA' }); if (field) ctx.group.add(field.mesh); }
     if (sky.length) { skyField = createAuraField(THREE, sky, { isNight: night, tier: tier(), name: 'SKY_SPECTRAL_AURA', renderOrder: -7.5 }); if (skyField) { skyField.mesh.material.transparent = false; ctx.group.add(skyField.mesh); } }   /* the celestial backdrop pass: additive, no depth write, before the world */
     [[req, field, followers], [sky, skyField, skyFollowers]].forEach(function (L) { if (L[1]) L[0].forEach(function (r, i) { if (typeof r.follow === 'function') L[2].push({ i: i, fn: r.follow, fade: r.fade || null, base: r.intensity === undefined ? 0.5 : r.intensity }); }); });
-    var fl = ambientLaw((ctx.auraForms || []).filter(function (f) { return f.shape !== 'CRYSTAL'; })); skyForms(fl); var tq = tier(); if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; });   /* LOW: every sky form, half the local ones */
+    var fl = ambientLaw((ctx.auraForms || []).filter(function (f) { return f.shape !== 'CRYSTAL'; })), tq = tier(); if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; }); skyForms(fl);   /* LOW: every sky form, half the local ones (M19 review: thinned BEFORE the sky forms join, so the two small M19 sky figures both stay) */
     forms = createAuraForms(THREE, fl, { isNight: night, tier: tq, name: 'WORLD_AURA_FORMS', day: 0.5, night: 1.0 }); if (forms) ctx.group.add(forms.mesh);
     log('aura: ' + req.length + ' spectral auras in one draw, ' + sky.length + ' sky moments in the backdrop, ' + (forms ? forms.count : 0) + ' dimensional forms in one draw (' + (followers.length + skyFollowers.length) + ' following)'); }
   function follow(f, list, t) { if (!f || !list.length) return; var P = f.positions, K = f.mesh.geometry.attributes.aK;

@@ -42,7 +42,7 @@ export function createMatchHall(ctx) {
   function roundedRect(w, d, r) { var s = new THREE.Shape(); var x = -w / 2, y = -d / 2; s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + d - r); s.quadraticCurveTo(x + w, y + d, x + w - r, y + d); s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); return s; }
   /* annular prism r1..r2, height h, bottom at y, covering the shape-space arc a1..a2 (a full ring when a2 - a1 >= 2π).
      The extrude is rotated flat with rotateX(-π/2), so shape angle -π/2 (3π/2) lands on world / room +z. */
-  var ARC_SEG = 96;   /* M19: segments per full circle for the court's arcs / rings — 48 on the LOW tier (set in buildCourt) */
+  var ARC_SEG = 96;   /* M19: segments per full circle for the court's arcs / rings — 64 on the LOW tier (set in buildCourt) */
   function arcPrism(r1, r2, h, cx, cz, y, a1, a2) {
     var full = (a2 - a1) >= TWO_PI - 1e-6; var n = Math.max(8, Math.round((a2 - a1) / TWO_PI * ARC_SEG)); var shape = new THREE.Shape(); var i, a;
     if (full) {
@@ -169,11 +169,19 @@ export function createMatchHall(ctx) {
     panel(-hw, d0 > 0 ? d0 - 9.5 : d0 + 9.5, -1, 0);   /* door facade, beside the portal */
     panel(4, -hd, 0, -1);   /* south face */
     /* M19 fix: the sigil plane sat at 0.20 m, 1 cm BEHIND its backing plate's front face (0.21 m), so the depth test hid it and only the dark
-       plate showed; it now stands 2.5 cm in front of the plate — the MAH MATCH diamond (blue → violet, the five-class sweep) finally reads. */
+       plate showed; it now stands 2.5 cm in front of the plate — the MAH MATCH diamond (blue → violet, the five-class sweep) finally reads.
+       M19 review (the first time this shader was ever seen): it read the canvas's RED channel, and the un-premultiplied canvas is white
+       wherever the glow halo reaches, so the line-art diamond drew as a solid glowing lozenge; the sweep AVERAGED the class colour with the
+       blue → violet base (LEAN crimson turned pink) and a ~3x gain let the channels clip (gold → a white slab, TITAN blue → pale cyan).
+       Now: the texture's ALPHA is the line coverage (the diamond, the M and the label draw as lines with a soft halo); the sweep eases the
+       base to equal-channel white and rises from white into the class colour (never an RGB average of two far hues, as auraForms' cycle5);
+       every colour is kept at full hue with its brightest channel at 1 and the light is capped below 1 (0.9 at night), so nothing clips;
+       the line is drawn premultiplied OVER the plate (it hides what is behind it by its coverage), so by day the class colour is not washed
+       toward pink / pale by the lit grey plate showing through additive light. */
     sigilGeo = new THREE.BufferGeometry(); sigilGeo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); sigilGeo.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2)); sigilGeo.setIndex(I); sigilGeo.computeBoundingSphere();
-    sigilMat = new THREE.ShaderMaterial({ uniforms: { uMap: { value: sigilTex }, uTime: facadeU ? facadeU.uTime : { value: 0 }, uNight: facadeU ? facadeU.uNight : { value: night ? 1 : 0 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false,
+    sigilMat = new THREE.ShaderMaterial({ uniforms: { uMap: { value: sigilTex }, uTime: facadeU ? facadeU.uTime : { value: 0 }, uNight: facadeU ? facadeU.uNight : { value: night ? 1 : 0 } }, transparent: true, depthWrite: false, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide, toneMapped: false,   /* M19 review: premultiplied 'over' — the lit line hides the plate behind it (additive light on the daylit grey plate turned crimson pink); at night the plate is black and this is the old additive look */
       vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: 'uniform sampler2D uMap; uniform float uTime; uniform float uNight; varying vec2 vUv; void main() { float a = texture2D(uMap, vUv).r; if (a < 0.01) discard; vec3 B = vec3(0.028, 0.147, 1.0), V = vec3(0.254, 0.074, 1.0); vec3 c = mix(B, V, smoothstep(0.15, 0.95, vUv.y + 0.08 * sin(uTime * 0.3)));\n float sp = vUv.y * 0.8 - uTime * 0.09, sweep = exp(-pow(fract(sp) - 0.5, 2.0) * 40.0), n = mod(floor(sp), 5.0); vec3 K = n < 0.5 ? vec3(1.0, 0.8, 0.36) : (n < 1.5 ? vec3(0.34, 0.56, 1.0) : (n < 2.5 ? vec3(1.0, 0.24, 0.34) : (n < 3.5 ? vec3(0.64, 0.46, 1.0) : vec3(1.0, 0.5, 0.78)))); c = mix(mix(c, vec3(0.85, 0.9, 1.0), 0.35 * a * a), K, 0.75 * sweep) * (0.9 + 1.3 * sweep);   /* M16: each sweep up the sigil carries the next class in turn — gold, blue, crimson, violet, pink: the match hall belongs to all five */\n gl_FragColor = vec4(c * a * mix(0.55, 1.35, uNight), 1.0); }' });
+      fragmentShader: 'uniform sampler2D uMap; uniform float uTime; uniform float uNight; varying vec2 vUv; void main() { float a = texture2D(uMap, vUv).a; if (a < 0.01) discard; vec3 B = vec3(0.028, 0.147, 1.0), V = vec3(0.254, 0.074, 1.0); vec3 c = mix(B, V, smoothstep(0.15, 0.95, vUv.y + 0.08 * sin(uTime * 0.3)));   /* M19 review: alpha = the line coverage */\n float sp = vUv.y * 0.8 - uTime * 0.09, sweep = exp(-pow(fract(sp) - 0.5, 2.0) * 40.0), n = mod(floor(sp), 5.0); vec3 K = n < 0.5 ? vec3(1.0, 0.848, 0.461) : (n < 1.5 ? vec3(0.375, 0.583, 1.0) : (n < 2.5 ? vec3(1.0, 0.245, 0.349) : (n < 3.5 ? vec3(0.662, 0.491, 1.0) : vec3(1.0, 0.575, 0.767))));   /* M16: each sweep up the sigil carries the next class in turn — gold, blue, crimson, violet, pink: the match hall belongs to all five (M19: the five class hexes at full brightness, display space) */\n float tw = smoothstep(0.12, 0.5, sweep), tk = smoothstep(0.5, 0.85, sweep); c = mix(mix(c, vec3(1.0), tw), K, tk); c = mix(c, vec3(1.0), 0.12 * a * a * (1.0 - tk)); c /= max(max(c.r, c.g), max(c.b, 1e-3));   /* M19: base → white → class (never an RGB average), a faint white line core, the brightest channel at 1 */\n gl_FragColor = vec4(c * min(a * mix(0.42, 0.62, uNight) * (1.0 + 0.45 * sweep), mix(0.66, 0.9, uNight)), min(a * 1.15, 0.92)); }' });   /* M19: capped light — the class reads as colour, never a clipped white glare */
     sigilMat.name = 'matchHall_sigil'; }
   function tierQ() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   /* a vertical strip following a rounded-rect outline (w × d, corner r, centred at cx, cz) from y0 to y1, pushed off the outline by off;
@@ -240,8 +248,9 @@ export function createMatchHall(ctx) {
      Host safety: the lobby glass (3 cm) and its reveal (4.5 cm) stand ≤ 5 cm proud of the body face below 3.4 m; everything else new is
      above 8.8 m; no collider changes. Cost: 0 draws — the glass joins the sky-glass draw, the noses + reveals the crown draw, the reveal
      lines the line draw. */
+  var BODY_NOSE = [8.8, 13.4], BODY_NH = 0.42;   /* the slab-nose floor lines (bottom y) and nose height — shared with the corner light rivers */
   function bodyLevels(hw, hd, d0, dw, S, PLINTH, graphite, cyan, glass) {
-    var LOWQ = tierQ() === 'LOW', NOSE = [8.8, 13.4], NH = 0.42, NB = 0.06, NO = 0.1, NR = 0.45;   /* a nose stands 0.16 m proud; NR ≤ 0.48 keeps the rounded corner outside the sharp body corner */
+    var LOWQ = tierQ() === 'LOW', NOSE = BODY_NOSE, NH = BODY_NH, NB = 0.06, NO = 0.1, NR = 0.45;   /* a nose stands 0.16 m proud; NR ≤ 0.48 keeps the rounded corner outside the sharp body corner */
     NOSE.forEach(function (y) { var s = new THREE.ExtrudeGeometry(roundedRect(2 * hw + 2 * NO, 2 * hd + 2 * NO, NR), { depth: NH - 2 * NB, bevelEnabled: true, bevelThickness: NB, bevelSize: NB, bevelSegments: LOWQ ? 1 : 2, steps: 1, curveSegments: LOWQ ? 2 : 6 }); s.rotateX(-Math.PI / 2); s.translate(0, y + NB, 0); graphite.push(s);
       cyan.push(tag(ribbon(2 * hw + 2 * NO, 2 * hd + 2 * NO, NR, 0, 0, y - 0.05, y + 0.01, 0.0, LOWQ ? 40 : 72), 5)); });   /* the lit reveal tucked under the nose (kind 5: dim blue, one slow travelling light) */
     var sigZ = d0 > 0 ? d0 - 9.5 : d0 + 9.5, bladeZ = d0 > 0 ? -hd + 1.4 : hd - 1.4, SIG_HALF = 3.2;   /* == sigils(): the door-facade panel beside the portal, the south panel at x = 4 (W 5.5 + 0.8 backing) */
@@ -302,7 +311,8 @@ export function createMatchHall(ctx) {
     alongZ(-hw, -1, true); alongZ(hw, 1, false); alongX(-hd, -1); alongX(hd, 1);
     [-1, 1].forEach(function (s) { cyan.push(tag(box(0.05, 0.07, 2 * hd + 0.1, s * (hw + 0.025), bodyTop - 0.78, 0), 1)); cyan.push(tag(box(2 * hw + 0.1, 0.07, 0.05, 0, bodyTop - 0.78, s * (hd + 0.025)), 1)); });
     neoTokyo(hw, hd, d0, dw, dh, bodyTop, cyan, graphite);   /* M12: the ticker band, the signage blade and its lit edges */
-    [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (c) { cyan.push(tag(box(0.2, bodyTop - PLINTH - 0.9, 0.2, c[0] * (hw + 0.02), PLINTH + 0.6, c[1] * (hd + 0.02)), 4)); });   /* M14: light rivers up the body's corners */
+    var RIV = [[PLINTH + 0.6, BODY_NOSE[0] - 0.06], [BODY_NOSE[0] + BODY_NH, BODY_NOSE[1] - 0.06], [BODY_NOSE[1] + BODY_NH, bodyTop - 0.3]];   /* M19 review: the 0.2 m river (out to hw + 0.12) cut through each rounded slab-nose corner (≈ hw + 0.03 on the diagonal) — it now runs up to each nose and on above it, as if behind the slab */
+    [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (c) { RIV.forEach(function (r) { cyan.push(tag(box(0.2, r[1] - r[0], 0.2, c[0] * (hw + 0.02), r[0], c[1] * (hd + 0.02)), 4)); }); });   /* M14: light rivers up the body's corners */
     var glass = []; skyGlass(); var sky = skyTiers(hw, hd, H, black, graphite, platinum, cyan, glass);   /* M14: the stacked sky tiers */
     var levels = bodyLevels(hw, hd, d0, dw, S, PLINTH, graphite, cyan, glass);   /* M19: readable floors, punched windows into lit rooms, the lobby glass */
     sigils(hw, hd, d0, graphite);   /* M15: the diamond sigil panels */
@@ -335,7 +345,7 @@ export function createMatchHall(ctx) {
     if (!C || !C.position) { log('matchHall: MATCH_COURT_OUTDOOR artifact missing → court skipped'); return; }
     var cx = C.position[0], cz = C.position[2]; var R = C.r || (Z && Z.r) || 16; var sr = (Z && Z.spectator_r && Z.spectator_r.length === 2) ? Z.spectator_r : [R + 3, R + 8]; if (!Z || !Z.spectator_r) log('matchHall: zone MATCH_COURT.spectator_r missing → ring at r + 3 .. r + 8');
     var s1 = sr[0], s2 = sr[1], sm = (s1 + s2) / 2; var graphite = [], platinum = [], cyan = [];
-    var LOWQ = tierQ() === 'LOW', RS = LOWQ ? 48 : 96; ARC_SEG = RS;   /* M19: LOW halves the court's circle segments */
+    var LOWQ = tierQ() === 'LOW', RS = LOWQ ? 64 : 96; ARC_SEG = RS;   /* M19: LOW uses 64 segments per circle (was 96; 48 faceted visibly on the r ≈ 24 m spectator arcs) */
     graphite.push(disc(R, 0.04, 0, 0, RS));
     platinum.push(arcPrism(R - 0.5, R + 0.25, 0.07, 0, 0, 0, 0, TWO_PI));                                    /* rim kerb (7 cm, not a collider) */
     var GH = 2.0 / s1; var segs = arcSegments([0, Math.PI / 2, Math.PI, Math.PI * 1.5], GH);                 /* four ~4 m aisles so the ring is approachable */
