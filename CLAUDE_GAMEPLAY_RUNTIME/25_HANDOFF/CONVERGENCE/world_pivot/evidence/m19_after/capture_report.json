@@ -1,0 +1,712 @@
+{
+ "started": "2026-09-27T07:19:47.551Z",
+ "size": [
+  960,
+  540
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "HA",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HA_DAY_t40.jpg",
+   "pos": [
+    -350,
+    200,
+    -140
+   ],
+   "look": [
+    -405,
+    146,
+    -165
+   ],
+   "stats": {
+    "calls": 81,
+    "triangles": 564585,
+    "geometries": 214,
+    "textures": 43,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 39870
+  },
+  {
+   "id": "HT",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HT_DAY_t40.jpg",
+   "pos": [
+    -395,
+    300,
+    -160
+   ],
+   "look": [
+    -395,
+    146,
+    -159
+   ],
+   "stats": {
+    "calls": 115,
+    "triangles": 898353,
+    "geometries": 221,
+    "textures": 46,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 16109
+  },
+  {
+   "id": "HL1",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HL1_DAY_t40.jpg",
+   "pos": [
+    -392,
+    149,
+    -186
+   ],
+   "look": [
+    -410,
+    147.5,
+    -140
+   ],
+   "stats": {
+    "calls": 88,
+    "triangles": 570249,
+    "geometries": 221,
+    "textures": 46,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 17846
+  },
+  {
+   "id": "HS",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HS_DAY_t40.jpg",
+   "pos": [
+    -419,
+    150.5,
+    -190
+   ],
+   "look": [
+    -393,
+    149,
+    -147
+   ],
+   "stats": {
+    "calls": 535,
+    "triangles": 2847898,
+    "geometries": 546,
+    "textures": 67,
+    "programs": 170
+   },
+   "frames_in_600ms": 1,
+   "ms": 62445
+  },
+  {
+   "id": "HG",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HG_DAY_t40.jpg",
+   "pos": [
+    -392,
+    147.8,
+    -205
+   ],
+   "look": [
+    -420,
+    146.5,
+    -150
+   ],
+   "stats": {
+    "calls": 85,
+    "triangles": 568515,
+    "geometries": 546,
+    "textures": 67,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 46162
+  },
+  {
+   "id": "HV",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HV_DAY_t40.jpg",
+   "pos": [
+    -335,
+    168,
+    -95
+   ],
+   "look": [
+    -405,
+    148,
+    -170
+   ],
+   "stats": {
+    "calls": 81,
+    "triangles": 564585,
+    "geometries": 546,
+    "textures": 67,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 27405
+  },
+  {
+   "id": "HR",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HR_DAY_t40.jpg",
+   "pos": [
+    -362,
+    148.2,
+    -178
+   ],
+   "look": [
+    -378,
+    146.5,
+    -186
+   ],
+   "stats": {
+    "calls": 80,
+    "triangles": 560169,
+    "geometries": 546,
+    "textures": 67,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 17345
+  },
+  {
+   "id": "F2",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "F2_DAY_t40.jpg",
+   "pos": [
+    -152,
+    16,
+    2
+   ],
+   "look": [
+    -330,
+    80,
+    -135
+   ],
+   "stats": {
+    "calls": 104,
+    "triangles": 607663,
+    "geometries": 546,
+    "textures": 67,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 16106
+  },
+  {
+   "id": "F6",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "F6_DAY_t40.jpg",
+   "pos": [
+    -110,
+    300,
+    20
+   ],
+   "look": [
+    -360,
+    150,
+    -150
+   ],
+   "stats": {
+    "calls": 110,
+    "triangles": 721869,
+    "geometries": 546,
+    "textures": 67,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 15018
+  },
+  {
+   "id": "FP",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "FP_DAY_t40.jpg",
+   "pos": [
+    -250,
+    12,
+    -90
+   ],
+   "look": [
+    -320,
+    20,
+    -140
+   ],
+   "stats": {
+    "calls": 81,
+    "triangles": 568047,
+    "geometries": 546,
+    "textures": 67,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 12531
+  },
+  {
+   "id": "FW1",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "FW1_DAY_t40.jpg",
+   "pos": [
+    -205,
+    7,
+    -50
+   ],
+   "look": [
+    -320,
+    70,
+    -135
+   ],
+   "stats": {
+    "calls": 89,
+    "triangles": 570741,
+    "geometries": 546,
+    "textures": 67,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 14919
+  },
+  {
+   "id": "FK",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "FK_DAY_t40.jpg",
+   "pos": [
+    -372,
+    150,
+    -152
+   ],
+   "look": [
+    -345,
+    144,
+    -143
+   ],
+   "stats": {
+    "calls": 558,
+    "triangles": 2841900,
+    "geometries": 560,
+    "textures": 68,
+    "programs": 170
+   },
+   "frames_in_600ms": 1,
+   "ms": 29004
+  },
+  {
+   "id": "HA",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "HA_NIGHT_t40.jpg",
+   "pos": [
+    -350,
+    200,
+    -140
+   ],
+   "look": [
+    -405,
+    146,
+    -165
+   ],
+   "stats": {
+    "calls": 85,
+    "triangles": 577865,
+    "geometries": 565,
+    "textures": 73,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 22952
+  },
+  {
+   "id": "HT",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "HT_NIGHT_t40.jpg",
+   "pos": [
+    -395,
+    300,
+    -160
+   ],
+   "look": [
+    -395,
+    146,
+    -159
+   ],
+   "stats": {
+    "calls": 113,
+    "triangles": 911405,
+    "geometries": 565,
+    "textures": 73,
+    "programs": 170
+   },
+   "frames_in_600ms": 1,
+   "ms": 7918
+  },
+  {
+   "id": "HL1",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "HL1_NIGHT_t40.jpg",
+   "pos": [
+    -392,
+    149,
+    -186
+   ],
+   "look": [
+    -410,
+    147.5,
+    -140
+   ],
+   "stats": {
+    "calls": 92,
+    "triangles": 583529,
+    "geometries": 565,
+    "textures": 73,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 6995
+  },
+  {
+   "id": "HS",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "HS_NIGHT_t40.jpg",
+   "pos": [
+    -419,
+    150.5,
+    -190
+   ],
+   "look": [
+    -393,
+    149,
+    -147
+   ],
+   "stats": {
+    "calls": 551,
+    "triangles": 2870368,
+    "geometries": 568,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 1,
+   "ms": 31579
+  },
+  {
+   "id": "HG",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "HG_NIGHT_t40.jpg",
+   "pos": [
+    -392,
+    147.8,
+    -205
+   ],
+   "look": [
+    -420,
+    146.5,
+    -150
+   ],
+   "stats": {
+    "calls": 89,
+    "triangles": 581795,
+    "geometries": 568,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 21010
+  },
+  {
+   "id": "HV",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "HV_NIGHT_t40.jpg",
+   "pos": [
+    -335,
+    168,
+    -95
+   ],
+   "look": [
+    -405,
+    148,
+    -170
+   ],
+   "stats": {
+    "calls": 85,
+    "triangles": 577865,
+    "geometries": 568,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 8714
+  },
+  {
+   "id": "HR",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "HR_NIGHT_t40.jpg",
+   "pos": [
+    -362,
+    148.2,
+    -178
+   ],
+   "look": [
+    -378,
+    146.5,
+    -186
+   ],
+   "stats": {
+    "calls": 84,
+    "triangles": 573449,
+    "geometries": 568,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 10671
+  },
+  {
+   "id": "F2",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "F2_NIGHT_t40.jpg",
+   "pos": [
+    -152,
+    16,
+    2
+   ],
+   "look": [
+    -330,
+    80,
+    -135
+   ],
+   "stats": {
+    "calls": 105,
+    "triangles": 620829,
+    "geometries": 568,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 1,
+   "ms": 13786
+  },
+  {
+   "id": "F6",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "F6_NIGHT_t40.jpg",
+   "pos": [
+    -110,
+    300,
+    20
+   ],
+   "look": [
+    -360,
+    150,
+    -150
+   ],
+   "stats": {
+    "calls": 115,
+    "triangles": 742205,
+    "geometries": 568,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 7279
+  },
+  {
+   "id": "FP",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "FP_NIGHT_t40.jpg",
+   "pos": [
+    -250,
+    12,
+    -90
+   ],
+   "look": [
+    -320,
+    20,
+    -140
+   ],
+   "stats": {
+    "calls": 85,
+    "triangles": 581327,
+    "geometries": 568,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 0,
+   "ms": 8184
+  },
+  {
+   "id": "FW1",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "FW1_NIGHT_t40.jpg",
+   "pos": [
+    -205,
+    7,
+    -50
+   ],
+   "look": [
+    -320,
+    70,
+    -135
+   ],
+   "stats": {
+    "calls": 93,
+    "triangles": 584021,
+    "geometries": 568,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 1,
+   "ms": 9436
+  },
+  {
+   "id": "FK",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "FK_NIGHT_t40.jpg",
+   "pos": [
+    -372,
+    150,
+    -152
+   ],
+   "look": [
+    -345,
+    144,
+    -143
+   ],
+   "stats": {
+    "calls": 565,
+    "triangles": 2864028,
+    "geometries": 569,
+    "textures": 75,
+    "programs": 170
+   },
+   "frames_in_600ms": 1,
+   "ms": 38259
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 13,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (1337 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (17 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (12 ms)",
+   "combatZones: 2 courts (CZ_ELEVATOR_GROVE 24 m, CZ_GYM_LAWN 24 m) in 1 draw; roster authority HOST",
+   "worldB combatZones ready (2 ms)",
+   "aura: 65 spectral auras in one draw, 2 sky moments in the backdrop, 25 dimensional forms in one draw (2 following)",
+   "worldB aura ready (4 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 19711.7,
+  "error": null
+ },
+ "finished": "2026-09-27T07:29:19.941Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 134,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (1337 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (17 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (12 ms)",
+   "combatZones: 2 courts (CZ_ELEVATOR_GROVE 24 m, CZ_GYM_LAWN 24 m) in 1 draw; roster authority HOST",
+   "worldB combatZones ready (2 ms)",
+   "aura: 65 spectral auras in one draw, 2 sky moments in the backdrop, 25 dimensional forms in one draw (2 following)",
+   "worldB aura ready (4 ms)"
+  ]
+ }
+}
