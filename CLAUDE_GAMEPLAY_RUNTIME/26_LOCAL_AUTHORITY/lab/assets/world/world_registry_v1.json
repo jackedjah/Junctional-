@@ -6076,7 +6076,7 @@
   "atmosphere": {
    "_doc": "owner B7 §8 (2026-09-20): the phone-safe physically-inspired sky (lab/world/atmosphere.js) — a Rayleigh-style zenith → horizon mix by the optical depth of the view ray, a horizon haze band warmed toward the sun, a Henyey-Greenstein Mie lobe (the sun glare + halo), a graphite ground haze, a faint cool-violet MAHWORLD zenith cast; the scene fog takes the haze colour (one truth for sky + distance falloff). Tiers: HIGH / MED full, LOW = Mie lobe off. The oversized sun / moon canon (registry.celestial) and the water stay.",
    "day": {
-    "zenith": "#575b80",
+    "zenith": "#63678b",
     "horizon": "#c8c6d8",
     "haze": "#e0dfe9",
     "sunTint": "#f0ede8",

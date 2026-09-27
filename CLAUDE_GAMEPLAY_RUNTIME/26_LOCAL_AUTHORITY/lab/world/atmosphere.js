@@ -29,7 +29,7 @@
 export function createAtmosphere(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var scene = ctx.scene; var reg = ctx.registry || {}; var A = (reg.sky && reg.sky.atmosphere) || {};
   var night = !!ctx.night, mat = null, prev = null, dome = null, clock = 0, own = [];
-  var DAY = { zenith: '#575b80', horizon: '#c8c6d8', haze: '#e0dfe9', sunTint: '#f0ede8', ground: '#4d4e5a', mie: 0.85, fog: '#bdbccd', fog_near_m: 75, lavender: '#bab2cc', lavender_k: 0.35, haze_k: 0.8, veil_k: 0.55, veil_scale: 1, cast_k: 0.3 };
+  var DAY = { zenith: '#63678b', horizon: '#c8c6d8', haze: '#e0dfe9', sunTint: '#f0ede8', ground: '#4d4e5a', mie: 0.85, fog: '#bdbccd', fog_near_m: 75, lavender: '#bab2cc', lavender_k: 0.35, haze_k: 0.8, veil_k: 0.55, veil_scale: 1, cast_k: 0.3 };
   var NIGHT = { zenith: '#04070f', horizon: '#15213a', haze: '#1d2a45', sunTint: '#aab8d2', ground: '#090c14', mie: 0.55, fog: '#0d1522', fog_near_m: 80, lavender: '#2f3a58', lavender_k: 0.2, haze_k: 0.6, veil_k: 0.25, veil_scale: 1, cast_k: 0.6 };
   function P(k) { var src = night ? (A.night || {}) : (A.day || {}); var base = night ? NIGHT : DAY; return src[k] !== undefined ? src[k] : base[k]; }
   function col(hex) { return new THREE.Color(hex); }
@@ -81,9 +81,9 @@ export function createAtmosphere(ctx) {
         /* M20 ALTOSTRATUS VEIL: a high overcast sheet on a plane above the world (the dome rides with the viewer, so it is infinitely far):
            streaks along the wind, compressed toward the horizon and faded out below ~10° before they alias; a little darker than the sky
            where thick (the storm-light layering), silvered on the key's side */
-        '  { vec2 q = d.xz / (hp + 0.16); q = vec2(dot(q, uVeilW), dot(q, vec2(-uVeilW.y, uVeilW.x))) * vec2(0.075, 0.2) * uVeilS + uVeilO;',   /* uVeilO: the drift, wrapped on the CPU (a mediump clock would quantise it after an hour) */
-        '    float n = texture2D(uVeilTex, q).r * 0.66 + texture2D(uVeilTex, q * vec2(2.3, 3.1) + vec2(0.37, 0.61)).g * 0.34;',
-        '    float hz = smoothstep(0.03, 0.18, hp), cov = smoothstep(0.36, 0.74, n) * hz, gap = (1.0 - smoothstep(0.16, 0.4, n)) * hz, sunK = pow(max(mu, 0.0), 3.0);',
+        '  { vec2 q = d.xz / (hp + 0.16); q = vec2(dot(q, uVeilW), dot(q, vec2(-uVeilW.y, uVeilW.x))) * vec2(0.11, 0.2) * uVeilS + uVeilO;',   /* uVeilO: the drift, wrapped on the CPU (a mediump clock would quantise it after an hour) */
+        '    float n = texture2D(uVeilTex, q).r * 0.66 + texture2D(uVeilTex, q * vec2(2.0, 3.0) + vec2(0.37, 0.61)).g * 0.34;',   /* M20 review: integer octave scales, so the CPU-wrapped drift never jumps the fine octave (it popped every ~42 min); the streaks are less anisotropic and thin toward the zenith (they converged into vertical bands overhead) */
+        '    float hz = smoothstep(0.03, 0.18, hp), cov = smoothstep(0.36, 0.74, n) * hz * (1.0 - 0.55 * smoothstep(0.45, 0.95, hp)), gap = (1.0 - smoothstep(0.16, 0.4, n)) * hz, sunK = pow(max(mu, 0.0), 3.0);',
         '    vec3 vc = mix(uHorizon, uZenith, 0.38 + 0.3 * smoothstep(0.55, 0.9, n)) * (0.9 + 0.26 * sunK) + uSunTint * sunK * 0.12;',
         '    c = mix(c, vc, cov * uVeilK); c = mix(c, uHaze, gap * uVeilK * 0.24); }',   /* thick streaks a shade darker, the thin breaks a shade silverier: light moving through the layer */
         '#endif',
