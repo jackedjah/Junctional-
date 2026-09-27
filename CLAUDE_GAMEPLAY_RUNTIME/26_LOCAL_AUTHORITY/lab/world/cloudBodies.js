@@ -20,168 +20,196 @@
    class-family hues only, uAuraK). Layout, positions and the shared sky stream are untouched: only the drawing changes.
    M19 ATMOSPHERE, NOT OBJECTS (owner 2026-09-27, still not accepted: lobed cotton objects — longer, more oblong, more continuous, fewer
    circular lobes, more scale variation, softer distance extinction, irregular erosion, a deeper but subtler underside, weaker far contrast,
-   faint aura, better horizon merging; the best cloud sometimes reads as atmosphere rather than object):
-     · decks, streets and heaps are no longer unions of cloudlets but a few wide SOFT SLICES through ONE analytic body (FRAG): a flat base
-       shared by the layer, one continuous upper profile over the body's apparent width, a body-plane noise field that erodes, opens gaps
-       and sets thickness identically for every overlapping slice — no card can draw its own round outline; from below, the footprint along
-       the view ray; from above, the plate becomes a mottled top sheet. Towers and wind streaks keep their (flatter, streak-eroded) atlas;
-     · each body draws a FORM (deck / street / heap) and a SCALE (0.6–1.9×) from its private stream; horizon banks lie along their ring;
-     · aerial perspective is Beer-Lambert extinction toward the sky dome's OWN colour along the view ray (the dome uniforms are shared by
-       reference), after the contrast has fallen toward the body tone — far bodies dissolve into the horizon haze;
-     · cheaper: octagon cards (no empty corners), fewer and less-stretched cards, cheap early discards, cards a view cannot show collapsed
-       in the vertex stage, slices sample no atlas; LOW keeps the front row and drops the faintest fragments. */
+   faint aura, better horizon merging; the best cloud sometimes reads as atmosphere rather than object). Second pass after review: camera-
+   facing cards of any kind still drew OBJECTS — from below every card (or card-sized footprint) read as a smooth egg, capsule or lens, and
+   the towering ring stayed a translucent stack of lobes. So a body is no longer drawn with cards at all:
+     · ONE VOLUME PER BODY: each body is ONE box proxy (one instance, 12 triangles; faces turned away from the viewer are collapsed in the
+       vertex stage) whose fragments march the view ray through a HEIGHTFIELD cloud — a flat base shared by the layer and a top set by a
+       body-anchored noise field, thresholded inside a soft, noise-eaten rounded-rectangle footprint. Thickness, gaps, cells, rolls and
+       broken ends all come from that one field: a deck from below is a mottled sheet with sky in its gaps, from the side a long band with
+       an uneven top, and toward the horizon its cells and rolls compress into bands in true perspective. No card outline exists to be seen;
+     · FORMS: SHEET (stratocumulus deck: wide, thin, flat-topped cells), STREET (rolls along the body axis with clear lanes between), HEAP
+       (low domed cumulus cells), TOWER (the far congestus ring: one broad mass split into sub-towers with rounded turrets — no stacked
+       lobes — that fades into the haze sooner, a presence behind the banks);
+     · LIGHT: Beer-Lambert extinction along the ray; the key reaches each sample through the shorter of its depth below the local top or
+       its way in from the sunward flank (lit crowns and sunward sides, deep but soft bases under thick cells, lighter thin cells), sky
+       ambient rising with height, a silver lining where the body is thin; on HIGH / MED the crown's slope adds lit / shaded relief;
+     · DEPTH: every fragment writes the depth where the body actually is along its ray, so a mountain or the highland standing inside a
+       body's box hides the cloud behind it (the box face alone drew it over the peak); aerial extinction by that distance toward the
+       dome's own colour (sky.shareSky), contrast first; the horizon fade acts only near the horizon LINE, and a body looked DOWN upon (the
+       HALO rim, the highland) thins to a veil of mist, so the districts below stay readable;
+     · AURA (colour law): a faint pearl sheen on thin parts that only ever eases ONE class hue out of an equal-channel neutral — gold toward
+       the key, pale blue away from it, pink only on lit near-white parts — never an RGB midpoint between two class hues;
+     · COST: one shaded fragment per covered pixel per body (no stacked cards: far fewer rasterised and blended cloud fragments) × about
+       two march steps per field cell along the ray (HIGH 5–20, MED 4–10; each one mip-filtered texture fetch) + two relief reads; LOW
+       takes ONE sample (the body as a thickness map), no relief, no aura noise, the sky colour per vertex, and half the bodies (sky.js).
+       The wind streaks on the tower flanks are the only atlas cards left. */
 
 /* M19 SKY REPLICA: the dome's own scattering (atmosphere.js, the same uniforms shared by reference through sky.shareSky), evaluated along the
-   view ray — aerial perspective pulls a distant cloud toward exactly the sky behind it, so far bodies dissolve into the horizon haze instead
-   of standing in front of it. Per fragment on HIGH / MED, per vertex on LOW. */
+   view ray — aerial perspective pulls a distant cloud toward the sky behind it, so far bodies dissolve into the horizon haze instead of
+   standing in front of it. Includes the dome's Henyey-Greenstein glare, halo and aureole (a cloud near the Sun fades into the glare, not into
+   a darker sky). Below the horizon the airlight is the horizon haze (what the scene fog paints over the terrain), not the dome's graphite
+   ground colour, which is never seen. Per fragment on HIGH / MED, per vertex on LOW. */
 var SKY_FN = [
   'uniform vec3 uSkyZ, uSkyH, uSkyHz, uSkyT, uSkyL, uSkyS; uniform float uSkyMie, uSkyLavK, uSkyHazeK, uSkyOn;',
   'vec3 skyAt(vec3 d) {',
-  '  float h = clamp(d.y, -1.0, 1.0), hp = max(h, 0.0), mu = dot(d, normalize(uSkyS)), od = 1.0 / (hp * 4.0 + 0.22);',
+  '  float hp = max(d.y, 0.0), mu = dot(d, normalize(uSkyS)), mp = max(mu, 0.0), od = 1.0 / (hp * 4.0 + 0.22);',
   '  float t = clamp(0.62 * pow(1.0 - hp, 2.2) + 0.38 * (1.0 - exp(-od * 0.55)), 0.0, 1.0); vec3 c = mix(uSkyZ, uSkyH, t) * mix(0.9, 1.1, (0.5 + 0.5 * mu) * (0.35 + 0.65 * t));',
-  '  c = mix(c, mix(uSkyHz, uSkyT, 0.55 * pow(max(mu, 0.0), 4.0)), clamp((exp(-hp * 16.0) + 0.38 * exp(-hp * 3.6)) * uSkyHazeK, 0.0, 1.0));',
-  '  c = mix(c, uSkyL, clamp(pow(max(-mu, 0.0), 1.4) * exp(-hp * 7.0) * uSkyLavK, 0.0, 1.0)) + uSkyT * pow(max(mu, 0.0), 3.0) * exp(-hp * 3.0) * 0.16 * uSkyMie;',
-  '  return mix(c, c * vec3(0.95, 0.975, 1.07), smoothstep(0.35, 0.95, h)); }'].join('\n');
+  '  c = mix(c, mix(uSkyHz, uSkyT, 0.55 * pow(mp, 4.0)), clamp((exp(-hp * 16.0) + 0.38 * exp(-hp * 3.6)) * uSkyHazeK, 0.0, 1.0));',
+  '  c = mix(c, uSkyL, clamp(pow(max(-mu, 0.0), 1.4) * exp(-hp * 7.0) * uSkyLavK, 0.0, 1.0)) + uSkyT * pow(mp, 3.0) * exp(-hp * 3.0) * 0.16 * uSkyMie;',
+  '  c += uSkyT * (0.0039312 / pow(1.6724 - 1.64 * mu, 1.5) * uSkyMie + pow(mp, 10.0) * 0.1 * max(uSkyMie, 0.25) + pow(mp, 56.0) * 0.28 * uSkyMie);',   /* the dome's HG glare (g 0.82) + soft halo + tight aureole */
+  '  return mix(c, c * vec3(0.95, 0.975, 1.07), smoothstep(0.35, 0.95, d.y)); }'].join('\n');
 
 var VERT = [
-  'attribute vec4 aPuff;',              /* x: height inside the cloud 0..1 · y: atlas shape (integer part 0..3) + seed (fraction) · z: alpha · w: flatten (base puffs) */
-  'attribute vec3 aCloud;',             /* x: cloud base world y · y: cloud vertical extent (m) · z: M19 the body's own seed (its field never repeats another body's) */
+  'attribute vec4 aPuff;',              /* x: height inside the cloud 0..1 · y: atlas shape (integer part 0..3) + seed (fraction) · z: alpha · w: kind (0.5 wind-streak card · 3 the body VOLUME) */
+  'attribute vec3 aCloud;',             /* x: the body's flat base (world y) · y: its height (m) · z: its FORM (0 sheet · 1 street · 2 heap · 3 tower) + its own seed (fraction) */
   'attribute vec4 aCentre;',            /* xyz: the cloud body's centre (world) · w: its radius (m) — the whole body is lit from the key's side */
-  'attribute vec4 aBody;',              /* M19: xy the body's long axis (world xz) · z its half length · w its half depth (m) — the soft ENVELOPE of one long mass */
+  'attribute vec4 aBody;',              /* M19: xy the body's long axis (world xz) · z its half length · w its half depth (m) — the volume's footprint */
   'uniform vec3 uLightWorld; uniform float uOblong; uniform float uTime;',
   SKY_FN,
-  'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow; varying float vShell; varying float vFade;',
-  'varying vec2 vHxz; varying vec3 vCtr; varying vec4 vBodyK; varying float vAbove; varying float vSoft; varying float vSeed; varying vec3 vView; varying vec3 vSky; varying float vSide; varying float vForm; varying float vExt;',
+  'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vFade;',
+  'varying vec3 vView; varying vec3 vCtr; varying vec4 vBodyK; varying vec4 vSlab; varying float vKind;',
+  '#if CLOUD_TAPS == 0',
+  'varying vec3 vSky;',
+  '#endif',
   'void main() {',
   '  float seed = fract(aPuff.y), shape = floor(aPuff.y + 0.001); bool flip = seed > 0.5;',
-  '  vUv = vec2(flip ? 1.0 - uv.x : uv.x, uv.y); vPuff = vec4(aPuff.x, seed, aPuff.z, aPuff.w);',
+  '  vUv = vec2(flip ? 0.5 - position.x : position.x + 0.5, position.y + 0.5); vPuff = vec4(aPuff.x, seed, aPuff.z, aPuff.w);',
   '  vCell = vec2(mod(shape, 2.0) * 0.5, (1.0 - floor(shape * 0.5)) * 0.5);',   /* 2 × 2 atlas cell (canvas rows are flipped into uv) */
-  '  vec3 centre = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;',
-  '  float sx = length(instanceMatrix[0].xyz), sy = length(instanceMatrix[1].xyz);',
-  '  vec3 toCam = normalize(cameraPosition - centre);',
-  '  float tyB = normalize(cameraPosition - aCentre.xyz).y, below = smoothstep(0.2, 0.7, -tyB); vBelow = below; float isPlate = step(1.5, aPuff.w), isBase = step(0.5, aPuff.w) * (1.0 - isPlate), slabV = step(floor(aCloud.z + 0.0005), 2.5) * (1.0 - step(0.25, aPuff.w) * step(aPuff.w, 0.75)); sy *= 1.0 + below * (0.6 + 0.9 * min(aPuff.w, 1.0)) * (1.0 - 0.8 * slabV);',   /* M19: a slice is already as wide as its body needs; it is stretched far less (fewer overlapping fragments) */
-  '  float under = smoothstep(0.08, 0.42, -tyB); vFade = mix(mix(1.0 - 0.3 * under, 1.0 - 0.65 * under, isBase), under, isPlate); vSide = 1.0 - smoothstep(0.03, 0.18, -tyB);',   /* M19: from below the base plate (the deck's soft mottled underside) takes over sooner, and the flat-base clip only acts side-on (from below it cut every card at the same height: stacked hat brims) — all three are read from the BODY centre, so every card of one body takes the same state (per card they switched at card borders: hard seams) */
-  '  float oblong = 1.0 + (1.0 - isPlate) * uOblong * (0.62 + 0.45 * min(aPuff.w, 1.0) + 0.45 * fract(seed * 5.31)) * (1.0 - 0.75 * slabV); sx *= oblong; sy *= 1.0 - 0.1 * uOblong * (1.0 - isPlate);',   /* M14: stretched along the horizon (base puffs most, each a little differently), a touch flatter — drifting masses, not balls */   /* M9: the plate appears as the base puffs fade, once the body is overhead */   /* seen from below, puffs spread vertically so the underside closes into one flat grey surface (thin stacked puffs read as slices) */
+  '  vec3 centre = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz, Lw = normalize(uLightWorld), world; float fade = 1.0, kind = step(2.5, aPuff.w), bH = max(aCloud.y, 1.0), bX = max(aBody.z, 1.0), bZ = max(aBody.w, 1.0);',
+  '  vKind = kind; vCtr = aCentre.xyz; vBodyK = vec4(aBody.xy, bX, bZ); vSlab = vec4(aCloud.x, bH, fract(aCloud.z), floor(aCloud.z + 0.0005));',
+  '  if (kind > 0.5) {',
+  /* M19 the body VOLUME: a box around the heightfield. With the viewer outside, the faces turned away are collapsed (every covered pixel is
+     shaded once, from the entry face); with the viewer inside (a stratus deck met on the highland), every face is kept and the march starts at the eye */
+  '    world = (modelMatrix * instanceMatrix * vec4(position, 1.0)).xyz; vec3 nW = mat3(modelMatrix * instanceMatrix) * normal, dc = cameraPosition - aCentre.xyz;',
+  '    vec3 lc = vec3(dot(dc.xz, aBody.xy) / bX, (cameraPosition.y - aCloud.x) / bH * 2.0 - 1.0, dot(dc.xz, vec2(-aBody.y, aBody.x)) / bZ);',
+  '    if (max(abs(lc.x), max(abs(lc.y), abs(lc.z))) > 1.0 && dot(nW, cameraPosition - (modelMatrix * instanceMatrix * vec4(normal * 0.5, 1.0)).xyz) < 0.0) fade = 0.0;',   /* decided at the FACE centre, so all four corners of a face agree (a face seen edge-on never splits into a sliver) */
+  '    vRel = vec3(0.0); vLs = vec2(0.0); vH = 0.5;',
+  '  } else {',
+  /* a WIND STREAK card (the only cards left): camera-facing, upright near the horizon, drawn on the box's front face only */
+  '    float sx = length(instanceMatrix[0].xyz), sy = length(instanceMatrix[1].xyz); vec3 toCam = normalize(cameraPosition - centre); if (normal.z < 0.5) fade = 0.0;',
+  '    sx *= 1.0 + uOblong * (0.62 + 0.45 * fract(seed * 5.31)); sy *= 1.0 - 0.1 * uOblong;',   /* M14: stretched along the horizon, each a little differently */
   '#if CLOUD_TAPS == 0',
-  '  sx *= 0.84; sy *= 0.9;',   /* M19 LOW: square cards, drawn a little smaller, so LOW rasterises fewer cloud fragments than before in every view */
+  '    sx *= 0.84; sy *= 0.9;',   /* LOW: drawn a little smaller */
   '#endif',
-  '  vec3 viewUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);',
-  '  vec3 camUp = normalize(mix(vec3(0.0, 1.0, 0.0), viewUp, smoothstep(0.35, 0.85, abs(toCam.y))));',   /* upright near the horizon (flat base, crown up); camera-facing when looked at steeply from below/above so puffs never foreshorten into stacked discs */
-  '  vec3 camRight = normalize(cross(camUp, toCam)); camUp = normalize(cross(toCam, camRight));',
-  '  float rot = (1.0 - step(0.25, aPuff.w)) * step(2.5, aCloud.z) * (fract(seed * 7.13) - 0.5) * 0.9 * (1.0 - 0.7 * uOblong), cr = cos(rot), sr = sin(rot); vec2 q = vec2(position.x * sx, position.y * sy);',
-  '  vec3 tX = camRight * cr + camUp * sr, tY = camUp * cr - camRight * sr;',   /* M10: crown puffs turn up to ±26° in their own plane, so the four atlas shapes never stand in the same pose (M19: towers only — slices stay level) */
-  '  vec3 world = centre + tX * q.x + tY * q.y + (tX * sin(uTime * 0.035 + seed * 31.0) * 0.07 * sx + tY * sin(uTime * 0.027 + seed * 17.0) * 0.035 * sy) * (1.0 - isPlate);',   /* M15: every lobe drifts slowly inside its body, so a cloud never just sits there */
-  '  float over = smoothstep(0.1, 0.45, tyB), isWisp = step(0.25, aPuff.w) * step(aPuff.w, 0.75); vFade = mix(vFade * (1.0 - 0.55 * over), over, isPlate * step(0.0, tyB)) * (1.0 - isWisp * smoothstep(0.2, 0.5, abs(tyB)));',   /* M19 seen from ABOVE (the HALO rim): the plate rises to the body top and becomes its lit, mottled upper sheet while the cards thin out; wind streaks are side-view features and fade when looked at steeply */
-  '  if (isPlate > 0.5) { float up = step(0.0, tyB); world = centre + mat3(instanceMatrix) * vec3(position.x, 0.0, position.y) + vec3(0.0, up * aCloud.y * 0.6, 0.0); vBelow = 1.0 - up; }',   /* the base plate lies flat in the body's own frame */
-  '  vH = clamp((world.y - aCloud.x) / max(aCloud.y, 1.0), 0.0, 1.0);',   /* shade by height inside the WHOLE cloud: no per-puff banding */
-  '  vRel = ((centre - aCentre.xyz) + (world - centre) * 0.35 * (1.0 - below)) / max(aCentre.w, 1.0);',   /* body-side light is taken at the PUFF centre (plus a little in-puff gradient seen side-on): per-fragment it painted the same gradient on every puff, which stacked into plates seen from below */
-  '  vec3 Lw = normalize(uLightWorld); vLs = vec2(dot(Lw, tX) * (flip ? -1.0 : 1.0), dot(Lw, tY)) * (1.0 - 0.85 * below);',   /* the key projected into this puff's texture plane: the self-shadow march direction */
-  '  vec3 vd = world - cameraPosition; float vl = max(length(vd), 1.0); vElev = vd.y / vl; vFwd = max(dot(vd / vl, Lw), 0.0);',
+  '    vec3 viewUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);',
+  '    vec3 camUp = normalize(mix(vec3(0.0, 1.0, 0.0), viewUp, smoothstep(0.35, 0.85, abs(toCam.y))));',   /* upright near the horizon; camera-facing when looked at steeply */
+  '    vec3 camRight = normalize(cross(camUp, toCam)); camUp = normalize(cross(toCam, camRight)); vec2 q = vec2(position.x * sx, position.y * sy);',
+  '    world = centre + camRight * q.x + camUp * q.y + camRight * sin(uTime * 0.035 + seed * 31.0) * 0.07 * sx + camUp * sin(uTime * 0.027 + seed * 17.0) * 0.035 * sy;',   /* M15: drifts slowly inside its body */
+  '    fade *= 1.0 - smoothstep(0.2, 0.5, abs(toCam.y));',   /* wind streaks are side-view features: they fade when looked at steeply */
+  '    vH = clamp((world.y - aCloud.x) / bH, 0.0, 1.0); vRel = ((centre - aCentre.xyz) + (world - centre) * 0.35) / max(aCentre.w, 1.0);',   /* shade by height inside the WHOLE cloud; body-side light at the card centre */
+  '    vLs = vec2(dot(Lw, camRight) * (flip ? -1.0 : 1.0), dot(Lw, camUp));',   /* the key projected into the card plane: the self-shadow march direction */
+  '  }',
+  '  vec3 vd = world - cameraPosition; float vl = max(length(vd), 1.0); vElev = vd.y / vl; vFwd = max(dot(vd / vl, Lw), 0.0); vView = vd; vFade = fade;',
   '  vDist = length(cameraPosition - centre);',
-  '  vec3 dO = (centre - aCentre.xyz) / vec3(max(aCentre.w, 1.0), max(aCloud.y * 0.5, 1.0), max(aCentre.w, 1.0)); vShell = length(dO - toCam * dot(dO, toCam));',   /* M9: the puff's place in the body's SILHOUETTE (ellipsoid-normalised, projected across the view): 0 = covered core, ~1 = the visible outline */
-  /* M19 ONE BODY, ONE FIELD (owner 2026-09-27: still lobed cotton objects): every fragment is placed in its BODY's frame, not its card's —
-     (1) the body ENVELOPE, a soft horizontal ellipse over the long axis, so the mass thins out toward its ends and flanks as one form;
-     (2) the body PLANE (per fragment, FRAG): the view ray is cut by the plane through the body centre facing the viewer, so every
-     overlapping card samples the SAME outline, erosion and thickness at the same screen point — no card draws an outline of its own;
-     (3) height above the body's one flat base, shared by the whole layer. */
-  '  vec3 tcB = normalize(cameraPosition - aCentre.xyz); vec2 ax = aBody.xy;',
-  '  vHxz = vec2(max(aBody.z, 1.0), max(aBody.w, 1.0));',
-  '#if CLOUD_TAPS == 0',
-  '  vHxz *= 0.86;',   /* LOW: the footprint shrinks with its smaller cards */
-  '#endif',
-  '  vec3 rB = cross(vec3(0.0, 1.0, 0.0), tcB); rB = length(rB) > 0.001 ? normalize(rB) : vec3(1.0, 0.0, 0.0); float cth = dot(rB.xz, ax);',
-  '  vCtr = aCentre.xyz; vBodyK = vec4(ax, max(sqrt(vHxz.x * vHxz.x * cth * cth + vHxz.y * vHxz.y * (1.0 - cth * cth)), 1.0), max(aCentre.w, 1.0));',   /* the body's APPARENT half width from this side, and its radius */
-  '  vAbove = world.y - aCloud.x; vSoft = max(2.5, aCloud.y * 0.1); vSeed = fract(aCloud.z); vForm = floor(aCloud.z + 0.0005); vExt = aCloud.y; vView = vd;',
   '#if CLOUD_TAPS == 0',
   '  vSky = skyAt(vd / vl);',
-  '#else',
-  '  vSky = vec3(0.0);',
   '#endif',
-  '  gl_Position = vFade < 0.003 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * viewMatrix * vec4(world, 1.0);',   /* M19: a card this view does not show (the plate side-on, a streak from above) is collapsed outside the clip volume: no fragments at all */
+  '  gl_Position = fade < 0.003 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * viewMatrix * vec4(world, 1.0);',   /* a face or card this view does not show is collapsed outside the clip volume: no fragments at all */
   '}'].join('\n');
 
 var FRAG = [
-  'uniform sampler2D uMap; uniform vec3 uTop, uShade, uRim, uHaze, uLightWorld; uniform float uOpacity, uRimK, uHazeNear, uHazeFar, uHazeMax, uBaseDark, uShadowK, uTime; uniform vec2 uHor; uniform float uDiffuse, uAuraK; uniform vec3 uAuraA, uAuraB, uAuraC;',
-  'uniform vec2 uAerial; uniform float uErode;',   /* M19: aerial extinction (start m, e-folding length m) · body-field erosion */
+  'uniform sampler2D uMap, uField; uniform vec3 uTop, uShade, uRim, uHaze, uLightWorld; uniform float uOpacity, uRimK, uHazeNear, uHazeFar, uHazeMax, uBaseDark, uShadowK, uTime; uniform vec2 uHor; uniform float uDiffuse, uAuraK; uniform vec3 uAuraA, uAuraB, uAuraC;',
+  'uniform vec2 uAerial; uniform float uErode, uSig, uFieldN, uAmb; uniform mat4 projectionMatrix;',   /* M19: aerial extinction (start m, e-folding m) · field erosion · extinction per metre · field texture size · the camera projection (for the fragment's own depth) */
   SKY_FN,
-  'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow; varying float vShell; varying float vFade;',
-  'varying vec2 vHxz; varying vec3 vCtr; varying vec4 vBodyK; varying float vAbove; varying float vSoft; varying float vSeed; varying vec3 vView; varying vec3 vSky; varying float vSide; varying float vForm; varying float vExt;',
+  'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vFade;',
+  'varying vec3 vView; varying vec3 vCtr; varying vec4 vBodyK; varying vec4 vSlab; varying float vKind;',
+  '#if CLOUD_TAPS == 0',
+  'varying vec3 vSky;',
+  '#endif',
   'vec4 cellTex(vec2 u) { return texture2D(uMap, vCell + clamp(u, 0.006, 0.994) * 0.5); }',
   'float cH(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }',
   'float cN(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(cH(i), cH(i + vec2(1.0, 0.0)), f.x), mix(cH(i + vec2(0.0, 1.0)), cH(i + vec2(1.0, 1.0)), f.x), f.y); }',
+  /* M19 the body FIELD at one point of the footprint (body frame, metres): x the local TOP height, y the BASE height, z the footprint weight */
+  'float gHx, gHz, gH, gForm, gThr, gBil, gEIn; vec2 gFsc, gOff;',
+  'vec3 slabField(vec2 q, float lod) {',
+  '  vec4 f = textureLod(uField, q * gFsc + gOff, lod); vec2 e = q / vec2(gHx, gHz); float r = max(abs(e.x), abs(e.y)) * 0.35 + length(e) * 0.65 + f.a * 0.2, kl = max(r - gEIn, 0.0) * 2.2, E = max(1.0 - kl, 0.0);',   /* a wide, soft rounded-rectangle footprint: toward its edge the threshold rises, so cells shrink into scattered fragments (never an outline; nothing reaches the box walls) */
+  '  float c = mix(f.r, f.g, gBil) + (f.b - 0.5) * uErode * 0.55 + (gForm > 0.5 && gForm < 1.5 ? 0.15 * cos(e.y * 6.0 + (f.a - 0.5) * 4.0) : 0.0);',   /* streets: parallel rolls along the axis, clear lanes between */
+  '  float x = clamp((c - kl - gThr) / (1.0 - gThr), 0.0, 1.0), qq = r / 0.92, th = gH * 0.94 * (gForm < 1.5 ? mix(sqrt(x), x, gForm < 0.5 ? 0.55 : 0.35) * (0.6 + 0.4 * E) : (gForm > 2.5 ? sqrt(clamp(1.0 - qq * qq, 0.0, 1.0)) * (0.45 + 0.55 * f.r) * (0.7 + 0.3 * f.g) : pow(clamp(1.0 - qq * qq, 0.0, 1.0), 0.6) * (0.5 + 0.5 * x)) * smoothstep(0.0, 0.25, x));',   /* decks and streets: flat-topped cells; heaps: one low domed mass; towers: a dome split by the broad masses (R) into two or three sub-towers of different heights, crowned by the dome-topped cells (G) — rounded turrets, never spires */
+  '  return vec3(th, gH * (gForm < 1.5 ? 0.22 * (1.0 - E) : (gForm > 2.5 ? 0.14 : 0.3) * smoothstep(0.35, 0.9, r) * (0.6 + 0.4 * c)), E); }',   /* the BASE: flat under the core, lifted toward the flanks — thin deck edges from below, heaps that bulge a little above a narrower flat base */
   'void main() {',
-  '  vec2 u = vUv;',
-  '  float shell = smoothstep(0.3, 0.85, vShell);',   /* M9 (owner: clouds still read as stacked pancakes): a puff INSIDE the body must not draw its own outline */
-  /* M19 SLICES THROUGH ONE BODY (owner 2026-09-27: still lobed cotton objects — longer, more continuous, fewer circular lobes): decks,
-     streets and heaps are no longer a union of cloudlet sprites. Their cards are wide SOFT SLICES (a radial falloff, no outline of their
-     own) through ONE analytic body: a flat base, and an upper outline that is one continuous profile over the body's apparent width —
-     a long undulating ridge that tapers to its ends (deck), the same ridge broken into separate masses where it dips (street), one broad
-     dome (heap). Only towers and wind streaks keep their atlas cloudlet. */
-  '  vec3 tcB = normalize(cameraPosition - vCtr), rB = cross(vec3(0.0, 1.0, 0.0), tcB); rB = length(rB) > 0.001 ? normalize(rB) : vec3(1.0, 0.0, 0.0);',
-  '  vec3 X = vView * (dot(cameraPosition - vCtr, tcB) / max(dot(vView, -tcB), 0.001)) + cameraPosition - vCtr, rw = vView + cameraPosition - vCtr;',   /* the view ray cut by the body plane (relative to the centre) · the fragment itself */
-  '  float hbS = mix((X.y + vCtr.y - cameraPosition.y - vView.y + vAbove) / max(vExt, 1.0), vAbove / max(vExt, 1.0), step(1.5, vPuff.w));',   /* height above the flat base, read on the SAME body plane (the plate keeps its own): cards at different depths share one outline instead of stacking lens edges */
-  '  float vProf = dot(X, rB) / vBodyK.z; vec2 bodyP = mix(vec2(dot(X, rB), dot(X, cross(tcB, rB))), vec2(dot(rw.xz, vBodyK.xy), dot(rw.xz, vec2(-vBodyK.y, vBodyK.x))), smoothstep(0.55, 0.85, abs(tcB.y))) / vBodyK.w;',
-  '  float slab = step(vForm, 2.5) * (1.0 - step(0.25, vPuff.w) * step(vPuff.w, 0.75));',
-  '  vec4 tex = slab > 0.5 ? vec4(0.5, 0.5, 1.0, 1.0 - smoothstep(mix(0.3, 0.62, step(1.5, vPuff.w)), 1.0, length(vUv * 2.0 - 1.0))) : cellTex(u); float dens = tex.a; if (dens < 0.01 || vSide * step(hbS * vExt, -1.2 * vSoft) > 0.5) discard;',   /* cheap outs first: outside the card's soft ellipse, or under the flat base seen side-on */   /* slices sample no atlas at all */
-  '  float pu = 1.0 - smoothstep(0.2, 1.0, abs(vProf)), tn = cN(vec2(vProf * (vForm > 1.5 ? 1.5 : (vForm > 0.5 ? 1.9 : 2.4)) + vSeed * 23.0, vSeed * 7.0 + uTime * 0.003));',
-  '  float top = vForm > 1.5 ? pow(pu, 0.55) * (0.6 + 0.4 * tn) : sqrt(pu) * (vForm > 0.5 ? smoothstep(0.2, 0.8, tn) : 0.4 + 0.6 * tn), hb = hbS;',
-  '  float pl = slab * max(vBelow, step(1.5, vPuff.w)), cut = slab * (1.0 - pl); if (dens * (1.0 - cut * smoothstep(top + 0.12, top + 0.3, hb)) < 0.012) discard;',   /* early out before the field */
-  /* M19 BODY FIELD: an anisotropic value-noise field in the body plane (long along the horizon, fine across it: stratocumulus cells and
-     wind-combed streaks), slowly evolving — it erodes the edges, opens gaps and sets the thickness, identically for every overlapping card
-     (the finer octaves shift a little per slice, so the stack reads as depth, not as one pasted layer) */
-  '  vec2 bp = bodyP * vec2(2.4, 7.0) + vec2(uTime * 0.012 + vSeed * 37.0, vSeed * 19.0); float bn = cN(bp);',
-  '#if CLOUD_TAPS > 0',
-  '  bn = bn * 0.56 + cN(bp * vec2(2.3, 2.0) + 5.3 + vPuff.y * 1.7) * 0.44;',
-  '#if CLOUD_TAPS > 1',
-  '  bn = bn * 0.8 + cN(bp * vec2(5.2, 4.1) - 2.9 + vPuff.y * 3.1) * 0.2;',
-  '#endif',
-  '#endif',
-  '  vec2 bax = vBodyK.xy, bpp = vec2(-bax.y, bax.x); vec3 Pb = vView * ((vView.y - vAbove) / (abs(vView.y) > 0.001 ? vView.y : 0.001)) + cameraPosition - vCtr;',   /* the view ray where it meets the body's flat base plane */
-  '  float env = 1.0 - smoothstep(0.55, 1.1, length(vec2(dot(rw.xz, bax) / vHxz.x, dot(rw.xz, bpp) / vHxz.y) * vec2(1.0, 0.6)));',   /* an atlas cloudlet's own place in the footprint (towers, streaks) */
-  '  float envB = 0.0; if (pl > 0.01) { vec2 fq = vec2(dot(Pb.xz, bax) / vHxz.x, dot(Pb.xz, bpp) / vHxz.y); envB = (1.0 - smoothstep(0.5, 1.08, length(fq * vec2(1.0, 0.9)) + (cN(fq * vec2(2.2, 3.0) + vSeed * 13.0) - 0.5) * 0.3 + (bn - 0.5) * 0.3)) * clamp(0.7 + 0.6 * bn, 0.0, 1.0); }',   /* an irregular, mottled underside (thin cells let the sky through), not an oval */   /* seen from below (or above), the FOOTPRINT along the view ray: every card of the body agrees on it, so no card draws a lens edge */
-  '  float sil = mix(1.0 - slab * smoothstep(top - 0.38, top + 0.06, hb + (bn - 0.5) * 0.42), envB, pl);',   /* side-on: the continuous, frayed upper outline · from below: the footprint */
-  '  float d = dens * mix(1.0, env, (1.0 - slab) * (0.3 + 0.45 * vBelow)) * sil; d = clamp(d + (bn - 0.5) * uErode * (0.6 + 0.6 * shell) * min(d * 2.5, 1.0) * (1.0 - 0.5 * smoothstep(0.5, 0.95, d)), 0.0, 1.0);',
-  '  d *= mix(1.0, smoothstep(-vSoft, vSoft * 1.6, hbS * vExt), vSide);',   /* one soft flat base for the whole body (the layer shares its altitude) */
-  '  float a = smoothstep(0.03, 0.62, d) * (0.72 + 0.28 * bn) * vPuff.z * mix(1.0, 0.72, slab) * uOpacity * vFade; if (a < (CLOUD_TAPS == 0 ? 0.02 : 0.004)) discard;',   /* never an opaque cotton core: thin cells let the sky through (slices stack, so each is lighter) · LOW drops the faintest 2 % of fragments (no blend for what the eye cannot see) */
-  '  float occl = 0.0;',
-  '#if CLOUD_TAPS > 0',
-  '  if (slab < 0.5) {',   /* M19: only atlas cloudlets (towers, streaks) march their own thickness; a slice takes its thickness from the body */
-  '  occl = cellTex(u + vLs * 0.06).r * 0.55;',   /* thickness between this point and the key, inside the puff */
-  '#if CLOUD_TAPS > 1',
-  '  occl += cellTex(u + vLs * 0.16).r * 0.45;',
+  '  vec3 Lw = normalize(uLightWorld), rd = normalize(vView), col, bodyCol; float a, dist, hN, lit, thin, sunK, fw, an, zf = gl_FragCoord.z;',
+  '  if (vKind > 0.5) {',
+  /* M19 ONE VOLUME, ONE FIELD: the view ray is cut by the body's box (in the body frame: x along its axis, y above its flat base, z across),
+     then marched front to back through the heightfield. The field (one mip-filtered fetch per step: R masses · G dome-topped cells ·
+     B fine erosion · A footprint erosion) is thresholded inside the footprint, so the body thins into gaps and broken fragments toward its ends instead of
+     ending in an outline; the top is sqrt-shaped (flat-topped cells) for decks and streets, domed for heaps and the tower ring. */
+  '    vec2 ax = vBodyK.xy, px = vec2(-ax.y, ax.x); float hx = vBodyK.z, hz = vBodyK.w, H = vSlab.y, form = vSlab.w, sd = vSlab.z;',
+  '    vec3 o = cameraPosition - vec3(vCtr.x, vSlab.x, vCtr.z), ol = vec3(dot(o.xz, ax), o.y, dot(o.xz, px)), dl = vec3(dot(rd.xz, ax), rd.y, dot(rd.xz, px));',
+  '    vec3 dn = vec3(abs(dl.x) < 1e-4 ? 1e-4 : dl.x, abs(dl.y) < 1e-4 ? 1e-4 : dl.y, abs(dl.z) < 1e-4 ? 1e-4 : dl.z), ta = (vec3(-hx, 0.0, -hz) - ol) / dn, tb = (vec3(hx, H, hz) - ol) / dn, tn = min(ta, tb), tf = max(ta, tb);',
+  '    float t0 = max(max(tn.x, tn.y), max(tn.z, 0.0)), t1 = min(min(tf.x, tf.y), tf.z); if (t1 <= t0) discard;',
+  '    float fan = form < 0.5 ? 0.6 : (form < 1.5 ? 0.35 : (form < 2.5 ? 0.8 : 1.0)), thr = form < 0.5 ? 0.14 : (form < 1.5 ? 0.24 : (form < 2.5 ? 0.24 : 0.12)), bil = form < 0.5 ? 0.7 : (form < 1.5 ? 0.6 : (form < 2.5 ? 0.5 : 0.6)), eIn = form < 0.5 ? 0.55 : (form < 1.5 ? 0.5 : (form < 2.5 ? 0.62 : 0.72));',
+  '    float fs = min((form < 0.5 ? 0.71 : (form < 1.5 ? 0.62 : (form < 2.5 ? 0.5 : 0.7))) * (0.8 + 0.4 * sd) / hx, 0.0079); vec2 fsc = vec2(fs * fan, fs), off = vec2(sd * 7.31 + uTime * 0.0005, sd * 3.17); gHx = hx; gHz = hz; gH = H; gForm = form; gThr = thr; gBil = bil; gEIn = eIn; gFsc = fsc; gOff = off;',   /* cells scale with the body (a deck has 6–8 across its length, never under 18 m): big banks keep big, soft cells; the field never repeats inside a body */
+  '    float pathL = t1 - t0, nE = floor(min(max(pathL * fs * (form > 2.5 ? 20.0 : 12.0), float(SLAB_MIN)), float(SLAB_STEPS))), ds = pathL / nE, lod = clamp(log2(max(ds * length(dl.xz) * (CLOUD_TAPS == 0 ? 0.08 : 0.8), (t0 + t1) * 0.0008) * fs * uFieldN), 0.0, 4.0);',   /* steps of about half a cell along the ray (a steep look through a thin deck takes 3–5, a grazing one up to the tier cap); the mip level follows the step's horizontal travel, so long grazing paths read a pre-filtered field instead of aliasing into spikes */
+  '#if CLOUD_TAPS == 0',
+  '    float jit = 0.5, kY = max(Lw.y, 0.3);',   /* LOW: one sample at the middle of the path, its height span integrated (the body as a thickness map) */
   '#else',
-  '  occl *= 1.6;',
+  '    float jit = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))), kY = max(Lw.y, 0.3);',
   '#endif',
-  '  }',
-  '#endif',
-  '  vec3 Lw = normalize(uLightWorld); float side = dot(normalize(vRel + vec3(0.0, 0.2, 0.0)), Lw);',   /* which side of the whole BODY faces the key */
-  '  float sunK = clamp(0.5 + 0.5 * side, 0.0, 1.0); sunK = sunK * sunK * (3.0 - 2.0 * sunK); float h = smoothstep(0.0, 0.9, vH);',
-  '  float thick = clamp(d * (0.4 + 0.95 * bn), 0.0, 1.0);',   /* M19: thickness is a BODY quantity (field × density), so light and shade never outline a single lobe */
-  '  float lit = sunK * (1.0 - uShadowK * clamp(occl * 0.25 + thick * 0.5, 0.0, 1.0)) * (0.62 + 0.38 * h) + 0.22 * h;',
-  '  float baseK = 1.0 - smoothstep(0.0, 0.3, vH);',   /* flat, darker bases */
-  '  float belly = 1.0 - smoothstep(0.05, 0.85, vH);',   /* M19: a deeper but SOFTER underside — the shade rises gradually through the lower body, strongest where it is thick */
-  '  lit = mix(lit, 0.3 + 0.42 * (1.0 - thick) + 0.14 * sunK, vBelow);',   /* seen from below, the whole underside shares one tone (lighter where thin) */
-  '  vec3 col = mix(uShade, uTop, clamp(lit, 0.0, 1.0)) * (1.0 - uBaseDark * (0.35 * baseK + 0.65 * belly) * (0.45 + 0.55 * thick) * (1.0 - 0.4 * sunK));',
-  '  vec3 bodyCol = mix(uShade, uTop, clamp(0.4 + 0.32 * sunK + 0.18 * h, 0.0, 1.0)) * (1.0 - uBaseDark * 0.45 * belly);',
-  '  col = mix(col, bodyCol, 0.25 * uDiffuse);',   /* every part leans toward the body's mean tone: one soft mass, not a cluster of lit balls */
-  '  float edge = 1.0 - smoothstep(0.04, 0.45, d);',   /* thin parts scatter the key forward: a silver lining, strongest toward the light */
-  '  col += uRim * uRimK * edge * (0.08 + 1.5 * pow(vFwd, 5.0)) * (0.35 + 0.65 * sunK) * (1.0 - 0.7 * vBelow) * (0.35 + 0.65 * shell);',
-  /* M19 AERIAL PERSPECTIVE: contrast falls away first (toward the body tone), then the body takes the sky's own colour along the view ray
-     (Beer-Lambert extinction, plus the long horizon path) — distant decks become brighter sky, not grey objects on it */
-  '  float fogK = smoothstep(uHazeNear, uHazeFar, vDist) * uHazeMax; float ext = max(fogK, 1.0 - exp(-max(vDist - uAerial.x, 0.0) / max(uAerial.y, 1.0)));',
-  '  float horK = 1.0 - smoothstep(uHor.x, uHor.y, vElev);',   /* aerial perspective + the horizon haze swallowing distant bases */
+  '    vec2 kx = normalize(vec2(dot(Lw.xz, ax), dot(Lw.xz, px)) + 1e-4); float kH = max(length(Lw.xz), 0.3); float T = 1.0, tAcc = 0.0, lAcc = 0.0, tS = -1.0; vec3 C = vec3(0.0), ps = vec3(0.0);',
+  '    for (int i = 0; i < SLAB_STEPS; i++) { if (float(i) >= nE) break;',
+  '      float t = t0 + (float(i) + jit) * ds; vec3 p = ol + dl * t, F = slabField(p.xz, lod); vec2 e = p.xz / vec2(hx, hz); float th = F.x, b = F.y;',
+  '      float yh = abs(dl.y) * ds * 0.5, d = clamp((min(p.y + yh, th) - max(p.y - yh, b) + 2.0) / (yh * 2.0 + 4.0), 0.0, 1.0);',   /* the share of this step's height span that lies between the base and top surfaces (integrated, not point-sampled: flat bases and tops stay clean lines instead of a dithered stipple); one flat base for the body core (the layer shares its altitude) */
+  '      if (d > 0.002) {',
+  '        float dk = max(th - p.y, 0.0), sun = exp(-min(dk / kY, max(0.0, 0.8 - dot(e, kx)) * (hx + hz) * 0.5 / kH) * uSig * 0.55), amb = 0.45 + 0.55 * clamp((p.y - b) / max(th - b, 1.0), 0.0, 1.0);',   /* the key through the shorter of two paths — down from the local top, or in from the sun-facing flank (a tall mass is lit on its sunward side, not only on its crown) · sky ambient rising with height */
+  '        float lr = clamp(sun * (0.72 - 0.3 * uShadowK) + amb * uAmb + uAmb * 0.33, 0.0, 1.0), ai = 1.0 - exp(-d * uSig * ds);',
+  '        C += T * ai * mix(uShade, uTop, lr) * (1.0 - uBaseDark * (1.0 - smoothstep(0.0, 0.55, p.y / H)) * smoothstep(0.08, 0.55, dk / H));',   /* a deeper but SOFT underside: only under thick cells, fading up through the lower body */
+  '        tAcc += T * ai * t; lAcc += T * ai * lr; if (T > 0.55 && T * (1.0 - ai) <= 0.55) { ps = p; tS = th; } T *= 1.0 - ai; if (T < 0.02) break; }',
+  '    }',
+  '    a = 1.0 - T; if (a < 0.004) discard; col = C / a; dist = tAcc / a; lit = lAcc / a;',
+  '    vec4 cp = projectionMatrix * viewMatrix * vec4(cameraPosition + rd * dist, 1.0); zf = clamp(0.5 + 0.5 * cp.z / cp.w, 0.0, 0.999999);',   /* DEPTH where the body actually is along the ray (its density-weighted distance), not where its box begins: a mountain or the highland standing inside a body's box hides the cloud behind it and is veiled by the cloud in front of it */
   '#if CLOUD_TAPS > 0',
-  '  vec3 sc = mix(uHaze, skyAt(normalize(vView)), uSkyOn);',
+  /* RELIEF (HIGH / MED): where the ray first meets the body's upper surface, the top's slope (two more field reads) turns each cell and
+     turret toward or away from the key — lit and shaded sides on the crowns of heaps and towers, seen from the side or above */
+  '    if (tS > 0.0) { float gd = 0.3 / (7.0 * fs), gx = (slabField(ps.xz + vec2(gd, 0.0), lod).x - tS) / gd, gz = (slabField(ps.xz + vec2(0.0, gd), lod).x - tS) / gd; vec3 nw = normalize(vec3(-gx * ax.x - gz * px.x, 1.0, -gx * ax.y - gz * px.y)); col *= mix(1.0, 0.72 + 0.44 * clamp(dot(nw, Lw) * 0.6 + 0.4, 0.0, 1.0), (1.0 - smoothstep(0.1, 0.5, -rd.y)) * smoothstep(0.35, 0.8, ps.y / max(tS, 1.0))); }',
+  '#endif',
+  '    vec3 pm = ol + dl * dist; hN = clamp(pm.y / H, 0.0, 1.0); thin = 1.0 - smoothstep(0.12, 0.85, a); fw = max(dot(rd, Lw), 0.0);',
+  '    vec3 wr = vec3(ax.x * pm.x + px.x * pm.z, pm.y - H * 0.45, ax.y * pm.x + px.y * pm.z) / max(hx, 1.0); sunK = clamp(0.5 + 0.5 * dot(normalize(wr + vec3(0.0, 0.2, 0.0)), Lw), 0.0, 1.0); sunK = sunK * sunK * (3.0 - 2.0 * sunK);',
+  '    a *= uOpacity * 0.94 * vFade * (1.0 - 0.68 * smoothstep(0.08, 0.5, -rd.y)); bodyCol = mix(uShade, uTop, clamp(0.42 + 0.3 * sunK + 0.18 * hN, 0.0, 1.0)); an = CLOUD_TAPS == 0 ? sd : cN((cameraPosition.xz + rd.xz * dist) * 0.011 + sd * 9.0);',   /* never an opaque core · looked DOWN upon (the HALO rim, the highland) a body thins to a veil of mist, so the districts below stay readable through it */
+  '  } else {',
+  /* a WIND STREAK card: the M8D atlas cloudlet with its own thickness self-shadow (tiered taps) */
+  '    vec2 u = vUv; float dens = cellTex(u).a;',
+  '#if CLOUD_TAPS > 0',
+  '    dens = clamp(dens + (cN(vUv * vec2(3.0, 14.0) + vec2(vPuff.y * 17.0, uTime * 0.012)) - 0.5) * 0.9 * (1.0 - smoothstep(0.4, 0.95, dens)), 0.0, 1.0);',   /* combed into strands */
+  '#endif',
+  '    a = smoothstep(0.02, 0.7, dens) * vPuff.z * uOpacity * vFade; if (a < 0.004) discard;',
+  '    float occl = 0.0;',
+  '#if CLOUD_TAPS > 0',
+  '    occl = cellTex(u + vLs * 0.06).r * 0.55;',   /* thickness between this point and the key, inside the streak */
+  '#if CLOUD_TAPS > 1',
+  '    occl += cellTex(u + vLs * 0.16).r * 0.45;',
+  '#else',
+  '    occl *= 1.6;',
+  '#endif',
+  '#endif',
+  '    float side = dot(normalize(vRel + vec3(0.0, 0.2, 0.0)), Lw);',   /* which side of the whole BODY faces the key */
+  '    sunK = clamp(0.5 + 0.5 * side, 0.0, 1.0); sunK = sunK * sunK * (3.0 - 2.0 * sunK); float h = smoothstep(0.0, 0.9, vH);',
+  '    lit = clamp(sunK * (1.0 - uShadowK * clamp(occl * 0.5, 0.0, 1.0)) * (0.62 + 0.38 * h) + 0.22 * h, 0.0, 1.0);',
+  '    float baseK = 1.0 - smoothstep(0.0, 0.3, vH);',   /* flat, darker bases */
+  '    col = mix(uShade, uTop, lit) * (1.0 - uBaseDark * baseK * (1.0 - 0.4 * sunK)); bodyCol = mix(uShade, uTop, clamp(0.4 + 0.32 * sunK + 0.18 * h, 0.0, 1.0));',
+  '    col = mix(col, bodyCol, 0.4 * uDiffuse); thin = 1.0 - smoothstep(0.08, 0.62, dens); dist = vDist; hN = vH; fw = vFwd; an = cN(vUv * 2.3 + vPuff.y * 9.0);',
+  '  }',
+  '  col += uRim * uRimK * thin * (0.08 + 1.5 * pow(fw, 5.0)) * (0.35 + 0.65 * sunK);',   /* thin parts scatter the key forward: a silver lining, strongest toward the light */
+  /* M19 AERIAL PERSPECTIVE: contrast falls away first (toward the body tone), then the body takes the sky's own colour along the view ray
+     (Beer-Lambert extinction by the distance where the body actually is, plus the long horizon path) — far decks become brighter sky */
+  '  float fogK = smoothstep(uHazeNear, uHazeFar, dist) * uHazeMax, ext = max(fogK, 1.0 - exp(-max(dist - uAerial.x, 0.0) / max(uAerial.y, 1.0)));',
+  '  float horK = 1.0 - smoothstep(uHor.x, uHor.y, vElev);',   /* aerial perspective + the horizon haze swallowing distant bases */
+  '  horK = (vKind > 0.5 ? 1.0 - smoothstep(uHor.x, uHor.y, rd.y) : horK) * (1.0 - smoothstep(0.02, 0.2, -rd.y));',   /* only near the horizon LINE: a cloud seen from above is not a far base */
+  '#if CLOUD_TAPS > 0',
+  '  vec3 sc = mix(uHaze, skyAt(rd), uSkyOn);',
   '#else',
   '  vec3 sc = mix(uHaze, vSky, uSkyOn);',
   '#endif',
-  '  float thin = 1.0 - smoothstep(0.08, 0.62, d);',   /* M14 AURA, M19 body-coherent: a faint pearl sheen where the body is thin — pale blue / pink away from the key, pale gold toward it, fading with distance */
-  '  vec3 aur = mix(mix(uAuraB, uAuraC, smoothstep(0.35, 0.7, bn)), uAuraA, sunK * 0.65 * (1.0 - vBelow)); float lum = max(max(col.r, col.g), col.b);',
-  '  col = mix(col, aur * lum, clamp(thin * (0.3 + 0.7 * shell) * uAuraK * (1.0 - ext), 0.0, 1.0));',
-  '  col = mix(col, bodyCol, clamp(ext * 1.25, 0.0, 0.8));',
-  '  col = mix(col, sc, clamp(ext * 0.9 + horK * (0.3 + 0.45 * (1.0 - vH)) * (1.0 - ext), 0.0, 0.94));',
-  '  a *= (1.0 - horK * (0.22 + 0.38 * (1.0 - vH)) * uDiffuse) * (1.0 - ext * 0.4);',   /* the far base dissolves into the haze first */
-  '  gl_FragColor = vec4(col, a);',
+  /* M19 AURA (colour law, review 2026-09-27): a faint pearl sheen where the body is thin. ONE class hue at a time is eased out of an
+     equal-channel neutral — gold toward the key, pale blue away from it, pink only where the body is lit near-white — the weights never
+     overlap, so no RGB midpoint of two class hues (blue + pink = a fake purple, gold + pink = peach) can form */
+  '  float wA = smoothstep(0.58, 0.9, sunK), cool = 1.0 - smoothstep(0.1, 0.42, sunK), wB = cool * (1.0 - smoothstep(0.3, 0.46, an)), wC = cool * smoothstep(0.54, 0.7, an) * smoothstep(0.62, 0.85, lit);',
+  '  vec3 tint = vec3(1.0) + (uAuraA / max(max(uAuraA.r, uAuraA.g), max(uAuraA.b, 0.001)) - 1.0) * wA + (uAuraB / max(max(uAuraB.r, uAuraB.g), max(uAuraB.b, 0.001)) - 1.0) * wB + (uAuraC / max(max(uAuraC.r, uAuraC.g), max(uAuraC.b, 0.001)) - 1.0) * wC;',
+  '  col = mix(col, tint * max(max(col.r, col.g), col.b), clamp(thin * uAuraK * (1.0 - ext), 0.0, 1.0));',
+  '  col = mix(col, bodyCol, clamp(ext * 1.2, 0.0, 0.75));',
+  '  col = mix(col, sc, clamp(ext * 0.9 + horK * (0.3 + 0.45 * (1.0 - hN)) * (1.0 - ext), 0.0, 0.94));',
+  '  a *= (1.0 - horK * (0.22 + 0.38 * (1.0 - hN)) * uDiffuse) * (1.0 - ext * 0.4);',   /* the far base dissolves into the haze first */
+  '  gl_FragColor = vec4(col, a); gl_FragDepth = zf;',   /* (writing the depth turns off the early depth test for the cloud draws: accepted, one shaded fragment per covered pixel per body) */
   '  #include <colorspace_fragment>',
   '}'].join('\n');
 
@@ -221,19 +249,35 @@ function puffAtlas(THREE, cell) {
   ATLAS[key] = { tex: t, refs: 1 }; return t;
 }
 function releaseAtlas(tex) { for (var k in ATLAS) if (ATLAS[k].tex === tex && --ATLAS[k].refs <= 0) { tex.dispose(); delete ATLAS[k]; } }
+/* M19 the body FIELD: one shared, tileable N × N data texture (reference-counted with the atlas), mip-mapped so a long grazing ray reads a
+   pre-filtered field. R: continuous masses (periodic gradient-noise fBm) · G: CELLS (a warped Voronoi mosaic of dome-topped cells with thin
+   gaps between them — the stratocumulus underside, the cauliflower crown) · B: fine erosion · A: macro variation that eats the footprint unevenly. Each channel is
+   stretched to its 2–98 % range, so a threshold means the same in every channel. */
+function pgn(x, y, P, s) { var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy, ux = fx * fx * fx * (fx * (fx * 6 - 15) + 10), uy = fy * fy * fy * (fy * (fy * 6 - 15) + 10); function g(i, j, dx, dy) { var a = h2(((i % P) + P) % P, ((j % P) + P) % P, s) * 6.2831853; return Math.cos(a) * dx + Math.sin(a) * dy; } var a = g(ix, iy, fx, fy), b = g(ix + 1, iy, fx - 1, fy), c = g(ix, iy + 1, fx, fy - 1), d = g(ix + 1, iy + 1, fx - 1, fy - 1); return 0.5 + 0.75 * (a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy); }
+function pgf(u, v, base, oct, s) { var t = 0, n = 0, amp = 0.5; for (var o = 0; o < oct; o++) { var P = base << o; t += amp * pgn(u * P, v * P, P, s + o * 31); n += amp; amp *= 0.5; } return t / n; }
+function pcell(u, v, P, s) { var x = u * P, y = v * P, ix = Math.floor(x), iy = Math.floor(y), d1 = 9, d2 = 9; for (var j = -1; j <= 1; j++) for (var i = -1; i <= 1; i++) { var cx = ix + i, cy = iy + j, hx = ((cx % P) + P) % P, hy = ((cy % P) + P) % P, qx = cx + 0.15 + 0.7 * h2(hx, hy, s), qy = cy + 0.15 + 0.7 * h2(hx, hy, s + 7), dd = Math.hypot(x - qx, y - qy); if (dd < d1) { d2 = d1; d1 = dd; } else if (dd < d2) d2 = dd; } return Math.sqrt(Math.max(0, 1 - d1 * d1 * 1.4)) * 0.75 + (d2 - d1) * 0.25; }
+function fieldTexture(THREE, N) {
+  var key = 'f' + N; if (ATLAS[key]) { ATLAS[key].refs++; return ATLAS[key].tex; }
+  var ch = [0, 1, 2, 3].map(function () { return new Float32Array(N * N); }), px = new Uint8Array(N * N * 4);
+  for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) { var u = x / N, v = y / N, i = y * N + x, wu = u + (pgf(u, v, 4, 2, 71) - 0.5) * 0.06, wv = v + (pgf(u, v, 4, 2, 73) - 0.5) * 0.06;
+    ch[0][i] = pgf(u, v, 3, 5, 11); ch[1][i] = pcell(((wu % 1) + 1) % 1, ((wv % 1) + 1) % 1, 7, 23) + (pgf(u, v, 16, 3, 29) - 0.5) * 0.25; ch[2][i] = pgf(u, v, 12, 4, 37); ch[3][i] = pgf(u, v, 2, 3, 53); }
+  ch.forEach(function (A, k) { var s = Array.prototype.slice.call(A).sort(function (p, q) { return p - q; }), lo = s[Math.floor(s.length * 0.02)], hi = s[Math.floor(s.length * 0.98)]; for (var i = 0; i < A.length; i++) px[i * 4 + k] = Math.round(255 * Math.max(0, Math.min(1, (A[i] - lo) / Math.max(1e-6, hi - lo)))); });
+  var t = new THREE.DataTexture(px, N, N, THREE.RGBAFormat); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; t.colorSpace = THREE.NoColorSpace; t.needsUpdate = true;
+  ATLAS[key] = { tex: t, refs: 1 }; return t;
+}
 
 /* Deterministic cluster layout for one cloud of footprint length L (metres). Returns puffs relative to the cloud origin.
    M10 (owner: close-range clouds still read as a chain of equal round balls): a real cumulus is a flat base shelf with a few CONVECTIVE
    CELLS rising out of it — one dominant, the others lower, each a mound of billows that shrink as they climb, set in DEPTH (not one row),
    with small ragged FRINGE puffs on the flanks. Sizes now vary inside a body (core billows three to four times the fringe), so the outline
    breaks into turrets, shoulders and gaps instead of a string of beads. Puff count stays about the same (tier-scaled as before).
-   M19 (owner 2026-09-27: longer, more continuous, fewer lobes — sometimes ATMOSPHERE rather than OBJECT): the cards are now wide soft
-   SLICES through one analytic body (the shader draws the outline, see FRAG), in three FORMS of different thickness —
+   M19 (owner 2026-09-27: longer, more continuous, fewer lobes — sometimes ATMOSPHERE rather than OBJECT): the layout now sets the body's
+   PROPORTIONS for one volume (the shader draws the body, see FRAG) in three FORMS of different thickness — its tallest slice gives the
+   height, its spread in depth the footprint depth — and its wind STREAKS (the only atlas cards still drawn for a deck):
      · SHEET  a stratocumulus deck: long, low (height 16–26 % of its length), broad in depth;
-     · STREET a broken cloud street: the same slices, the shader's ridge dips into gaps between separate masses;
-     · HEAP   a flattened cumulus: one broad dome, 30–44 % of its length tall.
-   Order matters: the front row and the crown come first and the second depth row last, so a tier that keeps fewer cards drops depth, not
-   coverage. Every form ends in one or two wind STREAKS (atlas cloudlets). Card counts are lower than M10's. */
+     · STREET a broken cloud street: rolls along the axis, a little taller, narrower;
+     · HEAP   flattened cumulus cells: 30–44 % of its length tall (capped by the layer's headroom).
+   Order matters: the front row and the crown come first and the second depth row last. */
 export function cloudCluster(L, rnd, crown, form) {
   var k = crown === undefined ? 1 : crown, puffs = [], F = form || (rnd() < 0.4 ? 'SHEET' : (rnd() < 0.55 ? 'STREET' : 'HEAP'));
   var H = L * (F === 'HEAP' ? 0.3 + rnd() * 0.14 : (F === 'STREET' ? 0.2 + rnd() * 0.1 : 0.16 + rnd() * 0.1)) * (0.7 + 0.3 * k), D = L * (F === 'SHEET' ? 0.26 + rnd() * 0.14 : (F === 'HEAP' ? 0.16 + rnd() * 0.08 : 0.14 + rnd() * 0.08));
@@ -271,10 +315,9 @@ export function towerCluster(W, H, rnd) {
   return puffs;
 }
 
-/* M19: every card is a corner-cut OCTAGON (its edges touch the inscribed circle): the corners of a square card are empty in every atlas
-   cloudlet and every soft slice, and they were still rasterised — about a sixth of the sky's cloud fragments, for 4 more triangles a card (HIGH / MED; LOW keeps the quad and draws its cards 13 % smaller) */
-function cardGeometry(THREE) { var g = new THREE.BufferGeometry(), p = [], uv = [], ix = [], r = 0.5 / Math.cos(Math.PI / 8); for (var i = 0; i < 8; i++) { var a = (i + 0.5) * Math.PI / 4, x = Math.cos(a) * r, y = Math.sin(a) * r; p.push(x, y, 0); uv.push(x + 0.5, y + 0.5); if (i > 1) ix.push(0, i - 1, i); }   /* a 6-triangle fan, no centre vertex */
-  g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(ix); return g; }
+/* M19: ONE geometry for the whole layer — a unit box with per-face normals (24 vertices, 12 triangles, no material groups): a body VOLUME
+   uses the faces the viewer can see (the others collapse in the vertex stage), a wind-streak card uses only its front face as a quad. */
+function volumeGeometry(THREE) { var g = new THREE.BoxGeometry(1, 1, 1); g.clearGroups(); return g; }
 function pickShape(P, style, r) { return P.flat ? (style === 'STRATUS' && r() < 0.15 ? 3 : 2) : (P.height >= 1 ? 0 : (style === 'STRATUS' ? (r() < 0.7 ? 1 : 3) : (r() < 0.55 ? 0 : 1))); }   /* atlas shape per puff */
 function privateRnd(x, z, k) { var s = (Math.imul(Math.round(x * 64) | 0, 73856093) ^ Math.imul(Math.round(z * 64) | 0, 19349663) ^ Math.imul(k | 0, 83492791)) >>> 0 || 1; return function () { s = (s + 0x6D2B79F5) >>> 0; var t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function angleGap(a, b) { var d = Math.abs(a - b) % (Math.PI * 2); return d > Math.PI ? Math.PI * 2 - d : d; }
@@ -299,42 +342,45 @@ export function createCloudBodies(ctx, L, opts) {
        cloud-base plane that recedes in perspective. The shared stream and every accepted position, yaw and drift are untouched. */
     var form = null; cl.seed = Math.abs(Math.sin(x0 * 78.233 + z0 * 12.9898 + k) * 43758.5453) % 1;
     if (!tower) { var fr = pr(), sr = pr(), alt = L.alt_m || 150; form = style === 'STRATUS' ? (fr < 0.62 ? 'SHEET' : 'STREET') : (L.bank ? (fr < 0.5 ? 'SHEET' : 'STREET') : (fr < 0.34 ? 'SHEET' : (fr < 0.7 ? 'STREET' : 'HEAP')));
-      len *= sr < 0.16 ? 1.45 + sr * 2.8 : (sr < 0.4 ? 0.6 + (sr - 0.16) * 0.8 : 0.9 + (sr - 0.4) * 0.4); cl.len = len; cl.y = alt + (cl.y - alt) * 0.3; cl.form = form; }
-    cl.formI = form === 'SHEET' ? 0 : (form === 'STREET' ? 1 : (form === 'HEAP' ? 2 : 3));   /* the shader's silhouette rule per form (3 = tower: its own puff outline) */
-    var raw = tower ? towerCluster(len, L.tower_h_m ? L.tower_h_m[0] + rnd() * (L.tower_h_m[1] - L.tower_h_m[0]) : len * 0.8, rnd) : cloudCluster(len, pr, crownK, form); var keep = Math.max(4, Math.round(raw.length * tierScale));
+      len *= sr < 0.16 ? 1.45 + sr * 2.8 : (sr < 0.4 ? 0.6 + (sr - 0.16) * 0.8 : 0.9 + (sr - 0.4) * 0.4); if (sr >= 0.16 && sr < 0.4) form = 'SHEET'; else if (form === 'SHEET') len *= 1.3; if (!L.bank) len *= 1.35; cl.len = len;   /* a small fragment is always a thin sheet of small cells (a lone roll or dome that small read as a floating pebble); full decks run 30 % longer; a volume shows less of its footprint than a card cluster did, so the low / mid bodies grow 35 % to keep the sky's coverage */ cl.y = alt + (cl.y - alt) * 0.3; cl.form = form; }
+    cl.formI = form === 'SHEET' ? 0 : (form === 'STREET' ? 1 : (form === 'HEAP' ? 2 : 3));   /* the shader's field rule per form (3 = the tower ring) */
+    var tH = tower ? (L.tower_h_m ? L.tower_h_m[0] + rnd() * (L.tower_h_m[1] - L.tower_h_m[0]) : len * 0.8) : 0;   /* drawn before the tower layout, exactly as before */
+    var raw = tower ? towerCluster(len, tH, rnd) : cloudCluster(len, pr, crownK, form); var keep = Math.max(4, Math.round(raw.length * tierScale));
     if (L.ring_m && !tower) { cl.yawJ = (cl.yaw - Math.PI / 2) * 0.25; cl.yaw = ang0 + Math.PI / 2 + cl.yawJ; }   /* M19: a horizon bank lies ALONG its ring (±22°), so from the world it is always a long bank, never an end-on column; sky.js keeps it tangent as it drifts */
     if (tower) cl.yaw = ang0 + Math.PI / 2;   /* a tower's long axis runs along the ring: seen broadside from the world */
-    cl.extent = Math.max.apply(Math, raw.map(function (P) { return P.y + P.h * 0.5; })) + len * 0.02; cl.rad = Math.max(len * 0.5, cl.extent * 0.55);
+    cl.extent = tower ? tH : Math.max.apply(Math, raw.map(function (P) { return P.y + P.h * 0.5; })) + len * 0.02;
+    if (form === 'SHEET') cl.extent *= 0.72;   /* a deck is a thin sheet: about a tenth of its length */
+    if (!tower && L.max_top_m) cl.extent = Math.max(8, Math.min(cl.extent, L.max_top_m - cl.y - 1));   /* M19 (review): a body taller than the layer's headroom is FLATTENED to it, never pushed down (8 of 26 mid bodies had sunk ≥ 20 m below the shared base) */
+    cl.rad = Math.max(len * 0.5, cl.extent * 0.55);
     if (L.max_top_m && cl.y + cl.extent > L.max_top_m) cl.y = L.max_top_m - cl.extent;   /* keeps every body below the HALO deck (240 m): no cloud ever pokes up through the upper-realm floor */
-    for (var p = 0; p < raw.length; p++) { if (tower ? (p % Math.max(1, Math.round(raw.length / keep)) !== 0 && raw.length > keep) : p >= keep) continue; var P = raw[p];   /* M19: slice bodies keep their FIRST cards (front row + crown), so a lower tier drops depth, never coverage */ P.cloud = cl; P.seed = pr();
+    var ez = 0;
+    for (var p = 0; p < raw.length; p++) { if (tower ? (p % Math.max(1, Math.round(raw.length / keep)) !== 0 && raw.length > keep) : p >= keep) continue; var P = raw[p]; P.cloud = cl; P.seed = pr();
       if (P.v === undefined) { P.v = pickShape(P, style, pr); if (P.v === 0 && P.seed < 0.55) P.v = 1; }   /* M14: about half the cauliflower lobes become soft billows (no draw added: the seed is already drawn) */
-      cl.puffs.push(P); puffs.push(P); }
-    /* M9 BASE PLATE (owner: clouds read as stacked pancakes / cards from below): ONE horizontal soft card per body at its base, the body's
-       footprint, aligned with its yaw. Seen from below it takes over from the base puffs (a row of upright base puffs seen end-on stacked
-       into a tower of ellipses), so the underside reads as one flat, darker surface; from the side it is edge-on and invisible. */
-    var bx0 = 1e9, bx1 = -1e9, bz = 0, by = 1e9; cl.puffs.forEach(function (Q) { bx0 = Math.min(bx0, Q.x - Q.w * 0.42); bx1 = Math.max(bx1, Q.x + Q.w * 0.42); bz = Math.max(bz, Math.abs(Q.z) + Q.w * 0.3); if (Q.flat) by = Math.min(by, Q.y - Q.h * 0.3); });
-    if (!tower) { var fz = 0; cl.puffs.forEach(function (Q) { fz = Math.max(fz, Math.abs(Q.z)); }); bx0 = -len * 0.53; bx1 = len * 0.53; bz = fz + len * 0.09; }   /* M19: a slice body's plate is its own footprint (its cards overhang it) */
-    if (by < 1e8) { var PL = { x: (bx0 + bx1) / 2, y: by, z: 0, w: (bx1 - bx0), h: bz * 2, height: 0, flat: 2, v: 1, plate: true, cloud: cl, seed: Math.abs(Math.sin(cl.x0 * 12.9898 + cl.z0 * 78.233) * 43758.5453) % 1 };   /* a positional hash: the plate never draws from the shared sky stream (the composition stays put) */ cl.puffs.push(PL); puffs.push(PL); }
-    var ex = 0, ez = 0; cl.puffs.forEach(function (Q) { if (!Q.plate) { ex = Math.max(ex, Math.abs(Q.x) + Q.w * (tower ? 0.6 : 0)); ez = Math.max(ez, Math.abs(Q.z) + (tower ? Q.w * 0.5 : 0)); } }); cl.hx = Math.max(tower ? ex : len * 0.5, 1); cl.hz = Math.max(tower ? ez : ez + len * 0.08, 1);   /* M19: the body ENVELOPE (half length / half depth): the analytic body's own footprint, not its cards' */
+      if (P.flat !== 0.5 || !tower) { ez = Math.max(ez, Math.abs(P.z) + (tower ? P.w * 0.3 : 0)); continue; }   /* M19: the layout's slices, lobes and deck streaks only size the body (the VOLUME draws it; a deck's streak card read as a floating pebble) */
+      cl.puffs.push(P); puffs.push(P); }   /* the tower flanks keep their wind streaks as atlas cards */
+    /* M19 the body VOLUME (replaces M9's base plate and every slice): one box around the heightfield — half length, half depth (the layout's
+       spread in depth), the body's height — drawn as ONE instance; a positional hash seeds it (the shared sky stream is not touched). */
+    cl.hx = Math.max(len * (tower ? 0.62 : 0.72), 1); cl.hz = Math.max(tower ? Math.max(ez, len * 0.36) : (ez * 1.15 + len * 0.04) * 1.2, 1);   /* the field thins out over the outer third: the box is larger than the body it holds */
+    var SV = { x: 0, y: cl.extent * 0.5, z: 0, w: cl.hx * 2, h: cl.extent, height: 0.5, flat: 3, v: 1, slab: true, cloud: cl, seed: Math.abs(Math.sin(cl.x0 * 12.9898 + cl.z0 * 78.233) * 43758.5453) % 1 }; cl.puffs.push(SV); puffs.push(SV);
     clouds.push(cl); }
-  var geo = opts.taps === 0 ? new THREE.PlaneGeometry(1, 1) : cardGeometry(THREE); own.push(geo);   /* LOW keeps the two-triangle card (fewer triangles than before) */ var aPuff = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aPuff.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aPuff', aPuff); var aCloud = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 3), 3); aCloud.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aCloud', aCloud);
+  var geo = volumeGeometry(THREE); own.push(geo);   /* M19: one box per body (+ a quad per wind streak) on every tier */ var aPuff = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aPuff.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aPuff', aPuff); var aCloud = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 3), 3); aCloud.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aCloud', aCloud);
   var aCentre = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aCentre.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aCentre', aCentre);
   var aBody = new THREE.InstancedBufferAttribute(new Float32Array(puffs.length * 4), 4); aBody.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aBody', aBody);   /* M19: the body's long axis + envelope */
-  var taps = opts.taps === undefined ? 2 : opts.taps, tex = puffAtlas(THREE, opts.cell || 256);
-  var mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false, depthTest: true, fog: false, side: THREE.DoubleSide, toneMapped: true, defines: { CLOUD_TAPS: taps },
+  var taps = opts.taps === undefined ? 2 : opts.taps, tex = puffAtlas(THREE, opts.cell || 256), fieldN = (opts.cell || 256) >= 256 ? 256 : 128, field = fieldTexture(THREE, fieldN);
+  var mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false, depthTest: true, fog: false, side: THREE.DoubleSide, toneMapped: true, defines: { CLOUD_TAPS: taps, SLAB_STEPS: taps === 0 ? 1 : (taps === 1 ? 10 : 20), SLAB_MIN: taps === 0 ? 1 : (taps === 1 ? 4 : 5) },   /* M19: march steps per tier (HIGH 5–20 · MED 4–10 · LOW 1); the shader takes about two per field cell along the ray */
     uniforms: { uMap: { value: tex }, uTop: { value: new THREE.Color() }, uShade: { value: new THREE.Color() }, uRim: { value: new THREE.Color() }, uHaze: { value: new THREE.Color() }, uLightWorld: { value: new THREE.Vector3(0, 1, 0) }, uOpacity: { value: 1 }, uRimK: { value: 0.6 },
       uHazeNear: { value: 260 }, uHazeFar: { value: 1250 }, uHazeMax: { value: 0.7 }, uHor: { value: new THREE.Vector2(0.0, 0.16) }, uBaseDark: { value: 0.18 }, uShadowK: { value: 0.55 }, uTime: { value: 0 },
-      uOblong: { value: 1 }, uDiffuse: { value: 1 }, uAuraK: { value: 0.2 }, uAuraA: { value: new THREE.Color(0xffe2b0) }, uAuraB: { value: new THREE.Color(0xb4c4ee) }, uAuraC: { value: new THREE.Color(0xf2b3dc) },
-      uAerial: { value: new THREE.Vector2(160, 1100) }, uErode: { value: 0.9 },   /* M19 */
+      uOblong: { value: 1 }, uDiffuse: { value: 1 }, uAuraK: { value: 0.2 }, uAuraA: { value: new THREE.Color(0xffe9b3) }, uAuraB: { value: new THREE.Color(0xb4c4ee) }, uAuraC: { value: new THREE.Color(0xf2b3dc) },
+      uAerial: { value: new THREE.Vector2(160, 1100) }, uErode: { value: 0.9 }, uField: { value: field }, uFieldN: { value: fieldN }, uSig: { value: 0.06 }, uAmb: { value: 0.3 },   /* M19 */
       uSkyZ: { value: new THREE.Color() }, uSkyH: { value: new THREE.Color() }, uSkyHz: { value: new THREE.Color() }, uSkyT: { value: new THREE.Color() }, uSkyL: { value: new THREE.Color() }, uSkyS: { value: new THREE.Vector3(0, 1, 0) }, uSkyMie: { value: 0 }, uSkyLavK: { value: 0 }, uSkyHazeK: { value: 0 }, uSkyOn: { value: 0 } } });   /* M19: replaced by the dome's own uniform objects (shareSky) */
   own.push(mat);
   var mesh = new THREE.InstancedMesh(geo, mat, puffs.length); mesh.name = 'SKY_' + L.id; mesh.frustumCulled = false; mesh.userData.noMerge = true; mesh.renderOrder = opts.renderOrder || 4; mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  mesh.userData.cloudSilhouette = { kind: tower ? 'LIT_TOWER_CLUSTER' : 'LIT_PUFF_CLUSTER', rectangular: false, feathered: true, clouds: clouds.length, puffs: puffs.length, tier_scale: tierScale, shapes: 'ATLAS_4_NOISE_ERODED', self_shadow_taps: taps, style: style, body: tower ? 'ATLAS_CLOUDLETS' : 'ANALYTIC_SLICES', card: 'OCTAGON', forms: clouds.map(function (c) { return c.form || 'TOWER'; }).join(',') };
+  mesh.userData.cloudSilhouette = { kind: tower ? 'LIT_TOWER_CLUSTER' : 'LIT_PUFF_CLUSTER', rectangular: false, feathered: true, clouds: clouds.length, puffs: puffs.length, tier_scale: tierScale, shapes: 'ATLAS_4_NOISE_ERODED', self_shadow_taps: taps, style: style, body: 'HEIGHTFIELD_VOLUME', card: 'BOX_PROXY + STREAK_CARDS', forms: clouds.map(function (c) { return c.form || 'TOWER'; }).join(',') };
   var _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _qp = new THREE.Quaternion(), _up = new THREE.Vector3(0, 1, 0); var order = puffs.map(function (p, i) { return i; }); var sortClock = 1e9;
   function write(camPos) {  /* recompute world puff positions from the drifting cloud origins; with camPos also re-sort back-to-front */
     for (var i = 0; i < puffs.length; i++) { var P = puffs[i], c = P.cloud, cs = Math.cos(c.yaw), sn = Math.sin(c.yaw); P.wx = c.x + P.x * cs - P.z * sn; P.wy = c.y + P.y; P.wz = c.z + P.x * sn + P.z * cs; P.d2 = camPos ? (P.wx - camPos.x) * (P.wx - camPos.x) + (P.wy - camPos.y) * (P.wy - camPos.y) + (P.wz - camPos.z) * (P.wz - camPos.z) : 0; }
     if (camPos) order.sort(function (a, b) { return puffs[b].d2 - puffs[a].d2; });   /* back-to-front */
-    for (var j = 0; j < order.length; j++) { var Q = puffs[order[j]]; _p.set(Q.wx, Q.wy, Q.wz); if (Q.plate) { _qp.setFromAxisAngle(_up, -Q.cloud.yaw); _s.set(Q.w, 1, Q.h); _m.compose(_p, _qp, _s); } else { _s.set(Q.w, Q.h, 1); _m.compose(_p, _q, _s); } mesh.setMatrixAt(j, _m); aPuff.setXYZW(j, Q.height, Q.v + Q.seed * 0.998, Q.plate && Q.cloud.formI < 3 ? 1.2 : 0.5 + 0.34 * (1 - Q.flat * 0.25), Q.flat); aCloud.setXYZ(j, Q.cloud.y - Q.cloud.len * 0.02, Q.cloud.extent, Q.cloud.formI + Q.cloud.seed * 0.998); aCentre.setXYZW(j, Q.cloud.x, Q.cloud.y + Q.cloud.extent * 0.45, Q.cloud.z, Q.cloud.rad); aBody.setXYZW(j, Math.cos(Q.cloud.yaw), Math.sin(Q.cloud.yaw), Q.cloud.hx, Q.cloud.hz); }
+    for (var j = 0; j < order.length; j++) { var Q = puffs[order[j]]; _p.set(Q.wx, Q.wy, Q.wz); if (Q.slab) { _qp.setFromAxisAngle(_up, -Q.cloud.yaw); _s.set(Q.cloud.hx * 2, Q.cloud.extent, Q.cloud.hz * 2); _m.compose(_p, _qp, _s); } else { _s.set(Q.w, Q.h, 1); _m.compose(_p, _q, _s); } mesh.setMatrixAt(j, _m); aPuff.setXYZW(j, Q.height, Q.v + Q.seed * 0.998, Q.slab ? 1 : 0.5, Q.flat); aCloud.setXYZ(j, Q.cloud.y, Q.cloud.extent, Q.cloud.formI + Q.cloud.seed * 0.998); aCentre.setXYZW(j, Q.cloud.x, Q.cloud.y + Q.cloud.extent * 0.45, Q.cloud.z, Q.cloud.rad); aBody.setXYZW(j, Math.cos(Q.cloud.yaw), Math.sin(Q.cloud.yaw), Q.cloud.hx, Q.cloud.hz); }
     mesh.instanceMatrix.needsUpdate = true; aPuff.needsUpdate = true; aCloud.needsUpdate = true; aCentre.needsUpdate = true; aBody.needsUpdate = true; }
   write(null);
   function setLook(look) { var U = mat.uniforms; U.uTop.value.set(look.top); U.uShade.value.set(look.shade); U.uRim.value.set(look.rim); U.uHaze.value.set(look.haze); U.uOpacity.value = look.opacity; U.uRimK.value = look.rimK;
@@ -342,13 +388,16 @@ export function createCloudBodies(ctx, L, opts) {
     U.uHor.value.set(look.hor ? look.hor[0] : 0.0, look.hor ? look.hor[1] : 0.16); U.uBaseDark.value = look.baseDark !== undefined ? look.baseDark : 0.18; U.uShadowK.value = look.shadowK !== undefined ? look.shadowK : 0.55;
     U.uOblong.value = look.oblong !== undefined ? look.oblong : 1; U.uDiffuse.value = look.diffuse !== undefined ? look.diffuse : 1; U.uAuraK.value = look.auraK !== undefined ? look.auraK : 0.2;   /* M14 */
     if (look.auraA) U.uAuraA.value.set(look.auraA); if (look.auraB) U.uAuraB.value.set(look.auraB); if (look.auraC) U.uAuraC.value.set(look.auraC);
-    if (look.aerial) U.uAerial.value.set(look.aerial[0], look.aerial[1]); U.uErode.value = look.erode !== undefined ? look.erode : 0.9; }   /* M19 */
+    if (look.aerial) U.uAerial.value.set(look.aerial[0], look.aerial[1]); U.uErode.value = look.erode !== undefined ? look.erode : 0.9; U.uSig.value = look.sig !== undefined ? look.sig : 0.06; U.uAmb.value = look.amb !== undefined ? look.amb : 0.3; }   /* M19 */
   /* M19: share the sky dome's scattering uniforms BY REFERENCE (atmosphere.js calls sky.shareSky once its shader exists), so day / night
-     switches and the LOW tier's Mie-off reach the clouds' aerial perspective with no copy; null falls back to the flat haze colour. */
+     switches and the LOW tier's Mie-off reach the clouds' aerial perspective with no copy; null falls back to the flat haze colour.
+     This swaps uniform OBJECTS inside mat.uniforms after the program may have compiled: it works because three.js resolves each uniform
+     by name in material.uniforms on every upload (no cached reference to the old object). It relies on the build order sky → atmosphere
+     (worldB.js); a module built later that calls shareSky again simply re-points the same entries. */
   function shareSky(D) { var U = mat.uniforms; if (!D) { U.uSkyOn = { value: 0 }; return; } U.uSkyZ = D.uZenith; U.uSkyH = D.uHorizon; U.uSkyHz = D.uHaze; U.uSkyT = D.uSunTint; U.uSkyL = D.uLav; U.uSkyS = D.uSun; U.uSkyMie = D.uMie; U.uSkyLavK = D.uLavK; U.uSkyHazeK = D.uHazeK; U.uSkyOn = { value: 1 }; }
   /* camPos: {x,y,z} (ctx.cameraPos()) for the back-to-front sort · lightDir: the world direction of the active key (Sun by day, Moon by night) */
   function tick(dt, t, camPos, lightDir) { mat.uniforms.uTime.value = t || 0; if (lightDir) mat.uniforms.uLightWorld.value.set(lightDir[0], lightDir[1], lightDir[2]).normalize();
     sortClock += dt || 0; var sortNow = sortClock > 0.25 && camPos; write(sortNow ? camPos : null); if (sortNow) sortClock = 0; }
-  function dispose() { if (mesh.parent) mesh.parent.remove(mesh); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; releaseAtlas(tex); }
+  function dispose() { if (mesh.parent) mesh.parent.remove(mesh); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; releaseAtlas(tex); releaseAtlas(field); }
   return { mesh: mesh, mat: mat, clouds: clouds, puffs: puffs, setLook: setLook, shareSky: shareSky, tick: tick, write: write, dispose: dispose };
 }
