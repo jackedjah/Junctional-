@@ -11,6 +11,21 @@
 import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js'; import { taperShaft, orb } from './formKit.js'; import { createReflectionStreaks } from './wetReflect.js';
 
 import { groundYAt } from './worldLayout.js';
+/* M19 fix (review 2026-09-27, colour law — "blue + pink → a fake purple: blend through neutral white"). A lamp's own LIGHT and the light it
+   CASTS are separate things. The luminaire head burns its class colour (ATHLETE gold, LEAN crimson, BAGE rose; TITAN the registry blue).
+   What it casts onto the moon-blue night floor and water — the additive pool, the wet-floor streak, the near-player PointLight — adds
+   onto that blue: rose + blue night floor averaged into violet (BAGE V07 night: purple 3.0 % → 6.9 % of the frame, more than its pink),
+   and crimson + blue read magenta-pink or lavender on the LEAN floor (measured in V16 at 321–331° — BAGE's hue, not LEAN's). So the
+   rose and crimson lamps cast clean equal-channel white and their class stays in the heads, the lanterns, the crystals and the groves.
+   Gold + blue passes through neutral (never violet), so ATHLETE keeps its gilded pool, streak and a pale-gold near light, authored as a
+   display hex inside the family (#ffe3a0 = 42°): easing gold toward white in linear light drifted it to 33° (amber, off-law).
+   Every other shared lamp casts neutral white (the old #e3eaff pale blue was TITAN's). Pure (THREE-free): the tests audit what each
+   family casts over the measured night floors. */
+export var LAMP_CLASS_LIGHT = { gold: 0xf7ba3c, red: 0xe8304a, pink: 0xff4aa8 };
+export function lampCast(fam) { var warm = LAMP_CLASS_LIGHT[fam];
+  if (fam === 'blue') return { head: null, pool: 0x8fb4ea, pool_k: 0.7, streak: 0xd6e4ff, tint: 0xe3eaff };   /* TITAN: the registry blue head (null = registry), its pools at 0.7, unchanged */
+  if (fam !== 'gold') return { head: warm || 0xe2e2e2, pool: 0xb0b0b0, pool_k: 1, streak: 0xe2e2e2, tint: 0xf0f0f0 };   /* LEAN, BAGE and every shared lamp: neutral cast light (the class burns in the head) */
+  return { head: warm, pool: warm, pool_k: 0.8, streak: 0xffe57c, tint: 0xffe3a0 }; }   /* ATHLETE: the gilded pool at 0.8 of the lamp hue; the streak shader writes the colour's linear value raw — #ffe57c shows at 47° */
 export function createFixtures(ctx) {
   var THREE = ctx.THREE;
   var HEAD_EMISSIVE_DAY = 0.35, HEAD_EMISSIVE_NIGHT = 1.6;      /* luminaire emissiveIntensity (owner spec) */
@@ -38,8 +53,8 @@ export function createFixtures(ctx) {
      (#e6c36a / #f08ab8 tone-map to champagne / blush and never read as class light): each keeps its family hue through ACES at the head's
      day (0.35) and night (1.6) emissive. Per-instance colour on the heads (albedo + emissive), the pools (the lamp's hue, no brighter than the
      old blue pool: a warm cast, never a coloured floor) and the wet-floor streaks; the near-player lights take a warm lamp's tint when they
-     anchor to it. No new draw call, no new program per lamp. */
-  var LAMP_LIGHT = { gold: 0xf7ba3c, red: 0xe8304a, pink: 0xff4aa8 }, LAMP_STREAK = { gold: 0xffe57c, red: 0xf35670, pink: 0xff95d6 }, LAMP_WHITE = 0xe2e2e2, POOL_WHITE = 0xb0b0b0, LAMP_BLUE = null, lampFam = null, lampTint = null;
+     anchor to it (M19 fix: only ATHLETE's gold is cast as a hue — LEAN / BAGE / shared lamps cast neutral light, see lampCast above). No new draw call, no new program per lamp. */
+  var LAMP_LIGHT = LAMP_CLASS_LIGHT, LAMP_BLUE = null, lampFam = null, lampTint = null;   /* M19 fix: what each family casts → lampCast() above */
   function lampFamily(p, reg) { var RG = reg.regions && reg.regions.list || [], i, j;
     for (i = 0; i < RG.length; i++) { var R = RG[i], s = R.shape || {}; if (!R.class) continue; var m = 6, inside = s.kind === 'CIRCLE' ? Math.hypot(p.x - s.x, p.z - s.z) <= s.r + m : (s.rects || []).some(function (r) { return p.x >= r.x1 - m && p.x <= r.x2 + m && p.z >= r.z1 - m && p.z <= r.z2 + m; }); if (inside) return R.family; }   /* a lamp at a sanctuary's edge (≤ 6 m) is that sanctuary's */
     var road = null, PL = reg.paths && reg.paths.list || []; for (j = 0; j < PL.length && !road; j++) if (PL[j].id === p.route) road = PL[j].family;
@@ -118,10 +133,9 @@ export function createFixtures(ctx) {
       tmpV.set(ex, gy + headY, ez); tmpM.compose(tmpV, tmpQ, tmpS); heads.setMatrixAt(i, tmpM);
       hx[i] = ex; hy[i] = gy + headY; hz[i] = ez;
       if (pools) { tmpQ.identity(); tmpV.set(ex, gy + POOL_Y, ez); tmpM.compose(tmpV, tmpQ, tmpS); pools.setMatrixAt(i, tmpM); }
-      var fam = lampFamily({ x: x, z: z, route: p.route }, reg), warm = LAMP_LIGHT[fam], hc = warm ? new THREE.Color(warm) : (fam === 'blue' ? LAMP_BLUE.clone() : new THREE.Color(LAMP_WHITE));
-      var pc = warm ? new THREE.Color(warm).multiplyScalar(0.8) : (fam === 'blue' ? new THREE.Color(0x8fb4ea).multiplyScalar(0.7) : new THREE.Color(POOL_WHITE));   /* warm pools: the lamp's own hue, no brighter than the old blue pool (gold at 0.8 ≈ its luminance; crimson / rose darker) — a warm cast under the lamp, not a coloured floor; never mixed toward white (in linear light that drifts gold to amber). TITAN's pools at 0.7: now that pools show on the roads too, TITAN's blue is not increased */
-      heads.setColorAt(i, hc); if (pools) pools.setColorAt(i, pc); lampFam.push(fam); lampTint.push(warm ? new THREE.Color(warm).lerp(new THREE.Color(0xffffff), 0.5) : null);
-      lampList.push({ x: ex, y: gy, z: ez, h: headY, color: warm ? LAMP_STREAK[fam] : (fam === 'blue' ? 0xd6e4ff : LAMP_WHITE) });   /* the streak shader writes the colour's linear value raw: the streak tones are chosen so that value is the class hue (gold 47°, crimson 355°, rose 326°) */
+      var fam = lampFamily({ x: x, z: z, route: p.route }, reg), LC = lampCast(fam), hc = LC.head === null ? LAMP_BLUE.clone() : new THREE.Color(LC.head), pc = new THREE.Color(LC.pool).multiplyScalar(LC.pool_k);   /* the head in its class colour; warm gold / crimson pools the lamp's own hue at 0.8 (≈ the old blue pool's value: a warm cast, never a coloured floor; never mixed toward white in linear light, which drifts gold to amber); BAGE and shared pools neutral white; TITAN's at 0.7 */
+      heads.setColorAt(i, hc); if (pools) pools.setColorAt(i, pc); lampFam.push(fam); lampTint.push(new THREE.Color(LC.tint));
+      lampList.push({ x: ex, y: gy, z: ez, h: headY, color: LC.streak });
     }
     poles.instanceMatrix.needsUpdate = true; arms.instanceMatrix.needsUpdate = true; heads.instanceMatrix.needsUpdate = true; if (pools) pools.instanceMatrix.needsUpdate = true; if (heads.instanceColor) heads.instanceColor.needsUpdate = true; if (pools && pools.instanceColor) pools.instanceColor.needsUpdate = true;
     [poles, arms, heads, pools].forEach(function (m) { if (m) { if (m.computeBoundingSphere) m.computeBoundingSphere(); m.frustumCulled = true; group.add(m); } });
