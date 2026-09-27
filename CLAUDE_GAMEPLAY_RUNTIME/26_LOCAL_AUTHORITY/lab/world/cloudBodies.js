@@ -84,7 +84,7 @@ var VERT = [
      (2) the body PLANE (per fragment, FRAG): the view ray is cut by the plane through the body centre facing the viewer, so every
      overlapping card samples the SAME outline, erosion and thickness at the same screen point — no card draws an outline of its own;
      (3) height above the body's one flat base, shared by the whole layer. */
-  '  vec3 rel = world - aCentre.xyz, tcB = normalize(cameraPosition - aCentre.xyz); vec2 ax = aBody.xy, pp = vec2(-ax.y, ax.x);',
+  '  vec3 tcB = normalize(cameraPosition - aCentre.xyz); vec2 ax = aBody.xy;',
   '  vHxz = vec2(max(aBody.z, 1.0), max(aBody.w, 1.0));',
   '#if CLOUD_TAPS == 0',
   '  vHxz *= 0.86;',   /* LOW: the footprint shrinks with its smaller cards */
