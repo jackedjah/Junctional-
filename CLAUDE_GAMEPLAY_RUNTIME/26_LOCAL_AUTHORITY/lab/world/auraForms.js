@@ -11,18 +11,35 @@
    Host safety: pure light (additive, no depth write), no collider, no interaction; placements keep every form's lowest point at least
    3.4 m above its ground or outside the host reach (callers choose; formsSafe() below reports the clearance).
    Cost: ONE instanced draw for every form in a field — the four shapes share one small vertex buffer (≈ 0.3 k vertices) and each
-   instance keeps only its own shape (the others collapse outside the clip volume). LOW tier: fewer ring segments, no edge shimmer. */
+   instance keeps only its own shape (the others collapse outside the clip volume). LOW tier: fewer ring segments, no edge shimmer.
+   M19 (owner 2026-09-27: "Continue the ambient aura-shape system: rings, cubes, diamonds, hexagonal / polyhedral forms, other tasteful 3D
+   magical figures. Rules: clearly non-interactable; sparse; stronger / firmer higher in space; faint near ground / humans; visually
+   integrated; no random pickup appearance. Use class-color balance rather than defaulting to purple."):
+     · two more figures in the same buffer — an OCTA (the regular octahedron: the MAH MATCH diamond sigil in three dimensions) and an
+       ICOSA (the icosahedron). (A star tetrahedron was tried first and dropped: turning, it keeps reading as a six-pointed star, a symbol
+       the world should not hang in its sky.)
+     · the height law is steeper: a form is faint to 26 m of lift and only reaches full line weight, glow and a faint glass face ~120 m+
+       up ("firmer higher"); it also stays faint within 40 m of the viewer;
+     · the class tint is kept as a class colour: it is normalised by its brightest channel and eased toward equal-channel white only a
+       little (the old 40–60 % white mix turned LEAN crimson pink and TITAN blue lavender against the night sky);
+     · a black tint (0x000000) means CYCLE: the form turns slowly through all five classes, holding each and passing through white between
+       them (never an RGB blend of two far hues) — for places that belong to every class (MAH MATCH).
+   LOW: the new figures are not in the LOW buffer (a LOW OCTA draws as a DIAMOND, an ICOSA as a HEX) and the ring has 32 segments (was 40),
+   so LOW does less vertex work per form than before. */
 
-export var FORM = { RING: 0, CUBE: 1, HEX: 2, DIAMOND: 3 };
+export var FORM = { RING: 0, CUBE: 1, HEX: 2, DIAMOND: 3, OCTA: 4, ICOSA: 5 };
 
 var VERT = [
   'attribute vec3 aE; attribute float aShape;',
   'attribute vec4 iPos; attribute vec4 iAxis; attribute vec4 iK; attribute vec3 iTint; attribute vec3 iScl;',   /* iPos: centre + size (m) · iAxis: tilt axis + spin (rad/s) · iK: shape, phase, intensity, ground y · iScl: shape scale (a ring's y = its line sharpness) */
   'uniform float uTime;',
-  'varying vec3 vE; varying vec3 vN; varying vec3 vV; varying vec3 vTint; varying float vA; varying float vShape; varying float vPh;',
+  'varying vec3 vE; varying vec3 vN; varying vec3 vV; varying vec3 vTint; varying float vA; varying float vShape; varying float vPh; varying float vFirm;',
   'mat3 rotAxis(vec3 a, float g) { a = normalize(a); float s = sin(g), c = cos(g), o = 1.0 - c;',
   '  return mat3(o * a.x * a.x + c, o * a.x * a.y + a.z * s, o * a.z * a.x - a.y * s, o * a.x * a.y - a.z * s, o * a.y * a.y + c, o * a.y * a.z + a.x * s, o * a.z * a.x + a.y * s, o * a.y * a.z - a.x * s, o * a.z * a.z + c); }',
-  'void main() { vShape = iK.x; vPh = iK.y; vTint = iTint; vE = aE; vA = 0.0; vN = vec3(0.0, 1.0, 0.0); vV = vec3(0.0, 0.0, 1.0);',
+  'vec3 cls(float k) { if (k < 0.5) return vec3(1.0, 0.848, 0.461); if (k < 1.5) return vec3(0.375, 0.583, 1.0); if (k < 2.5) return vec3(1.0, 0.245, 0.349); if (k < 3.5) return vec3(0.662, 0.491, 1.0); return vec3(1.0, 0.575, 0.767); }',   /* the five class hexes (e6c36a 5a8cf0 d4344a 8f6ad8 f08ab8) at full brightness, in display space like the tints */
+  'vec3 cycle5(float x) { x = mod(x, 5.0); float k = floor(x), f = x - k; vec3 a = cls(k), b = cls(mod(k + 1.0, 5.0));',   /* hold a class, ease to white, rise into the next class: two far hues never average */
+  '  return f < 0.7 ? a : (f < 0.85 ? mix(a, vec3(1.0), (f - 0.7) / 0.15) : mix(vec3(1.0), b, (f - 0.85) / 0.15)); }',
+  'void main() { vShape = iK.x; vPh = iK.y; vTint = iTint.r + iTint.g + iTint.b < 0.004 ? cycle5(uTime * 0.045 + iK.y * 5.0) : iTint; vE = aE; vA = 0.0; vFirm = 0.0; vN = vec3(0.0, 1.0, 0.0); vV = vec3(0.0, 0.0, 1.0);',
   '  if (abs(aShape - iK.x) > 0.5) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }',   /* not this instance's shape: outside the clip volume */
   '  float t = uTime; mat3 R = rotAxis(iAxis.xyz, t * iAxis.w + iK.y * 6.2831853); if (aShape < 0.5) vE.z = iScl.y;',   /* a ring carries its line sharpness */
   '  vec3 scl = aShape < 0.5 ? vec3(iScl.x, 1.0, iScl.z) : iScl;',
@@ -31,8 +48,8 @@ var VERT = [
   '  vec3 wp = c + R * (position * scl) * iPos.w * breath;',
   '  vN = R * normalize(normal / scl); vV = cameraPosition - wp;',
   '  float lift = c.y - iK.w - iPos.w * 0.5;',   /* the form's lowest point above its ground */
-  '  float hK = smoothstep(3.4, 16.0, lift) * mix(0.75, 1.0, smoothstep(24.0, 140.0, lift));',   /* faint near the ground, clean when suspended high */
-  '  float d = length(vV), nK = smoothstep(6.0, 30.0, d) * (1.0 - smoothstep(1100.0, 1350.0, d));',   /* faint near the viewer */
+  '  float hK = smoothstep(4.0, 26.0, lift) * mix(0.6, 1.1, smoothstep(22.0, 160.0, lift)); vFirm = smoothstep(18.0, 120.0, lift);',   /* M19: faint to 26 m of lift, firm (line weight, glow, a faint glass face) only high in space */
+  '  float d = length(vV), nK = smoothstep(8.0, 40.0, d) * (1.0 - smoothstep(1100.0, 1350.0, d));',   /* faint near the viewer */
   '  float cyc = 0.5 + 0.5 * smoothstep(-0.6, 0.6, sin(t * 0.083 + iK.y * 17.0));',   /* a long fade in / out */
   '  vA = iK.z * hK * nK * cyc;',
   '  gl_Position = projectionMatrix * viewMatrix * vec4(wp, 1.0); }'
@@ -40,20 +57,22 @@ var VERT = [
 
 var FRAG = [
   'uniform float uTime; uniform float uGlobal; uniform float uEdge;',
-  'varying vec3 vE; varying vec3 vN; varying vec3 vV; varying vec3 vTint; varying float vA; varying float vShape; varying float vPh;',
+  'varying vec3 vE; varying vec3 vN; varying vec3 vV; varying vec3 vTint; varying float vA; varying float vShape; varying float vPh; varying float vFirm;',
   'void main() { if (vA < 0.002) discard; vec3 N = normalize(vN), V = normalize(vV); float fres = pow(1.0 - abs(dot(N, V)), 2.2), t = uTime; vec3 col;',
+  '  vec3 tn = vTint / max(max(vTint.r, vTint.g), max(vTint.b, 1e-3));',   /* M19: the class tint at full brightness (scaled by its brightest channel, never clipped) */
   '  if (vShape < 0.5) { float sharp = max(vE.z, 1.0), band = exp(-vE.x * vE.x * sharp);',   /* the soft ring: a light line across its band */
   '    float run = 0.72 + 0.28 * sin(vE.y * 6.2831853 * 3.0 - t * 0.5 + vPh * 5.0) * uEdge;',
-  '    col = mix(vTint, vec3(1.0), 0.3 + 0.2 * run) * band * run * (0.6 + 0.4 * fres); }',
+  '    col = mix(tn, vec3(1.0), 0.1 + 0.12 * run) * band * run * (0.6 + 0.4 * fres) * (0.85 + 0.3 * vFirm); }',   /* M19: a little white in the line core, the class colour kept (was a 40–60 % white wash) */
   '  else { float m = min(min(vE.x, vE.y), vE.z), w = fwidth(m);',
   '    float line = 1.0 - smoothstep(w * 0.6, w * 2.2 + 0.012, m), glow = exp(-m * 16.0) * 0.3;',   /* fine edge lines + a soft glow off them */
   '    float run = 0.65 + 0.35 * sin((vE.x * 1.7 - vE.y + vE.z * 0.6) * 9.0 - t * 0.8 + vPh * 7.0) * uEdge;',   /* a shimmer running along the edges */
-  '    vec3 ec = mix(vTint, vec3(1.0), 0.4 + 0.2 * sin(t * 0.35 + vPh * 3.0));',
-  '    col = ec * (line * 1.05 + glow) * run + vTint * (fres * 0.3 + 0.025); }',   /* the faces nearly clear: only the facing-ratio sheen */
+  '    vec3 ec = mix(tn, vec3(1.0), 0.14 + 0.1 * sin(t * 0.35 + vPh * 3.0));',
+  '    col = ec * (line * (0.9 + 0.35 * vFirm) + glow * (0.8 + 0.5 * vFirm)) * run + tn * (fres * (0.22 + 0.2 * vFirm) + 0.012 + 0.045 * vFirm); }',   /* the faces nearly clear: a facing-ratio sheen, a faint glass body only when high */
   '  gl_FragColor = vec4(col * vA * uGlobal, 1.0); }'
 ].join('\n');
 
-/* The shared vertex buffer: RING (annulus, radius 0.5, band ±0.06) · CUBE (1 m) · HEX prism (r 0.55, h 1) · DIAMOND (hex bipyramid).
+/* The shared vertex buffer: RING (annulus, radius 0.5, band ±0.06) · CUBE (1 m) · HEX prism (r 0.55, h 1) · DIAMOND (hex bipyramid) ·
+   M19: OCTA (regular octahedron, r 0.6) · ICOSA (icosahedron, r 0.55) — both left out of the LOW buffer.
    aE: barycentric edge coordinates (an internal edge — a quad diagonal, a cap-fan spoke — is held at 1 so it never draws); for the ring
    aE = (across-band −1..1, along 0..1, 1). */
 function formGeometry(THREE, tier) {
@@ -64,7 +83,7 @@ function formGeometry(THREE, tier) {
     [a, b, c].forEach(function (p, i) { P.push(p.x, p.y, p.z); Nn.push(n.x, n.y, n.z); E.push(e[i][0], e[i][1], e[i][2]); S.push(shape); }); }
   function quad(a, b, c, d, shape) { tri(a, b, c, shape, [true, false, true]); tri(a, c, d, shape, [true, true, false]); }   /* the a–c diagonal is internal */
   /* RING */
-  var RS = tier === 'LOW' ? 40 : 64, r0 = 0.44, r1 = 0.56;
+  var RS = tier === 'LOW' ? 32 : 64, r0 = 0.44, r1 = 0.56;   /* M19: LOW 32 (was 40) — pays for nothing new, LOW gets lighter */
   for (var i = 0; i < RS; i++) { var a0 = i / RS * Math.PI * 2, a1 = (i + 1) / RS * Math.PI * 2, u0 = i / RS, u1 = (i + 1) / RS;
     var p = [[Math.cos(a0) * r0, Math.sin(a0) * r0, -1, u0], [Math.cos(a0) * r1, Math.sin(a0) * r1, 1, u0], [Math.cos(a1) * r1, Math.sin(a1) * r1, 1, u1], [Math.cos(a1) * r0, Math.sin(a1) * r0, -1, u1]];
     [[0, 1, 2], [0, 2, 3]].forEach(function (T) { T.forEach(function (k) { P.push(p[k][0], 0, p[k][1]); Nn.push(0, 1, 0); E.push(p[k][2], p[k][3], 1); S.push(0); }); }); }
@@ -77,6 +96,9 @@ function formGeometry(THREE, tier) {
   /* DIAMOND: a hexagonal bipyramid, long below like a cut gem */
   var gir = []; for (j = 0; j < 6; j++) { var ag = j / 6 * Math.PI * 2 + Math.PI / 6; gir.push(V(Math.cos(ag) * 0.5, 0.12, Math.sin(ag) * 0.5)); }
   for (j = 0; j < 6; j++) { var jm = (j + 1) % 6; tri(V(0, 0.55, 0), gir[j], gir[jm], 3, [true, true, true]); tri(V(0, -0.85, 0), gir[jm], gir[j], 3, [true, true, true]); }
+  if (tier !== 'LOW') {   /* M19: OCTA — the regular octahedron (every face edge draws) */
+    var O = [V(0.6, 0, 0), V(0, 0, 0.6), V(-0.6, 0, 0), V(0, 0, -0.6)]; for (j = 0; j < 4; j++) { tri(V(0, 0.6, 0), O[j], O[(j + 1) % 4], 4, [true, true, true]); tri(V(0, -0.6, 0), O[(j + 1) % 4], O[j], 4, [true, true, true]); }
+    var ico = new THREE.IcosahedronGeometry(0.55, 0), ip = ico.attributes.position; for (j = 0; j < ip.count; j += 3) tri(V(ip.getX(j), ip.getY(j), ip.getZ(j)), V(ip.getX(j + 1), ip.getY(j + 1), ip.getZ(j + 1)), V(ip.getX(j + 2), ip.getY(j + 2), ip.getZ(j + 2)), 5, [true, true, true]); ico.dispose(); }   /* ICOSA: the icosahedron */
   var g = new THREE.InstancedBufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(Nn, 3)); g.setAttribute('aE', new THREE.Float32BufferAttribute(E, 3)); g.setAttribute('aShape', new THREE.Float32BufferAttribute(S, 1));
   return g;
 }
@@ -88,11 +110,11 @@ export function createAuraForms(THREE, items, opts) {
   opts = opts || {}; var n = items.length; if (!n) return null;
   var g = formGeometry(THREE, opts.tier), col = new THREE.Color();
   var IP = new Float32Array(n * 4), IA = new Float32Array(n * 4), IK = new Float32Array(n * 4), IT = new Float32Array(n * 3), IS = new Float32Array(n * 3);
-  items.forEach(function (it, i) { var sh = typeof it.shape === 'string' ? FORM[it.shape] : it.shape; if (sh === undefined) sh = FORM.RING; var ax = it.axis || [0.2, 1, 0.1], sc = it.scale || [1, sh === FORM.RING ? 6 : 1, 1];
+  items.forEach(function (it, i) { var sh = typeof it.shape === 'string' ? FORM[it.shape] : it.shape; if (sh === undefined) sh = FORM.RING; if (opts.tier === 'LOW' && sh >= FORM.OCTA) sh = sh === FORM.OCTA ? FORM.DIAMOND : FORM.HEX; var ax = it.axis || [0.2, 1, 0.1], sc = it.scale || [1, sh === FORM.RING ? 6 : 1, 1];
     IP[i * 4] = it.x; IP[i * 4 + 1] = it.y; IP[i * 4 + 2] = it.z; IP[i * 4 + 3] = it.size || 6;
     IA[i * 4] = ax[0]; IA[i * 4 + 1] = ax[1]; IA[i * 4 + 2] = ax[2]; IA[i * 4 + 3] = it.spin === undefined ? 0.06 : it.spin;
     IK[i * 4] = sh; IK[i * 4 + 1] = it.phase === undefined ? (i * 0.618) % 1 : it.phase; IK[i * 4 + 2] = it.intensity === undefined ? 0.5 : it.intensity; IK[i * 4 + 3] = it.ground || 0;
-    col.set(it.tint === undefined ? 0xf4f6ff : it.tint); IT[i * 3] = col.r; IT[i * 3 + 1] = col.g; IT[i * 3 + 2] = col.b; IS[i * 3] = sc[0]; IS[i * 3 + 1] = sc[1]; IS[i * 3 + 2] = sc[2]; });
+    col.setHex(it.tint === undefined ? 0xf4f6ff : it.tint); col.convertLinearToSRGB(); IT[i * 3] = col.r; IT[i * 3 + 1] = col.g; IT[i * 3 + 2] = col.b;   /* M19: display-space tint — this raw shader writes gl_FragColor unconverted, so a linear tint drifted darker and warmer (pale gold showed at hue 35°, orange) */ IS[i * 3] = sc[0]; IS[i * 3 + 1] = sc[1]; IS[i * 3 + 2] = sc[2]; });
   g.setAttribute('iPos', new THREE.InstancedBufferAttribute(IP, 4)); g.setAttribute('iAxis', new THREE.InstancedBufferAttribute(IA, 4)); g.setAttribute('iK', new THREE.InstancedBufferAttribute(IK, 4)); g.setAttribute('iTint', new THREE.InstancedBufferAttribute(IT, 3)); g.setAttribute('iScl', new THREE.InstancedBufferAttribute(IS, 3)); g.instanceCount = n;
   var day = opts.day === undefined ? 0.5 : opts.day, nightK = opts.night === undefined ? 1.0 : opts.night;
   var uniforms = { uTime: { value: 0 }, uGlobal: { value: opts.isNight ? nightK : day }, uEdge: { value: opts.tier === 'LOW' ? 0 : 1 } };

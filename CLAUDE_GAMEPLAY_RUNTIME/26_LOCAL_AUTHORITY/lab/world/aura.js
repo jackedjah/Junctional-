@@ -101,15 +101,28 @@ export function createAura(ctx) {
     var haloR = D * Math.tan(Math.max(22, sunHalf * 1.38) * Math.PI / 180), coronaR = D * Math.tan(Math.max(7, moonHalf * 1.3) * Math.PI / 180);
     req.push({ x: 0, y: 0, z: 0, size: haloR / 0.8, ring: 0.8, ringW: 0.03, breakup: 0.45, tint: 0x000000, spectral: 1.0, intensity: 0.75, nightK: 0, phase: 0.7, follow: at(sd, sl),
       fade: function (t, n) { if (n) return 0; var u = ((t % 300) + 300) % 300; return Math.min(1, Math.max(0, u / 12)) * Math.min(1, Math.max(0, (75 - u) / 12)); } });
-    req.push({ x: 0, y: 0, z: 0, size: coronaR / 0.6, ring: 0.6, ringW: 0.08, breakup: 0.25, tint: 0x241c36, spectral: 0.9, intensity: 0.6, phase: 1.9, follow: at(md, ml),
+    req.push({ x: 0, y: 0, z: 0, size: coronaR / 0.6, ring: 0.6, ringW: 0.08, breakup: 0.25, tint: 0x1c1d21, spectral: 0.9, intensity: 0.6, phase: 1.9, follow: at(md, ml),   /* M19: a neutral silver bloom (was 0x241c36, a violet wash ~75° wide round the Moon); the five-class ring stays */
       fade: function (t, n) { return n ? 1 : 0; } }); }
   /* M14 SKY FORMS: dimensional aura in the sky, far beyond anyone's reach — a gyroscope of two slow soft rings round the HALO dome, outside
      its shell (the rings' inner band edge clears the shell radius), and two great light frames far out over the sea. */
   function skyForms(F) { var H = HALO_LAYOUT, cy = H.arrival_height_m + 22, R = H.shell_radius_m + 32;
     F.push({ x: H.center.x, y: cy, z: H.center.z, size: R * 2, shape: 'RING', scale: [1, 40, 1], tint: 0xffd88a, intensity: 0.34, ground: 0, axis: [0.22, 1, 0.1], spin: 0.012, phase: 0.1 });
     F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: CRYSTAL_TINT.blue, intensity: 0.3, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });   /* M16: the HALO gyroscope is gold + TITAN blue (was gold + violet) — the shared hub is not VISIONARY's */
-    F.push({ x: -60, y: 205, z: -560, size: 110, shape: 'HEX', scale: [1, 0.35, 1], tint: CRYSTAL_TINT.red, intensity: 0.22, ground: 0, axis: [0.3, 1, 0.2], spin: 0.02, phase: 0.35 });   /* M16: LEAN crimson far out over the southern sea (was ice) */
-    F.push({ x: 540, y: 250, z: 320, size: 80, shape: 'DIAMOND', tint: 0xff9ad2, intensity: 0.18, ground: 0, axis: [0.1, 1, 0.25], spin: 0.03, phase: 0.72 }); }
+    F.push({ x: -60, y: 205, z: -560, size: 110, shape: 'HEX', scale: [1, 0.35, 1], tint: CLASS_TINT.red, intensity: 0.22, ground: 0, axis: [0.3, 1, 0.2], spin: 0.02, phase: 0.35 });   /* M16: LEAN crimson far out over the southern sea (was ice); M19: the deep class crimson (the pale crystal tint read pink on the night sky) */
+    F.push({ x: 540, y: 250, z: 320, size: 80, shape: 'DIAMOND', tint: 0xff9ad2, intensity: 0.18, ground: 0, axis: [0.1, 1, 0.25], spin: 0.03, phase: 0.72 });
+    /* M19 (owner 2026-09-27: "rings, cubes, diamonds, hexagonal / polyhedral forms, other tasteful 3D magical figures … sparse; stronger /
+       firmer higher in space … class-color balance rather than defaulting to purple"): two new figures, both far above anyone — a tall
+       octahedron (the MAH MATCH diamond sigil in three dimensions) riding high over the hall and turning slowly through all five classes
+       (tint 0 = the five-class cycle: the match belongs to every class; its lowest point ~58 m up, clear of the 52 m crown tip) and a LEAN
+       crimson icosahedron over the north-west terraces (crimson had the fewest figures). Sparse: 25 → 27 figures world-wide. */
+    F.push({ x: 124, y: 74, z: 6, size: 12, shape: 'OCTA', scale: [1, 1.3, 1], tint: 0x000000, intensity: 0.4, ground: 0, axis: [0.08, 1, 0.05], spin: 0.02, phase: 0.43 });
+    F.push({ x: -128, y: 104, z: 236, size: 15, shape: 'ICOSA', tint: CLASS_TINT.red, intensity: 0.34, ground: 0, axis: [0.45, 1, 0.1], spin: 0.014, phase: 0.18 }); }
+  /* M19 AMBIENT LAW (owner 2026-09-27: "clearly non-interactable; sparse; stronger / firmer higher in space; faint near ground / humans; …
+     no random pickup appearance"): a small figure turning a few metres over a crystal is exactly the look of a game pickup. Every local form
+     under 4 m is lifted so its lowest point clears 12 m above its ground, grown to at least 3.6 m and slowed to a drift (≤ 0.03 rad/s); the
+     form shader's height law then keeps it faint until it is well above people. Pure light: nothing near a hand moves, no collider. */
+  function ambientLaw(list) { return list.map(function (f) { if (f.shape === 'CRYSTAL' || (f.size || 6) >= 4) return f; var g = Object.assign({}, f), s = Math.max(3.6, f.size || 0), sc = f.scale || [1, 1, 1], k = (f.shape === 'RING' ? 0.56 * Math.max(sc[0], sc[2]) : 0.9 * Math.max(sc[0], sc[1], sc[2])) * 1.035 + 0.06, low = (f.ground || 0) + 12 + s * k;
+    g.size = s; g.y = Math.max(f.y, low); var sp = f.spin === undefined ? 0.06 : f.spin; if (Math.abs(sp) > 0.03) g.spin = sp < 0 ? -0.03 : 0.03; return g; }); }
   /* M15 FLOATING CRYSTALS (owner reference renders): great diamonds hanging high over the plaza, the highland, the river, TITAN and the
      north-west terrace, and two far out in the sky — all 40 m+ above the ground; modules may add more (shape 'CRYSTAL' in ctx.auraForms).
      M16 (five-class world): each takes the colour of the district it hangs over — pearl over the shared plaza, VISIONARY purple over the
@@ -128,7 +141,7 @@ export function createAura(ctx) {
     if (req.length) { field = createAuraField(THREE, req, { isNight: night, tier: tier(), name: 'WORLD_SPECTRAL_AURA' }); if (field) ctx.group.add(field.mesh); }
     if (sky.length) { skyField = createAuraField(THREE, sky, { isNight: night, tier: tier(), name: 'SKY_SPECTRAL_AURA', renderOrder: -7.5 }); if (skyField) { skyField.mesh.material.transparent = false; ctx.group.add(skyField.mesh); } }   /* the celestial backdrop pass: additive, no depth write, before the world */
     [[req, field, followers], [sky, skyField, skyFollowers]].forEach(function (L) { if (L[1]) L[0].forEach(function (r, i) { if (typeof r.follow === 'function') L[2].push({ i: i, fn: r.follow, fade: r.fade || null, base: r.intensity === undefined ? 0.5 : r.intensity }); }); });
-    var fl = (ctx.auraForms || []).filter(function (f) { return f.shape !== 'CRYSTAL'; }); skyForms(fl); var tq = tier(); if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; });   /* LOW: every sky form, half the local ones */
+    var fl = ambientLaw((ctx.auraForms || []).filter(function (f) { return f.shape !== 'CRYSTAL'; })); skyForms(fl); var tq = tier(); if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; });   /* LOW: every sky form, half the local ones */
     forms = createAuraForms(THREE, fl, { isNight: night, tier: tq, name: 'WORLD_AURA_FORMS', day: 0.5, night: 1.0 }); if (forms) ctx.group.add(forms.mesh);
     log('aura: ' + req.length + ' spectral auras in one draw, ' + sky.length + ' sky moments in the backdrop, ' + (forms ? forms.count : 0) + ' dimensional forms in one draw (' + (followers.length + skyFollowers.length) + ' following)'); }
   function follow(f, list, t) { if (!f || !list.length) return; var P = f.positions, K = f.mesh.geometry.attributes.aK;

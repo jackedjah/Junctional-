@@ -35,15 +35,16 @@ export function createMatchHall(ctx) {
     g.computeBoundingSphere(); var m = new THREE.Mesh(g, material); m.name = name; m.castShadow = false; m.receiveShadow = !!receive; m.userData.noMerge = true; m.userData.tris = Math.round(g.attributes.position.count / 3); return m;
   }
   function box(w, h, d, x, y, z) { var g = new THREE.BoxGeometry(w, h, d); g.translate(x, y + h / 2, z); return g; }
-  function tag(g, k) { var n = g.attributes.position.count, a = new Float32Array(n); a.fill(k); g.setAttribute('aLine', new THREE.BufferAttribute(a, 1)); return g; }   /* M12: line kind for the facade animation — 0 vertical strip, 1 horizontal band, 2 portal / sign edge */                       /* y = bottom */
+  function tag(g, k) { var n = g.attributes.position.count, a = new Float32Array(n); a.fill(k); g.setAttribute('aLine', new THREE.BufferAttribute(a, 1)); return g; }   /* M12: line kind for the facade animation — 0 vertical strip, 1 horizontal band, 2 portal / sign edge (M14: 3 tier band, 4 light river; M19: 5 body floor reveal) */                       /* y = bottom */
   function cyl(rt, rb, h, x, y, z, seg) { var g = new THREE.CylinderGeometry(rt, rb, h, seg || 16); g.translate(x, y + h / 2, z); return g; }
   function disc(r, y, cx, cz, seg) { var g = new THREE.CircleGeometry(r, seg || 64); g.rotateX(-Math.PI / 2); g.translate(cx, y, cz); return g; }
   function flatRing(r1, r2, y, cx, cz, seg) { var g = new THREE.RingGeometry(r1, r2, seg || 96, 1); g.rotateX(-Math.PI / 2); g.translate(cx, y, cz); return g; }
   function roundedRect(w, d, r) { var s = new THREE.Shape(); var x = -w / 2, y = -d / 2; s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + d - r); s.quadraticCurveTo(x + w, y + d, x + w - r, y + d); s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); return s; }
   /* annular prism r1..r2, height h, bottom at y, covering the shape-space arc a1..a2 (a full ring when a2 - a1 >= 2π).
      The extrude is rotated flat with rotateX(-π/2), so shape angle -π/2 (3π/2) lands on world / room +z. */
+  var ARC_SEG = 96;   /* M19: segments per full circle for the court's arcs / rings — 48 on the LOW tier (set in buildCourt) */
   function arcPrism(r1, r2, h, cx, cz, y, a1, a2) {
-    var full = (a2 - a1) >= TWO_PI - 1e-6; var n = Math.max(8, Math.round((a2 - a1) / TWO_PI * 96)); var shape = new THREE.Shape(); var i, a;
+    var full = (a2 - a1) >= TWO_PI - 1e-6; var n = Math.max(8, Math.round((a2 - a1) / TWO_PI * ARC_SEG)); var shape = new THREE.Shape(); var i, a;
     if (full) {
       for (i = 0; i < n; i++) { a = a1 + i / n * TWO_PI; if (i) shape.lineTo(Math.cos(a) * r2, Math.sin(a) * r2); else shape.moveTo(Math.cos(a) * r2, Math.sin(a) * r2); } shape.closePath();
       var hole = new THREE.Path(); for (i = 0; i < n; i++) { a = a1 + i / n * TWO_PI; if (i) hole.lineTo(Math.cos(a) * r1, Math.sin(a) * r1); else hole.moveTo(Math.cos(a) * r1, Math.sin(a) * r1); } hole.closePath(); shape.holes.push(hole);
@@ -128,8 +129,10 @@ export function createMatchHall(ctx) {
         '  else if (k < 2.5) { float f = fract((vLP.y + abs(vLP.z) + abs(vLP.x) * 0.3) * 0.3 - t * 0.5); add += vec3(0.9, 0.78, 0.5) * pow(0.5 - 0.5 * cos(f * 6.2831853), 3.0) * 0.9; }',
         '  else if (k < 3.5) { float a2 = atan(vLP.z, vLP.x - 3.0) / 6.2831853 + 0.5, lv = floor(vLP.y * 0.4); float f = fract(a2 * 2.0 - t * (0.045 + 0.02 * mod(lv, 3.0)) + lv * 0.37);',   /* M14 tier bands: TITAN blue ↔ VISIONARY violet, a soft light chasing round each floor at its own pace */
         '    vec3 cc = mix(vec3(0.028, 0.147, 1.0), vec3(0.254, 0.074, 1.0), 0.5 + 0.5 * sin(vLP.y * 0.35 + a2 * 6.2831853 + t * 0.25)); add += cc * (0.55 + 1.7 * pow(0.5 - 0.5 * cos(f * 6.2831853), 5.0)); }',
-        '  else { float f = fract(vLP.y * 0.04 - t * 0.2 + fract((vLP.x + vLP.z) * 0.013)); vec3 cc = mix(vec3(0.028, 0.147, 1.0), vec3(0.254, 0.074, 1.0), smoothstep(8.0, 40.0, vLP.y));',   /* M14 light rivers: pulses climbing the corners into the crown, blue below turning violet above */
+        '  else if (k < 4.5) { float f = fract(vLP.y * 0.04 - t * 0.2 + fract((vLP.x + vLP.z) * 0.013)); vec3 cc = mix(vec3(0.028, 0.147, 1.0), vec3(0.254, 0.074, 1.0), smoothstep(8.0, 40.0, vLP.y));',   /* M14 light rivers: pulses climbing the corners into the crown, blue below turning violet above */
         '    add += cc * (0.4 + 2.2 * pow(0.5 - 0.5 * cos(f * 6.2831853), 8.0)); }',
+        '  else { float f = fract(ang * 2.0 - t * 0.022 + vLP.y * 0.05); vec3 cc = mix(vec3(0.05, 0.28, 1.0), vec3(0.254, 0.074, 1.0), 0.25 + 0.25 * sin(t * 0.17 + vLP.y * 0.3));',   /* M19 body floor reveals: a dim bright-blue line under each slab nose, one slow soft light travelling round it (restraint: not a neon band) */
+        '    add += cc * (0.14 + 0.6 * pow(0.5 - 0.5 * cos(f * 6.2831853), 6.0)); }',
         '  float bk = k > 2.5 ? 0.25 : (k > 1.5 ? 2.6 : (k > 0.5 ? 1.0 : 0.45));   /* M15c restraint: the body strips keep only a faint base line — the black body leads */',
         '  totalEmissiveRadiance = Eb * mix(0.1, 0.13, uNight) * bk + add * mix(0.75, 1.0, uNight) + Eb * sweep * mix(0.35, 0.6, uNight) * (k > 2.5 ? 0.3 : 1.0); }'].join('\n')); };   /* absolute levels: a dim ice base line; class-coloured packets with a white head and a fading tail climb the strips, kept below the tone-map shoulder so the class colour survives (a hot packet read as flat white) */
     facadeMat.customProgramCacheKey = function () { return 'matchHall_neoTokyo'; }; facadeMat.color.setHex(0x1c2028); facadeMat.metalness = 0.6; facadeMat.roughness = 0.4;   /* dark diffuse: the lines are light, not white paint lit by the sky */
@@ -161,10 +164,12 @@ export function createMatchHall(ctx) {
     var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; t.anisotropy = 4; return t; }
   function sigils(hw, hd, d0, graphite) { sigilTex = sigilTexture(); if (!sigilTex) return;
     var W = 5.5, Hh = 8.2, Y = 9.4, P = [], U = [], I = [], k = 0;   /* 9.4 – 17.6 m: clear of the name plate below and the ticker band above */
-    function panel(cx, cz, nx, nz) { var tx = -nz, tz = nx; [[-1, 0], [1, 0], [1, 1], [-1, 1]].forEach(function (q) { P.push(cx + nx * 0.2 + tx * q[0] * W / 2, Y + q[1] * Hh, cz + nz * 0.2 + tz * q[0] * W / 2); U.push((q[0] * (nx + nz < 0 ? -1 : 1) + 1) / 2, q[1]); }); I.push(k, k + 1, k + 2, k, k + 2, k + 3); k += 4;
+    function panel(cx, cz, nx, nz) { var tx = -nz, tz = nx; [[-1, 0], [1, 0], [1, 1], [-1, 1]].forEach(function (q) { P.push(cx + nx * 0.235 + tx * q[0] * W / 2, Y + q[1] * Hh, cz + nz * 0.235 + tz * q[0] * W / 2); U.push((q[0] * (nx + nz < 0 ? -1 : 1) + 1) / 2, q[1]); }); I.push(k, k + 1, k + 2, k, k + 2, k + 3); k += 4;
       var bw = Math.abs(nx) > 0 ? 0.24 : W + 0.8, bd = Math.abs(nx) > 0 ? W + 0.8 : 0.24; graphite.push(box(bw, Hh + 0.8, bd, cx + nx * 0.09, Y - 0.4, cz + nz * 0.09)); }
     panel(-hw, d0 > 0 ? d0 - 9.5 : d0 + 9.5, -1, 0);   /* door facade, beside the portal */
     panel(4, -hd, 0, -1);   /* south face */
+    /* M19 fix: the sigil plane sat at 0.20 m, 1 cm BEHIND its backing plate's front face (0.21 m), so the depth test hid it and only the dark
+       plate showed; it now stands 2.5 cm in front of the plate — the MAH MATCH diamond (blue → violet, the five-class sweep) finally reads. */
     sigilGeo = new THREE.BufferGeometry(); sigilGeo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); sigilGeo.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2)); sigilGeo.setIndex(I); sigilGeo.computeBoundingSphere();
     sigilMat = new THREE.ShaderMaterial({ uniforms: { uMap: { value: sigilTex }, uTime: facadeU ? facadeU.uTime : { value: 0 }, uNight: facadeU ? facadeU.uNight : { value: night ? 1 : 0 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false,
       vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -190,7 +195,7 @@ export function createMatchHall(ctx) {
         '{ vec3 V = normalize(vGW - cameraPosition); float cn = max(dot(V, -vGN), 0.1), t = uTime, fl = vGl.x, ce = vGl.x + vGl.y;',
         '  float sW = 3.2 / cn, sY = V.y > 0.0 ? (ce - vGW.y) / max(V.y, 1e-3) : (fl - vGW.y) / min(V.y, -1e-3), s = min(sW, max(sY, 0.0)); vec3 Q = vGW + V * s;',   /* interior mapping: the room's back wall, ceiling or floor */
         '  float wall = step(sW, sY), up = step(0.0, V.y), yIn = clamp((Q.y - fl) / max(vGl.y, 0.5), 0.0, 1.0);',
-        '  vec3 B = vec3(0.028, 0.147, 1.0), P = vec3(0.254, 0.074, 1.0); vec3 wash = mix(B, P, 0.5 + 0.5 * sin((Q.x * 0.07 + Q.z * 0.05) * 2.0 + t * 0.21 + fl * 0.4));',
+        '  vec3 B = vec3(0.05, 0.28, 1.0), P = vec3(0.254, 0.074, 1.0); vec3 wash = mix(B, P, 0.8 * smoothstep(0.3, 1.0, 0.5 + 0.5 * sin((Q.x * 0.07 + Q.z * 0.05) * 2.0 + t * 0.21 + fl * 0.4)));',   /* M19: bright TITAN blue leads, VISIONARY violet drifts through as the accent (the rooms read mostly violet before) */
         '  float beams = pow(0.5 + 0.5 * sin((Q.x - Q.z) * 0.42 - t * 0.8 + fl), 10.0) + 0.7 * pow(0.5 + 0.5 * sin((Q.x + Q.z) * 0.29 + t * 0.55 - fl * 0.7), 14.0);',   /* light beams sweeping the room */
         '  float lines = pow(0.5 + 0.5 * cos((Q.x + Q.z) * 1.9), 24.0);',
         '  vec3 room = wall * wash * (0.2 + 0.9 * exp(-yIn * 4.0) + 0.85 * beams * (0.3 + 0.7 * yIn))',   /* back wall: the wash, light pooled low, beams */
@@ -223,6 +228,40 @@ export function createMatchHall(ctx) {
     return { tx: tx, top: y, ringY: ringY, gemY: gemY, height: gemY + 1.25 + tipH, tiers: T.length, floors: T.reduce(function (a, t) { return a + t.floors.length; }, 0) };
   }
 
+  /* ---------- M19 BODY LEVELS (owner 2026-09-27, MAH MATCH: "Keep its black identity. Continue toward: more readable levels; more visible
+     occupancy; better window rhythm; premium violet + bright blue animated facade behavior; interior glimpses; restrained Neo-Tokyo
+     character; more humanistic architectural transitions. Do NOT cover it in neon.") ----------
+     The 22 m body was one windowless black box under the lit sky tiers. It now reads as a building of floors: two softened graphite slab
+     noses wrap the body (rounded where they turn the corners, a thin blue → violet reveal tucked under each, the tiers' floor-line language
+     carried down) at the floor lines of a double-height lobby and two upper levels; each 5 m bay between the light strips carries ONE punched
+     window per upper level — a rounded-corner graphite reveal round coated glass that looks into a lit room (the tiers' interior mapping:
+     the blue → violet wash, people crossing, occupancy that changes bay to bay) — and the door facade opens its lobby in four tall windows
+     beside the portal. The corners, the edge half-bays and the sigil / blade bays stay black, so the black mass still leads (≈ 15 % glass).
+     Host safety: the lobby glass (3 cm) and its reveal (4.5 cm) stand ≤ 5 cm proud of the body face below 3.4 m; everything else new is
+     above 8.8 m; no collider changes. Cost: 0 draws — the glass joins the sky-glass draw, the noses + reveals the crown draw, the reveal
+     lines the line draw. */
+  function bodyLevels(hw, hd, d0, dw, S, PLINTH, graphite, cyan, glass) {
+    var LOWQ = tierQ() === 'LOW', NOSE = [8.8, 13.4], NH = 0.42, NB = 0.06, NO = 0.1, NR = 0.45;   /* a nose stands 0.16 m proud; NR ≤ 0.48 keeps the rounded corner outside the sharp body corner */
+    NOSE.forEach(function (y) { var s = new THREE.ExtrudeGeometry(roundedRect(2 * hw + 2 * NO, 2 * hd + 2 * NO, NR), { depth: NH - 2 * NB, bevelEnabled: true, bevelThickness: NB, bevelSize: NB, bevelSegments: LOWQ ? 1 : 2, steps: 1, curveSegments: LOWQ ? 2 : 6 }); s.rotateX(-Math.PI / 2); s.translate(0, y + NB, 0); graphite.push(s);
+      cyan.push(tag(ribbon(2 * hw + 2 * NO, 2 * hd + 2 * NO, NR, 0, 0, y - 0.05, y + 0.01, 0.0, LOWQ ? 40 : 72), 5)); });   /* the lit reveal tucked under the nose (kind 5: dim blue, one slow travelling light) */
+    var sigZ = d0 > 0 ? d0 - 9.5 : d0 + 9.5, bladeZ = d0 > 0 ? -hd + 1.4 : hd - 1.4, SIG_HALF = 3.2;   /* == sigils(): the door-facade panel beside the portal, the south panel at x = 4 (W 5.5 + 0.8 backing) */
+    var ROWS = [{ y0: 9.95, y1: 12.55, fl: NOSE[0] + NH, h: NOSE[1] - NOSE[0] - NH, dep: 0.26 }, { y0: 14.45, y1: 16.75, fl: NOSE[1] + NH, h: 17.35 - NOSE[1] - NH, dep: 0.26 }], LOBBY = { y0: 1.0, y1: 6.2, fl: PLINTH, h: NOSE[0] - PLINTH, dep: 0.045 };
+    var WW = 3.2, FW = 0.22, cs = 2, ui = 0, n = { upper: 0, lobby: 0 };   /* LOW: glass only, no rounded reveals */
+    function pane(nx, nz, a, a0, a1, R) {   /* one window: glass 3 cm off the face + a rounded reveal; a = the bay centre along the face, a0..a1 = the glazed span */
+      var tx = nz, tz = -nx, fx = nx * hw, fz = nz * hd, w = a1 - a0, h = R.y1 - R.y0, cA = (a0 + a1) / 2, cx = fx + tx * cA, cz = fz + tz * cA, o = 0.03, u0 = ui++ * 7 + (WW - w);
+      var P = [], U = [], I = [0, 1, 2, 0, 2, 3]; [[a0, R.y0, 0], [a1, R.y0, 1], [a1, R.y1, 1], [a0, R.y1, 0]].forEach(function (q) { P.push(fx + tx * q[0] + nx * o, q[1], fz + tz * q[0] + nz * o); U.push(u0 + (q[0] - a0), q[2]); });
+      var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute([nx, 0, nz, nx, 0, nz, nx, 0, nz, nx, 0, nz], 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2)); g.setAttribute('aGlass', new THREE.Float32BufferAttribute([R.fl, R.h, R.fl, R.h, R.fl, R.h, R.fl, R.h], 2)); g.setIndex(I); glass.push(g);
+      if (LOWQ) return; var sh = roundedRect(w + 2 * FW, h + 2 * FW, 0.42), hole = roundedRect(w, h, 0.26); sh.holes.push(hole);
+      var fr = new THREE.ExtrudeGeometry(sh, { depth: R.dep, bevelEnabled: false, steps: 1, curveSegments: cs }); fr.rotateY(Math.atan2(nx, nz)); fr.translate(cx, (R.y0 + R.y1) / 2, cz); graphite.push(fr); }
+    [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(function (f) { var nx = f[0], nz = f[1], half = nx ? hd : hw, doorFace = nx < 0;   /* the door face is local -x (doorFrame) */
+      for (var a = -half + S; a <= half - S + 1e-6; a += S) { var lz = nx ? -nx * a : 0, lx = nz ? nz * a : 0, a0 = a - WW / 2, a1 = a + WW / 2;   /* the bay centre in local x / z */
+        var clear = !(doorFace && (Math.abs(lz - sigZ) < SIG_HALF + WW / 2 || Math.abs(lz - bladeZ) < WW / 2 + 0.6)) && !(nz < 0 && Math.abs(lx - 4) < SIG_HALF + WW / 2);
+        if (clear) ROWS.forEach(function (R) { pane(nx, nz, a, a0, a1, R); n.upper++; });
+        if (doorFace && Math.abs(lz - d0) <= 2 * S + 1e-6 && Math.abs(lz - d0) > 1e-6) { var gap = dw + 0.75, s0 = a0, s1 = a1; if (lz > d0) s0 = Math.max(a0, d0 + gap); else s1 = Math.min(a1, d0 - gap);   /* trim clear of the portal frame */
+          if (s1 - s0 >= 2.2) { pane(nx, nz, a, s0, s1, LOBBY); n.lobby++; } } } });
+    return { noses: NOSE.length, windows_upper: n.upper, windows_lobby: n.lobby };
+  }
+
   /* ---------- EXTERIOR: the official match building (black body, graphite crown + portal, platinum plinth, cyan lines) ---------- */
   function buildBuilding() {
     var A = artifact('MATCH_HALL'); if (!A || !A.position || !A.footprint) { log('matchHall: MATCH_HALL artifact (position / footprint) missing → exterior skipped'); return; }
@@ -237,7 +276,8 @@ export function createMatchHall(ctx) {
     black.push(box(RECESS, bodyTop - PLINTH, hd - (d0 + dw), -hw + RECESS / 2, PLINTH, (d0 + dw + hd) / 2));
     black.push(box(RECESS, bodyTop - dh, 2 * dw, -hw + RECESS / 2, dh, d0));
     /* softened silhouette: a bevelled graphite crown band with rounded corners, overhanging the body */
-    var crown = new THREE.ExtrudeGeometry(roundedRect(2 * hw + 0.5, 2 * hd + 0.5, 2.4), { depth: CROWN, bevelEnabled: true, bevelThickness: BEVEL, bevelSize: BEVEL, bevelSegments: 4, steps: 1, curveSegments: 8 }); crown.rotateX(-Math.PI / 2); crown.translate(0, bodyTop + BEVEL, 0); graphite.push(crown);
+    var LOWQ = tierQ() === 'LOW';   /* M19: the LOW tier pays for the body levels by a lighter crown band and court (it must never get heavier) */
+    var crown = new THREE.ExtrudeGeometry(roundedRect(2 * hw + 0.5, 2 * hd + 0.5, 2.4), { depth: CROWN, bevelEnabled: true, bevelThickness: BEVEL, bevelSize: BEVEL, bevelSegments: LOWQ ? 2 : 4, steps: 1, curveSegments: LOWQ ? 4 : 8 }); crown.rotateX(-Math.PI / 2); crown.translate(0, bodyTop + BEVEL, 0); graphite.push(crown);
     /* platinum: plinth (0.3 m, 0.25 proud, absent in the doorway), ledge under the crown, one roof diamond */
     platinum.push(box(2 * hw - RECESS + 0.25, PLINTH, 2 * hd + 0.5, RECESS / 2 + 0.125, 0, 0));
     platinum.push(box(RECESS + 0.25, PLINTH, (d0 - dw) + hd + 0.25, -hw + RECESS / 2 - 0.125, 0, (-hd - 0.25 + d0 - dw) / 2));
@@ -264,6 +304,7 @@ export function createMatchHall(ctx) {
     neoTokyo(hw, hd, d0, dw, dh, bodyTop, cyan, graphite);   /* M12: the ticker band, the signage blade and its lit edges */
     [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (c) { cyan.push(tag(box(0.2, bodyTop - PLINTH - 0.9, 0.2, c[0] * (hw + 0.02), PLINTH + 0.6, c[1] * (hd + 0.02)), 4)); });   /* M14: light rivers up the body's corners */
     var glass = []; skyGlass(); var sky = skyTiers(hw, hd, H, black, graphite, platinum, cyan, glass);   /* M14: the stacked sky tiers */
+    var levels = bodyLevels(hw, hd, d0, dw, S, PLINTH, graphite, cyan, glass);   /* M19: readable floors, punched windows into lit rooms, the lobby glass */
     sigils(hw, hd, d0, graphite);   /* M15: the diamond sigil panels */
     /* assemble */
     var g = new THREE.Group(); g.name = 'MATCH_HALL'; g.position.set(A.position[0], 0, A.position[2]); g.rotation.y = F.theta; g.userData.noMerge = true;
@@ -282,7 +323,7 @@ export function createMatchHall(ctx) {
     if (plateTex) { plateMat = new THREE.MeshBasicMaterial({ map: plateTex, transparent: true, depthWrite: false }); var plate = new THREE.Mesh(new THREE.PlaneGeometry(8.6, 1.62), plateMat); plate.rotation.y = -Math.PI / 2; plate.position.set(-hw - 0.17, dh + 2.6, d0); plate.name = 'MATCH_HALL_PLATE'; plate.renderOrder = 3; g.add(plate); tris += 2; }
     else log('matchHall: no document → name plate skipped');
     ctx.group.add(g); groups.push(g);
-    stats.building = { id: A.id, at: [A.position[0], A.position[2]], door: { side: door.side || '-x', x: door.x, z: door.z, w: 2 * dw, h: dh }, draw_calls: g.children.length, tris: tris, strips: strips, height_m: H, sky_tiers: { tiers: sky.tiers, floors: sky.floors, visual_top_m: +sky.height.toFixed(1), collider_top_m: H, note: 'visual only, above the collider top and inside the footprint; a matching collider waits on the runtime bridge' } };
+    stats.building = { id: A.id, at: [A.position[0], A.position[2]], door: { side: door.side || '-x', x: door.x, z: door.z, w: 2 * dw, h: dh }, draw_calls: g.children.length, tris: tris, strips: strips, height_m: H, sky_tiers: { tiers: sky.tiers, floors: sky.floors, visual_top_m: +sky.height.toFixed(1), collider_top_m: H, note: 'visual only, above the collider top and inside the footprint; a matching collider waits on the runtime bridge' }, body_levels: levels };
     if (ctx.auraRequests) { var ct = Math.cos(F.theta), st = Math.sin(F.theta), wx = A.position[0] + sky.tx * ct, wz = A.position[2] - sky.tx * st;   /* M14 AURA: a halo round the crown ring (M16: pearl-prismatic, was violet), a soft blue presence round the tiers (night-led) */
       ctx.auraRequests.push({ x: wx, y: sky.ringY, z: wz, size: 10.5, aspect: 0.8, ring: 0.66, ringW: 0.05, breakup: 0.55, tint: 0xf4f6ff, spectral: 0.9, intensity: 0.16, pull: 5, nightK: 3.2, phase: 2.1 });
       ctx.auraRequests.push({ x: wx, y: H + (sky.top - H) * 0.5, z: wz, size: 24, aspect: 0.75, ring: 0, tint: 0x5a8cf0, spectral: 0.4, intensity: 0.05, pull: 10, nightK: 5, phase: 0.7 }); }
@@ -294,17 +335,18 @@ export function createMatchHall(ctx) {
     if (!C || !C.position) { log('matchHall: MATCH_COURT_OUTDOOR artifact missing → court skipped'); return; }
     var cx = C.position[0], cz = C.position[2]; var R = C.r || (Z && Z.r) || 16; var sr = (Z && Z.spectator_r && Z.spectator_r.length === 2) ? Z.spectator_r : [R + 3, R + 8]; if (!Z || !Z.spectator_r) log('matchHall: zone MATCH_COURT.spectator_r missing → ring at r + 3 .. r + 8');
     var s1 = sr[0], s2 = sr[1], sm = (s1 + s2) / 2; var graphite = [], platinum = [], cyan = [];
-    graphite.push(disc(R, 0.04, 0, 0, 96));
+    var LOWQ = tierQ() === 'LOW', RS = LOWQ ? 48 : 96; ARC_SEG = RS;   /* M19: LOW halves the court's circle segments */
+    graphite.push(disc(R, 0.04, 0, 0, RS));
     platinum.push(arcPrism(R - 0.5, R + 0.25, 0.07, 0, 0, 0, 0, TWO_PI));                                    /* rim kerb (7 cm, not a collider) */
     var GH = 2.0 / s1; var segs = arcSegments([0, Math.PI / 2, Math.PI, Math.PI * 1.5], GH);                 /* four ~4 m aisles so the ring is approachable */
     segs.forEach(function (s) { platinum.push(arcPrism(s1, sm, 0.07, 0, 0, 0, s[0], s[1])); platinum.push(arcPrism(sm, s2, 0.14, 0, 0, 0, s[0], s[1])); cyan.push(arcPrism(s1 + 0.05, s1 + 0.2, 0.03, 0, 0, 0.07, s[0], s[1])); cyan.push(arcPrism(sm + 0.05, sm + 0.2, 0.03, 0, 0, 0.14, s[0], s[1])); });   /* FLAT spectator inlays (7 / 14 cm: below the host's 20 cm step, so no collider is needed and nothing is walked through) */
-    [0.25, 0.5, 0.75].forEach(function (k) { cyan.push(flatRing(R * k - 0.06, R * k + 0.06, 0.065, 0, 0, 96)); }); cyan.push(disc(0.55, 0.065, 0, 0, 32));
+    [0.25, 0.5, 0.75].forEach(function (k) { cyan.push(flatRing(R * k - 0.06, R * k + 0.06, 0.065, 0, 0, RS)); }); cyan.push(disc(0.55, 0.065, 0, 0, 32));
     for (var i = 0; i < 4; i++) { var a = Math.PI / 4 + i * Math.PI / 2; var px = Math.cos(a) * (s1 - 1.3), pz = Math.sin(a) * (s1 - 1.3); graphite.push(cyl(0.28, 0.36, 4.6, px, 0, pz, 12)); platinum.push(cyl(0.4, 0.4, 0.12, px, 4.3, pz, 12)); cyan.push(box(0.18, 3.4, 0.18, px, 4.42, pz)); }
     var g = new THREE.Group(); g.name = 'MATCH_COURT'; g.position.set(cx, 0, cz); g.userData.noMerge = true;
     var meshes = [merged(graphite, mat('graphite', { color: 0x1d2229, roughness: 0.55, metalness: 0.75 }), 'MATCH_COURT_FLOOR', true), merged(platinum, mat('platinum', { color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), 'MATCH_COURT_TIERS', true), merged(cyan, lineMat, 'MATCH_COURT_LINES', false)];
     var tris = 0; meshes.forEach(function (m) { if (m) { g.add(m); tris += m.userData.tris; } });
     ctx.group.add(g); groups.push(g);
-    stats.court = { id: C.id, at: [cx, cz], r: R, spectator_r: [s1, s2], pylons: 4, aisles: segs.length, draw_calls: g.children.length, tris: tris };
+    stats.court = { id: C.id, at: [cx, cz], r: R, spectator_r: [s1, s2], pylons: 4, aisles: segs.length, draw_calls: g.children.length, tris: tris }; ARC_SEG = 96;
   }
 
   /* ---------- INTERIOR: room MATCH_HALL (origin-centred room metres, +z = the doorway wall, as in interiorScene) ---------- */
