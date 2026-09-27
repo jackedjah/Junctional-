@@ -28,7 +28,7 @@ var F = s1.fragmentShader, V = s1.vertexShader;
 var parts = { vary: /vSwW = \(modelMatrix \* vec4\(transformed, 1\.0\)\)\.xyz;/.test(V), metal: F.indexOf('metalnessFactor *= 0.08;') >= 0, calm: F.indexOf('swUp') >= 0,
   mix: /outgoingLight = mix\(totalDiffuse \* mix\(uBodyK, 1\.0, swSh \* 0\.8\), swSky \* uReflK, clamp\(swF, 0\.0, 1\.0\)\) \+ reflectedLight\.directSpecular \* uGlintK \+ totalEmissiveRadiance;/.test(F),
   fres: F.indexOf('float swF = 0.02 + 0.98 * pow(1.0 - clamp(dot(normal, swV), 0.0, 1.0), 5.0);') >= 0, out: F.split('#include <opaque_fragment>').length === 2,
-  order: F.indexOf('swSky.r = min(swSky.r, swSky.g)') > F.indexOf('uLandH > 0.0') && F.indexOf('swSky.r = min(swSky.r, swSky.g)') < F.indexOf('outgoingLight = mix(totalDiffuse') };
+  order: F.indexOf('swSky.r = min(swSky.r, swSky.g * 0.85)') > F.indexOf('uLandH > 0.0') && F.indexOf('swSky.r = min(swSky.r, swSky.g * 0.85)') < F.indexOf('outgoingLight = mix(totalDiffuse') };
 ok('2. all splices land: world varying, dielectric metalness, calm / rough patches, Fresnel, body + mirrored sky + Sun glints, output kept once, blue guard after the skyline',
   Object.keys(parts).every(function (k) { return parts[k]; }), parts);
 
@@ -60,7 +60,7 @@ var bad = [], n6 = 0;
 ['DAY', 'NIGHT'].forEach(function (tod) { var P = pal(tod), Z = new THREE.Color(P.zenith), Hh = new THREE.Color(P.horizon), Hz = new THREE.Color(P.haze), T = new THREE.Color(P.sunTint);
   for (var hp = 0; hp <= 1.0001; hp += 0.05) for (var sun = 0; sun <= 1.0001; sun += 0.25) for (var land = 0; land <= 1; land++) {
     var c = Hh.clone().lerp(Z, Math.pow(hp, 0.55)); c.lerp(Hz, Math.exp(-hp * 10) * 0.55); c.add(T.clone().multiplyScalar(Math.pow(sun, 24) * 0.22)); if (land) c = Hh.clone().multiplyScalar(0.42);
-    c.r = Math.min(c.r, c.g); var hx = c.getHex(), v = classify(hx); n6++; if (v.verdict === 'VIOLATION' || (v.verdict === 'LAW' && v.family !== 'BLUE')) bad.push({ tod: tod, hp: +hp.toFixed(2), sun: sun, land: land, hex: '#' + c.getHexString(), v: v }); } });
+    c.r = Math.min(c.r, c.g * 0.85); var hx = c.getHex(), v = classify(hx); n6++; if (v.verdict === 'VIOLATION' || (v.verdict === 'LAW' && v.family !== 'BLUE')) bad.push({ tod: tod, hp: +hp.toFixed(2), sun: sun, land: land, hex: '#' + c.getHexString(), v: v }); } });
 ok('6. the mirrored sky stays BLUE or neutral in ' + n6 + ' day / night samples (night haze ' + pal('NIGHT').haze + ', Moon tint ' + pal('NIGHT').sunTint + ' would read purple unguarded)', n6 > 400 && bad.length === 0, bad.slice(0, 6));
 
 /* 7. the Veil curtain falls: its streak field runs in √y (v ∝ √drop), so features at the lip are ~2.5× shorter than at the base */
