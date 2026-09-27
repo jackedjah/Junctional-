@@ -94,7 +94,7 @@ export function veilCurtainKeep(stations, W) { var CU = W && W.curtain; if (!CU)
 
 export function createVeilFalls(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var group = null, own = [], night = !!ctx.night, clock = 0, info = {};
-  var bufV = new THREE.Vector2(); var ANCH = null, crysGlow = null; var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null, lakeU = null;
+  var bufV = new THREE.Vector2(); var ANCH = null, crysGlow = null, plU = null; var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null, lakeU = null;
   function tier() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   function rnd(seed) { return ctx.rnd ? ctx.rnd(seed) : (function (s) { return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; })(seed >>> 0); }
   function keep(o) { own.push(o); return o; }
@@ -151,7 +151,7 @@ export function createVeilFalls(ctx) {
       if (!smain) { sd = 0.12; while (sd < 0.5 && crY(sk - sd - 0.02) >= slip + 0.5 && crY(sk + sd + 0.02) >= slip + 0.5) sd += 0.02; }
       STR.push(new THREE.Vector4(sk / NS, slip, sd / NS, (smain ? 1.25 : 0.8) / NS)); }
     while (STR.length < 4) STR.push(new THREE.Vector4(0, 0, 0, 0));
-    info.strands = STR.filter(function (v) { return v.z > 0; }).map(function (v) { return { station: LINES[Math.round(v.x * NS)].k, lip_y: +v.y.toFixed(1), lip_w_m: +(v.z * 2 * CH).toFixed(1), base_w_m: +(v.w * 2 * CH).toFixed(1) }; });
+    info.strands = STR.filter(function (v) { return v.z > 0; }).map(function (v) { return { station: LINES[Math.round(v.x * NS)].k, lip_y: +Math.min(v.y, lipAt(v.x * NS)).toFixed(1), lip_w_m: +(v.z * 2 * CH).toFixed(1), base_w_m: +(v.w * 2 * CH).toFixed(1) }; });
     var SPANW = 0.7, SPANT = 0.3, rowCache = {};
     function rowPath(t) { var key = t.toFixed(5), off = OFF; if (rowCache[key]) return rowCache[key];
       var S2 = CPS, M2 = NS * S2, FV = [], SN = [], P = [], Sm = [], k, i;
@@ -168,9 +168,12 @@ export function createVeilFalls(ctx) {
         if (fz.x * nm.x + fz.z * nm.z < 0) { fz.x = -fz.x; fz.z = -fz.z; }
         var H = [], srt = FV.map(function (p, q) { return { k: q, a: (p.x - A0.x) * e.x + (p.z - A0.z) * e.z, b: (p.x - A0.x) * fz.x + (p.z - A0.z) * fz.z }; }).sort(function (p, q) { return p.a - q.a; });
         srt.forEach(function (p) { while (H.length >= 2) { var o = H[H.length - 2], q = H[H.length - 1]; if ((q.a - o.a) * (p.b - o.b) - (q.b - o.b) * (p.a - o.a) >= 0) H.pop(); else break; } H.push(p); });   /* the field-side hull: the fin tips the span rests on */
-        var hk = H.map(function (p) { return p.k; }).sort(function (p, q) { return p - q; }), wt = Math.min(1, t / SPANT), ww = SPANW * wt * wt * (3 - 2 * wt), q0 = 0;
+        var hk = H.map(function (p) { return p.k; }).sort(function (p, q) { return p - q; }), wt = Math.min(1, t / SPANT), ww = SPANW * wt * wt * (3 - 2 * wt), q0 = 0, FR = [];
         for (i = 0; i <= M2; i++) { var uu = i / S2; while (q0 < hk.length - 2 && hk[q0 + 1] <= uu) q0++; var k0 = hk[q0], k1 = hk[q0 + 1], fr = (uu - k0) / (k1 - k0), p0 = FV[k0], p1 = FV[k1], cx2 = p1.x - p0.x, cz2 = p1.z - p0.z, cl = Math.hypot(cx2, cz2) || 1;
-          var spx = p0.x + cx2 * fr - cz2 / cl * sideK * off * 1.4, spz = p0.z + cz2 * fr + cx2 / cl * sideK * off * 1.4; Sm[i].x += (spx - Sm[i].x) * ww; Sm[i].z += (spz - Sm[i].z) * ww; } }
+          var tcx = cx2 / cl, tcz = cz2 / cl, ncx = -tcz * sideK, ncz = tcx * sideK, am = (Sm[i].x - p0.x) * tcx + (Sm[i].z - p0.z) * tcz, bm = (Sm[i].x - p0.x) * ncx + (Sm[i].z - p0.z) * ncz;
+          FR.push({ x: p0.x, z: p0.z, tx: tcx, tz: tcz, nx: ncx, nz: ncz, a: am + (fr * cl - am) * ww / SPANW, b: bm + (off * 1.4 - bm) * ww }); }
+        for (i = 0; i <= M2; i++) { var hb = Math.min(4, i, M2 - i), sb = 0, sw = 0; for (k = -hb; k <= hb; k++) { var wb = Math.exp(-k * k / 6); sb += FR[i + k].b * wb; sw += wb; } var F2 = FR[i], bb = F2.b + (sb / sw - F2.b) * ww / SPANW;   /* and the depth eases smoothly round each fin tip */
+          Sm[i] = { x: F2.x + F2.tx * F2.a + F2.nx * bb, z: F2.z + F2.tz * F2.a + F2.nz * bb }; } }   /* in the chord's frame: along the chord the columns settle evenly (no sliding down the fin walls into spikes), across it the sheet keeps 30 % of the bay's depth */
       rowCache[key] = Sm; return Sm; }
     function curtain(off, rib, opt) { opt = opt || {}; var pos = [], uv = [], rb = [], idx = [], i, j, J0 = opt.brink ? -4 : 0, rows = NR - J0 + 1, BRK = [20, 12, 6, 2.2], BRV = [-0.1, -0.065, -0.035, -0.012];   /* M19: opt.brink — four rows run the flume's water down its length and over the crest at the notch (the high terrain pours INTO the fall); opt.bow(t) — extra offset down the drop */
       for (j = J0; j <= NR; j++) { var t = Math.max(0, j / NR), o2 = off + (opt.bow ? opt.bow(t) : 0), RP = opt.span ? rowPath(t) : null;
@@ -229,6 +232,25 @@ export function createVeilFalls(ctx) {
         '  gl_FragColor = vec4(c, fo * 0.85);', '#include <fog_fragment>', '}'].join('\n') }));
     var foam = new THREE.Mesh(foamG, foamMat); foam.scale.set(CH * 0.62, 1, 36); foam.rotation.y = Math.atan2(ox, oz); foam.position.set(baseX, SEA + 0.03, baseZ); foam.name = 'VEIL_FALLS_FOAM'; foam.renderOrder = 5; group.add(foam);
     info.foam_y_above_sea = 0.03;
+    /* M20 THE PLUNGE LINE (owner: "waterfall-to-water transition"; review: the strands ended in a hem over a calm blue sea). Where each strand
+       meets the sea, a band of churning white water along its landing line — from 2 m under the hem out 16 m toward the field, a dense boil
+       at the impact breaking into lace and streaks as it spreads, only under the strands (their own mask at base width). Flush on the sea
+       (3 cm — the foam's own rule), one draw; the older foam field stays as the wide outflow. */
+    (function () { var RB = rowPath(1), NW = 8, pw = [], pu = [], pi = [], i, j, L = 0; for (i = 1; i <= NC; i++) L += Math.hypot(RB[i].x - RB[i - 1].x, RB[i].z - RB[i - 1].z);
+      for (i = 0; i <= NC; i++) { var ia = Math.max(0, i - 4), ib = Math.min(NC, i + 4), tx = RB[ib].x - RB[ia].x, tz = RB[ib].z - RB[ia].z, tl = Math.hypot(tx, tz) || 1, nx = -tz / tl * sideK, nz = tx / tl * sideK;   /* a wide tangent: no fans at the fin tips */
+        for (j = 0; j <= NW; j++) { var dd = -2 + 18 * j / NW; pw.push(RB[i].x + nx * dd, SEA + 0.03, RB[i].z + nz * dd); pu.push(i / NC, j / NW); } }
+      for (i = 0; i < NC; i++) for (j = 0; j < NW; j++) { var a0 = i * (NW + 1) + j, b0 = a0 + NW + 1; pi.push(a0, b0, a0 + 1, a0 + 1, b0, b0 + 1); }
+      var wg = keep(new THREE.BufferGeometry()); wg.setAttribute('position', new THREE.Float32BufferAttribute(pw, 3)); wg.setAttribute('uv', new THREE.Float32BufferAttribute(pu, 2)); wg.setIndex(pi); wg.computeBoundingSphere();
+      plU = fogUniforms({ uTime: { value: 0 }, uNight: { value: night ? 1 : 0 }, uLen: { value: L } }); plU.uStr = { value: STR }; plU.uStrBase = { value: yBot };
+      var plMat = keep(new THREE.ShaderMaterial({ uniforms: plU, transparent: true, depthWrite: false, fog: true,
+        vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv; varying float vWy;\nvoid main() { vUv = uv; vWy = 0.0; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
+        fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uLen; varying vec2 vUv;', NOISE, STRAND,
+          'void main() { float stL, m = vfStrand(vUv.x, uStrBase - 1.0, uTime, 1.3, 0.0, stL), d = vUv.y * 18.0 - 2.0, xm = vUv.x * uLen;',
+          '  float n1 = vfN(vec2(xm * 0.32, d * 0.45 - uTime * 0.8)), n2 = vfN(vec2(xm * 1.05 + 7.0, d * 1.2 - uTime * 1.6)), n3 = vfN(vec2(xm * 2.6 - 3.0, d * 2.4 - uTime * 2.3));',
+          '  float boil = (1.0 - smoothstep(0.5, 6.5, d)) * (0.72 + 0.28 * n3), lace = smoothstep(0.46, 0.8, n1 * 0.55 + n2 * 0.3 + n3 * 0.15) * (1.0 - smoothstep(3.0, 16.0, d));',
+          '  float fo = max(boil, lace * 0.8) * m * smoothstep(-2.0, -0.6, d);',
+          '  gl_FragColor = vec4(vec3(0.95, 0.97, 1.0) * (0.9 + 0.1 * n2) * mix(1.0, 0.45, uNight), fo * 0.9);', '#include <fog_fragment>', '}'].join('\n') }));
+      var pl = new THREE.Mesh(wg, plMat); pl.name = 'VEIL_FALLS_PLUNGE'; pl.renderOrder = 5.5; group.add(pl); info.plunge_line = { length_m: +L.toFixed(1), band_m: [-2, 16], y_above_sea: 0.03 }; })();
     if (!LOW) { var NB = T === 'MED' ? 230 : 420, NT2 = 0,   /* no mid-height tier on the broad curtain: its puffs read as glowing orbs */
         NM = NB + NT2, mp = new Float32Array(NM * 3), ms = new Float32Array(NM), mr = new Float32Array(NM), r0 = rnd(0x7E11), midY = yTop * 0.46 + yBot * 0.54;
       for (var m = 0; m < NM; m++) { var tier2 = m >= NB, uu = r0() * NS, bq = BP[Math.min(BP.length - 1, Math.round(uu * 4))];
@@ -760,8 +782,8 @@ export function createVeilFalls(ctx) {
     ctx.veilFalls = { lip: { x: lip.x, y: yTop, z: lip.z }, base: { x: baseX, z: baseZ }, highland: { x: CX, z: CZ, top_y: TOP }, reachable: false };
     log('veilFalls: curtain stations ' + LINES[0].k + '–' + LINES[NS].k + ' (' + NR + '×' + NC + ', chord ' + CH.toFixed(0) + ' m), lip ' + yTop.toFixed(1) + ' m → ' + yBot + ' m, highland top ' + TOP + ' m, homes ' + info.homes + ' + civic pavilion, overlooks ' + info.overlooks + ', garden shrubs ' + info.garden_shrubs + ', trees ' + info.trees + ', lanterns ' + info.lanterns + ' (not reachable until the runtime bridge)');
   }
-  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (frontU) frontU.uTime.value = clock; if (wetTU) wetTU.uTime.value = clock; if (lakeU) lakeU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
-  function setNight(n) { night = !!n; if (litNightU) litNightU.value = night ? 1 : 0; if (waterU) waterU.uNight.value = night ? 1 : 0; if (frontU) frontU.uNight.value = night ? 1 : 0; if (wetTU) wetTU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
+  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (frontU) frontU.uTime.value = clock; if (wetTU) wetTU.uTime.value = clock; if (lakeU) lakeU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (plU) plU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
+  function setNight(n) { night = !!n; if (litNightU) litNightU.value = night ? 1 : 0; if (waterU) waterU.uNight.value = night ? 1 : 0; if (frontU) frontU.uNight.value = night ? 1 : 0; if (wetTU) wetTU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (plU) plU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
     if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.3 : 0.07; if (bladeMat) bladeMat.emissiveIntensity = night ? 0.1 : 0.04; if (spireMat) spireMat.emissiveIntensity = night ? 0.8 : 0.16; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; if (flMat) flMat.emissiveIntensity = night ? 0.45 : 0.14; if (crysGlow) crysGlow.value = night ? 0.5 : 0.35; }
   function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; group = null; }
   function debug() { return info; }

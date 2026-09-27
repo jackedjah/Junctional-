@@ -87,4 +87,18 @@ console.warn = warn8;
 ok('8. the fall reaches the sea as a flush film on the rock: HIGH ' + res8.HIGH.tris + ' / MED ' + res8.MED.tris + ' triangles, worst ' + (res8.HIGH.worst * 100).toFixed(1) + ' / ' + (res8.MED.worst * 100).toFixed(1) + ' cm off the ridge below 3.4 m; the curtain still stops at ' + res8.HIGH.curtainMinY.toFixed(1) + ' m; LOW has none',
   res8.HIGH.film && res8.MED.film && !res8.LOW.film && res8.HIGH.tris > 40 && res8.HIGH.over === 0 && res8.MED.over === 0 && res8.HIGH.worst <= 0.05 && res8.MED.worst <= 0.05 && res8.HIGH.curtainMinY >= 3.4 && /film\.name = 'VEIL_FALLS_FILM'/.test(VF), res8);
 
+/* 9. M20 strands + plunge line: the fall leaves the crest only at its notches, each from a level lip under its own crest (no water on a
+      slope); the curtain spans the bays (it no longer folds back on itself); the plunge line is a flush band on the sea under the strands */
+var g9 = new THREE.Group(), c9 = { THREE: THREE, registry: REGW, group: g9, quality: { tier: function () { return 'HIGH'; } }, auraRequests: [], auraForms: [], log: function () { }, mods: {} }, w9 = console.warn; console.warn = function () { };
+var vf9 = createVeilFalls(c9); vf9.build(); g9.updateMatrixWorld(true); console.warn = w9; var I9 = vf9.debug(), ST9 = I9.strands || [], pl9 = g9.getObjectByName('VEIL_FALLS_PLUNGE'), cu9 = g9.getObjectByName('VEIL_FALLS_CURTAIN');
+var MR9 = REGW.macro.mountains.filter(function (m) { return m.id === 'RIDGE_NEAR'; })[0], rl9 = await import('../26_LOCAL_AUTHORITY/lab/world/ridgeLayout.js'), st9 = rl9.ridgeStations(MR9, REGW.macro.mountains.indexOf(MR9));
+var lipOk = ST9.every(function (S) { return S.lip_y <= rl9.ridgeFaceSegment(st9, S.station).crestA.y; }), SEA9 = REGW.coast.sea_y, plY = [1e9, -1e9], pp9 = pl9 ? pl9.geometry.attributes.position : null;
+if (pp9) for (var q9 = 0; q9 < pp9.count; q9++) { plY[0] = Math.min(plY[0], pp9.getY(q9)); plY[1] = Math.max(plY[1], pp9.getY(q9)); }
+var cp9 = cu9.geometry.attributes.position, cv9 = cu9.geometry.attributes.uv, NC9 = 0; for (q9 = 1; q9 < cp9.count; q9++) if (cv9.getY(q9) !== cv9.getY(0)) { NC9 = q9 - 1; break; }
+var worstTurn = 0, lastRow = cp9.count / (NC9 + 1) - 1; for (var r9 = lastRow - 20; r9 <= lastRow; r9++) for (q9 = 1; q9 < NC9; q9++) { var k9 = r9 * (NC9 + 1) + q9, ax9 = cp9.getX(k9) - cp9.getX(k9 - 1), az9 = cp9.getZ(k9) - cp9.getZ(k9 - 1), bx9 = cp9.getX(k9 + 1) - cp9.getX(k9), bz9 = cp9.getZ(k9 + 1) - cp9.getZ(k9);
+  var tn9 = Math.abs(Math.atan2(ax9 * bz9 - az9 * bx9, ax9 * bx9 + az9 * bz9)) * 180 / Math.PI; worstTurn = Math.max(worstTurn, tn9); }
+ok('9. the fall pours from ' + ST9.length + ' notches (' + ST9.map(function (S) { return S.station + ' @ ' + S.lip_y + ' m'; }).join(', ') + '), each lip under its crest; the lower curtain never folds back (sharpest turn ' + worstTurn.toFixed(0) + '°); the plunge line lies flush on the sea (' + (plY[0] - SEA9).toFixed(2) + '–' + (plY[1] - SEA9).toFixed(2) + ' m)',
+  ST9.length >= 2 && ST9.some(function (S) { return S.station === REGW.macro.waterfalls.filter(function (w) { return w.style === 'VEIL'; })[0].station; }) && lipOk && worstTurn < 90 && pl9 && plY[0] >= SEA9 && plY[1] - SEA9 <= 0.05 && /vfStrand/.test(VF), { ST9: ST9, worstTurn: worstTurn, plY: plY });
+vf9.dispose();
+
 console.log('RESULT world m20 water: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
