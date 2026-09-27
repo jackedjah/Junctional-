@@ -62,8 +62,8 @@ export function veilWaterMaterial(THREE, opts) { opts = opts || {};
         '  float fb = vfN(vec2(xs * 2.1 + 17.0, y * 0.35 - t * 0.02)) + 0.14 * vfN(vec2(xs * 23.0, y * 7.0 - t * 2.2));',
         '  a *= smoothstep(0.52, 0.68, fb) * smoothstep(0.015, 0.14, y) * (1.0 - smoothstep(0.7, 0.96, y)) * 0.8;',
         '#endif',
-        '  if (y > 1.0) { float yf2 = clamp((y - 1.0) / 0.08, 0.0, 1.0), f1 = vfN(vec2(xs * 30.0, yf2 * 5.0 - t * 3.4)) * 0.6 + vfN(vec2(xs * 73.0 + 5.0, yf2 * 11.0 - t * 5.0)) * 0.4, wh = smoothstep(0.32, 0.78, f1);',   /* M20 THE FILM: white water cascading down the last metres of rock into the sea — flush on the rock (host-safe) */
-        '    body = mix(vec3(0.5, 0.57, 0.66), vec3(0.97, 0.98, 1.0), 0.5 + 0.5 * wh) * mix(1.0, 0.42, uNight); a = edge * (0.66 + 0.28 * wh) * (1.0 - 0.3 * smoothstep(0.75, 1.0, yf2)); }',
+        '  if (y > 1.0) { float yf2 = clamp((y - 1.0) / 0.08, 0.0, 1.0), f1 = vfN(vec2(xs * 34.0, yf2 * 1.4 - t * 2.2)) * 0.6 + vfN(vec2(xs * 90.0 + 5.0, yf2 * 3.0 - t * 3.6)) * 0.4, wh = smoothstep(0.32, 0.78, f1);',   /* M20 THE FILM: white water cascading down the last metres of rock into the sea — flush on the rock (host-safe) */
+        '    body = mix(vec3(0.64, 0.7, 0.78), vec3(0.97, 0.98, 1.0), clamp(0.55 + 0.45 * wh + 0.35 * smoothstep(0.55, 1.0, yf2), 0.0, 1.0)) * mix(1.0, 0.42, uNight); a = edge * (0.66 + 0.28 * wh) * (1.0 + 0.1 * smoothstep(0.6, 1.0, yf2)); }   /* long vertical runs (not foil blotches), whitening into foam where it meets the sea */',
         '  gl_FragColor = vec4(body, clamp(a, 0.0, 0.96));', '#include <fog_fragment>', '}'].join('\n') }); }
 
 /* THE CURTAIN (owner reference pass): the station lines (inner foot → crest) the curtain pours over, and the keep circles that hold the ridge
