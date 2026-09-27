@@ -58,6 +58,12 @@ export function createMacro(ctx) {
     var sculptOn = true; try { sculptOn = !/[?&]ridgeSculpt=0/.test(location.search); } catch (e) { }
     var sc = null; if (sculptOn) { var keep = ((M && M.waterfalls) || []).filter(function (W) { return W.source_id === R.id; }).reduce(function (acc, W) { acc.push({ x: W.source.x, z: W.source.z, r: 28 }); (W.keep_line || []).forEach(function (K) { acc.push({ x: K[0], z: K[1], r: K[2] }); }); veilCurtainKeep(stations, W).forEach(function (K) { acc.push(K); }); return acc; }, []);   /* M12: a keep_line holds the whole face under a long fall still */
       sc = sculptRidge(pos, col, ridgeWarpField(R, stations, idx, keep), tier() === 'HIGH' ? 4 : tier() === 'LOW' ? 1 : 3, tags, RP.cols); pos = sc.pos; col = sc.col; nrm = sc.nrm; }
+    /* M19 (found by the M19 mountains review, confirmed in a headless build: 98 % of the ribbon's triangles faced DOWN): the ribbon has been
+       wound inside-out since M6. With a FrontSide material, from anywhere inside the ring the INNER face — the owner OP10 collision face — was
+       back-face culled, and the eye saw the displaced OUTER face from behind, lit from below: dark, shelves reading as overhang undersides,
+       and the visible rock standing behind the wall the host actually collides with. Every triangle is re-wound here (corners 1 and 2
+       swapped, normals negated): the positions are untouched, so the collision face stays bit-identical (gameplay_world_m19_mountains 7). */
+    for (var fw = 0; fw < pos.length; fw += 9) for (var fc = 0; fc < 3; fc++) { var ta = pos[fw + 3 + fc]; pos[fw + 3 + fc] = pos[fw + 6 + fc]; pos[fw + 6 + fc] = ta; ta = col[fw + 3 + fc]; col[fw + 3 + fc] = col[fw + 6 + fc]; col[fw + 6 + fc] = ta; ta = nrm[fw + 3 + fc]; nrm[fw + 3 + fc] = -nrm[fw + 6 + fc]; nrm[fw + 6 + fc] = -ta; nrm[fw + fc] = -nrm[fw + fc]; }
     var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3)); own.push(g);
     var softRock = true; try { softRock = !/[?&]rockSoft=0/.test(location.search); } catch (e) { }
     if (softRock) { var gs = toCreasedNormals(g, 55 * Math.PI / 180); if (gs !== g) { own.push(gs); g = gs; } }   /* DESIGN DNA: the rock flows — facet breaks under 55° shade smooth (the sculpt's subdivision seams, the small fins), real ledges and crest breaks stay crisp. ?rockSoft=0 for the A/B */

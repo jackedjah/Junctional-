@@ -110,8 +110,18 @@ var s7 = { checked: 0, missing: 0, tiers: {} };
       var siA = { x: inA.x * 0.54 + cA.x * 0.46, y: inA.y * 0.54 + cA.y * 0.46, z: inA.z * 0.54 + cA.z * 0.46 }, siB = { x: inB.x * 0.54 + cB.x * 0.46, y: inB.y * 0.54 + cB.y * 0.46, z: inB.z * 0.54 + cB.z * 0.46 };
       var uiA = { x: inA.x * 0.24 + cA.x * 0.76, y: inA.y * 0.24 + cA.y * 0.76, z: inA.z * 0.24 + cA.z * 0.76 }, uiB = { x: inB.x * 0.24 + cB.x * 0.76, y: inB.y * 0.24 + cB.y * 0.76, z: inB.z * 0.24 + cB.z * 0.76 };
       [[inA, siB, siA], [inA, inB, siB], [siA, uiB, uiA], [siA, siB, uiB], [uiA, cB, cA], [uiA, uiB, cB]].forEach(function (Tr) { if (!Tr.every(function (v) { return mn(v.x, v.z) < REACH_IN; })) return; chk++;
-        if (!have.has(Tr.map(function (v) { return [fr(v.x), fr(v.y), fr(v.z)].join(','); }).join(','))) miss++; }); } });
+        var key = function (L) { return L.map(function (v) { return [fr(v.x), fr(v.y), fr(v.z)].join(','); }).join(','); }; if (!have.has(key(Tr)) && !have.has(key([Tr[0], Tr[2], Tr[1]]))) miss++; }); } });   /* the authored corners, exactly — in the authored order or re-wound (M19: macro.js re-winds the inside-out ribbon; positions untouched) */
   s7.tiers[T] = { checked: chk, missing: miss }; s7.checked += chk; s7.missing += miss; });
 ok('7. real build, every tier: the in-reach inner (collision) face is bit-identical — ' + s7.checked + ' authored triangles checked, ' + s7.missing + ' missing', s7.checked > 30 && s7.missing === 0, s7);
+
+/* 8. (M19 lead) the ribbon faces OUT of the rock: it was wound inside-out since M6 (98 % of triangles faced down), so from inside the ring the
+      collision face was back-face culled and the eye saw the outer face from behind, lit from below. On every tier ≥ 95 % of the ridge
+      triangles now face up, and the lit normal agrees with the winding on every triangle. */
+var s8 = {};
+['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(); var M = createMacro({ THREE: THREE, group: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }); M.build(); var up = 0, n = 0, dis = 0;
+  g.traverse(function (o) { if (!/^MACRO_RIDGE_/.test(o.name)) return; var p = o.geometry.attributes.position.array, N = o.geometry.attributes.normal.array;
+    for (var q = 0; q < p.length; q += 9) { var ax = p[q + 3] - p[q], ay = p[q + 4] - p[q + 1], az = p[q + 5] - p[q + 2], bx = p[q + 6] - p[q], by = p[q + 7] - p[q + 1], bz = p[q + 8] - p[q + 2], nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx; n++; if (ny > 0) up++; if (nx * N[q] + ny * N[q + 1] + nz * N[q + 2] <= 0) dis++; } });
+  s8[T] = { tris: n, up: +(up / Math.max(1, n)).toFixed(3), normal_disagree: dis }; });
+ok('8. the ridge ribbon faces out of the rock on every tier (share facing up: ' + ['HIGH', 'MED', 'LOW'].map(function (T) { return T + ' ' + s8[T].up; }).join(', ') + '; lit normal against winding: ' + ['HIGH', 'MED', 'LOW'].map(function (T) { return s8[T].normal_disagree; }).join(' / ') + ')', ['HIGH', 'MED', 'LOW'].every(function (T) { return s8[T].tris > 1000 && s8[T].up >= 0.95 && s8[T].normal_disagree === 0; }), s8);
 
 console.log('RESULT world M19 mountains: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
