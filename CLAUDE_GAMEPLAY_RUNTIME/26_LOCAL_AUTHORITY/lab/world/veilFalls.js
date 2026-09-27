@@ -6,8 +6,8 @@
    prismatic ring round it): one broad curtain over the crest from station 106 to 114 — the notch at 110 carries the tallest strand
    (146.7 m), the buttress noses at 109 / 111 / 113 are the rock ribs between strands, the lip steps down with the crest to the side tiers.
    Aerated streak water in the shader, a dark wet-rock sheet behind, a long foam field on the sea, a rising spray wall along the base,
-   violet crystal growth on the flanking cliffs (never green), and the aura language: the glory ring and its faint outer ring, a soft
-   iridescent cap over the lip, the veil glow and the base spray bloom.
+   violet crystal growth on the flanking cliffs (never green), and the aura language: a soft iridescent cap over the lip, the veil glow and
+   the base spray bloom (M19: the full glory ring is retired — the spectrum lives in the rising mist and a soft field over the upper curtain).
    THE HIGHLAND: a hanging mesa behind the crest at the lip height — a calm silver-lavender meadow with the source lake that feeds the lip, crystal
    groves, five quiet villas facing the view, lantern paths, a flight landing pad and the Veil spire (visible above the lower crests to the
    north). It reads as land you could go to.
@@ -16,7 +16,8 @@
    The highland lies 370–500 m out, beyond the host's ±300 m reach — ENTERING it needs new colliders + host validation, so it waits on the
    runtime bridge (registry `reachable: false`).
    The ridge sculpt keeps the face under the curtain as authored (keep_line + veilCurtainKeep; host-safety 17). Draws: curtain 1, wet rock 1, foam 1, mist 1 (not LOW), cliff crystals 1 (not LOW), highland ground 1,
-   lake 1, trunks 1, canopies 1, villas 3, spire 1, lanterns 1, pad 1 — all behind the west ridge, frustum-culled as a group. */
+   lake 1, trunks 1, canopies 1, villas 3, spire 1, lanterns 1, pad 1 — all behind the west ridge, frustum-culled as a group. M19 adds the front
+   veil (not LOW), the paving and the crystal grass (not LOW): +3 on HIGH / MED, +1 on LOW (16_TESTS/gameplay_world_veil_district). */
 import { ridgeStations, ridgeFaceSegment, ridgeFacePoint } from './ridgeLayout.js';
 import { SPECTRAL, CLASS_TINT, CRYSTAL_TINT } from './aura.js'; import { applyGeology } from './surfaceDetail.js'; import { softBox } from './formKit.js';
 
@@ -33,25 +34,32 @@ var NOISE = [
    geometry carries aRib (0..1, a buttress nose under the water): there, and in broad noise bands, the curtain thins to strands so the
    dark wet rock shows between them, as in the owner's reference; the lower third merges into one white wall of spray. */
 export function veilWaterMaterial(THREE, opts) { opts = opts || {};
-  var U = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uNight: { value: opts.night ? 1 : 0 }, uSX: { value: opts.sx || 1 }, uFlip: { value: opts.flipV ? 1 : 0 } }]);
-  return new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true, defines: opts.ribs ? { VEIL_RIBS: 1 } : {},
+  var U = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uNight: { value: opts.night ? 1 : 0 }, uSX: { value: opts.sx || 1 }, uFlip: { value: opts.flipV ? 1 : 0 }, uSeed: { value: opts.seed || 0 } }]);
+  return new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true, defines: Object.assign({}, opts.ribs ? { VEIL_RIBS: 1 } : {}, opts.front ? { VEIL_FRONT: 1 } : {}),
     vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\n#ifdef VEIL_RIBS\nattribute float aRib; varying float vRib;\n#endif\nvoid main() { vUv = uv;\n#ifdef VEIL_RIBS\n vRib = aRib;\n#endif\n vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
-    fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uSX; uniform float uFlip; varying vec2 vUv;', '#ifdef VEIL_RIBS', 'varying float vRib;', '#endif', NOISE,
-        'void main() { float x = vUv.x, y = mix(vUv.y, 1.0 - vUv.y, uFlip), t = uTime, xs = x * uSX;',
+    fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uSX; uniform float uFlip; uniform float uSeed; varying vec2 vUv;', '#ifdef VEIL_RIBS', 'varying float vRib;', '#endif', NOISE,
+        'void main() { float x = vUv.x, y = mix(vUv.y, 1.0 - vUv.y, uFlip), t = uTime, xs = x * uSX + uSeed;',
         '  float n1 = vfN(vec2(xs * 20.0, y * 5.5 - t * 1.7)), n2 = vfN(vec2(xs * 57.0 + 3.1, y * 11.0 - t * 2.6)), n3 = vfN(vec2(xs * 7.0 - 1.3, y * 2.2 - t * 0.9));',
         '  float streak = smoothstep(0.32, 0.92, n1 * 0.55 + n2 * 0.3 + n3 * 0.15);',
         '  float rag = vfN(vec2(xs * 9.0, y * 16.0 - t * 1.3)); float side = min(x, 1.0 - x); float edge = smoothstep(0.0, 0.2 + 0.12 * rag, side);',
-        '  float aer = (1.0 - smoothstep(0.0, 0.1, y)) + smoothstep(0.72, 1.0, y) * 0.9;',
+        '  float aer = (1.0 - smoothstep(0.0, 0.1, y)) * smoothstep(-0.02, -0.001, y) + smoothstep(0.72, 1.0, y) * 0.9;',   /* M19: up the flume (y < 0; 0.1 ≈ 20 m) the water runs clear and streaked, whitening only in the last ~4 m before the brink */
+        '#ifdef VEIL_RIBS', '  aer += vRib * 0.35 * smoothstep(0.04, 0.3, y);', '#endif',   /* M19: white water where the fall breaks over a rock rib */
         '  float strand = smoothstep(0.22, 0.72, vfN(vec2(xs * 6.5 + 11.0, y * 0.8 - t * 0.04)) * 0.75 + vfN(vec2(xs * 15.0 - 4.0, y * 1.6)) * 0.25);',   /* a horsetail veil: uneven strands, not one flat sheet */
-        '  vec3 body = mix(vec3(0.74, 0.84, 0.96), vec3(0.985, 0.99, 1.0), clamp(streak * 0.8 + aer * 0.6 + strand * 0.2, 0.0, 1.0));',
+        '  vec3 body = mix(vec3(0.6, 0.69, 0.81), vec3(0.985, 0.99, 1.0), clamp(streak * 0.95 + aer * 0.6 + strand * 0.2, 0.0, 1.0));',   /* M19: thin water shows the dark rock through it — more contrast between sheet and streak */
+        '  float bil = vfN(vec2(xs * 3.0, y * 6.0 - t * 0.35)) * 0.6 + vfN(vec2(xs * 8.0 + 2.0, y * 15.0 - t * 0.8)) * 0.4; body *= mix(1.0, 0.78 + 0.3 * bil, smoothstep(0.55, 0.8, y));',   /* M19 turbulence: shadowed billows in the spray wall (volume, not a flat white) */
+        '  if (y < 0.0) { float yf = y * 200.0, fl = vfN(vec2(xs * 26.0, yf * 0.18 - t * 2.4)) * 0.6 + vfN(vec2(xs * 61.0, yf * 0.45 - t * 3.6)) * 0.4; streak = smoothstep(0.45, 0.85, fl); body = mix(vec3(0.4, 0.5, 0.62), vec3(0.97, 0.98, 1.0), clamp(streak * 0.85 + aer * 0.9, 0.0, 1.0)); }',   /* M19 the flume: shallow fast water — long streaks racing to the brink, whitening as it tips over */
         '  vec3 sp = vfSpec(y * 1.5 + x * 0.7 - t * 0.02); body += sp * (0.06 + 0.1 * aer + 0.08 * (1.0 - edge));',   /* light interference in the veil */
         '  body *= mix(1.0, 0.4, uNight); body += sp * 0.07 * uNight;',
-        '  float a = edge * mix(0.35, 1.0, strand) * (0.58 + 0.4 * streak + 0.25 * aer);',
+        '  float a = edge * mix(0.35, 1.0, strand) * (0.46 + 0.55 * streak + 0.25 * aer); if (y < 0.0) a = edge * (0.66 + 0.3 * streak + 0.3 * aer);',
         '#ifdef VEIL_RIBS',
         '  float br = vfN(vec2(xs * 1.7 + 5.0, y * 0.45 - t * 0.012)), merge = 1.0 - smoothstep(0.48, 0.8, y);',
         '  float thin = clamp(vRib * 0.95 + (1.0 - smoothstep(0.22, 0.55, br)) * 0.7, 0.0, 1.0) * merge;',
         '  a *= 1.0 - 0.9 * thin; a = max(a, smoothstep(0.62, 0.95, y) * 0.9 * edge);',
         '  a *= 1.0 - 0.8 * smoothstep(0.88, 1.0, y) * (0.6 + 0.4 * rag);',   /* the last rows dissolve into the spray: no hard hem above the sea (LOW has no mist) */
+        '#endif',
+        '#ifdef VEIL_FRONT',   /* M19 the front veil: separate flow bands of varying thickness with ragged edges, bowing out from the main sheet, gone before the spray */
+        '  float fb = vfN(vec2(xs * 2.1 + 17.0, y * 0.35 - t * 0.02)) + 0.14 * vfN(vec2(xs * 23.0, y * 7.0 - t * 2.2));',
+        '  a *= smoothstep(0.52, 0.68, fb) * smoothstep(0.015, 0.14, y) * (1.0 - smoothstep(0.7, 0.96, y)) * 0.8;',
         '#endif',
         '  gl_FragColor = vec4(body, clamp(a, 0.0, 0.96));', '#include <fog_fragment>', '}'].join('\n') }); }
 
@@ -69,7 +77,7 @@ export function veilCurtainKeep(stations, W) { var CU = W && W.curtain; if (!CU)
 
 export function createVeilFalls(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var group = null, own = [], night = !!ctx.night, clock = 0, info = {};
-  var bufV = new THREE.Vector2(); var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null;
+  var bufV = new THREE.Vector2(); var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null;
   function tier() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   function rnd(seed) { return ctx.rnd ? ctx.rnd(seed) : (function (s) { return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; })(seed >>> 0); }
   function keep(o) { own.push(o); return o; }
@@ -97,30 +105,43 @@ export function createVeilFalls(ctx) {
     function lipAt(u) { var i = Math.min(NS - 1, Math.floor(u)), f = u - i; return LINES[i].crest.y + (LINES[i + 1].crest.y - LINES[i].crest.y) * f - LIPD; }
     var nose = LINES.map(function (Ln, i) { if (i === 0 || i === NS) return 0; var r = function (q) { return Math.hypot(LINES[q].crest.x, LINES[q].crest.z); }; return Math.max(0, Math.min(1, ((r(i - 1) + r(i + 1)) / 2 - r(i)) / 25)); });   /* a buttress nose juts toward the field between two notches */
     function ribAt(u) { var k = Math.round(u); return (nose[k] || 0) * (1 - Math.min(1, Math.max(0, (Math.abs(u - k) - 0.1) / 0.28))); }
-    function curtain(off, rib) { var pos = [], uv = [], rb = [], idx = [], i, j;
-      for (j = 0; j <= NR; j++) { var t = j / NR;
-        for (i = 0; i <= NC; i++) { var u = i / CPS, top = lipAt(u), y = top + (yBot - top) * t, p = faceOn(LINES, u, y), n = normalOn(LINES, u, y);
-          pos.push(p.x + n.x * off, y, p.z + n.z * off); uv.push(i / NC, t); if (rib) rb.push(ribAt(u)); } }
-      for (j = 0; j < NR; j++) for (i = 0; i < NC; i++) { var a = j * (NC + 1) + i, b = a + NC + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
+    function curtain(off, rib, opt) { opt = opt || {}; var pos = [], uv = [], rb = [], idx = [], i, j, J0 = opt.brink ? -4 : 0, rows = NR - J0 + 1, BRK = [20, 12, 6, 2.2], BRV = [-0.1, -0.065, -0.035, -0.012];   /* M19: opt.brink — four rows run the flume's water down its length and over the crest at the notch (the high terrain pours INTO the fall); opt.bow(t) — extra offset down the drop */
+      for (j = J0; j <= NR; j++) { var t = Math.max(0, j / NR);
+        for (i = 0; i <= NC; i++) { var u = i / CPS, top = lipAt(u), y = top + (yBot - top) * t, p = faceOn(LINES, u, y), n = normalOn(LINES, u, y), o2 = off + (opt.bow ? opt.bow(t) : 0), px = p.x + n.x * o2, pz = p.z + n.z * o2, vv = t;
+          if (j < 0) { var bw = Math.min(1, Math.max(0, (0.95 - Math.abs(u - NS / 2)) / 0.35)), c = faceOn(LINES, u, top + LIPD), D = BRK[j + 4]; bw = bw * bw * (3 - 2 * bw); px += (c.x - n.x * D - px) * bw; pz += (c.z - n.z * D - pz) * bw; y += (HL.top_y_m + (j === -1 ? 0.18 : 0.26) - y) * bw; vv = BRV[j + 4]; }
+          pos.push(px, y, pz); uv.push(i / NC, vv); if (rib) rb.push(ribAt(u)); } }
+      for (j = 0; j < rows - 1; j++) for (i = 0; i < NC; i++) { var a = j * (NC + 1) + i, b = a + NC + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
       var g = keep(new THREE.BufferGeometry()); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); if (rib) g.setAttribute('aRib', new THREE.Float32BufferAttribute(rb, 1)); g.setIndex(idx); g.computeBoundingSphere(); return g; }
     var fallMat = keep(veilWaterMaterial(THREE, { night: night, sx: NS * 0.8, ribs: true })); waterU = fallMat.uniforms;
-    var fall = new THREE.Mesh(curtain(OFF, true), fallMat); fall.name = 'VEIL_FALLS_CURTAIN'; fall.renderOrder = 6; group.add(fall);
+    var fall = new THREE.Mesh(curtain(OFF, true, { brink: true }), fallMat); fall.name = 'VEIL_FALLS_CURTAIN'; fall.renderOrder = 6; group.add(fall);
+    /* M19 MULTIPLE FLOW BANDS (owner: "multiple flow bands, varying thickness, broken edges … depth"): a second, broken veil in front of the
+       main sheet — bands of water that shot further off the lip, bowing up to ~3.6 m out and rejoining before the spray; its own noise seed,
+       so it never repeats the sheet behind it. One draw, not on LOW; bottom at the same 3.6 m as the curtain. */
+    if (!LOW) { var frontMat = keep(veilWaterMaterial(THREE, { night: night, sx: NS * 0.8, front: true, seed: 7.3 })); frontU = frontMat.uniforms;
+      var front = new THREE.Mesh(curtain(OFF + 0.3, false, { bow: function (t) { return 3.6 * Math.sin(Math.PI * Math.min(1, t * 1.1)); } }), frontMat); front.name = 'VEIL_FALLS_FRONT'; front.renderOrder = 6.5; group.add(front); info.front_veil = true; }
     /* the wet rock behind the water: a darker, glistening sheet on the face, so the white strands read against dark rock and the ribs between them read wet */
-    var wetU = fogUniforms({ uNight: { value: night ? 1 : 0 } }); var wetMat = keep(new THREE.ShaderMaterial({ uniforms: wetU, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
+    var wetU = fogUniforms({ uNight: { value: night ? 1 : 0 }, uTime: { value: 0 } }); wetTU = wetU; var wetMat = keep(new THREE.ShaderMaterial({ uniforms: wetU, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
       vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\nvoid main() { vUv = uv; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
-      fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uNight; varying vec2 vUv;', NOISE, 'void main() { float side = min(vUv.x, 1.0 - vUv.x); float a = smoothstep(0.0, 0.06, side) * (0.5 + 0.2 * vfN(vUv * vec2(9.0, 30.0))) * (1.0 - smoothstep(0.86, 1.0, vUv.y));', '  gl_FragColor = vec4(vec3(0.11, 0.13, 0.19) * mix(1.0, 0.6, uNight), a * 0.8);', '#include <fog_fragment>', '}'].join('\n') }));
+      fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uNight; uniform float uTime; varying vec2 vUv;', NOISE, 'void main() { float side = min(vUv.x, 1.0 - vUv.x); float a = smoothstep(0.0, 0.06, side) * (0.5 + 0.2 * vfN(vUv * vec2(9.0, 30.0))) * (1.0 - smoothstep(0.86, 1.0, vUv.y));',
+        '  float gl = pow(vfN(vec2(vUv.x * 160.0, vUv.y * 22.0 - uTime * 0.9)), 7.0) * 0.9 + pow(vfN(vec2(vUv.x * 70.0 + 3.0, vUv.y * 9.0 - uTime * 0.5)), 9.0) * 0.6;',   /* M19: trickles glinting down the wet rock (reflected light) */
+        '  gl_FragColor = vec4((vec3(0.11, 0.13, 0.19) + vec3(0.55, 0.6, 0.68) * gl * (1.0 - 0.5 * uNight)) * mix(1.0, 0.6, uNight), a * 0.8 + gl * 0.15);', '#include <fog_fragment>', '}'].join('\n') }));
     var wet = new THREE.Mesh(curtain(0.8, false), wetMat); wet.name = 'VEIL_FALLS_WET_ROCK'; wet.renderOrder = 5; group.add(wet); info.wet_rock = true;
     var baseX = 0, baseZ = 0, BP = []; for (var q = 0; q <= NS * 4; q++) { var up = q / 4, pb = faceOn(LINES, up, yBot), nb = normalOn(LINES, up, yBot); BP.push({ x: pb.x, z: pb.z, nx: nb.x, nz: nb.z }); baseX += pb.x / (NS * 4 + 1); baseZ += pb.z / (NS * 4 + 1); }
     baseX -= ox * 10; baseZ -= oz * 10;   /* the plunge centre: the base polyline's centroid, stood off toward the field */
     info.fall = { lip_y: +yTop.toFixed(2), bottom_y: yBot, stations: [LINES[0].k, LINES[NS].k], columns: NC, rows: NR, chord_m: +CH.toFixed(1), offset_m: OFF, ribs: nose.map(function (v) { return +v.toFixed(2); }) };
 
     /* ---------- 2. the plunge: one long foam field on the sea (flush 3 cm) + a white wall of rising spray along the whole base ---------- */
-    var foamG = keep(new THREE.CircleGeometry(1, 48)); foamG.rotateX(-Math.PI / 2); foamU = fogUniforms({ uTime: { value: 0 }, uNight: { value: night ? 1 : 0 } });
+    var foamG = keep(new THREE.PlaneGeometry(2, 4.2, 1, 1)); foamG.rotateX(-Math.PI / 2); foamG.translate(0, 0, -1.1);   /* M19: the plunge disc plus the outflow toward the lower world (-z → the field) */ foamU = fogUniforms({ uTime: { value: 0 }, uNight: { value: night ? 1 : 0 } });
     var foamMat = keep(new THREE.ShaderMaterial({ uniforms: foamU, transparent: true, depthWrite: false, fog: true,
       vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vP;\nvoid main() { vP = position.xz; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
       fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; varying vec2 vP;', NOISE,
         'void main() { float r = length(vP); float n = vfN(vP * 9.0 + vec2(uTime * 0.4, -uTime * 0.7)) * 0.6 + vfN(vP * 23.0 - vec2(uTime * 0.9, uTime * 0.3)) * 0.4;',
-        '  float fo = (1.0 - smoothstep(0.25, 1.0, r)) * smoothstep(0.35, 0.75, n + (1.0 - r) * 0.35);', 'vec3 c = vec3(0.95, 0.97, 1.0) * mix(1.0, 0.45, uNight);',
+        '  float fo = (1.0 - smoothstep(0.25, 1.0, r)) * smoothstep(0.35, 0.75, n + (1.0 - r) * 0.35);',
+        '  float rg = 0.5 + 0.5 * sin((r * 7.0 - uTime * 0.55) * 6.2832); fo = max(fo, (1.0 - smoothstep(0.55, 1.25, r)) * smoothstep(0.55, 0.95, rg * (0.6 + 0.4 * n)) * 0.55);',   /* M19 THE PLUNGE: rings of foam pushed out from the impact */
+        '  float al = max(0.0, -vP.y - 0.4), wd = 0.5 + al * 0.22, lat = abs(vP.x) / wd;',   /* M19 THE CONTINUATION: streaks of foam carried out toward the lower world, spreading and thinning */
+        '  float st = vfN(vec2(vP.x * 11.0 / (1.0 + al * 0.4), al * 2.4 - uTime * 0.22)) * 0.7 + vfN(vec2(vP.x * 29.0, al * 6.0 - uTime * 0.4)) * 0.3;',
+        '  fo = max(fo, smoothstep(0.58, 0.82, st) * (1.0 - smoothstep(0.55, 1.0, lat)) * (1.0 - smoothstep(0.6, 2.6, al)) * step(0.0, -vP.y - 0.4) * 0.75);',
+        'vec3 c = vec3(0.95, 0.97, 1.0) * mix(1.0, 0.45, uNight);',
         '  gl_FragColor = vec4(c, fo * 0.85);', '#include <fog_fragment>', '}'].join('\n') }));
     var foam = new THREE.Mesh(foamG, foamMat); foam.scale.set(CH * 0.62, 1, 36); foam.rotation.y = Math.atan2(ox, oz); foam.position.set(baseX, SEA + 0.03, baseZ); foam.name = 'VEIL_FALLS_FOAM'; foam.renderOrder = 5; group.add(foam);
     info.foam_y_above_sea = 0.03;
@@ -132,8 +153,13 @@ export function createVeilFalls(ctx) {
       var mg = keep(new THREE.BufferGeometry()); mg.setAttribute('position', new THREE.BufferAttribute(mp, 3)); mg.setAttribute('aSeed', new THREE.BufferAttribute(ms, 1)); mg.setAttribute('aRise', new THREE.BufferAttribute(mr, 1)); mg.boundingSphere = new THREE.Sphere(new THREE.Vector3(baseX, 60, baseZ), CH * 0.6 + 140);
       mistU = { uTime: { value: 0 }, uNight: { value: night ? 1 : 0 }, uScale: { value: 700 }, uOut: { value: new THREE.Vector2(-ox, -oz) } };
       var mistMat = keep(new THREE.ShaderMaterial({ uniforms: mistU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-        vertexShader: 'attribute float aSeed; attribute float aRise; uniform float uTime; uniform float uScale; uniform vec2 uOut; varying float vA;\nvoid main() { float ph = fract(aSeed + uTime * (0.03 + aSeed * 0.02)); vec3 p = position; p.y += ph * aRise; p.xz += uOut * ph * aRise * 0.35; p.x += sin(uTime * 0.3 + aSeed * 40.0) * 4.0 * ph; p.z += cos(uTime * 0.23 + aSeed * 31.0) * 3.0 * ph;\n  vA = sin(ph * 3.14159) * (0.55 + 0.45 * aSeed); vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_PointSize = uScale * (8.0 + 18.0 * ph) / max(1.0, -mv.z); gl_Position = projectionMatrix * mv; }',
-        fragmentShader: 'uniform float uNight; varying float vA;\nvoid main() { float r = length(gl_PointCoord - 0.5) * 2.0; if (r > 1.0) discard; float s = pow(1.0 - r, 1.8); gl_FragColor = vec4(vec3(0.93, 0.96, 1.0) * s * vA * mix(0.085, 0.1, uNight), 1.0); }' }));
+        vertexShader: 'attribute float aSeed; attribute float aRise; uniform float uTime; uniform float uScale; uniform vec2 uOut; varying float vA; varying float vH; varying float vS;\nvoid main() { float ph = fract(aSeed + uTime * (0.03 + aSeed * 0.02)); vec3 p = position; p.y += ph * aRise; p.xz += uOut * ph * aRise * 0.35; p.x += sin(uTime * 0.3 + aSeed * 40.0) * 4.0 * ph; p.z += cos(uTime * 0.23 + aSeed * 31.0) * 3.0 * ph;\n  vA = sin(ph * 3.14159) * (0.55 + 0.45 * aSeed); vH = ph; vS = aSeed; vec4 mv = modelViewMatrix * vec4(p, 1.0); vA *= smoothstep(10.0, 55.0, -mv.z); gl_PointSize = min(uScale * (8.0 + 18.0 * ph) / max(1.0, -mv.z), uScale * 0.5); gl_Position = projectionMatrix * mv; }',
+        fragmentShader: ['uniform float uNight; varying float vA; varying float vH; varying float vS;',
+          'vec3 mSpec(float t) { t = fract(t) * 7.0; vec3 v = vec3(0.706, 0.549, 1.0), i = vec3(0.498, 0.816, 1.0), w = vec3(0.957, 0.965, 1.0), g = vec3(1.0, 0.847, 0.541), p = vec3(1.0, 0.604, 0.824), c = vec3(1.0, 0.44, 0.51);',
+          '  if (t < 1.0) return mix(v, i, t); if (t < 2.0) return mix(i, w, t - 1.0); if (t < 3.0) return mix(w, g, t - 2.0); if (t < 4.0) return mix(g, w, t - 3.0); if (t < 5.0) return mix(w, p, t - 4.0); if (t < 6.0) return mix(p, c, t - 5.0); return mix(c, v, t - 6.0); }',   /* the aura's five-class prism: violet, ice blue, pale gold, pink, a little crimson — through white, never green or orange */
+          'void main() { float r = length(gl_PointCoord - 0.5) * 2.0; if (r > 1.0) discard; float s = pow(1.0 - r, 1.8);',
+          '  vec3 c = mix(vec3(0.93, 0.96, 1.0), mSpec(vS * 0.8 + vH * 0.9), smoothstep(0.3, 0.85, vH) * 0.5 * (1.0 - 0.7 * uNight));',   /* M19: the spectrum lives in the rising mist — white spray low, prismatic as it climbs */
+          '  gl_FragColor = vec4(c * s * vA * mix(0.085, 0.1, uNight), 1.0); }'].join('\n') }));   /* M19: points fade within ~10–55 m of the eye and never grow past half the frame scale — the plume no longer blows a close view out to white */
       var mist = new THREE.Points(mg, mistMat); mist.name = 'VEIL_FALLS_MIST'; mist.renderOrder = 7; group.add(mist); info.mist = NM; }
 
     /* ---------- 2b. crystal growth on the cliffs (the reference's lush cliffs, in the VISIONARY palette — violet, silver, a little ice; never
@@ -155,16 +181,18 @@ export function createVeilFalls(ctx) {
 
     /* ---------- 3. the highland mesa ---------- */
     var CB = HL.center_bearing, CD = HL.center_dist_m, CX = Math.sin(CB) * CD, CZ = Math.cos(CB) * CD, er = [Math.sin(CB), Math.cos(CB)], et = [Math.cos(CB), -Math.sin(CB)];
-    var TOP = HL.top_y_m, AR = HL.radial_m, AT = HL.tangential_m, RING = LOW ? 12 : 22, SEG = LOW ? 72 : 120, rn = rnd(0x51C3);
+    var TOP = HL.top_y_m, AR = HL.radial_m, AT = HL.tangential_m, RING = LOW ? 12 : (T === 'MED' ? 28 : 36), SEG = LOW ? 72 : (T === 'MED' ? 150 : 200), rn = rnd(0x51C3);   /* M19: a finer meadow on HIGH / MED (was 22 × 120) so the flush paving, rills and garden walls meet the ground it actually draws */
     var lip = { x: crC.x, z: crC.z }, lakeC = { x: lip.x + ox * 20, z: lip.z + oz * 20 };   /* the source lake just behind the lip */
     function roll0(x, z) { var h = 1.4 * Math.sin(x * 0.047 + 1.3) * Math.cos(z * 0.041 - 0.7) + 0.7 * Math.sin((x + z) * 0.11); var dl = Math.hypot(x - lakeC.x, z - lakeC.z); return h * Math.min(1, Math.max(0, (dl - 16) / 22)); }
     function rimR(th) { var e = Math.hypot(Math.cos(th) / AR, Math.sin(th) / AT); return (1 / e) * (1 + 0.09 * Math.sin(th * 3 + 0.7) + 0.05 * Math.sin(th * 7 + 2.1)); }
     /* M15c: the residential crescent is laid out BEFORE the meadow is built, so flat pads sit under every home and garden, the civic
        plaza and the overlooks (the meadow's gentle roll varies by up to ~2.6 m across a 30 m plaza) */
     var PADS = [];
-    function roll(x, z) { var h = roll0(x, z); for (var i = 0; i < PADS.length; i++) { var P = PADS[i], d = Math.hypot(x - P.x, z - P.z); if (d < P.r + 7) { var w = d <= P.r ? 1 : 1 - (d - P.r) / 7; w = w * w * (3 - 2 * w); h += (P.h - h) * w; } } return h; }
+    function roll(x, z) { var h = roll0(x, z); for (var i = 0; i < PADS.length; i++) { var P = PADS[i], d = Math.hypot(x - P.x, z - P.z), E = P.e || 7; if (d < P.r + E) { var w = d <= P.r ? 1 : 1 - (d - P.r) / E; w = w * w * (3 - 2 * w); h += (P.h - h) * w; } } return h; }
     function L2W(lx, lz) { return { x: CX + er[0] * lx + et[0] * lz, z: CZ + er[1] * lx + et[1] * lz }; }
     function laneX(lz) { return 3 + lz * lz / 420; }   /* the crescent: concave toward the lake and the lip */
+    /* M19: H.ds — the side of a home its door (and the side path) is on: toward the district's middle. The M15c rule (lz > 0 → -1) assumed an
+       unmirrored frame; L2W is a mirror, so every door had faced the crescent's ends, and the last one opened onto the mesa's edge. */
     var RES = (function () { var rl = rnd(0xA11B), face0 = Math.atan2(-ox, -oz), busy = [{ x: lakeC.x + ox * 6, z: lakeC.z + oz * 6, r: 20 }, { x: lip.x, z: lip.z, r: 14 }, { x: Math.sin(HL.spire_bearing) * HL.spire_dist_m, z: Math.cos(HL.spire_bearing) * HL.spire_dist_m, r: 12 }];
       function free(p, r) { if (Math.hypot(p.x, p.z) < 372) return false; for (var q = 0; q < busy.length; q++) if (Math.hypot(p.x - busy[q].x, p.z - busy[q].z) < busy[q].r + r) return false; return true; }
       var civ = L2W(laneX(0) + 2, 0); busy.push({ x: civ.x, z: civ.z, r: 16 }); PADS.push({ x: civ.x, z: civ.z, r: 16.5, h: roll0(civ.x, civ.z) });
@@ -173,37 +201,82 @@ export function createVeilFalls(ctx) {
       var homes = []; [[-52, -1], [-32, -1], [50, -1], [-56, 1], [-34, 1], [34, 1], [56, 1]].forEach(function (S) { var hz = S[0], sd = S[1], hx = laneX(hz) + sd * 11.5;
         if (Math.hypot((hx + sd * 9) / AR, hz / AT) > 0.9) return; var P = L2W(hx, hz); if (!free(P, 10)) return;
         var yaw = face0 + (rl() - 0.5) * 0.22, h0 = roll0(P.x, P.z), gx = P.x + Math.sin(yaw) * 7.8, gz = P.z + Math.cos(yaw) * 7.8;
-        homes.push({ x: P.x, z: P.z, lz: hz, yaw: yaw, W: 12 + rl() * 2.5 }); busy.push({ x: P.x, z: P.z, r: 10 }); PADS.push({ x: P.x, z: P.z, r: 11, h: h0 }, { x: gx, z: gz, r: 7, h: h0 }); });   /* the home and its garden share one level */
+        homes.push({ x: P.x, z: P.z, lz: hz, yaw: yaw, W: 12 + rl() * 2.5, ds: (et[0] * Math.cos(yaw) - et[1] * Math.sin(yaw)) * hz > 0 ? -1 : 1 }); busy.push({ x: P.x, z: P.z, r: 10 }); PADS.push({ x: P.x, z: P.z, r: 11, h: h0 }, { x: gx, z: gz, r: 7, h: h0, e: 4 }); });   /* the home and its garden share one level (M19: the garden terrace falls away over 4 m below its retaining wall, not 7) */
       var looks = []; [-1, 1].forEach(function (sd) { var lz = sd * 56, lx = -Math.sqrt(Math.max(0, 0.86 * 0.86 - (lz / AT) * (lz / AT))) * AR, P = L2W(lx, lz); if (!free(P, 8)) return; var Q = L2W(lx - 10, lz);
         looks.push({ x: P.x, z: P.z, yaw: Math.atan2(Q.x - P.x, Q.z - P.z) }); busy.push({ x: P.x, z: P.z, r: 10 }); PADS.push({ x: P.x, z: P.z, r: 4, h: roll0(P.x, P.z) }); });
       return { civ: civ, homes: homes, looks: looks, face: face0 }; })();
-    var gp = [], gc = [], gi = [], col = new THREE.Color(), meadowA = new THREE.Color(0xa29eb2), meadowB = new THREE.Color(0x87839a), meadowC = new THREE.Color(0xbdb9ca), rockA = new THREE.Color(0x3b4154), rockB = new THREE.Color(0x6f6b75);
-    function vtx(x, y, z, c) { gp.push(x, y, z); gc.push(c.r, c.g, c.b); return gp.length / 3 - 1; }
+    /* M19 THE WATER PLAN (owner 2026-09-27: "water runoff / wetness logic, drainage where appropriate, transition toward the waterfall"):
+       the source lake already stood 0.25 m over the meadow, so it becomes what that is — a raised stone BASIN; the channel to the lip becomes
+       a stone FLUME between wet banks that pours over the lip; two stone RILLS carry the district's runoff from springs beside the lane down
+       into the basin, each starting where the meadow stands higher than the water. Wetness follows the water: a damp margin round the
+       basin, wet banks along the flume and the rills, spray-wet ground at the lip. */
+    var LK = { x: lakeC.x + ox * 6, z: lakeC.z + oz * 6 }, tgx = oz, tgz = -ox;   /* the basin's centre; its 24 m axis runs along the tangent (oz, -ox), its 16 m axis along o */
+    function lakeE(x, z) { var dx = x - LK.x, dz = z - LK.z; return Math.hypot((dx * ox + dz * oz) / 8, (dx * tgx + dz * tgz) / 12); }   /* 1 on the water's edge */
+    function chanD(x, z) { var dx = x - lip.x, dz = z - lip.z, a = dx * ox + dz * oz, b = Math.abs(dx * tgx + dz * tgz); return Math.max(a < -2 ? -2 - a : (a > 20 ? a - 20 : 0), b - LIPW * 0.4); }   /* metres outside the flume */
+    var RILLS = []; [-1, 1].forEach(function (sd) { var best = null; [19, 22, 25, 28].forEach(function (az) { var S = L2W(laneX(sd * az) - 4.6, sd * az), h = roll0(S.x, S.z); if (!best || h > best.h) best = { S: S, h: h, lz: sd * az }; });
+      if (!best || best.h < 0.3) return; var S = best.S, e = lakeE(S.x, S.z), E = { x: LK.x + (S.x - LK.x) / e * 1.04, z: LK.z + (S.z - LK.z) / e * 1.04 }, mx = (S.x + E.x) / 2 + (E.z - S.z) * 0.16 * sd, mz = (S.z + E.z) / 2 - (E.x - S.x) * 0.16 * sd, pts = [];
+      for (var i = 0; i <= 24; i++) { var t = i / 24, u = 1 - t; pts.push({ x: u * u * S.x + 2 * u * t * mx + t * t * E.x, z: u * u * S.z + 2 * u * t * mz + t * t * E.z }); } RILLS.push({ pts: pts, spring: S, h: best.h, lz: best.lz }); });
+    function segD(x, z, P) { var b = 1e9; for (var i = 1; i < P.length; i++) { var ax = P[i - 1].x, az = P[i - 1].z, dx = P[i].x - ax, dz = P[i].z - az, l2 = dx * dx + dz * dz || 1, t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / l2)); b = Math.min(b, Math.hypot(x - ax - dx * t, z - az - dz * t)); } return b; }
+    function wetK(x, z) { var w = Math.max(0, 1 - Math.max(0, (lakeE(x, z) - 1) * 9 - 0.8) / 2.4) * 0.7; w = Math.max(w, Math.max(0, 1 - Math.max(0, chanD(x, z)) / 3)); w = Math.max(w, Math.max(0, 1 - Math.max(0, Math.hypot(x - lip.x, z - lip.z) - 12) / 9) * 0.85);
+      for (var r = 0; r < RILLS.length; r++) w = Math.max(w, Math.max(0, 1 - Math.max(0, segD(x, z, RILLS[r].pts) - 0.7) / 1.6) * 0.6); return Math.min(1, w); }
+    function gardenK(x, z) { var g = 0; for (var i = 0; i < PADS.length; i++) { var P = PADS[i]; if (P.r < 5) continue; var d = Math.hypot(x - P.x, z - P.z) - P.r - 1.5; g = Math.max(g, d <= 0 ? 1 : Math.max(0, 1 - d / 4)); } return g; }   /* the tended lawn round the homes and the civic plaza */
+    var gp = [], gc = [], gi = [], gw = [], col = new THREE.Color(), meadowA = new THREE.Color(0x7b7674), meadowB = new THREE.Color(0x676261), meadowC = new THREE.Color(0x847d86), lawnA = new THREE.Color(0x837e7b), rockA = new THREE.Color(0x3b4154), rockB = new THREE.Color(0x6f6b75);   /* M19: a silver-greige lawn (was lavender-grey, and a cool grey read periwinkle under the sky light — the land must read neither purple nor TITAN blue): a faint mauve only in the bloom drifts, lighter and even where it is tended */
+    function vtx(x, y, z, c, w) { gp.push(x, y, z); gc.push(c.r, c.g, c.b); gw.push(w || 0); return gp.length / 3 - 1; }
     var cIdx = vtx(CX, TOP + roll(CX, CZ), CZ, meadowA), rings = [];
     for (var k = 1; k <= RING; k++) { var fk = k / RING, row = []; for (var s2 = 0; s2 < SEG; s2++) { var th = s2 / SEG * Math.PI * 2, rr = rimR(th) * fk, lx = Math.cos(th) * rr, lz = Math.sin(th) * rr;
         var x = CX + er[0] * lx + et[0] * lz, z = CZ + er[1] * lx + et[1] * lz, yy = TOP + roll(x, z) - (fk > 0.86 ? (fk - 0.86) * 12 : 0);
-        var nz = 0.5 + 0.5 * Math.sin(x * 0.09 + z * 0.13) * Math.sin(x * 0.031 - z * 0.057); col.copy(meadowA).lerp(nz > 0.6 ? meadowC : meadowB, Math.abs(nz - 0.5) * 1.6); if (fk > 0.9) col.lerp(rockB, (fk - 0.9) * 6);
-        row.push(vtx(x, yy, z, col)); } rings.push(row); }
-    for (s2 = 0; s2 < SEG; s2++) gi.push(cIdx, rings[0][(s2 + 1) % SEG], rings[0][s2]);
-    for (k = 0; k < RING - 1; k++) for (s2 = 0; s2 < SEG; s2++) { var a0 = rings[k][s2], a1 = rings[k][(s2 + 1) % SEG], b0 = rings[k + 1][s2], b1 = rings[k + 1][(s2 + 1) % SEG]; gi.push(a0, a1, b0, a1, b1, b0); }
+        var nz = 0.5 + 0.5 * Math.sin(x * 0.09 + z * 0.13) * Math.sin(x * 0.031 - z * 0.057); col.copy(meadowA).lerp(nz > 0.6 ? meadowC : meadowB, Math.abs(nz - 0.5) * 1.6); var gk = gardenK(x, z); if (gk > 0) col.lerp(lawnA, gk * 0.75); if (fk > 0.9) col.lerp(rockB, (fk - 0.9) * 6);
+        row.push(vtx(x, yy, z, col, fk > 0.92 ? 0 : wetK(x, z))); } rings.push(row); }
+    /* M19 (found in the M19 aerial audit): L2W is a mirror frame (det -1), so the meadow's old winding faced DOWN and the whole meadow top was
+       back-face culled — from above and at eye level the eye fell through to the ridge rock and the sea (strip() already righted its ribbons).
+       The same triangles, wound up. */
+    for (s2 = 0; s2 < SEG; s2++) gi.push(cIdx, rings[0][s2], rings[0][(s2 + 1) % SEG]);
+    for (k = 0; k < RING - 1; k++) for (s2 = 0; s2 < SEG; s2++) { var a0 = rings[k][s2], a1 = rings[k][(s2 + 1) % SEG], b0 = rings[k + 1][s2], b1 = rings[k + 1][(s2 + 1) % SEG]; gi.push(a0, b0, a1, a1, b0, b1); }
     var topCount = gi.length, prev = rings[RING - 1], drops = [[10, 5], [34, 12], [78, 22], [118, 30]];   /* the mesa's cliff skirt: drop / outward flare */
     drops.forEach(function (D, di) { var row = []; for (var s3 = 0; s3 < SEG; s3++) { var q = prev[s3], px = gp[q * 3], py = gp[q * 3 + 1], pz = gp[q * 3 + 2], dx = px - CX, dz = pz - CZ, dl = Math.hypot(dx, dz) || 1;
-        var jag = (rn() - 0.5) * 3 + Math.sin(s3 * 1.7 + di) * 2.2, ny = TOP - D[0] + (rn() - 0.5) * 4; col.copy(rockA).lerp(rockB, 0.55 - di * 0.12 + (rn() - 0.5) * 0.2);
+        var thS = s3 / SEG * Math.PI * 2, jag = Math.sin(thS * 17 + di * 1.3) * 1.6 + Math.sin(thS * 41 - di) * 0.9 + (rn() - 0.5) * 0.8, ny = TOP - D[0] + Math.sin(thS * 13 + di * 2) * 1.4 + (rn() - 0.5) * 1.2;   /* M19: the break-away follows the angle (was a random step per segment — a saw-tooth fringe from above once the finer meadow doubled the segments) */ col.copy(rockA).lerp(rockB, 0.55 - di * 0.12 + (rn() - 0.5) * 0.2);
         var toField = Math.max(0, -(dx / dl * er[0] + dz / dl * er[1])), fl = D[1] * (1 - toField * 1.6) + jag * (1 - toField);   /* the field-facing side tucks back into the ridge body instead of flaring in front of the face and the fall */
         row.push(vtx(CX + dx / dl * (Math.hypot(dx, dz) + fl), ny, CZ + dz / dl * (Math.hypot(dx, dz) + fl), col)); }
       for (s3 = 0; s3 < SEG; s3++) { var p0 = prev[s3], p1 = prev[(s3 + 1) % SEG], q0 = row[s3], q1 = row[(s3 + 1) % SEG]; gi.push(p0, q0, p1, p1, q0, q1); } prev = row; });
-    var hg = keep(new THREE.BufferGeometry()); hg.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3)); hg.setAttribute('color', new THREE.Float32BufferAttribute(gc, 3)); hg.setIndex(gi); hg.computeVertexNormals();
+    var hg = keep(new THREE.BufferGeometry()); hg.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3)); hg.setAttribute('color', new THREE.Float32BufferAttribute(gc, 3)); hg.setAttribute('aWet', new THREE.Float32BufferAttribute(gw, 1)); hg.setAttribute('aLit', new THREE.Float32BufferAttribute(new Float32Array(gw.length), 1)); hg.setIndex(gi); hg.computeVertexNormals();
     hg.addGroup(0, topCount, 0); hg.addGroup(topCount, gi.length - topCount, 1);   /* the meadow top and the rock skirt: one mesh, two material groups */
     var hm = keep(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, metalness: 0.05, envMapIntensity: 0.3 })), rockM = keep(new THREE.MeshStandardMaterial({ color: 0x5a6172, roughness: 0.88, metalness: 0.04, flatShading: true, envMapIntensity: 0.2 }));
     applyGeology(THREE, rockM, { strata: 2.2, tier: T });   /* the ridges' own rock language on the mesa cliffs */
+    /* M19 THE LAWN (owner: "ground material, grass … lifeless flat ground" is out): the meadow top gets a crystal-lawn surface in world space —
+       drifts at 3–9 m, blade grain and a combed streak up close, sparse crystal glints, the tended evenness of the gardens (vertex tone), wet
+       ground darker and glossier (aWet, from the water plan) and the bollards' light pools at night (aLit, baked once below). Value /
+       roughness only; LOW keeps the tone terms without the relief. */
+    litNightU = { value: night ? 1 : 0 };
+    hm.onBeforeCompile = function (sh) { sh.uniforms.uLitN = litNightU;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float aWet; attribute float aLit; varying float vWet; varying float vLit; varying vec3 vLw;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWet = aWet; vLit = aLit; vLw = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uLitN; varying float vWet; varying float vLit; varying vec3 vLw;\n' + NOISE)
+        .replace('#include <color_fragment>', ['#include <color_fragment>', 'vec2 lp = vLw.xz; float lnear = 1.0 - smoothstep(16.0, 95.0, length(cameraPosition - vLw));',
+          'float lm = vfN(lp * 0.12) * 0.6 + vfN(lp * 0.41 + 7.0) * 0.4;', 'float lg = vfN(lp * 2.4) * 0.45 + vfN(lp * 7.3 + 3.0) * 0.3 + vfN(vec2(lp.x * 21.0 + lp.y * 6.0, lp.y * 21.0 - lp.x * 6.0)) * 0.25;',
+          'float lsp = step(0.988, vfH(floor(lp * 6.0))) * lnear * (1.0 - vWet); float lwR = 1.0 + (lg - 0.5) * 0.35 * lnear;',
+          'diffuseColor.rgb *= (0.8 + 0.4 * lm) * (1.0 + (lg - 0.5) * 0.34 * lnear); diffuseColor.rgb *= mix(1.0, 0.56, vWet); lwR *= mix(1.0, 0.3, vWet);',
+          'diffuseColor.rgb += vec3(0.30, 0.31, 0.34) * lsp; lwR *= 1.0 - 0.75 * lsp;'].join('\n'))
+        .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor * lwR, 0.06, 1.0);')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1.0, 0.93, 0.84) * vLit * 0.6 * uLitN * diffuseColor.rgb;')
+        .replace('#include <normal_fragment_maps>', LOW ? '#include <normal_fragment_maps>' : '#include <normal_fragment_maps>\n{ float lh = lg * 0.035 * lnear; vec3 dpx = dFdx(-vViewPosition), dpy = dFdy(-vViewPosition); vec3 r1 = cross(dpy, normal), r2 = cross(normal, dpx); float det = dot(dpx, r1); vec3 grad = sign(det) * (dFdx(lh) * r1 + dFdy(lh) * r2); normal = normalize(abs(det) * normal - grad); }'); };
+    hm.customProgramCacheKey = function () { return 'veil_lawn_m19' + (LOW ? 'L' : 'H'); };
     var ground = new THREE.Mesh(hg, [hm, rockM]); ground.name = 'VEIL_HIGHLAND_GROUND'; ground.receiveShadow = true; group.add(ground);
+    /* M19: the height of the meadow as DRAWN (its triangles, not the smooth roll) — every flush part below sits on this, so nothing sinks into
+       a coarse cell or floats over it (the pad ramps bend faster than a cell) */
+    function gY(x, z) { var dx = x - CX, dz = z - CZ, lx = er[0] * dx + er[1] * dz, lz = et[0] * dx + et[1] * dz, th = Math.atan2(lz, lx); if (th < 0) th += Math.PI * 2;
+      var sf = th / (Math.PI * 2) * SEG, s0 = Math.floor(sf) % SEG, s1 = (s0 + 1) % SEG, fs = sf - Math.floor(sf), rr = rimR(s0 / SEG * Math.PI * 2) * (1 - fs) + rimR(s1 / SEG * Math.PI * 2) * fs, kk = Math.hypot(lx, lz) / rr * RING;
+      function Y(i) { return gp[i * 3 + 1]; }
+      if (kk >= RING) return Y(rings[RING - 1][s0]) * (1 - fs) + Y(rings[RING - 1][s1]) * fs;
+      if (kk < 1) { var c = Y(cIdx); return c + kk * (Y(rings[0][s0]) * (1 - fs) + Y(rings[0][s1]) * fs - c); }
+      var k0 = Math.floor(kk), f2 = kk - k0, A0 = rings[k0 - 1], B0 = rings[k0], a0 = Y(A0[s0]), a1 = Y(A0[s1]), b0 = Y(B0[s0]), b1 = Y(B0[s1]);
+      return fs + f2 <= 1 ? a0 + fs * (a1 - a0) + f2 * (b0 - a0) : b1 + (1 - fs) * (b0 - b1) + (1 - f2) * (a1 - b1); }
 
     /* the source lake + the channel to the lip (flush water on the meadow) */
     var lakeG = keep(new THREE.CircleGeometry(1, 40)); lakeG.rotateX(-Math.PI / 2); var lakeM = keep(new THREE.MeshStandardMaterial({ color: 0x34506e, roughness: 0.06, metalness: 0.75, envMapIntensity: 0.8, transparent: true, opacity: 0.94 }));
     lakeG.scale(12, 1, 8); lakeG.rotateY(Math.atan2(ox, oz)); lakeG.translate(lakeC.x + ox * 6, TOP + 0.25, lakeC.z + oz * 6);
-    var chG = new THREE.PlaneGeometry(LIPW * 0.8, 22); chG.rotateX(-Math.PI / 2); chG.rotateY(Math.atan2(ox, oz)); chG.translate(lip.x + ox * 9, TOP + 0.2, lip.z + oz * 9);
-    var lwG = keep(new THREE.BufferGeometry()), lw1 = lakeG.index ? lakeG.toNonIndexed() : lakeG, lw2 = chG.toNonIndexed(); chG.dispose(); lwG.setAttribute('position', new THREE.Float32BufferAttribute(Array.from(lw1.attributes.position.array).concat(Array.from(lw2.attributes.position.array)), 3)); lwG.computeVertexNormals();
-    var lake = new THREE.Mesh(lwG, lakeM); lake.name = 'VEIL_HIGHLAND_LAKE'; group.add(lake);   /* the lake and its channel to the lip: one draw */
+    /* M19: the channel to the lip is no longer a still mirror plane — its bed is wet dark stone (the paving draw, M19 block) and the water running
+       down it is the curtain's own flowing sheet (the curtain's brink rows): shallow fast water over stone, whitening at the brink */
+    var lwG = keep(new THREE.BufferGeometry()), lw1 = lakeG.index ? lakeG.toNonIndexed() : lakeG; lwG.setAttribute('position', new THREE.Float32BufferAttribute(Array.from(lw1.attributes.position.array), 3)); lwG.computeVertexNormals();
+    var lake = new THREE.Mesh(lwG, lakeM); lake.name = 'VEIL_HIGHLAND_LAKE'; group.add(lake);   /* the basin (M19: with its rills and springs): one draw */
 
     /* placement helper: meadow points away from the lake, the lip and each other */
     var taken = [{ x: lakeC.x + ox * 6, z: lakeC.z + oz * 6, r: 20 }, { x: lip.x, z: lip.z, r: 14 }];
@@ -218,7 +291,7 @@ export function createVeilFalls(ctx) {
        middle a round civic pavilion under a broad canopy faces the lake and the lip — the calm focal point under the spire. Two
        crescent overlooks sit on the field-facing rim either side of the falls, their rails lit at night. Visual only, beyond the host's
        reach like the rest of the highland; everything joins the existing villa draws (the shrubs join the grove canopy instances). */
-    var bodyP = [], darkP = [], glassP = [], spireParts = [], shrubs = [], laneLamps = [], face = RES.face;
+    var bodyP = [], darkP = [], glassP = [], spireParts = [], shrubs = [], laneLamps = [], gardens = [], sidePaths = [], benchAt = [], face = RES.face;
     var VT = tier() === 'LOW' ? 'LOW' : 'MED'; function boxAt(list, w, h, d, x, y, z, yaw) { var bg = softBox(THREE, w, h, d, Math.min(0.6, Math.min(w, h, d) * 0.24), VT); bg.rotateY(yaw); bg.translate(x, y, z); list.push(bg); }   /* M14 (design DNA, seen from afar): every villa / belvedere volume is filleted — no raw box edge on the highland skyline */
     var SEGR = VT === 'LOW' ? 12 : 20, rv = rnd(0xA11A);
     function W3(lx, lz) { var p = L2W(lx, lz); p.y = TOP + roll(p.x, p.z); return p; }
@@ -231,12 +304,12 @@ export function createVeilFalls(ctx) {
     function arcAt(list, R, tube, A, x, y, z, yaw) { var g = new THREE.TorusGeometry(R, tube, 5, Math.max(8, Math.round(A * 9)), A); g.rotateX(-Math.PI / 2); g.rotateY(-Math.PI / 2 - A / 2 + yaw); g.translate(x, y, z); list.push(g); }   /* a flat arc centred on the yaw's forward (sin yaw, cos yaw) */
     function colAt(list, h, x, y, z) { var g = new THREE.CylinderGeometry(0.16, 0.24, h, 8); g.translate(x, y + h / 2, z); list.push(g); }
     function strip(list, a, b, w, lift) { var n = Math.max(2, Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 2.5)), dx = b.x - a.x, dz = b.z - a.z, l = Math.hypot(dx, dz) || 1, px = -dz / l * w / 2, pz = dx / l * w / 2, P = [], I = [];
-      for (var i = 0; i <= n; i++) { var f = i / n, x = a.x + dx * f, z = a.z + dz * f; P.push(x - px, TOP + roll(x - px, z - pz) + lift, z - pz, x + px, TOP + roll(x + px, z + pz) + lift, z + pz); if (i) { var k = i * 2 - 2; I.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); } }
+      for (var i = 0; i <= n; i++) { var f = i / n, x = a.x + dx * f, z = a.z + dz * f; P.push(x - px, gY(x - px, z - pz) + lift, z - pz, x + px, gY(x + px, z + pz) + lift, z + pz); if (i) { var k = i * 2 - 2; I.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); } }
       var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); g.computeVertexNormals(); if (g.attributes.normal.getY(0) < 0) { I.reverse(); g.setIndex(I); g.computeVertexNormals(); } list.push(g); }   /* a flush ribbon that follows the meadow */
     function fwd(yaw, k) { return [Math.sin(yaw) * k, Math.cos(yaw) * k]; } function side(yaw, k) { return [Math.cos(yaw) * k, -Math.sin(yaw) * k]; }
     var SHRUB = [CLASS_TINT.purple, CRYSTAL_TINT.gold, CRYSTAL_TINT.pink, CRYSTAL_TINT.red, CRYSTAL_TINT.blue, 0xd9dcef];   /* M16: gardens of all five classes + pearl white (was purple / violet / pink-led) */
     /* the lane: a pale 3.4 m ribbon on the meadow, lanterns along both edges */
-    for (var li = 0, lz = -62; lz < 62; lz += 4, li++) { var A0 = W3(laneX(lz), lz), B0 = W3(laneX(lz + 4), lz + 4); strip(bodyP, A0, B0, 3.4, 0.07);
+    for (var li = 0, lz = -62; lz < 62; lz += 4, li++) {   /* M19: the lane itself is laid in the paving draw (below); this loop keeps its lamps */
       if (li % 2 === 0) { var dl = (laneX(lz + 0.5) - laneX(lz - 0.5)), nl = Math.hypot(1, dl); [-1, 1].forEach(function (sd) { var P = W3(laneX(lz) + sd * 2.4 / nl, lz - sd * 2.4 * dl / nl); laneLamps.push(P.x, P.y + 1.2, P.z); }); } }
     /* the civic pavilion: a round glass hall under a broad lens canopy on a white round plaza, at the lane's middle, facing the lake */
     var civ = RES.civ; civ.y = TOP + roll(civ.x, civ.z); taken.push({ x: civ.x, z: civ.z, r: 16 });
@@ -255,10 +328,10 @@ export function createVeilFalls(ctx) {
       pillAt(glassP, W0 + 0.12, 0.95, D0 + 0.12, H.x + f1[0] * cant, y0 + 0.65 + 3.3 + 1.7, H.z + f1[1] * cant, yaw);     /* its lit ribbon window */
       var cy = y0 + 0.65 + 6.3 + 0.9; lensAt(bodyP, (W0 + 5) / 2, (D0 + 5) / 2, 0.95, 0.32, H.x + f1[0] * cant, cy, H.z + f1[1] * cant, yaw);   /* the lens canopy roof */
       [[-1, 1], [1, 1], [-1, -1], [1, -1]].forEach(function (q) { var s1 = side(yaw, q[0] * (W0 / 2 + 1.3)), f2 = fwd(yaw, cant + q[1] * (D0 / 2 + 1.3)); colAt(bodyP, cy - y0 - 0.3, H.x + s1[0] + f2[0], y0 + 0.3, H.z + s1[1] + f2[1]); });
-      var g0 = fwd(yaw, 7.8); arcAt(bodyP, 6.0, 0.3, 2.3, H.x + g0[0], y0 + 0.28, H.z + g0[1], yaw);                        /* the curved garden wall */
+      var g0 = fwd(yaw, 7.8); gardens.push({ x: H.x + g0[0], z: H.z + g0[1], y: y0, yaw: yaw, H: H });                   /* the curved garden wall (M19: built in stone below, as the terrace's retaining edge) */
       for (var sI = 0; sI < 6; sI++) { var a = (rv() - 0.5) * 2.0, rr = 1.2 + rv() * 3.6, gx = H.x + g0[0] + Math.sin(yaw + a) * rr, gz = H.z + g0[1] + Math.cos(yaw + a) * rr, s = 0.42 + rv() * 0.4;
         shrubs.push({ x: gx, y: TOP + roll(gx, gz) + s * 1.1, z: gz, s: s, yaw: rv() * 3, c: SHRUB[Math.floor(rv() * SHRUB.length)] }); }
-      var sl = side(yaw, (W0 / 2 + 1.0) * (H.lz > 0 ? -1 : 1)), door = { x: H.x + sl[0], z: H.z + sl[1] }, ln = W3(laneX(H.lz), H.lz); strip(bodyP, ln, door, 2.0, 0.06);   /* a path from the lane round the side of the house */
+      var sl = side(yaw, (W0 / 2 + 1.0) * H.ds), door = { x: H.x + sl[0], z: H.z + sl[1] }, ln = W3(laneX(H.lz), H.lz); sidePaths.push({ a: ln, b: door, H: H });   /* a path from the lane round the side of the house (M19: paved below) */
       taken.push({ x: H.x, z: H.z, r: 11 }); });
     /* M18 HUMAN SCALE (owner 2026-09-27: "waterfall + elevated suburban district", Xenosaga-inspired human-scale futurism, character-world
        coherence): the things a person reads a home by — a lit entrance door under a small canopy where the side path arrives, a glass
@@ -267,7 +340,7 @@ export function createVeilFalls(ctx) {
     function slab(list, w, h, d, x, y, z, yaw) { var g = new THREE.BoxGeometry(w, h, d); g.rotateY(yaw); g.translate(x, y, z); list.push(g); }   /* small parts: a plain box (a filleted one would only add triangles at this size) */
     function bench(x, z, yaw, dy) { var y = TOP + roll(x, z) + (dy || 0), b = fwd(yaw, -0.22); slab(bodyP, 1.9, 0.1, 0.5, x, y + 0.46, z, yaw); slab(bodyP, 1.9, 0.42, 0.08, x + b[0], y + 0.78, z + b[1], yaw); [-0.75, 0.75].forEach(function (o) { var s3 = side(yaw, o); slab(darkP, 0.12, 0.42, 0.44, x + s3[0], y + 0.21, z + s3[1], yaw); }); }   /* a seat, a low back, two graphite legs */
     var human = { doors: 0, balconies: 0, terraces: 0, benches: 0 };
-    RES.homes.forEach(function (H) { var yaw = H.yaw, W0 = H.W, D0 = 7.2, cant = 1.8, y0 = TOP + roll(H.x, H.z), sd = H.lz > 0 ? -1 : 1, so = side(yaw, sd);
+    RES.homes.forEach(function (H) { var yaw = H.yaw, W0 = H.W, D0 = 7.2, cant = 1.8, y0 = TOP + roll(H.x, H.z), sd = H.ds, so = side(yaw, sd);
       /* the entrance: a lit glass door at the side end of the glass ground floor, a platinum frame, a small lens canopy over it */
       var dr = side(yaw, sd * ((W0 - 1.5) / 2 + 0.06)), dx = H.x + dr[0], dz = H.z + dr[1];
       slab(glassP, 0.1, 2.3, 1.15, dx, y0 + 0.65 + 1.15, dz, yaw); [-0.66, 0.66].forEach(function (o) { var f3 = fwd(yaw, o); slab(bodyP, 0.16, 2.5, 0.12, dx + f3[0], y0 + 0.65 + 1.25, dz + f3[1], yaw); });
@@ -285,7 +358,7 @@ export function createVeilFalls(ctx) {
     /* benches along the lantern lane, alternating sides, clear of the home paths and the pavilion */
     for (var bl = -54, bk = 0; bl <= 54; bl += 13, bk++) { var bs = bk % 2 ? 1 : -1, dlb = laneX(bl + 0.5) - laneX(bl - 0.5), nlb = Math.hypot(1, dlb), BP = L2W(laneX(bl) + bs * 3.3 / nlb, bl - bs * 3.3 * dlb / nlb);
       if (Math.hypot(BP.x - civ.x, BP.z - civ.z) < 18 || RES.homes.some(function (H) { return Math.abs(H.lz - bl) < 5; })) continue;
-      var lp2 = L2W(laneX(bl), bl); bench(BP.x, BP.z, Math.atan2(lp2.x - BP.x, lp2.z - BP.z)); human.benches++; }
+      var lp2 = L2W(laneX(bl), bl); bench(BP.x, BP.z, Math.atan2(lp2.x - BP.x, lp2.z - BP.z)); human.benches++; benchAt.push({ x: BP.x, z: BP.z, lz: bl }); }
     /* the civic pavilion's ring of benches between the columns and the plaza edge, facing in */
     for (var pb = 0; pb < 8; pb++) { var pa = pb / 8 * Math.PI * 2 + 0.2 + Math.PI / 8, px2 = civ.x + Math.cos(pa) * 12.9, pz2 = civ.z + Math.sin(pa) * 12.9; bench(px2, pz2, Math.atan2(civ.x - px2, civ.z - pz2), civ.y + 0.27 - (TOP + roll(px2, pz2))); human.benches++; }   /* on the pavilion's raised plaza disc */
     info.human_scale = human;
@@ -311,6 +384,199 @@ export function createVeilFalls(ctx) {
       boxAt(darkP, 11, 0.6, 9, bx - ox * 1.5, by - 0.3, bz - oz * 1.5, yawB); boxAt(bodyP, 11.2, 0.25, 9.2, bx - ox * 1.5, by + 0.1, bz - oz * 1.5, yawB);
       boxAt(glassP, 10.6, 1.1, 0.12, bx - ox * 5.9, by + 0.8, bz - oz * 5.9, yawB); boxAt(glassP, 8.4, 3.2, 6.2, bx + ox * 1.2, by + 1.9, bz + oz * 1.2, yawB); boxAt(bodyP, 9.4, 0.3, 7.4, bx + ox * 1.0, by + 3.65, bz + oz * 1.0, yawB);
       info.belvedere = { x: +bx.toFixed(1), z: +bz.toFixed(1), y: by }; })();
+    /* the flight landing pad (reachable only once the bridge brings the highland into the host; M19: placed before the walks and groves claim the meadow) */
+    var pad = spot(380, 14, rnd(0xBAD)); if (pad) { var pg = new THREE.RingGeometry(8.4, 9.4, 48); pg.rotateX(-Math.PI / 2); pg.translate(pad.x, pad.y + 0.12, pad.z); glassP.push(pg); var pd = new THREE.CircleGeometry(8.4, 32); pd.rotateX(-Math.PI / 2); pd.translate(pad.x, pad.y + 0.08, pad.z); darkP.push(pd); info.pad = { x: +pad.x.toFixed(1), z: +pad.z.toFixed(1) }; }   /* the pad: a lit ring (glass draw) on a graphite disc (roof draw) */
+    /* ---------- M19 THE SPACE BETWEEN THE BUILDINGS (owner 2026-09-27: the district's weakness is "the SPACE BETWEEN THE BUILDINGS" — ground
+       material, pedestrian routes, landscaped borders, grass, crystalline gardens, small elevation changes, home-to-path thresholds, retaining
+       edges, drainage, quiet lighting, planted areas, scenic overlooks, transitions into rock and toward the waterfall; Xenosaga Episode II
+       principles — human-scale futurism, clean soft architecture, planting woven into technology, calm, readable circulation — in MAHWORLD's
+       own language, nothing copied). ONE new draw, VEIL_PAVING: vertex-coloured stone with a pattern in its own UV space — kerbed slab
+       courses that follow each path's curve, planting beds of dark crystal grit behind a pale edging, honed coping blocks — wet and
+       night-lit per vertex. Everything else joins existing draws: bollards → the villa graphite + lit glass, hedges → the grove canopy
+       instances, rill and spring water → the basin draw, boulders → the mesa rock group.
+       THE CIRCULATION: the lane is the spine; the civic plaza opens onto a paved quay at the basin; lakeside walks run round both flanks of
+       the basin and along the flume banks to a footbridge at the lip; a rim promenade leaves each flank behind the arcades and ends at an
+       overlook, which also links back to the lane's end; a spur reaches the belvedere; front-row gardens open through gates in their
+       retaining walls onto the walks; every door gets a paved landing and two stone steps up to its plinth; spur paths reach the springs.
+       Visual only — beyond the host's reach like the rest of the highland. ---------- */
+    var PV = { p: [], uv: [], c: [], a: [], i: [] }, pvc = new THREE.Color(), PATHS = [], WT = [], LAMP19 = [], h19 = { paths_m: 0, beds_m: 0, walls_m: 0, bollards: 0, boulders: 0, rills: RILLS.length, hedges: 0, steps: 0, gates: 0 };
+    function toLocal(p) { var dx = p.x - CX, dz = p.z - CZ; return { x: er[0] * dx + er[1] * dz, z: et[0] * dx + et[1] * dz }; }   /* world → mesa frame (L2W's inverse) */
+    function pvV(x, y, z, u, v, hex, hw, kind, wt) { PV.p.push(x, y, z); PV.uv.push(u, v); pvc.setHex(hex); PV.c.push(pvc.r, pvc.g, pvc.b); PV.a.push(hw, kind, wt || 0, 0); return PV.p.length / 3 - 1; }
+    function sheet(A, B, UA, UB, want, hex, hw, kind, WA, WB) { var base = PV.p.length / 3, n = A.length; if (n < 2) return;   /* a strip between two edge polylines, wound to face `want` */
+      for (var i = 0; i < n; i++) { pvV(A[i][0], A[i][1], A[i][2], UA[i][0], UA[i][1], hex, hw, kind, WA ? WA[i] : 0); pvV(B[i][0], B[i][1], B[i][2], UB[i][0], UB[i][1], hex, hw, kind, WB ? WB[i] : 0); }
+      var m = Math.min(n - 2, Math.floor(n / 2)), e1 = [A[m + 1][0] - A[m][0], A[m + 1][1] - A[m][1], A[m + 1][2] - A[m][2]], e2 = [B[m][0] - A[m][0], B[m][1] - A[m][1], B[m][2] - A[m][2]];
+      var flip = (e1[1] * e2[2] - e1[2] * e2[1]) * want[0] + (e1[2] * e2[0] - e1[0] * e2[2]) * want[1] + (e1[0] * e2[1] - e1[1] * e2[0]) * want[2] < 0;
+      for (i = 0; i < n - 1; i++) { var a0 = base + i * 2, b0 = a0 + 1, a1 = a0 + 2, b1 = a0 + 3; if (!flip) PV.i.push(a0, a1, b0, a1, b1, b0); else PV.i.push(a0, b0, a1, a1, b0, b1); } }
+    function resample(P, step) { var out = [{ x: P[0].x, z: P[0].z }], acc = 0; for (var i = 1; i < P.length; i++) { var ax = P[i - 1].x, az = P[i - 1].z, dx = P[i].x - ax, dz = P[i].z - az, l = Math.hypot(dx, dz); if (l < 1e-6) continue; var t = step - acc; while (t <= l) { out.push({ x: ax + dx * t / l, z: az + dz * t / l }); t += step; } acc = l - (t - step); }
+      var last = P[P.length - 1], lo = out[out.length - 1]; if (Math.hypot(last.x - lo.x, last.z - lo.z) > step * 0.3) out.push({ x: last.x, z: last.z }); else if (out.length > 1) { lo.x = last.x; lo.z = last.z; } return out; }
+    function smooth(P, n) { var out = []; for (var i = 0; i < P.length - 1; i++) { var p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(P.length - 1, i + 2)]; for (var j = 0; j < n; j++) { var t = j / n, t2 = t * t, t3 = t2 * t;   /* Catmull-Rom through the waypoints */
+        out.push({ x: 0.5 * (2 * p1.x + (p2.x - p0.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (3 * p1.x - p0.x - 3 * p2.x + p3.x) * t3), z: 0.5 * (2 * p1.z + (p2.z - p0.z) * t + (2 * p0.z - 5 * p1.z + 4 * p2.z - p3.z) * t2 + (3 * p1.z - p0.z - 3 * p2.z + p3.z) * t3) }); } } out.push(P[P.length - 1]); return out; }
+    function nrm(S, i) { var a = S[Math.max(0, i - 1)], b = S[Math.min(S.length - 1, i + 1)], tx = b.x - a.x, tz = b.z - a.z, l = Math.hypot(tx, tz) || 1; return { x: -tz / l, z: tx / l }; }
+    function ribbon(P, hw, lift, kind, hex, opt) { opt = opt || {}; var S = opt.raw ? P : resample(P, opt.step || 1.0), A = [], B = [], UA = [], UB = [], WA = [], WB = [], L = 0;
+      for (var i = 0; i < S.length; i++) { if (i) L += Math.hypot(S[i].x - S[i - 1].x, S[i].z - S[i - 1].z); var n = nrm(S, i), cx = S[i].x + n.x * (opt.off || 0), cz = S[i].z + n.z * (opt.off || 0), ax = cx - n.x * hw, az = cz - n.z * hw, bx = cx + n.x * hw, bz = cz + n.z * hw;
+        A.push([ax, opt.y ? opt.y(ax, az, i) : gY(ax, az) + lift, az]); B.push([bx, opt.y ? opt.y(bx, bz, i) : gY(bx, bz) + lift, bz]); UA.push([-hw, L]); UB.push([hw, L]); WA.push(wetK(ax, az)); WB.push(wetK(bx, bz)); }
+      sheet(A, B, UA, UB, [0, 1, 0], hex, hw, kind, WA, WB); return { S: S, len: L }; }
+    function wallRun(S, hw, top, bot, hex) { var n = S.length; if (n < 2) return; var L = 0, TA = [], TB = [], UA = [], UB = [], BA = [], BB = [], FA = [], FB = [], WW = [], m = Math.floor(n / 2), nm = nrm(S, m);   /* a stone course: cap + both faces + end caps */
+      for (var i = 0; i < n; i++) { if (i) L += Math.hypot(S[i].x - S[i - 1].x, S[i].z - S[i - 1].z); var q = nrm(S, i), ax = S[i].x - q.x * hw, az = S[i].z - q.z * hw, bx = S[i].x + q.x * hw, bz = S[i].z + q.z * hw, yt = top(i, S[i].x, S[i].z), yb = bot(i, S[i].x, S[i].z);
+        TA.push([ax, yt, az]); TB.push([bx, yt, bz]); UA.push([-hw, L]); UB.push([hw, L]); BA.push([ax, yb, az]); BB.push([bx, yb, bz]); FA.push([yb - yt, L]); FB.push([0, L]); WW.push(wetK(S[i].x, S[i].z)); }
+      sheet(TA, TB, UA, UB, [0, 1, 0], hex, hw, 2, WW, WW); sheet(BA, TA, FA, FB, [-nm.x, 0, -nm.z], hex, hw, 2, WW, WW); sheet(BB, TB, FA, FB, [nm.x, 0, nm.z], hex, hw, 2, WW, WW);
+      [[0, -1], [n - 1, 1]].forEach(function (E) { var q = nrm(S, E[0]), tx = q.z * E[1], tz = -q.x * E[1], k = E[0]; sheet([BA[k], TA[k]], [BB[k], TB[k]], [[0, 0], [0, 0.4]], [[0.3, 0], [0.3, 0.4]], [tx, 0, tz], hex, hw, 2, [WW[k], WW[k]], [WW[k], WW[k]]); });
+      h19.walls_m += L; }
+    function addGeo(g, hex, kind) { var q = g.index ? g.toNonIndexed() : g, P = q.attributes.position, U = q.attributes.uv, base = PV.p.length / 3; for (var i = 0; i < P.count; i++) pvV(P.getX(i), P.getY(i), P.getZ(i), U ? U.getX(i) * 1.3 : 0, U ? U.getY(i) * 1.3 : 0, hex, 0.5, kind, wetK(P.getX(i), P.getZ(i)));
+      for (i = 0; i < P.count; i++) PV.i.push(base + i); if (q !== g) q.dispose(); g.dispose(); }
+    function pathD(x, z, skipLane) { var b = 1e9; PATHS.forEach(function (Pa) { if (skipLane && Pa.lane) return; b = Math.min(b, segD(x, z, Pa.S) - Pa.hw); }); return b; }   /* metres beyond the nearest paved edge */
+    function path(P, hw, hex, opt) { opt = opt || {}; var r = ribbon(P, hw, 0.05 + 0.004 * (PATHS.length % 5), 0, hex || 0xd1cfca, opt);   /* each path a few mm off the next, so a junction never z-fights */ PATHS.push({ S: r.S, hw: hw, lane: !!opt.lane, lamps: opt.lamps !== false && !opt.lane, name: opt.name || '' }); h19.paths_m += r.len;
+      for (var i = 0; i < r.S.length; i += 3) taken.push({ x: r.S[i].x, z: r.S[i].z, r: hw + 0.4 }); return r; }
+    function LP(a, b) { return { x: lip.x + ox * a + tgx * b, z: lip.z + oz * a + tgz * b }; }   /* lip frame: a inward along o, b along the lip */
+    function lipAB(p) { var dx = p.x - lip.x, dz = p.z - lip.z; return { a: dx * ox + dz * oz, b: dx * tgx + dz * tgz }; }
+    function EL(phi, d) { var c = Math.cos(phi), sn = Math.sin(phi); return { x: LK.x + ox * (8 + d) * c + tgx * (12 + d) * sn, z: LK.z + oz * (8 + d) * c + tgz * (12 + d) * sn }; }   /* round the basin, d m off the water (phi 0 faces the pavilion) */
+    function laneC(lz) { return L2W(laneX(lz), lz); }
+    function laneN(lz) { var a = laneC(lz - 0.5), b = laneC(lz + 0.5), tx = b.x - a.x, tz = b.z - a.z, l = Math.hypot(tx, tz) || 1; return { x: -tz / l, z: tx / l }; }
+    function sideOf(p, lz) { var c = laneC(lz), n = laneN(lz); return (p.x - c.x) * n.x + (p.z - c.z) * n.z >= 0 ? 1 : -1; }
+    var STONE = 0xc9c6c0, WALK = 0xd1cfca, BED = 0x48464f, rq = rnd(0xB0A7);
+
+    /* THE SPINE: the lane, paved (kerbed slab courses, 3.4 m) */
+    var lanePts = []; for (var lzz = -62; lzz <= 62; lzz += 2) lanePts.push(laneC(lzz)); path(lanePts, 1.7, 0xd8d6d1, { lane: true, name: 'lane' });
+    /* THE QUAY: the civic plaza opens onto a paved waterfront along the basin's pavilion side; lakeside walks run on round both flanks */
+    var quay = []; for (var qf = -0.62; qf <= 0.621; qf += 0.04) quay.push(EL(qf, 3.24)); path(quay, 2.8, 0xd8d6d1, { name: 'quay', lamps: false });
+    info.quay_gap_m = +Math.min.apply(null, quay.map(function (Q) { return Math.hypot(Q.x - civ.x, Q.z - civ.z); })).toFixed(1);
+    var flankEnd = {}; [-1, 1].forEach(function (sg) { var W1 = []; for (var fphi = 0.5; fphi <= 2.02; fphi += 0.06) W1.push(EL(sg * fphi, 1.64)); var e = lipAB(W1[W1.length - 1]);
+      W1 = W1.concat(smooth([LP(e.a - 2.5, sg * 11.9), LP(14, sg * 11.7), LP(6.6, sg * 11.7)], 4)); path(W1, 1.2, WALK, { name: 'flank' + sg }); flankEnd[sg] = W1; });
+    /* THE FOOTBRIDGE over the flume at the lip: a paved deck on a stone slab, rails with slim graphite posts; ramps down to both walks */
+    var BRA = 6, BRH = LIPW * 0.4 + 1.0, deckY = TOP + 0.72;
+    function brY(bb) { var t = Math.max(0, Math.min(1, (Math.abs(bb) - BRH) / 3.2)); return deckY * (1 - t) + (TOP + 0.06) * t; }
+    var brS = []; for (var bb = -(BRH + 3.2); bb <= BRH + 3.201; bb += 0.8) brS.push(LP(BRA, bb));
+    ribbon(brS, 1.1, 0, 0, 0xd8d6d1, { raw: true, y: function (x, z) { var b2 = lipAB({ x: x, z: z }).b; return Math.max(gY(x, z) + 0.055, brY(b2)); } });
+    wallRun(brS, 1.14, function (i, x, z) { return Math.max(gY(x, z) + 0.035, brY(lipAB({ x: x, z: z }).b) - 0.02); }, function (i, x, z) { return Math.min(gY(x, z) - 0.2, brY(lipAB({ x: x, z: z }).b) - 0.34); }, STONE);
+    [-1, 1].forEach(function (sg) { var yawR = Math.atan2(tgx, tgz), c0 = LP(BRA + sg * 1.05, 0); slab(bodyP, 0.07, 0.06, 2 * BRH, c0.x, deckY + 1.0, c0.z, yawR); slab(bodyP, 0.04, 0.04, 2 * BRH, c0.x, deckY + 0.55, c0.z, yawR);
+      for (var rp2 = -BRH; rp2 <= BRH + 0.01; rp2 += 1.2) { var pp = LP(BRA + sg * 1.05, rp2); slab(darkP, 0.05, 1.0, 0.05, pp.x, deckY + 0.5, pp.z, yawR); } });
+    [-1, 1].forEach(function (sg) { var e = LP(BRA, sg * (BRH + 0.2)); LAMP19.push(e.x + ox * 1.25, deckY + 1.08, e.z + oz * 1.25, e.x - ox * 1.25, deckY + 1.08, e.z - oz * 1.25); });
+    info.footbridge = { a: BRA, half_m: +BRH.toFixed(1), deck_y: +deckY.toFixed(2) };
+    /* THE RIM PROMENADE: from each flank, behind the arcades, to the overlook on that side; the overlooks link back to the lane's ends */
+    RES.looks.forEach(function (O) { var ab = lipAB(O), sg = ab.b >= 0 ? 1 : -1, F = flankEnd[sg]; if (!F) return;
+      path(smooth([LP(14.5, sg * 11.7), LP(11.5, sg * 19), LP(12.5, sg * 31), LP(12.5 + (ab.a - 12.5) * 0.45, sg * (31 + (Math.abs(ab.b) - 31) * 0.55)), O], 6), 1.2, WALK, { name: 'rim' + sg });
+      var oL = toLocal(O), lzE = oL.z >= 0 ? 62 : -62, sz2 = lzE > 0 ? 1 : -1; path(smooth([laneC(lzE), L2W(0, sz2 * 67), L2W(-18, sz2 * 64), O], 6), 1.1, WALK, { name: 'link' + sz2 });
+      [-0.45, 0.45].forEach(function (da) { var bx2 = O.x + Math.sin(O.yaw + da) * 4.6, bz2 = O.z + Math.cos(O.yaw + da) * 4.6; bench(bx2, bz2, O.yaw, TOP + roll(O.x, O.z) + 0.345 - (TOP + roll(bx2, bz2))); human.benches++; }); });   /* two benches on each overlook deck, facing the view */
+    /* the belvedere spur */
+    (function () { var tx = -oz, tz = ox, sgB = (tx * tgx + tz * tgz) >= 0 ? 1 : -1; path(smooth([LP(14.5, sgB * 11.7), LP(11, sgB * 15.3), LP(3.4, sgB * 15.9)], 5), 1.0, WALK, { name: 'belvedere' }); })();
+    /* the spire: a spur from the lane to its plinth, if the way is clear of the homes */
+    (function () { var spx = Math.sin(HL.spire_bearing) * HL.spire_dist_m, spz = Math.cos(HL.spire_bearing) * HL.spire_dist_m, sL = toLocal({ x: spx, z: spz }), lzS = Math.max(-60, Math.min(60, sL.z)), A = laneC(lzS), dx = spx - A.x, dz = spz - A.z, dl2 = Math.hypot(dx, dz) || 1, B = { x: spx - dx / dl2 * 7.2, z: spz - dz / dl2 * 7.2 };
+      if (dl2 < 9 || RES.homes.some(function (H) { return segD(H.x, H.z, [A, B]) < 12; })) return; path([A, B], 1.0, WALK, { name: 'spire' }); info.spire_path = +dl2.toFixed(1); })();
+    /* the springs: a round stone basin beside the lane, a short spur to it, the rill down to the basin (below) */
+    RILLS.forEach(function (Rl) { var S0 = Rl.pts[0], S1 = Rl.pts[2], dx = S1.x - S0.x, dz = S1.z - S0.z, dl3 = Math.hypot(dx, dz) || 1; Rl.dir = { x: dx / dl3, z: dz / dl3 }; Rl.c = { x: S0.x - Rl.dir.x * 0.9, z: S0.z - Rl.dir.z * 0.9 };
+      var A = laneC(Rl.lz), cx = Rl.c.x - A.x, cz = Rl.c.z - A.z, cl = Math.hypot(cx, cz) || 1; path([A, { x: Rl.c.x - cx / cl * 1.45, z: Rl.c.z - cz / cl * 1.45 }], 0.8, WALK, { name: 'spring', lamps: false }); });
+    /* DOOR THRESHOLDS: a landing where the side path arrives and two stone steps up to the graphite plinth; the path itself paved */
+    sidePaths.forEach(function (SP) { var H = SP.H, sgn = H.ds, ends = (H.W + 2.6) / 2, y0 = TOP + roll(H.x, H.z), so = side(H.yaw, sgn);
+      [[0.18, 0.44], [0.53, 0.23]].forEach(function (St) { var cx = H.x + so[0] * (ends + St[0]), cz = H.z + so[1] * (ends + St[0]), gb = gY(cx, cz) - 0.15, g = new THREE.BoxGeometry(0.35, y0 + St[1] - gb, 1.9); g.rotateY(H.yaw); g.translate(cx, (y0 + St[1] + gb) / 2, cz); addGeo(g, STONE, 2); h19.steps++; });
+      var foot = { x: H.x + so[0] * (ends + 0.72), z: H.z + so[1] * (ends + 0.72) }; path([SP.a, foot], 1.0, WALK, { name: 'door', lamps: false }); });
+    /* THE BASIN: a honed stone coping round the water (open where the flume leaves and where the rills spill in); the flume's banks */
+    var cop = []; for (var cf = 0; cf <= Math.PI * 2 + 1e-6; cf += 0.035) cop.push(EL(cf, 0.22));
+    var copRuns = [], cr0 = []; cop.forEach(function (C) { var open = chanD(C.x, C.z) < 0.6 || RILLS.some(function (Rl) { var E = Rl.pts[Rl.pts.length - 1]; return Math.hypot(C.x - E.x, C.z - E.z) < 0.75; }); if (open) { if (cr0.length > 1) copRuns.push(cr0); cr0 = []; } else cr0.push(C); }); if (cr0.length > 1) copRuns.push(cr0);
+    copRuns.forEach(function (Rn) { wallRun(Rn, 0.22, function () { return TOP + 0.36; }, function (i, x, z) { return gY(x, z) - 0.25; }, STONE); });
+    [-1, 1].forEach(function (sg) { var bk = []; for (var ba = 0; ba <= 19.01; ba += 0.8) bk.push(LP(ba, sg * (LIPW * 0.4 + 0.22))); wallRun(bk, 0.22, function (i, x, z) { return Math.max(TOP + 0.4, gY(x, z) + 0.12); }, function (i, x, z) { return Math.min(TOP - 0.1, gY(x, z) - 0.3); }, 0xb4b2b0); });
+    var flumeBed = new THREE.PlaneGeometry(LIPW * 0.8 + 0.1, 21.1), fbc = LP(9.95, 0); flumeBed.rotateX(-Math.PI / 2); flumeBed.rotateY(Math.atan2(ox, oz)); flumeBed.translate(fbc.x, TOP + 0.12, fbc.z); darkP.push(flumeBed);   /* the flume's bed: dark graphite stone under the running water (the curtain's brink rows) — in the villa graphite draw, not the paving, whose depth offset would lift it through the water sheet at a grazing view */
+    /* THE RILLS: stone channels, water stepping down to the basin (never uphill: each sample may only fall, and never below the meadow);
+       where a walk crosses, the rill runs under it in a culvert */
+    function waterQuad(A0, B0, A1, B1) { WT.push(A0[0], A0[1], A0[2], B0[0], B0[1], B0[2], A1[0], A1[1], A1[2], B0[0], B0[1], B0[2], B1[0], B1[1], B1[2], A1[0], A1[1], A1[2]); }
+    RILLS.forEach(function (Rl) { var S = resample(Rl.pts, 0.8), n = S.length, wy = [], prevY = 1e9, endY = TOP + 0.3, drop = 0;
+      for (var i = 0; i < n; i++) { var g = gY(S[i].x, S[i].z); var y = Math.max(g + 0.06, Math.min(prevY, g + 0.14)); if (y > prevY + 1e-6) drop = Math.max(drop, y - prevY); prevY = y; wy.push(y); }
+      for (i = n - 1; i >= 0 && wy[i] < endY; i--) wy[i] = endY; Rl.uphill_m = +drop.toFixed(3); Rl.fall_m = +(wy[0] - wy[n - 1]).toFixed(2);
+      var under = S.map(function (P) { return pathD(P.x, P.z) < 0.25; }), runs = [], cur = [];
+      for (i = 0; i < n; i++) { if (under[i]) { if (cur.length > 1) runs.push(cur); cur = []; } else cur.push(i); } if (cur.length > 1) runs.push(cur);
+      runs.forEach(function (Ix) { var Sr = Ix.map(function (k) { return S[k]; }); [-1, 1].forEach(function (sg) { var Off = Sr.map(function (P, k) { var q = nrm(Sr, k); return { x: P.x + q.x * sg * 0.47, z: P.z + q.z * sg * 0.47 }; });
+          wallRun(Off, 0.12, function (k) { return wy[Ix[k]] + 0.08; }, function (k, x, z) { return gY(x, z) - 0.2; }, STONE); });
+        for (var k = 0; k < Sr.length - 1; k++) { var q0 = nrm(Sr, k), q1 = nrm(Sr, k + 1), y0 = wy[Ix[k]] - 0.01, y1 = wy[Ix[k + 1]] - 0.01;
+          waterQuad([Sr[k].x - q0.x * 0.36, y0, Sr[k].z - q0.z * 0.36], [Sr[k].x + q0.x * 0.36, y0, Sr[k].z + q0.z * 0.36], [Sr[k + 1].x - q1.x * 0.36, y1, Sr[k + 1].z - q1.z * 0.36], [Sr[k + 1].x + q1.x * 0.36, y1, Sr[k + 1].z + q1.z * 0.36]); } });
+      /* the spring: a round stone basin (open toward the rill) with its water and a pale ice crystal rising from it */
+      var ring = [], rr3 = []; for (var ra = 0; ra <= Math.PI * 2 + 1e-6; ra += Math.PI / 14) { var P = { x: Rl.c.x + Math.sin(ra) * 1.05, z: Rl.c.z + Math.cos(ra) * 1.05 }; if ((P.x - Rl.c.x) * Rl.dir.x + (P.z - Rl.c.z) * Rl.dir.z > 0.8) { if (rr3.length > 1) ring.push(rr3); rr3 = []; } else rr3.push(P); } if (rr3.length > 1) ring.push(rr3);
+      if (ring.length > 1 && Math.hypot(ring[0][0].x - ring[ring.length - 1][ring[ring.length - 1].length - 1].x, ring[0][0].z - ring[ring.length - 1][ring[ring.length - 1].length - 1].z) < 0.5) ring = [ring[ring.length - 1].concat(ring[0])].concat(ring.slice(1, -1));
+      ring.forEach(function (Rn) { wallRun(Rn, 0.15, function () { return wy[0] + 0.14; }, function (k, x, z) { return gY(x, z) - 0.2; }, STONE); });
+      for (var sa = 0; sa < 16; sa++) { var a1 = sa / 16 * Math.PI * 2, a2 = (sa + 1) / 16 * Math.PI * 2, wy0 = wy[0] + 0.01; WT.push(Rl.c.x, wy0, Rl.c.z, Rl.c.x + Math.sin(a1) * 0.92, wy0, Rl.c.z + Math.cos(a1) * 0.92, Rl.c.x + Math.sin(a2) * 0.92, wy0, Rl.c.z + Math.cos(a2) * 0.92); }
+      shrubs.push({ x: Rl.c.x, y: wy[0] + 0.42, z: Rl.c.z, s: 0.3, yaw: 0.3, c: SPECTRAL.ice }); });
+    info.rills = RILLS.map(function (Rl) { return { spring_lz: Rl.lz, meadow_over_top_m: +Rl.h.toFixed(2), fall_m: Rl.fall_m, uphill_m: Rl.uphill_m }; });
+    /* GARDEN TERRACES: the garden wall becomes a stone retaining edge — its top a level course over the terrace, its foot following the
+       lawn as it falls away (the garden pads now ramp over 4 m); front-row gardens open through a gate onto the nearest walk; a
+       back-row garden stops its wall at the lane, which passes its open front */
+    gardens.forEach(function (G) { var front = toLocal(G.H).x < laneX(G.H.lz), arc = [], runs = [], cur = [];
+      for (var ga = -1.15; ga <= 1.1501; ga += 0.1) { var P = { x: G.x + Math.sin(G.yaw + ga) * 6.2, z: G.z + Math.cos(G.yaw + ga) * 6.2 }, gate = front && Math.abs(ga) < 0.12, onLane = pathD(P.x, P.z) < 0.45;
+        if (gate || onLane) { if (cur.length > 1) runs.push(cur); cur = []; } else cur.push(P); } if (cur.length > 1) runs.push(cur);
+      runs.forEach(function (Rn) { wallRun(Rn, 0.18, function (k, x, z) { return Math.max(G.y, gY(x, z)) + 0.46; }, function (k, x, z) { return Math.min(G.y, gY(x, z)) - 0.3; }, STONE); });
+      if (!front) return; var gt = { x: G.x + Math.sin(G.yaw) * 6.2, z: G.z + Math.cos(G.yaw) * 6.2 }, best = null; PATHS.forEach(function (Pa) { if (Pa.lane || /door|spring/.test(Pa.name)) return; Pa.S.forEach(function (Q) { var d = Math.hypot(Q.x - gt.x, Q.z - gt.z); if (!best || d < best.d) best = { d: d, q: Q }; }); });
+      if (!best || best.d > 34) return; var out = { x: G.x + Math.sin(G.yaw) * 7.4, z: G.z + Math.cos(G.yaw) * 7.4 }; path(smooth([{ x: G.x + Math.sin(G.yaw) * 5.6, z: G.z + Math.cos(G.yaw) * 5.6 }, out, { x: (out.x + best.q.x) / 2, z: (out.z + best.q.z) / 2 }, best.q], 5), 0.85, WALK, { name: 'gate' }); h19.gates++; });
+    /* LANDSCAPED BORDERS: planting beds either side of the lane (dark crystal grit behind a pale edging) with low crystal hedges — pearl
+       with an accent of one class per run — broken for door paths, bench bays, the spring spurs and the civic plaza; the lane's lamps
+       stand in them */
+    var ACC = [CRYSTAL_TINT.gold, CRYSTAL_TINT.blue, CRYSTAL_TINT.red, CLASS_TINT.purple, CRYSTAL_TINT.pink], runN = 0;
+    [-1, 1].forEach(function (sg) { var run = [], lzs = [];
+      function flush() { if (lzs.length >= 3) { var pts = lzs.map(laneC); ribbon(pts, 0.55, 0.05, 1, BED, { off: sg * 2.3 }); h19.beds_m += lzs.length - 1; var acc = ACC[runN++ % ACC.length];
+          for (var hz = lzs[0] + 0.3; hz <= lzs[lzs.length - 1] - 0.3; hz += 0.5) { var k = Math.round((hz - lzs[0]) / 0.5), c = laneC(hz), n = laneN(hz), off = sg * (2.3 + (k % 2 ? 0.2 : -0.2) + (rq() - 0.5) * 0.1), x = c.x + n.x * off, z = c.z + n.z * off, s0 = 0.2 + rq() * 0.16;
+            shrubs.push({ x: x, y: gY(x, z) + s0 * 1.0, z: z, s: s0, yaw: rq() * 3, c: k % 5 === 2 ? acc : (k % 3 ? 0xd9dcef : 0xb9bdd0) }); h19.hedges++; }
+          lzs.forEach(function (lz2) { var c = laneC(lz2), n = laneN(lz2); taken.push({ x: c.x + n.x * sg * 2.3, z: c.z + n.z * sg * 2.3, r: 0.9 }); }); } lzs = []; }
+      for (var lz2 = -60; lz2 <= 60; lz2 += 1) { var skip = Math.abs(lz2) < 18 || sidePaths.some(function (SP) { return Math.abs(lz2 - SP.H.lz) < 2.4 && sideOf(SP.b, SP.H.lz) === sg; }) || benchAt.some(function (B) { return Math.abs(lz2 - B.lz) < 1.7 && sideOf(B, B.lz) === sg; }) || RILLS.some(function (Rl) { return Math.abs(lz2 - Rl.lz) < 1.8 && sideOf(Rl.c, Rl.lz) === sg; }) || PATHS.some(function (Pa) { return /spire/.test(Pa.name) && segD(laneC(lz2).x + laneN(lz2).x * sg * 2.3, laneC(lz2).z + laneN(lz2).z * sg * 2.3, Pa.S) < Pa.hw + 0.6; });
+        if (skip) flush(); else lzs.push(lz2); } flush(); });
+    shrubs = shrubs.filter(function (Sh) { return pathD(Sh.x, Sh.z) > 0.25 || RES.looks.some(function (O) { return Math.hypot(Sh.x - O.x, Sh.z - O.z) < 1.5; }); });   /* no crystal stands on a paved way (the overlook centrepieces stay on their decks) */
+    /* QUIET LIGHT: the lane's lamps get their posts (a slim graphite bollard with a lit glass head), and bollards line the walks every ~8 m,
+       alternating sides — light where people walk instead of the old free-floating loop lanterns */
+    function bollard(x, z) { var y = gY(x, z), pg2 = new THREE.CylinderGeometry(0.055, 0.075, 0.95, 8); pg2.translate(x, y + 0.47, z); darkP.push(pg2); var hd = new THREE.CylinderGeometry(0.1, 0.09, 0.16, 10); hd.translate(x, y + 1.03, z); glassP.push(hd); LAMP19.push(x, y + 1.06, z); h19.bollards++; }
+    for (var ll = 0; ll < laneLamps.length; ll += 3) { var lx5 = laneLamps[ll], lz5 = laneLamps[ll + 2]; if (Math.hypot(lx5 - civ.x, lz5 - civ.z) < 16) continue; bollard(lx5, lz5); } laneLamps = [];
+    PATHS.forEach(function (Pa) { if (!Pa.lamps) return; for (var i = 4, k = 0; i < Pa.S.length - 2; i += 8, k++) { var q = nrm(Pa.S, i), o2 = (k % 2 ? 1 : -1) * (Pa.hw + 0.35), x = Pa.S[i].x + q.x * o2, z = Pa.S[i].z + q.z * o2; if (pathD(x, z) < 0.15 || chanD(x, z) < 0.6 || lakeE(x, z) < 1.1) continue; bollard(x, z); } });
+    /* TRANSITIONS INTO ROCK: outcrops where the lawn meets the mesa's rim (clusters of weathered boulders half-sunk in the turf) and a few
+       wet stones at the lip beside the flume mouth. They join the mesa's rock group (its geology material); no new draw. */
+    var BLD = [], rb2 = rnd(0x0B01D);
+    function boulder(x, z, sc, wetB) { var g = new THREE.IcosahedronGeometry(1, LOW ? 0 : 1), P = g.attributes.position, sx2 = sc * (0.9 + rb2() * 0.5), sy2 = sc * (0.45 + rb2() * 0.3), sz2 = sc * (0.8 + rb2() * 0.5), yw = rb2() * 6.283, cyw = Math.cos(yw), syw = Math.sin(yw), ph = rb2() * 10;
+      for (var i = 0; i < P.count; i++) { var vx = P.getX(i), vy = P.getY(i), vz = P.getZ(i), k2 = 0.78 + 0.22 * Math.sin(vx * 2.1 + ph) * Math.cos(vz * 1.7 - ph) + 0.12 * Math.sin(vy * 3.3 + ph * 1.3); if (vy > 0.55) k2 *= 0.9; vx *= sx2 * k2; vy *= sy2 * k2; vz *= sz2 * k2; P.setXYZ(i, x + vx * cyw + vz * syw, 0, z - vx * syw + vz * cyw); P.setY(i, vy); }
+      var yb2 = 1e9; for (i = 0; i < P.count; i++) yb2 = Math.min(yb2, gY(P.getX(i), P.getZ(i))); for (i = 0; i < P.count; i++) P.setY(i, P.getY(i) + yb2 + sy2 * 0.35);
+      BLD.push(g); taken.push({ x: x, z: z, r: sc * 1.2 }); h19.boulders++; }
+    (function () { var ov = RES.looks, bel = info.belvedere; for (var bt = 0; bt < Math.PI * 2; bt += 0.075) { var n1 = Math.sin(bt * 5.3 + 1.1) * 0.6 + Math.sin(bt * 11.7 - 0.4) * 0.4; if (n1 < 0.25) continue;
+        var fk2 = 0.86 + rb2() * 0.07, rr5 = rimR(bt) * fk2, P = L2W(Math.cos(bt) * rr5, Math.sin(bt) * rr5), ab = lipAB(P);
+        if (chanD(P.x, P.z) < 8 || Math.hypot(P.x - lip.x, P.z - lip.z) < 16 || ov.some(function (O) { return Math.hypot(P.x - O.x, P.z - O.z) < 12; }) || (ab.a > -1 && ab.a < 11 && Math.abs(ab.b) > 16 && Math.abs(ab.b) < 50) || (bel && Math.hypot(P.x - bel.x, P.z - bel.z) < 12)) continue;
+        if (pathD(P.x, P.z) < 2.5 || taken.some(function (Tk) { return Math.hypot(P.x - Tk.x, P.z - Tk.z) < Tk.r + 1.5; })) continue;
+        var nb2 = 1 + Math.floor(rb2() * (LOW ? 2 : 3)), s5 = 0.9 + n1 * 1.6; boulder(P.x, P.z, s5, false); for (var bi = 1; bi < nb2; bi++) { var ang = rb2() * 6.283, dd = s5 * (1.1 + rb2() * 0.6); boulder(P.x + Math.cos(ang) * dd, P.z + Math.sin(ang) * dd, s5 * (0.35 + rb2() * 0.35), false); } }
+      [-1, 1].forEach(function (sg) { [[0.6, 10.9, 0.75], [2.2, 12.4, 0.55], [-0.8, 13.6, 0.9]].forEach(function (Bq) { var P = LP(Bq[0], sg * Bq[1]); if (pathD(P.x, P.z) > 0.6) boulder(P.x, P.z, Bq[2], true); }); }); })();
+    if (BLD.length) { var gBase = gp.length / 3; BLD.forEach(function (g) { var q = g.index ? g.toNonIndexed() : g, P = q.attributes.position; for (var i = 0; i < P.count; i++) vtx(P.getX(i), P.getY(i), P.getZ(i), rockB, 0); for (i = 0; i < P.count; i++) gi.push(gBase + i); gBase += P.count; if (q !== g) q.dispose(); g.dispose(); }); }
+    /* CRYSTAL GRASS (owner: "grass" — never green): tufts of fine crystal blades — silver, ice and a faint lilac, with a rare pale class-coloured
+       'flower' — clustered in drifts, thickest along the walk margins and in the gardens, never on paving, beds, water, floors or terraces.
+       Instanced with the grove canopy's crystal material (one draw; not on LOW). */
+    var BLADES = []; if (!LOW) { var GW = 120, GH = 190, grid = new Float32Array(GW * GH).fill(99);
+      PATHS.forEach(function (Pa) { Pa.S.forEach(function (Q) { var ql = toLocal(Q), R = Pa.hw + 2.2; for (var gx = Math.floor(ql.x + 60 - R); gx <= Math.ceil(ql.x + 60 + R); gx++) for (var gz = Math.floor(ql.z + 95 - R); gz <= Math.ceil(ql.z + 95 + R); gz++) { if (gx < 0 || gz < 0 || gx >= GW || gz >= GH) continue; var d = Math.hypot(gx + 0.5 - 60 - ql.x, gz + 0.5 - 95 - ql.z) - Pa.hw - (Pa.lane ? 1.3 : 0), o3 = gz * GW + gx; if (d < grid[o3]) grid[o3] = d; } }); });
+      var gridD = function (p) { var ql = toLocal(p), gx = Math.floor(ql.x + 60), gz = Math.floor(ql.z + 95); return gx < 0 || gz < 0 || gx >= GW || gz >= GH ? 99 : grid[gz * GW + gx]; };   /* metres past the nearest paved edge (the lane's beds count as paved), 1 m cells */
+      var NBL = T === 'MED' ? 2400 : 5000, tries = 0, BLC = [0xc3c7d4, 0xb4b8c6, 0xcbd6e8, 0xb9b1d3, 0x9a9eab], FLW = [CRYSTAL_TINT.gold, CRYSTAL_TINT.blue, CRYSTAL_TINT.red, CLASS_TINT.purple, CRYSTAL_TINT.pink];
+      while (BLADES.length < NBL && tries++ < NBL * 14) { var blx = (rq() * 2 - 1) * AR, blz = (rq() * 2 - 1) * AT; if (Math.hypot(blx / AR, blz / AT) > 0.84) continue; var P = L2W(blx, blz), gd = gridD(P);
+        if (gd < 0.15 || lakeE(P.x, P.z) < 1.1 || chanD(P.x, P.z) < 0.9 || Math.hypot(P.x - civ.x, P.z - civ.z) < 15.8 || Math.hypot(P.x - lip.x, P.z - lip.z) < 6) continue;
+        if (RES.homes.some(function (H) { return Math.hypot(P.x - H.x, P.z - H.z) < 7.5; }) || RES.looks.some(function (O) { return Math.hypot(P.x - O.x, P.z - O.z) < 9; }) || RILLS.some(function (Rl) { return segD(P.x, P.z, Rl.pts) < 0.75 || Math.hypot(P.x - Rl.c.x, P.z - Rl.c.z) < 1.4; })) continue;
+        var cn = 0.5 + 0.5 * Math.sin(P.x * 0.23 + P.z * 0.11) * Math.sin(P.x * 0.07 - P.z * 0.19), edge = gd < 1.6 ? 0.55 : 0, gdn = gardens.some(function (G) { return Math.hypot(P.x - G.x, P.z - G.z) < 6 && Math.hypot(P.x - G.x + Math.sin(G.yaw) * 1.5, P.z - G.z + Math.cos(G.yaw) * 1.5) > 2.6; }) ? 0.35 : 0;
+        if (rq() > Math.min(0.95, Math.max(0, (cn - 0.35) * 2.2) + edge + gdn)) continue;
+        for (var tb = 0, tuft = 1 + Math.floor(rq() * 3); tb < tuft && BLADES.length < NBL; tb++) { var bx3 = P.x + (rq() - 0.5) * 0.35, bz3 = P.z + (rq() - 0.5) * 0.35, flw = rq() < 0.035;
+          BLADES.push({ x: bx3, y: gY(bx3, bz3) - 0.02, z: bz3, w: flw ? 0.06 : 0.025 + rq() * 0.03, h: flw ? 0.1 : 0.05 + rq() * 0.11, yaw: rq() * 6.28, lean: (rq() - 0.5) * 0.5, c: flw ? FLW[Math.floor(rq() * 5)] : BLC[Math.floor(rq() * BLC.length)] }); } } }
+    h19.grass = BLADES.length;
+    /* NIGHT LIGHT POOLS: each lamp's warm pool baked once into the paving and the lawn (emissive at night only) */
+    function litAt(x, z) { var L = 0; for (var i = 0; i < LAMP19.length; i += 3) { var d = Math.hypot(x - LAMP19[i], z - LAMP19[i + 2]); if (d < 4.2) { var f3 = 1 - d / 4.2; L += f3 * f3; } } return Math.min(1, L); }
+    for (var pv = 0; pv < PV.p.length / 3; pv++) PV.a[pv * 4 + 3] = litAt(PV.p[pv * 3], PV.p[pv * 3 + 2]);
+    var gLit = new Float32Array(gp.length / 3), topV = 1 + RING * SEG; for (var gv = 0; gv < topV; gv++) gLit[gv] = litAt(gp[gv * 3], gp[gv * 3 + 2]);
+    hg.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3)); hg.setAttribute('color', new THREE.Float32BufferAttribute(gc, 3)); hg.setAttribute('aWet', new THREE.Float32BufferAttribute(gw, 1)); hg.setAttribute('aLit', new THREE.BufferAttribute(gLit, 1));
+    hg.setIndex(gi); hg.clearGroups(); hg.addGroup(0, topCount, 0); hg.addGroup(topCount, gi.length - topCount, 1); hg.computeVertexNormals(); hg.computeBoundingSphere();
+    if (WT.length) { var lwP = Array.from(lwG.attributes.position.array).concat(WT); lwG.setAttribute('position', new THREE.Float32BufferAttribute(lwP, 3)); lwG.computeVertexNormals(); lwG.computeBoundingSphere(); }
+    var pvM = keep(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.03, envMapIntensity: 0.45, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }));
+    pvM.onBeforeCompile = function (sh) { sh.uniforms.uLitN = litNightU;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec4 aPav; varying vec4 vPav; varying vec2 vPuv; varying vec3 vPw;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvPav = aPav; vPuv = uv; vPw = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uLitN; varying vec4 vPav; varying vec2 vPuv; varying vec3 vPw;\n' + NOISE)
+        .replace('#include <color_fragment>', ['#include <color_fragment>',
+          'float pvK = vPav.y, pvHW = vPav.x; vec2 pq = vPuv; float pvNear = 1.0 - smoothstep(22.0, 110.0, length(cameraPosition - vPw)); float pvTone = 1.0, pvR = 1.0, pvSeam = 0.0, pvD = 1.0, pvW = 0.03;',
+          'float pvG = vfN(vPw.xz * 5.3 + vPw.y) * 0.6 + vfN(vPw.xz * 17.0 + 3.0) * 0.4;',
+          'if (pvK < 0.5) { float ax = abs(pq.x), kb = pvHW - 0.2, kerb = step(kb, ax), inner = max(0.2, 2.0 * kb), nc = max(1.0, floor(inner / 0.95 + 0.5)), cw = inner / nc, cx = clamp((pq.x + kb) / cw, 0.0, nc - 0.001), ci = floor(cx);',   /* PAVING: a kerb course each side, staggered slab courses between */
+          '  float sl = 0.85 + 0.2 * mod(ci, 2.0), sy = pq.y / sl + 0.5 * mod(ci, 2.0) + 0.29 * ci; vec2 sid = vec2(ci, floor(sy));',
+          '  float dS = min(min(fract(cx), 1.0 - fract(cx)) * cw, min(fract(sy), 1.0 - fract(sy)) * sl); float ky = pq.y / 1.4, dK = min(min(fract(ky), 1.0 - fract(ky)) * 1.4, abs(ax - kb));',
+          '  pvD = mix(min(dS, abs(ax - kb)), dK, kerb); float h1 = vfH(sid + 7.3 + kerb * (31.0 + floor(ky))); pvTone = (1.0 + (h1 - 0.5) * 0.1) * mix(1.0, 0.6, kerb); pvR = (1.0 + (vfH(sid * 1.7 + kerb * 5.0) - 0.5) * 0.28) * mix(1.0, 0.78, kerb); }',
+          'else if (pvK < 1.5) { float edge = step(pvHW - 0.09, abs(pq.x)); float grit = step(0.93, vfH(floor(vPw.xz * 9.0))) * pvNear; pvTone = mix((0.78 + 0.44 * pvG) * (1.0 + grit * 1.7), 2.5, edge); pvR = mix(1.3 - grit * 0.75, 0.95, edge); pvD = abs(abs(pq.x) - (pvHW - 0.09)); pvW = 0.015; }',   /* BED */
+          'else { float by = pq.y / 1.3; pvD = min(fract(by), 1.0 - fract(by)) * 1.3; pvTone = 1.0 + (vfH(vec2(floor(by), 3.0 + pvHW * 7.0 + floor(vPw.y))) - 0.5) * 0.12; pvW = 0.02; }',   /* STONE: coping blocks */
+          'float pvAA = max(fwidth(pvD), 1e-4) * 1.2; pvSeam = (1.0 - smoothstep(pvW * 0.5, pvW * 0.5 + pvAA, pvD)) * pvNear * clamp(pvW / pvAA, 0.0, 1.0);',
+          'pvTone *= 1.0 + (pvG - 0.5) * 0.09 * pvNear; diffuseColor.rgb *= pvTone * mix(1.0, 0.55, pvSeam); diffuseColor.rgb *= mix(1.0, 0.58, vPav.z); pvR *= mix(1.0, 0.28, vPav.z);'].join('\n'))
+        .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(mix(roughnessFactor * pvR, 0.92, pvSeam), 0.05, 1.0);')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1.0, 0.93, 0.84) * vPav.w * 0.7 * uLitN * diffuseColor.rgb;'); };
+    pvM.customProgramCacheKey = function () { return 'veil_paving_m19'; };
+    var pvGeo = keep(new THREE.BufferGeometry()); pvGeo.setAttribute('position', new THREE.Float32BufferAttribute(PV.p, 3)); pvGeo.setAttribute('uv', new THREE.Float32BufferAttribute(PV.uv, 2)); pvGeo.setAttribute('color', new THREE.Float32BufferAttribute(PV.c, 3)); pvGeo.setAttribute('aPav', new THREE.Float32BufferAttribute(PV.a, 4)); pvGeo.setIndex(PV.i); pvGeo.computeVertexNormals(); pvGeo.computeBoundingSphere();
+    var paving = new THREE.Mesh(pvGeo, pvM); paving.name = 'VEIL_PAVING'; paving.receiveShadow = true; group.add(paving);
+    h19.paths_m = Math.round(h19.paths_m); h19.walls_m = Math.round(h19.walls_m); h19.paving_tris = PV.i.length / 3; h19.paths = PATHS.map(function (Pa) { return Pa.name; }); info.m19 = h19;
     function merged(list, mat, name) { if (!list.length) return null; var parts = list.map(function (q) { return q.index ? q.toNonIndexed() : q; }), n = 0; parts.forEach(function (q) { n += q.attributes.position.count; });
       var P = new Float32Array(n * 3), Nn = new Float32Array(n * 3), o = 0; parts.forEach(function (q) { P.set(q.attributes.position.array, o * 3); Nn.set(q.attributes.normal.array, o * 3); o += q.attributes.position.count; q.dispose(); });
       var g2 = keep(new THREE.BufferGeometry()); g2.setAttribute('position', new THREE.BufferAttribute(P, 3)); g2.setAttribute('normal', new THREE.BufferAttribute(Nn, 3)); var me = new THREE.Mesh(g2, mat); me.name = name; group.add(me); return me; }
@@ -327,6 +593,9 @@ export function createVeilFalls(ctx) {
     canopyMat.onBeforeCompile = function (sh) { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_INSTANCING_COLOR\n totalEmissiveRadiance *= vColor.rgb;\n#endif'); }; canopyMat.customProgramCacheKey = function () { return 'veil_canopy'; };
     var cnI = new THREE.InstancedMesh(cnG, canopyMat, Math.max(1, canopy.length)), cc = new THREE.Color();
     canopy.forEach(function (Cn, ci) { e4.set(0, Cn.yaw, 0); cnI.setMatrixAt(ci, m4.compose(v4.set(Cn.x, Cn.y, Cn.z), q4.setFromEuler(e4), s4.set(Cn.s, Cn.s, Cn.s))); cnI.setColorAt(ci, cc.set(Cn.c)); }); cnI.count = canopy.length; cnI.name = 'VEIL_GROVE_CANOPY'; group.add(cnI); info.trees = trunks.length;
+    if (BLADES.length) { var blG = keep(new THREE.OctahedronGeometry(1, 0)); blG.translate(0, 0.9, 0); blG.scale(1, 1.1, 0.55); bladeMat = keep(canopyMat.clone()); bladeMat.emissiveIntensity = night ? 0.1 : 0.04; bladeMat.onBeforeCompile = canopyMat.onBeforeCompile; bladeMat.customProgramCacheKey = canopyMat.customProgramCacheKey;   /* the canopy's program, a dimmer glow (a field of glowing blades read as stars on the ground) */
+      var blI = new THREE.InstancedMesh(blG, bladeMat, BLADES.length), eb = new THREE.Euler();   /* M19: the crystal grass (planned in the M19 block above) */
+      BLADES.forEach(function (Bd, bi) { eb.set(Bd.lean, Bd.yaw, Bd.lean * 0.6); blI.setMatrixAt(bi, m4.compose(v4.set(Bd.x, Bd.y, Bd.z), q4.setFromEuler(eb), s4.set(Bd.w, Bd.h, Bd.w))); blI.setColorAt(bi, cc.set(Bd.c)); }); blI.count = BLADES.length; blI.name = 'VEIL_CRYSTAL_GRASS'; blI.computeBoundingSphere(); group.add(blI); }
 
     /* the Veil spire: a tall VISIONARY crystal on a platinum plinth, placed on the north part of the mesa so it shows above the lower crests */
     var SB = HL.spire_bearing, SD = HL.spire_dist_m, sx = Math.sin(SB) * SD, sz = Math.cos(SB) * SD, sy = TOP + roll(sx, sz), SH = HL.spire_h_m || 48; taken.push({ x: sx, z: sz, r: 10 });
@@ -337,14 +606,12 @@ export function createVeilFalls(ctx) {
     var spM = merged(spParts, spireMat, 'VEIL_SPIRE');   /* the spire and its three satellite shards: one draw */
     info.spire = { x: +sx.toFixed(1), z: +sz.toFixed(1), top_y: +(sy + 2.2 + SH).toFixed(1) };
 
-    /* the flight landing pad (reachable only once the bridge brings the highland into the host) */
-    var pad = spot(380, 14, rnd(0xBAD)); if (pad) { var pg = new THREE.RingGeometry(8.4, 9.4, 48); pg.rotateX(-Math.PI / 2); pg.translate(pad.x, pad.y + 0.12, pad.z); glassP.push(pg); var pd = new THREE.CircleGeometry(8.4, 32); pd.rotateX(-Math.PI / 2); pd.translate(pad.x, pad.y + 0.08, pad.z); darkP.push(pd); info.pad = { x: +pad.x.toFixed(1), z: +pad.z.toFixed(1) }; }   /* the pad: a lit ring (glass draw) on a graphite disc (roof draw) */
     merged(bodyP, keep(new THREE.MeshStandardMaterial({ color: 0xd9dde4, roughness: 0.38, metalness: 0.35, envMapIntensity: 0.6 })), 'VEIL_VILLAS');
     merged(darkP, keep(new THREE.MeshStandardMaterial({ color: 0x2e333d, roughness: 0.55, metalness: 0.4 })), 'VEIL_VILLA_ROOFS');
     glassMat = keep(new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.08, metalness: 0.7, emissive: 0xfff1dc, emissiveIntensity: night ? 0.9 : 0.06, envMapIntensity: 1.0, side: THREE.DoubleSide })); merged(glassP, glassMat, 'VEIL_VILLA_GLASS');
 
-    /* lantern paths: soft neutral lamps in loops through the meadow (additive points, strong at night) */
-    var lp = [], rl = rnd(0x1A7E); for (var lI = 0; lI < 90; lI++) { var th4 = lI / 90 * Math.PI * 2 * 2, f4 = lI < 45 ? 0.45 : 0.72, rr4 = rimR(th4) * (f4 + (rl() - 0.5) * 0.04), lx4 = Math.cos(th4) * rr4, lz4 = Math.sin(th4) * rr4; var x4 = CX + er[0] * lx4 + et[0] * lz4, z4 = CZ + er[1] * lx4 + et[1] * lz4; if (Math.hypot(x4 - (lakeC.x + ox * 6), z4 - (lakeC.z + oz * 6)) < 17) continue; lp.push(x4, TOP + roll(x4, z4) + 1.3, z4); }
+    /* lantern light: soft neutral glows over the bollard heads (additive points, strong at night) */
+    var lp = LAMP19.slice();   /* M19: the old loop lanterns floated free over the lawn (no path under them); the bollards on the walks and the lane carry the light now */
     lp = lp.concat(laneLamps); var lg = keep(new THREE.BufferGeometry()); lg.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3)); var LS = 32, ld = new Uint8Array(LS * LS * 4); for (var li2 = 0; li2 < LS * LS; li2++) { var qx = (li2 % LS + 0.5) / LS * 2 - 1, qy = (Math.floor(li2 / LS) + 0.5) / LS * 2 - 1, qr = Math.min(1, Math.hypot(qx, qy)), qv = Math.round(255 * Math.pow(1 - qr, 1.6)); ld[li2 * 4] = ld[li2 * 4 + 1] = ld[li2 * 4 + 2] = qv; ld[li2 * 4 + 3] = qv; }
     var lampTex = keep(new THREE.DataTexture(ld, LS, LS, THREE.RGBAFormat)); lampTex.needsUpdate = true;   /* M15c: a round soft lantern glow (the bare point sprite drew hard white squares up close) */
     lampMat = keep(new THREE.PointsMaterial({ color: 0xfff1dc, map: lampTex, size: 2.2, sizeAttenuation: true, transparent: true, opacity: night ? 0.95 : 0.25, depthWrite: false, blending: THREE.AdditiveBlending }));
@@ -357,25 +624,27 @@ export function createVeilFalls(ctx) {
         F.push({ x: cMid.x - ox * 16, y: yTop + CH * 0.75, z: cMid.z - oz * 16, size: CH * 0.86, shape: 'RING', scale: [1, 12, 1], tint: 0xff9ad2, intensity: 0.45, ground: yTop, axis: [-oz, 0.4, ox], spin: -0.024, phase: 0.55 });
         [[-26, 0.95, -18, 5.5, 0xb99cff], [-8, 1.6, 22, 4.2, 0xff6f82], [14, 1.15, -30, 3.6, 0xffa6d4]].forEach(function (k) { var tx = -oz, tz = ox; F.push({ x: cMid.x + ox * k[0] + tx * k[2], y: yTop + CH * k[1], z: cMid.z + oz * k[0] + tz * k[2], size: k[3], tint: k[4], ground: yTop, shape: 'CRYSTAL' }); });   /* M15: great diamonds hanging in the air over the falls (the owner's reference); M16: VISIONARY purple, LEAN crimson, BAGE pink (was violet, pink, violet) */
         F.push({ x: cMid.x - ox * 10, y: yTop + CH * 1.35, z: cMid.z - oz * 10, size: CH * 0.42, shape: 'HEX', scale: [1, 0.4, 1], tint: CRYSTAL_TINT.blue, intensity: 0.5, ground: yTop, axis: [0.2, 1, 0.3], spin: 0.04, phase: 0.8 }); }
-      A.push({ x: cMid.x - ox * 8, y: gy, z: cMid.z - oz * 8, size: CH * 0.55, aspect: Math.max(1, HT / (CH * 0.95)), ring: 0, tint: 0x8c84c8, spectral: 0.55, intensity: 0.18, pull: 20, phase: 0.3 });   /* the veil glow hugging the curtain (fringes, no circle) */
-      A.push({ x: baseX - ox * 6, y: 14, z: baseZ - oz * 6, size: CH * 0.8, aspect: 0.42, ring: 0, tint: 0xeef4ff, spectral: 0.35, intensity: 0.22, pull: 14, nightK: 1.25 });   /* the base spray bloom */
-      /* THE GLORY (the owner's reference): a full prismatic ring framing the whole falls, and a faint second ring outside it. The colour
-         runs across the band (ice → white → gold → pink, pearl-soft; no green or orange — colour law); its foot sinks into the spray and
-         the sea. Sunlit spray makes it, so it is a day phenomenon: a trace at night. */
-      A.push({ x: baseX, y: gy, z: baseZ, size: GR / 0.8, aspect: 1, ring: 0.8, ringW: 0.024, breakup: 0.15, tint: 0x000000, spectral: 2.0, intensity: 0.95, pull: 30, phase: 0.4, nightK: 0.2 });
-      A.push({ x: baseX, y: gy, z: baseZ, size: GR * 1.3 / 0.9, aspect: 1, ring: 0.9, ringW: 0.013, breakup: 0.3, tint: 0x000000, spectral: 1.7, intensity: 0.42, pull: 30, phase: 2.6, nightK: 0.1 });
+      A.push({ x: cMid.x - ox * 8, y: gy, z: cMid.z - oz * 8, size: CH * 0.55, aspect: Math.max(1, HT / (CH * 0.95)), ring: 0, tint: 0x98a3c4, spectral: 0.55, intensity: 0.12, pull: 20, phase: 0.3 });   /* the veil glow hugging the curtain (fringes, no circle; M19: pale steel, was a lavender default) */
+      A.push({ x: baseX - ox * 6, y: 14, z: baseZ - oz * 6, size: CH * 0.8, aspect: 0.42, ring: 0, tint: 0xeef4ff, spectral: 0.35, intensity: 0.16, pull: 14, nightK: 1.25 });   /* the base spray bloom (M19: softer at eye level) */
+      /* M19 (owner 2026-09-27: "a restrained spectral field — violet, blue, pale gold, pink, subtle crimson; not a literal rainbow sticker;
+         stronger high up and in the mist, fainter near eye level"): the M12 GLORY — a full prismatic ring framing the whole falls, and its
+         faint outer ring — is retired. The spectrum lives in the water and the air instead: the rising mist takes it on as it climbs (mist
+         shader), a soft field of prismatic fringes hangs over the upper curtain and over the lip, and the cap arcs high above stay, softer.
+         Nothing spectral sits at eye level. */
+      A.push({ x: cMid.x - ox * 12, y: yBot + HT * 0.74, z: cMid.z - oz * 12, size: CH * 0.5, aspect: 1.25, ring: 0, tint: 0x000000, spectral: 1.0, intensity: 1.1, pull: 24, phase: 0.9, nightK: 0.35 });
+      A.push({ x: lip.x - ox * 16, y: yTop + 14, z: lip.z - oz * 16, size: CH * 0.36, aspect: 0.7, ring: 0, tint: 0x000000, spectral: 1.0, intensity: 0.9, pull: 16, phase: 2.2, nightK: 0.3 });
       /* the iridescent cap: soft pastel arcs in the air over the lip, as in the reference's lit cloud crown (day only) */
-      A.push({ x: baseX + ox * 20, y: yTop + 52, z: baseZ + oz * 20, size: CH * 0.62, aspect: 1, ring: 0.8, ringW: 0.1, arc: 1, breakup: 0.5, tint: 0x000000, spectral: 1.6, intensity: 0.5, pull: 10, phase: 3.3, nightK: 0 });
-      A.push({ x: baseX + ox * 30, y: yTop + 76, z: baseZ + oz * 30, size: CH * 0.8, aspect: 1, ring: 0.78, ringW: 0.07, arc: 1, breakup: 0.6, tint: 0x000000, spectral: 1.5, intensity: 0.35, pull: 10, phase: 4.1, nightK: 0 });
+      A.push({ x: baseX + ox * 20, y: yTop + 52, z: baseZ + oz * 20, size: CH * 0.62, aspect: 1, ring: 0.8, ringW: 0.1, arc: 1, breakup: 0.6, tint: 0x000000, spectral: 1.2, intensity: 0.32, pull: 10, phase: 3.3, nightK: 0 });
+      A.push({ x: baseX + ox * 30, y: yTop + 76, z: baseZ + oz * 30, size: CH * 0.8, aspect: 1, ring: 0.78, ringW: 0.07, arc: 1, breakup: 0.7, tint: 0x000000, spectral: 1.1, intensity: 0.2, pull: 10, phase: 4.1, nightK: 0 });
       A.push({ x: lip.x - ox * 3, y: yTop + 2, z: lip.z - oz * 3, size: 18, aspect: 0.8, ring: 0, tint: SPECTRAL.gold, spectral: 0.45, intensity: 0.28, pull: 6 });          /* the lip glow */
       A.push({ x: sx, y: sy + 2.2 + SH * 0.55, z: sz, size: 18, aspect: 3.2, ring: 0, tint: CLASS_TINT.purple, spectral: 0.6, intensity: 0.34, pull: 6 });               /* the Veil spire column */
       A.push({ x: sx, y: sy + 2.2 + SH, z: sz, size: 12, aspect: 1, ring: 0.65, ringW: 0.08, breakup: 0.85, tint: SPECTRAL.ice, spectral: 0.6, intensity: 0.45, pull: 4, phase: 2.2 }); }
     ctx.veilFalls = { lip: { x: lip.x, y: yTop, z: lip.z }, base: { x: baseX, z: baseZ }, highland: { x: CX, z: CZ, top_y: TOP }, reachable: false };
     log('veilFalls: curtain stations ' + LINES[0].k + '–' + LINES[NS].k + ' (' + NR + '×' + NC + ', chord ' + CH.toFixed(0) + ' m), lip ' + yTop.toFixed(1) + ' m → ' + yBot + ' m, highland top ' + TOP + ' m, homes ' + info.homes + ' + civic pavilion, overlooks ' + info.overlooks + ', garden shrubs ' + info.garden_shrubs + ', trees ' + info.trees + ', lanterns ' + info.lanterns + ' (not reachable until the runtime bridge)');
   }
-  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
-  function setNight(n) { night = !!n; if (waterU) waterU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
-    if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.35 : 0.08; if (spireMat) spireMat.emissiveIntensity = night ? 0.9 : 0.22; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; if (flMat) flMat.emissiveIntensity = night ? 1.0 : 0.2; }
+  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (frontU) frontU.uTime.value = clock; if (wetTU) wetTU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
+  function setNight(n) { night = !!n; if (litNightU) litNightU.value = night ? 1 : 0; if (waterU) waterU.uNight.value = night ? 1 : 0; if (frontU) frontU.uNight.value = night ? 1 : 0; if (wetTU) wetTU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
+    if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.35 : 0.08; if (bladeMat) bladeMat.emissiveIntensity = night ? 0.1 : 0.04; if (spireMat) spireMat.emissiveIntensity = night ? 0.9 : 0.22; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; if (flMat) flMat.emissiveIntensity = night ? 1.0 : 0.2; }
   function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; group = null; }
   function debug() { return info; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
