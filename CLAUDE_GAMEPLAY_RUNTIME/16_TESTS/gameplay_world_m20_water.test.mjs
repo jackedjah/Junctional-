@@ -49,7 +49,7 @@ ok('4. sea: shore distance field (rect + 6 island slots), shallows clear toward 
 /* 5. wired to every water body, with no new mesh (value / normal / alpha only) */
 var sw = WAT.slice(WAT.indexOf('export function skyWater'), WAT.indexOf('export function createWater'));
 var wired = { canal: /skyWater\(THREE, waterMat, ctx, \{ land: 0\.34 \}\)/.test(WAT), near: /if \(nearW2\) skyWater\(THREE, nearW2\.material, ctx, \{ land: 0\.34 \}\)/.test(WAT),
-  sea: /skyWater\(THREE, seaMat, ctx, \{ shore: \{ rect: \[/.test(CST), basin: /skyWater\(THREE, lakeM, ctx, \{ refl: 0\.9, body: 0\.6, land: 0\.3 \}\)/.test(VF), noDraw: !/new THREE\.(Mesh|Points|InstancedMesh|BufferGeometry)/.test(sw) };
+  sea: /skyWater\(THREE, seaMat, ctx, \{ shore: \{ rect: \[/.test(CST), basin: /skyWater\(THREE, lakeM, ctx, \{ refl: 0\.9, body: 0\.\d+, land: 0\.3 \}\)/.test(VF), noDraw: !/new THREE\.(Mesh|Points|InstancedMesh|BufferGeometry)/.test(sw) };
 ok('5. canals + ripple window (ridge skyline), sea (shore field), Veil basin (skyline) all mirror the sky; the patch adds no draw', Object.keys(wired).every(function (k) { return wired[k]; }), wired);
 
 /* 6. COLOUR LAW: emulate the shader's sky mix for the REAL day and night palettes of atmosphere.js over a sweep of reflected directions

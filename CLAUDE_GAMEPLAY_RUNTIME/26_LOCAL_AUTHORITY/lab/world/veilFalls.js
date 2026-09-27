@@ -411,7 +411,7 @@ export function createVeilFalls(ctx) {
       return fs + f2 <= 1 ? a0 + fs * (a1 - a0) + f2 * (b0 - a0) : b1 + (1 - fs) * (b0 - b1) + (1 - f2) * (a1 - b1); }
 
     /* the source lake + the channel to the lip (flush water on the meadow) */
-    var lakeG = keep(new THREE.CircleGeometry(1, 40)); lakeG.rotateX(-Math.PI / 2); var lakeM = keep(new THREE.MeshStandardMaterial({ color: 0x3e4b5d, roughness: 0.05, metalness: 0.72, envMapIntensity: 0.9, transparent: true, opacity: 0.94 }));
+    var lakeG = keep(new THREE.CircleGeometry(1, 40)); lakeG.rotateX(-Math.PI / 2); var lakeM = keep(new THREE.MeshStandardMaterial({ color: 0x56657a, roughness: 0.05, metalness: 0.72, envMapIntensity: 0.9, transparent: true, opacity: 0.94 }));
     /* M19 water realism: the basin was a flat navy disc from above (a hole in the district). A steel tone, and slow wind ripples in world space —
        two drifting noise layers bend the normal, so the sky breaks up in the water; the rill's water runs (its ripples ride the flow speed) */
     lakeU = { uTime: { value: 0 } }; lakeM.onBeforeCompile = function (sh) { sh.uniforms.uTime = lakeU.uTime;
@@ -420,7 +420,7 @@ export function createVeilFalls(ctx) {
         '{ vec2 q = vLkW.xz; float e = 0.35, t = uTime; float h0 = vfN(q * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN(q * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4;',
         '  float hx = vfN((q + vec2(e, 0.0)) * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN((q + vec2(e, 0.0)) * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4, hz = vfN((q + vec2(0.0, e)) * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN((q + vec2(0.0, e)) * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4;',
         '  float fade = 1.0 - smoothstep(40.0, 160.0, length(cameraPosition - vLkW)); vec3 wn = normalize(vec3(-(hx - h0) / e * 0.15 * fade, 1.0, -(hz - h0) / e * 0.15 * fade)); normal = normalize(mix(normal, (viewMatrix * vec4(wn, 0.0)).xyz, 0.85)); }'].join('\n')); };
-    lakeM.customProgramCacheKey = function () { return 'veil_lake_m19'; }; skyWater(THREE, lakeM, ctx, { refl: 0.9, body: 0.6, land: 0.3 });   /* M20: the basin mirrors the sky like the sea and the canals */
+    lakeM.customProgramCacheKey = function () { return 'veil_lake_m19'; }; skyWater(THREE, lakeM, ctx, { refl: 0.9, body: 0.85, land: 0.3 });   /* M20: the basin mirrors the sky like the sea and the canals */
     lakeG.scale(12, 1, 8); lakeG.rotateY(Math.atan2(ox, oz)); lakeG.translate(lakeC.x + ox * 6, TOP + 0.25, lakeC.z + oz * 6);
     /* M19: the channel to the lip is no longer a still mirror plane — its bed is wet dark stone (the paving draw, M19 block) and the water running
        down it is the curtain's own flowing sheet (the curtain's brink rows): shallow fast water over stone, whitening at the brink */
