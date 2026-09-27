@@ -94,7 +94,7 @@ export function veilCurtainKeep(stations, W) { var CU = W && W.curtain; if (!CU)
 
 export function createVeilFalls(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var group = null, own = [], night = !!ctx.night, clock = 0, info = {};
-  var bufV = new THREE.Vector2(); var ANCH = null, crysGlow = null, plU = null; var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null, lakeU = null;
+  var bufV = new THREE.Vector2(); var ANCH = null, crysGlow = null, plU = null, spU = null; var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null, lakeU = null;
   function tier() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   function rnd(seed) { return ctx.rnd ? ctx.rnd(seed) : (function (s) { return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; })(seed >>> 0); }
   function keep(o) { own.push(o); return o; }
@@ -251,6 +251,27 @@ export function createVeilFalls(ctx) {
           '  float fo = max(boil, lace * 0.8) * m * smoothstep(-2.0, -0.6, d);',
           '  gl_FragColor = vec4(vec3(0.95, 0.97, 1.0) * (0.9 + 0.1 * n2) * mix(1.0, 0.45, uNight), fo * 0.9);', '#include <fog_fragment>', '}'].join('\n') }));
       var pl = new THREE.Mesh(wg, plMat); pl.name = 'VEIL_FALLS_PLUNGE'; pl.renderOrder = 5.5; group.add(pl); info.plunge_line = { length_m: +L.toFixed(1), band_m: [-2, 16], y_above_sea: 0.03 }; })();
+    /* M20 THE SPRAY WALL (owner reference: "a white wall of spray at the base"; review: the strands met the sea with no spray at all — the M19
+       puffs read as glowing orbs and were retired). A soft billowing sheet of spray standing off each strand's landing line: it fades in
+       from 3.6 m (nothing new below 3.4 m within the host's reach), thickest ~8–16 m up, thinning into the air by ~42 m, leaning out toward
+       the field as it rises; alpha-blended grey-white billows with shadowed cores (a volume, not a glow), faded near the eye so a close
+       camera never sees a white screen. Strand mask at base width, one draw, not LOW. */
+    if (!LOW) (function () { var RB = rowPath(1), NV = 10, pw = [], pu = [], pi = [], i, j, L = 0, Y0 = Math.max(yBot, 3.6), Y1 = 42; for (i = 1; i <= NC; i++) L += Math.hypot(RB[i].x - RB[i - 1].x, RB[i].z - RB[i - 1].z);
+      for (i = 0; i <= NC; i++) { var ia = Math.max(0, i - 4), ib = Math.min(NC, i + 4), tx = RB[ib].x - RB[ia].x, tz = RB[ib].z - RB[ia].z, tl = Math.hypot(tx, tz) || 1, nx = -tz / tl * sideK, nz = tx / tl * sideK;
+        for (j = 0; j <= NV; j++) { var fy = j / NV, yy = Y0 + (Y1 - Y0) * fy, dd = 3 + 9 * Math.pow(fy, 1.3); pw.push(RB[i].x + nx * dd, yy, RB[i].z + nz * dd); pu.push(i / NC, fy); } }
+      for (i = 0; i < NC; i++) for (j = 0; j < NV; j++) { var a0 = i * (NV + 1) + j, b0 = a0 + NV + 1; pi.push(a0, b0, a0 + 1, a0 + 1, b0, b0 + 1); }
+      var sg = keep(new THREE.BufferGeometry()); sg.setAttribute('position', new THREE.Float32BufferAttribute(pw, 3)); sg.setAttribute('uv', new THREE.Float32BufferAttribute(pu, 2)); sg.setIndex(pi); sg.computeBoundingSphere();
+      spU = fogUniforms({ uTime: { value: 0 }, uNight: { value: night ? 1 : 0 }, uLen: { value: L } }); spU.uStr = { value: STR }; spU.uStrBase = { value: yBot };
+      var spMat = keep(new THREE.ShaderMaterial({ uniforms: spU, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
+        vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv; varying float vWy; varying float vEye;\nvoid main() { vUv = uv; vec4 wp = modelMatrix * vec4(position, 1.0); vWy = wp.y; vEye = length(cameraPosition - wp.xyz); vec4 mvPosition = viewMatrix * wp; gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
+        fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uLen; varying vec2 vUv; varying float vEye;', NOISE, STRAND,
+          'void main() { float stL, m = vfStrand(vUv.x, uStrBase - 1.0, uTime, 1.35, 0.0, stL), xm = vUv.x * uLen, h = vUv.y;',
+          '  float b1 = vfN(vec2(xm * 0.09, vWy * 0.07 - uTime * 0.22)), b2 = vfN(vec2(xm * 0.23 + 5.0, vWy * 0.16 - uTime * 0.41)), b3 = vfN(vec2(xm * 0.6 - 2.0, vWy * 0.4 - uTime * 0.7));',
+          '  float bil = b1 * 0.55 + b2 * 0.3 + b3 * 0.15, prof = smoothstep(0.0, 0.14, h) * (1.0 - smoothstep(0.3, 1.0, h));',
+          '  float a = m * prof * smoothstep(0.22, 0.62, bil + 0.18 * (1.0 - h)) * 0.75 * smoothstep(6.0, 30.0, vEye);',
+          '  vec3 c = mix(vec3(0.74, 0.77, 0.82), vec3(0.97, 0.98, 1.0), smoothstep(0.35, 0.8, b2 * 0.6 + b3 * 0.4)) * mix(1.0, 0.42, uNight);',   /* shadowed cores, lit rims */
+          '  gl_FragColor = vec4(c, a);', '#include <fog_fragment>', '}'].join('\n') }));
+      var sp = new THREE.Mesh(sg, spMat); sp.name = 'VEIL_FALLS_SPRAY'; sp.renderOrder = 6.8; group.add(sp); info.spray_wall = { from_y: Y0, to_y: Y1, stand_off_m: [3, 12] }; })();
     if (!LOW) { var NB = T === 'MED' ? 230 : 420, NT2 = 0,   /* no mid-height tier on the broad curtain: its puffs read as glowing orbs */
         NM = NB + NT2, mp = new Float32Array(NM * 3), ms = new Float32Array(NM), mr = new Float32Array(NM), r0 = rnd(0x7E11), midY = yTop * 0.46 + yBot * 0.54;
       for (var m = 0; m < NM; m++) { var tier2 = m >= NB, uu = r0() * NS, bq = BP[Math.min(BP.length - 1, Math.round(uu * 4))];
@@ -782,8 +803,8 @@ export function createVeilFalls(ctx) {
     ctx.veilFalls = { lip: { x: lip.x, y: yTop, z: lip.z }, base: { x: baseX, z: baseZ }, highland: { x: CX, z: CZ, top_y: TOP }, reachable: false };
     log('veilFalls: curtain stations ' + LINES[0].k + '–' + LINES[NS].k + ' (' + NR + '×' + NC + ', chord ' + CH.toFixed(0) + ' m), lip ' + yTop.toFixed(1) + ' m → ' + yBot + ' m, highland top ' + TOP + ' m, homes ' + info.homes + ' + civic pavilion, overlooks ' + info.overlooks + ', garden shrubs ' + info.garden_shrubs + ', trees ' + info.trees + ', lanterns ' + info.lanterns + ' (not reachable until the runtime bridge)');
   }
-  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (frontU) frontU.uTime.value = clock; if (wetTU) wetTU.uTime.value = clock; if (lakeU) lakeU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (plU) plU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
-  function setNight(n) { night = !!n; if (litNightU) litNightU.value = night ? 1 : 0; if (waterU) waterU.uNight.value = night ? 1 : 0; if (frontU) frontU.uNight.value = night ? 1 : 0; if (wetTU) wetTU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (plU) plU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
+  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (frontU) frontU.uTime.value = clock; if (wetTU) wetTU.uTime.value = clock; if (lakeU) lakeU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (plU) plU.uTime.value = clock; if (spU) spU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
+  function setNight(n) { night = !!n; if (litNightU) litNightU.value = night ? 1 : 0; if (waterU) waterU.uNight.value = night ? 1 : 0; if (frontU) frontU.uNight.value = night ? 1 : 0; if (wetTU) wetTU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (plU) plU.uNight.value = night ? 1 : 0; if (spU) spU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
     if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.3 : 0.07; if (bladeMat) bladeMat.emissiveIntensity = night ? 0.1 : 0.04; if (spireMat) spireMat.emissiveIntensity = night ? 0.8 : 0.16; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; if (flMat) flMat.emissiveIntensity = night ? 0.45 : 0.14; if (crysGlow) crysGlow.value = night ? 0.5 : 0.35; }
   function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; group = null; }
   function debug() { return info; }

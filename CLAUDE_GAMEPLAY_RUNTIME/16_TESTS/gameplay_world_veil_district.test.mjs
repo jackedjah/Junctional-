@@ -71,10 +71,10 @@ ok('7. the district is walkable in the renders: ' + names.length + ' paved route
   ['lane', 'quay', 'flank-1', 'flank1', 'rim-1', 'rim1', 'link-1', 'link1', 'belvedere'].every(function (n) { return names.indexOf(n) >= 0; }) && doors === H.info.homes && I7.steps === 2 * H.info.homes && I7.gates >= 1 && I7.bollards >= 40 && onPave <= n7 * 0.01 && I7.grass > 1000, { names: names, onPave: onPave });
 
 /* 8. budget: M19 adds exactly three draws on HIGH (VEIL_PAVING, VEIL_CRYSTAL_GRASS, VEIL_FALLS_FRONT) and one on LOW (the paving); LOW keeps the
-      coarse meadow and drops the grass and the front veil (M20 adds one draw on every tier: VEIL_FALLS_PLUNGE, the flush plunge line) */
+      coarse meadow and drops the grass and the front veil (M20 adds one draw on every tier: VEIL_FALLS_PLUNGE, the flush plunge line; and one on HIGH / MED: VEIL_FALLS_SPRAY, the spray wall, which stands from 3.6 m up) */
 var hi = Object.keys(H.by), lo = Object.keys(L.by), newHi = ['VEIL_PAVING', 'VEIL_CRYSTAL_GRASS', 'VEIL_FALLS_FRONT'];
 ok('8. draws: HIGH ' + hi.length + ' (M19: ' + newHi.filter(function (n) { return hi.indexOf(n) >= 0; }).join(', ') + '), LOW ' + lo.length + ' (no grass, no front veil); meadow triangles HIGH ' + (G.geometry.groups[0].count / 3) + ' vs LOW ' + (L.by.VEIL_HIGHLAND_GROUND.geometry.groups[0].count / 3),
-  newHi.every(function (n) { return hi.indexOf(n) >= 0; }) && hi.length === 17 && hi.indexOf('VEIL_FALLS_PLUNGE') >= 0 && lo.indexOf('VEIL_FALLS_PLUNGE') >= 0 && lo.indexOf('VEIL_PAVING') >= 0 && lo.indexOf('VEIL_CRYSTAL_GRASS') < 0 && lo.indexOf('VEIL_FALLS_FRONT') < 0 && lo.length < hi.length && L.by.VEIL_HIGHLAND_GROUND.geometry.groups[0].count < G.geometry.groups[0].count, { hi: hi, lo: lo });
+  newHi.every(function (n) { return hi.indexOf(n) >= 0; }) && hi.length === 18 && hi.indexOf('VEIL_FALLS_PLUNGE') >= 0 && lo.indexOf('VEIL_FALLS_PLUNGE') >= 0 && lo.indexOf('VEIL_FALLS_SPRAY') < 0 && lowY(H.by.VEIL_FALLS_SPRAY) >= 3.4 && lo.indexOf('VEIL_PAVING') >= 0 && lo.indexOf('VEIL_CRYSTAL_GRASS') < 0 && lo.indexOf('VEIL_FALLS_FRONT') < 0 && lo.length < hi.length && L.by.VEIL_HIGHLAND_GROUND.geometry.groups[0].count < G.geometry.groups[0].count, { hi: hi, lo: lo });
 
 [H, L].forEach(function (B) { B.m.dispose(); });
 console.log('RESULT world veil district: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
