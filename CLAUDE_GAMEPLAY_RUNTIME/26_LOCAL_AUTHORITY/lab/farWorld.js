@@ -1,4 +1,4 @@
-import { applyGeology } from './world/surfaceDetail.js'; import { softBox, taperShaft, orb, energyTip } from './world/formKit.js';
+import { applyGeology } from './world/surfaceDetail.js'; import { softBox, taperShaft, orb, energyTip } from './world/formKit.js'; import { RIDGE_DIP } from './world/ridgeSculpt.js';
 /* MAHWORLD :: FAR WORLD (convergence PASS 2b — sky / far-background scale illusion, owner addendum 2026-09-17)
    Three readable depth layers around the playable district, in the MAHWORLD language (platinum, crystal, diamond-family prisms, cool sky):
      · MID  (230–330 m from the plaza, the empty southern / lateral sectors only): a few elevated crystal walkway arcs between low platforms and
@@ -15,7 +15,7 @@ export function createFarWorld(THREE, opts) {
   var sunDir = new THREE.Vector3(26, 34, 14).normalize();
   /* WORLD PIVOT PASS 2b: BOTH palettes are baked (index 0 = day, 1 = night) and the vertex colours are swapped live by group.userData.setNight —
      the in-game time toggle never rebuilds the field, and these unlit, fog-free silhouettes kept their daylight caps glowing in a night sky. */
-  var PAL = [{ haze: 0x8fb0d0, pHaze: 0xa9c0de, rockLit: 0xaeb6c6, rockShade: 0x4c5674, cap: 0xecf1f9, base: 0x3f4862,   /* M9: cool blue-grey aerial perspective, clearly darker than the horizon sky (the warm near-white read as paper / glass) */ midPlat: 0xaab0b8, midCrystal: 0xb4cde6, ringIn: 0x2a3341, ringOut: 0xb9c8d6, midGlass: 0x3b4558, midLit: 0xdfe5ee },
+  var PAL = [{ haze: 0x8fb0d0, pHaze: 0xa9c0de, rockLit: 0x9ba4b6, rockShade: 0x46506e, cap: 0xecf1f9, base: 0x3f4862,   /* M9: cool blue-grey aerial perspective, clearly darker than the horizon sky (the warm near-white read as paper / glass); M19: rock a step darker again so the snow reads against it */ midPlat: 0xaab0b8, midCrystal: 0xb4cde6, ringIn: 0x2a3341, ringOut: 0xb9c8d6, midGlass: 0x3b4558, midLit: 0xdfe5ee },
              { haze: 0x2a4363, pHaze: 0x252a55, rockLit: 0x4f4c7c, rockShade: 0x1b1d3a, cap: 0x77739f, base: 0x141629, midPlat: 0x55657e, midCrystal: 0x5d7aa6, ringIn: 0x141a24, ringOut: 0x1e2c42, midGlass: 0x8e97ab, midLit: 0xe8e4d8 }];   /* M9: night — the glazing bands and deck-edge lines are lit (neutral practical light) */
   function pair(k) { return [new THREE.Color(PAL[0][k]), new THREE.Color(PAL[1][k])]; } function pmap(p2, fn) { return [fn(p2[0].clone(), 0), fn(p2[1].clone(), 1)]; }
   var hazeP = pair('haze');
@@ -28,7 +28,7 @@ export function createFarWorld(THREE, opts) {
      every peak is a noise-displaced cone (12 × 6) with BAKED facet light from the registry Sun direction — warm light-stone on lit faces,
      cool lavender-grey in shadow, pale crystal-white caps on the high upward faces — then aerial perspective toward the daylight horizon
      haze by distance and by height (thicker air low). Neutral rock only (colour law); still unlit, fog-free and ONE merged draw call. */
-  var far = { pos: [], colD: [], colN: [] }; var N = 40; var FAR_SEG = o.tier === 'LOW' ? 12 : (o.tier === 'MED' ? 16 : 22), FAR_ROWS = o.tier === 'LOW' ? 6 : (o.tier === 'MED' ? 8 : 11);   /* M9: tiered massif resolution (HIGH ≈ 97 k tris for the ring, MED ≈ half) */
+  var far = { pos: [], colD: [], colN: [] }; var N = 40; var FAR_SEG = o.tier === 'LOW' ? 10 : (o.tier === 'MED' ? 16 : 22), FAR_ROWS = o.tier === 'LOW' ? 5 : (o.tier === 'MED' ? 8 : 11);   /* M9: tiered massif resolution (HIGH ≈ 97 k tris for the ring, MED ≈ half); M19: LOW 10 × 5 (was 12 × 6, −30 %) */
   var pSun = new THREE.Vector3(26, 19, 14).normalize(); var pHaze = pair('pHaze');
   var rockLit = pair('rockLit'), rockShade = pair('rockShade'), capCol = pair('cap'), baseCol = pair('base');
   function hsh(n) { var v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); }
@@ -48,21 +48,30 @@ export function createFarWorld(THREE, opts) {
        broken summit: the top rows rise and fall round the peak, so the apex becomes one or two broad, uneven summits with a saddle, not one point. */
     var nT = 2.2 + hsh(sd * 3.1) * 1.8, tPh = hsh(sd * 4.7), sPk = 0.65 + hsh(sd * 5.3) * 0.8, apexY = h * (0.86 + 0.06 * hsh(sd * 6.1));
     function prof(tt) { tt = Math.max(0, Math.min(1, tt)); return Math.pow(1 - tt, 0.6) * (1 - 0.2 * smooth01(tt / 0.25)); }   /* a spreading foot, full shoulders, a broad crown (a cone is 1 − t) */
+    var cav = new Float32Array(P.count);   /* M19: the relief deviation per vertex (spur +, gully −) → baked cavity light */
     for (var i = 0; i < P.count; i++) { var x = P.getX(i), y = P.getY(i), z = P.getZ(i), t = y / h, rad = Math.hypot(x, z);
       if (rad > 1e-4) { var th = Math.atan2(z, x), n = fbm(x * 0.045 + sd, y * 0.05, z * 0.045 - sd), rn = 1 - Math.abs(2 * fbm(x * 0.022 - sd, y * 0.03, z * 0.022 + sd) - 1);
         var arete = Math.pow(Math.abs(Math.cos((th * nA + aPh + (n - 0.5) * 1.6) * 0.5)), 3.0);   /* spurs: ridgelines from the top down the flanks */
         var tf = t * nT + tPh, fr = tf - Math.floor(tf), tStep = t + ((fr * 0.3 + 0.7 * smooth01((fr - 0.6) / 0.34)) - fr) / nT * 0.85;   /* shelves: steep band, then a setback */
         var kp = prof(tStep) / Math.max(1e-3, 1 - t);
-        var k = (1 + ((n - 0.5) * 0.7 + (rn - 0.55) * 0.45 + (arete - 0.35) * 0.5) * (1 - t * 0.45)) * kp; x *= k; z *= k;
+        var dev = (n - 0.5) * 0.7 + (rn - 0.55) * 0.45 + (arete - 0.35) * 0.5, k = (1 + dev * (1 - t * 0.45)) * kp; x *= k; z *= k; cav[i] = dev;
         var pk = 1 - Math.abs(2 * vnoise(Math.cos(th) * sPk + sd, Math.sin(th) * sPk - sd, sd * 0.37) - 1);   /* summits round the top (wraps: circle coordinates) */
         y += (fbm(x * 0.03, y * 0.03 + sd, z * 0.03) - 0.5) * h * 0.1 * (1 - t) + (rn - 0.5) * h * 0.05 * t + (pk * 0.7 + pk * pk * 0.3 - 0.45) * h * 0.26 * smooth01((t - 0.45) / 0.5); }
       else y = apexY;   /* the cone apex drops below the risen top rows: the summits are theirs */
       x += apexShift * t * t; P.setXYZ(i, x, Math.max(0, y), z); }
-    g = g.toNonIndexed(); g.applyMatrix4(place(cx, -6, cz, ry, 1, 1, squash)); g.computeVertexNormals(); var p = g.attributes.position, nm = g.attributes.normal, c = new THREE.Color();
-    for (var v = 0; v < p.count; v++) { var lam = nm.getX(v) * pSun.x + nm.getY(v) * pSun.y + nm.getZ(v) * pSun.z; var yy = p.getY(v) + 6, tt = yy / h;
-      for (var s2 = 0; s2 < 2; s2++) { c.copy(rockShade[s2]).lerp(rockLit[s2], smooth01(lam * 1.25 + 0.18)); c.lerp(baseCol[s2], (1 - smooth01(tt * 2.2)) * 0.4);   /* M9: a firmer lit / shadow split — the massif has a sunlit side and a shadow side */
-        if (tt > 0.66 && nm.getY(v) > 0.38) c.lerp(capCol[s2], smooth01((tt - 0.66) / 0.2) * smooth01((nm.getY(v) - 0.38) / 0.3) * (0.55 + 0.45 * Math.max(0, lam)));   /* M10: the broad crowns and shelf tops would wash white — snow only on the high, flatter faces */
-        c.lerp(pHaze[s2], Math.min(0.8, mix * 0.8 + (1 - smooth01(tt)) * 0.2)); (s2 ? far.colN : far.colD).push(c.r, c.g, c.b); }   /* M9: less haze wash (the forms were dissolving into near-white) */
+    /* M19 (owner 2026-09-27: "less obvious giant polygon faceting … softer distant mountains; atmospheric depth"): the baked light now reads
+       SMOOTH normals of the displaced cone (its seam and summit rows welded) — the flanks shade as continuous rock instead of flat facets —
+       plus a cavity term (the gullies between the arêtes darker, the spurs lighter) and a sky term (upward faces a touch brighter, overhangs darker). Snow lies on the high, flatter
+       ground under a seeded, ragged snowline instead of a flat cap, and the air thickens toward each massif's foot (a soft haze skirt), so
+       the ring steps back in depth without a white-out. Same merged draw, same silhouettes. */
+    g.setAttribute('cav', new THREE.BufferAttribute(cav, 1)); g.applyMatrix4(place(cx, -6, cz, ry, 1, 1, squash)); g.computeVertexNormals(); var NA = g.attributes.normal, W1 = FAR_SEG + 1, sn = new THREE.Vector3();
+    for (var jr = 0; jr <= FAR_ROWS; jr++) { var i0 = jr * W1, i1 = i0 + FAR_SEG; sn.set(NA.getX(i0) + NA.getX(i1), NA.getY(i0) + NA.getY(i1), NA.getZ(i0) + NA.getZ(i1)).normalize(); NA.setXYZ(i0, sn.x, sn.y, sn.z); NA.setXYZ(i1, sn.x, sn.y, sn.z); }   /* the cone's UV seam column shares one normal */
+    sn.set(0, 0, 0); for (var ja = 0; ja < W1; ja++) sn.x += NA.getX(ja), sn.y += NA.getY(ja), sn.z += NA.getZ(ja); sn.normalize(); for (ja = 0; ja < W1; ja++) NA.setXYZ(ja, sn.x, sn.y, sn.z);   /* ... and the summit row (row 0) one normal */
+    g = g.toNonIndexed(); (function (G) { var Pp = G.attributes.position, Nn = G.attributes.normal, a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), fn = new THREE.Vector3(), m = new THREE.Vector3(); for (var f3 = 0; f3 < Pp.count; f3 += 3) { a.fromBufferAttribute(Pp, f3); b.fromBufferAttribute(Pp, f3 + 1); c.fromBufferAttribute(Pp, f3 + 2); fn.subVectors(c, b).cross(a.clone().sub(b)).normalize(); for (var q = 0; q < 3; q++) { m.fromBufferAttribute(Nn, f3 + q).lerp(fn, 0.45).normalize(); Nn.setXYZ(f3 + q, m.x, m.y, m.z); } } })(g);   /* softened facets: 55 % smooth / 45 % flat — the rock keeps its cut planes, the giant-facet edges melt */ var p = g.attributes.position, nm = g.attributes.normal, cv = g.attributes.cav, c = new THREE.Color(), snowL = 0.66 + 0.14 * hsh(sd * 7.9);
+    for (var v = 0; v < p.count; v++) { var lam = nm.getX(v) * pSun.x + nm.getY(v) * pSun.y + nm.getZ(v) * pSun.z, ny = nm.getY(v); var yy = p.getY(v) + 6, tt = yy / h, sl = snowL + (fbm(p.getX(v) * 0.02, sd, p.getZ(v) * 0.02) - 0.5) * 0.22;
+      for (var s2 = 0; s2 < 2; s2++) { c.copy(rockShade[s2]).lerp(rockLit[s2], smooth01(lam * 1.25 + 0.18)); var dv = cv ? Math.max(-0.4, Math.min(0.4, cv.getX(v))) : 0; c.multiplyScalar((0.92 + 0.14 * ny) * (1 + 0.55 * dv));   /* gullies between the arêtes sit in their own shadow, the spurs catch more sky */ c.lerp(baseCol[s2], (1 - smooth01(tt * 2.2)) * 0.4);   /* M9: a firmer lit / shadow split — the massif has a sunlit side and a shadow side */
+        if (tt > sl - 0.25 * Math.max(0, -dv) && ny > 0.36) c.lerp(capCol[s2], smooth01((tt - sl + 0.25 * Math.max(0, -dv)) / 0.14) * smooth01((ny - 0.36) / 0.3) * (1 - 0.6 * Math.max(0, dv) / 0.4) * (0.55 + 0.45 * Math.max(0, lam)));   /* M10 / M19: snow on the high, flatter faces under a ragged snowline, a little lower in the gullies, thinner on the exposed arêtes */
+        c.lerp(pHaze[s2], Math.min(0.8, mix * 0.72 + (1 - smooth01(tt * 1.4)) * 0.3)); (s2 ? far.colN : far.colD).push(c.r, c.g, c.b); }   /* M9: less haze wash (the forms were dissolving into near-white); M19: a thicker haze skirt at the foot */
       far.pos.push(p.getX(v), p.getY(v), p.getZ(v)); }
     g.dispose(); }
   for (var k = 0; k < N; k++) { var ang = k / N * Math.PI * 2 + (rnd() - 0.5) * 0.12; var dist = 620 + rnd() * 240; var mix = 0.18 + 0.36 * (dist - 620) / 240;   /* farther = closer to the haze colour; forms stay readable, never fogged out */
@@ -70,7 +79,7 @@ export function createFarWorld(THREE, opts) {
     for (var j = 0; j < pieces; j++) { var h = j === 0 ? main : main * (0.35 + rnd() * 0.45); var r = h * (0.42 + rnd() * 0.22); var ox = (rnd() - 0.5) * 120, oz = (rnd() - 0.5) * 120; rockPeak(cx + ox, cz + oz, r, h, rnd() * 3, 0.78 + rnd() * 0.5, mix, k * 13 + j * 3.7); }
     if (k % 7 === 3) { var sh = 190 + rnd() * 70; pushGeo(far, new THREE.ConeGeometry(14 + rnd() * 8, sh, 6), place(cx, sh / 2 - 6, cz, rnd() * 3, 1, 1, 1), pmap(capCol, function (c, i) { return c.lerp(pHaze[i], 0.35 + mix * 0.5); }), true);   /* a world-scale spire: a platinum monument on the horizon */ pushGeo(far, new THREE.OctahedronGeometry(18, 0), place(cx, sh - 2, cz, rnd() * 3, 1, 1.9, 1), pmap(capCol, function (c, i) { return c.lerp(pHaze[i], mix * 0.6); }), true); }
   }
-  var farMat = new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, toneMapped: false }); applyGeology(THREE, farMat, { lit: false, strata: 19, joint: 26, ledge: 0.14, fracture: 0.25, cleft: 0.9, macro: 0.16, grain: 0, bump: 0, lod: [500, 2500] });   /* M9: broader, calmer beds (fine 11 m strata aliased into glassy stripes at 700 m) */   /* M8C: the same geology as value only — the baked facets gain strata, joints and clefts */ var farMesh = finish(far, farMat); farMesh.name = 'FAR_MASSIFS'; farMesh.renderOrder = -5; group.add(farMesh);
+  var farMat = new THREE.MeshBasicMaterial({ vertexColors: true, fog: false, toneMapped: false }); applyGeology(THREE, farMat, { lit: false, strata: 19, joint: 26, ledge: 0.14, fracture: 0.25, cleft: 0.9, macro: 0.16, grain: 0, bump: 0, lod: [500, 2500], dip: RIDGE_DIP, soft: 0.65 });   /* M19: the ridges' regional dip / faults carry on into the far ring (one geology), and the thin bed lines soften at this range */   /* M9: broader, calmer beds (fine 11 m strata aliased into glassy stripes at 700 m) */   /* M8C: the same geology as value only — the baked facets gain strata, joints and clefts */ var farMesh = finish(far, farMat); farMesh.name = 'FAR_MASSIFS'; farMesh.renderOrder = -5; group.add(farMesh);
   /* ---------- MID: elevated crystal walkway arcs + prism towers in the empty sectors (lit, fogged naturally) ---------- */
   var FT = o.tier || 'HIGH', mid = { pos: [], colD: [], colN: [], nrm: [] }; var sectors = [Math.PI * 0.62, Math.PI * 0.85, Math.PI * 1.05, Math.PI * 1.28, Math.PI * 1.5, Math.PI * 1.72];   /* bearings (atan2 x,z): the north half holds the temple / market / gym / tower — mid forms stay south, east and west */
   var midPlat = pair('midPlat'), midCrystal = pair('midCrystal');   /* B7 §10 F: the mid forms a step darker than the far ring — three readable depth steps */

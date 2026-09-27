@@ -230,6 +230,23 @@ export function applyGeology(THREE, mat, spec) {
   if (!mat || (PATCHED ? PATCHED.has(mat) : (mat.userData && mat.userData.surfaceDetail))) return mat;
   var S = Object.assign({ snowY: 1e5, strata: 2.6, major: 0, ledge: 0.32, joint: 4.5, fracture: 1, cleft: 1, macro: 0.16, grain: 0.07, bump: 1, lit: true, tier: 'HIGH', lod: [60, 900], bumpLod: [40, 260], relief: null }, spec || {});
   var LOW = S.tier === 'LOW', lit = S.lit && !!mat.isMeshStandardMaterial, MAJ = S.major || S.strata * 3.2;
+  /* M19 (owner 2026-09-27: "mountains still not real enough — geological continuity, erosion, ledges, strata, broken rock shelves, more
+     convincing rock material response, atmospheric depth without hiding them behind fog"). OPT-IN keys, so every other caller (the Veil
+     mesa cliffs, the coast islands) compiles exactly the shader it had:
+       dip: [dx, dz, fold m]   REGIONAL BEDDING — the beds tilt the same way across the whole range and fold gently (one analytic function of
+                               world position, mirrored by ridgeSculpt's shelves), so strata run continuously from face to face;
+       polarUV: true           joints / fractures / clefts take the ring bearing as their along-face axis (continuous across every facet);
+       alpine: k               SNOW THAT BEHAVES — it collects on the shelf tops, fills the high couloirs and sits on flatter ground; the
+                               steep rock between stays dark (the graphite / snow contrast is what reads as a mountain from far away);
+       talus: [y0, y1]         the foot of every face breaks down into a paler, finer scree apron (the erosion product of the cliff above);
+       cavity: k               relief recesses (gullies, clefts) darker and buttress ribs lighter as VALUE, so faces read in shadow too;
+       varnish: k              dark, slightly glossy water / varnish streaks down the faces from the ledges (the rock's material response);
+       relief3: [amp m, w m]   a second, larger relief order (spurs and couloirs 40–90 m across) under the M9 relief;
+       soft: k                 distant rock: the thin bedding / lip / joint lines fade by k, the bed zoning stays;
+       nightSnow: { value }    a shared uniform: the snow's faint cool night glow (the owner module sets it on its time switch);
+       aerial: [y0, y1, k]     HEIGHT-THINNED HAZE: the scene fog keeps its distance falloff but thins with altitude (× k at y1), so the
+                               bases sit in the valley haze and the upper faces keep their form — depth without a white-out. */
+  var AL = S.alpine || 0, SY = S.dip ? 'gSy' : 'vSdW.y';
   /* v2 (M8C iteration 2): the first cut read as a crazed-glaze web (an isotropic Voronoi everywhere) with dotted "stitching" where thin ledge
      lips went through the derivative bump. Rock now reads in three orders, each only where it can resolve: MAJOR BEDS (≈ 8 m: value zoning
      and ledges — a lit lip above a ledge boundary, a shadowed undercut below it), MINOR BEDS (the bedding lines) with JOINTS that stop at the
@@ -237,16 +254,20 @@ export function applyGeology(THREE, mat, spec) {
      clefts, grain) enter the bump; the thin lines are value / roughness. */
   var body = ['#include <color_fragment>',
     'vec3 gAn = abs(normalize(cross(dFdx(vSdW), dFdy(vSdW)))); vec2 gUV = gAn.x > gAn.z ? vec2(vSdW.z, vSdW.y) : vec2(vSdW.x, vSdW.y);',   /* the face plane (from derivatives: works on flat-shaded and normal-less geometry): along-face horizontal × height */
+    S.polarUV && S.reliefPolar ? 'gUV = vec2(atan(vSdW.x - ' + f(S.reliefPolar[0]) + ', vSdW.z - ' + f(S.reliefPolar[1]) + ') * ' + f(S.reliefPolar[2]) + ', vSdW.y);' : '',   /* M19: ring-continuous along-face axis */
+    S.dip ? 'float gSy = vSdW.y + vSdW.x * ' + f(S.dip[0]) + ' + vSdW.z * ' + f(S.dip[1]) + ' + ' + f(S.dip[2] || 0) + ' * sin(vSdW.x * 0.0093 + vSdW.z * 0.0061) * cos(vSdW.z * 0.0071 - vSdW.x * 0.0023);' + (S.dip[3] ? ' { float gFu = atan(vSdW.x, vSdW.z) * ' + f(400 / S.dip[3]) + '; float gFi = floor(gFu); gSy += mix(sin((gFi - 1.0) * 2.399 + 0.7), sin(gFi * 2.399 + 0.7), smoothstep(0.0, ' + f(6 / S.dip[3]) + ', gFu - gFi)) * ' + f(S.dip[4] || 0) + '; }' : '') : '',   /* M19 regional dip + fold + FAULT BLOCKS (the beds step at a fault every ~dip[3] m of ring; ridgeSculpt.bedY mirrors it exactly) */
     'float gDist = length(cameraPosition - vSdW); float gNear = 1.0 - smoothstep(' + f(S.lod[0]) + ', ' + f(S.lod[1]) + ', gDist);',
-    'float gWarp = geoFbm(vSdW.xz * 0.012) * 7.0 + geoFbm(vec2(gUV.x * 0.03, vSdW.y * 0.01)) * 2.0;',
-    'float gYM = (vSdW.y + gWarp) / ' + f(MAJ) + '; float gBM = floor(gYM), gFM = fract(gYM); float gHM = sdHash(vec2(gBM, 7.3)); float gPx = max(fwidth(gYM) * ' + f(MAJ) + ', 1e-3);',   /* metres per pixel up the face */
+    'float gWarp = geoFbm(vSdW.xz * 0.012) * ' + (S.dip ? '3.0' : '7.0') + ' + geoFbm(vec2(gUV.x * 0.03, vSdW.y * 0.01)) * 2.0;',
+    'float gYM = (' + SY + ' + gWarp) / ' + f(MAJ) + '; float gBM = floor(gYM), gFM = fract(gYM); float gHM = sdHash(vec2(gBM, 7.3)); float gPx = max(fwidth(gYM) * ' + f(MAJ) + ', 1e-3);',   /* metres per pixel up the face */
     'float gTop = (1.0 - gFM) * ' + f(MAJ) + ', gBot = gFM * ' + f(MAJ) + '; float gLk = clamp(0.9 / gPx, 0.0, 1.0);',
     'float gLip = step(' + f(1 - S.ledge) + ', gHM) * (1.0 - smoothstep(0.0, 0.9, gBot)) * gLk;',   /* this bed juts out over a ledge boundary at its base: a rounded, lit lip */
     'float gUnder = step(' + f(1 - S.ledge) + ', sdHash(vec2(gBM + 1.0, 7.3))) * (1.0 - smoothstep(0.0, 1.8, gTop)) * gLk;',   /* ... and the bed below it sits in the undercut shadow */
-    'float gYm = (vSdW.y + gWarp) / ' + f(S.strata) + '; float gBm = floor(gYm), gFm = fract(gYm); float gHm = sdHash(vec2(gBm, 2.9));',
+    'float gYm = (' + SY + ' + gWarp) / ' + f(S.strata) + '; float gBm = floor(gYm), gFm = fract(gYm); float gHm = sdHash(vec2(gBm, 2.9));',
     'float gFw = fwidth(gYm); float gBedW = max(0.035, gFw * 1.5); float gBed = (1.0 - smoothstep(0.0, gBedW, min(gFm, 1.0 - gFm))) * clamp(0.035 / gBedW, 0.0, 1.0);',   /* footprint AA: a bedding line thinner than a pixel fades instead of aliasing */
     'float gRw = max(0.15, gPx * 1.5); float gH = gLip * smoothstep(0.0, gRw, gBot) * 0.55 - gUnder * smoothstep(0.0, gRw, gTop) * 0.7;',   /* the height meets 0 at the ledge boundary (a hard step there made the derivative bump sparkle in dotted lines) */
     'float gTone = 1.0 + (gHM - 0.5) * 0.26 + (gHm - 0.5) * 0.08 - gBed * 0.2 + gLip * 0.12 - gUnder * 0.36;',
+    S.soft ? 'gTone = mix(gTone, 1.0 + (gHM - 0.5) * 0.26 + (gHm - 0.5) * 0.08, ' + f(S.soft) + ');' : '',   /* M19 soft: distant rock keeps its bed zoning but drops the thin bedding / lip lines (they aliased into stacked-paper stripes) */
+    S.dip ? '{ float gLy = (gSy + gWarp) / ' + f(MAJ * 3) + ', gLi = floor(gLy), gLf = fract(gLy); float gL0 = sdHash(vec2(gLi, 5.1)), gL1 = sdHash(vec2(gLi + 1.0, 5.1)); gTone *= 1.0 + (mix(gL0, gL1, smoothstep(0.82, 1.0, gLf)) - 0.5) * 0.3; }' : '',   /* M19 LITHOLOGY: every ~25 m package of beds its own shade (paler limestone / darker shale), dipping and faulted with the beds, so the strata read continuously from a distance */
     'float gRough = 1.0 + (sdHash(vec2(gBm, 2.1)) - 0.5) * 0.2 - gLip * 0.08;'];
   if (!LOW) body.push(
     'float gJx = (gUV.x + (geoN(vec2(gUV.x * 0.15, gBm * 1.7)) - 0.5) * 2.2) / ' + f(S.joint) + ' + sdHash(vec2(gBm, 1.3)) * 7.0; float gJd = min(fract(gJx), 1.0 - fract(gJx)) * ' + f(S.joint) + ';',
@@ -254,7 +275,7 @@ export function applyGeology(THREE, mat, spec) {
     'vec2 gV = geoVor(vec2(gUV.x * 0.05, vSdW.y * 0.009) + gWarp * 0.01); float gCd = gV.y - gV.x; float gCw = max(0.05, fwidth(gCd) * 1.5); float gCrack = (1.0 - smoothstep(0.0, gCw, gCd)) * clamp(0.05 / gCw, 0.0, 1.0) * smoothstep(0.42, 0.62, geoN(vec2(gUV.x * 0.021, vSdW.y * 0.006) + 5.3)) * ' + f(S.fracture) + ';',   /* sparse master fractures: long, near-vertical */
     'float gCl = geoN(vec2(gUV.x * 0.028, 3.7)) * 0.7 + geoN(vec2(gUV.x * 0.07, vSdW.y * 0.004)) * 0.3; float gCleft = pow(smoothstep(0.55, 0.95, gCl), 2.0) * ' + f(S.cleft) + ';',
     'float gGrain = (geoN(gUV * 1.1) * 0.6 + geoN(gUV * 3.3) * 0.4 - 0.5) * gNear;',
-    'gH += -gCleft * 1.6 + gGrain * 0.35; gTone *= (1.0 - gJoint * 0.34) * (1.0 - gCrack * 0.38) * (1.0 - gCleft * 0.42) * (1.0 + gGrain * ' + f(S.grain * 2) + '); gRough *= 1.0 + gJoint * 0.12 + gCrack * 0.12 + gCleft * 0.08 + gGrain * 0.1;');
+    'gH += -gCleft * 1.6 + gGrain * 0.35; gTone *= (1.0 - gJoint * ' + (S.soft ? f(0.34 * (1 - S.soft)) : '0.34') + ') * (1.0 - gCrack * ' + (S.soft ? f(0.38 * (1 - S.soft)) : '0.38') + ') * (1.0 - gCleft * 0.42) * (1.0 + gGrain * ' + f(S.grain * 2) + '); gRough *= 1.0 + gJoint * 0.12 + gCrack * 0.12 + gCleft * 0.08 + gGrain * 0.1;');
   body.push('float gMacro = geoFbm(vSdW.xz * 0.004 + vec2(vSdW.y * 0.002)) - 0.5; gTone *= 1.0 + gMacro * ' + f(S.macro * 2) + ';');
   /* M9 MACRO RELIEF (spec.relief = [amplitude m, width m]): the rock MASS — fall-line gullies and buttress ribs 10–40 m across, stretched down
      the slope and ridged, entering the bump at mountain distances (they are what a large face shows from the plaza). With smooth-shaded
@@ -263,19 +284,36 @@ export function applyGeology(THREE, mat, spec) {
   if (S.relief) body.push('vec2 gRp = vec2((' + RU + ') / ' + f(S.relief[1]) + ', vSdW.y / ' + f(S.relief[1] * 2.6) + ') + vec2(gWarp * 0.02, 0.0); float gRn = geoFbm(gRp); float gRr = 1.0 - abs(2.0 * geoFbm(gRp * vec2(1.7, 0.8) + 3.1) - 1.0);',
     'float gRelief = (gRn * 0.55 + gRr * 0.45 - 0.5) * ' + f(S.relief[0]) + '; gTone *= 1.0 + (gRn - 0.5) * 0.34 + (gRr - 0.5) * 0.12;');
   else body.push('float gRelief = 0.0;');
-  if (S.snowY < 1e4) body.push('float gUp = gAn.y; float gSnow = smoothstep(0.55, 0.8, gUp + gLip * 0.25) * smoothstep(' + f(S.snowY - 18) + ', ' + f(S.snowY + 14) + ', vSdW.y + (geoFbm(vSdW.xz * 0.02) - 0.5) * 36.0);');
+  /* M19 second relief order: SPURS and COULOIRS (40–90 m) — ridged, stretched down the fall line; gCou is the couloir channel (0..1) */
+  if (S.relief3) body.push('vec2 gRq = vec2((' + RU + ') / ' + f(S.relief3[1]) + ', ' + SY + ' / ' + f(S.relief3[1] * 3.4) + ') + vec2(gWarp * 0.01, 0.0); float gSp = 1.0 - abs(2.0 * geoFbm(gRq + 11.3) - 1.0); float gCou = smoothstep(0.78, 0.97, gSp);',   /* a ridged fbm sits near 1 only along thin lines: those are the couloir channels (≈ 20 % of the face) */
+    'float gRel3 = (0.3 - gCou) * ' + f(S.relief3[0]) + ' + (geoFbm(gRq * vec2(0.5, 0.7) + 4.2) - 0.5) * ' + f(S.relief3[0] * 0.8) + '; gRelief += gRel3; gTone *= 1.0 - 0.16 * gCou + (geoFbm(gRq * vec2(0.5, 0.7) + 4.2) - 0.5) * 0.12;');
+  if (S.cavity && S.relief) body.push('float gCav = clamp(-gRelief / ' + f(S.relief[0] + (S.relief3 ? S.relief3[0] : 0)) + ' * 2.4, 0.0, 1.0), gRib = clamp(gRelief / ' + f(S.relief[0] + (S.relief3 ? S.relief3[0] : 0)) + ' * 2.4, 0.0, 1.0); gTone *= (1.0 - ' + f(S.cavity) + ' * gCav) * (1.0 + ' + f(S.cavity * 0.45) + ' * gRib);');
+  if (S.varnish && !LOW) body.push('float gVn = geoN(vec2(gUV.x * 0.42, ' + SY + ' * 0.011 + gBM * 0.37)); float gVar = smoothstep(0.6, 0.84, gVn) * (0.35 + 0.65 * smoothstep(0.0, 0.5, gFM)) * ' + f(S.varnish) + '; gTone *= 1.0 - 0.3 * gVar; gRough *= 1.0 - 0.34 * gVar;');   /* streaks run down from each major bed's top: dark, a little glossy */
+  if (S.talus) body.push('float gTal = 1.0 - smoothstep(' + f(S.talus[0]) + ', ' + f(S.talus[1]) + ', vSdW.y + (geoFbm(vec2(gUV.x * 0.05, 1.7)) - 0.5) * ' + f((S.talus[1] - S.talus[0]) * 1.1) + ');',
+    'float gScree = geoN(gUV * 2.3) * 0.5 + geoN(gUV * 6.1) * 0.3 + step(0.9, sdHash(floor(gUV * 1.7))) * 0.25; gTone = mix(gTone, 1.08 + (gScree - 0.5) * 0.3, gTal); gRough = mix(gRough, 1.12, gTal); gH *= 1.0 - gTal; gRelief *= 1.0 - 0.7 * gTal;');   /* the apron loses its beds and joints: loose, paler, matte */
+  if (S.snowY < 1e4 && AL) body.push('float gUp = gAn.y; float gAlt = smoothstep(' + f(S.snowY - 18) + ', ' + f(S.snowY + 14) + ', vSdW.y + (geoFbm(vSdW.xz * 0.02) - 0.5) * 36.0); float gSnow = smoothstep(0.55, 0.8, gUp + gLip * 0.25) * gAlt;');
+  else if (S.snowY < 1e4) body.push('float gUp = gAn.y; float gSnow = smoothstep(0.55, 0.8, gUp + gLip * 0.25) * smoothstep(' + f(S.snowY - 18) + ', ' + f(S.snowY + 14) + ', vSdW.y + (geoFbm(vSdW.xz * 0.02) - 0.5) * 36.0);');
   else body.push('float gSnow = 0.0;');
+  if (S.snowY < 1e4 && AL) body.push('{ float aLo = smoothstep(' + f(S.snowY * 0.55 - 20) + ', ' + f(S.snowY * 0.55 + 10) + ', vSdW.y + (geoFbm(vSdW.xz * 0.02 + 3.1) - 0.5) * 30.0);',   /* the ledges and relief benches hold snow lower than the open faces */
+    '  float aShelf = step(' + f(1 - S.ledge) + ', gHM) * (1.0 - smoothstep(0.0, max(1.4, gPx * 1.6), gTop)) * clamp(1.6 / gPx, 0.0, 1.0) * smoothstep(0.56, 0.8, geoN(vec2(gUV.x * 0.1, gBM * 1.37)) + (geoN(gUV * vec2(0.5, 0.9)) - 0.5) * 0.4);',   /* the top of a jutting bed: broken lips of snow along it (patches, never a painted line) */
+    LOW ? '  float aUp = gUp;' : '  vec3 aN = normalize(cross(dFdx(vSdW), dFdy(vSdW))); float aUp = geoBump(vSdW, aN, gRelief * (1.0 - smoothstep(700.0, 1500.0, gDist))).y; gTone *= 0.8 + 0.44 * clamp(aUp - aN.y + 0.45, 0.0, 1.0);',   /* snow reads the RELIEF: it settles where the bumped rock turns flatter (benches, spur tops), so its patches follow the form; the same bumped normal gives the relief its SKY LIGHT as value (faces tipped to the sky lighter, undercut faces darker), so the form reads on the shadow side too */
+    '  float aSn = smoothstep(0.58, 0.7, aUp + (geoN(gUV * vec2(0.22, 0.3)) - 0.5) * 0.16) * smoothstep(0.25, 0.55, geoN(gUV * vec2(0.07, 0.11) + 2.7));',
+    '  gSnow *= 0.15 + 0.85 * smoothstep(0.34, 0.6, geoN(vec2(gUV.x * 0.03, vSdW.y * 0.05)) + (geoN(gUV * 0.2) - 0.5) * 0.36);' + (S.cavity && S.relief ? ' gSnow *= 1.0 - 0.8 * gRib;' : ''),   /* wind-scoured summits: the snow cover breaks up and the rock ribs stand clear of it */
+    '  gSnow = max(gSnow, ' + f(AL) + ' * aLo * max(aShelf * 0.55, aSn * (0.55 + 0.45 * gAlt)));' + (S.talus ? ' gSnow *= 1.0 - gTal;' : '') + ' }');
   body.push('diffuseColor.rgb *= mix(gTone, 1.0, gSnow * 0.9);', 'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.9, 0.93, 0.97) * diffuse, gSnow * 0.88);');
   var frag = function (fs) {
     fs = fs.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + GEO_FUNCS).replace('#include <color_fragment>', body.join('\n'));
     if (lit) { fs = fs.replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(mix(roughnessFactor * gRough, 0.55, gSnow), 0.3, 1.0);');
       if (!LOW && S.bump > 0) fs = fs.replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nnormal = geoBump(-vViewPosition, normal, gH * ' + f(S.bump) + ' * (1.0 - smoothstep(' + f(S.bumpLod[0]) + ', ' + f(S.bumpLod[1]) + ', gDist)) + gRelief * (1.0 - smoothstep(700.0, 1500.0, gDist)));'); }
+    if (S.nightSnow && S.snowY < 1e4 && lit) fs = fs.replace('#include <common>', '#include <common>\nuniform float uGeoNightSnow;').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(0.62, 0.66, 0.74) * gSnow * uGeoNightSnow;');   /* M19 moonlit snow: at night the snow patches keep a faint cool glow, so the range reads by its snow as real mountains do under the Moon */
+    if (S.aerial) fs = fs.replace('#include <fog_fragment>', ['#ifdef USE_FOG', '#ifdef FOG_EXP2', '  float fogFactor = 1.0 - exp(- fogDensity * fogDensity * vFogDepth * vFogDepth);', '#else', '  float fogFactor = smoothstep(fogNear, fogFar, vFogDepth);', '#endif',
+      '  fogFactor *= mix(1.0, ' + f(S.aerial[2]) + ', smoothstep(' + f(S.aerial[0]) + ', ' + f(S.aerial[1]) + ', vSdW.y));', '  gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, fogFactor);', '#endif'].join('\n'));   /* M19 height-thinned haze */
     return fs; };
-  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-geo-' + [S.snowY < 1e4 ? Math.round(S.snowY) : 'x', S.strata, S.ledge, S.fracture, S.cleft, S.macro, S.grain, S.bump, lit ? 'L' : 'U', LOW ? 'lo' : 'hi', S.lod.join('x'), S.bumpLod.join('x'), MAJ, S.joint, S.relief ? 'r' + S.relief.join('x') + (S.reliefPolar ? 'p' + S.reliefPolar.join('x') : '') : 'r0', 'v2b'].join('_');
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-geo-' + [S.snowY < 1e4 ? Math.round(S.snowY) : 'x', S.strata, S.ledge, S.fracture, S.cleft, S.macro, S.grain, S.bump, lit ? 'L' : 'U', LOW ? 'lo' : 'hi', S.lod.join('x'), S.bumpLod.join('x'), MAJ, S.joint, S.relief ? 'r' + S.relief.join('x') + (S.reliefPolar ? 'p' + S.reliefPolar.join('x') : '') : 'r0', 'v2b'].join('_') + (S.dip || S.polarUV || AL || S.talus || S.cavity || S.varnish || S.relief3 || S.aerial || S.soft || S.nightSnow ? '_m19_' + JSON.stringify([S.dip, S.polarUV, AL, S.talus, S.cavity, S.varnish, S.relief3, S.aerial, S.soft, !!S.nightSnow]) : '');
   mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW; varying vec3 vSdN;').replace('#include <project_vertex>', ['#include <project_vertex>',
       '{ vec4 sdP = vec4(transformed, 1.0);', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; vSdN = vec3(0.0, 1.0, 0.0); }'].join('\n'));
-    sh.fragmentShader = frag(sh.fragmentShader); };
+    if (S.nightSnow) sh.uniforms.uGeoNightSnow = S.nightSnow; sh.fragmentShader = frag(sh.fragmentShader); };
   mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|' + key; };
   mat.userData.surfaceDetail = { kind: 'GEOLOGY', key: key }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
   return mat;
