@@ -704,6 +704,18 @@ export function createVeilFalls(ctx) {
     function litAt(x, z) { var L = 0; for (var i = 0; i < LAMP19.length; i += 3) { var d = Math.hypot(x - LAMP19[i], z - LAMP19[i + 2]); if (d < 4.2) { var f3 = 1 - d / 4.2; L += f3 * f3; } } return Math.min(1, L); }
     for (var pv = 0; pv < PV.p.length / 3; pv++) PV.a[pv * 4 + 3] = litAt(PV.p[pv * 3], PV.p[pv * 3 + 2]);
     var gLit = new Float32Array(gp.length / 3), topV = 1 + RING * SEG; for (var gv = 0; gv < topV; gv++) gLit[gv] = litAt(gp[gv * 3], gp[gv * 3 + 2]);
+    /* M20: no lawn through the paving (review: a hard dark patch on the HL1 path) — the paths are ribbons laid over the drawn meadow, and where
+       a meadow vertex bulges inside a paving triangle (the pad ramps bend between the ribbon's points) the lawn showed through, up to 13 cm.
+       The hidden meadow vertex under every near-level paving triangle now sinks 1.5 cm below the paving there (at most 20 cm; the paving
+       itself never moves, so it stays 0–12 cm over the meadow at its edges). */
+    (function () { var CS = 4, cell = {}, key, q, P = PV.p, I = PV.i, sunk = 0, worst = 0; for (q = 0; q < gp.length; q += 3) { key = Math.floor(gp[q] / CS) + ',' + Math.floor(gp[q + 2] / CS); (cell[key] = cell[key] || []).push(q); }
+      for (var t = 0; t < I.length; t += 3) { var ia = I[t] * 3, ib = I[t + 1] * 3, ic = I[t + 2] * 3, ax = P[ia], ay = P[ia + 1], az = P[ia + 2], ux = P[ib] - ax, uy = P[ib + 1] - ay, uz = P[ib + 2] - az, vx = P[ic] - ax, vy = P[ic + 1] - ay, vz = P[ic + 2] - az;
+        var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx, nl = Math.hypot(nx, ny, nz), det = ux * vz - uz * vx; if (nl < 1e-9 || Math.abs(ny) / nl < 0.8 || Math.abs(det) < 1e-9) continue;
+        var x0 = Math.floor(Math.min(ax, ax + ux, ax + vx) / CS), x1 = Math.floor(Math.max(ax, ax + ux, ax + vx) / CS), z0 = Math.floor(Math.min(az, az + uz, az + vz) / CS), z1 = Math.floor(Math.max(az, az + uz, az + vz) / CS);
+        for (var cx = x0; cx <= x1; cx++) for (var cz = z0; cz <= z1; cz++) { var L = cell[cx + ',' + cz]; if (!L) continue;
+          for (var m = 0; m < L.length; m++) { var g0 = L[m], px = gp[g0] - ax, pz = gp[g0 + 2] - az, s1 = (px * vz - pz * vx) / det, r1 = (ux * pz - uz * px) / det; if (s1 < 0.002 || r1 < 0.002 || s1 + r1 > 0.998) continue;
+            var d = gp[g0 + 1] + 0.015 - (ay + s1 * uy + r1 * vy); if (d > 0) { d = Math.min(d, 0.2); gp[g0 + 1] -= d; sunk++; worst = Math.max(worst, d); } } } }
+      h19.lawn_sunk = { vertices: sunk, worst_m: +worst.toFixed(3) }; })();
     hg.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3)); hg.setAttribute('color', new THREE.Float32BufferAttribute(gc, 3)); hg.setAttribute('aWet', new THREE.Float32BufferAttribute(gw, 1)); hg.setAttribute('aLit', new THREE.BufferAttribute(gLit, 1));
     hg.setIndex(gi); hg.clearGroups(); hg.addGroup(0, topCount, 0); hg.addGroup(topCount, gi.length - topCount, 1); hg.computeVertexNormals(); hg.computeBoundingSphere();
     if (WT.length) { var lwP = Array.from(lwG.attributes.position.array).concat(WT); lwG.setAttribute('position', new THREE.Float32BufferAttribute(lwP, 3)); lwG.computeVertexNormals(); lwG.computeBoundingSphere(); }
@@ -769,7 +781,24 @@ export function createVeilFalls(ctx) {
 
     merged(bodyP, keep(new THREE.MeshStandardMaterial({ color: 0xd9dde4, roughness: 0.38, metalness: 0.35, envMapIntensity: 0.6 })), 'VEIL_VILLAS');
     merged(darkP, keep(new THREE.MeshStandardMaterial({ color: 0x2e333d, roughness: 0.55, metalness: 0.4 })), 'VEIL_VILLA_ROOFS');
-    glassMat = keep(new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.08, metalness: 0.7, emissive: 0xfff1dc, emissiveIntensity: night ? 0.9 : 0.06, envMapIntensity: 1.0, side: THREE.DoubleSide })); merged(glassP, glassMat, 'VEIL_VILLA_GLASS');
+    glassMat = keep(new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.08, metalness: 0.7, emissive: 0xfff1dc, emissiveIntensity: night ? 0.9 : 0.06, envMapIntensity: 1.0, side: THREE.DoubleSide }));
+    /* M20 ROOMS BEHIND THE GLASS (review: at night every villa, the civic hall and the doors glowed as one flat cream sheet — a blank screen).
+       The vertical glass now reads as glazing onto rooms: a mullion / transom grid in world space (1.7 m bays, 2.9 m storeys) that frames it by
+       day, and at night a room per bay — most lit, each its own warmth, the rest dim rather than black — the light pooling mid-bay under the
+       ceiling, soft furniture shadow along the lower third. Level glass (the landing-pad ring, rail tops) keeps its plain glow. Shader only, no draw. */
+    glassMat.onBeforeCompile = function (sh) {
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vGw; varying vec3 vGn;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvGw = (modelMatrix * vec4(transformed, 1.0)).xyz; vGn = normalize(mat3(modelMatrix) * objectNormal);');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vGw; varying vec3 vGn;')
+        .replace('#include <color_fragment>', ['#include <color_fragment>',
+          'vec3 gn = normalize(vGn); float gV = 1.0 - smoothstep(0.55, 0.8, abs(gn.y)); vec3 gq = vGw / vec3(1.7, 2.9, 1.7), gc = floor(gq), gf = fract(gq);',
+          'float gmz = (1.0 - smoothstep(0.0, 0.035, min(gf.z, 1.0 - gf.z))) * abs(gn.x), gmx = (1.0 - smoothstep(0.0, 0.035, min(gf.x, 1.0 - gf.x))) * abs(gn.z), gtr = 1.0 - smoothstep(0.0, 0.03, min(gf.y, 1.0 - gf.y));',
+          'float gMull = clamp(max(max(gmz, gmx), gtr), 0.0, 1.0) * gV; diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.64, 0.68), gMull * 0.7);',
+          'float gH = fract(sin(dot(gc, vec3(12.9898, 78.233, 37.719))) * 43758.5453), gLit = smoothstep(0.36, 0.46, gH), gWarm = 0.5 + 0.5 * fract(gH * 7.13), gX = mix(gf.x, gf.z, abs(gn.x));',
+          'float gFurn = smoothstep(0.4, 0.5, fract(gH * 3.7 + gX * 1.4)) * (1.0 - smoothstep(0.16, 0.3, gf.y));',
+          'float gRoom = mix(0.45, 1.0, smoothstep(0.1, 0.9, gf.y)) * (1.0 - 0.35 * gFurn) * (0.72 + 0.28 * sin(3.14159 * gX)), gCard = mix(0.2, 1.0, gLit) * gWarm * gRoom;'].join('\n'))
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mix(1.0, gCard * (1.0 - 0.92 * gMull), gV);'); };
+    glassMat.customProgramCacheKey = function () { return 'veil_glass_rooms_m20'; };
+    merged(glassP, glassMat, 'VEIL_VILLA_GLASS');
 
     /* lantern light: soft neutral glows over the bollard heads (additive points, strong at night) */
     var lp = LAMP19.slice();   /* M19: the old loop lanterns floated free over the lawn (no path under them); the bollards on the walks and the lane carry the light now */
