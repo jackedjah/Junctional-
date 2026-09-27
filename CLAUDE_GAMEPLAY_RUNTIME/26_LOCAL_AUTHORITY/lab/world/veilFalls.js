@@ -77,7 +77,7 @@ export function veilCurtainKeep(stations, W) { var CU = W && W.curtain; if (!CU)
 
 export function createVeilFalls(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var group = null, own = [], night = !!ctx.night, clock = 0, info = {};
-  var bufV = new THREE.Vector2(); var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null;
+  var bufV = new THREE.Vector2(); var flMat = null, waterU = null, foamU = null, mistU = null, lampMat = null, glassMat = null, canopyMat = null, spireMat = null, padMat = null, litNightU = null, frontU = null, wetTU = null, bladeMat = null, lakeU = null;
   function tier() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   function rnd(seed) { return ctx.rnd ? ctx.rnd(seed) : (function (s) { return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; })(seed >>> 0); }
   function keep(o) { own.push(o); return o; }
@@ -271,7 +271,16 @@ export function createVeilFalls(ctx) {
       return fs + f2 <= 1 ? a0 + fs * (a1 - a0) + f2 * (b0 - a0) : b1 + (1 - fs) * (b0 - b1) + (1 - f2) * (a1 - b1); }
 
     /* the source lake + the channel to the lip (flush water on the meadow) */
-    var lakeG = keep(new THREE.CircleGeometry(1, 40)); lakeG.rotateX(-Math.PI / 2); var lakeM = keep(new THREE.MeshStandardMaterial({ color: 0x34506e, roughness: 0.06, metalness: 0.75, envMapIntensity: 0.8, transparent: true, opacity: 0.94 }));
+    var lakeG = keep(new THREE.CircleGeometry(1, 40)); lakeG.rotateX(-Math.PI / 2); var lakeM = keep(new THREE.MeshStandardMaterial({ color: 0x3e4b5d, roughness: 0.05, metalness: 0.72, envMapIntensity: 0.9, transparent: true, opacity: 0.94 }));
+    /* M19 water realism: the basin was a flat navy disc from above (a hole in the district). A steel tone, and slow wind ripples in world space —
+       two drifting noise layers bend the normal, so the sky breaks up in the water; the rill's water runs (its ripples ride the flow speed) */
+    lakeU = { uTime: { value: 0 } }; lakeM.onBeforeCompile = function (sh) { sh.uniforms.uTime = lakeU.uTime;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vLkW;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvLkW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime; varying vec3 vLkW;\n' + NOISE).replace('#include <normal_fragment_maps>', ['#include <normal_fragment_maps>',
+        '{ vec2 q = vLkW.xz; float e = 0.35, t = uTime; float h0 = vfN(q * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN(q * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4;',
+        '  float hx = vfN((q + vec2(e, 0.0)) * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN((q + vec2(e, 0.0)) * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4, hz = vfN((q + vec2(0.0, e)) * 0.9 + vec2(t * 0.21, t * 0.13)) * 0.6 + vfN((q + vec2(0.0, e)) * 2.3 - vec2(t * 0.34, -t * 0.27)) * 0.4;',
+        '  float fade = 1.0 - smoothstep(40.0, 160.0, length(cameraPosition - vLkW)); vec3 wn = normalize(vec3(-(hx - h0) / e * 0.15 * fade, 1.0, -(hz - h0) / e * 0.15 * fade)); normal = normalize(mix(normal, (viewMatrix * vec4(wn, 0.0)).xyz, 0.85)); }'].join('\n')); };
+    lakeM.customProgramCacheKey = function () { return 'veil_lake_m19'; };
     lakeG.scale(12, 1, 8); lakeG.rotateY(Math.atan2(ox, oz)); lakeG.translate(lakeC.x + ox * 6, TOP + 0.25, lakeC.z + oz * 6);
     /* M19: the channel to the lip is no longer a still mirror plane — its bed is wet dark stone (the paving draw, M19 block) and the water running
        down it is the curtain's own flowing sheet (the curtain's brink rows): shallow fast water over stone, whitening at the brink */
@@ -642,7 +651,7 @@ export function createVeilFalls(ctx) {
     ctx.veilFalls = { lip: { x: lip.x, y: yTop, z: lip.z }, base: { x: baseX, z: baseZ }, highland: { x: CX, z: CZ, top_y: TOP }, reachable: false };
     log('veilFalls: curtain stations ' + LINES[0].k + '–' + LINES[NS].k + ' (' + NR + '×' + NC + ', chord ' + CH.toFixed(0) + ' m), lip ' + yTop.toFixed(1) + ' m → ' + yBot + ' m, highland top ' + TOP + ' m, homes ' + info.homes + ' + civic pavilion, overlooks ' + info.overlooks + ', garden shrubs ' + info.garden_shrubs + ', trees ' + info.trees + ', lanterns ' + info.lanterns + ' (not reachable until the runtime bridge)');
   }
-  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (frontU) frontU.uTime.value = clock; if (wetTU) wetTU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
+  function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (frontU) frontU.uTime.value = clock; if (wetTU) wetTU.uTime.value = clock; if (lakeU) lakeU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
   function setNight(n) { night = !!n; if (litNightU) litNightU.value = night ? 1 : 0; if (waterU) waterU.uNight.value = night ? 1 : 0; if (frontU) frontU.uNight.value = night ? 1 : 0; if (wetTU) wetTU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
     if (glassMat) glassMat.emissiveIntensity = night ? 0.9 : 0.06; if (canopyMat) canopyMat.emissiveIntensity = night ? 0.35 : 0.08; if (bladeMat) bladeMat.emissiveIntensity = night ? 0.1 : 0.04; if (spireMat) spireMat.emissiveIntensity = night ? 0.9 : 0.22; if (lampMat) lampMat.opacity = night ? 0.95 : 0.25; if (flMat) flMat.emissiveIntensity = night ? 1.0 : 0.2; }
   function dispose() { if (group && group.parent) group.parent.remove(group); own.forEach(function (o) { try { o.dispose(); } catch (e) { } }); own = []; group = null; }
