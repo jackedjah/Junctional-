@@ -260,7 +260,36 @@ export function createVeilFalls(ctx) {
         shrubs.push({ x: gx, y: TOP + roll(gx, gz) + s * 1.1, z: gz, s: s, yaw: rv() * 3, c: SHRUB[Math.floor(rv() * SHRUB.length)] }); }
       var sl = side(yaw, (W0 / 2 + 1.0) * (H.lz > 0 ? -1 : 1)), door = { x: H.x + sl[0], z: H.z + sl[1] }, ln = W3(laneX(H.lz), H.lz); strip(bodyP, ln, door, 2.0, 0.06);   /* a path from the lane round the side of the house */
       taken.push({ x: H.x, z: H.z, r: 11 }); });
-    info.homes = RES.homes.length; info.home_slots = RES.homes.map(function (H) { return H.lz; });
+    /* M18 HUMAN SCALE (owner 2026-09-27: "waterfall + elevated suburban district", Xenosaga-inspired human-scale futurism, character-world
+       coherence): the things a person reads a home by — a lit entrance door under a small canopy where the side path arrives, a glass
+       balcony on the cantilevered view side, a front terrace with a table and two chairs inside the garden wall; benches along the lantern
+       lane; a ring of benches round the civic pavilion. All of it joins the existing villa draws (platinum / graphite / lit glass). */
+    function slab(list, w, h, d, x, y, z, yaw) { var g = new THREE.BoxGeometry(w, h, d); g.rotateY(yaw); g.translate(x, y, z); list.push(g); }   /* small parts: a plain box (a filleted one would only add triangles at this size) */
+    function bench(x, z, yaw, dy) { var y = TOP + roll(x, z) + (dy || 0), b = fwd(yaw, -0.22); slab(bodyP, 1.9, 0.1, 0.5, x, y + 0.46, z, yaw); slab(bodyP, 1.9, 0.42, 0.08, x + b[0], y + 0.78, z + b[1], yaw); [-0.75, 0.75].forEach(function (o) { var s3 = side(yaw, o); slab(darkP, 0.12, 0.42, 0.44, x + s3[0], y + 0.21, z + s3[1], yaw); }); }   /* a seat, a low back, two graphite legs */
+    var human = { doors: 0, balconies: 0, terraces: 0, benches: 0 };
+    RES.homes.forEach(function (H) { var yaw = H.yaw, W0 = H.W, D0 = 7.2, cant = 1.8, y0 = TOP + roll(H.x, H.z), sd = H.lz > 0 ? -1 : 1, so = side(yaw, sd);
+      /* the entrance: a lit glass door at the side end of the glass ground floor, a platinum frame, a small lens canopy over it */
+      var dr = side(yaw, sd * ((W0 - 1.5) / 2 + 0.06)), dx = H.x + dr[0], dz = H.z + dr[1];
+      slab(glassP, 0.1, 2.3, 1.15, dx, y0 + 0.65 + 1.15, dz, yaw); [-0.66, 0.66].forEach(function (o) { var f3 = fwd(yaw, o); slab(bodyP, 0.16, 2.5, 0.12, dx + f3[0], y0 + 0.65 + 1.25, dz + f3[1], yaw); });
+      lensAt(bodyP, 1.3, 1.5, 0.28, 0.12, dx + so[0] * 0.9, y0 + 0.65 + 2.75, dz + so[1] * 0.9, yaw); human.doors++; if (!human.door_at) human.door_at = [+dx.toFixed(1), +y0.toFixed(1), +dz.toFixed(1), +so[0].toFixed(3), +so[1].toFixed(3)];
+      /* the balcony: a slab and a glass balustrade with a platinum top rail along the view side of the cantilevered upper floor */
+      var yb = y0 + 0.65 + 3.3, fb = fwd(yaw, cant + D0 / 2 + 0.65), fr = fwd(yaw, cant + D0 / 2 + 1.28);
+      slab(bodyP, W0 - 1.2, 0.18, 1.4, H.x + fb[0], yb - 0.05, H.z + fb[1], yaw); slab(bodyP, W0 - 1.1, 0.07, 0.1, H.x + fr[0], yb + 1.03, H.z + fr[1], yaw); slab(bodyP, W0 - 1.1, 0.04, 0.05, H.x + fr[0], yb + 0.55, H.z + fr[1], yaw);   /* a light railing, not a wall: top rail, mid rail … */
+      for (var rp = 0, nrp = Math.round((W0 - 1.2) / 0.85); rp <= nrp; rp++) { var rs = side(yaw, -(W0 - 1.2) / 2 + rp * (W0 - 1.2) / nrp); slab(darkP, 0.045, 0.98, 0.045, H.x + fr[0] + rs[0], yb + 0.52, H.z + fr[1] + rs[1], yaw); }   /* … and slim graphite posts every ~0.85 m */
+      human.balconies++;
+      /* the front terrace inside the garden wall: a round stone disc, a round table, two chairs facing the view */
+      var ft = fwd(yaw, 6.3), tx0 = H.x + ft[0], tz0 = H.z + ft[1], ty = TOP + roll(tx0, tz0), tg = new THREE.CylinderGeometry(2.3, 2.4, 0.14, SEGR); tg.translate(tx0, ty + 0.03, tz0); bodyP.push(tg);
+      if (VT !== 'LOW') { var tb = new THREE.CylinderGeometry(0.45, 0.45, 0.05, 14); tb.translate(tx0, ty + 0.74, tz0); bodyP.push(tb); var tl = new THREE.CylinderGeometry(0.05, 0.07, 0.7, 6); tl.translate(tx0, ty + 0.39, tz0); darkP.push(tl);
+        [-1, 1].forEach(function (k) { var cs = side(yaw, k * 0.95), cb = fwd(yaw, -0.25), cx = tx0 + cs[0], cz = tz0 + cs[1]; slab(bodyP, 0.5, 0.08, 0.5, cx, ty + 0.46, cz, yaw); slab(bodyP, 0.5, 0.45, 0.07, cx + cb[0], ty + 0.72, cz + cb[1], yaw); slab(darkP, 0.4, 0.42, 0.4, cx, ty + 0.21, cz, yaw); }); }
+      human.terraces++; });
+    /* benches along the lantern lane, alternating sides, clear of the home paths and the pavilion */
+    for (var bl = -54, bk = 0; bl <= 54; bl += 13, bk++) { var bs = bk % 2 ? 1 : -1, dlb = laneX(bl + 0.5) - laneX(bl - 0.5), nlb = Math.hypot(1, dlb), BP = L2W(laneX(bl) + bs * 3.3 / nlb, bl - bs * 3.3 * dlb / nlb);
+      if (Math.hypot(BP.x - civ.x, BP.z - civ.z) < 18 || RES.homes.some(function (H) { return Math.abs(H.lz - bl) < 5; })) continue;
+      var lp2 = L2W(laneX(bl), bl); bench(BP.x, BP.z, Math.atan2(lp2.x - BP.x, lp2.z - BP.z)); human.benches++; }
+    /* the civic pavilion's ring of benches between the columns and the plaza edge, facing in */
+    for (var pb = 0; pb < 8; pb++) { var pa = pb / 8 * Math.PI * 2 + 0.2 + Math.PI / 8, px2 = civ.x + Math.cos(pa) * 12.9, pz2 = civ.z + Math.sin(pa) * 12.9; bench(px2, pz2, Math.atan2(civ.x - px2, civ.z - pz2), civ.y + 0.27 - (TOP + roll(px2, pz2))); human.benches++; }   /* on the pavilion's raised plaza disc */
+    info.human_scale = human;
+    info.homes = RES.homes.length; info.home_slots = RES.homes.map(function (H) { return H.lz; }); info.home_at = RES.homes.map(function (H) { return [+H.x.toFixed(1), +(TOP + roll(H.x, H.z)).toFixed(1), +H.z.toFixed(1), +H.yaw.toFixed(3)]; }); info.civic_at = [+civ.x.toFixed(1), +civ.y.toFixed(1), +civ.z.toFixed(1)]; info.face = +face.toFixed(3);   /* dev: where the district stands (evidence cameras) */
     /* the overlooks: two crescent terraces on the field-facing rim either side of the falls (clear of the arcades), rails lit at night */
     RES.looks.forEach(function (O) { var y = TOP + roll(O.x, O.z), deck = new THREE.CylinderGeometry(8.5, 8.8, 0.45, SEGR * 2, 1, false, -0.95, 1.9); deck.rotateY(O.yaw); deck.translate(O.x, y + 0.12, O.z); bodyP.push(deck);
       arcAt(glassP, 8.3, 0.07, 1.9, O.x, y + 1.15, O.z, O.yaw); arcAt(bodyP, 8.3, 0.11, 1.9, O.x, y + 0.55, O.z, O.yaw);   /* a lit rail over a white kerb */
