@@ -12,6 +12,7 @@
 import { celestialDirection } from './celestial.js';
 import { createAuraForms, createFloatingCrystals } from './auraForms.js';
 import { HALO_LAYOUT } from '../../play/haloLayout.js';
+import { createAmbientMagic } from './ambientMagic.js'; import { groundYAt } from './worldLayout.js'; import { combatZoneCircles } from './combatZones.js';   /* M20 ambient magic ecology: built and driven by this module (the aura language's living layer) */
 
 export var SPECTRAL = { violet: 0xb48cff, ice: 0x7fd0ff, white: 0xf4f6ff, gold: 0xffd88a, pink: 0xff9ad2 };
 export var CLASS_TINT = { gold: 0xe6c36a, blue: 0x5a8cf0, purple: 0x9a78e0, pink: 0xf08ab8, red: 0xd4344a, white: 0xf4f6ff };
@@ -120,7 +121,11 @@ export function createAura(ctx) {
      V21 / V33: a blue wire box in the sky); only the soft RINGS render (the HALO gyroscope, the Veil pair, the five hero crown rings), and
      they break into arcs. FRAME_MIN_Y is the one knob: frames centred above it would render again (Infinity = none). */
   var FRAME_MIN_Y = Infinity;
-  function curate(list) { return list.filter(function (f) { var sh = typeof f.shape === 'string' ? f.shape : ['RING', 'CUBE', 'HEX', 'DIAMOND', 'OCTA', 'ICOSA'][f.shape]; return sh === 'RING' || f.y >= FRAME_MIN_Y; }); }
+  /* M20 magic-ecology pass (owner: "a faint slowly turning arcane ring … high over a landmark, only if it reads as elegant, never a UI
+     circle"): a ring tilted round a hero crown gem (~14 m, V13 night: an orbit ellipse round the TITAN gem, an atom icon) is dropped too;
+     only the sky-scale rings stay (RING_MIN_M and up: the HALO gyroscope, the pair high over the Veil falls). */
+  var RING_MIN_M = 40;
+  function curate(list) { return list.filter(function (f) { var sh = typeof f.shape === 'string' ? f.shape : ['RING', 'CUBE', 'HEX', 'DIAMOND', 'OCTA', 'ICOSA'][f.shape]; return (sh === 'RING' && (f.size || 6) >= RING_MIN_M) || f.y >= FRAME_MIN_Y; }); }
   /* M19 AMBIENT LAW (owner 2026-09-27: "clearly non-interactable; sparse; stronger / firmer higher in space; faint near ground / humans; …
      no random pickup appearance"): a small figure turning a few metres over a crystal is exactly the look of a game pickup. Every local form
      under 4 m is lifted so its lowest point clears 12 m above its ground, grown to at least 3.6 m and slowed to a drift (≤ 0.03 rad/s); the
@@ -148,8 +153,22 @@ export function createAura(ctx) {
      with the plain class hex its rim pixels crossed into the PINK window (measured on the GR / GML gem cameras: rendered hue 346–349° and
      7–20 % PINK pixels → 349–351° and 0–6 %). */
   function skyCrystals(C) { var T = CRYSTAL_TINT; [[-30, 42, -8, 4.2, T.white], [-120, 64, 20, 5.5, T.purple], [140, 62, 150, 5.0, T.blue], [0, 56, 220, 5.6, T.gold], [-24, 38, 200, 2.2, T.gold], [-116, 52, 218, 5.4, T.red], [-96, 38, 234, 2.0, T.red], [0, 50, 282, 5.0, T.pink], [22, 37, 266, 2.0, T.pink]].forEach(function (a) { C.push({ x: a[0], y: a[1], z: a[2], size: a[3], tint: a[4], ground: 0, shape: 'CRYSTAL' }); }); }
-  var skyField = null, forms = null, skyFollowers = [], crystals = null, formsDropped = 0;
-  function build() { var req = ctx.auraRequests || [], sky = []; skyMoments(sky);
+  /* M20 AMBIENT MAGIC ECOLOGY (owner 2026-09-27, priority 7): the aura language's living layer — motes in the grove air and over the Veil
+     lanes, crystal pollen off the grove crowns, light-moths at night (ambientMagic.js). Built here, after every module has published its
+     data (the forest placement, the Veil's anchors). Duel courts and class houses are kept clear; the key light is the celestial direction
+     the light rig uses. One draw on HIGH / MED, none on LOW. */
+  function ambientOpts() { var reg = ctx.registry || {}, C = reg.celestial || {}, avoid = combatZoneCircles(reg, 4).map(function (c) { return { x: c.x, z: c.z, r: c.r }; });
+    (((reg.architecture && reg.architecture.class_houses) || [])).forEach(function (h) { avoid.push({ x: h.x, z: h.z, r: 12 }); });
+    return { ground: function (x, z) { return groundYAt(reg, x, z); }, avoid: avoid, key: function (n) { return celestialDirection(n ? C.moon : C.sun, n ? 'moon' : 'sun'); } }; }
+  var skyField = null, forms = null, skyFollowers = [], crystals = null, formsDropped = 0, ambient = null;
+  /* M20 RING CURATION (owner 2026-09-27: "remove … redundant aura … visually noisy effects"; the magic-ecology audit, V13 / V16 / FW1 at
+     night): a ring drawn round a crown gem, a spire tip or a lead monolith breaks into a circle of bright beads — a dotted UI loading ring
+     round the TITAN tower's gem, the gold temple's, the Veil spire's (a blue bokeh orb over the falls). Local requests keep their soft
+     bloom and fringes and lose the drawn ring; only a mist-bow (an upper arc in falling water's spray) keeps its arc, and the sky moments
+     (the 22° Sun halo, the lunar corona) keep theirs. The ambient ecology below carries the life the rings were standing in for. */
+  function curateRings(list) { return list.map(function (r) { if (r.follow || r.arc || !(r.ring > 0)) return r; ringsDropped++; return Object.assign({}, r, { ring: 0 }); }); }
+  var ringsDropped = 0;
+  function build() { var req = curateRings(ctx.auraRequests || []), sky = []; skyMoments(sky);
     var cl = (ctx.auraForms || []).filter(function (f) { return f.shape === 'CRYSTAL'; }); skyCrystals(cl);
     cl = cl.map(function (c) { return c.tint === CRYSTAL_TINT.red ? Object.assign({}, c, { tint: 0xd42c3a }) : c; });   /* M20 review: a LEAN gem is the deep class crimson (hue-held for the sky light, see above), never the pale crystal red (it read pink) */
     cl.forEach(function (c) { req.push({ x: c.x, y: c.y, z: c.z, size: c.size * 2.3, aspect: 1.25, ring: 0, tint: c.tint, spectral: 0.6, intensity: 0.2, pull: c.size, nightK: 1.9, phase: (c.x * 0.01) % 6 }); });   /* each crystal's soft bloom */
@@ -159,13 +178,14 @@ export function createAura(ctx) {
     [[req, field, followers], [sky, skyField, skyFollowers]].forEach(function (L) { if (L[1]) L[0].forEach(function (r, i) { if (typeof r.follow === 'function') L[2].push({ i: i, fn: r.follow, fade: r.fade || null, base: r.intensity === undefined ? 0.5 : r.intensity }); }); });
     var asked = (ctx.auraForms || []).filter(function (f) { return f.shape !== 'CRYSTAL'; }), fl = curate(ambientLaw(asked)), tq = tier(); formsDropped = asked.length - fl.length; if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; }); skyForms(fl);   /* LOW: every sky form, half the local ones (M19 review: thinned BEFORE the sky forms join, so the two small M19 sky figures both stay) */
     forms = createAuraForms(THREE, fl, { isNight: night, tier: tq, name: 'WORLD_AURA_FORMS', day: 0.5, night: 1.0 }); if (forms) ctx.group.add(forms.mesh);
+    try { ambient = createAmbientMagic(ctx, ambientOpts()); ambient.build(); } catch (e) { ambient = null; log('aura: ambient magic FAILED: ' + (e && e.message || e)); }
     log('aura: ' + req.length + ' spectral auras in one draw, ' + sky.length + ' sky moments in the backdrop, ' + (forms ? forms.count : 0) + ' dimensional forms in one draw (' + (followers.length + skyFollowers.length) + ' following)'); }
   function follow(f, list, t) { if (!f || !list.length) return; var P = f.positions, K = f.mesh.geometry.attributes.aK;
     for (var i = 0; i < list.length; i++) { var F = list[i], p = F.fn(t); if (p) { P.setXYZ(F.i, p[0], p[1], p[2]); } if (F.fade) K.setX(F.i, F.base * F.fade(t, night)); }
     P.needsUpdate = true; K.needsUpdate = true; }
-  function tick(dt, t) { if (field) field.tick(t); if (skyField) skyField.tick(t); if (forms) forms.tick(t); if (crystals) crystals.tick(t); follow(field, followers, t); follow(skyField, skyFollowers, t); }
-  function setNight(n) { night = !!n; if (field) field.setNight(night); if (skyField) skyField.setNight(night); if (forms) forms.setNight(night); if (crystals) crystals.setNight(night); }
-  function dispose() { [field, skyField, forms, crystals].forEach(function (f) { if (f) { if (f.mesh.parent) f.mesh.parent.remove(f.mesh); f.dispose(); } }); field = skyField = forms = crystals = null; followers = []; skyFollowers = []; }
-  function debug() { return { count: field ? field.count : 0, sky_moments: skyField ? skyField.count : 0, forms: forms ? forms.count : 0, forms_dropped: formsDropped, crystals: crystals ? crystals.count : 0, crystal_tris: crystals ? crystals.tris : 0, following: followers.length + skyFollowers.length }; }
+  function tick(dt, t) { if (field) field.tick(t); if (skyField) skyField.tick(t); if (forms) forms.tick(t); if (crystals) crystals.tick(t); if (ambient) ambient.tick(dt, t); follow(field, followers, t); follow(skyField, skyFollowers, t); }
+  function setNight(n) { night = !!n; if (field) field.setNight(night); if (skyField) skyField.setNight(night); if (forms) forms.setNight(night); if (crystals) crystals.setNight(night); if (ambient) ambient.setNight(night); }
+  function dispose() { [field, skyField, forms, crystals].forEach(function (f) { if (f) { if (f.mesh.parent) f.mesh.parent.remove(f.mesh); f.dispose(); } }); if (ambient) ambient.dispose(); field = skyField = forms = crystals = ambient = null; followers = []; skyFollowers = []; }
+  function debug() { return { count: field ? field.count : 0, sky_moments: skyField ? skyField.count : 0, forms: forms ? forms.count : 0, forms_dropped: formsDropped, rings_dropped: ringsDropped, crystals: crystals ? crystals.count : 0, crystal_tris: crystals ? crystals.tris : 0, following: followers.length + skyFollowers.length, ambient: ambient ? ambient.debug() : null }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
 }
