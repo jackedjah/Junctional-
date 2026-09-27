@@ -168,4 +168,59 @@ var s10 = {}, M20T = ['geoFacet', 'gWet', 'gRiv', 'gUV = vSdW.xz', 'gFq'];
 var ok10 = s10.HIGH.islandGround && s10.MED.islandGround && !s10.LOW.islandGround && s10.HIGH.farPolar && s10.MED.farPolar && !s10.LOW.farPolar && s10.HIGH.frisvad && s10.MED.frisvad && s10.LOW.lowClean && s10.MED.nearCost <= s10.HIGH.nearCost && s10.HIGH.wetNear && s10.MED.wetNear && !s10.LOW.wetNear && !s10.HIGH.wetMid;
 ok('10. continuous rock coordinates (islands on the ground plane, far ring on the bearing, Frisvad facet frame), LOW free of M20 terms, NEAR ridge MED ' + s10.MED.nearCost + ' ≤ HIGH ' + s10.HIGH.nearCost + ' (LOW ' + s10.LOW.nearCost + ')', ok10, s10);
 
+/* 12. M20 round 2 — the RIDGE CRAGS (lab/world/ridgeCrags.js: a crest cap and nose ribs, non-collision rock that changes the NEAR ridge's outline
+       where the collision face may not move) are host-safe on the REAL build: HIGH / MED one mesh on the NEAR ridge's own material (one draw, no
+       new program), LOW none (tier law); every vertex inside the reach square (max(|x|, |z|) < REACH_IN + 4) at least CRAG_MIN_Y ≥ 4.4 m up (rule
+       3.4 m + 1 m); over a pass (within its half-width) nothing under its floor + 3.4 m + 2 m (the routes); nothing over the Veil falls face (the
+       curtain's stations ± 3) or inside a keep circle × 2.2 + 30 m (the lead's falls); and the collision face under them stays bit-identical
+       (check 7 runs the same build). */
+var { createRidgeCrags, CRAG_MIN_Y } = await import('../26_LOCAL_AUTHORITY/lab/world/ridgeCrags.js'); var { ridgeKeep } = await import('../26_LOCAL_AUTHORITY/lab/world/macro.js');
+var s12 = {}, RN12 = R.macro.mountains[0], st12 = ridgeStations(RN12, 0), keep12 = ridgeKeep(R.macro, RN12, st12), VW12 = (R.macro.waterfalls || []).filter(function (w) { return w.style === 'VEIL'; })[0], TAU12 = Math.PI * 2;
+var vb12 = VW12 && VW12.curtain ? [st12[VW12.curtain.from - 3].b, st12[VW12.curtain.to + 3].b] : null;
+['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(), ctx = { THREE: THREE, group: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }; createMacro(ctx).build(); var C = createRidgeCrags(ctx); C.build();
+  var m = g.getObjectByName('RIDGE_CRAGS_RIDGE_NEAR'), rd = g.getObjectByName('MACRO_RIDGE_RIDGE_NEAR'), o = { mesh: !!m, sameMat: !!m && m.material === rd.material, draws: C.debug().draw_calls, verts: 0, minYIn: 1e9, inPass: 0, inVeil: 0, inKeep: 0 };
+  if (m) { var p = m.geometry.attributes.position; o.verts = p.count; for (var i = 0; i < p.count; i++) { var x = p.getX(i), y = p.getY(i), z = p.getZ(i), b = Math.atan2(x, z);
+    if (mn(x, z) < REACH_IN + 4) o.minYIn = Math.min(o.minYIn, y);
+    if ((RN12.passes || []).some(function (P) { var d = Math.abs(((b - P.bearing_rad) % TAU12 + TAU12 * 1.5) % TAU12 - Math.PI); return d < P.half_width_rad && y < P.floor_m + 3.4 + 2; })) o.inPass++;
+    var bb = (b + TAU12) % TAU12; if (vb12 && bb >= vb12[0] && bb <= vb12[1]) o.inVeil++;
+    if (keep12.some(function (K) { return Math.hypot(x - K.x, z - K.z) < K.r * 2.2 + 30; })) o.inKeep++; } }
+  s12[T] = o; });
+ok('12. ridge crags host-safe: HIGH ' + s12.HIGH.verts + ' / MED ' + s12.MED.verts + ' vertices on the ridge material (1 draw each), LOW none; min height inside the reach square ' + s12.HIGH.minYIn.toFixed(1) + ' / ' + s12.MED.minYIn.toFixed(1) + ' m (≥ ' + CRAG_MIN_Y + '); none low over a pass, over the Veil curtain or in a keep circle',
+  CRAG_MIN_Y >= 4.4 && ['HIGH', 'MED'].every(function (T) { var o = s12[T]; return o.mesh && o.sameMat && o.draws === 1 && o.verts > 1000 && o.minYIn >= CRAG_MIN_Y && o.inPass === 0 && o.inVeil === 0 && o.inKeep === 0; }) && !s12.LOW.mesh && s12.LOW.draws === 0 && !!vb12, s12);
+
+/* 13. M20 round 2 — close-range rock (review: rectangular panels with hard straight edges on the V27 / CL1 faces, pasted-on sheen, smooth plaster
+       with blurry blotches on CL2 / CL3): the NEAR / MID ridges read the ROCK DETAIL map (uGeoDet, a 256² tileable texture generated on the CPU —
+       no asset, no network — mip-mapped, repeating) on HIGH / MED and not on LOW; the hashed grain is gone from their shader; the HIGH-only second
+       fracture-plane order (the ≈ 10 × 6 m rectangular panels) is gone; and the MED NEAR-ridge fragment is back at or under the M19 MED ridge
+       (check 5's figure: round 1 had raised it ≈ 31 %), with MED still no heavier than HIGH. */
+var s13 = {};
+['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(); createMacro({ THREE: THREE, group: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }).build();
+  var mats = ['MACRO_RIDGE_RIDGE_NEAR', 'MACRO_RIDGE_RIDGE_MID'].map(function (n) { return g.getObjectByName(n).material; }), fsN = null, tex = null;
+  s13[T] = mats.map(function (mt) { var sh = { vertexShader: THREE.ShaderLib.standard.vertexShader, fragmentShader: THREE.ShaderLib.physical.fragmentShader, uniforms: {} }; mt.onBeforeCompile(sh, null); if (!fsN) fsN = sh.fragmentShader; if (sh.uniforms.uGeoDet) tex = sh.uniforms.uGeoDet.value;
+    var main = sh.fragmentShader.slice(sh.fragmentShader.indexOf('void main')); return { det: main.indexOf('texture2D(uGeoDet') >= 0, grain: main.indexOf('geoN(gUV * 1.1)') >= 0, facets: main.split('geoFacet(').length - 1 }; });
+  s13[T + '_cost'] = cost10(fsN.slice(fsN.indexOf('void main'))); s13[T + '_tex'] = tex ? { w: tex.image.width, h: tex.image.height, mip: tex.generateMipmaps, rep: tex.wrapS === THREE.RepeatWrapping && tex.wrapT === THREE.RepeatWrapping, data: tex.isDataTexture } : null; });
+var ok13 = ['HIGH', 'MED'].every(function (T) { return s13[T].every(function (r) { return r.det && !r.grain; }) && s13[T + '_tex'] && s13[T + '_tex'].w === 256 && s13[T + '_tex'].mip && s13[T + '_tex'].rep && s13[T + '_tex'].data; }) && s13.LOW.every(function (r) { return !r.det; }) && !s13.LOW_tex
+  && s13.HIGH.every(function (r) { return r.facets === 1; }) && s13.MED_cost <= c5.MED.hashEq && s13.MED_cost <= s13.HIGH_cost;
+ok('13. close-range rock: the detail map on the ridges (HIGH / MED, not LOW), no hashed grain, one fracture-plane order on HIGH (the rectangular panels gone), NEAR ridge MED ' + s13.MED_cost + ' ≤ the M19 MED ridge ' + c5.MED.hashEq + ' (HIGH ' + s13.HIGH_cost + ')', ok13, s13);
+
+/* 14. M20 round 2 — the island trees and relief (review: "in V11 the distant island reads as a flat dark slab with small dark-maroon clumps …
+       the reachable-islet canopies (LU) are primitive blobs"): on HIGH / MED the reachable islets keep their own close-range tree mesh
+       (ISLAND_TREES: exactly the islet trees, check 9's clearance) and every other island's trees are the light grove mesh (ISLAND_GROVES); LOW keeps
+       the M9 single mesh; every crown colour — the instance colour and the tip colour at its brightest channel — sits inside its class family's
+       hue window (colour law); and whatever the M20 knolls / outcrops raise stays outside the reach square (island land inside it ≤ 3.6 m, the M9
+       mound, away from the reachable islets — walkable ground themselves). */
+function hue14(c) { var mx = Math.max(c.r, c.g, c.b), mnn = Math.min(c.r, c.g, c.b), d = mx - mnn; if (d < 1e-6) return null; var h = mx === c.r ? ((c.g - c.b) / d) % 6 : mx === c.g ? (c.b - c.r) / d + 2 : (c.r - c.g) / d + 4; return (h * 60 + 360) % 360; }
+var WIN14 = { red: [[345, 360], [0, 12]], gold: [[36, 56]], blue: [[200, 245]], purple: [[246, 292]], pink: [[293, 344]] }, s14 = {};
+['HIGH', 'MED', 'LOW'].forEach(function (T) { var g = new THREE.Group(), C = createCoast({ THREE: THREE, group: g, scene: g, registry: R, quality: { tier: function () { return T; } }, log: function () { } }); C.build(); g.updateMatrixWorld(true);
+  var near = g.getObjectByName('ISLAND_TREES'), far = g.getObjectByName('ISLAND_GROVES'), m4 = new THREE.Matrix4(), c = new THREE.Color(), o = { near: near ? near.count : 0, far: far ? far.count : 0, isletTrees: 0, offHue: 0, landIn: -1e9 };
+  [near, far].forEach(function (M, mi) { if (!M) return; for (var i = 0; i < M.count; i++) { M.getMatrixAt(i, m4); var px = m4.elements[12], pz = m4.elements[14], IS = (R.coast.islands || []).filter(function (I) { return Math.hypot((px - I.x) / I.rx, (pz - I.z) / I.rz) < 1.3; }), I = IS[0];   /* ISLE_NE and ISLE_CROWN overlap: a tree may belong to either */
+    if (I && I.reachable && mi === 0) o.isletTrees++; if (!I || !M.instanceColor) continue; M.getColorAt(i, c); var mxc = Math.max(c.r, c.g, c.b), tip = new THREE.Color(c.r / mxc, c.g / mxc, c.b / mxc);
+    [c.clone(), tip].forEach(function (cc) { var h = hue14(cc.convertLinearToSRGB());   /* the hue as displayed (the instance colours are linear) */ if (h === null || !IS.some(function (J) { return (WIN14[J.family] || []).some(function (w) { return h >= w[0] && h <= w[1]; }); })) o.offHue++; }); } });
+  var lp = g.getObjectByName('ISLAND_LAND').geometry.attributes.position, isl14 = (R.coast.islands || []).filter(function (I) { return I.reachable; });
+  for (var v = 0; v < lp.count; v++) { var lx = lp.getX(v), lz = lp.getZ(v); if (mn(lx, lz) < RB11.half && !isl14.some(function (I) { return Math.hypot((lx - I.x) / I.rx, (lz - I.z) / I.rz) < 1.5; })) o.landIn = Math.max(o.landIn, lp.getY(v)); }   /* the reachable islets are walkable ground themselves (their M9 mound) */
+  s14[T] = o; });
+var nIslet14 = (R.coast.islands || []).filter(function (I) { return I.reachable; }).reduce(function (a, I) { return a + (I.trees || 0); }, 0), nAll14 = (R.coast.islands || []).reduce(function (a, I) { return a + (I.trees || 0); }, 0);
+ok('14. island trees: HIGH / MED ' + s14.HIGH.near + ' islet trees (close-range mesh) + ' + s14.HIGH.far + ' grove trees, LOW one M9 mesh (' + s14.LOW.near + '); crowns inside their class hue windows (off: ' + ['HIGH', 'MED', 'LOW'].map(function (T) { return s14[T].offHue; }).join(' / ') + '); island land inside the reach square ≤ ' + Math.max(s14.HIGH.landIn, s14.MED.landIn).toFixed(2) + ' m',
+  ['HIGH', 'MED'].every(function (T) { return s14[T].near === nIslet14 && s14[T].isletTrees === nIslet14 && s14[T].far === nAll14 - nIslet14; }) && s14.LOW.near === nAll14 && s14.LOW.far === 0 && ['HIGH', 'MED', 'LOW'].every(function (T) { return s14[T].offHue === 0 && s14[T].landIn <= 3.6; }), s14);
+
 console.log('RESULT world M19 mountains: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
