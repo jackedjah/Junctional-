@@ -31,7 +31,7 @@ var VERT = [
 ].join('\n');
 
 var FRAG = [
-  'uniform float uTime; uniform float uGlobal; uniform float uFringe; uniform float uNight;',
+  'uniform float uTime; uniform float uGlobal; uniform float uFringe; uniform float uNight; uniform float uRingK; uniform float uBreakMin;',
   'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec3 vX; varying float vNear;',
   'float auH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
   'float auN(float x) { float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(auH(vec2(i, 1.7)), auH(vec2(i + 1.0, 1.7)), f); }',
@@ -44,10 +44,10 @@ var FRAG = [
   'void main() { float r = length(vUv); if (r > 1.0) discard;',
   '  float ang = atan(vUv.y, vUv.x), ph = vK.z, t = uTime;',
   '  float bloom = pow(1.0 - r, 2.4) * (0.85 + 0.15 * sin(t * 0.7 + ph));',   /* soft core, a slow breath */
-  '  float ringR = vS.z, ringW = max(0.02, vK.w);',
-  '  float rr = (r - ringR) / ringW; float band = exp(-rr * rr * 1.4) * step(0.001, ringR);',
+  '  float ringR = vS.z, ringW = max(0.02, vK.w) * mix(1.0, 1.6, step(uRingK, 0.99));',   /* M20: a softened ring is 1.6x wider … */
+  '  float rr = (r - ringR) / ringW; float band = exp(-rr * rr * 1.4) * step(0.001, ringR) * uRingK;',   /* … and fainter: a haze of light round the emitter, not a drawn circle */
   '  float arc = vX.x > 0.5 ? smoothstep(-0.05, 0.45, vUv.y / max(r, 1e-3)) : 1.0;',   /* 1 = an upper arc only (a mist-bow), never a full UI circle */
-  '  float brk = mix(1.0, smoothstep(0.25, 0.85, auN(ang * 2.6 + ph * 3.0 + t * 0.04) * 0.7 + auN(ang * 7.0 - t * 0.07) * 0.3), vX.y);',   /* the ring breaks into soft arcs */
+  '  float brk = mix(1.0, smoothstep(0.25, 0.85, auN(ang * 2.6 + ph * 3.0 + t * 0.04) * 0.7 + auN(ang * 7.0 - t * 0.07) * 0.3), max(vX.y, uBreakMin));',   /* the ring breaks into soft arcs (M20: never less than uBreakMin — no closed UI circle anywhere) */
   '  float shimmer = 0.78 + 0.22 * sin(ang * 5.0 + t * 0.45 + ph) * sin(ang * 3.0 - t * 0.31 + ph * 1.7);',
   '  float viv = clamp(vK.y - 1.0, 0.0, 1.0), spk = min(vK.y, 1.0);',   /* spectral > 1: the vivid band (the Veil glory); ≤ 1: pearl-soft, unchanged */
   '  vec3 sp = mix(mix(spectral(rr * 0.22 + 0.5 + 0.04 * sin(t * 0.2 + ph)), vec3(1.0), 0.3), vivid(rr * 0.3 + 0.5), viv);',
@@ -61,7 +61,8 @@ var FRAG = [
    no ring), ringW (ring half-width as a fraction), tint (hex, the bloom colour), spectral (0..1 ring / fringe strength; 1..2 blends the ring toward the vivid prismatic band), intensity (day
    brightness, ~0.2–1), pull (m toward the camera), phase }]. Returns { mesh, uniforms, setNight(n), tick(t), count }. */
 /* extra per item: arc (1 = upper arc only), breakup (0..1, the ring dissolves into soft arcs; default 0.75), nightK (night brightness factor; default 1) */
-/* opts: isNight, tier, name, renderOrder, day / night (global levels), cull (true for a fixed field: frustum-cull it as one sphere) */
+/* opts: isNight, tier, name, renderOrder, day / night (global levels), cull (true for a fixed field: frustum-cull it as one sphere),
+   ringK (ring strength, default 0.55 — M20: rings are a soft haze; 1 = the old full-strength line), breakMin (the least ring breakup, default 0.85) */
 export function createAuraField(THREE, items, opts) {
   opts = opts || {}; var n = items.length; if (!n) return null;
   var base = new THREE.PlaneGeometry(2, 2); var g = new THREE.InstancedBufferGeometry(); g.index = base.index; g.setAttribute('position', base.attributes.position); g.instanceCount = n;
@@ -72,7 +73,7 @@ export function createAuraField(THREE, items, opts) {
     K[i * 4] = it.intensity === undefined ? 0.5 : it.intensity; K[i * 4 + 1] = it.spectral === undefined ? 0.6 : it.spectral; K[i * 4 + 2] = it.phase === undefined ? i * 1.37 : it.phase; K[i * 4 + 3] = it.ringW === undefined ? 0.06 : it.ringW; X[i * 3] = it.arc ? 1 : 0; X[i * 3 + 1] = it.breakup === undefined ? 0.75 : it.breakup; X[i * 3 + 2] = it.nightK === undefined ? 1 : it.nightK; });
   g.setAttribute('aP', new THREE.InstancedBufferAttribute(P, 3)); g.setAttribute('aS', new THREE.InstancedBufferAttribute(S, 4)); g.setAttribute('aC', new THREE.InstancedBufferAttribute(C, 3)); g.setAttribute('aK', new THREE.InstancedBufferAttribute(K, 4)); g.setAttribute('aX', new THREE.InstancedBufferAttribute(X, 3));
   var day = opts.day === undefined ? 0.55 : opts.day, nightK = opts.night === undefined ? 1.0 : opts.night;
-  var uniforms = { uTime: { value: 0 }, uGlobal: { value: opts.isNight ? nightK : day }, uFringe: { value: opts.tier === 'LOW' ? 0 : 1 }, uNight: { value: opts.isNight ? 1 : 0 } };
+  var uniforms = { uTime: { value: 0 }, uGlobal: { value: opts.isNight ? nightK : day }, uFringe: { value: opts.tier === 'LOW' ? 0 : 1 }, uNight: { value: opts.isNight ? 1 : 0 }, uRingK: { value: opts.ringK === undefined ? 0.55 : opts.ringK }, uBreakMin: { value: opts.breakMin === undefined ? 0.85 : opts.breakMin } };   /* M20: every field's rings are softened by default (the civic emblem and HALO fields included) */
   var mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uniforms, transparent: true, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending, toneMapped: false });
   var mesh = new THREE.Mesh(g, mat); mesh.frustumCulled = false;
   if (opts.cull) { var cx = 0, cy = 0, cz = 0, R = 0; items.forEach(function (it) { cx += it.x / n; cy += it.y / n; cz += it.z / n; });   /* a fixed local field (no followers) can be frustum-culled: one sphere round every quad at its full reach */
@@ -106,17 +107,20 @@ export function createAura(ctx) {
   /* M14 SKY FORMS: dimensional aura in the sky, far beyond anyone's reach — a gyroscope of two slow soft rings round the HALO dome, outside
      its shell (the rings' inner band edge clears the shell radius), and two great light frames far out over the sea. */
   function skyForms(F) { var H = HALO_LAYOUT, cy = H.arrival_height_m + 22, R = H.shell_radius_m + 32;
-    F.push({ x: H.center.x, y: cy, z: H.center.z, size: R * 2, shape: 'RING', scale: [1, 40, 1], tint: 0xffd88a, intensity: 0.34, ground: 0, axis: [0.22, 1, 0.1], spin: 0.012, phase: 0.1 });
-    F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: CRYSTAL_TINT.blue, intensity: 0.3, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });   /* M16: the HALO gyroscope is gold + TITAN blue (was gold + violet) — the shared hub is not VISIONARY's */
-    F.push({ x: -60, y: 205, z: -560, size: 110, shape: 'HEX', scale: [1, 0.35, 1], tint: CLASS_TINT.red, intensity: 0.22, ground: 0, axis: [0.3, 1, 0.2], spin: 0.02, phase: 0.35 });   /* M16: LEAN crimson far out over the southern sea (was ice); M19: the deep class crimson (the pale crystal tint read pink on the night sky) */
-    F.push({ x: 540, y: 250, z: 320, size: 80, shape: 'DIAMOND', tint: 0xff9ad2, intensity: 0.18, ground: 0, axis: [0.1, 1, 0.25], spin: 0.03, phase: 0.72 });
-    /* M19 (owner 2026-09-27: "rings, cubes, diamonds, hexagonal / polyhedral forms, other tasteful 3D magical figures … sparse; stronger /
-       firmer higher in space … class-color balance rather than defaulting to purple"): two new figures, both far above anyone — a tall
-       octahedron (the MAH MATCH diamond sigil in three dimensions) riding high over the hall and turning slowly through all five classes
-       (tint 0 = the five-class cycle: the match belongs to every class; its lowest point ~58 m up, clear of the 52 m crown tip) and a LEAN
-       crimson icosahedron over the north-west terraces (crimson had the fewest figures). Sparse: 25 → 27 figures world-wide. */
-    F.push({ x: 124, y: 74, z: 6, size: 12, shape: 'OCTA', scale: [1, 1.3, 1], tint: 0x000000, intensity: 0.4, ground: 0, axis: [0.08, 1, 0.05], spin: 0.02, phase: 0.43 });
-    F.push({ x: -128, y: 104, z: 236, size: 15, shape: 'ICOSA', tint: CLASS_TINT.red, intensity: 0.34, ground: 0, axis: [0.45, 1, 0.1], spin: 0.014, phase: 0.18 }); }
+    F.push({ x: H.center.x, y: cy, z: H.center.z, size: R * 2, shape: 'RING', scale: [1, 40, 1], tint: 0xffd88a, intensity: 0.26, ground: 0, axis: [0.22, 1, 0.1], spin: 0.012, phase: 0.1 });
+    F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: CRYSTAL_TINT.blue, intensity: 0.22, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });   /* M16: the HALO gyroscope is gold + TITAN blue (was gold + violet) — the shared hub is not VISIONARY's; M20: fainter (0.34 / 0.3 → 0.26 / 0.22), and the ring shader now breaks it into drifting arcs */
+    /* M20 (owner 2026-09-27: "remove … redundant aura … visually noisy effects"): the four free-standing sky figures are REMOVED — the 110 m
+       crimson hex frame over the southern sea (TS1 / V33: a pink wireframe box in the sky), the 80 m rose diamond far east (V04 night), the
+       MAH MATCH octahedron (MA: a white wire gem beside the Sun) and the crimson icosahedron over the north-west terraces. Each read as a UI
+       sticker pasted on the sky; the HALO gyroscope and the rings over the falls keep the dimensional language. 27 → 9 forms (curate below). */ }
+  /* M20 FORM CURATION: a polyhedral frame (cube / hex / diamond / octa / icosa) is a wire outline of hard edges and points — exactly the
+     "sharp objects and edges, even with the diamonds" the owner asked to lose — and low over a landmark it doubled the landmark's own crown,
+     ring and halo (the gold temple wore a crystal, a hex frame, a tilted ring and two spectral rings at once). Every frame request is
+     dropped here (the eight crown hex frames, the five cubes / diamonds over the region lead crystals, the Veil's hex frame over the falls —
+     V21 / V33: a blue wire box in the sky); only the soft RINGS render (the HALO gyroscope, the Veil pair, the five hero crown rings), and
+     they break into arcs. FRAME_MIN_Y is the one knob: frames centred above it would render again (Infinity = none). */
+  var FRAME_MIN_Y = Infinity;
+  function curate(list) { return list.filter(function (f) { var sh = typeof f.shape === 'string' ? f.shape : ['RING', 'CUBE', 'HEX', 'DIAMOND', 'OCTA', 'ICOSA'][f.shape]; return sh === 'RING' || f.y >= FRAME_MIN_Y; }); }
   /* M19 AMBIENT LAW (owner 2026-09-27: "clearly non-interactable; sparse; stronger / firmer higher in space; faint near ground / humans; …
      no random pickup appearance"): a small figure turning a few metres over a crystal is exactly the look of a game pickup. Every local form
      under 4 m is lifted so its lowest point clears 12 m above its ground, grown to at least 3.6 m and slowed to a drift (≤ 0.03 rad/s); the
@@ -132,16 +136,21 @@ export function createAura(ctx) {
      (≈ 5 % and 2 % of their district frames) while ATHLETE, LEAN and BAGE sat near 0.2–0.5 %. The warm sanctuaries get their own skyborne
      crowns — three crystals each over the gold temple, the crimson terraces and the rose market (34–52 m up, never a ground feature: no
      collider moves) — so every class has a luminous signature of its own. */
-  function skyCrystals(C) { var T = CRYSTAL_TINT; [[-30, 42, -8, 4.2, T.white], [58, 58, -40, 3.2, T.blue], [-120, 64, 20, 5.5, T.purple], [0, 70, 215, 4.8, T.gold], [140, 62, 150, 4.0, T.blue], [-150, 72, 240, 5.0, T.red], [-300, 150, -120, 14, T.pink], [300, 180, 60, 12, T.gold], [-26, 34, 196, 3.6, T.gold], [26, 36, 200, 3.2, T.gold], [0, 52, 222, 4.4, T.gold], [-132, 34, 196, 3.6, T.red], [-96, 38, 232, 3.2, T.red], [-116, 50, 218, 4.4, T.red], [-20, 34, 262, 3.4, T.pink], [20, 36, 266, 3.2, T.pink], [0, 48, 282, 4.4, T.pink]].forEach(function (a) { C.push({ x: a[0], y: a[1], z: a[2], size: a[3], tint: a[4], ground: 0, shape: 'CRYSTAL' }); }); }
-  var skyField = null, forms = null, skyFollowers = [], crystals = null;
+  /* M20 (owner 2026-09-27: "Keep crystals important. But remove excessive or repetitive crystal clutter. Each crystal should feel intentional
+     … scale variety"): 17 → 9 sky crystals. ONE hero gem per district (pearl over the shared plaza, VISIONARY purple, TITAN blue, and the
+     warm heroes a size up at 5–5.6 m) and, for the three warm classes that carry the least ground crystal, one small 2 m companion hanging
+     lower beside the hero — a deliberate pair, not a scattered trio. Removed: the three-crystal crowns (their tallest becomes the hero), the
+     second TITAN gem by MAH MATCH and the two 12–14 m gems far out over the coast (more of the same diamond at every horizon). */
+  function skyCrystals(C) { var T = CRYSTAL_TINT; [[-30, 42, -8, 4.2, T.white], [-120, 64, 20, 5.5, T.purple], [140, 62, 150, 5.0, T.blue], [0, 56, 220, 5.6, T.gold], [-24, 38, 200, 2.2, T.gold], [-116, 52, 218, 5.4, T.red], [-96, 38, 234, 2.0, T.red], [0, 50, 282, 5.0, T.pink], [22, 37, 266, 2.0, T.pink]].forEach(function (a) { C.push({ x: a[0], y: a[1], z: a[2], size: a[3], tint: a[4], ground: 0, shape: 'CRYSTAL' }); }); }
+  var skyField = null, forms = null, skyFollowers = [], crystals = null, formsDropped = 0;
   function build() { var req = ctx.auraRequests || [], sky = []; skyMoments(sky);
     var cl = (ctx.auraForms || []).filter(function (f) { return f.shape === 'CRYSTAL'; }); skyCrystals(cl);
     cl.forEach(function (c) { req.push({ x: c.x, y: c.y, z: c.z, size: c.size * 2.3, aspect: 1.25, ring: 0, tint: c.tint, spectral: 0.6, intensity: 0.2, pull: c.size, nightK: 1.9, phase: (c.x * 0.01) % 6 }); });   /* each crystal's soft bloom */
-    crystals = createFloatingCrystals(THREE, cl, { isNight: night, name: 'WORLD_FLOATING_CRYSTALS' }); if (crystals) ctx.group.add(crystals.mesh);
+    crystals = createFloatingCrystals(THREE, cl, { isNight: night, tier: tier(), name: 'WORLD_FLOATING_CRYSTALS' }); if (crystals) ctx.group.add(crystals.mesh);
     if (req.length) { field = createAuraField(THREE, req, { isNight: night, tier: tier(), name: 'WORLD_SPECTRAL_AURA' }); if (field) ctx.group.add(field.mesh); }
     if (sky.length) { skyField = createAuraField(THREE, sky, { isNight: night, tier: tier(), name: 'SKY_SPECTRAL_AURA', renderOrder: -7.5 }); if (skyField) { skyField.mesh.material.transparent = false; ctx.group.add(skyField.mesh); } }   /* the celestial backdrop pass: additive, no depth write, before the world */
     [[req, field, followers], [sky, skyField, skyFollowers]].forEach(function (L) { if (L[1]) L[0].forEach(function (r, i) { if (typeof r.follow === 'function') L[2].push({ i: i, fn: r.follow, fade: r.fade || null, base: r.intensity === undefined ? 0.5 : r.intensity }); }); });
-    var fl = ambientLaw((ctx.auraForms || []).filter(function (f) { return f.shape !== 'CRYSTAL'; })), tq = tier(); if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; }); skyForms(fl);   /* LOW: every sky form, half the local ones (M19 review: thinned BEFORE the sky forms join, so the two small M19 sky figures both stay) */
+    var asked = (ctx.auraForms || []).filter(function (f) { return f.shape !== 'CRYSTAL'; }), fl = curate(ambientLaw(asked)), tq = tier(); formsDropped = asked.length - fl.length; if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; }); skyForms(fl);   /* LOW: every sky form, half the local ones (M19 review: thinned BEFORE the sky forms join, so the two small M19 sky figures both stay) */
     forms = createAuraForms(THREE, fl, { isNight: night, tier: tq, name: 'WORLD_AURA_FORMS', day: 0.5, night: 1.0 }); if (forms) ctx.group.add(forms.mesh);
     log('aura: ' + req.length + ' spectral auras in one draw, ' + sky.length + ' sky moments in the backdrop, ' + (forms ? forms.count : 0) + ' dimensional forms in one draw (' + (followers.length + skyFollowers.length) + ' following)'); }
   function follow(f, list, t) { if (!f || !list.length) return; var P = f.positions, K = f.mesh.geometry.attributes.aK;
@@ -150,6 +159,6 @@ export function createAura(ctx) {
   function tick(dt, t) { if (field) field.tick(t); if (skyField) skyField.tick(t); if (forms) forms.tick(t); if (crystals) crystals.tick(t); follow(field, followers, t); follow(skyField, skyFollowers, t); }
   function setNight(n) { night = !!n; if (field) field.setNight(night); if (skyField) skyField.setNight(night); if (forms) forms.setNight(night); if (crystals) crystals.setNight(night); }
   function dispose() { [field, skyField, forms, crystals].forEach(function (f) { if (f) { if (f.mesh.parent) f.mesh.parent.remove(f.mesh); f.dispose(); } }); field = skyField = forms = crystals = null; followers = []; skyFollowers = []; }
-  function debug() { return { count: field ? field.count : 0, sky_moments: skyField ? skyField.count : 0, forms: forms ? forms.count : 0, crystals: crystals ? crystals.count : 0, following: followers.length + skyFollowers.length }; }
+  function debug() { return { count: field ? field.count : 0, sky_moments: skyField ? skyField.count : 0, forms: forms ? forms.count : 0, forms_dropped: formsDropped, crystals: crystals ? crystals.count : 0, crystal_tris: crystals ? crystals.tris : 0, following: followers.length + skyFollowers.length }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
 }

@@ -337,24 +337,44 @@ export function applyGeology(THREE, mat, spec) {
 /* M8C · CRYSTAL — the MAHWORLD crystal family (class shards, crowns, roof diamonds). A cut stone is not one flat value: each facet sits at
    its own angle to the light and the eye, the body looks deep face-on and bright at grazing (Fresnel), and faint internal fracture planes
    catch light inside it. Per-facet tone / roughness from the facet's world orientation (derivatives: flat-shaded and merged geometry work),
-   a face-on depth darkening with a bright grazing rim, and sparse inclusion planes. Value / roughness only — the class hue is untouched. */
+   a face-on depth darkening with a bright grazing rim, and sparse inclusion planes. Value / roughness only — the class hue is untouched.
+   M20 (owner 2026-09-27: "Each crystal should feel intentional. Improve: refraction illusion, facet differentiation, edge highlights, embedded
+   lighting, grounding … Try to remove sharp objects and edges, even with the diamonds. There should be more of a transition into the magic
+   power look"): every crystal gains a REFRACTION ILLUSION — a view-dependent inner light band from the view ray bent through the facet
+   (it slides across the stone as the eye moves, strongest face-on) — on HIGH / MED. spec.soft (geometry from auraForms.softCrystalGeometry,
+   carrying aCrys = tip / edge / base) adds the SOFT CRYSTAL: an EMBEDDED core light in the class colour (brightest looking into the thick
+   body), a class-coloured FRESNEL EDGE HIGHLIGHT easing to white only at the grazing rim, glowing rounded edges, TIPS that thin into the
+   class glow (alpha falls, emission rises — no razor point) and a silhouette that softens at grazing, plus CONTACT DARKENING where a ground
+   crystal enters the ground (aCrys.base). The class colour is scaled by its brightest channel (never clipped, never averaged with another
+   hue); spec.glow = { value } scales the light (callers raise it at night). */
 export function applyCrystal(THREE, mat, spec) {
   if (!mat || !mat.isMeshStandardMaterial || (PATCHED ? PATCHED.has(mat) : (mat.userData && mat.userData.surfaceDetail))) return mat;
-  var S = Object.assign({ facet: 0.34, depth: 0.3, rim: 0.4, veins: 0.12, tier: 'HIGH' }, spec || {}); var LOW = S.tier === 'LOW';
+  var S = Object.assign({ facet: 0.34, depth: 0.3, rim: 0.4, veins: 0.12, refract: 0.18, tier: 'HIGH', soft: false }, spec || {}); var LOW = S.tier === 'LOW', SOFT = !!S.soft, GLOW = S.glow || { value: 1 };
   var body = ['#include <color_fragment>',
     'vec3 cN = normalize(cross(dFdx(vSdW), dFdy(vSdW))); vec3 cV = normalize(cameraPosition - vSdW); float cFr = pow(1.0 - clamp(abs(dot(cN, cV)), 0.0, 1.0), 3.0);',
     'float cF = sdHash(floor(cN.xz * 5.0 + cN.y * 3.0) + 0.37);',   /* facet id from its orientation: every cut plane keeps its own value */
     'float cTone = (1.0 + (cF - 0.5) * ' + f(S.facet) + ') * (1.0 - ' + f(S.depth) + ' * (1.0 - cFr)) + cFr * ' + f(S.rim) + ';'];
   if (!LOW && S.veins > 0) body.push('float cVp = dot(vSdW, normalize(vec3(0.62, 1.0, 0.41))) * 1.7; float cVw = max(fwidth(cVp), 1e-3) * 1.5; float cVd = 0.5 - abs(fract(cVp) - 0.5); float cVein = (1.0 - smoothstep(0.0, cVw + 0.02, cVd)) * clamp(0.05 / (cVw + 0.03), 0.0, 1.0) * step(0.62, sdHash(vec2(floor(cVp + 0.5), 4.1))); cTone *= 1.0 + cVein * ' + f(S.veins) + ';');
+  if (!LOW && S.refract > 0) body.push('vec3 cRd = refract(-cV, cN, 0.66); float cIn = 0.5 + 0.5 * sin(dot(cRd, vec3(2.3, 5.1, 1.7)) * 2.6 + dot(vSdW, vec3(0.21, 0.09, 0.15)) + cF * 3.0); cTone *= 1.0 + (cIn - 0.5) * ' + f(S.refract * 2.0) + ' * (1.0 - cFr);');   /* M20 refraction illusion: an inner light band that slides with the view */
+  if (SOFT) body.push('cTone *= mix(1.0, 0.3, vCrys.z);');   /* contact darkening where a ground crystal enters the ground (a scalar, folded into the tone) */
   body.push('diffuseColor.rgb *= cTone;');
+  if (SOFT) body.push('#ifdef FLAT_SHADED', 'float cSf = 1.0 - abs(dot(cN, cV));', '#else', 'float cSf = 1.0 - abs(dot(normalize(vNormal), normalize(vViewPosition)));', '#endif',
+    'cSoftFam = diffuseColor.rgb / max(max(diffuseColor.r, diffuseColor.g), max(diffuseColor.b, 1e-3));',   /* the class hue at full brightness (scaled by its brightest channel) */
+    'cSoftFr = cSf * cSf; cSoftTip = smoothstep(0.5, 1.0, vCrys.x); cSoftEdge = vCrys.y; cSoftBase = vCrys.z; cSoftCore = (1.0 - cSf) * (1.0 - cSf) * (1.0 - cSoftTip) * (0.75 + 0.25 * cIn0());');
   var rough = '#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor * (0.55 + 0.9 * cF), 0.03, 0.45);';
-  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-crystal-' + [S.facet, S.depth, S.rim, S.veins, LOW ? 'lo' : 'hi'].join('_');
-  mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
-    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW;').replace('#include <project_vertex>', ['#include <project_vertex>',
-      '{ vec4 sdP = vec4(transformed, 1.0);', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; }'].join('\n'));
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW;\n' + HELPERS.split('\n').slice(1).join('\n')).replace('#include <color_fragment>', body.join('\n')).replace('#include <roughnessmap_fragment>', rough); };
+  var soft = ['#include <aomap_fragment>',
+    '{ vec3 cE = cSoftFam * (cSoftCore * 0.25 + cSoftTip * 0.9 + cSoftEdge * 0.35) + mix(cSoftFam, vec3(1.0), 0.05 + 0.2 * cSoftFr) * cSoftFr * 0.4;',   /* embedded core light · tips burning into glow · lit edges · the class rim easing to white only at grazing */
+    '  totalEmissiveRadiance += cE * uCrysGlow * (1.0 - 0.85 * cSoftBase);',
+    '  diffuseColor.a *= (1.0 - cSoftTip * 0.72) * (1.0 - smoothstep(0.6, 1.0, sqrt(cSoftFr)) * 0.5); }'].join('\n');   /* the point thins to light, the silhouette softens at grazing */
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-crystal-' + [S.facet, S.depth, S.rim, S.veins, LOW ? 'lo' : 'hi', 'r' + S.refract, SOFT ? 'soft' : 'cut'].join('_');
+  mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r); if (SOFT) sh.uniforms.uCrysGlow = GLOW;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW;' + (SOFT ? ' attribute vec3 aCrys; varying vec3 vCrys;' : '')).replace('#include <project_vertex>', ['#include <project_vertex>',
+      '{ vec4 sdP = vec4(transformed, 1.0);', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; }' + (SOFT ? ' vCrys = aCrys;' : '')].join('\n'));
+    var pars = '#include <common>\nvarying vec3 vSdW;\n' + HELPERS.split('\n').slice(1).join('\n') + (SOFT ? '\nvarying vec3 vCrys; uniform float uCrysGlow; vec3 cSoftFam; float cSoftFr, cSoftTip, cSoftEdge, cSoftBase, cSoftCore;' : '');
+    var b = body.join('\n').replace('cIn0()', !LOW && S.refract > 0 ? 'cIn' : '0.5');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', pars).replace('#include <color_fragment>', b).replace('#include <roughnessmap_fragment>', rough); if (SOFT) sh.fragmentShader = sh.fragmentShader.replace('#include <aomap_fragment>', soft); };
   mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|' + key; };
-  mat.userData.surfaceDetail = { kind: 'CRYSTAL', key: key }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
+  mat.userData.surfaceDetail = { kind: 'CRYSTAL', key: key, soft: SOFT }; if (PATCHED) PATCHED.add(mat); mat.needsUpdate = true;
   return mat;
 }
 
