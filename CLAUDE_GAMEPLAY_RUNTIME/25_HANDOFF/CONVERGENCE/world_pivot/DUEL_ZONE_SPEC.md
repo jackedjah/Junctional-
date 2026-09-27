@@ -155,17 +155,37 @@ The court is **24 m of clear playable width (≈ 79 ft) plus a 1.2 m inlaid bord
 - **Flight:** PvP flight is off (`teams.pvp_flight`). The field handles airborne fighters anyway.
 - **Growth:** if Character integration shows 24 m is cramped for five, the court grows, and lock-on must grow with it.
 
-## 8. Placement rules (for the modest set after the canonical court)
+## 8. Placement — a modest set of three
 
-- Spread the courts out.
-- Hide direct sightlines between courts.
-- No stacking.
-- Never on roads.
-- Never over important ecology.
-- Never obstructing a sanctuary.
-- Integrate with the paving and material language.
-- Leave comfortable approach and exit space.
+**Rules (tested):**
+
+- ≥ 4 m of approach and exit space beyond each court's circumradius, clear of every collider.
+- Never on a road, spur, forecourt or water.
+- Flat ground.
+- Clear of the official match court.
+- No two courts within 90 m.
+- Any pair closer than 120 m must be screened by a building at eye height.
 - No mass placement.
+
+**Re-survey:** every collider, path, water body, interactable and NPC spot was checked at the 26.4 m footprint. Inside the field walls, only a handful of open regions fit. Outside the walls is sea and cliff.
+
+**The three placed courts:**
+
+| court | position | setting |
+|---|---|---|
+| **CZ_ELEVATOR_GROVE** | (45, 110) | the canonical court: open paving between the HALO trunk and the north-east forest |
+| **CZ_PLAZA_SOUTH** | (43, −24.5) | the quiet south apron between the Arena Dome and the Mentor Spire, on the NPC spar spot |
+| **CZ_WEST_LAWN** | (−53, −22.5) | the open lawn at the plaza's west edge, short of the west forest |
+
+**Sightlines between them:**
+
+| pair | distance | screening |
+|---|---|---|
+| GROVE ↔ WEST_LAWN | 165 m | the Training Hall |
+| SOUTH ↔ WEST_LAWN | 96 m | the Arena Dome |
+| GROVE ↔ SOUTH | 134.5 m | none; at that distance the flat inlay sits under a 1° grazing angle from eye height |
+
+**Not placed yet:** the other M15 sites (highland, match east, lean glade, gym west) stay in `pending_sites`. They fail the flat / clearance check at 26.4 m.
 
 ## 9. Coverage — mathematical, not thousands of fixtures
 

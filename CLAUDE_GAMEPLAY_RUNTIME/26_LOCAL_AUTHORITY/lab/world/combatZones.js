@@ -130,7 +130,8 @@ var FLOOR_F = [
   '  col += C[4] * band5 * step(4.5, tn) * step(0.01, P[4].w) * split * live * 0.45;',
   /* the WAITING window (READY only, neutral): a pearl light fills the border band as the 30 s pass — then a steady slow pulse */
   '  float wOn = ready * (1.0 - live) * step(0.005, wait), wLead = czGlow(ang - wait, 0.0004) * (1.0 - step(0.999, wait));',
-  '  col += uPearl * band * wOn * (step(ang, wait) * (0.32 + 0.1 * step(0.999, wait) * sin(t * 1.6)) + wLead * 1.1);',
+  '  float wFill = step(ang, wait); col *= 1.0 - wOn * 0.55 * (1.0 - wFill) * court * (1.0 - field * (1.0 - czLine(sq - h, 0.06)));',   /* a progress ring: the unfilled arc of the border dims while the window runs */
+  '  col += uPearl * (band + czLine(sq - h, 0.06) * 0.8) * wOn * (step(ang, wait) * (0.55 + 0.15 * step(0.999, wait) * sin(t * 1.6)) + wLead * 1.8);',   /* the filled arc lights the band and its inner edge — readable from the approach */
   '  col += vec3(1.0) * czGlow(sq - surge * hb * 1.15, 0.8) * (1.0 - surge) * live * 1.2;',   /* the activation surge */
   '  col += uCore * czGlow(sq - (1.0 - reset) * hb, 0.5) * sin(reset * 3.14159265) * 0.6;',   /* the neutral reset sweep */
   '  col += uIce * czGlow(sq - hb, 0.45) * 0.1 * (1.0 - 0.5 * court);',   /* low ground-bound energy just outside the border */

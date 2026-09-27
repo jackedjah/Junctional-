@@ -10309,13 +10309,11 @@
     "yaw_deg": 45,
     "district": "athlete",
     "note": "the canonical court: open paved ground between the HALO trunk and the north-east forest, off the temple causeway; circumradius 18.7 m at the M17 26.4 m footprint, clear of every collider, flat across the footprint"
-   }
-  ],
-  "pending_sites": [
+   },
    {
     "id": "CZ_PLAZA_SOUTH",
-    "x": 37,
-    "z": -28.5,
+    "x": 43,
+    "z": -24.5,
     "y": 0,
     "yaw_deg": 45,
     "district": "plaza",
@@ -10323,9 +10321,19 @@
      36,
      -30
     ],
-    "note": "the quiet south apron between the Arena Dome and the Mentor Spire; on the NPC spar spot",
-    "status": "RE-SURVEY at the M17 26.4 m footprint (24 m playable + border)"
+    "note": "M17 modest set: the quiet south apron between the Arena Dome and the Mentor Spire (the NPC spar spot); re-surveyed at the 26.4 m footprint - clear of every collider by >= 4 m beyond its circumradius, off every path, forecourt and water, flat; screened from CZ_WEST_LAWN by the Arena Dome"
    },
+   {
+    "id": "CZ_WEST_LAWN",
+    "x": -53,
+    "z": -22.5,
+    "y": 0,
+    "yaw_deg": 45,
+    "district": "plaza",
+    "note": "M17 modest set: the open lawn at the west edge of the plaza, short of the west forest; re-surveyed at the 26.4 m footprint - clear of every collider by >= 4 m beyond its circumradius, off every path, forecourt and water, flat; screened from CZ_ELEVATOR_GROVE by the Training Hall and from CZ_PLAZA_SOUTH by the Arena Dome"
+   }
+  ],
+  "pending_sites": [
    {
     "id": "CZ_VISIONARY_HIGHLAND",
     "x": -141,
@@ -10395,6 +10403,10 @@
    "engine": "lab/world/duelRoster.js",
    "spec": "25_HANDOFF/CONVERGENCE/world_pivot/DUEL_ZONE_SPEC.md",
    "host": "PENDING - the host duel (DuelHost) is 1v1; the engine is host-shareable and the client mirrors snap.duelZones"
+  },
+  "placement": {
+   "rule": "M17 modest set (owner 2026-09-27): spread out; no two courts within 90 m; a pair closer than 120 m must be screened by a building; approach and exit space (>= 4 m beyond the circumradius clear of every collider); never on a road, forecourt, water or sanctuary approach; flat; no mass placement",
+   "courts": 3
   }
  }
 }
