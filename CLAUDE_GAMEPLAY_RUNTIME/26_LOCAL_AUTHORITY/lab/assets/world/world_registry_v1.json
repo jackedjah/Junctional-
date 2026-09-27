@@ -1337,7 +1337,12 @@
     "spires": 3,
     "trees": 40,
     "seed": 12,
-    "family": "blue"
+    "family": "blue",
+    "town": {
+     "houses": 6,
+     "tower_h": 38,
+     "note": "M15c: a village with a landmark tower"
+    }
    },
    {
     "id": "ISLE_N",
@@ -1361,7 +1366,11 @@
     "spires": 2,
     "trees": 30,
     "seed": 14,
-    "family": "pink"
+    "family": "pink",
+    "town": {
+     "houses": 5,
+     "note": "M15c: a small village"
+    }
    },
    {
     "id": "ISLE_NE",
@@ -1399,7 +1408,12 @@
     "spires": 4,
     "trees": 75,
     "seed": 17,
-    "family": "pink"
+    "family": "pink",
+    "town": {
+     "houses": 12,
+     "tower_h": 72,
+     "note": "M15c distant civilization: the town facing the plaza across the southern sea"
+    }
    },
    {
     "id": "ISLE_FAR_W",
