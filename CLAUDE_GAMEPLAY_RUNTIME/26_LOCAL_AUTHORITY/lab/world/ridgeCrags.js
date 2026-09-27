@@ -24,9 +24,10 @@ import { mergeVertices, toCreasedNormals } from '../../vendor/three/BufferGeomet
    3.4 m; the Veil cliff crystals are the precedent for art on the in-reach face) — and, for flight, far higher inside the reach square (below); nothing where the crest is under 18 m (the pass floors and
    their ramps: whatever stands over a pass stands ≥ 5.4 m over its floor + 3.4 m), nothing on the Veil falls face (the curtain's stations ± 4 and
    every keep circle × 2.2 + 30 m: the lead's) or at the north fall's lip; the collision face is untouched (gameplay_world_m19_mountains 12).
-   FLIGHT (M20 round-2 review, blocking): the host lets a FUSED player fly to 50 m over the ground (MovementCapabilities travel ceiling) and
+   FLIGHT (M20 round-2 review, blocking; lead correction after the re-review): in the open FIELD room the host lets a player fly to
+   max(50 m canon, FIELD.flight_ceiling_m = 100 m) over the walkable ground (00_CORE/dev_tuning.dev.json; PlayMode.flightTick) and
    land on any ridge-face collider top on the way (PlayMode.flightTick F01: held at solid.h + 0.05, a completed landing) — so inside the
-   host's reach square (ridgeReachBounds ± half + 1 m: the body radius and a margin) NO part of a crag lies under CRAG_FLY_Y = 56 m (the 50 m
+   host's reach square (ridgeReachBounds ± half + 1 m: the body radius and a margin) NO part of a crag lies under CRAG_FLY_Y = 105.6 m (the 100 m
    ceiling over ground ≤ 0.5 m by the ring + the 1.7 m body + the 3.4 m rule): nobody lands inside a crest cap or flies through a tower. It is
    exact per triangle (each strip triangle, the closing fans included, is clipped to the square; a section that dips under the line is cut
    and its strip closes there), and the caps / ledges / ribs grow in only as their rock rises clear of that volume, so a strip never ends
@@ -51,7 +52,7 @@ function sstep(a, b, x) { var t = Math.max(0, Math.min(1, (x - a) / (b - a))); r
 function hash2(i, j, s) { var h = Math.imul(i, 374761393) + Math.imul(j, 668265263) + Math.imul(s, 1442695041) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967296; }
 function vn2(x, z, s) { var i = Math.floor(x), j = Math.floor(z), fx = x - i, fz = z - j; fx = fx * fx * (3 - 2 * fx); fz = fz * fz * (3 - 2 * fz); var a = hash2(i, j, s), b = hash2(i + 1, j, s), c = hash2(i, j + 1, s), d = hash2(i + 1, j + 1, s); return a + (b - a) * fx + (c - a) * fz + (a - b - c + d) * fx * fz; }
 export var CRAG_MIN_Y = 6;   /* every crag vertex inside REACH_IN + 4 stays at least this high (the walking rule: 3.4 m) */
-export var CRAG_FLY_Y = 56;   /* … and inside the host's reach square no crag point lies under the flight volume: 50 m FUSED travel ceiling + 0.5 m ground + 1.7 m body + 3.4 m */
+export var CRAG_FLY_Y = 105.6;   /* … and inside the host's reach square no crag point lies under the flight volume: the FIELD room's 100 m flight ceiling + 0.5 m ground + 1.7 m body + 3.4 m (m19_mountains check 15 reads the real ceiling) */
 /* the part of triangle A B C inside the square |x|, |z| ≤ q (Sutherland–Hodgman), as a polygon */
 function clipSquare(poly, q) { [['x', 1], ['x', -1], ['z', 1], ['z', -1]].forEach(function (E) { var out = [], k = E[0], s = E[1]; for (var i = 0; i < poly.length; i++) { var P = poly[i], Q = poly[(i + 1) % poly.length], dp = s * P[k] - q, dq = s * Q[k] - q; if (dp <= 0) out.push(P); if ((dp < 0 && dq > 0) || (dp > 0 && dq < 0)) out.push(lerp3(P, Q, dp / (dp - dq))); } poly = out; }); return poly; }
 export function cragFlightHit(A, B, C, q, yMin) { if (Math.min(A.y, B.y, C.y) >= yMin) return false; if (Math.min(A.x, B.x, C.x) > q || Math.max(A.x, B.x, C.x) < -q || Math.min(A.z, B.z, C.z) > q || Math.max(A.z, B.z, C.z) < -q) return false;
