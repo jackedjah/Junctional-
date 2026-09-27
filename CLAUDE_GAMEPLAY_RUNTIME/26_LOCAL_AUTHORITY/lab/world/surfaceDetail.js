@@ -101,7 +101,7 @@ export function applySurface(THREE, mat, family, tier) { var S = SURFACE[family]
    drops slightly, so tiling gives way to weathered, soil-softened ground instead of a hard edge. Zones live in uniform arrays filled from
    the registry after it loads (the pattern starts as the civic default). Value / roughness only — never hue. */
 var ZONED_FUNCS = [
-  'uniform vec4 uZR[16]; uniform float uZRT[16]; uniform float uZRS[16]; uniform vec4 uZC[6]; uniform float uZCS[6]; uniform vec4 uZS[8]; uniform float uZDefSoft;',
+  'uniform vec4 uZR[16]; uniform float uZRT[16]; uniform float uZRS[16]; uniform vec4 uZC[6]; uniform float uZCS[6]; uniform vec4 uZS[8]; uniform float uZDefSoft; uniform sampler2D uZWear; uniform vec4 uZWearB;',
   'void pBond(vec2 p, vec2 cell, float stag, out float d, out vec2 id, out vec2 cc) { vec2 g = p / cell; float row = floor(g.y); float sh = stag * mod(row, 2.0); g.x += sh; vec2 i = floor(g), f = fract(g); vec2 e = min(f, 1.0 - f) * cell; d = min(e.x, e.y); id = i; cc = vec2(i.x + 0.5 - sh, i.y + 0.5) * cell; }',
   'void pRings(vec2 q, float w, float jl, out float d, out vec2 id, out vec2 cc) { float r = length(q); float ri = floor(r / w), fr = fract(r / w); float n = max(3.0, floor(6.2831853 * (ri + 0.5) * w / jl)); float a = (atan(q.y, q.x) + 3.14159265) / 6.2831853 * n; float ai = floor(a), fa = fract(a); d = min(min(fr, 1.0 - fr) * w, min(fa, 1.0 - fa) * 6.2831853 * max(r, 0.2) / n); id = vec2(ri, ai); float ac = (ai + 0.5) / n * 6.2831853 - 3.14159265; cc = vec2(cos(ac), sin(ac)) * (ri + 0.5) * w; }',
   'void pHex(vec2 p, float s, out float d, out vec2 id, out vec2 cc) { vec2 r = vec2(1.0, 1.7320508), h = r * 0.5; vec2 P = p / s; vec2 a = mod(P, r) - h, b = mod(P - h, r) - h; vec2 gv = dot(a, a) < dot(b, b) ? a : b; vec2 c = P - gv; vec2 ag = abs(gv); float hd = max(dot(ag, vec2(0.5, 0.8660254)), ag.x); d = (0.5 - hd) * s; id = vec2(floor(c.x * 2.0 + 0.5), floor(c.y / 0.8660254 + 0.5)); cc = c * s; }',
@@ -109,12 +109,34 @@ var ZONED_FUNCS = [
   'void pTri(vec2 p, float s, out float d, out vec2 id, out vec2 cc) { float hg = s * 0.8660254; vec2 q = vec2(p.x / s - p.y / (2.0 * hg), p.y / hg); vec2 i = floor(q), f = fract(q); float up = step(1.0, f.x + f.y); vec3 e = up < 0.5 ? vec3(f.x, f.y, 1.0 - f.x - f.y) : vec3(1.0 - f.x, 1.0 - f.y, f.x + f.y - 1.0); d = min(min(e.x, e.y), e.z) * hg; id = vec2(i.x * 2.0 + up, i.y); vec2 cq = i + (up < 0.5 ? vec2(0.3333333) : vec2(0.6666667)); cc = vec2((cq.x + cq.y * 0.5) * s, cq.y * hg); }'
 ].join('\n');
 
+/* M14 LIVED-IN GROUND (owner 2026-09-27: "floors / grass more real, humanistic, lived-in … believable transitions, material richness").
+   One soft WEAR field baked once from the registry's paths: the centre band of every causeway / regional road / trail, the forecourt spurs
+   to each door (worn hardest) and the desire lines the causeways draw across the plaza to its centre. The ground paving and the path cores
+   sample it: foot-polished where people walk (smoother, a touch lighter, joints packed with grit), grimier joints in the untrodden margins.
+   A 512² single-channel texture (≈ 1.3 m texels), built by rasterising each segment only inside its own bounds; shared, never re-built. */
+var WEAR = null;
+export function wearField(THREE, reg) {
+  if (WEAR && WEAR.reg === reg) return WEAR;
+  var PW = (reg && reg.paths) || {}, L = PW.list || [], segs = [], W = { CAUSEWAY: PW.causeway_w || 20, REGIONAL: PW.regional_w || 8, TRAIL: PW.trail_w || 3 }, K = { CAUSEWAY: 0.75, REGIONAL: 0.65, TRAIL: 0.5 };
+  L.forEach(function (P) { var pts = P.pts || [], w = P.width_m || W[P.tier] || 6, k = K[P.tier] || 0.5; for (var i = 1; i < pts.length; i++) segs.push([pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], w, k]);
+    if (P.forecourt) [P.spur, P.spur2].forEach(function (S) { if (S && S.to) segs.push([P.forecourt.x, P.forecourt.z, S.to[0], S.to[1], (PW.spur_w || 6) * 1.2, 1.0]); }); });
+  var x0 = 1e9, z0 = 1e9, x1 = -1e9, z1 = -1e9; segs.forEach(function (s) { x0 = Math.min(x0, s[0], s[2]); x1 = Math.max(x1, s[0], s[2]); z0 = Math.min(z0, s[1], s[3]); z1 = Math.max(z1, s[1], s[3]); });
+  if (!segs.length) { x0 = z0 = -1; x1 = z1 = 1; } x0 -= 24; z0 -= 24; x1 += 24; z1 += 24;
+  var N = 512, data = new Uint8Array(N * N), sx = (x1 - x0) / N, sz = (z1 - z0) / N;
+  segs.forEach(function (s) { var ax = s[0], az = s[1], bx = s[2], bz = s[3], w = s[4], k = s[5], reach = w * 0.5 + 1, dx = bx - ax, dz = bz - az, L2 = dx * dx + dz * dz || 1;
+    var i0 = Math.max(0, Math.floor((Math.min(ax, bx) - reach - x0) / sx)), i1 = Math.min(N - 1, Math.ceil((Math.max(ax, bx) + reach - x0) / sx)), j0 = Math.max(0, Math.floor((Math.min(az, bz) - reach - z0) / sz)), j1 = Math.min(N - 1, Math.ceil((Math.max(az, bz) + reach - z0) / sz));
+    for (var j = j0; j <= j1; j++) for (var i = i0; i <= i1; i++) { var px = x0 + (i + 0.5) * sx, pz = z0 + (j + 0.5) * sz, t = Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / L2)), ex = px - ax - dx * t, ez = pz - az - dz * t, u = (Math.sqrt(ex * ex + ez * ez) - w * 0.12) / (w * 0.36);
+      var v = u <= 0 ? 1 : (u >= 1 ? 0 : 1 - u * u * (3 - 2 * u)), c = Math.round(v * k * 255), o = j * N + i; if (c > data[o]) data[o] = c; } });   /* full wear in the centre 24 % of the width, easing out to 96 % */
+  var tex = new THREE.DataTexture(data, N, N, THREE.RedFormat, THREE.UnsignedByteType); tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearFilter; tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping; tex.needsUpdate = true;
+  WEAR = { reg: reg, tex: tex, bounds: new THREE.Vector4(x0, z0, 1 / (x1 - x0), 1 / (z1 - z0)), segs: segs.length }; return WEAR;
+}
+
 export var PAVING_TYPES = { BOND: 0, RINGS: 1, HEX: 2, DIAMOND: 3, TRI: 4, PLANKS: 5, SQUARE: 6, MOSAIC: 7, FINE_RINGS: 8 };
 var CLASS_PAVING = { ATHLETE: ['DIAMOND', 0.1], TITAN: ['HEX', 0.15], LEAN: ['PLANKS', 0.35], VISIONARY: ['TRI', 0.5], BAGE: ['MOSAIC', 0.2] };
 
 /* the zone state: plain arrays the shader uniforms point at (filled in place, so a late registry updates every patched material) */
 export function createPavingZones(THREE) {
-  var Z = { rects: [], rtype: [], rsoft: [], circles: [], csoft: [], soft: [], defSoft: { value: 0.18 }, info: { rects: 0, circles: 0, soft: 0 } };
+  var Z = { rects: [], rtype: [], rsoft: [], circles: [], csoft: [], soft: [], defSoft: { value: 0.18 }, wearU: { value: null }, wearB: { value: new THREE.Vector4(0, 0, 0, 0) }, info: { rects: 0, circles: 0, soft: 0 } };
   for (var i = 0; i < 16; i++) { Z.rects.push(new THREE.Vector4(1, 1, 0, 0)); Z.rtype.push(0); Z.rsoft.push(0); }
   for (i = 0; i < 6; i++) { Z.circles.push(new THREE.Vector4(0, 0, 0, 0)); Z.csoft.push(0); }
   for (i = 0; i < 8; i++) Z.soft.push(new THREE.Vector4(1, 1, 0, 0));
@@ -124,7 +146,8 @@ export function createPavingZones(THREE) {
     var plazaR = (reg && reg.field && reg.field.plaza_radius_m) || 56; Z.circles[ci].set(0, 0, plazaR, PAVING_TYPES.RINGS); Z.csoft[ci] = 0; ci++;
     if (opts.halo) { Z.circles[ci].set(opts.halo.x, opts.halo.z, opts.halo.r || 18, PAVING_TYPES.FINE_RINGS); Z.csoft[ci] = 0; ci++; }
     ((reg && reg.zones) || []).forEach(function (z) { var r = z.rect || z; if (si >= 8 || z.kind !== 'FOREST' || r.x1 === undefined) return; Z.soft[si].set(r.x1, r.z1, r.x2, r.z2); si++; });
-    Z.info = { rects: ri, circles: ci, soft: si }; return Z; };
+    var wear = 0; try { var WF = wearField(THREE, reg); Z.wearU.value = WF.tex; Z.wearB.value.copy(WF.bounds); wear = WF.segs; } catch (e) { }   /* M14: the lived-in wear field */
+    Z.info = { rects: ri, circles: ci, soft: si, wear_segments: wear }; return Z; };
   return Z;
 }
 
@@ -163,17 +186,20 @@ export function zonedPaving(THREE, mat, Z, spec) {
     'float zGH = geoFbm(zp * 0.42) * 0.6 + geoN(zp * 2.6) * 0.3 + step(0.93, sdHash(floor(zp * 2.2))) * 0.35; float zGrit = step(0.994, sdHash(floor(zp * 7.0) + 3.3)) * zNatK;',
     'float zGap = zGone * (1.0 - smoothstep(0.0, 0.12, sdD)) * (1.0 - smoothstep(0.82, 0.97, zNat));',   /* the broken edge of the paving around a missing tile */
     'sdSeam = mix(sdSeam, 0.0, zNatK); sdTone = mix(sdTone, (0.46 + 0.2 * zGH) * (1.0 + zGrit * 1.4), zNatK) * (1.0 - zGap * 0.45); sdRough = mix(sdRough, 1.35 * (1.0 - zGrit * 0.6), zNatK);',
+    'float zWear = texture2D(uZWear, (zp - uZWearB.xy) * uZWearB.zw).r * (0.55 + 0.45 * sdNoise(zp * 0.13)) * (1.0 - zNatK);',   /* M14 LIVED-IN: foot-polished where people walk, joints packed with grit */
+    'sdRough *= 1.0 - 0.36 * zWear; sdTone *= 1.0 + 0.05 * zWear; sdSeam *= 1.0 - 0.5 * zWear;',
     'float sdMacro = sdNoise(zp * 0.045) - 0.5; sdTone *= 1.0 + sdMacro * ' + f(S.macro * 2) + '; sdRough *= 1.0 + sdMacro * ' + f(S.macro * 3) + ';',
     'float sdGrain = sdNoise(zp * 7.3) * 0.6 + sdNoise(zp * 23.0) * 0.4 - 0.5; sdTone *= 1.0 + sdGrain * ' + f(S.grain) + ' * sdNear; sdRough *= 1.0 + sdGrain * ' + f(S.grain * 2.2) + ' * sdNear;');
   body.push('diffuseColor.rgb *= sdTone * mix(1.0, ' + f(S.seamDark) + ', sdSeam);');
   var rough = ['#include <roughnessmap_fragment>', 'roughnessFactor = clamp(mix(roughnessFactor * sdRough, max(roughnessFactor, 0.86), sdSeam), 0.04, 1.0);'];
   var metal = ['#include <metalnessmap_fragment>', 'metalnessFactor *= 1.0 - 0.6 * sdSeam;' + (LOW ? '' : ' metalnessFactor = mix(metalnessFactor, 0.02, zNatK);')];
   var nrm = ['#include <normal_fragment_maps>'];
-  if (!LOW) nrm.push('if (zNatK > 0.01) normal = normalize(mix(normal, geoBump(-vViewPosition, normal, (zGH * 0.5 - zGap * 0.2) * sdNear), zNatK));');
+  if (!LOW) nrm.push('if (zNatK > 0.01) normal = normalize(mix(normal, geoBump(-vViewPosition, normal, (zGH * 0.5 - zGap * 0.2) * sdNear), zNatK));',
+    '{ vec3 sdTl = vec3(sdH1 - 0.5, 0.0, sdH2 - 0.5) * 0.045 * sdNear * (1.0 - zNatK) * (1.0 - zBand) * (1.0 - 0.6 * zWear); normal = normalize(normal + (viewMatrix * vec4(sdTl, 0.0)).xyz); }');   /* M14: every slab laid a hair off true, as real stone is, so the sky breaks slab by slab in its reflection */
   if (!LOW && S.bevel > 0) nrm.push('{ vec2 bd = zp - sdCC; float bl = length(bd); if (bl > 1e-4) { float sdK = ' + f(S.bevel) + ' * (1.0 - smoothstep(0.0, ' + f(Math.max(S.seam * 2.5, 0.06)) + ', sdD)) * sdNear * clamp(' + f(Math.max(S.seam * 2.5, 0.06)) + ' / sdAA, 0.0, 1.0) * (1.0 - zPatch) * (1.0 - 0.6 * zBand) * (1.0 - zNatK); normal = normalize(normal + sdK * normalize((viewMatrix * vec4(bd.x / bl, 0.0, bd.y / bl, 0.0)).xyz)); } }');
-  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-zoned-m8c-' + [S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.lod.join('x'), S.band, LOW ? 'L' : 'H'].join('_');
+  var prevOBC = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey; var key = 'mahworld-zoned-m14-' + [S.seam, S.seamDark, S.bevel, S.toneVar, S.roughVar, S.macro, S.grain, S.lod.join('x'), S.band, LOW ? 'L' : 'H'].join('_');
   mat.onBeforeCompile = function (sh, r) { if (prevOBC) prevOBC.call(this, sh, r);
-    sh.uniforms.uZR = { value: Z.rects }; sh.uniforms.uZRT = { value: Z.rtype }; sh.uniforms.uZRS = { value: Z.rsoft }; sh.uniforms.uZC = { value: Z.circles }; sh.uniforms.uZCS = { value: Z.csoft }; sh.uniforms.uZS = { value: Z.soft }; sh.uniforms.uZDefSoft = Z.defSoft;
+    sh.uniforms.uZWear = Z.wearU; sh.uniforms.uZWearB = Z.wearB; sh.uniforms.uZR = { value: Z.rects }; sh.uniforms.uZRT = { value: Z.rtype }; sh.uniforms.uZRS = { value: Z.rsoft }; sh.uniforms.uZC = { value: Z.circles }; sh.uniforms.uZCS = { value: Z.csoft }; sh.uniforms.uZS = { value: Z.soft }; sh.uniforms.uZDefSoft = Z.defSoft;
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSdW; varying vec3 vSdN;').replace('#include <project_vertex>', ['#include <project_vertex>',
       '{ vec4 sdP = vec4(transformed, 1.0); vec3 sdN0 = objectNormal;', '#ifdef USE_INSTANCING', '  sdP = instanceMatrix * sdP; sdN0 = mat3(instanceMatrix) * sdN0;', '#endif', '  vSdW = (modelMatrix * sdP).xyz; vSdN = normalize(mat3(modelMatrix) * sdN0); }'].join('\n'));
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\n' + HELPERS + '\n' + GEO_FUNCS + '\n' + ZONED_FUNCS).replace('#include <color_fragment>', body.join('\n'))

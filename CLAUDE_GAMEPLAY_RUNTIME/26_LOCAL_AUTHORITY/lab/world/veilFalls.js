@@ -18,7 +18,7 @@
    The ridge sculpt keeps the face under the curtain as authored (keep_line + veilCurtainKeep; host-safety 17). Draws: curtain 1, wet rock 1, foam 1, mist 1 (not LOW), cliff crystals 1 (not LOW), highland ground 1,
    lake 1, trunks 1, canopies 1, villas 3, spire 1, lanterns 1, pad 1 — all behind the west ridge, frustum-culled as a group. */
 import { ridgeStations, ridgeFaceSegment, ridgeFacePoint } from './ridgeLayout.js';
-import { SPECTRAL, CLASS_TINT } from './aura.js'; import { applyGeology } from './surfaceDetail.js';
+import { SPECTRAL, CLASS_TINT } from './aura.js'; import { applyGeology } from './surfaceDetail.js'; import { softBox } from './formKit.js';
 
 var NOISE = [
   'float vfH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
@@ -194,7 +194,7 @@ export function createVeilFalls(ctx) {
 
     /* villas: a glass ground floor, a cantilevered platinum upper volume, a thin graphite roof and plinth — facing the view */
     var bodyP = [], darkP = [], glassP = [], face = Math.atan2(-ox, -oz), rv = rnd(0xA11A);
-    function boxAt(list, w, h, d, x, y, z, yaw) { var bg = new THREE.BoxGeometry(w, h, d); bg.rotateY(yaw); bg.translate(x, y, z); list.push(bg); }
+    var VT = tier() === 'LOW' ? 'LOW' : 'MED'; function boxAt(list, w, h, d, x, y, z, yaw) { var bg = softBox(THREE, w, h, d, Math.min(0.6, Math.min(w, h, d) * 0.24), VT); bg.rotateY(yaw); bg.translate(x, y, z); list.push(bg); }   /* M14 (design DNA, seen from afar): every villa / belvedere volume is filleted — no raw box edge on the highland skyline */
     for (var v = 0; v < (HL.villas || 5); v++) { var sp = spot(372, 16, rv); if (!sp) continue; var yaw = face + (rv() - 0.5) * 0.5, c = Math.cos(yaw), s = Math.sin(yaw), shift = 2.2;
       boxAt(darkP, 16, 0.8, 11, sp.x, sp.y + 0.4, sp.z, yaw); boxAt(glassP, 12, 3.6, 8, sp.x, sp.y + 0.8 + 1.8, sp.z, yaw);
       boxAt(bodyP, 13, 3.2, 8.5, sp.x + s * shift, sp.y + 0.8 + 3.4 + 1.6, sp.z + c * shift, yaw); boxAt(glassP, 13.2, 1.1, 8.7, sp.x + s * shift, sp.y + 0.8 + 3.4 + 1.7, sp.z + c * shift, yaw);
@@ -243,6 +243,10 @@ export function createVeilFalls(ctx) {
 
     /* ---------- 4. the aura language (one shared field, built by aura.js) ---------- */
     var A = ctx.auraRequests; if (A) { var HT = yTop - yBot, cMid = faceOn(LINES, NS / 2, yBot + HT * 0.5), gy = yBot + HT * 0.5, GR = Math.max(CH * 0.66, HT * 0.64);
+      if (ctx.auraForms) { var F = ctx.auraForms;   /* M14 DIMENSIONAL AURA: over the falls' crest, high above the highland, a pair of tilted soft rings turning against each other and a hexagonal frame above them — magic in the air, far from anyone's reach */
+        F.push({ x: cMid.x - ox * 16, y: yTop + CH * 0.75, z: cMid.z - oz * 16, size: CH * 1.1, shape: 'RING', scale: [1, 14, 1], tint: 0xb48cff, intensity: 0.55, ground: yTop, axis: [ox, 0.5, oz], spin: 0.03, phase: 0.2 });
+        F.push({ x: cMid.x - ox * 16, y: yTop + CH * 0.75, z: cMid.z - oz * 16, size: CH * 0.86, shape: 'RING', scale: [1, 12, 1], tint: 0xff9ad2, intensity: 0.45, ground: yTop, axis: [-oz, 0.4, ox], spin: -0.024, phase: 0.55 });
+        F.push({ x: cMid.x - ox * 10, y: yTop + CH * 1.35, z: cMid.z - oz * 10, size: CH * 0.42, shape: 'HEX', scale: [1, 0.4, 1], tint: 0x7fd0ff, intensity: 0.5, ground: yTop, axis: [0.2, 1, 0.3], spin: 0.04, phase: 0.8 }); }
       A.push({ x: cMid.x - ox * 8, y: gy, z: cMid.z - oz * 8, size: CH * 0.55, aspect: Math.max(1, HT / (CH * 0.95)), ring: 0, tint: 0x8c84c8, spectral: 0.55, intensity: 0.18, pull: 20, phase: 0.3 });   /* the veil glow hugging the curtain (fringes, no circle) */
       A.push({ x: baseX - ox * 6, y: 14, z: baseZ - oz * 6, size: CH * 0.8, aspect: 0.42, ring: 0, tint: 0xeef4ff, spectral: 0.35, intensity: 0.22, pull: 14, nightK: 1.25 });   /* the base spray bloom */
       /* THE GLORY (the owner's reference): a full prismatic ring framing the whole falls, and a faint second ring outside it. The colour

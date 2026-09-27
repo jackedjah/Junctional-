@@ -12,13 +12,18 @@
      · SCALE: skewed size distributions (many small, few large) and a camera-relative ring of TOWERING cumulus behind the far massifs
        (towerCluster) that keeps clear of the Sun and Moon sectors.
    Puffs are re-sorted back-to-front a few times per second (instances are drawn in buffer order), so nearer bodies always cover farther ones.
-   Tiers scale the puff count (HIGH 1 · MED 0.7 · LOW 0.45). Presentation only; the shared optics in sky.js are unchanged. */
+   Tiers scale the puff count (HIGH 1 · MED 0.7 · LOW 0.45). Presentation only; the shared optics in sky.js are unchanged.
+   M14 CLOUD REFINEMENT (owner 2026-09-27: more oblong, more diffuse, fainter in the background, aura-rich — stretched drifting masses, not
+   cotton balls or bubble clusters): every puff is STRETCHED along the horizon in the shader (uOblong; base puffs most), its in-plane tilt is
+   calmed so the stretched lobes lie along the wind, the silhouette rim fades gradually instead of cutting (uDiffuse), distant bodies thin out
+   harder into the haze, and the thin edges carry a faint pearl AURA (violet / pink toward the anti-light side, pale gold toward the key —
+   class-family hues only, uAuraK). Layout, positions and the shared sky stream are untouched: only the drawing changes. */
 
 var VERT = [
   'attribute vec4 aPuff;',              /* x: height inside the cloud 0..1 · y: atlas shape (integer part 0..3) + seed (fraction) · z: alpha · w: flatten (base puffs) */
   'attribute vec2 aCloud;',             /* x: cloud base world y · y: cloud vertical extent (m) */
   'attribute vec4 aCentre;',            /* xyz: the cloud body's centre (world) · w: its radius (m) — the whole body is lit from the key's side */
-  'uniform vec3 uLightWorld;',
+  'uniform vec3 uLightWorld; uniform float uOblong;',
   'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow; varying float vShell; varying float vFade;',
   'void main() {',
   '  float seed = fract(aPuff.y), shape = floor(aPuff.y + 0.001); bool flip = seed > 0.5;',
@@ -28,11 +33,12 @@ var VERT = [
   '  float sx = length(instanceMatrix[0].xyz), sy = length(instanceMatrix[1].xyz);',
   '  vec3 toCam = normalize(cameraPosition - centre);',
   '  float below = smoothstep(0.2, 0.7, -toCam.y); vBelow = below; float isPlate = step(1.5, aPuff.w), isBase = step(0.5, aPuff.w) * (1.0 - isPlate); sy *= 1.0 + below * (0.6 + 0.9 * min(aPuff.w, 1.0));',
-  '  float under = smoothstep(0.03, 0.35, -toCam.y); vFade = mix(mix(1.0, 1.0 - 0.85 * under, isBase), under, isPlate);',   /* M9: the plate appears as the base puffs fade, once the body is overhead */   /* seen from below, puffs spread vertically so the underside closes into one flat grey surface (thin stacked puffs read as slices) */
+  '  float under = smoothstep(0.03, 0.35, -toCam.y); vFade = mix(mix(1.0, 1.0 - 0.85 * under, isBase), under, isPlate);',
+  '  float oblong = 1.0 + (1.0 - isPlate) * uOblong * (0.5 + 0.45 * min(aPuff.w, 1.0) + 0.45 * fract(seed * 5.31)); sx *= oblong; sy *= 1.0 - 0.2 * uOblong * (1.0 - isPlate);',   /* M14: stretched along the horizon (base puffs most, each a little differently), a touch flatter — drifting masses, not balls */   /* M9: the plate appears as the base puffs fade, once the body is overhead */   /* seen from below, puffs spread vertically so the underside closes into one flat grey surface (thin stacked puffs read as slices) */
   '  vec3 viewUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);',
   '  vec3 camUp = normalize(mix(vec3(0.0, 1.0, 0.0), viewUp, smoothstep(0.35, 0.85, abs(toCam.y))));',   /* upright near the horizon (flat base, crown up); camera-facing when looked at steeply from below/above so puffs never foreshorten into stacked discs */
   '  vec3 camRight = normalize(cross(camUp, toCam)); camUp = normalize(cross(toCam, camRight));',
-  '  float rot = (1.0 - step(0.25, aPuff.w)) * (fract(seed * 7.13) - 0.5) * 0.9, cr = cos(rot), sr = sin(rot); vec2 q = vec2(position.x * sx, position.y * sy);',
+  '  float rot = (1.0 - step(0.25, aPuff.w)) * (fract(seed * 7.13) - 0.5) * 0.9 * (1.0 - 0.7 * uOblong), cr = cos(rot), sr = sin(rot); vec2 q = vec2(position.x * sx, position.y * sy);',
   '  vec3 tX = camRight * cr + camUp * sr, tY = camUp * cr - camRight * sr;',   /* M10: crown puffs turn up to ±26° in their own plane, so the four atlas shapes never stand in the same pose */
   '  vec3 world = centre + tX * q.x + tY * q.y;',
   '  if (isPlate > 0.5) { world = centre + mat3(instanceMatrix) * vec3(position.x, 0.0, position.y); vBelow = 1.0; }',   /* the base plate lies flat in the body's own frame */
@@ -46,7 +52,7 @@ var VERT = [
   '}'].join('\n');
 
 var FRAG = [
-  'uniform sampler2D uMap; uniform vec3 uTop, uShade, uRim, uHaze, uLightWorld; uniform float uOpacity, uRimK, uHazeNear, uHazeFar, uHazeMax, uBaseDark, uShadowK, uTime; uniform vec2 uHor;',
+  'uniform sampler2D uMap; uniform vec3 uTop, uShade, uRim, uHaze, uLightWorld; uniform float uOpacity, uRimK, uHazeNear, uHazeFar, uHazeMax, uBaseDark, uShadowK, uTime; uniform vec2 uHor; uniform float uDiffuse, uAuraK; uniform vec3 uAuraA, uAuraB, uAuraC;',
   'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow; varying float vShell; varying float vFade;',
   'vec4 cellTex(vec2 u) { return texture2D(uMap, vCell + clamp(u, 0.006, 0.994) * 0.5); }',
   'float cH(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }',
@@ -60,9 +66,9 @@ var FRAG = [
   '#if CLOUD_TAPS > 1',
   '    en = en * 0.62 + cN(eu * 2.4 + 7.1) * 0.38;',
   '#endif',
-  '    dens = clamp(dens + (en - 0.5) * 0.8 * (1.0 - smoothstep(0.4, 0.95, dens)), 0.0, 1.0); }',
+  '    dens = clamp(dens + (en - 0.5) * (0.8 + 0.45 * uDiffuse) * (1.0 - smoothstep(0.4, 0.95, dens)), 0.0, 1.0); }',
   '#endif',
-  '  float a = dens * vPuff.z * uOpacity * mix(1.0, smoothstep(0.0, 0.85, dens), vBelow) * mix(smoothstep(0.0, 0.6, dens), 1.0, shell * (1.0 - vBelow * 0.7)) * vFade; if (a < 0.004) discard;',   /* interior puffs fade in softly and merge; shell puffs keep the crisp cauliflower silhouette */
+  '  float a = dens * vPuff.z * uOpacity * mix(1.0, smoothstep(0.0, 0.85, dens), vBelow) * mix(smoothstep(0.0, 0.6, dens), mix(1.0, smoothstep(0.0, 0.52, dens), uDiffuse), shell * (1.0 - vBelow * 0.7)) * vFade; if (a < 0.004) discard;',   /* M14: the outline rim fades out gradually (uDiffuse) instead of cutting */   /* interior puffs fade in softly and merge; shell puffs keep the crisp cauliflower silhouette */
   '  float occl = 0.0;',
   '#if CLOUD_TAPS > 0',
   '  occl = cellTex(u + vLs * 0.06).r * 0.55;',   /* thickness between this point and the key, inside the puff */
@@ -79,11 +85,16 @@ var FRAG = [
   '  lit = mix(lit, 0.22 + 0.18 * (1.0 - clamp(tex.r, 0.0, 1.0)) + 0.12 * sunK, vBelow); baseK = mix(baseK, 0.7, vBelow);',   /* seen from below, the whole underside shares one tone (lighter where thin): stacked puffs at different heights otherwise outline each other as discs */
   '  vec3 col = mix(uShade, uTop, clamp(lit, 0.0, 1.0)) * (1.0 - uBaseDark * baseK * (1.0 - 0.5 * sunK)) * (0.95 + 0.1 * tex.r * shell);',
   '  vec3 bodyCol = mix(uShade, uTop, clamp(0.35 + 0.35 * sunK + 0.2 * h, 0.0, 1.0)) * (1.0 - uBaseDark * baseK * 0.6);',
-  '  col = mix(col, bodyCol, (1.0 - smoothstep(0.1, 0.65, dens)) * 0.65 * (1.0 - 0.6 * shell));',   /* M10: a lobe's thin rim takes the body's mean tone, so a shaded lobe in front of a lit one no longer draws a crisp disc (the outer silhouette keeps its edge) */
+  '  col = mix(col, bodyCol, (1.0 - smoothstep(0.1, 0.65, dens)) * 0.65 * (1.0 - 0.6 * shell));',
+  '  col = mix(col, bodyCol, 0.42 * uDiffuse * (1.0 - 0.5 * vBelow));',   /* M14: every lobe leans toward the body's mean tone, so a body reads as one soft mass rather than a cluster of lit balls */   /* M10: a lobe's thin rim takes the body's mean tone, so a shaded lobe in front of a lit one no longer draws a crisp disc (the outer silhouette keeps its edge) */
   '  float edge = 1.0 - smoothstep(0.06, 0.55, dens);',   /* thin parts scatter the key forward: a silver lining, strongest toward the light */
-  '  col += uRim * uRimK * edge * shell * (0.1 + 1.6 * pow(vFwd, 5.0)) * (0.35 + 0.65 * sunK) * (1.0 - 0.7 * vBelow);',   /* the silver lining rims the BODY silhouette, not every puff */
+  '  col += uRim * uRimK * edge * shell * shell * (0.1 + 1.6 * pow(vFwd, 5.0)) * (0.35 + 0.65 * sunK) * (1.0 - 0.7 * vBelow) * (1.0 - 0.35 * uDiffuse);',   /* M14: only the true outline carries the lining */   /* the silver lining rims the BODY silhouette, not every puff */
   '  float fogK = smoothstep(uHazeNear, uHazeFar, vDist) * uHazeMax; float horK = 1.0 - smoothstep(uHor.x, uHor.y, vElev);',   /* aerial perspective + the horizon haze swallowing distant bases */
-  '  col = mix(col, uHaze, clamp(fogK + horK * 0.55, 0.0, 0.92)); a *= (1.0 - horK * 0.6) * (1.0 - fogK * 0.3);',
+  '  float thin = 1.0 - smoothstep(0.1, 0.72, dens), ph = cN(vUv * 2.3 + vec2(vPuff.y * 9.0, uTime * 0.01));',   /* M14 AURA: a faint pearl sheen on the thin edges — violet / pink away from the key, pale gold toward it */
+  '  vec3 aur = mix(mix(uAuraB, uAuraC, smoothstep(0.3, 0.75, ph)), uAuraA, sunK * 0.65 * (1.0 - vBelow)); float lum = max(max(col.r, col.g), col.b);',
+  '  col = mix(col, aur * lum, clamp(thin * (0.35 + 0.65 * shell) * uAuraK * (1.0 - 0.6 * fogK), 0.0, 1.0));',
+  '  col = mix(col, uHaze, clamp(fogK + horK * 0.55, 0.0, 0.92)); a *= (1.0 - horK * (0.6 + 0.2 * uDiffuse)) * (1.0 - fogK * (0.3 + 0.4 * uDiffuse));',   /* M14: distant bodies thin out harder into the haze (less direct visibility, more presence) */
+  '  a *= mix(1.0, smoothstep(0.0, 0.75, dens), clamp(fogK / max(uHazeMax, 0.05), 0.0, 1.0) * uDiffuse);',   /* …and their outlines go softer with distance */
   '  gl_FragColor = vec4(col, a);',
   '  #include <colorspace_fragment>',
   '}'].join('\n');
@@ -95,8 +106,8 @@ function h2(x, y, s) { var h = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 66
 function vn(x, y, s) { var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy; fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); var a = h2(ix, iy, s), b = h2(ix + 1, iy, s), c = h2(ix, iy + 1, s), d = h2(ix + 1, iy + 1, s); return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy; }
 function fbm(x, y, s) { var v = 0, a = 0.5, f = 1, t = 0; for (var o = 0; o < 5; o++) { v += a * vn(x * f, y * f, s + o * 17); t += a; a *= 0.5; f *= 2.03; } return v / t; }
 var SHAPES = [   /* blobs: [x, y, radius, weight] in the cell's -1..1 space · cut: flat-bottom height (only the BASE shape is cut: stacked crown puffs with flat bottoms read as horizontal slices) · warp / erode / billow: outline turbulence · soft: rim width */
-  { blobs: [[0, -0.3, 0.5, 1], [-0.42, -0.32, 0.34, 0.9], [0.44, -0.34, 0.32, 0.85], [-0.25, -0.02, 0.34, 0.8], [0.24, 0.02, 0.36, 0.85], [0, 0.26, 0.3, 0.75], [0.5, -0.08, 0.24, 0.55], [-0.55, -0.1, 0.22, 0.5], [-0.1, 0.46, 0.18, 0.45], [0.28, 0.36, 0.2, 0.5]], cut: -1.2, warp: 0.2, erode: 0.36, billow: 0.55, soft: 0.12, freq: 4.6 },
-  { blobs: [[0, -0.12, 0.6, 1], [-0.4, 0, 0.38, 0.8], [0.38, 0.04, 0.36, 0.8], [0.02, 0.32, 0.32, 0.7], [-0.22, -0.38, 0.38, 0.55]], cut: -1.2, warp: 0.16, erode: 0.32, billow: 0.4, soft: 0.2, freq: 3.6 },
+  { blobs: [[0, -0.3, 0.5, 1], [-0.42, -0.32, 0.34, 0.9], [0.44, -0.34, 0.32, 0.85], [-0.25, -0.02, 0.34, 0.8], [0.24, 0.02, 0.36, 0.85], [0, 0.26, 0.3, 0.75], [0.5, -0.08, 0.24, 0.55], [-0.55, -0.1, 0.22, 0.5], [-0.1, 0.46, 0.18, 0.45], [0.28, 0.36, 0.2, 0.5]], cut: -1.2, warp: 0.2, erode: 0.36, billow: 0.4, soft: 0.22, freq: 4.6 },
+  { blobs: [[0, -0.12, 0.6, 1], [-0.4, 0, 0.38, 0.8], [0.38, 0.04, 0.36, 0.8], [0.02, 0.32, 0.32, 0.7], [-0.22, -0.38, 0.38, 0.55]], cut: -1.2, warp: 0.16, erode: 0.32, billow: 0.3, soft: 0.25, freq: 3.6 },
   { blobs: [[0, -0.18, 0.6, 1], [-0.55, -0.2, 0.36, 0.85], [0.56, -0.18, 0.36, 0.85], [-0.25, -0.05, 0.36, 0.7], [0.28, -0.04, 0.34, 0.7]], cut: -0.5, warp: 0.18, erode: 0.4, billow: 0.25, soft: 0.2, freq: 3.8, sy: 1.5 },
   { blobs: [[0, 0, 0.55, 0.8], [-0.45, 0.06, 0.36, 0.6], [0.46, -0.05, 0.34, 0.6], [0.2, 0.12, 0.3, 0.4]], cut: -0.95, warp: 0.5, erode: 0.9, billow: 0, soft: 0.42, freq: 2.6, sy: 1.3 }
 ];
@@ -191,7 +202,7 @@ export function createCloudBodies(ctx, L, opts) {
     cl.extent = Math.max.apply(Math, raw.map(function (P) { return P.y + P.h * 0.5; })) + len * 0.02; cl.rad = Math.max(len * 0.5, cl.extent * 0.55);
     if (L.max_top_m && cl.y + cl.extent > L.max_top_m) cl.y = L.max_top_m - cl.extent;   /* keeps every body below the HALO deck (240 m): no cloud ever pokes up through the upper-realm floor */
     for (var p = 0; p < raw.length; p++) { if (p % Math.max(1, Math.round(raw.length / keep)) !== 0 && raw.length > keep) continue; var P = raw[p]; P.cloud = cl; P.seed = pr();
-      if (P.v === undefined) P.v = pickShape(P, style, pr);
+      if (P.v === undefined) { P.v = pickShape(P, style, pr); if (P.v === 0 && P.seed < 0.55) P.v = 1; }   /* M14: about half the cauliflower lobes become soft billows (no draw added: the seed is already drawn) */
       cl.puffs.push(P); puffs.push(P); }
     /* M9 BASE PLATE (owner: clouds read as stacked pancakes / cards from below): ONE horizontal soft card per body at its base, the body's
        footprint, aligned with its yaw. Seen from below it takes over from the base puffs (a row of upright base puffs seen end-on stacked
@@ -204,7 +215,8 @@ export function createCloudBodies(ctx, L, opts) {
   var taps = opts.taps === undefined ? 2 : opts.taps, tex = puffAtlas(THREE, opts.cell || 256);
   var mat = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false, depthTest: true, fog: false, side: THREE.DoubleSide, toneMapped: true, defines: { CLOUD_TAPS: taps },
     uniforms: { uMap: { value: tex }, uTop: { value: new THREE.Color() }, uShade: { value: new THREE.Color() }, uRim: { value: new THREE.Color() }, uHaze: { value: new THREE.Color() }, uLightWorld: { value: new THREE.Vector3(0, 1, 0) }, uOpacity: { value: 1 }, uRimK: { value: 0.6 },
-      uHazeNear: { value: 260 }, uHazeFar: { value: 1250 }, uHazeMax: { value: 0.7 }, uHor: { value: new THREE.Vector2(0.0, 0.16) }, uBaseDark: { value: 0.18 }, uShadowK: { value: 0.55 }, uTime: { value: 0 } } });
+      uHazeNear: { value: 260 }, uHazeFar: { value: 1250 }, uHazeMax: { value: 0.7 }, uHor: { value: new THREE.Vector2(0.0, 0.16) }, uBaseDark: { value: 0.18 }, uShadowK: { value: 0.55 }, uTime: { value: 0 },
+      uOblong: { value: 1 }, uDiffuse: { value: 1 }, uAuraK: { value: 0.2 }, uAuraA: { value: new THREE.Color(0xffe2b0) }, uAuraB: { value: new THREE.Color(0xb9a8f0) }, uAuraC: { value: new THREE.Color(0xf2b3dc) } } });
   own.push(mat);
   var mesh = new THREE.InstancedMesh(geo, mat, puffs.length); mesh.name = 'SKY_' + L.id; mesh.frustumCulled = false; mesh.userData.noMerge = true; mesh.renderOrder = opts.renderOrder || 4; mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.userData.cloudSilhouette = { kind: tower ? 'LIT_TOWER_CLUSTER' : 'LIT_PUFF_CLUSTER', rectangular: false, feathered: true, clouds: clouds.length, puffs: puffs.length, tier_scale: tierScale, shapes: 'ATLAS_4_NOISE_ERODED', self_shadow_taps: taps, style: style };
@@ -217,7 +229,9 @@ export function createCloudBodies(ctx, L, opts) {
   write(null);
   function setLook(look) { var U = mat.uniforms; U.uTop.value.set(look.top); U.uShade.value.set(look.shade); U.uRim.value.set(look.rim); U.uHaze.value.set(look.haze); U.uOpacity.value = look.opacity; U.uRimK.value = look.rimK;
     U.uHazeNear.value = look.hazeNear !== undefined ? look.hazeNear : 260; U.uHazeFar.value = look.hazeFar !== undefined ? look.hazeFar : 1250; U.uHazeMax.value = look.hazeMax !== undefined ? look.hazeMax : 0.7;
-    U.uHor.value.set(look.hor ? look.hor[0] : 0.0, look.hor ? look.hor[1] : 0.16); U.uBaseDark.value = look.baseDark !== undefined ? look.baseDark : 0.18; U.uShadowK.value = look.shadowK !== undefined ? look.shadowK : 0.55; }
+    U.uHor.value.set(look.hor ? look.hor[0] : 0.0, look.hor ? look.hor[1] : 0.16); U.uBaseDark.value = look.baseDark !== undefined ? look.baseDark : 0.18; U.uShadowK.value = look.shadowK !== undefined ? look.shadowK : 0.55;
+    U.uOblong.value = look.oblong !== undefined ? look.oblong : 1; U.uDiffuse.value = look.diffuse !== undefined ? look.diffuse : 1; U.uAuraK.value = look.auraK !== undefined ? look.auraK : 0.2;   /* M14 */
+    if (look.auraA) U.uAuraA.value.set(look.auraA); if (look.auraB) U.uAuraB.value.set(look.auraB); if (look.auraC) U.uAuraC.value.set(look.auraC); }
   /* camPos: {x,y,z} (ctx.cameraPos()) for the back-to-front sort · lightDir: the world direction of the active key (Sun by day, Moon by night) */
   function tick(dt, t, camPos, lightDir) { mat.uniforms.uTime.value = t || 0; if (lightDir) mat.uniforms.uLightWorld.value.set(lightDir[0], lightDir[1], lightDir[2]).normalize();
     sortClock += dt || 0; var sortNow = sortClock > 0.25 && camPos; write(sortNow ? camPos : null); if (sortNow) sortClock = 0; }

@@ -10,6 +10,7 @@
    setNight() only changes emissive intensities (no rebuild). Nothing animates, so there is no tick. The interior uses its OWN material
    clones because the host's clearGroup() disposes every material in a room group when the player leaves. */
 import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js';
+import { taperShaft, energyTip, tipMaterial } from './formKit.js';
 
 var TWO_PI = Math.PI * 2;
 var _instance = null;   /* the latest createMatchHall() instance, so the module-level buildInterior export can serve a host that imports it directly */
@@ -124,10 +125,76 @@ export function createMatchHall(ctx) {
         '    float on = step(0.3, fract(id * 13.7)); vec3 cc = nkClass(fract(id * 5.3)); for (int j = 0; j < 2; j++) { float d = fract(ph + float(j) * 0.47) - yN; float tail = exp(-d * d * 55.0) * (0.8 + 0.2 * sin(t * 0.9 + id * 11.0)); float head = exp(-d * d * 1400.0) * 0.5;',
         '    add += cc * (tail * 2.1 + head * 0.8) * on; } }   /* DESIGN DNA: soft eased light bulbs that breathe (no hard white head) */',
         '  else if (k < 1.5) { float f = fract(ang * 14.0 - t * 0.35); add += Eb * (0.5 - 0.5 * cos(f * 6.2831853)) * 0.55; }',
-        '  else { float f = fract((vLP.y + abs(vLP.z) + abs(vLP.x) * 0.3) * 0.3 - t * 0.5); add += vec3(0.9, 0.78, 0.5) * pow(0.5 - 0.5 * cos(f * 6.2831853), 3.0) * 0.9; }',
-        '  totalEmissiveRadiance = Eb * mix(0.1, 0.13, uNight) * (k > 1.5 ? 2.6 : 1.0) + add * mix(0.75, 1.0, uNight) + Eb * sweep * mix(0.35, 0.6, uNight); }'].join('\n')); };   /* absolute levels: a dim ice base line; class-coloured packets with a white head and a fading tail climb the strips, kept below the tone-map shoulder so the class colour survives (a hot packet read as flat white) */
+        '  else if (k < 2.5) { float f = fract((vLP.y + abs(vLP.z) + abs(vLP.x) * 0.3) * 0.3 - t * 0.5); add += vec3(0.9, 0.78, 0.5) * pow(0.5 - 0.5 * cos(f * 6.2831853), 3.0) * 0.9; }',
+        '  else if (k < 3.5) { float a2 = atan(vLP.z, vLP.x - 3.0) / 6.2831853 + 0.5, lv = floor(vLP.y * 0.4); float f = fract(a2 * 2.0 - t * (0.045 + 0.02 * mod(lv, 3.0)) + lv * 0.37);',   /* M14 tier bands: TITAN blue ↔ VISIONARY violet, a soft light chasing round each floor at its own pace */
+        '    vec3 cc = mix(vec3(0.028, 0.147, 1.0), vec3(0.254, 0.074, 1.0), 0.5 + 0.5 * sin(vLP.y * 0.35 + a2 * 6.2831853 + t * 0.25)); add += cc * (0.55 + 1.7 * pow(0.5 - 0.5 * cos(f * 6.2831853), 5.0)); }',
+        '  else { float f = fract(vLP.y * 0.04 - t * 0.2 + fract((vLP.x + vLP.z) * 0.013)); vec3 cc = mix(vec3(0.028, 0.147, 1.0), vec3(0.254, 0.074, 1.0), smoothstep(8.0, 40.0, vLP.y));',   /* M14 light rivers: pulses climbing the corners into the crown, blue below turning violet above */
+        '    add += cc * (0.4 + 2.2 * pow(0.5 - 0.5 * cos(f * 6.2831853), 8.0)); }',
+        '  float bk = k > 2.5 ? 0.25 : (k > 1.5 ? 2.6 : 1.0);',
+        '  totalEmissiveRadiance = Eb * mix(0.1, 0.13, uNight) * bk + add * mix(0.75, 1.0, uNight) + Eb * sweep * mix(0.35, 0.6, uNight) * (k > 2.5 ? 0.3 : 1.0); }'].join('\n')); };   /* absolute levels: a dim ice base line; class-coloured packets with a white head and a fading tail climb the strips, kept below the tone-map shoulder so the class colour survives (a hot packet read as flat white) */
     facadeMat.customProgramCacheKey = function () { return 'matchHall_neoTokyo'; }; facadeMat.color.setHex(0x1c2028); facadeMat.metalness = 0.6; facadeMat.roughness = 0.4;   /* dark diffuse: the lines are light, not white paint lit by the sky */
     stats.neoTokyo = { ticker_perimeter_m: +(u0 * REP).toFixed(1), blade: [BW, BH, BY] };
+  }
+
+  /* ---------- M14 SKY TIERS (owner 2026-09-27: "grander … taller / more significant, a few more visible floors / stacked upper levels, more
+     expressive from top and side views, much more Neo-Tokyo / futuristic nightlife … very bright blue, strong purple, animated light movement
+     across and into the building … layered facade logic … the inside beginning to reflect that energy … not tacky, not casino") ----------
+     Three stepped, softened tiers rise from the roof, set back toward the rear so the door facade reads as a cascade. Every floor is a glass
+     ribbon over a lit ROOM drawn by interior mapping (the view ray is carried to the room's back wall, ceiling or floor: a blue → violet
+     wash, light beams sweeping it, light pooled low, ceiling light lines — true parallax, no geometry); every floor line and slab nose is a
+     TITAN-blue / VISIONARY-violet band that chases round its tier; LIGHT RIVERS climb the body's corners and the tiers' rounded corners
+     toward the crown; a lit halo ring and a tapered mast carry the roof diamond and a class-blue energy tip.
+     Presentation only: every part is ABOVE the 22 m collider top (≥ 21.75 m) and inside the 40 × 40 footprint; the host collider is
+     unchanged (a matching collider for the tiers waits on the runtime bridge). Cost: +2 draws (tier glass, tip); the tier bodies, slabs and
+     lines merge into the existing body / crown / line draws. */
+  var glassMat = null, glassU = null, tipM = null, tipGeo = null;
+  function tierQ() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
+  /* a vertical strip following a rounded-rect outline (w × d, corner r, centred at cx, cz) from y0 to y1, pushed off the outline by off;
+     outward normals, u in metres along the outline; room = [floor y, room height] adds the glass aGlass attribute */
+  function ribbon(w, d, r, cx, cz, y0, y1, off, n, room) {
+    var pts = roundedRect(w, d, r).getSpacedPoints(n), N = pts.length, pos = [], nor = [], uv = [], gl = [], idx = [], u = 0;
+    for (var i = 0; i < N; i++) { var a = pts[i === 0 || i === N - 1 ? N - 2 : i - 1], b = pts[i === 0 || i === N - 1 ? 1 : i + 1], tx = b.x - a.x, ty = b.y - a.y, tl = Math.hypot(tx, ty) || 1, nx = ty / tl, nz = tx / tl;   /* the outline runs counter-clockwise: 2D outward (ty, −tx) → world (x, −y) */
+      if (i > 0) u += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); var X = cx + pts[i].x + nx * off, Z = cz - pts[i].y + nz * off;
+      pos.push(X, y0, Z, X, y1, Z); nor.push(nx, 0, nz, nx, 0, nz); uv.push(u, 0, u, 1); if (room) gl.push(room[0], room[1], room[0], room[1]);
+      if (i < N - 1) { var k = i * 2; idx.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); } }
+    var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); if (room) g.setAttribute('aGlass', new THREE.Float32BufferAttribute(gl, 2)); g.setIndex(idx); return g;
+  }
+  function skyGlass() {
+    glassMat = new THREE.MeshStandardMaterial({ color: 0x07090e, roughness: 0.08, metalness: 0.85, envMapIntensity: 1.1 }); glassMat.name = 'matchHall_sky_glass';
+    glassU = { uTime: facadeU ? facadeU.uTime : { value: 0 }, uNight: facadeU ? facadeU.uNight : { value: night ? 1 : 0 } };
+    glassMat.onBeforeCompile = function (sh) { sh.uniforms.uTime = glassU.uTime; sh.uniforms.uNight = glassU.uNight;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec2 aGlass; varying vec2 vGl; varying vec3 vGW; varying vec3 vGN; varying float vGU;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvGl = aGlass; vGU = uv.x; vGW = (modelMatrix * vec4(position, 1.0)).xyz; vGN = normalize(mat3(modelMatrix) * normal);');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime; uniform float uNight; varying vec2 vGl; varying vec3 vGW; varying vec3 vGN; varying float vGU;').replace('#include <emissivemap_fragment>', ['#include <emissivemap_fragment>',
+        '{ vec3 V = normalize(vGW - cameraPosition); float cn = max(dot(V, -vGN), 0.1), t = uTime, fl = vGl.x, ce = vGl.x + vGl.y;',
+        '  float sW = 3.2 / cn, sY = V.y > 0.0 ? (ce - vGW.y) / max(V.y, 1e-3) : (fl - vGW.y) / min(V.y, -1e-3), s = min(sW, max(sY, 0.0)); vec3 Q = vGW + V * s;',   /* interior mapping: the room's back wall, ceiling or floor */
+        '  float wall = step(sW, sY), up = step(0.0, V.y), yIn = clamp((Q.y - fl) / max(vGl.y, 0.5), 0.0, 1.0);',
+        '  vec3 B = vec3(0.028, 0.147, 1.0), P = vec3(0.254, 0.074, 1.0); vec3 wash = mix(B, P, 0.5 + 0.5 * sin((Q.x * 0.07 + Q.z * 0.05) * 2.0 + t * 0.21 + fl * 0.4));',
+        '  float beams = pow(0.5 + 0.5 * sin((Q.x - Q.z) * 0.42 - t * 0.8 + fl), 10.0) + 0.7 * pow(0.5 + 0.5 * sin((Q.x + Q.z) * 0.29 + t * 0.55 - fl * 0.7), 14.0);',   /* light beams sweeping the room */
+        '  float lines = pow(0.5 + 0.5 * cos((Q.x + Q.z) * 1.9), 24.0);',
+        '  vec3 room = wall * wash * (0.2 + 0.9 * exp(-yIn * 4.0) + 0.85 * beams * (0.3 + 0.7 * yIn))',   /* back wall: the wash, light pooled low, beams */
+        '    + (1.0 - wall) * up * (wash * (0.12 + 0.35 * beams) + vec3(0.75, 0.8, 1.0) * lines * 0.35)',   /* ceiling: light lines */
+        '    + (1.0 - wall) * (1.0 - up) * wash * (0.55 + 0.8 * beams);',   /* floor: glossy, catching the beams */
+        '  float occ = 0.55 + 0.45 * sin(fl * 1.9 + floor(vGU / 7.0) * 2.7 + 0.3 * sin(t * 0.13 + vGU * 0.2)), mull = 1.0 - smoothstep(0.44, 0.48, abs(fract(vGU / 1.6) - 0.5));',
+        '  totalEmissiveRadiance += room * occ * mull * smoothstep(0.08, 0.45, cn) * mix(0.22, 1.0, uNight); }'].join('\n')); };
+    glassMat.customProgramCacheKey = function () { return 'matchHall_skyGlass'; };
+  }
+  function skyTiers(hw, hd, H, black, graphite, platinum, cyan, glass) {
+    var LOWQ = tierQ() === 'LOW', seg = LOWQ ? 56 : 96, y = H - 0.25, SL = 0.5, OV = 0.7, bev = 0.22, curve = LOWQ ? 4 : 8;
+    var T = [{ cx: 2.0, w: 31, d: 30, r: 3.0, floors: [3.2, 3.0] }, { cx: 3.2, w: 23, d: 22, r: 3.6, floors: [3.0, 2.9] }, { cx: 4.0, w: 14, d: 14, r: 4.4, floors: [4.4] }];
+    cyan.push(tag(ribbon(T[0].w + 3.4, T[0].d + 3.4, T[0].r + 1.7, T[0].cx, 0, y, y + 0.06, 0, seg), 1));   /* a lit kerb round the roof terrace (the chase) */
+    T.forEach(function (t) { var h = t.floors.reduce(function (a, b) { return a + b; }, 0), fy = y;
+      var body = new THREE.ExtrudeGeometry(roundedRect(t.w, t.d, t.r), { depth: h - 2 * bev, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: LOWQ ? 1 : 2, steps: 1, curveSegments: curve }); body.rotateX(-Math.PI / 2); body.translate(t.cx, y + bev, 0); black.push(body);   /* the extrude's walls stand bev outside the outline */
+      t.floors.forEach(function (fh) { glass.push(ribbon(t.w, t.d, t.r, t.cx, 0, fy + 0.42, fy + fh - 0.5, bev + 0.03, seg, [fy + 0.1, fh - 0.25])); cyan.push(tag(ribbon(t.w, t.d, t.r, t.cx, 0, fy + 0.15, fy + 0.26, bev + 0.05, seg), 3)); fy += fh; });   /* a glass floor over its lit room, and its floor line */
+      [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (c) { var o = bev * 0.7071 + 0.03; cyan.push(tag(box(0.16, h - 0.5, 0.16, t.cx + c[0] * (t.w / 2 - 0.25 * t.r + o), y + 0.25, c[1] * (t.d / 2 - 0.25 * t.r + o)), 4)); });   /* light rivers at the rounded corners (the quadratic corner's midpoint) */
+      y += h; var sw = t.w + 2 * OV, sd = t.d + 2 * OV, sr = t.r + OV;
+      var slab = new THREE.ExtrudeGeometry(roundedRect(sw - 0.4, sd - 0.4, sr - 0.2), { depth: SL - 0.4, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.2, bevelSegments: LOWQ ? 1 : 2, steps: 1, curveSegments: curve }); slab.rotateX(-Math.PI / 2); slab.translate(t.cx, y + 0.2, 0); graphite.push(slab);   /* a softened slab nose over each tier */
+      cyan.push(tag(ribbon(sw, sd, sr, t.cx, 0, y + 0.16, y + 0.3, 0.03, seg), 3)); y += SL; });
+    var tx = T[2].cx, ringY = y + 1.6, RR = 6.0;
+    var ring = new THREE.TorusGeometry(RR, 0.13, LOWQ ? 6 : 8, LOWQ ? 48 : 96); ring.rotateX(Math.PI / 2); ring.translate(tx, ringY, 0); cyan.push(tag(ring, 3));   /* the crown's halo ring */
+    [0, 1, 2, 3].forEach(function (i) { var a = Math.PI / 4 + i * Math.PI / 2; graphite.push(box(0.09, 1.6, 0.09, tx + Math.cos(a) * RR, y, Math.sin(a) * RR)); });   /* its four hangers */
+    var mast = taperShaft(THREE, 0.5, 0.16, 6.5, LOWQ ? 'LOW' : 'MED', { flare: 1.3, belly: 0.04 }); mast.translate(tx, y, 0); graphite.push(mast);
+    var gemY = y + 6.5 + 1.2, tipH = 3.0; tipGeo = energyTip(THREE, 0.32, tipH, 0x2f6bff, LOWQ ? 'LOW' : 'MED'); tipGeo.translate(tx, gemY + 1.25, 0);
+    return { tx: tx, top: y, ringY: ringY, gemY: gemY, height: gemY + 1.25 + tipH, tiers: T.length, floors: T.reduce(function (a, t) { return a + t.floors.length; }, 0) };
   }
 
   /* ---------- EXTERIOR: the official match building (black body, graphite crown + portal, platinum plinth, cyan lines) ---------- */
@@ -150,7 +217,6 @@ export function createMatchHall(ctx) {
     platinum.push(box(RECESS + 0.25, PLINTH, (d0 - dw) + hd + 0.25, -hw + RECESS / 2 - 0.125, 0, (-hd - 0.25 + d0 - dw) / 2));
     platinum.push(box(RECESS + 0.25, PLINTH, hd + 0.25 - (d0 + dw), -hw + RECESS / 2 - 0.125, 0, (d0 + dw + hd + 0.25) / 2));
     [-1, 1].forEach(function (s) { platinum.push(box(0.18, 0.12, 2 * hd + 0.36, s * (hw + 0.09), bodyTop - 0.5, 0)); platinum.push(box(2 * hw + 0.36, 0.12, 0.18, 0, bodyTop - 0.5, s * (hd + 0.09))); });
-    var gem = new THREE.OctahedronGeometry(0.8, 0); gem.scale(1, 1.6, 1); gem.translate(0, H + 0.9, 0); platinum.push(gem);   /* roof diamond: y 21.6 .. 24.2, the only part above the 22 m collider */
     /* the door: a graphite portal frame proud of the face, a graphite threshold in the recess, the cyan lintel line, the name plate backing */
     [-1, 1].forEach(function (s) { graphite.push(box(0.35, dh + 0.9, 0.5, -hw - 0.175, 0, d0 + s * (dw + 0.25))); });
     graphite.push(box(0.35, 0.6, 2 * dw + 1.0, -hw - 0.175, dh + 0.3, d0));
@@ -170,19 +236,28 @@ export function createMatchHall(ctx) {
     alongZ(-hw, -1, true); alongZ(hw, 1, false); alongX(-hd, -1); alongX(hd, 1);
     [-1, 1].forEach(function (s) { cyan.push(tag(box(0.05, 0.07, 2 * hd + 0.1, s * (hw + 0.025), bodyTop - 0.78, 0), 1)); cyan.push(tag(box(2 * hw + 0.1, 0.07, 0.05, 0, bodyTop - 0.78, s * (hd + 0.025)), 1)); });
     neoTokyo(hw, hd, d0, dw, dh, bodyTop, cyan, graphite);   /* M12: the ticker band, the signage blade and its lit edges */
+    [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (c) { cyan.push(tag(box(0.2, bodyTop - PLINTH - 0.9, 0.2, c[0] * (hw + 0.02), PLINTH + 0.6, c[1] * (hd + 0.02)), 4)); });   /* M14: light rivers up the body's corners */
+    var glass = []; skyGlass(); var sky = skyTiers(hw, hd, H, black, graphite, platinum, cyan, glass);   /* M14: the stacked sky tiers */
     /* assemble */
     var g = new THREE.Group(); g.name = 'MATCH_HALL'; g.position.set(A.position[0], 0, A.position[2]); g.rotation.y = F.theta; g.userData.noMerge = true;
+    var gem = new THREE.OctahedronGeometry(0.8, 0); gem.scale(1, 1.6, 1); gem.translate(sky.tx, sky.gemY, 0); platinum.push(gem);   /* M14: the roof diamond is now the crest on the crown mast (was on the flat roof, y 21.6 – 24.2) */
     var meshes = [merged(black, mat('black', { color: 0x0b0d11, roughness: 0.42, metalness: 0.8 }), 'MATCH_HALL_BODY', true), merged(graphite, mat('graphite', { color: 0x1d2229, roughness: 0.55, metalness: 0.75 }), 'MATCH_HALL_CROWN', true), merged(platinum, mat('platinum', { color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), 'MATCH_HALL_PLINTH', true), merged(cyan, facadeMat || lineMat, 'MATCH_HALL_LINES', false)];
+    var gm = merged(glass, glassMat, 'MATCH_HALL_SKY_GLASS', false); if (gm) { gm.renderOrder = 1; meshes.push(gm); }
+    if (tipGeo) { tipM = tipMaterial(THREE); var tp = new THREE.Mesh(tipGeo, tipM); tp.name = 'MATCH_HALL_CROWN_TIP'; tp.userData.tris = Math.round(tipGeo.index ? tipGeo.index.count / 3 : tipGeo.attributes.position.count / 3); meshes.push(tp); }
     if (tickerGeo) { var tk = new THREE.Mesh(tickerGeo, tickerMat); tk.name = 'MATCH_HALL_TICKER'; tk.renderOrder = 3; meshes.push(tk); } if (bladeGeo) { var bl = new THREE.Mesh(bladeGeo, [graphiteM2, bladeMat]); bl.name = 'MATCH_HALL_SIGN_BLADE'; meshes.push(bl); }
     var tris = 0; meshes.forEach(function (m) { if (m) { g.add(m); tris += m.userData.tris || 0; } });
     /* the gate: a dark glass plane at the back of the recess (reads as open; the interior is a room transition) */
-    var gate = new THREE.Mesh(new THREE.PlaneGeometry(2 * dw - 0.1, dh - 0.1), gateMat); gate.rotation.y = -Math.PI / 2; gate.position.set(-hw + RECESS - 0.08, dh / 2, d0); gate.name = 'MATCH_HALL_GATE'; gate.renderOrder = 2; g.add(gate); tris += 2;
+    var gateGeo = new THREE.PlaneGeometry(2 * dw - 0.1, dh - 0.1); if (glassMat) { var gn = gateGeo.attributes.position.count, ga = new Float32Array(gn * 2), gu = gateGeo.attributes.uv; for (var gi = 0; gi < gn; gi++) { ga[gi * 2] = 0.05; ga[gi * 2 + 1] = dh + 0.6; gu.setX(gi, gu.getX(gi) * (2 * dw - 0.1) + 0.8); } gateGeo.setAttribute('aGlass', new THREE.BufferAttribute(ga, 2)); }   /* M14: the gate is a window into a lit lobby (the tiers' interior mapping), so the energy reads inside the building too */
+    var gate = new THREE.Mesh(gateGeo, glassMat || gateMat); gate.rotation.y = -Math.PI / 2; gate.position.set(-hw + RECESS - 0.08, dh / 2, d0); gate.name = 'MATCH_HALL_GATE'; gate.renderOrder = 2; g.add(gate); tris += 2;
     /* the name plate 'MAH MATCH' (registry map label) as a canvas plane on the door facade above the portal */
     var label = (A.map && A.map.label) || 'MAH MATCH'; plateTex = nameTexture(label);
     if (plateTex) { plateMat = new THREE.MeshBasicMaterial({ map: plateTex, transparent: true, depthWrite: false }); var plate = new THREE.Mesh(new THREE.PlaneGeometry(8.6, 1.62), plateMat); plate.rotation.y = -Math.PI / 2; plate.position.set(-hw - 0.17, dh + 2.6, d0); plate.name = 'MATCH_HALL_PLATE'; plate.renderOrder = 3; g.add(plate); tris += 2; }
     else log('matchHall: no document → name plate skipped');
     ctx.group.add(g); groups.push(g);
-    stats.building = { id: A.id, at: [A.position[0], A.position[2]], door: { side: door.side || '-x', x: door.x, z: door.z, w: 2 * dw, h: dh }, draw_calls: g.children.length, tris: tris, strips: strips, height_m: H };
+    stats.building = { id: A.id, at: [A.position[0], A.position[2]], door: { side: door.side || '-x', x: door.x, z: door.z, w: 2 * dw, h: dh }, draw_calls: g.children.length, tris: tris, strips: strips, height_m: H, sky_tiers: { tiers: sky.tiers, floors: sky.floors, visual_top_m: +sky.height.toFixed(1), collider_top_m: H, note: 'visual only, above the collider top and inside the footprint; a matching collider waits on the runtime bridge' } };
+    if (ctx.auraRequests) { var ct = Math.cos(F.theta), st = Math.sin(F.theta), wx = A.position[0] + sky.tx * ct, wz = A.position[2] - sky.tx * st;   /* M14 AURA: a violet halo round the crown ring, a soft blue presence round the tiers (night-led) */
+      ctx.auraRequests.push({ x: wx, y: sky.ringY, z: wz, size: 10.5, aspect: 0.8, ring: 0.66, ringW: 0.05, breakup: 0.55, tint: 0x9a78e0, spectral: 0.9, intensity: 0.16, pull: 5, nightK: 3.2, phase: 2.1 });
+      ctx.auraRequests.push({ x: wx, y: H + (sky.top - H) * 0.5, z: wz, size: 24, aspect: 0.75, ring: 0, tint: 0x5a8cf0, spectral: 0.4, intensity: 0.05, pull: 10, nightK: 5, phase: 0.7 }); }
   }
 
   /* ---------- COURT: outdoor official-match ground (graphite disc, platinum rim + stepped spectator tiers, cyan rings, 4 pylons) ---------- */
@@ -243,9 +318,9 @@ export function createMatchHall(ctx) {
     night = !!n; if (lineMat) lineMat.emissiveIntensity = night ? LINE_NIGHT : LINE_DAY; if (gateMat) gateMat.emissiveIntensity = night ? GATE_NIGHT : GATE_DAY;
     if (interiorMats) { interiorMats.line.emissiveIntensity = night ? LINE_NIGHT : LINE_DAY; interiorMats.gate.emissiveIntensity = night ? GATE_NIGHT : GATE_DAY; }
   }
-  function neoNight(n) { if (facadeU) facadeU.uNight.value = n ? 1 : 0; if (facadeMat) facadeMat.emissiveIntensity = n ? LINE_NIGHT : LINE_DAY; if (tickerMat) tickerMat.color.setScalar(n ? 1.15 : 0.62); if (bladeMat) bladeMat.color.setScalar(n ? 1.1 : 0.6); }
+  function neoNight(n) { if (glassU && !facadeU) glassU.uNight.value = n ? 1 : 0; if (tipM) tipM.opacity = n ? 0.95 : 0.8; if (facadeU) facadeU.uNight.value = n ? 1 : 0; if (facadeMat) facadeMat.emissiveIntensity = n ? LINE_NIGHT : LINE_DAY; if (tickerMat) tickerMat.color.setScalar(n ? 1.15 : 0.62); if (bladeMat) bladeMat.color.setScalar(n ? 1.1 : 0.6); }
   var api = {
-    tick: function (dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (facadeU) facadeU.uTime.value = clock; if (tickerTex) tickerTex.offset.x = (clock * 0.018) % 1; },
+    tick: function (dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (facadeU) facadeU.uTime.value = clock; else if (glassU) glassU.uTime.value = clock; if (tickerTex) tickerTex.offset.x = (clock * 0.018) % 1; },
     build: function () {
       var base = mat('cyanLine', { color: 0xe6ecf6, emissive: 0xdfe8ff, emissiveIntensity: 1.6, roughness: 0.3, metalness: 0.2 }); lineMat = base.clone(); lineMat.name = 'matchHall_line';
       gateMat = new THREE.MeshStandardMaterial({ color: 0x05080c, roughness: 0.06, metalness: 0.7, transparent: true, opacity: 0.74, emissive: 0x10131c, emissiveIntensity: GATE_DAY, depthWrite: false }); gateMat.name = 'matchHall_gate';
@@ -257,7 +332,7 @@ export function createMatchHall(ctx) {
     buildInterior: buildInterior,
     dispose: function () {
       groups.forEach(function (g) { if (g.parent) g.parent.remove(g); g.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); }); groups = [];
-      [facadeMat, tickerMat, tickerTex, bladeMat, bladeTex].forEach(function (o) { if (o) o.dispose(); }); facadeMat = tickerMat = tickerTex = bladeMat = bladeTex = null; if (tickerGeo) tickerGeo.dispose(); if (bladeGeo) bladeGeo.dispose(); tickerGeo = bladeGeo = null;
+      [facadeMat, tickerMat, tickerTex, bladeMat, bladeTex, glassMat, tipM].forEach(function (o) { if (o) o.dispose(); }); facadeMat = tickerMat = tickerTex = bladeMat = bladeTex = glassMat = tipM = null; glassU = null; if (tipGeo) tipGeo.dispose(); tipGeo = null; if (tickerGeo) tickerGeo.dispose(); if (bladeGeo) bladeGeo.dispose(); tickerGeo = bladeGeo = null;
       if (lineMat) lineMat.dispose(); if (gateMat) gateMat.dispose(); if (plateMat) plateMat.dispose(); if (plateTex) plateTex.dispose(); lineMat = gateMat = plateMat = plateTex = null; stats.building = stats.court = null; if (_instance === api) _instance = null;
     },
     debug: function () { return { building: stats.building, court: stats.court, interior: stats.interior, night: night, draw_calls_field: (stats.building ? stats.building.draw_calls : 0) + (stats.court ? stats.court.draw_calls : 0) }; }

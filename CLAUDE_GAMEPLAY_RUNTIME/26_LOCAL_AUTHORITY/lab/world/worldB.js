@@ -48,7 +48,7 @@ export function createWorldB(THREE, scene, opts) {
   var ctx = { THREE: THREE, scene: scene, group: group, M: M, loadGlb: loadGlb, url: url, night: !!opts.night, quality: opts.quality, renderer: opts.renderer, registry: null, layout: null, forest: null, fixtures: null,
     playerPos: opts.playerPos || function () { return { x: 0, y: 0, z: 0 }; }, cameraPos: opts.cameraPos || function () { return { x: 0, y: 5, z: 10 }; }, playerHeading: opts.playerHeading || function () { return 0; }, playerHand: opts.playerHand || null, playerSocket: opts.playerSocket || null, snapshot: function () { return lastSnap; },
     applyCelestialLight: typeof opts.applyCelestialLight === 'function' ? opts.applyCelestialLight : null,   /* M5 owner correction: fieldScene owns the one real key; sky/celestial may only supply its stable direction + bounded cloud transmission. */
-    auraRequests: [], addTick: function (fn) { ticks.push(fn); }, onNight: function (fn) { nightFns.push(fn); }, disposeRoot: disposeRoot, rnd: seededRnd, log: opts.log || function () { } };
+    auraRequests: [], auraForms: [], addTick: function (fn) { ticks.push(fn); }, onNight: function (fn) { nightFns.push(fn); }, disposeRoot: disposeRoot, rnd: seededRnd, log: opts.log || function () { } };
   function seededRnd(seed) { var s = (seed >>> 0) || 1; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
   async function build(hostLayout, reg) {
     if (built) return; built = true; var buildGeneration = ++generation; layout = hostLayout || null; registry = reg || await fetch(url('lab/assets/world/world_registry_v1.json')).then(function (r) { return r.json(); }); if (!built || buildGeneration !== generation) return mods;

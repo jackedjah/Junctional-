@@ -10,6 +10,7 @@ import { ridgeStations, ridgeFaceSegment, ridgeFacePoint, ridgeReachBounds } fro
 import { veilCurtainKeep } from '../26_LOCAL_AUTHORITY/lab/world/veilFalls.js';
 import { ridgeWarpField, sculptRidge, REACH_IN, REACH_FLOOR } from '../26_LOCAL_AUTHORITY/lab/world/ridgeSculpt.js';
 import { buildRoadNetwork } from '../26_LOCAL_AUTHORITY/lab/world/roadNetwork.js';
+import { formsSafe, FORM } from '../26_LOCAL_AUTHORITY/lab/world/auraForms.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
@@ -181,4 +182,15 @@ if (CU17 && RN17) { var st17 = ridgeStations(RN17, ri17), keep17 = [{ x: VW.sour
 var crysOk17 = /Math\.max\(4 \+ s2 \* 0\.7,/.test(VF) && !/Math\.max\(4 \+ s2 \* 0\.[0-6],/.test(VF);
 ok('17. M12 Veil curtain rides authored rock (' + res17.n + ' footprints, max sculpt weight ' + res17.maxW + ', ' + (CU17 ? CU17.to - CU17.from : 0) + ' station spans) and the cliff crystals stay ≥ 3.4 m', !!CU17 && res17.n > 0 && res17.maxW === 0 && CU17.to - CU17.from >= 6 && crysOk17, { res17: res17, crysOk17: crysOk17 });
 
+/* 18. M14 dimensional aura forms are pure light and stay out of reach: additive, no depth write, no collider, flagged non-interactable; the
+       lead-monolith form's placement keeps its lowest point ≥ 3.4 m above its ground for every monolith height / form size; the HALO sky
+       rings' inner band edge clears the dome shell and the structural deck radius; the MAH MATCH sky tiers stand above the 22 m collider top. */
+var FORMS = src('lab/world/auraForms.js'), TERR = src('lab/world/terrain.js'), AURA = src('lab/world/aura.js'), MHALL = src('lab/world/matchHall.js'), VEIL = src('lab/world/veilFalls.js');
+var pureLight = /transparent: true, depthWrite: false, depthTest: true, blending: THREE\.AdditiveBlending/.test(FORMS) && /userData\.nonInteractable = true/.test(FORMS) && !/solids|colliders\.push|addCollider|walls\.push/.test(FORMS);
+var monoRule = /y: mg0 \+ Math\.max\(h \* 1\.02 \+ fs \* 0\.95, 3\.4 \+ fs \* 0\.98 \+ 0\.2\)/.test(TERR) && /fs = Math\.max\(1\.6, h \* 0\.3\)/.test(TERR), monoLow = 1e9;
+for (var mh = 1; mh <= 16; mh += 0.5) { var mfs = Math.max(1.6, mh * 0.3); ['CUBE', 'DIAMOND'].forEach(function (sh) { var lo = formsSafe([{ y: Math.max(mh * 1.02 + mfs * 0.95, 3.4 + mfs * 0.98 + 0.2), size: mfs, shape: sh, ground: 0 }])[0].lowest_m; monoLow = Math.min(monoLow, lo); }); }
+var hr = /R = H\.shell_radius_m \+ ([0-9.]+);/.exec(AURA), haloInner = hr ? 0.44 * 2 * (HALO_LAYOUT.shell_radius_m + +hr[1]) : 0;
+var tiersAbove = /var LOWQ = tierQ\(\) === 'LOW', seg = LOWQ \? 56 : 96, y = H - 0\.25,/.test(MHALL) && /sky_tiers: \{ tiers: sky\.tiers/.test(MHALL);
+var veilUp = /y: yTop \+ CH \* 0\.75, z: cMid\.z - oz \* 16, size: CH \* 1\.1/.test(VEIL) && 0.75 - 1.1 * 0.56 * 1.035 - 1.1 * 0.06 > 0;
+ok('18. M14 aura forms are additive light (no depth write, no collider, non-interactable); the lead-monolith form clears 3.4 m (lowest ' + monoLow.toFixed(2) + ' m); the HALO sky rings clear the shell (' + haloInner.toFixed(1) + ' m > ' + HALO_LAYOUT.shell_radius_m + ' m) and the structural deck; the Veil rings stay above the crest; the MAH MATCH tiers start at the collider top', pureLight && monoRule && monoLow >= 3.4 && haloInner > Math.max(HALO_LAYOUT.shell_radius_m, HALO_LAYOUT.structural_deck_radius_m) + 3 && tiersAbove && veilUp && FORM.RING === 0, { pureLight: pureLight, monoRule: monoRule, monoLow: monoLow, haloInner: haloInner, tiersAbove: tiersAbove, veilUp: veilUp });
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

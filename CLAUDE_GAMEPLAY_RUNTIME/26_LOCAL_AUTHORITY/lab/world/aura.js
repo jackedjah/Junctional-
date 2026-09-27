@@ -9,23 +9,26 @@
    LOW tier keeps the bloom and drops the fringes. */
 
 import { celestialDirection } from './celestial.js';
+import { createAuraForms } from './auraForms.js';
+import { HALO_LAYOUT } from '../../play/haloLayout.js';
 
 export var SPECTRAL = { violet: 0xb48cff, ice: 0x7fd0ff, white: 0xf4f6ff, gold: 0xffd88a, pink: 0xff9ad2 };
 export var CLASS_TINT = { gold: 0xe6c36a, blue: 0x5a8cf0, purple: 0x9a78e0, pink: 0xf08ab8, red: 0xd4344a, white: 0xf4f6ff };
 
 var VERT = [
   'attribute vec3 aP; attribute vec4 aS; attribute vec3 aC; attribute vec4 aK; attribute vec3 aX;',
-  'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec3 vX;',
+  'uniform float uTime;',
+  'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec3 vX; varying float vNear;',
   'void main() { vUv = position.xy; vC = aC; vK = aK; vS = aS; vX = aX;',
-  '  vec4 mv = viewMatrix * vec4(aP, 1.0);',
-  '  float s = aS.x; mv.xy += position.xy * vec2(s, s * aS.y);',   /* camera-facing quad; aS.y stretches it vertically (columns, falls) */
+  '  vec4 mv = viewMatrix * vec4(aP, 1.0); vNear = smoothstep(3.0, 22.0, -mv.z);',   /* M14: an aura goes faint as the viewer walks into it (never in anyone's face) */
+  '  float s = aS.x * (1.0 + 0.035 * sin(uTime * 0.29 + aK.z * 3.7)); mv.xy += position.xy * vec2(s, s * aS.y);',   /* M14: a slow breath in size, not only in brightness */   /* camera-facing quad; aS.y stretches it vertically (columns, falls) */
   '  mv.z += aS.w;',                                                 /* pull toward the camera (m) so a halo is not cut by its own emitter */
   '  gl_Position = projectionMatrix * mv; }'
 ].join('\n');
 
 var FRAG = [
   'uniform float uTime; uniform float uGlobal; uniform float uFringe; uniform float uNight;',
-  'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec3 vX;',
+  'varying vec2 vUv; varying vec3 vC; varying vec4 vK; varying vec4 vS; varying vec3 vX; varying float vNear;',
   'float auH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
   'float auN(float x) { float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(auH(vec2(i, 1.7)), auH(vec2(i + 1.0, 1.7)), f); }',
   'vec3 spectral(float t) { t = fract(t);',   /* violet → ice → white → gold → pink → violet */
@@ -47,7 +50,7 @@ var FRAG = [
   '  vec3 col = vC * bloom + sp * band * spk * shimmer * arc * brk;',
   '  col += spectral(r * 2.6 - t * 0.035 + ph) * bloom * 0.22 * spk * uFringe;',   /* faint interference fringes inside the bloom */
   '  float edge = 1.0 - smoothstep(0.86, 1.0, r);',
-  '  gl_FragColor = vec4(col * vK.x * uGlobal * mix(1.0, vX.z, uNight) * edge, 1.0); }'
+  '  gl_FragColor = vec4(col * vK.x * uGlobal * mix(1.0, vX.z, uNight) * edge * vNear, 1.0); }'
 ].join('\n');
 
 /* items: [{ x, y, z, size (m, quad half-extent), aspect (vertical stretch, 1 = round), ring (0..1 ring radius as a fraction of the quad; 0 =
@@ -90,20 +93,33 @@ export function createAura(ctx) {
   function skyMoments(req) { var reg = ctx.registry || {}, C = reg.celestial; if (!C || !ctx.cameraPos) return; var D = 870;
     var sd = celestialDirection(C.sun, 'sun'), sl = Math.hypot(sd[0], sd[1], sd[2]) || 1, md = celestialDirection(C.moon, 'moon'), ml = Math.hypot(md[0], md[1], md[2]) || 1;
     function at(d, l) { return function () { var c = ctx.cameraPos(); return [c.x + d[0] / l * D, c.y + d[1] / l * D, c.z + d[2] / l * D]; }; }
-    var haloR = D * Math.tan(22 * Math.PI / 180), coronaR = D * Math.tan(7 * Math.PI / 180);
+    var sunHalf = ((C.sun && +C.sun.apparent_deg) || 6.5) / 2, moonHalf = ((C.moon && +C.moon.apparent_deg) || 11) / 2;   /* M14: drawn in the sky backdrop with the bodies (never over a far massif); the corona clears the larger Moon's limb */
+    var haloR = D * Math.tan(Math.max(22, sunHalf * 1.38) * Math.PI / 180), coronaR = D * Math.tan(Math.max(7, moonHalf * 1.3) * Math.PI / 180);
     req.push({ x: 0, y: 0, z: 0, size: haloR / 0.8, ring: 0.8, ringW: 0.03, breakup: 0.45, tint: 0x000000, spectral: 1.0, intensity: 0.75, nightK: 0, phase: 0.7, follow: at(sd, sl),
       fade: function (t, n) { if (n) return 0; var u = ((t % 300) + 300) % 300; return Math.min(1, Math.max(0, u / 12)) * Math.min(1, Math.max(0, (75 - u) / 12)); } });
     req.push({ x: 0, y: 0, z: 0, size: coronaR / 0.6, ring: 0.6, ringW: 0.08, breakup: 0.25, tint: 0x241c36, spectral: 0.9, intensity: 0.6, phase: 1.9, follow: at(md, ml),
       fade: function (t, n) { return n ? 1 : 0; } }); }
-  function build() { var req = ctx.auraRequests || []; skyMoments(req); if (!req.length) { log('aura: no requests'); return; }
-    field = createAuraField(THREE, req, { isNight: night, tier: tier(), name: 'WORLD_SPECTRAL_AURA' }); if (!field) return; ctx.group.add(field.mesh);
-    req.forEach(function (r, i) { if (typeof r.follow === 'function') followers.push({ i: i, fn: r.follow, fade: r.fade || null, base: r.intensity === undefined ? 0.5 : r.intensity }); });
-    log('aura: ' + req.length + ' spectral auras in one draw (' + followers.length + ' following)'); }
-  function tick(dt, t) { if (!field) return; field.tick(t); if (!followers.length) return; var P = field.positions, K = field.mesh.geometry.attributes.aK;
-    for (var i = 0; i < followers.length; i++) { var F = followers[i], p = F.fn(t); if (p) { P.setXYZ(F.i, p[0], p[1], p[2]); } if (F.fade) K.setX(F.i, F.base * F.fade(t, night)); }
+  /* M14 SKY FORMS: dimensional aura in the sky, far beyond anyone's reach — a gyroscope of two slow soft rings round the HALO dome, outside
+     its shell (the rings' inner band edge clears the shell radius), and two great light frames far out over the sea. */
+  function skyForms(F) { var H = HALO_LAYOUT, cy = H.arrival_height_m + 22, R = H.shell_radius_m + 32;
+    F.push({ x: H.center.x, y: cy, z: H.center.z, size: R * 2, shape: 'RING', scale: [1, 40, 1], tint: 0xffd88a, intensity: 0.34, ground: 0, axis: [0.22, 1, 0.1], spin: 0.012, phase: 0.1 });
+    F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: 0xb48cff, intensity: 0.3, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });
+    F.push({ x: -60, y: 205, z: -560, size: 110, shape: 'HEX', scale: [1, 0.35, 1], tint: 0x7fd0ff, intensity: 0.34, ground: 0, axis: [0.3, 1, 0.2], spin: 0.02, phase: 0.35 });
+    F.push({ x: 540, y: 250, z: 320, size: 80, shape: 'DIAMOND', tint: 0xff9ad2, intensity: 0.3, ground: 0, axis: [0.1, 1, 0.25], spin: 0.03, phase: 0.72 }); }
+  var skyField = null, forms = null, skyFollowers = [];
+  function build() { var req = ctx.auraRequests || [], sky = []; skyMoments(sky);
+    if (req.length) { field = createAuraField(THREE, req, { isNight: night, tier: tier(), name: 'WORLD_SPECTRAL_AURA' }); if (field) ctx.group.add(field.mesh); }
+    if (sky.length) { skyField = createAuraField(THREE, sky, { isNight: night, tier: tier(), name: 'SKY_SPECTRAL_AURA', renderOrder: -7.5 }); if (skyField) { skyField.mesh.material.transparent = false; ctx.group.add(skyField.mesh); } }   /* the celestial backdrop pass: additive, no depth write, before the world */
+    [[req, field, followers], [sky, skyField, skyFollowers]].forEach(function (L) { if (L[1]) L[0].forEach(function (r, i) { if (typeof r.follow === 'function') L[2].push({ i: i, fn: r.follow, fade: r.fade || null, base: r.intensity === undefined ? 0.5 : r.intensity }); }); });
+    var fl = (ctx.auraForms || []).slice(); skyForms(fl); var tq = tier(); if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; });   /* LOW: every sky form, half the local ones */
+    forms = createAuraForms(THREE, fl, { isNight: night, tier: tq, name: 'WORLD_AURA_FORMS', day: 0.5, night: 1.0 }); if (forms) ctx.group.add(forms.mesh);
+    log('aura: ' + req.length + ' spectral auras in one draw, ' + sky.length + ' sky moments in the backdrop, ' + (forms ? forms.count : 0) + ' dimensional forms in one draw (' + (followers.length + skyFollowers.length) + ' following)'); }
+  function follow(f, list, t) { if (!f || !list.length) return; var P = f.positions, K = f.mesh.geometry.attributes.aK;
+    for (var i = 0; i < list.length; i++) { var F = list[i], p = F.fn(t); if (p) { P.setXYZ(F.i, p[0], p[1], p[2]); } if (F.fade) K.setX(F.i, F.base * F.fade(t, night)); }
     P.needsUpdate = true; K.needsUpdate = true; }
-  function setNight(n) { night = !!n; if (field) field.setNight(night); }
-  function dispose() { if (field) { if (field.mesh.parent) field.mesh.parent.remove(field.mesh); field.dispose(); field = null; } }
-  function debug() { return { count: field ? field.count : 0, following: followers.length }; }
+  function tick(dt, t) { if (field) field.tick(t); if (skyField) skyField.tick(t); if (forms) forms.tick(t); follow(field, followers, t); follow(skyField, skyFollowers, t); }
+  function setNight(n) { night = !!n; if (field) field.setNight(night); if (skyField) skyField.setNight(night); if (forms) forms.setNight(night); }
+  function dispose() { [field, skyField, forms].forEach(function (f) { if (f) { if (f.mesh.parent) f.mesh.parent.remove(f.mesh); f.dispose(); } }); field = skyField = forms = null; followers = []; skyFollowers = []; }
+  function debug() { return { count: field ? field.count : 0, sky_moments: skyField ? skyField.count : 0, forms: forms ? forms.count : 0, following: followers.length + skyFollowers.length }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
 }
