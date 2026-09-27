@@ -155,10 +155,28 @@ export function createVeilFalls(ctx) {
 
     /* ---------- 3. the highland mesa ---------- */
     var CB = HL.center_bearing, CD = HL.center_dist_m, CX = Math.sin(CB) * CD, CZ = Math.cos(CB) * CD, er = [Math.sin(CB), Math.cos(CB)], et = [Math.cos(CB), -Math.sin(CB)];
-    var TOP = HL.top_y_m, AR = HL.radial_m, AT = HL.tangential_m, RING = 12, SEG = 72, rn = rnd(0x51C3);
+    var TOP = HL.top_y_m, AR = HL.radial_m, AT = HL.tangential_m, RING = LOW ? 12 : 22, SEG = LOW ? 72 : 120, rn = rnd(0x51C3);
     var lip = { x: crC.x, z: crC.z }, lakeC = { x: lip.x + ox * 20, z: lip.z + oz * 20 };   /* the source lake just behind the lip */
-    function roll(x, z) { var h = 1.4 * Math.sin(x * 0.047 + 1.3) * Math.cos(z * 0.041 - 0.7) + 0.7 * Math.sin((x + z) * 0.11); var dl = Math.hypot(x - lakeC.x, z - lakeC.z); return h * Math.min(1, Math.max(0, (dl - 16) / 22)); }
+    function roll0(x, z) { var h = 1.4 * Math.sin(x * 0.047 + 1.3) * Math.cos(z * 0.041 - 0.7) + 0.7 * Math.sin((x + z) * 0.11); var dl = Math.hypot(x - lakeC.x, z - lakeC.z); return h * Math.min(1, Math.max(0, (dl - 16) / 22)); }
     function rimR(th) { var e = Math.hypot(Math.cos(th) / AR, Math.sin(th) / AT); return (1 / e) * (1 + 0.09 * Math.sin(th * 3 + 0.7) + 0.05 * Math.sin(th * 7 + 2.1)); }
+    /* M15c: the residential crescent is laid out BEFORE the meadow is built, so flat pads sit under every home and garden, the civic
+       plaza and the overlooks (the meadow's gentle roll varies by up to ~2.6 m across a 30 m plaza) */
+    var PADS = [];
+    function roll(x, z) { var h = roll0(x, z); for (var i = 0; i < PADS.length; i++) { var P = PADS[i], d = Math.hypot(x - P.x, z - P.z); if (d < P.r + 7) { var w = d <= P.r ? 1 : 1 - (d - P.r) / 7; w = w * w * (3 - 2 * w); h += (P.h - h) * w; } } return h; }
+    function L2W(lx, lz) { return { x: CX + er[0] * lx + et[0] * lz, z: CZ + er[1] * lx + et[1] * lz }; }
+    function laneX(lz) { return 3 + lz * lz / 420; }   /* the crescent: concave toward the lake and the lip */
+    var RES = (function () { var rl = rnd(0xA11B), face0 = Math.atan2(-ox, -oz), busy = [{ x: lakeC.x + ox * 6, z: lakeC.z + oz * 6, r: 20 }, { x: lip.x, z: lip.z, r: 14 }, { x: Math.sin(HL.spire_bearing) * HL.spire_dist_m, z: Math.cos(HL.spire_bearing) * HL.spire_dist_m, r: 12 }];
+      function free(p, r) { if (Math.hypot(p.x, p.z) < 372) return false; for (var q = 0; q < busy.length; q++) if (Math.hypot(p.x - busy[q].x, p.z - busy[q].z) < busy[q].r + r) return false; return true; }
+      var civ = L2W(laneX(0) + 2, 0); busy.push({ x: civ.x, z: civ.z, r: 16 }); PADS.push({ x: civ.x, z: civ.z, r: 16.5, h: roll0(civ.x, civ.z) });
+      /* two rows either side of the lane, each slot at least 20 m from the next, clear of the lake, the spire and the civic plaza (front
+         row toward the lake and the view; the back row looks over it) */
+      var homes = []; [[-52, -1], [-32, -1], [50, -1], [-56, 1], [-34, 1], [34, 1], [56, 1]].forEach(function (S) { var hz = S[0], sd = S[1], hx = laneX(hz) + sd * 11.5;
+        if (Math.hypot((hx + sd * 9) / AR, hz / AT) > 0.9) return; var P = L2W(hx, hz); if (!free(P, 10)) return;
+        var yaw = face0 + (rl() - 0.5) * 0.22, h0 = roll0(P.x, P.z), gx = P.x + Math.sin(yaw) * 7.8, gz = P.z + Math.cos(yaw) * 7.8;
+        homes.push({ x: P.x, z: P.z, lz: hz, yaw: yaw, W: 12 + rl() * 2.5 }); busy.push({ x: P.x, z: P.z, r: 10 }); PADS.push({ x: P.x, z: P.z, r: 11, h: h0 }, { x: gx, z: gz, r: 7, h: h0 }); });   /* the home and its garden share one level */
+      var looks = []; [-1, 1].forEach(function (sd) { var lz = sd * 56, lx = -Math.sqrt(Math.max(0, 0.86 * 0.86 - (lz / AT) * (lz / AT))) * AR, P = L2W(lx, lz); if (!free(P, 8)) return; var Q = L2W(lx - 10, lz);
+        looks.push({ x: P.x, z: P.z, yaw: Math.atan2(Q.x - P.x, Q.z - P.z) }); busy.push({ x: P.x, z: P.z, r: 10 }); PADS.push({ x: P.x, z: P.z, r: 4, h: roll0(P.x, P.z) }); });
+      return { civ: civ, homes: homes, looks: looks, face: face0 }; })();
     var gp = [], gc = [], gi = [], col = new THREE.Color(), meadowA = new THREE.Color(0xa29eb2), meadowB = new THREE.Color(0x87839a), meadowC = new THREE.Color(0xbdb9ca), rockA = new THREE.Color(0x3b4154), rockB = new THREE.Color(0x6f6b75);
     function vtx(x, y, z, c) { gp.push(x, y, z); gc.push(c.r, c.g, c.b); return gp.length / 3 - 1; }
     var cIdx = vtx(CX, TOP + roll(CX, CZ), CZ, meadowA), rings = [];
@@ -192,13 +210,62 @@ export function createVeilFalls(ctx) {
     function spot(minR, clear, rngf) { for (var tries = 0; tries < 200; tries++) { var th2 = rngf() * Math.PI * 2, f2 = Math.sqrt(rngf()) * 0.8, rr2 = rimR(th2) * f2, lx2 = Math.cos(th2) * rr2, lz2 = Math.sin(th2) * rr2;
         var x2 = CX + er[0] * lx2 + et[0] * lz2, z2 = CZ + er[1] * lx2 + et[1] * lz2; if (Math.hypot(x2, z2) < minR) continue; var ok = true; for (var q2 = 0; q2 < taken.length; q2++) if (Math.hypot(x2 - taken[q2].x, z2 - taken[q2].z) < taken[q2].r + clear) { ok = false; break; } if (!ok) continue; taken.push({ x: x2, z: z2, r: clear }); return { x: x2, z: z2, y: TOP + roll(x2, z2) }; } return null; }
 
-    /* villas: a glass ground floor, a cantilevered platinum upper volume, a thin graphite roof and plinth — facing the view */
-    var bodyP = [], darkP = [], glassP = [], face = Math.atan2(-ox, -oz), rv = rnd(0xA11A);
+    /* M15c THE RESIDENTIAL CRESCENT (owner 2026-09-27 world-language reference, principles only — human-scale futurism, softened
+       precision, calm hierarchy, livability; no game asset or data): the highland's houses become a quiet street. A pale lane curves
+       across the mesa behind the source lake; homes stand along it in two staggered rows, every one facing the view. A home is a glass
+       ground floor with rounded ends, a white upper volume cantilevered toward the view with a lit ribbon window, and a lens-shaped
+       canopy roof on slender columns; a low curved garden wall holds crystal shrubs in the class colours in front of it. At the lane's
+       middle a round civic pavilion under a broad canopy faces the lake and the lip — the calm focal point under the spire. Two
+       crescent overlooks sit on the field-facing rim either side of the falls, their rails lit at night. Visual only, beyond the host's
+       reach like the rest of the highland; everything joins the existing villa draws (the shrubs join the grove canopy instances). */
+    var bodyP = [], darkP = [], glassP = [], spireParts = [], shrubs = [], laneLamps = [], face = RES.face;
     var VT = tier() === 'LOW' ? 'LOW' : 'MED'; function boxAt(list, w, h, d, x, y, z, yaw) { var bg = softBox(THREE, w, h, d, Math.min(0.6, Math.min(w, h, d) * 0.24), VT); bg.rotateY(yaw); bg.translate(x, y, z); list.push(bg); }   /* M14 (design DNA, seen from afar): every villa / belvedere volume is filleted — no raw box edge on the highland skyline */
-    for (var v = 0; v < (HL.villas || 5); v++) { var sp = spot(372, 16, rv); if (!sp) continue; var yaw = face + (rv() - 0.5) * 0.5, c = Math.cos(yaw), s = Math.sin(yaw), shift = 2.2;
-      boxAt(darkP, 16, 0.8, 11, sp.x, sp.y + 0.4, sp.z, yaw); boxAt(glassP, 12, 3.6, 8, sp.x, sp.y + 0.8 + 1.8, sp.z, yaw);
-      boxAt(bodyP, 13, 3.2, 8.5, sp.x + s * shift, sp.y + 0.8 + 3.4 + 1.6, sp.z + c * shift, yaw); boxAt(glassP, 13.2, 1.1, 8.7, sp.x + s * shift, sp.y + 0.8 + 3.4 + 1.7, sp.z + c * shift, yaw);
-      boxAt(bodyP, 15.5, 0.35, 11, sp.x + s * shift * 1.3, sp.y + 0.8 + 6.6 + 0.18, sp.z + c * shift * 1.3, yaw); boxAt(darkP, 15.7, 0.12, 11.2, sp.x + s * shift * 1.3, sp.y + 0.8 + 6.6 - 0.02, sp.z + c * shift * 1.3, yaw); boxAt(bodyP, 1.2, 6.6, 1.2, sp.x - s * 5.2 - c * 4.8, sp.y + 0.8 + 3.3, sp.z - c * 5.2 + s * 4.8, yaw); }
+    var SEGR = VT === 'LOW' ? 12 : 20, rv = rnd(0xA11A);
+    function W3(lx, lz) { var p = L2W(lx, lz); p.y = TOP + roll(p.x, p.z); return p; }
+    function pillAt(list, w, h, d, x, y, z, yaw) { var r = d / 2, core = Math.max(0.05, w - d), b = new THREE.BoxGeometry(core, h, d), e1 = new THREE.CylinderGeometry(r, r, h, SEGR), e2 = e1.clone(); e1.translate(core / 2, 0, 0); e2.translate(-core / 2, 0, 0); [b, e1, e2].forEach(function (g) { g.rotateY(yaw); g.translate(x, y, z); list.push(g); }); }   /* a stadium-plan volume: straight sides, round ends */
+    function lensAt(list, rx, rz, hT, hB, x, y, z, yaw) { var e = 0.4 / Math.min(rx, rz), t = 0.2, pts = [], i, u;   /* a lens canopy: a shallow dome over a shallower soffit, meeting in a soft rounded rim (~0.4 m) — never a knife edge */
+      for (i = 0; i <= 6; i++) { u = i / 6; pts.push(new THREE.Vector2(u * (1 - e), -t - (hB - t) * (1 - u * u))); }
+      for (i = 1; i < 8; i++) { var a = -Math.PI / 2 + i / 8 * Math.PI; pts.push(new THREE.Vector2(1 - e + e * Math.cos(a), t * Math.sin(a))); }
+      for (i = 6; i >= 0; i--) { u = i / 6; pts.push(new THREE.Vector2(u * (1 - e), t + (hT - t) * (1 - u * u))); }
+      var g = new THREE.LatheGeometry(pts, SEGR + 8); g.scale(rx, 1, rz); g.rotateY(yaw); g.translate(x, y, z); list.push(g); }
+    function arcAt(list, R, tube, A, x, y, z, yaw) { var g = new THREE.TorusGeometry(R, tube, 5, Math.max(8, Math.round(A * 9)), A); g.rotateX(-Math.PI / 2); g.rotateY(-Math.PI / 2 - A / 2 + yaw); g.translate(x, y, z); list.push(g); }   /* a flat arc centred on the yaw's forward (sin yaw, cos yaw) */
+    function colAt(list, h, x, y, z) { var g = new THREE.CylinderGeometry(0.16, 0.24, h, 8); g.translate(x, y + h / 2, z); list.push(g); }
+    function strip(list, a, b, w, lift) { var n = Math.max(2, Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 2.5)), dx = b.x - a.x, dz = b.z - a.z, l = Math.hypot(dx, dz) || 1, px = -dz / l * w / 2, pz = dx / l * w / 2, P = [], I = [];
+      for (var i = 0; i <= n; i++) { var f = i / n, x = a.x + dx * f, z = a.z + dz * f; P.push(x - px, TOP + roll(x - px, z - pz) + lift, z - pz, x + px, TOP + roll(x + px, z + pz) + lift, z + pz); if (i) { var k = i * 2 - 2; I.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); } }
+      var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); g.computeVertexNormals(); if (g.attributes.normal.getY(0) < 0) { I.reverse(); g.setIndex(I); g.computeVertexNormals(); } list.push(g); }   /* a flush ribbon that follows the meadow */
+    function fwd(yaw, k) { return [Math.sin(yaw) * k, Math.cos(yaw) * k]; } function side(yaw, k) { return [Math.cos(yaw) * k, -Math.sin(yaw) * k]; }
+    var SHRUB = [CLASS_TINT.purple, SPECTRAL.violet, SPECTRAL.pink, CLASS_TINT.pink, SPECTRAL.gold, SPECTRAL.ice, 0xd9dcef];   /* class families + pearl white only (colour law) */
+    /* the lane: a pale 3.4 m ribbon on the meadow, lanterns along both edges */
+    for (var li = 0, lz = -62; lz < 62; lz += 4, li++) { var A0 = W3(laneX(lz), lz), B0 = W3(laneX(lz + 4), lz + 4); strip(bodyP, A0, B0, 3.4, 0.07);
+      if (li % 2 === 0) { var dl = (laneX(lz + 0.5) - laneX(lz - 0.5)), nl = Math.hypot(1, dl); [-1, 1].forEach(function (sd) { var P = W3(laneX(lz) + sd * 2.4 / nl, lz - sd * 2.4 * dl / nl); laneLamps.push(P.x, P.y + 1.2, P.z); }); } }
+    /* the civic pavilion: a round glass hall under a broad lens canopy on a white round plaza, at the lane's middle, facing the lake */
+    var civ = RES.civ; civ.y = TOP + roll(civ.x, civ.z); taken.push({ x: civ.x, z: civ.z, r: 16 });
+    (function () { var pl = new THREE.CylinderGeometry(15, 15.4, 0.5, SEGR * 2); pl.translate(civ.x, civ.y + 0.02, civ.z); bodyP.push(pl);
+      var hall = new THREE.CylinderGeometry(7, 7, 4.4, SEGR * 2, 1, true); hall.translate(civ.x, civ.y + 0.25 + 2.2, civ.z); glassP.push(hall);
+      var ring = new THREE.TorusGeometry(7.1, 0.28, 6, SEGR * 2); ring.rotateX(Math.PI / 2); ring.translate(civ.x, civ.y + 4.75, civ.z); bodyP.push(ring);
+      for (var cI = 0; cI < 8; cI++) { var a = cI / 8 * Math.PI * 2 + 0.2; colAt(bodyP, 6.3, civ.x + Math.cos(a) * 10.5, civ.y + 0.25, civ.z + Math.sin(a) * 10.5); }
+      lensAt(bodyP, 13, 13, 1.6, 0.55, civ.x, civ.y + 6.8, civ.z, face);
+      var fin = new THREE.OctahedronGeometry(1, 0); fin.scale(0.9, 2.6, 0.9); fin.translate(civ.x, civ.y + 6.8 + 1.6 + 2.2, civ.z); spireParts.push(fin);   /* a small VISIONARY crystal crowns it (the spire's draw) */
+      [-1, 1].forEach(function (sd) { var s2 = side(face, 16.5 * sd); shrubs.push({ x: civ.x + s2[0], y: civ.y + 1.0, z: civ.z + s2[1], s: 0.95, yaw: sd, c: CLASS_TINT.purple }); }); })();
+    /* the homes */
+    RES.homes.forEach(function (H) { var yaw = H.yaw, f1 = fwd(yaw, 1), W0 = H.W, D0 = 7.2, cant = 1.8, y0 = TOP + roll(H.x, H.z);
+      pillAt(darkP, W0 + 2.6, 0.9, D0 + 3.2, H.x, y0 + 0.2, H.z, yaw);                                                   /* the graphite plinth */
+      pillAt(glassP, W0 - 1.5, 3.3, D0 - 1.0, H.x, y0 + 0.65 + 1.65, H.z, yaw);                                           /* the glass ground floor */
+      pillAt(bodyP, W0, 3.0, D0, H.x + f1[0] * cant, y0 + 0.65 + 3.3 + 1.5, H.z + f1[1] * cant, yaw);                     /* the white upper volume, cantilevered toward the view */
+      pillAt(glassP, W0 + 0.12, 0.95, D0 + 0.12, H.x + f1[0] * cant, y0 + 0.65 + 3.3 + 1.7, H.z + f1[1] * cant, yaw);     /* its lit ribbon window */
+      var cy = y0 + 0.65 + 6.3 + 0.9; lensAt(bodyP, (W0 + 5) / 2, (D0 + 5) / 2, 0.95, 0.32, H.x + f1[0] * cant, cy, H.z + f1[1] * cant, yaw);   /* the lens canopy roof */
+      [[-1, 1], [1, 1], [-1, -1], [1, -1]].forEach(function (q) { var s1 = side(yaw, q[0] * (W0 / 2 + 1.3)), f2 = fwd(yaw, cant + q[1] * (D0 / 2 + 1.3)); colAt(bodyP, cy - y0 - 0.3, H.x + s1[0] + f2[0], y0 + 0.3, H.z + s1[1] + f2[1]); });
+      var g0 = fwd(yaw, 7.8); arcAt(bodyP, 6.0, 0.3, 2.3, H.x + g0[0], y0 + 0.28, H.z + g0[1], yaw);                        /* the curved garden wall */
+      for (var sI = 0; sI < 6; sI++) { var a = (rv() - 0.5) * 2.0, rr = 1.2 + rv() * 3.6, gx = H.x + g0[0] + Math.sin(yaw + a) * rr, gz = H.z + g0[1] + Math.cos(yaw + a) * rr, s = 0.42 + rv() * 0.4;
+        shrubs.push({ x: gx, y: TOP + roll(gx, gz) + s * 1.1, z: gz, s: s, yaw: rv() * 3, c: SHRUB[Math.floor(rv() * SHRUB.length)] }); }
+      var sl = side(yaw, (W0 / 2 + 1.0) * (H.lz > 0 ? -1 : 1)), door = { x: H.x + sl[0], z: H.z + sl[1] }, ln = W3(laneX(H.lz), H.lz); strip(bodyP, ln, door, 2.0, 0.06);   /* a path from the lane round the side of the house */
+      taken.push({ x: H.x, z: H.z, r: 11 }); });
+    info.homes = RES.homes.length; info.home_slots = RES.homes.map(function (H) { return H.lz; });
+    /* the overlooks: two crescent terraces on the field-facing rim either side of the falls (clear of the arcades), rails lit at night */
+    RES.looks.forEach(function (O) { var y = TOP + roll(O.x, O.z), deck = new THREE.CylinderGeometry(8.5, 8.8, 0.45, SEGR * 2, 1, false, -0.95, 1.9); deck.rotateY(O.yaw); deck.translate(O.x, y + 0.12, O.z); bodyP.push(deck);
+      arcAt(glassP, 8.3, 0.07, 1.9, O.x, y + 1.15, O.z, O.yaw); arcAt(bodyP, 8.3, 0.11, 1.9, O.x, y + 0.55, O.z, O.yaw);   /* a lit rail over a white kerb */
+      shrubs.push({ x: O.x, y: y + 0.95, z: O.z, s: 0.8, yaw: 0.4, c: SPECTRAL.pink }); taken.push({ x: O.x, z: O.z, r: 10 }); });
+    info.overlooks = RES.looks.length;
     /* M15 ARCADES (owner reference renders: "a terraced waterfall civilization" — lit arcades along the cliffs): on each side of the lip, set
        6 m back on the plateau, four filleted piers-and-arches bays carry a deck; warm light fills each opening at night (the villa glass),
        so from the plaza the top of the falls reads as a lived-in, lit edge. Beyond the host reach like the rest of the highland. */
@@ -218,12 +285,13 @@ export function createVeilFalls(ctx) {
     function merged(list, mat, name) { if (!list.length) return null; var parts = list.map(function (q) { return q.index ? q.toNonIndexed() : q; }), n = 0; parts.forEach(function (q) { n += q.attributes.position.count; });
       var P = new Float32Array(n * 3), Nn = new Float32Array(n * 3), o = 0; parts.forEach(function (q) { P.set(q.attributes.position.array, o * 3); Nn.set(q.attributes.normal.array, o * 3); o += q.attributes.position.count; q.dispose(); });
       var g2 = keep(new THREE.BufferGeometry()); g2.setAttribute('position', new THREE.BufferAttribute(P, 3)); g2.setAttribute('normal', new THREE.BufferAttribute(Nn, 3)); var me = new THREE.Mesh(g2, mat); me.name = name; group.add(me); return me; }
-    info.villas = glassP.length / 2;
+    info.villas = info.homes;   /* the M15c homes replace the M12 villas */
 
     /* crystal groves: a platinum trunk and three crystal canopy facets per tree, VISIONARY-led with the other spectral stops */
     var NT = LOW ? 20 : 48, rt = rnd(0x7EE5), trunks = [], canopy = [], pal = [CLASS_TINT.purple, CLASS_TINT.purple, SPECTRAL.violet, SPECTRAL.violet, 0xd9dcef, 0xd9dcef, SPECTRAL.ice];
     for (var tI = 0; tI < NT; tI++) { var ts = spot(365, 4.5, rt); if (!ts) continue; var th3 = 5 + rt() * 4; trunks.push({ x: ts.x, y: ts.y, z: ts.z, h: th3 }); var ck = pal[Math.floor(rt() * pal.length)];
       for (var cI = 0; cI < 3; cI++) canopy.push({ x: ts.x + (rt() - 0.5) * 2.0, y: ts.y + th3 + cI * 1.2 - 0.6, z: ts.z + (rt() - 0.5) * 2.0, s: 2.1 - cI * 0.45 + rt() * 0.5, yaw: rt() * 3, c: ck }); }
+    shrubs.forEach(function (S) { canopy.push(S); }); info.garden_shrubs = shrubs.length;   /* M15c: the garden shrubs share the grove's instanced canopy draw */
     trunks.forEach(function (T2) { var tg = new THREE.CylinderGeometry(0.28, 0.55, T2.h, 6); tg.translate(T2.x, T2.y + T2.h / 2, T2.z); bodyP.push(tg); });   /* trunks join the villa platinum draw */
     var m4 = new THREE.Matrix4(), q4 = new THREE.Quaternion(), v4 = new THREE.Vector3(), s4 = new THREE.Vector3(), e4 = new THREE.Euler();
     var cnG = keep(new THREE.OctahedronGeometry(1, 0)); cnG.scale(1, 1.35, 1); canopyMat = keep(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.18, metalness: 0.45, flatShading: true, emissive: 0xffffff, emissiveIntensity: night ? 0.35 : 0.08 }));
@@ -235,7 +303,7 @@ export function createVeilFalls(ctx) {
     var SB = HL.spire_bearing, SD = HL.spire_dist_m, sx = Math.sin(SB) * SD, sz = Math.cos(SB) * SD, sy = TOP + roll(sx, sz), SH = HL.spire_h_m || 48; taken.push({ x: sx, z: sz, r: 10 });
     spireMat = keep(new THREE.MeshStandardMaterial({ color: 0xcfc2f2, roughness: 0.08, metalness: 0.4, flatShading: true, emissive: 0x9a78e0, emissiveIntensity: night ? 0.9 : 0.22, transparent: true, opacity: 0.94 }));
     var plinth = new THREE.CylinderGeometry(5.5, 6.5, 2.2, 8); plinth.translate(sx, sy + 1.1, sz); bodyP.push(plinth);   /* the plinth joins the platinum draw */
-    var spParts = [], spG = new THREE.OctahedronGeometry(1, 0); spG.scale(3.2, SH / 2, 3.2); spG.rotateY(0.4); spG.translate(sx, sy + 2.2 + SH / 2, sz); spParts.push(spG);
+    var spParts = spireParts, spG = new THREE.OctahedronGeometry(1, 0); spG.scale(3.2, SH / 2, 3.2); spG.rotateY(0.4); spG.translate(sx, sy + 2.2 + SH / 2, sz); spParts.push(spG);
     [[7, 0.45, 1.3], [-6, 0.32, 2.4], [2, 0.62, 3.9]].forEach(function (S2) { var sg = new THREE.OctahedronGeometry(1, 0); sg.scale(1.1, 5 * S2[1] + 3, 1.1); sg.rotateZ(S2[0] * 0.02); sg.translate(sx + Math.cos(S2[2]) * S2[0], sy + 2.2 + SH * S2[1], sz + Math.sin(S2[2]) * S2[0]); spParts.push(sg); });
     var spM = merged(spParts, spireMat, 'VEIL_SPIRE');   /* the spire and its three satellite shards: one draw */
     info.spire = { x: +sx.toFixed(1), z: +sz.toFixed(1), top_y: +(sy + 2.2 + SH).toFixed(1) };
@@ -248,7 +316,9 @@ export function createVeilFalls(ctx) {
 
     /* lantern paths: soft neutral lamps in loops through the meadow (additive points, strong at night) */
     var lp = [], rl = rnd(0x1A7E); for (var lI = 0; lI < 90; lI++) { var th4 = lI / 90 * Math.PI * 2 * 2, f4 = lI < 45 ? 0.45 : 0.72, rr4 = rimR(th4) * (f4 + (rl() - 0.5) * 0.04), lx4 = Math.cos(th4) * rr4, lz4 = Math.sin(th4) * rr4; var x4 = CX + er[0] * lx4 + et[0] * lz4, z4 = CZ + er[1] * lx4 + et[1] * lz4; if (Math.hypot(x4 - (lakeC.x + ox * 6), z4 - (lakeC.z + oz * 6)) < 17) continue; lp.push(x4, TOP + roll(x4, z4) + 1.3, z4); }
-    var lg = keep(new THREE.BufferGeometry()); lg.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3)); lampMat = keep(new THREE.PointsMaterial({ color: 0xfff1dc, size: 1.6, sizeAttenuation: true, transparent: true, opacity: night ? 0.95 : 0.25, depthWrite: false, blending: THREE.AdditiveBlending }));
+    lp = lp.concat(laneLamps); var lg = keep(new THREE.BufferGeometry()); lg.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3)); var LS = 32, ld = new Uint8Array(LS * LS * 4); for (var li2 = 0; li2 < LS * LS; li2++) { var qx = (li2 % LS + 0.5) / LS * 2 - 1, qy = (Math.floor(li2 / LS) + 0.5) / LS * 2 - 1, qr = Math.min(1, Math.hypot(qx, qy)), qv = Math.round(255 * Math.pow(1 - qr, 1.6)); ld[li2 * 4] = ld[li2 * 4 + 1] = ld[li2 * 4 + 2] = qv; ld[li2 * 4 + 3] = qv; }
+    var lampTex = keep(new THREE.DataTexture(ld, LS, LS, THREE.RGBAFormat)); lampTex.needsUpdate = true;   /* M15c: a round soft lantern glow (the bare point sprite drew hard white squares up close) */
+    lampMat = keep(new THREE.PointsMaterial({ color: 0xfff1dc, map: lampTex, size: 2.2, sizeAttenuation: true, transparent: true, opacity: night ? 0.95 : 0.25, depthWrite: false, blending: THREE.AdditiveBlending }));
     var lamps = new THREE.Points(lg, lampMat); lamps.name = 'VEIL_HIGHLAND_LANTERNS'; group.add(lamps); info.lanterns = lp.length / 3;
 
     /* ---------- 4. the aura language (one shared field, built by aura.js) ---------- */
@@ -272,7 +342,7 @@ export function createVeilFalls(ctx) {
       A.push({ x: sx, y: sy + 2.2 + SH * 0.55, z: sz, size: 18, aspect: 3.2, ring: 0, tint: CLASS_TINT.purple, spectral: 0.6, intensity: 0.34, pull: 6 });               /* the Veil spire column */
       A.push({ x: sx, y: sy + 2.2 + SH, z: sz, size: 12, aspect: 1, ring: 0.65, ringW: 0.08, breakup: 0.85, tint: SPECTRAL.ice, spectral: 0.6, intensity: 0.45, pull: 4, phase: 2.2 }); }
     ctx.veilFalls = { lip: { x: lip.x, y: yTop, z: lip.z }, base: { x: baseX, z: baseZ }, highland: { x: CX, z: CZ, top_y: TOP }, reachable: false };
-    log('veilFalls: curtain stations ' + LINES[0].k + '–' + LINES[NS].k + ' (' + NR + '×' + NC + ', chord ' + CH.toFixed(0) + ' m), lip ' + yTop.toFixed(1) + ' m → ' + yBot + ' m, highland top ' + TOP + ' m, villas ' + info.villas + ', trees ' + info.trees + ', lanterns ' + info.lanterns + ' (not reachable until the runtime bridge)');
+    log('veilFalls: curtain stations ' + LINES[0].k + '–' + LINES[NS].k + ' (' + NR + '×' + NC + ', chord ' + CH.toFixed(0) + ' m), lip ' + yTop.toFixed(1) + ' m → ' + yBot + ' m, highland top ' + TOP + ' m, homes ' + info.homes + ' + civic pavilion, overlooks ' + info.overlooks + ', garden shrubs ' + info.garden_shrubs + ', trees ' + info.trees + ', lanterns ' + info.lanterns + ' (not reachable until the runtime bridge)');
   }
   function tick(dt, t) { clock = (typeof t === 'number' && isFinite(t)) ? t : clock + (dt || 0); if (waterU) waterU.uTime.value = clock; if (foamU) foamU.uTime.value = clock; if (mistU) { mistU.uTime.value = clock; if (ctx.renderer && ctx.renderer.getDrawingBufferSize) { ctx.renderer.getDrawingBufferSize(bufV); if (bufV.y > 0) mistU.uScale.value = 700 * bufV.y / 720; } } }   /* the mist's point size follows the drawing buffer (700 was tuned at 720 px): a smaller frame no longer blows the plume out to white, a DPR-3 phone no longer shrinks it */
   function setNight(n) { night = !!n; if (waterU) waterU.uNight.value = night ? 1 : 0; if (foamU) foamU.uNight.value = night ? 1 : 0; if (mistU) mistU.uNight.value = night ? 1 : 0;
