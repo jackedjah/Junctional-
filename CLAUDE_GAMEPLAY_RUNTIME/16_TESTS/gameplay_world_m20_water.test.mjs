@@ -35,9 +35,11 @@ ok('2. all splices land: world varying, dielectric metalness, calm / rough patch
 /* 3. the mirrored sky IS the atmosphere dome's: its uniforms are bound by reference (setNight mutates them in place, so the water follows) */
 var AU = { uZenith: { value: new THREE.Color(1, 0, 0) }, uHorizon: { value: new THREE.Color() }, uHaze: { value: new THREE.Color() }, uSun: { value: new THREE.Vector3(0, 1, 0) }, uSunTint: { value: new THREE.Color() } };
 var m3 = new THREE.MeshStandardMaterial(); skyWater(THREE, m3, { mods: { atmosphere: { uniforms: function () { return AU; } } } }, { land: 0.3 }); var s3 = fakeShader(); m3.onBeforeCompile(s3, null);
-ok('3. bound to the dome by reference (uSkyZ/H/Hz/Sun/Tint are the atmosphere uniforms), live-tunable swU, ridge skyline height 0.3',
-  s3.uniforms.uSkyZ === AU.uZenith && s3.uniforms.uSkyH === AU.uHorizon && s3.uniforms.uSkyHz === AU.uHaze && s3.uniforms.uSkySun === AU.uSun && s3.uniforms.uSkyTint === AU.uSunTint && s3.uniforms.uLandH === m3.userData.swU.uLandH && m3.userData.swU.uLandH.value === 0.3 && /uniforms: function \(\) \{ return mat \? mat\.uniforms : null; \}/.test(ATM),
-  Object.keys(s3.uniforms));
+var CX = { mods: {} }, m3b = new THREE.MeshStandardMaterial(); skyWater(THREE, m3b, CX, {}); var s3b = fakeShader(); m3b.onBeforeCompile(s3b, null); var early = s3b.uniforms.uSkyH.value.getHexString(); CX.mods.atmosphere = { uniforms: function () { return AU; } }; AU.uHorizon.value.setHex(0x2a2c5e);
+ok('3. the mirrored sky resolves to the dome\'s LIVE uniforms at every upload (compiled before the atmosphere exists it falls back, then follows it; setNight mutates in place), live-tunable swU, ridge skyline 0.3',
+  s3.uniforms.uSkyZ.value === AU.uZenith.value && s3.uniforms.uSkyH.value === AU.uHorizon.value && s3.uniforms.uSkyHz.value === AU.uHaze.value && s3.uniforms.uSkySun.value === AU.uSun.value && s3.uniforms.uSkyTint.value === AU.uSunTint.value
+  && early === 'a4c3e3' && s3b.uniforms.uSkyH.value === AU.uHorizon.value && s3b.uniforms.uSkyH.value.getHexString() === '2a2c5e' && s3.uniforms.uLandH === m3.userData.swU.uLandH && m3.userData.swU.uLandH.value === 0.3 && /uniforms: function \(\) \{ return mat \? mat\.uniforms : null; \}/.test(ATM),
+  { early: early, late: s3b.uniforms.uSkyH.value.getHexString() });
 
 /* 4. the sea variant carries the shore field: mainland rounded rectangle + up to six island ellipses, translucent shallows toward them */
 var m4 = new THREE.MeshStandardMaterial(); skyWater(THREE, m4, null, { shore: { rect: [-10, -20, 10, 20], r: 4, islands: [[100, 0, 20, 10]] } }); var s4 = fakeShader(); m4.onBeforeCompile(s4, null);
