@@ -20,9 +20,13 @@ export var REACH_IN = 312, REACH_OUT = 336, REACH_FLOOR = 304;
 /* M19 (owner 2026-09-27: "more geological continuity — ledges, strata, broken rock shelves"): ONE regional bedding for the whole range. The
    beds dip gently (dx, dz m per m) and fold (± fold m) — the same analytic surface in the rock shader (applyGeology dip) and here, where the
    geometric shelves step on it — so a ledge in the rock and a bedding line in the shader are the same bed, continuous face to face. */
-export var RIDGE_DIP = [0.045, -0.02, 10, 150, 9];   /* dip x, dip z, fold m, fault block length m (of a 400 m ring), fault throw m */
-export function bedY(x, y, z) { var D = RIDGE_DIP, fu = Math.atan2(x, z) * 400 / D[3], fi = Math.floor(fu), ft = sstep(0, 6 / D[3], fu - fi);
-  return y + x * D[0] + z * D[1] + D[2] * Math.sin(x * 0.0093 + z * 0.0061) * Math.cos(z * 0.0071 - x * 0.0023) + (Math.sin((fi - 1) * 2.399 + 0.7) * (1 - ft) + Math.sin(fi * 2.399 + 0.7) * ft) * D[4]; }   /* the beds step at each fault: a broken shelf, not a contour line */
+export var RIDGE_DIP = [0.045, -0.02, 10, 17, 9, 0.2];   /* dip x, dip z, fold m, fault blocks per ring (a whole number: the blocks wrap at the ±π bearing, no seam), fault throw m, fault ramp (fraction of a block) */
+/* M19 review fix: the fault used to step its throw within ~5 m of arc, which a 3.5–6 m column mesh cannot resolve — the shelves sheared into
+   thin pale blades at every fault — and 400 / 150 blocks did not close round the ring (a hard ~16 m bed step due south). The blocks are now a
+   whole number per ring and the throw ramps over a fifth of a block (≈ 27 m of arc on the near ridge): a broken, offset shelf the mesh can carry. */
+function faultT(i) { var n = RIDGE_DIP[3]; return Math.sin((((i % n) + n) % n) * 2.399 + 0.7); }
+export function bedY(x, y, z) { var D = RIDGE_DIP, fu = (Math.atan2(x, z) / TAU + 0.5) * D[3], fi = Math.floor(fu), ft = sstep(0, D[5], fu - fi);
+  return y + x * D[0] + z * D[1] + D[2] * Math.sin(x * 0.0093 + z * 0.0061) * Math.cos(z * 0.0071 - x * 0.0023) + (faultT(fi - 1) * (1 - ft) + faultT(fi) * ft) * D[4]; }   /* the beds step at each fault: a broken shelf, not a contour line */
 /* the geometric shelf step: a whole number of the shader's MAJOR beds (strata 2.6 × 3.2 = 8.32 m), so shelf lips land on bed boundaries */
 export function ridgeShelfStep(R) { return 2.6 * 3.2 * ((R && R.dist_m || 400) < 450 ? 3 : 4); }
 /* M19 row budget per tier: the ribbon's bands are cut into horizontal strips (rows ≈ rowM tall) × cols per station span, instead of the
@@ -48,7 +52,7 @@ export function ridgeWarpField(R, stations, idx, keepOut) {
   var rad = stations.map(function (s) { return Math.hypot(s.x, s.z); });
   /* the crest line eased: a circular moving average over ±3 stations removes the jitter fins, noise below puts natural variation back */
   var rs = []; for (var i = 0; i < N; i++) { var acc = 0, wt = 0; for (var k = -3; k <= 3; k++) { var q = 1 - Math.abs(k) / 4; acc += rad[((i + k) % N + N) % N] * q; wt += q; } rs.push(acc / wt); } rs.push(rs[0]);
-  var perCrest = Math.max(8, Math.round(TAU * arc / 170)), perShelf = Math.max(8, Math.round(TAU * arc / 120)), perSpur = Math.max(8, Math.round(TAU * arc / (arc < 450 ? 105 : 130)));
+  var perCrest = Math.max(8, Math.round(TAU * arc / 170)), perShelf = Math.max(8, Math.round(TAU * arc / 120)), perSpur = Math.max(8, Math.round(TAU * arc / (arc < 450 ? 105 : 130))), perNotch = Math.max(16, Math.round(TAU * arc / 55));
   var SSP = ridgeShelfStep(R), passes = R.passes || [];
   function at(b) { var f = (((b % TAU) + TAU) % TAU) / TAU * N, i = Math.min(N - 1, Math.floor(f)), t = f - i; return { r: rad[i] + (rad[i + 1] - rad[i]) * t, rs: rs[i] + (rs[i + 1] - rs[i]) * t, h: stations[i].h + (stations[i + 1].h - stations[i].h) * t, w: stations[i].w + (stations[i + 1].w - stations[i].w) * t }; }
   var kb = (keepOut || []).reduce(function (b, K) { var m = K.r * 2.2; return [Math.min(b[0], K.x - m), Math.max(b[1], K.x + m), Math.min(b[2], K.z - m), Math.max(b[3], K.z + m)]; }, [1e9, -1e9, 1e9, -1e9]);   /* the keep circles' reach box: most vertices skip the loop */
@@ -79,8 +83,13 @@ export function ridgeWarpField(R, stations, idx, keepOut) {
     dr += side * (cDeep * gch * sstep(0.12, 0.5, yN) * (1 - 0.45 * sstep(0.88, 1.0, yN)) - hb * 0.045 * spur * sstep(0.05, 0.3, yN) * (1 - sstep(0.55, 0.9, yN)));
     var dy = -cDeep * 0.6 * gch * sstep(0.8, 1.0, yN);
     /* 4 · secondary summits and saddles on a long, asymmetric crest profile */
-    var peaks = ridged(b, 0.37, perCrest, seed + 6, 2), longw = fbm(b, 0.13, Math.max(4, perCrest >> 2), seed + 7, 2);
+    var peaks = ridged(b, 0.37, perCrest, seed + 6, 3), longw = fbm(b, 0.13, Math.max(4, perCrest >> 2), seed + 7, 2);
     dy += hb * (0.22 * (peaks - 0.42) + 0.12 * (longw - 0.5)) * sstep(0.62, 1.0, yN);
+    /* 4b · M19 review fix (F4: the dominant summit behind the Veil highland had turned into a flat-topped block): a BROKEN CREST — frost-
+       shattered notches and small towers every ~25–55 m along the top only (crest band, yN > 0.84), so summits split and saddles bite
+       without folding the faces again (the old 34 m V-gullies did, the crumpled-foil read). The third summit octave is back as well. */
+    var nt = ridged(b, 0.9, perNotch, seed + 12, 2), nn = sstep(0.5, 0.85, vnoise(b / TAU * perNotch * 2, 1.7, perNotch * 2, seed + 13));
+    dy += hb * (0.05 * (nt - 0.4) - 0.07 * nn) * sstep(0.84, 1.0, yN);
     /* 5 · broken rock: low-amplitude, larger-scale irregularity so no face is a plane (M19: half the old amplitude — it read as crumpling) */
     dr += side * hb * 0.01 * (fbm(b, yb / 40, perShelf * 2, seed + 8, 2) - 0.5); dy += hb * 0.012 * (fbm(b, yb / 45, perShelf * 2, seed + 9, 2) - 0.5) * sstep(0.1, 0.5, yN);
     var ux = x / r, uz = z / r, DX = ux * dr * amp, DY = dy * amp, DZ = uz * dr * amp;
