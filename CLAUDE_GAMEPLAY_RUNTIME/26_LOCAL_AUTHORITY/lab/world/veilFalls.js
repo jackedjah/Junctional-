@@ -12,7 +12,7 @@
    groves, five quiet villas facing the view, lantern paths, a flight landing pad and the Veil spire (visible above the lower crests to the
    north). It reads as land you could go to.
    HOST SAFETY: nothing here is a collider or walkable surface. The curtain stops 3.6 m above the sea (a solid below 3.4 m would need to be flush);
-   below that there is only a 3 cm foam decal on the sea and additive light. The curtain rides 2 m in front of the face along its normal (allowed above 3.4 m); the cliff crystals keep their feet above 3.4 m.
+   below that there is only a 3 cm foam decal on the sea and additive light. The curtain hangs at least 2 m clear of the face (M20: eased toward the span across the fin tips as it falls — allowed above 3.4 m); the cliff crystals keep their feet above 3.4 m.
    The highland lies 370–500 m out, beyond the host's ±300 m reach — ENTERING it needs new colliders + host validation, so it waits on the
    runtime bridge (registry `reachable: false`).
    The ridge sculpt keeps the face under the curtain as authored (keep_line + veilCurtainKeep; host-safety 17). Draws: curtain 1, wet rock 1, foam 1, mist 1 (not LOW), cliff crystals 1 (not LOW), highland ground 1,
@@ -27,6 +27,16 @@ var NOISE = [
   'vec3 vfSpec(float t) { t = fract(t); vec3 v = vec3(0.706, 0.549, 1.0), i = vec3(0.498, 0.816, 1.0), w = vec3(0.957, 0.965, 1.0), g = vec3(1.0, 0.847, 0.541), p = vec3(1.0, 0.604, 0.824);',
   '  if (t < 0.2) return mix(v, i, t / 0.2); if (t < 0.4) return mix(i, w, (t - 0.2) / 0.2); if (t < 0.6) return mix(w, g, (t - 0.4) / 0.2); if (t < 0.8) return mix(g, p, (t - 0.6) / 0.2); return mix(p, v, (t - 0.8) / 0.2); }'
 ].join('\n');
+/* M20 STRANDS: the fall pours only from the real notches in the crest, each from its own LEVEL lip, spreading as it drops — see createVeilFalls.
+   uStr[k] = (centre x across the sheet, lip y, half-width at the lip, half-width at the base) in sheet x units; z <= 0 = unused. */
+var STRAND = ['uniform vec4 uStr[4]; uniform float uStrBase; varying float vWy;',
+  'float vfStrand(float x, float wy, float t, float widen, float lift, out float lipK) { float m = 0.0; lipK = 0.0;',
+  '  for (int k = 0; k < 4; k++) { vec4 S = uStr[k]; if (S.z <= 0.0) continue;',
+  '    float drop = max(S.y - wy, 0.0), fall = clamp(drop / max(S.y - uStrBase, 1.0), 0.0, 1.0), hw = mix(S.z, S.w, sqrt(fall)) * widen;',   /* a horsetail: quick to spread below the lip, then slower */
+  '    float d = abs(x - S.x) + (vfN(vec2(x * 70.0 + float(k) * 7.0, wy * 0.07 - t * 0.3)) - 0.5) * (0.3 * hw + 0.004);',   /* ragged, moving edges */
+  '    float sm = (1.0 - smoothstep(hw * 0.7, hw, d)) * smoothstep(S.y + 0.6 + lift, S.y - 1.4 + lift, wy);',
+  '    m = max(m, sm); lipK = max(lipK, sm * (1.0 - smoothstep(0.0, 18.0, drop))); }',
+  '  return m; }'].join('\n');
 
 /* THE VEIL WATER (M12), shared with the older falls (macro.js): aerated streak water flowing down the sheet, horsetail strands, lip / base
    aeration and a faint spectral sheen; darker at night. uv.x runs across the sheet, uv.y from the lip (0) to the base (1) — flipV for a
@@ -34,24 +44,27 @@ var NOISE = [
    geometry carries aRib (0..1, a buttress nose under the water): there, and in broad noise bands, the curtain thins to strands so the
    dark wet rock shows between them, as in the owner's reference; the lower third merges into one white wall of spray. */
 export function veilWaterMaterial(THREE, opts) { opts = opts || {};
-  var U = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uNight: { value: opts.night ? 1 : 0 }, uSX: { value: opts.sx || 1 }, uFlip: { value: opts.flipV ? 1 : 0 }, uSeed: { value: opts.seed || 0 }, uFilm: { value: 0 } }]);   /* uFilm: the curtain continues as a flush film down the rock to the sea (M20) */
-  return new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true, defines: Object.assign({}, opts.ribs ? { VEIL_RIBS: 1 } : {}, opts.front ? { VEIL_FRONT: 1 } : {}),
-    vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\n#ifdef VEIL_RIBS\nattribute float aRib; varying float vRib;\n#endif\nvoid main() { vUv = uv;\n#ifdef VEIL_RIBS\n vRib = aRib;\n#endif\n vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
-    fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uSX; uniform float uFlip; uniform float uSeed; uniform float uFilm; varying vec2 vUv;', '#ifdef VEIL_RIBS', 'varying float vRib;', '#endif', NOISE,
+  var U = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uNight: { value: opts.night ? 1 : 0 }, uSX: { value: opts.sx || 1 }, uFlip: { value: opts.flipV ? 1 : 0 }, uSeed: { value: opts.seed || 0 }, uFilm: { value: 0 } }]);
+  if (opts.strands) { U.uStr = { value: opts.strands }; U.uStrBase = { value: opts.strandBase || 0 }; }   /* uFilm: the curtain continues as a flush film down the rock to the sea (M20) */
+  return new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true, defines: Object.assign({}, opts.ribs ? { VEIL_RIBS: 1 } : {}, opts.front ? { VEIL_FRONT: 1 } : {}, opts.strands ? { VEIL_STRANDS: 1 } : {}),
+    vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\n#ifdef VEIL_RIBS\nattribute float aRib; varying float vRib;\n#endif\n#ifdef VEIL_STRANDS\nvarying float vWy;\n#endif\nvoid main() { vUv = uv;\n#ifdef VEIL_RIBS\n vRib = aRib;\n#endif\n#ifdef VEIL_STRANDS\n vWy = (modelMatrix * vec4(position, 1.0)).y;\n#endif\n vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
+    fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uTime; uniform float uNight; uniform float uSX; uniform float uFlip; uniform float uSeed; uniform float uFilm; varying vec2 vUv;', '#ifdef VEIL_RIBS', 'varying float vRib;', '#endif', NOISE, '#ifdef VEIL_STRANDS', STRAND, '#endif',
         'void main() { float x = vUv.x, y = mix(vUv.y, 1.0 - vUv.y, uFlip), t = uTime, xs = x * uSX + uSeed;',
         '  float ya = sqrt(max(y, 0.0) + 0.015) * 2.0;',   /* M20 FREE FALL: the water accelerates (v ∝ √drop), so the streak field runs in √y — short clumps at the lip stretching into long streaks below, not one constant-speed texture scroll */
         '  float n1 = vfN(vec2(xs * 20.0, ya * 3.1 - t * 1.7)), n2 = vfN(vec2(xs * 57.0 + 3.1, ya * 6.2 - t * 2.6)), n3 = vfN(vec2(xs * 7.0 - 1.3, ya * 1.25 - t * 0.9));',
         '  float streak = smoothstep(0.32, 0.92, n1 * 0.55 + n2 * 0.3 + n3 * 0.15);',
         '  float rag = vfN(vec2(xs * 9.0, ya * 9.0 - t * 1.3)); float side = min(x, 1.0 - x); float edge = smoothstep(0.0, 0.2 + 0.12 * rag, side);',
         '  float aer = (1.0 - smoothstep(0.0, 0.1, y)) * smoothstep(-0.02, -0.001, y) + smoothstep(0.72, 1.0, y) * 0.9;',   /* M19: up the flume (y < 0; 0.1 ≈ 20 m) the water runs clear and streaked, whitening only in the last ~4 m before the brink */
-        '#ifdef VEIL_RIBS', '  aer += vRib * 0.35 * smoothstep(0.04, 0.3, y);', '#endif',   /* M19: white water where the fall breaks over a rock rib */
+        '#ifdef VEIL_RIBS', '  aer += vRib * 0.35 * smoothstep(0.04, 0.3, y);', '#endif',
+        '#ifdef VEIL_STRANDS', '  float stL, stM = vfStrand(x, vWy, t, 1.0, 0.0, stL); if (y < 0.0) stM = 1.0; aer = max(aer, stL * 0.85);', '#endif',   /* each strand whitens where it tips over its own lip */   /* M19: white water where the fall breaks over a rock rib */
         '  float strand = smoothstep(0.22, 0.72, vfN(vec2(xs * 6.5 + 11.0, y * 0.8 - t * 0.04)) * 0.75 + vfN(vec2(xs * 15.0 - 4.0, y * 1.6)) * 0.25);',   /* a horsetail veil: uneven strands, not one flat sheet */
-        '  vec3 body = mix(vec3(0.6, 0.69, 0.81), vec3(0.985, 0.99, 1.0), clamp(streak * 0.95 + aer * 0.6 + strand * 0.2, 0.0, 1.0));',   /* M19: thin water shows the dark rock through it — more contrast between sheet and streak */
+        '  vec3 body = mix(vec3(0.72, 0.77, 0.85), vec3(0.985, 0.99, 1.0), clamp(streak * 0.95 + aer * 0.6 + strand * 0.2, 0.0, 1.0));',   /* M19: thin water shows the dark rock through it — more contrast between sheet and streak (M20: a paler body, less blue glass) */
         '  float bil = vfN(vec2(xs * 3.0, y * 6.0 - t * 0.35)) * 0.6 + vfN(vec2(xs * 8.0 + 2.0, y * 15.0 - t * 0.8)) * 0.4; body *= mix(1.0, 0.78 + 0.3 * bil, smoothstep(0.55, 0.8, y));',   /* M19 turbulence: shadowed billows in the spray wall (volume, not a flat white) */
         '  if (y < 0.0) { float yf = y * 200.0, fl = vfN(vec2(xs * 26.0, yf * 0.18 - t * 2.4)) * 0.6 + vfN(vec2(xs * 61.0, yf * 0.45 - t * 3.6)) * 0.4; streak = smoothstep(0.45, 0.85, fl); body = mix(vec3(0.4, 0.5, 0.62), vec3(0.97, 0.98, 1.0), clamp(streak * 0.85 + aer * 0.9, 0.0, 1.0)); }',   /* M19 the flume: shallow fast water — long streaks racing to the brink, whitening as it tips over */
+        '  float clump = vfN(vec2(xs * 7.0 + 3.0, ya * 1.6 - t * 0.95)) * 0.6 + vfN(vec2(xs * 19.0, ya * 3.4 - t * 1.6)) * 0.4, ck = smoothstep(0.42, 0.78, clump) * smoothstep(0.02, 0.2, y); body = mix(body * (0.9 + 0.1 * clump), vec3(0.97, 0.98, 1.0), ck * 0.55);',   /* M20 HORSETAIL CLUMPS: big packets of aerated white falling (in free-fall time) through the sheet — water, not frosted glass */
         '  vec3 sp = vfSpec(y * 1.5 + x * 0.7 - t * 0.02); body += sp * (0.06 + 0.1 * aer + 0.08 * (1.0 - edge));',   /* light interference in the veil */
         '  body *= mix(1.0, 0.4, uNight); body += sp * 0.07 * uNight;',
-        '  float a = edge * mix(0.35, 1.0, strand) * (0.46 + 0.55 * streak + 0.25 * aer); if (y < 0.0) a = edge * (0.66 + 0.3 * streak + 0.3 * aer);',
+        '  float a = edge * mix(0.62, 1.0, strand) * (0.6 + 0.4 * streak + 0.25 * aer); if (y < 0.0) a = edge * (0.66 + 0.3 * streak + 0.3 * aer);',
         '#ifdef VEIL_RIBS',
         '  float br = vfN(vec2(xs * 1.7 + 5.0, y * 0.45 - t * 0.012)), merge = 1.0 - smoothstep(0.48, 0.8, y);',
         '  float thin = clamp(vRib * 0.95 + (1.0 - smoothstep(0.22, 0.55, br)) * 0.7, 0.0, 1.0) * merge;',
@@ -64,6 +77,7 @@ export function veilWaterMaterial(THREE, opts) { opts = opts || {};
         '#endif',
         '  if (y > 1.0) { float yf2 = clamp((y - 1.0) / 0.08, 0.0, 1.0), f1 = vfN(vec2(xs * 34.0, yf2 * 1.4 - t * 2.2)) * 0.6 + vfN(vec2(xs * 90.0 + 5.0, yf2 * 3.0 - t * 3.6)) * 0.4, wh = smoothstep(0.32, 0.78, f1);',   /* M20 THE FILM: white water cascading down the last metres of rock into the sea — flush on the rock (host-safe) */
         '    body = mix(vec3(0.76, 0.8, 0.86), vec3(0.97, 0.98, 1.0), clamp(0.6 + 0.3 * wh + 0.3 * smoothstep(0.55, 1.0, yf2), 0.0, 1.0)) * mix(1.0, 0.42, uNight); a = edge * (0.58 + 0.26 * wh) * (1.0 + 0.1 * smoothstep(0.6, 1.0, yf2)); }   /* long vertical runs (not foil blotches), whitening into foam where it meets the sea */',
+        '#ifdef VEIL_STRANDS', '  a = max(a, ck * 0.9 * edge * step(0.0, y)); a *= stM;', '#endif',
         '  gl_FragColor = vec4(body, clamp(a, 0.0, 0.96));', '#include <fog_fragment>', '}'].join('\n') }); }
 
 /* THE CURTAIN (owner reference pass): the station lines (inner foot → crest) the curtain pours over, and the keep circles that hold the ridge
@@ -99,7 +113,7 @@ export function createVeilFalls(ctx) {
        ribs, merging into one white wall of spray at the base). It pours over the crest from station curtain.from to curtain.to: the notch at
        `station` carries the tallest strand, the buttress noses between the notches become the rock ribs, and the lip steps down with the
        crest to the lower side tiers. The face under it is held unsculpted (veilCurtainKeep), so the water rides the rock at every tier. ---------- */
-    var CU = W.curtain || { from: si - 1, to: si + 1 }, LINES = curtainLines(st, CU.from, CU.to), NS = LINES.length - 1, CPS = 6, NC = NS * CPS, NR = 46;
+    var CU = W.curtain || { from: si - 1, to: si + 1 }, LINES = curtainLines(st, CU.from, CU.to), NS = LINES.length - 1, CPS = 12, NC = NS * CPS, NR = 46;
     var LIPW = W.lip_w_m || 24, OFF = 2.0, LIPD = 0.6, yTop = crC.y - LIPD, yBot = 3.6;
     function onLine(inner, crest, y) { return ridgeFacePoint(inner, crest, Math.min(y, crest.y)); }
     function faceOn(L, u, y) { var n = L.length - 1, i = Math.min(n - 1, Math.max(0, Math.floor(u))), f = u - i, a = onLine(L[i].inner, L[i].crest, y), b = onLine(L[i + 1].inner, L[i + 1].crest, y); return { x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f }; }
@@ -120,15 +134,55 @@ export function createVeilFalls(ctx) {
       for (var k = 0; k < n0; k += 3) { var tri = [], y0 = 1e9, y1 = -1e9, cx = 0, cz = 0; for (var e = 0; e < 3; e++) { va.fromBufferAttribute(P0, I0 ? I0.getX(k + e) : k + e).applyMatrix4(RN.matrixWorld); tri.push(va.x, va.y, va.z); y0 = Math.min(y0, va.y); y1 = Math.max(y1, va.y); cx += va.x / 3; cz += va.z / 3; }
         if (y1 < SEA - 2 || y0 > yBot + 4 || cx < lo.x - 25 || cx > hi.x + 25 || cz < lo.z - 25 || cz > hi.z + 25) continue; out.push.apply(out, tri); }
       if (out.length) { var fg = keep(new THREE.BufferGeometry()); fg.setAttribute('position', new THREE.Float32BufferAttribute(out, 3)); filmTri = new THREE.Mesh(fg, keep(new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }))); filmTri.updateMatrixWorld(true); } })();
+    /* M20 THE CURTAIN IN PLAN (owner: waterfall realism first; review: the fall read as tall folded glass fins). Under the curtain the face is
+       a zigzag of knife-thin buttress fins and ~45 m deep bays, and the curtain rode 2 m off every facet of it: from the field a row of flat
+       sheets seen edge-on, folding back on itself (180° hairpins) at every bay back. Each row is now drawn in plan: the offset face with the
+       hairpins pushed out to a clean clearance and lightly smoothed, then — as the water falls clear of the lip — eased 70 % of the way toward
+       the span across the fin tips (the field-side hull of the face, 1.4 × the offset out). Inside each bay that is a blend between a point
+       in the bay and a point on its mouth, so it never enters the rock. The lip rows (and the flume's brink rows) still leave the crest where
+       it is; ~40 m down the fall hangs as one broad sheet bowing gently into each bay, facing the field. The wet-rock sheet keeps to the face. */
+    /* M20 STRANDS (review: the curtain's top followed the crest from 80 m at the ends up to 147 m at the notch and back — a triangle of water
+       poured over a mountain slope, the "glass fin" silhouette). Water leaves a crest only at its notches, over a LEVEL lip: the bay backs
+       (the crest stations set deepest into the ridge — 107, 110, 112). 110 carries the flume from the highland lake: the broad main fall,
+       24 m at the lip spreading to span the bay mouth below; the two side notches pour narrower horsetails from 5 m under their crests. The
+       dark wet rock and the fin crests show between them — the reference's strands split by rock ribs, without water on a slope. */
+    var STR = [], rC = function (k) { return Math.hypot(LINES[k].crest.x, LINES[k].crest.z); }, crY = function (u) { var i = Math.min(NS - 1, Math.max(0, Math.floor(u))), f = u - i; return LINES[i].crest.y + (LINES[i + 1].crest.y - LINES[i].crest.y) * f; };
+    for (var sk = 1; sk < NS && STR.length < 4; sk++) if (rC(sk) > rC(sk - 1) && rC(sk) > rC(sk + 1)) { var smain = Math.abs(sk - NS / 2) < 0.5, slip = LINES[sk].crest.y + (smain ? 1 : -5), sd = 0.6;   /* the main lip is the curtain's own top edge (the level cut sits above it) */
+      if (!smain) { sd = 0.12; while (sd < 0.5 && crY(sk - sd - 0.02) >= slip + 0.5 && crY(sk + sd + 0.02) >= slip + 0.5) sd += 0.02; }
+      STR.push(new THREE.Vector4(sk / NS, slip, sd / NS, (smain ? 1.25 : 0.8) / NS)); }
+    while (STR.length < 4) STR.push(new THREE.Vector4(0, 0, 0, 0));
+    info.strands = STR.filter(function (v) { return v.z > 0; }).map(function (v) { return { station: LINES[Math.round(v.x * NS)].k, lip_y: +v.y.toFixed(1), lip_w_m: +(v.z * 2 * CH).toFixed(1), base_w_m: +(v.w * 2 * CH).toFixed(1) }; });
+    var SPANW = 0.7, SPANT = 0.3, rowCache = {};
+    function rowPath(t) { var key = t.toFixed(5), off = OFF; if (rowCache[key]) return rowCache[key];
+      var S2 = CPS, M2 = NS * S2, FV = [], SN = [], P = [], Sm = [], k, i;
+      for (k = 0; k <= NS; k++) FV.push(faceOn(LINES, k, lipAt(k) + (yBot - lipAt(k)) * t));
+      for (k = 0; k < NS; k++) { var sx = FV[k + 1].x - FV[k].x, sz = FV[k + 1].z - FV[k].z, sl = Math.hypot(sx, sz) || 1; SN.push({ x: -sz / sl * sideK, z: sx / sl * sideK }); }
+      function project(p, d) { for (var rp = 0; rp < 3; rp++) for (var s = 0; s < NS; s++) { var a = FV[s], b = FV[s + 1], ex = b.x - a.x, ez = b.z - a.z, tau = ((p.x - a.x) * ex + (p.z - a.z) * ez) / (ex * ex + ez * ez || 1), inner = tau > 0 && tau < 1; tau = Math.max(0, Math.min(1, tau));
+          var cx = a.x + ex * tau, cz = a.z + ez * tau, dx = p.x - cx, dz = p.z - cz, dd = Math.hypot(dx, dz), side = dx * SN[s].x + dz * SN[s].z;
+          if (inner) { if (side < d && side > -3 * d) { p.x += SN[s].x * (d - side); p.z += SN[s].z * (d - side); } } else if (dd < d && dd > 1e-6 && side > -0.5 * d) { p.x = cx + dx / dd * d; p.z = cz + dz / dd * d; } } }
+      for (i = 0; i <= M2; i++) { var u = i / S2, y = lipAt(u) + (yBot - lipAt(u)) * t, f = faceOn(LINES, u, y), n = normalOn(LINES, u, y); P.push({ x: f.x + n.x * off, z: f.z + n.z * off }); }
+      P.forEach(function (p) { project(p, off); });
+      for (i = 0; i <= M2; i++) { var h = Math.min(5, i, M2 - i), wx = 0, wz = 0, ws = 0; for (k = -h; k <= h; k++) { var w = Math.exp(-k * k / 4.5); wx += P[i + k].x * w; wz += P[i + k].z * w; ws += w; } Sm.push({ x: wx / ws, z: wz / ws }); }
+      Sm.forEach(function (p) { project(p, off); });
+      if (t > 0) { var A0 = FV[0], ax = FV[NS].x - A0.x, az = FV[NS].z - A0.z, al = Math.hypot(ax, az) || 1, e = { x: ax / al, z: az / al }, fz = { x: -e.z, z: e.x }, nm = SN[Math.floor(NS / 2)];
+        if (fz.x * nm.x + fz.z * nm.z < 0) { fz.x = -fz.x; fz.z = -fz.z; }
+        var H = [], srt = FV.map(function (p, q) { return { k: q, a: (p.x - A0.x) * e.x + (p.z - A0.z) * e.z, b: (p.x - A0.x) * fz.x + (p.z - A0.z) * fz.z }; }).sort(function (p, q) { return p.a - q.a; });
+        srt.forEach(function (p) { while (H.length >= 2) { var o = H[H.length - 2], q = H[H.length - 1]; if ((q.a - o.a) * (p.b - o.b) - (q.b - o.b) * (p.a - o.a) >= 0) H.pop(); else break; } H.push(p); });   /* the field-side hull: the fin tips the span rests on */
+        var hk = H.map(function (p) { return p.k; }).sort(function (p, q) { return p - q; }), wt = Math.min(1, t / SPANT), ww = SPANW * wt * wt * (3 - 2 * wt), q0 = 0;
+        for (i = 0; i <= M2; i++) { var uu = i / S2; while (q0 < hk.length - 2 && hk[q0 + 1] <= uu) q0++; var k0 = hk[q0], k1 = hk[q0 + 1], fr = (uu - k0) / (k1 - k0), p0 = FV[k0], p1 = FV[k1], cx2 = p1.x - p0.x, cz2 = p1.z - p0.z, cl = Math.hypot(cx2, cz2) || 1;
+          var spx = p0.x + cx2 * fr - cz2 / cl * sideK * off * 1.4, spz = p0.z + cz2 * fr + cx2 / cl * sideK * off * 1.4; Sm[i].x += (spx - Sm[i].x) * ww; Sm[i].z += (spz - Sm[i].z) * ww; } }
+      rowCache[key] = Sm; return Sm; }
     function curtain(off, rib, opt) { opt = opt || {}; var pos = [], uv = [], rb = [], idx = [], i, j, J0 = opt.brink ? -4 : 0, rows = NR - J0 + 1, BRK = [20, 12, 6, 2.2], BRV = [-0.1, -0.065, -0.035, -0.012];   /* M19: opt.brink — four rows run the flume's water down its length and over the crest at the notch (the high terrain pours INTO the fall); opt.bow(t) — extra offset down the drop */
-      for (j = J0; j <= NR; j++) { var t = Math.max(0, j / NR);
-        for (i = 0; i <= NC; i++) { var u = i / CPS, top = lipAt(u), y = top + (yBot - top) * t, p = faceOn(LINES, u, y), n = normalOn(LINES, u, y), o2 = off + (opt.bow ? opt.bow(t) : 0), px = p.x + n.x * o2, pz = p.z + n.z * o2, vv = t;
+      for (j = J0; j <= NR; j++) { var t = Math.max(0, j / NR), o2 = off + (opt.bow ? opt.bow(t) : 0), RP = opt.span ? rowPath(t) : null;
+        for (i = 0; i <= NC; i++) { var u = i / CPS, top = lipAt(u), y = top + (yBot - top) * t, px, pz, vv = t;
+          if (RP) { var ia = Math.max(0, i - 1), ib = Math.min(NC, i + 1), tx = RP[ib].x - RP[ia].x, tz = RP[ib].z - RP[ia].z, tl = Math.hypot(tx, tz) || 1; px = RP[i].x - tz / tl * sideK * (o2 - OFF); pz = RP[i].z + tx / tl * sideK * (o2 - OFF); }   /* the front veil: off the curtain's own path */
+          else { var p = faceOn(LINES, u, y), n = normalOn(LINES, u, y); px = p.x + n.x * o2; pz = p.z + n.z * o2; }
           if (j < 0) { var bw = Math.min(1, Math.max(0, (0.95 - Math.abs(u - NS / 2)) / 0.35)), D = BRK[j + 4], lat = brS * Math.max(-1, Math.min(1, (u - NS / 2) / 0.6)) * (LIPW * 0.4 - 0.05); bw = bw * bw * (3 - 2 * bw); px += (crC.x + ox * D + oz * lat - px) * bw; pz += (crC.z + oz * D - ox * lat - pz) * bw; y += (HL.top_y_m + (j === -1 ? 0.18 : 0.26) - y) * bw; vv = BRV[j + 4]; }   /* M20: the flume rows lie on the channel's own frame (lip + axis·D + tangent·lat) — they used to be pushed back along each station's face normal, fanning the cove's normals into a few 30 m spikes that smeared the flow noise into flat grey blotches */
           pos.push(px, y, pz); uv.push(i / NC, vv); if (rib) rb.push(ribAt(u)); } }
       for (j = 0; j < rows - 1; j++) for (i = 0; i < NC; i++) { var a = j * (NC + 1) + i, b = a + NC + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
       var g = keep(new THREE.BufferGeometry()); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); if (rib) g.setAttribute('aRib', new THREE.Float32BufferAttribute(rb, 1)); g.setIndex(idx); g.computeBoundingSphere(); return g; }
-    var fallMat = keep(veilWaterMaterial(THREE, { night: night, sx: NS * 0.8, ribs: true })); waterU = fallMat.uniforms;
-    var fall = new THREE.Mesh(curtain(OFF, true, { brink: true }), fallMat); fall.name = 'VEIL_FALLS_CURTAIN'; fall.renderOrder = 6; group.add(fall);
+    var fallMat = keep(veilWaterMaterial(THREE, { night: night, sx: NS * 0.8, ribs: true, strands: STR, strandBase: yBot })); waterU = fallMat.uniforms;
+    var fall = new THREE.Mesh(curtain(OFF, true, { brink: true, span: true }), fallMat); fall.name = 'VEIL_FALLS_CURTAIN'; fall.renderOrder = 6; group.add(fall);
     if (filmTri) (function () { var FP = filmTri.geometry.attributes.position, BPL = [], YC = 3.8, fp = [], fu = [], A = new THREE.Vector3(), B = new THREE.Vector3(), C = new THREE.Vector3(), e1 = new THREE.Vector3(), e2 = new THREE.Vector3(), nn = new THREE.Vector3(), cen = new THREE.Vector3(), nf = 0;
       for (var q = 0; q <= NS * 8; q++) { var fq = faceOn(LINES, q / 8, yBot), nq = normalOn(LINES, q / 8, yBot); BPL.push({ x: fq.x, z: fq.z, nx: nq.x, nz: nq.z }); }
       function nearQ(x, z) { var qb2 = 0, d2 = 1e9; for (var q2 = 0; q2 < BPL.length; q2++) { var dd2 = Math.hypot(x - BPL[q2].x, z - BPL[q2].z); if (dd2 < d2) { d2 = dd2; qb2 = q2; } } return { q: qb2, d: d2 }; }
@@ -147,12 +201,12 @@ export function createVeilFalls(ctx) {
     /* M19 MULTIPLE FLOW BANDS (owner: "multiple flow bands, varying thickness, broken edges … depth"): a second, broken veil in front of the
        main sheet — bands of water that shot further off the lip, bowing up to ~3.6 m out and rejoining before the spray; its own noise seed,
        so it never repeats the sheet behind it. One draw, not on LOW; bottom at the same 3.6 m as the curtain. */
-    if (!LOW) { var frontMat = keep(veilWaterMaterial(THREE, { night: night, sx: NS * 0.8, front: true, seed: 7.3 })); frontU = frontMat.uniforms;
-      var front = new THREE.Mesh(curtain(OFF + 0.3, false, { bow: function (t) { return 3.6 * Math.sin(Math.PI * Math.min(1, t * 1.1)); } }), frontMat); front.name = 'VEIL_FALLS_FRONT'; front.renderOrder = 6.5; group.add(front); info.front_veil = true; }
+    if (!LOW) { var frontMat = keep(veilWaterMaterial(THREE, { night: night, sx: NS * 0.8, front: true, seed: 7.3, strands: STR, strandBase: yBot })); frontU = frontMat.uniforms;
+      var front = new THREE.Mesh(curtain(OFF + 0.3, false, { span: true, bow: function (t) { return 3.6 * Math.sin(Math.PI * Math.min(1, t * 1.1)); } }), frontMat); front.name = 'VEIL_FALLS_FRONT'; front.renderOrder = 6.5; group.add(front); info.front_veil = true; }
     /* the wet rock behind the water: a darker, glistening sheet on the face, so the white strands read against dark rock and the ribs between them read wet */
-    var wetU = fogUniforms({ uNight: { value: night ? 1 : 0 }, uTime: { value: 0 } }); wetTU = wetU; var wetMat = keep(new THREE.ShaderMaterial({ uniforms: wetU, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
-      vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv;\nvoid main() { vUv = uv; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
-      fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uNight; uniform float uTime; varying vec2 vUv;', NOISE, 'void main() { float side = min(vUv.x, 1.0 - vUv.x); float a = smoothstep(0.0, 0.06, side) * (0.5 + 0.2 * vfN(vUv * vec2(9.0, 30.0))) * (1.0 - smoothstep(0.86, 1.0, vUv.y));',
+    var wetU = fogUniforms({ uNight: { value: night ? 1 : 0 }, uTime: { value: 0 } }); wetU.uStr = { value: STR }; wetU.uStrBase = { value: yBot }; wetTU = wetU; var wetMat = keep(new THREE.ShaderMaterial({ uniforms: wetU, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true,
+      vertexShader: '#include <common>\n#include <fog_pars_vertex>\nvarying vec2 vUv; varying float vWy;\nvoid main() { vUv = uv; vWy = (modelMatrix * vec4(position, 1.0)).y; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mvPosition;\n#include <fog_vertex>\n}',
+      fragmentShader: ['#include <common>', '#include <fog_pars_fragment>', 'uniform float uNight; uniform float uTime; varying vec2 vUv;', NOISE, STRAND, 'void main() { float side = min(vUv.x, 1.0 - vUv.x), stL; float a = smoothstep(0.0, 0.06, side) * (0.5 + 0.2 * vfN(vUv * vec2(9.0, 30.0))) * (1.0 - smoothstep(0.86, 1.0, vUv.y)) * vfStrand(vUv.x, vWy, uTime, 1.25, 3.0, stL);',   /* M20: the rock is wet only round the strands (and a little above their lips) */
         '  float gl = pow(vfN(vec2(vUv.x * 160.0, vUv.y * 22.0 - uTime * 0.9)), 7.0) * 0.9 + pow(vfN(vec2(vUv.x * 70.0 + 3.0, vUv.y * 9.0 - uTime * 0.5)), 9.0) * 0.6;',   /* M19: trickles glinting down the wet rock (reflected light) */
         '  gl_FragColor = vec4((vec3(0.11, 0.13, 0.19) + vec3(0.55, 0.6, 0.68) * gl * (1.0 - 0.5 * uNight)) * mix(1.0, 0.6, uNight), a * 0.8 + gl * 0.15);', '#include <fog_fragment>', '}'].join('\n') }));
     var wet = new THREE.Mesh(curtain(0.8, false), wetMat); wet.name = 'VEIL_FALLS_WET_ROCK'; wet.renderOrder = 5; group.add(wet); info.wet_rock = true;
