@@ -10,7 +10,7 @@
    Integration note (not solved here, presentation only): the FIELD district floor is an opaque plane at y ≈ 0 across the whole
    field, while the river surface sits at surface_y (−1) — the floor must carry a cut-out over the river band for the water to
    be visible; the geometry here is authored at the registry heights regardless. */
-import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js';
+import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js'; import { taperShaft } from './formKit.js';
 import { waterColliders } from './worldLayout.js';
 import { createRipples } from './waterRipples.js';   /* owner interjection 2026-09-19: responsive water (near-window GPU ripples) + floating objects */
 
@@ -110,10 +110,14 @@ export function createWater(ctx) {
       var o = byBridge[b.id]; counts.bridges++;
       o.rails.forEach(function (s) {
         var lx = (s.x1 + s.x2) / 2, top = s.h, base = num(s.y0) ? s.y0 : b.deck_y, mid = base + (top - base) * 0.55; counts.rails++; counts.railTopY = Math.max(counts.railTopY, top);
-        chrome.push(box(lx - 0.07, lx + 0.07, top - 0.07, top, s.z1, s.z2));            /* top rail cap (level, == the collider's top edge) */
-        chrome.push(box(lx - 0.025, lx + 0.025, mid - 0.025, mid + 0.025, s.z1, s.z2)); /* mid rail */
+        /* DESIGN DNA: a round handrail (its top edge is still the collider's), polished orb finials just inside both ends, a round mid rail —
+           all inside the rail collider's 0.14 m width; tapered posts below */
+        var WT = 'HIGH'; try { WT = ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { }
+        var hr = new THREE.CylinderGeometry(0.065, 0.065, s.z2 - s.z1, WT === 'LOW' ? 6 : 10, 1); hr.rotateX(Math.PI / 2); hr.translate(lx, top - 0.065, (s.z1 + s.z2) / 2); chrome.push(hr);
+        [s.z1 + 0.07, s.z2 - 0.07].forEach(function (ze) { var fo = new THREE.SphereGeometry(0.07, WT === 'LOW' ? 6 : 10, WT === 'LOW' ? 4 : 7); fo.translate(lx, top - 0.07, ze); chrome.push(fo); });
+        var mr = new THREE.CylinderGeometry(0.025, 0.025, s.z2 - s.z1, 6, 1); mr.rotateX(Math.PI / 2); mr.translate(lx, mid, (s.z1 + s.z2) / 2); chrome.push(mr);
         var zs = []; for (var z = s.z1; z < s.z2 - 0.5; z += POST_M) zs.push(z); zs.push(s.z2);
-        zs.forEach(function (z) { var zz = Math.min(s.z2 - 0.06, Math.max(s.z1 + 0.06, z)); var y0 = surfaceAt(o, zz), h = top - 0.07 - y0; if (h <= 0.05) return; var c = new THREE.CylinderGeometry(0.045, 0.052, h, 8, 1); c.translate(lx, y0 + h / 2, zz); chrome.push(c); counts.posts++; });
+        zs.forEach(function (z) { var zz = Math.min(s.z2 - 0.06, Math.max(s.z1 + 0.06, z)); var y0 = surfaceAt(o, zz), h = top - 0.07 - y0; if (h <= 0.05) return; var c = taperShaft(THREE, 0.05, 0.034, h, WT, { flare: 1, belly: 0.05, radial: 8, rows: 4 }); c.translate(lx, y0, zz); chrome.push(c); counts.posts++; });   /* tapered posts, widest 5.3 cm (inside the 7 cm rail half-width) */
       });
       if (o.deck) { var d = o.deck; [d.x1 + 0.38, d.x2 - 0.38].forEach(function (lx) {   /* cyan light line just inboard of each rail lane, on the deck and continuing down both ramps */
         lines.push(box(lx - 0.04, lx + 0.04, d.h + 0.005, d.h + 0.035, d.z1, d.z2)); counts.edgeLines++;

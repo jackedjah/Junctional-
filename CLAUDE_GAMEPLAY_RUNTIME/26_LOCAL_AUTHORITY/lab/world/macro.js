@@ -1,6 +1,6 @@
 import { ridgeStations, ridgeFaceSegment } from './ridgeLayout.js';
 import { applyGeology } from './surfaceDetail.js';
-import { toCreasedNormals } from '../../vendor/three/BufferGeometryUtils.js'; import { ridgeWarpField, sculptRidge } from './ridgeSculpt.js'; import { veilWaterMaterial, veilCurtainKeep } from './veilFalls.js';
+import { toCreasedNormals } from '../../vendor/three/BufferGeometryUtils.js'; import { plumeMaterial } from './formKit.js'; import { ridgeWarpField, sculptRidge } from './ridgeSculpt.js'; import { veilWaterMaterial, veilCurtainKeep } from './veilFalls.js';
 
 /* JOB B world module — MACRO GEOGRAPHY (owner B8 §16–§18 "floor down, world up"). Data: registry.macro.
    MOUNTAINS: two ridge bands between the sanctuaries and the far massifs (NEAR 300–420 m, MID 470–560 m) — each ONE merged ribbon mesh
@@ -74,9 +74,7 @@ export function createMacro(ctx) {
     /* DESIGN DNA (owner: softer, more magical power — no harsh beams): each sky beam is a tapered light plume, the roster's energy-tip ramp
        turned skyward — white at the root, its class colour higher up — with a soft silhouette (the rim fades by facing ratio), soft bands
        drifting slowly upward and a slow breath. Same instanced draw, same placement. */
-    beamMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 }, uOp: { value: night ? 0.7 : 0.42 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-      vertexShader: 'varying vec2 vUv; varying vec3 vCol; varying float vFace;\nvoid main() { vUv = uv; vCol = vec3(1.0);\n#ifdef USE_INSTANCING_COLOR\n vCol = instanceColor;\n#endif\n mat4 mm = modelMatrix;\n#ifdef USE_INSTANCING\n mm = modelMatrix * instanceMatrix;\n#endif\n vec4 wp = mm * vec4(position, 1.0); vec3 wn = normalize(mat3(mm) * normal); vFace = abs(dot(wn, normalize(cameraPosition - wp.xyz))); gl_Position = projectionMatrix * viewMatrix * wp; }',
-      fragmentShader: 'uniform float uTime; uniform float uOp; varying vec2 vUv; varying vec3 vCol; varying float vFace;\nvoid main() { float up = vUv.y, soft = pow(vFace, 1.7), fade = (1.0 - smoothstep(0.5, 1.0, up)) * smoothstep(0.0, 0.05, up);\n float drift = 0.72 + 0.28 * sin((up * 5.0 - uTime * 0.12) * 6.2831853), breath = 0.86 + 0.14 * sin(uTime * 0.55);\n vec3 c = mix(vCol, vec3(1.0), 0.45 * (1.0 - smoothstep(0.0, 0.45, up)));\n gl_FragColor = vec4(c * soft * fade * drift * breath * uOp, 1.0); }' });
+    beamMat = plumeMaterial(THREE, night ? 0.7 : 0.42);
     own.push(beamMat); beams = new THREE.InstancedMesh(g, beamMat, list.length); beams.name = 'MACRO_SKY_BEAMS'; beams.userData.noMerge = true; beams.frustumCulled = false; var m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), s = new THREE.Vector3(), col = new THREE.Color(); list.forEach(function (B, i) { v.set(B.x, B.y, B.z); s.set(B.radius_m, B.height_m, B.radius_m); m4.compose(v, q, s); beams.setMatrixAt(i, m4); col.setHex(FAM[B.family] || FAM.cyan); beams.setColorAt(i, col); }); if (beams.instanceColor) beams.instanceColor.needsUpdate = true; group.add(beams); }
   function build() { group = new THREE.Group(); group.name = 'JOBB_MACRO'; group.userData.noMerge = true; ctx.group.add(group); reg = ctx.registry; M = reg && reg.macro; if (!M) { log('macro: registry.macro missing — nothing built'); return; }
     (M.mountains || []).forEach(ridge); var soft = softTexture(); (M.waterfalls || []).forEach(function (W) { waterfall(W, soft); }); buildBeams(M.sky_beams || []); applyNight(night);

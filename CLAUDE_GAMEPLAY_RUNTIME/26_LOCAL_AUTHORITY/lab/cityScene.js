@@ -6,7 +6,7 @@
    one hemisphere, an environment map for specular, emissive trims for local light (no per-lamp point lights). */
 import { HALO_LAYOUT, HALO_PLAY_LAYOUT } from '../play/haloLayout.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { createAuraField } from './world/aura.js'; import { toLacquer, taperShaft, orb, energyTip, tipMaterial, softBox } from './world/formKit.js';   /* M12 owner pivot: the spectral aura language */
+import { createAuraField } from './world/aura.js'; import { toLacquer, taperShaft, orb, energyTip, tipMaterial, softBox, plumeMaterial } from './world/formKit.js';   /* M12 owner pivot: the spectral aura language */
 import { defaultTextureCap } from './texCap.js'; import { applySurface, applyCrystal, applyRadialDeck } from './world/surfaceDetail.js'; import { createFacadeKit, profileFor, addCivicBuilding } from './world/facadeKit.js';
 export function createCityScene(THREE, group, helpers) {
   var roundedBox = helpers.roundedBox, canvasTex = helpers.canvasTex; var DAY = helpers.night === false;
@@ -436,10 +436,9 @@ export function createCityScene(THREE, group, helpers) {
         LIGHT rises from a flush floor emitter ring — the same language as the city's sky-energy conduits: light, not a solid (nothing to walk or
         fly into). It gives the empty deck five mid-distance landmarks in the sector's class colour — faint by day, a quiet glow at night — and a
         flush light pool on the deck around it. 3 draws (beams, emitter rings, pools). */
-        var bc = document.createElement('canvas'); bc.width = 8; bc.height = 128; var bx2 = bc.getContext('2d'), bgr = bx2.createLinearGradient(0, 0, 0, 128); bgr.addColorStop(0, 'rgba(255,255,255,0)'); bgr.addColorStop(0.55, 'rgba(255,255,255,0.22)'); bgr.addColorStop(0.9, 'rgba(255,255,255,0.75)'); bgr.addColorStop(1, 'rgba(255,255,255,1)'); bx2.fillStyle = bgr; bx2.fillRect(0, 0, 8, 128);
-        var bt = new THREE.CanvasTexture(bc); bt.colorSpace = THREE.SRGBColorSpace;
+        /* (the beam gradient texture is gone: the plume shader draws the gradient) */
         var pc = document.createElement('canvas'); pc.width = pc.height = 64; var px2 = pc.getContext('2d'), pgr = px2.createRadialGradient(32, 32, 1, 32, 32, 32); pgr.addColorStop(0, 'rgba(255,255,255,0.9)'); pgr.addColorStop(0.35, 'rgba(255,255,255,0.35)'); pgr.addColorStop(1, 'rgba(255,255,255,0)'); px2.fillStyle = pgr; px2.fillRect(0, 0, 64, 64); var pt = new THREE.CanvasTexture(pc); pt.colorSpace = THREE.SRGBColorSpace;
-        var bG = new THREE.CylinderGeometry(1, 1, 1, 18, 1, true); bG.translate(0, 0.5, 0); var bM = new THREE.MeshBasicMaterial({ map: bt, transparent: true, opacity: DAY ? 0.14 : 0.32, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false });
+        var bG = new THREE.CylinderGeometry(0.4, 1, 1, 24, 1, true); bG.translate(0, 0.5, 0); var bM = plumeMaterial(THREE, DAY ? 0.2 : 0.45);   /* DESIGN DNA: a tapered, breathing light plume (was a hard open cylinder) */
         var eG = new THREE.TorusGeometry(1, 0.035, 4, 64); eG.rotateX(Math.PI / 2); var eM = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: DAY ? 0.5 : 1.8, roughness: 0.3, metalness: 0.2 });
         var pG = new THREE.CircleGeometry(1, 40); pG.rotateX(-Math.PI / 2); var pM = new THREE.MeshBasicMaterial({ map: pt, transparent: true, opacity: DAY ? 0.08 : 0.42, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, polygonOffset: true, polygonOffsetFactor: -2 });
         var beams2 = new THREE.InstancedMesh(bG, bM, 5), rings2 = new THREE.InstancedMesh(eG, eM, 5), pools2 = new THREE.InstancedMesh(pG, pM, 5), m5 = new THREE.Matrix4(), q5 = new THREE.Quaternion(), v5 = new THREE.Vector3(), s5 = new THREE.Vector3(), c5 = new THREE.Color();
@@ -447,7 +446,8 @@ export function createCityScene(THREE, group, helpers) {
           beams2.setMatrixAt(gI, m5.compose(v5.set(gx, PH + 0.02, gz), q5, s5.set(1.2, 60, 1.2))); beams2.setColorAt(gI, c5);
           rings2.setMatrixAt(gI, m5.compose(v5.set(gx, PH + 0.006, gz), q5, s5.set(1.2, 1, 1.2))); rings2.setColorAt(gI, c5.clone().lerp(new THREE.Color(0xffffff), 0.45));   /* flush: the ring tops out 4 cm above the deck */
           pools2.setMatrixAt(gI, m5.compose(v5.set(gx, PH + 0.012, gz), q5, s5.set(8, 1, 8))); pools2.setColorAt(gI, c5); }
-        [[beams2, 'HALO_GARDEN_LIGHT_BEAMS', function (n) { bM.opacity = n ? 0.32 : 0.14; }], [rings2, 'HALO_GARDEN_EMITTERS', function (n) { eM.emissiveIntensity = n ? 1.8 : 0.5; }], [pools2, 'HALO_GARDEN_LIGHT_POOLS', function (n) { pM.opacity = n ? 0.42 : 0.08; }]].filter(function (B, bi) { if (SDT === 'LOW' && bi > 0) { B[0].geometry.dispose(); B[0].material.dispose(); return false; } return true; }).forEach(function (B) { B[0].instanceMatrix.needsUpdate = true; if (B[0].instanceColor) B[0].instanceColor.needsUpdate = true; B[0].computeBoundingSphere(); B[0].name = B[1]; B[0].userData.noMerge = true; B[0].userData.dayNight = B[2]; B[0].renderOrder = 5; g.add(B[0]); });
+        beams2.userData.tick = function (t) { bM.uniforms.uTime.value = t || 0; }; haloTicks.push(beams2);
+        [[beams2, 'HALO_GARDEN_LIGHT_BEAMS', function (n) { bM.uniforms.uOp.value = n ? 0.45 : 0.2; }], [rings2, 'HALO_GARDEN_EMITTERS', function (n) { eM.emissiveIntensity = n ? 1.8 : 0.5; }], [pools2, 'HALO_GARDEN_LIGHT_POOLS', function (n) { pM.opacity = n ? 0.42 : 0.08; }]].filter(function (B, bi) { if (SDT === 'LOW' && bi > 0) { B[0].geometry.dispose(); B[0].material.dispose(); return false; } return true; }).forEach(function (B) { B[0].instanceMatrix.needsUpdate = true; if (B[0].instanceColor) B[0].instanceColor.needsUpdate = true; B[0].computeBoundingSphere(); B[0].name = B[1]; B[0].userData.noMerge = true; B[0].userData.dayNight = B[2]; B[0].renderOrder = 5; g.add(B[0]); });
         rings2.renderOrder = 0; })();   /* M10 LOW: the beams only (no emitter rings / pools) */
       (function () {   /* M11 PROMENADE + VIEWING EDGE LIGHT (owner: promenade identity, architectural lighting, integrated class-colour accents). Flush
         recessed floor lights (2 cm) run along both promenade curbs every 5 m — neutral white, except where a class spoke crosses the promenade,

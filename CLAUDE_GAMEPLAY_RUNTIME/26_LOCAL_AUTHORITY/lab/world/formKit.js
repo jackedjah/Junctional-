@@ -62,3 +62,12 @@ export function toLacquer(THREE, m, cc, ccr, tier) {
   var p = new THREE.MeshPhysicalMaterial(); THREE.MeshStandardMaterial.prototype.copy.call(p, m); p.defines = { STANDARD: '', PHYSICAL: '' };
   p.clearcoat = cc; p.clearcoatRoughness = ccr; p.name = m.name; m.dispose(); return p;
 }
+
+/* A tapered LIGHT PLUME material (the owner's "soft aura drift, tapered light trails — no harsh beams"): for an open, tapered, instanced
+   column with uv.y rising 0 → 1. White at the root, the instance colour higher up, a soft silhouette (the rim fades by facing ratio), soft
+   bands drifting slowly upward and a slow breath. Additive; drive uniforms.uTime and uniforms.uOp. */
+export function plumeMaterial(THREE, op) {
+  return new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 }, uOp: { value: op === undefined ? 0.5 : op } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    vertexShader: 'varying vec2 vUv; varying vec3 vCol; varying float vFace;\nvoid main() { vUv = uv; vCol = vec3(1.0);\n#ifdef USE_INSTANCING_COLOR\n vCol = instanceColor;\n#endif\n mat4 mm = modelMatrix;\n#ifdef USE_INSTANCING\n mm = modelMatrix * instanceMatrix;\n#endif\n vec4 wp = mm * vec4(position, 1.0); vec3 wn = normalize(mat3(mm) * normal); vFace = abs(dot(wn, normalize(cameraPosition - wp.xyz))); gl_Position = projectionMatrix * viewMatrix * wp; }',
+    fragmentShader: 'uniform float uTime; uniform float uOp; varying vec2 vUv; varying vec3 vCol; varying float vFace;\nvoid main() { float up = vUv.y, soft = pow(vFace, 1.7), fade = (1.0 - smoothstep(0.5, 1.0, up)) * smoothstep(0.0, 0.05, up);\n float drift = 0.72 + 0.28 * sin((up * 5.0 - uTime * 0.12) * 6.2831853), breath = 0.86 + 0.14 * sin(uTime * 0.55);\n vec3 c = mix(vCol, vec3(1.0), 0.45 * (1.0 - smoothstep(0.0, 0.45, up)));\n gl_FragColor = vec4(c * soft * fade * drift * breath * uOp, 1.0); }' });
+}
