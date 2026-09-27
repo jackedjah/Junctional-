@@ -10263,8 +10263,8 @@
   "review": "QR_FIVE_SANCTUARY_NIGHT_CIRCUIT"
  },
  "combat_zones": {
-  "_doc": "M15b owner 2026-09-27 correction (supersedes the M15 12 m ring): DUEL COURTS are dormant world infrastructure drawn into the ground — a large square-diamond court (crystalline inlay, faint faceted seams, diamond anchors, low ground-bound energy); no cage, walls, raised arena or spectator structure; no collider. States: DORMANT (white / cool white-blue / pale ice only — ZERO class colour), READY (someone on it: a neutral response, white presence, still zero class colour), ACTIVATION (~2.8 s: each fighter's class territory, up to four, seams through white, then it lets go), ACTIVE_DUEL (neutral court; each fighter carries a local class-colour presence field that moves with them), RESOLUTION (~1.4 s drain), RESET (~1.2 s neutral sweep) → DORMANT. ONE court is placed until the owner verifies the footprint and the dormant look; the M15 sites wait in pending_sites for a re-survey at the new footprint. Runtime: lab/world/combatZones.js (world module 'combatZones'; worldB.combatZones() is the host API).",
-  "playable_m": 26,
+  "_doc": "M15b owner 2026-09-27 correction (supersedes the M15 12 m ring): DUEL COURTS are dormant world infrastructure drawn into the ground — a large square-diamond court (crystalline inlay, faint faceted seams, diamond anchors, low ground-bound energy); no cage, walls, raised arena or spectator structure; no collider. States: DORMANT (white / cool white-blue / pale ice only — ZERO class colour), READY (someone on it: a neutral response, white presence, still zero class colour), ACTIVATION (~2.8 s: the court splits into equal class territories by its own symmetry — five fighters, one of each class, take four corner territories and a central diamond, each one fifth; seams through white; then it lets go), ACTIVE_DUEL (neutral court; each fighter carries a local class-colour presence field that moves with them), RESOLUTION (~1.4 s drain), RESET (~1.2 s neutral sweep) → DORMANT. ONE court is placed until the owner verifies the footprint and the dormant look; the M15 sites wait in pending_sites for a re-survey at the new footprint. Runtime: lab/world/combatZones.js (world module 'combatZones'; worldB.combatZones() is the host API).",
+  "playable_m": 31,
   "border_m": 1.2,
   "shape": "SQUARE_DIAMOND",
   "ground_only": true,
@@ -10272,13 +10272,15 @@
   "sizing": {
    "melee_unit_m": 2.5,
    "max_aoe_radius_m": 6.25,
+   "max_fighters": 5,
    "four_fighter_packing_m": 25,
+   "five_fighter_packing_m": 30.18,
    "owner_min_m": 18,
    "owner_range_m": [
     18,
     24
    ],
-   "note": "rules_17_23: the largest area effect is 2.5 melee units (6.25 m radius); four fighters whose largest areas must not stack pack 2 x 2 into 25 m, so the court gives 26 m of clear playable width (about 85 ft) — above the owner's 18–24 m floor — plus a 1.2 m inlaid border (28.4 m across). Projectiles reach 12 units (30 m): ranged play may run past the court edge; the court marks the duel, it does not contain it."
+   "note": "rules_17_23: the largest area effect is 2.5 melee units (6.25 m radius). All five classes can meet on one court (owner 2026-09-27: 'they also have a fifth class that is purple'); the tightest square holding five such areas without stacking is the dice-five pattern, R(2 + 2*sqrt(2)) = 30.2 m (four fighters would need 2 x 2 = 25 m). So the court gives 31 m of clear playable width (about 102 ft), plus a 1.2 m inlaid border (33.4 m across). Projectiles reach 12 units (30 m): ranged play may run past the court edge; the court marks the duel, it does not contain it."
   },
   "class_family": {
    "ATHLETE": "gold",
@@ -10301,7 +10303,7 @@
     "y": 0,
     "yaw_deg": 45,
     "district": "athlete",
-    "note": "the first court: open paved ground between the HALO trunk and the north-east forest, off the temple causeway; 35.7 m clear of every collider from its centre (circumradius 20.1 m), flat across the footprint"
+    "note": "the first court: open paved ground between the HALO trunk and the north-east forest, off the temple causeway; 35.7 m clear of every collider from its centre (circumradius 23.6 m at the five-fighter footprint), flat across the footprint"
    }
   ],
   "pending_sites": [
@@ -10317,7 +10319,7 @@
      -30
     ],
     "note": "the quiet south apron between the Arena Dome and the Mentor Spire; on the NPC spar spot",
-    "status": "RE-SURVEY at the 28.4 m footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
    },
    {
     "id": "CZ_VISIONARY_HIGHLAND",
@@ -10327,7 +10329,7 @@
     "yaw_deg": 45,
     "district": "visionary",
     "note": "on the Visionary highland plateau, south of the overlook",
-    "status": "RE-SURVEY at the 28.4 m footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
    },
    {
     "id": "CZ_MATCH_EAST",
@@ -10337,7 +10339,7 @@
     "yaw_deg": 45,
     "district": "match",
     "note": "behind MAH MATCH, hidden from the plaza by the hall",
-    "status": "RE-SURVEY at the 28.4 m footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
    },
    {
     "id": "CZ_LEAN_GLADE",
@@ -10347,7 +10349,7 @@
     "yaw_deg": 45,
     "district": "lean",
     "note": "a clearing in the north-west forest",
-    "status": "RE-SURVEY at the 28.4 m footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
    },
    {
     "id": "CZ_GYM_WEST",
@@ -10357,8 +10359,11 @@
     "yaw_deg": 45,
     "district": "gym",
     "note": "an open field west of the gym causeway, at the edge of the west forest",
-    "status": "RE-SURVEY at the 28.4 m footprint (fails the flat / clearance check as placed)"
+    "status": "RE-SURVEY at the 33.4 m five-fighter footprint (fails the flat / clearance check as placed)"
    }
-  ]
+  ],
+  "territories": {
+   "rule": "the court's own symmetry, equal shares: 5 = four corner territories + a central diamond |x|+|z| <= h*sqrt(0.4) (each one fifth); 4 = corner quadrants; 3 = 120-degree sectors, mirror-symmetric; 2 = halves on the court symmetry line nearest the fighters; fighters take the territory nearest them (least total travel)"
+  }
  }
 }
