@@ -122,7 +122,7 @@ export function createMatchHall(ctx) {
         '{ float k = vLine, t = uTime; vec3 Eb = totalEmissiveRadiance / max(length(totalEmissiveRadiance), 1e-3); vec3 add = vec3(0.0);',
         '  float ang = atan(vLP.z, vLP.x) / 6.2831853 + 0.5; float sweep = pow(0.5 - 0.5 * cos(fract(ang - t * 0.018) * 6.2831853), 6.0) * (0.9 + 0.1 * sin(t * 0.4));',
         '  if (k < 0.5) { float id = nkH(floor(vLP.xz * 0.4 + 0.5)); float yN = clamp(vLP.y / uH, 0.0, 1.0); float ph = fract(t * (0.035 + id * 0.03) + id * 7.0);',
-        '    float on = step(0.3, fract(id * 13.7)); vec3 cc = nkClass(fract(id * 5.3)); for (int j = 0; j < 2; j++) { float d = fract(ph + float(j) * 0.47) - yN; float tail = exp(-d * d * 55.0) * (0.8 + 0.2 * sin(t * 0.9 + id * 11.0)); float head = exp(-d * d * 1400.0) * 0.5;',
+        '    float on = step(0.45, fract(id * 13.7)); vec3 cc = mix(vec3(0.028, 0.147, 1.0), vec3(0.254, 0.074, 1.0), fract(id * 5.3)); for (int j = 0; j < 2; j++) { float d = fract(ph + float(j) * 0.47) - yN; float tail = exp(-d * d * 55.0) * (0.8 + 0.2 * sin(t * 0.9 + id * 11.0)); float head = exp(-d * d * 1400.0) * 0.5;',
         '    add += cc * (tail * 2.1 + head * 0.8) * on; } }   /* DESIGN DNA: soft eased light bulbs that breathe (no hard white head) */',
         '  else if (k < 1.5) { float f = fract(ang * 14.0 - t * 0.35); add += Eb * (0.5 - 0.5 * cos(f * 6.2831853)) * 0.55; }',
         '  else if (k < 2.5) { float f = fract((vLP.y + abs(vLP.z) + abs(vLP.x) * 0.3) * 0.3 - t * 0.5); add += vec3(0.9, 0.78, 0.5) * pow(0.5 - 0.5 * cos(f * 6.2831853), 3.0) * 0.9; }',
@@ -130,7 +130,7 @@ export function createMatchHall(ctx) {
         '    vec3 cc = mix(vec3(0.028, 0.147, 1.0), vec3(0.254, 0.074, 1.0), 0.5 + 0.5 * sin(vLP.y * 0.35 + a2 * 6.2831853 + t * 0.25)); add += cc * (0.55 + 1.7 * pow(0.5 - 0.5 * cos(f * 6.2831853), 5.0)); }',
         '  else { float f = fract(vLP.y * 0.04 - t * 0.2 + fract((vLP.x + vLP.z) * 0.013)); vec3 cc = mix(vec3(0.028, 0.147, 1.0), vec3(0.254, 0.074, 1.0), smoothstep(8.0, 40.0, vLP.y));',   /* M14 light rivers: pulses climbing the corners into the crown, blue below turning violet above */
         '    add += cc * (0.4 + 2.2 * pow(0.5 - 0.5 * cos(f * 6.2831853), 8.0)); }',
-        '  float bk = k > 2.5 ? 0.25 : (k > 1.5 ? 2.6 : 1.0);',
+        '  float bk = k > 2.5 ? 0.25 : (k > 1.5 ? 2.6 : (k > 0.5 ? 1.0 : 0.45));   /* M15c restraint: the body strips keep only a faint base line — the black body leads */',
         '  totalEmissiveRadiance = Eb * mix(0.1, 0.13, uNight) * bk + add * mix(0.75, 1.0, uNight) + Eb * sweep * mix(0.35, 0.6, uNight) * (k > 2.5 ? 0.3 : 1.0); }'].join('\n')); };   /* absolute levels: a dim ice base line; class-coloured packets with a white head and a fading tail climb the strips, kept below the tone-map shoulder so the class colour survives (a hot packet read as flat white) */
     facadeMat.customProgramCacheKey = function () { return 'matchHall_neoTokyo'; }; facadeMat.color.setHex(0x1c2028); facadeMat.metalness = 0.6; facadeMat.roughness = 0.4;   /* dark diffuse: the lines are light, not white paint lit by the sky */
     stats.neoTokyo = { ticker_perimeter_m: +(u0 * REP).toFixed(1), blade: [BW, BH, BY] };
@@ -196,6 +196,10 @@ export function createMatchHall(ctx) {
         '  vec3 room = wall * wash * (0.2 + 0.9 * exp(-yIn * 4.0) + 0.85 * beams * (0.3 + 0.7 * yIn))',   /* back wall: the wash, light pooled low, beams */
         '    + (1.0 - wall) * up * (wash * (0.12 + 0.35 * beams) + vec3(0.75, 0.8, 1.0) * lines * 0.35)',   /* ceiling: light lines */
         '    + (1.0 - wall) * (1.0 - up) * wash * (0.55 + 0.8 * beams);',   /* floor: glossy, catching the beams */
+        '  float alW = abs(vGN.z) > abs(vGN.x) ? Q.x : Q.z, hY = Q.y - fl, wd = mix(0.23, 0.11, step(1.42, hY));',
+        '  float w1 = (fract(alW / 11.0 + t * 0.021 + fl * 0.37) - 0.5) * 11.0, w2 = (fract(alW / 7.3 - t * 0.016 + fl * 0.61) - 0.5) * 7.3;',
+        '  float fig = max(1.0 - smoothstep(wd - 0.03, wd + 0.03, abs(w1)), (1.0 - smoothstep(wd - 0.03, wd + 0.03, abs(w2))) * step(0.5, fract(fl * 3.1))) * (1.0 - smoothstep(1.66, 1.74, hY)) * step(0.0, hY) * wall;',   /* M15c internal activity: people crossing the lit rooms, silhouettes against the wash */
+        '  room *= 1.0 - 0.82 * fig;',
         '  float occ = 0.55 + 0.45 * sin(fl * 1.9 + floor(vGU / 7.0) * 2.7 + 0.3 * sin(t * 0.13 + vGU * 0.2)), mull = 1.0 - smoothstep(0.44, 0.48, abs(fract(vGU / 1.6) - 0.5));',
         '  totalEmissiveRadiance += room * occ * mull * smoothstep(0.08, 0.45, cn) * mix(0.22, 1.0, uNight); }'].join('\n')); };
     glassMat.customProgramCacheKey = function () { return 'matchHall_skyGlass'; };
@@ -252,7 +256,7 @@ export function createMatchHall(ctx) {
     /* approach lines on the ground either side of the door path (the MATCH_DOOR interactable sits ~4 m out on this axis) */
     [-1, 1].forEach(function (s) { cyan.push(tag(box(6.0, 0.03, 0.12, -hw - 3.2, 0.005, d0 + s * (dw + 0.4)), 2)); });
     /* vertical light lines: evenly spaced on all four facades, ending under one horizontal band below the crown; none in the door zone */
-    var S = 2.5, y0 = PLINTH + 0.6, y1 = bodyTop - 1.1, L = y1 - y0, strips = 0;
+    var S = 5.0, y0 = PLINTH + 0.6, y1 = bodyTop - 1.1, L = y1 - y0, strips = 0;   /* M15c restraint (owner 2026-09-27: black identity, selected violet / blue light): half as many strips as M12's 2.5 m rhythm */
     function alongZ(x, proudSign, skipDoor) { for (var z = -hd + S / 2; z < hd - S / 4; z += S) { if (skipDoor && Math.abs(z - d0) < dw + 1.2) continue; cyan.push(tag(box(0.06, L, 0.14, x + proudSign * 0.03, y0, z), 0)); strips++; } }
     function alongX(z, proudSign) { for (var x = -hw + S / 2; x < hw - S / 4; x += S) { cyan.push(tag(box(0.14, L, 0.06, x, y0, z + proudSign * 0.03), 0)); strips++; } }
     alongZ(-hw, -1, true); alongZ(hw, 1, false); alongX(-hd, -1); alongX(hd, 1);
