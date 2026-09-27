@@ -1,0 +1,244 @@
+{
+ "started": "2026-09-27T00:36:02.066Z",
+ "size": [
+  960,
+  540
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V34",
+   "label": "MAH MATCH hall exterior from its approach",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V34_DAY_t40.jpg",
+   "pos": [
+    84,
+    2.2,
+    -14
+   ],
+   "look": [
+    122,
+    9,
+    6
+   ],
+   "stats": {
+    "calls": 146,
+    "triangles": 1077633,
+    "geometries": 224,
+    "textures": 57,
+    "programs": 162
+   },
+   "frames_in_600ms": 0,
+   "ms": 56277
+  },
+  {
+   "id": "MA",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "MA_DAY_t40.jpg",
+   "pos": [
+    60,
+    12,
+    -60
+   ],
+   "look": [
+    122,
+    26,
+    6
+   ],
+   "stats": {
+    "calls": 176,
+    "triangles": 1245147,
+    "geometries": 261,
+    "textures": 57,
+    "programs": 162
+   },
+   "frames_in_600ms": 0,
+   "ms": 26795
+  },
+  {
+   "id": "MT",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "MT_DAY_t40.jpg",
+   "pos": [
+    160,
+    95,
+    -50
+   ],
+   "look": [
+    122,
+    24,
+    6
+   ],
+   "stats": {
+    "calls": 311,
+    "triangles": 2256076,
+    "geometries": 317,
+    "textures": 63,
+    "programs": 162
+   },
+   "frames_in_600ms": 0,
+   "ms": 37392
+  },
+  {
+   "id": "V34",
+   "label": "MAH MATCH hall exterior from its approach",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V34_NIGHT_t40.jpg",
+   "pos": [
+    84,
+    2.2,
+    -14
+   ],
+   "look": [
+    122,
+    9,
+    6
+   ],
+   "stats": {
+    "calls": 138,
+    "triangles": 1069217,
+    "geometries": 319,
+    "textures": 64,
+    "programs": 162
+   },
+   "frames_in_600ms": 0,
+   "ms": 40839
+  },
+  {
+   "id": "MA",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "MA_NIGHT_t40.jpg",
+   "pos": [
+    60,
+    12,
+    -60
+   ],
+   "look": [
+    122,
+    26,
+    6
+   ],
+   "stats": {
+    "calls": 169,
+    "triangles": 1243787,
+    "geometries": 320,
+    "textures": 65,
+    "programs": 162
+   },
+   "frames_in_600ms": 0,
+   "ms": 26765
+  },
+  {
+   "id": "MT",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "MT_NIGHT_t40.jpg",
+   "pos": [
+    160,
+    95,
+    -50
+   ],
+   "look": [
+    122,
+    24,
+    6
+   ],
+   "stats": {
+    "calls": 305,
+    "triangles": 2249452,
+    "geometries": 322,
+    "textures": 66,
+    "programs": 162
+   },
+   "frames_in_600ms": 0,
+   "ms": 35936
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 7,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (2466 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (79 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (31 ms)",
+   "aura: 45 spectral auras in one draw (2 following)",
+   "worldB aura ready (1 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 25298.4,
+  "error": null
+ },
+ "finished": "2026-09-27T00:41:22.080Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 35,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (2466 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (79 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (31 ms)",
+   "aura: 45 spectral auras in one draw (2 following)",
+   "worldB aura ready (1 ms)"
+  ]
+ }
+}

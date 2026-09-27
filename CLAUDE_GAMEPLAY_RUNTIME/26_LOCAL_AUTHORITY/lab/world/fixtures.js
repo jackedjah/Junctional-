@@ -8,7 +8,7 @@
    character receives local light when moving near / under a fixture without dozens of lights. Day is the default; setNight(n) switches the
    head emissive (0.35 / 1.6), the pool alpha (day_pool_alpha / night_pool_alpha) and the light intensity without rebuilding anything.
    No per-frame allocation in tick(): the nearest-fixture search runs on flat Float32Arrays into two preallocated small arrays. */
-import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js'; import { taperShaft, orb } from './formKit.js';
+import { mergeGeometries } from '../../vendor/three/BufferGeometryUtils.js'; import { taperShaft, orb } from './formKit.js'; import { createReflectionStreaks } from './wetReflect.js';
 
 import { groundYAt } from './worldLayout.js';
 export function createFixtures(ctx) {
@@ -17,7 +17,7 @@ export function createFixtures(ctx) {
   var LIGHT_NIGHT = 42, LIGHT_DAY_NEAR = 14;                     /* candela (three r155+ physical units, decay 2): ~1.1 irradiance right under the head at night; a subtle cool fill by day */
   var NEAR_POLE_M = 6, HOP_INTERVAL_S = 0.25, FADE_RATE = 8;     /* by day a light only wakes while the player is within 6 m of its pole; intensities ease toward their targets */
   var POOL_SIZE_M = 9, POOL_Y = 0.045, ARM_LEN_M = 1.4;          /* M9: pool quad ~9 m (7 m at alpha 0.45 vanished on the night paving), just above the plaza floor (0.012) with a polygon offset against z-fighting */
-  var group = null, poles = null, arms = null, heads = null, pools = null, headMat = null, poolMat = null, poolTex = null, geos = [];
+  var group = null, poles = null, arms = null, heads = null, pools = null, headMat = null, poolMat = null, poolTex = null, geos = [], streaks = null, lampList = [];
   var lights = [], lightFix = [], lightTarget = [];
   var n = 0, hx = null, hy = null, hz = null, px = null, pz = null;   /* head positions (light anchors) and pole feet (the near-pole test) */
   var bestIdx = null, bestD2 = null, bestN = 0;
@@ -99,10 +99,12 @@ export function createFixtures(ctx) {
       tmpV.set(ex, gy + headY, ez); tmpM.compose(tmpV, tmpQ, tmpS); heads.setMatrixAt(i, tmpM);
       hx[i] = ex; hy[i] = gy + headY; hz[i] = ez;
       if (pools) { tmpQ.identity(); tmpV.set(ex, gy + POOL_Y, ez); tmpM.compose(tmpV, tmpQ, tmpS); pools.setMatrixAt(i, tmpM); }
+      lampList.push({ x: ex, y: gy, z: ez, h: headY, color: 0xd6e4ff });
     }
     poles.instanceMatrix.needsUpdate = true; arms.instanceMatrix.needsUpdate = true; heads.instanceMatrix.needsUpdate = true; if (pools) pools.instanceMatrix.needsUpdate = true;
     [poles, arms, heads, pools].forEach(function (m) { if (m) { if (m.computeBoundingSphere) m.computeBoundingSphere(); m.frustumCulled = true; group.add(m); } });
     drawCalls = 3 + (pools ? 1 : 0);
+    streaks = createReflectionStreaks(THREE, lampList, { tier: FT, night: night, name: 'FIXTURE_WET_REFLECTIONS' }); if (streaks) { group.add(streaks.mesh); drawCalls++; }   /* M15: the polished night floor mirrors every luminaire as a streak toward the viewer */
 
     /* the few real lights: never shadow-casting, always present (a constant light count keeps one shader variant — intensity 0 is "off") */
     for (var k = 0; k < nLights; k++) { var L = new THREE.PointLight(0xe3eaff, 0, reach, 2); L.castShadow = false; L.name = 'FIXTURE_LIGHT_' + k; L.position.set(0, headY, 0); group.add(L); lights.push(L); lightFix.push(-1); lightTarget.push(0); }
@@ -134,7 +136,7 @@ export function createFixtures(ctx) {
   }
   function setNight(nt) {
     night = !!nt; if (!built) return;
-    headMat.emissiveIntensity = night ? HEAD_EMISSIVE_NIGHT : HEAD_EMISSIVE_DAY; if (poolMat) poolMat.opacity = night ? nightAlpha : dayAlpha;
+    headMat.emissiveIntensity = night ? HEAD_EMISSIVE_NIGHT : HEAD_EMISSIVE_DAY; if (poolMat) poolMat.opacity = night ? nightAlpha : dayAlpha; if (streaks) streaks.setNight(night);
     acc = 0; assign();   /* retarget the light intensities now; tick() eases them */
   }
   function dispose() {
@@ -142,7 +144,7 @@ export function createFixtures(ctx) {
     for (var k = 0; k < lights.length; k++) if (lights[k].dispose) lights[k].dispose();
     lights.length = 0; lightFix.length = 0; lightTarget.length = 0;
     geos.forEach(function (g) { g.dispose(); }); geos.length = 0;
-    if (headMat) headMat.dispose(); if (poolMat) poolMat.dispose(); if (poolTex) poolTex.dispose();
+    if (headMat) headMat.dispose(); if (poolMat) poolMat.dispose(); if (poolTex) poolTex.dispose(); if (streaks) streaks.dispose(); streaks = null; lampList = [];
     poles = arms = heads = pools = headMat = poolMat = poolTex = group = null; built = false; n = 0; drawCalls = 0;
   }
   function debug() {

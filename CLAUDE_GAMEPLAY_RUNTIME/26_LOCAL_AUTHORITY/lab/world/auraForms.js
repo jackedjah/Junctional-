@@ -107,3 +107,26 @@ export function createAuraForms(THREE, items, opts) {
 /* the clearance report the host-safety test reads: each form's lowest possible point (its bounding radius below the bob centre) above its ground */
 export function formsSafe(items) { return items.map(function (it) { var s = it.size || 6, sc = it.scale || [1, 1, 1], sh = typeof it.shape === 'string' ? FORM[it.shape] : it.shape, k = sh === FORM.RING ? 0.56 * Math.max(sc[0], sc[2]) : 0.9 * Math.max(sc[0], sc[1], sc[2]), r = s * k * 1.035 + s * 0.06;   /* any orientation, the breath and the bob */
   return { shape: it.shape, lowest_m: +((it.y - r) - (it.ground || 0)).toFixed(2) }; }); }
+
+/* M15 FLOATING CRYSTALS (owner 2026-09-27 reference renders: great faceted violet diamonds hanging in the air over the city, the falls and
+   the highland). Solid-looking but clearly scenery: 2–7 m tall, always high (their lowest point ≥ 12 m above the ground below, most far
+   higher), slowly turning, bobbing and breathing light — never near a hand, never a pickup. One instanced draw; each pairs with a soft
+   aura bloom (added by aura.js). items: [{ x, y, z, size (m, height), tint (hex, a class family), ground }] */
+export function createFloatingCrystals(THREE, items, opts) {
+  opts = opts || {}; var n = items.length; if (!n) return null;
+  var geo = new THREE.OctahedronGeometry(0.5, 0); geo.scale(0.62, 1, 0.62); geo = geo.toNonIndexed(); geo.computeVertexNormals();
+  var mat = new THREE.MeshStandardMaterial({ color: 0x3a2f5c, roughness: 0.14, metalness: 0.35, emissive: 0xffffff, emissiveIntensity: opts.isNight ? 0.85 : 0.45, flatShading: true, transparent: true, opacity: 0.93, envMapIntensity: 0.9 });
+  var U = { uTime: { value: 0 } };
+  mat.onBeforeCompile = function (sh) { sh.uniforms.uTime = U.uTime;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uTime; varying float vCrY;').replace('#include <begin_vertex>', ['#include <begin_vertex>',
+      '{ float ph = float(gl_InstanceID) * 1.618; float a = uTime * (0.16 + 0.05 * fract(ph)) + ph * 6.0; float c = cos(a), s = sin(a); transformed.xz = mat2(c, -s, s, c) * transformed.xz; objectNormal.xz = mat2(c, -s, s, c) * objectNormal.xz;',
+      '  transformed.y += sin(uTime * 0.45 + ph * 3.0) * 0.08; vCrY = position.y; }'].join('\n'));
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime; varying float vCrY;').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_INSTANCING_COLOR\n totalEmissiveRadiance *= vColor.rgb;\n#endif\n totalEmissiveRadiance *= (0.55 + 0.9 * smoothstep(0.1, 0.5, abs(vCrY))) * (0.85 + 0.15 * sin(uTime * 0.8));');   /* the tips burn brighter; a slow breath */ };
+  mat.customProgramCacheKey = function () { return 'mahworld_floating_crystal'; };
+  var mesh = new THREE.InstancedMesh(geo, mat, n), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), s = new THREE.Vector3(), col = new THREE.Color();
+  items.forEach(function (it, i) { v.set(it.x, it.y, it.z); s.setScalar(it.size || 4); q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), ((i * 0.37) % 1 - 0.5) * 0.25); m4.compose(v, q, s); mesh.setMatrixAt(i, m4); col.set(it.tint === undefined ? 0xb99cff : it.tint); mesh.setColorAt(i, col); });
+  mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true; mesh.computeBoundingSphere(); mesh.frustumCulled = true; mesh.name = opts.name || 'FLOATING_CRYSTALS'; mesh.userData.noMerge = true; mesh.userData.nonInteractable = true; mesh.castShadow = false; mesh.receiveShadow = false;
+  return { mesh: mesh, count: n, uniforms: U, setNight: function (nt) { mat.emissiveIntensity = nt ? 0.85 : 0.45; }, tick: function (t) { U.uTime.value = t || 0; }, dispose: function () { geo.dispose(); mat.dispose(); } };
+}
+/* the clearance report for a floating crystal: its lowest point (spin, bob) above its ground */
+export function crystalLowest(it) { var s = it.size || 4; return +((it.y - s * 0.5 - s * 0.08) - (it.ground || 0)).toFixed(2); }

@@ -1,0 +1,504 @@
+{
+ "started": "2026-09-27T00:45:37.088Z",
+ "size": [
+  1280,
+  720
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V13_DAY_t40.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 314,
+    "triangles": 1771004,
+    "geometries": 316,
+    "textures": 59,
+    "programs": 154
+   },
+   "frames_in_600ms": 0,
+   "ms": 82345
+  },
+  {
+   "id": "V16",
+   "label": "LEAN spire house on the north-west terrace",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V16_DAY_t40.jpg",
+   "pos": [
+    -82,
+    7,
+    238
+   ],
+   "look": [
+    -110,
+    15,
+    272
+   ],
+   "stats": {
+    "calls": 132,
+    "triangles": 795931,
+    "geometries": 330,
+    "textures": 63,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 51886
+  },
+  {
+   "id": "W2",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "W2_DAY_t40.jpg",
+   "pos": [
+    10,
+    3,
+    200
+   ],
+   "look": [
+    10,
+    1.5,
+    240
+   ],
+   "stats": {
+    "calls": 145,
+    "triangles": 2302606,
+    "geometries": 332,
+    "textures": 71,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 42489
+  },
+  {
+   "id": "P2",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "P2_DAY_t40.jpg",
+   "pos": [
+    40,
+    30,
+    -90
+   ],
+   "look": [
+    0,
+    20,
+    0
+   ],
+   "stats": {
+    "calls": 361,
+    "triangles": 2406198,
+    "geometries": 380,
+    "textures": 78,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 50511
+  },
+  {
+   "id": "T1",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "T1_DAY_t40.jpg",
+   "pos": [
+    -60,
+    20,
+    40
+   ],
+   "look": [
+    -230,
+    50,
+    110
+   ],
+   "stats": {
+    "calls": 130,
+    "triangles": 1095041,
+    "geometries": 390,
+    "textures": 78,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 38609
+  },
+  {
+   "id": "H1",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "H1_DAY_t40.jpg",
+   "pos": [
+    110,
+    241.7,
+    40
+   ],
+   "look": [
+    170,
+    241.2,
+    40
+   ],
+   "stats": {
+    "calls": 122,
+    "triangles": 527025,
+    "geometries": 424,
+    "textures": 81,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 22242
+  },
+  {
+   "id": "MC",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "MC_DAY_t40.jpg",
+   "pos": [
+    96,
+    4,
+    -18
+   ],
+   "look": [
+    122,
+    13,
+    6
+   ],
+   "stats": {
+    "calls": 159,
+    "triangles": 1082141,
+    "geometries": 425,
+    "textures": 82,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 24389
+  },
+  {
+   "id": "P1",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "P1_DAY_t40.jpg",
+   "pos": [
+    -40,
+    3,
+    -60
+   ],
+   "look": [
+    -20,
+    6,
+    -10
+   ],
+   "stats": {
+    "calls": 390,
+    "triangles": 2483172,
+    "geometries": 425,
+    "textures": 82,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 40858
+  },
+  {
+   "id": "V13",
+   "label": "plaza street level toward the tree elevator",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V13_NIGHT_t40.jpg",
+   "pos": [
+    -10,
+    3.2,
+    -14
+   ],
+   "look": [
+    30,
+    10,
+    40
+   ],
+   "stats": {
+    "calls": 320,
+    "triangles": 1786546,
+    "geometries": 430,
+    "textures": 85,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 53817
+  },
+  {
+   "id": "V16",
+   "label": "LEAN spire house on the north-west terrace",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V16_NIGHT_t40.jpg",
+   "pos": [
+    -82,
+    7,
+    238
+   ],
+   "look": [
+    -110,
+    15,
+    272
+   ],
+   "stats": {
+    "calls": 124,
+    "triangles": 787515,
+    "geometries": 430,
+    "textures": 85,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 46804
+  },
+  {
+   "id": "W2",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "W2_NIGHT_t40.jpg",
+   "pos": [
+    10,
+    3,
+    200
+   ],
+   "look": [
+    10,
+    1.5,
+    240
+   ],
+   "stats": {
+    "calls": 137,
+    "triangles": 2294190,
+    "geometries": 430,
+    "textures": 85,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 36963
+  },
+  {
+   "id": "P2",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "P2_NIGHT_t40.jpg",
+   "pos": [
+    40,
+    30,
+    -90
+   ],
+   "look": [
+    0,
+    20,
+    0
+   ],
+   "stats": {
+    "calls": 356,
+    "triangles": 2406630,
+    "geometries": 430,
+    "textures": 85,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 53016
+  },
+  {
+   "id": "T1",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "T1_NIGHT_t40.jpg",
+   "pos": [
+    -60,
+    20,
+    40
+   ],
+   "look": [
+    -230,
+    50,
+    110
+   ],
+   "stats": {
+    "calls": 122,
+    "triangles": 1086625,
+    "geometries": 430,
+    "textures": 85,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 59719
+  },
+  {
+   "id": "H1",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "H1_NIGHT_t40.jpg",
+   "pos": [
+    110,
+    241.7,
+    40
+   ],
+   "look": [
+    170,
+    241.2,
+    40
+   ],
+   "stats": {
+    "calls": 115,
+    "triangles": 525665,
+    "geometries": 430,
+    "textures": 85,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 37146
+  },
+  {
+   "id": "MC",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "MC_NIGHT_t40.jpg",
+   "pos": [
+    96,
+    4,
+    -18
+   ],
+   "look": [
+    122,
+    13,
+    6
+   ],
+   "stats": {
+    "calls": 152,
+    "triangles": 1080781,
+    "geometries": 430,
+    "textures": 86,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 20193
+  },
+  {
+   "id": "P1",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "P1_NIGHT_t40.jpg",
+   "pos": [
+    -40,
+    3,
+    -60
+   ],
+   "look": [
+    -20,
+    6,
+    -10
+   ],
+   "stats": {
+    "calls": 385,
+    "triangles": 2483604,
+    "geometries": 430,
+    "textures": 86,
+    "programs": 155
+   },
+   "frames_in_600ms": 0,
+   "ms": 60414
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 8,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife ready: HORSE, PHOENIX, FISH — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (1390 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (26 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (81 ms)",
+   "aura: 45 spectral auras in one draw (2 following)",
+   "worldB aura ready (4 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 21933.9,
+  "error": null
+ },
+ "finished": "2026-09-27T00:59:05.361Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 80,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L1 ready (6500 tris) — applies to figures created from now on",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife ready: HORSE, PHOENIX, FISH — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (1390 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (26 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (81 ms)",
+   "aura: 45 spectral auras in one draw (2 following)",
+   "worldB aura ready (4 ms)"
+  ]
+ }
+}

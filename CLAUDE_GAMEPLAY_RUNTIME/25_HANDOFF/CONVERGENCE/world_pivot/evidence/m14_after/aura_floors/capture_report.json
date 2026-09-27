@@ -1,0 +1,712 @@
+{
+ "started": "2026-09-27T00:52:28.717Z",
+ "size": [
+  960,
+  540
+ ],
+ "quality": "HIGH",
+ "settle_ms": 2500,
+ "views": [
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V06_DAY_t40.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 118,
+    "triangles": 1088965,
+    "geometries": 223,
+    "textures": 46,
+    "programs": 162
+   },
+   "frames_in_600ms": 0,
+   "ms": 42375
+  },
+  {
+   "id": "V09",
+   "label": "HALO dome from the ground",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V09_DAY_t40.jpg",
+   "pos": [
+    -130,
+    22,
+    -150
+   ],
+   "look": [
+    30,
+    230,
+    40
+   ],
+   "stats": {
+    "calls": 290,
+    "triangles": 1029409,
+    "geometries": 406,
+    "textures": 52,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 24808
+  },
+  {
+   "id": "V10",
+   "label": "sky toward the Sun",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V10_DAY_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    260,
+    150,
+    140
+   ],
+   "stats": {
+    "calls": 266,
+    "triangles": 1507479,
+    "geometries": 464,
+    "textures": 58,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 23673
+  },
+  {
+   "id": "V18",
+   "label": "plaza hardscape close (Mentor Spire base)",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V18_DAY_t40.jpg",
+   "pos": [
+    -2,
+    1.6,
+    -16
+   ],
+   "look": [
+    10,
+    0.2,
+    -6
+   ],
+   "stats": {
+    "calls": 246,
+    "triangles": 1417655,
+    "geometries": 477,
+    "textures": 58,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 36849
+  },
+  {
+   "id": "V20",
+   "label": "causeway road edge close",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V20_DAY_t40.jpg",
+   "pos": [
+    7,
+    1.7,
+    70
+   ],
+   "look": [
+    0,
+    0.3,
+    92
+   ],
+   "stats": {
+    "calls": 166,
+    "triangles": 1822950,
+    "geometries": 528,
+    "textures": 64,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 39121
+  },
+  {
+   "id": "V21",
+   "label": "sky away from the Sun (zenith depth, anti-solar band)",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V21_DAY_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    -120,
+    40,
+    -70
+   ],
+   "stats": {
+    "calls": 191,
+    "triangles": 956211,
+    "geometries": 534,
+    "textures": 64,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 36576
+  },
+  {
+   "id": "V25",
+   "label": "ATHLETE district paving close",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V25_DAY_t40.jpg",
+   "pos": [
+    -30,
+    1.8,
+    146
+   ],
+   "look": [
+    -30,
+    0,
+    162
+   ],
+   "stats": {
+    "calls": 160,
+    "triangles": 2262044,
+    "geometries": 535,
+    "textures": 66,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 31726
+  },
+  {
+   "id": "V32",
+   "label": "plaza hub toward the temple causeway (clear of the arena: V01 now sits on its roof)",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "V32_DAY_t40.jpg",
+   "pos": [
+    12,
+    1.7,
+    -4
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 257,
+    "triangles": 1993050,
+    "geometries": 550,
+    "textures": 70,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 43751
+  },
+  {
+   "id": "F3",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "F3_DAY_t40.jpg",
+   "pos": [
+    0,
+    1.7,
+    0
+   ],
+   "look": [
+    -320,
+    60,
+    -130
+   ],
+   "stats": {
+    "calls": 183,
+    "triangles": 963069,
+    "geometries": 552,
+    "textures": 70,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 48930
+  },
+  {
+   "id": "F4",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "F4_DAY_t40.jpg",
+   "pos": [
+    -250,
+    230,
+    -40
+   ],
+   "look": [
+    -398,
+    146,
+    -160
+   ],
+   "stats": {
+    "calls": 74,
+    "triangles": 441765,
+    "geometries": 552,
+    "textures": 70,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 20698
+  },
+  {
+   "id": "L1",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "L1_DAY_t40.jpg",
+   "pos": [
+    -150,
+    10,
+    240
+   ],
+   "look": [
+    -150,
+    18,
+    305
+   ],
+   "stats": {
+    "calls": 98,
+    "triangles": 857861,
+    "geometries": 552,
+    "textures": 70,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 17829
+  },
+  {
+   "id": "HX",
+   "label": "ad-hoc audit camera",
+   "tod": "DAY",
+   "clock": 40,
+   "file": "HX_DAY_t40.jpg",
+   "pos": [
+    -40,
+    40,
+    -200
+   ],
+   "look": [
+    30,
+    250,
+    40
+   ],
+   "stats": {
+    "calls": 280,
+    "triangles": 818607,
+    "geometries": 552,
+    "textures": 70,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 14116
+  },
+  {
+   "id": "V06",
+   "label": "VISIONARY purple highland overlook",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V06_NIGHT_t40.jpg",
+   "pos": [
+    -96,
+    14,
+    -8
+   ],
+   "look": [
+    -150,
+    12,
+    0
+   ],
+   "stats": {
+    "calls": 114,
+    "triangles": 892305,
+    "geometries": 556,
+    "textures": 75,
+    "programs": 163
+   },
+   "frames_in_600ms": 1,
+   "ms": 33305
+  },
+  {
+   "id": "V09",
+   "label": "HALO dome from the ground",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V09_NIGHT_t40.jpg",
+   "pos": [
+    -130,
+    22,
+    -150
+   ],
+   "look": [
+    30,
+    230,
+    40
+   ],
+   "stats": {
+    "calls": 296,
+    "triangles": 1061889,
+    "geometries": 557,
+    "textures": 76,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 22188
+  },
+  {
+   "id": "V10",
+   "label": "sky toward the Sun",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V10_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    260,
+    150,
+    140
+   ],
+   "stats": {
+    "calls": 272,
+    "triangles": 1526983,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 23853
+  },
+  {
+   "id": "V18",
+   "label": "plaza hardscape close (Mentor Spire base)",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V18_NIGHT_t40.jpg",
+   "pos": [
+    -2,
+    1.6,
+    -16
+   ],
+   "look": [
+    10,
+    0.2,
+    -6
+   ],
+   "stats": {
+    "calls": 251,
+    "triangles": 1430103,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 40574
+  },
+  {
+   "id": "V20",
+   "label": "causeway road edge close",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V20_NIGHT_t40.jpg",
+   "pos": [
+    7,
+    1.7,
+    70
+   ],
+   "look": [
+    0,
+    0.3,
+    92
+   ],
+   "stats": {
+    "calls": 178,
+    "triangles": 1833948,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 33359
+  },
+  {
+   "id": "V21",
+   "label": "sky away from the Sun (zenith depth, anti-solar band)",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V21_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    3,
+    0
+   ],
+   "look": [
+    -120,
+    40,
+    -70
+   ],
+   "stats": {
+    "calls": 192,
+    "triangles": 967521,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 30825
+  },
+  {
+   "id": "V25",
+   "label": "ATHLETE district paving close",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V25_NIGHT_t40.jpg",
+   "pos": [
+    -30,
+    1.8,
+    146
+   ],
+   "look": [
+    -30,
+    0,
+    162
+   ],
+   "stats": {
+    "calls": 160,
+    "triangles": 2272586,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 25490
+  },
+  {
+   "id": "V32",
+   "label": "plaza hub toward the temple causeway (clear of the arena: V01 now sits on its roof)",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "V32_NIGHT_t40.jpg",
+   "pos": [
+    12,
+    1.7,
+    -4
+   ],
+   "look": [
+    0,
+    6,
+    60
+   ],
+   "stats": {
+    "calls": 265,
+    "triangles": 2031106,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 43556
+  },
+  {
+   "id": "F3",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "F3_NIGHT_t40.jpg",
+   "pos": [
+    0,
+    1.7,
+    0
+   ],
+   "look": [
+    -320,
+    60,
+    -130
+   ],
+   "stats": {
+    "calls": 187,
+    "triangles": 974493,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 40876
+  },
+  {
+   "id": "F4",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "F4_NIGHT_t40.jpg",
+   "pos": [
+    -250,
+    230,
+    -40
+   ],
+   "look": [
+    -398,
+    146,
+    -160
+   ],
+   "stats": {
+    "calls": 77,
+    "triangles": 452421,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 14510
+  },
+  {
+   "id": "L1",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "L1_NIGHT_t40.jpg",
+   "pos": [
+    -150,
+    10,
+    240
+   ],
+   "look": [
+    -150,
+    18,
+    305
+   ],
+   "stats": {
+    "calls": 101,
+    "triangles": 868517,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 11589
+  },
+  {
+   "id": "HX",
+   "label": "ad-hoc audit camera",
+   "tod": "NIGHT",
+   "clock": 40,
+   "file": "HX_NIGHT_t40.jpg",
+   "pos": [
+    -40,
+    40,
+    -200
+   ],
+   "look": [
+    30,
+    250,
+    40
+   ],
+   "stats": {
+    "calls": 286,
+    "triangles": 851087,
+    "geometries": 559,
+    "textures": 77,
+    "programs": 163
+   },
+   "frames_in_600ms": 0,
+   "ms": 11923
+  }
+ ],
+ "console_errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "ready": {
+  "built": true,
+  "error": null,
+  "frames": 14,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "DAY",
+  "tier": "HIGH",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (1152 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (133 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (15 ms)",
+   "aura: 45 spectral auras in one draw, 2 sky moments in the backdrop, 25 dimensional forms in one draw (2 following)",
+   "worldB aura ready (3 ms)"
+  ]
+ },
+ "prewarm": {
+  "started": true,
+  "done": true,
+  "states": [
+   "DAY",
+   "NIGHT"
+  ],
+  "restored": "DAY",
+  "ms": 26350.2,
+  "error": null
+ },
+ "finished": "2026-09-27T01:05:45.100Z",
+ "final_state": {
+  "built": true,
+  "error": null,
+  "frames": 121,
+  "layout": {
+   "version": "FIELD_COLLIDERS_DISTRICT_V1",
+   "base": 28,
+   "district": 792,
+   "world": 9457
+  },
+  "world": {
+   "status": "READY",
+   "error": null
+  },
+  "tod": "NIGHT",
+  "tier": "HIGH",
+  "log": [
+   "creatures: DOGKIE_FOREST_CREATURE L2 ready (2600 tris) — applies to figures created from now on",
+   "wildlife PHOENIX: GOLDEN_PHOENIX_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.98×0.74×0.91 m, head at +z (2569 vs 490 verts), scale 3.740, rigid (root-weighted) → shader deformation",
+   "wildlife FISH: FISH_DEEPWATER_CREATURE L0 ready — rebase {\"rebased\":0,\"skinned_meshes\":1,\"untouched\":1,\"reason\":\"source inverse bind preserved\"}, mesh 0.84×0.42×0.98 m, head at +z (1750 vs 330 verts), scale 2.448, rigid (root-weighted) → shader deformation",
+   "wildlife HORSE: HORSE_RANGE_CREATURE L0 ready — rebase {\"rebased\":1,\"skinned_meshes\":1,\"untouched\":0}, mesh 0.27×0.73×0.98 m, head at +z (3216 vs 278 verts), scale 2.384, rigid (root-weighted) → shader deformation",
+   "wildlife ready: FISH, PHOENIX, HORSE — figures follow p.wildlife (host authority; payment UI: none — wild / pet metadata only)",
+   "worldB wildlife ready (1152 ms)",
+   "gear ready (bushes 41 × 64 shards, diamonds ≤ 104; dumbbell / barbell = the gym derivatives, band = procedural tube)",
+   "worldB gear ready (133 ms)",
+   "signage ready (30 wayfinders / 75 blades, 14 building names; labels ≤ 10 visible, fade 30–48 m)",
+   "worldB signage ready (15 ms)",
+   "aura: 45 spectral auras in one draw, 2 sky moments in the backdrop, 25 dimensional forms in one draw (2 following)",
+   "worldB aura ready (3 ms)"
+  ]
+ }
+}

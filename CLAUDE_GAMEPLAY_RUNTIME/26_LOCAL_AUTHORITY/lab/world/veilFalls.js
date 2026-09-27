@@ -199,6 +199,16 @@ export function createVeilFalls(ctx) {
       boxAt(darkP, 16, 0.8, 11, sp.x, sp.y + 0.4, sp.z, yaw); boxAt(glassP, 12, 3.6, 8, sp.x, sp.y + 0.8 + 1.8, sp.z, yaw);
       boxAt(bodyP, 13, 3.2, 8.5, sp.x + s * shift, sp.y + 0.8 + 3.4 + 1.6, sp.z + c * shift, yaw); boxAt(glassP, 13.2, 1.1, 8.7, sp.x + s * shift, sp.y + 0.8 + 3.4 + 1.7, sp.z + c * shift, yaw);
       boxAt(bodyP, 15.5, 0.35, 11, sp.x + s * shift * 1.3, sp.y + 0.8 + 6.6 + 0.18, sp.z + c * shift * 1.3, yaw); boxAt(darkP, 15.7, 0.12, 11.2, sp.x + s * shift * 1.3, sp.y + 0.8 + 6.6 - 0.02, sp.z + c * shift * 1.3, yaw); boxAt(bodyP, 1.2, 6.6, 1.2, sp.x - s * 5.2 - c * 4.8, sp.y + 0.8 + 3.3, sp.z - c * 5.2 + s * 4.8, yaw); }
+    /* M15 ARCADES (owner reference renders: "a terraced waterfall civilization" — lit arcades along the cliffs): on each side of the lip, set
+       6 m back on the plateau, four filleted piers-and-arches bays carry a deck; warm light fills each opening at night (the villa glass),
+       so from the plaza the top of the falls reads as a lived-in, lit edge. Beyond the host reach like the rest of the highland. */
+    (function () { var tx = -oz, tz = ox, yawA = Math.atan2(-tz, tx), BW = 5.5, NB = 4, PH = 5.0, AR2 = BW / 2 - 0.45, S0 = LIPW * 0.5 + 10;
+      [-1, 1].forEach(function (sd) { var at = function (o, back) { var x = lip.x + tx * o + ox * back, z = lip.z + tz * o + oz * back; return { x: x, z: z, y: TOP + roll(x, z) }; };
+        for (var b = 0; b <= NB; b++) { var P = at(sd * (S0 + b * BW), 6); boxAt(bodyP, 0.9, PH, 0.9, P.x, P.y + PH / 2, P.z, yawA);
+          if (b < NB) { var Q = at(sd * (S0 + b * BW + BW / 2), 6), arc = new THREE.TorusGeometry(AR2, 0.24, 6, 14, Math.PI); arc.rotateY(yawA); arc.translate(Q.x, Q.y + PH - AR2 - 0.3, Q.z); bodyP.push(arc);
+            var F2 = at(sd * (S0 + b * BW + BW / 2), 6.45); boxAt(glassP, BW - 1.2, PH - 1.3, 0.12, F2.x, F2.y + 0.2 + (PH - 1.3) / 2, F2.z, yawA); } }
+        var D = at(sd * (S0 + NB * BW / 2), 6); boxAt(bodyP, NB * BW + 1.4, 0.55, 2.2, D.x, D.y + PH + 0.3, D.z, yawA); });
+      info.arcades = 2 * NB; })();
     /* the BELVEDERE: a cantilevered glass viewing deck at the lip beside the falls (dark soffit + platinum frame + lit glass) — seen from the
        highland below as a small lit silhouette at the top of the water: the cue that people go up there */
     (function () { var tx = -oz, tz = ox, bx = lip.x + tx * (LIPW * 0.5 + 9) - ox * 2, bz = lip.z + tz * (LIPW * 0.5 + 9) - oz * 2, by = TOP + 0.2, yawB = Math.atan2(-ox, -oz);
@@ -246,6 +256,7 @@ export function createVeilFalls(ctx) {
       if (ctx.auraForms) { var F = ctx.auraForms;   /* M14 DIMENSIONAL AURA: over the falls' crest, high above the highland, a pair of tilted soft rings turning against each other and a hexagonal frame above them — magic in the air, far from anyone's reach */
         F.push({ x: cMid.x - ox * 16, y: yTop + CH * 0.75, z: cMid.z - oz * 16, size: CH * 1.1, shape: 'RING', scale: [1, 14, 1], tint: 0xb48cff, intensity: 0.55, ground: yTop, axis: [ox, 0.5, oz], spin: 0.03, phase: 0.2 });
         F.push({ x: cMid.x - ox * 16, y: yTop + CH * 0.75, z: cMid.z - oz * 16, size: CH * 0.86, shape: 'RING', scale: [1, 12, 1], tint: 0xff9ad2, intensity: 0.45, ground: yTop, axis: [-oz, 0.4, ox], spin: -0.024, phase: 0.55 });
+        [[-26, 0.95, -18, 5.5, 0xb99cff], [-8, 1.6, 22, 4.2, 0xffa6d4], [14, 1.15, -30, 3.6, 0xb99cff]].forEach(function (k) { var tx = -oz, tz = ox; F.push({ x: cMid.x + ox * k[0] + tx * k[2], y: yTop + CH * k[1], z: cMid.z + oz * k[0] + tz * k[2], size: k[3], tint: k[4], ground: yTop, shape: 'CRYSTAL' }); });   /* M15: great violet diamonds hanging in the air over the falls (the owner's reference) */
         F.push({ x: cMid.x - ox * 10, y: yTop + CH * 1.35, z: cMid.z - oz * 10, size: CH * 0.42, shape: 'HEX', scale: [1, 0.4, 1], tint: 0x7fd0ff, intensity: 0.5, ground: yTop, axis: [0.2, 1, 0.3], spin: 0.04, phase: 0.8 }); }
       A.push({ x: cMid.x - ox * 8, y: gy, z: cMid.z - oz * 8, size: CH * 0.55, aspect: Math.max(1, HT / (CH * 0.95)), ring: 0, tint: 0x8c84c8, spectral: 0.55, intensity: 0.18, pull: 20, phase: 0.3 });   /* the veil glow hugging the curtain (fringes, no circle) */
       A.push({ x: baseX - ox * 6, y: 14, z: baseZ - oz * 6, size: CH * 0.8, aspect: 0.42, ring: 0, tint: 0xeef4ff, spectral: 0.35, intensity: 0.22, pull: 14, nightK: 1.25 });   /* the base spray bloom */

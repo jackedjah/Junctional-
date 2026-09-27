@@ -147,7 +147,29 @@ export function createMatchHall(ctx) {
      Presentation only: every part is ABOVE the 22 m collider top (≥ 21.75 m) and inside the 40 × 40 footprint; the host collider is
      unchanged (a matching collider for the tiers waits on the runtime bridge). Cost: +2 draws (tier glass, tip); the tier bodies, slabs and
      lines merge into the existing body / crown / line draws. */
-  var glassMat = null, glassU = null, tipM = null, tipGeo = null;
+  var glassMat = null, glassU = null, tipM = null, tipGeo = null, sigilMat = null, sigilTex = null, sigilGeo = null;
+  /* M15 SIGIL (owner 2026-09-27, reference renders: a stronger exterior identity): the MAH MATCH diamond sigil as a tall luminous panel on the
+     plaza-facing door facade and on the south face — a crystal diamond cut into an M, lit from within in TITAN blue rising into VISIONARY
+     violet, a slow light sweeping up through it. It sits on a graphite backing plate proud of the facade strips (9.4 – 17.6 m up). +1 draw. */
+  function sigilTexture() { if (typeof document === 'undefined') return null; var c = document.createElement('canvas'); c.width = 512; c.height = 768; var g = c.getContext('2d'); if (!g) return null;
+    g.clearRect(0, 0, 512, 768); g.lineJoin = 'round'; g.strokeStyle = '#ffffff'; g.shadowColor = '#ffffff'; g.shadowBlur = 18;
+    function dia(cx, cy, w, h, lw) { g.lineWidth = lw; g.beginPath(); g.moveTo(cx, cy - h); g.lineTo(cx + w, cy); g.lineTo(cx, cy + h); g.lineTo(cx - w, cy); g.closePath(); g.stroke(); }
+    dia(256, 330, 200, 300, 14); dia(256, 330, 150, 225, 5);
+    g.lineWidth = 16; g.beginPath(); g.moveTo(150, 440); g.lineTo(150, 250); g.lineTo(256, 360); g.lineTo(362, 250); g.lineTo(362, 440); g.stroke();   /* the M */
+    g.lineWidth = 6; g.beginPath(); g.moveTo(256, 360); g.lineTo(256, 520); g.stroke(); g.beginPath(); g.moveTo(256, 60); g.lineTo(256, 140); g.stroke();
+    g.font = '600 58px "Segoe UI", Arial, sans-serif'; g.textAlign = 'center'; try { g.letterSpacing = '10px'; } catch (e) { } g.shadowBlur = 10; g.fillStyle = '#ffffff'; g.fillText('MAH MATCH', 256, 715);
+    var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; t.anisotropy = 4; return t; }
+  function sigils(hw, hd, d0, graphite) { sigilTex = sigilTexture(); if (!sigilTex) return;
+    var W = 5.5, Hh = 8.2, Y = 9.4, P = [], U = [], I = [], k = 0;   /* 9.4 – 17.6 m: clear of the name plate below and the ticker band above */
+    function panel(cx, cz, nx, nz) { var tx = -nz, tz = nx; [[-1, 0], [1, 0], [1, 1], [-1, 1]].forEach(function (q) { P.push(cx + nx * 0.2 + tx * q[0] * W / 2, Y + q[1] * Hh, cz + nz * 0.2 + tz * q[0] * W / 2); U.push((q[0] * (nx + nz < 0 ? -1 : 1) + 1) / 2, q[1]); }); I.push(k, k + 1, k + 2, k, k + 2, k + 3); k += 4;
+      var bw = Math.abs(nx) > 0 ? 0.24 : W + 0.8, bd = Math.abs(nx) > 0 ? W + 0.8 : 0.24; graphite.push(box(bw, Hh + 0.8, bd, cx + nx * 0.09, Y - 0.4, cz + nz * 0.09)); }
+    panel(-hw, d0 > 0 ? d0 - 9.5 : d0 + 9.5, -1, 0);   /* door facade, beside the portal */
+    panel(4, -hd, 0, -1);   /* south face */
+    sigilGeo = new THREE.BufferGeometry(); sigilGeo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); sigilGeo.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2)); sigilGeo.setIndex(I); sigilGeo.computeBoundingSphere();
+    sigilMat = new THREE.ShaderMaterial({ uniforms: { uMap: { value: sigilTex }, uTime: facadeU ? facadeU.uTime : { value: 0 }, uNight: facadeU ? facadeU.uNight : { value: night ? 1 : 0 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false,
+      vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: 'uniform sampler2D uMap; uniform float uTime; uniform float uNight; varying vec2 vUv; void main() { float a = texture2D(uMap, vUv).r; if (a < 0.01) discard; vec3 B = vec3(0.028, 0.147, 1.0), V = vec3(0.254, 0.074, 1.0); vec3 c = mix(B, V, smoothstep(0.15, 0.95, vUv.y + 0.08 * sin(uTime * 0.3)));\n float sweep = exp(-pow(fract(vUv.y * 0.8 - uTime * 0.09) - 0.5, 2.0) * 40.0); c = mix(c, vec3(0.85, 0.9, 1.0), 0.35 * a * a) * (0.9 + 1.3 * sweep);\n gl_FragColor = vec4(c * a * mix(0.55, 1.35, uNight), 1.0); }' });
+    sigilMat.name = 'matchHall_sigil'; }
   function tierQ() { try { return ctx.quality && ctx.quality.tier ? String(ctx.quality.tier()).toUpperCase() : 'HIGH'; } catch (e) { return 'HIGH'; } }
   /* a vertical strip following a rounded-rect outline (w × d, corner r, centred at cx, cz) from y0 to y1, pushed off the outline by off;
      outward normals, u in metres along the outline; room = [floor y, room height] adds the glass aGlass attribute */
@@ -238,11 +260,13 @@ export function createMatchHall(ctx) {
     neoTokyo(hw, hd, d0, dw, dh, bodyTop, cyan, graphite);   /* M12: the ticker band, the signage blade and its lit edges */
     [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (c) { cyan.push(tag(box(0.2, bodyTop - PLINTH - 0.9, 0.2, c[0] * (hw + 0.02), PLINTH + 0.6, c[1] * (hd + 0.02)), 4)); });   /* M14: light rivers up the body's corners */
     var glass = []; skyGlass(); var sky = skyTiers(hw, hd, H, black, graphite, platinum, cyan, glass);   /* M14: the stacked sky tiers */
+    sigils(hw, hd, d0, graphite);   /* M15: the diamond sigil panels */
     /* assemble */
     var g = new THREE.Group(); g.name = 'MATCH_HALL'; g.position.set(A.position[0], 0, A.position[2]); g.rotation.y = F.theta; g.userData.noMerge = true;
     var gem = new THREE.OctahedronGeometry(0.8, 0); gem.scale(1, 1.6, 1); gem.translate(sky.tx, sky.gemY, 0); platinum.push(gem);   /* M14: the roof diamond is now the crest on the crown mast (was on the flat roof, y 21.6 – 24.2) */
     var meshes = [merged(black, mat('black', { color: 0x0b0d11, roughness: 0.42, metalness: 0.8 }), 'MATCH_HALL_BODY', true), merged(graphite, mat('graphite', { color: 0x1d2229, roughness: 0.55, metalness: 0.75 }), 'MATCH_HALL_CROWN', true), merged(platinum, mat('platinum', { color: 0xdfe6ee, roughness: 0.34, metalness: 0.82 }), 'MATCH_HALL_PLINTH', true), merged(cyan, facadeMat || lineMat, 'MATCH_HALL_LINES', false)];
     var gm = merged(glass, glassMat, 'MATCH_HALL_SKY_GLASS', false); if (gm) { gm.renderOrder = 1; meshes.push(gm); }
+    if (sigilGeo && sigilMat) { var sg = new THREE.Mesh(sigilGeo, sigilMat); sg.name = 'MATCH_HALL_SIGIL'; sg.renderOrder = 4; meshes.push(sg); }
     if (tipGeo) { tipM = tipMaterial(THREE); var tp = new THREE.Mesh(tipGeo, tipM); tp.name = 'MATCH_HALL_CROWN_TIP'; tp.userData.tris = Math.round(tipGeo.index ? tipGeo.index.count / 3 : tipGeo.attributes.position.count / 3); meshes.push(tp); }
     if (tickerGeo) { var tk = new THREE.Mesh(tickerGeo, tickerMat); tk.name = 'MATCH_HALL_TICKER'; tk.renderOrder = 3; meshes.push(tk); } if (bladeGeo) { var bl = new THREE.Mesh(bladeGeo, [graphiteM2, bladeMat]); bl.name = 'MATCH_HALL_SIGN_BLADE'; meshes.push(bl); }
     var tris = 0; meshes.forEach(function (m) { if (m) { g.add(m); tris += m.userData.tris || 0; } });
@@ -332,7 +356,7 @@ export function createMatchHall(ctx) {
     buildInterior: buildInterior,
     dispose: function () {
       groups.forEach(function (g) { if (g.parent) g.parent.remove(g); g.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); }); groups = [];
-      [facadeMat, tickerMat, tickerTex, bladeMat, bladeTex, glassMat, tipM].forEach(function (o) { if (o) o.dispose(); }); facadeMat = tickerMat = tickerTex = bladeMat = bladeTex = glassMat = tipM = null; glassU = null; if (tipGeo) tipGeo.dispose(); tipGeo = null; if (tickerGeo) tickerGeo.dispose(); if (bladeGeo) bladeGeo.dispose(); tickerGeo = bladeGeo = null;
+      [facadeMat, tickerMat, tickerTex, bladeMat, bladeTex, glassMat, tipM, sigilMat, sigilTex, sigilGeo].forEach(function (o) { if (o) o.dispose(); }); facadeMat = tickerMat = tickerTex = bladeMat = bladeTex = glassMat = tipM = sigilMat = sigilTex = sigilGeo = null; glassU = null; if (tipGeo) tipGeo.dispose(); tipGeo = null; if (tickerGeo) tickerGeo.dispose(); if (bladeGeo) bladeGeo.dispose(); tickerGeo = bladeGeo = null;
       if (lineMat) lineMat.dispose(); if (gateMat) gateMat.dispose(); if (plateMat) plateMat.dispose(); if (plateTex) plateTex.dispose(); lineMat = gateMat = plateMat = plateTex = null; stats.building = stats.court = null; if (_instance === api) _instance = null;
     },
     debug: function () { return { building: stats.building, court: stats.court, interior: stats.interior, night: night, draw_calls_field: (stats.building ? stats.building.draw_calls : 0) + (stats.court ? stats.court.draw_calls : 0) }; }

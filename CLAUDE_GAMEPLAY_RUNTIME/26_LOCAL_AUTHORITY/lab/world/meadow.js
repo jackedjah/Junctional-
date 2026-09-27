@@ -5,7 +5,7 @@
    (terrain.js). Placement is seeded per chunk and excluded from lanes / paths / plaza / landmarks / water / doors / spawn points (the same
    exclusion the trees and shards use). A subtle shimmer: the emissive breathes by instance hash × time in the vertex shader (no per-instance
    CPU work). Budget: registry ground_detail.meadow (density_per_m2, max_instances); tick() only toggles chunk visibility / counts every 0.25 s. */
-import { forestExclusions, groundYAt } from './worldLayout.js';
+import { forestExclusions, groundYAt } from './worldLayout.js'; import { combatZoneCircles } from './combatZones.js';
 
 export function createMeadow(ctx) {
   var THREE = ctx.THREE, log = ctx.log || function () { }; var reg = ctx.registry || {}; var GD = reg.ground_detail || {}; var MD = GD.meadow || null; var FAM = reg.crystal_families || {};
@@ -20,7 +20,7 @@ export function createMeadow(ctx) {
     var lms = (ctx.layout && ctx.layout.landmarks || []).map(function (l) { return l.envelope || l; }); var ex = forestExclusions(reg, lms);
     var PW = reg.paths || {}; var widths = { CAUSEWAY: PW.causeway_w || 8, REGIONAL: PW.regional_w || 3.6, TRAIL: PW.trail_w || 1.8 }; var pathSegs = []; (PW.list || []).forEach(function (P) { var w = (widths[P.tier] || 3) / 2 + 1.2; for (var i = 0; i < P.pts.length - 1; i++) pathSegs.push({ a: P.pts[i], b: P.pts[i + 1], w: w }); if (P.forecourt) pathSegs.push({ a: [P.forecourt.x, P.forecourt.z], b: [P.forecourt.x, P.forecourt.z], w: (P.forecourt.r || 12) + 1 }); [P.spur, P.spur2].forEach(function (S) { if (S && S.to && P.forecourt) pathSegs.push({ a: [P.forecourt.x, P.forecourt.z], b: S.to, w: (PW.spur_w || 6) / 2 + 1 }); }); });
     var waters = ((reg.water && reg.water.rivers) || []).map(function (r) { return { x1: r.x1 - 1, z1: r.z1 - 1, x2: r.x2 + 1, z2: r.z2 + 1 }; }); var houses = ((reg.architecture && reg.architecture.class_houses) || []).map(function (h) { return { x: h.x, z: h.z, r: 12 }; });
-    var allRects = ex.rects.concat(waters), allCircles = ex.circles.concat(houses), allSegs = ex.segs.concat(pathSegs);
+    var allRects = ex.rects.concat(waters), allCircles = ex.circles.concat(houses, combatZoneCircles(reg, 1.5)), allSegs = ex.segs.concat(pathSegs);
     /* M9 (audit: crystal blades lay like confetti on the paved squares — temple forecourt, TITAN hex squares, the canal promenade): the
        district floors are PAVED (M8B zoned paving) and dissolve into natural ground only inside the FOREST / garden zones (M8C). A blade now
        grows only there: inside a natural zone, its edge feathered by value noise so the planting thins out toward the paving. */

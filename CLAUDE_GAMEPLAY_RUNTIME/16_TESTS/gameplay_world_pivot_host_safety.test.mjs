@@ -10,7 +10,7 @@ import { ridgeStations, ridgeFaceSegment, ridgeFacePoint, ridgeReachBounds } fro
 import { veilCurtainKeep } from '../26_LOCAL_AUTHORITY/lab/world/veilFalls.js';
 import { ridgeWarpField, sculptRidge, REACH_IN, REACH_FLOOR } from '../26_LOCAL_AUTHORITY/lab/world/ridgeSculpt.js';
 import { buildRoadNetwork } from '../26_LOCAL_AUTHORITY/lab/world/roadNetwork.js';
-import { formsSafe, FORM } from '../26_LOCAL_AUTHORITY/lab/world/auraForms.js';
+import { formsSafe, FORM, crystalLowest } from '../26_LOCAL_AUTHORITY/lab/world/auraForms.js';
 var HERE = path.dirname(fileURLToPath(import.meta.url)); var LA = path.join(HERE, '..', '26_LOCAL_AUTHORITY');
 var pass = 0, fail = 0; function ok(name, cond, detail) { if (cond) { pass++; console.log('PASS ' + name); } else { fail++; console.log('FAIL ' + name + (detail === undefined ? '' : ' — ' + JSON.stringify(detail).slice(0, 1600))); } }
 function src(rel) { return fs.readFileSync(path.join(LA, rel), 'utf8'); }
@@ -193,4 +193,11 @@ var hr = /R = H\.shell_radius_m \+ ([0-9.]+);/.exec(AURA), haloInner = hr ? 0.44
 var tiersAbove = /var LOWQ = tierQ\(\) === 'LOW', seg = LOWQ \? 56 : 96, y = H - 0\.25,/.test(MHALL) && /sky_tiers: \{ tiers: sky\.tiers/.test(MHALL);
 var veilUp = /y: yTop \+ CH \* 0\.75, z: cMid\.z - oz \* 16, size: CH \* 1\.1/.test(VEIL) && 0.75 - 1.1 * 0.56 * 1.035 - 1.1 * 0.06 > 0;
 ok('18. M14 aura forms are additive light (no depth write, no collider, non-interactable); the lead-monolith form clears 3.4 m (lowest ' + monoLow.toFixed(2) + ' m); the HALO sky rings clear the shell (' + haloInner.toFixed(1) + ' m > ' + HALO_LAYOUT.shell_radius_m + ' m) and the structural deck; the Veil rings stay above the crest; the MAH MATCH tiers start at the collider top', pureLight && monoRule && monoLow >= 3.4 && haloInner > Math.max(HALO_LAYOUT.shell_radius_m, HALO_LAYOUT.structural_deck_radius_m) + 3 && tiersAbove && veilUp && FORM.RING === 0, { pureLight: pureLight, monoRule: monoRule, monoLow: monoLow, haloInner: haloInner, tiersAbove: tiersAbove, veilUp: veilUp });
+/* 19. M15 floating crystals hang high (lowest point ≥ 12 m above the ground below, the listed sky set parsed from aura.js; the Veil set sits
+       0.95 CH+ above the crest) and are flagged non-interactable; the night reflection streaks lie 4.5 cm above the floor as additive light. */
+var skyC = /\[\[-30, 42, -8, [\s\S]*?\]\]\.forEach/.exec(AURA), crysList = skyC ? JSON.parse(skyC[0].replace(/\.forEach$/, '').replace(/0x([0-9a-f]+)/gi, function (m, h) { return String(parseInt(h, 16)); })) : [], crysLow = Math.min.apply(Math, crysList.map(function (a) { return crystalLowest({ y: a[1], size: a[3], ground: 0 }); }));
+var WET = src('lab/world/wetReflect.js');
+var crysOk = crysList.length >= 6 && crysLow >= 12 && /userData\.nonInteractable = true; mesh\.castShadow = false/.test(FORMS) && /\[\[-26, 0\.95, -18, 5\.5, 0xb99cff\], \[-8, 1\.6, 22, 4\.2, 0xffa6d4\], \[14, 1\.15, -30, 3\.6, 0xb99cff\]\]/.test(VEIL);
+var wetOk = /vec4\(p\.x, iL\.y \+ 0\.045, p\.y, 1\.0\)/.test(WET) && /depthWrite: false, depthTest: true, blending: THREE\.AdditiveBlending/.test(WET) && /userData\.nonInteractable = true/.test(WET);
+ok('19. M15 floating crystals stay high (' + crysList.length + ' sky crystals, lowest ' + crysLow.toFixed(1) + ' m) and non-interactable; night reflection streaks are flush additive light (4.5 cm)', crysOk && wetOk, { crysLow: crysLow, n: crysList.length, wetOk: wetOk });
 console.log('RESULT world pivot host safety: ' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

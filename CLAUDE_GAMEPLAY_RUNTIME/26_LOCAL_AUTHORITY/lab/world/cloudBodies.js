@@ -23,7 +23,7 @@ var VERT = [
   'attribute vec4 aPuff;',              /* x: height inside the cloud 0..1 · y: atlas shape (integer part 0..3) + seed (fraction) · z: alpha · w: flatten (base puffs) */
   'attribute vec2 aCloud;',             /* x: cloud base world y · y: cloud vertical extent (m) */
   'attribute vec4 aCentre;',            /* xyz: the cloud body's centre (world) · w: its radius (m) — the whole body is lit from the key's side */
-  'uniform vec3 uLightWorld; uniform float uOblong;',
+  'uniform vec3 uLightWorld; uniform float uOblong; uniform float uTime;',
   'varying vec2 vUv; varying vec2 vCell; varying vec4 vPuff; varying float vDist; varying float vH; varying vec3 vRel; varying vec2 vLs; varying float vElev; varying float vFwd; varying float vBelow; varying float vShell; varying float vFade;',
   'void main() {',
   '  float seed = fract(aPuff.y), shape = floor(aPuff.y + 0.001); bool flip = seed > 0.5;',
@@ -34,13 +34,13 @@ var VERT = [
   '  vec3 toCam = normalize(cameraPosition - centre);',
   '  float below = smoothstep(0.2, 0.7, -toCam.y); vBelow = below; float isPlate = step(1.5, aPuff.w), isBase = step(0.5, aPuff.w) * (1.0 - isPlate); sy *= 1.0 + below * (0.6 + 0.9 * min(aPuff.w, 1.0));',
   '  float under = smoothstep(0.03, 0.35, -toCam.y); vFade = mix(mix(1.0, 1.0 - 0.85 * under, isBase), under, isPlate);',
-  '  float oblong = 1.0 + (1.0 - isPlate) * uOblong * (0.5 + 0.45 * min(aPuff.w, 1.0) + 0.45 * fract(seed * 5.31)); sx *= oblong; sy *= 1.0 - 0.2 * uOblong * (1.0 - isPlate);',   /* M14: stretched along the horizon (base puffs most, each a little differently), a touch flatter — drifting masses, not balls */   /* M9: the plate appears as the base puffs fade, once the body is overhead */   /* seen from below, puffs spread vertically so the underside closes into one flat grey surface (thin stacked puffs read as slices) */
+  '  float oblong = 1.0 + (1.0 - isPlate) * uOblong * (0.62 + 0.45 * min(aPuff.w, 1.0) + 0.45 * fract(seed * 5.31)); sx *= oblong; sy *= 1.0 - 0.26 * uOblong * (1.0 - isPlate);',   /* M14: stretched along the horizon (base puffs most, each a little differently), a touch flatter — drifting masses, not balls */   /* M9: the plate appears as the base puffs fade, once the body is overhead */   /* seen from below, puffs spread vertically so the underside closes into one flat grey surface (thin stacked puffs read as slices) */
   '  vec3 viewUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);',
   '  vec3 camUp = normalize(mix(vec3(0.0, 1.0, 0.0), viewUp, smoothstep(0.35, 0.85, abs(toCam.y))));',   /* upright near the horizon (flat base, crown up); camera-facing when looked at steeply from below/above so puffs never foreshorten into stacked discs */
   '  vec3 camRight = normalize(cross(camUp, toCam)); camUp = normalize(cross(toCam, camRight));',
   '  float rot = (1.0 - step(0.25, aPuff.w)) * (fract(seed * 7.13) - 0.5) * 0.9 * (1.0 - 0.7 * uOblong), cr = cos(rot), sr = sin(rot); vec2 q = vec2(position.x * sx, position.y * sy);',
   '  vec3 tX = camRight * cr + camUp * sr, tY = camUp * cr - camRight * sr;',   /* M10: crown puffs turn up to ±26° in their own plane, so the four atlas shapes never stand in the same pose */
-  '  vec3 world = centre + tX * q.x + tY * q.y;',
+  '  vec3 world = centre + tX * q.x + tY * q.y + (tX * sin(uTime * 0.035 + seed * 31.0) * 0.07 * sx + tY * sin(uTime * 0.027 + seed * 17.0) * 0.035 * sy) * (1.0 - isPlate);',   /* M15: every lobe drifts slowly inside its body, so a cloud never just sits there */
   '  if (isPlate > 0.5) { world = centre + mat3(instanceMatrix) * vec3(position.x, 0.0, position.y); vBelow = 1.0; }',   /* the base plate lies flat in the body's own frame */
   '  vH = clamp((world.y - aCloud.x) / max(aCloud.y, 1.0), 0.0, 1.0);',   /* shade by height inside the WHOLE cloud: no per-puff banding */
   '  vRel = ((centre - aCentre.xyz) + (world - centre) * 0.35 * (1.0 - below)) / max(aCentre.w, 1.0);',   /* body-side light is taken at the PUFF centre (plus a little in-puff gradient seen side-on): per-fragment it painted the same gradient on every puff, which stacked into plates seen from below */
@@ -93,8 +93,9 @@ var FRAG = [
   '  float thin = 1.0 - smoothstep(0.1, 0.72, dens), ph = cN(vUv * 2.3 + vec2(vPuff.y * 9.0, uTime * 0.01));',   /* M14 AURA: a faint pearl sheen on the thin edges — violet / pink away from the key, pale gold toward it */
   '  vec3 aur = mix(mix(uAuraB, uAuraC, smoothstep(0.3, 0.75, ph)), uAuraA, sunK * 0.65 * (1.0 - vBelow)); float lum = max(max(col.r, col.g), col.b);',
   '  col = mix(col, aur * lum, clamp(thin * (0.35 + 0.65 * shell) * uAuraK * (1.0 - 0.6 * fogK), 0.0, 1.0));',
-  '  col = mix(col, uHaze, clamp(fogK + horK * 0.55, 0.0, 0.92)); a *= (1.0 - horK * (0.6 + 0.2 * uDiffuse)) * (1.0 - fogK * (0.3 + 0.4 * uDiffuse));',   /* M14: distant bodies thin out harder into the haze (less direct visibility, more presence) */
-  '  a *= mix(1.0, smoothstep(0.0, 0.75, dens), clamp(fogK / max(uHazeMax, 0.05), 0.0, 1.0) * uDiffuse);',   /* …and their outlines go softer with distance */
+  '  col = mix(col, uHaze, clamp(fogK + horK * 0.55, 0.0, 0.92)); a *= (1.0 - horK * (0.6 + 0.25 * uDiffuse)) * (1.0 - fogK * (0.3 + 0.5 * uDiffuse));',   /* M14: distant bodies thin out harder into the haze (less direct visibility, more presence) */
+  '  a *= mix(1.0, smoothstep(0.0, 0.75, dens), clamp(fogK / max(uHazeMax, 0.05), 0.0, 1.0) * uDiffuse);',
+  '  { float wisp = cN(vec2(vUv.x * 3.0 + vPuff.y * 5.0 - uTime * 0.01, vUv.y * 16.0 + vPuff.y * 9.0)); a *= mix(1.0, 0.5 + 0.5 * wisp, (1.0 - smoothstep(0.25, 0.8, dens)) * uDiffuse * shell); }',   /* M15: the thin rims draw out into wind-combed streaks (aura texture), not round bubble edges */   /* …and their outlines go softer with distance */
   '  gl_FragColor = vec4(col, a);',
   '  #include <colorspace_fragment>',
   '}'].join('\n');

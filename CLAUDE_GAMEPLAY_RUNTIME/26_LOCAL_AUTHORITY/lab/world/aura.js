@@ -9,7 +9,7 @@
    LOW tier keeps the bloom and drops the fringes. */
 
 import { celestialDirection } from './celestial.js';
-import { createAuraForms } from './auraForms.js';
+import { createAuraForms, createFloatingCrystals } from './auraForms.js';
 import { HALO_LAYOUT } from '../../play/haloLayout.js';
 
 export var SPECTRAL = { violet: 0xb48cff, ice: 0x7fd0ff, white: 0xf4f6ff, gold: 0xffd88a, pink: 0xff9ad2 };
@@ -104,22 +104,28 @@ export function createAura(ctx) {
   function skyForms(F) { var H = HALO_LAYOUT, cy = H.arrival_height_m + 22, R = H.shell_radius_m + 32;
     F.push({ x: H.center.x, y: cy, z: H.center.z, size: R * 2, shape: 'RING', scale: [1, 40, 1], tint: 0xffd88a, intensity: 0.34, ground: 0, axis: [0.22, 1, 0.1], spin: 0.012, phase: 0.1 });
     F.push({ x: H.center.x, y: cy, z: H.center.z, size: (R + 14) * 2, shape: 'RING', scale: [1, 44, 1], tint: 0xb48cff, intensity: 0.3, ground: 0, axis: [1, 0.3, 0.45], spin: -0.009, phase: 0.6 });
-    F.push({ x: -60, y: 205, z: -560, size: 110, shape: 'HEX', scale: [1, 0.35, 1], tint: 0x7fd0ff, intensity: 0.34, ground: 0, axis: [0.3, 1, 0.2], spin: 0.02, phase: 0.35 });
-    F.push({ x: 540, y: 250, z: 320, size: 80, shape: 'DIAMOND', tint: 0xff9ad2, intensity: 0.3, ground: 0, axis: [0.1, 1, 0.25], spin: 0.03, phase: 0.72 }); }
-  var skyField = null, forms = null, skyFollowers = [];
+    F.push({ x: -60, y: 205, z: -560, size: 110, shape: 'HEX', scale: [1, 0.35, 1], tint: 0x7fd0ff, intensity: 0.24, ground: 0, axis: [0.3, 1, 0.2], spin: 0.02, phase: 0.35 });
+    F.push({ x: 540, y: 250, z: 320, size: 80, shape: 'DIAMOND', tint: 0xff9ad2, intensity: 0.18, ground: 0, axis: [0.1, 1, 0.25], spin: 0.03, phase: 0.72 }); }
+  /* M15 FLOATING CRYSTALS (owner reference renders): great violet diamonds hanging high over the plaza, the highland, the river, TITAN and the
+     north-west terrace, and two far out in the sky — all 40 m+ above the ground; modules may add more (shape 'CRYSTAL' in ctx.auraForms) */
+  function skyCrystals(C) { [[-30, 42, -8, 4.2, 0xb99cff], [58, 58, -40, 3.2, 0xffa6d4], [-120, 64, 20, 5.5, 0xb99cff], [0, 70, 215, 4.8, 0xb99cff], [140, 62, 150, 4.0, 0x7fd0ff], [-150, 72, 240, 5.0, 0xb99cff], [-300, 150, -120, 14, 0xb99cff], [300, 180, 60, 12, 0xffa6d4]].forEach(function (a) { C.push({ x: a[0], y: a[1], z: a[2], size: a[3], tint: a[4], ground: 0, shape: 'CRYSTAL' }); }); }
+  var skyField = null, forms = null, skyFollowers = [], crystals = null;
   function build() { var req = ctx.auraRequests || [], sky = []; skyMoments(sky);
+    var cl = (ctx.auraForms || []).filter(function (f) { return f.shape === 'CRYSTAL'; }); skyCrystals(cl);
+    cl.forEach(function (c) { req.push({ x: c.x, y: c.y, z: c.z, size: c.size * 2.3, aspect: 1.25, ring: 0, tint: c.tint, spectral: 0.6, intensity: 0.2, pull: c.size, nightK: 1.9, phase: (c.x * 0.01) % 6 }); });   /* each crystal's soft bloom */
+    crystals = createFloatingCrystals(THREE, cl, { isNight: night, name: 'WORLD_FLOATING_CRYSTALS' }); if (crystals) ctx.group.add(crystals.mesh);
     if (req.length) { field = createAuraField(THREE, req, { isNight: night, tier: tier(), name: 'WORLD_SPECTRAL_AURA' }); if (field) ctx.group.add(field.mesh); }
     if (sky.length) { skyField = createAuraField(THREE, sky, { isNight: night, tier: tier(), name: 'SKY_SPECTRAL_AURA', renderOrder: -7.5 }); if (skyField) { skyField.mesh.material.transparent = false; ctx.group.add(skyField.mesh); } }   /* the celestial backdrop pass: additive, no depth write, before the world */
     [[req, field, followers], [sky, skyField, skyFollowers]].forEach(function (L) { if (L[1]) L[0].forEach(function (r, i) { if (typeof r.follow === 'function') L[2].push({ i: i, fn: r.follow, fade: r.fade || null, base: r.intensity === undefined ? 0.5 : r.intensity }); }); });
-    var fl = (ctx.auraForms || []).slice(); skyForms(fl); var tq = tier(); if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; });   /* LOW: every sky form, half the local ones */
+    var fl = (ctx.auraForms || []).filter(function (f) { return f.shape !== 'CRYSTAL'; }); skyForms(fl); var tq = tier(); if (tq === 'LOW') fl = fl.filter(function (f, i) { return f.size > 40 || i % 2 === 0; });   /* LOW: every sky form, half the local ones */
     forms = createAuraForms(THREE, fl, { isNight: night, tier: tq, name: 'WORLD_AURA_FORMS', day: 0.5, night: 1.0 }); if (forms) ctx.group.add(forms.mesh);
     log('aura: ' + req.length + ' spectral auras in one draw, ' + sky.length + ' sky moments in the backdrop, ' + (forms ? forms.count : 0) + ' dimensional forms in one draw (' + (followers.length + skyFollowers.length) + ' following)'); }
   function follow(f, list, t) { if (!f || !list.length) return; var P = f.positions, K = f.mesh.geometry.attributes.aK;
     for (var i = 0; i < list.length; i++) { var F = list[i], p = F.fn(t); if (p) { P.setXYZ(F.i, p[0], p[1], p[2]); } if (F.fade) K.setX(F.i, F.base * F.fade(t, night)); }
     P.needsUpdate = true; K.needsUpdate = true; }
-  function tick(dt, t) { if (field) field.tick(t); if (skyField) skyField.tick(t); if (forms) forms.tick(t); follow(field, followers, t); follow(skyField, skyFollowers, t); }
-  function setNight(n) { night = !!n; if (field) field.setNight(night); if (skyField) skyField.setNight(night); if (forms) forms.setNight(night); }
-  function dispose() { [field, skyField, forms].forEach(function (f) { if (f) { if (f.mesh.parent) f.mesh.parent.remove(f.mesh); f.dispose(); } }); field = skyField = forms = null; followers = []; skyFollowers = []; }
-  function debug() { return { count: field ? field.count : 0, sky_moments: skyField ? skyField.count : 0, forms: forms ? forms.count : 0, following: followers.length + skyFollowers.length }; }
+  function tick(dt, t) { if (field) field.tick(t); if (skyField) skyField.tick(t); if (forms) forms.tick(t); if (crystals) crystals.tick(t); follow(field, followers, t); follow(skyField, skyFollowers, t); }
+  function setNight(n) { night = !!n; if (field) field.setNight(night); if (skyField) skyField.setNight(night); if (forms) forms.setNight(night); if (crystals) crystals.setNight(night); }
+  function dispose() { [field, skyField, forms, crystals].forEach(function (f) { if (f) { if (f.mesh.parent) f.mesh.parent.remove(f.mesh); f.dispose(); } }); field = skyField = forms = crystals = null; followers = []; skyFollowers = []; }
+  function debug() { return { count: field ? field.count : 0, sky_moments: skyField ? skyField.count : 0, forms: forms ? forms.count : 0, crystals: crystals ? crystals.count : 0, following: followers.length + skyFollowers.length }; }
   return { build: build, tick: tick, setNight: setNight, dispose: dispose, debug: debug };
 }
